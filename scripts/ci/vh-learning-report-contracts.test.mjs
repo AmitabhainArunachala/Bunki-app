@@ -1,12 +1,20 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { mkdirSync, mkdtempSync, readFileSync, utimesSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   learningReportContracts,
   READER_CASES,
   READER_CONTROLS,
   READER_RUN_ROWS,
+  READER_D1_DAY,
+  READER_D1_PICKS,
   PUBLIC_DISCLOSURE,
 } from './vh-learning-report-contracts.mjs';
+import { validateGateEvidence } from './gate-evidence.mjs';
+import { digest } from './verification-admission.mjs';
 import {
   RECORD_ROWS,
   RECORD_CONTROLS,
@@ -21,6 +29,8 @@ const base = {
   fullAcceptance: true,
 };
 const context = { engine: 'chromium', ...base };
+const deliveryContext = { ...context, engine: 'all' };
+const shelf = (width) => `D1 ${width}: today's picks are on the shelf`;
 const clone = (x) => globalThis.structuredClone(x),
   triplet = (x) => ['tap', 'Enter', 'Space'].map((how) => ({ how, ...x }));
 const served = (key) => [
@@ -38,7 +48,12 @@ function reader() {
     engine: 'chromium',
     browserVersion: '1',
     pageErrors: [],
-    results: READER_CASES.map((id) => ({ id, pass: true })),
+    d1Day: READER_D1_DAY,
+    results: READER_CASES.map((id) =>
+      [1728, 390].some((width) => id === shelf(width))
+        ? { id, pass: true, observed: { day: READER_D1_DAY, count: READER_D1_PICKS } }
+        : { id, pass: true },
+    ),
     controls: [],
   };
   for (const [name, spec] of Object.entries(READER_CONTROLS)) {
@@ -103,125 +118,145 @@ function reader() {
 }
 const recordRows = (cases = Object.keys(RECORD_ROWS)) =>
   cases.flatMap((name) => RECORD_ROWS[name].map((id) => ({ id: `chromium/${id}`, ok: true })));
-function record() {
+function record(engines = ['chromium']) {
+  const files = new Map();
+  const at = (engine, label) => `/gate/record-depth/${engine}-${label}-Ab12Cd`;
+  const rowsFor = (engine, cases) =>
+    recordRows(cases).map((row) => ({ ...row, id: row.id.replace(/^chromium\//u, `${engine}/`) }));
   const report = {
     ...base,
     schema: 'vh-record-depth/1',
     phase: 'controls-parent',
     scope: 'full-engine',
     selectors: { controls: true, only: null, control: null },
-    engines: ['chromium'],
-    browsers: { chromium: '1' },
-    rows: recordRows(),
+    engines,
+    browsers: Object.fromEntries(engines.map((engine) => [engine, '1'])),
+    rows: engines.flatMap((engine) => rowsFor(engine)),
     controls: [],
   };
-  for (const [name, spec] of Object.entries(RECORD_CONTROLS)) {
-    const receipt = (phase) => ({
-      ...base,
-      runId: `${name}-${phase}`,
-      fullAcceptance: false,
-      engines: ['chromium'],
-      browsers: { chromium: '1' },
-      selectors: {
-        controls: false,
-        only: phase === 'candidate' ? null : [spec.case],
-        control: phase === 'mutant' ? name : null,
-      },
-      rows: recordRows(phase === 'candidate' ? undefined : [spec.case]),
-    });
-    const candidate = receipt('candidate'),
-      mutant = receipt('mutant'),
-      restore = receipt('restore');
-    const red = mutant.rows.find((row) => row.id === `chromium/${spec.kill}`);
-    red.ok = false;
-    red.observed =
-      name === 'kagami-spelling-only'
-        ? { rowReading: 'ねん', mirror: { toshi: true } }
-        : { head: '訳', reading: 'やく', tutor: true, page: 'STALE_WAKE_REASON' };
-    mutant.control = { served: served(name === 'kagami-spelling-only' ? 'door' : 'ref') };
-    const child = (receipt, code) => ({
-      valid: true,
-      status: { code, signal: null, timedOut: false },
-      receipt,
-    });
-    report.controls.push({
-      name,
-      engine: 'chromium',
-      verdict: 'killed',
-      candidate: child(candidate, 3),
-      mutant: child(mutant, 1),
-      restore: child(restore, 3),
-    });
+  const receipt = (engine, name, phase, spec) => ({
+    ...base,
+    nonce: `${engine}-${name}-${phase}`,
+    fullAcceptance: false,
+    engines: [engine],
+    browsers: { [engine]: '1' },
+    selectors: {
+      controls: false,
+      only: phase === 'candidate' ? null : [spec.case],
+      control: phase === 'mutant' ? name : null,
+    },
+    rows: rowsFor(engine, phase === 'candidate' ? undefined : [spec.case]),
+  });
+  const child = (dir, receipt, code) => {
+    files.set(`${dir}/verify-record-depth.json`, clone(receipt));
+    return { dir, valid: true, status: { code, signal: null, timedOut: false }, receipt };
+  };
+  for (const engine of engines) {
+    const candidate = child(at(engine, 'candidate'), receipt(engine, 'all', 'candidate'), 3);
+    for (const [name, spec] of Object.entries(RECORD_CONTROLS)) {
+      const mutant = receipt(engine, name, 'mutant', spec),
+        restore = receipt(engine, name, 'restore', spec);
+      const red = mutant.rows.find((row) => row.id === `${engine}/${spec.kill}`);
+      red.ok = false;
+      red.observed =
+        name === 'kagami-spelling-only'
+          ? { rowReading: 'ねん', mirror: { toshi: true } }
+          : { head: '訳', reading: 'やく', tutor: true, page: 'STALE_WAKE_REASON' };
+      mutant.control = { served: served(name === 'kagami-spelling-only' ? 'door' : 'ref') };
+      report.controls.push({
+        name,
+        engine,
+        verdict: 'killed',
+        candidate: clone(candidate),
+        mutant: child(at(engine, name), mutant, 1),
+        restore: child(at(engine, `${name}-restore`), restore, 3),
+      });
+    }
   }
-  return report;
+  const readReport = (path) => {
+    if (!files.has(path)) throw new Error(`Required receipt missing: ${path}`);
+    return clone(files.get(path));
+  };
+  return {
+    report,
+    files,
+    context: { ...context, engine: engines.length > 1 ? 'all' : engines[0], readReport },
+  };
 }
-function delivery() {
+function delivery(engines = ['chromium', 'webkit']) {
   const report = {
     ...base,
     schema: 'vh-report-delivery/1',
     scope: 'full-engine',
-    engines: ['chromium'],
-    browsers: { chromium: '1' },
-    checks: expectedReportChecks(['chromium']).map((name) => ({ name, pass: true })),
-    scenarios: [
-      'copy en',
-      'copy ja',
-      'prefilled issue',
-      'long report',
-      'blocked window',
-      'relay',
-      'no Blob storage',
-      'setup link',
-    ].map((name) => ({ name: `chromium · ${name}`, completed: true })),
+    engines,
+    browsers: Object.fromEntries(engines.map((engine) => [engine, '1'])),
+    checks: expectedReportChecks(engines).map((name) => ({ name, pass: true })),
+    scenarios: engines.flatMap((engine) =>
+      [
+        'copy en',
+        'copy ja',
+        'prefilled issue',
+        'long report',
+        'blocked window',
+        'relay',
+        'no Blob storage',
+        'setup link',
+      ].map((name) => ({ name: `${engine} · ${name}`, completed: true })),
+    ),
     controls: [],
   };
-  for (const locale of ['en', 'ja'])
-    for (const name of REPORT_COPY_CONTROLS) {
-      const pending = name === 'fallback-advertised-before-probe',
-        label = pending ? 'Send report' : locale === 'ja' ? '送る' : 'Send';
-      let before = {
-          observed: {
-            visible: label,
-            accessible: label,
-            visibleShown: true,
-            delivery: pending ? 'service' : 'github',
-            disabled: false,
+  for (const engine of engines)
+    for (const locale of ['en', 'ja'])
+      for (const name of REPORT_COPY_CONTROLS) {
+        const pending = name === 'fallback-advertised-before-probe',
+          label = pending ? 'Send report' : locale === 'ja' ? '送る' : 'Send';
+        let before = {
+            observed: {
+              visible: label,
+              accessible: label,
+              visibleShown: true,
+              delivery: pending ? 'service' : 'github',
+              disabled: false,
+            },
           },
-        },
-        mutant = clone(before);
-      if (name === 'fallback-copy-empty') mutant.observed.visible = '';
-      if (name === 'fallback-copy-wrong') mutant.observed.visible = 'Send report';
-      if (name === 'fallback-accessible-name-wrong') mutant.observed.accessible = 'wrong';
-      if (pending) mutant.observed.delivery = 'github';
-      if (name === 'public-disclosure-removed') {
-        before = {
-          observed: {
-            expected: PUBLIC_DISCLOSURE[locale],
-            pass: true,
-            text: PUBLIC_DISCLOSURE[locale],
-          },
-        };
-        mutant = {
-          observed: { expected: PUBLIC_DISCLOSURE[locale], pass: false, text: 'Details' },
-        };
+          mutant = clone(before);
+        if (name === 'fallback-copy-empty') mutant.observed.visible = '';
+        if (name === 'fallback-copy-wrong') mutant.observed.visible = 'Send report';
+        if (name === 'fallback-accessible-name-wrong') mutant.observed.accessible = 'wrong';
+        if (pending) mutant.observed.delivery = 'github';
+        if (name === 'public-disclosure-removed') {
+          before = {
+            observed: {
+              expected: PUBLIC_DISCLOSURE[locale],
+              pass: true,
+              text: PUBLIC_DISCLOSURE[locale],
+            },
+          };
+          mutant = {
+            observed: { expected: PUBLIC_DISCLOSURE[locale], pass: false, text: 'Details' },
+          };
+        }
+        report.controls.push({
+          engine,
+          locale,
+          name,
+          verdict: 'killed',
+          before,
+          mutant,
+          restored: clone(before),
+        });
       }
-      report.controls.push({
-        engine: 'chromium',
-        locale,
-        name,
-        verdict: 'killed',
-        before,
-        mutant,
-        restored: clone(before),
-      });
-    }
   return report;
 }
-const fixtures = { 'reader-doors': reader, 'record-depth': record, 'report-delivery': delivery };
+const fixtures = {
+  'reader-doors': () => ({ report: reader(), context }),
+  'record-depth': record,
+  'report-delivery': () => ({ report: delivery(), context: deliveryContext }),
+};
 for (const [kind, fixture] of Object.entries(fixtures)) {
   const adapter = learningReportContracts[kind];
   test(`${kind}: accepts exact completed candidate and rejects every individual omitted row/control`, () => {
-    const report = fixture();
+    const { report, context } = fixture();
     assert.deepEqual(adapter.validate(report, context).errors, []);
     const key = kind === 'reader-doors' ? 'results' : kind === 'record-depth' ? 'rows' : 'checks';
     for (let i = 0; i < report[key].length; i++) {
@@ -269,28 +304,261 @@ test('reader exact Escape witness, unrelated red, clean restore bytes, and engin
     false,
   );
 });
+const childFile = (r, index, phase) =>
+  `${r.report.controls[index][phase].dir}/verify-record-depth.json`;
+const onBoth = (r, phase, index, change) => {
+  for (const control of phase === 'candidate' ? r.report.controls : [r.report.controls[index]])
+    change(control[phase].receipt);
+  change(r.files.get(childFile(r, index, phase)));
+};
+const judgeRecord = (r) => learningReportContracts['record-depth'].validate(r.report, r.context);
+test('record admission keeps its independent17 rows when the producer helper loses a row', () => {
+  const removed = RECORD_ROWS.A.pop();
+  try {
+    const narrowed = record();
+    assert.equal(narrowed.report.rows.length, 16);
+    assert.equal(learningReportContracts['record-depth'].expectedCases('chromium').length, 17);
+    assert.equal(judgeRecord(narrowed).passed, false);
+  } finally {
+    RECORD_ROWS.A.push(removed);
+  }
+  assert.equal(judgeRecord(record()).passed, true);
+});
+test('record admission requires strict boolean observations in candidate, mutant and restore', () => {
+  for (const badValue of [undefined, null, 0, 1, 'true', 'false']) {
+    const parent = record();
+    parent.report.rows[0].ok = badValue;
+    assert.equal(judgeRecord(parent).passed, false);
+    for (const phase of ['candidate', 'restore']) {
+      const child = record();
+      onBoth(child, phase, 0, (receipt) => (receipt.rows[0].ok = badValue));
+      assert.equal(judgeRecord(child).passed, false, phase);
+    }
+    const mutant = record();
+    onBoth(mutant, 'mutant', 0, (receipt) => {
+      receipt.rows.find((row) => row.ok === false).ok = badValue;
+    });
+    assert.equal(
+      judgeRecord(mutant).passed,
+      false,
+      'a missing/truthy marker is not a named false witness',
+    );
+  }
+});
 test('record raw full run, filtered candidate, setup failures and false claimed kills cannot be accepted', () => {
   for (const mutate of [
-    (x) => (x.phase = 'candidate'),
-    (x) => (x.selectors.controls = false),
-    (x) => (x.controls[0].candidate.receipt.selectors.only = ['R']),
-    (x) => (x.controls[0].mutant.status.code = 0),
-    (x) => (x.controls[0].mutant.status.timedOut = true),
-    (x) => (x.controls[0].mutant.receipt.control.setupError = 'failed edit'),
-    (x) => (x.controls[0].mutant.receipt.rows.find((r) => !r.ok).observed = {}),
-    (x) => (x.controls[0].restore.receipt.rows[0].ok = false),
-    (x) => (x.controls[0].mutant.receipt.runId = x.controls[0].restore.receipt.runId),
-    (x) => (x.controls[0].mutant.receipt.control.served[0].baseSha256 = ''),
+    (r) => (r.report.phase = 'candidate'),
+    (r) => (r.report.selectors.controls = false),
+    (r) => onBoth(r, 'candidate', 0, (x) => (x.selectors.only = ['R'])),
+    (r) => (r.report.controls[0].mutant.status.code = 0),
+    (r) => (r.report.controls[0].mutant.status.timedOut = true),
+    (r) => onBoth(r, 'mutant', 0, (x) => (x.control.setupError = 'failed edit')),
+    (r) => onBoth(r, 'mutant', 0, (x) => (x.rows.find((row) => !row.ok).observed = {})),
+    (r) => onBoth(r, 'restore', 0, (x) => (x.rows[0].ok = false)),
+    (r) => onBoth(r, 'mutant', 0, (x) => (x.nonce = r.report.controls[0].restore.receipt.nonce)),
+    (r) => onBoth(r, 'mutant', 1, (x) => (x.nonce = r.report.controls[0].mutant.receipt.nonce)),
+    (r) => onBoth(r, 'mutant', 0, (x) => (x.control.served[0].baseSha256 = '')),
   ]) {
-    const bad = record();
-    mutate(bad);
-    assert.equal(learningReportContracts['record-depth'].validate(bad, context).passed, false);
+    const r = record();
+    mutate(r);
+    assert.equal(judgeRecord(r).passed, false);
   }
-  assert.equal(
-    learningReportContracts['record-depth'].validate(record(), { ...context, engine: 'all' })
-      .passed,
+  const r = record();
+  assert.equal(judgeRecord({ ...r, context: { ...r.context, engine: 'all' } }).passed, false);
+  const both = record(['chromium', 'webkit']);
+  assert.deepEqual(
+    learningReportContracts['record-depth-webkit'].validate(both.report, both.context).passed,
     false,
   );
+  assert.deepEqual(judgeRecord(both).errors, []);
+});
+test('record children are re-read fresh from their own attempt directories, never trusted from the parent copy', () => {
+  assert.deepEqual(judgeRecord(record()).errors, []);
+  for (const [label, mutate] of [
+    ['missing mutant receipt', (r) => r.files.delete(childFile(r, 0, 'mutant'))],
+    ['missing candidate receipt', (r) => r.files.delete(childFile(r, 0, 'candidate'))],
+    ['no fresh reader', (r) => delete r.context.readReport],
+    [
+      'stale restore refused by the reader',
+      (r) => {
+        const read = r.context.readReport;
+        r.context.readReport = (path) => {
+          if (path === childFile(r, 0, 'restore')) throw new Error(`Stale receipt: ${path}`);
+          return read(path);
+        };
+      },
+    ],
+    ['foreign child run', (r) => onBoth(r, 'restore', 0, (x) => (x.runId = 'other-run'))],
+    ['missing child nonce', (r) => onBoth(r, 'mutant', 0, (x) => delete x.nonce)],
+    [
+      'red disk restore, green parent copy',
+      (r) => (r.files.get(childFile(r, 0, 'restore')).rows[0].ok = false),
+    ],
+    [
+      'doctored parent copy of a genuine kill',
+      (r) =>
+        (r.report.controls[0].mutant.receipt.rows.find((row) => !row.ok).observed = {
+          doctored: true,
+        }),
+    ],
+    [
+      'restore child error',
+      (r) => onBoth(r, 'restore', 0, (x) => (x.terminalError = 'Error: restore failed')),
+    ],
+    [
+      'mutant pointed at the restore attempt',
+      (r) => {
+        r.report.controls[0].mutant.dir = r.report.controls[0].restore.dir;
+        r.report.controls[0].mutant.receipt = clone(r.report.controls[0].restore.receipt);
+      },
+    ],
+    [
+      'attempt directory outside the declared naming',
+      (r) => {
+        const dir = '/gate/record-depth/elsewhere';
+        r.files.set(`${dir}/verify-record-depth.json`, r.files.get(childFile(r, 0, 'mutant')));
+        r.report.controls[0].mutant.dir = dir;
+      },
+    ],
+    ['parent rows not the candidate rows', (r) => (r.report.rows[0].observed = 'doctored')],
+    ['parent version not the candidate version', (r) => (r.report.browsers.chromium = '2')],
+  ]) {
+    const r = record();
+    mutate(r);
+    assert.equal(judgeRecord(r).passed, false, label);
+  }
+});
+test('record-depth admission reads fresh child receipts from disk through the real gate consumer', () => {
+  const root = fileURLToPath(new globalThis.URL('../..', import.meta.url));
+  const producerSha = digest(
+    readFileSync(join(root, 'prototypes/corridor/tools/verify-record-depth.mjs')),
+  );
+  const materialize = (name) => {
+    const out = mkdtempSync(join(tmpdir(), `vh-record-depth-${name}-`)),
+      gate = join(out, 'record-depth'),
+      r = record();
+    const moved = new Map();
+    for (const control of r.report.controls)
+      for (const phase of ['candidate', 'mutant', 'restore']) {
+        const child = control[phase],
+          from = `${child.dir}/verify-record-depth.json`;
+        child.dir = join(gate, child.dir.split('/').at(-1));
+        child.receipt.verifierSha256 = producerSha;
+        if (!moved.has(from))
+          moved.set(from, { ...r.files.get(from), verifierSha256: producerSha });
+        mkdirSync(child.dir, { recursive: true });
+        writeFileSync(join(child.dir, 'verify-record-depth.json'), JSON.stringify(moved.get(from)));
+      }
+    r.report.verifierSha256 = producerSha;
+    writeFileSync(join(gate, 'verify-record-depth.json'), JSON.stringify(r.report));
+    const context = {
+      root,
+      out,
+      engine: 'chromium',
+      startedAt: new Date(Date.now() - 1000).toISOString(),
+      runId: base.runId,
+      gitSha: base.gitSha,
+      artifactSha256: base.artifactSha256,
+      verifierSha256: producerSha,
+      stdoutPath: join(out, 'record-depth.stdout.json'),
+    };
+    const admit = () =>
+      validateGateEvidence(
+        { name: 'record-depth', args: ['--controls'] },
+        { kind: 'adapter', name: 'record-depth' },
+        context,
+      );
+    return { out, report: r.report, admit };
+  };
+  const good = materialize('good');
+  try {
+    const admitted = good.admit();
+    assert.equal(admitted.obligation.observedCases.length, 17);
+    assert(admitted.receipts.length > 1);
+  } finally {
+    rmSync(good.out, { recursive: true, force: true });
+  }
+  for (const [label, mutate, pattern] of [
+    [
+      'stale child',
+      (x) =>
+        utimesSync(
+          join(x.report.controls[0].restore.dir, 'verify-record-depth.json'),
+          new Date(0),
+          new Date(0),
+        ),
+      /Stale receipt/u,
+    ],
+    [
+      'missing child',
+      (x) => rmSync(join(x.report.controls[1].mutant.dir, 'verify-record-depth.json')),
+      /mutant: fresh child receipt unreadable: ENOENT/u,
+    ],
+    [
+      'foreign child nonce',
+      (x) => {
+        const file = join(x.report.controls[0].mutant.dir, 'verify-record-depth.json');
+        writeFileSync(
+          file,
+          JSON.stringify({ ...JSON.parse(readFileSync(file, 'utf8')), runId: 'other' }),
+        );
+      },
+      /run nonce differs/u,
+    ],
+    [
+      'embedded copy differs from disk',
+      (x) => {
+        const file = join(x.report.controls[0].restore.dir, 'verify-record-depth.json');
+        const child = JSON.parse(readFileSync(file, 'utf8'));
+        child.rows[0].ok = false;
+        writeFileSync(file, JSON.stringify(child));
+      },
+      /embedded child differs/u,
+    ],
+  ]) {
+    const x = materialize(label.replaceAll(' ', '-'));
+    try {
+      mutate(x);
+      assert.throws(() => x.admit(), pattern, label);
+    } finally {
+      rmSync(x.out, { recursive: true, force: true });
+    }
+  }
+});
+test('reader D1 is judged at the declared shelf day with exactly six picks per width', () => {
+  assert.deepEqual(learningReportContracts['reader-doors'].validate(reader(), context).errors, []);
+  for (const mutate of [
+    (x) => (x.d1Day = '2026-10-16'),
+    (x) => delete x.d1Day,
+    (x) => (x.results.find((r) => r.id === shelf(390)).observed.day = '2026-10-16'),
+    (x) => (x.results.find((r) => r.id === shelf(1728)).observed.count = 5),
+    (x) => delete x.results.find((r) => r.id === shelf(1728)).observed,
+    (x) => {
+      x.results = x.results.filter((r) => !/^D1 390 pick 6:/u.test(r.id));
+      x.results.find((r) => r.id === shelf(390)).observed.count = 5;
+    },
+  ]) {
+    const bad = reader();
+    mutate(bad);
+    assert.equal(learningReportContracts['reader-doors'].validate(bad, context).passed, false);
+  }
+});
+test('report delivery is pinned to both engines independently of the declared gate engine', () => {
+  const adapter = learningReportContracts['report-delivery'];
+  assert.deepEqual(adapter.validate(delivery(), deliveryContext).errors, []);
+  assert.deepEqual(adapter.expectedCases('chromium'), adapter.expectedCases('all'));
+  for (const engine of ['chromium', 'webkit']) {
+    assert.equal(adapter.validate(delivery([engine]), { ...context, engine }).passed, false);
+    assert.equal(adapter.validate(delivery([engine]), deliveryContext).passed, false);
+    assert.equal(adapter.validate(delivery(), { ...context, engine }).passed, false);
+  }
+  const unversioned = delivery();
+  delete unversioned.browsers.webkit;
+  assert.equal(adapter.validate(unversioned, deliveryContext).passed, false);
+  const diagnostic = delivery();
+  diagnostic.scope = 'diagnostic';
+  assert.equal(adapter.validate(diagnostic, deliveryContext).passed, false);
+  assert.equal(learningReportContracts['report-delivery-chromium'], undefined);
 });
 test('report claims are re-adjudicated from exact copy/disclosure observations and complete scenarios', () => {
   for (const mutate of [
@@ -305,6 +573,9 @@ test('report claims are re-adjudicated from exact copy/disclosure observations a
   ]) {
     const bad = delivery();
     mutate(bad);
-    assert.equal(learningReportContracts['report-delivery'].validate(bad, context).passed, false);
+    assert.equal(
+      learningReportContracts['report-delivery'].validate(bad, deliveryContext).passed,
+      false,
+    );
   }
 });

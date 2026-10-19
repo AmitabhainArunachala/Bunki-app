@@ -185,13 +185,33 @@ function contrastFixture(engine) {
             observed: [
               {
                 current: true,
+                name: 'read-mini-rise',
+                animationType: 'CSSAnimation',
+                documentId: '4b60dc24-b05a-4546-8341-9b76d7368f06',
+                sameDocument: true,
                 motionPreference: 'no-preference',
                 completed: true,
+                timeOrigin: 1000,
+                frameCalibration: {
+                  method: 'median-of-12-pre-arrival-raf-intervals',
+                  timeOrigin: 1000,
+                  documentId: '4b60dc24-b05a-4546-8341-9b76d7368f06',
+                  sameDocument: true,
+                  timestamps: Array.from({ length: 13 }, (_, index) => index * 16),
+                  frameMs: 16,
+                },
+                startTime: 500,
+                observedAt: 860,
+                rafTime: 860,
+                currentTime: 350,
+                playbackRate: 1,
                 authoredDuration: 350,
+                authoredDelay: 0,
+                authoredEndDelay: 0,
+                authoredIterations: 1,
                 authoredEnd: 350,
                 opacity: 1,
                 elapsed: 360,
-                previousElapsed: 344,
                 frameMs: 16,
                 playState: 'finished',
               },
@@ -300,8 +320,49 @@ for (const engine of ['chromium', 'webkit'])
         r.rows.find((row) => row.id.endsWith('/fresh-demo.arrival')).observed[0].elapsed = 367;
       },
       (r) => {
-        r.rows.find((row) => row.id.endsWith('/fresh-demo.arrival')).observed[0].previousElapsed =
-          351;
+        r.rows.find((row) => row.id.endsWith('/fresh-demo.arrival')).observed[0].startTime = 700;
+      },
+      (r) => {
+        r.rows.find((row) => row.id.endsWith('/fresh-demo.arrival')).observed[0].name = 'feel-fade';
+      },
+      (r) => {
+        r.rows.find((row) => row.id.endsWith('/fresh-demo.arrival')).observed[0].missingAnimation =
+          true;
+      },
+      (r) => {
+        const a = r.rows.find((row) => row.id.endsWith('/fresh-demo.arrival')).observed[0];
+        a.noAnimation = true;
+        a.authoredDuration = 0;
+        a.authoredEnd = 0;
+      },
+      (r) => {
+        const a = r.rows.find((row) => row.id.endsWith('/fresh-demo.arrival')).observed[0];
+        a.observedAt = 1000;
+        a.rafTime = 1000;
+        a.elapsed = 500;
+        a.frameMs = 500;
+      },
+      (r) => {
+        r.rows.find((row) => row.id.endsWith('/fresh-demo.arrival')).observed[0].playState =
+          'paused';
+      },
+      (r) => {
+        r.rows.find((row) =>
+          row.id.endsWith('/fresh-demo.arrival'),
+        ).observed[0].frameCalibration.timestamps[12] = 800;
+      },
+      (r) => {
+        r.rows.find((row) => row.id.endsWith('/fresh-demo.arrival')).observed[0].documentId =
+          '4b60dc24-b05a-4546-8341-9b76d7368f07';
+      },
+      (r) => {
+        r.rows.find((row) => row.id.endsWith('/fresh-demo.arrival')).observed[0].sameDocument =
+          false;
+      },
+      (r) => {
+        r.rows.find((row) =>
+          row.id.endsWith('/fresh-demo.arrival'),
+        ).observed[0].frameCalibration.sameDocument = false;
       },
       (r) => {
         r.controls = [];
@@ -393,4 +454,60 @@ test('identity and richer child/provider/integrity semantics are retained', () =
     false,
   );
   assert.equal(validateExistingReport('unmigrated-producer', {}).passed, false);
+});
+test('actual engine and browser-version evidence is mandatory, never checked only when a producer happens to emit it', () => {
+  const rejects = (gate, mutate, label) => {
+    const { report, context } = fixture(gate);
+    mutate(report, context);
+    assert.equal(validateExistingReport(gate, report, context).passed, false, `${gate}: ${label}`);
+  };
+  for (const gate of [
+    'source-inbox-integration',
+    'listening-intake-integration',
+    'timed-transcript-integration',
+    'source-learning-integration',
+    'sentence-practice-integration',
+    'sentence-feedback-integration',
+    'bundled-practice-integration',
+    'bundled-listening-integration',
+    'bundled-listening-failures',
+    'later-encounters-integration',
+    'source-processing-integration',
+    'sentence-drafts-integration',
+    'source-kanji-practice-integration',
+  ]) {
+    rejects(gate, (r) => delete r.results.at(-1).browserVersion, 'row version absent');
+    rejects(gate, (r) => (r.results[0].browserVersion = null), 'row version null');
+  }
+  for (const gate of ['teacher-drafts-integration', 'reading-position-integration']) {
+    rejects(gate, (r) => delete r.engines, 'declared engines absent');
+    rejects(gate, (r) => delete r.browserVersions, 'report versions absent');
+    rejects(gate, (r) => (r.browserVersions = {}), 'engine version absent');
+  }
+  rejects('sentence-drafts-integration', (r) => delete r.engines, 'declared engines absent');
+  rejects('record-host-webkit', (r) => delete r.browserVersion, 'single-engine version absent');
+  rejects('record-binding-webkit', (r) => delete r.observations.runtime.version, 'runtime version');
+  rejects(
+    'teacher-context-integration',
+    (r, c) => {
+      const read = c.readReport;
+      c.readReport = (path) => ({ ...read(path), browser: undefined });
+    },
+    'child browser build absent',
+  );
+  for (const gate of Object.keys(existingReportContracts).filter(
+    (name) => !['record-controller', 'record-controller-webkit'].includes(name),
+  )) {
+    rejects(gate, (r, c) => delete c.artifactSha256, 'artifact unbound');
+    if (!gate.startsWith('record-binding'))
+      rejects(gate, (r, c) => delete c.verifierSha256, 'verifier unbound');
+  }
+  for (const engine of ['chromium', 'webkit']) {
+    const gate = `contrast-sweep${engine === 'webkit' ? '-webkit' : ''}`;
+    for (const key of ['runId', 'artifactSha256', 'verifierSha256', 'engine']) {
+      const { report, context } = contrastFixture(engine);
+      delete context[key];
+      assert.equal(validateExistingReport(gate, report, context).passed, false, `${gate}: ${key}`);
+    }
+  }
 });

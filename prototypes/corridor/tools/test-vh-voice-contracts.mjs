@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { readFileSync } from 'node:fs';
-import vm from 'node:vm';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { selection, exactRoster, SENSE_GROUPS, SPEAK_CASE_IDS, SPEAK_CONTROL_IDS_BY_ENGINE, speakControlPlan, senseAttempts, readingInteraction, speakCompletion, adjudicateSpeakPhase } from './vh-voice-contracts.mjs';
+import { grokCase } from './sense-grok-case.mjs';
+const grokDeps = (deps) => ({ openArticle: async () => true, card: async () => null, cardState: async () => null, closeMini: async () => {}, delay: async () => {},
+  pageSense: async () => [], glossesOf: () => [], sidecarRow: () => null, led: (rows) => rows, pageNames: new Set(), vhControl: '', vhMutations: [], ...deps });
 
 for (const raw of ['', 'p', 'unknown', 'g,g', 'g,', ',g']) test(`selector refuses ${JSON.stringify(raw)}`, () => {
   assert.throws(() => selection(raw, SENSE_GROUPS, 'SENSE_TRUTH_ONLY'));
@@ -40,17 +41,11 @@ test('one setup timeout can retry, ordinary errors and second timeouts cannot', 
   }
 });
 test('SENSE-1: actual grokCase publishes its wrong G before pageSense throws', async () => {
-  const source = readFileSync(new URL('./verify-sense-truth.mjs', import.meta.url), 'utf8');
-  const start = source.indexOf('async function grokCase(page, fixture, emit)');
-  const end = source.indexOf('/* ------------------------------------------------------------------ W', start);
-  const context = vm.createContext({ openArticle: async () => true, vhControl: '',
-    card: async () => ({ lines: ['wrong sense'], sense: '1:0', word: 'word', more: '' }),
-    PAGE: new Set(['fixture']), led: (rows) => rows, glossesOf: () => ['correct sense'],
-    pageSense: async () => { throw timeout('navigation'); }, readingInteraction });
-  vm.runInContext(source.slice(start, end), context);
+  const deps = grokDeps({ card: async () => ({ lines: ['wrong sense'], sense: '1:0', word: 'word', more: '' }),
+    pageNames: new Set(['fixture']), glossesOf: () => ['correct sense'], pageSense: async () => { throw timeout('navigation'); } });
   const rows = [], history = []; let runs = 0;
   await senseAttempts({ emit: (row) => rows.push(row), history, run: async (emit) => {
-    runs++; await context.grokCase({}, { name: 'fixture', at: 'article', index: 1, seq: '1', k: 0, kind: 'sense', never: 'wrong sense' }, emit);
+    runs++; await grokCase({}, { name: 'fixture', at: 'article', index: 1, seq: '1', k: 0, kind: 'sense', never: 'wrong sense' }, emit, deps);
   } });
   assert.equal(runs, 1); assert.equal(rows[0].id, 'G.fixture'); assert.equal(rows[0].ok, false);
   assert.equal(rows[1].id, 'incomplete'); assert.equal(history[0].retry, false);
@@ -131,31 +126,38 @@ for (const [file, variable, args, bad] of [
 });
 
 test('product-selects-annotation-oracle: actual grokCase refuses a quoted reading mislabeled by the DOM', async () => {
-  const source = readFileSync(new URL('./verify-sense-truth.mjs', import.meta.url), 'utf8');
-  const start = source.indexOf('async function grokCase(page, fixture, emit)');
-  const end = source.indexOf('/* ------------------------------------------------------------------ W', start);
   const rows = [];
   const target = { evaluate: async () => ({ annotation: true, interactive: false }), tap: async () => {} };
   const page = { locator: () => ({ first: () => target }), evaluate: async () => ({ mini: false, sheet: false, rung: null }) };
-  const context = vm.createContext({ openArticle: async () => true, vhControl: '', readingInteraction,
-    closeMini: async () => {}, delay: async () => {},
-    card: async () => ({ word: 'ちゅう', lines: ['a reading in this text'], more: '', sense: '' }) });
-  vm.runInContext(source.slice(start, end), context);
-  await context.grokCase(page, { name: 'quoted', at: 'hashira', index: 242, s: 'ちゅう', kind: 'reading', expectedInteraction: 'reading-card' }, (row) => rows.push(row));
+  const deps = grokDeps({ card: async () => ({ word: 'ちゅう', lines: ['a reading in this text'], more: '', sense: '' }) });
+  await grokCase(page, { name: 'quoted', at: 'hashira', index: 242, s: 'ちゅう', kind: 'reading', expectedInteraction: 'reading-card' }, (row) => rows.push(row), deps);
   assert.equal(rows[0].id, 'G.quoted.classification'); assert.equal(rows[0].ok, false);
   assert.equal(rows[1].id, 'G.quoted'); assert.equal(rows[1].ok, false);
 });
 for (const [index, s] of [[233, 'た'], [234, 'ん']]) test(`actual grokCase refuses pronunciation ${s} #${index} promoted to a door`, async () => {
-  const source = readFileSync(new URL('./verify-sense-truth.mjs', import.meta.url), 'utf8');
-  const start = source.indexOf('async function grokCase(page, fixture, emit)');
-  const end = source.indexOf('/* ------------------------------------------------------------------ W', start);
   const rows = [], target = { evaluate: async () => ({ annotation: false, interactive: true }), tap: async () => {} };
   const page = { locator: () => ({ first: () => target }), evaluate: async () => ({ mini: true, sheet: false, rung: null }) };
-  const context = vm.createContext({ openArticle: async () => true, vhControl: '', readingInteraction,
-    closeMini: async () => {}, delay: async () => {}, card: async () => ({ word: s, lines: ['a reading in this text'], more: '', sense: '' }) });
-  vm.runInContext(source.slice(start, end), context);
-  await context.grokCase(page, { name: `annotation-${s}`, at: 'gojuon', index, s, kind: 'reading', expectedInteraction: 'inert-annotation' }, (row) => rows.push(row));
+  const deps = grokDeps({ card: async () => ({ word: s, lines: ['a reading in this text'], more: '', sense: '' }) });
+  await grokCase(page, { name: `annotation-${s}`, at: 'gojuon', index, s, kind: 'reading', expectedInteraction: 'inert-annotation' }, (row) => rows.push(row), deps);
   assert.equal(rows.length, 1); assert.equal(rows[0].id, `G.annotation-${s}`); assert.equal(rows[0].ok, false);
+});
+test('actual grokCase accepts a true inert annotation and a correct sense, and a control mutation stays visible', async () => {
+  const rows = [], target = { evaluate: async () => ({ annotation: true, interactive: false }), tap: async () => {} };
+  const page = { locator: () => ({ first: () => target, evaluate: async () => {} }), evaluate: async () => ({ mini: false, sheet: false, rung: null }) };
+  await grokCase(page, { name: 'inert', at: 'gojuon', index: 233, s: 'た', kind: 'reading', expectedInteraction: 'inert-annotation' }, (row) => rows.push(row), grokDeps());
+  assert.deepEqual(rows.map((row) => [row.id, row.ok]), [['G.inert', true]]);
+  rows.length = 0;
+  const sense = { lines: ['correct sense'], sense: '7:0', word: 'word', more: '' };
+  await grokCase(page, { name: 'sense', at: 'article', index: 1, seq: '7', k: 0, kind: 'sense', never: 'wrong sense' }, (row) => rows.push(row),
+    grokDeps({ card: async () => sense, glossesOf: () => ['correct sense'] }));
+  assert.deepEqual(rows.map((row) => [row.id, row.ok]), [['G.sense', true]]);
+  rows.length = 0;
+  const vhMutations = [];
+  await grokCase(page, { name: 'sense', at: 'article', index: 1, seq: '7', k: 0, kind: 'sense', never: 'wrong sense' }, (row) => rows.push(row),
+    grokDeps({ card: async () => sense, cardState: async () => ({ ...sense, lines: ['VH wrong sense sentinel'] }), glossesOf: () => ['correct sense'],
+      vhControl: 'discard-completed-red-on-retry', vhMutations }));
+  assert.deepEqual(rows.map((row) => [row.id, row.ok]), [['G.sense', false]]);
+  assert.equal(vhMutations.length, 1);
 });
 
 test('Speak downstream names are exact and cannot replace the primary witness', () => {

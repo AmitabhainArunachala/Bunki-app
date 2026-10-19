@@ -1,4 +1,7 @@
 /** VH-1: reviewed producer rosters at 384d4a70; expected names are independent of report contents. */
+import { createHash } from 'node:crypto';
+import { existsSync, lstatSync, readFileSync, readdirSync, realpathSync } from 'node:fs';
+import { join, relative, sep } from 'node:path';
 export const MEDIA_CASES = Object.freeze({
   'guided-journey': [
     'D1 the study hall lists the guided session as a door',
@@ -310,6 +313,14 @@ export const MEDIA_CASES = Object.freeze({
 });
 const sha = (value) => typeof value === 'string' && /^[a-f0-9]{64}$/u.test(value);
 const text = (value) => typeof value === 'string' && value.length > 0;
+const realPath = (path) => {
+  try {
+    return text(path) ? realpathSync(path) : null;
+  } catch {
+    return null;
+  }
+};
+const samePath = (a, b) => realPath(a) !== null && realPath(a) === realPath(b);
 const exact = (expected, observed) =>
   expected.length > 0 &&
   expected.length === observed.length &&
@@ -333,6 +344,7 @@ export const mediaReportNarrowingEnvironment = Object.freeze([
   'GUIDED_VIEWPORTS',
   'GUIDED_PARTS',
   'GUIDED_FAULT',
+  'GUIDED_STANDALONE',
 ]);
 function fullScope(context, require) {
   const env = context.env || context.environment || {};
@@ -353,7 +365,7 @@ function identity(
     require(sha(context.artifactSha256), 'Missing independently pinned artifact identity');
     if (legacy)
       require(text(context.site) &&
-        report.site === context.site &&
+        samePath(report.site, context.site) &&
         context.artifactVerifiedBeforeAndAfter ===
           true, 'Legacy site-only report needs runner proof of the same artifact before and after execution');
     else
@@ -568,7 +580,29 @@ const definitions = {
         !report.offlineRequests.some((path) =>
           /\/guided/u.test(path),
         ), 'Guided asset requested from network offline');
-      require(text(report.standalone), 'Single-file handoff observation missing');
+      require(report.standaloneDeclared ===
+        null, 'A declared single-file handoff is diagnostic, never acceptance');
+      const gate = realPath(
+        text(context.out) && text(context.gateId) ? join(context.out, context.gateId) : null,
+      );
+      const runs = gate
+        ? readdirSync(gate).filter((entry) => entry.startsWith('guided-offline-'))
+        : [];
+      const placed =
+        gate && realPath(report.standalone)
+          ? relative(gate, realPath(report.standalone)).split(sep)
+          : [];
+      require(runs.length === 1 &&
+        placed.length === 2 &&
+        placed[0] === runs[0] &&
+        placed[1] ===
+          'corridor-standalone.html', "Single-file handoff is not this gate's own fresh producer output");
+      require(placed.length === 2 &&
+        existsSync(report.standalone) &&
+        lstatSync(report.standalone).isFile() &&
+        sha(report.standaloneSha256) &&
+        createHash('sha256').update(readFileSync(report.standalone)).digest('hex') ===
+          report.standaloneSha256, 'Single-file handoff bytes differ from the observed handoff');
     },
   }),
 };

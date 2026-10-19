@@ -1,6 +1,18 @@
 /* global structuredClone */
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
+import {
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  realpathSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
+import { receiptPaths } from './gate-evidence.mjs';
 import {
   DECK_CASES,
   deckReportContracts,
@@ -13,7 +25,15 @@ import {
   HOST_CASES,
   KOTOBA_PILOTS,
   KOTOBA_SITES,
+  PAIRED_ENGINES,
 } from './vh-deck-report-contracts.mjs';
+const SITE = mkdtempSync(join(tmpdir(), 'vh-deck-site-')),
+  OTHER_SITE = mkdtempSync(join(tmpdir(), 'vh-deck-other-')),
+  SITE_LINK = join(mkdtempSync(join(tmpdir(), 'vh-deck-link-')), 'site');
+symlinkSync(SITE, SITE_LINK);
+const observedReceipts = JSON.parse(
+  readFileSync(new globalThis.URL('./vh-deck-observed-receipts.json', import.meta.url), 'utf8'),
+);
 const hash = 'a'.repeat(64),
   input = {
     id: 'kotoba-mcd',
@@ -24,7 +44,7 @@ const hash = 'a'.repeat(64),
   };
 const base = {
   engine: 'chromium',
-  site: '/immutable/site',
+  site: SITE,
   runId: 'current-attempt',
   artifactSha256: hash,
   verifierSha256: hash,
@@ -40,10 +60,22 @@ const base = {
 function context(name) {
   return {
     ...base,
-    engine: ['redesign-docks', 'personal-collections-browser', 'deck-player-browser'].includes(name)
+    engine: [
+      'redesign-docks',
+      'redesign-foundation',
+      'personal-collections-browser',
+      'deck-player-browser',
+    ].includes(name)
       ? 'all'
       : 'chromium',
-    env: name === 'personal-host-webkit' ? { PERSONAL_HOST_BROWSER: 'webkit' } : {},
+    env:
+      name === 'personal-host-webkit'
+        ? { PERSONAL_HOST_BROWSER: 'webkit' }
+        : name === 'redesign-foundation'
+          ? { KAIRO_BROWSER: 'all' }
+          : name === 'personal-collections-browser'
+            ? { PERSONAL_BROWSERS: 'chromium,webkit' }
+            : {},
   };
 }
 function fixture(name, c = context(name)) {
@@ -70,7 +102,13 @@ function fixture(name, c = context(name)) {
       ),
     });
   if (name === 'personal-collections-browser')
-    Object.assign(r, { status: 'passed', checks: ids, browsers: ['chromium', 'webkit'] });
+    Object.assign(r, {
+      status: 'passed',
+      checks: ids,
+      browsers: ['chromium', 'webkit'],
+      browserVersions: { chromium: '153.0.7258.5', webkit: '26.0' },
+      executableOverride: false,
+    });
   if (name === 'redesign-foundation') {
     r.checks = ids.map((id) => {
       const [engine, width, lang] = id.split('/');
@@ -78,6 +116,7 @@ function fixture(name, c = context(name)) {
     });
     Object.assign(r, {
       diagnostics: [],
+      browserVersions: { chromium: '153.0.7258.5', webkit: '26.0' },
       horizontalSamples: r.checks.map((row) => ({
         ...row,
         noHorizontalScroll: true,
@@ -374,6 +413,49 @@ test('producer-specific engine scopes are enforced', () => {
     }).passed,
     false,
   );
+  for (const [name, narrowed] of [
+    ['personal-collections-browser', { PERSONAL_BROWSERS: 'chromium' }],
+    ['redesign-foundation', { KAIRO_BROWSER: 'chromium' }],
+  ]) {
+    const single = fixture(name);
+    single.checks = single.checks.filter((row) =>
+      typeof row === 'string' ? row.startsWith('chromium: ') : row.engine === 'chromium',
+    );
+    if (single.horizontalSamples)
+      single.horizontalSamples = single.horizontalSamples.filter((x) => x.engine === 'chromium');
+    single.browsers &&= ['chromium'];
+    single.browserVersions = { chromium: single.browserVersions.chromium };
+    for (const c of [
+      context(name),
+      { ...context(name), engine: 'chromium', env: { ...context(name).env, ...narrowed } },
+    ])
+      assert.equal(validateDeckReport(name, single, c).passed, false, `${name} single engine`);
+    assert.deepEqual(
+      deckReportContracts[name].expectedCases('chromium', {
+        ...context(name),
+        env: narrowed,
+      }),
+      deckReportContracts[name].expectedCases('all', context(name)),
+      `${name} roster is independent of the declaration`,
+    );
+  }
+  for (const [name, mutate] of [
+    ['personal-collections-browser', (r) => delete r.browserVersions.webkit],
+    ['personal-collections-browser', (r) => (r.browserVersions.chromium = '')],
+    ['personal-collections-browser', (r) => delete r.browserVersions],
+    ['personal-collections-browser', (r) => (r.executableOverride = true)],
+    ['personal-collections-browser', (r) => delete r.executableOverride],
+    ['redesign-foundation', (r) => delete r.browserVersions.chromium],
+    ['redesign-foundation', (r) => (r.browserVersions.webkit = '')],
+    ['redesign-foundation', (r) => delete r.browserVersions],
+    ['redesign-docks', (r) => delete r.results.at(-1).browserVersion],
+    ['personal-host-webkit', (r) => delete r.browserVersion],
+  ]) {
+    const r = fixture(name);
+    mutate(r);
+    assert.equal(validateDeckReport(name, r, context(name)).passed, false, `${name} version`);
+  }
+  assert.deepEqual(PAIRED_ENGINES, ['chromium', 'webkit']);
   for (const name of [
     'places-layout',
     'experience-require-skip',
@@ -392,4 +474,131 @@ test('independent published obligation counts cover all variants', () => {
   assert.equal(PLACES_CASES.length, 92);
   assert.equal(EXPERIENCE_CASES.length, 42);
   assert.equal(KOTOBA_SITES.length, 151);
+});
+test('served-site identity compares real paths on both sides', () => {
+  const field = {
+    'n2n1-decks-browser': 'site',
+    'redesign-language': 'artifact',
+    'experience-require-skip': 'root',
+  };
+  for (const [name, key] of Object.entries(field)) {
+    const good = fixture(name);
+    for (const site of [SITE_LINK, `${SITE}/`, `${SITE_LINK}/`]) {
+      assert.deepEqual(
+        validateDeckReport(name, good, { ...context(name), site }).errors,
+        [],
+        `${name} context ${site}`,
+      );
+      assert.deepEqual(
+        validateDeckReport(name, { ...good, [key]: site }, context(name)).errors,
+        [],
+        `${name} receipt ${site}`,
+      );
+    }
+    for (const site of [OTHER_SITE, join(SITE, 'missing'), ''])
+      assert.equal(
+        validateDeckReport(name, { ...good, [key]: site }, context(name)).passed,
+        false,
+        `${name} foreign ${site}`,
+      );
+  }
+});
+test('redesign-language admits the receipt where the producer path resolution writes it', () => {
+  const runnerTemp = mkdtempSync(join(tmpdir(), 'vh-language-')),
+    gate = join(runnerTemp, 'redesign-language');
+  const child = spawnSync(
+    process.execPath,
+    [
+      '--input-type=module',
+      '-e',
+      [
+        `import { resolveCorridorEvidence } from ${JSON.stringify(new globalThis.URL('../resolve-corridor-site.mjs', import.meta.url).href)};`,
+        `import { uiLanguageReportPath } from ${JSON.stringify(new globalThis.URL('../../tools/ui-language-report.mjs', import.meta.url).href)};`,
+        'process.stdout.write(uiLanguageReportPath(resolveCorridorEvidence()));',
+      ].join('\n'),
+    ],
+    {
+      encoding: 'utf8',
+      env: { ...process.env, KAIRO_EVIDENCE_DIR: gate, CI: '1', RUNNER_TEMP: runnerTemp },
+    },
+  );
+  assert.equal(child.status, 0, child.stderr);
+  const written = child.stdout;
+  mkdirSync(dirname(written), { recursive: true });
+  writeFileSync(written, JSON.stringify(fixture('redesign-language')));
+  const [declared] = deckReportContracts['redesign-language'].paths;
+  const found = receiptPaths(gate, declared);
+  assert.equal(realpathSync(found), realpathSync(written));
+  assert.throws(() => receiptPaths(gate, 'report.json'), /got 0/u);
+  assert.deepEqual(
+    validateDeckReport(
+      'redesign-language',
+      JSON.parse(readFileSync(found, 'utf8')),
+      context('redesign-language'),
+    ).errors,
+    [],
+  );
+});
+test('independent observed producer receipts meet the pinned rosters', () => {
+  const language = structuredClone(observedReceipts['redesign-language'].report);
+  language.artifact = SITE;
+  const c = context('redesign-language');
+  assert.deepEqual(validateDeckReport('redesign-language', language, c).errors, []);
+  const japanese = language.results.findLastIndex((row) => row.language === '日本語');
+  for (const mutate of [
+    (r) => r.results.splice(japanese, 1),
+    (r) => r.results.push({ ...r.results[0], room: 'undeclared-room' }),
+    (r) => (r.results[1] = structuredClone(r.results[0])),
+    (r) => (r.results = r.results.filter((row) => row.language === 'EN')),
+  ]) {
+    const bad = structuredClone(language);
+    mutate(bad);
+    assert.equal(validateDeckReport('redesign-language', bad, c).passed, false);
+  }
+
+  const foundation = context('redesign-foundation');
+  assert.deepEqual(
+    validateDeckReport(
+      'redesign-foundation',
+      observedReceipts['redesign-foundation'].report,
+      foundation,
+    ).errors,
+    ['Foundation always runs both engines; engine/version evidence missing'],
+  );
+  const versioned = {
+    ...structuredClone(observedReceipts['redesign-foundation'].report),
+    browserVersions: { chromium: '153.0.7258.5', webkit: '26.0' },
+  };
+  assert.deepEqual(validateDeckReport('redesign-foundation', versioned, foundation).errors, []);
+  const partial = {
+    ...structuredClone(observedReceipts['redesign-foundation-partial'].report),
+    browserVersions: versioned.browserVersions,
+  };
+  assert(
+    validateDeckReport('redesign-foundation', partial, foundation).errors.includes(
+      'Missing/duplicate/extra/wrong-engine case',
+    ),
+  );
+  const extra = structuredClone(versioned);
+  extra.checks.push({ ...extra.checks[0], width: 1440 });
+  extra.horizontalSamples.push({ ...extra.horizontalSamples[0], width: 1440 });
+  assert.equal(validateDeckReport('redesign-foundation', extra, foundation).passed, false);
+
+  const personal = observedReceipts['personal-collections-contract'].report,
+    pc = {
+      ...context('personal-collections-contract'),
+      runId: personal.runId,
+      verifierSha256: personal.verifierSha256,
+      sourceFiles: Object.fromEntries(personal.sources.map((x) => [x.path, x.sha256])),
+    };
+  assert.deepEqual(validateDeckReport('personal-collections-contract', personal, pc).errors, []);
+  for (const mutate of [
+    (r) => r.checks.pop(),
+    (r) => r.checks.push('an undeclared extra completion'),
+    (r) => (r.checks[1] = r.checks[0]),
+  ]) {
+    const bad = structuredClone(personal);
+    mutate(bad);
+    assert.equal(validateDeckReport('personal-collections-contract', bad, pc).passed, false);
+  }
 });

@@ -11,6 +11,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } 
 import { extname, isAbsolute, join, resolve } from 'node:path';
 import process from 'node:process';
 import { chromium, webkit } from 'playwright-core';
+import { contextBrowserVersion } from './browser-version-support.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
 
@@ -252,7 +253,7 @@ for (const engine of engines) for (const width of sizes) {
       acceptDownloads: true, ignoreHTTPSErrors: true, ...(engine === 'chromium' ? { args: ['--ignore-certificate-errors'] } : {}),
       recordVideo: { dir: videos, size: { width, height: width === 390 ? 844 : 1050 } },
     });
-    result.browserVersion = context.browser()?.version();
+    result.browserVersion = await contextBrowserVersion(context, { chromium, webkit }[engine]);
     // A separate loopback HTTPS server exercises real CORS/abort behavior,
     // including WebKit requests controlled by the installed service worker.
     syntheticResponder = async (request, response) => {

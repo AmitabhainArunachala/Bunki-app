@@ -2,6 +2,9 @@
  * never extracted from the running producer or inferred from a reported count.
  * Fresh attempt containment, producer/input digests and invocation are the outer runner's obligation.
  */
+import { realpathSync } from 'node:fs';
+import { isAbsolute, join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 export const ASSESSMENT_CASES = Object.freeze({
   'assessment-bank': [
     'Preserved original N2 draft copies retain their source bytes',
@@ -429,10 +432,40 @@ const hashAt = (context, path) =>
   Array.isArray(context.runtimeFiles)
     ? context.runtimeFiles.find((row) => row.path === path)?.sha256
     : context.runtimeFiles?.[path];
-const inputAt = (context, path) =>
-  Array.isArray(context.sourceFiles)
-    ? context.sourceFiles.find((row) => row.path === path || path.endsWith(`/${row.path}`))?.sha256
-    : context.sourceFiles?.[path];
+const inputAt = (context, path) => context.sourceFiles?.[path];
+const realPath = (path) => {
+  try {
+    return realpathSync(path);
+  } catch {
+    return null;
+  }
+};
+const driverPath = (url) => {
+  try {
+    return realpathSync(fileURLToPath(url));
+  } catch {
+    return null;
+  }
+};
+const questionSources = [
+  'assessment-question-source.mjs',
+  'assessment-question-practice.mjs',
+  'assessment-v2-controller.mjs',
+  'assessment-learning.mjs',
+  'assessment-cloze.mjs',
+  'sentence-practice.mjs',
+  'teacher-context.mjs',
+  'teacher-drafts.mjs',
+  'sentence-drafts.mjs',
+];
+export const ASSESSMENT_SOURCE_INPUTS = Object.freeze({
+  'assessment-question-practice': Object.freeze([
+    'prototypes/corridor/assessment-question-practice.mjs',
+  ]),
+  'assessment-question-source': Object.freeze(
+    questionSources.map((name) => `prototypes/corridor/${name}`),
+  ),
+});
 function runtime(require, context, actual, path) {
   require(digest(actual), `${path}: missing digest`);
   const expected = hashAt(context, path);
@@ -592,20 +625,9 @@ defs['assessment-question-practice'] = make('assessment-question-practice', {
     verifier(q, r, c);
     q(digest(r.sourceSha256), 'Question-practice source missing');
     const want = inputAt(c, 'prototypes/corridor/assessment-question-practice.mjs');
-    if (want) q(want === r.sourceSha256, 'Question-practice source changed');
+    q(digest(want) && want === r.sourceSha256, 'Question-practice source changed or unpinned');
   },
 });
-const questionSources = [
-  'assessment-question-source.mjs',
-  'assessment-question-practice.mjs',
-  'assessment-v2-controller.mjs',
-  'assessment-learning.mjs',
-  'assessment-cloze.mjs',
-  'sentence-practice.mjs',
-  'teacher-context.mjs',
-  'teacher-drafts.mjs',
-  'sentence-drafts.mjs',
-];
 defs['assessment-question-source'] = make('assessment-question-source', {
   paths: ['check-*/receipt.json'],
   pure: true,
@@ -619,9 +641,13 @@ defs['assessment-question-source'] = make('assessment-question-source', {
       'Question-source module roster incomplete',
     );
     for (const row of r.sources || []) {
-      q(digest(row.sha256), 'Question-source hash missing');
-      const want = inputAt(c, row.path);
-      if (want) q(want === row.sha256, 'Question-source bytes changed');
+      const file = `prototypes/corridor/${row.path?.split('/').at(-1)}`;
+      const want = inputAt(c, file);
+      q(
+        digest(row.sha256) && nonempty(row.path) && row.path.endsWith(`/${file}`),
+        'Question-source hash/path missing',
+      );
+      q(digest(want) && want === row.sha256, 'Question-source bytes changed or unpinned');
     }
   },
 });
@@ -918,14 +944,27 @@ for (const producer of ['reading-candidates', 'personal-reading', 'source-shelf'
             r.controllerSha256,
             producer === 'personal-reading' ? 'reading-controller.mjs' : 'feed-controller.mjs',
           );
-          if (producer === 'personal-reading')
+          if (producer === 'personal-reading') {
             q(
               !r.counterfactualSource &&
                 r.externalRequestsSent === 0 &&
                 nonempty(r.browser?.version),
               'Personal reading source/egress/browser invalid',
             );
-          else q(r.externalRequests === 0, 'Source shelf egress invalid');
+            const intended = nonempty(c.root)
+              ? realPath(join(c.root, 'node_modules', 'playwright-core'))
+              : null;
+            const used = driverPath(r.browser?.driverUrl);
+            const within = intended && used ? relative(intended, used) : '';
+            q(
+              !Object.hasOwn(c.env || c.environment || {}, 'KAIRO_PLAYWRIGHT_MODULE') &&
+                r.browser?.driverModule === 'playwright-core' &&
+                nonempty(within) &&
+                !within.startsWith('..') &&
+                !isAbsolute(within),
+              'Personal reading did not run on the workspace playwright-core driver',
+            );
+          } else q(r.externalRequests === 0, 'Source shelf egress invalid');
         }
       },
     });
@@ -1080,6 +1119,7 @@ export const assessmentReportNarrowingEnvironment = Object.freeze([
   'KAIRO_ASSESSMENT_CLICK_DIAGNOSTICS',
   'KAIRO_PRIVATE_PACK',
   'KAIRO_PERSONAL_READING_SOURCE',
+  'KAIRO_PLAYWRIGHT_MODULE',
   'KAIRO_ASSESSMENT_SITE_DIR',
   'KAIRO_ASSESSMENT_SITE_SHA256',
 ]);

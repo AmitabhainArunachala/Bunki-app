@@ -36,6 +36,7 @@ import { openShelfTools } from './shelf-tools-support.mjs';
 
 const selection = parseRecordArgs(process.argv.slice(2));
 const runId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
+const nonce = process.env.RECORD_DEPTH_NONCE || null;
 const startedAt = new Date().toISOString();
 const verifierSha256 = createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex');
 const verifierGitSha = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
@@ -76,7 +77,7 @@ const check = (id, title, ok, observed = '') => {
 };
 let host = null;
 let terminalError = null;
-const reportBase = () => ({ schema: 'vh-record-depth/1', runId, startedAt, finishedAt: new Date().toISOString(),
+const reportBase = () => ({ schema: 'vh-record-depth/1', runId, nonce, startedAt, finishedAt: new Date().toISOString(),
   site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, verifierGitSha, verifierSha256,
   engines, browsers: versions, selectors: selection, scope: only ? 'diagnostic' : 'full-engine', terminalError });
 
@@ -84,10 +85,10 @@ const reportBase = () => ({ schema: 'vh-record-depth/1', runId, startedAt, finis
 if (selection.controls) {
   const proof = { ...reportBase(), phase: 'controls-parent', rows: [], controls: [], fullAcceptance: false };
   const child = async (args, phase, actualEngine) => {
-    const nonce=randomUUID(), dir=mkdtempSync(join(evidence, `${actualEngine}-${phase}-`));
+    const childNonce=randomUUID(), dir=mkdtempSync(join(evidence, `${actualEngine}-${phase}-`));
     let log='';
     const status=await new Promise(resolveStatus=>{
-      const proc=spawn(process.execPath, [fileURLToPath(import.meta.url), ...args], {env:{...process.env,KAIRO_BROWSER:actualEngine,KAIRO_EVIDENCE_DIR:dir,KAIRO_GATE_RUN_ID:nonce},stdio:['ignore','pipe','pipe'],detached:process.platform!=='win32'});
+      const proc=spawn(process.execPath, [fileURLToPath(import.meta.url), ...args], {env:{...process.env,KAIRO_BROWSER:actualEngine,KAIRO_EVIDENCE_DIR:dir,KAIRO_GATE_RUN_ID:runId,RECORD_DEPTH_NONCE:childNonce},stdio:['ignore','pipe','pipe'],detached:process.platform!=='win32'});
       proc.stdout.on('data',bytes=>{log+=bytes; process.stdout.write(bytes);}); proc.stderr.on('data',bytes=>{log+=bytes; process.stderr.write(bytes);});
       let timedOut=false; const timer=setTimeout(()=>{timedOut=true;try { if(process.platform==='win32') proc.kill('SIGKILL'); else process.kill(-proc.pid,'SIGKILL'); } catch {}},30*60*1000);
       proc.on('error',error=>{clearTimeout(timer);resolveStatus({error:String(error),code:null});});
@@ -95,7 +96,7 @@ if (selection.controls) {
     });
     writeFileSync(join(dir,'child.log'),log);
     let receipt=null; try {receipt=JSON.parse(readFileSync(join(dir,'verify-record-depth.json'),'utf8'));} catch {}
-    const valid=receipt?.runId===nonce && receipt?.artifactSha256===identity.artifactSha256 && receipt?.gitSha===identity.gitSha
+    const valid=receipt?.runId===runId && receipt?.nonce===childNonce && receipt?.artifactSha256===identity.artifactSha256 && receipt?.gitSha===identity.gitSha
       && receipt?.verifierSha256===verifierSha256 && JSON.stringify(receipt?.engines)===JSON.stringify([actualEngine]) && !status.timedOut && !status.signal && !status.error;
     return {dir,status,valid,receipt};
   };

@@ -7,6 +7,7 @@ import {
   DESIGN_CASES,
   READING_CASES,
   exactRoster,
+  plainBadBreak,
 } from '../../prototypes/corridor/tools/vh-visual-contracts.mjs';
 const readingRoster = JSON.parse(
   readFileSync(
@@ -100,6 +101,98 @@ export const SWEEP_ROOMS = Object.freeze([
   ...['dojo', 'shelf', 'search', 'tests', 'me'].map((view) => `places-${view}`),
 ]);
 const shelfMutants = ['drop-duplicate-hides-omission', 'series-book-order-swapped'];
+const SHELF_CONTROLS = Object.freeze({
+  'drop-duplicate-hides-omission': {
+    mode: 'duplicate',
+    intended: ['roster', 'blocks'],
+    allowed: ['roster', 'blocks', 'order'],
+  },
+  'series-book-order-swapped': {
+    mode: 'swap',
+    intended: ['series', 'order'],
+    allowed: ['series', 'order'],
+    pair: ['aozora:049966-1', 'aozora:049966-2'],
+  },
+  'day-two-drop-order-drift': { mode: 'swap', intended: ['order'], allowed: ['order'] },
+});
+const SHELF_PREDICATES = ['roster', 'blocks', 'series', 'order'];
+const idList = (value) =>
+  Array.isArray(value) &&
+  value.length > 0 &&
+  value.every((id) => typeof id === 'string' && id.length > 0);
+function shelfControlHolds(r) {
+  const spec = SHELF_CONTROLS[r.id],
+    m = r.mutation;
+  if (!spec || !m || m.id !== r.id || m.mode !== spec.mode || !equal(m.intended, spec.intended))
+    return false;
+  const { baseline, changed, restored } = r;
+  if (![baseline, changed, restored].every(idList) || new Set(baseline).size !== baseline.length)
+    return false;
+  if (changed.length !== baseline.length || equal(changed, baseline) || !equal(restored, baseline))
+    return false;
+  const moved = baseline.map((id, i) => (id === changed[i] ? -1 : i)).filter((i) => i >= 0);
+  const pair = [m.pair?.a, m.pair?.b];
+  const mutated =
+    spec.mode === 'duplicate'
+      ? moved.length === 1 &&
+        baseline[moved[0]] === pair[1] &&
+        changed[moved[0]] === pair[0] &&
+        baseline.indexOf(pair[0]) >= 0 &&
+        baseline.indexOf(pair[0]) < moved[0]
+      : moved.length === 2 &&
+        changed[moved[0]] === baseline[moved[1]] &&
+        changed[moved[1]] === baseline[moved[0]] &&
+        equal([baseline[moved[0]], baseline[moved[1]]], pair);
+  if (!mutated || (spec.pair && !equal(pair, spec.pair))) return false;
+  const judged = r.judged;
+  if (!judged || !SHELF_PREDICATES.every((key) => typeof judged[key] === 'boolean')) return false;
+  const failures = SHELF_PREDICATES.filter((key) => judged[key] === false);
+  return (
+    r.passed === true &&
+    r.premise?.baseGood === true &&
+    r.premise?.legacyMembership === true &&
+    r.premise?.neighborClean === true &&
+    r.restoredBytes === true &&
+    equal(r.failures, failures) &&
+    spec.intended.every((key) => failures.includes(key)) &&
+    failures.every((key) => spec.allowed.includes(key)) &&
+    Array.isArray(r.unrelated) &&
+    !r.unrelated.length
+  );
+}
+const LEXICAL_WITNESS = 'inside an independently evidenced mixed-script word';
+const lineObservation = (o) =>
+  !!o &&
+  typeof o === 'object' &&
+  typeof o.text === 'string' &&
+  o.text.length > 0 &&
+  typeof o.html === 'string' &&
+  o.html.length > 0 &&
+  Array.isArray(o.breaks) &&
+  Array.isArray(o.glyphs) &&
+  o.glyphs.length === [...o.text].length;
+const badBreaks = (o) => o.breaks.map((at) => plainBadBreak(o.text, at)).filter(Boolean);
+function lexicalControlHolds(r) {
+  const { candidate, mutant, restored } = r;
+  if (![candidate, mutant, restored].every(lineObservation)) return false;
+  return (
+    r.passed === true &&
+    r.premise === true &&
+    candidate.text === 'サボる' &&
+    mutant.text === candidate.text &&
+    restored.text === candidate.text &&
+    candidate.html !== mutant.html &&
+    candidate.html === restored.html &&
+    equal(candidate.breaks, restored.breaks) &&
+    mutant.breaks.includes(2) &&
+    equal(badBreaks(candidate), []) &&
+    equal(r.clean, []) &&
+    equal(badBreaks(mutant), [LEXICAL_WITNESS]) &&
+    equal(r.wrong, [LEXICAL_WITNESS]) &&
+    equal(badBreaks(restored), []) &&
+    equal(r.back, [])
+  );
+}
 export function sweepExpectedIds(engine = 'chromium') {
   return [
     ...engines(engine).flatMap((e) =>
@@ -165,15 +258,7 @@ function controls(report, kind, requiredEngines, require) {
       rows.map((r) => `${r.engine}/${r.lang}/${r.width}/${r.id}`),
     ), 'Lexical control roster incomplete/duplicated');
     for (const r of rows)
-      require(r.passed === true &&
-        r.premise === true &&
-        Array.isArray(r.clean) &&
-        !r.clean.length &&
-        Array.isArray(r.back) &&
-        !r.back.length &&
-        equal(r.wrong, ['inside an independently evidenced mixed-script word']) &&
-        r.candidate?.html ===
-          r.restored?.html, 'Lexical candidate, intended red or restored green missing');
+      require(lexicalControlHolds(r), 'Lexical candidate, intended red or restored green missing');
   } else if (kind === 'sweep') {
     const expected = requiredEngines.flatMap((e) =>
       langs.flatMap((lang) =>
@@ -196,14 +281,9 @@ function controls(report, kind, requiredEngines, require) {
       rows.map((r) => `${r.engine}/${r.lang}/${days.indexOf(r.day)}/${r.id}`),
     ), 'Shelf control roster incomplete/duplicated');
     for (const r of rows)
-      require(r.passed === true &&
-        r.premise?.baseGood === true &&
-        r.premise?.legacyMembership === true &&
-        r.premise?.neighborClean === true &&
-        r.restoredBytes === true &&
-        equal(r.baseline, r.restored) &&
-        Array.isArray(r.unrelated) &&
-        !r.unrelated.length, 'Shelf mutation prerequisite, intended kill or byte restore missing');
+      require(shelfControlHolds(
+        r,
+      ), 'Shelf mutation prerequisite, intended kill or byte restore missing');
   } else if (kind === 'reading-truth') {
     const expected = requiredEngines.flatMap((e) =>
       ['aozora:000628#76', 'bunki-graded-n3-hashira-counter#242']
@@ -249,6 +329,14 @@ function controls(report, kind, requiredEngines, require) {
     }
   }
 }
+export const visualReportNarrowingEnvironment = Object.freeze([
+  'COMB_NEGATIVE',
+  'KAIRO_SWEEP_MODE',
+  'KAIRO_SWEEP_NEGATIVE',
+  'READING_TRUTH_ONLY',
+  'READING_TRUTH_SWEEP_IDS',
+  'READING_TRUTH_PAST_F0',
+]);
 const definitions = {};
 for (const kind of ['comb-0', 'sweep', 'reading-truth', 'design-reader-shelf'])
   for (const engine of ['chromium', 'webkit']) {
@@ -289,6 +377,10 @@ for (const kind of ['comb-0', 'sweep', 'reading-truth', 'design-reader-shelf'])
           !report.partial &&
           !report.sweepIds &&
           !report.pastF0, 'Diagnostic scope cannot accept');
+        const declaredEnv = context.env || context.environment || {};
+        require(visualReportNarrowingEnvironment.every(
+          (name) => !Object.hasOwn(declaredEnv, name),
+        ), 'Declared narrowing selector cannot accept');
         require(digest(report.artifactSha256), 'Missing artifact identity');
         if (context.artifactSha256)
           require(report.artifactSha256 === context.artifactSha256, 'Wrong artifact');
@@ -351,6 +443,11 @@ for (const kind of ['comb-0', 'sweep', 'reading-truth', 'design-reader-shelf'])
         }
         if (kind === 'sweep') {
           require(report.mode === 'verify', 'Sweep inventory cannot accept');
+          require(!!report.selectors &&
+            typeof report.selectors === 'object' &&
+            !Array.isArray(report.selectors) &&
+            Object.keys(report.selectors).length ===
+              0, 'Explicit sweep selector is diagnostic, even verify');
           require(exactRoster(
             langs.flatMap((lang) => SWEEP_ROOMS.map((room) => `${engine}/${lang}/${room}`)),
             (report.inventory || []).map((r) => `${r.engine}/${r.lang}/${r.room}`),
@@ -395,14 +492,6 @@ export function validateVisualReport(name, report, context = {}) {
     }
   );
 }
-export const visualReportNarrowingEnvironment = Object.freeze([
-  'COMB_NEGATIVE',
-  'KAIRO_SWEEP_MODE',
-  'KAIRO_SWEEP_NEGATIVE',
-  'READING_TRUTH_ONLY',
-  'READING_TRUTH_SWEEP_IDS',
-  'READING_TRUTH_PAST_F0',
-]);
 
 // F0 premise IDs reviewed against fixture declarations and checks at lines 266–431.
 export const readingDataIds = [

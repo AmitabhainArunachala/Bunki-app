@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
 import {
-  appendFileSync,
   closeSync,
   existsSync,
   lstatSync,
@@ -17,6 +16,7 @@ import {
   symlinkSync,
   unlinkSync,
   writeFileSync,
+  writeSync,
 } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
@@ -211,6 +211,9 @@ function timeoutMs(value = DEFAULT_TIMEOUT_MS) {
   );
   return parsed;
 }
+
+// The CI planner uses exactly the same default and validation as the child runner.
+export { timeoutMs as gateTimeoutMs };
 
 // Every entry is required. Deleting a verifier or corpus must fail, not skip.
 export function batteryGates(out, env = process.env) {
@@ -626,22 +629,26 @@ export function batteryGates(out, env = process.env) {
       env: { KAIRO_BROWSER: 'webkit' },
       timeoutMs: 60 * 60 * 1000,
     },
+    // VH-1: one gate per engine. Three run past the battery's default, so each carries its own floor, at least twice its
+    // longest healthy run: reader-doors with its controls (831 s WebKit), the Speak negatives one mutant at a time
+    // (1,104 s WebKit, 22 controls) and reading-truth's full sweep (2,149–2,388 s; 4,801 s under fleet load)
     ...['chromium', 'webkit'].flatMap((engine) => {
       const suffix = engine === 'webkit' ? '-webkit' : '';
       return [
         ['record-depth', 'verify-record-depth', ['--controls']],
         ['speak', 'verify-speak', []],
-        ['speak-negatives', 'verify-speak', ['--negatives']],
+        ['speak-negatives', 'verify-speak', ['--negatives'], 60 * 60 * 1000],
         ['vh-sense-controls', 'verify-vh-sense-controls', []],
-        ['reader-doors', 'verify-reader-doors', []],
-        ['reading-truth', 'verify-reading-truth', []],
+        ['reader-doors', 'verify-reader-doors', [], 40 * 60 * 1000],
+        ['reading-truth', 'verify-reading-truth', [], 3 * 60 * 60 * 1000],
         ['comb-0', 'verify-comb-0', []],
         ['sweep', 'verify-sweep', []],
         ['contrast-sweep', 'verify-contrast-sweep', []],
         ['design-reader-shelf', 'verify-design-reader-shelf', []],
-      ].map(([name, file, args]) => ({
+      ].map(([name, file, args, floor]) => ({
         ...node(name + suffix, tool(file), args),
         env: { KAIRO_BROWSER: engine },
+        ...(floor ? { timeoutMs: floor } : {}),
       }));
     }),
     node('vh-voice-controls', tool('verify-vh-voice-controls')),
@@ -2293,7 +2300,7 @@ async function runGate(gate, root, out, signal, boundary = {}) {
   if (gate.requiredPath && !existsSync(resolve(root, gate.requiredPath))) {
     return finish('missing', 127, `Required path is missing: ${gate.requiredPath}`);
   }
-  let declaration, invocation, commandBefore, sourceBefore;
+  let declaration, invocation, commandBefore, sourceBefore, fd, stdoutFd;
   const producer =
     gate.requiredPath &&
     existsSync(resolve(root, gate.requiredPath)) &&
@@ -2318,14 +2325,20 @@ async function runGate(gate, root, out, signal, boundary = {}) {
     );
     invocation = evidenceInvocation(gate, declaration, root);
     if (declaration.kind === 'command-check') commandBefore = commandCheckEvidence(gate, root);
+    fd = openSync(log, 'a');
+    stdoutFd = openSync(stdoutPath, 'wx');
   } catch (error) {
+    if (fd !== undefined) closeSync(fd);
     return finish('incomplete', 78, error.message);
   }
-  const fd = openSync(log, 'a');
-  const stdoutFd = openSync(stdoutPath, 'wx');
+  const tee = (chunk) => {
+    for (const target of [stdoutFd, fd])
+      for (let at = 0; at < chunk.length;) at += writeSync(target, chunk, at);
+  };
   let child;
   let timer;
   let killTimer;
+  let drainTimer;
   let killed = null;
   let stopPromise = Promise.resolve();
   const killGroup = (kind) => {
@@ -2345,6 +2358,7 @@ async function runGate(gate, root, out, signal, boundary = {}) {
     stopPromise = new Promise((accept) => {
       killTimer = setTimeout(() => {
         killGroup('SIGKILL');
+        child?.stdout?.destroy();
         accept();
       }, 250);
     });
@@ -2356,8 +2370,12 @@ async function runGate(gate, root, out, signal, boundary = {}) {
       child = spawn(invocation.command, invocation.args, {
         cwd: resolve(root, gate.cwd || '.'),
         env: { ...acceptanceEnvironment(process.env, invocation.env), KAIRO_GATE_RUN_ID: runId },
-        stdio: ['ignore', stdoutFd, fd],
+        stdio: ['ignore', 'pipe', fd],
         detached: process.platform !== 'win32',
+      });
+      child.stdout?.on('data', tee);
+      child.once('exit', () => {
+        drainTimer = setTimeout(() => child.stdout?.destroy(), 2000);
       });
       child.once('error', (error) => accept({ error }));
       child.once('close', (code, processSignal) => accept({ code, processSignal }));
@@ -2370,10 +2388,11 @@ async function runGate(gate, root, out, signal, boundary = {}) {
   } finally {
     clearTimeout(timer);
     clearTimeout(killTimer);
+    clearTimeout(drainTimer);
     signal?.removeEventListener('abort', abort);
+    child?.stdout?.destroy();
     closeSync(fd);
     closeSync(stdoutFd);
-    appendFileSync(log, readFileSync(stdoutPath));
   }
   if (killed)
     return finish(killed, killed === 'timed-out' ? 124 : 130, `Gate ${killed}`, result.code);

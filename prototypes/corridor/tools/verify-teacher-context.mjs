@@ -14,6 +14,7 @@ import { homedir } from 'node:os';
 import { extname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
+import { contextBrowserVersion } from './browser-version-support.mjs';
 import {
   resolveCorridorEvidence,
   resolveCorridorSite,
@@ -661,7 +662,7 @@ async function runCase(name, synthetic, body) {
     status: 'running',
     startedAt: new Date().toISOString(),
     syntheticProvider: synthetic,
-    browser: context.browser()?.version(),
+    browser: await contextBrowserVersion(context, chromium, { executablePath: process.env.CHROMIUM_PATH }),
   };
   const video = page.video();
   try {

@@ -38,7 +38,7 @@
 import assert from 'node:assert/strict';
 import { sweepExpectedIds } from '../../../scripts/ci/vh-visual-report-contracts.mjs';
 import { randomUUID, createHash } from 'node:crypto';
-import { exactRoster, shelfContract, shelfEvidence, shelfMutationControls } from './vh-visual-contracts.mjs';
+import { exactRoster, scopeResult, shelfContract, shelfEvidence, shelfMutationControls, sweepSelection } from './vh-visual-contracts.mjs';
 import console from 'node:console';
 import process from 'node:process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -53,10 +53,9 @@ assert(process.env.KAIRO_BROWSER === undefined || ['chromium','webkit','all'].in
 const runId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
 const identity = JSON.parse(readFileSync(join(resolveCorridorSite(), 'build-identity.json'), 'utf8'));
 assert(process.argv.length === 2, 'Unknown sweep argument');
-assert(process.env.KAIRO_SWEEP_MODE === undefined || ['inventory','verify'].includes(process.env.KAIRO_SWEEP_MODE), 'Unknown or empty KAIRO_SWEEP_MODE');
-assert(process.env.KAIRO_SWEEP_NEGATIVE === undefined || ['chip','cover','box'].includes(process.env.KAIRO_SWEEP_NEGATIVE), 'Unknown or empty KAIRO_SWEEP_NEGATIVE');
-const MODE = process.env.KAIRO_SWEEP_MODE === 'inventory' ? 'inventory' : 'verify';
-const NEGATIVE = process.env.KAIRO_SWEEP_NEGATIVE || '';
+const SCOPE = sweepSelection(process.env);
+const MODE = SCOPE.mode;
+const NEGATIVE = SCOPE.negative;
 const SHOTS = MODE === 'inventory' || process.env.KAIRO_SWEEP_SHOTS === '1';
 const out = resolveCorridorEvidence();
 mkdirSync(join(out, 'rooms'), { recursive: true });
@@ -1025,13 +1024,14 @@ try {
 } finally {
   const expectedCases = sweepExpectedIds(Object.keys(engines).length === 2 ? 'all' : Object.keys(engines)[0]);
   const observedCases = checks.map(row => row.id);
-  const complete = exactRoster(expectedCases, observedCases);
+  const verdict = scopeResult({ expected: expectedCases, observed: observedCases, passed: checks.length > 0 && checks.every(row => row.pass), diagnostic: SCOPE.diagnostic });
+  const complete = verdict.complete;
   if (!NEGATIVE && MODE === 'verify' && !complete) process.exitCode = 1;
   writeFileSync(join(out, 'sweep.json'), `${JSON.stringify({ schemaVersion: 2, runId, expectedCases, observedCases, complete, artifactSha256: identity.artifactSha256, gitSha: identity.gitSha, sourceDirty: identity.sourceDirty, engines: Object.keys(engines), browserVersions, verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
-    requestedScope: MODE, selectedPassed: checks.length > 0 && checks.every(row => row.pass),
-    fullAcceptance: MODE === 'verify' && !NEGATIVE && complete && checks.length > 0 && checks.every(row => row.pass),
+    requestedScope: MODE, selectors: SCOPE.selectors, selectedPassed: checks.length > 0 && checks.every(row => row.pass),
+    fullAcceptance: verdict.fullAcceptance,
     mode: MODE, negative: NEGATIVE, summary, checks, inventory, controls }, null, 1)}\n`);
   await host.close();
-  if (!process.exitCode && (MODE !== 'verify' || NEGATIVE)) process.exitCode = 3;
+  if (!process.exitCode && SCOPE.diagnostic) process.exitCode = 3;
 }
 assert(MODE === 'inventory' || checks.length > 0, 'at least one check ran');

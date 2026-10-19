@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 export const RECORD_ROWS = Object.freeze({
   A: ['A.upgrade','A.look-up','A.known','A.finish','A.round-trip','A.page-errors'],
   A2: ['A2.later-met','A2.page-errors'],
@@ -52,6 +53,26 @@ export function reportCopyObservation(observed, { locale='en', pending=false, re
   const delivery=pending || relay ? 'service' : 'github';
   return { label: observed.visible===label && observed.accessible===label && observed.visibleShown===true,
     delivery: observed.delivery===delivery, enabled: observed.disabled===false };
+}
+
+export const READER_D1_DAY = '2026-10-15';
+export const READER_D1_PICKS = 6;
+export async function restoreServedDigests({ files, fetchBytes, manifest, served }) {
+  for (const file of new Set(files)) {
+    const sha256 = createHash('sha256').update(await fetchBytes(file)).digest('hex');
+    served.push({ file, sha256 });
+    if (sha256 !== manifest.get(file)) throw new Error(`restore digest mismatch: ${file}`);
+  }
+  return served;
+}
+export function readerDoorsReceipt({ runId, servedIdentity, verifierGitSha, verifierSha256, engine, browserVersion, origin, d1Day, results, controls, pageErrors,
+  expectedControls, lastCase }) {
+  const hex = (value, length) => typeof value === 'string' && value.length === length && /^[a-f0-9]+$/u.test(value);
+  const fullAcceptance = typeof runId === 'string' && runId.length > 0 && hex(servedIdentity?.gitSha, 40) && hex(servedIdentity?.artifactSha256, 64)
+    && hex(verifierSha256, 64) && results.length > 0 && results.every(row => row.pass === true) && !pageErrors.length
+    && expectedControls > 0 && controls.length === expectedControls && controls.every(row => row.verdict === 'killed');
+  return { schema: 'vh-reader-doors/1', runId, gitSha: servedIdentity?.gitSha, artifactSha256: servedIdentity?.artifactSha256, verifierGitSha, verifierSha256,
+    engine, browserVersion, origin, d1Day, results, controls, pageErrors, fullAcceptance, lastCase };
 }
 
 export function escapeObligations(rows) {

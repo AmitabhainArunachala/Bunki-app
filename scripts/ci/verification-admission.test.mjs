@@ -21,6 +21,19 @@ test('each ambient narrower/fault is cleared; only the declared engine wins', ()
     assert.equal(env.KAIRO_BROWSER, 'chromium');
   }
 });
+test('an ambient standalone handoff, browser driver/binary or child nonce never reaches an acceptance child', () => {
+  const env = acceptanceEnvironment(
+    {
+      PATH: '/bin',
+      GUIDED_STANDALONE: '/elsewhere/corridor-standalone.html',
+      KAIRO_PLAYWRIGHT_MODULE: '/elsewhere/playwright/index.mjs',
+      PERSONAL_CHROMIUM: '/elsewhere/chrome',
+      RECORD_DEPTH_NONCE: 'copied-child-nonce',
+    },
+    { KAIRO_BROWSER: 'webkit' },
+  );
+  assert.deepEqual(env, { PATH: '/bin', KAIRO_BROWSER: 'webkit' });
+});
 test('exact nonempty case roster rejects missing, extra and same-count duplicates', () => {
   for (const observed of [[], ['A'], ['A', 'A'], ['A', 'B', 'C']])
     assert.throws(() => exactIds(['A', 'B'], observed));

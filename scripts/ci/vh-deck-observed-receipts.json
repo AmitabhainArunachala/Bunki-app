@@ -1,0 +1,4043 @@
+{
+  "redesign-language": {
+    "observed": "2026-10-11/r6-gates/independent-ci-after-2/ui-language/ui-language/report.json",
+    "report": {
+      "results": [
+        {
+          "room": "drift",
+          "language": "EN",
+          "view": "drift",
+          "error": 0,
+          "shell": {
+            "view": "drift",
+            "stamp": "door",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 71
+        },
+        {
+          "room": "shelf",
+          "language": "EN",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 265
+        },
+        {
+          "room": "reader",
+          "language": "EN",
+          "view": "reader",
+          "error": 0,
+          "shell": {
+            "view": "reader",
+            "stamp": "reader",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 229
+        },
+        {
+          "room": "entry",
+          "language": "EN",
+          "view": "entry",
+          "error": 0,
+          "shell": {
+            "view": "entry",
+            "stamp": "entry",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 13
+        },
+        {
+          "room": "tray",
+          "language": "EN",
+          "view": "tray",
+          "error": 0,
+          "shell": {
+            "view": "tray",
+            "stamp": "tray",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 48
+        },
+        {
+          "room": "list",
+          "language": "EN",
+          "view": "list",
+          "error": 0,
+          "shell": {
+            "view": "list",
+            "stamp": "list",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 24
+        },
+        {
+          "room": "browse",
+          "language": "EN",
+          "view": "browse",
+          "error": 0,
+          "shell": {
+            "view": "browse",
+            "stamp": "browse",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 31
+        },
+        {
+          "room": "srs-stats",
+          "language": "EN",
+          "view": "srs-stats",
+          "error": 0,
+          "shell": {
+            "view": "srs-stats",
+            "stamp": "progress",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 72
+        },
+        {
+          "room": "review",
+          "language": "EN",
+          "view": "review",
+          "error": 0,
+          "shell": {
+            "view": "review",
+            "stamp": "review",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 20
+        },
+        {
+          "room": "probe",
+          "language": "EN",
+          "view": "probe",
+          "error": 0,
+          "shell": {
+            "view": "probe",
+            "stamp": "probe",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 22
+        },
+        {
+          "room": "archive",
+          "language": "EN",
+          "view": "archive",
+          "error": 0,
+          "shell": {
+            "view": "archive",
+            "stamp": "archive",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 42
+        },
+        {
+          "room": "dojo",
+          "language": "EN",
+          "view": "dojo",
+          "error": 0,
+          "shell": {
+            "view": "dojo",
+            "stamp": "learn",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 49
+        },
+        {
+          "room": "levels",
+          "language": "EN",
+          "view": "levels",
+          "error": 0,
+          "shell": {
+            "view": "levels",
+            "stamp": "reference",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 54
+        },
+        {
+          "room": "ai",
+          "language": "EN",
+          "view": "ai",
+          "error": 0,
+          "shell": {
+            "view": "ai",
+            "stamp": "tutor",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 27
+        },
+        {
+          "room": "aiquiz",
+          "language": "EN",
+          "view": "tray",
+          "error": 0,
+          "shell": {
+            "view": "tray",
+            "stamp": "tray",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 50
+        },
+        {
+          "room": "lessons",
+          "language": "EN",
+          "view": "lessons",
+          "error": 0,
+          "shell": {
+            "view": "lessons",
+            "stamp": "lessons",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 118
+        },
+        {
+          "room": "mock",
+          "language": "EN",
+          "view": "mock",
+          "error": 0,
+          "shell": {
+            "view": "mock",
+            "stamp": "jlpt",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 69
+        },
+        {
+          "room": "kagami",
+          "language": "EN",
+          "view": "kagami",
+          "error": 0,
+          "shell": {
+            "view": "kagami",
+            "stamp": "progress",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 22
+        },
+        {
+          "room": "thesaurus",
+          "language": "EN",
+          "view": "thesaurus",
+          "error": 0,
+          "shell": {
+            "view": "thesaurus",
+            "stamp": "word-web",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 326
+        },
+        {
+          "room": "airead",
+          "language": "EN",
+          "view": "airead",
+          "error": 0,
+          "shell": {
+            "view": "airead",
+            "stamp": "personal-reading",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 36
+        },
+        {
+          "room": "feed",
+          "language": "EN",
+          "view": "feed",
+          "error": 0,
+          "shell": {
+            "view": "feed",
+            "stamp": "feed",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 28
+        },
+        {
+          "room": "publisher",
+          "language": "EN",
+          "view": "publisher",
+          "error": 0,
+          "shell": {
+            "view": "publisher",
+            "stamp": "publisher",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 20
+        },
+        {
+          "room": "source-inbox",
+          "language": "EN",
+          "view": "source-inbox",
+          "error": 0,
+          "shell": {
+            "view": "source-inbox",
+            "stamp": "source-inbox",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 28
+        },
+        {
+          "room": "source-reader",
+          "language": "EN",
+          "view": "source-reader",
+          "error": 0,
+          "shell": {
+            "view": "source-reader",
+            "stamp": "source-reader",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 20
+        },
+        {
+          "room": "sentence-practice",
+          "language": "EN",
+          "view": "sentence-practice",
+          "error": 0,
+          "shell": {
+            "view": "sentence-practice",
+            "stamp": "sentence-practice",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 20
+        },
+        {
+          "room": "kanjidex",
+          "language": "EN",
+          "view": "kanjidex",
+          "error": 0,
+          "shell": {
+            "view": "kanjidex",
+            "stamp": "kanji",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 244
+        },
+        {
+          "room": "yoji",
+          "language": "EN",
+          "view": "yoji",
+          "error": 0,
+          "shell": {
+            "view": "yoji",
+            "stamp": "idioms",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 103
+        },
+        {
+          "room": "grammar",
+          "language": "EN",
+          "view": "grammar",
+          "error": 0,
+          "shell": {
+            "view": "grammar",
+            "stamp": "grammar",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 267
+        },
+        {
+          "room": "guided",
+          "language": "EN",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 42
+        },
+        {
+          "room": "search",
+          "language": "EN",
+          "view": "search",
+          "error": 0,
+          "shell": {
+            "view": "search",
+            "stamp": "search",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 58
+        },
+        {
+          "room": "me",
+          "language": "EN",
+          "view": "me",
+          "error": 0,
+          "shell": {
+            "view": "me",
+            "stamp": "me",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 41
+        },
+        {
+          "room": "settings",
+          "language": "EN",
+          "view": "settings",
+          "error": 0,
+          "shell": {
+            "view": "settings",
+            "stamp": "settings",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 26
+        },
+        {
+          "room": "front-navigation",
+          "language": "EN",
+          "view": "drift",
+          "error": 0,
+          "shell": {
+            "view": "drift",
+            "stamp": "door",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 79
+        },
+        {
+          "room": "world-picker",
+          "language": "EN",
+          "view": "drift",
+          "error": 0,
+          "shell": {
+            "view": "drift",
+            "stamp": "door",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 93
+        },
+        {
+          "room": "mirror-with-evidence",
+          "language": "EN",
+          "view": "kagami",
+          "error": 0,
+          "shell": {
+            "view": "kagami",
+            "stamp": "progress",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 32
+        },
+        {
+          "room": "review-question",
+          "language": "EN",
+          "view": "review",
+          "error": 0,
+          "shell": {
+            "view": "review",
+            "stamp": "review",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 11
+        },
+        {
+          "room": "review-answer",
+          "language": "EN",
+          "view": "review",
+          "error": 0,
+          "shell": {
+            "view": "review",
+            "stamp": "review",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 15
+        },
+        {
+          "room": "probe-question",
+          "language": "EN",
+          "view": "probe",
+          "error": 0,
+          "shell": {
+            "view": "probe",
+            "stamp": "probe",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 14
+        },
+        {
+          "room": "probe-answer",
+          "language": "EN",
+          "view": "probe",
+          "error": 0,
+          "shell": {
+            "view": "probe",
+            "stamp": "probe",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 15
+        },
+        {
+          "room": "lesson-question",
+          "language": "EN",
+          "view": "lessons",
+          "error": 0,
+          "shell": {
+            "view": "lessons",
+            "stamp": "lessons",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 25
+        },
+        {
+          "room": "lesson-answer",
+          "language": "EN",
+          "view": "lessons",
+          "error": 0,
+          "shell": {
+            "view": "lessons",
+            "stamp": "lessons",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 25
+        },
+        {
+          "room": "guided-setup",
+          "language": "EN",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 38
+        },
+        {
+          "room": "guided-question",
+          "language": "EN",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 70
+        },
+        {
+          "room": "guided-explanation",
+          "language": "EN",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 77
+        },
+        {
+          "room": "guided-answer",
+          "language": "EN",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 73
+        },
+        {
+          "room": "guided-grammar-question",
+          "language": "EN",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 77
+        },
+        {
+          "room": "guided-grammar-explanation",
+          "language": "EN",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 92
+        },
+        {
+          "room": "guided-branch",
+          "language": "EN",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 57
+        },
+        {
+          "room": "guided-word",
+          "language": "EN",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 37
+        },
+        {
+          "room": "guided-summary",
+          "language": "EN",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 54
+        },
+        {
+          "room": "guided-results",
+          "language": "EN",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 46
+        },
+        {
+          "room": "guided-learn",
+          "language": "EN",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 46
+        },
+        {
+          "room": "guided-field",
+          "language": "EN",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 43
+        },
+        {
+          "room": "guided-sensei",
+          "language": "EN",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 54
+        },
+        {
+          "room": "guided-about",
+          "language": "EN",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 37
+        },
+        {
+          "room": "mock-confirm",
+          "language": "EN",
+          "view": "mock",
+          "error": 0,
+          "shell": {
+            "view": "mock",
+            "stamp": "jlpt",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 25
+        },
+        {
+          "room": "mock-question",
+          "language": "EN",
+          "view": "mock",
+          "error": 0,
+          "shell": {
+            "view": "mock",
+            "stamp": "jlpt",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 112
+        },
+        {
+          "room": "search-skip",
+          "language": "EN",
+          "view": "search",
+          "error": 0,
+          "shell": {
+            "view": "search",
+            "stamp": "search",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 414
+        },
+        {
+          "room": "search-parts",
+          "language": "EN",
+          "view": "search",
+          "error": 0,
+          "shell": {
+            "view": "search",
+            "stamp": "search",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 250
+        },
+        {
+          "room": "search-radical",
+          "language": "EN",
+          "view": "search",
+          "error": 0,
+          "shell": {
+            "view": "search",
+            "stamp": "search",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 252
+        },
+        {
+          "room": "search-draw",
+          "language": "EN",
+          "view": "search",
+          "error": 0,
+          "shell": {
+            "view": "search",
+            "stamp": "search",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 40
+        },
+        {
+          "room": "search-reading",
+          "language": "EN",
+          "view": "search",
+          "error": 0,
+          "shell": {
+            "view": "search",
+            "stamp": "search",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 38
+        },
+        {
+          "room": "search-meaning",
+          "language": "EN",
+          "view": "search",
+          "error": 0,
+          "shell": {
+            "view": "search",
+            "stamp": "search",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 38
+        },
+        {
+          "room": "search-strokes",
+          "language": "EN",
+          "view": "search",
+          "error": 0,
+          "shell": {
+            "view": "search",
+            "stamp": "search",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 68
+        },
+        {
+          "room": "search-freq",
+          "language": "EN",
+          "view": "search",
+          "error": 0,
+          "shell": {
+            "view": "search",
+            "stamp": "search",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 42
+        },
+        {
+          "room": "search-level",
+          "language": "EN",
+          "view": "search",
+          "error": 0,
+          "shell": {
+            "view": "search",
+            "stamp": "search",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 52
+        },
+        {
+          "room": "search-kkld",
+          "language": "EN",
+          "view": "search",
+          "error": 0,
+          "shell": {
+            "view": "search",
+            "stamp": "search",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 41
+        },
+        {
+          "room": "shelf-tools",
+          "language": "EN",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 297
+        },
+        {
+          "room": "sheet-word",
+          "language": "EN",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 315
+        },
+        {
+          "room": "sheet-word-details",
+          "language": "EN",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 315
+        },
+        {
+          "room": "sheet-kanji",
+          "language": "EN",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 351
+        },
+        {
+          "room": "sheet-kanji-details",
+          "language": "EN",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 351
+        },
+        {
+          "room": "sheet-radical",
+          "language": "EN",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 382
+        },
+        {
+          "room": "sheet-radical-details",
+          "language": "EN",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 382
+        },
+        {
+          "room": "sheet-idiom",
+          "language": "EN",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 314
+        },
+        {
+          "room": "sheet-idiom-details",
+          "language": "EN",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 314
+        },
+        {
+          "room": "sheet-grammar",
+          "language": "EN",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 323
+        },
+        {
+          "room": "sheet-grammar-details",
+          "language": "EN",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 323
+        },
+        {
+          "room": "sheet-particle",
+          "language": "EN",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 319
+        },
+        {
+          "room": "sheet-particle-details",
+          "language": "EN",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 319
+        },
+        {
+          "room": "word-save-destinations",
+          "language": "EN",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 319
+        },
+        {
+          "room": "word-new-list",
+          "language": "EN",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 321
+        },
+        {
+          "room": "variants",
+          "language": "EN",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 325
+        },
+        {
+          "room": "deck-n2",
+          "language": "EN",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 23
+        },
+        {
+          "room": "deck-n2-question",
+          "language": "EN",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 25
+        },
+        {
+          "room": "deck-n2-answer",
+          "language": "EN",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 116
+        },
+        {
+          "room": "deck-n2-settings",
+          "language": "EN",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 61
+        },
+        {
+          "room": "deck-n1",
+          "language": "EN",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 23
+        },
+        {
+          "room": "deck-n1-question",
+          "language": "EN",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 25
+        },
+        {
+          "room": "deck-n1-answer",
+          "language": "EN",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 103
+        },
+        {
+          "room": "deck-n1-settings",
+          "language": "EN",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 61
+        },
+        {
+          "room": "deck-senmon",
+          "language": "EN",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 23
+        },
+        {
+          "room": "deck-senmon-question",
+          "language": "EN",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 25
+        },
+        {
+          "room": "deck-senmon-answer",
+          "language": "EN",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 104
+        },
+        {
+          "room": "deck-senmon-settings",
+          "language": "EN",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 61
+        },
+        {
+          "room": "deck-kotoba",
+          "language": "EN",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 23
+        },
+        {
+          "room": "deck-kotoba-question",
+          "language": "EN",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 25
+        },
+        {
+          "room": "deck-kotoba-answer",
+          "language": "EN",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 52
+        },
+        {
+          "room": "deck-kotoba-settings",
+          "language": "EN",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 67
+        },
+        {
+          "room": "deck-mcd",
+          "language": "EN",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 23
+        },
+        {
+          "room": "deck-mcd-question",
+          "language": "EN",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 25
+        },
+        {
+          "room": "deck-mcd-answer",
+          "language": "EN",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 109
+        },
+        {
+          "room": "deck-mcd-settings",
+          "language": "EN",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 67
+        },
+        {
+          "room": "deck-context",
+          "language": "EN",
+          "view": "contextdeck",
+          "error": 0,
+          "shell": {
+            "view": "contextdeck",
+            "stamp": "contextdeck",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 39
+        },
+        {
+          "room": "deck-context-question",
+          "language": "EN",
+          "view": "contextdeck",
+          "error": 0,
+          "shell": {
+            "view": "contextdeck",
+            "stamp": "contextdeck",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 23
+        },
+        {
+          "room": "deck-context-answer",
+          "language": "EN",
+          "view": "contextdeck",
+          "error": 0,
+          "shell": {
+            "view": "contextdeck",
+            "stamp": "contextdeck",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 24
+        },
+        {
+          "room": "personal-home",
+          "language": "EN",
+          "view": "personaldeck",
+          "error": 0,
+          "shell": {
+            "view": "personaldeck",
+            "stamp": "personal",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 13
+        },
+        {
+          "room": "personal-import-preview",
+          "language": "EN",
+          "view": "personaldeck",
+          "error": 0,
+          "shell": {
+            "view": "personaldeck",
+            "stamp": "personal",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 17
+        },
+        {
+          "room": "personal-study",
+          "language": "EN",
+          "view": "personaldeck",
+          "error": 0,
+          "shell": {
+            "view": "personaldeck",
+            "stamp": "personal",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 25
+        },
+        {
+          "room": "personal-answer",
+          "language": "EN",
+          "view": "personaldeck",
+          "error": 0,
+          "shell": {
+            "view": "personaldeck",
+            "stamp": "personal",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 145
+        },
+        {
+          "room": "personal-dictionary",
+          "language": "EN",
+          "view": "personaldeck",
+          "error": 0,
+          "shell": {
+            "view": "personaldeck",
+            "stamp": "personal",
+            "tabs": 1,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 154
+        },
+        {
+          "room": "personal-dictionary-meanings",
+          "language": "EN",
+          "view": "personaldeck",
+          "error": 0,
+          "shell": {
+            "view": "personaldeck",
+            "stamp": "personal",
+            "tabs": 1,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 154
+        },
+        {
+          "room": "personal-read",
+          "language": "EN",
+          "view": "personaldeck",
+          "error": 0,
+          "shell": {
+            "view": "personaldeck",
+            "stamp": "personal",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 37
+        },
+        {
+          "room": "personal-connections",
+          "language": "EN",
+          "view": "personaldeck",
+          "error": 0,
+          "shell": {
+            "view": "personaldeck",
+            "stamp": "personal",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 24
+        },
+        {
+          "room": "personal-settings",
+          "language": "EN",
+          "view": "personaldeck",
+          "error": 0,
+          "shell": {
+            "view": "personaldeck",
+            "stamp": "personal",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 45
+        },
+        {
+          "room": "drift",
+          "language": "日本語",
+          "view": "drift",
+          "error": 0,
+          "shell": {
+            "view": "drift",
+            "stamp": "door",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "shelf",
+          "language": "日本語",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "reader",
+          "language": "日本語",
+          "view": "reader",
+          "error": 0,
+          "shell": {
+            "view": "reader",
+            "stamp": "reader",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "entry",
+          "language": "日本語",
+          "view": "entry",
+          "error": 0,
+          "shell": {
+            "view": "entry",
+            "stamp": "entry",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "tray",
+          "language": "日本語",
+          "view": "tray",
+          "error": 0,
+          "shell": {
+            "view": "tray",
+            "stamp": "tray",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "list",
+          "language": "日本語",
+          "view": "list",
+          "error": 0,
+          "shell": {
+            "view": "list",
+            "stamp": "list",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "browse",
+          "language": "日本語",
+          "view": "browse",
+          "error": 0,
+          "shell": {
+            "view": "browse",
+            "stamp": "browse",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "srs-stats",
+          "language": "日本語",
+          "view": "srs-stats",
+          "error": 0,
+          "shell": {
+            "view": "srs-stats",
+            "stamp": "progress",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "review",
+          "language": "日本語",
+          "view": "review",
+          "error": 0,
+          "shell": {
+            "view": "review",
+            "stamp": "review",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "probe",
+          "language": "日本語",
+          "view": "probe",
+          "error": 0,
+          "shell": {
+            "view": "probe",
+            "stamp": "probe",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "archive",
+          "language": "日本語",
+          "view": "archive",
+          "error": 0,
+          "shell": {
+            "view": "archive",
+            "stamp": "archive",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "dojo",
+          "language": "日本語",
+          "view": "dojo",
+          "error": 0,
+          "shell": {
+            "view": "dojo",
+            "stamp": "learn",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "levels",
+          "language": "日本語",
+          "view": "levels",
+          "error": 0,
+          "shell": {
+            "view": "levels",
+            "stamp": "reference",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "ai",
+          "language": "日本語",
+          "view": "ai",
+          "error": 0,
+          "shell": {
+            "view": "ai",
+            "stamp": "tutor",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "aiquiz",
+          "language": "日本語",
+          "view": "tray",
+          "error": 0,
+          "shell": {
+            "view": "tray",
+            "stamp": "tray",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "lessons",
+          "language": "日本語",
+          "view": "lessons",
+          "error": 0,
+          "shell": {
+            "view": "lessons",
+            "stamp": "lessons",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "mock",
+          "language": "日本語",
+          "view": "mock",
+          "error": 0,
+          "shell": {
+            "view": "mock",
+            "stamp": "jlpt",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "kagami",
+          "language": "日本語",
+          "view": "kagami",
+          "error": 0,
+          "shell": {
+            "view": "kagami",
+            "stamp": "progress",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "thesaurus",
+          "language": "日本語",
+          "view": "thesaurus",
+          "error": 0,
+          "shell": {
+            "view": "thesaurus",
+            "stamp": "word-web",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "airead",
+          "language": "日本語",
+          "view": "airead",
+          "error": 0,
+          "shell": {
+            "view": "airead",
+            "stamp": "personal-reading",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "feed",
+          "language": "日本語",
+          "view": "feed",
+          "error": 0,
+          "shell": {
+            "view": "feed",
+            "stamp": "feed",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "publisher",
+          "language": "日本語",
+          "view": "publisher",
+          "error": 0,
+          "shell": {
+            "view": "publisher",
+            "stamp": "publisher",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "source-inbox",
+          "language": "日本語",
+          "view": "source-inbox",
+          "error": 0,
+          "shell": {
+            "view": "source-inbox",
+            "stamp": "source-inbox",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "source-reader",
+          "language": "日本語",
+          "view": "source-reader",
+          "error": 0,
+          "shell": {
+            "view": "source-reader",
+            "stamp": "source-reader",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "sentence-practice",
+          "language": "日本語",
+          "view": "sentence-practice",
+          "error": 0,
+          "shell": {
+            "view": "sentence-practice",
+            "stamp": "sentence-practice",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "kanjidex",
+          "language": "日本語",
+          "view": "kanjidex",
+          "error": 0,
+          "shell": {
+            "view": "kanjidex",
+            "stamp": "kanji",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "yoji",
+          "language": "日本語",
+          "view": "yoji",
+          "error": 0,
+          "shell": {
+            "view": "yoji",
+            "stamp": "idioms",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "grammar",
+          "language": "日本語",
+          "view": "grammar",
+          "error": 0,
+          "shell": {
+            "view": "grammar",
+            "stamp": "grammar",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "guided",
+          "language": "日本語",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "search",
+          "language": "日本語",
+          "view": "search",
+          "error": 0,
+          "shell": {
+            "view": "search",
+            "stamp": "search",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "me",
+          "language": "日本語",
+          "view": "me",
+          "error": 0,
+          "shell": {
+            "view": "me",
+            "stamp": "me",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "settings",
+          "language": "日本語",
+          "view": "settings",
+          "error": 0,
+          "shell": {
+            "view": "settings",
+            "stamp": "settings",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "front-navigation",
+          "language": "日本語",
+          "view": "drift",
+          "error": 0,
+          "shell": {
+            "view": "drift",
+            "stamp": "door",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "world-picker",
+          "language": "日本語",
+          "view": "drift",
+          "error": 0,
+          "shell": {
+            "view": "drift",
+            "stamp": "door",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "mirror-with-evidence",
+          "language": "日本語",
+          "view": "kagami",
+          "error": 0,
+          "shell": {
+            "view": "kagami",
+            "stamp": "progress",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "review-question",
+          "language": "日本語",
+          "view": "review",
+          "error": 0,
+          "shell": {
+            "view": "review",
+            "stamp": "review",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "review-answer",
+          "language": "日本語",
+          "view": "review",
+          "error": 0,
+          "shell": {
+            "view": "review",
+            "stamp": "review",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "probe-question",
+          "language": "日本語",
+          "view": "probe",
+          "error": 0,
+          "shell": {
+            "view": "probe",
+            "stamp": "probe",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "probe-answer",
+          "language": "日本語",
+          "view": "probe",
+          "error": 0,
+          "shell": {
+            "view": "probe",
+            "stamp": "probe",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "lesson-question",
+          "language": "日本語",
+          "view": "lessons",
+          "error": 0,
+          "shell": {
+            "view": "lessons",
+            "stamp": "lessons",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "lesson-answer",
+          "language": "日本語",
+          "view": "lessons",
+          "error": 0,
+          "shell": {
+            "view": "lessons",
+            "stamp": "lessons",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "guided-setup",
+          "language": "日本語",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "guided-question",
+          "language": "日本語",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "guided-explanation",
+          "language": "日本語",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "guided-answer",
+          "language": "日本語",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "guided-grammar-question",
+          "language": "日本語",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "guided-grammar-explanation",
+          "language": "日本語",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "guided-branch",
+          "language": "日本語",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "guided-word",
+          "language": "日本語",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "guided-summary",
+          "language": "日本語",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "guided-results",
+          "language": "日本語",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "guided-learn",
+          "language": "日本語",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "guided-field",
+          "language": "日本語",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "guided-sensei",
+          "language": "日本語",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "guided-about",
+          "language": "日本語",
+          "view": "guided",
+          "error": 0,
+          "shell": {
+            "view": "guided",
+            "stamp": "guided",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "mock-confirm",
+          "language": "日本語",
+          "view": "mock",
+          "error": 0,
+          "shell": {
+            "view": "mock",
+            "stamp": "jlpt",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "mock-question",
+          "language": "日本語",
+          "view": "mock",
+          "error": 0,
+          "shell": {
+            "view": "mock",
+            "stamp": "jlpt",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "search-skip",
+          "language": "日本語",
+          "view": "search",
+          "error": 0,
+          "shell": {
+            "view": "search",
+            "stamp": "search",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "search-parts",
+          "language": "日本語",
+          "view": "search",
+          "error": 0,
+          "shell": {
+            "view": "search",
+            "stamp": "search",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "search-radical",
+          "language": "日本語",
+          "view": "search",
+          "error": 0,
+          "shell": {
+            "view": "search",
+            "stamp": "search",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "search-draw",
+          "language": "日本語",
+          "view": "search",
+          "error": 0,
+          "shell": {
+            "view": "search",
+            "stamp": "search",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "search-reading",
+          "language": "日本語",
+          "view": "search",
+          "error": 0,
+          "shell": {
+            "view": "search",
+            "stamp": "search",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "search-meaning",
+          "language": "日本語",
+          "view": "search",
+          "error": 0,
+          "shell": {
+            "view": "search",
+            "stamp": "search",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "search-strokes",
+          "language": "日本語",
+          "view": "search",
+          "error": 0,
+          "shell": {
+            "view": "search",
+            "stamp": "search",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "search-freq",
+          "language": "日本語",
+          "view": "search",
+          "error": 0,
+          "shell": {
+            "view": "search",
+            "stamp": "search",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "search-level",
+          "language": "日本語",
+          "view": "search",
+          "error": 0,
+          "shell": {
+            "view": "search",
+            "stamp": "search",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "search-kkld",
+          "language": "日本語",
+          "view": "search",
+          "error": 0,
+          "shell": {
+            "view": "search",
+            "stamp": "search",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "shelf-tools",
+          "language": "日本語",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "sheet-word",
+          "language": "日本語",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "sheet-word-details",
+          "language": "日本語",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "sheet-kanji",
+          "language": "日本語",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "sheet-kanji-details",
+          "language": "日本語",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "sheet-radical",
+          "language": "日本語",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "sheet-radical-details",
+          "language": "日本語",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "sheet-idiom",
+          "language": "日本語",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "sheet-idiom-details",
+          "language": "日本語",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "sheet-grammar",
+          "language": "日本語",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "sheet-grammar-details",
+          "language": "日本語",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "sheet-particle",
+          "language": "日本語",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "sheet-particle-details",
+          "language": "日本語",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "word-save-destinations",
+          "language": "日本語",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "word-new-list",
+          "language": "日本語",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 0,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "variants",
+          "language": "日本語",
+          "view": "shelf",
+          "error": 0,
+          "shell": {
+            "view": "shelf",
+            "stamp": "shelf",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-n2",
+          "language": "日本語",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-n2-question",
+          "language": "日本語",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-n2-answer",
+          "language": "日本語",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-n2-settings",
+          "language": "日本語",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-n1",
+          "language": "日本語",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-n1-question",
+          "language": "日本語",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-n1-answer",
+          "language": "日本語",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-n1-settings",
+          "language": "日本語",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-senmon",
+          "language": "日本語",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-senmon-question",
+          "language": "日本語",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-senmon-answer",
+          "language": "日本語",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-senmon-settings",
+          "language": "日本語",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-kotoba",
+          "language": "日本語",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-kotoba-question",
+          "language": "日本語",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-kotoba-answer",
+          "language": "日本語",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-kotoba-settings",
+          "language": "日本語",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-mcd",
+          "language": "日本語",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-mcd-question",
+          "language": "日本語",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-mcd-answer",
+          "language": "日本語",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-mcd-settings",
+          "language": "日本語",
+          "view": "deckplay",
+          "error": 0,
+          "shell": {
+            "view": "deckplay",
+            "stamp": "deckplay",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-context",
+          "language": "日本語",
+          "view": "contextdeck",
+          "error": 0,
+          "shell": {
+            "view": "contextdeck",
+            "stamp": "contextdeck",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-context-question",
+          "language": "日本語",
+          "view": "contextdeck",
+          "error": 0,
+          "shell": {
+            "view": "contextdeck",
+            "stamp": "contextdeck",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "deck-context-answer",
+          "language": "日本語",
+          "view": "contextdeck",
+          "error": 0,
+          "shell": {
+            "view": "contextdeck",
+            "stamp": "contextdeck",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "personal-home",
+          "language": "日本語",
+          "view": "personaldeck",
+          "error": 0,
+          "shell": {
+            "view": "personaldeck",
+            "stamp": "personal",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "personal-import-preview",
+          "language": "日本語",
+          "view": "personaldeck",
+          "error": 0,
+          "shell": {
+            "view": "personaldeck",
+            "stamp": "personal",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "personal-study",
+          "language": "日本語",
+          "view": "personaldeck",
+          "error": 0,
+          "shell": {
+            "view": "personaldeck",
+            "stamp": "personal",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "personal-answer",
+          "language": "日本語",
+          "view": "personaldeck",
+          "error": 0,
+          "shell": {
+            "view": "personaldeck",
+            "stamp": "personal",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "personal-dictionary",
+          "language": "日本語",
+          "view": "personaldeck",
+          "error": 0,
+          "shell": {
+            "view": "personaldeck",
+            "stamp": "personal",
+            "tabs": 1,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "personal-dictionary-meanings",
+          "language": "日本語",
+          "view": "personaldeck",
+          "error": 0,
+          "shell": {
+            "view": "personaldeck",
+            "stamp": "personal",
+            "tabs": 1,
+            "activeTabs": 0,
+            "quiet": true
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "personal-read",
+          "language": "日本語",
+          "view": "personaldeck",
+          "error": 0,
+          "shell": {
+            "view": "personaldeck",
+            "stamp": "personal",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "personal-connections",
+          "language": "日本語",
+          "view": "personaldeck",
+          "error": 0,
+          "shell": {
+            "view": "personaldeck",
+            "stamp": "personal",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        },
+        {
+          "room": "personal-settings",
+          "language": "日本語",
+          "view": "personaldeck",
+          "error": 0,
+          "shell": {
+            "view": "personaldeck",
+            "stamp": "personal",
+            "tabs": 1,
+            "activeTabs": 1,
+            "quiet": false
+          },
+          "contractIssues": [],
+          "issues": [],
+          "inspected": 0
+        }
+      ],
+      "errors": [],
+      "issues": []
+    }
+  },
+  "redesign-foundation": {
+    "observed": "2026-10-15/juncture/one-hand/N2/verify-1/redesign-foundation-webkit/foundation.json",
+    "report": {
+      "checks": [
+        {
+          "engine": "chromium",
+          "width": 320,
+          "lang": "bi",
+          "passed": true
+        },
+        {
+          "engine": "chromium",
+          "width": 320,
+          "lang": "ja",
+          "passed": true
+        },
+        {
+          "engine": "chromium",
+          "width": 390,
+          "lang": "bi",
+          "passed": true
+        },
+        {
+          "engine": "chromium",
+          "width": 390,
+          "lang": "ja",
+          "passed": true
+        },
+        {
+          "engine": "chromium",
+          "width": 768,
+          "lang": "bi",
+          "passed": true
+        },
+        {
+          "engine": "chromium",
+          "width": 768,
+          "lang": "ja",
+          "passed": true
+        },
+        {
+          "engine": "webkit",
+          "width": 320,
+          "lang": "bi",
+          "passed": true
+        },
+        {
+          "engine": "webkit",
+          "width": 320,
+          "lang": "ja",
+          "passed": true
+        },
+        {
+          "engine": "webkit",
+          "width": 390,
+          "lang": "bi",
+          "passed": true
+        },
+        {
+          "engine": "webkit",
+          "width": 390,
+          "lang": "ja",
+          "passed": true
+        },
+        {
+          "engine": "webkit",
+          "width": 768,
+          "lang": "bi",
+          "passed": true
+        },
+        {
+          "engine": "webkit",
+          "width": 768,
+          "lang": "ja",
+          "passed": true
+        }
+      ],
+      "horizontalSamples": [
+        {
+          "engine": "chromium",
+          "width": 320,
+          "lang": "bi",
+          "stage": "return-to-read-after-dictionary",
+          "noHorizontalScroll": true
+        },
+        {
+          "engine": "chromium",
+          "width": 320,
+          "lang": "ja",
+          "stage": "return-to-read-after-dictionary",
+          "noHorizontalScroll": true
+        },
+        {
+          "engine": "chromium",
+          "width": 390,
+          "lang": "bi",
+          "stage": "return-to-read-after-dictionary",
+          "noHorizontalScroll": true
+        },
+        {
+          "engine": "chromium",
+          "width": 390,
+          "lang": "ja",
+          "stage": "return-to-read-after-dictionary",
+          "noHorizontalScroll": true
+        },
+        {
+          "engine": "chromium",
+          "width": 768,
+          "lang": "bi",
+          "stage": "return-to-read-after-dictionary",
+          "noHorizontalScroll": true
+        },
+        {
+          "engine": "chromium",
+          "width": 768,
+          "lang": "ja",
+          "stage": "return-to-read-after-dictionary",
+          "noHorizontalScroll": true
+        },
+        {
+          "engine": "webkit",
+          "width": 320,
+          "lang": "bi",
+          "stage": "return-to-read-after-dictionary",
+          "noHorizontalScroll": true
+        },
+        {
+          "engine": "webkit",
+          "width": 320,
+          "lang": "ja",
+          "stage": "return-to-read-after-dictionary",
+          "noHorizontalScroll": true
+        },
+        {
+          "engine": "webkit",
+          "width": 390,
+          "lang": "bi",
+          "stage": "return-to-read-after-dictionary",
+          "noHorizontalScroll": true
+        },
+        {
+          "engine": "webkit",
+          "width": 390,
+          "lang": "ja",
+          "stage": "return-to-read-after-dictionary",
+          "noHorizontalScroll": true
+        },
+        {
+          "engine": "webkit",
+          "width": 768,
+          "lang": "bi",
+          "stage": "return-to-read-after-dictionary",
+          "noHorizontalScroll": true
+        },
+        {
+          "engine": "webkit",
+          "width": 768,
+          "lang": "ja",
+          "stage": "return-to-read-after-dictionary",
+          "noHorizontalScroll": true
+        }
+      ],
+      "diagnostics": []
+    }
+  },
+  "redesign-foundation-partial": {
+    "observed": "2026-10-15/juncture/one-hand/N2/verify-2/redesign-foundation-webkit/foundation.json",
+    "report": {
+      "checks": [
+        {
+          "engine": "chromium",
+          "width": 320,
+          "lang": "bi",
+          "passed": true
+        },
+        {
+          "engine": "chromium",
+          "width": 320,
+          "lang": "ja",
+          "passed": true
+        },
+        {
+          "engine": "chromium",
+          "width": 390,
+          "lang": "bi",
+          "passed": true
+        },
+        {
+          "engine": "chromium",
+          "width": 390,
+          "lang": "ja",
+          "passed": true
+        },
+        {
+          "engine": "chromium",
+          "width": 768,
+          "lang": "bi",
+          "passed": true
+        },
+        {
+          "engine": "chromium",
+          "width": 768,
+          "lang": "ja",
+          "passed": true
+        },
+        {
+          "engine": "webkit",
+          "width": 320,
+          "lang": "bi",
+          "passed": true
+        },
+        {
+          "engine": "webkit",
+          "width": 320,
+          "lang": "ja",
+          "passed": true
+        },
+        {
+          "engine": "webkit",
+          "width": 390,
+          "lang": "bi",
+          "passed": true
+        }
+      ],
+      "horizontalSamples": [
+        {
+          "engine": "chromium",
+          "width": 320,
+          "lang": "bi",
+          "stage": "return-to-read-after-dictionary",
+          "noHorizontalScroll": true
+        },
+        {
+          "engine": "chromium",
+          "width": 320,
+          "lang": "ja",
+          "stage": "return-to-read-after-dictionary",
+          "noHorizontalScroll": true
+        },
+        {
+          "engine": "chromium",
+          "width": 390,
+          "lang": "bi",
+          "stage": "return-to-read-after-dictionary",
+          "noHorizontalScroll": true
+        },
+        {
+          "engine": "chromium",
+          "width": 390,
+          "lang": "ja",
+          "stage": "return-to-read-after-dictionary",
+          "noHorizontalScroll": true
+        },
+        {
+          "engine": "chromium",
+          "width": 768,
+          "lang": "bi",
+          "stage": "return-to-read-after-dictionary",
+          "noHorizontalScroll": true
+        },
+        {
+          "engine": "chromium",
+          "width": 768,
+          "lang": "ja",
+          "stage": "return-to-read-after-dictionary",
+          "noHorizontalScroll": true
+        },
+        {
+          "engine": "webkit",
+          "width": 320,
+          "lang": "bi",
+          "stage": "return-to-read-after-dictionary",
+          "noHorizontalScroll": true
+        },
+        {
+          "engine": "webkit",
+          "width": 320,
+          "lang": "ja",
+          "stage": "return-to-read-after-dictionary",
+          "noHorizontalScroll": true
+        },
+        {
+          "engine": "webkit",
+          "width": 390,
+          "lang": "bi",
+          "stage": "return-to-read-after-dictionary",
+          "noHorizontalScroll": true
+        }
+      ],
+      "diagnostics": []
+    }
+  },
+  "personal-collections-contract": {
+    "observed": "2026-10-15/juncture/one-hand/H/codex-H1/VH1/final-source-gates/personal-collections-contract/personal-collections.json",
+    "report": {
+      "schemaVersion": 2,
+      "runId": "413c41ee-98fd-4a95-bb58-9d511d16de3e",
+      "suite": "personal-collections",
+      "passed": 15,
+      "checks": [
+        "original collection and exported bundle validate",
+        "answer enrichment binds to original text without changing assessment IDs, hashes or history",
+        "bad readings, changed text, missing kanji coverage and incorrect edition bindings reject atomically",
+        "answer revisions cannot downgrade or silently replace conflicting saved explanations",
+        "reject malformed input, tampering, duplicate identities, unsafe sources and foreign references",
+        "four modalities have stable, independent identities",
+        "view and preview create no evidence; exact due time gates reviews",
+        "related-card burial survives reload and expires on the Japan study day",
+        "undo is append-only, replay restores the prior memory state",
+        "daily new limit is shared across themes and task types",
+        "old or invalid backups cannot erase events; compatible history extends",
+        "invalid ratings, unknown cards, sequence gaps and backwards clocks are blocked",
+        "six failures pause a card, explicit resume permits review",
+        "long history is never truncated and export replay is deterministic",
+        "private route and all module dependencies are packaged and precached"
+      ],
+      "error": null,
+      "completed": true,
+      "verifierSha256": "aaeac8a50f45af4c6033b4d616c71bbc73d35c5a40e19d87a514ce65b236a2d1",
+      "sources": [
+        {
+          "path": "../decks/personal/engine.mjs",
+          "sha256": "9da3b8970e4855fed3e3854e7e56a91f18fef14aba0b7ee73685771194f06d38"
+        },
+        {
+          "path": "../decks/personal/schema.mjs",
+          "sha256": "6bc8079e6d9e080255c8f8c56a1985065f3321ccaad032478752a8036035f6c2"
+        },
+        {
+          "path": "../decks/personal/enrichment.mjs",
+          "sha256": "197bcb7435c65ab1db3585ee706432e9c10a397c70a7bfd198e53b3661270400"
+        },
+        {
+          "path": "../vendor/ts-fsrs.mjs",
+          "sha256": "837fea3f2553cb0878f53a82ac6238a4ab0adf367e1d571163504d452ff058b2"
+        },
+        {
+          "path": "./personal-fixture.mjs",
+          "sha256": "edbc93e18f47e512dcb3432a1354093f0b026967a81c4e7c91a3fda932f791c5"
+        },
+        {
+          "path": "../sw.js",
+          "sha256": "29dfd023fc7911cbd2073b2fe2ff9c51ce0a2364d467653130213069634de583"
+        },
+        {
+          "path": "../../../scripts/corridor-assets.mjs",
+          "sha256": "0a67097b7c2a29edd56b64dabdd35c33309b53656cd21132cf9b7c8758702455"
+        }
+      ]
+    }
+  }
+}

@@ -17,6 +17,21 @@ export function selection(value, allowed, name) {
   assert(selected.every(x => allowed.includes(x)), `${name}: unknown selection ${selected.filter(x => !allowed.includes(x)).join(',')}`);
   return selected;
 }
+export const SWEEP_SELECTORS = Object.freeze(['KAIRO_SWEEP_MODE', 'KAIRO_SWEEP_NEGATIVE']);
+export function sweepSelection(env) {
+  const mode = env.KAIRO_SWEEP_MODE, negative = env.KAIRO_SWEEP_NEGATIVE;
+  assert(mode === undefined || ['inventory', 'verify'].includes(mode), 'Unknown or empty KAIRO_SWEEP_MODE');
+  assert(negative === undefined || ['chip', 'cover', 'box'].includes(negative), 'Unknown or empty KAIRO_SWEEP_NEGATIVE');
+  const selectors = Object.fromEntries(SWEEP_SELECTORS.filter(name => env[name] !== undefined).map(name => [name, env[name]]));
+  return { mode: mode === 'inventory' ? 'inventory' : 'verify', negative: negative || '', selectors, diagnostic: Object.keys(selectors).length > 0 };
+}
+export const rubyHalfOfBody = (size, body) => size / body >= 0.49 && size / body <= 0.51;
+export const rubyLegible = size => size >= 10;
+export const readingContrastHolds = ratio => ratio >= 4.5;
+export const rubyTurnKeepsPassage = ({ frontText, backText, pitches }) => backText.length > 0 && backText === frontText
+  && pitches.length > 2 && Math.max(...pitches) - Math.min(...pitches) <= 1;
+export const rubyHideMovesNothing = ({ back, backTops, lines, tops }) =>
+  JSON.stringify(lines) === JSON.stringify(back) && JSON.stringify(tops) === JSON.stringify(backTops);
 export function scopeResult({ expected, observed, passed, diagnostic = false }) {
   const complete = exactRoster(expected, observed);
   return { expectedCases: expected, observedCases: observed, complete, selectedPassed: complete && passed,

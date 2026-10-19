@@ -492,7 +492,7 @@ try {
   const fullAcceptance=exactNamedCompletion(checks,expectedChecks) && exactNamedCompletion(scenarios,expectedScenarios,'name','completed') && observedControls.length===expectedControls.length && new Set(observedControls).size===expectedControls.length
     && expectedControls.every(id=>observedControls.includes(id)) && controls.every(row=>row.verdict==='killed');
   writeFileSync(join(out, 'verification-report.json'), `${JSON.stringify({schema:'vh-report-delivery/1',suite:'report-delivery',version,runId,startedAt,finishedAt:new Date().toISOString(),
-    gitSha:identity.gitSha,artifactSha256:identity.artifactSha256,verifierGitSha,verifierSha256,engines:Object.keys(engines),browsers:versions,scope:'full-engine',checks,expectedChecks,scenarios,expectedScenarios,controls,expectedControls,observedControls,fullAcceptance},null,2)}\n`);
+    gitSha:identity.gitSha,artifactSha256:identity.artifactSha256,verifierGitSha,verifierSha256,engines:Object.keys(engines),browsers:versions,scope:Object.keys(engines).length===2?'full-engine':'diagnostic',checks,expectedChecks,scenarios,expectedScenarios,controls,expectedControls,observedControls,fullAcceptance},null,2)}\n`);
   console.log(`\n${checks.filter(row=>row.pass).length}/${checks.length} checks passed`);
   if (!fullAcceptance) process.exitCode=1;
 }

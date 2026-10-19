@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { realpathSync } from 'node:fs';
 /** Deck/misc receipts; independent case inventories reviewed at 384d4a70. */
 export const DECK_CASES = Object.freeze({
   personal: [
@@ -50,24 +51,25 @@ const exact = (a, b) =>
   new Set(a).size === a.length &&
   new Set(b).size === b.length &&
   a.every((x) => b.includes(x));
+const realPath = (path) => {
+  try {
+    return realpathSync(path);
+  } catch {
+    return null;
+  }
+};
+const sameSite = (a, b) =>
+  nonempty(a) && nonempty(b) && realPath(a) !== null && realPath(a) === realPath(b);
+export const PAIRED_ENGINES = Object.freeze(['chromium', 'webkit']);
+const pairedVersions = (versions) =>
+  exact(PAIRED_ENGINES, Object.keys(versions || {})) &&
+  PAIRED_ENGINES.every((engine) => nonempty(versions[engine]));
 const engines = (engine) => {
   if (!['chromium', 'webkit', 'all'].includes(engine || 'chromium'))
     throw Error('Unknown engine scope');
   return engine === 'all' ? ['chromium', 'webkit'] : [engine || 'chromium'];
 };
 const envOf = (c) => c.env || c.environment || {};
-const personalEngines = (c) => {
-  const list = (envOf(c).PERSONAL_BROWSERS || 'chromium,webkit').split(',');
-  if (
-    !list.length ||
-    new Set(list).size !== list.length ||
-    list.some((e) => !['chromium', 'webkit'].includes(e))
-  )
-    throw Error('Unknown/duplicate personal engine scope');
-  return list;
-};
-const foundationEngines = (c) =>
-  (envOf(c).KAIRO_BROWSER || c.engine) === 'chromium' ? ['chromium'] : ['chromium', 'webkit'];
 const digest = (value) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
 function named({
   producer,
@@ -116,8 +118,10 @@ function named({
           sha(context.artifactSha256) &&
           nonempty(context.site) &&
           (!report.site ||
-            report.site ===
-              context.site), 'Legacy report needs pinned site before/after execution');
+            sameSite(
+              report.site,
+              context.site,
+            )), 'Legacy report needs pinned site before/after execution');
       for (const row of rows || [])
         if (typeof row === 'object') {
           require(row?.[passKey] === true &&
@@ -198,8 +202,8 @@ const defs = {
     path: 'results.json',
     rowKey: 'checks',
     rowId: (r) => r,
-    expectedCases: (e, c = {}) =>
-      personalEngines(c).flatMap((engine) =>
+    expectedCases: () =>
+      PAIRED_ENGINES.flatMap((engine) =>
         [
           ...DECK_CASES['personal-browser'],
           engine === 'webkit'
@@ -209,7 +213,11 @@ const defs = {
       ),
     extra(r, c, q) {
       q(
-        r.status === 'passed' && exact(personalEngines(c), r.browsers),
+        (envOf(c).PERSONAL_BROWSERS ?? PAIRED_ENGINES.join(',')) === PAIRED_ENGINES.join(',') &&
+          r.status === 'passed' &&
+          exact(PAIRED_ENGINES, r.browsers) &&
+          pairedVersions(r.browserVersions) &&
+          r.executableOverride === false,
         'Personal browser full engine coverage invalid',
       );
     },
@@ -221,11 +229,15 @@ defs['redesign-foundation'] = named({
   rowKey: 'checks',
   passKey: 'passed',
   rowId: (r) => `${r.engine}/${r.width}/${r.lang}`,
-  expectedCases: (e, c = {}) =>
-    foundationEngines({ ...c, engine: e }).flatMap((engine) =>
+  expectedCases: () =>
+    PAIRED_ENGINES.flatMap((engine) =>
       [320, 390, 768].flatMap((w) => ['bi', 'ja'].map((l) => `${engine}/${w}/${l}`)),
     ),
   extra(r, c, q) {
+    q(
+      c.engine === 'all' && envOf(c).KAIRO_BROWSER === 'all' && pairedVersions(r.browserVersions),
+      'Foundation always runs both engines; engine/version evidence missing',
+    );
     q(
       r.diagnostics?.length === 0 &&
         Array.isArray(r.horizontalSamples) &&
@@ -247,7 +259,7 @@ defs['redesign-docks'] = named({
   passKey: 'passed',
   rowId: (r) => `${r.engine}/${r.lang}/${r.width}/${r.kind}`,
   expectedCases: () =>
-    ['chromium', 'webkit'].flatMap((e) =>
+    PAIRED_ENGINES.flatMap((e) =>
       ['bi', 'ja'].flatMap((l) =>
         [
           ['context', 390],
@@ -289,7 +301,7 @@ defs['n2n1-decks-browser'] = {
       r.status === 'passed' &&
         !r.error &&
         c.engine === 'chromium' &&
-        r.site === c.site &&
+        sameSite(r.site, c.site) &&
         c.artifactVerifiedBeforeAndAfter === true &&
         sha(c.artifactSha256),
       'N2/N1 artifact/engine/completion',
@@ -1569,7 +1581,7 @@ export const LANGUAGE_STAMPS = Object.freeze({
 });
 defs['redesign-language'] = {
   producer: 'tools/lint-ui-language.mjs',
-  paths: ['report.json'],
+  paths: ['ui-language/report.json'],
   expectedCases: () =>
     ['EN', '日本語'].flatMap((l) => LANGUAGE_ROOMS.map((room) => `${l}/${room}`)),
   validate(r, c) {
@@ -1583,7 +1595,7 @@ defs['redesign-language'] = {
       c.engine === 'chromium' &&
         c.artifactVerifiedBeforeAndAfter === true &&
         sha(c.artifactSha256) &&
-        r.artifact === c.site,
+        sameSite(r.artifact, c.site),
       'Language tour artifact/engine mismatch',
     );
     q(!(c.args || c.argv || []).includes('--core-only'), 'Core-only language run');
@@ -1657,7 +1669,7 @@ defs['experience-require-skip'] = {
     q(
       c.engine === 'chromium' &&
         r.requiredSkip === true &&
-        r.root === c.site &&
+        sameSite(r.root, c.site) &&
         sha(c.artifactSha256) &&
         r.artifactSha256 === c.artifactSha256 &&
         c.artifactVerifiedBeforeAndAfter === true,

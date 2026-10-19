@@ -1,9 +1,14 @@
 /* global structuredClone */
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
+import { pathToFileURL, URL } from 'node:url';
 import {
   voiceReportContracts,
   validateVoiceReport,
+  speakMutantKill,
   SENSE_CONTROL_IDS,
   VOICE_CONTROL_IDS,
 } from './vh-voice-report-contracts.mjs';
@@ -139,6 +144,64 @@ test('Speak removed assertion cannot pass by decrementing its self-reported chec
   report.checks.shift();
   report.cases[0].checks--;
   assert.equal(validateVoiceReport('speak', report, context).passed, false);
+});
+test('Speak requires strict true for every completed case and individual assertion', () => {
+  for (const engine of ['chromium', 'webkit'])
+    for (const key of ['cases', 'checks'])
+      for (const value of [undefined, null, false, 0, 1, 'true']) {
+        const { report, context } = speak(engine);
+        report[key][0].pass = value;
+        assert.equal(
+          validateVoiceReport('speak', report, context).passed,
+          false,
+          `${engine}/${key}/${value}`,
+        );
+      }
+});
+test('Speak independently requires S23 and egress even when the producer declares its subset complete', () => {
+  for (const omitted of ['S23', 'egress']) {
+    const { report, context } = speak();
+    report.cases = report.cases.filter((row) => row.case !== omitted);
+    report.checks = report.checks.filter((row) => row.case !== omitted);
+    report.expectedCases = report.observedCases = report.cases.map(
+      (row) => `${row.engine}/${row.case}`,
+    );
+    assert.equal(voiceReportContracts.speak.expectedCases('chromium').length, 24);
+    assert.equal(validateVoiceReport('speak', report, context).passed, false);
+  }
+});
+test('a mutated producer case helper cannot shrink the executable Speak admission oracle', async () => {
+  const output = process.env.RUNNER_TEMP || join(homedir(), '.dharma', 'bunki', 'test-fixtures');
+  mkdirSync(output, { recursive: true });
+  const root = mkdtempSync(join(output, 'speak-oracle-'));
+  try {
+    const ci = join(root, 'scripts', 'ci'),
+      tools = join(root, 'prototypes', 'corridor', 'tools');
+    mkdirSync(ci, { recursive: true });
+    mkdirSync(tools, { recursive: true });
+    for (const name of ['vh-voice-report-contracts.mjs', 'vh-voice-rosters.mjs'])
+      writeFileSync(join(ci, name), readFileSync(new URL(name, import.meta.url)));
+    const originalHelper = new URL(
+      '../../prototypes/corridor/tools/vh-voice-contracts.mjs',
+      import.meta.url,
+    ).href;
+    writeFileSync(
+      join(tools, 'vh-voice-contracts.mjs'),
+      `export { exactRoster } from ${JSON.stringify(originalHelper)};\n` +
+        `export const SPEAK_CASE_IDS = ['S1'];\n` +
+        `export function speakCompletion() { return {fullAcceptance:true, observedCases:['chromium/S1','chromium/egress']}; }\n`,
+    );
+    const altered = await import(pathToFileURL(join(ci, 'vh-voice-report-contracts.mjs')).href);
+    assert.equal(altered.voiceReportContracts.speak.expectedCases('chromium').length, 24);
+    const full = speak();
+    assert.equal(altered.validateVoiceReport('speak', full.report, full.context).passed, true);
+    full.report.cases = full.report.cases.filter((row) => ['S1', 'egress'].includes(row.case));
+    full.report.checks = full.report.checks.filter((row) => ['S1', 'egress'].includes(row.case));
+    full.report.expectedCases = full.report.observedCases = ['chromium/S1', 'chromium/egress'];
+    assert.equal(altered.validateVoiceReport('speak', full.report, full.context).passed, false);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });
 test('both Speak engines require their own timing row, never the other engine’s alternative', () => {
   for (const engine of ['chromium', 'webkit']) {
@@ -340,6 +403,60 @@ test('Speak mutant admission rereads all phase nonces and exact primary assertio
   green.pass = true;
   report.rows[0].mutant.timedOut = true;
   assert.equal(validateVoiceReport('speak-negatives', report, context).passed, false);
+});
+test('Speak mutant children are confined to the selected cases: an unexpected case, red or green, never passes', () => {
+  const { report, context, children } = speakNegatives('chromium');
+  const row = report.rows.find((r) => r.fault === 'device-voice');
+  for (const phase of ['baseline', 'mutant', 'restore'])
+    for (const pass of [false, true]) {
+      const receipt = children.get(`${row[phase].evidence}/verify-speak.json`);
+      receipt.checks.push({ engine: 'chromium', case: 'S4', name: SPEAK_CHECK_NAMES.S4[0], pass });
+      assert.equal(
+        validateVoiceReport('speak-negatives', report, context).passed,
+        false,
+        `${phase}: unexpected S4 ${pass ? 'green' : 'red'}`,
+      );
+      receipt.checks.pop();
+    }
+  const judged = validateVoiceReport('speak-negatives', report, context);
+  assert(judged.passed, judged.errors.join(';'));
+});
+test('Speak mutant setup errors, spawn failures, child errors and timeouts are never kills', () => {
+  for (const mutate of [
+    (row) => (row.mutant.error = 'setup failed'),
+    (row) => (row.mutant.spawnError = 'ENOENT'),
+    (row) => (row.mutant.signal = 'SIGKILL'),
+    (row) => (row.mutant.timedOut = true),
+    (row) => (row.restore.timedOut = true),
+    (row) => (row.baseline.error = 'setup failed'),
+    (row) => (row.status = 'setup-error'),
+  ]) {
+    const { report, context } = speakNegatives('webkit');
+    mutate(report.rows[0]);
+    assert.equal(validateVoiceReport('speak-negatives', report, context).passed, false);
+  }
+  const { report, context, children } = speakNegatives('webkit');
+  const mutant = children.get(`${report.rows[0].mutant.evidence}/verify-speak.json`);
+  mutant.error = 'browserType.launch: setup failed';
+  assert.equal(validateVoiceReport('speak-negatives', report, context).passed, false);
+  delete mutant.error;
+  mutant.pageErrors = ['setup'];
+  assert.equal(validateVoiceReport('speak-negatives', report, context).passed, false);
+});
+test('a mutant witness must be an explicit non-empty expression for a selected case', () => {
+  const name = SPEAK_MUTANT_SPEC['device-voice'].witness.S2;
+  const checks = [{ engine: 'chromium', case: 'S2', name, pass: false }];
+  const kill = speakMutantKill({ witness: { S2: name }, downstream: {} }, checks, 'chromium');
+  assert.deepEqual([kill.scoped, kill.witnessed, kill.unrelatedClean], [true, true, true]);
+  for (const witness of [{}, { S2: '' }, { S2: undefined }, { S2: null }, { S9: name }]) {
+    const judged = speakMutantKill({ witness, downstream: {} }, checks, 'chromium');
+    assert.equal(judged.scoped && judged.witnessed && judged.unrelatedClean, false);
+  }
+  assert.equal(speakMutantKill(undefined, checks, 'chromium').witnessed, false);
+  assert.equal(
+    speakMutantKill({ witness: { S2: name }, downstream: {} }, checks, 'webkit').scoped,
+    false,
+  );
 });
 test('independent admission requires all 22 WebKit or 21 Chromium applicable controls', () => {
   for (const [engine, count] of [

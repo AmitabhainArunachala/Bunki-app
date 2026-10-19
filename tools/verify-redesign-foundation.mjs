@@ -21,10 +21,12 @@ const releaseVersion = JSON.parse(
   readFileSync(new URL('../release.json', import.meta.url)),
 ).version;
 const horizontalSamples = [];
+const browserVersions = {};
 const engines = process.env.KAIRO_BROWSER === 'chromium' ? { chromium } : { chromium, webkit };
 try {
   for (const [engine, browserType] of Object.entries(engines)) {
     const browser = await browserType.launch();
+    browserVersions[engine] = browser.version();
     try {
       for (const width of [320, 390, 768]) {
         const context = await browser.newContext({
@@ -184,12 +186,25 @@ try {
           // S (John, 2026-10-16: "why is the plus bar gone???? … how do we know where to add something"): it pinned "the bar
           // carries no Save of its own" (John, 2026-10-15 17:20). The new truth: the bar carries exactly one keep, and it is
           // the one Save component — the same path as the popup's — naming the word just touched; never a second kind
-          const barKeeps = await page.evaluate(() => [...document.querySelectorAll('#app > .chrome button')]
-            .filter((n) => n.id === 'reader-take' || /^(保存|Save)/u.test((n.textContent || '').trim()))
-            .map((n) => ({ id: n.id, one: n.matches('button.save-one[data-save-one]'), word: n.querySelector('.save-bar-word')?.textContent ?? '' })));
-          const touched = await page.evaluate(() => document.querySelector('#mini .mini-word')?.textContent ?? '');
+          const barKeeps = await page.evaluate(() =>
+            [...document.querySelectorAll('#app > .chrome button')]
+              .filter(
+                (n) => n.id === 'reader-take' || /^(保存|Save)/u.test((n.textContent || '').trim()),
+              )
+              .map((n) => ({
+                id: n.id,
+                one: n.matches('button.save-one[data-save-one]'),
+                word: n.querySelector('.save-bar-word')?.textContent ?? '',
+              })),
+          );
+          const touched = await page.evaluate(
+            () => document.querySelector('#mini .mini-word')?.textContent ?? '',
+          );
           assert(
-            barKeeps.length === 1 && barKeeps[0].id === 'chrome-keep' && barKeeps[0].one && barKeeps[0].word === touched,
+            barKeeps.length === 1 &&
+              barKeeps[0].id === 'chrome-keep' &&
+              barKeeps[0].one &&
+              barKeeps[0].word === touched,
             `The bar carries one keep, the one Save naming the touched word, while the popup is open: ${JSON.stringify({ barKeeps, touched })}`,
           );
           const popupCapture = await page.locator('#mini-take').boundingBox();
@@ -215,14 +230,20 @@ try {
             assert.deepEqual(
               await page.evaluate(() => {
                 const tabs = [...document.querySelectorAll('#primary-tabs')];
-                return { mounted: tabs.length, shown: tabs.filter((el) => el.getClientRects().length).length,
-                  display: tabs.map((el) => getComputedStyle(el).display), clearance: document.body.classList.contains('has-primary-tabs') };
+                return {
+                  mounted: tabs.length,
+                  shown: tabs.filter((el) => el.getClientRects().length).length,
+                  display: tabs.map((el) => document.defaultView.getComputedStyle(el).display),
+                  clearance: document.body.classList.contains('has-primary-tabs'),
+                };
               }),
               { mounted: 1, shown: 0, display: ['none'], clearance: true },
               'A sheet hides the bottom tabs without taking their layout away',
             );
             assert.equal(
-              await page.evaluate(() => document.querySelector('.chrome').getBoundingClientRect().height),
+              await page.evaluate(
+                () => document.querySelector('.chrome').getBoundingClientRect().height,
+              ),
               headerAfter,
               'Opening the entry must not re-lay the header',
             );
@@ -232,13 +253,22 @@ try {
             // Save, it pinned "no Save") and no second one, and the header keeps its height
             await page.locator('#mini').waitFor({ state: 'detached' });
             assert.equal(
-              await page.evaluate(() => ({
-                barSaves: [...document.querySelectorAll('#app > .chrome button')]
-                  .filter((n) => n.id === 'reader-take' || /^(保存|Save)/u.test((n.textContent || '').trim()))
-                  .filter((n) => !(n.id === 'chrome-keep' && n.matches('button.save-one[data-save-one]'))).length,
-                one: document.querySelectorAll('#app > .chrome #chrome-keep.save-one').length,
-                header: document.querySelector('.chrome').getBoundingClientRect().height,
-              })).then((s) => JSON.stringify(s)),
+              await page
+                .evaluate(() => ({
+                  barSaves: [...document.querySelectorAll('#app > .chrome button')]
+                    .filter(
+                      (n) =>
+                        n.id === 'reader-take' ||
+                        /^(保存|Save)/u.test((n.textContent || '').trim()),
+                    )
+                    .filter(
+                      (n) =>
+                        !(n.id === 'chrome-keep' && n.matches('button.save-one[data-save-one]')),
+                    ).length,
+                  one: document.querySelectorAll('#app > .chrome #chrome-keep.save-one').length,
+                  header: document.querySelector('.chrome').getBoundingClientRect().height,
+                }))
+                .then((s) => JSON.stringify(s)),
               JSON.stringify({ barSaves: 0, one: 1, header: headerAfter }),
               'After closing the entry the bar carries its one keep and no other Save, and keeps its height',
             );
@@ -417,7 +447,7 @@ try {
 } finally {
   writeFileSync(
     join(out, 'foundation.json'),
-    `${JSON.stringify({ checks, horizontalSamples, diagnostics }, null, 2)}\n`,
+    `${JSON.stringify({ checks, horizontalSamples, diagnostics, browserVersions }, null, 2)}\n`,
   );
   await host.close();
 }

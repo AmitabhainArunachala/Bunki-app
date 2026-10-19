@@ -361,7 +361,7 @@ export const RETAINED_CASES = Object.freeze({
   ],
 });
 
-import { resolve } from 'node:path';
+import { realpathSync } from 'node:fs';
 const WORD_IDS = [
   'T1',
   'T2',
@@ -424,6 +424,15 @@ const exact = (a, b) =>
 const sha = (x) => typeof x === 'string' && /^[a-f0-9]{64}$/u.test(x);
 const text = (x) => typeof x === 'string' && x.length > 0;
 const version = (x) => typeof x === 'string' && /^\d+\.\d+/u.test(x);
+const realPath = (x) => {
+  try {
+    return realpathSync(x);
+  } catch {
+    return null;
+  }
+};
+const sameSite = (a, b) =>
+  text(a) && text(b) && realPath(a) !== null && realPath(a) === realPath(b);
 const runtimeHash = (c, p) =>
   Array.isArray(c.runtimeFiles)
     ? c.runtimeFiles.find((r) => r.path === p)?.sha256
@@ -451,9 +460,7 @@ function state(
     require(context.artifactVerifiedBeforeAndAfter === true &&
       sha(context.artifactSha256) &&
       report.artifact?.sha256 === context.artifactSha256, 'Wrong/unverified served artifact');
-    require(text(context.site) &&
-      text(report.artifact?.path) &&
-      resolve(report.artifact.path) === resolve(context.site), 'Wrong served site');
+    require(sameSite(report.artifact?.path, context.site), 'Wrong served site');
   }
   if (browser)
     require(context.engine === 'chromium' &&

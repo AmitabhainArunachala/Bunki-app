@@ -1,11 +1,7 @@
 /** VH-1: release admission independently checks complete producer/phase evidence. */
 import { createHash } from 'node:crypto';
 import { join } from 'node:path';
-import {
-  SPEAK_CASE_IDS,
-  exactRoster,
-  speakCompletion,
-} from '../../prototypes/corridor/tools/vh-voice-contracts.mjs';
+import { exactRoster } from '../../prototypes/corridor/tools/vh-voice-contracts.mjs';
 import {
   SENSE_CASE_IDS,
   SENSE_DATA_INVENTORY_SHA256,
@@ -60,6 +56,8 @@ const senseExpected = (engine) => [
     ),
   ),
 ];
+// Admission obligations are independent of the producer's case/completion helper.
+const SPEAK_REQUIRED_CASES = Object.freeze(Object.keys(SPEAK_CHECK_NAMES));
 const speakNames = (engine, id) =>
   SPEAK_CHECK_NAMES[id].filter((name) =>
     engine === 'webkit'
@@ -112,6 +110,30 @@ function declared(report, state, observed) {
       exactRoster(observed, report.observedCases),
     'Declared coverage differs from independently observed roster',
   );
+}
+export function speakMutantKill(spec, checks, engine) {
+  const cases = Object.keys(spec?.witness || {});
+  const pattern = (id) =>
+    cases.includes(id) && nonempty(spec.witness[id]) ? new RegExp(spec.witness[id], 'u') : null;
+  const rows = Array.isArray(checks) ? checks : [];
+  const red = rows.filter((c) => c?.pass !== true);
+  const witnessed = (c) => pattern(c.case)?.test(c.name) === true;
+  return {
+    red,
+    scoped:
+      cases.length > 0 &&
+      cases.every((id) => pattern(id)) &&
+      rows.length > 0 &&
+      rows.every((c) => c?.engine === engine && cases.includes(c.case) && nonempty(c.name)),
+    witnessed:
+      cases.length > 0 && cases.every((id) => red.some((c) => c.case === id && witnessed(c))),
+    unrelatedClean: red.every(
+      (c) =>
+        c.engine === engine &&
+        cases.includes(c.case) &&
+        (witnessed(c) || (spec.downstream?.[c.case] || []).includes(c.name)),
+    ),
+  };
 }
 function child(context, phase, file) {
   const directory = phase.evidence || phase.dir;
@@ -216,7 +238,7 @@ const contracts = {
   speak: {
     producer: 'prototypes/corridor/tools/verify-speak.mjs',
     paths: ['verify-speak.json'],
-    expectedCases: (e) => ids([...SPEAK_CASE_IDS, 'egress'], e),
+    expectedCases: (e) => ids(SPEAK_REQUIRED_CASES, e),
     validate(report, context) {
       const state = setup(report, context, this.expectedCases(context.engine)),
         required = engines(context.engine);
@@ -229,29 +251,40 @@ const contracts = {
         report.only === null && report.phase === 'candidate' && report.complete === true,
         'Child/filtered/incomplete Speak receipt',
       );
-      const completion = speakCompletion({
-        engines: required,
-        selected: null,
-        cases: report.cases,
-        checks: report.checks,
-        error: report.error,
-        pageErrors: report.pageErrors,
-      });
+      const observed = report.cases.map((row) => `${row.engine}/${row.case}`);
       state.require(
-        completion.fullAcceptance === true,
-        'Speak completeness/semantic checks failed',
+        exactRoster(state.expectedCases, observed) &&
+          !report.error &&
+          Array.isArray(report.pageErrors) &&
+          report.pageErrors.length === 0 &&
+          !report.fault &&
+          !report.overlay &&
+          report.cases.every(
+            (row) =>
+              row.completed === true &&
+              row.pass === true &&
+              Number.isInteger(row.checks) &&
+              row.checks > 0,
+          ) &&
+          report.checks.every(
+            (row) => row.pass === true && state.expectedCases.includes(`${row.engine}/${row.case}`),
+          ),
+        'Speak independent completeness/strict per-row pass failed',
       );
       for (const e of required)
-        for (const id of [...SPEAK_CASE_IDS, 'egress'])
+        for (const id of SPEAK_REQUIRED_CASES) {
+          const checks = report.checks.filter((row) => row.engine === e && row.case === id);
+          const caseRow = report.cases.find((row) => row.engine === e && row.case === id);
           state.require(
             exactRoster(
               speakNames(e, id),
-              report.checks.filter((r) => r.engine === e && r.case === id).map((r) => r.name),
-            ),
-            `${e}/${id}: assertion missing/duplicated`,
+              checks.map((row) => row.name),
+            ) && caseRow?.checks === checks.length,
+            `${e}/${id}: assertion missing/duplicated or case count differs`,
           );
-      declared(report, state, completion.observedCases);
-      return finish(state, completion.observedCases);
+        }
+      declared(report, state, observed);
+      return finish(state, observed);
     },
   },
   'vh-sense-controls': {
@@ -484,25 +517,14 @@ contracts['speak-negatives'] = {
             ),
             'Child assertion missing/duplicated',
           );
-        const bad = r.checks.filter((c) => c.pass !== true);
+        const kill = speakMutantKill(spec, r.checks, row.engine);
+        state.require(kill.scoped, 'Child assertion outside the selected mutant cases');
         if (name === 'mutant') {
           state.require(
-            p.exit === 1 &&
-              r.fault === row.fault &&
-              cases.every((id) =>
-                bad.some((c) => c.case === id && new RegExp(spec.witness[id], 'u').test(c.name)),
-              ),
+            p.exit === 1 && r.fault === row.fault && kill.witnessed,
             'Intended primary witness missing',
           );
-          state.require(
-            bad.every(
-              (c) =>
-                c.engine === row.engine &&
-                (new RegExp(spec.witness[c.case], 'u').test(c.name) ||
-                  (spec.downstream[c.case] || []).includes(c.name)),
-            ),
-            'Unrelated red cannot kill mutant',
-          );
+          state.require(kill.unrelatedClean, 'Unrelated red cannot kill mutant');
           const mutation = r.mutations?.[row.fault];
           state.require(
             mutation?.matches === 1 &&
@@ -513,7 +535,7 @@ contracts['speak-negatives'] = {
           );
         } else
           state.require(
-            p.exit === 3 && r.selectedPassed === true && !r.fault && bad.length === 0,
+            p.exit === 3 && r.selectedPassed === true && !r.fault && kill.red.length === 0,
             'Candidate/restore not green',
           );
       }

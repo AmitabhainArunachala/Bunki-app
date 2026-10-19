@@ -9,6 +9,7 @@ import { cpSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } 
 import { dirname, extname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium, webkit } from 'playwright-core';
+import { contextBrowserVersion } from './browser-version-support.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
 
@@ -109,7 +110,7 @@ async function launch(fixture) {
     headless: true, viewport: { width: 1120, height: 1100 }, locale: 'en-US', serviceWorkers: 'block', acceptDownloads: true,
   });
   await fixture.context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1')); // Returning device fixture.
-  browserVersions[fixture.engine] = fixture.context.browser()?.version();
+  browserVersions[fixture.engine] = await contextBrowserVersion(fixture.context, { chromium, webkit }[fixture.engine]);
   await fixture.transport.install(fixture.context);
   fixture.page = fixture.context.pages()[0] || await fixture.context.newPage(); fixture.page.setDefaultTimeout(15000);
   fixture.page.on('pageerror', (error) => fixture.errors.push({ phase: fixture.phase, message: error.message, stack: error.stack }));

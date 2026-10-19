@@ -1,9 +1,7 @@
 /** Independently declared learning schedules; observed rows never define acceptance scope. */
+import { basename, join } from 'node:path';
+import { isDeepStrictEqual } from 'node:util';
 import {
-  RECORD_ROWS,
-  RECORD_CONTROLS,
-  recordCompletion,
-  recordControlVerdict,
   expectedReportChecks,
   reportCopyObservation,
   REPORT_COPY_CONTROLS,
@@ -17,6 +15,78 @@ const exact = (want, got) =>
   want.every((id) => got.includes(id));
 const sha = (value) => typeof value === 'string' && /^[a-f0-9]{64}$/u.test(value);
 const nonempty = (value) => typeof value === 'string' && value.length > 0;
+// Independently reviewed admission schedule: producer helpers cannot shrink this law.
+const RECORD_ROWS = Object.freeze({
+  A: Object.freeze([
+    'A.upgrade',
+    'A.look-up',
+    'A.known',
+    'A.finish',
+    'A.round-trip',
+    'A.page-errors',
+  ]),
+  A2: Object.freeze(['A2.later-met', 'A2.page-errors']),
+  R: Object.freeze(['R.list', 'R.sky', 'R.mirror', 'R.reader', 'R.page-errors']),
+  'R-cold': Object.freeze(['R.cold', 'R-cold.page-errors']),
+  T: Object.freeze(['T.archive', 'T.page-errors']),
+});
+const RECORD_CONTROLS = Object.freeze({
+  'kagami-spelling-only': Object.freeze({ case: 'R', kill: 'R.mirror' }),
+  'tutor-spelling-key': Object.freeze({ case: 'T', kill: 'T.archive' }),
+});
+function recordCompletion(rows, engines, cases = Object.keys(RECORD_ROWS)) {
+  const expected = engines.flatMap((engine) =>
+    cases.flatMap((name) => RECORD_ROWS[name].map((id) => `${engine}/${id}`)),
+  );
+  const scheduleComplete =
+    Array.isArray(rows) &&
+    exact(
+      expected,
+      rows.map((row) => row?.id),
+    );
+  return {
+    scheduleComplete,
+    diagnosticPass: scheduleComplete && rows.every((row) => row.ok === true),
+  };
+}
+function recordControlVerdict({ name, engine, candidate, mutant, restore }) {
+  const spec = RECORD_CONTROLS[name];
+  if (!spec) return { verdict: 'incomplete', reason: 'unknown control' };
+  const clean = (receipt, cases) =>
+    receipt &&
+    !receipt.terminalError &&
+    recordCompletion(receipt.rows, [engine], cases).diagnosticPass;
+  if (!clean(candidate, Object.keys(RECORD_ROWS)) || !clean(restore, [spec.case]))
+    return { verdict: 'incomplete', reason: 'candidate or restore not clean' };
+  if (
+    !recordCompletion(mutant?.rows, [engine], [spec.case]).scheduleComplete ||
+    mutant.terminalError ||
+    mutant.control?.setupError
+  )
+    return { verdict: 'incomplete', reason: 'mutant schedule/setup failed' };
+  const served = mutant.control?.served;
+  if (
+    !Array.isArray(served) ||
+    served.length === 0 ||
+    served.some((row) => row.baseSha256 === row.mutantSha256 || row.applied?.length !== 1)
+  )
+    return { verdict: 'incomplete', reason: 'served edit not proved' };
+  const kill = `${engine}/${spec.kill}`,
+    reds = mutant.rows.filter((row) => row.ok !== true);
+  if (reds.length !== 1 || reds[0].id !== kill || reds[0].ok !== false)
+    return { verdict: 'contaminated', reason: 'expected exact named false row only' };
+  const witness = reds[0].observed;
+  const witnessed =
+    name === 'kagami-spelling-only'
+      ? witness?.rowReading === 'ねん' && witness?.mirror?.toshi === true
+      : witness?.head?.startsWith('訳') &&
+        witness.reading === 'やく' &&
+        witness.tutor === true &&
+        /STALE_WAKE_REASON/u.test(witness.page || '');
+  return witnessed
+    ? { verdict: 'killed', reason: kill, witness }
+    : { verdict: 'contaminated', reason: 'fault-specific witness absent' };
+}
 export const PUBLIC_DISCLOSURE = Object.freeze({
   en: 'This opens GitHub with your words and this screen filled in. Tap “Submit new issue” there to send it. Issues in this repository are public, so leave out anything private. A copy stays on this device.',
   ja: '報告は、アプリを直す人が読む GitHub の公開ページに、あなたの言葉とこの画面の欄を入れて開く。そこで「Submit new issue」を押すと送られる。公開されるので、個人的なことは書かない。写しはこの端末に残る。',
@@ -112,11 +182,14 @@ export const READER_CONTROLS = Object.freeze({
     ],
   },
 });
+export const READER_D1_DAY = '2026-10-15';
+export const READER_D1_PICKS = 6;
+export const READER_D1_WIDTHS = Object.freeze([1728, 390]);
 export const READER_CASES = Object.freeze([
   'D0 served build is the expected clean commit',
-  ...[1728, 390].flatMap((width) => [
+  ...READER_D1_WIDTHS.flatMap((width) => [
     `D1 ${width}: today's picks are on the shelf`,
-    ...Array.from({ length: 6 }, (_, i) => [
+    ...Array.from({ length: READER_D1_PICKS }, (_, i) => [
       `D1 ${width} pick ${i + 1}: its centre is the door itself`,
       `D1 ${width} pick ${i + 1}: a click at that point opens that same article`,
     ]).flat(),
@@ -216,6 +289,15 @@ function validateReader(report, context, require, engines) {
   const rows = report.results || [],
     observed = rows.map((row) => `${report.engine}/${row.id || row.name}`);
   require(rows.every((row) => row.pass === true), 'Reader failed assertion');
+  require(report.d1Day === READER_D1_DAY, 'Reader D1 shelf day is not the declared day');
+  for (const width of READER_D1_WIDTHS) {
+    const shelf = rows.find(
+      (row) => (row.id || row.name) === `D1 ${width}: today's picks are on the shelf`,
+    );
+    require(shelf?.observed?.day === READER_D1_DAY &&
+      shelf.observed.count ===
+        READER_D1_PICKS, `D1 ${width}: shelf not observed at the declared day with exactly ${READER_D1_PICKS} picks`);
+  }
   require(exact(
     Object.keys(READER_CONTROLS),
     (report.controls || []).map((row) => row.name),
@@ -290,27 +372,55 @@ function validateRecord(report, context, require, engines) {
   ), 'Record control roster mismatch');
   for (const engine of engines)
     require(nonempty(report.browsers?.[engine]), `Record actual ${engine} version absent`);
+  const candidates = new Map(),
+    attemptNonces = [];
   for (const control of report.controls || []) {
     const spec = RECORD_CONTROLS[control.name];
     if (!spec) {
       require(false, 'Unknown record control');
       continue;
     }
-    for (const [phase, exit] of [
-      ['candidate', 3],
-      ['mutant', 1],
-      ['restore', 3],
+    const fresh = {};
+    for (const [phase, exit, label] of [
+      ['candidate', 3, 'candidate'],
+      ['mutant', 1, control.name],
+      ['restore', 3, `${control.name}-restore`],
     ]) {
-      const child = control[phase],
-        receipt = child?.receipt;
+      const child = control[phase];
+      let receipt = null;
+      try {
+        require(nonempty(child?.dir) &&
+          new RegExp(`^${control.engine}-${label}-[A-Za-z0-9]{6}$`, 'u').test(
+            basename(child.dir),
+          ), `${control.name}/${phase}: child attempt directory invalid`);
+        if (typeof context.readReport !== 'function')
+          throw new Error('fresh child receipt reader absent');
+        receipt = context.readReport(join(child.dir, 'verify-record-depth.json'));
+      } catch (error) {
+        require(false, `${control.name}/${phase}: fresh child receipt unreadable: ${error.message}`);
+      }
+      require(receipt &&
+        isDeepStrictEqual(
+          receipt,
+          child?.receipt,
+        ), `${control.name}/${phase}: embedded child differs from its fresh receipt`);
+      fresh[phase] = receipt;
+      if (phase === 'candidate') {
+        require(!candidates.has(control.engine) ||
+          isDeepStrictEqual(
+            candidates.get(control.engine),
+            receipt,
+          ), `${control.engine}: controls compare against different candidates`);
+        candidates.set(control.engine, receipt);
+      } else attemptNonces.push(receipt?.nonce);
       require(child?.valid === true &&
         child.status?.code === exit &&
         !child.status.signal &&
         !child.status.error &&
         !child.status.timedOut, `${control.name}/${phase}: child did not finish`);
       require(receipt &&
-        nonempty(receipt.runId) &&
-        receipt.runId !== report.runId &&
+        receipt.runId === report.runId &&
+        nonempty(receipt.nonce) &&
         receipt.gitSha === report.gitSha &&
         receipt.artifactSha256 === report.artifactSha256 &&
         receipt.verifierSha256 === report.verifierSha256 &&
@@ -332,11 +442,11 @@ function validateRecord(report, context, require, engines) {
     const verdict = recordControlVerdict({
       name: control.name,
       engine: control.engine,
-      candidate: control.candidate?.receipt,
-      mutant: control.mutant?.receipt,
-      restore: control.restore?.receipt,
+      candidate: fresh.candidate,
+      mutant: fresh.mutant,
+      restore: fresh.restore,
     });
-    const served = control.mutant?.receipt?.control?.served;
+    const served = fresh.mutant?.control?.served;
     require(Array.isArray(served) &&
       served.length > 0 &&
       served.every(
@@ -351,14 +461,33 @@ function validateRecord(report, context, require, engines) {
     require(verdict.verdict === 'killed' &&
       control.verdict ===
         'killed', `${control.name}: strict re-adjudication failed: ${verdict.reason}`);
-    require(control.candidate?.receipt.runId !== control.mutant?.receipt.runId &&
-      control.mutant?.receipt.runId !== control.restore?.receipt.runId &&
-      control.candidate?.receipt.runId !==
-        control.restore?.receipt.runId, `${control.name}: reused attempt`);
+    require(nonempty(fresh.candidate?.nonce) &&
+      fresh.candidate.nonce !== fresh.mutant?.nonce &&
+      fresh.mutant?.nonce !== fresh.restore?.nonce &&
+      fresh.candidate.nonce !== fresh.restore?.nonce, `${control.name}: reused attempt`);
+  }
+  require(new Set(attemptNonces).size === attemptNonces.length &&
+    attemptNonces.every(
+      (nonce) => ![...candidates.values()].some((receipt) => receipt?.nonce === nonce),
+    ), 'Record control attempt nonce reused');
+  for (const engine of engines) {
+    const candidate = candidates.get(engine);
+    require(candidate &&
+      isDeepStrictEqual(
+        (report.rows || []).filter((row) => String(row?.id).startsWith(`${engine}/`)),
+        candidate.rows,
+      ) &&
+      report.browsers?.[engine] ===
+        candidate.browsers?.[
+          engine
+        ], `Record ${engine} rows/version are not the fresh candidate's`);
   }
   return (report.rows || []).map((row) => row.id);
 }
+export const REPORT_DELIVERY_ENGINES = Object.freeze(['chromium', 'webkit']);
 function validateDelivery(report, context, require, engines) {
+  require(context.engine === 'all' &&
+    exact(REPORT_DELIVERY_ENGINES, engines), 'Report-delivery gate must declare both engines');
   require(report.schema === 'vh-report-delivery/1' &&
     report.scope === 'full-engine' &&
     exact(engines, report.engines), 'Report-delivery scope/engine mismatch');
@@ -478,11 +607,12 @@ const make = (kind, fixedEngine) =>
     },
   });
 const definitions = {};
-for (const kind of ['reader-doors', 'record-depth', 'report-delivery']) {
+for (const kind of ['reader-doors', 'record-depth']) {
   definitions[kind] = make(kind);
   for (const engine of ['chromium', 'webkit'])
     definitions[`${kind}-${engine}`] = make(kind, engine);
 }
+definitions['report-delivery'] = make('report-delivery', 'all');
 export const learningReportContracts = Object.freeze(definitions);
 export function validateLearningReport(name, report, context = {}) {
   return (

@@ -44,6 +44,7 @@ import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
 import { readAppRecord } from './record-test-support.mjs';
 import { contrastExpectedCases } from '../../../scripts/ci/vh-existing-report-contracts.mjs';
+import { judgeContrastArrival } from './vh-contrast-arrival.mjs';
 
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['webkit', 'chromium'];
 assert(engines.every((engine) => ['chromium', 'webkit'].includes(engine)));
@@ -789,49 +790,60 @@ function sourceAudit() {
 
 /* First-use is a separate pristine device, never inferred from the settled-reader fixture.
  * Lead ruling, 2026-10-19 VH-1: D2/C1 judges rest states, not mid-fade. The arrival must
- * reach full opacity by its authored duration plus one observed frame. No opacity is
+ * reach full opacity by its authored duration plus one independently calibrated frame. No opacity is
  * forced, no animation is cancelled/paused, and the 4.5/3:1 C1 thresholds stay intact. */
 const DEMO_ARRIVAL = () => {
   const seen = new WeakSet();
+  const installedDocument = document, installedWindow = window, documentId = crypto.randomUUID();
+  window.__contrastDocumentIdentity = { document: installedDocument, window: installedWindow, documentId };
   window.__contrastDemoArrivals = [];
   const observe = () => {
     const mini = document.querySelector('#mini[data-demo="true"]');
     if (!mini || seen.has(mini)) return;
     seen.add(mini);
     const style = getComputedStyle(mini);
-    // Reduced motion legitimately uses feel-fade; inspect the authored opacity animation,
-    // never assume the full-motion CSS animation's name also names this device's arrival.
-    const animation = mini.getAnimations().find((item) => item.effect?.getKeyframes().some((frame) => Object.hasOwn(frame, 'opacity')));
-    const row = { name: animation?.animationName || animation?.id || style.animationName, completed: false, connected: true };
+    const animations = mini.getAnimations();
+    const animation = animations.find((item) => item instanceof CSSAnimation && item.animationName === 'read-mini-rise');
+    const row = { name: animation?.animationName || style.animationName, animationType: animation?.constructor.name || null,
+      actualAnimationNames: animations.map((item) => item.animationName || item.id || item.constructor.name),
+      sampled: false, connected: true, timeOrigin: performance.timeOrigin,
+      documentId, sameDocument: document === installedDocument && window === installedWindow &&
+        window.__contrastCalibrationDocument === document && window.__contrastCalibrationWindow === window,
+      frameCalibration: window.__contrastFrameCalibration || null, samples: [] };
     window.__contrastDemoArrivals.push({ mini, row });
     if (!animation) {
-      const durations = style.animationDuration.split(',').map((value) => parseFloat(value) * (value.trim().endsWith('ms') ? 1 : 1000));
-      row.noAnimation = true;
-      row.authoredDuration = Math.max(...durations);
-      row.opacity = Number(style.opacity);
-      row.elapsed = 0; row.frameMs = 0;
-      row.completed = row.authoredDuration === 0 && row.opacity === 1;
+      row.missingAnimation = true; row.sampled = true; row.opacity = Number(style.opacity);
       return;
     }
     const timing = animation.effect.getComputedTiming();
     row.authoredDuration = Number(timing.duration);
+    row.authoredDelay = Number(timing.delay);
+    row.authoredEndDelay = Number(timing.endDelay);
+    row.authoredIterations = Number(timing.iterations);
     row.authoredEnd = Number(timing.endTime);
-    let previous = null;
+    const observedMount = performance.now();
     const sample = (now) => {
-      if (!mini.isConnected) { row.connected = false; row.superseded = true; return; }
-      const start = animation.startTime;
-      const elapsed = start === null ? null : now - start;
-      if (elapsed !== null && elapsed >= row.authoredEnd) {
-        row.elapsed = elapsed;
-        row.previousElapsed = previous === null ? null : previous - start;
-        row.frameMs = previous === null ? null : now - previous;
-        row.opacity = Number(getComputedStyle(mini).opacity);
-        row.playState = animation.playState;
-        row.completed = row.frameMs !== null && row.opacity === 1 && animation.playState === 'finished' &&
-          row.previousElapsed < row.authoredEnd && elapsed <= row.authoredEnd + row.frameMs;
+      if (!mini.isConnected) { row.connected = false; row.superseded = true; row.sampled = true; return; }
+      row.startTime = animation.startTime;
+      row.currentTime = animation.currentTime;
+      row.playbackRate = animation.playbackRate;
+      row.opacity = Number(getComputedStyle(mini).opacity);
+      row.playState = animation.playState;
+      row.rafTime = now;
+      // Lead 0842: compare the observing frame and the animation start on their
+      // shared document timeline. Callback delivery is separate telemetry; a late
+      // FRAME still never buys itself a later origin or a larger allowance.
+      row.observedAt = performance.now();
+      row.callbackDeliveryMs = row.observedAt - row.rafTime;
+      row.elapsed = row.startTime === null ? null : row.rafTime - row.startTime;
+      row.samples.push({ rafTime: row.rafTime, observedAt: row.observedAt, elapsed: row.elapsed,
+        callbackDeliveryMs: row.callbackDeliveryMs, currentTime: row.currentTime, opacity: row.opacity, playState: row.playState });
+      const allowance = row.frameCalibration?.frameMs;
+      if ((row.elapsed !== null && (row.elapsed > row.authoredEnd + allowance ||
+          (row.opacity === 1 && row.playState === 'finished'))) || row.observedAt - observedMount >= 2000) {
+        row.sampled = true;
         return;
       }
-      previous = now;
       requestAnimationFrame(sample);
     };
     requestAnimationFrame(sample);
@@ -866,12 +878,26 @@ async function freshDemo(browser, world, report) {
     page.on('pageerror', (error) => errors.push(error.message));
     page.setDefaultTimeout(20000);
     await STEPS.shelf(page);
+    await page.evaluate(async () => {
+      const timestamps = [];
+      await new Promise((done) => {
+        const sample = (now) => { timestamps.push(now); if (timestamps.length === 13) done(); else requestAnimationFrame(sample); };
+        requestAnimationFrame(sample);
+      });
+      const sorted = timestamps.slice(1).map((stamp, index) => stamp - timestamps[index]).sort((a, b) => a - b);
+      window.__contrastFrameCalibration = { method: 'median-of-12-pre-arrival-raf-intervals',
+        timeOrigin: performance.timeOrigin, timestamps, frameMs: (sorted[5] + sorted[6]) / 2,
+        documentId: window.__contrastDocumentIdentity.documentId,
+        sameDocument: window.__contrastDocumentIdentity.document === document && window.__contrastDocumentIdentity.window === window };
+      window.__contrastCalibrationDocument = document;
+      window.__contrastCalibrationWindow = window;
+    });
     await STEPS.reader(page);
     await page.locator('#mini[data-demo="true"] .mini-word').waitFor();
     await page.waitForFunction(() => {
       const mini = document.querySelector('#mini[data-demo="true"]');
       const observation = window.__contrastDemoArrivals.findLast((item) => item.mini === mini)?.row;
-      return observation && (observation.elapsed !== undefined || observation.noAnimation) && mini.getAttribute('aria-busy') !== 'true' &&
+      return observation?.sampled && mini.getAttribute('aria-busy') !== 'true' &&
         Number(getComputedStyle(mini).opacity) === 1 && !mini.getAnimations().some((animation) => animation.playState === 'running' || animation.playState === 'pending');
     });
     await page.evaluate(async () => { await document.fonts.ready; });
@@ -884,10 +910,14 @@ async function freshDemo(browser, world, report) {
     }));
     check(`${world}/fresh-demo.reach`, 'a pristine device opened the real first-use word demonstration', !!facts.word && facts.seen === '1', facts.word);
     check(`${world}/fresh-demo.world`, 'the fresh demonstration wears its requested world', facts.theme === world, facts.theme);
-    const current = facts.arrivals.filter((row) => row.current);
-    check(`${world}/fresh-demo.arrival`, 'the authored arrival reaches full opacity within its duration plus one observed frame',
-      facts.motionPreference === 'no-preference' && current.length === 1 && current.every((row) => row.completed && row.opacity === 1),
-      facts.arrivals.map((row) => ({ ...row, motionPreference: facts.motionPreference })));
+    const arrivals = facts.arrivals.map((row) => {
+      const observed = { ...row, motionPreference: facts.motionPreference };
+      const judged = judgeContrastArrival(observed);
+      return { ...observed, completed: judged.passed, frameMs: judged.frameMs, deadlineMs: judged.deadlineMs, arrivalErrors: judged.errors };
+    });
+    const current = arrivals.filter((row) => row.current);
+    check(`${world}/fresh-demo.arrival`, 'the named read-mini-rise reaches full opacity by its authored end plus an independently calibrated frame',
+      facts.motionPreference === 'no-preference' && current.length === 1 && current.every((row) => judgeContrastArrival(row).passed), arrivals);
     const candidate = await measureDemo(page, world, 'settled');
     report.results.push(candidate);
     check(`${world}/fresh-demo.coverage`, 'the actual demo headword and Kanji label are included in the pixel contrast measurement',
@@ -931,10 +961,11 @@ async function freshDemo(browser, world, report) {
 /* ------------------------------------------------------------------ run */
 const report = { schemaVersion: 2, runId, artifactSha256: identity.artifactSha256, gitSha: identity.gitSha, sourceDirty: identity.sourceDirty,
   verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
+  arrivalPredicateSha256: createHash('sha256').update(readFileSync(new URL('./vh-contrast-arrival.mjs', import.meta.url))).digest('hex'),
   identity: { gitSha: identity.gitSha, artifactSha256: identity.artifactSha256 }, partial, worlds, states, engines: {}, results: [], controls: [], source: null,
   requestedScope: partial ? 'diagnostic' : 'full', selectors: { worlds: onlyWorlds, states: onlyStates, demoOnly },
   freshDemoMotion: 'no-preference', settledMotion: 'reduce',
-  contrastTimingContract: 'Lead ruling 2026-10-19 VH-1: D2/C1 at rest; arrival full opacity by authored duration plus one observed frame; no mid-fade contrast exemption claimed as measured rest coverage.' };
+  contrastTimingContract: 'Lead rulings 0806/0842, 2026-10-19 VH-1: D2/C1 at rest; actual named read-mini-rise finishes at full opacity by its authored end plus one independently pre-calibrated frame. Elapsed is observing RAF/document.timeline timestamp minus CSSAnimation.startTime; performance.now is callback-delivery telemetry only.' };
 mkdirSync(join(evidence, 'shots'), { recursive: true });
 try {
   const source = sourceAudit();

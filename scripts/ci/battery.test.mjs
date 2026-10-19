@@ -1,11 +1,15 @@
 import { syntheticEvidence } from './test-evidence-fixture.mjs';
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import test from 'node:test';
-import { batteryGates, runGates } from '../verify-release-gates.mjs';
+import { batteryGates, gateTimeoutMs, runGates } from '../verify-release-gates.mjs';
+import { frozenDeck, supplementalGates } from './supplemental.mjs';
 import { EventEmitter } from 'node:events';
+import { parse as parseYaml } from 'yaml';
+import { scheduledBudget, SCHEDULING_POLICY } from './scheduling-budgets.mjs';
 import { importFlakes, validateFlake } from './import-flakes.mjs';
 import {
   aggregate,
@@ -19,6 +23,9 @@ import {
   loadReceipts,
   summary,
   validatePlan,
+  validateRetryPlan,
+  shardMatrix,
+  validateWorkflowSchedule,
 } from './battery.mjs';
 const parent =
   process.env.CI && process.env.RUNNER_TEMP
@@ -148,7 +155,7 @@ function withRetry() {
   return f;
 }
 
-test('measured deterministic partition covers every original and supplemental gate once', () => {
+test('budgeted deterministic partition covers every original and supplemental gate once', () => {
   const f = fixture();
   // 138 since slice V gated the voice lane: voice-lock, approved-voice-contract and
   // excerpt-narration-contract. The two suites already existed; neither was ever run by CI,
@@ -161,7 +168,14 @@ test('measured deterministic partition covers every original and supplemental ga
   // 157 since 1.2.0 added the places-layout gate (the layout under test), 161 with V's four,
   // 167 with the one-hand integration's six
   assert.equal(f.plan.requiredNames.length, 188);
-  assert.equal(f.plan.shards.filter((s) => s.id.startsWith('balanced-')).length, 10);
+  assert(
+    f.plan.shards.filter((s) => s.id.startsWith('balanced-')).length > 10,
+    'Actual execution ceilings require deterministic overflow lanes beyond the original ten',
+  );
+  for (const shard of f.plan.shards) {
+    assert(shard.budget.jobTimeoutMinutes <= 360);
+    assert(shard.budget.stepTimeoutMinutes < shard.budget.jobTimeoutMinutes);
+  }
   assert.deepEqual(createPlan({ identity }), f.plan);
   for (const s of f.plan.shards.filter((s) => s.kind === 'fast')) assert(s.predictedSeconds <= 480);
   assert.deepEqual(f.plan.shards.find((s) => s.id === 'practice-history').gates, [
@@ -645,6 +659,15 @@ test('measured healthy canonical gate durations stay below half their selected t
   for (const original of batteryGates('/unused', {})) {
     const measured = timings.gates.find((g) => g.name === original.name);
     assert(measured, `Missing scheduling measurement for ${original.name}`);
+    assert.notEqual(
+      measured.measurementStatus,
+      'unmeasured',
+      `Unmeasured current contract: ${original.name}; FULL must record an actual completed measurement`,
+    );
+    assert(
+      Number.isFinite(measured.maxSeconds) && measured.maxSeconds > 0,
+      `Missing observed duration for ${original.name}`,
+    );
     const selected = gateForShard(
       original,
       plan.shards.find((s) => s.gates.includes(original.name)),
@@ -662,4 +685,398 @@ test('CI contracts provision pytest for actual framework admission regressions',
   assert(shard, 'Required CI contracts shard');
   assert.equal(shard.python, true);
   assert.equal(shard.corpus, true);
+});
+
+const DECK_APKGS = [
+  'decks/kotoba-mine/release/kotoba-mine.apkg',
+  'decks/kotoba-mine/release/kotoba-mcd.apkg',
+  'decks/kotoba-mine/release/public/kotoba-mine.apkg',
+  'decks/kotoba-mine/release/public/kotoba-mcd.apkg',
+];
+function deckRepo(extra = '') {
+  const repo = fresh();
+  const files = {
+    'decks/kotoba-mine/tools/build.py': [
+      'import pathlib, sys, time',
+      "release = pathlib.Path(__file__).resolve().parents[1] / 'release'",
+      "out = release / 'public' if '--profile' in sys.argv else release",
+      "for name in ('kotoba-mine.apkg', 'kotoba-mcd.apkg'):",
+      '    (out / name).write_bytes(str(time.time_ns()).encode())',
+      extra,
+      '',
+    ].join('\n'),
+    'decks/kotoba-mine/release/kotoba-mine.tsv': 'card\n',
+    'prototypes/corridor/decks/index.json': '{}\n',
+    ...Object.fromEntries(DECK_APKGS.map((file) => [file, `original ${file}`])),
+  };
+  for (const [file, text] of Object.entries(files)) {
+    mkdirSync(dirname(join(repo, file)), { recursive: true });
+    writeFileSync(join(repo, file), text);
+  }
+  const git = (...args) => execFileSync('git', args, { cwd: repo, stdio: 'pipe' });
+  git('init', '-q');
+  git('add', '-A');
+  git(
+    '-c',
+    'user.name=fixture',
+    '-c',
+    'user.email=fixture@example.invalid',
+    '-c',
+    'commit.gpgsign=false',
+    'commit',
+    '-qm',
+    'fixture',
+    '--no-verify',
+  );
+  return repo;
+}
+const apkgBytes = (repo) => DECK_APKGS.map((file) => readFileSync(join(repo, file), 'utf8'));
+const dirty = (repo) =>
+  execFileSync('git', ['status', '--porcelain'], { cwd: repo, encoding: 'utf8' }).trimEnd();
+test('frozen deck build restores its timestamped APKGs and still rejects any other deck mutation', () => {
+  const clean = deckRepo();
+  const original = apkgBytes(clean);
+  frozenDeck(clean);
+  assert.deepEqual(apkgBytes(clean), original);
+  assert.equal(dirty(clean), '');
+  for (const [extra, pattern, left] of [
+    [
+      "(release / 'kotoba-mine.tsv').write_text('changed\\n')",
+      /Command failed: git diff/u,
+      ' M decks/kotoba-mine/release/kotoba-mine.tsv',
+    ],
+    [
+      "(release / 'extra.tsv').write_text('new\\n')",
+      /Deck build wrote uncommitted outputs/u,
+      '?? decks/kotoba-mine/release/extra.tsv',
+    ],
+    ['sys.exit(3)', /Command failed: python3/u, ''],
+  ]) {
+    const repo = deckRepo(extra);
+    const before = apkgBytes(repo);
+    assert.throws(() => frozenDeck(repo), pattern);
+    assert.deepEqual(apkgBytes(repo), before, extra);
+    assert.equal(dirty(repo), left, extra);
+  }
+});
+test('the per-gate source boundary admits the restoring frozen build and rejects an unrestored APKG rewrite', async () => {
+  const supplemental = new globalThis.URL('./supplemental.mjs', import.meta.url).href;
+  const probe = (name, args) => ({
+    name,
+    command: process.execPath,
+    fixtureReceipt: 'process-probe',
+    args,
+    timeoutMs: 30_000,
+  });
+  const restoring = deckRepo();
+  const original = apkgBytes(restoring);
+  const admitted = await runGates({
+    gates: [
+      probe('deck-frozen-fixture', [
+        '--input-type=module',
+        '-e',
+        `import { frozenDeck, supplementalGates } from ${JSON.stringify(supplemental)}; frozenDeck(process.cwd());`,
+      ]),
+    ],
+    root: restoring,
+    out: fresh(),
+  });
+  assert.equal(admitted.status, 'passed', admitted.gates[0].detail);
+  assert.deepEqual(apkgBytes(restoring), original);
+  const rewriting = deckRepo();
+  const rejected = await runGates({
+    gates: [
+      probe('apkg-rewrite', [
+        '-e',
+        `require('node:fs').writeFileSync(${JSON.stringify(join(rewriting, DECK_APKGS[0]))}, String(Date.now()))`,
+      ]),
+    ],
+    root: rewriting,
+    out: fresh(),
+  });
+  assert.equal(rejected.gates[0].status, 'incomplete');
+  assert.equal(rejected.gates[0].exitCode, 78);
+  assert.match(rejected.gates[0].detail, /Source\/input tree changed during gate execution/u);
+});
+test('a preexisting stdout receipt ends that gate incomplete with a terminal attempt and the battery continues', async () => {
+  const out = fresh();
+  const taken = join(out, 'stdout-taken.stdout.json');
+  writeFileSync(taken, 'stale');
+  const probe = (name) => ({
+    name,
+    command: process.execPath,
+    fixtureReceipt: 'process-probe',
+    args: ['-e', 'process.exit(0)'],
+  });
+  const result = await runGates({
+    gates: [probe('stdout-taken'), probe('after-stdout')],
+    root: out,
+    out,
+  });
+  assert.deepEqual(
+    result.gates.map((g) => [g.status, g.exitCode]),
+    [
+      ['incomplete', 78],
+      ['passed', 0],
+    ],
+  );
+  assert.match(result.gates[0].detail, /EEXIST/u);
+  assert.equal(
+    JSON.parse(readFileSync(result.gates[0].attemptReceipt, 'utf8')).status,
+    'incomplete',
+  );
+  assert.equal(readFileSync(taken, 'utf8'), 'stale');
+});
+test('child stdout reaches the gate log while the gate is still running, exactly once', async () => {
+  const out = fresh();
+  const log = join(out, 'live-stdout.log');
+  const result = await runGates({
+    gates: [
+      {
+        name: 'live-stdout',
+        command: process.execPath,
+        fixtureReceipt: 'process-probe',
+        args: [
+          '-e',
+          `process.stdout.write('live-marker\\n');setTimeout(()=>process.exit(require('node:fs').readFileSync(${JSON.stringify(log)},'utf8').includes('live-marker\\n')?0:3),500)`,
+        ],
+      },
+    ],
+    root: out,
+    out,
+  });
+  assert.equal(result.gates[0].status, 'passed', result.gates[0].detail);
+  assert.equal(readFileSync(join(out, 'live-stdout.stdout.json'), 'utf8'), 'live-marker\n');
+  assert.equal(readFileSync(log, 'utf8').split('live-marker\n').length, 2);
+  assert(existsSync(result.gates[0].attemptReceipt));
+});
+test('a gate whose leftover process still holds stdout ends when its own child exits', async () => {
+  const out = fresh();
+  const pidFile = join(out, 'holder.pid');
+  const holder = `require('node:fs').writeFileSync(${JSON.stringify(pidFile)}, String(process.pid)); setInterval(() => {}, 1000);`;
+  const started = Date.now();
+  const result = await runGates({
+    gates: [
+      {
+        name: 'stdout-holder',
+        command: process.execPath,
+        fixtureReceipt: 'process-probe',
+        timeoutMs: 30000,
+        args: [
+          '-e',
+          `process.stdout.write('before-exit\\n'); require('node:child_process').spawn(process.execPath, ['-e', ${JSON.stringify(holder)}], { stdio: ['ignore', 'inherit', 'ignore'], detached: true }).unref();`,
+        ],
+      },
+    ],
+    root: out,
+    out,
+  });
+  const elapsed = Date.now() - started;
+  if (existsSync(pidFile)) {
+    try {
+      process.kill(Number(readFileSync(pidFile, 'utf8')), 'SIGKILL');
+    } catch (error) {
+      if (error.code !== 'ESRCH') throw error;
+    }
+  }
+  assert.equal(result.gates[0].status, 'passed', result.gates[0].detail);
+  assert(elapsed < 15000, 'Gate waited for a leftover stdout holder');
+  assert.equal(readFileSync(join(out, 'stdout-holder.stdout.json'), 'utf8'), 'before-exit\n');
+});
+test('per-engine VH gates that outrun the battery default carry floors of twice their longest healthy run', () => {
+  const healthySeconds = {
+    'reader-doors': 831,
+    'speak-negatives': 1104,
+    'reading-truth': 4801,
+  };
+  const gates = batteryGates('/unused', {});
+  const plan = createPlan({ identity });
+  for (const [name, seconds] of Object.entries(healthySeconds))
+    for (const engine of ['', '-webkit']) {
+      const gate = gates.find((g) => g.name === name + engine);
+      const selected = gateForShard(
+        gate,
+        plan.shards.find((s) => s.gates.includes(gate.name)),
+        {},
+      );
+      assert(selected.timeoutMs >= 2 * seconds * 1000, gate.name);
+    }
+  const raised = batteryGates('/unused', { KAIRO_BATTERY_TIMEOUT_MS: String(4 * 60 * 60 * 1000) });
+  for (const name of ['reading-truth', 'record-depth-webkit'])
+    assert.equal(raised.find((g) => g.name === name).timeoutMs, 4 * 60 * 60 * 1000);
+});
+
+const workflow = () =>
+  parseYaml(
+    readFileSync(new globalThis.URL('../../.github/workflows/ci.yml', import.meta.url), 'utf8'),
+  );
+const budgetLanes = (shards) =>
+  Object.fromEntries(
+    ['fast', 'fast-retry', 'battery', 'retry'].map((id) => [
+      id,
+      shards.filter((s) => s.kind === (id.startsWith('fast') ? 'fast' : 'battery')),
+    ]),
+  );
+function rehash(value, key) {
+  const { [key]: previous, ...body } = value;
+  assert(previous);
+  value[key] = digest(body);
+  return value;
+}
+test('scheduling budgets bind all 188 actual descriptor ceilings and normalized workflow caps', () => {
+  const plan = createPlan({ identity });
+  const descriptors = [...batteryGates('/unused', {}), ...supplementalGates('/unused')];
+  assert.equal(plan.requiredNames.length, 188);
+  assert.equal(new Set(plan.shards.flatMap((s) => s.gates)).size, 188);
+  assert.equal(validateWorkflowSchedule(workflow(), budgetLanes(plan.shards)), true);
+  for (const shard of plan.shards) {
+    const expected = shard.gates.map((name) => ({
+      name,
+      timeoutMs: gateTimeoutMs(
+        gateForShard(
+          descriptors.find((g) => g.name === name),
+          shard,
+          {},
+        ).timeoutMs,
+      ),
+    }));
+    assert.deepEqual(shard.budget, scheduledBudget(expected));
+    assert(shard.budget.jobTimeoutMinutes <= SCHEDULING_POLICY.hostedJobMinutes);
+  }
+  // Current slow gates retain their authoritative descriptor floors; no timing weight supplies a ceiling.
+  const long = plan.shards.find((s) => s.gates.includes('reading-truth-webkit'));
+  assert(
+    long.budget.gateTimeouts.find((g) => g.name === 'reading-truth-webkit').timeoutMs >=
+      3 * 60 * 60 * 1000,
+  );
+  assert.equal(shardMatrix([long]).include[0].stepTimeoutMinutes, long.budget.stepTimeoutMinutes);
+  for (const scope of ['full', 'docs']) {
+    const scoped = createPlan({ identity, scope });
+    validatePlan(scoped);
+    validateWorkflowSchedule(workflow(), budgetLanes(scoped.shards));
+    assert.equal(scoped.shards.flatMap((s) => s.gates).length, scoped.requiredNames.length);
+    assert.deepEqual(scoped.shards.find((s) => s.id === 'fast-decks').gates, [
+      'deck-frozen-build',
+      'deck-gloss-ja',
+      'deck-export-mcd',
+      'deck-segment-overrides',
+    ]);
+  }
+});
+test('scheduling rejects missing unknown mismatched and impossible budgets after recomputed digests', () => {
+  const original = createPlan({ identity });
+  const mutations = [
+    (s) => {
+      delete s.budget;
+    },
+    (s) => {
+      delete s.budget.gateTimeouts[0].timeoutMs;
+    },
+    (s) => {
+      s.budget.gateTimeouts[0].name = 'unknown-gate';
+    },
+    (s) => {
+      s.budget.gateTimeouts.pop();
+    },
+    (s) => {
+      s.budget.gateTimeouts[0].timeoutMs = 1;
+      s.budget = scheduledBudget(s.budget.gateTimeouts);
+    },
+    (s) => {
+      s.budget.stepTimeoutMinutes = 1;
+    },
+    (s) => {
+      s.budget.jobTimeoutMinutes = 1;
+    },
+  ];
+  for (const mutate of mutations) {
+    const plan = clone(original);
+    mutate(plan.shards[0]);
+    assert.throws(() => validatePlan(rehash(plan, 'planDigest')), /budget/i);
+  }
+  const gates = batteryGates('/unused', {});
+  gates.find((g) => g.name === 'reading-truth').timeoutMs = 360 * 60 * 1000;
+  assert.throws(() => createPlan({ identity, gates }), /cannot fit.*hosted/);
+  const decks = clone(original),
+    shard = decks.shards.find((s) => s.id === 'fast-decks');
+  shard.gates.reverse();
+  shard.budget.gateTimeouts.reverse();
+  assert.throws(() => validatePlan(rehash(decks, 'planDigest')), /Frozen deck order/);
+});
+test('scheduling rejects too-small original and retry step/job caps through actual normalized YAML', () => {
+  const plan = createPlan({ identity }),
+    lanes = budgetLanes(plan.shards);
+  for (const id of Object.keys(lanes)) {
+    for (const field of ['step', 'job']) {
+      const bad = workflow(),
+        job = bad.jobs[id];
+      if (field === 'step') job.steps.find((s) => s.id === 'gates')['timeout-minutes'] = 1;
+      else job['timeout-minutes'] = 1;
+      assert.throws(() => validateWorkflowSchedule(bad, lanes), new RegExp(`${field} cap`, 'i'));
+    }
+    const huge = workflow();
+    huge.jobs[id]['timeout-minutes'] = 361;
+    assert.throws(() => validateWorkflowSchedule(huge, lanes), /Job cap/);
+    const unbounded = workflow();
+    delete unbounded.jobs[id].steps[0]['timeout-minutes'];
+    assert.throws(() => validateWorkflowSchedule(unbounded, lanes), /Unbounded setup/);
+    const excess = workflow();
+    excess.jobs[id].steps.at(-1)['timeout-minutes'] = 21;
+    assert.throws(() => validateWorkflowSchedule(excess, lanes), /Retention exceeds/);
+    const wrongMatrix = workflow();
+    wrongMatrix.jobs[id].strategy.matrix = '${{ fromJSON(needs.plan.outputs.wrong-matrix) }}';
+    assert.throws(
+      () => validateWorkflowSchedule(wrongMatrix, lanes),
+      /Wrong planned matrix source/,
+    );
+  }
+});
+test('scheduling retry matrices recalculate only selected failures and preserve dependency order', () => {
+  const f = fixture();
+  // Exercise both fast retry and battery retry templates with proper subset budgets.
+  for (const kind of ['fast', 'battery']) {
+    const shard = f.plan.shards.find((s) => s.kind === kind && s.gates.length > 2 && !s.e2e);
+    const receipt = f.receipts.find((r) => r.shardId === shard.id);
+    receipt.status = 'failed';
+    receipt.exitCode = 1;
+    for (const row of receipt.gates.slice(0, 2)) {
+      row.status = 'failed';
+      row.exitCode = 1;
+    }
+    // Receipt order cannot reverse dependency order in a retry plan.
+    receipt.gates.reverse();
+  }
+  refreshRetryPlans(f);
+  const retryShards = f.retryPlans.flatMap((r) => r.shards);
+  assert.equal(retryShards.length, 2);
+  validateWorkflowSchedule(workflow(), {
+    'fast-retry': retryShards.filter((s) => s.kind === 'fast'),
+    retry: retryShards.filter((s) => s.kind === 'battery'),
+  });
+  for (const retry of f.retryPlans) {
+    validateRetryPlan(f.plan, retry);
+    const selected = retry.shards[0],
+      original = f.plan.shards.find((s) => s.id === selected.id);
+    assert.deepEqual(selected.gates, original.gates.slice(0, 2));
+    assert(selected.budget.stepTimeoutMinutes < original.budget.stepTimeoutMinutes);
+    assert(selected.budget.jobTimeoutMinutes < original.budget.jobTimeoutMinutes);
+    assert.equal(
+      shardMatrix(retry.shards).include[0].stepTimeoutMinutes,
+      selected.budget.stepTimeoutMinutes,
+    );
+    for (const change of ['missing', 'original', 'reversed']) {
+      const bad = clone(retry),
+        row = bad.shards[0];
+      if (change === 'missing') delete row.budget;
+      if (change === 'original') row.budget = clone(original.budget);
+      if (change === 'reversed') {
+        row.gates.reverse();
+        row.budget.gateTimeouts.reverse();
+      }
+      assert.throws(
+        () => validateRetryPlan(f.plan, rehash(bad, 'retryDigest')),
+        /budget|dependency order/i,
+      );
+    }
+  }
 });

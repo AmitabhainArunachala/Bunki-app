@@ -12,7 +12,10 @@ import { mediaReportContracts } from './vh-media-report-contracts.mjs';
 import { visualReportContracts } from './vh-visual-report-contracts.mjs';
 import { voiceReportContracts } from './vh-voice-report-contracts.mjs';
 import { learningReportContracts } from './vh-learning-report-contracts.mjs';
-import { assessmentReportContracts } from './vh-assessment-report-contracts.mjs';
+import {
+  assessmentReportContracts,
+  ASSESSMENT_SOURCE_INPUTS,
+} from './vh-assessment-report-contracts.mjs';
 import { miscReportContracts } from './vh-misc-report-contracts.mjs';
 import { deckReportContracts, PERSONAL_SOURCES } from './vh-deck-report-contracts.mjs';
 import { PYTHON_REPORTS, validatePythonReport } from './vh-python-report-contracts.mjs';
@@ -201,7 +204,12 @@ export function validateGateEvidence(gate, declaration, context, retainedValidat
               digest(readFileSync(resolve(context.root, 'prototypes/corridor/tools', file))),
             ]),
           )
-        : {};
+        : Object.fromEntries(
+            (ASSESSMENT_SOURCE_INPUTS[gate.name] || []).map((file) => [
+              file,
+              digest(readFileSync(resolve(context.root, file))),
+            ]),
+          );
     const producerHash =
       c.producer && existsSync(resolve(context.root, c.producer))
         ? digest(readFileSync(resolve(context.root, c.producer)))
@@ -316,13 +324,27 @@ export function validateGateEvidence(gate, declaration, context, retainedValidat
       assert.equal(r.artifactSha256, context.artifactSha256);
       assert.equal(r.verifierSha256, context.verifierSha256);
       exactIds([context.engine], r.engines, 'Word-grammar engines');
-      assert.deepEqual(r.requestedScope.argv, ['--controls']);
+      assert(
+        typeof r.browserVersions?.[context.engine] === 'string' &&
+          r.browserVersions[context.engine].length > 0,
+        'Word-grammar browser version missing',
+      );
+      assert.equal(gate.args[0], gate.requiredPath, 'Word-grammar invocation is not its verifier');
+      const argv = gate.args.slice(1);
+      assert.deepEqual(argv, ['--controls'], 'Word-grammar gate is not the full control schedule');
+      assert.deepEqual(r.requestedScope?.argv, argv, 'Word-grammar receipt argv differs');
+      assert(
+        Array.isArray(context.runtimeFiles) && context.runtimeFiles.length > 0,
+        'Word-grammar controls need the served artifact manifest',
+      );
       const admission = grammarAcceptance({
-        selection: r.requestedScope,
+        argv,
         engines: r.engines,
         rows: r.rows,
         walks: r.walks,
         g6Completed: r.g6Completed,
+        controls: r.controls,
+        runtimeFiles: context.runtimeFiles,
       });
       assert.equal(
         admission.fullAcceptance,

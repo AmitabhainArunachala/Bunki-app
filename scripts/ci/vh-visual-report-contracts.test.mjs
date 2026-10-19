@@ -7,9 +7,26 @@ import {
   SWEEP_ROOMS,
   readingDataIds,
 } from './vh-visual-report-contracts.mjs';
+import { readFileSync } from 'node:fs';
 import { READING_CASES } from '../../prototypes/corridor/tools/vh-visual-contracts.mjs';
 const sha = 'a'.repeat(64),
   context = { artifactSha256: sha, verifierSha256: sha, runId: 'attempt-1' };
+const observedControls = JSON.parse(
+  readFileSync(
+    new globalThis.URL(
+      '../../prototypes/corridor/tools/vh-visual-observed-controls.json',
+      import.meta.url,
+    ),
+  ),
+);
+const observedComb = (engine) => structuredClone(observedControls.engines[engine].comb);
+const observedShelf = (engine) =>
+  observedControls.engines[engine].shelf.map(({ edits, ...row }) => {
+    const baseline = [...observedControls.shelves[row.day]],
+      changed = [...baseline];
+    for (const [at, id] of edits) changed[at] = id;
+    return structuredClone({ ...row, baseline, changed, restored: [...baseline] });
+  });
 function candidate(name) {
   const contract = visualReportContracts[name],
     engine = name.endsWith('-webkit') ? 'webkit' : 'chromium',
@@ -79,45 +96,14 @@ function candidate(name) {
     report.checks = ids.map((id) => ({ id, pass: true }));
     if (kind === 'comb-0') {
       report.engines = report.browserVersions;
-      for (const lang of ['bi', 'ja'])
-        for (const width of [320, 390])
-          report.controls.push({
-            engine,
-            lang,
-            width,
-            id: 'mixed-script-verb-split',
-            passed: true,
-            premise: true,
-            clean: [],
-            back: [],
-            wrong: ['inside an independently evidenced mixed-script word'],
-            candidate: { html: 'サボる' },
-            restored: { html: 'サボる' },
-          });
+      report.controls = observedComb(engine);
     } else {
       report.mode = 'verify';
+      report.selectors = {};
       report.inventory = ['bi', 'ja'].flatMap((lang) =>
         SWEEP_ROOMS.map((room) => ({ engine, lang, room })),
       );
-      for (const lang of ['bi', 'ja'])
-        for (let day = 0; day < 4; day++)
-          for (const id of [
-            'drop-duplicate-hides-omission',
-            'series-book-order-swapped',
-            ...(day === 1 ? ['day-two-drop-order-drift'] : []),
-          ])
-            report.controls.push({
-              engine,
-              lang,
-              day: `2026-10-${19 + day}`,
-              id,
-              passed: true,
-              premise: { baseGood: true, legacyMembership: true, neighborClean: true },
-              restoredBytes: true,
-              baseline: ['a', 'b'],
-              restored: ['a', 'b'],
-              unrelated: [],
-            });
+      report.controls = observedShelf(engine);
     }
   }
   return report;
@@ -202,4 +188,129 @@ test('whole record fields, exact restored shelf and isolated control red are man
   const mutated = candidate('reading-truth');
   mutated.controls.at(-1).judged.asWritten = false;
   assert.equal(validateVisualReport('reading-truth', mutated, context).passed, false);
+});
+
+const shelfRow = (r, id) => r.controls.find((row) => row.id === id);
+for (const name of ['sweep', 'sweep-webkit'])
+  test(`${name}: shelf controls need actual baseline, mutant and restored observations`, () => {
+    const original = candidate(name);
+    assert.deepEqual(validateVisualReport(name, original, context).errors, []);
+    const forgeries = {
+      'the finding example: booleans only, no observations': (r) => {
+        const row = r.controls[0];
+        r.controls[0] = {
+          id: row.id,
+          engine: row.engine,
+          lang: row.lang,
+          day: row.day,
+          passed: true,
+          premise: { baseGood: true, legacyMembership: true, neighborClean: true },
+          restoredBytes: true,
+          unrelated: [],
+        };
+      },
+      'baseline and restored both missing': (r) => {
+        delete r.controls[0].baseline;
+        delete r.controls[0].restored;
+      },
+      'restored missing': (r) => {
+        delete r.controls[0].restored;
+      },
+      'restored is not the baseline': (r) => {
+        const row = r.controls[0];
+        [row.restored[0], row.restored[1]] = [row.restored[1], row.restored[0]];
+      },
+      'mutant equals baseline': (r) => {
+        r.controls[0].changed = [...r.controls[0].baseline];
+      },
+      'mutant moved rows other than its declared pair': (r) => {
+        const row = shelfRow(r, 'day-two-drop-order-drift');
+        [row.changed[0], row.changed[1]] = [row.changed[1], row.changed[0]];
+      },
+      'series swap names another pair': (r) => {
+        const row = shelfRow(r, 'series-book-order-swapped');
+        row.mutation.pair = { a: row.baseline[0], b: row.baseline[1] };
+      },
+      'intended series witness absent': (r) => {
+        const row = shelfRow(r, 'series-book-order-swapped');
+        row.judged.series = true;
+        row.failures = ['order'];
+      },
+      'unrelated predicate failed alongside the intended one': (r) => {
+        const row = shelfRow(r, 'day-two-drop-order-drift');
+        row.judged.roster = false;
+        row.failures = ['roster', 'order'];
+      },
+      'reported failures disagree with the judged predicates': (r) => {
+        shelfRow(r, 'drop-duplicate-hides-omission').failures = ['roster', 'blocks'];
+      },
+      'judged predicates missing': (r) => {
+        delete shelfRow(r, 'drop-duplicate-hides-omission').judged;
+      },
+      'declared intended kill rewritten by the receipt': (r) => {
+        shelfRow(r, 'drop-duplicate-hides-omission').mutation.intended = ['order'];
+      },
+    };
+    for (const [label, mutate] of Object.entries(forgeries)) {
+      const r = structuredClone(original);
+      mutate(r);
+      assert.equal(validateVisualReport(name, r, context).passed, false, label);
+    }
+  });
+for (const name of ['comb-0', 'comb-0-webkit'])
+  test(`${name}: the lexical control is re-judged from its observed line breaks`, () => {
+    const original = candidate(name);
+    assert.deepEqual(validateVisualReport(name, original, context).errors, []);
+    const forgeries = {
+      'candidate and restored missing': (r) => {
+        delete r.controls[0].candidate;
+        delete r.controls[0].restored;
+      },
+      'mutant missing': (r) => {
+        delete r.controls[0].mutant;
+      },
+      'mutant is the candidate unchanged': (r) => {
+        r.controls[0].mutant = structuredClone(r.controls[0].candidate);
+      },
+      'mutant has no break, yet the receipt claims the witness': (r) => {
+        r.controls[0].mutant.breaks = [];
+      },
+      'restored html differs from the candidate': (r) => {
+        r.controls[0].restored.html = 'サボ<br>る';
+      },
+      'candidate itself breaks inside the word': (r) => {
+        r.controls[0].candidate.breaks = [2];
+      },
+      'another fixture word': (r) => {
+        for (const key of ['candidate', 'mutant', 'restored']) r.controls[0][key].text = 'メモる';
+      },
+    };
+    for (const [label, mutate] of Object.entries(forgeries)) {
+      const r = structuredClone(original);
+      mutate(r);
+      assert.equal(validateVisualReport(name, r, context).passed, false, label);
+    }
+  });
+test('an explicit or declared sweep selector stays diagnostic, even KAIRO_SWEEP_MODE=verify', () => {
+  const original = candidate('sweep');
+  assert.equal(validateVisualReport('sweep', original, context).passed, true);
+  const explicit = structuredClone(original);
+  explicit.selectors = { KAIRO_SWEEP_MODE: 'verify' };
+  assert.equal(validateVisualReport('sweep', explicit, context).passed, false);
+  const unrecorded = structuredClone(original);
+  delete unrecorded.selectors;
+  assert.equal(validateVisualReport('sweep', unrecorded, context).passed, false);
+  for (const name of Object.keys(visualReportContracts)) {
+    const report = candidate(name);
+    assert.equal(validateVisualReport(name, report, context).passed, true, name);
+    for (const env of [{ KAIRO_SWEEP_MODE: 'verify' }, { COMB_NEGATIVE: 'breaks' }])
+      assert.equal(
+        validateVisualReport(name, report, {
+          ...context,
+          env: { KAIRO_BROWSER: 'chromium', ...env },
+        }).passed,
+        false,
+        `${name} ${JSON.stringify(env)}`,
+      );
+  }
 });

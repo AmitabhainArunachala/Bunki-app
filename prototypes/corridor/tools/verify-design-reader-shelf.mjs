@@ -157,7 +157,7 @@ import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash, randomUUID } from 'node:crypto';
-import { designSelection, scopeResult } from './vh-visual-contracts.mjs';
+import { designSelection, readingContrastHolds, rubyHalfOfBody, rubyLegible, scopeResult } from './vh-visual-contracts.mjs';
 import { createRequire } from 'node:module';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -484,10 +484,10 @@ try {
         });
         assert(rt && rt.shown && rt.opacity > 0.9 && rt.text, `the first tap shows no reading: ${JSON.stringify(rt)}`);
         assert.deepEqual(rt.pseudo, [], `a pseudo-element draws a reading: ${JSON.stringify(rt.pseudo)}`);
-        assert(Math.abs(rt.size / body - 0.5) <= 0.01, `furigana ${rt.size}px is ${(rt.size / body).toFixed(2)}× the body, not half`);
-        assert(rt.size >= 10, `furigana ${rt.size}px is under 10px`);
+        assert(rubyHalfOfBody(rt.size, body), `furigana ${rt.size}px is ${(rt.size / body).toFixed(2)}× the body, not half`);
+        assert(rubyLegible(rt.size), `furigana ${rt.size}px is under 10px`);
         const readingContrast = await page.evaluate(contrastOf, '#reader .tok[data-index="1"] rt:not(.hidden-rt)');
-        assert(readingContrast >= 4.5, `the reading's contrast ${readingContrast}:1`);
+        assert(readingContrastHolds(readingContrast), `the reading's contrast ${readingContrast}:1`);
         // one tap is the meaning (reader lane 2026-10-02): the English stands in the word's popup
         const gloss = await page.evaluate(() => {
           const node = document.querySelector('#mini .mini-gloss');

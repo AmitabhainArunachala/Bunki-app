@@ -1,6 +1,7 @@
 /** Unique assertions retained from the consolidated standalone workflows. */
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 export function supplementalGates(out) {
@@ -38,6 +39,7 @@ export function supplementalGates(out) {
         'prototypes/corridor/tools/vh-word-grammar-contracts.test.mjs',
         'prototypes/corridor/tools/vh-learning-contracts.test.mjs',
         'prototypes/corridor/tools/vh-learning-reader-receipt.test.mjs',
+        'prototypes/corridor/tools/vh-contrast-arrival.test.mjs',
         'prototypes/corridor/tools/vh-visual-contracts.test.mjs',
         'prototypes/corridor/tools/test-vh-voice-contracts.mjs',
         'scripts/release/release.test.mjs',
@@ -106,36 +108,33 @@ export function supplementalGates(out) {
     ]),
   ].map((gate) => ({ ...gate, env: { KAIRO_EVIDENCE_DIR: join(out, gate.name), ...gate.env } }));
 }
+const DECK_PATHS = ['prototypes/corridor/decks', 'decks/kotoba-mine'];
 export function frozenDeck(root = process.cwd()) {
-  for (const args of [[], ['--profile', 'public']])
-    execFileSync('python3', ['decks/kotoba-mine/tools/build.py', '--frozen', ...args], {
-      cwd: root,
-      stdio: 'inherit',
-    });
-  execFileSync(
-    'git',
-    [
-      'diff',
-      '--stat',
-      '--exit-code',
-      '--',
-      'prototypes/corridor/decks',
-      'decks/kotoba-mine',
-      ':(exclude)*.apkg',
-    ],
-    { cwd: root, stdio: 'inherit' },
-  );
-  const untracked = execFileSync(
-    'git',
-    [
-      'ls-files',
-      '--others',
-      '--exclude-standard',
-      '--',
-      'prototypes/corridor/decks',
-      'decks/kotoba-mine',
-    ],
-    { cwd: root, encoding: 'utf8' },
-  ).trim();
-  assert.equal(untracked, '', 'Deck build wrote uncommitted outputs');
+  const generated = execFileSync('git', ['ls-files', '-z', '--', ...DECK_PATHS], {
+    cwd: root,
+    encoding: 'utf8',
+  })
+    .split('\0')
+    .filter((file) => file.endsWith('.apkg'))
+    .map((file) => [join(root, file), readFileSync(join(root, file))]);
+  try {
+    for (const args of [[], ['--profile', 'public']])
+      execFileSync('python3', ['decks/kotoba-mine/tools/build.py', '--frozen', ...args], {
+        cwd: root,
+        stdio: 'inherit',
+      });
+    execFileSync(
+      'git',
+      ['diff', '--stat', '--exit-code', '--', ...DECK_PATHS, ':(exclude)*.apkg'],
+      { cwd: root, stdio: 'inherit' },
+    );
+    const untracked = execFileSync(
+      'git',
+      ['ls-files', '--others', '--exclude-standard', '--', ...DECK_PATHS],
+      { cwd: root, encoding: 'utf8' },
+    ).trim();
+    assert.equal(untracked, '', 'Deck build wrote uncommitted outputs');
+  } finally {
+    for (const [file, bytes] of generated) writeFileSync(file, bytes);
+  }
 }

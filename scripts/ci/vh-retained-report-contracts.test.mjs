@@ -1,7 +1,15 @@
 /* global structuredClone */
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { mkdtempSync, symlinkSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { retainedReportContracts, driftFastSchedule } from './vh-retained-report-contracts.mjs';
+const SITE = mkdtempSync(join(tmpdir(), 'vh-retained-site-')),
+  OTHER_SITE = mkdtempSync(join(tmpdir(), 'vh-retained-other-')),
+  LINKS = mkdtempSync(join(tmpdir(), 'vh-retained-link-')),
+  SITE_LINK = join(LINKS, 'site');
+symlinkSync(SITE, SITE_LINK);
 const A = 'a'.repeat(64),
   B = 'b'.repeat(64),
   C = 'c'.repeat(64),
@@ -16,7 +24,7 @@ function fixture(name) {
     sourceVerifiedBeforeAndAfter: true,
     engine: 'chromium',
     gitSha: H,
-    site: '/candidate/site',
+    site: SITE,
     artifactSha256: A,
     artifactVerifiedBeforeAndAfter: true,
     runtimeFiles: { 'corridor.js': C },
@@ -197,7 +205,8 @@ for (const name of Object.keys(retainedReportContracts))
       for (const patch of [
         { artifactSha256: C },
         { artifactVerifiedBeforeAndAfter: false },
-        { site: '/wrong/site' },
+        { site: OTHER_SITE },
+        { site: join(SITE, 'missing') },
         { engine: 'webkit' },
       ])
         assert.equal(contract.validate(report, { ...context, ...patch }).passed, false);
@@ -209,6 +218,23 @@ for (const name of Object.keys(retainedReportContracts))
     for (const malformed of [null, {}, [], { results: [null] }])
       assert.equal(contract.validate(malformed, context).passed, false);
   });
+test('served-site identity compares real paths on both sides', () => {
+  for (const name of Object.keys(retainedReportContracts)) {
+    const { report, context, contract } = fixture(name);
+    if (contract.sourceOnly) continue;
+    for (const site of [SITE_LINK, `${SITE}/`, `${SITE_LINK}/`]) {
+      const judged = contract.validate(report, { ...context, site });
+      assert(judged.passed, `${name} ${site}: ${judged.errors.join(';')}`);
+      const linked = structuredClone(report);
+      linked.artifact.path = site;
+      assert(contract.validate(linked, context).passed, `${name} report ${site}`);
+    }
+    const foreign = structuredClone(report);
+    foreign.artifact.path = OTHER_SITE;
+    assert.equal(contract.validate(foreign, context).passed, false, name);
+    assert.equal(contract.validate(report, { ...context, site: '' }).passed, false, name);
+  }
+});
 test('Drift self-declared small counts cannot replace three words, three hops or twelve exact seeded actions', () => {
   const { report, context, contract } = fixture('drift-fast');
   for (const mutate of [

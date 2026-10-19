@@ -1,20 +1,43 @@
 /* global structuredClone */
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import {
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  realpathSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   MEDIA_CASES,
   mediaReportContracts,
   validateMediaReport,
 } from './vh-media-report-contracts.mjs';
+import { validateGateEvidence } from './gate-evidence.mjs';
 const A = 'a'.repeat(64),
   B = 'b'.repeat(64),
   C = 'c'.repeat(64);
+const sha256 = (path) => createHash('sha256').update(readFileSync(path)).digest('hex');
+const site = mkdtempSync(join(tmpdir(), 'vh-media-site-'));
+const evidence = mkdtempSync(join(tmpdir(), 'vh-media-out-'));
+const handoffRun = join(evidence, 'guided-offline', 'guided-offline-fixture');
+mkdirSync(handoffRun, { recursive: true });
+const handoff = join(handoffRun, 'corridor-standalone.html');
+writeFileSync(handoff, '<!doctype html><title>handoff</title>\n');
 function fixture(name, engine = 'chromium') {
   const context = {
     engine,
     artifactSha256: A,
     verifierSha256: B,
-    site: '/immutable/site',
+    site,
+    out: evidence,
+    gateId: name,
     artifactVerifiedBeforeAndAfter: true,
     sourceVerifiedBeforeAndAfter: true,
     runtimeFiles: { 'corridor.js': C, 'audio/test.m4a': C },
@@ -72,7 +95,9 @@ function fixture(name, engine = 'chromium') {
     problems: [],
     installedGuided: ['guided/room.js'],
     offlineRequests: [],
-    standalone: '/handoff.html',
+    standalone: handoff,
+    standaloneDeclared: null,
+    standaloneSha256: sha256(handoff),
     summary: { total: results.length, failed: 0 },
     timing: ['shelf → reader (picture)', 'deck Good → next card'].map((move) => ({
       engine,
@@ -245,6 +270,7 @@ test('explicit filters/faults cannot inherit full acceptance even with every row
       { GUIDED_VIEWPORTS: '390,1280' },
       { GUIDED_MOMENTS: '0' },
       { GUIDED_FAULT: 'mask' },
+      { GUIDED_STANDALONE: handoff },
     ])
       assert.equal(validateMediaReport(name, report, { ...context, env }).passed, false, name);
   }
@@ -340,5 +366,108 @@ test('device voice, missing supplemental proof, and unverified offline requests 
   assert.equal(
     validateMediaReport('guided-offline', offline.report, offline.context).passed,
     false,
+  );
+});
+
+test('legacy site identity is the same real directory through symlinks and trailing slashes', () => {
+  const link = join(mkdtempSync(join(tmpdir(), 'vh-media-link-')), 'site');
+  symlinkSync(site, link);
+  for (const name of ['guided-session', 'import-provider', 'playback']) {
+    const { report, context } = fixture(name);
+    report.site = realpathSync(site);
+    for (const declared of [link, `${link}/`, `${site}/`])
+      assert.equal(
+        validateMediaReport(name, report, { ...context, site: declared }).passed,
+        true,
+        `${name}: ${declared}`,
+      );
+    const other = mkdtempSync(join(tmpdir(), 'vh-media-other-site-'));
+    assert.equal(validateMediaReport(name, report, { ...context, site: other }).passed, false);
+    assert.equal(
+      validateMediaReport(name, { ...report, site: join(site, 'missing') }, context).passed,
+      false,
+    );
+  }
+});
+test('guided offline admits only its own fresh built handoff, never a declared or foreign file', () => {
+  const { report, context } = fixture('guided-offline');
+  const admit = (change = {}, extra = {}) =>
+    validateMediaReport('guided-offline', { ...report, ...change }, { ...context, ...extra })
+      .passed;
+  assert.equal(admit(), true);
+  const foreign = join(
+    mkdtempSync(join(tmpdir(), 'vh-media-foreign-')),
+    'corridor-standalone.html',
+  );
+  writeFileSync(foreign, readFileSync(handoff));
+  assert.equal(admit({ standalone: foreign }), false, 'foreign file with identical bytes');
+  assert.equal(admit({ standaloneDeclared: foreign }), false, 'declared handoff');
+  assert.equal(admit({ standaloneDeclared: undefined }), false, 'producer did not say');
+  assert.equal(admit({}, { env: { GUIDED_STANDALONE: handoff } }), false, 'declared env');
+  assert.equal(admit({ standaloneSha256: C }), false, 'bytes differ from observation');
+  assert.equal(admit({}, { out: undefined }), false, 'no gate directory');
+  assert.equal(admit({}, { gateId: 'guided-session' }), false, 'another gate directory');
+  const loose = join(evidence, 'guided-offline', 'corridor-standalone.html');
+  writeFileSync(loose, readFileSync(handoff));
+  assert.equal(admit({ standalone: loose }), false, 'outside the producer run directory');
+  rmSync(loose);
+  const linked = join(handoffRun, 'linked.html');
+  symlinkSync(foreign, linked);
+  assert.equal(admit({ standalone: linked }), false, 'symlink to elsewhere');
+  rmSync(linked);
+  const second = join(evidence, 'guided-offline', 'guided-offline-second');
+  mkdirSync(second);
+  assert.equal(admit(), false, 'two producer runs in one attempt');
+  rmSync(second, { recursive: true });
+  assert.equal(admit(), true);
+});
+test('an observed guided-offline receipt is admitted at the producer layout by the real consumer', () => {
+  const observed = JSON.parse(
+    readFileSync(
+      new globalThis.URL('./vh-observed-media-assessment-receipts.json', import.meta.url),
+      'utf8',
+    ),
+  )['guided-offline'];
+  const root = fileURLToPath(new globalThis.URL('../..', import.meta.url));
+  const admit = (place) => {
+    const out = mkdtempSync(join(tmpdir(), 'vh-media-consumer-'));
+    const run = join(out, 'guided-offline', observed.layout.run);
+    mkdirSync(run, { recursive: true });
+    const standalone = join(run, observed.layout.standalone);
+    writeFileSync(standalone, '<!doctype html><title>observed handoff</title>\n');
+    const receipt = {
+      ...observed.report,
+      artifactSha256: A,
+      site,
+      standalone: realpathSync(standalone),
+      standaloneDeclared: null,
+      standaloneSha256: sha256(standalone),
+    };
+    writeFileSync(place(out, run), JSON.stringify(receipt));
+    return validateGateEvidence(
+      {
+        name: 'guided-offline',
+        args: ['prototypes/corridor/tools/verify-guided-offline.mjs'],
+        requiredPath: 'prototypes/corridor/tools/verify-guided-offline.mjs',
+      },
+      { kind: 'adapter', name: 'guided-offline' },
+      {
+        root,
+        out,
+        startedAt: new Date(Date.now() - 60_000).toISOString(),
+        runId: 'observed-attempt',
+        engine: 'chromium',
+        artifactSha256: A,
+      },
+    );
+  };
+  const admitted = admit((out, run) => join(run, observed.layout.receipt));
+  assert.deepEqual(
+    [...admitted.obligation.observedCases].sort(),
+    MEDIA_CASES['guided-offline'].map((name) => `chromium/${name}`).sort(),
+  );
+  assert.throws(
+    () => admit((out) => join(out, 'guided-offline', observed.layout.receipt)),
+    /exactly one fresh receipt/u,
   );
 });

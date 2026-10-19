@@ -218,6 +218,8 @@ function contract({
   requireRowErrors = false,
   requireEgress = false,
   requireObservations = false,
+  versions = singleEngine ? 'single' : 'row',
+  reportEngines = versions === 'report',
   extra = () => {},
 }) {
   const expectedCases = expected || ((engine) => rowsFor(names, engine, widths));
@@ -264,25 +266,29 @@ function contract({
         if (key in report) require(!report[key], `${key} changes or invalidates acceptance scope`);
       if (identity) {
         require(sha(report.artifactSha256), 'Missing artifact digest');
-        if (context.artifactSha256)
-          require(report.artifactSha256 === context.artifactSha256, 'Wrong artifact digest');
+        require(sha(context.artifactSha256) &&
+          report.artifactSha256 === context.artifactSha256, 'Wrong or unbound artifact digest');
         require(sha(report.verifierSha256), 'Missing verifier digest');
-        if (context.verifierSha256)
-          require(report.verifierSha256 === context.verifierSha256, 'Wrong verifier digest');
+        require(sha(context.verifierSha256) &&
+          report.verifierSha256 === context.verifierSha256, 'Wrong or unbound verifier digest');
       }
       for (const key of ['errors', 'externalRequests'])
         if (key in report)
           require(Array.isArray(report[key]) &&
             report[key].length === 0, `${key} is nonempty or malformed`);
-      if (singleEngine)
+      if (singleEngine || versions === 'single')
         require(engines.length === 1 &&
           report.engine === engines[0] &&
           nonempty(report.browserVersion), 'Wrong/missing actual engine or browser version');
-      if (Array.isArray(report.engines))
-        require(exact(engines, report.engines), 'Declared engines differ from required engines');
-      if (report.browserVersions)
+      if (reportEngines || 'engines' in report)
+        require(Array.isArray(report.engines) &&
+          exact(
+            engines,
+            report.engines,
+          ), 'Declared engines absent or differ from required engines');
+      if (versions === 'report' || 'browserVersions' in report)
         for (const engine of engines)
-          require(nonempty(report.browserVersions[engine]), `No observed ${engine} version`);
+          require(nonempty(report.browserVersions?.[engine]), `No observed ${engine} version`);
       const observed = rows.map((row) => {
         const engine = caseEngine
           ? caseEngine(report, row)
@@ -311,7 +317,7 @@ function contract({
         if (requireObservations && !row.control)
           require(Array.isArray(row.observations) &&
             row.observations.length > 0, `${label}: no completed journey observations`);
-        if ('browserVersion' in row)
+        if (versions === 'row' || 'browserVersion' in row)
           require(nonempty(row.browserVersion), `${label}: missing actual browser version`);
         if ('transport' in row) {
           require(row.transport &&
@@ -349,6 +355,7 @@ const definitions = {
     names: EXISTING_CASES['teacher-context'],
     status: 'status',
     caseEngine: () => 'chromium',
+    versions: 'extra',
     extra(report, context, require, rows) {
       require(context.engine !== 'webkit' &&
         context.engine !== 'all', 'Teacher-context producer only launches Chromium');
@@ -380,6 +387,7 @@ const definitions = {
   'teacher-drafts-integration': named('teacher-drafts', EXISTING_CASES['teacher-drafts'], {
     status: 'pass',
     mode: 'full',
+    versions: 'report',
     requireRowErrors: true,
     requireObservations: true,
     extra(report, context, require) {
@@ -389,6 +397,7 @@ const definitions = {
   'sentence-drafts-integration': named('sentence-drafts', EXISTING_CASES['sentence-drafts'], {
     widths: [1440, 390],
     mode: 'full',
+    reportEngines: true,
     requireRowErrors: true,
     requireEgress: true,
     requireObservations: true,
@@ -457,6 +466,7 @@ const definitions = {
       mode: 'full',
       status: 'pass',
       requireObservations: true,
+      versions: 'report',
       extra(report, context, require) {
         require(report.suite === 'record-reading-position', 'Wrong reading-position suite');
         require(Array.isArray(report.errors) &&
@@ -518,6 +528,7 @@ for (const engine of ['chromium', 'webkit']) {
       status: 'pass',
       mode: 'browser',
       identity: false,
+      versions: 'extra',
       caseEngine: (report) => report.observations?.runtime?.engine,
       expected: () => EXISTING_CASES['record-binding-browser'].map((id) => `${engine}/${id}`),
       extra(report, context, require) {
@@ -616,6 +627,70 @@ const completeContrast = (result) =>
     );
   });
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+// Consumer-side proof is independent of the producer's callable predicate and of
+// its completed/frameMs claims. In particular, the final interval cannot set the deadline.
+function normalDemoArrival(arrival) {
+  if (
+    !arrival ||
+    arrival.completed !== true ||
+    arrival.name !== 'read-mini-rise' ||
+    arrival.animationType !== 'CSSAnimation' ||
+    arrival.missingAnimation ||
+    arrival.noAnimation ||
+    arrival.motionPreference !== 'no-preference' ||
+    arrival.opacity !== 1 ||
+    arrival.playState !== 'finished'
+  )
+    return false;
+  const finite = (value) => typeof value === 'number' && Number.isFinite(value);
+  const calibration = arrival.frameCalibration;
+  const stamps = calibration?.timestamps;
+  if (
+    calibration?.method !== 'median-of-12-pre-arrival-raf-intervals' ||
+    !Array.isArray(stamps) ||
+    stamps.length !== 13 ||
+    !stamps.every(finite) ||
+    typeof arrival.documentId !== 'string' ||
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u.test(
+      arrival.documentId,
+    ) ||
+    calibration.documentId !== arrival.documentId ||
+    arrival.sameDocument !== true ||
+    calibration.sameDocument !== true ||
+    !finite(arrival.startTime) ||
+    stamps.at(-1) >= arrival.startTime
+  )
+    return false;
+  const intervals = stamps.slice(1).map((stamp, index) => stamp - stamps[index]);
+  if (!intervals.every((interval) => finite(interval) && interval > 0)) return false;
+  const sorted = intervals.sort((a, b) => a - b),
+    allowance = (sorted[5] + sorted[6]) / 2;
+  const end = Math.max(
+    0,
+    arrival.authoredDelay +
+      arrival.authoredDuration * arrival.authoredIterations +
+      arrival.authoredEndDelay,
+  );
+  return (
+    finite(arrival.authoredDuration) &&
+    arrival.authoredDuration > 0 &&
+    finite(arrival.authoredDelay) &&
+    finite(arrival.authoredEndDelay) &&
+    finite(arrival.authoredIterations) &&
+    arrival.authoredIterations > 0 &&
+    finite(end) &&
+    arrival.authoredEnd === end &&
+    arrival.playbackRate === 1 &&
+    finite(arrival.currentTime) &&
+    arrival.currentTime >= end &&
+    finite(arrival.observedAt) &&
+    finite(arrival.rafTime) &&
+    arrival.observedAt >= arrival.rafTime &&
+    arrival.elapsed === arrival.rafTime - arrival.startTime &&
+    arrival.elapsed >= end &&
+    arrival.elapsed <= end + allowance
+  );
+}
 for (const engine of ['chromium', 'webkit']) {
   definitions[`contrast-sweep${engine === 'webkit' ? '-webkit' : ''}`] = {
     producer: 'prototypes/corridor/tools/verify-contrast-sweep.mjs',
@@ -638,7 +713,8 @@ for (const engine of ['chromium', 'webkit']) {
         observed = rows.map((row) => row.id);
       require(report.schemaVersion === 2 &&
         nonempty(report.runId), 'Missing contrast schema/nonce');
-      if (context.runId) require(report.runId === context.runId, 'Wrong contrast attempt nonce');
+      require(nonempty(context.runId) &&
+        report.runId === context.runId, 'Wrong or unbound contrast attempt nonce');
       require(report.fullAcceptance === true &&
         report.selectedPassed === true &&
         report.partial === false &&
@@ -651,15 +727,13 @@ for (const engine of ['chromium', 'webkit']) {
       require(report.freshDemoMotion === 'no-preference' &&
         report.settledMotion === 'reduce', 'Wrong contrast motion contract');
       require(sha(report.artifactSha256) &&
-        (!context.artifactSha256 ||
-          report.artifactSha256 === context.artifactSha256), 'Wrong contrast artifact');
+        report.artifactSha256 === context.artifactSha256, 'Wrong or unbound contrast artifact');
       require(sha(report.verifierSha256) &&
-        (!context.verifierSha256 ||
-          report.verifierSha256 === context.verifierSha256), 'Wrong contrast verifier');
+        report.verifierSha256 === context.verifierSha256, 'Wrong or unbound contrast verifier');
       require(report.engines &&
         exact([engine], Object.keys(report.engines)) &&
         nonempty(report.engines[engine]) &&
-        (!context.engine || context.engine === engine), 'Wrong contrast engine scope');
+        context.engine === engine, 'Wrong contrast engine scope');
       require(exact(CONTRAST_WORLDS, report.worlds || []) &&
         exact(
           [...CONTRAST_STATES, 'fresh-demo'],
@@ -707,23 +781,8 @@ for (const engine of ['chromium', 'webkit']) {
           : [];
         require(current.length === 1 &&
           current.every(
-            (arrival) =>
-              arrival.completed === true &&
-              arrival.motionPreference === 'no-preference' &&
-              arrival.opacity === 1 &&
-              (arrival.noAnimation
-                ? arrival.authoredDuration === 0 && arrival.elapsed === 0
-                : Number.isFinite(arrival.authoredDuration) &&
-                  arrival.authoredDuration > 0 &&
-                  Number.isFinite(arrival.authoredEnd) &&
-                  Number.isFinite(arrival.frameMs) &&
-                  arrival.frameMs > 0 &&
-                  Number.isFinite(arrival.previousElapsed) &&
-                  arrival.previousElapsed < arrival.authoredEnd &&
-                  arrival.elapsed >= arrival.authoredEnd &&
-                  arrival.elapsed <= arrival.authoredEnd + arrival.frameMs &&
-                  arrival.playState === 'finished'),
-          ), `${world}: arrival duration/full-opacity evidence absent/red`);
+            normalDemoArrival,
+          ), `${world}: named normal arrival / independently calibrated deadline evidence absent or red`);
       }
       const controls = Array.isArray(report.controls) ? report.controls : [];
       require(controls.length === 1 &&

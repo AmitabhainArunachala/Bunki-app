@@ -1,34 +1,39 @@
-/** Exercise the actual restore-byte/emitter path without launching another full browser run. */
+/** The reader producer's restore-byte loop and final receipt, exercised without launching another full browser run. */
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
-const source=readFileSync(new URL('./verify-reader-doors.mjs',import.meta.url),'utf8');
-const start=source.indexOf('    for (const file of new Set(edits.map(edit => edit.file))) {');
-const end=source.indexOf('    const rec =',start);
-assert(start>=0&&end>start,'unique executable restored-byte loop exists');
-assert.equal(source.indexOf('    for (const file of new Set(edits.map(edit => edit.file))) {',start+1),-1);
-const run=new (Object.getPrototypeOf(async function(){}).constructor)('edits','restored','origin','sha256','manifest','control',source.slice(start,end));
+import {restoreServedDigests,readerDoorsReceipt,READER_D1_DAY} from './vh-learning-contracts.mjs';
+import {learningReportContracts,READER_CASES,READER_D1_DAY as ADMITTED_D1_DAY} from '../../../scripts/ci/vh-learning-report-contracts.mjs';
 const sha256=bytes=>createHash('sha256').update(bytes).digest('hex');
 const cases=[['corridor.js',Buffer.from('fixture restored application bytes')],['data/articles/aozora-046605.json',Buffer.from('{"tokens":[{"reading":"たにがわ"}]}')]];
 async function exercise(manifest){
- const fetched=[],control={restore:{rows:[],served:[],pageErrors:[],error:null}};
- const restored={page:{request:{get:async url=>{fetched.push(url);const bytes=cases.find(([path])=>url===`http://fixture/${path}`)?.[1];assert(bytes,'requested only declared restored files');return {body:async()=>bytes};}}}};
- await run([...cases.map(([file])=>({file})),{file:'corridor.js'}],restored,'http://fixture',sha256,manifest,control);
- return {fetched,control};
+ const fetched=[],served=[];
+ await restoreServedDigests({files:[...cases.map(([file])=>file),'corridor.js'],manifest,served,fetchBytes:async file=>{fetched.push(file);const bytes=cases.find(([path])=>path===file)?.[1];assert(bytes,'requested only declared restored files');return bytes;}});
+ return {fetched,served};
 }
-test('actual restored-byte loop retains exact SHA per served file in serializable final control shape',async()=>{
+const identity={gitSha:'a'.repeat(40),artifactSha256:'b'.repeat(64)};
+const receipt=(extra={})=>readerDoorsReceipt({runId:'gate-run',servedIdentity:identity,verifierGitSha:'a'.repeat(40),verifierSha256:'c'.repeat(64),engine:'chromium',browserVersion:'fixture-version',origin:'http://fixture',d1Day:READER_D1_DAY,
+ results:[{name:'D0 served build is the expected clean commit',pass:true},{id:'D2.fixture',name:'fixture',pass:true}],controls:[{name:'m8',verdict:'killed'},{name:'r1',verdict:'killed'}],pageErrors:[],expectedControls:2,lastCase:'D6',...extra});
+test('actual restored-byte loop retains exact SHA per served file, once per file',async()=>{
  const manifest=new Map(cases.map(([path,bytes])=>[path,sha256(bytes)]));
- const {control,fetched}=await exercise(manifest);
- assert.deepEqual(fetched,cases.map(([path])=>`http://fixture/${path}`));
- const emitter=source.split('\n').find(line=>line.includes("writeFileSync(resolve(EVIDENCE, 'reader-doors.json')"));
- assert(emitter,'actual final emitter exists');
- const names=['writeFileSync','resolve','EVIDENCE','runId','servedIdentity','verifierGitSha','verifierSha256','engine','browserVersion','origin','results','controls','pageErrors','CONTROLS','currentCase'];
- let report;
- new Function(...names,emitter)((path,body)=>{assert.equal(path,'/fixture/reader-doors.json');report=JSON.parse(body);},(...parts)=>parts.join('/'),'/fixture','fixture',{gitSha:'a'.repeat(40),artifactSha256:'b'.repeat(64)},'a'.repeat(40),'c'.repeat(64),'chromium','fixture-version','http://fixture',[],[control],[],[{}],'fixture');
- assert.equal(report.schema,'vh-reader-doors/1');
- assert.deepEqual(report.controls[0].restore.served,cases.map(([file,bytes])=>({file,sha256:sha256(bytes)})));
+ const {served,fetched}=await exercise(manifest);
+ assert.deepEqual(fetched,cases.map(([path])=>path));
+ assert.deepEqual(served,cases.map(([file,bytes])=>({file,sha256:sha256(bytes)})));
 });
 test('actual restored-byte loop rejects a changed body or missing manifest digest',async()=>{
  for(const manifest of [new Map(cases.map(([path])=>[path,'0'.repeat(64)])),new Map()])await assert.rejects(()=>exercise(manifest),/restore digest mismatch: corridor\.js/u);
+});
+test('final reader receipt binds run, served identity, verifier and the declared D1 day, and claims acceptance only for a complete clean run',()=>{
+ const good=receipt();
+ assert.equal(good.fullAcceptance,true);
+ assert.deepEqual([good.schema,good.runId,good.gitSha,good.artifactSha256,good.verifierSha256,good.d1Day],['vh-reader-doors/1','gate-run','a'.repeat(40),'b'.repeat(64),'c'.repeat(64),READER_D1_DAY]);
+ assert.deepEqual(JSON.parse(JSON.stringify(good)),good);
+ for(const extra of [{results:[]},{results:[{name:'x',pass:true},{name:'y',pass:false}]},{pageErrors:[{message:'boom'}]},{controls:[{name:'m8',verdict:'killed'}]},{controls:[{name:'m8',verdict:'killed'},{name:'r1',verdict:'incomplete'}]},{expectedControls:0,controls:[]},{runId:''},{runId:undefined},{servedIdentity:null},{servedIdentity:{gitSha:'short',artifactSha256:'b'.repeat(64)}},{verifierSha256:'C'.repeat(64)}])
+  assert.equal(receipt(extra).fullAcceptance,false,JSON.stringify(Object.keys(extra)));
+});
+test('the producer and the independent admission declare the same D1 day',()=>{
+ assert.equal(READER_D1_DAY,ADMITTED_D1_DAY);
+ const report=receipt({results:READER_CASES.map(id=>({id,pass:true}))});
+ const judged=learningReportContracts['reader-doors'].validate(report,{engine:'chromium',runId:'gate-run',gitSha:identity.gitSha,artifactSha256:identity.artifactSha256,verifierSha256:'c'.repeat(64)});
+ assert(judged.errors.some(error=>/D1 1728: shelf not observed/u.test(error)),judged.errors.join(';'));
 });

@@ -13,6 +13,7 @@ const root=resolveCorridorSite();
 const out=process.env.PERSONAL_QA_OUT || resolveCorridorEvidence();
 const selected=(process.env.PERSONAL_BROWSERS || 'chromium,webkit').split(',');
 assert(selected.length && selected.every(x=>['chromium','webkit'].includes(x)), 'Unknown browser selection');
+const browserVersions={};
 await mkdir(out,{recursive:true});
 const data=await fixture(), enrichment=await enrichmentFixture(data), checks=[];
 let denyFullDictionary=false;
@@ -47,6 +48,7 @@ try {
     if(!selected.includes(name)) continue;
     denyFullDictionary=false;
     const browser=await browserType.launch({headless:true,...(name==='chromium'&&process.env.PERSONAL_CHROMIUM?{executablePath:process.env.PERSONAL_CHROMIUM}:{})});
+    browserVersions[name]=browser.version();
     try {
       const context=await browser.newContext({viewport:{width:390,height:844},timezoneId:'Asia/Tokyo',acceptDownloads:true});
       const page=await context.newPage(),errors=[],outbound=[];
@@ -211,6 +213,6 @@ try {
       await context.close();
     } finally {await browser.close();}
   }
-  await writeFile(path.join(out,'results.json'),JSON.stringify({status:'passed',browsers:selected,checks},null,2));
+  await writeFile(path.join(out,'results.json'),JSON.stringify({status:'passed',browsers:selected,browserVersions,executableOverride:Boolean(process.env.PERSONAL_CHROMIUM),checks},null,2));
   console.log(JSON.stringify({passed:checks.length,checks},null,2));
 } finally {if(server.listening)server.close();}

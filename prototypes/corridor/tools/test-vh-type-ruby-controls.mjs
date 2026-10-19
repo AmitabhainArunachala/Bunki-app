@@ -1,57 +1,69 @@
-/** F approved-contract counterexamples execute the current producer predicates, not replicas.
- * These are source-oracle tests; real DOM/paint/geometry remains the browser producers' job. */
+/** F approved-contract counterexamples run the predicates verify-design-reader-shelf and verify-places-layout call,
+ * and the type-ruby adapter over the observed receipts of the approved 17-row producer (cda18876). */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import vm from 'node:vm';
-import ts from 'typescript';
-function calls(file) {
-  const source=readFileSync(new URL(file,import.meta.url),'utf8'),ast=ts.createSourceFile(file,source,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS),found=[];
-  function visit(node){if(ts.isCallExpression(node))found.push(node);ts.forEachChild(node,visit);}visit(ast);return{ast,found};
-}
-const design=calls('./verify-design-reader-shelf.mjs'),places=calls('./verify-places-layout.mjs');
-function assertPredicate(messageStart, messageEnd) {
-  const matches=design.found.filter(node=>node.expression.getText(design.ast)==='assert'&&node.arguments.length===2&&ts.isTemplateExpression(node.arguments[1])&&node.arguments[1].head.text.startsWith(messageStart)&&node.arguments[1].templateSpans.at(-1).literal.text.endsWith(messageEnd));
-  assert.equal(matches.length,1,`one real assertion for ${messageStart}`);
-  return input=>vm.runInNewContext(matches[0].arguments[0].getText(design.ast),input);
-}
-function checkPredicate(name) {
-  const matches=places.found.filter(node=>node.expression.getText(places.ast)==='check'&&ts.isStringLiteralLike(node.arguments[0])&&node.arguments[0].text===name);
-  assert.equal(matches.length,1,`one real check for ${name}`);
-  return input=>vm.runInNewContext(`(async()=>(${matches[0].arguments[1].getText(places.ast)}))()`,input);
-}
-const ratio=assertPredicate('furigana ', '× the body, not half');
-const minimum=assertPredicate('furigana ', 'px is under 10px');
-const contrast=assertPredicate("the reading's contrast ", ':1');
+import { readingContrastHolds, rubyHalfOfBody, rubyHideMovesNothing, rubyLegible, rubyTurnKeepsPassage } from './vh-visual-contracts.mjs';
+import { mediaReportContracts } from '../../../scripts/ci/vh-media-report-contracts.mjs';
 test('F ruby ruler: valid half-size, wrong-ratio boundary, restored half-size',()=>{
-  const good={rt:{size:10.5},body:21};assert.equal(ratio(good),true);
-  for(const proportion of [.489999,.510001,.46,.55])assert.equal(ratio({rt:{size:21*proportion},body:21}),false,`wrong ratio ${proportion}`);
-  for(const proportion of [.490001,.5,.509999])assert.equal(ratio({rt:{size:21*proportion},body:21}),true,`approved ratio ${proportion}`);
-  assert.equal(ratio(good),true);
+  assert.equal(rubyHalfOfBody(10.5,21),true);
+  for(const proportion of [.489999,.510001,.46,.55])assert.equal(rubyHalfOfBody(21*proportion,21),false,`wrong ratio ${proportion}`);
+  for(const proportion of [.490001,.5,.509999])assert.equal(rubyHalfOfBody(21*proportion,21),true,`approved ratio ${proportion}`);
+  assert.equal(rubyHalfOfBody(11.5,23),true);
+});
+test('F closed interval includes exact0.49 and0.51, without admitting values just outside',()=>{
+  for(const ratio of [0.49,0.51])assert.equal(rubyHalfOfBody(ratio,1),true,`closed endpoint ${ratio}`);
+  for(const ratio of [0.49-Number.EPSILON,0.51+Number.EPSILON])assert.equal(rubyHalfOfBody(ratio,1),false,`outside endpoint ${ratio}`);
+  assert.equal(rubyHalfOfBody(49,100),true);assert.equal(rubyHalfOfBody(51,100),true);
 });
 test('F ruby ruler: minimum 10px is inclusive and 9.999999px fails its own row',()=>{
-  assert.equal(minimum({rt:{size:10}}),true);assert.equal(minimum({rt:{size:9.999999}}),false);assert.equal(minimum({rt:{size:10}}),true);
+  assert.equal(rubyLegible(10),true);assert.equal(rubyLegible(9.999999),false);assert.equal(rubyLegible(10),true);
 });
 test('F ruby ruler: contrast 4.5:1 is inclusive, 4.499999:1 fails, restored contrast passes',()=>{
-  assert.equal(contrast({readingContrast:4.5}),true);assert.equal(contrast({readingContrast:4.499999}),false);assert.equal(contrast({readingContrast:4.5}),true);
+  assert.equal(readingContrastHolds(4.5),true);assert.equal(readingContrastHolds(4.499999),false);assert.equal(readingContrastHolds(4.5),true);
 });
-const passage=checkPredicate('focus · the turn keeps the passage whole, its lines at one pitch');
-const hide=checkPredicate('focus · turning readings off moves no line');
 const good={frontText:'漢字の読みを保つ。',backText:'漢字の読みを保つ。',pitches:[30,31,30,30.5]};
-test('F natural ruby layout: legal rewrap keeps text and uniform pitch, without old reveal-box equality',async()=>{
-  assert.equal(await passage({...good,front:['漢字の読み','を保つ。'],back:['漢字の','読みを','保つ。']}),true);
+test('F natural ruby layout: legal rewrap keeps text and uniform pitch, without old reveal-box equality',()=>{
+  assert.equal(rubyTurnKeepsPassage({...good,front:['漢字の読み','を保つ。'],back:['漢字の','読みを','保つ。']}),true);
 });
-test('F natural ruby layout: changed text fails independently of pitch, then restored text passes',async()=>{
-  assert.equal(await passage(good),true);assert.equal(await passage({...good,backText:'漢字の読みを失う。'}),false);assert.equal(await passage(good),true);
+test('F natural ruby layout: changed text fails independently of pitch, then restored text passes',()=>{
+  assert.equal(rubyTurnKeepsPassage(good),true);assert.equal(rubyTurnKeepsPassage({...good,backText:'漢字の読みを失う。'}),false);
+  assert.equal(rubyTurnKeepsPassage({...good,backText:''}),false);assert.equal(rubyTurnKeepsPassage(good),true);
 });
-test('F natural ruby layout: >1px nonuniform pitch fails independently of text; too few lines prove nothing',async()=>{
-  assert.equal(await passage(good),true);assert.equal(await passage({...good,pitches:[30,31.000001,30]}),false);
-  assert.equal(await passage({...good,pitches:[30,30]}),false);assert.equal(await passage(good),true);
+test('F natural ruby layout: >1px nonuniform pitch fails independently of text; too few lines prove nothing',()=>{
+  assert.equal(rubyTurnKeepsPassage(good),true);assert.equal(rubyTurnKeepsPassage({...good,pitches:[30,31.000001,30]}),false);
+  assert.equal(rubyTurnKeepsPassage({...good,pitches:[30,30]}),false);assert.equal(rubyTurnKeepsPassage(good),true);
 });
-test('F natural ruby hide: only the actual back geometry is its restoration reference',async()=>{
+test('F natural ruby hide: only the actual back geometry is its restoration reference',()=>{
   const back=['漢字の','読みを','保つ。'],backTops=[20,50,80],front=['漢字の読み','を保つ。'];
-  assert.equal(await hide({back,backTops,lines:async()=>back,tops:async()=>backTops}),true);
-  assert.equal(await hide({back,backTops,lines:async()=>front,tops:async()=>backTops}),false);
-  assert.equal(await hide({back,backTops,lines:async()=>back,tops:async()=>[20,50,81]}),false);
-  assert.equal(await hide({back,backTops,lines:async()=>back,tops:async()=>backTops}),true);
+  assert.equal(rubyHideMovesNothing({back,backTops,lines:back,tops:backTops}),true);
+  assert.equal(rubyHideMovesNothing({back,backTops,lines:front,tops:backTops}),false);
+  assert.equal(rubyHideMovesNothing({back,backTops,lines:back,tops:[20,50,81]}),false);
+  assert.equal(rubyHideMovesNothing({back,backTops,lines:back,tops:backTops}),true);
 });
+const observed=JSON.parse(readFileSync(new URL('./vh-type-ruby-observed-receipts.json',import.meta.url)));
+const R4_W1=['R4-breaks-on-touch-320','R4-breaks-on-touch-390','R4-breaks-on-touch-430','R4-breaks-on-touch-1368','W1-fresh-320-reveal-fold'];
+const admit=(engine,report,extra={})=>mediaReportContracts['type-ruby'].validate(report,{engine,artifactSha256:observed.receipts[engine].artifactSha256,
+  verifierSha256:observed.provenance.producerSha256,env:{KAIRO_BROWSER:engine},args:[],...extra});
+for(const engine of ['chromium','webkit']) {
+  test(`type-ruby ${engine}: the observed cda18876 receipt (17 rows plus two sheets) is admitted`,()=>{
+    const report=structuredClone(observed.receipts[engine]);
+    assert.equal(report.results.filter(row=>row.engine!=='sheets').length,17);
+    const verdict=admit(engine,report);
+    assert.deepEqual(verdict.errors,[]);assert.equal(verdict.passed,true);
+    assert.deepEqual([...verdict.observedCases].sort(),[...mediaReportContracts['type-ruby'].expectedCases(engine)].sort());
+  });
+  test(`type-ruby ${engine}: the base-shaped 12-row receipt, a wrong producer and a failed row are rejected`,()=>{
+    const base=structuredClone(observed.receipts[engine]);
+    base.results=base.results.filter(row=>!R4_W1.includes(row.name));
+    assert.equal(base.results.filter(row=>row.engine!=='sheets').length,12);
+    assert.equal(admit(engine,base).passed,false);
+    assert.equal(admit(engine,structuredClone(observed.receipts[engine]),{verifierSha256:'b'.repeat(64)}).passed,false);
+    const failed=structuredClone(observed.receipts[engine]);
+    failed.results.find(row=>row.name==='W1-fresh-320-reveal-fold').passed=false;
+    assert.equal(admit(engine,failed).passed,false);
+    const unversioned=structuredClone(observed.receipts[engine]);
+    unversioned.results.find(row=>row.name==='R4-breaks-on-touch-390').engine=engine;
+    assert.equal(admit(engine,unversioned).passed,false);
+  });
+}

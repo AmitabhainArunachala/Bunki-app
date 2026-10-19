@@ -20,6 +20,7 @@ import { extname, isAbsolute, join, resolve } from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { chromium, webkit } from 'playwright-core';
+import { contextBrowserVersion } from './browser-version-support.mjs';
 import { silenceBrowserAudio, TEST_AUDIO_OUTPUT } from './browser-audio-silence.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
@@ -152,7 +153,7 @@ for (const engine of engines) for (const width of sizes) {
       acceptDownloads: true, ignoreHTTPSErrors: true, ...(engine === 'chromium' ? { args: ['--ignore-certificate-errors'] } : {}),
       recordVideo: { dir: videos, size: { width, height: width === 390 ? 844 : 1050 } },
     });
-    result.browserVersion = context.browser()?.version();
+    result.browserVersion = await contextBrowserVersion(context, { chromium, webkit }[engine]);
     await silenceBrowserAudio(context);
     await context.addInitScript(() => {
       const NativeAudio = window.Audio; window.__observedNativeAudio = [];
@@ -336,7 +337,7 @@ for (const engine of engines) for (const [name, catalog] of [['locked-cue-offere
     headless: true, viewport: { width: 1440, height: 1050 }, locale: 'en-US', serviceWorkers: 'block', ignoreHTTPSErrors: true,
     ...(engine === 'chromium' ? { args: ['--ignore-certificate-errors'] } : {}),
   });
-  result.browserVersion = context.browser()?.version();
+  result.browserVersion = await contextBrowserVersion(context, { chromium, webkit }[engine]);
   try {
     await silenceBrowserAudio(context);
     const requested = [];

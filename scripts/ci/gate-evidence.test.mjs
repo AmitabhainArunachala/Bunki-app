@@ -26,6 +26,7 @@ import {
   digest,
   requireGateAttemptEvidence,
 } from './verification-admission.mjs';
+import { grammarFixture } from '../../prototypes/corridor/tools/vh-word-grammar-fixture.mjs';
 const root = fileURLToPath(new globalThis.URL('../..', import.meta.url));
 const parent =
   process.env.KAIRO_EVIDENCE_DIR ||
@@ -339,7 +340,7 @@ test('unknown producer and empty or duplicate battery rosters fail closed; learn
       }),
     /unique/u,
   );
-  for (const kind of ['reader-doors', 'record-depth', 'report-delivery'])
+  for (const kind of ['reader-doors', 'record-depth'])
     for (const engine of ['chromium', 'webkit']) {
       const gate = { name: `${kind}-${engine}`, command: process.execPath, args: [] };
       assert.deepEqual(gateEvidenceDeclaration(gate, root, fixture), {
@@ -347,6 +348,24 @@ test('unknown producer and empty or duplicate battery rosters fail closed; learn
         name: gate.name,
       });
     }
+  assert.deepEqual(
+    gateEvidenceDeclaration(
+      { name: 'report-delivery', command: process.execPath, args: [] },
+      root,
+      fixture,
+    ),
+    { kind: 'adapter', name: 'report-delivery' },
+  );
+  for (const engine of ['chromium', 'webkit'])
+    assert.throws(
+      () =>
+        gateEvidenceDeclaration(
+          { name: `report-delivery-${engine}`, command: process.execPath, args: [] },
+          root,
+          fixture,
+        ),
+      /No required evidence contract/u,
+    );
 });
 
 test('independent registry rejects an adapter that falsely promotes an empty or duplicate completion roster', async () => {
@@ -461,5 +480,96 @@ test('supplemental returned descriptors preserve both-engine scope and route Pyt
   assert.equal(
     gates.find((g) => g.name === 'deck-segment-overrides').env.KAIRO_EVIDENCE_DIR,
     join(out, 'deck-segment-overrides'),
+  );
+});
+
+test('word-grammar admission binds its invocation argv, declared engine, nonce and re-adjudicated controls', () => {
+  const tool = 'prototypes/corridor/tools/verify-word-grammar.mjs';
+  const canonical = {
+    name: 'word-grammar',
+    command: process.execPath,
+    args: [tool, '--controls'],
+    requiredPath: tool,
+    env: { KAIRO_BROWSER: 'chromium' },
+  };
+  const fixtureValue = grammarFixture(['chromium']);
+  const clean = () => ({
+    schemaVersion: 1,
+    runId: 'wg-current',
+    engines: ['chromium'],
+    requestedScope: { argv: ['--controls'], narrow: [], fullRequested: true },
+    walks: fixtureValue.walks,
+    g6Completed: ['chromium'],
+    rows: fixtureValue.rows,
+    controls: fixtureValue.controls,
+    artifactSha256: 'a'.repeat(64),
+    verifierSha256: 'b'.repeat(64),
+    browserVersions: { chromium: '131.0.6778.33' },
+    fullAcceptance: true,
+  });
+  const attempt = (
+    mutate = () => {},
+    { gate = canonical, context: overrides = {}, startedAt = Date.now() - 1000 } = {},
+  ) => {
+    const out = mkdtempSync(join(fixture, 'word-grammar-'));
+    const declaration = gateEvidenceDeclaration(gate, root, out);
+    assert.equal(declaration.kind, 'word-grammar');
+    const report = clean();
+    mutate(report);
+    mkdirSync(join(out, gate.name), { recursive: true });
+    writeFileSync(declaration.path, JSON.stringify(report));
+    return validateGateEvidence(gate, declaration, {
+      root,
+      out,
+      startedAt: new Date(startedAt).toISOString(),
+      runId: 'wg-current',
+      gitSha,
+      processExitCode: 0,
+      engine: 'chromium',
+      artifactSha256: 'a'.repeat(64),
+      verifierSha256: 'b'.repeat(64),
+      runtimeFiles: fixtureValue.runtimeFiles,
+      ...overrides,
+    });
+  };
+  assert.equal(attempt().obligation.fullAcceptance, true);
+  const narrowed = { ...canonical, args: [tool, '--controls', '--g5-only'] };
+  assert.throws(
+    () => attempt((r) => (r.requestedScope.argv = narrowed.args.slice(1)), { gate: narrowed }),
+    /full control schedule/u,
+  );
+  assert.throws(
+    () => attempt((r) => (r.requestedScope.argv = ['--controls', '--g3-only'])),
+    /argv differs/u,
+  );
+  assert.throws(() => attempt((r) => delete r.requestedScope), /argv differs/u);
+  assert.throws(
+    () => attempt(() => {}, { context: { engine: 'webkit' } }),
+    /Word-grammar engines/u,
+  );
+  assert.throws(
+    () => attempt((r) => (r.engines = ['chromium', 'webkit'])),
+    /Word-grammar engines/u,
+  );
+  assert.throws(() => attempt((r) => (r.browserVersions = {})), /browser version/u);
+  assert.throws(() => attempt((r) => (r.runId = 'wg-previous')));
+  assert.throws(() => attempt((r) => delete r.runId));
+  assert.throws(() => attempt(() => {}, { context: { runId: 'wg-next' } }));
+  assert.throws(() => attempt(() => {}, { startedAt: Date.now() + 60_000 }), /Stale receipt/u);
+  assert.throws(
+    () => attempt(() => {}, { context: { runtimeFiles: undefined } }),
+    /artifact manifest/u,
+  );
+  assert.throws(
+    () =>
+      attempt((r) => {
+        const control = r.controls.find((row) => row.id === 'second-hold-unkeeps');
+        control.restore[0].ok = false;
+      }),
+    /G1–G6 candidate and control/u,
+  );
+  assert.throws(
+    () => attempt((r) => (r.controls = r.controls.filter((row) => row.id !== 'G1.page-capped'))),
+    /G1–G6 candidate and control/u,
   );
 });

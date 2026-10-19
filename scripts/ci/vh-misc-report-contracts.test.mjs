@@ -6,6 +6,7 @@ import {
   MISC_CASES,
   REFERENCE_DATA_PINS,
   SKIP_BROWSER_NAMES,
+  SKIP_STANDALONE_CHECKS,
   validateMiscReport,
 } from './vh-misc-report-contracts.mjs';
 const A = 'a'.repeat(64),
@@ -60,6 +61,8 @@ function fixture(name) {
       selectedCase: null,
       excludedChecks: [],
       externalRequests: [],
+      site: '/site',
+      runId: 'run-id',
       browser: { engine: 'Chromium', version: '26.6' },
     });
   if (name === 'storage-integ')
@@ -88,7 +91,13 @@ function fixture(name) {
       ],
     });
   if (name === 'record-sync')
-    Object.assign(report, { pass: true, count: names.length, checks: names });
+    Object.assign(report, {
+      pass: true,
+      count: names.length,
+      checks: names,
+      sourceSha256: C,
+      browser: { engine: 'chromium', version: '26.6' },
+    });
   if (name === 'tutor-request-binding-integration')
     Object.assign(report, {
       schemaVersion: 1,
@@ -108,6 +117,7 @@ function fixture(name) {
       pass: true,
       mode: 'document',
       browser: '26.6',
+      checks: [...SKIP_STANDALONE_CHECKS],
       requests: [],
       shelfLook: { art: 1, artSource: 'blob:' },
     });
@@ -178,4 +188,53 @@ test('controlled storage mode and planned provider completion are mandatory', ()
     validateMiscReport('tutor-request-binding-integration', tutor.report, tutor.context).passed,
     false,
   );
+});
+test('attempt, site, source and engine identity are bound wherever the producer writes them', () => {
+  const rejects = (name, mutate, label) => {
+    const { report, context } = fixture(name);
+    mutate(report, context);
+    assert.equal(validateMiscReport(name, report, context).passed, false, `${name}: ${label}`);
+  };
+  for (const name of ['reference-connections', 'reference-browser']) {
+    for (const [label, change] of [
+      ['stale execution nonce', { runId: 'previous-run' }],
+      ['absent execution nonce', { runId: undefined }],
+      ['self-assembled site', { site: '/tmp/runtime-1234/site' }],
+      ['absent site', { site: undefined }],
+    ])
+      rejects(
+        name,
+        (r, c) => {
+          const read = c.readReport;
+          c.readReport = (path) => ({ ...read(path), ...change });
+        },
+        label,
+      );
+    rejects(name, (r, c) => delete c.runId, 'unbound attempt');
+  }
+  for (const [label, mutate] of [
+    ['stale nonce', (r) => (r.runId = 'previous-run')],
+    ['other source bytes', (r) => (r.sourceSha256 = 'd'.repeat(64))],
+    ['unbound source', (r, c) => delete c.sourceSha256],
+    ['absent browser build', (r) => delete r.browser.version],
+    ['wrong engine', (r) => (r.browser.engine = 'webkit')],
+  ])
+    rejects('record-sync', mutate, label);
+  for (const [label, mutate] of [
+    ['missing named check', (r) => r.checks.splice(3, 1)],
+    ['duplicate named check', (r) => (r.checks[0] = r.checks[1])],
+    ['unreviewed check', (r) => r.checks.push('invented')],
+    ['one-boolean legacy receipt', (r) => delete r.checks],
+    ['stale nonce', (r) => (r.runId = 'previous-run')],
+    ['other site', (r) => (r.site = '/elsewhere')],
+  ])
+    rejects('skip-standalone', mutate, label);
+  const { report, context } = fixture('skip-standalone');
+  const judged = validateMiscReport('skip-standalone', report, context);
+  assert.deepEqual(
+    judged.observedCases,
+    SKIP_STANDALONE_CHECKS.map((name) => `chromium/${name}`),
+  );
+  report.checks.pop();
+  assert.equal(validateMiscReport('skip-standalone', report, context).observedCases.length, 10);
 });

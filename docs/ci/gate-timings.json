@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "repository": "AmitabhainArunachala/Bunki-app",
-  "measurement": "Each gate's completedAt minus startedAt from uploaded battery.json; seconds, wall clock.",
+  "measurement": "Legacy CI rows use each battery gate completedAt minus startedAt in seconds, wall clock. New rows declare measurementStatus and measurementBoundary; producer-only intervals are not entire wrapper-command measurements. Unmeasured current contracts have no numeric statistics, and historicalSamples remain separate.",
   "limitations": [
     "Five completed batteries, including failed batteries whose later gates still ran; failed gates can finish early.",
     "Historical SHAs differ; maxSeconds is a conservative observed scheduling weight, not a future upper bound.",
     "Runner setup, artifact build/download/upload and queue time are excluded from per-gate durations.",
-    "Local f938 log duplicates run 37407758020 attempt 2 and is not a sixth independent sample."
+    "Local f938 log duplicates run 37407758020 attempt 2 and is not a sixth independent sample.",
+    "VH-1 additions use only retained measured evidence. Missing current-contract timings remain explicitly unmeasured and require FULL measurement; no default or estimate is labeled measured.",
+    "Record-depth measurements are producer-declared full controls-parent intervals, excluding startup/import time before startedAt; they are not externally timed wrapper commands.",
+    "Type-ruby retains one 594-second, 26-row, both-engine historical command only under historicalSamples. The newer current contract is unmeasured. Separate-engine timings are never summed into a combined command."
   ],
   "sources": [
     {
@@ -6476,6 +6479,624 @@
           "completedAt": "2026-10-06T11:40:13.814Z"
         }
       ]
+    },
+    {
+      "name": "record-depth",
+      "measurementStatus": "measured-producer-interval",
+      "currentContract": {
+        "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+        "producer": "prototypes/corridor/tools/verify-record-depth.mjs",
+        "producerSha256": "4029a13ac2b9742fcd917d3a26e19640975bc9c393679352b1625787364b5b6f",
+        "command": ["node", "prototypes/corridor/tools/verify-record-depth.mjs", "--controls"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium"
+        }
+      },
+      "sampleCount": 1,
+      "samples": [
+        {
+          "runId": "f7b35507-95ff-4eea-8d2e-0f51c643b9a1",
+          "seconds": 76.977,
+          "status": "passed",
+          "startedAt": "2026-10-18T21:54:10.779Z",
+          "completedAt": "2026-10-18T21:55:27.756Z",
+          "measurementBoundary": "producer startedAt to finishedAt, full controls-parent; excludes process startup/imports before startedAt",
+          "engine": "chromium",
+          "scope": {
+            "scope": "full-engine",
+            "selectors": {
+              "only": null,
+              "control": null,
+              "controls": true
+            },
+            "phase": "controls-parent"
+          },
+          "assertionCount": 17,
+          "fullAcceptance": true,
+          "processExitCode": null,
+          "command": ["node", "prototypes/corridor/tools/verify-record-depth.mjs", "--controls"],
+          "commandProvenance": "producer selectors controls=true, only=null, control=null and phase=controls-parent; exact shell argv not retained",
+          "sourceSha": "384d4a70e05a33019f1ad36789d13d22de04094a",
+          "artifactSha256": "339f7b39d99f72dbc079359780b6e516efb7cbf3aaef15dee528b0184748a29d",
+          "producerSha256": "4029a13ac2b9742fcd917d3a26e19640975bc9c393679352b1625787364b5b6f",
+          "receipt": {
+            "path": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/H/codex-H1/VH1/learning/record-chromium-1/verify-record-depth.json",
+            "sha256": "fd62a846e59abe3513148c893af1db30eeda5f0d2237425512dad64c3ced3d5a"
+          }
+        }
+      ],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+      "measurementBoundary": "producer-declared startedAt to finishedAt; full controls-parent interval, not external process-launch instrumentation",
+      "medianSeconds": 76.977,
+      "meanSeconds": 76.977,
+      "maxSeconds": 76.977,
+      "minSeconds": 76.977,
+      "successfulMedianSeconds": 76.977,
+      "limitations": [
+        "Duration excludes any import/startup before producer startedAt and is not a quiet product-frame verdict.",
+        "App artifact remains 384d4a70; no future merged-artifact acceptance is inferred."
+      ]
+    },
+    {
+      "name": "speak",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+        "producer": "prototypes/corridor/tools/verify-speak.mjs",
+        "producerSha256": "fdb0c6273c6562a36604f5c16d60890704c18073f774846eec45c7f67c483bfc",
+        "command": ["node", "prototypes/corridor/tools/verify-speak.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium"
+        }
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+      "unmeasuredReason": "No completed passing measured run of the current canonical command/engine/producer contract retained in searched scope; old/partial/failed or untimed evidence is kept separately.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for the current unmeasured contract.",
+        "Older, filtered, failed or untimed results are not promoted to a healthy current-command measurement."
+      ]
+    },
+    {
+      "name": "speak-negatives",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+        "producer": "prototypes/corridor/tools/verify-speak.mjs",
+        "producerSha256": "fdb0c6273c6562a36604f5c16d60890704c18073f774846eec45c7f67c483bfc",
+        "command": ["node", "prototypes/corridor/tools/verify-speak.mjs", "--negatives"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium"
+        }
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+      "unmeasuredReason": "No final applicable Chromium 21-control full run retained; no timing inferred from WebKit or partial controls.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for the current unmeasured contract.",
+        "Older, filtered, failed or untimed results are not promoted to a healthy current-command measurement."
+      ]
+    },
+    {
+      "name": "vh-sense-controls",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+        "producer": "prototypes/corridor/tools/verify-vh-sense-controls.mjs",
+        "producerSha256": "e7d15e4f709493441894a7fc56902e31258ec11792b3b50c3f794cba294a6caa",
+        "command": ["node", "prototypes/corridor/tools/verify-vh-sense-controls.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium"
+        }
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+      "unmeasuredReason": "No completed passing measured run of the current canonical command/engine/producer contract retained in searched scope; old/partial/failed or untimed evidence is kept separately.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for the current unmeasured contract.",
+        "Older, filtered, failed or untimed results are not promoted to a healthy current-command measurement."
+      ]
+    },
+    {
+      "name": "reader-doors",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+        "producer": "prototypes/corridor/tools/verify-reader-doors.mjs",
+        "producerSha256": "50691c2a36474527c4961631ad7f86c008e38253475bf19478d2f2b13cb4909d",
+        "command": ["node", "prototypes/corridor/tools/verify-reader-doors.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium"
+        }
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+      "unmeasuredReason": "No completed passing measured run of the current canonical command/engine/producer contract retained in searched scope; old/partial/failed or untimed evidence is kept separately.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for the current unmeasured contract.",
+        "Older, filtered, failed or untimed results are not promoted to a healthy current-command measurement."
+      ]
+    },
+    {
+      "name": "reading-truth",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+        "producer": "prototypes/corridor/tools/verify-reading-truth.mjs",
+        "producerSha256": "450b2f053679bc338b238b2e5a0579d7fc8debe3a60feffc169ed5cb7b51b384",
+        "command": ["node", "prototypes/corridor/tools/verify-reading-truth.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium"
+        }
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+      "unmeasuredReason": "No completed passing measured run of the current canonical command/engine/producer contract retained in searched scope; old/partial/failed or untimed evidence is kept separately.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for the current unmeasured contract.",
+        "Older, filtered, failed or untimed results are not promoted to a healthy current-command measurement."
+      ]
+    },
+    {
+      "name": "comb-0",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+        "producer": "prototypes/corridor/tools/verify-comb-0.mjs",
+        "producerSha256": "7a41f868b552c5c88673eed8b8a364b608b4ca16034c70e86265b935092b1dd7",
+        "command": ["node", "prototypes/corridor/tools/verify-comb-0.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium"
+        }
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+      "unmeasuredReason": "No completed passing measured run of the current canonical command/engine/producer contract retained in searched scope; old/partial/failed or untimed evidence is kept separately.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for the current unmeasured contract.",
+        "Older, filtered, failed or untimed results are not promoted to a healthy current-command measurement."
+      ]
+    },
+    {
+      "name": "sweep",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+        "producer": "prototypes/corridor/tools/verify-sweep.mjs",
+        "producerSha256": "d6f52012259a00270ebde440ae6401f991af2e235a5cba17b94804fc52218889",
+        "command": ["node", "prototypes/corridor/tools/verify-sweep.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium"
+        }
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+      "unmeasuredReason": "No completed passing measured run of the current canonical command/engine/producer contract retained in searched scope; old/partial/failed or untimed evidence is kept separately.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for the current unmeasured contract.",
+        "Older, filtered, failed or untimed results are not promoted to a healthy current-command measurement."
+      ]
+    },
+    {
+      "name": "contrast-sweep",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+        "producer": "prototypes/corridor/tools/verify-contrast-sweep.mjs",
+        "producerSha256": "97c53544226febf71a9f4b75f58a05d75887a3e62d80899ff39abc47a04514e0",
+        "command": ["node", "prototypes/corridor/tools/verify-contrast-sweep.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium"
+        }
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+      "unmeasuredReason": "No completed passing measured run of the current canonical command/engine/producer contract retained in searched scope; old/partial/failed or untimed evidence is kept separately.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for the current unmeasured contract.",
+        "Older, filtered, failed or untimed results are not promoted to a healthy current-command measurement."
+      ]
+    },
+    {
+      "name": "design-reader-shelf",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+        "producer": "prototypes/corridor/tools/verify-design-reader-shelf.mjs",
+        "producerSha256": "4aa4cab413661b4a7dd8c80c416b2128a10c638e25e228dde38da027314ce12a",
+        "command": ["node", "prototypes/corridor/tools/verify-design-reader-shelf.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium"
+        }
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+      "unmeasuredReason": "No completed passing measured run of the current canonical command/engine/producer contract retained in searched scope; old/partial/failed or untimed evidence is kept separately.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for the current unmeasured contract.",
+        "Older, filtered, failed or untimed results are not promoted to a healthy current-command measurement."
+      ]
+    },
+    {
+      "name": "record-depth-webkit",
+      "measurementStatus": "measured-producer-interval",
+      "currentContract": {
+        "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+        "producer": "prototypes/corridor/tools/verify-record-depth.mjs",
+        "producerSha256": "4029a13ac2b9742fcd917d3a26e19640975bc9c393679352b1625787364b5b6f",
+        "command": ["node", "prototypes/corridor/tools/verify-record-depth.mjs", "--controls"],
+        "environment": {
+          "KAIRO_BROWSER": "webkit"
+        }
+      },
+      "sampleCount": 1,
+      "samples": [
+        {
+          "runId": "e14d6a3e-b5fa-4ab9-8d49-62297ce153ec",
+          "seconds": 93.575,
+          "status": "passed",
+          "startedAt": "2026-10-18T21:56:02.121Z",
+          "completedAt": "2026-10-18T21:57:35.696Z",
+          "measurementBoundary": "producer startedAt to finishedAt, full controls-parent; excludes process startup/imports before startedAt",
+          "engine": "webkit",
+          "scope": {
+            "scope": "full-engine",
+            "selectors": {
+              "only": null,
+              "control": null,
+              "controls": true
+            },
+            "phase": "controls-parent"
+          },
+          "assertionCount": 17,
+          "fullAcceptance": true,
+          "processExitCode": null,
+          "command": ["node", "prototypes/corridor/tools/verify-record-depth.mjs", "--controls"],
+          "commandProvenance": "producer selectors controls=true, only=null, control=null and phase=controls-parent; exact shell argv not retained",
+          "sourceSha": "384d4a70e05a33019f1ad36789d13d22de04094a",
+          "artifactSha256": "339f7b39d99f72dbc079359780b6e516efb7cbf3aaef15dee528b0184748a29d",
+          "producerSha256": "4029a13ac2b9742fcd917d3a26e19640975bc9c393679352b1625787364b5b6f",
+          "receipt": {
+            "path": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/H/codex-H1/VH1/learning/record-webkit-1/verify-record-depth.json",
+            "sha256": "06a43ecd484663a29be09b012c006798962642a477067ae7844a384d32fb3d91"
+          }
+        }
+      ],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+      "measurementBoundary": "producer-declared startedAt to finishedAt; full controls-parent interval, not external process-launch instrumentation",
+      "medianSeconds": 93.575,
+      "meanSeconds": 93.575,
+      "maxSeconds": 93.575,
+      "minSeconds": 93.575,
+      "successfulMedianSeconds": 93.575,
+      "limitations": [
+        "Duration excludes any import/startup before producer startedAt and is not a quiet product-frame verdict.",
+        "App artifact remains 384d4a70; no future merged-artifact acceptance is inferred."
+      ]
+    },
+    {
+      "name": "speak-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+        "producer": "prototypes/corridor/tools/verify-speak.mjs",
+        "producerSha256": "fdb0c6273c6562a36604f5c16d60890704c18073f774846eec45c7f67c483bfc",
+        "command": ["node", "prototypes/corridor/tools/verify-speak.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "webkit"
+        }
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+      "unmeasuredReason": "No completed passing measured run of the current canonical command/engine/producer contract retained in searched scope; old/partial/failed or untimed evidence is kept separately.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for the current unmeasured contract.",
+        "Older, filtered, failed or untimed results are not promoted to a healthy current-command measurement."
+      ]
+    },
+    {
+      "name": "speak-negatives-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+        "producer": "prototypes/corridor/tools/verify-speak.mjs",
+        "producerSha256": "fdb0c6273c6562a36604f5c16d60890704c18073f774846eec45c7f67c483bfc",
+        "command": ["node", "prototypes/corridor/tools/verify-speak.mjs", "--negatives"],
+        "environment": {
+          "KAIRO_BROWSER": "webkit"
+        }
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+      "unmeasuredReason": "No completed passing measured run of the current canonical command/engine/producer contract retained in searched scope; old/partial/failed or untimed evidence is kept separately.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for the current unmeasured contract.",
+        "Older, filtered, failed or untimed results are not promoted to a healthy current-command measurement."
+      ]
+    },
+    {
+      "name": "vh-sense-controls-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+        "producer": "prototypes/corridor/tools/verify-vh-sense-controls.mjs",
+        "producerSha256": "e7d15e4f709493441894a7fc56902e31258ec11792b3b50c3f794cba294a6caa",
+        "command": ["node", "prototypes/corridor/tools/verify-vh-sense-controls.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "webkit"
+        }
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+      "unmeasuredReason": "No completed passing measured run of the current canonical command/engine/producer contract retained in searched scope; old/partial/failed or untimed evidence is kept separately.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for the current unmeasured contract.",
+        "Older, filtered, failed or untimed results are not promoted to a healthy current-command measurement."
+      ]
+    },
+    {
+      "name": "reader-doors-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+        "producer": "prototypes/corridor/tools/verify-reader-doors.mjs",
+        "producerSha256": "50691c2a36474527c4961631ad7f86c008e38253475bf19478d2f2b13cb4909d",
+        "command": ["node", "prototypes/corridor/tools/verify-reader-doors.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "webkit"
+        }
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+      "unmeasuredReason": "No completed passing measured run of the current canonical command/engine/producer contract retained in searched scope; old/partial/failed or untimed evidence is kept separately.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for the current unmeasured contract.",
+        "Older, filtered, failed or untimed results are not promoted to a healthy current-command measurement."
+      ]
+    },
+    {
+      "name": "reading-truth-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+        "producer": "prototypes/corridor/tools/verify-reading-truth.mjs",
+        "producerSha256": "450b2f053679bc338b238b2e5a0579d7fc8debe3a60feffc169ed5cb7b51b384",
+        "command": ["node", "prototypes/corridor/tools/verify-reading-truth.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "webkit"
+        }
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+      "unmeasuredReason": "No completed passing measured run of the current canonical command/engine/producer contract retained in searched scope; old/partial/failed or untimed evidence is kept separately.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for the current unmeasured contract.",
+        "Older, filtered, failed or untimed results are not promoted to a healthy current-command measurement."
+      ]
+    },
+    {
+      "name": "comb-0-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+        "producer": "prototypes/corridor/tools/verify-comb-0.mjs",
+        "producerSha256": "7a41f868b552c5c88673eed8b8a364b608b4ca16034c70e86265b935092b1dd7",
+        "command": ["node", "prototypes/corridor/tools/verify-comb-0.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "webkit"
+        }
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+      "unmeasuredReason": "No completed passing measured run of the current canonical command/engine/producer contract retained in searched scope; old/partial/failed or untimed evidence is kept separately.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for the current unmeasured contract.",
+        "Older, filtered, failed or untimed results are not promoted to a healthy current-command measurement."
+      ]
+    },
+    {
+      "name": "sweep-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+        "producer": "prototypes/corridor/tools/verify-sweep.mjs",
+        "producerSha256": "d6f52012259a00270ebde440ae6401f991af2e235a5cba17b94804fc52218889",
+        "command": ["node", "prototypes/corridor/tools/verify-sweep.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "webkit"
+        }
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+      "unmeasuredReason": "No completed passing measured run of the current canonical command/engine/producer contract retained in searched scope; old/partial/failed or untimed evidence is kept separately.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for the current unmeasured contract.",
+        "Older, filtered, failed or untimed results are not promoted to a healthy current-command measurement."
+      ]
+    },
+    {
+      "name": "contrast-sweep-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+        "producer": "prototypes/corridor/tools/verify-contrast-sweep.mjs",
+        "producerSha256": "97c53544226febf71a9f4b75f58a05d75887a3e62d80899ff39abc47a04514e0",
+        "command": ["node", "prototypes/corridor/tools/verify-contrast-sweep.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "webkit"
+        }
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+      "unmeasuredReason": "No completed passing measured run of the current canonical command/engine/producer contract retained in searched scope; old/partial/failed or untimed evidence is kept separately.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for the current unmeasured contract.",
+        "Older, filtered, failed or untimed results are not promoted to a healthy current-command measurement."
+      ]
+    },
+    {
+      "name": "design-reader-shelf-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+        "producer": "prototypes/corridor/tools/verify-design-reader-shelf.mjs",
+        "producerSha256": "4aa4cab413661b4a7dd8c80c416b2128a10c638e25e228dde38da027314ce12a",
+        "command": ["node", "prototypes/corridor/tools/verify-design-reader-shelf.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "webkit"
+        }
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+      "unmeasuredReason": "No completed passing measured run of the current canonical command/engine/producer contract retained in searched scope; old/partial/failed or untimed evidence is kept separately.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for the current unmeasured contract.",
+        "Older, filtered, failed or untimed results are not promoted to a healthy current-command measurement."
+      ]
+    },
+    {
+      "name": "vh-voice-controls",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+        "producer": "prototypes/corridor/tools/verify-vh-voice-controls.mjs",
+        "producerSha256": "13b2123bfac7d301fbc131a10707c5e4558bb0019e4d59baec0709a8e7ee7303",
+        "command": ["node", "prototypes/corridor/tools/verify-vh-voice-controls.mjs"],
+        "environment": {}
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+      "unmeasuredReason": "No completed passing measured run of the current canonical command/engine/producer contract retained in searched scope; old/partial/failed or untimed evidence is kept separately.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for the current unmeasured contract.",
+        "Older, filtered, failed or untimed results are not promoted to a healthy current-command measurement."
+      ]
+    },
+    {
+      "name": "type-ruby",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+        "producer": "prototypes/corridor/tools/verify-type-ruby.mjs",
+        "producerSha256": "d829279e24f3e7da7c49c875b0591ec6fa852e940524cef9a12c51cd2e46f8bc",
+        "command": ["node", "prototypes/corridor/tools/verify-type-ruby.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "all"
+        }
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+      "unmeasuredReason": "Current combined type-ruby contract unmeasured. Real older 26-row both-engine 594s pass is a separately labeled historical scheduling candidate; no engine sums allowed.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for the current unmeasured contract.",
+        "Older, filtered, failed or untimed results are not promoted to a healthy current-command measurement."
+      ],
+      "historicalSamples": [
+        {
+          "seconds": 594,
+          "status": "passed",
+          "measurementStatus": "historical-both-engine-command",
+          "currentContractMeasured": false,
+          "assertionCount": 26,
+          "scope": {
+            "scope": "F type and ruby: one ladder (sheets and rendered), one ruby rule, readings at half their word and 10 px or more on touch and always at 320/390/430/1368, never touching, never crossing a line, never meeting a glyph, over their word, moving no line; the deck back the same; glosses 13 px or more; the reader at 200 % text"
+          },
+          "engines": ["chromium", "webkit"],
+          "command": ["node", "prototypes/corridor/tools/verify-type-ruby.mjs"],
+          "environment": {
+            "KAIRO_BROWSER": "all"
+          },
+          "sourceSha": "252fab6a426dfe6d19dbf0c1521e7e289b848dbd",
+          "artifactSha256": "d20473ea79b832539647ab033750e6856ba2d2630a05a5cf48d21e3343b0edb7",
+          "producerSha256": "60ce428aa492fbeb32216738b876a27475693e70213907027bc9a5d0f996c07c",
+          "startedAt": null,
+          "completedAt": null,
+          "startedClockLocal": "13:25:54",
+          "completedClockLocal": "13:35:48",
+          "timingResolutionSeconds": 1,
+          "measurementBoundary": "retained shell date +%s delta for one both-engine command",
+          "processExitCode": 0,
+          "fullAcceptance": null,
+          "receipt": {
+            "path": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/F/final9/type-ruby-both/type-ruby.json",
+            "sha256": "ef240e4a4d27fb8f28439c7db95bb20e0e6e8450b0516ec7b42fba9998209f94"
+          },
+          "timingEvidence": {
+            "path": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/F/final9/batch.log",
+            "sha256": "178423247d7223381f6d9f7a7ba374d8080c00ae4014ed98db87e048b3408e89"
+          },
+          "timingLine": "type-ruby-both exit 0 (594s)",
+          "timingLineNumber": 4,
+          "clockProvenance": {
+            "path": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/F/final9.log",
+            "sha256": "ae2af1af37f99fb498452d077cfae277f16892960499fb10ba2c2ae7d97d18e6"
+          },
+          "commandHarness": {
+            "path": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/F/tools/run-targeted.sh",
+            "sha256": "7485a22d9a15e1857f53fc69086fe5ca75a26b0d0f556a75e68ed86d674b5891"
+          },
+          "callerScript": {
+            "path": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/F/tools/final9.sh",
+            "sha256": "b29b25e3e5f9e54c8bae5179e4f64db32fc7b70678e3ef3fdbb44c0d2bbdcc06"
+          },
+          "limitations": [
+            "Historical 26-row contract differs from cad5a167 current 17 assertions per engine plus shared checks; no final contract acceptance inferred.",
+            "Clock-only timestamps have no retained date; no filesystem dates are promoted to run start/end."
+          ]
+        }
+      ]
     }
-  ]
+  ],
+  "vh1EvidenceCatalog": {
+    "path": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/H/codex-H1/VH1/TIMING-EVIDENCE-CATALOG.json",
+    "sha256": "855dbef053bbb4608a6d24a9146307363be11a794b26d324427d26fa0dc41be5",
+    "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+    "newGateCount": 21,
+    "additionalExistingGate": "type-ruby",
+    "measuredProducerIntervalCount": 2,
+    "unmeasuredCurrentContractCount": 20,
+    "rejectedProposal": "INTG3/gate-timings.PROPOSAL.json sums separate engine runs and includes failed components; those values are not adopted."
+  }
 }

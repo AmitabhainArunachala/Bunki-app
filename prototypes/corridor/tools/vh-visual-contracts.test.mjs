@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { exactRoster, selection, scopeResult, DESIGN_CASES, designSelection, READING_CASES, plainBadBreak,
-  loadMixedLexemes, classEvidence, specialEvidence, loadSpecialProofs, shelfEvidence } from './vh-visual-contracts.mjs';
+  loadMixedLexemes, classEvidence, specialEvidence, loadSpecialProofs, shelfEvidence, sweepSelection } from './vh-visual-contracts.mjs';
 const site = fileURLToPath(new URL('../', import.meta.url));
 const fixture = JSON.parse(readFileSync(new URL('./vh-reading-special-fixtures.json', import.meta.url)));
 const proofs = loadSpecialProofs(site, fixture);
@@ -100,4 +100,18 @@ test('ROSTER exact declaration and same-count duplicate/missing/filtered control
   assert.equal(exactRoster([],[]),false);
   assert.equal(scopeResult({expected:['chromium/a','webkit/a'],observed:['chromium/a'],passed:true}).fullAcceptance,false);
   assert.equal(scopeResult({expected:DESIGN_CASES,observed:DESIGN_CASES,passed:true,diagnostic:true}).fullAcceptance,false);
+});
+
+test('SWEEP an explicit selector, even KAIRO_SWEEP_MODE=verify, keeps the sweep diagnostic', () => {
+  const plain = sweepSelection({});
+  assert.deepEqual(plain, { mode:'verify', negative:'', selectors:{}, diagnostic:false });
+  const expected=['S01/a','S02/a'];
+  assert.equal(scopeResult({expected,observed:expected,passed:true,diagnostic:plain.diagnostic}).fullAcceptance,true);
+  for (const [env,mode] of [[{KAIRO_SWEEP_MODE:'verify'},'verify'],[{KAIRO_SWEEP_MODE:'inventory'},'inventory'],[{KAIRO_SWEEP_NEGATIVE:'chip'},'verify']]) {
+    const scope=sweepSelection(env);
+    assert.equal(scope.mode,mode); assert.deepEqual(scope.selectors,env); assert.equal(scope.diagnostic,true);
+    const verdict=scopeResult({expected,observed:expected,passed:true,diagnostic:scope.diagnostic});
+    assert.equal(verdict.fullAcceptance,false); assert.equal(verdict.exitCode,3);
+  }
+  for (const env of [{KAIRO_SWEEP_MODE:''},{KAIRO_SWEEP_MODE:'full'},{KAIRO_SWEEP_NEGATIVE:''},{KAIRO_SWEEP_NEGATIVE:'all'}]) assert.throws(()=>sweepSelection(env));
 });

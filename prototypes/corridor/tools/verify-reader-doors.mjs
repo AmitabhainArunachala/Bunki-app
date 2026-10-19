@@ -26,7 +26,7 @@ import { pathToFileURL } from 'node:url';
 
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
-import { escapeObligations } from './vh-learning-contracts.mjs';
+import { escapeObligations, READER_D1_DAY, READER_D1_PICKS, readerDoorsReceipt, restoreServedDigests } from './vh-learning-contracts.mjs';
 import { restoreAppFixture } from './record-fixture-support.mjs';
 
 const require = createRequire(import.meta.url);
@@ -161,7 +161,7 @@ const CONTROLS = Object.freeze([
       ? '' : 'the exact wrong reading was not shown and spoken' },
 ]);
 
-async function openPage(viewport, query, mutation = null) {
+async function openPage(viewport, query, mutation = null, { shelfDay = null } = {}) {
   const context = await browser.newContext({ viewport, reducedMotion: 'reduce', deviceScaleFactor: viewport.width > 1000 ? 2 : 3,
     ...(mutation ? { serviceWorkers: 'block' } : {}) });
   const sink = mutation ? mutation.control.pageErrors : pageErrors;
@@ -170,9 +170,11 @@ async function openPage(viewport, query, mutation = null) {
   }));
   try {
     // This suite models an already-seen demo on this device; the fresh-device demo has its own G3 verifier.
-    await context.addInitScript(ownOrigin => {
-      if (location.origin === ownOrigin) localStorage.setItem('kairo-word-ladder-demo-v1', '1');
-    }, origin);
+    await context.addInitScript(({ ownOrigin, day }) => {
+      if (location.origin !== ownOrigin) return;
+      localStorage.setItem('kairo-word-ladder-demo-v1', '1');
+      if (day) localStorage.setItem('kairo-shelf-day', day);
+    }, { ownOrigin: origin, day: shelfDay });
     if (mutation) await serveMutation(context, mutation);
     const page = await context.newPage();
     await page.goto(`${origin}/index.html${query}`);
@@ -799,12 +801,8 @@ async function runControl(spec) {
   const errorsBefore = pageErrors.length;
   try {
     restored = await openPage(DESK, ['d2', 'd3'].includes(spec.run) ? '?entry=shelf' : D4_QUERY);
-    for (const file of new Set(edits.map(edit => edit.file))) {
-      const bytes = await (await restored.page.request.get(`${origin}/${file}`)).body();
-      const restoredSha256 = sha256(bytes);
-      control.restore.served.push({ file, sha256: restoredSha256 });
-      if (restoredSha256 !== manifest.get(file)) throw new Error(`restore digest mismatch: ${file}`);
-    }
+    await restoreServedDigests({ files: edits.map(edit => edit.file), manifest, served: control.restore.served,
+      fetchBytes: async (file) => (await restored.page.request.get(`${origin}/${file}`)).body() });
     const rec = (id, name, pass, detail, observed) => control.restore.rows.push({id, name, pass: !!pass, detail, observed});
     if (spec.run === 'd3') await d3Names(restored.page, rec);
     else if (spec.run === 'd4') await d4Walk(restored.page, rec);
@@ -847,9 +845,11 @@ try {
   currentCase = 'D1';
   for (const viewport of [{ width: 1728, height: 996 }, { width: 390, height: 844 }]) {
     const label = `${viewport.width}`;
-    const { context, page } = await openPage(viewport, '?entry=shelf');
+    const { context, page } = await openPage(viewport, '?entry=shelf', null, { shelfDay: READER_D1_DAY });
     const count = await page.locator('#shelf-today .shelf-open').count();
-    check(`D1 ${label}: today's picks are on the shelf`, count > 0, `${count} doors`);
+    const day = await page.locator('#shelf-today').getAttribute('data-day').catch(() => null);
+    check(`D1 ${label}: today's picks are on the shelf`, count === READER_D1_PICKS && day === READER_D1_DAY, `${count} doors on ${day}`,
+      { observed: { day, count } });
     for (let i = 0; i < count; i++) {
       await page.goto(`${origin}/index.html?entry=shelf`); await ready(page);
       const door = page.locator('#shelf-today .shelf-open').nth(i);
@@ -947,7 +947,8 @@ try {
   await browser?.close().catch((error) => results.push({ name: 'browser · cleanup', pass: false, detail: error.message }));
   await host?.close().catch((error) => results.push({ name: 'host · cleanup', pass: false, detail: error.message }));
   if (pageErrors.length) results.push({ name: 'no uncaught page errors', pass: false, detail: JSON.stringify(pageErrors) });
-  writeFileSync(resolve(EVIDENCE, 'reader-doors.json'), JSON.stringify({ schema: 'vh-reader-doors/1', runId, gitSha: servedIdentity?.gitSha, artifactSha256: servedIdentity?.artifactSha256, verifierGitSha, verifierSha256, engine, browserVersion, origin, results, controls, pageErrors, fullAcceptance: !results.some(row => !row.pass) && !pageErrors.length && controls.length === CONTROLS.length && controls.every(row => row.verdict === 'killed'), lastCase: currentCase }, null, 2) + '\n');
+  writeFileSync(resolve(EVIDENCE, 'reader-doors.json'), JSON.stringify(readerDoorsReceipt({ runId, servedIdentity, verifierGitSha, verifierSha256, engine, browserVersion, origin,
+    d1Day: READER_D1_DAY, results, controls, pageErrors, expectedControls: CONTROLS.length, lastCase: currentCase }), null, 2) + '\n');
 }
 const failed = results.filter((r) => !r.pass);
 console.log(`\n${results.length - failed.length}/${results.length} passed · evidence ${EVIDENCE}`);

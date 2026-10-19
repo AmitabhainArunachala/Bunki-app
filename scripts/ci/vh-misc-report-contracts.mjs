@@ -1,3 +1,5 @@
+import { realpathSync } from 'node:fs';
+import { resolve } from 'node:path';
 export const REFERENCE_BROWSER_CASES = Object.freeze([
   'the reference door boots without console exceptions',
   'N1 intermediate paging, jump, and bottom controls reach exact records',
@@ -343,6 +345,28 @@ const exact = (a, b) =>
   new Set(b).size === b.length &&
   a.every((x) => b.includes(x));
 const engines = (engine) => (engine === 'all' ? ['chromium', 'webkit'] : [engine || 'chromium']);
+const canonicalPath = (path) => {
+  try {
+    return realpathSync(path);
+  } catch {
+    return resolve(path);
+  }
+};
+const sameSite = (a, b) => nonempty(a) && nonempty(b) && canonicalPath(a) === canonicalPath(b);
+const sameRun = (report, context) => nonempty(context.runId) && report?.runId === context.runId;
+export const SKIP_STANDALONE_CHECKS = Object.freeze([
+  'embedded-shelf-art',
+  'inlined-editorial-shelf-layout',
+  'lookup-words-read-as-prose',
+  'english-chrome',
+  'dictionary-door-behind-study-tools',
+  'skip-grid-wheels-and-filters',
+  'no-skip-or-editorial-requests',
+  'no-personal-deck-row',
+  'personal-route-falls-back-to-shelf',
+  'no-personal-requests',
+  'no-page-errors',
+]);
 const runtime = (context, path) =>
   Array.isArray(context.runtimeFiles)
     ? context.runtimeFiles.find((r) => r.path === path)?.sha256
@@ -401,8 +425,10 @@ function named({
           sha(context.artifactSha256) &&
           nonempty(context.site) &&
           (!report.site ||
-            report.site ===
-              context.site), 'Legacy report needs pinned site before/after execution');
+            sameSite(
+              report.site,
+              context.site,
+            )), 'Legacy report needs pinned site before/after execution');
       for (const row of rows || [])
         if (typeof row === 'object') {
           require(row?.[passKey] === true &&
@@ -446,6 +472,11 @@ const defs = {
         execution.excludedChecks?.length === 0 &&
         execution.externalRequests?.length ===
           0, 'Reference execution filtered, external or incomplete');
+      require(sameRun(execution, context) &&
+        sameSite(
+          execution.site,
+          context.site,
+        ), 'Reference execution not bound to this attempt and site');
       require(context.engine === 'chromium', 'Reference producer is Chromium only');
     },
   }),
@@ -526,6 +557,14 @@ const defs = {
         r.pass === true && r.count === MISC_CASES.sync.length && c.engine === 'chromium',
         'Wrong/incomplete hybrid source+Chromium sync receipt',
       );
+      q(
+        sameRun(r, c) &&
+          sha(c.sourceSha256) &&
+          r.sourceSha256 === c.sourceSha256 &&
+          r.browser?.engine === 'chromium' &&
+          nonempty(r.browser?.version),
+        'Sync receipt not bound to this attempt, source and Chromium build',
+      );
     },
   }),
   'writing-room': named({
@@ -577,10 +616,14 @@ reference.validate = function (report, context) {
 defs['skip-standalone'] = {
   producer: 'prototypes/corridor/tools/verify-skip-standalone.mjs',
   paths: ['skip-standalone-document-*/result.json'],
-  expectedCases: () => ['chromium/complete-standalone-skip-document'],
+  expectedCases: () => SKIP_STANDALONE_CHECKS.map((name) => `chromium/${name}`),
   validate(r, c) {
     const expected = this.expectedCases();
+    const observed = Array.isArray(r.checks) ? r.checks.map((name) => `chromium/${name}`) : [];
     const ok =
+      exact(expected, observed) &&
+      sameRun(r, c) &&
+      sameSite(r.site, c.site) &&
       r.pass === true &&
       r.mode === 'document' &&
       r.artifactSha256 === c.artifactSha256 &&
@@ -596,9 +639,11 @@ defs['skip-standalone'] = {
       passed: ok,
       errors: ok
         ? []
-        : ['Incomplete/wrong standalone mode, artifact, browser, errors or embedded art'],
+        : [
+            'Incomplete/wrong standalone checks, attempt, site, mode, artifact, browser, errors or embedded art',
+          ],
       expectedCases: expected,
-      observedCases: ok ? expected : [],
+      observedCases: observed,
     };
   },
 };
@@ -614,6 +659,10 @@ defs['reference-browser'] = named({
   roster: REFERENCE_BROWSER_CASES,
   extra(r, c, q) {
     const execution = c.readReport?.('execution.json');
+    q(
+      sameRun(execution, c) && sameSite(execution?.site, c.site),
+      'Reference execution not bound to this attempt and site',
+    );
     q(
       c.engine === 'chromium' &&
         execution?.selectedCase === null &&
