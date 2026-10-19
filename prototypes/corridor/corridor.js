@@ -22719,29 +22719,53 @@ function renderSkipLookup(host, options = {}) {
   });
 }
 
-/** The shared results grid — every hit opens the same kanji entry. */
-function renderKdxGrid(host, chars, CAP = 200) {
-  host.append(
-    withEn(
-      el('p', 'eyebrow', `見つかった字 — ${chars.length}`),
-      chars.length > CAP ? `found — first ${CAP} shown` : 'found',
-      'en-inline',
-    ),
-  );
+/** What a capped grid shows: its first `cap` hits, or every hit once its "show all" is open (K05). */
+function kdxGridShown(chars, cap, open) {
+  return open ? chars : chars.slice(0, cap);
+}
+/** The shared results grid — every hit opens the same kanji entry. The count is the true one, and a grid longer
+ * than its first page carries one "show all" door (K05). `key` names the query: an opened grid stays open for that
+ * query in this session (S.kdx, never the record), so Back from an entry lands on the same place. `empty: false`
+ * leaves out the no-match line when the lookup itself is not complete (a failure is not a no-match, K06). */
+function renderKdxGrid(host, chars, CAP = 200, key = '', { empty = true, mark = null } = {}) {
+  const open = !!key && S.kdx?.open === key;
+  const heading = (shown) => tx(`見つかった字 — ${chars.length}`, shown < chars.length
+    ? `${chars.length.toLocaleString('en')} found — first ${shown} shown` : `${chars.length.toLocaleString('en')} found`);
+  const eyebrow = el('p', 'eyebrow', heading(kdxGridShown(chars, CAP, open).length));
+  eyebrow.dataset.kdxCount = String(chars.length);
+  host.append(eyebrow);
   if (!chars.length) {
-    host.append(el('div', 'sem-empty', tx('この条件の字はない。', 'No character matches that yet.')));
+    if (empty) host.append(el('div', 'sem-empty', tx('この条件の字はない。', 'No character matches that yet.')));
     return;
   }
   const grid = el('div', 'kdx-grid');
-  for (const c of chars.slice(0, CAP)) {
-    const b = el('button', 'kdx-glyph', c);
-    b.type = 'button';
-    b.dataset.kdxHit = c;
-    if (D.kanji[c]) b.setAttribute('aria-label', D.kanji[c].m);
-    b.addEventListener('click', () => go({ t: 'kanji', id: c }));
-    grid.append(b);
-  }
+  const add = (list) => {
+    for (const c of list) {
+      const b = el('button', 'kdx-glyph', c);
+      b.type = 'button';
+      b.dataset.kdxHit = c;
+      if (D.kanji[c]) b.setAttribute('aria-label', D.kanji[c].m);
+      mark?.(b, c);
+      b.addEventListener('click', () => go({ t: 'kanji', id: c }));
+      grid.append(b);
+    }
+  };
+  add(kdxGridShown(chars, CAP, open));
   host.append(grid);
+  if (kdxGridShown(chars, CAP, open).length < chars.length) {
+    const more = el('button', 'more-row kdx-more');
+    more.type = 'button';
+    more.dataset.kdxMore = key || 'grid';
+    const remain = chars.length - CAP;
+    more.textContent = tx(`のこり ${remain} 字をすべて見る`, `show all ${chars.length.toLocaleString('en')} — ${remain.toLocaleString('en')} more`);
+    more.addEventListener('click', () => {
+      if (key) (S.kdx ||= {}).open = key;
+      add(chars.slice(CAP));
+      eyebrow.textContent = heading(chars.length);
+      more.remove();
+    });
+    host.append(more);
+  }
 }
 
 /* 部品 — multi-radical. Tap several parts you can see; the set narrows to
@@ -22790,7 +22814,7 @@ function renderKdxParts(main) {
   }
 
   const hits = kdxPartHits();
-  if (S.kdx.parts.length || S.kdx.st) renderKdxGrid(main, hits, 160);
+  if (S.kdx.parts.length || S.kdx.st) renderKdxGrid(main, hits, 160, `parts:${S.kdx.parts.join('')}:${S.kdx.st || ''}`);
 
   // which components still co-occur with the current hits? (the union of the
   // hits' own parts). Nothing selected → everything is available.
@@ -22818,7 +22842,10 @@ function kdxPartGrid(coPresent) {
   const wrap = el('div');
   wrap.id = 'kdx-partgrid';
   const q = (S.kdx.partq || '').trim().toLowerCase();
-  let parts = Object.values(D.radicals).filter((r) => (r.kanjiCount || 0) >= 8);
+  // a part used in fewer than 8 kanji stays out of the browsing wall, but the exact part or its exact name
+  // typed in the filter always finds it (K05: 父, ちち)
+  let parts = Object.values(D.radicals).filter((r) =>
+    (r.kanjiCount || 0) >= 8 || (q && (r.c === q || (r.name && r.name.toLowerCase() === q))));
   if (q) parts = parts.filter((r) => r.c === q || (r.name && r.name.toLowerCase().includes(q)));
   parts.sort((a, b) => (a.st || 99) - (b.st || 99) || b.kanjiCount - a.kanjiCount);
   const bySt = new Map();
@@ -22877,7 +22904,7 @@ function renderKdxStrokes(main) {
     const chars = kanjiFinderUniverse()
       .filter((c) => (D.kanji[c] || kanjiReference(c))?.st === S.kdx.st)
       .sort((a, b) => (a < b ? -1 : 1));
-    renderKdxGrid(main, chars, 300);
+    renderKdxGrid(main, chars, 300, `st:${S.kdx.st}`);
   }
 }
 
@@ -22907,11 +22934,11 @@ function renderKdxRadical(main) {
   }
   main.append(row);
   if (S.kdx.rad) {
-    const chars = Object.keys(D.kanji)
-      .filter((c) => D.kanji[c].rad === S.kdx.rad)
-      .sort((a, b) => D.kanji[a].st - D.kanji[b].st || (a < b ? -1 : 1));
-    renderKdxGrid(main, chars, 300);
-    for (const g of main.querySelectorAll('.kdx-glyph')) g.dataset.rad = String(S.kdx.rad);
+    const rec = (c) => D.kanji[c] || kanjiReference(c);
+    const chars = kanjiFinderUniverse()
+      .filter((c) => rec(c)?.rad === S.kdx.rad)
+      .sort((a, b) => rec(a).st - rec(b).st || (a < b ? -1 : 1));
+    renderKdxGrid(main, chars, 300, `rad:${S.kdx.rad}`, { mark: (b) => { b.dataset.rad = String(S.kdx.rad); } });
   }
 }
 
@@ -22935,6 +22962,30 @@ function ensureKanjiFrequency() {
       });
   }
   return kanjiFreqPromise;
+}
+/** The kanji one newspaper-frequency band lists, commonest first, over the finder's universe (K05). */
+function kdxFrequencyHits(lo, hi) {
+  return kanjiFinderUniverse()
+    .filter((c) => D.kanjiFreq?.[c] >= lo && D.kanjiFreq[c] <= hi)
+    .sort((a, b) => D.kanjiFreq[a] - D.kanjiFreq[b]);
+}
+/** The honest line for a lookup table that could not load, with the one retry: the retry answers the query the
+ * learner already has (S.kdx keeps it), without a reload (K06). */
+function kdxLoadFailed(host, id, ja, en, retry) {
+  const line = el('p', 'sem-empty', tx(ja, en));
+  line.dataset.kdxLoad = 'failed';
+  line.setAttribute('role', 'status');
+  const button = biLabel('button', 'chip', '再試行', 'Try again');
+  button.type = 'button';
+  button.id = id;
+  button.addEventListener('click', () => {
+    const pending = retry();
+    render();
+    pending.then(() => {
+      if (S.view === 'search' || S.view === 'kanjidex') render();
+    });
+  });
+  host.append(line, button);
 }
 const FREQ_BANDS = [
   [1, 100],
@@ -22968,11 +23019,8 @@ function renderKdxFrequency(main) {
   }
   main.append(row);
   if (S.kdx.freqLo) {
-    const chars = Object.keys(D.kanjiFreq)
-      .filter((c) => D.kanji[c] && D.kanjiFreq[c] >= S.kdx.freqLo && D.kanjiFreq[c] <= S.kdx.freqHi)
-      .sort((a, b) => D.kanjiFreq[a] - D.kanjiFreq[b]);
-    renderKdxGrid(main, chars, 500);
-    for (const g of main.querySelectorAll('.kdx-glyph')) g.dataset.freq = String(D.kanjiFreq[g.dataset.kdxHit]);
+    const chars = kdxFrequencyHits(S.kdx.freqLo, S.kdx.freqHi);
+    renderKdxGrid(main, chars, 500, `freq:${S.kdx.freqLo}`, { mark: (b, c) => { b.dataset.freq = String(D.kanjiFreq[c]); } });
   }
 }
 
@@ -23010,8 +23058,7 @@ function renderKdxLevel(main) {
     const chars = Object.keys(D.kanji)
       .filter((c) => D.kanji[c].kk === S.kdx.kk)
       .sort((a, b) => D.kanji[a].st - D.kanji[b].st || (a < b ? -1 : 1));
-    renderKdxGrid(main, chars, 400);
-    for (const g of main.querySelectorAll('.kdx-glyph')) g.dataset.kk = S.kdx.kk;
+    renderKdxGrid(main, chars, 400, `kk:${S.kdx.kk}`, { mark: (b) => { b.dataset.kk = S.kdx.kk; } });
   }
 }
 
@@ -34641,19 +34688,30 @@ function renderKanjiNode(sheet, node) {
     );
   }
 
+  // K05 · as many idioms as the heading counts are one tap away
   const idioms = D.idiomsByKanji[k.c] || [];
   if (idioms.length) {
     const heading = el('p', 'eyebrow');
     heading.textContent = tx(`熟語・慣用句 — ${idioms.length}`, `${idioms.length} idioms and set phrases`);
     sheet.append(heading);
-    sheet.append(
-      chipsFor(
-        idioms.slice(0, 24).map((w) => ({ label: w, sub: D.idioms[w]?.r || '' })),
-        (item) => go({ t: 'idiom', id: item.label, from: node.from }),
-        null,
-        'idiom',
-      ),
-    );
+    const FIRST_IDIOMS = 24;
+    const chipOf = (w) => ({ label: w, sub: D.idioms[w]?.r || '' });
+    const openIdiom = (item) => go({ t: 'idiom', id: item.label, from: node.from });
+    const chips = chipsFor((node.idiomsExpanded ? idioms : idioms.slice(0, FIRST_IDIOMS)).map(chipOf), openIdiom, null, 'idiom');
+    sheet.append(chips);
+    if (idioms.length > FIRST_IDIOMS && !node.idiomsExpanded) {
+      const more = el('button', 'more-row');
+      more.type = 'button';
+      more.id = 'kanji-idioms-more';
+      const remain = idioms.length - FIRST_IDIOMS;
+      more.textContent = tx(`のこり ${remain} 語をすべて見る`, `show all ${idioms.length} — ${remain} more`);
+      more.addEventListener('click', () => {
+        node.idiomsExpanded = true;
+        chips.append(...chipsFor(idioms.slice(FIRST_IDIOMS).map(chipOf), openIdiom, null, 'idiom').children);
+        more.remove();
+      });
+      sheet.append(more);
+    }
   }
 
 
