@@ -16,7 +16,9 @@
  *   (h) the daily new-card limit holds;
  *   (i) undo restores the exact record and keeps another window's grade;
  *   (j) the close's numbers are the sitting's own answers;
- *   P0  two open copies of a deck never lose a grade: a stale copy's answer is refused, not written over newer ones;
+ *   P0  two open copies of a deck never lose a grade: a stale copy's answer is refused, and a stale copy's word lookup is
+ *       merged, never written over newer grades (the stale copy also misses the other's storage events, as a frozen
+ *       background tab can, so only the fresh-read write protects it);
  *   C1  timed Kanji-only practice of a card not due records practice only, never a review;
  *   B   burying across surfaces (lead's ruling 10-19): 検証 answered in 専門 → its cards in 言葉の鉱脈, MCD, the context
  *       deck and its saved word: card rest today and are served tomorrow; kanji:検 and the MCD 字 card are not buried;
@@ -190,7 +192,7 @@ function nodePart() {
       const T0 = Date.parse('2026-10-19T07:00:00Z');
       const row = { t: 'word', id: '検証', label: '検証', ts: T0 - 9e8, started: T0 - 9e8 };
       const sandbox = { S: { taken: [row, { ...row }, { ...row, id: '実装', label: '実装' }], srs: { 'word:検証': { due: new Date(T0 - 60e3).toISOString(), state: 2 } }, suspended: {}, stats: {}, srsPrefs: {}, revlog: [] },
-        D: { pin, dict: {} }, srsCore, Math, JSON, Number, Array, Object, String, Set, Map, Date, globalThis: {} };
+        D: { pin, dict: {} }, srsCore, Math, JSON, Number, Array, Object, String, Set, Map, Date };
       try {
         vm.runInNewContext(`${program}\n;globalThis.out = { todayQueue, srsDueItems };`, sandbox);
         const now = new Date(T0);
@@ -307,6 +309,8 @@ const MUTANTS = {
   'stale-whole-write': () => mutant('decks/player/mount.js', `  if (text !== ctx.ledgerText && text != null) {`, `  if (false) {`),
   'context-frozen-queue': () => mutant('decks/context-dense/mount.js', `  ui.index += 1;\n  settle(next, now);`, `  ui.index += 1;\n  ui.screen = ui.index >= ui.queue.length ? 'done' : 'card';`),
   'corridor-silent-ahead': () => mutant('corridor.js', `ahead: !!rv.ahead });`, `ahead: true });`),
+  'lookup-stale-save': () => mutant('decks/player/mount.js', `  writeLedger((fresh) => logLookup(fresh, { cardId, where, surface: frame.surface, key: frame.key, depth }, new Date()));\n`,
+    `  { const next = logLookup(ctx.state, { cardId, where, surface: frame.surface, key: frame.key, depth }, new Date()); if (save(next)) ctx.state = next; }\n`),
   'bury-off': () => mutant('srs-core.mjs', `export function buriedHere(answered, term, reading, where) {\n`, `export function buriedHere(answered, term, reading, where) {\n  return false;\n`),
 };
 function control(name, checkName, caught, detail = '') {
@@ -315,7 +319,8 @@ function control(name, checkName, caught, detail = '') {
 }
 
 /* ------------------------------------------------------------------ browser helpers */
-const T_LOCAL = new Date('2026-10-19T16:00:00+09:00');
+// the clock starts at the real minute: the app's importer refuses a backup stamped later than its own clock
+const T_LOCAL = new Date(Math.floor(Date.now() / MIN) * MIN);
 async function newPage(browser, { seedLocal = null } = {}) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, serviceWorkers: 'block', timezoneId: 'Asia/Tokyo' });
   await silenceBrowserAudio(context);
@@ -553,6 +558,8 @@ async function playerTwoWindows(browser, engine, { mutate = null } = {}) {
   const out = {};
   try {
     const b = await context.newPage();
+    // the stale copy misses the other window's storage events (a frozen background tab can): only a fresh read can save it
+    await b.addInitScript(() => window.addEventListener('storage', (event) => event.stopImmediatePropagation(), true));
     await openDeck(b);
     await b.locator('#kp-start').click();
     out.bCard = await onCard(b);
@@ -583,6 +590,43 @@ async function playerTwoWindows(browser, engine, { mutate = null } = {}) {
   if (mutate) return pass;
   check(`[${engine}] P0 two open copies: A answers five review cards Good (${out.labels?.[0]}); the stale copy's answer is refused, nothing rolls back`, pass && /another window/u.test(out.toast), { logA: out.logA, logB: out.logB, rolledBack: out.rolledBack.length, keptTheirDays: out.allDays, toast: out.toast });
   check(`[${engine}] P0 …and after a reload none of those cards is due again today`, /Done for today|今日はここまで/u.test(out.startAfter), out.startAfter);
+  return pass;
+}
+
+/** P0, a word lookup: a stale copy's tap on a word is merged into the stored ledger, never written over newer grades */
+async function playerLookupRace(browser, engine, { mutate = null } = {}) {
+  const T = T_LOCAL.getTime();
+  const deck = JSON.parse(readFileSync(join(SITE, 'decks/n2/deck.json'), 'utf8'));
+  const ids = deck.words.slice(0, 5).map((w) => w.cards[0].id);
+  const cards = Object.fromEntries(ids.map((id, i) => [id, { due: new Date(T - (5 - i) * MIN).toISOString(), stability: 0.6, difficulty: 5, elapsed_days: 1, scheduled_days: 1, learning_steps: 0, reps: 3, lapses: 0, state: 2, last_review: new Date(T - DAY).toISOString(), introducedAt: new Date(T - 9 * DAY).toISOString() }]));
+  const seeded = { format: 'bunki-cloze-state', version: 1, deckId: 'n2', cards, groupsOff: [], log: [], suspended: {}, repairs: {}, repairLog: [], lookups: [] };
+  const { context, page: a } = await newPage(browser, { seedLocal: { ...PREFS(0), 'bunki-cloze:n2': seeded } });
+  const out = {};
+  try {
+    const b = await context.newPage();
+    await b.addInitScript(() => window.addEventListener('storage', (event) => event.stopImmediatePropagation(), true));
+    await openDeck(b);
+    await b.locator('#kp-start').click();
+    await onCard(b);
+    await b.locator('#kp-reveal').click();
+    await b.waitForSelector('#kp-card .kp-sentence .kp-tok:not(.kp-target)', { timeout: 15000 });
+    await openDeck(a);
+    await a.locator('#kp-start').click();
+    for (let i = 0; i < 5; i += 1) { await onCard(a); await answer(a); }
+    const afterA = await ledgerOf(a);
+    await b.locator('#kp-card .kp-sentence .kp-tok:not(.kp-target)').first().click();
+    await b.waitForFunction(() => (JSON.parse(localStorage.getItem('bunki-cloze:n2') || '{}').lookups || []).length > 0, null, { timeout: 5000 }).catch(() => {});
+    const afterB = await ledgerOf(a);
+    out.logA = afterA.log.length;
+    out.logB = afterB.log.length;
+    out.lookups = (afterB.lookups || []).length;
+    out.rolledBack = ids.filter((id) => afterB.cards[id].due !== afterA.cards[id].due).length;
+  } finally {
+    await context.close();
+  }
+  const pass = out.logB === out.logA && out.logA === 5 && out.rolledBack === 0 && out.lookups >= 1;
+  if (mutate) return pass;
+  check(`[${engine}] P0 a stale copy looks a word up after the other answered five cards: its lookup is kept and none of the five grades rolls back`, pass, out);
   return pass;
 }
 
@@ -814,6 +858,7 @@ for (const engine of ENGINES) {
     if (runs('john')) await scenario(`[${engine}] John's route`, () => playerJohnRoute(browser, engine));
     if (runs('steps')) await scenario(`[${engine}] deck player steps`, () => playerSteps(browser, engine));
     if (runs('p0')) await scenario(`[${engine}] P0 two windows`, () => playerTwoWindows(browser, engine));
+    if (runs('p0')) await scenario(`[${engine}] P0 lookup race`, () => playerLookupRace(browser, engine));
     if (runs('context')) await scenario(`[${engine}] context deck`, () => contextDeck(browser, engine));
     if (runs('corridor')) await scenario(`[${engine}] corridor review`, () => corridorReview(browser, engine));
     if (runs('timed')) await scenario(`[${engine}] timed Kanji-only`, () => timedKanji(browser, engine));
@@ -830,6 +875,7 @@ for (const engine of ENGINES) {
       // a control is caught only when its named check returns red; a crash under a control is not proof
       for (const [key, name, label, checkName, run] of [
         ['p0', 'stale-whole-write', 'a stale whole-ledger write (no fresh read)', 'P0 two open copies', () => playerTwoWindows(browser, engine, { mutate: true })],
+        ['p0', 'lookup-stale-save', 'a lookup saved from the stale copy\'s ledger (the old logTap)', 'P0 a stale copy looks a word up', () => playerLookupRace(browser, engine, { mutate: true })],
         ['context', 'context-frozen-queue', 'the context deck with its own frozen queue', '(a)(b) context deck', () => contextDeck(browser, engine, { mutate: true })],
         ['corridor', 'corridor-silent-ahead', 'the corridor learning ahead without the choice', '(a)(c) corridor review', () => corridorReview(browser, engine, { mutate: true })],
         ['bury', 'bury-off', 'burying across surfaces switched off', 'B 検証 answered in 専門', () => buryAcrossDecks(browser, engine, { mutate: true })],
