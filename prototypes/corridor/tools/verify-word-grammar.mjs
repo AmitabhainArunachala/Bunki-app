@@ -3568,7 +3568,7 @@ try {
       const web = mini.querySelector(':scope > .mini-web')?.getBoundingClientRect();
       return { mini: true, scrollTop: mini.scrollTop, more, compact: mini.classList.contains('is-compact'), glide: mini.dataset.glide ?? null,
         mustFoot: web ? Math.round(web.bottom - box.top + mini.scrollTop) : null, scrollY: Math.round(scrollY),
-        box: { top: Math.round(box.top), bottom: Math.round(box.bottom) }, ceiling, floor, rows };
+        box: { top: Math.round(box.top), bottom: Math.round(box.bottom), left: Math.round(box.left), right: Math.round(box.right) }, ceiling, floor, rows };
     });
     // the word as the card's seat counts it before the stage (its reading over it, its English under it), and the two rooms
     const d7Before = (word) => word.evaluate((node) => {
@@ -3580,7 +3580,10 @@ try {
       const rects = [node.getBoundingClientRect(), ...[...node.querySelectorAll('rt')].filter((rt) => !rt.classList.contains('hidden-rt'))
         .flatMap((rt) => { range.selectNodeContents(rt); return [rt.getBoundingClientRect(), ...range.getClientRects()]; })].filter((r) => r.height > 0.5);
       const top = Math.min(...rects.map((r) => r.top)), bottom = Math.max(...rects.map((r) => r.bottom));
-      return { scrollY: Math.round(scrollY), roomAbove: Math.round(top - 10 - ceiling), roomBelow: Math.round(floor - (bottom + 10)) };
+      // G5's 層 mark at the foot is a floor too for a box that would stand over it (docked in its open block, it is none)
+      const markNode = document.getElementById('layers-mark'), markBox = markNode && !markNode.dataset.docked ? markNode.getBoundingClientRect() : null;
+      const mark = markBox?.height ? { top: markBox.top, left: markBox.left, right: markBox.right } : null;
+      return { scrollY: Math.round(scrollY), roomAbove: Math.round(top - 10 - ceiling), roomBelow: Math.round(floor - (bottom + 10)), wordBottom: bottom, mark };
     });
     const ladderD7 = (viewport) => async (page) => {
       await openStory(page);
@@ -3609,9 +3612,12 @@ try {
         // the print stays still, unless even the compact card's kanji rows had no room beside the word where it stood (D7's
         // case 3), and then it moved exactly the glide the card records
         const still = moved !== null && Math.abs(moved) < 1 && seen.glide === null;
+        // the room below ends at the 層 mark where the box, as it stands, spans it (G5: no box over the mark)
+        const overMark = !!before?.mark && seen.box && seen.box.left < before.mark.right && seen.box.right > before.mark.left;
+        const roomBelow = before && overMark ? Math.min(before.roomBelow, Math.round(before.mark.top - 8 - (before.wordBottom + 10))) : before?.roomBelow;
         const glideJustified = moved !== null && seen.glide !== null && seen.compact && seen.mustFoot !== null &&
-          Math.max(before.roomAbove, before.roomBelow) < seen.mustFoot - 1 && Math.abs(moved - Number(seen.glide)) <= 2;
-        places.push({ where, placed, before, moved, still, glideJustified, ...seen, clear: clear.clear, overReading: clear.overReading, overWord: clear.overWord });
+          Math.max(before.roomAbove, roomBelow) < seen.mustFoot - 1 && Math.abs(moved - Number(seen.glide)) <= 2;
+        places.push({ where, placed, before, overMark, roomBelow, moved, still, glideJustified, ...seen, clear: clear.clear, overReading: clear.overReading, overWord: clear.overWord });
         if (where !== 'high') await page.screenshot({ path: resolve(evidence, `${engine}-L-d7-${viewport.width}-${where}.png`) });
         await page.keyboard.press('Escape'); await delay(400);
       }
@@ -3701,7 +3707,7 @@ try {
             from: "    if (top == null && !sentence && anchor?.matches?.('#reader .tok, .japanese-lookup-word, .sentence-tok') &&\n        card.querySelector(':scope > .mini-web') && !card.classList.contains('is-compact')) {",
             to: '    if (false) { // Ladder negative: no compact card' },
           { file: 'corridor.js', key: 'no-glide',
-            from: '    if (top == null && !sentence && scroller && Math.max(roomAbove, roomBelow) < mustShowHeight(card)) {',
+            from: '    if (top == null && !sentence && scroller && Math.max(roomAbove - shift, roomBelow + shift) < mustShowHeight(card)) {',
             to: '    if (false) { // Ladder negative: no room made; the card is cut where it stands' }] },
         { id: 'no-aside-mark', run: 'L-climb', body: ladderClimb, options: ladderView, kills: ['L.dots'], witness: (row) => row.observed.aside === null,
           edits: [{ file: 'corridor.js', key: 'english-without-aside', from: "  if (hasEn) span.dataset.depthAside = 'meaning';",
