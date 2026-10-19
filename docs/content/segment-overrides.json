@@ -66,7 +66,15 @@
     {
       "word": "ノースカロライナ",
       "match": [{ "s": "ノース" }, { "s": "カロライナ" }],
-      "tokens": [{ "s": "ノースカロライナ", "b": "ノースカロライナ", "p": "名詞", "r": "のーすかろらいな", "c": false }],
+      "tokens": [
+        {
+          "s": "ノースカロライナ",
+          "b": "ノースカロライナ",
+          "p": "名詞",
+          "r": "のーすかろらいな",
+          "c": false
+        }
+      ],
       "note": "the state name as one token (same defect class as ハイナー) (Bunki batch-1r, bunki-read-n1-soai-nobel)"
     },
     {
@@ -120,7 +128,9 @@
     {
       "word": "ローディガー",
       "match": [{ "s": "ローディ" }, { "s": "ガー" }],
-      "tokens": [{ "s": "ローディガー", "b": "ローディガー", "p": "名詞", "r": "ろーでぃがー", "c": false }],
+      "tokens": [
+        { "s": "ローディガー", "b": "ローディガー", "p": "名詞", "r": "ろーでぃがー", "c": false }
+      ],
       "note": "surname Roediger as one token (same defect class as ハイナー) (Bunki batch-1r, bunki-read-n2-forgetting-curve)"
     },
     {
@@ -132,7 +142,15 @@
     {
       "word": "マウンテンビュー",
       "match": [{ "s": "マウンテン" }, { "s": "ビュー" }],
-      "tokens": [{ "s": "マウンテンビュー", "b": "マウンテンビュー", "p": "名詞", "r": "まうんてんびゅー", "c": false }],
+      "tokens": [
+        {
+          "s": "マウンテンビュー",
+          "b": "マウンテンビュー",
+          "p": "名詞",
+          "r": "まうんてんびゅー",
+          "c": false
+        }
+      ],
       "note": "place name Mountain View as one token (Bunki batch-1r, bunki-read-n2-shima-4004)"
     },
     {
@@ -150,7 +168,15 @@
     {
       "word": "パールストリート",
       "match": [{ "s": "パール" }, { "s": "ストリート" }],
-      "tokens": [{ "s": "パールストリート", "b": "パールストリート", "p": "名詞", "r": "ぱーるすとりーと", "c": false }],
+      "tokens": [
+        {
+          "s": "パールストリート",
+          "b": "パールストリート",
+          "p": "名詞",
+          "r": "ぱーるすとりーと",
+          "c": false
+        }
+      ],
       "note": "street name as one token (Bunki batch-1r, bunki-read-n2-kobe-jain)"
     },
     {
@@ -186,13 +212,17 @@
     {
       "word": "正倉院展",
       "match": [{ "s": "正倉" }, { "s": "院展" }],
-      "tokens": [{ "s": "正倉院展", "b": "正倉院展", "p": "名詞", "r": "しょうそういんてん", "c": true }],
+      "tokens": [
+        { "s": "正倉院展", "b": "正倉院展", "p": "名詞", "r": "しょうそういんてん", "c": true }
+      ],
       "note": "正倉院展 as one token; UniDic splits 正倉 + 院展 (Bunki batch-2r, bunki-read-n2-shosoin-names)"
     },
     {
       "word": "白瑠璃瓶",
       "match": [{ "s": "白" }, { "s": "瑠璃" }, { "s": "瓶" }],
-      "tokens": [{ "s": "白瑠璃瓶", "b": "白瑠璃瓶", "p": "名詞", "r": "はくるりのへい", "c": true }],
+      "tokens": [
+        { "s": "白瑠璃瓶", "b": "白瑠璃瓶", "p": "名詞", "r": "はくるりのへい", "c": true }
+      ],
       "note": "the treasure's name reads はくるりのへい (Nara National Museum's list and press release); UniDic gives しろ + るり + びん (Bunki batch-2r, bunki-read-n2-shosoin-names)"
     },
     {
@@ -209,8 +239,24 @@
     },
     {
       "word": "銭洗弁財天宇賀福神社",
-      "match": [{ "s": "銭" }, { "s": "洗" }, { "s": "弁財" }, { "s": "天" }, { "s": "宇賀" }, { "s": "福神" }, { "s": "社" }],
-      "tokens": [{ "s": "銭洗弁財天宇賀福神社", "b": "銭洗弁財天宇賀福神社", "p": "名詞", "r": "ぜにあらいべんざいてんうがふくじんじゃ", "c": false }],
+      "match": [
+        { "s": "銭" },
+        { "s": "洗" },
+        { "s": "弁財" },
+        { "s": "天" },
+        { "s": "宇賀" },
+        { "s": "福神" },
+        { "s": "社" }
+      ],
+      "tokens": [
+        {
+          "s": "銭洗弁財天宇賀福神社",
+          "b": "銭洗弁財天宇賀福神社",
+          "p": "名詞",
+          "r": "ぜにあらいべんざいてんうがふくじんじゃ",
+          "c": false
+        }
+      ],
       "note": "the shrine's full name as one token: 銭洗 + 弁財天 + 宇賀福神社 (kotobank: 銭洗宇賀福神社 ぜにあらいうがふくじんじゃ; 弁財天 べんざいてん); UniDic splits it into seven pieces and reads 銭 せん, 社 しゃ (Bunki batch-2r, bunki-read-n2-benzaiten)"
     },
     {
@@ -228,13 +274,37 @@
     {
       "word": "金光明最勝王経",
       "match": [{ "s": "金" }, { "s": "光明" }, { "s": "最勝" }, { "s": "王" }, { "s": "経" }],
-      "tokens": [{ "s": "金光明最勝王経", "b": "金光明最勝王経", "p": "名詞", "r": "こんこうみょうさいしょうおうきょう", "c": false }],
+      "tokens": [
+        {
+          "s": "金光明最勝王経",
+          "b": "金光明最勝王経",
+          "p": "名詞",
+          "r": "こんこうみょうさいしょうおうきょう",
+          "c": false
+        }
+      ],
       "note": "the sutra's title reads こんこうみょうさいしょうおうきょう (日本大百科全書); UniDic gives きん + みつあき + … (Bunki batch-2r, bunki-read-n2-benzaiten)"
     },
     {
       "word": "金光明四天王護国之寺",
-      "match": [{ "s": "金" }, { "s": "光明" }, { "s": "四" }, { "s": "天王" }, { "s": "護国" }, { "s": "之" }, { "s": "寺" }],
-      "tokens": [{ "s": "金光明四天王護国之寺", "b": "金光明四天王護国之寺", "p": "名詞", "r": "こんこうみょうしてんのうごこくのてら", "c": false }],
+      "match": [
+        { "s": "金" },
+        { "s": "光明" },
+        { "s": "四" },
+        { "s": "天王" },
+        { "s": "護国" },
+        { "s": "之" },
+        { "s": "寺" }
+      ],
+      "tokens": [
+        {
+          "s": "金光明四天王護国之寺",
+          "b": "金光明四天王護国之寺",
+          "p": "名詞",
+          "r": "こんこうみょうしてんのうごこくのてら",
+          "c": false
+        }
+      ],
       "note": "the formal name of the 国分寺 reads こんこうみょうしてんのうごこくのてら (デジタル大辞泉); UniDic gives きん + … + よん + … (Bunki batch-2r, bunki-read-n2-benzaiten)"
     },
     {
@@ -264,7 +334,9 @@
     {
       "word": "三位一体",
       "match": [{ "s": "三" }, { "s": "位" }, { "s": "一体" }],
-      "tokens": [{ "s": "三位一体", "b": "三位一体", "p": "名詞", "r": "さんみいったい", "c": true }],
+      "tokens": [
+        { "s": "三位一体", "b": "三位一体", "p": "名詞", "r": "さんみいったい", "c": true }
+      ],
       "note": "三位一体 is one word read さんみいったい; UniDic splits 三[さん] + 位[い] + 一体 (Bunki batch-2r, bunki-read-n1-neocognitron)"
     },
     {
@@ -309,37 +381,73 @@
     {
       "word": "アイスキューブ",
       "match": [{ "s": "アイス" }, { "s": "キューブ" }],
-      "tokens": [{ "s": "アイスキューブ", "b": "アイスキューブ", "p": "名詞", "r": "あいすきゅーぶ", "c": false }],
+      "tokens": [
+        {
+          "s": "アイスキューブ",
+          "b": "アイスキューブ",
+          "p": "名詞",
+          "r": "あいすきゅーぶ",
+          "c": false
+        }
+      ],
       "note": "katakana name as one token (lesson carried from batch 1); UniDic splits it into アイス + キューブ (Bunki batch-3r, bunki-read-n2-icecube-nobel)"
     },
     {
       "word": "ハルツェン",
       "match": [{ "s": "ハル" }, { "s": "ツェン" }],
-      "tokens": [{ "s": "ハルツェン", "b": "ハルツェン", "p": "名詞", "r": "はるつぇん", "c": false }],
+      "tokens": [
+        { "s": "ハルツェン", "b": "ハルツェン", "p": "名詞", "r": "はるつぇん", "c": false }
+      ],
       "note": "katakana name as one token (lesson carried from batch 1); UniDic splits it into ハル + ツェン (Bunki batch-3r, bunki-read-n2-icecube-nobel)"
     },
     {
       "word": "ニュートリノ",
       "match": [{ "s": "ニュートリ" }, { "s": "ノ" }],
-      "tokens": [{ "s": "ニュートリノ", "b": "ニュートリノ", "p": "名詞", "r": "にゅーとりの", "c": true }],
+      "tokens": [
+        { "s": "ニュートリノ", "b": "ニュートリノ", "p": "名詞", "r": "にゅーとりの", "c": true }
+      ],
       "note": "the loanword ニュートリノ (neutrino) as one token; UniDic splits it into ニュートリ + ノ (Bunki batch-3r, bunki-read-n2-icecube-nobel)"
     },
     {
       "word": "スーパーカミオカンデ",
       "match": [{ "s": "スーパー" }, { "s": "カミオカンデ" }],
-      "tokens": [{ "s": "スーパーカミオカンデ", "b": "スーパーカミオカンデ", "p": "名詞", "r": "すーぱーかみおかんで", "c": false }],
+      "tokens": [
+        {
+          "s": "スーパーカミオカンデ",
+          "b": "スーパーカミオカンデ",
+          "p": "名詞",
+          "r": "すーぱーかみおかんで",
+          "c": false
+        }
+      ],
       "note": "katakana name as one token (lesson carried from batch 1); UniDic splits it into スーパー + カミオカンデ (Bunki batch-3r, bunki-read-n2-icecube-nobel)"
     },
     {
       "word": "ハイパーカミオカンデ",
       "match": [{ "s": "ハイパー" }, { "s": "カミオカンデ" }],
-      "tokens": [{ "s": "ハイパーカミオカンデ", "b": "ハイパーカミオカンデ", "p": "名詞", "r": "はいぱーかみおかんで", "c": false }],
+      "tokens": [
+        {
+          "s": "ハイパーカミオカンデ",
+          "b": "ハイパーカミオカンデ",
+          "p": "名詞",
+          "r": "はいぱーかみおかんで",
+          "c": false
+        }
+      ],
       "note": "katakana name as one token (lesson carried from batch 1); UniDic splits it into ハイパー + カミオカンデ (Bunki batch-3r, bunki-read-n2-icecube-nobel)"
     },
     {
       "word": "梵字悉曇字母并釈義",
       "match": [{ "s": "梵字" }, { "s": "悉曇" }, { "s": "字母" }, { "s": "并" }, { "s": "釈義" }],
-      "tokens": [{ "s": "梵字悉曇字母并釈義", "b": "梵字悉曇字母并釈義", "p": "名詞", "r": "ぼんじしったんじもならびにしゃくぎ", "c": false }],
+      "tokens": [
+        {
+          "s": "梵字悉曇字母并釈義",
+          "b": "梵字悉曇字母并釈義",
+          "p": "名詞",
+          "r": "ぼんじしったんじもならびにしゃくぎ",
+          "c": false
+        }
+      ],
       "note": "a book title, read as the National Diet Library records it (ボンジ シッタン ジモ ナラビニ シャクギ, KU32); UniDic splits it and reads 并 ならび, 字母 じぼ (Bunki batch-3r, bunki-read-n1-kukai-sanskrit)"
     },
     {
@@ -384,7 +492,9 @@
     {
       "word": "ベストセラー",
       "match": [{ "s": "ベスト" }, { "s": "セラー" }],
-      "tokens": [{ "s": "ベストセラー", "b": "ベストセラー", "p": "名詞", "r": "べすとせらー", "c": true }],
+      "tokens": [
+        { "s": "ベストセラー", "b": "ベストセラー", "p": "名詞", "r": "べすとせらー", "c": true }
+      ],
       "note": "the loanword ベストセラー as one token; UniDic splits it into ベスト + セラー (Bunki batch-3r, bunki-read-n2-grit-checked)"
     },
     {
@@ -396,7 +506,15 @@
     {
       "word": "大乗起信論",
       "match": [{ "s": "大乗" }, { "s": "起" }, { "s": "信" }, { "s": "論" }],
-      "tokens": [{ "s": "大乗起信論", "b": "大乗起信論", "p": "名詞", "r": "だいじょうきしんろん", "c": false }],
+      "tokens": [
+        {
+          "s": "大乗起信論",
+          "b": "大乗起信論",
+          "p": "名詞",
+          "r": "だいじょうきしんろん",
+          "c": false
+        }
+      ],
       "note": "a book title as one token (日本大百科全書: 大乗起信論(だいじょうきしんろん)); UniDic splits it into 大乗 + 起 + 信 + 論 (Bunki batch-3r, bunki-read-n1-suzuki-zen)"
     },
     {
@@ -408,25 +526,57 @@
     {
       "word": "スマートフォン",
       "match": [{ "s": "スマート" }, { "s": "フォン" }],
-      "tokens": [{ "s": "スマートフォン", "b": "スマートフォン", "p": "名詞", "r": "すまーとふぉん", "c": true }],
+      "tokens": [
+        {
+          "s": "スマートフォン",
+          "b": "スマートフォン",
+          "p": "名詞",
+          "r": "すまーとふぉん",
+          "c": true
+        }
+      ],
       "note": "katakana name or term as one token; UniDic splits it into スマート + フォン (Bunki batch-4r, bunki-read-n2-japan-us-chip-fab); a content word (c: true), so the decks type it 語 and ship its gloss_ja sense (Hfix-2c)"
     },
     {
       "word": "データセンター",
       "match": [{ "s": "データ" }, { "s": "センター" }],
-      "tokens": [{ "s": "データセンター", "b": "データセンター", "p": "名詞", "r": "でーたせんたー", "c": true }],
+      "tokens": [
+        {
+          "s": "データセンター",
+          "b": "データセンター",
+          "p": "名詞",
+          "r": "でーたせんたー",
+          "c": true
+        }
+      ],
       "note": "katakana name or term as one token; UniDic splits it into データ + センター (Bunki batch-4r, bunki-read-n2-japan-us-chip-fab); a content word (c: true), so the decks type it 語 and ship its gloss_ja sense (Hfix-2c)"
     },
     {
       "word": "グローバルファウンドリーズ",
       "match": [{ "s": "グローバル" }, { "s": "ファウンド" }, { "s": "リーズ" }],
-      "tokens": [{ "s": "グローバルファウンドリーズ", "b": "グローバルファウンドリーズ", "p": "名詞", "r": "ぐろーばるふぁうんどりーず", "c": false }],
+      "tokens": [
+        {
+          "s": "グローバルファウンドリーズ",
+          "b": "グローバルファウンドリーズ",
+          "p": "名詞",
+          "r": "ぐろーばるふぁうんどりーず",
+          "c": false
+        }
+      ],
       "note": "katakana name or term as one token; UniDic splits it into グローバル + ファウンド + リーズ (Bunki batch-4r, bunki-read-n2-japan-us-chip-fab)"
     },
     {
       "word": "ルネサスエレクトロニクス",
       "match": [{ "s": "ルネサス" }, { "s": "エレクトロニクス" }],
-      "tokens": [{ "s": "ルネサスエレクトロニクス", "b": "ルネサスエレクトロニクス", "p": "名詞", "r": "るねさすえれくとろにくす", "c": false }],
+      "tokens": [
+        {
+          "s": "ルネサスエレクトロニクス",
+          "b": "ルネサスエレクトロニクス",
+          "p": "名詞",
+          "r": "るねさすえれくとろにくす",
+          "c": false
+        }
+      ],
       "note": "katakana name or term as one token; UniDic splits it into ルネサス + エレクトロニクス (Bunki batch-4r, bunki-read-n2-japan-us-chip-fab)"
     },
     {
@@ -450,13 +600,17 @@
     {
       "word": "グンパール",
       "match": [{ "s": "グン" }, { "s": "パール" }],
-      "tokens": [{ "s": "グンパール", "b": "グンパール", "p": "名詞", "r": "ぐんぱーる", "c": false }],
+      "tokens": [
+        { "s": "グンパール", "b": "グンパール", "p": "名詞", "r": "ぐんぱーる", "c": false }
+      ],
       "note": "katakana name or term as one token; UniDic splits it into グン + パール (Bunki batch-4r, aozora:049966-2)"
     },
     {
       "word": "モンゴリヤ",
       "match": [{ "s": "モンゴ" }, { "s": "リヤ" }],
-      "tokens": [{ "s": "モンゴリヤ", "b": "モンゴリヤ", "p": "名詞", "r": "もんごりや", "c": false }],
+      "tokens": [
+        { "s": "モンゴリヤ", "b": "モンゴリヤ", "p": "名詞", "r": "もんごりや", "c": false }
+      ],
       "note": "katakana name or term as one token; UniDic splits it into モンゴ + リヤ (Bunki batch-4r, aozora:049966-2)"
     },
     {
@@ -474,7 +628,9 @@
     {
       "word": "シャブズン",
       "match": [{ "s": "シャブズン" }],
-      "tokens": [{ "s": "シャブズン", "b": "シャブズン", "p": "名詞", "r": "しゃぶずん", "c": false }],
+      "tokens": [
+        { "s": "シャブズン", "b": "シャブズン", "p": "名詞", "r": "しゃぶずん", "c": false }
+      ],
       "note": "katakana name (ラマ・シャブズン) given its reading; UniDic leaves the unknown name without one (Bunki batch-4r, aozora:049966-2)"
     },
     {
@@ -486,13 +642,23 @@
     {
       "word": "オンライン",
       "match": [{ "s": "オン" }, { "s": "ライン" }],
-      "tokens": [{ "s": "オンライン", "b": "オンライン", "p": "名詞", "r": "おんらいん", "c": false }],
+      "tokens": [
+        { "s": "オンライン", "b": "オンライン", "p": "名詞", "r": "おんらいん", "c": false }
+      ],
       "note": "katakana name or term as one token; UniDic splits it into オン + ライン (Bunki batch-4r, global-voices:2026-07-28-65374)"
     },
     {
       "word": "シリコンバレー",
       "match": [{ "s": "シリコン" }, { "s": "バレー" }],
-      "tokens": [{ "s": "シリコンバレー", "b": "シリコンバレー", "p": "名詞", "r": "しりこんばれー", "c": true }],
+      "tokens": [
+        {
+          "s": "シリコンバレー",
+          "b": "シリコンバレー",
+          "p": "名詞",
+          "r": "しりこんばれー",
+          "c": true
+        }
+      ],
       "note": "katakana name or term as one token; UniDic splits it into シリコン + バレー (Bunki batch-4r, global-voices:2026-07-28-65374); a content word (c: true), so the decks type it 語 and ship its gloss_ja sense (Hfix-2c)"
     },
     {
@@ -516,7 +682,9 @@
     {
       "word": "ケーブルカー",
       "match": [{ "s": "ケーブル" }, { "s": "カー" }],
-      "tokens": [{ "s": "ケーブルカー", "b": "ケーブルカー", "p": "名詞", "r": "けーぶるかー", "c": true }],
+      "tokens": [
+        { "s": "ケーブルカー", "b": "ケーブルカー", "p": "名詞", "r": "けーぶるかー", "c": true }
+      ],
       "note": "the loanword ケーブルカー as one token; UniDic splits it into ケーブル + カー (Bunki batch-4r, bunki-read-n2-shoten-ganesha)"
     },
     {
@@ -528,25 +696,57 @@
     {
       "word": "アテンションエコノミー",
       "match": [{ "s": "アテンション" }, { "s": "エコノミー" }],
-      "tokens": [{ "s": "アテンションエコノミー", "b": "アテンションエコノミー", "p": "名詞", "r": "あてんしょんえこのみー", "c": false }],
+      "tokens": [
+        {
+          "s": "アテンションエコノミー",
+          "b": "アテンションエコノミー",
+          "p": "名詞",
+          "r": "あてんしょんえこのみー",
+          "c": false
+        }
+      ],
       "note": "katakana name or term as one token; UniDic splits it into アテンション + エコノミー (Bunki batch-4r, govonline:202403-entry-5920-column)"
     },
     {
       "word": "フィルターバブル",
       "match": [{ "s": "フィルター" }, { "s": "バブル" }],
-      "tokens": [{ "s": "フィルターバブル", "b": "フィルターバブル", "p": "名詞", "r": "ふぃるたーばぶる", "c": false }],
+      "tokens": [
+        {
+          "s": "フィルターバブル",
+          "b": "フィルターバブル",
+          "p": "名詞",
+          "r": "ふぃるたーばぶる",
+          "c": false
+        }
+      ],
       "note": "katakana name or term as one token; UniDic splits it into フィルター + バブル (Bunki batch-4r, govonline:202403-entry-5920-column)"
     },
     {
       "word": "エコーチェンバー",
       "match": [{ "s": "エコー" }, { "s": "チェンバー" }],
-      "tokens": [{ "s": "エコーチェンバー", "b": "エコーチェンバー", "p": "名詞", "r": "えこーちぇんばー", "c": false }],
+      "tokens": [
+        {
+          "s": "エコーチェンバー",
+          "b": "エコーチェンバー",
+          "p": "名詞",
+          "r": "えこーちぇんばー",
+          "c": false
+        }
+      ],
       "note": "katakana name or term as one token; UniDic splits it into エコー + チェンバー (Bunki batch-4r, govonline:202403-entry-5920-column)"
     },
     {
       "word": "ディープフェイク",
       "match": [{ "s": "ディープ" }, { "s": "フェイク" }],
-      "tokens": [{ "s": "ディープフェイク", "b": "ディープフェイク", "p": "名詞", "r": "でぃーぷふぇいく", "c": false }],
+      "tokens": [
+        {
+          "s": "ディープフェイク",
+          "b": "ディープフェイク",
+          "p": "名詞",
+          "r": "でぃーぷふぇいく",
+          "c": false
+        }
+      ],
       "note": "katakana name or term as one token; UniDic splits it into ディープ + フェイク (Bunki batch-4r, govonline:202403-entry-5920-column)"
     },
     {
