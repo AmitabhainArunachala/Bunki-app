@@ -57,6 +57,7 @@ function buildRelease() {
     ...shellPaths(SW).filter((path) => path !== '.'),
     ...listPaths(SW, 'BOOT_DATA'),
     ...listPaths(SW, 'GUIDED_ROOM'),
+    ...listPaths(SW, 'SPEAK_ROOM'),
     FONT_A,
     FONT_B,
   ]);
@@ -298,6 +299,7 @@ describe('sw.js bundled fonts (R5-19)', () => {
       ...shellPaths(SW).filter((path) => path !== '.'),
       ...listPaths(SW, 'BOOT_DATA'),
       ...listPaths(SW, 'GUIDED_ROOM'),
+      ...listPaths(SW, 'SPEAK_ROOM'),
       'build-identity.json',
       'sw.js',
     ];

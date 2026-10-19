@@ -34,6 +34,24 @@ import { readAppRecordSnapshot } from './record-test-support.mjs';
 import { serveMutation } from './reader-gloss-mutants.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
 
+/** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
+ * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
+async function answeringRestore(page, run) {
+  let problem;
+  const answer = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', answer);
+  try { const value = await run(); if (problem) throw problem; return value; }
+  catch (error) { throw problem || error; }
+  finally { page.off('dialog', answer); }
+}
+
 const selection = parseRecordArgs(process.argv.slice(2));
 const runId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
 const nonce = process.env.RECORD_DEPTH_NONCE || null;
@@ -245,12 +263,14 @@ async function exportRecord(page, name) {
 async function importRecord(page, path) {
   const marker = randomUUID();
   await page.evaluate((m) => { window.__g2Import = m; }, marker);
-  await page.locator('#import-file').setInputFiles(path);
-  const outcome = await page.waitForFunction((m) => {
-    if (window.__g2Import !== m && document.body?.dataset.ready === '1') return 'reloaded';
-    const note = document.getElementById('record-portability-status')?.textContent?.trim();
-    return note && /could not|exceeds|上限|できなかった|limit/u.test(note) ? note : false;
-  }, marker, { timeout: 300000, polling: 200 }).then((handle) => handle.jsonValue());
+  const outcome = await answeringRestore(page, async () => {
+    await page.locator('#import-file').setInputFiles(path);
+    return page.waitForFunction((m) => {
+      if (window.__g2Import !== m && document.body?.dataset.ready === '1') return 'reloaded';
+      const note = document.getElementById('record-portability-status')?.textContent?.trim();
+      return note && /could not|exceeds|上限|できなかった|limit/u.test(note) ? note : false;
+    }, marker, { timeout: 300000, polling: 200 }).then((handle) => handle.jsonValue());
+  });
   if (outcome === 'reloaded') await writable(page);
   return outcome;
 }

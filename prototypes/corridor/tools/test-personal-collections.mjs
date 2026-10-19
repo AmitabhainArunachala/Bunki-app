@@ -128,7 +128,7 @@ await test('private route and all module dependencies are packaged and precached
   const worker=vm.createContext({self:{registration:{scope},location:{origin:new URL(scope).origin},addEventListener(){}},
     URL,Request,Response,Headers,TextEncoder,TextDecoder,crypto:webcrypto});
   vm.runInContext(readFileSync(new URL('../sw.js',import.meta.url),'utf8'),worker);
-  const precached=new Set(vm.runInContext('[...SHELL,...BOOT_DATA,...GUIDED_ROOM]',worker));
+  const precached=new Set(vm.runInContext('[...SHELL,...BOOT_DATA,...GUIDED_ROOM,...SPEAK_ROOM]',worker));
   for(const path of [...['mount.mjs','engine.mjs','schema.mjs','store.mjs','enrichment.mjs','host-bridge.mjs','personal.css'].map(file=>`decks/personal/${file}`),'vendor/ts-fsrs.mjs','fonts.css']) {
     assert(CORRIDOR_REQUIRED_ROOTS.some(root=>path===root||path.startsWith(`${root}/`)),`${path} is a required release asset`);
     assert(assembled.has(path),`${path} is assembled into the release`);

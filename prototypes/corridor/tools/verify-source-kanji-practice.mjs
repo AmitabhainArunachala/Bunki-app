@@ -19,6 +19,24 @@ import { silenceBrowserAudio, TEST_AUDIO_OUTPUT } from './browser-audio-silence.
 import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 
+/** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
+ * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
+async function answeringRestore(page, run) {
+  let problem;
+  const answer = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', answer);
+  try { const value = await run(); if (problem) throw problem; return value; }
+  catch (error) { throw problem || error; }
+  finally { page.off('dialog', answer); }
+}
+
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable, already built KAIRO_SITE_DIR');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
 assert(!existsSync(join(OUT, 'receipt.json')), 'Use a fresh KAIRO_EVIDENCE_DIR');
@@ -388,18 +406,25 @@ async function faceDown(fixture, entry) {
   if (entry.plan.kind === 'kanji-reading') {
     assert.equal(await fixture.page.locator('.sentence-recall .sentence-answer').textContent(), fixture.source.token.s);
     assert.equal(await fixture.page.locator('.sentence-recall .sentence-response-text').count(), 0, 'Supplied kana is hidden before checking or revealing');
-    assert.match(await fixture.page.locator('.sentence-recall').innerText(), /whole word[\s\S]*unreviewed/u);
+    // S (82361f78; John, 10-16: no provenance label in the learner's app): the face says how the reading is checked and
+    // never that the supplied reading is automatic or unreviewed
+    const recall = await fixture.page.locator('.sentence-recall').innerText();
+    assert.match(recall, /Read the whole word in this sentence\./u);
+    assert.doesNotMatch(recall, /automatic|unreviewed|not been reviewed/iu);
   }
   assert.equal(await fixture.page.locator('#sentence-recall-check').isDisabled(), true);
 }
-// Again turns the same card face-down at once (Anki's learn-ahead, 35f8b940): no countdown beat and
-// no いま見る. The graded card is reinserted as the session's very next item, answer box empty.
+// Again reinserts the graded card as the session's very next item. SRS (b00e5e93): a reinserted learning step waits for
+// its due, so with only that step left the sitting closes, says when it comes back and offers it now, early; there is no
+// countdown and no いま見る (35f8b940's face-down-at-once beat went with them). The card stays face-down until then.
 async function againReturns(fixture, entry, session) {
   const page = fixture.page;
-  await page.waitForFunction(() => !document.querySelector('.grade')
-    && document.getElementById('sentence-recall-answer')?.value === '');
+  await page.locator('#review-pause').waitFor();
+  assert.equal(await page.locator('.grade').count(), 0);
+  assert.equal(await page.locator('#sentence-recall-answer').count(), 0, 'The learning step waits for its due');
   assert.equal(await page.locator('[data-review-wait]').count(), 0, 'Again holds no countdown');
-  await faceDown(fixture, entry);
+  assert.match(await page.locator('#review-pause').innerText(), /^1 word is in a learning step \(the next is due in /u);
+  assert.equal(await page.locator('#review-ahead').count(), 1, 'The close offers the step now, early');
   assert.deepEqual(await page.evaluate(() => window.__KAIRO_SRS__.session()),
     { queue: session.queue + 1, ix: session.ix + 1, deferred: session.deferred }, 'Again reinserts the card as the next item');
 }
@@ -537,8 +562,8 @@ async function exportUi(fixture) {
 }
 async function importUi(fixture, file) {
   await tray(fixture); const page = fixture.page, timeOrigin = await page.evaluate(() => performance.timeOrigin), start = fixture.assetLoads.length;
-  await page.locator('#import-file').setInputFiles(file);
-  await page.waitForFunction(prior => performance.timeOrigin !== prior && document.body.dataset.ready === '1', timeOrigin, { timeout: 30000 });
+  await answeringRestore(page, async () => { await page.locator('#import-file').setInputFiles(file);
+    await page.waitForFunction(prior => performance.timeOrigin !== prior && document.body.dataset.ready === '1', timeOrigin, { timeout: 30000 }); });
   await ready(fixture); await attestRuntime(fixture, start, 'actual-ui-import-reload');
 }
 
@@ -552,31 +577,20 @@ async function ordinary(fixture) {
   const read = await readAppRecordSnapshot(page), readingObservation = read.record.obslog.at(-1);
   assert(readingObservation[0] >= tapStarted && readingObservation[0] <= Date.now());
   assert.deepEqual(readingObservation.slice(1), ['tap', `word:${source.token.b}`, 1, source.id]);
-  assert.deepEqual(read.record.obslog, [...sourceBefore.record.obslog, readingObservation]); unchangedExcept(sourceBefore, read, ['obslog']);
-  assert.equal(await token.getAttribute('data-ladder-rung'), 'reading');
-  assert.equal(await token.locator('rt:not(.hidden-rt)').allTextContents().then(parts => parts.join('')), source.token.r);
-  assert.equal(await page.locator('#mini,#sheet').count(), 0, 'The first activation exposes only the source reading');
-  const stageStarted = Date.now();
-  await token.click();
-  await page.locator('#mini').waitFor();
-  // G2 · the tap that shows the meaning (the stage) is also his encounter with the word as it reads here and a help he
-  // asked of this article: it writes the encounter ledger (met) and the help signal (readHelp) beside the observation.
-  // Exactly the word's own identity in each; no other root. The reading rung before it wrote neither.
+  // G2 × G3 in the merged app (ba36905a: "the ledger counts the reading the first tap raises"): the tap that raises the
+  // reading is his encounter with the word as it reads here and a help he asked of this article, so its tap row carries
+  // the encounter ledger (met) and the help signal (readHelp) in the same write. Exactly the word's own identity in each;
+  // no other root. The stage after it adds its observation alone: the day is counted and the help already names the word.
   const met = JSON.stringify([1, 'word', source.token.b, 'core', null, source.token.r]);
-  await waitForAppRecord(page, record => record.obslog.length === read.record.obslog.length + 1 && !!record.met?.entries?.[met]
-    && !!record.readHelp?.articles?.[source.id], { description: 'the stage\'s observation, its encounter and its help' });
-  const tapped = await readAppRecordSnapshot(page), tap = tapped.record.obslog.at(-1);
-  assert(tap[0] >= stageStarted && tap[0] <= Date.now());
-  assert.deepEqual(tap.slice(1), ['tap', `word:${source.token.b}`, 2, source.id]);
-  assert.deepEqual(tapped.record.obslog, [...read.record.obslog, tap]); unchangedExcept(read, tapped, ['obslog', 'met', 'readHelp']);
-  assert.deepEqual(Object.keys(tapped.record.met.entries).filter(key => !Object.hasOwn(sourceBefore.record.met?.entries || {}, key)), [met],
+  assert.deepEqual(read.record.obslog, [...sourceBefore.record.obslog, readingObservation]); unchangedExcept(sourceBefore, read, ['obslog', 'met', 'readHelp']);
+  assert.deepEqual(Object.keys(read.record.met?.entries || {}).filter(key => !Object.hasOwn(sourceBefore.record.met?.entries || {}, key)), [met],
     'The tap adds exactly its own encounter: the core word, read as it reads here');
   for (const [key, entry] of Object.entries(sourceBefore.record.met?.entries || {}))
-    assert.deepEqual(tapped.record.met.entries[key], entry, 'The tap leaves every other encounter as it was');
-  const today = tapped.record.met.entries[met];
+    assert.deepEqual(read.record.met.entries[key], entry, 'The tap leaves every other encounter as it was');
+  const today = read.record.met.entries[met];
   assert(Number.isSafeInteger(today.first) && today.last === today.first && today.days === 1,
     `A first encounter is one day, first = last: ${JSON.stringify(today)}`);
-  const helpBefore = sourceBefore.record.readHelp, help = tapped.record.readHelp;
+  const helpBefore = sourceBefore.record.readHelp, help = read.record.readHelp;
   assert.equal(help?.version, 1, 'The help signal is the versioned root');
   assert.deepEqual(Object.keys(help.articles).filter(id => !Object.hasOwn(helpBefore?.articles || {}, id)), [source.id],
     'The tap adds exactly its own article to the help signal');
@@ -588,6 +602,17 @@ async function ordinary(fixture) {
   if (!helpBefore) assert(Number.isSafeInteger(help.since) && help.since >= tapStarted && help.since <= Date.now(),
     `A new help signal starts at the tap: ${help.since}`);
   else assert.equal(help.since, helpBefore.since, 'An existing help signal keeps its start');
+  assert.equal(await token.getAttribute('data-ladder-rung'), 'reading');
+  assert.equal(await token.locator('rt:not(.hidden-rt)').allTextContents().then(parts => parts.join('')), source.token.r);
+  assert.equal(await page.locator('#mini,#sheet').count(), 0, 'The first activation exposes only the source reading');
+  const stageStarted = Date.now();
+  await token.click();
+  await page.locator('#mini').waitFor();
+  await waitForAppRecord(page, record => record.obslog.length === read.record.obslog.length + 1, { description: 'the stage\'s observation' });
+  const tapped = await readAppRecordSnapshot(page), tap = tapped.record.obslog.at(-1);
+  assert(tap[0] >= stageStarted && tap[0] <= Date.now());
+  assert.deepEqual(tap.slice(1), ['tap', `word:${source.token.b}`, 2, source.id]);
+  assert.deepEqual(tapped.record.obslog, [...read.record.obslog, tap]); unchangedExcept(read, tapped, ['obslog']);
   assert.equal(await token.getAttribute('data-ladder-rung'), 'stage');
   assert.equal(await page.locator('#mini .mini-word').textContent(), source.token.b);
   assert.equal(await page.locator('#mini .mini-reading').textContent(), source.token.r);
@@ -620,7 +645,11 @@ async function ordinary(fixture) {
   await page.locator('#source-kanji-practice').click(); await page.locator('#kanji-reading-confirm').waitFor();
   await focusedInViewport(page, 'kanji-reading-confirm');
   assert.equal(await page.locator('.sentence-original').textContent(), source.quote);
-  assert.match(await page.locator('main').innerText(), /automatically supplied reading has not been reviewed[\s\S]*whole word/u);
+  // S (82361f78; John, 10-16: no provenance label in the learner's app): the choice says how a response is compared and
+  // never that the supplied reading is automatic or unreviewed
+  const choice = await page.locator('main').innerText();
+  assert.match(choice, /Your response is compared with the reading of the whole word in this sentence\./u);
+  assert.doesNotMatch(choice, /automatic|unreviewed|not been reviewed/iu);
   retained(beforeKanji, await snapshot(fixture, 'reading-choice-neutral'));
   await shot(fixture, 'explicit-whole-token-reading-choice');
   await page.locator('#sentence-practice-back').click();

@@ -28,6 +28,24 @@ import { buildListeningCues, listeningSentences } from './build-listening-cues.m
 import { runtimeLock, voiceForRole } from './voice-lock.mjs';
 import { DEVICE_TUTOR, setUpDeviceTutor } from './tutor-fixture-support.mjs';
 
+/** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
+ * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
+async function answeringRestore(page, run) {
+  let problem;
+  const answer = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', answer);
+  try { const value = await run(); if (problem) throw problem; return value; }
+  catch (error) { throw problem || error; }
+  finally { page.off('dialog', answer); }
+}
+
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable staged KAIRO_SITE_DIR');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
 assert(!existsSync(join(OUT, 'receipt.json')), 'Use a fresh evidence directory');
@@ -303,8 +321,8 @@ for (const engine of engines) for (const width of sizes) {
     assert.deepEqual(JSON.parse(readFileSync(backupPath)).record.sentencePractice, completed.sentencePractice);
     await close(); profile = 'profile-restored'; await open(); await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page);
     await shelf(page); await page.locator('#tray').click(); const timeOrigin = await page.evaluate(() => performance.timeOrigin);
-    await page.locator('#import-file').setInputFiles(backupPath);
-    await page.waitForFunction(old => performance.timeOrigin !== old && document.body?.dataset.ready === '1', timeOrigin, { timeout: 30000 });
+    await answeringRestore(page, async () => { await page.locator('#import-file').setInputFiles(backupPath);
+      await page.waitForFunction(old => performance.timeOrigin !== old && document.body?.dataset.ready === '1', timeOrigin, { timeout: 30000 }); });
     // Warm the original source through its actual action before disconnecting.
     await openSaved(); await page.locator('.learning-source summary').click(); await page.locator('#learning-source-return').click(); await returned(page);
     await page.locator('#reader-source-back').click(); await page.locator('#sentence-production-text').waitFor();

@@ -29,6 +29,24 @@ import { chromium, webkit } from 'playwright-core';
 import { readAppRecordSnapshot, readAppRecord, waitForAppRecord, armRecordWriteFailure, clearRecordWriteFailure } from './record-test-support.mjs';
 import { silenceBrowserAudio, TEST_AUDIO_OUTPUT } from './browser-audio-silence.mjs';
 
+/** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
+ * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
+async function answeringRestore(page, run) {
+  let problem;
+  const answer = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', answer);
+  try { const value = await run(); if (problem) throw problem; return value; }
+  catch (error) { throw problem || error; }
+  finally { page.off('dialog', answer); }
+}
+
 const LEGACY_CASES = [
   'two-completed-attempts-and-failed-save-actions',
   'saved-form-survives-changed-upstream-and-no-set-fetch-reload',
@@ -1392,13 +1410,15 @@ try {
         await restored.page.evaluate(() => {
           window.__practiceBeforeImport = true;
         });
-        await restored.page.locator('#import-file').setInputFiles({
-          name: 'synthetic-practice-backup.json',
-          mimeType: 'application/json',
-          buffer: bytes,
-        });
-        await restored.page.waitForFunction(() => window.__practiceBeforeImport !== true, null, {
-          timeout: 20_000,
+        await answeringRestore(restored.page, async () => {
+          await restored.page.locator('#import-file').setInputFiles({
+            name: 'synthetic-practice-backup.json',
+            mimeType: 'application/json',
+            buffer: bytes,
+          });
+          await restored.page.waitForFunction(() => window.__practiceBeforeImport !== true, null, {
+            timeout: 20_000,
+          });
         });
         await ready(restored.page);
         const restoredAfter = await readAppRecordSnapshot(restored.page);

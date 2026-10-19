@@ -85,12 +85,27 @@ const stable = async () => {
   await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
 };
 const capture = async (name) => { await stable(); if (shots) await page.screenshot({ path: resolve(shots, `${name}.png`) }); };
+// A word page takes its complete entry by drawing itself again when the bank's examples and the dictionary's senses
+// arrive (refreshWordSheet; the levels room re-renders whole), so a .sheet a locator found can be detached before it
+// is measured: boundingBox() then returns null and an evaluate reads a detached node's zero widths. Wait for the senses,
+// then read the one live page in a single turn, where no redraw can come between finding it and measuring it.
+const completeEntry = () => page.waitForFunction(() => {
+  const sheets = document.querySelectorAll('.sheet');
+  return sheets.length === 1 && !sheets[0].querySelector('.dictionary-opening');
+});
+const livePage = async () => (await page.waitForFunction(() => {
+  const sheets = document.querySelectorAll('.sheet');
+  if (sheets.length !== 1 || !sheets[0].getClientRects().length) return null;
+  const [sheet] = sheets; const rect = sheet.getBoundingClientRect();
+  return { x: rect.x, width: rect.width, scrollWidth: sheet.scrollWidth, clientWidth: sheet.clientWidth,
+    disclosureOpen: sheet.querySelector('.reference-entry-provenance')?.open === true };
+})).jsonValue();
+const noEvidence = () => ({ taken: [], srs: {}, revlog: [], obslog: [], lessonsDone: {}, mockDone: {}, mockRun: null });
 const evidence = async () => {
   const s = await readAppRecord(page);
-  const defaults = { taken: [], srs: {}, revlog: [], obslog: [], lessonsDone: {}, mockDone: {}, mockRun: null };
   // A first reader bookmark materializes the envelope; empty fields still
   // mean zero evidence, whether absent on disk or normalized by the store.
-  return Object.fromEntries(Object.entries(defaults).map(([key, empty]) => [key, s[key] ?? empty]));
+  return Object.fromEntries(Object.entries(noEvidence()).map(([key, empty]) => [key, s[key] ?? empty]));
 };
 const json = (path) => JSON.parse(readFileSync(resolve(root, path), 'utf8'));
 const fixtures = {
@@ -103,9 +118,13 @@ let initial;
 try {
   await check('library names the current room, exposes dictionary search, and starts without study debt', async () => {
     await boot(); initial = await evidence(); await openShelfDoor(page, '#levels-link');
-    assert.equal(await page.locator('.crumb b').innerText(), 'reference library');
-    assert.match(await page.locator('.crumb').getAttribute('aria-label'), /bookshelf.*reference library/);
+    // the one room-name table (one-hand E, 778f52b8) names this room in its title, sign and way back
+    assert.equal(await page.locator('.crumb b').innerText(), 'JLPT & Kanken lists');
+    assert.equal(await page.locator('.crumb').getAttribute('aria-label'), 'Bookshelf › JLPT & Kanken lists');
     assert.ok(await page.locator('#reference-global-search').isVisible());
+    // no study debt: a fresh learner reaches the library with nothing enrolled, scheduled or reviewed, and looking adds none
+    assert.deepEqual(initial, noEvidence());
+    assert.deepEqual(await evidence(), initial);
     await capture('after-mobile-overview');
   });
   await check('paged/sorted collection → canonical sheet → row restores page, sort, scroll and focus', async () => {
@@ -247,10 +266,12 @@ try {
       await capture(`after-overview-${width}`);
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
       await page.click('[data-reference-collection="jlpt:N5"]'); await page.fill('#reference-search', '学校'); await page.click('[data-entry-id="学校"]');
-      await page.waitForSelector('[data-kanjirow="学"]'); await capture(`after-word-${width}`);
-      await page.locator('.reference-entry-provenance summary').click(); await capture(`after-provenance-${width}`);
-      assert.ok(await page.locator('.sheet').evaluate((n) => n.scrollWidth <= n.clientWidth + 1));
-      const rect = await page.locator('.sheet').boundingBox(); assert.ok(rect.x >= 0 && rect.x + rect.width <= width + 1);
+      await page.waitForSelector('[data-kanjirow="学"]'); await completeEntry(); await capture(`after-word-${width}`);
+      await page.locator('.reference-entry-provenance summary').click();
+      const sheet = await livePage(); await capture(`after-provenance-${width}`);
+      assert.ok(sheet.disclosureOpen, 'the source-tag disclosure is open on the page measured');
+      assert.ok(sheet.scrollWidth <= sheet.clientWidth + 1);
+      assert.ok(sheet.width > 0 && sheet.x >= 0 && sheet.x + sheet.width <= width + 1);
     });
   }
   await check('nested article detour restores the exact live review, taken item and source identity', async () => {

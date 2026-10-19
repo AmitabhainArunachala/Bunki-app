@@ -31,6 +31,24 @@ import {
   clearRecordWriteFailure,
 } from './record-test-support.mjs';
 
+/** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
+ * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
+async function answeringRestore(page, run) {
+  let problem;
+  const answer = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', answer);
+  try { const value = await run(); if (problem) throw problem; return value; }
+  catch (error) { throw problem || error; }
+  finally { page.off('dialog', answer); }
+}
+
 const hash = (value) => createHash('sha256').update(value).digest('hex');
 const sourcePath = fileURLToPath(import.meta.url);
 const repository = resolve(dirname(sourcePath), '../../..');
@@ -1185,13 +1203,15 @@ async function ui() {
           await restored.page.evaluate(() => {
             window.publisherBeforeImport = true;
           });
-          await restored.page.locator('#import-file').setInputFiles({
-            name: 'synthetic-publisher-backup.json',
-            mimeType: 'application/json',
-            buffer: bytes,
-          });
-          await restored.page.waitForFunction(() => window.publisherBeforeImport !== true, null, {
-            timeout: 20_000,
+          await answeringRestore(restored.page, async () => {
+            await restored.page.locator('#import-file').setInputFiles({
+              name: 'synthetic-publisher-backup.json',
+              mimeType: 'application/json',
+              buffer: bytes,
+            });
+            await restored.page.waitForFunction(() => window.publisherBeforeImport !== true, null, {
+              timeout: 20_000,
+            });
           });
           await ready(restored.page);
           assert.deepEqual((await record(restored.page)).publisherLibrary, saved.publisherLibrary);

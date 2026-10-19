@@ -10,6 +10,23 @@ import { extname, resolve } from 'node:path';
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecordSnapshot, armRecordWriteFailure, clearRecordWriteFailure } from './record-test-support.mjs';
+/** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
+ * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
+async function answeringRestore(page, run) {
+  let problem;
+  const answer = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', answer);
+  try { const value = await run(); if (problem) throw problem; return value; }
+  catch (error) { throw problem || error; }
+  finally { page.off('dialog', answer); }
+}
 
 const SITE = resolveCorridorSite();
 const OUT = resolveCorridorEvidence();
@@ -165,9 +182,22 @@ async function assertUiNotes(page, state) {
   await page.waitForFunction((revision) => document.querySelector('#record-notes')?.dataset.revision === String(revision), state.snapshot.revision);
   const rows = await exact(page, () => [...document.querySelectorAll('article.record-note')].map((row) => ({
     // childElements counts elements the note's own bytes could have made: the app's lookup doors on its
-    // Japanese words (a wrapper holding text-only prose word spans) are chrome, not markup from the note
+    // Japanese words (a wrapper holding text-only prose word spans) are chrome, not markup from the note, and so is Q's
+    // line-breaking inside that wrapper (a052490f): a <wbr> between words, a no-break unit (span.ja-unit) for a word's
+    // segments or a Latin or number run, a kinsoku glue holding a mark to its neighbour. Each is recognised by its exact
+    // shape and place; any other element still counts.
     id: row.dataset.noteId, segments: [...row.querySelectorAll('.record-note-segment')].map((node) => ({ kind: node.dataset.segmentKind, text: node.textContent,
-      childElements: [...node.querySelectorAll('*')].filter((child) => !(child.matches('span.japanese-lookup-text') && child.parentElement === node) && !(child.matches('span.japanese-lookup-word[role="presentation"][data-lookup-text]') && child.parentElement?.matches('span.japanese-lookup-text') && !child.childElementCount)).length })),
+      childElements: [...node.querySelectorAll('*')].filter((child) => {
+        if (child.matches('span.japanese-lookup-text')) return child.parentElement !== node;
+        const text = child.parentElement?.closest('span.japanese-lookup-text');
+        if (!text || text.parentElement !== node) return true;
+        for (let up = child.parentElement; up !== text; up = up.parentElement) if (!up.matches('span.ja-unit, span.kinsoku-glue')) return true;
+        const names = [...child.attributes].map((attribute) => attribute.name).join(' ');
+        if (child.matches('wbr')) return names !== '';
+        if (child.matches('span.ja-unit')) return !(child.className === 'ja-unit' && names === 'class');
+        if (child.matches('span.kinsoku-glue')) return !(/^kinsoku-glue( kinsoku-open)?$/u.test(child.className) && names === 'class');
+        return !(child.matches('span.japanese-lookup-word[role="presentation"][data-lookup-text]') && !child.childElementCount);
+      }).length })),
   })));
   assert.equal(rows.length, state.snapshot.replica.operations.length);
   for (const operation of state.snapshot.replica.operations) {
@@ -499,8 +529,8 @@ try {
         assert.equal(await page.locator('#personal-note-input').inputValue(), '');
         assert.equal(await page.locator('#note-input').inputValue(), 'Independent builder feedback draft');
         await page.evaluate(() => { window.__ownNoteImportDocument = true; });
-        await page.locator('#import-file').setInputFiles(exported.file);
-        await page.waitForFunction(() => !window.__ownNoteImportDocument && document.body.dataset.ready === '1');
+        await answeringRestore(page, async () => { await page.locator('#import-file').setInputFiles(exported.file);
+          await page.waitForFunction(() => !window.__ownNoteImportDocument && document.body.dataset.ready === '1'); });
         await tray(page);
         const restored = await admit(page, evidence, 'own-journal-ui-backup-restored');
         assert.deepEqual(restored.record, exported.backup.record, 'Explicit restore uses the actual file, whose stats precede the export timestamp');
