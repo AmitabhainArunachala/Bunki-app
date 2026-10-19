@@ -742,7 +742,7 @@ export function paintStillFor(canvas, spec) {
 }
 
 /* ------------------------------------------------------- live engines
- * Handle contract (both backends): { kind, ondead, rewrite(), stop() },
+ * Handle contract (both backends): { kind, ondead, rewrite(), setSpeed(speed), stop() },
  * GPU adds .ready (a promise that rejects on validation failure). */
 function startGPU(canvas, spec, device) {
   let alive = true, dead = false, seed = 0;
@@ -778,7 +778,7 @@ function startGPU(canvas, spec, device) {
   // detail the hand just placed. ゆっくり dilates the clock (speed < 1):
   // slower hand, MORE physics per stroke — richer ink, never poorer.
   // No auto-rewrite: 触れて、もう一度 — the hand writes again on touch.
-  let writing = false, writeSpeed = 1, t0 = 0;
+  let writing = false, writeSpeed = 1, t0 = 0, wallAnchor = 0, virtualAnchor = 0;
   let looping = false; // the frame loop runs only while there is something to draw
   function begin(opts) {
     try {
@@ -790,6 +790,7 @@ function startGPU(canvas, spec, device) {
       device.queue.copyExternalImageToTexture({ source: spec.ground(r, N) }, { texture: engine.ground }, [N, N]);
       uploadSprite(0);
       t0 = performance.now();
+      wallAnchor = virtualAnchor = t0;
       writer.start(t0);
       writing = true;
       if (spec.onPhase) spec.onPhase('writing');
@@ -809,6 +810,9 @@ function startGPU(canvas, spec, device) {
     device.queue.submit([e.finish()]);
   }
   function frame(now) {
+    // rAF's timestamp can predate a speed input handled before this callback.
+    // Sample the same monotonic clock as begin/setSpeed: never extrapolate back.
+    now = performance.now();
     if (!alive) return;
     if (dead) { if (handle.ondead) handle.ondead(); return; }
     if (!writing) {
@@ -819,7 +823,7 @@ function startGPU(canvas, spec, device) {
     }
     requestAnimationFrame(frame);
     try {
-      const vNow = t0 + (now - t0) * writeSpeed;
+      const vNow = virtualAnchor + (now - wallAnchor) * writeSpeed;
       const step = writer.advance(vNow);
       if (step.beginStroke !== null) {
         uploadSprite(step.beginStroke);
@@ -833,6 +837,15 @@ function startGPU(canvas, spec, device) {
   const handle = {
     kind: 'gpu',
     ondead: null,
+    // Preserve the hand's virtual position: a rate change must never clear or
+    // reseed the sheet, nor jump forward/back along the current stroke.
+    setSpeed(speed) {
+      if (!alive || !Number.isFinite(speed) || speed <= 0) return;
+      const now = performance.now();
+      virtualAnchor += (now - wallAnchor) * writeSpeed;
+      wallAnchor = now;
+      writeSpeed = speed;
+    },
     rewrite(opts) { if (alive && !dead) begin(opts); },
     stop() { alive = false; try { engine.destroy(); } catch { /* already gone */ } },
     ready: initCheck,
@@ -984,7 +997,7 @@ function startGL2(canvas, spec) {
   // wall speed via iterations, ゆっくり via speed < 1 (more sim, richer ink)
   // 原拍 GALLERY LAW — same as the gpu path: wall-clock hand, two sim steps
   // per displayed frame (the gallery's own gl2 rhythm), freeze at finish.
-  let writing = false, writeSpeed = 1, t0 = 0;
+  let writing = false, writeSpeed = 1, t0 = 0, wallAnchor = 0, virtualAnchor = 0;
   let looping = false; // the frame loop runs only while there is something to draw
   function draw() {
     gl.bindBuffer(gl.ARRAY_BUFFER, quad);
@@ -1009,6 +1022,7 @@ function startGL2(canvas, spec) {
     }
     uploadSprite(0);
     t0 = performance.now();
+    wallAnchor = virtualAnchor = t0;
     writer.start(t0);
     writing = true;
     if (spec.onPhase) spec.onPhase('writing');
@@ -1075,6 +1089,8 @@ function startGL2(canvas, spec) {
     draw();
   }
   function frame(now) {
+    // Use callback time, as begin/setSpeed do; a queued rAF timestamp may be stale.
+    now = performance.now();
     if (!alive) return;
     if (!writing) {
       // FREEZE at finish (gallery law): the simulation already stops, but the
@@ -1087,7 +1103,7 @@ function startGL2(canvas, spec) {
       return;
     }
     requestAnimationFrame(frame);
-    const vNow = t0 + (now - t0) * writeSpeed;
+    const vNow = virtualAnchor + (now - wallAnchor) * writeSpeed;
     const out = writer.advance(vNow);
     if (out.beginStroke !== null) {
       uploadSprite(out.beginStroke);
@@ -1102,6 +1118,15 @@ function startGL2(canvas, spec) {
   const handle = {
     kind: 'gl2',
     ondead: null,
+    // Preserve the hand's virtual position: a rate change must never clear or
+    // reseed the sheet, nor jump forward/back along the current stroke.
+    setSpeed(speed) {
+      if (!alive || !Number.isFinite(speed) || speed <= 0) return;
+      const now = performance.now();
+      virtualAnchor += (now - wallAnchor) * writeSpeed;
+      wallAnchor = now;
+      writeSpeed = speed;
+    },
     rewrite(opts) { if (alive) begin(opts); },
     stop() {
       alive = false;

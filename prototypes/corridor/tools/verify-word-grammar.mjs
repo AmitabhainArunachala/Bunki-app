@@ -3516,10 +3516,10 @@ try {
       }
       const { slow, middle, fast } = measured;
       const expect = (speed) => Math.round(Math.max(45, Math.min(110, 1400 / middle.strokes)) * middle.strokes * (1.1 / speed));
-      check('G4.tempo.slider', 'the one slider set slow, fast and middle (0.7 · 1.6 · 1.1), as the device keeps it',
-        slow.set.value === '0' && slow.set.stored === '0.7' && fast.set.value === '2' && fast.set.stored === '1.6' && middle.set.value === '1' && middle.set.stored === '1.1', measured);
+      check('G4.tempo.slider', 'the one slider set slow, fast and middle (0.55 · 2.2 · 1.1), as the device keeps it',
+        slow.set.value === '0' && slow.set.stored === '0.55' && fast.set.value === '2' && fast.set.stored === '2.2' && middle.set.value === '1' && middle.set.stored === '1.1', measured);
       check('G4.tempo.planned', `総理 (${middle.strokes} strokes): each stroke min(110, 1400 ÷ strokes) ≥ 45 ms at the middle step — 1.4 s — scaled by the slider`,
-        middle.strokes === 25 && middle.planned === 1400 && slow.planned === expect(0.7) && fast.planned === expect(1.6), measured);
+        middle.strokes === 25 && middle.planned === 1400 && slow.planned === expect(0.55) && fast.planned === expect(2.2), measured);
       check('G4.tempo.measured', 'measured on the page clock, slow > middle > fast, each within a frame or two of its plan, and the middle ≤ 1.4 s (+ one frame)',
         [slow, middle, fast].every((m) => Number.isFinite(m.wall) && m.wall >= m.planned - 20 && m.wall <= m.planned + 120) &&
         slow.wall > middle.wall && middle.wall > fast.wall && middle.wall <= 1400 + 34, measured);
