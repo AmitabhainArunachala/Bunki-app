@@ -12754,7 +12754,9 @@ function placeSealStrip(open) {
   }
   // a room of its own under the word's paragraph: nothing is laid over a control; then the reading moves the least that
   // brings the whole strip onto the glass
-  const block = anchor.closest('p, li, dd, blockquote, [data-reader-prose], [data-lookup-block], .example-ja, .sent-reader') || anchor.parentElement;
+  // Hfix-2e · a word in the word web's plate (its nodes stand at absolute places) takes its room under the whole plate,
+  // never at the top of its layer over the plate's other nodes
+  const block = anchor.closest('p, li, dd, blockquote, [data-reader-prose], [data-lookup-block], .example-ja, .sent-reader, .ww-plate') || anchor.parentElement;
   if (!open.room) {
     open.room = el('div', 'seal-strip-room');
     open.room.setAttribute('aria-hidden', 'true');
@@ -23547,11 +23549,19 @@ function renderSkipLookup(host, options = {}) {
 function kdxGridShown(chars, cap, open) {
   return open ? chars : chars.slice(0, cap);
 }
+/** Hfix-2e (KT-3) · a grid glyph's name says the kanji itself, then its meaning (「稿 — draft」), with the reading its
+ * grid found it by where it has one (「食 たべる — eat」): the gloss alone hid the glyph from VoiceOver. A kanji the
+ * lessons lack keeps its reference meaning. */
+function kdxGlyphName(c, reading = '') {
+  const gloss = String((D.kanji[c] || kanjiReference(c))?.m || '').toLowerCase();
+  const head = reading ? `${c} ${reading}` : c;
+  return gloss ? `${head} — ${gloss}` : head;
+}
 /** The shared results grid — every hit opens the same kanji entry. The count is the true one, and a grid longer
  * than its first page carries one "show all" door (K05). `key` names the query: an opened grid stays open for that
  * query in this session (S.kdx, never the record), so Back from an entry lands on the same place. `empty: false`
  * leaves out the no-match line when the lookup itself is not complete (a failure is not a no-match, K06). */
-function renderKdxGrid(host, chars, CAP = 200, key = '', { empty = true, mark = null } = {}) {
+function renderKdxGrid(host, chars, CAP = 200, key = '', { empty = true, mark = null, readingOf = null } = {}) {
   const open = !!key && S.kdx?.open === key;
   const heading = (shown) => tx(`見つかった字 — ${chars.length}`, shown < chars.length
     ? `${chars.length.toLocaleString('en')} found — first ${shown} shown` : `${chars.length.toLocaleString('en')} found`);
@@ -23568,7 +23578,7 @@ function renderKdxGrid(host, chars, CAP = 200, key = '', { empty = true, mark = 
       const b = el('button', 'kdx-glyph', c);
       b.type = 'button';
       b.dataset.kdxHit = c;
-      if (D.kanji[c]) b.setAttribute('aria-label', D.kanji[c].m);
+      b.setAttribute('aria-label', kdxGlyphName(c, readingOf?.(c) || ''));
       mark?.(b, c);
       b.addEventListener('click', () => go({ t: 'kanji', id: c }));
       grid.append(b);
@@ -24098,7 +24108,13 @@ function kdxTextResults(kind) {
         wrap.append(retry);
       }
     }
-    renderKdxGrid(wrap, chars, 200, `reading:${qh}`, { empty: state === 'complete' });
+    // Hfix-2e (KT-3) · each glyph's name carries the reading it was found by (た.べる is said たべる)
+    const readingOf = (c) => {
+      const k = kanjiReference(c) || D.kanji[c];
+      const hit = [...(k?.on || []), ...(k?.kun || [])].find((r) => helpers.readingMatch([r], qh) === rank.get(c));
+      return hit ? String(hit).replace(/[.\-]/gu, '') : '';
+    };
+    renderKdxGrid(wrap, chars, 200, `reading:${qh}`, { empty: state === 'complete', readingOf });
     return wrap;
   }
   const ql = q.toLowerCase();
@@ -24202,7 +24218,7 @@ function kdxDrawResults(chars) {
   for (const c of chars) {
     const b = el('button', 'kdx-glyph', c);
     b.type = 'button';
-    if (D.kanji[c]) b.setAttribute('aria-label', D.kanji[c].m);
+    b.setAttribute('aria-label', kdxGlyphName(c));
     b.addEventListener('click', () => go({ t: 'kanji', id: c }));
     grid.append(b);
   }
@@ -24592,7 +24608,8 @@ function wwPassages(w, cap = 2) {
     wwSentences(p, (t) => t.b === w, cap, out);
     if (out.length >= cap) return out;
   }
-  for (const ex of D.exampleBank?.get(w) || []) {
+  // KT-6 · only the word's own bank lines: a kana key's homophones are not its passages
+  for (const ex of bankExamplesFor(w)) {
     if (out.length >= cap) break;
     out.push({ ...ex, target: w });
   }
@@ -24921,16 +24938,22 @@ function wwPlate(model, section) {
   glyph.dataset.len = String(Math.min([...c.glyph].length, 4));
   glyph.title = tx('語釈を開く', 'Open the quick look');
   glyph.setAttribute('aria-haspopup', 'dialog');
+  const openCentre = (keyboard = false) => {
+    if (!centreNode) { go({ t: 'radical', id: c.key }, { invoker: glyph }); return; }
+    openSlip(centreNode, { anchor: glyph, from: 'lookup', focus: keyboard, readingVisible: () => !!c.reading });
+  };
   glyph.addEventListener('click', (event) => {
     event.stopPropagation();
-    if (!centreNode) { go({ t: 'radical', id: c.key }, { invoker: glyph }); return; }
-    openSlip(centreNode, { anchor: glyph, from: 'lookup', focus: event.detail === 0, readingVisible: () => !!c.reading });
+    if (event.detail !== 0 && Date.now() < swallowClickUntil) return; // the hold's own release
+    openCentre(event.detail === 0);
   });
   glyph.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape' || !document.getElementById('mini')) return;
     event.preventDefault(); event.stopPropagation();
     removeMini();
   });
+  // Hfix-2e · the headword holds like every word in the web (S1): the ring, the 印, the strip
+  wireWordWebHold(glyph, () => centreNode, () => openCentre(true));
   centre.append(glyph);
   if (c.gloss) centre.append(el('span', 'ww-c-m', c.gloss));
   inner.append(centre);
@@ -25133,7 +25156,10 @@ function wwDetail(model, section) {
       b.dataset.uiContentValue = k;
       b.append(wwLearn('span', null, k));
       b.setAttribute('aria-label', tx(`漢字「${k}」をひらく`, `Open the kanji ${k}`));
-      b.addEventListener('click', event => openWordWebLadder({ type: 'kanji', key: k }, section, b, event.detail === 0));
+      b.addEventListener('click', (event) => {
+        if (event.detail !== 0 && Date.now() < swallowClickUntil) return; // the hold's own release (Hfix-2e: a mouse's too)
+        openWordWebLadder({ type: 'kanji', key: k }, section, b, event.detail === 0);
+      });
       wireWordWebHold(b, () => ({ t: 'kanji', id: k }),
         () => openWordWebLadder({ type: 'kanji', key: k }, section, b, true, true));
       grid.append(b);
@@ -25208,35 +25234,130 @@ function openWordWebLadder(item, section, anchor, keyboard = false, redo = false
     },
   });
 }
-/** Press-and-hold (touch and pen) or right-click on a web node opens its slip in place; a hold that moves is
- * a scroll, and the hold's release never counts as the walking tap (swallowClickUntil, as the reader's menu). */
+/** Hfix-2e · the Words room's hold is the reader's hold (John, 10-19 17:19, on the Mac: "HOLDING A WORD does nothing at
+ * all"; checklist S1): a finger, a pen, or a mouse or trackpad press held still on a web node's word or kanji fills the
+ * ring from RING_MS and seals it at MENU_MS (sealWord: the 印 presses on, the word is kept, the strip opens; a second hold
+ * opens the same strip and keeps nothing twice). A mouse holds with its primary button only, never with Control (the
+ * Mac's secondary click); it has no implicit capture, so its move, release and cancel are heard on the window, and past
+ * MOVE_PX it is a drag, never a seal. A finger that moves is a scroll. The hold's release never counts as the walking tap
+ * (swallowClickUntil). A radical that is not a kanji has nothing to keep: its hold opens it in place, as before.
+ * Right-click, the menu key and Shift+F10 do what a hold does (S3; the lead's ruling, 10-20): the seal and its strip. */
 function wireWordWebHold(button, nodeOf, activate = null) {
+  warmSealStripFaces();
   let hold = null;
-  const clear = () => { if (hold) clearTimeout(hold.timer); hold = null; };
   const open = () => {
     if (activate) { activate(); return; }
     const node = nodeOf();
     if (!node) return;
     openSlip(node, { anchor: button, from: 'lookup', redo: true });
   };
-  button.addEventListener('contextmenu', (event) => { event.preventDefault(); clear(); open(); });
+  // the identity a hold keeps is the one the node's slip saves (openSlip: the quick dictionary's record, else the kept
+  // card's own)
+  let record = null;
+  const door = {
+    get target() { const node = nodeOf(); return node ? { kind: node.t, id: node.id } : null; },
+    get label() { return nodeOf()?.id || ''; },
+    get copyText() { return nodeOf()?.id || ''; },
+    get entryAvailable() { const node = nodeOf(); return !!node && (node.t === 'word' ? !!record : !!D.kanji?.[node.id]); },
+    prepare: async () => {
+      const node = nodeOf();
+      if (!node) return false;
+      record = node.t === 'word' ? lookup(node.id) || savedNodeRecord(node) || null : null;
+    },
+    save: () => {
+      const node = nodeOf();
+      if (!node) return null;
+      if (node.t !== 'word') return { g: null, held: false, node, state: wordCaptureState(node), identityHeld: false };
+      return wordSaveFacts({ s: node.id, b: node.id, r: record?.r || '', c: !!record }, { record });
+    },
+    quickLook: () => open(),
+    openEntry: (modality) => { const node = nodeOf(); if (node) go(node, { invoker: button, instant: modality === 'keyboard' }); },
+    reopen: () => open(),
+  };
+  // a committed mouse hold keeps no text selected: the press was a hold, not the start of a drag
+  const unselect = () => {
+    const selection = typeof getSelection === 'function' ? getSelection() : null;
+    if (selection && !selection.isCollapsed && selection.containsNode?.(button, true)) selection.removeAllRanges();
+  };
+  const clear = () => {
+    const h = hold;
+    if (!h) return;
+    hold = null;
+    clearTimeout(h.timer);
+    clearTimeout(h.ringTimer);
+    window.removeEventListener('pointerdown', h.other, true);
+    h.unwatch?.();
+    if (!h.committed) h.ring?.cancel();
+  };
+  const commit = (h) => {
+    if (hold !== h || h.committed) return;
+    h.committed = Date.now();
+    clearTimeout(h.timer);
+    clearTimeout(h.ringTimer);
+    // the release may synthesise a click: it belongs to the hold, never to the walk
+    swallowClickUntil = Date.now() + 700;
+    if (h.mouse) unselect();
+    if (!nodeOf()) { open(); return; }
+    void sealWord(button, door, { ring: h.ring });
+  };
+  const moved = (event) => {
+    if (!hold || event.pointerId !== hold.start.id) return;
+    if (hold.committed) { if (hold.mouse) unselect(); return; }
+    if (Math.hypot(event.clientX - hold.start.x, event.clientY - hold.start.y) > GESTURE.MOVE_PX) clear();
+  };
+  const released = (event) => {
+    if (!hold || event.pointerId !== hold.start.id) return;
+    if (hold.committed) swallowClickUntil = Date.now() + 700;
+    clear();
+  };
+  button.addEventListener('contextmenu', (event) => {
+    event.preventDefault();
+    // a touch hold some engines also report as a contextmenu is the same hold: one seal, never two
+    if (hold && !hold.committed && event.pointerType !== 'mouse') { commit(hold); return; }
+    if (hold?.committed && Date.now() - hold.committed < 1200) return;
+    clear();
+    if (!nodeOf()) { open(); return; }
+    // a contextmenu the keyboard raised has no pointer position: the strip takes the keyboard
+    void sealWord(button, door, { keyboard: !event.clientX && !event.clientY });
+  });
   button.addEventListener('pointerdown', (event) => {
     clear();
-    if (event.pointerType === 'mouse' || event.isPrimary === false) return;
-    hold = { start: { x: event.clientX, y: event.clientY }, timer: setTimeout(() => {
-      hold = null;
-      swallowClickUntil = Date.now() + 700;
-      open();
-    }, GESTURE.MENU_MS) };
+    if (event.isPrimary === false) return;
+    const mouse = event.pointerType === 'mouse';
+    if (mouse && (event.button !== 0 || event.ctrlKey)) return;
+    const start = { x: event.clientX, y: event.clientY, id: event.pointerId };
+    const h = { start, ring: null, committed: 0, mouse };
+    h.other = (other) => { if (other.pointerId !== start.id && hold === h && !h.committed) clear(); };
+    window.addEventListener('pointerdown', h.other, true);
+    if (mouse) {
+      const lost = () => clear();
+      window.addEventListener('pointermove', moved, true);
+      window.addEventListener('pointerup', released, true);
+      window.addEventListener('pointercancel', lost, true);
+      window.addEventListener('blur', lost);
+      h.unwatch = () => {
+        window.removeEventListener('pointermove', moved, true);
+        window.removeEventListener('pointerup', released, true);
+        window.removeEventListener('pointercancel', lost, true);
+        window.removeEventListener('blur', lost);
+      };
+    }
+    if (nodeOf()) h.ringTimer = setTimeout(() => { if (hold === h && !h.committed) h.ring = holdRing(start.x, start.y); }, GESTURE.RING_MS);
+    h.timer = setTimeout(() => commit(h), GESTURE.MENU_MS);
+    hold = h;
   });
-  button.addEventListener('pointermove', (event) => {
-    if (hold && Math.hypot(event.clientX - hold.start.x, event.clientY - hold.start.y) > GESTURE.MOVE_PX) clear();
+  button.addEventListener('pointermove', moved);
+  button.addEventListener('pointerup', released);
+  button.addEventListener('pointercancel', (event) => {
+    if (hold && event.pointerId === hold.start.id) clear();
   });
-  button.addEventListener('pointerup', clear);
-  button.addEventListener('pointercancel', clear);
   button.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && document.getElementById('mini')) { event.preventDefault(); event.stopPropagation(); removeMini(); return; }
-    if (event.key === 'ContextMenu' || (event.key === 'F10' && event.shiftKey)) { event.preventDefault(); open(); }
+    if (event.key === 'ContextMenu' || (event.key === 'F10' && event.shiftKey)) {
+      event.preventDefault();
+      if (nodeOf()) void sealWord(button, door, { keyboard: true });
+      else open();
+    }
   });
 }
 
@@ -25257,6 +25378,13 @@ function wwWatchPassages(section, tries) {
     const now = wwTrail().at(-1);
     if (!section.isConnected || section.classList.contains('ww-leaving') || section.contains(document.activeElement)) return;
     if (!now || section.dataset.wwCentre !== `${now.type}:${now.key}`) return;
+    // Hfix-2e · a held word's strip (or a word's slip) standing on this plate keeps it: drawing the plate again would take
+    // the strip's room and its word away from under it. The card comes on a later look, once they are put away
+    if ((sealStrip?.strip.isConnected && section.contains(sealStrip.anchor)) || sealPending ||
+        (document.getElementById('mini') && miniAnchor && section.contains(miniAnchor))) {
+      wwWatchPassages(section, tries + 1);
+      return;
+    }
     const found = now.type === 'word' ? wwPassages(now.key, 1).length > 0 : !!wwKanjiPassage(now.key);
     if (!found) {
       wwWatchPassages(section, tries + 1);
@@ -28878,11 +29006,41 @@ function chromeKeep() {
   paintKeepAside(button);
   return button;
 }
+/* Hfix-2e (X-10) · a click lands only on the element its press went down on. The press on the bar's keep that puts a
+ * word's raised reading away (the outside press, clearWordLadder) used to draw the keep afresh under that press: on the
+ * Mac its first click only took the reading away and nothing was saved (a finger's tap was spared). While a press is down
+ * on the keep it is repainted in place, and drawn afresh once the press has landed (after its click, the same task). */
+let chromeKeepPressed = null;
+let chromeKeepResync = false;
+if (typeof window !== 'undefined') {
+  window.addEventListener('pointerdown', (event) => {
+    const keep = event.target?.closest?.('#chrome-keep');
+    if (!keep) return;
+    chromeKeepPressed = keep;
+    const landed = () => {
+      window.removeEventListener('pointerup', landed, true);
+      window.removeEventListener('pointercancel', landed, true);
+      setTimeout(() => {
+        if (chromeKeepPressed !== keep) return;
+        chromeKeepPressed = null;
+        if (chromeKeepResync) { chromeKeepResync = false; syncChromeKeep(); }
+      }, 0);
+    };
+    window.addEventListener('pointerup', landed, true);
+    window.addEventListener('pointercancel', landed, true);
+  }, true);
+}
 /** After a touch, a save or an undo: the bar's keep names the word now under the finger, in place (no render). */
 function syncChromeKeep() {
   const old = document.getElementById('chrome-keep');
   if (!old) return;
   const fresh = chromeKeep();
+  if (old === chromeKeepPressed) {
+    paintWordSave(old, fresh.getAttribute('aria-pressed') === 'true');
+    paintKeepAside(old);
+    chromeKeepResync = true;
+    return;
+  }
   if (fresh.dataset.saveKey === old.dataset.saveKey && old.getAttribute('aria-expanded') === 'true') {
     paintWordSave(old, fresh.getAttribute('aria-pressed') === 'true');
     paintKeepAside(old);
@@ -32809,9 +32967,86 @@ function renderCardVariant(container, target) {
   container.append(box);
 }
 
-/** Real usages from the committed shelf: sentences containing the word. */
-function findExamples(id, cap = 4) {
+/* KT-6 (Hfix-2e) · a word's examples are the word's own. The bank is keyed by spelling, and its generator credits every
+ * form of an entry, so a kana key gathers every word read that way: 愛's sentences sit under あい, the key the core
+ * dictionary files 藍 by, and 藍's page opened on 「愛は盲目。」. A sentence is this word's example only when it holds
+ * the word: a content token whose dictionary form (b, the spelling as the sentence writes it, inflection undone, so
+ * 歩け holds 歩く) is one of the word's own written forms — its key, the core's other spelling (事 for こと), and, once
+ * the index has its entry, that entry's spellings (引き返す for 引きかえす; a word with no kanji, its kana forms). Never
+ * a kana another entry shares. A page that names its sense (an entry number or a reading) also asks an uninflected
+ * token to be read one of that entry's ways, so 一日 read ついたち is not an example of いちにち. */
+function exampleIdentity(id, node = null) {
+  const key = String(id || '');
+  const forms = new Set(key ? [key] : []);
+  const alt = D.dict?.[key]?.alt;
+  if (alt) forms.add(alt);
+  const own = node && node.id === key ? node : { t: 'word', id: key };
+  const rows = key && D.dictionaryIndex ? dictionaryDetailRowsFor(own) : [];
+  for (const row of rows) {
+    const written = Array.isArray(row?.[4]) ? row[4] : [];
+    for (const form of written.length ? written : Array.isArray(row?.[5]) ? row[5] : []) forms.add(form);
+  }
+  // KT-6 (the lead's final ruling, 05:4x): the word's own entry is the one entry that writes its key with the word's own
+  // reading and sense (exampleOwnRows; never a homograph: 首's こうべ entry is 頭's, 才's sense is not 歳's). Of its
+  // spellings only those written with the key's own kanji are the word's (another okurigana: 押さえる, 代わる, 或る): a
+  // sentence written with other kanji does not hold this word's written form (依る is not 因る, 機械 is not 器械, 表す is
+  // not 現す), whatever entry the dictionary files it under. Never another entry's spelling.
+  for (const row of exampleOwnRows(key)) {
+    for (const form of row[4]) if (!forms.has(form) && exampleKanji(form) === exampleKanji(key)) forms.add(form);
+  }
+  let readings = null;
+  if (own === node && (node.seq || node.reading) && rows.length) {
+    readings = new Set(rows.flatMap((row) => (Array.isArray(row?.[5]) ? row[5] : []).map((kana) => kataToHira(String(kana)))));
+    if (node.reading) readings.add(kataToHira(String(node.reading)));
+  }
+  // a kana spelling is the same spelling in either kana: ドキドキ is どきどき, ガン is がん (癌)
+  const kana = new Set([...forms].filter((form) => READER_KANA.test(form)).map((form) => kataToHira(form)));
+  return { forms, kana, readings };
+}
+/** The kanji a spelling is written with, in order (押さえる and 押える: 押). */
+function exampleKanji(form) {
+  return (String(form || '').match(/\p{Script=Han}/gu) || []).join('');
+}
+/** A gloss as the sense test compares it: the dictionary's own normalisation, its ellipses and spacing set aside ("a certain
+ * ..." and "a certain..." are one sense). */
+function exampleSenseKey(gloss) {
+  return normalizeGloss(String(gloss || '')).replace(/[.…]+/gu, ' ').replace(/\s+/gu, ' ').trim();
+}
+/** The word's own entry: of the entries at hand that write `key`, the one read the core word's way (that reading allowed
+ * for this spelling) and holding one of its senses. A kanji key with a core word only: a kana key, or a word with no core
+ * reading and sense, names no entry by itself. */
+function exampleOwnRows(key) {
+  const core = D.dict?.[key];
+  if (!key || !core?.r || !D.dictionaryIndex || !exampleKanji(key)) return [];
+  const reading = kataToHira(core.r);
+  const senses = new Set((core.m || []).flatMap((gloss) => String(gloss).split(/;\s*/u)).map(exampleSenseKey).filter(Boolean));
+  return dictionaryRowsForForm(key).filter((row) => Array.isArray(row?.[4]) && row[4].includes(key) &&
+    (row[5] || []).some((kana) => kataToHira(kana) === reading && dictionaryReadingSupportsForm(row, kana, key)) &&
+    (row[6] || []).some((gloss) => senses.has(exampleSenseKey(gloss))));
+}
+function exampleTokenIsWord(token, identity) {
+  if (!token?.c) return false;
+  const spelled = identity.forms.has(token.b) || (READER_KANA.test(String(token.b || '')) && identity.kana.has(kataToHira(String(token.b))));
+  if (!spelled) return false;
+  // an inflected token's reading is its ending's too: its dictionary spelling speaks for it
+  return !identity.readings || token.s !== token.b || !token.r || identity.readings.has(kataToHira(String(token.r)));
+}
+function exampleHoldsWord(tokens, identity) {
+  return Array.isArray(tokens) && tokens.some((token) => exampleTokenIsWord(token, identity));
+}
+/** The bank's fetched sentences that are this word's own (ensureBankExamples keeps the key's whole list). */
+function bankExamplesFor(id, node = null) {
+  const banked = D.exampleBank?.get(id);
+  if (!banked?.length) return [];
+  const identity = exampleIdentity(id, node);
+  return banked.filter((ex) => exampleHoldsWord(ex.tokens, identity));
+}
+
+/** Real usages from the committed shelf: sentences containing the word. A page passes its node, so a sense it names
+ * keeps its examples to that sense (KT-6). */
+function findExamples(id, cap = 4, node = null) {
   const out = [];
+  const identity = node ? exampleIdentity(id, node) : null;
   for (const p of D.passages) {
     if (!p.tokens) continue; // not yet fetched — prefetch fills these in
     let sentence = [];
@@ -32819,7 +33054,7 @@ function findExamples(id, cap = 4) {
     let hit = false;
     for (const [index, t] of p.tokens.entries()) {
       sentence.push(t);
-      if (t.c && t.b === id) hit = true;
+      if (t.c && t.b === id && (!identity || exampleTokenIsWord(t, identity))) hit = true;
       if ('。！？'.includes(t.s)) {
         if (hit) out.push({ tokens: sentence, source: learnerSourceLabel(p), passage: p.id, start });
         sentence = [];
@@ -32832,9 +33067,9 @@ function findExamples(id, cap = 4) {
     if (out.length >= cap) return out;
   }
   // the bank fills what the shelf cannot — already-fetched sentences only
-  // (ensureBankExamples warms this cache; callers refresh once it lands)
-  const banked = D.exampleBank?.get(id);
-  if (banked) {
+  // (ensureBankExamples warms this cache; callers refresh once it lands), and only the word's own (KT-6)
+  const banked = bankExamplesFor(id, node);
+  if (banked.length) {
     const seen = new Set(out.map((ex) => ex.tokens.map((t) => t.s).join('')));
     for (const ex of banked) {
       if (out.length >= cap) break;
@@ -35241,7 +35476,7 @@ function renderWordNode(sheet, node) {
       refreshWordSheet(node);
     });
   }
-  const { first: leadExamples, more: moreExamples } = exampleOrder(node, findExamples(node.id, 6));
+  const { first: leadExamples, more: moreExamples } = exampleOrder(node, findExamples(node.id, 6, node));
   if (leadExamples.length || moreExamples.length) {
     // The words teach the shared ladder themselves; this heading names the examples.
     sheet.append(
