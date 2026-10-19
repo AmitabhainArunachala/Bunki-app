@@ -3329,7 +3329,9 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
 }
 /* ─ the head: after a deck's first sittings the task goes unsaid (the marked word says it); the
    level stays as one small figure in the corner, not a chip */
-#app .kp-study .kp-chips > .kp-chip:not(.kp-levelchip) { display: none; }
+#app .kp-study .kp-chips > .kp-chip:not(.kp-levelchip):not(.kp-st-step) { display: none; }
+/* a card in its learning steps, or shown early by the learner's choice, says so quietly (lead's ruling 10-19) */
+#app .kp-study .kp-chips > .kp-st-step { color: var(--kp-ink-2); border-color: transparent; }
 #app .kp-study .kp-chips { flex-wrap: nowrap; min-height: 16px; }
 #app .kp-study .kp-eyebrow { flex: 1 1 auto; min-width: 0; font: 600 var(--type-caption)/1.2 var(--sans, system-ui); letter-spacing: 0.02em; text-transform: none; color: var(--kp-mute); }
 #app .kp[data-hints='0'] .kp-study .kp-eyebrow-t,

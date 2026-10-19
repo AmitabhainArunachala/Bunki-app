@@ -143,12 +143,24 @@ export function sittingTally(rows, { learning = [], startedAt = null, now = new 
   };
 }
 
-/** a wait in the app's words: 1 min, 8 min, 2 hr; 1分, 8分, 2時間 */
+/** a wait in the app's words: 1 min, 8 min, 2 hr, 1 day, 6 days, 2 months, 1.5 years; 1分 … 6日, 2か月, 1.5年 */
 export function waitWords(ms, lang = 'en') {
-  const min = Math.max(1, Math.round(ms / 60e3));
-  if (min < 60) return lang === 'ja' ? `${min}分` : `${min} min`;
-  const hr = Math.round(min / 60);
-  return lang === 'ja' ? `${hr}時間` : `${hr} hr`;
+  const MIN = 60e3;
+  const DAY = 864e5;
+  const ja = lang === 'ja';
+  if (ms < 60 * MIN) {
+    const min = Math.max(1, Math.round(ms / MIN));
+    return ja ? `${min}分` : `${min} min`;
+  }
+  if (ms < DAY) {
+    const hr = Math.round(ms / (60 * MIN));
+    return ja ? `${hr}時間` : `${hr} hr`;
+  }
+  const count = (n, one) => `${n} ${n === 1 ? one : `${one}s`}`;
+  if (ms < 30 * DAY) return ja ? `${Math.round(ms / DAY)}日` : count(Math.round(ms / DAY), 'day');
+  if (ms < 365 * DAY) return ja ? `${Math.round(ms / (30 * DAY))}か月` : count(Math.round(ms / (30 * DAY)), 'month');
+  const years = Number((ms / (365 * DAY)).toFixed(1));
+  return ja ? `${years}年` : `${years} ${years === 1 ? 'year' : 'years'}`;
 }
 
 const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
@@ -174,7 +186,8 @@ export function closeLines(tally, lang = 'en') {
   const met = [newWords ? plural(newWords, 'new word') : '', reviewWords ? plural(reviewWords, 'review') : ''].filter(Boolean).join(' and ');
   out.push(`${met ? `${met} · ` : ''}${plural(answers, 'answer')} in ${plural(minutes, 'minute')}.`);
   const parts = [];
-  if (returns) parts.push(`cards came back ${returns === 1 ? 'once' : `${returns} times`} for a learning step${early ? ` (${early} a few minutes early, with nothing else left)` : ''}`);
+  const earlyWords = early === returns ? (returns === 1 ? 'a few minutes early' : 'all a few minutes early') : `${early} a few minutes early`;
+  if (returns) parts.push(`${returns === 1 ? 'a card came back' : `cards came back ${returns} times`} for a learning step${early ? ` (${earlyWords}, with nothing else left)` : ''}`);
   if (againWords) parts.push(`${plural(againWords, 'word')} needed Again`);
   if (parts.length) {
     const s = parts.join('; ');

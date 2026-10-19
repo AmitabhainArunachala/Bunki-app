@@ -108,6 +108,14 @@ describe('the close counts the sitting', () => {
     ]);
     expect(core.closeLines(tally, 'ja')).toEqual(['新しい語 2・復習 1・回答 6（4 分）。', '学習ステップで戻った札 3（うち 2 はほかに札がなく少し早めに）、もう一度 1 語。']);
   });
+  it('one card that came back once, early, reads as one card', () => {
+    const one = core.sittingTally([{ word: 'a', before: null, rating: 3 }, { word: 'a', before: 1, rating: 3, early: true }], { startedAt: T.getTime(), now: at(MIN) });
+    expect(core.closeLines(one, 'en')).toEqual(['1 new word · 2 answers in 1 minute.', 'A card came back for a learning step (a few minutes early, with nothing else left).']);
+  });
+  it('names waits the way the pads do', () => {
+    expect([MIN, 10 * MIN, 90 * MIN, DAYS(1), DAYS(6), DAYS(60), DAYS(548)].map((ms) => core.waitWords(ms))).toEqual(['1 min', '10 min', '2 hr', '1 day', '6 days', '2 months', '1.5 years']);
+    expect([10 * MIN, DAYS(6)].map((ms) => core.waitWords(ms, 'ja'))).toEqual(['10分', '6日']);
+  });
   it('offers the early choice only within the learn-ahead limit', () => {
     expect(core.pauseWords({ count: 5, at: at(8 * MIN).getTime(), canEarly: true }, 'en', T)).toEqual({
       line: '5 words are in a learning step (the next is due in 8 min): review them now, early, or they will wait for you.',
