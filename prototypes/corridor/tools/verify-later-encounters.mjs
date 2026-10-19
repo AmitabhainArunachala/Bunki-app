@@ -14,6 +14,7 @@ import { chromium, webkit } from 'playwright-core';
 import { contextBrowserVersion } from './browser-version-support.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+import { selectBackupFile } from './record-fixture-support.mjs';
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable staged site');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
 assert(!existsSync(join(OUT, 'receipt.json')), 'Use a fresh evidence directory');
@@ -50,9 +51,14 @@ const ORIGIN = `https://127.0.0.1:${server.address().port}`;
 const results = [], startedAt = new Date().toISOString();
 const stableRoots = ['sentencePractice', 'teacherContexts', 'teacherDrafts', 'taken', 'srs', 'revlog', 'stats'];
 function unchanged(before, after, keys = stableRoots) { for (const key of keys) assert.deepEqual(after[key], before[key], key); }
-// Again turns the same card face-down at once (Anki's learn-ahead, 35f8b940): no countdown beat and
-// no いま見る. The graded card is reinserted as the session's very next item, answer box empty.
+// Again on the sitting's only card: with nothing else left the close offers it now, early (Anki's learn-ahead, by the
+// learner's choice: lead's ruling 10-19, SRS; the same change SRS made to verify-sentence-practice in bb2549ba) — no
+// countdown beat and no いま見る. Taken, the graded card is the session's very next item, face-down, answer box empty.
 async function againReturns(page, cue, session) {
+  await page.waitForSelector('#review-ahead', { timeout: 15000 });
+  assert.match(await page.locator('#review-pause').textContent(), /^1 word is in a learning step \(the next is due in 1 min\): review it now, early, or it will wait for you\.$/u,
+    'the close says the card is in its 1-minute step and offers it early');
+  await page.locator('#review-ahead').click();
   await page.waitForFunction(() => !document.querySelector('.grade')
     && document.getElementById('sentence-recall-answer')?.value === '');
   assert.equal(await page.locator('[data-review-wait]').count(), 0, 'Again holds no countdown');
@@ -347,18 +353,35 @@ for (const engine of engines) for (const width of sizes) {
     exportMetadataOnly(beforeExport, afterExport, exportStarted, Date.now());
     await close(); await open();
     assert.deepEqual((await readAppRecordSnapshot(page)).record, afterExport.record, 'Committed export metadata survives restart');
-    await close(); profile = 'profile-foreign'; await open(); await shelf(page); await page.locator('#tray').click();
+    // A browser with its own learner refuses a different learner's backup. An empty browser would adopt it after a
+    // confirmation (Hfix-2a, the accepted product), so this profile first does real learner work: it chooses a sentence
+    // to practise from a reading, as the first source above did. The refusal comes before any restore confirmation.
+    await close(); profile = 'profile-foreign'; await open(); await shelf(page);
+    await openShelfDoor(page, '#airead-link'); await page.locator('#airead-startingLevel').selectOption('N5');
+    await waitForAppRecord(page, r => r.readingSettings?.startingLevel === 'N5'); await page.locator('#back').click();
+    const foreignItem = page.locator('.shelf-item:not([data-recommendation])').filter({ has: page.locator('.shelf-title', { hasText: /^静かな朝$/u }) });
+    await foreignItem.locator('.shelf-open').click(); await openReaderWordStage(page, page.locator('#reader .tok[data-index="9"][data-word="窓"]'));
+    await page.locator('#mini-sentence-open').click(); await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-choose-production').check();
+    await page.locator('#sentence-practice-confirm').click(); await page.locator('#sentence-production-text').waitFor();
+    await waitForAppRecord(page, r => r.sentencePractice?.entries.length === 1);
+    await shelf(page); await page.locator('#tray').click();
     const foreignBefore = await readAppRecordSnapshot(page);
     assert.notEqual(foreignBefore.installation.binding.learnerId, beforeExport.installation.binding.learnerId);
-    await page.locator('#import-file').setInputFiles(backup);
-    await page.waitForFunction(() => document.getElementById('record-portability-status')?.textContent.includes('belongs to a different learner'));
+    let foreignDialogs = 0; const foreignDialog = (dialog) => { foreignDialogs += 1; void dialog.dismiss().catch(() => {}); };
+    page.on('dialog', foreignDialog);
+    try {
+      await page.locator('#import-file').setInputFiles(backup);
+      await page.waitForFunction(() => document.getElementById('record-portability-status')?.textContent.includes('belongs to a different learner'));
+    } finally { page.off('dialog', foreignDialog); }
+    assert.equal(foreignDialogs, 0, 'A different learner\'s backup is refused before any restore confirmation');
     assert.deepEqual(await readAppRecordSnapshot(page), foreignBefore, 'Foreign backup refusal preserves the entire installation and record');
     await shot('foreign-learner-backup-refused');
     result.observations.push({ name: 'foreign-learner-backup-refused', allRecordAndAuthorityRootsUnchanged: true });
     await close(); profile = 'profile-recovery-point'; await open(); await shelf(page); await suggestion('revisit').waitFor();
     assert.deepEqual((await readAppRecordSnapshot(page)).record, recoveryBaseline.record);
     await page.locator('#tray').click();
-    const originTime = await page.evaluate(() => performance.timeOrigin); await page.locator('#import-file').setInputFiles(backup);
+    // Every restore asks first (Hfix-2a): answer exactly that confirmation; any other dialog fails.
+    const originTime = await page.evaluate(() => performance.timeOrigin); await selectBackupFile(page, backup);
     await page.waitForFunction(prior => performance.timeOrigin !== prior && document.body.dataset.ready === '1', originTime, { timeout: 30000 });
     const restored = await readAppRecordSnapshot(page);
     // Import preserves null/omitted draft roots when neither side has drafts.
