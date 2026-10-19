@@ -413,6 +413,7 @@ async function playerJohnRoute(browser, engine, { mutate = null } = {}) {
           await page.waitForTimeout(700);
           await page.screenshot({ path: join(OUT, `${engine}-player-early-card.png`) });
         }
+        out.counts = [...(out.counts || []), ((await shownText(page.locator('.kp-count'))) || '').trim()];
         const a = await answer(page);
         out.ahead.push(a);
         if (a.label !== a.promised) out.labelsHonest = false;
@@ -441,6 +442,9 @@ async function playerJohnRoute(browser, engine, { mutate = null } = {}) {
   check(`[${engine}] (c) chosen early: each card says it is early and in its learning step, and Good graduates it`,
     ahead.length === n && ahead.every((a) => a.early && a.chips.some((c) => /Learning|学習中/u.test(c)) && a.after?.state === 2 && /days?$/u.test(a.label)),
     ahead.slice(0, 2).map((a) => `${a.chips.join('+')} → ${a.label}`).join(' · '));
+  check(`[${engine}] (c) the early pass counts within itself: its first card reads 1/${n}, its last ${n}/${n}`,
+    out.counts?.length === n && out.counts[0] === `1/${n}` && out.counts[n - 1] === `${n}/${n}`, `${out.counts?.[0]} … ${out.counts?.at(-1)}`);
+  early.deck = ahead[0]?.chips.find((c) => isEarly([c])) ?? '';
   check(`[${engine}] (d) every pressed pad named exactly what it scheduled (${out.showings.length + ahead.length} answers)`, out.labelsHonest,
     [...out.showings, ...ahead].filter((a) => a.label !== a.promised).slice(0, 3).map((a) => `${a.label}≠${a.promised}`).join(' ') || `e.g. ${out.showings[0]?.label} · ${ahead[0]?.label}`);
   check(`[${engine}] (d) a card whose Good keeps it in its steps says when it comes back`, stepNoteSays(out.showings[0]), out.showings[0]?.stepNote || '');
@@ -765,6 +769,7 @@ async function corridorReview(browser, engine, { mutate = null } = {}) {
   if (mutate) return pass;
   check(`[${engine}] (a)(c) corridor review: ${n} saved words answered Good, none again before its step; then the close offers the early choice`, pass, { shown: out.shown.length, repeats: out.earlyBeforeChoice, pause: out.pause });
   check(`[${engine}] (j) corridor close counts the sitting`, new RegExp(`^${n} new words · ${n} answers in \\d+ minutes?\\.$`, 'u').test(out.said.trim()), out.said);
+  early.corridor = out.ahead?.[0]?.step ?? '';
   check(`[${engine}] (c) corridor, chosen early: each card says it is early, Good graduates it`, (out.ahead || []).length === n && out.ahead.every((g) => /early/u.test(g.step)), (out.ahead || []).slice(0, 1).map((g) => g.step).join(''));
   check(`[${engine}] (d) corridor pads named what they scheduled (${out.labels.length} answers)`, out.labels.every(([a, b]) => a === b), out.labels.filter(([a, b]) => a !== b).slice(0, 3).map((l) => l.join('≠')).join(' ') || out.labels.slice(0, 1).concat(out.labels.slice(-1)).map((l) => l[0]).join(' … '));
   return pass;
@@ -795,6 +800,54 @@ async function timedKanji(browser, engine) {
     await context.close();
   }
   check(`[${engine}] C1 timed Kanji-only practice of a card due in six days is practice (稽古): its schedule and review log stay byte-identical`, out.practice === 1 && out.same && out.obs === 1 && /practice|稽古/u.test(out.label), out);
+}
+
+/* ------------------------------------------------------------------ one early wording on every surface */
+const EARLY_WORDS = ['Learning · a few minutes early (nothing else left)', '学習中 · 少し早め（ほかに札がないため）'];
+let early = {};
+async function earlyElsewhere(browser, engine) {
+  const T = T_LOCAL.getTime();
+  {
+    // the context deck: today's new cards already introduced, two of them in their step, due in 5 minutes
+    const step = (state, due) => ({ due: new Date(due).toISOString(), stability: state === 1 ? 0.6 : 6, difficulty: 5, elapsed_days: 0, scheduled_days: state === 1 ? 0 : 5, learning_steps: state === 1 ? 1 : 0, reps: 1, lapses: 0, state, last_review: new Date(T - 5 * MIN).toISOString(), introducedAt: new Date(T).toISOString() });
+    const cards = JSON.parse(readFileSync(join(SITE, 'decks/context-dense/deck.json'), 'utf8')).cards.slice(0, 20);
+    const seeded = { format: 'bunki-srs-deck-state', version: 1, deckId: 'bunki-context-dense-2026', cards: Object.fromEntries(cards.map((c, i) => [c.id, i < 2 ? step(1, T + 5 * MIN) : step(2, T + 5 * DAY)])) };
+    const { context, page } = await newPage(browser, { seedLocal: { 'bunki-srs-deck:bunki-context-dense-2026': seeded } });
+    try {
+      await page.goto(`${BASE}/index.html?entry=shelf&ui=bi&deck=context`, { waitUntil: 'load' });
+      await page.waitForSelector('#cd-start', { timeout: 30000 });
+      await page.locator('#cd-start').click();
+      await page.locator('#cd-ahead').click();
+      // the step line is drawn on the card's back, once the learner has said how it went
+      await page.waitForSelector('#cd-got', { timeout: 10000 });
+      await page.locator('#cd-got').click();
+      await page.waitForSelector('.cd-step', { timeout: 10000 });
+      early.context = (await page.locator('.cd-step').textContent()).trim();
+    } finally {
+      await context.close();
+    }
+  }
+  {
+    // your own texts: the collection's new cards answered Good, then the close's early choice
+    const { context, page } = await newPage(browser);
+    try {
+      await page.goto(`${BASE}/index.html?ui=bi&deck=personal`, { waitUntil: 'load' });
+      await page.locator('.pc-file').setInputFiles({ name: 'synthetic.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(await personalFixture())) });
+      await page.locator('[data-action="confirm-import"]').click();
+      await page.locator('[data-card]').waitFor({ timeout: 15000 });
+      for (let i = 0; i < 12 && !(await page.locator('#pc-ahead').count()); i += 1) {
+        const id = await page.locator('[data-card]').getAttribute('data-card');
+        await page.locator('[data-action="reveal"]').click();
+        await page.locator('[data-grade="3"]:not([disabled])').click();
+        await page.waitForFunction((id) => document.querySelector('#pc-ahead') || document.querySelector('[data-card]')?.dataset.card !== id, id, { timeout: 10000 });
+      }
+      await page.locator('#pc-ahead').click();
+      await page.waitForSelector('[data-card] .pc-state', { timeout: 10000 });
+      early.personal = (await page.locator('[data-card] .pc-state').textContent()).trim();
+    } finally {
+      await context.close();
+    }
+  }
 }
 
 /* ------------------------------------------------------------------ burying across surfaces */
@@ -884,6 +937,7 @@ for (const engine of ENGINES) {
   try {
     receipt[`${engine}Version`] = browser.version();
     overrides = {};
+    early = {};
     if (runs('john')) await scenario(`[${engine}] John's route`, () => playerJohnRoute(browser, engine));
     if (runs('steps')) await scenario(`[${engine}] deck player steps`, () => playerSteps(browser, engine));
     if (runs('p0')) await scenario(`[${engine}] P0 two windows`, () => playerTwoWindows(browser, engine));
@@ -892,6 +946,11 @@ for (const engine of ENGINES) {
     if (runs('corridor')) await scenario(`[${engine}] corridor review`, () => corridorReview(browser, engine));
     if (runs('timed')) await scenario(`[${engine}] timed Kanji-only`, () => timedKanji(browser, engine));
     if (runs('bury')) await scenario(`[${engine}] burying across surfaces`, () => buryAcrossDecks(browser, engine));
+    if (runs('early')) await scenario(`[${engine}] early wording`, () => earlyElsewhere(browser, engine));
+    if (runs('john') && runs('corridor') && runs('early')) {
+      check(`[${engine}] (c) one early wording: the deck player, context cards, saved words and your own texts each say "${EARLY_WORDS[0]}"`,
+        ['deck', 'context', 'corridor', 'personal'].every((k) => EARLY_WORDS.includes(early[k])), early);
+    }
     if (CONTROLS) {
       if (runs('john')) {
       overrides = MUTANTS['pos-plus-4']();
