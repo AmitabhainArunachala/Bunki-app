@@ -610,7 +610,7 @@ async function ordinary(fixture) {
   // depth-2 observation alone; the third activation opens the stage without another observation or encounter.
   const englishStarted = Date.now();
   await token.click();
-  await page.waitForFunction(node => node.dataset.ladderRung !== 'reading', await token.elementHandle());
+  await page.waitForFunction(node => node.dataset.ladderRung !== 'reading' && Boolean(node.querySelector('.tok-en')?.textContent.trim()), await token.elementHandle());
   assert.equal(await token.getAttribute('data-ladder-rung'), 'gloss', 'The second activation sets the English under the word');
   assert.equal(await page.locator('#mini,#sheet').count(), 0, 'The English rung opens no stage and no page');
   await waitForAppRecord(page, record => record.obslog.length === read.record.obslog.length + 1, { description: 'the English rung\'s observation' });

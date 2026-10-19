@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "reviewedHead": "9a26f84da6916bfeeb35624adae5eb4edcfcf563",
-  "note": "Independent candidate assertion identities, reconciled against historical complete schedules and current verifier source. Green/red observations do not change this roster. Engine-specific timing obligations are retained. Batch3 Ladder: preserve every old identity; add accepted G3 English/stage-clear rows and engine-specific L walks. Historical G3 schedules supply identities only, reconciled against accepted9a source; r3 native receipts pin new Ladder identities, not merged green proof.",
+  "reviewedHead": "36798e807b394d3c49b923d0d45101c5bf9747aa",
+  "note": "Independent candidate assertion identities, reconciled against historical complete schedules and current verifier source. Green/red observations do not change this roster. Engine-specific timing obligations are retained. Batch3 Ladder: preserve every old identity; add accepted G3 English/stage-clear rows and engine-specific L walks. Historical G3 schedules supply identities only, reconciled against accepted9a source; r3 native receipts pin new Ladder identities, not merged green proof. R4: replace only the3 superseded short row-box fade walks with9 accepted DPR ink walks and1 gap walk; add settled/box gloss walks; keep all other candidate IDs. Historical receipts are not merged acceptance.",
   "sources": [
     {
       "path": "G6/codex-build/site-17-wordgrammar/verify-word-grammar.json",
@@ -54,6 +54,16 @@
     {
       "path": "LADDER/r3/verify/word-grammar---ladder-only--controls-webkit/verify-word-grammar.json",
       "sha256": "5b614d002967af7b5c9f24524a61f123d1cf34d63529ebe4e580e0a2bb5ffb37"
+    },
+    {
+      "path": "LADDER/r4/verify/word-grammar---ladder-only--controls-chromium/verify-word-grammar.json",
+      "sha256": "0000ccba8bf46f9af920011c2e00a94b8b391626ad7b0b8c1832782b019b73f9",
+      "purpose": "ordered identity observation only; WebKit full source receipt retains6 red rows"
+    },
+    {
+      "path": "LADDER/r4/verify/word-grammar---ladder-only--controls-webkit/verify-word-grammar.json",
+      "sha256": "a1be295239d02f9679c2bf2043c9ae40763e99bfe1780217097a8d615eeca391",
+      "purpose": "ordered identity observation only; WebKit full source receipt retains6 red rows"
     }
   ],
   "engines": {
@@ -355,6 +365,14 @@
         "L.gloss.never-dash",
         "L.gloss.sense",
         "L-gloss.page-errors"
+      ],
+      "L-settled": [
+        "L.gloss.settled",
+        "L-settled.page-errors"
+      ],
+      "L-box": [
+        "L.gloss.box",
+        "L-box.page-errors"
       ],
       "page": [
         "P3.card",
@@ -1567,22 +1585,58 @@
         "L.d7.430x932",
         "L-d7-430.page-errors"
       ],
-      "L-d7s-390x520": [
-        "L.d7.fade.390x520",
-        "L-d7s-390x520.page-errors"
+      "L-d7i-390x520-dpr1": [
+        "L.d7.ink.390x520.dpr1",
+        "L-d7i-390x520-dpr1.page-errors"
       ],
-      "L-d7s-390x560": [
-        "L.d7.fade.390x560",
-        "L-d7s-390x560.page-errors"
+      "L-d7i-390x520-dpr2": [
+        "L.d7.ink.390x520.dpr2",
+        "L-d7i-390x520-dpr2.page-errors"
       ],
-      "L-d7s-320x568": [
-        "L.d7.fade.320x568",
-        "L-d7s-320x568.page-errors"
+      "L-d7i-390x520-dpr3": [
+        "L.d7.ink.390x520.dpr3",
+        "L-d7i-390x520-dpr3.page-errors"
+      ],
+      "L-d7i-390x560-dpr1": [
+        "L.d7.ink.390x560.dpr1",
+        "L-d7i-390x560-dpr1.page-errors"
+      ],
+      "L-d7i-390x560-dpr2": [
+        "L.d7.ink.390x560.dpr2",
+        "L-d7i-390x560-dpr2.page-errors"
+      ],
+      "L-d7i-390x560-dpr3": [
+        "L.d7.ink.390x560.dpr3",
+        "L-d7i-390x560-dpr3.page-errors"
+      ],
+      "L-d7i-320x568-dpr1": [
+        "L.d7.ink.320x568.dpr1",
+        "L-d7i-320x568-dpr1.page-errors"
+      ],
+      "L-d7i-320x568-dpr2": [
+        "L.d7.ink.320x568.dpr2",
+        "L-d7i-320x568-dpr2.page-errors"
+      ],
+      "L-d7i-320x568-dpr3": [
+        "L.d7.ink.320x568.dpr3",
+        "L-d7i-320x568-dpr3.page-errors"
+      ],
+      "L-d7-gap": [
+        "L.d7.scroll-gap",
+        "L-d7-gap.page-errors"
       ],
       "L-gloss": [
         "L.gloss.never-dash",
         "L.gloss.sense",
         "L-gloss.page-errors"
+      ],
+      "L-settled": [
+        "L.gloss.settled",
+        "L-settled.page-errors"
+      ],
+      "L-box": [
+        "L.gloss.box",
+        "L-box.page-errors"
       ],
       "page": [
         "P3.card",

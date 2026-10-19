@@ -7,6 +7,7 @@ import { execFileSync } from 'node:child_process';
 // Ambient diagnostics/faults never select an acceptance schedule. Mutant children
 // receive their explicit scope from their own strict parent after this boundary.
 export const NARROWING_ENV = Object.freeze([
+  'KAIRO_LADDER_WALKS',
   'SENSE_TRUTH_ONLY',
   'SENSE_VH_CASES',
   'SENSE_VH_CONTROL',

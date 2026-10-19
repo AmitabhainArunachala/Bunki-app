@@ -56,7 +56,10 @@ function controlFor(engine, rowId, spec, rows) {
       'ladder:back-leaves-at-once': [{ first: { view: 'today' } }],
       'ladder:no-room-made': [{ rows: [{ whole: false }] }],
       'ladder:no-aside-mark': { aside: null },
-      'ladder:fade-on-a-row': [{ underFade: ['synthetic row'] }],
+      'ladder:fade-on-a-row': [{ inkUnderFade: ['synthetic ink'] }],
+      'ladder:provisional-paint': [{ other: [{ text: 'provisional meaning' }] }],
+      'ladder:row-not-the-box': [{ english: 'to receive', box: 'to get someone to do something' }],
+      'ladder:fold-at-560': [{ steps: [{ folds: 1 }] }],
       'ladder:dash-for-none': { dashes: ['—'] },
       'ladder:english-ignores-sense': { words: [{ wrong: ['synthetic wrong meaning'] }] },
     };

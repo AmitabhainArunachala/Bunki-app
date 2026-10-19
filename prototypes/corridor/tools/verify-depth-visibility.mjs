@@ -758,7 +758,7 @@ async function liveFirstState(page, out, { name, id, query, word, prior, archive
   row(out, `${name}.reading-without-encounter`, reading.rung === 'reading' && reading.reading.length > 0 && !reading.mini && !encounterAt(pre) && settle.settled && !encounterAt(settle.snapshot) && !encounterAt(beforeInput2),
     { reading, revisions: { beforeInput1: pre.revision, settle: settle.reads, settled: settle.settled, waitedMs: settle.waitedMs, quietMs: settle.quietMs, beforeInput2: beforeInput2.revision }, encounter: { settled: encounterAt(settle.snapshot), beforeInput2: encounterAt(beforeInput2) } });
   await input();
-  await page.waitForFunction((selector) => document.querySelector(selector)?.dataset.ladderRung === 'gloss', selector);
+  await page.waitForFunction((selector) => { const word = document.querySelector(selector); return word?.dataset.ladderRung === 'gloss' && Boolean(word.querySelector('.tok-en')?.textContent.trim()); }, selector);
   const gloss = await sample('gloss');
   await input();
   await page.locator('#mini').waitFor({ state: 'visible' });

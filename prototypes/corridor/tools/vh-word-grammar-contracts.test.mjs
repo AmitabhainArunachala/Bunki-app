@@ -1,7 +1,8 @@
+import { acceptanceEnvironment, NARROWING_ENV } from '../../../scripts/ci/verification-admission.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { grammarSelection, grammarWalkNames, grammarControlSpec, foldGeometryEqual, foldShiftBites, grammarAcceptance, grammarControlRows, grammarControlVerdicts, sharedHoverDiverges, WG_CANDIDATE_ROSTER, WG_CONTROL_EVIDENCE } from './vh-word-grammar-contracts.mjs';
+import { grammarSelection, grammarWalkNames, grammarControlSpec, grammarCandidateRows, wordGrammarNarrowingEnvironment, foldGeometryEqual, foldShiftBites, grammarAcceptance, grammarControlRows, grammarControlVerdicts, sharedHoverDiverges, WG_CANDIDATE_ROSTER, WG_CONTROL_EVIDENCE } from './vh-word-grammar-contracts.mjs';
 import { grammarFixture, sha } from './vh-word-grammar-fixture.mjs';
 const geometry = x => [{ id: 'p1', top: x, height: 24, tokens: [{ id: '76', left: 4, top: 9 }] }];
 test('WG-1 raw boundary rejects old rounded false green and malformed observations', () => {
@@ -400,8 +401,8 @@ test('Ladder remains diagnostic, preserves the old stalled control, and admits e
   for (const engine of ['chromium', 'webkit']) {
     const value = grammarFixture([engine]);
     assert.equal(grammarAcceptance(value).fullAcceptance, true);
-    assert.equal(grammarWalkNames(engine).filter(w => w.startsWith('L-')).length, engine === 'chromium' ? 9 : 16);
-    assert.equal(grammarControlRows(engine).filter(id => id.includes('/L.negative.')).length, engine === 'chromium' ? 7 : 8);
+    assert.equal(grammarWalkNames(engine).filter(w => w.startsWith('L-')).length, engine === 'chromium' ? 11 : 25);
+    assert.equal(grammarControlRows(engine).filter(id => id.includes('/L.negative.')).length, engine === 'chromium' ? 9 : 11);
     assert.ok(grammarControlRows(engine).includes(`${engine}/G3.negative.stalled-second`));
     value.argv = ['--ladder-only', '--controls'];
     value.rows = value.rows.filter(row => row.walk?.startsWith('L-') || row.id.includes('/L.negative.'));
@@ -435,6 +436,32 @@ test('each added Ladder/G3 obligation rejects missing rows, fabricated witnesses
     for (const suffix of ['G3.control.gloss', 'G3.control.stage-clear', 'L.tap2', 'L.gloss.sense']) {
       const missing = structuredClone(fresh); missing.rows = missing.rows.filter(row => row.id !== `${engine}/${suffix}`);
       assert.equal(grammarAcceptance(missing).fullAcceptance, false);
+    }
+  }
+});
+
+test('R4 walk selectors never narrow a full acceptance schedule', () => {
+  for (const key of wordGrammarNarrowingEnvironment) {
+    assert(NARROWING_ENV.includes(key));
+    for (const value of ['L-box', '']) assert(!Object.hasOwn(acceptanceEnvironment({ [key]: value }), key));
+  }
+  assert.throws(() => grammarSelection(['--controls'], { ladderWalks: ['L-settled'] }));
+  for (const ladderWalks of [[''], ['../'], ['L-box', 'L-box'], 'L-box'])
+    assert.throws(() => grammarSelection(['--ladder-only'], { ladderWalks }));
+  const selected = grammarSelection(['--ladder-only', '--controls'], { ladderWalks: ['L-settled', 'L-box'] });
+  assert.equal(selected.fullRequested, false); assert.deepEqual(selected.ladderWalks, ['L-settled', 'L-box']);
+  const full = grammarFixture(['chromium']); full.ladderWalks = ['L-settled'];
+  assert.throws(() => grammarAcceptance(full));
+});
+test('R4 keeps all non-superseded rows and requires new DPR, gap and gloss obligations', () => {
+  for (const engine of ['chromium', 'webkit']) {
+    const value = grammarFixture([engine]);
+    assert.equal(grammarAcceptance(value).fullAcceptance, true);
+    assert.equal(grammarCandidateRows(engine).length, engine === 'chromium' ? 938 : 936);
+    assert.equal(grammarControlRows(engine).length, engine === 'chromium' ? 49 : 47);
+    for (const walk of ['L-settled', 'L-box', ...(engine === 'webkit' ? ['L-d7-gap', ...['390x520', '390x560', '320x568'].flatMap(size => [1,2,3].map(dpr => `L-d7i-${size}-dpr${dpr}`))] : [])]) {
+      const missing = structuredClone(value); missing.rows = missing.rows.filter(row => row.walk !== walk);
+      assert.equal(grammarAcceptance(missing).fullAcceptance, false, `${engine}/${walk}`);
     }
   }
 });

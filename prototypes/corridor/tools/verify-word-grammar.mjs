@@ -110,7 +110,7 @@ const WORLDS = Object.freeze(['hokusai', 'sumi', 'shu', 'akafuji', 'iwa', 'rokus
 const FRAME_WINDOW = 1400;
 
 const rows = [];
-const selection = grammarSelection(process.argv.slice(2));
+const selection = grammarSelection(process.argv.slice(2), { ladderWalks: (process.env.KAIRO_LADDER_WALKS || '').split(',').map(value => value.trim()).filter(Boolean) });
 const runId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
 const completedWalks = [], g6Completed = [];
 const g1Only = process.argv.includes('--g1-only');
@@ -181,6 +181,7 @@ assert(!(g6Only && (g2Only || g4Only || g5Only)), 'Choose one explicit narrow sc
 const ladderOnly = process.argv.includes('--ladder-only');
 assert(!(ladderOnly && (g2Only || g3Only || g4Only || g5Only || g6Only)), 'Choose one explicit narrow schedule');
 const ladderOn = ladderOnly || !(vhOnly || g1Only || g2Only || g3Only || g4Only || g5Only || g6Only);
+const ladderWalks = selection.ladderWalks;
 
 const host = await startStaticHost({ site, port: 0 });
 async function boot(page, { world = null } = {}) {
@@ -397,6 +398,20 @@ const GLYPHS = () => {
   };
 };
 const glyphsOf = (page, selector) => page.evaluate((s) => window.__glyphs(document.querySelector(s)), selector);
+/* Ladder R4 · every frame (requestAnimationFrame) of every English row under a text word: its text and how many frames and ms
+ * it stood, by the word's index (window.__enFrames) — read by the walks, never written back. */
+const EN_FRAMES = () => {
+  window.__enFrames = {};
+  const tick = () => {
+    for (const ink of document.querySelectorAll('.tok[data-index] > .tok-en > .tok-en-text')) {
+      const list = (window.__enFrames[ink.closest('.tok[data-index]').dataset.index] ||= []), text = ink.textContent, last = list.at(-1);
+      if (last && last.text === text) { last.frames += 1; last.until = performance.now(); }
+      else list.push({ text, from: performance.now(), until: performance.now(), frames: 1 });
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+};
 /* Ladder R2 · every text an English row under a text word says, in order, by the word's index (window.__en): recorded in the
  * mutation's own microtask, so a text that stood for a frame is never missed — read by the walks, never written back. */
 const EN_TRACE = () => {
@@ -2552,13 +2567,15 @@ try {
     // G6's suite runs beside the walks, never under another slice's narrow schedule
     if (!vhOnly && !g1Only && !g2Only && !g3Only && !g4Only && !g5Only && !ladderOnly) { await runG6Suite(browser); g6Completed.push(engine); }
     const retainedWalks = new Map();
-    const walk = async (name, body, { viewport = { width: 390, height: 844 }, mobile = true, control = null, init = null, demo = false, phase = 'candidate', reducedMotion = 'no-preference' } = {}) => {
+    const walk = async (name, body, { viewport = { width: 390, height: 844 }, mobile = true, control = null, init = null, demo = false, phase = 'candidate', reducedMotion = 'no-preference', dsf = 2 } = {}) => {
       if (vhInkOnly && name!=='G4-interrupt-save') return;
       if (vhOnly && !['page','exposure','g2-depth','g2-reading','g2-taps','G4-interrupt-save','G5-room-hover','G5-layers'].includes(name)) return;
       if (g1Only && /^(?:G[2-6]|g2|L-)/u.test(name)) return;
       if (g2Only && !name.startsWith('g2')) return;
       if (g6Only && !name.startsWith('G6')) return;
       if (ladderOnly && !name.startsWith('L-')) return;
+      // KAIRO_LADDER_WALKS=<prefix,…> narrows --ladder-only to the walks named (a red or a probe's scope; never an acceptance)
+      if (ladderOnly && ladderWalks.length && !ladderWalks.some((prefix) => name.startsWith(prefix))) return;
       // --controls-only is a G3 schedule that also replays G4's three candidate schedules (G4-named)
       if (g3Only && !name.startsWith('G3') && !(controlsOnly && name.startsWith('G4'))) return;
       if (g4Only && !name.startsWith('G4')) return;
@@ -2573,8 +2590,8 @@ try {
       const completion = { engine, name, phase: control ? `mutant:${control.id}` : phase, complete: false };
       completedWalks.push(completion);
       mediaPhase = completion.phase.replaceAll(':','-');
-      if (!control && phase === 'candidate') retainedWalks.set(name, { body, options: { viewport, mobile, init, demo, reducedMotion }, start: began });
-      const context = await browser.newContext({ viewport, isMobile: mobile, hasTouch: true, deviceScaleFactor: 2, serviceWorkers: 'block', reducedMotion });
+      if (!control && phase === 'candidate') retainedWalks.set(name, { body, options: { viewport, mobile, init, demo, reducedMotion, dsf }, start: began });
+      const context = await browser.newContext({ viewport, isMobile: mobile, hasTouch: true, deviceScaleFactor: dsf, serviceWorkers: 'block', reducedMotion });
       await context.addInitScript(GLYPHS);
       if (!demo) await context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1'));
       for (const script of [].concat(init || [])) await context.addInitScript(script);
@@ -3401,6 +3418,8 @@ try {
       await press(page, locator);
       await page.waitForFunction(({ n, before }) => (n.dataset.ladderRung || null) !== before.rung || document.querySelectorAll('#mini').length !== before.stages,
         { n: node, before }, { timeout: 10000 }).catch(() => {});
+      // Ladder R4 · the English rung keeps its line empty until its gloss is settled (the lead's F1 ruling): read it settled
+      await page.waitForFunction((n) => !n.querySelector(':scope > .tok-en.tok-en-wait'), node, { timeout: 8000 }).catch(() => {});
       await delay(pause);
     };
     // the English row as read: the world's own ink, and no word or reading of another line under it
@@ -3669,67 +3688,128 @@ try {
           place.rows[0].text === '総' && place.rows[1].text === '理' && place.rows.every((row) => row.whole) && place.clear &&
           (place.still || place.glideJustified)), places);
     };
-    // Ladder R2 · D7 on short glasses (the critic's FAIL, 10-20, WebKit touch: 総理 at 30, 45 and 60 % of the clear glass at
-    // 390×520 and 390×560, and the second 総理 mid-glass at 320×568, its box cut with its fade lying on a kanji row; DESIGN:
-    // "the fade never lies on a row"). Wherever the word stands, its box (opened by observed rungs) is compact; where it is
-    // cut, its fade lies on no row of it and the cut falls across none; it stands on neither the word, its reading nor its
-    // English. The rows are every line the box has: its bands, their own lines, Save's menu items
-    const d7FadeFacts = (page) => page.evaluate(() => {
+    // Ladder R2/R4 · D7 on short glasses. R4 (the lead's ruling on the critic's r2 read, 10-20): the fade may lie on a row's
+    // blank padding, never on its ink (every text the box draws, its kanji tiles, Save and the keys beside it); 理 shows
+    // whole at 390×560; a scrolled cut box never shows a gap between its rows. The critic's ten short placements (総理 at
+    // 30, 45 and 60 % of the clear glass at 390×520, 390×560 and 320×568, and the second 総理 mid-glass at 320×568), each at
+    // DPR 1, 2 and 3, WebKit touch, the box opened by observed rungs. The clear glass is read from the glass itself (the
+    // first and last points the reader's text answers at the column's centre), so a dock or a bar at the foot moves it
+    const clearGlass = (page) => page.evaluate(() => {
+      const reader = document.getElementById('reader').getBoundingClientRect(), x = reader.left + reader.width / 2;
+      // the reader's own area (its text, the article's head above it), never a bar, a dock or the box (the critic's clearZone)
+      const text = (y) => { const e = document.elementFromPoint(x, y); return !!e?.closest('#reader, main') && !e.closest('[data-bar], .chrome, #tabs, nav, header, #mini'); };
+      let top = 0; while (top < innerHeight && !text(top)) top += 1;
+      let bottom = innerHeight - 1; while (bottom > top && !text(bottom)) bottom -= 1;
+      // a dock at the foot (the reader's #app::after strip, Hfix-2e part 2's X-13) takes no pointer: read its own box
+      const dock = getComputedStyle(document.getElementById('app'), '::after');
+      const dockTop = dock.display !== 'none' && dock.position === 'fixed' && dock.content !== 'none' && parseFloat(dock.height) > 0
+        ? innerHeight - (parseFloat(dock.bottom) || 0) - parseFloat(dock.height) : Infinity;
+      return { top, bottom: Math.min(bottom + 1, dockTop), dockTop: Number.isFinite(dockTop) ? Math.round(dockTop) : null };
+    });
+    const d7InkFacts = (page) => page.evaluate(() => {
       const mini = document.getElementById('mini');
       if (!mini) return { mini: false };
       const box = mini.getBoundingClientRect(), border = parseFloat(getComputedStyle(mini).borderTopWidth) || 0;
       const seen = { top: box.top + border, bottom: box.top + border + mini.clientHeight };
       const after = getComputedStyle(mini, '::after'), more = mini.dataset.more === 'true';
       const fade = more && after.content !== 'none' && after.content !== 'normal' ? parseFloat(after.height) : 0;
-      const fadeTop = seen.bottom - fade;
-      const rows = [...mini.querySelectorAll('.mini-head, .mini-word-note, .mini-actions, .mini-take-reason, .mini-band-head, .mini-kanji-row, ' +
-        '.mini-sentence-open, #vocabulary-list-popover > *, .vocabulary-list-more > *')].filter((n) => n.getClientRects().length).map((n) => {
-        const r = n.getBoundingClientRect();
-        return { row: n.className.split(' ')[0] + (n.matches('.mini-kanji-row') ? `:${n.textContent.trim().slice(0, 1)}` : ''),
-          top: Math.round(r.top * 10) / 10, bottom: Math.round(r.bottom * 10) / 10 };
+      const fadeTop = seen.bottom - fade, range = document.createRange(), ink = [];
+      const add = (what, r) => { if (r.width > 0.5 && r.height > 0.5) ink.push({ what, top: Math.round(r.top * 10) / 10, bottom: Math.round(r.bottom * 10) / 10 }); };
+      const walker = document.createTreeWalker(mini, NodeFilter.SHOW_TEXT);
+      for (let t = walker.nextNode(); t; t = walker.nextNode()) {
+        const host = t.parentElement;
+        if (!t.nodeValue.trim() || !host?.getClientRects().length || host.closest('.visually-hidden, [hidden]')) continue;
+        const style = getComputedStyle(host);
+        if (style.visibility === 'hidden' || Number(style.opacity) === 0) continue;
+        range.selectNodeContents(t);
+        for (const r of range.getClientRects()) add(t.nodeValue.trim().slice(0, 10), r);
+      }
+      for (const n of mini.querySelectorAll('.mini-kanji-glyph, .mini-take, .mini-actions button')) if (n.getClientRects().length) add(n.className.split(' ')[0] + (n.matches('.mini-kanji-glyph') ? `:${n.textContent.trim()}` : ''), n.getBoundingClientRect());
+      const visible = (r) => r.bottom > seen.top + 0.5 && r.top < seen.bottom - 0.5;
+      const kanji = [...mini.querySelectorAll('.mini-kanji > .mini-kanji-row')].map((row) => {
+        const g = row.querySelector('.mini-kanji-glyph'), rects = [g?.getBoundingClientRect()].filter(Boolean);
+        const w = document.createTreeWalker(row, NodeFilter.SHOW_TEXT);
+        for (let t = w.nextNode(); t; t = w.nextNode()) { if (!t.nodeValue.trim()) continue; range.selectNodeContents(t); rects.push(...[...range.getClientRects()].filter((r) => r.width > 0.5 && r.height > 0.5)); }
+        const top = Math.min(...rects.map((r) => r.top)), bottom = Math.max(...rects.map((r) => r.bottom));
+        return { kanji: g?.textContent.trim() ?? '', inkTop: Math.round(top * 10) / 10, inkBottom: Math.round(bottom * 10) / 10,
+          whole: top >= seen.top - 0.5 && bottom <= (fade ? fadeTop : seen.bottom) + 0.5 };
       });
       return { mini: true, compact: mini.classList.contains('is-compact'), cut: mini.scrollHeight > mini.clientHeight + 1, more, fade,
-        scrollTop: mini.scrollTop, glide: mini.dataset.glide ?? null, side: mini.dataset.side ?? null,
-        seen: { top: Math.round(seen.top), bottom: Math.round(seen.bottom) },
-        underFade: fade ? rows.filter((r) => r.bottom > fadeTop + 0.5 && r.top < seen.bottom - 0.5)
-          .map((r) => `${r.row} ${r.top}–${r.bottom} (fade ${Math.round(fadeTop)}–${Math.round(seen.bottom)})`) : [],
-        across: rows.filter((r) => r.top < seen.bottom - 0.5 && r.bottom > seen.bottom + 0.5).map((r) => r.row),
-        kanji: rows.filter((r) => r.row.startsWith('mini-kanji-row') && r.top >= seen.top - 0.5 && r.bottom <= fadeTop + 0.5).map((r) => r.row.slice(-1)) };
+        seen: { top: Math.round(seen.top * 10) / 10, bottom: Math.round(seen.bottom * 10) / 10 }, fadeTop: Math.round(fadeTop * 10) / 10,
+        inkUnderFade: fade ? ink.filter((r) => visible(r) && r.bottom > fadeTop + 0.5).map((r) => `${r.what} ${r.top}–${r.bottom}`) : [],
+        inkAcross: ink.filter((r) => r.top < seen.bottom - 0.5 && r.bottom > seen.bottom + 0.5).map((r) => `${r.what} ${r.top}–${r.bottom}`),
+        kanji, folds: [...mini.querySelectorAll('[data-fold]')].length, glide: mini.dataset.glide ?? null, side: mini.dataset.side ?? null };
     });
-    const ladderD7Short = (viewport) => async (page) => {
+    const D7_PLACES = { '390x520': [[0, 0.3], [0, 0.45], [0, 0.6]], '390x560': [[0, 0.3], [0, 0.45], [0, 0.6]], '320x568': [[1, 0.45], [0, 0.3], [0, 0.45], [0, 0.6]] };
+    const placeWord = async (page, word, spot) => {
+      for (let k = 0; k < 2; k++) {
+        const glass = await clearGlass(page);
+        await word.evaluate((node, { glass, spot }) => scrollBy(0, window.__glyphs(node).top - (glass.top + (glass.bottom - glass.top) * spot)), { glass, spot });
+        await delay(300);
+      }
+    };
+    const openBox = async (page, word) => {
+      const rungs = [];
+      for (let step = 0; step < 3 && !(await page.locator('#mini').count()); step++) {
+        await pressSettled(page, word, 500);
+        rungs.push(await page.locator('#mini').count() ? 'stage' : await word.getAttribute('data-ladder-rung'));
+      }
+      await delay(1500);
+      return rungs;
+    };
+    const ladderD7Ink = (viewport, dsf) => async (page) => {
       await openStory(page);
-      const places = [];
-      // the first 総理 at 30, 45 and 60 % of the clear glass; the second (the critic's 320×568 case) mid-glass
-      for (const [nth, spot] of [[0, 0.3], [0, 0.45], [0, 0.6], [1, 0.45]]) {
+      const size = `${viewport.width}x${viewport.height}`, places = [];
+      for (const [nth, spot] of D7_PLACES[size]) {
         const word = page.locator(`#reader .tok[data-prose-label="${WORD}"]`).nth(nth);
-        for (let k = 0; k < 2; k++) {
-          await word.evaluate((node, spot) => {
-            const edge = (sel, side, fallback) => { const n = document.querySelector(sel); if (!n) return fallback; const style = getComputedStyle(n);
-              if (!['fixed', 'sticky'].includes(style.position) || style.display === 'none') return fallback; const b = n.getBoundingClientRect(); return b.height ? b[side] : fallback; };
-            const ceiling = Math.max(edge('#app > .chrome', 'bottom', 0), edge('#app > .scale-thread', 'bottom', 0));
-            const floor = Math.min(edge('#primary-tabs', 'top', innerHeight), edge('.listen-row', 'top', innerHeight), innerHeight);
-            scrollBy(0, window.__glyphs(node).top - (ceiling + (floor - ceiling) * spot));
-          }, spot);
-          await delay(300);
-        }
-        const index = Number(await word.getAttribute('data-index'));
-        const placed = await word.evaluate((node) => Math.round(window.__glyphs(node).top));
-        const rungs = [];
-        for (let step = 0; step < 3 && !(await page.locator('#mini').count()); step++) {
-          await pressSettled(page, word, 500);
-          rungs.push(await page.locator('#mini').count() ? 'stage' : await word.getAttribute('data-ladder-rung'));
-        }
-        // the glide, the sense and a late font have seated it
-        await delay(1500);
-        const seen = await d7FadeFacts(page), clear = await boxClear(page, word);
-        places.push({ index, spot, placed, rungs, ...seen, clear: clear.clear, overReading: clear.overReading, overWord: clear.overWord, overEnglish: clear.overEnglish });
-        if (spot === 0.45) await page.screenshot({ path: resolve(evidence, `${engine}-L-d7-fade-${viewport.width}x${viewport.height}-${nth ? 'second' : 'first'}.png`) });
+        await placeWord(page, word, spot);
+        const glass = await clearGlass(page), index = Number(await word.getAttribute('data-index'));
+        const rungs = await openBox(page, word);
+        const seen = await d7InkFacts(page), clear = await boxClear(page, word);
+        places.push({ index, spot, glass, rungs, ...seen, clear: clear.clear, overReading: clear.overReading, overWord: clear.overWord, overEnglish: clear.overEnglish });
+        if (spot === 0.45) await page.screenshot({ path: resolve(evidence, `${engine}-L-d7-ink-${size}-dsf${dsf}-${nth ? 'second' : 'first'}.png`) });
         await page.keyboard.press('Escape'); await delay(400);
         if (await page.locator('#mini').count()) { await page.keyboard.press('Escape'); await delay(400); }
       }
-      check(`L.d7.fade.${viewport.width}x${viewport.height}`, `${viewport.width}×${viewport.height}: 総理 at 30, 45 and 60 % of the clear glass and the second 総理 mid-glass: its box, opened by observed rungs, is compact; where it is cut its fade lies on no row of it and the cut falls across none; it stands on neither the word, its reading nor its English`,
-        places.length === 4 && places.every((place) => place.mini && place.compact && place.rungs.at(-1) === 'stage' && place.clear &&
-          (!place.cut || (place.more && place.fade >= 16 && place.underFade.length === 0 && place.across.length === 0))), places);
+      const riWhole = size !== '390x560' || places.every((place) => place.kanji?.length === 2 && place.kanji.every((k) => k.whole));
+      check(`L.d7.ink.${size}.dpr${dsf}`, `${viewport.width}×${viewport.height} at DPR ${dsf}: 総理 at 30, 45 and 60 % of the clear glass${size === '320x568' ? ' and the second 総理 mid-glass' : ''}: its box, opened by observed rungs, is compact; where it is cut its fade lies on no ink (its texts, kanji tiles, Save and its keys) and the cut crosses none; it stands on neither the word, its reading nor its English${size === '390x560' ? '; 理 shows whole (総 and 理 both above the fade)' : ''}`,
+        places.length === D7_PLACES[size].length && riWhole && places.every((place) => place.mini && place.compact && place.rungs.at(-1) === 'stage' && place.clear &&
+          (!place.cut || (place.more && place.fade >= 16 && place.inkUnderFade.length === 0 && place.inkAcross.length === 0))), places);
+    };
+    // Ladder R4 · a cut box scrolled through its rows shows no gap between them: its kanji rows abut as in the whole box
+    // (round 2 folded them 33 px apart), and no row is folded. 390×520 is held (the lead's call on a shorter head): its
+    // fold is recorded, never judged here
+    const ladderD7Gap = async (page) => {
+      await openStory(page);
+      const out = [];
+      for (const viewport of [{ width: 390, height: 560 }, { width: 320, height: 568 }]) {
+        await page.setViewportSize(viewport);
+        await delay(400);
+        const word = page.locator(`#reader .tok[data-prose-label="${WORD}"]`).first();
+        await placeWord(page, word, 0.45);
+        await openBox(page, word);
+        const steps = [];
+        const facts = () => page.evaluate(() => {
+          const mini = document.getElementById('mini');
+          if (!mini) return null;
+          const rows = [...mini.querySelectorAll('.mini-kanji > .mini-kanji-row')].map((r) => r.getBoundingClientRect());
+          return { scrollTop: Math.round(mini.scrollTop), cut: mini.scrollHeight > mini.clientHeight + 1, folds: mini.querySelectorAll('[data-fold]').length,
+            gaps: rows.slice(1).map((r, k) => Math.round((r.top - rows[k].bottom) * 10) / 10) };
+        });
+        for (let k = 0; k < 12; k++) {
+          const f = await facts();
+          if (!f) break;
+          steps.push(f);
+          const end = await page.evaluate(() => { const m = document.getElementById('mini'); const before = m.scrollTop; m.scrollTop += 40; return m.scrollTop === before; });
+          if (end) break;
+          await delay(120);
+        }
+        out.push({ size: `${viewport.width}x${viewport.height}`, steps });
+        await page.keyboard.press('Escape'); await delay(400);
+        if (await page.locator('#mini').count()) { await page.keyboard.press('Escape'); await delay(400); }
+      }
+      check('L.d7.scroll-gap', 'a cut box scrolled through its rows (390×560 and 320×568, 総理 mid-glass) shows no gap between them: its kanji rows abut, no row is folded',
+        out.length === 2 && out.every((o) => o.steps.length > 0 && o.steps[0].cut && o.steps.every((st) => st.folds === 0 && st.gaps.every((g) => Math.abs(g) <= 1))), out);
     };
     // Ladder R2 · the English rung's words (the critic's round-1 FAIL, 10-20: tap 2 repeated the quick dictionary's first
     // gloss, and 9 of the story's 102 content words showed "—"). On a cold dictionary (its index answering 1.8 s late), every
@@ -3799,6 +3879,59 @@ try {
         sensed.length === GLOSS_SENSE.length && sensed.every((w) => !!glossWant(w) && w.rung === 'gloss' && w.drawn && w.english === glossWant(w).english && !w.wrong.length),
         { words: sensed.map(({ at, index, s, label, rung, english, drawn, gloss, seen, wrong }) => ({ at, index, s, label, rung, english, drawn, box: gloss, seen, wrong })) });
     };
+    // Ladder R4 · F1 (the lead's ruling on the critic's r2 read, 10-20: "never show an English word that later changes"): on
+    // a cold dictionary (its index 1.8 s late) every frame of each English row is recorded; the words the critic saw swap
+    // (また "again" → "and", とも, おら/おり, 全て in both test articles; くれる and しまう in Bunki's own) show no gloss but
+    // their settled one, an empty line before it. F2 ("the row must match the box"): te-form もらう and いただく say under
+    // the word the gloss their box leads with ("to get someone to do something"), as the box draws it
+    const GLOSS_STORIES = {
+      gratitude: Object.freeze({ id: 'bunki-graded-n3-gratitude-week', search: '感謝の言葉' }),
+      hofstadter: Object.freeze({ id: 'bunki-read-n2-hofstadter-law', search: 'ホフスタッター' }),
+    };
+    const SETTLED_CASES = [{ story: STORY, words: [132, 185, 282, 304, 316, 351, 369, 385] }, { story: GLOSS_A2, words: [165, 248, 338] },
+      { story: GLOSS_STORIES.gratitude, words: [273] }, { story: GLOSS_STORIES.hofstadter, words: [185] }];
+    const BOX_CASES = [{ story: STORY, words: [344] }, { story: GLOSS_STORIES.gratitude, words: [195] }, { story: GLOSS_STORIES.hofstadter, words: [332, 470] }];
+    // the box's first meaning line, trimmed as the row trims it (corridor.js boxLeadGloss)
+    const boxTrim = (text) => { const plain = String(text || '').replace(/\([^)]*\)/g, '').replace(/\s+/g, ' ').trim() || String(text || '');
+      return plain.length > 18 && plain.includes(',') ? plain.split(',')[0].trim() : plain; };
+    const englishWalk = async (page, cases) => {
+      await page.route('**/data/share_alike/dict-v2/index.json', async (route) => { await delay(1800); await route.continue().catch(() => {}); });
+      const words = [];
+      for (const { story, words: list } of cases) {
+        await openStory(page, { story });
+        for (const index of list) {
+          const word = page.locator(`#reader .tok[data-index="${index}"]`);
+          await word.evaluate((node) => node.scrollIntoView({ block: 'center' }));
+          await delay(250);
+          const label = await word.getAttribute('data-prose-label');
+          for (let step = 0; step < 2 && (await word.getAttribute('data-ladder-rung')) !== 'gloss' && !(await page.locator('#mini').count()); step++) {
+            await pressSettled(page, word, 300);
+          }
+          const rung = await word.getAttribute('data-ladder-rung');
+          await delay(400);
+          const english = await word.evaluate((node) => node.querySelector(':scope > .tok-en .tok-en-text')?.textContent ?? null);
+          await pressSettled(page, word, 300);
+          await page.waitForFunction(() => { const m = document.getElementById('mini'); return !!m && !m.getAttribute('aria-busy') && m.dataset.sense !== 'pending'; }, null, { timeout: 15000 }).catch(() => {});
+          await delay(300);
+          const box = await page.evaluate(() => document.querySelector('#mini .mini-gloss')?.textContent.trim() ?? null);
+          const frames = (await page.evaluate((i) => window.__enFrames?.[i] || [], index)).map((f) => ({ text: f.text, frames: f.frames, ms: Math.round(f.until - f.from) }));
+          words.push({ at: story.id, index, label, rung, english, box, frames, other: frames.filter((f) => f.text.trim() && f.text !== english) });
+          await page.keyboard.press('Escape'); await delay(350);
+          if (await page.locator('#mini').count()) { await page.keyboard.press('Escape'); await delay(350); }
+        }
+      }
+      return words;
+    };
+    const ladderSettled = async (page) => {
+      const words = await englishWalk(page, SETTLED_CASES);
+      check('L.gloss.settled', 'cold (the index 1.8 s late), frame by frame: また, とも, おら/おり and 全て in both test articles, くれる and しまう in Bunki\'s own show under the word only their settled gloss, an empty line before it, never one that later changes',
+        words.length === SETTLED_CASES.reduce((n, c) => n + c.words.length, 0) && words.every((w) => w.rung === 'gloss' && !!w.english?.trim() && !w.other.length), words);
+    };
+    const ladderBox = async (page) => {
+      const words = await englishWalk(page, BOX_CASES);
+      check('L.gloss.box', 'te-form いただく (担い手になっていただく) and もらう (gratitude-week, hofstadter-law) say under the word the gloss their box leads with, as the box draws it, never "to receive"',
+        words.length === BOX_CASES.reduce((n, c) => n + c.words.length, 0) && words.every((w) => w.rung === 'gloss' && !!w.box && w.english === boxTrim(w.box) && !w.other.length), words);
+    };
     const ladderRun = async (name, body, options = {}) => {
       const begin = rows.length;
       await walk(name, body, options);
@@ -3858,9 +3991,15 @@ try {
     // Ladder R2 · D7's fade on the short glasses, where the critic found it on a row: the phone (the Mac's glass is never this
     // short); the English rung's words in both engines
     const d7ShortViews = desk ? [] : [{ width: 390, height: 520 }, { width: 390, height: 560 }, { width: 320, height: 568 }];
-    for (const viewport of d7ShortViews) await ladderRun(`L-d7s-${viewport.width}x${viewport.height}`, ladderD7Short(viewport), { viewport, mobile: true });
+    for (const viewport of d7ShortViews) for (const dsf of [1, 2, 3]) {
+      await ladderRun(`L-d7i-${viewport.width}x${viewport.height}-dpr${dsf}`, ladderD7Ink(viewport, dsf), { viewport, mobile: true, dsf });
+    }
+    if (!desk) await ladderRun('L-d7-gap', ladderD7Gap, { viewport: { width: 390, height: 560 }, mobile: true });
     const glossView = { ...ladderView, init: EN_TRACE };
     await ladderRun('L-gloss', ladderGloss, glossView);
+    const settledView = { ...ladderView, init: EN_FRAMES };
+    await ladderRun('L-settled', ladderSettled, settledView);
+    await ladderRun('L-box', ladderBox, settledView);
     if (withControls && ladderOn) {
       // the Ladder's own named controls: each served in memory (page.route), never edited on disk; killed only when its named
       // rows fail for the witnessed reason while every other row of its schedule passes, and the unmodified restore passes
@@ -3892,12 +4031,28 @@ try {
           edits: [{ file: 'corridor.js', key: 'english-without-aside', from: "  if (hasEn) span.dataset.depthAside = 'meaning';",
             to: "  if (false) span.dataset.depthAside = 'meaning'; // Ladder negative: the English row leaves the dot in place" }] },
         // Ladder R2 · the cut takes no account of its fade (Hfix-1A's rowCut alone): at 390×560 the fade lies on 理's row
-        ...(desk ? [] : [{ id: 'fade-on-a-row', run: 'L-d7s-390x560', body: ladderD7Short({ width: 390, height: 560 }),
-          options: { viewport: { width: 390, height: 560 }, mobile: true }, kills: ['L.d7.fade.390x560'],
-          witness: (row) => row.observed.some((place) => place.underFade?.length > 0),
+        ...(desk ? [] : [{ id: 'fade-on-a-row', run: 'L-d7i-390x560-dpr2', body: ladderD7Ink({ width: 390, height: 560 }, 2),
+          options: { viewport: { width: 390, height: 560 }, mobile: true, dsf: 2 }, kills: ['L.d7.ink.390x560.dpr2'],
+          witness: (row) => row.observed.some((place) => place.inkUnderFade?.length > 0),
           edits: [{ file: 'corridor.js', key: 'cut-without-its-fade',
             from: "      const fit = (card.classList.contains('is-compact') ? fadeCut(card, room) : null) ?? rowCut(card, room);",
             to: '      const fit = rowCut(card, room); // Ladder negative: the cut leaves its fade no room' }] }]),
+        // Ladder R4 · F1's control: the row paints the word's quick gloss at once, then its settled one (round 2's swap)
+        { id: 'provisional-paint', run: 'L-settled', body: ladderSettled, options: settledView, kills: ['L.gloss.settled'],
+          witness: (row) => row.observed.some((w) => w.other?.length > 0),
+          edits: [{ file: 'corridor.js', key: 'english-painted-at-once', from: "  const line = inlineGlossLine(settled ? readerTokenLead(token) : '', !settled);",
+            to: "  const line = inlineGlossLine(readerTokenLead(token), !settled); // Ladder negative: the quick gloss painted at once" }] },
+        // Ladder R4 · F2's control: the row takes the dictionary's shortest early gloss, not the one its box leads with
+        { id: 'row-not-the-box', run: 'L-box', body: ladderBox, options: settledView, kills: ['L.gloss.box'],
+          witness: (row) => row.observed.some((w) => w.box && w.english !== boxTrim(w.box)),
+          edits: [{ file: 'corridor.js', key: 'english-shortest-gloss', from: '  return boxLeadGloss(readerQuickRecordAsRead(door));',
+            to: "  return inlineGloss(readerQuickRecordAsRead(door)) || ''; // Ladder negative: the shortest early gloss" }] },
+        // Ladder R4 · the scroll-gap row's control: round 2's fold where the ink leaves the fade room (390×560)
+        ...(desk ? [] : [{ id: 'fold-at-560', run: 'L-d7-gap', body: ladderD7Gap, options: { viewport: { width: 390, height: 560 }, mobile: true },
+          kills: ['L.d7.scroll-gap'], witness: (row) => row.observed.some((o) => o.steps.some((st) => st.folds > 0)),
+          edits: [{ file: 'corridor.js', key: 'fold-where-the-ink-has-room', from: '  if (best) return best;\n', to: '  if (false) return best; // Ladder negative: a fold instead\n' },
+            { file: 'corridor.js', key: 'fold-from-the-row-box', from: '    const inkFoot = Math.max(0, ...ink.filter(([top]) => top < foot.bottom - 0.5).map(([, bottom]) => bottom));',
+              to: "    const inkFoot = foot.bottom; // Ladder negative: round 3's fold, measured from the row's box" }] }]),
         // Ladder R2 · a word with no English says the dash again
         { id: 'dash-for-none', run: 'L-gloss', body: ladderGloss, options: glossView, kills: ['L.gloss.never-dash'],
           witness: (row) => row.observed.dashes?.length > 0,
@@ -3908,14 +4063,12 @@ try {
         // Ladder R2 · the English rung takes the word's own first gloss, never the sense its sentence uses
         { id: 'english-ignores-sense', run: 'L-gloss', body: ladderGloss, options: glossView, kills: ['L.gloss.sense'],
           witness: (row) => row.observed.words?.some((w) => w.wrong?.length > 0),
-          edits: [{ file: 'corridor.js', key: 'english-never-waits', from: '  const named = () => sensing() && !!sidecarSense(senseNeighbours(token))?.seq;',
-            to: '  const named = () => false; // Ladder negative: the English never waits for its sense' },
-          { file: 'corridor.js', key: 'english-without-sense', from: "  const line = inlineGlossLine(named() ? '' : readerTokenGloss(token), !!reading || sensing());",
-            to: "  const line = inlineGlossLine(named() ? '' : readerDoorGloss(readingTokenEntry(token)), !!reading || sensing()); // Ladder negative" },
-          { file: 'corridor.js', key: 'english-follows-no-sense', from: "    const was = line.textContent, found = !last && named() ? '' : readerTokenGloss(token);",
-            to: "    const was = line.textContent, found = !last && named() ? '' : readerDoorGloss(readingTokenEntry(token)); // Ladder negative" }] },
+          edits: [{ file: 'corridor.js', key: 'english-without-sense', from: 'const readerTokenLead = (token) => readerDoorLead(readingToken(token));',
+            to: 'const readerTokenLead = (token) => readerDoorLead(readingTokenEntry(token)); // Ladder negative: the English never takes the sense' }] },
       ];
       for (const spec of ladderSpecs) {
+        // a narrowed run (KAIRO_LADDER_WALKS) runs only the controls of the walks it ran
+        if (ladderOnly && ladderWalks.length && !ladderWalks.some((prefix) => spec.run.startsWith(prefix))) continue;
         const baseline = ladderSchedules[spec.run] || [];
         const expected = baseline.map((row) => row.id);
         const control = { engine, id: `ladder:${spec.id}`, edits: spec.edits, served: [], pageErrors: [] };
@@ -6013,8 +6166,8 @@ try {
 
 function innerHeightOf(facts) { return facts?.inner?.height || 844; }
 
-const admission = grammarAcceptance({ argv: process.argv.slice(2), engines, rows, walks: completedWalks, g6Completed, controls, runtimeFiles: identity.files });
-writeFileSync(resolve(evidence, 'verify-word-grammar.json'), JSON.stringify({ schemaVersion: 1, runId, engines, requestedScope: selection, walks: completedWalks, g6Completed, ...admission, site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, verifierSha256, browserVersions, scope: ladderOnly ? `Ladder only (accepted9a26f84d): tap ladder, placement, trackpad scroll and mouse hold${withControls ? ' with its engine-specific negative controls' : ''}; diagnostic, no G1–G6/full acceptance` : vhOnly ? 'VH-1 repaired contracts only; diagnostic, no full acceptance' : g1Only ? 'G1 candidate and controls only; diagnostic' : g2Only ? 'G2 walks only' : g6ThreadCurrentOnly ? 'G6 current-thread visibility: six width/palette native contexts only' : g6FramesOnly ? 'G6 twelve directed edges and frames only; draft scope limits in g6-<engine>.json' : g6ControlsOnly ? 'G6 controls with positives and restores only' : g6Only ? 'G6 core schedule only; no G1/G2/G3/G4/G5 claim; draft scope limits in g6-<engine>.json' : g4Only ? `G4 only${withControls ? ' with its three negative controls' : ''}; G1, G2, G3 and G5 gates not run` : g5Only ? `G5 only${g5Controls ? ' with its negative controls' : ''}; G1, G2, G3 and G4 gates not run` : skyOwnershipOnly ? `G3 controlled sky glyph hit ownership${withControls ? ' and its negative controls' : ''}; named 嘩/眩/貰 use fixture-only corpus/captions, actual product mount/hit code; no natural-input, G1 or frame claim` : skyReadingsOnly ? 'G3 actual sky glyph and reader particle across all dials; canonical host getter; hosted sky particle rendering unproven because its legacy scene is unreachable; no G1 or frame gates' : controlsOnly ? 'G3 and G4 negative controls only; exact candidate schedules, mutants and restores; no G1 or frame gates' : roomsOnly ? 'G3 Words, sky words/glyphs, and reader particle; fixed activation counts; no G1 or frame gates' : sentencesOnly ? 'G3 sentence/example rendered ruby, all three dials, and sealed front; no G1 or frame gates' : kanaOnly ? 'G3 identical kana, particle bar Save, and meaningful particle dials; no G1 or frame gates' : g3Only ? 'G3 only; G1 gates not run' : `G1, G2, G3, G4, G5 and G6 core (G6 scope limits in per-engine receipt)${g5Controls ? ' with G5 negative controls' : ''}`, ...(Object.keys(g2Versions).length ? { browsers: g2Versions } : {}), ...(controlsRun.length ? { control: controlsRun } : {}), rows, frames, controls, fixtures }, null, 1));
+const admission = grammarAcceptance({ argv: process.argv.slice(2), ladderWalks, engines, rows, walks: completedWalks, g6Completed, controls, runtimeFiles: identity.files });
+writeFileSync(resolve(evidence, 'verify-word-grammar.json'), JSON.stringify({ schemaVersion: 1, runId, engines, requestedScope: selection, walks: completedWalks, g6Completed, ...admission, site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, verifierSha256, browserVersions, scope: ladderOnly ? `Ladder only (accepted36798e80): tap ladder, placement, trackpad scroll and mouse hold${withControls ? ' with its engine-specific negative controls' : ''}${ladderWalks.length ? `; NARROWED to ${ladderWalks.join(', ')}` : ''}; diagnostic, no G1–G6/full acceptance` : vhOnly ? 'VH-1 repaired contracts only; diagnostic, no full acceptance' : g1Only ? 'G1 candidate and controls only; diagnostic' : g2Only ? 'G2 walks only' : g6ThreadCurrentOnly ? 'G6 current-thread visibility: six width/palette native contexts only' : g6FramesOnly ? 'G6 twelve directed edges and frames only; draft scope limits in g6-<engine>.json' : g6ControlsOnly ? 'G6 controls with positives and restores only' : g6Only ? 'G6 core schedule only; no G1/G2/G3/G4/G5 claim; draft scope limits in g6-<engine>.json' : g4Only ? `G4 only${withControls ? ' with its three negative controls' : ''}; G1, G2, G3 and G5 gates not run` : g5Only ? `G5 only${g5Controls ? ' with its negative controls' : ''}; G1, G2, G3 and G4 gates not run` : skyOwnershipOnly ? `G3 controlled sky glyph hit ownership${withControls ? ' and its negative controls' : ''}; named 嘩/眩/貰 use fixture-only corpus/captions, actual product mount/hit code; no natural-input, G1 or frame claim` : skyReadingsOnly ? 'G3 actual sky glyph and reader particle across all dials; canonical host getter; hosted sky particle rendering unproven because its legacy scene is unreachable; no G1 or frame gates' : controlsOnly ? 'G3 and G4 negative controls only; exact candidate schedules, mutants and restores; no G1 or frame gates' : roomsOnly ? 'G3 Words, sky words/glyphs, and reader particle; fixed activation counts; no G1 or frame gates' : sentencesOnly ? 'G3 sentence/example rendered ruby, all three dials, and sealed front; no G1 or frame gates' : kanaOnly ? 'G3 identical kana, particle bar Save, and meaningful particle dials; no G1 or frame gates' : g3Only ? 'G3 only; G1 gates not run' : `G1, G2, G3, G4, G5 and G6 core (G6 scope limits in per-engine receipt)${g5Controls ? ' with G5 negative controls' : ''}`, ...(Object.keys(g2Versions).length ? { browsers: g2Versions } : {}), ...(controlsRun.length ? { control: controlsRun } : {}), rows, frames, controls, fixtures }, null, 1));
 const failed = rows.filter((row) => !row.ok);
 console.log(`\n${rows.length - failed.length}/${rows.length} — evidence ${evidence}`);
 process.exit(failed.length || (selection.fullRequested && !admission.fullAcceptance) ? 1 : admission.fullAcceptance ? 0 : 3);

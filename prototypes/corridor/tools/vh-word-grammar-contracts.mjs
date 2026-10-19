@@ -13,7 +13,8 @@ export const WG_FLAGS = Object.freeze([
   '--g6-only', '--g6-thread-current-only', '--g6-frames-only', '--g6-controls-only', '--controls-only',
   '--rooms-only', '--sentences-only', '--kana-only', '--sky-readings-only', '--sky-ownership-only',
 ]);
-export function grammarSelection(argv) {
+export const wordGrammarNarrowingEnvironment = Object.freeze(['KAIRO_LADDER_WALKS']);
+export function grammarSelection(argv, { ladderWalks = [] } = {}) {
   const seen = new Set(), narrow = [];
   for (let i = 0; i < argv.length; i++) {
     const flag = argv[i];
@@ -27,7 +28,10 @@ export function grammarSelection(argv) {
     } else if (flag !== '--controls' && flag !== '--g5-controls') narrow.push(flag);
   }
   assert(narrow.length <= 1, 'Choose exactly one explicit narrow word-grammar schedule');
-  return { argv: [...argv], narrow, fullRequested: narrow.length === 0 && seen.has('--controls') };
+  assert(Array.isArray(ladderWalks) && ladderWalks.every(prefix => typeof prefix === 'string' && /^L-[A-Za-z0-9-]+$/u.test(prefix)), 'Invalid Ladder walk selector');
+  assert(new Set(ladderWalks).size === ladderWalks.length, 'Duplicate Ladder walk selector');
+  assert(!ladderWalks.length || seen.has('--ladder-only'), 'Ladder walk selectors require explicit --ladder-only');
+  return { argv: [...argv], narrow, ladderWalks: [...ladderWalks], fullRequested: narrow.length === 0 && seen.has('--controls') && ladderWalks.length === 0 };
 }
 
 /** Coordinates remain raw. Identity/shape must agree before any tolerance applies. */
@@ -86,7 +90,7 @@ export function grammarControlRows(engine) {
     ...['missing-final-stroke','never-plain-after-input','writing-blocks-tap', 'empty-first-board', 'second-speed-control'].map(id => `G4.negative.${id}`),
     ...['room-keep-hover','second-hold-unkeeps', 'strip-covers-a-button', 'layer-stays-open', 'fold-shift-one-pixel', 'fold-shift-one-quarter-over'].map(id => `G5.negative.${id}`),
   ];
-  ids.push(...['mouse-ignored', 'card-fixed-to-glass', 'back-leaves-at-once', 'no-room-made', 'no-aside-mark', ...(engine === 'webkit' ? ['fade-on-a-row'] : []), 'dash-for-none', 'english-ignores-sense'].map(id => `L.negative.${id}`));
+  ids.push(...['mouse-ignored', 'card-fixed-to-glass', 'back-leaves-at-once', 'no-room-made', 'no-aside-mark', ...(engine === 'webkit' ? ['fade-on-a-row'] : []), 'provisional-paint', 'row-not-the-box', ...(engine === 'webkit' ? ['fold-at-560'] : []), 'dash-for-none', 'english-ignores-sense'].map(id => `L.negative.${id}`));
   for (const mode of ['touch', 'keyboard']) {
     const g6 = ['missing-reverse', 'captured-text-pinch', 'lost-return-line', 'touchmove-cancel'];
     if (engine === 'chromium') g6.push('late-bubble-pointer', 'touchmove-cancel-native');
@@ -131,7 +135,10 @@ export const WG_CONTROL_EVIDENCE = Object.freeze({
   'L.negative.back-leaves-at-once': servedEdit('ladder:back-leaves-at-once', ['L.bar-back']),
   'L.negative.no-room-made': Object.freeze({ ...servedEdit('ladder:no-room-made', []), killsByEngine: Object.freeze({ chromium: Object.freeze(['L.d7.1440x900']), webkit: Object.freeze(['L.d7.390x844']) }) }),
   'L.negative.no-aside-mark': servedEdit('ladder:no-aside-mark', ['L.dots']),
-  'L.negative.fade-on-a-row': servedEdit('ladder:fade-on-a-row', ['L.d7.fade.390x560']),
+  'L.negative.fade-on-a-row': servedEdit('ladder:fade-on-a-row', ['L.d7.ink.390x560.dpr2']),
+  'L.negative.provisional-paint': servedEdit('ladder:provisional-paint', ['L.gloss.settled']),
+  'L.negative.row-not-the-box': servedEdit('ladder:row-not-the-box', ['L.gloss.box']),
+  'L.negative.fold-at-560': servedEdit('ladder:fold-at-560', ['L.d7.scroll-gap']),
   'L.negative.dash-for-none': servedEdit('ladder:dash-for-none', ['L.gloss.never-dash']),
   'L.negative.english-ignores-sense': servedEdit('ladder:english-ignores-sense', ['L.gloss.sense']),
   'G3.negative.ruby-survives-back': servedEdit('ruby-survives-back', ['G3.clear.bare']),
@@ -256,6 +263,10 @@ function g6ObservedWitness(spec, baseline, mutant, restore) {
     default: return false;
   }
 }
+function ladderBoxTrim(text) {
+  const plain = String(text || '').replace(/\([^)]*\)/gu, '').replace(/\s+/gu, ' ').trim() || String(text || '');
+  return plain.length > 18 && plain.includes(',') ? plain.split(',')[0].trim() : plain;
+}
 function ladderFaultWitness(spec, targets) {
   const o = targets[0]?.observed;
   switch (spec.control) {
@@ -264,7 +275,10 @@ function ladderFaultWitness(spec, targets) {
     case 'ladder:back-leaves-at-once': return Array.isArray(o) && o.some(step => typeof step?.first?.view === 'string' && step.first.view !== 'reader');
     case 'ladder:no-room-made': return Array.isArray(o) && o.some(place => Array.isArray(place?.rows) && place.rows.some(row => row?.whole === false));
     case 'ladder:no-aside-mark': return observedObject(o) && o.aside === null;
-    case 'ladder:fade-on-a-row': return Array.isArray(o) && o.some(place => Array.isArray(place?.underFade) && place.underFade.length > 0);
+    case 'ladder:fade-on-a-row': return Array.isArray(o) && o.some(place => Array.isArray(place?.inkUnderFade) && place.inkUnderFade.length > 0);
+    case 'ladder:provisional-paint': return Array.isArray(o) && o.some(word => Array.isArray(word?.other) && word.other.length > 0);
+    case 'ladder:row-not-the-box': return Array.isArray(o) && o.some(word => typeof word?.box === 'string' && word.box.length > 0 && typeof word.english === 'string' && word.english !== ladderBoxTrim(word.box));
+    case 'ladder:fold-at-560': return Array.isArray(o) && o.some(place => Array.isArray(place?.steps) && place.steps.some(step => Number.isFinite(step?.folds) && step.folds > 0));
     case 'ladder:dash-for-none': return Array.isArray(o?.dashes) && o.dashes.length > 0;
     case 'ladder:english-ignores-sense': return Array.isArray(o?.words) && o.words.some(word => Array.isArray(word?.wrong) && word.wrong.length > 0);
     default: return false;
@@ -323,8 +337,8 @@ export function grammarControlVerdicts({ engines, rows, controls, runtimeFiles }
     return { id, ok };
   }));
 }
-export function grammarAcceptance({ argv, engines, rows, walks, g6Completed, controls, runtimeFiles }) {
-  const selection = grammarSelection(argv);
+export function grammarAcceptance({ argv, ladderWalks = [], engines, rows, walks, g6Completed, controls, runtimeFiles }) {
+  const selection = grammarSelection(argv, { ladderWalks });
   const expectedWalks = engines.flatMap(engine => grammarWalkNames(engine).map(name => `${engine}/${name}`));
   const observedWalks = walks.filter(w => w.phase === 'candidate').map(w => `${w.engine}/${w.name}`);
   const expectedControls = engines.flatMap(grammarControlRows);

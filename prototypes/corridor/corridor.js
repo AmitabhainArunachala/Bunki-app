@@ -9730,30 +9730,45 @@ function seatGlossRow(anchor, line) {
 function inlineTokenGloss(anchor, token) {
   return seatGlossRow(anchor, tokenGlossLine(token));
 }
-/** Ladder R2 · a text token's English row (the critic's round-1 FAIL, 10-20: tap 2 repeated the quick dictionary's first gloss,
- * so 先 in 出荷先 could read "point", and a word with no meaning at hand showed "—"). It says the gloss of the sense its
- * sentence uses where the article's sense data names one (the sidecar, R3 part 2), else the box's first gloss: its door's
- * meaning, led by the sense the box settles on once that is in (readerTokenGloss). A sense the sidecar names that is not
- * yet at hand is waited for, never painted over with a meaning it takes back (R3's rule for the box); elsewhere the row
- * speaks at once. Its reading's rows and its sense are asked for (the reader asked at the word's first rung: senseAhead):
- * once the rows are in the row says what they give, as it always has, and once the sense is in, what that settles; with
- * nothing to say it says nothing. `painted` hears a change. */
+/** Ladder R2/R4 · a text token's English row. It says the gloss the word's box leads with (readerTokenLead: the sense its
+ * sentence uses, from the article's sense data or the box's own rules, as the box draws it) and nothing else. R4 (the
+ * lead's ruling on the critic's r2 read, 10-20: "never show an English word that later changes"): until that gloss is
+ * settled (its reading's rows in, and the sense the box will lead with) the row keeps its line empty (tok-en-wait), then
+ * says it once; round 2 painted the quick dictionary's gloss first and swapped it (また "again" → "and"). The reading's rows
+ * and the sense are asked for from the word's first rung (senseAhead), the full dictionary from the first press on the
+ * text (below). With no gloss at all it says nothing. `painted` hears the gloss land. */
 function tokenGlossLine(token, painted = null) {
   const reading = readyTokenReading(token);
   const sensing = () => !SENSE_GAVE_UP.has(token) && !!senseChoice(token, readingTokenEntry(token))?.need;
-  const named = () => sensing() && !!sidecarSense(senseNeighbours(token))?.seq;
-  const line = inlineGlossLine(named() ? '' : readerTokenGloss(token), !!reading || sensing());
-  if (!reading && !sensing()) return line;
-  const paint = (last) => {
+  const settled = !reading && !sensing();
+  const line = inlineGlossLine(settled ? readerTokenLead(token) : '', !settled);
+  if (settled) return line;
+  Promise.resolve(reading).then(() => ensureSense(token, readingTokenEntry(token))).catch(() => {}).then(() => {
     if (!line.isConnected) return;
-    const was = line.textContent, found = !last && named() ? '' : readerTokenGloss(token);
-    setGlossLine(line, found, !last && sensing());
-    if (found) seatInlineGloss(line);
-    if (found !== was) painted?.(line);
-  };
-  Promise.resolve(reading).then(() => { paint(false); return ensureSense(token, readingTokenEntry(token)); })
-    .catch(() => {}).then(() => paint(true));
+    // what the box leads with now: the sense's gloss, or (a sense that cannot be had) the word's own meaning, as the box
+    const found = readerTokenLead(token);
+    setGlossLine(line, found);
+    if (found) { seatInlineGloss(line); painted?.(line); }
+  });
   return line;
+}
+/** Ladder R4 (F1's prefetch, the lead's ruling, 10-20) · the first press on the text being read opens the full dictionary, so
+ * a word's sense is usually at hand by its second tap: a finger touching the text, to scroll it or to tap a word, starts the
+ * index then, not at the tap's click (each word's own rows and sense still start at its first rung, senseAhead). A reader
+ * who never touches the text never loads it. */
+if (typeof document !== 'undefined') document.addEventListener('pointerdown', (event) => {
+  if (D.dictionaryIndex || !event.target?.closest?.('#reader')) return;
+  ensureDictionaryIndex().catch(() => {});
+}, { capture: true, passive: true });
+/** Ladder R4 (F2, the lead's ruling, 10-20) · the gloss a word's box leads with, its first meaning line (the box's own record:
+ * the sense it settles on, a te-form auxiliary's te-form sense, a name's line), only trimmed within itself for the row under
+ * the word: a parenthesis dropped, a long gloss cut at its first comma. Never another gloss in its place: inlineGloss's
+ * fallback to a shorter later gloss put "to receive" under ていただく while the box said "to get someone to do something". */
+function boxLeadGloss(rec) {
+  const first = String(rec?.m?.[0] || '');
+  if (!first) return '';
+  const plain = first.replace(/\([^)]*\)/g, '').replace(/\s+/g, ' ').trim() || first;
+  return plain.length > 18 && plain.includes(',') ? plain.split(',')[0].trim() : plain;
 }
 /** The English row's words: centred under their word, never past the edge of the line they stand in. */
 function seatInlineGloss(line) {
@@ -10401,8 +10416,9 @@ async function openJapaneseLookup(anchor, text, context = {}) {
     ...(context.kanjiOnly ? { kanjiOnly: true } : {}), ...(readMiss ? { readMiss: true } : {}) };
   const entryNode = record ? { t: 'word', id: token.b, ...(record.seq ? { seq: record.seq, reading: record.r } : {}) }
     : hasKanjiEntry ? { t: 'kanji', id: text } : null;
-  // Ladder · the English under the word: the sense its text uses (the record above), a lone kanji's meaning, or the dash
-  const english = record?.m?.length ? inlineGloss(record) : (context.kanjiOnly || hasKanjiEntry) ? String(D.kanji[text]?.m || '').toLowerCase() : '';
+  // Ladder · the English under the word: the gloss its box leads with (the record above; R4: boxLeadGloss), a lone kanji's
+  // meaning, or nothing
+  const english = record?.m?.length ? boxLeadGloss(record) : (context.kanjiOnly || hasKanjiEntry) ? String(D.kanji[text]?.m || '').toLowerCase() : '';
   // Ladder · the surface the reading is weighed against is the word as printed: a caller's label (the exam paper passes
   // surface: 'assessment') is not, so a kana word there starts at its English, as everywhere
   const printed = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(String(context.surface || '')) ? context.surface : text;
@@ -12060,35 +12076,74 @@ function rowCut(card, room) {
   }
   return foot >= 96 ? Math.ceil(foot + 1) : room;
 }
-/** Ladder R2 · D7 · the depth of a cut card's fade (rooms/read.css: #mini[data-more='true']::after), and the rows it may
- * never lie on: the card's bands and their own lines (the word band, Save and its reason, the kanji band's heading and its
- * rows, the sentence's door, Save's menu items). */
+/** Ladder R2/R4 · D7 · the depth of a cut card's fade (rooms/read.css: #mini[data-more='true']::after); the card's rows (its
+ * bands and their own lines); and its ink, what the rows draw: every text, the kanji tiles, the Save key and the keys beside
+ * it. */
 const MINI_FADE = 32;
 const MINI_FADE_ROWS = '.mini-head, .mini-word-note, .mini-actions, .mini-take-reason, .mini-band-head, .mini-kanji-row, ' +
   '.mini-sentence-open, #vocabulary-list-popover, #vocabulary-list-popover > *, .vocabulary-list-more > *';
-/** Ladder R2 · D7 (the critic's FAIL, 10-20: at 390×520 and 390×560, and at 320×568 with the second 総理 mid-glass, the
- * compact box was cut at a kanji row's foot and its fade lay on that row; DESIGN: "the fade never lies on a row"). A compact
- * card cut to its room ends a fade's depth below the deepest row that leaves that much room under it, so its fade lies on
- * paper: under its last kanji row the kanji band's own depth is there already (is-cut); under any other row, what follows is
- * folded down by what the fade still needs (data-fold, closed when the card is seated again). A band's heading is never the
- * last row shown, nor a line inside Save's menu (the menu shows whole or waits under the fold). The cut's height, or null
- * where not even the word band leaves room for a fade under it (then rowCut decides). */
+const MINI_INK = '.mini-kanji-glyph, .mini-take, .mini-actions button';
+/** Ladder R4 · D7 · a card's ink as bands of its own scroll's height ([top, bottom], from its outer top), merged where they
+ * meet: the text it draws (not text kept for a screen reader alone) and its tiles and keys. */
+function cardInk(card) {
+  const box = card.getBoundingClientRect(), range = document.createRange(), spans = [];
+  const add = (r) => { if (r.width > 0.5 && r.height > 0.5) spans.push([r.top - box.top + card.scrollTop, r.bottom - box.top + card.scrollTop]); };
+  const walker = document.createTreeWalker(card, NodeFilter.SHOW_TEXT);
+  for (let text = walker.nextNode(); text; text = walker.nextNode()) {
+    const host = text.parentElement;
+    if (!text.nodeValue.trim() || !host?.getClientRects().length || host.closest('.visually-hidden, [hidden]')) continue;
+    const style = getComputedStyle(host);
+    if (style.visibility === 'hidden' || Number(style.opacity) === 0) continue;
+    range.selectNodeContents(text);
+    for (const r of range.getClientRects()) add(r);
+  }
+  for (const node of card.querySelectorAll(MINI_INK)) if (node.getClientRects().length) add(node.getBoundingClientRect());
+  spans.sort((a, b) => a[0] - b[0]);
+  const merged = [];
+  for (const [top, bottom] of spans) {
+    const last = merged.at(-1);
+    if (last && top <= last[1]) last[1] = Math.max(last[1], bottom);
+    else merged.push([top, bottom]);
+  }
+  return merged;
+}
+/** Ladder R2/R4 · D7. A compact card cut to its room keeps its fade off every row's ink; the fade may lie on a row's blank
+ * padding (the lead's ruling on the critic's r2 read, 10-20; round 2 folded rows apart instead, and a scrolled box showed a
+ * 33 px gap between 総 and 理). In order:
+ *   1. round 1's cut below the kanji band, its fade on the band's own depth (is-cut), where the room holds it: a glass with
+ *      that room (390×844, 320×568) shows exactly what it showed;
+ *   2. else the deepest place in the room where the fade's band holds no ink (390×560: 理's row whole, the fade on its blank
+ *      foot and the band's depth);
+ *   3. else (390×520, held: the lead's call on a shorter head) a fold under the deepest row whose ink leaves the fade room,
+ *      what follows it moved down only by what the fade still lacks (data-fold, closed when the card is seated again). A
+ *      band's heading is never the last row shown, nor a line inside Save's menu.
+ * The cut's height, or null (rowCut decides). */
 function fadeCut(card, room) {
   const box = card.getBoundingClientRect();
-  const rows = [...card.querySelectorAll(MINI_FADE_ROWS)].filter((node) => node.getClientRects().length).map((node) => {
-    const b = node.getBoundingClientRect();
-    return { node, top: b.top - box.top + card.scrollTop, bottom: b.bottom - box.top + card.scrollTop };
-  });
+  const at = (node) => { const b = node.getBoundingClientRect(); return { node, top: b.top - box.top + card.scrollTop, bottom: b.bottom - box.top + card.scrollTop }; };
+  const web = card.classList.contains('is-cut') ? card.querySelector(':scope > .mini-web') : null;
+  if (web?.getClientRects().length) {
+    const below = Math.ceil(at(web).bottom + 1);
+    if (below <= room) return below;
+  }
+  // the scrollport's foot s = cut − 1 (the card's foot border): its fade [s − MINI_FADE, s] between two inks
+  const ink = cardInk(card);
+  let best = 0;
+  for (let k = 0; k < ink.length; k += 1) {
+    const clearFrom = ink[k][1], clearTo = k + 1 < ink.length ? ink[k + 1][0] : Infinity;
+    const cut = Math.floor(Math.min(room, clearTo + 1));
+    if (cut - 1 - MINI_FADE >= clearFrom - 0.01 && cut > best) best = cut;
+  }
+  if (best) return best;
+  const rows = [...card.querySelectorAll(MINI_FADE_ROWS)].filter((node) => node.getClientRects().length).map(at);
   const feet = rows.filter((row) => !row.node.matches('.mini-band-head, #vocabulary-list-popover > *, .vocabulary-list-more > *') &&
     !rows.some((other) => other.top < row.bottom - 0.5 && other.bottom > row.bottom + 0.5)).sort((a, b) => b.bottom - a.bottom);
   for (const foot of feet) {
-    // the fade's depth and the card's own foot border; and, where the room has it, a px of paper between the fade and the
-    // row (as the cut rowCut made below the kanji band had)
-    const tight = Math.ceil(foot.bottom + MINI_FADE + 1);
-    if (tight > room) continue;
-    const cut = tight + 1 <= room ? tight + 1 : tight;
-    const next = Math.min(Infinity, ...rows.filter((row) => row !== foot && row.top >= foot.bottom - 0.5).map((row) => row.top));
-    const fold = Math.ceil(foot.bottom + MINI_FADE + (cut - tight) - next);
+    const inkFoot = Math.max(0, ...ink.filter(([top]) => top < foot.bottom - 0.5).map(([, bottom]) => bottom));
+    const nextInk = Math.min(Infinity, ...ink.filter(([top]) => top >= foot.bottom - 0.5).map(([top]) => top));
+    const cut = Math.ceil(inkFoot + MINI_FADE + 1);
+    if (cut > room) continue;
+    const fold = Math.ceil(cut - 1 - nextInk);
     if (fold > 0) { foot.node.style.marginBottom = `${fold}px`; foot.node.dataset.fold = String(fold); }
     return cut;
   }
@@ -14864,6 +14919,14 @@ function readerDoorGloss(door) {
   return record?.m?.length ? inlineGloss(record) : '';
 }
 const readerTokenGloss = (token) => readerDoorGloss(readingToken(token));
+/** Ladder R4 · the English row's gloss for a reader door: the box's lead (boxLeadGloss) where readerDoorGloss gave its
+ * shortest candidate; a lone kanji's meaning as before. */
+function readerDoorLead(door) {
+  const kanji = door.kanjiOnly ? D.kanji?.[door.b] : null;
+  if (kanji) return String(kanji.m || '').toLowerCase();
+  return boxLeadGloss(readerQuickRecordAsRead(door));
+}
+const readerTokenLead = (token) => readerDoorLead(readingToken(token));
 function readerGlossLine(token) {
   // Ladder R2 · the sense its sentence uses, followed to its answer (tokenGlossLine); its spoken state follows the row
   return tokenGlossLine(token, (line) => {
@@ -14904,7 +14967,7 @@ function readerTokenState(token, index, kind) {
   const said = token.b && token.b !== token.s ? String(token.r || '')
     : own && !(record?.r && kataToHira(String(record.r)) === kataToHira(own)) ? own : record?.r;
   if (showing && said && said !== token.s) parts.push(said);
-  if (S.glossed?.has(index)) parts.push(kanji ? String(kanji.m || '').toLowerCase() : record?.m?.length ? inlineGloss(record)
+  if (S.glossed?.has(index)) parts.push(kanji ? String(kanji.m || '').toLowerCase() : record?.m?.length ? boxLeadGloss(record)
     : quick && !record ? readerReadingMissText(door.b) : readerGlossMissText(door.b, door.r, door.several));
   return parts.join(' · ');
 }
