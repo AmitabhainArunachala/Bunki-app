@@ -12000,7 +12000,8 @@ function mustShowHeight(card) {
 }
 /** Ladder · D7 · how far the text must rise (+) or fall (−) so a seat beside the word holds a card of each height in turn
  * (the whole card, then what it must show): the least move over the two sides, within what its scroller can scroll, with the
- * word and its reading staying on the glass between the frame and the floor. 0 when no height can be had. */
+ * word and its reading staying on the glass between the frame and the floor. When no height can be had, the move that gives
+ * the most room, if it gives more; else 0. */
 function roomForCard(r, ceiling, floor, scroller, heights, at = scroller === 'window' ? window.scrollY : scroller.scrollTop) {
   const win = scroller === 'window';
   const max = win ? document.documentElement.scrollHeight - window.innerHeight : scroller.scrollHeight - scroller.clientHeight;
@@ -12016,7 +12017,14 @@ function roomForCard(r, ceiling, floor, scroller, heights, at = scroller === 'wi
     }
     if (best != null && Math.abs(best) >= 1) return Math.round(best);
   }
-  return 0;
+  // no height can be had beside the word wherever the text stands (a glass shorter than the card's must-show and its word:
+  // 390×520): the move that gives the card the most room, its word still on the glass, when that is more than it has.
+  // Standing still there cut it to what the word's middle left (131 px of 339: not one kanji row)
+  const sinks = Math.max(r.bottom - floor, -at), rises = Math.min(r.top - ceiling, max - at);
+  const roomAbove = (s) => r.top - s - 10 - ceiling, roomBelow = (s) => floor - (r.bottom - s) - 10;
+  const now = Math.max(roomAbove(0), roomBelow(0));
+  const [move, room] = roomAbove(sinks) >= roomBelow(rises) ? [sinks, roomAbove(sinks)] : [rises, roomBelow(rises)];
+  return room > now + 1 && Math.abs(move) >= 1 ? Math.round(move) : 0;
 }
 /** Ladder · where a word's card travels: 'window' for a word that scrolls with the page, the element that scrolls it inside
  * a scrolling surface (a page), or null: a word that does not scroll (a fixed surface), a word inside a card, or no word set

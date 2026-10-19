@@ -1689,7 +1689,7 @@ body.v-depth-layered #reader, #reader.reader {
 .reader .para-break { height: 1.5em; }
 /* Ladder · the reader's English row: its own ink at the control size (15 px), under the word (corridor.css .tok-en) */
 .reader .tok-en { margin-top: 0.15em; }
-.reader .tok-en-text { font-size: max(13px, var(--type-control)); line-height: 1.35; }
+.reader .tok-en-text { font-size: var(--type-control); line-height: 1.35; }
 /* segmentation shows only under the finger or the pointer, hugging the glyphs */
 #reader .tok:hover, #reader .tok:focus-visible { background: transparent; }
 body[data-view='reader'] main > blockquote {
