@@ -3388,6 +3388,10 @@ body:has(#app :is(.kp-study, .kp-done)) #app > .report-line-page { display: none
    the band and, at its end, rests above it. The key never moves: a short front is the screen's height, so its place in
    the flow is its pinned place. Undo, when there is one, stands on the same row at the left. */
 #app .kp-study:has(> .kp-reveal) { min-height: 100dvh; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+/* the inset is counted once, by the study (its padding, its key and its band reach the glass): the app's own inset padding
+   left the page's end that much below the study, so at a long front's end the key rose by the inset (78 px off the
+   bottom at a 34 px inset, where it stands at 44) and a short front scrolled by it */
+body:has(#app .kp-study > .kp-reveal) #app { padding-bottom: 0; }
 #app .kp .kp-study > .kp-reveal {
   position: sticky; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 3; order: 2; flex: none;
   align-self: flex-end; width: auto; min-width: 44px; min-height: 44px; margin: auto 0 0; padding: 0 6px 0 16px;
