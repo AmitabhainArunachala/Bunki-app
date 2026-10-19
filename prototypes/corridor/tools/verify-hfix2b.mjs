@@ -11,6 +11,8 @@
  *   KH1-3 no gloss the page is served, and no accessible name it renders, ends mid-word
  *   X-9   a word marked "Not yet" through the app's own writer reaches Today's sky, with its
  *         reason
+ *   H2-1  nothing legible in the sky is cut by the glass edge, at 390×844, 1024×768 and
+ *         1440×900, at rest and while dragging
  *
  * HOW BASE IS MEASURED. `KAIRO_HFIX2B_BASE=1` routes the four runtime files this slice changed
  * to their bytes at the base commit, so the base and the branch are judged by the SAME rows on
@@ -21,6 +23,7 @@
  *   seat     restore the old whole-world scatter of seats      → X-12's first-frame row must go red
  *   why      strip `why` from the kept projection              → X-1 must go red
  *   cover    slide the rail so the shelf bead hides under 宙   → X-14 must go red
+ *   edge     restore the old guard's three exclusions          → H2-1 must go red
  * A control that leaves its row green is itself a failure, and is reported as one.
  *
  * This writes nothing to the learner's record beyond the fixture it imports and the one "Not yet"
@@ -72,6 +75,19 @@ const atBase = (path) => {
 };
 const TYPE = { '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json' };
 
+/** A control that silently fails to apply is worse than no control: the row goes green and the
+ * run reports a discriminating check that never happened. Every swap goes through here, and a
+ * pattern that is not found exactly once stops the run. */
+function swap(text, from, to, label) {
+  const first = text.indexOf(from);
+  if (first < 0) throw new Error(`control "${label}" did not apply: pattern not found`);
+  if (text.indexOf(from, first + 1) >= 0) throw new Error(`control "${label}" is ambiguous: pattern found twice`);
+  return text.slice(0, first) + to + text.slice(first + from.length);
+}
+const OLD_EDGE_GUARD = '    if(n.kind==="word"&&(n.mode==="free"||n.mode==="glide")&&n!==focusN&&!n.hlDom){\n'
+  + '      const zf=(n.fpx||14)*n.s*cam.z;';
+const NEW_EDGE_GUARD = '    {\n      const zf=(n.fpx||14)*n.s*cam.z;';
+
 /** corridor.js keeps its functions in its own top-level scope, not on `window`, so a test cannot
  * reach the writer the word page calls. This rides INSIDE corridor.js — base bytes included, so
  * X-9 is measured the same way on both sides — and exposes that one writer and nothing else. */
@@ -113,6 +129,83 @@ const WHY = { test: 'missed in a test', yesterday: 'missed yesterday', unknown: 
   twice: 'you looked it up twice', due: 'due today' };
 
 /** Every kept star the sky is actually showing, with how it is painted. */
+
+/** H2-1 — anything LEGIBLE in the sky that crosses the glass edge.
+ *
+ * The sky's law is a dissolve, not a hard stop: a node fades out over its last ~34px, so while
+ * it is crossing it is both faintly visible and partly outside. That is the design. The floor
+ * below separates that intended whisper from a cut a reader can actually read — at the moment a
+ * node's box touches the edge the fade has already taken it to a quarter of its opacity, and a
+ * node meaningfully over the edge is below a sixteenth. Anything at or above the floor must lie
+ * wholly inside. Measured on the rendered box, so a glyph's hero type counts at its real size. */
+const LEGIBLE = 0.08;
+const readCutNodes = (page, floor) => page.evaluate((limit) => {
+  const layer = document.getElementById('drift-layer');
+  if (!layer) return { total: 0, cut: [] };
+  // every piece of text the sky draws, including the scale-stars: their captions run to 210px
+  // and carry a reason line under them now, so they are the largest ink in the field and the
+  // likeliest to meet an edge. Leaving them out would have been a hole in the row.
+  const nodes = [...layer.querySelectorAll('.word, .glyph, .part, .scale-star')];
+  const cut = [];
+  for (const n of nodes) {
+    const op = Number(getComputedStyle(n).opacity);
+    if (!(op >= limit)) continue;
+    const r = n.getBoundingClientRect();
+    if (!r.width || !r.height) continue;
+    // A CUT is a node the glass slices: part of it on screen, part of it beyond. A node that
+    // has left the viewport entirely is not cut, it is simply elsewhere — the field is far
+    // wider than the glass and is meant to be, so flagging those would condemn the sky itself.
+    const onW = Math.min(r.right, innerWidth) - Math.max(r.left, 0);
+    const onH = Math.min(r.bottom, innerHeight) - Math.max(r.top, 0);
+    if (!(onW > 0 && onH > 0)) continue;
+    const over = Math.max(-r.left, r.right - innerWidth, -r.top, r.bottom - innerHeight);
+    if (over > 0.5) {
+      cut.push({ text: (n.textContent || '').trim().slice(0, 10),
+        kind: n.classList.contains('scale-star') ? 'scale-star'
+          : n.classList.contains('word') ? 'word' : n.classList.contains('glyph') ? 'glyph' : 'part',
+        sat: n.classList.contains('bsat'), op: +op.toFixed(3), over: Math.round(over),
+        rect: [Math.round(r.left), Math.round(r.top), Math.round(r.right), Math.round(r.bottom)] });
+    }
+  }
+  return { total: nodes.length, cut: cut.sort((a, b) => b.op - a.op) };
+}, floor);
+
+/** Open the sky, let the field settle, tap a word to raise a constellation (the state Grok's
+ * walk was in — a bloom's satellites are the brightest ink the field ever shows), then watch
+ * several frames at rest and several more while the field is dragged. */
+async function sweepSkyEdges(page, host, label, drag) {
+  await page.goto(`${host.origin}/index.html?entry=drift&ui=bi`);
+  await page.waitForFunction(() => document.body.dataset.ready === '1');
+  await page.waitForTimeout(1500);
+  const worst = [];
+  let total = 0;
+  const sample = async () => {
+    const seen = await readCutNodes(page, LEGIBLE);
+    total = Math.max(total, seen.total);
+    worst.push(...seen.cut);
+  };
+  for (let i = 0; i < 4; i += 1) { await page.waitForTimeout(700); await sample(); }
+  // raise a constellation: its satellites sit at 0.95 and orbit, which is where the walk's
+  // cut words came from
+  const word = page.locator('#drift-layer .word').first();
+  if (await word.count()) {
+    const box = await word.boundingBox().catch(() => null);
+    if (box) { await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await page.waitForTimeout(1200); }
+  }
+  for (let i = 0; i < 4; i += 1) { await page.waitForTimeout(700); await sample(); }
+  // and while the field is carried: a node crossing the rim must fade, not slide out whole
+  for (const [dx, dy] of [[-150, -90], [150, 90], [-90, 150]]) {
+    await page.mouse.move(drag.x, drag.y);
+    await page.mouse.down();
+    for (let s = 1; s <= 5; s += 1) await page.mouse.move(drag.x + (dx * s) / 5, drag.y + (dy * s) / 5);
+    await sample();
+    await page.mouse.up();
+    await page.waitForTimeout(500);
+    await sample();
+  }
+  worst.sort((a, b) => b.op - a.op);
+  return { total, cut: worst };
+}
 const readKeptStars = (page) => page.evaluate(() => [...document.querySelectorAll('.scale-star-kept')]
   .filter((n) => !n.hidden)
   .map((n) => {
@@ -150,15 +243,20 @@ try {
         const kind = TYPE[hit.slice(hit.lastIndexOf('.'))];
         let text = AS_BASE ? atBase(hit).toString('utf8') : await (await route.fetch()).text();
         if (!AS_BASE && CONTROL === 'ink' && hit === '/drift-layer.css') {
-          text = text.replace('#drift-layer .scale-star-kept { color: var(--ink); }',
-            '#drift-layer .scale-star-kept { color: var(--verm, #b34836); }');
+          text = swap(text, '#drift-layer .scale-star-kept { color: var(--ink); }',
+            '#drift-layer .scale-star-kept { color: var(--verm, #b34836); }', 'ink');
         }
         if (!AS_BASE && CONTROL === 'seat' && hit === '/drift-layer.js') {
-          text = text.replace('const seat=keptSeat(index);',
-            'const seat={x:WR.w*(0.12+(scaleHash(row.key)%100000)/100000*0.76),y:WR.h*(0.12+(scaleHash(row.key+"y")%100000)/100000*0.76)};');
+          text = swap(text, 'const seat=keptSeat(index);',
+            'const seat={x:WR.w*(0.12+(scaleHash(row.key)%100000)/100000*0.76),y:WR.h*(0.12+(scaleHash(row.key+"y")%100000)/100000*0.76)};', 'seat');
         }
         if (!AS_BASE && CONTROL === 'why' && hit === '/drift-layer.js') {
-          text = text.replace("why:typeof row.why==='string'?row.why:''", "why:''");
+          text = swap(text, "why:typeof row.why==='string'?row.why:''", "why:''", 'why');
+        }
+        // the H2-1 control: put the three exclusions back, so only free-drifting words that
+        // are neither focused nor in a constellation can dissolve — the base's own guard
+        if (!AS_BASE && CONTROL === 'edge' && hit === '/drift-layer.js') {
+          text = swap(text, NEW_EDGE_GUARD, OLD_EDGE_GUARD, 'edge');
         }
         // the writer bridge rides on both sides, so X-9 is judged on the sky's read, never on
         // whether the test could reach the writer at all
@@ -307,6 +405,43 @@ try {
 
       check(`${tag} · no page errors`, errors.length === 0, errors.slice(0, 3).join(' | '));
       await context.close();
+
+      /* ---------------------------------------------------------------- H2-1, the glass edge
+       * Each engine sweeps its own sizes: the phone on WebKit, and on Chromium both the iPad
+       * and the laptop, so all three sizes Grok's walk names are measured. */
+      const sizes = engine === 'webkit'
+        ? [['phone', 390, 844]]
+        : [['ipad', 1024, 768], ['laptop', 1440, 900]];
+      for (const [sizeName, width, height] of sizes) {
+        const edgeContext = await browser.newContext({
+          viewport: { width, height },
+          isMobile: engine === 'webkit', hasTouch: engine === 'webkit', serviceWorkers: 'block',
+        });
+        await silenceBrowserAudio(edgeContext);
+        const edgePage = await edgeContext.newPage();
+        edgePage.setDefaultTimeout(25_000);
+        const edgeErrors = [];
+        edgePage.on('pageerror', (error) => edgeErrors.push(error.message));
+        await edgePage.route('**/*', async (route) => {
+          const url = new URL(route.request().url());
+          const hit = Object.keys(SWAP).find((path) => url.pathname.endsWith(path));
+          if (!hit) return route.continue();
+          let text = AS_BASE ? atBase(hit).toString('utf8') : await (await route.fetch()).text();
+          if (!AS_BASE && CONTROL === 'edge' && hit === '/drift-layer.js') {
+            text = swap(text, NEW_EDGE_GUARD, OLD_EDGE_GUARD, 'edge');
+          }
+          return route.fulfill({ status: 200, contentType: TYPE[hit.slice(hit.lastIndexOf('.'))], body: text });
+        });
+        const swept = await sweepSkyEdges(edgePage, host, sizeName, { x: width / 2, y: height / 2 });
+        const kinds = [...new Set(swept.cut.map((c) => c.kind))].join('+') || 'none';
+        check(`${tag} · H2-1 ${sizeName} ${width}×${height}: nothing legible is cut by the glass edge`,
+          swept.total > 0 && swept.cut.length === 0,
+          `${swept.total} nodes drawn, ${swept.cut.length} cut at ≥${LEGIBLE} opacity (${kinds})`
+          + `${swept.cut.length ? `: ${JSON.stringify(swept.cut.slice(0, 4))}` : ''}`);
+        await edgePage.screenshot({ path: join(out, `edges-${sizeName}-${AS_BASE ? 'base' : 'branch'}${CONTROL ? `-${CONTROL}` : ''}.png`) });
+        check(`${tag} · H2-1 ${sizeName} no page errors`, edgeErrors.length === 0, edgeErrors.slice(0, 2).join(' | '));
+        await edgeContext.close();
+      }
     } finally {
       await browser.close();
     }

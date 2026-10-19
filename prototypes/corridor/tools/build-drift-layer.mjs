@@ -681,6 +681,45 @@ patch('for(let i=0;i<2600;i++){', 'for(let i=0;i<600;i++){', 'r4 fewer grain spe
 patch('for(let i=0;i<26;i++){', 'for(let i=0;i<8;i++){', 'r4 fewer heavy kozo strands');
 patch('for(let i=0;i<46;i++){', 'for(let i=0;i<0;i++){', 'r4 no foxing spots');
 patch('g.addColorStop(0,shade(th.ground,f,th.dark?.22:.5));', 'g.addColorStop(0,shade(th.ground,f,th.dark?.14:.26));', 'r4 gentler mottling');
+
+// Hfix-2b · H2-1 (Grok's H2 walk: the sky cuts words at its edges on phone, iPad and laptop).
+// The donor's law is "nothing is ever half-guillotined by the viewport", but its guard was
+// written for free-drifting WORDS only, and three exclusions kept it away from the very nodes
+// the walk caught:
+//   · kind — a glyph and a part were never covered at all, and a glyph renders at hero type:
+//     the largest, most legible ink in the field (日 cut at the right edge on the iPad).
+//   · mode — spawnGlyph and spawnPart both start in "orbit", which the guard excluded, so no
+//     glyph could EVER dissolve however far off the glass its orbit carried it.
+//   · hlDom — a bloom's satellites sit at top=0.95, and layoutHeldRing's clamp is applied to
+//     the ring's target, not to the orbit and fluid drift that keep moving afterwards.
+// The law now covers every rendered node, with no exception at all — including the focused word.
+// Exempting focusN was tried and measured: drag the field after a tap and the focused word rides
+// to the rim at 0.97 opacity and is sliced there, which is the very thing the law forbids. The
+// camera centres focusN on a tap, so in ordinary use it is nowhere near an edge; when the learner
+// carries it there anyway, it dissolves like everything else.
+patch('    if(n.kind==="word"&&(n.mode==="free"||n.mode==="glide")&&n!==focusN&&!n.hlDom){\n'
+  + '      const zf=(n.fpx||14)*n.s*cam.z;\n'
+  + '      const ehw=n.w.length*zf*0.55, ehh=zf*0.62;',
+  '    {\n'
+  + '      const zf=(n.fpx||14)*n.s*cam.z;\n'
+  + '      const zs2=(n.mode==="free"||n.mode==="glide")?cam.z:1;\n'
+  + '      // A character count times the font box is right for a word and badly wrong for a\n'
+  + '      // glyph (hero type above its own gloss line); measuring the wrong box only moves the\n'
+  + '      // cut instead of removing it. So the node\'s OWN untransformed box is read and kept,\n'
+  + '      // and only for a node that has come within reach of an edge — a few reads on\n'
+  + '      // approach, never a per-frame layout pass. The class list is the cache key because\n'
+  + '      // it is exactly what changes when the box does: a hosted reading mounts its ruby\n'
+  + '      // (hosted-reading-shown) long after spawn, and a word taken into a constellation\n'
+  + '      // grows as bsat. A zero is never cached, so a node measured before it is laid out\n'
+  + '      // simply falls back to the estimate and is measured again next frame.\n'
+  + '      const text=(n.kind==="word"?n.w:n.ch)||"";\n'
+  + '      let ehw=Math.max(1,[...text].length)*zf*0.55, ehh=zf*0.62;\n'
+  + '      if(n.boxKey!==n.el.className&&n.el.isConnected&&Math.min(n.x,vw()-n.x,n.y,vh()-n.y)<220){\n'
+  + '        const bw=n.el.offsetWidth, bh=n.el.offsetHeight;\n'
+  + '        if(bw>0&&bh>0){n.boxW=bw;n.boxH=bh;n.boxKey=n.el.className;}\n'
+  + '      }\n'
+  + '      if(n.boxW>0){ehw=Math.max(ehw,n.boxW*n.s*zs2/2); ehh=Math.max(ehh,n.boxH*n.s*zs2/2);}',
+  'Hfix-2b H2-1 every rendered node dissolves at the glass edge, not only free words');
 patch('vg.addColorStop(1,th.dark?"rgba(0,0,0,.5)":rgba(th.ink,.14));', 'vg.addColorStop(1,th.dark?"rgba(0,0,0,.36)":rgba(th.ink,.07));', 'r4 lighter vignette');
 patch('ictx.globalAlpha=Math.min(.3,th.blobA*b.a);', 'ictx.globalAlpha=th.dark?Math.min(.09,th.blobA*b.a*.4):Math.min(.2,th.blobA*b.a*.8);', 'r4 pools a whisper by night, a cool mist by day');
 patch('pool:["#1E50A2","#1E50A2","#165E83","#165E83","#EB6101"]', 'pool:["#1E50A2","#1E50A2","#165E83","#165E83","#6E87A6"]', 'r4 the day mist stays cool (北斎)');
