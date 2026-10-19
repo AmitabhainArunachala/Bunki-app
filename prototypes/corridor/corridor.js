@@ -18616,16 +18616,53 @@ function lessonLaneIds(kind, lvl) {
 function lessonPlan(kind, lvl) {
   const ids = lessonLaneIds(kind, lvl);
   const out = [];
+  // K08 · a lane's last few items are a short lesson of their own (鹿 alone in 7級): never dropped, and the
+  // lessons before keep their ids and items, so a kept score still names the same ten
   for (let i = 0; i < ids.length; i += LESSON_SIZE) {
     const words = ids.slice(i, i + LESSON_SIZE);
-    if (words.length < 4) break;
     out.push({ id: `${lvl}-${out.length + 1}`, lvl, kind, words });
   }
   return out;
 }
-function startLesson(lesson) {
+/** K08 · the items the lesson's latest full run missed, from its own evidence rows (the record's shape is
+ * unchanged: one score per lesson, and one obslog row per item per run, stamped with the score's time). */
+function lessonMissedLast(lesson) {
+  const done = S.lessonsDone?.[lesson.id];
+  if (!done) return [];
+  const kind = lesson.kind || 'word';
+  const missed = new Set((S.obslog || [])
+    .filter((row) => row[1] === 'lesson' && row[4] === lesson.id && row[0] === done.ts && row[3] === 1)
+    .map((row) => row[2]));
+  return lesson.words.filter((w) => missed.has(srsKey(kind, w)));
+}
+/** The run before a lesson's latest one, read back from the evidence rows: id → { score, total }. */
+function lessonPreviousRuns() {
+  const runs = new Map();
+  for (const row of S.obslog || []) {
+    if (row[1] !== 'lesson' || !S.lessonsDone?.[row[4]]) continue;
+    const byTime = runs.get(row[4]) || new Map();
+    const run = byTime.get(row[0]) || { score: 0, total: 0 };
+    run.total += 1;
+    if (row[3] === 3) run.score += 1;
+    byTime.set(row[0], run);
+    runs.set(row[4], byTime);
+  }
+  const previous = new Map();
+  for (const [id, byTime] of runs) {
+    const before = [...byTime.keys()].filter((ts) => ts < S.lessonsDone[id].ts).sort((a, b) => b - a)[0];
+    if (before != null) previous.set(id, byTime.get(before));
+  }
+  return previous;
+}
+/** Start a lesson: all of it, or only `only` (its missed items, which never touch its score). */
+function startLesson(lesson, { only = null } = {}) {
   S.lessonsScroll = window.scrollY; // the list keeps the learner's place
-  S.lessonRun = { ...lesson, ix: 0, phase: 'learn', correct: 0, picked: null, choices: null };
+  const plan = { id: lesson.id, lvl: lesson.lvl, kind: lesson.kind, words: [...lesson.words] };
+  S.lessonRun = {
+    ...plan, plan, words: only ? [...only] : [...lesson.words], missedOnly: !!only,
+    previous: S.lessonsDone?.[lesson.id] || null, lastMissed: lessonMissedLast(plan),
+    ix: 0, phase: 'learn', correct: 0, picked: null, choices: null,
+  };
   render();
   window.scrollTo(0, 0);
 }
@@ -18715,6 +18752,7 @@ function renderLessons(main) {
   main.append(withEn(el('p', 'eyebrow', 'レッスン'), 'lessons', 'en-inline'));
   if (!run) {
     main.append(el('h1', 'view-title', tx('入り口から、順に', 'From the entrance, in order')));
+    const previous = lessonPreviousRuns();
     const section = (kind, lvl, label) => {
       const plan = lessonPlan(kind, lvl);
       if (!plan.length) return;
@@ -18723,17 +18761,43 @@ function renderLessons(main) {
       head.append(document.createTextNode(`${label} — ${done} / ${plan.length}`));
       if (bi()) head.append(el('span', 'en-inline', `${plan.length} lessons`));
       main.append(head);
+      // K08 · a finished lesson with misses stays in the list with its score, beside the next unfinished
+      // ones; "see all" opens every lesson of the lane, a perfect one included, to take again
+      const laneKey = `${kind}:${lvl}`;
+      const all = S.lessonsAll === laneKey;
+      const again = new Set(plan.filter((l) => S.lessonsDone[l.id] && S.lessonsDone[l.id].score < S.lessonsDone[l.id].total).slice(0, 5));
       const next = plan.filter((l) => !S.lessonsDone[l.id]).slice(0, 5);
-      for (const lesson of next) {
+      const shown = all ? plan : plan.filter((l) => again.has(l) || next.includes(l));
+      for (const lesson of shown) {
         const row = el('button', 'entry-row lesson-row');
         row.type = 'button';
+        row.dataset.lesson = lesson.id;
         row.append(el('span', 'row-glyph', lesson.id.split('-')[1]));
         row.append(el('span', 'row-main', lesson.words.slice(0, 4).join('・') + (lesson.words.length > 4 ? '…' : '')));
+        const result = S.lessonsDone[lesson.id];
+        if (result) {
+          const before = previous.get(lesson.id);
+          const score = el('span', 'lesson-score', `${result.score}/${result.total}`);
+          if (before) score.append(el('span', 'lesson-score-before', tx(` · 前回 ${before.score}/${before.total}`, ` · last time ${before.score}/${before.total}`)));
+          row.append(score);
+        }
         row.append(el('span', 'row-go', '›'));
         row.addEventListener('click', () => startLesson(lesson));
         main.append(row);
       }
-      if (!next.length) main.append(el('p', 'card-kind', tx('この級はぜんぶ終わった。', 'Every lesson at this level is done.')));
+      if (!all && !next.length && !again.size) main.append(el('p', 'card-kind', tx('この級はぜんぶ終わった。', 'Every lesson at this level is done.')));
+      if (all || shown.length < plan.length) {
+        const toggle = el('button', 'more-row lesson-all');
+        toggle.type = 'button';
+        toggle.dataset.lessonLane = laneKey;
+        toggle.setAttribute('aria-expanded', String(all));
+        toggle.textContent = all ? tx('たたむ', 'show fewer') : tx(`この級のレッスンをすべて見る（${plan.length}）`, `see all ${plan.length} lessons`);
+        toggle.addEventListener('click', () => {
+          S.lessonsAll = all ? null : laneKey;
+          render();
+        });
+        main.append(toggle);
+      }
     };
     for (const lvl of JLPT_LANES) section('word', lvl, lvl);
     main.append(withEn(el('p', 'eyebrow', '漢検 — 字のレッスン'), 'kanji lessons, by Kanji Kentei grade', 'en-inline'));
@@ -18745,6 +18809,11 @@ function renderLessons(main) {
     const word = run.words[run.ix];
     const backc = reviewBack({ t: run.kind || 'word', id: word });
     main.append(el('p', 'card-kind', `${run.id} — ${run.ix + 1} / ${run.words.length}`));
+    if ((run.lastMissed || []).includes(word)) {
+      const missed = el('p', 'lesson-missed-mark', tx('× 前回まちがえた', '× missed last time'));
+      missed.dataset.lessonMissed = word;
+      main.append(missed);
+    }
     const face = el('div', 'review-face');
     face.append(el('div', 'review-front', word));
     if (backc.reading) face.append(el('div', 'review-reading', backc.reading));
@@ -18821,13 +18890,15 @@ function renderLessons(main) {
           const kt = run.kind || 'word';
           const now = Date.now();
           const result = { score: run.correct, total: run.words.length, ts: now };
-          const rows = run.words.map((w, i) => [now, 'lesson', srsKey(kt, w), run.results[i] === 3 ? 3 : 1, run.id]);
+          // K08 · going over the missed ones is practice on the record, named apart, and never the lesson's score
+          const runName = run.missedOnly ? `${run.id}:missed` : run.id;
+          const rows = run.words.map((w, i) => [now, 'lesson', srsKey(kt, w), run.results[i] === 3 ? 3 : 1, runName]);
           run.pending = true;
           btn.disabled = true;
           let saved;
           try {
             saved = await commitStorePatch((latest) => ({
-              lessonsDone: { ...latest.lessonsDone, [run.id]: result },
+              ...(run.missedOnly ? {} : { lessonsDone: { ...latest.lessonsDone, [run.id]: result } }),
               obslog: [...(latest.obslog || []), ...rows],
             }));
           } finally { run.pending = false; }
@@ -18846,6 +18917,16 @@ function renderLessons(main) {
   // stands in the observation ledger; 覚える is a quiet choice, per word
   // or all at once, and choosing nothing adds nothing.
   main.append(el('h1', 'view-title', tx(`${run.correct} / ${run.words.length}`, `${run.correct} of ${run.words.length}`)));
+  // K08 · the lesson's earlier score stays named; a run of the missed ones leaves the score as it was
+  if (run.missedOnly) {
+    const kept = S.lessonsDone?.[run.id];
+    const line = el('p', 'gloss lesson-score-kept', kept
+      ? tx(`まちがえた分だけの稽古。レッスンの点数は ${kept.score} / ${kept.total} のまま。`, `Practice on the missed ones only — the lesson's score stays ${kept.score} of ${kept.total}.`)
+      : tx('まちがえた分だけの稽古。レッスンの点数は変わらない。', 'Practice on the missed ones only — the lesson\'s score does not change.'));
+    main.append(line);
+  } else if (run.previous) {
+    main.append(el('p', 'gloss lesson-score-before', tx(`前回は ${run.previous.score} / ${run.previous.total}`, `Last time ${run.previous.score} of ${run.previous.total}`)));
+  }
   main.append(
     el(
       'p',
@@ -18907,6 +18988,22 @@ function renderLessons(main) {
     all.disabled = learningEnrollmentPending.has(run);
     main.append(all);
   }
+  // K08 · a failed or partial lesson is taught again from here: only the missed ones, or all of it
+  const plan = run.plan || { id: run.id, lvl: run.lvl, kind: run.kind, words: run.words };
+  const missed = run.words.filter((w, i) => (run.results || [])[i] !== 3);
+  if (missed.length) {
+    const counter = kt === 'kanji' ? '字' : '語';
+    const redo = biLabel('button', 'take', `まちがえた ${missed.length} ${counter}をもう一度`, `Go over the ${missed.length} missed`);
+    redo.type = 'button';
+    redo.id = 'lesson-missed';
+    redo.addEventListener('click', () => startLesson(plan, { only: missed }));
+    main.append(redo);
+  }
+  const retake = biLabel('button', missed.length ? 'chip' : 'take', 'レッスンをはじめから', 'Retake this lesson');
+  retake.type = 'button';
+  retake.id = 'lesson-retake';
+  retake.addEventListener('click', () => startLesson(plan));
+  main.append(retake);
   const again = biLabel('button', 'take', 'レッスン一覧へ', 'back to lessons');
   again.type = 'button';
   again.addEventListener('click', endLessonRun);

@@ -4333,6 +4333,27 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   font-size: var(--type-control);
 }
 
+/* K08 · a finished lesson keeps its score in its row (and the run before, when there was one) */
+.lesson-row .lesson-score {
+  flex: none;
+  color: var(--ink-2);
+  font-size: var(--type-caption);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.lesson-missed-mark {
+  margin: 0 0 6px;
+  color: var(--red);
+  font-size: var(--type-caption);
+}
+
+.lesson-reading-note {
+  margin: 4px 0 0;
+  color: var(--ink-2);
+  font-size: var(--type-caption);
+}
+
 .lesson-options {
   display: flex;
   flex-direction: column;
