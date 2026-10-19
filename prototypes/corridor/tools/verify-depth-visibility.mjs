@@ -2,6 +2,8 @@
  * Delta-E 76 >= 10 is a conservative engineering separation, not a WCAG rule.
  * Evidence-only --worlds may narrow a diagnostic, never the full 22-context claim.
  * The ladder contract is exercised as an attribute, not claimed as a ladder interaction.
+ * Lead 1940's title rows use real first and second taps on fresh native profiles; they
+ * measure the title's layout through the first state, not the Ladder's own behaviour.
  */
 import assert from 'node:assert/strict';
 import { createHash, randomUUID } from 'node:crypto';
@@ -21,6 +23,9 @@ const WORLDS = ['hokusai', 'sumi', 'shu', 'akafuji', 'iwa', 'rokusho', 'yoru', '
 const PARA = { unmet: 23, met: 14, again: 18, recalled: 20, owned: 13, listed: 21, notYet: 31 };
 const DAY = 86400000;
 const STORY = 'kantei:jp-105-actions-202609-25startup';
+const CONTEXT_STORY = 'aozora:000772-1';
+const LIVE = [{ name: 'live-daisho', id: STORY, query: 'スタートアップ大賞', word: '大賞' }, { name: 'live-watashi', id: CONTEXT_STORY, query: '私の個人主義', word: '私' }];
+const savedWord = (id, now) => ({ t: 'word', id, label: id, ts: now - 40 * DAY, started: now - 40 * DAY });
 const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const option = (name) => { const i = process.argv.indexOf(name); return i < 0 ? null : process.argv[i + 1]; };
 const allowedArgs = new Set(['--worlds', '--control-current-paint']);
@@ -36,6 +41,7 @@ const controlBytes = controlFile ? readFileSync(resolve(controlFile)) : null;
 const report = { schemaVersion: 1, runId: process.env.KAIRO_GATE_RUN_ID || randomUUID(), startedAt: new Date().toISOString(),
   verifierSha256: hash(readFileSync(fileURLToPath(import.meta.url))), command: [process.execPath, ...process.argv.slice(1)],
   scope: { engines, worlds, full: engines.length === 2 && worlds.length === 11, rooms: ['slip', 'basis', 'tray', 'today', 'mirror'],
+    card: { title: STORY, context: `${CONTEXT_STORY} 講演 met+saved`, live: LIVE.map((l) => `${l.id} ${l.word}: fresh profile, real first and second input`) },
     fixture: 'G2 first paragraph; native installation record; exact dictionary identities', ladder: 'attribute contract only' },
   thresholds: { fillCssPx: 6, actualFillExtentCssPx: 5, actualFillAreaCssPx2: 18, actualFillNote: 'Interior mask excludes 0.25px radius edge; extent allows circle antialiasing, area rejects clipped stripes', keptOuterCssPx: 10, knownContrast: 3, savedContrast: 3, metContrast: 1.5, semanticDeltaE76: 10,
     deltaEStatus: 'conservative engineering bound, not WCAG', measurement: 'actual device pixels: painted screenshot vs identical geometry with only dots hidden; paper is the hidden pixel' },
@@ -72,22 +78,37 @@ async function boot(page) {
   await page.goto(new URL('index.html?entry=shelf&ui=bi', base).href);
   await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 45000 });
 }
-async function story(page) {
+async function story(page, id = STORY, query = 'スタートアップ大賞') {
   await boot(page);
-  const direct = page.locator(`[data-passage="${STORY}"]:not([data-recommendation]) .shelf-open`).first();
-  if (await direct.count()) await direct.click(); else { await openShelfTools(page); await page.locator('#shelf-reading-search').fill('スタートアップ大賞'); await page.locator('#shelf-reading-search').press('Enter'); await page.locator(`#shelf-reading-results [data-passage="${STORY}"] .shelf-open`).first().click(); }
+  const direct = page.locator(`[data-passage="${id}"]:not([data-recommendation]) .shelf-open`).first();
+  if (await direct.count()) await direct.click(); else { await openShelfTools(page); await page.locator('#shelf-reading-search').fill(query); await page.locator('#shelf-reading-search').press('Enter'); await page.locator(`#shelf-reading-results [data-passage="${id}"] .shelf-open`).first().click(); }
   await page.locator('#reader .tok[data-index]').first().waitFor({ timeout: 30000 }); await delay(1000);
 }
 /** The title as laid out now, with the native depth of every card word read
  * through the app's own resolver, independent of painted attributes. */
-const titleLayout = (page) => page.evaluate(() => {
+const titleLayout = (page) => page.evaluate(async () => {
+  await document.fonts.ready;
   const h1 = document.querySelector('.reader-card > h1.view-title');
   if (!h1) return null;
-  const style = getComputedStyle(h1), words = [...document.querySelectorAll('.reader-card .japanese-lookup-word[data-lookup-text]')];
-  return { fontSize: style.fontSize, lineHeight: style.lineHeight, paddingBottom: style.paddingBottom, height: h1.getBoundingClientRect().height,
-    painted: words.filter((w) => w.dataset.depth != null || w.dataset.kept != null).map((w) => w.dataset.lookupText),
-    nativeActive: words.filter((w) => { const d = window.__KAIRO_DEPTH__.depth({ t: 'word', id: w.dataset.lookupText }); return d && (d.depth !== 'unmet' || d.kept); }).map((w) => w.dataset.lookupText) };
+  const style = getComputedStyle(h1);
+  const words = [...document.querySelectorAll('.reader-card .japanese-lookup-word[data-lookup-text]')].map((w) => {
+    const d = window.__KAIRO_DEPTH__.depth({ t: 'word', id: w.dataset.lookupText });
+    return { text: w.dataset.lookupText, title: h1.contains(w), painted: w.dataset.depth != null || w.dataset.kept != null, nativeActive: Boolean(d && (d.depth !== 'unmet' || d.kept)) };
+  });
+  return { fontSize: style.fontSize, lineHeight: style.lineHeight, paddingBottom: style.paddingBottom, height: h1.getBoundingClientRect().height, titleWords: words.filter((w) => w.title).length, words };
 });
+const stateless = (layout, where = () => true) => Boolean(layout) && !layout.words.some((w) => where(w) && (w.painted || w.nativeActive));
+const sameRhythm = (a, b) => Boolean(a && b) && ['fontSize', 'lineHeight', 'paddingBottom', 'height'].every((k) => a[k] === b[k]);
+/** Commit a whole learner record through the app's own replication store. */
+async function commitRecord(page, value, tag) {
+  const blank = new URL(`__dots-${tag}-blank`, base).href;
+  await page.route(blank, (route) => route.fulfill({ contentType: 'text/html', body: '<!doctype html><title>Native fixture</title>' }));
+  await page.goto(blank);
+  await page.evaluate(async ({ text, moduleUrl, tag }) => { const core = await import(moduleUrl); const installation = JSON.parse(localStorage.getItem('kairo-local-record-binding-v1')); const policy = { binding: installation.binding, schemaEpoch: 1, deletionEpoch: 0, mergePolicy: 'kairo-conservative-merge/1' };
+    const store = await core.IndexedDbReplicationStore.open({ databaseName: installation.databaseName, policy, actor: installation.actor });
+    try { const before = await store.snapshot(); await store.commitLocal({ changeId: `dots-${tag}-${crypto.randomUUID()}`, binding: policy.binding, expectedRevision: before.revision, occurredAt: new Date().toISOString(), mutations: [{ kind: 'put', collection: 'learner-record', id: 'current', value: JSON.parse(text) }], operations: [] }); } finally { await store.close(); }
+  }, { text: JSON.stringify(value), moduleUrl: new URL('modules/record-core.mjs', base).href, tag });
+}
 async function seed(page, out) {
   await story(page);
   out.freshTitle = await titleLayout(page);
@@ -96,7 +117,7 @@ async function seed(page, out) {
   assert(Object.entries(wanted).every(([k, v]) => nodes[k]?.node?.id === v && nodes[k].kind === 'core'), `Fixture identity mismatch: ${JSON.stringify(nodes)}`);
   const today = await page.evaluate(() => window.__KAIRO_DEPTH__.day()), now = Date.now();
   const value = (await readAppRecordSnapshot(page)).record;
-  const item = (id) => ({ t: 'word', id, label: id, ts: now - 40 * DAY, started: now - 40 * DAY });
+  const item = (id) => savedWord(id, now);
   const card = (stability, daysAgo) => ({ due: new Date(now + Math.round(stability * 0.6) * DAY).toISOString(), last_review: new Date(now - daysAgo * DAY).toISOString(), stability, difficulty: 5.1, elapsed_days: daysAgo, scheduled_days: Math.round(stability * 0.6) + daysAgo, reps: 7, lapses: 0, learning_steps: 0, state: 2 });
   value.taken = [...value.taken, ...['大臣', '挨拶', '日', '年', '官邸', '大賞', '表彰'].map(item)];
   value.lists = { ...value.lists, 式典: [{ t: 'word', id: '式', label: '式', ts: now - 3 * DAY }] };
@@ -114,13 +135,7 @@ async function seed(page, out) {
   assert.equal(nativeTitle.kind, 'core', 'Native title 日本 identity is core');
   value.met.entries[nativeTitle.key] = { first: today, last: today, days: 1 };
   value.taken.push(item('日本'));
-  const blank = new URL('__dots-blank', base).href;
-  await page.route(blank, (route) => route.fulfill({ contentType: 'text/html', body: '<!doctype html><title>Native fixture</title>' }));
-  await page.goto(blank);
-  await page.evaluate(async ({ text, moduleUrl }) => { const core = await import(moduleUrl); const installation = JSON.parse(localStorage.getItem('kairo-local-record-binding-v1')); const policy = { binding: installation.binding, schemaEpoch: 1, deletionEpoch: 0, mergePolicy: 'kairo-conservative-merge/1' };
-    const store = await core.IndexedDbReplicationStore.open({ databaseName: installation.databaseName, policy, actor: installation.actor });
-    try { const before = await store.snapshot(); await store.commitLocal({ changeId: `dots-seed-${crypto.randomUUID()}`, binding: policy.binding, expectedRevision: before.revision, occurredAt: new Date().toISOString(), mutations: [{ kind: 'put', collection: 'learner-record', id: 'current', value: JSON.parse(text) }], operations: [] }); } finally { await store.close(); }
-  }, { text: JSON.stringify(value), moduleUrl: new URL('modules/record-core.mjs', base).href });
+  await commitRecord(page, value, 'seed');
   await story(page); await page.waitForFunction(() => document.querySelector('#reader .tok[data-depth]')); await delay(700); return nodes;
 }
 /** Geometry is read before hiding paint; pixels decide whether paint exists. */
@@ -364,7 +379,86 @@ async function titleCard(page, out) {
     row(out, 'title.first-line-ring', distinct && first.kept && underRing.length > 0, { first: first && { fragments: first.fragments, dot: [first.left, first.top, first.right, first.bottom], spread: first.spread, kept: first.kept }, second: second && { fragments: second.fragments }, underRing });
   }
   const fresh = out.freshTitle, stateful = await titleLayout(page);
-  row(out, 'title.no-state-unreserved', Boolean(fresh && stateful) && !fresh.painted.length && !fresh.nativeActive.length && stateful.painted.length > 0 && fresh.fontSize === stateful.fontSize && fresh.lineHeight !== stateful.lineHeight && fresh.paddingBottom !== stateful.paddingBottom, { fresh, stateful });
+  row(out, 'title.same-rhythm-fresh-and-stateful', fresh?.titleWords > 0 && stateless(fresh) && stateful?.words.some((w) => w.title && w.painted) && sameRhythm(fresh, stateful),
+    { law: 'lead 1940: a title holding lookup words reserves its line space before any state', fresh, stateful });
+}
+/** A real context line (aozora:000772-1) under the title: its word holds
+ * native met+saved history while no title word does. Its dot is measured like
+ * every other card dot, and the title keeps its fresh layout. */
+async function contextCard(page, out) {
+  await story(page, CONTEXT_STORY, '私の個人主義');
+  const fresh = await titleLayout(page);
+  const word = await page.evaluate(() => { const node = { t: 'word', id: '講演' }; return { present: Boolean(document.querySelector('.reader-card .reader-context .japanese-lookup-word[data-lookup-text="講演"]')), key: window.__KAIRO_DEPTH__.key(node), kind: window.__KAIRO_DEPTH__.identity(node)?.kind ?? null }; });
+  assert(word.present && word.kind === 'core', `Native context word 講演: ${JSON.stringify(word)}`);
+  const today = await page.evaluate(() => window.__KAIRO_DEPTH__.day()), now = Date.now();
+  const value = (await readAppRecordSnapshot(page)).record;
+  value.met = { version: 1, entries: { ...(value.met?.entries || {}), [word.key]: { first: today, last: today, days: 1 } } };
+  value.taken = [...(value.taken || []), savedWord('講演', now)];
+  await commitRecord(page, value, 'context');
+  await story(page, CONTEXT_STORY, '私の個人主義');
+  await page.waitForFunction(() => document.querySelector('.reader-card .reader-context .japanese-lookup-word[data-lookup-text="講演"][data-depth]'));
+  const contextOnly = await titleLayout(page);
+  row(out, 'context.title-unchanged', fresh?.titleWords > 0 && stateless(fresh) && stateless(contextOnly, (w) => w.title) && contextOnly?.words.some((w) => !w.title && w.text === '講演' && w.painted) && sameRhythm(fresh, contextOnly), { fresh, contextOnly });
+  await page.locator('.reader-card').evaluate((el) => el.scrollIntoView({ block: 'center', inline: 'nearest' })); await delay(250);
+  const card = await surfaceCapture(page, out, 'context', '.reader-card .japanese-lookup-word[data-lookup-text]');
+  checkPaint(out, 'context', card);
+  lineGeometry(out, 'context', card);
+  const kouen = (out.nativeCensus?.context || []).find((r) => r.text === '講演');
+  row(out, 'context.native-kouen', kouen?.active === true && kouen.expectedDepth === 'met' && kouen.expectedKept && kouen.actualDepth === 'met' && kouen.actualKept && card.some((d) => d.probeId === kouen.probeId && d.raster.changedPixels >= 4), { kind: word.kind, census: kouen || null });
+}
+/** Lead 1940: on a fresh native profile, the first input on a title word
+ * shows its reading without an encounter, the second opens its stage and
+ * records the first state. Through both, the word stays put, the open slip
+ * stays seated beside the word and its reading, and the title keeps its height. */
+async function liveFirstState(page, out, { name, id, query, word }) {
+  await story(page, id, query);
+  await page.locator('.reader-card').evaluate((el) => el.scrollIntoView({ block: 'center', inline: 'nearest' })); await delay(250);
+  const selector = `.reader-card > h1.view-title .japanese-lookup-word[data-lookup-text="${word}"]`, target = page.locator(selector).first();
+  const native = await page.evaluate((word) => { const node = { t: 'word', id: word }; return { key: window.__KAIRO_DEPTH__.key(node), kind: window.__KAIRO_DEPTH__.identity(node)?.kind ?? null }; }, word);
+  const lines = await page.evaluate(() => [...document.querySelectorAll('.reader-card > h1.view-title .japanese-lookup-word')].map((w) => { const r = w.getClientRects()[0]; return { text: w.dataset.lookupText, top: r?.top ?? null, bottom: r?.bottom ?? null }; }));
+  const sample = (label) => page.evaluate(async ({ selector, label }) => {
+    await document.fonts.ready;
+    const el = document.querySelector(selector);
+    const plain = (b) => ({ x: b.x, y: b.y, width: b.width, height: b.height });
+    const h1 = el.closest('h1.view-title'), heading = getComputedStyle(h1), r = el.getBoundingClientRect(), glyphs = [];
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); let text;
+    while ((text = walker.nextNode())) for (let i = 0; i < text.length; i++) { if (!text.textContent[i].trim()) continue; const range = document.createRange(); range.setStart(text, i); range.setEnd(text, i + 1); for (const b of range.getClientRects()) if (b.width && b.height) glyphs.push(b); }
+    const union = glyphs.length ? { left: Math.min(...glyphs.map((b) => b.left)), top: Math.min(...glyphs.map((b) => b.top)), right: Math.max(...glyphs.map((b) => b.right)), bottom: Math.max(...glyphs.map((b) => b.bottom)) } : null;
+    const mini = document.getElementById('mini'), m = mini?.getBoundingClientRect(), ms = mini && getComputedStyle(mini);
+    const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    return { label, scrollX, scrollY, source: plain(r), union, rung: el.dataset.ladderRung || null, depth: el.dataset.depth || null, kept: el.dataset.kept != null,
+      reading: [...el.querySelectorAll('rt')].filter((rt) => { const s = getComputedStyle(rt); return !rt.classList.contains('hidden-rt') && s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0'; }).map((rt) => rt.textContent).join(''),
+      title: { height: h1.getBoundingClientRect().height, lineHeight: heading.lineHeight, paddingBottom: heading.paddingBottom, fontSize: heading.fontSize },
+      mini: m && m.width > 0 && m.height > 0 && ms.display !== 'none' && ms.visibility !== 'hidden' ? plain(m) : null, hitOwned: Boolean(hit && (hit === el || el.contains(hit))) };
+  }, { selector, label });
+  const input = () => (out.engine === 'webkit' ? target.tap() : target.click());
+  const shift = (a, b) => (a && b ? Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y)) : Infinity);
+  const unionShift = (a, b) => (a && b ? Math.max(...['left', 'top', 'right', 'bottom'].map((k) => Math.abs(a[k] - b[k]))) : Infinity);
+  const gap = (s) => (s.mini && s.union ? Math.max(s.union.top - (s.mini.y + s.mini.height), s.mini.y - s.union.bottom) : null);
+  const fresh = await titleLayout(page);
+  const before = await sample('before');
+  const first = lines.find((l) => l.text === '日本'), daisho = lines.find((l) => l.text === '大賞');
+  const twoLine = Boolean(first && daisho && first.top != null && daisho.top != null && daisho.top - first.top > (first.bottom - first.top) / 2);
+  row(out, `${name}.fresh`, native.kind === 'core' && fresh?.titleWords > 0 && stateless(fresh) && !before.rung && !before.mini && (out.engine !== 'webkit' || id !== STORY || twoLine), { native, lines, twoLine, fresh, before });
+  await input();
+  await page.waitForFunction((selector) => document.querySelector(selector)?.dataset.ladderRung != null, selector); await delay(350);
+  const reading = await sample('reading');
+  const firstEncounter = (await readAppRecordSnapshot(page)).record.met?.entries?.[native.key] ?? null;
+  row(out, `${name}.reading-without-encounter`, reading.rung === 'reading' && reading.reading.length > 0 && !firstEncounter && !reading.mini, { reading, firstEncounter });
+  row(out, `${name}.source-input-1`, shift(before.source, reading.source) <= 1, { shift: shift(before.source, reading.source), before: before.source, reading: reading.source, scrollY: [before.scrollY, reading.scrollY], hitOwned: [before.hitOwned, reading.hitOwned] });
+  await input();
+  await page.locator('#mini').waitFor({ state: 'visible' });
+  const opened = await sample('stage-open');
+  const miniHandle = await page.$('#mini');
+  const committed = await waitForAppRecord(page, (value) => Boolean(value.met?.entries?.[native.key]), { description: `native first encounter for ${word}` });
+  await page.waitForFunction((selector) => document.querySelector(selector)?.dataset.depth === 'met', selector); await delay(350);
+  const met = await sample('stage-met');
+  const sameMini = Boolean(miniHandle) && await miniHandle.evaluate((el) => el.isConnected && el === document.getElementById('mini'));
+  const expected = await page.evaluate((word) => window.__KAIRO_DEPTH__.depth({ t: 'word', id: word }), word);
+  row(out, `${name}.stage-commits-met`, opened.rung === 'stage' && met.rung === 'stage' && committed.met.entries[native.key]?.days >= 1 && expected?.depth === 'met' && met.depth === 'met', { encounter: committed.met.entries[native.key], expected, opened: { rung: opened.rung, depth: opened.depth }, met: { rung: met.rung, depth: met.depth } });
+  row(out, `${name}.source-input-2`, shift(reading.source, met.source) <= 1 && unionShift(reading.union, met.union) <= 1, { shift: shift(reading.source, met.source), unionShift: unionShift(reading.union, met.union), reading: { source: reading.source, union: reading.union }, met: { source: met.source, union: met.union }, scrollY: [reading.scrollY, met.scrollY], hitOwned: [reading.hitOwned, met.hitOwned] });
+  row(out, `${name}.title-height-first-state`, JSON.stringify(reading.title) === JSON.stringify(met.title) && JSON.stringify(opened.title) === JSON.stringify(met.title), { reading: reading.title, opened: opened.title, met: met.title, openedBeforeState: !opened.depth });
+  row(out, `${name}.slip-seated`, sameMini && shift(opened.mini, met.mini) <= 1 && Number.isFinite(gap(opened)) && Number.isFinite(gap(met)) && gap(opened) >= 0 && gap(met) >= 0 && Math.abs(gap(met) - gap(opened)) <= 1, { sameMini, opened: { mini: opened.mini, union: opened.union, gap: gap(opened) }, met: { mini: met.mini, union: met.union, gap: gap(met) }, openedBeforeState: !opened.depth });
 }
 async function rooms(page, out) {
   out.roomStateCoverage = {};
@@ -424,13 +518,23 @@ async function rooms(page, out) {
   checkPaint(out, 'mirror', mirror); semanticFamily(out, 'mirror', mirror);
 }
 
+/** A fresh native profile for this engine and world, served the same CSS as every other page of the run. */
+async function openContext(browser, engine, world) {
+  const context = await browser.newContext({ viewport: engine === 'webkit' ? { width: 390, height: 844 } : { width: 1440, height: 900 }, deviceScaleFactor: 2, isMobile: engine === 'webkit', hasTouch: engine === 'webkit', reducedMotion: 'reduce', colorScheme: 'light', serviceWorkers: 'block' });
+  await context.addInitScript((world) => { localStorage.setItem('kairo-theme', world); localStorage.setItem('kairo-word-ladder-demo-v1', '1'); }, world);
+  if (controlBytes || diagnosticInlineEnd || process.env.DOTS_BASE_URL) await context.route(new URL('editorial.css', base).href + '*', async (route) => { try { const response = await route.fetch(); const original = await response.body(); const expected = report.identity.files?.find((f) => f.path === 'editorial.css')?.sha256; assert(expected && hash(original) === expected, 'Control fetched CSS does not match artifact'); const servedBytes = controlBytes || (process.env.DOTS_BASE_URL ? original : Buffer.concat([original, Buffer.from('\n.japanese-lookup-word:is([data-depth],[data-kept])::after { left:auto; right:auto; transform:translateX(calc(-0.5em - var(--depth-size)/2)); }\n')])); if (!process.env.DOTS_BASE_URL) assert(hash(original) !== hash(servedBytes), 'Control must change CSS'); (process.env.DOTS_BASE_URL ? (report.remoteCssServed ||= []) : report.control.served).push({ url: route.request().url(), candidateSha256: hash(original), servedSha256: hash(servedBytes) }); await route.fulfill({ response, body: servedBytes, headers: { ...response.headers(), 'content-length': String(servedBytes.length), 'content-type': 'text/css' } }); } catch (e) { report.control.setupError = String(e.stack); await route.abort(); } });
+  return context;
+}
+async function freshWalk(browser, out, walk) {
+  const context = await openContext(browser, out.engine, out.world);
+  try { const page = await context.newPage(); page.setDefaultTimeout(15000); page.on('pageerror', (e) => out.errors.push(String(e))); await walk(page); }
+  finally { await context.close(); }
+}
 async function one(browser, engine, world) {
   const out = { engine, version: browser.version(), world, viewport: engine === 'webkit' ? { width: 390, height: 844 } : { width: 1440, height: 900 }, deviceScaleFactor: 2, touch: engine === 'webkit', startedAt: new Date().toISOString(), rows: [], measurements: {}, errors: [] };
   report.contexts.push(out); save();
-  const context = await browser.newContext({ viewport: engine === 'webkit' ? { width: 390, height: 844 } : { width: 1440, height: 900 }, deviceScaleFactor: 2, isMobile: engine === 'webkit', hasTouch: engine === 'webkit', reducedMotion: 'reduce', colorScheme: 'light', serviceWorkers: 'block' });
+  const context = await openContext(browser, engine, world);
   try {
-    await context.addInitScript((world) => { localStorage.setItem('kairo-theme', world); localStorage.setItem('kairo-word-ladder-demo-v1', '1'); }, world);
-    if (controlBytes || diagnosticInlineEnd || process.env.DOTS_BASE_URL) await context.route(new URL('editorial.css', base).href + '*', async (route) => { try { const response = await route.fetch(); const original = await response.body(); const expected = report.identity.files?.find((f) => f.path === 'editorial.css')?.sha256; assert(expected && hash(original) === expected, 'Control fetched CSS does not match artifact'); const servedBytes = controlBytes || (process.env.DOTS_BASE_URL ? original : Buffer.concat([original, Buffer.from('\n.japanese-lookup-word:is([data-depth],[data-kept])::after { left:auto; right:auto; transform:translateX(calc(-0.5em - var(--depth-size)/2)); }\n')])); if (!process.env.DOTS_BASE_URL) assert(hash(original) !== hash(servedBytes), 'Control must change CSS'); (process.env.DOTS_BASE_URL ? (report.remoteCssServed ||= []) : report.control.served).push({ url: route.request().url(), candidateSha256: hash(original), servedSha256: hash(servedBytes) }); await route.fulfill({ response, body: servedBytes, headers: { ...response.headers(), 'content-length': String(servedBytes.length), 'content-type': 'text/css' } }); } catch (e) { report.control.setupError = String(e.stack); await route.abort(); } });
     const page = await context.newPage(); page.setDefaultTimeout(15000); page.on('pageerror', (e) => out.errors.push(String(e)));
     await seed(page, out);
     await worldBinding(page, out, 'reader');
@@ -467,6 +571,8 @@ async function one(browser, engine, world) {
     console.log(JSON.stringify({ engine, world, metrics: { met: met?.raster, owned: owned?.raster, recalled: recalled?.raster }, states })); save();
     await rooms(page, out);
     await worldBinding(page, out, 'after-rooms');
+    await freshWalk(browser, out, (fresh) => contextCard(fresh, out));
+    for (const live of LIVE) await freshWalk(browser, out, (fresh) => liveFirstState(fresh, out, live));
     out.completedWalk = true;
   } catch (error) { out.errors.push(String(error.stack || error)); console.error(`${engine}/${world}: ${error.message}`); }
   finally { await context.close(); out.completedAt = new Date().toISOString(); out.passed = !out.errors.length && out.completedWalk && out.rows.length >= 24 && out.rows.every((r) => r.passed); save(); }
@@ -494,6 +600,6 @@ finally {
   report.completedAt = new Date().toISOString();
   report.passed = !report.errors.length && !report.control.setupError && report.contexts.length === engines.length * worlds.length && report.contexts.every((c) => c.passed) && (!controlBytes || report.control.served.length > 0);
   report.fullAcceptance = report.passed && report.scope.full && report.mode === 'local artifact' && !controlBytes && !diagnosticInlineEnd;
-  report.control.killed = Boolean(controlBytes && !report.control.setupError && !report.errors.length && report.contexts.every((c) => !c.errors.length) && report.control.served.length && report.contexts.some((c) => c.rows.some((r) => /^(reader|title|slip|basis|prose|tray|today|mirror)(?:-[a-z]+)*\.(size|contrast|nonempty|semantic-separation)$/.test(r.id) && !r.passed)));
+  report.control.killed = Boolean(controlBytes && !report.control.setupError && !report.errors.length && report.contexts.every((c) => !c.errors.length) && report.control.served.length && report.contexts.some((c) => c.rows.some((r) => /^(reader|title|context|slip|basis|prose|tray|today|mirror)(?:-[a-z]+)*\.(size|contrast|nonempty|semantic-separation)$/.test(r.id) && !r.passed)));
   save(); console.log(`DOTS ${report.passed ? 'PASS' : 'FAIL'}: ${evidence}`); if (!report.passed) process.exitCode = 1;
 }

@@ -5414,9 +5414,10 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
    recalled most of it, familiar the ink itself. Six CSS pixels give the fill 44% more area than the former five;
    the kept ring spans eleven (ten on the slip). The visibility verifier measures the actual paper, including inherited opacity.
    The dot sits where a 圏点 sits, under the word, out of the line box (absolute: no line, ruby or gloss moves), and never
-   takes a tap (pointer-events: none). Body text never changes its line height for a dot. The reader's title card is the one
-   exception (lead ruling 1912): once a title word holds a state, the title reserves line space under each of its lines, so
-   its rings clear the next title line and the English caption. A title with no state keeps its own rhythm.
+   takes a tap (pointer-events: none). Body text and the title card's context line never change their line height for a
+   dot. The reader's title is the one exception (lead ruling 1940): whenever it holds lookup words, it always reserves line
+   space under each of its lines, before any word has a state, so its rings clear the next title line and the English
+   caption and a state arriving mid-reading never reflows the title.
    The ring around a dot is the world's seal red, and it means one thing everywhere: kept.
    Red is left to the ring in every world. Every value below is a world token or a mix of two (D3);
    corridor.js wordDepth decides the state; stronger paint never invents an encounter or changes the record.
@@ -5472,10 +5473,11 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
   bottom: calc(-0.3em + 1px);
   transform: translateX(calc(-0.5em - var(--depth-size) / 2));
 }
-/* the title card with a stateful word: each title line holds its own font cell plus room for a ring below it, and the dot
-   sits in that room, clear of its own glyphs, the next title line and the English caption */
-html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card:has(.japanese-lookup-word:is([data-depth],[data-kept])) > h1.view-title { line-height:calc(1.45em + 14px); padding-bottom:8px; }
-html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card:has(.japanese-lookup-word:is([data-depth],[data-kept])) > h1.view-title .japanese-lookup-word:is([data-depth],[data-kept])::after { bottom:-10.5px; }
+/* a title holding lookup words: each title line always holds its own font cell plus room for a ring below it, stateful or
+   not, so the first state never moves a word; the dot sits in that room, clear of its own glyphs, the next title line and
+   the English caption. Only the title's own words decide it, never the context line */
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card:has(> h1.view-title .japanese-lookup-word) > h1.view-title { line-height:calc(1.45em + 14px); padding-bottom:8px; }
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card:has(> h1.view-title .japanese-lookup-word) > h1.view-title .japanese-lookup-word:is([data-depth],[data-kept])::after { bottom:-10.5px; }
 /* Ladder contract: only this occurrence steps aside while its inline English is open. Removing the attribute
    restores the same fill and ring; the painter and learner record are untouched, and no line box moves. */
 #reader .tok[data-depth-aside='meaning'] > .tok-word::after,
