@@ -4,6 +4,8 @@
  * engine KAIRO_BROWSER names (webkit or chromium; both when unset), at 390×844 unless the row names another size:
  *   1   the stage stands whole beside its word (the reading moves the least that seats it, the word kept on the glass); a
  *       stage no seat can hold ends between two rows, says so with a fade at its foot, and scrolls by touch and keyboard;
+ *       the reading's move is the app's own, not his input: the word still writes itself to the end (1.ink), while a
+ *       scroll the app did not make ends the writing;
  *   2   the open layers lie under no part of the 層 mark (it stands in their corner), whole on the glass; it folds them and
  *       goes home;
  *   3   at part depth the thread rests with no bead half under the sticky 宙, the current bead whole, also after a finger
@@ -24,6 +26,7 @@
  *       W-1: a dictionary shard that fails once is asked again, and the stage still lands on its sense;
  *   15  R3-3: さもなければかの is ば + かの (that), never ばか (idiot);
  *   16  H0-1: Today's note field shows its whole hint at 390 and 320, in English and 日本語;
+ * HFIX1A_ONLY=1.ink,3. runs only the items with those row prefixes (a partial run, never an acceptance: exit 3 when green).
  * Negative controls: HFIX1A_NEGATIVE=<id> runs one item with its defect put back (the base's own lines served in place of
  * the fix, or CSS over the page) and that item's rows must go red; --controls runs every control after the plain run and
  * writes one row per control (killed = at least one of its item's rows red, with no page error). Claim boundary: headless
@@ -43,6 +46,7 @@ import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 
 const CONTROLS = process.argv.includes('--controls');
 const ONLY = process.env.HFIX1A_NEGATIVE || '';
+const PART = (process.env.HFIX1A_ONLY || '').split(',').map((p) => p.trim()).filter(Boolean);
 const out = resolveCorridorEvidence();
 mkdirSync(out, { recursive: true });
 const host = await startCorridorDev(0);
@@ -70,6 +74,7 @@ const CONTROL = {
     ['corridor.js', 'const fit = rowCut(card, Math.max(roomAbove, roomBelow, 96));', 'const fit = Math.max(roomAbove, roomBelow, 96);'],
   ] },
   'stage-fade': { item: '1.', css: "#mini[data-more='true']::after { content: none !important; }" },
+  'ink-move': { item: '1.ink', source: [['corridor.js', 'function appMadeScroll(event) {', 'function appMadeScroll(event) { return false;']] },
   layers: { item: '2.', source: [['corridor.js', 'dockLayersMark(mark, block, null, () => layersOnGlass(block));', 'void layersOnGlass;']] },
   'one-save': { item: '4.', source: [['corridor.js', 'function paintKeepAside(button) {', 'function paintKeepAside(button) { return;']] },
   'speak-bar': { item: '5.', source: [['corridor.js', "  if (S.view === 'reader' && passage()) chrome.append(chromeKeep());",
@@ -321,9 +326,15 @@ async function itemThread(browser, engine) {
       // the rail names its origin once a word has been opened (verify-word-grammar g6OpenOrigin)
       await stage(page);
       await page.keyboard.press('Escape'); await delay(250); await page.keyboard.press('Escape'); await delay(250);
+      // item 8: the rail offers a word's kanji only once that kanji has been entered, so the word → kanji step is the
+      // page's kanji row (G6's own door, verify-word-grammar's g6Door); the other steps are the rail's
+      const railAt = (to) => page.waitForFunction((s) => [...document.querySelectorAll('.scale-thread')].some((n) => !n.closest('[inert],[aria-hidden="true"]') && n.getClientRects().length && n.dataset.scale === s), to, { timeout: 8000 });
       for (const [from, to] of [['article', 'sentence'], ['sentence', 'word'], ['word', 'kanji'], ['kanji', 'part']]) {
-        await page.locator(`${RAIL}[data-scale="${from}"] button[data-scale-in]`).tap();
-        await page.waitForFunction((s) => [...document.querySelectorAll('.scale-thread')].some((n) => !n.closest('[inert],[aria-hidden="true"]') && n.getClientRects().length && n.dataset.scale === s), to, { timeout: 8000 });
+        if (from === 'word') {
+          const row = page.locator('#sheet .entry-row[data-kanjirow]').first();
+          await row.scrollIntoViewIfNeeded(); await row.tap();
+        } else await page.locator(`${RAIL}[data-scale="${from}"] button[data-scale-in]`).tap();
+        await railAt(to);
         await settle(page, 450);
       }
       const f = await railFacts(page, 'part');
@@ -736,8 +747,48 @@ async function itemNoteHint(browser, engine) {
   }
 }
 
+async function itemStageInk(browser, engine) {
+  // 1 · its writing: a stage seated whole moves the reading itself (1.stage-whole's least move), and that move is not
+  // his input, so the word still writes itself (筆 at a first meeting) to the end; a scroll the app did not make itself
+  // still ends the writing at once (found by the round-1 capture's screen 06: the move ended every writing)
+  const walk = async (scrollMidway) => {
+    const { context, page, errors } = await session(browser, { world: 'hokusai' });
+    try {
+      await openStory(page);
+      const tok = page.locator(WORD_SEL).first();
+      await tok.scrollIntoViewIfNeeded(); await delay(250);
+      await page.evaluate(() => {
+        window.__ink = [];
+        new MutationObserver((list) => { for (const m of list) { const v = m.target.getAttribute(m.attributeName);
+          if (v && m.target.closest('#mini')) window.__ink.push(`${m.attributeName === 'data-ink' ? 'ink' : 'ended'}:${v}`); } })
+          .observe(document.body, { subtree: true, attributes: true, attributeFilter: ['data-ink', 'data-ink-ended'] });
+      });
+      await tok.tap();
+      const rung = await page.waitForFunction((el) => (document.getElementById('mini') ? 'stage' : el.dataset.ladderRung === 'reading' ? 'reading' : null),
+        await tok.elementHandle(), { timeout: 8000 }).then((h) => h.jsonValue()).catch(() => null);
+      const y0 = await page.evaluate(() => window.scrollY);
+      if (rung === 'reading') await tok.tap();
+      await page.locator('#mini .mini-word').waitFor({ timeout: 10_000 });
+      if (scrollMidway) {
+        const writing = await page.waitForFunction(() => window.__ink.includes('ink:writing'), null, { timeout: 4000 }).then(() => true, () => false);
+        if (writing) { await delay(150); await page.evaluate(() => window.scrollBy({ top: 30, behavior: 'instant' })); }
+      }
+      await page.waitForFunction(() => window.__ink.some((v) => v.startsWith('ended:')), null, { timeout: 8000 }).catch(() => {});
+      const f = await page.evaluate(() => ({ log: window.__ink.slice(), y: Math.round(window.scrollY), ceremony: document.getElementById('mini')?.dataset.ceremony || null }));
+      return { ...f, moved: Math.round(f.y - y0), errors };
+    } finally { await context.close(); }
+  };
+  const a = await walk(false);
+  check(`1.ink-moved · ${engine} · the stage moved the reading itself (${a.moved} px) and its word still wrote itself to the end`,
+    a.ceremony === 'write' && a.moved !== 0 && a.log.includes('ink:writing') && a.log.includes('ended:written') && !a.log.includes('ended:input') && !a.errors.length, a);
+  const b = await walk(true);
+  check(`1.ink-hand · ${engine} · a scroll the app did not make itself ends the writing at once`,
+    b.ceremony === 'write' && b.log.includes('ink:writing') && b.log.includes('ended:input') && !b.log.includes('ended:written') && !b.errors.length, b);
+}
+
 const ITEMS = [
   { id: 'stage', prefix: '1.', run: itemStage },
+  { id: 'stage-ink', prefix: '1.ink', run: itemStageInk },
   { id: 'layers', prefix: '2.', run: itemLayers },
   { id: 'thread', prefix: '3.', run: itemThread },
   { id: 'one-save', prefix: '4.', run: itemOneSave },
@@ -779,8 +830,8 @@ try {
     console.log(red.length ? `CONTROL ${ONLY} KILLED — ${red.length} red` : `CONTROL ${ONLY} SURVIVED — nothing went red`);
     if (!red.length) process.exitCode = 1;
   } else {
-    await runAll();
-    if (CONTROLS) {
+    await runAll(PART.length ? PART : null);
+    if (CONTROLS && !PART.length) {
       for (const id of Object.keys(CONTROL)) {
         const start = rows.length;
         control = id;
@@ -794,8 +845,9 @@ try {
       }
     }
     const failed = rows.filter((r) => !r.control && !r.pass);
-    console.log(failed.length ? `HFIX-1A FAIL — ${failed.length} of ${rows.filter((r) => !r.control).length}` : `HFIX-1A PASS — ${rows.filter((r) => !r.control).length} rows`);
+    console.log(failed.length ? `HFIX-1A FAIL — ${failed.length} of ${rows.filter((r) => !r.control).length}` : `HFIX-1A PASS — ${rows.filter((r) => !r.control).length} rows${PART.length ? ` — PARTIAL RUN (${PART.join(', ')}): never an acceptance` : ''}`);
     if (failed.length || !rows.length) process.exitCode = 1;
+    else if (PART.length) process.exitCode = 3;
   }
 } finally {
   writeFileSync(join(out, `hfix-1a${ONLY ? `-negative-${ONLY}` : CONTROLS ? '-controls' : ''}.json`), `${JSON.stringify({ engines: log.engines, negative: ONLY || null, controls: CONTROLS, rows }, null, 2)}\n`);
