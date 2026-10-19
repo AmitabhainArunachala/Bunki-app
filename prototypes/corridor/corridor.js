@@ -23192,29 +23192,52 @@ function kdxTextResults(kind) {
   wrap.id = 'kdx-results';
   const q = ((kind === 'reading' ? S.kdx.reading : S.kdx.meaning) || '').trim();
   if (!q) return wrap;
-  let chars;
+  const strokesOf = (c) => (D.kanji[c] || kanjiReference(c))?.st ?? 99;
   if (kind === 'reading') {
-    const hasKana = /[ぁ-んァ-ンー]/.test(q);
-    const qh = (hasKana ? kataToHira(q) : ROMAJI(q) || q.toLowerCase()).replace(/[.\-・\s]/g, '');
-    // match PER reading (never concatenated — else 介 + い.う spuriously reads
-    // かいう ⊇ かい): a reading whose okurigana-stripped stem starts with the
-    // query counts, so typing か…かい narrows the same way a paper index does.
-    chars = Object.keys(D.kanji).filter((c) => {
-      const k = D.kanji[c];
-      return (
-        qh &&
-        [...k.on, ...k.kun].some((r) => {
-          const rh = kataToHira(r).replace(/[.\-・\s].*$/, '').replace(/[.\-・\s]/g, '');
-          return rh === qh || rh.startsWith(qh);
-        })
-      );
-    });
-  } else {
-    const ql = q.toLowerCase();
-    chars = Object.keys(D.kanji).filter((c) => String(D.kanji[c].m).toLowerCase().includes(ql));
+    // K03 · the whole reading or its stem, one reading at a time (never concatenated — else 介 + い.う would read
+    // かいう ⊇ かい), over every reading the kanji has (K01): たべる, taberu, タベル, ﾀﾍﾞﾙ and an IME's たべr all find
+    // 食, and た still does; a reading that IS the query (whole or stem) comes before one that only begins with it.
+    const helpers = window.BunkiReferenceCore;
+    const qh = helpers.normalizeReadingQuery(q, ROMAJI);
+    const rank = new Map();
+    if (qh) {
+      for (const c of kanjiFinderUniverse()) {
+        const k = kanjiReference(c) || D.kanji[c];
+        const level = helpers.readingMatch([...(k?.on || []), ...(k?.kun || [])], qh);
+        if (level) rank.set(c, level);
+      }
+    }
+    const chars = [...rank.keys()].sort((a, b) => rank.get(b) - rank.get(a) || strokesOf(a) - strokesOf(b) || (a < b ? -1 : 1));
+    // until every reading has arrived the search runs over the lessons' readings only, and says so: a miss
+    // then is not a "no match" (K06)
+    const state = kanjiReadingsState();
+    if (state !== 'complete') {
+      const line = el('p', 'sem-empty', state === 'failed'
+        ? tx('すべての読みを読み込めなかった。いまはレッスン用に選んだ読みだけで探している。', 'Every reading could not be loaded — searching only the readings chosen for lessons.')
+        : tx('すべての読みを読み込み中。いまはレッスン用に選んだ読みだけで探している。', 'Loading every reading — searching only the readings chosen for lessons for now.'));
+      line.dataset.kdxReadings = state;
+      line.setAttribute('role', 'status');
+      wrap.append(line);
+      if (state === 'failed') {
+        const retry = biLabel('button', 'chip', '再試行', 'Try again');
+        retry.type = 'button';
+        retry.id = 'kdx-readings-retry';
+        retry.addEventListener('click', () => {
+          const pending = loadReferenceExtra();
+          document.getElementById('kdx-results')?.replaceWith(kdxTextResults(kind));
+          pending.then(() => document.getElementById('kdx-results')?.replaceWith(kdxTextResults(kind)));
+        });
+        wrap.append(retry);
+      }
+    }
+    renderKdxGrid(wrap, chars, 200, `reading:${qh}`, { empty: state === 'complete' });
+    return wrap;
   }
-  chars.sort((a, b) => D.kanji[a].st - D.kanji[b].st || (a < b ? -1 : 1));
-  renderKdxGrid(wrap, chars, 200);
+  const ql = q.toLowerCase();
+  const chars = kanjiFinderUniverse()
+    .filter((c) => String((D.kanji[c] || kanjiReference(c))?.m || '').toLowerCase().includes(ql))
+    .sort((a, b) => strokesOf(a) - strokesOf(b) || (a < b ? -1 : 1));
+  renderKdxGrid(wrap, chars, 200, `meaning:${ql}`);
   return wrap;
 }
 
