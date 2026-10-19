@@ -10,7 +10,8 @@
     "scope": "Complete indexed committed corpus, not official or exam-complete lists. Kentei collections are assigned-grade bins, not cumulative test scope.",
     "jlptKanji": "Bundled editorial JLPT tags retained verbatim; N3 has no tagged kanji. Historical pre-2010 KANJIDIC levels are not mapped to modern JLPT levels.",
     "unknown": "No attested label, or an unrecognized label kept verbatim; never infer a level from school grade or rank.",
-    "relationships": "Kentei related forms share an attested species ID, not necessarily a glyph or grade. Dictionary candidates require exact form/reading and reading restrictions; they do not classify every sense or authorize a canonical redirect."
+    "relationships": "Kentei related forms share an attested species ID, not necessarily a glyph or grade. Dictionary candidates require exact form/reading and reading restrictions; they do not classify every sense or authorize a canonical redirect.",
+    "kanjiReadings": "A kanji shows every reading: the listed readings first, then each further KANJIDIC2 reading, then each 常用漢字表 (2010) reading KANJIDIC2 lacks, marked as such. Nothing is dropped, merged or generated."
   },
   "stats": {
     "sourceRows": {
@@ -133,6 +134,14 @@
         "dictionaryIndex": {
           "path": "prototypes/corridor/data/share_alike/dict-v2/index.json",
           "sha256": "2f8c35efd206f0772ecf516a8773398cccaf062b256c43933da06c53930bdfb5"
+        },
+        "skip": {
+          "path": "prototypes/corridor/data/share_alike/skip.json",
+          "sha256": "9605a24687dc8a24179089670e7ffa95cefa1a887b19ee7d951cb77dbc61aa74"
+        },
+        "joyo": {
+          "path": "tools/fixtures/reference/joyo-2010.json",
+          "sha256": "67831f9bb9a0ca8c7a9061674fb5a37e515c4a0bee5fc8719eaad30a9cbb85db"
         }
       },
       "kanjidicArchive": {
@@ -222,6 +231,68 @@
           "No JLPT/Kentei classifications."
         ]
       ],
+      "kanjiTrust": {
+        "readingSource": {
+          "path": "prototypes/corridor/data/share_alike/skip.json",
+          "release": "3.6.2+20260803141815",
+          "archiveSha256": "5dfb850ee88c7bccecf4694cc4d7b1338e608440c5edcb8fefc93216b3471fe6",
+          "dictionaryDate": "2026-08-03",
+          "databaseVersion": "2026-215"
+        },
+        "readingScope": "Every kanji.json glyph and the 2,136 characters of the 2010 常用漢字表 (= strokes.json meta).",
+        "readingRule": "Exact KANJIDIC2 on/kun strings in source order. The app lists kanji.json readings first, then each further KANJIDIC2 reading, then officialReadings; nothing is dropped or merged.",
+        "kanjiReadingRows": 2578,
+        "kanjiRecords": [
+          "剝",
+          "𠮟"
+        ],
+        "officialTable": {
+          "path": "tools/fixtures/reference/joyo-2010.json",
+          "url": "https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/kanji/joyokanjisakuin/index.html",
+          "fetchedAt": "2026-10-19T08:09:17Z",
+          "pageSha256": "33cb7b99d88d069a5e6e228a71f587285c9fa3cc6937e74022928524569f26f3",
+          "characters": 2136,
+          "readings": 4388
+        },
+        "officialReadingsAdded": [
+          "塞:ふさがる",
+          "羨:うらやましい",
+          "曽:ゾ",
+          "速:はやまる",
+          "中:ジュウ",
+          "丼:どん",
+          "務:つとまる",
+          "踊:おどり",
+          "絡:からめる"
+        ],
+        "wordFill": {
+          "source": "prototypes/corridor/data/share_alike/dict-v2 (JMdict 3.6.2+20260803141815)",
+          "perKanji": 10,
+          "rule": "Only for a Jōyō kanji no shipped word list names (headwords, k lists, alternate spellings). JMdict entries written with it, never a search-only spelling (sK); reading allowed for that spelling; first gloss of the first sense allowed for both; common spellings first, rare (rK) last, then shorter, then sequence.",
+          "emptyBefore": "串剝勅咽嗣塡壱媛孔弐怨恣恭慄憬斤曽朕栃梨沃淫璽羞臼舷茨蔽薫虞訃諧謁貞辣逓采隻頰𠮟",
+          "filled": "剝勅咽嗣塡壱媛孔弐怨慄憬曽梨沃羞茨蔽薫虞謁頰𠮟",
+          "searchOnlySpellingsOnly": "串斤采",
+          "withoutWords": "串恣恭斤朕栃淫璽臼舷訃諧貞辣逓采隻",
+          "shardSha256": {
+            "prototypes/corridor/data/share_alike/dict-v2/00.json": "e5b86ef5ff46b01061d659482a77cef588ad19884db583ffbae5f304f6f84966",
+            "prototypes/corridor/data/share_alike/dict-v2/01.json": "0b699cb7cd59e7be4e506a73d69d407e3dd15078b0a7eef7ff5fe27d95309194",
+            "prototypes/corridor/data/share_alike/dict-v2/02.json": "e0c4c9462f5a18e564b8cb9f5c7014bb98dd42efe899c6f4b68fe75b4d544518",
+            "prototypes/corridor/data/share_alike/dict-v2/03.json": "41608704b6b28f914878fa5d6e360283848a9348166909ef4d2b413c7faea726",
+            "prototypes/corridor/data/share_alike/dict-v2/04.json": "c564455a0c2d301201cab48042bf33d34bdbc9e9f4dd37c5e79f30de736c9ceb",
+            "prototypes/corridor/data/share_alike/dict-v2/05.json": "48488e40a4268eb83708f74d95ef8a1df0882f41c792b09819a5965dbff8046c",
+            "prototypes/corridor/data/share_alike/dict-v2/06.json": "aa81e54eb617a8c7aa6fa9571ed6138e8efea712781a85d37d956a0b79fd523c",
+            "prototypes/corridor/data/share_alike/dict-v2/07.json": "6c4c87329444ff5268163f58fece63cbc90d2282a85858683e24f16ba7c39e87",
+            "prototypes/corridor/data/share_alike/dict-v2/08.json": "5b2b12b1f911b860356f60548b13e626dcd6d133d684f23b8b31757129d346bf",
+            "prototypes/corridor/data/share_alike/dict-v2/09.json": "9137ced2e0ed93ea9af1185b8b3a3b9870f27cb9e0a76f2b1d4df8ac52c29440",
+            "prototypes/corridor/data/share_alike/dict-v2/0a.json": "9c8571872e46b6de70639a50a82992d894bed95cac89033c058ef3590a3cb91f",
+            "prototypes/corridor/data/share_alike/dict-v2/0b.json": "7c0890fc51363274b6ba742d7d7856fc8dd5c5162ad51482086b0d2642983308",
+            "prototypes/corridor/data/share_alike/dict-v2/0c.json": "0b6ccea9ae9fec8e93f87d17c794c133c5a74ba0cd2761a1b98b7f34eed1b8cf",
+            "prototypes/corridor/data/share_alike/dict-v2/0d.json": "05399a3563e69e7ab75b78d81bcb12790f7482cc3ce51eb9fc39d59e5e7dbfc9",
+            "prototypes/corridor/data/share_alike/dict-v2/0e.json": "3f09712415c0fbc3cda17577375959b9770cc0d478b60f8244a2620401aa96ca",
+            "prototypes/corridor/data/share_alike/dict-v2/0f.json": "95b5bc19d50af0ce85388d451279c0cfd6f4bf5219e149accae7a994970a3e09"
+          }
+        }
+      },
       "rebuild": "node tools/build-reference-data.mjs --archive /path/to/kanjidic2-en-3.6.2+20260803141815.json.zip",
       "offlineCheck": "node tools/build-reference-data.mjs --check"
     },
@@ -504,10 +575,1948 @@
     ],
     "baseKanjiFieldsFilled": [
       {
+        "id": "安",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "安"
+      },
+      {
+        "id": "一",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "一"
+      },
+      {
+        "id": "飲",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "飲"
+      },
+      {
+        "id": "雨",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "雨"
+      },
+      {
+        "id": "円",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "円"
+      },
+      {
+        "id": "下",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "下"
+      },
+      {
+        "id": "何",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "何"
+      },
+      {
+        "id": "火",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "火"
+      },
+      {
+        "id": "外",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "外"
+      },
+      {
+        "id": "気",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "気"
+      },
+      {
+        "id": "金",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "金"
+      },
+      {
+        "id": "魚",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "魚"
+      },
+      {
+        "id": "空",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "空"
+      },
+      {
+        "id": "古",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "古"
+      },
+      {
+        "id": "行",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "行"
+      },
+      {
+        "id": "高",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "高"
+      },
+      {
+        "id": "後",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "後"
+      },
+      {
+        "id": "四",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "四"
+      },
+      {
+        "id": "子",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "子"
+      },
+      {
+        "id": "手",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "手"
+      },
+      {
+        "id": "出",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "出"
+      },
+      {
+        "id": "書",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "書"
+      },
+      {
+        "id": "小",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "小"
+      },
+      {
+        "id": "食",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "食"
+      },
+      {
+        "id": "新",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "新"
+      },
+      {
+        "id": "時",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "時"
+      },
+      {
+        "id": "十",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "十"
+      },
+      {
+        "id": "上",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "上"
+      },
+      {
+        "id": "人",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "人"
+      },
+      {
+        "id": "水",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "水"
+      },
+      {
+        "id": "生",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "生"
+      },
+      {
+        "id": "前",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "前"
+      },
+      {
+        "id": "足",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "足"
+      },
+      {
+        "id": "大",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "大"
+      },
+      {
+        "id": "中",
+        "field": "officialReadings",
+        "source": "joyo-2010",
+        "sourceId": "中"
+      },
+      {
+        "id": "天",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "天"
+      },
+      {
+        "id": "読",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "読"
+      },
+      {
+        "id": "日",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "日"
+      },
+      {
+        "id": "入",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "入"
+      },
+      {
+        "id": "白",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "白"
+      },
+      {
+        "id": "八",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "八"
+      },
+      {
+        "id": "分",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "分"
+      },
+      {
+        "id": "木",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "木"
+      },
+      {
+        "id": "毎",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "毎"
+      },
+      {
+        "id": "名",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "名"
+      },
+      {
+        "id": "目",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "目"
+      },
+      {
+        "id": "来",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "来"
+      },
+      {
+        "id": "立",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "立"
+      },
+      {
+        "id": "六",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "六"
+      },
+      {
+        "id": "悪",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "悪"
+      },
+      {
+        "id": "引",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "引"
+      },
+      {
+        "id": "映",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "映"
+      },
+      {
+        "id": "回",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "回"
+      },
+      {
+        "id": "開",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "開"
+      },
+      {
+        "id": "画",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "画"
+      },
+      {
+        "id": "帰",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "帰"
+      },
+      {
+        "id": "起",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "起"
+      },
+      {
+        "id": "去",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "去"
+      },
+      {
+        "id": "強",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "強"
+      },
+      {
+        "id": "建",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "建"
+      },
+      {
+        "id": "犬",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "犬"
+      },
+      {
+        "id": "験",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "験"
+      },
+      {
+        "id": "好",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "好"
+      },
+      {
+        "id": "広",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "広"
+      },
+      {
+        "id": "合",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "合"
+      },
+      {
+        "id": "作",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "作"
+      },
+      {
+        "id": "産",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "産"
+      },
+      {
+        "id": "使",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "使"
+      },
+      {
+        "id": "始",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "始"
+      },
+      {
+        "id": "止",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "止"
+      },
+      {
+        "id": "死",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "死"
+      },
+      {
+        "id": "質",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "質"
+      },
+      {
+        "id": "写",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "写"
+      },
+      {
+        "id": "終",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "終"
+      },
+      {
+        "id": "所",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "所"
+      },
+      {
+        "id": "心",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "心"
+      },
+      {
+        "id": "真",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "真"
+      },
+      {
+        "id": "親",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "親"
+      },
+      {
+        "id": "字",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "字"
+      },
+      {
+        "id": "持",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "持"
+      },
+      {
+        "id": "弱",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "弱"
+      },
+      {
+        "id": "住",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "住"
+      },
+      {
+        "id": "重",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "重"
+      },
+      {
+        "id": "乗",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "乗"
+      },
+      {
+        "id": "声",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "声"
+      },
+      {
+        "id": "正",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "正"
+      },
+      {
+        "id": "青",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "青"
+      },
+      {
+        "id": "赤",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "赤"
+      },
+      {
+        "id": "切",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "切"
+      },
+      {
+        "id": "早",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "早"
+      },
+      {
+        "id": "待",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "待"
+      },
+      {
+        "id": "貸",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "貸"
+      },
+      {
+        "id": "代",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "代"
+      },
+      {
+        "id": "着",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "着"
+      },
+      {
+        "id": "通",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "通"
+      },
+      {
+        "id": "転",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "転"
+      },
+      {
+        "id": "頭",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "頭"
+      },
+      {
+        "id": "度",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "度"
+      },
+      {
+        "id": "発",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "発"
+      },
+      {
+        "id": "病",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "病"
+      },
+      {
+        "id": "風",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "風"
+      },
+      {
+        "id": "物",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "物"
+      },
+      {
+        "id": "方",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "方"
+      },
+      {
+        "id": "明",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "明"
+      },
+      {
+        "id": "野",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "野"
+      },
+      {
+        "id": "愛",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "愛"
+      },
+      {
+        "id": "圧",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "圧"
+      },
+      {
+        "id": "衣",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "衣"
+      },
+      {
+        "id": "違",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "違"
+      },
+      {
+        "id": "育",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "育"
+      },
+      {
+        "id": "印",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "印"
+      },
+      {
+        "id": "雲",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "雲"
+      },
+      {
+        "id": "栄",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "栄"
+      },
+      {
+        "id": "越",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "越"
+      },
+      {
+        "id": "延",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "延"
+      },
+      {
+        "id": "汚",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "汚"
+      },
+      {
+        "id": "押",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "押"
+      },
+      {
+        "id": "温",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "温"
+      },
+      {
+        "id": "仮",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "仮"
+      },
+      {
+        "id": "化",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "化"
+      },
+      {
+        "id": "可",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "可"
+      },
+      {
+        "id": "果",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "果"
+      },
+      {
+        "id": "過",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "過"
+      },
+      {
+        "id": "届",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "届"
+      },
+      {
+        "id": "解",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "解"
+      },
+      {
+        "id": "格",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "格"
+      },
+      {
+        "id": "覚",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "覚"
+      },
+      {
+        "id": "割",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "割"
+      },
+      {
+        "id": "乾",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "乾"
+      },
+      {
+        "id": "干",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "干"
+      },
+      {
+        "id": "換",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "換"
+      },
+      {
+        "id": "甘",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "甘"
+      },
+      {
+        "id": "関",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "関"
+      },
+      {
+        "id": "願",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "願"
+      },
+      {
+        "id": "寄",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "寄"
+      },
+      {
+        "id": "希",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "希"
+      },
+      {
+        "id": "詰",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "詰"
+      },
+      {
+        "id": "給",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "給"
+      },
+      {
+        "id": "居",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "居"
+      },
+      {
+        "id": "供",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "供"
+      },
+      {
+        "id": "共",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "共"
+      },
+      {
+        "id": "恐",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "恐"
+      },
+      {
+        "id": "挟",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "挟"
+      },
+      {
+        "id": "狭",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "狭"
+      },
+      {
+        "id": "胸",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "胸"
+      },
+      {
+        "id": "極",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "極"
+      },
+      {
+        "id": "勤",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "勤"
+      },
+      {
+        "id": "御",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "御"
+      },
+      {
+        "id": "玉",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "玉"
+      },
+      {
+        "id": "苦",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "苦"
+      },
+      {
+        "id": "君",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "君"
+      },
+      {
+        "id": "群",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "群"
+      },
+      {
+        "id": "係",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "係"
+      },
+      {
+        "id": "傾",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "傾"
+      },
+      {
+        "id": "型",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "型"
+      },
+      {
+        "id": "形",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "形"
+      },
+      {
+        "id": "経",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "経"
+      },
+      {
+        "id": "決",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "決"
+      },
+      {
+        "id": "現",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "現"
+      },
+      {
+        "id": "限",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "限"
+      },
+      {
+        "id": "固",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "固"
+      },
+      {
+        "id": "込",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "込"
+      },
+      {
+        "id": "交",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "交"
+      },
+      {
+        "id": "向",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "向"
+      },
+      {
+        "id": "更",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "更"
+      },
+      {
+        "id": "荒",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "荒"
+      },
+      {
+        "id": "降",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "降"
+      },
+      {
+        "id": "黄",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "黄"
+      },
+      {
+        "id": "根",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "根"
+      },
+      {
+        "id": "混",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "混"
+      },
+      {
+        "id": "誤",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "誤"
+      },
+      {
+        "id": "済",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "済"
+      },
+      {
+        "id": "細",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "細"
+      },
+      {
+        "id": "際",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "際"
+      },
+      {
+        "id": "刷",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "刷"
+      },
+      {
+        "id": "殺",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "殺"
+      },
+      {
+        "id": "参",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "参"
+      },
+      {
+        "id": "散",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "散"
+      },
+      {
+        "id": "残",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "残"
+      },
+      {
+        "id": "刺",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "刺"
+      },
+      {
+        "id": "指",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "指"
+      },
+      {
+        "id": "歯",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "歯"
+      },
+      {
+        "id": "湿",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "湿"
+      },
+      {
+        "id": "取",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "取"
+      },
+      {
+        "id": "守",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "守"
+      },
+      {
+        "id": "種",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "種"
+      },
+      {
+        "id": "酒",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "酒"
+      },
+      {
+        "id": "舟",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "舟"
+      },
+      {
+        "id": "処",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "処"
+      },
+      {
+        "id": "初",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "初"
+      },
+      {
+        "id": "勝",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "勝"
+      },
+      {
+        "id": "咲",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "咲"
+      },
+      {
+        "id": "将",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "将"
+      },
+      {
+        "id": "焼",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "焼"
+      },
+      {
+        "id": "伸",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "伸"
+      },
+      {
+        "id": "寝",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "寝"
+      },
+      {
+        "id": "深",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "深"
+      },
+      {
+        "id": "申",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "申"
+      },
+      {
+        "id": "神",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "神"
+      },
+      {
+        "id": "辛",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "辛"
+      },
+      {
+        "id": "震",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "震"
+      },
+      {
+        "id": "児",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "児"
+      },
+      {
+        "id": "治",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "治"
+      },
+      {
+        "id": "実",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "実"
+      },
+      {
+        "id": "若",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "若"
+      },
+      {
+        "id": "受",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "受"
+      },
+      {
+        "id": "柔",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "柔"
+      },
+      {
+        "id": "準",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "準"
+      },
+      {
+        "id": "助",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "助"
+      },
+      {
+        "id": "除",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "除"
+      },
+      {
+        "id": "常",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "常"
+      },
+      {
+        "id": "数",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "数"
+      },
+      {
+        "id": "成",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "成"
+      },
+      {
+        "id": "星",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "星"
+      },
+      {
+        "id": "晴",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "晴"
+      },
+      {
+        "id": "静",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "静"
+      },
+      {
+        "id": "積",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "積"
+      },
+      {
+        "id": "折",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "折"
+      },
+      {
+        "id": "節",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "節"
+      },
+      {
+        "id": "戦",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "戦"
+      },
+      {
+        "id": "船",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "船"
+      },
+      {
+        "id": "選",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "選"
+      },
+      {
+        "id": "善",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "善"
+      },
+      {
+        "id": "然",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "然"
+      },
+      {
+        "id": "組",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "組"
+      },
+      {
+        "id": "双",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "双"
+      },
+      {
+        "id": "相",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "相"
+      },
+      {
+        "id": "草",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "草"
+      },
+      {
+        "id": "則",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "則"
+      },
+      {
+        "id": "束",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "束"
+      },
+      {
+        "id": "速",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "速"
+      },
+      {
+        "id": "速",
+        "field": "officialReadings",
+        "source": "joyo-2010",
+        "sourceId": "速"
+      },
+      {
+        "id": "卒",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "卒"
+      },
+      {
+        "id": "存",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "存"
+      },
+      {
+        "id": "尊",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "尊"
+      },
+      {
+        "id": "損",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "損"
+      },
+      {
+        "id": "増",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "増"
+      },
+      {
+        "id": "憎",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "憎"
+      },
+      {
+        "id": "造",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "造"
+      },
+      {
+        "id": "続",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "続"
+      },
+      {
+        "id": "対",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "対"
+      },
+      {
+        "id": "替",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "替"
+      },
+      {
+        "id": "退",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "退"
+      },
+      {
+        "id": "達",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "達"
+      },
+      {
+        "id": "打",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "打"
+      },
+      {
+        "id": "暖",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "暖"
+      },
+      {
+        "id": "恥",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "恥"
+      },
+      {
+        "id": "置",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "置"
+      },
+      {
+        "id": "張",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "張"
+      },
+      {
+        "id": "調",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "調"
+      },
+      {
+        "id": "直",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "直"
+      },
+      {
+        "id": "痛",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "痛"
+      },
+      {
+        "id": "程",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "程"
+      },
+      {
+        "id": "点",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "点"
+      },
+      {
+        "id": "泥",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "泥"
+      },
+      {
+        "id": "伝",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "伝"
+      },
+      {
+        "id": "殿",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "殿"
+      },
+      {
+        "id": "渡",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "渡"
+      },
+      {
+        "id": "倒",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "倒"
+      },
+      {
+        "id": "凍",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "凍"
+      },
+      {
+        "id": "当",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "当"
+      },
+      {
+        "id": "投",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "投"
+      },
+      {
+        "id": "灯",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "灯"
+      },
+      {
+        "id": "登",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "登"
+      },
+      {
+        "id": "等",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "等"
+      },
+      {
+        "id": "逃",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "逃"
+      },
+      {
+        "id": "鈍",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "鈍"
+      },
+      {
+        "id": "難",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "難"
+      },
+      {
+        "id": "悩",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "悩"
+      },
+      {
+        "id": "能",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "能"
+      },
+      {
+        "id": "背",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "背"
+      },
+      {
+        "id": "薄",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "薄"
+      },
+      {
+        "id": "畑",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "畑"
+      },
+      {
+        "id": "反",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "反"
+      },
+      {
+        "id": "馬",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "馬"
+      },
+      {
+        "id": "抜",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "抜"
+      },
+      {
+        "id": "疲",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "疲"
+      },
+      {
+        "id": "被",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "被"
+      },
+      {
+        "id": "飛",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "飛"
+      },
+      {
+        "id": "表",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "表"
+      },
+      {
+        "id": "付",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "付"
+      },
+      {
+        "id": "布",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "布"
+      },
+      {
+        "id": "怖",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "怖"
+      },
+      {
+        "id": "浮",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "浮"
+      },
+      {
+        "id": "払",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "払"
+      },
+      {
+        "id": "舞",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "舞"
+      },
+      {
+        "id": "部",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "部"
+      },
+      {
+        "id": "並",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "並"
+      },
+      {
+        "id": "平",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "平"
+      },
+      {
+        "id": "閉",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "閉"
+      },
+      {
+        "id": "片",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "片"
+      },
+      {
+        "id": "編",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "編"
+      },
+      {
+        "id": "辺",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "辺"
+      },
+      {
+        "id": "返",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "返"
+      },
+      {
+        "id": "捕",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "捕"
+      },
+      {
+        "id": "放",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "放"
+      },
+      {
+        "id": "法",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "法"
+      },
+      {
+        "id": "亡",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "亡"
+      },
+      {
+        "id": "忙",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "忙"
+      },
+      {
+        "id": "埋",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "埋"
+      },
+      {
+        "id": "末",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "末"
+      },
+      {
+        "id": "務",
+        "field": "officialReadings",
+        "source": "joyo-2010",
+        "sourceId": "務"
+      },
+      {
+        "id": "与",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "与"
+      },
+      {
+        "id": "余",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "余"
+      },
+      {
+        "id": "踊",
+        "field": "officialReadings",
+        "source": "joyo-2010",
+        "sourceId": "踊"
+      },
+      {
+        "id": "絡",
+        "field": "officialReadings",
+        "source": "joyo-2010",
+        "sourceId": "絡"
+      },
+      {
+        "id": "乱",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "乱"
+      },
+      {
+        "id": "略",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "略"
+      },
+      {
+        "id": "流",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "流"
+      },
+      {
+        "id": "留",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "留"
+      },
+      {
+        "id": "涼",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "涼"
+      },
+      {
+        "id": "良",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "良"
+      },
+      {
+        "id": "冷",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "冷"
+      },
+      {
+        "id": "連",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "連"
+      },
+      {
+        "id": "路",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "路"
+      },
+      {
+        "id": "労",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "労"
+      },
+      {
         "id": "論",
         "field": "kun",
         "source": "kotobako",
         "sourceId": "kanji_8ad6"
+      },
+      {
+        "id": "和",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "和"
+      },
+      {
+        "id": "為",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "為"
+      },
+      {
+        "id": "隠",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "隠"
+      },
+      {
+        "id": "沿",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "沿"
+      },
+      {
+        "id": "縁",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "縁"
+      },
+      {
+        "id": "艶",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "艶"
+      },
+      {
+        "id": "往",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "往"
       },
       {
         "id": "旺",
@@ -516,10 +2525,196 @@
         "sourceId": "kanji_65fa"
       },
       {
+        "id": "乙",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "乙"
+      },
+      {
+        "id": "嫁",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "嫁"
+      },
+      {
+        "id": "懐",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "懐"
+      },
+      {
+        "id": "掛",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "掛"
+      },
+      {
+        "id": "堪",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "堪"
+      },
+      {
+        "id": "緩",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "緩"
+      },
+      {
+        "id": "我",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "我"
+      },
+      {
         "id": "慨",
         "field": "kun",
         "source": "kotobako",
         "sourceId": "kanji_6168"
+      },
+      {
+        "id": "奇",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "奇"
+      },
+      {
+        "id": "姫",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "姫"
+      },
+      {
+        "id": "幾",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "幾"
+      },
+      {
+        "id": "貴",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "貴"
+      },
+      {
+        "id": "鬼",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "鬼"
+      },
+      {
+        "id": "及",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "及"
+      },
+      {
+        "id": "宮",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "宮"
+      },
+      {
+        "id": "窮",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "窮"
+      },
+      {
+        "id": "仰",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "仰"
+      },
+      {
+        "id": "凝",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "凝"
+      },
+      {
+        "id": "虞",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "虞"
+      },
+      {
+        "id": "径",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "径"
+      },
+      {
+        "id": "継",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "継"
+      },
+      {
+        "id": "兼",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "兼"
+      },
+      {
+        "id": "堅",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "堅"
+      },
+      {
+        "id": "遣",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "遣"
+      },
+      {
+        "id": "厳",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "厳"
+      },
+      {
+        "id": "斎",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "斎"
+      },
+      {
+        "id": "撮",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "撮"
+      },
+      {
+        "id": "擦",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "擦"
+      },
+      {
+        "id": "氏",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "氏"
+      },
+      {
+        "id": "漬",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "漬"
+      },
+      {
+        "id": "雌",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "雌"
+      },
+      {
+        "id": "煮",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "煮"
       },
       {
         "id": "赦",
@@ -534,10 +2729,298 @@
         "sourceId": "kanji_5c3a"
       },
       {
+        "id": "尺",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "尺"
+      },
+      {
+        "id": "狩",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "狩"
+      },
+      {
+        "id": "臭",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "臭"
+      },
+      {
+        "id": "縮",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "縮"
+      },
+      {
+        "id": "焦",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "焦"
+      },
+      {
+        "id": "祥",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "祥"
+      },
+      {
+        "id": "称",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "称"
+      },
+      {
+        "id": "織",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "織"
+      },
+      {
+        "id": "慎",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "慎"
+      },
+      {
+        "id": "振",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "振"
+      },
+      {
+        "id": "蛇",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "蛇"
+      },
+      {
+        "id": "寂",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "寂"
+      },
+      {
+        "id": "汁",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "汁"
+      },
+      {
+        "id": "尽",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "尽"
+      },
+      {
+        "id": "須",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "須"
+      },
+      {
+        "id": "垂",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "垂"
+      },
+      {
+        "id": "炊",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "炊"
+      },
+      {
+        "id": "斉",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "斉"
+      },
+      {
+        "id": "潟",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "潟"
+      },
+      {
+        "id": "染",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "染"
+      },
+      {
+        "id": "潜",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "潜"
+      },
+      {
+        "id": "漸",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "漸"
+      },
+      {
+        "id": "粗",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "粗"
+      },
+      {
+        "id": "創",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "創"
+      },
+      {
+        "id": "扱",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "扱"
+      },
+      {
+        "id": "沢",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "沢"
+      },
+      {
+        "id": "旦",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "旦"
+      },
+      {
+        "id": "端",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "端"
+      },
+      {
+        "id": "弾",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "弾"
+      },
+      {
+        "id": "稚",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "稚"
+      },
+      {
+        "id": "抽",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "抽"
+      },
+      {
+        "id": "沖",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "沖"
+      },
+      {
+        "id": "鋳",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "鋳"
+      },
+      {
+        "id": "丁",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "丁"
+      },
+      {
+        "id": "塚",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "塚"
+      },
+      {
+        "id": "彫",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "彫"
+      },
+      {
+        "id": "澄",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "澄"
+      },
+      {
+        "id": "跳",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "跳"
+      },
+      {
+        "id": "釣",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "釣"
+      },
+      {
+        "id": "締",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "締"
+      },
+      {
+        "id": "貞",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "貞"
+      },
+      {
         "id": "典",
         "field": "kun",
         "source": "kotobako",
         "sourceId": "kanji_5178"
+      },
+      {
+        "id": "棟",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "棟"
+      },
+      {
+        "id": "稲",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "稲"
+      },
+      {
+        "id": "豆",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "豆"
+      },
+      {
+        "id": "透",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "透"
+      },
+      {
+        "id": "納",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "納"
+      },
+      {
+        "id": "輩",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "輩"
+      },
+      {
+        "id": "煩",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "煩"
       },
       {
         "id": "頒",
@@ -546,10 +3029,694 @@
         "sourceId": "kanji_9812"
       },
       {
+        "id": "伐",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "伐"
+      },
+      {
+        "id": "罷",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "罷"
+      },
+      {
+        "id": "肥",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "肥"
+      },
+      {
         "id": "賓",
         "field": "kun",
         "source": "kotobako",
         "sourceId": "kanji_8cd3"
+      },
+      {
+        "id": "苗",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "苗"
+      },
+      {
+        "id": "瓶",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "瓶"
+      },
+      {
+        "id": "敷",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "敷"
+      },
+      {
+        "id": "腐",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "腐"
+      },
+      {
+        "id": "紛",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "紛"
+      },
+      {
+        "id": "弁",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "弁"
+      },
+      {
+        "id": "崩",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "崩"
+      },
+      {
+        "id": "棚",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "棚"
+      },
+      {
+        "id": "傍",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "傍"
+      },
+      {
+        "id": "畝",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "畝"
+      },
+      {
+        "id": "弥",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "弥"
+      },
+      {
+        "id": "又",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "又"
+      },
+      {
+        "id": "幽",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "幽"
+      },
+      {
+        "id": "憂",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "憂"
+      },
+      {
+        "id": "雄",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "雄"
+      },
+      {
+        "id": "揚",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "揚"
+      },
+      {
+        "id": "揺",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "揺"
+      },
+      {
+        "id": "裂",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "裂"
+      },
+      {
+        "id": "畏",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "畏"
+      },
+      {
+        "id": "萎",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "萎"
+      },
+      {
+        "id": "咽",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "咽"
+      },
+      {
+        "id": "淫",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "淫"
+      },
+      {
+        "id": "于",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "于"
+      },
+      {
+        "id": "曰",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "曰"
+      },
+      {
+        "id": "宛",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "宛"
+      },
+      {
+        "id": "於",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "於"
+      },
+      {
+        "id": "苛",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "苛"
+      },
+      {
+        "id": "咳",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "咳"
+      },
+      {
+        "id": "咼",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "咼"
+      },
+      {
+        "id": "曷",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "曷"
+      },
+      {
+        "id": "厓",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "厓"
+      },
+      {
+        "id": "蓋",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "蓋"
+      },
+      {
+        "id": "毀",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "毀"
+      },
+      {
+        "id": "冋",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "冋"
+      },
+      {
+        "id": "怯",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "怯"
+      },
+      {
+        "id": "詣",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "詣"
+      },
+      {
+        "id": "翟",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "翟"
+      },
+      {
+        "id": "絜",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "絜"
+      },
+      {
+        "id": "捲",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "捲"
+      },
+      {
+        "id": "屰",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "屰"
+      },
+      {
+        "id": "隙",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "隙"
+      },
+      {
+        "id": "乎",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "乎"
+      },
+      {
+        "id": "夅",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "夅"
+      },
+      {
+        "id": "乞",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "乞"
+      },
+      {
+        "id": "圣",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "圣"
+      },
+      {
+        "id": "丨",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "丨"
+      },
+      {
+        "id": "吾",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "吾"
+      },
+      {
+        "id": "乍",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "乍"
+      },
+      {
+        "id": "柵",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "柵"
+      },
+      {
+        "id": "坐",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "坐"
+      },
+      {
+        "id": "斬",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "斬"
+      },
+      {
+        "id": "之",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "之"
+      },
+      {
+        "id": "嗜",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "嗜"
+      },
+      {
+        "id": "摯",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "摯"
+      },
+      {
+        "id": "齒",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "齒"
+      },
+      {
+        "id": "叱",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "叱"
+      },
+      {
+        "id": "洒",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "洒"
+      },
+      {
+        "id": "這",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "這"
+      },
+      {
+        "id": "垔",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "垔"
+      },
+      {
+        "id": "腫",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "腫"
+      },
+      {
+        "id": "庄",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "庄"
+      },
+      {
+        "id": "賑",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "賑"
+      },
+      {
+        "id": "尓",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "尓"
+      },
+      {
+        "id": "而",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "而"
+      },
+      {
+        "id": "餌",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "餌"
+      },
+      {
+        "id": "呪",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "呪"
+      },
+      {
+        "id": "濡",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "濡"
+      },
+      {
+        "id": "贅",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "贅"
+      },
+      {
+        "id": "齊",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "齊"
+      },
+      {
+        "id": "敫",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "敫"
+      },
+      {
+        "id": "揃",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "揃"
+      },
+      {
+        "id": "羨",
+        "field": "officialReadings",
+        "source": "joyo-2010",
+        "sourceId": "羨"
+      },
+      {
+        "id": "曽",
+        "field": "officialReadings",
+        "source": "joyo-2010",
+        "sourceId": "曽"
+      },
+      {
+        "id": "爪",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "爪"
+      },
+      {
+        "id": "痩",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "痩"
+      },
+      {
+        "id": "塞",
+        "field": "officialReadings",
+        "source": "joyo-2010",
+        "sourceId": "塞"
+      },
+      {
+        "id": "卆",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "卆"
+      },
+      {
+        "id": "詫",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "詫"
+      },
+      {
+        "id": "兌",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "兌"
+      },
+      {
+        "id": "疒",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "疒"
+      },
+      {
+        "id": "弛",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "弛"
+      },
+      {
+        "id": "儲",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "儲"
+      },
+      {
+        "id": "氐",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "氐"
+      },
+      {
+        "id": "綴",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "綴"
+      },
+      {
+        "id": "姪",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "姪"
+      },
+      {
+        "id": "塡",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "塡"
+      },
+      {
+        "id": "纏",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "纏"
+      },
+      {
+        "id": "妬",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "妬"
+      },
+      {
+        "id": "涂",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "涂"
+      },
+      {
+        "id": "丼",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "丼"
+      },
+      {
+        "id": "丼",
+        "field": "officialReadings",
+        "source": "joyo-2010",
+        "sourceId": "丼"
+      },
+      {
+        "id": "頓",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "頓"
+      },
+      {
+        "id": "乃",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "乃"
+      },
+      {
+        "id": "捻",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "捻"
+      },
+      {
+        "id": "剥",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "剥"
+      },
+      {
+        "id": "汎",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "汎"
+      },
+      {
+        "id": "莫",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "莫"
+      },
+      {
+        "id": "畀",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "畀"
+      },
+      {
+        "id": "疋",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "疋"
+      },
+      {
+        "id": "尃",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "尃"
+      },
+      {
+        "id": "毋",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "毋"
+      },
+      {
+        "id": "蔑",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "蔑"
+      },
+      {
+        "id": "呆",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "呆"
+      },
+      {
+        "id": "夆",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "夆"
+      },
+      {
+        "id": "斿",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "斿"
+      },
+      {
+        "id": "溜",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "溜"
+      },
+      {
+        "id": "捩",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "捩"
+      },
+      {
+        "id": "弄",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "弄"
+      },
+      {
+        "id": "籠",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "籠"
+      },
+      {
+        "id": "歪",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "歪"
+      },
+      {
+        "id": "蒦",
+        "field": "readings",
+        "source": "kanjidic-pinned",
+        "sourceId": "蒦"
       }
     ],
     "policy": "Glyphless records and absent metadata are not broken canonical links. Missing on or kun alone is not proof of a metadata gap; a character need not have both."
