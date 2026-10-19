@@ -39,9 +39,9 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { createServer } from 'node:http';
+import { createRequire } from 'node:module';
 import { mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
-import { extname, join, relative, resolve } from 'node:path';
+import { join, relative, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
@@ -277,25 +277,18 @@ async function historyPart(corridor) {
 }
 
 /* ------------------------------------------------------------------ serving, with in-memory controls */
-const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.woff2': 'font/woff2', '.webmanifest': 'application/manifest+json', '.png': 'image/png', '.svg': 'image/svg+xml', '.m4a': 'audio/mp4' };
+// the app's own static host (the one the suites and the desktop shell use); a control's edit is served per browser
+// context through a route, so no copy of the site is ever written
+const require = createRequire(import.meta.url);
+const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
+const host = await startStaticHost({ site: SITE, port: 0 });
+const BASE = host.origin;
 let overrides = {};
-const server = createServer((request, response) => {
-  const path = decodeURIComponent((request.url ?? '/').split('?')[0]);
-  const rel = path === '/' ? 'index.html' : path.replace(/^\/+/u, '');
-  const file = resolve(SITE, rel);
-  let body;
-  try {
-    assert(file.startsWith(`${SITE}/`));
-    body = overrides[rel] ?? readFileSync(file);
-  } catch {
-    response.writeHead(404).end();
-    return;
+async function applyOverrides(context) {
+  for (const [file, body] of Object.entries(overrides)) {
+    await context.route((url) => url.origin === BASE && url.pathname === `/${file}`, (route) => route.fulfill({ status: 200, body, headers: { 'content-type': 'text/javascript; charset=utf-8', 'cache-control': 'no-store' } }));
   }
-  response.writeHead(200, { 'cache-control': 'no-store', 'content-type': MIME[extname(file)] ?? 'application/octet-stream' });
-  response.end(body);
-});
-await new Promise((done) => server.listen(0, '127.0.0.1', done));
-const BASE = `http://127.0.0.1:${server.address().port}`;
+}
 /** a named in-memory edit of one served file; it must match exactly once */
 function mutant(file, from, to) {
   const text = readFileSync(join(SITE, file), 'utf8');
@@ -322,7 +315,9 @@ function control(name, checkName, caught, detail = '') {
 // the clock starts at the real minute: the app's importer refuses a backup stamped later than its own clock
 const T_LOCAL = new Date(Math.floor(Date.now() / MIN) * MIN);
 async function newPage(browser, { seedLocal = null } = {}) {
-  const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, serviceWorkers: 'block', timezoneId: 'Asia/Tokyo' });
+  // the machine's own time zone: the app's importer and the learner's day both read it
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, serviceWorkers: 'block' });
+  await applyOverrides(context);
   await silenceBrowserAudio(context);
   const page = await context.newPage();
   await page.clock.install({ time: T_LOCAL });
@@ -614,7 +609,18 @@ async function playerLookupRace(browser, engine, { mutate = null } = {}) {
     await a.locator('#kp-start').click();
     for (let i = 0; i < 5; i += 1) { await onCard(a); await answer(a); }
     const afterA = await ledgerOf(a);
-    await b.locator('#kp-card .kp-sentence .kp-tok:not(.kp-target)').first().click();
+    // a passage word the learner can see, tapped where it is (kotoba-mine's way); the dock can cover the lower words
+    const spot = await b.evaluate(() => {
+      for (const node of document.querySelectorAll('#kp-card .kp-sentence .kp-tok:not(.kp-target)')) {
+        const r = node.getBoundingClientRect();
+        const x = r.left + r.width / 2;
+        const y = r.top + r.height / 2;
+        if (r.width && y > 0 && y < innerHeight && document.elementFromPoint(x, y)?.closest('.kp-tok') === node) return { x, y };
+      }
+      return null;
+    });
+    if (spot) await b.mouse.click(spot.x, spot.y);
+    out.tapped = spot ? 'pointer' : 'none';
     await b.waitForFunction(() => (JSON.parse(localStorage.getItem('bunki-cloze:n2') || '{}').lookups || []).length > 0, null, { timeout: 5000 }).catch(() => {});
     const afterB = await ledgerOf(a);
     out.logA = afterA.log.length;
@@ -692,7 +698,7 @@ async function corridorBoot(browser, seed, { local = null } = {}) {
 async function corridorReview(browser, engine, { mutate = null } = {}) {
   const T = T_LOCAL.getTime();
   const taken = WORDS.map((id, i) => ({ t: 'word', id, label: id, ts: T - 1e6 + i, started: T - 1e6 + i }));
-  const { context, page } = await corridorBoot(browser, { v: 1, taken, srs: {}, revlog: [], obslog: [], stats: {}, suspended: {}, srsPrefs: { newPerDay: 20, reviewLimit: 200 } });
+  const { context, page } = await corridorBoot(browser, { v: 1, taken, srs: {}, revlog: [], obslog: [], stats: {}, suspended: {}, srsPrefs: { newPerDay: 20 } });
   const out = { shown: [], labels: [], earlyBeforeChoice: 0 };
   try {
     out.todayKeys = await page.evaluate(() => window.__KAIRO_SRS__.today().keys);
@@ -735,7 +741,8 @@ async function corridorReview(browser, engine, { mutate = null } = {}) {
     await context.close();
   }
   const n = WORDS.length;
-  const pass = out.shown.length === n && out.earlyBeforeChoice === 0 && /are in a learning step/u.test(out.pause);
+  const pass = out.shown.length === n && out.earlyBeforeChoice === 0 &&
+    new RegExp(`^${n} words are in a learning step \\(the next is due in ([1-9]|10) min\\): review them now, early, or they will wait for you\\.$`, 'u').test(out.pause.trim());
   if (mutate) return pass;
   check(`[${engine}] (a)(c) corridor review: ${n} saved words answered Good, none again before its step; then the close offers the early choice`, pass, { shown: out.shown.length, repeats: out.earlyBeforeChoice, pause: out.pause });
   check(`[${engine}] (j) corridor close counts the sitting`, new RegExp(`^${n} new words · ${n} answers in \\d+ minutes?\\.$`, 'u').test(out.said.trim()), out.said);
@@ -746,7 +753,7 @@ async function corridorReview(browser, engine, { mutate = null } = {}) {
 async function timedKanji(browser, engine) {
   const T = T_LOCAL.getTime();
   const card = { due: new Date(T + 6 * DAY).toISOString(), last_review: new Date(T - DAY).toISOString(), stability: 6, difficulty: 5, elapsed_days: 1, scheduled_days: 7, learning_steps: 0, reps: 4, lapses: 0, state: 2 };
-  const seed = { v: 1, taken: [{ t: 'kanji', id: '海', label: '海', ts: T - 9e8, started: T - 9e8 }], srs: { 'kanji:海': card }, revlog: [], obslog: [], stats: {}, suspended: {}, srsPrefs: { newPerDay: 20, reviewLimit: 200 } };
+  const seed = { v: 1, taken: [{ t: 'kanji', id: '海', label: '海', ts: T - 9e8, started: T - 9e8 }], srs: { 'kanji:海': card }, revlog: [], obslog: [], stats: {}, suspended: {}, srsPrefs: { newPerDay: 20 } };
   const { context, page } = await corridorBoot(browser, seed);
   const out = {};
   try {
@@ -783,12 +790,15 @@ async function buryAcrossDecks(browser, engine, { mutate = null } = {}) {
   const mcdKanji = find('kotoba-mcd').cards.find((c) => c.type === 'kanji').id;
   const local = {
     'bunki-cloze:senmon': ledger('senmon', [senmon]), 'bunki-cloze:kotoba-mine': ledger('kotoba-mine', [mine]), 'bunki-cloze:kotoba-mcd': ledger('kotoba-mcd', [mcdWord, mcdKanji]),
-    'bunki-srs-deck:bunki-context-dense-2026': { format: 'bunki-srs-deck-state', version: 1, deckId: 'bunki-context-dense-2026', cards: { kensho: due({ introducedAt: new Date(T - 30 * DAY).toISOString() }) } },
+    // the context deck's own new cards for today are already introduced, so only its due 検証 card could be served
+    'bunki-srs-deck:bunki-context-dense-2026': { format: 'bunki-srs-deck-state', version: 1, deckId: 'bunki-context-dense-2026', cards: { kensho: due({ introducedAt: new Date(T - 30 * DAY).toISOString() }),
+      ...Object.fromEntries(JSON.parse(readFileSync(join(SITE, 'decks/context-dense/deck.json'), 'utf8')).cards.filter((c) => c.id !== 'kensho').slice(0, 20)
+        .map((c) => [c.id, due({ due: new Date(T + 5 * DAY).toISOString(), introducedAt: new Date(T).toISOString() })])) } },
     ...Object.fromEntries(['senmon', 'kotoba-mine', 'kotoba-mcd'].map((id) => [`bunki-cloze:prefs:v3:${id}`, { newPerDay: 0, mode: 'cloze' }])),
   };
   const started = T - 9e8;
   const seed = { v: 1, taken: [{ t: 'word', id: '検証', label: '検証', ts: started, started }, { t: 'kanji', id: '検', label: '検', ts: started + 1, started: started + 1 }],
-    srs: { 'word:検証': due(), 'kanji:検': due() }, revlog: [], obslog: [], stats: {}, suspended: {}, srsPrefs: { newPerDay: 0, reviewLimit: 200 } };
+    srs: { 'word:検証': due(), 'kanji:検': due() }, revlog: [], obslog: [], stats: {}, suspended: {}, srsPrefs: { newPerDay: 0 } };
   const { context, page } = await corridorBoot(browser, seed, { local });
   const out = {};
   const corridorKeys = async () => {
@@ -890,7 +900,7 @@ for (const engine of ENGINES) {
     await browser.close();
   }
 }
-server.close();
+await host.close?.();
 receipt.uptimeEnd = uptime();
 receipt.finishedAt = new Date().toISOString();
 receipt.results = results;

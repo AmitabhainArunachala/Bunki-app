@@ -28721,7 +28721,8 @@ function renderReview(main) {
   }
   // the next card by srs-core's rule (the dojo drills and skips it): a learning step only when it is due; with nothing
   // else left the close offers the steps still to come, early by the learner's choice, or they wait
-  const paused = !S.focus && !rv.pending && !rv.revealed && rv.ix < rv.queue.length ? reviewNextStep(rv).pause || null : null;
+  const step = !S.focus && !rv.pending && !rv.revealed && rv.ix < rv.queue.length ? reviewNextStep(rv) : null;
+  const paused = step?.pause ? step : null;
   if (rv.ix >= rv.queue.length || paused) {
     main.append(withEn(el('p', 'eyebrow', S.focus ? '集中' : '復習'), S.focus ? 'focus' : 'review', 'en-inline'));
     // count grades pressed, not queue rows — re-inserted learning passes
