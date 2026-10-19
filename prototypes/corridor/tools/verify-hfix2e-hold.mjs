@@ -185,6 +185,13 @@ async function sealRow(page, { node, type, key }) {
   if (first.after.mini || first.after.rung) throw fail('the release climbed the walk', detail);
   if (!/Saved ✓|保存済み/u.test(first.after.stripSays)) throw fail('the strip does not say the word is saved', detail);
   if (first.after.covered.length) throw fail(`the strip covers other controls: ${JSON.stringify(first.after.covered)}`, detail);
+  // the plate's late passages (wwWatchPassages draws the plate again 1.8 s after it opens) never take the strip's room
+  // or its word away while it stands
+  await delay(2500);
+  detail.later = await facts(page, key);
+  detail.later.anchorOnPage = await page.evaluate((key) => !!(key === '#centre' ? document.querySelector('.ww-plate .ww-c-glyph') : document.querySelector(`.ww-plate .ww-node[data-ww-key="${CSS.escape(key)}"]`)), key);
+  if (!detail.later.strip) throw fail('the strip went away by itself', detail);
+  if (detail.later.covered.length) throw fail(`2.5 s on, the strip covers other controls: ${JSON.stringify(detail.later.covered)}`, detail);
   // a second hold opens the same strip and keeps nothing twice
   await page.keyboard.press('Escape');
   await page.locator('#seal-strip').waitFor({ state: 'detached', timeout: 3000 }).catch(() => {});

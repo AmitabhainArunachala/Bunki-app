@@ -25127,6 +25127,13 @@ function wwWatchPassages(section, tries) {
     const now = wwTrail().at(-1);
     if (!section.isConnected || section.classList.contains('ww-leaving') || section.contains(document.activeElement)) return;
     if (!now || section.dataset.wwCentre !== `${now.type}:${now.key}`) return;
+    // Hfix-2e · a held word's strip (or a word's slip) standing on this plate keeps it: drawing the plate again would take
+    // the strip's room and its word away from under it. The card comes on a later look, once they are put away
+    if ((sealStrip?.strip.isConnected && section.contains(sealStrip.anchor)) || sealPending ||
+        (document.getElementById('mini') && miniAnchor && section.contains(miniAnchor))) {
+      wwWatchPassages(section, tries + 1);
+      return;
+    }
     const found = now.type === 'word' ? wwPassages(now.key, 1).length > 0 : !!wwKanjiPassage(now.key);
     if (!found) {
       wwWatchPassages(section, tries + 1);
