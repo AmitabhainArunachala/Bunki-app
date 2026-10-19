@@ -43,7 +43,9 @@ function replaceOnce(before, after) {
   assert.equal(adapted.split(before).length, 2, `Contrast adapter seam must be unique: ${before.slice(0, 60)}`);
   adapted = adapted.replace(before, after);
 }
-replaceOnce('createRequire(import.meta.url)', `createRequire(${JSON.stringify(source.href)})`);
+// the runner lives beside its evidence: the sweep's own location answers its require, its digest and its sibling predicate
+assert.equal(adapted.split('import.meta.url').length - 1, 3, 'Contrast adapter seam: the sweep names its own location three times');
+adapted = adapted.split('import.meta.url').join(JSON.stringify(source.href));
 // each slot navigates fresh: no prerequisite walk
 replaceOnce("if (!states.includes(state) && !['shelf', 'reader', 'slip', 'page', 'today', 'me', 'deck-front'].includes(state)) continue;",
   'if (!states.includes(state)) continue;');
