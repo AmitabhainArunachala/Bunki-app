@@ -565,7 +565,8 @@ async function propertyChecks() {
         case 'kanji-unavailable': part = [start, { op: 'dictionary', available: false }, gradeCommand, stage, ok,
           { op: 'dictionary', available: true }, gradeCommand, stage, ok]; break;
         case 'committed-lost-ack': part = [start, gradeCommand, { op: 'duplicate' }, stage, { op: 'ack', save: true, lostAck: true }]; break;
-        case 'ownership-after-publication': part = [start, gradeCommand, { op: 'duplicate' }, stage, { op: 'ack', save: true, loseOwnershipAfterPublish: true }]; break;
+        // its grade must save before ownership moves: a card earlier backward moves left before its due is reached first
+        case 'ownership-after-publication': part = [{ ...start, toDue: true }, gradeCommand, { op: 'duplicate' }, stage, { op: 'ack', save: true, loseOwnershipAfterPublish: true }]; break;
         case 'two-grade-two-undo': part = [start, { op: 'grade', rating: 1 }, stage, ok,
           { op: 'clock', shift: 86400000 }, { op: 'disclosure', revealed: true, declared: 1 }, gradeCommand, stage, ok,
           { op: 'undo' }, stage, ok, { op: 'undo' }, stage, ok]; break;
@@ -694,6 +695,12 @@ async function propertyChecks() {
           case 'start': {
             assert.equal(pending, null); rejectedGrade = false; target = items[command.type]; now += command.shift;
             if (command.shift < 0) count('backwardClockMoves'); else if (command.shift === 0) count('equalClockMoves');
+            // srs-core refuses a grade before its due (the model says so at stage); a case that needs its grade saved walks the
+            // clock on, forward only, to that due
+            if (command.toDue) {
+              const rec = f.durable().srs[keyOf(target)];
+              if (!gradeableNow(rec, now)) { now = Date.parse(rec.due); count('clockMovesToDue'); }
+            }
             const rv = newSession(command.dojo); rv.declared = command.declared; break;
           }
           case 'clock': assert.equal(pending, null); now += command.shift; count('explicitClockMoves'); break;
