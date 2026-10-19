@@ -116,7 +116,7 @@ const facts = (page, key) => page.evaluate((key) => {
       const b = c.getBoundingClientRect(); const st = getComputedStyle(c);
       if (!b.width || !b.height || st.visibility === 'hidden' || st.display === 'none' || Number(st.opacity) === 0) continue;
       if (b.right <= r.left + 0.5 || b.left >= r.right - 0.5 || b.bottom <= r.top + 0.5 || b.top >= r.bottom - 0.5) continue;
-      covered.push((c.dataset.wwKey || c.id || c.className || c.tagName).toString().slice(0, 40));
+      covered.push({ name: (c.dataset.wwKey || c.id || c.className || c.tagName).toString().slice(0, 40), box: [b.left, b.top, b.right, b.bottom].map(Math.round), strip: [r.left, r.top, r.right, r.bottom].map(Math.round) });
     }
   }
   return { covered,
@@ -150,6 +150,12 @@ async function holdOn(page, locator, key, { ms = 760, at = 300, drag = 0 } = {})
     await fire('pointerdown'); await delay(at); mid = await facts(page, key); await delay(ms - at); await fire('pointerup');
   }
   await delay(900);
+  // the strip is read where it rests: its arrival (and any seat it takes again) has finished
+  await page.evaluate(async () => {
+    const strip = document.getElementById('seal-strip');
+    if (strip) await Promise.all(strip.getAnimations({ subtree: true }).map((run) => run.finished.catch(() => {})));
+    await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
+  });
   return { mid, after: await facts(page, key) };
 }
 async function shot(page, name) { await page.screenshot({ path: join(out, `${engine}-${mode}-${name}.png`) }).catch(() => {}); }
@@ -178,7 +184,7 @@ async function sealRow(page, { node, type, key }) {
   if (!(first.after.seen.stamp >= 1)) throw fail('no 印 pressed on', detail);
   if (first.after.mini || first.after.rung) throw fail('the release climbed the walk', detail);
   if (!/Saved ✓|保存済み/u.test(first.after.stripSays)) throw fail('the strip does not say the word is saved', detail);
-  if (first.after.covered.length) throw fail(`the strip covers other controls: ${first.after.covered.join(', ')}`, detail);
+  if (first.after.covered.length) throw fail(`the strip covers other controls: ${JSON.stringify(first.after.covered)}`, detail);
   // a second hold opens the same strip and keeps nothing twice
   await page.keyboard.press('Escape');
   await page.locator('#seal-strip').waitFor({ state: 'detached', timeout: 3000 }).catch(() => {});
@@ -192,7 +198,7 @@ async function sealRow(page, { node, type, key }) {
   if (!second.after.strip) throw fail('the second hold opened no strip', detail);
   if (second.after.count !== c0 + 1) throw fail(`the second hold changed the count to ${second.after.count}`, detail);
   if (second.after.mini || second.after.rung) throw fail('the second release climbed the walk', detail);
-  if (second.after.covered.length) throw fail(`the second strip covers other controls: ${second.after.covered.join(', ')}`, detail);
+  if (second.after.covered.length) throw fail(`the second strip covers other controls: ${JSON.stringify(second.after.covered)}`, detail);
   return detail;
 }
 await row('W7-hold', async ({ page }) => sealRow(page, await pickNode(page)));
