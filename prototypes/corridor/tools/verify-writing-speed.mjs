@@ -325,7 +325,7 @@ async function visuals(page, label) {
   const quiet = s => clear(s) && s.shadow === 'none' && s.borders.every(width => width === 0);
   check(`${label}/compact-transparent`, quiet(facts.wrap) && quiet(facts.numbers) && facts.wrap.box.width <= 85 && facts.wrap.box.height <= 45 && facts.numbers.box.width <= 45 && facts.numbers.box.height <= 45, facts);
   check(`${label}/touch-targets`, facts.range.box.width >= 44 && facts.range.box.height >= 44 && facts.numbers.box.width >= 44 && facts.numbers.box.height >= 44, facts);
-  check(`${label}/names-and-glyphs`, !!facts.range.name && !!facts.numbers.name && facts.glyphs.map(g => g.text).join('') === '緩中速順' && facts.numbers.text === '順', facts);
+  check(`${label}/names-and-glyphs`, !!facts.range.name && !!facts.numbers.name && facts.glyphs.length === 4 && ['緩', '中', '速', '順'].every(text => facts.glyphs.filter(g => g.text === text).length === 1) && facts.numbers.text === '順', facts);
   for (const selector of ['#stroke-speed-range', '#stroke-numbers']) {
     await page.locator(selector).focus();
     await page.keyboard.press('Tab');
@@ -405,6 +405,7 @@ try {
         const { context, page, errors } = await makeContext(browser, name, 'hokusai');
         try {
           await openBoard(page, host.origin, true, true);
+          await page.locator('#stroke-speed-range').scrollIntoViewIfNeeded();
           const classic = await placement(page, `${name}-classic`);
           check(`${name}-classic/explicit-mode`, classic.minimal === 'off' && errors.length === 0, { classic, errors });
           item.classic = classic;

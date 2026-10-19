@@ -2223,6 +2223,7 @@ body .sheet .stroke-door {
 #stroke-page .stroke-back .en-sub { display: inline; font-size: var(--type-caption); letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
 /* The two learning controls belong to the sheet, without raised surfaces.
  * Full pigment (rather than low opacity) keeps the tiny marks legible in every world. */
+#stroke-page #stroke-numbers,
 #stroke-page .stroke-btn.stroke-corner,
 #stroke-page .stroke-speed-wrap,
 #stroke-page .stroke-speed-wrap.stroke-corner {
