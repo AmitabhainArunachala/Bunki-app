@@ -11678,7 +11678,8 @@ function layersMarkTop(left, width) {
 function rowCut(card, room) {
   const box = card.getBoundingClientRect();
   let foot = 0;
-  for (const row of card.querySelectorAll(':scope > *, .mini-web > *, .mini-kanji > *, .mini-sentence-wrap > *')) {
+  // (Save ▾'s menu unfolds as a band of its own: its items are rows too, so the cut never climbs above Save and its menu)
+  for (const row of card.querySelectorAll(':scope > *, .mini-web > *, .mini-kanji > *, .mini-sentence-wrap > *, #vocabulary-list-popover > *, .vocabulary-list-more > *')) {
     if (!row.getClientRects().length) continue;
     const bottom = row.getBoundingClientRect().bottom - box.top + card.scrollTop;
     if (bottom + 1 <= room && bottom > foot) foot = bottom;
@@ -11707,6 +11708,9 @@ function placeFloating(card, r) {
     r = { ...r, top: r.top - moved, bottom: r.bottom - moved, left: r.left, width: r.width };
     delete card.dataset.flowScroll;
   }
+  // Hfix-1A · a cut card seated again (its content grew: the sense, Save's menu) keeps where it was scrolled to; measuring
+  // it uncapped would put it back at its top, and the focus it had revealed (the menu's first item) under its foot
+  const scrolled = card.scrollTop;
   card.style.maxHeight = '';
   card.style.overflowY = '';
   const m = card.getBoundingClientRect();
@@ -11799,6 +11803,7 @@ function placeFloating(card, r) {
       const fit = rowCut(card, Math.max(roomAbove, roomBelow, 96));
       card.style.maxHeight = `${fit}px`;
       card.style.overflowY = 'auto';
+      if (scrolled) card.scrollTop = scrolled;
       // above its word a cut card still meets the chrome's edge (no strip of cut title glyphs over it); its foot, shortened
       // to a row, ends further from the word
       top = roomAbove >= roomBelow ? ceiling : r.bottom + 10;

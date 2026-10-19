@@ -737,15 +737,19 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-colo
 /* Hfix-1A · a stage cut short of its rows (no seat on the glass holds it whole) ends between two rows and says it scrolls:
    its foot fades into the band the cut falls in (corridor.js markCardMore), the hold strip's own sign
    (editorial.css .seal-strip[data-more]), and the fade leaves once the last row is in view */
+/* Hfix-1A · the room a meaning still to come keeps in the word band (reserveSenseRoom) is the word view's; the sentence view
+   sets its head otherwise, and keeps none */
+#mini.is-sentence .mini-head-text { min-height: 0 !important; }
 #mini[data-more='true']::after {
   content: '';
   position: sticky;
   bottom: 0;
   flex: none;
   display: block;
-  height: 22px;
-  margin-top: -22px;
-  /* bokashi: atenashi — the stage's foot — focus: the band's own ground rising over its last 22 px, where there is more */
+  height: 32px;
+  margin-top: -32px;
+  /* bokashi: atenashi — the stage's foot — focus: the band's own ground rising over its last 32 px, where there is more
+     (32, not 22: C4's one step per 24 px; over 22 px hokusai's band rose 4.9 ΔE, two steps, in WebKit) */
   background: linear-gradient(to bottom, color-mix(in srgb, var(--mini-more-ground, var(--mini-paper)) 0%, transparent),
     var(--mini-more-ground, var(--mini-paper)));
   pointer-events: none;
