@@ -702,14 +702,49 @@ for (let attempt = 1; attempt <= 3; attempt++) {
     const cr = card ? card.getBoundingClientRect() : null;
     const words = [...document.querySelectorAll('#drift-layer .word')];
     // Keep the highest/leftmost hit-owned orbiter at least 20px clear of the shared stage, on any side.
+    //
+    // INTFIX · a finger aims at a word, not at its mathematical centre. The shared stage opens
+    // over a dive that has receded the field, so only a handful of orbiters are still touchable,
+    // and those few drift: measured on 2a1e6aef at 390x844, two of four cleared the card and the
+    // centre point of one of them was covered by a NEIGHBOUR's always-on reading <rt>, which is
+    // ordinary overlap in a drifting field. Testing the centre alone therefore found an owner
+    // only sometimes, and when it found none this staging broke out with no retry — the gate's
+    // "card=true orbiter=false". Each candidate is now probed where a finger would land: its own
+    // .base glyph first, then the element centre, then two points inside that glyph. The first
+    // candidate that owns one of its own points is taken.
+    //
+    // Nothing is widened. The geometric filters (opacity, the 110..560 band, 20px clear of the
+    // stage on some side) are unchanged, every probe point lies inside the word's own box, and
+    // delivery is still proved against the exact node by hit.sameNode below. If no candidate
+    // owns any of its own points the staging still fails, so a product regression that makes
+    // orbiters untouchable stays red.
+    const ownedPoint = (el, r) => {
+      const glyph = el.querySelector('.base');
+      const g = glyph ? glyph.getBoundingClientRect() : null;
+      const points = [];
+      if (g && g.width && g.height) points.push([g.left + g.width / 2, g.top + g.height / 2]);
+      points.push([r.left + r.width / 2, r.top + r.height / 2]);
+      if (g && g.width && g.height) {
+        points.push([g.left + g.width * 0.3, g.top + g.height / 2], [g.left + g.width * 0.7, g.top + g.height / 2]);
+      }
+      for (const [x, y] of points) {
+        if (!(x >= 0 && y >= 0 && x <= innerWidth && y <= innerHeight)) continue;
+        if (el.contains(document.elementFromPoint(x, y))) return { x, y };
+      }
+      return null;
+    };
     const orb = words.map((el) => {
       const r = el.getBoundingClientRect();
       return { el, r, x: r.left + r.width / 2, y: r.top + r.height / 2 };
     }).filter((o) => o.r.width && !o.el.classList.contains('center') &&
       parseFloat(o.el.style.opacity || '1') > 0.4 && o.r.top > 110 && o.r.bottom < 560 &&
-      (!cr || o.r.bottom < cr.top - 20 || o.r.top > cr.bottom + 20 || o.r.right < cr.left - 20 || o.r.left > cr.right + 20) &&
-      o.el.contains(document.elementFromPoint(o.x, o.y)))
-      .sort((a, b) => (a.y + a.x) - (b.y + b.x))[0];
+      (!cr || o.r.bottom < cr.top - 20 || o.r.top > cr.bottom + 20 || o.r.right < cr.left - 20 || o.r.left > cr.right + 20))
+      .sort((a, b) => (a.y + a.x) - (b.y + b.x))
+      .reduce((found, o) => {
+        if (found) return found;
+        const point = ownedPoint(o.el, o.r);
+        return point ? { ...o, x: point.x, y: point.y } : null;
+      }, null);
     const corner = cr ? { x: cr.right - 26, y: cr.top + 20 } : null;
     const stage = {
       card: corner ? { ...corner, hit: card.contains(document.elementFromPoint(corner.x, corner.y)) } : null,
