@@ -5412,7 +5412,7 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
    color schema and delicately placed in every session it would help deepen retention". One dot under a word, in its
    world's text ink laid into its paper like the printer's 濃淡: a word met once is a lighter ink, seen again a half tone,
    recalled most of it, familiar the ink itself. Six CSS pixels give the fill 44% more area than the former five;
-   the kept ring spans ten. The visibility verifier measures the actual paper, including inherited opacity.
+   the kept ring spans eleven (ten on the slip). The visibility verifier measures the actual paper, including inherited opacity.
    The dot sits where a 圏点 sits, under the word, out of the line box (absolute: no line, ruby or gloss moves), and never
    takes a tap (pointer-events: none). The ring around it is the world's seal red, and it means one thing everywhere: kept.
    Red is left to the ring in every world. Every value below is a world token or a mix of two (D3);
@@ -5438,7 +5438,7 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
 :where(#reader .tok, .japanese-lookup-word, .depth-dot, #mini, .today-star)[data-depth='owned'] { --depth-fill: var(--depth-owned); }
 /* kept: a hairline of the page between the dot and its seal-red ring (a kept word not yet met is the ring alone) */
 :where(#reader .tok, .japanese-lookup-word, .depth-dot, #mini, .today-star)[data-kept] {
-  --depth-edge: 0 0 0 1px var(--depth-ground), 0 0 0 2px var(--depth-ring);
+  --depth-edge: 0 0 0 1px var(--depth-ground), 0 0 0 2.5px var(--depth-ring);
 }
 
 /* in running text (the reader, a page's prose): under the word's own row, centred, out of the line box */
@@ -5460,11 +5460,11 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
 }
 /* A prose word can wrap between glyphs; its positioned inline box can then have zero width. With both horizontal
    insets auto, the dot starts at the text's own inline end, then moves under the final glyph. No line breaks change.
-   Half a pixel of lift keeps the saved ring clear of the next line's glyph box. Reader tokens stay centred. */
+   A pixel of lift keeps the saved ring clear of the next line's glyph box. Reader tokens stay centred. */
 .japanese-lookup-word:is([data-depth], [data-kept])::after {
   left: auto;
   right: auto;
-  bottom: calc(-0.3em + 0.5px);
+  bottom: calc(-0.3em + 1px);
   transform: translateX(calc(-0.5em - var(--depth-size) / 2));
 }
 /* Ladder contract: only this occurrence steps aside while its inline English is open. Removing the attribute
