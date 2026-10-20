@@ -4006,8 +4006,11 @@ try {
       const ladderSpecs = [
         { id: 'mouse-ignored', run: 'L-mouse', body: ladderMouse, options: { viewport: { width: 1440, height: 900 }, mobile: false },
           kills: ['M.hold', 'M.second-hold', 'M.drag'], witness: (row) => row.observed.ring === 0 && row.observed.strip === 0,
-          edits: [{ file: 'corridor.js', key: 'mouse-never-holds', from: "    if (mouse && (event.button !== 0 || event.ctrlKey)) return;",
-            to: '    if (mouse) return; // Ladder negative: a mouse or trackpad press is never a hold' }] },
+          // the reader span's own guard, named by the Ladder comment above it: Hfix-2e item 7's Words-room hold copies the guard
+          // line itself, so the line alone matched twice in the woven build (the served edit must match exactly once)
+          edits: [{ file: 'corridor.js', key: 'mouse-never-holds',
+            from: "    // nothing at all\"): its primary button only, never with Control (the Mac's secondary click, the contextmenu below)\n    const mouse = event.pointerType === 'mouse';\n    if (mouse && (event.button !== 0 || event.ctrlKey)) return;",
+            to: "    // nothing at all\"): its primary button only, never with Control (the Mac's secondary click, the contextmenu below)\n    const mouse = event.pointerType === 'mouse';\n    if (mouse) return; // Ladder negative: a mouse or trackpad press is never a hold" }] },
         { id: 'card-fixed-to-glass', run: 'L-scroll', body: ladderScroll, options: macView, kills: ['L.scroll.down', 'L.scroll.up'],
           witness: (row) => Math.abs(row.observed.rode) < 1 && Math.abs(row.observed.moved) >= 60,
           edits: [{ file: 'corridor.js', key: 'card-stays-on-the-glass',
@@ -4047,10 +4050,13 @@ try {
           witness: (row) => row.observed.some((w) => w.box && w.english !== boxTrim(w.box)),
           edits: [{ file: 'corridor.js', key: 'english-shortest-gloss', from: '  return boxLeadGloss(readerQuickRecordAsRead(door));',
             to: "  return inlineGloss(readerQuickRecordAsRead(door)) || ''; // Ladder negative: the shortest early gloss" }] },
-        // Ladder R4 · the scroll-gap row's control: round 2's fold where the ink leaves the fade room (390×560)
+        // Ladder R4 · the scroll-gap row's control: round 2's fold where the ink leaves the fade room (390×560).
+        // Bypass both no-fold returns: the woven card can fit the padded kanji band before the ink-gap search runs.
         ...(desk ? [] : [{ id: 'fold-at-560', run: 'L-d7-gap', body: ladderD7Gap, options: { viewport: { width: 390, height: 560 }, mobile: true },
           kills: ['L.d7.scroll-gap'], witness: (row) => row.observed.some((o) => o.steps.some((st) => st.folds > 0)),
-          edits: [{ file: 'corridor.js', key: 'fold-where-the-ink-has-room', from: '  if (best) return best;\n', to: '  if (false) return best; // Ladder negative: a fold instead\n' },
+          edits: [{ file: 'corridor.js', key: 'fold-before-band-cut', from: '    if (below <= room) return below;',
+            to: '    if (false) return below; // Ladder negative: fold instead of using the padded kanji band' },
+            { file: 'corridor.js', key: 'fold-where-the-ink-has-room', from: '  if (best) return best;\n', to: '  if (false) return best; // Ladder negative: a fold instead\n' },
             { file: 'corridor.js', key: 'fold-from-the-row-box', from: '    const inkFoot = Math.max(0, ...ink.filter(([top]) => top < foot.bottom - 0.5).map(([, bottom]) => bottom));',
               to: "    const inkFoot = foot.bottom; // Ladder negative: round 3's fold, measured from the row's box" }] }]),
         // Ladder R2 · a word with no English says the dash again
