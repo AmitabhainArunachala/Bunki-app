@@ -20288,7 +20288,7 @@ function renderKanjiCourse(main) {
     main.append(el('p', 'card-kind', tx(`学ぶ — ${visit.index + 1} / ${unit.targets.length}`, `Learn — ${visit.index + 1} of ${unit.targets.length}`)));
     const face = el('div', 'review-face');
     face.append(el('div', 'review-front', target.kanji));
-    face.append(el('p', 'review-sense', `${tx('この練習の漢字キーワード', 'Character keyword for this check')}: ${target.meaning}`));
+    face.append(el('p', 'review-sense', `${tx('この練習の漢字キーワード', 'Character keyword for this check')}: ${target.displayKeyword || target.meaning}`));
     face.append(el('div', 'review-front', target.wordKey), el('div', 'review-reading', target.readings.join(' / ')));
     face.append(el('p', 'review-sense', `${tx('この例でのことばの意味', 'Word meaning for this example')}: ${target.displayMeaning || target.wordMeaning}`));
     main.append(face, entryDoor(target, 'kanji'), entryDoor(target, 'word'));
@@ -20298,7 +20298,7 @@ function renderKanjiCourse(main) {
       const attribution = el('a', 'fine', target.teachingSentence.sourceAttribution.attribution);
       attribution.href = target.teachingSentence.sourceAttribution.url;
       main.append(attribution);
-      if (target.teachingSentence.register) main.append(el('p', 'fine', tx('文語の慣用表現です。', 'A literary set saying.')));
+      if (target.teachingSentence.register) main.append(el('p', 'fine', tx('文語調の格言です。', 'A literary set saying.')));
     }
     if (target.examples.length) {
       const examples = el('section');

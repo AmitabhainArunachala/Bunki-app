@@ -12,7 +12,11 @@ This is keyword recognition and whole-word reading practice. A plain-form prompt
 
 Meanings/readings are copied from the pinned local `kanji.json` and `words.json`, with their source hashes in `catalog().sources`. Alternatives are teaching examples, not additional assessment tasks. In particular, 織's character keyword is not the translation of 組織, and a shared component does not establish an individual character reading inside a word.
 
+Slice 5.1 preserves each raw `meaning` above and adds the editorial `displayKeyword` labels **職 — “Job; position”** and **識 — “Knowing; awareness”**. Teaching, every occurrence in a choice list (including distractors), and answer feedback use the same display label. 織/木 retain “Weave”/“Tree”. This field is separate from the whole-word `displayMeaning`; it does not change raw glosses, readings, answer IDs, lesson identities or the original 96 prompt contracts. Learner answers are still the selected glyph IDs, never the English labels. These exact display strings are submitted for language review, not represented as prior reviewer approval.
+
 Each target also has `teachingSentence = {text, english, reference, sourceAttribution, note, register?}` copied from its exact `kanji-family.json` bundled example. The original occurrence identity and Tanaka Corpus/Tatoeba CC BY 2.0 FR attribution are retained. 知識は力なり。 has `register: "literary-set-saying"` and is labelled as a literary set saying, not ordinary modern conversation. These examples do not authorize a sentence-to-card mapping or source-transfer assessment. Japanese editorial acceptance belongs to the designated reviewers; the source tests establish correspondence, not that acceptance.
+
+The teaching label now reads **「文語調の格言です。」**, following lead0319 and W2's combined0330 ruling. The reviews disagreed: Claude0316 requested this wording because the sentence is a maxim, whereas Fugu0327 explicitly accepted the previous 「文語の慣用表現です。」. This is a recorded lead disposition, not a unanimous finding that the previous label was defective. The English “A literary set saying.” and the attributed example remain unchanged.
 
 ## Exact task identity
 

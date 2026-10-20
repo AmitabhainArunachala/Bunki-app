@@ -74,7 +74,7 @@ class Element {
 function descend(node) {
   return [node, ...node.children.filter(child => child instanceof Element).flatMap(descend)];
 }
-function harness() {
+function harness({ language = 'en' } = {}) {
   const commits = [], navigations = [], invokers = [];
   let scope = { record: { v: 1, taken: [], srs: {}, revlog: [], obslog: [], lessonsDone: {} } };
   let main = new Element('main'), renderCount = 0, now = 1760000000000, sessionNumber = 0;
@@ -83,8 +83,8 @@ function harness() {
   const context = vm.createContext({
     S, recordEpoch: 1, personalHost: null, window: { scrollTo() {} }, Date: TestDate, crypto: { randomUUID: () => `session-${++sessionNumber}` },
     el: (tag, cls, text) => new Element(tag, cls, text),
-    biLabel: (tag, cls, _ja, en) => new Element(tag, cls, en),
-    tx: (_ja, en) => en,
+    biLabel: (tag, cls, ja, en) => new Element(tag, cls, language === 'ja' ? ja : en),
+    tx: (ja, en) => language === 'ja' ? ja : en,
     document: { getElementById: id => descend(main).find(element => element.id === id) || null },
     recordReady: epoch => epoch === context.recordEpoch,
     preserveVisibleDrafts: () => true,
@@ -755,6 +755,39 @@ test('family teaches retained examples then presents ordinary-text checks withou
   assert.match(h.text, /Type the whole word’s reading in kana/);
   assert.doesNotMatch(h.text, /しょくぎょう/);
   assert.equal(h.commits.length, 0);
+});
+
+test('family teaching, choices and answer feedback share display keywords in both languages', () => {
+  const labels = { 職: 'Job; position', 識: 'Knowing; awareness', 織: 'Weave', 木: 'Tree' };
+  for (const language of ['ja', 'en']) {
+    const h = harness({ language });
+    h.select('shiki-shoku');
+    assert.doesNotMatch(h.text, /Job; position|Knowing; awareness|Post|Discriminating/);
+    h.click('kanji-course-learn');
+    for (const target of ['職', '識', '織']) {
+      const keyword = h.elements.find(element => element.className === 'review-sense');
+      assert.equal(keyword.textContent, `${language === 'ja' ? 'この練習の漢字キーワード' : 'Character keyword for this check'}: ${labels[target]}`);
+      if (target === '識') {
+        assert.ok(h.elements.some(element => element.textContent ===
+          (language === 'ja' ? '文語調の格言です。' : 'A literary set saying.')));
+        assert.doesNotMatch(h.text, /文語の慣用表現です。/);
+      }
+      h.click('kanji-course-teach-next');
+    }
+    while (!h.S.kanjiCourse.run.complete) {
+      const prompt = h.course.currentPrompt(h.S.kanjiCourse.run);
+      if (prompt.kind === 'meaning') {
+        for (const [id, label] of Object.entries(labels)) assert.equal(h.byId(`kanji-course-choice-${id}`).textContent, label);
+        assert.doesNotMatch(h.text, /Post|Discriminating/);
+        h.click(`kanji-course-choice-${prompt.targetId}`);
+        assert.ok(h.elements.some(element => element.className === 'review-sense' &&
+          element.textContent === labels[prompt.targetId]));
+      } else h.submit(prompt.acceptedAnswers[0]);
+      h.click('kanji-course-next');
+    }
+    assert.equal(h.course.summary(h.S.kanjiCourse.run).correct, 6);
+    assert.equal(h.commits.length, 0);
+  }
 });
 
 test('family hook is explicit, once per attempt, after response and feedback; no schedule writer is called', async () => {

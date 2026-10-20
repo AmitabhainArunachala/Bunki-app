@@ -6,6 +6,8 @@
  * transfer remain withheld until independently reviewed and revalidated.
  * wordMeaning preserves the attested source gloss. Optional displayMeaning is
  * an editorial selection for the learner-facing word gloss, not a source quote.
+ * meaning likewise preserves the raw character keyword; displayKeyword is an
+ * optional learner-facing clarification shared by teaching, choices and answers.
  */
 /* global module:readonly -- Optional CommonJS export, guarded for browsers. */
 (function (root, factory) {
@@ -1512,6 +1514,7 @@
       "id": "職",
       "kanji": "職",
       "meaning": "Post",
+      "displayKeyword": "Job; position",
       "wordKey": "職業",
       "wordMeaning": "occupation, business",
       "readings": [
@@ -1557,6 +1560,7 @@
       "id": "識",
       "kanji": "識",
       "meaning": "Discriminating",
+      "displayKeyword": "Knowing; awareness",
       "wordKey": "知識",
       "wordMeaning": "knowledge, information",
       "readings": [
@@ -1713,7 +1717,10 @@
     const index = unit.targets.indexOf(target);
     const choices = kind === 'meaning'
       ? [...target.distractors.slice(0, index % 4), target.id, ...target.distractors.slice(index % 4)]
-        .map(id => ({ id, label: TARGETS.get(id).meaning })) : [];
+        .map(id => {
+          const choice = TARGETS.get(id);
+          return { id, label: choice.displayKeyword || choice.meaning };
+        }) : [];
     return freeze({
       id: `${unit.id}/${target.id}/${kind}`, targetId: target.id, kind,
       kanji: target.kanji, wordKey: target.wordKey, wordMeaning: target.wordMeaning,
@@ -1721,7 +1728,7 @@
       scope: kind === 'meaning' ? 'selected-character-keyword' : 'whole-word-reading',
       prompt: kind === 'meaning' ? `Choose the selected keyword for ${target.kanji}.`
         : `Recall the whole word’s reading: ${target.wordKey}`,
-      correctAnswer: kind === 'meaning' ? target.meaning : target.readings.join(' / '),
+      correctAnswer: kind === 'meaning' ? target.displayKeyword || target.meaning : target.readings.join(' / '),
       answerId: kind === 'meaning' ? target.id : null,
       acceptedAnswers: kind === 'meaning' ? [target.id] : [...target.readings],
       choices,

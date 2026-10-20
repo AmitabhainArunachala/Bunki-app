@@ -564,6 +564,39 @@ test('first family has three exact dictionary targets and three attributed bundl
   assert.equal(course.catalog().sourceTransfer.enabled, false);
 });
 
+test('family display keywords preserve raw meanings and agree across choices, answers and grading', () => {
+  const labels = { 職: 'Job; position', 識: 'Knowing; awareness', 織: 'Weave', 木: 'Tree' };
+  const unit = course.getUnit('shiki-shoku');
+  assert.deepEqual(unit.targets.map(target => [target.kanji, target.meaning, target.displayKeyword ?? null]),
+    [['職', 'Post', labels.職], ['識', 'Discriminating', labels.識], ['織', 'Weave', null]]);
+  let run = familyRun(['meaning']);
+  while (!run.complete) {
+    const prompt = course.currentPrompt(run);
+    assert.equal(prompt.correctAnswer, labels[prompt.targetId]);
+    assert.deepEqual(prompt.acceptedAnswers, [prompt.targetId], 'display text never becomes an answer identity');
+    assert.equal(prompt.choices.length, 4);
+    for (const choice of prompt.choices) assert.equal(choice.label, labels[choice.id], 'sibling distractors use the same label');
+    assert.deepEqual(course.plainPrompt(run).choices, prompt.choices);
+    assert.throws(() => familyAnswer(run, prompt.correctAnswer), /choice-invalid/);
+    const wrong = familyAnswer(run, prompt.choices.find(choice => choice.id !== prompt.targetId).id);
+    assert.equal(course.summary(wrong).results.at(-1).status, 'wrong');
+    run = familyAnswer(run, prompt.targetId);
+    const result = course.summary(run).results.at(-1);
+    assert.equal(result.status, 'correct');
+    assert.equal(result.correctAnswer, labels[prompt.targetId]);
+  }
+  assert.equal(course.summary(run).correct, 3);
+  for (const target of unit.targets) assert.equal(target.meaning, kanji[target.kanji].m);
+  let readings = familyRun(['reading']);
+  while (!readings.complete) {
+    const prompt = course.currentPrompt(readings);
+    const target = unit.targets.find(value => value.id === prompt.targetId);
+    assert.equal(prompt.wordMeaning, words[target.wordKey].g);
+    assert.equal(prompt.correctAnswer, target.readings[0]);
+    readings = familyAnswer(readings);
+  }
+});
+
 test('family task binding is exact kanji or whole primary word plus raw reading, never inferred from a part or sentence', () => {
   for (const target of course.getUnit('shiki-shoku').targets) {
     for (const [reference, kind] of [[{ type: 'kanji', id: target.kanji }, 'meaning'],
