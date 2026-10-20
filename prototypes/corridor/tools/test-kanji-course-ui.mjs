@@ -73,7 +73,7 @@ function descend(node) {
   return [node, ...node.children.filter(child => child instanceof Element).flatMap(descend)];
 }
 function harness() {
-  const commits = [], navigations = [];
+  const commits = [], navigations = [], invokers = [];
   let scope = { record: { v: 1, taken: [], srs: {}, revlog: [], obslog: [], lessonsDone: {} } };
   let main = new Element('main'), renderCount = 0, now = 1760000000000;
   const S = { view: 'lessons', kanjiCourse: null, lessonsDone: scope.record.lessonsDone };
@@ -85,7 +85,7 @@ function harness() {
     document: { getElementById: id => descend(main).find(element => element.id === id) || null },
     recordReady: epoch => epoch === context.recordEpoch,
     render: () => draw(),
-    go: node => { navigations.push(copy(node)); S.view = node.t; draw(); },
+    go: (node, options) => { navigations.push(copy(node)); invokers.push(options?.invoker); S.view = node.t; draw(); },
     commitStorePatch: builder => {
       const owner = scope;
       return new Promise(resolve => {
@@ -125,7 +125,7 @@ function harness() {
   };
   draw();
   return {
-    context, S, commits, navigations, draw, byId, select,
+    context, S, commits, navigations, invokers, draw, byId, select,
     get text() { return main.textContent; },
     get elements() { return descend(main); },
     get record() { return scope.record; },
@@ -179,7 +179,8 @@ test('actual menu starts four teaching cards then independent meaning/reading ch
   h.click('kanji-course-learn');
   assert.equal(h.S.kanjiCourse.stage, 'teach');
   assert.match(h.text, /Character keyword for this check.*Tree/);
-  assert.match(h.text, /Dictionary meanings of the word.*tree, wood/);
+  assert.match(h.text, /Word meaning for this example.*tree, wood/);
+  assert.match(h.text, /See it in another word.*木曜日.*もくようび.*Thursday/);
   for (let index = 0; index < 4; index++) h.click('kanji-course-teach-next');
   assert.equal(h.S.kanjiCourse.stage, 'check');
   assert.equal(h.S.kanjiCourse.run.mode, 'check');
@@ -215,12 +216,48 @@ test('entry detour retains the actual visit and teaching position without a writ
   const h = harness();
   h.select('shapes'); h.click('kanji-course-learn'); h.click('kanji-course-teach-next');
   const visit = h.S.kanjiCourse;
+  const door = h.byId('kanji-course-entry-word');
   h.click('kanji-course-entry-word');
   assert.deepEqual(h.navigations, [{ t: 'word', id: '林', reading: 'はやし' }]);
+  assert.strictEqual(h.invokers[0], door);
   assert.strictEqual(h.S.kanjiCourse, visit);
   h.returnToLessons();
   assert.equal(visit.index, 1);
   assert.match(h.text, /Learn — 2 of 4/);
+  assert.equal(h.commits.length, 0);
+});
+
+test('teaching shows reviewed gloss selections and alternate words without raw annotation artifacts', () => {
+  const h = harness();
+  h.select('marks'); h.click('kanji-course-learn');
+  h.click('kanji-course-teach-next'); h.click('kanji-course-teach-next');
+  assert.match(h.text, /Word meaning for this example: future/);
+  assert.doesNotMatch(h.text, /life tense/);
+  assert.match(h.text, /未定.*みてい.*not yet fixed/);
+  assert.equal(h.course.getUnit('marks').targets[2].wordMeaning, 'future (life tense)');
+  h.click('kanji-course-leave');
+  h.select('word-readings'); h.click('kanji-course-learn');
+  h.click('kanji-course-teach-next');
+  assert.match(h.text, /Word meaning for this example: school/);
+  h.click('kanji-course-teach-next');
+  assert.match(h.text, /Word meaning for this example: before; ahead/);
+  assert.match(h.text, /先生.*せんせい.*teacher/);
+  assert.doesNotMatch(h.text, /recent, previous|teasing form of address/);
+  assert.equal(h.commits.length, 0);
+});
+
+test('course menu leaves an unrelated lesson intact and resumes it only on explicit selection', () => {
+  const h = harness();
+  const previous = { lesson: 'other', cursor: 3, draft: 'kept' };
+  h.S.lessonRun = previous;
+  h.S.kanjiCourse = { stage: 'menu' }; h.draw();
+  assert.match(h.text, /Resume the previous lesson/);
+  h.select('shapes'); h.click('kanji-course-learn'); h.click('kanji-course-leave');
+  assert.equal(h.S.kanjiCourse.stage, 'menu');
+  assert.strictEqual(h.S.lessonRun, previous);
+  h.click('kanji-course-other-lessons');
+  assert.equal(h.S.kanjiCourse, null);
+  assert.strictEqual(h.S.lessonRun, previous);
   assert.equal(h.commits.length, 0);
 });
 

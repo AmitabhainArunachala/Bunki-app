@@ -4,6 +4,8 @@
  * Keyword recall, whole-word reading and optional writing are distinct targets.
  * Dictionary keywords are not compound translations; explanations and source
  * transfer remain withheld until independently reviewed and revalidated.
+ * wordMeaning preserves the attested source gloss. Optional displayMeaning is
+ * an editorial selection for the learner-facing word gloss, not a source quote.
  */
 /* global module:readonly -- Optional CommonJS export, guarded for browsers. */
 (function (root, factory) {
@@ -13,7 +15,7 @@
   'use strict';
 
   const COURSE_ID = 'kanji-foundations-24';
-  const REVISION = 1;
+  const REVISION = 2;
   const KINDS = ['meaning', 'reading'];
   const UNITS = [
   {
@@ -447,11 +449,12 @@
         "meaning": "Un-",
         "wordKey": "未来",
         "wordMeaning": "future (life tense)",
+        "displayMeaning": "future",
         "readings": [
           "みらい"
         ],
         "distractors": [
-          "森",
+          "末",
           "青",
           "学"
         ],
@@ -479,7 +482,7 @@
           "げつまつ"
         ],
         "distractors": [
-          "土",
+          "未",
           "人",
           "生"
         ],
@@ -516,9 +519,9 @@
           "あおい"
         ],
         "distractors": [
-          "学",
-          "田",
-          "人"
+          "清",
+          "晴",
+          "情"
         ],
         "examples": [
           {
@@ -544,9 +547,9 @@
           "きよい"
         ],
         "distractors": [
-          "月",
-          "本",
-          "入"
+          "青",
+          "晴",
+          "情"
         ],
         "examples": [
           {
@@ -572,9 +575,9 @@
           "はれる"
         ],
         "distractors": [
-          "田",
-          "本",
-          "休"
+          "青",
+          "清",
+          "情"
         ],
         "examples": [
           {
@@ -596,13 +599,14 @@
         "meaning": "Feelings",
         "wordKey": "情報",
         "wordMeaning": "information; news; report; intelligence; information (data contained in characters, signals, code, etc.); informatics (as a subject)",
+        "displayMeaning": "information",
         "readings": [
           "じょうほう"
         ],
         "distractors": [
-          "森",
-          "月",
-          "大"
+          "青",
+          "清",
+          "晴"
         ],
         "examples": [
           {
@@ -662,6 +666,7 @@
         "meaning": "Study",
         "wordKey": "学校",
         "wordMeaning": "a school",
+        "displayMeaning": "school",
         "readings": [
           "がっこう"
         ],
@@ -690,6 +695,7 @@
         "meaning": "Before",
         "wordKey": "先",
         "wordMeaning": "future; recent, previous",
+        "displayMeaning": "before; ahead",
         "readings": [
           "さき"
         ],
@@ -702,6 +708,7 @@
           {
             "wordKey": "先生",
             "wordMeaning": "teacher; instructor; master; sensei; title or form of address for a teacher, master, doctor, lawyer, etc.; intimate or teasing form of address",
+            "displayMeaning": "teacher",
             "readings": [
               "せんせい"
             ]
@@ -812,6 +819,7 @@
     return freeze({
       id: `${unit.id}/${target.id}/${kind}`, targetId: target.id, kind,
       kanji: target.kanji, wordKey: target.wordKey, wordMeaning: target.wordMeaning,
+      displayMeaning: target.displayMeaning || target.wordMeaning,
       scope: kind === 'meaning' ? 'selected-character-keyword' : 'whole-word-reading',
       prompt: kind === 'meaning' ? `Choose the selected keyword for ${target.kanji}.`
         : `Recall the whole word’s reading: ${target.wordKey}`,

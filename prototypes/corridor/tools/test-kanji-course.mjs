@@ -104,6 +104,72 @@ test('catalog withholds explanations, source transfer and delayed-memory claims'
   assert.throws(() => course.getUnit('missing'), /unit-unknown/);
 });
 
+test('editorial word meanings are explicit selections while raw glosses and readings remain attested', () => {
+  const selected = {
+    '未来': 'future',
+    '先': 'before; ahead',
+    '先生': 'teacher',
+    '情報': 'information',
+    '学校': 'school',
+  };
+  const records = course.listUnits().flatMap(unit =>
+    unit.targets.flatMap(target => [target, ...target.examples]));
+  assert.deepEqual(Object.fromEntries(records.filter(record => Object.hasOwn(record, 'displayMeaning'))
+    .map(record => [record.wordKey, record.displayMeaning])), selected);
+  for (const record of records) {
+    assert.equal(record.wordMeaning, words[record.wordKey].g, record.wordKey);
+    assert.deepEqual(record.readings, words[record.wordKey].r.split(';').map(value => value.trim()));
+    if (Object.hasOwn(selected, record.wordKey)) {
+      assert.equal(record.displayMeaning, selected[record.wordKey]);
+      assert.notEqual(record.displayMeaning, record.wordMeaning);
+    }
+  }
+  for (const unit of course.listUnits()) {
+    let run = course.createRun(unit.id);
+    while (!run.complete) {
+      const prompt = course.currentPrompt(run);
+      assert.equal(prompt.wordMeaning, words[prompt.wordKey].g);
+      assert.equal(prompt.displayMeaning, selected[prompt.wordKey] || prompt.wordMeaning);
+      run = course.answer(run, prompt.acceptedAnswers[0]);
+    }
+  }
+  const before = course.getUnit('word-readings').targets.find(target => target.id === '先');
+  assert.equal(before.meaning, 'Before', 'character keyword is distinct from the selected word meaning');
+  assert.equal(before.examples[0].displayMeaning, 'teacher', 'editorial selection also reaches the teaching example');
+});
+
+test('revision two lesson IDs do not reuse or replace revision one observations and scores', () => {
+  assert.equal(course.catalog().revision, 2);
+  const legacy = { obslog: [], lessonsDone: {} };
+  const fresh = { obslog: [], lessonsDone: {} };
+  for (const unit of course.listUnits()) {
+    const run = course.createRun(unit.id);
+    const oldRun = { ...clone(run), revision: 1 };
+    assert.throws(() => course.currentPrompt(oldRun), /run-invalid/);
+    const evidence = clone(course.toLessonEvidence(allCorrect(run), 2000));
+    fresh.obslog.push(...evidence.obslog);
+    Object.assign(fresh.lessonsDone, evidence.lessonsDone);
+    for (const kind of ['meaning', 'reading']) {
+      const id = `kanji-foundations-24:r2:${unit.id}:${kind}`;
+      assert.equal(course.lessonId(unit.id, kind), id);
+      const oldId = id.replace(':r2:', ':r1:');
+      legacy.lessonsDone[oldId] = { score: 1, total: 4, ts: 1000 };
+      legacy.obslog.push([1000, 'lesson', 'kanji:木', 1, oldId]);
+    }
+  }
+  const before = clone(legacy);
+  const merged = {
+    obslog: [...legacy.obslog, ...fresh.obslog],
+    lessonsDone: { ...legacy.lessonsDone, ...fresh.lessonsDone },
+  };
+  assert.equal(Object.keys(fresh.lessonsDone).length, 12);
+  assert.equal(Object.keys(merged.lessonsDone).length, 24);
+  for (const [id, score] of Object.entries(legacy.lessonsDone)) assert.deepEqual(merged.lessonsDone[id], score);
+  assert.deepEqual(legacy, before);
+  assert.ok(fresh.obslog.every(row => row[4].includes(':r2:')));
+  assert.equal(native.roots(merged), true, 'actual native validators retain both curriculum revisions');
+});
+
 test('meaning choices use a finite explicit nonoverlapping keyword set, independent of word translation', () => {
   for (const unit of course.listUnits()) {
     let run = course.createRun(unit.id, { targets: ['meaning'] });
@@ -127,6 +193,30 @@ test('meaning choices use a finite explicit nonoverlapping keyword set, independ
   assert.equal(prompt.correctAnswer, 'Life');
   assert.equal(prompt.wordMeaning, 'to live');
   assert.throws(() => course.answer(course.createRun('shapes'), 'invented choice'), /choice-invalid/);
+});
+
+test('confusable marks and sound-clue siblings are actual wrong alternatives, not accepted synonyms', () => {
+  const keywords = { '未': 'Un-', '末': 'End', '青': 'Blue', '清': 'Pure', '晴': 'Clear Up', '情': 'Feelings' };
+  const family = ['青', '清', '晴', '情'];
+  for (const unitId of ['marks', 'sound-clues']) {
+    let run = course.createRun(unitId, { targets: ['meaning'] });
+    while (!run.complete) {
+      const prompt = course.currentPrompt(run);
+      if (Object.hasOwn(keywords, prompt.targetId)) {
+        const required = family.includes(prompt.targetId) ? family : ['未', '末'];
+        for (const id of required) {
+          assert.ok(prompt.choices.some(choice => choice.id === id && choice.label === keywords[id]));
+        }
+        assert.equal(prompt.correctAnswer, keywords[prompt.targetId]);
+        assert.deepEqual(prompt.acceptedAnswers, [prompt.targetId]);
+        for (const choice of prompt.choices) {
+          const result = course.summary(course.answer(run, choice.id)).results.at(-1);
+          assert.equal(result.status, choice.id === prompt.targetId ? 'correct' : 'wrong');
+        }
+      }
+      run = course.answer(run, prompt.answerId);
+    }
+  }
 });
 
 test('all lesson prompts have exact scope, target identity and independent results', () => {

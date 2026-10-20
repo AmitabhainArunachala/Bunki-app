@@ -20,6 +20,23 @@ The dictionary fields do not rewrite old lesson keywords, captured answers or sc
 
 Readers and the Kanji finder reach the same ordinary entry. The parts inspector stores selection on that entry's navigation node and activates at `mountPageEffects`, including idle-prebuilt pages. It does not mutate the source context, return path or learner record. Other worlds can consume these contracts without copying this rendering or creating alternate learner identities.
 
+The second source revision applies the pilot language critique. Five selected
+`displayMeaning` values simplify teaching labels while preserving raw
+`wordMeaning` values and readings. 未/末 and 青/清/晴/情 appear among each
+other's meaning distractors. The curriculum revision is 2, so the changed
+checks cannot overwrite revision-1 lesson evidence. Teaching cards also show
+their attested alternate words; preview checks still withhold teaching answers.
+
+Reader slip and keyboard lookup shortcuts carry their original passage and
+token index into the kanji entry. Related-form navigation retains that origin
+without merging the distinct glyphs. The existing source-practice guard still
+requires the requested kanji to occur in the actual source token. Course entry
+detours explicitly name their return control, and the finder resumes a live
+course without clearing it or an unrelated ordinary lesson. These are session
+navigation guarantees; course drafts are not newly persisted across reloads.
+Existing reader taps and assistance may still record encounter/help observations.
+They are not recall grades, and the new inspector does not create learner writes.
+
 ## Source and rights
 
 KANJIDIC2/scriptin release `3.6.2+20260803141815`; raw archive SHA-256 `5dfb850ee88c7bccecf4694cc4d7b1338e608440c5edcb8fefc93216b3471fe6`. Complete field projection and provenance are generated in `reference-extra.json`; the old tables are preserved.
