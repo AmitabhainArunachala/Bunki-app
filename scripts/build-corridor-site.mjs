@@ -114,6 +114,7 @@ try {
     'reference-core.js',
     'reference-ui.js',
     'kanji-structure.js',
+    'kanji-family.js',
     'kanji-course.js',
     'decks/context-dense/engine.js',
     'decks/context-dense/mount.js',

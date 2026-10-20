@@ -61,6 +61,14 @@ has no course-router contract, so its shared entry intentionally has no such doo
 
 ## Source and rights
 
+The fourth source slice adds a [frozen library inventory](LIBRARY_INVENTORY.md)
+and the first [attributed 戠 family](SHIKI_SHOKU_FAMILY.md). Identity coverage,
+word/readings, source occurrences, geometry, authored role edges and missing
+historical coverage are separate counts. `BunkiKanjiFamily` supplies typed,
+immutable joins with exact source evidence; its three family members are not
+additional authored course targets. Kimi's further teaching-gloss selections
+preserve raw fields, lesson identities and all existing graded prompts.
+
 KANJIDIC2/scriptin release `3.6.2+20260803141815`; raw archive SHA-256 `5dfb850ee88c7bccecf4694cc4d7b1338e608440c5edcb8fefc93216b3471fe6`. Complete field projection and provenance are generated in `reference-extra.json`; the old tables are preserved.
 
 KanjiVG commit `61e39cfc29724132a6f8823b166296932985a0ff`, Ulrich Apel, CC BY-SA 3.0. Original SVG bytes and hashes are retained in `prototypes/corridor/tools/fixtures/kanji-structure/`; the deterministic extractor derives group hierarchy while preserving stroke paths unchanged. No creative-lane engine was imported.
@@ -73,6 +81,6 @@ Before integration: freeze a source head; independently review language/answers 
 
 ## Not complete
 
-The six-character structure sample is not full-corpus decomposition. Sound/meaning family roles, validated historical structure, vetted sentence transfer for all course targets, a complete adaptive curriculum, the standalone World, personal quests, cross-world journey persistence, world-class animation/art direction, and measured delayed learning remain open. The pilot has no unseen-transfer or retention claims. Optional handwriting scoring is not implemented; the existing writing room remains a reference tool.
+The six-character structure sample is not full-corpus decomposition. One sound/meaning family now has attributed source data, still awaiting exact-slice language and integration acceptance. Broader family coverage, validated historical structure, vetted sentence transfer for all course targets, a complete adaptive curriculum, the standalone World, personal quests, cross-world journey persistence, world-class animation/art direction, and measured delayed learning remain open. The pilot has no unseen-transfer or retention claims. Optional handwriting scoring is not implemented; the existing writing room remains a reference tool.
 
 The live execution plan and raw receipts are outside the repo in `~/.dharma/bunki_review/2026-10-15/juncture/one-hand/KANJI-NEXT/`. New art remains under John's pause; the failed Rainwell direction is preserved and stopped. Publication remains with the lead's combined handoff and the existing release workflow.

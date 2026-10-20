@@ -70,6 +70,7 @@ export const CORRIDOR_REQUIRED_ROOTS = [
   'reference-core.js',
   'reference-ui.js',
   'kanji-structure.js',
+  'kanji-family.js',
   'kanji-course.js',
   'reference-ui.css',
   'drift-layer.css',

@@ -20023,7 +20023,16 @@ function kanjiCourseReturnFrame() {
  * The original node is retained only for returning to that exact dictionary
  * entry. Other teaching words/characters never acquire its source provenance. */
 function kanjiCourseEntryNode(visit, target, type) {
-  const origin = kanjiCourseReturnFrame()?.kanjiCourseReturn.originNode || visit.originNode;
+  // A finder/Atlas detour can put generic frames above this course's caller.
+  // Keep the nearest live capsule for this visit without rewriting older ones.
+  // A visit's creation-time origin is not evidence of the current source.
+  const live = visit && visit === S.kanjiCourse && recordReady(visit.epoch) &&
+    !S.navigationReturns.some((frame) => frame.kanjiCourseReturn &&
+      (!recordReady(frame.kanjiCourseReturn.epoch) ||
+        (frame.view === 'review' && S.review !== frame.kanjiCourseReturn.review)));
+  const frame = live ? [...S.navigationReturns].reverse().find((candidate) =>
+    candidate.destination === 'lessons' && candidate.kanjiCourseReturn?.visit === visit) : null;
+  const origin = frame?.kanjiCourseReturn.originNode;
   if (type === 'kanji' && origin?.id === target.kanji) return { ...origin };
   return { t: type, id: type === 'kanji' ? target.kanji : target.wordKey,
     ...(type === 'word' && target.readings?.length === 1 ? { reading: target.readings[0] } : {}) };
@@ -24391,7 +24400,7 @@ function renderKanjidex(main) {
   S.kdx ||= {};
   if (typeof S.kdx.mode !== 'string') S.kdx.mode = 'parts';
   if (!Array.isArray(S.kdx.parts)) S.kdx.parts = S.kdx.part ? [S.kdx.part] : [];
-  main.append(withEn(el('p', 'eyebrow', '字を引く'), 'find a kanji you cannot read', 'en-inline'));
+  main.append(withEn(el('p', 'eyebrow', '字を調べる'), 'find a kanji you cannot read', 'en-inline'));
   main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.kanjidex)));
   const characterCount = window.BunkiKanjiCourse?.counts().characters || 0;
   const courseDoor = biLabel('button', 'chip',
@@ -41278,7 +41287,7 @@ function renderSearchPage(main) {
   skipOpener.setAttribute('aria-controls', 'search-skip-results');
   results.id = 'search-skip-results';
 
-  // 字を引く — every way of finding a kanji, each an explicit lens in the
+  // 字を調べる — every way of finding a kanji, each an explicit lens in the
   // search room itself (operator, 2026-09-17: "we need the option for skip,
   // for regular word search, radical search, frequency of use search, by
   // grade search…"). The lenses are the 字引 finder's own, plus radical,
@@ -41302,7 +41311,7 @@ function renderSearchPage(main) {
   const lensRow = el('div', 'kdx-lenses search-lenses');
   lensRow.id = 'search-lenses';
   lensRow.setAttribute('role', 'group');
-  lensRow.setAttribute('aria-label', tx('字を引く方法', 'ways to find a kanji'));
+  lensRow.setAttribute('aria-label', tx('字を調べる方法', 'ways to find a kanji'));
   for (const [id, ja, en] of SEARCH_LENSES) {
     const b = el('button', S.searchLens === id ? 'kdx-lens on' : 'kdx-lens');
     b.type = 'button';

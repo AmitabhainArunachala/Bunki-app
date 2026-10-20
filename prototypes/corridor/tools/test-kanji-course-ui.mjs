@@ -181,6 +181,162 @@ const checked = actions => {
   return h;
 };
 
+// These probes use the real route/stack functions. Rendering, transitions and
+// focus remain synthetic; no browser layout or durable storage is exercised.
+function routeHarness() {
+  const h = harness(), c = h.context;
+  const noop = () => {};
+  Object.assign(c, {
+    roomTransition: action => action(),
+    learningSourceVisit: null, pendingReferenceCollection: null,
+    referenceLibrary: { state: {}, keepScroll: noop, returnScroll: noop,
+      entry: (type, id) => ({ type, id }) },
+    retireScaleReturn: noop, rememberSheet: noop, restoreDialogInvoker: noop,
+    stopReadAloud: noop, rememberScaleEntry: noop, keyboardActivated: () => true,
+    finishPageTransition: noop, layerPathFor: () => false, scaleNodeBelongs: () => false,
+    ladderOpening: null, ladderPages: new WeakMap(), ladderVisit: null, ladderReturning: null,
+    heroSource: new WeakMap(), keptPages: new WeakMap(), pageEpoch: 1,
+    sampleWhere: () => '', pageCutAllowed: () => false, removeMini: noop,
+    sampleTransition: noop, clearReaderSummons: noop, syncWalkSentinel: noop,
+    withEn: element => element, ROOM_NAMES: { rooms: { kanjidex: ['字引', 'Kanji finder'] } },
+    saveReaderPosition: () => { throw new Error('unexpected position write'); },
+  });
+  c.window.scrollY = 75;
+  c.window.scrollTo = (_x, y) => { c.window.scrollY = y; };
+  const declaration = name => {
+    const node = ast.statements.find(statement => ts.isFunctionDeclaration(statement) && statement.name?.text === name);
+    assert.ok(node, `actual route function ${name}`);
+    return node;
+  };
+  const routeNames = ['keepNavigationReturn', 'returnFromNavigation', 'foundationDoor', 'keepScroll',
+    'returnScroll', 'invokerKey', 'go', 'enterWord', 'recede'];
+  // Lift through the actual mounted course door; unrelated finder lenses are
+  // outside this route test. This uses the parsed statement, not a copied callback.
+  const finder = declaration('renderKanjidex');
+  const mount = finder.body.statements.find(statement => ts.isExpressionStatement(statement) &&
+    ts.isCallExpression(statement.expression) && statement.expression.expression.getText(ast) === 'main.append' &&
+    statement.expression.arguments.some(argument => argument.getText(ast) === 'courseDoor'));
+  assert.ok(mount, 'actual finder course door mount');
+  const finderPrefix = source.slice(finder.getStart(ast), mount.end) + '\n}';
+  vm.runInContext(routeNames.map(name => declaration(name).getText(ast)).join('\n') + '\n' + finderPrefix, c);
+  h.detour = view => c.foundationDoor(`detour-${view}`, view, view, view).fire('click');
+  h.genericResume = () => {
+    const finderMain = new Element('main');
+    c.renderKanjidex(finderMain);
+    const door = descend(finderMain).find(element => element.id === 'kanjidex-course');
+    assert.ok(door, 'actual finder resume callback');
+    door.fire('click');
+  };
+  h.openContext = node => {
+    h.S.stack = [node];
+    const sheet = new Element('section');
+    c.renderKanjiCourseDoor(sheet, node);
+    assert.equal(sheet.children.length, 1);
+    sheet.children[0].fire('click');
+  };
+  return h;
+}
+
+function genericResumeJourney(h, { atlas = false, ownerChange = false } = {}) {
+  const c = h.context, S = h.S;
+  const originA = { t: 'kanji', id: '森', from: { passage: 'source-A', index: 99 },
+    sourceContext: { sourceId: 'source-A', index: 99 }, kanjiOccurrenceId: 'occurrence-A' };
+  const originB = { t: 'kanji', id: '森', referenceEntry: { type: 'kanji', id: '森' },
+    kanjiOccurrenceId: 'occurrence-B', ...(atlas ? {} : {
+      from: { passage: 'source-B', index: 3 }, sourceContext: { sourceId: 'source-B', index: 3 },
+    }) };
+  S.view = 'reader';
+  h.openContext(originA);
+  const visit = S.kanjiCourse, capsuleA = S.navigationReturns[0];
+  h.click('kanji-course-practise');
+  h.click('kanji-course-choice-人'); h.click('kanji-course-next');
+  visit.draft = 'unfinished kana';
+  const answers = copy(visit.run.responses), originalOrigin = copy(visit.originNode);
+  const lesson = { id: 'ordinary-lesson', draft: 'keep ordinary lesson' };
+  S.lessonRun = lesson;
+  h.detour(atlas ? 'levels' : 'reader');
+  h.openContext(originB);
+  const capsuleB = S.navigationReturns.at(-1), currentRun = visit.run;
+  assert.strictEqual(S.kanjiCourse, visit);
+  const target = h.course.getUnit('shapes').targets.find(row => row.kanji === '森');
+  h.detour('kanjidex'); h.genericResume();
+  assert.equal(S.view, 'lessons');
+  assert.equal(c.kanjiCourseReturnFrame(), null, 'generic top frame remains an ordinary return');
+  assert.equal(S.navigationReturns.length, 5);
+  if (ownerChange) {
+    h.changeEpoch();
+    const outbound = c.kanjiCourseEntryNode(visit, target, 'kanji');
+    assert.deepEqual(copy(outbound), { t: 'kanji', id: '森' }, 'old owner cannot lend source provenance');
+    assert.equal(c.returnFromNavigation(), true);
+    assert.equal(S.navigationReturns.length, 0);
+    assert.equal(S.stack.length, 0);
+    assert.equal(S.view, 'lessons');
+    assert.equal(S.kanjiCourse.stage, 'menu');
+    assert.equal(h.commits.length, 0);
+    return;
+  }
+  const outbound = c.kanjiCourseEntryNode(visit, target, 'kanji');
+  assert.equal(outbound.kanjiOccurrenceId, 'occurrence-B', 'generic resume must use the active B occurrence');
+  assert.strictEqual(outbound.referenceEntry, originB.referenceEntry);
+  if (atlas) {
+    assert.equal(Object.hasOwn(outbound, 'from'), false, 'Atlas cannot borrow source A');
+    assert.equal(Object.hasOwn(outbound, 'sourceContext'), false);
+  } else {
+    assert.deepEqual(copy(outbound.from), originB.from, 'generic resume must use the active B source');
+    assert.deepEqual(copy(outbound.sourceContext), originB.sourceContext);
+  }
+  c.go(outbound, { invoker: new Element('button'), instant: true });
+  assert.strictEqual(S.stack.at(-1), outbound);
+  c.recede({ instant: true });
+  assert.equal(S.stack.length, 0);
+  assert.equal(c.returnFromNavigation(), true); // generic course -> finder
+  assert.equal(S.view, 'kanjidex');
+  assert.equal(c.returnFromNavigation(), true); // finder -> course B
+  assert.strictEqual(c.kanjiCourseReturnFrame(), capsuleB);
+  h.click('kanji-course-source-return'); // course B -> exact B caller
+  assert.strictEqual(S.stack.at(-1), originB);
+  assert.equal(S.view, atlas ? 'levels' : 'reader');
+  assert.equal(c.returnFromNavigation(), true); // B caller -> older course A
+  assert.strictEqual(c.kanjiCourseReturnFrame(), capsuleA);
+  assert.deepEqual(copy(c.kanjiCourseEntryNode(visit, target, 'kanji').from), originA.from);
+  assert.deepEqual(copy(visit.originNode), originalOrigin, 'shared visit origin was not overwritten');
+  assert.deepEqual(copy(visit.run.responses), answers);
+  assert.strictEqual(visit.run, currentRun);
+  assert.equal(visit.draft, 'unfinished kana');
+  assert.strictEqual(S.lessonRun, lesson);
+  h.click('kanji-course-source-return'); // older course A -> exact A caller
+  assert.strictEqual(S.stack.at(-1), originA);
+  assert.equal(S.view, 'reader');
+  assert.equal(S.kanjiCourse, null);
+  assert.equal(S.navigationReturns.length, 0);
+  assert.equal(h.commits.length, 0);
+  assert.deepEqual(h.record, { v: 1, taken: [], srs: {}, revlog: [], obslog: [], lessonsDone: {} });
+}
+
+test('generic finder resume keeps current B provenance and unwinds both capsules exactly', () => {
+  genericResumeJourney(routeHarness());
+});
+
+test('generic finder resume from Atlas keeps no source and preserves reverse unwind', () => {
+  genericResumeJourney(routeHarness(), { atlas: true });
+});
+
+test('owner change during generic resume discards stale origins and the old return chain', () => {
+  genericResumeJourney(routeHarness(), { ownerChange: true });
+});
+
+test('control: the prior top-frame-only fallback is killed by the generic resume regression', () => {
+  const h = routeHarness();
+  // Intentionally restore the exact old resolution bug in this isolated VM.
+  vm.runInContext(`function kanjiCourseEntryNode(visit, target, type) {
+    const origin = kanjiCourseReturnFrame()?.kanjiCourseReturn.originNode || visit.originNode;
+    if (type === 'kanji' && origin?.id === target.kanji) return { ...origin };
+    return { t: type, id: type === 'kanji' ? target.kanji : target.wordKey,
+      ...(type === 'word' && target.readings?.length === 1 ? { reading: target.readings[0] } : {}) };
+  }`, h.context);
+  assert.throws(() => genericResumeJourney(h), /generic resume must use the active B occurrence/);
+});
+
 test('actual menu starts four teaching cards then independent meaning/reading checks', () => {
   const h = harness();
   assert.equal(h.elements.filter(element => element.dataset.kanjiCourseUnit).length, 12);
@@ -322,7 +478,8 @@ test('supported status survives paused intro and menu; unrelated examples never 
   assert.equal(h.elements.some(element => element.id === 'kanji-course-preview'), false);
   const origin = { t: 'kanji', id: '雨', from: { passage: 'rain', index: 2 },
     sourceContext: { sourceId: 'rain', index: 2, quote: '雨です。' } };
-  h.S.kanjiCourse.originNode = origin;
+  h.S.view = 'reader'; h.S.stack = [origin];
+  assert.equal(h.context.openKanjiCourseUnit(origin, new Element('button')), true);
   h.click('kanji-course-learn');
   const targets = h.course.getUnit('nature').targets;
   for (let index = 0; index < targets.length; index++) {

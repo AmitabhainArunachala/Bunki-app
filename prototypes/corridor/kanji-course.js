@@ -919,7 +919,8 @@
         "writing": {
           "optional": true,
           "assessment": "self-comparison"
-        }
+        },
+        "displayMeaning": "above; top"
       },
       {
         "id": "下",
@@ -969,7 +970,8 @@
             "wordMeaning": "left and right; influence",
             "readings": [
               "さゆう"
-            ]
+            ],
+            "displayMeaning": "left and right"
           }
         ],
         "writing": {
@@ -997,7 +999,8 @@
             "wordMeaning": "left and right; influence",
             "readings": [
               "さゆう"
-            ]
+            ],
+            "displayMeaning": "left and right"
           }
         ],
         "writing": {
@@ -1035,7 +1038,8 @@
             "wordMeaning": "East and West, whole country",
             "readings": [
               "とうざい"
-            ]
+            ],
+            "displayMeaning": "East and West"
           }
         ],
         "writing": {
@@ -1409,7 +1413,8 @@
         "writing": {
           "optional": true,
           "assessment": "self-comparison"
-        }
+        },
+        "displayMeaning": "to go out; to leave"
       },
       {
         "id": "来",

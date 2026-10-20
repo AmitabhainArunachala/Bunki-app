@@ -193,11 +193,17 @@ test('editorial word meanings are explicit selections while raw glosses and read
     '先生': 'teacher',
     '情報': 'information',
     '学校': 'school',
+    '上': 'above; top',
+    '出る': 'to go out; to leave',
+    '左右': 'left and right',
+    '東西': 'East and West',
   };
   const records = course.listUnits().flatMap(unit =>
     unit.targets.flatMap(target => [target, ...target.examples]));
   assert.deepEqual(Object.fromEntries(records.filter(record => Object.hasOwn(record, 'displayMeaning'))
     .map(record => [record.wordKey, record.displayMeaning])), selected);
+  assert.equal(records.filter(record => Object.hasOwn(record, 'displayMeaning')).length, 10,
+    'all selected occurrences are covered, including both 左右 alternate examples');
   for (const record of records) {
     assert.equal(record.wordMeaning, words[record.wordKey].g, record.wordKey);
     assert.deepEqual(record.readings, words[record.wordKey].r.split(';').map(value => value.trim()));
@@ -218,6 +224,25 @@ test('editorial word meanings are explicit selections while raw glosses and read
   const before = course.getUnit('word-readings').targets.find(target => target.id === '先');
   assert.equal(before.meaning, 'Before', 'character keyword is distinct from the selected word meaning');
   assert.equal(before.examples[0].displayMeaning, 'teacher', 'editorial selection also reaches the teaching example');
+});
+
+test('teaching-gloss corrections retain all 96 graded prompts, lesson IDs and unit revisions', () => {
+  assert.equal(course.catalog().revision, 3);
+  const graded = [];
+  for (const unit of course.listUnits()) {
+    let run = course.createRun(unit.id);
+    while (!run.complete) {
+      const prompt = { ...course.currentPrompt(run) };
+      delete prompt.displayMeaning;
+      graded.push({ lessonId: course.lessonId(unit.id, prompt.kind), revision: run.revision, ...prompt });
+      run = course.answer(run, prompt.acceptedAnswers[0]);
+    }
+    assert.equal(course.summary(run).targets.meaning.correct, 4);
+    assert.equal(course.summary(run).targets.reading.correct, 4);
+  }
+  assert.equal(graded.length, 96);
+  // Actual pre-correction prompt contract at accepted slice-3 head 0186490e.
+  assert.equal(sha(JSON.stringify(graded)), 'eea2d371bc4e12e1ea00bbfdcde279ede1ed5ea62d5629d23ac3c9abff7c0410');
 });
 
 test('original revision two lesson IDs do not reuse or replace revision one observations and scores', () => {
