@@ -465,3 +465,139 @@ test('R4 keeps all non-superseded rows and requires new DPR, gap and gloss oblig
     }
   }
 });
+
+
+const LADDER_FOLD_CONTROL = 'webkit/L.negative.fold-at-560';
+function foldObserved(value, phase) {
+  const c = control(value, 'webkit', 'ladder:fold-at-560');
+  const rows = phase === 'candidate' ? value.rows : c[phase];
+  const row = rows.find(row => row.id === 'webkit/L.d7.scroll-gap');
+  // Each phase owns its sample, including in tests that forge a passing flag.
+  row.observed = structuredClone(row.observed);
+  return row.observed;
+}
+function moveGap(step, gap) {
+  const second = step.rows[1];
+  second.top = step.rows[0].bottom + gap;
+  second.bottom = second.top + second.height;
+  step.gaps[0] = Math.round((second.top - step.rows[0].bottom) * 10) / 10;
+}
+function foldVerdict(value) {
+  return grammarControlVerdicts(value).find(row => row.id === LADDER_FOLD_CONTROL).ok;
+}
+test('Ladder fold admission independently binds a rendered33px fault and clean phases without changing other controls', () => {
+  const value = clean();
+  assert.equal(foldVerdict(value), true);
+  assert.equal(grammarAcceptance(value).fullAcceptance, true);
+  assert(grammarControlVerdicts(value).every(row => row.ok));
+  assert.equal(grammarControlRows('chromium').some(id => id === 'chromium/L.negative.fold-at-560'), false);
+  for (const gap of [33]) {
+    const sample = grammarFixture(['webkit']);
+    for (const step of foldObserved(sample, 'rows')[0].steps) moveGap(step, gap);
+    assert.equal(foldVerdict(sample), true, `one-decimal authored fold: ${gap}`);
+  }
+  // Frozen9058 uses native binary subtraction: nominal32.9/33.1 are just outside0.1.
+  for (const gap of [32.8, 32.9, 33.1, 33.2, 1, 0, -33]) {
+    const sample = grammarFixture(['webkit']);
+    for (const step of foldObserved(sample, 'rows')[0].steps) moveGap(step, gap);
+    rejects(sample, LADDER_FOLD_CONTROL);
+  }
+});
+test('Ladder fold rejects empty, foreign, incomplete or unstable evidence in every phase', () => {
+  const mutations = [
+    o => o.splice(0), o => o.pop(), o => o.reverse(), o => o.push(structuredClone(o[0])),
+    o => { o[0].size = '390x520'; }, o => { o[0].index = null; }, o => { o[0].index = -1; }, o => { o[0].index = 9.5; },
+    o => { o[1].index = 10; for (const step of o[1].steps) step.anchor.index = 10; },
+    o => { o[0].rungs = []; }, o => { o[0].rungs = ['reading', 'gloss']; },
+    o => { o[0].rungs = ['invented', 'stage']; }, o => { o[0].rungs = ['stage', 'stage']; },
+    o => { o[0].steps = []; }, o => { o[0].steps[0].cut = false; },
+    o => { o[0].steps[0].anchor.word = '理総'; }, o => { o[0].steps[0].anchor.index = null; }, o => { o[0].steps[0].anchor.index = 10; },
+    o => { o[0].steps[0].anchor.connected = false; }, o => { o[0].steps[0].anchor.inReader = false; },
+    o => { o[0].steps[0].card.word = '総'; }, o => { o[0].steps[0].card.contentWord = '総'; },
+    o => { o[0].steps[0].card.count = 2; }, o => { delete o[0].steps[0].card; },
+    o => { o[0].steps[0].rows = []; }, o => { o[0].steps[0].rows.pop(); },
+    o => { o[0].steps[0].rows.reverse(); }, o => { o[0].steps[0].rows[1].glyph = '総'; },
+    o => { o[0].steps[0].rows[0].isKanjiRow = false; },
+    o => { o[0].steps[0].rows[0].rowIndex = 1; }, o => { delete o[0].steps[0].rows[1].rowIndex; },
+    o => { o[0].steps[0].rows.push(structuredClone(o[0].steps[0].rows[0])); },
+    o => { o[0].steps[0].gaps = []; }, o => { o[0].steps[0].gaps.push(0); },
+    o => { o[0].steps[0].scrollTop = '0'; }, o => { o[0].steps[0].scrollTop = -1; },
+    o => { o[0].steps[0].folds = 1.5; }, o => { delete o[0].steps[0].foldOwners; },
+  ];
+  for (const phase of ['candidate', 'rows', 'restore']) for (const mutate of mutations) {
+    const value = grammarFixture(['webkit']); mutate(foldObserved(value, phase));
+    rejects(value, LADDER_FOLD_CONTROL);
+  }
+  for (const phase of ['rows', 'restore']) {
+    const value = grammarFixture(['webkit']);
+    for (const place of foldObserved(value, phase)) { place.index = 10; for (const step of place.steps) step.anchor.index = 10; }
+    rejects(value, LADDER_FOLD_CONTROL); // stable within a phase still cannot substitute another occurrence
+  }
+});
+test('Ladder fold recomputes finite nonzero raw geometry and the native rounded gap', () => {
+  for (const phase of ['candidate', 'rows', 'restore']) for (const mutate of [
+    step => { step.rows[0].top = NaN; }, step => { step.rows[1].bottom = Infinity; },
+    step => { step.rows[0].height = '44.5'; }, step => { step.rows[0].marginBottom = '33px'; },
+    step => { step.rows[0].height = 0; step.rows[0].bottom = step.rows[0].top; },
+    step => { step.rows[0].height = -1; }, step => { step.rows[1].height += 0.02; },
+    step => { step.rows[0].bottom += 1; }, step => { step.gaps[0] += 0.1; },
+    step => { step.gaps[0] = NaN; }, step => { step.gaps[0] = String(step.gaps[0]); },
+  ]) {
+    const value = grammarFixture(['webkit']); mutate(foldObserved(value, phase)[0].steps[0]);
+    rejects(value, LADDER_FOLD_CONTROL);
+  }
+  for (const phase of ['candidate', 'restore']) for (const gap of [-1, 1, 1.04]) {
+    const value = grammarFixture(['webkit']); moveGap(foldObserved(value, phase)[0].steps[0], gap);
+    assert.equal(foldVerdict(value), true, `${phase}: existing rounded±1 law`);
+  }
+  for (const phase of ['candidate', 'restore']) for (const gap of [-1.1, 1.1]) {
+    const value = grammarFixture(['webkit']); moveGap(foldObserved(value, phase)[0].steps[0], gap);
+    rejects(value, LADDER_FOLD_CONTROL);
+  }
+});
+test('Ladder fold requires one matching総 owner,33px margin and a real gap in the authored viewport', () => {
+  for (const mutate of [
+    step => { step.foldOwners[0].rowIndex = 1; }, step => { step.foldOwners[0].rowIndex = -1; },
+    step => { step.foldOwners[0].rowIndex = '0'; }, step => { delete step.foldOwners[0].rowIndex; },
+    step => { step.foldOwners[0].top += 1; }, step => { step.foldOwners[0].bottom += 1; },
+    step => { step.foldOwners[0].height += 1; }, step => { step.foldOwners[0].top = NaN; },
+    step => { step.foldOwners[0].glyph = '理'; }, step => { step.foldOwners[0].glyph = null; },
+    step => { step.foldOwners[0].isKanjiRow = false; }, step => { step.foldOwners[0].fold = '33'; },
+    step => { step.foldOwners[0].fold = 32; }, step => { step.foldOwners[0].marginBottom = 32; },
+    step => { step.rows[0].fold = null; }, step => { step.rows[0].marginBottom = 0; },
+    step => { step.rows[1].fold = 33; }, step => { step.foldOwners = []; },
+    step => { step.foldOwners.push({ glyph: '理', isKanjiRow: true, fold: 33, marginBottom: 33 }); step.folds = 2; },
+    step => { step.folds = 0; step.foldOwners = []; step.rows[0].fold = null; },
+    step => moveGap(step, 0), step => moveGap(step, 1), step => moveGap(step, 2),
+  ]) {
+    const value = grammarFixture(['webkit']);
+    for (const step of foldObserved(value, 'rows')[0].steps) mutate(step);
+    rejects(value, LADDER_FOLD_CONTROL);
+  }
+  const foreign = grammarFixture(['webkit']), observed = foldObserved(foreign, 'rows');
+  observed[1].steps[0].folds = 1;
+  observed[1].steps[0].foldOwners = [{ glyph: 'foreign', isKanjiRow: false, fold: 33, marginBottom: 33 }];
+  rejects(foreign, LADDER_FOLD_CONTROL); // a genuine560 fault cannot conceal contamination at568
+  const wrongView = grammarFixture(['webkit']), swapped = foldObserved(wrongView, 'rows');
+  [swapped[0].steps, swapped[1].steps] = [swapped[1].steps, swapped[0].steps];
+  rejects(wrongView, LADDER_FOLD_CONTROL);
+});
+test('Ladder fold independently rejects dirty candidate/restore flags and no-op or unserved mutants', () => {
+  for (const phase of ['candidate', 'restore']) {
+    const value = grammarFixture(['webkit']);
+    const dirty = structuredClone(foldObserved(value, 'rows')[0].steps[0]);
+    foldObserved(value, phase)[0].steps[0] = dirty;
+    rejects(value, LADDER_FOLD_CONTROL); // phase row remains forged ok=true
+  }
+  const noOp = grammarFixture(['webkit']);
+  control(noOp, 'webkit', 'ladder:fold-at-560').rows.find(row => row.id === 'webkit/L.d7.scroll-gap').observed = structuredClone(foldObserved(noOp, 'candidate'));
+  rejects(noOp, LADDER_FOLD_CONTROL); // target still says ok=false, control still says killed
+  for (const mutate of [
+    c => { c.served[0].mutantSha256 = c.served[0].baseSha256; },
+    c => { c.served[0].applied = []; }, c => { c.served = []; },
+    c => { c.rows.find(row => row.id.endsWith('.page-errors')).ok = false; },
+  ]) {
+    const value = grammarFixture(['webkit']); mutate(control(value, 'webkit', 'ladder:fold-at-560'));
+    rejects(value, LADDER_FOLD_CONTROL);
+  }
+});

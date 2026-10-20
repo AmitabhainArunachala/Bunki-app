@@ -267,7 +267,52 @@ function ladderBoxTrim(text) {
   const plain = String(text || '').replace(/\([^)]*\)/gu, '').replace(/\s+/gu, ' ').trim() || String(text || '');
   return plain.length > 18 && plain.includes(',') ? plain.split(',')[0].trim() : plain;
 }
-function ladderFaultWitness(spec, targets) {
+// The fold control is a measured rendered regression, not a data-fold marker alone.
+// Keep raw boxes until the producer's one-decimal gap measurement is recomputed.
+const LADDER_GAP_SIZES = ['390x560', '320x568'];
+function ladderGapSample(step, index) {
+  if (!step || !Number.isInteger(step.scrollTop) || step.scrollTop < 0 || typeof step.cut !== 'boolean' ||
+      step.anchor?.word !== '総理' || step.anchor.index !== index || step.anchor.connected !== true || step.anchor.inReader !== true ||
+      step.card?.word !== '総理' || step.card.contentWord !== '総理' || step.card.count !== 1 ||
+      !Array.isArray(step.rows) || step.rows.length !== 2) return false;
+  if (!step.rows.every((row, k) => row?.glyph === ['総', '理'][k] && row.isKanjiRow === true && row.rowIndex === k &&
+      [row.top, row.bottom, row.height, row.marginBottom].every(Number.isFinite) && row.height > 0 && row.bottom > row.top &&
+      Math.abs(row.bottom - row.top - row.height) < 0.01 && (row.fold === null || Number.isFinite(row.fold)))) return false;
+  return Array.isArray(step.gaps) && step.gaps.length === 1 && Number.isFinite(step.gaps[0]) &&
+    step.gaps[0] === Math.round((step.rows[1].top - step.rows[0].bottom) * 10) / 10 &&
+    Number.isInteger(step.folds) && step.folds >= 0 && Array.isArray(step.foldOwners) && step.foldOwners.length === step.folds &&
+    step.foldOwners.every(owner => Number.isInteger(owner?.rowIndex) && owner.rowIndex >= 0 && owner.rowIndex < step.rows.length &&
+      ['glyph', 'isKanjiRow', 'fold', 'marginBottom', 'top', 'bottom', 'height'].every(key => owner[key] === step.rows[owner.rowIndex][key]));
+}
+function ladderGapSchedule(observed, index) {
+  return Array.isArray(observed) && observed.length === 2 && Number.isInteger(index) && index >= 0 &&
+    observed.every((place, k) => place?.size === LADDER_GAP_SIZES[k] && place.index === index &&
+      Array.isArray(place.rungs) && place.rungs.length > 0 && place.rungs.length <= 3 && place.rungs.at(-1) === 'stage' &&
+      place.rungs.every((rung, i) => ['reading', 'gloss', 'stage'].includes(rung) &&
+        (i === 0 || ['reading', 'gloss', 'stage'].indexOf(rung) > ['reading', 'gloss', 'stage'].indexOf(place.rungs[i - 1]))) &&
+      Array.isArray(place.steps) && place.steps.length > 0 && place.steps.length <= 12 && place.steps[0]?.cut === true &&
+      place.steps.every(step => ladderGapSample(step, index)));
+}
+const ladderGapCleanStep = step => step.folds === 0 && step.rows.every(row => row.fold === null) && Math.abs(step.gaps[0]) <= 1;
+function ladderGapFaultStep(step) {
+  const owner = step.foldOwners[0];
+  return step.folds === 1 && owner?.glyph === '総' && owner.isKanjiRow === true && owner.rowIndex === 0 && owner.fold === 33 && owner.marginBottom === 33 &&
+    step.rows[0].fold === 33 && step.rows[0].marginBottom === 33 && step.rows[1].fold === null &&
+    step.gaps[0] > 1 && Math.abs(step.gaps[0] - 33) <= 0.1;
+}
+function ladderFoldControl(baseline, mutant, restore, engine) {
+  const id = `${engine}/L.d7.scroll-gap`;
+  const before = baseline.find(row => row.id === id)?.observed, after = restore.find(row => row.id === id)?.observed;
+  const index = before?.[0]?.index;
+  if (![before, mutant, after].every(value => ladderGapSchedule(value, index))) return false;
+  if (![before, after].every(value => value.every(place => place.steps.every(ladderGapCleanStep)))) return false;
+  // The mutation only authors a fold at560. Every other sample must remain clean,
+  // and no foreign fold may hide behind one genuine positive witness.
+  return mutant[0].steps.some(ladderGapFaultStep) &&
+    mutant[0].steps.every(step => ladderGapCleanStep(step) || ladderGapFaultStep(step)) &&
+    mutant[1].steps.every(ladderGapCleanStep);
+}
+function ladderFaultWitness(spec, targets, context) {
   const o = targets[0]?.observed;
   switch (spec.control) {
     case 'ladder:mouse-ignored': return o?.ring === 0 && o?.strip === 0;
@@ -278,7 +323,7 @@ function ladderFaultWitness(spec, targets) {
     case 'ladder:fade-on-a-row': return Array.isArray(o) && o.some(place => Array.isArray(place?.inkUnderFade) && place.inkUnderFade.length > 0);
     case 'ladder:provisional-paint': return Array.isArray(o) && o.some(word => Array.isArray(word?.other) && word.other.length > 0);
     case 'ladder:row-not-the-box': return Array.isArray(o) && o.some(word => typeof word?.box === 'string' && word.box.length > 0 && typeof word.english === 'string' && word.english !== ladderBoxTrim(word.box));
-    case 'ladder:fold-at-560': return Array.isArray(o) && o.some(place => Array.isArray(place?.steps) && place.steps.some(step => Number.isFinite(step?.folds) && step.folds > 0));
+    case 'ladder:fold-at-560': return ladderFoldControl(context.baseline, o, context.restore, context.engine);
     case 'ladder:dash-for-none': return Array.isArray(o?.dashes) && o.dashes.length > 0;
     case 'ladder:english-ignores-sense': return Array.isArray(o?.words) && o.words.some(word => Array.isArray(word?.wrong) && word.wrong.length > 0);
     default: return false;
@@ -307,7 +352,7 @@ function servedEditVerdict(spec, control, { engine, rows, digests }) {
   if (![...baseline, ...mutant, ...restore].every(executedRow)) return false;
   if (spec.local && !g6ObservedWitness(spec, baseline, mutant, restore)) return false;
   const targets = kills.map(id => mutant.find(row => row.id === id));
-  if (spec.control.startsWith('ladder:') && !ladderFaultWitness(spec, targets)) return false;
+  if (spec.control.startsWith('ladder:') && !ladderFaultWitness(spec, targets, { baseline, restore, engine })) return false;
   return targets.every(row => row && row.ok === false) && mutant.every(row => kills.includes(row.id) || row.ok === true) && restore.every(row => row.ok === true);
 }
 const sharedHover = sample => !!sample?.held && !!sample?.peer && sample.held.hover === true && sample.peer.hover === true && sample.held.disabled === false &&

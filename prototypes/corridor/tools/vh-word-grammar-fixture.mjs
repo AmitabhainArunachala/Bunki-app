@@ -9,7 +9,25 @@ const geometry = (top) => [{ id: 'p1', top, height: 24, tokens: [{ id: '76', lef
 const hover = (background, peer = background) => ({ held: { hover: true, background, disabled: false }, peer: { hover: true, background: peer, disabled: false } });
 const sample = (s) => ({ ...s, equal: s.held.background === s.peer.background });
 
+// Purpose-built numeric samples; these are not retained browser receipts.
+function ladderGapObserved(folded = false) {
+  return ['390x560', '320x568'].map((size, k) => {
+    const fault = folded && k === 0, gap = fault ? 33 : 0;
+    return { size, index: 9, rungs: ['reading', 'gloss', 'stage'],
+      steps: (fault ? [0, 40, 80, 92] : [0, 40, k ? 53 : 59]).map(scrollTop => {
+        const top = 250 - scrollTop, bottom = top + 44.5;
+        const rows = [
+          { glyph: '総', isKanjiRow: true, rowIndex: 0, top, bottom, height: 44.5, fold: fault ? 33 : null, marginBottom: gap },
+          { glyph: '理', isKanjiRow: true, rowIndex: 1, top: bottom + gap, bottom: bottom + gap + 44, height: 44, fold: null, marginBottom: 0 },
+        ];
+        return { scrollTop, cut: true, folds: fault ? 1 : 0, gaps: [gap], rows,
+          foldOwners: fault ? [{ ...rows[0] }] : [],
+          anchor: { word: '総理', index: 9, connected: true, inReader: true }, card: { word: '総理', contentWord: '総理', count: 1 } };
+      }) };
+  });
+}
 function candidateObserved(id) {
+  if (id.endsWith('/L.d7.scroll-gap')) return ladderGapObserved();
   if (id.endsWith('/G5.layers.bare-again')) return { plain: geometry(10), bareAgain: geometry(10.4) };
   if (id.endsWith('/G5.room.shared-hover')) return sample(hover('rgb(1, 2, 3)'));
   return '';
@@ -59,7 +77,7 @@ function controlFor(engine, rowId, spec, rows) {
       'ladder:fade-on-a-row': [{ inkUnderFade: ['synthetic ink'] }],
       'ladder:provisional-paint': [{ other: [{ text: 'provisional meaning' }] }],
       'ladder:row-not-the-box': [{ english: 'to receive', box: 'to get someone to do something' }],
-      'ladder:fold-at-560': [{ steps: [{ folds: 1 }] }],
+      'ladder:fold-at-560': ladderGapObserved(true),
       'ladder:dash-for-none': { dashes: ['—'] },
       'ladder:english-ignores-sense': { words: [{ wrong: ['synthetic wrong meaning'] }] },
     };
