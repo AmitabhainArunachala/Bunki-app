@@ -69,6 +69,8 @@ export const CORRIDOR_REQUIRED_ROOTS = [
   'register.css',
   'reference-core.js',
   'reference-ui.js',
+  'kanji-structure.js',
+  'kanji-course.js',
   'reference-ui.css',
   'drift-layer.css',
   'drift-layer.js',

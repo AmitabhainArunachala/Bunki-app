@@ -735,9 +735,28 @@ const evidence = {
       .filter((e) => e.type === 'kanji' && input.kanji[e.id])
       .flatMap((e) =>
         Object.entries(e.metadataSources)
-          .filter(([, p]) => p.source !== 'kanji' && p.source !== 'kmeta')
+          // K02 full reference fields sit beside legacy metadata; they do not fill an empty lesson field.
+          .filter(
+            ([field, p]) =>
+              !['completeMeanings', 'radicalSchemes'].includes(field) &&
+              p.source !== 'kanji' &&
+              p.source !== 'kmeta',
+          )
           .map(([field, provider]) => ({ id: e.id, field, ...provider })),
       ),
+    completeReferenceFacts: {
+      sourceLiterals: committed.kanjiFacts.length,
+      sourceNelsonFields: committed.kanjiFacts.filter((row) => row[3] !== null).length,
+      catalogEntries: referenceEntries.filter(
+        (entry) => entry.type === 'kanji' && entry.completeMeanings?.length,
+      ).length,
+      canonicalEntries: Object.keys(input.kanji).filter((id) =>
+        core.kanjiReferenceFacts(committed, id),
+      ).length,
+      canonicalAbsentFromSource: Object.keys(input.kanji)
+        .filter((id) => !core.kanjiReferenceFacts(committed, id))
+        .sort(),
+    },
     policy:
       'Glyphless records and absent metadata are not broken canonical links. Missing on or kun alone is not proof of a metadata gap; a character need not have both.',
   },

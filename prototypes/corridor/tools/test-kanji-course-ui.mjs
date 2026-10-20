@@ -1,0 +1,415 @@
+/** Source-only UI/state probes over the actual course renderer, menu and patch
+ * helper, lifted by TypeScript AST. The real UMD course executes in the same VM.
+ *
+ * Fake DOM: tree/text, attributes, focus and explicit events only. render replaces
+ * the tree; go changes view and retains the visit. commitStorePatch is a controlled
+ * promise whose callback sees the latest synthetic record at ACK. These tests do
+ * not establish browser layout, native IME ordering, navigation-stack restoration,
+ * storage-host/IndexedDB durability, accessibility or actual learner acceptance.
+ */
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { test } from 'node:test';
+import vm from 'node:vm';
+
+const require = createRequire(import.meta.url);
+const ts = require('typescript');
+const read = name => readFileSync(new URL(name, import.meta.url), 'utf8');
+const source = read('../corridor.js');
+const courseSource = read('../kanji-course.js');
+const ast = ts.createSourceFile('corridor.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+const names = ['kanjiCourseEvidencePatch', 'renderKanjiCourseMenu', 'renderKanjiCourse'];
+const lifted = names.map(name => {
+  const node = ast.statements.find(statement => ts.isFunctionDeclaration(statement) && statement.name?.text === name);
+  assert.ok(node, `actual source function ${name}`);
+  return node.getText(ast);
+}).join('\n');
+const sha = text => createHash('sha256').update(text).digest('hex');
+console.log(JSON.stringify({
+  scope: 'source-only fake DOM and controlled synthetic commit',
+  corridorSha256: sha(source), courseSha256: sha(courseSource), liftedFunctionsSha256: sha(lifted), functions: names,
+}));
+const copy = value => JSON.parse(JSON.stringify(value));
+const tick = () => new Promise(resolve => setImmediate(resolve));
+
+class Element {
+  constructor(tag, className = '', text = '') {
+    this.tagName = tag.toUpperCase();
+    this.className = className;
+    this.text = String(text);
+    this.children = [];
+    this.dataset = {};
+    this.attributes = {};
+    this.events = new Map();
+    this.id = '';
+    this.value = '';
+    this.disabled = false;
+  }
+  append(...children) {
+    for (const child of children) {
+      if (child instanceof Element) child.parentElement = this;
+      this.children.push(child);
+    }
+  }
+  setAttribute(key, value) { this.attributes[key] = String(value); }
+  getAttribute(key) { return this.attributes[key] ?? null; }
+  addEventListener(type, listener) {
+    this.events.set(type, [...(this.events.get(type) || []), listener]);
+  }
+  focus() { this.focused = true; }
+  get textContent() {
+    return this.text + this.children.map(child => child instanceof Element ? child.textContent : String(child)).join('');
+  }
+  fire(type, values = {}, force = false) {
+    if (type === 'click' && this.disabled && !force) return null;
+    const event = { target: this, defaultPrevented: false, preventDefault() { this.defaultPrevented = true; }, ...values };
+    for (const listener of this.events.get(type) || []) listener(event);
+    return event;
+  }
+}
+function descend(node) {
+  return [node, ...node.children.filter(child => child instanceof Element).flatMap(descend)];
+}
+function harness() {
+  const commits = [], navigations = [];
+  let scope = { record: { v: 1, taken: [], srs: {}, revlog: [], obslog: [], lessonsDone: {} } };
+  let main = new Element('main'), renderCount = 0, now = 1760000000000;
+  const S = { view: 'lessons', kanjiCourse: null, lessonsDone: scope.record.lessonsDone };
+  const context = vm.createContext({
+    S, recordEpoch: 1, window: {}, Date: { now: () => now },
+    el: (tag, cls, text) => new Element(tag, cls, text),
+    biLabel: (tag, cls, _ja, en) => new Element(tag, cls, en),
+    tx: (_ja, en) => en,
+    document: { getElementById: id => descend(main).find(element => element.id === id) || null },
+    recordReady: epoch => epoch === context.recordEpoch,
+    render: () => draw(),
+    go: node => { navigations.push(copy(node)); S.view = node.t; draw(); },
+    commitStorePatch: builder => {
+      const owner = scope;
+      return new Promise(resolve => {
+        commits.push({
+          owner, builder, resolved: false,
+          resolve(saved, { apply = saved } = {}) {
+            assert.equal(this.resolved, false);
+            this.resolved = true;
+            if (apply) {
+              this.patch = builder(owner.record);
+              owner.record = { ...owner.record, ...this.patch };
+              if (owner === scope) S.lessonsDone = owner.record.lessonsDone;
+            }
+            resolve(saved);
+          },
+        });
+      });
+    },
+  });
+  vm.runInContext(courseSource, context);
+  vm.runInContext(`window.BunkiKanjiCourse = BunkiKanjiCourse;\n${lifted}`, context);
+  function draw() {
+    main = new Element('main'); renderCount++;
+    if (S.view !== 'lessons') return;
+    if (S.kanjiCourse) context.renderKanjiCourse(main);
+    else context.renderKanjiCourseMenu(main);
+  }
+  const byId = id => {
+    const found = descend(main).find(element => element.id === id);
+    assert.ok(found, `rendered #${id}; text=${main.textContent}`);
+    return found;
+  };
+  const select = id => {
+    const row = descend(main).find(element => element.dataset.kanjiCourseUnit === id);
+    assert.ok(row, `unit ${id}`);
+    row.fire('click');
+  };
+  draw();
+  return {
+    context, S, commits, navigations, draw, byId, select,
+    get text() { return main.textContent; },
+    get elements() { return descend(main); },
+    get record() { return scope.record; },
+    get renderCount() { return renderCount; },
+    get course() { return context.BunkiKanjiCourse; },
+    click(id) { byId(id).fire('click'); },
+    setNow(value) { now = value; },
+    changeEpoch() {
+      context.recordEpoch++;
+      scope = { record: { v: 1, taken: [], srs: {}, revlog: [], obslog: [], lessonsDone: {} } };
+      S.lessonsDone = scope.record.lessonsDone;
+      draw();
+    },
+    returnToLessons() { S.view = 'lessons'; draw(); },
+    submit(value, event = {}) {
+      const input = byId('kanji-course-answer');
+      input.value = value; input.fire('input');
+      const form = descend(main).find(element => element.tagName === 'FORM');
+      assert.ok(form); return form.fire('submit', event);
+    },
+    finish(actions = []) {
+      let step = 0;
+      while (!S.kanjiCourse.run.complete) {
+        const prompt = context.BunkiKanjiCourse.currentPrompt(S.kanjiCourse.run);
+        const action = actions[step++] || 'correct';
+        if (action === 'skip' || action === 'reveal') this.click(`kanji-course-${action}`);
+        else if (prompt.kind === 'meaning') {
+          const choice = action === 'wrong' ? prompt.choices.find(item => item.id !== prompt.answerId).id : prompt.answerId;
+          this.click(`kanji-course-choice-${choice}`);
+        } else this.submit(action === 'wrong' ? 'ちがう' : prompt.acceptedAnswers[0]);
+        this.click('kanji-course-next');
+      }
+    },
+  };
+}
+const checked = actions => {
+  const h = harness();
+  h.select('shapes');
+  h.click('kanji-course-preview');
+  h.finish(actions);
+  return h;
+};
+
+test('actual menu starts four teaching cards then independent meaning/reading checks', () => {
+  const h = harness();
+  assert.equal(h.elements.filter(element => element.dataset.kanjiCourseUnit).length, 6);
+  assert.match(h.text, /editorial review.*pending/);
+  h.select('shapes');
+  assert.equal(h.S.kanjiCourse.stage, 'intro');
+  assert.doesNotMatch(h.text, /Tree|tree, wood|き/);
+  h.click('kanji-course-learn');
+  assert.equal(h.S.kanjiCourse.stage, 'teach');
+  assert.match(h.text, /Character keyword for this check.*Tree/);
+  assert.match(h.text, /Dictionary meanings of the word.*tree, wood/);
+  for (let index = 0; index < 4; index++) h.click('kanji-course-teach-next');
+  assert.equal(h.S.kanjiCourse.stage, 'check');
+  assert.equal(h.S.kanjiCourse.run.mode, 'check');
+  assert.equal(h.S.kanjiCourse.run.cursor, 0);
+  assert.match(h.text, /Choose the character keyword/);
+  assert.equal(h.commits.length, 0);
+  assert.deepEqual(h.record.taken, []);
+});
+
+test('every unit intro withholds teaching answers before learner chooses Learn or Preview', () => {
+  const h = harness();
+  for (const unit of h.course.listUnits()) {
+    h.select(unit.id);
+    assert.equal(h.S.kanjiCourse.stage, 'intro');
+    assert.equal(h.S.kanjiCourse.run, null);
+    assert.match(h.text, /Meaning and reading results stay separate/);
+    for (const target of unit.targets) {
+      assert.equal(h.text.includes(target.meaning), false, `${unit.id}: keyword not taught before preview`);
+      assert.equal(h.text.includes(target.wordMeaning), false, `${unit.id}: word gloss not taught before preview`);
+      for (const reading of target.readings) assert.equal(h.text.includes(reading), false, `${unit.id}: reading not taught before preview`);
+    }
+    assert.equal(h.elements.some(element => element.className === 'review-reading'), false);
+    h.click('kanji-course-preview');
+    assert.equal(h.S.kanjiCourse.run.mode, 'preview');
+    assert.equal(h.S.kanjiCourse.run.cursor, 0);
+    assert.equal(h.S.kanjiCourse.run.responses.length, 0);
+    assert.equal(h.commits.length, 0);
+    h.click('kanji-course-leave');
+  }
+});
+
+test('entry detour retains the actual visit and teaching position without a write', () => {
+  const h = harness();
+  h.select('shapes'); h.click('kanji-course-learn'); h.click('kanji-course-teach-next');
+  const visit = h.S.kanjiCourse;
+  h.click('kanji-course-entry-word');
+  assert.deepEqual(h.navigations, [{ t: 'word', id: '林', reading: 'はやし' }]);
+  assert.strictEqual(h.S.kanjiCourse, visit);
+  h.returnToLessons();
+  assert.equal(visit.index, 1);
+  assert.match(h.text, /Learn — 2 of 4/);
+  assert.equal(h.commits.length, 0);
+});
+
+test('actual feedback distinguishes wrong, correct reading, revealed and skipped without exposing skipped answer', () => {
+  const h = harness();
+  h.select('shapes'); h.click('kanji-course-preview');
+  assert.equal(h.S.kanjiCourse.run.mode, 'preview');
+  const prompt = h.course.currentPrompt(h.S.kanjiCourse.run);
+  h.click(`kanji-course-choice-${prompt.choices.find(choice => choice.id !== prompt.answerId).id}`);
+  assert.match(h.text, /One to practise again/);
+  assert.equal(h.S.kanjiCourse.feedback.result.status, 'wrong');
+  h.click('kanji-course-next');
+  h.submit('キ');
+  assert.match(h.text, /Correct/);
+  assert.equal(h.S.kanjiCourse.feedback.result.kind, 'reading');
+  h.click('kanji-course-next'); h.click('kanji-course-reveal');
+  assert.match(h.text, /Answer revealed/);
+  assert.match(h.text, /Grove/);
+  h.click('kanji-course-next'); h.click('kanji-course-skip');
+  assert.match(h.text, /Skipped for now/);
+  assert.doesNotMatch(h.text, /はやし/);
+  h.click('kanji-course-next'); h.finish();
+  assert.match(h.text, /Meaning recognition: 2 \/ 4/);
+  assert.match(h.text, /Whole-word reading: 3 \/ 4/);
+  assert.match(h.text, /1 incorrect · 1 revealed · 0 skipped/);
+  assert.match(h.text, /0 incorrect · 0 revealed · 1 skipped/);
+  assert.equal(h.commits.length, 0);
+});
+
+test('actual composition handlers hold submission until composition ends and retain drafts', () => {
+  const h = harness();
+  h.select('shapes'); h.click('kanji-course-preview'); h.click('kanji-course-choice-木'); h.click('kanji-course-next');
+  const input = h.byId('kanji-course-answer');
+  input.fire('compositionstart');
+  input.value = 'き'; input.fire('input');
+  assert.equal(h.S.kanjiCourse.draft, 'き');
+  assert.equal(input.fire('keydown', { key: 'Enter', isComposing: true }).defaultPrevented, true);
+  h.submit('き');
+  assert.equal(h.S.kanjiCourse.run.cursor, 1);
+  input.fire('compositionend');
+  h.submit('き', { isComposing: true });
+  assert.equal(h.S.kanjiCourse.run.cursor, 1);
+  h.submit('き');
+  assert.equal(h.S.kanjiCourse.run.cursor, 2);
+  assert.equal(h.S.kanjiCourse.draft, '');
+});
+
+test('actual Keep callback builds one atomic delta against latest state and suppresses pending double-clicks', async () => {
+  const h = checked();
+  const button = h.byId('kanji-course-keep-result');
+  button.fire('click');
+  assert.equal(h.S.kanjiCourse.pending, true);
+  button.fire('click', {}, true);
+  assert.equal(h.commits.length, 1);
+  assert.equal(h.byId('kanji-course-retake').disabled, true);
+  assert.equal(h.record.obslog.length, 0);
+  const priorSrs = h.record.srs, priorTaken = h.record.taken;
+  h.record.obslog.push([9, 'note', 'op', 'Concurrent observation']);
+  h.record.lessonsDone.other = { score: 1, total: 2, ts: 9 };
+  h.commits[0].resolve(true); await tick();
+  assert.deepEqual(Object.keys(h.commits[0].patch).sort(), ['lessonsDone', 'obslog']);
+  assert.equal(h.record.obslog.length, 9);
+  assert.equal(h.record.obslog[0][3], 'Concurrent observation');
+  assert.equal(Object.keys(h.record.lessonsDone).length, 3);
+  assert.strictEqual(h.record.srs, priorSrs);
+  assert.strictEqual(h.record.taken, priorTaken);
+  assert.equal(h.S.kanjiCourse.pending, false);
+  assert.equal(h.S.kanjiCourse.saved, true);
+  assert.match(h.text, /Practice result saved/);
+  assert.ok(!h.elements.some(element => element.id === 'kanji-course-keep-result'));
+});
+
+test('failed ACK keeps unsaved session; retry reuses evidenceTime and deduplicates already-applied rows', async () => {
+  const h = checked();
+  h.click('kanji-course-keep-result');
+  const time = h.S.kanjiCourse.evidenceTime;
+  // Synthetic lost-ACK condition: persistence applied, caller receives false.
+  h.commits[0].resolve(false, { apply: true }); await tick();
+  assert.equal(h.S.kanjiCourse.saved, false);
+  assert.equal(h.S.kanjiCourse.pending, false);
+  assert.doesNotMatch(h.text, /Practice result saved/);
+  assert.equal(h.record.obslog.length, 8);
+  h.setNow(time + 10000); h.click('kanji-course-keep-result');
+  assert.equal(h.S.kanjiCourse.evidenceTime, time);
+  h.commits[1].resolve(true); await tick();
+  assert.equal(h.record.obslog.length, 8);
+  assert.equal(h.S.kanjiCourse.saved, true);
+});
+
+test('ordinary rejected write leaves record unchanged and allows a later successful Keep', async () => {
+  const h = checked(), before = copy(h.record);
+  h.click('kanji-course-keep-result'); h.commits[0].resolve(false); await tick();
+  assert.deepEqual(h.record, before);
+  assert.equal(h.S.kanjiCourse.saved, false);
+  assert.ok(h.byId('kanji-course-keep-result'));
+  h.click('kanji-course-keep-result'); h.commits[1].resolve(true); await tick();
+  assert.equal(h.S.kanjiCourse.saved, true);
+  assert.equal(h.record.obslog.length, 8);
+});
+
+test('navigation away during write preserves successful ACK on visit; return never offers duplicate Keep', async () => {
+  const h = checked(), visit = h.S.kanjiCourse;
+  h.click('kanji-course-keep-result');
+  h.S.view = 'kanji'; h.draw();
+  const rendersAway = h.renderCount;
+  h.commits[0].resolve(true); await tick();
+  assert.equal(visit.saved, true);
+  assert.equal(h.renderCount, rendersAway, 'ACK does not redraw another view');
+  h.returnToLessons();
+  assert.strictEqual(h.S.kanjiCourse, visit);
+  assert.match(h.text, /Practice result saved/);
+  assert.ok(!h.elements.some(element => element.id === 'kanji-course-keep-result'));
+  assert.equal(h.commits.length, 1);
+  assert.equal(h.record.obslog.length, 8);
+});
+
+test('learner epoch change during write cannot mark old session saved or write into the new record', async () => {
+  const h = checked(), visit = h.S.kanjiCourse;
+  h.click('kanji-course-keep-result'); h.changeEpoch();
+  const newRecord = copy(h.record);
+  assert.match(h.text, /learner record changed/);
+  h.commits[0].resolve(true); await tick();
+  assert.equal(visit.saved, false);
+  assert.deepEqual(h.record, newRecord);
+  assert.ok(!h.elements.some(element => element.id === 'kanji-course-keep-result'));
+});
+
+test('replacement visit is not modified by old ACK', async () => {
+  const h = checked(), old = h.S.kanjiCourse;
+  h.click('kanji-course-keep-result');
+  h.S.kanjiCourse = null; h.draw(); h.select('outlines');
+  const replacement = h.S.kanjiCourse;
+  h.commits[0].resolve(true); await tick();
+  assert.equal(old.saved, false);
+  assert.strictEqual(h.S.kanjiCourse, replacement);
+  assert.equal(replacement.saved, false);
+  assert.equal(replacement.stage, 'intro');
+  assert.equal(replacement.unitId, 'outlines');
+});
+
+test('actual patch preserves newer full scores, exact-row dedupe and unrelated record data', () => {
+  const h = checked(), evidence = h.course.toLessonEvidence(h.S.kanjiCourse.run, 1000);
+  const id = h.course.lessonId('shapes', 'meaning');
+  const newer = { score: 1, total: 4, ts: 2000 };
+  const latest = { lessonsDone: { [id]: newer, other: { score: 2, total: 3, ts: 2 } },
+    obslog: [copy(evidence.obslog[0]), [5, 'note', 'op', 'Retain me']], srs: { untouched: true } };
+  const before = copy(latest);
+  const patch = h.context.kanjiCourseEvidencePatch(latest, evidence);
+  assert.deepEqual(latest, before);
+  assert.deepEqual(copy(patch.lessonsDone[id]), newer);
+  assert.equal(patch.obslog.length, 9);
+  const repeated = h.context.kanjiCourseEvidencePatch({ ...latest, ...patch }, evidence);
+  assert.deepEqual(copy(repeated), copy(patch));
+  assert.deepEqual(Object.keys(patch).sort(), ['lessonsDone', 'obslog']);
+});
+
+test('repair requires original result ACK, contains only missed targets and retains full scores', async () => {
+  const h = checked(['wrong']);
+  assert.equal(h.byId('kanji-course-repair').disabled, true);
+  assert.match(h.text, /Keep the original result to start repair/);
+  h.click('kanji-course-repair');
+  assert.equal(h.S.kanjiCourse.run.mode, 'preview');
+  h.click('kanji-course-keep-result'); h.commits[0].resolve(true); await tick();
+  const scores = copy(h.record.lessonsDone);
+  h.click('kanji-course-repair');
+  assert.equal(h.S.kanjiCourse.run.mode, 'repair');
+  assert.deepEqual(copy(h.S.kanjiCourse.run.promptIds), ['shapes/木/meaning']);
+  assert.equal(h.S.kanjiCourse.evidenceTime, null);
+  h.finish();
+  assert.match(h.text, /Repair practice keeps the original unit scores/);
+  h.setNow(1760000005000);
+  h.click('kanji-course-keep-result'); h.commits[1].resolve(true); await tick();
+  assert.deepEqual(copy(h.record.lessonsDone), scores);
+  assert.equal(h.record.obslog.length, 9);
+  assert.ok(h.record.obslog.at(-1)[4].endsWith(':missed'));
+});
+
+test('all skipped/revealed results produce no write; reveals can repair without invented original answers', () => {
+  const skipped = checked(Array(8).fill('skip'));
+  skipped.click('kanji-course-keep-result');
+  assert.equal(skipped.commits.length, 0);
+  assert.equal(skipped.S.kanjiCourse.saved, false);
+  assert.match(skipped.text, /Unanswered items are not recorded/);
+  assert.ok(!skipped.elements.some(element => element.id === 'kanji-course-repair'));
+  const revealed = checked(Array(8).fill('reveal'));
+  assert.equal(revealed.byId('kanji-course-repair').disabled, false);
+  revealed.click('kanji-course-keep-result');
+  assert.equal(revealed.commits.length, 0);
+  revealed.click('kanji-course-repair');
+  assert.equal(revealed.S.kanjiCourse.run.mode, 'repair');
+  assert.equal(revealed.S.kanjiCourse.run.promptIds.length, 8);
+});

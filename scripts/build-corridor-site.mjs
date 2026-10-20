@@ -113,6 +113,8 @@ try {
     'skip-ui.js',
     'reference-core.js',
     'reference-ui.js',
+    'kanji-structure.js',
+    'kanji-course.js',
     'decks/context-dense/engine.js',
     'decks/context-dense/mount.js',
     'decks/player/engine.js',

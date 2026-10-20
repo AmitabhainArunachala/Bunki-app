@@ -86,6 +86,22 @@
     },
     "committedAudit": {
       "schemaVersion": 1,
+      "kanjiFacts": {
+        "schemaVersion": 1,
+        "release": "3.6.2+20260803141815",
+        "archiveSha256": "5dfb850ee88c7bccecf4694cc4d7b1338e608440c5edcb8fefc93216b3471fe6",
+        "dictionaryDate": "2026-08-03",
+        "databaseVersion": "2026-215",
+        "projectedRows": 10384,
+        "projectedSha256": "5449793753db312e7698c10e3b09238cc211e23b9ad55dcb662fc44b0b4c9b63",
+        "fields": [
+          "literal",
+          "readingMeaning.groups[].meanings[lang=en].value",
+          "radicals[type=classical].value",
+          "radicals[type=nelson_c].value"
+        ],
+        "rule": "All 10,384 pinned literals, sorted by Unicode scalar. Every English gloss verbatim in source order; no truncation, synonym generation, or deduplication. Classical and Nelson fields are copied separately; absent Nelson is null. No query codes or inferred classifications."
+      },
       "sourceHashes": {
         "dict": {
           "path": "prototypes/corridor/data/share_alike/dict.json",
@@ -3719,6 +3735,20 @@
         "sourceId": "蒦"
       }
     ],
+    "completeReferenceFacts": {
+      "sourceLiterals": 10384,
+      "sourceNelsonFields": 721,
+      "catalogEntries": 6283,
+      "canonicalEntries": 2576,
+      "canonicalAbsentFromSource": [
+        "劦",
+        "厽",
+        "壴",
+        "夋",
+        "甶",
+        "菐"
+      ]
+    },
     "policy": "Glyphless records and absent metadata are not broken canonical links. Missing on or kun alone is not proof of a metadata gap; a character need not have both."
   },
   "collections": [

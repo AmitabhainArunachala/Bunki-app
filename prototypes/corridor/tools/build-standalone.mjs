@@ -176,6 +176,7 @@ const BUNDLES = {
   manifest: 'data/manifest.json',
   'fsrs-pin': 'data/fsrs-pin.json',
   'share_alike/reference-extra': 'data/share_alike/reference-extra.json',
+  'share_alike/kanji-structure': 'data/share_alike/kanji-structure.json',
   'share_alike/kkld': 'data/share_alike/kkld.json',
 };
 
@@ -282,6 +283,8 @@ ${read('maintenance/report-client.js')}
 </script>
 <script>
 ${read('reference-core.js')}
+${read('kanji-structure.js')}
+${read('kanji-course.js')}
 ${read('reference-ui.js')}
 </script>
 <script type="application/json" id="corridor-bundle">${JSON.stringify(bundle).replace(/</g, '\\u003c')}</script>
