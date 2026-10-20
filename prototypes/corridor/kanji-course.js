@@ -14,8 +14,9 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
+  // Stable persisted identity: expansion changes the title, not existing records.
   const COURSE_ID = 'kanji-foundations-24';
-  const REVISION = 2;
+  const REVISION = 3;
   const KINDS = ['meaning', 'reading'];
   const UNITS = [
   {
@@ -135,7 +136,8 @@
           "assessment": "self-comparison"
         }
       }
-    ]
+    ],
+    "revision": 2
   },
   {
     "id": "outlines",
@@ -256,7 +258,8 @@
           "assessment": "self-comparison"
         }
       }
-    ]
+    ],
+    "revision": 2
   },
   {
     "id": "combinations",
@@ -377,7 +380,8 @@
           "assessment": "self-comparison"
         }
       }
-    ]
+    ],
+    "revision": 2
   },
   {
     "id": "marks",
@@ -500,7 +504,8 @@
           "assessment": "self-comparison"
         }
       }
-    ]
+    ],
+    "revision": 2
   },
   {
     "id": "sound-clues",
@@ -622,7 +627,8 @@
           "assessment": "self-comparison"
         }
       }
-    ]
+    ],
+    "revision": 2
   },
   {
     "id": "word-readings",
@@ -755,7 +761,742 @@
           "assessment": "self-comparison"
         }
       }
-    ]
+    ],
+    "revision": 2
+  },
+  {
+    "id": "numbers",
+    "title": "Numbers in words",
+    "prerequisites": [
+      "outlines"
+    ],
+    "targets": [
+      {
+        "id": "一",
+        "kanji": "一",
+        "meaning": "One",
+        "wordKey": "一つ",
+        "wordMeaning": "one thing",
+        "readings": [
+          "ひとつ"
+        ],
+        "distractors": [
+          "二",
+          "三",
+          "四"
+        ],
+        "examples": [
+          {
+            "wordKey": "一人",
+            "wordMeaning": "one person",
+            "readings": [
+              "ひとり"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      },
+      {
+        "id": "二",
+        "kanji": "二",
+        "meaning": "Two",
+        "wordKey": "二つ",
+        "wordMeaning": "two things",
+        "readings": [
+          "ふたつ"
+        ],
+        "distractors": [
+          "一",
+          "三",
+          "四"
+        ],
+        "examples": [
+          {
+            "wordKey": "二人",
+            "wordMeaning": "two people",
+            "readings": [
+              "ふたり"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      },
+      {
+        "id": "三",
+        "kanji": "三",
+        "meaning": "Three",
+        "wordKey": "三つ",
+        "wordMeaning": "three things",
+        "readings": [
+          "みっつ"
+        ],
+        "distractors": [
+          "一",
+          "二",
+          "四"
+        ],
+        "examples": [
+          {
+            "wordKey": "三角",
+            "wordMeaning": "triangle, triangular",
+            "readings": [
+              "さんかく"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      },
+      {
+        "id": "四",
+        "kanji": "四",
+        "meaning": "Four",
+        "wordKey": "四つ",
+        "wordMeaning": "four things",
+        "readings": [
+          "よっつ"
+        ],
+        "distractors": [
+          "一",
+          "二",
+          "三"
+        ],
+        "examples": [
+          {
+            "wordKey": "四角",
+            "wordMeaning": "square",
+            "readings": [
+              "しかく"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      }
+    ],
+    "revision": 3
+  },
+  {
+    "id": "positions",
+    "title": "Position words",
+    "prerequisites": [
+      "outlines"
+    ],
+    "targets": [
+      {
+        "id": "上",
+        "kanji": "上",
+        "meaning": "Above",
+        "wordKey": "上",
+        "wordMeaning": "above…",
+        "readings": [
+          "うえ"
+        ],
+        "distractors": [
+          "下",
+          "左",
+          "右"
+        ],
+        "examples": [
+          {
+            "wordKey": "上着",
+            "wordMeaning": "coat, jacket",
+            "readings": [
+              "うわぎ"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      },
+      {
+        "id": "下",
+        "kanji": "下",
+        "meaning": "Below",
+        "wordKey": "下",
+        "wordMeaning": "under, below",
+        "readings": [
+          "した"
+        ],
+        "distractors": [
+          "上",
+          "左",
+          "右"
+        ],
+        "examples": [
+          {
+            "wordKey": "靴下",
+            "wordMeaning": "socks",
+            "readings": [
+              "くつした"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      },
+      {
+        "id": "左",
+        "kanji": "左",
+        "meaning": "Left",
+        "wordKey": "左",
+        "wordMeaning": "left hand side",
+        "readings": [
+          "ひだり"
+        ],
+        "distractors": [
+          "上",
+          "下",
+          "右"
+        ],
+        "examples": [
+          {
+            "wordKey": "左右",
+            "wordMeaning": "left and right; influence",
+            "readings": [
+              "さゆう"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      },
+      {
+        "id": "右",
+        "kanji": "右",
+        "meaning": "Right",
+        "wordKey": "右",
+        "wordMeaning": "right hand side",
+        "readings": [
+          "みぎ"
+        ],
+        "distractors": [
+          "上",
+          "下",
+          "左"
+        ],
+        "examples": [
+          {
+            "wordKey": "左右",
+            "wordMeaning": "left and right; influence",
+            "readings": [
+              "さゆう"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      }
+    ],
+    "revision": 3
+  },
+  {
+    "id": "directions",
+    "title": "Compass directions",
+    "prerequisites": [
+      "positions"
+    ],
+    "targets": [
+      {
+        "id": "東",
+        "kanji": "東",
+        "meaning": "East",
+        "wordKey": "東",
+        "wordMeaning": "east",
+        "readings": [
+          "ひがし"
+        ],
+        "distractors": [
+          "西",
+          "南",
+          "北"
+        ],
+        "examples": [
+          {
+            "wordKey": "東西",
+            "wordMeaning": "East and West, whole country",
+            "readings": [
+              "とうざい"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      },
+      {
+        "id": "西",
+        "kanji": "西",
+        "meaning": "West",
+        "wordKey": "西",
+        "wordMeaning": "west",
+        "readings": [
+          "にし"
+        ],
+        "distractors": [
+          "東",
+          "南",
+          "北"
+        ],
+        "examples": [
+          {
+            "wordKey": "西洋",
+            "wordMeaning": "the West, Western countries",
+            "readings": [
+              "せいよう"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      },
+      {
+        "id": "南",
+        "kanji": "南",
+        "meaning": "South",
+        "wordKey": "南",
+        "wordMeaning": "South",
+        "readings": [
+          "みなみ"
+        ],
+        "distractors": [
+          "東",
+          "西",
+          "北"
+        ],
+        "examples": [
+          {
+            "wordKey": "南米",
+            "wordMeaning": "South America",
+            "readings": [
+              "なんべい"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      },
+      {
+        "id": "北",
+        "kanji": "北",
+        "meaning": "North",
+        "wordKey": "北",
+        "wordMeaning": "north",
+        "readings": [
+          "きた"
+        ],
+        "distractors": [
+          "東",
+          "西",
+          "南"
+        ],
+        "examples": [
+          {
+            "wordKey": "北極",
+            "wordMeaning": "North Pole",
+            "readings": [
+              "ほっきょく"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      }
+    ],
+    "revision": 3
+  },
+  {
+    "id": "daily-actions",
+    "title": "Everyday actions",
+    "prerequisites": [
+      "word-readings"
+    ],
+    "targets": [
+      {
+        "id": "食",
+        "kanji": "食",
+        "meaning": "Eat",
+        "wordKey": "食べる",
+        "wordMeaning": "to eat",
+        "readings": [
+          "たべる"
+        ],
+        "distractors": [
+          "飲",
+          "見",
+          "聞"
+        ],
+        "examples": [
+          {
+            "wordKey": "食事",
+            "wordMeaning": "meal",
+            "readings": [
+              "しょくじ"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      },
+      {
+        "id": "飲",
+        "kanji": "飲",
+        "meaning": "Drink",
+        "wordKey": "飲む",
+        "wordMeaning": "to drink",
+        "readings": [
+          "のむ"
+        ],
+        "distractors": [
+          "食",
+          "見",
+          "聞"
+        ],
+        "examples": [
+          {
+            "wordKey": "飲み物",
+            "wordMeaning": "drink, beverage",
+            "readings": [
+              "のみもの"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      },
+      {
+        "id": "見",
+        "kanji": "見",
+        "meaning": "See",
+        "wordKey": "見る",
+        "wordMeaning": "to see, to look",
+        "readings": [
+          "みる"
+        ],
+        "distractors": [
+          "食",
+          "飲",
+          "聞"
+        ],
+        "examples": [
+          {
+            "wordKey": "見物",
+            "wordMeaning": "sightseeing",
+            "readings": [
+              "けんぶつ"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      },
+      {
+        "id": "聞",
+        "kanji": "聞",
+        "meaning": "Hear",
+        "wordKey": "聞く",
+        "wordMeaning": "to hear, to listen",
+        "readings": [
+          "きく"
+        ],
+        "distractors": [
+          "食",
+          "飲",
+          "見"
+        ],
+        "examples": [
+          {
+            "wordKey": "新聞",
+            "wordMeaning": "newspaper",
+            "readings": [
+              "しんぶん"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      }
+    ],
+    "revision": 3
+  },
+  {
+    "id": "nature",
+    "title": "Nature and weather",
+    "prerequisites": [
+      "combinations",
+      "marks"
+    ],
+    "targets": [
+      {
+        "id": "山",
+        "kanji": "山",
+        "meaning": "Mountain",
+        "wordKey": "山",
+        "wordMeaning": "mountain",
+        "readings": [
+          "やま"
+        ],
+        "distractors": [
+          "水",
+          "火",
+          "雨"
+        ],
+        "examples": [
+          {
+            "wordKey": "火山",
+            "wordMeaning": "volcano",
+            "readings": [
+              "かざん"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      },
+      {
+        "id": "水",
+        "kanji": "水",
+        "meaning": "Water",
+        "wordKey": "水",
+        "wordMeaning": "water",
+        "readings": [
+          "みず"
+        ],
+        "distractors": [
+          "山",
+          "火",
+          "雨"
+        ],
+        "examples": [
+          {
+            "wordKey": "水曜日",
+            "wordMeaning": "Wednesday",
+            "readings": [
+              "すいようび"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      },
+      {
+        "id": "火",
+        "kanji": "火",
+        "meaning": "Fire",
+        "wordKey": "火",
+        "wordMeaning": "fire",
+        "readings": [
+          "ひ"
+        ],
+        "distractors": [
+          "山",
+          "水",
+          "雨"
+        ],
+        "examples": [
+          {
+            "wordKey": "火曜日",
+            "wordMeaning": "Tuesday",
+            "readings": [
+              "かようび"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      },
+      {
+        "id": "雨",
+        "kanji": "雨",
+        "meaning": "Rain",
+        "wordKey": "雨",
+        "wordMeaning": "rain",
+        "readings": [
+          "あめ"
+        ],
+        "distractors": [
+          "山",
+          "水",
+          "火"
+        ],
+        "examples": [
+          {
+            "wordKey": "雨天",
+            "wordMeaning": "rainy weather",
+            "readings": [
+              "うてん"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      }
+    ],
+    "revision": 3
+  },
+  {
+    "id": "more-actions",
+    "title": "Going, reading, writing",
+    "prerequisites": [
+      "outlines",
+      "word-readings"
+    ],
+    "targets": [
+      {
+        "id": "出",
+        "kanji": "出",
+        "meaning": "Exit",
+        "wordKey": "出る",
+        "wordMeaning": "to appear, to leave",
+        "readings": [
+          "でる"
+        ],
+        "distractors": [
+          "来",
+          "読",
+          "書"
+        ],
+        "examples": [
+          {
+            "wordKey": "出口",
+            "wordMeaning": "an exit",
+            "readings": [
+              "でぐち"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      },
+      {
+        "id": "来",
+        "kanji": "来",
+        "meaning": "Come",
+        "wordKey": "来る",
+        "wordMeaning": "to come",
+        "readings": [
+          "くる"
+        ],
+        "distractors": [
+          "出",
+          "読",
+          "書"
+        ],
+        "examples": [
+          {
+            "wordKey": "来年",
+            "wordMeaning": "next year",
+            "readings": [
+              "らいねん"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      },
+      {
+        "id": "読",
+        "kanji": "読",
+        "meaning": "Read",
+        "wordKey": "読む",
+        "wordMeaning": "to read",
+        "readings": [
+          "よむ"
+        ],
+        "distractors": [
+          "出",
+          "来",
+          "書"
+        ],
+        "examples": [
+          {
+            "wordKey": "読書",
+            "wordMeaning": "reading",
+            "readings": [
+              "どくしょ"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      },
+      {
+        "id": "書",
+        "kanji": "書",
+        "meaning": "Write",
+        "wordKey": "書く",
+        "wordMeaning": "to write",
+        "readings": [
+          "かく"
+        ],
+        "distractors": [
+          "出",
+          "来",
+          "読"
+        ],
+        "examples": [
+          {
+            "wordKey": "辞書",
+            "wordMeaning": "dictionary",
+            "readings": [
+              "じしょ"
+            ]
+          }
+        ],
+        "writing": {
+          "optional": true,
+          "assessment": "self-comparison"
+        }
+      }
+    ],
+    "revision": 3
   }
 ];
 
@@ -784,7 +1525,7 @@
   }
   const DATA = freeze({
     schemaVersion: 1, id: COURSE_ID, revision: REVISION,
-    title: '24 characters in words',
+    title: '48 characters in words',
     scope: 'Selected keyword recognition and whole-word reading practice; no mastery claim.',
     meaningScope: 'A selected character keyword, not a compound translation.',
     readingScope: 'The whole displayed word, not every reading of a character.',
@@ -796,10 +1537,17 @@
       words: { path: 'data/share_alike/words.json', sha256: '4606aaa9da2b84fb7d49fe5023cd1d4d1cda6097287994717ac3522321914ac5' },
       kanji: { path: 'data/share_alike/kanji.json', sha256: '8ce7ad0151a2bf487bda72c384460eca908fc1bdc2a4073042b9e3db7342d2ce' },
     },
+    counts: { units: UNITS.length, characters: UNITS.reduce((sum, unit) => sum + unit.targets.length, 0),
+      wordExamples: UNITS.reduce((sum, unit) =>
+        sum + unit.targets.reduce((total, target) => total + 1 + target.examples.length, 0), 0) },
     units: UNITS,
   });
   const TARGETS = new Map(UNITS.flatMap(unit => unit.targets.map(target => [target.id, target])));
+  const CHARACTER_UNITS = new Map(UNITS.flatMap(unit => unit.targets.map(target => [target.kanji, unit])));
   function catalog() { return DATA; }
+  // wordExamples counts primary and alternate records, including shared words.
+  function counts() { return DATA.counts; }
+  function unitForCharacter(character) { return CHARACTER_UNITS.get(character) || null; }
   function listUnits() { return DATA.units; }
   function getUnit(id) {
     const unit = UNITS.find(value => value.id === id);
@@ -807,9 +1555,9 @@
     return unit;
   }
   function lessonId(unitId, kind) {
-    getUnit(unitId);
+    const unit = getUnit(unitId);
     insist(KINDS.includes(kind), 'course-target-unknown');
-    return `${COURSE_ID}:r${REVISION}:${unitId}:${kind}`;
+    return `${COURSE_ID}:r${unit.revision}:${unitId}:${kind}`;
   }
   function promptFor(unit, target, kind) {
     const index = unit.targets.indexOf(target);
@@ -838,7 +1586,7 @@
       new Set(kinds).size === kinds.length && kinds.every(kind => KINDS.includes(kind));
   }
   function makeRun(unitId, mode, targets, promptIds, responses = []) {
-    return freeze({ schemaVersion: 1, courseId: COURSE_ID, revision: REVISION,
+    return freeze({ schemaVersion: 1, courseId: COURSE_ID, revision: getUnit(unitId).revision,
       unitId, mode, targets: [...targets], promptIds: [...promptIds],
       responses: responses.map(response => ({ ...response })), cursor: responses.length,
       complete: responses.length === promptIds.length });
@@ -855,7 +1603,7 @@
   function checkedRun(run) {
     insist(exactKeys(run, ['schemaVersion', 'courseId', 'revision', 'unitId', 'mode', 'targets',
       'promptIds', 'responses', 'cursor', 'complete']), 'course-run-invalid');
-    insist(run.schemaVersion === 1 && run.courseId === COURSE_ID && run.revision === REVISION &&
+    insist(run.schemaVersion === 1 && run.courseId === COURSE_ID && run.revision === getUnit(run.unitId).revision &&
       ['check', 'preview', 'repair'].includes(run.mode) && validKinds(run.targets), 'course-run-invalid');
     const all = prompts(run.unitId, run.targets), byId = new Map(all.map(prompt => [prompt.id, prompt]));
     insist(Array.isArray(run.promptIds) && run.promptIds.length > 0 &&
@@ -878,6 +1626,13 @@
   function currentPrompt(run) {
     const byId = checkedRun(run);
     return run.complete ? null : byId.get(run.promptIds[run.cursor]);
+  }
+  // Reference help can expose answers during a preview. Relabel that same run as
+  // supported practice without resetting responses, advancing or changing credit.
+  function asPractice(run) {
+    checkedRun(run);
+    return run.mode === 'preview'
+      ? makeRun(run.unitId, 'check', run.targets, run.promptIds, run.responses) : run;
   }
   function transition(run, action, value) {
     const prompt = currentPrompt(run);
@@ -947,6 +1702,6 @@
     }
     return freeze({ obslog, lessonsDone });
   }
-  return freeze({ catalog, listUnits, getUnit, lessonId, createRun, currentPrompt,
+  return freeze({ catalog, counts, unitForCharacter, listUnits, getUnit, lessonId, createRun, currentPrompt, asPractice,
     answer, reveal, skip, summary, retry, toLessonEvidence, normalizeKana });
 });

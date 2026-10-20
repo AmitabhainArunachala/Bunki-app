@@ -20,7 +20,8 @@ const read = name => readFileSync(new URL(name, import.meta.url), 'utf8');
 const source = read('../corridor.js');
 const courseSource = read('../kanji-course.js');
 const ast = ts.createSourceFile('corridor.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
-const names = ['kanjiCourseEvidencePatch', 'renderKanjiCourseMenu', 'renderKanjiCourse'];
+const names = ['kanjiCourseEvidencePatch', 'kanjiCourseReturnFrame', 'kanjiCourseEntryNode',
+  'openKanjiCourseUnit', 'renderKanjiCourseDoor', 'renderKanjiCourseMenu', 'renderKanjiCourse'];
 const lifted = names.map(name => {
   const node = ast.statements.find(statement => ts.isFunctionDeclaration(statement) && statement.name?.text === name);
   assert.ok(node, `actual source function ${name}`);
@@ -46,6 +47,7 @@ class Element {
     this.id = '';
     this.value = '';
     this.disabled = false;
+    this.isConnected = true;
   }
   append(...children) {
     for (const child of children) {
@@ -76,14 +78,24 @@ function harness() {
   const commits = [], navigations = [], invokers = [];
   let scope = { record: { v: 1, taken: [], srs: {}, revlog: [], obslog: [], lessonsDone: {} } };
   let main = new Element('main'), renderCount = 0, now = 1760000000000;
-  const S = { view: 'lessons', kanjiCourse: null, lessonsDone: scope.record.lessonsDone };
+  const S = { view: 'lessons', stack: [], navigationReturns: [], kanjiCourse: null, lessonsDone: scope.record.lessonsDone };
   const context = vm.createContext({
-    S, recordEpoch: 1, window: {}, Date: { now: () => now },
+    S, recordEpoch: 1, personalHost: null, window: { scrollTo() {} }, Date: { now: () => now },
     el: (tag, cls, text) => new Element(tag, cls, text),
     biLabel: (tag, cls, _ja, en) => new Element(tag, cls, en),
     tx: (_ja, en) => en,
     document: { getElementById: id => descend(main).find(element => element.id === id) || null },
     recordReady: epoch => epoch === context.recordEpoch,
+    preserveVisibleDrafts: () => true,
+    keepNavigationReturn: destination => {
+      S.navigationReturns.push({ destination, view: S.view, stack: S.stack });
+      S.stack = [];
+    },
+    returnFromNavigation: () => {
+      const home = S.navigationReturns.pop();
+      S.kanjiCourse = home.kanjiCourseReturn.priorCourse;
+      S.stack = home.stack; S.view = home.view; draw();
+    },
     render: () => draw(),
     go: (node, options) => { navigations.push(copy(node)); invokers.push(options?.invoker); S.view = node.t; draw(); },
     commitStorePatch: builder => {
@@ -171,7 +183,8 @@ const checked = actions => {
 
 test('actual menu starts four teaching cards then independent meaning/reading checks', () => {
   const h = harness();
-  assert.equal(h.elements.filter(element => element.dataset.kanjiCourseUnit).length, 6);
+  assert.equal(h.elements.filter(element => element.dataset.kanjiCourseUnit).length, 12);
+  assert.match(h.text, /48 characters in words/);
   assert.match(h.text, /editorial review.*pending/);
   h.select('shapes');
   assert.equal(h.S.kanjiCourse.stage, 'intro');
@@ -198,7 +211,10 @@ test('every unit intro withholds teaching answers before learner chooses Learn o
     assert.equal(h.S.kanjiCourse.run, null);
     assert.match(h.text, /Meaning and reading results stay separate/);
     for (const target of unit.targets) {
-      assert.equal(h.text.includes(target.meaning), false, `${unit.id}: keyword not taught before preview`);
+      // "Read" occurs inside the generic "Reading checks" instruction. Check
+      // actual answer content, not a substring of unrelated instructional prose.
+      assert.equal(h.elements.some(element => element.text === target.meaning ||
+        element.text.includes(`: ${target.meaning}`)), false, `${unit.id}: keyword not taught before preview`);
       assert.equal(h.text.includes(target.wordMeaning), false, `${unit.id}: word gloss not taught before preview`);
       for (const reading of target.readings) assert.equal(h.text.includes(reading), false, `${unit.id}: reading not taught before preview`);
     }
@@ -210,6 +226,114 @@ test('every unit intro withholds teaching answers before learner chooses Learn o
     assert.equal(h.commits.length, 0);
     h.click('kanji-course-leave');
   }
+});
+
+test('an exact character door opens supported practice and preserves earlier course and lesson identities', () => {
+  const h = harness();
+  h.select('outlines'); h.click('kanji-course-preview');
+  h.click('kanji-course-skip'); h.click('kanji-course-next');
+  h.S.kanjiCourse.draft = 'ひ';
+  const prior = h.S.kanjiCourse, responses = copy(prior.run.responses);
+  const lesson = { id: 'ordinary-lesson', draft: 'keep' };
+  h.S.lessonRun = lesson;
+  const node = { t: 'kanji', id: '雨', from: { passage: 'rain', index: 2 }, occurrence: 'keep-occurrence' };
+  h.S.view = 'reader'; h.S.stack = [node];
+  const sheet = new Element('section');
+  h.context.renderKanjiCourseDoor(sheet, node);
+  assert.equal(sheet.children.length, 1);
+  sheet.children[0].fire('click');
+  assert.equal(h.S.kanjiCourse.unitId, 'nature');
+  assert.equal(h.S.kanjiCourse.supportedPractice, true);
+  assert.strictEqual(h.S.lessonRun, lesson);
+  assert.strictEqual(h.S.navigationReturns[0].kanjiCourseReturn.priorCourse, prior);
+  assert.equal(prior.run.mode, 'check');
+  assert.equal(prior.draft, 'ひ');
+  assert.deepEqual(copy(prior.run.responses), responses);
+  assert.match(h.text, /not a first-try check/);
+  assert.equal(h.elements.some(element => element.id === 'kanji-course-preview'), false);
+  assert.equal(h.elements.some(element => element.id === 'kanji-course-leave'), false);
+  h.click('kanji-course-practise');
+  assert.equal(h.S.kanjiCourse.run.mode, 'check');
+  h.click('kanji-course-source-return');
+  assert.strictEqual(h.S.kanjiCourse, prior);
+  assert.strictEqual(h.S.lessonRun, lesson);
+  assert.strictEqual(h.S.stack[0], node);
+  assert.equal(h.commits.length, 0);
+  assert.deepEqual(h.record, { v: 1, taken: [], srs: {}, revlog: [], obslog: [], lessonsDone: {} });
+});
+
+test('unsupported glyph, private host, pending save, stale node or epoch cannot start a contextual visit', () => {
+  const h = harness();
+  const invoker = new Element('button');
+  for (const glyph of ['學', '𠮟', '川']) {
+    const node = { t: 'kanji', id: glyph }, sheet = new Element('section');
+    h.S.stack = [node];
+    h.context.renderKanjiCourseDoor(sheet, node);
+    assert.equal(sheet.children.length, 0);
+    assert.equal(h.context.openKanjiCourseUnit(node, invoker), false);
+  }
+  const node = { t: 'kanji', id: '森' };
+  h.S.view = 'reader'; h.S.stack = [node];
+  h.context.personalHost = {};
+  const hostSheet = new Element('section');
+  h.context.renderKanjiCourseDoor(hostSheet, node);
+  assert.equal(hostSheet.children.length, 0);
+  assert.equal(h.context.openKanjiCourseUnit(node, invoker), false);
+  h.context.personalHost = null;
+  h.S.kanjiCourse = { pending: true };
+  assert.equal(h.context.openKanjiCourseUnit(node, invoker), false);
+  h.S.kanjiCourse = null;
+  assert.equal(h.context.openKanjiCourseUnit({ ...node }, invoker), false, 'exact live node required');
+  invoker.isConnected = false;
+  assert.equal(h.context.openKanjiCourseUnit(node, invoker), false);
+  invoker.isConnected = true;
+  const sheet = new Element('section');
+  h.context.renderKanjiCourseDoor(sheet, node);
+  h.context.recordEpoch++;
+  sheet.children[0].fire('click', {}, true);
+  assert.equal(h.S.kanjiCourse, null);
+  assert.equal(h.S.navigationReturns.length, 0);
+  assert.equal(h.commits.length, 0);
+});
+
+test('returning from a same-unit dictionary entry resumes the run and draft without another frame', () => {
+  const h = harness();
+  h.select('shapes'); h.click('kanji-course-preview');
+  const visit = h.S.kanjiCourse, run = visit.run;
+  visit.draft = 'き';
+  const node = { t: 'kanji', id: '森' };
+  h.S.stack = [node];
+  assert.equal(h.context.openKanjiCourseUnit(node, new Element('button')), true);
+  assert.strictEqual(h.S.kanjiCourse, visit);
+  assert.equal(visit.draft, 'き');
+  assert.deepEqual(copy(visit.run.promptIds), copy(run.promptIds));
+  assert.equal(visit.run.mode, 'check');
+  assert.equal(h.S.stack.length, 0);
+  assert.equal(h.S.navigationReturns.length, 0);
+  assert.equal(h.commits.length, 0);
+});
+
+test('supported status survives paused intro and menu; unrelated examples never inherit the source token', () => {
+  const h = harness();
+  h.select('shapes');
+  h.S.kanjiCourse.supportedPractice = true;
+  h.draw(); h.click('kanji-course-leave'); h.select('nature');
+  assert.equal(h.S.kanjiCourse.supportedPractice, true);
+  assert.equal(h.elements.some(element => element.id === 'kanji-course-preview'), false);
+  const origin = { t: 'kanji', id: '雨', from: { passage: 'rain', index: 2 },
+    sourceContext: { sourceId: 'rain', index: 2, quote: '雨です。' } };
+  h.S.kanjiCourse.originNode = origin;
+  h.click('kanji-course-learn');
+  const targets = h.course.getUnit('nature').targets;
+  for (let index = 0; index < targets.length; index++) {
+    const target = targets[index];
+    const actual = h.context.kanjiCourseEntryNode(h.S.kanjiCourse, target, 'kanji');
+    assert.deepEqual(copy(actual), target.kanji === '雨' ? origin : { t: 'kanji', id: target.kanji });
+    const word = h.context.kanjiCourseEntryNode(h.S.kanjiCourse, target, 'word');
+    assert.equal(Object.hasOwn(word, 'sourceContext'), false);
+    assert.equal(Object.hasOwn(word, 'from'), false);
+  }
+  assert.equal(h.commits.length, 0);
 });
 
 test('entry detour retains the actual visit and teaching position without a write', () => {

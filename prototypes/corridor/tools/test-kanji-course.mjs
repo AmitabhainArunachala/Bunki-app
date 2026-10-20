@@ -70,29 +70,111 @@ const completeWith = (run, answers) => {
   return next;
 };
 
-test('exact six-unit/24-character inventory and all primary/alternate word answers are attested', () => {
+test('exact twelve-unit/48-character inventory and all primary/alternate word answers are attested', () => {
   const units = course.listUnits();
-  assert.deepEqual(units.map(unit => unit.id), ['shapes', 'outlines', 'combinations', 'marks', 'sound-clues', 'word-readings']);
-  assert.equal(units.flatMap(unit => unit.targets).map(target => target.kanji).join(''), '木林森本人入大休日月明田土天未末青清晴情生学先行');
-  assert.equal(new Set(units.flatMap(unit => unit.targets.map(target => target.kanji))).size, 24);
+  assert.deepEqual(units.map(unit => unit.id), ['shapes', 'outlines', 'combinations', 'marks', 'sound-clues', 'word-readings',
+    'numbers', 'positions', 'directions', 'daily-actions', 'nature', 'more-actions']);
+  assert.equal(units.flatMap(unit => unit.targets).map(target => target.kanji).join(''),
+    '木林森本人入大休日月明田土天未末青清晴情生学先行一二三四上下左右東西南北食飲見聞山水火雨出来読書');
+  assert.equal(new Set(units.flatMap(unit => unit.targets.map(target => target.kanji))).size, 48);
   assert.equal(sha(wordsText), course.catalog().sources.words.sha256);
   assert.equal(sha(kanjiText), course.catalog().sources.kanji.sha256);
   let wordCount = 0;
   for (const [index, unit] of units.entries()) {
     assert.equal(unit.targets.length, 4);
+    assert.equal(unit.revision, index < 6 ? 2 : 3);
+    assert.equal(new Set(unit.prerequisites).size, unit.prerequisites.length);
     assert.ok(unit.prerequisites.every(id => units.slice(0, index).some(previous => previous.id === id)));
     for (const target of unit.targets) {
       assert.equal(target.meaning, kanji[target.kanji].m);
+      assert.ok(target.examples.length >= 1);
+      assert.ok(target.examples.every(example => example.wordKey !== target.wordKey));
       for (const example of [target, ...target.examples]) {
         assert.ok(words[example.wordKey], example.wordKey);
+        assert.ok(example.wordKey.includes(target.kanji), `${target.kanji} occurs in ${example.wordKey}`);
+        assert.ok(example.wordMeaning.trim(), `${example.wordKey} has an attested nonempty gloss`);
         assert.equal(example.wordMeaning, words[example.wordKey].g);
         assert.deepEqual(example.readings, words[example.wordKey].r.split(';').map(value => value.trim()));
+        assert.ok(example.readings.every(reading => reading.trim().length > 0));
         wordCount++;
       }
       assert.deepEqual(target.writing, { optional: true, assessment: 'self-comparison' });
     }
   }
-  assert.equal(wordCount, 49);
+  assert.equal(wordCount, 97);
+});
+
+test('original units retain exact authored content and r2 sessions when the catalog expands', () => {
+  const originalUnits = course.listUnits().slice(0, 6).map(({ revision, ...unit }) => {
+    assert.equal(revision, 2);
+    return unit;
+  });
+  // Canonical JSON of all six units from accepted 1eddfdb3, before per-unit revisions.
+  assert.equal(sha(JSON.stringify(originalUnits)), '50124294c857b7a2bbf93eccb40ea4ea60c388a3066345da4dd785c9a5593fd3');
+  assert.equal(course.catalog().id, 'kanji-foundations-24', 'stable persisted course identity');
+  assert.equal(course.catalog().revision, 3);
+  const legacyRun = {
+    schemaVersion: 1, courseId: 'kanji-foundations-24', revision: 2, unitId: 'shapes', mode: 'check',
+    targets: ['meaning', 'reading'],
+    promptIds: ['shapes/木/meaning', 'shapes/木/reading', 'shapes/林/meaning', 'shapes/林/reading',
+      'shapes/森/meaning', 'shapes/森/reading', 'shapes/本/meaning', 'shapes/本/reading'],
+    responses: [{ promptId: 'shapes/木/meaning', action: 'answer', value: '木' }],
+    cursor: 1, complete: false,
+  };
+  const before = clone(legacyRun);
+  assert.equal(course.currentPrompt(legacyRun).id, 'shapes/木/reading');
+  const resumed = course.answer(legacyRun, 'き');
+  assert.equal(resumed.revision, 2);
+  assert.equal(course.summary(resumed).correct, 2);
+  assert.deepEqual(legacyRun, before);
+  for (const unit of course.listUnits()) {
+    assert.equal(course.createRun(unit.id).revision, unit.revision);
+    assert.equal(course.lessonId(unit.id, 'meaning'), `kanji-foundations-24:r${unit.revision}:${unit.id}:meaning`);
+    const wrongRevision = { ...clone(course.createRun(unit.id)), revision: unit.revision === 2 ? 3 : 2 };
+    assert.throws(() => course.currentPrompt(wrongRevision), /run-invalid/);
+  }
+});
+
+test('character lookup returns only its exact authored unit and immutable counts include word examples', () => {
+  assert.deepEqual(course.counts(), { units: 12, characters: 48, wordExamples: 97 });
+  assert.strictEqual(course.counts(), course.catalog().counts);
+  assert.ok(Object.isFrozen(course.counts()));
+  for (const unit of course.listUnits()) {
+    for (const target of unit.targets) {
+      assert.strictEqual(course.unitForCharacter(target.kanji), unit);
+      assert.ok(Object.isFrozen(course.unitForCharacter(target.kanji).targets));
+    }
+  }
+  for (const input of ['川', '角', '未来', ' 木 ', '', null, undefined, 1, {}, ['木']]) {
+    assert.equal(course.unitForCharacter(input), null, 'absent/support/malformed input has no invented unit');
+  }
+});
+
+test('reference-assisted previews become practice without losing answers, cursor, unit revision or evidence', () => {
+  for (const unitId of ['shapes', 'numbers']) {
+    let preview = course.createRun(unitId, { mode: 'preview' });
+    preview = completeWith(preview, ['correct', 'wrong', 'reveal']);
+    const before = clone(preview);
+    const practice = course.asPractice(preview);
+    assert.equal(practice.mode, 'check');
+    assert.equal(practice.revision, course.getUnit(unitId).revision);
+    assert.deepEqual(practice, { ...before, mode: 'check' });
+    assert.deepEqual(preview, before);
+    assert.deepEqual(course.summary(practice), { ...course.summary(preview), mode: 'check' });
+    assert.equal(course.currentPrompt(practice).id, course.currentPrompt(preview).id);
+    assert.deepEqual(course.toLessonEvidence(allCorrect(practice), 1000),
+      course.toLessonEvidence(allCorrect(preview), 1000));
+    assert.ok(Object.isFrozen(practice.responses[0]));
+    assert.strictEqual(course.asPractice(practice), practice);
+    const repair = course.retry(allCorrect(preview));
+    assert.strictEqual(course.asPractice(repair), repair);
+    const copied = clone(preview);
+    copied.revision = 99;
+    assert.throws(() => course.asPractice(copied), /run-invalid/);
+  }
+  assert.throws(() => course.asPractice(null), /run-invalid/);
+  const badCursor = { ...clone(course.createRun('shapes')), cursor: 7 };
+  assert.throws(() => course.asPractice(badCursor), /cursor-invalid/);
 });
 
 test('catalog withholds explanations, source transfer and delayed-memory claims', () => {
@@ -138,11 +220,10 @@ test('editorial word meanings are explicit selections while raw glosses and read
   assert.equal(before.examples[0].displayMeaning, 'teacher', 'editorial selection also reaches the teaching example');
 });
 
-test('revision two lesson IDs do not reuse or replace revision one observations and scores', () => {
-  assert.equal(course.catalog().revision, 2);
+test('original revision two lesson IDs do not reuse or replace revision one observations and scores', () => {
   const legacy = { obslog: [], lessonsDone: {} };
   const fresh = { obslog: [], lessonsDone: {} };
-  for (const unit of course.listUnits()) {
+  for (const unit of course.listUnits().slice(0, 6)) {
     const run = course.createRun(unit.id);
     const oldRun = { ...clone(run), revision: 1 };
     assert.throws(() => course.currentPrompt(oldRun), /run-invalid/);
@@ -193,6 +274,49 @@ test('meaning choices use a finite explicit nonoverlapping keyword set, independ
   assert.equal(prompt.correctAnswer, 'Life');
   assert.equal(prompt.wordMeaning, 'to live');
   assert.throws(() => course.answer(course.createRun('shapes'), 'invented choice'), /choice-invalid/);
+});
+
+test('new groups contrast distinct keywords and accept only the selected target choice', () => {
+  const expected = [
+    ['One', 'Two', 'Three', 'Four'],
+    ['Above', 'Below', 'Left', 'Right'],
+    ['East', 'West', 'South', 'North'],
+    ['Eat', 'Drink', 'See', 'Hear'],
+    ['Mountain', 'Water', 'Fire', 'Rain'],
+    ['Exit', 'Come', 'Read', 'Write'],
+  ];
+  for (const [index, unit] of course.listUnits().slice(6).entries()) {
+    assert.deepEqual(unit.targets.map(target => target.meaning), expected[index]);
+    let run = course.createRun(unit.id, { targets: ['meaning'] });
+    while (!run.complete) {
+      const prompt = course.currentPrompt(run);
+      assert.deepEqual([...prompt.choices.map(choice => choice.label)].sort(), [...expected[index]].sort());
+      for (const choice of prompt.choices) {
+        assert.equal(course.summary(course.answer(run, choice.id)).results.at(-1).status,
+          choice.id === prompt.targetId ? 'correct' : 'wrong');
+      }
+      run = course.answer(run, prompt.answerId);
+    }
+  }
+});
+
+test('new unit evidence uses r3 and missed-only repairs preserve its full score', () => {
+  const run = completeWith(course.createRun('more-actions'),
+    ['correct', 'wrong', 'wrong', 'correct', 'correct', 'correct', 'correct', 'correct']);
+  const original = course.toLessonEvidence(run, 1000);
+  const meaningId = 'kanji-foundations-24:r3:more-actions:meaning';
+  const readingId = 'kanji-foundations-24:r3:more-actions:reading';
+  assert.deepEqual(Object.keys(original.lessonsDone), [meaningId, readingId]);
+  assert.equal(original.lessonsDone[meaningId].score, 3);
+  assert.equal(original.lessonsDone[readingId].score, 3);
+  const repair = course.retry(run);
+  assert.equal(repair.revision, 3);
+  assert.deepEqual(repair.promptIds, ['more-actions/出/reading', 'more-actions/来/meaning']);
+  const delta = course.toLessonEvidence(allCorrect(repair), 2000);
+  assert.deepEqual(delta.lessonsDone, {});
+  assert.deepEqual(delta.obslog.map(row => row[4]), [`${readingId}:missed`, `${meaningId}:missed`]);
+  assert.equal(native.roots(clone(original)), true);
+  assert.equal(native.roots(clone(delta)), true);
 });
 
 test('confusable marks and sound-clue siblings are actual wrong alternatives, not accepted synonyms', () => {
@@ -356,5 +480,7 @@ test('UMD browser export initializes without browser, storage, timers or schedul
   const sandbox = vm.createContext({});
   vm.runInContext(read('../kanji-course.js'), sandbox);
   assert.equal(sandbox.BunkiKanjiCourse.catalog().id, course.catalog().id);
-  assert.equal(sandbox.BunkiKanjiCourse.listUnits().length, 6);
+  assert.equal(sandbox.BunkiKanjiCourse.listUnits().length, 12);
+  assert.equal(sandbox.BunkiKanjiCourse.unitForCharacter('東').id, 'directions');
+  assert.equal(sandbox.BunkiKanjiCourse.counts().characters, 48);
 });

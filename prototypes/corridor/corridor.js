@@ -6213,7 +6213,25 @@ function keepNavigationReturn(destination, invoker = document.activeElement) {
 function returnFromNavigation() {
   const home = S.navigationReturns.at(-1);
   if (!home || home.destination !== S.view) return false;
+  // A course detour may contain ordinary Atlas/search frames. Check its owner
+  // before any inner frame can restore the old caller under a new record.
+  const staleCourse = S.navigationReturns.findIndex((frame) => frame.kanjiCourseReturn &&
+    (!recordReady(frame.kanjiCourseReturn.epoch) ||
+      (frame.view === 'review' && S.review !== frame.kanjiCourseReturn.review)));
+  if (staleCourse !== -1) {
+    S.navigationReturns.splice(staleCourse);
+    S.stack = []; S.dialogInvoker = null; S.scaleVisit = null;
+    learningSourceVisit = null;
+    if (!S.kanjiCourse || !recordReady(S.kanjiCourse.epoch)) S.kanjiCourse = { stage: 'menu' };
+    S.view = 'lessons'; render(); window.scrollTo(0, 0);
+    return true;
+  }
   S.navigationReturns.pop();
+  if (home.kanjiCourseReturn) {
+    S.kanjiCourse = home.kanjiCourseReturn.priorCourse;
+    Object.assign(S, home.kanjiCourseReturn.sourceState);
+    S.sentencePracticeView = home.kanjiCourseReturn.sentencePracticeView;
+  }
   if (home.referenceState && referenceLibrary) Object.assign(referenceLibrary.state, home.referenceState);
   if (S.view === 'reader' && S.passageId) {
     clearTimeout(readerPosTimer);
@@ -19997,12 +20015,78 @@ function kanjiCourseEvidencePatch(latest, evidence) {
   }
   return { lessonsDone, obslog: [...(latest.obslog || []), ...rows] };
 }
+function kanjiCourseReturnFrame() {
+  const frame = S.navigationReturns.at(-1);
+  return frame?.destination === 'lessons' && frame.kanjiCourseReturn?.visit === S.kanjiCourse ? frame : null;
+}
+/** This is an authored character unit, not a reading test for the source token.
+ * The original node is retained only for returning to that exact dictionary
+ * entry. Other teaching words/characters never acquire its source provenance. */
+function kanjiCourseEntryNode(visit, target, type) {
+  const origin = kanjiCourseReturnFrame()?.kanjiCourseReturn.originNode || visit.originNode;
+  if (type === 'kanji' && origin?.id === target.kanji) return { ...origin };
+  return { t: type, id: type === 'kanji' ? target.kanji : target.wordKey,
+    ...(type === 'word' && target.readings?.length === 1 ? { reading: target.readings[0] } : {}) };
+}
+function openKanjiCourseUnit(node, invoker) {
+  const course = window.BunkiKanjiCourse;
+  const unit = node?.t === 'kanji' && course?.unitForCharacter(node.id);
+  const priorCourse = S.kanjiCourse;
+  if (personalHost || !unit || !recordReady(recordEpoch) || priorCourse?.pending ||
+      S.stack.at(-1) !== node || !invoker?.isConnected || !preserveVisibleDrafts()) return false;
+  if (priorCourse && priorCourse.stage !== 'menu' && !recordReady(priorCourse.epoch)) return false;
+  // Looking at the dictionary cannot leave a paused check labelled "before
+  // studying". Keep every response and draft, but describe it as practice.
+  if (priorCourse) {
+    if (priorCourse.run) priorCourse.run = course.asPractice(priorCourse.run);
+    priorCourse.supportedPractice = true;
+  }
+  if (S.view === 'lessons' && priorCourse?.unitId === unit.id) {
+    S.stack = []; S.dialogInvoker = null;
+    render(); document.getElementById('kanji-course-title')?.focus();
+    return true;
+  }
+  const visit = priorCourse?.unitId === unit.id ? priorCourse : {
+    unitId: unit.id, stage: 'intro', index: 0, epoch: recordEpoch, run: null,
+    draft: '', feedback: null, saved: false, pending: false, supportedPractice: true,
+    originNode: { ...node },
+  };
+  // keepScroll inside this call settles source-reader/publisher coordinates.
+  // Capture their stored positions afterwards, not the preceding scroll event.
+  keepNavigationReturn('lessons', invoker);
+  const capsule = { epoch: recordEpoch, priorCourse, visit, originNode: { ...node }, review: S.review,
+    sentencePracticeView: S.sentencePracticeView,
+    sourceState: { sourceCaptureId: S.sourceCaptureId, sourceContextReturn: S.sourceContextReturn,
+      sourceScroll: S.sourceScroll, publisherReceipt: S.publisherReceipt,
+      publisherContextReturn: S.publisherContextReturn, publisherScroll: S.publisherScroll } };
+  S.navigationReturns.at(-1).kanjiCourseReturn = capsule;
+  S.kanjiCourse = visit; S.view = 'lessons';
+  render(); window.scrollTo(0, 0); document.getElementById('kanji-course-title')?.focus();
+  return true;
+}
+function renderKanjiCourseDoor(sheet, node) {
+  const course = window.BunkiKanjiCourse;
+  const unit = node.t === 'kanji' && course?.unitForCharacter(node.id);
+  if (personalHost || !unit) return;
+  const epoch = recordEpoch;
+  const resume = S.kanjiCourse?.unitId === unit.id;
+  const door = biLabel('button', 'chip', resume ? `「${node.id}」の練習を再開` : `「${node.id}」をことばで練習`,
+    resume ? `Resume practice with ${node.id}` : `Practise ${node.id} in words`);
+  door.type = 'button'; door.id = 'kanji-course-unit-door';
+  door.dataset.kanjiCourseUnit = unit.id;
+  door.disabled = !recordReady(epoch) || !!S.kanjiCourse?.pending;
+  door.addEventListener('click', () => {
+    if (recordReady(epoch)) openKanjiCourseUnit(node, door);
+  });
+  sheet.append(door);
+}
 function renderKanjiCourseMenu(main) {
   const course = window.BunkiKanjiCourse;
   if (!course) return;
   const section = el('section');
   section.id = 'kanji-course-menu';
-  section.append(el('h2', 'list-head', tx('ことばで学ぶ 24 字', '24 characters in words')));
+  const characterCount = course.counts().characters;
+  section.append(el('h2', 'list-head', tx(`ことばで学ぶ ${characterCount} 字`, `${characterCount} characters in words`)));
   section.append(el('p', 'gloss', tx(
     '意味を選ぶ練習と、ことば全体の読みを答える練習。順番は目安です。どこからでも始められます。',
     'Practise meaning choices and recall whole-word readings separately. The order is guidance; start anywhere.',
@@ -20026,7 +20110,8 @@ function renderKanjiCourseMenu(main) {
     });
     row.append(el('span', 'lesson-score', result.join(' · ')), el('span', 'row-go', '›'));
     row.addEventListener('click', () => {
-      S.kanjiCourse = { unitId: unit.id, stage: 'intro', index: 0, epoch: recordEpoch, run: null, draft: '', feedback: null, saved: false, pending: false };
+      S.kanjiCourse = { unitId: unit.id, stage: 'intro', index: 0, epoch: recordEpoch, run: null, draft: '', feedback: null, saved: false, pending: false,
+        supportedPractice: !!S.kanjiCourse?.supportedPractice };
       render();
       document.getElementById('kanji-course-title')?.focus();
     });
@@ -20064,7 +20149,17 @@ function renderKanjiCourse(main) {
     main.append(reset);
     return;
   }
-  main.append(button('kanji-course-leave', 'コース一覧へ', 'Back to course list', () => { S.kanjiCourse = { stage: 'menu' }; render(); }));
+  if (kanjiCourseReturnFrame()) {
+    main.append(button('kanji-course-source-return', '開いていた項目に戻る', 'Return to the entry I came from', returnFromNavigation));
+  } else {
+    main.append(button('kanji-course-leave', 'コース一覧へ', 'Back to course list', () => {
+      S.kanjiCourse = { stage: 'menu', supportedPractice: !!visit.supportedPractice }; render();
+    }));
+  }
+  if (visit.supportedPractice) main.append(el('p', 'fine', tx(
+    '辞書を見たあとの練習です。初見のテストではありません。',
+    'Practice after opening the dictionary. This is not a first-try check.',
+  )));
   const start = (mode) => {
     visit.run = course.createRun(unit.id, { mode });
     visit.stage = 'check'; visit.feedback = null; visit.draft = ''; visit.saved = false; visit.evidenceTime = null; visit.noEvidence = false;
@@ -20073,8 +20168,7 @@ function renderKanjiCourse(main) {
   const entryDoor = (target, type) => {
     const door = button(`kanji-course-entry-${type}`, type === 'kanji' ? '漢字の全項目' : 'ことばの全項目',
       type === 'kanji' ? 'Full kanji entry' : 'Full word entry',
-      () => go({ t: type, id: type === 'kanji' ? target.kanji : target.wordKey,
-        ...(type === 'word' && target.readings?.length === 1 ? { reading: target.readings[0] } : {}) }, { invoker: door }));
+      () => go(kanjiCourseEntryNode(visit, target, type), { invoker: door }));
     return door;
   };
   if (visit.stage === 'intro') {
@@ -20084,7 +20178,8 @@ function renderKanjiCourse(main) {
     )));
     main.append(el('p', 'fine', tx('読みの練習には、かな入力を使います。答えを見る・今回はスキップすることもできます。', 'Reading checks use kana input. You can reveal an answer or skip a target without receiving credit.')));
     main.append(button('kanji-course-learn', '先に学ぶ', 'Learn the four characters first', () => { visit.stage = 'teach'; redraw(); }, 'take'));
-    main.append(button('kanji-course-preview', '説明を見ずに試す', 'Try the checks before studying', () => start('preview')));
+    if (visit.supportedPractice) main.append(button('kanji-course-practise', 'すぐ練習する', 'Practise now', () => start('check')));
+    else main.append(button('kanji-course-preview', '説明を見ずに試す', 'Try the checks before studying', () => start('preview')));
     return;
   }
   if (visit.stage === 'teach') {
@@ -20228,7 +20323,7 @@ function renderKanjiCourse(main) {
   main.append(el('p', 'fine', tx('カードにする場合は全項目を開き、そこで保存を選びます。', 'To add a review card, open its full entry and choose Save there.')));
   for (const target of unit.targets) {
     const row = button(`kanji-course-result-${target.id}`, target.kanji, target.kanji,
-      () => go({ t: 'kanji', id: target.kanji }, { invoker: row }), 'chip');
+      () => go(kanjiCourseEntryNode(visit, target, 'kanji'), { invoker: row }), 'chip');
     main.append(row);
   }
 }
@@ -24298,9 +24393,10 @@ function renderKanjidex(main) {
   if (!Array.isArray(S.kdx.parts)) S.kdx.parts = S.kdx.part ? [S.kdx.part] : [];
   main.append(withEn(el('p', 'eyebrow', '字を引く'), 'find a kanji you cannot read', 'en-inline'));
   main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.kanjidex)));
+  const characterCount = window.BunkiKanjiCourse?.counts().characters || 0;
   const courseDoor = biLabel('button', 'chip',
-    S.kanjiCourse && S.kanjiCourse.stage !== 'menu' ? '漢字コースを再開' : 'ことばで学ぶ 24 字',
-    S.kanjiCourse && S.kanjiCourse.stage !== 'menu' ? 'Resume the kanji course' : 'Learn 24 characters in words');
+    S.kanjiCourse && S.kanjiCourse.stage !== 'menu' ? '漢字コースを再開' : `ことばで学ぶ ${characterCount} 字`,
+    S.kanjiCourse && S.kanjiCourse.stage !== 'menu' ? 'Resume the kanji course' : `Learn ${characterCount} characters in words`);
   courseDoor.type = 'button'; courseDoor.id = 'kanjidex-course';
   courseDoor.addEventListener('click', () => {
     keepNavigationReturn('lessons', courseDoor);
@@ -36951,6 +37047,7 @@ function renderKanjiNode(sheet, node) {
     }
   }
   renderSourceKanjiDoor(sheet, node);
+  renderKanjiCourseDoor(sheet, node);
 
   renderKanjiClassifications(sheet, node.id, node);
 
@@ -39862,7 +39959,8 @@ let pageEpoch = 0; // bumped by every render(): a page built or kept against an 
 function pageKey(node, depth) {
   const lists = Object.entries(S.lists || {}).map(([name, rows]) => `${name}:${rows?.length || 0}`).join(',');
   return JSON.stringify([node.t, node.id, String(node.seq ?? ''), node.reading || '', node.from?.passage || '',
-    node.from?.index ?? '', !!node.readerChoice, depth, S.view, S.passageId || '', S.lang, themeIx(),
+    node.from?.index ?? '', node.sourceContext || null, recordEpoch, !!node.readerChoice,
+    depth, S.view, S.passageId || '', S.lang, themeIx(),
     S.taken.length, lists, pageEpoch]);
 }
 /** After `after` ms, at the next idle moment: requestIdleCallback where it exists, else just after a frame (WebKit has
