@@ -100,9 +100,10 @@ function sense() {
     });
   return { report, context };
 }
-test('independent Sense registry includes 135 data and 1462 browser rows; Speak actual per-engine assertion coverage', () => {
-  assert.equal(voiceReportContracts['sense-truth'].expectedCases('chromium').length, 1597);
-  assert.equal(voiceReportContracts['sense-truth'].expectedCases('all').length, 3059);
+test('independent Sense registry includes 135 data and 1490 browser rows; Speak actual per-engine assertion coverage', () => {
+  // FULL-R1 D (2026-10-21): + the 28 C4 rows Ladder's sense sidecar adds (1462 → 1490 per engine)
+  assert.equal(voiceReportContracts['sense-truth'].expectedCases('chromium').length, 1625);
+  assert.equal(voiceReportContracts['sense-truth'].expectedCases('all').length, 3115);
   const { report, context } = speak();
   const judged = validateVoiceReport('speak', report, context);
   assert(judged.passed, judged.errors.join(';'));
