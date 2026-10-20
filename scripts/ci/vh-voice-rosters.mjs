@@ -1,4 +1,5 @@
-/** Reviewed VH-1 coverage at 384d4a70. Static producer-source names and data class occurrences, never receipt-selected. */
+/** Reviewed VH-1 coverage at 384d4a70; the sense sidecar's C4 rows and pin re-reviewed at df617045 (FULL-R1 D: Ladder
+ * a2c1776d and 384edc5d). Static producer-source names and data class occurrences, never receipt-selected. */
 // Independent admission policy, not imported from the producer's scheduling helper. The original fault annotation
 // names WebKit offline refusal; lead approved 0708 on 2026-10-19. All positive cases still apply to both engines.
 const reviewedSpeakControls = Object.freeze([
@@ -1352,10 +1353,26 @@ export const SENSE_CASE_IDS = Object.freeze([
   'chromium/C.case.C4.jawiki:5238864-s63.448',
   'chromium/C.case.C4.jawiki:5294446.159',
   'chromium/C.case.C4.jawiki:5294446.164',
+  // FULL-R1 D: + the 15 reviewed rows Ladder's sidecar adds to this article (a2c1776d)
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-15hyousyou.26',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-15hyousyou.40',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-15hyousyou.89',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-15hyousyou.95',
   'chromium/C.case.C4.kantei:jp-105-actions-202609-15hyousyou.124',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-15hyousyou.162',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-15hyousyou.238',
   'chromium/C.case.C4.kantei:jp-105-actions-202609-15hyousyou.239',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-15hyousyou.244',
   'chromium/C.case.C4.kantei:jp-105-actions-202609-15hyousyou.255',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-15hyousyou.297',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-15hyousyou.329',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-15hyousyou.333',
   'chromium/C.case.C4.kantei:jp-105-actions-202609-15hyousyou.334',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-15hyousyou.405',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-15hyousyou.422',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-15hyousyou.435',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-15hyousyou.445',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-15hyousyou.448',
   'chromium/C.case.C4.kantei:jp-105-actions-202609-18fukudaijin.169',
   'chromium/C.case.C4.kantei:jp-105-actions-202609-18fukudaijin.233',
   'chromium/C.case.C4.kantei:jp-105-actions-202609-18fukudaijin.261',
@@ -1365,8 +1382,22 @@ export const SENSE_CASE_IDS = Object.freeze([
   'chromium/C.case.C4.kantei:jp-105-actions-202609-19seimukan.271',
   'chromium/C.case.C4.kantei:jp-105-actions-202609-19seimukan.315',
   'chromium/C.case.C4.kantei:jp-105-actions-202609-19seimukan.419',
+  // FULL-R1 D: + the 13 reviewed rows Ladder's sidecar adds to this article (a2c1776d)
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-25startup.21',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-25startup.35',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-25startup.54',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-25startup.108',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-25startup.116',
   'chromium/C.case.C4.kantei:jp-105-actions-202609-25startup.155',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-25startup.191',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-25startup.207',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-25startup.211',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-25startup.236',
   'chromium/C.case.C4.kantei:jp-105-actions-202609-25startup.256',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-25startup.318',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-25startup.406',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-25startup.424',
+  'chromium/C.case.C4.kantei:jp-105-actions-202609-25startup.427',
   'chromium/C.case.C4.kantei:jp-105-discourse-20260923message.115',
   'chromium/C.case.C4.kantei:jp-105-discourse-20260923message.266',
   'chromium/C.case.C4.kantei:jp-105-discourse-20260923message.292',
@@ -1629,8 +1660,9 @@ export const SENSE_CASE_IDS = Object.freeze([
   'chromium/c.page-errors',
 ]);
 // INT-VH (merge 2): recomputed after the reviewed aozora-049966-2 change below (Hfix-1A R3-3); every other entry unchanged
+// FULL-R1 D: recomputed after the reviewed senses.json change below (Ladder a2c1776d, 384edc5d); every other entry unchanged
 export const SENSE_DATA_INVENTORY_SHA256 =
-  '5477af625758b6e84d76e14b39e7d9fd92ae3cdc8043a9f4fd9bb315ef05eff1';
+  'f994b18feaccb4dc548f4fe0d4be5138cec9b969130f5ce97d2f0f1310b6c2d1';
 export const SPEAK_CHECK_NAMES = Object.freeze({
   S1: [
     'the Learn room has one Speak door, a study-door row',
@@ -6241,7 +6273,9 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
     'data/articles/real-tsurezure.json',
     '394c22790bc216adb53d46a4ea17f235c62785be83e2a7d2bfb7f5895e792d4b',
   ],
-  ['data/articles/senses.json', 'f701a005bf17d513cd43f1b1e526774b32f813c8b59679cd0b4b97bc155462af'],
+  // FULL-R1 D: Ladder's sidecar (a2c1776d: 28 reviewed rows for the two kantei actions articles, 3 re-sourced;
+  // 384edc5d: 3 rows lead with their own gloss). Reviewed: the 28 rows are the C4 rows added above; no row removed
+  ['data/articles/senses.json', 'f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387'],
   [
     'data/articles/sports-sports-b_menu-houdou-31-09-1420919_00007.json',
     '9a2e9c25f4c13488144b431c748220214cf55e1e07c726206a71e87edb448f58',
