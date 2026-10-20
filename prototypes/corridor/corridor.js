@@ -30205,6 +30205,7 @@ async function reportHookAttempt(evidence) {
   let decision = null;
   const admitted = await srsCore.admitAnswer({
     locks: globalThis.navigator?.locks || null,
+    clock: () => new Date(),
     storage: globalThis.localStorage,
     where: evidence?.surface,
     commit: async ({ now, answered, reserve }) => {
