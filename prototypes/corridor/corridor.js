@@ -22976,6 +22976,10 @@ function sentenceKept(node) {
   const quote = node?.sourceContext?.quote || teacherSentence(node)?.quote || '';
   return !!quote && (S.teacherContexts?.entries || []).some((entry) => entry.quote === quote);
 }
+/** A tutor door's item and the encounter it was met in: every drawing of one page's door agrees on it. */
+function teacherDoorKey(node) {
+  return JSON.stringify([node?.t, node?.id, node?.from?.passage, node?.from?.index, node?.sourceContext?.id]);
+}
 function renderTeacherDoor(container, getNode) {
   const node = typeof getNode === 'function' ? getNode() : getNode;
   const wrap = el('div', 'teacher-door');
@@ -22985,6 +22989,8 @@ function renderTeacherDoor(container, getNode) {
   actions.dataset.saveRow = '';
   const note = el('p', 'teacher-note');
   note.setAttribute('role', 'status');
+  // FULL-R1 · its line is the visit's (sheetActionLineWriter): a page drawn again draws it again
+  drawSheetActionLine(note, teacherDoorKey(node));
   // S · the sentence's keep is the one Save (saveOne): it keeps the sentence on the tutor page, then its menu; asking the
   // tutor and practising stay beside it as two quiet actions, in the words the slip's sentence pane uses
   const selectedNow = () => (typeof getNode === 'function' ? getNode() : getNode);
@@ -22994,7 +23000,8 @@ function renderTeacherDoor(container, getNode) {
     keep: async () => {
       const selected = selectedNow();
       if (!selected || !recordWritable()) return false;
-      return sendSentenceToTutor(selected, false, retainActionSurface(keepSentence), (text) => { note.textContent = text; });
+      return sendSentenceToTutor(selected, false, retainActionSurface(keepSentence),
+        sheetActionLineWriter(keepSentence, teacherDoorKey(selected), note));
     },
     more: () => [{ id: 'teacher-save-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(quote.textContent || '') }],
   });
@@ -23007,9 +23014,9 @@ function renderTeacherDoor(container, getNode) {
     button.addEventListener('click', async () => {
       const selected = selectedNow();
       if (!selected || button.disabled) return;
-      const currentSurface = retainActionSurface(button);
+      const currentSurface = retainActionSurface(button), say = sheetActionLineWriter(button, teacherDoorKey(selected), note);
       for (const control of actions.children) control.disabled = true;
-      try { await sendSentenceToTutor(selected, true, currentSurface, (text) => { note.textContent = text; }); }
+      try { await sendSentenceToTutor(selected, true, currentSurface, say); }
       finally {
         for (const control of actions.children) control.disabled = !recordWritable();
       }
@@ -23021,12 +23028,11 @@ function renderTeacherDoor(container, getNode) {
     const practice = biLabel('button', 'chip btn-tertiary', '練習する', 'Practice it');
     practice.type = 'button'; practice.id = 'entry-sentence-practice';
     const selectedNode = () => typeof getNode === 'function' ? getNode() : getNode;
-    const key = (value) => JSON.stringify([value?.t, value?.id, value?.from?.passage, value?.from?.index, value?.sourceContext?.id]);
     practice.disabled = !node || !recordWritable();
     practice.addEventListener('click', () => {
-      const selected = selectedNode(), selectedKey = key(selected);
+      const selected = selectedNode(), selectedKey = teacherDoorKey(selected);
       if (selected) void openBundledSentenceChoice(() => contextFromTeacherNode(selected), practice, note,
-        () => key(selectedNode()) === selectedKey);
+        () => teacherDoorKey(selectedNode()) === selectedKey, sheetActionLineWriter(practice, selectedKey, note));
     });
     actions.append(practice);
   }
@@ -28289,6 +28295,54 @@ function retainActionSurface(button) {
   const visit = syncSheetActionVisit();
   return () => !!visit && syncSheetActionVisit() === visit;
 }
+/* FULL-R1 · a page door's line ("Saved on the tutor page.", or why a save, an ask or a practice did not go through) is
+ * kept by the visit its press was made in, as the action is, and never only in the node it was first written into: a
+ * page can be drawn again while the line stands (refreshWordSheet redraws it when its examples or dictionary data
+ * arrive), and a line kept only in its node went with that node, leaving Saved ✓ beside an empty status. Every drawing
+ * of the door in that visit reads the line, and a line said after a drawing reaches the door as it stands now; the
+ * visit's end (another page, Back, 筆順) ends it. */
+const sheetActionLines = new WeakMap(); // visit → Map(door key → its latest line)
+const sheetActionLineKeys = new WeakMap(); // a door's status node → its door key
+/** The test syncSheetActionVisit makes, read-only (keep the two in step): a page built ahead lends buildPage its path
+ * while it is drawn, and nothing read while a page is drawn may move the visit. */
+function sheetActionVisitHolds(visit) {
+  return !!visit && S.stack.length > 0 && !S.strokes && visit.view === S.view && visit.passageId === S.passageId &&
+    visit.stack === S.stack && visit.path.length === S.stack.length && visit.path.every((node, index) => node === S.stack[index]);
+}
+/** The line a door shows now: the standing visit's, or none (a page built ahead, a visit that has ended). */
+function sheetActionLine(key) {
+  return (sheetActionVisitHolds(sheetActionVisit) && sheetActionLines.get(sheetActionVisit)?.get(key)) || '';
+}
+function drawSheetActionLine(note, key) {
+  sheetActionLineKeys.set(note, key);
+  note.textContent = sheetActionLine(key);
+}
+/** A page as it is mounted shows its doors' lines as the standing visit holds them. Back mounts again the very page a
+ * deeper one covered (keptPages), nodes and all: the line its old visit said ended with that visit. */
+function reconcileSheetActionLines(sheet) {
+  for (const note of sheet.querySelectorAll('.teacher-note')) {
+    const key = sheetActionLineKeys.get(note);
+    if (key === undefined) continue;
+    const line = sheetActionLine(key);
+    if (note.textContent !== line) note.textContent = line;
+  }
+}
+/** The line writer for one press of a door's action. It speaks only while the press's visit stands: into the door as it
+ * is drawn now (its own node, or the one a redraw put in its place) and into the visit's line every later drawing reads.
+ * A visit that has ended writes nothing, not even into its own node, which Back may mount again. A press made outside
+ * any page visit keeps its node's line, as before. */
+function sheetActionLineWriter(button, key, own) {
+  const visit = button.isConnected && button.closest('#sheet') ? syncSheetActionVisit() : null;
+  return (text) => {
+    if (!visit) { own.textContent = text; return; }
+    if (sheetActionVisit !== visit || !sheetActionVisitHolds(visit)) return;
+    if (!sheetActionLines.has(visit)) sheetActionLines.set(visit, new Map());
+    sheetActionLines.get(visit).set(key, text);
+    for (const note of document.querySelectorAll('#sheet .teacher-note')) {
+      if (sheetActionLineKeys.get(note) === key && note.textContent !== text) note.textContent = text;
+    }
+  };
+}
 let sentenceListeningCatalog = null, sentenceListeningCatalogWait = null, sentenceListeningOwner = null;
 function ensureSentenceListeningCatalog() {
   if (window.__CORRIDOR_STANDALONE__ === true || !window.__KAIRO_AUDIO__) return Promise.resolve(null);
@@ -28350,7 +28404,8 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden) window.__DRIFT__.hide();
   else if (S.view === 'drift' && !S.stack.length) window.__DRIFT__.show();
 });
-async function openBundledSentenceChoice(getContext, button, note, stillCurrent) {
+async function openBundledSentenceChoice(getContext, button, note, stillCurrent,
+  say = (text) => { if (note.isConnected) note.textContent = text; }) {
   if (button.disabled || !recordWritable() || !sentencePracticeModule) return;
   const epoch = recordEpoch, serial = ++sentenceChoiceSerial, currentSurface = retainActionSurface(button);
   button.disabled = true;
@@ -28366,7 +28421,7 @@ async function openBundledSentenceChoice(getContext, button, note, stillCurrent)
     S.sentencePracticeView = { ...choice, cloze: true, production: false, listening: false, listeningCue, returnCaller,
       returnView: S.view, returnScroll: window.scrollY };
     S.stack = []; S.view = 'sentence-practice'; render(); window.scrollTo(0, 0);
-  } catch (error) { if (recordReady(epoch) && note.isConnected) note.textContent = teacherSourceError(error); }
+  } catch (error) { if (recordReady(epoch)) say(teacherSourceError(error)); }
   finally { button.disabled = !recordWritable(); }
 }
 function renderSourceKanjiDoor(sheet, node) {
@@ -39019,6 +39074,8 @@ function mountPageEffects(sheet, node) {
   if (thread) revealMountedScaleCurrent(thread);
   activatePendingLookupReadings(sheet);
   adoptSaveMenuOwner();
+  // FULL-R1 · and its doors' lines, against the visit standing now (reconcileSheetActionLines)
+  reconcileSheetActionLines(sheet);
   // reading position survives the doors: Back hands a ~2,700px entry its place, never its top (P1, review)
   const savedSheetScroll = node.sheetScroll || 0;
   if (savedSheetScroll) requestAnimationFrame(() => {
