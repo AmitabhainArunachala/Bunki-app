@@ -164,7 +164,8 @@ test('reviewed inventories are independently fixed, including full fast schedule
       'word-saved-answer-controls': 19,
       // INT-VH (2026-10-19): e9b020ee's reader-navigation rows (the 390 px Learn door added): 282 → 283;
       // merge 2: Hfix-1A item 18's three pending-save rows: 283 → 286
-      corridor: 286,
+      // Ladder 82997bcb, accepted9a26f84d: two authored English-rung assertions,286 →288.
+      corridor: 288,
       'corridor-a11y': 62,
       'drift-fast': 66,
       'word-saved-answer-mutation-controls': 38,
@@ -742,4 +743,93 @@ test('word-saved-answer mutation controls: survived, missing, tampered, unstable
       false,
       JSON.stringify(malformed),
     );
+});
+
+// Exact independent schedule update for accepted Ladder82997bcb/9a26f84d.
+const LADDER_CORRIDOR_RENAMES = [
+  [
+    'grammar · second activation opens the stage — exact word, reading, meaning and Save, the band its door, no separate Full entry button',
+    'grammar · third activation opens the stage — exact word, reading, meaning and Save, the band its door, no separate Full entry button',
+  ],
+  [
+    'grammar · the tapped word does not move, nothing is written under it, and its popup leaves it uncovered',
+    'grammar · the tapped word does not move, only its own English is written under it, and its popup leaves it uncovered',
+  ],
+  [
+    'grammar · activation from the stage opens its full entry — the popup gone, nothing under the word, the word still the chosen one',
+    "grammar · activation from the stage opens its full entry — the popup gone, the word's own English held under it, the word still the chosen one",
+  ],
+  [
+    'grammar · closing the page restores its stage and summoned reading on the chosen word',
+    'grammar · closing the page restores its stage, summoned reading and English on the chosen word',
+  ],
+  [
+    'grammar · with always-on readings, stage then page takes two activations',
+    'grammar · with always-on readings, the English, the stage, then the page take three activations',
+  ],
+  [
+    'reading, stage and page each log their depth; Back and fold log nothing; the next visit repeats the same exact word/source',
+    "reading, English and page each log their depth (the meaning's 2 at the English, before any stage); the stage, Back and fold log nothing; the next visit repeats the same exact word/source",
+  ],
+  [
+    'example tokens reach their stage through the observed reading rung, with nothing under the word',
+    'example tokens reach their stage through the observed reading and English rungs, their own English kept under the word',
+  ],
+  [
+    'bare cycle · second activation is the meaning stage',
+    'bare cycle · third activation is the meaning stage, the English kept under the word',
+  ],
+  [
+    'bare cycle · third activation opens the full entry',
+    'bare cycle · fourth activation opens the full entry, the English held under the word for the way back',
+  ],
+  [
+    'bare cycle · Back restores the same meaning stage',
+    'bare cycle · Back restores the same meaning stage, its English under the word',
+  ],
+];
+const LADDER_CORRIDOR_ADDITIONS = [
+  "grammar · second activation writes the word's English under it, keeps its reading, and opens nothing",
+  'bare cycle · second activation writes the English under the word, its reading kept, and opens no stage',
+];
+test('Corridor accepts the full authored Ladder schedule and rejects old names, omitted English rows and hidden reds', () => {
+  const { report, context, contract } = fixture('corridor');
+  assert.equal(contract.expectedCases().length, 288);
+  assert.deepEqual(contract.validate(report, context).errors, []);
+  for (const name of [
+    ...LADDER_CORRIDOR_ADDITIONS,
+    ...LADDER_CORRIDOR_RENAMES.map(([, current]) => current),
+  ])
+    assert.equal(report.results.filter((row) => row.name === name).length, 1);
+  for (const [old, current] of LADDER_CORRIDOR_RENAMES) {
+    assert(!contract.expectedCases().includes(old));
+    const legacy = structuredClone(report);
+    legacy.results.find((row) => row.name === current).name = old;
+    assert.equal(contract.validate(legacy, context).passed, false, `Old Ladder name: ${old}`);
+  }
+  for (const name of LADDER_CORRIDOR_ADDITIONS) {
+    const absent = structuredClone(report);
+    absent.results = absent.results.filter((row) => row.name !== name);
+    absent.summary.total--;
+    assert.equal(
+      contract.validate(absent, context).passed,
+      false,
+      `Omitted authored English row: ${name}`,
+    );
+    const red = structuredClone(report);
+    red.results.find((row) => row.name === name).pass = false;
+    assert.equal(
+      contract.validate(red, context).passed,
+      false,
+      `Green summary cannot hide: ${name}`,
+    );
+    const duplicate = structuredClone(report);
+    duplicate.results.push(structuredClone(duplicate.results.find((row) => row.name === name)));
+    duplicate.summary.total++;
+    assert.equal(
+      contract.validate(duplicate, context).passed,
+      false,
+      `Duplicated English row: ${name}`,
+    );
+  }
 });
