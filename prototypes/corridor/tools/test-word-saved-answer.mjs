@@ -105,6 +105,8 @@ function defineRows() {
     // remove route, with a toast that can undo it; the list chooser left the seal for a popover beside it
     'wordSaveFacts', 'paintWordSave', 'paintMiniPath', 'refreshWordSaveControls', 'toggleWordSave', 'READER_TOAST_MS', 'readerToastTimer',
     'hideReaderToast', 'showReaderToast', 'miniAnchor', 'SAVE_PRESS_MS', 'placeFloating', 'keepFloatingBeside',
+    // Ladder R2/R4 (e4b3c1c5): placeFloating rides the word's own scroller and closes a cut's fold ([data-fold])
+    'slipScroller',
     'miniKanjiWeb', 'revealFloatingFocus',
     // Q (2026-10-17): the slip stands clear of its word with the word's reading (anchorBox); a kanji's part is named by
     // its plain meaning (partGloss); the bar's Save fits its bar (fitChromeKeep)
@@ -204,12 +206,14 @@ function defineRows() {
     return target[key];
   } });
 
-  /** The selectors the fake DOM answers: one id, one class or one tag — and the one compound query Save ▾'s menu makes
-   * for its checkboxes. Anything else is a disclosed-boundary failure. */
+  /** The selectors the fake DOM answers: one id, one class or one tag, the fold row's attribute-presence query
+   * placeFloating makes (Ladder R2/R4, e4b3c1c5), and the one compound query Save ▾'s menu makes for its
+   * checkboxes. Anything else is a disclosed-boundary failure. */
   const matcher = (selector) => {
     const box = /^input\[type="checkbox"\](:not\(:disabled\))?$/u.exec(selector);
     if (box) return (node) => node.tag === 'input' && node.type === 'checkbox' && (!box[1] || !node.disabled);
-    assert.match(selector, /^[#.]?[a-z-]+$/u, 'the fake DOM answers one id, one class or one tag selector, or the menu’s checkbox query, only');
+    if (selector === '[data-fold]') return (node) => Object.hasOwn(node.dataset ?? {}, 'fold') || Object.hasOwn(node.attributes ?? {}, 'data-fold');
+    assert.match(selector, /^[#.]?[a-z-]+$/u, 'the fake DOM answers one id, one class or one tag selector, [data-fold], or the menu’s checkbox query, only');
     const name = selector.replace(/^[#.]/u, '');
     return (node) => selector[0] === '#' ? node.id === name : selector[0] === '.' ? !!node.classList?.contains(name) : node.tag === name;
   };
@@ -243,7 +247,7 @@ function defineRows() {
     contains(node) { for (let at = node; at; at = at.parentNode) if (at === this) return true; return false; }
     closest(selector) { const hit = matcher(selector); for (let at = this; at; at = at.parentNode) if (hit(at)) return at; return null; }
     querySelectorAll(selector) {
-      assert.match(selector, /^([a-z]+|input\[type="checkbox"\])$/u, 'the fake DOM answers tag selectors, or the menu’s checkbox query, only');
+      assert.match(selector, /^([a-z]+|input\[type="checkbox"\]|\[data-fold\])$/u, 'the fake DOM answers tag selectors, [data-fold], or the menu’s checkbox query, only');
       const hit = matcher(selector);
       const found = [], walk = (node) => { for (const child of node.children || []) { if (hit(child)) found.push(child); walk(child); } };
       walk(this); return found;

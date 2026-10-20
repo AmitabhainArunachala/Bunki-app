@@ -33,6 +33,7 @@ export const WBIG_JSON = resolve(drift, 'data/wbig.json');
 export const ARTIFACT = resolve(drift, 'drift-artifact.html');
 export const LAYER = resolve(corridor, 'drift-layer.js');
 export const WORDS_JSON = resolve(corridor, 'data/share_alike/words.json');
+export const DRIFT_WORDS_JSON = resolve(corridor, '../../apps/app/src/data/generated/drift-words.json');
 
 /** The one WBIG literal, on its own line in both the runtime and the artifact. */
 const WBIG_RE = /const WBIG=(\[.*\]);/;
@@ -59,9 +60,9 @@ export function repairedGloss(headword, gloss, words) {
   const full = String(words?.[headword]?.g || '');
   // the dictionary's own wording, whenever it is itself whole — complete beats long
   if (full && !looksClipped(full)) return full;
-  // clipped in both: keep only what we can stand behind, and mark the cut
+  // clipped in both: keep only what we can stand behind, and mark the cut; never write an empty gloss
   const honest = tidyGloss(full.length > gloss.length ? full : gloss);
-  return honest === gloss ? null : honest;
+  return honest && honest !== gloss ? honest : null;
 }
 
 export function repairRows(rows, words) {
@@ -103,17 +104,25 @@ function main() {
     { name: 'drift/data/wbig.json', kind: 'json', file: WBIG_JSON },
     { name: 'corridor/drift-layer.js', kind: 'literal', file: LAYER },
     { name: 'drift/drift-artifact.html', kind: 'literal', file: ARTIFACT },
+    // FIXR (a0, lead's ruling 10:4x): the second truncated copy. Same [word, reading, gloss, …] rows;
+    // the reference page renders every variant, so a cut variant here shows beside the whole ones.
+    { name: 'app/src/data/generated/drift-words.json', kind: 'json', file: DRIFT_WORDS_JSON },
   ];
 
   for (const source of sources) {
     const loaded = source.kind === 'json'
       ? { rows: JSON.parse(readFileSync(source.file, 'utf8')) }
       : literalOf(source.file);
+    // a clean check asks two things of the committed input: nothing in it still ends mid-word, and
+    // the repair proposes nothing. Judging only the repaired projection made --check green on a
+    // stale target it had every row to fix (W2, FIXR 1041)
+    const clippedIn = stillClipped(loaded.rows);
     const { rows, changes } = repairRows(loaded.rows, words);
     const left = stillClipped(rows);
-    report.files[source.name] = { rows: rows.length, repaired: changes.length, stillClipped: left.length };
+    report.files[source.name] = { rows: rows.length, clipped: clippedIn.length, repaired: changes.length, stillClipped: left.length };
     report.repaired = Math.max(report.repaired, changes.length);
     report.remaining = Math.max(report.remaining, left.length);
+    report.proposed = (report.proposed || 0) + changes.length;
     if (!report.samples.length) report.samples = changes.slice(0, 4);
     if (mode === 'write' && changes.length) {
       if (source.kind === 'json') writeFileSync(source.file, JSON.stringify(rows));
@@ -135,7 +144,7 @@ function main() {
     report.remaining = Math.max(report.remaining, clippedWords.length);
   }
 
-  const green = mode === 'write' || report.remaining === 0;
+  const green = report.remaining === 0 && (mode === 'write' || (report.proposed || 0) === 0);
   console.log(JSON.stringify({ verdict: green ? 'green' : 'red', ...report }, null, 2));
   return green ? 0 : 1;
 }
