@@ -32,6 +32,11 @@
  *   x13   the reader's dock is not drawn while 層 rests at the foot           → X13.cover must go red
  *   look  round 1's dock: a raised strip of its own, the Line's hairline between, the disc ringless → X13.look must go red
  *   snap  the dock appears and goes in one frame                                → X13.fade must go red
+ *   shift the reading moved down one px (#reader translate)                       → X13.mac and G61.press must go red
+ * In a combined build the lane's own base also lacks every other lane's reader changes, so the no-change rows (X13.mac,
+ * G61.press) take the base by a pinned input instead: HFIX2E2_BASE_DIR (the combined source's corridor.js and editorial.css
+ * with only this lane's product commits taken out, written by tools/hfix2e2-base.mjs) and HFIX2E2_BASE_SHA256 (their sha256,
+ * corridor.js,editorial.css); bytes that are not the pinned bytes stop the run.
  *   fade  the folded reading's transition is dropped (the base's instant conceal) → G61.fade must go red
  *   seat  the fold unseats its reading at once, while it still fades            → G61.still must go red
  *   nami  nami's label ink is not declared (the accent, #8fb3d1, again)         → NAMI must go red
@@ -60,8 +65,15 @@ assert(['webkit', 'chromium'].includes(engine), 'Choose exactly one engine (KAIR
 const mode = process.env.HFIX2E2_MODE || 'branch';
 assert(['base', 'branch', 'control'].includes(mode), `unknown HFIX2E2_MODE ${mode}`);
 const CONTROL = process.env.HFIX2E2_CONTROL || '';
-assert(mode === 'control' ? ['x13', 'look', 'snap', 'fade', 'seat', 'nami'].includes(CONTROL) : !CONTROL, 'HFIX2E2_CONTROL names one control, and only in control mode');
+assert(mode === 'control' ? ['x13', 'look', 'snap', 'fade', 'seat', 'nami', 'shift'].includes(CONTROL) : !CONTROL, 'HFIX2E2_CONTROL names one control, and only in control mode');
 const BASE_SHA = process.env.HFIX2E2_BASE_SHA || '1f790977';
+// HFIX2E2_BASE_DIR + HFIX2E2_BASE_SHA256 (the two files' sha256, corridor.js then editorial.css): the base a combined build is
+// judged against — the combined source with only this lane's product commits taken out (tools/hfix2e2-base.mjs). Pinned: a
+// file whose bytes are not the pinned bytes stops the run. Without it the base is the lane's own, BASE_SHA's two files.
+const BASE_DIR = process.env.HFIX2E2_BASE_DIR || '';
+const BASE_PIN = (process.env.HFIX2E2_BASE_SHA256 || '').split(',').map((v) => v.trim()).filter(Boolean);
+assert(!BASE_DIR === !BASE_PIN.length, 'HFIX2E2_BASE_DIR and HFIX2E2_BASE_SHA256 come together');
+assert(!BASE_DIR || (BASE_PIN.length === 2 && BASE_PIN.every((v) => /^[a-f0-9]{64}$/u.test(v))), 'HFIX2E2_BASE_SHA256 is two sha256s: corridor.js,editorial.css');
 // HFIX2E2_SERVE_DIR: serve this build's two files from a directory instead of the site's own (a check of this lane's change
 // on another lane's build before the two are merged, e.g. Ladder's site with this lane's hunks applied to its two files)
 const SERVE_DIR = process.env.HFIX2E2_SERVE_DIR || '';
@@ -83,6 +95,12 @@ const STORY = 'wikinews:1403'; // 知床: 17 paragraphs, the long article the X-
 const FILES = { 'editorial.css': 'prototypes/corridor/editorial.css', 'corridor.js': 'prototypes/corridor/corridor.js' };
 const baseText = new Map();
 const atBase = (file) => {
+  if (!baseText.has(file) && BASE_DIR) {
+    const bytes = readFileSync(join(BASE_DIR, file));
+    const want = BASE_PIN[file === 'corridor.js' ? 0 : 1];
+    assert.equal(sha(bytes), want, `the pinned base's ${file} is not the pinned bytes`);
+    baseText.set(file, bytes.toString('utf8'));
+  }
   if (!baseText.has(file)) baseText.set(file, execFileSync('git', ['show', `${BASE_SHA}:${FILES[file]}`], { cwd: REPO, maxBuffer: 1 << 29 }).toString('utf8'));
   return baseText.get(file);
 };
@@ -95,6 +113,8 @@ const MUTATIONS = {
     ['editorial.css', '    box-shadow: inset 0 0 0 1px var(--color-bar-quiet);\n', '    box-shadow: none;\n']],
   // the dock appears and goes in one frame
   snap: [['editorial.css', DOCK + '    transition: opacity var(--motion-room) var(--ease-standard);\n', DOCK]],
+  // the reading moved by one px: the no-change rows (X13.mac, G61.press) must see it
+  shift: [['editorial.css', '#reader:not(.fg-always) { --reading-gap: 0; }\n', '#reader:not(.fg-always) { --reading-gap: 0; }\n#reader { translate: 0 1px; }\n']],
   fade: [['editorial.css', '  transition: opacity var(--motion-fast) var(--ease-exit), display var(--motion-fast) allow-discrete;\n', '']],
   seat: [['corridor.js', '  if (touchReadingFading(rt)) return;\n', '']],
   nami: [['editorial.css', '{ --color-accent-label: #a8c4db; }', '{ }']],
@@ -127,7 +147,7 @@ const host = await startCorridorDev(0);
 const browser = await ({ webkit, chromium }[engine]).launch();
 const version = browser.version();
 const results = [];
-console.log(`engine ${engine} ${version} · mode ${mode}${CONTROL ? ` (${CONTROL})` : ''} · build ${identity.gitSha} · artifact ${identity.artifactSha256}${SERVE_DIR ? ` · its two files served from ${SERVE_DIR}` : ''} · base ${BASE_SHA}`);
+console.log(`engine ${engine} ${version} · mode ${mode}${CONTROL ? ` (${CONTROL})` : ''} · build ${identity.gitSha} · artifact ${identity.artifactSha256}${SERVE_DIR ? ` · its two files served from ${SERVE_DIR}` : ''} · base ${BASE_DIR ? `${BASE_DIR} (pinned ${BASE_PIN.map((v) => v.slice(0, 12)).join(', ')})` : BASE_SHA}`);
 console.log(`load at start: ${load()}`);
 
 const PHONE = { isMobile: true, hasTouch: true, deviceScaleFactor: 2 };
@@ -843,7 +863,9 @@ try {
 if (runs('NAMI')) nami();
 const counted = results.filter((r) => !/^(G61\.trace|NAMI\.sweep) /u.test(r.name));
 const green = counted.filter((r) => r.pass).length;
-const report = { engine, version, mode, control: CONTROL || null, base: BASE_SHA, only: ONLY, build: identity.gitSha, artifact: identity.artifactSha256,
+const report = { engine, version, mode, control: CONTROL || null, base: BASE_DIR ? { dir: BASE_DIR, sha256: BASE_PIN,
+    head: (() => { try { return JSON.parse(readFileSync(join(BASE_DIR, 'base.json'), 'utf8')).head; } catch { return null; } })() } : BASE_SHA,
+  only: ONLY, build: identity.gitSha, artifact: identity.artifactSha256,
   serveDir: SERVE_DIR || null, served: SERVE_DIR ? Object.fromEntries(Object.keys(FILES).map((f) => [f, sha(readFileSync(join(SERVE_DIR, f), 'utf8'))])) : null,
   mutations: mutated.filter((m, i, all) => all.findIndex((n) => n.file === m.file && n.served === m.served) === i), rows: results, green, total: counted.length,
   loadAtEnd: load() };

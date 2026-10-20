@@ -14,6 +14,10 @@ import {
   batch3Digest,
   readBatch3Evidence,
   validateBatch3Admission,
+  E2_BASE_TOOL,
+  E2_BASE_COMMITS,
+  E2_BASE_FILES,
+  readBatch3Base,
 } from './vh-batch3-report-contracts.mjs';
 const sha = 'a'.repeat(64),
   sha2 = 'b'.repeat(64);
@@ -54,12 +58,37 @@ function sample(suite, engine) {
     siteDir: value.site || '/unit-fixture/site',
     identity,
     sources,
-    baseline: suite === 'hfix2e2' ? { unit: sha } : null,
+    baseline:
+      suite === 'hfix2e2'
+        ? {
+            head: identity.gitSha,
+            reverted: E2_BASE_COMMITS.map((commit) => commit.slice(0, 8)),
+            files: [...E2_BASE_FILES],
+            sha256: {
+              'corridor.js': batch3Digest('synthetic corridor'),
+              'editorial.css': batch3Digest('synthetic editorial'),
+            },
+          }
+        : null,
   };
+  const extras = sweep ? { sweep, runnerSha256: value.adapter?.runnerSha256 || sha } : {};
+  if (suite === 'hfix2e2') {
+    sources[E2_BASE_TOOL] = sha;
+    extras.baseline = {
+      dir: '/unit-fixture/e2-base',
+      metadata: structuredClone(pins.baseline),
+      files: {},
+    };
+    value.base = {
+      dir: extras.baseline.dir,
+      sha256: Object.values(pins.baseline.sha256),
+      head: identity.gitSha,
+    };
+  }
   return {
     value,
     pins,
-    extras: sweep ? { sweep, runnerSha256: value.adapter?.runnerSha256 || sha } : {},
+    extras,
     files: { 'unit-fixture.json': sha },
   };
 }
@@ -124,10 +153,18 @@ for (const suite of BATCH3_SUITES)
           HFIX2E_MODE: 'base',
           HFIX2E2_MODE: 'control',
           HFIX2E2_SERVE_DIR: '/foreign',
+          HFIX2E2_BASE_SHA: 'foreign',
+          HFIX2E2_BASE_DIR: '/foreign-base',
+          HFIX2E2_BASE_SHA256: `${sha},${sha2}`,
           KAIRO_HFIX2B_BASE: '1',
           KAIRO_HFIX2B_CONTROL: 'why',
           SWEEP_WORLDS: 'nami',
           SWEEP_STATES: 'learn',
+          GIT_DIR: '/foreign-repository',
+          GIT_WORK_TREE: '/foreign-source',
+          GIT_CONFIG_COUNT: '1',
+          GIT_CONFIG_KEY_0: 'core.worktree',
+          GIT_CONFIG_VALUE_0: '/foreign-source',
         },
         suite,
         engine,
@@ -138,6 +175,9 @@ for (const suite of BATCH3_SUITES)
       for (const key of [
         'HFIX2E_CASE',
         'HFIX2E2_SERVE_DIR',
+        'HFIX2E2_BASE_SHA',
+        'HFIX2E2_BASE_DIR',
+        'HFIX2E2_BASE_SHA256',
         'KAIRO_HFIX2B_BASE',
         'KAIRO_HFIX2B_CONTROL',
         'SWEEP_WORLDS',
@@ -145,7 +185,8 @@ for (const suite of BATCH3_SUITES)
       ])
         assert(!Object.hasOwn(env, key));
       assert.equal(env.HFIX2E_CENTRE, '元気');
-      assert.equal(env.HFIX2E2_BASE_SHA, '1f790977');
+      assert(!Object.hasOwn(env, 'HFIX2E2_BASE_SHA'));
+      if (suite === 'hfix2e2') assert(!Object.keys(env).some((key) => key.startsWith('GIT_')));
     });
   }
 test('X19 retains unrelated diagnostic reds; a target red, missing scene, stale nonce or false app-wide acceptance fails', () => {
@@ -335,6 +376,20 @@ for (const suite of BATCH3_SUITES)
         put('sweep-webkit.json', f.extras.sweep);
         put('contrast-sweep.json', f.extras.sweep);
       }
+      if (suite === 'hfix2e2') {
+        const dir = join(out, 'e2-base');
+        mkdirSync(dir);
+        writeFileSync(join(dir, 'corridor.js'), 'synthetic corridor');
+        writeFileSync(join(dir, 'editorial.css'), 'synthetic editorial');
+        writeFileSync(join(dir, 'base.json'), JSON.stringify(f.pins.baseline));
+        f.value.base.dir = dir;
+        put('base-process.json', {
+          argv: [E2_BASE_TOOL, '--head', f.pins.identity.gitSha, '--out', dir],
+          status: 0,
+          signal: null,
+          error: null,
+        });
+      }
       const name = batch3NativeFile(suite, 'webkit');
       put(name, f.value);
       const child = {
@@ -499,4 +554,79 @@ test('E2 r2 reduced motion rejects an intermediate first frame', () => {
     (r) => r.name.includes('X13.fade') && r.name.includes('(reduced motion)'),
   ).detail.opened.first[1] = 0.5;
   assert.throws(() => validateBatch3Native(f.value, f.pins, f.extras));
+});
+
+test('E2 baseline admission rejects caller pins, old heads, reversed hash order and missing derivation witness', () => {
+  for (const engine of ['chromium', 'webkit'])
+    for (const mutate of [
+      (f) => {
+        f.value.base = '1f790977';
+      },
+      (f) => {
+        f.value.base.dir = '/caller-chosen-base';
+      },
+      (f) => {
+        f.value.base.head = '2'.repeat(40);
+      },
+      (f) => {
+        f.value.base.sha256.reverse();
+      },
+      (f) => {
+        f.value.base.sha256[0] = sha2;
+      },
+      (f) => {
+        delete f.extras.baseline;
+      },
+      (f) => {
+        f.extras.baseline.metadata.reverted.pop();
+      },
+      (f) => {
+        f.extras.baseline.metadata.sha256['corridor.js'] = sha2;
+      },
+      (f) => {
+        delete f.pins.sources[E2_BASE_TOOL];
+      },
+    ]) {
+      const f = sample('hfix2e2', engine);
+      assert.equal(validateBatch3Native(f.value, f.pins, f.extras), true);
+      mutate(f);
+      assert.throws(() => validateBatch3Native(f.value, f.pins, f.extras));
+    }
+});
+test('E2 base files are checked against independent expected bytes, not a self-consistent caller manifest', () => {
+  const parent = join(homedir(), '.dharma', 'bunki', 'vh-batch3-consumer-tests');
+  mkdirSync(parent, { recursive: true });
+  const out = mkdtempSync(join(parent, 'base-unit-')),
+    dir = join(out, 'e2-base');
+  const f = sample('hfix2e2', 'chromium');
+  mkdirSync(dir);
+  const restore = () => {
+    for (const name of ['base.json', 'corridor.js', 'editorial.css'])
+      rmSync(join(dir, name), { force: true });
+    writeFileSync(join(dir, 'base.json'), JSON.stringify(f.pins.baseline));
+    writeFileSync(join(dir, 'corridor.js'), 'synthetic corridor');
+    writeFileSync(join(dir, 'editorial.css'), 'synthetic editorial');
+  };
+  try {
+    restore();
+    assert.equal(readBatch3Base(out, f.pins).dir, dir);
+    writeFileSync(join(dir, 'corridor.js'), 'forged');
+    const forged = structuredClone(f.pins.baseline);
+    forged.sha256['corridor.js'] = batch3Digest('forged');
+    writeFileSync(join(dir, 'base.json'), JSON.stringify(forged));
+    assert.throws(() => readBatch3Base(out, f.pins));
+    restore();
+    writeFileSync(join(dir, 'editorial.css'), 'changed after the native child');
+    assert.throws(() => readBatch3Base(out, f.pins));
+    restore();
+    rmSync(join(dir, 'corridor.js'));
+    writeFileSync(join(out, 'foreign.js'), 'synthetic corridor');
+    symlinkSync(join(out, 'foreign.js'), join(dir, 'corridor.js'));
+    assert.throws(() => readBatch3Base(out, f.pins));
+    restore();
+    writeFileSync(join(dir, 'unowned.json'), '{}');
+    assert.throws(() => readBatch3Base(out, f.pins));
+  } finally {
+    rmSync(out, { recursive: true, force: true });
+  }
 });

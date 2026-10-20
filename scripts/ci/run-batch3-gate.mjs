@@ -1,7 +1,14 @@
 /** Fresh artifact-bound launch of a complete accepted native lane. No native result is rewritten. */
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { existsSync, lstatSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  lstatSync,
+  mkdirSync,
+  readdirSync,
+  realpathSync,
+  writeFileSync,
+} from 'node:fs';
 import { resolve, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
@@ -10,6 +17,8 @@ import {
   loadBatch3Pins,
   readBatch3Evidence,
   makeBatch3Admission,
+  E2_BASE_TOOL,
+  readBatch3Base,
 } from './vh-batch3-report-contracts.mjs';
 
 export async function runBatch3Gate({ root, siteDir, out, suite, env }) {
@@ -43,6 +52,32 @@ export async function runBatch3Gate({ root, siteDir, out, suite, env }) {
       suite,
       pins.engine,
     );
+    if (suite === 'hfix2e2') {
+      const baseDir = join(realpathSync(out), 'e2-base');
+      assert(!existsSync(baseDir), 'The canonical gate creates its own fresh baseline');
+      const baseArgv = [E2_BASE_TOOL, '--head', pins.identity.gitSha, '--out', baseDir];
+      const baseResult = spawnSync(process.execPath, baseArgv, {
+        cwd: root,
+        env: childEnv,
+        stdio: 'inherit',
+      });
+      const baseChild = {
+        argv: baseArgv,
+        status: baseResult.status,
+        signal: baseResult.signal,
+        error: baseResult.error ? String(baseResult.error) : null,
+      };
+      writeFileSync(join(out, 'base-process.json'), JSON.stringify(baseChild, null, 2) + '\n');
+      if (baseResult.error) throw baseResult.error;
+      assert.equal(baseResult.signal, null, 'E2 baseline builder interrupted');
+      assert.equal(baseResult.status, 0, 'E2 baseline builder failed');
+      const baseline = readBatch3Base(out, pins);
+      // Inject only the gate-owned verified output after stripping every ambient override.
+      childEnv.HFIX2E2_BASE_DIR = baseline.dir;
+      childEnv.HFIX2E2_BASE_SHA256 = ['corridor.js', 'editorial.css']
+        .map((name) => pins.baseline.sha256[name])
+        .join(',');
+    }
     const argv = [`prototypes/corridor/tools/verify-${suite}.mjs`];
     const result = spawnSync(process.execPath, argv, {
       cwd: root,

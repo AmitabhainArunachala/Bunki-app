@@ -3,7 +3,17 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
-import { lstatSync, readFileSync, realpathSync } from 'node:fs';
+import {
+  lstatSync,
+  readFileSync,
+  realpathSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
+import { homedir } from 'node:os';
 import { dirname, join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -27,6 +37,8 @@ export const BATCH3_ENV_KEYS = Object.freeze([
   'HFIX2E2_CASE',
   'HFIX2E2_CONTROL',
   'HFIX2E2_BASE_SHA',
+  'HFIX2E2_BASE_DIR',
+  'HFIX2E2_BASE_SHA256',
   'HFIX2E2_SERVE_DIR',
   'HFIX2E2_NAMI_VIEWPORT',
   'KAIRO_HFIX2B_BASE',
@@ -60,6 +72,123 @@ export const BATCH3_DYNAMIC_SOURCES = Object.freeze({
 });
 const shared = 'prototypes/corridor/tools/verify-contrast-sweep.mjs';
 const arrival = 'prototypes/corridor/tools/vh-contrast-arrival.mjs';
+
+// Independent canonical baseline: exact accepted product commits, newest first.
+// No hash, commit, directory or metadata supplied by the caller becomes this oracle.
+export const E2_BASE_TOOL = 'prototypes/corridor/tools/hfix2e2-base.mjs';
+export const E2_BASE_COMMITS = Object.freeze([
+  'd61334a538a6e34ebd0701862521914cc1c2ff4b',
+  '680fa019e692e474beec544d5c1c901c46d50237',
+  '1e8e1b085c7ca23c4563d532ca3a8268e23d5c93',
+  'f23c3133c0739251552509bc181b50b9104f709e',
+]);
+export const E2_BASE_FILES = Object.freeze([
+  'prototypes/corridor/corridor.js',
+  'prototypes/corridor/editorial.css',
+]);
+function deriveE2Base(root, site, identity) {
+  const head = identity.gitSha;
+  assert.match(head || '', /^[a-f0-9]{40}$/u);
+  // Repository selection and patch interpretation cannot come from ambient git overrides.
+  const env = Object.fromEntries(
+    Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_')),
+  );
+  const git = (...args) => execFileSync('git', args, { cwd: root, env, maxBuffer: 1 << 29 });
+  assert.equal(git('rev-parse', '--verify', `${head}^{commit}`).toString().trim(), head);
+  const parent = join(homedir(), '.dharma', 'bunki', 'e2-base-oracle');
+  mkdirSync(parent, { recursive: true });
+  const work = mkdtempSync(join(parent, 'derive-'));
+  try {
+    for (const file of E2_BASE_FILES) {
+      const bytes = git('show', `${head}:${file}`),
+        name = file.split('/').pop();
+      assert.equal(
+        batch3Digest(regular(site, name)),
+        batch3Digest(bytes),
+        `Artifact differs from its committed ${name}`,
+      );
+      mkdirSync(dirname(join(work, file)), { recursive: true });
+      writeFileSync(join(work, file), bytes);
+    }
+    for (const commit of E2_BASE_COMMITS) {
+      assert.equal(git('rev-parse', '--verify', `${commit}^{commit}`).toString().trim(), commit);
+      git('merge-base', '--is-ancestor', commit, head);
+      const touched = git('diff-tree', '--no-commit-id', '--name-only', '-r', commit)
+        .toString()
+        .trim()
+        .split('\n');
+      assert(
+        touched.length && touched.every((file) => E2_BASE_FILES.includes(file)),
+        'Non-E2 product delta',
+      );
+      const patch = git(
+        'diff',
+        '--no-ext-diff',
+        '--no-textconv',
+        '--src-prefix=a/',
+        '--dst-prefix=b/',
+        `${commit}^`,
+        commit,
+        '--',
+        ...E2_BASE_FILES,
+      );
+      assert(patch.length > 0, 'Empty E2 product delta');
+      // Independent reconstruction: no helper output or caller-supplied base is used.
+      execFileSync('git', ['apply', '-R', '--check', '-'], { cwd: work, env, input: patch });
+      execFileSync('git', ['apply', '-R', '-'], { cwd: work, env, input: patch });
+    }
+    return {
+      head,
+      reverted: E2_BASE_COMMITS.map((commit) => commit.slice(0, 8)),
+      files: [...E2_BASE_FILES],
+      sha256: Object.fromEntries(
+        E2_BASE_FILES.map((file) => [
+          file.split('/').pop(),
+          batch3Digest(readFileSync(join(work, file))),
+        ]),
+      ),
+    };
+  } finally {
+    rmSync(work, { recursive: true, force: true });
+  }
+}
+function e2BasePinsValid(p) {
+  sha(p.sources[E2_BASE_TOOL]);
+  assert.equal(p.baseline?.head, p.identity.gitSha);
+  exact(
+    p.baseline.reverted,
+    E2_BASE_COMMITS.map((commit) => commit.slice(0, 8)),
+  );
+  exact(p.baseline.files, E2_BASE_FILES);
+  exact(Object.keys(p.baseline.sha256), ['corridor.js', 'editorial.css']);
+  for (const hash of Object.values(p.baseline.sha256)) sha(hash);
+}
+export function readBatch3Base(out, p) {
+  assert.equal(p.suite, 'hfix2e2');
+  e2BasePinsValid(p);
+  const dir = join(realpathSync(out), 'e2-base'),
+    stat = lstatSync(dir);
+  assert(
+    stat.isDirectory() && !stat.isSymbolicLink(),
+    'Managed E2 base must be a regular directory',
+  );
+  exact(readdirSync(dir).sort(), ['base.json', 'corridor.js', 'editorial.css']);
+  const metadataBytes = regular(dir, 'base.json'),
+    metadata = JSON.parse(metadataBytes);
+  exact(
+    metadata,
+    p.baseline,
+    'E2 base was not reconstructed from this artifact and the four owned commits',
+  );
+  const files = { 'e2-base/base.json': batch3Digest(metadataBytes) };
+  for (const name of ['corridor.js', 'editorial.css']) {
+    const digest = batch3Digest(regular(dir, name));
+    assert.equal(digest, p.baseline.sha256[name], `Foreign E2 baseline ${name}`);
+    files[`e2-base/${name}`] = digest;
+  }
+  return { dir, metadata, files };
+}
+
 const worlds = [
   'hokusai',
   'sumi',
@@ -87,7 +216,11 @@ export function batch3CanonicalEnvironment(env, suite, engine) {
   assert(['chromium', 'webkit'].includes(engine));
   const clean = { ...env };
   for (const key of Object.keys(clean))
-    if (/^(?:HFIX2E_|HFIX2E2_|KAIRO_HFIX2B_|SWEEP_)/u.test(key)) delete clean[key];
+    if (
+      /^(?:HFIX2E_|HFIX2E2_|KAIRO_HFIX2B_|SWEEP_)/u.test(key) ||
+      (suite === 'hfix2e2' && key.startsWith('GIT_'))
+    )
+      delete clean[key];
   return {
     ...clean,
     KAIRO_BROWSER: engine,
@@ -95,7 +228,6 @@ export function batch3CanonicalEnvironment(env, suite, engine) {
     HFIX2E2_MODE: 'branch',
     HFIX2E_CENTRE: '元気',
     HFIX2E_VIEWPORT: engine === 'webkit' ? 'phone' : 'desktop',
-    HFIX2E2_BASE_SHA: '1f790977',
     HFIX2E2_NAMI_VIEWPORT: 'phone',
   };
 }
@@ -146,20 +278,10 @@ export function loadBatch3Pins({ root, siteDir, suite, engine, runId }) {
     'prototypes/bunki-desktop/lib/artifact.cjs',
   ];
   if (['hfix2e-contrast', 'hfix2e2'].includes(suite)) seeds.push(shared, arrival);
+  if (suite === 'hfix2e2') seeds.push(E2_BASE_TOOL);
   seeds.push(...(BATCH3_DYNAMIC_SOURCES[suite] || []));
   const sources = sourceClosure(root, seeds);
-  // The accepted G61/Mac controls deliberately compare the build to these immutable baseline bytes.
-  const baseline =
-    suite === 'hfix2e2'
-      ? Object.fromEntries(
-          ['prototypes/corridor/corridor.js', 'prototypes/corridor/editorial.css'].map((file) => [
-            file,
-            batch3Digest(
-              execFileSync('git', ['show', `1f790977:${file}`], { cwd: root, maxBuffer: 1 << 29 }),
-            ),
-          ]),
-        )
-      : null;
+  const baseline = suite === 'hfix2e2' ? deriveE2Base(root, site, identity) : null;
   return { suite, engine, runId, siteDir: site, identity, sources, baseline };
 }
 function pinsValid(p) {
@@ -182,6 +304,7 @@ function pinsValid(p) {
     sha(p.sources[name]);
   for (const path of BATCH3_DYNAMIC_SOURCES[p.suite] || []) sha(p.sources[path]);
   for (const hash of Object.values(p.sources)) sha(hash);
+  if (p.suite === 'hfix2e2') e2BasePinsValid(p);
 }
 function base(v, p) {
   assert.equal(v.engine, p.engine);
@@ -568,7 +691,17 @@ function validateContrast(v, p, extra) {
 }
 function validateE2(v, p, extra) {
   base(v, p);
-  assert.equal(v.base, '1f790977');
+  exact(extra.baseline?.metadata, p.baseline, 'Missing independently verified E2 base');
+  nonempty(extra.baseline.dir);
+  exact(
+    v.base,
+    {
+      dir: extra.baseline.dir,
+      sha256: ['corridor.js', 'editorial.css'].map((name) => p.baseline.sha256[name]),
+      head: p.identity.gitSha,
+    },
+    'Native E2 report used a foreign or historical baseline',
+  );
   exact(v.only, []);
   exact(v.mutations, []);
   assert.equal(v.control, null);
@@ -750,6 +883,22 @@ export function readBatch3Evidence(out, p) {
       JSON.parse(regular(out, 'contrast-sweep.json')),
       extras.sweep,
       'Native diagnostic copies disagree',
+    );
+  }
+  if (p.suite === 'hfix2e2') {
+    extras.baseline = readBatch3Base(out, p);
+    Object.assign(files, extras.baseline.files);
+    const baseProcess = regular(out, 'base-process.json');
+    files['base-process.json'] = batch3Digest(baseProcess);
+    exact(
+      JSON.parse(baseProcess),
+      {
+        argv: [E2_BASE_TOOL, '--head', p.identity.gitSha, '--out', extras.baseline.dir],
+        status: 0,
+        signal: null,
+        error: null,
+      },
+      'E2 baseline builder did not finish successfully',
     );
   }
   const processBytes = regular(out, 'native-process.json');
