@@ -140,6 +140,14 @@ const DOWNSTREAM = {
     'every take ends with all tracks stopped', 'leaving the room stops every track'] },
   'tracks-kept': { S3: ['leaving the room stops every track'] },
   'late-opening-voice': { S17: ['a new scene while the old opening waits: the old line is never voiced, the new one is'] },
+  // INTFIX · pending-mic's one consequence row. Removing the `wanted()` guard does not only start
+  // a take while the page is hidden (the witness); it leaves that unwanted take and its live track
+  // behind, so the room cannot be returned to rest and the next tap does not listen. The case
+  // already tries to neutralise the leftover take before its second half, and under the mutant
+  // that cleanup does not hold — the room is genuinely broken by the same single defect. This is
+  // the same cascade `mic-on-entry` declares three rows of. Declaring it does not weaken the
+  // control: the witness row must still go red, and ANY other red still voids the kill.
+  'pending-mic': { S18: ['in view again, the next tap listens as before'] },
   'spend-unchecked': { S19: ['written at last, the owed cost counts: past the cap the next turn is refused'] },
   'notes-claim': { S20: ['trying again keeps them, once each'] },
   'no-his-pitch': { S23: ['a corrected line, shadowed from the look back after End: the same three things, against its whole reading',
