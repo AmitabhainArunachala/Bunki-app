@@ -3291,18 +3291,38 @@ window.addEventListener('storage', (e) => {
  * Patch values must be constructed off-side; mutating a live nested value
  * before this call would defeat the write-before-publish boundary. */
 async function commitStorePatch(patch, appendArchive = []) {
+  const result = await commitStorePatchOutcome(patch, appendArchive);
+  return result.outcome === 'published' && result.acknowledged;
+}
+
+/** A producer's way to refuse its own write without a store failure: thrown inside the producer, it rejects before any
+ * target write (record-app: a producer error rejects before a target write) and is reported as not published. */
+const PRODUCER_DECLINED = 'producer-declined';
+const declineWrite = (reason) => Object.assign(new Error(PRODUCER_DECLINED), { code: PRODUCER_DECLINED, reason });
+
+/** commitStorePatch with the save's publication outcome (HOOKS-SPEC §3.3), for callers that must not mistake a lost
+ * acknowledgment for a refusal: { outcome, acknowledged, reason? }.
+ *   'not-published' — refused before anything was applied: not allowed, not this window's record, the producer threw
+ *                     (or declined) before a target write, or the record was not active so the producer never ran;
+ *   'published'     — recordApp.write applied it (active, or recovery with a durable target commit); acknowledged only
+ *                     when this window still owns the record and the UI replay ran;
+ *   'uncertain'     — the write's own outcome is unknown (recovery without a durable target receipt).
+ * commitStorePatch is its boolean view: published and acknowledged, exactly as before. */
+async function commitStorePatchOutcome(patch, appendArchive = []) {
   // Private lookup can capture canonical entries, but cannot grade or rewrite learning evidence.
   const host = typeof personalHost === 'undefined' ? null : personalHost;
   const allowed = host?.captureAccess?.() || (() => !host || host.allowed());
-  if (!allowed() || (host && appendArchive.length)) return false;
+  if (!allowed() || (host && appendArchive.length)) return { outcome: 'not-published', acknowledged: false };
   const epoch = recordEpoch;
-  if (!recordWritable(epoch) || !recordApp) { safelySyncStoreAlert(); return false; }
+  if (!recordWritable(epoch) || !recordApp) { safelySyncStoreAlert(); return { outcome: 'not-published', acknowledged: false }; }
   // An older object-style caller may only replace roots it actually saw.
   // Producers are preferred: they compute from the latest queued authority.
   const baseline = publishedRecord;
+  let ran = false;
   try {
     const proposed = typeof patch === 'function' ? patch : JSON.parse(JSON.stringify(patch));
     const outcome = await recordApp.write((record, snapshot) => {
+      ran = true;
       if (!recordWritable(epoch)) throw new Error('record-owner-changed');
       if (!allowed()) throw new Error('personal-capture-not-allowed');
       if (typeof proposed !== 'function') for (const key of Object.keys(proposed)) {
@@ -3315,15 +3335,20 @@ async function commitStorePatch(patch, appendArchive = []) {
       return { patch: nextPatch,
         ...(appendArchive.length ? { appendArchive } : {}) };
     });
-    if (outcome.status !== 'active') { recordFailure(outcome.reason, true); return false; }
-    if (!recordWritable(epoch) || outcome.replayUiEffects !== true) return false;
+    if (outcome.status !== 'active') {
+      recordFailure(outcome.reason, true);
+      if (!ran) return { outcome: 'not-published', acknowledged: false, reason: outcome.reason };
+      return { outcome: outcome.targetCommitDurable === true ? 'published' : 'uncertain', acknowledged: false, reason: outcome.reason };
+    }
+    if (!recordWritable(epoch) || outcome.replayUiEffects !== true) return { outcome: 'published', acknowledged: false };
     S.storeError = null;
     S.storeFull = false;
     safelySyncStoreAlert();
-    return true;
+    return { outcome: 'published', acknowledged: true };
   } catch (error) {
+    if (error?.code === PRODUCER_DECLINED) return { outcome: 'not-published', acknowledged: false, reason: error.reason };
     if (error?.message !== 'personal-capture-not-allowed' || allowed()) recordFailure(error?.code || error?.message);
-    return false;
+    return { outcome: 'not-published', acknowledged: false };
   }
 }
 
@@ -29972,10 +29997,28 @@ function advanceReviewSession(rv, item, next, entry) {
   rv.sentenceInput = '';
   rv.sentenceStarted = null;
   rv.sentenceSourceError = '';
+  rv.answerRefusal = '';
   resetAssessmentQuestionReview(rv);
 }
 
-async function commitReviewAction(rv, item, produce, advance) {
+/** a card leaves the sitting without a grade (its word was answered on another surface since it was put on screen:
+ * it rests until tomorrow, and the close counts it); the next card asks its own question, as after a grade */
+function dropReviewCard(rv) {
+  rv.queue.splice(rv.ix, 1);
+  rv.revealed = false;
+  rv.declared = null;
+  rv.presented = null;
+  rv.early = false;
+  rv.moreOpen = false;
+  rv.sentenceAttemptId = null;
+  rv.sentenceInput = '';
+  rv.sentenceStarted = null;
+  rv.sentenceSourceError = '';
+  rv.answerRefusal = '';
+  resetAssessmentQuestionReview(rv);
+}
+
+async function commitReviewAction(rv, item, produce, advance, report = null) {
   if (!rv || rv.pending || S.review !== rv || rv.queue[rv.ix] !== item || !recordWritable()) return false;
   const epoch = recordEpoch;
   const ix = rv.ix;
@@ -29984,13 +30027,20 @@ async function commitReviewAction(rv, item, produce, advance) {
   let failure = null;
   try {
     if (S.view === 'review') render();
-    const saved = await commitStorePatch((latest, snapshot) => {
+    const producer = (latest, snapshot) => {
       if (S.review !== rv || rv.ix !== ix || rv.queue[ix] !== item || rv.pending !== pending) {
         throw new Error('Review changed before its save');
       }
       try { return produce(latest, snapshot); }
       catch (error) { failure = error; throw error; }
-    });
+    };
+    let saved;
+    if (report) {
+      // the publication outcome, for the shared answer admission: a lost acknowledgment is not a refusal (review hooks)
+      const result = await commitStorePatchOutcome(producer);
+      Object.assign(report, { outcome: result.outcome, reason: result.reason });
+      saved = result.outcome === 'published' && result.acknowledged;
+    } else saved = await commitStorePatch(producer);
     if (!saved && failure && item?.t === 'question' && S.review === rv) rv.questionError = assessmentQuestionError();
     if (!saved && failure && S.review === rv && rv.ix === ix && rv.queue[ix] === item &&
         item.t === 'sentence' && sentencePracticeModule.selectSentencePractice(S.sentencePractice, item.id)?.plan.kind === 'kanji-reading')
@@ -30018,9 +30068,50 @@ async function commitDrillGrade({ rv, item, next, key, skey, rating, mode, now }
     () => advanceReviewSession(rv, item, next, { key, drill: true }));
 }
 
-async function commitStandardGrade({ rv, item, key, skey, rating, now, day }) {
+/**
+ * The shared answer admission around a review grade (HOOKS-SPEC §3.6): every surface that grades a word takes the one
+ * Web Lock, samples `now` once it holds it, re-reads today's answered words at the commit, reserves the word's mark
+ * before the grade is published, and releases only a mark it inserted when the grade is confirmed not published. A
+ * kanji/sentence/question card takes no mark (it never rests). A word answered on another surface since its card was
+ * put on screen leaves the sitting (the close counts it); another refusal keeps the card with one plain line.
+ */
+async function admitStandardGrade({ rv, item, key, skey, rating }) {
+  if (!rv || rv.pending || rv.admitting || S.review !== rv || rv.queue[rv.ix] !== item || !rv.revealed) return false;
+  rv.admitting = true;
+  let refusal = null;
+  let admitted;
+  try {
+    admitted = await srsCore.admitAnswer({
+      locks: globalThis.navigator?.locks || null,
+      clock: () => new Date(),
+      storage: globalThis.localStorage,
+      where: 'corridor',
+      commit: async ({ now, answered, reserve }) => {
+        const report = {};
+        const graded = await commitStandardGrade({ rv, item, key, skey, rating, now, day: dayKey(now), answered, reserve, report,
+          refuse: (reason) => { refusal = reason; } });
+        return { outcome: report.outcome || 'not-published', graded };
+      },
+    });
+  } finally {
+    rv.admitting = false;
+  }
+  if (!admitted.admitted) refusal = admitted.reason;
+  else if (!admitted.graded && !refusal && (admitted.outcome === 'published' || admitted.outcome === 'uncertain')) refusal = 'publish-uncertain';
+  if (refusal && S.review === rv && rv.queue[rv.ix] === item) {
+    if (refusal === 'answered-elsewhere') dropReviewCard(rv);
+    else rv.answerRefusal = srsCore.refusalWords(refusal, bi() ? 'en' : 'ja') || '';
+    if (S.view === 'review') render();
+  }
+  return admitted.graded === true;
+}
+
+/** a review grade's save. Under the shared answer admission (admitStandardGrade) it also gets today's answered words,
+ * the reservation and a report of the save's outcome; called without them it grades exactly as before. */
+async function commitStandardGrade({ rv, item, key, skey, rating, now, day, answered = null, reserve = null, report = null, refuse = null }) {
   if (!rv.revealed) return false;
   if (!S.focus && rv.declared === 0) { rating = fsrsApi.Rating.Again; key = 'again'; }
+  const decline = (reason) => { refuse?.(reason); throw declineWrite(reason); };
   let committedNext;
   let entry;
   const questionGradeId = item.t === 'question' ? crypto.randomUUID() : null;
@@ -30058,6 +30149,9 @@ async function commitStandardGrade({ rv, item, key, skey, rating, now, day }) {
     // srs-core's gate: a card that is not due now (a learning step within the learn-ahead limit at most) is never
     // graded as a real review, whatever led here — a duplicate row, a second window, a practice lap, a list row
     if (prevRec !== undefined && !srsCore.servable(prevRec, now, { learnAhead: true })) throw new Error('Review card is not due');
+    // the commit-time re-check, by the sitting's own rule (srsDueItems): a word answered on another surface today rests,
+    // unless its card is in its learning steps
+    if (answered && item.t === 'word' && (!prevRec || prevRec.state === srsCore.REVIEW) && srsWordRests(item, answered)) decline('answered-elsewhere');
     const card = prevRec
       ? { ...prevRec, due: new Date(prevRec.due), ...(prevRec.last_review ? { last_review: new Date(prevRec.last_review) } : {}) }
       : fsrsApi.createEmptyCard(now);
@@ -30073,10 +30167,90 @@ async function commitStandardGrade({ rv, item, key, skey, rating, now, day }) {
     }
     dayStats.n = (dayStats.n || 0) + 1;
     if (key === 'again') dayStats.again = (dayStats.again || 0) + 1;
+    // today's answer is reserved before the grade is published (a word only; a home learning step already holds it)
+    if (reserve && !reserve(srsWordAnswerIdentity(item))) decline('mark-unavailable');
     return { srs, revlog, stats: { ...(latest.stats || {}), [day]: dayStats }, ...(sentenceRoot ? { sentencePractice: sentenceRoot } : {}),
       ...(questionRoot ? { assessmentQuestionPractice: questionRoot } : {}) };
-  }, () => advanceReviewSession(rv, item, committedNext, entry));
+  }, () => advanceReviewSession(rv, item, committedNext, entry), report);
 }
+
+/* ------------------------------------------------ review hooks (HOOKS-SPEC r7, W2 PASS 4fae8c1b)
+ * The only path from a world, quest, room, ride or course into the schedule (lead 0057). An attempt binds to an
+ * existing card derived from its item on the latest record, is decided by srs-core, reserves its word's mark and is
+ * published inside the shared answer admission, in this window, which owns the record. Evidence writing is OFF: a
+ * passive or refused call writes nothing. A hook's kanji attempt still takes the admission and this window's ownership,
+ * only without a mark; a deck 字 card is the deck's own path. */
+/** the record owner's facts about the card an item names, for srsCore.bindTarget */
+function hookCardFacts(latest, item, key) {
+  const colon = key.indexOf(':');
+  const t = key.slice(0, colon);
+  const id = key.slice(colon + 1);
+  if (!(latest.taken || []).some((row) => row.t === t && row.id === id) || latest.suspended?.[key]) return null;
+  if (item.kind !== 'word') return { enrolled: true, reading: null, sameEntry: true };
+  const reading = D.dict?.[id]?.r || savedAnswerFor({ t: 'word', id }, latest)?.reading || null;
+  // a task naming a dictionary entry must name the card's saved one; a task naming none takes the saved identity
+  const sameEntry = item.seq == null ? true
+    : sameWordIdentity(wordNodeIdentity({ t: 'word', id, seq: String(item.seq), reading: item.reading }, latest), wordCardIdentity(latest, id));
+  return { enrolled: true, reading, sameEntry };
+}
+/**
+ * One attempt from a hook surface. evidence: { kind, item, surface, tests, answer, revealed, answeredAt, help, card? }
+ * (HOOKS-SPEC §3.1). Returns { write: true, rating, from, capped } or { write: false, reason, line } — `line` is the
+ * plain refusal the surface shows while practice continues; null when the reason is an ordinary decision.
+ */
+async function reportHookAttempt(evidence) {
+  const lang = bi() ? 'en' : 'ja';
+  const refusedWith = (reason) => ({ write: false, reason, line: srsCore?.refusalWords(reason, lang) ?? null });
+  if (!srsCore || !scheduler) return refusedWith('no-shared-admission');
+  let decision = null;
+  const admitted = await srsCore.admitAnswer({
+    locks: globalThis.navigator?.locks || null,
+    storage: globalThis.localStorage,
+    where: evidence?.surface,
+    commit: async ({ now, answered, reserve }) => {
+      const saved = await commitStorePatchOutcome((latest) => {
+        const item = evidence?.item;
+        const key = srsCore.validItem(item) ? srsKey(item.kind, item.kind === 'word' ? item.term : item.literal) : null;
+        const named = evidence?.card ?? null;
+        const bound = srsCore.bindTarget(item, named, key ? hookCardFacts(latest, item, named ?? key) : null);
+        if (bound.refuse) {
+          decision = { write: false, reason: bound.refuse };
+          throw declineWrite(bound.refuse);
+        }
+        const stored = bound.eligible ? latest.srs[bound.key] : undefined;
+        const record = stored
+          ? { ...stored, due: new Date(stored.due), ...(stored.last_review ? { last_review: new Date(stored.last_review) } : {}) }
+          : null;
+        decision = srsCore.decideReview(evidence, record, { now, answered });
+        if (!decision.write) throw declineWrite(decision.reason);
+        if (!reserve(item.kind === 'word' ? srsCore.itemIdentity(item) : null)) {
+          decision = { write: false, reason: 'mark-unavailable' };
+          throw declineWrite('mark-unavailable');
+        }
+        const schedNow = srsSchedulerInstant(record, now);
+        const next = scheduler.repeat(record, schedNow)[decision.rating].card;
+        const day = dayKey(now);
+        const dayStats = { ...(latest.stats?.[day] || { n: 0, again: 0 }) };
+        dayStats.n = (dayStats.n || 0) + 1;
+        if (decision.rating === fsrsApi.Rating.Again) dayStats.again = (dayStats.again || 0) + 1;
+        return {
+          srs: { ...latest.srs, [bound.key]: srsStoredRecord(next) },
+          revlog: [...(latest.revlog || []), srsReviewLogRow(bound.key, record, next, decision.rating, now, schedNow)],
+          stats: { ...(latest.stats || {}), [day]: dayStats },
+        };
+      });
+      return { outcome: saved.outcome };
+    },
+  });
+  if (!admitted.admitted) return refusedWith(admitted.reason);
+  if (admitted.outcome === 'published') return decision;
+  if (admitted.outcome === 'uncertain') return refusedWith('publish-uncertain');
+  if (decision && !decision.write) return { ...decision, line: srsCore.refusalWords(decision.reason, lang) };
+  return refusedWith('publish-failed');
+}
+/* the hook surfaces' handle (the __KAIRO_* idiom): worlds, quests, rooms, rides and courses report attempts here and
+ * nowhere else; there is no second way into the schedule */
+window.__KAIRO_HOOKS__ = Object.freeze({ report: reportHookAttempt });
 
 /** Items ready to review: real reviews ordered most-overdue first, then
  * never-seen cards — capped a DAY (default 20, the learner's own number via
@@ -30115,10 +30289,10 @@ function srsWordRests(item, answered) {
   if (item.t !== 'word' || !srsCore) return false;
   return srsCore.buriedHere(answered, item.id, D.dict?.[item.id]?.r ?? null, 'corridor');
 }
-/** after a real grade of a saved word (never practice): the word was answered here today */
-function srsNoteAnswered(item, now) {
-  if (item.t !== 'word' || !srsCore) return false;
-  return srsCore.noteAnswered(globalThis.localStorage, srsCore.wordIdentity(item.id, D.dict?.[item.id]?.r), 'corridor', now);
+/** a saved word card's answered-today identity (its lemma and dictionary reading): what its grade reserves under the
+ * shared answer admission before it is published (never practice); null for kanji, sentence and question cards */
+function srsWordAnswerIdentity(item) {
+  return item.t === 'word' && srsCore ? srsCore.wordIdentity(item.id, D.dict?.[item.id]?.r) : null;
 }
 function srsDueItems(now = new Date()) {
   const reviews = [];
@@ -31128,7 +31302,6 @@ function renderReview(main) {
     b.addEventListener('click', async () => {
       if (rv.pending || S.review !== rv || rv.queue[rv.ix] !== item || !rv.revealed) return;
       const pressedNow = new Date();
-      const day = dayKey(pressedNow);
       const skey = srsKey(item.t, item.id);
       // T-06 forcing at the commit: after a check that must repeat, the
       // declaration names the grade — whatever was tapped, Again is what the
@@ -31150,17 +31323,15 @@ function renderReview(main) {
           });
         return;
       }
-      const graded = await commitStandardGrade({
+      // a saved word answered here today: its cards in the decks rest until tomorrow (burying across surfaces); the
+      // shared answer admission reserves that mark before the grade is published (HOOKS-SPEC §3.6)
+      await admitStandardGrade({
           rv,
           item,
           key: effKey,
           skey,
           rating: fsrsApi.Rating[effRating],
-          now: pressedNow,
-          day,
         });
-      // a saved word answered here today: its cards in the decks rest until tomorrow (burying across surfaces)
-      if (graded) srsNoteAnswered(item, pressedNow);
     });
     row.append(b);
   }
@@ -31176,6 +31347,12 @@ function renderReview(main) {
     reload.addEventListener('click', () => { if (preserveVisibleDrafts()) location.reload(); });
     why.append(reload);
     main.append(why);
+  }
+  // a refused grade says so in one plain line, and the card stays for practice (HOOKS-SPEC §3.6, lead 0128)
+  if (rv.answerRefusal) {
+    const note = el('p', 'teacher-note review-refusal', rv.answerRefusal);
+    note.setAttribute('role', 'status');
+    main.append(note);
   }
   main.append(row);
   // rest · undo · the full entry live behind the … mark — the zen glass

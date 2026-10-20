@@ -7,7 +7,7 @@
  * The page follows the backs of Core / Yomitan cards (the whole reading in
  * furigana), an MCD front (one gap in the sentence), and the corridor seals.
  */
-import { basicTsv, buriedToday, buriedWords, closeLines, counts, createScheduler, emptyState, grade, LEARN_AHEAD_MS, nextStep, normalizeState, noteAnsweredCard, paragraphOf, pauseWords, preview, servable, sittingTally, studyQueue, validateDeck, waitWords, RATINGS, codePoints } from './engine.js';
+import { admitContextGrade, basicTsv, buriedToday, buriedWords, closeLines, counts, createScheduler, emptyState, grade, LEARN_AHEAD_MS, nextStep, normalizeState, paragraphOf, pauseWords, preview, refusalWords, servable, sittingTally, studyQueue, validateDeck, waitWords, RATINGS, codePoints } from './engine.js';
 
 const deck = await fetch(new URL('./deck.json', import.meta.url)).then((response) => {
   if (!response.ok) throw new Error('context deck could not be read');
@@ -268,6 +268,7 @@ function sheet(card, revealed, missed, remaining) {
 
 function showAnswer(host, opts, state, missed) {
   ui.phase = 'answer';
+  ui.refusal = '';
   ui.missed = missed;
   paint(host, opts, state);
 }
@@ -275,30 +276,52 @@ function showAnswer(host, opts, state, missed) {
 /**
  * One answer, fresh-read-then-write: graded on the ledger as it is stored now (another window's grades are kept), and
  * only if the card is still the one put on screen and may be answered now (srs-core's gate); otherwise nothing is
- * graded and the sitting moves on. A full storage keeps the card on screen.
+ * graded and the sitting moves on. It runs under the shared answer admission (one Web Lock; today's answered words read
+ * again; the word's mark reserved before the save): a word answered on another surface since the card was shown leaves
+ * the sitting, and a refused grade keeps the card on screen with one plain line — practice continues.
  */
-function commit(host, opts, state, rating) {
+async function commit(host, opts, state, rating) {
   const card = ui.queue[ui.index];
-  const now = new Date();
-  const fresh = loadState(opts.storage);
-  const stored = fresh.cards[card.id] ?? null;
-  ui.phase = 'declare';
-  ui.missed = false;
-  if (JSON.stringify(stored) !== ui.shown || !servable(stored, now, { learnAhead: true })) {
+  if (!card || ui.committing) return;
+  ui.committing = true;
+  let graded;
+  try {
+    graded = await admitContextGrade({
+      locks: globalThis.navigator?.locks || null,
+      storage: opts.storage,
+      card,
+      load: () => loadState(opts.storage),
+      save: (next) => saveState(opts.storage, next),
+      change: (fresh, now) => {
+        const stored = fresh.cards[card.id] ?? null;
+        if (JSON.stringify(stored) !== ui.shown || !servable(stored, now, { learnAhead: true })) return null;
+        return grade(fsrsApi, opts.scheduler || scheduler, fresh, card.id, rating, now);
+      },
+    });
+  } finally {
+    ui.committing = false;
+  }
+  if (ui.queue[ui.index] !== card) return;
+  const { result, fresh, next, now } = graded;
+  if (result === 'refused' || result === 'answered-elsewhere') {
+    ui.phase = 'declare';
+    ui.missed = false;
+    ui.refusal = '';
     ui.queue.splice(ui.index, 1);
     settle(fresh, now);
     paint(host, opts, fresh);
     return;
   }
-  const next = grade(fsrsApi, opts.scheduler || scheduler, fresh, card.id, rating, now);
-  if (!saveState(opts.storage, next)) {
+  if (result !== 'graded') {
     ui.phase = 'answer';
-    paint(host, opts, fresh);
+    ui.refusal = refusalWords(result === 'failed' ? 'publish-failed' : result, english ? 'en' : 'ja') || '';
+    paint(host, opts, fresh || state);
     return;
   }
-  ui.log.push({ word: card.id, before: stored?.state ?? null, rating, early: ui.early });
-  // the word was answered here today: its cards on the other surfaces rest until tomorrow
-  noteAnsweredCard(opts.storage, card, now);
+  ui.phase = 'declare';
+  ui.missed = false;
+  ui.refusal = '';
+  ui.log.push({ word: card.id, before: fresh.cards[card.id]?.state ?? null, rating, early: ui.early });
   ui.index += 1;
   settle(next, now);
   paint(host, opts, next);
@@ -481,6 +504,12 @@ function paintCard(room, opts, state, look) {
   // a card in its learning steps says so, and one shown early says that it is early and why (lead's ruling 10-19)
   const stored = state.cards[card.id];
   if (ui.early || isStep(stored)) page.column.append(h('p', 'cd-step', ui.early ? t('学習中 · 少し早め（ほかに札がないため）', 'Learning · a few minutes early (nothing else left)') : t('学習中', 'Learning')));
+  // a refused grade says so in one plain line; the card stays for practice (HOOKS-SPEC §3.6, lead 0128)
+  if (ui.refusal) {
+    const note = h('p', 'cd-refusal', ui.refusal);
+    note.setAttribute('role', 'status');
+    room.append(note);
+  }
   const grades = h('div', 'cd-dock cd-grades');
   // each seal names the wait its answer schedules, now (the scheduler's own preview)
   const pv = preview(fsrsApi, opts.scheduler || scheduler, state, card.id, new Date());

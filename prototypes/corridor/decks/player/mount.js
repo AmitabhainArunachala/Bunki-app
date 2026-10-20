@@ -16,6 +16,7 @@
  */
 import {
   RATINGS,
+  admitDeckGrade,
   buildQueue,
   buriedToday,
   buriedWords,
@@ -34,9 +35,9 @@ import {
   logLookup,
   nextStep,
   normalizeState,
-  noteAnsweredWord,
   pauseWords,
   preview,
+  refusalWords,
   repairCard,
   restoreSuspended,
   servable,
@@ -565,6 +566,8 @@ const UI_EN = {
   "裏：ふりがな付きの全文、読み、品詞、日本語の説明と使い方。英語の意味とその文の英訳はタップで開く。": "The back shows the passage with readings, the target’s reading, part of speech, Japanese definition and usage. Open folds for English meaning and the target sentence’s translation.",
   "文章はすべて書き下ろし。自然さ・事実・レベルを、書き手とは別のモデルが一枚ずつ確かめています。級は公開リストによる目安です。": "Every passage is original. A model separate from its author checks naturalness, facts and level for each card. Level labels are estimates from public lists."
 };
+// a refused grade's one plain line (the shared answer admission, HOOKS-SPEC §3.6): the same wording on every surface
+for (const reason of ['no-shared-admission', 'mark-unavailable']) UI_EN[refusalWords(reason, 'ja')] = refusalWords(reason, 'en');
 const t = (ja, en = UI_EN[ja]) => ctx?.english !== false ? (en ?? ja) : ja;
 
 /* ------------------------------------------------------------- helpers */
@@ -2930,19 +2933,38 @@ function retireRule() {
   if (storePrefs(prefs)) ctx.prefs = prefs;
 }
 
-function commit(rating, { stay = false } = {}) {
+async function commit(rating, { stay = false } = {}) {
   const id = ui.queue[ui.pos];
-  if (!id) return;
-  const now = new Date();
+  if (!id || ui.committing) return;
   const sitting = sittingNow();
-  // graded on the ledger as it is now, and only if the card is still the one put on screen and may be answered now
-  // (srs-core's gate): a card another window has answered, or one a stale queue still held, is never graded early
-  const r = writeLedger((fresh) => {
-    const stored = fresh.cards[id] ?? null;
-    if (isSuspended(fresh, id) || JSON.stringify(stored) !== ui.shown || !servable(stored, now, { learnAhead: true })) return null;
-    return grade(fsrsApi, ctx.scheduler, fresh, id, rating, now);
-  });
-  if (r.refused) {
+  const indexed = ctx.index.cards.get(id);
+  ui.committing = true;
+  let graded;
+  try {
+    // graded on the ledger as it is now, and only if the card is still the one put on screen and may be answered now
+    // (srs-core's gate): a card another window has answered, or one a stale queue still held, is never graded early.
+    // A word card's grade runs under the shared answer admission (one Web Lock, a re-check of today's answered words,
+    // its mark reserved before the write); a 字 card's does not (it never rests)
+    graded = await admitDeckGrade({
+      locks: globalThis.navigator?.locks || null,
+      storage: ctx.storage,
+      deckId: ctx.deck.id,
+      id,
+      word: indexed?.word,
+      card: indexed?.card,
+      write: writeLedger,
+      change: (fresh, now) => {
+        const stored = fresh.cards[id] ?? null;
+        if (isSuspended(fresh, id) || JSON.stringify(stored) !== ui.shown || !servable(stored, now, { learnAhead: true })) return null;
+        return grade(fsrsApi, ctx.scheduler, fresh, id, rating, now);
+      },
+    });
+  } finally {
+    ui.committing = false;
+  }
+  if (ui.queue[ui.pos] !== id) return;
+  const { result, r } = graded;
+  if (result === 'refused' || result === 'answered-elsewhere') {
     dropFromQueue(id);
     settle();
     resetCard();
@@ -2950,7 +2972,17 @@ function commit(rating, { stay = false } = {}) {
     paintResponse({ front: true });
     return;
   }
-  if (r.failed) {
+  if (result === 'no-shared-admission' || result === 'mark-unavailable') {
+    // practice continues: the card stays, and one plain line says the answer did not change its schedule
+    if (cardMode() === 'choice') {
+      ui.revealed = false;
+      ui.picked = null;
+    }
+    ui.toast = refusalWords(result, 'ja');
+    paint();
+    return;
+  }
+  if (result === 'failed') {
     // not stored: the same card stays, ready to answer again
     if (cardMode() === 'choice') {
       ui.revealed = false;
@@ -2960,15 +2992,12 @@ function commit(rating, { stay = false } = {}) {
     return;
   }
   askToKeepStorage();
-  // the word was answered here today: its cards on the other surfaces rest until tomorrow
-  const indexed = ctx.index.cards.get(id);
-  noteAnsweredWord(ctx.storage, ctx.deck.id, indexed?.word, indexed?.card, now);
   if (cardMode() !== 'choice') retireRule();
   ui.toast = '';
   ui.undo = { change: changeOf(r.before, r.state), sitting };
   ui.done++;
   if (rating >= RATINGS.hard) ui.right++;
-  const answered = ctx.index.cards.get(id)?.word;
+  const answered = indexed?.word;
   // the close counts these: the word, where the card was in its schedule before this answer, and whether it came early
   if (answered) ui.log.push({ term: answered.term, ok: rating >= RATINGS.hard, word: answered.id, before: r.before.cards[id]?.state ?? null, rating, early: ui.early });
   if (stay) {
