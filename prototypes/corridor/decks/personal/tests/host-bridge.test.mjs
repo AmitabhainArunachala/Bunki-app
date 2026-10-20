@@ -331,7 +331,7 @@ test('stamped service worker returns an uncached 503 for missing offline content
   // Derive a valid small installed generation from the actual worker's boot
   // contract. Its identity and stamped worker are validated unchanged at fetch.
   vm.runInContext(source,context);
-  const required = vm.runInContext('[...new Set([...SHELL,...BOOT_DATA,...GUIDED_ROOM].filter(path => path !== "."))]',context);
+  const required = vm.runInContext('[...new Set([...SHELL,...BOOT_DATA,...GUIDED_ROOM,...SPEAK_ROOM].filter(path => path !== "."))]',context);
   const files = new Map(required.map(path => [path,Buffer.from('fixture')]));
   const core = 'data/share_alike/dict.json', shard = 'data/share_alike/dict-v2/index.json';
   files.set(core,Buffer.from(JSON.stringify({words:{'本':{r:'ほん',m:['book']}}})));
