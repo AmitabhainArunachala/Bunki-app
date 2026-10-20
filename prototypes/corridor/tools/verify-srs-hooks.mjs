@@ -557,6 +557,7 @@ async function glueSuite(core, engines, corridorProgram) {
     return layer.corridorSandbox(corridorProgram, { core, fsrsApi, pin, record: corridorRecord(), dict: { 組織: { r: 'そしき', m: ['organization'] } }, clock: () => dueNow, ...opts });
   };
   const hookEvidence = (extra = {}) => ({ kind: 'attempt', item: { kind: 'word', term: '組織', reading: 'そしき' }, surface: 'quest:q1', tests: 'reading', revealed: true, answer: { rating: 3 }, ...extra });
+  const reviewLine = (box) => box.S.review?.answerRefusal;
   const reviewRun = (box) => {
     const item = { t: 'word', id: '組織' };
     const rv = { queue: [item], ix: 0, revealed: true, history: [], done: { again: 0, hard: 0, good: 0, easy: 0 }, pending: null, declared: null };
@@ -798,6 +799,36 @@ async function glueSuite(core, engines, corridorProgram) {
     }
     return 'midnight while the review grade or the hook waits for the lock: the day is sampled inside the admission on the actual corridor path (the mark and the day’s count are the new day’s)';
   });
+  await check('C9', 4, async () => {
+    // W3 slice5-independent (owner-wait): the record is replaced by another owner while the attempt waits for the lock
+    for (const side of ['review', 'hook']) {
+      for (const replaced of [false, true]) {
+        const box = corridorBox();
+        const release = box.locks.hold();
+        const pending = side === 'review' ? reviewRun(box).grade() : box.lifted.reportHookAttempt(hookEvidence());
+        pending.catch(() => {}); // awaited below; on a red tree its rejection must not escape
+        if (replaced) {
+          box.box.record = corridorRecord(); // owner B's record, adopted while the attempt waits
+          box.sandbox.recordEpoch = 2;
+        }
+        release();
+        const r = await pending;
+        const graded = side === 'review' ? r === true : r.write === true;
+        if (!replaced) {
+          assert.equal(graded, true, `${side}: the same owner grades`);
+          assert.equal(box.box.writes, 1);
+          continue;
+        }
+        assert.equal(graded, false, `${side}: a stale owner's queued attempt is refused (got ${JSON.stringify(r)})`);
+        assert.equal(box.box.writes, 0, `${side}: nothing is published into the adopted record`);
+        assert.equal((box.box.record.revlog || []).length, 0);
+        assert.ok(!String(box.storage.getItem(KEY)).includes(side === 'review' ? 'corridor' : 'quest:q1'), `${side}: no answered mark is left`);
+        if (side === 'hook') assert.equal(r.reason, 'publish-failed');
+        else assert.ok(reviewLine(box)?.length > 20, 'the review keeps the card with a plain line');
+      }
+    }
+    return 'the record replaced by another owner while the review grade or the hook waits for the lock: nothing is published into the adopted record and no mark is left; the same owner grades (W3 owner-wait)';
+  });
   return cases;
 }
 
@@ -863,12 +894,15 @@ const CORRIDOR_MUTANTS = {
   'review-no-recheck': [["    if (answered && item.t === 'word' && (!prevRec || prevRec.state === srsCore.REVIEW) && srsWordRests(item, answered)) decline('answered-elsewhere');\n", '']],
   'review-unlocked': [["      locks: globalThis.navigator?.locks || null,\n      clock: () => new Date(),\n      storage: globalThis.localStorage,\n      where: 'corridor',", "      locks: { request: (name, run) => run() },\n      clock: () => new Date(),\n      storage: globalThis.localStorage,\n      where: 'corridor',"]],
   'review-stale-clock': [["      clock: () => new Date(),\n      storage: globalThis.localStorage,\n      where: 'corridor',", "      clock: ((sampled) => () => sampled)(new Date()),\n      storage: globalThis.localStorage,\n      where: 'corridor',"]],
+  'hook-owner-unpinned': [["      if (!recordWritable(epoch)) return { outcome: 'not-published' };\n", '']],
+  'review-owner-unpinned': [["        if (!recordWritable(epoch)) { refusal = 'publish-failed'; return { outcome: 'not-published', graded: false }; }\n", '']],
   'hook-stale-clock': [["    clock: () => new Date(),\n    storage: globalThis.localStorage,\n    where: evidence?.surface,", "    clock: ((sampled) => () => sampled)(new Date()),\n    storage: globalThis.localStorage,\n    where: evidence?.surface,"]],
 };
 const EXPECT = {
   'deck-no-recheck': ['E2'], 'deck-no-reservation': ['E1'], 'deck-kanji-locked': ['E3'], 'context-no-recheck': ['E6'], 'context-no-reservation': ['E6'],
   'corridor-no-reservation': ['C2'], 'corridor-false-ack': ['C1', 'C3'], 'corridor-durable-unknown': ['C1', 'C3'], 'corridor-declined-alerts': ['C1'],
   'review-no-recheck': ['C6'], 'review-unlocked': ['C6'], 'review-stale-clock': ['C8'], 'hook-stale-clock': ['C8'],
+  'hook-owner-unpinned': ['C9'], 'review-owner-unpinned': ['C9'],
   'grade-passive': ['P1'], 'trust-target': ['P14'], 'open-surface': ['P13'], 'ignore-help': ['P3', 'P4'], 'late-help-counts': ['P4'],
   'facet-optional': ['P13'], 'loose-time': ['P13'], 'trust-tap': ['P6'], 'reveal-is-recall': ['P6'], 'no-day-cap': ['P7', 'P8'],
   'stale-commit': ['P15'], 'no-shared-boundary': ['P15'], 'unlocked-fallback': ['P16', 'P20'], 'release-any': ['P17'],

@@ -30078,6 +30078,8 @@ async function commitDrillGrade({ rv, item, next, key, skey, rating, mode, now }
 async function admitStandardGrade({ rv, item, key, skey, rating }) {
   if (!rv || rv.pending || rv.admitting || S.review !== rv || rv.queue[rv.ix] !== item || !rv.revealed) return false;
   rv.admitting = true;
+  // the record this page owned when the grade was given: one adopted while the grade waited for the lock never takes it
+  const epoch = recordEpoch;
   let refusal = null;
   let admitted;
   try {
@@ -30087,6 +30089,7 @@ async function admitStandardGrade({ rv, item, key, skey, rating }) {
       storage: globalThis.localStorage,
       where: 'corridor',
       commit: async ({ now, answered, reserve }) => {
+        if (!recordWritable(epoch)) { refusal = 'publish-failed'; return { outcome: 'not-published', graded: false }; }
         const report = {};
         const graded = await commitStandardGrade({ rv, item, key, skey, rating, now, day: dayKey(now), answered, reserve, report,
           refuse: (reason) => { refusal = reason; } });
@@ -30202,6 +30205,8 @@ async function reportHookAttempt(evidence) {
   const lang = bi() ? 'en' : 'ja';
   const refusedWith = (reason) => ({ write: false, reason, line: srsCore?.refusalWords(reason, lang) ?? null });
   if (!srsCore || !scheduler) return refusedWith('no-shared-admission');
+  // the record this page owned when the attempt was made: one adopted while the attempt waited for the lock never takes it
+  const epoch = recordEpoch;
   let decision = null;
   const admitted = await srsCore.admitAnswer({
     locks: globalThis.navigator?.locks || null,
@@ -30209,6 +30214,7 @@ async function reportHookAttempt(evidence) {
     storage: globalThis.localStorage,
     where: evidence?.surface,
     commit: async ({ now, answered, reserve }) => {
+      if (!recordWritable(epoch)) return { outcome: 'not-published' };
       const saved = await commitStorePatchOutcome((latest) => {
         const item = evidence?.item;
         const key = srsCore.validItem(item) ? srsKey(item.kind, item.kind === 'word' ? item.term : item.literal) : null;
