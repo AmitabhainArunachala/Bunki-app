@@ -28309,21 +28309,37 @@ function sheetActionVisitHolds(visit) {
   return !!visit && S.stack.length > 0 && !S.strokes && visit.view === S.view && visit.passageId === S.passageId &&
     visit.stack === S.stack && visit.path.length === S.stack.length && visit.path.every((node, index) => node === S.stack[index]);
 }
+/** The line a door shows now: the standing visit's, or none (a page built ahead, a visit that has ended). */
+function sheetActionLine(key) {
+  return (sheetActionVisitHolds(sheetActionVisit) && sheetActionLines.get(sheetActionVisit)?.get(key)) || '';
+}
 function drawSheetActionLine(note, key) {
   sheetActionLineKeys.set(note, key);
-  note.textContent = (sheetActionVisitHolds(sheetActionVisit) && sheetActionLines.get(sheetActionVisit)?.get(key)) || '';
+  note.textContent = sheetActionLine(key);
 }
-/** The line writer for one press of a door's action: its own node as before, the press's visit, and the door now drawn. */
+/** A page as it is mounted shows its doors' lines as the standing visit holds them. Back mounts again the very page a
+ * deeper one covered (keptPages), nodes and all: the line its old visit said ended with that visit. */
+function reconcileSheetActionLines(sheet) {
+  for (const note of sheet.querySelectorAll('.teacher-note')) {
+    const key = sheetActionLineKeys.get(note);
+    if (key === undefined) continue;
+    const line = sheetActionLine(key);
+    if (note.textContent !== line) note.textContent = line;
+  }
+}
+/** The line writer for one press of a door's action. It speaks only while the press's visit stands: into the door as it
+ * is drawn now (its own node, or the one a redraw put in its place) and into the visit's line every later drawing reads.
+ * A visit that has ended writes nothing, not even into its own node, which Back may mount again. A press made outside
+ * any page visit keeps its node's line, as before. */
 function sheetActionLineWriter(button, key, own) {
   const visit = button.isConnected && button.closest('#sheet') ? syncSheetActionVisit() : null;
   return (text) => {
-    own.textContent = text;
-    if (!visit) return;
+    if (!visit) { own.textContent = text; return; }
+    if (sheetActionVisit !== visit || !sheetActionVisitHolds(visit)) return;
     if (!sheetActionLines.has(visit)) sheetActionLines.set(visit, new Map());
     sheetActionLines.get(visit).set(key, text);
-    if (sheetActionVisit !== visit || !sheetActionVisitHolds(visit)) return;
     for (const note of document.querySelectorAll('#sheet .teacher-note')) {
-      if (note !== own && sheetActionLineKeys.get(note) === key && note.textContent !== text) note.textContent = text;
+      if (sheetActionLineKeys.get(note) === key && note.textContent !== text) note.textContent = text;
     }
   };
 }
@@ -39058,6 +39074,8 @@ function mountPageEffects(sheet, node) {
   if (thread) revealMountedScaleCurrent(thread);
   activatePendingLookupReadings(sheet);
   adoptSaveMenuOwner();
+  // FULL-R1 · and its doors' lines, against the visit standing now (reconcileSheetActionLines)
+  reconcileSheetActionLines(sheet);
   // reading position survives the doors: Back hands a ~2,700px entry its place, never its top (P1, review)
   const savedSheetScroll = node.sheetScroll || 0;
   if (savedSheetScroll) requestAnimationFrame(() => {
