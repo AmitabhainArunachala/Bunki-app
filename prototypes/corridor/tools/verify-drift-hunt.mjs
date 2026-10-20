@@ -694,7 +694,14 @@ for (let attempt = 1; attempt <= 3; attempt++) {
   // Reset observations, take p0 and aim in one synchronous evaluation. No
   // page read, screenshot or wait belongs between this snapshot and native
   // touchStart: the selected body continues orbiting after we return.
-  const snapshot = await page.evaluate(`(() => {
+  //
+  // INTFIX · the aim is taken repeatedly until one lands. Whether an orbiter owns its own centre
+  // is a property of THIS FRAME of a field that never stops drifting, and after the dive has
+  // receded the field only a handful of orbiters are touchable at all, so a single look decided
+  // the whole row on a coin-flip. Each look is a complete, self-contained snapshot; the one that
+  // finds an owner is the one that arms the listener and whose coordinates are touched, with no
+  // read or wait between it and touchStart. A wait only ever happens BEFORE a fresh look.
+  const takeAim = () => page.evaluate(`(() => {
     window.__driftHuntPointerDowns.length = 0;
     window.__driftHuntOwnerHit = null;
     const p0 = ${fieldPos};
@@ -702,14 +709,49 @@ for (let attempt = 1; attempt <= 3; attempt++) {
     const cr = card ? card.getBoundingClientRect() : null;
     const words = [...document.querySelectorAll('#drift-layer .word')];
     // Keep the highest/leftmost hit-owned orbiter at least 20px clear of the shared stage, on any side.
-    const orb = words.map((el) => {
+    //
+    // INTFIX · a finger aims at a word, not at its mathematical centre. The shared stage opens
+    // over a dive that has receded the field, so only a handful of orbiters are still touchable,
+    // and those few drift: measured on 2a1e6aef at 390x844, two of four cleared the card and the
+    // centre point of one of them was covered by a NEIGHBOUR's always-on reading <rt>, which is
+    // ordinary overlap in a drifting field. Testing the centre alone therefore found an owner
+    // only sometimes, and when it found none this staging broke out with no retry — the gate's
+    // "card=true orbiter=false". Each candidate is now probed where a finger would land: its own
+    // .base glyph first, then the element centre, then two points inside that glyph. The first
+    // candidate that owns one of its own points is taken.
+    //
+    // Nothing is widened. The geometric filters (opacity, the 110..560 band, 20px clear of the
+    // stage on some side) are unchanged, every probe point lies inside the word's own box, and
+    // delivery is still proved against the exact node by hit.sameNode below. If no candidate
+    // owns any of its own points the staging still fails, so a product regression that makes
+    // orbiters untouchable stays red.
+    const owns = (el, x, y) => x >= 0 && y >= 0 && x <= innerWidth && y <= innerHeight &&
+      el.contains(document.elementFromPoint(x, y));
+    // Points inside the word's own glyph, used only as a fallback. A single owned sliver is not
+    // enough: the field drifts between this snapshot and the native touch, so a word whose
+    // centre belongs to a neighbour is a word the finger will miss. A fallback candidate must
+    // own its glyph centre AND both flanks before it is trusted.
+    const glyphHold = (el) => {
+      const glyph = el.querySelector('.base');
+      const g = glyph ? glyph.getBoundingClientRect() : null;
+      if (!g || !g.width || !g.height) return null;
+      const y = g.top + g.height / 2;
+      const mid = g.left + g.width / 2;
+      if (!owns(el, mid, y) || !owns(el, g.left + g.width * 0.3, y) || !owns(el, g.left + g.width * 0.7, y)) return null;
+      return { x: mid, y };
+    };
+    const candidates = words.map((el) => {
       const r = el.getBoundingClientRect();
       return { el, r, x: r.left + r.width / 2, y: r.top + r.height / 2 };
     }).filter((o) => o.r.width && !o.el.classList.contains('center') &&
       parseFloat(o.el.style.opacity || '1') > 0.4 && o.r.top > 110 && o.r.bottom < 560 &&
-      (!cr || o.r.bottom < cr.top - 20 || o.r.top > cr.bottom + 20 || o.r.right < cr.left - 20 || o.r.left > cr.right + 20) &&
-      o.el.contains(document.elementFromPoint(o.x, o.y)))
-      .sort((a, b) => (a.y + a.x) - (b.y + b.x))[0];
+      (!cr || o.r.bottom < cr.top - 20 || o.r.top > cr.bottom + 20 || o.r.right < cr.left - 20 || o.r.left > cr.right + 20))
+      .sort((a, b) => (a.y + a.x) - (b.y + b.x));
+    // Unchanged first choice: the highest/leftmost orbiter that owns its own centre. Only when
+    // no orbiter owns its centre — the state that broke this staging — does the glyph fallback
+    // run, so a run that used to stage still stages exactly the same word.
+    const orb = candidates.find((o) => owns(o.el, o.x, o.y))
+      || candidates.reduce((found, o) => found || (() => { const h = glyphHold(o.el); return h ? { ...o, x: h.x, y: h.y } : null; })(), null);
     const corner = cr ? { x: cr.right - 26, y: cr.top + 20 } : null;
     const stage = {
       card: corner ? { ...corner, hit: card.contains(document.elementFromPoint(corner.x, corner.y)) } : null,
@@ -735,6 +777,12 @@ for (let attempt = 1; attempt <= 3; attempt++) {
     }
     return { stage, p0, aimedAt: performance.now() };
   })()`);
+  let snapshot = null;
+  for (let look = 1; look <= 10; look += 1) {
+    snapshot = await takeAim();
+    if (snapshot.stage.card?.hit && snapshot.stage.orb) break;
+    if (look < 10) await page.waitForTimeout(320);
+  }
   stage = snapshot.stage;
   p0 = snapshot.p0;
   staging.snapshot = snapshot;
