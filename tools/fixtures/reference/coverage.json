@@ -93,7 +93,7 @@
         },
         "words": {
           "path": "prototypes/corridor/data/share_alike/words.json",
-          "sha256": "69d73f9289c0f9d869173988be2d90cc178f9e908a465b79c5098f03c9992d00"
+          "sha256": "4606aaa9da2b84fb7d49fe5023cd1d4d1cda6097287994717ac3522321914ac5"
         },
         "kanji": {
           "path": "prototypes/corridor/data/share_alike/kanji.json",
@@ -117,7 +117,7 @@
         },
         "wbig": {
           "path": "prototypes/drift/data/wbig.json",
-          "sha256": "4fff148b3b7e97af994b8110fe8d060a641aafe3ff7dd6affc2acc4ae59389c5"
+          "sha256": "cd21316538833aa2f3623be889bc0bc75d30da7ea27af9f2cc6d5c22fda6a277"
         },
         "driftWords": {
           "path": "apps/app/src/data/generated/drift-words.json",
