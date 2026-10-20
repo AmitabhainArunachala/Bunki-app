@@ -434,6 +434,7 @@ function suite(core, glue = {}) {
       const clock = () => new Date(t);
       const d1 = deck(locks, dk, 'n2:組織', WORD, 3, new Date(midnight + 50));
       const w1 = hook(locks, world, attempt('quest:q1', { answer: { rating: 3 } }), clock);
+      w1.catch(() => {}); // awaited below; on a red tree its rejection must not escape
       t = midnight + 50;
       assert.equal(await d1, 'graded');
       assert.deepEqual(await w1, no('answered-today'));
@@ -551,7 +552,10 @@ async function glueSuite(core, engines, corridorProgram) {
   const deckGrade = (locks, storage, host, { id = 'c1', word = WORD, card = { type: 'cloze' }, rating = 3, clock = () => dueNow } = {}) =>
     engines.deck.admitDeckGrade({ locks, storage, deckId: 'n2', id, word, card, write: host.write, change: host.change(id, rating), clock });
   const corridorRecord = () => ({ taken: [{ t: 'word', id: '組織', started: 1 }], srs: { 'word:組織': stored(CARD) }, revlog: [], stats: {}, suspended: {}, deepWords: {} });
-  const corridorBox = (opts = {}) => layer.corridorSandbox(corridorProgram, { core, fsrsApi, pin, record: corridorRecord(), dict: { 組織: { r: 'そしき', m: ['organization'] } }, clock: () => dueNow, ...opts });
+  const corridorBox = (opts = {}) => {
+    if (corridorProgram instanceof Error) throw corridorProgram;
+    return layer.corridorSandbox(corridorProgram, { core, fsrsApi, pin, record: corridorRecord(), dict: { 組織: { r: 'そしき', m: ['organization'] } }, clock: () => dueNow, ...opts });
+  };
   const hookEvidence = (extra = {}) => ({ kind: 'attempt', item: { kind: 'word', term: '組織', reading: 'そしき' }, surface: 'quest:q1', tests: 'reading', revealed: true, answer: { rating: 3 }, ...extra });
   const reviewRun = (box) => {
     const item = { t: 'word', id: '組織' };
@@ -752,6 +756,7 @@ async function glueSuite(core, engines, corridorProgram) {
     const run5 = reviewRun(b5);
     const release = b5.locks.hold();
     const first = run5.grade();
+    first.catch(() => {}); // awaited below; on a red tree its rejection must not escape
     assert.equal(await run5.grade(), false, 'a second tap while waiting for the lock is refused at once');
     release();
     assert.equal(await first, true);
@@ -859,7 +864,9 @@ function mutate(source, edits, name) {
 
 const core = await import(pathToFileURL(CORE_PATH));
 const engines = await loadEngines(CORE_SOURCE);
-const corridorProgram = layer.liftCorridor(CORRIDOR_SOURCE);
+/* a tree without the hook definitions (df617045) reports every corridor case red instead of stopping */
+const liftOrError = (source) => { try { return layer.liftCorridor(source); } catch (error) { return error; } };
+const corridorProgram = liftOrError(CORRIDOR_SOURCE);
 const everything = async (c, e, program, glue) => [...await suite(c, glue), ...await glueSuite(c, e, program)];
 const baseline = await everything(core, engines, corridorProgram);
 const report = {
