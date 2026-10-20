@@ -317,6 +317,22 @@ async function focusSourceWord(page, token) {
   for (let step = 0; step < offset; step++) await page.keyboard.press('ArrowRight');
   assert(await token.evaluate(word => document.activeElement === word), 'Paragraph navigation selects the exact source token');
 }
+// FULL-R1 (C) · The native record once the reader's own bookmark has settled. The reader saves its place 900 ms after
+// any scroll in it (corridor.js saveReaderPosition), and opening an article from a scrolled shelf is one: the window
+// returns to the article's top. Wait out that debounce in real time, as openWord does, then until no write has landed
+// for 300 ms, so a bookmark still committing joins the baseline instead of a later neutral window.
+async function readerSettled(page) {
+  await delay(950);
+  let settled = await readAppRecordSnapshot(page), quietSince = Date.now();
+  const deadline = quietSince + 10000;
+  while (Date.now() - quietSince < 300) {
+    assert(Date.now() < deadline, 'The native record settles after the reader bookmark debounce');
+    await delay(25);
+    const now = await readAppRecordSnapshot(page);
+    if (now.revision !== settled.revision) { settled = now; quietSince = Date.now(); }
+  }
+  return settled;
+}
 async function openWord(fixture) {
   // Wait in real time before the native baseline so that the preceding reader
   // bookmark debounce can settle.
@@ -570,8 +586,11 @@ async function importUi(fixture, file) {
 async function ordinary(fixture) {
   const { page, source } = fixture;
   await openSource(fixture);
-  const sourceBefore = await readAppRecordSnapshot(page), tapStarted = Date.now();
   const token = page.locator(`#reader .tok[data-index="${source.index}"]`);
+  // The ladder's neutral windows start with the reader at rest: a scroll the taps would need happens now, and the
+  // reader's own bookmark of it, or of the open, is in the baseline (readerSettled), never inside a window below.
+  await token.scrollIntoViewIfNeeded();
+  const sourceBefore = await readerSettled(page), tapStarted = Date.now();
   await token.click();
   await waitForAppRecord(page, record => record.obslog.length === sourceBefore.record.obslog.length + 1);
   const read = await readAppRecordSnapshot(page), readingObservation = read.record.obslog.at(-1);
