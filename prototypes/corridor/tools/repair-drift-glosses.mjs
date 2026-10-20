@@ -33,6 +33,7 @@ export const WBIG_JSON = resolve(drift, 'data/wbig.json');
 export const ARTIFACT = resolve(drift, 'drift-artifact.html');
 export const LAYER = resolve(corridor, 'drift-layer.js');
 export const WORDS_JSON = resolve(corridor, 'data/share_alike/words.json');
+export const DRIFT_WORDS_JSON = resolve(corridor, '../../apps/app/src/data/generated/drift-words.json');
 
 /** The one WBIG literal, on its own line in both the runtime and the artifact. */
 const WBIG_RE = /const WBIG=(\[.*\]);/;
@@ -103,6 +104,9 @@ function main() {
     { name: 'drift/data/wbig.json', kind: 'json', file: WBIG_JSON },
     { name: 'corridor/drift-layer.js', kind: 'literal', file: LAYER },
     { name: 'drift/drift-artifact.html', kind: 'literal', file: ARTIFACT },
+    // FIXR (a0, lead's ruling 10:4x): the second truncated copy. Same [word, reading, gloss, …] rows;
+    // the reference page renders every variant, so a cut variant here shows beside the whole ones.
+    { name: 'app/src/data/generated/drift-words.json', kind: 'json', file: DRIFT_WORDS_JSON },
   ];
 
   for (const source of sources) {

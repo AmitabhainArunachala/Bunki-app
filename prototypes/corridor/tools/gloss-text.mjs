@@ -68,6 +68,8 @@ export function looksClipped(text, oracle = shared) {
   if (/[\s([]$/u.test(s)) return true;
   if ((s.match(/\(/gu) || []).length > (s.match(/\)/gu) || []).length) return true;
   if (/[,;]$/u.test(s)) return true;
+  // a cut that lands inside an HTML entity leaves it unterminated (庇う's "to&nbsp;&nbs", FIXR a0)
+  if (/&(?:#[0-9]*|[a-z][a-z0-9]*)$/iu.test(s)) return true;
   // fragment, only where the extractor's cut can have landed
   if (s.length !== CLIP_CAP) return false;
   const last = tokens(s).at(-1);
