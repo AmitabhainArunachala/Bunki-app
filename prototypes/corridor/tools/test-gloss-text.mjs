@@ -27,8 +27,8 @@ test('negative: ampersand abbreviations are never clipped (W2 1046)', () => {
   }
 });
 
-test('negative: legitimate ampersand tails at exactly the cap are not clipped (W2 1051)', () => {
-  for (const tail of ['fish&chips', 'rock&roll']) {
+test('negative: legitimate ampersand tails at exactly the cap are not clipped (W2 1051, 1107)', () => {
+  for (const tail of ['fish&chips', 'rock&roll', 'yes&no', 'and&or', 'or&not']) {
     const s = capWith(tail);
     assert.equal(s.length, CLIP_CAP, s);
     assert.equal(looksClipped(s), false, s);

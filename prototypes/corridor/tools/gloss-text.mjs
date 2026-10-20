@@ -86,12 +86,13 @@ export function looksClipped(text, oracle = shared) {
   // reference (…&amp; is a whole sentence, not a clipped one; W2's at-cap ampersand control)
   if (/;$/u.test(s)) return !/&(?:#[0-9]{1,6}|#x[0-9a-f]{1,6}|[a-z][a-z0-9]{1,7});$/iu.test(s);
   // a cut that lands inside an HTML entity leaves an unterminated tail: at the cap only, '&'
-  // followed by two or more letters that strictly begin a known entity name (FIXR a0; the
-  // 32-character "to&nbsp;&nbs" row). An ampersand abbreviation (R&D, AT&T: one letter) or a
-  // plain tail (fish&chips: begins no entity) is not a fragment.
+  // followed by two or more letters that strictly begin a known entity name AND are not a real
+  // word ("to&nbsp;&nbs" is a fragment; yes&no, and&or, or&not are not — "no", "or", "not" are
+  // words, "&nbs" is not). The corpus's own vocabulary decides, never a guessed list.
   if (s.length === CLIP_CAP) {
     const tail = /&([A-Za-z]{2,8})$/.exec(s)?.[1];
-    if (tail && ENTITY_NAMES.some((name) => name.length > tail.length && name.startsWith(tail))) return true;
+    if (tail && !(oracle && oracle.words.has(tail.toLowerCase()))
+      && ENTITY_NAMES.some((name) => name.length > tail.length && name.startsWith(tail))) return true;
   }
   // fragment, only where the extractor's cut can have landed
   if (s.length !== CLIP_CAP) return false;
