@@ -25,6 +25,7 @@
 
 import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfDoor, openShelfTools } from './shelf-tools-support.mjs';
+import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { isDeepStrictEqual } from 'node:util';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
@@ -209,12 +210,35 @@ const sameData = (left, right) => isDeepStrictEqual(
 const wordCaptures = (record, id) => record.taken.filter((row) => row.t === 'word' && row.id === id);
 const hasNote = (record, text) => (record.obslog || []).some((row) => row[1] === 'note' && String(row[3]).includes(text));
 
+/** Hfix-2a (71907eb2) made every backup restore ask first. Answer exactly that
+ * question around the caller's original operation and wait; any other dialog
+ * fails the row without adding selectBackupFile's separate 20 s wait. */
+async function answeringRestore(page, run) {
+  let problem;
+  const answer = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', answer);
+  try { const value = await run(); if (problem) throw problem; return value; }
+  catch (error) { throw problem || error; }
+  finally { page.off('dialog', answer); }
+}
+
 async function importThroughUi(page, text, name) {
   if (!await page.locator('#import-file').count()) await page.locator('#tray').click();
   await page.locator('#import-file').waitFor({ state: 'attached' });
   await page.evaluate(() => { window.__PRE_IMPORT_PAGE = 1; });
-  await page.locator('#import-file').setInputFiles({ name, mimeType: 'application/json', buffer: Buffer.from(text, 'utf8') });
-  await page.waitForFunction(() => !window.__PRE_IMPORT_PAGE && document.body.dataset.ready === '1', null, { timeout: 30000 });
+  // INTFIX · answer the one restore confirmation inline, then keep the original
+  // 30 s sentinel as the only import-completion wait. No row or assertion moves.
+  await answeringRestore(page, async () => {
+    await page.locator('#import-file').setInputFiles({ name, mimeType: 'application/json', buffer: Buffer.from(text, 'utf8') });
+    await page.waitForFunction(() => !window.__PRE_IMPORT_PAGE && document.body.dataset.ready === '1', null, { timeout: 30000 });
+  });
   return readAppRecordSnapshot(page);
 }
 
@@ -970,10 +994,14 @@ async function main() {
   const storeBeforeQuota = await readAppRecordSnapshot(page);
   await armRecordWriteFailure(page, 'quota');
   await page.evaluate(() => { window.__PRE_IMPORT_PAGE = 1; });
-  await page.setInputFiles('#import-file', {
-    name: 'synthetic-quota.json', mimeType: 'application/json', buffer: Buffer.from(exportedRecord, 'utf8'),
+  // a VALID backup: it passes validation and reaches window.confirm, so the restore must be
+  // answered or the armed quota fault below can never fire
+  await answeringRestore(page, async () => {
+    await page.setInputFiles('#import-file', {
+      name: 'synthetic-quota.json', mimeType: 'application/json', buffer: Buffer.from(exportedRecord, 'utf8'),
+    });
+    await page.waitForFunction(() => window.__recordTestFault?.fired > 0, null, { timeout: 8000 });
   });
-  await page.waitForFunction(() => window.__recordTestFault?.fired > 0, null, { timeout: 8000 });
   await page.waitForFunction(() => !!document.querySelector('.port-row:has(#import-file) + .airead-note')?.textContent, null, { timeout: 8000 });
   const quotaAfter = await readAppRecordSnapshot(page);
   const quotaOutcome = {

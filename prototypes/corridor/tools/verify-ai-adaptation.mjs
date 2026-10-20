@@ -121,13 +121,37 @@ const openShelf = async () => {
   // the study tools open from the shelf's one 学習ツール button (shared helper)
   await openShelfTools(page);
 };
+/** Hfix-2a (71907eb2) made every backup restore ask first. Answer exactly that
+ * question around the caller's original operation and wait; any other dialog
+ * fails the case without adding selectBackupFile's separate 20 s wait. */
+async function answeringRestore(run) {
+  let problem;
+  const answer = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', answer);
+  try { const value = await run(); if (problem) throw problem; return value; }
+  catch (error) { throw problem || error; }
+  finally { page.off('dialog', answer); }
+}
 async function importFixture(name, record, { navigate = true } = {}) {
   write(`${name}-import.json`, record);
   if (navigate) await openShelf();
   await page.locator('#tray').click();
   await page.evaluate(() => { window.__PI_ADAPT_BEFORE_IMPORT = true; });
-  await page.locator('#import-file').setInputFiles({ name: `${name}.json`, mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(record)) });
-  await page.waitForFunction(() => !window.__PI_ADAPT_BEFORE_IMPORT && document.body.dataset.ready === '1', null, { timeout: 30000 });
+  // INTFIX · answer the one restore confirmation inline, then keep the original
+  // 30 s sentinel as the only import-completion wait. No row or assertion moves.
+  await answeringRestore(async () => {
+    await page.locator('#import-file').setInputFiles({
+      name: `${name}.json`, mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(record)),
+    });
+    await page.waitForFunction(() => !window.__PI_ADAPT_BEFORE_IMPORT && document.body.dataset.ready === '1', null, { timeout: 30000 });
+  });
   const snapshot = await readAppRecordSnapshot(page);
   write(`${name}-imported.json`, snapshot);
   assert.deepEqual(snapshot.record.obslog, record.obslog);
