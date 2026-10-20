@@ -776,6 +776,28 @@ async function glueSuite(core, engines, corridorProgram) {
     }
     return 'a corridor grade (the hook, or the review) and a deck page committing at once on one word: one grade (actual corridor code and actual deck engine)';
   });
+  await check('C8', 4, async () => {
+    const day = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const eve = new Date(dueNow);
+    eve.setHours(23, 59, 30, 0);
+    if (eve < dueNow) eve.setDate(eve.getDate() + 1);
+    const after = new Date(eve.getTime() + 60e3);
+    for (const side of ['review', 'hook']) {
+      let t = eve;
+      const box = corridorBox({ clock: () => t });
+      const release = box.locks.hold();
+      const pending = side === 'review' ? reviewRun(box).grade() : box.lifted.reportHookAttempt(hookEvidence());
+      pending.catch(() => {}); // awaited below; on a red tree its rejection must not escape
+      t = after; // midnight passes while the commit waits for the lock
+      release();
+      const r = await pending;
+      assert.ok(side === 'review' ? r === true : r.write === true, `${side}: graded`);
+      assert.equal(JSON.parse(box.storage.getItem(KEY)).day, day(after), `${side}: the answered mark is the new day's`);
+      const days = Object.keys(box.box.record.stats || {});
+      assert.ok(days.includes(day(after)) && !days.includes(day(eve)), `${side}: the grade counts on the new day (stats ${days.join(', ')})`);
+    }
+    return 'midnight while the review grade or the hook waits for the lock: the day is sampled inside the admission on the actual corridor path (the mark and the day’s count are the new day’s)';
+  });
   return cases;
 }
 
@@ -840,11 +862,13 @@ const CORRIDOR_MUTANTS = {
   'corridor-declined-alerts': [["    if (error?.code === PRODUCER_DECLINED) return { outcome: 'not-published', acknowledged: false, reason: error.reason };\n", '']],
   'review-no-recheck': [["    if (answered && item.t === 'word' && (!prevRec || prevRec.state === srsCore.REVIEW) && srsWordRests(item, answered)) decline('answered-elsewhere');\n", '']],
   'review-unlocked': [["      locks: globalThis.navigator?.locks || null,\n      clock: () => new Date(),\n      storage: globalThis.localStorage,\n      where: 'corridor',", "      locks: { request: (name, run) => run() },\n      clock: () => new Date(),\n      storage: globalThis.localStorage,\n      where: 'corridor',"]],
+  'review-stale-clock': [["      clock: () => new Date(),\n      storage: globalThis.localStorage,\n      where: 'corridor',", "      clock: ((sampled) => () => sampled)(new Date()),\n      storage: globalThis.localStorage,\n      where: 'corridor',"]],
+  'hook-stale-clock': [["    clock: () => new Date(),\n    storage: globalThis.localStorage,\n    where: evidence?.surface,", "    clock: ((sampled) => () => sampled)(new Date()),\n    storage: globalThis.localStorage,\n    where: evidence?.surface,"]],
 };
 const EXPECT = {
   'deck-no-recheck': ['E2'], 'deck-no-reservation': ['E1'], 'deck-kanji-locked': ['E3'], 'context-no-recheck': ['E6'], 'context-no-reservation': ['E6'],
   'corridor-no-reservation': ['C2'], 'corridor-false-ack': ['C1', 'C3'], 'corridor-durable-unknown': ['C1', 'C3'], 'corridor-declined-alerts': ['C1'],
-  'review-no-recheck': ['C6'], 'review-unlocked': ['C6'],
+  'review-no-recheck': ['C6'], 'review-unlocked': ['C6'], 'review-stale-clock': ['C8'], 'hook-stale-clock': ['C8'],
   'grade-passive': ['P1'], 'trust-target': ['P14'], 'open-surface': ['P13'], 'ignore-help': ['P3', 'P4'], 'late-help-counts': ['P4'],
   'facet-optional': ['P13'], 'loose-time': ['P13'], 'trust-tap': ['P6'], 'reveal-is-recall': ['P6'], 'no-day-cap': ['P7', 'P8'],
   'stale-commit': ['P15'], 'no-shared-boundary': ['P15'], 'unlocked-fallback': ['P16', 'P20'], 'release-any': ['P17'],
