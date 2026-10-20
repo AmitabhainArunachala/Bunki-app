@@ -473,6 +473,21 @@ function suite(core, glue = {}) {
       assert.ok(/couldn’t confirm/.test(en) && /practis/.test(en) && /確かめられません/.test(ja) && /練習/.test(ja));
       return 'W2’s 0150 sequence: after an uncertain deck Again the home step grades and the quest is refused; the uncertain line promises nothing about today';
     });
+    await check('P22', 4, async () => {
+      // the four refusal lines, pinned word for word: English as frozen in HOOKS-SPEC r7 §3.6 (its straight ' typeset as ’, the
+      // app's house style), Japanese as Kimi passed them (0155). mark-unavailable and publish-failed differ only by 安全に / “safely”
+      const APPROVED_LINES = {
+        "no-shared-admission": ["This page can't keep answers in step with your other Bunki pages, so this card is practice only: your answer won't change its schedule.", "このページはほかの Bunki のページと答えをそろえられないため、この札は練習だけです。答えても予定は変わりません。"],
+        "mark-unavailable": ["This answer couldn't be saved safely, so it didn't change the card's schedule. You can keep practising.", "この答えは安全に保存できなかったため、札の予定は変わっていません。このまま練習を続けられます。"],
+        "publish-failed": ["This answer couldn't be saved, so it didn't change the card's schedule. You can keep practising.", "この答えは保存できなかったため、札の予定は変わっていません。このまま練習を続けられます。"],
+        "publish-uncertain": ["We couldn't confirm this answer was saved. You can keep practising.", "この答えが保存されたか確かめられませんでした。このまま練習を続けられます。"],
+      };
+      for (const [reason, [en, ja]] of Object.entries(APPROVED_LINES)) {
+        assert.equal(core.refusalWords(reason, 'en'), en.replaceAll("'", '’'), `${reason} en`);
+        assert.equal(core.refusalWords(reason, 'ja'), ja, `${reason} ja`);
+      }
+      return 'the four refusal lines are the approved text, word for word, in English (HOOKS-SPEC r7) and Japanese (Kimi 0155)';
+    });
     /* rule 5 */
     await check('P10', 5, async () => {
       const e = seeded();
@@ -868,6 +883,11 @@ const CORE_MUTANTS = {
   'loose-id': [["const HOOK_SURFACE = /^(world|quest|room|ride|course):(?!.*\\.\\.)[\\p{L}\\p{N}][\\p{L}\\p{N}._-]{0,63}$/u;", 'const HOOK_SURFACE = /^(world|quest|room|ride|course):[^\\s:]+$/u;']],
   'stale-clock': [['  return locks.request(ANSWER_LOCK, async () => {\n    const now = clock();', '  const now = clock();\n  return locks.request(ANSWER_LOCK, async () => {']],
   'silent-refusal': [['  const words = REFUSAL_WORDS[reason];\n  return words ?', '  const words = null;\n  return words ?']],
+  'swap-safe-lines': [
+    ["    ja: 'この答えは安全に保存できなかったため、札の予定は変わっていません。このまま練習を続けられます。',", "    ja: 'この答えは保存できなかったため、札の予定は変わっていません。このまま練習を続けられます。',"],
+    ["    ja: 'この答えは保存できなかったため、札の予定は変わっていません。このまま練習を続けられます。',\n  },\n  'publish-uncertain'", "    ja: 'この答えは安全に保存できなかったため、札の予定は変わっていません。このまま練習を続けられます。',\n  },\n  'publish-uncertain'"],
+  ],
+  'drop-anzen': [['この答えは安全に保存できなかったため', 'この答えは保存できなかったため']],
   'banning-uncertain-line': [
     ["    en: 'We couldn’t confirm this answer was saved. You can keep practising.',", "    en: 'We couldn’t confirm this answer was saved. This card won’t be graded again today; you can keep practising.',"],
     ["    ja: 'この答えが保存されたか確かめられませんでした。このまま練習を続けられます。',", "    ja: 'この答えが保存されたか確かめられませんでした。この札は今日はもう採点されませんが、練習は続けられます。',"],
@@ -907,7 +927,7 @@ const EXPECT = {
   'facet-optional': ['P13'], 'loose-time': ['P13'], 'trust-tap': ['P6'], 'reveal-is-recall': ['P6'], 'no-day-cap': ['P7', 'P8'],
   'stale-commit': ['P15'], 'no-shared-boundary': ['P15'], 'unlocked-fallback': ['P16', 'P20'], 'release-any': ['P17'],
   'uncertain-releases': ['P18'], 'loose-id': ['P13'], 'stale-clock': ['P19'], 'silent-refusal': ['P20'],
-  'banning-uncertain-line': ['P21'], 'mark-after-publish': ['P16'], 'false-ack-releases': ['P18'], 'abandon-penalty': ['P10'],
+  'banning-uncertain-line': ['P21'], 'swap-safe-lines': ['P22'], 'drop-anzen': ['P22'], 'mark-after-publish': ['P16'], 'false-ack-releases': ['P18'], 'abandon-penalty': ['P10'],
 };
 
 function mutate(source, edits, name) {
