@@ -14,6 +14,22 @@
   },
   "entries": [
     {
+      "word": "何を",
+      "reading": "なにを",
+      "surfaces": ["何", "を"],
+      "readings": ["なに", null],
+      "kind": "term",
+      "note": "E2 reviewed reading: 何 directly before the case particle を reads なに. The particle is a context guard and stays unchanged."
+    },
+    {
+      "word": "何が",
+      "reading": "なにが",
+      "surfaces": ["何", "が"],
+      "readings": ["なに", null],
+      "kind": "term",
+      "note": "E2 reviewed reading: 何 directly before the case particle が reads なに. The particle is a context guard and stays unchanged."
+    },
+    {
       "word": "一晩中",
       "reading": "ひとばんじゅう",
       "surfaces": ["一晩", "中"],

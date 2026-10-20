@@ -109,7 +109,7 @@
         },
         "words": {
           "path": "prototypes/corridor/data/share_alike/words.json",
-          "sha256": "4606aaa9da2b84fb7d49fe5023cd1d4d1cda6097287994717ac3522321914ac5"
+          "sha256": "d21ff76508a3ed88cec9c096510feac9b5ff2df639061a3be46cb85c6fdf985b"
         },
         "kanji": {
           "path": "prototypes/corridor/data/share_alike/kanji.json",

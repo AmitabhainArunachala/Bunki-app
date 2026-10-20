@@ -8,7 +8,7 @@
   "tokens": 95731
  },
  "statusCounts": {
-  "lexicon-fixed": 672,
+  "lexicon-fixed": 719,
   "accepted": 30
  },
  "openCount": 0,
@@ -205,6 +205,16 @@
   },
   {
    "article": "aozora:000628",
+   "token": 654,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "においといて、何をさがしにか、",
+   "note": "何を"
+  },
+  {
+   "article": "aozora:000628",
    "token": 1482,
    "rule": "override-site",
    "surface": "床",
@@ -232,6 +242,16 @@
    "status": "lexicon-fixed",
    "context": "いきました。四月のいい晩でした",
    "note": "四月"
+  },
+  {
+   "article": "aozora:000628",
+   "token": 2306,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "あるんだ」「何が？」「おっ",
+   "note": "何が"
   },
   {
    "article": "aozora:046605",
@@ -282,6 +302,16 @@
    "status": "lexicon-fixed",
    "context": "は分からなかった日本語の言葉を思い出しまし",
    "note": "日本語"
+  },
+  {
+   "article": "bunki-essay-n1-ai",
+   "token": 82,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "はない。むしろ、何を疑い、どの違い",
+   "note": "何を"
   },
   {
    "article": "real-gokajo",
@@ -434,6 +464,16 @@
    "note": "日本語"
   },
   {
+   "article": "bunki-essay-n2-notebook",
+   "token": 99,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "ときのほうが、何を残すべきかを",
+   "note": "何を"
+  },
+  {
    "article": "bunki-essay-n2-translation",
    "token": 20,
    "rule": "override-site",
@@ -452,6 +492,46 @@
    "status": "lexicon-fixed",
    "context": "に必ず出会う。日本語で言えば「もったい",
    "note": "日本語"
+  },
+  {
+   "article": "bunki-essay-n1-memory",
+   "token": 36,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "にしたときに何が残るか、と",
+   "note": "何が"
+  },
+  {
+   "article": "bunki-essay-n1-memory",
+   "token": 89,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "自体ではなく、何が失われ何が",
+   "note": "何が"
+  },
+  {
+   "article": "bunki-essay-n1-memory",
+   "token": 93,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "、何が失われ何が残るかを偶然",
+   "note": "何が"
+  },
+  {
+   "article": "bunki-essay-n1-memory",
+   "token": 195,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "は難しい。自分が何を忘れかけているか",
+   "note": "何を"
   },
   {
    "article": "bunki-graded-n3-zoka-sanjin-morning",
@@ -652,6 +732,36 @@
    "status": "lexicon-fixed",
    "context": "柱を一言で創造神と呼んで終わるより",
    "note": "創造神"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 510,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "。一つは、何が書かれている",
+   "note": "何が"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 534,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "の人がそこから何を考えたかを",
+   "note": "何を"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 625,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "の解釈が自分に何を問いかけるかを考えれ",
+   "note": "何を"
   },
   {
    "article": "bunki-graded-n3-zoka-sanjin-morning",
@@ -1204,6 +1314,26 @@
    "note": "造化三神"
   },
   {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 653,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "とは限らない。何が確かで、何",
+   "note": "何が"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 658,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "何が確かで、何が後の解釈か",
+   "note": "何が"
+  },
+  {
    "article": "bunki-graded-n3-hidden-deity",
    "token": 82,
    "rule": "override-site",
@@ -1695,6 +1825,26 @@
   },
   {
    "article": "bunki-graded-n3-musubi-visual",
+   "token": 503,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "一つである。何を美しいと考え、",
+   "note": "何を"
+  },
+  {
+   "article": "bunki-graded-n3-musubi-visual",
+   "token": 509,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "を美しいと考え、何を静かに見せ、",
+   "note": "何を"
+  },
+  {
+   "article": "bunki-graded-n3-musubi-visual",
    "token": 549,
    "rule": "override-site",
    "surface": "造化",
@@ -1712,6 +1862,16 @@
    "status": "lexicon-fixed",
    "context": "始まったか、造化三神が何をした",
    "note": "造化三神"
+  },
+  {
+   "article": "bunki-graded-n3-musubi-visual",
+   "token": 552,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "か、造化三神が何をしたかを",
+   "note": "何を"
   },
   {
    "article": "bunki-graded-n3-gratitude-week",
@@ -1752,6 +1912,16 @@
    "status": "lexicon-fixed",
    "context": "なかった。新しい日本語の文を練習し",
    "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-thanks-before-help",
+   "token": 374,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "が起きたら、まず何をする？」と",
+   "note": "何を"
   },
   {
    "article": "bunki-essay-n2-zoka-as-one",
@@ -1974,6 +2144,26 @@
    "note": "大国主神"
   },
   {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 706,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "はない。本文が何を述べ、何を",
+   "note": "何を"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 710,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "が何を述べ、何を述べていない",
+   "note": "何を"
+  },
+  {
    "article": "bunki-essay-n2-nakaima-time",
    "token": 57,
    "rule": "override-site",
@@ -2034,6 +2224,26 @@
    "note": "天之御中主神"
   },
   {
+   "article": "bunki-essay-n2-nakaima-time",
+   "token": 514,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "だけだ。今、何を感じるか。今",
+   "note": "何を"
+  },
+  {
+   "article": "bunki-essay-n2-nakaima-time",
+   "token": 521,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "感じるか。今、何を選べるか。そして",
+   "note": "何を"
+  },
+  {
    "article": "bunki-essay-n2-creator-god",
    "token": 78,
    "rule": "override-site",
@@ -2052,6 +2262,16 @@
    "status": "lexicon-fixed",
    "context": "である。「創造神」は分かりやすい言葉",
    "note": "創造神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 88,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "やすい言葉だが、何を意味するかに",
+   "note": "何を"
   },
   {
    "article": "bunki-essay-n2-creator-god",
@@ -2355,6 +2575,16 @@
   },
   {
    "article": "bunki-essay-n2-creator-god",
+   "token": 738,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "なく問いになる。何が生まれたのか",
+   "note": "何が"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
    "token": 64,
    "rule": "kami-on",
    "surface": "神",
@@ -2465,6 +2695,26 @@
   },
   {
    "article": "bunki-essay-n2-silent-amenominakanushi",
+   "token": 199,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "ない。天之御中主神が何を考え、なぜ隠れ",
+   "note": "何を"
+  },
+  {
+   "article": "bunki-essay-n2-silent-amenominakanushi",
+   "token": 210,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "、隠れた後に何をしたかを",
+   "note": "何を"
+  },
+  {
+   "article": "bunki-essay-n2-silent-amenominakanushi",
    "token": 375,
    "rule": "override-site",
    "surface": "日本",
@@ -2482,6 +2732,16 @@
    "status": "lexicon-fixed",
    "context": "。また、『日本書紀』の天地開闢の",
    "note": "日本書紀"
+  },
+  {
+   "article": "bunki-essay-n2-silent-amenominakanushi",
+   "token": 427,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "神を読むとは何をすることだろう。",
+   "note": "何を"
   },
   {
    "article": "bunki-essay-n2-silent-amenominakanushi",
@@ -2522,6 +2782,16 @@
    "status": "lexicon-fixed",
    "context": "成立とし、稗田阿礼が伝承してい",
    "note": "稗田阿礼"
+  },
+  {
+   "article": "bunki-essay-n2-kojiki-myth-history",
+   "token": 257,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "するだけでなく、何を始まりとし、",
+   "note": "何を"
   },
   {
    "article": "bunki-essay-n2-myth-to-book",
@@ -2584,6 +2854,36 @@
    "note": "誦習"
   },
   {
+   "article": "bunki-essay-n2-feel-jingu-musubi",
+   "token": 447,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "近くで見せるか、何を画面の外に",
+   "note": "何を"
+  },
+  {
+   "article": "bunki-essay-n2-prayer-on-screen",
+   "token": 465,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "が残されると、何を見ているの",
+   "note": "何を"
+  },
+  {
+   "article": "bunki-essay-n2-prayer-on-screen",
+   "token": 659,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "自らをどう見せ、何を大切な主題と",
+   "note": "何を"
+  },
+  {
    "article": "bunki-essay-n2-thanks-first",
    "token": 8,
    "rule": "override-site",
@@ -2602,6 +2902,26 @@
    "status": "lexicon-fixed",
    "context": "場面では、日本語で「すみません",
    "note": "日本語"
+  },
+  {
+   "article": "bunki-essay-n2-thanks-first",
+   "token": 713,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "自分がその言葉で何をしているの",
+   "note": "何を"
+  },
+  {
+   "article": "bunki-essay-n2-testimony-literacy",
+   "token": 171,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "したり、作者が何を保証したか",
+   "note": "何を"
   },
   {
    "article": "bunki-essay-n1-cosmic-analogy",
@@ -2682,6 +3002,16 @@
    "status": "lexicon-fixed",
    "context": "はない。「天之御中主神を宇宙の中心の",
    "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-cosmic-analogy",
+   "token": 457,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "と、自分には何が見えるか」と",
+   "note": "何が"
   },
   {
    "article": "bunki-essay-n1-cosmic-analogy",
@@ -2782,6 +3112,16 @@
    "status": "accepted",
    "context": "も異なる。造化三神を宇宙論とし",
    "note": "造化三神"
+  },
+  {
+   "article": "bunki-essay-n1-nakaima-time-theory",
+   "token": 725,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "語感ではなく、何を区別できるかで",
+   "note": "何を"
   },
   {
    "article": "bunki-essay-n1-nakaima-time-theory",
@@ -3155,6 +3495,16 @@
   },
   {
    "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 432,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "てしまうからだ。何を基準に最高と",
+   "note": "何を"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
    "token": 500,
    "rule": "override-site",
    "surface": "天之御中主",
@@ -3315,6 +3665,16 @@
   },
   {
    "article": "bunki-essay-n1-silent-god-theology",
+   "token": 365,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "広く用いるなら、「何を知ったか」",
+   "note": "何を"
+  },
+  {
+   "article": "bunki-essay-n1-silent-god-theology",
    "token": 598,
    "rule": "override-site",
    "surface": "日本",
@@ -3465,6 +3825,26 @@
   },
   {
    "article": "bunki-essay-n1-kojiki-power",
+   "token": 615,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "を同時に行う。何が古い層に属し",
+   "note": "何が"
+  },
+  {
+   "article": "bunki-essay-n1-kojiki-power",
+   "token": 622,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "古い層に属し、何が編纂時の関心",
+   "note": "何が"
+  },
+  {
+   "article": "bunki-essay-n1-kojiki-power",
    "token": 692,
    "rule": "override-site",
    "surface": "日本",
@@ -3482,6 +3862,16 @@
    "status": "lexicon-fixed",
    "context": "ている。『日本書紀』が七二〇",
    "note": "日本書紀"
+  },
+  {
+   "article": "bunki-essay-n1-beyond-fact-fiction",
+   "token": 688,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "、今の自分は何を付け加えているか",
+   "note": "何を"
   },
   {
    "article": "bunki-essay-n1-beyond-fact-fiction",
@@ -3522,6 +3912,36 @@
    "status": "lexicon-fixed",
    "context": "はない。『日本書紀』の異伝、風土",
    "note": "日本書紀"
+  },
+  {
+   "article": "bunki-essay-n1-ise-time",
+   "token": 536,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "が必要であり、何を残すかという",
+   "note": "何を"
+  },
+  {
+   "article": "bunki-essay-n1-miracle-testimony",
+   "token": 274,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "の細部がある。何を恐れていた",
+   "note": "何を"
+  },
+  {
+   "article": "bunki-essay-n1-prayer-reality",
+   "token": 360,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "。祈りによって何が変わったと主張",
+   "note": "何が"
   },
   {
    "article": "wikinews:44381",
@@ -4925,6 +5345,16 @@
   },
   {
    "article": "aozora:000772-1",
+   "token": 18,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "ん、といって何をして好いか",
+   "note": "何を"
+  },
+  {
+   "article": "aozora:000772-1",
    "token": 167,
    "rule": "override-site",
    "surface": "一",
@@ -6024,6 +6454,16 @@
    "note": "10月"
   },
   {
+   "article": "bunki-read-n1-zazen-brainwaves",
+   "token": 610,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "とき自分の注意に何が起こるか、確かめ",
+   "note": "何が"
+  },
+  {
    "article": "bunki-read-n2-japan-us-chip-fab",
    "token": 59,
    "rule": "override-site",
@@ -6635,6 +7075,26 @@
   },
   {
    "article": "aozora:053224-1",
+   "token": 292,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "張合いを失って、何をする元気もなくなっ",
+   "note": "何を"
+  },
+  {
+   "article": "aozora:053224-1",
+   "token": 439,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "失って弟子たちは何をする張合いもなくなる",
+   "note": "何を"
+  },
+  {
+   "article": "aozora:053224-1",
    "token": 833,
    "rule": "override-site",
    "surface": "一言",
@@ -6892,6 +7352,16 @@
    "status": "lexicon-fixed",
    "context": "は、この判断にピレイ氏の影響が大きかっ",
    "note": "ピレイ"
+  },
+  {
+   "article": "bunki-read-n1-suzuki-zen",
+   "token": 66,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "、大拙は西洋に何を運んだのか",
+   "note": "何を"
   },
   {
    "article": "bunki-read-n1-suzuki-zen",

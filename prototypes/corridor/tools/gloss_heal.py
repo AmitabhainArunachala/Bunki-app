@@ -24,6 +24,24 @@ from pathlib import Path
 GLOSS_CAP = 32
 MAX_SENSES = 3
 MAX_GLOSSES = 3
+# E2's reviewed word/reading pairs. Short or empty source glosses can be wrong
+# too; these do not broaden the generic dictionary-completion rule.
+REVIEWED_GLOSSES = {
+    ("拍子", "ひょうし"): "time; meter; rhythm",
+    ("初耳", "はつみみ"): "something heard for the first time",
+    ("金", "かね"): "money; metal",
+}
+
+
+def apply_reviewed_glosses(words: dict[str, dict]) -> int:
+    """Final bounded pass after shelf/semantic words and their readings exist."""
+    changed = 0
+    for word, rec in words.items():
+        replacement = REVIEWED_GLOSSES.get((word, rec.get("r", "")))
+        if replacement is not None and rec.get("g", "") != replacement:
+            rec["g"] = replacement
+            changed += 1
+    return changed
 
 
 def dict_glosses(share_alike: Path) -> dict[str, tuple[str, str]]:
@@ -83,6 +101,9 @@ def sense_glosses(sense) -> list[str]:
 
 def complete(word: str, reading: str, gloss: str, full: dict[str, tuple[str, str]],
              v2: dict[str, list[tuple[set[str], str, frozenset[str]]]]) -> str:
+    reviewed = REVIEWED_GLOSSES.get((word, reading))
+    if reviewed is not None:
+        return reviewed
     if len(gloss) < GLOSS_CAP:
         return gloss
     matched = [(text, foreign) for readings, text, foreign in v2.get(word, []) if reading in readings]

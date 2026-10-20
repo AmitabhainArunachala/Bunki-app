@@ -58,7 +58,8 @@ export const REFERENCE_BROWSER_CASES = Object.freeze([
 export const REFERENCE_DATA_PINS = Object.freeze({
   'data/share_alike/dict.json': 'a752529ab0e93d094a0eb04a89bdc2bc01f761c728590d6a485f38a256f175fd',
   // FULL-R1 (A): followed Hfix-2b's words.json fix (a1dbed8f; was the a1dbed8f^ bytes, 69d73f92…)
-  'data/share_alike/words.json': '4606aaa9da2b84fb7d49fe5023cd1d4d1cda6097287994717ac3522321914ac5',
+  // R2 E2: three reviewed word/reading gloss repairs.
+  'data/share_alike/words.json': 'd21ff76508a3ed88cec9c096510feac9b5ff2df639061a3be46cb85c6fdf985b',
   'data/share_alike/kanji.json': '8ce7ad0151a2bf487bda72c384460eca908fc1bdc2a4073042b9e3db7342d2ce',
   'data/proprietary_safe/kanken.json':
     '6efa199b7caec160c95e87c260b4184694fb8e4778a4563327bf1d79741ff444',
@@ -66,8 +67,9 @@ export const REFERENCE_DATA_PINS = Object.freeze({
     '435c37c0063fba4180d3cb444ef54cfa2430e71a650a4032cc481ada29627f2b',
   // FULL-R1 (A): followed FIXR's sidecar regeneration over the repaired drift-words (b10aa853;
   // was the pre-FIXR bytes, 8a5c953e…)
+  // R2 E2: preserves KANJI-NEXT facts, refreshes words audit; also closes the inherited stale M1 pin.
   'data/share_alike/reference-extra.json':
-    '5d644f76b759f8433e604f98317f3770f63dc2cc74e4195569b889ed294aac3e',
+    'd3ad5ee711abb3122d263c4e0d8772dc6f8ce2cb671a9865ac5d03e512138e3d',
 });
 export const SKIP_BROWSER_NAMES = Object.freeze([
   'dictionary tool includes its label in the accessible name',

@@ -1662,8 +1662,9 @@ export const SENSE_CASE_IDS = Object.freeze([
 // INT-VH (merge 2): recomputed after the reviewed aozora-049966-2 change below (Hfix-1A R3-3); every other entry unchanged
 // FULL-R1 D: recomputed after the reviewed senses.json change below (Ladder a2c1776d, 384edc5d); every other entry unchanged
 // FULL-R1 E1: recomputed after the 31 reader-furigana bodies below (何を/何が → なに; wikinews:12024 放出 → はなてん, 間 → かん); every other entry unchanged
+// R2 E2: two article pins refreshed; seven local readings and four 何 lexicon provenance tags.
 export const SENSE_DATA_INVENTORY_SHA256 =
-  'c627b2a4beb68c784301106bd2685323ffe41362912905a4d73fc764324667f2';
+  'c42f33af958fcc06bd572d0371668c5d5ffa1cfa1c0dab2304f1c5b9eb3914c6';
 export const SPEAK_CHECK_NAMES = Object.freeze({
   S1: [
     'the Learn room has one Speak door, a study-door row',
@@ -4923,7 +4924,7 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   ],
   [
     'data/articles/bunki-essay-n1-memory.json',
-    'fc8a7a4fe15ccb23d7302e3a532c8a5214b1b6c3b079099dd92fbce421a93e93',
+    '0b77fe797127bbd289145907b94190e4f00748330484d26de0b8b37e5c90cf4b',
   ],
   [
     'data/articles/bunki-essay-n1-miracle-testimony.json',
@@ -6295,7 +6296,7 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   ],
   [
     'data/articles/wikinews-12024.json',
-    'b026f7822252f39982f1730c2b2e0ac003423b36d95091d3d970b48537d8d8a6',
+    '49d3a7c068ce35b25b957d4206085a5fc6732921c60e09d4e796b22f7799a956',
   ],
   [
     'data/articles/wikinews-1403.json',

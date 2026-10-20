@@ -1687,9 +1687,9 @@
       reason: 'Requires exact source revalidation and qualified editorial review.' },
     explanations: { enabled: false, status: 'withheld-pending-qualified-editor' },
     sources: {
-      words: { path: 'data/share_alike/words.json', sha256: '4606aaa9da2b84fb7d49fe5023cd1d4d1cda6097287994717ac3522321914ac5' },
+      words: { path: 'data/share_alike/words.json', sha256: 'd21ff76508a3ed88cec9c096510feac9b5ff2df639061a3be46cb85c6fdf985b' },
       kanji: { path: 'data/share_alike/kanji.json', sha256: '8ce7ad0151a2bf487bda72c384460eca908fc1bdc2a4073042b9e3db7342d2ce' },
-      family: { path: 'data/share_alike/kanji-family.json', sha256: '51baa9e4d5d7cb8a863fa6ba0994b4125fe83777507dd72bd1feee499aa23f7d' },
+      family: { path: 'data/share_alike/kanji-family.json', sha256: 'd164ec7b2fe39c5920d7fc05f4731c79db535815c5495aea7c2904b59532499b' },
     },
     counts: { units: UNITS.length, characters: UNITS.reduce((sum, unit) => sum + unit.targets.length, 0),
       wordExamples: UNITS.reduce((sum, unit) =>
