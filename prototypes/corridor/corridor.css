@@ -3235,6 +3235,27 @@ body.v-depth-layered .stroke-page {
   font-size: var(--type-caption);
   opacity: 0.8;
 }
+.stroke-reference-status {
+  width: min(100%, 420px);
+  overflow-wrap: anywhere;
+}
+.stroke-reference-status .stroke-read-note {
+  max-width: 100%;
+}
+.kanji-structure-diagram {
+  display: block;
+  width: min(100%, 220px);
+  height: auto;
+  color: var(--ink);
+}
+.kanji-structure-controls {
+  flex-wrap: wrap;
+}
+.kanji-structure-controls .chip,
+#kanji-course-menu .entry-row {
+  min-height: 44px;
+  min-width: 44px;
+}
 .stroke-read-label {
   margin-right: 0.6em;
   font-size: var(--type-caption);

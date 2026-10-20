@@ -1,0 +1,1448 @@
+{
+  "schemaVersion": 1,
+  "family": {
+    "id": "shiki-shoku",
+    "titleJa": "戠を音符にもつ字",
+    "titleEn": "Characters with 戠 as a sound component",
+    "center": {
+      "type": "kanji",
+      "id": "戠"
+    },
+    "members": [
+      {
+        "type": "kanji",
+        "id": "職"
+      },
+      {
+        "type": "kanji",
+        "id": "識"
+      },
+      {
+        "type": "kanji",
+        "id": "織"
+      }
+    ],
+    "scope": "One attributed family, not an exhaustive phonetic series or a historical-form reconstruction."
+  },
+  "sources": [
+    {
+      "id": "kanji",
+      "kind": "retained-file",
+      "path": "prototypes/corridor/data/share_alike/kanji.json",
+      "sha256": "8ce7ad0151a2bf487bda72c384460eca908fc1bdc2a4073042b9e3db7342d2ce",
+      "bytes": 514757
+    },
+    {
+      "id": "words",
+      "kind": "retained-file",
+      "path": "prototypes/corridor/data/share_alike/words.json",
+      "sha256": "4606aaa9da2b84fb7d49fe5023cd1d4d1cda6097287994717ac3522321914ac5",
+      "bytes": 808630
+    },
+    {
+      "id": "structure",
+      "kind": "retained-file",
+      "path": "prototypes/corridor/data/share_alike/kanji-structure.json",
+      "sha256": "1d20c18a662734f84eb6b718457de35536d51952b56328cefa7eaa111251537a",
+      "bytes": 43788,
+      "license": "CC BY-SA 3.0"
+    },
+    {
+      "id": "example-manifest",
+      "kind": "retained-file",
+      "path": "prototypes/corridor/data/proprietary_safe/examples/manifest.json",
+      "sha256": "a2142727a3b89b909bf89bc3f83e3a9ebd988a0010eb6428673fbf098aa1c76b",
+      "bytes": 1265,
+      "sharding": {
+        "id": "fnv1a32-utf8-mask15",
+        "indexShards": 16,
+        "sentsPerShard": 2000,
+        "sentenceShards": 23
+      },
+      "definitions": [
+        {
+          "name": "snow-t15-t23",
+          "licence": "CC BY 4.0",
+          "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+          "url": "https://www.jnlp.org/GengoHouse/snow/t15",
+          "labelJa": "用例",
+          "labelEn": "examples corpus"
+        },
+        {
+          "name": "tanaka-corpus",
+          "licence": "CC BY 2.0 FR",
+          "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+          "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus",
+          "labelJa": "用例",
+          "labelEn": "examples corpus"
+        },
+        {
+          "name": "ja.wikinews",
+          "licence": "CC BY 2.5",
+          "attribution": "ja.wikinews contributors, CC BY 2.5",
+          "url": "https://ja.wikinews.org/",
+          "labelJa": "ウィキニュース",
+          "labelEn": "wikinews"
+        }
+      ]
+    },
+    {
+      "id": "example-generator",
+      "kind": "retained-file",
+      "path": "prototypes/corridor/tools/build_examples.py",
+      "sha256": "29fa15c74b3319281731edcfabd600ef85e7d54402658d85dda6ff8fd981dd16",
+      "bytes": 11451
+    },
+    {
+      "id": "kanjipedia-8077",
+      "kind": "dictionary-entry",
+      "subject": {
+        "type": "kanji",
+        "id": "職"
+      },
+      "title": "職 | 漢字一字 | 漢字ペディア",
+      "url": "https://www.kanjipedia.jp/kanji/0003558300",
+      "accessedDate": "2026-10-21",
+      "publisher": "公益財団法人 日本漢字能力検定協会",
+      "formationWork": "角川新字源 改訂新版",
+      "formationPublisher": "KADOKAWA",
+      "rawPageSha256": null,
+      "rawPageArchive": "not acquired"
+    },
+    {
+      "id": "kanjipedia-8b58",
+      "kind": "dictionary-entry",
+      "subject": {
+        "type": "kanji",
+        "id": "識"
+      },
+      "title": "識 | 漢字一字 | 漢字ペディア",
+      "url": "https://www.kanjipedia.jp/kanji/0002903800",
+      "accessedDate": "2026-10-21",
+      "publisher": "公益財団法人 日本漢字能力検定協会",
+      "formationWork": "角川新字源 改訂新版",
+      "formationPublisher": "KADOKAWA",
+      "rawPageSha256": null,
+      "rawPageArchive": "not acquired"
+    },
+    {
+      "id": "kanjipedia-7e54",
+      "kind": "dictionary-entry",
+      "subject": {
+        "type": "kanji",
+        "id": "織"
+      },
+      "title": "織 | 漢字一字 | 漢字ペディア",
+      "url": "https://www.kanjipedia.jp/kanji/0003557300",
+      "accessedDate": "2026-10-21",
+      "publisher": "公益財団法人 日本漢字能力検定協会",
+      "formationWork": "角川新字源 改訂新版",
+      "formationPublisher": "KADOKAWA",
+      "rawPageSha256": null,
+      "rawPageArchive": "not acquired"
+    },
+    {
+      "id": "kanjivg-職",
+      "kind": "retained-svg",
+      "path": "prototypes/corridor/tools/fixtures/kanji-structure/source/08077.svg",
+      "sha256": "c004baafee3021780fa772c6da927bc30cf40c379da96e8ae5b41e927337f1ee",
+      "bytes": 5709,
+      "url": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/kanji/08077.svg",
+      "repository": "https://github.com/KanjiVG/kanjivg",
+      "commit": "61e39cfc29724132a6f8823b166296932985a0ff",
+      "license": "CC BY-SA 3.0",
+      "attribution": "Ulrich Apel / KanjiVG"
+    },
+    {
+      "id": "kanjivg-識",
+      "kind": "retained-svg",
+      "path": "prototypes/corridor/tools/fixtures/kanji-structure/source/08b58.svg",
+      "sha256": "4fb80f7684e1299ddea6e056cc65fed76599e584ac06330d29bf6ecf22f90abd",
+      "bytes": 6093,
+      "url": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/kanji/08b58.svg",
+      "repository": "https://github.com/KanjiVG/kanjivg",
+      "commit": "61e39cfc29724132a6f8823b166296932985a0ff",
+      "license": "CC BY-SA 3.0",
+      "attribution": "Ulrich Apel / KanjiVG"
+    },
+    {
+      "id": "kanjivg-織",
+      "kind": "retained-svg",
+      "path": "prototypes/corridor/tools/fixtures/kanji-structure/source/07e54.svg",
+      "sha256": "464a97cde3a8cba2aff6c5eeefa99a377526bde24ce8d53cbbd9d1e1350233d1",
+      "bytes": 5815,
+      "url": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/kanji/07e54.svg",
+      "repository": "https://github.com/KanjiVG/kanjivg",
+      "commit": "61e39cfc29724132a6f8823b166296932985a0ff",
+      "license": "CC BY-SA 3.0",
+      "attribution": "Ulrich Apel / KanjiVG"
+    },
+    {
+      "id": "example-shard-6284",
+      "kind": "retained-file",
+      "path": "prototypes/corridor/data/proprietary_safe/examples/s-03.json",
+      "sha256": "f33399c869ae19796716f4571ac58da2f180b1836ea9cd4f24c34960fba5cc62",
+      "bytes": 828472,
+      "licence": "CC BY 2.0 FR",
+      "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+      "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+    },
+    {
+      "id": "example-shard-1369",
+      "kind": "retained-file",
+      "path": "prototypes/corridor/data/proprietary_safe/examples/s-00.json",
+      "sha256": "6d053025b8187ecd6b5e1a4474a21e95369a0695b9d11286ece17f003aa419ed",
+      "bytes": 551813,
+      "licence": "CC BY 2.0 FR",
+      "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+      "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+    },
+    {
+      "id": "example-shard-8906",
+      "kind": "retained-file",
+      "path": "prototypes/corridor/data/proprietary_safe/examples/s-04.json",
+      "sha256": "8c0ca81c54aeebedc2c1562bf0fdfe0aa7e3416909d515bdeef8c1d95c010e65",
+      "bytes": 880479,
+      "licence": "CC BY 2.0 FR",
+      "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+      "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+    }
+  ],
+  "nodes": [
+    {
+      "reference": {
+        "type": "kanji",
+        "id": "戠"
+      },
+      "identityEvidence": [
+        {
+          "sourceId": "kanji",
+          "locator": "/kanji/戠"
+        }
+      ],
+      "rawOnReadings": [
+        "ショク",
+        "シキ",
+        "シ"
+      ],
+      "standaloneGeometry": "absent",
+      "historicalFormGeometry": "not-in-this-dataset"
+    },
+    {
+      "reference": {
+        "type": "kanji",
+        "id": "職"
+      },
+      "identityEvidence": [
+        {
+          "sourceId": "kanji",
+          "locator": "/kanji/職"
+        }
+      ],
+      "rawOnReadings": [
+        "ショク",
+        "ソク"
+      ],
+      "standaloneGeometry": "available",
+      "historicalFormGeometry": "not-in-this-dataset",
+      "familyReadings": {
+        "standardOn": [
+          "ショク"
+        ],
+        "outsideTableOn": [
+          "シキ"
+        ],
+        "evidence": [
+          {
+            "sourceId": "kanjipedia-8077",
+            "locator": "音（表外印を区別）"
+          }
+        ],
+        "scope": "Selected dictionary entry; does not replace the raw local readings or determine a word reading."
+      }
+    },
+    {
+      "reference": {
+        "type": "kanji",
+        "id": "識"
+      },
+      "identityEvidence": [
+        {
+          "sourceId": "kanji",
+          "locator": "/kanji/識"
+        }
+      ],
+      "rawOnReadings": [
+        "シキ"
+      ],
+      "standaloneGeometry": "available",
+      "historicalFormGeometry": "not-in-this-dataset",
+      "familyReadings": {
+        "standardOn": [
+          "シキ"
+        ],
+        "outsideTableOn": [
+          "シ",
+          "ショク"
+        ],
+        "evidence": [
+          {
+            "sourceId": "kanjipedia-8b58",
+            "locator": "音（表外印を区別）"
+          }
+        ],
+        "scope": "Selected dictionary entry; does not replace the raw local readings or determine a word reading."
+      }
+    },
+    {
+      "reference": {
+        "type": "kanji",
+        "id": "織"
+      },
+      "identityEvidence": [
+        {
+          "sourceId": "kanji",
+          "locator": "/kanji/織"
+        }
+      ],
+      "rawOnReadings": [
+        "ショク",
+        "シキ"
+      ],
+      "standaloneGeometry": "available",
+      "historicalFormGeometry": "not-in-this-dataset",
+      "familyReadings": {
+        "standardOn": [
+          "ショク",
+          "シキ"
+        ],
+        "outsideTableOn": [],
+        "evidence": [
+          {
+            "sourceId": "kanjipedia-7e54",
+            "locator": "音（表外印を区別）"
+          }
+        ],
+        "scope": "Selected dictionary entry; does not replace the raw local readings or determine a word reading."
+      }
+    },
+    {
+      "reference": {
+        "type": "kanji",
+        "id": "耳"
+      },
+      "identityEvidence": [
+        {
+          "sourceId": "kanji",
+          "locator": "/kanji/耳"
+        }
+      ],
+      "rawOnReadings": [
+        "ジ"
+      ],
+      "standaloneGeometry": "available",
+      "historicalFormGeometry": "not-in-this-dataset"
+    },
+    {
+      "reference": {
+        "type": "kanji",
+        "id": "言"
+      },
+      "identityEvidence": [
+        {
+          "sourceId": "kanji",
+          "locator": "/kanji/言"
+        }
+      ],
+      "rawOnReadings": [
+        "ゲン",
+        "ゴン"
+      ],
+      "standaloneGeometry": "available",
+      "historicalFormGeometry": "not-in-this-dataset"
+    },
+    {
+      "reference": {
+        "type": "kanji",
+        "id": "糸"
+      },
+      "identityEvidence": [
+        {
+          "sourceId": "kanji",
+          "locator": "/kanji/糸"
+        }
+      ],
+      "rawOnReadings": [
+        "シ"
+      ],
+      "standaloneGeometry": "available",
+      "historicalFormGeometry": "not-in-this-dataset"
+    },
+    {
+      "reference": {
+        "type": "component-occurrence",
+        "id": "[\"kanjivg-occurrence\",\"61e39cfc29724132a6f8823b166296932985a0ff\",\"職\",\"c004baafee3021780fa772c6da927bc30cf40c379da96e8ae5b41e927337f1ee\",\"$/0/0\"]"
+      },
+      "host": {
+        "type": "kanji",
+        "id": "職"
+      },
+      "component": {
+        "type": "kanji",
+        "id": "耳"
+      },
+      "groupPath": "$/0/0",
+      "sourceGroupId": "kvg:08077-g1",
+      "sourceSha256": "c004baafee3021780fa772c6da927bc30cf40c379da96e8ae5b41e927337f1ee",
+      "strokeIndices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "evidence": [
+        {
+          "sourceId": "kanjivg-職",
+          "locator": "kvg:08077-g1"
+        }
+      ]
+    },
+    {
+      "reference": {
+        "type": "component-occurrence",
+        "id": "[\"kanjivg-occurrence\",\"61e39cfc29724132a6f8823b166296932985a0ff\",\"職\",\"c004baafee3021780fa772c6da927bc30cf40c379da96e8ae5b41e927337f1ee\",\"$/0/1\"]"
+      },
+      "host": {
+        "type": "kanji",
+        "id": "職"
+      },
+      "component": {
+        "type": "kanji",
+        "id": "戠"
+      },
+      "groupPath": "$/0/1",
+      "sourceGroupId": "kvg:08077-g2",
+      "sourceSha256": "c004baafee3021780fa772c6da927bc30cf40c379da96e8ae5b41e927337f1ee",
+      "strokeIndices": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "evidence": [
+        {
+          "sourceId": "kanjivg-職",
+          "locator": "kvg:08077-g2"
+        }
+      ]
+    },
+    {
+      "reference": {
+        "type": "component-occurrence",
+        "id": "[\"kanjivg-occurrence\",\"61e39cfc29724132a6f8823b166296932985a0ff\",\"識\",\"4fb80f7684e1299ddea6e056cc65fed76599e584ac06330d29bf6ecf22f90abd\",\"$/0/0\"]"
+      },
+      "host": {
+        "type": "kanji",
+        "id": "識"
+      },
+      "component": {
+        "type": "kanji",
+        "id": "言"
+      },
+      "groupPath": "$/0/0",
+      "sourceGroupId": "kvg:08b58-g1",
+      "sourceSha256": "4fb80f7684e1299ddea6e056cc65fed76599e584ac06330d29bf6ecf22f90abd",
+      "strokeIndices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "evidence": [
+        {
+          "sourceId": "kanjivg-識",
+          "locator": "kvg:08b58-g1"
+        }
+      ]
+    },
+    {
+      "reference": {
+        "type": "component-occurrence",
+        "id": "[\"kanjivg-occurrence\",\"61e39cfc29724132a6f8823b166296932985a0ff\",\"識\",\"4fb80f7684e1299ddea6e056cc65fed76599e584ac06330d29bf6ecf22f90abd\",\"$/0/1\"]"
+      },
+      "host": {
+        "type": "kanji",
+        "id": "識"
+      },
+      "component": {
+        "type": "kanji",
+        "id": "戠"
+      },
+      "groupPath": "$/0/1",
+      "sourceGroupId": "kvg:08b58-g3",
+      "sourceSha256": "4fb80f7684e1299ddea6e056cc65fed76599e584ac06330d29bf6ecf22f90abd",
+      "strokeIndices": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "evidence": [
+        {
+          "sourceId": "kanjivg-識",
+          "locator": "kvg:08b58-g3"
+        }
+      ]
+    },
+    {
+      "reference": {
+        "type": "component-occurrence",
+        "id": "[\"kanjivg-occurrence\",\"61e39cfc29724132a6f8823b166296932985a0ff\",\"織\",\"464a97cde3a8cba2aff6c5eeefa99a377526bde24ce8d53cbbd9d1e1350233d1\",\"$/0/0\"]"
+      },
+      "host": {
+        "type": "kanji",
+        "id": "織"
+      },
+      "component": {
+        "type": "kanji",
+        "id": "糸"
+      },
+      "groupPath": "$/0/0",
+      "sourceGroupId": "kvg:07e54-g1",
+      "sourceSha256": "464a97cde3a8cba2aff6c5eeefa99a377526bde24ce8d53cbbd9d1e1350233d1",
+      "strokeIndices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "evidence": [
+        {
+          "sourceId": "kanjivg-織",
+          "locator": "kvg:07e54-g1"
+        }
+      ]
+    },
+    {
+      "reference": {
+        "type": "component-occurrence",
+        "id": "[\"kanjivg-occurrence\",\"61e39cfc29724132a6f8823b166296932985a0ff\",\"織\",\"464a97cde3a8cba2aff6c5eeefa99a377526bde24ce8d53cbbd9d1e1350233d1\",\"$/0/1\"]"
+      },
+      "host": {
+        "type": "kanji",
+        "id": "織"
+      },
+      "component": {
+        "type": "kanji",
+        "id": "戠"
+      },
+      "groupPath": "$/0/1",
+      "sourceGroupId": "kvg:07e54-g2",
+      "sourceSha256": "464a97cde3a8cba2aff6c5eeefa99a377526bde24ce8d53cbbd9d1e1350233d1",
+      "strokeIndices": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "evidence": [
+        {
+          "sourceId": "kanjivg-織",
+          "locator": "kvg:07e54-g2"
+        }
+      ]
+    },
+    {
+      "reference": {
+        "type": "word",
+        "id": "職業",
+        "reading": "しょくぎょう"
+      },
+      "rawRecord": {
+        "w": "職業",
+        "r": "しょくぎょう",
+        "g": "occupation, business",
+        "jlpt": 3,
+        "k": [
+          "業",
+          "職"
+        ]
+      },
+      "evidence": [
+        {
+          "sourceId": "words",
+          "locator": "/words/職業"
+        }
+      ]
+    },
+    {
+      "reference": {
+        "type": "sentence-occurrence",
+        "id": "[\"bundled-example\",\"prototypes/corridor/data/proprietary_safe/examples/s-03.json\",\"f33399c869ae19796716f4571ac58da2f180b1836ea9cd4f24c34960fba5cc62\",284,2]"
+      },
+      "evidence": [
+        {
+          "sourceId": "example-shard-6284",
+          "locator": "/284"
+        }
+      ]
+    },
+    {
+      "reference": {
+        "type": "word",
+        "id": "知識",
+        "reading": "ちしき"
+      },
+      "rawRecord": {
+        "w": "知識",
+        "r": "ちしき",
+        "g": "knowledge, information",
+        "jlpt": 3,
+        "k": [
+          "知",
+          "識"
+        ]
+      },
+      "evidence": [
+        {
+          "sourceId": "words",
+          "locator": "/words/知識"
+        }
+      ]
+    },
+    {
+      "reference": {
+        "type": "sentence-occurrence",
+        "id": "[\"bundled-example\",\"prototypes/corridor/data/proprietary_safe/examples/s-00.json\",\"6d053025b8187ecd6b5e1a4474a21e95369a0695b9d11286ece17f003aa419ed\",1369,0]"
+      },
+      "evidence": [
+        {
+          "sourceId": "example-shard-1369",
+          "locator": "/1369"
+        }
+      ]
+    },
+    {
+      "reference": {
+        "type": "word",
+        "id": "組織",
+        "reading": "そしき"
+      },
+      "rawRecord": {
+        "w": "組織",
+        "r": "そしき",
+        "g": "organization; structure; tissue",
+        "jlpt": 3,
+        "k": [
+          "組",
+          "織"
+        ]
+      },
+      "evidence": [
+        {
+          "sourceId": "words",
+          "locator": "/words/組織"
+        }
+      ]
+    },
+    {
+      "reference": {
+        "type": "sentence-occurrence",
+        "id": "[\"bundled-example\",\"prototypes/corridor/data/proprietary_safe/examples/s-04.json\",\"8c0ca81c54aeebedc2c1562bf0fdfe0aa7e3416909d515bdeef8c1d95c010e65\",906,1]"
+      },
+      "evidence": [
+        {
+          "sourceId": "example-shard-8906",
+          "locator": "/906"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "戠:phonetic-component-of:職",
+      "relation": "phonetic-component",
+      "from": {
+        "type": "kanji",
+        "id": "戠"
+      },
+      "to": {
+        "type": "kanji",
+        "id": "職"
+      },
+      "evidence": [
+        {
+          "sourceId": "kanjipedia-8077",
+          "locator": "なりたち"
+        }
+      ],
+      "account": "The cited dictionary identifies 戠 as the phonetic component of 職.",
+      "boundary": "Lexicographical formation account, not a newly verified archaeological lineage; not inferred automatically from geometry."
+    },
+    {
+      "id": "耳:semantic-component-of:職",
+      "relation": "semantic-component",
+      "from": {
+        "type": "kanji",
+        "id": "耳"
+      },
+      "to": {
+        "type": "kanji",
+        "id": "職"
+      },
+      "evidence": [
+        {
+          "sourceId": "kanjipedia-8077",
+          "locator": "なりたち"
+        }
+      ],
+      "account": "The cited formation account links the ear component with hearing and learning/remembering, then describes extension to an office or charge. This is not a claim that ear directly means employment.",
+      "boundary": "Lexicographical formation account, not a newly verified archaeological lineage; not inferred automatically from geometry."
+    },
+    {
+      "id": "戠:phonetic-component-of:識",
+      "relation": "phonetic-component",
+      "from": {
+        "type": "kanji",
+        "id": "戠"
+      },
+      "to": {
+        "type": "kanji",
+        "id": "識"
+      },
+      "evidence": [
+        {
+          "sourceId": "kanjipedia-8b58",
+          "locator": "なりたち"
+        }
+      ],
+      "account": "The cited dictionary identifies 戠 as the phonetic component of 識.",
+      "boundary": "Lexicographical formation account, not a newly verified archaeological lineage; not inferred automatically from geometry."
+    },
+    {
+      "id": "言:semantic-component-of:識",
+      "relation": "semantic-component",
+      "from": {
+        "type": "kanji",
+        "id": "言"
+      },
+      "to": {
+        "type": "kanji",
+        "id": "識"
+      },
+      "evidence": [
+        {
+          "sourceId": "kanjipedia-8b58",
+          "locator": "なりたち"
+        }
+      ],
+      "account": "The cited formation account combines the speech/word component with the phonetic component and relates the character to understanding and remembering, then marking.",
+      "boundary": "Lexicographical formation account, not a newly verified archaeological lineage; not inferred automatically from geometry."
+    },
+    {
+      "id": "戠:phonetic-component-of:織",
+      "relation": "phonetic-component",
+      "from": {
+        "type": "kanji",
+        "id": "戠"
+      },
+      "to": {
+        "type": "kanji",
+        "id": "織"
+      },
+      "evidence": [
+        {
+          "sourceId": "kanjipedia-7e54",
+          "locator": "なりたち"
+        }
+      ],
+      "account": "The cited dictionary identifies 戠 as the phonetic component of 織.",
+      "boundary": "Lexicographical formation account, not a newly verified archaeological lineage; not inferred automatically from geometry."
+    },
+    {
+      "id": "糸:semantic-component-of:織",
+      "relation": "semantic-component",
+      "from": {
+        "type": "kanji",
+        "id": "糸"
+      },
+      "to": {
+        "type": "kanji",
+        "id": "織"
+      },
+      "evidence": [
+        {
+          "sourceId": "kanjipedia-7e54",
+          "locator": "なりたち"
+        }
+      ],
+      "account": "The cited formation account combines the thread component with the phonetic component and relates the character to weaving cloth.",
+      "boundary": "Lexicographical formation account, not a newly verified archaeological lineage; not inferred automatically from geometry."
+    },
+    {
+      "id": "職:耳:source-occurrence",
+      "relation": "source-component-occurrence",
+      "from": {
+        "type": "kanji",
+        "id": "耳"
+      },
+      "to": {
+        "type": "component-occurrence",
+        "id": "[\"kanjivg-occurrence\",\"61e39cfc29724132a6f8823b166296932985a0ff\",\"職\",\"c004baafee3021780fa772c6da927bc30cf40c379da96e8ae5b41e927337f1ee\",\"$/0/0\"]"
+      },
+      "evidence": [
+        {
+          "sourceId": "kanjivg-職",
+          "locator": "kvg:08077-g1"
+        }
+      ],
+      "boundary": "A labelled group in this exact glyph; geometry is not evidence of a phonetic or semantic role."
+    },
+    {
+      "id": "職:戠:source-occurrence",
+      "relation": "source-component-occurrence",
+      "from": {
+        "type": "kanji",
+        "id": "戠"
+      },
+      "to": {
+        "type": "component-occurrence",
+        "id": "[\"kanjivg-occurrence\",\"61e39cfc29724132a6f8823b166296932985a0ff\",\"職\",\"c004baafee3021780fa772c6da927bc30cf40c379da96e8ae5b41e927337f1ee\",\"$/0/1\"]"
+      },
+      "evidence": [
+        {
+          "sourceId": "kanjivg-職",
+          "locator": "kvg:08077-g2"
+        }
+      ],
+      "boundary": "A labelled group in this exact glyph; geometry is not evidence of a phonetic or semantic role."
+    },
+    {
+      "id": "識:言:source-occurrence",
+      "relation": "source-component-occurrence",
+      "from": {
+        "type": "kanji",
+        "id": "言"
+      },
+      "to": {
+        "type": "component-occurrence",
+        "id": "[\"kanjivg-occurrence\",\"61e39cfc29724132a6f8823b166296932985a0ff\",\"識\",\"4fb80f7684e1299ddea6e056cc65fed76599e584ac06330d29bf6ecf22f90abd\",\"$/0/0\"]"
+      },
+      "evidence": [
+        {
+          "sourceId": "kanjivg-識",
+          "locator": "kvg:08b58-g1"
+        }
+      ],
+      "boundary": "A labelled group in this exact glyph; geometry is not evidence of a phonetic or semantic role."
+    },
+    {
+      "id": "識:戠:source-occurrence",
+      "relation": "source-component-occurrence",
+      "from": {
+        "type": "kanji",
+        "id": "戠"
+      },
+      "to": {
+        "type": "component-occurrence",
+        "id": "[\"kanjivg-occurrence\",\"61e39cfc29724132a6f8823b166296932985a0ff\",\"識\",\"4fb80f7684e1299ddea6e056cc65fed76599e584ac06330d29bf6ecf22f90abd\",\"$/0/1\"]"
+      },
+      "evidence": [
+        {
+          "sourceId": "kanjivg-識",
+          "locator": "kvg:08b58-g3"
+        }
+      ],
+      "boundary": "A labelled group in this exact glyph; geometry is not evidence of a phonetic or semantic role."
+    },
+    {
+      "id": "織:糸:source-occurrence",
+      "relation": "source-component-occurrence",
+      "from": {
+        "type": "kanji",
+        "id": "糸"
+      },
+      "to": {
+        "type": "component-occurrence",
+        "id": "[\"kanjivg-occurrence\",\"61e39cfc29724132a6f8823b166296932985a0ff\",\"織\",\"464a97cde3a8cba2aff6c5eeefa99a377526bde24ce8d53cbbd9d1e1350233d1\",\"$/0/0\"]"
+      },
+      "evidence": [
+        {
+          "sourceId": "kanjivg-織",
+          "locator": "kvg:07e54-g1"
+        }
+      ],
+      "boundary": "A labelled group in this exact glyph; geometry is not evidence of a phonetic or semantic role."
+    },
+    {
+      "id": "織:戠:source-occurrence",
+      "relation": "source-component-occurrence",
+      "from": {
+        "type": "kanji",
+        "id": "戠"
+      },
+      "to": {
+        "type": "component-occurrence",
+        "id": "[\"kanjivg-occurrence\",\"61e39cfc29724132a6f8823b166296932985a0ff\",\"織\",\"464a97cde3a8cba2aff6c5eeefa99a377526bde24ce8d53cbbd9d1e1350233d1\",\"$/0/1\"]"
+      },
+      "evidence": [
+        {
+          "sourceId": "kanjivg-織",
+          "locator": "kvg:07e54-g2"
+        }
+      ],
+      "boundary": "A labelled group in this exact glyph; geometry is not evidence of a phonetic or semantic role."
+    },
+    {
+      "id": "職業:contains:職",
+      "relation": "word-contains-kanji",
+      "from": {
+        "type": "word",
+        "id": "職業",
+        "reading": "しょくぎょう"
+      },
+      "to": {
+        "type": "kanji",
+        "id": "職"
+      },
+      "scalarIndex": 0,
+      "evidence": [
+        {
+          "sourceId": "words",
+          "locator": "/words/職業"
+        }
+      ],
+      "boundary": "Spelling membership; no per-character kana alignment or contextual sense is inferred."
+    },
+    {
+      "id": "example:6284:word",
+      "relation": "attested-word-occurrence",
+      "from": {
+        "type": "sentence-occurrence",
+        "id": "[\"bundled-example\",\"prototypes/corridor/data/proprietary_safe/examples/s-03.json\",\"f33399c869ae19796716f4571ac58da2f180b1836ea9cd4f24c34960fba5cc62\",284,2]"
+      },
+      "to": {
+        "type": "word",
+        "id": "職業",
+        "reading": "しょくぎょう"
+      },
+      "evidence": [
+        {
+          "sourceId": "example-shard-6284",
+          "locator": "/284/0/2"
+        }
+      ]
+    },
+    {
+      "id": "知識:contains:識",
+      "relation": "word-contains-kanji",
+      "from": {
+        "type": "word",
+        "id": "知識",
+        "reading": "ちしき"
+      },
+      "to": {
+        "type": "kanji",
+        "id": "識"
+      },
+      "scalarIndex": 1,
+      "evidence": [
+        {
+          "sourceId": "words",
+          "locator": "/words/知識"
+        }
+      ],
+      "boundary": "Spelling membership; no per-character kana alignment or contextual sense is inferred."
+    },
+    {
+      "id": "example:1369:word",
+      "relation": "attested-word-occurrence",
+      "from": {
+        "type": "sentence-occurrence",
+        "id": "[\"bundled-example\",\"prototypes/corridor/data/proprietary_safe/examples/s-00.json\",\"6d053025b8187ecd6b5e1a4474a21e95369a0695b9d11286ece17f003aa419ed\",1369,0]"
+      },
+      "to": {
+        "type": "word",
+        "id": "知識",
+        "reading": "ちしき"
+      },
+      "evidence": [
+        {
+          "sourceId": "example-shard-1369",
+          "locator": "/1369/0/0"
+        }
+      ]
+    },
+    {
+      "id": "組織:contains:織",
+      "relation": "word-contains-kanji",
+      "from": {
+        "type": "word",
+        "id": "組織",
+        "reading": "そしき"
+      },
+      "to": {
+        "type": "kanji",
+        "id": "織"
+      },
+      "scalarIndex": 1,
+      "evidence": [
+        {
+          "sourceId": "words",
+          "locator": "/words/組織"
+        }
+      ],
+      "boundary": "Spelling membership; no per-character kana alignment or contextual sense is inferred."
+    },
+    {
+      "id": "example:8906:word",
+      "relation": "attested-word-occurrence",
+      "from": {
+        "type": "sentence-occurrence",
+        "id": "[\"bundled-example\",\"prototypes/corridor/data/proprietary_safe/examples/s-04.json\",\"8c0ca81c54aeebedc2c1562bf0fdfe0aa7e3416909d515bdeef8c1d95c010e65\",906,1]"
+      },
+      "to": {
+        "type": "word",
+        "id": "組織",
+        "reading": "そしき"
+      },
+      "evidence": [
+        {
+          "sourceId": "example-shard-8906",
+          "locator": "/906/0/1"
+        }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "reference": {
+        "type": "sentence-occurrence",
+        "id": "[\"bundled-example\",\"prototypes/corridor/data/proprietary_safe/examples/s-03.json\",\"f33399c869ae19796716f4571ac58da2f180b1836ea9cd4f24c34960fba5cc62\",284,2]"
+      },
+      "word": {
+        "type": "word",
+        "id": "職業",
+        "reading": "しょくぎょう"
+      },
+      "bundleSid": 6284,
+      "sentence": "彼の職業は医師だ。",
+      "english": "He is a doctor by profession.",
+      "rawRow": [
+        [
+          [
+            "彼",
+            "彼",
+            "かれ",
+            1,
+            "代名詞",
+            [
+              [
+                "彼",
+                "かれ"
+              ]
+            ]
+          ],
+          [
+            "の",
+            "の",
+            "の",
+            0,
+            "助詞",
+            [
+              [
+                "の"
+              ]
+            ]
+          ],
+          [
+            "職業",
+            "職業",
+            "しょくぎょう",
+            1,
+            "名詞",
+            [
+              [
+                "職業",
+                "しょくぎょう"
+              ]
+            ]
+          ],
+          [
+            "は",
+            "は",
+            "は",
+            0,
+            "助詞",
+            [
+              [
+                "は"
+              ]
+            ]
+          ],
+          [
+            "医師",
+            "医師",
+            "いし",
+            1,
+            "名詞",
+            [
+              [
+                "医師",
+                "いし"
+              ]
+            ]
+          ],
+          [
+            "だ",
+            "だ",
+            "だ",
+            0,
+            "助動詞",
+            [
+              [
+                "だ"
+              ]
+            ]
+          ],
+          [
+            "。",
+            "。",
+            "",
+            0,
+            "補助記号",
+            [
+              [
+                "。"
+              ]
+            ]
+          ]
+        ],
+        "He is a doctor by profession.",
+        1
+      ],
+      "tokenIndex": 2,
+      "sourceIndex": 1,
+      "sourceRowIndex": 284,
+      "evidence": [
+        {
+          "sourceId": "example-shard-6284",
+          "locator": "/284"
+        }
+      ],
+      "sourceAttribution": {
+        "name": "tanaka-corpus",
+        "licence": "CC BY 2.0 FR",
+        "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+        "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus",
+        "labelJa": "用例",
+        "labelEn": "examples corpus"
+      },
+      "dictionaryEvidence": [
+        {
+          "sourceId": "words",
+          "locator": "/words/職業"
+        }
+      ],
+      "readingOrigin": "bundled tokenizer output, corroborated against exact dictionary word reading",
+      "contextualSenseId": null,
+      "characterReadingAlignment": null,
+      "originalCorpusSentenceId": null,
+      "missing": "The compact bundle discards the upstream sentence ID. This is a hash-bound bundled corpus occurrence, not a verified live Tatoeba sentence link."
+    },
+    {
+      "reference": {
+        "type": "sentence-occurrence",
+        "id": "[\"bundled-example\",\"prototypes/corridor/data/proprietary_safe/examples/s-00.json\",\"6d053025b8187ecd6b5e1a4474a21e95369a0695b9d11286ece17f003aa419ed\",1369,0]"
+      },
+      "word": {
+        "type": "word",
+        "id": "知識",
+        "reading": "ちしき"
+      },
+      "bundleSid": 1369,
+      "sentence": "知識は力なり。",
+      "english": "Knowledge is power.",
+      "rawRow": [
+        [
+          [
+            "知識",
+            "知識",
+            "ちしき",
+            1,
+            "名詞",
+            [
+              [
+                "知識",
+                "ちしき"
+              ]
+            ]
+          ],
+          [
+            "は",
+            "は",
+            "は",
+            0,
+            "助詞",
+            [
+              [
+                "は"
+              ]
+            ]
+          ],
+          [
+            "力",
+            "力",
+            "ちから",
+            1,
+            "名詞",
+            [
+              [
+                "力",
+                "ちから"
+              ]
+            ]
+          ],
+          [
+            "なり",
+            "なり",
+            "なり",
+            0,
+            "助動詞",
+            [
+              [
+                "なり"
+              ]
+            ]
+          ],
+          [
+            "。",
+            "。",
+            "",
+            0,
+            "補助記号",
+            [
+              [
+                "。"
+              ]
+            ]
+          ]
+        ],
+        "Knowledge is power.",
+        1
+      ],
+      "tokenIndex": 0,
+      "sourceIndex": 1,
+      "sourceRowIndex": 1369,
+      "evidence": [
+        {
+          "sourceId": "example-shard-1369",
+          "locator": "/1369"
+        }
+      ],
+      "sourceAttribution": {
+        "name": "tanaka-corpus",
+        "licence": "CC BY 2.0 FR",
+        "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+        "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus",
+        "labelJa": "用例",
+        "labelEn": "examples corpus"
+      },
+      "dictionaryEvidence": [
+        {
+          "sourceId": "words",
+          "locator": "/words/知識"
+        }
+      ],
+      "readingOrigin": "bundled tokenizer output, corroborated against exact dictionary word reading",
+      "contextualSenseId": null,
+      "characterReadingAlignment": null,
+      "originalCorpusSentenceId": null,
+      "missing": "The compact bundle discards the upstream sentence ID. This is a hash-bound bundled corpus occurrence, not a verified live Tatoeba sentence link."
+    },
+    {
+      "reference": {
+        "type": "sentence-occurrence",
+        "id": "[\"bundled-example\",\"prototypes/corridor/data/proprietary_safe/examples/s-04.json\",\"8c0ca81c54aeebedc2c1562bf0fdfe0aa7e3416909d515bdeef8c1d95c010e65\",906,1]"
+      },
+      "word": {
+        "type": "word",
+        "id": "組織",
+        "reading": "そしき"
+      },
+      "bundleSid": 8906,
+      "sentence": "この組織は戦後生まれた。",
+      "english": "This institution came into being after the war.",
+      "rawRow": [
+        [
+          [
+            "この",
+            "この",
+            "この",
+            1,
+            "連体詞",
+            [
+              [
+                "この"
+              ]
+            ]
+          ],
+          [
+            "組織",
+            "組織",
+            "そしき",
+            1,
+            "名詞",
+            [
+              [
+                "組織",
+                "そしき"
+              ]
+            ]
+          ],
+          [
+            "は",
+            "は",
+            "は",
+            0,
+            "助詞",
+            [
+              [
+                "は"
+              ]
+            ]
+          ],
+          [
+            "戦後",
+            "戦後",
+            "せんご",
+            1,
+            "名詞",
+            [
+              [
+                "戦後",
+                "せんご"
+              ]
+            ]
+          ],
+          [
+            "生まれ",
+            "生まれる",
+            "うまれ",
+            1,
+            "動詞",
+            [
+              [
+                "生",
+                "う"
+              ],
+              [
+                "まれ"
+              ]
+            ]
+          ],
+          [
+            "た",
+            "た",
+            "た",
+            0,
+            "助動詞",
+            [
+              [
+                "た"
+              ]
+            ]
+          ],
+          [
+            "。",
+            "。",
+            "",
+            0,
+            "補助記号",
+            [
+              [
+                "。"
+              ]
+            ]
+          ]
+        ],
+        "This institution came into being after the war.",
+        1
+      ],
+      "tokenIndex": 1,
+      "sourceIndex": 1,
+      "sourceRowIndex": 906,
+      "evidence": [
+        {
+          "sourceId": "example-shard-8906",
+          "locator": "/906"
+        }
+      ],
+      "sourceAttribution": {
+        "name": "tanaka-corpus",
+        "licence": "CC BY 2.0 FR",
+        "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+        "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus",
+        "labelJa": "用例",
+        "labelEn": "examples corpus"
+      },
+      "dictionaryEvidence": [
+        {
+          "sourceId": "words",
+          "locator": "/words/組織"
+        }
+      ],
+      "readingOrigin": "bundled tokenizer output, corroborated against exact dictionary word reading",
+      "contextualSenseId": null,
+      "characterReadingAlignment": null,
+      "originalCorpusSentenceId": null,
+      "missing": "The compact bundle discards the upstream sentence ID. This is a hash-bound bundled corpus occurrence, not a verified live Tatoeba sentence link."
+    }
+  ],
+  "coverage": {
+    "roleEdges": 6,
+    "sourceComponentOccurrences": 6,
+    "attestedExamples": 3,
+    "historicalFormGeometry": 0,
+    "fontMeshBindings": 0,
+    "missing": [
+      "Standalone 戠 stroke paths and an upstream standalone SVG are not in this dataset.",
+      "Historical forms and a verified font-mesh binding are not in this dataset.",
+      "Original upstream sentence IDs, contextual sense IDs and per-character kana alignment are not retained.",
+      "Family membership does not imply the same reading in every word.",
+      "Family kanji nodes retain on-readings only (rawOnReadings). Kun readings such as 織 お.る and 識 し.る remain in kanji.json and the full reference; they are outside this phonetic-family account.",
+      "The 音 and split 戈 subgroups remain geometry evidence only; no second-level teaching edge is authored here."
+    ]
+  }
+}

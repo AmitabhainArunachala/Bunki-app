@@ -6213,7 +6213,25 @@ function keepNavigationReturn(destination, invoker = document.activeElement) {
 function returnFromNavigation() {
   const home = S.navigationReturns.at(-1);
   if (!home || home.destination !== S.view) return false;
+  // A course detour may contain ordinary Atlas/search frames. Check its owner
+  // before any inner frame can restore the old caller under a new record.
+  const staleCourse = S.navigationReturns.findIndex((frame) => frame.kanjiCourseReturn &&
+    (!recordReady(frame.kanjiCourseReturn.epoch) ||
+      (frame.view === 'review' && S.review !== frame.kanjiCourseReturn.review)));
+  if (staleCourse !== -1) {
+    S.navigationReturns.splice(staleCourse);
+    S.stack = []; S.dialogInvoker = null; S.scaleVisit = null;
+    learningSourceVisit = null;
+    if (!S.kanjiCourse || !recordReady(S.kanjiCourse.epoch)) S.kanjiCourse = { stage: 'menu' };
+    S.view = 'lessons'; render(); window.scrollTo(0, 0);
+    return true;
+  }
   S.navigationReturns.pop();
+  if (home.kanjiCourseReturn) {
+    S.kanjiCourse = home.kanjiCourseReturn.priorCourse;
+    Object.assign(S, home.kanjiCourseReturn.sourceState);
+    S.sentencePracticeView = home.kanjiCourseReturn.sentencePracticeView;
+  }
   if (home.referenceState && referenceLibrary) Object.assign(referenceLibrary.state, home.referenceState);
   if (S.view === 'reader' && S.passageId) {
     clearTimeout(readerPosTimer);
@@ -6356,7 +6374,7 @@ function back({ instant = false } = {}) {
     render();
     return;
   }
-  if (S.view === 'lessons' && S.lessonRun) {
+  if (S.view === 'lessons' && S.lessonRun && !S.kanjiCourse) {
     endLessonRun();
     return;
   }
@@ -11808,7 +11826,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     mini.append(actions);
   }
   // the word's kanji, their parts and its web follow the actions, so Save is always the first thing in reach
-  if (kanji) { const web = miniKanjiWeb(token.b, span, reading); if (web) mini.append(web); }
+  if (kanji) { const web = miniKanjiWeb(token.b, span, reading, from); if (web) mini.append(web); }
   if (sentence) mini.append(sentence);
   // (a slip drawn again in place has its Escape already: the same word's)
   if (!standing) mini.addEventListener('keydown', (event) => {
@@ -11858,7 +11876,7 @@ function slipAllowed(anchor) {
  * words that share one of them, and one door into the web of the word. Every part comes from the
  * kanji data (D.kanji[c].parts through mainParts, named from D.radicals), never chosen by hand; the
  * cards line comes from the learner's own saved words. Nothing is drawn when the word has no kanji. */
-function miniKanjiWeb(word, anchor, wordReading = '') {
+function miniKanjiWeb(word, anchor, wordReading = '', sourceFrom = null) {
   const chars = [...new Set([...String(word || '')].filter((c) => D.kanji?.[c]))].slice(0, 3);
   if (!chars.length) return null;
   const box = el('div', 'mini-web');
@@ -11917,7 +11935,7 @@ function miniKanjiWeb(word, anchor, wordReading = '') {
       what.append(set);
     }
     row.append(what);
-    row.addEventListener('click', open({ t: 'kanji', id: c }));
+    row.addEventListener('click', open({ t: 'kanji', id: c, ...(sourceFrom ? { from: sourceFrom } : {}) }));
     list.append(row);
   }
   box.append(list);
@@ -11951,7 +11969,7 @@ function miniKanjiWeb(word, anchor, wordReading = '') {
   web.addEventListener('click', (event) => {
     event.stopPropagation();
     if (typeof window.openWordWeb === 'function') { removeMini(); window.openWordWeb(word); return; }
-    open({ t: 'kanji', id: chars[0] })(event);
+    open({ t: 'kanji', id: chars[0], ...(sourceFrom ? { from: sourceFrom } : {}) })(event);
   });
   top.append(web);
   return box;
@@ -15274,8 +15292,8 @@ function wireLookupToken(span, token, index, p, lookupContext, named) {
       removeMini();
       // the keyboard's doors (Ctrl+Enter, the word menu) open the page at once; a tap's comes by the cut
       const instant = modality === 'keyboard';
-      if (record) go({ t: 'word', id: record.head || text, ...(record.seq ? { seq: record.seq, reading: record.r } : {}) }, { invoker: span, instant });
-      else go({ t: 'kanji', id: text }, { invoker: span, instant });
+      if (record) go({ t: 'word', id: record.head || text, from, ...(record.seq ? { seq: record.seq, reading: record.r } : {}) }, { invoker: span, instant });
+      else go({ t: 'kanji', id: text, from }, { invoker: span, instant });
     },
     reopen: () => quickLook('programmatic', { restore: true }),
   };
@@ -19986,11 +20004,484 @@ function heldEnrollRoute(node, id) {
   open.addEventListener('click', () => go(heldWordCardNode(S, node.id), { invoker: open }));
   return open;
 }
+/** Authored checks use the existing lesson evidence envelope. The live run is
+ * session state only; no part, view, reveal or skip creates a scheduled card. */
+function kanjiCourseEvidencePatch(latest, evidence) {
+  const seen = new Set((latest.obslog || []).map((row) => JSON.stringify(row)));
+  const rows = evidence.obslog.filter((row) => !seen.has(JSON.stringify(row)));
+  const lessonsDone = { ...latest.lessonsDone };
+  for (const [id, result] of Object.entries(evidence.lessonsDone)) {
+    if (!lessonsDone[id] || lessonsDone[id].ts <= result.ts) lessonsDone[id] = result;
+  }
+  return { lessonsDone, obslog: [...(latest.obslog || []), ...rows] };
+}
+/** W3 owns the attempt and help history. The schedule is reached only through
+ * W4's accepted hook once it is integrated; there is no fallback writer. */
+function kanjiCourseNodeUnit(node) {
+  const course = window.BunkiKanjiCourse;
+  if (node?.t === 'kanji') return course?.unitForCharacter(node.id) || null;
+  if (node?.t !== 'word' || typeof node.reading !== 'string') return null;
+  return course?.unitForTask?.({ type: 'word', id: node.id, reading: node.reading }) || null;
+}
+function kanjiCourseApplyHelp(visit) {
+  const course = window.BunkiKanjiCourse;
+  if (visit?.run?.schemaVersion !== 2 || visit.run.complete || visit.feedback) return;
+  for (const help of [...(visit.referenceHelp || [])].sort((a, b) => a.at - b.at)) {
+    const attempt = course.currentAttempt(visit.run);
+    visit.run = course.recordHelp(visit.run, attempt.attemptId, help);
+  }
+}
+function kanjiCourseRememberHelp(visit, helps) {
+  if (visit?.unitId !== 'shiki-shoku') return;
+  visit.referenceHelp ||= [];
+  for (const help of helps) if (!visit.referenceHelp.some((row) => JSON.stringify(row) === JSON.stringify(help))) {
+    visit.referenceHelp.push(help);
+  }
+  visit.referenceHelp.sort((a, b) => a.at - b.at);
+}
+function kanjiCourseTeachingHelp(visit, target) {
+  if (visit?.unitId !== 'shiki-shoku' || !recordReady(visit.epoch)) return;
+  const at = Date.now();
+  kanjiCourseRememberHelp(visit, [
+    { what: 'teaching-card', about: { kind: 'kanji', literal: target.kanji }, reveals: ['meaning', 'form'], at },
+    { what: 'teaching-card', about: { kind: 'word', term: target.wordKey, reading: target.readings[0] },
+      reveals: ['reading', 'meaning', 'form'], at },
+  ]);
+}
+function kanjiCourseReferenceHelp(visit, node) {
+  if (visit?.unitId !== 'shiki-shoku' || !recordReady(visit.epoch) ||
+      !['kanji', 'word'].includes(node?.t)) return;
+  const about = node.t === 'kanji' ? { kind: 'kanji', literal: node.id }
+    : typeof node.reading === 'string' && node.reading.trim()
+      ? { kind: 'word', term: node.id, reading: node.reading } : null;
+  const help = { what: 'dictionary-entry', ...(about ? { about } : {}),
+    reveals: node.t === 'word' ? ['reading', 'meaning', 'form'] : ['meaning', 'form'], at: Date.now() };
+  kanjiCourseRememberHelp(visit, [help]);
+  visit.supportedPractice = true;
+  kanjiCourseApplyHelp(visit);
+}
+function kanjiCourseHookLine(outcome) {
+  if (outcome?.write === true) return tx(
+    `復習に記録しました（評価 ${outcome.rating}）。`, `Recorded for review (rating ${outcome.rating}).`,
+  );
+  if (outcome?.line) return outcome.line;
+  const text = {
+    'hook-unavailable': ['この版ではコースから復習に記録できません。練習は続けられます。', 'Review recording from this course is unavailable in this version. Practice still works.'],
+    'no-schedule': ['この項目には復習中のカードがありません。練習のみの結果です。', 'This item has no active review card. This remains practice.'],
+    'not-due': ['このカードはまだ復習時刻ではありません。予定は変わりません。', 'This card is not due. Its schedule is unchanged.'],
+    'answered-today': ['この項目は今日すでに復習しました。もう一度は記録しません。', 'This item has already been reviewed today. It will not be graded again.'],
+    'publish-uncertain': ['復習への記録を確認できません。この回答は再送しません。', 'The review write could not be confirmed. This answer will not be sent again.'],
+  };
+  return tx(...(text[outcome?.reason] || ['復習には記録できませんでした。練習は続けられます。', 'This could not be recorded for review. Practice still works.']));
+}
+async function reportKanjiCourseAttempt(visit, attemptId, choice) {
+  const course = window.BunkiKanjiCourse;
+  if (S.kanjiCourse !== visit || S.view !== 'lessons' || !recordReady(visit.epoch) ||
+      visit.pending || visit.feedback?.result.attemptId !== attemptId) return;
+  visit.hookOutcomes ||= {};
+  if (Object.hasOwn(visit.hookOutcomes, attemptId)) return;
+  const hook = window.__KAIRO_HOOKS__;
+  if (typeof hook?.report !== 'function') {
+    visit.hookOutcomes[attemptId] = { write: false, reason: 'hook-unavailable' };
+    render(); return;
+  }
+  const checkedAt = Date.now();
+  visit.run = course.selfCheck(visit.run, attemptId, choice, checkedAt);
+  const candidate = course.hookCandidate(visit.run, attemptId);
+  if (!candidate) return;
+  visit.hookOutcomes[attemptId] = { pending: true };
+  visit.pending = true; render();
+  let outcome;
+  try { outcome = await hook.report({ ...candidate, at: new Date(checkedAt) }); }
+  catch { outcome = { write: false, reason: 'publish-uncertain' }; }
+  // Keep a terminal receipt on the originating visit even if its page/owner
+  // changed. Never retry a possibly published write or replay it on repaint.
+  visit.hookOutcomes[attemptId] = outcome && typeof outcome.write === 'boolean'
+    ? outcome : { write: false, reason: 'publish-uncertain' };
+  visit.pending = false;
+  if (S.kanjiCourse === visit && S.view === 'lessons' && recordReady(visit.epoch)) render();
+}
+function kanjiCourseReturnFrame() {
+  const frame = S.navigationReturns.at(-1);
+  return frame?.destination === 'lessons' && frame.kanjiCourseReturn?.visit === S.kanjiCourse ? frame : null;
+}
+/** This is an authored character unit, not a reading test for the source token.
+ * The original node is retained only for returning to that exact dictionary
+ * entry. Other teaching words/characters never acquire its source provenance. */
+function kanjiCourseEntryNode(visit, target, type) {
+  // A finder/Atlas detour can put generic frames above this course's caller.
+  // Keep the nearest live capsule for this visit without rewriting older ones.
+  // A visit's creation-time origin is not evidence of the current source.
+  const live = visit && visit === S.kanjiCourse && recordReady(visit.epoch) &&
+    !S.navigationReturns.some((frame) => frame.kanjiCourseReturn &&
+      (!recordReady(frame.kanjiCourseReturn.epoch) ||
+        (frame.view === 'review' && S.review !== frame.kanjiCourseReturn.review)));
+  const frame = live ? [...S.navigationReturns].reverse().find((candidate) =>
+    candidate.destination === 'lessons' && candidate.kanjiCourseReturn?.visit === visit) : null;
+  const origin = frame?.kanjiCourseReturn.originNode;
+  if (type === 'kanji' && origin?.t === 'kanji' && origin.id === target.kanji) return { ...origin };
+  if (type === 'word' && origin?.t === 'word' && origin.id === target.wordKey &&
+      target.readings?.includes(origin.reading)) return { ...origin };
+  return { t: type, id: type === 'kanji' ? target.kanji : target.wordKey,
+    ...(type === 'word' && target.readings?.length === 1 ? { reading: target.readings[0] } : {}) };
+}
+function openKanjiCourseUnit(node, invoker) {
+  const course = window.BunkiKanjiCourse;
+  const unit = kanjiCourseNodeUnit(node);
+  const priorCourse = S.kanjiCourse;
+  if (personalHost || !unit || !recordReady(recordEpoch) || priorCourse?.pending ||
+      S.stack.at(-1) !== node || !invoker?.isConnected || !preserveVisibleDrafts()) return false;
+  if (priorCourse && priorCourse.stage !== 'menu' && !recordReady(priorCourse.epoch)) return false;
+  // Looking at the dictionary cannot leave a paused check labelled "before
+  // studying". Keep every response and draft, but describe it as practice.
+  if (priorCourse) {
+    if (priorCourse.run) priorCourse.run = course.asPractice(priorCourse.run);
+    priorCourse.supportedPractice = true;
+    kanjiCourseReferenceHelp(priorCourse, node);
+  }
+  if (S.view === 'lessons' && priorCourse?.unitId === unit.id) {
+    S.stack = []; S.dialogInvoker = null;
+    render(); document.getElementById('kanji-course-title')?.focus();
+    return true;
+  }
+  const visit = priorCourse?.unitId === unit.id ? priorCourse : {
+    unitId: unit.id, stage: 'intro', index: 0, epoch: recordEpoch, run: null,
+    draft: '', feedback: null, saved: false, pending: false, supportedPractice: true,
+    originNode: { ...node },
+  };
+  if (visit !== priorCourse) kanjiCourseReferenceHelp(visit, node);
+  // keepScroll inside this call settles source-reader/publisher coordinates.
+  // Capture their stored positions afterwards, not the preceding scroll event.
+  keepNavigationReturn('lessons', invoker);
+  const capsule = { epoch: recordEpoch, priorCourse, visit, originNode: { ...node }, review: S.review,
+    sentencePracticeView: S.sentencePracticeView,
+    sourceState: { sourceCaptureId: S.sourceCaptureId, sourceContextReturn: S.sourceContextReturn,
+      sourceScroll: S.sourceScroll, publisherReceipt: S.publisherReceipt,
+      publisherContextReturn: S.publisherContextReturn, publisherScroll: S.publisherScroll } };
+  S.navigationReturns.at(-1).kanjiCourseReturn = capsule;
+  S.kanjiCourse = visit; S.view = 'lessons';
+  render(); window.scrollTo(0, 0); document.getElementById('kanji-course-title')?.focus();
+  return true;
+}
+function renderKanjiCourseDoor(sheet, node) {
+  const unit = kanjiCourseNodeUnit(node);
+  if (personalHost || !unit) return;
+  const epoch = recordEpoch;
+  const resume = S.kanjiCourse?.unitId === unit.id;
+  const door = biLabel('button', 'chip', resume ? `「${node.id}」の練習を再開` : `「${node.id}」をことばで練習`,
+    resume ? `Resume practice with ${node.id}` : `Practise ${node.id} in words`);
+  door.type = 'button'; door.id = 'kanji-course-unit-door';
+  door.dataset.kanjiCourseUnit = unit.id;
+  door.disabled = !recordReady(epoch) || !!S.kanjiCourse?.pending;
+  door.addEventListener('click', () => {
+    if (recordReady(epoch)) openKanjiCourseUnit(node, door);
+  });
+  sheet.append(door);
+}
+function renderKanjiCourseMenu(main) {
+  const course = window.BunkiKanjiCourse;
+  if (!course) return;
+  const section = el('section');
+  section.id = 'kanji-course-menu';
+  const characterCount = course.counts().characters;
+  section.append(el('h2', 'list-head', tx(`ことばで学ぶ ${characterCount} 字`, `${characterCount} characters in words`)));
+  section.append(el('p', 'gloss', tx(
+    '意味を選ぶ練習と、ことば全体の読みを答える練習。順番は目安です。どこからでも始められます。',
+    'Practise meaning choices and recall whole-word readings separately. The order is guidance; start anywhere.',
+  )));
+  section.append(el('p', 'fine', tx('試作コース。学習効果・日本語編集の検証は未完了です。', 'Pilot course. Learning effectiveness and Japanese editorial review are still pending.')));
+  if (S.kanjiCourse?.stage === 'menu') {
+    const other = biLabel('button', 'chip', S.lessonRun ? '前のレッスンを再開' : 'ほかのレッスン',
+      S.lessonRun ? 'Resume the previous lesson' : 'Other lessons');
+    other.id = 'kanji-course-other-lessons'; other.type = 'button';
+    other.addEventListener('click', () => { S.kanjiCourse = null; render(); });
+    section.append(other);
+  }
+  for (const unit of course.listUnits()) {
+    const row = el('button', 'entry-row');
+    row.type = 'button';
+    row.dataset.kanjiCourseUnit = unit.id;
+    row.append(el('span', 'row-main', unit.targets.map((target) => target.kanji).join('・')));
+    const result = ['meaning', 'reading'].map((kind) => {
+      const done = S.lessonsDone?.[course.lessonId(unit.id, kind)];
+      const assisted = S.lessonsDone?.[`${course.lessonId(unit.id, kind)}:assisted`];
+      return `${kind === 'meaning' ? tx('意味', 'meaning') : tx('読み', 'reading')}: ${done ? `${done.score}/${done.total}` : '—'}${
+        assisted ? ` · ${tx('ヘルプあり', 'with help')} ${assisted.score}/${assisted.total}` : ''}`;
+    });
+    row.append(el('span', 'lesson-score', result.join(' · ')), el('span', 'row-go', '›'));
+    row.addEventListener('click', () => {
+      S.kanjiCourse = { unitId: unit.id, stage: 'intro', index: 0, epoch: recordEpoch, run: null, draft: '', feedback: null, saved: false, pending: false,
+        supportedPractice: !!S.kanjiCourse?.supportedPractice };
+      render();
+      document.getElementById('kanji-course-title')?.focus();
+    });
+    section.append(row);
+  }
+  main.append(section);
+}
+function renderKanjiCourse(main) {
+  const course = window.BunkiKanjiCourse;
+  const visit = S.kanjiCourse;
+  if (!course || !visit) return;
+  if (visit.stage === 'menu') { renderKanjiCourseMenu(main); return; }
+  const unit = course.getUnit(visit.unitId);
+  const current = () => S.kanjiCourse === visit && S.view === 'lessons' && recordReady(visit.epoch);
+  const redraw = () => {
+    if (!current()) return;
+    render();
+    document.getElementById('kanji-course-title')?.focus({ preventScroll: true });
+  };
+  const button = (id, ja, en, action, cls = 'chip') => {
+    const b = biLabel('button', cls, ja, en);
+    b.type = 'button'; b.id = id;
+    b.disabled = !!visit.pending;
+    b.addEventListener('click', () => { if (current() && !visit.pending) action(); });
+    return b;
+  };
+  const title = el('h1', 'view-title', unit.targets.map((target) => target.kanji).join('・'));
+  title.id = 'kanji-course-title'; title.tabIndex = -1;
+  main.append(title);
+  if (!recordReady(visit.epoch)) {
+    main.append(el('p', 'gloss', tx('記録が切り替わったため、この練習は保存できません。', 'The learner record changed. This session cannot be saved.')));
+    const reset = biLabel('button', 'chip', 'コース一覧へ', 'Back to course list');
+    reset.type = 'button';
+    reset.addEventListener('click', () => { S.kanjiCourse = { stage: 'menu' }; render(); });
+    main.append(reset);
+    return;
+  }
+  if (kanjiCourseReturnFrame()) {
+    main.append(button('kanji-course-source-return', '開いていた項目に戻る', 'Return to the entry I came from', returnFromNavigation));
+  } else {
+    main.append(button('kanji-course-leave', 'コース一覧へ', 'Back to course list', () => {
+      S.kanjiCourse = { stage: 'menu', supportedPractice: !!visit.supportedPractice }; render();
+    }));
+  }
+  if (visit.supportedPractice) main.append(el('p', 'fine', tx(
+    '辞書を見たあとの練習です。初見のテストではありません。',
+    'Practice after opening the dictionary. This is not a first-try check.',
+  )));
+  const start = (mode) => {
+    visit.run = course.createRun(unit.id, { mode, ...(unit.id === 'shiki-shoku' ? { sessionId: crypto.randomUUID() } : {}) });
+    visit.stage = 'check'; visit.feedback = null; visit.draft = ''; visit.saved = false; visit.evidenceTime = null; visit.noEvidence = false;
+    kanjiCourseApplyHelp(visit);
+    redraw();
+  };
+  const entryDoor = (target, type) => {
+    const door = button(`kanji-course-entry-${type}`, type === 'kanji' ? '漢字の全項目' : 'ことばの全項目',
+      type === 'kanji' ? 'Full kanji entry' : 'Full word entry',
+      () => go(kanjiCourseEntryNode(visit, target, type), { invoker: door }));
+    return door;
+  };
+  if (visit.stage === 'intro') {
+    main.append(el('p', 'gloss', tx(
+      `${unit.targets.length}字のキーワードを選び、${unit.targets.length}語の読みを答えます。意味と読みは別々に記録します。`,
+      `Choose ${unit.targets.length} character keywords and recall ${unit.targets.length} whole-word readings. Meaning and reading results stay separate.`,
+    )));
+    main.append(el('p', 'fine', tx('読みの練習には、かな入力を使います。答えを見る・今回はスキップすることもできます。', 'Reading checks use kana input. You can reveal an answer or skip a target without receiving credit.')));
+    main.append(button('kanji-course-learn', '先に学ぶ', `Learn the ${unit.targets.length} characters first`, () => { visit.stage = 'teach'; kanjiCourseTeachingHelp(visit, unit.targets[visit.index]); redraw(); }, 'take'));
+    if (visit.supportedPractice) main.append(button('kanji-course-practise', 'すぐ練習する', 'Practise now', () => start('check')));
+    else main.append(button('kanji-course-preview', '説明を見ずに試す', 'Try the checks before studying', () => start('preview')));
+    return;
+  }
+  if (visit.stage === 'teach') {
+    const target = unit.targets[visit.index];
+    main.append(el('p', 'card-kind', tx(`学ぶ — ${visit.index + 1} / ${unit.targets.length}`, `Learn — ${visit.index + 1} of ${unit.targets.length}`)));
+    const face = el('div', 'review-face');
+    face.append(el('div', 'review-front', target.kanji));
+    face.append(el('p', 'review-sense', `${tx('この練習の漢字キーワード', 'Character keyword for this check')}: ${target.displayKeyword || target.meaning}`));
+    face.append(el('div', 'review-front', target.wordKey), el('div', 'review-reading', target.readings.join(' / ')));
+    face.append(el('p', 'review-sense', `${tx('この例でのことばの意味', 'Word meaning for this example')}: ${target.displayMeaning || target.wordMeaning}`));
+    main.append(face, entryDoor(target, 'kanji'), entryDoor(target, 'word'));
+    if (target.teachingSentence) {
+      main.append(el('p', 'gloss', target.teachingSentence.text),
+        el('p', 'fine', target.teachingSentence.english));
+      const attribution = el('a', 'fine', target.teachingSentence.sourceAttribution.attribution);
+      attribution.href = target.teachingSentence.sourceAttribution.url;
+      main.append(attribution);
+      if (target.teachingSentence.register) main.append(el('p', 'fine', tx('文語調の格言です。', 'A literary set saying.')));
+    }
+    if (target.examples.length) {
+      const examples = el('section');
+      examples.append(el('h2', 'list-head', tx('ほかのことばで見る', 'See it in another word')));
+      for (const example of target.examples) {
+        const line = el('p', 'gloss');
+        line.append(el('span', 'review-reading', `${example.wordKey} — ${example.readings.join(' / ')}`));
+        line.append(el('span', 'review-sense', ` · ${example.displayMeaning || example.wordMeaning}`));
+        examples.append(line);
+      }
+      main.append(examples);
+    }
+    main.append(el('p', 'fine', tx('漢字のキーワードと、ことば全体の意味・読みは別々に扱います。', 'The character keyword and the whole word’s meanings and reading are separate targets.')));
+    main.append(button('kanji-course-teach-next', visit.index + 1 < unit.targets.length ? 'つぎへ' : '練習へ',
+      visit.index + 1 < unit.targets.length ? 'Next character' : 'Start the checks', () => {
+        if (visit.index + 1 < unit.targets.length) {
+          visit.index += 1; kanjiCourseTeachingHelp(visit, unit.targets[visit.index]); redraw();
+        } else start('check');
+      }, 'take'));
+    return;
+  }
+  if (visit.feedback) {
+    const { prompt, result } = visit.feedback;
+    const labels = {
+      correct: ['正解', 'Correct'], wrong: ['もう一度練習する項目', 'One to practise again'],
+      revealed: ['答えを見ました', 'Answer revealed'], skipped: ['今回はスキップ', 'Skipped for now'],
+    };
+    const feedback = el('p', 'gloss', tx(...labels[result.status]));
+    feedback.setAttribute('role', 'status');
+    main.append(feedback);
+    // A skip advances without exposing the answer or creating a success.
+    if (result.status !== 'skipped') {
+      main.append(el('div', 'review-front', prompt.kind === 'meaning' ? prompt.kanji : prompt.wordKey));
+      main.append(el('p', 'review-sense', prompt.correctAnswer));
+    }
+    if (result.attemptId && ['correct', 'wrong'].includes(result.status)) {
+      const outcome = visit.hookOutcomes?.[result.attemptId];
+      if (result.assisted) main.append(el('p', 'fine', tx('この回答にはヘルプを使いました。', 'Help was used for this answer.')));
+      if (outcome) {
+        const status = el('p', 'fine', outcome.pending
+          ? tx('復習への記録を確認中…', 'Checking the review write…') : kanjiCourseHookLine(outcome));
+        status.id = 'kanji-course-review-status'; status.setAttribute('role', 'status'); main.append(status);
+      } else if (typeof window.__KAIRO_HOOKS__?.report !== 'function') {
+        main.append(el('p', 'fine', kanjiCourseHookLine({ reason: 'hook-unavailable' })));
+      } else {
+        main.append(el('p', 'fine', tx('答えを確認しましたか。既存の復習カードに記録する場合だけ選んでください。',
+          'Check your answer. Choose below only to record this attempt on an existing review card.')));
+        if (result.status === 'correct') main.append(button('kanji-course-self-knew', '答えられた・復習に記録', 'I knew it — record for review',
+          () => reportKanjiCourseAttempt(visit, result.attemptId, 'knew')));
+        main.append(button('kanji-course-self-missed', '答えられなかった・復習に記録', 'I missed it — record for review',
+          () => reportKanjiCourseAttempt(visit, result.attemptId, 'missed')));
+      }
+    }
+    main.append(button('kanji-course-next', 'つぎへ', visit.run.complete ? 'See separate results' : 'Next check', () => {
+      visit.feedback = null; kanjiCourseApplyHelp(visit); redraw();
+    }, 'take'));
+    return;
+  }
+  if (!visit.run.complete) {
+    const prompt = course.currentPrompt(visit.run);
+    main.append(el('p', 'card-kind', tx(`${visit.run.cursor + 1} / ${visit.run.promptIds.length}`, `${visit.run.cursor + 1} of ${visit.run.promptIds.length}`)));
+    main.append(el('p', 'gloss', prompt.kind === 'meaning'
+      ? tx('この漢字の学習キーワードを選んでください。', 'Choose the character keyword taught in this unit.')
+      : tx('ことば全体の読みを、かなで答えてください。', 'Type the whole word’s reading in kana.')));
+    main.append(el('div', 'review-front', prompt.kind === 'meaning' ? prompt.kanji : prompt.wordKey));
+    const respond = (action, value) => {
+      if (!current() || visit.feedback || visit.pending) return;
+      const attempt = visit.run.schemaVersion === 2 ? course.currentAttempt(visit.run) : null;
+      const meta = attempt ? { attemptId: attempt.attemptId, at: Date.now() } : undefined;
+      visit.run = action === 'answer' ? course.answer(visit.run, value, meta) : course[action](visit.run, meta);
+      if (attempt && action === 'answer') visit.run = course.showFeedback(visit.run, attempt.attemptId, Date.now());
+      visit.feedback = { prompt, result: course.summary(visit.run).results.at(-1) };
+      if (attempt) kanjiCourseRememberHelp(visit, visit.feedback.result.exposure);
+      visit.draft = '';
+      redraw();
+    };
+    if (prompt.kind === 'meaning') {
+      const choices = el('div', 'lesson-options');
+      for (const choice of prompt.choices) choices.append(button(
+        `kanji-course-choice-${choice.id}`, choice.label, choice.label, () => respond('answer', choice.id), 'lesson-option',
+      ));
+      main.append(choices);
+    } else {
+      const form = el('form');
+      const label = el('label', 'reference-field-label', tx('読み（かな）', 'Reading in kana'));
+      label.htmlFor = 'kanji-course-answer';
+      const input = el('input', 'search-field');
+      input.id = 'kanji-course-answer'; input.lang = 'ja'; input.autocomplete = 'off'; input.spellcheck = false;
+      input.maxLength = 200; input.required = true; input.value = visit.draft;
+      let composing = false;
+      input.addEventListener('compositionstart', () => { composing = true; });
+      input.addEventListener('compositionend', () => { composing = false; visit.draft = input.value; });
+      input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' && (composing || event.isComposing)) event.preventDefault();
+      });
+      input.addEventListener('input', () => { visit.draft = input.value; });
+      const submit = biLabel('button', 'take', '答えを確認', 'Check reading');
+      submit.type = 'submit';
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        if (input.value.trim() && !composing && !event.isComposing) respond('answer', input.value);
+      });
+      form.append(label, input, submit); main.append(form);
+    }
+    if (visit.run.schemaVersion === 2) {
+      const attempt = course.currentAttempt(visit.run);
+      main.append(el('p', 'fine', attempt.help.length
+        ? tx(`この問いで使ったヘルプ：${attempt.help.length}件`, `Help recorded for this check: ${attempt.help.length}`)
+        : tx('色分け・ふりがななしで答えます。', 'Answer in ordinary text, without part colours or furigana.')));
+      for (const help of attempt.help) main.append(el('p', 'fine', `${tx('ヘルプ', 'Help')}: ${
+        help.about?.kind === 'word' ? help.about.term : help.about?.literal || tx('参照項目', 'reference entry')}`));
+      const target = unit.targets.find((item) => item.id === prompt.targetId);
+      main.append(entryDoor(target, prompt.kind === 'reading' ? 'word' : 'kanji'));
+    }
+    main.append(button('kanji-course-reveal', '答えを見る', 'Reveal answer', () => respond('reveal')));
+    main.append(button('kanji-course-skip', '今回はスキップ', 'Skip for now', () => respond('skip')));
+    return;
+  }
+  const result = course.summary(visit.run);
+  for (const [kind, counts] of Object.entries(result.targets)) {
+    if (!counts.total) continue;
+    const label = kind === 'meaning' ? tx('意味の選択', 'Meaning recognition') : tx('ことば全体の読み', 'Whole-word reading');
+    main.append(el('p', 'gloss', `${label}: ${counts.correct} / ${counts.total}`));
+    main.append(el('p', 'fine', tx(
+      `誤答 ${counts.wrong}・答えを見た ${counts.revealed}・スキップ ${counts.skipped}`,
+      `${counts.wrong} incorrect · ${counts.revealed} revealed · ${counts.skipped} skipped`,
+    )));
+  }
+  main.append(el('p', 'fine', tx('この回の練習結果です。習得・長期記憶を示す点数ではありません。', 'These results describe this practice session. They do not establish mastery or long-term retention.')));
+  if (visit.run.schemaVersion === 2) {
+    const assisted = result.results.filter((row) => row.assisted).length;
+    main.append(el('p', 'fine', tx(`ヘルプを使った回答：${assisted}件。詳細はこの練習中だけ保持します。`,
+      `Answers with help: ${assisted}. Detailed help history lasts for this session only.`)));
+  }
+  if (visit.run.mode === 'repair') main.append(el('p', 'fine', tx('復習練習は元のコース点数を書き換えません。', 'Repair practice keeps the original unit scores.')));
+  if (!visit.saved) {
+    main.append(button('kanji-course-keep-result', 'この練習結果を記録', 'Keep this practice result', async () => {
+      const completedRun = visit.run;
+      visit.evidenceTime ??= Date.now();
+      const evidence = course.toLessonEvidence(completedRun, visit.evidenceTime);
+      if (!evidence.obslog.length && !Object.keys(evidence.lessonsDone).length) {
+        visit.noEvidence = true; redraw(); return;
+      }
+      visit.pending = true; render();
+      let saved;
+      try {
+        saved = await commitStorePatch((latest) => kanjiCourseEvidencePatch(latest, evidence));
+      } finally { visit.pending = false; }
+      // The write belongs to this run, even if its page is no longer visible.
+      // Keep an acknowledged result on the visit before deciding to redraw.
+      if (!recordReady(visit.epoch) || S.kanjiCourse !== visit || visit.run !== completedRun) return;
+      visit.saved = !!saved; redraw();
+    }, 'take'));
+  } else main.append(el('p', 'gloss', tx('練習結果を記録しました。復習カードは追加していません。', 'Practice result saved. No review cards were added.')));
+  if (visit.noEvidence) main.append(el('p', 'fine', tx('答えていない項目は正解・誤答として記録しません。', 'Unanswered items are not recorded as correct or incorrect.')));
+  if (result.missedPromptIds.length) {
+    const repair = button('kanji-course-repair', 'まちがえた目標だけ練習', 'Practise only the missed targets', () => {
+      visit.run = course.retry(visit.run); visit.saved = false; visit.evidenceTime = null; visit.noEvidence = false; visit.feedback = null; kanjiCourseApplyHelp(visit); redraw();
+    });
+    if (!visit.saved && result.results.some((row) => row.status === 'correct' || row.status === 'wrong')) {
+      repair.disabled = true;
+      const reason = el('p', 'fine', tx('元の結果を記録すると、まちがえた目標だけを練習できます。', 'Keep the original result to start repair practice.'));
+      reason.id = 'kanji-course-repair-reason';
+      repair.setAttribute('aria-describedby', reason.id);
+      main.append(reason);
+    }
+    main.append(repair);
+  }
+  main.append(button('kanji-course-retake', '最初から試す', 'Try the full unit again', () => start('check')));
+  main.append(el('p', 'fine', tx('カードにする場合は全項目を開き、そこで保存を選びます。', 'To add a review card, open its full entry and choose Save there.')));
+  for (const target of unit.targets) {
+    const row = button(`kanji-course-result-${target.id}`, target.kanji, target.kanji,
+      () => go(kanjiCourseEntryNode(visit, target, 'kanji'), { invoker: row }), 'chip');
+    main.append(row);
+  }
+}
 function renderLessons(main) {
+  if (S.kanjiCourse) { renderKanjiCourse(main); return; }
   const run = S.lessonRun;
   main.append(withEn(el('p', 'eyebrow', 'レッスン'), 'lessons', 'en-inline'));
   if (!run) {
     main.append(el('h1', 'view-title', tx('入り口から、順に', 'From the entrance, in order')));
+    renderKanjiCourseMenu(main);
     const previous = lessonPreviousRuns();
     const section = (kind, lvl, label) => {
       const plan = lessonPlan(kind, lvl);
@@ -23594,6 +24085,7 @@ function loadReferenceExtra() {
       data = await response.json();
     }
     if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Reference data unavailable');
+    if (!window.BunkiReferenceCore?.validateKanjiFacts(data)) throw new Error('Dictionary meanings and classifications unavailable');
     D.referenceExtra = data;
     // the official table that supplies the readings KANJIDIC2 lacks is named beside the other sources
     const table = (data.sources || []).find((source) => String(source.name).startsWith('常用漢字表'));
@@ -23615,10 +24107,16 @@ function loadReferenceExtra() {
       if (document.querySelector('#kdx-results > [data-kdx-readings="pending"]')) {
         document.getElementById('kdx-results')?.replaceWith(kdxTextResults('reading'));
       }
+      if (document.querySelector('#kdx-results [data-kanji-facts-state="pending"]')) {
+        document.getElementById('kdx-results')?.replaceWith(kdxTextResults('meaning'));
+      }
+      if (document.querySelector('#kdx-radical-results [data-kanji-facts-state="pending"]')) {
+        document.getElementById('kdx-radical-results')?.replaceWith(kdxRadicalResults());
+      }
       // an open writing room keeps its ink: only its readings are drawn again, the entry beneath when the room closes
       if (S.strokes) {
-        if (document.querySelector('#stroke-page [data-stroke-readings]')) refreshStrokeReadings();
-      } else if (document.querySelector('[data-kanji-readings="pending"]')) render();
+        if (document.querySelector('#stroke-page [data-stroke-readings], #stroke-page [data-kanji-facts-state]')) refreshStrokeReadings();
+      } else if (document.querySelector('[data-kanji-readings="pending"], [data-kanji-facts-state="pending"]')) render();
     }
   });
   return referenceExtraTask;
@@ -23715,8 +24213,10 @@ function renderLevels(main) {
  * Canonical word/kanji records still use their full existing entry sheets. */
 function openReferenceEntry(entry, invoker) {
   const target = entry.canonicalTarget;
+  const origin = S.stack.at(-1)?.from;
   go({ t: target ? target.type : 'reference', id: target ? target.id : entry.key,
-    ...(target?.reading ? { reading: target.reading } : {}), referenceEntry: entry }, { invoker });
+    ...(target?.reading ? { reading: target.reading } : {}), ...(origin ? { from: origin } : {}),
+    referenceEntry: entry }, { invoker });
 }
 
 /* Kanji-trust K01 · one reference record for every kanji door. kanji.json's short reading lists stay what the
@@ -23748,6 +24248,41 @@ function kanjiReferenceRows() {
 /** Whether every reading is here yet: 'complete' once the sidecar arrived, else 'pending' or 'failed' (retryable). */
 function kanjiReadingsState() {
   return D.referenceExtra ? 'complete' : referenceExtraError && !referenceExtraPending ? 'failed' : 'pending';
+}
+/** Reference facts never replace a lesson keyword or a learner's saved answer.
+ * A present, valid source can explicitly lack a glyph; pending/failed is a
+ * different state. Exact literal identity is preserved, including astral forms. */
+function kanjiFactsState() {
+  if (!D.referenceExtra) return kanjiReadingsState();
+  return window.BunkiReferenceCore?.validateKanjiFacts(D.referenceExtra) ? 'complete' : 'failed';
+}
+function kanjiFacts(id) {
+  return kanjiFactsState() === 'complete' ? window.BunkiReferenceCore.kanjiReferenceFacts(D.referenceExtra, id) : null;
+}
+function kanjiReferenceView(id, fallback = null) {
+  const facts = kanjiFacts(id);
+  const state = kanjiFactsState();
+  const meanings = facts?.completeMeanings || (fallback?.meanings?.length ? fallback.meanings : fallback?.m ? [fallback.m] : []);
+  return { ...facts, meanings: [...meanings], state: facts ? 'complete' : state === 'complete' ? 'absent' : state };
+}
+function kanjiFactsStatus(host, state, retryId, refresh) {
+  if (state !== 'pending' && state !== 'failed') return;
+  const line = el('p', 'fine reading-source-note', state === 'failed'
+    ? tx('辞書の意味・部首分類を読み込めませんでした。', 'Dictionary meanings and radical classifications could not load.')
+    : tx('辞書の意味・部首分類を読み込み中…', 'Loading dictionary meanings and radical classifications…'));
+  line.dataset.kanjiFactsState = state;
+  line.setAttribute('role', 'status');
+  host.append(line);
+  if (state !== 'failed') return;
+  const retry = biLabel('button', 'chip', '再試行', 'Try again');
+  retry.type = 'button';
+  retry.id = retryId;
+  retry.addEventListener('click', () => {
+    const task = loadReferenceExtra();
+    refresh();
+    void task.then(() => { if (host.isConnected) refresh(); });
+  });
+  host.append(retry);
 }
 /** The whole record of one kanji: the listed readings first, then each further KANJIDIC2 reading, then the
  * 常用漢字表 ones KANJIDIC2 lacks (named in officialReadings). lessonOn/lessonKun keep the lessons' selection.
@@ -23822,7 +24357,8 @@ function renderReferenceMetadata(container, entry) {
     }
   }
   const grouped = new Map();
-  const labels = { on: '音読み', kun: '訓読み', meanings: tx('意味', 'meanings'), strokeCount: tx('画数', 'stroke count'),
+  const labels = { on: '音読み', kun: '訓読み', meanings: tx('意味', 'meanings'), completeMeanings: tx('辞書の全語義', 'complete dictionary meanings'),
+    radicalSchemes: tx('辞書の部首分類', 'dictionary radical classifications'), strokeCount: tx('画数', 'stroke count'),
     readings: tx('すべての読み', 'every reading'), officialReadings: tx('常用漢字表の読み', 'Jōyō table readings') };
   for (const [field, credit] of Object.entries(entry.metadataSources || {})) {
     if (credit.source === 'kanji' || credit.source === 'kmeta') continue;
@@ -23861,8 +24397,8 @@ function renderReferenceConnections(sheet, entry) {
   sheet.append(rows);
 }
 
-function openReferenceCollection(collectionId) {
-  keepNavigationReturn('levels');
+function openReferenceCollection(collectionId, invoker = document.activeElement) {
+  keepNavigationReturn('levels', invoker);
   S.view = 'levels';
   pendingReferenceCollection = collectionId;
   render(); // initialize the shared controller, or show its honest retry state
@@ -23875,7 +24411,7 @@ function referenceCollectionChip(label, collectionId) {
   chip.type = 'button';
   chip.dataset.referenceDoor = collectionId;
   chip.setAttribute('aria-label', tx(`${label} の参考書庫をひらく`, `open ${shown} in the reference library`));
-  chip.addEventListener('click', () => openReferenceCollection(collectionId));
+  chip.addEventListener('click', () => openReferenceCollection(collectionId, chip));
   return chip;
 }
 
@@ -23888,14 +24424,16 @@ function renderReferenceNode(sheet, node) {
   sheet.append(el('p', 'reading', entry.readings?.length
     ? entry.readings.join('・')
     : entry.reading || tx('読みなし', 'No reading')));
-  sheet.append(el('p', 'gloss', entry.meanings?.length
-    ? entry.meanings.join('; ')
+  const meanings = entry.type === 'kanji' ? entry.completeMeanings || entry.meanings : entry.meanings;
+  sheet.append(el('p', 'gloss', meanings?.length
+    ? meanings.join('; ')
     : tx('意味未収録', 'Meaning not supplied')));
   if (entry.type === 'kanji') {
     const readings = el('dl', 'kv');
     readings.append(el('dt', null, '音読み'), el('dd', null, entry.on?.join('・') || tx('未収録', 'Not supplied')), el('dt', null, '訓読み'), el('dd', null, entry.kun?.join('・') || tx('未収録', 'Not supplied')));
     sheet.append(readings);
     if (entry.strokeCount != null) sheet.append(el('p', 'sense-pos', tx(`${entry.strokeCount} 画`, `${entry.strokeCount} strokes`)));
+    renderKanjiClassifications(sheet, entry.id, node);
   }
   renderReferenceMetadata(sheet, entry);
   renderReferenceConnections(sheet, entry);
@@ -24007,8 +24545,19 @@ function renderKanjidex(main) {
   S.kdx ||= {};
   if (typeof S.kdx.mode !== 'string') S.kdx.mode = 'parts';
   if (!Array.isArray(S.kdx.parts)) S.kdx.parts = S.kdx.part ? [S.kdx.part] : [];
-  main.append(withEn(el('p', 'eyebrow', '字を引く'), 'find a kanji you cannot read', 'en-inline'));
+  main.append(withEn(el('p', 'eyebrow', '字を調べる'), 'find a kanji you cannot read', 'en-inline'));
   main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.kanjidex)));
+  const characterCount = window.BunkiKanjiCourse?.counts().characters || 0;
+  const courseDoor = biLabel('button', 'chip',
+    S.kanjiCourse && S.kanjiCourse.stage !== 'menu' ? '漢字コースを再開' : `ことばで学ぶ ${characterCount} 字`,
+    S.kanjiCourse && S.kanjiCourse.stage !== 'menu' ? 'Resume the kanji course' : `Learn ${characterCount} characters in words`);
+  courseDoor.type = 'button'; courseDoor.id = 'kanjidex-course';
+  courseDoor.addEventListener('click', () => {
+    keepNavigationReturn('lessons', courseDoor);
+    S.view = 'lessons'; S.kanjiCourse ||= { stage: 'menu' };
+    render(); window.scrollTo(0, 0);
+  });
+  main.append(courseDoor);
 
   // one door, several lenses (operator 2026-08-10, KKLD tab model): the parts
   // picker, a draw canvas, reading, meaning, and stroke count — every hit
@@ -24110,7 +24659,7 @@ function kdxGridShown(chars, cap, open) {
  * grid found it by where it has one (「食 たべる — eat」): the gloss alone hid the glyph from VoiceOver. A kanji the
  * lessons lack keeps its reference meaning. */
 function kdxGlyphName(c, reading = '') {
-  const gloss = String((D.kanji[c] || kanjiReference(c))?.m || '').toLowerCase();
+  const gloss = kanjiReferenceView(c, D.kanji[c] || kanjiReference(c)).meanings.join('; ').toLowerCase();
   const head = reading ? `${c} ${reading}` : c;
   return gloss ? `${head} — ${gloss}` : head;
 }
@@ -24303,7 +24852,7 @@ function renderKdxStrokes(main) {
  * search" as its own mode). A radical is the one part a kanji is filed
  * under; the 部品 lens is the wider component search. */
 function renderKdxRadical(main) {
-  main.append(withEn(el('p', 'eyebrow', '部首'), 'the radical a kanji is filed under — 214', 'en-inline'));
+  main.append(el('p', 'gloss', tx('伝統部首分類 — KANJIDIC2・214 部首', 'Classical radical classification — KANJIDIC2 · 214 radicals')));
   const row = el('div', 'kdx-row');
   for (let n = 1; n <= 214; n++) {
     const r = D.radInfo?.[n];
@@ -24324,13 +24873,28 @@ function renderKdxRadical(main) {
     row.append(b);
   }
   main.append(row);
-  if (S.kdx.rad) {
-    const rec = (c) => D.kanji[c] || kanjiReference(c);
-    const chars = kanjiFinderUniverse()
-      .filter((c) => rec(c)?.rad === S.kdx.rad)
-      .sort((a, b) => rec(a).st - rec(b).st || (a < b ? -1 : 1));
-    renderKdxGrid(main, chars, 300, `rad:${S.kdx.rad}`, { mark: (b) => { b.dataset.rad = String(S.kdx.rad); } });
-  }
+  main.append(kdxRadicalResults());
+}
+function classicalRadicalHits(radical) {
+  if (kanjiFactsState() !== 'complete') return [];
+  const rec = (c) => D.kanji[c] || kanjiReference(c);
+  return kanjiFinderUniverse()
+    .filter((c) => kanjiFacts(c)?.radicalSchemes.classical === radical)
+    .sort((a, b) => (rec(a)?.st ?? 99) - (rec(b)?.st ?? 99) || (a < b ? -1 : 1));
+}
+function kdxRadicalResults() {
+  const wrap = el('div');
+  wrap.id = 'kdx-radical-results';
+  const state = kanjiFactsState();
+  kanjiFactsStatus(wrap, state, 'kdx-radical-retry', () => {
+    document.getElementById('kdx-radical-results')?.replaceWith(kdxRadicalResults());
+  });
+  if (state !== 'complete' || !S.kdx.rad) return wrap;
+  renderKdxGrid(wrap, classicalRadicalHits(S.kdx.rad), 300, `classical:${S.kdx.rad}`, {
+    mark: (b) => { b.dataset.rad = String(S.kdx.rad); },
+  });
+  wrap.append(el('p', 'fine', tx('字引に収録した字の辞書分類です。見える部品で探すには「部品」へ。', 'Dictionary classification within this finder. Use “by its parts” to search visible components.')));
+  return wrap;
 }
 
 /* 頻度 — newspaper frequency rank (KANJIDIC2's 2,501 most used, carried by
@@ -24676,9 +25240,14 @@ function kdxTextResults(kind) {
   }
   const ql = q.toLowerCase();
   const chars = kanjiFinderUniverse()
-    .filter((c) => String((D.kanji[c] || kanjiReference(c))?.m || '').toLowerCase().includes(ql))
+    .filter((c) => kanjiReferenceView(c, D.kanji[c] || kanjiReference(c)).meanings.some((meaning) => meaning.toLowerCase().includes(ql)))
     .sort((a, b) => strokesOf(a) - strokesOf(b) || (a < b ? -1 : 1));
-  renderKdxGrid(wrap, chars, 200, `meaning:${ql}`);
+  const state = kanjiFactsState();
+  kanjiFactsStatus(wrap, state, 'kdx-meanings-retry', () => {
+    document.getElementById('kdx-results')?.replaceWith(kdxTextResults(kind));
+  });
+  if (state !== 'complete') wrap.append(el('p', 'fine', tx('いまはレッスン用の語義だけで検索しています。', 'Searching the lesson keywords only for now.')));
+  renderKdxGrid(wrap, chars, 200, `meaning:${ql}`, { empty: state === 'complete' });
   return wrap;
 }
 
@@ -25222,7 +25791,7 @@ function wwKanjiCap(c) {
   const k = D.kanji[c];
   if (!k) return { en: '', ja: '' };
   // Q · a caption is a name: the plain meaning a part's row gives (partMeaning); the whole meaning is the slip's, a hold away
-  return { en: partMeaning(k.m), ja: String((k.kun || [])[0] || (k.on || [])[0] || '').replace(/\..*$/, '') };
+  return { en: partMeaning(kanjiReferenceView(c, k).meanings.join('; ')), ja: String((k.kun || [])[0] || (k.on || [])[0] || '').replace(/\..*$/, '') };
 }
 /** A part's name, never a reading posing as one: the official 部首 name (radicals214: 日 → ひへん),
  * else the part table's own name when it is more than the kanji's kun or on reading; else none. */
@@ -25370,7 +25939,8 @@ function wwModel(centre, mine) {
       const [x, y] = wwP(180, 136, 0);
       nodes.push({ type: 'passage', key: `${ex.passage}:${ex.start}`, ex, target: ex.target, x, y: y - 4, from: [[WW_CX, WW_CY]], card: true });
     }
-    const rad = k.rad && D.radInfo ? D.radInfo[k.rad] : null;
+    const facts = kanjiFacts(c);
+    const rad = facts && D.radInfo?.[facts.radicalSchemes.classical];
     const inMine = [...mine.words].filter((x) => wwKanjiOf(x).includes(c)).length;
     const met = encounterTrail(srsKey('kanji', c));
     const marks = [];
@@ -25378,13 +25948,13 @@ function wwModel(centre, mine) {
     if (k.kk) marks.push([tx('漢検', 'Kanken'), bi() ? kankenGradeLabel(k.kk) : k.kk]);
     if (k.on?.length) marks.push([tx('音読み', 'On'), k.on.slice(0, 2).join('・'), true]);
     if (k.kun?.length) marks.push([tx('訓読み', 'Kun'), k.kun.slice(0, 2).map((r) => r.replace(/\.(.+)$/, '($1)')).join('・'), true]);
-    if (rad) marks.push([tx('部首', 'Radical'), `${rad.c} ${rad.n}`, true]);
+    if (rad) marks.push([tx('伝統部首（KANJIDIC2）', 'Classical radical (KANJIDIC2)'), `${rad.c} ${rad.n}`, true]);
     if (D.kanjiWords[c]?.length) marks.push([tx('この字の語', 'Words with it'), String(D.kanjiWords[c].length)]);
     marks.push([tx('あなたの語', 'In your words'), String(inMine)]);
     if (D.kanjiFreq?.[c]) marks.push([tx('頻度順位', 'Frequency rank'), String(D.kanjiFreq[c])]);
     if (met) marks.push([tx('初めて', 'First met'), new Date(met.first).toLocaleDateString()]);
     const cap = wwKanjiCap(c);
-    return { centre: { ...centre, glyph: c, reading: (k.on || [])[0] || '', gloss: bi() ? cap.en : cap.ja, strokes: k.st || 0 }, nodes, marks, senses: k.m ? [k.m] : [], examples: ex ? [ex] : [] };
+    return { centre: { ...centre, glyph: c, reading: (k.on || [])[0] || '', gloss: bi() ? cap.en : cap.ja, strokes: k.st || 0 }, nodes, marks, senses: kanjiReferenceView(c, k).meanings, examples: ex ? [ex] : [] };
   }
   // a part: its family on one ring — your kanji first, the kanji you came from among them
   const p = centre.key;
@@ -26985,12 +27555,14 @@ function sentenceDoor(ex, target) {
  * 漢検 3級 / JLPT N1 / 12 画 and see EVERY kanji in that group, exhaustively.
  * The same node opens the same way everywhere the chip appears. */
 function catalogLabel(by, value) {
+  if (by === 'classical-radical') return tx(`伝統部首 ${value}・${D.radInfo?.[value]?.c || ''}`, `Classical radical ${value} · ${D.radInfo?.[value]?.c || ''}`);
   if (by === 'strokes') return tx(`${value} 画`, `${value} strokes`);
   if (by === 'kanken') return tx(`漢検 ${value}`, `Kanji Kentei ${kankenGradeLabel(value)}`);
   if (by === 'jlpt') return `JLPT ${value}`;
   return String(value);
 }
 function catalogEn(by, value) {
+  if (by === 'classical-radical') return 'KANJIDIC2 dictionary classification';
   if (by === 'strokes') return `${value}-stroke kanji`;
   if (by === 'kanken') return `Kanji Kentei ${kankenGradeLabel(value)} kanji`;
   if (by === 'jlpt') return `JLPT ${value} kanji`;
@@ -26998,6 +27570,7 @@ function catalogEn(by, value) {
 }
 /** Every kanji in a category, ordered common-first (by 漢検 rank) then simpler. */
 function catalogMatch(by, value) {
+  if (by === 'classical-radical') return classicalRadicalHits(value);
   const out = [];
   for (const [c, k] of Object.entries(D.kanji)) {
     const hit =
@@ -27025,13 +27598,18 @@ function catalogChip(ja, en, by, value, from) {
   const chip = el('button', 'pool-tag cat-chip', bi() && en ? en : ja);
   chip.type = 'button';
   chip.setAttribute('aria-label', tx(`${ja} の漢字をすべて見る`, `see every ${en} kanji`));
-  chip.addEventListener('click', () => go({ t: 'catalog', id: `${by}:${value}`, by, value, from }));
+  chip.addEventListener('click', () => go({ t: 'catalog', id: `${by}:${value}`, by, value, from }, { invoker: chip }));
   return chip;
 }
 function renderCatalogNode(sheet, node) {
   const { by, value } = node;
   const chars = catalogMatch(by, value);
   sheet.append(withEn(el('h1', 'view-title', catalogLabel(by, value)), catalogEn(by, value), 'en-inline'));
+  if (by === 'classical-radical') {
+    kanjiFactsStatus(sheet, kanjiFactsState(), 'catalog-facts-retry', () => { if (sheet.isConnected) render(); });
+    if (kanjiFactsState() !== 'complete') return;
+    sheet.append(el('p', 'fine', tx('字引に収録した字の分類。部品の形や語源の説明ではありません。', 'Classification of characters in this finder. This does not describe their visible parts or origins.')));
+  }
   sheet.append(
     el('p', 'gloss', tx(`このくくりの漢字 — 全 ${chars.length} 字`, `every kanji in this group — all ${chars.length}`)),
   );
@@ -27044,8 +27622,8 @@ function renderCatalogNode(sheet, node) {
     const cell = el('button', 'cat-cell');
     cell.type = 'button';
     cell.append(el('span', 'cat-glyph', c));
-    cell.append(el('span', 'cat-mean', D.kanji[c].m));
-    cell.addEventListener('click', () => go({ t: 'kanji', id: c, from: node.from }));
+    cell.append(el('span', 'cat-mean', kanjiReferenceView(c, D.kanji[c] || kanjiReference(c)).meanings.join('; ')));
+    cell.addEventListener('click', () => go({ t: 'kanji', id: c, from: node.from }, { invoker: cell }));
     grid.append(cell);
   }
   sheet.append(grid);
@@ -27059,7 +27637,7 @@ function chipsFor(items, onTap, sub, kind) {
     chip.append(el('span', 'big', item.label));
     const subText = sub ? sub(item) : item.sub;
     if (subText) chip.append(el('span', 'sub', subText));
-    chip.addEventListener('click', () => onTap(item));
+    chip.addEventListener('click', () => onTap(item, chip));
     wrap.append(chip);
   }
   return wrap;
@@ -35971,6 +36549,7 @@ function renderWordNode(sheet, node) {
   if (shownReading) sheet.append(el('p', 'reading', shownReading));
   // G2 · the dot's basis in one quiet line — days met, review state, the reading — and his "I know this" / "Not yet"
   renderDepthBasis(sheet, node, shownReading || '');
+  if (!unresolved && shownReading === node.reading) renderKanjiCourseDoor(sheet, node);
 
   // KANJI IN THIS WORD — each row opens that kanji's full entry. G1: right under the word and its reading
   // (John, 09-29: "kanji in the word needs to be more at the top!"; MASTER_SPEC §7.22)
@@ -36363,6 +36942,177 @@ function writtenFormNote(tags = []) {
   return '';
 }
 
+/** Dictionary classification is not visible-part membership or etymology.
+ * Preserve both source schemes; never relabel the legacy lesson `rad`. */
+function renderKanjiClassifications(sheet, id, node = {}) {
+  const facts = kanjiFacts(id);
+  if (!facts) return;
+  const number = facts.radicalSchemes.classical;
+  const rad = D.radInfo?.[number];
+  const heading = el('h3', 'list-head', tx('辞書の部首分類', 'Dictionary classification'));
+  sheet.append(heading);
+  const door = el('button', 'rad-door');
+  door.type = 'button';
+  door.dataset.classicalRadical = String(number);
+  door.append(el('span', 'rad-glyph', rad?.c || String(number)));
+  const text = el('span', 'rad-text');
+  text.append(el('span', 'rad-name', tx(`伝統部首 ${number}`, `Classical radical ${number}`)));
+  text.append(el('span', 'rad-sub', `KANJIDIC2${rad?.name ? ` · ${rad.name}` : ''}`));
+  door.append(text, el('span', 'row-go', '›'));
+  door.addEventListener('click', () => go({
+    t: 'catalog', id: `classical-radical:${number}`, by: 'classical-radical', value: number, from: node.from,
+  }, { invoker: door }));
+  sheet.append(door);
+  const nelson = facts.radicalSchemes.nelson;
+  if (nelson != null) {
+    const label = D.radInfo?.[nelson]?.c || '';
+    const line = el('p', 'fine', tx(`Nelson 部首 ${nelson} ${label} — KANJIDIC2`, `Nelson radical ${nelson} ${label} — KANJIDIC2`));
+    line.dataset.nelsonRadical = String(nelson);
+    sheet.append(line);
+  }
+}
+
+let kanjiStructureTask = null;
+let kanjiStructureModel = null;
+let kanjiStructureError = null;
+const kanjiStructureMounts = new WeakMap();
+function activateKanjiStructure(sheet) {
+  for (const section of sheet.querySelectorAll('[data-kanji-structure]')) kanjiStructureMounts.get(section)?.();
+}
+function loadKanjiStructure() {
+  if (kanjiStructureModel) return Promise.resolve(kanjiStructureModel);
+  if (kanjiStructureTask) return kanjiStructureTask;
+  kanjiStructureError = null;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+  kanjiStructureTask = Promise.resolve().then(async () => {
+    if (!window.BunkiKanjiStructure) throw new Error('Structure controller unavailable');
+    const bundled = window.__CORRIDOR_BUNDLE__;
+    let grouping = bundled?.['share_alike/kanji-structure'];
+    if (!bundled) {
+      const response = await fetch('data/share_alike/kanji-structure.json', { signal: controller.signal });
+      if (!response.ok) throw new Error(`Structure data: ${response.status}`);
+      grouping = await response.json();
+    }
+    if (!grouping) throw new Error('Structure source unavailable');
+    kanjiStructureModel = window.BunkiKanjiStructure.createModel({ kanji: D.kanji, strokes: D.strokes, grouping });
+    return kanjiStructureModel;
+  }).catch((error) => {
+    kanjiStructureError = error;
+    return null;
+  }).finally(() => {
+    clearTimeout(timeout);
+    kanjiStructureTask = null;
+  });
+  return kanjiStructureTask;
+}
+/** A functional inspection of original paths, not an authored visual world.
+ * Selection is kept on the navigation node; it never enters learner storage. */
+function renderKanjiStructure(sheet, node) {
+  const section = el('section', 'kanji-structure');
+  section.dataset.kanjiStructure = node.id;
+  sheet.append(section);
+  const paint = (focus = false) => {
+    if (!section.isConnected) return;
+    section.replaceChildren(el('h3', 'list-head', tx('字の中を見る', 'Inside the character')));
+    if (!kanjiStructureModel) {
+      const line = el('p', 'fine', kanjiStructureError
+        ? tx('部品の筆画データを読み込めませんでした。', 'The source groups could not load.')
+        : tx('部品の筆画データを読み込み中…', 'Loading source stroke groups…'));
+      line.setAttribute('role', 'status');
+      section.append(line);
+      if (kanjiStructureError) {
+        const retry = biLabel('button', 'chip', '再試行', 'Try again');
+        retry.type = 'button';
+        retry.addEventListener('click', () => { const task = loadKanjiStructure(); paint(); void task.then(() => paint(true)); });
+        section.append(retry);
+      }
+      return;
+    }
+    const info = kanjiStructureModel.inspect(node.id);
+    if (info.grouping.status !== 'available') {
+      section.append(el('p', 'fine', tx(
+        'この字の部品の位置・重なりは未収録です。下の部品一覧は配置や語源を示すものではありません。',
+        'Source grouping is not bundled for this character. The listed components below do not establish their positions or origins.',
+      )));
+      return;
+    }
+    const whole = info.occurrences.find((item) => item.reference?.type === 'kanji' && item.reference.id === node.id);
+    const selected = kanjiStructureModel.occurrence(node.id, node.kanjiOccurrenceId) || whole;
+    node.kanjiOccurrenceId = selected.id;
+    const projected = kanjiStructureModel.project(node.id, selected.id);
+    const label = selected.reference?.id || tx('名称のないグループ', 'Unnamed source group');
+    const caption = el('p', 'gloss', tx(
+      `${label} — ${projected.pathIndices.length} 画を選択`,
+      `${label} — ${projected.pathIndices.length} strokes selected`,
+    ));
+    caption.id = `kanji-structure-selection-${node.id}`;
+    caption.tabIndex = -1;
+    caption.setAttribute('role', 'status');
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('viewBox', projected.viewBox);
+    svg.setAttribute('class', 'kanji-structure-diagram');
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', tx(`${node.id} の中の ${label}`, `${label} within ${node.id}`));
+    const selectedIndices = new Set(projected.pathIndices);
+    (D.strokes[node.id] || []).forEach((d, index) => {
+      const path = document.createElementNS(SVG_NS, 'path');
+      path.setAttribute('d', d);
+      path.setAttribute('fill', 'none'); path.setAttribute('stroke', 'currentColor');
+      path.setAttribute('stroke-width', '3'); path.setAttribute('stroke-linecap', 'round');
+      path.setAttribute('stroke-linejoin', 'round');
+      path.setAttribute('opacity', selectedIndices.has(index) ? '1' : '0.18');
+      path.dataset.structureStroke = String(index);
+      path.dataset.selected = String(selectedIndices.has(index));
+      svg.append(path);
+    });
+    section.append(caption, svg);
+    const controls = el('div', 'chips kanji-structure-controls');
+    const select = (id) => { node.kanjiOccurrenceId = id; paint(true); };
+    if (selected.id !== whole.id) {
+      const parent = kanjiStructureModel.occurrence(node.id, selected.parentId);
+      const back = biLabel('button', 'chip', 'ひとつ戻る', 'One level out');
+      back.type = 'button'; back.dataset.structureBack = '';
+      back.addEventListener('click', () => select(parent && parent.id !== info.grouping.rootOccurrenceId ? parent.id : whole.id));
+      controls.append(back);
+      const reset = biLabel('button', 'chip', '字の全体へ', 'Whole character');
+      reset.type = 'button'; reset.dataset.structureWhole = '';
+      reset.addEventListener('click', () => select(whole.id));
+      controls.append(reset);
+    }
+    selected.childIds.forEach((id, index) => {
+      const child = kanjiStructureModel.occurrence(node.id, id);
+      const label = child.reference?.id || tx('グループ', 'Group');
+      const childButton = el('button', 'chip', `${label} · ${index + 1}`);
+      childButton.type = 'button';
+      childButton.dataset.structureOccurrence = id;
+      childButton.setAttribute('aria-label', tx(`${label}・${index + 1} 番目・${child.strokeIndices.length} 画`, `${label}, occurrence ${index + 1}, ${child.strokeIndices.length} strokes`));
+      childButton.addEventListener('click', () => select(id));
+      controls.append(childButton);
+    });
+    section.append(controls);
+    if (!selected.childIds.length) section.append(el('p', 'fine', tx('この資料では、ここまでの細分です。', 'This source supplies no smaller group here.')));
+    section.append(el('p', 'fine', tx(
+      '同じ形も一つずつ選べます。KanjiVG の筆画グループです。意味・音・語源の説明ではありません。',
+      'Repeated shapes remain separate. These are KanjiVG stroke groups; they do not establish meaning, sound or historical origin.',
+    )));
+    const source = el('a', 'fine', 'KanjiVG · CC BY-SA 3.0');
+    source.href = info.grouping.source.url; source.target = '_blank'; source.rel = 'noopener noreferrer';
+    section.append(source);
+    if (focus) caption.focus({ preventScroll: true });
+  };
+  // Pages can be prebuilt at idle and mounted much later. Use the real page
+  // mount boundary, not a microtask that may run while a prebuilt page is detached.
+  const mount = () => {
+    if (!section.isConnected) return;
+    paint();
+    if (!kanjiStructureModel && !kanjiStructureError) void loadKanjiStructure().then(() => paint());
+  };
+  kanjiStructureMounts.set(section, mount);
+  section.append(el('h3', 'list-head', tx('字の中を見る', 'Inside the character')));
+  if (section.isConnected) mount();
+}
+
 function renderKanjiNode(sheet, node) {
   const retained = retainedKanjiRecord(node.id);
   const k = retained || D.kanji[node.id] || window.BunkiSkipUI?.getKanji(S.skipUi, node.id);
@@ -36397,7 +37147,8 @@ function renderKanjiNode(sheet, node) {
   hero.append(el('div', 'hero-glyph', k.c));
   const meta = el('div', 'hero-meta');
   const display = kanjiEntryRecord(node.id, node.referenceEntry) || k;
-  meta.append(el('div', 'hero-mean', display.m || tx('語義は未収録です。', 'Meaning not supplied.')));
+  const referenceView = kanjiReferenceView(node.id, display);
+  meta.append(el('div', 'hero-mean', referenceView.meanings.join('; ') || tx('語義は未収録です。', 'Meaning not supplied.')));
   const chips = el('div', 'shelf-meta');
   if (Number.isInteger(k.st)) chips.append(catalogChip(`${k.st} 画`, `${k.st} strokes`, 'strokes', k.st, node.from));
   if (D.kanken[k.c]?.kk)
@@ -36421,6 +37172,24 @@ function renderKanjiNode(sheet, node) {
   meta.append(chips);
   hero.append(meta);
   sheet.append(hero);
+  if (referenceView.state === 'complete') {
+    const source = el('p', 'fine', tx(
+      `辞書の全語義 — KANJIDIC2 ${referenceView.referenceSource.dictionaryDate}`,
+      `Complete dictionary meanings — KANJIDIC2 ${referenceView.referenceSource.dictionaryDate}`,
+    ));
+    source.dataset.kanjiMeaningsSource = referenceView.referenceSource.release;
+    sheet.append(source);
+  } else {
+    sheet.append(el('p', 'fine', tx('上の語義は保存済み・レッスン用の語義です。', 'The meanings above are the saved or lesson keywords.')));
+    if (referenceView.state === 'absent') sheet.append(el('p', 'fine', tx('この字の辞書語義・部首分類は資料にありません。', 'This source does not supply dictionary meanings or classification for this form.')));
+    kanjiFactsStatus(sheet, referenceView.state, 'kanji-facts-retry', () => { if (sheet.isConnected) render(); });
+  }
+  if (retained) {
+    sheet.append(el('p', 'fine', tx(
+      `保存した回答・以下の読みは KANJIDIC2 ${retained.sourceVersion.dictionaryDate} のままです。辞書を開いても書き換わりません。`,
+      `Your saved answer and the readings below remain from KANJIDIC2 ${retained.sourceVersion.dictionaryDate}. Opening this dictionary does not rewrite them.`,
+    )));
+  }
   // K01 · an official Jōyō form kanji.json lacks (剝, 𠮟) says what it is; any other wider entry keeps its SKIP note
   const joyoForm = !D.kanji[k.c] && !!kanjiReferenceRows()?.records.has(k.c);
   if (k.skipFallback) sheet.append(el('p', 'skip-fallback-note', joyoForm
@@ -36482,28 +37251,9 @@ function renderKanjiNode(sheet, node) {
     }
   }
   renderSourceKanjiDoor(sheet, node);
+  renderKanjiCourseDoor(sheet, node);
 
-  // 部首 — the ONE official radical (the Kangxi classification), with its
-  // Japanese name, position, and number. This is the dictionary's radical, not
-  // up for debate; the shape-components further down are a different thing.
-  const rad = k.rad && D.radInfo ? D.radInfo[k.rad] : null;
-  if (rad) {
-    sheet.append(withEn(el('p', 'eyebrow', '部首'), 'radical', 'en-inline'));
-    const door = el('button', 'rad-door');
-    door.type = 'button';
-    const glyph = el('span', 'rad-glyph', rad.c);
-    if (rad.var && rad.var !== rad.c) glyph.append(el('span', 'rad-var', rad.var));
-    door.append(glyph);
-    const text = el('span', 'rad-text');
-    text.append(el('span', 'rad-name', rad.name));
-    const posLabel =
-      rad.pos === '独立' ? tx('独立', 'stands alone') : tx(rad.pos, rad.posEn || 'position not supplied');
-    text.append(el('span', 'rad-sub', tx(`${posLabel}・部首 ${rad.n}`, `${posLabel} · radical ${rad.n}`)));
-    door.append(text);
-    door.append(el('span', 'row-go', '›'));
-    door.addEventListener('click', () => go({ t: 'radical', id: rad.c, from: node.from }));
-    sheet.append(door);
-  }
+  renderKanjiClassifications(sheet, node.id, node);
 
   // まぎらわしい字 — the look-alikes, laid side by side to break the spell
   const twins = confusablesFor(k.c);
@@ -36517,7 +37267,7 @@ function renderKanjiNode(sheet, node) {
       row.append(el('span', 'row-glyph', c));
       row.append(el('span', 'row-main', D.kanji[c].m));
       row.append(el('span', 'row-go', '›'));
-      row.addEventListener('click', () => go({ t: 'kanji', id: c, from: node.from }));
+      row.addEventListener('click', () => go({ t: 'kanji', id: c, from: node.from }, { invoker: row }));
       rows.append(row);
     }
     sheet.append(rows);
@@ -36527,10 +37277,11 @@ function renderKanjiNode(sheet, node) {
   // dedicated full-screen page where the strokes actually draw themselves.
   sheet.append(withEn(el('p', 'eyebrow', '筆順'), 'stroke order', 'en-inline'));
   sheet.append(strokeDoor(k));
+  renderKanjiStructure(sheet, node);
 
   const parts = mainParts(k.c);
   if (parts.length) {
-    sheet.append(withEn(el('p', 'eyebrow', '部品'), 'main components', 'en-inline'));
+    sheet.append(withEn(el('p', 'eyebrow', '部品一覧'), 'listed components', 'en-inline'));
     const rows = el('div', 'entry-rows');
     for (const c of parts) {
       const row = el('button', 'entry-row');
@@ -36539,7 +37290,7 @@ function renderKanjiNode(sheet, node) {
       row.dataset.component = c;
       row.append(el('span', 'row-main', componentLabel(c)));
       row.append(el('span', 'row-go', '›'));
-      row.addEventListener('click', () => go({ t: 'radical', id: c, from: node.from }));
+      row.addEventListener('click', () => go({ t: 'radical', id: c, from: node.from }, { invoker: row }));
       rows.append(row);
     }
     sheet.append(rows);
@@ -36583,7 +37334,7 @@ function renderKanjiNode(sheet, node) {
       row.append(el('span', 'row-go', '›'));
       row.addEventListener('click', () => go(item.seq
         ? { t: 'word', id: item.form, seq: item.seq, reading: item.reading, from: node.from }
-        : { t: 'word', id: item.id, from: node.from }));
+        : { t: 'word', id: item.id, from: node.from }, { invoker: row }));
       return row;
     };
     const FIRST = 24;
@@ -36620,7 +37371,7 @@ function renderKanjiNode(sheet, node) {
     sheet.append(heading);
     const FIRST_IDIOMS = 24;
     const chipOf = (w) => ({ label: w, sub: D.idioms[w]?.r || '' });
-    const openIdiom = (item) => go({ t: 'idiom', id: item.label, from: node.from });
+    const openIdiom = (item, invoker) => go({ t: 'idiom', id: item.label, from: node.from }, { invoker });
     const chips = chipsFor((node.idiomsExpanded ? idioms : idioms.slice(0, FIRST_IDIOMS)).map(chipOf), openIdiom, null, 'idiom');
     sheet.append(chips);
     if (idioms.length > FIRST_IDIOMS && !node.idiomsExpanded) {
@@ -36972,6 +37723,16 @@ function strokeReadingField(k) {
   // what the lists are (unfinished, or carrying a starred reading) is said above them: below, the writing-speed
   // corner covers the field's left edge
   readings.append(...strokeReadingsStatus(k));
+  if (k?.sourceVersion) {
+    const saved = !!retainedKanjiRecord(k.c);
+    readings.append(el('p', 'stroke-reading-note', saved ? tx(
+      `保存した読み — KANJIDIC2 ${k.sourceVersion.dictionaryDate}`,
+      `Saved readings — KANJIDIC2 ${k.sourceVersion.dictionaryDate}`,
+    ) : tx(
+      `辞書の読み — KANJIDIC2 ${k.sourceVersion.dictionaryDate}`,
+      `Dictionary readings — KANJIDIC2 ${k.sourceVersion.dictionaryDate}`,
+    )));
+  }
   if (k?.officialReadings?.length) {
     readings.append(el('p', 'stroke-reading-note', tx('* 常用漢字表（2010年）にある読み', '* a reading from the official Jōyō kanji table (2010)')));
   }
@@ -36979,6 +37740,64 @@ function strokeReadingField(k) {
     strokeReadingRow('音読み', 'on', k?.on, 'on', k?.officialReadings),
     strokeReadingRow('訓読み', 'kun', k?.kun, 'kun', k?.officialReadings),
   );
+  return readings;
+}
+
+function strokeClassificationLine(id, k) {
+  const radical = kanjiFacts(id)?.radicalSchemes.classical;
+  const glyph = D.radInfo?.[radical]?.c;
+  return `${k?.st ?? strokePathsFor(id).length}画${glyph
+    ? tx(` · 伝統部首 ${glyph}（KANJIDIC2）`, ` · classical radical ${glyph} (KANJIDIC2)`) : ''}`;
+}
+function strokeReferenceStatus(id, k) {
+  const note = el('div', 'stroke-reference-status');
+  const view = kanjiReferenceView(id, k);
+  if (view.state === 'complete') note.append(el('p', 'stroke-read-note', tx(
+    `意味・部首分類 — KANJIDIC2 ${view.referenceSource.dictionaryDate}`,
+    `Meanings and classification — KANJIDIC2 ${view.referenceSource.dictionaryDate}`,
+  )));
+  else {
+    note.append(el('p', 'stroke-read-note', tx('語義は保存済み・レッスン用のものです。', 'Meanings shown are saved or lesson keywords.')));
+    if (view.state === 'absent') note.append(el('p', 'stroke-read-note', tx('この資料には辞書語義・部首分類がありません。', 'This source supplies no dictionary meanings or classification for this form.')));
+    kanjiFactsStatus(note, view.state, 'stroke-facts-retry', refreshStrokeReadings);
+  }
+  if (k?.sourceVersion) {
+    const saved = !!retainedKanjiRecord(id);
+    note.append(el('p', 'stroke-read-note', saved ? tx(
+      `読み・保存した回答 — KANJIDIC2 ${k.sourceVersion.dictionaryDate}`,
+      `Readings and saved answer — KANJIDIC2 ${k.sourceVersion.dictionaryDate}`,
+    ) : tx(
+      `辞書の読み — KANJIDIC2 ${k.sourceVersion.dictionaryDate}`,
+      `Dictionary readings — KANJIDIC2 ${k.sourceVersion.dictionaryDate}`,
+    )));
+  }
+  return note;
+}
+function strokeClassicReadings(k) {
+  const readings = el('span', 'stroke-readings');
+  const officialOnly = new Set(k?.officialReadings || []);
+  const star = (reading) => (officialOnly.has(reading) ? '*' : '');
+  if (k?.on?.length) {
+    const row = el('span', 'stroke-read-row');
+    row.append(el('span', 'stroke-read-label', '音'), el('span', 'stroke-on', k.on.map((reading) => reading + star(reading)).join('・')));
+    readings.append(row);
+  }
+  if (k?.kun?.length) {
+    const row = el('span', 'stroke-read-row');
+    row.append(el('span', 'stroke-read-label', '訓'));
+    k.kun.forEach((kn, i) => {
+      const [stem, oku] = kn.split('.');
+      if (i) row.append(document.createTextNode('・'));
+      const reading = el('span', 'stroke-kun');
+      reading.append(el('span', 'stroke-kun-stem', stem));
+      if (oku) reading.append(document.createTextNode(oku));
+      if (star(kn)) reading.append(document.createTextNode(star(kn)));
+      row.append(reading);
+    });
+    readings.append(row);
+  }
+  if (officialOnly.size) readings.append(el('span', 'stroke-read-note', tx('* 常用漢字表（2010年）にある読み', '* a reading from the official Jōyō kanji table (2010)')));
+  readings.append(...strokeReadingsStatus(k, 'span', 'stroke-read-note'));
   return readings;
 }
 
@@ -37004,17 +37823,32 @@ function strokeReadingsStatus(k, tag = 'p', className = 'stroke-reading-note') {
   return [line, retry];
 }
 
-/** K01 · the readings arrived, failed, or are being asked for again while the writing room is open: only its readings
- * are drawn again, so the ink keeps writing. The classic room carries them in its header and is drawn whole. */
+/** Reference data arrived, failed, or is being retried: patch the visible labels
+ * in either writing-room layout while the existing ink engine keeps running. */
 function refreshStrokeReadings() {
   if (!S.strokes) return;
+  const record = strokeRoomRecord(S.strokes.id);
   const field = document.querySelector('#stroke-awake-field .stroke-reading-field');
   if (!field) {
-    render();
+    // Refresh labels only. Dictionary loading must not restart an ink engine.
+    const classic = document.querySelector('#stroke-page .stroke-readings');
+    const oldStatus = document.querySelector('#stroke-page .stroke-reference-status');
+    const hadFocus = classic?.contains(document.activeElement) || oldStatus?.contains(document.activeElement);
+    classic?.replaceWith(strokeClassicReadings(record));
+    const meta = document.querySelector('#stroke-page .stroke-k-meta');
+    if (meta) meta.textContent = strokeClassificationLine(S.strokes.id, record);
+    const meaning = document.querySelector('#stroke-page .stroke-meta-mean');
+    if (meaning) meaning.textContent = kanjiReferenceView(S.strokes.id, record).meanings.join('; ');
+    const nextStatus = strokeReferenceStatus(S.strokes.id, record);
+    oldStatus?.replaceWith(nextStatus);
+    if (hadFocus && nextStatus.isConnected) {
+      nextStatus.tabIndex = -1;
+      (nextStatus.querySelector('#stroke-facts-retry, #stroke-readings-retry') || nextStatus).focus({ preventScroll: true });
+    }
     return;
   }
   const hadFocus = field.contains(document.activeElement);
-  const next = strokeReadingField(strokeRoomRecord(S.strokes.id));
+  const next = strokeReadingField(record);
   field.replaceWith(next);
   if (hadFocus) {
     next.tabIndex = -1;
@@ -37071,14 +37905,16 @@ function strokeMissing(page, id, k) {
   const note = el('p', 'stroke-missing-note');
   note.textContent = k?.st
     ? tx(
-        `分かっているのは画数だけ — ${k.st} 画。この字の筆順は KanjiVG にまだ入っていない。`,
-        `What is known is the count — ${k.st} strokes. KanjiVG does not carry this character's stroke paths yet.`,
+        `画数 — ${k.st} 画。このアプリにはこの字の筆順データが未収録です。`,
+        `Stroke count — ${k.st}. This app does not bundle stroke paths for this character.`,
       )
     : tx(
-        'この字の筆順は KanjiVG にまだ入っていない。',
-        'KanjiVG does not carry this character’s stroke paths yet.',
+        'このアプリにはこの字の筆順データが未収録です。',
+        'This app does not bundle stroke paths for this character.',
       );
   box.append(note);
+  box.append(el('p', 'stroke-meta-mean', kanjiReferenceView(id, k).meanings.join('; ')));
+  box.append(strokeClassicReadings(k), strokeReferenceStatus(id, k));
   page.append(box);
 }
 
@@ -37865,38 +38701,10 @@ function renderStrokePage(root) {
     // in the world's red (the design's khead, from real kanji data)
     const khead = el('div', 'stroke-khead');
     const kleft = el('span', 'stroke-k', st.id);
-    const radC = D.radInfo?.[k?.rad]?.c;
-    kleft.append(
-      el('span', 'stroke-k-meta', `${k?.st ?? paths.length}画${radC ? ` · ${radC}部` : ''}`),
-    );
-    const readings = el('span', 'stroke-readings');
-    const officialOnly = new Set(k?.officialReadings || []);
-    const star = (reading) => (officialOnly.has(reading) ? '*' : '');
-    if (k?.on?.length) {
-      const row = el('span', 'stroke-read-row');
-      row.append(el('span', 'stroke-read-label', '音'), el('span', 'stroke-on', k.on.map((reading) => reading + star(reading)).join('・')));
-      readings.append(row);
-    }
-    if (k?.kun?.length) {
-      const row = el('span', 'stroke-read-row');
-      row.append(el('span', 'stroke-read-label', '訓'));
-      k.kun.forEach((kn, i) => {
-        const [stem, oku] = kn.split('.');
-        if (i) row.append(document.createTextNode('・'));
-        const reading = el('span', 'stroke-kun');
-        reading.append(el('span', 'stroke-kun-stem', stem));
-        if (oku) reading.append(document.createTextNode(oku));
-        if (star(kn)) reading.append(document.createTextNode(star(kn)));
-        row.append(reading);
-      });
-      readings.append(row);
-    }
-    if (officialOnly.size) {
-      readings.append(el('span', 'stroke-read-note', tx('* 常用漢字表（2010年）にある読み', '* a reading from the official Jōyō kanji table (2010)')));
-    }
-    readings.append(...strokeReadingsStatus(k, 'span', 'stroke-read-note'));
+    kleft.append(el('span', 'stroke-k-meta', strokeClassificationLine(st.id, k)));
+    const readings = strokeClassicReadings(k);
     khead.append(kleft, readings);
-    if (!S.strokeMinimal) body.append(khead);
+    if (!S.strokeMinimal) body.append(khead, strokeReferenceStatus(st.id, k));
     const stage = el('div', 'stroke-stage');
     stage.id = 'ink-stage';
     stage.setAttribute('role', 'img');
@@ -38113,7 +38921,7 @@ function renderStrokePage(root) {
           k?.st ?? paths.length,
         ),
       );
-      if (k) meta.append(el('span', 'stroke-meta-mean', k.m), document.createTextNode('　·　'));
+      if (k) meta.append(el('span', 'stroke-meta-mean', kanjiReferenceView(st.id, k).meanings.join('; ')), document.createTextNode('　·　'));
       links.forEach((b, i) => {
         if (i) meta.append(document.createTextNode(' · '));
         meta.append(b);
@@ -38664,7 +39472,7 @@ function renderRadicalNode(sheet, node) {
     sheet.append(
       chipsFor(
         [{ label: r.c, sub: tx('字としても見る', 'view as a kanji') }],
-        (item) => go({ t: 'kanji', id: item.label, from: node.from }),
+        (item, invoker) => go({ t: 'kanji', id: item.label, from: node.from }, { invoker }),
         null,
         'kanji',
       ),
@@ -38687,7 +39495,7 @@ function renderRadicalNode(sheet, node) {
   sheet.append(
     chipsFor(
       r.kanji.map((c) => ({ label: c, sub: D.kanken[c]?.kk ? tx(D.kanken[c].kk, kankenGradeLabel(D.kanken[c].kk)) : '' })),
-      (item) => go({ t: 'kanji', id: item.label, from: node.from }),
+      (item, invoker) => go({ t: 'kanji', id: item.label, from: node.from }, { invoker }),
       null,
       'kanji',
     ),
@@ -38715,7 +39523,7 @@ function renderIdiomNode(sheet, node) {
   sheet.append(
     chipsFor(
       idiom.k.map((c) => ({ label: c, sub: D.kanken[c]?.kk ? tx(D.kanken[c].kk, kankenGradeLabel(D.kanken[c].kk)) : '' })),
-      (item) => go({ t: 'kanji', id: item.label, from: node.from }),
+      (item, invoker) => go({ t: 'kanji', id: item.label, from: node.from }, { invoker }),
       null,
       'kanji',
     ),
@@ -39073,6 +39881,7 @@ function mountPageEffects(sheet, node) {
   else oldThread?.remove();
   if (thread) revealMountedScaleCurrent(thread);
   activatePendingLookupReadings(sheet);
+  activateKanjiStructure(sheet);
   adoptSaveMenuOwner();
   // FULL-R1 · and its doors' lines, against the visit standing now (reconcileSheetActionLines)
   reconcileSheetActionLines(sheet);
@@ -39271,6 +40080,7 @@ function enterWord(node, { from = null, invoker = null, instant = false } = {}) 
   const depth = S.stack.length + 1;
   const ready = layered ? takePrebuiltPage(node, depth) : null;
   const pushed = ready?.node || node;
+  kanjiCourseReferenceHelp(S.kanjiCourse, pushed);
   if (pushed.t === 'word' && scaleNodeBelongs(pushed) && (!S.stack.length || S.stack.at(-1)?.t === 'sent')) S.scaleVisit.word = pushed;
   if (ladderOpening) {
     ladderOpening.rung = 'page';
@@ -39356,7 +40166,8 @@ let pageEpoch = 0; // bumped by every render(): a page built or kept against an 
 function pageKey(node, depth) {
   const lists = Object.entries(S.lists || {}).map(([name, rows]) => `${name}:${rows?.length || 0}`).join(',');
   return JSON.stringify([node.t, node.id, String(node.seq ?? ''), node.reading || '', node.from?.passage || '',
-    node.from?.index ?? '', !!node.readerChoice, depth, S.view, S.passageId || '', S.lang, themeIx(),
+    node.from?.index ?? '', node.sourceContext || null, recordEpoch, !!node.readerChoice,
+    depth, S.view, S.passageId || '', S.lang, themeIx(),
     S.taken.length, lists, pageEpoch]);
 }
 /** After `after` ms, at the next idle moment: requestIdleCallback where it exists, else just after a frame (WebKit has
@@ -40674,7 +41485,7 @@ function renderSearchPage(main) {
   skipOpener.setAttribute('aria-controls', 'search-skip-results');
   results.id = 'search-skip-results';
 
-  // 字を引く — every way of finding a kanji, each an explicit lens in the
+  // 字を調べる — every way of finding a kanji, each an explicit lens in the
   // search room itself (operator, 2026-09-17: "we need the option for skip,
   // for regular word search, radical search, frequency of use search, by
   // grade search…"). The lenses are the 字引 finder's own, plus radical,
@@ -40698,7 +41509,7 @@ function renderSearchPage(main) {
   const lensRow = el('div', 'kdx-lenses search-lenses');
   lensRow.id = 'search-lenses';
   lensRow.setAttribute('role', 'group');
-  lensRow.setAttribute('aria-label', tx('字を引く方法', 'ways to find a kanji'));
+  lensRow.setAttribute('aria-label', tx('字を調べる方法', 'ways to find a kanji'));
   for (const [id, ja, en] of SEARCH_LENSES) {
     const b = el('button', S.searchLens === id ? 'kdx-lens on' : 'kdx-lens');
     b.type = 'button';

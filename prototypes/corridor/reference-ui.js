@@ -478,8 +478,8 @@
         content.append(
           node('span', 'reference-entry-headword', entry.missingGlyph ? tx(`字形未収録 (${entry.id})`, `Glyph not supplied (${entry.id})`) : entry.text || entry.id),
           readingCell(entry),
-          node('span', 'reference-entry-meaning', entry.meanings?.length
-            ? entry.meanings.join('; ')
+          node('span', 'reference-entry-meaning', (entry.completeMeanings || entry.meanings)?.length
+            ? (entry.completeMeanings || entry.meanings).join('; ')
             : tx('意味未収録', 'Meaning not supplied')),
         );
         if (entry.conflicts?.[collection.family] || (entry.conflict && !entry.conflicts)) {

@@ -27,6 +27,11 @@
  * completeOn/completeKun and officialReadings; `on`/`kun` keep their first-source contract. The pure
  * reading helpers (readingMatch, normalizeReadingQuery, mergeReadings, kanjiWordBuckets, kanjiAltWords) are
  * the rules the generator, the app's kanji finder and the node invariant share.
+ * K02: validateKanjiFacts(extra) checks the immutable supplement's schema, pinned provenance and all rows
+ * once; kanjiReferenceFacts(extra, literal) returns copied completeMeanings, radicalSchemes and referenceSource,
+ * or null when unavailable/absent. A valid table plus null means the literal is absent from this source.
+ * Runtime validation is structural; raw-source and projection-hash parity are verified by the generator/tests.
+ * Catalog legacy meanings are unchanged; completeMeanings are additional reference facts and searchable.
  * The separate, licensed data projection is rebuilt and audited by:
  *   node tools/build-reference-data.mjs --check [--archive /path/to/archive.zip]
  * No network or generated classifications are used.
@@ -68,6 +73,61 @@
     relationships: 'Kentei related forms share an attested species ID, not necessarily a glyph or grade. Dictionary candidates require exact form/reading and reading restrictions; they do not classify every sense or authorize a canonical redirect.',
     kanjiReadings: 'A kanji shows every reading: the listed readings first, then each further KANJIDIC2 reading, then each 常用漢字表 (2010) reading KANJIDIC2 lacks, marked as such. Nothing is dropped, merged or generated.',
   });
+
+  const KANJI_FACTS_SOURCE = Object.freeze({
+    release: '3.6.2+20260803141815',
+    archiveSha256: '5dfb850ee88c7bccecf4694cc4d7b1338e608440c5edcb8fefc93216b3471fe6',
+    dictionaryDate: '2026-08-03',
+    databaseVersion: '2026-215',
+  });
+  const kanjiFactsCache = new WeakMap();
+  function kanjiFactsIndex(extra) {
+    if (!extra || typeof extra !== 'object' || Array.isArray(extra)) return null;
+    if (kanjiFactsCache.has(extra)) return kanjiFactsCache.get(extra);
+    const source = extra.audit?.kanjiFacts;
+    const rows = extra.kanjiFacts;
+    let valid = extra.schemaVersion === 4 && extra.kanjiFactsVersion === 1 && source?.schemaVersion === 1 &&
+      Object.entries(KANJI_FACTS_SOURCE).every(([key, value]) => source[key] === value) &&
+      source.projectedRows === 10384 && /^[0-9a-f]{64}$/u.test(source.projectedSha256 || '') &&
+      Array.isArray(rows) && rows.length === 10384;
+    const byLiteral = new Map();
+    const radical = (value) => Number.isInteger(value) && value >= 1 && value <= 214;
+    let previous = -1;
+    if (valid) {
+      for (const row of rows) {
+        const literal = row?.[0];
+        if (!Array.isArray(row) || row.length !== 4 || typeof literal !== 'string' ||
+          [...literal].length !== 1 || /[\uD800-\uDFFF]/u.test(literal) ||
+          literal.codePointAt(0) <= previous || !Array.isArray(row[1]) || !row[1].length ||
+          !row[1].every((meaning) => typeof meaning === 'string' && meaning.trim()) ||
+          !radical(row[2]) || (row[3] !== null && !radical(row[3]))) {
+          valid = false;
+          break;
+        }
+        previous = literal.codePointAt(0);
+        byLiteral.set(literal, { meanings: [...row[1]], classical: row[2], nelson: row[3] });
+      }
+    }
+    const index = valid ? {
+      byLiteral,
+      source: { ...KANJI_FACTS_SOURCE, projectionSha256: source.projectedSha256 },
+    } : null;
+    // Loaded source objects are immutable inputs. Copies in this cache cannot be changed through returned facts.
+    kanjiFactsCache.set(extra, index);
+    return index;
+  }
+  function validateKanjiFacts(extra) {
+    return kanjiFactsIndex(extra) !== null;
+  }
+  function kanjiReferenceFacts(extra, literal) {
+    const index = kanjiFactsIndex(extra);
+    const row = index?.byLiteral.get(literal);
+    return row ? {
+      completeMeanings: [...row.meanings],
+      radicalSchemes: { classical: row.classical, nelson: row.nelson },
+      referenceSource: { source: 'kanjidic-pinned', sourceId: literal, ...index.source },
+    } : null;
+  }
 
   function text(value) {
     return value == null ? '' : String(value);
@@ -134,7 +194,7 @@
     return entries.filter((entry) => {
       const haystack = normalizeQuery([
         entry.id, entry.text, entry.reading,
-        ...strings(entry.readings), ...strings(entry.meanings),
+        ...strings(entry.readings), ...strings(entry.meanings), ...strings(entry.completeMeanings),
         ...strings(entry.on), ...strings(entry.kun), ...strings(entry.aliases),
         ...(entry.variants || []).flatMap((item) => [item.reading, ...item.meanings]),
         ...(entry.levelSources || []).map((item) => item.level),
@@ -436,6 +496,18 @@
       }
     }
 
+    // K02 augments existing catalog identities only; dictionary facts never infer levels or enlarge lessons.
+    if (committed) {
+      for (const entry of kanjiEntries.values()) {
+        const facts = kanjiReferenceFacts(extra, entry.id);
+        if (!facts) continue;
+        Object.assign(entry, facts);
+        entry.metadataSources.completeMeanings = { source: 'kanjidic-pinned', sourceId: entry.id };
+        entry.metadataSources.radicalSchemes = { source: 'kanjidic-pinned', sourceId: entry.id };
+        addSource(entry, 'kanjidic-pinned');
+      }
+    }
+
     function collectionFor(family, level) {
       const id = `${family}:${level}`;
       if (!collections.has(id)) {
@@ -538,6 +610,7 @@
   return Object.freeze({
     createCatalog, search, searchEntries, sortEntries, paginateEntries,
     readingForms, readingKey, mergeReadings, normalizeReadingQuery, readingMatch, kanjiWordBuckets, kanjiAltWords,
+    validateKanjiFacts, kanjiReferenceFacts,
     normalizeQuery, normalizeLevel, compareEntries, wordKey, JLPT_LEVELS, KANKEN_LEVELS,
   });
 });

@@ -25,6 +25,12 @@ import { fileURLToPath } from 'node:url';
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const OUTPUT = resolve(ROOT, 'prototypes/corridor/data/share_alike/reference-extra.json');
 export const ARCHIVE_SHA = '5dfb850ee88c7bccecf4694cc4d7b1338e608440c5edcb8fefc93216b3471fe6';
+const FACTS_SOURCE = Object.freeze({
+  release: '3.6.2+20260803141815',
+  archiveSha256: ARCHIVE_SHA,
+  dictionaryDate: '2026-08-03',
+  databaseVersion: '2026-215',
+});
 export const sourcePaths = {
   dict: 'prototypes/corridor/data/share_alike/dict.json',
   words: 'prototypes/corridor/data/share_alike/words.json',
@@ -99,6 +105,52 @@ const byCodePoint = (a, b) => a.codePointAt(0) - b.codePointAt(0);
 const appliesTo = (list, value) =>
   Array.isArray(list) && (list.includes('*') || list.includes(value));
 export const WORDS_PER_EMPTY_KANJI = 10;
+
+/** K02 reference facts, not lesson answers. All source glosses survive verbatim and radical schemes stay separate. */
+export function kanjiFactsProjection(characters) {
+  const facts = characters
+    .map((row) => {
+      const radicals = row.radicals || [];
+      assert(
+        radicals.every((radical) => ['classical', 'nelson_c'].includes(radical.type)),
+        `Unrecognized radical scheme: ${row.literal}`,
+      );
+      const classical = radicals.filter((radical) => radical.type === 'classical');
+      const nelson = radicals.filter((radical) => radical.type === 'nelson_c');
+      assert(
+        classical.length === 1 && nelson.length <= 1,
+        `Ambiguous radical scheme: ${row.literal}`,
+      );
+      return [
+        row.literal,
+        (row.readingMeaning?.groups || [])
+          .flatMap((group) => group.meanings || [])
+          .filter((meaning) => meaning.lang === 'en')
+          .map((meaning) => meaning.value),
+        classical[0].value,
+        nelson[0]?.value ?? null,
+      ];
+    })
+    .sort((a, b) => byCodePoint(a[0], b[0]));
+  const projectedSha256 = hash(serialize(facts));
+  assert(
+    core.validateKanjiFacts({
+      schemaVersion: 4,
+      kanjiFactsVersion: 1,
+      kanjiFacts: facts,
+      audit: {
+        kanjiFacts: {
+          schemaVersion: 1,
+          ...FACTS_SOURCE,
+          projectedRows: facts.length,
+          projectedSha256,
+        },
+      },
+    }),
+    'Invalid or incomplete KANJIDIC2 reference facts',
+  );
+  return facts;
+}
 
 /**
  * Kanji-trust projection (K01, K07). Copies facts only; nothing is merged, normalized into a new form or generated.
@@ -363,6 +415,7 @@ export function buildReferenceData({ archive, prior } = {}) {
       ]),
   ].filter(usefulMetadata);
   let pinnedRows;
+  let kanjiFacts;
   let archiveCharacters = null;
   if (archive) {
     assert.equal(hash(readFileSync(archive)), ARCHIVE_SHA, 'KANJIDIC archive pin mismatch');
@@ -377,6 +430,13 @@ export function buildReferenceData({ archive, prior } = {}) {
       { maxBuffer: 64 * 1024 * 1024 },
     );
     const data = JSON.parse(raw);
+    assert.equal(data.dictDate, FACTS_SOURCE.dictionaryDate, 'KANJIDIC2 dictionary date changed');
+    assert.equal(
+      data.databaseVersion,
+      FACTS_SOURCE.databaseVersion,
+      'KANJIDIC2 database version changed',
+    );
+    kanjiFacts = kanjiFactsProjection(data.characters);
     archiveCharacters = new Map(data.characters.map((row) => [row.literal, row]));
     assert.equal(data.characters.length, 10384);
     pinnedRows = data.characters
@@ -403,6 +463,16 @@ export function buildReferenceData({ archive, prior } = {}) {
       'First build needs the pinned --archive; offline checks can reuse an existing sidecar',
     );
     assert.equal(prior.audit?.kanjidicArchive?.sha256, ARCHIVE_SHA);
+    assert(
+      core.validateKanjiFacts(prior),
+      'Complete reference facts require the pinned --archive for their first build',
+    );
+    kanjiFacts = prior.kanjiFacts;
+    assert.equal(
+      prior.audit.kanjiFacts.projectedSha256,
+      hash(serialize(kanjiFacts)),
+      'Reference facts projection integrity mismatch; use the pinned archive to rebuild',
+    );
     pinnedRows = prior.kanjiMetadata.filter((row) => row[5] === 'kanjidic-pinned');
     assert.equal(
       prior.audit.kanjidicArchive.projectedSha256,
@@ -456,7 +526,7 @@ export function buildReferenceData({ archive, prior } = {}) {
     archiveCharacters,
   });
   return {
-    schemaVersion: 3,
+    schemaVersion: 4,
     pool: 'share_alike',
     sources: [
       {
@@ -509,6 +579,7 @@ export function buildReferenceData({ archive, prior } = {}) {
       wordLinks: ['id', 'exactReading', 'candidateJmdictSequences'],
       kanjiReadings: ['glyph', 'kanjidic2On', 'kanjidic2Kun'],
       kanjiRecords: ['glyph', 'meanings', 'strokeCount', 'classicalRadical'],
+      kanjiFacts: ['glyph', 'englishMeanings', 'classicalRadical', 'nelsonRadicalOrNull'],
       officialReadings: ['glyph', 'reading'],
       jmdictWords: ['glyph', 'words[jmdictSeq, writtenForm, reading, firstGloss, writtenFormTags]'],
       kanjiWithoutWords: ['glyph'],
@@ -530,11 +601,26 @@ export function buildReferenceData({ archive, prior } = {}) {
     wordLinks,
     kanjiReadings: trust.kanjiReadings,
     kanjiRecords: trust.kanjiRecords,
+    kanjiFactsVersion: 1,
+    kanjiFacts,
     officialReadings: trust.officialReadings,
     jmdictWords: trust.jmdictWords,
     kanjiWithoutWords: trust.kanjiWithoutWords,
     audit: {
       schemaVersion: 1,
+      kanjiFacts: {
+        schemaVersion: 1,
+        ...FACTS_SOURCE,
+        projectedRows: kanjiFacts.length,
+        projectedSha256: hash(serialize(kanjiFacts)),
+        fields: [
+          'literal',
+          'readingMeaning.groups[].meanings[lang=en].value',
+          'radicals[type=classical].value',
+          'radicals[type=nelson_c].value',
+        ],
+        rule: 'All 10,384 pinned literals, sorted by Unicode scalar. Every English gloss verbatim in source order; no truncation, synonym generation, or deduplication. Classical and Nelson fields are copied separately; absent Nelson is null. No query codes or inferred classifications.',
+      },
       sourceHashes: Object.fromEntries(
         Object.entries(sourcePaths).map(([key, path]) => [key, { path, sha256: hash(read(path)) }]),
       ),
