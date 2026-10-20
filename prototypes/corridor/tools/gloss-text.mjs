@@ -54,22 +54,45 @@ export function useVocabulary(oracle) { shared = oracle; return shared; }
  *
  *  · STRUCTURAL — a trailing space, a dangling separator, or a parenthesis opened and never
  *    closed. These are wrong at any length ("above (up, top" is 14 characters and still cut),
- *    so they are judged on every gloss.
+ *    so they are judged on every gloss. A final ';' counts unless it closes a complete entity
+ *    reference (a sentence ending "…&amp;" is whole), and a cut that lands inside an entity
+ *    leaves an unterminated tail, judged at the cap by strict entity-name prefix.
  *
  *  · FRAGMENT — the last word is not a word. This is judged ONLY on glosses of exactly
  *    CLIP_CAP characters, because that is the only length the old extractor could produce.
  *    Applying it more widely was measurably wrong: it called "…to be restored; to heal" and
  *    "pros and cons" clipped, since "heal" and "cons" are proper prefixes of other corpus
  *    words. Those glosses are complete and longer than the cap, so the cut never touched them. */
+/** The standard HTML4 entity names, for the unterminated-entity fragment test below. */
+const ENTITY_NAMES = ('amp lt gt quot apos nbsp ensp emsp thinsp zwnj zwj lrm rlm ndash mdash lsquo rsquo sbquo ldquo rdquo bdquo dagger Dagger permil prime Prime lsaquo rsaquo oline frasl euro'
+  + ' alfa alpha beta gamma delta epsilon zeta eta theta iota kappa lambda mu nu xi omicron pi rho sigma tau upsilon phi chi psi omega Alpha Beta Gamma Delta Epsilon Zeta Eta Theta Iota Kappa Lambda Mu Nu Xi Omicron Pi Rho Sigma Tau Upsilon Phi Chi Psi Omega'
+  + ' forall part exist empty nabla isin notin ni prod sum minus lowast radic prop infin ang and or cap cup int there4 sim cong asymp ne equiv le ge sup sub nsup sube supe oplus otimes perp sdot lceil rceil lfloor rfloor lang rang loz spades clubs hearts diams'
+  + ' cent pound curren yen brvbar sect uml copy ordf laquo not shy reg macr deg plusmn sup1 sup2 sup3 acute micro para middot cedil sup1 ordm raquo frac14 frac12 frac34 iquest Agrave Aacute Acirc Atilde Auml Aring AElig Ccedil Egrave Eacute Ecirc Euml Igrave Iacute Icirc Iuml ETH Ntilde Ograve Oacute Ocirc Otilde Ouml times Oslash Ugrave Uacute Ucirc Uuml Yacute THORN szlig agrave aacute acirc atilde auml aring aelig ccedil egrave eacute ecirc euml igrave iacute icirc iuml eth ntilde ograve oacute ocirc otilde ouml divide oslash ugrave uacute ucirc uuml yacute thorn yuml'
+  + ' OElig oelig Scaron scaron Yuml fnof circ tilde'
+  + ' hellip trade alefsym image real weierp rarr larr uarr darr harr crarr lArr uArr rArr dArr hArr cong approx'
+  + ' ominus sdote vprop ngt nles nges NotEqual misraq PlusMinus'
+).split(' ');
+
+/** Is `text`, as the extractor's clip left it, ending mid-word? Structural signs count at any
+ * length; a tail fragment counts only at the cap the old extractor cut to. */
 export function looksClipped(text, oracle = shared) {
   const s = String(text ?? '');
   if (!s) return false;
   // structural, at any length
   if (/[\s([]$/u.test(s)) return true;
   if ((s.match(/\(/gu) || []).length > (s.match(/\)/gu) || []).length) return true;
-  if (/[,;]$/u.test(s)) return true;
-  // a cut that lands inside an HTML entity leaves it unterminated (庇う's "to&nbsp;&nbs", FIXR a0)
-  if (/&(?:#[0-9]*|[a-z][a-z0-9]*)$/iu.test(s)) return true;
+  if (/[,]$/u.test(s)) return true;
+  // a gloss ending in ';' reads as a mid-list cut — unless that ';' closes a complete entity
+  // reference (…&amp; is a whole sentence, not a clipped one; W2's at-cap ampersand control)
+  if (/;$/u.test(s)) return !/&(?:#[0-9]{1,6}|#x[0-9a-f]{1,6}|[a-z][a-z0-9]{1,7});$/iu.test(s);
+  // a cut that lands inside an HTML entity leaves an unterminated tail: at the cap only, '&'
+  // followed by two or more letters that strictly begin a known entity name (FIXR a0; the
+  // 32-character "to&nbsp;&nbs" row). An ampersand abbreviation (R&D, AT&T: one letter) or a
+  // plain tail (fish&chips: begins no entity) is not a fragment.
+  if (s.length === CLIP_CAP) {
+    const tail = /&([A-Za-z]{2,8})$/.exec(s)?.[1];
+    if (tail && ENTITY_NAMES.some((name) => name.length > tail.length && name.startsWith(tail))) return true;
+  }
   // fragment, only where the extractor's cut can have landed
   if (s.length !== CLIP_CAP) return false;
   const last = tokens(s).at(-1);
