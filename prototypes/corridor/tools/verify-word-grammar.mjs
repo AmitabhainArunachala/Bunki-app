@@ -4006,8 +4006,11 @@ try {
       const ladderSpecs = [
         { id: 'mouse-ignored', run: 'L-mouse', body: ladderMouse, options: { viewport: { width: 1440, height: 900 }, mobile: false },
           kills: ['M.hold', 'M.second-hold', 'M.drag'], witness: (row) => row.observed.ring === 0 && row.observed.strip === 0,
-          edits: [{ file: 'corridor.js', key: 'mouse-never-holds', from: "    if (mouse && (event.button !== 0 || event.ctrlKey)) return;",
-            to: '    if (mouse) return; // Ladder negative: a mouse or trackpad press is never a hold' }] },
+          // the reader span's own guard, named by the Ladder comment above it: Hfix-2e item 7's Words-room hold copies the guard
+          // line itself, so the line alone matched twice in the woven build (the served edit must match exactly once)
+          edits: [{ file: 'corridor.js', key: 'mouse-never-holds',
+            from: "    // nothing at all\"): its primary button only, never with Control (the Mac's secondary click, the contextmenu below)\n    const mouse = event.pointerType === 'mouse';\n    if (mouse && (event.button !== 0 || event.ctrlKey)) return;",
+            to: "    // nothing at all\"): its primary button only, never with Control (the Mac's secondary click, the contextmenu below)\n    const mouse = event.pointerType === 'mouse';\n    if (mouse) return; // Ladder negative: a mouse or trackpad press is never a hold" }] },
         { id: 'card-fixed-to-glass', run: 'L-scroll', body: ladderScroll, options: macView, kills: ['L.scroll.down', 'L.scroll.up'],
           witness: (row) => Math.abs(row.observed.rode) < 1 && Math.abs(row.observed.moved) >= 60,
           edits: [{ file: 'corridor.js', key: 'card-stays-on-the-glass',
