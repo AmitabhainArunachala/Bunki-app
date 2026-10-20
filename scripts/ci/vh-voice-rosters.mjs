@@ -1661,8 +1661,9 @@ export const SENSE_CASE_IDS = Object.freeze([
 ]);
 // INT-VH (merge 2): recomputed after the reviewed aozora-049966-2 change below (Hfix-1A R3-3); every other entry unchanged
 // FULL-R1 D: recomputed after the reviewed senses.json change below (Ladder a2c1776d, 384edc5d); every other entry unchanged
+// FULL-R1 E1: recomputed after the 31 reader-furigana bodies below (何を/何が → なに; wikinews:12024 放出 → はなてん, 間 → かん); every other entry unchanged
 export const SENSE_DATA_INVENTORY_SHA256 =
-  'f994b18feaccb4dc548f4fe0d4be5138cec9b969130f5ce97d2f0f1310b6c2d1';
+  'c627b2a4beb68c784301106bd2685323ffe41362912905a4d73fc764324667f2';
 export const SPEAK_CHECK_NAMES = Object.freeze({
   S1: [
     'the Learn room has one Speak door, a study-door row',
@@ -2076,7 +2077,7 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   ],
   [
     'data/articles/aozora-000628.json',
-    '46ff162b984078b356a67c62e5f6d4015dd74b9fa73ee0bf613a24b9abf7114f',
+    '4c5d1870620e88026c4c69dd5b243f3e0484dc6a2e40624b6d7b69c17fcb9163',
   ],
   [
     'data/articles/aozora-000772-1.json',
@@ -2306,7 +2307,7 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   ],
   [
     'data/articles/archive/wikinews-14282.json',
-    'f9e3455523c78a25e7a71cefae205de4935f17b8402e9a7e14dddbc22181d29d',
+    '4d4a1cb3a600a1eeb9be7a321eac74b3f83bab4706e589b08a972500cf0e389f',
   ],
   [
     'data/articles/archive/wikinews-14479.json',
@@ -2506,7 +2507,7 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   ],
   [
     'data/articles/archive/wikinews-18554.json',
-    '80f980dc891725cb358b8cd420733d5345ba63735603678208ddc2dca1ff3179',
+    'f15c571848cf05312165b6ca1e630be6fc20b6c92ea755ca5233131d4005d705',
   ],
   [
     'data/articles/archive/wikinews-18591.json',
@@ -3518,7 +3519,7 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   ],
   [
     'data/articles/archive/wikinews-29218.json',
-    '2a53d146ccbcf606400adfd61db924c79b4f2fbe38a13dbeff06c512d1a11f89',
+    '9b7228631aac516dff742415fd25d6c5d0e2beef9e8abc6499f100e2098d878a',
   ],
   [
     'data/articles/archive/wikinews-29219.json',
@@ -4562,7 +4563,7 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   ],
   [
     'data/articles/archive/wikinews-45032.json',
-    '64c30bf8ba1623a1afe5f08fa6081b89426dcd2dd621bb2208ff66004387f644',
+    'd6ba6d416d2a19c0c738e9f5c9657e14cf4b8bfd24511f0774fcc29ac64e055a',
   ],
   [
     'data/articles/archive/wikinews-45041.json',
@@ -4654,7 +4655,7 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   ],
   [
     'data/articles/archive/wikinews-45118.json',
-    '8d27b7bde71df59bd860954804f25ac4ac1f7f394935770234ad9d60ba7092ba',
+    'a6a2fb8edce8aeab9be1af6d802975a59bab0805598702e9a1ea38f42011e61d',
   ],
   [
     'data/articles/archive/wikinews-45119.json',
@@ -4894,11 +4895,11 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   ],
   [
     'data/articles/bunki-essay-n1-ai.json',
-    '42344338e4177b704c7953f71136afcfbb0d101b54c80a296f299a680d10c0ff',
+    '6f94b628beb7de29652e0d5110e25ee6e17191a3d219e7d6d364d5b15f68ade6',
   ],
   [
     'data/articles/bunki-essay-n1-beyond-fact-fiction.json',
-    '62198111051339b4ecd754c9aa9d39d10d0529061d88701280a12f46e36f9f92',
+    '0db45e13d1dd22d9fd5800c56ebac96ef87abf9b764fcde3f0709ab70b104de6',
   ],
   [
     'data/articles/bunki-essay-n1-city.json',
@@ -4906,19 +4907,19 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   ],
   [
     'data/articles/bunki-essay-n1-cosmic-analogy.json',
-    '8ebcf5efd762346d54da055446ed61f69c67e4a981306af33124ae68458e8b4f',
+    'f9af86076032b49e9527f9d1895b6d2a2f83d1824e3f4e8cdd9f76acdaec491f',
   ],
   [
     'data/articles/bunki-essay-n1-first-versus-supreme.json',
-    '4d8b93cf75d7c724257dc6f041e056c40d31126a12709d5caa902366cfc977cc',
+    'bb36d7deb554ed4b7f9488de244948a16bb35ada066d39dce2edbea333dbac4a',
   ],
   [
     'data/articles/bunki-essay-n1-ise-time.json',
-    '6913368cad11e6a2d96cd4211bacbb45f02e01abdf04edf9781f260172bf0c0e',
+    'fb549945eea2c81f7bed778d022f39a16f9d75c127bd3ab1cb28c7063257729d',
   ],
   [
     'data/articles/bunki-essay-n1-kojiki-power.json',
-    'ddd5c4e036bd6535597971a82a575d1c5deae61b3bcc733a9ede6bd3826c88fb',
+    'd8eb3c46c775b1975321a5f2d7533c6acf3c5e5b7a2166a4e24a34d0c14c2bf2',
   ],
   [
     'data/articles/bunki-essay-n1-memory.json',
@@ -4926,15 +4927,15 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   ],
   [
     'data/articles/bunki-essay-n1-miracle-testimony.json',
-    '9349f316a4833aaf0c401a6d2c503623e1f37ce4de611d944feb8e276679600e',
+    '134ffabe0047a897fe583dc44505ac854d3922cf8403fdc63fa00961292946b0',
   ],
   [
     'data/articles/bunki-essay-n1-nakaima-time-theory.json',
-    'bc2af6bcd54b5ff7acfd107e59d4c7b4d5f8d98284ae85223b8a3e25ca8d8567',
+    'e5db90e07b5a0418580744f1e326b27e4f08b29127961571870c8fc0e280e27c',
   ],
   [
     'data/articles/bunki-essay-n1-prayer-reality.json',
-    'f92c8c6517129662f9dbcfb1a24379575b989b7f8f456db4c67cb43f7a27192a',
+    '8e44e2e11775734e8c0ab11b3a37258be19f687f66179fb72dc3b0fd9d2fcc19',
   ],
   [
     'data/articles/bunki-essay-n1-sacred-media.json',
@@ -4942,15 +4943,15 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   ],
   [
     'data/articles/bunki-essay-n1-silent-god-theology.json',
-    '0edf4421c8378c2b35392249b412256f9aa461927bb5799bcad05d1580e1dc18',
+    'f95c8b87a75adb2ec50eecd437edd578c98b29a6743f9805124d73a7beefefd5',
   ],
   [
     'data/articles/bunki-essay-n2-creator-god.json',
-    '015fca7e049a0ac93c38915667e4bb79f432b6e145168b682ff5c9b617f52714',
+    'd07ee9f8216ac1ee12cce7226c3113330cb3a6c7b6efb1fdfd8c899cfd3cf669',
   ],
   [
     'data/articles/bunki-essay-n2-feel-jingu-musubi.json',
-    'f03473e1c3ba4e943f98c1c5a0de10dde8242709fbce2b6fdf14f08519c777c0',
+    'eb7ab8f9c87335f5e484c0201bb50511ae8c89e5ac17ce3a644fa52869397020',
   ],
   [
     'data/articles/bunki-essay-n2-handwriting.json',
@@ -4958,7 +4959,7 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   ],
   [
     'data/articles/bunki-essay-n2-kojiki-myth-history.json',
-    'a3a9a0605ba11bb4b7912ad6c190fd157e7c8a51059fb471ec0e2778bed97826',
+    'e6111832dab4a2eb43c85c0807e188aa947604f8a1df770b3b402c42f701a549',
   ],
   [
     'data/articles/bunki-essay-n2-mountain.json',
@@ -4970,15 +4971,15 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   ],
   [
     'data/articles/bunki-essay-n2-nakaima-time.json',
-    'c5c6c23814ad012c9a22610f3562a9cfce0cf2774efdcadc82db49d3b75da69c',
+    'd28cfaa76579c46436043e4fa4c9c3c6fc8a6151cae715b111980af49f27777f',
   ],
   [
     'data/articles/bunki-essay-n2-notebook.json',
-    '73bb13698a56e20dde989880d9b4bb0065d85c550ac874f302af6c6bf477f27f',
+    '77dba09404d57732b143ee75fcbf2ea5f657ecdd822f55a9826e9be83c43514e',
   ],
   [
     'data/articles/bunki-essay-n2-prayer-on-screen.json',
-    '5db9070778d3eb7624122416d44963ede93f4e82ae1d33248fac0bd289a8825d',
+    '50b38a9f59739ecc5a0e2fb014d7fd700d1008102ad999b773449be1d3abfa90',
   ],
   [
     'data/articles/bunki-essay-n2-rain.json',
@@ -4986,15 +4987,15 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   ],
   [
     'data/articles/bunki-essay-n2-silent-amenominakanushi.json',
-    'd27a0a8803ca179f5496449ee2aed492f03e1b430464362457a55ae9fd27da74',
+    'b2268b1cb38e65633ede972f707eaa9b53a28016cda3752e4612b1c19bbadfe0',
   ],
   [
     'data/articles/bunki-essay-n2-testimony-literacy.json',
-    '7622bd22fa411cd32db82eacbde5adf73fabf51d98aef26dca2f53a84392485a',
+    'f10d2822881a8135ec979ca006a432f704e15387b4905488166269f946fbb771',
   ],
   [
     'data/articles/bunki-essay-n2-thanks-first.json',
-    '2c33844051812663dd398336592284c1565acc2fdaec40bb36bb3819603873da',
+    'e24b8e85ed7a9d0f173d440be80675cce343fec79b2106b79ef29dc6e77d6f07',
   ],
   [
     'data/articles/bunki-essay-n2-translation.json',
@@ -5002,7 +5003,7 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   ],
   [
     'data/articles/bunki-essay-n2-zoka-as-one.json',
-    'be406ba9d81674b8eed9ff9e2ed00b40d96324783fe728a6e410fc0249159c40',
+    '6073e1524df8873436bc1b654ef94f387aa7b5edabe58b2965ef34de63cf80c8',
   ],
   [
     'data/articles/bunki-graded-n3-feel-jingu-forest.json',
@@ -5026,7 +5027,7 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   ],
   [
     'data/articles/bunki-graded-n3-musubi-visual.json',
-    'bf50595f2f423557513d3d810d4450fb3c229fa76d977a1ad4c66a2c359ea4a9',
+    '27c44e18a84ff82ac6c652af326cc77da88df9521698ba09dbcb60ab19a5484a',
   ],
   [
     'data/articles/bunki-graded-n3-nakaima-diary.json',
@@ -5042,7 +5043,7 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   ],
   [
     'data/articles/bunki-graded-n3-thanks-before-help.json',
-    'aab75d52ae591503f3c4e0960906471671ef3a72cd8d5d2b71ea53bad46a1f3a',
+    'b560c2db9eea3bd8ffd2604f8e2681d88f85b239f3c4bf24356cdba04a34426a',
   ],
   [
     'data/articles/bunki-graded-n3-town.json',
@@ -5050,11 +5051,11 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   ],
   [
     'data/articles/bunki-graded-n3-world-beginning.json',
-    'a69805f345ca177a926d29f13e5e7d633c56fecc9f76eb144bf07912e467eba5',
+    '32efa64760d31ca7b9802494957d4b74295e860aaf2edab34c21e85b9aa3d58a',
   ],
   [
     'data/articles/bunki-graded-n3-zoka-sanjin-morning.json',
-    '7673cae386ac5b716565c1d6f3fa4e5b67c2b48b2fba6a194a503112770ec21c',
+    'b05ec30977c04dba6b309de7e27441c0423451099a1fa16cc9174f1b8bfe1f53',
   ],
   [
     'data/articles/bunki-graded-n4-bicycle.json',
@@ -6294,7 +6295,7 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   ],
   [
     'data/articles/wikinews-12024.json',
-    '45dfaf2b45ed744a68e4639a15b4908a62a79072b58dcf95bc659481ffeaafba',
+    'b026f7822252f39982f1730c2b2e0ac003423b36d95091d3d970b48537d8d8a6',
   ],
   [
     'data/articles/wikinews-1403.json',
