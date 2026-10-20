@@ -6506,7 +6506,10 @@ const __SRS_CORE__ = (() => {
  *   4. the close: what a sitting did, counted from its own answers (sittingTally, closeLines,
  *      pauseWords);
  *   5. burying across surfaces: once a word is answered on one surface today, its cards on the
- *      others wait until tomorrow (answeredToday, buriedHere, noteAnswered).
+ *      others wait until tomorrow (answeredToday, buriedHere, noteAnswered);
+ *   6. review hooks: whether a world, quest, room, ride or course attempt may grade an existing card
+ *      (decideReview), and the one commit order every surface grading a word follows under one Web
+ *      Lock (admitAnswer, reserveAnswered, releaseAnswered, refusalWords).
  *
  * Each surface keeps its own ledger (no learner record moves); every one of them asks this module.
  */
@@ -6777,7 +6780,191 @@ function buriedWords(count, lang = 'en') {
   return `${count === 1 ? '1 card for a word you already answered today waits' : `${count} cards for words you already answered today wait`} until tomorrow.`;
 }
 
-return { NEW, LEARNING, REVIEW, RELEARNING, LEARN_AHEAD_MS, schedulerInput, createScheduler, reviewInstant, isLearning, endOfDay, servable, nextStep, sittingTally, waitWords, closeLines, pauseWords, ANSWERED_KEY, wordIdentity, dayOf, answeredToday, buriedHere, noteAnswered, buriedWords };
+/* ---------------------------------------------------------------- review hooks (HOOKS-SPEC r7, W2 PASS 4fae8c1b)
+ * The only path from a world, quest, room, ride or course into a schedule (lead 0057): decideReview says whether an
+ * attempt may grade an existing card, and admitAnswer is the commit order every surface that commits a WORD grade
+ * follows — the hook adapter, the corridor review, the deck player and the context deck — under one Web Lock, so a
+ * word is graded once a day across every ledger. Evidence writing is OFF (lead 0057): nothing here writes an
+ * observation. Pure like the rest of this module: storage, locks and the save itself are handed in. */
+const ANSWER_LOCK = 'bunki-srs:answer';
+const FACETS = Object.freeze(['reading', 'meaning', 'form']);
+/** a hook caller: one of five kinds and a safe id (1–64: a letter or digit first, then letters, digits, . _ -; never ..) */
+const HOOK_SURFACE = /^(world|quest|room|ride|course):(?!.*\.\.)[\p{L}\p{N}][\p{L}\p{N}._-]{0,63}$/u;
+const trustedSurface = (surface) => typeof surface === 'string' && HOOK_SURFACE.test(surface);
+
+const filled = (value) => typeof value === 'string' && value.trim() !== '';
+const plainObject = (value) => !!value && typeof value === 'object' && !Array.isArray(value);
+/** { kind: 'word', term, reading, seq? } | { kind: 'kanji', literal } */
+function validItem(item) {
+  if (!plainObject(item)) return false;
+  if (item.kind === 'kanji') return filled(item.literal);
+  return item.kind === 'word' && filled(item.term) && filled(item.reading) && (item.seq == null || filled(String(item.seq)));
+}
+/** an item's one identity: a word by its lemma and hiragana reading (wordIdentity), a kanji by its literal */
+function itemIdentity(item) {
+  return item.kind === 'word' ? wordIdentity(item.term, item.reading) : `kanji:${item.literal}`;
+}
+/** exactly one answer: { rating: 1–4 } · { selfCheck: 'knew'|'missed' } · { claim: true } */
+function validAnswer(answer) {
+  if (answer == null) return true;
+  if (!plainObject(answer)) return false;
+  const keys = Object.keys(answer);
+  if (keys.length !== 1) return false;
+  if (keys[0] === 'rating') return [1, 2, 3, 4].includes(answer.rating);
+  if (keys[0] === 'selfCheck') return answer.selfCheck === 'knew' || answer.selfCheck === 'missed';
+  return keys[0] === 'claim' && answer.claim === true;
+}
+const validHelp = (help) => plainObject(help) && filled(help.what) && Array.isArray(help.reveals) &&
+  help.reveals.every((facet) => FACETS.includes(facet)) && (help.about == null || validItem(help.about)) &&
+  (help.at == null || Number.isFinite(help.at));
+/** an attempt names its item, the facet it tests, one well-formed answer, finite times and well-formed help */
+function validAttempt(evidence) {
+  if (!plainObject(evidence) || !validItem(evidence.item) || !FACETS.includes(evidence.tests) || !validAnswer(evidence.answer)) return false;
+  if (evidence.revealed != null && typeof evidence.revealed !== 'boolean') return false;
+  if (evidence.answeredAt != null && !Number.isFinite(evidence.answeredAt)) return false;
+  if (evidence.help != null && !Array.isArray(evidence.help)) return false;
+  return (evidence.help || []).every(validHelp);
+}
+/**
+ * Which card an attempt grades: always derived from its item, never chosen by the caller. named: the card key the
+ * surface believes it is grading (a quest's draw) or null; card: the record owner's facts about that card on the latest
+ * state — { enrolled, reading, sameEntry } — or null when there is none. sameEntry is the owner's own saved-identity
+ * check (corridor: sameWordIdentity(wordNodeIdentity(node), wordCardIdentity(record, id))): a task naming another
+ * dictionary entry is another word's task. Returns { key, eligible } | { refuse: 'target-mismatch' | 'invalid-task' }.
+ */
+function bindTarget(item, named, card) {
+  if (!validItem(item)) return { refuse: 'invalid-task' };
+  const key = item.kind === 'word' ? `word:${item.term}` : `kanji:${item.literal}`;
+  if (named != null && named !== key) return { refuse: 'target-mismatch' };
+  if (!card || !card.enrolled) return { key, eligible: false };
+  if (item.kind === 'word' && (wordIdentity(item.term, card.reading) !== itemIdentity(item) || card.sameEntry === false)) {
+    return { refuse: 'target-mismatch' };
+  }
+  return { key, eligible: true };
+}
+const gradedToday = (record, now) => record?.last_review != null && dayOf(new Date(record.last_review)) === dayOf(now);
+/** help shows the answer when it is about the tested item (unstated: the tested item) and reveals the tested facet */
+const showsAnswer = (help, evidence) =>
+  (help.about == null || itemIdentity(help.about) === itemIdentity(evidence.item)) && help.reveals.includes(evidence.tests);
+const refused = (reason) => ({ write: false, reason });
+
+/**
+ * May this attempt grade this card, and with what rating? evidence: { kind, item, surface, tests, answer, revealed,
+ * answeredAt, help } (only kind 'attempt' can grade); record: the bound card's FSRS record on the latest state, or null
+ * when the item has no eligible card. answered: answeredToday(...) read fresh inside the admission.
+ * Returns { write: true, rating, from, capped } | { write: false, reason }. The checks run in this order:
+ * evidence-only · untrusted-surface · invalid-task · no-schedule (before servable: servable(null) is true) ·
+ * answered-today (any hook surface: the card's own last review today, or the word answered anywhere today) · not-due ·
+ * claim-without-check (a tap, or a self-check or rating before the reveal) · no-answer · then help: answer-showing help
+ * used before answeredAt gives Again, any other help caps at Hard.
+ */
+function decideReview(evidence, record, { now, answered = {}, dayEnd } = {}) {
+  if (!plainObject(evidence) || evidence.kind !== 'attempt') return refused('evidence-only');
+  if (!trustedSurface(evidence.surface)) return refused('untrusted-surface');
+  if (!validAttempt(evidence)) return refused('invalid-task');
+  if (!record) return refused('no-schedule');
+  if (gradedToday(record, now)) return refused('answered-today');
+  if (evidence.item.kind === 'word' && (answered[itemIdentity(evidence.item)] || []).length) return refused('answered-today');
+  if (!servable(record, now, dayEnd == null ? {} : { dayEnd })) return refused('not-due');
+  const answer = evidence.answer || {};
+  let rating;
+  if (answer.claim) return refused('claim-without-check');
+  if (answer.selfCheck) {
+    if (!evidence.revealed) return refused('claim-without-check');
+    rating = answer.selfCheck === 'knew' ? 3 : 1;
+  } else if (answer.rating) {
+    if (!evidence.revealed) return refused('claim-without-check');
+    rating = answer.rating;
+  } else return refused('no-answer');
+  const help = (evidence.help || []).filter((h) => evidence.answeredAt == null || h.at == null || h.at <= evidence.answeredAt);
+  const from = rating;
+  if (help.some((h) => showsAnswer(h, evidence))) rating = 1;
+  else if (help.length) rating = Math.min(rating, 2);
+  return { write: true, rating, from, capped: rating !== from };
+}
+
+/** reserve today's answer for a word before its grade is published: { ok, inserted }. A mark this surface already holds
+ * (its own earlier grade, e.g. a home learning step) is ok and not inserted, and is never this call's to release. */
+function reserveAnswered(storage, identity, where, now) {
+  if ((answeredToday(storage, now)[identity] || []).includes(where)) return { ok: true, inserted: false };
+  const ok = noteAnswered(storage, identity, where, now) && (answeredToday(storage, now)[identity] || []).includes(where);
+  return { ok, inserted: ok };
+}
+/** best-effort removal of one surface's mark for a word (only ever an inserted reservation whose grade was confirmed
+ * not published). False when storage refuses: the word then rests ungraded until tomorrow. */
+function releaseAnswered(storage, identity, where, now) {
+  if (!storage) return false;
+  try {
+    const words = { ...answeredToday(storage, now) };
+    const list = (Array.isArray(words[identity]) ? words[identity] : []).filter((w) => w !== where);
+    if (list.length) words[identity] = list;
+    else delete words[identity];
+    storage.setItem(ANSWERED_KEY, JSON.stringify({ day: dayOf(now), words }));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * The commit order for one word or kanji grade on any surface (HOOKS-SPEC §3.3, §3.6):
+ *   1. without Web Locks nothing is admitted ('no-shared-admission'; the surface shows refusalWords);
+ *   2. under ANSWER_LOCK, `now` is sampled once (clock), after the lock is held;
+ *   3. commit({ now, answered, reserve }) decides on fresh state; for a write it calls reserve(identity) — a word's
+ *      identity, or null for a kanji card, which never buries — and publishes only if that returned true;
+ *   4. commit returns { outcome, ...anything }: outcome 'published' (the write landed, acknowledged or not),
+ *      'not-published' (confirmed before anything was applied, or refused before publishing) or 'uncertain';
+ *   5. only after 'not-published' is a reservation released, and only one this attempt inserted.
+ * locks: navigator.locks (or null); storage: the answered-today storage; where: the surface's answered where-string.
+ */
+async function admitAnswer({ locks, clock = () => new Date(), storage, where, commit }) {
+  if (!locks || typeof locks.request !== 'function') return { admitted: false, reason: 'no-shared-admission' };
+  return locks.request(ANSWER_LOCK, async () => {
+    const now = clock();
+    let reservation = null;
+    const reserve = (identity) => {
+      if (identity == null) return true;
+      const r = reserveAnswered(storage, identity, where, now);
+      reservation = { identity, inserted: !!(r.inserted || reservation?.inserted) };
+      return r.ok;
+    };
+    let result;
+    try {
+      result = (await commit({ now, answered: answeredToday(storage, now), reserve })) || {};
+    } catch (error) {
+      result = { outcome: 'uncertain', reason: 'publish-uncertain', error };
+    }
+    if (result.outcome === 'not-published' && reservation?.inserted) releaseAnswered(storage, reservation.identity, where, now);
+    return { admitted: true, now, ...result };
+  });
+}
+
+/** the one plain line a surface shows when it refuses a grade; practice continues and nothing claims the answer was
+ * saved (lead 0128; the Japanese checked by Kimi, 0155). null for a reason that is not such a refusal. */
+const REFUSAL_WORDS = {
+  'no-shared-admission': {
+    en: 'This page can’t keep answers in step with your other Bunki pages, so this card is practice only: your answer won’t change its schedule.',
+    ja: 'このページはほかの Bunki のページと答えをそろえられないため、この札は練習だけです。答えても予定は変わりません。',
+  },
+  'mark-unavailable': {
+    en: 'This answer couldn’t be saved safely, so it didn’t change the card’s schedule. You can keep practising.',
+    ja: 'この答えは安全に保存できなかったため、札の予定は変わっていません。このまま練習を続けられます。',
+  },
+  'publish-failed': {
+    en: 'This answer couldn’t be saved, so it didn’t change the card’s schedule. You can keep practising.',
+    ja: 'この答えは保存できなかったため、札の予定は変わっていません。このまま練習を続けられます。',
+  },
+  'publish-uncertain': {
+    en: 'We couldn’t confirm this answer was saved. You can keep practising.',
+    ja: 'この答えが保存されたか確かめられませんでした。このまま練習を続けられます。',
+  },
+};
+function refusalWords(reason, lang = 'en') {
+  const words = REFUSAL_WORDS[reason];
+  return words ? words[lang === 'ja' ? 'ja' : 'en'] : null;
+}
+
+return { NEW, LEARNING, REVIEW, RELEARNING, LEARN_AHEAD_MS, schedulerInput, createScheduler, reviewInstant, isLearning, endOfDay, servable, nextStep, sittingTally, waitWords, closeLines, pauseWords, ANSWERED_KEY, wordIdentity, dayOf, answeredToday, buriedHere, noteAnswered, buriedWords, ANSWER_LOCK, FACETS, trustedSurface, validItem, itemIdentity, validAttempt, bindTarget, decideReview, reserveAnswered, releaseAnswered, admitAnswer, refusalWords };
 })();
 const __KP_ENGINE__ = (() => {
 /**
@@ -6822,10 +7009,58 @@ function buriedToday(storage, deckId, now) {
   const where = `deck:${deckId}`;
   return (word) => srsCore.buriedHere(answered, word.term, word.reading, where);
 }
-/** after a real answer of a word card (never a 字 card): the word was answered in this deck today */
-function noteAnsweredWord(storage, deckId, word, card, now) {
-  if (card?.type === 'kanji' || !word) return false;
-  return srsCore.noteAnswered(storage, srsCore.wordIdentity(word.term, word.reading), `deck:${deckId}`, now);
+/** the one plain line a refused grade shows (practice continues); shared by every surface (srs-core) */
+const refusalWords = srsCore.refusalWords;
+/**
+ * A grade of this deck's card under the shared answer admission (HOOKS-SPEC §3.6). A deck 字 card neither takes nor
+ * needs it: it never rests and is never rested, and this deck ledger's fresh-read revision check already serializes it.
+ * A word card is admitted under the one Web Lock (none: 'no-shared-admission'), re-checked against today's answered
+ * words at the commit — a word answered on another surface since the card was shown rests, unless the card is in its
+ * learning steps ('answered-elsewhere') — and its word's mark is reserved before the ledger write ('mark-unavailable'
+ * when it cannot be written). The reservation is released only if that write is refused before storing.
+ * write: the host's fresh-read-then-write (writeLedger); change(fresh, now): its own gate and grade, null to refuse.
+ * Returns { result: 'graded'|'refused'|'answered-elsewhere'|'mark-unavailable'|'failed'|'no-shared-admission', r, now }.
+ */
+async function admitDeckGrade({ locks, storage, deckId, id, word, card, write, change, clock = () => new Date() }) {
+  if (card?.type === 'kanji' || !word) {
+    const now = clock();
+    const r = write((fresh) => change(fresh, now));
+    return { result: r.refused ? 'refused' : r.failed ? 'failed' : 'graded', r, now };
+  }
+  const where = `deck:${deckId}`;
+  let result = null;
+  let r = null;
+  const admitted = await srsCore.admitAnswer({
+    locks,
+    clock,
+    storage,
+    where,
+    commit: async ({ now, answered, reserve }) => {
+      r = write((fresh) => {
+        const next = change(fresh, now);
+        if (!next) {
+          result = 'refused';
+          return null;
+        }
+        const stored = fresh.cards[id] ?? null;
+        const rests = !stored || stored.state === srsCore.NEW || stored.state === srsCore.REVIEW;
+        if (rests && srsCore.buriedHere(answered, word.term, word.reading, where)) {
+          result = 'answered-elsewhere';
+          return null;
+        }
+        if (!reserve(srsCore.wordIdentity(word.term, word.reading))) {
+          result = 'mark-unavailable';
+          return null;
+        }
+        return next;
+      });
+      if (r.failed) result = 'failed';
+      else if (!r.refused) result = 'graded';
+      // a refused change or a write that threw stored nothing (localStorage throws without writing): not published
+      return { outcome: result === 'graded' ? 'published' : 'not-published' };
+    },
+  });
+  return admitted.admitted ? { result, r, now: admitted.now } : { result: 'no-shared-admission', r: null, now: null };
 }
 
 function dayKey(date) {
@@ -7399,7 +7634,7 @@ function dueCount(deck, state, now, opts) {
   return buildQueue(deck, state, now, 0, opts).due.length;
 }
 
-return { DECK_FORMAT, STATE_FORMAT, VERSION, LEECH_LAPSES, RATINGS, nextStep, servable, sittingTally, closeLines, pauseWords, LEARN_AHEAD_MS, buriedWords, buriedToday, noteAnsweredWord, dayKey, validateDeck, indexDeck, TOKENS_FORMAT, TOKEN_KINDS, cardTokens, defTokens, createScheduler, emptyState, LOOKUP_KEEP, logLookup, REPAIR_ACTIONS, inspectState, normalizeState, isSuspended, suspendCard, restoreSuspended, isLeech, swapTarget, swapCard, repairCard, skipFor, introducedToday, buildQueue, learningSoon, effectiveReviewTime, grade, changeOf, undoChange, preview, wordStatus, dueCount };
+return { DECK_FORMAT, STATE_FORMAT, VERSION, LEECH_LAPSES, RATINGS, nextStep, servable, sittingTally, closeLines, pauseWords, LEARN_AHEAD_MS, buriedWords, buriedToday, refusalWords, admitDeckGrade, dayKey, validateDeck, indexDeck, TOKENS_FORMAT, TOKEN_KINDS, cardTokens, defTokens, createScheduler, emptyState, LOOKUP_KEEP, logLookup, REPAIR_ACTIONS, inspectState, normalizeState, isSuspended, suspendCard, restoreSuspended, isLeech, swapTarget, swapCard, repairCard, skipFor, introducedToday, buildQueue, learningSoon, effectiveReviewTime, grade, changeOf, undoChange, preview, wordStatus, dueCount };
 })();
 /**
  * 集中道場 deck player. One screen at a time: deck → study → done, plus the
@@ -7419,6 +7654,7 @@ return { DECK_FORMAT, STATE_FORMAT, VERSION, LEECH_LAPSES, RATINGS, nextStep, se
  */
 const {
   RATINGS,
+  admitDeckGrade,
   buildQueue,
   buriedToday,
   buriedWords,
@@ -7437,9 +7673,9 @@ const {
   logLookup,
   nextStep,
   normalizeState,
-  noteAnsweredWord,
   pauseWords,
   preview,
+  refusalWords,
   repairCard,
   restoreSuspended,
   servable,
@@ -7968,6 +8204,8 @@ const UI_EN = {
   "裏：ふりがな付きの全文、読み、品詞、日本語の説明と使い方。英語の意味とその文の英訳はタップで開く。": "The back shows the passage with readings, the target’s reading, part of speech, Japanese definition and usage. Open folds for English meaning and the target sentence’s translation.",
   "文章はすべて書き下ろし。自然さ・事実・レベルを、書き手とは別のモデルが一枚ずつ確かめています。級は公開リストによる目安です。": "Every passage is original. A model separate from its author checks naturalness, facts and level for each card. Level labels are estimates from public lists."
 };
+// a refused grade's one plain line (the shared answer admission, HOOKS-SPEC §3.6): the same wording on every surface
+for (const reason of ['no-shared-admission', 'mark-unavailable']) UI_EN[refusalWords(reason, 'ja')] = refusalWords(reason, 'en');
 const t = (ja, en = UI_EN[ja]) => ctx?.english !== false ? (en ?? ja) : ja;
 
 /* ------------------------------------------------------------- helpers */
@@ -10333,19 +10571,38 @@ function retireRule() {
   if (storePrefs(prefs)) ctx.prefs = prefs;
 }
 
-function commit(rating, { stay = false } = {}) {
+async function commit(rating, { stay = false } = {}) {
   const id = ui.queue[ui.pos];
-  if (!id) return;
-  const now = new Date();
+  if (!id || ui.committing) return;
   const sitting = sittingNow();
-  // graded on the ledger as it is now, and only if the card is still the one put on screen and may be answered now
-  // (srs-core's gate): a card another window has answered, or one a stale queue still held, is never graded early
-  const r = writeLedger((fresh) => {
-    const stored = fresh.cards[id] ?? null;
-    if (isSuspended(fresh, id) || JSON.stringify(stored) !== ui.shown || !servable(stored, now, { learnAhead: true })) return null;
-    return grade(fsrsApi, ctx.scheduler, fresh, id, rating, now);
-  });
-  if (r.refused) {
+  const indexed = ctx.index.cards.get(id);
+  ui.committing = true;
+  let graded;
+  try {
+    // graded on the ledger as it is now, and only if the card is still the one put on screen and may be answered now
+    // (srs-core's gate): a card another window has answered, or one a stale queue still held, is never graded early.
+    // A word card's grade runs under the shared answer admission (one Web Lock, a re-check of today's answered words,
+    // its mark reserved before the write); a 字 card's does not (it never rests)
+    graded = await admitDeckGrade({
+      locks: globalThis.navigator?.locks || null,
+      storage: ctx.storage,
+      deckId: ctx.deck.id,
+      id,
+      word: indexed?.word,
+      card: indexed?.card,
+      write: writeLedger,
+      change: (fresh, now) => {
+        const stored = fresh.cards[id] ?? null;
+        if (isSuspended(fresh, id) || JSON.stringify(stored) !== ui.shown || !servable(stored, now, { learnAhead: true })) return null;
+        return grade(fsrsApi, ctx.scheduler, fresh, id, rating, now);
+      },
+    });
+  } finally {
+    ui.committing = false;
+  }
+  if (ui.queue[ui.pos] !== id) return;
+  const { result, r } = graded;
+  if (result === 'refused' || result === 'answered-elsewhere') {
     dropFromQueue(id);
     settle();
     resetCard();
@@ -10353,7 +10610,17 @@ function commit(rating, { stay = false } = {}) {
     paintResponse({ front: true });
     return;
   }
-  if (r.failed) {
+  if (result === 'no-shared-admission' || result === 'mark-unavailable') {
+    // practice continues: the card stays, and one plain line says the answer did not change its schedule
+    if (cardMode() === 'choice') {
+      ui.revealed = false;
+      ui.picked = null;
+    }
+    ui.toast = refusalWords(result, 'ja');
+    paint();
+    return;
+  }
+  if (result === 'failed') {
     // not stored: the same card stays, ready to answer again
     if (cardMode() === 'choice') {
       ui.revealed = false;
@@ -10363,15 +10630,12 @@ function commit(rating, { stay = false } = {}) {
     return;
   }
   askToKeepStorage();
-  // the word was answered here today: its cards on the other surfaces rest until tomorrow
-  const indexed = ctx.index.cards.get(id);
-  noteAnsweredWord(ctx.storage, ctx.deck.id, indexed?.word, indexed?.card, now);
   if (cardMode() !== 'choice') retireRule();
   ui.toast = '';
   ui.undo = { change: changeOf(r.before, r.state), sitting };
   ui.done++;
   if (rating >= RATINGS.hard) ui.right++;
-  const answered = ctx.index.cards.get(id)?.word;
+  const answered = indexed?.word;
   // the close counts these: the word, where the card was in its schedule before this answer, and whether it came early
   if (answered) ui.log.push({ term: answered.term, ok: rating >= RATINGS.hard, word: answered.id, before: r.before.cards[id]?.state ?? null, rating, early: ui.early });
   if (stay) {

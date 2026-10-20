@@ -75,7 +75,7 @@ const names = new Set([
   'advanceReviewSession', 'resetAssessmentQuestionReview', 'commitReviewAction', 'commitDrillGrade', 'commitStandardGrade',
   'renderReview', 'renderReviewUndo', 'renderProbe', 'renderLessons', 'renderSrsPrefs',
   // the review's next card by the app's one schedule owner (srs-core.mjs, given to the sandbox below)
-  'reviewNextStep', 'reviewPauseTimer', 'srsNoteAnswered',
+  'reviewNextStep', 'reviewPauseTimer', 'srsWordAnswerIdentity',
   'reviewCounts', 'srsCardKind', 'SRS_KINDS',
   'aiQuizPending', 'aiQuizStarting', 'aiQuizParse', 'aiQuizCommit', 'aiQuizStart', 'renderAiQuiz',
   'learningEnrollmentPending', 'commitLearningEnrollment', 'captureStorePatch', 'commitCapture',

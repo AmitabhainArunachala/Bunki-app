@@ -40,10 +40,58 @@ export function buriedToday(storage, deckId, now) {
   const where = `deck:${deckId}`;
   return (word) => srsCore.buriedHere(answered, word.term, word.reading, where);
 }
-/** after a real answer of a word card (never a 字 card): the word was answered in this deck today */
-export function noteAnsweredWord(storage, deckId, word, card, now) {
-  if (card?.type === 'kanji' || !word) return false;
-  return srsCore.noteAnswered(storage, srsCore.wordIdentity(word.term, word.reading), `deck:${deckId}`, now);
+/** the one plain line a refused grade shows (practice continues); shared by every surface (srs-core) */
+export const refusalWords = srsCore.refusalWords;
+/**
+ * A grade of this deck's card under the shared answer admission (HOOKS-SPEC §3.6). A deck 字 card neither takes nor
+ * needs it: it never rests and is never rested, and this deck ledger's fresh-read revision check already serializes it.
+ * A word card is admitted under the one Web Lock (none: 'no-shared-admission'), re-checked against today's answered
+ * words at the commit — a word answered on another surface since the card was shown rests, unless the card is in its
+ * learning steps ('answered-elsewhere') — and its word's mark is reserved before the ledger write ('mark-unavailable'
+ * when it cannot be written). The reservation is released only if that write is refused before storing.
+ * write: the host's fresh-read-then-write (writeLedger); change(fresh, now): its own gate and grade, null to refuse.
+ * Returns { result: 'graded'|'refused'|'answered-elsewhere'|'mark-unavailable'|'failed'|'no-shared-admission', r, now }.
+ */
+export async function admitDeckGrade({ locks, storage, deckId, id, word, card, write, change, clock = () => new Date() }) {
+  if (card?.type === 'kanji' || !word) {
+    const now = clock();
+    const r = write((fresh) => change(fresh, now));
+    return { result: r.refused ? 'refused' : r.failed ? 'failed' : 'graded', r, now };
+  }
+  const where = `deck:${deckId}`;
+  let result = null;
+  let r = null;
+  const admitted = await srsCore.admitAnswer({
+    locks,
+    clock,
+    storage,
+    where,
+    commit: async ({ now, answered, reserve }) => {
+      r = write((fresh) => {
+        const next = change(fresh, now);
+        if (!next) {
+          result = 'refused';
+          return null;
+        }
+        const stored = fresh.cards[id] ?? null;
+        const rests = !stored || stored.state === srsCore.NEW || stored.state === srsCore.REVIEW;
+        if (rests && srsCore.buriedHere(answered, word.term, word.reading, where)) {
+          result = 'answered-elsewhere';
+          return null;
+        }
+        if (!reserve(srsCore.wordIdentity(word.term, word.reading))) {
+          result = 'mark-unavailable';
+          return null;
+        }
+        return next;
+      });
+      if (r.failed) result = 'failed';
+      else if (!r.refused) result = 'graded';
+      // a refused change or a write that threw stored nothing (localStorage throws without writing): not published
+      return { outcome: result === 'graded' ? 'published' : 'not-published' };
+    },
+  });
+  return admitted.admitted ? { result, r, now: admitted.now } : { result: 'no-shared-admission', r: null, now: null };
 }
 
 export function dayKey(date) {

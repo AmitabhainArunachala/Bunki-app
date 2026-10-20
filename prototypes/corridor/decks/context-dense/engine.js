@@ -303,9 +303,52 @@ export function buriedToday(storage, now) {
   const answered = srsCore.answeredToday(storage, now);
   return (card) => srsCore.buriedHere(answered, card.target, card.reading, 'context');
 }
-/** after a real answer: the word was answered in the context deck today */
-export function noteAnsweredCard(storage, card, now) {
-  return srsCore.noteAnswered(storage, srsCore.wordIdentity(card.target, card.reading), 'context', now);
+/** the one plain line a refused grade shows (practice continues); shared by every surface (srs-core) */
+export const refusalWords = srsCore.refusalWords;
+/**
+ * One grade under the shared answer admission (HOOKS-SPEC §3.6): admitted under the one Web Lock (none:
+ * 'no-shared-admission'); the ledger read fresh; change(fresh, now) is the host's own gate and grade (null refuses:
+ * 'refused'); a word answered on another surface since the card was shown rests unless the card is in its learning
+ * steps ('answered-elsewhere'); the word's mark is reserved before the ledger is saved ('mark-unavailable' when it
+ * cannot be written); a save that stores nothing ('failed') releases a reservation this grade inserted.
+ * Returns { result, fresh, next, now }.
+ */
+export async function admitContextGrade({ locks, storage, card, load, save, change, clock = () => new Date() }) {
+  let result = null;
+  let fresh = null;
+  let next = null;
+  const admitted = await srsCore.admitAnswer({
+    locks,
+    clock,
+    storage,
+    where: 'context',
+    commit: async ({ now, answered, reserve }) => {
+      fresh = load();
+      next = change(fresh, now);
+      if (!next) {
+        result = 'refused';
+        return { outcome: 'not-published' };
+      }
+      const stored = fresh.cards[card.id] ?? null;
+      const inSteps = !!stored && (stored.state === srsCore.LEARNING || stored.state === srsCore.RELEARNING);
+      if (!inSteps && srsCore.buriedHere(answered, card.target, card.reading, 'context')) {
+        result = 'answered-elsewhere';
+        return { outcome: 'not-published' };
+      }
+      if (!reserve(srsCore.wordIdentity(card.target, card.reading))) {
+        result = 'mark-unavailable';
+        return { outcome: 'not-published' };
+      }
+      // a save that stores nothing (a full or refused storage) is not published
+      if (!save(next)) {
+        result = 'failed';
+        return { outcome: 'not-published' };
+      }
+      result = 'graded';
+      return { outcome: 'published' };
+    },
+  });
+  return admitted.admitted ? { result, fresh, next, now: admitted.now } : { result: 'no-shared-admission', fresh: null, next: null, now: null };
 }
 
 function reviveCard(stored, TypeConvert) {
