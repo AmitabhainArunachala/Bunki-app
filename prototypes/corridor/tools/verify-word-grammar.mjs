@@ -3779,6 +3779,29 @@ try {
     // Ladder R4 · a cut box scrolled through its rows shows no gap between them: its kanji rows abut as in the whole box
     // (round 2 folded them 33 px apart), and no row is folded. 390×520 is held (the lead's call on a shorter head): its
     // fold is recorded, never judged here
+    const ladderGapSampleHasRows = (step, index) => step && Number.isInteger(step.scrollTop) && step.scrollTop >= 0 &&
+      typeof step.cut === 'boolean' && step.anchor?.word === WORD && step.anchor.index === index &&
+      step.anchor.connected === true && step.anchor.inReader === true && step.card?.word === WORD &&
+      step.card.contentWord === WORD && step.card.count === 1 && Array.isArray(step.rows) && step.rows.length === 2 &&
+      step.rows.every((row, k) => row.glyph === ['総', '理'][k] && row.isKanjiRow === true && row.rowIndex === k &&
+        [row.top, row.bottom, row.height, row.marginBottom].every(Number.isFinite) && row.height > 0 &&
+        Math.abs(row.bottom - row.top - row.height) < 0.01 && (row.fold === null || Number.isFinite(row.fold))) &&
+      Array.isArray(step.gaps) && step.gaps.length === 1 && Number.isFinite(step.gaps[0]) &&
+      step.gaps[0] === Math.round((step.rows[1].top - step.rows[0].bottom) * 10) / 10 &&
+      Number.isInteger(step.folds) && step.folds >= 0 && Array.isArray(step.foldOwners) && step.foldOwners.length === step.folds &&
+      step.foldOwners.every((owner) => Number.isInteger(owner.rowIndex) && owner.rowIndex >= 0 && owner.rowIndex < step.rows.length &&
+        ['glyph', 'isKanjiRow', 'fold', 'marginBottom', 'top', 'bottom', 'height'].every((key) => owner[key] === step.rows[owner.rowIndex][key]));
+    const ladderGapHasRows = (observed) => Array.isArray(observed) && observed.length === 2 &&
+      observed.every((o, k) => o.size === ['390x560', '320x568'][k] && Number.isInteger(o.index) && o.index >= 0 && o.index === observed[0].index &&
+        Array.isArray(o.rungs) && o.rungs.at(-1) === 'stage' && Array.isArray(o.steps) && o.steps.length > 0 &&
+        o.steps[0].cut === true && o.steps.every((step) => ladderGapSampleHasRows(step, o.index)));
+    const ladderGapClean = (observed) => ladderGapHasRows(observed) && observed.every((o) => o.steps.every((step) =>
+      step.folds === 0 && step.rows.every((row) => row.fold === null) && step.gaps.every((gap) => Math.abs(gap) <= 1)));
+    const ladderGapFoldWitness = (row) => ladderGapHasRows(row?.observed) && row.observed[0].steps.some((step) =>
+      step.folds === 1 && step.foldOwners[0]?.isKanjiRow === true && step.foldOwners[0].rowIndex === 0 && step.foldOwners[0].glyph === '総' &&
+      step.foldOwners[0].fold === 33 && step.foldOwners[0].marginBottom === 33 &&
+      step.rows[0].fold === 33 && step.rows[0].marginBottom === 33 && step.rows[1].fold === null &&
+      step.gaps[0] > 1 && Math.abs(step.gaps[0] - 33) <= 0.1);
     const ladderD7Gap = async (page) => {
       await openStory(page);
       const out = [];
@@ -3787,14 +3810,31 @@ try {
         await delay(400);
         const word = page.locator(`#reader .tok[data-prose-label="${WORD}"]`).first();
         await placeWord(page, word, 0.45);
-        await openBox(page, word);
+        const rawIndex = await word.getAttribute('data-index');
+        const index = rawIndex === null || !rawIndex.trim() ? null : Number(rawIndex);
+        const rungs = await openBox(page, word);
         const steps = [];
-        const facts = () => page.evaluate(() => {
+        const facts = () => word.evaluate((anchor) => {
           const mini = document.getElementById('mini');
           if (!mini) return null;
-          const rows = [...mini.querySelectorAll('.mini-kanji > .mini-kanji-row')].map((r) => r.getBoundingClientRect());
+          const rawAnchorIndex = anchor.getAttribute('data-index');
+          const kanjiRows = [...mini.querySelectorAll('.mini-kanji > .mini-kanji-row')];
+          const foldFacts = (row) => {
+            const box = row.getBoundingClientRect();
+            return { glyph: row.querySelector('.mini-kanji-glyph')?.textContent.trim() ?? null,
+              isKanjiRow: row.matches('.mini-kanji > .mini-kanji-row'), rowIndex: kanjiRows.indexOf(row),
+              fold: row.hasAttribute('data-fold') ? Number(row.dataset.fold) : null,
+              marginBottom: parseFloat(getComputedStyle(row).marginBottom), top: box.top, bottom: box.bottom, height: box.height };
+          };
+          const rows = kanjiRows.map(foldFacts);
+          const foldOwners = [...mini.querySelectorAll('[data-fold]')].map(foldFacts);
           return { scrollTop: Math.round(mini.scrollTop), cut: mini.scrollHeight > mini.clientHeight + 1, folds: mini.querySelectorAll('[data-fold]').length,
-            gaps: rows.slice(1).map((r, k) => Math.round((r.top - rows[k].bottom) * 10) / 10) };
+            gaps: rows.slice(1).map((r, k) => Math.round((r.top - rows[k].bottom) * 10) / 10), rows, foldOwners,
+            anchor: { word: anchor.dataset.proseLabel ?? null,
+              index: rawAnchorIndex === null || !rawAnchorIndex.trim() ? null : Number(rawAnchorIndex),
+              connected: anchor.isConnected, inReader: anchor.matches('#reader .tok[data-prose-label]') },
+            card: { word: mini.querySelector('.mini-word')?.textContent.trim() ?? null,
+              contentWord: mini.dataset.uiContentValue ?? null, count: document.querySelectorAll('#mini').length } };
         });
         for (let k = 0; k < 12; k++) {
           const f = await facts();
@@ -3804,12 +3844,12 @@ try {
           if (end) break;
           await delay(120);
         }
-        out.push({ size: `${viewport.width}x${viewport.height}`, steps });
+        out.push({ size: `${viewport.width}x${viewport.height}`, index, rungs, steps });
         await page.keyboard.press('Escape'); await delay(400);
         if (await page.locator('#mini').count()) { await page.keyboard.press('Escape'); await delay(400); }
       }
       check('L.d7.scroll-gap', 'a cut box scrolled through its rows (390×560 and 320×568, 総理 mid-glass) shows no gap between them: its kanji rows abut, no row is folded',
-        out.length === 2 && out.every((o) => o.steps.length > 0 && o.steps[0].cut && o.steps.every((st) => st.folds === 0 && st.gaps.every((g) => Math.abs(g) <= 1))), out);
+        ladderGapClean(out), out);
     };
     // Ladder R2 · the English rung's words (the critic's round-1 FAIL, 10-20: tap 2 repeated the quick dictionary's first
     // gloss, and 9 of the story's 102 content words showed "—"). On a cold dictionary (its index answering 1.8 s late), every
@@ -4006,8 +4046,11 @@ try {
       const ladderSpecs = [
         { id: 'mouse-ignored', run: 'L-mouse', body: ladderMouse, options: { viewport: { width: 1440, height: 900 }, mobile: false },
           kills: ['M.hold', 'M.second-hold', 'M.drag'], witness: (row) => row.observed.ring === 0 && row.observed.strip === 0,
-          edits: [{ file: 'corridor.js', key: 'mouse-never-holds', from: "    if (mouse && (event.button !== 0 || event.ctrlKey)) return;",
-            to: '    if (mouse) return; // Ladder negative: a mouse or trackpad press is never a hold' }] },
+          // the reader span's own guard, named by the Ladder comment above it: Hfix-2e item 7's Words-room hold copies the guard
+          // line itself, so the line alone matched twice in the woven build (the served edit must match exactly once)
+          edits: [{ file: 'corridor.js', key: 'mouse-never-holds',
+            from: "    // nothing at all\"): its primary button only, never with Control (the Mac's secondary click, the contextmenu below)\n    const mouse = event.pointerType === 'mouse';\n    if (mouse && (event.button !== 0 || event.ctrlKey)) return;",
+            to: "    // nothing at all\"): its primary button only, never with Control (the Mac's secondary click, the contextmenu below)\n    const mouse = event.pointerType === 'mouse';\n    if (mouse) return; // Ladder negative: a mouse or trackpad press is never a hold" }] },
         { id: 'card-fixed-to-glass', run: 'L-scroll', body: ladderScroll, options: macView, kills: ['L.scroll.down', 'L.scroll.up'],
           witness: (row) => Math.abs(row.observed.rode) < 1 && Math.abs(row.observed.moved) >= 60,
           edits: [{ file: 'corridor.js', key: 'card-stays-on-the-glass',
@@ -4047,12 +4090,20 @@ try {
           witness: (row) => row.observed.some((w) => w.box && w.english !== boxTrim(w.box)),
           edits: [{ file: 'corridor.js', key: 'english-shortest-gloss', from: '  return boxLeadGloss(readerQuickRecordAsRead(door));',
             to: "  return inlineGloss(readerQuickRecordAsRead(door)) || ''; // Ladder negative: the shortest early gloss" }] },
-        // Ladder R4 · the scroll-gap row's control: round 2's fold where the ink leaves the fade room (390×560)
+        // Ladder R4 · render round 2's forbidden inter-kanji fold in the actual compact cut card. Earlier fadeCut branch
+        // switches survived the woven geometry; this served mutation must produce a measured gap on the named rows.
         ...(desk ? [] : [{ id: 'fold-at-560', run: 'L-d7-gap', body: ladderD7Gap, options: { viewport: { width: 390, height: 560 }, mobile: true },
-          kills: ['L.d7.scroll-gap'], witness: (row) => row.observed.some((o) => o.steps.some((st) => st.folds > 0)),
-          edits: [{ file: 'corridor.js', key: 'fold-where-the-ink-has-room', from: '  if (best) return best;\n', to: '  if (false) return best; // Ladder negative: a fold instead\n' },
-            { file: 'corridor.js', key: 'fold-from-the-row-box', from: '    const inkFoot = Math.max(0, ...ink.filter(([top]) => top < foot.bottom - 0.5).map(([, bottom]) => bottom));',
-              to: "    const inkFoot = foot.bottom; // Ladder negative: round 3's fold, measured from the row's box" }] }]),
+          kills: ['L.d7.scroll-gap'], witness: ladderGapFoldWitness,
+          edits: [{ file: 'corridor.js', key: 'fold-between-the-kanji-rows',
+            from: "      card.style.maxHeight = `${fit}px`;\n      card.style.overflowY = 'auto';",
+            to: "      card.style.maxHeight = `${fit}px`;\n      card.style.overflowY = 'auto';\n" +
+              "      // Ladder negative: round 2's real 33px fold between 総 and 理.\n" +
+              "      if (window.innerWidth === 390 && window.innerHeight === 560 && card.classList.contains('is-compact') &&\n" +
+              "          card.querySelector('.mini-word')?.textContent.trim() === '総理') {\n" +
+              "        const foldRows = [...card.querySelectorAll('.mini-kanji > .mini-kanji-row')];\n" +
+              "        if (foldRows.length === 2 && foldRows.every((row, k) => row.querySelector('.mini-kanji-glyph')?.textContent.trim() === ['総', '理'][k])) {\n" +
+              "          foldRows[0].style.marginBottom = '33px'; foldRows[0].dataset.fold = '33';\n" +
+              "        }\n      }" }] }]),
         // Ladder R2 · a word with no English says the dash again
         { id: 'dash-for-none', run: 'L-gloss', body: ladderGloss, options: glossView, kills: ['L.gloss.never-dash'],
           witness: (row) => row.observed.dashes?.length > 0,
