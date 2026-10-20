@@ -16,7 +16,7 @@
 
   // Stable persisted identity: expansion changes the title, not existing records.
   const COURSE_ID = 'kanji-foundations-24';
-  const REVISION = 3;
+  const REVISION = 4;
   const KINDS = ['meaning', 'reading'];
   const UNITS = [
   {
@@ -1502,7 +1502,151 @@
       }
     ],
     "revision": 3
-  }
+  },
+{
+  "id": "shiki-shoku",
+  "title": "職・識・織 in words",
+  "prerequisites": [],
+  "targets": [
+    {
+      "id": "職",
+      "kanji": "職",
+      "meaning": "Post",
+      "wordKey": "職業",
+      "wordMeaning": "occupation, business",
+      "readings": [
+        "しょくぎょう"
+      ],
+      "distractors": [
+        "識",
+        "織",
+        "木"
+      ],
+      "examples": [
+        {
+          "wordKey": "職場",
+          "wordMeaning": "workplace",
+          "readings": [
+            "しょくば"
+          ]
+        }
+      ],
+      "writing": {
+        "optional": true,
+        "assessment": "self-comparison"
+      },
+      "teachingSentence": {
+        "text": "彼の職業は医師だ。",
+        "english": "He is a doctor by profession.",
+        "reference": {
+          "type": "sentence-occurrence",
+          "id": "[\"bundled-example\",\"prototypes/corridor/data/proprietary_safe/examples/s-03.json\",\"f33399c869ae19796716f4571ac58da2f180b1836ea9cd4f24c34960fba5cc62\",284,2]"
+        },
+        "sourceAttribution": {
+          "name": "tanaka-corpus",
+          "licence": "CC BY 2.0 FR",
+          "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+          "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus",
+          "labelJa": "用例",
+          "labelEn": "examples corpus"
+        },
+        "note": "An attested bundled example; not a source-transfer assessment."
+      }
+    },
+    {
+      "id": "識",
+      "kanji": "識",
+      "meaning": "Discriminating",
+      "wordKey": "知識",
+      "wordMeaning": "knowledge, information",
+      "readings": [
+        "ちしき"
+      ],
+      "distractors": [
+        "職",
+        "織",
+        "木"
+      ],
+      "examples": [
+        {
+          "wordKey": "意識",
+          "wordMeaning": "consciousness, senses",
+          "readings": [
+            "いしき"
+          ]
+        }
+      ],
+      "writing": {
+        "optional": true,
+        "assessment": "self-comparison"
+      },
+      "teachingSentence": {
+        "text": "知識は力なり。",
+        "english": "Knowledge is power.",
+        "reference": {
+          "type": "sentence-occurrence",
+          "id": "[\"bundled-example\",\"prototypes/corridor/data/proprietary_safe/examples/s-00.json\",\"6d053025b8187ecd6b5e1a4474a21e95369a0695b9d11286ece17f003aa419ed\",1369,0]"
+        },
+        "sourceAttribution": {
+          "name": "tanaka-corpus",
+          "licence": "CC BY 2.0 FR",
+          "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+          "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus",
+          "labelJa": "用例",
+          "labelEn": "examples corpus"
+        },
+        "note": "A literary set saying; なり is a classical copula.",
+        "register": "literary-set-saying"
+      }
+    },
+    {
+      "id": "織",
+      "kanji": "織",
+      "meaning": "Weave",
+      "wordKey": "組織",
+      "wordMeaning": "organization; structure; tissue",
+      "readings": [
+        "そしき"
+      ],
+      "distractors": [
+        "職",
+        "識",
+        "木"
+      ],
+      "examples": [
+        {
+          "wordKey": "織る",
+          "wordMeaning": "to weave",
+          "readings": [
+            "おる"
+          ]
+        }
+      ],
+      "writing": {
+        "optional": true,
+        "assessment": "self-comparison"
+      },
+      "teachingSentence": {
+        "text": "この組織は戦後生まれた。",
+        "english": "This institution came into being after the war.",
+        "reference": {
+          "type": "sentence-occurrence",
+          "id": "[\"bundled-example\",\"prototypes/corridor/data/proprietary_safe/examples/s-04.json\",\"8c0ca81c54aeebedc2c1562bf0fdfe0aa7e3416909d515bdeef8c1d95c010e65\",906,1]"
+        },
+        "sourceAttribution": {
+          "name": "tanaka-corpus",
+          "licence": "CC BY 2.0 FR",
+          "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+          "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus",
+          "labelJa": "用例",
+          "labelEn": "examples corpus"
+        },
+        "note": "An attested bundled example; not a source-transfer assessment."
+      }
+    }
+  ],
+  "revision": 4
+}
 ];
 
   function freeze(value) {
@@ -1530,7 +1674,7 @@
   }
   const DATA = freeze({
     schemaVersion: 1, id: COURSE_ID, revision: REVISION,
-    title: '48 characters in words',
+    title: '51 characters in words',
     scope: 'Selected keyword recognition and whole-word reading practice; no mastery claim.',
     meaningScope: 'A selected character keyword, not a compound translation.',
     readingScope: 'The whole displayed word, not every reading of a character.',
@@ -1541,6 +1685,7 @@
     sources: {
       words: { path: 'data/share_alike/words.json', sha256: '4606aaa9da2b84fb7d49fe5023cd1d4d1cda6097287994717ac3522321914ac5' },
       kanji: { path: 'data/share_alike/kanji.json', sha256: '8ce7ad0151a2bf487bda72c384460eca908fc1bdc2a4073042b9e3db7342d2ce' },
+      family: { path: 'data/share_alike/kanji-family.json', sha256: '51baa9e4d5d7cb8a863fa6ba0994b4125fe83777507dd72bd1feee499aa23f7d' },
     },
     counts: { units: UNITS.length, characters: UNITS.reduce((sum, unit) => sum + unit.targets.length, 0),
       wordExamples: UNITS.reduce((sum, unit) =>
@@ -1597,6 +1742,7 @@
       complete: responses.length === promptIds.length });
   }
   function createRun(unitId, options = {}) {
+    if (unitId === FAMILY_UNIT) return createFamilyRun(options);
     insist(plain(options) && Object.keys(options).every(key => ['mode', 'targets'].includes(key)), 'course-options-invalid');
     const mode = options.mode === undefined ? 'check' : options.mode;
     const targets = options.targets === undefined ? KINDS : options.targets;
@@ -1606,6 +1752,7 @@
     return makeRun(unitId, mode, ordered, prompts(unitId, ordered).map(prompt => prompt.id));
   }
   function checkedRun(run) {
+    if (run && (run.schemaVersion === 2 || run.unitId === FAMILY_UNIT)) return checkedFamilyRun(run);
     insist(exactKeys(run, ['schemaVersion', 'courseId', 'revision', 'unitId', 'mode', 'targets',
       'promptIds', 'responses', 'cursor', 'complete']), 'course-run-invalid');
     insist(run.schemaVersion === 1 && run.courseId === COURSE_ID && run.revision === getUnit(run.unitId).revision &&
@@ -1636,6 +1783,7 @@
   // supported practice without resetting responses, advancing or changing credit.
   function asPractice(run) {
     checkedRun(run);
+    if (run.schemaVersion === 2) return run.mode === 'preview' ? freeze({ ...familyCopy(run), mode: 'check' }) : run;
     return run.mode === 'preview'
       ? makeRun(run.unitId, 'check', run.targets, run.promptIds, run.responses) : run;
   }
@@ -1646,9 +1794,12 @@
     return makeRun(run.unitId, run.mode, run.targets, run.promptIds,
       [...run.responses, { promptId: prompt.id, action, value }]);
   }
-  function answer(run, response) { return transition(run, 'answer', response); }
-  function reveal(run) { return transition(run, 'reveal', null); }
-  function skip(run) { return transition(run, 'skip', null); }
+  function answer(run, response, meta) { return run?.schemaVersion === 2
+    ? familyTransition(run, 'answer', response, meta) : transition(run, 'answer', response); }
+  function reveal(run, meta) { return run?.schemaVersion === 2
+    ? familyTransition(run, 'reveal', null, meta) : transition(run, 'reveal', null); }
+  function skip(run, meta) { return run?.schemaVersion === 2
+    ? familyTransition(run, 'skip', null, meta) : transition(run, 'skip', null); }
   function outcome(prompt, response) {
     if (response.action !== 'answer') return response.action === 'skip' ? 'skipped' : 'revealed';
     const correct = prompt.kind === 'meaning' ? response.value === prompt.answerId
@@ -1668,7 +1819,8 @@
       if (['wrong', 'revealed'].includes(status)) missedPromptIds.push(prompt.id);
       if (status === 'skipped') skippedPromptIds.push(prompt.id);
       return { promptId: prompt.id, targetId: prompt.targetId, kind: prompt.kind, status,
-        response: response.value, correctAnswer: prompt.correctAnswer };
+        response: response.value, correctAnswer: prompt.correctAnswer,
+        ...(run.schemaVersion === 2 ? familyResult(run, prompt.id) : {}) };
     });
     for (const counts of Object.values(targets)) counts.pending = counts.total - counts.answered - counts.revealed - counts.skipped;
     return freeze({ complete: run.complete, mode: run.mode, total: run.promptIds.length,
@@ -1680,6 +1832,9 @@
     const result = summary(run);
     insist(result.complete, 'course-run-incomplete');
     if (!result.missedPromptIds.length) return null;
+    if (run.schemaVersion === 2) return makeFamilyRun(run.sessionId, run.round + 1, 'repair', run.targets,
+      result.missedPromptIds, [], result.missedPromptIds.map(id => { const attempt = run.attempts.find(value => value.promptId === id);
+        return mergeHelp(attempt.help, attempt.exposure); }));
     return makeRun(run.unitId, 'repair', run.targets, result.missedPromptIds);
   }
   /** Deltas only: caller merges into latest obslog/lessonsDone through its existing
@@ -1691,6 +1846,7 @@
     const result = summary(run), byId = checkedRun(run);
     insist(result.complete, 'course-run-incomplete');
     insist(Number.isSafeInteger(atMs) && atMs >= 0, 'course-time-invalid');
+    if (run.schemaVersion === 2) return familyLessonEvidence(run, result, byId, atMs);
     const obslog = result.results.filter(row => ['correct', 'wrong'].includes(row.status)).map(row => {
       const prompt = byId.get(row.promptId);
       return [atMs, 'lesson', `${prompt.kind === 'meaning' ? 'kanji' : 'word'}:${prompt.kind === 'meaning' ? prompt.kanji : prompt.wordKey}`,
@@ -1707,6 +1863,239 @@
     }
     return freeze({ obslog, lessonsDone });
   }
+  // Schema 2 is session-only and belongs exclusively to this authored family.
+  // The caller supplies identities/times; no storage, clock or scheduler is used.
+  const FAMILY_UNIT = 'shiki-shoku';
+  const FAMILY_SURFACE = 'course:kanji-shiki-shoku-r1';
+  function taskTarget(reference) {
+    if (!plain(reference)) return null;
+    const unit = getUnit(FAMILY_UNIT);
+    let target, kind;
+    if (exactKeys(reference, ['type', 'id']) && reference.type === 'kanji') {
+      target = unit.targets.find(value => value.kanji === reference.id);
+      kind = 'meaning';
+    } else if (exactKeys(reference, ['type', 'id', 'reading']) && reference.type === 'word') {
+      target = unit.targets.find(value => value.wordKey === reference.id && value.readings.includes(reference.reading));
+      kind = 'reading';
+    }
+    return target ? freeze({ courseId: COURSE_ID, unitId: unit.id, revision: unit.revision,
+      targetId: target.id, promptIds: [`${unit.id}/${target.id}/${kind}`] }) : null;
+  }
+  function taskForReference(reference) { return taskTarget(reference); }
+  function unitForTask(reference) { return taskTarget(reference) ? getUnit(FAMILY_UNIT) : null; }
+  function familyItem(prompt) {
+    return prompt.kind === 'meaning' ? { kind: 'kanji', literal: prompt.kanji }
+      : { kind: 'word', term: prompt.wordKey, reading: prompt.acceptedAnswers[0] };
+  }
+  function finiteTime(value) { return typeof value === 'number' && Number.isFinite(value); }
+  function canonicalItem(item) {
+    const text = value => typeof value === 'string' && value.trim().length > 0;
+    if (exactKeys(item, ['kind', 'literal']) && item.kind === 'kanji' && text(item.literal))
+      return { kind: 'kanji', literal: item.literal };
+    insist(plain(item) && item.kind === 'word' && text(item.term) && text(item.reading) &&
+      Object.keys(item).every(key => ['kind', 'term', 'reading', 'seq'].includes(key)) &&
+      ['kind', 'term', 'reading'].every(key => Object.hasOwn(item, key)) &&
+      (!Object.hasOwn(item, 'seq') || text(item.seq)), 'course-help-item-invalid');
+    return { kind: 'word', term: item.term, reading: item.reading,
+      ...(Object.hasOwn(item, 'seq') ? { seq: item.seq } : {}) };
+  }
+  function canonicalHelp(help) {
+    insist(plain(help) && Object.keys(help).every(key => ['what', 'about', 'reveals', 'at'].includes(key)) &&
+      ['what', 'reveals', 'at'].every(key => Object.hasOwn(help, key)) &&
+      typeof help.what === 'string' && help.what.trim().length > 0 && finiteTime(help.at) &&
+      Array.isArray(help.reveals) && new Set(help.reveals).size === help.reveals.length &&
+      help.reveals.every(facet => ['reading', 'meaning', 'form'].includes(facet)), 'course-help-invalid');
+    return { what: help.what, ...(Object.hasOwn(help, 'about') ? { about: canonicalItem(help.about) } : {}),
+      reveals: ['reading', 'meaning', 'form'].filter(facet => help.reveals.includes(facet)), at: help.at };
+  }
+  function orderedHelp(rows) {
+    insist(Array.isArray(rows), 'course-help-invalid');
+    const result = rows.map(canonicalHelp);
+    insist(result.every((row, index) => index === 0 || row.at >= result[index - 1].at), 'course-help-order');
+    insist(new Set(result.map(row => JSON.stringify(row))).size === result.length, 'course-help-duplicate');
+    return result;
+  }
+  function mergeHelp(...groups) {
+    const unique = new Map(groups.flat().map(canonicalHelp).map(row => [JSON.stringify(row), row]));
+    return [...unique.values()].sort((a, b) => a.at - b.at);
+  }
+  function makeFamilyRun(sessionId, round, mode, targets, promptIds, responses = [], inherited = []) {
+    return freeze({ schemaVersion: 2, courseId: COURSE_ID, revision: getUnit(FAMILY_UNIT).revision,
+      unitId: FAMILY_UNIT, mode, targets: [...targets], promptIds: [...promptIds],
+      responses: responses.map(response => ({ ...response })), cursor: responses.length,
+      complete: responses.length === promptIds.length, sessionId, round,
+      attempts: promptIds.map((promptId, index) => ({ attemptId: `${sessionId}/${round}/${promptId}`, promptId,
+        help: orderedHelp(inherited[index] || []), exposure: [], actedAt: null, answeredAt: null,
+        feedbackAt: null, selfCheck: null, checkedAt: null })) });
+  }
+  function createFamilyRun(options) {
+    insist(plain(options) && Object.keys(options).every(key => ['mode', 'targets', 'sessionId'].includes(key)), 'course-options-invalid');
+    insist(typeof options.sessionId === 'string' && /^[A-Za-z0-9_-]{1,80}$/.test(options.sessionId), 'course-session-invalid');
+    const mode = options.mode === undefined ? 'check' : options.mode;
+    const targets = options.targets === undefined ? KINDS : options.targets;
+    insist(['check', 'preview'].includes(mode), 'course-mode-invalid');
+    insist(validKinds(targets), 'course-targets-invalid');
+    const ordered = KINDS.filter(kind => targets.includes(kind));
+    return makeFamilyRun(options.sessionId, 0, mode, ordered, prompts(FAMILY_UNIT, ordered).map(prompt => prompt.id));
+  }
+  function checkedFamilyRun(run) {
+    insist(exactKeys(run, ['schemaVersion', 'courseId', 'revision', 'unitId', 'mode', 'targets',
+      'promptIds', 'responses', 'cursor', 'complete', 'sessionId', 'round', 'attempts']) &&
+      run.schemaVersion === 2 && run.courseId === COURSE_ID && run.unitId === FAMILY_UNIT &&
+      run.revision === getUnit(FAMILY_UNIT).revision && ['check', 'preview', 'repair'].includes(run.mode) &&
+      validKinds(run.targets) && typeof run.sessionId === 'string' && /^[A-Za-z0-9_-]{1,80}$/.test(run.sessionId) &&
+      Number.isSafeInteger(run.round) && run.round >= 0, 'course-run-invalid');
+    const all = prompts(FAMILY_UNIT, run.targets), byId = new Map(all.map(prompt => [prompt.id, prompt]));
+    insist(Array.isArray(run.promptIds) && run.promptIds.length > 0 && new Set(run.promptIds).size === run.promptIds.length &&
+      run.promptIds.every(id => byId.has(id)), 'course-prompts-invalid');
+    if (run.mode !== 'repair') insist(JSON.stringify(run.promptIds) === JSON.stringify(all.map(prompt => prompt.id)), 'course-prompts-incomplete');
+    insist(Array.isArray(run.responses) && run.responses.length <= run.promptIds.length &&
+      run.cursor === run.responses.length && run.complete === (run.cursor === run.promptIds.length), 'course-cursor-invalid');
+    insist(Array.isArray(run.attempts) && run.attempts.length === run.promptIds.length, 'course-attempt-invalid');
+    for (const [index, attempt] of run.attempts.entries()) {
+      insist(exactKeys(attempt, ['attemptId', 'promptId', 'help', 'exposure', 'actedAt', 'answeredAt', 'feedbackAt', 'selfCheck', 'checkedAt']) &&
+        attempt.promptId === run.promptIds[index] && attempt.attemptId === `${run.sessionId}/${run.round}/${attempt.promptId}`, 'course-attempt-invalid');
+      orderedHelp(attempt.help);
+      orderedHelp(attempt.exposure);
+      const response = run.responses[index];
+      if (!response) {
+        insist([attempt.actedAt, attempt.answeredAt, attempt.feedbackAt, attempt.selfCheck, attempt.checkedAt].every(value => value === null) &&
+          attempt.exposure.length === 0, 'course-attempt-invalid');
+        continue;
+      }
+      insist(exactKeys(response, ['promptId', 'action', 'value']) && response.promptId === attempt.promptId &&
+        ['answer', 'reveal', 'skip'].includes(response.action) && finiteTime(attempt.actedAt) &&
+        attempt.help.every(row => row.at <= attempt.actedAt), 'course-response-invalid');
+      const prompt = byId.get(attempt.promptId);
+      if (response.action === 'answer') {
+        validateAnswer(prompt, response.value);
+        insist(attempt.answeredAt === attempt.actedAt, 'course-attempt-invalid');
+      } else insist(response.value === null && attempt.answeredAt === null && attempt.feedbackAt === null &&
+        attempt.selfCheck === null && attempt.checkedAt === null, 'course-attempt-invalid');
+      const expectedExposure = response.action === 'reveal'
+        ? [{ what: 'revealed-answer', about: familyItem(prompt), reveals: [prompt.kind], at: attempt.actedAt }]
+        : attempt.feedbackAt === null ? []
+          : [{ what: 'answer-feedback', about: familyItem(prompt), reveals: [prompt.kind], at: attempt.feedbackAt }];
+      insist(JSON.stringify(attempt.exposure.map(canonicalHelp)) === JSON.stringify(expectedExposure), 'course-exposure-invalid');
+      if (attempt.feedbackAt !== null) insist(response.action === 'answer' && finiteTime(attempt.feedbackAt) &&
+        attempt.feedbackAt >= attempt.answeredAt, 'course-feedback-invalid');
+      if (attempt.selfCheck !== null) insist(['knew', 'missed'].includes(attempt.selfCheck) && attempt.feedbackAt !== null &&
+        finiteTime(attempt.checkedAt) && attempt.checkedAt >= attempt.feedbackAt &&
+        (attempt.selfCheck !== 'knew' || outcome(prompt, response) === 'correct'), 'course-self-check-invalid');
+      else insist(attempt.checkedAt === null, 'course-self-check-invalid');
+    }
+    return byId;
+  }
+  function familyCopy(run) { return JSON.parse(JSON.stringify(run)); }
+  function attemptAt(run, attemptId) {
+    checkedFamilyRun(run);
+    const index = run.attempts.findIndex(attempt => attempt.attemptId === attemptId);
+    insist(index >= 0, 'course-attempt-stale');
+    return index;
+  }
+  function currentAttempt(run) {
+    const byId = checkedFamilyRun(run);
+    if (run.complete) return null;
+    const attempt = run.attempts[run.cursor], prompt = byId.get(attempt.promptId);
+    return freeze({ ...familyCopy(attempt), item: familyItem(prompt), tests: prompt.kind });
+  }
+  function plainPrompt(run) {
+    const attempt = currentAttempt(run);
+    if (!attempt) return null;
+    const prompt = currentPrompt(run);
+    return freeze({ attemptId: attempt.attemptId, promptId: prompt.id, kind: prompt.kind,
+      text: prompt.kind === 'meaning' ? prompt.kanji : prompt.wordKey,
+      choices: prompt.choices.map(choice => ({ ...choice })) });
+  }
+  function recordHelp(run, attemptId, help) {
+    const index = attemptAt(run, attemptId);
+    insist(index === run.cursor && !run.complete, 'course-attempt-closed');
+    const row = canonicalHelp(help), current = run.attempts[index].help;
+    if (current.some(value => JSON.stringify(canonicalHelp(value)) === JSON.stringify(row))) return run;
+    insist(!current.length || row.at >= current.at(-1).at, 'course-help-order');
+    const next = familyCopy(run);
+    next.attempts[index].help.push(row);
+    return freeze(next);
+  }
+  function familyTransition(run, action, value, meta) {
+    const prompt = currentPrompt(run);
+    insist(prompt, 'course-run-complete');
+    insist(exactKeys(meta, ['attemptId', 'at']) && finiteTime(meta.at), 'course-attempt-meta-invalid');
+    const index = attemptAt(run, meta.attemptId);
+    insist(index === run.cursor, 'course-attempt-stale');
+    if (action === 'answer') validateAnswer(prompt, value);
+    insist(run.attempts[index].help.every(row => row.at <= meta.at), 'course-answer-before-help');
+    const next = familyCopy(run), attempt = next.attempts[index];
+    next.responses.push({ promptId: prompt.id, action, value });
+    next.cursor++;
+    next.complete = next.cursor === next.promptIds.length;
+    attempt.actedAt = meta.at;
+    if (action === 'answer') attempt.answeredAt = meta.at;
+    if (action === 'reveal') attempt.exposure.push({ what: 'revealed-answer', about: familyItem(prompt), reveals: [prompt.kind], at: meta.at });
+    return freeze(next);
+  }
+  function showFeedback(run, attemptId, at) {
+    const index = attemptAt(run, attemptId), response = run.responses[index];
+    insist(response?.action === 'answer' && finiteTime(at), 'course-feedback-invalid');
+    if (run.attempts[index].feedbackAt !== null) return run;
+    insist(at >= run.attempts[index].answeredAt, 'course-feedback-before-answer');
+    const next = familyCopy(run), attempt = next.attempts[index];
+    const prompt = prompts(FAMILY_UNIT, run.targets).find(value => value.id === attempt.promptId);
+    attempt.feedbackAt = at;
+    // Phase, not timestamp, separates answer feedback from pre-answer help.
+    attempt.exposure = [{ what: 'answer-feedback', about: familyItem(prompt), reveals: [prompt.kind], at }];
+    return freeze(next);
+  }
+  function selfCheck(run, attemptId, check, at) {
+    const index = attemptAt(run, attemptId), attempt = run.attempts[index];
+    const prompt = prompts(FAMILY_UNIT, run.targets).find(value => value.id === attempt.promptId);
+    insist(['knew', 'missed'].includes(check) && finiteTime(at) && attempt.feedbackAt !== null &&
+      at >= attempt.feedbackAt && (check !== 'knew' || outcome(prompt, run.responses[index]) === 'correct'), 'course-self-check-invalid');
+    if (attempt.selfCheck !== null) {
+      insist(attempt.selfCheck === check, 'course-self-check-already-recorded');
+      return run;
+    }
+    const next = familyCopy(run);
+    next.attempts[index].selfCheck = check;
+    next.attempts[index].checkedAt = at;
+    return freeze(next);
+  }
+  function familyResult(run, promptId) {
+    const attempt = run.attempts.find(value => value.promptId === promptId);
+    const prompt = prompts(FAMILY_UNIT, run.targets).find(value => value.id === promptId);
+    return { ...familyCopy(attempt), item: familyItem(prompt), tests: prompt.kind,
+      assisted: attempt.help.length > 0 };
+  }
+  function hookCandidate(run, attemptId) {
+    const index = attemptAt(run, attemptId), attempt = run.attempts[index], response = run.responses[index];
+    if (response?.action !== 'answer' || attempt.feedbackAt === null || attempt.selfCheck === null) return null;
+    const prompt = prompts(FAMILY_UNIT, run.targets).find(value => value.id === attempt.promptId);
+    if (attempt.selfCheck === 'knew' && outcome(prompt, response) !== 'correct') return null;
+    return freeze({ kind: 'attempt', item: familyItem(prompt), surface: FAMILY_SURFACE,
+      tests: prompt.kind, answer: { selfCheck: attempt.selfCheck }, revealed: true,
+      answeredAt: attempt.answeredAt, help: attempt.help.map(canonicalHelp) });
+  }
+  function familyLessonEvidence(run, result, byId, atMs) {
+    const answered = result.results.filter(row => ['correct', 'wrong'].includes(row.status));
+    const key = row => lessonId(run.unitId, row.kind) + (row.assisted ? ':assisted' : '') + (run.mode === 'repair' ? ':missed' : '');
+    const obslog = answered.map(row => {
+      const prompt = byId.get(row.promptId);
+      return [atMs, 'lesson', `${prompt.kind === 'meaning' ? 'kanji' : 'word'}:${prompt.kind === 'meaning' ? prompt.kanji : prompt.wordKey}`,
+        row.status === 'correct' ? 3 : 1, key(row)];
+    });
+    const lessonsDone = {};
+    if (run.mode !== 'repair') for (const kind of run.targets) {
+      const counts = result.targets[kind];
+      if (!counts.total || counts.answered !== counts.total) continue;
+      for (const assisted of [false, true]) {
+        const rows = answered.filter(row => row.kind === kind && row.assisted === assisted);
+        if (rows.length) lessonsDone[key(rows[0])] = { score: rows.filter(row => row.status === 'correct').length,
+          total: rows.length, ts: atMs };
+      }
+    }
+    return freeze({ obslog, lessonsDone });
+  }
   return freeze({ catalog, counts, unitForCharacter, listUnits, getUnit, lessonId, createRun, currentPrompt, asPractice,
-    answer, reveal, skip, summary, retry, toLessonEvidence, normalizeKana });
+    answer, reveal, skip, summary, retry, toLessonEvidence, normalizeKana,
+    unitForTask, taskTarget, taskForReference, currentAttempt, plainPrompt, recordHelp, showFeedback, selfCheck, hookCandidate });
 });

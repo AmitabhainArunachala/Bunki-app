@@ -20015,6 +20015,92 @@ function kanjiCourseEvidencePatch(latest, evidence) {
   }
   return { lessonsDone, obslog: [...(latest.obslog || []), ...rows] };
 }
+/** W3 owns the attempt and help history. The schedule is reached only through
+ * W4's accepted hook once it is integrated; there is no fallback writer. */
+function kanjiCourseNodeUnit(node) {
+  const course = window.BunkiKanjiCourse;
+  if (node?.t === 'kanji') return course?.unitForCharacter(node.id) || null;
+  if (node?.t !== 'word' || typeof node.reading !== 'string') return null;
+  return course?.unitForTask?.({ type: 'word', id: node.id, reading: node.reading }) || null;
+}
+function kanjiCourseApplyHelp(visit) {
+  const course = window.BunkiKanjiCourse;
+  if (visit?.run?.schemaVersion !== 2 || visit.run.complete || visit.feedback) return;
+  for (const help of [...(visit.referenceHelp || [])].sort((a, b) => a.at - b.at)) {
+    const attempt = course.currentAttempt(visit.run);
+    visit.run = course.recordHelp(visit.run, attempt.attemptId, help);
+  }
+}
+function kanjiCourseRememberHelp(visit, helps) {
+  if (visit?.unitId !== 'shiki-shoku') return;
+  visit.referenceHelp ||= [];
+  for (const help of helps) if (!visit.referenceHelp.some((row) => JSON.stringify(row) === JSON.stringify(help))) {
+    visit.referenceHelp.push(help);
+  }
+  visit.referenceHelp.sort((a, b) => a.at - b.at);
+}
+function kanjiCourseTeachingHelp(visit, target) {
+  if (visit?.unitId !== 'shiki-shoku' || !recordReady(visit.epoch)) return;
+  const at = Date.now();
+  kanjiCourseRememberHelp(visit, [
+    { what: 'teaching-card', about: { kind: 'kanji', literal: target.kanji }, reveals: ['meaning', 'form'], at },
+    { what: 'teaching-card', about: { kind: 'word', term: target.wordKey, reading: target.readings[0] },
+      reveals: ['reading', 'meaning', 'form'], at },
+  ]);
+}
+function kanjiCourseReferenceHelp(visit, node) {
+  if (visit?.unitId !== 'shiki-shoku' || !recordReady(visit.epoch) ||
+      !['kanji', 'word'].includes(node?.t)) return;
+  const about = node.t === 'kanji' ? { kind: 'kanji', literal: node.id }
+    : typeof node.reading === 'string' && node.reading.trim()
+      ? { kind: 'word', term: node.id, reading: node.reading } : null;
+  const help = { what: 'dictionary-entry', ...(about ? { about } : {}),
+    reveals: node.t === 'word' ? ['reading', 'meaning', 'form'] : ['meaning', 'form'], at: Date.now() };
+  kanjiCourseRememberHelp(visit, [help]);
+  visit.supportedPractice = true;
+  kanjiCourseApplyHelp(visit);
+}
+function kanjiCourseHookLine(outcome) {
+  if (outcome?.write === true) return tx(
+    `復習に記録しました（評価 ${outcome.rating}）。`, `Recorded for review (rating ${outcome.rating}).`,
+  );
+  if (outcome?.line) return outcome.line;
+  const text = {
+    'hook-unavailable': ['この版ではコースから復習に記録できません。練習は続けられます。', 'Review recording from this course is unavailable in this version. Practice still works.'],
+    'no-schedule': ['この項目には復習中のカードがありません。練習のみの結果です。', 'This item has no active review card. This remains practice.'],
+    'not-due': ['このカードはまだ復習時刻ではありません。予定は変わりません。', 'This card is not due. Its schedule is unchanged.'],
+    'answered-today': ['この項目は今日すでに復習しました。もう一度は記録しません。', 'This item has already been reviewed today. It will not be graded again.'],
+    'publish-uncertain': ['復習への記録を確認できません。この回答は再送しません。', 'The review write could not be confirmed. This answer will not be sent again.'],
+  };
+  return tx(...(text[outcome?.reason] || ['復習には記録できませんでした。練習は続けられます。', 'This could not be recorded for review. Practice still works.']));
+}
+async function reportKanjiCourseAttempt(visit, attemptId, choice) {
+  const course = window.BunkiKanjiCourse;
+  if (S.kanjiCourse !== visit || S.view !== 'lessons' || !recordReady(visit.epoch) ||
+      visit.pending || visit.feedback?.result.attemptId !== attemptId) return;
+  visit.hookOutcomes ||= {};
+  if (Object.hasOwn(visit.hookOutcomes, attemptId)) return;
+  const hook = window.__KAIRO_HOOKS__;
+  if (typeof hook?.report !== 'function') {
+    visit.hookOutcomes[attemptId] = { write: false, reason: 'hook-unavailable' };
+    render(); return;
+  }
+  const checkedAt = Date.now();
+  visit.run = course.selfCheck(visit.run, attemptId, choice, checkedAt);
+  const candidate = course.hookCandidate(visit.run, attemptId);
+  if (!candidate) return;
+  visit.hookOutcomes[attemptId] = { pending: true };
+  visit.pending = true; render();
+  let outcome;
+  try { outcome = await hook.report({ ...candidate, at: new Date(checkedAt) }); }
+  catch { outcome = { write: false, reason: 'publish-uncertain' }; }
+  // Keep a terminal receipt on the originating visit even if its page/owner
+  // changed. Never retry a possibly published write or replay it on repaint.
+  visit.hookOutcomes[attemptId] = outcome && typeof outcome.write === 'boolean'
+    ? outcome : { write: false, reason: 'publish-uncertain' };
+  visit.pending = false;
+  if (S.kanjiCourse === visit && S.view === 'lessons' && recordReady(visit.epoch)) render();
+}
 function kanjiCourseReturnFrame() {
   const frame = S.navigationReturns.at(-1);
   return frame?.destination === 'lessons' && frame.kanjiCourseReturn?.visit === S.kanjiCourse ? frame : null;
@@ -20033,13 +20119,15 @@ function kanjiCourseEntryNode(visit, target, type) {
   const frame = live ? [...S.navigationReturns].reverse().find((candidate) =>
     candidate.destination === 'lessons' && candidate.kanjiCourseReturn?.visit === visit) : null;
   const origin = frame?.kanjiCourseReturn.originNode;
-  if (type === 'kanji' && origin?.id === target.kanji) return { ...origin };
+  if (type === 'kanji' && origin?.t === 'kanji' && origin.id === target.kanji) return { ...origin };
+  if (type === 'word' && origin?.t === 'word' && origin.id === target.wordKey &&
+      target.readings?.includes(origin.reading)) return { ...origin };
   return { t: type, id: type === 'kanji' ? target.kanji : target.wordKey,
     ...(type === 'word' && target.readings?.length === 1 ? { reading: target.readings[0] } : {}) };
 }
 function openKanjiCourseUnit(node, invoker) {
   const course = window.BunkiKanjiCourse;
-  const unit = node?.t === 'kanji' && course?.unitForCharacter(node.id);
+  const unit = kanjiCourseNodeUnit(node);
   const priorCourse = S.kanjiCourse;
   if (personalHost || !unit || !recordReady(recordEpoch) || priorCourse?.pending ||
       S.stack.at(-1) !== node || !invoker?.isConnected || !preserveVisibleDrafts()) return false;
@@ -20049,6 +20137,7 @@ function openKanjiCourseUnit(node, invoker) {
   if (priorCourse) {
     if (priorCourse.run) priorCourse.run = course.asPractice(priorCourse.run);
     priorCourse.supportedPractice = true;
+    kanjiCourseReferenceHelp(priorCourse, node);
   }
   if (S.view === 'lessons' && priorCourse?.unitId === unit.id) {
     S.stack = []; S.dialogInvoker = null;
@@ -20060,6 +20149,7 @@ function openKanjiCourseUnit(node, invoker) {
     draft: '', feedback: null, saved: false, pending: false, supportedPractice: true,
     originNode: { ...node },
   };
+  if (visit !== priorCourse) kanjiCourseReferenceHelp(visit, node);
   // keepScroll inside this call settles source-reader/publisher coordinates.
   // Capture their stored positions afterwards, not the preceding scroll event.
   keepNavigationReturn('lessons', invoker);
@@ -20074,8 +20164,7 @@ function openKanjiCourseUnit(node, invoker) {
   return true;
 }
 function renderKanjiCourseDoor(sheet, node) {
-  const course = window.BunkiKanjiCourse;
-  const unit = node.t === 'kanji' && course?.unitForCharacter(node.id);
+  const unit = kanjiCourseNodeUnit(node);
   if (personalHost || !unit) return;
   const epoch = recordEpoch;
   const resume = S.kanjiCourse?.unitId === unit.id;
@@ -20115,7 +20204,9 @@ function renderKanjiCourseMenu(main) {
     row.append(el('span', 'row-main', unit.targets.map((target) => target.kanji).join('・')));
     const result = ['meaning', 'reading'].map((kind) => {
       const done = S.lessonsDone?.[course.lessonId(unit.id, kind)];
-      return `${kind === 'meaning' ? tx('意味', 'meaning') : tx('読み', 'reading')}: ${done ? `${done.score}/${done.total}` : '—'}`;
+      const assisted = S.lessonsDone?.[`${course.lessonId(unit.id, kind)}:assisted`];
+      return `${kind === 'meaning' ? tx('意味', 'meaning') : tx('読み', 'reading')}: ${done ? `${done.score}/${done.total}` : '—'}${
+        assisted ? ` · ${tx('ヘルプあり', 'with help')} ${assisted.score}/${assisted.total}` : ''}`;
     });
     row.append(el('span', 'lesson-score', result.join(' · ')), el('span', 'row-go', '›'));
     row.addEventListener('click', () => {
@@ -20170,8 +20261,9 @@ function renderKanjiCourse(main) {
     'Practice after opening the dictionary. This is not a first-try check.',
   )));
   const start = (mode) => {
-    visit.run = course.createRun(unit.id, { mode });
+    visit.run = course.createRun(unit.id, { mode, ...(unit.id === 'shiki-shoku' ? { sessionId: crypto.randomUUID() } : {}) });
     visit.stage = 'check'; visit.feedback = null; visit.draft = ''; visit.saved = false; visit.evidenceTime = null; visit.noEvidence = false;
+    kanjiCourseApplyHelp(visit);
     redraw();
   };
   const entryDoor = (target, type) => {
@@ -20182,11 +20274,11 @@ function renderKanjiCourse(main) {
   };
   if (visit.stage === 'intro') {
     main.append(el('p', 'gloss', tx(
-      '四つの漢字のキーワードを選び、四つのことば全体の読みを答えます。意味と読みは別々に記録します。',
-      'Choose four character keywords and recall four whole-word readings. Meaning and reading results stay separate.',
+      `${unit.targets.length}字のキーワードを選び、${unit.targets.length}語の読みを答えます。意味と読みは別々に記録します。`,
+      `Choose ${unit.targets.length} character keywords and recall ${unit.targets.length} whole-word readings. Meaning and reading results stay separate.`,
     )));
     main.append(el('p', 'fine', tx('読みの練習には、かな入力を使います。答えを見る・今回はスキップすることもできます。', 'Reading checks use kana input. You can reveal an answer or skip a target without receiving credit.')));
-    main.append(button('kanji-course-learn', '先に学ぶ', 'Learn the four characters first', () => { visit.stage = 'teach'; redraw(); }, 'take'));
+    main.append(button('kanji-course-learn', '先に学ぶ', `Learn the ${unit.targets.length} characters first`, () => { visit.stage = 'teach'; kanjiCourseTeachingHelp(visit, unit.targets[visit.index]); redraw(); }, 'take'));
     if (visit.supportedPractice) main.append(button('kanji-course-practise', 'すぐ練習する', 'Practise now', () => start('check')));
     else main.append(button('kanji-course-preview', '説明を見ずに試す', 'Try the checks before studying', () => start('preview')));
     return;
@@ -20200,6 +20292,14 @@ function renderKanjiCourse(main) {
     face.append(el('div', 'review-front', target.wordKey), el('div', 'review-reading', target.readings.join(' / ')));
     face.append(el('p', 'review-sense', `${tx('この例でのことばの意味', 'Word meaning for this example')}: ${target.displayMeaning || target.wordMeaning}`));
     main.append(face, entryDoor(target, 'kanji'), entryDoor(target, 'word'));
+    if (target.teachingSentence) {
+      main.append(el('p', 'gloss', target.teachingSentence.text),
+        el('p', 'fine', target.teachingSentence.english));
+      const attribution = el('a', 'fine', target.teachingSentence.sourceAttribution.attribution);
+      attribution.href = target.teachingSentence.sourceAttribution.url;
+      main.append(attribution);
+      if (target.teachingSentence.register) main.append(el('p', 'fine', tx('文語の慣用表現です。', 'A literary set saying.')));
+    }
     if (target.examples.length) {
       const examples = el('section');
       examples.append(el('h2', 'list-head', tx('ほかのことばで見る', 'See it in another word')));
@@ -20214,7 +20314,9 @@ function renderKanjiCourse(main) {
     main.append(el('p', 'fine', tx('漢字のキーワードと、ことば全体の意味・読みは別々に扱います。', 'The character keyword and the whole word’s meanings and reading are separate targets.')));
     main.append(button('kanji-course-teach-next', visit.index + 1 < unit.targets.length ? 'つぎへ' : '練習へ',
       visit.index + 1 < unit.targets.length ? 'Next character' : 'Start the checks', () => {
-        if (visit.index + 1 < unit.targets.length) { visit.index += 1; redraw(); } else start('check');
+        if (visit.index + 1 < unit.targets.length) {
+          visit.index += 1; kanjiCourseTeachingHelp(visit, unit.targets[visit.index]); redraw();
+        } else start('check');
       }, 'take'));
     return;
   }
@@ -20232,8 +20334,26 @@ function renderKanjiCourse(main) {
       main.append(el('div', 'review-front', prompt.kind === 'meaning' ? prompt.kanji : prompt.wordKey));
       main.append(el('p', 'review-sense', prompt.correctAnswer));
     }
+    if (result.attemptId && ['correct', 'wrong'].includes(result.status)) {
+      const outcome = visit.hookOutcomes?.[result.attemptId];
+      if (result.assisted) main.append(el('p', 'fine', tx('この回答にはヘルプを使いました。', 'Help was used for this answer.')));
+      if (outcome) {
+        const status = el('p', 'fine', outcome.pending
+          ? tx('復習への記録を確認中…', 'Checking the review write…') : kanjiCourseHookLine(outcome));
+        status.id = 'kanji-course-review-status'; status.setAttribute('role', 'status'); main.append(status);
+      } else if (typeof window.__KAIRO_HOOKS__?.report !== 'function') {
+        main.append(el('p', 'fine', kanjiCourseHookLine({ reason: 'hook-unavailable' })));
+      } else {
+        main.append(el('p', 'fine', tx('答えを確認しましたか。既存の復習カードに記録する場合だけ選んでください。',
+          'Check your answer. Choose below only to record this attempt on an existing review card.')));
+        if (result.status === 'correct') main.append(button('kanji-course-self-knew', '答えられた・復習に記録', 'I knew it — record for review',
+          () => reportKanjiCourseAttempt(visit, result.attemptId, 'knew')));
+        main.append(button('kanji-course-self-missed', '答えられなかった・復習に記録', 'I missed it — record for review',
+          () => reportKanjiCourseAttempt(visit, result.attemptId, 'missed')));
+      }
+    }
     main.append(button('kanji-course-next', 'つぎへ', visit.run.complete ? 'See separate results' : 'Next check', () => {
-      visit.feedback = null; redraw();
+      visit.feedback = null; kanjiCourseApplyHelp(visit); redraw();
     }, 'take'));
     return;
   }
@@ -20246,8 +20366,12 @@ function renderKanjiCourse(main) {
     main.append(el('div', 'review-front', prompt.kind === 'meaning' ? prompt.kanji : prompt.wordKey));
     const respond = (action, value) => {
       if (!current() || visit.feedback || visit.pending) return;
-      visit.run = action === 'answer' ? course.answer(visit.run, value) : course[action](visit.run);
+      const attempt = visit.run.schemaVersion === 2 ? course.currentAttempt(visit.run) : null;
+      const meta = attempt ? { attemptId: attempt.attemptId, at: Date.now() } : undefined;
+      visit.run = action === 'answer' ? course.answer(visit.run, value, meta) : course[action](visit.run, meta);
+      if (attempt && action === 'answer') visit.run = course.showFeedback(visit.run, attempt.attemptId, Date.now());
       visit.feedback = { prompt, result: course.summary(visit.run).results.at(-1) };
+      if (attempt) kanjiCourseRememberHelp(visit, visit.feedback.result.exposure);
       visit.draft = '';
       redraw();
     };
@@ -20279,6 +20403,16 @@ function renderKanjiCourse(main) {
       });
       form.append(label, input, submit); main.append(form);
     }
+    if (visit.run.schemaVersion === 2) {
+      const attempt = course.currentAttempt(visit.run);
+      main.append(el('p', 'fine', attempt.help.length
+        ? tx(`この問いで使ったヘルプ：${attempt.help.length}件`, `Help recorded for this check: ${attempt.help.length}`)
+        : tx('色分け・ふりがななしで答えます。', 'Answer in ordinary text, without part colours or furigana.')));
+      for (const help of attempt.help) main.append(el('p', 'fine', `${tx('ヘルプ', 'Help')}: ${
+        help.about?.kind === 'word' ? help.about.term : help.about?.literal || tx('参照項目', 'reference entry')}`));
+      const target = unit.targets.find((item) => item.id === prompt.targetId);
+      main.append(entryDoor(target, prompt.kind === 'reading' ? 'word' : 'kanji'));
+    }
     main.append(button('kanji-course-reveal', '答えを見る', 'Reveal answer', () => respond('reveal')));
     main.append(button('kanji-course-skip', '今回はスキップ', 'Skip for now', () => respond('skip')));
     return;
@@ -20294,6 +20428,11 @@ function renderKanjiCourse(main) {
     )));
   }
   main.append(el('p', 'fine', tx('この回の練習結果です。習得・長期記憶を示す点数ではありません。', 'These results describe this practice session. They do not establish mastery or long-term retention.')));
+  if (visit.run.schemaVersion === 2) {
+    const assisted = result.results.filter((row) => row.assisted).length;
+    main.append(el('p', 'fine', tx(`ヘルプを使った回答：${assisted}件。詳細はこの練習中だけ保持します。`,
+      `Answers with help: ${assisted}. Detailed help history lasts for this session only.`)));
+  }
   if (visit.run.mode === 'repair') main.append(el('p', 'fine', tx('復習練習は元のコース点数を書き換えません。', 'Repair practice keeps the original unit scores.')));
   if (!visit.saved) {
     main.append(button('kanji-course-keep-result', 'この練習結果を記録', 'Keep this practice result', async () => {
@@ -20317,7 +20456,7 @@ function renderKanjiCourse(main) {
   if (visit.noEvidence) main.append(el('p', 'fine', tx('答えていない項目は正解・誤答として記録しません。', 'Unanswered items are not recorded as correct or incorrect.')));
   if (result.missedPromptIds.length) {
     const repair = button('kanji-course-repair', 'まちがえた目標だけ練習', 'Practise only the missed targets', () => {
-      visit.run = course.retry(visit.run); visit.saved = false; visit.evidenceTime = null; visit.noEvidence = false; visit.feedback = null; redraw();
+      visit.run = course.retry(visit.run); visit.saved = false; visit.evidenceTime = null; visit.noEvidence = false; visit.feedback = null; kanjiCourseApplyHelp(visit); redraw();
     });
     if (!visit.saved && result.results.some((row) => row.status === 'correct' || row.status === 'wrong')) {
       repair.disabled = true;
@@ -36355,6 +36494,7 @@ function renderWordNode(sheet, node) {
   if (shownReading) sheet.append(el('p', 'reading', shownReading));
   // G2 · the dot's basis in one quiet line — days met, review state, the reading — and his "I know this" / "Not yet"
   renderDepthBasis(sheet, node, shownReading || '');
+  if (!unresolved && shownReading === node.reading) renderKanjiCourseDoor(sheet, node);
 
   // KANJI IN THIS WORD — each row opens that kanji's full entry. G1: right under the word and its reading
   // (John, 09-29: "kanji in the word needs to be more at the top!"; MASTER_SPEC §7.22)
@@ -39883,6 +40023,7 @@ function enterWord(node, { from = null, invoker = null, instant = false } = {}) 
   const depth = S.stack.length + 1;
   const ready = layered ? takePrebuiltPage(node, depth) : null;
   const pushed = ready?.node || node;
+  kanjiCourseReferenceHelp(S.kanjiCourse, pushed);
   if (pushed.t === 'word' && scaleNodeBelongs(pushed) && (!S.stack.length || S.stack.at(-1)?.t === 'sent')) S.scaleVisit.word = pushed;
   if (ladderOpening) {
     ladderOpening.rung = 'page';

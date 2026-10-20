@@ -20,7 +20,7 @@ const read = name => readFileSync(new URL(name, import.meta.url), 'utf8');
 const source = read('../corridor.js');
 const courseSource = read('../kanji-course.js');
 const ast = ts.createSourceFile('corridor.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
-const names = ['kanjiCourseEvidencePatch', 'kanjiCourseReturnFrame', 'kanjiCourseEntryNode',
+const names = ['kanjiCourseNodeUnit', 'kanjiCourseApplyHelp', 'kanjiCourseRememberHelp', 'kanjiCourseTeachingHelp', 'kanjiCourseReferenceHelp', 'kanjiCourseHookLine', 'reportKanjiCourseAttempt', 'kanjiCourseEvidencePatch', 'kanjiCourseReturnFrame', 'kanjiCourseEntryNode',
   'openKanjiCourseUnit', 'renderKanjiCourseDoor', 'renderKanjiCourseMenu', 'renderKanjiCourse'];
 const lifted = names.map(name => {
   const node = ast.statements.find(statement => ts.isFunctionDeclaration(statement) && statement.name?.text === name);
@@ -77,10 +77,11 @@ function descend(node) {
 function harness() {
   const commits = [], navigations = [], invokers = [];
   let scope = { record: { v: 1, taken: [], srs: {}, revlog: [], obslog: [], lessonsDone: {} } };
-  let main = new Element('main'), renderCount = 0, now = 1760000000000;
+  let main = new Element('main'), renderCount = 0, now = 1760000000000, sessionNumber = 0;
+  class TestDate extends Date { static now() { return now; } }
   const S = { view: 'lessons', stack: [], navigationReturns: [], kanjiCourse: null, lessonsDone: scope.record.lessonsDone };
   const context = vm.createContext({
-    S, recordEpoch: 1, personalHost: null, window: { scrollTo() {} }, Date: { now: () => now },
+    S, recordEpoch: 1, personalHost: null, window: { scrollTo() {} }, Date: TestDate, crypto: { randomUUID: () => `session-${++sessionNumber}` },
     el: (tag, cls, text) => new Element(tag, cls, text),
     biLabel: (tag, cls, _ja, en) => new Element(tag, cls, en),
     tx: (_ja, en) => en,
@@ -97,7 +98,7 @@ function harness() {
       S.stack = home.stack; S.view = home.view; draw();
     },
     render: () => draw(),
-    go: (node, options) => { navigations.push(copy(node)); invokers.push(options?.invoker); S.view = node.t; draw(); },
+    go: (node, options) => { context.kanjiCourseReferenceHelp(S.kanjiCourse, node); navigations.push(copy(node)); invokers.push(options?.invoker); S.view = node.t; draw(); },
     commitStorePatch: builder => {
       const owner = scope;
       return new Promise(resolve => {
@@ -339,8 +340,8 @@ test('control: the prior top-frame-only fallback is killed by the generic resume
 
 test('actual menu starts four teaching cards then independent meaning/reading checks', () => {
   const h = harness();
-  assert.equal(h.elements.filter(element => element.dataset.kanjiCourseUnit).length, 12);
-  assert.match(h.text, /48 characters in words/);
+  assert.equal(h.elements.filter(element => element.dataset.kanjiCourseUnit).length, 13);
+  assert.match(h.text, /51 characters in words/);
   assert.match(h.text, /editorial review.*pending/);
   h.select('shapes');
   assert.equal(h.S.kanjiCourse.stage, 'intro');
@@ -730,4 +731,205 @@ test('all skipped/revealed results produce no write; reveals can repair without 
   revealed.click('kanji-course-repair');
   assert.equal(revealed.S.kanjiCourse.run.mode, 'repair');
   assert.equal(revealed.S.kanjiCourse.run.promptIds.length, 8);
+});
+
+test('family teaches retained examples then presents ordinary-text checks without reading aids', () => {
+  const h = harness();
+  h.select('shiki-shoku');
+  assert.match(h.text, /Choose 3 character keywords.*3 whole-word readings/);
+  assert.doesNotMatch(h.text, /しょくぎょう|ちしき|そしき|彼の職業/);
+  h.click('kanji-course-learn');
+  assert.match(h.text, /職業.*しょくぎょう/);
+  assert.match(h.text, /彼の職業は医師だ。/);
+  h.click('kanji-course-teach-next');
+  assert.match(h.text, /知識は力なり。.*literary set saying/);
+  h.click('kanji-course-teach-next'); h.click('kanji-course-teach-next');
+  assert.equal(h.S.kanjiCourse.run.schemaVersion, 2);
+  assert.equal(h.course.currentPrompt(h.S.kanjiCourse.run).kind, 'meaning');
+  assert.equal(h.elements.some(element => ['RUBY', 'SVG'].includes(element.tagName)), false);
+  assert.doesNotMatch(h.text, /しょくぎょう|ちしき|そしき/);
+  h.click('kanji-course-choice-職');
+  assert.match(h.text, /Review recording.*unavailable.*Practice still works/);
+  assert.equal(h.elements.some(element => element.id.startsWith('kanji-course-self-')), false);
+  h.click('kanji-course-next');
+  assert.match(h.text, /Type the whole word’s reading in kana/);
+  assert.doesNotMatch(h.text, /しょくぎょう/);
+  assert.equal(h.commits.length, 0);
+});
+
+test('family hook is explicit, once per attempt, after response and feedback; no schedule writer is called', async () => {
+  const h = harness(), calls = [];
+  let finish;
+  h.context.window.__KAIRO_HOOKS__ = { report: evidence => {
+    calls.push(evidence); return new Promise(resolve => { finish = resolve; });
+  } };
+  h.select('shiki-shoku'); h.click('kanji-course-preview');
+  h.setNow(1000); h.click('kanji-course-choice-職');
+  assert.equal(calls.length, 0, 'response and feedback alone do not grade');
+  const knew = h.byId('kanji-course-self-knew');
+  h.setNow(1010); knew.fire('click'); knew.fire('click', {}, true);
+  assert.equal(calls.length, 1);
+  const call = calls[0];
+  assert.deepEqual(copy(call.item), { kind: 'kanji', literal: '職' });
+  assert.equal(call.surface, 'course:kanji-shiki-shoku-r1');
+  assert.equal(call.tests, 'meaning');
+  assert.equal(call.answeredAt, 1000);
+  assert.equal(call.at.getTime(), 1010);
+  assert.deepEqual(copy(call.help), []);
+  assert.deepEqual(copy(call.answer), { selfCheck: 'knew' });
+  assert.equal(call.revealed, true);
+  assert.equal(h.byId('kanji-course-next').disabled, true);
+  finish({ write: true, rating: 3, from: 3, capped: false }); await tick();
+  assert.match(h.text, /Recorded for review \(rating 3\)/);
+  h.draw(); knew.fire('click', {}, true);
+  assert.equal(calls.length, 1, 'repaint/stale event cannot send again');
+  assert.equal(h.commits.length, 0, 'W3 does not write a grade through course storage');
+  assert.deepEqual(h.record.srs, {}); assert.deepEqual(h.record.revlog, []);
+});
+
+test('dictionary assistance is retained on the exact word attempt and precedes its answer cutoff', async () => {
+  const h = harness(), calls = [];
+  h.context.window.__KAIRO_HOOKS__ = { report: async evidence => {
+    calls.push(copy(evidence)); return { write: false, reason: 'not-due' };
+  } };
+  h.select('shiki-shoku'); h.click('kanji-course-preview');
+  h.click('kanji-course-skip'); h.click('kanji-course-next');
+  h.setNow(2000); h.click('kanji-course-entry-word');
+  assert.deepEqual(h.navigations[0], { t: 'word', id: '職業', reading: 'しょくぎょう' });
+  h.returnToLessons();
+  assert.match(h.text, /Help recorded for this check: 1/);
+  h.setNow(2010); h.submit('しょくぎょう');
+  assert.match(h.text, /Help was used/);
+  h.setNow(2020); h.click('kanji-course-self-knew'); await tick();
+  assert.equal(calls.length, 1);
+  assert.deepEqual(calls[0].item, { kind: 'word', term: '職業', reading: 'しょくぎょう' });
+  assert.deepEqual(calls[0].help, [{ what: 'dictionary-entry',
+    about: { kind: 'word', term: '職業', reading: 'しょくぎょう' },
+    reveals: ['reading', 'meaning', 'form'], at: 2000 }]);
+  assert.equal(calls[0].answeredAt, 2010);
+  assert.match(h.text, /not due.*unchanged/);
+  assert.equal(h.commits.length, 0);
+});
+
+test('family reveal, skip, known-wrong answer and absent hook cannot manufacture a successful grade', async () => {
+  const h = harness(), calls = [];
+  h.context.window.__KAIRO_HOOKS__ = { report: async value => {
+    calls.push(value); return { write: false, reason: 'no-schedule' };
+  } };
+  h.select('shiki-shoku'); h.click('kanji-course-preview');
+  h.click('kanji-course-reveal');
+  assert.equal(h.elements.some(element => element.id.startsWith('kanji-course-self-')), false);
+  h.click('kanji-course-next'); h.click('kanji-course-skip');
+  assert.equal(h.elements.some(element => element.id.startsWith('kanji-course-self-')), false);
+  h.click('kanji-course-next');
+  const prompt = h.course.currentPrompt(h.S.kanjiCourse.run);
+  h.click(`kanji-course-choice-${prompt.choices.find(row => row.id !== prompt.answerId).id}`);
+  assert.equal(h.elements.some(element => element.id === 'kanji-course-self-knew'), false);
+  assert.equal(calls.length, 0);
+  h.click('kanji-course-self-missed'); await tick();
+  assert.deepEqual(copy(calls[0].answer), { selfCheck: 'missed' });
+  assert.match(h.text, /no active review card.*practice/);
+  assert.equal(h.commits.length, 0);
+});
+
+test('uncertain hook result is terminal and stale owner does not receive its confirmation', async () => {
+  const h = harness(); let reject; let calls = 0;
+  h.context.window.__KAIRO_HOOKS__ = { report: () => {
+    calls++; return new Promise((_resolve, failure) => { reject = failure; });
+  } };
+  h.select('shiki-shoku'); h.click('kanji-course-preview'); h.click('kanji-course-choice-職');
+  const visit = h.S.kanjiCourse, attemptId = visit.feedback.result.attemptId;
+  h.click('kanji-course-self-knew');
+  h.changeEpoch(); const renders = h.renderCount;
+  reject(new Error('unknown publication')); await tick();
+  assert.equal(h.renderCount, renders, 'old owner outcome cannot repaint current owner');
+  assert.equal(visit.hookOutcomes[attemptId].reason, 'publish-uncertain');
+  assert.equal(visit.pending, false);
+  await h.context.reportKanjiCourseAttempt(visit, attemptId, 'knew');
+  assert.equal(calls, 1);
+  assert.deepEqual(h.record.srs, {});
+});
+
+test('reader, Atlas and review family word doors preserve the exact caller and never invent source admission', () => {
+  const family = JSON.parse(read('../data/share_alike/kanji-family.json'));
+  for (const view of ['reader', 'levels', 'review']) {
+    const h = routeHarness(), example = family.examples[1], S = h.S;
+    const review = { ix: 2, queue: [{ t: 'word', id: example.word.id }], revealed: false };
+    S.review = review; S.view = view;
+    S.lessonRun = { id: 'kept-old-lesson', draft: 'old draft' };
+    const lesson = S.lessonRun;
+    const origin = { t: 'word', id: example.word.id, reading: example.word.reading,
+      ...(view === 'levels' ? { referenceEntry: { type: 'word', id: example.word.id, reading: example.word.reading } }
+        : { from: { passage: 'retained-example', index: example.tokenIndex },
+          sourceContext: { occurrenceId: example.reference.id, sentence: example.sentence } }) };
+    const before = copy(origin);
+    h.openContext(origin);
+    assert.equal(S.kanjiCourse.unitId, 'shiki-shoku');
+    const visit = S.kanjiCourse;
+    h.click('kanji-course-practise');
+    assert.ok(h.course.currentAttempt(visit.run).help.length > 0, 'entry exposure is explicit help');
+    const target = h.course.getUnit('shiki-shoku').targets.find(row => row.kanji === '識');
+    const outbound = h.context.kanjiCourseEntryNode(visit, target, 'word');
+    assert.deepEqual(copy(outbound), before, 'only the exact word/reading retains caller provenance');
+    const other = h.course.getUnit('shiki-shoku').targets.find(row => row.kanji === '織');
+    assert.deepEqual(copy(h.context.kanjiCourseEntryNode(visit, other, 'word')),
+      { t: 'word', id: '組織', reading: 'そしき' });
+    h.click('kanji-course-source-return');
+    assert.strictEqual(S.stack.at(-1), origin);
+    assert.equal(S.view, view);
+    assert.strictEqual(S.review, review); assert.strictEqual(S.lessonRun, lesson);
+    assert.deepEqual(copy(origin), before);
+    assert.equal(h.commits.length, 0);
+    assert.deepEqual(h.record.srs, {});
+  }
+});
+
+test('wrong or absent word reading cannot expose a family course door', () => {
+  const h = harness();
+  for (const node of [{ t: 'word', id: '知識' }, { t: 'word', id: '知識', reading: 'ししき' },
+    { t: 'part', id: '戠' }, { t: 'word', id: '織物', reading: 'おりもの' }]) {
+    const sheet = new Element('section');
+    h.context.renderKanjiCourseDoor(sheet, node);
+    assert.equal(sheet.children.length, 0);
+  }
+});
+
+test('teaching and earlier feedback remain help across plain checks and a full retake', () => {
+  const h = harness(); h.select('shiki-shoku');
+  h.click('kanji-course-learn');
+  for (let i = 0; i < 3; i++) h.click('kanji-course-teach-next');
+  let attempt = h.course.currentAttempt(h.S.kanjiCourse.run);
+  assert.ok(attempt.help.some(row => row.what === 'teaching-card' && row.about.literal === '職' && row.reveals.includes('meaning')));
+  assert.ok(attempt.help.some(row => row.about.term === '職業' && row.reveals.includes('reading')));
+  h.finish();
+  const completed = h.S.kanjiCourse.run;
+  const first = h.course.summary(completed).results[0];
+  assert.equal(first.assisted, true);
+  assert.equal(first.help.some(row => row.what === 'answer-feedback' && row.about.literal === '職'), false,
+    'same-millisecond feedback is not pre-answer help on its own response');
+  h.click('kanji-course-retake');
+  attempt = h.course.currentAttempt(h.S.kanjiCourse.run);
+  assert.notEqual(h.S.kanjiCourse.run.sessionId, completed.sessionId);
+  assert.ok(attempt.help.some(row => row.what === 'answer-feedback' && row.about.literal === '職'),
+    'retake does not erase already shown answer');
+  assert.equal(h.commits.length, 0);
+});
+
+test('assisted family results save only the separate practice buckets and preserve schedule/card roots', async () => {
+  const h = harness(); h.select('shiki-shoku'); h.click('kanji-course-learn');
+  for (let i = 0; i < 3; i++) h.click('kanji-course-teach-next');
+  h.finish();
+  h.click('kanji-course-keep-result');
+  assert.equal(h.commits.length, 1);
+  h.commits[0].resolve(true); await tick();
+  const keys = Object.keys(h.record.lessonsDone);
+  assert.deepEqual(keys.sort(), [
+    'kanji-foundations-24:r4:shiki-shoku:meaning:assisted',
+    'kanji-foundations-24:r4:shiki-shoku:reading:assisted',
+  ]);
+  assert.equal(h.record.obslog.length, 6);
+  assert.ok(h.record.obslog.every(row => row[1] === 'lesson' && row[4].endsWith(':assisted')));
+  assert.deepEqual(h.record.srs, {}); assert.deepEqual(h.record.taken, []); assert.deepEqual(h.record.revlog, []);
+  h.click('kanji-course-leave');
+  assert.match(h.text, /with help 3\/3/);
 });

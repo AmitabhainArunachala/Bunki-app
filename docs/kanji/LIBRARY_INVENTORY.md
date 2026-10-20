@@ -100,3 +100,7 @@ The machine report retains the local source declarations verbatim:
 Not inventoried as a frozen corpus: personal/own-text/imported material, standalone deck contents, the full examples corpus beyond the three selected family bindings, future dynamically generated text, exhaustive runtime-resolved senses, qualified historical decomposition, complete authored families, or native course/reader behavior. Dictionary date and a source URL are provenance, not proof that a learner-facing interpretation has passed editorial review.
 
 The focused pure checks cover identity separation, repeated/supplementary source occurrences, contextual sense bounds, absent versus authored family data, unchanged-byte pin enforcement, repository-output refusal, real-source denominators and deterministic output. They provide **no browser, IndexedDB, phone, learning-effectiveness or release evidence**.
+
+## Slice 5 successor
+
+The retained slice-4 numbers above describe its immutable snapshot. Slice 5 adds the separately authored 職・識・織 unit: **51 characters / 13 units / 103 primary and alternate word records**. The original 48 targets and 96 graded prompt contracts keep their identities and answers. The new unit adds six tasks (three keyword choices, three whole-word readings); its retained sentences remain teaching material, not admitted source-transfer tasks. A new external inventory and input hashes accompany READY-05.md; the earlier inventory is preserved. Reference and geometry coverage do not expand with a course unit.

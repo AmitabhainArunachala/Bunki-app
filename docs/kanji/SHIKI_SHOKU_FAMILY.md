@@ -1,6 +1,6 @@
 # First family: 戠 → 職・識・織
 
-This is a source and pure-API slice for the world engine. It supplies one attributed family, not a new course, renderer, historical reconstruction or learner record. Native presentation and source/task adapters remain unqualified.
+This is a source and pure-API slice for the world engine. It supplies one attributed family, separate from the authored course described below, rendering, historical reconstruction and learner records. Native presentation and source/task adapters remain unqualified.
 
 The asset is `prototypes/corridor/data/share_alike/kanji-family.json`; the pure module is `kanji-family.js`. The existing production asset list, deferred script list, worker cache list and standalone source bundler include them. No standalone HTML or site was generated for this slice.
 
@@ -8,11 +8,11 @@ The asset is `prototypes/corridor/data/share_alike/kanji-family.json`; the pure 
 
 The three cited Kanjipedia formation entries, attributed there to **角川新字源 改訂新版**, identify 戠 as a sound component. The six role edges are factual paraphrases with per-edge citations, separate from geometry.
 
-| Member | Selected standard on-readings | Meaning-component account                                                                                                                                                            | Source                                           |
-| ------ | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
-| 職     | ショク                        | 耳 is associated with hearing/knowing in the dictionary's formation account, followed by an extension to office or charge. This does not make “ear” a direct synonym for employment. | [職](https://www.kanjipedia.jp/kanji/0003558300) |
-| 識     | シキ                          | The account associates 言 with understanding and remembering.                                                                                                                        | [識](https://www.kanjipedia.jp/kanji/0002903800) |
-| 織     | ショク・シキ                  | The account associates 糸 with weaving cloth.                                                                                                                                        | [織](https://www.kanjipedia.jp/kanji/0003557300) |
+| Member | Selected standard on-readings | Meaning-component account                                                                                                                                                                             | Source                                           |
+| ------ | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| 職     | ショク                        | 耳 is associated with hearing and learning/remembering in the dictionary's formation account, followed by an extension to office or charge. This does not make “ear” a direct synonym for employment. | [職](https://www.kanjipedia.jp/kanji/0003558300) |
+| 識     | シキ                          | The account associates 言 with understanding and remembering.                                                                                                                                         | [識](https://www.kanjipedia.jp/kanji/0002903800) |
+| 織     | ショク・シキ                  | The account associates 糸 with weaving cloth.                                                                                                                                                         | [織](https://www.kanjipedia.jp/kanji/0003557300) |
 
 These are attributed lexicographical accounts. They are not a newly verified archaeological lineage. Source access date is **2026-10-21**; raw page bytes were not archived and no page hash is claimed. No long dictionary passage is copied.
 
@@ -96,7 +96,11 @@ The immutable handback's Git head plus the family and structure SHA-256 values i
 
 W5 owns mapping its proposed `GraphPort` to these exports, selecting each destination's own occurrence, return capabilities, rendering and depth semantics. The technical `$` wrapper remains retained evidence; `$/0` is the glyph root. W3 owns source truth and later reviewed relationship/task adapters.
 
-**First-family course tasks remain unavailable.** The 48-character pilot has no authored 職・識・織・戠・糸 targets. Use `taskTarget: null`; do not invent a course ID or turn sentence exposure into a graded attempt. A future source-practice task must separately admit its live source context/reading cue and confirm an existing plan under the real host contract. The three retained examples do not grant that admission. Course rows stay off the scheduler; W4 remains the sole gated grading owner.
+**Slice 5 adds separately authored course targets.** `BunkiKanjiCourse.taskTarget(reference)` now resolves exact canonical 職・識・織 references to their keyword tasks and the exact primary word/reading pairs 職業・しょくぎょう, 知識・ちしき and 組織・そしき to their whole-word reading tasks. It returns the stable course ID, `unitId: "shiki-shoku"`, unit revision 4, target ID and authored prompt IDs. Component occurrences, sentence occurrences, wrong readings and teaching-only alternate words still resolve to null. This supersedes slice 4's `taskTarget: null` boundary only for these new tasks; earlier frozen source remains unchanged.
+
+See [first-family learning contract](FIRST_FAMILY_LEARNING.md). The course is ordinary-text practice, not a source-transfer assessment, handwriting recognition or a delayed-retention claim. The retained sentences remain teaching examples; they never become confirmed source-practice plans or scheduler identities. Any future source-practice task still needs separate live source-context/reading-cue admission and plan confirmation under the actual host contract. Course result rows remain practice observations. Only an explicit eligible attempt may cross W4's one hook; its implementation is not included in this branch.
+
+The family asset deliberately retains only on-readings. Kun readings such as 織 お.る and 識 し.る remain available in `kanji.json` and the complete kanji reference supplied by the consumer; the 戠 phonetic-family association does not govern or predict them. Missing standalone geometry and historical/font bindings remain unchanged.
 
 ## Why `learning-core.mjs` is absent from Git
 
@@ -121,4 +125,4 @@ This command was **not executed** for slice 4. Materialize the tracked build inp
 
 Run `node --test prototypes/corridor/tools/test-kanji-family.mjs` for offline source and adversarial join controls, plus the inventory's focused tests and affected course/route suites. Runtime receipts live outside the repository. The tests preserve distinctions between malformed-data refusal, source-hash parity, independent review and native behavior.
 
-W5 receives the asset/API snapshot for its real-data probe. W2/Kimi review this exact slice; Grok cross-checks. Source/font correspondence, first-family task authoring, historical forms, full-source admission, live host return completion, phone visuals and learning-effectiveness evidence remain separate work. Nothing here is a world-class-completion or production-release claim.
+W5 receives the asset/API snapshot for its real-data probe. W2/Kimi review this exact slice; Grok cross-checks. Source/font correspondence, first-family native task qualification, historical forms, full-source admission, live host return completion, phone visuals and learning-effectiveness evidence remain separate work. Nothing here is a world-class-completion or production-release claim.

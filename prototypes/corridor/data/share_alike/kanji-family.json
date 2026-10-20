@@ -1441,6 +1441,7 @@
       "Historical forms and a verified font-mesh binding are not in this dataset.",
       "Original upstream sentence IDs, contextual sense IDs and per-character kana alignment are not retained.",
       "Family membership does not imply the same reading in every word.",
+      "Family kanji nodes retain on-readings only (rawOnReadings). Kun readings such as 織 お.る and 識 し.る remain in kanji.json and the full reference; they are outside this phonetic-family account.",
       "The 音 and split 戈 subgroups remain geometry evidence only; no second-level teaching edge is authored here."
     ]
   }
