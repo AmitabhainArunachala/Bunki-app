@@ -121,7 +121,7 @@
         },
         "driftWords": {
           "path": "apps/app/src/data/generated/drift-words.json",
-          "sha256": "1b6847b9261945cb8f3509a1306349fa84b2aa91976dde165275029d76900daa"
+          "sha256": "ef1f0ce0c2dd0c44b79241e1b4fe710832c3ce645f9df18cd225586c45ee65a1"
         },
         "driftKanji": {
           "path": "apps/app/src/data/generated/drift-kanji.json",
