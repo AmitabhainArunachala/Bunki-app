@@ -3688,7 +3688,6 @@ function checkedKeptWords(rows){
       why:typeof row.why==='string'?row.why:''});
   });
 }
-function scaleHash(key){let h=2166136261;for(const ch of key)h=Math.imul(h^ch.codePointAt(0),16777619)>>>0;return h;}
 /** Hfix-2b · X-12 — where a kept word sits.
  *
  * The old seat was WR.w*(0.12+hash*0.76): a uniform scatter across 76% of a world 3.2 viewports

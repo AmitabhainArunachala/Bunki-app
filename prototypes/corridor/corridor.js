@@ -13598,7 +13598,7 @@ function wireReaderWordMenu(span, door) {
   };
   // a committed mouse hold keeps no text selected: the press was a hold, not the start of a drag
   const unselect = () => {
-    const selection = typeof getSelection === 'function' ? getSelection() : null;
+    const selection = typeof window.getSelection === 'function' ? window.getSelection() : null;
     if (selection && !selection.isCollapsed && selection.containsNode?.(span, true)) selection.removeAllRanges();
   };
   const commit = (h) => {
@@ -17844,7 +17844,7 @@ function notYetMarks(record = S) {
   for (const [key, entry] of Object.entries(root.entries || {})) {
     const said = plainRecord(entry) && plainRecord(entry.said) ? entry.said : null;
     if (said?.value !== 'not-yet') continue;
-    let parsed = null;
+    let parsed;
     try { parsed = JSON.parse(key); } catch { parsed = null; }
     // [1, 'word', id, kind, seq, reading] — what he met, never the spelling alone
     if (!Array.isArray(parsed) || parsed[0] !== 1 || parsed[1] !== 'word' || !nonEmptyString(parsed[2])) continue;
@@ -24663,7 +24663,7 @@ function kdxTextResults(kind) {
     const readingOf = (c) => {
       const k = kanjiReference(c) || D.kanji[c];
       const hit = [...(k?.on || []), ...(k?.kun || [])].find((r) => helpers.readingMatch([r], qh) === rank.get(c));
-      return hit ? String(hit).replace(/[.\-]/gu, '') : '';
+      return hit ? String(hit).replace(/[.-]/gu, '') : '';
     };
     renderKdxGrid(wrap, chars, 200, `reading:${qh}`, { empty: state === 'complete', readingOf });
     return wrap;
@@ -25827,7 +25827,7 @@ function wireWordWebHold(button, nodeOf, activate = null) {
   };
   // a committed mouse hold keeps no text selected: the press was a hold, not the start of a drag
   const unselect = () => {
-    const selection = typeof getSelection === 'function' ? getSelection() : null;
+    const selection = typeof window.getSelection === 'function' ? window.getSelection() : null;
     if (selection && !selection.isCollapsed && selection.containsNode?.(button, true)) selection.removeAllRanges();
   };
   const clear = () => {

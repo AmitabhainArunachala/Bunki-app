@@ -402,8 +402,10 @@ try {
             '#drift-layer .scale-star-kept { color: var(--verm, #b34836); }', 'ink');
         }
         if (!AS_BASE && CONTROL === 'seat' && hit === '/drift-layer.js') {
+          // LINTFIX: scaleHash left production (unused since keptSeat); the old scatter the control
+          // exercises now carries the identical helper inside its own injected code — no ReferenceError
           text = swap(text, 'const seat=keptSeat(index);',
-            'const seat={x:WR.w*(0.12+(scaleHash(row.key)%100000)/100000*0.76),y:WR.h*(0.12+(scaleHash(row.key+"y")%100000)/100000*0.76)};', 'seat');
+            'function scaleHash(key){let h=2166136261;for(const ch of key)h=Math.imul(h^ch.codePointAt(0),16777619)>>>0;return h;}const seat={x:WR.w*(0.12+(scaleHash(row.key)%100000)/100000*0.76),y:WR.h*(0.12+(scaleHash(row.key+"y")%100000)/100000*0.76)};', 'seat');
         }
         if (!AS_BASE && CONTROL === 'why' && hit === '/drift-layer.js') {
           text = swap(text, "why:typeof row.why==='string'?row.why:''", "why:''", 'why');
