@@ -89,7 +89,7 @@ class Element {
 const descendants = element => [element,
   ...element.children.filter(child => child instanceof Element).flatMap(descendants)];
 function harness({ bundle = true, model = true } = {}) {
-  const microtasks = [], requests = [], timers = new Map();
+  const microtasks = [], requests = [], timers = new Map(), sheetActionReconciliations = [];
   let timerId = 0, sheet = null;
   const window = {};
   if (bundle) window.__CORRIDOR_BUNDLE__ = bundle === true
@@ -104,6 +104,7 @@ function harness({ bundle = true, model = true } = {}) {
     scaleThread: () => null,
     activatePendingLookupReadings: () => {},
     adoptSaveMenuOwner: () => {},
+    reconcileSheetActionLines: (...args) => sheetActionReconciliations.push(args),
     findSheetDoor: () => null,
     queueMicrotask: callback => microtasks.push(callback),
     setTimeout: (callback, ms) => { const id = ++timerId; timers.set(id, { callback, ms }); return id; },
@@ -123,7 +124,7 @@ function harness({ bundle = true, model = true } = {}) {
     while (microtasks.length) microtasks.shift()();
   };
   return {
-    context, window, requests, timers, microtasks, flush, state,
+    context, window, requests, timers, microtasks, sheetActionReconciliations, flush, state,
     async preload() { return context.loadKanjiStructure(); },
     load() { return context.loadKanjiStructure(); },
     render(node, { mount = true } = {}) {
@@ -391,6 +392,7 @@ test('actual mountPageEffects activates an idle-prebuilt sheet; late response wa
   assert.equal(h.requests.length, 0, 'idle-prebuilt sheet does not fetch before real mount');
   assert.equal(h.timers.size, 0);
   h.sheet.connected = true; h.mountEffects(node); await tick();
+  assert.equal(h.sheetActionReconciliations.length, 1, 'shared sheet effects still run at mount');
   assert.equal(h.requests.length, 1);
   assert.match(h.text, /Loading source stroke groups/);
   const beforeDetached = { replacements: section.replacements, text: section.textContent };
@@ -411,6 +413,7 @@ test('actual mountPageEffects activates an idle-prebuilt sheet; late response wa
   assert.equal(node.kanjiOccurrenceId, chosen);
   assert.deepEqual(h.selected(), selected);
   assert.equal(h.requests.length, 1);
+  assert.equal(h.sheetActionReconciliations.length, 3, 'each remount retains the shared sheet effect');
 });
 
 test('late completion of mounted-then-detached view leaves old section and selection untouched', async () => {
