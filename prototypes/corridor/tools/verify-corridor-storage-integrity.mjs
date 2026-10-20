@@ -1219,7 +1219,7 @@ await verifiedAsync('current-commit-wrapper-refuses-unowned-stale-and-unacknowle
     recordFailure: (reason) => { context.failure = reason; },
     recordApp: { write: () => { writes += 1; return new Promise((done) => { resolveWrite = done; }); } },
   });
-  vm.runInContext(definitions('commitStorePatch', 'canonicalRecordJson', 'plainRecord'), context);
+  vm.runInContext(definitions('commitStorePatch', 'commitStorePatchOutcome', 'PRODUCER_DECLINED', 'canonicalRecordJson', 'plainRecord'), context);
   assert.equal(await context.commitStorePatch({ taken: [] }), false); assert.equal(writes, 0);
   context.writable = true;
   let pending = context.commitStorePatch({ taken: [] }); resolveWrite({ status: 'active', replayUiEffects: false });
