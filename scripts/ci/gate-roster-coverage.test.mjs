@@ -31,9 +31,9 @@ for (const file of readdirSync(join(root, 'scripts/ci')).filter((f) =>
       for (const key of value) known.add(key);
     }
 }
-test('all 215 canonical and supplemental gates have unique names and mandatory declarations', () => {
-  assert.equal(gates.length, 215);
-  assert.equal(new Set(gates.map((g) => g.name)).size, 215);
+test('all 216 canonical and supplemental gates have unique names and mandatory declarations', () => {
+  assert.equal(gates.length, 216);
+  assert.equal(new Set(gates.map((g) => g.name)).size, 216);
   const expected = JSON.parse(
     readFileSync(new URL('./vh-required-gate-roster.json', import.meta.url), 'utf8'),
   );
@@ -53,6 +53,22 @@ test('all 215 canonical and supplemental gates have unique names and mandatory d
         out,
       ),
     /No required evidence contract/u,
+  );
+});
+test('gloss classifier uses the complete Node suite and rejects narrowed selection', () => {
+  const gate = gates.find((entry) => entry.name === 'gloss-text');
+  assert(gate);
+  const file = 'prototypes/corridor/tools/test-gloss-text.mjs';
+  assert.equal(gate.command, process.execPath);
+  assert.deepEqual(gate.args, [file]);
+  assert.equal(gate.requiredPath, file);
+  const declaration = gateEvidenceDeclaration(gate, root, out);
+  assert.equal(declaration.kind, 'node-test');
+  assert.deepEqual(declaration.files, [file]);
+  assert.throws(
+    () =>
+      gateEvidenceDeclaration({ ...gate, args: [file, '--test-name-pattern=positive'] }, root, out),
+    /Unexpected Node test selection/u,
   );
 });
 test('Kanji-trust admission accepts complete pinned receipts and rejects incomplete or foreign evidence', () => {

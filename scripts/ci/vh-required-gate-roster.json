@@ -5,6 +5,7 @@
     "corridor-build",
     "reference-core",
     "reference-data",
+    "gloss-text",
     "reference-ui-contracts",
     "skip-core",
     "skip-ui-contracts",
@@ -224,6 +225,7 @@
     "corridor-build",
     "reference-core",
     "reference-data",
+    "gloss-text",
     "reference-ui-contracts",
     "skip-core",
     "skip-ui-contracts",
@@ -458,7 +460,8 @@
     "contrast-sweep-webkit",
     "design-reader-shelf-webkit",
     "vh-voice-controls",
-    "word-saved-answer-mutation-controls"
+    "word-saved-answer-mutation-controls",
+    "gloss-text"
   ],
   "removed": []
 }

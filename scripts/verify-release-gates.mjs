@@ -268,6 +268,7 @@ export function batteryGates(out, env = process.env) {
       join(out, 'reference-core'),
     ]),
     node('reference-data', 'tools/build-reference-data.mjs', ['--check']),
+    node('gloss-text', tool('test-gloss-text')),
     node('reference-ui-contracts', tool('test-reference-ui')),
     node('skip-core', tool('test-skip-core')),
     node('skip-ui-contracts', tool('test-skip-ui')),
@@ -3081,6 +3082,7 @@ async function verifyRunner(out) {
   const requiredNames = [
     'reference-core',
     'reference-data',
+    'gloss-text',
     'reference-ui-contracts',
     'skip-core',
     'skip-ui-contracts',
