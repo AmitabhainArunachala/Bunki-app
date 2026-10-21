@@ -63,22 +63,35 @@ const all = (node) => [node, ...node.children.filter((c) => c instanceof Element
 const shape = (node) => all(node).map((e) => `${e.tagName}#${e.id}${e.disabled ? '[disabled]' : ''}:${e.text}`);
 const flush = async () => { for (let i = 0; i < 40; i += 1) await new Promise((r) => setImmediate(r)); };
 
-/** a bundled passage with 職業 at token 26 (the fixture occurrence, sentence [24,41)) and at tokens 60–69, which share one sentence
- * [58,75): two occurrences in one sentence */
-const PASSAGE = { id: 'bunki-essay-n1-city', tokens: Array.from({ length: 90 }, (_, i) => (i === 26 || (i >= 60 && i < 70)
-  ? { s: '職業', b: '職業' } : { s: 'の', b: 'の' })) };
-const span = (index) => (index >= 60 && index < 70 ? [58, 75] : [index - 2, index + 15]);
-const sentenceAt = (index) => ({ p: PASSAGE, index, start: span(index)[0], end: span(index)[1],
-  quote: PASSAGE.tokens.slice(...span(index)).map((t) => t.s).join('') });
+/** a bundled passage of five sentences, each ending in 。: 職業 at token 26 (the fixture occurrence, sentence [24,42)) and at tokens
+ * 60–69, ten in one sentence [58,76) */
+const T = (s) => ({ s, b: s });
+const SENTENCES = () => [[...Array(23).fill('の'), '。'], ['の', 'の', '職業', ...Array(14).fill('の'), '。'], [...Array(15).fill('の'), '。'],
+  ['の', 'の', ...Array(10).fill('職業'), ...Array(5).fill('の'), '。'], [...Array(13).fill('の'), '。']];
+const PASSAGE = { id: 'bunki-essay-n1-city', tokens: SENTENCES().flat().map(T) };
+const ORIGINAL = PASSAGE.tokens;
+/** the reader's sentence for a token, as takenContext gives it: from the token after the previous 。 to this sentence's 。 */
+const sentenceAt = (index, p = PASSAGE) => {
+  let start = index; while (start > 0 && p.tokens[start - 1].s !== '。') start -= 1;
+  let end = index; while (end < p.tokens.length && p.tokens[end].s !== '。') end += 1;
+  end = Math.min(end + 1, p.tokens.length);
+  return { p, index, start, end, quote: p.tokens.slice(start, end).map((t) => t.s).join('') };
+};
 const WORD = (index = 26) => ({ t: 'word', id: '職業', reading: 'しょくぎょう', from: { passage: PASSAGE.id, index }, ctxScope: 'sent' });
-const occurrence = (index = 26) => ({ source: 'passage', passage: PASSAGE.id, token: index, sentence: span(index), quote: sentenceAt(index).quote,
-  word: '職業' });
+/** the occurrence as content (lead 2023): the sentence text, which copy of it in the passage, and the word's offset in it */
+const occurrence = (index = 26) => {
+  const s = sentenceAt(index), text = (from, to) => PASSAGE.tokens.slice(from, to).map((t) => t.s).join('');
+  const full = text(0, PASSAGE.tokens.length), at = text(0, s.start).length;
+  let nth = 0;
+  for (let i = full.indexOf(s.quote); i !== -1 && i < at; i = full.indexOf(s.quote, i + 1)) nth += 1;
+  return { source: 'passage', passage: PASSAGE.id, quote: s.quote, nth, offset: text(s.start, index).length, surface: '職業', word: '職業' };
+};
 
 let serial = 0;
 /** one page: the lifted program, ON or OFF, over a fresh S and a day's lifecycle */
 function page(m, day, { source = current?.source ?? SOURCE, names = [...BASE, ...QUEST], on = true, lang = 'en' } = {}) {
   let main = new Element('main');
-  const toasts = [], returns = [];
+  const toasts = [], returns = [], archive = { fail: false, passages: [] };
   const S = { view: 'lessons', stack: [], navigationReturns: [], kanjiCourse: null, lessonsDone: {}, lessonRun: null };
   const context = vm.createContext({
     console: { ...console, warn() {} },
@@ -102,11 +115,20 @@ function page(m, day, { source = current?.source ?? SOURCE, names = [...BASE, ..
     },
     showReaderToast: (message) => toasts.push(message),
     scrollTo: () => {},
-    teacherSentence: (node) => (node?.from?.passage === PASSAGE.id && PASSAGE.tokens && Number.isInteger(node.from.index) && node.from.index >= 2 &&
-      node.from.index < PASSAGE.tokens.length - 15 ? sentenceAt(node.from.index) : null),
+    teacherSentence: (node) => {
+      const p = context.D.passages.find((entry) => entry.id === node?.from?.passage);
+      return p?.tokens && Number.isInteger(node.from.index) && node.from.index >= 0 && node.from.index < p.tokens.length ? sentenceAt(node.from.index, p) : null;
+    },
     D: { passages: [PASSAGE] },
-    // the reader's article loader, modelled: a passage whose tokens were set aside gets them back on the next turn
-    ensureArticle: async (passage) => { await null; if (!passage.tokens && passage.__tokens) passage.tokens = passage.__tokens; },
+    // the reader's article loader, modelled: a passage whose tokens were set aside gets them back on the next turn, or fails
+    ensureArticle: async (passage) => { await null; if (passage.__fail) throw new Error('article unavailable'); if (!passage.tokens && passage.__tokens) passage.tokens = passage.__tokens; },
+    // the archive index (ensureArchiveIndex, C:5199), modelled: it loads later than the main index, adds its passages, or fails
+    ensureArchiveIndex: async () => {
+      await null;
+      if (archive.fail) throw new Error('archive-index → 503');
+      context.D.archive = archive.passages; context.D.passages.push(...archive.passages);
+      return archive.passages;
+    },
     // the unchanged entry seam: reuse the visit for the same unit, else open a new one (the reader start is help: K-25)
     openKanjiCourseUnit: (node) => {
       const unit = context.kanjiCourseNodeUnit(node);
@@ -132,7 +154,7 @@ function __journey() { return kanjiJourney; }
 function __setJourney(journey) { kanjiJourney = journey; }
 function __preset(lifecycle, quest) { kanjiJourneyModule = Promise.resolve(lifecycle); if (typeof kanjiQuestModule !== 'undefined') kanjiQuestModule = Promise.resolve(quest); }`, Object.assign(context, { __now: () => day.time.now }));
   const ui = {
-    S, context, toasts, returns, day, lang, course: context.BunkiKanjiCourse,
+    S, context, toasts, returns, archive, day, lang, course: context.BunkiKanjiCourse,
     get main() { return main; },
     find: (id) => all(main).find((e) => e.id === id) || null,
     text: () => main.textContent,
@@ -520,22 +542,25 @@ test('U19', 'a seed is bound to its sentence (W2 2004 S3B-2; lead 2005): changed
   } finally { PASSAGE.tokens[30] = saved; }
   p.S.kanjiCourse = null;
   const a = await created(p, 60), b = await created(p, 61);
-  assert.notEqual(a.id, b.id); assert.deepEqual([a.seed.sourceOccurrence.sentence, a.seed.sourceOccurrence.quote], [b.seed.sourceOccurrence.sentence, b.seed.sourceOccurrence.quote]);
+  assert.notEqual(a.id, b.id); assert.equal(a.seed.sourceOccurrence.quote, b.seed.sourceOccurrence.quote, 'one sentence');
+  assert.deepEqual([a.seed.sourceOccurrence.offset, b.seed.sourceOccurrence.offset], [2, 4], 'told apart by position');
   assert.equal(p.word(60).children.at(-1).text, p.copy('Q-01r'), 'the unchanged occurrence still resumes');
 });
 
-test('U21', 'a goal with no stored sentence, or from a passage no longer in the build, refuses to resume with Q-27u + End only and is never retargeted; a passage not yet loaded shows Q-17, then resumes once it loads (lead 2009)', async (m) => {
+test('U21', 'unproved occurrences (lead 2009, 2023): a goal without content identity, a passage absent once the archive index has loaded, an archive index or a passage text that fails to load each show Q-27u + End; a pending index or text shows Q-17, then a redraw; none binds or is retargeted', async (m) => {
   const p = await onPage(m);
-  const bare = p.q.questSeed({ source: 'passage', passage: PASSAGE.id, token: 26, sentence: [24, 41], word: '職業' });
-  const gone = p.q.questSeed({ ...occurrence(62), passage: 'bunki-essay-retired' });
-  const unversioned = (await p.q.createQuest(p.day.lc, p.state(), bare)).goalId, retired = (await p.q.createQuest(p.day.lc, p.state(), gone)).goalId;
+  const bare = p.q.questSeed({ source: 'passage', passage: PASSAGE.id, token: 26, sentence: [24, 42], word: '職業' });
+  const unversioned = (await p.q.createQuest(p.day.lc, p.state(), bare)).goalId;
+  const retired = (await p.q.createQuest(p.day.lc, p.state(), p.q.questSeed({ ...occurrence(62), passage: 'bunki-essay-retired' }))).goalId;
   assert.equal(p.word(26).children.at(-1).text, p.copy('Q-01'), 'never retargeted to the current occurrence');
-  for (const id of [unversioned, retired]) {
-    p.S.kanjiCourse = null;
-    all(p.lessons()).find((e) => e.id === `kanji-quest-lessons-${id}`).click();
-    assert.ok(p.has('Q-27u')); assert.equal(p.has('Q-27'), false, 'no change is claimed');
-    assert.ok(p.find('kanji-quest-end')); assert.equal(p.find('kanji-quest-reading'), null);
-  }
+  const open = (id) => { p.S.kanjiCourse = null; all(p.lessons()).find((e) => e.id === `kanji-quest-lessons-${id}`).click(); };
+  open(unversioned);
+  assert.ok(p.has('Q-27u') && p.find('kanji-quest-end')); assert.equal(p.has('Q-27'), false); assert.equal(p.find('kanji-quest-reading'), null);
+  p.archive.fail = true;
+  open(retired);
+  assert.ok(p.has('Q-17'), 'the archive index is pending'); assert.equal(p.find('kanji-quest-reading'), null);
+  await flush();
+  assert.ok(p.has('Q-27u'), 'the archive index failed: unproved, never "has changed"'); assert.equal(p.has('Q-27'), false);
   const ready = await created(p, 60);
   intoReading(p);
   assert.deepEqual(p.state().sessions.get(p.S.kanjiCourse.run.sessionId)?.binding?.goals.map((g) => g.id), [ready.id], 'neither binds');
@@ -547,6 +572,46 @@ test('U21', 'a goal with no stored sentence, or from a passage no longer in the 
     await flush();
     assert.ok(p.find('kanji-quest-reading'), 'resumes once the passage is loaded and unchanged');
   } finally { PASSAGE.tokens ||= PASSAGE.__tokens; delete PASSAGE.__tokens; }
+});
+
+test('U23', 'the archive index loads later than the main index (W2 2020 S3B-2b): an unchanged archive quest shows Q-17 at a cold open, then resumes once the index loads; one still absent after it loads shows Q-27u', async (m) => {
+  const p = await onPage(m);
+  const later = { ...PASSAGE, id: 'bunki-archive-0007', file: 'archive/0007.json', tokens: ORIGINAL };
+  const kept = (await p.q.createQuest(p.day.lc, p.state(), p.q.questSeed({ ...occurrence(26), passage: later.id }))).goalId;
+  const lost = (await p.q.createQuest(p.day.lc, p.state(), p.q.questSeed({ ...occurrence(60), passage: 'bunki-archive-0404' }))).goalId;
+  p.archive.passages = [later];
+  try {
+    p.S.kanjiCourse = null; all(p.lessons()).find((e) => e.id === `kanji-quest-lessons-${kept}`).click();
+    assert.ok(p.has('Q-17'), 'pending'); assert.equal(p.find('kanji-quest-reading'), null);
+    await flush();
+    assert.ok(p.find('kanji-quest-reading'), 'the cold archive quest resumes once its index has loaded');
+    p.S.kanjiCourse = null; all(p.lessons()).find((e) => e.id === `kanji-quest-lessons-${lost}`).click();
+    assert.ok(p.has('Q-27u'), 'absent from every index once it has loaded'); assert.equal(p.has('Q-17'), false);
+  } finally { p.context.D.passages.splice(1); }
+});
+
+test('U22', 'identity is content and position, never the token index (lead 2023): unchanged text that the tokenizer splits differently resumes, binds and is matched by its door; a real occurrence shift refuses', async (m) => {
+  const p = await onPage(m);
+  const old = await created(p, 26);
+  PASSAGE.tokens = [T('のの'), ...ORIGINAL.slice(2)];
+  try {
+    assert.equal(PASSAGE.tokens.map((t) => t.s).join(''), ORIGINAL.map((t) => t.s).join(''), 'the same text, one token fewer');
+    assert.equal(p.word(25).children.at(-1).text, p.copy('Q-01r'), 'the door at the recomputed token resumes the same quest');
+    p.S.kanjiCourse = null; all(p.lessons()).find((e) => e.id === `kanji-quest-lessons-${old.id}`).click();
+    assert.equal(p.has('Q-27'), false); intoReading(p);
+    assert.deepEqual(p.state().sessions.get(p.S.kanjiCourse.run.sessionId)?.binding?.goals.map((g) => g.id), [old.id], 'it binds');
+  } finally { PASSAGE.tokens = ORIGINAL; }
+  // two copies of the fixture sentence: a quest on the second, then the first is removed, so that occurrence no longer exists
+  const copy = ORIGINAL.slice(24, 42);
+  PASSAGE.tokens = [...ORIGINAL.slice(0, 24), ...copy, ...ORIGINAL.slice(24)];
+  let second;
+  try {
+    p.S.kanjiCourse = null;
+    second = await created(p, 44);
+    assert.equal(second.seed.sourceOccurrence.nth, 1);
+  } finally { PASSAGE.tokens = ORIGINAL; }
+  p.S.kanjiCourse = null; all(p.lessons()).find((e) => e.id === `kanji-quest-lessons-${second.id}`).click();
+  assert.ok(p.has('Q-27'), 'the shifted occurrence refuses'); assert.equal(p.find('kanji-quest-reading'), null);
 });
 
 test('U20', 'packaging (W2 2004 S3B-1): every module the journey and quest seams import ships as a required asset and in the offline shell; with the adapter absent the real import fails closed: no quest memory, door or row, and the rooms still work', async (m) => {
@@ -597,13 +662,18 @@ export const MUTANTS = {
   'stale-binding-in-progress': ['U18', [["if (!results.length) { settle.lines = owned() ? ['Q-21'] : ['K-26']; return; }", "if (!results.length) { settle.lines = owned() ? ['Q-22'] : ['K-26']; return; }"]]],
   'k20-hidden-in-quest': ['U6', [["        if (hookless) main.append(el('p', 'fine', kanjiCourseHookLine({ reason: 'hook-unavailable' })));\n", '']]],
   'conflicting-provenance': ['U2', [["  if (node?.t !== 'word' || node.id !== '職業' || node.sourceContext != null) return null;", "  if (node?.t !== 'word' || node.id !== '職業') return null;"]]],
-  'seed-without-content': ['U19', [["    quote: sentence.quote, word: node.id });", "    word: node.id });"]]],
+  'seed-without-content': ['U19', [["  return module.questSeed({ source: 'passage', passage: sentence.p.id, quote: sentence.quote, nth,", "  return module.questSeed({ source: 'passage', passage: sentence.p.id, quote: 'x', nth,"]]],
+  'position-ignored': ['U19', [["    offset: text(sentence.start, sentence.index).length, surface: token.s, word: node.id });", "    offset: 0, surface: token.s, word: node.id });"],
+    ["typeof at.surface !== 'string' || at.quote.slice(at.offset, at.offset + at.surface.length) !== at.surface) return 'unverifiable';", "typeof at.surface !== 'string') return 'unverifiable';"]]],
+  'token-in-identity': ['U22', [["  return module.questSeed({ source: 'passage', passage: sentence.p.id, quote: sentence.quote, nth,", "  return module.questSeed({ source: 'passage', passage: sentence.p.id, token: sentence.index, quote: sentence.quote, nth,"]]],
+  'nth-ignored': ['U22', [["  for (let n = 0; n <= at.nth; n += 1) { found = full.indexOf(at.quote, found + 1); if (found === -1) break; }", "  found = full.indexOf(at.quote);"]]],
+  'archive-absent-early': ['U23', [["  if (!p) return D.archive || window.__CORRIDOR_STANDALONE__ === true || typeof ensureArchiveIndex !== 'function' ? 'unverifiable'", "  if (!p) return true ? 'unverifiable'"]]],
+  'archive-failure-pending': ['U21', [["    return kanjiQuestLoading.get(key) === 'failed' ? 'unverifiable' : null;", "    return null;"]]],
   'stale-resumes': ['U19', [["  if (stale !== false) {\n    // lead 2005", "  if (false) {\n    // lead 2005"]]],
   'stale-binds': ['U19', [[", { eligible: (goal) => kanjiQuestStale(goal.seed) === false });", ");"]]],
   'unverifiable-says-changed': ['U21', [["lines([{ changed: 'Q-27', unverifiable: 'Q-27u' }[stale] ?? 'Q-17']);", "lines([{ changed: 'Q-27', unverifiable: 'Q-27' }[stale] ?? 'Q-17']);"]]],
-  'unversioned-resumes': ['U21', [["  if (at?.source !== 'passage' || typeof at.quote !== 'string') return 'unverifiable';", "  if (at?.source !== 'passage') return 'unverifiable';\n  if (typeof at.quote !== 'string') return false;"]]],
-  'unloaded-assumed-same': ['U21', [["      ensureArticle(p).catch(() => {}).finally(() => { kanjiQuestLoading.delete(p.id); if (p.tokens) redraw?.(); });\n    }\n    return null;",
-    "      ensureArticle(p).catch(() => {}).finally(() => { kanjiQuestLoading.delete(p.id); if (p.tokens) redraw?.(); });\n    }\n    return false;"]]],
+  'unversioned-resumes': ['U21', [["  if (at?.source !== 'passage' || typeof at.quote !== 'string' || !Number.isInteger(at.nth) || !Number.isInteger(at.offset) ||\n      typeof at.surface !== 'string'", "  if (at?.source !== 'passage') return 'unverifiable';\n  if (typeof at.quote !== 'string') return false;\n  if (!Number.isInteger(at.nth) || !Number.isInteger(at.offset) ||\n      typeof at.surface !== 'string'"]]],
+  'unloaded-assumed-same': ['U21', [["  if (!p.tokens) return typeof ensureArticle === 'function' ? load(`passage:${p.id}`, () => ensureArticle(p)) : 'unverifiable';", "  if (!p.tokens) return false;"]]],
   'adapter-not-shipped': ['U20', [], [], [["  'journey-lifecycle.mjs',\n  'm4-quest.mjs',\n", "  'journey-lifecycle.mjs',\n"]]],
   'adapter-not-offline': ['U20', [], [], [], [["  'journey-lifecycle.mjs',\n  // M4 v0: the quest adapter, imported beside the lifecycle when the switch is ON\n  'm4-quest.mjs',\n", "  'journey-lifecycle.mjs',\n"]]],
   'structural-ignored': ['U16', [["  return !view.root || KANJI_QUEST_STRUCTURAL.includes(view.phase);", '  return !view.root;']]],
