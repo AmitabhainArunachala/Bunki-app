@@ -37839,13 +37839,14 @@ function kanjiFamilyHasExampleOrigin() {
   return S.stack.some((node) => !!kanjiFamilyResolveExample(node));
 }
 function sanitizeKanjiFamilyExposure(sheet) {
-  // The fence runs before attachment, including kept/prebuilt pages. No one-frame answer flash.
+  // Before attachment, remove revoked facts: author display rules can override hidden.
   for (const section of sheet.querySelectorAll('[data-kanji-family-surface]')) {
     const exposure = kanjiFamilyExposures.get(section);
     if (!exposure || kanjiFamilyStampCurrent(exposure.state.stamp)) continue;
     exposure.state.stamp = null;
     exposure.state.busy = false;
     exposure.panel.hidden = true;
+    exposure.panel.replaceChildren();
   }
 }
 function activateKanjiFamily(sheet) {

@@ -786,29 +786,58 @@ test('F7/F11 every actual family edge/word/other-host route opts out of adversar
   assert.equal(h.context.kanjiCourseEntryNode(visit, other, 'word').sourceContext, undefined);
 });
 
-test('F11 pre-attachment fence hides pre-course/previous-owner/model panels before append; same-visit repaint remains acknowledged', async () => {
-  for (const invalidate of [h => { h.S.kanjiCourse = h.visit; },
-    h => { h.context.recordEpoch++; }, h => { h.context.kanjiFamilyRuntime = { ...h.runtime }; }]) {
+test('F11 pre-attachment fence removes revoked answer DOM; same-visit repaint and new-opening capture remain intact', async () => {
+  function assertRevokedAtAppend(invalidate, sanitizer = declaration('sanitizeKanjiFamilyExposure')) {
     const h = surfaceHarness(); h.render(); h.mount();
-    assert.ok(visibleText(h.sheet).includes('知識'));
+    const section = h.sheet.querySelector('[data-kanji-family-surface]');
+    const { panel } = h.context.kanjiFamilyExposures.get(section);
+    assert.ok(panel.children.length > 0);
+    assert.ok(panel.textContent.includes('知識'));
+    assert.ok(panel.textContent.includes('ちしき'));
     h.sheet.isConnected = false; invalidate(h);
     let appended = false;
     h.context.wordSheetGesture = null;
     h.context.mountPageEffects = () => {};
+    vm.runInContext(sanitizer, h.context);
     vm.runInContext(declaration('renderSheet'), h.context);
     h.context.renderSheet({ append(sheet) {
+      assert.equal(panel.children.length, 0, 'revoked answer descendants are absent before attachment');
+      assert.equal(panel.textContent, '', 'revoked panel has no raw answer text');
+      assert.equal(sheet.textContent.includes('知識'), false);
+      assert.equal(sheet.textContent.includes('ちしき'), false);
       assert.equal(visibleText(sheet).includes('知識'), false, 'answer is already hidden at attachment');
       appended = true;
     } }, { prebuilt: h.sheet });
     assert.equal(appended, true); assert.equal(h.captures.length, 0);
   }
+  for (const invalidate of [h => { h.S.kanjiCourse = h.visit; },
+    h => { h.context.recordEpoch++; }, h => { h.context.kanjiFamilyRuntime = { ...h.runtime }; }])
+    assertRevokedAtAppend(invalidate);
+  const actual = declaration('sanitizeKanjiFamilyExposure');
+  const retainAnswers = actual.replace('exposure.panel.replaceChildren();', '');
+  assert.notEqual(retainAnswers, actual);
+  assert.throws(() => assertRevokedAtAppend(h => { h.S.kanjiCourse = h.visit; }, retainAnswers),
+    { name: 'AssertionError', message: /revoked answer descendants are absent before attachment/u },
+    'the former hidden-only fence fails the raw DOM boundary even when visibleText claims it is hidden');
   const h = surfaceHarness({ live: true }); h.render(); h.mount();
   await disclosure(h.sheet).fire();
+  const section = h.sheet.querySelector('[data-kanji-family-surface]');
+  const { panel } = h.context.kanjiFamilyExposures.get(section);
+  const acknowledgedChildren = [...panel.children];
   h.context.sanitizeKanjiFamilyExposure(h.sheet);
+  assert.deepEqual(panel.children, acknowledgedChildren, 'same-visit acknowledged children are retained');
+  assert.ok(panel.textContent.includes('ちしき'));
   assert.ok(visibleText(h.sheet).includes('知識')); assert.equal(h.captures.length, 1);
   h.S.kanjiCourse = { ...h.visit, run: {} };
   h.context.sanitizeKanjiFamilyExposure(h.sheet);
+  assert.equal(panel.children.length, 0);
+  assert.equal(panel.textContent, '');
   assert.equal(visibleText(h.sheet).includes('知識'), false);
+  h.context.activateKanjiFamily(h.sheet);
+  assert.equal(h.captures.length, 1, 'revocation repaint does not capture');
+  await disclosure(h.sheet).fire();
+  assert.ok(h.sheet.textContent.includes('ちしき'));
+  assert.equal(h.captures.length, 2, 'a new opening captures after the revoked facts were removed');
 });
 
 test('F7/F11 actual sentence/header branches suppress only family capture, ladder, encounter and prose paths', () => {
