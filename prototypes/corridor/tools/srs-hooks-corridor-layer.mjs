@@ -23,6 +23,7 @@ export const CORRIDOR_NAMES = [
   'KANJI_LEDGER_LIMITS', 'kanjiDeepFreeze', 'kanjiDataProperty', 'kanjiPlainData', 'kanjiPlainList', 'kanjiCourseRowValid',
   'kanjiCourseLedger', 'kanjiCourseCapture', 'kanjiCourseLedgerBefore', 'kanjiCourseSnapshot', 'KANJI_REVIEW_STATE',
   'kanjiCoursePrepareReview', 'kanjiCourseAct', 'kanjiCourseApplyHelp', 'kanjiCourseRememberHelp', 'reportKanjiCourseAttempt',
+  'kanjiCourseJourney', 'KANJI_LEDGER_FULL', 'kanjiCourseHookLine',
 ];
 
 /** lift the named top-level definitions from corridor.js source text */

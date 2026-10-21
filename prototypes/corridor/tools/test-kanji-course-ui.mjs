@@ -27,7 +27,7 @@ const names = ['kanjiCourseNodeUnit', 'kanjiCourseApplyHelp', 'kanjiCourseRememb
   // HOOKS r8: the course visit's retained ledger, its PREPARE_REVIEW and the one review caller
   'HELP_RELEVANCE_POLICY', 'helpRelevanceRule', 'kanjiReviewCaller', 'KANJI_REVIEW_OWNER', 'kanjiReviewRetained', 'adoptHelpRelevance',
   'KANJI_LEDGER_LIMITS', 'kanjiDeepFreeze', 'kanjiDataProperty', 'kanjiPlainData', 'kanjiPlainList', 'kanjiCourseRowValid',
-  'kanjiCourseLedger', 'kanjiCourseCapture', 'kanjiCourseLedgerBefore', 'kanjiCourseSnapshot', 'KANJI_REVIEW_STATE', 'kanjiCoursePrepareReview', 'kanjiCourseAct'];
+  'kanjiCourseLedger', 'kanjiCourseCapture', 'kanjiCourseLedgerBefore', 'kanjiCourseSnapshot', 'KANJI_REVIEW_STATE', 'kanjiCoursePrepareReview', 'kanjiCourseAct', 'kanjiCourseJourney', 'KANJI_LEDGER_FULL'];
 const declares = (statement, name) => (ts.isFunctionDeclaration(statement) && statement.name?.text === name) ||
   (ts.isVariableStatement(statement) && statement.declarationList.declarations.some(node => node.name.getText(ast) === name));
 const lifted = names.map(name => {

@@ -20073,12 +20073,14 @@ function kanjiCourseRememberHelp(visit, helps, attemptId = null) {
   }
   visit.referenceHelp.sort((a, b) => a.at - b.at);
 }
-/** HOOKS r8 (W5 r2's view/owner adapter): the course visit's retained help ledger, bounded to that one visit: the menu and a
- * new unit start a new visit, and its ledger, with no claim to earlier history. Every row the course is given is kept
- * raw, in capture order, with its origin; equal rows from distinct events stay distinct; arrays and rows are frozen and
- * replaced, never edited. W3's attempt.help is a projection of the same rows, never the provenance source. Rows that
- * predate the ledger keep a null (unknown) origin. A refused capture makes the ledger unavailable: nothing it would
- * prepare could be complete, so every later preparation in the visit is refused */
+/** HOOKS r8 (W5 r2's view/owner adapter; lead 1207): the page's retained help ledger, one learning session per page record
+ * ownership (recordEpoch), shared by every course visit: the menu and a new unit keep it, so help seen in one visit still
+ * counts in the next; a reload or an owner change starts a new one. It is the in-memory view of W5's journey. Every row
+ * the course is given is kept raw, in capture order, with its origin; equal rows from distinct events stay distinct;
+ * arrays and rows are frozen and replaced, never edited. W3's attempt.help is each visit's projection of its own rows,
+ * never the provenance source. Rows that predate the ledger keep a null (unknown) origin. A refused capture makes the
+ * ledger unavailable: nothing it would prepare could be complete, so every later preparation on the page is refused, and
+ * a full ledger says so (review-history-full) */
 const KANJI_LEDGER_LIMITS = Object.freeze({ events: 128, attempts: 96 });
 function kanjiDeepFreeze(value) {
   if (value !== null && typeof value === 'object' && !Object.isFrozen(value)) {
@@ -20110,13 +20112,21 @@ function kanjiCourseRowValid(help) {
     return false;
   }
 }
+let kanjiCourseJourney = null;
+/** the reasons a ledger stops because it is full, not because something was wrong */
+const KANJI_LEDGER_FULL = Object.freeze(['help-limit', 'attempt-input-limit', 'review-record-limit']);
 function kanjiCourseLedger(visit) {
-  if (!visit.reviewLedger) {
+  // a visit of an earlier ownership never reads or writes the live ledger
+  if (visit.epoch !== recordEpoch) return { unavailable: 'owner-changed', exposure: [], origins: [], inputs: {}, records: {}, serial: 0 };
+  let ledger = kanjiCourseJourney?.epoch === recordEpoch ? kanjiCourseJourney : null;
+  if (!ledger) {
     const prior = (visit.referenceHelp || []).map((row) => JSON.parse(JSON.stringify(row)));
-    visit.reviewLedger = { journeyId: crypto.randomUUID(), sessionId: crypto.randomUUID(), serial: 0, unavailable: null,
+    ledger = { epoch: recordEpoch, journeyId: crypto.randomUUID(), sessionId: crypto.randomUUID(), serial: 0, unavailable: null,
       exposure: kanjiDeepFreeze(prior), origins: kanjiDeepFreeze(prior.map(() => null)), inputs: {}, records: {} };
+    kanjiCourseJourney = ledger;
   }
-  return visit.reviewLedger;
+  visit.reviewLedger = ledger;
+  return ledger;
 }
 /** capture one batch, all or nothing. The batch must be a dense plain list of data entries, each read once. A course reveal
  * or feedback row is the event course/<attempt>/<what> with its attempt; the same event again is idempotent, the same id
@@ -20196,8 +20206,11 @@ const KANJI_REVIEW_STATE = Object.freeze({ journey: Object.freeze({ location: Ob
  * { details, binding }, or { reason } with nothing retained */
 function kanjiCoursePrepareReview(visit, attemptId, actual) {
   const ledger = visit.reviewLedger, input = ledger?.inputs[attemptId];
-  if (!input || ledger.unavailable || input.courseSessionId !== visit.run.sessionId || Object.hasOwn(ledger.records, attemptId) ||
-    Object.keys(ledger.records).length >= KANJI_LEDGER_LIMITS.attempts) return { reason: 'review-unverified' };
+  if (ledger && !ledger.unavailable && Object.keys(ledger.records).length >= KANJI_LEDGER_LIMITS.attempts) ledger.unavailable = 'review-record-limit';
+  if (KANJI_LEDGER_FULL.includes(ledger?.unavailable)) return { reason: 'review-history-full' };
+  if (!input || ledger.unavailable || input.courseSessionId !== visit.run.sessionId || Object.hasOwn(ledger.records, attemptId)) {
+    return { reason: 'review-unverified' };
+  }
   const copy = (value) => JSON.parse(JSON.stringify(value));
   const rawCandidate = { ...copy(actual), help: copy(input.exposure) };
   const context = { attemptId, sessionId: input.sessionId, origins: copy(input.origins) };
@@ -20244,6 +20257,11 @@ function kanjiCourseHookLine(outcome) {
   if (outcome?.line) return outcome.line;
   if (outcome?.reason === 'hook-unavailable') return tx(
     'この版ではコースから復習に記録できません。練習は続けられます。', 'Review recording from this course is unavailable in this version. Practice still works.',
+  );
+  // lead 1207: the page's help history is full; nothing was graded, and the learner is told why and what restores it
+  if (outcome?.reason === 'review-history-full') return tx(
+    'このページで記録できるヘルプの履歴が上限に達しました。復習に記録するには、ページを読み込み直してください。練習はこのまま続けられます。',
+    'This page has kept all the help history it can. Reload the page to record reviews again; practice still works.',
   );
   // HOOKS r8 §4: every hook refusal shows its one approved line from srs-core, never a text of this view's own
   const core = typeof srsCore === 'undefined' ? null : srsCore;
@@ -31037,10 +31055,11 @@ let helpRelevanceRule = null;
 /** the one review caller (review-caller.mjs, the r3.1 caller): every course attempt reaches the hook through it, at most once */
 let kanjiReviewCaller = null;
 const KANJI_REVIEW_OWNER = 'learner-record';
-/** custody.retained: the live course visit's own retained record (its ledger holds it, bounded, and drops it with the visit),
- * replayed as a copy and never relabelled; a candidate that differs from it is refused */
+/** custody.retained: the page ledger's own retained record (bounded, and dropped with the ledger at a reload or when a new
+ * owner's ledger replaces it), replayed as a copy and never relabelled; a candidate that differs from it is refused. Whether
+ * that owner is still live is the caller's check, not custody's */
 function kanjiReviewRetained(attemptId, candidate) {
-  const record = S.kanjiCourse?.reviewLedger?.records?.[attemptId];
+  const record = kanjiCourseJourney?.records?.[attemptId];
   if (!record) throw new Error('review-not-prepared');
   if (candidate !== undefined && JSON.stringify(record.details.candidate) !== JSON.stringify(candidate)) throw new Error('review-transport-changed');
   return JSON.parse(JSON.stringify(record));
@@ -31060,7 +31079,8 @@ function adoptHelpRelevance({ createRelevance, createCaller, catalog }) {
     core: srsCore,
     hook: { report: (candidate, admission) => window.__KAIRO_HOOKS__.report(candidate, admission) },
     lines: { forReason: (reason, lang) => srsCore.refusalWords(reason, lang) },
-    ownership: () => ({ owner: recordReady(recordEpoch) ? KANJI_REVIEW_OWNER : null, journeyId: S.kanjiCourse?.reviewLedger?.journeyId ?? null, epoch: recordEpoch }),
+    ownership: () => ({ owner: recordReady(recordEpoch) ? KANJI_REVIEW_OWNER : null,
+      journeyId: kanjiCourseJourney?.epoch === recordEpoch ? kanjiCourseJourney.journeyId : null, epoch: recordEpoch }),
     custody: { retained: kanjiReviewRetained },
     admit: rule,
     course: window.BunkiKanjiCourse,

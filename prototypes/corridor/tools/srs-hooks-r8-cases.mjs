@@ -8,9 +8,9 @@
  *
  * Cases: I1 the install · R0–R3 grades through the course · W1–W4 W2's 0524 witnesses · X1–X3 W3's 0532 custody
  * controls · K3–K5 the binding · WA/WB W2's 0546 witnesses · L1–L6 W5's 1131 ledger contract, rule present and absent ·
- * L7 W3's 1200 F1 witnesses.
- * Not proved here: the rendered course in a browser, and continuity across course visits (each visit is its own
- * learning session; W5 1131 point 5).
+ * L7 W3's 1200 F1 witnesses · L8 a full page ledger refuses in plain words · L9 how often a bound is reached (lead 1207).
+ * Not proved here: the rendered course in a browser, and continuity across a reload or between entrances (the page ledger
+ * is the in-memory view of W5's journey; lead 1207).
  */
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -36,6 +36,7 @@ const tick = () => new Promise((resolve) => setImmediate(resolve));
 /* helpers defined inside the sandbox, so every object the adapter sees is made in its own realm */
 const VM_HELPERS = `
 var __calls = [];
+function tx(ja, en) { return en; }
 const __report = reportHookAttempt;
 window.__KAIRO_HOOKS__ = Object.freeze({ report: (evidence, binding) => { __calls.push(JSON.parse(JSON.stringify({ evidence, binding }))); return __report(evidence, binding); } });
 function __visit(sessionId, priorHelp) {
@@ -89,6 +90,7 @@ export function r8Harness({ layer, program, core, fsrsApi, pin, mods, sources })
   const dict = Object.fromEntries(entries.map(([, word, reading]) => [word, { r: reading, m: ['retained word meaning'] }]));
   const catalog = JSON.parse(sources.catalog);
   let serial = 0;
+  const pages = [];
 
   /** one page: the lifted adapter, the actual course and hook, the caller adopted with (rule) or without W3's rule */
   function page({ rule = true, catalogOverride = null } = {}) {
@@ -117,14 +119,17 @@ export function r8Harness({ layer, program, core, fsrsApi, pin, mods, sources })
       report: async (visit, id, check = 'knew') => { now += 10; await ctx.reportKanjiCourseAttempt(visit, id, check); await tick(); return copy(visit.hookOutcomes[id]); },
       ledger: (visit) => copy(visit.reviewLedger),
       retained: (visit, id) => visit.reviewLedger.records[id],
+      journey: () => copy(run('kanjiCourseJourney')),
+      line: (outcome) => ctx.kanjiCourseHookLine(outcome),
     };
+    pages.push(p);
     return p;
   }
-  return { page, catalog, dueAt };
+  return { page, catalog, dueAt, pages };
 }
 
 export async function r8Cases({ check, layer, program, core, fsrsApi, pin, mods, sources }) {
-  const { page, catalog } = r8Harness({ layer, program, core, fsrsApi, pin, mods, sources });
+  const { page, catalog, pages } = r8Harness({ layer, program, core, fsrsApi, pin, mods, sources });
   const row = (what, about, reveals, at) => ({ what, ...(about ? { about } : {}), reveals, at });
   const kanji = (literal) => ({ kind: 'kanji', literal });
   const word = (term, reading) => ({ kind: 'word', term, reading });
@@ -443,29 +448,47 @@ export async function r8Cases({ check, layer, program, core, fsrsApi, pin, mods,
       assert.equal((visit.referenceHelp || []).length, 0, `${name}: kept nowhere`);
     }
     const p = page();
+    p.deliberateBound = true;
     const visit = p.visit();
     p.capture(visit, Array.from({ length: 128 }, (_, i) => row('teaching-card', kanji('織'), ['meaning'], 1000 + i)));
     assert.equal(p.ledger(visit).exposure.length, 128);
     p.capture(visit, [unrelated(5000)]);
     assert.equal(p.ledger(visit).unavailable, 'help-limit');
     const q = page();
+    q.deliberateBound = true;
     const other = q.visit();
     for (let i = 0; i < 97; i++) q.run(`kanjiCourseSnapshot(S.kanjiCourse, 'a${i}', kanjiCourseLedgerBefore(S.kanjiCourse))`);
     assert.equal(q.ledger(other).unavailable, 'attempt-input-limit');
     return 'a Date, accessor, extra field, foreign prototype or holey list refuses before any copy; 128 events and 96 attempts are the bounds';
   });
   await check('L5', 'r8', async () => {
+    // W5 1159's counterexample: the answer shown in one visit, then the menu or a new unit, then a correct answer
     const p = page();
-    const visit = p.visit([row('teaching-card', kanji('織'), ['meaning', 'form'], 900)]);
-    const id = p.act(visit);
-    const ledger = p.ledger(visit);
-    assert.equal(ledger.origins[0], null, 'help from before the ledger keeps an unknown origin');
-    const prepared = p.prepare(visit, id);
-    assert.deepEqual(prepared.binding.origins, [null], 'and the attempt is prepared with it');
-    const nextVisit = p.visit();
-    p.capture(nextVisit, [unrelated(5000)]);
-    assert.notEqual(p.ledger(nextVisit).sessionId, ledger.sessionId, 'a new visit is a new learning session, with no claim to the old one');
-    return 'the ledger is bounded to one course visit; rows older than it keep null origins';
+    const first = p.visit();
+    p.capture(first, [row('dictionary-entry', kanji('職'), ['meaning', 'form'], 1000)]);
+    const second = p.visit();
+    const id = p.act(second);
+    assert.equal(p.ledger(second).journeyId, p.ledger(first).journeyId, 'a new visit continues the page\u2019s ledger');
+    assert.equal(p.ledger(second).sessionId, p.ledger(first).sessionId, 'and its learning session');
+    const outcome = await p.report(second, id);
+    assert.deepEqual([outcome.write, outcome.rating], [true, 1], 'the answer seen in the earlier visit still grades Again');
+    // an owner change is the restart boundary: a new ledger with no claim to the old one
+    const q = page();
+    const before = q.visit();
+    q.capture(before, [row('dictionary-entry', kanji('職'), ['meaning', 'form'], 1000)]);
+    const oldSession = q.ledger(before).sessionId;
+    q.ctx.recordEpoch = 2;
+    const after = q.visit();
+    q.capture(after, [unrelated(5000)]);
+    assert.notEqual(q.ledger(after).sessionId, oldSession, 'a new record ownership starts a new learning session');
+    assert.equal(q.ledger(before).unavailable, null, 'the earlier ledger is left as it was');
+    // rows that predate the ledger keep a null origin
+    const r = page();
+    const legacy = r.visit([row('teaching-card', kanji('織'), ['meaning', 'form'], 900)]);
+    const legacyId = r.act(legacy);
+    assert.equal(r.ledger(legacy).origins[0], null, 'help from before the ledger keeps an unknown origin');
+    assert.deepEqual(r.prepare(legacy, legacyId).binding.origins, [null]);
+    return 'the ledger is the page\u2019s: help seen in one visit still counts after the menu or a new unit (W5\u2019s counterexample grades Again); an owner change starts a new one; older rows keep null origins';
   });
   await check('L6', 'r8', async () => {
     const p = page({ rule: false });
@@ -496,21 +519,54 @@ export async function r8Cases({ check, layer, program, core, fsrsApi, pin, mods,
       kanjiCourseRememberHelp(a, [supplied]);
       supplied.about.literal = '職';
       kanjiCourseApplyHelp(a);
+      return { retained: a.reviewLedger.exposure[0].about.literal, reference: a.referenceHelp[0].about.literal,
+        projected: a.run.attempts[0].help[0].about.literal, unavailable: a.reviewLedger.unavailable };
+    })()`));
+    const q = page();
+    const accessor = copy(q.run(`(() => {
+      const row = (literal) => ({ what: 'dictionary-entry', about: { kind: 'kanji', literal }, reveals: ['meaning'], at: 1000 });
       const b = __visit('l7accessor'), batch = [];
       let reads = 0;
       Object.defineProperty(batch, '0', { enumerable: true, configurable: true, get() { return row(++reads === 1 ? '水' : '職'); } });
       kanjiCourseRememberHelp(b, batch);
       kanjiCourseApplyHelp(b);
-      return {
-        alias: { retained: a.reviewLedger.exposure[0].about.literal, reference: a.referenceHelp[0].about.literal,
-          projected: a.run.attempts[0].help[0].about.literal, unavailable: a.reviewLedger.unavailable },
-        accessor: { reads, kept: b.reviewLedger.exposure.length, reference: (b.referenceHelp || []).length,
-          projected: b.run.attempts[0].help.length, unavailable: b.reviewLedger.unavailable },
-      };
+      return { reads, kept: b.reviewLedger.exposure.length, reference: (b.referenceHelp || []).length,
+        projected: b.run.attempts[0].help.length, unavailable: b.reviewLedger.unavailable };
     })()`));
-    assert.deepEqual(result.alias, { retained: '水', reference: '水', projected: '水', unavailable: null }, 'a row mutated after capture changes nothing');
-    assert.deepEqual(result.accessor, { reads: 0, kept: 0, reference: 0, projected: 0, unavailable: 'help-batch-invalid' }, 'an accessor batch is refused unread');
+    assert.deepEqual(result, { retained: '水', reference: '水', projected: '水', unavailable: null }, 'a row mutated after capture changes nothing');
+    assert.deepEqual(accessor, { reads: 0, kept: 0, reference: 0, projected: 0, unavailable: 'help-batch-invalid' }, 'an accessor batch is refused unread');
     return 'the course projects only the ledger\u2019s frozen copies: a supplied row mutated after capture changes neither ledger nor projection; a batch with an accessor entry is refused before any read';
+  });
+  /* lead 1207: a full ledger refuses visibly, and how often anything reaches a bound */
+  await check('L8', 'r8', async () => {
+    const plain = 'This page has kept all the help history it can. Reload the page to record reviews again; practice still works.';
+    const p = page();
+    p.deliberateBound = true;
+    const filled = p.visit();
+    p.capture(filled, Array.from({ length: 128 }, (_, i) => row('teaching-card', kanji('織'), ['meaning'], 1000 + i)));
+    p.capture(filled, [unrelated(5000)]);
+    assert.equal(p.ledger(filled).unavailable, 'help-limit');
+    const later = p.visit();
+    const id = p.act(later);
+    const before = p.record();
+    const outcome = await p.report(later, id);
+    assert.deepEqual([outcome.write, outcome.reason, p.calls(), p.writes(), p.record()], [false, 'review-history-full', 0, 0, before], 'nothing grades');
+    assert.equal(p.line(outcome), plain, 'and the course says why, in plain words');
+    const q = page();
+    q.deliberateBound = true;
+    const busy = q.visit();
+    const busyId = q.act(busy);
+    q.run(`for (let i = 0; i < 96; i++) S.kanjiCourse.reviewLedger.records['r' + i] = Object.freeze({})`);
+    assert.deepEqual(q.prepare(busy, busyId).reason, 'review-history-full', '96 prepared reviews on one page: the same honest refusal');
+    return `at 128 events (or 96 attempts or reviews) the course records nothing and says: \u201c${plain}\u201d`;
+  });
+  await check('L9', 'r8', async () => {
+    const full = ['help-limit', 'attempt-input-limit', 'review-record-limit'];
+    const ledgers = pages.map((p) => ({ p, journey: p.journey() })).filter(({ journey }) => journey);
+    const reached = ledgers.filter(({ journey }) => full.includes(journey.unavailable));
+    assert.ok(reached.every(({ p }) => p.deliberateBound), 'only the cases built to reach a bound reach one');
+    const largest = Math.max(0, ...ledgers.filter(({ p }) => !p.deliberateBound).map(({ journey }) => journey.exposure.length));
+    return `${reached.length} of ${ledgers.length} page ledgers reached a bound, all in L4/L8 by design; the largest other ledger held ${largest} events`;
   });
 }
 
@@ -534,10 +590,12 @@ export const R8_CORRIDOR_MUTANTS = {
   'rule-unpinned': [['    if (rule.policy !== HELP_RELEVANCE_POLICY) rule = null;\n', '']],
   'projection-rereads-input': [['  for (const help of kept) if (!visit.referenceHelp.some(', '  for (const help of helps) if (!visit.referenceHelp.some(']],
   'batch-unvalidated': [["  if (!kanjiPlainList(helps)) {\n    ledger.unavailable = 'help-batch-invalid';\n    return null;\n  }\n", '']],
+  'ledger-per-visit': [['  let ledger = kanjiCourseJourney?.epoch === recordEpoch ? kanjiCourseJourney : null;', '  let ledger = visit.reviewLedger || null;']],
+  'history-full-silent': [["  if (KANJI_LEDGER_FULL.includes(ledger?.unavailable)) return { reason: 'review-history-full' };\n", '']],
 };
 export const R8_EXPECT = {
   'caller-skips-binding-check': ['X1', 'WB'], 'caller-skips-custody': ['X1', 'R1'],
   'custody-trusts-received': ['L1'], 'custody-aliased': ['L1'], 'capture-replay-by-id': ['L2'], 'projection-appends': ['L3'],
   'capture-unvalidated': ['L4'], 'snapshot-overwrites': ['L6'], 'snapshot-after-feedback': ['L6'], 'rule-unpinned': ['I1'],
-  'projection-rereads-input': ['L7'], 'batch-unvalidated': ['L7'],
+  'projection-rereads-input': ['L7'], 'batch-unvalidated': ['L7'], 'ledger-per-visit': ['L5'], 'history-full-silent': ['L8'],
 };
