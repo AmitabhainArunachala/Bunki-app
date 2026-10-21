@@ -20787,7 +20787,8 @@ function kanjiQuestStructural(journey) {
 /** the reader occurrence a 職業 word page came from: its passage, the token's index (the reader node's from.index) and that token's
  * sentence. A page opened without one (search, lists, an imported source in v0) offers no quest */
 function kanjiQuestSeed(node, module) {
-  if (node?.t !== 'word' || node.id !== '職業') return null;
+  // an imported source's context beside a passage index is conflicting provenance (W5 2000): no quest, never a passage seed
+  if (node?.t !== 'word' || node.id !== '職業' || node.sourceContext != null) return null;
   const sentence = teacherSentence(node);
   if (!sentence || sentence.p.tokens[sentence.index]?.b !== node.id) return null;
   return module.questSeed({ source: 'passage', passage: sentence.p.id, token: sentence.index, sentence: [sentence.start, sentence.end],
@@ -20849,7 +20850,9 @@ function kanjiQuestSettle(visit) {
   visit.questSettle = settle;
   const owned = kanjiQuestOwner(journey);
   return journey.quest.module.settleRun(journey.lifecycle, journey.quest.state, run, { course, owned }).then((results) => {
-    if (!results.length) { settle.lines = owned() ? ['Q-22'] : ['K-26']; return; }
+    // a binding made under another activation, journey or generation wrote nothing here, and the quest's state now is unknown
+    // to this page (W12 2000 L3): Q-21, never "still in progress"
+    if (!results.length) { settle.lines = owned() ? ['Q-21'] : ['K-26']; return; }
     for (const { goalId, complete, retire } of results) {
       const done = ['published', 'already-completed'].includes(complete.kind);
       if (done && visit.quest?.goalId === goalId) visit.quest.done = true;
@@ -20947,7 +20950,11 @@ function kanjiQuestLessonRows(section) {
     if (goal.status !== 'unfinished') continue;
     const row = el('button', 'entry-row');
     row.type = 'button'; row.id = `kanji-quest-lessons-${goal.id}`;
-    row.append(el('span', 'row-main', kanjiQuestLine('Q-08')), el('span', 'row-go', kanjiQuestLine('Q-08b')));
+    row.append(el('span', 'row-main', kanjiQuestLine('Q-08')));
+    // W12 2000 L2: the quest's own sentence tells several rows apart (no new copy)
+    const sentence = kanjiQuestSentence(goal.seed);
+    if (sentence) row.append(el('span', 'lesson-score', sentence));
+    row.append(el('span', 'row-go', kanjiQuestLine('Q-08b')));
     row.addEventListener('click', () => {
       if (!recordReady(recordEpoch)) return;
       // Lessons adds no slip help (§7 step 7); a visit of the unit keeps its run, draft and help, only a missing one is opened anew
@@ -21288,14 +21295,17 @@ function renderKanjiCourse(main) {
     if (result.attemptId && ['correct', 'wrong'].includes(result.status)) {
       const outcome = visit.hookOutcomes?.[result.attemptId];
       const inQuest = typeof kanjiQuestBound === 'function' && kanjiQuestBound(visit);
+      const hookless = typeof window.__KAIRO_HOOKS__?.report !== 'function' || !(typeof kanjiReviewCaller === 'undefined' ? null : kanjiReviewCaller);
       if (result.assisted) main.append(el('p', 'fine', tx('この回答にはヘルプを使いました。', 'Help was used for this answer.')));
       if (outcome) {
         const status = el('p', 'fine', outcome.pending
           ? tx('復習への記録を確認中…', 'Checking the review write…') : kanjiCourseHookLine(outcome));
         status.id = 'kanji-course-review-status'; status.setAttribute('role', 'status'); main.append(status);
-      } else if (!inQuest && (typeof window.__KAIRO_HOOKS__?.report !== 'function' || !(typeof kanjiReviewCaller === 'undefined' ? null : kanjiReviewCaller))) {
+      } else if (!inQuest && hookless) {
         main.append(el('p', 'fine', kanjiCourseHookLine({ reason: 'hook-unavailable' })));
       } else {
+        // W12 2000 L1: with no hook, K-20 stays beside Q-16, so the self-check never reads as if it could record
+        if (hookless) main.append(el('p', 'fine', kanjiCourseHookLine({ reason: 'hook-unavailable' })));
         main.append(el('p', 'fine', inQuest ? tx(...M4_COPY['Q-16']) : tx('答えを確認しましたか。既存の復習カードに記録する場合だけ選んでください。',
           'Check your answer. Choose below only to record this attempt on an existing review card.')));
         if (result.status === 'correct') main.append(button('kanji-course-self-knew', '答えられた・復習に記録', 'I knew it — record for review',
