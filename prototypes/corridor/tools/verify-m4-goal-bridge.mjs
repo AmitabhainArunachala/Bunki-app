@@ -19,7 +19,7 @@ const goalData = () => ({ seed: structuredClone(SEED), inspected: false, practic
 
 /** the record port, with two test seams: `gate.close` names the action whose next commit meets a closed host gate (the host
  * refuses it, journey-gate-closed); `lie.next` rewrites the next 'work' commit's result after the commit itself happened */
-function lifecycleOn(m, app, { time, epoch }) {
+export function lifecycleOn(m, app, { time, epoch }) {
   let serial = 0;
   const device = memoryDevice(), lie = { next: null }, gate = { close: null };
   const real = m.lifecycle.recordPort({ app, binding: () => ({ epoch: epoch.v }), nextId: () => `journey-${++serial}-${crypto.randomUUID()}` });
@@ -33,7 +33,7 @@ function lifecycleOn(m, app, { time, epoch }) {
     validateCapture: (entries) => entries });
   return { lc, device, lie, gate };
 }
-async function activeDay(m, controller = memoryController()) {
+export async function activeDay(m, controller = memoryController()) {
   const app = await openApp(m, controller), time = { now: Date.parse(ON) }, epoch = { v: 1 };
   const { lc, device, lie, gate } = lifecycleOn(m, app, { time, epoch });
   await lc.ready; time.now = corePort().endOfDay(new Date(time.now)) + 60_000; await lc.tick();
@@ -48,10 +48,10 @@ async function withGoal(m) {
   return { ...day, goal: day.lc.inspect().root.goals.at(-1) };
 }
 /** the next commit of `action` meets a closed host gate: the host refuses it and the port reports not-published */
-const closeGateDuring = async (day, action, start) => { day.gate.close = action; try { return await start(); } finally { day.gate.close = null; } };
-const journeyRows = (c) => c.rows(COMMANDS).filter((r) => r.type === 'journey.lifecycle/1');
+export const closeGateDuring = async (day, action, start) => { day.gate.close = action; try { return await start(); } finally { day.gate.close = null; } };
+export const journeyRows = (c) => c.rows(COMMANDS).filter((r) => r.type === 'journey.lifecycle/1');
 /** a refusal where success is expected is a failed assertion, so a mutant that throws is counted as killed, not as a crash */
-const must = async (start, what) => { try { return await start(); } catch (error) { return assert.fail(`${what} was refused: ${error.message}`); } };
+export const must = async (start, what) => { try { return await start(); } catch (error) { return assert.fail(`${what} was refused: ${error.message}`); } };
 
 export const CASES = [];
 const test = (id, name, fn) => CASES.push({ id, name, fn });
