@@ -23,7 +23,8 @@ const source = read('../corridor.js');
 const courseSource = read('../kanji-course.js');
 const ast = ts.createSourceFile('corridor.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
 const names = ['kanjiCourseNodeUnit', 'kanjiCourseApplyHelp', 'kanjiCourseRememberHelp', 'kanjiCourseTeachingHelp', 'kanjiCourseReferenceHelp', 'kanjiCourseHookLine', 'reportKanjiCourseAttempt', 'kanjiCourseEvidencePatch', 'kanjiCourseReturnFrame', 'kanjiCourseEntryNode',
-  'openKanjiCourseUnit', 'renderKanjiCourseDoor', 'renderKanjiCourseMenu', 'renderKanjiCourse',
+  'openKanjiCourseUnit', 'kanjiCourseRunKind', 'kanjiRoomEntry', 'kanjiEnterCourseDoor',
+  'renderKanjiCourseDoor', 'renderKanjiCourseMenu', 'renderKanjiCourse',
   // HOOKS r8: the course visit's retained ledger, its PREPARE_REVIEW and the one review caller
   'HELP_RELEVANCE_POLICY', 'helpRelevanceRule', 'kanjiReviewCaller', 'KANJI_REVIEW_OWNER', 'kanjiReviewRetained', 'adoptHelpRelevance',
   'KANJI_LEDGER_LIMITS', 'kanjiDeepFreeze', 'kanjiDataProperty', 'kanjiPlainData', 'kanjiPlainList', 'kanjiCourseRowValid',
