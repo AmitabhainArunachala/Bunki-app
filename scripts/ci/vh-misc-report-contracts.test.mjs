@@ -240,7 +240,7 @@ test('attempt, site, source and engine identity are bound wherever the producer 
   assert.equal(validateMiscReport('skip-standalone', report, context).observedCases.length, 10);
 });
 
-test('reference registry binds actual bundled data and rejects the pre-E3 sidecar pin', () => {
+test('reference registry binds actual bundled data and rejects stale sidecar pins', () => {
   const { report, context } = fixture('reference-browser');
   for (const [path, expected] of Object.entries(REFERENCE_DATA_PINS)) {
     const bytes = readFileSync(new URL(`../../prototypes/corridor/${path}`, import.meta.url));
@@ -252,6 +252,7 @@ test('reference registry binds actual bundled data and rejects the pre-E3 sideca
   for (const oldPin of [
     'd3ad5ee711abb3122d263c4e0d8772dc6f8ce2cb671a9865ac5d03e512138e3d',
     '9c81f60aa68d788ad97714dfc0413c5649898b479e55a5686d60c33b610be0e4',
+    'befca0f9e83642cf835fe8b39f9aa020b8a04e68f8139fa712bad3c395b7bc94',
   ]) {
     context.runtimeFiles['data/share_alike/reference-extra.json'] = oldPin;
     const rejected = validateMiscReport('reference-browser', report, context);

@@ -26,8 +26,8 @@ const source = verifier.slice(start, end);
 const readAs = (form, reading) => index.filter(row => [row[1], ...row[4], ...row[5]].includes(form)
   && row[5].some((kana, k) => k2h(kana) === k2h(reading) && (kana === form || (row[4].includes(form)
     && (row[11][k] === 0 || (Array.isArray(row[11][k]) && row[11][k].includes(row[4].indexOf(form))))))));
-const resolver = (lookup = detailOf) => new Function('readAs', 'detailOf', 'core', 'legacyWords', 'readingSenseProofs', 'k2h',
-  `${source}\nreturn meaningEntry;`)(readAs, lookup, core, legacy, readingSenseProofs, k2h);
+const resolver = (lookup = detailOf, indexLookup = readAs) => new Function('readAs', 'detailOf', 'core', 'legacyWords', 'readingSenseProofs', 'k2h',
+  `${source}\nreturn meaningEntry;`)(indexLookup, lookup, core, legacy, readingSenseProofs, k2h);
 const meaningEntry = resolver();
 
 // Each native representative has its own positive, negative, and restored
@@ -129,12 +129,21 @@ test('sense applicability keeps entry, reading, written-form and exact-gloss res
   assert.deepEqual(readingSenseProofs(row, detail, 'のぼる', 'のぼる', 'invented meaning'), []);
   assert(readingSenseProofs(row, detail, ...args).length);
 });
-test('the two data gaps remain unproved; quick prose POS cannot create dictionary evidence', () => {
-  for (const [form, reading, gloss] of [['仕上がる', 'しあがる', 'to be finished'], ['違える', 'ちがえる', 'to change']]) {
-    assert.equal(readAs(form, reading).length, 0);
+test('the two attested additions prove their exact sense; removing source evidence stays unproved', () => {
+  for (const [form, reading, gloss, seq, pos] of [
+    ['仕上がる', 'しあがる', 'to be finished', '1305130', ['v5r', 'vi']],
+    ['違える', 'ちがえる', 'to change', '1158890', ['v1', 'vt']],
+  ]) {
+    assert.deepEqual(readAs(form, reading).map(row => String(row[0])), [seq]);
     const entry = meaningEntry(form, reading, gloss);
-    assert(entry); assert.deepEqual(entry.proofs, []);
-    const verdict = classEvidence('動詞', { ...entry, p: 'verb', pos: ['v1'] });
-    assert(verdict.unknown && !verdict.proved);
+    assert.deepEqual(entry.proofs, [{ seq, form, reading, senseIndex: 0, gloss, pos }]);
+    assert(classEvidence('動詞', entry).proved);
+    for (const missing of [resolver(detailOf, () => []), resolver(() => null)]) {
+      const unproved = missing(form, reading, gloss);
+      assert(unproved); assert.deepEqual(unproved.proofs, []);
+      const verdict = classEvidence('動詞', { ...unproved, p: 'verb', pos: ['v1'] });
+      assert(verdict.unknown && !verdict.proved, 'quick prose POS cannot replace missing index or detail');
+    }
+    assert(classEvidence('動詞', meaningEntry(form, reading, gloss)).proved);
   }
 });

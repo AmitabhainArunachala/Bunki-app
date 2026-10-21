@@ -69,7 +69,7 @@ export const REFERENCE_DATA_PINS = Object.freeze({
   // was the pre-FIXR bytes, 8a5c953e…)
   // R2 E3: adds full Jōyō on/kun projections; E2 words audit and KANJI-NEXT facts remain exact.
   'data/share_alike/reference-extra.json':
-    'befca0f9e83642cf835fe8b39f9aa020b8a04e68f8139fa712bad3c395b7bc94',
+    'fdeb4a2c9d04248e7b6c6147b272555386a6e2e850ae4448f59b93c7797eedf8',
 });
 export const SKIP_BROWSER_NAMES = Object.freeze([
   'dictionary tool includes its label in the accessible name',

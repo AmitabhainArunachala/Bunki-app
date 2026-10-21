@@ -58,12 +58,12 @@ const EXPECTED = Object.freeze({
   // 2026-10-18: なり 1536290, the classical copula; つ 2220330, the general counter of 一つ) + 7 expressions the shelf
   // writes across words (R3, Grok 2029: につき 1009850, 床に就く 1854590, 相違ない 2027060, なくちゃ 2098160, ともなく
   // 2137120, 性暴力 2456730, 何度となく 2840609). A content slice that adds article entries moves these two counts
-  // together, named in its commit
-  selectedEntries: 70_179,
+  // together, named in its commit. Reading-truth 2026-10-22 adds 1305130 仕上がる and 1158890 違える.
+  selectedEntries: 70_181,
   selectedCommon: 22_626,
   selectedKanaOnly: 36_683,
   selectedTop151: 10_687,
-  selectedArticleEntries: 183,
+  selectedArticleEntries: 185,
 });
 
 const SHARD_COUNT = 16;

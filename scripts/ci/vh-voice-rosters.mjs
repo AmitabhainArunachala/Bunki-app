@@ -1664,7 +1664,7 @@ export const SENSE_CASE_IDS = Object.freeze([
 // FULL-R1 E1: recomputed after the 31 reader-furigana bodies below (何を/何が → なに; wikinews:12024 放出 → はなてん, 間 → かん); every other entry unchanged
 // R2 E2: two article pins refreshed; seven local readings and four 何 lexicon provenance tags.
 export const SENSE_DATA_INVENTORY_SHA256 =
-  'c42f33af958fcc06bd572d0371668c5d5ffa1cfa1c0dab2304f1c5b9eb3914c6';
+  'd63c3a32f1cb71b0a84b9f79cf7495cbdff52b94de7bfec80085841deb470ba7';
 export const SPEAK_CHECK_NAMES = Object.freeze({
   S1: [
     'the Learn room has one Speak door, a study-door row',
@@ -6344,70 +6344,70 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   ],
   [
     'data/share_alike/dict-v2/00.json',
-    'e5b86ef5ff46b01061d659482a77cef588ad19884db583ffbae5f304f6f84966',
+    '40bd35fc3605eed61db54b73e56e7fb9ca1ef670ba5d275acafc38d29a820685',
   ],
   [
     'data/share_alike/dict-v2/01.json',
-    '0b699cb7cd59e7be4e506a73d69d407e3dd15078b0a7eef7ff5fe27d95309194',
+    'e93dc8a5c97011032517db3a72e70975f632701dfd33971cb950d78e62ea03a6',
   ],
   [
     'data/share_alike/dict-v2/02.json',
-    'e0c4c9462f5a18e564b8cb9f5c7014bb98dd42efe899c6f4b68fe75b4d544518',
+    '9ac1638c2cb03d339ab51f8d8f736643e41e5a34a87e2ad3ce07b084e36c3d78',
   ],
   [
     'data/share_alike/dict-v2/03.json',
-    '41608704b6b28f914878fa5d6e360283848a9348166909ef4d2b413c7faea726',
+    '8a9ad35425e81e993aab8cf7ef45ab80f2c16fa98ced5f78c5284becad17b82c',
   ],
   [
     'data/share_alike/dict-v2/04.json',
-    'c564455a0c2d301201cab48042bf33d34bdbc9e9f4dd37c5e79f30de736c9ceb',
+    'f65ca5c79e78f977a8d7ea2d9646a463e975013dac8b8b859d85a94886f51e9b',
   ],
   [
     'data/share_alike/dict-v2/05.json',
-    '48488e40a4268eb83708f74d95ef8a1df0882f41c792b09819a5965dbff8046c',
+    '6dec1f4c2fb2338093d7bb9d753ec8b00bb55fc62ab7fa39e600a812cca3aed5',
   ],
   [
     'data/share_alike/dict-v2/06.json',
-    'aa81e54eb617a8c7aa6fa9571ed6138e8efea712781a85d37d956a0b79fd523c',
+    '1dd71f8cb516c9d70afcb51c2242967c59d44bbd9b65b3785a34faf97e0de1bd',
   ],
   [
     'data/share_alike/dict-v2/07.json',
-    '6c4c87329444ff5268163f58fece63cbc90d2282a85858683e24f16ba7c39e87',
+    '18f73ea54d406982efb862d10f5a480e069e097e085e8e8363cde57888eed033',
   ],
   [
     'data/share_alike/dict-v2/08.json',
-    '5b2b12b1f911b860356f60548b13e626dcd6d133d684f23b8b31757129d346bf',
+    'd13729245a01e56a14351a81fc534e109759657fb0ecdbd474490ee95f2595e9',
   ],
   [
     'data/share_alike/dict-v2/09.json',
-    '9137ced2e0ed93ea9af1185b8b3a3b9870f27cb9e0a76f2b1d4df8ac52c29440',
+    '33ef6440ed4fccfcbe699e4649fe7b70a176b182e59ce727c3176e125b0fc10b',
   ],
   [
     'data/share_alike/dict-v2/0a.json',
-    '9c8571872e46b6de70639a50a82992d894bed95cac89033c058ef3590a3cb91f',
+    '373d58f021180ce13ee15224cd79000c2e8406518fc05e7fdaddf7c15890308d',
   ],
   [
     'data/share_alike/dict-v2/0b.json',
-    '7c0890fc51363274b6ba742d7d7856fc8dd5c5162ad51482086b0d2642983308',
+    'd83924999832a2a8f08dfa60756b6bab1eb0307070982eb1d281988195c5a287',
   ],
   [
     'data/share_alike/dict-v2/0c.json',
-    '0b6ccea9ae9fec8e93f87d17c794c133c5a74ba0cd2761a1b98b7f34eed1b8cf',
+    '0c2744b3fea0cad6eb013278f9dd9b16643d73939b9897e9cd9a8041a5653a82',
   ],
   [
     'data/share_alike/dict-v2/0d.json',
-    '05399a3563e69e7ab75b78d81bcb12790f7482cc3ce51eb9fc39d59e5e7dbfc9',
+    'c9124f3de90fc67f7c24d3ef4941896d3447f81d9f111607bc90f852e5365518',
   ],
   [
     'data/share_alike/dict-v2/0e.json',
-    '3f09712415c0fbc3cda17577375959b9770cc0d478b60f8244a2620401aa96ca',
+    '4aba95e3b5185271ec61194e38ae67baed95e40104f2f5a8d96a748f735477b3',
   ],
   [
     'data/share_alike/dict-v2/0f.json',
-    '95b5bc19d50af0ce85388d451279c0cfd6f4bf5219e149accae7a994970a3e09',
+    '4949be91842f41d4ee3026d76c99b66dd3cd34054844bcb912dbda218c8f39fa',
   ],
   [
     'data/share_alike/dict-v2/index.json',
-    '2f8c35efd206f0772ecf516a8773398cccaf062b256c43933da06c53930bdfb5',
+    'd20bb1fa3f968bd2f5e4e84c2ed0221fbd0d2d655f17dbc23713152995619b84',
   ],
 ]);
