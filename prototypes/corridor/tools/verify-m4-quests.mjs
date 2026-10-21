@@ -216,6 +216,8 @@ test('U2', 'ON: adoption keeps one quest memory for this owner; the 職業 word 
   assert.equal(noOccurrence.children.some((e) => e.id === 'kanji-quest-door'), false, 'a page opened without an occurrence offers none');
   const other = new Element('section'); p.context.renderKanjiCourseDoor(other, { t: 'word', id: '知識', reading: 'ちしき', from: { passage: PASSAGE.id, index: 30 } });
   assert.equal(other.children.some((e) => e.id === 'kanji-quest-door'), false);
+  const both = new Element('section'); p.context.renderKanjiCourseDoor(both, { ...WORD(), sourceContext: { sourceId: 'imported-1', sourceDigest: 'd' } });
+  assert.equal(both.children.some((e) => e.id === 'kanji-quest-door'), false, 'conflicting provenance offers none (W5 2000)');
   assert.equal(shape(p.lessons()).some((row) => row.includes('kanji-quest-lessons')), false, 'no Lessons row with no quest');
 });
 
@@ -243,7 +245,7 @@ test('U4', 'Q-05 published: one goal with the exact occurrence seed; the quest p
   assert.equal(p.find('kanji-course-leave'), null, 'never "Back to course list" on a quest stage');
   assert.equal(p.word().children.at(-1).text, p.copy('Q-01r'));
   const rows = all(p.lessons()).filter((e) => e.id.startsWith('kanji-quest-lessons-'));
-  assert.deepEqual(rows.map((r) => [r.id, r.textContent]), [[`kanji-quest-lessons-${goal.id}`, p.copy('Q-08') + p.copy('Q-08b')]]);
+  assert.deepEqual(rows.map((r) => [r.id, r.textContent]), [[`kanji-quest-lessons-${goal.id}`, p.copy('Q-08') + sentenceAt(26).quote + p.copy('Q-08b')]]);
 });
 
 test('U5', 'fresh-run bind (W2 1928): a Reading run started from the quest binds it at creation; a run started before the goal never binds, shows Q-19 + R-11, resumes as it was and completes nothing', async (m) => {
@@ -271,6 +273,7 @@ test('U6', 'inside a quest Q-16 replaces K-03 and the self-check is offered with
   await created(p); intoReading(p);
   await answer(p, 'wrong');
   assert.ok(p.has('Q-16'));
+  assert.ok(p.text().includes('Review recording from this course is unavailable in this version.'), 'K-20 beside Q-16 before the choice (W12 L1)');
   assert.equal(p.text().includes('Check your answer. Choose below only'), false, 'no K-03');
   assert.equal(p.find('kanji-course-self-knew'), null); assert.ok(p.find('kanji-course-self-missed'));
   p.click('kanji-course-self-missed'); await flush();
@@ -468,6 +471,20 @@ test('U17', 'with a review hook the quest settles beside it: the last self-check
   assert.ok(p.has('Q-12')); assert.equal(goals(p).length, 0);
 });
 
+test('U18', 'a binding made under another activation settles nothing: Q-21, never Q-22 or Q-12, and the quest stays as it was (W12 2000 L3)', async (m) => {
+  const p = await onPage(m);
+  await created(p); intoReading(p);
+  await prompt(p, 'right', 'knew'); await prompt(p, 'wrong', 'missed'); await answer(p, 'right');
+  const entry = p.state().sessions.get(p.S.kanjiCourse.run.sessionId);
+  entry.binding.boot = Object.freeze({});
+  const rows = journeyRows(p.day.c).length;
+  p.click('kanji-course-self-knew'); await flush();
+  p.click('kanji-course-next'); await flush();
+  assert.ok(p.has('Q-21')); assert.equal(p.has('Q-22') || p.has('Q-12'), false);
+  assert.equal(journeyRows(p.day.c).length, rows, 'nothing written');
+  assert.equal(goals(p)[0].status, 'unfinished');
+});
+
 /** each control mutates corridor.js (or m4-quest.mjs) and names the case that must fail */
 export const MUTANTS = {
   'no-bind-at-start': ['U5', [["    if (typeof kanjiQuestRunStarted === 'function') kanjiQuestRunStarted(visit);\n", '']]],
@@ -476,7 +493,7 @@ export const MUTANTS = {
     ["  const toRoom = () => { quest.view = 'room';", "  const toRoom = () => { if (visit.run) kanjiQuestRunStarted(visit); quest.view = 'room';"]]],
   'pre-goal-run-counts': ['U5', [["if (occupying && !(occupying === 'reading' && bound)) {", "if (occupying && occupying !== 'reading') {"]]],
   'k03-in-quest': ['U6', [["inQuest ? tx(...M4_COPY['Q-16']) : tx(", "false ? tx(...M4_COPY['Q-16']) : tx("]]],
-  'no-self-check-without-hook': ['U6', [["} else if (!inQuest && (typeof window.__KAIRO_HOOKS__", "} else if ((typeof window.__KAIRO_HOOKS__"]]],
+  'no-self-check-without-hook': ['U6', [["} else if (!inQuest && hookless) {", "} else if (hookless) {"]]],
   'no-settle-without-hook': ['U7', [["  visit.hookOutcomes[attemptId] = { write: false, reason: 'hook-unavailable' };\n  kanjiQuestSettle(visit);\n", "  visit.hookOutcomes[attemptId] = { write: false, reason: 'hook-unavailable' };\n"]]],
   'done-while-pending': ['U7', [["for (const id of settle.pending ? [] : settle.lines) line(id);", "for (const id of settle.pending ? ['Q-12'] : settle.lines) line(id);"]]],
   'no-settle-with-hook': ['U17', [["  if (typeof kanjiQuestSettle === 'function') kanjiQuestSettle(visit);\n", '']]],
@@ -494,6 +511,9 @@ export const MUTANTS = {
   'quests-when-off': ['U1', [["  if (JOURNEY_WRITES && typeof kanjiQuestAdopt === 'function') await kanjiQuestAdopt(journey);", "  if (typeof kanjiQuestAdopt === 'function') await kanjiQuestAdopt(journey);"]]],
   'restart-every-render': ['U14', [["journey.quest.restarted = false; lines(['Q-15']);", "lines(['Q-15']);"]]],
   'lessons-show-finished': ['U15', [["    if (goal.status !== 'unfinished') continue;\n    const row = el('button', 'entry-row');", "    const row = el('button', 'entry-row');"]]],
+  'stale-binding-in-progress': ['U18', [["if (!results.length) { settle.lines = owned() ? ['Q-21'] : ['K-26']; return; }", "if (!results.length) { settle.lines = owned() ? ['Q-22'] : ['K-26']; return; }"]]],
+  'k20-hidden-in-quest': ['U6', [["        if (hookless) main.append(el('p', 'fine', kanjiCourseHookLine({ reason: 'hook-unavailable' })));\n", '']]],
+  'conflicting-provenance': ['U2', [["  if (node?.t !== 'word' || node.id !== '職業' || node.sourceContext != null) return null;", "  if (node?.t !== 'word' || node.id !== '職業') return null;"]]],
   'structural-ignored': ['U16', [["  return !view.root || KANJI_QUEST_STRUCTURAL.includes(view.phase);", '  return !view.root;']]],
   'adapter-clear-unfinished': ['U15', [], [["  if (!goal || goal.status !== 'completed') return { kind: 'absent' };\n  if (!owned()) return { kind: 'owner-changed' };\n  state.recovered.add(goalId);",
     "  if (!goal) return { kind: 'absent' };\n  if (!owned()) return { kind: 'owner-changed' };\n  state.recovered.add(goalId);"]]],
