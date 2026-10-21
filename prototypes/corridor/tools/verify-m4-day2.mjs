@@ -36,7 +36,7 @@ const NAMES = [...layer.CORRIDOR_NAMES, ...layer.JOURNEY_NAMES, 'kanjiCourseRefe
   'renderKanjiRoomChooser', 'renderKanjiCourseDoor', 'renderKanjiCourseMenu', 'renderKanjiCourse', 'kanjiCourseNodeUnit',
   'kanjiCourseReturnFrame', 'kanjiCourseEntryNode',
   'kanjiQuestModule', 'KANJI_QUEST_STRUCTURAL', 'KANJI_QUEST_FAILED', 'kanjiQuestAdopt', 'kanjiQuestOwner', 'kanjiQuestFor',
-  'kanjiQuestStructural', 'kanjiQuestSeed', 'kanjiQuestQuote', 'kanjiQuestLoading', 'kanjiQuestStale', 'kanjiQuestLine', 'kanjiQuestLines',
+  'kanjiQuestStructural', 'kanjiQuestSeed', 'kanjiQuestSentences', 'kanjiQuestQuote', 'kanjiQuestLoading', 'kanjiQuestStale', 'kanjiQuestLine', 'kanjiQuestLines',
   'kanjiQuestBinding', 'kanjiQuestBound', 'kanjiQuestWordsDone', 'kanjiQuestRunStarted', 'kanjiQuestSettle', 'kanjiQuestSelfCheck',
   'kanjiQuestRedraw', 'kanjiQuestAct', 'kanjiQuestCreate', 'kanjiQuestEnd', 'kanjiQuestClear', 'kanjiQuestDoor', 'kanjiQuestOpen',
   'kanjiQuestLessonRows', 'kanjiQuestStage', 'kanjiQuestLeave', 'kanjiQuestPool', 'kanjiQuestRender', 'kanjiQuestSummary'];
@@ -55,9 +55,15 @@ class Element {
 }
 const all = (node) => [node, ...node.children.filter((c) => c instanceof Element).flatMap(all)];
 
-/** the fixture occurrence (§7): 職業 at token 26 of bunki-essay-n1-city, sentence [24,41) */
-const PASSAGE = { id: 'bunki-essay-n1-city', tokens: Array.from({ length: 60 }, (_, i) => (i === 26 ? { s: '職業', b: '職業' } : { s: 'の', b: 'の' })) };
-const sentenceAt = (index) => ({ p: PASSAGE, index, start: 24, end: 41, quote: PASSAGE.tokens.slice(24, 41).map((t) => t.s).join('') });
+/** the fixture occurrence (§7): 職業 at token 26 of bunki-essay-n1-city, in a passage of 。-ended sentences (this one [24,42)) */
+const PASSAGE = { id: 'bunki-essay-n1-city', tokens: [[...Array(23).fill('の'), '。'], ['の', 'の', '職業', ...Array(14).fill('の'), '。'],
+  [...Array(17).fill('の'), '。']].flat().map((s) => ({ s, b: s })) };
+/** the reader's sentence for a token, as takenContext gives it in this model: from after the previous 。 through its own 。 */
+const sentenceAt = (index) => {
+  let start = index; while (start > 0 && PASSAGE.tokens[start - 1].s !== '。') start -= 1;
+  let end = index; while (end < PASSAGE.tokens.length - 1 && PASSAGE.tokens[end].s !== '。') end += 1;
+  return { p: PASSAGE, index, start, end: end + 1, quote: PASSAGE.tokens.slice(start, end + 1).map((t) => t.s).join('') };
+};
 const WORD = Object.freeze({ t: 'word', id: '職業', reading: 'しょくぎょう', from: { passage: PASSAGE.id, index: 26 }, ctxScope: 'sent' });
 const dict = { 職業: { r: 'しょくぎょう', m: ['occupation'] }, 知識: { r: 'ちしき', m: ['knowledge'] }, 組織: { r: 'そしき', m: ['organization'] },
   水道: { r: 'すいどう', m: ['water supply'] } };
@@ -109,7 +115,8 @@ async function page(env, modules, { controller, storage, time }) {
     go: (node) => ctx.kanjiCourseReferenceHelp(ctx.S.kanjiCourse, node),
     returnFromNavigation: () => false,
     showReaderToast: (message) => toasts.push(message),
-    teacherSentence: (node) => (node?.from?.passage === PASSAGE.id && node.from.index === 26 ? sentenceAt(26) : null),
+    teacherSentence: (node) => (node?.from?.passage === PASSAGE.id && Number.isInteger(node.from.index) && node.from.index >= 0 &&
+      node.from.index < PASSAGE.tokens.length ? sentenceAt(node.from.index) : null),
     ensureArticle: async () => {},
     // the reader's course door on the word page (C:20590–20612): a new visit, and the reader start is dictionary help (K-25)
     openKanjiCourseUnit: (node) => {

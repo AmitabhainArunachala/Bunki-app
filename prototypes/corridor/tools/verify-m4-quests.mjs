@@ -41,7 +41,7 @@ const BASE = ['ROOM_NAMES', 'roomName', 'M4_COPY', 'kanjiCourseRunKind', 'kanjiR
   'kanjiCourseAct', 'JOURNEY_WRITES', 'kanjiJourney', 'kanjiJourneyModule', 'kanjiJourneyDevice', 'adoptJourney', 'kanjiJourneyRun',
   'kanjiJourneyFor'];
 const QUEST = ['kanjiQuestModule', 'KANJI_QUEST_STRUCTURAL', 'KANJI_QUEST_FAILED', 'kanjiQuestAdopt', 'kanjiQuestOwner', 'kanjiQuestFor',
-  'kanjiQuestStructural', 'kanjiQuestSeed', 'kanjiQuestQuote', 'kanjiQuestLoading', 'kanjiQuestStale', 'kanjiQuestLine', 'kanjiQuestLines', 'kanjiQuestBinding',
+  'kanjiQuestStructural', 'kanjiQuestSeed', 'kanjiQuestSentences', 'kanjiQuestQuote', 'kanjiQuestLoading', 'kanjiQuestStale', 'kanjiQuestLine', 'kanjiQuestLines', 'kanjiQuestBinding',
   'kanjiQuestBound', 'kanjiQuestWordsDone', 'kanjiQuestRunStarted', 'kanjiQuestSettle', 'kanjiQuestSelfCheck', 'kanjiQuestRedraw',
   'kanjiQuestAct', 'kanjiQuestCreate', 'kanjiQuestEnd', 'kanjiQuestClear', 'kanjiQuestDoor', 'kanjiQuestOpen', 'kanjiQuestLessonRows',
   'kanjiQuestStage', 'kanjiQuestLeave', 'kanjiQuestPool', 'kanjiQuestRender', 'kanjiQuestSummary'];
@@ -70,20 +70,27 @@ const SENTENCES = () => [[...Array(23).fill('の'), '。'], ['の', 'の', '職�
   ['の', 'の', ...Array(10).fill('職業'), ...Array(5).fill('の'), '。'], [...Array(13).fill('の'), '。']];
 const PASSAGE = { id: 'bunki-essay-n1-city', tokens: SENTENCES().flat().map(T) };
 const ORIGINAL = PASSAGE.tokens;
-/** the reader's sentence for a token, as takenContext gives it: from the token after the previous 。 to this sentence's 。 */
+/** the reader's sentences, as takenContext cuts them in this model: up to a 。 and any closing 」 right after it */
+const spans = (p) => {
+  const out = [];
+  for (let i = 0; i < p.tokens.length;) {
+    let end = i;
+    while (end < p.tokens.length && p.tokens[end].s !== '。') end += 1;
+    end = Math.min(end + 1, p.tokens.length);
+    while (end < p.tokens.length && p.tokens[end].s === '」') end += 1;
+    out.push([i, end]); i = end;
+  }
+  return out;
+};
 const sentenceAt = (index, p = PASSAGE) => {
-  let start = index; while (start > 0 && p.tokens[start - 1].s !== '。') start -= 1;
-  let end = index; while (end < p.tokens.length && p.tokens[end].s !== '。') end += 1;
-  end = Math.min(end + 1, p.tokens.length);
+  const [start, end] = spans(p).find(([a, b]) => index >= a && index < b);
   return { p, index, start, end, quote: p.tokens.slice(start, end).map((t) => t.s).join('') };
 };
 const WORD = (index = 26) => ({ t: 'word', id: '職業', reading: 'しょくぎょう', from: { passage: PASSAGE.id, index }, ctxScope: 'sent' });
 /** the occurrence as content (lead 2023): the sentence text, which copy of it in the passage, and the word's offset in it */
 const occurrence = (index = 26) => {
   const s = sentenceAt(index), text = (from, to) => PASSAGE.tokens.slice(from, to).map((t) => t.s).join('');
-  const full = text(0, PASSAGE.tokens.length), at = text(0, s.start).length;
-  let nth = 0;
-  for (let i = full.indexOf(s.quote); i !== -1 && i < at; i = full.indexOf(s.quote, i + 1)) nth += 1;
+  const nth = spans(PASSAGE).filter(([a, b]) => b <= s.start && text(a, b) === s.quote).length;
   return { source: 'passage', passage: PASSAGE.id, quote: s.quote, nth, offset: text(s.start, index).length, surface: '職業', word: '職業' };
 };
 
@@ -609,6 +616,54 @@ test('U24', 'a late load never resurrects a page it left (W5 2030): the archive 
   }
 });
 
+test('U25', 'the stored sentence must be a whole sentence and the selected word must still be there (W2 2037 S3B-2c): the old sentence grown by a prefix or a suffix, or a different word at the selection, refuses with Q-27; the same text with the selected word re-analysed (another base, or split) refuses with Q-27u; none binds', async (m) => {
+  const variants = {
+    prefix: () => [...ORIGINAL.slice(0, 23), ...ORIGINAL.slice(24)],
+    suffix: () => [...ORIGINAL.slice(0, 42), T('」'), ...ORIGINAL.slice(42)],
+    'selection-text': () => ORIGINAL.map((t, i) => (i === 26 ? T('職場') : t)),
+    'selection-base': () => ORIGINAL.map((t, i) => (i === 26 ? { s: '職業', b: '職業病' } : t)),
+    'selection-split': () => [...ORIGINAL.slice(0, 26), T('職'), T('業'), ...ORIGINAL.slice(27)],
+  };
+  for (const [name, tokens] of Object.entries(variants)) {
+    const p = await onPage(m);
+    const old = await created(p, 26);
+    PASSAGE.tokens = tokens();
+    try {
+      const sameText = PASSAGE.tokens.map((t) => t.s).join('') === ORIGINAL.map((t) => t.s).join('');
+      p.S.kanjiCourse = null; all(p.lessons()).find((e) => e.id === `kanji-quest-lessons-${old.id}`).click();
+      const line = name.startsWith('selection-') && sameText ? 'Q-27u' : 'Q-27';
+      assert.ok(p.has(line), `${name}: ${line}`); assert.equal(p.find('kanji-quest-reading'), null, `${name}: not resumed`);
+      if (line === 'Q-27u') assert.equal(p.has('Q-27'), false, `${name}: no change is claimed for the same text`);
+    } finally { PASSAGE.tokens = ORIGINAL; }
+  }
+});
+
+test('U26', 'a pending load wakes every current page that joined it (W2 2037 S3B-2d): a new visit joining an earlier page\'s load, and a page joining a load that a Reading start began with no callback, both leave Q-17 when it settles', async (m) => {
+  const archived = (p) => {
+    const later = { ...PASSAGE, id: 'bunki-archive-0009', file: 'archive/0009.json', tokens: ORIGINAL };
+    p.archive.passages = [later];
+    return p.q.createQuest(p.day.lc, p.state(), p.q.questSeed({ ...occurrence(26), passage: later.id })).then((out) => out.goalId);
+  };
+  const open = (p, id) => { p.S.kanjiCourse = null; all(p.lessons()).find((e) => e.id === `kanji-quest-lessons-${id}`).click(); };
+  {
+    const p = await onPage(m), id = await archived(p);
+    open(p, id); assert.ok(p.has('Q-17'));
+    open(p, id); assert.ok(p.has('Q-17'), 'a new visit joins the pending load');
+    await flush();
+    assert.ok(p.find('kanji-quest-reading'), 'the joining visit is woken and resumes');
+  }
+  {
+    const p = await onPage(m);
+    const shelf = await created(p, 60), id = await archived(p);
+    intoReading(p);
+    assert.deepEqual(p.state().sessions.get(p.S.kanjiCourse.run.sessionId)?.binding?.goals.map((g) => g.id), [shelf.id], 'the unverified quest is not bound');
+    open(p, id);
+    assert.ok(p.has('Q-17'), 'the page joins the load the Reading start began');
+    await flush();
+    assert.ok(p.find('kanji-quest-reading'), 'woken, not left on Q-17');
+  }
+});
+
 test('U22', 'identity is content and position, never the token index (lead 2023): unchanged text that the tokenizer splits differently resumes, binds and is matched by its door; a real occurrence shift refuses', async (m) => {
   const p = await onPage(m);
   const old = await created(p, 26);
@@ -682,13 +737,16 @@ export const MUTANTS = {
   'k20-hidden-in-quest': ['U6', [["        if (hookless) main.append(el('p', 'fine', kanjiCourseHookLine({ reason: 'hook-unavailable' })));\n", '']]],
   'conflicting-provenance': ['U2', [["  if (node?.t !== 'word' || node.id !== '職業' || node.sourceContext != null) return null;", "  if (node?.t !== 'word' || node.id !== '職業') return null;"]]],
   'seed-without-content': ['U19', [["  return module.questSeed({ source: 'passage', passage: sentence.p.id, quote: sentence.quote, nth,", "  return module.questSeed({ source: 'passage', passage: sentence.p.id, quote: 'x', nth,"]]],
-  'position-ignored': ['U19', [["    offset: text(sentence.start, sentence.index).length, surface: token.s, word: node.id });", "    offset: 0, surface: token.s, word: node.id });"],
+  'position-ignored': ['U19', [["    offset: sentence.p.tokens.slice(sentence.start, sentence.index).map((t) => t.s).join('').length, surface: token.s, word: node.id });", "    offset: 0, surface: token.s, word: node.id });"],
     ["typeof at.surface !== 'string' || at.quote.slice(at.offset, at.offset + at.surface.length) !== at.surface) return 'unverifiable';", "typeof at.surface !== 'string') return 'unverifiable';"]]],
   'token-in-identity': ['U22', [["  return module.questSeed({ source: 'passage', passage: sentence.p.id, quote: sentence.quote, nth,", "  return module.questSeed({ source: 'passage', passage: sentence.p.id, token: sentence.index, quote: sentence.quote, nth,"]]],
-  'nth-ignored': ['U22', [["  for (let n = 0; n <= at.nth; n += 1) { found = full.indexOf(at.quote, found + 1); if (found === -1) break; }", "  found = full.indexOf(at.quote);"]]],
+  'nth-ignored': ['U22', [["  const sentence = kanjiQuestSentences(p).filter((s) => s.quote === at.quote)[at.nth];", "  const sentence = kanjiQuestSentences(p).filter((s) => s.quote === at.quote)[0];"]]],
+  'substring-match': ['U25', [["  const sentence = kanjiQuestSentences(p).filter((s) => s.quote === at.quote)[at.nth];", "  const sentence = kanjiQuestSentences(p).filter((s) => s.quote.includes(at.quote))[at.nth];"]]],
+  'base-not-revalidated': ['U25', [["    if (offset === at.offset) return p.tokens[index].s === at.surface && p.tokens[index].b === at.word ? false : 'unverifiable';", "    if (offset === at.offset) return p.tokens[index].s === at.surface ? false : 'unverifiable';"]]],
+  'first-waiter-only': ['U26', [["    if (entry.state === 'pending' && redraw) entry.waiters.add(redraw);", "    if (entry.state === 'pending' && redraw && !entry.waiters.size && !entry.asked) entry.waiters.add(redraw);\n    entry.asked = true;"]]],
   'late-load-resurrects': ['U24', [["  const stale = goal ? kanjiQuestStale(goal.seed, redraw) : false;", "  const stale = goal ? kanjiQuestStale(goal.seed, () => { S.view = 'lessons'; render(); }) : false;"]]],
   'archive-absent-early': ['U23', [["  if (!p) return D.archive || window.__CORRIDOR_STANDALONE__ === true || typeof ensureArchiveIndex !== 'function' ? 'unverifiable'", "  if (!p) return true ? 'unverifiable'"]]],
-  'archive-failure-pending': ['U21', [["    return kanjiQuestLoading.get(key) === 'failed' ? 'unverifiable' : null;", "    return null;"]]],
+  'archive-failure-pending': ['U21', [["    return entry.state === 'failed' ? 'unverifiable' : null;", "    return null;"]]],
   'stale-resumes': ['U19', [["  if (stale !== false) {\n    // lead 2005", "  if (false) {\n    // lead 2005"]]],
   'stale-binds': ['U19', [[", { eligible: (goal) => kanjiQuestStale(goal.seed) === false });", ");"]]],
   'unverifiable-says-changed': ['U21', [["lines([{ changed: 'Q-27', unverifiable: 'Q-27u' }[stale] ?? 'Q-17']);", "lines([{ changed: 'Q-27', unverifiable: 'Q-27' }[stale] ?? 'Q-17']);"]]],
