@@ -7,7 +7,8 @@
  * layer's doubles.
  *
  * Cases: I1 the install · R0–R3 grades through the course · W1–W4 W2's 0524 witnesses · X1–X3 W3's 0532 custody
- * controls · K3–K5 the binding · WA/WB W2's 0546 witnesses · L1–L6 W5's 1131 ledger contract, rule present and absent.
+ * controls · K3–K5 the binding · WA/WB W2's 0546 witnesses · L1–L6 W5's 1131 ledger contract, rule present and absent ·
+ * L7 W3's 1200 F1 witnesses.
  * Not proved here: the rendered course in a browser, and continuity across course visits (each visit is its own
  * learning session; W5 1131 point 5).
  */
@@ -486,6 +487,31 @@ export async function r8Cases({ check, layer, program, core, fsrsApi, pin, mods,
     assert.equal(outcome.write, true, 'and it is delivered as first prepared');
     return 'the snapshot is kept once, after the action, without its own feedback; a rule that loads later leaves a prepared record as it was';
   });
+  /* W3 1200 F1: the course projects only the ledger's accepted copies; W3's two witnesses */
+  await check('L7', 'r8', async () => {
+    const p = page();
+    const result = copy(p.run(`(() => {
+      const row = (literal) => ({ what: 'dictionary-entry', about: { kind: 'kanji', literal }, reveals: ['meaning'], at: 1000 });
+      const a = __visit('l7alias'), supplied = row('水');
+      kanjiCourseRememberHelp(a, [supplied]);
+      supplied.about.literal = '職';
+      kanjiCourseApplyHelp(a);
+      const b = __visit('l7accessor'), batch = [];
+      let reads = 0;
+      Object.defineProperty(batch, '0', { enumerable: true, configurable: true, get() { return row(++reads === 1 ? '水' : '職'); } });
+      kanjiCourseRememberHelp(b, batch);
+      kanjiCourseApplyHelp(b);
+      return {
+        alias: { retained: a.reviewLedger.exposure[0].about.literal, reference: a.referenceHelp[0].about.literal,
+          projected: a.run.attempts[0].help[0].about.literal, unavailable: a.reviewLedger.unavailable },
+        accessor: { reads, kept: b.reviewLedger.exposure.length, reference: (b.referenceHelp || []).length,
+          projected: b.run.attempts[0].help.length, unavailable: b.reviewLedger.unavailable },
+      };
+    })()`));
+    assert.deepEqual(result.alias, { retained: '水', reference: '水', projected: '水', unavailable: null }, 'a row mutated after capture changes nothing');
+    assert.deepEqual(result.accessor, { reads: 0, kept: 0, reference: 0, projected: 0, unavailable: 'help-batch-invalid' }, 'an accessor batch is refused unread');
+    return 'the course projects only the ledger\u2019s frozen copies: a supplied row mutated after capture changes neither ledger nor projection; a batch with an accessor entry is refused before any read';
+  });
 }
 
 /* controls on review-caller.mjs (imported from the edited text) and on corridor.js (lifted from the edited text) */
@@ -499,16 +525,19 @@ export const R8_CORRIDOR_MUTANTS = {
     ['  ledger.records[attemptId] = kanjiDeepFreeze(copy({ attemptId, rawCandidate, context, details }));', '  ledger.records[attemptId] = { attemptId, rawCandidate, context, details };'],
     ['  return { details: copy(details), binding:', '  return { details, binding:'],
   ],
-  'capture-replay-by-id': [["      if (JSON.stringify(exposure[known]) === JSON.stringify(help) && JSON.stringify(origins[known]) === JSON.stringify(origin)) continue;\n", '      continue;\n']],
+  'capture-replay-by-id': [["      if (JSON.stringify(exposure[known]) === JSON.stringify(help) && JSON.stringify(origins[known]) === JSON.stringify(origin)) {\n", '      if (known >= 0) {\n']],
   'projection-appends': [["  run.attempts[run.cursor].help = [];\n", '']],
   'capture-unvalidated': [['function kanjiCourseRowValid(help) {\n', 'function kanjiCourseRowValid(help) {\n  return true;\n']],
   'snapshot-overwrites': [['  if (Object.hasOwn(ledger.inputs, attemptId)) return;\n', '']],
   'snapshot-after-feedback': [['  if (attempt) kanjiCourseRememberHelp(visit, result.exposure, attempt.attemptId);\n',
     '  if (attempt) kanjiCourseRememberHelp(visit, result.exposure, attempt.attemptId);\n  if (attempt) { delete visit.reviewLedger.inputs[attempt.attemptId]; kanjiCourseSnapshot(visit, attempt.attemptId, kanjiCourseLedgerBefore(visit)); }\n']],
   'rule-unpinned': [['    if (rule.policy !== HELP_RELEVANCE_POLICY) rule = null;\n', '']],
+  'projection-rereads-input': [['  for (const help of kept) if (!visit.referenceHelp.some(', '  for (const help of helps) if (!visit.referenceHelp.some(']],
+  'batch-unvalidated': [["  if (!kanjiPlainList(helps)) {\n    ledger.unavailable = 'help-batch-invalid';\n    return null;\n  }\n", '']],
 };
 export const R8_EXPECT = {
   'caller-skips-binding-check': ['X1', 'WB'], 'caller-skips-custody': ['X1', 'R1'],
   'custody-trusts-received': ['L1'], 'custody-aliased': ['L1'], 'capture-replay-by-id': ['L2'], 'projection-appends': ['L3'],
   'capture-unvalidated': ['L4'], 'snapshot-overwrites': ['L6'], 'snapshot-after-feedback': ['L6'], 'rule-unpinned': ['I1'],
+  'projection-rereads-input': ['L7'], 'batch-unvalidated': ['L7'],
 };

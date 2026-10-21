@@ -20064,9 +20064,11 @@ function kanjiCourseApplyHelp(visit) {
 function kanjiCourseRememberHelp(visit, helps, attemptId = null) {
   if (visit?.unitId !== 'shiki-shoku') return;
   visit.referenceHelp ||= [];
-  // a batch the ledger refuses is kept nowhere, so the course never projects a row the ledger lacks
-  if (!kanjiCourseCapture(visit, helps, attemptId)) return;
-  for (const help of helps) if (!visit.referenceHelp.some((row) => JSON.stringify(row) === JSON.stringify(help))) {
+  // the course projects only the ledger's own accepted copies, never the caller's objects again; a batch the ledger refuses
+  // is kept nowhere, so the course never projects a row the ledger lacks
+  const kept = kanjiCourseCapture(visit, helps, attemptId);
+  if (!kept) return;
+  for (const help of kept) if (!visit.referenceHelp.some((row) => JSON.stringify(row) === JSON.stringify(help))) {
     visit.referenceHelp.push(help);
   }
   visit.referenceHelp.sort((a, b) => a.at - b.at);
@@ -20116,34 +20118,45 @@ function kanjiCourseLedger(visit) {
   }
   return visit.reviewLedger;
 }
-/** capture one batch, all or nothing. A course reveal or feedback row is the event course/<attempt>/<what> with its attempt;
- * the same event again is idempotent, the same id with another row or origin refuses. A teaching or dictionary row is a
- * new event of this visit. Returns whether the batch is kept */
+/** capture one batch, all or nothing. The batch must be a dense plain list of data entries, each read once. A course reveal
+ * or feedback row is the event course/<attempt>/<what> with its attempt; the same event again is idempotent, the same id
+ * with another row or origin refuses. A teaching or dictionary row is a new event of this visit. Returns the accepted
+ * frozen copies, in batch order, or null when the batch is refused */
 function kanjiCourseCapture(visit, helps, attemptId = null) {
   const ledger = kanjiCourseLedger(visit);
-  if (ledger.unavailable) return false;
-  const exposure = [...ledger.exposure], origins = [...ledger.origins];
+  if (ledger.unavailable) return null;
+  if (!kanjiPlainList(helps)) {
+    ledger.unavailable = 'help-batch-invalid';
+    return null;
+  }
+  const exposure = [...ledger.exposure], origins = [...ledger.origins], kept = [];
   let serial = ledger.serial, refused = null;
-  for (const help of helps) {
+  for (let index = 0; index < helps.length; index++) {
+    const help = helps[index];
     if (!kanjiCourseRowValid(help)) { refused = 'help-row-invalid'; break; }
     const origin = attemptId ? { eventId: `course/${attemptId}/${help.what}`, sessionId: ledger.sessionId, attemptId }
       : { eventId: `${help.what}/${ledger.journeyId}/${serial + 1}`, sessionId: ledger.sessionId };
     const known = origins.findIndex((value) => value?.eventId === origin.eventId);
     if (known >= 0) {
-      if (JSON.stringify(exposure[known]) === JSON.stringify(help) && JSON.stringify(origins[known]) === JSON.stringify(origin)) continue;
+      if (JSON.stringify(exposure[known]) === JSON.stringify(help) && JSON.stringify(origins[known]) === JSON.stringify(origin)) {
+        kept.push(exposure[known]);
+        continue;
+      }
       refused = 'help-event-reuse-conflict'; break;
     }
     if (exposure.length >= KANJI_LEDGER_LIMITS.events) { refused = 'help-limit'; break; }
     if (!attemptId) serial += 1;
-    exposure.push(JSON.parse(JSON.stringify(help)));
+    const accepted = kanjiDeepFreeze(JSON.parse(JSON.stringify(help)));
+    exposure.push(accepted);
     origins.push(origin);
+    kept.push(accepted);
   }
   if (refused) {
     ledger.unavailable = refused;
-    return false;
+    return null;
   }
   Object.assign(ledger, { exposure: kanjiDeepFreeze(exposure), origins: kanjiDeepFreeze(origins), serial });
-  return true;
+  return kept;
 }
 /** the ledger as it stands before answer, reveal or skip (frozen, so it cannot change after) */
 function kanjiCourseLedgerBefore(visit) {
