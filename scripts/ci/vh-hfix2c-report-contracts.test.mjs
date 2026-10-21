@@ -84,7 +84,7 @@ function fixture(
     },
   };
 }
-function nativeKanjiContract(f) {
+function nativeKanjiContract(f, glyph = '生') {
   // Execute only the actual native verifier's pure expectation function, never its browser setup.
   const source = readFileSync(
     new URL('../../prototypes/corridor/tools/verify-hfix2c.mjs', import.meta.url),
@@ -97,8 +97,8 @@ function nativeKanjiContract(f) {
   const fn = source.slice(source.indexOf(start), source.indexOf(end));
   return JSON.parse(
     JSON.stringify(
-      runInNewContext(`${fn}\nactualKanjiContract('生')`, {
-        read: (file) => readFileSync(join(f.siteDir, file), 'utf8'),
+      runInNewContext(`${fn}\nactualKanjiContract(${JSON.stringify(glyph)})`, {
+        read: (file) => (f.read ? f.read(file) : readFileSync(join(f.siteDir, file), 'utf8')),
       }),
     ),
   );
@@ -162,6 +162,37 @@ test('E3.1 native and receipt expectations prefer a unique dot over an undotted 
     'complete',
   );
   assert.throws(() => validateHfix2cFocused(bad, p));
+});
+
+test('E3.2 native expectations keep eight official noun forms undotted without losing their verb dots', () => {
+  const input = Object.fromEntries(
+    ['kanji', 'reference-extra'].map((name) => [
+      `data/share_alike/${name}.json`,
+      readFileSync(
+        new URL(`../../prototypes/corridor/data/share_alike/${name}.json`, import.meta.url),
+        'utf8',
+      ),
+    ]),
+  );
+  const f = { read: (file) => input[file] };
+  for (const [glyph, noun, dotted, verbs] of [
+    ['卸', 'おろし', 'おろ.し', ['おろ.す']],
+    ['割', 'わり', 'わ.り', ['わ.る', 'わ.れる', 'さ.く']],
+    ['巻', 'まき', 'ま.き', ['ま.く']],
+    ['折', 'おり', 'お.り', ['お.る', 'お.れる']],
+    ['彼', 'かの', 'か.の', []],
+    ['掛', 'かかり', 'か.かり', ['か.ける', 'か.かる']],
+    ['並', 'なみ', 'な.み', ['なら.べる', 'なら.ぶ']],
+    ['謡', 'うたい', 'うた.い', ['うた.う']],
+  ]) {
+    const actual = nativeKanjiContract(f, glyph);
+    assert(actual.kun.includes(noun) && !actual.kun.includes(dotted), glyph);
+    for (const verb of verbs) assert(actual.kun.includes(verb), `${glyph}: ${verb}`);
+    assert.deepEqual(
+      actual.lessonKun,
+      JSON.parse(input['data/share_alike/kanji.json']).kanji[glyph].kun,
+    );
+  }
 });
 
 test('E3 absent Jōyō row keeps the legacy union; a present empty row preserves dictionary-attested dots', () => {

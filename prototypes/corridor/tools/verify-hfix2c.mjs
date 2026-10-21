@@ -267,6 +267,12 @@ function actualKanjiContract(id) {
   let kun = fullKun;
   if (joyo) {
     const plain = reading => reading.replaceAll('.', '');
+    // 送り仮名の付け方 通則4 例外: exact noun readings, never glyph-wide verb suppression.
+    // https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/okurikana/honbun04.html
+    const nouns = { 謡: 'うたい', 虞: 'おそれ', 趣: 'おもむき', 氷: 'こおり', 印: 'しるし',
+      頂: 'いただき', 帯: 'おび', 畳: 'たたみ', 卸: 'おろし', 煙: 'けむり', 恋: 'こい', 志: 'こころざし',
+      次: 'つぎ', 隣: 'となり', 富: 'とみ', 恥: 'はじ', 話: 'はなし', 光: 'ひかり', 舞: 'まい',
+      折: 'おり', 係: 'かかり', 掛: 'かかり', 組: 'くみ', 肥: 'こえ', 並: 'なみ', 巻: 'まき', 割: 'わり' };
     const preferred = { '押:おさえる': 'お.さえる', '交:かわす': 'か.わす', '行:おこなう': 'おこな.う', '生:うまれる': 'う.まれる' };
     const selected = new Map();
     let unresolved = false;
@@ -275,7 +281,8 @@ function actualKanjiContract(id) {
       const dots = [...new Set(forms.filter(value => value.includes('.')))];
       const choice = preferred[`${id}:${reading}`];
       const retained = lesson.kun.map(value => value.replace(/-/g, '')).find(value => forms.includes(value));
-      let shown = choice && forms.includes(choice) ? choice
+      let shown = nouns[id] === reading || id === '彼' && reading === 'かの' ? reading
+        : choice && forms.includes(choice) ? choice
         : dots.length === 1 ? dots[0]
         : retained !== undefined ? retained
         : dots.length === 0 && forms.includes(reading) ? reading : undefined;

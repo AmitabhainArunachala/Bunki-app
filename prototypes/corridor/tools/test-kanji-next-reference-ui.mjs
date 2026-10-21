@@ -595,52 +595,115 @@ test('E3 display retains attested dictionary dots, affixes and fallback', () => 
   assert.deepEqual(plain(core.joyoKunDisplay([], [], ['う.む']).kun), ['う.む']);
 });
 
-const uniqueDotCases = [['卸', 'おろし', 'おろ.し'], ['割', 'わり', 'わ.り'],
-  ['巻', 'まき', 'ま.き'], ['折', 'おり', 'お.り'], ['彼', 'かの', 'か.の']];
-test('E3.1 unique dictionary dots win over the earlier undotted lesson form in all five readings', () => {
-  const a = app();
-  const before = JSON.stringify({ D: a.D, S: a.S });
-  for (const [glyph, undotted, dotted] of uniqueDotCases) {
-    const dictionary = extra.kanjiReadings.find(row => row[0] === glyph)[2];
-    assert(canonical[glyph].kun.indexOf(undotted) < canonical[glyph].kun.indexOf(dotted), glyph);
-    assert.deepEqual(dictionary.filter(value => fullKunKey(value) === undotted && value.includes('.')), [dotted], glyph);
+// Independent reading pairs from 通則4 例外, matched to the pinned 2010 table.
+const exceptionNouns = { 謡: 'うたい', 虞: 'おそれ', 趣: 'おもむき', 氷: 'こおり', 印: 'しるし',
+  頂: 'いただき', 帯: 'おび', 畳: 'たたみ', 卸: 'おろし', 煙: 'けむり', 恋: 'こい', 志: 'こころざし',
+  次: 'つぎ', 隣: 'となり', 富: 'とみ', 恥: 'はじ', 話: 'はなし', 光: 'ひかり', 舞: 'まい',
+  折: 'おり', 係: 'かかり', 掛: 'かかり', 組: 'くみ', 肥: 'こえ', 並: 'なみ', 巻: 'まき', 割: 'わり' };
+const nounDeltaCases = [['卸', 'おろし', 'おろ.し'], ['割', 'わり', 'わ.り'], ['巻', 'まき', 'ま.き'],
+  ['折', 'おり', 'お.り'], ['彼', 'かの', 'か.の'], ['掛', 'かかり', 'か.かり'],
+  ['並', 'なみ', 'な.み'], ['謡', 'うたい', 'うた.い']];
+function nounProjection(api, glyph) {
+  const official = fixtureKun(joyoFixture.rows.find(row => row[0] === glyph)[1]);
+  const dictionary = extra.kanjiReadings.find(row => row[0] === glyph)[2];
+  return { official, dictionary, view: api.joyoKunDisplay(canonical[glyph]?.kun || [], official, dictionary, glyph) };
+}
+function assertNoun(api, glyph, reading) {
+  const { official, view } = nounProjection(api, glyph);
+  assert.equal(view.joyoKun[official.indexOf(reading)], reading, `${glyph}: noun ${reading} must be undotted`);
+}
+function assertVerbDots(api, glyph) {
+  const { official, dictionary, view } = nounProjection(api, glyph);
+  let checked = 0;
+  for (const reading of official.filter(value => value !== exceptionNouns[glyph])) {
+    const forms = [...new Set(dictionary.filter(value => value.replace(/[.-]/g, '') === reading)
+      .map(value => value.replace(/-/g, '')).filter(value => value.includes('.')))];
+    if (forms.length === 1) {
+      assert.equal(view.joyoKun[official.indexOf(reading)], forms[0], `${glyph}: verb ${forms[0]} must keep its dot`);
+      checked++;
+    }
+  }
+  return checked;
+}
+test('E3.2 all 27 official noun exceptions and 彼 are undotted while verbs retain attested dots', () => {
+  assert.equal(Object.keys(exceptionNouns).length, 27);
+  assert.deepEqual(plain(core.JOYO_KUN_ORTHOGRAPHY.nouns), exceptionNouns);
+  assert.equal(core.JOYO_KUN_ORTHOGRAPHY.source,
+    'https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/okurikana/honbun04.html');
+  let verbCount = 0;
+  for (const [glyph, reading] of Object.entries(exceptionNouns)) {
+    assertNoun(core, glyph, reading);
+    verbCount += assertVerbDots(core, glyph);
+  }
+  assert(verbCount > 20, 'noun handling must exercise verbs, not strip all dots from the glyph');
+  assertNoun(core, '彼', 'かの');
+  const a = app(), before = JSON.stringify({ D: a.D, S: a.S });
+  for (const [glyph, undotted, dotted] of nounDeltaCases) {
     for (const resolve of [a.runtime.kanjiDisplayRecord, a.runtime.kanjiEntryRecord, a.runtime.strokeRoomRecord]) {
       const record = resolve(glyph);
-      assert(record.joyoKun.includes(dotted), `${glyph}: official ${dotted}`);
-      assert(record.kun.includes(dotted) && !record.kun.includes(undotted), `${glyph}: visible ${dotted}`);
-      assert.deepEqual(plain(record.lessonKun), canonical[glyph].kun, `${glyph}: lesson unchanged`);
+      assert(record.joyoKun.includes(undotted) && !record.joyoKun.includes(dotted), glyph);
+      assert(record.kun.includes(undotted) && !record.kun.includes(dotted), glyph);
+      assert(record.completeKun.includes(dotted), `${glyph}: full dictionary inventory retains ${dotted}`);
+      assert.deepEqual(plain(record.lessonKun), canonical[glyph].kun);
     }
+    const snapshot = { ...savedRecord(glyph), kun: [...canonical[glyph].kun] };
+    const saved = app({ state: { taken: [{ t: 'kanji', id: glyph, kanjiRecord: snapshot }] } });
+    assert.deepEqual(plain(saved.runtime.kanjiEntryRecord(glyph).kun), snapshot.kun);
   }
   assert.equal(JSON.stringify({ D: a.D, S: a.S }), before);
 });
 
-test('E3.1 old-precedence control loses exactly five official dots across all 2136 glyphs', () => {
-  const precedence = /else if \(dotted.length === 1\) form = dotted\[0\];\s*else if \(retained !== undefined\) form = retained;[^\n]*/;
-  assert.equal([...coreSource.matchAll(new RegExp(precedence, 'g'))].length, 1);
-  const mutated = { module: { exports: {} } };
-  vm.runInNewContext(coreSource.replace(precedence,
-    'else if (retained !== undefined) form = retained;\n      else if (dotted.length === 1) form = dotted[0];'), mutated);
-  const old = mutated.module.exports, changed = [];
+test('E3.2 controls reject a dot on each noun exception and loss of each exception glyph verb dot', () => {
+  const branch = /if \(JOYO_KUN_ORTHOGRAPHY.nouns\[glyph\] === reading \|\|\s*JOYO_KUN_ORTHOGRAPHY.lexical\[.*?\] === reading\) form = reading;/;
+  assert.equal([...coreSource.matchAll(new RegExp(branch, 'g'))].length, 1);
+  const corruptNouns = { module: { exports: {} } };
+  vm.runInNewContext(coreSource.replace(branch, match => match.replace('form = reading;',
+    "form = reading.slice(0, -1) + '.' + reading.slice(-1);")), corruptNouns);
+  for (const [glyph, reading] of [...Object.entries(exceptionNouns), ['彼', 'かの']])
+    assert.throws(() => assertNoun(corruptNouns.module.exports, glyph, reading), assert.AssertionError, glyph);
+  const show = 'const show = value => undotted ? full(value) : selected.get(full(value)) || value;';
+  assert.equal(coreSource.split(show).length, 2);
+  const corruptVerbs = { module: { exports: {} } };
+  vm.runInNewContext(coreSource.replace(show, 'const show = value => full(value);'), corruptVerbs);
+  for (const glyph of Object.keys(exceptionNouns)) if (assertVerbDots(core, glyph))
+    assert.throws(() => assertVerbDots(corruptVerbs.module.exports, glyph), assert.AssertionError, glyph);
+});
+
+test('E3.2 bounded precedence changes eight rows; removing attested raw resolution widens it to 19 rows and 41 readings', () => {
+  const exceptionBranch = /if \(JOYO_KUN_ORTHOGRAPHY.nouns\[glyph\] === reading \|\|\s*JOYO_KUN_ORTHOGRAPHY.lexical\[.*?\] === reading\) form = reading;\s*else if/;
+  assert.equal([...coreSource.matchAll(new RegExp(exceptionBranch, 'g'))].length, 1);
+  const prior = { module: { exports: {} } };
+  vm.runInNewContext(coreSource.replace(exceptionBranch, 'if'), prior);
+  const retained = /else if \(retained !== undefined\) form = retained;[^\n]*/;
+  assert.equal([...coreSource.matchAll(new RegExp(retained, 'g'))].length, 1);
+  const overbroad = { module: { exports: {} } };
+  vm.runInNewContext(coreSource.replace(retained, ''), overbroad);
+  const changed = [], rejected = [];
+  let changedReadings = 0;
   for (const [glyph, readings] of joyoFixture.rows) {
-    const raw = canonical[glyph]?.kun || [];
-    const official = fixtureKun(readings);
+    const raw = canonical[glyph]?.kun || [], official = fixtureKun(readings);
     const dictionary = extra.kanjiReadings.find(row => row[0] === glyph)?.[2] || [];
-    const actual = plain(core.joyoKunDisplay(raw, official, dictionary, glyph));
-    const prior = plain(old.joyoKunDisplay(raw, official, dictionary, glyph));
-    const expected = uniqueDotCases.find(row => row[0] === glyph);
-    if (!expected) assert.deepEqual(actual, prior, `${glyph}: unrelated display unchanged`);
+    const args = [raw, official, dictionary, glyph];
+    const before = plain(prior.module.exports.joyoKunDisplay(...args));
+    const actual = plain(core.joyoKunDisplay(...args));
+    const bad = plain(overbroad.module.exports.joyoKunDisplay(...args));
+    const expected = nounDeltaCases.find(row => row[0] === glyph);
+    if (!expected) assert.deepEqual(actual, before, `${glyph}: outside bounded delta`);
     else {
       const [, undotted, dotted] = expected;
-      assert.throws(() => assert(prior.joyoKun.includes(dotted)), assert.AssertionError, `${glyph}: control must fail`);
-      assert(actual.joyoKun.includes(dotted), glyph);
-      assert.deepEqual(actual, { ...prior,
-        kun: prior.kun.map(value => value === undotted ? dotted : value),
-        joyoKun: prior.joyoKun.map(value => value === undotted ? dotted : value),
-      }, `${glyph}: only the named reading changes`);
+      assert.deepEqual(actual, { ...before,
+        kun: before.kun.map(value => value === dotted ? undotted : value),
+        joyoKun: before.joyoKun.map(value => value === dotted ? undotted : value),
+      }, `${glyph}: only the official noun dot changes`);
       changed.push(glyph);
     }
+    if (JSON.stringify(bad.joyoKun) !== JSON.stringify(before.joyoKun)) rejected.push(glyph);
+    changedReadings += before.joyoKun.filter((value, i) => value !== bad.joyoKun[i]).length;
   }
-  assert.deepEqual(changed.sort(), uniqueDotCases.map(row => row[0]).sort());
+  assert.deepEqual(changed.sort(), nounDeltaCases.map(row => row[0]).sort());
+  assert.equal(rejected.length, 19);
+  assert.equal(changedReadings, 41);
+  assert.throws(() => assert.equal(rejected.length, 8), assert.AssertionError);
 });
 
 test('E3 saved 開 生 閉 retain their answers and expose current official kun separately', () => {
