@@ -91,10 +91,10 @@ export function loadHfix2cPins({ root, siteDir, engine, runId }) {
       let shown =
         choice && forms.includes(choice)
           ? choice
-          : retained !== undefined
-            ? retained
-            : dots.length === 1
-              ? dots[0]
+          : dots.length === 1
+            ? dots[0]
+            : retained !== undefined
+              ? retained
               : dots.length === 0 && forms.includes(reading)
                 ? reading
                 : undefined;

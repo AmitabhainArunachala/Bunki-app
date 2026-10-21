@@ -276,8 +276,9 @@ function actualKanjiContract(id) {
       const choice = preferred[`${id}:${reading}`];
       const retained = lesson.kun.map(value => value.replace(/-/g, '')).find(value => forms.includes(value));
       let shown = choice && forms.includes(choice) ? choice
+        : dots.length === 1 ? dots[0]
         : retained !== undefined ? retained
-        : dots.length === 1 ? dots[0] : dots.length === 0 && forms.includes(reading) ? reading : undefined;
+        : dots.length === 0 && forms.includes(reading) ? reading : undefined;
       if (shown === undefined) { unresolved = true; shown = reading; }
       selected.set(reading, shown);
     }

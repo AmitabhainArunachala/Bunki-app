@@ -595,6 +595,54 @@ test('E3 display retains attested dictionary dots, affixes and fallback', () => 
   assert.deepEqual(plain(core.joyoKunDisplay([], [], ['う.む']).kun), ['う.む']);
 });
 
+const uniqueDotCases = [['卸', 'おろし', 'おろ.し'], ['割', 'わり', 'わ.り'],
+  ['巻', 'まき', 'ま.き'], ['折', 'おり', 'お.り'], ['彼', 'かの', 'か.の']];
+test('E3.1 unique dictionary dots win over the earlier undotted lesson form in all five readings', () => {
+  const a = app();
+  const before = JSON.stringify({ D: a.D, S: a.S });
+  for (const [glyph, undotted, dotted] of uniqueDotCases) {
+    const dictionary = extra.kanjiReadings.find(row => row[0] === glyph)[2];
+    assert(canonical[glyph].kun.indexOf(undotted) < canonical[glyph].kun.indexOf(dotted), glyph);
+    assert.deepEqual(dictionary.filter(value => fullKunKey(value) === undotted && value.includes('.')), [dotted], glyph);
+    for (const resolve of [a.runtime.kanjiDisplayRecord, a.runtime.kanjiEntryRecord, a.runtime.strokeRoomRecord]) {
+      const record = resolve(glyph);
+      assert(record.joyoKun.includes(dotted), `${glyph}: official ${dotted}`);
+      assert(record.kun.includes(dotted) && !record.kun.includes(undotted), `${glyph}: visible ${dotted}`);
+      assert.deepEqual(plain(record.lessonKun), canonical[glyph].kun, `${glyph}: lesson unchanged`);
+    }
+  }
+  assert.equal(JSON.stringify({ D: a.D, S: a.S }), before);
+});
+
+test('E3.1 old-precedence control loses exactly five official dots across all 2136 glyphs', () => {
+  const precedence = /else if \(dotted.length === 1\) form = dotted\[0\];\s*else if \(retained !== undefined\) form = retained;[^\n]*/;
+  assert.equal([...coreSource.matchAll(new RegExp(precedence, 'g'))].length, 1);
+  const mutated = { module: { exports: {} } };
+  vm.runInNewContext(coreSource.replace(precedence,
+    'else if (retained !== undefined) form = retained;\n      else if (dotted.length === 1) form = dotted[0];'), mutated);
+  const old = mutated.module.exports, changed = [];
+  for (const [glyph, readings] of joyoFixture.rows) {
+    const raw = canonical[glyph]?.kun || [];
+    const official = fixtureKun(readings);
+    const dictionary = extra.kanjiReadings.find(row => row[0] === glyph)?.[2] || [];
+    const actual = plain(core.joyoKunDisplay(raw, official, dictionary, glyph));
+    const prior = plain(old.joyoKunDisplay(raw, official, dictionary, glyph));
+    const expected = uniqueDotCases.find(row => row[0] === glyph);
+    if (!expected) assert.deepEqual(actual, prior, `${glyph}: unrelated display unchanged`);
+    else {
+      const [, undotted, dotted] = expected;
+      assert.throws(() => assert(prior.joyoKun.includes(dotted)), assert.AssertionError, `${glyph}: control must fail`);
+      assert(actual.joyoKun.includes(dotted), glyph);
+      assert.deepEqual(actual, { ...prior,
+        kun: prior.kun.map(value => value === undotted ? dotted : value),
+        joyoKun: prior.joyoKun.map(value => value === undotted ? dotted : value),
+      }, `${glyph}: only the named reading changes`);
+      changed.push(glyph);
+    }
+  }
+  assert.deepEqual(changed.sort(), uniqueDotCases.map(row => row[0]).sort());
+});
+
 test('E3 saved 開 生 閉 retain their answers and expose current official kun separately', () => {
   for (const glyph of ['開', '生', '閉']) {
     const snapshot = { ...savedRecord(glyph), on: [...canonical[glyph].on], kun: [...canonical[glyph].kun] };

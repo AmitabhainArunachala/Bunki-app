@@ -143,6 +143,27 @@ test('E3 real expectation functions preserve raw kun and affixes while completin
   }
 });
 
+test('E3.1 native and receipt expectations prefer a unique dot over an undotted lesson form', () => {
+  // Synthetic duplicate-form witness: force the precedence that the real five readings exposed.
+  const f = fixture('chromium', {
+    lessonKun: ['いきる', 'い.きる'],
+    dictionaryKun: ['いきる', 'い.きる', 'い.きる'],
+    joyoKun: [['生', ['いきる']]],
+  });
+  const p = f.pins();
+  assert.deepEqual(p.canonical.kun, ['い.きる']);
+  assert.deepEqual(p.canonical.lessonKun, ['いきる', 'い.きる']);
+  assert.deepEqual(nativeKanjiContract(f), p.canonical);
+  const good = focused(p);
+  assert.equal(validateHfix2cFocused(good, p), true);
+  const bad = structuredClone(good);
+  bad.rows.find((row) => row.name === HFIX2C.transition).observed.complete = snapshot(
+    { ...p.canonical, kun: ['いきる'] },
+    'complete',
+  );
+  assert.throws(() => validateHfix2cFocused(bad, p));
+});
+
 test('E3 absent Jōyō row keeps the legacy union; a present empty row preserves dictionary-attested dots', () => {
   for (const joyoKun of [undefined, [], [['生', []]]]) {
     const f = fixture('chromium', {

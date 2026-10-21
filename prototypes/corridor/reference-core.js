@@ -286,8 +286,8 @@
       const retained = listed.map(value => value.replace(/-/g, '')).find(value => forms.includes(value));
       let form;
       if (preferred && forms.includes(preferred)) form = preferred;
-      else if (retained !== undefined) form = retained; // preserve an already-attested raw choice
       else if (dotted.length === 1) form = dotted[0];
+      else if (retained !== undefined) form = retained; // raw choice only when no unique dot settles it
       else if (dotted.length === 0 && forms.includes(reading)) form = reading;
       if (form === undefined) { unattestedKun.push(reading); form = reading; }
       return [reading, form];
