@@ -387,6 +387,72 @@ test('S17', 'W5 1504: the record store fails, a capture rejects before it has a 
   assert.deepEqual([o.write, o.reason], [false, 'not-recorded']); assert.equal(reload.calls(), 0);
 });
 
+test('S18', 'W2 1524: with the snapshot write stalled, the act still completes on time and practice continues; the attempt is unrecordable, and a late snapshot never revives it', async (P) => {
+  const s = store(), { time } = await journeyOnNextDay(P, s);
+  const p = await page(P.on, { ...s, time });
+  const v = p.visit();
+  let release; s.controller.state.gate = new Promise((resolve) => { release = () => { s.controller.state.gate = null; resolve(); }; });
+  let id;
+  try {
+    id = await Promise.race([p.act(v), new Promise((resolve) => setTimeout(() => resolve(null), 1500))]);
+    assert.ok(id, 'practice waited on the stalled snapshot');
+    assert.ok(v.feedback?.result, 'the feedback did not show');
+    const o = await p.report(v, id);
+    assert.deepEqual([o.write, o.reason], [false, 'not-recorded']); assert.equal(p.calls(), 0);
+    assert.ok(s.storage.getItem('bunki-journey:hold'), 'the stalled feedback capture set no W-hold');
+  } finally { release(); }
+  await new Promise((r) => setTimeout(r, 80));
+  const entry = copy(p.run(`kanjiJourney.snapshots.get(${JSON.stringify(id)})`));
+  assert.equal(entry.refused, 'not-recorded'); assert.equal(entry.token ?? null, null);
+});
+
+test('S18b', 'storage recovering after the snapshot bound: the late snapshot commits, yet the attempt stays unrecordable (no token) and the day is not held', async (P) => {
+  const s = store(), { time } = await journeyOnNextDay(P, s);
+  const p = await page(P.on, { ...s, time });
+  const v = p.visit();
+  let release; s.controller.state.gate = new Promise((resolve) => { release = () => { s.controller.state.gate = null; resolve(); }; });
+  setTimeout(release, 400);
+  const id = await p.act(v);
+  await new Promise((r) => setTimeout(r, 400));
+  const entry = copy(p.run(`kanjiJourney.snapshots.get(${JSON.stringify(id)})`));
+  assert.equal(entry.refused, 'not-recorded'); assert.equal(entry.token ?? null, null, 'the late snapshot made the attempt reviewable');
+  assert.ok(p.record().m4Journey.daily.attempts.some((a) => a.status === 'snapshot'), 'the late snapshot did not commit');
+  const o = await p.report(v, id);
+  assert.deepEqual([o.write, o.reason], [false, 'not-recorded']); assert.equal(p.calls(), 0);
+});
+
+/** W3 1525 (F8): the actual enterWord and kanjiCourseReferenceHelp, lifted by text into a small context with display stubs (W3's
+ * own probe shape); the course's help keep is a deferred promise this test resolves */
+function dictionary(source) {
+  const body = (name) => { const anchor = `function ${name}(`; assert.equal(source.split(anchor).length, 2, name);
+    const start = source.indexOf(anchor), end = source.indexOf('\n}', start) + 2; return source.slice(start, end); };
+  const deferred = [];
+  const ctx = vm.createContext({ S: { stack: [], view: 'lessons', kanjiCourse: { unitId: 'shiki-shoku', epoch: 1 }, wordEntrySerial: 0 }, recordEpoch: 1,
+    finishPageTransition() {}, layerPathFor: () => false, ladderOpening: null, heroSource: new Map(), sampleWhere: () => null, pageCutAllowed: () => false,
+    removeMini() {}, document: { getElementById: () => null }, sampleTransition() {}, recordReady: (epoch) => epoch === ctx.recordEpoch,
+    kanjiCourseApplyHelp() {}, kanjiCourseRememberHelp: () => new Promise((resolve) => deferred.push(resolve)), render() {} });
+  vm.runInContext(`${body('kanjiCourseReferenceHelp')}\n${body('enterWord')}`, ctx);
+  const flush = async () => { for (let i = 0; i < 15; i++) await Promise.resolve(); };
+  return { ctx, open: (id = '職') => ctx.enterWord({ t: 'kanji', id }, { instant: true }),
+    finish: async (n = 0) => { deferred[n](); await flush(); }, shown: () => Array.from(ctx.S.stack, (node) => node.id) };
+}
+const F8 = (id, name, navigate, expect) => test(id, name, async (P) => {
+  const d = dictionary(P.source);
+  d.open(); assert.deepEqual(d.shown(), [], 'shown before its help was kept');
+  navigate(d.ctx); await d.finish();
+  assert.deepEqual(d.shown(), expect);
+});
+F8('F8a', 'healthy: the dictionary page from a course shows once its help is kept', () => {}, ['職']);
+F8('F8b', 'leaving for the course list before the help is kept: the old page never shows', (ctx) => { ctx.S.kanjiCourse = { stage: 'menu' }; }, []);
+F8('F8c', 'a tab change before the help is kept: the old page never shows', (ctx) => { ctx.S.stack = []; ctx.S.view = 'shelf'; }, []);
+F8('F8d', 'a new record owner before the help is kept: the old page never shows', (ctx) => { ctx.recordEpoch += 1; }, []);
+F8('F8f', 'away and back at the same depth (tab away, then the course again): the old page never shows', (ctx) => {
+  ctx.S.stack = []; ctx.S.view = 'shelf'; ctx.S.stack = []; ctx.S.view = 'lessons'; }, []);
+test('F8e', 'a newer dictionary page cancels the older pending one; only the newer shows', async (P) => {
+  const d = dictionary(P.source);
+  d.open('職'); d.open('識'); await d.finish(0); assert.deepEqual(d.shown(), []); await d.finish(1); assert.deepEqual(d.shown(), ['識']);
+});
+
 /** W5's 70 vectors: their help rows and original origins imported into the root through a registered producer, a reload,
  * then the actual course attempt, preparation from the root, the caller, the fence and the hook. No preload */
 async function vectorRuns(P, { skipImport = false } = {}) {
@@ -453,6 +519,12 @@ export const MUTANTS = {
   'custody-trusts-received-on': ['S15', [["  if (candidate !== undefined && JSON.stringify(candidate) !== JSON.stringify(record.details.candidate)) throw new Error('review-transport-changed');\n", '']]],
   'corridor-deadline-missing': ['S16', [["    }, 300);\n    const unproved = ", "    }, 3000000);\n    const unproved = "]]],
   'unproved-not-held': ['S17', [["    kept.then((outcome) => (outcome === 'unproved' ? unproved() : done()), unproved);\n", "    kept.then(done, done);\n"]]],
+  'snapshot-unbounded': ['S18', [["    await Promise.race([recorded, new Promise((resolve) => { bound = setTimeout(resolve, 300); })]);\n", "    await recorded;\n"]]],
+  'late-snapshot-token': ['S18b', [["        if (!entry.refused) entry.token = token;\n", "        entry.token = token;\n"]]],
+  'f8-serial-only': ['F8b', [["      if (S.wordEntrySerial === serial && S.stack === stack && S.stack.length + 1 === depth && S.view === room &&\n        S.kanjiCourse === visit && recordEpoch === owner && recordReady(owner)) show();", "      if (S.wordEntrySerial === serial && S.stack.length + 1 === depth) show();"]]],
+  'f8-no-stack-identity': ['F8f', [["S.wordEntrySerial === serial && S.stack === stack && S.stack.length + 1", "S.wordEntrySerial === serial && S.stack.length + 1"]]],
+  'f8-no-visit': ['F8b', [["\n        S.kanjiCourse === visit && recordEpoch === owner", "\n        recordEpoch === owner"]]],
+  'f8-no-owner': ['F8d', [["S.kanjiCourse === visit && recordEpoch === owner && recordReady(owner)) show();", "S.kanjiCourse === visit) show();"]]],
   'day-full-not-told': ['S13', [["  if (KANJI_JOURNEY_DAY_FULL.includes(error?.message)) journey.fullDay = day;\n", '']]],
 };
 
@@ -461,10 +533,14 @@ async function main() {
   floor();
   assert.ok(arg('modules') || process.env.KAIRO_MODULES_DIR, 'pass --modules=<dir> holding a built record-core.mjs and reading-core.mjs');
   modules = await load();
-  const P = { ...programs(), base: baseProgram() };
+  // lifting parses corridor.js with the TypeScript AST; build each program only when a case asks for it
+  const lazy = (source, base) => { let lifted = null, baseLifted = base ?? null;
+    return { source, get off() { return (lifted ||= programs(source)).off; }, get on() { return (lifted ||= programs(source)).on; },
+      get base() { return (baseLifted ||= baseProgram()); } }; };
+  const P = lazy(SOURCE);
   const only = arg('case'), results = [];
   for (const t of CASES) {
-    if (only && t.id !== only) continue;
+    if (only && !only.split(',').includes(t.id)) continue;
     floor();
     try { await t.fn(P); results.push({ id: t.id, passed: true }); }
     catch (error) { results.push({ id: t.id, passed: false, error: error.message.split('\n').slice(0, 12).join(' ') }); }
@@ -485,11 +561,11 @@ async function main() {
   const controls = [];
   if (process.argv.includes('--mutants')) {
     for (const [name, [target, pairs]] of Object.entries(MUTANTS)) {
-      if (arg('mutant') && arg('mutant') !== name) continue;
+      if (arg('mutant') && !arg('mutant').split(',').includes(name)) continue;
       floor();
       let text = SOURCE;
       for (const [from, to] of pairs) { assert.equal(text.split(from).length, 2, 'mutant anchor not unique: ' + name); text = text.replace(from, to); }
-      const mutated = { ...programs(text), base: P.base };
+      const mutated = lazy(text, null);
       try { await CASES.find((entry) => entry.id === target).fn(mutated); controls.push({ name, target, killed: false }); }
       catch (error) { controls.push({ name, target, killed: error instanceof assert.AssertionError, witness: error.message.split('\n')[0] }); }
     }

@@ -20379,15 +20379,26 @@ async function kanjiJourneyAct(visit, action, value) {
   const course = window.BunkiKanjiCourse;
   const attempt = visit.run.schemaVersion === 2 ? course.currentAttempt(visit.run) : null;
   const journey = attempt ? kanjiJourneyFor(visit) : null;
-  if (journey && !journey.snapshots.has(attempt.attemptId)) await kanjiJourneyRun(journey, async () => {
-    let id = null;
-    try {
-      await journey.lifecycle.tick();
-      await kanjiJourneyEnter(journey, visit);
-      id = journey.lifecycle.namespace() + attempt.attemptId;
-      journey.snapshots.set(attempt.attemptId, { id, token: await journey.lifecycle.beforeAnswer(id) });
-    } catch (error) { journey.snapshots.set(attempt.attemptId, { id, refused: kanjiJourneyReason(journey, error) }); }
-  });
+  if (journey && !journey.snapshots.has(attempt.attemptId)) {
+    // W2 1524, lead 1526: the snapshot write is bounded like help, 300 ms from the act, so practice never waits on storage. An
+    // attempt whose snapshot was not recorded in time is unrecordable; a late completion never makes it reviewable
+    const entry = { id: null, token: null, refused: null };
+    journey.snapshots.set(attempt.attemptId, entry);
+    const recorded = kanjiJourneyRun(journey, async () => {
+      if (entry.refused) return;
+      try {
+        await journey.lifecycle.tick();
+        await kanjiJourneyEnter(journey, visit);
+        entry.id = journey.lifecycle.namespace() + attempt.attemptId;
+        const token = await journey.lifecycle.beforeAnswer(entry.id);
+        if (!entry.refused) entry.token = token;
+      } catch (error) { if (!entry.refused) entry.refused = kanjiJourneyReason(journey, error); }
+    });
+    let bound;
+    await Promise.race([recorded, new Promise((resolve) => { bound = setTimeout(resolve, 300); })]);
+    clearTimeout(bound);
+    if (!entry.token && !entry.refused) entry.refused = 'not-recorded';
+  }
   const meta = attempt ? { attemptId: attempt.attemptId, at: Date.now() } : undefined;
   visit.run = action === 'answer' ? course.answer(visit.run, value, meta) : course[action](visit.run, meta);
   if (attempt && action === 'answer') visit.run = course.showFeedback(visit.run, attempt.attemptId, Date.now());
@@ -40859,8 +40870,13 @@ function enterWord(node, { from = null, invoker = null, instant = false } = {}) 
   };
   const kept = kanjiCourseReferenceHelp(S.kanjiCourse, pushed);
   if (kept?.then) {
-    const serial = S.wordEntrySerial;
-    kept.then(() => { if (S.wordEntrySerial === serial && S.stack.length + 1 === depth) show(); });
+    // W3 1525: the page shows only into the navigation it was asked from: no newer entry, the same stack (a tab change replaces
+    // it, even when both are empty), the same room, course visit and record owner
+    const serial = S.wordEntrySerial, stack = S.stack, room = S.view, visit = S.kanjiCourse, owner = recordEpoch;
+    kept.then(() => {
+      if (S.wordEntrySerial === serial && S.stack === stack && S.stack.length + 1 === depth && S.view === room &&
+        S.kanjiCourse === visit && recordEpoch === owner && recordReady(owner)) show();
+    });
     return;
   }
   show();
