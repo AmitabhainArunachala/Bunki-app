@@ -25,6 +25,14 @@ export const ADAPTER = readFileSync(resolve(DIR, 'm4-quest.mjs'), 'utf8');
 const BEFORE = '910d8325';
 const beforeSource = () => execFileSync('git', ['show', `${BEFORE}:prototypes/corridor/corridor.js`], { cwd: DIR, maxBuffer: 64 * 1024 ** 2 }).toString();
 const COURSE = readFileSync(resolve(DIR, 'kanji-course.js'), 'utf8');
+/** the release's required assets and the offline shell (W2 2004 S3B-1) */
+export const ASSETS = readFileSync(resolve(DIR, '../../scripts/corridor-assets.mjs'), 'utf8');
+export const SW = readFileSync(resolve(DIR, 'sw.js'), 'utf8');
+const entries = (text, declaration) => {
+  const body = text.split(`${declaration} = [`)[1]?.split('];')[0];
+  assert.ok(body, `no ${declaration}`);
+  return [...body.matchAll(/^\s*'([^']+)',/gm)].map((match) => match[1]);
+};
 const SWITCH = 'const JOURNEY_WRITES = false;';
 const adapterFrom = (text) => import('data:text/javascript;base64,' + Buffer.from(text).toString('base64'));
 const BASE = ['ROOM_NAMES', 'roomName', 'M4_COPY', 'kanjiCourseRunKind', 'kanjiRoomEntry', 'kanjiChooseRoom', 'kanjiEnterCourseDoor',
@@ -33,7 +41,7 @@ const BASE = ['ROOM_NAMES', 'roomName', 'M4_COPY', 'kanjiCourseRunKind', 'kanjiR
   'kanjiCourseAct', 'JOURNEY_WRITES', 'kanjiJourney', 'kanjiJourneyModule', 'kanjiJourneyDevice', 'adoptJourney', 'kanjiJourneyRun',
   'kanjiJourneyFor'];
 const QUEST = ['kanjiQuestModule', 'KANJI_QUEST_STRUCTURAL', 'KANJI_QUEST_FAILED', 'kanjiQuestAdopt', 'kanjiQuestOwner', 'kanjiQuestFor',
-  'kanjiQuestStructural', 'kanjiQuestSeed', 'kanjiQuestSentence', 'kanjiQuestLine', 'kanjiQuestLines', 'kanjiQuestBinding',
+  'kanjiQuestStructural', 'kanjiQuestSeed', 'kanjiQuestQuote', 'kanjiQuestLoading', 'kanjiQuestStale', 'kanjiQuestLine', 'kanjiQuestLines', 'kanjiQuestBinding',
   'kanjiQuestBound', 'kanjiQuestWordsDone', 'kanjiQuestRunStarted', 'kanjiQuestSettle', 'kanjiQuestSelfCheck', 'kanjiQuestRedraw',
   'kanjiQuestAct', 'kanjiQuestCreate', 'kanjiQuestEnd', 'kanjiQuestClear', 'kanjiQuestDoor', 'kanjiQuestOpen', 'kanjiQuestLessonRows',
   'kanjiQuestStage', 'kanjiQuestLeave', 'kanjiQuestPool', 'kanjiQuestRender', 'kanjiQuestSummary'];
@@ -55,13 +63,16 @@ const all = (node) => [node, ...node.children.filter((c) => c instanceof Element
 const shape = (node) => all(node).map((e) => `${e.tagName}#${e.id}${e.disabled ? '[disabled]' : ''}:${e.text}`);
 const flush = async () => { for (let i = 0; i < 40; i += 1) await new Promise((r) => setImmediate(r)); };
 
-/** a bundled passage with 職業 at token 26 (the fixture occurrence) and at tokens 60–69, each token its own sentence span */
+/** a bundled passage with 職業 at token 26 (the fixture occurrence, sentence [24,41)) and at tokens 60–69, which share one sentence
+ * [58,75): two occurrences in one sentence */
 const PASSAGE = { id: 'bunki-essay-n1-city', tokens: Array.from({ length: 90 }, (_, i) => (i === 26 || (i >= 60 && i < 70)
   ? { s: '職業', b: '職業' } : { s: 'の', b: 'の' })) };
-const sentenceAt = (index) => ({ p: PASSAGE, index, start: index - 2, end: index + 15,
-  quote: PASSAGE.tokens.slice(index - 2, index + 15).map((t) => t.s).join('') });
+const span = (index) => (index >= 60 && index < 70 ? [58, 75] : [index - 2, index + 15]);
+const sentenceAt = (index) => ({ p: PASSAGE, index, start: span(index)[0], end: span(index)[1],
+  quote: PASSAGE.tokens.slice(...span(index)).map((t) => t.s).join('') });
 const WORD = (index = 26) => ({ t: 'word', id: '職業', reading: 'しょくぎょう', from: { passage: PASSAGE.id, index }, ctxScope: 'sent' });
-const occurrence = (index = 26) => ({ source: 'passage', passage: PASSAGE.id, token: index, sentence: [index - 2, index + 15], word: '職業' });
+const occurrence = (index = 26) => ({ source: 'passage', passage: PASSAGE.id, token: index, sentence: span(index), quote: sentenceAt(index).quote,
+  word: '職業' });
 
 let serial = 0;
 /** one page: the lifted program, ON or OFF, over a fresh S and a day's lifecycle */
@@ -91,8 +102,11 @@ function page(m, day, { source = current?.source ?? SOURCE, names = [...BASE, ..
     },
     showReaderToast: (message) => toasts.push(message),
     scrollTo: () => {},
-    teacherSentence: (node) => (node?.from?.passage === PASSAGE.id && Number.isInteger(node.from.index) && node.from.index >= 2 &&
+    teacherSentence: (node) => (node?.from?.passage === PASSAGE.id && PASSAGE.tokens && Number.isInteger(node.from.index) && node.from.index >= 2 &&
       node.from.index < PASSAGE.tokens.length - 15 ? sentenceAt(node.from.index) : null),
+    D: { passages: [PASSAGE] },
+    // the reader's article loader, modelled: a passage whose tokens were set aside gets them back on the next turn
+    ensureArticle: async (passage) => { await null; if (!passage.tokens && passage.__tokens) passage.tokens = passage.__tokens; },
     // the unchanged entry seam: reuse the visit for the same unit, else open a new one (the reader start is help: K-25)
     openKanjiCourseUnit: (node) => {
       const unit = context.kanjiCourseNodeUnit(node);
@@ -421,9 +435,9 @@ test('U14', 'reload: a completed quest left in the pool is retired once on open,
   assert.deepEqual(rows.map((r) => r.id), [`kanji-quest-lessons-${open.id}`]);
   assert.equal(p.word(60).children.at(-1).text, p.copy('Q-01r'));
   rows[0].click();
-  assert.ok(p.has('Q-15') && p.find('kanji-quest-reading').textContent.includes(p.copy('Q-09', 0)));
+  assert.ok(p.has('Q-15r') && p.find('kanji-quest-reading').textContent.includes(p.copy('Q-09', 0)));
   p.context.render();
-  assert.equal(p.has('Q-15'), false, 'once');
+  assert.equal(p.has('Q-15r'), false, 'once');
   intoReading(p);
   assert.ok(p.find('kanji-course-answer'), 'the no-teaching route from Lessons starts at the first word');
 });
@@ -485,6 +499,75 @@ test('U18', 'a binding made under another activation settles nothing: Q-21, neve
   assert.equal(goals(p)[0].status, 'unfinished');
 });
 
+test('U19', 'a seed is bound to its sentence (W2 2004 S3B-2; lead 2005): changed text at the same coordinates refuses to resume (Q-27 + End only), is never bound or matched again, and keeps its stored sentence; two occurrences in one sentence stay two quests', async (m) => {
+  const p = await onPage(m);
+  const old = await created(p, 26);
+  assert.equal(old.seed.sourceOccurrence.quote, sentenceAt(26).quote, 'the seed carries the sentence it was read in');
+  const read = sentenceAt(26).quote, saved = PASSAGE.tokens[30];
+  try {
+    PASSAGE.tokens[30] = { s: 'が', b: 'が' };
+    assert.equal(p.word(26).children.at(-1).text, p.copy('Q-01'), 'the changed occurrence is a new one: Q-01, never Q-01r');
+    const row = all(p.lessons()).find((e) => e.id === `kanji-quest-lessons-${old.id}`);
+    assert.equal(row.textContent, p.copy('Q-08') + read + p.copy('Q-08b'), 'the row keeps the sentence as it was read');
+    row.click();
+    assert.ok(p.has('Q-27')); assert.ok(p.find('kanji-quest-end'));
+    for (const id of ['kanji-quest-reading', 'kanji-quest-rooms', 'kanji-room-return']) assert.equal(p.find(id), null, `no ${id}`);
+    assert.equal(p.text().includes(p.copy('Q-09', 0)), false);
+    const fresh = await created(p, 26);
+    assert.notEqual(fresh.id, old.id);
+    intoReading(p);
+    assert.deepEqual(p.state().sessions.get(p.S.kanjiCourse.run.sessionId)?.binding?.goals.map((g) => g.id), [fresh.id], 'the changed quest never binds');
+  } finally { PASSAGE.tokens[30] = saved; }
+  p.S.kanjiCourse = null;
+  const a = await created(p, 60), b = await created(p, 61);
+  assert.notEqual(a.id, b.id); assert.deepEqual([a.seed.sourceOccurrence.sentence, a.seed.sourceOccurrence.quote], [b.seed.sourceOccurrence.sentence, b.seed.sourceOccurrence.quote]);
+  assert.equal(p.word(60).children.at(-1).text, p.copy('Q-01r'), 'the unchanged occurrence still resumes');
+});
+
+test('U21', 'a goal with no stored sentence, or from a passage no longer in the build, refuses to resume with Q-27u + End only and is never retargeted; a passage not yet loaded shows Q-17, then resumes once it loads (lead 2009)', async (m) => {
+  const p = await onPage(m);
+  const bare = p.q.questSeed({ source: 'passage', passage: PASSAGE.id, token: 26, sentence: [24, 41], word: '職業' });
+  const gone = p.q.questSeed({ ...occurrence(62), passage: 'bunki-essay-retired' });
+  const unversioned = (await p.q.createQuest(p.day.lc, p.state(), bare)).goalId, retired = (await p.q.createQuest(p.day.lc, p.state(), gone)).goalId;
+  assert.equal(p.word(26).children.at(-1).text, p.copy('Q-01'), 'never retargeted to the current occurrence');
+  for (const id of [unversioned, retired]) {
+    p.S.kanjiCourse = null;
+    all(p.lessons()).find((e) => e.id === `kanji-quest-lessons-${id}`).click();
+    assert.ok(p.has('Q-27u')); assert.equal(p.has('Q-27'), false, 'no change is claimed');
+    assert.ok(p.find('kanji-quest-end')); assert.equal(p.find('kanji-quest-reading'), null);
+  }
+  const ready = await created(p, 60);
+  intoReading(p);
+  assert.deepEqual(p.state().sessions.get(p.S.kanjiCourse.run.sessionId)?.binding?.goals.map((g) => g.id), [ready.id], 'neither binds');
+  p.click('kanji-quest-leave'); p.click('kanji-quest-leave');
+  PASSAGE.__tokens = PASSAGE.tokens; delete PASSAGE.tokens;
+  try {
+    p.S.view = 'lessons'; p.context.render();
+    assert.ok(p.has('Q-17')); assert.equal(p.find('kanji-quest-reading'), null, 'not resumed before the text is checked');
+    await flush();
+    assert.ok(p.find('kanji-quest-reading'), 'resumes once the passage is loaded and unchanged');
+  } finally { PASSAGE.tokens ||= PASSAGE.__tokens; delete PASSAGE.__tokens; }
+});
+
+test('U20', 'packaging (W2 2004 S3B-1): every module the journey and quest seams import ships as a required asset and in the offline shell; with the adapter absent the real import fails closed: no quest memory, door or row, and the rooms still work', async (m) => {
+  const source = current?.source ?? SOURCE;
+  const seams = liftCorridor(source, ['adoptJourney', 'kanjiQuestAdopt']);
+  const imported = [...seams.matchAll(/import\('\.\/([^']+)'\)/g)].map((match) => match[1]).sort();
+  assert.deepEqual(imported, ['journey-lifecycle.mjs', 'm4-quest.mjs']);
+  const assets = entries(current?.assets ?? ASSETS, 'export const CORRIDOR_REQUIRED_ROOTS'), shell = entries(current?.sw ?? SW, 'const SHELL');
+  for (const file of imported) { assert.ok(assets.includes(file), `${file} is a required asset`); assert.ok(shell.includes(file), `${file} is in the offline shell`); }
+  const day = await activeDay(m), p = page(m, day), app = { journeyAuthority() {} };
+  p.context.recordApp = app;
+  p.context.__lc = { createLifecycle: () => day.lc, recordPort: () => ({}), LIMITS: m.lifecycle.LIMITS };
+  vm.runInContext('kanjiJourneyModule = Promise.resolve(__lc);', p.context);
+  await p.context.adoptJourney(1, app); await flush();
+  assert.ok(p.journey(), 'the journey adopts'); assert.equal(p.journey().quest, undefined, 'no quest memory');
+  assert.equal(p.word().children.some((e) => e.id === 'kanji-quest-door'), false);
+  assert.equal(all(p.lessons()).some((e) => e.id.startsWith('kanji-quest-lessons-')), false);
+  p.context.openKanjiRooms(WORD(), null); p.click('kanji-room-reading'); p.click('kanji-course-practise');
+  assert.ok(p.find('kanji-course-answer'), 'the room still works');
+});
+
 /** each control mutates corridor.js (or m4-quest.mjs) and names the case that must fail */
 export const MUTANTS = {
   'no-bind-at-start': ['U5', [["    if (typeof kanjiQuestRunStarted === 'function') kanjiQuestRunStarted(visit);\n", '']]],
@@ -509,11 +592,20 @@ export const MUTANTS = {
   'leave-drops-visit': ['U13', [['  if (frame) { frame.kanjiCourseReturn.priorCourse = visit; returnFromNavigation(); return; }', '  if (frame) { returnFromNavigation(); return; }']]],
   'leave-is-course-back': ['U4', [["  if (questStage && questStage !== 'ended') {", "  if (false) {"]]],
   'quests-when-off': ['U1', [["  if (JOURNEY_WRITES && typeof kanjiQuestAdopt === 'function') await kanjiQuestAdopt(journey);", "  if (typeof kanjiQuestAdopt === 'function') await kanjiQuestAdopt(journey);"]]],
-  'restart-every-render': ['U14', [["journey.quest.restarted = false; lines(['Q-15']);", "lines(['Q-15']);"]]],
+  'restart-every-render': ['U14', [["journey.quest.restarted = false; lines(['Q-15r']);", "lines(['Q-15r']);"]]],
   'lessons-show-finished': ['U15', [["    if (goal.status !== 'unfinished') continue;\n    const row = el('button', 'entry-row');", "    const row = el('button', 'entry-row');"]]],
   'stale-binding-in-progress': ['U18', [["if (!results.length) { settle.lines = owned() ? ['Q-21'] : ['K-26']; return; }", "if (!results.length) { settle.lines = owned() ? ['Q-22'] : ['K-26']; return; }"]]],
   'k20-hidden-in-quest': ['U6', [["        if (hookless) main.append(el('p', 'fine', kanjiCourseHookLine({ reason: 'hook-unavailable' })));\n", '']]],
   'conflicting-provenance': ['U2', [["  if (node?.t !== 'word' || node.id !== '職業' || node.sourceContext != null) return null;", "  if (node?.t !== 'word' || node.id !== '職業') return null;"]]],
+  'seed-without-content': ['U19', [["    quote: sentence.quote, word: node.id });", "    word: node.id });"]]],
+  'stale-resumes': ['U19', [["  if (stale !== false) {\n    // lead 2005", "  if (false) {\n    // lead 2005"]]],
+  'stale-binds': ['U19', [[", { eligible: (goal) => kanjiQuestStale(goal.seed) === false });", ");"]]],
+  'unverifiable-says-changed': ['U21', [["lines([{ changed: 'Q-27', unverifiable: 'Q-27u' }[stale] ?? 'Q-17']);", "lines([{ changed: 'Q-27', unverifiable: 'Q-27' }[stale] ?? 'Q-17']);"]]],
+  'unversioned-resumes': ['U21', [["  if (at?.source !== 'passage' || typeof at.quote !== 'string') return 'unverifiable';", "  if (at?.source !== 'passage') return 'unverifiable';\n  if (typeof at.quote !== 'string') return false;"]]],
+  'unloaded-assumed-same': ['U21', [["      ensureArticle(p).catch(() => {}).finally(() => { kanjiQuestLoading.delete(p.id); if (p.tokens) redraw?.(); });\n    }\n    return null;",
+    "      ensureArticle(p).catch(() => {}).finally(() => { kanjiQuestLoading.delete(p.id); if (p.tokens) redraw?.(); });\n    }\n    return false;"]]],
+  'adapter-not-shipped': ['U20', [], [], [["  'journey-lifecycle.mjs',\n  'm4-quest.mjs',\n", "  'journey-lifecycle.mjs',\n"]]],
+  'adapter-not-offline': ['U20', [], [], [], [["  'journey-lifecycle.mjs',\n  // M4 v0: the quest adapter, imported beside the lifecycle when the switch is ON\n  'm4-quest.mjs',\n", "  'journey-lifecycle.mjs',\n"]]],
   'structural-ignored': ['U16', [["  return !view.root || KANJI_QUEST_STRUCTURAL.includes(view.phase);", '  return !view.root;']]],
   'adapter-clear-unfinished': ['U15', [], [["  if (!goal || goal.status !== 'completed') return { kind: 'absent' };\n  if (!owned()) return { kind: 'owner-changed' };\n  state.recovered.add(goalId);",
     "  if (!goal) return { kind: 'absent' };\n  if (!owned()) return { kind: 'owner-changed' };\n  state.recovered.add(goalId);"]]],
@@ -534,13 +626,13 @@ async function main() {
   }
   const controls = [];
   if (process.argv.includes('--mutants')) {
-    const original = { source: SOURCE, adapter: ADAPTER };
-    for (const [name, [target, corridorPairs, adapterPairs = []]] of Object.entries(MUTANTS)) {
+    for (const [name, [target, corridorPairs, adapterPairs = [], assetPairs = [], swPairs = []]] of Object.entries(MUTANTS)) {
       floor();
-      const source = mutate(original.source, corridorPairs, name), adapter = mutate(original.adapter, adapterPairs, name);
+      const texts = { source: mutate(SOURCE, corridorPairs, name), adapter: mutate(ADAPTER, adapterPairs, name),
+        assets: mutate(ASSETS, assetPairs, name), sw: mutate(SW, swPairs, name) };
       const t = CASES.find((entry) => entry.id === target);
       try {
-        await withSources(source, adapter, () => t.fn(modules));
+        await withSources(texts, () => t.fn(modules));
         controls.push({ name, target, killed: false });
       } catch (error) { controls.push({ name, target, killed: error instanceof assert.AssertionError, witness: error.message.split('\n')[0] }); }
     }
@@ -552,8 +644,8 @@ async function main() {
 }
 /** a mutant runs its case over the mutated texts: the page and the adapter read these bindings */
 let current = null;
-async function withSources(source, adapter, start) {
-  current = { source, adapter };
+async function withSources(texts, start) {
+  current = texts;
   try { return await start(); } finally { current = null; }
 }
 if (import.meta.url === pathToFileURL(process.argv[1]).href) await main();

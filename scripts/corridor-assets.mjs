@@ -79,6 +79,7 @@ export const CORRIDOR_REQUIRED_ROOTS = [
   'review-caller.mjs',
   'help-relevance.mjs',
   'journey-lifecycle.mjs',
+  'm4-quest.mjs',
   'decks/context-dense/mount.js',
   'decks/context-dense/engine.js',
   'decks/context-dense/deck.json',
