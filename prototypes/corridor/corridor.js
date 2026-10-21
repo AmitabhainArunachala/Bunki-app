@@ -20292,6 +20292,8 @@ async function adoptJourney(epoch, app) {
   kanjiJourney = journey;
   for (const note of journey.lifecycle.inspect().diagnostics) console.warn('journey:', note);
   await kanjiJourneyRun(journey, () => journey.lifecycle.ready);
+  // M4 (lead 1709): quests exist only with the switch ON
+  if (JOURNEY_WRITES && typeof kanjiQuestAdopt === 'function') await kanjiQuestAdopt(journey);
 }
 function kanjiJourneyRun(journey, step) {
   const run = journey.queue.then(step);
@@ -20537,11 +20539,15 @@ async function reportKanjiCourseAttempt(visit, attemptId, choice) {
   if (Object.hasOwn(visit.hookOutcomes, attemptId)) return;
   const caller = typeof kanjiReviewCaller === 'undefined' ? null : kanjiReviewCaller;
   if (typeof window.__KAIRO_HOOKS__?.report !== 'function' || !caller) {
+    // M4 Q-16: inside a quest the self-check is still kept, and counts toward it, with no hook to record it
+    if (typeof kanjiQuestSelfCheck === 'function' && kanjiQuestSelfCheck(visit, attemptId, choice)) return;
     visit.hookOutcomes[attemptId] = { write: false, reason: 'hook-unavailable' };
     render(); return;
   }
   const checkedAt = Date.now();
   visit.run = course.selfCheck(visit.run, attemptId, choice, checkedAt);
+  // M4: the last required self-check settles the bound quests before anything can replace the run
+  if (typeof kanjiQuestSettle === 'function') kanjiQuestSettle(visit);
   const candidate = course.hookCandidate(visit.run, attemptId);
   if (!candidate) return;
   // HOOKS r8: prepare from the retained ledger, then the one caller, which re-checks the retained record and the binding
@@ -20650,6 +20656,7 @@ function renderKanjiCourseDoor(sheet, node) {
     rooms.disabled = door.disabled;
     rooms.addEventListener('click', () => { if (recordReady(epoch)) openKanjiRooms(node, rooms); });
     sheet.append(rooms);
+    if (typeof kanjiQuestDoor === 'function') kanjiQuestDoor(sheet, node, door.disabled);
   }
 }
 /** M4 v0 learner lines (UX r4.2 7eae4438 §6.1 and §6.3), verbatim on both keys: [Japanese, English] for tx(). Q-13 is
@@ -20748,6 +20755,328 @@ function renderKanjiRoomChooser(main, visit, redraw) {
     main.append(door);
   }
 }
+/** M4 v0 quests (UX r4.2 §2; lead 1709: they exist only with the switch ON): the adapter, loaded once beside the lifecycle */
+let kanjiQuestModule = null;
+/** the lifecycle phases of a structural hold (§5: J1/P4 roots, JLp:195–196): no quest starts or advances, the rooms still work */
+const KANJI_QUEST_STRUCTURAL = Object.freeze(['missing-root-hold', 'invalid-root-hold', 'unowned-root-hold', 'authority-unavailable']);
+/** what a failed write of each quest action says (§2.3); a retirement after a confirmed Done says nothing of its own */
+const KANJI_QUEST_FAILED = Object.freeze({ create: 'Q-20', complete: 'Q-22', end: 'Q-23', retire: null });
+/** ON, once the owner's lifecycle is ready: this owner's quest memory, then one try at retiring quests already done (§2.3). A run
+ * lives only in this page's memory, so a quest present at load restarts its set (Q-15, once) */
+async function kanjiQuestAdopt(journey) {
+  kanjiQuestModule ||= import('./m4-quest.mjs').catch((err) => { console.warn('quests unavailable', err); return null; });
+  const module = await kanjiQuestModule;
+  if (!module || kanjiJourney !== journey || journey.epoch !== recordEpoch) return;
+  const present = module.quests(journey.lifecycle.inspect().root);
+  journey.quest = { module, state: module.createQuestState(), restarted: present.some((goal) => goal.status === 'unfinished'), toldHold: false };
+  await module.recoverCompleted(journey.lifecycle, journey.quest.state, { owned: kanjiQuestOwner(journey) });
+}
+/** the live owner check every quest write carries (W2 1907): the journey it began under is still this record owner's */
+function kanjiQuestOwner(journey) {
+  return () => kanjiJourney === journey && journey.epoch === recordEpoch && recordReady(journey.epoch);
+}
+/** this owner's journey when quests can run: ON, adopted, and the visit (or the page, with none) still this owner's */
+function kanjiQuestFor(visit = { epoch: recordEpoch }) {
+  const journey = kanjiJourneyFor(visit);
+  return journey?.quest ? journey : null;
+}
+function kanjiQuestStructural(journey) {
+  const view = journey.lifecycle.inspect();
+  return !view.root || KANJI_QUEST_STRUCTURAL.includes(view.phase);
+}
+/** the reader occurrence a 職業 word page came from: its passage, the token's index (the reader node's from.index) and that token's
+ * sentence. A page opened without one (search, lists, an imported source in v0) offers no quest */
+function kanjiQuestSeed(node, module) {
+  if (node?.t !== 'word' || node.id !== '職業') return null;
+  const sentence = teacherSentence(node);
+  if (!sentence || sentence.p.tokens[sentence.index]?.b !== node.id) return null;
+  return module.questSeed({ source: 'passage', passage: sentence.p.id, token: sentence.index, sentence: [sentence.start, sentence.end],
+    word: node.id });
+}
+/** Q-04's sentence, only while the passage still has the seed's sentence at that token */
+function kanjiQuestSentence(seed) {
+  const at = seed?.sourceOccurrence;
+  const sentence = at?.source === 'passage' ? teacherSentence({ from: { passage: at.passage, index: at.token } }) : null;
+  return sentence && sentence.start === at.sentence[0] && sentence.end === at.sentence[1] ? sentence.quote : null;
+}
+/** one learner line by id; K-26 is the course's own record-changed line (C:20697) */
+function kanjiQuestLine(id, n = 0) {
+  if (id === 'K-26') return tx('記録が切り替わったため、この練習は保存できません。', 'The learner record changed. This session cannot be saved.');
+  return tx(...M4_COPY[id].map((text) => text.replace('${n}', n)));
+}
+/** a quest write's lines (§2.3): nothing for a published one; K-26 or Q-17 for a refusal before commit; the action's own line for a
+ * known non-publication, Q-21 for an unproved one. Q-25 joins once, and only while a commit has left this page held (lead 1823) */
+function kanjiQuestLines(journey, action, out) {
+  if (['published', 'already-completed', 'exists', 'absent', 'pool-full'].includes(out.kind)) return [];
+  if (out.kind === 'owner-changed' || out.kind === 'structural') return action === 'retire' ? [] : [out.kind === 'structural' ? 'Q-17' : 'K-26'];
+  const own = out.kind === 'uncertain' ? 'Q-21' : KANJI_QUEST_FAILED[action];
+  const lines = own && action !== 'retire' ? [own] : [];
+  const view = journey.lifecycle.inspect();
+  if (view.phase === 'publication-hold' && Date.now() < view.holdUntil && !journey.quest.toldHold) {
+    journey.quest.toldHold = true; lines.push('Q-25');
+  }
+  return lines;
+}
+/** the binding this run took at its creation, while it still holds a quest */
+function kanjiQuestBinding(journey, run) {
+  const binding = journey.quest.state.sessions.get(run?.sessionId)?.binding;
+  return binding?.goals.length ? binding : null;
+}
+/** inside a quest, Q-16 replaces K-03 and the self-check is always offered (decision 8a) */
+function kanjiQuestBound(visit) {
+  const journey = kanjiQuestFor(visit);
+  return !!(journey && visit.run && kanjiQuestBinding(journey, visit.run));
+}
+/** words done in a run: answered, with feedback and a self-check (participation, never recall) */
+function kanjiQuestWordsDone(run) {
+  return run.attempts.filter((attempt, index) => run.responses[index]?.action === 'answer' && attempt.feedbackAt !== null &&
+    attempt.selfCheck !== null).length;
+}
+/** at a run's creation only (W2 1928): a fresh Reading run binds the unfinished quests present now; any other run binds none */
+function kanjiQuestRunStarted(visit) {
+  const journey = kanjiQuestFor(visit);
+  if (!journey) return;
+  visit.questSettle = null;
+  journey.quest.module.bindRun(journey.quest.state, journey.lifecycle, visit.run);
+}
+/** at the last required self-check, before anything can replace the run (W5 1746; W2 1928): a qualifying bound run settles its
+ * quests. The adapter reserves each one before its first write; the course's review write goes on beside it */
+function kanjiQuestSettle(visit) {
+  const journey = kanjiQuestFor(visit), course = window.BunkiKanjiCourse, run = visit.run;
+  const binding = journey && run ? kanjiQuestBinding(journey, run) : null;
+  if (!binding || !journey.quest.module.runQualifies(run, binding, course)) return null;
+  const settle = { sessionId: run.sessionId, pending: true, lines: [] };
+  visit.questSettle = settle;
+  const owned = kanjiQuestOwner(journey);
+  return journey.quest.module.settleRun(journey.lifecycle, journey.quest.state, run, { course, owned }).then((results) => {
+    if (!results.length) { settle.lines = owned() ? ['Q-22'] : ['K-26']; return; }
+    for (const { goalId, complete, retire } of results) {
+      const done = ['published', 'already-completed'].includes(complete.kind);
+      if (done && visit.quest?.goalId === goalId) visit.quest.done = true;
+      for (const id of done ? ['Q-12', ...(retire ? kanjiQuestLines(journey, 'retire', retire) : [])] : kanjiQuestLines(journey, 'complete', complete))
+        if (!settle.lines.includes(id)) settle.lines.push(id);
+    }
+  }, () => { settle.lines = kanjiQuestLines(journey, 'complete', { kind: 'uncertain' }); }).finally(() => {
+    settle.pending = false;
+    kanjiQuestRedraw(visit);
+  });
+}
+/** Q-16 with no review hook: inside a quest the self-check is still kept and counts toward it, and the line says recording is
+ * unavailable (K-20) */
+function kanjiQuestSelfCheck(visit, attemptId, choice) {
+  if (!kanjiQuestBound(visit)) return false;
+  visit.run = window.BunkiKanjiCourse.selfCheck(visit.run, attemptId, choice, Date.now());
+  visit.hookOutcomes[attemptId] = { write: false, reason: 'hook-unavailable' };
+  kanjiQuestSettle(visit);
+  render();
+  return true;
+}
+function kanjiQuestRedraw(visit) {
+  if (S.kanjiCourse !== visit || S.view !== 'lessons' || !recordReady(visit.epoch)) return;
+  render(); document.getElementById('kanji-course-title')?.focus({ preventScroll: true });
+}
+/** one quest write from a quest stage: the visit waits, then the stage shows that write's own outcome */
+async function kanjiQuestAct(visit, act) {
+  const journey = kanjiQuestFor(visit), quest = visit.quest;
+  if (!journey || !quest || visit.pending) return null;
+  visit.pending = true; quest.lines = []; render();
+  let out;
+  try { out = await act(journey.quest.module, journey.lifecycle, journey.quest.state, { owned: kanjiQuestOwner(journey) }); }
+  catch { out = { kind: 'uncertain' }; }
+  visit.pending = false;
+  return visit.quest === quest ? { journey, quest, out } : null;
+}
+/** Q-05: the quest page opens only on a published create; an occurrence's unfinished quest is resumed, a finished one shows done */
+async function kanjiQuestCreate(visit) {
+  const acted = await kanjiQuestAct(visit, (module, lc, state, opts) => module.createQuest(lc, state, visit.quest.seed, opts));
+  if (acted) {
+    const { journey, quest, out } = acted;
+    if ((out.kind === 'published' && out.goalId != null) || (out.kind === 'exists' && out.status === 'unfinished'))
+      Object.assign(quest, { goalId: out.goalId, view: 'page' });
+    else if (out.kind === 'pool-full') quest.view = 'pool';
+    // an End still pending for this occurrence, or a create already in flight that has not resolved, is not known either way
+    else quest.lines = kanjiQuestLines(journey, 'create', out.kind === 'published' || out.kind === 'pending-end' ||
+      out.reason === 'create-unresolved' ? { kind: 'uncertain' } : out);
+  }
+  kanjiQuestRedraw(visit);
+}
+/** Q-11b End it: abandon-and-retire. Q-24 only once it is published; the run is left as it is (§3.3) */
+async function kanjiQuestEnd(visit) {
+  const acted = await kanjiQuestAct(visit, (module, lc, state, opts) => module.endQuest(lc, state, visit.quest.goalId, opts));
+  if (acted) {
+    const { journey, quest, out } = acted;
+    quest.confirmEnd = false;
+    if (out.kind === 'published' || out.kind === 'absent') Object.assign(quest, { view: 'ended', lines: out.kind === 'published' ? ['Q-24'] : [] });
+    else quest.lines = kanjiQuestLines(journey, 'end', out);
+  }
+  kanjiQuestRedraw(visit);
+}
+/** Q-26: clear one finished quest still in the pool (owned retirement recovery); a published one leaves the list */
+async function kanjiQuestClear(visit, goalId) {
+  const acted = await kanjiQuestAct(visit, (module, lc, state, opts) => module.clearCompleted(lc, state, goalId, opts));
+  if (acted) acted.quest.lines = kanjiQuestLines(acted.journey, 'retire', acted.out);
+  kanjiQuestRedraw(visit);
+}
+/** Q-01 / Q-01r beside the course door on the 職業 word page (window 4 1926; W12 1928): one quest per occurrence */
+function kanjiQuestDoor(sheet, node, disabled) {
+  const journey = kanjiQuestFor();
+  const seed = journey && kanjiQuestSeed(node, journey.quest.module);
+  if (!seed) return;
+  if (kanjiQuestStructural(journey)) { sheet.append(el('p', 'fine', kanjiQuestLine('Q-17'))); return; }
+  const goal = journey.quest.module.questFor(journey.lifecycle.inspect().root, seed);
+  const resume = goal?.status === 'unfinished' ? goal : null;
+  const door = biLabel('button', 'chip', ...M4_COPY[resume ? 'Q-01r' : 'Q-01']);
+  door.type = 'button'; door.id = 'kanji-quest-door'; door.disabled = disabled;
+  const epoch = recordEpoch;
+  door.addEventListener('click', () => { if (recordReady(epoch)) kanjiQuestOpen(node, door, seed, resume ? resume.id : null); });
+  sheet.append(door);
+}
+/** the door takes the course's own help path from the page (K-25, §2.1): the objective card, or the quest page to resume */
+function kanjiQuestOpen(node, invoker, seed, goalId) {
+  if (!openKanjiCourseUnit(node, invoker)) return false;
+  Object.assign(S.kanjiCourse, { chooser: false, blocked: null,
+    quest: { seed, goalId, view: goalId === null ? 'objective' : 'page', lines: [], confirmEnd: false, done: false } });
+  render(); document.getElementById('kanji-course-title')?.focus();
+  return true;
+}
+/** Q-08 rows in Lessons, ON only, one per unfinished quest; a finished one is never shown in progress (§2.3) */
+function kanjiQuestLessonRows(section) {
+  const journey = kanjiQuestFor();
+  if (!journey || kanjiQuestStructural(journey)) return;
+  for (const goal of journey.quest.module.quests(journey.lifecycle.inspect().root)) {
+    if (goal.status !== 'unfinished') continue;
+    const row = el('button', 'entry-row');
+    row.type = 'button'; row.id = `kanji-quest-lessons-${goal.id}`;
+    row.append(el('span', 'row-main', kanjiQuestLine('Q-08')), el('span', 'row-go', kanjiQuestLine('Q-08b')));
+    row.addEventListener('click', () => {
+      if (!recordReady(recordEpoch)) return;
+      // Lessons adds no slip help (§7 step 7); a visit of the unit keeps its run, draft and help, only a missing one is opened anew
+      if (S.kanjiCourse?.unitId !== journey.quest.module.QUEST_UNIT) S.kanjiCourse = { unitId: journey.quest.module.QUEST_UNIT, stage: 'intro',
+        index: 0, epoch: recordEpoch, run: null, draft: '', feedback: null, saved: false, pending: false,
+        supportedPractice: !!S.kanjiCourse?.supportedPractice };
+      Object.assign(S.kanjiCourse, { chooser: false, blocked: null,
+        quest: { seed: goal.seed, goalId: goal.id, view: 'page', lines: [], confirmEnd: false, done: false } });
+      render(); document.getElementById('kanji-course-title')?.focus();
+    });
+    section.append(row);
+  }
+}
+/** the visit's quest stage after this owner's root is read: null with no quest, 'ended' once its goal has left the root (absence
+ * proves only absence, W5 1746: no ended or retired line after the fact) */
+function kanjiQuestStage(visit) {
+  const quest = visit.quest, journey = quest ? kanjiQuestFor(visit) : null;
+  if (!journey) { if (quest) visit.quest = null; return null; }
+  if (quest.view === 'page' && !quest.done &&
+      !journey.quest.module.quests(journey.lifecycle.inspect().root).some((goal) => goal.id === quest.goalId)) quest.view = 'ended';
+  return quest.view;
+}
+/** K-22 Back on a quest stage. In a room it goes up to the quest page; elsewhere it is "leave for now" (§2.1, condition B): the visit
+ * keeps its run, attempt, draft and help and only the view changes, never "Back to course list". Q-07 only for a quest in the
+ * last confirmed root, otherwise Q-21 */
+function kanjiQuestLeave(visit) {
+  const quest = visit.quest, journey = kanjiQuestFor(visit);
+  if (!quest || !journey) return;
+  quest.lines = []; quest.confirmEnd = false;
+  if (quest.view === 'room') { Object.assign(visit, { chooser: false, blocked: null }); quest.view = 'page'; kanjiQuestRedraw(visit); return; }
+  if (quest.view === 'page' && !quest.done) {
+    const goal = journey.quest.module.quests(journey.lifecycle.inspect().root).find((g) => g.id === quest.goalId);
+    showReaderToast(kanjiQuestLine(kanjiQuestStructural(journey) ? 'Q-17' : goal?.status === 'unfinished' ? 'Q-07' : 'Q-21'));
+  }
+  const frame = kanjiCourseReturnFrame();
+  if (frame) { frame.kanjiCourseReturn.priorCourse = visit; returnFromNavigation(); return; }
+  S.view = 'reader'; render(); window.scrollTo(0, 0);
+}
+/** Q-13r: eight quests present, finished ones too (W5 1746). Each is listed: an unfinished one to resume or end, a finished one to
+ * clear (Q-26); none is evicted to make room */
+function kanjiQuestPool(main, visit, journey, button, redraw) {
+  main.append(el('p', 'gloss', kanjiQuestLine('Q-13r')));
+  const go = (goal, confirmEnd) => {
+    visit.quest = { seed: goal.seed, goalId: goal.id, view: 'page', lines: [], confirmEnd, done: false }; redraw();
+  };
+  for (const goal of journey.quest.module.quests(journey.lifecycle.inspect().root)) {
+    if (goal.status === 'unfinished') {
+      main.append(el('p', 'fine', kanjiQuestLine('Q-08')));
+      const sentence = kanjiQuestSentence(goal.seed);
+      if (sentence) main.append(el('p', 'fine', sentence));
+      main.append(button(`kanji-quest-resume-${goal.id}`, ...M4_COPY['Q-08b'], () => go(goal, false)),
+        button(`kanji-quest-end-${goal.id}`, ...M4_COPY['Q-10'], () => go(goal, true)));
+    } else if (goal.status === 'completed') {
+      main.append(button(`kanji-quest-clear-${goal.id}`, ...M4_COPY['Q-26'], () => kanjiQuestClear(visit, goal.id)));
+    }
+  }
+}
+/** the quest's own stages in this visit (§2.1–§2.2): the objective card, the quest page and the full pool; true when it drew the
+ * whole stage. In a room, or once the quest has ended, the course draws below the quest's lines */
+function kanjiQuestRender(main, visit, redraw, button) {
+  const quest = visit.quest, journey = kanjiQuestFor(visit);
+  if (!quest || !journey) return false;
+  const { module } = journey.quest;
+  const lines = (ids) => {
+    for (const id of ids) { const line = el('p', 'gloss', kanjiQuestLine(id)); line.setAttribute('role', 'status'); main.append(line); }
+  };
+  if (journey.quest.restarted && quest.view === 'page') { journey.quest.restarted = false; lines(['Q-15']); }
+  lines(quest.lines);
+  if (quest.view === 'room' || quest.view === 'ended') return false;
+  main.append(el('h2', 'list-head', kanjiQuestLine('Q-02')));
+  if (kanjiQuestStructural(journey)) { lines(['Q-17']); return true; }
+  const root = journey.lifecycle.inspect().root;
+  if (quest.view === 'pool') { kanjiQuestPool(main, visit, journey, button, redraw); return true; }
+  if (quest.view === 'objective') {
+    // no reading: the next thing asked is the reading (§2.1)
+    main.append(el('p', 'gloss', kanjiQuestLine('Q-03')));
+    const sentence = kanjiQuestSentence(quest.seed);
+    if (sentence) main.append(el('p', 'fine', kanjiQuestLine('Q-04')), el('p', 'gloss', sentence));
+    main.append(el('p', 'fine', kanjiQuestLine('Q-14')), el('p', 'fine', kanjiQuestLine('Q-06')));
+    const goal = module.questFor(root, quest.seed);
+    if (goal?.status === 'completed') {
+      lines(['Q-12']);
+      main.append(button('kanji-quest-clear', ...M4_COPY['Q-26'], () => kanjiQuestClear(visit, goal.id)));
+    } else if (module.quests(root).length >= journey.module.LIMITS.goals) kanjiQuestPool(main, visit, journey, button, redraw);
+    else main.append(button('kanji-quest-start', ...M4_COPY['Q-05'], () => kanjiQuestCreate(visit), 'take'));
+    return true;
+  }
+  // the quest page: no score, only words done (§4)
+  if (quest.done || module.quests(root).find((goal) => goal.id === quest.goalId)?.status === 'completed') {
+    lines(['Q-12']);
+    main.append(el('p', 'fine', tx('この回の練習結果です。習得・長期記憶を示す点数ではありません。', 'These results describe this practice session. They do not establish mastery or long-term retention.')));
+    return true;
+  }
+  const occupying = kanjiCourseRunKind(visit.run);
+  const bound = !!kanjiQuestBinding(journey, visit.run)?.goals.some((goal) => goal.id === quest.goalId);
+  const toRoom = () => { quest.view = 'room'; quest.lines = []; quest.confirmEnd = false; Object.assign(visit, { chooser: false, blocked: null }); };
+  if (occupying && !(occupying === 'reading' && bound)) {
+    // §3.3: a pre-goal, Meaning or mixed run is never answered, bound or reset from here; R-11 goes back to it as it is
+    lines(['Q-19']);
+    main.append(button('kanji-room-return', ...M4_COPY['R-11'], () => { toRoom(); redraw(); }));
+  } else {
+    const door = el('button', 'study-door');
+    door.type = 'button'; door.id = 'kanji-quest-reading'; door.dataset.studyDoor = 'room-reading';
+    door.append(el('span', 'study-door-t', tx(...ROOM_NAMES.rooms['room-reading'])),
+      el('span', 'study-door-sub', kanjiQuestLine('Q-09', occupying ? kanjiQuestWordsDone(visit.run) : 0)));
+    door.disabled = !!visit.pending;
+    door.addEventListener('click', () => {
+      if (S.kanjiCourse !== visit || visit.pending) return;
+      toRoom(); kanjiChooseRoom(visit, 'reading'); redraw();
+    });
+    main.append(door, button('kanji-quest-rooms', ...M4_COPY['R-01'], () => { toRoom(); visit.chooser = true; redraw(); }));
+  }
+  if (quest.confirmEnd) {
+    main.append(el('p', 'fine', kanjiQuestLine('Q-11')));
+    const [endJa, keepJa] = M4_COPY['Q-11b'][0].split(' · '), [endEn, keepEn] = M4_COPY['Q-11b'][1].split(' · ');
+    main.append(button('kanji-quest-end-confirm', endJa, endEn, () => kanjiQuestEnd(visit)),
+      button('kanji-quest-end-keep', keepJa, keepEn, () => { quest.confirmEnd = false; redraw(); }));
+  } else main.append(button('kanji-quest-end', ...M4_COPY['Q-10'], () => { quest.confirmEnd = true; quest.lines = []; redraw(); }));
+  return true;
+}
+/** at a bound run's results (§2.1): Q-12 only once its completion is published (K-21 stands below), the write's own line when not,
+ * and Q-18 with Q-18b when the set finished without every self-check */
+function kanjiQuestSummary(main, visit, button, start) {
+  if (!kanjiQuestBound(visit)) return;
+  const settle = visit.questSettle?.sessionId === visit.run.sessionId ? visit.questSettle : null;
+  const line = (id) => { const p = el('p', 'gloss', kanjiQuestLine(id)); p.setAttribute('role', 'status'); main.append(p); };
+  if (!settle) { line('Q-18'); main.append(button('kanji-quest-again', ...M4_COPY['Q-18b'], () => start('check'), 'take')); return; }
+  for (const id of settle.pending ? [] : settle.lines) line(id);
+}
 function renderKanjiCourseMenu(main) {
   const course = window.BunkiKanjiCourse;
   if (!course) return;
@@ -20801,6 +21130,7 @@ function renderKanjiCourseMenu(main) {
     });
     section.append(rooms);
   }
+  if (typeof kanjiQuestLessonRows === 'function') kanjiQuestLessonRows(section);
   main.append(section);
 }
 function renderKanjiCourse(main) {
@@ -20833,7 +21163,10 @@ function renderKanjiCourse(main) {
     main.append(reset);
     return;
   }
-  if (kanjiCourseReturnFrame()) {
+  const questStage = typeof kanjiQuestStage === 'function' ? kanjiQuestStage(visit) : null;
+  if (questStage && questStage !== 'ended') {
+    main.append(button('kanji-quest-leave', '戻る', 'Back', () => kanjiQuestLeave(visit)));
+  } else if (kanjiCourseReturnFrame()) {
     main.append(button('kanji-course-source-return', '開いていた項目に戻る', 'Return to the entry I came from', returnFromNavigation));
   } else {
     main.append(button('kanji-course-leave', 'コース一覧へ', 'Back to course list', () => {
@@ -20844,6 +21177,7 @@ function renderKanjiCourse(main) {
     '辞書を見たあとの練習です。初見のテストではありません。',
     'Practice after opening the dictionary. This is not a first-try check.',
   )));
+  if (questStage && kanjiQuestRender(main, visit, redraw, button)) return;
   // M4 rooms (UX r4.2 §3): the chooser, or a blocked entry that shows only its line and the way back, never a check
   if (visit.chooser) { renderKanjiRoomChooser(main, visit, redraw); return; }
   if (visit.blocked) {
@@ -20859,6 +21193,7 @@ function renderKanjiCourse(main) {
   const start = (mode) => {
     visit.run = course.createRun(unit.id, { mode, ...(unit.id === 'shiki-shoku' ? { sessionId: crypto.randomUUID() } : {}),
       ...(visit.room ? { targets: [visit.room] } : {}) });
+    if (typeof kanjiQuestRunStarted === 'function') kanjiQuestRunStarted(visit);
     visit.stage = 'check'; visit.feedback = null; visit.draft = ''; visit.saved = false; visit.evidenceTime = null; visit.noEvidence = false;
     kanjiCourseApplyHelp(visit);
     redraw();
@@ -20952,15 +21287,16 @@ function renderKanjiCourse(main) {
     }
     if (result.attemptId && ['correct', 'wrong'].includes(result.status)) {
       const outcome = visit.hookOutcomes?.[result.attemptId];
+      const inQuest = typeof kanjiQuestBound === 'function' && kanjiQuestBound(visit);
       if (result.assisted) main.append(el('p', 'fine', tx('この回答にはヘルプを使いました。', 'Help was used for this answer.')));
       if (outcome) {
         const status = el('p', 'fine', outcome.pending
           ? tx('復習への記録を確認中…', 'Checking the review write…') : kanjiCourseHookLine(outcome));
         status.id = 'kanji-course-review-status'; status.setAttribute('role', 'status'); main.append(status);
-      } else if (typeof window.__KAIRO_HOOKS__?.report !== 'function' || !(typeof kanjiReviewCaller === 'undefined' ? null : kanjiReviewCaller)) {
+      } else if (!inQuest && (typeof window.__KAIRO_HOOKS__?.report !== 'function' || !(typeof kanjiReviewCaller === 'undefined' ? null : kanjiReviewCaller))) {
         main.append(el('p', 'fine', kanjiCourseHookLine({ reason: 'hook-unavailable' })));
       } else {
-        main.append(el('p', 'fine', tx('答えを確認しましたか。既存の復習カードに記録する場合だけ選んでください。',
+        main.append(el('p', 'fine', inQuest ? tx(...M4_COPY['Q-16']) : tx('答えを確認しましたか。既存の復習カードに記録する場合だけ選んでください。',
           'Check your answer. Choose below only to record this attempt on an existing review card.')));
         if (result.status === 'correct') main.append(button('kanji-course-self-knew', '答えられた・復習に記録', 'I knew it — record for review',
           () => reportKanjiCourseAttempt(visit, result.attemptId, 'knew')));
@@ -21036,6 +21372,7 @@ function renderKanjiCourse(main) {
     return;
   }
   const result = course.summary(visit.run);
+  if (typeof kanjiQuestSummary === 'function') kanjiQuestSummary(main, visit, button, start);
   for (const [kind, counts] of Object.entries(result.targets)) {
     if (!counts.total) continue;
     const label = kind === 'meaning' ? tx('意味の選択', 'Meaning recognition') : tx('ことば全体の読み', 'Whole-word reading');

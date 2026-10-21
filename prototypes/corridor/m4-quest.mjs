@@ -186,3 +186,11 @@ export async function recoverCompleted(lc, state, { owned = () => true } = {}) {
   }
   return results;
 }
+/** Q-26: the learner clears one finished quest still in the pool, an explicit retry of its retirement (never automatic) */
+export async function clearCompleted(lc, state, goalId, { owned = () => true } = {}) {
+  const goal = quests(lc.inspect().root).find((g) => g.id === goalId);
+  if (!goal || goal.status !== 'completed') return { kind: 'absent' };
+  if (!owned()) return { kind: 'owner-changed' };
+  state.recovered.add(goalId);
+  return questWrite(lc, (observe) => lc.retire('goals', goalId, 'retire-completed', { observe }), owned);
+}
