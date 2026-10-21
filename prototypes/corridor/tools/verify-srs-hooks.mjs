@@ -26,6 +26,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import * as layer from './srs-hooks-corridor-layer.mjs';
+import * as r8 from './srs-hooks-r8-cases.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const CORRIDOR = join(HERE, '..');
@@ -568,7 +569,10 @@ async function loadEngines(coreSource, edits = {}) {
   return out;
 }
 
-async function glueSuite(core, engines, corridorProgram) {
+/* HOOKS r8 install and wiring: W3's rule and the one caller, imported from their text so a control can edit them */
+const R8_SOURCES = r8.r8Sources(CORRIDOR);
+const R8_MODS = { relevance: await importSource(R8_SOURCES.relevance), caller: await importSource(R8_SOURCES.caller) };
+async function glueSuite(core, engines, corridorProgram, mods = R8_MODS) {
   const scheduler = core.createScheduler(fsrsApi, pin);
   const MIN = 60e3;
   const base = new Date('2026-10-10T09:00:00');
@@ -903,6 +907,7 @@ async function glueSuite(core, engines, corridorProgram) {
     assert.equal((await box.lifted.reportHookAttempt(hookEvidence())).write, true, 'an unannotated candidate keeps the r7 path');
     return 'HOOKS r8: an annotated candidate without the admitted rule and a verified admission is refused (not-recorded line, no write); an unannotated one grades as in r7';
   });
+  await r8.r8Cases({ check, layer, program: corridorProgram, core, fsrsApi, pin, mods, sources: R8_SOURCES });
   return cases;
 }
 
@@ -982,6 +987,7 @@ const CORRIDOR_MUTANTS = {
   'hook-ignores-binding-epoch': [['  const epoch = Number.isSafeInteger(binding?.epoch) ? binding.epoch : recordEpoch;', '  const epoch = recordEpoch;']],
   'hook-skips-admission': [["    if (!admitted) return refusedWith('review-unverified');\n", '']],
   'hook-stale-clock': [["    clock: () => new Date(),\n    storage: globalThis.localStorage,\n    where: evidence?.surface,", "    clock: ((sampled) => () => sampled)(new Date()),\n    storage: globalThis.localStorage,\n    where: evidence?.surface,"]],
+  ...r8.R8_CORRIDOR_MUTANTS,
 };
 const EXPECT = {
   'deck-no-recheck': ['E2'], 'deck-no-reservation': ['E1'], 'deck-kanji-locked': ['E3'], 'context-no-recheck': ['E6'], 'context-no-reservation': ['E6'],
@@ -994,6 +1000,7 @@ const EXPECT = {
   'stale-commit': ['P15'], 'no-shared-boundary': ['P15'], 'unlocked-fallback': ['P16', 'P20'], 'release-any': ['P17'],
   'uncertain-releases': ['P18'], 'loose-id': ['P13'], 'stale-clock': ['P19'], 'silent-refusal': ['P20'],
   'banning-uncertain-line': ['P21'], 'swap-safe-lines': ['P22'], 'drop-anzen': ['P22'], 'mark-after-publish': ['P16'], 'false-ack-releases': ['P18'], 'abandon-penalty': ['P10'],
+  ...r8.R8_EXPECT,
 };
 
 function mutate(source, edits, name) {
@@ -1018,7 +1025,8 @@ const report = {
   spec: { path: 'one-hand/SRS/HOOKS-SPEC.md', sha256: '4fae8c1b14f844e6d6491fe4c3e7b520280f568f12ad1260ed4a02c902198a20', verdict: 'W2 PASS (design model), 2026-10-21T02:01' },
   sources: { 'srs-core.mjs': sha(CORE_SOURCE), 'corridor.js': sha(CORRIDOR_SOURCE), 'decks/player/engine.js': sha(ENGINE_SOURCES.deck),
     'decks/context-dense/engine.js': sha(ENGINE_SOURCES.context), 'vendor/ts-fsrs.mjs': sha(readFileSync(join(CORRIDOR, 'vendor/ts-fsrs.mjs'))),
-    'data/fsrs-pin.json': sha(readFileSync(join(CORRIDOR, 'data/fsrs-pin.json'))) },
+    'data/fsrs-pin.json': sha(readFileSync(join(CORRIDOR, 'data/fsrs-pin.json'))), 'kanji-course.js': sha(R8_SOURCES.course),
+    'help-relevance.mjs': sha(R8_SOURCES.relevance), 'review-caller.mjs': sha(R8_SOURCES.caller), 'data/help-relevance-catalog.json': sha(R8_SOURCES.catalog) },
   scope: 'product code in three layers: srs-core (P), the deck engines (E), corridor.js lifted into a vm (C); test doubles for ledgers, the record app, storage and the Web Lock; the refusal UI and the phone-walk origin need a browser (§7 items 9, 11)',
   node: process.version,
   timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -1056,6 +1064,14 @@ if (!args.includes('--no-controls')) {
     const caught = EXPECT[name].every((id) => failed.includes(id));
     report.controls.push({ name, layer: 'corridor', failed, expected: EXPECT[name], caught });
     console.log(`${caught ? 'CAUGHT' : 'MISSED'} control ${name} (corridor): red ${failed.join(', ') || 'none'} (expects ${EXPECT[name].join(', ')})`);
+    ok &&= caught;
+  }
+  for (const [name, edits] of Object.entries(r8.CALLER_MUTANTS)) {
+    const caller = await importSource(mutate(R8_SOURCES.caller, edits, name));
+    const failed = (await glueSuite(core, engines, corridorProgram, { ...R8_MODS, caller })).filter((c) => !c.pass).map((c) => c.id);
+    const caught = EXPECT[name].every((id) => failed.includes(id));
+    report.controls.push({ name, layer: 'caller', failed, expected: EXPECT[name], caught });
+    console.log(`${caught ? 'CAUGHT' : 'MISSED'} control ${name} (caller): red ${failed.join(', ') || 'none'} (expects ${EXPECT[name].join(', ')})`);
     ok &&= caught;
   }
 }

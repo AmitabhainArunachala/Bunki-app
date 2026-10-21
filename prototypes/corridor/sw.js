@@ -91,6 +91,10 @@ const SHELL = [
   'vendor/ts-fsrs.mjs',
   // the one schedule owner every deck, review and practice asks
   'srs-core.mjs',
+  // HOOKS r8: the one review caller, W3's help-relevance rule and its catalog, installed beside it
+  'review-caller.mjs',
+  'help-relevance.mjs',
+  'data/help-relevance-catalog.json',
   'dictionary-worker.js',
   'skip-core.js',
   'skip-ui.js',

@@ -18,6 +18,11 @@ export const CORRIDOR_NAMES = [
   'sameWordIdentity', 'wordNodeIdentity', 'wordCardIdentity', 'wordAnswerIdentity', 'savedAnswerFor', 'nonBlankMeanings',
   'admitStandardGrade', 'commitStandardGrade', 'commitReviewAction', 'advanceReviewSession', 'dropReviewCard',
   'srsWordAnswerIdentity', 'srsWordRests',
+  // HOOKS r8 install and wiring: W3's rule and the one caller, the course visit's retained ledger, its PREPARE_REVIEW, custody
+  'helpRelevanceRule', 'kanjiReviewCaller', 'KANJI_REVIEW_OWNER', 'kanjiReviewRetained', 'adoptHelpRelevance',
+  'KANJI_LEDGER_LIMITS', 'kanjiDeepFreeze', 'kanjiDataProperty', 'kanjiPlainData', 'kanjiPlainList', 'kanjiCourseRowValid',
+  'kanjiCourseLedger', 'kanjiCourseCapture', 'kanjiCourseLedgerBefore', 'kanjiCourseSnapshot', 'KANJI_REVIEW_STATE',
+  'kanjiCoursePrepareReview', 'kanjiCourseAct', 'kanjiCourseApplyHelp', 'kanjiCourseRememberHelp', 'reportKanjiCourseAttempt',
 ];
 
 /** lift the named top-level definitions from corridor.js source text */

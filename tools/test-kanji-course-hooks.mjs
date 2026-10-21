@@ -16,6 +16,7 @@ import { setImmediate } from 'node:timers';
 import { URL } from 'node:url';
 import vm from 'node:vm';
 import ts from 'typescript';
+import { createCaller } from '../prototypes/corridor/review-caller.mjs';
 import * as core from '../prototypes/corridor/srs-core.mjs';
 import * as fsrsApi from '../prototypes/corridor/vendor/ts-fsrs.mjs';
 import {
@@ -216,12 +217,15 @@ function harness({ learner = record() } = {}) {
   // actual assignment below still installs that adapter through the product seam.
   vm.runInContext(
     `const originalHookReport = reportHookAttempt;
-    reportHookAttempt = function (evidence) { __hookCalls.push(evidence); return originalHookReport(evidence); };
+    reportHookAttempt = function (evidence, binding) { __hookCalls.push(evidence); return originalHookReport(evidence, binding); };
     ${installation.getText(ast)}\n${courseSource}\nwindow.BunkiKanjiCourse = BunkiKanjiCourse;\n${courseProgram}`,
     context,
   );
   assert.equal(Object.isFrozen(context.window.__KAIRO_HOOKS__), true);
   assert.equal(context.window.__KAIRO_HOOKS__.report, context.reportHookAttempt);
+  // HOOKS r8: the course reaches the hook through the one review caller. W3's rule is absent here, so the course prepares
+  // unannotated candidates and these r7 expectations hold as written (verify-srs-hooks proves the installed rule)
+  context.adoptHelpRelevance({ createRelevance: null, createCaller, catalog: null });
   function draw() {
     main = new Element('main');
     renders++;
