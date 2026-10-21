@@ -13,7 +13,7 @@ import ts from 'typescript';
 
 /** the authored definitions under test, by name */
 export const CORRIDOR_NAMES = [
-  'commitStorePatchOutcome', 'commitStorePatch', 'PRODUCER_DECLINED', 'declineWrite',
+  'commitStorePatchOutcome', 'commitStorePatch', 'PRODUCER_DECLINED', 'declineWrite', 'HELP_RELEVANCE_POLICY',
   'reportHookAttempt', 'hookCardFacts', 'srsKey', 'srsStoredRecord', 'srsSchedulerInstant', 'srsReviewLogRow',
   'sameWordIdentity', 'wordNodeIdentity', 'wordCardIdentity', 'wordAnswerIdentity', 'savedAnswerFor', 'nonBlankMeanings',
   'admitStandardGrade', 'commitStandardGrade', 'commitReviewAction', 'advanceReviewSession', 'dropReviewCard',

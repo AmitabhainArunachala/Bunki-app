@@ -13,6 +13,7 @@ import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { test } from 'node:test';
 import vm from 'node:vm';
+import * as srsCoreModule from '../srs-core.mjs';
 
 const require = createRequire(import.meta.url);
 const ts = require('typescript');
@@ -81,7 +82,7 @@ function harness({ language = 'en' } = {}) {
   class TestDate extends Date { static now() { return now; } }
   const S = { view: 'lessons', stack: [], navigationReturns: [], kanjiCourse: null, lessonsDone: scope.record.lessonsDone };
   const context = vm.createContext({
-    S, recordEpoch: 1, personalHost: null, window: { scrollTo() {} }, Date: TestDate, crypto: { randomUUID: () => `session-${++sessionNumber}` },
+    S, recordEpoch: 1, personalHost: null, window: { scrollTo() {} }, Date: TestDate, srsCore: srsCoreModule, crypto: { randomUUID: () => `session-${++sessionNumber}` },
     el: (tag, cls, text) => new Element(tag, cls, text),
     biLabel: (tag, cls, ja, en) => new Element(tag, cls, language === 'ja' ? ja : en),
     tx: (ja, en) => language === 'ja' ? ja : en,
@@ -840,7 +841,8 @@ test('dictionary assistance is retained on the exact word attempt and precedes i
     about: { kind: 'word', term: '職業', reading: 'しょくぎょう' },
     reveals: ['reading', 'meaning', 'form'], at: 2000 }]);
   assert.equal(calls[0].answeredAt, 2010);
-  assert.match(h.text, /not due.*unchanged/);
+  // HOOKS r8 §4 (C2): the view shows srs-core's one approved line for the refusal
+  assert.ok(h.text.includes(srsCoreModule.refusalWords('not-due', 'en')), h.text);
   assert.equal(h.commits.length, 0);
 });
 
@@ -861,7 +863,7 @@ test('family reveal, skip, known-wrong answer and absent hook cannot manufacture
   assert.equal(calls.length, 0);
   h.click('kanji-course-self-missed'); await tick();
   assert.deepEqual(copy(calls[0].answer), { selfCheck: 'missed' });
-  assert.match(h.text, /no active review card.*practice/);
+  assert.ok(h.text.includes(srsCoreModule.refusalWords('no-schedule', 'en')), h.text);
   assert.equal(h.commits.length, 0);
 });
 

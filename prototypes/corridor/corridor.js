@@ -20090,14 +20090,13 @@ function kanjiCourseHookLine(outcome) {
     `復習に記録しました（評価 ${outcome.rating}）。`, `Recorded for review (rating ${outcome.rating}).`,
   );
   if (outcome?.line) return outcome.line;
-  const text = {
-    'hook-unavailable': ['この版ではコースから復習に記録できません。練習は続けられます。', 'Review recording from this course is unavailable in this version. Practice still works.'],
-    'no-schedule': ['この項目には復習中のカードがありません。練習のみの結果です。', 'This item has no active review card. This remains practice.'],
-    'not-due': ['このカードはまだ復習時刻ではありません。予定は変わりません。', 'This card is not due. Its schedule is unchanged.'],
-    'answered-today': ['この項目は今日すでに復習しました。もう一度は記録しません。', 'This item has already been reviewed today. It will not be graded again.'],
-    'publish-uncertain': ['復習への記録を確認できません。この回答は再送しません。', 'The review write could not be confirmed. This answer will not be sent again.'],
-  };
-  return tx(...(text[outcome?.reason] || ['復習には記録できませんでした。練習は続けられます。', 'This could not be recorded for review. Practice still works.']));
+  if (outcome?.reason === 'hook-unavailable') return tx(
+    'この版ではコースから復習に記録できません。練習は続けられます。', 'Review recording from this course is unavailable in this version. Practice still works.',
+  );
+  // HOOKS r8 §4: every hook refusal shows its one approved line from srs-core, never a text of this view's own
+  const core = typeof srsCore === 'undefined' ? null : srsCore;
+  const words = (lang) => core?.refusalWords(outcome?.reason, lang) ?? core?.refusalWords('not-recorded', lang);
+  return tx(words('ja') ?? '復習には記録できませんでした。練習は続けられます。', words('en') ?? 'This could not be recorded for review. Practice still works.');
 }
 async function reportKanjiCourseAttempt(visit, attemptId, choice) {
   const course = window.BunkiKanjiCourse;
@@ -30874,12 +30873,37 @@ function hookCardFacts(latest, item, key) {
  * (HOOKS-SPEC §3.1). Returns { write: true, rating, from, capped } or { write: false, reason, line } — `line` is the
  * plain refusal the surface shows while practice continues; null when the reason is an ordinary decision.
  */
-async function reportHookAttempt(evidence) {
+/** HOOKS r8: the one help-relevance policy (W3's rule and catalog version, rebound to R2 with this branch's srs-core; the
+ * version hashes the catalog's pinned files, not the head) whose annotations may exempt help from the cap. It lives here,
+ * not in srs-core, because the catalog pins srs-core's bytes */
+const HELP_RELEVANCE_POLICY = 'w3-help-relevance-r8-v1:9f0691b2f04c3abcb5898ceebf148f879b112dd35831ae4ae814ac1fc1770a06';
+/** the admitted relevance rule, W3's module created over srsCore with the pinned catalog; installed by W3 in R2 (null until then:
+ * an annotated candidate is refused, an unannotated one keeps r7's cap) */
+let helpRelevanceRule = null;
+async function reportHookAttempt(evidence, binding = null) {
   const lang = bi() ? 'en' : 'ja';
   const refusedWith = (reason) => ({ write: false, reason, line: srsCore?.refusalWords(reason, lang) ?? null });
   if (!srsCore || !scheduler) return refusedWith('no-shared-admission');
-  // the record this page owned when the attempt was made: one adopted while the attempt waited for the lock never takes it
-  const epoch = recordEpoch;
+  // r8 (W2 0524 C1, W3 0532): an annotated candidate grades only under the caller's admission — the producer's retained
+  // raw candidate and context — from which the admitted relevance rule (W3's, installed as helpRelevanceRule) must
+  // reproduce it exactly; otherwise it is refused with no write. A candidate with no annotation keeps r7's conservative cap
+  const annotated = evidence?.helpRelevance != null || (Array.isArray(evidence?.help) && evidence.help.some((row) => row && Object.hasOwn(row, 'relevance')));
+  if (annotated) {
+    const rule = typeof helpRelevanceRule === 'undefined' ? null : helpRelevanceRule;
+    let admitted = false;
+    try {
+      if (rule && rule.policy === HELP_RELEVANCE_POLICY && binding?.raw) {
+        rule.assertPreserved(binding.raw, { attemptId: binding.attemptId, sessionId: binding.sessionId, origins: binding.origins }, evidence);
+        admitted = true;
+      }
+    } catch {
+      admitted = false;
+    }
+    if (!admitted) return refusedWith('review-unverified');
+  }
+  // the record this page owned when the attempt was made (r8: the caller's binding from preparation, when it sends one):
+  // one adopted since — before the call or while it waited for the lock — never takes it
+  const epoch = Number.isSafeInteger(binding?.epoch) ? binding.epoch : recordEpoch;
   let decision = null;
   const admitted = await srsCore.admitAnswer({
     locks: globalThis.navigator?.locks || null,
@@ -30901,7 +30925,7 @@ async function reportHookAttempt(evidence) {
         const record = stored
           ? { ...stored, due: new Date(stored.due), ...(stored.last_review ? { last_review: new Date(stored.last_review) } : {}) }
           : null;
-        decision = srsCore.decideReview(evidence, record, { now, answered });
+        decision = srsCore.decideReview(evidence, record, { now, answered, relevancePolicy: HELP_RELEVANCE_POLICY });
         if (!decision.write) throw declineWrite(decision.reason);
         if (!reserve(item.kind === 'word' ? srsCore.itemIdentity(item) : null)) {
           decision = { write: false, reason: 'mark-unavailable' };
