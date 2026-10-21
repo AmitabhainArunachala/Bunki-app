@@ -87,18 +87,18 @@ export async function createQuest(lc, state, seed, { owned = () => true } = {}) 
 const readingRun = (run) => run?.unitId === QUEST_UNIT && run.round === 0 && ['check', 'preview'].includes(run.mode) &&
   Array.isArray(run.targets) && run.targets.length === 1 && run.targets[0] === 'reading';
 const freshRun = (run) => run.cursor === 0 && run.responses.length === 0 && !run.complete;
-/** once per started run: a fresh Reading run binds the unfinished quests present now; Meaning, mixed and repair runs bind none
- * (decision 10). A run seen again, or first seen already answered, keeps what it had (W5 1901 F2), and a quest whose
+/** once per started run: a fresh Reading run binds the unfinished quests present now that the caller finds eligible (a quest whose
+ * source sentence changed is not: lead 2005); Meaning, mixed and repair runs bind none (decision 10). A run seen again, or first seen already answered, keeps what it had (W5 1901 F2), and a quest whose
  * completion is still pending keeps its earlier result. The binding keeps the lifecycle activation, journey and generation it
  * was made under (W2 1907), so a reboot or a switch retires it */
-export function bindRun(state, lc, run) {
+export function bindRun(state, lc, run, { eligible = () => true } = {}) {
   if (typeof run?.sessionId !== 'string') return null;
   const known = state.sessions.get(run.sessionId);
   if (known) return known.consumed ? null : known.binding;
   const root = lc.inspect().root;
   let binding = null;
   if (root && readingRun(run) && freshRun(run)) {
-    const goals = quests(root).filter((goal) => goal.status === 'unfinished' && !state.pending.has(goal.id));
+    const goals = quests(root).filter((goal) => goal.status === 'unfinished' && !state.pending.has(goal.id) && eligible(goal));
     if (goals.length) binding = { sessionId: run.sessionId, boot: lc.bootIdentity(), journeyId: root.id, generation: root.generation,
       goals: goals.map((goal) => ({ id: goal.id, seed: structuredClone(goal.seed) })) };
   }

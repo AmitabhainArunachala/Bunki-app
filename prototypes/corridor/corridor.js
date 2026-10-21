@@ -20678,7 +20678,8 @@ const M4_COPY = Object.freeze({
   'Q-11b': ['やめる · 続ける', 'End it · Keep going'],
   'Q-12': ['クエストを終えました：三つのことばすべてに答えて確かめ、答えられたかどうかを選びました。', 'Quest done: you answered and checked all three words, and said whether you knew each.'],
   'Q-14': ['この文で「職業」がどの意味かは、まだ確認されていません。', 'Bunki hasn’t yet confirmed which meaning 職業 has in this sentence.'],
-  'Q-15': ['練習が中断されたため、最初のことばからもう一度始めます。記録済みの復習はそのまま残ります。', 'Your practice was interrupted, so this set starts again from the first word. Reviews already recorded stay as they are.'],
+  // Q-15r replaces Q-15 (W12 2000; lead 2005; stand-in 2005 and Grok 2010 PASS): true with or without a practice in progress
+  'Q-15r': ['練習の途中経過は、読み込み直したりアプリを閉じたりすると残らないため、最初のことばから始めます。記録済みの復習はそのまま残ります。', 'Practice in progress isn’t kept when you reload or close the app, so this set starts from the first word. Reviews already recorded stay as they are.'],
   'Q-16': ['答えられたかどうかを選んでください。選ぶと、クエストの進み具合に反映されます。復習に記録されるのは、札の復習の時期が来ているときだけです。', 'Say whether you knew it; this counts toward the quest. A review is recorded only when the card is due.'],
   'Q-17': ['いまはクエストを始めたり続けたりできません。練習はこのまま続けられます。', 'Quests can’t be started or continued right now. Practice still works.'],
   'Q-18': ['答えられたかどうかを選んでいないことばがあるため、クエストはまだ終わっていません。', 'You didn’t say whether you knew one of the words, so the quest isn’t finished yet.'],
@@ -20704,6 +20705,10 @@ const M4_COPY = Object.freeze({
   'Q-25': ['今日このあとは、このページで答えても復習には記録されず、練習になります。', 'For the rest of today, answers on this page stay practice and aren’t recorded for review.'],
   'Q-13r': ['クエストがすでに8件あります。新しく始めるには、どれかを終えるか、やめるか、一覧から外すかしてください。', 'You already have 8 quests. Finish, end or clear one to start another.'],
   'Q-26': ['終えたクエストを一覧から外す', 'Clear this finished quest'],
+  // proposed by W12 2008 for the stale quest of lead 2005; with the language keys, a one-string swap if they change it
+  'Q-27': ['このクエストのもとの文が変わったため、再開できません。このクエストはやめられます。新しいクエストは、ことば「職業」からつくれます。', 'The sentence this quest came from has changed, so it can’t be resumed. You can end it, and you can make a new quest from the word 職業.'],
+  // W12 2015: the same page when no change can be proved (a goal kept without its text, or a passage no longer in the build)
+  'Q-27u': ['このクエストのもとの文が変わっていないか確かめられないため、再開できません。このクエストはやめられます。新しいクエストは、ことば「職業」からつくれます。', 'We can’t confirm the sentence this quest came from is unchanged, so it can’t be resumed. You can end it, and you can make a new quest from the word 職業.'],
 });
 /** M4 rooms (UX r4.2 §3.3): the facet a visit's unfinished run practises, or null when no run is left to finish */
 function kanjiCourseRunKind(run) {
@@ -20784,21 +20789,43 @@ function kanjiQuestStructural(journey) {
   const view = journey.lifecycle.inspect();
   return !view.root || KANJI_QUEST_STRUCTURAL.includes(view.phase);
 }
-/** the reader occurrence a 職業 word page came from: its passage, the token's index (the reader node's from.index) and that token's
- * sentence. A page opened without one (search, lists, an imported source in v0) offers no quest */
+/** the reader occurrence a 職業 word page came from: its passage, the token's index (the reader node's from.index), that token's
+ * sentence and the sentence's exact text, so a bundle update that keeps the coordinates and changes the words is another
+ * occurrence, never the old quest (W2 2004 S3B-2). A page opened without one (search, lists, an imported source in v0) offers no
+ * quest */
 function kanjiQuestSeed(node, module) {
   // an imported source's context beside a passage index is conflicting provenance (W5 2000): no quest, never a passage seed
   if (node?.t !== 'word' || node.id !== '職業' || node.sourceContext != null) return null;
   const sentence = teacherSentence(node);
   if (!sentence || sentence.p.tokens[sentence.index]?.b !== node.id) return null;
   return module.questSeed({ source: 'passage', passage: sentence.p.id, token: sentence.index, sentence: [sentence.start, sentence.end],
-    word: node.id });
+    quote: sentence.quote, word: node.id });
 }
-/** Q-04's sentence, only while the passage still has the seed's sentence at that token */
-function kanjiQuestSentence(seed) {
+/** the sentence the quest was made from, as it was read (Q-04, the Lessons and pool rows), never the passage's text now */
+function kanjiQuestQuote(seed) {
+  const quote = seed?.sourceOccurrence?.quote;
+  return typeof quote === 'string' ? quote : null;
+}
+/** passages this page is loading for a stale check, so a render asks once */
+const kanjiQuestLoading = new Set();
+/** is the occurrence's sentence still the one the quest was made from (W2 2004 S3B-2; lead 2005)? false only while the passage has the
+ * seed's exact text at that token; 'changed' when the stored text proves a difference there; 'unverifiable' when nothing can prove
+ * either (a goal kept without its text, or a passage no longer in the build); null while the passage is not loaded, which this asks
+ * for once, redrawing when it arrives. Only false resumes or binds */
+function kanjiQuestStale(seed, redraw = null) {
   const at = seed?.sourceOccurrence;
-  const sentence = at?.source === 'passage' ? teacherSentence({ from: { passage: at.passage, index: at.token } }) : null;
-  return sentence && sentence.start === at.sentence[0] && sentence.end === at.sentence[1] ? sentence.quote : null;
+  if (at?.source !== 'passage' || typeof at.quote !== 'string') return 'unverifiable';
+  const p = D.passages?.find((entry) => entry.id === at.passage);
+  if (!p) return 'unverifiable';
+  if (!p.tokens) {
+    if (!kanjiQuestLoading.has(p.id) && typeof ensureArticle === 'function') {
+      kanjiQuestLoading.add(p.id);
+      ensureArticle(p).catch(() => {}).finally(() => { kanjiQuestLoading.delete(p.id); if (p.tokens) redraw?.(); });
+    }
+    return null;
+  }
+  const sentence = teacherSentence({ from: { passage: at.passage, index: at.token } });
+  return sentence && sentence.start === at.sentence[0] && sentence.end === at.sentence[1] && sentence.quote === at.quote ? false : 'changed';
 }
 /** one learner line by id; K-26 is the course's own record-changed line (C:20697) */
 function kanjiQuestLine(id, n = 0) {
@@ -20838,7 +20865,7 @@ function kanjiQuestRunStarted(visit) {
   const journey = kanjiQuestFor(visit);
   if (!journey) return;
   visit.questSettle = null;
-  journey.quest.module.bindRun(journey.quest.state, journey.lifecycle, visit.run);
+  journey.quest.module.bindRun(journey.quest.state, journey.lifecycle, visit.run, { eligible: (goal) => kanjiQuestStale(goal.seed) === false });
 }
 /** at the last required self-check, before anything can replace the run (W5 1746; W2 1928): a qualifying bound run settles its
  * quests. The adapter reserves each one before its first write; the course's review write goes on beside it */
@@ -20951,8 +20978,8 @@ function kanjiQuestLessonRows(section) {
     const row = el('button', 'entry-row');
     row.type = 'button'; row.id = `kanji-quest-lessons-${goal.id}`;
     row.append(el('span', 'row-main', kanjiQuestLine('Q-08')));
-    // W12 2000 L2: the quest's own sentence tells several rows apart (no new copy)
-    const sentence = kanjiQuestSentence(goal.seed);
+    // W12 2000 L2: the quest's own sentence, as it was read, tells several rows apart (no new copy)
+    const sentence = kanjiQuestQuote(goal.seed);
     if (sentence) row.append(el('span', 'lesson-score', sentence));
     row.append(el('span', 'row-go', kanjiQuestLine('Q-08b')));
     row.addEventListener('click', () => {
@@ -21003,7 +21030,7 @@ function kanjiQuestPool(main, visit, journey, button, redraw) {
   for (const goal of journey.quest.module.quests(journey.lifecycle.inspect().root)) {
     if (goal.status === 'unfinished') {
       main.append(el('p', 'fine', kanjiQuestLine('Q-08')));
-      const sentence = kanjiQuestSentence(goal.seed);
+      const sentence = kanjiQuestQuote(goal.seed);
       if (sentence) main.append(el('p', 'fine', sentence));
       main.append(button(`kanji-quest-resume-${goal.id}`, ...M4_COPY['Q-08b'], () => go(goal, false)),
         button(`kanji-quest-end-${goal.id}`, ...M4_COPY['Q-10'], () => go(goal, true)));
@@ -21021,7 +21048,7 @@ function kanjiQuestRender(main, visit, redraw, button) {
   const lines = (ids) => {
     for (const id of ids) { const line = el('p', 'gloss', kanjiQuestLine(id)); line.setAttribute('role', 'status'); main.append(line); }
   };
-  if (journey.quest.restarted && quest.view === 'page') { journey.quest.restarted = false; lines(['Q-15']); }
+  if (journey.quest.restarted && quest.view === 'page') { journey.quest.restarted = false; lines(['Q-15r']); }
   lines(quest.lines);
   if (quest.view === 'room' || quest.view === 'ended') return false;
   main.append(el('h2', 'list-head', kanjiQuestLine('Q-02')));
@@ -21031,7 +21058,7 @@ function kanjiQuestRender(main, visit, redraw, button) {
   if (quest.view === 'objective') {
     // no reading: the next thing asked is the reading (§2.1)
     main.append(el('p', 'gloss', kanjiQuestLine('Q-03')));
-    const sentence = kanjiQuestSentence(quest.seed);
+    const sentence = kanjiQuestQuote(quest.seed);
     if (sentence) main.append(el('p', 'fine', kanjiQuestLine('Q-04')), el('p', 'gloss', sentence));
     main.append(el('p', 'fine', kanjiQuestLine('Q-14')), el('p', 'fine', kanjiQuestLine('Q-06')));
     const goal = module.questFor(root, quest.seed);
@@ -21043,15 +21070,20 @@ function kanjiQuestRender(main, visit, redraw, button) {
     return true;
   }
   // the quest page: no score, only words done (§4)
-  if (quest.done || module.quests(root).find((goal) => goal.id === quest.goalId)?.status === 'completed') {
+  const goal = module.quests(root).find((g) => g.id === quest.goalId);
+  if (quest.done || goal?.status === 'completed') {
     lines(['Q-12']);
     main.append(el('p', 'fine', tx('この回の練習結果です。習得・長期記憶を示す点数ではありません。', 'These results describe this practice session. They do not establish mastery or long-term retention.')));
     return true;
   }
   const occupying = kanjiCourseRunKind(visit.run);
-  const bound = !!kanjiQuestBinding(journey, visit.run)?.goals.some((goal) => goal.id === quest.goalId);
+  const bound = !!kanjiQuestBinding(journey, visit.run)?.goals.some((g) => g.id === quest.goalId);
   const toRoom = () => { quest.view = 'room'; quest.lines = []; quest.confirmEnd = false; Object.assign(visit, { chooser: false, blocked: null }); };
-  if (occupying && !(occupying === 'reading' && bound)) {
+  const stale = goal ? kanjiQuestStale(goal.seed, redraw) : false;
+  if (stale !== false) {
+    // lead 2005: a changed sentence refuses to resume, with its line and End only (W12 2008); an unloaded passage can't be checked yet
+    lines([{ changed: 'Q-27', unverifiable: 'Q-27u' }[stale] ?? 'Q-17']);
+  } else if (occupying && !(occupying === 'reading' && bound)) {
     // §3.3: a pre-goal, Meaning or mixed run is never answered, bound or reset from here; R-11 goes back to it as it is
     lines(['Q-19']);
     main.append(button('kanji-room-return', ...M4_COPY['R-11'], () => { toRoom(); redraw(); }));

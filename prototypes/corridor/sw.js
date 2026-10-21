@@ -97,6 +97,8 @@ const SHELL = [
   'data/help-relevance-catalog.json',
   // HOOKS r8 rev 3.2 §7: the journey's lifecycle, switched by JOURNEY_WRITES
   'journey-lifecycle.mjs',
+  // M4 v0: the quest adapter, imported beside the lifecycle when the switch is ON
+  'm4-quest.mjs',
   'dictionary-worker.js',
   'skip-core.js',
   'skip-ui.js',
