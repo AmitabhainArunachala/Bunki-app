@@ -20,7 +20,7 @@ import { load, memoryController, openApp, RECORD, COMMANDS } from './verify-jour
 
 const DIR = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (name) => process.argv.find((value) => value.startsWith(`--${name}=`))?.slice(name.length + 3);
-const floor = () => { const s = statfsSync(DIR); assert.ok(s.bavail * s.bsize >= 1.5 * 1024 ** 3, 'DISK STOP: below 1.5 GiB'); };
+const floor = () => { const s = statfsSync(DIR); assert.ok(s.bavail * s.bsize >= 1.2 * 1024 ** 3, 'DISK STOP: below 1.2 GiB (rule 1725)'); };
 const read = (path) => readFileSync(join(DIR, path), 'utf8');
 const copy = (value) => JSON.parse(JSON.stringify(value));
 const deepFreeze = (value) => { if (value && typeof value === 'object' && !Object.isFrozen(value)) { Object.values(value).forEach(deepFreeze); Object.freeze(value); } return value; };
