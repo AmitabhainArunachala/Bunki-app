@@ -52,8 +52,8 @@ export const baseRecord = () => ({ v: 1, taken: [], srs: { 'k:職': { due: '2026
   revlog: [{ k: 'k:職', r: 3 }], obslog: [], stats: { '2026-10-20': { n: 1, again: 0 } }, futureRoot: { nested: { keep: 'unknown-json' } } });
 
 /** the controller seam the host uses: snapshot and commitLocal over one in-memory store; a test can fail or delay a commit */
-export function memoryController({ record = baseRecord(), rows = [], migrationId = 'synthetic-migration' } = {}) {
-  let revision = 1, documents = [{ collection: RECORD, id: CURRENT, value: record }, { collection: ARCHIVE, id: CURRENT, value: { version: 1, turns: [] } }, ...rows];
+export function memoryController({ record = baseRecord(), rows = [], migrationId = 'synthetic-migration', revision: start = 1 } = {}) {
+  let revision = start, documents = [{ collection: RECORD, id: CURRENT, value: record }, { collection: ARCHIVE, id: CURRENT, value: { version: 1, turns: [] } }, ...rows];
   const state = { mode: 'ok', delay: 0, commits: 0 };
   return {
     state,
@@ -175,7 +175,7 @@ test('H8', 'the projection keeps restores and creations only, and authority read
 function lifecycleOn(m, app, { time, epoch = () => 1 } = {}) {
   let serial = 0;
   const device = memoryDevice();
-  const port = m.lifecycle.recordPort({ app, binding: () => ({ epoch: epoch() }), nextId: () => `journey-${++serial}` });
+  const port = m.lifecycle.recordPort({ app, binding: () => ({ epoch: epoch() }), nextId: () => `journey-${++serial}-${crypto.randomUUID()}` });
   const lc = m.lifecycle.createLifecycle({ port, device, buildId: 'build-a', core: corePort(), clock: () => time.now, enabled: true,
     validateCapture: (entries) => entries });
   return { lc, device };
@@ -231,6 +231,143 @@ test('L3', 'the exact boundary (J2): an acknowledgement seen at 299 ms is kept; 
   }
 });
 
+/** P1–P6 (rev 3.2 §7) run on copies of a synthetic learner record shaped like John's: every one of corridor's 36 known
+ * roots but 'ai' (the record host never holds it), with representative content, and an unknown root. Never his store */
+export const johnShaped = () => ({ v: 1,
+  taken: Array.from({ length: 40 }, (_, i) => ({ t: i % 2 ? 'word' : 'kanji', id: `id-${i}`, started: 1700000000000 + i })),
+  lists: { 'n3-core': ['id-1', 'id-2'] }, srs: Object.fromEntries(Array.from({ length: 40 }, (_, i) => [`kanji:id-${i}`,
+    { due: '2026-10-20T00:00:00.000Z', stability: 3.1 + i, difficulty: 5.2, elapsed_days: 1, scheduled_days: 3, reps: 4, lapses: 0, state: 2, last_review: '2026-10-17T00:00:00.000Z' }])),
+  revlog: Array.from({ length: 120 }, (_, i) => ({ k: `kanji:id-${i % 40}`, r: 1 + (i % 4), t: 1700000000000 + i * 60000 })),
+  obslog: Array.from({ length: 60 }, (_, i) => [1700000000000 + i, 'tap', `word:w${i}`, 1 + (i % 3), 'article-1']),
+  deepWords: { 職業: { seen: 3 } }, lessonsDone: { 'shiki-shoku': 1 }, mockDone: {}, mockRun: null, assessmentLibrary: null,
+  assessmentLibraryV2: null, assessmentLearning: null, assessmentReceived: null, assessmentQuestionPractice: null,
+  aiReading: null, aiReadings: [], readingSettings: { size: 2 }, feedLibrary: { feeds: [] }, publisherLibrary: { items: [] },
+  sourceInbox: { items: [] }, sentencePractice: { done: [] }, sentenceDrafts: [], suspended: { 'kanji:id-3': true },
+  aiChat: [], teacherContexts: [], teacherDrafts: [], aiQuiz: null, stats: { '2026-10-20': { n: 12, again: 2, nnew: 3 } },
+  srsPrefs: { newPerDay: 20, reviewsPerDay: 200 }, readDone: { 'p-1': 1 }, readerPos: { 'p-1': 120 }, dials: { kanji: 1, furigana: 1, spacing: 0 },
+  met: { 職: 1 }, readHelp: { gloss: 2 }, futureRoot: { nested: { keep: 'unknown-json' } } });
+const byRoot = (m, record) => Object.fromEntries(Object.entries(record).map(([key, value]) => [key, m.core.encodeLocalJson(value).text]));
+async function restoreInto(app, backup) {
+  const current = await app.snapshot(); assert.equal(current.status, 'active');
+  return app.restore(backup, { expectedRevision: current.snapshot.revision });
+}
+/** a full ON day on the real app: bootstrap, the next day's rotation, help, an attempt prepared, dispatched, admitted, settled */
+async function fullDay(m, app, time, rule) {
+  const { lc, device } = lifecycleOn(m, app, { time });
+  await lc.ready; time.now = corePort().endOfDay(new Date(time.now)) + 60_000; await lc.tick();
+  const shown = await lc.awaitHelp(await lc.beginHelp(helpBatch('atlas:9', { what: 'reference', about: { kind: 'kanji', literal: '職' }, reveals: ['meaning'], at: 9 },
+    Object.freeze({ eventId: 'atlas:9', sessionId: 'earlier' }))));
+  assert.equal(shown.accepted, true);
+  const snap = await lc.beforeAnswer(lc.namespace() + 'course-attempt');
+  const prepared = await lc.prepare(snap, { kind: 'attempt', item: { kind: 'kanji', literal: '職' }, surface: 'course:kanji-shiki-shoku-r1', tests: 'meaning',
+    answer: { selfCheck: 'knew' }, revealed: false, answeredAt: time.now, help: [] }, rule);
+  const dispatch = await lc.reserve(prepared);
+  assert.equal(lc.admitAtLock(dispatch), true); await lc.settle(dispatch, { write: true, rating: 1 });
+  return { lc, device };
+}
+const passRule = { policy: 'test-policy', labelCandidate: (source) => ({ ...source, helpRelevance: { policy: 'test-policy' } }), assertPreserved: () => true };
+
+test('P1', 'a full ON day changes only m4Journey: every other root and the envelope v stay byte-identical (36-root synthetic copy)', async (m) => {
+  const c = memoryController({ record: johnShaped() }), app = await openApp(m, c), before = byRoot(m, c.document(RECORD)), time = { now: Date.parse(ON) };
+  await fullDay(m, app, time, passRule);
+  const after = byRoot(m, c.document(RECORD));
+  assert.deepEqual(Object.keys(after).filter((k) => k !== 'm4Journey').sort(), Object.keys(before).sort());
+  for (const key of Object.keys(before)) assert.equal(after[key], before[key], key);
+  assert.ok(after.m4Journey); assert.equal(Object.keys(before).length, 36);
+});
+test('P2', 'export and restore: the root returns byte-identical, is validated, then retired under the new generation, never merged', async (m) => {
+  const a = memoryController({ record: johnShaped() }), appA = await openApp(m, a), time = { now: Date.parse(ON) };
+  await fullDay(m, appA, time, passRule);
+  const exported = await appA.exportBackup(); assert.equal(exported.status, 'active');
+  const root = a.document(RECORD).m4Journey;
+  assert.equal(m.core.encodeLocalJson(exported.backup.record.m4Journey).text, m.core.encodeLocalJson(root).text);
+  const b = memoryController({ record: johnShaped(), migrationId: 'other-installation' }), appB = await openApp(m, b);
+  const restored = await restoreInto(appB, exported.backup); assert.equal(restored.status, 'active');
+  assert.equal(m.core.encodeLocalJson(b.document(RECORD).m4Journey).text, m.core.encodeLocalJson(root).text);
+  const { lc } = lifecycleOn(m, appB, { time });
+  const booted = await lc.ready;
+  assert.equal(booted.phase, 'cold-activation');
+  const fresh = b.document(RECORD).m4Journey;
+  assert.notEqual(fresh.id, root.id); assert.deepEqual(fresh.retired, { id: root.id, generation: root.generation, hash: m.lifecycle.digest(root),
+    restore: b.rows(COMMANDS).find((row) => row.type === 'host.restore/1').changeId });
+  assert.deepEqual(fresh.daily.events, []); assert.deepEqual(b.rows(COMMANDS).filter((row) => row.type === 'journey.lifecycle/1').map((row) => row.journey.action), ['retire-generation']);
+});
+test('P3', 'the release build (a8b9cbff host) keeps a root through writes and export; this head OFF opens a journaled record', async (m) => {
+  const old = await load({ ...SOURCES, host: RELEASE.host, app: RELEASE.app });
+  const withRoot = { ...johnShaped(), m4Journey: { version: 1, protocol: 'journey-r2', id: 'journey-x', marker: 'keep' } };
+  const c = memoryController({ record: withRoot }), app = await openApp(old, c);
+  assert.equal((await app.write((record) => ({ patch: { srs: { ...record.srs, 'kanji:new': { due: 'x', state: 0 } } } }))).status, 'active');
+  const same = (a, b) => assert.equal(m.core.encodeLocalJson(a).text, m.core.encodeLocalJson(b).text);
+  same(c.document(RECORD).m4Journey, withRoot.m4Journey);
+  same((await app.exportBackup()).backup.record.m4Journey, withRoot.m4Journey);
+  const journaled = memoryController({ record: johnShaped() }), onApp = await openApp(m, journaled);
+  await fullDay(m, onApp, { now: Date.parse(ON) }, passRule);
+  const rows = journaled.rows(COMMANDS).map((row) => ({ collection: COMMANDS, id: row.changeId, value: row }));
+  const reopen = (modules) => openApp(modules, memoryController({ record: journaled.document(RECORD), rows, revision: journaled.revision }));
+  assert.equal((await reopen(m)).current().status, 'active');
+  RELEASE.rollback = (await reopen(old)).current();
+});
+test('P4', 'a globally valid backup with an invalid journey root restores the rest and holds reviews (ON), keeping the root byte for byte', async (m) => {
+  const a = memoryController({ record: { ...johnShaped(), m4Journey: { version: 7, protocol: 'journey-r9', future: [1, 2, 3] } } }), appA = await openApp(m, a);
+  const exported = await appA.exportBackup(); assert.equal(exported.status, 'active');
+  const b = memoryController({ record: baseRecord() }), appB = await openApp(m, b);
+  assert.equal((await restoreInto(appB, exported.backup)).status, 'active');
+  assert.equal(b.document(RECORD).srsPrefs.newPerDay, 20);
+  const { lc } = lifecycleOn(m, appB, { time: { now: Date.parse(ON) } });
+  assert.equal((await lc.ready).phase, 'invalid-root-hold');
+  assert.deepEqual(b.document(RECORD).m4Journey, { version: 7, protocol: 'journey-r9', future: [1, 2, 3] });
+  await assert.rejects(async () => lc.assertReviewable());
+});
+test('P5', 'restoring an older backup over a newer record retires the restored root and never merges either journey', async (m) => {
+  const time = { now: Date.parse(ON) };
+  const a = memoryController({ record: johnShaped() }), appA = await openApp(m, a);
+  await fullDay(m, appA, time, passRule);
+  const older = (await appA.exportBackup()).backup, olderRoot = a.document(RECORD).m4Journey;
+  const b = memoryController({ record: johnShaped(), migrationId: 'newer' }), appB = await openApp(m, b), later = { now: time.now + 3 * 86400000 };
+  await fullDay(m, appB, later, passRule);
+  const newerRoot = b.document(RECORD).m4Journey;
+  assert.equal((await restoreInto(appB, older)).status, 'active');
+  const { lc } = lifecycleOn(m, appB, { time: later });
+  assert.equal((await lc.ready).phase, 'cold-activation');
+  const fresh = b.document(RECORD).m4Journey;
+  assert.equal(fresh.retired.id, olderRoot.id); assert.notEqual(fresh.id, newerRoot.id); assert.notEqual(fresh.id, olderRoot.id);
+  assert.deepEqual(fresh.daily.events, []); assert.equal(fresh.progress.participated, 0);
+});
+test('P6', 'a full root (128 events, 96 attempts, 32 visits, 8 goals, 16 projects, near 252 KiB) survives export and restore; counts and limits', async (m) => {
+  const c = memoryController({ record: johnShaped() }), app = await openApp(m, c), time = { now: Date.parse(ON) };
+  const { lc } = lifecycleOn(m, app, { time });
+  await lc.ready; time.now = corePort().endOfDay(new Date(time.now)) + 60_000; await lc.tick();
+  const filler = 'あ'.repeat(3000);
+  for (let n = 0; n < 8; n++) await lc.work('goals', { status: 'unfinished', note: filler });
+  for (let n = 0; n < 16; n++) await lc.work('projects', { status: 'unfinished', note: filler });
+  for (let n = 0; n < 31; n++) await lc.enter('lessons');
+  for (let n = 0; n < 128; n += 8) {
+    const batch = Object.freeze(Array.from({ length: 8 }, (_, i) => Object.freeze({ receiptKey: `e:${n + i}`, raw: Object.freeze({ what: 'reference', reveals: Object.freeze(['meaning']), at: n + i }),
+      origin: Object.freeze({ eventId: `e:${n + i}`, sessionId: 's' }) })));
+    assert.equal((await lc.awaitHelp(await lc.beginHelp(batch))).accepted, true);
+  }
+  for (let n = 0; n < 96; n++) await lc.beforeAnswer(lc.namespace() + `a${n}`);
+  const root = c.document(RECORD).m4Journey, bytes = new TextEncoder().encode(JSON.stringify(root)).byteLength;
+  assert.equal(root.daily.events.length, 128); assert.equal(root.daily.attempts.length, 96); assert.equal(root.daily.visits, 31);
+  assert.ok(bytes <= m.lifecycle.LIMITS.dataBytes, String(bytes));
+  await assert.rejects(async () => lc.work('goals', { status: 'unfinished' }), /work-bound/);
+  await assert.rejects(async () => lc.beforeAnswer(lc.namespace() + 'a96'), /attempt-bound/);
+  const exported = await app.exportBackup(); assert.equal(exported.status, 'active');
+  const text = JSON.stringify(exported.backup);
+  assert.ok(new TextEncoder().encode(text).byteLength < 32 * 1024 * 1024);
+  const other = memoryController({ record: baseRecord(), migrationId: 'other' }), appB = await openApp(m, other);
+  assert.equal((await restoreInto(appB, exported.backup)).status, 'active');
+  assert.equal(m.core.encodeLocalJson(other.document(RECORD).m4Journey).text, m.core.encodeLocalJson(root).text);
+  assert.equal(Object.hasOwn(exported.backup.counts, 'journey'), false);
+  RELEASE.p6 = { rootBytes: bytes, backupBytes: new TextEncoder().encode(text).byteLength, journeyReceipts: c.rows(COMMANDS).filter((r) => r.type === 'journey.lifecycle/1').length,
+    receiptBytesEach: Math.round(c.rows(COMMANDS).filter((r) => r.type === 'journey.lifecycle/1').reduce((sum, r) => sum + JSON.stringify(r).length, 0) / c.rows(COMMANDS).filter((r) => r.type === 'journey.lifecycle/1').length) };
+});
+/** the release build (a8b9cbff, the same host and app bytes as 87dededd) for P3, and the measured findings */
+const RELEASE = {};
+for (const name of ['host', 'app']) RELEASE[name] = (await import('node:child_process')).execFileSync('git',
+  ['show', `a8b9cbff1157766ff56f722612e75a5515a58f38:prototypes/corridor/record-${name}.mjs`], { cwd: DIR, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
+export const FINDINGS = RELEASE;
+
 /** one targeted mutant per host guard; each must turn its own case red (an assertion, not a crash) */
 export const MUTANTS = {
   'cas-ignored': ['H2', 'host', [["insist(expected.rootSha256 === digest(own(state.record, 'm4Journey') ? state.record.m4Journey : null), 'journey-root-moved');", '']]],
@@ -266,6 +403,7 @@ async function main() {
   }
   const failed = results.filter((r) => !r.passed), survived = controls.filter((c) => !c.killed);
   console.log(JSON.stringify({ cases: `${results.length - failed.length}/${results.length}`, failed,
+    findings: { releaseHostOpensJournaledRecord: RELEASE.rollback ? { status: RELEASE.rollback.status, reason: RELEASE.rollback.reason } : null, p6: RELEASE.p6 ?? null },
     controls: controls.length ? `${controls.length - survived.length}/${controls.length}` : 'not run', survived, controlDetails: controls }, null, 1));
   process.exitCode = failed.length || survived.length ? 1 : 0;
 }
