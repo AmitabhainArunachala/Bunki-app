@@ -72,6 +72,7 @@ export async function createQuest(lc, state, seed, { owned = () => true } = {}) 
   const attempt = (async () => {
     const known = exists();
     if (known) return known;
+    if (!owned()) return { kind: 'owner-changed' };
     const admit = (root) => { if (root.goals.some((goal) => isQuest(goal) && sameSeed(goal.seed, seed))) throw new Error('quest-exists'); };
     const out = await questWrite(lc, (observe) => lc.work('goals', { seed: structuredClone(seed), inspected: false, practiceSession: null },
       { observe, admit }), owned);
@@ -88,15 +89,18 @@ const readingRun = (run) => run?.unitId === QUEST_UNIT && run.round === 0 && ['c
 const freshRun = (run) => run.cursor === 0 && run.responses.length === 0 && !run.complete;
 /** once per started run: a fresh Reading run binds the unfinished quests present now; Meaning, mixed and repair runs bind none
  * (decision 10). A run seen again, or first seen already answered, keeps what it had (W5 1901 F2), and a quest whose
- * completion is still pending keeps its earlier result */
-export function bindRun(state, root, run) {
+ * completion is still pending keeps its earlier result. The binding keeps the lifecycle activation, journey and generation it
+ * was made under (W2 1907), so a reboot or a switch retires it */
+export function bindRun(state, lc, run) {
   if (typeof run?.sessionId !== 'string') return null;
   const known = state.sessions.get(run.sessionId);
   if (known) return known.consumed ? null : known.binding;
+  const root = lc.inspect().root;
   let binding = null;
-  if (readingRun(run) && freshRun(run)) {
+  if (root && readingRun(run) && freshRun(run)) {
     const goals = quests(root).filter((goal) => goal.status === 'unfinished' && !state.pending.has(goal.id));
-    if (goals.length) binding = { sessionId: run.sessionId, journeyId: root.id, goals: goals.map((goal) => ({ id: goal.id, seed: structuredClone(goal.seed) })) };
+    if (goals.length) binding = { sessionId: run.sessionId, boot: lc.bootIdentity(), journeyId: root.id, generation: root.generation,
+      goals: goals.map((goal) => ({ id: goal.id, seed: structuredClone(goal.seed) })) };
   }
   state.sessions.set(run.sessionId, { binding, consumed: false });
   state.binding = binding;
@@ -124,13 +128,16 @@ export async function settleRun(lc, state, run, { course, owned = () => true } =
   if (!runQualifies(run, binding, course)) return [];
   entry.consumed = true;
   if (state.binding === binding) state.binding = null;
+  const now = lc.inspect().root;
+  if (binding.boot !== lc.bootIdentity() || binding.journeyId !== now?.id || binding.generation !== now?.generation) return [];
   for (const { id } of binding.goals) state.pending.set(id, 'completing');
   const results = [];
   for (const { id, seed } of binding.goals) {
     const goal = quests(lc.inspect().root).find((g) => g.id === id);
     if (!goal) { state.pending.delete(id); results.push({ goalId: id, complete: { kind: 'absent' } }); continue; }
     let complete;
-    if (goal.status === 'completed') complete = { kind: 'already-completed' };
+    if (!owned()) complete = { kind: 'owner-changed' };
+    else if (goal.status === 'completed') complete = { kind: 'already-completed' };
     else {
       let ticket;
       try { ticket = lc.completionTicket(id, binding.sessionId, seed); }
@@ -141,14 +148,15 @@ export async function settleRun(lc, state, run, { course, owned = () => true } =
       }
       complete = await questWrite(lc, (observe) => lc.completeGoal(id, ticket, { observe }), owned);
       // no commit was made for an already-completed goal, so there is no observation to read
-      if (complete.value?.alreadyCompleted === true) complete.kind = 'already-completed';
+      if (complete.value?.alreadyCompleted === true && complete.kind !== 'owner-changed') complete.kind = 'already-completed';
       else if (complete.kind === 'published' && complete.value?.confirmed !== true) complete.kind = 'uncertain';
     }
     if (complete.kind === 'uncertain') { state.pending.set(id, 'uncertain'); results.push({ goalId: id, complete }); continue; }
     state.pending.delete(id);
     if (!['published', 'already-completed'].includes(complete.kind)) { results.push({ goalId: id, complete }); continue; }
     state.recovered.add(id);
-    const retire = await questWrite(lc, (observe) => lc.retire('goals', id, 'retire-completed', { observe }), owned);
+    const retire = owned() ? await questWrite(lc, (observe) => lc.retire('goals', id, 'retire-completed', { observe }), owned)
+      : { kind: 'owner-changed' };
     results.push({ goalId: id, complete, retire });
   }
   return results;
@@ -158,6 +166,7 @@ export async function settleRun(lc, state, run, { course, owned = () => true } =
 export async function endQuest(lc, state, goalId, { owned = () => true } = {}) {
   const goal = quests(lc.inspect().root).find((g) => g.id === goalId);
   if (!goal) return { kind: 'absent' };
+  if (!owned()) return { kind: 'owner-changed' };
   const key = seedKey(goal.seed);
   state.ending.add(key);
   const out = await questWrite(lc, (observe) => lc.retire('goals', goalId, 'abandon-and-retire', { observe }), owned);
@@ -171,6 +180,7 @@ export async function recoverCompleted(lc, state, { owned = () => true } = {}) {
   const results = [];
   for (const goal of quests(lc.inspect().root)) {
     if (goal.status !== 'completed' || state.recovered.has(goal.id)) continue;
+    if (!owned()) { results.push({ goalId: goal.id, retire: { kind: 'owner-changed' } }); continue; }
     state.recovered.add(goal.id);
     results.push({ goalId: goal.id, retire: await questWrite(lc, (observe) => lc.retire('goals', goal.id, 'retire-completed', { observe }), owned) });
   }
