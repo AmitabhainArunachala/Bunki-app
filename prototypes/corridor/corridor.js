@@ -6215,6 +6215,9 @@ function installScaleBridge() {
 /** Search and source reading are detours, not destructive replacements.
  * A frame holds the same canonical nodes, with their exact place and origin. */
 function keepNavigationReturn(destination, invoker = document.activeElement) {
+  // every saved-state detour is a departure, even when its Back restores the same stack, room and visit (W3 1542). A separate
+  // count from wordEntrySerial: only a page deferred for a journey keep reads it, so nothing else on the page changes
+  S.navigationDepartures = (S.navigationDepartures || 0) + 1;
   if (S.scaleVisit) retireScaleReturn();
   keepScroll();
   rememberSheet(invoker);
@@ -40870,12 +40873,13 @@ function enterWord(node, { from = null, invoker = null, instant = false } = {}) 
   };
   const kept = kanjiCourseReferenceHelp(S.kanjiCourse, pushed);
   if (kept?.then) {
-    // W3 1525: the page shows only into the navigation it was asked from: no newer entry, the same stack (a tab change replaces
-    // it, even when both are empty), the same room, course visit and record owner
-    const serial = S.wordEntrySerial, stack = S.stack, room = S.view, visit = S.kanjiCourse, owner = recordEpoch;
+    // W3 1525/1542: the page shows only into the navigation it was asked from: no newer entry and no detour since (a Search or
+    // Me detour's Back restores the same stack), the same stack (a tab change replaces it, even when both are empty), the same
+    // room, course visit and record owner
+    const serial = S.wordEntrySerial, departures = S.navigationDepartures || 0, stack = S.stack, room = S.view, visit = S.kanjiCourse, owner = recordEpoch;
     kept.then(() => {
-      if (S.wordEntrySerial === serial && S.stack === stack && S.stack.length + 1 === depth && S.view === room &&
-        S.kanjiCourse === visit && recordEpoch === owner && recordReady(owner)) show();
+      if (S.wordEntrySerial === serial && (S.navigationDepartures || 0) === departures && S.stack === stack && S.stack.length + 1 === depth &&
+        S.view === room && S.kanjiCourse === visit && recordEpoch === owner && recordReady(owner)) show();
     });
     return;
   }

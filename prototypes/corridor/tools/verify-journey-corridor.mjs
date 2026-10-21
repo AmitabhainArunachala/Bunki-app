@@ -423,15 +423,19 @@ test('S18b', 'storage recovering after the snapshot bound: the late snapshot com
 
 /** W3 1525 (F8): the actual enterWord and kanjiCourseReferenceHelp, lifted by text into a small context with display stubs (W3's
  * own probe shape); the course's help keep is a deferred promise this test resolves */
-function dictionary(source) {
+function dictionary(source, { immediate = false } = {}) {
   const body = (name) => { const anchor = `function ${name}(`; assert.equal(source.split(anchor).length, 2, name);
     const start = source.indexOf(anchor), end = source.indexOf('\n}', start) + 2; return source.slice(start, end); };
   const deferred = [];
-  const ctx = vm.createContext({ S: { stack: [], view: 'lessons', kanjiCourse: { unitId: 'shiki-shoku', epoch: 1 }, wordEntrySerial: 0 }, recordEpoch: 1,
-    finishPageTransition() {}, layerPathFor: () => false, ladderOpening: null, heroSource: new Map(), sampleWhere: () => null, pageCutAllowed: () => false,
-    removeMini() {}, document: { getElementById: () => null }, sampleTransition() {}, recordReady: (epoch) => epoch === ctx.recordEpoch,
-    kanjiCourseApplyHelp() {}, kanjiCourseRememberHelp: () => new Promise((resolve) => deferred.push(resolve)), render() {} });
-  vm.runInContext(`${body('kanjiCourseReferenceHelp')}\n${body('enterWord')}`, ctx);
+  const ctx = vm.createContext({ S: { stack: [], view: 'lessons', navigationReturns: [], kanjiCourse: { unitId: 'shiki-shoku', epoch: 1 }, wordEntrySerial: 0 },
+    recordEpoch: 1, finishPageTransition() {}, layerPathFor: () => false, ladderOpening: null, heroSource: new Map(), sampleWhere: () => null,
+    pageCutAllowed: () => false, removeMini() {}, document: { getElementById: () => null, activeElement: null }, sampleTransition() {},
+    recordReady: (epoch) => epoch === ctx.recordEpoch, kanjiCourseApplyHelp() {},
+    kanjiCourseRememberHelp: () => (immediate ? undefined : new Promise((resolve) => deferred.push(resolve))), render() {},
+    // the Search detour and Back (W3 1542's path): its own state only
+    window: { scrollY: 0, scrollTo() {} }, keepScroll() {}, rememberSheet() {}, invokerKey: () => null, learningSourceVisit: null, referenceLibrary: null,
+    pendingReferenceCollection: null, restoreDialogInvoker() {}, worldPickerEls: null, foldWordLadder: () => false, roomTransitionUpdating: true, stopReadAloud() {} });
+  vm.runInContext(['kanjiCourseReferenceHelp', 'enterWord', 'keepNavigationReturn', 'returnFromNavigation', 'openSearchPage', 'back'].map(body).join('\n'), ctx);
   const flush = async () => { for (let i = 0; i < 15; i++) await Promise.resolve(); };
   return { ctx, open: (id = '職') => ctx.enterWord({ t: 'kanji', id }, { instant: true }),
     finish: async (n = 0) => { deferred[n](); await flush(); }, shown: () => Array.from(ctx.S.stack, (node) => node.id) };
@@ -448,6 +452,18 @@ F8('F8c', 'a tab change before the help is kept: the old page never shows', (ctx
 F8('F8d', 'a new record owner before the help is kept: the old page never shows', (ctx) => { ctx.recordEpoch += 1; }, []);
 F8('F8f', 'away and back at the same depth (tab away, then the course again): the old page never shows', (ctx) => {
   ctx.S.stack = []; ctx.S.view = 'shelf'; ctx.S.stack = []; ctx.S.view = 'lessons'; }, []);
+test('F8g', 'W3 1542: Search and Back before the help is kept restore the same stack, room and visit; the old page still never shows', async (P) => {
+  const d = dictionary(P.source);
+  d.open(); const stack = d.ctx.S.stack, visit = d.ctx.S.kanjiCourse;
+  d.ctx.openSearchPage(); assert.equal(d.ctx.S.view, 'search');
+  d.ctx.back({ instant: true });
+  assert.equal(d.ctx.S.view, 'lessons'); assert.equal(d.ctx.S.stack, stack); assert.equal(d.ctx.S.kanjiCourse, visit);
+  await d.finish(); assert.deepEqual(d.shown(), []);
+});
+test('F8h', 'with nothing to keep (switch off, no live course) the page shows at once, as before', async (P) => {
+  const d = dictionary(P.source, { immediate: true });
+  d.open(); assert.deepEqual(d.shown(), ['職']);
+});
 test('F8e', 'a newer dictionary page cancels the older pending one; only the newer shows', async (P) => {
   const d = dictionary(P.source);
   d.open('職'); d.open('識'); await d.finish(0); assert.deepEqual(d.shown(), []); await d.finish(1); assert.deepEqual(d.shown(), ['識']);
@@ -521,9 +537,10 @@ export const MUTANTS = {
   'unproved-not-held': ['S17', [["    kept.then((outcome) => (outcome === 'unproved' ? unproved() : done()), unproved);\n", "    kept.then(done, done);\n"]]],
   'snapshot-unbounded': ['S18', [["    await Promise.race([recorded, new Promise((resolve) => { bound = setTimeout(resolve, 300); })]);\n", "    await recorded;\n"]]],
   'late-snapshot-token': ['S18b', [["        if (!entry.refused) entry.token = token;\n", "        entry.token = token;\n"]]],
-  'f8-serial-only': ['F8b', [["      if (S.wordEntrySerial === serial && S.stack === stack && S.stack.length + 1 === depth && S.view === room &&\n        S.kanjiCourse === visit && recordEpoch === owner && recordReady(owner)) show();", "      if (S.wordEntrySerial === serial && S.stack.length + 1 === depth) show();"]]],
-  'f8-no-stack-identity': ['F8f', [["S.wordEntrySerial === serial && S.stack === stack && S.stack.length + 1", "S.wordEntrySerial === serial && S.stack.length + 1"]]],
-  'f8-no-visit': ['F8b', [["\n        S.kanjiCourse === visit && recordEpoch === owner", "\n        recordEpoch === owner"]]],
+  'f8-serial-only': ['F8b', [["      if (S.wordEntrySerial === serial && (S.navigationDepartures || 0) === departures && S.stack === stack && S.stack.length + 1 === depth &&\n        S.view === room && S.kanjiCourse === visit && recordEpoch === owner && recordReady(owner)) show();", "      if (S.wordEntrySerial === serial && S.stack.length + 1 === depth) show();"]]],
+  'f8-no-departure-check': ['F8g', [["(S.navigationDepartures || 0) === departures && ", '']]],
+  'f8-no-stack-identity': ['F8f', [["&& S.stack === stack && S.stack.length + 1 === depth", "&& S.stack.length + 1 === depth"]]],
+  'f8-no-visit': ['F8b', [["S.kanjiCourse === visit && recordEpoch === owner && recordReady(owner)) show();", "recordEpoch === owner && recordReady(owner)) show();"]]],
   'f8-no-owner': ['F8d', [["S.kanjiCourse === visit && recordEpoch === owner && recordReady(owner)) show();", "S.kanjiCourse === visit) show();"]]],
   'day-full-not-told': ['S13', [["  if (KANJI_JOURNEY_DAY_FULL.includes(error?.message)) journey.fullDay = day;\n", '']]],
 };
