@@ -590,6 +590,25 @@ test('U23', 'the archive index loads later than the main index (W2 2020 S3B-2b):
   } finally { p.context.D.passages.splice(1); }
 });
 
+test('U24', 'a late load never resurrects a page it left (W5 2030): the archive index finishing after leave-for-now, or after an owner change, redraws nothing, binds nothing and writes nothing', async (m) => {
+  for (const away of ['leave', 'owner']) {
+    const p = await onPage(m);
+    const later = { ...PASSAGE, id: 'bunki-archive-0008', file: 'archive/0008.json', tokens: ORIGINAL };
+    const id = (await p.q.createQuest(p.day.lc, p.state(), p.q.questSeed({ ...occurrence(26), passage: later.id }))).goalId;
+    p.archive.passages = [later];
+    p.S.kanjiCourse = null; all(p.lessons()).find((e) => e.id === `kanji-quest-lessons-${id}`).click();
+    assert.ok(p.has('Q-17'));
+    const visit = p.S.kanjiCourse, rows = journeyRows(p.day.c).length, sessions = p.state().sessions.size;
+    if (away === 'leave') p.click('kanji-quest-leave'); else p.context.recordEpoch += 1;
+    const view = p.S.view, shown = p.main;
+    await flush();
+    assert.equal(p.S.view, view, `${away}: the view stays where the learner went`);
+    assert.equal(p.main, shown, `${away}: no redraw of the departed page`);
+    assert.equal(p.S.kanjiCourse, visit); assert.equal(visit.run, null, `${away}: no run started`);
+    assert.equal(p.state().sessions.size, sessions, `${away}: nothing bound`); assert.equal(journeyRows(p.day.c).length, rows, `${away}: nothing written`);
+  }
+});
+
 test('U22', 'identity is content and position, never the token index (lead 2023): unchanged text that the tokenizer splits differently resumes, binds and is matched by its door; a real occurrence shift refuses', async (m) => {
   const p = await onPage(m);
   const old = await created(p, 26);
@@ -667,6 +686,7 @@ export const MUTANTS = {
     ["typeof at.surface !== 'string' || at.quote.slice(at.offset, at.offset + at.surface.length) !== at.surface) return 'unverifiable';", "typeof at.surface !== 'string') return 'unverifiable';"]]],
   'token-in-identity': ['U22', [["  return module.questSeed({ source: 'passage', passage: sentence.p.id, quote: sentence.quote, nth,", "  return module.questSeed({ source: 'passage', passage: sentence.p.id, token: sentence.index, quote: sentence.quote, nth,"]]],
   'nth-ignored': ['U22', [["  for (let n = 0; n <= at.nth; n += 1) { found = full.indexOf(at.quote, found + 1); if (found === -1) break; }", "  found = full.indexOf(at.quote);"]]],
+  'late-load-resurrects': ['U24', [["  const stale = goal ? kanjiQuestStale(goal.seed, redraw) : false;", "  const stale = goal ? kanjiQuestStale(goal.seed, () => { S.view = 'lessons'; render(); }) : false;"]]],
   'archive-absent-early': ['U23', [["  if (!p) return D.archive || window.__CORRIDOR_STANDALONE__ === true || typeof ensureArchiveIndex !== 'function' ? 'unverifiable'", "  if (!p) return true ? 'unverifiable'"]]],
   'archive-failure-pending': ['U21', [["    return kanjiQuestLoading.get(key) === 'failed' ? 'unverifiable' : null;", "    return null;"]]],
   'stale-resumes': ['U19', [["  if (stale !== false) {\n    // lead 2005", "  if (false) {\n    // lead 2005"]]],
