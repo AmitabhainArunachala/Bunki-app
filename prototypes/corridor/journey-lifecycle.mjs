@@ -367,7 +367,7 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
    await port.wait(t.operation,left());}}
  const ready=run(boot);
  return {ready,inspect,boot:op(boot),setSwitch:op(setSwitch),tick:op(tick),enter:op(enter),work:op(work),retire:op(retire),
-  completionTicket,completeGoal:op(completeGoal),holdUnconfirmed,
+  completionTicket,completeGoal:op(completeGoal),holdUnconfirmed,bootIdentity:()=>bootToken,
   beginHelp:op(beginHelp),finishHelp:op(finishHelp),awaitHelp,holdAtDeadline,beforeAnswer:op(beforeAnswer),prepare:op(prepare),reserve:op(reserve),
   admitAtLock,settle:op(settle),assertReviewable:op(reviewable),namespace:()=>root.id+'/'+root.dayEpoch+'/'};
 }

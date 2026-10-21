@@ -64,10 +64,10 @@ test('Q1', 'a quest is one goal per occurrence with its exact seed; a second cre
 });
 test('Q2', 'only a Reading run started after the quest binds it: a quest made after the run started stays out, and Meaning and mixed runs bind nothing', async (m) => {
   const d = await day(m), a = await created(d);
-  assert.equal(d.q.bindRun(d.state, root(d), runFor(['meaning'])), null);
-  assert.equal(d.q.bindRun(d.state, root(d), runFor()), null, 'the mixed run binds nothing');
+  assert.equal(d.q.bindRun(d.state, d.lc, runFor(['meaning'])), null);
+  assert.equal(d.q.bindRun(d.state, d.lc, runFor()), null, 'the mixed run binds nothing');
   const run = runFor(['reading']);
-  assert.deepEqual(d.q.bindRun(d.state, root(d), run)?.goals.map((g) => g.id), [a]);
+  assert.deepEqual(d.q.bindRun(d.state, d.lc, run)?.goals.map((g) => g.id), [a]);
   const b = await created(d, d.q.questSeed({ ...OCCURRENCE, token: 27 }));
   assert.equal(d.q.bindingFor(d.state, b), null, 'a quest made after the run started is not bound to it');
   assert.equal(d.q.bindingFor(d.state, a)?.sessionId, run.sessionId);
@@ -77,7 +77,7 @@ test('Q2', 'only a Reading run started after the quest binds it: a quest made af
 });
 test('Q3', 'at the last self-check the bound quest completes, then retires as its own write; a wrong answer with an honest self-check counts', async (m) => {
   const d = await day(m), id = await created(d);
-  const run = runFor(['reading']); d.q.bindRun(d.state, root(d), run);
+  const run = runFor(['reading']); d.q.bindRun(d.state, d.lc, run);
   const done = qualified(run), before = journeyRows(d.c).length;
   const results = await d.q.settleRun(d.lc, d.state, done, { course });
   assert.deepEqual(results.map((r) => [r.goalId, r.complete.kind, r.retire?.kind]), [[id, 'published', 'published']]);
@@ -88,10 +88,10 @@ test('Q3', 'at the last self-check the bound quest completes, then retires as it
 test('Q4', 'no completion from a reveal, a skip, a missing self-check, or run.complete before the last self-check', async (m) => {
   const d = await day(m), id = await created(d), settle = (run) => d.q.settleRun(d.lc, d.state, run, { course });
   for (const how of ['reveal', 'skip']) {
-    const run = runFor(['reading']); d.q.bindRun(d.state, root(d), run);
+    const run = runFor(['reading']); d.q.bindRun(d.state, d.lc, run);
     assert.deepEqual(await settle(step(step(step(run, 'right', 'knew'), how), 'right', 'knew')), []);
   }
-  const run = runFor(['reading']); d.q.bindRun(d.state, root(d), run);
+  const run = runFor(['reading']); d.q.bindRun(d.state, d.lc, run);
   const unchecked = step(step(step(run, 'right', 'knew'), 'wrong', 'missed'), 'right');
   assert.equal(unchecked.complete, true, 'the course marks the run complete at the last answer');
   assert.deepEqual(await settle(unchecked), [], 'run.complete without the last self-check is not enough');
@@ -103,9 +103,9 @@ test('Q4', 'no completion from a reveal, a skip, a missing self-check, or run.co
 });
 test('Q5', 'a repair round and a Meaning run never complete a quest', async (m) => {
   const d = await day(m); await created(d);
-  const meaning = runFor(['meaning']); d.q.bindRun(d.state, root(d), meaning);
+  const meaning = runFor(['meaning']); d.q.bindRun(d.state, d.lc, meaning);
   assert.deepEqual(await d.q.settleRun(d.lc, d.state, step(step(step(meaning, 'right', 'knew'), 'right', 'knew'), 'right', 'knew'), { course }), []);
-  const run = runFor(['reading']), binding = d.q.bindRun(d.state, root(d), run);
+  const run = runFor(['reading']), binding = d.q.bindRun(d.state, d.lc, run);
   // all three missed, so the repair round carries all three prompts in the same session; only its round and mode keep it out
   const repair = course.retry(step(step(step(run, 'wrong', 'missed'), 'wrong', 'missed'), 'wrong', 'missed'));
   assert.deepEqual([repair.promptIds.length, repair.sessionId, repair.mode], [3, run.sessionId, 'repair']);
@@ -113,26 +113,26 @@ test('Q5', 'a repair round and a Meaning run never complete a quest', async (m) 
 });
 test('Q6', 'a completion that is not published keeps the quest in progress and frees it for the next Reading run', async (m) => {
   const d = await day(m), id = await created(d);
-  const run = runFor(['reading']); d.q.bindRun(d.state, root(d), run);
+  const run = runFor(['reading']); d.q.bindRun(d.state, d.lc, run);
   const results = await closeGateDuring(d, 'work', () => d.q.settleRun(d.lc, d.state, qualified(run), { course }));
   assert.deepEqual(results.map((r) => [r.complete.kind, r.retire]), [['not-published', undefined]]);
   assert.equal(root(d).goals.find((g) => g.id === id).status, 'unfinished'); assert.equal(d.lc.inspect().phase, 'publication-hold');
   assert.equal(d.state.pending.has(id), false);
-  assert.deepEqual(d.q.bindRun(d.state, root(d), runFor(['reading']))?.goals.map((g) => g.id), [id]);
+  assert.deepEqual(d.q.bindRun(d.state, d.lc, runFor(['reading']))?.goals.map((g) => g.id), [id]);
 });
 test('Q7', 'an uncertain completion shows no Done, starts no retirement, and no later run can rebind that quest', async (m) => {
   const d = await day(m), id = await created(d), before = journeyRows(d.c).length;
-  const run = runFor(['reading']); d.q.bindRun(d.state, root(d), run);
+  const run = runFor(['reading']); d.q.bindRun(d.state, d.lc, run);
   d.lie.next = () => ({ outcome: 'uncertain', acknowledged: false });
   const results = await d.q.settleRun(d.lc, d.state, qualified(run), { course });
   assert.deepEqual(results.map((r) => [r.complete.kind, r.retire]), [['uncertain', undefined]]);
   assert.deepEqual(journeyRows(d.c).slice(before).map((r) => r.journey.action), ['work'], 'no retirement write');
   assert.equal(d.state.pending.get(id), 'uncertain');
-  assert.equal(d.q.bindRun(d.state, root(d), runFor(['reading'])), null, 'the pending quest keeps its earlier result');
+  assert.equal(d.q.bindRun(d.state, d.lc, runFor(['reading'])), null, 'the pending quest keeps its earlier result');
 });
 test('Q8', 'a crash between completion and retirement: the next open shows it done and retires it once', async (m) => {
   const d = await day(m), id = await created(d);
-  const run = runFor(['reading']); d.q.bindRun(d.state, root(d), run);
+  const run = runFor(['reading']); d.q.bindRun(d.state, d.lc, run);
   const results = await closeGateDuring(d, 'retire-work', () => d.q.settleRun(d.lc, d.state, qualified(run), { course }));
   assert.deepEqual(results.map((r) => [r.complete.kind, r.retire.kind]), [['published', 'not-published']]);
   assert.equal(root(d).goals.find((g) => g.id === id).status, 'completed', 'completion stays true');
@@ -150,7 +150,7 @@ test('Q8', 'a crash between completion and retirement: the next open shows it do
 });
 test('Q9', 'a lost retirement reply claims no retirement, holds this runtime, and the reloaded page claims nothing from the goal\'s absence', async (m) => {
   const d = await day(m), id = await created(d);
-  const run = runFor(['reading']); d.q.bindRun(d.state, root(d), run);
+  const run = runFor(['reading']); d.q.bindRun(d.state, d.lc, run);
   // the retirement commit lands, but the port reports it uncertain
   d.lie.action = 'retire-work'; d.lie.next = () => ({ outcome: 'uncertain', acknowledged: false });
   const out = await d.q.settleRun(d.lc, d.state, qualified(run), { course });
@@ -162,7 +162,7 @@ test('Q9', 'a lost retirement reply claims no retirement, holds this runtime, an
 });
 test('Q10', 'eight present quests fill the pool, a completed-but-unretired one included; a ninth is refused before commit and nothing is evicted', async (m) => {
   const d = await day(m), first = await created(d);
-  const run = runFor(['reading']); d.q.bindRun(d.state, root(d), run);
+  const run = runFor(['reading']); d.q.bindRun(d.state, d.lc, run);
   await closeGateDuring(d, 'retire-work', () => d.q.settleRun(d.lc, d.state, qualified(run), { course }));
   assert.equal(root(d).goals.find((g) => g.id === first).status, 'completed');
   const ids = [first];
@@ -174,7 +174,7 @@ test('Q10', 'eight present quests fill the pool, a completed-but-unretired one i
 });
 test('Q11', 'End retires the quest; a new quest for the occurrence takes a new monotonic id and the old run counts for none', async (m) => {
   const d = await day(m), id = await created(d);
-  const run = runFor(['reading']); d.q.bindRun(d.state, root(d), run);
+  const run = runFor(['reading']); d.q.bindRun(d.state, d.lc, run);
   const ended = await d.q.endQuest(d.lc, d.state, id);
   assert.equal(ended.kind, 'published'); assert.equal(root(d).goals.find((g) => g.id === id), undefined);
   assert.equal(d.q.bindingFor(d.state, id), null);
@@ -191,7 +191,7 @@ test('Q12', 'an End whose outcome is unknown blocks a second quest for the same 
 });
 test('Q13', 'nothing revives after a reload: a fresh page has no binding and the old run completes nothing', async (m) => {
   const d = await day(m), id = await created(d);
-  const run = runFor(['reading']); d.q.bindRun(d.state, root(d), run);
+  const run = runFor(['reading']); d.q.bindRun(d.state, d.lc, run);
   const reloaded = lifecycleOn(m, d.app, { time: d.time, epoch: { v: 1 } }).lc; await reloaded.ready;
   assert.deepEqual(await d.q.settleRun(reloaded, d.q.createQuestState(), qualified(run), { course }), []);
   assert.equal(reloaded.inspect().root.goals.find((g) => g.id === id).status, 'unfinished');
@@ -206,13 +206,13 @@ test('Q14', 'an unconfirmed create is reconciled by occurrence before another cr
 });
 test('Q15', 'two quests started before one Reading run both complete from it, each with its own ticket and write', async (m) => {
   const d = await day(m), a = await created(d), b = await created(d, d.q.questSeed({ ...OCCURRENCE, token: 27 }));
-  const run = runFor(['reading']); d.q.bindRun(d.state, root(d), run);
+  const run = runFor(['reading']); d.q.bindRun(d.state, d.lc, run);
   const results = await d.q.settleRun(d.lc, d.state, qualified(run), { course });
   assert.deepEqual(results.map((r) => [r.goalId, r.complete.kind, r.retire.kind]), [[a, 'published', 'published'], [b, 'published', 'published']]);
 });
 test('Q16', 'an owner change seen after the commit is reported as owner-changed, never as a definite failure', async (m) => {
   const d = await day(m); await created(d);
-  const run = runFor(['reading']); d.q.bindRun(d.state, root(d), run);
+  const run = runFor(['reading']); d.q.bindRun(d.state, d.lc, run);
   let owned = true;
   const results = await closeGateDuring(d, 'work', () => {
     const pending = d.q.settleRun(d.lc, d.state, qualified(run), { course, owned: () => owned }); owned = false; return pending;
@@ -222,13 +222,13 @@ test('Q16', 'an owner change seen after the commit is reported as owner-changed,
 
 test('Q17', 'W5 F1: every bound quest is reserved before the first write, so a second Reading run started during it binds none of them', async (m) => {
   const d = await day(m), a = await created(d), b = await created(d, d.q.questSeed({ ...OCCURRENCE, token: 27 }));
-  const r1 = runFor(['reading']); d.q.bindRun(d.state, root(d), r1);
+  const r1 = runFor(['reading']); d.q.bindRun(d.state, d.lc, r1);
   let release; d.c.state.gate = new Promise((resolve) => { release = () => { d.c.state.gate = null; resolve(); }; });
   const settling = d.q.settleRun(d.lc, d.state, qualified(r1), { course });
   await new Promise((resolve) => setTimeout(resolve, 20));
   assert.deepEqual([...d.state.pending.keys()].sort(), [a, b].sort(), 'both quests reserved while the first write waits');
   const r2 = runFor(['reading']);
-  assert.equal(d.q.bindRun(d.state, root(d), r2), null, 'R2 cannot bind a quest R1 reserved');
+  assert.equal(d.q.bindRun(d.state, d.lc, r2), null, 'R2 cannot bind a quest R1 reserved');
   release();
   const results = await settling;
   assert.deepEqual(results.map((r) => [r.goalId, r.complete.kind, r.retire?.kind]), [[a, 'published', 'published'], [b, 'published', 'published']]);
@@ -237,17 +237,17 @@ test('Q17', 'W5 F1: every bound quest is reserved before the first write, so a s
 test('Q18', 'W5 F2: a run binds once when it starts; seen again, first seen answered, or after settlement, it attaches no later quest', async (m) => {
   const d = await day(m);
   const r0 = runFor(['reading']);
-  assert.equal(d.q.bindRun(d.state, root(d), r0), null, 'no quest yet: an empty binding is recorded');
+  assert.equal(d.q.bindRun(d.state, d.lc, r0), null, 'no quest yet: an empty binding is recorded');
   const a = await created(d);
-  assert.equal(d.q.bindRun(d.state, root(d), r0), null, 'seen again, it keeps its empty binding');
+  assert.equal(d.q.bindRun(d.state, d.lc, r0), null, 'seen again, it keeps its empty binding');
   assert.deepEqual(await d.q.settleRun(d.lc, d.state, qualified(r0), { course }), []);
   const late = step(runFor(['reading']), 'right', 'knew');
-  assert.equal(d.q.bindRun(d.state, root(d), late), null, 'an answered run is not a new start');
+  assert.equal(d.q.bindRun(d.state, d.lc, late), null, 'an answered run is not a new start');
   const r1 = runFor(['reading']);
-  assert.deepEqual(d.q.bindRun(d.state, root(d), r1)?.goals.map((g) => g.id), [a]);
+  assert.deepEqual(d.q.bindRun(d.state, d.lc, r1)?.goals.map((g) => g.id), [a]);
   await d.q.settleRun(d.lc, d.state, qualified(r1), { course });
   const c2 = await created(d, d.q.questSeed({ ...OCCURRENCE, token: 28 }));
-  assert.equal(d.q.bindRun(d.state, root(d), r1), null, 'a consumed binding never revives');
+  assert.equal(d.q.bindRun(d.state, d.lc, r1), null, 'a consumed binding never revives');
   assert.equal(root(d).goals.find((g) => g.id === c2).status, 'unfinished');
 });
 test('Q19', 'W5 F3: overlapping creates store one quest per occurrence, on one page and across two tabs', async (m) => {
@@ -271,7 +271,7 @@ test('Q20', 'W5 F4: a throw after an observed publication is uncertain and holds
   await assert.rejects(async () => d.lc.assertReviewable(), /day-hold/);
   assert.equal(d.c.document(RECORD).m4Journey.goals.length, 1);
   const e = await day(m), id = await created(e), before = journeyRows(e.c).length;
-  const run = runFor(['reading']); e.q.bindRun(e.state, root(e), run);
+  const run = runFor(['reading']); e.q.bindRun(e.state, e.lc, run);
   const lost = { ...e.lc, completeGoal: async (...args) => { await e.lc.completeGoal(...args); throw new Error('lost-return-after-write'); } };
   const results = await e.q.settleRun(lost, e.state, qualified(run), { course });
   assert.deepEqual(results.map((r) => [r.goalId, r.complete.kind, r.retire]), [[id, 'uncertain', undefined]]);
@@ -292,7 +292,7 @@ test('Q21', 'W5 1901 ruling: an unconfirmed create, End or retirement holds this
   assert.equal((await b.q.endQuest(b.lc, b.state, idB)).kind, 'uncertain');
   await assert.rejects(async () => b.lc.assertReviewable(), /day-hold/);
   const c = await day(m), idC = await created(c);
-  const run = runFor(['reading']); c.q.bindRun(c.state, root(c), run);
+  const run = runFor(['reading']); c.q.bindRun(c.state, c.lc, run);
   c.lie.action = 'retire-work'; c.lie.next = mismatch;
   const results = await c.q.settleRun(c.lc, c.state, qualified(run), { course });
   assert.deepEqual(results.map((r) => [r.goalId, r.complete.kind, r.retire.kind]), [[idC, 'published', 'uncertain']]);
@@ -300,6 +300,46 @@ test('Q21', 'W5 1901 ruling: an unconfirmed create, End or retirement holds this
   const e = await day(m);
   assert.equal((await e.q.endQuest(e.lc, e.state, 'journey-x/goals/9')).kind, 'absent');
   await must(() => e.lc.assertReviewable(), 'a page with no unconfirmed write');
+});
+
+test('Q22', 'W2 1907 O1: without the owner no retirement is written, on the cached, the delayed no-write and the between-writes paths', async (m) => {
+  const noRetire = (d, from) => assert.deepEqual(journeyRows(d.c).slice(from).filter((r) => r.journey.action === 'retire-work'), []);
+  // cached: the local root already shows the bound quest completed by another tab
+  const a = await day(m), idA = await created(a);
+  const runA = runFor(['reading']); a.q.bindRun(a.state, a.lc, runA);
+  const tab = lifecycleOn(m, a.app, { time: a.time, epoch: { v: 1 } }).lc; await tab.ready;
+  await tab.completeGoal(idA, tab.completionTicket(idA, 'other-tab', a.seed));
+  await a.lc.tick(); assert.equal(root(a).goals.find((g) => g.id === idA).status, 'completed');
+  let from = journeyRows(a.c).length;
+  const cached = await a.q.settleRun(a.lc, a.state, qualified(runA), { course, owned: () => false });
+  assert.deepEqual(cached.map((r) => [r.complete.kind, r.retire]), [['owner-changed', undefined]]); noRetire(a, from);
+  assert.deepEqual((await a.q.recoverCompleted(a.lc, a.state, { owned: () => false })).map((r) => r.retire.kind), ['owner-changed']); noRetire(a, from);
+  // delayed: the completion call itself finds the quest completed and writes nothing
+  const b = await day(m), idB = await created(b);
+  const runB = runFor(['reading']); b.q.bindRun(b.state, b.lc, runB);
+  const tabB = lifecycleOn(m, b.app, { time: b.time, epoch: { v: 1 } }).lc; await tabB.ready;
+  await tabB.completeGoal(idB, tabB.completionTicket(idB, 'other-tab', b.seed));
+  from = journeyRows(b.c).length;
+  let calls = 0;
+  const delayed = await b.q.settleRun(b.lc, b.state, qualified(runB), { course, owned: () => calls++ < 1 });
+  assert.deepEqual(delayed.map((r) => [r.complete.kind, r.retire]), [['owner-changed', undefined]]); noRetire(b, from);
+  // between writes: the completion is published, then the owner moves before retirement
+  const c = await day(m), idC = await created(c);
+  const runC = runFor(['reading']); c.q.bindRun(c.state, c.lc, runC);
+  from = journeyRows(c.c).length; calls = 0;
+  const between = await c.q.settleRun(c.lc, c.state, qualified(runC), { course, owned: () => calls++ < 2 });
+  assert.deepEqual(between.map((r) => [r.goalId, r.complete.kind, r.retire.kind]), [[idC, 'published', 'owner-changed']]); noRetire(c, from);
+  assert.equal(root(c).goals.find((g) => g.id === idC).status, 'completed');
+});
+test('Q23', 'W2 1907 custody: a binding made before a reboot or an OFF→ON switch completes nothing afterwards', async (m) => {
+  const d = await day(m), id = await created(d);
+  const r1 = runFor(['reading']); d.q.bindRun(d.state, d.lc, r1);
+  await d.lc.boot();
+  assert.deepEqual(await d.q.settleRun(d.lc, d.state, qualified(r1), { course }), []);
+  const r2 = runFor(['reading']); assert.deepEqual(d.q.bindRun(d.state, d.lc, r2)?.goals.map((g) => g.id), [id]);
+  await d.lc.setSwitch(false); await d.lc.setSwitch(true);
+  assert.deepEqual(await d.q.settleRun(d.lc, d.state, qualified(r2), { course }), []);
+  assert.equal(root(d).goals.find((g) => g.id === id).status, 'unfinished');
 });
 
 /** one targeted mutant per adapter rule; each must turn its own case red */
@@ -319,6 +359,10 @@ export const MUTANTS = {
   'thrown-publication-as-failure': ['Q20', [["    if (observed.outcome === 'not-published') return { kind: 'not-published', reason, observed };\n    return unconfirmed(lc, { reason, observed }, owned);",
     "    return { kind: observed.outcome === 'uncertain' ? 'uncertain' : 'not-published', reason, observed };"]]],
   'no-unconfirmed-hold': ['Q21', [["  if (out.observed?.outcome === 'published') lc.holdUnconfirmed();\n", '']]],
+  'already-completed-overrides-owner': ['Q22', [["if (complete.value?.alreadyCompleted === true && complete.kind !== 'owner-changed')", 'if (complete.value?.alreadyCompleted === true)']]],
+  'retire-without-owner': ['Q22', [["    const retire = owned() ? await questWrite(lc, (observe) => lc.retire('goals', id, 'retire-completed', { observe }), owned)\n      : { kind: 'owner-changed' };",
+    "    const retire = await questWrite(lc, (observe) => lc.retire('goals', id, 'retire-completed', { observe }), owned);"]]],
+  'binding-ignores-boot': ['Q23', [['  if (binding.boot !== lc.bootIdentity() || binding.journeyId', '  if (binding.journeyId']]],
   'owner-change-ignored': ['Q16', [["    if (!owned()) return { kind: 'owner-changed', reason, observed };\n", '']]],
 };
 
