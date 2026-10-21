@@ -18,15 +18,16 @@ const SEED = Object.freeze({ kind: 'reading', sourceOccurrence: { article: 'bunk
 const goalData = () => ({ seed: structuredClone(SEED), inspected: false, practiceSession: null });
 
 /** the record port, with two test seams: `gate.close` names the action whose next commit meets a closed host gate (the host
- * refuses it, journey-gate-closed); `lie.next` rewrites the next 'work' commit's result after the commit itself happened */
+ * refuses it, journey-gate-closed); `lie.next` rewrites the result of the next commit of `lie.action` (default 'work') after
+ * the commit itself happened */
 export function lifecycleOn(m, app, { time, epoch }) {
   let serial = 0;
-  const device = memoryDevice(), lie = { next: null }, gate = { close: null };
+  const device = memoryDevice(), lie = { next: null, action: 'work' }, gate = { close: null };
   const real = m.lifecycle.recordPort({ app, binding: () => ({ epoch: epoch.v }), nextId: () => `journey-${++serial}-${crypto.randomUUID()}` });
   const port = { ...real, commit: async (expected, next, meta, open) => {
     if (gate.close === meta.action) { gate.close = null; return real.commit(expected, next, meta, () => false); }
     const result = await real.commit(expected, next, meta, open);
-    if (meta.action !== 'work' || !lie.next) return result;
+    if (meta.action !== lie.action || !lie.next) return result;
     const swap = lie.next; lie.next = null; return swap(result);
   } };
   const lc = m.lifecycle.createLifecycle({ port, device, buildId: 'build-a', core: corePort(), clock: () => time.now, enabled: true,
@@ -184,6 +185,29 @@ test('B12', 'UX4: a failed commit holds this runtime only; a fresh lifecycle on 
   assert.equal(reloaded.inspect().phase, 'active'); await reloaded.assertReviewable();
 });
 
+test('B13', 'an admit guard runs inside the queued mutation: its refusal reaches no port and sets no hold; a passing guard creates', async (m) => {
+  const { c, lc } = await withGoal(m), seen = [], commits = c.state.commits;
+  const refuse = (root) => { if (root.goals.length) throw new Error('quest-exists'); };
+  await assert.rejects(async () => lc.work('goals', goalData(), { observe: (r) => seen.push(r), admit: refuse }), /quest-exists/);
+  assert.deepEqual(seen, []); assert.equal(c.state.commits, commits); assert.equal(lc.inspect().phase, 'active');
+  let shown = null;
+  await must(() => lc.work('goals', goalData(), { admit: (root) => { shown = root; } }), 'a create its guard admits');
+  assert.ok(Object.isFrozen(shown) && Object.isFrozen(shown.goals), 'the guard sees a frozen copy');
+  assert.equal(lc.inspect().root.goals.length, 2);
+});
+test('B14', 'holdUnconfirmed holds this runtime only: no marker, no root guard, never for a switched-off page; a reload records again', async (m) => {
+  const { c, app, lc, device, time } = await withGoal(m), guard = c.document(RECORD).m4Journey.guard, commits = c.state.commits;
+  lc.holdUnconfirmed();
+  assert.equal(lc.inspect().phase, 'publication-hold');
+  await assert.rejects(async () => lc.assertReviewable(), /day-hold/);
+  assert.equal(device.saved.has('bunki-journey:hold'), false, 'no persisted hold marker');
+  assert.deepEqual(c.document(RECORD).m4Journey.guard, guard); assert.equal(c.state.commits, commits, 'no root guard write');
+  const off = lifecycleOn(m, app, { time, epoch: { v: 1 } }).lc; await off.ready; await off.setSwitch(false);
+  assert.equal(off.holdUnconfirmed().phase, 'off-page-ledger');
+  const reloaded = lifecycleOn(m, app, { time, epoch: { v: 1 } }).lc; await reloaded.ready;
+  assert.equal(reloaded.inspect().phase, 'active');
+});
+
 /** one targeted mutant per bridge rule; each must turn its own case red (an assertion, not a crash) */
 export const MUTANTS = {
   'uncertain-as-refused': ['B3', [["t.state=seen?.outcome==='uncertain'?'uncertain':'refused';", "t.state='refused';"]]],
@@ -200,6 +224,12 @@ export const MUTANTS = {
     ["if(root&&classify(root)==='valid')try{const next=nextRoot();next.guard={reason,until:holdUntil};yield* write(next,'hold',{control:true});}",
       "if(root&&classify(root)==='valid')try{const next=nextRoot();next.guard={reason,until:holdUntil};yield* write(next,'hold',{control:true,observe:currentObserver});}"]]],
   'legacy-observer-required': ['B11', [["function* enter(entrance,{observe=null}={}){", 'function* enter(entrance,{observe}){']]],
+  'admit-ignored': ['B13', [['  if(typeof admit===\'function\')admit(freeze(cp(s)));\n', '']]],
+  'admit-sees-live-root': ['B13', [['admit(freeze(cp(s)));', 'admit(s);']]],
+  'unconfirmed-hold-persists': ['B14', [["function holdUnconfirmed(){if(on&&owns())held('publication-hold');return inspect();}",
+    "function holdUnconfirmed(){if(on&&owns()){held('publication-hold');markHold('publication-hold');}return inspect();}"]]],
+  'unconfirmed-hold-when-off': ['B14', [["function holdUnconfirmed(){if(on&&owns())held('publication-hold');return inspect();}",
+    "function holdUnconfirmed(){held('publication-hold');return inspect();}"]]],
 };
 
 async function main() {
