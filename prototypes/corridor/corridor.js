@@ -20320,12 +20320,16 @@ async function kanjiJourneyEnter(journey, visit) {
 }
 /** keep one batch before it shows (rev 3.2 §7.7–8): the course's validation; the course's own origins in the journey's session
  * (a course row is the event course/<attempt>/<what> of its journey attempt); one queued write; then the display wait,
- * acknowledged within 300 ms or shown once with the day held. Resolves after the course projects the kept rows; a batch the
- * journey did not keep is projected nowhere */
+ * acknowledged within 300 ms or shown once with the day held. The request's own 300 ms runs from the moment the help is asked
+ * for (W5 1441): a queued step or a blocked write never delays the display; at the deadline the journey holds the day with
+ * W-hold, the help shows once, and a capture that had not begun is cancelled. Resolves when the help may show; only rows the
+ * journey kept in time are projected */
 function kanjiJourneyRemember(visit, helps, attemptId) {
   const journey = kanjiJourneyFor(visit);
   if (!journey) return Promise.resolve();
-  return kanjiJourneyRun(journey, async () => {
+  const request = { token: null, cancelled: false, settled: false };
+  const kept = kanjiJourneyRun(journey, async () => {
+    if (request.cancelled) return;
     await journey.lifecycle.tick();
     await kanjiJourneyEnter(journey, visit);
     const root = journey.lifecycle.inspect().root;
@@ -20344,12 +20348,25 @@ function kanjiJourneyRemember(visit, helps, attemptId) {
       if (root.daily.events.length + fresh > journey.module.LIMITS.events) journey.fullDay = root.dayEpoch;
     }
     let shown;
-    try { shown = await journey.lifecycle.awaitHelp(await journey.lifecycle.beginHelp(batch)); }
-    catch { return; }
-    if (shown?.accepted !== true) return;
+    try {
+      request.token = await journey.lifecycle.beginHelp(batch);
+      if (request.cancelled) { journey.lifecycle.holdAtDeadline(request.token); return; }
+      shown = await journey.lifecycle.awaitHelp(request.token);
+    } catch { return; }
+    if (request.cancelled || shown?.accepted !== true) return;
     visit.referenceHelp ||= [];
     for (const help of rows) if (!visit.referenceHelp.some((row) => JSON.stringify(row) === JSON.stringify(help))) visit.referenceHelp.push(help);
     visit.referenceHelp.sort((a, b) => a.at - b.at);
+  });
+  return new Promise((resolve) => {
+    const done = () => { if (request.settled) return; request.settled = true; clearTimeout(deadline); resolve(); };
+    const deadline = setTimeout(() => {
+      if (request.settled) return;
+      request.cancelled = true;
+      journey.lifecycle.holdAtDeadline(request.token);
+      done();
+    }, 300);
+    kept.then(done, done);
   });
 }
 /** ON's kanjiCourseAct: the journey snapshot (its attempt is the course's, inside the review day's namespace) is written before

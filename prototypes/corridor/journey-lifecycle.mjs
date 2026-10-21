@@ -26,7 +26,7 @@ const originOK=o=>o===null||(plain(o)&&text(o.eventId)&&text(o.sessionId)&&
 const rawOK=r=>object(r)&&text(r.what)&&Object.keys(r).every(k=>['what','about','reveals','at'].includes(k))&&
  Array.isArray(r.reveals)&&r.reveals.every(v=>['meaning','reading','form'].includes(v))&&new Set(r.reveals).size===r.reveals.length;
 function plain(x,depth=0){
- if(depth>24)return false;
+ if(depth>22)return false; // rev 3.3 §7.6 (W5 1441 F4): the root sits two levels inside a backup whose own limit is 24
  if(x===null||typeof x==='string'||typeof x==='boolean')return true;
  if(typeof x==='number')return Number.isFinite(x);
  if(!x||typeof x!=='object'||![Object.prototype,Array.prototype].includes(Object.getPrototypeOf(x)))return false;
@@ -87,7 +87,7 @@ export function classify(root){
 export function createLifecycle({port,device,buildId,core,clock,enabled,validateCapture}){
  insist(text(buildId),'build-identity-required');
  let on=enabled===true, owner=cp(port.binding()),root=null,phase='closed',holdUntil=-Infinity,lastNow=clock();
- let generation=null,activation=null,offDay=null,diagnostics=[];
+ let generation=null,activation=null,offDay=null,diagnostics=[],holdEpoch=0;
  const helpTickets=new WeakMap(),snapshots=new WeakMap(),preparations=new WeakMap(),dispatches=new WeakMap();
  const dayEnd=t=>core.endOfDay(new Date(t));
  const current=()=>port.snapshot();
@@ -116,7 +116,7 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
   return {expiredHold:hold!==undefined};
  }
  function clearRetiredHold(){const w=witnesses();if(w.expiredHold){try{insist(device.remove(MARKERS.hold)===true,'device-clear-failed');}catch{diagnostics.push('hold-marker-clear-unavailable');}}}
- function held(reason,until=dayEnd(clock())){phase=reason;holdUntil=Math.max(holdUntil,until);return inspect();}
+ function held(reason,until=dayEnd(clock())){phase=reason;holdUntil=Math.max(holdUntil,until);holdEpoch++;return inspect();}
  function* write(next,action,{control=false}={}){
   insist(on,'switch-off');insist(owns(),'owner-epoch');
   const before=current(),auth=authority(before);
@@ -182,11 +182,12 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
   if(clock()<lastNow){yield* hold('clock-reversal',Math.max(holdUntil,root?.dayEnd??dayEnd(lastNow)));return inspect();}
   lastNow=clock();
   if(!root||classify(root)!=='valid'||['missing-root-hold','invalid-root-hold','unowned-root-hold','authority-unavailable'].includes(phase))return inspect();
+  reconcile();
   // An expired review day retires normally, including after a clean cold start.
   if(clock()>root.dayEnd&&clock()>holdUntil){
    try{const witness=witnesses();if(witness.doubt){yield* hold(witness.doubt,witness.until);return inspect();}
-    const next=rotate(nextRoot());next.guard={reason:'clear',until:0};
-    if(yield* write(next,'rotate',{control:true})){phase='active';holdUntil=-Infinity;activation=Object.freeze({});clearRetiredHold();}
+    const next=rotate(nextRoot());next.guard={reason:'clear',until:0};const holds=holdEpoch;
+    if(yield* write(next,'rotate',{control:true})){if(holdEpoch===holds){phase='active';holdUntil=-Infinity;}activation=Object.freeze({});clearRetiredHold();}
    }catch{return held('root-sync-hold');}
   }
   return inspect();
@@ -205,6 +206,22 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
    if(root&&classify(root)==='valid')try{const next=nextRoot();next.guard={reason,until:holdUntil};yield* write(next,'hold',{control:true});}catch{/* dual-store failure is accepted residual r2 */}
   }
  }
+ /** §7.8 (W5 1441): the hold behind a held display is set at once (runtime and W-hold); the root guard stays best effort and is
+  * queued behind whatever write is pending, so storage never delays the display */
+ function holdForDisplay(reason){held(reason);if(on&&owns()){if(!markHold(reason))diagnostics.push('hold-marker-unavailable');run(()=>guardRoot(reason));}}
+ function* guardRoot(reason){if(!on||!owns()||!root||classify(root)!=='valid')return;
+  try{const next=nextRoot();next.guard={reason,until:holdUntil};yield* write(next,'hold',{control:true});}catch{/* dual-store failure is accepted residual r2 */}}
+ /** the display owner's 300 ms deadline, outside the operation queue: the capture's ticket (or, before it has one, the request) is
+  * shown once, held; its completion stays data only */
+ function holdAtDeadline(token){const t=token?helpTickets.get(token):null;
+  if(t?.shown)return {display:false,late:true,phase};if(t){t.done=true;t.shown=true;}
+  if(!on||!owns()||(t&&(!same(t.owner,owner)||t.generation!==generation)))return {display:false,late:true,phase};
+  holdForDisplay('help-write-hold');return {display:true,held:true,phase};}
+ /** F6 (lead 1443): a cache left behind by a late acknowledgement is reconciled from the host's validated authority, only for the
+  * same owner (tick checks it), generation and journey. Holds and markers stay as they are, and no ticket, snapshot or
+  * preparation revives: their tokens bind the activation and day they were made in */
+ function reconcile(){const s=current();let auth;try{auth=authority(s);}catch{return;}const host=s.record.m4Journey;
+  if(auth.generation===generation&&classify(host)==='valid'&&host.id===root.id&&host.generation===generation&&host.revision>root.revision)root=cp(host);}
  function* enter(entrance){return yield* change('visit',s=>{insist(s.daily.visits<LIMITS.visits,'visit-bound');s.daily.visits++;s.location=entrance;});}
  function* work(kind,data){insist(['goals','projects'].includes(kind),'work-kind');return yield* change('work',s=>{
   insist(plain(data)&&s[kind].length<LIMITS[kind],'work-bound');
@@ -238,19 +255,20 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
   // All late acknowledgements are data only. They cannot clear a hold or write
   // after OFF, changed ownership, retirement or timeout.
   if(t.done)return {display:false,late:true,phase};
-  if(!on||!owns()||!same(t.owner,owner)||t.generation!==generation){t.done=true;return {display:false,late:true,phase};}
+  if(!on||!owns()||!same(t.owner,owner)||t.generation!==generation){t.done=true;t.shown=true;return {display:false,late:true,phase};}
   const result=t.operation?port.completion(t.operation):null;
   if(result?.outcome==='published'&&classify(current().record.m4Journey)==='valid'&&
    digest(current().record.m4Journey)===t.proposedHash)root=cp(current().record.m4Journey);
   if(t.activation!==activation||t.dayEpoch!==root?.dayEpoch||clock()>root.dayEnd){
-   t.done=true;yield* tick();yield* hold('late-help-current-day');return {display:true,held:true,phase};
+   t.done=true;yield* tick();if(t.shown)return {display:false,late:true,phase};
+   t.shown=true;holdForDisplay('late-help-current-day');return {display:true,held:true,phase};
   }
   if(!t.preflight&&!result&&clock()-t.started<300)return {display:false,pending:true};
   t.done=true;
   if(result?.outcome==='published'&&classify(current().record.m4Journey)==='valid')root=cp(current().record.m4Journey);
   if(t.preflight||clock()-t.started>=300||result?.outcome!=='published'||result.acknowledged!==true||
-    result.rootHash!==t.proposedHash||digest(root)!==t.proposedHash){yield* hold('help-write-hold');return {display:true,held:true,phase};}
-  return {display:true,held:phase!=='active',accepted:true};
+    result.rootHash!==t.proposedHash||digest(root)!==t.proposedHash){t.shown=true;holdForDisplay('help-write-hold');return {display:true,held:true,phase};}
+  t.shown=true;return {display:true,held:phase!=='active',accepted:true};
  }
  function* beforeAnswer(id){yield* reviewable();insist(text(id)&&id.startsWith(root.id+'/'+root.dayEpoch+'/'),'attempt-namespace');
   const token=Object.freeze({});yield* change('snapshot',s=>{insist(s.daily.attempts.length<LIMITS.attempts,'attempt-bound');
@@ -302,11 +320,16 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
  function track(promise){const settled=promise.then(()=>{},()=>{});chain=settled;settled.then(()=>{if(chain===settled)chain=null;});}
  const op=fn=>(...args)=>run(()=>fn(...args));
  /** product display wait: the help's own acknowledgement or its 300 ms, whichever comes first (port.wait) */
- async function awaitHelp(token){for(;;){const result=await run(()=>finishHelp(token));if(!result.pending)return result;
-  const t=helpTickets.get(token);await port.wait(t.operation,Math.max(0,300-(clock()-t.started)));}}
+ async function awaitHelp(token){const t=helpTickets.get(token);insist(t,'unknown-capture');
+  const left=()=>Math.max(0,300-(clock()-t.started)),deadline=Symbol('deadline');
+  for(;;){const step=run(()=>finishHelp(token));
+   const result=thenable(step)?await Promise.race([step,new Promise(resolve=>setTimeout(()=>resolve(deadline),left()))]):step;
+   if(result===deadline)return holdAtDeadline(token);
+   if(!result.pending)return result;
+   await port.wait(t.operation,left());}}
  const ready=run(boot);
  return {ready,inspect,boot:op(boot),setSwitch:op(setSwitch),tick:op(tick),enter:op(enter),work:op(work),retire:op(retire),
-  beginHelp:op(beginHelp),finishHelp:op(finishHelp),awaitHelp,beforeAnswer:op(beforeAnswer),prepare:op(prepare),reserve:op(reserve),
+  beginHelp:op(beginHelp),finishHelp:op(finishHelp),awaitHelp,holdAtDeadline,beforeAnswer:op(beforeAnswer),prepare:op(prepare),reserve:op(reserve),
   admitAtLock,settle:op(settle),assertReviewable:op(reviewable),namespace:()=>root.id+'/'+root.dayEpoch+'/'};
 }
 

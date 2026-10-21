@@ -54,7 +54,7 @@ export const baseRecord = () => ({ v: 1, taken: [], srs: { 'k:職': { due: '2026
 /** the controller seam the host uses: snapshot and commitLocal over one in-memory store; a test can fail or delay a commit */
 export function memoryController({ record = baseRecord(), rows = [], migrationId = 'synthetic-migration', revision: start = 1 } = {}) {
   let revision = start, documents = [{ collection: RECORD, id: CURRENT, value: record }, { collection: ARCHIVE, id: CURRENT, value: { version: 1, turns: [] } }, ...rows];
-  const state = { mode: 'ok', delay: 0, commits: 0 };
+  const state = { mode: 'ok', delay: 0, commits: 0, gate: null };
   return {
     state,
     get revision() { return revision; },
@@ -66,6 +66,7 @@ export function memoryController({ record = baseRecord(), rows = [], migrationId
     },
     async commitLocal(request) {
       if (state.delay) await new Promise((r) => setTimeout(r, state.delay));
+      if (state.gate) await state.gate;
       if (state.mode === 'fail') return { status: 'recovery-required', reason: 'storage-or-source-failure' };
       assert.equal(request.expectedRevision, revision);
       for (const m of request.mutations) {
@@ -231,6 +232,96 @@ test('L3', 'the exact boundary (J2): an acknowledgement seen at 299 ms is kept; 
   }
 });
 
+/** hold the next commits until release() (W5 1441's blocked-commit reproduction) */
+const blockCommits = (c) => { let release; c.state.gate = new Promise((resolve) => { release = () => { c.state.gate = null; resolve(); }; }); return release; };
+const within = (promise, ms) => Promise.race([promise.then((value) => ({ value })), new Promise((resolve) => setTimeout(() => resolve(null), ms))]);
+async function activeDay(m, record) {
+  const c = memoryController(record ? { record } : {}), app = await openApp(m, c), time = { now: Date.parse(ON) };
+  const { lc, device } = lifecycleOn(m, app, { time });
+  await lc.ready; time.now = corePort().endOfDay(new Date(time.now)) + 60_000; await lc.tick();
+  return { c, app, time, lc, device };
+}
+test('L4', 'W5 1441: with the help commit blocked, the held display resolves at the deadline, before storage is released; the late commit stays inert', async (m) => {
+  const { c, lc, device, time } = await activeDay(m);
+  const base = time.now, wall = Date.now(), clock = setInterval(() => { time.now = base + (Date.now() - wall); }, 5);
+  const release = blockCommits(c);
+  try {
+    const token = await lc.beginHelp(helpBatch('atlas:4', { what: 'reference', reveals: ['meaning'], at: 4 }));
+    const shown = await within(lc.awaitHelp(token), 1500);
+    assert.ok(shown, 'the display waited on the blocked commit');
+    assert.deepEqual([shown.value.display, shown.value.held], [true, true]);
+    assert.equal(device.saved.get('bunki-journey:hold').reason, 'help-write-hold'); assert.equal(lc.inspect().phase, 'help-write-hold');
+    release();
+    await new Promise((r) => setTimeout(r, 50));
+    assert.equal((await lc.finishHelp(token)).late, true); assert.notEqual(lc.inspect().phase, 'active');
+    await assert.rejects(async () => lc.assertReviewable());
+  } finally { clearInterval(clock); c.state.gate = null; }
+});
+test('L4b', 'the held display also beats another journey write already queued in front of it (the race in awaitHelp)', async (m) => {
+  const { c, lc, device, time } = await activeDay(m);
+  const base = time.now, wall = Date.now(), clock = setInterval(() => { time.now = base + (Date.now() - wall); }, 5);
+  const release = blockCommits(c);
+  try {
+    const token = await lc.beginHelp(helpBatch('atlas:4b', { what: 'reference', reveals: ['form'], at: 41 }));
+    const queued = lc.enter('lessons');
+    const shown = await within(lc.awaitHelp(token), 1500);
+    assert.ok(shown, 'the display waited behind the queued write');
+    assert.deepEqual([shown.value.display, shown.value.held], [true, true]); assert.ok(device.saved.has('bunki-journey:hold'));
+    release(); await Promise.resolve(queued).catch(() => {});
+  } finally { clearInterval(clock); c.state.gate = null; }
+});
+test('L4c', 'finishHelp itself decides a held display without waiting on the queued root guard', async (m) => {
+  const { c, lc, time } = await activeDay(m);
+  const release = blockCommits(c);
+  try {
+    const token = await lc.beginHelp(helpBatch('atlas:4c', { what: 'reference', reveals: ['meaning'], at: 42 }));
+    time.now += 300;
+    const shown = await within(Promise.resolve(lc.finishHelp(token)), 1000);
+    assert.ok(shown, 'finishHelp waited on the blocked write');
+    assert.deepEqual([shown.value.display, shown.value.held], [true, true]);
+    release(); await new Promise((r) => setTimeout(r, 20));
+  } finally { c.state.gate = null; }
+});
+test('L5', 'F6 (lead 1443): after a late acknowledgement the same session reconciles at the next day\'s rollover and resumes, with no reload', async (m) => {
+  const { c, lc, device, time } = await activeDay(m);
+  const base = time.now, wall = Date.now(), clock = setInterval(() => { time.now = base + (Date.now() - wall); }, 5);
+  c.state.delay = 450;
+  let token;
+  try {
+    token = await lc.beginHelp(helpBatch('atlas:5', { what: 'reference', reveals: ['reading'], at: 5 }));
+    assert.equal((await lc.awaitHelp(token)).held, true);
+    await new Promise((r) => setTimeout(r, 600));
+  } finally { clearInterval(clock); c.state.delay = 0; }
+  const late = c.document(RECORD).m4Journey;
+  assert.equal(late.daily.events.length, 1);
+  await assert.rejects(async () => lc.assertReviewable());
+  assert.equal((await lc.finishHelp(token)).late, true);
+  time.now = corePort().endOfDay(new Date(time.now)) + 60_000;
+  const next = await lc.tick();
+  assert.equal(next.phase, 'active'); assert.equal(c.document(RECORD).m4Journey.dayEpoch, late.dayEpoch + 1);
+  assert.equal(device.saved.has('bunki-journey:hold'), false);
+  await lc.assertReviewable();
+});
+test('L6', 'a rotation still being written cannot clear a hold set meanwhile (the deadline hold survives its acknowledgement)', async (m) => {
+  const { c, lc, time } = await activeDay(m);
+  time.now = corePort().endOfDay(new Date(time.now)) + 60_000;
+  const release = blockCommits(c);
+  const rotating = lc.tick();
+  await new Promise((r) => setTimeout(r, 20));
+  assert.deepEqual(lc.holdAtDeadline(null), { display: true, held: true, phase: 'help-write-hold' });
+  release(); await rotating; await new Promise((r) => setTimeout(r, 20));
+  assert.equal(lc.inspect().phase, 'help-write-hold');
+  await assert.rejects(async () => lc.assertReviewable());
+});
+test('D1', 'rev 3.3 §7.6 (F4): a whole root of depth 22 commits; depth 23 refuses before the port, with nothing written', async (m) => {
+  const { c, lc } = await activeDay(m);
+  const nest = (n) => { let v = 'leaf'; for (let i = 0; i < n; i++) v = { d: v }; return v; };
+  await lc.work('goals', { status: 'unfinished', note: nest(19) });
+  const commits = c.state.commits, before = c.document(RECORD).m4Journey;
+  await assert.rejects(async () => lc.work('projects', { status: 'unfinished', note: nest(20) }), /root-invalid/);
+  assert.equal(c.state.commits, commits); assert.deepEqual(c.document(RECORD).m4Journey, before);
+});
+
 /** P1–P6 (rev 3.2 §7) run on copies of a synthetic learner record shaped like John's: every one of corridor's 36 known
  * roots but 'ai' (the record host never holds it), with representative content, and an unknown root. Never his store */
 export const johnShaped = () => ({ v: 1,
@@ -379,6 +470,11 @@ export const MUTANTS = {
   'receipt-unchecked': ['H7', 'host', [["insist(own(value, 'journey'), 'unsupported-command-receipt'); journeyEvidence(value.journey);", '']]],
   'projection-drops-creation': ['H1', 'host', [["(row.type === JOURNEY_LIFECYCLE && JOURNEY_CREATION.has(row.journey.action))", 'false']]],
   'ack-deadline-ignored': ['L3', 'lifecycle', [['if(t.preflight||clock()-t.started>=300||', 'if(t.preflight||']]],
+  'display-waits-on-queue': ['L4b', 'lifecycle', [['   if(result===deadline)return holdAtDeadline(token);', '   if(result===deadline)return await step;']]],
+  'held-display-awaits-guard': ['L4c', 'lifecycle', [["{t.shown=true;holdForDisplay('help-write-hold');return {display:true,held:true,phase};}", "{yield* hold('help-write-hold');t.shown=true;return {display:true,held:true,phase};}"]]],
+  'no-reconcile': ['L5', 'lifecycle', [['  reconcile();\n', '']]],
+  'rotation-clears-hold': ['L6', 'lifecycle', [["if(holdEpoch===holds){phase='active';holdUntil=-Infinity;}", "phase='active';holdUntil=-Infinity;"]]],
+  'depth-24': ['D1', 'lifecycle', [[' if(depth>22)return false;', ' if(depth>24)return false;']]],
 };
 
 async function main() {

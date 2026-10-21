@@ -119,6 +119,7 @@ export async function page(program, { controller, storage, time, served = { git_
   journey = true } = {}) {
   const h = layer.corridorSandbox(program, { core, fsrsApi, pin, record: {}, dict, clock: () => new Date(time.now), storage });
   const ctx = h.sandbox;
+  ctx.setTimeout = setTimeout; ctx.clearTimeout = clearTimeout;
   delete ctx.Object; delete ctx.JSON; delete ctx.Array;
   vm.runInContext(`${COURSE}\nwindow.BunkiKanjiCourse = BunkiKanjiCourse;\n${HELPERS}`, ctx);
   const app = await openApp(modules, controller);
@@ -322,15 +323,18 @@ test('S14', 'help not acknowledged within 300 ms shows once, holds the day with 
   const s = store(), { time } = await journeyOnNextDay(P, s);
   const p = await page(P.on, { ...s, time });
   const v = p.visit();
+  await p.capture(v, [row('dictionary-entry', kanji('水'), ['meaning'], 49)]);
+  assert.equal(v.referenceHelp.length, 1);
   s.controller.state.delay = 450;
   const started = time.now, wall = Date.now(), clock = setInterval(() => { time.now = started + (Date.now() - wall); }, 5);
   try { await p.capture(v, [row('dictionary-entry', kanji('職'), ['meaning', 'form'], 50)]); }
   finally { clearInterval(clock); }
-  assert.equal((v.referenceHelp || []).length, 0);
+  assert.equal(v.referenceHelp.length, 1);
   assert.equal(JSON.parse(s.storage.getItem('bunki-journey:hold')).reason, 'help-write-hold');
   assert.notEqual(p.lifecycle().phase, 'active');
   s.controller.state.delay = 0;
   await new Promise((r) => setTimeout(r, 500));
+  assert.equal(v.referenceHelp.length, 1, 'the late commit projected its rows');
   const w = p.visit(); const id = await p.act(w); const o = await p.report(w, id);
   assert.deepEqual([o.write, o.reason], [false, 'not-recorded']); assert.equal(p.calls(), 0);
 });
@@ -344,6 +348,23 @@ test('S15', 'custody with the journey on: a candidate stripped of its labels (pa
   delete forged.candidate.helpRelevance; forged.candidate.help = forged.candidate.help.map(({ relevance, ...raw }) => raw);
   const o = await p.observe(prepared.details.attemptId, forged, prepared.binding);
   assert.deepEqual([o.write, o.reason], [false, 'review-unverified']); assert.equal(p.calls(), 0);
+});
+
+test('S16', 'W5 1441 in the course: a capture whose commit is blocked still shows at the request\'s 300 ms, held with W-hold, projected nowhere', async (P) => {
+  const s = store(), { time } = await journeyOnNextDay(P, s);
+  const p = await page(P.on, { ...s, time });
+  const v = p.visit();
+  let release; s.controller.state.gate = new Promise((resolve) => { release = () => { s.controller.state.gate = null; resolve(); }; });
+  try {
+    const started = Date.now();
+    const shown = await Promise.race([p.capture(v, [row('dictionary-entry', kanji('職'), ['meaning', 'form'], 70)]).then(() => true),
+      new Promise((resolve) => setTimeout(() => resolve(false), 1500))]);
+    assert.equal(shown, true, 'the help waited on storage'); assert.ok(Date.now() - started < 1000);
+    assert.equal(JSON.parse(s.storage.getItem('bunki-journey:hold')).reason, 'help-write-hold');
+    assert.equal((v.referenceHelp || []).length, 0); assert.notEqual(p.lifecycle().phase, 'active');
+  } finally { release(); }
+  await new Promise((r) => setTimeout(r, 50));
+  assert.equal((v.referenceHelp || []).length, 0);
 });
 
 /** W5's 70 vectors: their help rows and original origins imported into the root through a registered producer, a reload,
@@ -408,8 +429,9 @@ export const MUTANTS = {
   'off-device-unwired': ['S1', [["      device: kanjiJourneyDevice, buildId,", "      device: { read() {}, write() { return true; }, remove() { return true; } }, buildId,"]]],
   'off-tick-missing': ['S3', [["  if (typeof kanjiJourneyTick === 'function') kanjiJourneyTick();\n", '']]],
   'build-unchecked': ['S12', [["    if (!served) { kanjiJourney = { epoch, unavailable: 'build-unidentified' }; return; }\n", '']]],
-  'projected-before-kept': ['S14', [["    if (shown?.accepted !== true) return;\n", '']]],
+  'projected-before-kept': ['S14', [["    if (request.cancelled || shown?.accepted !== true) return;\n", '']]],
   'custody-trusts-received-on': ['S15', [["  if (candidate !== undefined && JSON.stringify(candidate) !== JSON.stringify(record.details.candidate)) throw new Error('review-transport-changed');\n", '']]],
+  'corridor-deadline-missing': ['S16', [["    }, 300);\n    kept.then(done, done);\n", "    }, 3000000);\n    kept.then(done, done);\n"]]],
   'day-full-not-told': ['S13', [["  if (KANJI_JOURNEY_DAY_FULL.includes(error?.message)) journey.fullDay = day;\n", '']]],
 };
 
