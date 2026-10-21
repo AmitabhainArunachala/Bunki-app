@@ -24111,6 +24111,7 @@ function loadReferenceExtra() {
     }
     if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Reference data unavailable');
     if (!window.BunkiReferenceCore?.validateKanjiFacts(data)) throw new Error('Dictionary meanings and classifications unavailable');
+    if (!window.BunkiReferenceCore?.validateJoyoKun?.(data) || !window.BunkiReferenceCore?.validateJoyoOn?.(data)) throw new Error('Complete Jōyō readings unavailable');
     D.referenceExtra = data;
     // the official table that supplies the readings KANJIDIC2 lacks is named beside the other sources
     const table = (data.sources || []).find((source) => String(source.name).startsWith('常用漢字表'));
@@ -24254,6 +24255,9 @@ function kanjiReferenceRows() {
   const extra = D.referenceExtra;
   if (!extra) return null;
   if (kanjiReferenceIndexFor !== extra) {
+    kanjiReferenceIndexFor = extra;
+    kanjiReferenceIndex = null;
+    if (!window.BunkiReferenceCore?.validateJoyoKun?.(extra) || !window.BunkiReferenceCore?.validateJoyoOn?.(extra)) return null;
     const official = new Map();
     for (const [glyph, reading] of extra.officialReadings || []) {
       if (!official.has(glyph)) official.set(glyph, []);
@@ -24261,6 +24265,8 @@ function kanjiReferenceRows() {
     }
     kanjiReferenceIndex = {
       readings: new Map((extra.kanjiReadings || []).map((row) => [row[0], row])),
+      joyoKun: new Map(extra.joyoKun || []),
+      joyoOn: new Map(extra.joyoOn || []),
       official,
       records: new Map((extra.kanjiRecords || []).map((row) => [row[0], row])),
       words: new Map(extra.jmdictWords || []),
@@ -24272,7 +24278,8 @@ function kanjiReferenceRows() {
 }
 /** Whether every reading is here yet: 'complete' once the sidecar arrived, else 'pending' or 'failed' (retryable). */
 function kanjiReadingsState() {
-  return D.referenceExtra ? 'complete' : referenceExtraError && !referenceExtraPending ? 'failed' : 'pending';
+  return D.referenceExtra ? (kanjiReferenceRows() ? 'complete' : 'failed')
+    : referenceExtraError && !referenceExtraPending ? 'failed' : 'pending';
 }
 /** Reference facts never replace a lesson keyword or a learner's saved answer.
  * A present, valid source can explicitly lack a glyph; pending/failed is a
@@ -24318,15 +24325,21 @@ function kanjiReference(id) {
   const added = rows?.official.get(id) || [];
   const helpers = window.BunkiReferenceCore;
   const core = D.kanji?.[id];
-  if (!helpers?.mergeReadings) {
+  if (!helpers?.mergeReadings || !helpers?.joyoKunDisplay || !helpers?.joyoOnDisplay) {
     return core ? { ...core, lessonOn: [...(core.on || [])], lessonKun: [...(core.kun || [])], officialReadings: [], readingsState: 'failed' } : null;
   }
   const isOn = (reading) => helpers.readingKey(reading).startsWith('on:');
+  const completeKun = helpers.mergeReadings(core?.kun, row?.[2], added.filter((reading) => !isOn(reading)));
+  const kunView = helpers.joyoKunDisplay(core?.kun, rows?.joyoKun.get(id), row?.[2], id);
+  const completeOn = helpers.mergeReadings(core?.on, row?.[1], added.filter(isOn));
+  const onView = helpers.joyoOnDisplay(core?.on, rows?.joyoOn.get(id), completeOn);
   if (core) {
     return {
       ...core,
-      on: helpers.mergeReadings(core.on, row?.[1], added.filter(isOn)),
-      kun: helpers.mergeReadings(core.kun, row?.[2], added.filter((reading) => !isOn(reading))),
+      ...onView,
+      completeOn,
+      ...kunView,
+      completeKun,
       lessonOn: [...(core.on || [])],
       lessonKun: [...(core.kun || [])],
       officialReadings: added,
@@ -24336,11 +24349,35 @@ function kanjiReference(id) {
   const record = rows?.records.get(id);
   if (!record) return null;
   return {
-    c: id, on: [...(row?.[1] || [])], kun: [...(row?.[2] || [])], m: record[1].join('; '), meanings: [...record[1]],
+    c: id, ...onView, completeOn, ...kunView, completeKun, m: record[1].join('; '), meanings: [...record[1]],
     st: record[2], rad: record[3], parts: [], officialReadings: added, readingsState: 'complete', joyoOutsideCore: true,
   };
 }
-/** Every kanji the finder lists: kanji.json's, and the Jōyō forms it lacks once the reference record holds them. */
+/** Current official reference is separate from a learner's preserved saved answer. */
+function currentJoyoKunNote(id, tag = 'p', className = 'fine') {
+  if (!retainedKanjiRecord(id)) return null;
+  const readings = kanjiReference(id)?.joyoKun;
+  if (!readings) return null;
+  const note = el(tag, className, tx('常用漢字表（2010年）の訓読み', 'Jōyō kun readings (2010 table)') +
+    ' — ' + (readings.join('・') || '—'));
+  note.dataset.currentJoyoKun = id;
+  return note;
+}
+/** Explicit table status for the readings actually shown, including preserved saved answers. */
+function joyoOnNote(id, shown, tag = 'p', className = 'fine') {
+  const current = kanjiReference(id);
+  if (!current?.joyoOn) return null;
+  const parts = [];
+  if (retainedKanjiRecord(id)) parts.push(tx('常用漢字表（2010年）の音読み', 'Jōyō on readings (2010 table)') +
+    ' — ' + (current.joyoOn.join('・') || '—'));
+  const outside = (shown || []).filter(reading => !current.joyoOn.includes(reading));
+  if (outside.length) parts.push(tx('常用漢字表外の音読み', 'On readings outside the jōyō table') + ' — ' + outside.join('・'));
+  if (!parts.length) return null;
+  const note = el(tag, className, parts.join(' / '));
+  note.dataset.joyoOnStatus = id;
+  return note;
+}
+/** Every kanji the finder lists, including official forms absent from the lesson source. */
 function kanjiFinderUniverse() {
   const rows = kanjiReferenceRows();
   const keys = Object.keys(D.kanji || {});
@@ -24446,8 +24483,9 @@ function renderReferenceNode(sheet, node) {
   sheet.append(el('h2', 'headword', entry.missingGlyph
     ? tx(`字形未収録 (${entry.id})`, `Glyph not supplied (${entry.id})`)
     : entry.text || entry.id));
-  sheet.append(el('p', 'reading', entry.readings?.length
-    ? entry.readings.join('・')
+  const displayReadings = entry.displayReadings || entry.readings;
+  sheet.append(el('p', 'reading', displayReadings?.length
+    ? displayReadings.join('・')
     : entry.reading || tx('読みなし', 'No reading')));
   const meanings = entry.type === 'kanji' ? entry.completeMeanings || entry.meanings : entry.meanings;
   sheet.append(el('p', 'gloss', meanings?.length
@@ -24455,8 +24493,10 @@ function renderReferenceNode(sheet, node) {
     : tx('意味未収録', 'Meaning not supplied')));
   if (entry.type === 'kanji') {
     const readings = el('dl', 'kv');
-    readings.append(el('dt', null, '音読み'), el('dd', null, entry.on?.join('・') || tx('未収録', 'Not supplied')), el('dt', null, '訓読み'), el('dd', null, entry.kun?.join('・') || tx('未収録', 'Not supplied')));
+    readings.append(el('dt', null, '音読み'), el('dd', null, (entry.displayOn || entry.on)?.join('・') || tx('未収録', 'Not supplied')), el('dt', null, '訓読み'), el('dd', null, (entry.displayKun || entry.kun)?.join('・') || tx('未収録', 'Not supplied')));
     sheet.append(readings);
+    const tableStatus = joyoOnNote(entry.id, entry.displayOn || entry.on);
+    if (tableStatus) sheet.append(tableStatus);
     if (entry.strokeCount != null) sheet.append(el('p', 'sense-pos', tx(`${entry.strokeCount} 画`, `${entry.strokeCount} strokes`)));
     renderKanjiClassifications(sheet, entry.id, node);
   }
@@ -31726,6 +31766,8 @@ function renderReview(main) {
       }
       if (readings.querySelector('[data-lesson-selection]')) readings.append(el('p', 'sense-pos review-kanji-note', tx('「レッスン」は、このレッスンで扱う読みです。', '“Lesson” marks the readings selected for this lesson.')));
       if (display?.officialReadings?.length) readings.append(el('p', 'sense-pos review-kanji-note', tx('＊ 常用漢字表にある読み。', '* Reading supplied by the Jōyō Kanji Table.')));
+      const tableStatus = joyoOnNote(item.id, display?.on, 'p', 'sense-pos review-kanji-note');
+      if (tableStatus) readings.append(tableStatus);
       if (display?.readingsState !== 'complete') readings.append(el('p', 'sense-pos review-kanji-status', display?.readingsState === 'pending'
         ? tx('全ての読みを読み込み中…', 'Loading the complete reading set…')
         : tx('全ての読みは現在表示できません。確認できる読みを表示しています。', 'The complete reading set is unavailable. Showing the available readings.')));
@@ -37388,8 +37430,9 @@ function renderKanjiNode(sheet, node) {
   // only the official 2010 table gives is starred and named under the list. Until every reading has arrived the
   // list is the lessons' selection and says so; a failed load offers its retry.
   const kv = el('dl', 'kv');
-  const readingsState = display.readingsState || 'complete';
+  const readingsState = display.readingsState || (retained ? 'saved' : 'complete');
   kv.dataset.kanjiReadings = readingsState;
+  if (retained) kv.dataset.currentJoyoKunState = kanjiReadingsState();
   const officialOnly = new Set(display.officialReadings || []);
   const readingLine = (list) => {
     const span = el('span', 'on');
@@ -37411,6 +37454,10 @@ function renderKanjiNode(sheet, node) {
   kun.append(readingLine(display.kun));
   kv.append(withEn(el('dt', null, '訓'), 'kun'), kun);
   sheet.append(kv);
+  const currentKun = currentJoyoKunNote(node.id);
+  if (currentKun) sheet.append(currentKun);
+  const tableStatus = joyoOnNote(node.id, display.on);
+  if (tableStatus) sheet.append(tableStatus);
   if (officialOnly.size) {
     const official = el('p', 'fine reading-source-note', tx('* 常用漢字表（2010年）にある読み', '* a reading from the official Jōyō kanji table (2010)'));
     official.id = 'kanji-reading-official';
@@ -37924,6 +37971,10 @@ function strokeReadingField(k) {
     strokeReadingRow('音読み', 'on', k?.on, 'on', k?.officialReadings),
     strokeReadingRow('訓読み', 'kun', k?.kun, 'kun', k?.officialReadings),
   );
+  const tableStatus = joyoOnNote(k?.c, k?.on, 'p', 'stroke-reading-note');
+  if (tableStatus) readings.append(tableStatus);
+  const currentKun = currentJoyoKunNote(k?.c, 'p', 'stroke-reading-note');
+  if (currentKun) readings.append(currentKun);
   return readings;
 }
 
@@ -37982,6 +38033,10 @@ function strokeClassicReadings(k) {
   }
   if (officialOnly.size) readings.append(el('span', 'stroke-read-note', tx('* 常用漢字表（2010年）にある読み', '* a reading from the official Jōyō kanji table (2010)')));
   readings.append(...strokeReadingsStatus(k, 'span', 'stroke-read-note'));
+  const tableStatus = joyoOnNote(k?.c, k?.on, 'span', 'stroke-read-note');
+  if (tableStatus) readings.append(tableStatus);
+  const currentKun = currentJoyoKunNote(k?.c, 'span', 'stroke-read-note');
+  if (currentKun) readings.append(currentKun);
   return readings;
 }
 

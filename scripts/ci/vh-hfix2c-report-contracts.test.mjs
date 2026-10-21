@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
+import { runInNewContext } from 'node:vm';
 import {
   HFIX2C,
   hfixDigest,
@@ -22,7 +23,14 @@ const write = (path, value) => {
   mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, typeof value === 'string' ? value : JSON.stringify(value));
 };
-function fixture(engine = 'chromium') {
+function fixture(
+  engine = 'chromium',
+  {
+    lessonKun = ['い.きる'],
+    dictionaryKun = ['い.きる', 'なま'],
+    joyoKun = [['生', ['いきる', 'うまれる', 'なま']]],
+  } = {},
+) {
   const base = mkdtempSync(join(parent, 'case-')),
     root = join(base, 'root'),
     siteDir = join(base, 'site');
@@ -44,10 +52,11 @@ function fixture(engine = 'chromium') {
   ])
     write(join(root, 'scripts/ci', file), '// pinned fixture ' + file);
   const files = {
-    'data/share_alike/kanji.json': { kanji: { 生: { on: ['セイ'], kun: ['い.きる'] } } },
+    'data/share_alike/kanji.json': { kanji: { 生: { on: ['セイ'], kun: lessonKun } } },
     'data/share_alike/reference-extra.json': {
-      kanjiReadings: [['生', ['セイ', 'ショウ'], ['い.きる', 'なま']]],
+      kanjiReadings: [['生', ['セイ', 'ショウ'], dictionaryKun]],
       officialReadings: [['生', 'ショウ']],
+      ...(joyoKun === null ? {} : { joyoKun }),
     },
     'corridor.js': '// immutable corridor',
   };
@@ -75,6 +84,99 @@ function fixture(engine = 'chromium') {
     },
   };
 }
+function nativeKanjiContract(f) {
+  // Execute only the actual native verifier's pure expectation function, never its browser setup.
+  const source = readFileSync(
+    new URL('../../prototypes/corridor/tools/verify-hfix2c.mjs', import.meta.url),
+    'utf8',
+  );
+  const start = 'function actualKanjiContract(id) {';
+  const end = '\nfunction readKanjiReview() {';
+  assert.equal(source.split(start).length, 2);
+  assert.equal(source.split(end).length, 2);
+  const fn = source.slice(source.indexOf(start), source.indexOf(end));
+  return JSON.parse(
+    JSON.stringify(
+      runInNewContext(`${fn}\nactualKanjiContract('生')`, {
+        read: (file) => readFileSync(join(f.siteDir, file), 'utf8'),
+      }),
+    ),
+  );
+}
+
+test('E3 real expectation functions preserve raw kun and affixes while completing only attested Jōyō display', () => {
+  const f = fixture('chromium', {
+    lessonKun: ['い.きる', 'い.きる'],
+    dictionaryKun: ['い.きる', 'う.まれる', 'うま.れる', 'う.む', 'なま', 'なま-', 'な.る', '-う'],
+    joyoKun: [['生', ['いきる', 'うまれる', 'うむ', 'なま']]],
+  });
+  const files = ['data/share_alike/kanji.json', 'data/share_alike/reference-extra.json'];
+  const before = files.map((file) => readFileSync(join(f.siteDir, file), 'utf8'));
+  const p = f.pins();
+  assert.deepEqual(p.canonical.kun, [
+    'い.きる',
+    'う.まれる',
+    'う.む',
+    'なま',
+    'なま-',
+    'な.る',
+    '-う',
+  ]);
+  assert.deepEqual(p.canonical.lessonKun, ['い.きる', 'い.きる']);
+  assert.deepEqual(nativeKanjiContract(f), p.canonical);
+  assert.deepEqual(
+    files.map((file) => readFileSync(join(f.siteDir, file), 'utf8')),
+    before,
+  );
+  const good = focused(p);
+  assert.equal(validateHfix2cFocused(good, p), true);
+  for (const wrong of [
+    p.canonical.kun.filter((reading) => reading !== 'う.む'),
+    p.canonical.kun.map((reading) => (reading === 'う.まれる' ? 'うま.れる' : reading)),
+    [...p.canonical.kun, p.canonical.kun[0]],
+    p.canonical.kun.filter((reading) => reading !== 'なま-'),
+  ]) {
+    const bad = structuredClone(good);
+    const observed = bad.rows.find((row) => row.name === HFIX2C.transition).observed;
+    observed.complete = snapshot({ ...p.canonical, kun: wrong }, 'complete');
+    assert.throws(() => validateHfix2cFocused(bad, p));
+  }
+});
+
+test('E3 absent Jōyō row keeps the legacy union; a present empty row preserves dictionary-attested dots', () => {
+  for (const joyoKun of [undefined, [], [['生', []]]]) {
+    const f = fixture('chromium', {
+      dictionaryKun: ['い.きる', 'う.まれる', 'うま.れる', 'なま'],
+      joyoKun: joyoKun === undefined ? null : joyoKun,
+    });
+    const p = f.pins();
+    assert.deepEqual(p.canonical.kun, ['い.きる', 'う.まれる', 'うま.れる', 'なま']);
+    assert.deepEqual(nativeKanjiContract(f), p.canonical);
+  }
+});
+
+test('E3 native missing-reading control removes both completion inputs without deleting another reading', () => {
+  const source = readFileSync(
+    new URL('../../prototypes/corridor/tools/verify-kanji-trust.mjs', import.meta.url),
+    'utf8',
+  );
+  const start = 'const CONTROLS = {';
+  const end = '\nfunction replaceOnce(';
+  assert.equal(source.split(start).length, 2);
+  assert.equal(source.split(end).length, 2);
+  const edit = runInNewContext(
+    `${source.slice(source.indexOf(start), source.indexOf(end))}\nCONTROLS['drop-official-reading'].edit`,
+  );
+  const input = {
+    kanjiReadings: [['生', ['セイ'], ['う.まれる', 'うま.れる', 'う.まれ', 'うまれ']]],
+    joyoKun: [['生', ['うまれる', 'うむ']]],
+  };
+  const changed = JSON.parse(edit(JSON.stringify(input)));
+  assert.deepEqual(changed.kanjiReadings[0][2], ['う.まれ', 'うまれ']);
+  assert.deepEqual(changed.joyoKun[0][1], ['うむ']);
+  assert.deepEqual(input.kanjiReadings[0][2], ['う.まれる', 'うま.れる', 'う.まれ', 'うまれ']);
+});
+
 function snapshot(record, state) {
   return {
     state,

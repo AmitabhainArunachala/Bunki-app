@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -236,4 +238,28 @@ test('attempt, site, source and engine identity are bound wherever the producer 
   );
   report.checks.pop();
   assert.equal(validateMiscReport('skip-standalone', report, context).observedCases.length, 10);
+});
+
+test('reference registry binds actual bundled data and rejects the pre-E3 sidecar pin', () => {
+  const { report, context } = fixture('reference-browser');
+  for (const [path, expected] of Object.entries(REFERENCE_DATA_PINS)) {
+    const bytes = readFileSync(new URL(`../../prototypes/corridor/${path}`, import.meta.url));
+    const actual = createHash('sha256').update(bytes).digest('hex');
+    assert.equal(actual, expected, path);
+    context.runtimeFiles[path] = actual;
+  }
+  assert.equal(validateMiscReport('reference-browser', report, context).passed, true);
+  for (const oldPin of [
+    'd3ad5ee711abb3122d263c4e0d8772dc6f8ce2cb671a9865ac5d03e512138e3d',
+    '9c81f60aa68d788ad97714dfc0413c5649898b479e55a5686d60c33b610be0e4',
+  ]) {
+    context.runtimeFiles['data/share_alike/reference-extra.json'] = oldPin;
+    const rejected = validateMiscReport('reference-browser', report, context);
+    assert.equal(rejected.passed, false);
+    assert(
+      rejected.errors.includes(
+        'Reference data roster changed: data/share_alike/reference-extra.json',
+      ),
+    );
+  }
 });

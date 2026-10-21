@@ -256,8 +256,12 @@
           "databaseVersion": "2026-215"
         },
         "readingScope": "Every kanji.json glyph and the 2,136 characters of the 2010 常用漢字表 (= strokes.json meta).",
-        "readingRule": "Exact KANJIDIC2 on/kun strings in source order. The app lists kanji.json readings first, then each further KANJIDIC2 reading, then officialReadings; nothing is dropped or merged.",
+        "readingRule": "Exact KANJIDIC2 on/kun source inventories are retained. Display keeps the raw lesson selection first, completes kun from joyoKun, then retains other dictionary readings. KANJIDIC2-attested okurigana are preserved; four ambiguous positions use the reviewed 本則 forms only when dictionary-attested. Any unresolved official reading makes its whole displayed kun list undotted. Affix hyphens stay distinct. Official on readings complete the display; additional dictionary on readings are labelled outside the Jōyō table.",
         "kanjiReadingRows": 2578,
+        "joyoOnRows": 2136,
+        "joyoOnReadings": 2352,
+        "joyoKunRows": 2136,
+        "joyoKunReadings": 2036,
         "kanjiRecords": [
           "剝",
           "𠮟"

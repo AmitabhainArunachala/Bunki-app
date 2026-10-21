@@ -245,6 +245,70 @@
   function mergeReadings(base, ...more) {
     return unique([...strings(base), ...more.flatMap(strings)]);
   }
+  /** Runtime shape gate for the complete pinned 2010 table, including explicit empty kun rows.
+   * Semantic parity with the fixture is checked by the source verifier; this refuses partial payloads. */
+  function validateJoyoTable(rows, expectedReadings, form) {
+    if (!Array.isArray(rows) || rows.length !== 2136) return false;
+    const glyphs = new Set();
+    let count = 0;
+    for (const row of rows) {
+      if (!Array.isArray(row) || row.length !== 2 || typeof row[0] !== 'string' ||
+        !/^\p{Script=Han}$/u.test(row[0]) || glyphs.has(row[0]) || !Array.isArray(row[1]) ||
+        row[1].some(value => typeof value !== 'string' || !form.test(value)) ||
+        new Set(row[1]).size !== row[1].length) return false;
+      glyphs.add(row[0]); count += row[1].length;
+    }
+    return count === expectedReadings;
+  }
+  const validateJoyoKun = extra => validateJoyoTable(extra?.joyoKun, 2036, /^[ぁ-ゖー]+$/u);
+  const validateJoyoOn = extra => validateJoyoTable(extra?.joyoOn, 2352, /^[ァ-ヺー]+$/u) &&
+    extra.joyoOn.every((row, index) => row[0] === extra.joyoKun?.[index]?.[0]);
+  /** Lead 0545: keep dictionary-attested okurigana. The four ambiguous positions are
+   * the independently reviewed 本則 choices; a choice is usable only when that exact form
+   * occurs in the pinned dictionary. Any unresolved official reading makes the WHOLE
+   * visible kun list undotted. Source inventories and saved answers remain untouched. */
+  const JOYO_KUN_PREFERRED = Object.freeze({
+    '押:おさえる': 'お.さえる', '交:かわす': 'か.わす',
+    '行:おこなう': 'おこな.う', '生:うまれる': 'う.まれる',
+  });
+  function joyoKunDisplay(raw, official, dictionary = [], glyph = '') {
+    const listed = strings(raw), supplied = strings(dictionary);
+    if (!Array.isArray(official)) return { kun: mergeReadings(listed, supplied) };
+    const full = value => value.replace(/\./g, '');
+    const unattestedKun = [];
+    const selected = new Map(strings(official).map(reading => {
+      // KANJIDIC affix hyphens are not okurigana boundaries. Match the full reading,
+      // retaining its attested dot position; the separate dictionary affix stays in the full list.
+      const forms = unique(supplied.filter(value => value.replace(/[.-]/g, '') === reading)
+        .map(value => value.replace(/-/g, '')));
+      const dotted = unique(forms.filter(value => value.includes('.')));
+      const preferred = JOYO_KUN_PREFERRED[`${glyph}:${reading}`];
+      const retained = listed.map(value => value.replace(/-/g, '')).find(value => forms.includes(value));
+      let form;
+      if (preferred && forms.includes(preferred)) form = preferred;
+      else if (retained !== undefined) form = retained; // preserve an already-attested raw choice
+      else if (dotted.length === 1) form = dotted[0];
+      else if (dotted.length === 0 && forms.includes(reading)) form = reading;
+      if (form === undefined) { unattestedKun.push(reading); form = reading; }
+      return [reading, form];
+    }));
+    const undotted = unattestedKun.length > 0;
+    const show = value => undotted ? full(value) : selected.get(full(value)) || value;
+    return {
+      kun: mergeReadings(listed.map(show), official.map(show), supplied.map(show)),
+      joyoKun: official.map(show),
+      kunDotMode: undotted ? 'undotted-unattested' : 'attested',
+      unattestedKun,
+    };
+  }
+  /** Jōyō status is a display annotation, never a deletion or change to an answer inventory. */
+  function joyoOnDisplay(raw, official, dictionary = []) {
+    const on = mergeReadings(raw, official, dictionary);
+    if (!Array.isArray(official)) return { on };
+    const joyoOn = [...official];
+    const officialSet = new Set(joyoOn);
+    return { on, joyoOn, outsideJoyoOn: on.filter(reading => !officialSet.has(reading)) };
+  }
   /** A query as the reading lens reads it: NFKC (ｔａｂｅｒｕ, ﾀﾍﾞﾙ), katakana as hiragana, romaji through `toKana`
    * (the app's own converter). Latin typed after kana is still being composed (たべr): a run `toKana` cannot read is
    * dropped at the end, and refuses the query anywhere else. Returns '' when nothing readable is left. */
@@ -496,6 +560,29 @@
       }
     }
 
+    // E3 completes display fields only. Search and dictionary inventories retain their exact strings.
+    if (committed) for (const [id, officialKun] of extra.joyoKun || []) {
+      const entry = kanjiEntries.get(id);
+      if (!entry) continue;
+      const dictionaryKun = extra.kanjiReadings?.find(row => row[0] === id)?.[2] || [];
+      const view = joyoKunDisplay(kanji[id]?.kun, officialKun, dictionaryKun, id);
+      entry.joyoKun = view.joyoKun;
+      entry.kunDotMode = view.kunDotMode;
+      entry.unattestedKun = view.unattestedKun;
+      entry.displayKun = view.kun;
+      entry.displayReadings = mergeReadings(entry.completeOn || entry.on, view.kun);
+    }
+
+    if (committed) for (const [id, officialOn] of extra.joyoOn || []) {
+      const entry = kanjiEntries.get(id);
+      if (!entry) continue;
+      const view = joyoOnDisplay(kanji[id]?.on, officialOn, entry.completeOn || entry.on);
+      entry.joyoOn = view.joyoOn;
+      entry.outsideJoyoOn = view.outsideJoyoOn;
+      entry.displayOn = view.on;
+      entry.displayReadings = mergeReadings(view.on, entry.displayKun || entry.completeKun || entry.kun);
+    }
+
     // K02 augments existing catalog identities only; dictionary facts never infer levels or enlarge lessons.
     if (committed) {
       for (const entry of kanjiEntries.values()) {
@@ -609,8 +696,8 @@
 
   return Object.freeze({
     createCatalog, search, searchEntries, sortEntries, paginateEntries,
-    readingForms, readingKey, mergeReadings, normalizeReadingQuery, readingMatch, kanjiWordBuckets, kanjiAltWords,
-    validateKanjiFacts, kanjiReferenceFacts,
+    readingForms, readingKey, mergeReadings, joyoKunDisplay, joyoOnDisplay, normalizeReadingQuery, readingMatch, kanjiWordBuckets, kanjiAltWords,
+    validateKanjiFacts, kanjiReferenceFacts, validateJoyoKun, validateJoyoOn,
     normalizeQuery, normalizeLevel, compareEntries, wordKey, JLPT_LEVELS, KANKEN_LEVELS,
   });
 });

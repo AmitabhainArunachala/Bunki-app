@@ -28,12 +28,13 @@
     /** A row's readings: every reading (Kanji-trust K01); one only the official 2010 table gives is starred. */
     const readingCell = (entry) => {
       const cell = node('span', 'reference-entry-reading');
-      if (!entry.readings?.length) {
+      const readings = entry.displayReadings || entry.readings;
+      if (!readings?.length) {
         cell.textContent = entry.reading || tx('読みなし', 'No reading');
         return cell;
       }
       const official = new Set(entry.officialReadings || []);
-      entry.readings.forEach((reading, index) => {
+      readings.forEach((reading, index) => {
         if (index) cell.append('・');
         cell.append(reading);
         if (official.has(reading)) {
@@ -42,6 +43,8 @@
           cell.append(mark);
         }
       });
+      if (entry.outsideJoyoOn?.length) cell.append(node('span', 'reference-reading-outside-joyo',
+        ' — ' + tx('常用漢字表外の音読み', 'On readings outside the jōyō table') + ': ' + entry.outsideJoyoOn.join('・')));
       return cell;
     };
     const state = {

@@ -251,7 +251,7 @@ async function readingRows() {
   } finally { await context.close(); }
 }
 const KANJI = {
-  '生': { on: ['セイ', 'ショウ'], kun: ['い.きる', 'い.かす', 'い.ける', 'う.まれる', 'うま.れる', 'う.まれ', 'うまれ', 'う.む', 'お.う', 'は.える', 'は.やす', 'き', 'なま', 'なま-', 'な.る', 'な.す', 'む.す', '-う'], lessonOn: ['セイ', 'ショウ'], lessonKun: ['い.きる', 'い.かす', 'い.ける'], officialReadings: [], readingsState: 'complete' },
+  '生': { on: ['セイ', 'ショウ'], kun: ['い.きる', 'い.かす', 'い.ける', 'う.まれる', 'う.む', 'お.う', 'は.える', 'は.やす', 'き', 'なま', 'う.まれ', 'うまれ', 'なま-', 'な.る', 'な.す', 'む.す', '-う'], lessonOn: ['セイ', 'ショウ'], lessonKun: ['い.きる', 'い.かす', 'い.ける'], officialReadings: [], readingsState: 'complete' },
   '中': { on: ['チュウ', 'ジュウ'], kun: ['なか', 'うち', 'あた.る'], lessonOn: ['チュウ'], lessonKun: ['なか', 'うち', 'あた.る'], officialReadings: ['ジュウ'], readingsState: 'complete' }
 };
 // Independent expected display, built from the pinned lesson/sidecar bytes rather than the UI helper.
@@ -262,8 +262,30 @@ function actualKanjiContract(id) {
   if (!lesson || !row) return null;
   const officialReadings = (extra.officialReadings || []).filter(([glyph]) => glyph === id).map(([,reading]) => reading);
   const isOn = reading => /[ァ-ヺ]/u.test(reading.replace(/[.-]/gu, ''));
-  return { on: [...new Set([...(lesson.on || []), ...row[1], ...officialReadings.filter(isOn)])],
-    kun: [...new Set([...(lesson.kun || []), ...row[2], ...officialReadings.filter(reading => !isOn(reading))])],
+  const fullKun = [...new Set([...(lesson.kun || []), ...row[2], ...officialReadings.filter(reading => !isOn(reading))])];
+  const joyo = extra.joyoKun?.find(([glyph]) => glyph === id);
+  let kun = fullKun;
+  if (joyo) {
+    const plain = reading => reading.replaceAll('.', '');
+    const preferred = { '押:おさえる': 'お.さえる', '交:かわす': 'か.わす', '行:おこなう': 'おこな.う', '生:うまれる': 'う.まれる' };
+    const selected = new Map();
+    let unresolved = false;
+    for (const reading of joyo[1]) {
+      const forms = [...new Set(row[2].filter(value => value.replace(/[.-]/g, '') === reading).map(value => value.replace(/-/g, '')))];
+      const dots = [...new Set(forms.filter(value => value.includes('.')))];
+      const choice = preferred[`${id}:${reading}`];
+      const retained = lesson.kun.map(value => value.replace(/-/g, '')).find(value => forms.includes(value));
+      let shown = choice && forms.includes(choice) ? choice
+        : retained !== undefined ? retained
+        : dots.length === 1 ? dots[0] : dots.length === 0 && forms.includes(reading) ? reading : undefined;
+      if (shown === undefined) { unresolved = true; shown = reading; }
+      selected.set(reading, shown);
+    }
+    const display = reading => unresolved ? plain(reading) : selected.get(plain(reading)) || reading;
+    kun = [...new Set([...lesson.kun, ...joyo[1], ...row[2]].map(display))];
+  }
+  return { on: [...new Set([...(lesson.on || []), ...(extra.joyoOn?.find(([glyph]) => glyph === id)?.[1] || []), ...row[1], ...officialReadings.filter(isOn)])],
+    kun,
     lessonOn: [...(lesson.on || [])], lessonKun: [...(lesson.kun || [])], officialReadings, readingsState: 'complete' };
 }
 function readKanjiReview() {

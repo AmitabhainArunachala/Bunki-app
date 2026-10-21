@@ -38,7 +38,7 @@ const declarations = [
   'referenceLibrary', 'referenceExtraError', 'referenceExtraPending', 'referenceExtraTask', 'loadReferenceExtra',
   'kanjiReferenceIndexFor', 'kanjiReferenceIndex', 'kanjiReferenceRows',
   'kanjiReadingsState', 'kanjiFactsState', 'kanjiFacts', 'kanjiReferenceView', 'kanjiFactsStatus',
-  'kanjiReference', 'kanjiFinderUniverse', 'kanjiDisplayRecord', 'kanjiEntryRecord', 'strokeRoomRecord',
+  'kanjiReference', 'currentJoyoKunNote', 'joyoOnNote', 'kanjiFinderUniverse', 'kanjiDisplayRecord', 'kanjiEntryRecord', 'strokeRoomRecord',
   'classicalRadicalHits', 'kdxRadicalResults', 'kdxTextResults',
   'kdxGridShown', 'kdxGlyphName', 'renderKdxGrid',
   'strokeClassificationLine', 'strokeReferenceStatus', 'strokeClassicReadings',
@@ -177,7 +177,7 @@ function app({ supplement = extra, pending = false, error = null, state = {}, co
   });
   const runtime = vm.runInContext(`${lifted(control)}
     ({
-      kanjiFactsState, kanjiFacts, kanjiReferenceView, classicalRadicalHits,
+      kanjiFactsState, kanjiReadingsState, currentJoyoKunNote, joyoOnNote, kanjiFacts, kanjiReferenceView, classicalRadicalHits,
       kdxRadicalResults, kdxTextResults, kanjiFactsStatus,
       retainedKanjiRecord, validKanjiRecord, kanjiDisplayRecord, kanjiEntryRecord, strokeRoomRecord,
       loadReferenceExtra, strokeClassificationLine, strokeReferenceStatus, strokeClassicReadings,
@@ -534,4 +534,219 @@ test('negative controls kill legacy-radical, keyword-only search and saved-answe
     },
   });
   assert.throws(() => assertRetained(lost, snapshot), assert.AssertionError);
+});
+
+// E3: exercise the real entry/writing adapter, not a second implementation.
+const joyoFixture = JSON.parse(read('../../../tools/fixtures/reference/joyo-2010.json'));
+const fullKunKey = value => String(value).replace(/\./gu, '');
+const fixtureKun = readings => readings.filter(value => !/[ァ-ヺ]/u.test(value));
+test('E3 official kun display is complete, raw-attested and pure for every Jōyō form', () => {
+  const a = app();
+  const before = JSON.stringify({ D: a.D, S: a.S });
+  for (const [glyph, readings] of joyoFixture.rows) {
+    const record = a.runtime.kanjiDisplayRecord(glyph);
+    assert(record, glyph);
+    const raw = canonical[glyph]?.kun || [];
+    const expected = fixtureKun(readings);
+    assert.deepEqual(plain(record.joyoKun.map(fullKunKey)), expected, glyph);
+    const officialOn = readings.filter(value => /[ァ-ヺ]/u.test(value));
+    assert.deepEqual(plain(record.joyoOn), officialOn, glyph);
+    assert.deepEqual(plain(record.outsideJoyoOn), plain(record.on.filter(value => !officialOn.includes(value))), glyph);
+    for (const value of officialOn) assert(record.on.includes(value), `${glyph}: official on ${value}`);
+    const visible = record.kun.map(fullKunKey);
+    for (const reading of expected) assert(visible.includes(fullKunKey(reading)), `${glyph}: ${reading}`);
+    const dictionary = extra.kanjiReadings.find(row => row[0] === glyph)?.[2] || [];
+    for (const reading of record.kun.filter(value => value.includes('.')))
+      assert([...raw, ...dictionary, ...dictionary.map(value => value.replace(/-/g, ''))].includes(reading), `${glyph}: unattested dots in ${reading}`);
+    if (record.unattestedKun.length) assert(record.kun.every(value => !value.includes('.')), glyph);
+    for (const reading of [...raw, ...dictionary])
+      assert(visible.includes(fullKunKey(reading)), `${glyph}: lost ${reading}`);
+    assert.deepEqual(plain(a.runtime.strokeRoomRecord(glyph).kun), plain(record.kun));
+  }
+  assert.equal(JSON.stringify({ D: a.D, S: a.S }), before);
+});
+test('E3 開 生 閉 have the requested attested additions and unchanged lesson fields', () => {
+  const a = app();
+  for (const [glyph, additions] of [['開', ['あく', 'あける']], ['生', ['うまれる', 'うむ', 'なま']], ['閉', ['しまる']]]) {
+    const record = a.runtime.kanjiEntryRecord(glyph);
+    for (const reading of additions) assert(record.kun.some(value => fullKunKey(value) === reading), `${glyph}: ${reading}`);
+    assert.deepEqual(plain(record.lessonKun), canonical[glyph].kun);
+    assert.deepEqual(plain(record.kun.slice(0, canonical[glyph].kun.length)), canonical[glyph].kun);
+  }
+});
+test('E3 complete projection is consumed: an omitted official row fails the display contract', () => {
+  const broken = copyFacts();
+  assert(Array.isArray(broken.joyoKun), 'projection must exist');
+  broken.joyoKun = broken.joyoKun.filter(([glyph]) => glyph !== '開');
+  const record = app({ supplement: broken }).runtime.kanjiEntryRecord('開');
+  const healthy = app().runtime.kanjiEntryRecord('開');
+  assert.equal(healthy.joyoKun.length, 4);
+  assert.notDeepEqual(plain(record.joyoKun || []), plain(healthy.joyoKun));
+});
+
+test('E3 display retains attested dictionary dots, affixes and fallback', () => {
+  const raw = Object.freeze(['い.きる']);
+  const official = Object.freeze(['いきる', 'うまれる', 'なま']);
+  const dictionary = Object.freeze(['い.きる', 'う.まれる', 'うま.れる', 'なま', 'なま-', '-う']);
+  const projected = core.joyoKunDisplay(raw, official, dictionary, '生');
+  assert.deepEqual(plain(projected), { joyoKun: ['い.きる', 'う.まれる', 'なま'],
+    kun: ['い.きる', 'う.まれる', 'なま', 'なま-', '-う'], kunDotMode: 'attested', unattestedKun: [] });
+  assert.deepEqual(plain(core.joyoKunDisplay(raw, undefined, dictionary).kun), [...new Set([...raw, ...dictionary])]);
+  assert.deepEqual(plain(core.joyoKunDisplay([], [], ['う.む']).kun), ['う.む']);
+});
+
+test('E3 saved 開 生 閉 retain their answers and expose current official kun separately', () => {
+  for (const glyph of ['開', '生', '閉']) {
+    const snapshot = { ...savedRecord(glyph), on: [...canonical[glyph].on], kun: [...canonical[glyph].kun] };
+    const a = app({ state: { taken: [{ t: 'kanji', id: glyph, kanjiRecord: snapshot }] } });
+    const before = JSON.stringify(a.S);
+    const record = a.runtime.kanjiEntryRecord(glyph);
+    assert.deepEqual(plain(record.kun), snapshot.kun);
+    const official = a.runtime.kanjiDisplayRecord(glyph).joyoKun;
+    for (const node of [a.runtime.currentJoyoKunNote(glyph), a.runtime.strokeReadingField(record), a.runtime.strokeClassicReadings(record)]) {
+      assert(node.textContent.includes('Jōyō kun readings (2010 table)'));
+      for (const reading of official) assert(node.textContent.includes(reading), `${glyph}:${reading}`);
+    }
+    assert.equal(JSON.stringify(a.S), before);
+  }
+});
+test('E3 malformed or missing table fails visibly; a full replacement restores completion', async () => {
+  for (const mutate of [value => delete value.joyoKun, value => value.joyoKun.pop(),
+    value => value.joyoKun[1][1].push('あ.われ'), value => value.joyoKun[1][1].pop(),
+    value => value.joyoKun[1][0] = value.joyoKun[0][0]]) {
+    const broken = copyFacts(); mutate(broken);
+    assert.equal(core.validateJoyoKun(broken), false);
+    const a = app({ supplement: broken });
+    assert.equal(a.runtime.kanjiReadingsState(), 'failed');
+    assert.equal(a.runtime.kanjiEntryRecord('開').readingsState, 'failed');
+    a.runtime.setReference(extra, false, null);
+    assert.equal(a.runtime.kanjiReadingsState(), 'complete');
+    assert(a.runtime.kanjiEntryRecord('開').kun.includes('あ.く'));
+  }
+  const a = app();
+  a.context.window.BunkiReferenceCore = { mergeReadings: core.mergeReadings };
+  assert.equal(a.runtime.kanjiEntryRecord('開').readingsState, 'failed');
+  assert.deepEqual(plain(a.runtime.kanjiEntryRecord('開').kun), canonical.開.kun);
+});
+
+test('E3 actual loader refuses incomplete kun data and retries without changing learner state', async () => {
+  const a = app({ supplement: null });
+  const before = learnerBytes(a.S);
+  const broken = copyFacts(); broken.joyoKun.pop();
+  a.context.window.__CORRIDOR_BUNDLE__ = { 'share_alike/reference-extra': broken };
+  assert.equal(await a.runtime.loadReferenceExtra(), null);
+  assert.equal(a.D.referenceExtra, null);
+  assert.equal(a.runtime.kanjiReadingsState(), 'failed');
+  a.context.window.__CORRIDOR_BUNDLE__ = { 'share_alike/reference-extra': extra };
+  assert.equal(await a.runtime.loadReferenceExtra(), extra);
+  assert.equal(a.runtime.kanjiReadingsState(), 'complete');
+  assert(a.runtime.kanjiEntryRecord('生').kun.includes('う.まれる'));
+  assert.equal(learnerBytes(a.S), before);
+  assert.equal(a.timers.size, 0);
+});
+test('E3 catalog display completes the fixture without altering raw or full dictionary inventories', () => {
+  const beforeExtra = copyFacts(); delete beforeExtra.joyoKun;
+  const input = { kanji: canonical, extra };
+  const before = core.createCatalog({ ...input, extra: beforeExtra });
+  const after = core.createCatalog(input);
+  const entries = catalog => new Map(catalog.collections.flatMap(collection => collection.entries)
+    .filter(entry => entry.type === 'kanji').map(entry => [entry.id, entry]));
+  const old = entries(before), current = entries(after);
+  for (const [glyph, readings] of joyoFixture.rows) {
+    const entry = current.get(glyph);
+    assert(entry, glyph);
+    assert.deepEqual(plain(entry.kun), plain(old.get(glyph).kun), `${glyph}: raw kun`);
+    assert.deepEqual(plain(entry.completeKun), plain(old.get(glyph).completeKun), `${glyph}: completeKun`);
+    assert.deepEqual(plain(entry.readings), plain(old.get(glyph).readings), `${glyph}: lookup inventory`);
+    for (const kun of fixtureKun(readings)) {
+      assert(entry.displayKun.some(value => fullKunKey(value) === kun), `${glyph}: kun cell ${kun}`);
+      assert(entry.displayReadings.some(value => fullKunKey(value) === kun), `${glyph}: combined cell ${kun}`);
+    }
+  }
+});
+
+const outsideOnCases = { 職: ['ソク'], 清: ['シン'], 請: ['ショウ'], 侍: ['シ'], 工: ['グ'],
+  霧: ['ボウ', 'ブ'], 金: ['ゴン'], 手: ['ズ'], 米: ['メエトル'], 貝: ['バイ'], 阜: ['フウ'], 狙: ['ショ'] };
+test('E3 scope-add labels the twelve outside-table on cases and completes 中 without rewriting raw', () => {
+  const a = app();
+  const before = JSON.stringify({ D: a.D, S: a.S });
+  assert(!canonical.中.on.includes('ジュウ'));
+  const middle = a.runtime.kanjiDisplayRecord('中');
+  assert(middle.on.includes('ジュウ'));
+  assert(middle.joyoOn.includes('ジュウ'));
+  assert(!middle.outsideJoyoOn.includes('ジュウ'));
+  for (const [glyph, wanted] of Object.entries(outsideOnCases)) {
+    const record = a.runtime.kanjiDisplayRecord(glyph);
+    for (const reading of wanted) {
+      assert(record.on.includes(reading), `${glyph}: reading preserved ${reading}`);
+      assert(record.outsideJoyoOn.includes(reading), `${glyph}: outside label ${reading}`);
+    }
+  }
+  assert.equal(JSON.stringify({ D: a.D, S: a.S }), before);
+});
+
+test('E3 labels outside-table on readings visibly on saved and current writing surfaces', () => {
+  for (const [glyph, wanted] of Object.entries(outsideOnCases)) {
+    for (const saved of [false, true]) {
+      const snapshot = { ...savedRecord(glyph), on: [...canonical[glyph].on], kun: [...canonical[glyph].kun] };
+      const a = app({ state: saved ? { taken: [{ t: 'kanji', id: glyph, kanjiRecord: snapshot }] } : {} });
+      const before = JSON.stringify(a.S);
+      const record = a.runtime.kanjiEntryRecord(glyph);
+      for (const node of [a.runtime.joyoOnNote(glyph, record.on), a.runtime.strokeReadingField(record), a.runtime.strokeClassicReadings(record)]) {
+        assert(node.textContent.includes('On readings outside the jōyō table'), glyph);
+        for (const value of wanted) assert(node.textContent.includes(value), `${glyph}: ${value}`);
+        if (saved) assert(node.textContent.includes('Jōyō on readings (2010 table)'));
+      }
+      assert.equal(JSON.stringify(a.S), before);
+    }
+  }
+  const snapshot = { ...savedRecord('中'), on: [...canonical.中.on], kun: [...canonical.中.kun] };
+  const a = app({ state: { taken: [{ t: 'kanji', id: '中', kanjiRecord: snapshot }] } });
+  assert.deepEqual(plain(a.runtime.kanjiEntryRecord('中').on), snapshot.on);
+  assert(a.runtime.joyoOnNote('中', snapshot.on).textContent.includes('ジュウ'));
+  assert.equal(app().runtime.joyoOnNote('中', ['チュウ', 'ジュウ']), null);
+  assert.equal(app({ supplement: null }).runtime.joyoOnNote('職', ['ソク']), null);
+});
+test('E3 actual loader rejects missing/partial/misaligned official on tables, then retries', async () => {
+  for (const mutate of [value => delete value.joyoOn, value => value.joyoOn.pop(),
+    value => value.joyoOn[0][1].push('あ'), value => value.joyoOn.reverse()]) {
+    const broken = copyFacts(); mutate(broken);
+    assert.equal(core.validateJoyoOn(broken), false);
+    const a = app({ supplement: null });
+    a.context.window.__CORRIDOR_BUNDLE__ = { 'share_alike/reference-extra': broken };
+    assert.equal(await a.runtime.loadReferenceExtra(), null);
+    assert.equal(a.runtime.kanjiReadingsState(), 'failed');
+    a.context.window.__CORRIDOR_BUNDLE__ = { 'share_alike/reference-extra': extra };
+    assert.equal(await a.runtime.loadReferenceExtra(), extra);
+    assert(a.runtime.kanjiDisplayRecord('中').on.includes('ジュウ'));
+  }
+});
+test('E3 control catches a hidden outside-table label rather than merely testing metadata', () => {
+  const broken = app({ control: { function: 'joyoOnNote',
+    from: 'if (outside.length) parts.push', to: 'if (false) parts.push' } });
+  assert.equal(broken.runtime.joyoOnNote('職', ['ショク', 'ソク']), null);
+  const healthy = app().runtime.joyoOnNote('職', ['ショク', 'ソク']);
+  assert(healthy.textContent.includes('On readings outside the jōyō table'));
+  assert(healthy.textContent.includes('ソク'));
+});
+
+test('E3 0545 uses the four attested 本則 choices and whole-list undotted fallback', () => {
+  for (const [glyph, reading, chosen] of [['押', 'おさえる', 'お.さえる'], ['交', 'かわす', 'か.わす'],
+    ['行', 'おこなう', 'おこな.う'], ['生', 'うまれる', 'う.まれる']]) {
+    const dictionary = extra.kanjiReadings.find(row => row[0] === glyph)[2];
+    assert(dictionary.includes(chosen));
+    assert.deepEqual(plain(core.joyoKunDisplay([], [reading], dictionary, glyph).joyoKun), [chosen]);
+  }
+  const a = app();
+  for (const glyph of ['塞', '羨', '速', '丼', '務', '踊', '絡']) {
+    const record = a.runtime.kanjiEntryRecord(glyph);
+    assert.equal(record.kunDotMode, 'undotted-unattested', glyph);
+    assert(record.unattestedKun.length > 0, glyph);
+    assert(record.kun.every(value => !value.includes('.')), glyph);
+  }
+  const refused = core.joyoKunDisplay([], ['うまれる'], ['うま.れる'], '生');
+  assert.deepEqual(plain(refused.joyoKun), ['うま.れる'], 'never invent the preferred form when its source omits it');
+  const unresolved = core.joyoKunDisplay(['た.べる'], ['たべる', 'みる'], ['た.べる'], '食');
+  assert.deepEqual(plain(unresolved.kun), ['たべる', 'みる']);
+  assert.deepEqual(plain(unresolved.unattestedKun), ['みる']);
 });

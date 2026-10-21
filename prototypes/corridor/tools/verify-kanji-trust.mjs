@@ -86,7 +86,10 @@ const CONTROLS = {
     edit: (text) => {
       const doc = JSON.parse(text);
       const row = doc.kanjiReadings.find(([glyph]) => glyph === '生');
-      row[2] = row[2].filter((reading) => !['う.まれる', 'うま.れる', 'う.まれ', 'うまれ'].includes(reading));
+      const keep = (reading) => reading.replace(/[.-]/g, '') !== 'うまれる';
+      row[2] = row[2].filter(keep);
+      const joyo = doc.joyoKun?.find(([glyph]) => glyph === '生');
+      if (joyo) joyo[1] = joyo[1].filter(keep);
       return JSON.stringify(doc);
     } },
   'stroke-own-record': { rows: ['K01-stroke-extended'], file: 'corridor.js',

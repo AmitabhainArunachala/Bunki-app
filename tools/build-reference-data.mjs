@@ -45,7 +45,7 @@ export const sourcePaths = {
   kanjidicSample: 'corpus/samples/jmdict/kanjidic_sample.jsonl',
   dictionaryIndex: 'prototypes/corridor/data/share_alike/dict-v2/index.json',
   // Kanji-trust: the complete KANJIDIC2 readings already ship in the SKIP sidecar (same pinned archive);
-  // the official 2010 table supplies only the readings KANJIDIC2 lacks (lead's ruling, 2026-10-19 17:25).
+  // E3 also projects the complete official on/kun lists for display; raw lesson fields stay untouched.
   skip: 'prototypes/corridor/data/share_alike/skip.json',
   joyo: 'tools/fixtures/reference/joyo-2010.json',
 };
@@ -284,6 +284,14 @@ export function kanjiTrustProjection({
   const kanjiWithoutWords = [...empty].filter((glyph) => !filled.has(glyph)).sort(byCodePoint);
   return {
     kanjiReadings,
+    joyoOn: joyo.rows.map(([glyph, readings]) => [
+      glyph,
+      readings.filter((reading) => /[ァ-ヺ]/u.test(reading)),
+    ]),
+    joyoKun: joyo.rows.map(([glyph, readings]) => [
+      glyph,
+      readings.filter((reading) => !/[ァ-ヺ]/u.test(reading)),
+    ]),
     kanjiRecords,
     officialReadings,
     jmdictWords,
@@ -560,7 +568,7 @@ export function buildReferenceData({ archive, prior } = {}) {
         pageSha256: joyo.sha256,
         licence: 'Outside copyright (Japan Copyright Act, art. 13)',
         attribution:
-          '文化庁「常用漢字表の音訓索引」. Supplies only the readings KANJIDIC2 lacks (officialReadings); the app marks each as from 常用漢字表.',
+          '文化庁「常用漢字表の音訓索引」. Supplies complete official on/kun lists (joyoOn/joyoKun) for display and outside-table on-reading labels and readings KANJIDIC2 lacks (officialReadings). No okurigana is inferred from this table.',
       },
     ],
     layout: {
@@ -578,6 +586,8 @@ export function buildReferenceData({ archive, prior } = {}) {
       kanjiLevels: ['glyph', 'family', 'level', 'source', 'sourceId'],
       wordLinks: ['id', 'exactReading', 'candidateJmdictSequences'],
       kanjiReadings: ['glyph', 'kanjidic2On', 'kanjidic2Kun'],
+      joyoKun: ['glyph', 'officialKunWithoutOkuriganaMarks'],
+      joyoOn: ['glyph', 'officialOn'],
       kanjiRecords: ['glyph', 'meanings', 'strokeCount', 'classicalRadical'],
       kanjiFacts: ['glyph', 'englishMeanings', 'classicalRadical', 'nelsonRadicalOrNull'],
       officialReadings: ['glyph', 'reading'],
@@ -600,6 +610,8 @@ export function buildReferenceData({ archive, prior } = {}) {
       .map((row) => [row.char, 'jlpt-kanji', row.jlpt, 'kotobako', row.id]),
     wordLinks,
     kanjiReadings: trust.kanjiReadings,
+    joyoKun: trust.joyoKun,
+    joyoOn: trust.joyoOn,
     kanjiRecords: trust.kanjiRecords,
     kanjiFactsVersion: 1,
     kanjiFacts,
@@ -692,8 +704,12 @@ export function buildReferenceData({ archive, prior } = {}) {
         readingScope:
           'Every kanji.json glyph and the 2,136 characters of the 2010 常用漢字表 (= strokes.json meta).',
         readingRule:
-          'Exact KANJIDIC2 on/kun strings in source order. The app lists kanji.json readings first, then each further KANJIDIC2 reading, then officialReadings; nothing is dropped or merged.',
+          'Exact KANJIDIC2 on/kun source inventories are retained. Display keeps the raw lesson selection first, completes kun from joyoKun, then retains other dictionary readings. KANJIDIC2-attested okurigana are preserved; four ambiguous positions use the reviewed 本則 forms only when dictionary-attested. Any unresolved official reading makes its whole displayed kun list undotted. Affix hyphens stay distinct. Official on readings complete the display; additional dictionary on readings are labelled outside the Jōyō table.',
         kanjiReadingRows: trust.kanjiReadings.length,
+        joyoOnRows: trust.joyoOn.length,
+        joyoOnReadings: trust.joyoOn.reduce((sum, [, readings]) => sum + readings.length, 0),
+        joyoKunRows: trust.joyoKun.length,
+        joyoKunReadings: trust.joyoKun.reduce((sum, [, readings]) => sum + readings.length, 0),
         kanjiRecords: trust.kanjiRecords.map(([glyph]) => glyph),
         officialTable: {
           path: sourcePaths.joyo,

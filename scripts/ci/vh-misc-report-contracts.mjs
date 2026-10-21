@@ -67,9 +67,9 @@ export const REFERENCE_DATA_PINS = Object.freeze({
     '435c37c0063fba4180d3cb444ef54cfa2430e71a650a4032cc481ada29627f2b',
   // FULL-R1 (A): followed FIXR's sidecar regeneration over the repaired drift-words (b10aa853;
   // was the pre-FIXR bytes, 8a5c953e…)
-  // R2 E2: preserves KANJI-NEXT facts, refreshes words audit; also closes the inherited stale M1 pin.
+  // R2 E3: adds full Jōyō on/kun projections; E2 words audit and KANJI-NEXT facts remain exact.
   'data/share_alike/reference-extra.json':
-    'd3ad5ee711abb3122d263c4e0d8772dc6f8ce2cb671a9865ac5d03e512138e3d',
+    'befca0f9e83642cf835fe8b39f9aa020b8a04e68f8139fa712bad3c395b7bc94',
 });
 export const SKIP_BROWSER_NAMES = Object.freeze([
   'dictionary tool includes its label in the accessible name',
