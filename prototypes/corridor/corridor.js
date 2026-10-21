@@ -20640,9 +20640,113 @@ function renderKanjiCourseDoor(sheet, node) {
   door.dataset.kanjiCourseUnit = unit.id;
   door.disabled = !recordReady(epoch) || !!S.kanjiCourse?.pending;
   door.addEventListener('click', () => {
-    if (recordReady(epoch)) openKanjiCourseUnit(node, door);
+    if (recordReady(epoch)) kanjiEnterCourseDoor(node, door);
   });
   sheet.append(door);
+  // M4 R-01 (UX r4.2 §3.1): beside the course door, the same help path into one facet's room
+  if (unit.id === 'shiki-shoku' && node.t === 'word' && node.id === '職業') {
+    const rooms = biLabel('button', 'chip', ...M4_COPY['R-01']);
+    rooms.type = 'button'; rooms.id = 'kanji-room-door';
+    rooms.disabled = door.disabled;
+    rooms.addEventListener('click', () => { if (recordReady(epoch)) openKanjiRooms(node, rooms); });
+    sheet.append(rooms);
+  }
+}
+/** M4 v0 learner lines (UX r4.2 7eae4438 §6.1 and §6.3), verbatim on both keys: [Japanese, English] for tx(). Q-13 is
+ * superseded by Q-13r */
+const M4_COPY = Object.freeze({
+  'Q-01': ['このことばでクエストをつくる', 'Make a quest from this word'],
+  'Q-01r': ['このクエストを再開', 'Resume this quest'],
+  'Q-02': ['クエスト · 職・識・織をことばで', 'Quest · 職・識・織 in words'],
+  'Q-03': ['職業・知識・組織の三つのことばの読みを答え、それぞれ確かめて、答えられたかどうかを選びます。', 'Answer the reading of all three words — 職業, 知識, 組織 — check each one, and say whether you knew it.'],
+  'Q-04': ['読んでいた文から：', 'From the sentence you were reading:'],
+  'Q-05': ['クエストを始める', 'Start quest'],
+  'Q-06': ['このクエストを終えても、それだけで復習が記録されるわけではありません。答えられたかどうかを選ぶたびに、その答えが復習に記録されたかどうかが表示されます。', 'Finishing this quest doesn’t save a review by itself. Each time you say whether you knew an answer, you’ll see whether it was recorded for review.'],
+  'Q-07': ['クエストはそのまま残っています。ことば「職業」から、または「レッスン」から再開できます。', 'Your quest is kept. Resume it from the word 職業 or from Lessons.'],
+  'Q-08': ['進行中のクエスト · 職・識・織', 'Quest in progress · 職・識・織'],
+  'Q-08b': ['再開', 'Resume'],
+  'Q-09': ['3語のうち${n}語を終えました', '${n} of 3 words done'],
+  'Q-10': ['このクエストをやめる', 'End this quest'],
+  'Q-11': ['やめても不利になることはなく、復習にも影響しません。ただし、このクエストは再開できなくなり、新しいクエストははじめからになります。', 'Ending it adds no penalty and changes no review. You can’t resume this quest afterwards; a new one starts from the beginning.'],
+  'Q-11b': ['やめる · 続ける', 'End it · Keep going'],
+  'Q-12': ['クエストを終えました：三つのことばすべてに答えて確かめ、答えられたかどうかを選びました。', 'Quest done: you answered and checked all three words, and said whether you knew each.'],
+  'Q-14': ['この文で「職業」がどの意味かは、まだ確認されていません。', 'Bunki hasn’t yet confirmed which meaning 職業 has in this sentence.'],
+  'Q-15': ['練習が中断されたため、最初のことばからもう一度始めます。記録済みの復習はそのまま残ります。', 'Your practice was interrupted, so this set starts again from the first word. Reviews already recorded stay as they are.'],
+  'Q-16': ['答えられたかどうかを選んでください。選ぶと、クエストの進み具合に反映されます。復習に記録されるのは、札の復習の時期が来ているときだけです。', 'Say whether you knew it; this counts toward the quest. A review is recorded only when the card is due.'],
+  'Q-17': ['いまはクエストを始めたり続けたりできません。練習はこのまま続けられます。', 'Quests can’t be started or continued right now. Practice still works.'],
+  'Q-18': ['答えられたかどうかを選んでいないことばがあるため、クエストはまだ終わっていません。', 'You didn’t say whether you knew one of the words, so the quest isn’t finished yet.'],
+  'Q-18b': ['三つのことばをもう一度練習する', 'Practise the three words again'],
+  'R-01': ['「職業」を、読みまたは意味で練習', 'Practise 職業 by reading or meaning'],
+  'R-02': ['部屋を選ぶ', 'Choose a room'],
+  'R-04': ['三つのことばをまとめて：職業・知識・組織', 'Three words together: 職業・知識・組織'],
+  'R-06': ['職・識・織の漢字キーワード', 'Character keywords for 職・識・織'],
+  'R-07': ['読んでいたことば：職業', 'From the text you were reading: 職業'],
+  'R-08': ['「ことば全体の読み」の練習が途中です。先にそちらを終えると、この部屋の練習を始められます。', 'Your whole-word reading practice isn’t finished. Finish it in “Whole-word reading” first; this room can start after that.'],
+  'R-09': ['ほかの部屋を選ぶ', 'Choose another room'],
+  'R-10': ['この部屋では「職業」だけでなく、三つのことばをまとめて練習します。', 'This room practises all three words together, not 職業 alone.'],
+  'R-10m': ['この部屋では、「職業」の「職」に識・織を加えた三つの漢字のキーワードをまとめて練習します。', 'This room practises the keywords of three characters together: 職 from 職業, plus 識 and 織.'],
+  'R-08b': ['「意味の選択」の練習が途中です。先にそちらを終えると、この部屋の練習を始められます。', 'Your meaning practice isn’t finished. Finish it in “Meaning recognition” first; this room can start after that.'],
+  'R-08c': ['職・識・織の練習が途中です。先にそちらを終えると、この部屋の練習を始められます。', 'Your practice of 職・識・織 isn’t finished. Finish it first; this room can start after that.'],
+  'R-11': ['その練習に戻る', 'Go back to that practice'],
+  'Q-19': ['途中の練習は、このクエストには反映されません。先にそちらを終えると、次に「ことば全体の読み」で練習したときから、クエストの進み具合に反映されます。', 'The practice you have in progress doesn’t count toward this quest. Finish it first; the quest counts from your next practice in “Whole-word reading”.'],
+  'Q-20': ['クエストを保存できなかったため、始められませんでした。このまま練習を続けられます。', 'The quest couldn’t be saved, so it wasn’t started. You can keep practising.'],
+  'Q-21': ['クエストが保存されたか確かめられませんでした。読み込み直すと、いまの状態がわかります。練習はこのまま続けられます。', 'We couldn’t confirm the quest was saved. Reload to see where it stands; practice still works.'],
+  'Q-22': ['クエストを完了として保存できなかったため、まだ進行中のままです。答えと復習は変わっていません。', 'The quest couldn’t be marked done, so it’s still in progress. Your answers and reviews are unchanged.'],
+  'Q-23': ['やめる操作を保存できなかったため、クエストはまだ進行中のままです。', 'The quest couldn’t be ended, so it’s still in progress.'],
+  'Q-24': ['クエストをやめました。', 'Quest ended.'],
+  'Q-25': ['今日このあとは、このページで答えても復習には記録されず、練習になります。', 'For the rest of today, answers on this page stay practice and aren’t recorded for review.'],
+  'Q-13r': ['クエストがすでに8件あります。新しく始めるには、どれかを終えるか、やめるか、一覧から外すかしてください。', 'You already have 8 quests. Finish, end or clear one to start another.'],
+  'Q-26': ['終えたクエストを一覧から外す', 'Clear this finished quest'],
+});
+/** M4 rooms (UX r4.2 §3.3): the facet a visit's unfinished run practises, or null when no run is left to finish */
+function kanjiCourseRunKind(run) {
+  if (!run || run.complete || run.schemaVersion !== 2) return null;
+  return run.targets.length === 1 ? run.targets[0] : 'mixed';
+}
+/** One run at a time, both ways: an entry resumes the unfinished run of its own kind, starts one when none is unfinished,
+ * and is otherwise blocked by the run that occupies the visit, which keeps its attempt, draft and help */
+function kanjiRoomEntry(visit, entry) {
+  const occupying = kanjiCourseRunKind(visit?.run);
+  if (!occupying) return 'start';
+  return occupying === entry ? 'resume' : `blocked-${occupying}`;
+}
+function kanjiChooseRoom(visit, room) {
+  const entry = kanjiRoomEntry(visit, room);
+  visit.chooser = false;
+  visit.blocked = entry.startsWith('blocked-') ? entry.slice('blocked-'.length) : null;
+  if (entry === 'start') Object.assign(visit, { room, stage: 'intro', index: 0, feedback: null });
+}
+/** the course door: the mixed run, subject to the same one-run rule */
+function kanjiEnterCourseDoor(node, invoker) {
+  if (!openKanjiCourseUnit(node, invoker)) return false;
+  const visit = S.kanjiCourse, entry = kanjiRoomEntry(visit, 'mixed');
+  visit.chooser = false;
+  visit.blocked = entry.startsWith('blocked-') ? entry.slice('blocked-'.length) : null;
+  if (entry === 'start' && visit.room) Object.assign(visit, { room: null, stage: 'intro', index: 0, feedback: null });
+  render();
+  return true;
+}
+/** R-01 from a word page: the chooser, carrying the word it came from (R-07) */
+function openKanjiRooms(node, invoker) {
+  if (!openKanjiCourseUnit(node, invoker)) return false;
+  Object.assign(S.kanjiCourse, { chooser: true, blocked: null, carried: node.t === 'word' ? node.id : null });
+  render(); document.getElementById('kanji-course-title')?.focus();
+  return true;
+}
+/** R-02: two study doors, each with its scope as the live line, and nothing else */
+function renderKanjiRoomChooser(main, visit, redraw) {
+  main.append(el('h2', 'list-head', tx(...M4_COPY['R-02'])));
+  for (const [room, scope] of [['reading', 'R-04'], ['meaning', 'R-06']]) {
+    const door = el('button', 'study-door');
+    door.type = 'button'; door.id = `kanji-room-${room}`; door.dataset.studyDoor = `room-${room}`;
+    door.append(el('span', 'study-door-t', tx(...ROOM_NAMES.rooms[`room-${room}`])), el('span', 'study-door-sub', tx(...M4_COPY[scope])));
+    door.disabled = !!visit.pending;
+    door.addEventListener('click', () => {
+      if (S.kanjiCourse !== visit || visit.pending) return;
+      kanjiChooseRoom(visit, room); redraw();
+    });
+    main.append(door);
+  }
 }
 function renderKanjiCourseMenu(main) {
   const course = window.BunkiKanjiCourse;
@@ -20682,6 +20786,18 @@ function renderKanjiCourseMenu(main) {
       document.getElementById('kanji-course-title')?.focus();
     });
     section.append(row);
+  }
+  // M4 R-01 in Lessons: the chooser for the unit's two facet rooms (guarded for harnesses that lift only this function)
+  if (typeof M4_COPY !== 'undefined' && course.listUnits().some((unit) => unit.id === 'shiki-shoku')) {
+    const rooms = biLabel('button', 'chip', ...M4_COPY['R-01']);
+    rooms.type = 'button'; rooms.id = 'kanji-room-lessons';
+    rooms.addEventListener('click', () => {
+      S.kanjiCourse = { unitId: 'shiki-shoku', stage: 'intro', index: 0, epoch: recordEpoch, run: null, draft: '', feedback: null, saved: false,
+        pending: false, supportedPractice: !!S.kanjiCourse?.supportedPractice, chooser: true };
+      render();
+      document.getElementById('kanji-course-title')?.focus();
+    });
+    section.append(rooms);
   }
   main.append(section);
 }
@@ -20726,8 +20842,21 @@ function renderKanjiCourse(main) {
     '辞書を見たあとの練習です。初見のテストではありません。',
     'Practice after opening the dictionary. This is not a first-try check.',
   )));
+  // M4 rooms (UX r4.2 §3): the chooser, or a blocked entry that shows only its line and the way back, never a check
+  if (visit.chooser) { renderKanjiRoomChooser(main, visit, redraw); return; }
+  if (visit.blocked) {
+    const line = el('p', 'gloss', tx(...M4_COPY[{ reading: 'R-08', meaning: 'R-08b', mixed: 'R-08c' }[visit.blocked]]));
+    line.setAttribute('role', 'status'); main.append(line);
+    main.append(button('kanji-room-return', ...M4_COPY['R-11'], () => { visit.blocked = null; redraw(); }));
+    main.append(button('kanji-room-chooser', ...M4_COPY['R-09'], () => { visit.blocked = null; visit.chooser = true; redraw(); }));
+    return;
+  }
+  if (visit.room) main.append(button('kanji-room-chooser', ...M4_COPY['R-09'], () => { visit.chooser = true; redraw(); }));
+  // R-07: the word carried from the page, never its reading
+  if (visit.room && visit.carried && visit.stage === 'check') main.append(el('p', 'fine', tx(...M4_COPY['R-07'])));
   const start = (mode) => {
-    visit.run = course.createRun(unit.id, { mode, ...(unit.id === 'shiki-shoku' ? { sessionId: crypto.randomUUID() } : {}) });
+    visit.run = course.createRun(unit.id, { mode, ...(unit.id === 'shiki-shoku' ? { sessionId: crypto.randomUUID() } : {}),
+      ...(visit.room ? { targets: [visit.room] } : {}) });
     visit.stage = 'check'; visit.feedback = null; visit.draft = ''; visit.saved = false; visit.evidenceTime = null; visit.noEvidence = false;
     kanjiCourseApplyHelp(visit);
     redraw();
@@ -20739,7 +20868,8 @@ function renderKanjiCourse(main) {
     return door;
   };
   if (visit.stage === 'intro') {
-    main.append(el('p', 'gloss', tx(
+    if (visit.room) main.append(el('p', 'gloss', tx(...M4_COPY[visit.room === 'reading' ? 'R-10' : 'R-10m'])));
+    else main.append(el('p', 'gloss', tx(
       `${unit.targets.length}字のキーワードを選び、${unit.targets.length}語の読みを答えます。意味と読みは別々に記録します。`,
       `Choose ${unit.targets.length} character keywords and recall ${unit.targets.length} whole-word readings. Meaning and reading results stay separate.`,
     )));
@@ -43181,6 +43311,8 @@ const ROOM_NAMES = Object.freeze({
     saved: ['保存した語とリスト', 'Saved words & lists'], list: ['保存した語とリスト', 'Saved words & lists'],
     browse: ['札を探す', 'Browse cards'], aiquiz: ['小テスト', 'Quiz'],
     mock: ['模擬試験', 'Practice tests'], tests: ['試験', 'Tests'], guided: ['案内つきの練習', 'Guided practice'], lessons: ['レッスン', 'Lessons'],
+    // M4 rooms (UX r4.2 §3.2): the course's two facet rooms, named as its results name them (K-01, K-02)
+    'room-reading': ['ことば全体の読み', 'Whole-word reading'], 'room-meaning': ['意味の選択', 'Meaning recognition'],
     speak: ['話す', 'Speak'],
     levels: ['JLPT・漢検の一覧', 'JLPT & Kanken lists'], 'sentence-practice': ['文の練習', 'Sentence practice'],
     search: ['辞書', 'Dictionary'], kanjidex: ['漢字を調べる', 'Kanji by shape'], grammar: ['文法', 'Grammar'],
@@ -43196,6 +43328,10 @@ const ROOM_NAMES = Object.freeze({
 function roomName(view = S.view) {
   if (view === 'dojo') return placesLayout() ? ROOM_NAMES.places.dojo : ROOM_NAMES.rooms.dojo;
   if (view === 'review') return S.focus ? ROOM_NAMES.rooms.focus : ROOM_NAMES.rooms.review;
+  // a facet room lives inside Lessons, as the course visit it reuses, and takes the room's own name there
+  if (view === 'lessons' && !S.kanjiCourse?.chooser && ['reading', 'meaning'].includes(S.kanjiCourse?.room)) {
+    return ROOM_NAMES.rooms[`room-${S.kanjiCourse.room}`];
+  }
   return ROOM_NAMES.rooms[view] || null;
 }
 const tabWords = ([ja, en]) => ({ ja, en });
