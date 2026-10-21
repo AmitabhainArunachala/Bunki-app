@@ -12,7 +12,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const DIR = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (name) => process.argv.find((value) => value.startsWith(`--${name}=`))?.slice(name.length + 3);
 const MODULES = arg('modules') || process.env.KAIRO_MODULES_DIR;
-const floor = () => { const s = statfsSync(DIR); assert.ok(s.bavail * s.bsize >= 1.5 * 1024 ** 3, 'DISK STOP: below 1.5 GiB'); };
+const floor = () => { const s = statfsSync(DIR); assert.ok(s.bavail * s.bsize >= 1.2 * 1024 ** 3, 'DISK STOP: below 1.2 GiB (rule 1725)'); };
 const url = (text) => 'data:text/javascript;base64,' + Buffer.from(text).toString('base64');
 const built = (name) => pathToFileURL(resolve(MODULES, name)).href;
 const read = (name) => readFileSync(resolve(DIR, name), 'utf8');
