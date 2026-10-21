@@ -20785,45 +20785,68 @@ function kanjiQuestSeed(node, module) {
   const sentence = teacherSentence(node);
   const token = sentence?.p.tokens[sentence.index];
   if (!sentence || token?.b !== node.id) return null;
-  const text = (from, to) => sentence.p.tokens.slice(from, to).map((t) => t.s).join('');
-  const full = text(0, sentence.p.tokens.length), at = text(0, sentence.start).length;
-  let nth = 0;
-  for (let i = full.indexOf(sentence.quote); i !== -1 && i < at; i = full.indexOf(sentence.quote, i + 1)) nth += 1;
+  const nth = kanjiQuestSentences(sentence.p).filter((s) => s.end <= sentence.start && s.quote === sentence.quote).length;
   return module.questSeed({ source: 'passage', passage: sentence.p.id, quote: sentence.quote, nth,
-    offset: text(sentence.start, sentence.index).length, surface: token.s, word: node.id });
+    offset: sentence.p.tokens.slice(sentence.start, sentence.index).map((t) => t.s).join('').length, surface: token.s, word: node.id });
+}
+/** a loaded passage's whole sentences, as the reader cuts them (teacherSentence over takenContext), in order */
+function kanjiQuestSentences(p) {
+  const sentences = [];
+  for (let index = 0; index < p.tokens.length;) {
+    const sentence = teacherSentence({ from: { passage: p.id, index } });
+    if (!sentence || sentence.end <= index) break;
+    sentences.push({ start: sentence.start, end: sentence.end, quote: sentence.quote });
+    index = sentence.end;
+  }
+  return sentences;
 }
 /** the sentence the quest was made from, as it was read (Q-04, the Lessons and pool rows), never the passage's text now */
 function kanjiQuestQuote(seed) {
   const quote = seed?.sourceOccurrence?.quote;
   return typeof quote === 'string' ? quote : null;
 }
-/** what this page is loading for a stale check (a passage's text, the archive index): 'pending', or 'failed' once it failed */
+/** what this page is loading for a stale check (a passage's text, the archive index): { state: 'pending' | 'failed', waiters },
+ * where every current page that asked while it was pending is redrawn when it settles (W2 2037 S3B-2d) */
 const kanjiQuestLoading = new Map();
-/** is the occurrence still the one the quest was made from (W2 2004/2020 S3B-2; lead 2005, 2009)? false only while the passage's text
- * holds the seed's exact sentence as that same occurrence; 'changed' when the passage is loaded and does not; 'unverifiable' when
- * nothing can prove either: a seed without its content identity, a passage absent once every index has loaded, or a text or index
- * that failed to load; null while the archive index or the passage's text is still loading, asked for once, redrawing when it
- * settles. Only false resumes or binds */
+/** is the occurrence still the one the quest was made from (W2 2004/2020/2037 S3B-2; lead 2005, 2009, 2023)? false only while the
+ * passage has the seed's exact sentence as a whole sentence (the nth of that text), with a token at the stored offset whose surface
+ * and base are the stored ones; 'changed' when the passage is loaded and has no such whole sentence; 'unverifiable' when nothing can
+ * prove either: a seed without its content identity, the same sentence with the selected word no longer re-identified there, a
+ * passage absent once every index has loaded, or a text or index that failed to load; null while the archive index or the
+ * passage's text is still loading. A load starts once; every caller with a redraw joins it. Only false resumes or binds */
 function kanjiQuestStale(seed, redraw = null) {
   const at = seed?.sourceOccurrence;
   if (at?.source !== 'passage' || typeof at.quote !== 'string' || !Number.isInteger(at.nth) || !Number.isInteger(at.offset) ||
       typeof at.surface !== 'string' || at.quote.slice(at.offset, at.offset + at.surface.length) !== at.surface) return 'unverifiable';
   const load = (key, start) => {
-    if (!kanjiQuestLoading.has(key)) {
-      kanjiQuestLoading.set(key, 'pending');
-      start().then(() => kanjiQuestLoading.delete(key), () => kanjiQuestLoading.set(key, 'failed')).finally(() => redraw?.());
+    let entry = kanjiQuestLoading.get(key);
+    if (!entry) {
+      const loading = { state: 'pending', waiters: new Set() };
+      kanjiQuestLoading.set(key, entry = loading);
+      start().then(() => kanjiQuestLoading.delete(key), () => { loading.state = 'failed'; }).finally(() => {
+        // each waiter is its own page's redraw, which draws nothing once that page is no longer current
+        const waiters = [...loading.waiters];
+        loading.waiters.clear();
+        for (const wake of waiters) wake();
+      });
     }
-    return kanjiQuestLoading.get(key) === 'failed' ? 'unverifiable' : null;
+    if (entry.state === 'pending' && redraw) entry.waiters.add(redraw);
+    return entry.state === 'failed' ? 'unverifiable' : null;
   };
   const p = D.passages?.find((entry) => entry.id === at.passage);
   // the main index boots first; an archive passage is known only once the archive index has loaded (the standalone build has none)
   if (!p) return D.archive || window.__CORRIDOR_STANDALONE__ === true || typeof ensureArchiveIndex !== 'function' ? 'unverifiable'
     : load('archive-index', () => ensureArchiveIndex());
   if (!p.tokens) return typeof ensureArticle === 'function' ? load(`passage:${p.id}`, () => ensureArticle(p)) : 'unverifiable';
-  const full = p.tokens.map((t) => t.s).join('');
-  let found = -1;
-  for (let n = 0; n <= at.nth; n += 1) { found = full.indexOf(at.quote, found + 1); if (found === -1) break; }
-  return found === -1 ? 'changed' : false;
+  const sentence = kanjiQuestSentences(p).filter((s) => s.quote === at.quote)[at.nth];
+  if (!sentence) return 'changed';
+  // the selected word, recomputed in the current tokens: a token starting at the stored offset with the stored surface and base
+  let offset = 0;
+  for (let index = sentence.start; index < sentence.end; index += 1) {
+    if (offset === at.offset) return p.tokens[index].s === at.surface && p.tokens[index].b === at.word ? false : 'unverifiable';
+    offset += p.tokens[index].s.length;
+  }
+  return 'unverifiable';
 }
 /** one learner line by id; K-26 is the course's own record-changed line (C:20697) */
 function kanjiQuestLine(id, n = 0) {
