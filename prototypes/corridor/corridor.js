@@ -20705,10 +20705,10 @@ const M4_COPY = Object.freeze({
   'Q-25': ['今日このあとは、このページで答えても復習には記録されず、練習になります。', 'For the rest of today, answers on this page stay practice and aren’t recorded for review.'],
   'Q-13r': ['クエストがすでに8件あります。新しく始めるには、どれかを終えるか、やめるか、一覧から外すかしてください。', 'You already have 8 quests. Finish, end or clear one to start another.'],
   'Q-26': ['終えたクエストを一覧から外す', 'Clear this finished quest'],
-  // proposed by W12 2008 for the stale quest of lead 2005; with the language keys, a one-string swap if they change it
-  'Q-27': ['このクエストのもとの文が変わったため、再開できません。このクエストはやめられます。新しいクエストは、ことば「職業」からつくれます。', 'The sentence this quest came from has changed, so it can’t be resumed. You can end it, and you can make a new quest from the word 職業.'],
+  // the stale quest page (lead 2005, 2009; copy final lead 2015; quest UX r4.3 c427e515)
+  'Q-27': ['このクエストのもとの文が変わったため、再開できません。このクエストはやめられます。新しいクエストは、ことば「職業」からつくれます。', 'The sentence this quest came from has changed, so this quest can’t be resumed. You can end it, and you can make a new quest from the word 職業.'],
   // W12 2015: the same page when no change can be proved (a goal kept without its text, or a passage no longer in the build)
-  'Q-27u': ['このクエストのもとの文が変わっていないか確かめられないため、再開できません。このクエストはやめられます。新しいクエストは、ことば「職業」からつくれます。', 'We can’t confirm the sentence this quest came from is unchanged, so it can’t be resumed. You can end it, and you can make a new quest from the word 職業.'],
+  'Q-27u': ['このクエストのもとの文が変わっていないか確かめられないため、再開できません。このクエストはやめられます。新しいクエストは、ことば「職業」からつくれます。', 'We can’t confirm the sentence this quest came from is unchanged, so this quest can’t be resumed. You can end it, and you can make a new quest from the word 職業.'],
 });
 /** M4 rooms (UX r4.2 §3.3): the facet a visit's unfinished run practises, or null when no run is left to finish */
 function kanjiCourseRunKind(run) {
