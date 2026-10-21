@@ -42,6 +42,7 @@ export function supplementalGates(out) {
         'prototypes/corridor/tools/vh-learning-reader-receipt.test.mjs',
         'prototypes/corridor/tools/vh-contrast-arrival.test.mjs',
         'prototypes/corridor/tools/vh-visual-contracts.test.mjs',
+        'prototypes/corridor/tools/reading-truth-proof.test.mjs',
         'prototypes/corridor/tools/test-vh-voice-contracts.mjs',
         'scripts/release/release.test.mjs',
       ],
