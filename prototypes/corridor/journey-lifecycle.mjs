@@ -228,7 +228,9 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
  function reconcile(){const s=current();let auth;try{auth=authority(s);}catch{return;}const host=s.record.m4Journey;
   if(auth.generation===generation&&classify(host)==='valid'&&host.id===root.id&&host.generation===generation&&host.revision>root.revision)root=cp(host);}
  function* enter(entrance,{observe=null}={}){return yield* change('visit',s=>{insist(s.daily.visits<LIMITS.visits,'visit-bound');s.daily.visits++;s.location=entrance;},{observe});}
- function* work(kind,data,{observe=null}={}){insist(['goals','projects'].includes(kind),'work-kind');return yield* change('work',s=>{
+ function* work(kind,data,{observe=null,admit=null}={}){insist(['goals','projects'].includes(kind),'work-kind');return yield* change('work',s=>{
+  // M4 (W5 1901 F3): the caller's own recheck runs inside the queued mutation, against the root this write would replace
+  if(typeof admit==='function')admit(freeze(cp(s)));
   insist(plain(data)&&s[kind].length<LIMITS[kind],'work-bound');
   const key=kind==='goals'?'nextGoal':'nextProject';insist(Number.isSafeInteger(s[key]+1),'identity-exhausted');
   s[key]++;s[kind].push({...cp(data),id:s.id+'/'+kind+'/'+s[key],status:data.status??'unfinished'});
@@ -238,6 +240,8 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
   insist(decision==='retire-completed'&&s[kind][i].status==='completed'||decision==='abandon-and-retire','explicit-retirement');
   s[kind].splice(i,1);s.progress[kind==='goals'?'retiredGoals':'retiredProjects']++;
  },{shrinkingControl:true,observe});}
+ /** M4 (W5 1901): an attempted goal write that stays unconfirmed holds this runtime, as an unpublished commit does; nothing persists */
+ function holdUnconfirmed(){if(on&&owns())held('publication-hold');return inspect();}
  /** M4 S1 (W5 1746/1750): the quest adapter's proof that a bound Reading run qualified. Opaque and held here, one pending per
   * goal; only boot() resets them, so a reload or a switch never revives one */
  function completionTicket(goalId,practiceSession,seed){
@@ -363,7 +367,7 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
    await port.wait(t.operation,left());}}
  const ready=run(boot);
  return {ready,inspect,boot:op(boot),setSwitch:op(setSwitch),tick:op(tick),enter:op(enter),work:op(work),retire:op(retire),
-  completionTicket,completeGoal:op(completeGoal),
+  completionTicket,completeGoal:op(completeGoal),holdUnconfirmed,
   beginHelp:op(beginHelp),finishHelp:op(finishHelp),awaitHelp,holdAtDeadline,beforeAnswer:op(beforeAnswer),prepare:op(prepare),reserve:op(reserve),
   admitAtLock,settle:op(settle),assertReviewable:op(reviewable),namespace:()=>root.id+'/'+root.dayEpoch+'/'};
 }
