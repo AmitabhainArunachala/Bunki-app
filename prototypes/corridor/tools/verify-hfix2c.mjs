@@ -267,22 +267,40 @@ function actualKanjiContract(id) {
   let kun = fullKun;
   if (joyo) {
     const plain = reading => reading.replaceAll('.', '');
-    // 送り仮名の付け方 通則4 例外: exact noun readings, never glyph-wide verb suppression.
+    // 送り仮名の付け方 (昭和48年内閣告示第2号) 通則4 例外: exact nouns, not glyph-wide verbs.
     // https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/okurikana/honbun04.html
     const nouns = { 謡: 'うたい', 虞: 'おそれ', 趣: 'おもむき', 氷: 'こおり', 印: 'しるし',
       頂: 'いただき', 帯: 'おび', 畳: 'たたみ', 卸: 'おろし', 煙: 'けむり', 恋: 'こい', 志: 'こころざし',
       次: 'つぎ', 隣: 'となり', 富: 'とみ', 恥: 'はじ', 話: 'はなし', 光: 'ひかり', 舞: 'まい',
       折: 'おり', 係: 'かかり', 掛: 'かかり', 組: 'くみ', 肥: 'こえ', 並: 'なみ', 巻: 'まき', 割: 'わり' };
-    const preferred = { '押:おさえる': 'お.さえる', '交:かわす': 'か.わす', '行:おこなう': 'おこな.う', '生:うまれる': 'う.まれる' };
+    // Independent transcription of the approved table examples, not the runtime helper's data.
+    const tableForms = {
+      source: 'https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/kanji/joyokanjisakuin/index.html',
+      notice: '常用漢字表 (平成22年内閣告示第2号)',
+      forms: [
+        { glyph: '押', reading: 'おさえる', example: '押さえる', form: 'お.さえる' },
+        { glyph: '交', reading: 'かわす', example: '交わす', form: 'か.わす' },
+        { glyph: '行', reading: 'おこなう', example: '行う', form: 'おこな.う' },
+        { glyph: '生', reading: 'うまれる', example: '生まれる', form: 'う.まれる' },
+        { glyph: '癒', reading: 'いやす', example: '癒やす', form: 'い.やす' },
+        { glyph: '籠', reading: 'こもる', example: '籠もる', form: 'こ.もる' },
+        { glyph: '塞', reading: 'ふさがる', example: '塞がる', form: 'ふさ.がる' },
+        { glyph: '羨', reading: 'うらやましい', example: '羨ましい', form: 'うらや.ましい' },
+        { glyph: '速', reading: 'はやまる', example: '速まる', form: 'はや.まる' },
+        { glyph: '務', reading: 'つとまる', example: '務まる', form: 'つと.まる' },
+        { glyph: '踊', reading: 'おどり', example: '踊り', form: 'おど.り' },
+        { glyph: '絡', reading: 'からめる', example: '絡める', form: 'から.める' },
+      ],
+    };
     const selected = new Map();
     let unresolved = false;
     for (const reading of joyo[1]) {
       const forms = [...new Set(row[2].filter(value => value.replace(/[.-]/g, '') === reading).map(value => value.replace(/-/g, '')))];
       const dots = [...new Set(forms.filter(value => value.includes('.')))];
-      const choice = preferred[`${id}:${reading}`];
+      const choice = tableForms.forms.find(entry => entry.glyph === id && entry.reading === reading)?.form;
       const retained = lesson.kun.map(value => value.replace(/-/g, '')).find(value => forms.includes(value));
       let shown = nouns[id] === reading || id === '彼' && reading === 'かの' ? reading
-        : choice && forms.includes(choice) ? choice
+        : choice !== undefined ? choice
         : dots.length === 1 ? dots[0]
         : retained !== undefined ? retained
         : dots.length === 0 && forms.includes(reading) ? reading : undefined;

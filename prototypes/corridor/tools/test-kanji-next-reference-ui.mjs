@@ -540,7 +540,83 @@ test('negative controls kill legacy-radical, keyword-only search and saved-answe
 const joyoFixture = JSON.parse(read('../../../tools/fixtures/reference/joyo-2010.json'));
 const fullKunKey = value => String(value).replace(/\./gu, '');
 const fixtureKun = readings => readings.filter(value => !/[ァ-ヺ]/u.test(value));
-test('E3 official kun display is complete, raw-attested and pure for every Jōyō form', () => {
+// Independent literal witnesses from 常用漢字表 (2010), 例 column, not runtime-derived expectations.
+const approvedTableForms = [
+  ['押', 'おさえる', '押さえる', 'お.さえる'], ['交', 'かわす', '交わす', 'か.わす'],
+  ['行', 'おこなう', '行う', 'おこな.う'], ['生', 'うまれる', '生まれる', 'う.まれる'],
+  ['癒', 'いやす', '癒やす', 'い.やす'], ['籠', 'こもる', '籠もる', 'こ.もる'],
+  ['塞', 'ふさがる', '塞がる', 'ふさ.がる'], ['羨', 'うらやましい', '羨ましい', 'うらや.ましい'],
+  ['速', 'はやまる', '速まる', 'はや.まる'], ['務', 'つとまる', '務まる', 'つと.まる'],
+  ['踊', 'おどり', '踊り', 'おど.り'], ['絡', 'からめる', '絡める', 'から.める'],
+];
+function withoutTableAuthority() {
+  // Removing the new authority restores E3.2's four DICTIONARY-backed choices too.
+  // Removing those older choices would test a different baseline (four unrelated fallback rows).
+  const object = /const JOYO_KUN_TABLE_FORMS = Object.freeze\(\{[\s\S]*?\n {2}\}\);/;
+  const lookup = 'const preferred = JOYO_KUN_TABLE_FORMS.rows.find(row => row.glyph === glyph && row.reading === reading)?.form;';
+  assert.equal([...coreSource.matchAll(new RegExp(object, 'g'))].length, 1);
+  assert.equal(coreSource.split(lookup).length, 2);
+  assert.equal(coreSource.split('else if (preferred) form = preferred;').length, 2);
+  return coreSource.replace(object, 'const JOYO_KUN_TABLE_FORMS = Object.freeze({ rows: [] });')
+    .replace(lookup, "const preferred = { '押:おさえる': 'お.さえる', '交:かわす': 'か.わす', '行:おこなう': 'おこな.う', '生:うまれる': 'う.まれる' }[`${glyph}:${reading}`];")
+    .replace('else if (preferred) form = preferred;', 'else if (preferred && forms.includes(preferred)) form = preferred;');
+}
+test('E3.3 table authority changes exactly eight rows; removing it restores frozen E3.2 display bytes', () => {
+  const prior = { module: { exports: {} } };
+  vm.runInNewContext(withoutTableAuthority(), prior);
+  const changed = [], oldRows = [];
+  for (const [glyph, readings] of joyoFixture.rows) {
+    const args = [canonical[glyph]?.kun || [], fixtureKun(readings),
+      extra.kanjiReadings.find(row => row[0] === glyph)?.[2] || [], glyph];
+    const before = plain(prior.module.exports.joyoKunDisplay(...args));
+    const actual = plain(core.joyoKunDisplay(...args));
+    oldRows.push([glyph, before]);
+    if (JSON.stringify(actual) !== JSON.stringify(before)) changed.push(glyph);
+  }
+  assert.equal(oldRows.length, 2136);
+  assert.equal(createHash('sha256').update(JSON.stringify(oldRows)).digest('hex'),
+    '2e47cab77e5a91de0fa78494c277a5de9d7a69ee5c95712f1f33bad80d48c28a',
+    'all display bytes from frozen E3.2 bbfc6096, including 守 and 丼');
+  assert.deepEqual(changed.sort(), approvedTableForms.slice(4).map(row => row[0]).sort());
+  for (const [glyph] of approvedTableForms.slice(4)) {
+    const isolated = { module: { exports: {} } };
+    const lookup = 'JOYO_KUN_TABLE_FORMS.rows.find(row => row.glyph === glyph && row.reading === reading)?.form';
+    vm.runInNewContext(coreSource.replace(lookup, `glyph === '${glyph}' ? undefined : ${lookup}`), isolated);
+    assert.deepEqual(plain(nounProjection(isolated.module.exports, glyph).view),
+      oldRows.find(row => row[0] === glyph)[1], `${glyph}: removing its attestation must recover its whole E3.2 row`);
+  }
+});
+test('E3.3 every approved dot is the official example suffix; source inventories and saved answers stay intact', () => {
+  const data = core.JOYO_KUN_TABLE_FORMS;
+  assert.equal(data.sourceSha256, joyoFixture.sha256);
+  assert(data.source.endsWith('/kanji/joyokanjisakuin/index.html'));
+  assert.equal(data.rows.length, 12);
+  assert(Object.isFrozen(data) && Object.isFrozen(data.rows) && data.rows.every(Object.isFrozen));
+  assert.deepEqual(plain(data.rows), approvedTableForms.map(([glyph, reading, example, form]) => ({ glyph, reading, example, form })));
+  const a = app(), before = JSON.stringify({ D: a.D, S: a.S });
+  for (const [glyph, reading, example, form] of approvedTableForms) {
+    const suffix = example.slice(glyph.length);
+    const dictionary = extra.kanjiReadings.find(row => row[0] === glyph)[2];
+    const added = extra.officialReadings.filter(row => row[0] === glyph).map(row => row[1]).filter(value => !/[ァ-ヺ]/u.test(value));
+    const completeKun = [...new Set([...canonical[glyph].kun, ...dictionary, ...added])];
+    assert(example.startsWith(glyph) && suffix && reading.endsWith(suffix), glyph);
+    assert.equal(form, reading.slice(0, -suffix.length) + '.' + suffix, glyph);
+    assert.deepEqual(plain(core.joyoKunDisplay([], [reading], [], glyph).joyoKun), [form], glyph);
+    assert.deepEqual(plain(core.joyoKunDisplay([], [], [], glyph).joyoKun), [], 'does not invent an absent official reading');
+    assert.deepEqual(plain(core.joyoKunDisplay([], [reading], [], '食').unattestedKun), [reading], 'exact glyph match required');
+    for (const resolve of [a.runtime.kanjiDisplayRecord, a.runtime.kanjiEntryRecord, a.runtime.strokeRoomRecord]) {
+      const record = resolve(glyph);
+      assert(record.joyoKun.includes(form), glyph);
+      assert.deepEqual(plain(record.lessonKun), canonical[glyph].kun);
+      assert.deepEqual(plain(record.completeKun), completeKun, `${glyph}: full inventory`);
+    }
+    const snapshot = { ...savedRecord(glyph), kun: [...canonical[glyph].kun] };
+    const saved = app({ state: { taken: [{ t: 'kanji', id: glyph, kanjiRecord: snapshot }] } });
+    assert.deepEqual(plain(saved.runtime.kanjiEntryRecord(glyph).kun), snapshot.kun);
+  }
+  assert.equal(JSON.stringify({ D: a.D, S: a.S }), before);
+});
+test('E3 official kun display is complete, source-attested and pure for every Jōyō form', () => {
   const a = app();
   const before = JSON.stringify({ D: a.D, S: a.S });
   for (const [glyph, readings] of joyoFixture.rows) {
@@ -556,8 +632,9 @@ test('E3 official kun display is complete, raw-attested and pure for every Jōy�
     const visible = record.kun.map(fullKunKey);
     for (const reading of expected) assert(visible.includes(fullKunKey(reading)), `${glyph}: ${reading}`);
     const dictionary = extra.kanjiReadings.find(row => row[0] === glyph)?.[2] || [];
+    const tableForms = approvedTableForms.filter(row => row[0] === glyph).map(row => row[3]);
     for (const reading of record.kun.filter(value => value.includes('.')))
-      assert([...raw, ...dictionary, ...dictionary.map(value => value.replace(/-/g, ''))].includes(reading), `${glyph}: unattested dots in ${reading}`);
+      assert([...raw, ...dictionary, ...dictionary.map(value => value.replace(/-/g, '')), ...tableForms].includes(reading), `${glyph}: unattested dots in ${reading}`);
     if (record.unattestedKun.length) assert(record.kun.every(value => !value.includes('.')), glyph);
     for (const reading of [...raw, ...dictionary])
       assert(visible.includes(fullKunKey(reading)), `${glyph}: lost ${reading}`);
@@ -670,14 +747,18 @@ test('E3.2 controls reject a dot on each noun exception and loss of each excepti
 });
 
 test('E3.2 bounded precedence changes eight rows; removing attested raw resolution widens it to 19 rows and 41 readings', () => {
+  // Preserve the historical E3.2 witness independently of E3.3's new table authority.
+  const baselineSource = withoutTableAuthority();
+  const baseline = { module: { exports: {} } };
+  vm.runInNewContext(baselineSource, baseline);
   const exceptionBranch = /if \(JOYO_KUN_ORTHOGRAPHY.nouns\[glyph\] === reading \|\|\s*JOYO_KUN_ORTHOGRAPHY.lexical\[.*?\] === reading\) form = reading;\s*else if/;
   assert.equal([...coreSource.matchAll(new RegExp(exceptionBranch, 'g'))].length, 1);
   const prior = { module: { exports: {} } };
-  vm.runInNewContext(coreSource.replace(exceptionBranch, 'if'), prior);
+  vm.runInNewContext(baselineSource.replace(exceptionBranch, 'if'), prior);
   const retained = /else if \(retained !== undefined\) form = retained;[^\n]*/;
   assert.equal([...coreSource.matchAll(new RegExp(retained, 'g'))].length, 1);
   const overbroad = { module: { exports: {} } };
-  vm.runInNewContext(coreSource.replace(retained, ''), overbroad);
+  vm.runInNewContext(baselineSource.replace(retained, ''), overbroad);
   const changed = [], rejected = [];
   let changedReadings = 0;
   for (const [glyph, readings] of joyoFixture.rows) {
@@ -685,7 +766,7 @@ test('E3.2 bounded precedence changes eight rows; removing attested raw resoluti
     const dictionary = extra.kanjiReadings.find(row => row[0] === glyph)?.[2] || [];
     const args = [raw, official, dictionary, glyph];
     const before = plain(prior.module.exports.joyoKunDisplay(...args));
-    const actual = plain(core.joyoKunDisplay(...args));
+    const actual = plain(baseline.module.exports.joyoKunDisplay(...args));
     const bad = plain(overbroad.module.exports.joyoKunDisplay(...args));
     const expected = nounDeltaCases.find(row => row[0] === glyph);
     if (!expected) assert.deepEqual(actual, before, `${glyph}: outside bounded delta`);
@@ -841,7 +922,7 @@ test('E3 control catches a hidden outside-table label rather than merely testing
   assert(healthy.textContent.includes('ソク'));
 });
 
-test('E3 0545 uses the four attested 本則 choices and whole-list undotted fallback', () => {
+test('E3.3 retains the four 本則 choices; only 丼 remains in whole-list fallback', () => {
   for (const [glyph, reading, chosen] of [['押', 'おさえる', 'お.さえる'], ['交', 'かわす', 'か.わす'],
     ['行', 'おこなう', 'おこな.う'], ['生', 'うまれる', 'う.まれる']]) {
     const dictionary = extra.kanjiReadings.find(row => row[0] === glyph)[2];
@@ -849,14 +930,19 @@ test('E3 0545 uses the four attested 本則 choices and whole-list undotted fall
     assert.deepEqual(plain(core.joyoKunDisplay([], [reading], dictionary, glyph).joyoKun), [chosen]);
   }
   const a = app();
-  for (const glyph of ['塞', '羨', '速', '丼', '務', '踊', '絡']) {
+  for (const glyph of ['丼']) {
     const record = a.runtime.kanjiEntryRecord(glyph);
     assert.equal(record.kunDotMode, 'undotted-unattested', glyph);
     assert(record.unattestedKun.length > 0, glyph);
     assert(record.kun.every(value => !value.includes('.')), glyph);
   }
-  const refused = core.joyoKunDisplay([], ['うまれる'], ['うま.れる'], '生');
-  assert.deepEqual(plain(refused.joyoKun), ['うま.れる'], 'never invent the preferred form when its source omits it');
+  for (const glyph of ['塞', '羨', '速', '務', '踊', '絡']) {
+    const record = a.runtime.kanjiEntryRecord(glyph);
+    assert.equal(record.kunDotMode, 'attested', glyph);
+    assert.deepEqual(plain(record.unattestedKun), [], glyph);
+  }
+  const tableAttested = core.joyoKunDisplay([], ['うまれる'], ['うま.れる'], '生');
+  assert.deepEqual(plain(tableAttested.joyoKun), ['う.まれる'], 'the official example 生まれる attests the dot independently');
   const unresolved = core.joyoKunDisplay(['た.べる'], ['たべる', 'みる'], ['た.べる'], '食');
   assert.deepEqual(plain(unresolved.kun), ['たべる', 'みる']);
   assert.deepEqual(plain(unresolved.unattestedKun), ['みる']);

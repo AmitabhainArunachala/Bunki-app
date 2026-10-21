@@ -164,6 +164,66 @@ test('E3.1 native and receipt expectations prefer a unique dot over an undotted 
   assert.throws(() => validateHfix2cFocused(bad, p));
 });
 
+test('E3.3 native and receipt expectations accept the table form when its dictionary dot is absent', () => {
+  for (const dictionaryKun of [[], ['うま.れる']]) {
+    const f = fixture('chromium', {
+      lessonKun: ['うまれる'],
+      dictionaryKun,
+      joyoKun: [['生', ['うまれる']]],
+    });
+    const p = f.pins();
+    assert.deepEqual(p.canonical.kun, ['う.まれる']);
+    assert.deepEqual(p.canonical.lessonKun, ['うまれる']);
+    assert.deepEqual(nativeKanjiContract(f), p.canonical);
+    const good = focused(p);
+    assert.equal(validateHfix2cFocused(good, p), true);
+    for (const wrong of ['うまれる', 'うま.れる']) {
+      const bad = structuredClone(good);
+      bad.rows.find((row) => row.name === HFIX2C.transition).observed.complete = snapshot(
+        { ...p.canonical, kun: [wrong] },
+        'complete',
+      );
+      assert.throws(() => validateHfix2cFocused(bad, p));
+    }
+  }
+});
+
+test('E3.3 native expectations use the eight official table forms and preserve lesson readings', () => {
+  const input = Object.fromEntries(
+    ['kanji', 'reference-extra'].map((name) => [
+      `data/share_alike/${name}.json`,
+      readFileSync(
+        new URL(`../../prototypes/corridor/data/share_alike/${name}.json`, import.meta.url),
+        'utf8',
+      ),
+    ]),
+  );
+  const f = { read: (file) => input[file] };
+  const lessons = JSON.parse(input['data/share_alike/kanji.json']).kanji;
+  for (const [glyph, kun] of [
+    ['癒', ['い.える', 'い.やす']],
+    ['籠', ['かご', 'こ.める', 'こ.もる', 'こ.む']],
+    ['塞', ['ふさ.ぐ', 'とりで', 'み.ちる', 'ふさ.がる']],
+    ['羨', ['うらや.む', 'あまり', 'うらや.ましい']],
+    ['速', ['はや.い', 'はや', 'はや.める', 'はや.まる', 'すみ.やか', 'はや-']],
+    ['務', ['つと.める', 'つと.まる']],
+    ['踊', ['おど.る', 'おど.り']],
+    ['絡', ['から.む', 'から.まる', 'から.める']],
+  ]) {
+    const actual = nativeKanjiContract(f, glyph);
+    assert.deepEqual(actual.kun, kun, glyph);
+    assert.deepEqual(actual.lessonKun, lessons[glyph].kun, glyph);
+  }
+  assert.deepEqual(nativeKanjiContract(f, '丼').kun, ['どんぶり', 'どん']);
+  assert.deepEqual(nativeKanjiContract(f, '守').kun, [
+    'まも.る',
+    'まも.り',
+    'もり',
+    '-もり',
+    'かみ',
+  ]);
+});
+
 test('E3.2 native expectations keep eight official noun forms undotted without losing their verb dots', () => {
   const input = Object.fromEntries(
     ['kanji', 'reference-extra'].map((name) => [

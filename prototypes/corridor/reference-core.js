@@ -264,25 +264,40 @@
   const validateJoyoOn = extra => validateJoyoTable(extra?.joyoOn, 2352, /^[ァ-ヺー]+$/u) &&
     extra.joyoOn.every((row, index) => row[0] === extra.joyoKun?.[index]?.[0]);
   /** Official noun exceptions apply to these exact glyph/reading pairs, not their verbs.
-   * Source: 送り仮名の付け方 (昭和48年内閣告示), 通則4 例外; the 注意 distinguishes verb-sense uses.
+   * Source: 送り仮名の付け方 (昭和48年内閣告示第2号), 通則4 例外; the 注意 distinguishes verb-sense uses.
    * https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/okurikana/honbun04.html
    * Readings are matched to the pinned 常用漢字表 (2010); 彼 かの is a separate table-specific choice. */
   const JOYO_KUN_ORTHOGRAPHY = Object.freeze({
     source: 'https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/okurikana/honbun04.html',
-    section: '送り仮名の付け方 通則4 例外',
+    section: '送り仮名の付け方 (昭和48年内閣告示第2号) 通則4 例外',
     nouns: Object.freeze({ 謡: 'うたい', 虞: 'おそれ', 趣: 'おもむき', 氷: 'こおり', 印: 'しるし',
       頂: 'いただき', 帯: 'おび', 畳: 'たたみ', 卸: 'おろし', 煙: 'けむり', 恋: 'こい', 志: 'こころざし',
       次: 'つぎ', 隣: 'となり', 富: 'とみ', 恥: 'はじ', 話: 'はなし', 光: 'ひかり', 舞: 'まい',
       折: 'おり', 係: 'かかり', 掛: 'かかり', 組: 'くみ', 肥: 'こえ', 並: 'なみ', 巻: 'まき', 割: 'わり' }),
     lexical: Object.freeze({ '彼:かの': 'かの' }),
   });
-  /** Keep dictionary-attested okurigana after official noun exceptions. The four ambiguous positions are
-   * the independently reviewed 本則 choices; a choice is usable only when that exact form
-   * occurs in the pinned dictionary. Any unresolved official reading makes the WHOLE
-   * visible kun list undotted. Source inventories and saved answers remain untouched. */
-  const JOYO_KUN_PREFERRED = Object.freeze({
-    '押:おさえる': 'お.さえる', '交:かわす': 'か.わす',
-    '行:おこなう': 'おこな.う', '生:うまれる': 'う.まれる',
+  /** Approved example words from the same official table as joyo-2010.json. Their kana suffix
+   * attests the dot independently of KANJIDIC. Apply only to the exact official glyph/reading,
+   * after noun exceptions. Other unresolved readings still undot the WHOLE visible kun list.
+   * Source inventories and saved answers remain untouched. */
+  const JOYO_KUN_TABLE_FORMS = Object.freeze({
+    source: 'https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/kanji/joyokanjisakuin/index.html',
+    section: '常用漢字表 (平成22年内閣告示第2号) 例',
+    sourceSha256: '33cb7b99d88d069a5e6e228a71f587285c9fa3cc6937e74022928524569f26f3',
+    rows: Object.freeze([
+      { glyph: '押', reading: 'おさえる', example: '押さえる', form: 'お.さえる' },
+      { glyph: '交', reading: 'かわす', example: '交わす', form: 'か.わす' },
+      { glyph: '行', reading: 'おこなう', example: '行う', form: 'おこな.う' },
+      { glyph: '生', reading: 'うまれる', example: '生まれる', form: 'う.まれる' },
+      { glyph: '癒', reading: 'いやす', example: '癒やす', form: 'い.やす' },
+      { glyph: '籠', reading: 'こもる', example: '籠もる', form: 'こ.もる' },
+      { glyph: '塞', reading: 'ふさがる', example: '塞がる', form: 'ふさ.がる' },
+      { glyph: '羨', reading: 'うらやましい', example: '羨ましい', form: 'うらや.ましい' },
+      { glyph: '速', reading: 'はやまる', example: '速まる', form: 'はや.まる' },
+      { glyph: '務', reading: 'つとまる', example: '務まる', form: 'つと.まる' },
+      { glyph: '踊', reading: 'おどり', example: '踊り', form: 'おど.り' },
+      { glyph: '絡', reading: 'からめる', example: '絡める', form: 'から.める' },
+    ].map(Object.freeze)),
   });
   function joyoKunDisplay(raw, official, dictionary = [], glyph = '') {
     const listed = strings(raw), supplied = strings(dictionary);
@@ -295,12 +310,12 @@
       const forms = unique(supplied.filter(value => value.replace(/[.-]/g, '') === reading)
         .map(value => value.replace(/-/g, '')));
       const dotted = unique(forms.filter(value => value.includes('.')));
-      const preferred = JOYO_KUN_PREFERRED[`${glyph}:${reading}`];
+      const preferred = JOYO_KUN_TABLE_FORMS.rows.find(row => row.glyph === glyph && row.reading === reading)?.form;
       const retained = listed.map(value => value.replace(/-/g, '')).find(value => forms.includes(value));
       let form;
       if (JOYO_KUN_ORTHOGRAPHY.nouns[glyph] === reading ||
         JOYO_KUN_ORTHOGRAPHY.lexical[`${glyph}:${reading}`] === reading) form = reading;
-      else if (preferred && forms.includes(preferred)) form = preferred;
+      else if (preferred) form = preferred;
       else if (dotted.length === 1) form = dotted[0];
       else if (retained !== undefined) form = retained; // raw choice only when no unique dot settles it
       else if (dotted.length === 0 && forms.includes(reading)) form = reading;
@@ -711,7 +726,7 @@
 
   return Object.freeze({
     createCatalog, search, searchEntries, sortEntries, paginateEntries,
-    readingForms, readingKey, mergeReadings, JOYO_KUN_ORTHOGRAPHY, joyoKunDisplay, joyoOnDisplay, normalizeReadingQuery, readingMatch, kanjiWordBuckets, kanjiAltWords,
+    readingForms, readingKey, mergeReadings, JOYO_KUN_ORTHOGRAPHY, JOYO_KUN_TABLE_FORMS, joyoKunDisplay, joyoOnDisplay, normalizeReadingQuery, readingMatch, kanjiWordBuckets, kanjiAltWords,
     validateKanjiFacts, kanjiReferenceFacts, validateJoyoKun, validateJoyoOn,
     normalizeQuery, normalizeLevel, compareEntries, wordKey, JLPT_LEVELS, KANKEN_LEVELS,
   });

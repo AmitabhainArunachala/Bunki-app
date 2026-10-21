@@ -67,11 +67,15 @@ export function loadHfix2cPins({ root, siteDir, engine, runId }) {
   let kun = fullKun;
   if (joyo) {
     const plain = (reading) => reading.replaceAll('.', '');
-    const preferred = {
-      '押:おさえる': 'お.さえる',
-      '交:かわす': 'か.わす',
-      '行:おこなう': 'おこな.う',
-      '生:うまれる': 'う.まれる',
+    // This receipt is bound to 生; the table itself attests this form independently of KANJIDIC2.
+    const tableForm = {
+      source:
+        'https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/kanji/joyokanjisakuin/index.html',
+      notice: '常用漢字表 (平成22年内閣告示第2号)',
+      glyph: '生',
+      reading: 'うまれる',
+      example: '生まれる',
+      form: 'う.まれる',
     };
     const selected = new Map();
     let unresolved = false;
@@ -84,12 +88,12 @@ export function loadHfix2cPins({ root, siteDir, engine, runId }) {
         ),
       ];
       const dots = [...new Set(forms.filter((value) => value.includes('.')))];
-      const choice = preferred[`${'生'}:${reading}`];
+      const choice = tableForm.reading === reading ? tableForm.form : undefined;
       const retained = lesson.kun
         .map((value) => value.replace(/-/g, ''))
         .find((value) => forms.includes(value));
       let shown =
-        choice && forms.includes(choice)
+        choice !== undefined
           ? choice
           : dots.length === 1
             ? dots[0]
