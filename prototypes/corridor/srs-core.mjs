@@ -322,7 +322,8 @@ function validAnswer(answer) {
 }
 const validHelp = (help) => plainObject(help) && filled(help.what) && Array.isArray(help.reveals) &&
   help.reveals.every((facet) => FACETS.includes(facet)) && (help.about == null || validItem(help.about)) &&
-  (help.at == null || Number.isFinite(help.at));
+  (help.at == null || Number.isFinite(help.at)) &&
+  (help.relevance == null || ['target', 'related', 'unrelated'].includes(help.relevance));
 /** an attempt names its item, the facet it tests, one well-formed answer, finite times and well-formed help */
 export function validAttempt(evidence) {
   if (!plainObject(evidence) || !validItem(evidence.item) || !FACETS.includes(evidence.tests) || !validAnswer(evidence.answer)) return false;
@@ -352,6 +353,18 @@ const gradedToday = (record, now) => record?.last_review != null && dayOf(new Da
 /** help shows the answer when it is about the tested item (unstated: the tested item) and reveals the tested facet */
 const showsAnswer = (help, evidence) =>
   (help.about == null || itemIdentity(help.about) === itemIdentity(evidence.item)) && help.reveals.includes(evidence.tests);
+const validOrigin = (o) => o === null || (plainObject(o) && filled(o.eventId) && filled(o.sessionId) && (o.attemptId == null || filled(o.attemptId)));
+/** r8: an annotation may exempt help only when it is the admitted policy's (the caller passes it: the hook adapter
+ * holds it, so this file never embeds the catalog version that pins this file's own bytes), bound to this attempt's target
+ * and facet, names its attempt and learning session, and carries one well-formed origin per raw row (event ids unique) */
+const boundRelevance = (evidence, policy) => {
+  const b = evidence.helpRelevance;
+  if (!filled(policy) || !plainObject(b) || b.policy !== policy || !filled(b.attemptId) || !filled(b.sessionId)) return false;
+  if (b.targetIdentity !== `${evidence.item.kind}:${itemIdentity(evidence.item)}` || b.tests !== evidence.tests) return false;
+  if (!Array.isArray(b.origins) || b.origins.length !== (evidence.help || []).length || !b.origins.every(validOrigin)) return false;
+  const ids = b.origins.filter(Boolean).map((o) => o.eventId);
+  return new Set(ids).size === ids.length;
+};
 const refused = (reason) => ({ write: false, reason });
 
 /**
@@ -364,7 +377,7 @@ const refused = (reason) => ({ write: false, reason });
  * claim-without-check (a tap, or a self-check or rating before the reveal) · no-answer · then help: answer-showing help
  * used before answeredAt gives Again, any other help caps at Hard.
  */
-export function decideReview(evidence, record, { now, answered = {}, dayEnd } = {}) {
+export function decideReview(evidence, record, { now, answered = {}, dayEnd, relevancePolicy } = {}) {
   if (!plainObject(evidence) || evidence.kind !== 'attempt') return refused('evidence-only');
   if (!trustedSurface(evidence.surface)) return refused('untrusted-surface');
   if (!validAttempt(evidence)) return refused('invalid-task');
@@ -384,8 +397,11 @@ export function decideReview(evidence, record, { now, answered = {}, dayEnd } = 
   } else return refused('no-answer');
   const help = (evidence.help || []).filter((h) => evidence.answeredAt == null || h.at == null || h.at <= evidence.answeredAt);
   const from = rating;
+  const bound = boundRelevance(evidence, relevancePolicy);
   if (help.some((h) => showsAnswer(h, evidence))) rating = 1;
-  else if (help.length) rating = Math.min(rating, 2);
+  // r8 rule 2: a shown answer (above) is Again whatever any label says; help labelled 'unrelated' under a bound
+  // annotation does not cap; target, related, unlabelled or unbound help caps at Hard, as in r7
+  else if (help.some((h) => !(bound && h.relevance === 'unrelated'))) rating = Math.min(rating, 2);
   return { write: true, rating, from, capped: rating !== from };
 }
 
@@ -463,9 +479,27 @@ const REFUSAL_WORDS = {
   'publish-uncertain': {
     en: 'We couldn’t confirm this answer was saved. You can keep practising.',
     ja: 'この答えが保存されたか確かめられませんでした。このまま練習を続けられます。',
+  },  // HOOKS r8 §4: the decision refusals a learner meets in a quest or room (Claude stand-in 0507/0511, Grok 0508/0512)
+  'answered-today': {
+    en: 'You’ve already reviewed this today, so this answer is practice: it didn’t change the card’s schedule.',
+    ja: 'これは今日もう復習したので、この答えは練習で、札の予定を変えていません。',
+  },
+  'not-due': {
+    en: 'This card isn’t due yet, so this answer is practice: its schedule is unchanged.',
+    ja: 'この札はまだ復習の時期ではないので、この答えは練習です。予定は変わっていません。',
+  },
+  'no-schedule': {
+    en: 'This isn’t on your review schedule right now, so this answer is practice.',
+    ja: 'これは今は復習の予定に入っていないので、この答えは練習です。',
+  },
+  'not-recorded': {
+    en: 'This answer couldn’t be recorded for review. You can keep practising.',
+    ja: 'この答えは復習に記録できませんでした。このまま練習を続けられます。',
   },
 };
+/** HOOKS r8: refusals that take an approved line: nothing was saved (owner changed), or the attempt was not admitted */
+const REFUSAL_ALIASES = Object.freeze({ 'owner-changed': 'publish-failed', 'review-unverified': 'not-recorded' });
 export function refusalWords(reason, lang = 'en') {
-  const words = REFUSAL_WORDS[reason];
+  const words = REFUSAL_WORDS[REFUSAL_ALIASES[reason] ?? reason];
   return words ? words[lang === 'ja' ? 'ja' : 'en'] : null;
 }

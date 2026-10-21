@@ -13,11 +13,17 @@ import ts from 'typescript';
 
 /** the authored definitions under test, by name */
 export const CORRIDOR_NAMES = [
-  'commitStorePatchOutcome', 'commitStorePatch', 'PRODUCER_DECLINED', 'declineWrite',
+  'commitStorePatchOutcome', 'commitStorePatch', 'PRODUCER_DECLINED', 'declineWrite', 'HELP_RELEVANCE_POLICY',
   'reportHookAttempt', 'hookCardFacts', 'srsKey', 'srsStoredRecord', 'srsSchedulerInstant', 'srsReviewLogRow',
   'sameWordIdentity', 'wordNodeIdentity', 'wordCardIdentity', 'wordAnswerIdentity', 'savedAnswerFor', 'nonBlankMeanings',
   'admitStandardGrade', 'commitStandardGrade', 'commitReviewAction', 'advanceReviewSession', 'dropReviewCard',
   'srsWordAnswerIdentity', 'srsWordRests',
+  // HOOKS r8 install and wiring: W3's rule and the one caller, the course visit's retained ledger, its PREPARE_REVIEW, custody
+  'helpRelevanceRule', 'kanjiReviewCaller', 'KANJI_REVIEW_OWNER', 'kanjiReviewRetained', 'adoptHelpRelevance',
+  'KANJI_LEDGER_LIMITS', 'kanjiDeepFreeze', 'kanjiDataProperty', 'kanjiPlainData', 'kanjiPlainList', 'kanjiCourseRowValid',
+  'kanjiCourseLedger', 'kanjiCourseCapture', 'kanjiCourseLedgerBefore', 'kanjiCourseSnapshot', 'KANJI_REVIEW_STATE',
+  'kanjiCoursePrepareReview', 'kanjiCourseAct', 'kanjiCourseApplyHelp', 'kanjiCourseRememberHelp', 'reportKanjiCourseAttempt',
+  'kanjiCourseJourney', 'KANJI_LEDGER_FULL', 'kanjiCourseHookLine',
 ];
 
 /** lift the named top-level definitions from corridor.js source text */

@@ -13,6 +13,8 @@ import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { test } from 'node:test';
 import vm from 'node:vm';
+import { createCaller } from '../review-caller.mjs';
+import * as srsCoreModule from '../srs-core.mjs';
 
 const require = createRequire(import.meta.url);
 const ts = require('typescript');
@@ -21,9 +23,15 @@ const source = read('../corridor.js');
 const courseSource = read('../kanji-course.js');
 const ast = ts.createSourceFile('corridor.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
 const names = ['kanjiCourseNodeUnit', 'kanjiCourseApplyHelp', 'kanjiCourseRememberHelp', 'kanjiCourseTeachingHelp', 'kanjiCourseReferenceHelp', 'kanjiCourseHookLine', 'reportKanjiCourseAttempt', 'kanjiCourseEvidencePatch', 'kanjiCourseReturnFrame', 'kanjiCourseEntryNode',
-  'openKanjiCourseUnit', 'renderKanjiCourseDoor', 'renderKanjiCourseMenu', 'renderKanjiCourse'];
+  'openKanjiCourseUnit', 'renderKanjiCourseDoor', 'renderKanjiCourseMenu', 'renderKanjiCourse',
+  // HOOKS r8: the course visit's retained ledger, its PREPARE_REVIEW and the one review caller
+  'HELP_RELEVANCE_POLICY', 'helpRelevanceRule', 'kanjiReviewCaller', 'KANJI_REVIEW_OWNER', 'kanjiReviewRetained', 'adoptHelpRelevance',
+  'KANJI_LEDGER_LIMITS', 'kanjiDeepFreeze', 'kanjiDataProperty', 'kanjiPlainData', 'kanjiPlainList', 'kanjiCourseRowValid',
+  'kanjiCourseLedger', 'kanjiCourseCapture', 'kanjiCourseLedgerBefore', 'kanjiCourseSnapshot', 'KANJI_REVIEW_STATE', 'kanjiCoursePrepareReview', 'kanjiCourseAct', 'kanjiCourseJourney', 'KANJI_LEDGER_FULL'];
+const declares = (statement, name) => (ts.isFunctionDeclaration(statement) && statement.name?.text === name) ||
+  (ts.isVariableStatement(statement) && statement.declarationList.declarations.some(node => node.name.getText(ast) === name));
 const lifted = names.map(name => {
-  const node = ast.statements.find(statement => ts.isFunctionDeclaration(statement) && statement.name?.text === name);
+  const node = ast.statements.find(statement => declares(statement, name));
   assert.ok(node, `actual source function ${name}`);
   return node.getText(ast);
 }).join('\n');
@@ -81,7 +89,7 @@ function harness({ language = 'en' } = {}) {
   class TestDate extends Date { static now() { return now; } }
   const S = { view: 'lessons', stack: [], navigationReturns: [], kanjiCourse: null, lessonsDone: scope.record.lessonsDone };
   const context = vm.createContext({
-    S, recordEpoch: 1, personalHost: null, window: { scrollTo() {} }, Date: TestDate, crypto: { randomUUID: () => `session-${++sessionNumber}` },
+    S, recordEpoch: 1, personalHost: null, window: { scrollTo() {} }, Date: TestDate, srsCore: srsCoreModule, crypto: { randomUUID: () => `session-${++sessionNumber}` },
     el: (tag, cls, text) => new Element(tag, cls, text),
     biLabel: (tag, cls, ja, en) => new Element(tag, cls, language === 'ja' ? ja : en),
     tx: (ja, en) => language === 'ja' ? ja : en,
@@ -120,6 +128,8 @@ function harness({ language = 'en' } = {}) {
   });
   vm.runInContext(courseSource, context);
   vm.runInContext(`window.BunkiKanjiCourse = BunkiKanjiCourse;\n${lifted}`, context);
+  // HOOKS r8: the one review caller, W3's rule absent (unannotated candidates; these r7 expectations hold as written)
+  context.adoptHelpRelevance({ createRelevance: null, createCaller, catalog: null });
   function draw() {
     main = new Element('main'); renderCount++;
     if (S.view !== 'lessons') return;
@@ -807,7 +817,8 @@ test('family hook is explicit, once per attempt, after response and feedback; no
   assert.equal(call.surface, 'course:kanji-shiki-shoku-r1');
   assert.equal(call.tests, 'meaning');
   assert.equal(call.answeredAt, 1000);
-  assert.equal(call.at.getTime(), 1010);
+  // HOOKS r8: the hook gets the prepared candidate exactly (W3's hookCandidate, the retained help); no extra clock
+  assert.equal(Object.hasOwn(call, 'at'), false);
   assert.deepEqual(copy(call.help), []);
   assert.deepEqual(copy(call.answer), { selfCheck: 'knew' });
   assert.equal(call.revealed, true);
@@ -840,7 +851,8 @@ test('dictionary assistance is retained on the exact word attempt and precedes i
     about: { kind: 'word', term: '職業', reading: 'しょくぎょう' },
     reveals: ['reading', 'meaning', 'form'], at: 2000 }]);
   assert.equal(calls[0].answeredAt, 2010);
-  assert.match(h.text, /not due.*unchanged/);
+  // HOOKS r8 §4 (C2): the view shows srs-core's one approved line for the refusal
+  assert.ok(h.text.includes(srsCoreModule.refusalWords('not-due', 'en')), h.text);
   assert.equal(h.commits.length, 0);
 });
 
@@ -861,7 +873,7 @@ test('family reveal, skip, known-wrong answer and absent hook cannot manufacture
   assert.equal(calls.length, 0);
   h.click('kanji-course-self-missed'); await tick();
   assert.deepEqual(copy(calls[0].answer), { selfCheck: 'missed' });
-  assert.match(h.text, /no active review card.*practice/);
+  assert.ok(h.text.includes(srsCoreModule.refusalWords('no-schedule', 'en')), h.text);
   assert.equal(h.commits.length, 0);
 });
 

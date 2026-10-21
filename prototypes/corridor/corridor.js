@@ -5141,6 +5141,7 @@ async function boot() {
   } catch (err) {
     console.warn('FSRS unavailable', err);
   }
+  if (srsCore) await installHelpRelevance();
 
   // A kept word's projection includes its core dictionary identity. Publish
   // only after that catalog is hydrated, so loading it cannot change the
@@ -20051,18 +20052,182 @@ function kanjiCourseNodeUnit(node) {
 function kanjiCourseApplyHelp(visit) {
   const course = window.BunkiKanjiCourse;
   if (visit?.run?.schemaVersion !== 2 || visit.run.complete || visit.feedback) return;
-  for (const help of [...(visit.referenceHelp || [])].sort((a, b) => a.at - b.at)) {
-    const attempt = course.currentAttempt(visit.run);
-    visit.run = course.recordHelp(visit.run, attempt.attemptId, help);
-  }
+  const rows = [...(visit.referenceHelp || [])].sort((a, b) => a.at - b.at);
+  if (!rows.length) return;
+  // The open attempt's help is a projection of every row the visit kept (W5 r2): rebuild it in a copy, in time order, so a
+  // row with an older clock cannot break the course's order; closed attempts and responses are left as they are
+  let run = JSON.parse(JSON.stringify(visit.run));
+  run.attempts[run.cursor].help = [];
+  for (const help of rows) run = course.recordHelp(run, course.currentAttempt(run).attemptId, help);
+  visit.run = run;
 }
-function kanjiCourseRememberHelp(visit, helps) {
+function kanjiCourseRememberHelp(visit, helps, attemptId = null) {
   if (visit?.unitId !== 'shiki-shoku') return;
   visit.referenceHelp ||= [];
-  for (const help of helps) if (!visit.referenceHelp.some((row) => JSON.stringify(row) === JSON.stringify(help))) {
+  // the course projects only the ledger's own accepted copies, never the caller's objects again; a batch the ledger refuses
+  // is kept nowhere, so the course never projects a row the ledger lacks
+  const kept = kanjiCourseCapture(visit, helps, attemptId);
+  if (!kept) return;
+  for (const help of kept) if (!visit.referenceHelp.some((row) => JSON.stringify(row) === JSON.stringify(help))) {
     visit.referenceHelp.push(help);
   }
   visit.referenceHelp.sort((a, b) => a.at - b.at);
+}
+/** HOOKS r8 (W5 r2's view/owner adapter; lead 1207): the page's retained help ledger, one learning session per page record
+ * ownership (recordEpoch), shared by every course visit: the menu and a new unit keep it, so help seen in one visit still
+ * counts in the next; a reload or an owner change starts a new one. It is the in-memory view of W5's journey. Every row
+ * the course is given is kept raw, in capture order, with its origin; equal rows from distinct events stay distinct;
+ * arrays and rows are frozen and replaced, never edited. W3's attempt.help is each visit's projection of its own rows,
+ * never the provenance source. Rows that predate the ledger keep a null (unknown) origin. A refused capture makes the
+ * ledger unavailable: nothing it would prepare could be complete, so every later preparation on the page is refused, and
+ * a full ledger says so (review-history-full) */
+const KANJI_LEDGER_LIMITS = Object.freeze({ events: 128, attempts: 96 });
+function kanjiDeepFreeze(value) {
+  if (value !== null && typeof value === 'object' && !Object.isFrozen(value)) {
+    Object.values(value).forEach(kanjiDeepFreeze);
+    Object.freeze(value);
+  }
+  return value;
+}
+const kanjiDataProperty = (value, key) => {
+  const descriptor = Object.getOwnPropertyDescriptor(value, key);
+  return !!descriptor && descriptor.enumerable && Object.hasOwn(descriptor, 'value');
+};
+const kanjiPlainData = (value) => value !== null && typeof value === 'object' && Object.getPrototypeOf(value) === Object.prototype &&
+  Reflect.ownKeys(value).every((key) => typeof key === 'string' && kanjiDataProperty(value, key));
+const kanjiPlainList = (value) => Array.isArray(value) && Object.getPrototypeOf(value) === Array.prototype &&
+  Reflect.ownKeys(value).length === value.length + 1 && [...value.keys()].every((index) => kanjiDataProperty(value, String(index)));
+/** W5 r2 capture validation, before anything is copied: plain JSON-like data in the course's help shape (an accessor,
+ * prototype, Date or hidden field refuses rather than changing in the copy), and W3's own recordHelp accepts it */
+function kanjiCourseRowValid(help) {
+  try {
+    if (!kanjiPlainData(help) || !Reflect.ownKeys(help).every((key) => ['what', 'about', 'reveals', 'at'].includes(key)) ||
+      !['what', 'reveals', 'at'].every((key) => Object.hasOwn(help, key)) || !Number.isFinite(help.at) ||
+      !kanjiPlainList(help.reveals) || (Object.hasOwn(help, 'about') && !kanjiPlainData(help.about)) ||
+      JSON.stringify(JSON.parse(JSON.stringify(help))) !== JSON.stringify(help)) return false;
+    const course = window.BunkiKanjiCourse, probe = course.createRun('shiki-shoku', { sessionId: 'validation' });
+    course.recordHelp(probe, course.currentAttempt(probe).attemptId, help);
+    return true;
+  } catch {
+    return false;
+  }
+}
+let kanjiCourseJourney = null;
+/** the reasons a ledger stops because it is full, not because something was wrong */
+const KANJI_LEDGER_FULL = Object.freeze(['help-limit', 'attempt-input-limit', 'review-record-limit']);
+function kanjiCourseLedger(visit) {
+  // a visit of an earlier ownership never reads or writes the live ledger
+  if (visit.epoch !== recordEpoch) return { unavailable: 'owner-changed', exposure: [], origins: [], inputs: {}, records: {}, serial: 0 };
+  let ledger = kanjiCourseJourney?.epoch === recordEpoch ? kanjiCourseJourney : null;
+  if (!ledger) {
+    const prior = (visit.referenceHelp || []).map((row) => JSON.parse(JSON.stringify(row)));
+    ledger = { epoch: recordEpoch, journeyId: crypto.randomUUID(), sessionId: crypto.randomUUID(), serial: 0, unavailable: null,
+      exposure: kanjiDeepFreeze(prior), origins: kanjiDeepFreeze(prior.map(() => null)), inputs: {}, records: {} };
+    kanjiCourseJourney = ledger;
+  }
+  visit.reviewLedger = ledger;
+  return ledger;
+}
+/** capture one batch, all or nothing. The batch must be a dense plain list of data entries, each read once. A course reveal
+ * or feedback row is the event course/<attempt>/<what> with its attempt; the same event again is idempotent, the same id
+ * with another row or origin refuses. A teaching or dictionary row is a new event of this visit. Returns the accepted
+ * frozen copies, in batch order, or null when the batch is refused */
+function kanjiCourseCapture(visit, helps, attemptId = null) {
+  const ledger = kanjiCourseLedger(visit);
+  if (ledger.unavailable) return null;
+  if (!kanjiPlainList(helps)) {
+    ledger.unavailable = 'help-batch-invalid';
+    return null;
+  }
+  const exposure = [...ledger.exposure], origins = [...ledger.origins], kept = [];
+  let serial = ledger.serial, refused = null;
+  for (let index = 0; index < helps.length; index++) {
+    const help = helps[index];
+    if (!kanjiCourseRowValid(help)) { refused = 'help-row-invalid'; break; }
+    const origin = attemptId ? { eventId: `course/${attemptId}/${help.what}`, sessionId: ledger.sessionId, attemptId }
+      : { eventId: `${help.what}/${ledger.journeyId}/${serial + 1}`, sessionId: ledger.sessionId };
+    const known = origins.findIndex((value) => value?.eventId === origin.eventId);
+    if (known >= 0) {
+      if (JSON.stringify(exposure[known]) === JSON.stringify(help) && JSON.stringify(origins[known]) === JSON.stringify(origin)) {
+        kept.push(exposure[known]);
+        continue;
+      }
+      refused = 'help-event-reuse-conflict'; break;
+    }
+    if (exposure.length >= KANJI_LEDGER_LIMITS.events) { refused = 'help-limit'; break; }
+    if (!attemptId) serial += 1;
+    const accepted = kanjiDeepFreeze(JSON.parse(JSON.stringify(help)));
+    exposure.push(accepted);
+    origins.push(origin);
+    kept.push(accepted);
+  }
+  if (refused) {
+    ledger.unavailable = refused;
+    return null;
+  }
+  Object.assign(ledger, { exposure: kanjiDeepFreeze(exposure), origins: kanjiDeepFreeze(origins), serial });
+  return kept;
+}
+/** the ledger as it stands before answer, reveal or skip (frozen, so it cannot change after) */
+function kanjiCourseLedgerBefore(visit) {
+  if (visit?.unitId !== 'shiki-shoku') return null;
+  const ledger = kanjiCourseLedger(visit);
+  return { sessionId: ledger.sessionId, courseSessionId: visit.run.sessionId, exposure: ledger.exposure, origins: ledger.origins };
+}
+/** keep the pre-answer snapshot once the course accepted the action: the first one for an attempt stands (a retry or repaint
+ * never replaces it), and feedback to this answer is never in it */
+function kanjiCourseSnapshot(visit, attemptId, before) {
+  if (!before) return;
+  const ledger = kanjiCourseLedger(visit);
+  if (Object.hasOwn(ledger.inputs, attemptId)) return;
+  if (Object.keys(ledger.inputs).length >= KANJI_LEDGER_LIMITS.attempts) { ledger.unavailable ||= 'attempt-input-limit'; return; }
+  ledger.inputs[attemptId] = kanjiDeepFreeze({ ...before });
+}
+/** one answer, reveal or skip on the open check: the pre-answer snapshot is kept only once the course accepts the action,
+ * then the course's own feedback or reveal row is captured as this attempt's exposure. Returns the attempt's result */
+function kanjiCourseAct(visit, action, value) {
+  const course = window.BunkiKanjiCourse;
+  const attempt = visit.run.schemaVersion === 2 ? course.currentAttempt(visit.run) : null;
+  const meta = attempt ? { attemptId: attempt.attemptId, at: Date.now() } : undefined;
+  const before = attempt ? kanjiCourseLedgerBefore(visit) : null;
+  visit.run = action === 'answer' ? course.answer(visit.run, value, meta) : course[action](visit.run, meta);
+  if (attempt) kanjiCourseSnapshot(visit, attempt.attemptId, before);
+  if (attempt && action === 'answer') visit.run = course.showFeedback(visit.run, attempt.attemptId, Date.now());
+  const result = course.summary(visit.run).results.at(-1);
+  if (attempt) kanjiCourseRememberHelp(visit, result.exposure, attempt.attemptId);
+  return result;
+}
+/** the envelope the review caller reads with a prepared course attempt */
+const KANJI_REVIEW_STATE = Object.freeze({ journey: Object.freeze({ location: Object.freeze({ entrance: 'lessons' }) }) });
+/** HOOKS r8: the course's PREPARE_REVIEW. Identity, facet, answer and self-check come from W3's hookCandidate; help is the
+ * retained pre-answer snapshot; the admitted rule labels a copy and re-derives that label (assertPreserved). The record is
+ * retained once, deep-frozen and independent of anything handed out: the caller gets its own copy of the details and a
+ * binding whose origins are another copy. Without the rule the candidate is an unannotated copy (r7's cap). Returns
+ * { details, binding }, or { reason } with nothing retained */
+function kanjiCoursePrepareReview(visit, attemptId, actual) {
+  const ledger = visit.reviewLedger, input = ledger?.inputs[attemptId];
+  if (ledger && !ledger.unavailable && Object.keys(ledger.records).length >= KANJI_LEDGER_LIMITS.attempts) ledger.unavailable = 'review-record-limit';
+  if (KANJI_LEDGER_FULL.includes(ledger?.unavailable)) return { reason: 'review-history-full' };
+  if (!input || ledger.unavailable || input.courseSessionId !== visit.run.sessionId || Object.hasOwn(ledger.records, attemptId)) {
+    return { reason: 'review-unverified' };
+  }
+  const copy = (value) => JSON.parse(JSON.stringify(value));
+  const rawCandidate = { ...copy(actual), help: copy(input.exposure) };
+  const context = { attemptId, sessionId: input.sessionId, origins: copy(input.origins) };
+  const rule = typeof helpRelevanceRule === 'undefined' ? null : helpRelevanceRule;
+  let candidate = copy(rawCandidate);
+  if (rule) {
+    try {
+      candidate = rule.labelCandidate(copy(rawCandidate), copy(context));
+      rule.assertPreserved(copy(rawCandidate), copy(context), candidate);
+    } catch {
+      return { reason: 'review-unverified' };
+    }
+  }
+  const details = { attemptId, journeyId: ledger.journeyId, owner: KANJI_REVIEW_OWNER, candidate: copy(candidate), seam: 'kanji-course', delivered: false };
+  ledger.records[attemptId] = kanjiDeepFreeze(copy({ attemptId, rawCandidate, context, details }));
+  return { details: copy(details), binding: { owner: KANJI_REVIEW_OWNER, journeyId: ledger.journeyId, epoch: visit.epoch, attemptId,
+    sessionId: context.sessionId, origins: copy(context.origins) } };
 }
 function kanjiCourseTeachingHelp(visit, target) {
   if (visit?.unitId !== 'shiki-shoku' || !recordReady(visit.epoch)) return;
@@ -20090,14 +20255,18 @@ function kanjiCourseHookLine(outcome) {
     `復習に記録しました（評価 ${outcome.rating}）。`, `Recorded for review (rating ${outcome.rating}).`,
   );
   if (outcome?.line) return outcome.line;
-  const text = {
-    'hook-unavailable': ['この版ではコースから復習に記録できません。練習は続けられます。', 'Review recording from this course is unavailable in this version. Practice still works.'],
-    'no-schedule': ['この項目には復習中のカードがありません。練習のみの結果です。', 'This item has no active review card. This remains practice.'],
-    'not-due': ['このカードはまだ復習時刻ではありません。予定は変わりません。', 'This card is not due. Its schedule is unchanged.'],
-    'answered-today': ['この項目は今日すでに復習しました。もう一度は記録しません。', 'This item has already been reviewed today. It will not be graded again.'],
-    'publish-uncertain': ['復習への記録を確認できません。この回答は再送しません。', 'The review write could not be confirmed. This answer will not be sent again.'],
-  };
-  return tx(...(text[outcome?.reason] || ['復習には記録できませんでした。練習は続けられます。', 'This could not be recorded for review. Practice still works.']));
+  if (outcome?.reason === 'hook-unavailable') return tx(
+    'この版ではコースから復習に記録できません。練習は続けられます。', 'Review recording from this course is unavailable in this version. Practice still works.',
+  );
+  // lead 1207: the page's help history is full; nothing was graded, and the learner is told why and what restores it
+  if (outcome?.reason === 'review-history-full') return tx(
+    'このページで記録できるヘルプの履歴が上限に達しました。復習に記録するには、ページを読み込み直してください。練習はこのまま続けられます。',
+    'This page has kept all the help history it can. Reload the page to record reviews again; practice still works.',
+  );
+  // HOOKS r8 §4: every hook refusal shows its one approved line from srs-core, never a text of this view's own
+  const core = typeof srsCore === 'undefined' ? null : srsCore;
+  const words = (lang) => core?.refusalWords(outcome?.reason, lang) ?? core?.refusalWords('not-recorded', lang);
+  return tx(words('ja') ?? '復習には記録できませんでした。練習は続けられます。', words('en') ?? 'This could not be recorded for review. Practice still works.');
 }
 async function reportKanjiCourseAttempt(visit, attemptId, choice) {
   const course = window.BunkiKanjiCourse;
@@ -20105,8 +20274,8 @@ async function reportKanjiCourseAttempt(visit, attemptId, choice) {
       visit.pending || visit.feedback?.result.attemptId !== attemptId) return;
   visit.hookOutcomes ||= {};
   if (Object.hasOwn(visit.hookOutcomes, attemptId)) return;
-  const hook = window.__KAIRO_HOOKS__;
-  if (typeof hook?.report !== 'function') {
+  const caller = typeof kanjiReviewCaller === 'undefined' ? null : kanjiReviewCaller;
+  if (typeof window.__KAIRO_HOOKS__?.report !== 'function' || !caller) {
     visit.hookOutcomes[attemptId] = { write: false, reason: 'hook-unavailable' };
     render(); return;
   }
@@ -20114,11 +20283,17 @@ async function reportKanjiCourseAttempt(visit, attemptId, choice) {
   visit.run = course.selfCheck(visit.run, attemptId, choice, checkedAt);
   const candidate = course.hookCandidate(visit.run, attemptId);
   if (!candidate) return;
+  // HOOKS r8: prepare from the retained ledger, then the one caller, which re-checks the retained record and the binding
+  // before it calls the hook at most once; a preparation that fails reaches no hook
+  const prepared = kanjiCoursePrepareReview(visit, attemptId, candidate);
   visit.hookOutcomes[attemptId] = { pending: true };
   visit.pending = true; render();
   let outcome;
-  try { outcome = await hook.report({ ...candidate, at: new Date(checkedAt) }); }
-  catch { outcome = { write: false, reason: 'publish-uncertain' }; }
+  try {
+    outcome = prepared.reason ? { write: false, reason: prepared.reason }
+      : await caller.observe({ type: 'PREPARE_REVIEW', attemptId }, { status: 'prepared', details: prepared.details, state: KANJI_REVIEW_STATE },
+        prepared.binding);
+  } catch { outcome = { write: false, reason: 'publish-uncertain' }; }
   // Keep a terminal receipt on the originating visit even if its page/owner
   // changed. Never retry a possibly published write or replay it on repaint.
   visit.hookOutcomes[attemptId] = outcome && typeof outcome.write === 'boolean'
@@ -20366,7 +20541,7 @@ function renderKanjiCourse(main) {
         const status = el('p', 'fine', outcome.pending
           ? tx('復習への記録を確認中…', 'Checking the review write…') : kanjiCourseHookLine(outcome));
         status.id = 'kanji-course-review-status'; status.setAttribute('role', 'status'); main.append(status);
-      } else if (typeof window.__KAIRO_HOOKS__?.report !== 'function') {
+      } else if (typeof window.__KAIRO_HOOKS__?.report !== 'function' || !(typeof kanjiReviewCaller === 'undefined' ? null : kanjiReviewCaller)) {
         main.append(el('p', 'fine', kanjiCourseHookLine({ reason: 'hook-unavailable' })));
       } else {
         main.append(el('p', 'fine', tx('答えを確認しましたか。既存の復習カードに記録する場合だけ選んでください。',
@@ -20391,12 +20566,7 @@ function renderKanjiCourse(main) {
     main.append(el('div', 'review-front', prompt.kind === 'meaning' ? prompt.kanji : prompt.wordKey));
     const respond = (action, value) => {
       if (!current() || visit.feedback || visit.pending) return;
-      const attempt = visit.run.schemaVersion === 2 ? course.currentAttempt(visit.run) : null;
-      const meta = attempt ? { attemptId: attempt.attemptId, at: Date.now() } : undefined;
-      visit.run = action === 'answer' ? course.answer(visit.run, value, meta) : course[action](visit.run, meta);
-      if (attempt && action === 'answer') visit.run = course.showFeedback(visit.run, attempt.attemptId, Date.now());
-      visit.feedback = { prompt, result: course.summary(visit.run).results.at(-1) };
-      if (attempt) kanjiCourseRememberHelp(visit, visit.feedback.result.exposure);
+      visit.feedback = { prompt, result: kanjiCourseAct(visit, action, value) };
       visit.draft = '';
       redraw();
     };
@@ -30874,12 +31044,92 @@ function hookCardFacts(latest, item, key) {
  * (HOOKS-SPEC §3.1). Returns { write: true, rating, from, capped } or { write: false, reason, line } — `line` is the
  * plain refusal the surface shows while practice continues; null when the reason is an ordinary decision.
  */
-async function reportHookAttempt(evidence) {
+/** HOOKS r8: the one help-relevance policy (W3's rule and catalog version, rebound to R2 with this branch's srs-core; the
+ * version hashes the catalog's pinned files, not the head) whose annotations may exempt help from the cap. It lives here,
+ * not in srs-core, because the catalog pins srs-core's bytes */
+const HELP_RELEVANCE_POLICY = 'w3-help-relevance-r8-v1:9f0691b2f04c3abcb5898ceebf148f879b112dd35831ae4ae814ac1fc1770a06';
+/** the admitted relevance rule: W3's module (help-relevance.mjs, byte-identical to W3's relevance.mjs) over srsCore with the
+ * shipped catalog (data/help-relevance-catalog.json, whose pins a Node test checks against these sources). Null when it
+ * cannot be installed: an annotated candidate is then refused, and the course prepares unannotated ones (r7's cap) */
+let helpRelevanceRule = null;
+/** the one review caller (review-caller.mjs, the r3.1 caller): every course attempt reaches the hook through it, at most once */
+let kanjiReviewCaller = null;
+const KANJI_REVIEW_OWNER = 'learner-record';
+/** custody.retained: the page ledger's own retained record (bounded, and dropped with the ledger at a reload or when a new
+ * owner's ledger replaces it), replayed as a copy and never relabelled; a candidate that differs from it is refused. Whether
+ * that owner is still live is the caller's check, not custody's */
+function kanjiReviewRetained(attemptId, candidate) {
+  const record = kanjiCourseJourney?.records?.[attemptId];
+  if (!record) throw new Error('review-not-prepared');
+  if (candidate !== undefined && JSON.stringify(record.details.candidate) !== JSON.stringify(candidate)) throw new Error('review-transport-changed');
+  return JSON.parse(JSON.stringify(record));
+}
+/** HOOKS r8: install W3's rule, only under the admitted policy, and the one caller. The caller reaches the schedule through
+ * the public hook handle; ownership is the page's record ownership, the live course visit and the record epoch */
+function adoptHelpRelevance({ createRelevance, createCaller, catalog }) {
+  let rule;
+  try {
+    rule = createRelevance({ itemIdentity: srsCore.itemIdentity, validItem: srsCore.validItem, catalog });
+    if (rule.policy !== HELP_RELEVANCE_POLICY) rule = null;
+  } catch {
+    rule = null;
+  }
+  helpRelevanceRule = rule;
+  kanjiReviewCaller = createCaller({
+    core: srsCore,
+    hook: { report: (candidate, admission) => window.__KAIRO_HOOKS__.report(candidate, admission) },
+    lines: { forReason: (reason, lang) => srsCore.refusalWords(reason, lang) },
+    ownership: () => ({ owner: recordReady(recordEpoch) ? KANJI_REVIEW_OWNER : null,
+      journeyId: kanjiCourseJourney?.epoch === recordEpoch ? kanjiCourseJourney.journeyId : null, epoch: recordEpoch }),
+    custody: { retained: kanjiReviewRetained },
+    admit: rule,
+    course: window.BunkiKanjiCourse,
+  });
+  return { rule, caller: kanjiReviewCaller };
+}
+/** the caller is required (no caller: the course reports hook-unavailable); the rule is optional */
+async function installHelpRelevance() {
+  let createCaller, createRelevance = null, catalog = null;
+  try {
+    ({ createCaller } = await import('./review-caller.mjs'));
+  } catch (err) {
+    console.warn('review caller unavailable', err);
+    return;
+  }
+  try {
+    [{ createRelevance }, catalog] = await Promise.all([
+      import('./help-relevance.mjs'),
+      window.__CORRIDOR_BUNDLE__?.['help-relevance-catalog'] || fetch('data/help-relevance-catalog.json').then((r) => r.json()),
+    ]);
+  } catch (err) {
+    console.warn('help relevance unavailable', err);
+  }
+  adoptHelpRelevance({ createRelevance, createCaller, catalog });
+}
+async function reportHookAttempt(evidence, binding = null) {
   const lang = bi() ? 'en' : 'ja';
   const refusedWith = (reason) => ({ write: false, reason, line: srsCore?.refusalWords(reason, lang) ?? null });
   if (!srsCore || !scheduler) return refusedWith('no-shared-admission');
-  // the record this page owned when the attempt was made: one adopted while the attempt waited for the lock never takes it
-  const epoch = recordEpoch;
+  // r8 (W2 0524 C1, W3 0532): an annotated candidate grades only under the caller's admission — the producer's retained
+  // raw candidate and context — from which the admitted relevance rule (W3's, installed as helpRelevanceRule) must
+  // reproduce it exactly; otherwise it is refused with no write. A candidate with no annotation keeps r7's conservative cap
+  const annotated = evidence?.helpRelevance != null || (Array.isArray(evidence?.help) && evidence.help.some((row) => row && Object.hasOwn(row, 'relevance')));
+  if (annotated) {
+    const rule = typeof helpRelevanceRule === 'undefined' ? null : helpRelevanceRule;
+    let admitted = false;
+    try {
+      if (rule && rule.policy === HELP_RELEVANCE_POLICY && binding?.raw) {
+        rule.assertPreserved(binding.raw, { attemptId: binding.attemptId, sessionId: binding.sessionId, origins: binding.origins }, evidence);
+        admitted = true;
+      }
+    } catch {
+      admitted = false;
+    }
+    if (!admitted) return refusedWith('review-unverified');
+  }
+  // the record this page owned when the attempt was made (r8: the caller's binding from preparation, when it sends one):
+  // one adopted since — before the call or while it waited for the lock — never takes it
+  const epoch = Number.isSafeInteger(binding?.epoch) ? binding.epoch : recordEpoch;
   let decision = null;
   const admitted = await srsCore.admitAnswer({
     locks: globalThis.navigator?.locks || null,
@@ -30901,7 +31151,7 @@ async function reportHookAttempt(evidence) {
         const record = stored
           ? { ...stored, due: new Date(stored.due), ...(stored.last_review ? { last_review: new Date(stored.last_review) } : {}) }
           : null;
-        decision = srsCore.decideReview(evidence, record, { now, answered });
+        decision = srsCore.decideReview(evidence, record, { now, answered, relevancePolicy: HELP_RELEVANCE_POLICY });
         if (!decision.write) throw declineWrite(decision.reason);
         if (!reserve(item.kind === 'word' ? srsCore.itemIdentity(item) : null)) {
           decision = { write: false, reason: 'mark-unavailable' };

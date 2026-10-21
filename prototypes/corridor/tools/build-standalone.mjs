@@ -53,6 +53,9 @@ const recordImports = new Map([
   ['./modules/record-core.mjs', 'core'],
   // the one schedule owner, loaded beside ts-fsrs at boot
   ['./srs-core.mjs', 'srsCore'],
+  // HOOKS r8: the one review caller and W3's help-relevance rule, installed right after it
+  ['./review-caller.mjs', 'reviewCaller'],
+  ['./help-relevance.mjs', 'helpRelevance'],
 ]);
 const assessmentImports = new Map([
   ['./assessment-v2-controller.mjs', 'assessmentV2'],
@@ -175,6 +178,7 @@ const BUNDLES = {
   'original/grammar-v11': 'data/original/grammar-v11.json',
   manifest: 'data/manifest.json',
   'fsrs-pin': 'data/fsrs-pin.json',
+  'help-relevance-catalog': 'data/help-relevance-catalog.json',
   'share_alike/reference-extra': 'data/share_alike/reference-extra.json',
   'share_alike/kanji-structure': 'data/share_alike/kanji-structure.json',
   'share_alike/kanji-family': 'data/share_alike/kanji-family.json',

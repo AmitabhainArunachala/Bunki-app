@@ -16,6 +16,7 @@ import { setImmediate } from 'node:timers';
 import { URL } from 'node:url';
 import vm from 'node:vm';
 import ts from 'typescript';
+import { createCaller } from '../prototypes/corridor/review-caller.mjs';
 import * as core from '../prototypes/corridor/srs-core.mjs';
 import * as fsrsApi from '../prototypes/corridor/vendor/ts-fsrs.mjs';
 import {
@@ -216,12 +217,15 @@ function harness({ learner = record() } = {}) {
   // actual assignment below still installs that adapter through the product seam.
   vm.runInContext(
     `const originalHookReport = reportHookAttempt;
-    reportHookAttempt = function (evidence) { __hookCalls.push(evidence); return originalHookReport(evidence); };
+    reportHookAttempt = function (evidence, binding) { __hookCalls.push(evidence); return originalHookReport(evidence, binding); };
     ${installation.getText(ast)}\n${courseSource}\nwindow.BunkiKanjiCourse = BunkiKanjiCourse;\n${courseProgram}`,
     context,
   );
   assert.equal(Object.isFrozen(context.window.__KAIRO_HOOKS__), true);
   assert.equal(context.window.__KAIRO_HOOKS__.report, context.reportHookAttempt);
+  // HOOKS r8: the course reaches the hook through the one review caller. W3's rule is absent here, so the course prepares
+  // unannotated candidates and these r7 expectations hold as written (verify-srs-hooks proves the installed rule)
+  context.adoptHelpRelevance({ createRelevance: null, createCaller, catalog: null });
   function draw() {
     main = new Element('main');
     renders++;
@@ -497,7 +501,11 @@ test('no-card refusal is visible and leaves practice available without minting c
     h.byId('kanji-course-review-status').textContent,
     h.context.kanjiCourseHookLine(result),
   );
-  assert.match(h.getText(), /no active review card|no review card|no scheduled card/i);
+  // HOOKS r8 §4 (C2): srs-core's approved no-schedule line
+  assert.ok(
+    h.getText().includes(core.refusalWords('no-schedule', 'en')),
+    h.getText(),
+  );
   assert.equal(h.box.writes, 0);
   assert.deepEqual(h.box.record.srs, {});
   h.click('kanji-course-next');
@@ -518,7 +526,10 @@ test('not-due refusal is visible, preserves the exact card and allows the next c
     h.byId('kanji-course-review-status').textContent,
     h.context.kanjiCourseHookLine(result),
   );
-  assert.match(h.getText(), /not due/i);
+  assert.ok(
+    h.getText().includes(core.refusalWords('not-due', 'en')),
+    h.getText(),
+  );
   assert.deepEqual(h.box.record, before);
   assert.equal(h.box.writes, 0);
   h.click('kanji-course-next');

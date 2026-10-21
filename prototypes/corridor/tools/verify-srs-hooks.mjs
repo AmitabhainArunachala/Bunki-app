@@ -26,6 +26,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import * as layer from './srs-hooks-corridor-layer.mjs';
+import * as r8 from './srs-hooks-r8-cases.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const CORRIDOR = join(HERE, '..');
@@ -454,7 +455,7 @@ function suite(core, glue = {}) {
         for (const lang of ['en', 'ja']) assert.ok(core.refusalWords(reason, lang), `${reason} ${lang}`);
       }
       assert.ok(!/won’t change|didn’t change/.test(core.refusalWords('publish-uncertain', 'en')));
-      assert.equal(core.refusalWords('answered-today', 'en'), null);
+      assert.equal(core.refusalWords('evidence-only', 'en'), null, 'a reason with no learner-facing refusal has no line');
       return 'without Web Locks every hook surface and the deck refuse with an English and a Japanese line; the uncertain line never claims the schedule is unchanged';
     });
     await check('P21', 4, async () => {
@@ -486,7 +487,44 @@ function suite(core, glue = {}) {
         assert.equal(core.refusalWords(reason, 'en'), en.replaceAll("'", '’'), `${reason} en`);
         assert.equal(core.refusalWords(reason, 'ja'), ja, `${reason} ja`);
       }
-      return 'the four refusal lines are the approved text, word for word, in English (HOOKS-SPEC r7) and Japanese (Kimi 0155)';
+      // HOOKS r8 §4: the four decision refusals, word for word as approved by the Claude stand-in (0507, 0511) and Grok
+      // (0508, 0512); owner-changed and review-unverified take approved lines
+      const APPROVED_R8 = {
+        'answered-today': ['You’ve already reviewed this today, so this answer is practice: it didn’t change the card’s schedule.', 'これは今日もう復習したので、この答えは練習で、札の予定を変えていません。'],
+        'not-due': ['This card isn’t due yet, so this answer is practice: its schedule is unchanged.', 'この札はまだ復習の時期ではないので、この答えは練習です。予定は変わっていません。'],
+        'no-schedule': ['This isn’t on your review schedule right now, so this answer is practice.', 'これは今は復習の予定に入っていないので、この答えは練習です。'],
+        'not-recorded': ['This answer couldn’t be recorded for review. You can keep practising.', 'この答えは復習に記録できませんでした。このまま練習を続けられます。'],
+      };
+      for (const [reason, [en, ja]] of Object.entries(APPROVED_R8)) {
+        assert.equal(core.refusalWords(reason, 'en'), en, `${reason} en`);
+        assert.equal(core.refusalWords(reason, 'ja'), ja, `${reason} ja`);
+      }
+      for (const lang of ['en', 'ja']) {
+        assert.equal(core.refusalWords('owner-changed', lang), core.refusalWords('publish-failed', lang));
+        assert.equal(core.refusalWords('review-unverified', lang), core.refusalWords('not-recorded', lang));
+      }
+      return 'the eight refusal lines are the approved text, word for word: r7\u2019s four (HOOKS-SPEC r7, Kimi 0155) and r8\u2019s four (stand-in and Grok)';
+    });
+    await check('P23', 2, async () => {
+      // HOOKS r8 rule 2: help labelled 'unrelated' exempts only under an annotation bound to this attempt with the admitted
+      // policy; a shown target answer is Again whatever its label; related, unlabelled or unbound help caps at Hard
+      const item = { kind: 'kanji', literal: '職' };
+      const base = { kind: 'attempt', item, surface: 'course:kanji-shiki-shoku-r1', tests: 'meaning', revealed: true, answer: { selfCheck: 'knew' }, answeredAt: 100 };
+      const row = (about, reveals, relevance) => ({ what: 'dictionary', ...(about ? { about } : {}), reveals, at: 50, ...(relevance ? { relevance } : {}) });
+      const POLICY = `w3-help-relevance-r8-v1:${'a'.repeat(64)}`; // the admitted policy, passed in by the hook adapter
+      const bound = (help, over = {}) => ({ ...base, help, helpRelevance: { policy: POLICY, attemptId: 'a1', sessionId: 's1',
+        targetIdentity: `kanji:${core.itemIdentity(item)}`, tests: 'meaning', origins: help.map((_, i) => ({ eventId: `e${i}`, sessionId: 's0' })), ...over } });
+      const g = (e, relevancePolicy = POLICY) => core.decideReview(e, CARD, { now: dueNow, answered: {}, relevancePolicy }).rating;
+      const rain = row({ kind: 'kanji', literal: '雨' }, ['meaning'], 'unrelated');
+      assert.equal(g(bound([rain])), 3, 'unrelated help under a bound annotation: Good');
+      assert.equal(g(bound([row({ kind: 'kanji', literal: '耳' }, ['meaning'], 'related')])), 2, 'related: Hard');
+      assert.equal(g({ ...base, help: [row({ kind: 'kanji', literal: '雨' }, ['meaning'])] }), 2, 'unlabelled: Hard (r7)');
+      assert.equal(g(bound([rain], { policy: `w3-help-relevance-r8-v1:${'0'.repeat(64)}` })), 2, 'another policy: Hard');
+      assert.equal(g(bound([rain]), null), 2, 'no admitted policy passed: no exemption, Hard');
+      assert.equal(g(bound([rain], { tests: 'reading' })), 2, 'bound to another facet: Hard');
+      assert.equal(g(bound([row(item, ['meaning'], 'unrelated')])), 1, 'the target answer shown, labelled unrelated: Again');
+      assert.equal(g(bound([row(null, ['meaning'])])), 1, 'an unresolved general reveal: Again');
+      return 'unrelated + bound to the admitted policy → Good; related, unlabelled, another policy, no policy, another facet → Hard; a shown target answer (even labelled unrelated) or an unresolved general reveal → Again';
     });
     /* rule 5 */
     await check('P10', 5, async () => {
@@ -531,7 +569,10 @@ async function loadEngines(coreSource, edits = {}) {
   return out;
 }
 
-async function glueSuite(core, engines, corridorProgram) {
+/* HOOKS r8 install and wiring: W3's rule and the one caller, imported from their text so a control can edit them */
+const R8_SOURCES = r8.r8Sources(CORRIDOR);
+const R8_MODS = { relevance: await importSource(R8_SOURCES.relevance), caller: await importSource(R8_SOURCES.caller) };
+async function glueSuite(core, engines, corridorProgram, mods = R8_MODS) {
   const scheduler = core.createScheduler(fsrsApi, pin);
   const MIN = 60e3;
   const base = new Date('2026-10-10T09:00:00');
@@ -844,6 +885,29 @@ async function glueSuite(core, engines, corridorProgram) {
     }
     return 'the record replaced by another owner while the review grade or the hook waits for the lock: nothing is published into the adopted record and no mark is left; the same owner grades (W3 owner-wait)';
   });
+  await check('C10', 4, async () => {
+    const box = corridorBox();
+    box.sandbox.recordEpoch = 2;
+    const stale = await box.lifted.reportHookAttempt(hookEvidence(), { epoch: 1 });
+    assert.deepEqual([stale.write, box.box.writes], [false, 0]);
+    const live = await box.lifted.reportHookAttempt(hookEvidence(), { epoch: 2 });
+    assert.equal(live.write, true);
+    return 'HOOKS r8: the caller\u2019s preparation epoch pins the hook: epoch 1 after the record moved to 2 is refused, no write; epoch 2 grades';
+  });
+  await check('C11', 4, async () => {
+    const box = corridorBox();
+    const help = [{ what: 'dictionary', about: { kind: 'kanji', literal: '雨' }, reveals: ['meaning'], at: 1, relevance: 'unrelated' }];
+    const annotated = { ...hookEvidence(), help, helpRelevance: { policy: 'w3-help-relevance-r8-v1:x', attemptId: 'a', sessionId: 's', targetIdentity: 'x', tests: 'reading', origins: [null] } };
+    const raw = { ...hookEvidence(), help: help.map(({ relevance, ...r }) => { void relevance; return r; }) };
+    for (const admission of [undefined, { epoch: 1, attemptId: 'a', sessionId: 's', origins: [null], raw }]) {
+      const r = await box.lifted.reportHookAttempt(annotated, admission);
+      assert.deepEqual([r.write, r.reason, box.box.writes], [false, 'review-unverified', 0]);
+      assert.equal(r.line, core.refusalWords('not-recorded', 'en'));
+    }
+    assert.equal((await box.lifted.reportHookAttempt(hookEvidence())).write, true, 'an unannotated candidate keeps the r7 path');
+    return 'HOOKS r8: an annotated candidate without the admitted rule and a verified admission is refused (not-recorded line, no write); an unannotated one grades as in r7';
+  });
+  await r8.r8Cases({ check, layer, program: corridorProgram, core, fsrsApi, pin, mods, sources: R8_SOURCES });
   return cases;
 }
 
@@ -882,12 +946,16 @@ const CORE_MUTANTS = {
   'uncertain-releases': [["if (result.outcome === 'not-published' && reservation?.inserted)", "if ((result.outcome === 'not-published' || result.outcome === 'uncertain') && reservation?.inserted)"]],
   'loose-id': [["const HOOK_SURFACE = /^(world|quest|room|ride|course):(?!.*\\.\\.)[\\p{L}\\p{N}][\\p{L}\\p{N}._-]{0,63}$/u;", 'const HOOK_SURFACE = /^(world|quest|room|ride|course):[^\\s:]+$/u;']],
   'stale-clock': [['  return locks.request(ANSWER_LOCK, async () => {\n    const now = clock();', '  const now = clock();\n  return locks.request(ANSWER_LOCK, async () => {']],
-  'silent-refusal': [['  const words = REFUSAL_WORDS[reason];\n  return words ?', '  const words = null;\n  return words ?']],
+  'silent-refusal': [['  const words = REFUSAL_WORDS[REFUSAL_ALIASES[reason] ?? reason];\n  return words ?', '  const words = null;\n  return words ?']],
   'swap-safe-lines': [
     ["    ja: 'この答えは安全に保存できなかったため、札の予定は変わっていません。このまま練習を続けられます。',", "    ja: 'この答えは保存できなかったため、札の予定は変わっていません。このまま練習を続けられます。',"],
     ["    ja: 'この答えは保存できなかったため、札の予定は変わっていません。このまま練習を続けられます。',\n  },\n  'publish-uncertain'", "    ja: 'この答えは安全に保存できなかったため、札の予定は変わっていません。このまま練習を続けられます。',\n  },\n  'publish-uncertain'"],
   ],
   'drop-anzen': [['この答えは安全に保存できなかったため', 'この答えは保存できなかったため']],
+  'r8-line-drift': [["    ja: 'この札はまだ復習の時期ではないので、この答えは練習です。予定は変わっていません。',", "    ja: 'この札はまだ復習の時期ではないので、この答えは練習です。予定は変わりません。',"]],
+  'r7-help-cap': [["  else if (help.some((h) => !(bound && h.relevance === 'unrelated'))) rating = Math.min(rating, 2);", '  else if (help.length) rating = Math.min(rating, 2);']],
+  'policy-unpinned': [['  if (!filled(policy) || !plainObject(b) || b.policy !== policy || !filled(b.attemptId) || !filled(b.sessionId)) return false;', '  if (!plainObject(b) || !filled(b.attemptId) || !filled(b.sessionId)) return false;']],
+  'shown-answer-honours-label': [['  (help.about == null || itemIdentity(help.about) === itemIdentity(evidence.item)) && help.reveals.includes(evidence.tests);', "  help.relevance !== 'unrelated' && (help.about == null || itemIdentity(help.about) === itemIdentity(evidence.item)) && help.reveals.includes(evidence.tests);"]],
   'banning-uncertain-line': [
     ["    en: 'We couldn’t confirm this answer was saved. You can keep practising.',", "    en: 'We couldn’t confirm this answer was saved. This card won’t be graded again today; you can keep practising.',"],
     ["    ja: 'この答えが保存されたか確かめられませんでした。このまま練習を続けられます。',", "    ja: 'この答えが保存されたか確かめられませんでした。この札は今日はもう採点されませんが、練習は続けられます。',"],
@@ -916,18 +984,23 @@ const CORRIDOR_MUTANTS = {
   'review-stale-clock': [["      clock: () => new Date(),\n      storage: globalThis.localStorage,\n      where: 'corridor',", "      clock: ((sampled) => () => sampled)(new Date()),\n      storage: globalThis.localStorage,\n      where: 'corridor',"]],
   'hook-owner-unpinned': [["      if (!recordWritable(epoch)) return { outcome: 'not-published' };\n", '']],
   'review-owner-unpinned': [["        if (!recordWritable(epoch)) { refusal = 'publish-failed'; return { outcome: 'not-published', graded: false }; }\n", '']],
+  'hook-ignores-binding-epoch': [['  const epoch = Number.isSafeInteger(binding?.epoch) ? binding.epoch : recordEpoch;', '  const epoch = recordEpoch;']],
+  'hook-skips-admission': [["    if (!admitted) return refusedWith('review-unverified');\n", '']],
   'hook-stale-clock': [["    clock: () => new Date(),\n    storage: globalThis.localStorage,\n    where: evidence?.surface,", "    clock: ((sampled) => () => sampled)(new Date()),\n    storage: globalThis.localStorage,\n    where: evidence?.surface,"]],
+  ...r8.R8_CORRIDOR_MUTANTS,
 };
 const EXPECT = {
   'deck-no-recheck': ['E2'], 'deck-no-reservation': ['E1'], 'deck-kanji-locked': ['E3'], 'context-no-recheck': ['E6'], 'context-no-reservation': ['E6'],
   'corridor-no-reservation': ['C2'], 'corridor-false-ack': ['C1', 'C3'], 'corridor-durable-unknown': ['C1', 'C3'], 'corridor-declined-alerts': ['C1'],
   'review-no-recheck': ['C6'], 'review-unlocked': ['C6'], 'review-stale-clock': ['C8'], 'hook-stale-clock': ['C8'],
-  'hook-owner-unpinned': ['C9'], 'review-owner-unpinned': ['C9'],
+  'hook-owner-unpinned': ['C9'], 'review-owner-unpinned': ['C9'], 'hook-ignores-binding-epoch': ['C10'], 'hook-skips-admission': ['C11'],
+  'r8-line-drift': ['P22'], 'r7-help-cap': ['P23'], 'policy-unpinned': ['P23'], 'shown-answer-honours-label': ['P23'],
   'grade-passive': ['P1'], 'trust-target': ['P14'], 'open-surface': ['P13'], 'ignore-help': ['P3', 'P4'], 'late-help-counts': ['P4'],
   'facet-optional': ['P13'], 'loose-time': ['P13'], 'trust-tap': ['P6'], 'reveal-is-recall': ['P6'], 'no-day-cap': ['P7', 'P8'],
   'stale-commit': ['P15'], 'no-shared-boundary': ['P15'], 'unlocked-fallback': ['P16', 'P20'], 'release-any': ['P17'],
   'uncertain-releases': ['P18'], 'loose-id': ['P13'], 'stale-clock': ['P19'], 'silent-refusal': ['P20'],
   'banning-uncertain-line': ['P21'], 'swap-safe-lines': ['P22'], 'drop-anzen': ['P22'], 'mark-after-publish': ['P16'], 'false-ack-releases': ['P18'], 'abandon-penalty': ['P10'],
+  ...r8.R8_EXPECT,
 };
 
 function mutate(source, edits, name) {
@@ -952,7 +1025,8 @@ const report = {
   spec: { path: 'one-hand/SRS/HOOKS-SPEC.md', sha256: '4fae8c1b14f844e6d6491fe4c3e7b520280f568f12ad1260ed4a02c902198a20', verdict: 'W2 PASS (design model), 2026-10-21T02:01' },
   sources: { 'srs-core.mjs': sha(CORE_SOURCE), 'corridor.js': sha(CORRIDOR_SOURCE), 'decks/player/engine.js': sha(ENGINE_SOURCES.deck),
     'decks/context-dense/engine.js': sha(ENGINE_SOURCES.context), 'vendor/ts-fsrs.mjs': sha(readFileSync(join(CORRIDOR, 'vendor/ts-fsrs.mjs'))),
-    'data/fsrs-pin.json': sha(readFileSync(join(CORRIDOR, 'data/fsrs-pin.json'))) },
+    'data/fsrs-pin.json': sha(readFileSync(join(CORRIDOR, 'data/fsrs-pin.json'))), 'kanji-course.js': sha(R8_SOURCES.course),
+    'help-relevance.mjs': sha(R8_SOURCES.relevance), 'review-caller.mjs': sha(R8_SOURCES.caller), 'data/help-relevance-catalog.json': sha(R8_SOURCES.catalog) },
   scope: 'product code in three layers: srs-core (P), the deck engines (E), corridor.js lifted into a vm (C); test doubles for ledgers, the record app, storage and the Web Lock; the refusal UI and the phone-walk origin need a browser (§7 items 9, 11)',
   node: process.version,
   timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -990,6 +1064,14 @@ if (!args.includes('--no-controls')) {
     const caught = EXPECT[name].every((id) => failed.includes(id));
     report.controls.push({ name, layer: 'corridor', failed, expected: EXPECT[name], caught });
     console.log(`${caught ? 'CAUGHT' : 'MISSED'} control ${name} (corridor): red ${failed.join(', ') || 'none'} (expects ${EXPECT[name].join(', ')})`);
+    ok &&= caught;
+  }
+  for (const [name, edits] of Object.entries(r8.CALLER_MUTANTS)) {
+    const caller = await importSource(mutate(R8_SOURCES.caller, edits, name));
+    const failed = (await glueSuite(core, engines, corridorProgram, { ...R8_MODS, caller })).filter((c) => !c.pass).map((c) => c.id);
+    const caught = EXPECT[name].every((id) => failed.includes(id));
+    report.controls.push({ name, layer: 'caller', failed, expected: EXPECT[name], caught });
+    console.log(`${caught ? 'CAUGHT' : 'MISSED'} control ${name} (caller): red ${failed.join(', ') || 'none'} (expects ${EXPECT[name].join(', ')})`);
     ok &&= caught;
   }
 }

@@ -1,0 +1,676 @@
+{
+  "policy": "w3-help-relevance-r8-v1",
+  "sourceVersion": "9f0691b2f04c3abcb5898ceebf148f879b112dd35831ae4ae814ac1fc1770a06",
+  "pins": [
+    {
+      "path": "prototypes/corridor/srs-core.mjs",
+      "sha256": "e3814b711abc517421674514320d30bf3efd62fdadb68cf6592f71d6a3a3ae9a"
+    },
+    {
+      "path": "prototypes/corridor/data/share_alike/kanji-structure.json",
+      "sha256": "1d20c18a662734f84eb6b718457de35536d51952b56328cefa7eaa111251537a"
+    },
+    {
+      "path": "prototypes/corridor/data/share_alike/kanji-family.json",
+      "sha256": "d164ec7b2fe39c5920d7fc05f4731c79db535815c5495aea7c2904b59532499b"
+    },
+    {
+      "path": "prototypes/corridor/kanji-course.js",
+      "sha256": "90e2696fb4dccf8f157d3dbc59bbc7571cfded9b338dbb9b2187dad0ab89efb8"
+    }
+  ],
+  "pairs": [
+    {
+      "items": [
+        "丶",
+        "織"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "織",
+          "groupPath": "$/0/1/1/2/0",
+          "svgSha256": "464a97cde3a8cba2aff6c5eeefa99a377526bde24ce8d53cbbd9d1e1350233d1"
+        }
+      ]
+    },
+    {
+      "items": [
+        "丶",
+        "職"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "職",
+          "groupPath": "$/0/1/1/2/0",
+          "svgSha256": "c004baafee3021780fa772c6da927bc30cf40c379da96e8ae5b41e927337f1ee"
+        }
+      ]
+    },
+    {
+      "items": [
+        "丶",
+        "識"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "識",
+          "groupPath": "$/0/1/1/2/0",
+          "svgSha256": "4fb80f7684e1299ddea6e056cc65fed76599e584ac06330d29bf6ecf22f90abd"
+        }
+      ]
+    },
+    {
+      "items": [
+        "丿",
+        "織"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "織",
+          "groupPath": "$/0/1/1/1",
+          "svgSha256": "464a97cde3a8cba2aff6c5eeefa99a377526bde24ce8d53cbbd9d1e1350233d1"
+        }
+      ]
+    },
+    {
+      "items": [
+        "丿",
+        "職"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "職",
+          "groupPath": "$/0/1/1/1",
+          "svgSha256": "c004baafee3021780fa772c6da927bc30cf40c379da96e8ae5b41e927337f1ee"
+        }
+      ]
+    },
+    {
+      "items": [
+        "丿",
+        "識"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "識",
+          "groupPath": "$/0/1/1/1",
+          "svgSha256": "4fb80f7684e1299ddea6e056cc65fed76599e584ac06330d29bf6ecf22f90abd"
+        }
+      ]
+    },
+    {
+      "items": [
+        "口",
+        "品"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "品",
+          "groupPath": "$/0/0",
+          "svgSha256": "cff55162576da9e9c76cf9abd2eaba5b5313421d7a27c99a421dfb6e7b182f15"
+        },
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "品",
+          "groupPath": "$/0/1/0",
+          "svgSha256": "cff55162576da9e9c76cf9abd2eaba5b5313421d7a27c99a421dfb6e7b182f15"
+        },
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "品",
+          "groupPath": "$/0/1/1",
+          "svgSha256": "cff55162576da9e9c76cf9abd2eaba5b5313421d7a27c99a421dfb6e7b182f15"
+        }
+      ]
+    },
+    {
+      "items": [
+        "口",
+        "識"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "識",
+          "groupPath": "$/0/0/4",
+          "svgSha256": "4fb80f7684e1299ddea6e056cc65fed76599e584ac06330d29bf6ecf22f90abd"
+        }
+      ]
+    },
+    {
+      "items": [
+        "弋",
+        "織"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "織",
+          "groupPath": "$/0/1/0/0/4/0",
+          "svgSha256": "464a97cde3a8cba2aff6c5eeefa99a377526bde24ce8d53cbbd9d1e1350233d1"
+        },
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "織",
+          "groupPath": "$/0/1/1/0",
+          "svgSha256": "464a97cde3a8cba2aff6c5eeefa99a377526bde24ce8d53cbbd9d1e1350233d1"
+        },
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "織",
+          "groupPath": "$/0/1/1/2",
+          "svgSha256": "464a97cde3a8cba2aff6c5eeefa99a377526bde24ce8d53cbbd9d1e1350233d1"
+        }
+      ]
+    },
+    {
+      "items": [
+        "弋",
+        "職"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "職",
+          "groupPath": "$/0/1/0/0/4/0",
+          "svgSha256": "c004baafee3021780fa772c6da927bc30cf40c379da96e8ae5b41e927337f1ee"
+        },
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "職",
+          "groupPath": "$/0/1/1/0",
+          "svgSha256": "c004baafee3021780fa772c6da927bc30cf40c379da96e8ae5b41e927337f1ee"
+        },
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "職",
+          "groupPath": "$/0/1/1/2",
+          "svgSha256": "c004baafee3021780fa772c6da927bc30cf40c379da96e8ae5b41e927337f1ee"
+        }
+      ]
+    },
+    {
+      "items": [
+        "弋",
+        "識"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "識",
+          "groupPath": "$/0/1/0/0/4/0",
+          "svgSha256": "4fb80f7684e1299ddea6e056cc65fed76599e584ac06330d29bf6ecf22f90abd"
+        },
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "識",
+          "groupPath": "$/0/1/1/0",
+          "svgSha256": "4fb80f7684e1299ddea6e056cc65fed76599e584ac06330d29bf6ecf22f90abd"
+        },
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "識",
+          "groupPath": "$/0/1/1/2",
+          "svgSha256": "4fb80f7684e1299ddea6e056cc65fed76599e584ac06330d29bf6ecf22f90abd"
+        }
+      ]
+    },
+    {
+      "items": [
+        "戈",
+        "織"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "織",
+          "groupPath": "$/0/1/0/0/4",
+          "svgSha256": "464a97cde3a8cba2aff6c5eeefa99a377526bde24ce8d53cbbd9d1e1350233d1"
+        },
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "織",
+          "groupPath": "$/0/1/1",
+          "svgSha256": "464a97cde3a8cba2aff6c5eeefa99a377526bde24ce8d53cbbd9d1e1350233d1"
+        }
+      ]
+    },
+    {
+      "items": [
+        "戈",
+        "職"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "職",
+          "groupPath": "$/0/1/0/0/4",
+          "svgSha256": "c004baafee3021780fa772c6da927bc30cf40c379da96e8ae5b41e927337f1ee"
+        },
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "職",
+          "groupPath": "$/0/1/1",
+          "svgSha256": "c004baafee3021780fa772c6da927bc30cf40c379da96e8ae5b41e927337f1ee"
+        }
+      ]
+    },
+    {
+      "items": [
+        "戈",
+        "識"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "識",
+          "groupPath": "$/0/1/0/0/4",
+          "svgSha256": "4fb80f7684e1299ddea6e056cc65fed76599e584ac06330d29bf6ecf22f90abd"
+        },
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "識",
+          "groupPath": "$/0/1/1",
+          "svgSha256": "4fb80f7684e1299ddea6e056cc65fed76599e584ac06330d29bf6ecf22f90abd"
+        }
+      ]
+    },
+    {
+      "items": [
+        "戠",
+        "織"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "織",
+          "groupPath": "$/0/1",
+          "svgSha256": "464a97cde3a8cba2aff6c5eeefa99a377526bde24ce8d53cbbd9d1e1350233d1"
+        },
+        {
+          "kind": "direct-attributed-component",
+          "file": "prototypes/corridor/data/share_alike/kanji-family.json",
+          "edgeId": "戠:phonetic-component-of:織",
+          "citations": [
+            {
+              "sourceId": "kanjipedia-7e54",
+              "locator": "なりたち"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "items": [
+        "戠",
+        "職"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "職",
+          "groupPath": "$/0/1",
+          "svgSha256": "c004baafee3021780fa772c6da927bc30cf40c379da96e8ae5b41e927337f1ee"
+        },
+        {
+          "kind": "direct-attributed-component",
+          "file": "prototypes/corridor/data/share_alike/kanji-family.json",
+          "edgeId": "戠:phonetic-component-of:職",
+          "citations": [
+            {
+              "sourceId": "kanjipedia-8077",
+              "locator": "なりたち"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "items": [
+        "戠",
+        "識"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "識",
+          "groupPath": "$/0/1",
+          "svgSha256": "4fb80f7684e1299ddea6e056cc65fed76599e584ac06330d29bf6ecf22f90abd"
+        },
+        {
+          "kind": "direct-attributed-component",
+          "file": "prototypes/corridor/data/share_alike/kanji-family.json",
+          "edgeId": "戠:phonetic-component-of:識",
+          "citations": [
+            {
+              "sourceId": "kanjipedia-8b58",
+              "locator": "なりたち"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "items": [
+        "日",
+        "晶"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "晶",
+          "groupPath": "$/0/0",
+          "svgSha256": "83d97dd8c14bbe606a564409157237617777de36b8c99fbe9cd0c170240785e5"
+        },
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "晶",
+          "groupPath": "$/0/1/0",
+          "svgSha256": "83d97dd8c14bbe606a564409157237617777de36b8c99fbe9cd0c170240785e5"
+        },
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "晶",
+          "groupPath": "$/0/1/1",
+          "svgSha256": "83d97dd8c14bbe606a564409157237617777de36b8c99fbe9cd0c170240785e5"
+        }
+      ]
+    },
+    {
+      "items": [
+        "日",
+        "織"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "織",
+          "groupPath": "$/0/1/0/1",
+          "svgSha256": "464a97cde3a8cba2aff6c5eeefa99a377526bde24ce8d53cbbd9d1e1350233d1"
+        }
+      ]
+    },
+    {
+      "items": [
+        "日",
+        "職"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "職",
+          "groupPath": "$/0/1/0/1",
+          "svgSha256": "c004baafee3021780fa772c6da927bc30cf40c379da96e8ae5b41e927337f1ee"
+        }
+      ]
+    },
+    {
+      "items": [
+        "日",
+        "識"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "識",
+          "groupPath": "$/0/1/0/1",
+          "svgSha256": "4fb80f7684e1299ddea6e056cc65fed76599e584ac06330d29bf6ecf22f90abd"
+        }
+      ]
+    },
+    {
+      "items": [
+        "木",
+        "森"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "森",
+          "groupPath": "$/0/0",
+          "svgSha256": "a6a066aa5824d08f01a00f86c996fe22cc499abcb41ba6fc32628b3785ea8e51"
+        },
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "森",
+          "groupPath": "$/0/1/0",
+          "svgSha256": "a6a066aa5824d08f01a00f86c996fe22cc499abcb41ba6fc32628b3785ea8e51"
+        },
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "森",
+          "groupPath": "$/0/1/1",
+          "svgSha256": "a6a066aa5824d08f01a00f86c996fe22cc499abcb41ba6fc32628b3785ea8e51"
+        }
+      ]
+    },
+    {
+      "items": [
+        "林",
+        "森"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "森",
+          "groupPath": "$/0/1",
+          "svgSha256": "a6a066aa5824d08f01a00f86c996fe22cc499abcb41ba6fc32628b3785ea8e51"
+        }
+      ]
+    },
+    {
+      "items": [
+        "立",
+        "織"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "織",
+          "groupPath": "$/0/1/0/0",
+          "svgSha256": "464a97cde3a8cba2aff6c5eeefa99a377526bde24ce8d53cbbd9d1e1350233d1"
+        }
+      ]
+    },
+    {
+      "items": [
+        "立",
+        "職"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "職",
+          "groupPath": "$/0/1/0/0",
+          "svgSha256": "c004baafee3021780fa772c6da927bc30cf40c379da96e8ae5b41e927337f1ee"
+        }
+      ]
+    },
+    {
+      "items": [
+        "立",
+        "識"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "識",
+          "groupPath": "$/0/1/0/0",
+          "svgSha256": "4fb80f7684e1299ddea6e056cc65fed76599e584ac06330d29bf6ecf22f90abd"
+        }
+      ]
+    },
+    {
+      "items": [
+        "糸",
+        "織"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "織",
+          "groupPath": "$/0/0",
+          "svgSha256": "464a97cde3a8cba2aff6c5eeefa99a377526bde24ce8d53cbbd9d1e1350233d1"
+        },
+        {
+          "kind": "direct-attributed-component",
+          "file": "prototypes/corridor/data/share_alike/kanji-family.json",
+          "edgeId": "糸:semantic-component-of:織",
+          "citations": [
+            {
+              "sourceId": "kanjipedia-7e54",
+              "locator": "なりたち"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "items": [
+        "織",
+        "音"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "織",
+          "groupPath": "$/0/1/0",
+          "svgSha256": "464a97cde3a8cba2aff6c5eeefa99a377526bde24ce8d53cbbd9d1e1350233d1"
+        }
+      ]
+    },
+    {
+      "items": [
+        "耳",
+        "職"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "職",
+          "groupPath": "$/0/0",
+          "svgSha256": "c004baafee3021780fa772c6da927bc30cf40c379da96e8ae5b41e927337f1ee"
+        },
+        {
+          "kind": "direct-attributed-component",
+          "file": "prototypes/corridor/data/share_alike/kanji-family.json",
+          "edgeId": "耳:semantic-component-of:職",
+          "citations": [
+            {
+              "sourceId": "kanjipedia-8077",
+              "locator": "なりたち"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "items": [
+        "職",
+        "音"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "職",
+          "groupPath": "$/0/1/0",
+          "svgSha256": "c004baafee3021780fa772c6da927bc30cf40c379da96e8ae5b41e927337f1ee"
+        }
+      ]
+    },
+    {
+      "items": [
+        "言",
+        "識"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "識",
+          "groupPath": "$/0/0",
+          "svgSha256": "4fb80f7684e1299ddea6e056cc65fed76599e584ac06330d29bf6ecf22f90abd"
+        },
+        {
+          "kind": "direct-attributed-component",
+          "file": "prototypes/corridor/data/share_alike/kanji-family.json",
+          "edgeId": "言:semantic-component-of:識",
+          "citations": [
+            {
+              "sourceId": "kanjipedia-8b58",
+              "locator": "なりたち"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "items": [
+        "識",
+        "音"
+      ],
+      "evidence": [
+        {
+          "kind": "geometry-only",
+          "file": "prototypes/corridor/data/share_alike/kanji-structure.json",
+          "host": "識",
+          "groupPath": "$/0/1/0",
+          "svgSha256": "4fb80f7684e1299ddea6e056cc65fed76599e584ac06330d29bf6ecf22f90abd"
+        }
+      ]
+    }
+  ],
+  "boundary": "Direct component/host relation only. No sibling/common-component closure, etymology inferred from geometry, or alias expansion."
+}

@@ -116,6 +116,8 @@ try {
     'kanji-structure.js',
     'kanji-family.js',
     'kanji-course.js',
+    'review-caller.mjs',
+    'help-relevance.mjs',
     'decks/context-dense/engine.js',
     'decks/context-dense/mount.js',
     'decks/player/engine.js',
