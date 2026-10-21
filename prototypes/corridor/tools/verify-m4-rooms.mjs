@@ -194,6 +194,19 @@ test('R9', 'Japanese: the room lines show on the Japanese key', (src) => {
   for (const id of ['R-08', 'R-11', 'R-09']) assert.ok(p.text().includes(p.copy(id)), id);
 });
 
+test('R10', 'W12 1928: R-01 in Lessons reuses a visit holding an unfinished run; Meaning is then blocked and R-11 returns to the same prompt', (src) => {
+  const p = page(src);
+  into(p, 'reading'); answer(p);
+  const visit = p.S.kanjiCourse, attempt = p.course.currentAttempt(visit.run).attemptId; visit.draft = 'そ';
+  const menu = new Element('main'); p.context.renderKanjiCourseMenu(menu);
+  all(menu).find((e) => e.id === 'kanji-room-lessons').click();
+  assert.equal(p.S.kanjiCourse, visit, 'the same visit, not a new one');
+  p.click('kanji-room-meaning');
+  assert.ok(p.text().includes(p.copy('R-08')));
+  p.click('kanji-room-return');
+  assert.equal(p.course.currentAttempt(visit.run).attemptId, attempt); assert.equal(p.find('kanji-course-answer')?.value, 'そ');
+});
+
 /** one targeted mutant per room rule; each must turn its own case red */
 export const MUTANTS = {
   'blocked-starts-run': ['R3', [["  visit.blocked = entry.startsWith('blocked-') ? entry.slice('blocked-'.length) : null;\n  if (entry === 'start') Object.assign(visit, { room, stage: 'intro', index: 0, feedback: null });",
@@ -207,6 +220,7 @@ export const MUTANTS = {
   'carried-strip-shows-reading': ['R2', [["main.append(el('p', 'fine', tx(...M4_COPY['R-07'])));", "main.append(el('p', 'fine', `${tx(...M4_COPY['R-07'])} しょくぎょう`));"]]],
   'room-name-ignored': ['R2', [["  if (view === 'lessons' && !S.kanjiCourse?.chooser && ['reading', 'meaning'].includes(S.kanjiCourse?.room)) {", '  if (false) {']]],
   'finished-run-still-occupies': ['R6', [['  if (!run || run.complete || run.schemaVersion !== 2) return null;', '  if (!run || run.schemaVersion !== 2) return null;']]],
+  'lessons-door-replaces-visit': ['R10', [["      if (S.kanjiCourse?.unitId === 'shiki-shoku') Object.assign(S.kanjiCourse, { chooser: true, blocked: null });\n      else S.kanjiCourse =", '      S.kanjiCourse =']]],
   'room-door-on-every-word': ['R8', [["if (unit.id === 'shiki-shoku' && node.t === 'word' && node.id === '職業') {", "if (unit.id === 'shiki-shoku') {"]]],
 };
 
