@@ -88,7 +88,8 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
  insist(text(buildId),'build-identity-required');
  let on=enabled===true, owner=cp(port.binding()),root=null,phase='closed',holdUntil=-Infinity,lastNow=clock();
  let generation=null,activation=null,offDay=null,diagnostics=[],holdEpoch=0;
- const helpTickets=new WeakMap(),snapshots=new WeakMap(),preparations=new WeakMap(),dispatches=new WeakMap();
+ const helpTickets=new WeakMap(),snapshots=new WeakMap(),preparations=new WeakMap(),dispatches=new WeakMap(),completions=new WeakMap();
+ let bootToken=null,pendingByGoal=new Map();
  const dayEnd=t=>core.endOfDay(new Date(t));
  const current=()=>port.snapshot();
  const quality=s=>{const q=classify(s);return q==='valid'&&!s.daily.events.every(e=>
@@ -117,15 +118,18 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
  }
  function clearRetiredHold(){const w=witnesses();if(w.expiredHold){try{insist(device.remove(MARKERS.hold)===true,'device-clear-failed');}catch{diagnostics.push('hold-marker-clear-unavailable');}}}
  function held(reason,until=dayEnd(clock())){phase=reason;holdUntil=Math.max(holdUntil,until);holdEpoch++;return inspect();}
- function* write(next,action,{control=false}={}){
+ function* write(next,action,{control=false,observe=null}={}){
   insist(on,'switch-off');insist(owns(),'owner-epoch');
   const before=current(),auth=authority(before);
   insist(auth.generation===generation,'generation-changed');
   next.lastWriterBuild=buildId;
   insist(classify(next)==='valid','root-invalid');
   insist(bytes(next)<=(control?LIMITS.bytes:LIMITS.dataBytes),'byte-bound');
-  const result=yield port.commit({revision:before.revision,rootHash:digest(before.record.m4Journey??null),
-   generation,epoch:owner.epoch,switchOn:on},cp(next),{action,generation,journeyId:next.id});
+  const sent=cp(next),result=yield port.commit({revision:before.revision,rootHash:digest(before.record.m4Journey??null),
+   generation,epoch:owner.epoch,switchOn:on},sent,{action,generation,journeyId:next.id});
+  // M4 S1 (W5 1750): this call's own observer sees its port result before the unchanged boolean below
+  if(typeof observe==='function')try{observe(freeze({action,outcome:result?.outcome??null,acknowledged:result?.acknowledged===true,
+   rootHash:result?.rootHash??null,proposedHash:digest(sent)}));}catch{}
   if(result.outcome==='published'&&result.acknowledged===true){root=cp(current().record.m4Journey);return true;}
   held('publication-hold');return false;
  }
@@ -145,7 +149,8 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
   return next;
  }
  function* boot(){
-  owner=cp(port.binding());activation=Object.freeze({});phase='closed';holdUntil=-Infinity;lastNow=clock();diagnostics=[];
+  owner=cp(port.binding());activation=Object.freeze({});bootToken=Object.freeze({});pendingByGoal=new Map();
+  phase='closed';holdUntil=-Infinity;lastNow=clock();diagnostics=[];
   const s=current();let auth;
   const rootQuality=quality(s.record.m4Journey);root=s.record.m4Journey===undefined?null:cp(s.record.m4Journey);
   // OFF never uses this root to grade: diagnostics only, exact a8 page ledger.
@@ -198,8 +203,8 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
   insist(current().record.m4Journey?.revision===root.revision,'stale-root');
   const witness=witnesses();if(phase==='active'&&witness.doubt)yield* hold(witness.doubt,witness.until);}
  function* reviewable(){yield* usable();insist(phase==='active'&&clock()>holdUntil,'day-hold');}
- function* change(action,fn,{shrinkingControl=false}={}){yield* usable();const next=nextRoot();fn(next);
-  insist((yield* write(next,action,{control:shrinkingControl&&bytes(next)<bytes(root)})),'publication-hold');return inspect();}
+ function* change(action,fn,{shrinkingControl=false,observe=null}={}){yield* usable();const next=nextRoot();fn(next);
+  insist((yield* write(next,action,{control:shrinkingControl&&bytes(next)<bytes(root),observe})),'publication-hold');return inspect();}
  function* hold(reason,until=dayEnd(clock())){
   held(reason,until);if(on&&owns()){
    if(!markHold(reason))diagnostics.push('hold-marker-unavailable');
@@ -222,17 +227,46 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
   * preparation revives: their tokens bind the activation and day they were made in */
  function reconcile(){const s=current();let auth;try{auth=authority(s);}catch{return;}const host=s.record.m4Journey;
   if(auth.generation===generation&&classify(host)==='valid'&&host.id===root.id&&host.generation===generation&&host.revision>root.revision)root=cp(host);}
- function* enter(entrance){return yield* change('visit',s=>{insist(s.daily.visits<LIMITS.visits,'visit-bound');s.daily.visits++;s.location=entrance;});}
- function* work(kind,data){insist(['goals','projects'].includes(kind),'work-kind');return yield* change('work',s=>{
+ function* enter(entrance,{observe=null}={}){return yield* change('visit',s=>{insist(s.daily.visits<LIMITS.visits,'visit-bound');s.daily.visits++;s.location=entrance;},{observe});}
+ function* work(kind,data,{observe=null}={}){insist(['goals','projects'].includes(kind),'work-kind');return yield* change('work',s=>{
   insist(plain(data)&&s[kind].length<LIMITS[kind],'work-bound');
   const key=kind==='goals'?'nextGoal':'nextProject';insist(Number.isSafeInteger(s[key]+1),'identity-exhausted');
   s[key]++;s[kind].push({...cp(data),id:s.id+'/'+kind+'/'+s[key],status:data.status??'unfinished'});
- });}
- function* retire(kind,id,decision){return yield* change('retire-work',s=>{
+ },{observe});}
+ function* retire(kind,id,decision,{observe=null}={}){return yield* change('retire-work',s=>{
   insist(['goals','projects'].includes(kind),'work-kind');const i=s[kind].findIndex(v=>v.id===id);insist(i>=0,'work-missing');
   insist(decision==='retire-completed'&&s[kind][i].status==='completed'||decision==='abandon-and-retire','explicit-retirement');
   s[kind].splice(i,1);s.progress[kind==='goals'?'retiredGoals':'retiredProjects']++;
- },{shrinkingControl:true});}
+ },{shrinkingControl:true,observe});}
+ /** M4 S1 (W5 1746/1750): the quest adapter's proof that a bound Reading run qualified. Opaque and held here, one pending per
+  * goal; only boot() resets them, so a reload or a switch never revives one */
+ function completionTicket(goalId,practiceSession,seed){
+  insist(on,'switch-off');insist(owns(),'owner-epoch');
+  insist(root&&classify(root)==='valid'&&!['missing-root-hold','invalid-root-hold','unowned-root-hold','authority-unavailable'].includes(phase),'root-unavailable');
+  const goal=root.goals.find(g=>g.id===goalId);insist(goal,'work-missing');
+  insist(goal.status==='unfinished'&&plain(seed)&&same(goal.seed,seed)&&text(practiceSession),'completion-mismatch');
+  const prior=pendingByGoal.get(goalId);insist(!prior||completions.get(prior)?.state==='refused','completion-pending');
+  const ticket=Object.freeze({});
+  completions.set(ticket,{goalId,practiceSession,seed:cp(seed),boot:bootToken,generation,journeyId:root.id,owner:cp(owner),state:'minted'});
+  pendingByGoal.set(goalId,ticket);return ticket;
+ }
+ /** the goal's one status change, under the existing work action. Done needs the bridge's own exact-root acknowledgement */
+ function* completeGoal(goalId,ticket,{observe=null}={}){
+  const t=completions.get(ticket),bound=()=>t.boot===bootToken&&t.generation===generation&&same(t.owner,owner)&&t.journeyId===root?.id;
+  insist(t&&t.goalId===goalId&&bound(),'stale-completion');insist(t.state==='minted'||t.state==='refused','completion-pending');
+  yield* usable();insist(bound(),'stale-completion');
+  const goal=root.goals.find(g=>g.id===goalId);insist(goal,'work-missing');
+  if(goal.status==='completed'){t.state='settled';return {write:false,alreadyCompleted:true,phase};}
+  let seen=null;t.state='submitting';
+  try{yield* change('work',s=>{const g=s.goals.find(x=>x.id===goalId);
+    insist(g&&g.status==='unfinished'&&same(g.seed,t.seed),'completion-mismatch');g.status='completed';g.practiceSession=t.practiceSession;},
+   {observe:r=>{seen=r;if(typeof observe==='function')observe(r);}});}
+  catch(error){t.state=seen?.outcome==='uncertain'?'uncertain':'refused';throw error;}
+  const confirmed=seen?.outcome==='published'&&seen.acknowledged===true&&seen.rootHash===seen.proposedHash&&
+   digest(root)===seen.proposedHash&&owns()&&root.goals.find(g=>g.id===goalId)?.status==='completed';
+  if(!confirmed){t.state='uncertain';held('publication-hold');return {write:true,confirmed:false,phase};}
+  t.state='published';return {write:true,confirmed:true,phase};
+ }
  function* beginHelp(entries){yield* usable();
   const token=Object.freeze({}),t={activation,owner:cp(owner),generation,dayEpoch:root.dayEpoch,started:clock(),done:false};
   helpTickets.set(token,t);
@@ -329,6 +363,7 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
    await port.wait(t.operation,left());}}
  const ready=run(boot);
  return {ready,inspect,boot:op(boot),setSwitch:op(setSwitch),tick:op(tick),enter:op(enter),work:op(work),retire:op(retire),
+  completionTicket,completeGoal:op(completeGoal),
   beginHelp:op(beginHelp),finishHelp:op(finishHelp),awaitHelp,holdAtDeadline,beforeAnswer:op(beforeAnswer),prepare:op(prepare),reserve:op(reserve),
   admitAtLock,settle:op(settle),assertReviewable:op(reviewable),namespace:()=>root.id+'/'+root.dayEpoch+'/'};
 }
