@@ -118,6 +118,7 @@ try {
     'kanji-course.js',
     'review-caller.mjs',
     'help-relevance.mjs',
+    'journey-lifecycle.mjs',
     'decks/context-dense/engine.js',
     'decks/context-dense/mount.js',
     'decks/player/engine.js',

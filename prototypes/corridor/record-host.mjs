@@ -28,13 +28,24 @@ const NOTE_CHOOSE = 'host.note-choose/1';
 const NOTE_RESTORE_ORIGINAL = 'host.note-restore-original/1';
 const READING_RESUME = 'host.reading-resume/1';
 const SOURCE_REFERENCE = 'host.source-reference/1';
+/** HOOKS r8 rev 3.2 §7: the one write path of the learner record's m4Journey root. Its receipt is the journey's creation
+ * and lifecycle witness; the actions are journey-lifecycle.mjs's */
+const JOURNEY_LIFECYCLE = 'journey.lifecycle/1';
+const JOURNEY_ACTIONS = new Set(['bootstrap', 'activate', 'retire-generation', 'rotate', 'hold', 'help', 'visit', 'work', 'retire-work',
+  'snapshot', 'prepare', 'dispatch', 'settlement', 'late-settlement']);
+const JOURNEY_CREATION = new Set(['bootstrap', 'activate', 'retire-generation']);
+const JOURNEY_ROOT_BYTES = 262144;
 const NOTE_COMMANDS = new Set([NOTE_CREATE, NOTE_EDIT, NOTE_DELETE, NOTE_RESTORE, NOTE_CHOOSE, NOTE_RESTORE_ORIGINAL]);
-const BUILTIN = new Set(['host.observations/1', 'host.archive/1', 'host.restore/1', 'host.restore/2', ...NOTE_COMMANDS, PRACTICE_FINALIZE, ASSESSMENT_FINALIZE, ASSESSMENT_SUPPRESS, ASSESSMENT_RECONCILE, ASSESSMENT_ENRICH, READING_RESUME, SOURCE_REFERENCE]);
+const BUILTIN = new Set(['host.observations/1', 'host.archive/1', 'host.restore/1', 'host.restore/2', ...NOTE_COMMANDS, PRACTICE_FINALIZE, ASSESSMENT_FINALIZE, ASSESSMENT_SUPPRESS, ASSESSMENT_RECONCILE, ASSESSMENT_ENRICH, READING_RESUME, SOURCE_REFERENCE, JOURNEY_LIFECYCLE]);
 const own = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
 const plain = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 const copy = (value) => encodeLocalJson(value).value;
 const digest = (value) => encodeLocalJson(value).sha256;
 const same = (a, b) => encodeLocalJson(a).text === encodeLocalJson(b).text;
+const deepFreeze = (value) => {
+  if (value !== null && typeof value === 'object' && !Object.isFrozen(value)) { Object.values(value).forEach(deepFreeze); Object.freeze(value); }
+  return value;
+};
 const scopeOf = (binding) => ({ accountId: binding.accountId, learnerId: binding.learnerId });
 
 export class RecordHostError extends Error {
@@ -372,6 +383,17 @@ function suppressionEvidence(value) {
     Array.isArray(value.operations) && value.operations.length === value.keys.length, 'unsupported-command-receipt');
   noteRefs(value.operations);
 }
+function journeyEvidence(value) {
+  keys(value, ['action', 'generation', 'journeyId', 'rootSha256'], [], 'unsupported-command-receipt');
+  insist(JOURNEY_ACTIONS.has(value.action) && id(value.journeyId) && ['generation', 'rootSha256'].every((key) =>
+    typeof value[key] === 'string' && /^[0-9a-f]{64}$/u.test(value[key])), 'unsupported-command-receipt');
+}
+/** the generation the journey belongs to: the owned migration, the scope and the latest restore (journey-lifecycle.mjs authority) */
+function journeyGeneration(migrationId, binding, receipts) {
+  const restores = [...receipts.values()].filter((row) => row.type === 'host.restore/1' || row.type === 'host.restore/2')
+    .sort((a, b) => a.committedRevision - b.committedRevision);
+  return digest([migrationId, scopeOf(binding), restores.at(-1)?.changeId ?? 'origin']);
+}
 function sourceReferenceEvidence(value) {
   keys(value, ['captureId', 'intentSha256', 'operation'], [], 'unsupported-command-receipt');
   insist(typeof value.captureId === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u.test(value.captureId) &&
@@ -402,6 +424,7 @@ class RecordHost {
   #assessmentFormResolver;
   #assessmentPresentationResolver;
   #tail = Promise.resolve(); #closed = false; #published = Object.freeze({ status: 'uninitialized' }); #publishedWriter = null;
+  #journey = Object.freeze({ status: 'uninitialized' });
   constructor(options) {
     this.#controller = options.controller; this.#writer = options.writer; this.#binding = copy(options.binding);
     this.#validateRecord = options.validateRecord; this.#validateArchive = options.validateArchive;
@@ -443,13 +466,17 @@ class RecordHost {
   }
   #checkedReceipt(value, rowId, revision) {
     keys(value, ['format', 'version', 'changeId', 'type', 'occurredAt', 'scope', 'commandSha256',
-      'beforeRevision', 'committedRevision', 'recordSha256', 'archiveSha256'], value.type === PRACTICE_FINALIZE ? ['practice'] : value.type === ASSESSMENT_FINALIZE ? ['assessment'] : value.type === ASSESSMENT_SUPPRESS ? ['learningSuppression'] : value.type === ASSESSMENT_ENRICH ? ['learningEnrichment'] : value.type === ASSESSMENT_RECONCILE ? ['assessmentReconciliation'] : value.type === SOURCE_REFERENCE ? ['sourceReference'] : [], 'unsupported-command-receipt');
+      'beforeRevision', 'committedRevision', 'recordSha256', 'archiveSha256'], value.type === JOURNEY_LIFECYCLE ? ['journey'] : value.type === PRACTICE_FINALIZE ? ['practice'] : value.type === ASSESSMENT_FINALIZE ? ['assessment'] : value.type === ASSESSMENT_SUPPRESS ? ['learningSuppression'] : value.type === ASSESSMENT_ENRICH ? ['learningEnrichment'] : value.type === ASSESSMENT_RECONCILE ? ['assessmentReconciliation'] : value.type === SOURCE_REFERENCE ? ['sourceReference'] : [], 'unsupported-command-receipt');
     insist(value.format === 'kairo-local-command-receipt' && value.version === 1 && id(rowId) && value.changeId === rowId &&
       id(value.type) && same(value.scope, scopeOf(this.#binding)) && Number.isSafeInteger(value.beforeRevision) && value.beforeRevision >= 0 &&
       value.committedRevision === value.beforeRevision + 1 && value.committedRevision <= revision &&
       ['commandSha256', 'recordSha256', 'archiveSha256'].every((key) => typeof value[key] === 'string' && /^[0-9a-f]{64}$/u.test(value[key])),
     'unsupported-command-receipt');
     instant(value.occurredAt);
+    if (value.type === JOURNEY_LIFECYCLE) {
+      insist(own(value, 'journey'), 'unsupported-command-receipt'); journeyEvidence(value.journey);
+      insist(new globalThis.TextEncoder().encode(encodeLocalJson(value).text).byteLength <= 4096, 'unsupported-command-receipt');
+    }
     if (value.type === PRACTICE_FINALIZE) { practiceEvidence(value.practice); insist(new globalThis.TextEncoder().encode(encodeLocalJson(value).text).byteLength <= 4096, 'unsupported-command-receipt'); }
     if (value.type === ASSESSMENT_FINALIZE) { assessmentEvidence(value.assessment); insist(new globalThis.TextEncoder().encode(encodeLocalJson(value).text).byteLength <= 8192, 'unsupported-command-receipt'); }
     if (value.type === ASSESSMENT_SUPPRESS) { suppressionEvidence(value.learningSuppression); insist(new globalThis.TextEncoder().encode(encodeLocalJson(value).text).byteLength <= 65_536, 'unsupported-command-receipt'); }
@@ -506,9 +533,17 @@ class RecordHost {
   #publish(captured, state) {
     this.#guard(captured);
     this.#published = copy({ status: 'active', snapshot: this.#view(state) }); this.#publishedWriter = captured;
+    // The journey's authority from the same confirmed state: #read checked every receipt, and the projection keeps the
+    // ones authority reads (restores and journey creations), so it stays small as the journal grows. Plain JSON objects,
+    // as the lifecycle's plain-data checks expect
+    this.#journey = deepFreeze(JSON.parse(encodeLocalJson({ status: 'active', migrationId: state.outcome.migrationId, scope: scopeOf(this.#binding),
+      revision: state.snapshot.revision, commands: [...state.receipts.values()].filter((row) => row.type === 'host.restore/1' ||
+        row.type === 'host.restore/2' || (row.type === JOURNEY_LIFECYCLE && JOURNEY_CREATION.has(row.journey.action))),
+      record: own(state.record, 'm4Journey') ? { m4Journey: state.record.m4Journey } : {} }).text));
     return this.#published;
   }
   #block(outcome) {
+    this.#journey = Object.freeze({ status: outcome.status || 'recovery-required' });
     const lastCommitted = this.#published.snapshot || this.#published.lastCommitted;
     this.#published = copy({ ...outcome, ...(lastCommitted ? { lastCommitted } : {}) });
     return this.#published;
@@ -952,6 +987,82 @@ class RecordHost {
       return this.#failure(error, { changeId: value.changeId,
         ...(receipt ? { targetCommitDurable: true, targetReceipt: receipt } : {}) });
     }
+  }
+  /** One journey write (rev 3.2 §7.2): only m4Journey changes, against the latest record, with its typed receipt in the same
+   * transaction. The precondition is the root's own hash and the journey's generation, never the record revision, so an
+   * ordinary grade between two journey writes moves nothing. A refusal (moved root, other generation, closed gate) rejects
+   * before any commit and leaves the host as it was */
+  async #journeyCommit(captured, value, gate) {
+    let state;
+    try { state = await this.#read(captured); }
+    catch (error) { return this.#failure(error, { changeId: value.changeId }); }
+    if (state.outcome.status !== 'active') return this.#block(state.outcome);
+    const fingerprint = digest({ scope: scopeOf(this.#binding), type: value.type, occurredAt: value.occurredAt, input: value.input });
+    const prior = state.receipts.get(value.changeId);
+    if (prior) {
+      insist(prior.commandSha256 === fingerprint && prior.type === value.type && prior.occurredAt === value.occurredAt, 'command-id-conflict');
+      this.#publish(captured, state);
+      return { ...this.#ack(prior, 'duplicate', state), journey: copy(prior.journey) };
+    }
+    keys(value.input, ['expected', 'root', 'journey']);
+    const { expected, root, journey } = value.input;
+    keys(expected, ['rootSha256', 'generation']);
+    keys(journey, ['action', 'journeyId']);
+    insist(JOURNEY_ACTIONS.has(journey.action) && id(journey.journeyId) && plain(root) && root.version === 1 && root.protocol === 'journey-r2' &&
+      root.id === journey.journeyId && new globalThis.TextEncoder().encode(encodeLocalJson(root).text).byteLength <= JOURNEY_ROOT_BYTES,
+    'invalid-journey-command');
+    const generation = journeyGeneration(state.outcome.migrationId, this.#binding, state.receipts);
+    insist(expected.generation === generation && root.generation === generation, 'journey-generation-changed');
+    insist(expected.rootSha256 === digest(own(state.record, 'm4Journey') ? state.record.m4Journey : null), 'journey-root-moved');
+    insist(gate() === true, 'journey-gate-closed');
+    insist(Number.isSafeInteger(state.snapshot.revision + 1), 'revision-exhausted');
+    const record = copy({ ...state.record, m4Journey: root });
+    this.#validate(record, state.archive);
+    const row = { format: 'kairo-local-command-receipt', version: 1, changeId: value.changeId, type: value.type,
+      occurredAt: value.occurredAt, scope: scopeOf(this.#binding), commandSha256: fingerprint,
+      beforeRevision: state.snapshot.revision, committedRevision: state.snapshot.revision + 1,
+      recordSha256: digest(record), archiveSha256: digest(state.archive),
+      journey: { action: journey.action, generation, journeyId: journey.journeyId, rootSha256: digest(root) } };
+    this.#checkedReceipt(row, row.changeId, row.committedRevision);
+    const request = copy({ changeId: `host-command:${digest([scopeOf(this.#binding), value.changeId])}`,
+      binding: this.#binding, expectedRevision: row.beforeRevision, occurredAt: value.occurredAt,
+      mutations: [{ kind: 'put', collection: RECORD, id: CURRENT, value: record },
+        { kind: 'put', collection: COMMANDS, id: value.changeId, value: row }], operations: [] });
+    let receipt;
+    try {
+      this.#guard(captured);
+      const outcome = await this.#controller.commitLocal(request);
+      receipt = outcome.receipt || outcome.targetReceipt;
+      this.#guard(captured);
+      if (outcome.status !== 'active') return this.#block({ ...outcome, changeId: value.changeId });
+      insist(receipt && receipt.committedRevision === row.committedRevision, 'command-receipt-mismatch');
+      const current = await this.#read(captured);
+      if (current.outcome.status !== 'active') return this.#block({ ...current.outcome, changeId: value.changeId,
+        targetCommitDurable: true, targetReceipt: receipt });
+      insist(same(current.receipts.get(value.changeId), row), 'command-receipt-mismatch');
+      this.#publish(captured, current);
+      return { ...this.#ack(row, receipt.outcome === 'duplicate' ? 'duplicate' : 'committed', current), journey: copy(row.journey) };
+    } catch (error) {
+      return this.#failure(error, { changeId: value.changeId,
+        ...(receipt ? { targetCommitDurable: true, targetReceipt: receipt } : {}) });
+    }
+  }
+
+  /** HOOKS r8 rev 3.2 §7: the journey's view of the last confirmed state (journey-lifecycle.mjs port.snapshot), frozen and
+   * never a proposed root. An invalidated writer sees no authority */
+  journeyAuthority() {
+    if (this.#publishedWriter) {
+      try { this.#guard(this.#publishedWriter); } catch { return Object.freeze({ status: 'recovery-required' }); }
+    }
+    return this.#journey;
+  }
+  /** the one way to write m4Journey; gate() is asked again at the commit boundary (rev 3.2 §7.8: OFF or an owner change
+   * cancels an unapplied capture) */
+  commitJourney(raw, input, gate = () => true) {
+    let value;
+    try { insist(typeof gate === 'function', 'invalid-command'); value = baseCommand(raw, JOURNEY_LIFECYCLE, copy(input)); }
+    catch (error) { return Promise.reject(error); }
+    return this.#queue((captured) => this.#journeyCommit(captured, value, gate));
   }
 
   /** Last confirmed authority only. During a write it does not expose proposed

@@ -56,6 +56,8 @@ const recordImports = new Map([
   // HOOKS r8: the one review caller and W3's help-relevance rule, installed right after it
   ['./review-caller.mjs', 'reviewCaller'],
   ['./help-relevance.mjs', 'helpRelevance'],
+  // HOOKS r8 rev 3.2 §7: the journey's lifecycle, switched by JOURNEY_WRITES
+  ['./journey-lifecycle.mjs', 'journeyLifecycle'],
 ]);
 const assessmentImports = new Map([
   ['./assessment-v2-controller.mjs', 'assessmentV2'],

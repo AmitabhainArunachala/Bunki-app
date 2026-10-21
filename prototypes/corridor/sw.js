@@ -95,6 +95,8 @@ const SHELL = [
   'review-caller.mjs',
   'help-relevance.mjs',
   'data/help-relevance-catalog.json',
+  // HOOKS r8 rev 3.2 §7: the journey's lifecycle, switched by JOURNEY_WRITES
+  'journey-lifecycle.mjs',
   'dictionary-worker.js',
   'skip-core.js',
   'skip-ui.js',

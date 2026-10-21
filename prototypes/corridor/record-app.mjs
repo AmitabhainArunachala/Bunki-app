@@ -80,6 +80,8 @@ function expectedRoots(record, roots) {
 }
 function reducePatch({ record, revision }, input) {
   keys(input, ['patch', 'expected'], ['appendArchive', 'expectedRevision']);
+  // HOOKS r8 rev 3.2 §7.2: the journey root is written only by its typed command (record-host commitJourney)
+  insist(!own(input.patch, 'm4Journey'), 'journey-root-reserved');
   if (own(input.patch, 'assessmentQuestionPractice'))
     insist(Number.isSafeInteger(input.expectedRevision) && input.expectedRevision === revision, 'stale-question-snapshot');
   else if (own(input, 'expectedRevision'))
@@ -549,6 +551,16 @@ class RecordApp {
   }
   snapshot() {
     return this.#enqueue(async (captured) => this.#finish(captured, await this.#host.snapshot()));
+  }
+  /** HOOKS r8 rev 3.2 §7: the journey's confirmed authority, and its one write path, queued with every other write */
+  journeyAuthority() {
+    return this.#host.journeyAuthority();
+  }
+  commitJourney(input, gate) {
+    return this.#enqueue(
+      async (captured, meta) => this.#finish(captured, await this.#host.commitJourney(meta, input, gate)),
+      true,
+    );
   }
   /** A programming/producer error rejects before a target write. Operational
    * failures return recovery-required and preserve any durable target receipt. */
