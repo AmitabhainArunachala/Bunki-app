@@ -224,5 +224,183 @@
       geometry,
     });
   }
-  return Object.freeze({ createModel });
+  // Navigation is a projection of authored joins, never a graph completion or a
+  // learner-state operation. Its copies also isolate it from a replaced model.
+  function createNavigation({ model } = {}) {
+    check(model && ['catalog', 'node', 'example', 'geometry'].every(name =>
+      typeof model[name] === 'function'), 'navigation needs a family model');
+    const catalog = freeze(copy(model.catalog()));
+    const nodes = new Map(catalog.nodes.map(node => [key(node.reference), node]));
+    const sources = new Map(catalog.sources.map(source => [source.id, source]));
+    const examples = new Map(catalog.examples.map(row => [key(row.reference), row]));
+    const geometries = new Map(catalog.nodes.filter(node =>
+      node.reference.type === 'component-occurrence').map(node =>
+      [key(node.reference), freeze(copy(model.geometry(node.reference)))]));
+    const result = value => freeze(copy(value));
+    const invalid = reason => result({ status: 'invalid', reason });
+    const absent = reference => result({ status: 'absent', reference });
+    const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
+    const scalar = value => string(value) && [...value].length === 1 && !/[\uD800-\uDFFF]/u.test(value);
+    function exactFields(value, required, optional = []) {
+      return object(value) && required.every(field => own(value, field)) &&
+        Reflect.ownKeys(value).every(field => required.includes(field) || optional.includes(field));
+    }
+    function validReference(reference, allowed) {
+      if (!object(reference) || !allowed.includes(reference.type) || !string(reference.id) ||
+          !exactFields(reference, reference.type === 'word' ? ['type', 'id', 'reading'] : ['type', 'id'])) return false;
+      if (reference.type === 'kanji') return scalar(reference.id);
+      if (reference.type === 'word') return string(reference.reading);
+      try {
+        const tuple = JSON.parse(reference.id);
+        if (!Array.isArray(tuple) || tuple.length !== 5 || JSON.stringify(tuple) !== reference.id) return false;
+        if (reference.type === 'sentence-occurrence') return tuple[0] === 'bundled-example' &&
+          string(tuple[1]) && !tuple[1].startsWith('/') && !tuple[1].split('/').includes('..') &&
+          /^[a-f0-9]{64}$/u.test(tuple[2]) &&
+          tuple.slice(3).every(value => Number.isSafeInteger(value) && value >= 0);
+        return tuple[0] === 'kanjivg-occurrence' && /^[a-f0-9]{40}$/u.test(tuple[1]) &&
+          scalar(tuple[2]) && /^[a-f0-9]{64}$/u.test(tuple[3]) &&
+          /^\$(?:\/(?:0|[1-9][0-9]*))*$/u.test(tuple[4]);
+      } catch { return false; }
+    }
+    function resolve(reference, allowed) {
+      if (!validReference(reference, allowed)) return invalid('invalid-reference');
+      const node = nodes.get(key(reference));
+      if (node) return { status: 'available', node };
+      if (reference.type === 'word' && catalog.nodes.some(row =>
+        row.reference.type === 'word' && row.reference.id === reference.id)) return invalid('word-reading-mismatch');
+      return absent(reference);
+    }
+    const equalReference = (a, b) => key(a) === key(b);
+    function citations(evidence) {
+      return evidence.map(row => ({ ...row, source: sources.get(row.sourceId) }));
+    }
+    function edgeRow(edge, reference, direction = null) {
+      return {
+        edgeId: edge.id, relation: edge.relation, from: edge.from, to: edge.to,
+        direction: direction || (equalReference(edge.from, reference) ? 'outgoing' : 'incoming'),
+        evidence: edge.evidence, citations: citations(edge.evidence),
+        ...(edge.account ? { account: edge.account } : {}),
+        ...(edge.boundary ? { boundary: edge.boundary } : {}),
+      };
+    }
+    function exposureRows(rows, what) {
+      const byItem = new Map();
+      rows.forEach(({ about, reveals }) => {
+        const id = key(about);
+        if (!byItem.has(id)) byItem.set(id, { what, about, reveals: [] });
+        const current = byItem.get(id);
+        reveals.forEach(facet => { if (!current.reveals.includes(facet)) current.reveals.push(facet); });
+      });
+      return [...byItem.values()].map(row => ({ ...row,
+        reveals: ['reading', 'meaning'].filter(facet => row.reveals.includes(facet)),
+      }));
+    }
+    function view(reference) {
+      const resolved = resolve(reference, ['kanji', 'word']);
+      if (resolved.status !== 'available') return resolved;
+      const phonetic = [], semantic = [], occurrences = [], words = [], exampleRows = [];
+      for (const edge of catalog.edges) {
+        const direct = equalReference(edge.from, reference) || equalReference(edge.to, reference);
+        if (['phonetic-component', 'semantic-component'].includes(edge.relation) && direct) {
+          const host = nodes.get(key(edge.to));
+          const row = { ...edgeRow(edge, reference), host: edge.to, component: edge.from };
+          if (edge.relation === 'phonetic-component') {
+            row.readings = { ...host.familyReadings, citations: citations(host.familyReadings.evidence) };
+            phonetic.push(row);
+          } else semantic.push(row);
+        } else if (edge.relation === 'source-component-occurrence') {
+          const occurrence = nodes.get(key(edge.to));
+          if (direct || equalReference(occurrence.host, reference)) occurrences.push({
+            ...edgeRow(edge, reference, direct ? null : 'host'),
+            host: occurrence.host, component: occurrence.component, occurrence: occurrence.reference,
+            groupPath: occurrence.groupPath, sourceGroupId: occurrence.sourceGroupId,
+            sourceSha256: occurrence.sourceSha256, strokeIndices: occurrence.strokeIndices,
+            geometry: geometries.get(key(occurrence.reference)),
+          });
+        } else if (edge.relation === 'word-contains-kanji' && direct) {
+          const word = nodes.get(key(edge.from));
+          words.push({ ...edgeRow(edge, reference), word: word.reference,
+            rawRecord: word.rawRecord, scalarIndex: edge.scalarIndex });
+        }
+      }
+      for (const edge of catalog.edges.filter(row => row.relation === 'attested-word-occurrence')) {
+        const membership = words.find(row => equalReference(row.word, edge.to));
+        const direct = equalReference(edge.to, reference);
+        if (!direct && !membership) continue;
+        const example = examples.get(key(edge.from));
+        exampleRows.push({ ...edgeRow(edge, reference, direct ? 'incoming' : 'via-word'),
+          reference: example.reference, word: example.word, tokenIndex: example.tokenIndex,
+          ...(direct ? {} : { via: { edgeId: membership.edgeId, reference: membership.word } }),
+        });
+      }
+      // These facets follow only the displayed fields: selected host readings,
+      // attributed semantic account, and exact word/reading/gloss rows. Geometry
+      // and component glyphs disclose no additional meaning or reading facet.
+      const exposures = exposureRows([
+        ...phonetic.filter(row => row.readings.standardOn.length || row.readings.outsideTableOn.length)
+          .map(row => ({ about: row.host, reveals: ['reading'] })),
+        ...semantic.filter(row => row.account).map(row => ({ about: row.host, reveals: ['meaning'] })),
+        ...words.map(row => ({ about: row.word, reveals: ['reading', 'meaning'] })),
+      ], 'family-reference');
+      return result({ status: 'available', reference: resolved.node.reference,
+        family: catalog.family, phonetic, semantic, occurrences, words, examples: exampleRows, exposures });
+    }
+    function canonical(reference) {
+      if (reference.type === 'kanji') return { t: 'kanji', id: reference.id };
+      if (reference.type === 'word') return { t: 'word', id: reference.id, reading: reference.reading };
+      return null;
+    }
+    function destination(edgeId, from) {
+      if (!string(edgeId)) return invalid('invalid-edge-id');
+      const current = view(from);
+      if (current.status !== 'available') return current;
+      const row = [...current.phonetic, ...current.semantic, ...current.occurrences,
+        ...current.words, ...current.examples].find(item => item.edgeId === edgeId);
+      if (!row) return catalog.edges.some(edge => edge.id === edgeId)
+        ? invalid('edge-not-available-from-reference') : result({ status: 'absent', edgeId });
+      if (row.relation === 'source-component-occurrence') {
+        const geometry = row.geometry;
+        if (geometry?.status !== 'available') return result({ status: 'unavailable',
+          reason: geometry?.reason || 'geometry-unavailable', reference: row.occurrence });
+        const projection = geometry.projection;
+        if (!equalReference(projection.reference, row.host) || projection.occurrenceId !== row.occurrence.id ||
+            projection.source.sha256 !== row.sourceSha256 || !same(projection.pathIndices, row.strokeIndices)) {
+          return invalid('geometry-host-mismatch');
+        }
+        return result({ status: 'available', kind: 'geometry', reference: row.host,
+          node: { ...canonical(row.host), kanjiOccurrenceId: row.occurrence.id },
+          host: row.host, occurrence: row.occurrence, sameHost: equalReference(from, row.host) });
+      }
+      if (row.relation === 'attested-word-occurrence') return result({ status: 'available',
+        kind: 'example', reference: row.reference, word: row.word, tokenIndex: row.tokenIndex });
+      const reference = equalReference(row.from, from) ? row.to : row.from;
+      return result({ status: 'available', kind: reference.type, reference, node: canonical(reference) });
+    }
+    function example(reference, expected) {
+      const resolved = resolve(reference, ['sentence-occurrence']);
+      if (resolved.status !== 'available') return resolved;
+      const row = examples.get(key(reference));
+      if (!row) return invalid('example-join-missing');
+      if (expected !== undefined && (!exactFields(expected,
+        ['word', 'sentence', 'english', 'sourceAttribution'], ['register']) ||
+        !validReference(expected.word, ['word']) || !equalReference(expected.word, row.word) ||
+        expected.sentence !== row.sentence || expected.english !== row.english ||
+        !same(expected.sourceAttribution, row.sourceAttribution) ||
+        (own(expected, 'register') && !string(expected.register)))) return invalid('course-example-mismatch');
+      return result({ ...row, status: 'available', tokens: row.rawRow[0],
+        citations: citations(row.evidence),
+        ...(expected && own(expected, 'register') ? { register: expected.register } : {}),
+        exposures: exposureRows([{ about: row.word, reveals: ['reading', 'meaning'] }], 'family-example'),
+      });
+    }
+    function exampleTarget(reference, tokenIndex) {
+      const row = example(reference);
+      if (row.status !== 'available') return row;
+      if (!Number.isSafeInteger(tokenIndex) || tokenIndex !== row.tokenIndex) return invalid('not-selected-occurrence');
+      return result({ status: 'available', kind: 'word', reference: row.word,
+        node: canonical(row.word), example: row.reference, tokenIndex });
+    }
+    return Object.freeze({ view, destination, example, exampleTarget });
+  }
+  return Object.freeze({ createModel, createNavigation });
 });

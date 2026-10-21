@@ -6303,10 +6303,10 @@ function keyboardActivated() {
 
 /** Open a node's page one level deeper. `from` is the match cut's source (the slip's headword when the slip is the door,
  * else the tapped word or row); the page itself arrives through enterWord, at once when the keyboard opened the door. */
-function go(node, { invoker = null, from = null, instant = keyboardActivated() } = {}) {
+function go(node, { invoker = null, from = null, instant = keyboardActivated(), inheritSourceContext = true } = {}) {
   if (personalHost && !personalHost.allowed()) return;
-  const sourceContext = node.sourceContext || S.stack.at(-1)?.sourceContext ||
-    (S.view === 'search' ? S.navSourceContext : null);
+  const sourceContext = node.sourceContext || (inheritSourceContext
+    ? S.stack.at(-1)?.sourceContext || (S.view === 'search' ? S.navSourceContext : null) : null);
   if (sourceContext && !node.from?.passage) node = { ...node, sourceContext };
   if (node.t === 'kanji' && !node.referenceEntry) node.referenceEntry = referenceLibrary?.entry('kanji', node.id) || null;
   if (S.scaleVisit) retireScaleReturn();
@@ -11007,7 +11007,7 @@ function enhanceJapaneseProse(root) {
   const parents = root.querySelectorAll('p, blockquote, dd, li, h1, h2, h3, .view-title, .meaning, .publisher-body, .dictionary-forms, .review-face, .gs-passage');
   for (const parent of parents) {
     // The writing room's own hints are room chrome above the popup's layer, not text to study.
-    if (parent.closest('button,a,label,summary,[data-japanese-lookup],#reader,.reader,input,textarea,.gs-choices,.stroke-hint,.stroke-missing')) continue;
+    if (parent.closest('button,a,label,summary,[data-japanese-lookup],[data-kanji-family-surface],#reader,.reader,input,textarea,.gs-choices,.stroke-hint,.stroke-missing')) continue;
     // Interface Japanese is a label, not study prose. Turning a date or the Learn
     // heading into word buttons created tiny, surprising controls in Japanese mode.
     // Dictionary explanations and actual article/headline content keep their lookup doors.
@@ -20073,11 +20073,13 @@ function kanjiCourseRememberHelp(visit, helps, attemptId = null) {
   // the course projects only the ledger's own accepted copies, never the caller's objects again; a batch the ledger refuses
   // is kept nowhere, so the course never projects a row the ledger lacks
   const kept = kanjiCourseCapture(visit, helps, attemptId);
-  if (!kept) return;
+  if (!kept) return { status: 'refused' };
   for (const help of kept) if (!visit.referenceHelp.some((row) => JSON.stringify(row) === JSON.stringify(help))) {
     visit.referenceHelp.push(help);
   }
   visit.referenceHelp.sort((a, b) => a.at - b.at);
+  // Keep OFF synchronous: existing teaching/act callers use thenability to choose their branch.
+  return { status: 'kept' };
 }
 /** HOOKS r8 (W5 r2's view/owner adapter; lead 1207): the page's retained help ledger, one learning session per page record
  * ownership (recordEpoch), shared by every course visit: the menu and a new unit keep it, so help seen in one visit still
@@ -20330,7 +20332,7 @@ async function kanjiJourneyEnter(journey, visit) {
  * owner change or OFF holds nothing (holdAtDeadline). Resolves when the help may show; only rows kept in time are projected */
 function kanjiJourneyRemember(visit, helps, attemptId) {
   const journey = kanjiJourneyFor(visit);
-  if (!journey) return Promise.resolve();
+  if (!journey) return Promise.resolve({ status: visit.epoch !== recordEpoch ? 'cancelled' : 'refused' });
   const request = { token: null, cancelled: false, settled: false };
   const kept = kanjiJourneyRun(journey, async () => {
     if (request.cancelled) return 'cancelled';
@@ -20358,22 +20360,33 @@ function kanjiJourneyRemember(visit, helps, attemptId) {
       shown = await journey.lifecycle.awaitHelp(request.token);
     } catch { return 'unproved'; }
     if (request.cancelled) return 'cancelled';
-    if (shown?.accepted !== true) return shown?.held === true ? 'held' : 'unproved';
+    if (shown?.accepted !== true) return shown?.display === true && shown?.held === true ? 'held' : 'unproved';
     visit.referenceHelp ||= [];
     for (const help of rows) if (!visit.referenceHelp.some((row) => JSON.stringify(row) === JSON.stringify(help))) visit.referenceHelp.push(help);
     visit.referenceHelp.sort((a, b) => a.at - b.at);
     return 'kept';
   });
   return new Promise((resolve) => {
-    const done = () => { if (request.settled) return; request.settled = true; clearTimeout(deadline); resolve(); };
+    const refused = () => visit.epoch !== recordEpoch ? 'cancelled' : 'refused';
+    const hold = () => {
+      const result = journey.lifecycle.holdAtDeadline(request.token);
+      return result?.display === true && result?.held === true ? 'held' : refused();
+    };
+    const done = (status) => {
+      if (request.settled) return;
+      request.settled = true; clearTimeout(deadline); resolve({ status });
+    };
     const deadline = setTimeout(() => {
       if (request.settled) return;
       request.cancelled = true;
-      journey.lifecycle.holdAtDeadline(request.token);
-      done();
+      done(hold());
     }, 300);
-    const unproved = () => { if (!request.settled) journey.lifecycle.holdAtDeadline(request.token); done(); };
-    kept.then((outcome) => (outcome === 'unproved' ? unproved() : done()), unproved);
+    const unproved = () => { if (!request.settled) done(hold()); };
+    kept.then((outcome) => {
+      if (request.settled) return;
+      if (outcome === 'unproved') unproved();
+      else done(outcome === 'kept' || outcome === 'held' ? outcome : refused());
+    }, unproved);
   });
 }
 /** ON's kanjiCourseAct: the journey snapshot (its attempt is the course's, inside the review day's namespace) is written before
@@ -20591,7 +20604,8 @@ function openKanjiCourseUnit(node, invoker) {
     priorCourse.supportedPractice = true;
     kanjiCourseReferenceHelp(priorCourse, node);
   }
-  if (S.view === 'lessons' && priorCourse?.unitId === unit.id) {
+  if (S.view === 'lessons' && priorCourse?.unitId === unit.id &&
+      !(S.stack.some((entry) => entry.familyExample) && kanjiFamilyHasExampleOrigin())) {
     S.stack = []; S.dialogInvoker = null;
     render(); document.getElementById('kanji-course-title')?.focus();
     return true;
@@ -20756,6 +20770,17 @@ function renderKanjiCourse(main) {
       attribution.href = target.teachingSentence.sourceAttribution.url;
       main.append(attribution);
       if (target.teachingSentence.register) main.append(el('p', 'fine', tx('文語調の格言です。', 'A literary set saying.')));
+      if (target.teachingSentence.reference && target.readings.length === 1) {
+        const example = target.teachingSentence;
+        const door = button('kanji-course-example', 'この用例を読む', 'Read this example', () => {
+          void openKanjiFamilyExample(example.reference, door, {
+            word: { type: 'word', id: target.wordKey, reading: target.readings[0] },
+            sentence: example.text, english: example.english, sourceAttribution: example.sourceAttribution,
+            ...(example.register ? { register: example.register } : {}),
+          });
+        });
+        main.append(door);
+      }
     }
     if (target.examples.length) {
       const examples = el('section');
@@ -27993,6 +28018,7 @@ function nodeTitle(node) {
  * the long hold for the entry. The translation and the source sit beneath,
  * quiet. It rides the sheet stack, so 戻る returns exactly one step. */
 function renderSentenceNode(sheet, node) {
+  if (node.familyExample) { renderFamilyExampleNode(sheet, node); return; }
   sheet.append(withEn(el('p', 'eyebrow', '文'), 'one sentence, read closely', 'en-inline'));
   const line = el('p', 'sent-reader');
   // on its own page the sentence is ALL reader: the highlighted word keeps
@@ -37723,6 +37749,362 @@ function renderKanjiClassifications(sheet, id, node = {}) {
   }
 }
 
+/** M2 family navigation is an ephemeral capability, never learner/source-practice identity. */
+let kanjiFamilyTask = null;
+let kanjiFamilyRuntime = null;
+let kanjiFamilyError = null;
+const kanjiFamilyMounts = new WeakMap();
+const kanjiFamilyExposures = new WeakMap();
+const kanjiFamilyExamples = new WeakMap();
+const kanjiFamilyViews = new WeakMap();
+function kanjiFamilyLiveVisit() {
+  const visit = S.kanjiCourse;
+  return visit?.unitId === 'shiki-shoku' && recordReady(visit.epoch) ? visit : null;
+}
+function kanjiFamilyTicket(invoker) {
+  const visit = S.kanjiCourse;
+  return { epoch: recordEpoch, view: S.view, stack: S.stack, top: S.stack.at(-1), visit,
+    run: visit?.run, stage: visit?.stage, index: visit?.index,
+    departures: S.navigationDepartures || 0, serial: S.wordEntrySerial || 0,
+    runtime: kanjiFamilyRuntime, invoker };
+}
+function kanjiFamilyTicketCurrent(ticket) {
+  const visit = S.kanjiCourse;
+  return ticket.epoch === recordEpoch && ticket.view === S.view && ticket.stack === S.stack &&
+    ticket.top === S.stack.at(-1) && ticket.visit === visit && ticket.run === visit?.run &&
+    ticket.stage === visit?.stage && ticket.index === visit?.index &&
+    ticket.departures === (S.navigationDepartures || 0) && ticket.serial === (S.wordEntrySerial || 0) &&
+    (!ticket.runtime || ticket.runtime === kanjiFamilyRuntime) && ticket.invoker?.isConnected === true;
+}
+function kanjiFamilyStamp() {
+  return { runtime: kanjiFamilyRuntime, epoch: recordEpoch, visit: kanjiFamilyLiveVisit() };
+}
+function kanjiFamilyStampCurrent(stamp) {
+  return !!stamp && stamp.runtime === kanjiFamilyRuntime && stamp.epoch === recordEpoch &&
+    stamp.visit === kanjiFamilyLiveVisit();
+}
+function kanjiFamilyHelpRow(row, at) {
+  const about = row.about.type === 'word'
+    ? { kind: 'word', term: row.about.id, reading: row.about.reading }
+    : { kind: 'kanji', literal: row.about.id };
+  return { what: row.what, about, reveals: [...row.reveals], at };
+}
+async function kanjiFamilyAuthorize(exposures, ticket) {
+  if (!kanjiFamilyTicketCurrent(ticket)) return false;
+  const visit = kanjiFamilyLiveVisit();
+  if (!visit) return true;
+  const at = Date.now();
+  const outcome = await kanjiCourseRememberHelp(visit, exposures.map((row) => kanjiFamilyHelpRow(row, at)));
+  if (!kanjiFamilyTicketCurrent(ticket) || !['kept', 'held'].includes(outcome?.status)) return false;
+  kanjiCourseApplyHelp(visit);
+  ticket.run = visit.run; // only this accepted projection may advance the captured run
+  return true;
+}
+function loadKanjiFamily() {
+  if (kanjiFamilyRuntime) return Promise.resolve(kanjiFamilyRuntime);
+  if (kanjiFamilyTask) return kanjiFamilyTask;
+  kanjiFamilyError = null;
+  const controller = new AbortController();
+  let active = true, timeout;
+  const expired = new Promise((_, reject) => {
+    timeout = setTimeout(() => {
+      active = false; controller.abort(); reject(new Error('Family source timeout'));
+    }, 8000);
+  });
+  const work = Promise.resolve().then(async () => {
+    if (!window.BunkiKanjiFamily || !D.kanji || !D.words) throw new Error('Family controller unavailable');
+    const bundled = window.__CORRIDOR_BUNDLE__;
+    let data = bundled?.['share_alike/kanji-family'];
+    if (!bundled) {
+      const response = await fetch('data/share_alike/kanji-family.json', { signal: controller.signal });
+      if (!response.ok) throw new Error(`Family data: ${response.status}`);
+      data = await response.json();
+    }
+    if (!data || !active) throw new Error('Family source unavailable');
+    const structure = await loadKanjiStructure();
+    if (!structure || !active) throw new Error('Family structure unavailable');
+    const model = window.BunkiKanjiFamily.createModel({ data, kanji: D.kanji, words: D.words, structure });
+    const runtime = Object.freeze({ model, navigation: window.BunkiKanjiFamily.createNavigation({ model }) });
+    if (!active) return null;
+    kanjiFamilyRuntime = runtime;
+    return runtime;
+  });
+  kanjiFamilyTask = Promise.race([work, expired]).catch((error) => {
+    kanjiFamilyError = error;
+    return null;
+  }).finally(() => { active = false; clearTimeout(timeout); kanjiFamilyTask = null; });
+  return kanjiFamilyTask;
+}
+function kanjiFamilyHasExampleOrigin() {
+  return S.stack.some((node) => !!kanjiFamilyResolveExample(node));
+}
+function sanitizeKanjiFamilyExposure(sheet) {
+  // The fence runs before attachment, including kept/prebuilt pages. No one-frame answer flash.
+  for (const section of sheet.querySelectorAll('[data-kanji-family-surface]')) {
+    const exposure = kanjiFamilyExposures.get(section);
+    if (!exposure || kanjiFamilyStampCurrent(exposure.state.stamp)) continue;
+    exposure.state.stamp = null;
+    exposure.state.busy = false;
+    exposure.panel.hidden = true;
+  }
+}
+function activateKanjiFamily(sheet) {
+  for (const section of sheet.querySelectorAll('[data-kanji-family-surface]')) kanjiFamilyMounts.get(section)?.();
+}
+function kanjiFamilyControlId(reference, suffix) {
+  return `family-${encodeURIComponent(JSON.stringify(reference))}-${suffix}`;
+}
+function kanjiFamilyStatus(invoker, ja, en) {
+  if (!invoker?.isConnected) return;
+  let status = invoker.parentElement.querySelector('[data-family-status]');
+  if (!status) {
+    status = el('p', 'fine'); status.dataset.familyStatus = ''; status.setAttribute('role', 'status');
+    invoker.after(status);
+  }
+  status.textContent = tx(ja, en);
+}
+function kanjiFamilyRefusal(invoker) {
+  kanjiFamilyStatus(invoker, 'ヘルプの記録を確認できなかったため、内容はまだ表示していません。',
+    'The help record could not be confirmed, so this content has not been shown.');
+}
+function kanjiFamilyCourseExpectation(reference) {
+  const targets = window.BunkiKanjiCourse?.getUnit('shiki-shoku').targets || [];
+  const target = targets.find((value) => value.teachingSentence?.reference?.id === reference.id && value.readings.length === 1);
+  if (!target) return undefined;
+  const sentence = target.teachingSentence;
+  return { word: { type: 'word', id: target.wordKey, reading: target.readings[0] },
+    sentence: sentence.text, english: sentence.english, sourceAttribution: sentence.sourceAttribution,
+    ...(sentence.register ? { register: sentence.register } : {}) };
+}
+async function openKanjiFamilyExample(reference, invoker, expected = undefined) {
+  const ticket = kanjiFamilyTicket(invoker);
+  const runtime = await loadKanjiFamily();
+  if (!kanjiFamilyTicketCurrent(ticket)) return false;
+  if (!runtime) {
+    kanjiFamilyStatus(invoker, '字のつながりの資料を読み込めませんでした。', 'The relationship source could not load.');
+    return false;
+  }
+  ticket.runtime = runtime;
+  expected ??= kanjiFamilyCourseExpectation(reference);
+  const example = runtime.navigation.example(reference, expected);
+  if (example.status !== 'available') {
+    kanjiFamilyStatus(invoker, 'この用例を確認できませんでした。', 'This example could not be verified.');
+    return false;
+  }
+  if (!await kanjiFamilyAuthorize(example.exposures, ticket) || !kanjiFamilyTicketCurrent(ticket)) {
+    if (kanjiFamilyTicketCurrent(ticket)) kanjiFamilyRefusal(invoker);
+    return false;
+  }
+  // ApplyHelp changes the run only after the ticket has proved the capture. Navigation is synchronous from here.
+  const node = { t: 'sent', id: example.reference.id,
+    familyExample: { reference: example.reference, word: example.word, tokenIndex: example.tokenIndex },
+    tokens: example.rawRow[0].map(inflateExampleToken), en: example.english,
+    sourceAttribution: example.sourceAttribution, passage: null, targetOffset: example.tokenIndex };
+  kanjiFamilyExamples.set(node, { runtime, epoch: recordEpoch, visit: S.kanjiCourse,
+    expected, reference: JSON.stringify(node.familyExample) });
+  kanjiFamilyViews.set(node, { stamp: kanjiFamilyStamp(), busy: false });
+  go(node, { invoker, inheritSourceContext: false });
+  return true;
+}
+
+/** An actual disclosure captures once; repainting an acknowledged panel does not. */
+function renderKanjiFamilyDisclosure(section, node, exposures, renderFacts) {
+  let state = kanjiFamilyViews.get(node);
+  if (!state) { state = { stamp: null, busy: false }; kanjiFamilyViews.set(node, state); }
+  const live = kanjiFamilyLiveVisit();
+  if (!live) state.stamp = kanjiFamilyStamp();
+  const panel = el('div', 'entry-rows');
+  panel.id = kanjiFamilyControlId({ type: node.t, id: node.id }, 'facts');
+  panel.hidden = !kanjiFamilyStampCurrent(state.stamp);
+  kanjiFamilyExposures.set(section, { state, panel });
+  if (!panel.hidden) renderFacts(panel);
+  if (live) {
+    const reveal = biLabel('button', 'chip', '出典と説明', 'Source and account');
+    reveal.type = 'button'; reveal.id = kanjiFamilyControlId({ type: node.t, id: node.id }, 'disclose');
+    reveal.setAttribute('aria-controls', panel.id); reveal.setAttribute('aria-expanded', String(!panel.hidden));
+    state.control = reveal;
+    reveal.disabled = !!state.busy;
+    const explanation = el('p', 'fine', tx('開くと、ここにある読みや意味を、このコースで使ったヘルプとして扱います。',
+      'Opening this counts the readings and meanings shown here as help for this course.'));
+    reveal.addEventListener('click', async () => {
+      if (state.busy) return;
+      if (!panel.hidden) {
+        state.stamp = null; panel.hidden = true; panel.replaceChildren(); reveal.setAttribute('aria-expanded', 'false');
+        return;
+      }
+      const ticket = kanjiFamilyTicket(reveal);
+      state.busy = ticket; reveal.disabled = true;
+      try {
+        const allowed = await kanjiFamilyAuthorize(exposures, ticket);
+        if (!kanjiFamilyTicketCurrent(ticket)) return;
+        if (!allowed) { kanjiFamilyRefusal(reveal); return; }
+        state.stamp = kanjiFamilyStamp();
+        panel.replaceChildren(); renderFacts(panel); panel.hidden = false; reveal.setAttribute('aria-expanded', 'true');
+      } finally {
+        if (state.busy === ticket) { state.busy = false; if (state.control?.isConnected) state.control.disabled = false; }
+      }
+    });
+    section.append(reveal, explanation);
+  }
+  section.append(panel);
+}
+function kanjiFamilyCitations(parent, citations) {
+  for (const citation of citations) {
+    const source = citation.source;
+    const label = `${source.title || source.id} · ${citation.locator}`;
+    const line = el(/^https:\/\//u.test(source.url || '') ? 'a' : 'p', 'fine', label);
+    if (line.tagName === 'A') { line.href = source.url; line.target = '_blank'; line.rel = 'noopener noreferrer'; }
+    parent.append(line);
+  }
+}
+function renderKanjiFamily(sheet, node) {
+  const section = el('section'); section.dataset.kanjiFamilySurface = 'relationships';
+  const heading = () => el('h3', 'list-head', tx('資料でたどる字のつながり', 'Source-backed character relationships'));
+  section.append(heading()); sheet.append(section);
+  const current = () => section.isConnected && S.stack.at(-1) === node;
+  const paint = () => {
+    if (!current()) return;
+    section.replaceChildren(heading());
+    if (!kanjiFamilyRuntime) {
+      const line = el('p', 'fine', kanjiFamilyError
+        ? tx('字のつながりの資料を読み込めませんでした。', 'The relationship source could not load.')
+        : tx('字のつながりを読み込み中…', 'Loading sourced relationships…'));
+      line.setAttribute('role', 'status'); section.append(line);
+      if (kanjiFamilyError) {
+        const retry = biLabel('button', 'chip', '再試行', 'Try again'); retry.type = 'button';
+        retry.addEventListener('click', () => { const task = loadKanjiFamily(); paint(); void task.then(paint); });
+        section.append(retry);
+      }
+      return;
+    }
+    const runtime = kanjiFamilyRuntime, view = runtime.navigation.view({ type: 'kanji', id: node.id });
+    if (view.status !== 'available') {
+      section.append(el('p', 'fine', tx('この資料では、この字の音のつながりは未収録です。', 'This dataset has no sound relationship for this character.')),
+        el('p', 'fine', tx('この資料では、この字の意味のつながりは未収録です。', 'This dataset has no meaning relationship for this character.')));
+      return;
+    }
+    const doorFor = (row, label) => {
+      const door = el('button', 'chip', label); door.type = 'button';
+      door.id = kanjiFamilyControlId(view.reference, row.edgeId);
+      door.dataset.familyEdge = row.edgeId; door.dataset.familyDirection = row.direction;
+      door.addEventListener('click', () => {
+        if (!current() || runtime !== kanjiFamilyRuntime) return;
+        const next = runtime.navigation.destination(row.edgeId, view.reference);
+        if (next.status !== 'available' || !next.node) return;
+        if (next.kind === 'geometry' && next.sameHost) {
+          node.kanjiOccurrenceId = next.node.kanjiOccurrenceId;
+          activateKanjiStructure(sheet);
+        } else go({ ...next.node }, { invoker: door, inheritSourceContext: false });
+      });
+      return door;
+    };
+    for (const [rows, ja, en, absentJa, absentEn] of [
+      [view.phonetic, '音を表す部分', 'Sound component', 'この資料では、この字の音のつながりは未収録です。', 'This dataset has no sound relationship for this character.'],
+      [view.semantic, '意味に関わる部分', 'Meaning component', 'この資料では、この字の意味のつながりは未収録です。', 'This dataset has no meaning relationship for this character.'],
+    ]) {
+      section.append(el('h4', 'list-head', tx(ja, en)));
+      if (!rows.length) section.append(el('p', 'fine', tx(absentJa, absentEn)));
+      for (const row of rows) {
+        const line = el('div', 'row-stack');
+        line.append(doorFor(row, `${row.from.id} → ${row.to.id}`));
+        kanjiFamilyCitations(line, row.citations); section.append(line);
+      }
+    }
+    section.append(el('h4', 'list-head', `${tx('字の中を見る', 'Inside the character')} · ${view.occurrences.length}`));
+    for (const row of view.occurrences) {
+      const line = el('div', 'row-stack');
+      line.append(doorFor(row, `${row.component.id} · ${tx(`「${row.host.id}」の中で見る`, `Inspect within ${row.host.id}`)}`));
+      kanjiFamilyCitations(line, row.citations); section.append(line);
+    }
+    renderKanjiFamilyDisclosure(section, node, view.exposures, (panel) => {
+      for (const row of view.phonetic) {
+        panel.append(el('p', 'fine', tx(`${row.to.id}の音を表す部分：${row.from.id}`, `${row.to.id}: sound component ${row.from.id}`)));
+        if (row.readings?.standardOn?.length) panel.append(el('p', 'row-reading',
+          `${row.to.id} · ${tx('この辞書が示す常用漢字表の音読み', 'Standard on-readings from this source')}: ${row.readings.standardOn.join(' / ')}`));
+        kanjiFamilyCitations(panel, row.readings.citations);
+        panel.append(el('p', 'fine', row.account)); kanjiFamilyCitations(panel, row.citations);
+      }
+      if (view.phonetic.length) panel.append(el('p', 'fine', tx('音読みの手がかりであり、ことば全体の読みを決めるものではありません。',
+        'A clue to on-readings, not a rule determining a word’s reading.')));
+      const paraphrases = {
+        職: 'この辞書では、耳に、音を表す戠を組み合わせた字で、聞いて知る・覚えることを表し、そこから「つかさ」の意味にも使うと説明しています。',
+        識: 'この辞書では、言に、音を表す戠を組み合わせた字で、意味をよく理解して覚えることを表し、そこから「しるし」の意味にも使うと説明しています。',
+        織: 'この辞書では、糸に、音を表す戠を組み合わせた字で、布をおることを表すと説明しています。',
+      };
+      for (const row of view.semantic) {
+        panel.append(el('p', 'fine', tx(`${row.to.id}の意味に関わる部分：${row.from.id}`, `${row.to.id}: meaning component ${row.from.id}`)),
+          el('p', 'fine', tx(paraphrases[row.to.id], row.account)));
+        kanjiFamilyCitations(panel, row.citations);
+      }
+      if (view.phonetic.length || view.semantic.length) panel.append(el('p', 'fine', tx(
+        '字の成り立ちについての辞書の説明です。筆画のまとまりとは区別して示します。',
+        'Attributed dictionary formation accounts, distinct from stroke grouping.')));
+      panel.append(el('h4', 'list-head', `${tx('ことば', 'Words')} · ${view.words.length}`));
+      for (const row of view.words) {
+        const word = row.word;
+        const door = el('button', 'entry-row'); door.type = 'button';
+        door.id = kanjiFamilyControlId(word, 'entry');
+        door.append(el('span', 'row-main', word.id), el('span', 'row-reading', word.reading), el('span', 'fine', row.rawRecord.g));
+        door.addEventListener('click', () => {
+          if (current() && runtime === kanjiFamilyRuntime) go({ t: 'word', id: word.id, reading: word.reading }, { invoker: door, inheritSourceContext: false });
+        });
+        panel.append(door); kanjiFamilyCitations(panel, row.citations);
+      }
+      panel.append(el('h4', 'list-head', `${tx('出典のある用例', 'Attributed example')} · ${view.examples.length}`));
+      for (const row of view.examples) {
+        const door = biLabel('button', 'chip', 'この用例を読む', 'Read this example'); door.type = 'button';
+        door.id = kanjiFamilyControlId(row.reference, 'example');
+        door.addEventListener('click', () => { void openKanjiFamilyExample(row.reference, door); });
+        panel.append(door); kanjiFamilyCitations(panel, row.citations);
+      }
+    });
+  };
+  const mount = () => {
+    if (!current()) return;
+    paint();
+    if (!kanjiFamilyRuntime && !kanjiFamilyError) void loadKanjiFamily().then(paint);
+  };
+  kanjiFamilyMounts.set(section, mount);
+}
+function kanjiFamilyResolveExample(node) {
+  const capability = kanjiFamilyExamples.get(node);
+  if (!capability || capability.epoch !== recordEpoch || capability.runtime !== kanjiFamilyRuntime ||
+      capability.reference !== JSON.stringify(node.familyExample) || node.id !== node.familyExample.reference.id) return null;
+  const example = capability.runtime.navigation.example(node.familyExample.reference, capability.expected);
+  return example.status === 'available' ? example : null;
+}
+function renderFamilyExampleNode(sheet, node) {
+  const section = el('section'); section.dataset.kanjiFamilySurface = 'example'; sheet.append(section);
+  section.append(el('h3', 'list-head', tx('出典のある用例', 'Attributed example')));
+  const paint = () => {
+    if (!section.isConnected || S.stack.at(-1) !== node) return;
+    section.replaceChildren(el('h3', 'list-head', tx('出典のある用例', 'Attributed example')));
+    const example = kanjiFamilyResolveExample(node);
+    if (!example) { section.append(el('p', 'fine', tx('この用例を確認できませんでした。', 'This example could not be verified.'))); return; }
+    renderKanjiFamilyDisclosure(section, node, example.exposures, (panel) => {
+      const line = el('p', 'sent-reader');
+      example.rawRow[0].forEach((token, index) => {
+        if (index !== example.tokenIndex) { line.append(document.createTextNode(token[0])); return; }
+        const door = el('button', 'chip', token[0]); door.type = 'button';
+        door.id = kanjiFamilyControlId(example.reference, `token-${index}`);
+        door.setAttribute('aria-label', `${tx('用例のことばを開く', 'Open the word in this example')}: ${example.word.id} · ${example.word.reading}`);
+        door.addEventListener('click', () => {
+          if (!door.isConnected || S.stack.at(-1) !== node || !kanjiFamilyResolveExample(node)) return;
+          const destination = kanjiFamilyRuntime.navigation.exampleTarget(example.reference, index);
+          if (destination.status === 'available') go({ ...destination.node }, { invoker: door, inheritSourceContext: false });
+        });
+        line.append(door);
+      });
+      panel.append(line, el('p', 'row-reading', example.word.reading), el('p', 'sent-reader-en', example.english));
+      const source = el('a', 'example-src', example.sourceAttribution.attribution);
+      source.href = example.sourceAttribution.url; source.target = '_blank'; source.rel = 'noopener noreferrer'; panel.append(source);
+      if (example.register) panel.append(el('p', 'fine', tx('文語調の格言です。', 'A literary set saying.')));
+      panel.append(el('p', 'fine', tx('この用例に元の記事へのリンクはありません。', 'This example has no source-article link.')));
+    });
+  };
+  kanjiFamilyMounts.set(section, paint);
+}
+
 let kanjiStructureTask = null;
 let kanjiStructureModel = null;
 let kanjiStructureError = null;
@@ -38034,6 +38416,7 @@ function renderKanjiNode(sheet, node) {
   sheet.append(withEn(el('p', 'eyebrow', '筆順'), 'stroke order', 'en-inline'));
   sheet.append(strokeDoor(k));
   renderKanjiStructure(sheet, node);
+  renderKanjiFamily(sheet, node);
 
   const parts = mainParts(k.c);
   if (parts.length) {
@@ -40434,12 +40817,12 @@ function composePage(node, path) {
   // the word it is built around — the sentence itself is not a card kind,
   // and its seal says whose it is. A catalog is a grouping, not a thing,
   // and honestly carries none.
-  const sentenceFrom = node.t === 'sent' ? sentenceSource(node.tokens, node.passage, node.start) : null;
-  const sentenceTarget = node.t === 'sent' ? (Number.isInteger(node.targetOffset) ? node.targetOffset
+  const sentenceFrom = node.t === 'sent' && !node.familyExample ? sentenceSource(node.tokens, node.passage, node.start) : null;
+  const sentenceTarget = node.t === 'sent' && !node.familyExample ? (Number.isInteger(node.targetOffset) ? node.targetOffset
     : node.tokens.findIndex((token) => token.b === node.target)) : -1;
   const capNode = NODE_KIND[node.t]
     ? node
-    : node.t === 'sent' && node.target
+    : node.t === 'sent' && !node.familyExample && node.target
       ? { t: 'word', id: node.target, ...(sentenceFrom && sentenceTarget >= 0 ? {
         from: { passage: sentenceFrom.passage, index: sentenceFrom.index + sentenceTarget }, ctxScope: 'sent',
       } : {}) }
@@ -40561,9 +40944,9 @@ function composePage(node, path) {
     sheet.append(notes);
   }
   if (node.t === 'kanji' && node.referenceEntry) renderReferenceConnections(sheet, node.referenceEntry);
-  if (node.t !== 'word' && (capNode?.from?.passage || node.sourceContext))
+  if (!node.familyExample && node.t !== 'word' && (capNode?.from?.passage || node.sourceContext))
     renderTeacherDoor(sheet, { ...capNode, sourceContext: node.sourceContext });
-  renderEncounterTrail(sheet, node);
+  if (!node.familyExample) renderEncounterTrail(sheet, node);
   // reading position survives the doors: the sheet remembers where each
   // stack entry was scrolled and restores it when that entry returns —
   // back no longer teleports a ~2,700px entry to its top (P1, review).
@@ -40617,7 +41000,7 @@ function composePage(node, path) {
     }
   });
   if (maintenanceReports) sheet.append(reportEntries('report-line-sheet'));
-  enhanceJapaneseProse(sheet);
+  if (!node.familyExample) enhanceJapaneseProse(sheet);
   return sheet;
 }
 
@@ -40630,6 +41013,7 @@ function renderSheet(root, { prebuilt = null } = {}) {
   // render. Do not follow it with a redundant deferred repaint.
   if (wordSheetGesture?.node === node) wordSheetGesture.pending = false;
   const sheet = prebuilt || buildPage(node);
+  sanitizeKanjiFamilyExposure(sheet);
   root.append(sheet);
   mountPageEffects(sheet, node);
 }
@@ -40646,6 +41030,7 @@ function mountPageEffects(sheet, node) {
   if (thread) revealMountedScaleCurrent(thread);
   activatePendingLookupReadings(sheet);
   activateKanjiStructure(sheet);
+  activateKanjiFamily(sheet);
   adoptSaveMenuOwner();
   // FULL-R1 · and its doors' lines, against the visit standing now (reconcileSheetActionLines)
   reconcileSheetActionLines(sheet);
@@ -40842,7 +41227,7 @@ function enterWord(node, { from = null, invoker = null, instant = false } = {}) 
   finishPageTransition();
   const layered = layerPathFor();
   const depth = S.stack.length + 1;
-  const ready = layered ? takePrebuiltPage(node, depth) : null;
+  const ready = layered && !node.familyExample ? takePrebuiltPage(node, depth) : null;
   const pushed = ready?.node || node;
   // rev 3.2 §7.8: with the journey on, a dictionary page opened from a course shows once its help is kept (within 300 ms)
   const show = () => {

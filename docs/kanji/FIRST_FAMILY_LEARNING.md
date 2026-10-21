@@ -18,6 +18,16 @@ Each target also has `teachingSentence = {text, english, reference, sourceAttrib
 
 The teaching label now reads **「文語調の格言です。」**, following lead0319 and W2's combined0330 ruling. The reviews disagreed: Claude0316 requested this wording because the sentence is a maxim, whereas Fugu0327 explicitly accepted the previous 「文語の慣用表現です。」. This is a recorded lead disposition, not a unanimous finding that the previous label was defective. The English “A literary set saying.” and the attributed example remain unchanged.
 
+## M2 exact example detour and return
+
+Each retained teaching sentence has an explicit example door. It resolves its original occurrence reference and checks the exact word/reading, sentence, translation and attribution against the family model. The restricted sheet exposes only the verified token as a full-word entry button, with a stable control ID derived from the complete occurrence reference and token index. Duplicate spelling elsewhere in the sentence is plain text. The same resolver serves example doors in the family relationships UI; the literary register is taken only from the exactly matched course target.
+
+The sentence node and its return capability are ephemeral. A dictionary/geometry detour retains the same node, selected token and existing focus/scroll descriptors. Resuming the same course from a valid example-origin stack keeps a navigation-return capsule instead of dropping that stack; the existing visit, attempts, responses, draft, help history and source state survive. Ordinary same-course returns retain their existing behavior. This is source-level return behavior, not yet a native focus/scroll proof.
+
+Family disclosures and opening an example during a live visit capture exact item/facet help through the existing helper before display. The pure adapter's typed references are translated to the existing `{kind, literal}` / `{kind, term, reading}` help items. OFF returns a plain synchronous status object; ON retains its Promise, deadline and lifecycle hold policy. The new consumers reveal only for kept or proved held display with a current navigation ticket. Other callers retain their existing synchronous/async branches. False/late display is never relabelled held; a held day cannot grade.
+
+The bounded family surface does not use generic sentence observation, slip, source-article or sentence capture routes. A normal full dictionary child still invokes the existing reference help and canonical Save behavior. Wrong-owner, away-and-back, replaced-stack, changed-run or detached-invoker completions are inert. No new scheduler identity, attempt, review or learner-record root follows from navigation.
+
 ## Exact task identity
 
 `unitForTask(reference)` returns the family unit or `null`. `taskTarget(reference)` (also exported as `taskForReference`) returns:

@@ -1,6 +1,6 @@
 # First family: 戠 → 職・識・織
 
-This is a source and pure-API slice for the world engine. It supplies one attributed family, separate from the authored course described below, rendering, historical reconstruction and learner records. Native presentation and source/task adapters remain unqualified.
+This supplies one attributed family, its pure navigation adapter and the corridor relationship UI, separate from historical reconstruction and learner records. The authored course is described below. The M2 source joins are implemented; native presentation, focus/scroll and integrated demonstration remain unqualified.
 
 The asset is `prototypes/corridor/data/share_alike/kanji-family.json`; the pure module is `kanji-family.js`. The existing production asset list, deferred script list, worker cache list and standalone source bundler include them. No standalone HTML or site was generated for this slice.
 
@@ -101,6 +101,20 @@ W5 owns mapping its proposed `GraphPort` to these exports, selecting each destin
 See [first-family learning contract](FIRST_FAMILY_LEARNING.md). The course is ordinary-text practice, not a source-transfer assessment, handwriting recognition or a delayed-retention claim. The retained sentences remain teaching examples; they never become confirmed source-practice plans or scheduler identities. Any future source-practice task still needs separate live source-context/reading-cue admission and plan confirmation under the actual host contract. Course result rows remain practice observations. Only an explicit eligible attempt may cross W4's one hook; its implementation is not included in this branch.
 
 The family asset deliberately retains only on-readings. Kun readings such as 織 お.る and 識 し.る remain available in `kanji.json` and the complete kanji reference supplied by the consumer; the 戠 phonetic-family association does not govern or predict them. Missing standalone geometry and historical/font bindings remain unchanged.
+
+## M2 relationship and occurrence consumer
+
+`BunkiKanjiFamily.createNavigation({ model })` snapshots the validated model and exports frozen `view(reference)`, `destination(edgeId, fromReference)`, `example(reference, expected?)` and `exampleTarget(reference, tokenIndex)` results. Invalid shape/join, valid-but-absent coverage and unavailable geometry remain distinct. Word references require the exact reading. Views retain original directions and citations, keep the five relation kinds separate, and return a pure manifest of the exact reading/meaning facts displayed. The adapter does not capture help or touch learner state.
+
+Full kanji entries consume this adapter beside the existing structure inspector. Sound and meaning relationships have separate rows; component-labelled geometry controls select the retained occurrence in its own host. Reading labels show only the cited standard on-readings; raw readings and outside-table metadata are unchanged. Word and example rows retain their source locators. Missing relation categories are explicit, without inventing an edge or borrowing standalone geometry. The loader coalesces work, validates the structure dependency, settles after an eight-second deadline and requires an explicit retry after failure. Late completions cannot install a model.
+
+During a live `shiki-shoku` visit, glyph-only relationships, relation headings and non-answer citations remain visible. Word rows, readings and attributed accounts require an explicit disclosure. The existing course helper captures exact item/facet rows first; only kept or lifecycle-proved held display is allowed. A held display retains the existing day hold, preventing grading. Refused, stale and wrong-owner completions do not reveal the content. Repainting does not add another exposure; closing and reopening does. A pre-attachment fence protects kept/prebuilt pages when the owner or visit changes. Outside a live visit, these public facts show without a course capture.
+
+Example doors use the exact bundled occurrence and a restricted sentence sheet: only its attested token is a word-entry button. Its raw tokens, exact reading, translation, attribution and literary label remain bound to the same verified example. The sheet adds no article, generic token ladder, observation, sentence Save or source-practice identity. Its canonical full-word child retains the normal dictionary controls. New family routes opt out of unrelated inherited source context; genuine Back/source-return capsules keep their existing source state.
+
+The Japanese copy is final under the lead's 2026-10-21 17:29 ruling, SHA-256 `efa22d241eb6e023cae10ad5631865ef9fca3847f14bf2d89ca190b063df4679`. J20 uses the cited formation account's quoted 「つかさ」; the stand-in preferred 「役目」, Grok requested the correction, and the lead ruled for Grok. This is a recorded disposition, not unanimity. No family asset, source pin, course task, scheduler rule, root schema or `JOURNEY_WRITES = false` setting changes.
+
+The focused executable probe is `tools/test-kanji-family-navigation.mjs`; its F1–F11 controls exercise the pure adapter and actual corridor functions with controlled external boundaries. This source check does not establish native Tab/touch reachability, physical-phone layout, real storage durability or the M2 demonstration.
 
 ## Why `learning-core.mjs` is absent from Git
 
