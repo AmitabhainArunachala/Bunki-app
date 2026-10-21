@@ -20693,8 +20693,8 @@ const M4_COPY = Object.freeze({
   'Q-26': ['終えたクエストを一覧から外す', 'Clear this finished quest'],
   // the stale quest page (lead 2005, 2009; copy final lead 2015; quest UX r4.3 c427e515)
   'Q-27': ['このクエストのもとの文が変わったため、再開できません。このクエストはやめられます。新しいクエストは、ことば「職業」からつくれます。', 'The sentence this quest came from has changed, so this quest can’t be resumed. You can end it, and you can make a new quest from the word 職業.'],
-  // W12 2015: the same page when no change can be proved (a goal kept without its text, or a passage no longer in the build)
-  'Q-27u': ['このクエストのもとの文が変わっていないか確かめられないため、再開できません。このクエストはやめられます。新しいクエストは、ことば「職業」からつくれます。', 'We can’t confirm the sentence this quest came from is unchanged, so this quest can’t be resumed. You can end it, and you can make a new quest from the word 職業.'],
+  // no match proved: no stored identity, a failed or absent index or text, or the selected word not re-identified (lead 2046/2110; Grok 2108)
+  'Q-27u': ['このクエストを、もとの文で選んだことばと結びつけられないため、再開できません。このクエストはやめられます。新しいクエストは、ことば「職業」からつくれます。', 'We can’t link this quest to the word selected in the sentence it came from, so this quest can’t be resumed. You can end it, and you can make a new quest from the word 職業.'],
 });
 /** M4 rooms (UX r4.2 §3.3): the facet a visit's unfinished run practises, or null when no run is left to finish */
 function kanjiCourseRunKind(run) {
