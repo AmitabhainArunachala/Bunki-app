@@ -70,14 +70,13 @@ const SENTENCES = () => [[...Array(23).fill('の'), '。'], ['の', 'の', '職�
   ['の', 'の', ...Array(10).fill('職業'), ...Array(5).fill('の'), '。'], [...Array(13).fill('の'), '。']];
 const PASSAGE = { id: 'bunki-essay-n1-city', tokens: SENTENCES().flat().map(T) };
 const ORIGINAL = PASSAGE.tokens;
-/** the reader's sentences, as takenContext cuts them in this model: up to a 。 and any closing 」 right after it */
+/** the reader's sentences, as takenContext cuts them: through the next 。, ！ or ？ (W2 2048: nothing after the stop joins it) */
 const spans = (p) => {
   const out = [];
   for (let i = 0; i < p.tokens.length;) {
     let end = i;
-    while (end < p.tokens.length && p.tokens[end].s !== '。') end += 1;
+    while (end < p.tokens.length && !['。', '！', '？'].includes(p.tokens[end].s)) end += 1;
     end = Math.min(end + 1, p.tokens.length);
-    while (end < p.tokens.length && p.tokens[end].s === '」') end += 1;
     out.push([i, end]); i = end;
   }
   return out;
@@ -619,7 +618,8 @@ test('U24', 'a late load never resurrects a page it left (W5 2030): the archive 
 test('U25', 'the stored sentence must be a whole sentence and the selected word must still be there (W2 2037 S3B-2c): the old sentence grown by a prefix or a suffix, or a different word at the selection, refuses with Q-27; the same text with the selected word re-analysed (another base, or split) refuses with Q-27u; none binds', async (m) => {
   const variants = {
     prefix: () => [...ORIGINAL.slice(0, 23), ...ORIGINAL.slice(24)],
-    suffix: () => [...ORIGINAL.slice(0, 42), T('」'), ...ORIGINAL.slice(42)],
+    // a suffix inside the sentence, before its stop (the real reader never joins text after 。)
+    suffix: () => [...ORIGINAL.slice(0, 41), T('が'), ...ORIGINAL.slice(41)],
     'selection-text': () => ORIGINAL.map((t, i) => (i === 26 ? T('職場') : t)),
     'selection-base': () => ORIGINAL.map((t, i) => (i === 26 ? { s: '職業', b: '職業病' } : t)),
     'selection-split': () => [...ORIGINAL.slice(0, 26), T('職'), T('業'), ...ORIGINAL.slice(27)],
