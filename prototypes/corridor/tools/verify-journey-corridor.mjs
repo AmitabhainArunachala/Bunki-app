@@ -6,7 +6,8 @@
  * a grade's patch, are re-created in the module's and host's realm before their plain-data checks (in the browser there
  * is one realm).
  * stdout only; no files are written.
- *   node tools/verify-journey-corridor.mjs --modules=<dir> [--case=<id>] [--vectors] [--mutants]
+ *   node tools/verify-journey-corridor.mjs --modules=<dir> [--case=<id>] [--vectors] [--mutants [--mutant=<name>]]
+ * Keep memory low on a machine near its swap limit: one mutant per process (--mutant), --case for single cases.
  */
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
@@ -367,6 +368,25 @@ test('S16', 'W5 1441 in the course: a capture whose commit is blocked still show
   assert.equal((v.referenceHelp || []).length, 0);
 });
 
+test('S17', 'W5 1504: the record store fails, a capture rejects before it has a ticket, and still holds with W-hold before it shows; a same-day reload refuses', async (P) => {
+  const s = store(), { time } = await journeyOnNextDay(P, s);
+  const p = await page(P.on, { ...s, time });
+  assert.equal(p.lifecycle().phase, 'active');
+  s.controller.state.mode = 'fail';
+  const failed = await p.app.write((record) => ({ patch: { stats: { ...record.stats, [new Date(time.now).toLocaleDateString('sv-SE')]: { n: 1, again: 0 } } } }));
+  assert.equal(failed.status, 'recovery-required'); assert.equal(p.app.journeyAuthority().status, 'recovery-required');
+  const v = p.visit();
+  await p.capture(v, [row('dictionary-entry', kanji('職'), ['meaning', 'form'], 80)]);
+  assert.ok(s.storage.getItem('bunki-journey:hold'), 'the help showed with no W-hold');
+  assert.equal(JSON.parse(s.storage.getItem('bunki-journey:hold')).reason, 'help-write-hold');
+  assert.notEqual(p.lifecycle().phase, 'active'); assert.equal((v.referenceHelp || []).length, 0);
+  s.controller.state.mode = 'ok';
+  const reload = await page(P.on, { ...s, time });
+  assert.equal(reload.lifecycle().phase, 'help-write-hold');
+  const w = reload.visit(); const id = await reload.act(w); const o = await reload.report(w, id);
+  assert.deepEqual([o.write, o.reason], [false, 'not-recorded']); assert.equal(reload.calls(), 0);
+});
+
 /** W5's 70 vectors: their help rows and original origins imported into the root through a registered producer, a reload,
  * then the actual course attempt, preparation from the root, the caller, the fence and the hook. No preload */
 async function vectorRuns(P, { skipImport = false } = {}) {
@@ -429,9 +449,10 @@ export const MUTANTS = {
   'off-device-unwired': ['S1', [["      device: kanjiJourneyDevice, buildId,", "      device: { read() {}, write() { return true; }, remove() { return true; } }, buildId,"]]],
   'off-tick-missing': ['S3', [["  if (typeof kanjiJourneyTick === 'function') kanjiJourneyTick();\n", '']]],
   'build-unchecked': ['S12', [["    if (!served) { kanjiJourney = { epoch, unavailable: 'build-unidentified' }; return; }\n", '']]],
-  'projected-before-kept': ['S14', [["    if (request.cancelled || shown?.accepted !== true) return;\n", '']]],
+  'projected-before-kept': ['S14', [["    if (request.cancelled) return 'cancelled';\n    if (shown?.accepted !== true) return shown?.held === true ? 'held' : 'unproved';\n", '']]],
   'custody-trusts-received-on': ['S15', [["  if (candidate !== undefined && JSON.stringify(candidate) !== JSON.stringify(record.details.candidate)) throw new Error('review-transport-changed');\n", '']]],
-  'corridor-deadline-missing': ['S16', [["    }, 300);\n    kept.then(done, done);\n", "    }, 3000000);\n    kept.then(done, done);\n"]]],
+  'corridor-deadline-missing': ['S16', [["    }, 300);\n    const unproved = ", "    }, 3000000);\n    const unproved = "]]],
+  'unproved-not-held': ['S17', [["    kept.then((outcome) => (outcome === 'unproved' ? unproved() : done()), unproved);\n", "    kept.then(done, done);\n"]]],
   'day-full-not-told': ['S13', [["  if (KANJI_JOURNEY_DAY_FULL.includes(error?.message)) journey.fullDay = day;\n", '']]],
 };
 
@@ -464,6 +485,7 @@ async function main() {
   const controls = [];
   if (process.argv.includes('--mutants')) {
     for (const [name, [target, pairs]] of Object.entries(MUTANTS)) {
+      if (arg('mutant') && arg('mutant') !== name) continue;
       floor();
       let text = SOURCE;
       for (const [from, to] of pairs) { assert.equal(text.split(from).length, 2, 'mutant anchor not unique: ' + name); text = text.replace(from, to); }

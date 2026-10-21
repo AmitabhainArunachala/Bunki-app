@@ -20322,14 +20322,15 @@ async function kanjiJourneyEnter(journey, visit) {
  * (a course row is the event course/<attempt>/<what> of its journey attempt); one queued write; then the display wait,
  * acknowledged within 300 ms or shown once with the day held. The request's own 300 ms runs from the moment the help is asked
  * for (W5 1441): a queued step or a blocked write never delays the display; at the deadline the journey holds the day with
- * W-hold, the help shows once, and a capture that had not begun is cancelled. Resolves when the help may show; only rows the
- * journey kept in time are projected */
+ * W-hold, the help shows once, and a capture that had not begun is cancelled. A capture that was not proved for any other
+ * reason (W5 1504: a rejection before it had a ticket, or a rejected step) holds the same way before the help may show; an
+ * owner change or OFF holds nothing (holdAtDeadline). Resolves when the help may show; only rows kept in time are projected */
 function kanjiJourneyRemember(visit, helps, attemptId) {
   const journey = kanjiJourneyFor(visit);
   if (!journey) return Promise.resolve();
   const request = { token: null, cancelled: false, settled: false };
   const kept = kanjiJourneyRun(journey, async () => {
-    if (request.cancelled) return;
+    if (request.cancelled) return 'cancelled';
     await journey.lifecycle.tick();
     await kanjiJourneyEnter(journey, visit);
     const root = journey.lifecycle.inspect().root;
@@ -20350,13 +20351,15 @@ function kanjiJourneyRemember(visit, helps, attemptId) {
     let shown;
     try {
       request.token = await journey.lifecycle.beginHelp(batch);
-      if (request.cancelled) { journey.lifecycle.holdAtDeadline(request.token); return; }
+      if (request.cancelled) { journey.lifecycle.holdAtDeadline(request.token); return 'cancelled'; }
       shown = await journey.lifecycle.awaitHelp(request.token);
-    } catch { return; }
-    if (request.cancelled || shown?.accepted !== true) return;
+    } catch { return 'unproved'; }
+    if (request.cancelled) return 'cancelled';
+    if (shown?.accepted !== true) return shown?.held === true ? 'held' : 'unproved';
     visit.referenceHelp ||= [];
     for (const help of rows) if (!visit.referenceHelp.some((row) => JSON.stringify(row) === JSON.stringify(help))) visit.referenceHelp.push(help);
     visit.referenceHelp.sort((a, b) => a.at - b.at);
+    return 'kept';
   });
   return new Promise((resolve) => {
     const done = () => { if (request.settled) return; request.settled = true; clearTimeout(deadline); resolve(); };
@@ -20366,7 +20369,8 @@ function kanjiJourneyRemember(visit, helps, attemptId) {
       journey.lifecycle.holdAtDeadline(request.token);
       done();
     }, 300);
-    kept.then(done, done);
+    const unproved = () => { if (!request.settled) journey.lifecycle.holdAtDeadline(request.token); done(); };
+    kept.then((outcome) => (outcome === 'unproved' ? unproved() : done()), unproved);
   });
 }
 /** ON's kanjiCourseAct: the journey snapshot (its attempt is the course's, inside the review day's namespace) is written before
