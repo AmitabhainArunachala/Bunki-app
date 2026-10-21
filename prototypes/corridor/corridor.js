@@ -2350,6 +2350,7 @@ async function openAppRecord() {
     const current = await recordApp.snapshot();
     if (current.status !== 'active') { recordFailure(current.reason, true); return false; }
     publishRecordSnapshot(current.snapshot);
+    void adoptJourney(epoch, recordApp);
     const drafts = await import(window.__KAIRO_TEACHER_DRAFT_CONTROLLER_URL__ || './teacher-draft-controller.mjs');
     if (!assertOwner()) throw new Error('record-owner-changed');
     const installation = recordInstallation;
@@ -20063,6 +20064,8 @@ function kanjiCourseApplyHelp(visit) {
 }
 function kanjiCourseRememberHelp(visit, helps, attemptId = null) {
   if (visit?.unitId !== 'shiki-shoku') return;
+  // rev 3.2 §7.8: with the journey on, the rows are kept in the learner record first; the promise resolves once they show
+  if (typeof JOURNEY_WRITES !== 'undefined' && JOURNEY_WRITES) return kanjiJourneyRemember(visit, helps, attemptId);
   visit.referenceHelp ||= [];
   // the course projects only the ledger's own accepted copies, never the caller's objects again; a batch the ledger refuses
   // is kept nowhere, so the course never projects a row the ledger lacks
@@ -20133,6 +20136,8 @@ function kanjiCourseLedger(visit) {
  * with another row or origin refuses. A teaching or dictionary row is a new event of this visit. Returns the accepted
  * frozen copies, in batch order, or null when the batch is refused */
 function kanjiCourseCapture(visit, helps, attemptId = null) {
+  // HOOKS r8 rev 3.2 §7.1: with the journey off, a capture is where an open page crosses a day, so the date marker follows it
+  if (typeof kanjiJourneyTick === 'function') kanjiJourneyTick();
   const ledger = kanjiCourseLedger(visit);
   if (ledger.unavailable) return null;
   if (!kanjiPlainList(helps)) {
@@ -20229,10 +20234,212 @@ function kanjiCoursePrepareReview(visit, attemptId, actual) {
   return { details: copy(details), binding: { owner: KANJI_REVIEW_OWNER, journeyId: ledger.journeyId, epoch: visit.epoch, attemptId,
     sessionId: context.sessionId, origins: copy(context.origins) } };
 }
+/** HOOKS r8 rev 3.2 §7: the journey's release switch. OFF (until John's word) is a8b9cbff exactly: the page-session ledger
+ * above grades, and the journey's only write is the date-only device marker bunki-journey:off-day. ON keeps the course's help
+ * in the learner record's m4Journey root (journey-lifecycle.mjs): help shows once it is kept, an answer's snapshot, its
+ * preparation and its dispatch are written first, the hook's lock rechecks them read-only, and the review day rotates at
+ * srs-core's endOfDay. Every journey step runs on one queue, so a capture and the next snapshot never race on the root */
+const JOURNEY_WRITES = false;
+/** the current record owner's journey: { epoch, module, lifecycle, queue, retained, dispatches, snapshots, batches, entered, fullDay } */
+let kanjiJourney = null;
+let kanjiJourneyModule = null;
+/** the two device markers: W-off a date string, W-hold JSON; an unparseable W-hold reads back raw, so it counts as doubt */
+const kanjiJourneyDevice = Object.freeze({
+  read(key) {
+    const raw = localStorage.getItem(key);
+    if (raw === null) return undefined;
+    if (key === 'bunki-journey:off-day') return raw;
+    try { return JSON.parse(raw); } catch { return raw; }
+  },
+  write(key, value) { localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value)); return true; },
+  remove(key) { localStorage.removeItem(key); return true; },
+});
+/** the reasons a review day is full (rev 3.2 §7.6): only these promise tomorrow */
+const KANJI_JOURNEY_DAY_FULL = Object.freeze(['event-bound', 'attempt-bound', 'visit-bound']);
+/** a newly adopted record owner's journey. OFF writes its date marker and reads the root for diagnostics only. ON needs the
+ * served build's identity (lastWriterBuild); without one the journey cannot start, and course reviews refuse while practice
+ * continues */
+async function adoptJourney(epoch, app) {
+  kanjiJourneyModule ||= import('./journey-lifecycle.mjs').catch((err) => { console.warn('journey unavailable', err); return null; });
+  const module = await kanjiJourneyModule;
+  if (!module || !srsCore || epoch !== recordEpoch || app !== recordApp || typeof app?.journeyAuthority !== 'function') return;
+  let buildId = 'journey-off';
+  if (JOURNEY_WRITES) {
+    const served = await maintenanceServedBuild();
+    if (epoch !== recordEpoch || app !== recordApp) return;
+    if (!served) { kanjiJourney = { epoch, unavailable: 'build-unidentified' }; return; }
+    buildId = `${served.git_sha}/${served.artifact_sha256}`;
+  }
+  const journey = { epoch, module, queue: Promise.resolve(), retained: new Map(), dispatches: new Map(), snapshots: new Map(),
+    batches: new WeakSet(), entered: new WeakSet(), fullDay: null };
+  try {
+    journey.lifecycle = module.createLifecycle({
+      port: module.recordPort({ app, binding: () => ({ epoch: recordEpoch }), nextId: () => crypto.randomUUID() }),
+      device: kanjiJourneyDevice, buildId, core: srsCore, clock: Date.now, enabled: JOURNEY_WRITES,
+      // the course is the one registered producer: only a batch it built and froze here is admitted
+      validateCapture: (entries) => { if (!journey.batches.has(entries)) throw new Error('unknown-producer'); return entries; },
+    });
+  } catch (err) {
+    console.warn('journey unavailable', err);
+    kanjiJourney = { epoch, unavailable: 'journey-unavailable' };
+    return;
+  }
+  kanjiJourney = journey;
+  for (const note of journey.lifecycle.inspect().diagnostics) console.warn('journey:', note);
+  await kanjiJourneyRun(journey, () => journey.lifecycle.ready);
+}
+function kanjiJourneyRun(journey, step) {
+  const run = journey.queue.then(step);
+  journey.queue = run.catch(() => {});
+  return run;
+}
+/** the live journey of this visit's owner, or null (none yet, another owner, or unavailable) */
+function kanjiJourneyFor(visit) {
+  const journey = kanjiJourney;
+  return journey?.lifecycle && journey.epoch === recordEpoch && visit?.epoch === recordEpoch ? journey : null;
+}
+/** OFF: an open page crossing a day refreshes the date marker (the lifecycle's own tick, which writes nothing else) */
+function kanjiJourneyTick() {
+  const journey = kanjiJourney;
+  if (!JOURNEY_WRITES && journey?.lifecycle && journey.epoch === recordEpoch) journey.lifecycle.tick();
+}
+function kanjiJourneyId() {
+  const journey = kanjiJourney;
+  return journey?.lifecycle && journey.epoch === recordEpoch ? journey.lifecycle.inspect().root?.id ?? null : null;
+}
+function kanjiJourneyReason(journey, error) {
+  const day = journey.lifecycle.inspect().root?.dayEpoch ?? null;
+  if (KANJI_JOURNEY_DAY_FULL.includes(error?.message)) journey.fullDay = day;
+  return journey.fullDay !== null && journey.fullDay === day ? 'journey-day-full' : 'not-recorded';
+}
+/** a visit counts once toward the day's 32 (rev 3.2 §7.6), at its first kept help or answer */
+async function kanjiJourneyEnter(journey, visit) {
+  if (journey.entered.has(visit)) return;
+  journey.entered.add(visit);
+  try { await journey.lifecycle.enter('lessons'); } catch (error) { visit.journeyRefused = kanjiJourneyReason(journey, error); }
+}
+/** keep one batch before it shows (rev 3.2 §7.7–8): the course's validation; the course's own origins in the journey's session
+ * (a course row is the event course/<attempt>/<what> of its journey attempt); one queued write; then the display wait,
+ * acknowledged within 300 ms or shown once with the day held. Resolves after the course projects the kept rows; a batch the
+ * journey did not keep is projected nowhere */
+function kanjiJourneyRemember(visit, helps, attemptId) {
+  const journey = kanjiJourneyFor(visit);
+  if (!journey) return Promise.resolve();
+  return kanjiJourneyRun(journey, async () => {
+    await journey.lifecycle.tick();
+    await kanjiJourneyEnter(journey, visit);
+    const root = journey.lifecycle.inspect().root;
+    let batch = Object.freeze([]), rows = [];
+    if (root && kanjiPlainList(helps) && helps.every(kanjiCourseRowValid)) {
+      const namespace = journey.lifecycle.namespace(), session = namespace.slice(0, -1);
+      rows = helps.map((help) => JSON.parse(JSON.stringify(help)));
+      batch = kanjiDeepFreeze(rows.map((raw) => {
+        const id = attemptId ? namespace + attemptId : null;
+        const origin = id ? { eventId: `course/${id}/${raw.what}`, sessionId: session, attemptId: id }
+          : { eventId: `${raw.what}/${crypto.randomUUID()}`, sessionId: session };
+        return { receiptKey: origin.eventId, raw, origin };
+      }));
+      journey.batches.add(batch);
+      const fresh = batch.filter((entry) => !root.daily.events.some((event) => event.key === entry.receiptKey)).length;
+      if (root.daily.events.length + fresh > journey.module.LIMITS.events) journey.fullDay = root.dayEpoch;
+    }
+    let shown;
+    try { shown = await journey.lifecycle.awaitHelp(await journey.lifecycle.beginHelp(batch)); }
+    catch { return; }
+    if (shown?.accepted !== true) return;
+    visit.referenceHelp ||= [];
+    for (const help of rows) if (!visit.referenceHelp.some((row) => JSON.stringify(row) === JSON.stringify(help))) visit.referenceHelp.push(help);
+    visit.referenceHelp.sort((a, b) => a.at - b.at);
+  });
+}
+/** ON's kanjiCourseAct: the journey snapshot (its attempt is the course's, inside the review day's namespace) is written before
+ * the course acts, then the course's feedback or reveal is kept before it shows. Resolves to the attempt's result */
+async function kanjiJourneyAct(visit, action, value) {
+  const course = window.BunkiKanjiCourse;
+  const attempt = visit.run.schemaVersion === 2 ? course.currentAttempt(visit.run) : null;
+  const journey = attempt ? kanjiJourneyFor(visit) : null;
+  if (journey && !journey.snapshots.has(attempt.attemptId)) await kanjiJourneyRun(journey, async () => {
+    let id = null;
+    try {
+      await journey.lifecycle.tick();
+      await kanjiJourneyEnter(journey, visit);
+      id = journey.lifecycle.namespace() + attempt.attemptId;
+      journey.snapshots.set(attempt.attemptId, { id, token: await journey.lifecycle.beforeAnswer(id) });
+    } catch (error) { journey.snapshots.set(attempt.attemptId, { id, refused: kanjiJourneyReason(journey, error) }); }
+  });
+  const meta = attempt ? { attemptId: attempt.attemptId, at: Date.now() } : undefined;
+  visit.run = action === 'answer' ? course.answer(visit.run, value, meta) : course[action](visit.run, meta);
+  if (attempt && action === 'answer') visit.run = course.showFeedback(visit.run, attempt.attemptId, Date.now());
+  const result = course.summary(visit.run).results.at(-1);
+  if (attempt) await kanjiCourseRememberHelp(visit, result.exposure, attempt.attemptId);
+  return result;
+}
+/** ON's PREPARE_REVIEW: the journey prepares from its own snapshot (W3's rule labels it), then marks the dispatch, both
+ * journey writes; the retained record is that preparation, frozen, and the dispatch token waits for the lock. Returns
+ * { details, binding } with the journey attempt id, or { reason } */
+async function kanjiJourneyPrepare(visit, attemptId, actual) {
+  const journey = kanjiJourneyFor(visit), snap = journey?.snapshots.get(attemptId);
+  if (!journey) return { reason: kanjiJourney?.epoch === recordEpoch && kanjiJourney.unavailable ? 'not-recorded' : 'review-unverified' };
+  if (visit.journeyRefused) return { reason: visit.journeyRefused };
+  if (!snap) return { reason: 'review-unverified' };
+  if (snap.refused) return { reason: snap.refused };
+  const rule = typeof helpRelevanceRule === 'undefined' ? null : helpRelevanceRule;
+  if (!rule) return { reason: 'review-unverified' };
+  const copy = (value) => JSON.parse(JSON.stringify(value));
+  return kanjiJourneyRun(journey, async () => {
+    try {
+      const prepared = await journey.lifecycle.prepare(snap.token, copy(actual), rule);
+      const dispatch = await journey.lifecycle.reserve(prepared);
+      const journeyId = journey.lifecycle.inspect().root.id;
+      const details = { attemptId: prepared.id, journeyId, owner: KANJI_REVIEW_OWNER, candidate: copy(prepared.candidate), seam: 'kanji-course', delivered: false };
+      journey.retained.set(prepared.id, kanjiDeepFreeze(copy({ attemptId: prepared.id, rawCandidate: prepared.raw, context: prepared.context, details })));
+      journey.dispatches.set(prepared.id, dispatch);
+      const binding = { owner: KANJI_REVIEW_OWNER, journeyId, epoch: visit.epoch, attemptId: prepared.id,
+        sessionId: prepared.context.sessionId, origins: copy(prepared.context.origins) };
+      return { binding, details: copy(details) };
+    } catch (error) {
+      return { reason: kanjiJourneyReason(journey, error) };
+    }
+  });
+}
+/** custody.retained with the journey on: its frozen preparation, replayed as a copy (whether its owner is still live stays the
+ * caller's check, as with the page ledger) */
+function kanjiJourneyRetained(attemptId, candidate) {
+  const record = kanjiJourney?.retained?.get(attemptId);
+  if (!record) throw new Error('review-not-prepared');
+  if (candidate !== undefined && JSON.stringify(candidate) !== JSON.stringify(record.details.candidate)) throw new Error('review-transport-changed');
+  return JSON.parse(JSON.stringify(record));
+}
+/** the hook's admission carries the dispatch token the lock fence checks */
+function kanjiJourneyAdmission(admission) {
+  const journey = kanjiJourney;
+  return { ...admission, journey: journey?.epoch === recordEpoch ? journey.dispatches.get(admission?.attemptId) ?? null : null };
+}
+/** rev 3.2 §7.9 inside the hook's lock, beside the binding epoch: admitted for this owner, generation, root, switch, clock,
+ * review day and markers (S1: today's W-off, today's W-hold, unreadable evidence). Read-only: no marker, root, rotation or
+ * repair. Returns the refusal reason (an owner change: publish-failed; anything stale: not-recorded), or null */
+function kanjiJourneyFence(binding, epoch) {
+  const journey = kanjiJourney;
+  if (!journey?.lifecycle || journey.epoch !== epoch || epoch !== recordEpoch) return 'publish-failed';
+  try {
+    journey.lifecycle.admitAtLock(binding?.journey);
+    return null;
+  } catch {
+    return 'not-recorded';
+  }
+}
+/** an admitted call finishes once: its outcome settles the dispatch (a late one only the retired day's summary) */
+function kanjiJourneySettle(attemptId, outcome) {
+  const journey = kanjiJourney, dispatch = journey?.dispatches.get(attemptId);
+  if (!dispatch) return Promise.resolve();
+  journey.dispatches.delete(attemptId);
+  const settled = outcome?.write === true ? { write: true, rating: outcome.rating } : { write: false, reason: outcome?.reason || 'publish-uncertain' };
+  return kanjiJourneyRun(journey, () => journey.lifecycle.settle(dispatch, settled)).catch(() => {});
+}
 function kanjiCourseTeachingHelp(visit, target) {
   if (visit?.unitId !== 'shiki-shoku' || !recordReady(visit.epoch)) return;
   const at = Date.now();
-  kanjiCourseRememberHelp(visit, [
+  return kanjiCourseRememberHelp(visit, [
     { what: 'teaching-card', about: { kind: 'kanji', literal: target.kanji }, reveals: ['meaning', 'form'], at },
     { what: 'teaching-card', about: { kind: 'word', term: target.wordKey, reading: target.readings[0] },
       reveals: ['reading', 'meaning', 'form'], at },
@@ -20246,8 +20453,9 @@ function kanjiCourseReferenceHelp(visit, node) {
       ? { kind: 'word', term: node.id, reading: node.reading } : null;
   const help = { what: 'dictionary-entry', ...(about ? { about } : {}),
     reveals: node.t === 'word' ? ['reading', 'meaning', 'form'] : ['meaning', 'form'], at: Date.now() };
-  kanjiCourseRememberHelp(visit, [help]);
+  const kept = kanjiCourseRememberHelp(visit, [help]);
   visit.supportedPractice = true;
+  if (kept?.then) return kept.then(() => kanjiCourseApplyHelp(visit));
   kanjiCourseApplyHelp(visit);
 }
 function kanjiCourseHookLine(outcome) {
@@ -20262,6 +20470,11 @@ function kanjiCourseHookLine(outcome) {
   if (outcome?.reason === 'review-history-full') return tx(
     'このページで記録できるヘルプの履歴が上限に達しました。復習に記録するには、ページを読み込み直してください。練習はこのまま続けられます。',
     'This page has kept all the help history it can. Reload the page to record reviews again; practice still works.',
+  );
+  // rev 3.2 §7.6: with the journey on, a full review day (128 help events, 96 attempts or 32 visits) lifts at the next day
+  if (outcome?.reason === 'journey-day-full') return tx(
+    '今日記録できるヘルプの履歴が上限に達しました。復習への記録は明日また始まります。練習はこのまま続けられます。',
+    "Today's help history is full. Review recording starts again tomorrow; practice still works.",
   );
   // HOOKS r8 §4: every hook refusal shows its one approved line from srs-core, never a text of this view's own
   const core = typeof srsCore === 'undefined' ? null : srsCore;
@@ -20285,15 +20498,19 @@ async function reportKanjiCourseAttempt(visit, attemptId, choice) {
   if (!candidate) return;
   // HOOKS r8: prepare from the retained ledger, then the one caller, which re-checks the retained record and the binding
   // before it calls the hook at most once; a preparation that fails reaches no hook
-  const prepared = kanjiCoursePrepareReview(visit, attemptId, candidate);
+  // rev 3.2 §7: with the journey on, preparation and its dispatch mark are journey writes, made once the visit shows it waits
+  const journeyOn = typeof JOURNEY_WRITES !== 'undefined' && JOURNEY_WRITES;
+  const prepared = journeyOn ? null : kanjiCoursePrepareReview(visit, attemptId, candidate);
   visit.hookOutcomes[attemptId] = { pending: true };
   visit.pending = true; render();
-  let outcome;
+  let outcome, ready = prepared;
   try {
-    outcome = prepared.reason ? { write: false, reason: prepared.reason }
-      : await caller.observe({ type: 'PREPARE_REVIEW', attemptId }, { status: 'prepared', details: prepared.details, state: KANJI_REVIEW_STATE },
-        prepared.binding);
+    ready ??= await kanjiJourneyPrepare(visit, attemptId, candidate);
+    outcome = ready.reason ? { write: false, reason: ready.reason }
+      : await caller.observe({ type: 'PREPARE_REVIEW', attemptId: ready.details.attemptId }, { status: 'prepared', details: ready.details, state: KANJI_REVIEW_STATE },
+        ready.binding);
   } catch { outcome = { write: false, reason: 'publish-uncertain' }; }
+  if (journeyOn && ready?.details) await kanjiJourneySettle(ready.details.attemptId, outcome);
   // Keep a terminal receipt on the originating visit even if its page/owner
   // changed. Never retry a possibly published write or replay it on repaint.
   visit.hookOutcomes[attemptId] = outcome && typeof outcome.write === 'boolean'
@@ -20478,7 +20695,12 @@ function renderKanjiCourse(main) {
       `Choose ${unit.targets.length} character keywords and recall ${unit.targets.length} whole-word readings. Meaning and reading results stay separate.`,
     )));
     main.append(el('p', 'fine', tx('読みの練習には、かな入力を使います。答えを見る・今回はスキップすることもできます。', 'Reading checks use kana input. You can reveal an answer or skip a target without receiving credit.')));
-    main.append(button('kanji-course-learn', '先に学ぶ', `Learn the ${unit.targets.length} characters first`, () => { visit.stage = 'teach'; kanjiCourseTeachingHelp(visit, unit.targets[visit.index]); redraw(); }, 'take'));
+    main.append(button('kanji-course-learn', '先に学ぶ', `Learn the ${unit.targets.length} characters first`, () => {
+      visit.stage = 'teach';
+      // rev 3.2 §7.8: with the journey on, the card shows once its help is kept (at once with the journey off)
+      const kept = kanjiCourseTeachingHelp(visit, unit.targets[visit.index]);
+      if (kept?.then) { visit.pending = true; kept.then(() => { visit.pending = false; redraw(); }); } else redraw();
+    }, 'take'));
     if (visit.supportedPractice) main.append(button('kanji-course-practise', 'すぐ練習する', 'Practise now', () => start('check')));
     else main.append(button('kanji-course-preview', '説明を見ずに試す', 'Try the checks before studying', () => start('preview')));
     return;
@@ -20515,7 +20737,9 @@ function renderKanjiCourse(main) {
     main.append(button('kanji-course-teach-next', visit.index + 1 < unit.targets.length ? 'つぎへ' : '練習へ',
       visit.index + 1 < unit.targets.length ? 'Next character' : 'Start the checks', () => {
         if (visit.index + 1 < unit.targets.length) {
-          visit.index += 1; kanjiCourseTeachingHelp(visit, unit.targets[visit.index]); redraw();
+          visit.index += 1;
+          const kept = kanjiCourseTeachingHelp(visit, unit.targets[visit.index]);
+          if (kept?.then) { visit.pending = true; kept.then(() => { visit.pending = false; redraw(); }); } else redraw();
         } else start('check');
       }, 'take'));
     return;
@@ -20566,6 +20790,13 @@ function renderKanjiCourse(main) {
     main.append(el('div', 'review-front', prompt.kind === 'meaning' ? prompt.kanji : prompt.wordKey));
     const respond = (action, value) => {
       if (!current() || visit.feedback || visit.pending) return;
+      // rev 3.2 §7: with the journey on, the answer's snapshot and its feedback are kept before the feedback shows
+      if (typeof JOURNEY_WRITES !== 'undefined' && JOURNEY_WRITES) {
+        visit.pending = true; visit.draft = ''; render();
+        kanjiJourneyAct(visit, action, value).then((result) => { visit.feedback = { prompt, result }; },
+          () => {}).finally(() => { visit.pending = false; redraw(); });
+        return;
+      }
       visit.feedback = { prompt, result: kanjiCourseAct(visit, action, value) };
       visit.draft = '';
       redraw();
@@ -31059,6 +31290,7 @@ const KANJI_REVIEW_OWNER = 'learner-record';
  * owner's ledger replaces it), replayed as a copy and never relabelled; a candidate that differs from it is refused. Whether
  * that owner is still live is the caller's check, not custody's */
 function kanjiReviewRetained(attemptId, candidate) {
+  if (typeof JOURNEY_WRITES !== 'undefined' && JOURNEY_WRITES) return kanjiJourneyRetained(attemptId, candidate);
   const record = kanjiCourseJourney?.records?.[attemptId];
   if (!record) throw new Error('review-not-prepared');
   if (candidate !== undefined && JSON.stringify(record.details.candidate) !== JSON.stringify(candidate)) throw new Error('review-transport-changed');
@@ -31077,10 +31309,12 @@ function adoptHelpRelevance({ createRelevance, createCaller, catalog }) {
   helpRelevanceRule = rule;
   kanjiReviewCaller = createCaller({
     core: srsCore,
-    hook: { report: (candidate, admission) => window.__KAIRO_HOOKS__.report(candidate, admission) },
+    hook: { report: (candidate, admission) => window.__KAIRO_HOOKS__.report(candidate,
+      typeof JOURNEY_WRITES !== 'undefined' && JOURNEY_WRITES ? kanjiJourneyAdmission(admission) : admission) },
     lines: { forReason: (reason, lang) => srsCore.refusalWords(reason, lang) },
     ownership: () => ({ owner: recordReady(recordEpoch) ? KANJI_REVIEW_OWNER : null,
-      journeyId: kanjiCourseJourney?.epoch === recordEpoch ? kanjiCourseJourney.journeyId : null, epoch: recordEpoch }),
+      journeyId: typeof JOURNEY_WRITES !== 'undefined' && JOURNEY_WRITES ? kanjiJourneyId()
+        : kanjiCourseJourney?.epoch === recordEpoch ? kanjiCourseJourney.journeyId : null, epoch: recordEpoch }),
     custody: { retained: kanjiReviewRetained },
     admit: rule,
     course: window.BunkiKanjiCourse,
@@ -31138,6 +31372,12 @@ async function reportHookAttempt(evidence, binding = null) {
     where: evidence?.surface,
     commit: async ({ now, answered, reserve }) => {
       if (!recordWritable(epoch)) return { outcome: 'not-published' };
+      // rev 3.2 §7.9 (S1): with the journey on, a course review grades only under its admitted dispatch, rechecked here beside
+      // the binding epoch and read-only: owner, generation, root, switch, clock, review day and today's markers
+      if (typeof JOURNEY_WRITES !== 'undefined' && JOURNEY_WRITES && (binding?.raw || String(evidence?.surface).startsWith('course:'))) {
+        const fenced = kanjiJourneyFence(binding, epoch);
+        if (fenced) { decision = { write: false, reason: fenced }; return { outcome: 'not-published' }; }
+      }
       const saved = await commitStorePatchOutcome((latest) => {
         const item = evidence?.item;
         const key = srsCore.validItem(item) ? srsKey(item.kind, item.kind === 'word' ? item.term : item.literal) : null;
@@ -40569,31 +40809,40 @@ function enterWord(node, { from = null, invoker = null, instant = false } = {}) 
   const depth = S.stack.length + 1;
   const ready = layered ? takePrebuiltPage(node, depth) : null;
   const pushed = ready?.node || node;
-  kanjiCourseReferenceHelp(S.kanjiCourse, pushed);
-  if (pushed.t === 'word' && scaleNodeBelongs(pushed) && (!S.stack.length || S.stack.at(-1)?.t === 'sent')) S.scaleVisit.word = pushed;
-  if (ladderOpening) {
-    ladderOpening.rung = 'page';
-    ladderOpening.anchor.dataset.ladderRung = 'page';
-    ladderPages.set(pushed, ladderOpening);
-    ladderVisit = null;
+  // rev 3.2 §7.8: with the journey on, a dictionary page opened from a course shows once its help is kept (within 300 ms)
+  const show = () => {
+    if (pushed.t === 'word' && scaleNodeBelongs(pushed) && (!S.stack.length || S.stack.at(-1)?.t === 'sent')) S.scaleVisit.word = pushed;
+    if (ladderOpening) {
+      ladderOpening.rung = 'page';
+      ladderOpening.anchor.dataset.ladderRung = 'page';
+      ladderPages.set(pushed, ladderOpening);
+      ladderVisit = null;
+    }
+    if (invoker?.isConnected) heroSource.set(pushed, invoker);
+    const source = from?.isConnected ? from : invoker?.isConnected ? invoker : null;
+    const where = sampleWhere();
+    // where the word leaves from, read while it still stands (the slip closes next: its surface hears 'dive')
+    const leaves = !instant && pageCutAllowed() ? glyphBox(source) : null;
+    removeMini();
+    // the page this one covers is kept as it stands: Back mounts the same element, its words where Back's word goes home
+    const below = depth > 1 ? document.getElementById('sheet') : null;
+    if (below && layered) keptPages.set(S.stack.at(-1), { page: below, epoch: pageEpoch });
+    S.stack.push(pushed);
+    if (layered) renderLayer({ prebuilt: ready?.page || null });
+    else render();
+    const sheet = document.getElementById('sheet');
+    if (sheet && !pushed.sheetScroll) sheet.scrollTop = 0;
+    if (ready) reviveBuiltAhead(pushed);
+    if (leaves) flyWord(leaves, heroOf(sheet));
+    sampleTransition('page', where);
+  };
+  const kept = kanjiCourseReferenceHelp(S.kanjiCourse, pushed);
+  if (kept?.then) {
+    const serial = S.wordEntrySerial;
+    kept.then(() => { if (S.wordEntrySerial === serial && S.stack.length + 1 === depth) show(); });
+    return;
   }
-  if (invoker?.isConnected) heroSource.set(pushed, invoker);
-  const source = from?.isConnected ? from : invoker?.isConnected ? invoker : null;
-  const where = sampleWhere();
-  // where the word leaves from, read while it still stands (the slip closes next: its surface hears 'dive')
-  const leaves = !instant && pageCutAllowed() ? glyphBox(source) : null;
-  removeMini();
-  // the page this one covers is kept as it stands: Back mounts the same element, its words where Back's word goes home
-  const below = depth > 1 ? document.getElementById('sheet') : null;
-  if (below && layered) keptPages.set(S.stack.at(-1), { page: below, epoch: pageEpoch });
-  S.stack.push(pushed);
-  if (layered) renderLayer({ prebuilt: ready?.page || null });
-  else render();
-  const sheet = document.getElementById('sheet');
-  if (sheet && !pushed.sheetScroll) sheet.scrollTop = 0;
-  if (ready) reviveBuiltAhead(pushed);
-  if (leaves) flyWord(leaves, heroOf(sheet));
-  sampleTransition('page', where);
+  show();
 }
 
 /** Back (one level) or close-all. The page goes at once; its headword travels home to the element it was entered from

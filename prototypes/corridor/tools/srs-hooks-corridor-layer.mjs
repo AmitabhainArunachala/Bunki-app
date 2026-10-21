@@ -26,10 +26,18 @@ export const CORRIDOR_NAMES = [
   'kanjiCourseJourney', 'KANJI_LEDGER_FULL', 'kanjiCourseHookLine',
 ];
 
+/** HOOKS r8 rev 3.2 §7: the journey's switch, lifecycle adoption and course seams (lifted beside CORRIDOR_NAMES by the
+ * journey verifier; the r8 verifiers keep lifting exactly CORRIDOR_NAMES) */
+export const JOURNEY_NAMES = [
+  'JOURNEY_WRITES', 'kanjiJourney', 'kanjiJourneyModule', 'kanjiJourneyDevice', 'KANJI_JOURNEY_DAY_FULL', 'adoptJourney', 'kanjiJourneyRun',
+  'kanjiJourneyFor', 'kanjiJourneyTick', 'kanjiJourneyId', 'kanjiJourneyReason', 'kanjiJourneyEnter', 'kanjiJourneyRemember',
+  'kanjiJourneyAct', 'kanjiJourneyPrepare', 'kanjiJourneyRetained', 'kanjiJourneyAdmission', 'kanjiJourneyFence', 'kanjiJourneySettle',
+];
+
 /** lift the named top-level definitions from corridor.js source text */
-export function liftCorridor(source) {
+export function liftCorridor(source, list = CORRIDOR_NAMES) {
   const ast = ts.createSourceFile('corridor.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
-  const names = new Set(CORRIDOR_NAMES);
+  const names = new Set(list);
   const found = new Set();
   const selected = ast.statements.filter((statement) => {
     const declared = ts.isFunctionDeclaration(statement) ? [statement.name?.text]
