@@ -98,7 +98,48 @@ export function loadMixedLexemes(site) {
   }
   return MIXED_LEXEMES;
 }
-export function classEvidence(tokenClass, entry, expression = false) {
+const proofReading = value => String(value || '').replace(/[ァ-ヶ]/gu, char => String.fromCharCode(char.charCodeAt(0) - 0x60));
+/** Exact sense evidence for an already selected index entry. Kana displays still
+ * require a real entry reading; only written displays require appliesToKanji. */
+export function readingSenseProofs(row, detail, form, reading, gloss) {
+  const seq = String(row?.[0] || ''), stated = proofReading(reading);
+  if (!/^[0-9]+$/u.test(seq) || String(detail?.[0]) !== seq || !form || !stated || !gloss) return [];
+  const permitted = (row[5] || []).some((kana, k) => proofReading(kana) === stated && (kana === form
+    || ((row[4] || []).includes(form) && (row[11]?.[k] === 0
+      || (Array.isArray(row[11]?.[k]) && row[11][k].includes(row[4].indexOf(form)))))));
+  if (!permitted) return [];
+  const readings = (detail[2] || []).filter(kana => proofReading(kana[0]) === stated);
+  const kanaForm = readings.some(kana => kana[0] === form);
+  const writtenForm = (detail[1] || []).some(written => written[0] === form)
+    && readings.some(kana => (kana[3] || []).some(written => written === '*' || written === form));
+  if (!kanaForm && !writtenForm) return [];
+  return (detail[3] || []).flatMap((sense, senseIndex) => {
+    const written = sense[1] || ['*'], kana = sense[2] || ['*'];
+    if (!kanaForm && !written.includes('*') && !written.includes(form)) return [];
+    if (!kana.includes('*') && !kana.some(value => proofReading(value) === stated)) return [];
+    if (!(sense[10] || []).some(value => value[0] === gloss)) return [];
+    return [{ seq, form, reading, senseIndex, gloss, pos: sense[0] || [] }];
+  });
+}
+/** A lexical phrase has its own POS only with an exact contiguous spelling AND
+ * reading witness. Unlike the legacy exp check, this uses no inflection guesses. */
+export function exactExpressionSpan(tokens, index, form, reading) {
+  if (!Array.isArray(tokens) || !Number.isInteger(index) || index < 0 || index >= tokens.length
+    || typeof form !== 'string' || !form || typeof reading !== 'string' || !reading) return null;
+  for (let from = Math.max(0, index - 4); from <= index; from += 1) {
+    for (let to = Math.max(index, from + 1); to <= Math.min(tokens.length - 1, from + 4); to += 1) {
+      const span = tokens.slice(from, to + 1);
+      if (span.some(token => typeof token?.s !== 'string' || !token.s || /[\p{P}\p{Z}\p{C}]/u.test(token.s)
+        || typeof token.r !== 'string' || !token.r)) continue;
+      if (span.map(token => token.s).join('') === form
+        && proofReading(span.map(token => token.r).join('')) === proofReading(reading)) {
+        return { from, to, index, form, reading: proofReading(reading) };
+      }
+    }
+  }
+  return null;
+}
+export function classEvidence(tokenClass, entry, expression = false, wholeSpan = null) {
   if (!['動詞', '形容詞'].includes(tokenClass)) return { proved: true, required: false, unknown: false };
   const raw = entry?.proofs || [];
   const proofs = raw.filter(proof => /^[0-9]+$/u.test(String(proof.seq || '')) && typeof proof.form === 'string' && proof.form.length
@@ -108,8 +149,15 @@ export function classEvidence(tokenClass, entry, expression = false) {
   const unknown = !proofs.length || proofs.length !== raw.length || proofs.some(proof => !proof.pos.length);
   const fits = parts => tokenClass === '動詞' ? parts.some(part => /^v[0-9a-z]/u.test(part) || part === 'aux-v')
     : parts.some(part => /^adj-(i|ix|ku|shiku)$/u.test(part) || part === 'aux-adj');
+  const spanValid = wholeSpan && [wholeSpan.from, wholeSpan.to, wholeSpan.index].every(Number.isInteger)
+    && wholeSpan.from >= 0 && wholeSpan.to > wholeSpan.from && wholeSpan.to - wholeSpan.from < 5
+    && wholeSpan.from <= wholeSpan.index && wholeSpan.index <= wholeSpan.to
+    && typeof wholeSpan.form === 'string' && wholeSpan.form.length > 0
+    && typeof wholeSpan.reading === 'string' && wholeSpan.reading.length > 0;
+  const exactAdverb = proof => spanValid && proof.pos.includes('adv') && proof.form === wholeSpan.form
+    && proofReading(proof.reading) === proofReading(wholeSpan.reading);
   // Ambiguous matching entries cannot borrow the one compatible homograph's POS.
-  const proved = !unknown && proofs.every(proof => fits(proof.pos) || (expression && proof.pos.includes('exp')));
+  const proved = !unknown && proofs.every(proof => fits(proof.pos) || (expression && proof.pos.includes('exp')) || exactAdverb(proof));
   return { proved, required: true, unknown, pos, proofs };
 }
 export function specialEvidence({ article, index, token, card, proof }) {

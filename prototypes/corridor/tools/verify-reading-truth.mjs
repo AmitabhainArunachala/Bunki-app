@@ -77,7 +77,7 @@ import { selectBackupFile } from './record-fixture-support.mjs';
  * rule reverted (no token marked) N2.te, R2.stem and AUX fail; with the kana いる rule reverted N2.alone fails. */
 import assert from 'node:assert/strict';
 import { createHash, randomUUID } from 'node:crypto';
-import { selection, scopeResult, READING_CASES, classEvidence, specialEvidence, loadSpecialProofs, exactRoster } from './vh-visual-contracts.mjs';
+import { selection, scopeResult, READING_CASES, classEvidence, readingSenseProofs, exactExpressionSpan, specialEvidence, loadSpecialProofs, exactRoster } from './vh-visual-contracts.mjs';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
@@ -1221,13 +1221,7 @@ function meaningEntry(label, stated, gloss, readings = [stated]) {
   // sense's POS cannot lend proof. The quick dictionary's prose POS is not authority.
   const proofs = readings.flatMap(reading => readAs(label, reading).flatMap(row => {
     const seq = String(row[0]);
-    return (detailOf(seq)?.[3] || []).flatMap((sense, senseIndex) => {
-      const written = sense[1] || ['*'], kana = sense[2] || ['*'];
-      if (!written.includes('*') && !written.includes(label)) return [];
-      if (!kana.includes('*') && !kana.some(value => k2h(value) === k2h(reading))) return [];
-      if (!(sense[10] || []).some(value => value[0] === gloss)) return [];
-      return [{ seq, form: label, reading, senseIndex, gloss, pos: sense[0] || [] }];
-    });
+    return readingSenseProofs(row, detailOf(seq), label, reading, gloss);
   }));
   if (core[label] && readings.includes(k2h(core[label].r)) && (core[label].m || []).includes(gloss)) {
     return { from: 'quick', p: core[label].p, pos: proofs.flatMap(proof => proof.pos), proofs };
@@ -1454,7 +1448,9 @@ async function sweepCase(browser, contextOptions) {
             out.entry = entry;
             if (!entry) out.issues.push(`"${gloss}" belongs to no entry that writes ${label} and reads it ${stated}`);
             else {
-              out.classEvidence = classEvidence(token.p, entry, teExpressionFits(tokens, index, label, stated) || expressionFits(tokens, index, label, stated));
+              out.expressionSpan = exactExpressionSpan(tokens, index, label, stated);
+              out.classEvidence = classEvidence(token.p, entry,
+                teExpressionFits(tokens, index, label, stated) || expressionFits(tokens, index, label, stated), out.expressionSpan);
               out.classUnknown = out.classEvidence.unknown;
               if (!out.classEvidence.proved) out.issues.push(out.classUnknown ? 'class evidence is unproved for this exact entry/form/reading/sense' : `${entry.seq || entry.from} is not a ${token.p} (${out.classEvidence.pos.join(' ')})`);
             }
