@@ -20792,8 +20792,10 @@ function renderKanjiCourseMenu(main) {
     const rooms = biLabel('button', 'chip', ...M4_COPY['R-01']);
     rooms.type = 'button'; rooms.id = 'kanji-room-lessons';
     rooms.addEventListener('click', () => {
-      S.kanjiCourse = { unitId: 'shiki-shoku', stage: 'intro', index: 0, epoch: recordEpoch, run: null, draft: '', feedback: null, saved: false,
-        pending: false, supportedPractice: !!S.kanjiCourse?.supportedPractice, chooser: true };
+      // a visit of this unit keeps its run, draft and help (§3.3); only a missing visit is opened anew
+      if (S.kanjiCourse?.unitId === 'shiki-shoku') Object.assign(S.kanjiCourse, { chooser: true, blocked: null });
+      else S.kanjiCourse = { unitId: 'shiki-shoku', stage: 'intro', index: 0, epoch: recordEpoch, run: null, draft: '', feedback: null,
+        saved: false, pending: false, supportedPractice: !!S.kanjiCourse?.supportedPractice, chooser: true };
       render();
       document.getElementById('kanji-course-title')?.focus();
     });
