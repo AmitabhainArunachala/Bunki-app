@@ -2992,7 +2992,6 @@ body .token-actions button:hover { background: var(--ai-wash); }
   }
   body.has-primary-tabs[data-view='reader']:not(.zen):has(#layers-mark):not(:has(.listen-row.play-bar[data-open='true'])) #primary-tabs {
     background-origin: border-box;
-    transition: border-top-color var(--motion-room) var(--ease-standard), box-shadow var(--motion-room) var(--ease-standard);
   }
   body.has-primary-tabs[data-view='reader']:not(.zen):has(#layers-mark:not([data-docked])):not(:has(.listen-row.play-bar[data-open='true'])) #primary-tabs {
     border-top-color: transparent;
