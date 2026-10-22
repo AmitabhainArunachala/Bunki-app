@@ -1706,16 +1706,17 @@ body.v-depth-layered #reader, #reader.reader {
 /* a reading is the one ruby (rooms/motion.css): native, half its word, over it. On touch a reading stands
    alone over the word you tapped, so it keeps no gap at its sides and pries no air into the line (R1) */
 #reader:not(.fg-always) { --reading-gap: 0; }
-/* Hfix-2e2 · G6-1 · a reading folded away on touch fades (the house's fast beat) and only then gives up its box: the lead's
-   2158 delayed collapse, so at rest a folded reading takes no room and no width, and the fold is still seen to go. Its word
-   keeps the reading's seat until it has gone (corridor.js seatTouchReading). Revealed, it stands at once, as before: the
-   transition belongs to the folded state only. Reduced motion keeps the instant conceal. */
+/* Hfix-2e2 · G6-1 · only opacity transitions. The reader's conceal lifecycle owns the temporary box hold and its
+   pinned seat, then releases both together. A fresh reveal removes the hold and stands at once; hidden readings at rest
+   still use the global display:none rule. Reduced motion removes the held box on the first frame. */
 #reader:not(.fg-always) rt.hidden-rt {
   opacity: 0;
-  transition: opacity var(--motion-fast) var(--ease-exit), display var(--motion-fast) allow-discrete;
+  transition: opacity var(--motion-fast) var(--ease-exit);
 }
+#reader:not(.fg-always) rt.hidden-rt[data-touch-fading] { display: ruby-text; }
 @media (prefers-reduced-motion: reduce) {
   #reader:not(.fg-always) rt.hidden-rt { transition: none; }
+  #reader:not(.fg-always) rt.hidden-rt[data-touch-fading] { display: none; }
 }
 /* at 200 % text on a phone (a column under 240 CSS px) a bracketed word can be wider than the line: there the
    closing mark may start a line rather than run off the screen (the kinsoku rule yields to the page's edge) */
