@@ -9732,8 +9732,8 @@ function inlineWordReading(anchor, reading) {
   const ruby = anchor.querySelector('ruby');
   if (ruby) {
     const hidden = [...ruby.querySelectorAll('rt.hidden-rt')];
-    hidden.forEach(rt => rt.classList.remove('hidden-rt'));
-    return () => hidden.forEach(rt => rt.classList.add('hidden-rt'));
+    hidden.forEach(rt => setTouchReadingShown(rt, true));
+    return () => hidden.forEach(rt => setTouchReadingShown(rt, false));
   }
   const children = [...anchor.childNodes];
   const row = el('ruby');
@@ -9867,39 +9867,128 @@ function touchRows(rt, block) {
   }
   return rows;
 }
+// Seats belong to readings, not to whichever ancestor happens to carry a pin. Keeping the
+// actual rows also lets a detached reading release its old seat without touching a sibling's.
+const TOUCH_READING_ROWS = new Map();
+const TOUCH_ROW_PINS = new WeakMap();
+function pinTouchRows(rt, rows, widths) {
+  if (!rows.length) return;
+  TOUCH_READING_ROWS.set(rt, rows);
+  rows.forEach((row, i) => {
+    let pin = TOUCH_ROW_PINS.get(row);
+    if (!pin) {
+      pin = { owners: new Map(), width: row.style.width, priority: row.style.getPropertyPriority('width'),
+        attribute: row.getAttribute('data-touch-pin') };
+      TOUCH_ROW_PINS.set(row, pin);
+    }
+    pin.owners.set(rt, widths[i]);
+    row.style.width = [...pin.owners.values()].reduce((a, b) => parseFloat(a) >= parseFloat(b) ? a : b);
+    row.setAttribute('data-touch-pin', '');
+  });
+}
 function unpinTouchRows(rt) {
-  for (let n = rt.parentElement; n && n !== document.body; n = n.parentElement) {
-    if (n.hasAttribute('data-touch-pin')) { n.style.removeProperty('width'); n.removeAttribute('data-touch-pin'); }
+  const rows = TOUCH_READING_ROWS.get(rt) || [];
+  TOUCH_READING_ROWS.delete(rt);
+  for (const row of rows) {
+    const pin = TOUCH_ROW_PINS.get(row);
+    if (!pin) continue;
+    pin.owners.delete(rt);
+    if (pin.owners.size) {
+      row.style.width = [...pin.owners.values()].reduce((a, b) => parseFloat(a) >= parseFloat(b) ? a : b);
+    } else {
+      if (pin.width) row.style.setProperty('width', pin.width, pin.priority);
+      else row.style.removeProperty('width');
+      if (pin.attribute == null) row.removeAttribute('data-touch-pin');
+      else row.setAttribute('data-touch-pin', pin.attribute);
+      TOUCH_ROW_PINS.delete(row);
+    }
   }
 }
-/** Hfix-2e2 · G6-1 · a touch reading folded away fades before its box goes (editorial.css: the lead's 2158 delayed
- * collapse). While it fades it keeps its seat, its overhang and its pinned rows: unseated at once, a reading wider than its
- * word would widen the word for the fade and move the line twice. It is unseated once it has gone (its fade ended or was cut
- * short), and at once where no fade runs (reduced motion, or a reading no longer on the page). */
-const TOUCH_READING_FADES = new WeakSet();
+/** A conceal owns its box and seat until opacity finishes. Reveal invalidates that ownership
+ * before changing the class. No already-hidden construction starts a fade. */
+const TOUCH_READING_FADES = new Map();
+const TOUCH_READING_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)');
+function clearTouchReadingSeat(rt) {
+  rt.style.removeProperty('margin-inline');
+  unpinTouchRows(rt);
+}
+function stopTouchReadingFade(rt) {
+  const cycle = TOUCH_READING_FADES.get(rt);
+  if (cycle) {
+    TOUCH_READING_FADES.delete(rt);
+    clearTimeout(cycle.timer);
+    rt.removeEventListener('transitionend', cycle.event);
+    rt.removeEventListener('transitioncancel', cycle.event);
+  }
+  rt.removeAttribute('data-touch-fading');
+}
+function finishTouchReadingFade(rt, cycle) {
+  if (TOUCH_READING_FADES.get(rt) !== cycle) return;
+  stopTouchReadingFade(rt);
+  // Box removal and seat release share this task: no intervening painted frame.
+  clearTouchReadingSeat(rt);
+  if (touchReading(rt)) seatTouchReading(rt);
+}
 function touchReadingFading(rt) {
-  if (!rt.isConnected || !rt.classList.contains('hidden-rt') || getComputedStyle(rt).display === 'none') return false;
-  if (!TOUCH_READING_FADES.has(rt)) {
-    TOUCH_READING_FADES.add(rt);
-    let late = 0;
-    const gone = () => {
-      rt.removeEventListener('transitionend', gone);
-      rt.removeEventListener('transitioncancel', gone);
-      clearTimeout(late);
-      TOUCH_READING_FADES.delete(rt);
-      requestAnimationFrame(() => seatTouchReading(rt));
-    };
-    rt.addEventListener('transitionend', gone);
-    rt.addEventListener('transitioncancel', gone);
-    late = setTimeout(gone, 1000);
-  }
-  return true;
+  return TOUCH_READING_FADES.has(rt);
 }
+function setTouchReadingShown(rt, shown) {
+  if (shown) {
+    stopTouchReadingFade(rt);
+    rt.classList.remove('hidden-rt');
+    seatTouchReading(rt);
+    return;
+  }
+  const current = TOUCH_READING_FADES.get(rt);
+  const reader = rt.closest('#reader');
+  const canFade = rt.isConnected && rt.parentElement?.tagName === 'RUBY' && reader &&
+    !reader.classList.contains('fg-always') && !TOUCH_READING_MOTION.matches;
+  if (current) {
+    if (!canFade) finishTouchReadingFade(rt, current);
+    return; // repeated conceal cannot restart the fade or extend its deadline
+  }
+  const hidden = rt.classList.contains('hidden-rt');
+  const before = canFade && !hidden ? getComputedStyle(rt) : null;
+  const visible = before && before.display !== 'none' && before.visibility !== 'hidden' && Number(before.opacity) > 0;
+  if (!visible) {
+    stopTouchReadingFade(rt);
+    rt.classList.add('hidden-rt');
+    clearTouchReadingSeat(rt);
+    return;
+  }
+  const cycle = { timer: 0, animation: null, started: performance.now(), event: null };
+  const complete = () => finishTouchReadingFade(rt, cycle);
+  cycle.event = (event) => {
+    if (event.target !== rt || event.propertyName !== 'opacity' || event.pseudoElement || event.timeStamp < cycle.started) return;
+    // A queued event from an interrupted old transition cannot finish a new running one.
+    if (cycle.animation && ['running', 'pending'].includes(cycle.animation.playState)) return;
+    complete();
+  };
+  TOUCH_READING_FADES.set(rt, cycle);
+  rt.addEventListener('transitionend', cycle.event);
+  rt.addEventListener('transitioncancel', cycle.event);
+  rt.setAttribute('data-touch-fading', '');
+  rt.classList.add('hidden-rt');
+  const style = getComputedStyle(rt);
+  const seconds = value => parseFloat(value) * (value.trim().endsWith('ms') ? 1 : 1000);
+  const properties = style.transitionProperty.split(',').map(value => value.trim());
+  const durations = style.transitionDuration.split(',').map(seconds);
+  const delays = style.transitionDelay.split(',').map(seconds);
+  const time = Math.max(0, ...properties.map((property, i) => property === 'opacity'
+    ? durations[i % durations.length] + delays[i % delays.length] : 0));
+  if (!(time > 0)) { complete(); return; }
+  cycle.animation = rt.getAnimations?.().find(animation => animation.transitionProperty === 'opacity' && animation.effect?.target === rt) || null;
+  // The promise belongs to this actual transition; both outcomes still check this cycle's identity.
+  cycle.animation?.finished.then(complete, complete);
+  cycle.timer = setTimeout(complete, time + 50); // only a lost-completion fallback, not the normal fade clock
+}
+TOUCH_READING_MOTION.addEventListener('change', () => {
+  if (TOUCH_READING_MOTION.matches) for (const [rt, cycle] of TOUCH_READING_FADES) finishTouchReadingFade(rt, cycle);
+});
 function seatTouchReading(rt) {
   if (!rt?.style) return;
   if (touchReadingFading(rt)) return;
-  rt.style.removeProperty('margin-inline');
-  if (rt.isConnected) unpinTouchRows(rt);
+  clearTouchReadingSeat(rt);
   if (!touchReading(rt)) return;
   const style = getComputedStyle(rt);
   if (style.display === 'none' || style.visibility === 'hidden') return;
@@ -9925,7 +10014,7 @@ function seatTouchReading(rt) {
   let roomLeft = Math.max(0, left - line.left), roomRight = Math.max(0, line.right - right);
   // another reading shown on this line keeps its paper: the nearest on each side bounds the overhang
   for (const other of line.block.querySelectorAll('rt')) {
-    if (other === rt || other.classList.contains('hidden-rt')) continue;
+    if (other === rt || (other.classList.contains('hidden-rt') && !touchReadingFading(other))) continue;
     const box = other.getBoundingClientRect();
     if (!box.width || box.bottom <= own.top || box.top >= own.bottom) continue;
     if (box.right <= left) roomLeft = Math.min(roomLeft, Math.max(0, left - box.right - TOUCH_READING_GAP));
@@ -9937,23 +10026,37 @@ function seatTouchReading(rt) {
   if (short > 0) { const more = Math.min(roomLeft - start, short); start += more; end += Math.min(roomRight - end, short - more); }
   if (start + end <= 0.5) return;
   rt.style.marginInline = `${-start}px ${-end}px`;
-  rows.forEach((n, i) => { n.style.width = rowWidths[i]; n.setAttribute('data-touch-pin', ''); });
+  pinTouchRows(rt, rows, rowWidths);
 }
 if (typeof MutationObserver === 'function' && typeof document !== 'undefined' && document.documentElement) {
   new MutationObserver((records) => {
     const seen = new Set(), glosses = new Set();
+    // A move/reinsert is also a new attachment: finish old ownership before seating it there.
+    for (const record of records) for (const node of record.removedNodes || []) {
+      if (node.nodeType !== 1) continue;
+      const readings = node.nodeName === 'RT' ? [node] : node.querySelectorAll?.('rt') || [];
+      for (const rt of readings) {
+        stopTouchReadingFade(rt);
+        clearTouchReadingSeat(rt);
+        if (rt.isConnected) seen.add(rt);
+      }
+    }
+    for (const [rt, cycle] of TOUCH_READING_FADES) {
+      const reader = rt.closest('#reader');
+      if (!rt.isConnected || !reader || reader.classList.contains('fg-always') || !rt.classList.contains('hidden-rt')) finishTouchReadingFade(rt, cycle);
+    }
     for (const record of records) {
       if (record.type === 'attributes') { if (record.target.nodeName === 'RT') seen.add(record.target); continue; }
       for (const node of record.addedNodes) {
         if (node.nodeType !== 1) continue;
         if (node.nodeName === 'RT') seen.add(node);
-        else for (const rt of node.querySelectorAll?.('rt:not(.hidden-rt)') || []) seen.add(rt);
+        else for (const rt of node.querySelectorAll?.('rt') || []) seen.add(rt);
         // Ladder · an English row, its words seated after the readings (an overhang may move the word)
         if (node.classList?.contains('tok-en')) glosses.add(node);
         else for (const line of node.querySelectorAll?.('.tok-en') || []) glosses.add(line);
       }
     }
-    for (const rt of seen) if (rt.style.marginInline || touchReading(rt)) seatTouchReading(rt);
+    for (const rt of seen) seatTouchReading(rt);
     for (const line of glosses) seatInlineGloss(line);
   }).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
   // a width or a late font changes what a reading needs: the shown ones are seated again
@@ -15071,7 +15174,7 @@ function installReaderRoving(reader) {
 function paintNamedTok(span, token, index) {
   const shown = !!S.revealed?.has(index);
   if (S.dials.furigana === 1) {
-    for (const rt of span.querySelectorAll('rt')) rt.classList.toggle('hidden-rt', !shown);
+    for (const rt of span.querySelectorAll('rt')) setTouchReadingShown(rt, shown);
   } else if (S.dials.furigana === 0) {
     const next = wordRow(displayPairs(token), { furigana: shown ? 1 : 0, revealed: shown });
     const row = span.querySelector('.tok-word');
@@ -15092,7 +15195,7 @@ function paintTok(span, token, index) {
   const hasReading = S.dials.furigana === 2 || !!S.revealed?.has(index);
   const hasEn = S.glossed?.has(index);
   if (S.dials.furigana === 1) {
-    for (const rt of span.querySelectorAll('rt')) rt.classList.toggle('hidden-rt', !hasReading);
+    for (const rt of span.querySelectorAll('rt')) setTouchReadingShown(rt, hasReading);
   } else if (S.dials.furigana === 0) {
     // Off never borrows the reveal rung. Replacing only the word row keeps
     // an explicitly requested English gloss in its original position.
