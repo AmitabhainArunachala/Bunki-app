@@ -115,7 +115,7 @@ const MUTATIONS = {
   snap: [['editorial.css', DOCK + '    transition: opacity var(--motion-room) var(--ease-standard);\n', DOCK]],
   // the reading moved by one px: the no-change rows (X13.mac, G61.press) must see it
   shift: [['editorial.css', '#reader:not(.fg-always) { --reading-gap: 0; }\n', '#reader:not(.fg-always) { --reading-gap: 0; }\n#reader { translate: 0 1px; }\n']],
-  fade: [['editorial.css', '  transition: opacity var(--motion-fast) var(--ease-exit), display var(--motion-fast) allow-discrete;\n', '']],
+  fade: [['editorial.css', '  transition: opacity var(--motion-fast) var(--ease-exit);\n', '']],
   seat: [['corridor.js', '  if (touchReadingFading(rt)) return;\n', '']],
   nami: [['editorial.css', '{ --color-accent-label: #a8c4db; }', '{ }']],
 };
