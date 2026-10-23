@@ -10049,8 +10049,14 @@ if (typeof MutationObserver === 'function' && typeof document !== 'undefined' &&
       if (record.type === 'attributes') { if (record.target.nodeName === 'RT') seen.add(record.target); continue; }
       for (const node of record.addedNodes) {
         if (node.nodeType !== 1) continue;
-        if (node.nodeName === 'RT') seen.add(node);
-        else for (const rt of node.querySelectorAll?.('rt') || []) seen.add(rt);
+        // A reading may already have moved out of a removed subtree before delivery, so
+        // the arriving reading must also surrender its previous attachment's ownership.
+        const readings = node.nodeName === 'RT' ? [node] : node.querySelectorAll?.('rt') || [];
+        for (const rt of readings) {
+          stopTouchReadingFade(rt);
+          clearTouchReadingSeat(rt);
+          seen.add(rt);
+        }
         // Ladder · an English row, its words seated after the readings (an overhang may move the word)
         if (node.classList?.contains('tok-en')) glosses.add(node);
         else for (const line of node.querySelectorAll?.('.tok-en') || []) glosses.add(line);

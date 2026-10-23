@@ -164,3 +164,12 @@ test('an old animation promise and queued event cannot finish a fresh running tr
   animations[1].animation.playState = 'idle'; animations[1].reject(new Error('cancelled')); await Promise.resolve();
   h.clean(a); assert.equal(h.timers.size, 0);
 });
+
+test('moving a fading reading out of a detached subtree clears its old attachment ownership', () => {
+  const h = harness(), old = h.reading(true), next = h.reading(true);
+  h.set(old.rt, true); h.set(old.rt, false);
+  old.ruby.remove(); old.rt.remove(); next.rt.remove(); next.ruby.append(old.rt);
+  h.flush([{ type: 'childList', removedNodes: [old.ruby], addedNodes: [old.rt] }]);
+  h.clean(old); assert.equal(old.row.style.width, ''); assert.equal(h.timers.size, 0);
+  h.set(old.rt, true); assert.equal(h.seats.get(old.rt)[0], next.row);
+});

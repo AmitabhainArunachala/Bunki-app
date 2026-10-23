@@ -153,6 +153,12 @@ function app({ withIndex = true, withKanji = false } = {}) {
     // G4 · the stage's ink ceremony (dressStage: depth, the writing, 読 · 意) is the browser's; verify-word-grammar's G4
     // part proves it. Here a stage is dressed with none, as a stage outside the ladder is
     dressStage: () => null,
+    // This suite's lookup prose is outside #reader. Its instant ruby class boundary is
+    // stubbed here; touch-reading-lifecycle.test.mjs executes the real reader lifecycle.
+    setTouchReadingShown: (rt, shown) => {
+      for (let node = rt; node; node = node.parentElement) assert.notEqual(node.id, 'reader', 'lookup fixture must stay outside the reader lifecycle');
+      rt.classList.toggle('hidden-rt', !shown);
+    },
     syncWalkSentinel: () => {}, syncChromeKeep: () => {}, refreshLadderRoom: () => {}, wireReaderWordMenu: () => {},
     // the page's match cut is the browser's motion (Element.animate, reduced motion): none here
     pageCutAllowed: () => false,
