@@ -176,7 +176,11 @@ const manifest = JSON.parse(readFileSync(resolve(site, 'build-identity.json'), '
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['chromium', 'webkit'];
 assert(engines.every((engine) => ['chromium', 'webkit'].includes(engine)));
 const browserVersions = {};
-const selectedDesign = designSelection(process.argv.slice(2));
+const g6SentenceDoorControl = process.argv.includes('--g6-sentence-door-control');
+if (g6SentenceDoorControl) assert.deepEqual(process.argv.slice(2), ['--g6-sentence-door-control'], 'The G6 control must be the only argument');
+const selectedDesign = g6SentenceDoorControl
+  ? { scope: 'g6-sentence-door-control', diagnostic: true, cases: ['G6-sentence-return-motion-320'] }
+  : designSelection(process.argv.slice(2));
 const runId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
 const g3Only = process.argv.includes('--g3-only');
 const spacingOnly = process.argv.includes('--spacing-only');
@@ -200,13 +204,13 @@ const results = [];
 
 async function open(page, search = '') {
   await page.goto(`${host.origin}/?entry=shelf&ui=bi${search}`);
-  await page.waitForFunction(() => document.body.dataset.ready === '1');
+  await g6Wait(page, 'app-ready', () => document.body.dataset.ready === '1');
   await page.waitForTimeout(400);
 }
 async function openArticle(page, id, search = '') {
   await open(page, search);
   await page.evaluate((pid) => document.querySelector(`#shelf-body [data-passage="${pid}"] .shelf-open`).click(), id);
-  await page.waitForFunction(() => document.body.dataset.view === 'reader' && document.querySelector('#reader .tok'));
+  await g6Wait(page, 'article-reader-ready', () => document.body.dataset.view === 'reader' && document.querySelector('#reader .tok'));
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(500);
 }
@@ -390,16 +394,101 @@ async function climbToBox(page, locator, press = () => locator.click()) {
   } finally { await node?.dispose(); }
   return (await page.locator('#mini').count()) > 0;
 }
+/** G6 records dispatches and predicates without introducing a wait or retry. Event capture runs
+ * synchronously at the physical tap, so a rising target is observed where it was actually hit. */
+const g6Phase = (page, phase, predicate = null) => {
+  if (page.__g6) Object.assign(page.__g6, { phase, predicate });
+};
+const g6Wait = (page, phase, predicate, arg, options) => {
+  g6Phase(page, phase, predicate.toString());
+  return page.waitForFunction(predicate, arg, options);
+};
+const g6Tap = async (page, selector, point, invoke) => {
+  if (!page.__g6) return invoke();
+  const tap = { sequence: page.__g6.taps.length + 1, phase: page.__g6.phase, token: page.__g6.token,
+    selector, intendedCoordinates: point, coordinateSource: point ? 'explicit physical point' : 'locator resolves physical point',
+    startedAt: Date.now() };
+  page.__g6.taps.push(tap);
+  try { return await invoke(); } finally { tap.finishedAt = Date.now(); }
+};
+async function installG6Observability(page) {
+  page.__g6 = { phase: 'open-article', predicate: null, token: null, taps: [] };
+  await page.addInitScript(({ control }) => {
+    const describe = (node) => node instanceof Element ? { tag: node.tagName, id: node.id || null,
+      classes: node.getAttribute('class'), tokenIndex: node.closest('.tok[data-index]')?.dataset.index ?? null } : null;
+    const evidence = { taps: [], sentenceDoorClicks: 0, controlApplications: 0, blocked: [] };
+    window.__readerShelfG6Evidence = evidence;
+    for (const type of ['pointerdown', 'pointerup', 'click']) window.addEventListener(type, (event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      const door = target?.closest('#mini #mini-sentence-open');
+      if (type === 'click' && door) evidence.sentenceDoorClicks += 1;
+      const blocked = Boolean(control && type === 'click' && door && evidence.sentenceDoorClicks === 4);
+      const token = target?.closest('.tok[data-index]');
+      const mini = document.getElementById('mini');
+      const row = { type, at: Date.now(), coordinates: { x: event.clientX, y: event.clientY },
+        actualTarget: describe(target), sentenceDoor: describe(door), hitTarget: describe(document.elementFromPoint(event.clientX, event.clientY)),
+        token: token ? { index: token.dataset.index, rung: token.dataset.ladderRung ?? null } : null,
+        view: document.body?.dataset.view ?? null, focus: describe(document.activeElement),
+        scroll: { x: scrollX, y: scrollY }, viewport: { width: innerWidth, height: innerHeight },
+        popup: mini ? { word: mini.querySelector('.mini-word')?.textContent ?? null,
+          sentence: mini.querySelector('.mini-sentence-pane')?.hidden === false } : null,
+        isTrusted: event.isTrusted, blocked };
+      evidence.taps.push(row);
+      if (blocked) {
+        evidence.controlApplications += 1;
+        evidence.blocked.push(row);
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+    }, true);
+  }, { control: g6SentenceDoorControl });
+}
+function g6ControlOutcome(error, diagnostics) {
+  const events = diagnostics?.observed.events;
+  return { applications: events?.controlApplications ?? 0,
+    killed: diagnostics?.phase === 'rising-sentence-pane' &&
+      diagnostics?.predicate === String(() => document.querySelector('#mini .mini-sentence-pane')?.hidden === false) &&
+      /Timeout/u.test(String(error.message || error)) && events?.controlApplications === 1 &&
+      diagnostics?.observed.popup?.sentence === false && events?.blocked.length === 1 &&
+      events?.blocked[0].sentenceDoor?.id === 'mini-sentence-open' };
+}
+async function g6Diagnostics(page) {
+  const state = page.__g6;
+  if (!state) return undefined;
+  const observed = await page.evaluate((index) => {
+    const describe = (node) => node instanceof Element ? { tag: node.tagName, id: node.id || null,
+      classes: node.getAttribute('class'), tokenIndex: node.closest('.tok[data-index]')?.dataset.index ?? null } : null;
+    const token = index === null ? null : document.querySelector(`#reader .tok[data-index="${index}"]`);
+    const mini = document.getElementById('mini'), box = mini?.getBoundingClientRect();
+    return { token: token ? { index: token.dataset.index, rung: token.dataset.ladderRung ?? null,
+      text: token.textContent } : null, view: document.body?.dataset.view ?? null,
+      focus: describe(document.activeElement), scroll: { x: scrollX, y: scrollY },
+      viewport: { width: innerWidth, height: innerHeight }, popup: mini ? {
+        word: mini.querySelector('.mini-word')?.textContent ?? null,
+        sentence: mini.querySelector('.mini-sentence-pane')?.hidden === false,
+        rect: { x: box.x, y: box.y, width: box.width, height: box.height } } : null,
+      events: window.__readerShelfG6Evidence ?? null };
+  }, state.token).catch(error => ({ collectionError: String(error.message || error) }));
+  const taps = state.taps.map(tap => {
+    const events = observed.events?.taps.filter(event => event.at >= tap.startedAt && event.at <= (tap.finishedAt ?? Infinity)) ?? [];
+    const down = events.find(event => event.type === 'pointerdown');
+    return { ...tap, intendedCoordinates: tap.intendedCoordinates ?? down?.coordinates ?? null, events };
+  });
+  return { phase: state.phase, predicate: state.predicate, selectedToken: state.token, taps, observed };
+}
+
 async function tapToken(page, index, { scroll = true } = {}) {
+  if (page.__g6) page.__g6.token = index;
+  g6Phase(page, `token-${index}-first-tap`);
   const tok = page.locator(`#reader .tok[data-index="${index}"]`);
   if (scroll) await tok.evaluate((node) => node.scrollIntoView({ block: 'center' }));
   const box = await tok.evaluate((node) => { const r = node.getClientRects()[0]; return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
-  await page.mouse.click(box.x, box.y);
+  await g6Tap(page, `#reader .tok[data-index="${index}"]`, box, () => page.mouse.click(box.x, box.y));
   // Lookup-only words may still be resolving their dictionary index after
   // 250 ms. Observe this activation on the exact node; never add a retry tap.
   const activated = await tok.elementHandle();
   try {
-    await page.waitForFunction((node) => node?.isConnected &&
+    await g6Wait(page, `token-${index}-activated`, (node) => node?.isConnected &&
       (node.dataset.ladderRung === 'reading' || node.dataset.ladderRung === 'gloss' ||
         (node.dataset.ladderRung === 'stage' && !!document.querySelector('#mini'))), activated, { timeout: 5000 });
   } finally { await activated?.dispose(); }
@@ -409,14 +498,17 @@ async function tapToken(page, index, { scroll = true } = {}) {
     // Ladder (John, 10-19): after the reading comes the English under the word, then the stage — each click only once the
     // rung before it is seen, never a blind retry
     if (await tok.evaluate((node) => node.dataset.ladderRung === 'reading')) {
-      await tok.click();
-      await page.waitForFunction((node) => node?.isConnected && (node.dataset.ladderRung === 'gloss' || !!document.querySelector('#mini')),
+      g6Phase(page, `token-${index}-reading-to-gloss-tap`);
+      await g6Tap(page, `#reader .tok[data-index="${index}"]`, null, () => tok.click());
+      await g6Wait(page, `token-${index}-gloss-or-popup`, (node) => node?.isConnected && (node.dataset.ladderRung === 'gloss' || !!document.querySelector('#mini')),
         await tok.elementHandle(), { timeout: 5000 });
     }
     if (!await page.locator('#mini').count()) {
       assert(await tok.evaluate((node) => node.dataset.ladderRung === 'gloss'), `token ${index}: the English rung did not follow the reading`);
-      await tok.click();
+      g6Phase(page, `token-${index}-gloss-to-popup-tap`);
+      await g6Tap(page, `#reader .tok[data-index="${index}"]`, null, () => tok.click());
     }
+    g6Phase(page, `token-${index}-popup-visible`, 'waitForSelector("#mini")');
     await page.waitForSelector('#mini');
     await page.waitForTimeout(250);
   }
@@ -425,14 +517,17 @@ async function tapToken(page, index, { scroll = true } = {}) {
 /** Ladder · a tap where the control stands on the glass, once it holds still (two frames alike): a finger's tap, which never
  * scrolls the page to its target first. */
 async function tapWhereItStands(page, selector) {
+  g6Phase(page, `tap-target-visible:${selector}`, `locator(${JSON.stringify(selector)}).waitFor()`);
   await page.locator(selector).waitFor();
+  g6Phase(page, `tap-target-still:${selector}`, 'two consecutive animation-frame bounding rects are identical');
   const at = await page.locator(selector).evaluate((node) => new Promise((done) => {
     let last = null;
     const tick = () => { const r = node.getBoundingClientRect(), now = `${r.x}|${r.y}|${r.width}|${r.height}`;
       if (now === last) done({ x: r.x + r.width / 2, y: r.y + r.height / 2 }); else { last = now; requestAnimationFrame(tick); } };
     requestAnimationFrame(tick);
   }));
-  await page.mouse.click(at.x, at.y);
+  g6Phase(page, `physical-tap:${selector}`);
+  await g6Tap(page, selector, at, () => page.mouse.click(at.x, at.y));
 }
 
 /** The popup's painted box and which of its views is open. */
@@ -484,9 +579,13 @@ try {
         results.push({ engine, name, passed: true, observations });
         console.log(`PASS ${engine}/${name} ${JSON.stringify(observations)}`);
       } catch (error) {
+        // Collect before a screenshot disables animations or changes the state being diagnosed.
+        const diagnostics = await g6Diagnostics(page);
+        const controlOutcome = g6SentenceDoorControl ? g6ControlOutcome(error, diagnostics) : undefined;
         const screenshot = resolve(evidence, `${engine}-${name}.png`);
         await page.screenshot({ path: screenshot, animations: 'disabled' }).catch(() => {});
-        results.push({ engine, name, passed: false, error: String(error.message || error), pageErrorDetails, networkEvents, screenshot });
+        results.push({ engine, name, passed: false, error: String(error.message || error), pageErrorDetails, networkEvents,
+          ...(diagnostics ? { diagnostics, stack: error.stack ?? null } : {}), ...(controlOutcome ? { controlOutcome } : {}), screenshot });
         console.log(`FAIL ${engine}/${name}: ${String(error.message || error).split('\n')[0]}`);
       } finally { await ctx.close(); }
     };
@@ -1483,6 +1582,7 @@ try {
       });
 
       await run(`G6-sentence-return-motion-${label}`, viewport, async (page) => {
+        await installG6Observability(page);
         await page.emulateMedia({ reducedMotion: 'no-preference' });
         await openArticle(page, ARTICLE);
         const putAway = async () => {
@@ -1495,6 +1595,7 @@ try {
         const problems = [], returns = {};
         for (const [index, text] of [[4, 'の'], [0, 'ダマスカス'], [12, 'その']]) {
           await tapToken(page, index);
+          g6Phase(page, `token-${index}-sentence-door-visible`, 'waitForSelector("#mini #mini-sentence-open")');
           await page.waitForSelector('#mini #mini-sentence-open');
           await page.waitForTimeout(400); // the card has finished rising
           const left = await popupSeat(page);
@@ -1504,10 +1605,11 @@ try {
           // scroll moves the article (to 413 px here, then the practice view starts at 0), which no finger's tap does
           await tapWhereItStands(page, '#mini #mini-sentence-open');
           await tapWhereItStands(page, '#mini #reader-sentence-practice');
-          await page.waitForFunction(() => document.body.dataset.view === 'sentence-practice');
-          await page.locator('#sentence-practice-back').click();
-          await page.waitForFunction(() => document.body.dataset.view === 'reader');
-          await page.waitForFunction(() => document.activeElement?.id === 'reader-sentence-practice', null, { timeout: 5_000 })
+          await g6Wait(page, `token-${index}-practice-view`, () => document.body.dataset.view === 'sentence-practice');
+          g6Phase(page, `token-${index}-practice-back-tap`);
+          await g6Tap(page, '#sentence-practice-back', null, () => page.locator('#sentence-practice-back').click());
+          await g6Wait(page, `token-${index}-returned-reader`, () => document.body.dataset.view === 'reader');
+          await g6Wait(page, `token-${index}-returned-practice-focus`, () => document.activeElement?.id === 'reader-sentence-practice', null, { timeout: 5_000 })
             .catch(() => {});
           await page.waitForTimeout(400);
           const focus = await popupFocus(page);
@@ -1517,7 +1619,8 @@ try {
           if (focus.scrollY !== left.scrollY) problems.push(`${text}: the article moved from ${left.scrollY} to ${focus.scrollY}`);
           if (!returned?.sentence || returned.word !== text) problems.push(`${text}: its sentence pane did not reopen: ${JSON.stringify(returned)}`);
           else {
-            await page.locator('#mini #mini-sentence-back').click();
+            g6Phase(page, `token-${index}-sentence-back-tap`);
+            await g6Tap(page, '#mini #mini-sentence-back', null, () => page.locator('#mini #mini-sentence-back').click());
             await page.waitForTimeout(200);
             const word = await popupSeat(page);
             returns[text].word = word;
@@ -1527,30 +1630,34 @@ try {
         }
         // その once more: its sentence is opened by a second tap while the card is still rising
         await tapToken(page, 12);
+        g6Phase(page, 'rising-setup-sentence-door-visible', 'waitForSelector("#mini #mini-sentence-open")');
         await page.waitForSelector('#mini #mini-sentence-open');
         await page.waitForTimeout(400);
         const settled = await popupSeat(page);
         await putAway();
         const point = (selector) => page.locator(selector).evaluate((node) => { const r = node.getClientRects()[0]; return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
         const tok = await point('#reader .tok[data-index="12"]');
-        await page.mouse.click(tok.x, tok.y);
+        g6Phase(page, 'rising-token-first-tap');
+        await g6Tap(page, '#reader .tok[data-index="12"]', tok, () => page.mouse.click(tok.x, tok.y));
         // Ladder (John, 10-19, a spec change): その (kana) shows its English under it first; the next tap, taken only once that
         // rung is seen, opens its box, and its sentence is opened while the card still rises
-        await page.waitForFunction(() => document.querySelector('#reader .tok[data-index="12"]')?.dataset.ladderRung === 'gloss' || !!document.getElementById('mini'));
+        await g6Wait(page, 'rising-token-gloss-or-popup', () => document.querySelector('#reader .tok[data-index="12"]')?.dataset.ladderRung === 'gloss' || !!document.getElementById('mini'));
         if (!(await page.locator('#mini').count())) {
           const again = await point('#reader .tok[data-index="12"] .tok-word');
-          await page.mouse.click(again.x, again.y);
+          g6Phase(page, 'rising-token-popup-tap');
+          await g6Tap(page, '#reader .tok[data-index="12"] .tok-word', again, () => page.mouse.click(again.x, again.y));
         }
         const door = await point('#mini #mini-sentence-open');
-        await page.mouse.click(door.x, door.y);
-        await page.waitForFunction(() => document.querySelector('#mini .mini-sentence-pane')?.hidden === false);
+        g6Phase(page, 'rising-sentence-door-tap');
+        await g6Tap(page, '#mini #mini-sentence-open', door, () => page.mouse.click(door.x, door.y));
+        await g6Wait(page, 'rising-sentence-pane', () => document.querySelector('#mini .mini-sentence-pane')?.hidden === false);
         await page.waitForTimeout(500);
         const rising = await popupSeat(page);
         if (rising.scrollY !== settled.scrollY || !rising.sentence || Math.abs(rising.top - settled.top) > 1) {
           problems.push(`その: a sentence opened while the card rises is off the word card's seat: ${JSON.stringify({ settled, rising })}`);
         }
         assert.deepEqual(problems, [], 'Returning from Practice, and opening a sentence while the card rises, must land on the sentence pane at the word card\'s seat');
-        return { returns, settled, rising };
+        return { returns, settled, rising, diagnostics: await g6Diagnostics(page) };
       });
     }
 
@@ -1741,10 +1848,10 @@ try {
     schemaVersion: 2, runId, requestedScope: selectedDesign.scope, engines, ...acceptance,
     artifactSha256: manifest.artifactSha256, gitSha: manifest.gitSha, sourceDirty: manifest.sourceDirty,
     verifierSha256,
-    control: withControl ? (spacingOnly ? '8px padding after the actual 郊外 token' : '8px token padding; rt and ruby::before forced to 0.46em') : null,
+    control: g6SentenceDoorControl ? 'block exactly the fourth sentence-door click (the rising-card path); no extra tap or wait' : withControl ? (spacingOnly ? '8px padding after the actual 郊外 token' : '8px token padding; rt and ruby::before forced to 0.46em') : null,
     scope: fixesOnly ? 'R1 fragment spacing, W2 saved page return, G6 pinned below seat, and G8 motion coverage only; other design gates not run' : spacingOnly ? 'R1 actual inline-fragment widths and same-line printed-token gaps at 1368/390 only; no other design gates' : 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368, the silent fresh-record word demonstration with no permanent tip, ダマスカス savable, one word one card; reader lane: reading then stage shows the meaning, the word menu saves one card, Save is one tap with Undo, the menu by keyboard, the lists popover, the sentence row and phone seating, sentence Save without activation, the version switch with 44px hit boxes, transform/opacity-only motion across the reader room and the popup Save and list path, the same one path in the galaxy, return from Practice on lookup and content words with motion enabled, a public below-word sentence seat with unchanged anchor and article scroll, and Japanese punctuation line breaks with source text preserved',
     browserVersions,
-    selectedScope: fixesOnly ? 'Six exact changed or diagnosed design cases per engine' : spacingOnly ? 'R1 spacing only, both viewport sizes' : g3Only ? 'G3 demonstration, stage, keyboard and prose; older design gates not run' : 'all design gates',
+    selectedScope: g6SentenceDoorControl ? 'G6/320 single sentence-door negative control only; diagnostic, never full acceptance' : fixesOnly ? 'Six exact changed or diagnosed design cases per engine' : spacingOnly ? 'R1 spacing only, both viewport sizes' : g3Only ? 'G3 demonstration, stage, keyboard and prose; older design gates not run' : 'all design gates',
     results,
     passed: acceptance.fullAcceptance,
   };
