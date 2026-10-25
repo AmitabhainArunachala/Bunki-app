@@ -301,6 +301,8 @@ const MUTANTS = {
   'lying-label': () => mutant('decks/player/mount.js', `el('small', null, fmtWait(pv[name]))`, `el('small', null, fmtWait(pv[name] === 600000 ? 300000 : pv[name]))`),
   'stale-whole-write': () => mutant('decks/player/mount.js', `  if (text !== ctx.ledgerText && text != null) {`, `  if (false) {`),
   'context-frozen-queue': () => mutant('decks/context-dense/mount.js', `  ui.index += 1;\n  settle(next, now);`, `  ui.index += 1;\n  ui.screen = ui.index >= ui.queue.length ? 'done' : 'card';`),
+  // the deck claims the grade stored but never writes it: the bounded ledger wait must turn the scenario red
+  'context-never-writes': () => mutant('decks/context-dense/mount.js', `    storage.setItem(storageKey, JSON.stringify(state));\n    return true;`, `    return true;`),
   'corridor-silent-ahead': () => mutant('corridor.js', `ahead: !!rv.ahead });`, `ahead: true });`),
   'lookup-stale-save': () => mutant('decks/player/mount.js', `  writeLedger((fresh) => logLookup(fresh, { cardId, where, surface: frame.surface, key: frame.key, depth }, new Date()));\n`,
     `  { const next = logLookup(ctx.state, { cardId, where, surface: frame.surface, key: frame.key, depth }, new Date()); if (save(next)) ctx.state = next; }\n`),
@@ -660,11 +662,24 @@ async function playerLookupRace(browser, engine, { mutate = null } = {}) {
 }
 
 /* ------------------------------------------------------------------ the context deck */
+// observed 51–60 ms on chromium (diagnostic 2026-10-25); the bound only stops a grade that never lands from hanging
+const LEDGER_WAIT_MS = 5000;
 async function contextDeck(browser, engine, { mutate = null } = {}) {
   const { context, page } = await newPage(browser);
   const key = 'bunki-srs-deck:bunki-context-dense-2026';
-  const read = () => page.evaluate((key) => JSON.parse(localStorage.getItem(key) || 'null'), key);
-  const out = { order: [], labels: [] };
+  const raw = () => page.evaluate((key) => localStorage.getItem(key), key);
+  // the deck grades through the shared admission (navigator.locks), so its ledger lands after the click returns:
+  // wait, bounded, for the stored value to change; a grade that never reaches the ledger fails the scenario
+  const settled = async (prior) => {
+    const until = Date.now() + LEDGER_WAIT_MS;
+    for (;;) {
+      const now = await raw();
+      if (now !== prior) return JSON.parse(now);
+      if (Date.now() >= until) return null;
+      await new Promise((resolve) => setTimeout(resolve, 25));
+    }
+  };
+  const out = { order: [], labels: [], unwritten: null };
   try {
     await page.goto(`${BASE}/index.html?entry=shelf&ui=bi&deck=context`, { waitUntil: 'load' });
     await page.waitForSelector('#cd-start', { timeout: 30000 });
@@ -675,9 +690,14 @@ async function contextDeck(browser, engine, { mutate = null } = {}) {
       await page.locator('#cd-got').click();
       await page.waitForSelector(`#cd-${seal}`);
       const label = (await page.locator(`#cd-${seal} .cd-seal-t`).textContent()).trim();
-      const before = await read();
+      const prior = await raw();
+      const before = JSON.parse(prior || 'null');
       await page.locator(`#cd-${seal}`).click();
-      const after = await read();
+      const after = await settled(prior);
+      if (!after) {
+        out.unwritten = seal;
+        return null;
+      }
       const changed = Object.keys(after.cards).find((k) => JSON.stringify(after.cards[k]) !== JSON.stringify(before?.cards?.[k]));
       const rec = after.cards[changed];
       out.order.push(changed);
@@ -685,23 +705,30 @@ async function contextDeck(browser, engine, { mutate = null } = {}) {
       return changed;
     };
     out.first = await one('again');
-    await one('good');
-    await page.clock.fastForward('01:10');
-    await one('good');
-    await page.waitForSelector('#cd-got', { timeout: 10000 });
-    await page.locator('#cd-got').click();
-    await page.waitForSelector('#cd-good');
-    const before = await read();
-    await page.locator('#cd-good').click();
-    const after = await read();
-    out.fourth = Object.keys(after.cards).find((k) => JSON.stringify(after.cards[k]) !== JSON.stringify(before.cards[k]));
+    if (!out.unwritten) await one('good');
+    if (!out.unwritten) {
+      await page.clock.fastForward('01:10');
+      await one('good');
+    }
+    if (!out.unwritten) {
+      await page.waitForSelector('#cd-got', { timeout: 10000 });
+      await page.locator('#cd-got').click();
+      await page.waitForSelector('#cd-good');
+      const prior = await raw();
+      const before = JSON.parse(prior || 'null');
+      await page.locator('#cd-good').click();
+      const after = await settled(prior);
+      if (!after) out.unwritten = 'fourth good';
+      else out.fourth = Object.keys(after.cards).find((k) => JSON.stringify(after.cards[k]) !== JSON.stringify(before.cards[k]));
+    }
   } finally {
     await context.close();
   }
-  const pass = out.fourth === out.first && !out.order.slice(1).includes(out.first);
+  const pass = !out.unwritten && out.fourth === out.first && !out.order.slice(1).includes(out.first);
   if (mutate) return pass;
-  check(`[${engine}] (a)(b) context deck: Again comes back only after its minute, first once due`, pass, { again: out.first, fourth: out.fourth });
-  check(`[${engine}] (d) context deck: each seal names the wait it scheduled`, out.labels.every(([shown, stored]) => shown === stored), out.labels.map((l) => l.join('=')).join(' '));
+  check(`[${engine}] (a)(b) context deck: Again comes back only after its minute, first once due`, pass,
+    { again: out.first, fourth: out.fourth, ...(out.unwritten ? { unwritten: `${out.unwritten}: no ledger change ${LEDGER_WAIT_MS} ms after the seal click` } : {}) });
+  check(`[${engine}] (d) context deck: each seal names the wait it scheduled`, out.labels.length === 3 && out.labels.every(([shown, stored]) => shown === stored), out.labels.map((l) => l.join('=')).join(' '));
   return pass;
 }
 
@@ -971,6 +998,7 @@ for (const engine of ENGINES) {
         ['p0', 'stale-whole-write', 'a stale whole-ledger write (no fresh read)', 'P0 two open copies', () => playerTwoWindows(browser, engine, { mutate: true })],
         ['p0', 'lookup-stale-save', 'a lookup saved from the stale copy\'s ledger (the old logTap)', 'P0 a stale copy looks a word up', () => playerLookupRace(browser, engine, { mutate: true })],
         ['context', 'context-frozen-queue', 'the context deck with its own frozen queue', '(a)(b) context deck', () => contextDeck(browser, engine, { mutate: true })],
+        ['context', 'context-never-writes', 'a context deck that never writes its grade', '(a)(b) context deck', () => contextDeck(browser, engine, { mutate: true })],
         ['corridor', 'corridor-silent-ahead', 'the corridor learning ahead without the choice', '(a)(c) corridor review', () => corridorReview(browser, engine, { mutate: true })],
         ['bury', 'bury-off', 'burying across surfaces switched off', 'B 検証 answered in 専門', () => buryAcrossDecks(browser, engine, { mutate: true })],
       ]) {
