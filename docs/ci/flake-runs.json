@@ -229,22 +229,6 @@
     "result": "observed",
     "startedAt": "2026-10-10T22:08:20Z"
   },
-  "38061060544/1": {
-    "result": "observed",
-    "startedAt": "2026-10-10T14:48:12Z"
-  },
-  "38065082998/1": {
-    "result": "observed",
-    "startedAt": "2026-10-10T15:48:16Z"
-  },
-  "38066430339/1": {
-    "result": "observed",
-    "startedAt": "2026-10-10T16:08:17Z"
-  },
-  "38067800208/1": {
-    "result": "observed",
-    "startedAt": "2026-10-10T16:28:27Z"
-  },
   "38069236348/1": {
     "result": "observed",
     "startedAt": "2026-10-10T16:49:54Z"
@@ -459,8 +443,8 @@
     "result": "retry",
     "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
     "startedAt": "2026-10-14T01:09:56Z",
-    "failures": 15,
-    "attemptedAt": "2026-10-24T16:29:04.672Z",
+    "failures": 16,
+    "attemptedAt": "2026-10-25T16:29:33.268Z",
     "reason": "Observation artifact not yet available: bunki-plan-38488422321-1"
   },
   "38488451285/1": {
