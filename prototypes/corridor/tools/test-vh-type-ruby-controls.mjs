@@ -67,3 +67,90 @@ for(const engine of ['chromium','webkit']) {
     assert.equal(admit(engine,unversioned).passed,false);
   });
 }
+
+// RT1: execute the producer's actual collector, allow-list and L2 assertion block.
+// This file is already registered once in the required ci-contracts node suite.
+import { runInNewContext } from 'node:vm';
+import ts from 'typescript';
+const producer = readFileSync(new URL('./verify-type-ruby.mjs', import.meta.url), 'utf8');
+const producerAst = ts.createSourceFile('verify-type-ruby.mjs', producer, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+function producerNode(predicate) {
+  const found = [];
+  const visit = node => { if (predicate(node)) found.push(node); ts.forEachChild(node, visit); };
+  visit(producerAst); assert.equal(found.length, 1, 'one exact producer declaration/block');
+  return found[0].getText(producerAst);
+}
+const rtFunctions = ['declarations', 'collectRtRules', 'allowedRtRule'].map(name =>
+  producerNode(node => ts.isFunctionDeclaration(node) && node.name?.text === name)).join('\n');
+const rtAllowed = producerNode(node => ts.isVariableDeclaration(node) && node.name.getText(producerAst) === 'RT_ALLOWED');
+const l2Block = producerNode(node => ts.isTryStatement(node)
+  && node.tryBlock.getText(producerAst).includes("record('sheets', 'L2-one-ruby'"));
+const rtApi = runInNewContext(`const ${rtAllowed};\n${rtFunctions}\n({ declarations, collectRtRules, allowedRtRule })`);
+const collect = (css, file = 'editorial.css') => rtApi.collectRtRules(file, rtApi.declarations(css));
+function l2(rules, overrides = {}) {
+  const records = [];
+  runInNewContext(`const ${rtAllowed};\n${rtFunctions}\nconst { rtRules, rubyRules, pseudoReadings } = JSON.parse(input);\n${l2Block}`, {
+    assert, input: JSON.stringify({ rtRules: rules, rubyRules: ['rooms/motion.css|rt|0.5em'], pseudoReadings: [], ...overrides }),
+    record: (engine, name, passed, observations, error) => records.push({ engine, name, passed, observations, error }),
+  });
+  assert.equal(records.length, 1); assert.equal(records[0].name, 'L2-one-ruby');
+  return records[0];
+}
+const hiddenSelector = '#reader:not(.fg-always) rt.hidden-rt';
+const heldSelector = `${hiddenSelector}[data-touch-fading]`;
+const exactConcealCss = `${hiddenSelector} { opacity: 0; transition: opacity var(--motion-fast) var(--ease-exit); }
+${heldSelector} { display: ruby-text; }
+@media (prefers-reduced-motion: reduce) {
+  ${hiddenSelector} { transition: none; }
+  ${heldSelector} { display: none; }
+}`;
+const editorialCss = readFileSync(new URL('../editorial.css', import.meta.url), 'utf8');
+test('RT1 actual final editorial collector and L2 accept exactly five approved conceal declarations', () => {
+  const actual = collect(editorialCss), expected = collect(exactConcealCss);
+  assert.equal(actual.length, 5);
+  assert.deepEqual(JSON.parse(JSON.stringify(actual)), JSON.parse(JSON.stringify(expected)));
+  assert(actual.every(rule => rtApi.allowedRtRule(rule)));
+  assert.equal(l2(actual).passed, true);
+  assert.equal(actual.filter(rule => rule.prop === 'display').length, 2);
+  assert.equal(actual.filter(rule => rule.chain[0] === '@media (prefers-reduced-motion: reduce)').length, 2);
+});
+test('RT1 collector and L2 reject global/unscoped holds, extra selector, wrong property/value/file or media', () => {
+  const controls = [
+    ['global hold', `rt.hidden-rt[data-touch-fading] { display: ruby-text; }`],
+    ['always-readings hold', `#reader rt.hidden-rt[data-touch-fading] { display: ruby-text; }`],
+    ['extra selector', `${heldSelector}, rt { display: ruby-text; }`],
+    ['wrong property', `${heldSelector} { position: absolute; }`],
+    ['wrong display', `${heldSelector} { display: block; }`],
+    ['important display', `${heldSelector} { display: ruby-text !important; }`],
+    ['normal collapse', `${heldSelector} { display: none; }`],
+    ['reduced hold', `@media (prefers-reduced-motion: reduce) { ${heldSelector} { display: ruby-text; } }`],
+    ['wrong media', `@media (prefers-reduced-motion: no-preference) { ${heldSelector} { display: none; } }`],
+    ['extra nesting', `@supports (display: ruby-text) { @media (prefers-reduced-motion: reduce) { ${heldSelector} { display: none; } } }`],
+    ['unapproved reduced rule', `@media (prefers-reduced-motion: reduce) { rt { width: 40px; } }`],
+    ['wrong opacity', `${hiddenSelector} { opacity: 1; }`],
+    ['old discrete display transition', `${hiddenSelector} { transition: opacity var(--motion-fast) var(--ease-exit), display var(--motion-fast) allow-discrete; }`],
+    ['wrong file', `${heldSelector} { display: ruby-text; }`, 'corridor.css'],
+  ];
+  for (const [name, css, file] of controls) {
+    const rules = collect(css, file); assert(rules.length > 0, `${name}: collector reached`);
+    assert(rules.some(rule => !rtApi.allowedRtRule(rule)), `${name}: predicate rejects`);
+    const result = l2(rules); assert.equal(result.passed, false, name);
+    assert.match(result.error, /rules that touch a reading beyond/, `${name}: correct rejection`);
+  }
+  assert.equal(l2(collect(exactConcealCss)).passed, true, 'restored contract passes');
+});
+test('RT1 keeps the existing global ruby list, sole size rule and pseudo-reading guard', () => {
+  const global = collect(readFileSync(new URL('../rooms/motion.css', import.meta.url), 'utf8'), 'rooms/motion.css');
+  assert(global.some(rule => rule.selector === 'rt.hidden-rt' && rule.prop === 'display' && rule.value === 'none'));
+  assert.equal(l2(global).passed, true);
+  assert.equal(l2([], { rubyRules: ['rooms/motion.css|rt|0.5em', 'editorial.css|rt|12px'] }).passed, false);
+  assert.equal(l2([], { pseudoReadings: ['editorial.css rt::before'] }).passed, false);
+  const registration = readFileSync(new URL('../../../scripts/ci/supplemental.mjs', import.meta.url), 'utf8');
+  assert.equal(registration.split("'prototypes/corridor/tools/test-vh-type-ruby-controls.mjs'").length - 1, 1);
+});
+for (const engine of ['chromium', 'webkit']) test(`RT1 ${engine}: L2 remains required by native receipt admission`, () => {
+  const report = structuredClone(observed.receipts[engine]);
+  const row = report.results.find(row => row.engine === 'sheets' && row.name === 'L2-one-ruby');
+  assert(row); row.passed = false;
+  assert.equal(admit(engine, report).passed, false);
+});

@@ -136,6 +136,39 @@ function governed(size) {
   args.push(cur.trim());
   return args.every((arg) => SIZE_TOKEN.test(arg) || FIGURE.test(arg) || /^[0-9.]+(vw|vh|dvh|svh|cqw|cqi)$/.test(arg) || /^calc\([0-9.]+(vw|vh|dvh) \/ var\(--n, 2\)\)$/.test(arg));
 }
+const RT_ALLOWED = new Set([
+  'rooms/motion.css|rt|padding-inline', 'rooms/motion.css|rt|font-size', 'rooms/motion.css|rt|line-height', 'rooms/motion.css|rt|font-weight', 'rooms/motion.css|rt|letter-spacing', 'rooms/motion.css|rt|color',
+  'rooms/motion.css|rt.hidden-rt|display', 'rooms/motion.css|rt|margin-block-end',
+  "decks/player/player.css|.kp[data-readings='off'] .kp-sentence ruby:not(:is(.kp-target, .kp-tok.kp-lit) ruby) > rt|visibility",
+  'decks/player/player.css|.kp-sentence.kp-enter rt|animation',
+  'decks/context-dense/context-deck.css|ruby.cd-ruby rt|font-family', 'decks/context-dense/context-deck.css|ruby.cd-ruby rt|letter-spacing', 'decks/context-dense/context-deck.css|ruby.cd-ruby rt|color', 'decks/context-dense/context-deck.css|ruby.cd-ruby rt|line-height', 'decks/context-dense/context-deck.css|ruby.cd-ruby rt|user-select',
+  'decks/context-dense/context-deck.css|.cd-miss .cd-ink, .cd-miss rt|color',
+  'decks/personal/personal.css|.pc rt|font-family', 'decks/personal/personal.css|.pc rt|letter-spacing', 'decks/personal/personal.css|.pc rt|font-weight', 'decks/personal/personal.css|.pc rt|color',
+  'decks/personal/personal.css|.pc-japanese rt|font-family', 'decks/personal/personal.css|.pc-japanese rt|letter-spacing', 'decks/personal/personal.css|.pc-japanese rt|color',
+]);
+// L2 retains the whole declaration: reader concealment is approved only at these
+// exact values and nesting contexts, never by a blanket reduced-motion exemption.
+function collectRtRules(file, decls) {
+  return decls.filter(d => /(^|[\s,>+~(])rt\b(?![-\w])/.test(d.selector)).map(d => ({ file, ...d }));
+}
+function allowedRtRule(rule) {
+  const key = `${rule.file}|${rule.selector}|${rule.prop}`;
+  if (RT_ALLOWED.has(key) || /kp-sentence\.kp-enter :is\(\.kp-target, rt\)/.test(key)) return true;
+  const hidden = '#reader:not(.fg-always) rt.hidden-rt';
+  const held = `${hidden}[data-touch-fading]`;
+  const reduced = '@media (prefers-reduced-motion: reduce)';
+  const conceal = [
+    [hidden, 'opacity', '0', []],
+    [hidden, 'transition', 'opacity var(--motion-fast) var(--ease-exit)', []],
+    [held, 'display', 'ruby-text', []],
+    [hidden, 'transition', 'none', [reduced]],
+    [held, 'display', 'none', [reduced]],
+  ];
+  return rule.file === 'editorial.css' && conceal.some(([selector, prop, value, context]) =>
+    rule.selector === selector && rule.prop === prop && rule.value === value
+    && JSON.stringify(rule.chain) === JSON.stringify([...context, selector]));
+}
+
 {
   const bad = [], seenExceptions = new Set(), ladderBlocks = [], strayLadder = [], oldLadders = [], rubyRules = [], pseudoReadings = [], rtRules = [];
   let driftSha = null;
@@ -144,6 +177,7 @@ function governed(size) {
     const text = readFileSync(file, 'utf8');
     if (rel === 'drift-layer.css') { driftSha = createHash('sha256').update(text).digest('hex'); continue; }
     const decls = declarations(text);
+    rtRules.push(...collectRtRules(rel, decls));
     for (const d of decls) {
       if (/^--type-/.test(d.prop)) {
         if (rel === 'rooms/motion.css' && /^:root$/.test(d.selector)) ladderBlocks.push({ media: d.chain.length > 1 ? d.chain[0] : '', prop: d.prop, value: d.value });
@@ -153,7 +187,6 @@ function governed(size) {
       if (/^--leading-/.test(d.prop) && !(rel === 'rooms/motion.css' && d.selector === ':root')) strayLadder.push(`${rel} ${d.selector} ${d.prop}`);
       if (d.prop === 'content' && /attr\(data-r/.test(d.value)) pseudoReadings.push(`${rel} ${d.selector}`);
       const touchesRt = /(^|[\s,>+~(])rt\b(?![-\w])/.test(d.selector);
-      if (touchesRt) rtRules.push(`${rel}|${d.selector}|${d.prop}`);
       if ((d.prop === 'font-size' || d.prop === 'font') && touchesRt) rubyRules.push(`${rel}|${d.selector}|${d.value}`);
       if (d.prop !== 'font-size' && d.prop !== 'font') continue;
       const size = sizeOf(d);
@@ -175,21 +208,12 @@ function governed(size) {
     if (DRIFT_CSS_SHA256) assert.equal(driftSha, DRIFT_CSS_SHA256, 'the drift sky\'s sheet changed');
     record('sheets', 'L1-one-ladder', true, { files: cssFiles.length, exceptions: EXCEPTIONS.length, ladder, phone, driftSha });
   } catch (error) { record('sheets', 'L1-one-ladder', false, null, error.message); }
-  const RT_ALLOWED = new Set([
-    'rooms/motion.css|rt|padding-inline', 'rooms/motion.css|rt|font-size', 'rooms/motion.css|rt|line-height', 'rooms/motion.css|rt|font-weight', 'rooms/motion.css|rt|letter-spacing', 'rooms/motion.css|rt|color',
-    'rooms/motion.css|rt.hidden-rt|display', 'rooms/motion.css|rt|margin-block-end',
-    "decks/player/player.css|.kp[data-readings='off'] .kp-sentence ruby:not(:is(.kp-target, .kp-tok.kp-lit) ruby) > rt|visibility",
-    'decks/player/player.css|.kp-sentence.kp-enter rt|animation',
-    'decks/context-dense/context-deck.css|ruby.cd-ruby rt|font-family', 'decks/context-dense/context-deck.css|ruby.cd-ruby rt|letter-spacing', 'decks/context-dense/context-deck.css|ruby.cd-ruby rt|color', 'decks/context-dense/context-deck.css|ruby.cd-ruby rt|line-height', 'decks/context-dense/context-deck.css|ruby.cd-ruby rt|user-select',
-    'decks/context-dense/context-deck.css|.cd-miss .cd-ink, .cd-miss rt|color',
-    'decks/personal/personal.css|.pc rt|font-family', 'decks/personal/personal.css|.pc rt|letter-spacing', 'decks/personal/personal.css|.pc rt|font-weight', 'decks/personal/personal.css|.pc rt|color',
-    'decks/personal/personal.css|.pc-japanese rt|font-family', 'decks/personal/personal.css|.pc-japanese rt|letter-spacing', 'decks/personal/personal.css|.pc-japanese rt|color',
-  ]);
+
   try {
     assert.deepEqual(rubyRules, ['rooms/motion.css|rt|0.5em'], `one rule sizes a reading: ${rubyRules.join('; ')}`);
     assert.deepEqual(pseudoReadings, [], `a reading drawn as a pseudo-element: ${pseudoReadings.join('; ')}`);
-    const extra = rtRules.filter((r) => !RT_ALLOWED.has(r) && !/prefers-reduced-motion/.test(r) && !/kp-sentence\.kp-enter :is\(\.kp-target, rt\)/.test(r));
-    assert.deepEqual(extra, [], `rules that touch a reading beyond the one rule and the listed few: ${extra.join('; ')}`);
+    const extra = rtRules.filter((r) => !allowedRtRule(r));
+    assert.deepEqual(extra, [], `rules that touch a reading beyond the one rule and the listed few: ${JSON.stringify(extra)}`);
     record('sheets', 'L2-one-ruby', true, { rubyRules, rtRules: rtRules.length });
   } catch (error) { record('sheets', 'L2-one-ruby', false, null, error.message); }
 }
