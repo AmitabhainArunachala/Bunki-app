@@ -502,10 +502,7 @@ test('no-card refusal is visible and leaves practice available without minting c
     h.context.kanjiCourseHookLine(result),
   );
   // HOOKS r8 §4 (C2): srs-core's approved no-schedule line
-  assert.ok(
-    h.getText().includes(core.refusalWords('no-schedule', 'en')),
-    h.getText(),
-  );
+  assert.ok(h.getText().includes(core.refusalWords('no-schedule', 'en')), h.getText());
   assert.equal(h.box.writes, 0);
   assert.deepEqual(h.box.record.srs, {});
   h.click('kanji-course-next');
@@ -526,10 +523,7 @@ test('not-due refusal is visible, preserves the exact card and allows the next c
     h.byId('kanji-course-review-status').textContent,
     h.context.kanjiCourseHookLine(result),
   );
-  assert.ok(
-    h.getText().includes(core.refusalWords('not-due', 'en')),
-    h.getText(),
-  );
+  assert.ok(h.getText().includes(core.refusalWords('not-due', 'en')), h.getText());
   assert.deepEqual(h.box.record, before);
   assert.equal(h.box.writes, 0);
   h.click('kanji-course-next');

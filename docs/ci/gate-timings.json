@@ -2303,10 +2303,7 @@
         "producerBytesBasis": "Kanji-trust merged onto the Ink integration; producer bytes pinned by SHA-256.",
         "producer": "prototypes/corridor/tools/verify-kanji-trust.mjs",
         "producerSha256": "765b72e36bdd404a912953b83a7fa978b8bbe91be22b2aad950f268ba6080587",
-        "command": [
-          "node",
-          "prototypes/corridor/tools/verify-kanji-trust.mjs"
-        ],
+        "command": ["node", "prototypes/corridor/tools/verify-kanji-trust.mjs"],
         "environment": {
           "KAIRO_BROWSER": "chromium",
           "KAIRO_EVIDENCE_DIR": "/unused/kanji-trust"
@@ -2325,9 +2322,7 @@
       "wrapperWallTimeMeasured": false,
       "measurementObligation": "FULL measures this canonical gate on the pinned combined artifact.",
       "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
-      "limitations": [
-        "No numeric timing is claimed for this unmeasured contract."
-      ]
+      "limitations": ["No numeric timing is claimed for this unmeasured contract."]
     },
     {
       "name": "kanji-trust-webkit",
@@ -2337,10 +2332,7 @@
         "producerBytesBasis": "Kanji-trust merged onto the Ink integration; producer bytes pinned by SHA-256.",
         "producer": "prototypes/corridor/tools/verify-kanji-trust.mjs",
         "producerSha256": "765b72e36bdd404a912953b83a7fa978b8bbe91be22b2aad950f268ba6080587",
-        "command": [
-          "node",
-          "prototypes/corridor/tools/verify-kanji-trust.mjs"
-        ],
+        "command": ["node", "prototypes/corridor/tools/verify-kanji-trust.mjs"],
         "environment": {
           "KAIRO_BROWSER": "webkit",
           "KAIRO_EVIDENCE_DIR": "/unused/kanji-trust-webkit"
@@ -2359,9 +2351,7 @@
       "wrapperWallTimeMeasured": false,
       "measurementObligation": "FULL measures this canonical gate on the pinned combined artifact.",
       "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
-      "limitations": [
-        "No numeric timing is claimed for this unmeasured contract."
-      ]
+      "limitations": ["No numeric timing is claimed for this unmeasured contract."]
     },
     {
       "name": "hfix2d",
@@ -2371,10 +2361,7 @@
         "producerBytesBasis": "Accepted Hfix-2d r5 behavioral body with WEAVE receipt-only hardening; exact bytes are pinned below. No wrapper timing is claimed.",
         "producer": "prototypes/corridor/tools/verify-hfix2d.mjs",
         "producerSha256": "6ed37b2d8d64b9096b67f9773c9477b3a1d8fe55af68c8b8583eedc084243f79",
-        "command": [
-          "node",
-          "prototypes/corridor/tools/verify-hfix2d.mjs"
-        ],
+        "command": ["node", "prototypes/corridor/tools/verify-hfix2d.mjs"],
         "environment": {
           "KAIRO_BROWSER": "chromium",
           "KAIRO_EXPECT_GITSHA": "",
@@ -2394,9 +2381,7 @@
       "wrapperWallTimeMeasured": false,
       "measurementObligation": "FULL measures this exact 368-occurrence native-engine gate on the final combined artifact. Expected git SHA is bound from the selected site; the runner supplies the fresh attempt nonce.",
       "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
-      "limitations": [
-        "No numeric timing is claimed for this unmeasured contract."
-      ]
+      "limitations": ["No numeric timing is claimed for this unmeasured contract."]
     },
     {
       "name": "hfix2d-webkit",
@@ -2406,10 +2391,7 @@
         "producerBytesBasis": "Accepted Hfix-2d r5 behavioral body with WEAVE receipt-only hardening; exact bytes are pinned below. No wrapper timing is claimed.",
         "producer": "prototypes/corridor/tools/verify-hfix2d.mjs",
         "producerSha256": "6ed37b2d8d64b9096b67f9773c9477b3a1d8fe55af68c8b8583eedc084243f79",
-        "command": [
-          "node",
-          "prototypes/corridor/tools/verify-hfix2d.mjs"
-        ],
+        "command": ["node", "prototypes/corridor/tools/verify-hfix2d.mjs"],
         "environment": {
           "KAIRO_BROWSER": "webkit",
           "KAIRO_EXPECT_GITSHA": "",
@@ -2429,9 +2411,7 @@
       "wrapperWallTimeMeasured": false,
       "measurementObligation": "FULL measures this exact 368-occurrence native-engine gate on the final combined artifact. Expected git SHA is bound from the selected site; the runner supplies the fresh attempt nonce.",
       "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
-      "limitations": [
-        "No numeric timing is claimed for this unmeasured contract."
-      ]
+      "limitations": ["No numeric timing is claimed for this unmeasured contract."]
     },
     {
       "name": "hfix2c",
@@ -2441,10 +2421,7 @@
         "producerBytesBasis": "WEAVE integration consumer/producer bytes pinned by SHA-256; no timing is attributed to the parent.",
         "producer": "prototypes/corridor/tools/verify-hfix2c.mjs",
         "producerSha256": "7e73e56c0c0ddfdc4b548452ec195a60952f0cdad0a199305e017eb3ba48897a",
-        "command": [
-          "node",
-          "prototypes/corridor/tools/verify-hfix2c.mjs"
-        ],
+        "command": ["node", "prototypes/corridor/tools/verify-hfix2c.mjs"],
         "environment": {
           "KAIRO_BROWSER": "chromium",
           "HFIX2C_MODE": "branch",
@@ -2466,9 +2443,7 @@
       "wrapperWallTimeMeasured": false,
       "measurementObligation": "FULL measures this exact complete lane command on the final combined artifact; targeted contrast retains its explicit three-state scope.",
       "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
-      "limitations": [
-        "No numeric timing is claimed for this unmeasured contract."
-      ]
+      "limitations": ["No numeric timing is claimed for this unmeasured contract."]
     },
     {
       "name": "hfix2c-webkit",
@@ -2478,10 +2453,7 @@
         "producerBytesBasis": "WEAVE integration consumer/producer bytes pinned by SHA-256; no timing is attributed to the parent.",
         "producer": "prototypes/corridor/tools/verify-hfix2c.mjs",
         "producerSha256": "7e73e56c0c0ddfdc4b548452ec195a60952f0cdad0a199305e017eb3ba48897a",
-        "command": [
-          "node",
-          "prototypes/corridor/tools/verify-hfix2c.mjs"
-        ],
+        "command": ["node", "prototypes/corridor/tools/verify-hfix2c.mjs"],
         "environment": {
           "KAIRO_BROWSER": "webkit",
           "HFIX2C_MODE": "branch",
@@ -2503,9 +2475,7 @@
       "wrapperWallTimeMeasured": false,
       "measurementObligation": "FULL measures this exact complete lane command on the final combined artifact; targeted contrast retains its explicit three-state scope.",
       "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
-      "limitations": [
-        "No numeric timing is claimed for this unmeasured contract."
-      ]
+      "limitations": ["No numeric timing is claimed for this unmeasured contract."]
     },
     {
       "name": "hfix2c-contrast",
@@ -2515,10 +2485,7 @@
         "producerBytesBasis": "WEAVE integration consumer/producer bytes pinned by SHA-256; no timing is attributed to the parent.",
         "producer": "scripts/ci/run-hfix2c-contrast-gate.mjs",
         "producerSha256": "db692ca56e01ff3b058d10e8936736bb35e114370cb940246ee75f6d63685d11",
-        "command": [
-          "node",
-          "scripts/ci/run-hfix2c-contrast-gate.mjs"
-        ],
+        "command": ["node", "scripts/ci/run-hfix2c-contrast-gate.mjs"],
         "environment": {
           "KAIRO_BROWSER": "chromium",
           "KAIRO_EVIDENCE_DIR": "/unused/hfix2c-contrast"
@@ -2537,9 +2504,7 @@
       "wrapperWallTimeMeasured": false,
       "measurementObligation": "FULL measures this exact complete lane command on the final combined artifact; targeted contrast retains its explicit three-state scope.",
       "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
-      "limitations": [
-        "No numeric timing is claimed for this unmeasured contract."
-      ]
+      "limitations": ["No numeric timing is claimed for this unmeasured contract."]
     },
     {
       "name": "hfix2c-contrast-webkit",
@@ -2549,10 +2514,7 @@
         "producerBytesBasis": "WEAVE integration consumer/producer bytes pinned by SHA-256; no timing is attributed to the parent.",
         "producer": "scripts/ci/run-hfix2c-contrast-gate.mjs",
         "producerSha256": "db692ca56e01ff3b058d10e8936736bb35e114370cb940246ee75f6d63685d11",
-        "command": [
-          "node",
-          "scripts/ci/run-hfix2c-contrast-gate.mjs"
-        ],
+        "command": ["node", "scripts/ci/run-hfix2c-contrast-gate.mjs"],
         "environment": {
           "KAIRO_BROWSER": "webkit",
           "KAIRO_EVIDENCE_DIR": "/unused/hfix2c-contrast-webkit"
@@ -2571,9 +2533,7 @@
       "wrapperWallTimeMeasured": false,
       "measurementObligation": "FULL measures this exact complete lane command on the final combined artifact; targeted contrast retains its explicit three-state scope.",
       "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
-      "limitations": [
-        "No numeric timing is claimed for this unmeasured contract."
-      ]
+      "limitations": ["No numeric timing is claimed for this unmeasured contract."]
     },
     {
       "name": "hfix2a",
@@ -2583,10 +2543,7 @@
         "producerBytesBasis": "Hfix-2a merged into WEAVE; unchanged producer bytes pinned by SHA-256.",
         "producer": "prototypes/corridor/tools/verify-hfix2a.mjs",
         "producerSha256": "0b97e37ecf91dd95bffed8651f6e342a269dafe77fc4004d1ef9d4734e26f1f4",
-        "command": [
-          "node",
-          "prototypes/corridor/tools/verify-hfix2a.mjs"
-        ],
+        "command": ["node", "prototypes/corridor/tools/verify-hfix2a.mjs"],
         "environment": {
           "KAIRO_BROWSER": "chromium",
           "HFIX2A_MODE": "branch",
@@ -2607,9 +2564,7 @@
       "wrapperWallTimeMeasured": false,
       "measurementObligation": "FULL measures this complete canonical branch-mode gate on the pinned combined artifact.",
       "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
-      "limitations": [
-        "No numeric timing is claimed for this unmeasured contract."
-      ]
+      "limitations": ["No numeric timing is claimed for this unmeasured contract."]
     },
     {
       "name": "hfix2a-webkit",
@@ -2619,10 +2574,7 @@
         "producerBytesBasis": "Hfix-2a merged into WEAVE; unchanged producer bytes pinned by SHA-256.",
         "producer": "prototypes/corridor/tools/verify-hfix2a.mjs",
         "producerSha256": "0b97e37ecf91dd95bffed8651f6e342a269dafe77fc4004d1ef9d4734e26f1f4",
-        "command": [
-          "node",
-          "prototypes/corridor/tools/verify-hfix2a.mjs"
-        ],
+        "command": ["node", "prototypes/corridor/tools/verify-hfix2a.mjs"],
         "environment": {
           "KAIRO_BROWSER": "webkit",
           "HFIX2A_MODE": "branch",
@@ -2643,9 +2595,7 @@
       "wrapperWallTimeMeasured": false,
       "measurementObligation": "FULL measures this complete canonical branch-mode gate on the pinned combined artifact.",
       "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
-      "limitations": [
-        "No numeric timing is claimed for this unmeasured contract."
-      ]
+      "limitations": ["No numeric timing is claimed for this unmeasured contract."]
     },
     {
       "name": "hfix2a-item-a",
@@ -2655,10 +2605,7 @@
         "producerBytesBasis": "Hfix-2a merged into WEAVE; unchanged producer bytes pinned by SHA-256.",
         "producer": "prototypes/corridor/tools/verify-hfix2a-item-a.mjs",
         "producerSha256": "ab41711b357c67d46757d564982d49067a5575e239effb3a65f8055208a9bd97",
-        "command": [
-          "node",
-          "prototypes/corridor/tools/verify-hfix2a-item-a.mjs"
-        ],
+        "command": ["node", "prototypes/corridor/tools/verify-hfix2a-item-a.mjs"],
         "environment": {
           "KAIRO_BROWSER": "chromium",
           "HFIX2A_MODE": "branch",
@@ -2679,9 +2626,7 @@
       "wrapperWallTimeMeasured": false,
       "measurementObligation": "FULL measures this complete canonical branch-mode gate on the pinned combined artifact.",
       "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
-      "limitations": [
-        "No numeric timing is claimed for this unmeasured contract."
-      ]
+      "limitations": ["No numeric timing is claimed for this unmeasured contract."]
     },
     {
       "name": "hfix2a-item-a-webkit",
@@ -2691,10 +2636,7 @@
         "producerBytesBasis": "Hfix-2a merged into WEAVE; unchanged producer bytes pinned by SHA-256.",
         "producer": "prototypes/corridor/tools/verify-hfix2a-item-a.mjs",
         "producerSha256": "ab41711b357c67d46757d564982d49067a5575e239effb3a65f8055208a9bd97",
-        "command": [
-          "node",
-          "prototypes/corridor/tools/verify-hfix2a-item-a.mjs"
-        ],
+        "command": ["node", "prototypes/corridor/tools/verify-hfix2a-item-a.mjs"],
         "environment": {
           "KAIRO_BROWSER": "webkit",
           "HFIX2A_MODE": "branch",
@@ -2715,9 +2657,7 @@
       "wrapperWallTimeMeasured": false,
       "measurementObligation": "FULL measures this complete canonical branch-mode gate on the pinned combined artifact.",
       "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
-      "limitations": [
-        "No numeric timing is claimed for this unmeasured contract."
-      ]
+      "limitations": ["No numeric timing is claimed for this unmeasured contract."]
     },
     {
       "name": "later-encounters-contracts",
@@ -6177,10 +6117,7 @@
         "producerBytesBasis": "SRS FULLPROOF's integration branch (int-srs on 4159d180), optional reads presence-checked, ten controls, the early pass's counter and one early wording on four surfaces; producer bytes pinned by SHA-256, not falsely attributed to a parent commit.",
         "producer": "prototypes/corridor/tools/verify-srs-conformance.mjs",
         "producerSha256": "8b317203a8405f0e9dc706aad58fbfaf713ce55b7a6ed9030648f866082fe04a",
-        "command": [
-          "node",
-          "prototypes/corridor/tools/verify-srs-conformance.mjs"
-        ],
+        "command": ["node", "prototypes/corridor/tools/verify-srs-conformance.mjs"],
         "environment": {
           "KAIRO_BROWSER": "chromium",
           "KAIRO_EVIDENCE_DIR": "/unused/srs-conformance"
@@ -6232,10 +6169,7 @@
         "producerBytesBasis": "SRS FULLPROOF's integration branch (int-srs on 4159d180), optional reads presence-checked, ten controls, the early pass's counter and one early wording on four surfaces; producer bytes pinned by SHA-256, not falsely attributed to a parent commit.",
         "producer": "prototypes/corridor/tools/verify-srs-conformance.mjs",
         "producerSha256": "8b317203a8405f0e9dc706aad58fbfaf713ce55b7a6ed9030648f866082fe04a",
-        "command": [
-          "node",
-          "prototypes/corridor/tools/verify-srs-conformance.mjs"
-        ],
+        "command": ["node", "prototypes/corridor/tools/verify-srs-conformance.mjs"],
         "environment": {
           "KAIRO_BROWSER": "webkit",
           "KAIRO_EVIDENCE_DIR": "/unused/srs-conformance-webkit"
