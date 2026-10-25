@@ -19,8 +19,8 @@
     "result": "retry",
     "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
     "startedAt": "2026-10-12T07:09:14Z",
-    "failures": 17,
-    "attemptedAt": "2026-10-24T10:28:05.673Z",
+    "failures": 18,
+    "attemptedAt": "2026-10-25T11:24:44.215Z",
     "reason": "Observation artifact not yet available: bunki-plan-38211189408-2"
   },
   "38211189408/3": {
@@ -37,56 +37,56 @@
     "result": "retry",
     "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
     "startedAt": "2026-10-10T22:08:31Z",
-    "failures": 17,
-    "attemptedAt": "2026-10-24T10:28:05.673Z",
+    "failures": 18,
+    "attemptedAt": "2026-10-25T11:24:44.215Z",
     "reason": "Observation artifact not yet available: bunki-plan-37496611523-2"
   },
   "37496611523/3": {
     "result": "retry",
     "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
     "startedAt": "2026-10-10T22:08:31Z",
-    "failures": 17,
-    "attemptedAt": "2026-10-24T10:28:05.673Z",
+    "failures": 18,
+    "attemptedAt": "2026-10-25T11:24:44.215Z",
     "reason": "Observation artifact not yet available: bunki-plan-37496611523-3"
   },
   "37496611523/4": {
     "result": "retry",
     "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
     "startedAt": "2026-10-10T22:08:31Z",
-    "failures": 17,
-    "attemptedAt": "2026-10-24T10:28:05.673Z",
+    "failures": 18,
+    "attemptedAt": "2026-10-25T11:24:44.215Z",
     "reason": "Observation artifact not yet available: bunki-plan-37496611523-4"
   },
   "37496611523/5": {
     "result": "retry",
     "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
     "startedAt": "2026-10-10T22:08:31Z",
-    "failures": 17,
-    "attemptedAt": "2026-10-24T10:28:05.673Z",
+    "failures": 18,
+    "attemptedAt": "2026-10-25T11:24:44.215Z",
     "reason": "Observation artifact not yet available: bunki-plan-37496611523-5"
   },
   "37496611523/6": {
     "result": "retry",
     "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
     "startedAt": "2026-10-10T22:08:31Z",
-    "failures": 17,
-    "attemptedAt": "2026-10-24T10:28:05.673Z",
+    "failures": 18,
+    "attemptedAt": "2026-10-25T11:24:44.215Z",
     "reason": "Observation artifact not yet available: bunki-plan-37496611523-6"
   },
   "37496611523/7": {
     "result": "retry",
     "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
     "startedAt": "2026-10-10T22:08:31Z",
-    "failures": 17,
-    "attemptedAt": "2026-10-24T10:28:05.673Z",
+    "failures": 18,
+    "attemptedAt": "2026-10-25T11:24:44.215Z",
     "reason": "Observation artifact not yet available: bunki-plan-37496611523-7"
   },
   "37496611523/8": {
     "result": "retry",
     "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
     "startedAt": "2026-10-10T22:08:31Z",
-    "failures": 17,
-    "attemptedAt": "2026-10-24T10:28:05.673Z",
+    "failures": 18,
+    "attemptedAt": "2026-10-25T11:24:44.215Z",
     "reason": "Observation artifact not yet available: bunki-plan-37496611523-8"
   },
   "37634778277/1": {
@@ -1172,5 +1172,9 @@
   "37925123360/28": {
     "result": "observed",
     "startedAt": "2026-10-25T03:21:07Z"
+  },
+  "37980085769/28": {
+    "result": "observed",
+    "startedAt": "2026-10-25T11:23:49Z"
   }
 }
