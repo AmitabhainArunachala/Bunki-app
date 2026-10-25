@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
-import { cpSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, extname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium, webkit } from 'playwright-core';
@@ -49,12 +49,13 @@ const CASES = [
 ];
 assert(!FILTER || CASES.includes(FILTER), `Unknown case: ${FILTER}`);
 
-// Preserve the exact immutable artifact, verifier and available build inputs.
+// Share the exact immutable artifact; preserve verifier and available build inputs.
 // Current source hashes are recorded separately from the pinned artifact's
 // module-input hashes, so concurrent edits cannot masquerade as tested bytes.
-const retainedSite = resolve(OUT, 'tested-site');
-cpSync(SITE, retainedSite, { recursive: true, errorOnExist: true, force: false });
-for (const file of manifest.files) assert.equal(sha(readFileSync(resolve(retainedSite, file.path))), file.sha256, `Retained artifact copy differs: ${file.path}`);
+// resolveCorridorSite verifies the preserved shared artifact before use.
+// The gate only reads it; synthetic mutations are served from memory.
+const retainedSite = SITE;
+for (const file of manifest.files) assert.equal(sha(readFileSync(resolve(retainedSite, file.path))), file.sha256, `Shared artifact differs: ${file.path}`);
 const sourcePaths = new Set(['prototypes/corridor/tools/verify-record-reading-position.mjs',
   'prototypes/corridor/tools/record-test-support.mjs', 'prototypes/corridor/record-controller.mjs',
   'prototypes/corridor/record-host.mjs', 'prototypes/corridor/record-app.mjs',

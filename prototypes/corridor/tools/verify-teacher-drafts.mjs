@@ -5,7 +5,7 @@ import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
-import { cpSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, extname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium, webkit } from 'playwright-core';
@@ -25,8 +25,9 @@ const normalize = (value) => Array.isArray(value) ? value.map(normalize) : value
   ? Object.fromEntries(Object.keys(value).sort().map((key) => [key, normalize(value[key])])) : value;
 const digest = (value) => sha(JSON.stringify(normalize(value)));
 const manifest = JSON.parse(readFileSync(join(SITE, 'build-identity.json'), 'utf8'));
-const retainedSite = join(OUT, 'tested-site');
-cpSync(SITE, retainedSite, { recursive: true, errorOnExist: true, force: false });
+// resolveCorridorSite verifies every supplied artifact byte before this process uses it.
+// Share that preserved immutable artifact; source copies and gate evidence remain separate.
+const retainedSite = SITE;
 for (const file of manifest.files) assert.equal(sha(readFileSync(join(retainedSite, file.path))), file.sha256);
 const sourceCopies = [];
 for (const path of ['prototypes/corridor/tools/verify-teacher-drafts.mjs', 'prototypes/corridor/tools/record-test-support.mjs',

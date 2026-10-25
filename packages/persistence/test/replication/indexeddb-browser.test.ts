@@ -1,5 +1,5 @@
 import { createServer, type Server } from 'node:http';
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -109,7 +109,8 @@ describe.each(engines.filter(([name]) => requested.includes(name)))(
         await new Promise<void>((resolve, reject) =>
           server.close((error) => (error ? reject(error) : resolve())),
         );
-      if (profile) await rm(profile, { recursive: true, force: true });
+      // The outer gate owns retention after the entire suite and evidence validation.
+      // Keeping the profile here also preserves failures in another case or teardown.
       expect(errors, 'Unexpected browser page errors').toEqual([]);
     });
 
