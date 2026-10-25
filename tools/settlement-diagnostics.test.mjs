@@ -204,7 +204,11 @@ const step2Fault = name => Object.assign(new Error(`injected ${name}`), { code: 
 async function step2Fixture(config, inspect) {
   const checks = fileURLToPath(new URL('../checks/', import.meta.url));
   mkdirSync(checks, { recursive: true });
-  const directory = await fs.mkdtemp(join(checks, 'step2-'));
+  const directory = config.reuseDirectory || await fs.mkdtemp(join(checks, 'step2-'));
+  if (config.reuseDirectory) {
+    assert.equal(step2Path.dirname(directory), checks.replace(/\/$/, ''));
+    await fs.mkdir(directory); // Reuse only the now-absent, successfully disposed paired fixture path.
+  }
   let succeeded = false;
   const head = 'a'.repeat(40), artifact = 'b'.repeat(64), site = join(directory, 'fixture-site');
   const frozenSource = { sha: head, dirty: false, files: [] };
@@ -245,7 +249,7 @@ async function step2Fixture(config, inspect) {
     join, relative: step2Path.relative, isAbsolute: step2Path.isAbsolute,
     out: directory, root: directory, site, progress, active: state.active, failures: state.failures,
     PHASES: ['A', 'B', 'C'], LIMIT: { load1: 16, diskBytes: 8 * 1024 ** 3, memoryBytes: 8 * 1024 ** 3, pollMs: 15000 },
-    contract: { dependencies: {}, globallyExclusive: [] }, retentionMode: 'keep-all',
+    contract: { dependencies: {}, globallyExclusive: [] }, retentionMode: config.retentionMode || 'keep-all',
     now: () => '2026-10-25T00:00:00.000Z', performance: { now: () => { ticks += 100; return ticks; } }, machine: resources,
     // A native completion wakes the production Promise.race. No polling timer or OS process is started.
     delay: () => new Promise(() => {}),
@@ -260,7 +264,7 @@ async function step2Fixture(config, inspect) {
       await fs.writeFile(producerPath, JSON.stringify({ kind: 'fixture-producer', passed: true, name: gate.name }));
       const producerBytes = readFileSync(producerPath);
       const proof = { kind: 'producer-receipt', receipts: [{ path: producerPath, bytes: producerBytes.length, sha256: step2Hash(producerBytes) }] };
-      const runId = `${gate.name}-nonce`, startedAt = '2026-10-25T00:00:00.000Z', completedAt = '2026-10-25T00:00:00.100Z';
+      const runId = `${gate.name}-${step2Path.basename(attemptOut)}-nonce`, startedAt = '2026-10-25T00:00:00.000Z', completedAt = '2026-10-25T00:00:00.100Z';
       const evidenceReceipt = { schemaVersion: 1, kind: 'bunki-gate-evidence', name: gate.name, runId,
         gitSha: head, artifactSha256: artifact, fullAcceptance: true, proof };
       const result = { name: gate.name, runId, status: 'passed', exitCode: 0, processExitCode: 0, startedAt, completedAt, proof,
@@ -271,24 +275,30 @@ async function step2Fixture(config, inspect) {
       const receipt = { kind: 'kairo-required-battery', schemaVersion: 1, source: receiptSource,
         sourceBefore: frozenSource, sourceAfter: frozenSource, artifactBefore: { gitSha: head, artifactSha256: artifact },
         artifactAfter: { gitSha: head, artifactSha256: artifact }, status: 'passed', exitCode: 0, startedAt, completedAt, gates: [result] };
+      if (gate.name === 'fixture-first' && config.nativeRed) {
+        result.status = receipt.status = 'failed'; result.exitCode = result.processExitCode = receipt.exitCode = 1;
+      }
       if (gate.name === 'fixture-first' && config.invalidProof) result.evidenceReceiptSha256 = 'c'.repeat(64);
       await fs.writeFile(join(attemptOut, 'battery.json'), JSON.stringify(receipt));
       if (gate.name === 'fixture-first' && config.invalidPin) await fs.writeFile(producerPath, 'changed producer evidence\n');
       if (gate.name === 'fixture-first' && config.preexistingStop) progress.stop = operator;
+      if (gate.name === 'fixture-first') await config.prepareFixture?.({ state, attemptOut, result, receipt });
       return receipt;
     },
     snapshotGate,
     finalizeGateFootprint: async args => {
-      state.finalizeCalls.push({ root: args.root, passed: args.passed });
+      state.finalizeCalls.push({ root: args.root, passed: args.passed, retentionMode: args.retentionMode });
       assert(currentSettlement()?.attempted || args.passed === false, 'marker precedes finalizer');
-      const ledger = await finalizeGateFootprint(args);
+      const ledger = config.withFinalizer ? await config.withFinalizer({ args, state, run: () => finalizeGateFootprint(args) }) : await finalizeGateFootprint(args);
       state.ledgers.push({ ledger, originalBytes: readFileSync(ledger.ledgerPath) });
       return ledger;
     },
     checkOwnedClosure: attemptOut => {
       const first = attemptOut.includes('/fixture-first/');
-      const observation = probe(adapter, first ? config.lsof ?? cleanLsof() : cleanLsof(),
-        first ? config.ps ?? cleanPs() : cleanPs(), attemptOut);
+      if (first) config.mutateAtClosure?.({ attemptOut, state });
+      const dynamic = first ? config.commandResults?.(attemptOut) || {} : {};
+      const observation = probe(adapter, first ? dynamic.lsof ?? config.lsof ?? cleanLsof() : cleanLsof(),
+        first ? dynamic.ps ?? config.ps ?? cleanPs() : cleanPs(), attemptOut);
       state.closureCalls.push({ attemptOut, observation }); return observation;
     },
     summarizeFootprint: (ledger, pin) => { failOnce('summary'); return adapter.summarizeFootprint(ledger, pin); },
@@ -316,14 +326,14 @@ async function step2Fixture(config, inspect) {
     console.error(`STEP 2 failed fixture retained: ${directory}`); throw error;
   } finally { if (succeeded) await fs.rm(directory, { recursive: true }); }
 }
-function step2AssertBlock(state, { ledgerReason, stage, errorMessage, nativePassed = true }) {
+function step2AssertBlock(state, { ledgerReason, stage, errorMessage, nativePassed = true, retentionMode = 'keep-all' }) {
   const { progress, failures } = state, cause = progress.settlementBlock;
   assert.equal(progress.status, 'blocked'); assert.equal(progress.gates[0].outcome, 'blocked');
   assert.equal(progress.gates[1].outcome, 'pending'); assert(!state.launches.includes('fixture-next'));
   assert.equal(failures.length, 1); assert.equal(failures[0], cause);
   assert.equal(cause.kind, 'footprint-settlement-blocked'); assert.equal(cause.gate, 'fixture-first');
   assert.equal(cause.phase, 'A'); assert.equal(cause.number, 1); assert.equal(cause.stage, stage);
-  assert.equal(cause.retentionMode, 'keep-all'); assert.equal(cause.ledgerReason, ledgerReason);
+  assert.equal(cause.retentionMode, retentionMode); assert.equal(cause.ledgerReason, ledgerReason);
   assert.equal(cause.nativePassed, nativePassed); assert.equal(cause.error.message, errorMessage);
   const detail = Object.entries(cause.closure.commands || {}).map(([name, value]) => `${name} ${value.primary} (exit ${value.status})`).join('; ');
   assert.equal(cause.message, `fixture-first attempt 1: ${ledgerReason}${detail ? '; ' + detail : ''}; ${errorMessage}; evidence preserved`);
@@ -422,5 +432,236 @@ for (const timing of ['preexistingStop', 'lateStop']) test(`STEP2 ${timing} rema
       assert(observed); assert.deepEqual(observed.active, ['fixture-hold']);
       assert.equal(state.progress.gates[2].outcome, 'passed');
     }
+  });
+});
+
+// RS3 provenance: FULL #2 plan bytes are read-only; only literal link text is
+// reconstructed. Historical targets are never opened, traversed, copied or changed.
+const step3HistoricalRoot = '/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/owned-M1-f0e4891d-20261022-0005-e6d2-native/C/release-gates/attempt-1';
+const step3PlanPath = join(step3HistoricalRoot, '.gate-footprint-25P4u3/plan.json');
+const step3PlanSha = '586f2c7b12bc2f577cdccb1739cfe50ecc70f8a7bd229ae56db064713bf4f11a';
+const step3EightLinks = [
+  ['runner-verification/fixtures/offline-symlink-directory', `${step3HistoricalRoot}/runner-verification/fixtures/offline-symlink-directory-actual`, 202],
+  ['runner-verification/fixtures/offline-symlink-receipt/run-synthetic/receipt.json', 'actual-receipt.json', 19],
+  ['runner-verification/fixtures/offline-symlink-run/run-synthetic', 'actual-run', 10],
+  ['runner-verification/offline-symlink-directory/offline-report.json', `${step3HistoricalRoot}/runner-verification/fixtures/offline-symlink-directory-actual`, 202],
+  ['runner-verification/offline-symlink-receipt/offline-report.json/run-synthetic/receipt.json', `${step3HistoricalRoot}/runner-verification/fixtures/offline-symlink-receipt/run-synthetic/actual-receipt.json`, 227],
+  ['runner-verification/offline-symlink-run/offline-report.json/run-synthetic', `${step3HistoricalRoot}/runner-verification/fixtures/offline-symlink-run/actual-run`, 200],
+  ['runner-verification/record-practice-finalize-admission-symlink-evidence-directory/chromium/submission-atomic-exact-minimal-operation', `${step3HistoricalRoot}/runner-verification/fixtures/chromium/submission-atomic-exact-minimal-operation.held`, 225],
+  ['runner-verification/record-practice-finalize-admission-symlink-evidence-file/chromium/submission-atomic-exact-minimal-operation/evidence.json', `${step3HistoricalRoot}/runner-verification/fixtures/chromium/submission-atomic-exact-minimal-operation/evidence.json.held`, 239],
+];
+function step3LinkIdentity(path) {
+  const stat = step2Fs.lstatSync(path);
+  assert(stat.isSymbolicLink());
+  return { target: step2Fs.readlinkSync(path), dev: stat.dev, ino: stat.ino, size: stat.size, mtimeMs: stat.mtimeMs, ctimeMs: stat.ctimeMs };
+}
+async function step3Payload({ state, attemptOut }) {
+  await fs.mkdir(join(attemptOut, 'profile/Default'), { recursive: true });
+  await fs.writeFile(join(attemptOut, 'profile/Default/cache.bin'), 'owned scratch retained\n');
+  await fs.writeFile(join(attemptOut, 'trace.zip'), 'owned trace retained\n');
+  state.sentinelPath ||= join(state.directory, 'outside-sentinel');
+  if (!step2Fs.existsSync(state.sentinelPath)) await fs.writeFile(state.sentinelPath, 'outside sentinel unchanged\n');
+}
+async function step3GuardFinalizer({ args, state, run }) {
+  state.deletionCalls ||= []; state.targetTraversal ||= [];
+  const saved = Object.fromEntries(['open', 'readFile', 'readdir', 'realpath', 'stat', 'unlink', 'rmdir'].map(name => [name, fs[name]]));
+  const forbidden = [step3HistoricalRoot, ...(state.fixtureLinks || []).map(row => row.path)];
+  for (const [name, original] of Object.entries(saved)) fs[name] = async (target, ...rest) => {
+    const path = String(target);
+    if (name === 'unlink' || name === 'rmdir') {
+      state.deletionCalls.push({ operation: name, path }); throw new Error('fixture forbids production deletion');
+    }
+    if (forbidden.some(prefix => path === prefix || path.startsWith(prefix + '/'))) {
+      state.targetTraversal.push({ operation: name, path }); throw new Error('fixture forbids symlink target traversal');
+    }
+    return original.call(fs, target, ...rest);
+  };
+  try { return await run(); } finally { Object.assign(fs, saved); }
+}
+function step3Retained(state, ledger = state.ledgers[0].ledger) {
+  assert.equal(ledger.confirmedRemovedBytes, 0); assert.equal(ledger.bytesRemoved, 0);
+  assert.deepEqual(ledger.removedFiles, []); assert.deepEqual(ledger.removedDirs, []);
+  assert.deepEqual(state.deletionCalls, []); assert.deepEqual(state.targetTraversal, []);
+  assert.equal(readFileSync(join(ledger.root, 'trace.zip'), 'utf8'), 'owned trace retained\n');
+  assert.equal(readFileSync(join(ledger.root, 'profile/Default/cache.bin'), 'utf8'), 'owned scratch retained\n');
+  assert.equal(readFileSync(state.sentinelPath, 'utf8'), 'outside sentinel unchanged\n');
+}
+
+test('RS3 exact FULL #2 eight-link payload blocks cleanup but keep-all retains identities and dispatches next once', async () => {
+  const historicalPlanBytes = readFileSync(step3PlanPath);
+  assert.equal(step2Hash(historicalPlanBytes), step3PlanSha);
+  assert.deepEqual(JSON.parse(historicalPlanBytes).inventory.links, step3EightLinks.map(([path, , size]) => ({ path, size })));
+  for (const [path, target] of step3EightLinks) assert.equal(step2Fs.readlinkSync(join(step3HistoricalRoot, path)), target);
+  let pair;
+  for (const retentionMode of ['cleanup', 'keep-all']) await step2Fixture({ retentionMode,
+    reuseDirectory: pair?.directory, withFinalizer: step3GuardFinalizer,
+    prepareFixture: async context => {
+      await step3Payload(context); const { state, attemptOut } = context;
+      state.fixtureLinks = [];
+      for (const [path, target, size] of step3EightLinks) {
+        const absolute = join(attemptOut, path); await fs.mkdir(step2Path.dirname(absolute), { recursive: true });
+        await fs.symlink(target, absolute); const identity = step3LinkIdentity(absolute);
+        assert.equal(identity.size, size); state.fixtureLinks.push({ path: absolute, identity });
+      }
+    },
+  }, state => {
+    const ledger = state.ledgers[0].ledger, attempt = state.progress.gates[0].attempts[0];
+    const batteryBytes = readFileSync(attempt.battery.path), plan = JSON.parse(readFileSync(ledger.inventoryPath));
+    if (pair) {
+      assert.deepEqual(batteryBytes, pair.batteryBytes, 'paired cases use byte-identical validated battery');
+      assert.deepEqual(plan.inventory, pair.inventory, 'paired fixture payload/link inventories are identical');
+    } else pair = { directory: state.directory, batteryBytes, inventory: plan.inventory };
+    assert.equal(attempt.passed, true); assert.equal(ledger.passed, true); assert.equal(ledger.symlinks.length, 8);
+    assert.deepEqual(ledger.symlinks, step3EightLinks.map(([path, target, size]) => ({ path, size, target })));
+    for (const { path, identity } of state.fixtureLinks) assert.deepEqual(step3LinkIdentity(path), identity, 'literal target and inode identity retained');
+    step3Retained(state); assert.equal(ledger.payloadIntegrity.verified, true);
+    assert(!plan.inventory.files.some(row => step3EightLinks.some(([path]) => row.path === path || row.path.startsWith(path + '/'))));
+    if (retentionMode === 'cleanup') {
+      step2AssertBlock(state, { retentionMode, ledgerReason: 'symlink-refused', stage: 'summary', errorMessage: 'Footprint retention refused settlement' });
+      assert.equal(state.closureCalls.length, 0); assert.deepEqual(state.launches, ['fixture-first']);
+    } else {
+      assert.equal(state.progress.status, 'completed'); assert.equal(state.progress.settlementBlock, null);
+      assert.deepEqual(state.launches, ['fixture-first', 'fixture-next']); assert.equal(ledger.reason, 'keep-all-policy');
+      assert.equal(ledger.linkIntegrity.verified, true); assert.equal(state.closureCalls.length, 2);
+    }
+  });
+  assert.equal(step2Hash(readFileSync(step3PlanPath)), step3PlanSha, 'historical source plan untouched');
+});
+
+for (const kind of ['receipt-link', 'receipt-ancestor', 'changed-at-closure', 'root-replaced'])
+test(`RS4 ${kind} refuses connected settlement and preserves native pass`, async () => {
+  await step2Fixture({ withFinalizer: step3GuardFinalizer,
+    prepareFixture: async context => {
+      await step3Payload(context); const { state, attemptOut, result } = context;
+      if (kind === 'receipt-link') {
+        const original = result.proof.receipts[0].path, target = join(attemptOut, 'actual-producer.json');
+        await fs.rename(original, target); await fs.symlink('actual-producer.json', original);
+        state.fixtureLinks = [{ path: original }]; state.mutationCount = 1;
+      } else if (kind === 'receipt-ancestor') {
+        const actual = join(attemptOut, 'actual-receipt-directory'); await fs.mkdir(actual);
+        const producer = result.proof.receipts[0], bytes = readFileSync(producer.path);
+        await fs.writeFile(join(actual, 'producer.json'), bytes);
+        await fs.symlink('actual-receipt-directory', join(attemptOut, 'required-evidence'));
+        producer.path = join(attemptOut, 'required-evidence/producer.json');
+        result.evidenceReceiptSha256 = step2Hash(JSON.stringify(result.evidenceReceipt));
+        await fs.writeFile(join(attemptOut, 'battery.json'), JSON.stringify(context.receipt));
+        state.fixtureLinks = [{ path: join(attemptOut, 'required-evidence') }]; state.mutationCount = 1;
+      } else if (kind === 'root-replaced') {
+        const moved = attemptOut + '-original'; await fs.rename(attemptOut, moved);
+        await fs.cp(moved, attemptOut, { recursive: true }); state.mutationCount = 1;
+        state.originalRoot = moved;
+      }
+    },
+    mutateAtClosure: ({ state, attemptOut }) => {
+      if (kind === 'changed-at-closure') {
+        const path = join(attemptOut, 'battery.json'), battery = JSON.parse(readFileSync(path));
+        step2Fs.writeFileSync(path, JSON.stringify({ ...battery, changedDuringClosure: true })); state.mutationCount = 1;
+      }
+    },
+  }, state => {
+    const ledgerReason = kind === 'root-replaced' ? 'settlement-threw' : kind === 'changed-at-closure' ? 'gate-content-changed-before-cleanup' : 'evidence-not-regular-file';
+    step2AssertBlock(state, { ledgerReason, stage: kind === 'root-replaced' ? 'finalize' : 'summary',
+      errorMessage: kind === 'root-replaced' ? 'inventory-root-mismatch' : 'Footprint retention refused settlement' });
+    assert.equal(state.mutationCount, 1, 'named fixture mutation actually executed');
+    assert.equal(state.progress.gates[0].attempts[0].passed, true); assert.equal(state.finalizeCalls.length, 1);
+    assert.deepEqual(state.deletionCalls, []); assert.deepEqual(state.targetTraversal, []);
+    if (kind === 'root-replaced') {
+      assert.equal(state.ledgers.length, 0); assert.equal(state.closureCalls.length, 0);
+      assert(step2Fs.existsSync(join(state.originalRoot, 'battery.json')));
+    } else {
+      step3Retained(state);
+      assert.equal(state.closureCalls.length, kind === 'changed-at-closure' ? 1 : 0);
+      if (kind === 'changed-at-closure') assert.equal(state.ledgers[0].ledger.payloadIntegrity.verified, false);
+    }
+  });
+});
+
+for (const when of ['closure', 'final-inventory']) test(`RS4 same-length link retarget at ${when} blocks actual next dispatch`, async () => {
+  const change = (state, attemptOut) => {
+    const link = join(attemptOut, 'incidental-link'); step2Fs.unlinkSync(link); step2Fs.symlinkSync('target-B', link);
+    state.mutationCount = (state.mutationCount || 0) + 1;
+  };
+  await step2Fixture({
+    prepareFixture: async context => {
+      await step3Payload(context); const { state, attemptOut } = context;
+      await fs.writeFile(join(attemptOut, 'target-A'), 'first target'); await fs.writeFile(join(attemptOut, 'target-B'), 'other target');
+      await fs.symlink('target-A', join(attemptOut, 'incidental-link')); state.fixtureLinks = [{ path: join(attemptOut, 'incidental-link') }];
+    },
+    mutateAtClosure: ({ state, attemptOut }) => { if (when === 'closure') change(state, attemptOut); },
+    withFinalizer: async context => {
+      const original = fs.readdir; let rootReads = 0;
+      fs.readdir = async (path, ...rest) => {
+        if (when === 'final-inventory' && path === context.args.root && ++rootReads === 3) change(context.state, path);
+        return original(path, ...rest);
+      };
+      try { return await step3GuardFinalizer(context); } finally { fs.readdir = original; }
+    },
+  }, state => {
+    step2AssertBlock(state, { ledgerReason: when === 'closure' ? 'gate-content-changed-before-cleanup' : 'retained-symlink-changed',
+      stage: 'summary', errorMessage: 'Footprint retention refused settlement' });
+    assert.equal(state.mutationCount, 1); step3Retained(state);
+    const integrity = state.ledgers[0].ledger.linkIntegrity;
+    assert.equal(integrity.verified, false); assert.equal(integrity.before[0].target, 'target-A');
+    assert.equal(integrity.after[0].target, 'target-B'); assert.equal(integrity.before[0].size, integrity.after[0].size);
+  });
+});
+
+test('RS4 native red retains both attempts with passed=false and never invokes closure or deletion for red', async () => {
+  await step2Fixture({ nativeRed: true, retentionMode: 'cleanup', prepareFixture: step3Payload, withFinalizer: step3GuardFinalizer }, state => {
+    const first = state.progress.gates[0]; assert.equal(first.outcome, 'finding-red-twice');
+    assert.deepEqual(state.launches, ['fixture-first', 'fixture-first', 'fixture-next']);
+    assert.equal(first.attempts.length, 2); assert(first.attempts.every(attempt => attempt.passed === false && attempt.status === 'failed'));
+    for (const { ledger } of state.ledgers.slice(0, 2)) {
+      assert.equal(ledger.passed, false); assert.equal(ledger.status, 'retained'); assert.equal(ledger.reason, 'failed-attempt-retained');
+      assert.equal(ledger.closure.closed, false); step3Retained(state, ledger);
+    }
+    assert.deepEqual(state.finalizeCalls.map(call => call.passed), [false, false, true]);
+    assert.equal(state.closureCalls.length, 1); assert(state.closureCalls[0].attemptOut.includes('/fixture-next/'));
+    assert.equal(state.progress.settlementBlock, null);
+  });
+});
+
+for (const [label, commandResults, expectedReason, primary] of [
+  ['open owned file', () => ({ lsof: { ...cleanLsof(), status: 0, stdout: 'p123\nn/owned-open-file\n' } }), 'owned-files-open', 'open-handles'],
+  ['detached owned-path process', path => ({ ps: { ...cleanPs(), stdout: `444 detached-browser --profile=${path}/profile\n` } }), 'owned-path-in-live-process-command', 'open-handles'],
+  ['late out-of-sample warning', () => ({ lsof: { ...cleanLsof(), stderr: ' '.repeat(16000) + 'late warning' } }), 'lsof-unverified', 'warning'],
+  ['late out-of-sample match', path => ({ ps: { ...cleanPs(), stdout: '1 unrelated\n'.repeat(4000) + `555 browser ${path}\n` } }), 'owned-path-in-live-process-command', 'open-handles'],
+  ['5000 matching ps lines', path => ({ ps: { ...cleanPs(), stdout: Array.from({ length: 5000 }, (_, i) => `${i + 10} browser ${path}/profile`).join('\n') } }), 'owned-path-in-live-process-command', 'open-handles'],
+]) test(`RS4/RS5 ${label} survives real settlement and prevents next dispatch`, async () => {
+  await step2Fixture({ commandResults, prepareFixture: step3Payload, withFinalizer: step3GuardFinalizer }, state => {
+    const cause = step2AssertBlock(state, { ledgerReason: 'gate-not-closed', stage: 'summary', errorMessage: 'Footprint retention refused settlement' });
+    assert(cause.closure.reasons.includes(expectedReason)); step3Retained(state);
+    const closure = state.ledgers[0].ledger.closure, command = /warning|file/.test(label) ? 'lsof' : 'ps';
+    assert.equal(closure.commands[command].primary, primary);
+    assert(Buffer.byteLength(JSON.stringify(closure)) <= 24 * 1024); assert.deepEqual(JSON.parse(JSON.stringify(closure)), closure);
+    assert.equal(state.progress.gates[0].attempts[0].disk.closureCheckWallSeconds, 0.1);
+    const operation = readFileSync(state.ledgers[0].ledger.operationsPath, 'utf8').trim().split('\n').map(JSON.parse).find(row => row.action === 'closure-check');
+    assert.deepEqual(operation.result, closure); assert.deepEqual(state.closureCalls[0].observation, closure);
+    if (label.includes('out-of-sample')) {
+      const stream = closure.commands[command][label.includes('warning') ? 'stderr' : 'stdout'];
+      assert.equal(stream.truncated, true); assert(!stream.text.includes(label.includes('warning') ? 'late warning' : state.ledgers[0].ledger.root));
+      const raw = commandResults(state.ledgers[0].ledger.root)[command][label.includes('warning') ? 'stderr' : 'stdout'];
+      assert.equal(stream.sha256, step2Hash(raw)); assert.equal(stream.capturedBytes, Buffer.byteLength(raw));
+    }
+    if (label.startsWith('5000')) {
+      assert.equal(closure.matchingProcessCount, 5000); assert.equal(closure.matchingProcessIds.length, 64);
+      assert.equal(closure.matchingProcessIdsOmitted, 4936);
+    }
+  });
+});
+
+for (const command of ['lsof', 'ps']) for (const [label, result] of [
+  ['thrown invocation', () => { throw err('EACCES'); }],
+  ['maxBuffer failure', { status: null, error: err('ENOBUFS') }],
+  ['unexpected status', { status: 9 }],
+]) test(`RS2 connected ${command} ${label} preserves exact command refusal`, async () => {
+  await step2Fixture({ [command]: typeof result === 'function' ? result : { ...(command === 'lsof' ? cleanLsof() : cleanPs()), ...result },
+    prepareFixture: step3Payload, withFinalizer: step3GuardFinalizer }, state => {
+    const cause = step2AssertBlock(state, { ledgerReason: 'gate-not-closed', stage: 'summary', errorMessage: 'Footprint retention refused settlement' });
+    assert.equal(cause.closure.commands[command].primary, 'execution-failure'); step3Retained(state);
+    const observation = state.ledgers[0].ledger.closure.commands[command];
+    if (label === 'thrown invocation') { assert.equal(observation.invocationThrew, true); assert.equal(observation.error.code, 'EACCES'); }
+    if (label === 'maxBuffer failure') { assert.equal(observation.error.code, 'ENOBUFS'); assert.match(observation.outputCaptureFailure, /uncaptured bytes unknown/); }
+    if (label === 'unexpected status') assert.equal(observation.status, 9);
   });
 });

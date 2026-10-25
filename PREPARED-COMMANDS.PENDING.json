@@ -1,0 +1,67 @@
+{
+  "status": "pending-not-executable",
+  "freezer": [
+    "node",
+    "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/settlement-diagnostics-01/freeze-descriptors.mjs",
+    "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/settlement-diagnostics-01/FREEZE-BINDING.PENDING.json"
+  ],
+  "preflight": [
+    "/opt/homebrew/Cellar/node@22/22.23.3/bin/node",
+    "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/settlement-diagnostics-01/tools/run-full-r1.mjs",
+    "--worktree",
+    "/Users/dhyana/worktrees/Bunki-app/r2-integration_20261021",
+    "--site",
+    null,
+    "--expected-head",
+    "dd0d2403a2c79c586e36b9a0ec98c8d38f181394",
+    "--expected-artifact",
+    null,
+    "--engine-contract",
+    null,
+    "--contract-review",
+    "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/settlement-diagnostics-01/contract-review.W2.json",
+    "--out",
+    null,
+    "--retention",
+    "keep-all",
+    "--preflight-only"
+  ],
+  "full": [
+    "/opt/homebrew/Cellar/node@22/22.23.3/bin/node",
+    "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/settlement-diagnostics-01/tools/run-full-r1.mjs",
+    "--worktree",
+    "/Users/dhyana/worktrees/Bunki-app/r2-integration_20261021",
+    "--site",
+    null,
+    "--expected-head",
+    "dd0d2403a2c79c586e36b9a0ec98c8d38f181394",
+    "--expected-artifact",
+    null,
+    "--engine-contract",
+    null,
+    "--contract-review",
+    "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/settlement-diagnostics-01/contract-review.W2.json",
+    "--out",
+    "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/owned-FULL4-dd0d2403-settlement-01-native",
+    "--retention",
+    "keep-all"
+  ],
+  "launch": [
+    "python3",
+    "-I",
+    "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/settlement-diagnostics-01/launch-owned-full.py",
+    "--launch",
+    null
+  ],
+  "missing": [
+    "current native-policy/source mismatch (all four files)",
+    "lead-selected final source and fresh built artifact/site",
+    "refreshed descriptor projection and engine contract",
+    "independent W2 source/contract/footprint review",
+    "fresh preflight receipt",
+    "lead-owned custody/latch reconciliation and release",
+    "fresh admission; no prior receipt credit"
+  ],
+  "noConcurrentBuildBrowser": true,
+  "noPriorGateCredit": true
+}

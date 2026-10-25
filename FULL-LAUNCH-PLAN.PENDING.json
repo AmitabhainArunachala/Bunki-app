@@ -1,0 +1,76 @@
+{
+  "head": "dd0d2403a2c79c586e36b9a0ec98c8d38f181394",
+  "cwd": "/Users/dhyana/worktrees/Bunki-app/r2-integration_20261021",
+  "env": {
+    "PATH": "/opt/homebrew/Cellar/node@22/22.23.3/bin:/Users/dhyana/.dharma/bunki_review/2026-10-11/r6-gates/python-venv/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+  },
+  "supervisor": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/B/run_proofs.py",
+  "launcherSha256": "ff5e94303994e4d2bdf4810601709f3ebf7c04a255a12df6e39d34e67416ace8",
+  "custodyEvidence": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/owned-FULL4-dd0d2403-settlement-01",
+  "nativeOut": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/owned-FULL4-dd0d2403-settlement-01-native",
+  "sharedOwned": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/B/proofs-owned.json",
+  "sharedLatch": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/B/proofs-owned.latch.json",
+  "timeoutSeconds": 86400,
+  "timeoutMeaning": "24h outer emergency custody cap; native per-gate deadlines unchanged; normal operator stop drains exact child PID",
+  "resourceFloors": {
+    "load1Max": 16,
+    "diskGiBMin": 8,
+    "availableMemoryGiBMin": 8,
+    "memoryPages": [
+      "free",
+      "inactive",
+      "speculative",
+      "purgeable"
+    ]
+  },
+  "stop": "Import-only SIGINT/SIGTERM update rp.STOP, never reset; check before/after validation and immediately before sole supervise call; interruption uses reviewed owned-only closure path. Normal drain sends signal only to recorded native wrapper PID, leaving supervisor alive.",
+  "verdict": "Native216 progress/receipts separate; supervisor closed is whole-run closure only; no outer retry.",
+  "retentionMode": "keep-all",
+  "retentionScope": "keep-all-no-deletion",
+  "kind": "FULL4-owned-launch-PENDING-NOT-RELEASED",
+  "status": "pending-native-policy-source-and-fresh-build-contract-W2-custody",
+  "artifact": null,
+  "contract": null,
+  "review": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/settlement-diagnostics-01/contract-review.W2.json",
+  "preflightProgress": null,
+  "argv": [
+    "/opt/homebrew/Cellar/node@22/22.23.3/bin/node",
+    "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/settlement-diagnostics-01/tools/run-full-r1.mjs",
+    "--worktree",
+    "/Users/dhyana/worktrees/Bunki-app/r2-integration_20261021",
+    "--site",
+    null,
+    "--expected-head",
+    "dd0d2403a2c79c586e36b9a0ec98c8d38f181394",
+    "--expected-artifact",
+    null,
+    "--engine-contract",
+    null,
+    "--contract-review",
+    "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/settlement-diagnostics-01/contract-review.W2.json",
+    "--out",
+    "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/owned-FULL4-dd0d2403-settlement-01-native",
+    "--retention",
+    "keep-all"
+  ],
+  "pins": {
+    "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/settlement-diagnostics-01/launch-owned-full.py": "ff5e94303994e4d2bdf4810601709f3ebf7c04a255a12df6e39d34e67416ace8",
+    "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/settlement-diagnostics-01/freeze-descriptors.mjs": "cac3727839ab1885b4a1153af9dbe9a72b5a254ca98f40c5ce1401d3bc02cfe7",
+    "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULL/tools/full-support.mjs": "21778c8170ed426c77992e7ac5c1b820a490b8a04b9454ee6879a9366e160907",
+    "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/B/run_proofs.py": "88e3e72a890b3b7f3234be073e4907ac06850f5d3568c3c6818cdf8895434dcd",
+    "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/settlement-diagnostics-01/tools/disk-retention.mjs": "39eda4fa4184cc3666646d046c15b88f454f1274c0de8b08e847c9144013730e",
+    "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/settlement-diagnostics-01/tools/footprint-support.mjs": "6de7f68c2d1b8d2023d6746655942670a80fab411f040f03b49021f009833ab9",
+    "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/settlement-diagnostics-01/tools/native-policy.json": "69041c4647bbd27f48bcc1dbb96f3366756ef1eb282284680ee245132843efd5",
+    "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/settlement-diagnostics-01/tools/run-full-r1.mjs": "7bfd356f3c95f668804a4e56a7a47ea2f74ac1b87efa7014a8fa4b8f96a6de21"
+  },
+  "unresolvedBindings": [
+    "current native-policy/source mismatch (all four files)",
+    "lead-selected final source and fresh built artifact/site",
+    "refreshed descriptor projection and engine contract",
+    "independent W2 source/contract/footprint review",
+    "fresh preflight receipt",
+    "lead-owned custody/latch reconciliation and release",
+    "fresh admission; no prior receipt credit"
+  ],
+  "note": "DRAFT ONLY: not FULL-LAUNCH-PLAN.json, null bindings intentional. The unchanged launcher cannot run this draft. No custody prefix reservation or launch permission is implied."
+}

@@ -1,0 +1,12 @@
+{
+  "kind": "bunki-full4-freeze-binding",
+  "status": "pending-W2-and-fresh-build",
+  "worktree": "/Users/dhyana/worktrees/Bunki-app/r2-integration_20261021",
+  "head": "dd0d2403a2c79c586e36b9a0ec98c8d38f181394",
+  "site": null,
+  "artifact": null,
+  "contract": null,
+  "sourceProjection": null,
+  "outputDirectory": null,
+  "tools": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/FULLR1/settlement-diagnostics-01/tools"
+}
