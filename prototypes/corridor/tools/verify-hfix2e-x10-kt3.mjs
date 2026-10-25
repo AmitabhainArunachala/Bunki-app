@@ -7,12 +7,14 @@
  *        .fold · the card folded by Escape, .reading · one tap raising the word's reading: the bar's Save is the one live
  *        Save, names the word, and ONE press keeps it (S.taken grows by one). On the base .reading is red in Chromium: the
  *        press that puts the reading away drew the bar's Save afresh under the mouse, and its click was lost.
- *   KT3  a kanji-grid glyph's accessible name is the kanji itself plus its meaning (「稿 — draft」), with the reading the
- *        grid found it by where the grid has one (the reading lens: 「食 たべる — eat」), a kanji the lessons lack keeps its
+ *   KT3  a kanji-grid glyph's accessible name is the kanji itself plus all pinned reference meanings, with the reading the
+ *        grid found it by where the grid has one (the reading lens: 「食 たべる — …」), a kanji the lessons lack keeps its
  *        reference meaning (剝), in the English and the 日本語 interface (the meaning is English data in both).
  * HFIX2E_MODE: branch (every row green), base (the untouched base: the rows its defects fail are red), control (the defect
  * put back by a route-mutated corridor.js: X10 · the bar's keep never steps aside, as before Hfix-1A; KT3 · the gloss-only
  * name), legacy (an older build, e.g. the one sweep B found X-10 on). HFIX2E_CASE=X10|KT3 runs one item.
+ * HFIX2E_KT3_CONTROL=gloss-only (default)|missing-glyph|missing-primary-meaning selects the KT3 control only.
+ * KT3 independently validates the accepted facts projection in the selected artifact, never a product label function.
  */
 /* global window, document, getComputedStyle, innerHeight */
 import assert from 'node:assert/strict';
@@ -24,12 +26,15 @@ import { chromium, webkit } from 'playwright-core';
 import { startCorridorDev } from '../../../scripts/serve-corridor-dev.mjs';
 import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
+import { kt3LabelContract, assertKt3Observation, KT3_LABEL_ANCHOR, KT3_CONTROL_MUTATIONS } from './hfix2e-kt3-proof.test.mjs';
 
 const engine = process.env.KAIRO_BROWSER;
 assert(['webkit', 'chromium'].includes(engine), 'Choose exactly one engine (KAIRO_BROWSER=webkit|chromium)');
 const mode = process.env.HFIX2E_MODE || 'branch';
 assert(['base', 'branch', 'control', 'legacy'].includes(mode));
 const only = process.env.HFIX2E_CASE || '';
+const kt3Control = process.env.HFIX2E_KT3_CONTROL || 'gloss-only';
+assert(Object.hasOwn(KT3_CONTROL_MUTATIONS, kt3Control), 'Choose a supported HFIX2E_KT3_CONTROL');
 const out = resolveCorridorEvidence();
 mkdirSync(out, { recursive: true });
 const host = await startCorridorDev(0);
@@ -38,6 +43,13 @@ const version = browser.version();
 const mac = engine === 'chromium';
 const viewport = mac ? { width: 1440, height: 900 } : { width: 390, height: 844 };
 const identity = JSON.parse(readFileSync(join(process.env.KAIRO_SITE_DIR, 'build-identity.json'), 'utf8'));
+let kt3Contract;
+let kt3ContractError;
+if (only !== 'X10') {
+  try {
+    kt3Contract = kt3LabelContract(JSON.parse(readFileSync(join(process.env.KAIRO_SITE_DIR, 'data/share_alike/reference-extra.json'), 'utf8')));
+  } catch (error) { kt3ContractError = error; }
+}
 const load = () => execFileSync('uptime', { encoding: 'utf8' }).trim();
 const sha = (text) => createHash('sha256').update(text).digest('hex');
 const delay = (ms) => new Promise((done) => setTimeout(done, ms));
@@ -59,7 +71,7 @@ window.__H2E__ = {
 // (X10: the bar's keep never steps aside for the card, as before Hfix-1A, and a sync draws it afresh under its own press)
 const CONTROL = {
   X10: [['const aside = !!standingSlip() || S.stack.length > 0;', 'const aside = false;'], ['  if (old === chromeKeepPressed) {', '  if (false) {']],
-  KT3: [["b.setAttribute('aria-label', kdxGlyphName(c, readingOf?.(c) || ''));", "if (D.kanji[c]) b.setAttribute('aria-label', D.kanji[c].m);"]],
+  KT3: [[KT3_LABEL_ANCHOR, KT3_CONTROL_MUTATIONS[kt3Control]]],
 };
 
 async function session(row, { ui = 'bi' } = {}) {
@@ -229,25 +241,22 @@ async function glyphName(page, glyph) {
 }
 for (const ui of ['bi', 'ja']) {
   await row(`KT3 · ${engine} ${viewport.width} ${ui} · a grid glyph is named by the kanji and its meaning, with the reading the reading lens found it by`, 'KT3', async ({ page }) => {
+    assert.ifError(kt3ContractError);
     await finder(page);
-    const want = { '稿': '稿 — draft', '食': '食 たべる — eat', '剝': '剝 はがす — come off; peel; fade; discolor' };
+    const want = kt3Contract.cases;
     const got = {};
     await lensSearch(page, 4, 'draft');
     got['稿'] = await glyphName(page, '稿');
     // the accessibility tree's own name, as VoiceOver hears it: the exact name finds exactly this button
-    got['稿'].byRole = await page.getByRole('button', { name: want['稿'], exact: true }).count();
+    got['稿'].byRole = await page.getByRole('button', { name: want['稿'].expected, exact: true }).count();
     await lensSearch(page, 3, 'たべる');
     got['食'] = await glyphName(page, '食');
-    got['食'].byRole = await page.getByRole('button', { name: want['食'], exact: true }).count();
+    got['食'].byRole = await page.getByRole('button', { name: want['食'].expected, exact: true }).count();
     await lensSearch(page, 3, 'はがす');
     got['剝'] = await glyphName(page, '剝');
-    got['剝'].byRole = await page.getByRole('button', { name: want['剝'], exact: true }).count();
+    got['剝'].byRole = await page.getByRole('button', { name: want['剝'].expected, exact: true }).count();
     await shot(page, `KT3-${ui}`);
-    for (const [glyph, name] of Object.entries(want)) {
-      assert.equal(got[glyph].text, glyph, `KT3: the glyph itself still shows: ${JSON.stringify(got)}`);
-      assert.equal(got[glyph].label, name, `KT3: ${glyph} is named 「${name}」: ${JSON.stringify(got)}`);
-      assert.equal(got[glyph].byRole, 1, `KT3: the accessibility tree names ${glyph} 「${name}」: ${JSON.stringify(got)}`);
-    }
+    for (const [glyph, expected] of Object.entries(want)) assertKt3Observation(got[glyph], expected);
     return got;
   }, { ui });
 }
@@ -256,7 +265,8 @@ await browser.close();
 await host.close?.();
 const green = results.filter((r) => r.pass).length;
 const report = { engine, version, viewport, input: mac ? 'mouse' : 'touch', mode, only: only || null, build: identity.gitSha,
-  artifact: identity.artifactSha256, rows: results, mutations, green, total: results.length };
+  artifact: identity.artifactSha256, rows: results, mutations, green, total: results.length,
+  kt3Source: kt3Contract?.source || null, kt3Control: mode === 'control' ? kt3Control : null };
 writeFileSync(join(out, `result-${engine}-${mode}.json`), `${JSON.stringify(report, null, 2)}\n`);
 console.log(`${green}/${results.length} rows green · ${engine} ${version} · mode ${mode} · load at end: ${load()}`);
 process.exitCode = green === results.length ? 0 : 1;

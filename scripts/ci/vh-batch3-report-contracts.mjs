@@ -16,6 +16,7 @@ import {
 import { homedir } from 'node:os';
 import { dirname, join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { kt3LabelContract } from '../../prototypes/corridor/tools/hfix2e-kt3-proof.test.mjs';
 
 export const BATCH3 = JSON.parse(
   readFileSync(new URL('./vh-batch3-rosters.json', import.meta.url)),
@@ -31,6 +32,7 @@ export const BATCH3_SUITES = Object.freeze([
 export const BATCH3_ENV_KEYS = Object.freeze([
   'HFIX2E_MODE',
   'HFIX2E_CASE',
+  'HFIX2E_KT3_CONTROL',
   'HFIX2E_CENTRE',
   'HFIX2E_VIEWPORT',
   'HFIX2E2_MODE',
@@ -65,6 +67,7 @@ const zero = (value) => {
 const source = (suite) => `prototypes/corridor/tools/verify-${suite}.mjs`;
 const wrapper = (suite) => `scripts/ci/run-${suite}-gate.mjs`;
 export const BATCH3_DYNAMIC_SOURCES = Object.freeze({
+  'hfix2e-x10-kt3': Object.freeze(['prototypes/corridor/data/share_alike/reference-extra.json']),
   hfix2b: Object.freeze([
     'prototypes/drift/data/wbig.json',
     'prototypes/corridor/data/share_alike/words.json',
@@ -526,6 +529,17 @@ function validateHold(v, p) {
 function validateX10(v, p) {
   base(v, p);
   exact(v.mutations, []);
+  // Derive the consumer's oracle from pinned source facts, never from producer-reported labels.
+  const kt3 = kt3LabelContract(
+    JSON.parse(
+      readFileSync(
+        new URL('../../prototypes/corridor/data/share_alike/reference-extra.json', import.meta.url),
+        'utf8',
+      ),
+    ),
+  );
+  exact(v.kt3Source, kt3.source);
+  assert.equal(v.kt3Control, null);
   assert.equal(v.only, null);
   assert.equal(v.input, p.engine === 'webkit' ? 'touch' : 'mouse');
   const rs = rows(v, p);
@@ -547,11 +561,7 @@ function validateX10(v, p) {
   }
   assert.equal(rs[2].detail.rung, 'reading');
   for (const r of rs.slice(3))
-    for (const [glyph, label] of Object.entries({
-      稿: '稿 — draft',
-      食: '食 たべる — eat',
-      剝: '剝 はがす — come off; peel; fade; discolor',
-    }))
+    for (const [glyph, { expected: label }] of Object.entries(kt3.cases))
       exact(r.detail[glyph], { label, text: glyph, byRole: 1 });
 }
 function validateB(v, p) {

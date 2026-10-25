@@ -1,9 +1,14 @@
 /** Pure receipt-consumer tests. Synthetic fixtures are never runtime acceptance evidence. */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { mkdirSync, mkdtempSync, writeFileSync, rmSync, symlinkSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, writeFileSync, readFileSync, rmSync, symlinkSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import {
+  registerKt3ProofTests,
+  kt3LabelContract,
+  KT3_CONTROL_MUTATIONS,
+} from '../../prototypes/corridor/tools/hfix2e-kt3-proof.test.mjs';
 import {
   BATCH3_SUITES,
   BATCH3_DYNAMIC_SOURCES,
@@ -22,10 +27,28 @@ import {
 const sha = 'a'.repeat(64),
   sha2 = 'b'.repeat(64);
 import { unitFixture } from './fixtures/vh-batch3/fixture.mjs';
+registerKt3ProofTests();
+const kt3 = kt3LabelContract(
+  JSON.parse(
+    readFileSync(
+      new URL('../../prototypes/corridor/data/share_alike/reference-extra.json', import.meta.url),
+      'utf8',
+    ),
+  ),
+);
 function sample(suite, engine) {
   const native = unitFixture(suite, engine),
     value = native.value,
     sweep = native.extras.sweep || null;
+  if (suite === 'hfix2e-x10-kt3') {
+    // Explicit synthetic successor fixture; retained historical native receipts are never changed.
+    value.kt3Source = { ...kt3.source };
+    value.kt3Control = null;
+    for (const row of value.rows.filter((r) => r.item === 'KT3')) {
+      for (const [glyph, expected] of Object.entries(kt3.cases))
+        row.detail[glyph].label = expected.expected;
+    }
+  }
   const identity = {
     schemaVersion: 1,
     product: 'KAIRO',
@@ -283,6 +306,51 @@ test('X10 must actually save once and KT3 must have one real accessible glyph', 
     mutate(x);
     assert.throws(() => validateBatch3Native(x.value, x.pins));
   }
+});
+test('KT3 consumer rejects old, incomplete, appended, glyph-less and primary-less labels', () => {
+  for (const label of [
+    '稿 — draft',
+    kt3.cases['稿'].expected + '; unrelated text',
+    kt3.cases['稿'].expected.slice(1).trimStart(),
+    kt3.cases['稿'].expected.replace(`${kt3.cases['稿'].primary}; `, ''),
+    kt3.cases['稿'].primary,
+  ]) {
+    const x = sample('hfix2e-x10-kt3', 'chromium');
+    x.value.rows[3].detail['稿'].label = label;
+    assert.throws(() => validateBatch3Native(x.value, x.pins));
+  }
+});
+test('KT3 consumer rejects absent/foreign provenance and a control-labelled native receipt', () => {
+  for (const mutate of [
+    (x) => {
+      delete x.value.kt3Source;
+    },
+    (x) => {
+      x.value.kt3Source.projectedSha256 = sha;
+    },
+    (x) => {
+      delete x.pins.sources['prototypes/corridor/data/share_alike/reference-extra.json'];
+    },
+    (x) => {
+      x.value.kt3Control = 'missing-glyph';
+    },
+  ]) {
+    const x = sample('hfix2e-x10-kt3', 'webkit');
+    mutate(x);
+    assert.throws(() => validateBatch3Native(x.value, x.pins));
+  }
+});
+test('KT3 three native control selectors are stripped from the full gate environment', () => {
+  for (const engine of ['chromium', 'webkit'])
+    for (const control of Object.keys(KT3_CONTROL_MUTATIONS)) {
+      const env = batch3CanonicalEnvironment(
+        { HFIX2E_MODE: 'control', HFIX2E_KT3_CONTROL: control },
+        'hfix2e-x10-kt3',
+        engine,
+      );
+      assert.equal(env.HFIX2E_MODE, 'branch');
+      assert(!Object.hasOwn(env, 'HFIX2E_KT3_CONTROL'));
+    }
 });
 test('Hfix2b rejects zero sampled nodes, no held crossing and changed recorded reason', () => {
   for (const mutate of [
