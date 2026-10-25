@@ -37,7 +37,7 @@ export function requireFootprintApproval(value, { pins, head, artifact }) {
 // profile file inventory each time another gate completes.
 export function summarizeFootprint(ledger, pin) {
   return {
-    status: ledger.status, reason: ledger.reason,
+    status: ledger.status, reason: ledger.reason, closure: summarizeClosure(ledger.closure),
     bytesWritten: ledger.bytesWritten, bytesWrittenSemantics: ledger.bytesWrittenSemantics,
     bytesBeforeCleanup: ledger.bytesBeforeCleanup, bytesKept: ledger.bytesKept,
     bytesRemoved: ledger.bytesRemoved, confirmedRemovedBytes: ledger.confirmedRemovedBytes,
@@ -46,6 +46,37 @@ export function summarizeFootprint(ledger, pin) {
     retainedCandidates: ledger.keptCandidates?.length ?? 0,
     ledger: pin(ledger.ledgerPath), inventory: pin(ledger.inventoryPath), operations: pin(ledger.operationsPath),
   };
+}
+
+// Progress keeps a compact cause; command output remains in the pinned ledger.
+export function summarizeClosure(value) {
+  if (!value || typeof value !== 'object') return { closed: false, reasons: ['closure-unavailable'] };
+  const reasons = Array.isArray(value.reasons) ? value.reasons : [value.reason || 'closure-reason-unavailable'];
+  return { closed: value.closed === true, reasons: reasons.slice(0, 16).map(v => clipped(v, 128)),
+    commands: Object.fromEntries(['lsof', 'ps'].filter(name => value.commands?.[name]).map(name => {
+      const command = value.commands[name];
+      return [name, { primary: clipped(command.primary, 128),
+        observedCauses: (Array.isArray(command.observedCauses) ? command.observedCauses : ['diagnostic-causes-unavailable']).slice(0, 8).map(v => clipped(v, 128)),
+        status: command.status ?? null, signal: command.signal ?? null, elapsedMs: command.elapsedMs ?? null,
+        error: errorDiagnostic(command.error), stderr: clipped(command.stderr?.text, 256) }];
+    })) };
+}
+export function footprintBlockCause({ gate, phase, number, attemptOut, retentionMode, nativePassed, stage, ledger, ledgerPin, error }) {
+  let closure;
+  try { closure = summarizeClosure(ledger?.closure); }
+  catch (summaryError) { closure = { closed: false, reasons: ['closure-summary-unavailable'], error: errorDiagnostic(summaryError) }; }
+  const ledgerReason = clipped(ledger?.reason ?? (nativePassed == null ? 'native-proof-unverified' : 'settlement-threw'), 256);
+  const detail = Object.entries(closure.commands || {}).map(([name, value]) => `${name} ${value.primary} (exit ${value.status})`).join('; ');
+  const errorRecord = errorDiagnostic(error);
+  return { kind: 'footprint-settlement-blocked', gate, name: gate, phase, number, attemptOut, retentionMode,
+    nativePassed: nativePassed ?? null, stage, ledgerReason, closure, ledger: ledgerPin ?? null,
+    ledgerPath: ledger?.ledgerPath ? clipped(ledger.ledgerPath, 1024) : null, error: errorRecord,
+    message: clipped(`${gate} attempt ${number}: ${ledgerReason}${detail ? '; ' + detail : ''}; ${errorRecord?.message || 'boundary refused'}; evidence preserved`, 2048),
+    reportingFailures: [], reportingFailureCount: 0 };
+}
+export function recordSettlementReportingFailure(cause, operation, error) {
+  cause.reportingFailureCount++;
+  if (cause.reportingFailures.length < 4) cause.reportingFailures.push({ operation, error: errorDiagnostic(error) });
 }
 
 // Diagnostic limits apply to the entire returned value, including legacy fields.

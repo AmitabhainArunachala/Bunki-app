@@ -11,7 +11,7 @@ import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { soloFindings, validateFullContract } from '../../../FULL/tools/full-support.mjs';
 import { snapshotGate, finalizeGateFootprint } from './disk-retention.mjs';
-import { currentFootprintPins, requireFootprintApproval, checkOwnedClosure, summarizeFootprint } from './footprint-support.mjs';
+import { currentFootprintPins, requireFootprintApproval, checkOwnedClosure, summarizeFootprint, footprintBlockCause, recordSettlementReportingFailure } from './footprint-support.mjs';
 
 const SELF = fileURLToPath(import.meta.url), PREP = dirname(SELF);
 const EVIDENCE = resolve(PREP, '../../..');
@@ -85,7 +85,7 @@ const progress = {
   purpose: 'Fresh native FULL battery on one frozen final source and artifact',
   startedAt: now(), completedAt: null, status: 'preflight', root, site, out,
   expectedHead: options['expected-head'], expectedArtifact: options['expected-artifact'], limits: LIMIT, phaseOrder: PHASES,
-  gates: [], active: [], stop: null, reports: [],
+  gates: [], active: [], stop: null, settlementBlock: null, reports: [],
   footprintPolicy: { retentionMode, finalPassOnly: true, failedAttemptsPreserved: true, sharedVerifiedSite: true,
     bytesWrittenBasis: 'new/changed logical bytes present at settlement, not cumulative device IO',
     realMeasurement: 'pending until admitted native run' },
@@ -390,7 +390,8 @@ try {
       const number = schedule.attempts.length + 1; assert(number <= 2);
       const attemptOut = join(out, schedule.phase, schedule.name, `attempt-${number}`);
       assert(!existsSync(attemptOut)); mkdirSync(attemptOut, { recursive: true });
-      let footprintBefore;
+      let footprintBefore, diskLedger, attempt, boundaryCause;
+      let settlementAttempted = false;
       let gate = descriptors(attemptOut).find(item => item.name === schedule.name);
       gate = gateForShard(gate, { id: gate.name, gates: [gate.name] }, artifactEnv);
       assert.equal(normalized(gate, attemptOut), plannedByName.get(gate.name), 'Native descriptor changed');
@@ -399,6 +400,15 @@ try {
       for (const row of active.values()) row.overlaps.push({ name: run.name, phase: run.phase, number, startedAt: run.startedAt });
       schedule.outcome = 'running'; active.set(gate.name, run); progress.status = 'running'; updateActive();
       event({ kind: 'gate-start', ...run });
+      const block = (error, stage) => {
+        if (boundaryCause) { recordSettlementReportingFailure(boundaryCause, stage, error); return boundaryCause; }
+        boundaryCause = footprintBlockCause({ gate: gate.name, phase: schedule.phase, number, attemptOut,
+          retentionMode, nativePassed: attempt?.passed, stage, ledger: diskLedger, ledgerPin: run.settlement?.ledger, error });
+        schedule.outcome = 'blocked'; schedule.schedulerError = boundaryCause;
+        failures.push(boundaryCause); progress.settlementBlock ||= boundaryCause;
+        if (attempt) attempt.settlementBlock = boundaryCause;
+        return boundaryCause;
+      };
       const started = performance.now();
       run.promise = (async () => {
         try {
@@ -409,7 +419,7 @@ try {
           const { result, passed } = validateNative(receipt, gate.name);
           const nativeGateWallSeconds = (Date.parse(result.completedAt) - Date.parse(result.startedAt)) / 1000;
           const nativeBatteryWallSeconds = (Date.parse(receipt.completedAt) - Date.parse(receipt.startedAt)) / 1000;
-          const attempt = { number, origin: 'full', observedHere: true, passed, status: result.status,
+          attempt = { number, origin: 'full', observedHere: true, passed, status: result.status,
             exitCode: result.exitCode, processExitCode: result.processExitCode, runId: result.runId,
             startedAt: receipt.startedAt, completedAt: receipt.completedAt, resources, endResources, wallSeconds,
             nativeGateWallSeconds, nativeBatteryWallSeconds, admissionAndWrapperOverheadSeconds: wallSeconds - nativeGateWallSeconds,
@@ -427,22 +437,32 @@ try {
           // Save the pass record before any owned scratch can be removed.
           persist();
           const footprintStarted = performance.now();
-          const diskLedger = await finalizeGateFootprint({ root: attemptOut, before: footprintBefore, passed, retentionMode,
-            evidencePaths: [attempt.battery.path, ...attempt.retained.map(item => item.path),
-              ...(result.proof?.receipts || []).map(item => item.path)].map(path => relative(attemptOut, path)),
-            closureCheck: () => {
-              assertFrozen();
-              const closure = checkOwnedClosure(attemptOut);
-              assertFrozen();
-              return closure;
-            } });
+          settlementAttempted = true;
+          run.settlement = attempt.settlement = { attempted: true, startedAt: now(), stage: 'before-finalize', closureCheckWallSeconds: null };
+          persist(); // Marker precedes await, ledger pinning and summary work, including their throw paths.
+          try {
+            run.settlement.stage = 'finalize';
+            diskLedger = await finalizeGateFootprint({ root: attemptOut, before: footprintBefore, passed, retentionMode,
+              evidencePaths: [attempt.battery.path, ...attempt.retained.map(item => item.path),
+                ...(result.proof?.receipts || []).map(item => item.path)].map(path => relative(attemptOut, path)),
+              closureCheck: () => {
+                const closureStarted = performance.now();
+                try { assertFrozen(); const closure = checkOwnedClosure(attemptOut); assertFrozen(); return closure; }
+                finally { run.settlement.closureCheckWallSeconds = (performance.now() - closureStarted) / 1000; }
+              } });
+          } finally { run.settlement.wallSeconds = (performance.now() - footprintStarted) / 1000; }
+          run.settlement.stage = 'ledger-pin';
+          run.settlement.ledger = pin(diskLedger.ledgerPath);
+          run.settlement.stage = 'summary';
           attempt.disk = summarizeFootprint(diskLedger, pin);
           attempt.disk.settlementWallSeconds = (performance.now() - footprintStarted) / 1000;
+          attempt.disk.closureCheckWallSeconds = run.settlement.closureCheckWallSeconds;
           attempt.disk.sharedSite = { path: site, artifactSha256: progress.expectedArtifact,
             before: receipt.artifactBefore?.artifactSha256, after: receipt.artifactAfter?.artifactSha256,
             verification: 'native runGates verifies the complete artifact before and after this gate', copies: 0 };
           persist();
-          assert(attempt.disk.status !== 'blocked', 'Footprint retention could not safely settle; evidence preserved');
+          if (attempt.disk.status === 'blocked') throw Object.assign(new Error('Footprint retention refused settlement'), { code: 'FOOTPRINT_SETTLEMENT_BLOCKED' });
+          run.settlement.stage = 'settled';
           schedule.outcome = passed ? (number === 1 ? 'passed' : 'passed-on-retry') : attempt.knownVoiceRed ? 'known-voice-red-no-retry' : number === 1 ? 'retry-pending' : 'finding-red-twice';
           if (number === 2 && passed && schedule.attempts[0].origin === 'full' && schedule.attempts[0].overlaps.length) {
             schedule.parallelFirstRedThenSoloPass = { observationOnly: true, firstAttempt: schedule.attempts[0].battery.path,
@@ -452,20 +472,35 @@ try {
           event({ kind: 'gate-finished', name: gate.name, phase: schedule.phase, number, outcome: schedule.outcome, wallSeconds, nativeGateWallSeconds, nativeBatteryWallSeconds, startLoad: resources.load, endLoad: endResources.load, overlaps: run.overlaps });
           assertFrozen();
         } catch (error) {
-          schedule.outcome = 'blocked'; schedule.schedulerError = { message: error.message, attemptOut };
-          failures.push({ name: gate.name, number, message: error.message, attemptOut });
-          // Invalid/unfinished native attempts never qualify for cleanup. Still record their footprint.
-          if (!schedule.attempts.some(attempt => attempt.number === number && attempt.disk)) {
+          const cause = block(error, run.settlement?.stage || 'native-validation');
+          // Failed native validation may retain once; an entered settlement may NEVER run twice.
+          if (!settlementAttempted) {
+            settlementAttempted = true;
+            run.settlement = { attempted: true, startedAt: now(), stage: 'failed-native-retention' };
             try {
-              const blockedLedger = await finalizeGateFootprint({ root: attemptOut, before: footprintBefore, passed: false, retentionMode,
+              persist();
+              diskLedger = await finalizeGateFootprint({ root: attemptOut, before: footprintBefore, passed: false, retentionMode,
                 evidencePaths: [], closureCheck: () => ({ closed: false }) });
-              run.disk = summarizeFootprint(blockedLedger, pin);
+              run.settlement.ledger = pin(diskLedger.ledgerPath);
+              // Carry the raw ledger identity/cause even if the following summary throws.
+              Object.assign(cause, footprintBlockCause({ gate: gate.name, phase: schedule.phase, number, attemptOut,
+                retentionMode, nativePassed: null, stage: 'native-validation', ledger: diskLedger, ledgerPin: run.settlement.ledger, error }));
+              run.disk = summarizeFootprint(diskLedger, pin);
               schedule.blockedFootprints ||= [];
               schedule.blockedFootprints.push({ number, ...run.disk });
-            } catch (diskError) { schedule.footprintError = diskError.message; }
+            } catch (diskError) { recordSettlementReportingFailure(cause, 'failed-native-retention', diskError); }
           }
-          event({ kind: 'gate-boundary-blocked', ...failures.at(-1) });
-        } finally { active.delete(gate.name); updateActive(); }
+          try { persist(); } catch (reportError) { recordSettlementReportingFailure(cause, 'progress-write', reportError); }
+          try { event({ ...cause, kind: 'gate-boundary-blocked', cause }); }
+          catch (reportError) { recordSettlementReportingFailure(cause, 'scheduler-event-write', reportError); }
+        } finally {
+          active.delete(gate.name);
+          try { updateActive(); } catch (reportError) {
+            const cause = block(reportError, 'active-progress-write');
+            try { event({ ...cause, kind: 'gate-boundary-reporting-failed', cause }); }
+            catch (eventError) { recordSettlementReportingFailure(cause, 'scheduler-event-write', eventError); }
+          }
+        }
       })();
     };
     try { while (true) {

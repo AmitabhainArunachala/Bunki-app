@@ -7,19 +7,20 @@ import { dirname, join, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import vm from 'node:vm';
-import { parseOwnedClosure, requireFootprintApproval, summarizeFootprint } from './footprint-support.mjs';
+import { parseOwnedClosure, requireFootprintApproval, summarizeFootprint, footprintBlockCause, recordSettlementReportingFailure } from './footprint-support.mjs';
 
 const DIR = dirname(fileURLToPath(import.meta.url)), PACKET = dirname(DIR);
 const E = resolve(PACKET, '../..');
-const ROOT = '/Users/dhyana/worktrees/Bunki-app/fullr1-integration_20261021';
+const ROOT = '/Users/dhyana/worktrees/Bunki-app/r2-integration_20261021'; // Same Git object store; the old M1 worktree was retired.
 const require = createRequire('/Users/dhyana/worktrees/Bunki-app/r2-integration_20261021/package.json');
 const ts = require('typescript');
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
-const plan = JSON.parse(readFileSync(join(PACKET, 'NATIVE-PINS.json')));
+const BASE_PACKET = resolve(PACKET, '../footprint-keep-all-02');
+const plan = JSON.parse(readFileSync(join(BASE_PACKET, 'NATIVE-PINS.json')));
 const wrapper = readFileSync(join(DIR, 'run-full-r1.mjs'), 'utf8');
 const frozen = readFileSync(join(E, 'FULLR1/integration-source/native-prep/run-full-r1.mjs'), 'utf8');
 const original = path => execFileSync('git', ['-C', ROOT, 'show', `${plan.baseHead}:${path}`], { encoding: 'utf8' });
-const candidate = path => readFileSync(join(PACKET, 'native-source', path), 'utf8');
+const candidate = path => readFileSync(join(BASE_PACKET, 'native-source', path), 'utf8');
 function tree(text, name = 'source.mjs') {
   const ast = ts.createSourceFile(name, text, ts.ScriptTarget.Latest, true);
   assert.equal(ast.parseDiagnostics.length, 0, 'Source must parse before testing its declarations');
@@ -124,9 +125,13 @@ test('scheduler, resource floor, stop path and native acceptance remain byte-ide
   for (const name of ['chooseWork', 'parseVmStat', 'resourcesReady', 'validateNative', 'stopRequested', 'knownVoice', 'machine', 'LIMIT']) {
     assert.equal(declaration(wrapper, name), declaration(frozen, name), name);
   }
-  assert(wrapper.indexOf('validateNative(receipt, gate.name)') < wrapper.indexOf('const diskLedger = await finalizeGateFootprint'));
+  assert(wrapper.indexOf('validateNative(receipt, gate.name)') < wrapper.indexOf('diskLedger = await finalizeGateFootprint'));
   assert(wrapper.includes('schedule.attempts.push(attempt);\n          // Native receipt validation'));
-  assert(wrapper.includes('persist();\n          const footprintStarted = performance.now();\n          const diskLedger = await finalizeGateFootprint'));
+  assert(wrapper.includes('persist();\n          const footprintStarted = performance.now();\n          settlementAttempted = true;'));
+  assert(wrapper.indexOf('settlementAttempted = true;') < wrapper.indexOf('diskLedger = await finalizeGateFootprint'));
+  assert(wrapper.includes('if (!settlementAttempted)'));
+  assert(wrapper.includes('progress.settlementBlock ||= boundaryCause'));
+  assert(!wrapper.includes('progress.stop ||= boundaryCause'));
   const native = original('scripts/verify-release-gates.mjs');
   const run = declaration(native, 'runGates');
   assert(run.includes('verifyArtifact') && run.includes('artifactBefore') && run.includes('artifactAfter'));
@@ -170,7 +175,7 @@ test('actual wrapper settles after saved native proof; red/boundary failure neve
       attemptReceipt: '/owned/A/probe/attempt-1/probe.attempt.json', log: '/owned/A/probe/attempt-1/probe.log' };
     const receipt = { startedAt: result.startedAt, completedAt: result.completedAt,
       artifactBefore: { artifactSha256: 'artifact' }, artifactAfter: { artifactSha256: 'artifact' } };
-    const ctx = { assert, join, relative, summarizeFootprint, retentionMode, now: () => result.startedAt, out: '/owned', root: '/source', site: '/site',
+    const ctx = { assert, join, relative, summarizeFootprint, footprintBlockCause, recordSettlementReportingFailure, retentionMode, now: () => result.startedAt, out: '/owned', root: '/source', site: '/site',
       performance: { now: () => 1 }, active, failures, progress: { expectedHead: 'head', expectedArtifact: 'artifact' },
       existsSync: path => !path.endsWith('attempt-1'), mkdirSync: () => events.push('mkdir'),
       snapshotGate: () => { events.push('snapshot'); return {}; },
@@ -192,7 +197,11 @@ test('actual wrapper settles after saved native proof; red/boundary failure neve
           assert(args.evidencePaths.includes('battery.json'));
           assert(args.evidencePaths.every(path => !path.startsWith('/')));
         }
-        return { status: mode === 'retention-blocked' ? 'blocked' : args.passed ? 'cleaned' : 'retained' };
+        return { status: mode === 'retention-blocked' ? 'blocked' : args.passed ? 'cleaned' : 'retained',
+          reason: mode === 'retention-blocked' ? 'gate-not-closed' : args.passed ? 'validated-passing-gate' : 'failed-attempt-retained',
+          ledgerPath: '/owned/ledger.json', closure: mode === 'retention-blocked'
+            ? { closed: false, reasons: ['lsof-unverified'], commands: { lsof: { primary: 'warning', status: 1, observedCauses: ['warning'], stderr: { text: 'cannot stat' } } } }
+            : { closed: args.passed, reasons: [] } };
       } };
     const start = vm.runInNewContext(`const ${declaration(wrapper, 'start')}; start`, ctx);
     start(schedule, false, { load: [1] });
@@ -201,5 +210,14 @@ test('actual wrapper settles after saved native proof; red/boundary failure neve
     assert.equal(events.includes('cleanup-passed'), mode === 'pass' || mode === 'retention-blocked');
     assert.equal(schedule.outcome, mode === 'pass' ? 'passed' : mode === 'red' ? 'retry-pending' : 'blocked');
     if (mode === 'invalid') assert.equal(schedule.blockedFootprints.length, 1);
+    if (mode === 'invalid' || mode === 'retention-blocked') {
+      const cause = schedule.schedulerError;
+      assert.equal(cause.kind, 'footprint-settlement-blocked'); assert.equal(cause.gate, 'probe');
+      assert.equal(cause.ledgerReason, mode === 'invalid' ? 'failed-attempt-retained' : 'gate-not-closed');
+      assert.match(cause.message, mode === 'invalid' ? /invalid proof/ : /lsof warning \(exit 1\)/);
+      assert.equal(cause.nativePassed, mode === 'invalid' ? null : true);
+      assert.equal(ctx.progress.settlementBlock, cause); assert.equal(failures[0], cause);
+      assert.doesNotMatch(JSON.stringify(cause), /ReferenceError|TypeError|is not defined/);
+    }
   }
 });
