@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "kind": "bunki-full-footprint-native-policy",
+  "baseHead": "efbaf7d9ff517d3564c8e9a1bdf4d4c9b526544f",
+  "nativeSourcePins": {
+    "prototypes/corridor/tools/verify-teacher-drafts.mjs": "5bcdaba73aa3bd05e8a12b34f45cffd917a03824bae51a72fb9dfae2d8e75a5b",
+    "prototypes/corridor/tools/verify-record-reading-position.mjs": "94db15043a876e960cba7e8c122535898282d39b16f5b1b0acd01d19a4b33dad",
+    "prototypes/corridor/tools/verify-offline.mjs": "82993725d9839ef5787e198739d7ba9b19136fa3225ac1279d341e1474d7323a",
+    "packages/persistence/test/replication/indexeddb-browser.test.ts": "ebd41b8244427ab4208967abeb43faecbb1108a6aea00d4f34164b19596cde75"
+  }
+}
