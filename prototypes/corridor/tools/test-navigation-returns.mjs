@@ -225,3 +225,154 @@ test('same-visit retry and a reversible nested detour preserve the pending colle
   assert.equal(c.S.view, 'levels');
   assert.equal(c.pendingReferenceCollection, 'jlpt:N1');
 });
+
+// Exercise the actual Back, capture, source validation and prose-focus functions.
+// Only DOM layout/roving and rendering are doubled: the native companion must
+// still prove that the real browser settles at this same source after focus.
+function readerBack({ joined = false } = {}) {
+  const calls = [], delayedFocus = [];
+  const p = { id: 'source-a', tokens: Array.from({ length: 5 }, (_, index) =>
+    ({ s: index === 3 ? '総理' : '文', b: index === 3 ? '総理' : '文', r: '' })) };
+  const word = { t: 'word', id: '総理', from: { passage: p.id, index: 3 } };
+  const block = {};
+  let c, afterOpen = () => {}, afterFocus = () => {};
+  const anchor = {
+    isConnected: true, dataset: { index: joined ? '2' : '3', indexEnd: '3' }, documentY: 1064.6875,
+    closest: selector => selector === '[data-prose-roving]' ? block : null,
+    matches: selector => selector === '.tok',
+    getBoundingClientRect: () => ({ top: anchor.documentY - c.window.scrollY, width: 32, height: 24 }),
+  };
+  const reader = {
+    isConnected: true,
+    querySelector: selector => Number(selector.match(/data-index="(\d+)"/)?.[1]) === Number(anchor.dataset.index) ? anchor : null,
+    querySelectorAll: () => [anchor],
+  };
+  const glyph = { textContent: '総理', parentElement: { closest: () => null } };
+  const origin = { anchor, demo: false, openStage(options) { calls.push(['stage', options]); afterOpen(); } };
+  c = vm.createContext({
+    S: { view: 'reader', passageId: p.id, stack: [word], scaleVisit: null, wordEntrySerial: 0,
+      taken: [], srs: {}, revlog: [] }, D: { passages: [p] }, recordEpoch: 4, pageEpoch: 7,
+    learningSourceVisit: { view: 'review' }, personalHost: null, referenceLibrary: null, worldPickerEls: null,
+    innerWidth: 390, innerHeight: 844,
+    window: { scrollY: 0 },
+    document: {
+      activeElement: null, getElementById: id => id === 'reader' ? reader : null,
+      createTreeWalker(_anchor, _show, filter) {
+        let read = false;
+        return { nextNode() { if (read) return null; read = true; return filter.acceptNode(glyph) === 1 ? glyph : null; } };
+      },
+      createRange: () => ({ selectNodeContents() {}, getClientRects: () => [anchor.getBoundingClientRect()] }),
+    }, NodeFilter: { SHOW_TEXT: 4, FILTER_REJECT: 2, FILTER_ACCEPT: 1 },
+    proseWordRovers: new Map([[block, { selector: '.tok', focus(target, options) {
+      calls.push(['focus', options]); c.document.activeElement = target;
+      // The existing rover's nearest scroll can move the source even with preventScroll.
+      c.window.scrollY = 270; afterFocus();
+    } }]]),
+    passage: () => p, teacherSentence: () => ({ start: 0, end: p.tokens.length }),
+    learnerSourceLabel: () => 'source', invokerKey: token => token.id ? { id: token.id } : { index: Number(token.dataset.index) },
+    ladderPages: new Map([[word, origin]]), keptPages: new Map(), heroSource: new Map(),
+    ladderVisit: null, ladderReturning: null,
+    finishPageTransition() {}, layerPathFor: () => true, sampleWhere: () => ({}), pageCutAllowed: () => false,
+    renderLayer() { calls.push(['render']); }, render() { c.pageEpoch++; },
+    returnScroll() { c.window.scrollY = 0; }, restoreDialogInvoker() { delayedFocus.push(() => { c.document.activeElement = anchor; }); },
+    clearReaderSummons() {}, clearWordLadder(value = c.ladderVisit) { if (c.ladderVisit === value) c.ladderVisit = null; },
+    removeMini() {}, clearReaderReadings() {}, stopReadAloud() {}, stopSentenceListening() {},
+    keepScroll() {}, rememberSheet() {}, enterWord(node, options) { calls.push(['enter', node, options]); c.S.stack.push(node); },
+    scaleReaderIndex() { throw new Error('A retained source must not select a new visible occurrence'); },
+    syncWalkSentinel() {}, sampleTransition() {},
+  });
+  vm.runInContext(['scaleTokenFingerprint', 'scalePassage', 'scaleSource', 'scaleLineTop', 'readerTokenAtIndex',
+    'captureScaleVisit', 'focusProseWord', 'recede', 'scaleName', 'scaleNavigationAllowed', 'retireScaleReturn',
+    'retireScaleTransients', 'scaleNodeFrom', 'rememberScaleEntry', 'keyboardActivated', 'go', 'scaleIn']
+    .map(actualFunction).join('\n'), c);
+  const visit = c.captureScaleVisit(3, word);
+  const skyPlace = { id: 'retained-sky' };
+  visit.skyPlace = skyPlace;
+  return { c, p, word, reader, anchor, origin, visit, calls, delayedFocus,
+    onOpen(fn) { afterOpen = fn; }, onFocus(fn) { afterFocus = fn; } };
+}
+
+test('ordinary Back captures the landed source after actual stage/focus, including joined tokens', () => {
+  for (const joined of [false, true]) {
+    const f = readerBack({ joined }), { c, visit, word, anchor, calls } = f;
+    const roots = [c.S.taken, c.S.srs, c.S.revlog];
+    f.onOpen(() => { anchor.documentY += 20; });
+    assert.equal(visit.scroll, 0); assert.equal(visit.viewportY, 1064.6875);
+    c.recede();
+    const landed = c.S.scaleVisit;
+    assert.notEqual(landed, visit, 'Back must replace stale pre-focus geometry');
+    assert.equal(landed.scroll, 270); assert.equal(landed.viewportY, 814.6875);
+    assert.equal(landed.index, 3); assert.equal(landed.indexEnd, 3);
+    assert.equal(landed.fingerprint, visit.fingerprint); assert.equal(landed.word, word);
+    assert.equal(landed.skyPlace, visit.skyPlace); assert.equal(landed.learningSourceVisit, visit.learningSourceVisit);
+    assert.equal(c.document.activeElement, anchor); assert.equal(c.S.stack.length, 0);
+    assert.deepEqual([c.S.taken, c.S.srs, c.S.revlog], roots);
+    assert.deepEqual(calls.map(call => call[0]), ['render', 'stage', 'focus']);
+    assert.equal(calls[1][1].restore, true); assert.equal(calls[2][1].preventScroll, true);
+    assert.equal(visit.scroll, 0, 'The prior visit is not mutated into a different owner');
+  }
+});
+
+test('ordinary Back refuses stale, nested, replaced, pending or cancelled source owners', () => {
+  const cases = [
+    ['nested page', f => f.c.S.stack.unshift({ t: 'sent' })],
+    ['old learner', f => { f.c.recordEpoch++; }],
+    ['detached source at entry', f => { f.anchor.isConnected = false; }],
+    ['different occurrence', f => f.onOpen(() => { f.anchor.dataset.index = '4'; f.anchor.dataset.indexEnd = '4'; })],
+    ['changed occurrence extent', f => f.onOpen(() => { f.anchor.dataset.indexEnd = '4'; })],
+    ['changed source token', f => f.onOpen(() => { f.p.tokens[3].s = '別'; })],
+    ['pending request', f => { f.visit.returnRequest = {}; }],
+    ['pending job', f => { f.visit.returnJob = {}; }],
+    ['pending request retired during Back', f => { f.visit.returnRequest = {}; f.onOpen(() => { f.visit.returnRequest = null; }); }],
+    ['new request during focus', f => f.onFocus(() => { f.visit.returnRequest = {}; })],
+    ['new job during focus', f => f.onFocus(() => { f.visit.returnJob = {}; })],
+    ['new learner during focus', f => f.onFocus(() => { f.c.recordEpoch++; })],
+    ['changed passage during focus', f => f.onFocus(() => { f.c.S.passageId = 'source-b'; })],
+    ['changed room during focus', f => f.onFocus(() => { f.c.S.view = 'shelf'; })],
+    ['detached source during focus', f => f.onFocus(() => { f.anchor.isConnected = false; })],
+    ['detached reader during focus', f => f.onFocus(() => { f.reader.isConnected = false; })],
+    ['replaced reader', f => f.onFocus(() => { f.c.document.getElementById = () => ({}); })],
+    ['new page epoch', f => f.onFocus(() => { f.c.pageEpoch++; })],
+    ['new page action', f => f.onFocus(() => { f.c.S.wordEntrySerial++; })],
+    ['cancelled ladder', f => f.onFocus(() => { f.c.ladderVisit = null; })],
+    ['moved focus', f => f.onFocus(() => { f.c.document.activeElement = {}; })],
+  ];
+  for (const [name, arrange] of cases) {
+    const f = readerBack(); arrange(f); f.c.recede();
+    assert.equal(f.c.S.scaleVisit, f.visit, `${name} cannot acquire a new origin`);
+    assert.equal(f.visit.scroll, 0, `${name} cannot rewrite the retained geometry`);
+  }
+  for (const replacement of [null, { origin: 'reader', scroll: 900 }]) {
+    const f = readerBack(); f.onFocus(() => { f.c.S.scaleVisit = replacement; }); f.c.recede();
+    assert.equal(f.c.S.scaleVisit, replacement, 'A cancelled or superseding visit retains ownership');
+  }
+});
+
+test('close-all and room rebuild do not refresh the reader origin', () => {
+  for (const options of [{ all: true }, { viaRender: true }]) {
+    const f = readerBack(); f.c.recede(options);
+    assert.equal(f.c.S.scaleVisit, f.visit);
+    assert.equal(f.visit.scroll, 0);
+  }
+});
+
+test('the actual next scale entry retains the landed occurrence after simulated Tab scroll', () => {
+  const f = readerBack(); f.c.recede();
+  const landed = f.c.S.scaleVisit;
+  assert.equal(landed.scroll, 270);
+  // This callback is a DOM double, not a proof of native dialog-focus ownership.
+  f.delayedFocus.shift()();
+  assert.equal(f.c.S.scaleVisit, landed);
+  const rail = { id: 'scale-sentence' };
+  f.c.document.activeElement = rail; f.c.window.scrollY = 410;
+  f.c.window.event = { type: 'click', isTrusted: true, detail: 0 };
+  assert.equal(f.c.scaleIn(), true);
+  assert.equal(f.c.S.stack.length, 1);
+  assert.equal(f.c.S.stack[0], landed.sentence, 'The real scaleIn/go path enters the retained sentence');
+  assert.equal(f.c.S.stack[0].target, f.word.id); assert.equal(f.c.S.stack[0].targetOffset, 3);
+  assert.equal(f.calls.at(-1)[0], 'enter'); assert.equal(f.calls.at(-1)[2].invoker, rail);
+  assert.equal(f.calls.at(-1)[2].instant, true);
+  assert.equal(f.c.S.scaleVisit, landed);
+  assert.equal(landed.word, f.word); assert.equal(landed.index, 3);
+  assert.equal(landed.scroll, 270, 'Later rail traversal does not silently move this source origin');
+});

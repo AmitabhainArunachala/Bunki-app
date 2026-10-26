@@ -41931,7 +41931,11 @@ function enterWord(node, { from = null, invoker = null, instant = false } = {}) 
  * when that still stands on the screen (the reader keeps its tokens under the layer; a kept page keeps its words). */
 function recede({ all = false, viaRender = false, instant = false } = {}) {
   if (!S.stack.length) return null;
-  S.wordEntrySerial = (S.wordEntrySerial || 0) + 1;
+  const readerVisit = S.scaleVisit;
+  const reader = S.view === 'reader' ? document.getElementById('reader') : null;
+  const readerEpoch = pageEpoch;
+  const readerIdle = readerVisit && !readerVisit.returnRequest && !readerVisit.returnJob;
+  const entrySerial = S.wordEntrySerial = (S.wordEntrySerial || 0) + 1;
   finishPageTransition();
   const layered = !viaRender && layerPathFor();
   const leaving = all ? S.stack[0] : S.stack.at(-1);
@@ -41964,6 +41968,17 @@ function recede({ all = false, viaRender = false, instant = false } = {}) {
       origin.rung = origin.anchor.dataset.ladderRung = 'stage';
       origin.openStage({ restore: true, demo: origin.demo });
       focusProseWord(origin.anchor, { preventScroll: true });
+      // Ordinary Back can move the prose rover into view. That landed source,
+      // not its pre-focus geometry, owns the next scale journey.
+      if (!S.stack.length && S.view === 'reader' && readerIdle && reader?.isConnected &&
+          document.getElementById('reader') === reader && pageEpoch === readerEpoch &&
+          S.wordEntrySerial === entrySerial && ladderVisit === origin && S.scaleVisit === readerVisit &&
+          readerVisit.origin === 'reader' && readerVisit.recordEpoch === recordEpoch &&
+          readerVisit.passageId === S.passageId && !readerVisit.returnRequest && !readerVisit.returnJob &&
+          origin.anchor.isConnected && document.activeElement === origin.anchor &&
+          readerTokenAtIndex(readerVisit.index, reader) === origin.anchor &&
+          Number(origin.anchor.dataset.indexEnd || readerVisit.index) === readerVisit.indexEnd && scaleSource(readerVisit))
+        captureScaleVisit(readerVisit.index, readerVisit.word);
     } else if (origin) clearWordLadder(origin);
   } finally {
     ladderReturning = previousReturn;
