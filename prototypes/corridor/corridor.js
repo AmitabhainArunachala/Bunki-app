@@ -24468,15 +24468,21 @@ function renderPublisherContextSelection(main, saved, body) {
 }
 function renderTextSourceContextSelection(main, saved, body, personal) {
   const controlPrefix = personal ? 'source' : 'publisher';
-  const makeContext = async (selected) => {
-    const module = await ensureTeacherContextModule(), article = saved.candidate.article;
-    return module.createTeacherContext({
-      sourceKind: personal ? 'personal-reading' : 'publisher-reading', sourceId: personal ? saved.id : saved.receiptSha256,
-      sourceDigest: await module.digestText(article.body.text), unit: 'utf16-code-unit',
-      ...selected, index: selected.start, title: article.title,
-      attribution: article.source.attribution, url: personal ? saved.encounterUrl : article.canonicalUrl, target: null,
-    });
+  const sourceKind = personal ? 'personal-reading' : 'publisher-reading';
+  const sourceId = personal ? saved.id : saved.receiptSha256;
+  // Values, not selector object identity: both source selectors reparse their records.
+  const sourceIdentity = (entry) => {
+    const article = entry?.candidate?.article;
+    return article?.body ? JSON.stringify([sourceKind, personal ? entry.id : entry.receiptSha256,
+      article.body.text, article.body.contentSha256, article.title, article.source.attribution,
+      personal ? entry.encounterUrl : article.canonicalUrl, article.capabilities['quote-extract']]) : null;
   };
+  const liveSource = (root) => personal ? sourceInboxModule.selectSourceCapture(root.sourceInbox, sourceId)
+    : publisherModule.selectPublisherReading(root.publisherLibrary, sourceId);
+  const identity = sourceIdentity(saved), epoch = recordEpoch, page = pageEpoch;
+  const article = saved.candidate.article;
+  const source = { text: article.body.text, title: article.title, attribution: article.source.attribution,
+    url: personal ? saved.encounterUrl : article.canonicalUrl };
   const section = el('section', 'publisher-context-selection');
   section.setAttribute('aria-label', tx('選んだ文章を残す', 'Keep selected text'));
   const prompt = el('p', 'teacher-note', tx('本文の言葉を選ぶと、出典と一緒に保存できる。',
@@ -24485,22 +24491,129 @@ function renderTextSourceContextSelection(main, saved, body, personal) {
   const actions = el('div', 'teacher-actions');
   const status = el('p', 'teacher-note'); status.id = `${controlPrefix}-context-status`; status.setAttribute('role', 'status');
   const timedSelection = el('div'); timedSelection.id = `${controlPrefix}-selection-time`;
-  let selection = null, pending = false;
+  const state = { selection: null, generation: 0, pending: null, lastOutcome: null, sourceRevoked: false };
+  const surface = { state, connected: () => section.isConnected, update: () => update() };
   const controls = [];
   const refresh = () => {
     const allowed = saved.candidate.article.capabilities['quote-extract'].status === 'allowed';
-    controls.forEach((button) => { button.disabled = pending || !selection || !allowed || !recordWritable(); });
+    controls.forEach((button) => { button.disabled = !!state.pending || !state.selection || !allowed || !recordWritable(); });
+  };
+  const selectionKey = (selected) => selected ? JSON.stringify([selected.start, selected.end, selected.quote]) : null;
+  const currentSurface = (root = S) => {
+    try {
+      const live = !state.sourceRevoked && publisherSelectionSurface === surface && pageEpoch === page && recordEpoch === epoch &&
+        section.isConnected && status.isConnected && body.isConnected && body.textContent === source.text &&
+        S.view === (personal ? 'source-reader' : 'publisher') &&
+        (personal ? S.sourceCaptureId : S.publisherReceipt) === sourceId;
+      if (!live) return false;
+      // Queued authority can replace the source before S catches up. That loss cannot revive through stale S.
+      state.sourceRevoked = sourceIdentity(liveSource(root)) !== identity;
+      return !state.sourceRevoked;
+    } catch { state.sourceRevoked = true; return false; } // Refusing source parsers must still permit cleanup.
+  };
+  // This renderer cancels on repaint; it never recovers an operation through a repeated DOM id.
+  const sameNavigation = (operation) => S.view === operation.view && S.stack === operation.stack && S.stack.length === operation.stackEntries.length &&
+    S.stack.every((entry, index) => entry === operation.stackEntries[index]);
+  const ownerReason = (operation, root = S) => {
+    if (operation.reason) return operation.reason;
+    if (!recordWritable(operation.epoch)) return operation.commitAttempted ? 'O6' : 'O4';
+    if (state.pending !== operation || !sameNavigation(operation) ||
+        (operation.kind === 'open' && (state.generation !== operation.generation ||
+          selectionKey(state.selection) !== selectionKey(operation.selected) ||
+          operation.serial !== teacherContextSelectionSerial))) return 'O8';
+    if (!currentSurface(root) || !operation.control.isConnected) return 'O7';
+    return null;
+  };
+  const ownsNotice = (operation) => (!operation.reason || ['O4', 'O6'].includes(operation.reason)) &&
+    currentSurface() && sameNavigation(operation) && state.pending === operation &&
+    state.generation === operation.generation && selectionKey(state.selection) === selectionKey(operation.selected) &&
+    operation.control.isConnected && (operation.kind !== 'open' || operation.serial === teacherContextSelectionSerial);
+  // W2 final copy r2 476d551d: Open outcomes never claim an unconfirmed save or its erasure.
+  const openMessage = (code) => ({
+    O1: tx('本文から、ひらく文章を選ぶ。', 'Choose text in this reading before opening it.'),
+    O2: tx('この文章の操作は、すでに進んでいる。', 'An action for this selection is already in progress.'),
+    O3: tx('記録に書き込めないため、選んだ文章はひらけない。', 'This record is not writable. The selected text was not opened.'),
+    O4: tx('ひらく途中で記録が変わった。本文から文章を選び直す。', 'The record changed while opening. Select the text again.'),
+    O5: tx('保存を確認できなかったため、選んだ文章はひらかなかった。', 'Opening stopped because the save was not confirmed.'),
+    O6: tx('保存を試したあとに記録が変わったため、選んだ文章をひらく操作は止めた。', 'The record changed after the save attempt; opening stopped.'),
+    O7: tx('ひらく途中で、表示中の文章が変わった。元の文章に戻って選び直す。', 'The reading changed before opening finished. Return to the reading and select the text again.'),
+    O8: tx('新しい操作を優先したため、前の操作では文章をひらかなかった。', 'A newer action took over, so the earlier action did not open the text.'),
+    O9: tx('選んだ文章をひらけなかった。元の文章をひらき直し、選び直す。', 'The selected text could not be opened. Reopen the reading and select the text again.'),
+    working: tx('選んだ文章をひらいている。', 'Opening selected text…'),
+  })[code];
+  const classify = (operation, code) => {
+    operation.outcome = code;
+    if (state.pending === operation) state.lastOutcome = { kind: operation.kind, code };
+  };
+  const requireOwner = (operation, root = S) => {
+    const reason = ownerReason(operation, root);
+    if (reason) { operation.reason = reason; classify(operation, reason); throw declineWrite(reason); }
+  };
+  const announce = (operation, code) => {
+    if (ownsNotice(operation)) status.textContent = openMessage(code);
+  };
+  const begin = (kind, control) => {
+    if (!currentSurface()) { state.lastOutcome = { kind, code: recordEpoch === epoch ? 'O7' : 'O4' }; return null; }
+    if (!control.isConnected) { state.lastOutcome = { kind, code: 'O7' }; return null; }
+    // Re-entry belongs to the existing operation, including practice/lookup. No takeover or serial bump.
+    if (state.pending) {
+      state.lastOutcome = { kind, code: 'O2' };
+      if (kind === 'open') announce(state.pending, 'O2');
+      return null;
+    }
+    const code = !state.selection ? 'O1' : !recordWritable(epoch) ? 'O3' : null;
+    if (code) {
+      state.lastOutcome = { kind, code };
+      if (kind === 'open') status.textContent = openMessage(code);
+      return null;
+    }
+    const operation = { kind, control, epoch, sourceKind, sourceId, identity, selected: { ...state.selection },
+      view: S.view, stack: S.stack, stackEntries: S.stack.slice(),
+      generation: ++state.generation, serial: kind === 'open' ? ++teacherContextSelectionSerial : null,
+      commitAttempted: false, reason: null, outcome: 'pending' };
+    state.pending = operation; refresh();
+    if (kind === 'open') announce(operation, 'working');
+    return operation;
+  };
+  const finish = (operation) => {
+    const reason = ownerReason(operation);
+    if (reason && operation.outcome === 'pending') { operation.reason = reason; classify(operation, reason); }
+    // A silent revocation still releases its controls. Notice ownership is stricter than current-surface refresh.
+    if (state.pending === operation) { state.pending = null; if (currentSurface()) refresh(); }
+  };
+  const failed = (operation, error) => {
+    const code = ownerReason(operation) || 'O9';
+    classify(operation, code);
+    if (operation.kind === 'open') announce(operation, code);
+    else if (ownsNotice(operation)) status.textContent = teacherSourceError(error);
+  };
+  const makeContext = async (operation) => {
+    const module = await ensureTeacherContextModule(); requireOwner(operation);
+    const sourceDigest = await module.digestText(source.text); requireOwner(operation);
+    const context = await module.createTeacherContext({ sourceKind, sourceId, sourceDigest, unit: 'utf16-code-unit',
+      ...operation.selected, index: operation.selected.start, title: source.title,
+      attribution: source.attribution, url: source.url, target: null });
+    requireOwner(operation);
+    return { module, context };
   };
   const update = () => {
+    if (!currentSurface()) return;
     const selected = window.getSelection();
     if (!selected?.rangeCount || selected.isCollapsed) return;
     const range = selected.getRangeAt(0);
     if (!body.contains(range.startContainer) || !body.contains(range.endContainer)) return;
     const prefix = range.cloneRange(); prefix.selectNodeContents(body); prefix.setEnd(range.startContainer, range.startOffset);
     const text = range.toString(), start = prefix.toString().length;
-    selection = text.length > 0 && text.length <= 4000 &&
+    const selection = text.length > 0 && text.length <= 4000 &&
       body.textContent === saved.candidate.article.body.text &&
       body.textContent.slice(start, start + text.length) === text ? { start, end: start + text.length, quote: text } : null;
+    if (selectionKey(selection) === selectionKey(state.selection)) return;
+    const previous = state.pending;
+    state.selection = selection; state.generation++;
+    // An explicit Save/practice/lookup keeps its captured selection, but loses the notice for this new selection.
+    if (previous?.kind === 'open') {
+      previous.reason = 'O8'; classify(previous, 'O8'); state.pending = null;
+    }
     quote.textContent = selection?.quote || ''; quote.hidden = !selection;
     timedSelection.replaceChildren();
     if (personal && selection && sourceInboxModule.selectListeningTranscript(S.sourceInbox, saved.id))
@@ -24508,6 +24621,7 @@ function renderTextSourceContextSelection(main, saved, body, personal) {
     if (personal && selection && sourceInboxModule.selectFileCapture(S.sourceInbox, saved.id))
       appendFileSourceRange(timedSelection, saved, { ...selection, sourceDigest: saved.candidate.article.body.contentSha256 });
     status.textContent = selection ? '' : tx('4000文字以内の文章を選ぶ。', 'Choose a selection of at most 4,000 characters.');
+    if (selection && previous?.kind === 'open') status.textContent = openMessage('O8');
     refresh();
     paintWordSave(keepSave, !!selection && keptAt === selectionKey(selection));
   };
@@ -24515,44 +24629,44 @@ function renderTextSourceContextSelection(main, saved, body, personal) {
   // chip of its own words ("save selected text") with "No reviews were added." beside it; opening it on the tutor page stays
   // its own door. Both keep through the same guarded commit.
   let keptAt = null;
-  const selectionKey = (selected) => (selected ? `${selected.start}:${selected.end}` : null);
   const keepSelection = async (discuss, control) => {
-    const selected = selection;
-    if (!selected || pending || !recordWritable()) return false;
-    const epoch = recordEpoch, serial = discuss ? ++teacherContextSelectionSerial : null;
-    pending = true; refresh();
+    const operation = begin(discuss ? 'open' : 'save', control);
+    if (!operation) return false;
     try {
-      const module = await ensureTeacherContextModule();
-      const context = await makeContext(selected);
-      await resolveTeacherSource(context);
-      if (!recordWritable(epoch)) return false;
+      const { module, context } = await makeContext(operation); requireOwner(operation);
+      await resolveTeacherSource(context); requireOwner(operation);
+      operation.commitAttempted = true;
       const kept = await commitStorePatch((latest) => {
-        if (personal ? !sourceInboxModule.selectSourceCapture(latest.sourceInbox, saved.id)
-          : !publisherModule.selectPublisherReading(latest.publisherLibrary, saved.receiptSha256)) throw new Error('source-unavailable');
+        requireOwner(operation, latest);
         const selectedRoot = module.selectTeacherContext(latest.teacherContexts, context);
-        return { teacherContexts: discuss && control.isConnected && serial === teacherContextSelectionSerial
+        return { teacherContexts: discuss
           ? selectedRoot : module.activateTeacherContext(selectedRoot, latest.teacherContexts?.activeRef || null) };
       });
-      if (!kept || !recordWritable(epoch) || !control.isConnected) return false;
-      keptAt = selectionKey(selected);
-      if (discuss && serial === teacherContextSelectionSerial) {
+      requireOwner(operation);
+      if (!kept) { classify(operation, 'O5'); if (discuss) announce(operation, 'O5'); return false; }
+      keptAt = selectionKey(operation.selected);
+      if (discuss) {
+        requireOwner(operation); classify(operation, 'opened');
         keepScroll(); stopReadAloud(); S.stack = []; S.view = 'ai'; S.aiChatShown = AI_CHAT_PAGE;
         render(); window.scrollTo(0, 0);
-      } else status.textContent = tx('出典と一緒に保存した。', 'Saved with its source.');
+      } else {
+        classify(operation, 'saved');
+        if (ownsNotice(operation)) status.textContent = tx('出典と一緒に保存した。', 'Saved with its source.');
+      }
       return true;
     } catch (error) {
-      if (recordReady(epoch) && section.isConnected) status.textContent = teacherSourceError(error);
+      failed(operation, error);
       return false;
-    } finally { pending = false; refresh(); }
+    } finally { finish(operation); }
   };
   const keepSave = saveOne({
     id: `${controlPrefix}-context-save`, cls: 'context-save', label: tx('選んだ文章', 'the selected text'),
-    saved: () => !!selection && keptAt === selectionKey(selection),
+    saved: () => !!state.selection && keptAt === selectionKey(state.selection),
     keep: () => keepSelection(false, keepSave),
-    more: () => [{ id: `${controlPrefix}-context-copy`, label: tx('コピー', 'Copy'), run: () => copyReaderText(selection?.quote || '') }],
+    more: () => [{ id: `${controlPrefix}-context-copy`, label: tx('コピー', 'Copy'), run: () => copyReaderText(state.selection?.quote || '') }],
   });
   controls.push(keepSave); actions.append(keepSave);
-  const openSaved = biLabel('button', 'chip', '保存した文をひらく', 'open saved context'); openSaved.type = 'button';
+  const openSaved = biLabel('button', 'chip', '選んだ文章をひらく', 'open selected text'); openSaved.type = 'button';
   openSaved.id = `${controlPrefix}-context-open`;
   openSaved.addEventListener('click', () => { void keepSelection(true, openSaved); });
   controls.push(openSaved); actions.append(openSaved);
@@ -24561,34 +24675,37 @@ function renderTextSourceContextSelection(main, saved, body, personal) {
   const practice = biLabel('button', 'chip', 'この文を練習する', 'practice this sentence');
   practice.type = 'button'; practice.id = `${controlPrefix}-sentence-practice`;
   practice.addEventListener('click', async () => {
-    if (!selection || pending || !sentencePracticeModule) return;
-    const selected = { ...selection }, epoch = recordEpoch; pending = true; refresh();
+    if (!sentencePracticeModule) return;
+    const operation = begin('practice', practice); if (!operation) return;
+    const selected = operation.selected;
     try {
-      const selectedContext = await makeContext(selected); await resolveTeacherSource(selectedContext);
-      const context = await teacherContextModule.sourceSentenceContext(selectedContext, saved.candidate.article.body.text);
-      if (!recordWritable(epoch) || !practice.isConnected) return;
+      const { context: selectedContext } = await makeContext(operation); requireOwner(operation);
+      await resolveTeacherSource(selectedContext); requireOwner(operation);
+      const context = await teacherContextModule.sourceSentenceContext(selectedContext, source.text); requireOwner(operation);
       if (!selected.quote.trim() || selected.quote.length > 200) {
+        classify(operation, 'invalid-practice-selection');
         status.textContent = tx('練習したい語句を200文字以内で選ぶ。', 'Select a phrase of at most 200 characters to practice.'); return;
       }
       keepScroll();
       S.sentencePracticeView = { context, start: selected.start - context.start, end: selected.end - context.start,
         cloze: true, production: false, returnView: S.view, returnScroll: window.scrollY };
+      classify(operation, 'practice');
       S.view = 'sentence-practice'; render(); window.scrollTo(0, 0);
-    } catch (error) { if (recordReady(epoch) && status.isConnected) status.textContent = teacherSourceError(error); }
-    finally { pending = false; refresh(); }
+    } catch (error) { failed(operation, error); }
+    finally { finish(operation); }
   });
   if (sentencePracticeModule) { controls.push(practice); actions.append(practice); }
   if (personal) {
     const lookup = biLabel('button', 'chip', '選んだ言葉を調べる', 'look up selected text');
     lookup.type = 'button'; lookup.id = 'source-selection-lookup';
     lookup.addEventListener('click', async () => {
-      if (!selection || pending) return;
-      const selected = selection; pending = true; refresh();
+      const operation = begin('lookup', lookup); if (!operation) return;
       try {
-        const context = await makeContext(selected); await resolveTeacherSource(context);
-        if (lookup.isConnected) { S.navQ = selected.quote; openSearchPage({ sourceContext: context }); }
-      } catch (error) { if (status.isConnected) status.textContent = teacherSourceError(error); }
-      finally { pending = false; refresh(); }
+        const { context } = await makeContext(operation); requireOwner(operation);
+        await resolveTeacherSource(context); requireOwner(operation);
+        classify(operation, 'lookup'); S.navQ = operation.selected.quote; openSearchPage({ sourceContext: context });
+      } catch (error) { failed(operation, error); }
+      finally { finish(operation); }
     });
     controls.push(lookup); actions.prepend(lookup);
   }
@@ -24600,7 +24717,9 @@ function renderTextSourceContextSelection(main, saved, body, personal) {
     const range = document.createRange(); range.selectNodeContents(word);
     const selected = window.getSelection(); selected.removeAllRanges(); selected.addRange(range);
   }, true);
-  publisherSelectionSurface = { connected: () => section.isConnected, update };
+  const previous = publisherSelectionSurface?.state?.pending;
+  if (previous) { previous.reason = 'surface-replaced'; previous.outcome = 'surface-replaced'; }
+  publisherSelectionSurface = surface;
   refresh();
 }
 /** Whether this sentence already stands on the tutor page (a kept sentence): read-only, from the record's entries. */
