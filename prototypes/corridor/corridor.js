@@ -24684,7 +24684,7 @@ function renderTextSourceContextSelection(main, saved, body, personal) {
       const context = await teacherContextModule.sourceSentenceContext(selectedContext, source.text); requireOwner(operation);
       if (!selected.quote.trim() || selected.quote.length > 200) {
         classify(operation, 'invalid-practice-selection');
-        status.textContent = tx('練習したい語句を200文字以内で選ぶ。', 'Select a phrase of at most 200 characters to practice.'); return;
+        if (ownsNotice(operation)) status.textContent = tx('練習したい語句を200文字以内で選ぶ。', 'Select a phrase of at most 200 characters to practice.'); return;
       }
       keepScroll();
       S.sentencePracticeView = { context, start: selected.start - context.start, end: selected.end - context.start,

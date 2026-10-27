@@ -30,7 +30,7 @@ const clone = value => JSON.parse(JSON.stringify(value));
 const drain = async () => { for (let i = 0; i < 80; i++) await Promise.resolve(); };
 const deferred = () => { let resolve; const promise = new Promise(r => { resolve = r; }); return { promise, resolve }; };
 
-function harness({ personal = false, code = renderer, language = 'en' } = {}) {
+function harness({ personal = false, code = renderer, language = 'en', text = '町で雨を見る。' } = {}) {
   let selection = null, navigation = 0, commits = 0, writes = 0, refreshed = 0;
   const pauses = new Map(), visits = [], patches = [], created = [], nodes = [];
   class Node {
@@ -53,7 +53,7 @@ function harness({ personal = false, code = renderer, language = 'en' } = {}) {
     emit(type) { return [...(this.listeners.get(type) || [])].map(fn => fn({ target: this })); }
     click() { this.emit('click'); }
   }
-  const root = new Node('main'), body = new Node('article', '', '町で雨を見る。'); root.append(body);
+  const root = new Node('main'), body = new Node('article', '', text); root.append(body);
   const saved = { id: 'personal-1', receiptSha256: 'publisher-1', encounterUrl: 'https://source.test/personal',
     candidate: { article: { title: 'Reading', body: { text: body.textContent, contentSha256: 'body-digest' },
       source: { attribution: 'The source author' }, canonicalUrl: 'https://source.test/publisher',
@@ -346,6 +346,37 @@ test('practice sentence await and personal lookup await retain epoch/source owne
   const p = harness({ personal: true }); p.select(); const lookupHeld = p.pause('resolve'); const lookup = p.lookup(); await lookupHeld.entered.promise;
   p.context.S.view = 'dictionary'; lookupHeld.release.resolve(); await lookup;
   assert.equal(p.counts().navigation, 0); assert.equal(p.surface.state.pending, null);
+});
+
+async function practiceLengthNotice(changedSelection, code = renderer, language = 'en') {
+  const h = harness({ code, language, text: '長'.repeat(201) + '短い' }); h.select(0, 201);
+  const held = h.pause('sentence'), task = h.practice(); await held.entered.promise;
+  const operation = h.surface.state.pending, status = h.status;
+  assert.equal(operation.selected.quote, '長'.repeat(201));
+  if (changedSelection) {
+    h.select(201, 203); status.textContent = 'Selection B owns this notice';
+    assert.equal(h.surface.state.pending, operation, 'Practice keeps captured A while B owns the notice');
+  }
+  const before = status.history.length;
+  held.release.resolve(); await task;
+  assert.equal(operation.outcome, 'invalid-practice-selection', 'Invalid A is classified even without notice ownership');
+  assert.equal(status.textContent, changedSelection ? 'Selection B owns this notice' : language === 'ja'
+    ? '練習したい語句を200文字以内で選ぶ。' : 'Select a phrase of at most 200 characters to practice.',
+  'The late Practice warning must belong to the current selection');
+  assert.equal(status.history.length - before, changedSelection ? 0 : 1);
+  assert.equal(h.surface.state.selection.quote, changedSelection ? '短い' : '長'.repeat(201));
+  assert.equal(h.counts().navigation, 0); assert.equal(h.counts().commits, 0); assert.equal(h.counts().writes, 0);
+  assert.equal(h.surface.state.pending, null); assert.equal(h.find('context-open').disabled, false);
+  assert.equal(h.find('sentence-practice').disabled, false);
+}
+test('Practice over200 A held at sentence await cannot overwrite the notice after selecting B', () => practiceLengthNotice(true));
+test('Practice over200 A still shows its exact warning when A remains the current notice owner', async () => {
+  await practiceLengthNotice(false); await practiceLengthNotice(false, renderer, 'ja');
+});
+test('inverse: missing Practice warning notice guard is killed by the actual A-to-B interleaving', async () => {
+  const warning = "status.textContent = tx('練習したい語句を200文字以内で選ぶ。', 'Select a phrase of at most 200 characters to practice.'); return;";
+  const mutant = mutation('if (ownsNotice(operation)) ' + warning, warning);
+  await killed(() => practiceLengthNotice(true, mutant), /The late Practice warning must belong to the current selection/);
 });
 
 test('opaque source/commit errors never leak into either language of Open copy', async () => {
