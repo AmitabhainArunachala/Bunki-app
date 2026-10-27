@@ -30,6 +30,7 @@ import {
   armRecordWriteFailure,
   clearRecordWriteFailure,
 } from './record-test-support.mjs';
+import { applyProbes, applyMutant, MUTANTS } from './publisher-context-probes.mjs';
 
 /** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
  * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
@@ -105,6 +106,30 @@ const sources = [sourcePath, controllerPath, fixturePath, helperPath, recordHelp
   path,
   sha256: hash(readFileSync(path)),
 }));
+// Diagnostic only, never an acceptance run: serve corridor.js with passive keepSelection probes
+// (publisher-context-probes.mjs) to name which exit a silent "open saved context" takes. One round-trip
+// case per run; the original and served hashes are both in the receipt. Off unless the variable is 1.
+const CONTEXT_CASES = [
+  'selected-original-saves-exact-text-all-credits-and-no-learning-debt',
+  'phone-reader-links-and-controls-fit-and-meet-44px-targets',
+];
+const contextDiagnostics = process.env.KAIRO_PUBLISHER_CONTEXT_DIAGNOSTICS === '1';
+const contextMutant = process.env.KAIRO_PUBLISHER_CONTEXT_MUTANT || null;
+assert(!contextMutant || (contextDiagnostics && Object.hasOwn(MUTANTS, contextMutant)),
+  'A context mutant needs KAIRO_PUBLISHER_CONTEXT_DIAGNOSTICS=1 and a known mutant name');
+let contextInstrumentation = null;
+let servedCorridor = null;
+if (contextDiagnostics) {
+  const contextCase = process.argv.find((arg) => arg.startsWith('--case='))?.slice(7);
+  assert(mode === 'ui' && CONTEXT_CASES.includes(contextCase), 'Context diagnostics run one round-trip case with --ui');
+  const original = readFileSync(resolve(site, 'corridor.js'));
+  const { source: probed, applied } = applyProbes(original.toString('utf8'));
+  servedCorridor = Buffer.from(contextMutant ? applyMutant(probed, contextMutant) : probed);
+  const probesPath = resolve(repository, 'prototypes/corridor/tools/publisher-context-probes.mjs');
+  sources.push({ path: probesPath, sha256: hash(readFileSync(probesPath)) });
+  contextInstrumentation = { path: 'corridor.js', originalSha256: hash(original), servedSha256: hash(servedCorridor),
+    probes: applied, mutant: contextMutant, case: contextCase, diagnosticOnly: true };
+}
 const stage = mkdtempSync(resolve(out, 'contracts-runtime-'));
 mkdirSync(resolve(stage, 'modules'));
 writeFileSync(
@@ -516,6 +541,11 @@ async function ui() {
         response.end('<!doctype html><title>Synthetic publisher reader probe</title>');
         return;
       }
+      if (servedCorridor && pathname === '/corridor.js') {
+        response.writeHead(200, { 'content-type': 'text/javascript', 'cache-control': 'no-store' });
+        response.end(servedCorridor);
+        return;
+      }
       const file = resolve(site, pathname === '/' ? 'index.html' : pathname.slice(1));
       if (!inside(site, file) || !existsSync(file) || !lstatSync(file).isFile()) {
         response.writeHead(404).end();
@@ -843,6 +873,9 @@ async function ui() {
         .screenshot({ path: resolve(out, `${name}-failure.png`), fullPage: true })
         .catch(() => {});
     } finally {
+      if (contextDiagnostics)
+        context.diagnostics.push({ kind: 'context-diagnostics',
+          records: await context.page.evaluate(() => window.__ctxDiag || []).catch((error) => ({ captureError: String(error) })) });
       writeFileSync(
         resolve(out, `${name}-diagnostics.json`),
         JSON.stringify(context.diagnostics, null, 2) + '\n',
@@ -1332,11 +1365,13 @@ try {
           feedCore: files.find((file) => file.path === 'modules/feed-core.mjs'),
         },
         runtime: { node: process.version },
+        instrumentation: contextInstrumentation,
         results,
         observations,
         passed: results.filter((result) => result.pass).length,
         failed: results.filter((result) => !result.pass).length,
         limitations: [
+          ...(contextDiagnostics ? ['Diagnostic-only served corridor.js with passive keepSelection probes; never an acceptance run'] : []),
           'Synthetic selected publisher fixtures; no live publisher network in this verifier',
           'Receipt coherence is not independent source authority or editorial approval',
           'Contract mode runs exact compiled browser-target core in Node, not browser UI or native IPC',
