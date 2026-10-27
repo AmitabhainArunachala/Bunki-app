@@ -408,13 +408,16 @@ function projectData(d) { return { status: 'completed', recipe: d.built.ref, bui
 function ownedProject(root, d) { return root.projects.find(p => p.buildKey === d.key && p.status === 'completed' && samePlain(p.recipe, d.built.ref) && samePlain(p.placement, d.placement)); }
 function outcome(kind, reason = null, observed = null, extra = {}) { return freeze({ kind, reason, observed, ...extra }); }
 function releaseDraft(s, d) { if (!d.released) { d.released = true; s.liveDrafts--; } }
+// C2 proves the exact lifecycle invocation refused before target dispatch. Local
+// admission additionally needs our own error identity, target and draft version.
+const admissionRefusals = new WeakMap(), duplicateAdmissions = new WeakMap();
 function lifecyclePort(ports) {
-  const p = record(ports.lifecycle, ['tick', 'inspect', 'work', 'retire', 'holdUnconfirmed']);
+  const p = record(ports.lifecycle, ['tick', 'inspect', 'work', 'retire', 'holdUnconfirmed', 'preDispatchRefusal']);
   check(p && Object.values(p).every(v => typeof v === 'function') && typeof ports.digest === 'function', 'lifecycle-unavailable');
   return p;
 }
 async function writeProject(state, target, start, requireView = null) {
-  let observed = null, count = 0, thrown = null, lc, ports;
+  let observed = null, count = 0, thrown = false, caught, lc, ports;
   const a = worldAccess(state);
   if (!a.ok) return outcome('refused', a.reason);
   ports = a.value.ports;
@@ -427,11 +430,7 @@ async function writeProject(state, target, start, requireView = null) {
   };
   let open = true;
   try { await start(lc, raw => { if (open) observe(raw); }); } catch (error) {
-    thrown = 'refused';
-    try {
-      const message = Object.getOwnPropertyDescriptor(error, 'message');
-      if (message && Object.hasOwn(message, 'value') && typeof message.value === 'string') thrown = message.value;
-    } catch { /* an untrusted thrown value cannot skip publication reconciliation */ }
+    thrown = true; caught = error; // Do not inspect an escaping value for publication authority.
   }
   finally { open = false; }
   const owner = worldAccess(state);
@@ -445,13 +444,33 @@ async function writeProject(state, target, start, requireView = null) {
   } catch { /* failed digest is not acknowledgement */ }
   if (!worldAccess(state).ok) return outcome('owner-changed', 'owner-changed', observed);
   if (exact) return outcome('published', null, observed, { display: requireView === null || worldAccess(state, requireView, true).ok });
-  if (count === 1 && observed?.action === target.action && observed.outcome === 'not-published') return outcome('not-published', thrown, observed);
-  if (count === 0 && thrown && ['project-exists', 'work-bound', 'root-invalid', 'byte-bound', 'root-unavailable', 'switch-off',
-    'owner-epoch', 'generation-changed', 'stale-root', 'view-stale', 'draft-changed', 'work-missing', 'explicit-retirement'].includes(thrown)) {
-    return outcome(['root-invalid', 'byte-bound', 'root-unavailable'].includes(thrown) ? 'structural' : 'refused', thrown);
+  if (count === 1 && observed?.action === target.action && observed.outcome === 'not-published') {
+    // C2's observed nonpublication makes change() throw publication-hold. Keep
+    // that diagnostic without reading a possibly replaced escaping error.
+    return outcome('not-published', thrown ? 'publication-hold' : null, observed);
   }
+  if (count === 0 && thrown) {
+    let proof = null;
+    if (!worldAccess(state).ok) return outcome('owner-changed', 'owner-changed', observed);
+    try { proof = record(lc.preDispatchRefusal(target.operation, caught), ['action', 'collection', 'source', 'reason']); }
+    catch { /* Missing or throwing evidence after start cannot prove nonpublication. */ }
+    if (!worldAccess(state).ok) return outcome('owner-changed', 'owner-changed', observed); // after query and reflection
+    if (proof?.action === target.action && proof.collection === 'projects') {
+      if (proof.source === 'lifecycle-guard' && typeof proof.reason === 'string') {
+        return outcome(['root-invalid', 'byte-bound', 'root-unavailable'].includes(proof.reason) ? 'structural' : 'refused', proof.reason);
+      }
+      const own = admissionRefusals.get(caught), d = drafts.get(requireView);
+      if (proof.source === 'admission' && proof.reason === null && own?.target === target &&
+        own.draft === requireView && own.version === d?.version && d.state === state) {
+        const result = outcome('refused', own.reason);
+        if (own.reason === 'project-exists') duplicateAdmissions.set(result, target);
+        return result;
+      }
+    }
+  }
+  if (!worldAccess(state).ok) return outcome('owner-changed', 'owner-changed', observed);
   try { lc.holdUnconfirmed(); } catch { /* preserve uncertain target */ }
-  return outcome('uncertain', thrown || 'publication-unproved', observed);
+  return outcome('uncertain', 'publication-unproved', observed);
 }
 function reserved(s, key, run) {
   if (s.inflight.has(key)) return s.inflight.get(key);
@@ -476,17 +495,22 @@ export function keepBuild(state, draft) {
     if (d.phase === 'saved') return outcome('refused', 'saved-project-absent');
     const version = d.version, target = freeze({ action: 'work', buildKey: d.key, projectId: null, operation: token() });
     d.target = target;
-    const result = await writeProject(state, target, (lc, observe) => lc.work('projects', projectData(d), { observe,
+    const reject = reason => {
+      const error = new Error(reason);
+      admissionRefusals.set(error, { target, draft, version, reason });
+      throw error;
+    };
+    const result = await writeProject(state, target, (lc, observe) => lc.work('projects', projectData(d), { observe, operation: target.operation,
       admit(proposed) {
         const access = worldAccess(state, draft, true);
-        if (!access.ok) throw new Error(access.reason);
-        if (d.version !== version || d.phase !== 'assembled') throw new Error('draft-changed');
+        if (!access.ok) reject(access.reason);
+        if (d.version !== version || d.phase !== 'assembled') reject('draft-changed');
         const next = plainCopy(proposed);
-        if (next.id !== access.value.snapshot.journeyId || next.generation !== access.value.snapshot.generation) throw new Error('owner-epoch');
-        if (next.projects.some(p => p.buildKey === d.key)) throw new Error('project-exists');
-        if (!worldAccess(state, draft, true).ok || d.version !== version) throw new Error('draft-changed');
+        if (next.id !== access.value.snapshot.journeyId || next.generation !== access.value.snapshot.generation) reject('owner-epoch');
+        if (next.projects.some(p => p.buildKey === d.key)) reject('project-exists');
+        if (!worldAccess(state, draft, true).ok || d.version !== version) reject('draft-changed');
       } }), draft);
-    if (result.kind === 'published' || result.reason === 'project-exists') {
+    if (result.kind === 'published' || (result.kind === 'refused' && duplicateAdmissions.get(result) === target)) {
       const current = rootRead(state), found = current.ok && ownedProject(current.value, d);
       const final = worldAccess(state, draft);
       if (found && final.ok) {
@@ -506,7 +530,7 @@ async function settledRoot(state, target) {
   let signalled = false, open = true;
   try {
     if (typeof a.value.ports.settledRead !== 'function') return no('settlement-unavailable');
-    await a.value.ports.settledRead(target, () => { if (open) signalled = true; });
+    await a.value.ports.settledRead(target, settled => { if (open && settled === target) signalled = true; });
   } catch { return no('settlement-unresolved'); }
   finally { open = false; }
   if (!signalled || !worldAccess(state).ok) return no('settlement-unresolved');
@@ -548,7 +572,7 @@ export function removeBuild(state, projectId) {
     if (!row.actionable) return outcome('refused', 'stored-recipe-unadmitted');
     if (!worldAccess(state).ok) return outcome('owner-changed', 'owner-changed');
     const target = freeze({ action: 'retire-work', buildKey: row.buildKey, projectId, operation: token() });
-    const result = await writeProject(state, target, (lc, observe) => lc.retire('projects', projectId, 'retire-completed', { observe }));
+    const result = await writeProject(state, target, (lc, observe) => lc.retire('projects', projectId, 'retire-completed', { observe, operation: target.operation }));
     if (['uncertain', 'owner-changed'].includes(result.kind)) s.removals.set(projectId, target);
     else s.removals.delete(projectId);
     return result;

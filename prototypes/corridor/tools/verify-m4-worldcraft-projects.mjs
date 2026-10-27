@@ -40,8 +40,9 @@ function encodeLocalJson(raw) {
   return { value, text, sha256: createHash('sha256').update(text).digest('hex') };
 }
 const dataURL = s => 'data:text/javascript;base64,' + Buffer.from(s).toString('base64');
+const consumerSource = readFileSync(new URL('m4-worldcraft.mjs', base), 'utf8'), consumerHash = sha(consumerSource);
 const lifecycleSource = readFileSync(new URL('journey-lifecycle.mjs', base), 'utf8');
-const lifecycleHash = '2b7adb9e74af464563ebc3106a178a5223035cc2f8894f6cc05bf4ea57095a93';
+const lifecycleHash = '59a523bcae9fa1d1d09312b3938cbaac6b1890be25a2cf15aff87f7698e4aaee';
 assert.equal(sha(lifecycleSource), lifecycleHash);
 const shimURL = dataURL("import {createHash} from 'node:crypto'; export " + encodeLocalJson.toString());
 const loadLifecycle = source => import(dataURL(source.replace("'./modules/record-core.mjs'", JSON.stringify(shimURL))));
@@ -55,7 +56,10 @@ async function fixture(api = subject, options = {}) {
   const saved = { status: 'active', migrationId: 'fixture-migration', scope: { profile: label, store: 'memory' }, revision: 0, commands: [], record: { untouched: 'sentinel' } };
   const binding = { epoch: 1 }, markers = new Map(), counts = { commit: 0, capture: 0, work: 0, retire: 0, hold: 0, tick: 0 };
   const c = { journeyWrites: true, worldcraftEnabled: true, owner: {}, record: {}, view: {}, navigation: {}, visit: null, carried: null,
-    beforeRead: null, beforeCommit: null, capture: null, work: null, observe: null, afterWork: null, settled: null, reflect: null, digest: null, mode: 'published' };
+    beforeRead: null, beforeCommit: null, capture: null, work: null, retire: null, observe: null, afterWork: null, afterRetire: null,
+    settled: null, reflect: null, digest: null, query: null, commitGet: null, commitCall: null, dependency: null, mode: 'published',
+    now: new Date('2026-10-27T12:00:00+09:00').getTime() };
+  const invocations = [], queries = [], settlements = [], submissions = [];
   let id = 0, lc, state, owner;
   function receipt(type, journey) {
     saved.revision++;
@@ -63,9 +67,9 @@ async function fixture(api = subject, options = {}) {
       type, scope: copy(saved.scope), committedRevision: saved.revision, ...(journey ? { journey } : {}) });
   }
   const port = {
-    snapshot: () => copy(saved), binding: () => ({ ...binding }), nextId: () => label + '-journey-' + ++id,
+    snapshot: () => { if (c.dependency) c.dependency(); return copy(saved); }, binding: () => ({ ...binding }), nextId: () => label + '-journey-' + ++id,
     async commit(expected, next, meta) {
-      counts.commit++; if (c.beforeCommit) await c.beforeCommit(expected, next, meta);
+      if (c.beforeCommit) await c.beforeCommit(expected, next, meta);
       if (expected.epoch !== binding.epoch || expected.rootHash !== digest(saved.record.m4Journey ?? null) ||
         expected.generation !== authority(saved).generation) return { outcome: 'not-published', acknowledged: false };
       if (c.mode === 'not-published') return { outcome: 'not-published', acknowledged: false };
@@ -74,43 +78,55 @@ async function fixture(api = subject, options = {}) {
       return { outcome: c.mode === 'uncertain-present' ? 'uncertain' : 'published', acknowledged: c.mode !== 'uncertain-present', rootHash: digest(next) };
     },
   };
+  const commit = port.commit;
+  Object.defineProperty(port, 'commit', { get() {
+    if (c.commitGet) c.commitGet();
+    return (...args) => { counts.commit++; submissions.push(args); return c.commitCall ? c.commitCall(...args, commit) : commit(...args); };
+  } });
   const boot = async () => {
     lc = (options.lifecycleFactory ?? createLifecycle)({ port, device: { read: k => markers.get(k), write: (k, v) => { markers.set(k, copy(v)); return true; }, remove: k => markers.delete(k) || true },
       buildId: options.buildId ?? '3A-2-test', core: { endOfDay: d => d.setHours(23, 59, 59, 999), validItem: () => false },
-      clock: () => new Date('2026-10-27T12:00:00+09:00').getTime(), enabled: true, validateCapture: () => { throw Error('not-a-real-capture-service'); } });
+      clock: () => c.now, enabled: true, validateCapture: () => { throw Error('not-a-real-capture-service'); } });
     await lc.ready;
   };
   await boot();
   const lifecycle = new Proxy({
     tick: async () => { counts.tick++; return lc.tick(); }, inspect: () => lc.inspect(),
     work: async (kind, data, opts) => {
-      counts.work++; if (c.work) await c.work(kind, data, opts);
+      counts.work++; invocations.push({ action: 'work', operation: opts.operation }); if (c.work) await c.work(kind, data, opts);
       const wrapped = { ...opts, observe: r => { if (c.observe) c.observe(r, opts.observe); else opts.observe(r); } };
       const result = await lc.work(kind, data, wrapped); if (c.afterWork) c.afterWork(); return result;
     },
     retire: async (kind, projectId, decision, opts) => {
-      counts.retire++; return lc.retire(kind, projectId, decision, { ...opts, observe: r => c.observe ? c.observe(r, opts.observe) : opts.observe(r) });
+      counts.retire++; invocations.push({ action: 'retire-work', operation: opts.operation }); if (c.retire) await c.retire(kind, projectId, decision, opts);
+      const result = await lc.retire(kind, projectId, decision, { ...opts, observe: r => c.observe ? c.observe(r, opts.observe) : opts.observe(r) });
+      if (c.afterRetire) c.afterRetire(); return result;
     },
     holdUnconfirmed: () => { counts.hold++; return lc.holdUnconfirmed(); },
+    preDispatchRefusal: (operation, error) => {
+      const query = (...args) => lc.preDispatchRefusal(...(args.length ? args : [operation, error]));
+      queries.push({ operation, error }); return c.query ? c.query(operation, error, query) : query();
+    },
   }, { getPrototypeOf(target) { if (c.reflect) c.reflect(); return Object.getPrototypeOf(target); } });
   const ports = {
     read() {
       if (c.beforeRead) c.beforeRead();
       return { owner: c.owner, record: c.record, epoch: binding.epoch, boot: lc.bootIdentity(),
-        journeyId: saved.record.m4Journey?.id ?? null, generation: saved.record.m4Journey?.generation ?? null,
+        journeyId: saved.record.m4Journey?.id ?? null, generation: authority(saved).generation,
         view: c.view, navigation: c.navigation, visit: c.visit, carried: c.carried,
         root: copy(saved.record.m4Journey ?? null), journeyWrites: c.journeyWrites, worldcraftEnabled: c.worldcraftEnabled };
     },
     capture: async (request, sink) => { counts.capture++; return c.capture ? c.capture(request, sink) : sink.kept(); },
     lifecycle, digest: root => { if (c.digest) c.digest(); return digest(root); },
-    settledRead: async (target, signal) => { if (c.settled) return c.settled(target, signal); signal(); },
+    settledRead: async (target, signal) => { settlements.push(target); if (c.settled) return c.settled(target, signal); signal(target); },
   };
   owner = actual(api.createWorldOwner(catalog, ports)); state = actual(api.createWorldcraftState(owner));
   const reset = () => { for (const k of Object.keys(counts)) counts[k] = 0; };
   const draft = (host = '織') => actual(api.beginBuild(state, catalog, host));
   const assembled = async (host = '織') => { const d = draft(host); actual(await api.assembleBuild(state, d, actual(api.createWorldView(owner)))); return d; };
   reset();
-  return { api, catalog, owner, state, saved, binding, c, counts, ports, lifecycle, draft, assembled, reset,
+  return { api, catalog, owner, state, saved, binding, c, counts, ports, lifecycle, draft, assembled, reset, invocations, queries, settlements, submissions,
+    deliver: (...args) => commit(...args), // delayed completion of an already issued synthetic target, not another submission
     lc: () => lc, root: () => saved.record.m4Journey, bytes: () => JSON.stringify(saved.record),
     reload: async () => { binding.epoch++; await boot(); },
     restore: async () => { receipt('host.restore/2'); binding.epoch++; await boot(); },
@@ -227,7 +243,7 @@ async function reconcileOracle(api) {
   kind(await api.keepBuild(f.state,d),'uncertain'); const commits=f.counts.commit; let late;
   f.c.settled=(_,signal)=>{late=signal;return {settled:true};}; kind(await api.reconcileBuild(f.state,d),'unresolved'); late();
   kind(await api.keepBuild(f.state,d),'uncertain'); assert.equal(f.counts.commit,commits);
-  f.c.settled=(_,signal)=>signal(); kind(await api.reconcileBuild(f.state,d),'absent'); f.c.mode='published';
+  f.c.settled=(target,signal)=>signal(target); kind(await api.reconcileBuild(f.state,d),'absent'); f.c.mode='published';
   kind(await api.keepBuild(f.state,d),'published'); assert.equal(f.root().projects.length,1);
 }
 await test('uncertain absent read cannot enable retry; own terminal reconciliation can; late signal ignored',()=>reconcileOracle(subject));
@@ -239,7 +255,8 @@ await test('uncertain present root reconciles without append or historical succe
   kind(await subject.removeBuild(f.state,id),'absent');assert.equal(f.counts.commit,2);assert.equal(f.root().projects.length,0);
 });
 await test('confirmed nonpublication does not claim success; stale display suppresses toast after exact publication',async()=>{
-  const f=await fixture(),d=await f.assembled();f.c.mode='not-published';kind(await subject.keepBuild(f.state,d),'not-published');
+  const f=await fixture(),d=await f.assembled();f.c.mode='not-published';const noPublication=await subject.keepBuild(f.state,d);
+  kind(noPublication,'not-published');assert.equal(noPublication.reason,'publication-hold');assert.equal(f.counts.hold,0);
   assert.equal(f.root().projects.length,0);f.c.mode='published';f.c.afterWork=()=>{f.c.view={};};
   const r=await subject.keepBuild(f.state,d);kind(r,'published');assert.equal(r.display,false);
 });
@@ -374,14 +391,214 @@ await test('real lifecycle reload retains projects but invalidates model owner; 
   const h=await fixture();h.saved.record.m4Journey.protocol='future';const before=h.bytes();h.reset();await h.reload();
   assert.equal(h.lc().inspect().phase,'invalid-root-hold');assert.equal(h.bytes(),before);assert.equal(h.counts.commit,0);
 });
-async function mutant(before,after){let s=readFileSync(new URL('m4-worldcraft.mjs',base),'utf8');assert.equal(s.split(before).length,2,'unique mutant target');s=s.replace(before,after);
+const oldLabels = ['project-exists','work-bound','root-invalid','byte-bound','root-unavailable','switch-off',
+  'owner-epoch','generation-changed','stale-root','view-stale','draft-changed','work-missing','explicit-retirement'];
+let textMatrixCases = 0;
+async function unobserved(api, action = 'keep', edge = 'after', value = new Error('byte-bound')) {
+  const f = await fixture(api), d = await f.assembled(); let id;
+  if (action === 'remove') { kind(await api.keepBuild(f.state,d),'published'); id=f.root().projects[0].id; }
+  f.reset(); f.c.observe=()=>{};
+  const fail=()=>{throw value;};
+  if(edge==='getter')f.c.commitGet=fail;
+  if(edge==='call')f.c.commitCall=fail;
+  if(edge==='await')f.c.beforeCommit=async()=>{throw value;};
+  if(edge==='dependency')f.c.dependency=fail;
+  if(edge==='after-dependency')f.c.commitCall=async(expected,next,meta,commit)=>{
+    const result=await commit(expected,next,meta);f.c.dependency=fail;return result;
+  };
+  if(edge==='after')f.c[action==='keep'?'afterWork':'afterRetire']=fail;
+  const invoke=()=>action==='keep'?api.keepBuild(f.state,d):api.removeBuild(f.state,id);
+  const first=await invoke();
+  assert.equal(first.kind,'uncertain','U1 unobserved failure remains uncertain');
+  assert.equal(f.counts.hold,1,'U1 owned unobserved failure requests hold');
+  if(action==='keep')assert.equal(actual(api.inspectBuild(f.state,d)).uncertain,true,'U1 Keep retains uncertainty');
+  const originalOperation=f.invocations.at(-1).operation, counts={...f.counts};
+  assert.ok(originalOperation && typeof originalOperation==='object');
+  assert.strictEqual(f.queries.at(-1).operation,originalOperation);
+  assert.strictEqual(f.queries.at(-1).error,value,'exact escaping value reaches query');
+  for(const k of ['commitGet','commitCall','beforeCommit','dependency','afterWork','afterRetire','observe'])f.c[k]=null;
+  f.c.settled=()=>{};
+  const second=await invoke();
+  assert.equal(second.kind,action==='keep'?'uncertain':'unresolved','U1 retry cannot bypass settlement');
+  assert.equal(f.counts.work,counts.work,'U1 unresolved Keep cannot issue another work');
+  assert.equal(f.counts.retire,counts.retire,'U1 unresolved removal cannot issue another retire');
+  assert.equal(f.counts.commit,counts.commit,'U1 unresolved target cannot issue another commit');
+  return {f,d,id,invoke,originalOperation,counts};
+}
+async function textOracle(api, labels = oldLabels, edges = ['getter','call','await','dependency','after-dependency','after']) {
+  for(const action of ['keep','remove'])for(const label of labels)for(const edge of edges) {
+    await unobserved(api,action,edge,new Error(label)); textMatrixCases++;
+  }
+}
+await test('U1 all former refusal labels stay uncertain through getter/call/await/pre-and-post-dependency/after paths for Keep and remove',()=>textOracle(subject));
+async function shortcutOracle(api) { await unobserved(api,'keep','after',new Error('project-exists')); }
+await test('U1 raw project-exists after publication never becomes exists or saved',()=>shortcutOracle(subject));
+await test('U1 falsy, copied and proxy thrown values are not inspected for authority',async()=>{
+  let callbacks=0;
+  const hostile=new Proxy(new Error('byte-bound'),{get(){callbacks++;throw Error('get');},getPrototypeOf(){callbacks++;throw Error('proto');},getOwnPropertyDescriptor(){callbacks++;throw Error('descriptor');},ownKeys(){callbacks++;throw Error('keys');}});
+  for(const value of [undefined,null,false,0,'byte-bound',{name:'Error',message:'byte-bound'},hostile]) {
+    // Explicit undefined must not select unobserved's default argument.
+    const f=await fixture(),d=await f.assembled();f.c.observe=()=>{};f.c.afterWork=()=>{throw value;};
+    kind(await subject.keepBuild(f.state,d),'uncertain');assert.strictEqual(f.queries.at(-1).error,value);
+    assert.equal(f.counts.hold,1);kind(await subject.keepBuild(f.state,d),'uncertain');assert.equal(f.counts.commit,1);
+  }
+  assert.equal(callbacks,0,'U1 no callbacks on thrown value');
+});
+async function pendingOracle(api, action) {
+  for(const edge of ['call','await'])for(const publishedLate of [false,true]) {
+    const {f,d,invoke,originalOperation,counts}=await unobserved(api,action,edge);
+    const issued=f.submissions.at(-1);let originalTarget,late;
+    const reconcile=()=>action==='keep'?api.reconcileBuild(f.state,d):invoke();
+    for(const mode of ['return-only','missing','copy','operation-only','wrong','late']) {
+      f.c.settled=(target,signal)=>{
+        assert.strictEqual(target.operation,originalOperation,'settlement receives original operation');
+        if(originalTarget)assert.strictEqual(target,originalTarget,'settlement retains exact original target');else originalTarget=target;
+        if(mode==='return-only')return {settled:true,target};
+        if(mode==='missing')signal();
+        if(mode==='copy')signal({...target});
+        if(mode==='operation-only')signal({operation:target.operation});
+        if(mode==='wrong')signal({});
+        if(mode==='late')late=()=>signal(target);
+      };
+      assert.equal((await reconcile()).kind,'unresolved','U1 only exact timely target settles');if(late)late();
+      assert.equal(f.counts.commit,counts.commit,'U1 no second submission before terminal signal');
+    }
+    if(publishedLate)await f.deliver(...issued);
+    f.c.settled=(target,signal)=>{assert.strictEqual(target,originalTarget);signal(target);};
+    const terminal=await reconcile();
+    if(action==='keep') {
+      kind(terminal,publishedLate?'present':'absent');kind(await invoke(),publishedLate?'exists':'published');
+    } else kind(terminal,publishedLate?'absent':'published');
+    assert.equal(f.counts.commit,counts.commit+(publishedLate?0:1),'only confirmed nonpublication permits a fresh submission');
+    if(!publishedLate)assert.notStrictEqual(f.invocations.at(-1).operation,originalOperation);
+    assert.equal(f.root().projects.length,action==='keep'?1:0);
+  }
+}
+await test('U1 Keep retains exact target through sync/async failure and all nonterminal signals',()=>pendingOracle(subject,'keep'));
+await test('U1 remove retains exact target through sync/async failure and all nonterminal signals',()=>pendingOracle(subject,'remove'));
+async function guardFixture(api) {
+  const f=await fixture(api),d=await f.assembled(),r=sized(f.root(),LIMITS.dataBytes);r.revision++;await f.sync(r);f.reset();return {f,d};
+}
+await test('U1 query exact operation/error/action/collection/instance; missing or throwing capability fails closed',async()=>{
+  for(const mode of ['missing','throws','wrong-operation','wrong-error','proxy-error','other-instance','wrong-action','wrong-collection','wrong-source']) {
+    const {f,d}=await guardFixture(subject),other=mode==='other-instance'?await fixture():null;let callbacks=0;
+    if(mode==='missing')delete f.lifecycle.preDispatchRefusal;
+    else f.c.query=(op,error,query)=>{
+      if(mode==='throws')throw Error('byte-bound');
+      if(mode==='wrong-operation')return query({},error);
+      if(mode==='wrong-error')return query(op,new Error('byte-bound'));
+      if(mode==='proxy-error')return query(op,new Proxy(error,{get(){callbacks++;},getOwnPropertyDescriptor(){callbacks++;},getPrototypeOf(){callbacks++;}}));
+      if(mode==='other-instance')return other.lc().preDispatchRefusal(op,error);
+      const proof=query();assert.equal(proof.reason,'byte-bound');
+      return {...proof,...(mode==='wrong-action'?{action:'retire-work'}:mode==='wrong-collection'?{collection:'goals'}:{source:'copied-tag'})};
+    };
+    kind(await subject.keepBuild(f.state,d),mode==='missing'?'refused':'uncertain');
+    assert.equal(f.counts.work,mode==='missing'?0:1);assert.equal(f.counts.commit,0);assert.equal(callbacks,0);
+    assert.equal(f.counts.hold,mode==='missing'?0:1);
+  }
+  for(const firstRefused of [false,true]) {
+    const f=await fixture(),d=await f.assembled();f.c.work=async(k,data,opts)=>{
+      try{await f.lc().work(k,firstRefused?{padding:'x'.repeat(LIMITS.bytes)}:data,{operation:opts.operation});}catch{}
+    };
+    kind(await subject.keepBuild(f.state,d),'uncertain');assert.equal(f.counts.commit,firstRefused?0:1);
+    kind(await subject.keepBuild(f.state,d),'uncertain');assert.equal(f.counts.work,1);
+  }
+});
+async function admissionOracle(api, mode) {
+  const f=await fixture(api),d=await f.assembled(),view=f.c.view;let priorError;
+  if(mode==='replayed-target') {
+    f.c.work=()=>{f.c.view={};};f.c.query=(op,error,query)=>{priorError=error;return query();};
+    kind(await api.keepBuild(f.state,d),'refused');assert.equal(f.counts.hold,0);
+    f.c.view=view;f.c.query=null;
+  }
+  f.c.work=(k,data,opts)=>{
+    const admit=opts.admit;
+    opts.admit=root=>{
+      if(mode==='replayed-target')throw priorError;
+      if(mode==='arbitrary')throw Error('project-exists');
+      f.c.view={};
+      try{admit(root);}catch(error){f.c.view=view;throw new Error(error.message,{cause:error});}
+    };
+  };
+  const result=await api.keepBuild(f.state,d);
+  assert.equal(result.kind,'uncertain',mode==='replayed-target'?'U1 admission error binds original target':'U1 admission requires exact private escaping error');
+  assert.equal(f.counts.commit,0);assert.equal(f.counts.hold,1);
+  assert.equal(actual(api.inspectBuild(f.state,d)).uncertain,true);
+}
+await test('U1 admission error is private to exact target/draft/version and exact escaping identity',async()=>{
+  for(const mode of ['replayed-target','copied-error','arbitrary'])await admissionOracle(subject,mode);
+});
+async function queryFenceOracle(api) {
+  const {f,d}=await guardFixture(api);f.c.query=(op,error,query)=>{const proof=query();f.c.record={};return proof;};
+  assert.equal((await api.keepBuild(f.state,d)).kind,'owner-changed','U1 post-query owner fence');
+  assert.equal(f.counts.hold,0);assert.equal(f.counts.commit,0);kind(await api.keepBuild(f.state,d),'refused');
+}
+await test('U1 owner fences before/after query and reentrant query never revive stale outcomes',async()=>{
+  await queryFenceOracle(subject);
+  const f=await fixture(),d=await f.assembled();f.c.work=(k,data,opts)=>{opts.admit=()=>{f.c.record={};throw Error('byte-bound');};};
+  kind(await subject.keepBuild(f.state,d),'owner-changed');assert.equal(f.queries.length,0);assert.equal(f.counts.commit,0);
+  const {f:g,d:x}=await guardFixture(subject);let joined;
+  g.c.query=(op,error,query)=>{joined=subject.keepBuild(g.state,x);return query();};
+  const pending=subject.keepBuild(g.state,x);kind(await pending,'structural');assert.strictEqual(joined,pending);assert.equal(g.counts.work,1);
+});
+await test('U1 reentrant admission joins its reserved target and fences owner or boot replacement',async()=>{
+  for(const mode of ['join','owner','boot']) {
+    const f=await fixture(),d=await f.assembled();let joined,boot;
+    f.c.work=(k,data,opts)=>{const admit=opts.admit;opts.admit=root=>{
+      joined=subject.keepBuild(f.state,d);
+      if(mode==='owner')f.c.record={};
+      if(mode==='boot')boot=f.lc().boot();
+      return admit(root);
+    };};
+    const pending=subject.keepBuild(f.state,d);kind(await pending,mode==='join'?'published':'owner-changed');
+    if(boot)await boot;assert.strictEqual(joined,pending);assert.equal(f.counts.work,1);
+    assert.equal(f.counts.commit,mode==='join'?1:0);assert.equal(f.root().projects.length,mode==='join'?1:0);
+    if(mode!=='join'){kind(await subject.keepBuild(f.state,d),'refused');assert.equal(f.counts.work,1);}
+  }
+});
+await test('U1 post-entry getter reboot may publish but cannot revive old owner or issue a second target',async()=>{
+  for(const action of ['keep','remove'])for(const throws of [false,true]) {
+    const f=await fixture(),d=await f.assembled();let id;
+    if(action==='remove'){kind(await subject.keepBuild(f.state,d),'published');id=f.root().projects[0].id;}
+    f.reset();let boot;f.c.observe=()=>{};const escaping=new Error('byte-bound');
+    f.c.commitGet=()=>{f.c.commitGet=null;boot=f.lc().boot();if(throws)throw escaping;};
+    const invoke=()=>action==='keep'?subject.keepBuild(f.state,d):subject.removeBuild(f.state,id);
+    kind(await invoke(),'owner-changed');await boot;
+    assert.equal(f.counts.commit,throws?0:1);assert.equal(f.root().projects.length,action==='keep'?(throws?0:1):(throws?1:0));
+    const op=f.invocations.at(-1).operation;assert.equal(f.lc().preDispatchRefusal(op,escaping),null,'exact post-entry escaping error is never pre-dispatch proof');
+    kind(await invoke(),'refused');assert.equal(f.counts.commit,throws?0:1);assert.equal(f.counts.hold,0);
+  }
+});
+await test('U1 queued boot/owner/generation replacement cannot publish a stale target',async()=>{
+  for(const mode of ['boot','owner','generation']) {
+    const f=await fixture(),d=await f.assembled(),gate=deferred(),entered=deferred(),invoked=deferred();
+    f.c.beforeCommit=async()=>{entered.resolve();await gate.promise;};
+    const busy=f.lc().work('goals',{status:'unfinished'});await entered.promise;
+    const queued=mode==='boot'?f.lc().boot():null;
+    f.c.work=()=>{invoked.resolve();};const pending=subject.keepBuild(f.state,d);await invoked.promise;await Promise.resolve();await Promise.resolve();
+    if(mode==='owner')f.binding.epoch++;
+    if(mode==='generation')f.saved.migrationId='changed-generation';
+    gate.resolve();await Promise.allSettled([busy,queued]);
+    kind(await pending,'owner-changed');assert.equal(f.counts.work,1);assert.equal(f.root().projects.length,0);
+    const count=f.counts.commit;kind(await subject.keepBuild(f.state,d),'refused');assert.equal(f.counts.commit,count);
+  }
+});
+await test('U1 witnessed refusal after day rotation proves zero target writes, not zero total writes',async()=>{
+  const {f,d}=await guardFixture(subject),epoch=f.root().dayEpoch,receipts=f.saved.commands.length;
+  f.c.now+=86400000;
+  kind(await subject.keepBuild(f.state,d),'structural');assert.equal(f.root().dayEpoch,epoch+1);
+  assert.equal(f.counts.commit,1);assert.equal(f.counts.hold,0);assert.equal(f.root().projects.length,0);
+  assert.deepEqual(f.saved.commands.slice(receipts).map(r=>r.journey.action),['rotate']);
+  const {operation,error}=f.queries.at(-1);assert.equal(f.lc().preDispatchRefusal(operation,error).reason,'byte-bound');
+});
+async function mutant(before,after,source=consumerSource){let s=source;assert.equal(s.split(before).length,2,'unique mutant target');s=s.replace(before,after);
   for(const f of ['kanji-family.js','kanji-structure.js'])s=s.replace("'./"+f+"'",JSON.stringify(new URL(f,base).href));return import(dataURL(s));}
 let killed=0;
 for(const [name,before,after,oracle] of [
   ['OFF guard removed',"if (!r.value.journeyWrites || !r.value.worldcraftEnabled) return no('worldcraft-off');\n  if (requireView","if (false) return no('worldcraft-off');\n  if (requireView",offOracle],
   ['capture proof omitted',"|| failed || !proof)","|| failed)",captureOracle],
   ['same-key reservation join removed',"if (s.inflight.has(key)) return s.inflight.get(key);","if (false) return s.inflight.get(key);",overlapOracle],
-  ['queued duplicate admission removed',"if (next.projects.some(p => p.buildKey === d.key)) throw new Error('project-exists');","if (false) throw new Error('project-exists');",queuedOracle],
+  ['queued duplicate admission removed',"if (next.projects.some(p => p.buildKey === d.key)) reject('project-exists');","if (false) reject('project-exists');",queuedOracle],
   ['target action verification removed',"observed?.action === target.action && observed.outcome === 'published'","observed?.action && observed.outcome === 'published'",observerOracle],
   ['publication exception ignored',"exact = !thrown && count === 1", "exact = count === 1",observerOracle],
   ['ack verification removed',"observed.acknowledged === true && /^[a-f0-9]{64}$/", "true && /^[a-f0-9]{64}$/",observerOracle],
@@ -391,11 +608,45 @@ for(const [name,before,after,oracle] of [
 ]){
   const api=await mutant(before,after);await assert.rejects(()=>oracle(api),{code:'ERR_ASSERTION'},name);killed++;console.log('KILLED '+name);
 }
+const u1Mutants=[];
+for(const [name,before,after,oracle,message] of [
+  ['error text whitelist restored','  if (count === 0 && thrown) {',
+    "  if (count === 0 && thrown && "+JSON.stringify(oldLabels)+".includes(caught?.message)) return outcome('structural', caught.message);\n  if (count === 0 && thrown) {",
+    api=>unobserved(api,'keep','after'), 'U1 unobserved failure remains uncertain'],
+  ['private admission target ignored','own?.target === target','own?.target !== undefined',
+    api=>admissionOracle(api,'replayed-target'),'U1 admission error binds original target'],
+  ['private escaping error replaced by copied cause','admissionRefusals.get(caught)','admissionRefusals.get(caught?.cause)',
+    api=>admissionOracle(api,'copied-error'),'U1 admission requires exact private escaping error'],
+  ['post-query owner fence omitted',
+    "    if (!worldAccess(state).ok) return outcome('owner-changed', 'owner-changed', observed); // after query and reflection",
+    '    // mutant omits post-query ownership',queryFenceOracle,'U1 post-query owner fence'],
+  ['Keep pending uncertainty cleared on throw',"d.uncertain = ['uncertain', 'owner-changed'].includes(result.kind);",'d.uncertain = false;',
+    api=>unobserved(api,'keep','call'),'U1 Keep retains uncertainty'],
+  ['remove pending target cleared on throw',"if (['uncertain', 'owner-changed'].includes(result.kind)) s.removals.set(projectId, target);",
+    'if (false) s.removals.set(projectId, target);',api=>unobserved(api,'remove','call'),'U1 retry cannot bypass settlement'],
+  ['settlement accepts wrong target','if (open && settled === target) signalled = true','if (open) signalled = true',
+    api=>pendingOracle(api,'keep'),'U1 only exact timely target settles'],
+]) {
+  const api=await mutant(before,after);
+  await assert.rejects(()=>oracle(api),e=>e.code==='ERR_ASSERTION'&&e.message.includes(message),name+' intended invariant');
+  killed++;u1Mutants.push(name);console.log('KILLED U1 '+name);
+}
+// Diagnostic carrier only: production deliberately no longer copies thrown text.
+// First prove an uncertain project-exists reason cannot bypass the private gate;
+// then restore JUST that raw shortcut on identical carrier bytes. No whitelist.
+const uncertainReturn="return outcome('uncertain', 'publication-unproved', observed);";
+const carrierReturn="return outcome('uncertain', 'project-exists', observed);";
+assert.equal(consumerSource.split(uncertainReturn).length,2);
+const carrierSource=consumerSource.replace(uncertainReturn,carrierReturn);
+await shortcutOracle(await mutant(uncertainReturn,carrierReturn));
+const rawShortcut=await mutant("(result.kind === 'refused' && duplicateAdmissions.get(result) === target)","result.reason === 'project-exists'",carrierSource);
+await assert.rejects(()=>shortcutOracle(rawShortcut),e=>e.code==='ERR_ASSERTION'&&e.message.includes('U1 unobserved failure remains uncertain'),'raw shortcut intended invariant');
+killed++;u1Mutants.push('raw project-exists shortcut restored on passing diagnostic carrier');console.log('KILLED U1 raw project-exists shortcut');
 // Only in memory: restore the parent's pre-stamp eligibility decision. Both
 // independent fixtures must reach their own behavioral assertion, not a pin or
 // setup failure. No protected file is edited, and the same digest shim is used.
-const newOrder = 'write(next,action,{shrink:shrinkingControl,observe})';
-const oldOrder = 'write(next,action,{control:shrinkingControl&&bytes(next)<bytes(root),observe})';
+const newOrder = 'write(next,action,{shrink:shrinkingControl,observe,attempt})';
+const oldOrder = 'write(next,action,{control:shrinkingControl&&bytes(next)<bytes(root),observe,attempt})';
 assert.equal(lifecycleSource.split(newOrder).length, 2, 'unique lifecycle mutation target');
 const oldOrderSource = lifecycleSource.replace(newOrder, oldOrder);
 const oldLifecycle = await loadLifecycle(oldOrderSource);
@@ -413,7 +664,8 @@ for (const [path, oracle, message] of [
   oldOrderNegatives.push(path); console.log('KILLED old-order independently: ' + path);
 }
 killed++;
-console.log(JSON.stringify({verifier:'m4-worldcraft-projects',cases,mutantsKilled:killed,moduleMutantsKilled:killed-1,
+assert.equal(sha(readFileSync(new URL('m4-worldcraft.mjs',base))),consumerHash,'consumer bytes unchanged during probe');
+console.log(JSON.stringify({verifier:'m4-worldcraft-projects',cases,mutantsKilled:killed,moduleMutantsKilled:killed-1,consumerHash,textMatrixCases,u1Mutants,
   lifecycleMutantsKilled:1,oldOrderNegatives,oldOrderSourceSHA256:sha(oldOrderSource),retirementObservations,
   passed:unsupported.length===0,controlsPassed:true,unsupported,lifecycleHash,
   evidence:'unchanged lifecycle rule body; in-memory record-core digest shim; simulated ON record/CAS/device/capture/settlement authority; no real host/storage/capture admission'}));
