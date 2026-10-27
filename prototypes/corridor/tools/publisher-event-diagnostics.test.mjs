@@ -785,7 +785,7 @@ test('EV4: a stream fault stops only the stream; replaced main invalidates the b
 
 test('EV4: mutationStream gives its own verdict; missing binding, fault or overflow are INCONCLUSIVE, so absent rows prove nothing', () => {
   const binding = { docId: DOC, main: [1, 'main'], section: [2, 'section'], at: 1, invalidated: null };
-  const rows = [{ id: 'mutation', seq: 1, truncated: false }, { id: 'mutation-batch', batch: 1 }];
+  const rows = [{ id: 'mutation', seq: 1, truncated: false }, { id: 'mutation-batch', batch: 1, geometry: { seq: 9, bounded: [], error: null } }];
   assert.equal(mutationStream({ rows, recorder: { binding } }).verdict, 'OBSERVED');
   assert.deepEqual(mutationStream({ rows, recorder: {} }).reasons, ['no main/section binding']);
   assert.equal(mutationStream({ rows, recorder: { binding, mutationFault: 'x' } }).verdict, 'INCONCLUSIVE');
@@ -811,4 +811,62 @@ test('EV4: ladder observables are source-verified selectors, bounded to four det
     assert.deepEqual([sample.ladder.gloss.details[0].wait, sample.ladder.gloss.details[0].miss], [true, false]);
     assert.deepEqual([sample.ladder.glossedWords, sample.ladder.visibleReadings, sample.ladder.ruby.count], [1, 0, 0]);
   } finally { restore(); }
+});
+
+/* ---------------------------------------------------------------- EV4 corrections (W2 2055: R1 bounded refs, R2 null, R3 completeness) */
+test('EV4-R1: every EV4 description is bounded to 240 characters, numeric ids still join, and clipping is flagged', () => {
+  const restore = keepEventPrototype();
+  try {
+    const p = streamPage();
+    const long = 'L'.repeat(2200);
+    const body = p.element('DIV', 1, { id: 'publisher-body' });
+    const rung = p.element('SPAN', 1, { id: long, className: long, attrs: { 'data-ladder-rung': long } });
+    body.querySelectorAll = (selector) => (selector === '[data-ladder-rung]' ? [rung] : []);
+    const byId = p.win.document.getElementById;
+    p.win.document.getElementById = (id) => (id === 'publisher-body' ? body : byId(id));
+    installEventDiagnostics(p.win);
+    p.win.__evDiagArm(true);
+    const parent = p.element('DIV', 1, { id: long, className: long }), sibling = p.element('B', 1, { id: long }), added = p.element('SPAN', 1, { id: long, className: long });
+    p.deliver([record('childList', parent, { addedNodes: [added], previousSibling: sibling, nextSibling: sibling })]);
+    const row = p.win.__evDiag.rows.find((r) => r.id === 'mutation');
+    const batch = p.win.__evDiag.rows.find((r) => r.id === 'mutation-batch');
+    const strings = [];
+    const walk = (value) => { if (typeof value === 'string') strings.push(value); else if (value && typeof value === 'object') for (const v of Object.values(value)) walk(v); };
+    walk(row); walk(batch.geometry.ladder); walk(batch.geometry.extra); walk(p.win.__evDiag.binding);
+    assert.equal(strings.filter((text) => text.length > 240).length, 0, 'no EV4 descriptive field exceeds its bound');
+    assert.equal(row.truncated, true);
+    assert.equal(row.target.node[0], p.win.__diagId(parent), 'the numeric id still joins');
+    assert.equal(row.previous[0], p.win.__diagId(sibling));
+    assert.equal(batch.geometry.extra[0].node[0], p.win.__diagId(added));
+    assert(batch.geometry.bounded.includes('ladder-metadata') && batch.geometry.bounded.includes('extra-metadata'), 'sample-level clipping is named');
+    assert.equal(batch.geometry.ladder.rungs.details[0].rung.length, 240);
+  } finally { restore(); }
+});
+
+test('EV4-R2: an attribute absent at delivery stays null and an empty present value stays empty', () => {
+  const restore = keepEventPrototype();
+  try {
+    const p = streamPage();
+    installEventDiagnostics(p.win);
+    p.win.__evDiagArm(true);
+    const removed = p.element('P', 1), empty = p.element('P', 1, { attrs: { hidden: '' } });
+    p.deliver([record('attributes', removed, { attributeName: 'hidden', oldValue: '' }), record('attributes', empty, { attributeName: 'hidden', oldValue: null })]);
+    const rows = p.win.__evDiag.rows.filter((r) => r.id === 'mutation');
+    assert.deepEqual(rows.map((r) => [r.oldValue, r.valueAtDelivery]), [['', null], [null, '']]);
+  } finally { restore(); }
+});
+
+test('EV4-R3: clipped rows or a failed/bounded batch sample make the stream explicitly incomplete; complete input stays positive', () => {
+  const binding = { docId: DOC, main: [1, 'main'], section: [2, 'section'], at: 1, invalidated: null };
+  const ok = { id: 'mutation-batch', batch: 1, geometry: { seq: 3, bounded: [], error: null } };
+  const complete = mutationStream({ rows: [{ id: 'mutation', truncated: false }, ok], recorder: { binding } });
+  assert.deepEqual([complete.verdict, complete.complete], ['OBSERVED', true]);
+  const clipped = mutationStream({ rows: [{ id: 'mutation', truncated: true }, ok], recorder: { binding } });
+  assert.deepEqual([clipped.verdict, clipped.complete, clipped.rows.length], ['INCONCLUSIVE', false, 1], 'raw rows are kept');
+  assert.match(clipped.reasons[0], /clipped metadata/);
+  for (const geometry of [{ seq: 3, bounded: ['extra'] }, { seq: 3, bounded: [], error: 'rect gone' }, { label: 'x', truncated: true }, undefined]) {
+    const result = mutationStream({ rows: [{ id: 'mutation', truncated: false }, { id: 'mutation-batch', batch: 1, geometry }], recorder: { binding } });
+    assert.equal(result.verdict, 'INCONCLUSIVE', JSON.stringify(geometry));
+    assert.match(result.reasons.join(' '), /mutation-batch geometry/);
+  }
 });

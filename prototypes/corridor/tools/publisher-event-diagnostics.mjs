@@ -103,6 +103,12 @@ export function installEventDiagnostics(win, cap = 5000) {
     ...NODE_NAMES.map((name) => `${name}:rect,offsets,style,animations`), 'surfaces:rect', 'ladder:rect', 'extra:rect', 'documentAnimations'];
   // EV4 (W2 2037): bounded mutation stream; these repeat MUTATION_LIMITS for the same page-source reason
   const MUTATION_ROWS = 128, NODES_PER_ROW = 8, FIELD = 240, LADDER_DETAILS = 4, EXTRA_RECTS = 8;
+  // EV4 references keep the private numeric id (so rows still join) and bound only the description (W2 EV4-R1)
+  const bref = (node, flags) => {
+    const [id, text] = ref(node);
+    if (typeof text === 'string' && text.length > FIELD) { flags.truncated = true; return [id, text.slice(0, FIELD)]; }
+    return [id, text];
+  };
   const GEOMETRY_CAP = 200, ANIMATION_CAP = 16, OFFSET_DEPTH = 10, APPROACH_CAP = 24, ARMED_ROW_CAP = 64, MENU = 'vocabulary-list-popover';
   let geometrySeq = 0, armed = false, approachRows = 0, armedRows = 0;
   Object.assign(state, { geometryTruncated: false, approachTruncated: false, armedRowsTruncated: false });
@@ -157,19 +163,23 @@ export function installEventDiagnostics(win, cap = 5000) {
   const ladderOf = (sample) => {
     const body = doc().getElementById('publisher-body') || doc().getElementById('source-reader-body');
     if (!body) return { body: null };
+    const flags = { truncated: false };
     const detail = (selector, extra) => {
       const all = Array.from(body.querySelectorAll(selector));
       return { count: all.length, partial: all.length > LADDER_DETAILS,
-        details: all.slice(0, LADDER_DETAILS).map((node) => ({ node: ref(node), connected: node.isConnected, ...extra(node), rect: liveRect(node, sample) })) };
+        details: all.slice(0, LADDER_DETAILS).map((node) => ({ node: bref(node, flags), connected: node.isConnected, ...extra(node), rect: liveRect(node, sample) })) };
     };
-    return {
-      body: { node: ref(body), id: body.id, rect: liveRect(body, sample) },
-      rungs: detail('[data-ladder-rung]', (node) => ({ rung: String(node.getAttribute('data-ladder-rung')).slice(0, FIELD) })),
+    const rungOf = (node) => { const value = node.getAttribute('data-ladder-rung'); return value === null ? null : clip(value, flags); };
+    const out = {
+      body: { node: bref(body, flags), id: clip(body.id, flags), rect: liveRect(body, sample) },
+      rungs: detail('[data-ladder-rung]', (node) => ({ rung: rungOf(node) })),
       gloss: detail('.tok-en', (node) => ({ wait: node.classList.contains('tok-en-wait'), miss: node.classList.contains('tok-en-miss') })),
       ruby: detail('ruby[data-r]', () => ({})),
       visibleReadings: body.querySelectorAll('rt:not(.hidden-rt)').length,
       glossedWords: body.querySelectorAll('.has-en').length,
     };
+    if (flags.truncated) sample.bounded.push('ladder-metadata');
+    return out;
   };
   const sampleGeometry = (label, extra = []) => {
     if (geometrySeq >= GEOMETRY_CAP) { state.geometryTruncated = true; return { label, truncated: true }; }
@@ -197,8 +207,10 @@ export function installEventDiagnostics(win, cap = 5000) {
       }
       sample.ladder = ladderOf(sample);
       if (extra.length > EXTRA_RECTS) sample.bounded.push('extra');
-      sample.extra = extra.slice(0, EXTRA_RECTS).map((node) => ({ node: ref(node), connected: node.isConnected,
+      const extraFlags = { truncated: false };
+      sample.extra = extra.slice(0, EXTRA_RECTS).map((node) => ({ node: bref(node, extraFlags), connected: node.isConnected,
         rect: node.isConnected ? liveRect(node, sample) : null }));
+      if (extraFlags.truncated) sample.bounded.push('extra-metadata');
       sample.documentAnimations = animationsOf(doc().getAnimations ? doc().getAnimations() : [], sample.bounded, 'animations:document');
     } catch (error) { sample.error = String((error && error.message) || error); }
     sample.t1 = now();
@@ -226,10 +238,10 @@ export function installEventDiagnostics(win, cap = 5000) {
   };
   const nodeMeta = (node, flags) => {
     if (!node) return null;
-    if (node.nodeType === 1) return { node: ref(node), kind: 'element', tag: String(node.tagName).toLowerCase(), id: clip(node.id, flags),
+    if (node.nodeType === 1) return { node: bref(node, flags), kind: 'element', tag: clip(String(node.tagName).toLowerCase(), flags), id: clip(node.id, flags),
       classes: clip(typeof node.className === 'string' ? node.className : '', flags), connected: node.isConnected };
-    if (node.nodeType === 3) return { node: ref(node), kind: 'text', length: String(node.data ?? '').length, connected: node.isConnected };
-    return { node: ref(node), kind: `node:${node.nodeType}`, connected: node.isConnected };
+    if (node.nodeType === 3) return { node: bref(node, flags), kind: 'text', length: String(node.data ?? '').length, connected: node.isConnected };
+    return { node: bref(node, flags), kind: `node:${node.nodeType}`, connected: node.isConnected };
   };
   const relationOf = (target) => {
     if (!target.isConnected) return 'detached'; // never compareDocumentPosition on a detached node
@@ -261,11 +273,12 @@ export function installEventDiagnostics(win, cap = 5000) {
         const flags = { truncated: false };
         const row = { id: 'mutation', seq: ++mutationSeq, batch, delivered: t, type: record.type, target: nodeMeta(target, flags),
           relation, relationAt: 'delivery', retainedContext: retained,
-          previous: ref(record.previousSibling ?? null), next: ref(record.nextSibling ?? null) };
+          previous: bref(record.previousSibling ?? null, flags), next: bref(record.nextSibling ?? null, flags) };
         if (record.type === 'attributes') {
           row.attribute = record.attributeName;
           row.oldValue = record.oldValue == null ? null : clip(record.oldValue, flags); // historical
-          row.valueAtDelivery = target.getAttribute ? clip(target.getAttribute(record.attributeName), flags) : null;
+          const value = target.getAttribute ? target.getAttribute(record.attributeName) : null;
+          row.valueAtDelivery = value === null ? null : clip(value, flags); // absent stays null, present-empty stays ''
         } else if (record.type === 'characterData') {
           row.lengthAtDelivery = String(target.data ?? '').length; // no raw text
         } else {
@@ -293,7 +306,8 @@ export function installEventDiagnostics(win, cap = 5000) {
     const main = section?.closest('main') ?? null;
     if (!section || !main) { add({ id: 'binding-missing', open: opens.length }); return; }
     binding = { main, section };
-    state.binding = { docId: state.docId, main: ref(main), section: ref(section), at: now(), invalidated: null };
+    const flags = { truncated: false };
+    state.binding = { docId: state.docId, main: bref(main, flags), section: bref(section, flags), at: now(), invalidated: null, truncated: flags.truncated };
     if (typeof win.MutationObserver !== 'function') { state.mutationFault = 'no MutationObserver'; return; }
     stream = new win.MutationObserver(onMutations);
     stream.observe(main, { childList: true, subtree: true, characterData: true, attributes: true, attributeOldValue: true,
@@ -577,7 +591,12 @@ export function mutationStream({ rows, recorder = {} }) {
   if (recorder.mutationFault) reasons.push(`mutation stream faulted (${recorder.mutationFault})`);
   if (recorder.mutationTruncated) reasons.push('mutation rows were truncated');
   const mutations = rows.filter((row) => row.id === 'mutation');
-  return { verdict: reasons.length ? 'INCONCLUSIVE' : 'OBSERVED', reasons, binding: recorder.binding ?? null,
+  const clipped = mutations.filter((row) => row.truncated).length;
+  if (clipped) reasons.push(`${clipped} mutation rows had clipped metadata or node lists`);
+  const incompleteBatches = rows.filter((row) => row.id === 'mutation-batch' &&
+    (!row.geometry || row.geometry.truncated || row.geometry.error || row.geometry.bounded?.length)).length;
+  if (incompleteBatches) reasons.push(`${incompleteBatches} mutation-batch geometry samples failed or were bounded`);
+  return { verdict: reasons.length ? 'INCONCLUSIVE' : 'OBSERVED', complete: reasons.length === 0, reasons, binding: recorder.binding ?? null,
     skippedOutsideScope: recorder.mutationSkipped ?? 0, batches: rows.filter((row) => row.id === 'mutation-batch').length,
     truncatedRows: mutations.filter((row) => row.truncated).length, rows: mutations };
 }
