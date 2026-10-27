@@ -134,6 +134,53 @@ await test('command and option getters never run; revoked proxies refuse unchang
   unchanged(subject, page, proxy, 'command-shape');
   assert.equal(called, 0);
 });
+function duringReflection(trap, action) {
+  let calls = 0;
+  const trigger = () => { calls++; action(); };
+  const handler = {
+    getPrototypeOf(target) { trigger(); return Reflect.getPrototypeOf(target); },
+    ownKeys(target) { trigger(); return Reflect.ownKeys(target); },
+    getOwnPropertyDescriptor(target, key) { trigger(); return Reflect.getOwnPropertyDescriptor(target, key); },
+  };
+  return { command: new Proxy({ type: 'next' }, { [trap]: handler[trap] }), calls: () => calls };
+}
+function teardownDuringValidation(api, admittedRoute) {
+  for (const trap of ['getPrototypeOf', 'ownKeys', 'getOwnPropertyDescriptor']) {
+    const page = actual(api.createPassage(catalog, admittedRoute, { motion: 'full' }));
+    const { command, calls } = duringReflection(trap, () => assert.equal(api.discardPassage(page), true));
+    refuse(api.reducePassage(page, command), 'page-state-changed');
+    assert.equal(calls(), 1);
+    refuse(api.inspectPassage(page), 'page-not-live');
+    refuse(api.reducePassage(page, { type: 'next' }), 'page-not-live');
+  }
+}
+await test('3A-P1 live Proxy teardown refuses the outer transition at every reflection stage', () => teardownDuringValidation(subject, route));
+function reentrantChange(api, admittedRoute) {
+  for (const [initial, inner] of [['paused', 'next'], ['paused', 'pause'], ['playing', 'play']]) {
+    for (const trap of ['getPrototypeOf', 'getOwnPropertyDescriptor']) {
+      const page = actual(api.createPassage(catalog, admittedRoute, { motion: 'full' }));
+      if (initial === 'playing') step(api, page, { type: 'play' });
+      const before = view(api, page);
+      let afterInner;
+      const { command, calls } = duringReflection(trap, () => { afterInner = step(api, page, { type: inner }); });
+      refuse(api.reducePassage(page, command), 'page-state-changed');
+      assert.equal(calls(), 1);
+      const after = view(api, page);
+      assert.deepEqual(after, afterInner);
+      assert.strictEqual(after.motionTicket, afterInner.motionTicket);
+      assert.equal(after.cursor.index, inner === 'next' ? 1 : 0);
+      if (inner !== 'next') {
+        assert.deepEqual(after, before, 'same visible state must still fence the outer command');
+        assert.strictEqual(after.motionTicket, before.motionTicket);
+      }
+    }
+  }
+}
+await test('reentrant next and same-value pause/play retain only the inner action', () => reentrantChange(subject, route));
+await test('inert live Proxy commands still make one ordinary transition', () => {
+  const page = newPage();
+  assert.equal(step(subject, page, new Proxy({ type: 'next' }, {})).cursor.index, 1);
+});
 await test('progress1 is distinct from finish; scheduled completion is exact-once', () => {
   const page = newPage(), ticket = step(subject, page, { type: 'play' }).motionTicket;
   const progress = step(subject, page, { type: 'progress', ticket, phase: 1 });
@@ -206,6 +253,12 @@ for (const [name, replacements, oracle] of [
     ["if (current.motion !== 'full' || current.status !== 'playing') return no('motion-progress-refused');", "if (current.status !== 'playing') return no('motion-progress-refused');"],
     ["if (!ticket || command.ticket !== ticket) return no('motion-ticket-stale');", "if (current.motion === 'full' && (!ticket || command.ticket !== ticket)) return no('motion-ticket-stale');"],
   ], reducedTimer],
+  ['discarded-page liveness fence removed', [
+    ['live(page) === value && value.current === initialCurrent', 'value.current === initialCurrent'],
+  ], teardownDuringValidation],
+  ['reentrant-current identity fence removed', [
+    ['live(page) === value && value.current === initialCurrent', 'live(page) === value'],
+  ], reentrantChange],
 ]) {
   const api = await mutant(replacements), admittedRoute = actual(api.resolvePassage(catalog));
   assert.throws(() => oracle(api, admittedRoute), { code: 'ERR_ASSERTION' }, name);

@@ -89,13 +89,18 @@ function nextStop(current) {
 
 /**
  * Commands: play, pause, next, progress(ticket,phase), finish-step(ticket),
- * motion(motion), replay/start. Every refusal leaves private state unchanged.
+ * motion(motion), replay/start. Refusal makes no outer transition; a completed
+ * reentrant action is retained rather than overwritten or rolled back.
  * progress(1) only updates phase; finish-step requires phase1 and consumes the
  * current ticket. This preserves JM's distinction between progress and next.
  */
 export function reducePassage(page, command) {
   const value = live(page);
   if (!value) return no('page-not-live');
+  const initialCurrent = value.current;
+  // Every accepted reduction replaces current, even if its visible values are
+  // unchanged. Its private identity fences reflection-triggered reentrancy.
+  const unchanged = () => live(page) === value && value.current === initialCurrent;
   command = record(command, ['type'], ['ticket', 'phase', 'motion']);
   if (!command || typeof command.type !== 'string') return no('command-shape');
   const required = {
@@ -103,7 +108,8 @@ export function reducePassage(page, command) {
     progress: ['type', 'ticket', 'phase'], 'finish-step': ['type', 'ticket'], motion: ['type', 'motion'],
   };
   if (!Object.hasOwn(required, command.type) || !record(command, required[command.type])) return no('command-shape');
-  const current = value.current;
+  if (!unchanged()) return no('page-state-changed');
+  const current = initialCurrent;
   let next = { ...current }, ticket = value.ticket;
   switch (command.type) {
     case 'play':
@@ -151,6 +157,7 @@ export function reducePassage(page, command) {
     default:
       return no('command-shape');
   }
+  if (!unchanged()) return no('page-state-changed');
   value.current = next;
   value.ticket = ticket;
   // Model changes describe no learner/host/timer operation.

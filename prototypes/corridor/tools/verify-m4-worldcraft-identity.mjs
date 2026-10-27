@@ -127,6 +127,46 @@ async function bufferCopy(api) {
   assert.equal(sliceCalls, 0);
 }
 await test('ArrayBuffer slice override cannot alias the hashed and decoded bytes', () => bufferCopy(subject));
+async function byteBrands(api) {
+  for (const kind of ['iterator', 'length', 'typed-prototype', 'buffer-proxy', 'view-proxy']) {
+    let callbacks = 0;
+    const get = () => { callbacks++; return bytes.familyBytes.length; };
+    let forged = Object.create(kind === 'typed-prototype' ? Uint8Array.prototype : ArrayBuffer.prototype);
+    if (kind === 'iterator') {
+      Object.defineProperty(forged, Symbol.iterator, { get() {
+        callbacks++;
+        return function () { callbacks++; return bytes.familyBytes[Symbol.iterator](); };
+      } });
+    } else {
+      Object.defineProperties(forged, { length: { get }, byteLength: { get }, 0: { get } });
+    }
+    if (kind.endsWith('-proxy')) {
+      const data = new Uint8Array(bytes.familyBytes);
+      forged = new Proxy(kind === 'buffer-proxy' ? data.buffer : data, {
+        get(target, key) { callbacks++; return Reflect.get(target, key); },
+        getPrototypeOf(target) { callbacks++; return Reflect.getPrototypeOf(target); },
+      });
+    }
+    refused(await api.createWorldcraftCatalog({ ...bytes, familyBytes: forged }), 'source-bytes-required');
+    assert.equal(callbacks, 0, kind + ' must not invoke caller callbacks');
+  }
+}
+await test('3A-I1 forged buffer/view brands and iterator/length/proxy callbacks refuse untouched', () => byteBrands(subject));
+await test('real byte spans ignore shadow getters; shared backing cannot disguise its brand', async () => {
+  for (const kind of ['buffer', 'view']) {
+    let callbacks = 0;
+    const data = new Uint8Array(bytes.familyBytes), value = kind === 'buffer' ? data.buffer : data;
+    for (const key of ['buffer', 'length', 'byteLength', Symbol.iterator, Symbol.toStringTag]) {
+      Object.defineProperty(value, key, { get() { callbacks++; throw new Error('shadow getter'); } });
+    }
+    actual(await subject.createWorldcraftCatalog({ ...bytes, familyBytes: value }));
+    assert.equal(callbacks, 0);
+  }
+  const shared = new Uint8Array(new SharedArrayBuffer(bytes.familyBytes.length));
+  shared.set(bytes.familyBytes);
+  Object.setPrototypeOf(shared.buffer, ArrayBuffer.prototype);
+  refused(await subject.createWorldcraftCatalog({ ...bytes, familyBytes: shared }), 'source-bytes-required');
+});
 await test('exact spans and ordinary ArrayBuffers admit; surrounding bytes do not', async () => {
   const spans = Object.fromEntries(Object.entries(bytes).map(([key, value]) => {
     const padded = new Uint8Array(value.length + 12).fill(99);
@@ -211,6 +251,9 @@ for (const [name, before, after, oracle] of [
     "if (request.left !== hosts[request.host] || request.right !== '戠')", 'if (false)', wrongPart],
   ['caller ArrayBuffer slice aliases admitted bytes',
     'view = new Uint8Array(value);', 'return new Uint8Array(value.slice(0));', bufferCopy],
+  ['prototype membership substitutes for ArrayBuffer brand',
+    'const bufferSize = arrayBufferSize(value);',
+    'const bufferSize = value instanceof ArrayBuffer ? 0 : null;', byteBrands],
 ]) {
   const api = await mutant(before, after), admitted = actual(await api.createWorldcraftCatalog(bytes));
   await assert.rejects(async () => oracle(api, admitted), { code: 'ERR_ASSERTION' }, name);

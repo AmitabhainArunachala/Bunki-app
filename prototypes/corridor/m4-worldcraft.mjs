@@ -45,14 +45,23 @@ function record(value, required, optional = []) {
   } catch { return null; }
 }
 const typedArrayPrototype = Object.getPrototypeOf(Uint8Array.prototype);
+const bufferLength = Object.getOwnPropertyDescriptor(ArrayBuffer.prototype, 'byteLength').get;
+const typedName = Object.getOwnPropertyDescriptor(typedArrayPrototype, Symbol.toStringTag).get;
 const typedBuffer = Object.getOwnPropertyDescriptor(typedArrayPrototype, 'buffer').get;
 const typedLength = Object.getOwnPropertyDescriptor(typedArrayPrototype, 'byteLength').get;
+function arrayBufferSize(value) {
+  try { return bufferLength.call(value); } catch { return null; }
+}
 function bytes(value) {
   let view;
-  if (value instanceof ArrayBuffer) {
+  const bufferSize = arrayBufferSize(value);
+  // Internal brands precede conversion: forged prototypes must never reach
+  // Uint8Array's iterable/array-like overloads or invoke caller callbacks.
+  if (bufferSize !== null) {
     view = new Uint8Array(value);
   } else {
-    check(value instanceof Uint8Array && typedBuffer.call(value) instanceof ArrayBuffer, 'source-bytes-required');
+    check(typedName.call(value) === 'Uint8Array' &&
+      arrayBufferSize(typedBuffer.call(value)) !== null, 'source-bytes-required');
     view = value;
   }
   const length = typedLength.call(view);
