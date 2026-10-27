@@ -66,30 +66,77 @@ export const EVENT_PROBES = Object.freeze([
         `node: ${nodeId('openSaved')}, current: ${nodeId('event.currentTarget')}, target: ${nodeId('event.target')}, event: (window.__diagEventId ? window.__diagEventId(event) : null), trusted: event.isTrusted, phase: event.eventPhase`)} void keepSelection(true, openSaved); });\n` },
 ]);
 
-const probeSets = (events) => (events ? [...PROBES, ...EVENT_PROBES] : PROBES);
-const versionLine = (events) => (events ? EVENT_VERSION_LINE : VERSION_LINE);
+// Successor probes (W2 2040/2046, key 4c0e58f5) for the corrected renderer (7062ae8e, renderTextSourceContextSelection):
+// opt-in with { successor: true }; the version-1 sets above, their outputs and their exports are unchanged. Every record is
+// wrapped so a telemetry failure cannot change the app's control flow, and names only what is in lexical scope at its
+// anchor: `discuss` only inside keepSelection, the operation's own fields, and `state` (never a bare `pending`).
+export const SUCCESSOR_PROBE_VERSION = 'publisher-context-probes/2';
+export const SUCCESSOR_EVENT_PROBE_VERSION = 'publisher-context-probes/2+events/3';
+const SUCCESSOR_VERSION_LINE = `window.__ctxDiagVersion = ${JSON.stringify(SUCCESSOR_PROBE_VERSION)};\n`;
+const SUCCESSOR_EVENT_VERSION_LINE = `window.__ctxDiagVersion = ${JSON.stringify(SUCCESSOR_EVENT_PROBE_VERSION)};\n`;
+const guarded = (id, fields) => `try { (window.__ctxDiag ||= []).push({ id: ${JSON.stringify(id)}, t: performance.now(), ${fields} }); } catch {}`;
 
-export function applyProbes(source, { events = false } = {}) {
+export const SUCCESSOR_PROBES = Object.freeze([
+  // begin-time refusals (O1/O2/O3, O4/O7 at begin) are seen here, as `refused`; they never reach classify
+  { id: 'enter',
+    from: "  const keepSelection = async (discuss, control) => {\n    const operation = begin(discuss ? 'open' : 'save', control);\n",
+    insert: 'after', text: `    ${guarded('enter', 'discuss, begun: !!operation, generation: operation ? operation.generation : null, ' +
+      'serial: operation ? operation.serial : null, refused: operation ? null : (state.lastOutcome ? state.lastOutcome.code : null), ' +
+      'serialNow: teacherContextSelectionSerial')}\n` },
+  // every classify call: Open, Save, practice, lookup and O4–O9 (surface-replaced is assigned directly, not here)
+  { id: 'outcome',
+    from: '  const classify = (operation, code) => {\n    operation.outcome = code;\n',
+    insert: 'after', text: `    ${guarded('outcome', 'kind: operation.kind, code, generation: operation.generation, serial: operation.serial, ' +
+      'serialNow: teacherContextSelectionSerial, ownsPending: state.pending === operation')}\n` },
+  { id: 'commit',
+    from: '      operation.commitAttempted = true;\n',
+    insert: 'after', text: `      ${guarded('commit', 'kind: operation.kind, generation: operation.generation, serialNow: teacherContextSelectionSerial')}\n` },
+  // at the eventual unwind, after finish's own late classification and before it releases: ownership seen, not a release proven
+  { id: 'finish',
+    from: "  const finish = (operation) => {\n    const reason = ownerReason(operation);\n    if (reason && operation.outcome === 'pending') { operation.reason = reason; classify(operation, reason); }\n",
+    insert: 'after', text: `    ${guarded('finish', 'kind: operation.kind, outcome: operation.outcome, reason: operation.reason, ' +
+      'ownsPendingBeforeFinish: state.pending === operation')}\n` },
+]);
+
+// events/3: the version-1 event anchors, which are unchanged in the corrected renderer, with guarded records and the same
+// private node and event ids, so listener-open still joins the trusted action to keepSelection's enter
+export const SUCCESSOR_EVENT_PROBES = Object.freeze([
+  { id: 'render', from: EVENT_PROBES[0].from, insert: 'after', text: `  ${guarded('render', `personal, section: ${nodeId('section')}`)}\n` },
+  { id: 'reg-save', from: EVENT_PROBES[1].from, insert: 'after',
+    text: `  ${guarded('reg-save', `node: ${nodeId('keepSave')}, section: ${nodeId('section')}`)}\n` },
+  { id: 'reg-open', from: EVENT_PROBES[2].from, insert: 'replace',
+    text: `  ${guarded('reg-open', `node: ${nodeId('openSaved')}, section: ${nodeId('section')}`)}\n` +
+      `  openSaved.addEventListener('click', (event) => { ${guarded('listener-open',
+        `node: ${nodeId('openSaved')}, current: ${nodeId('event.currentTarget')}, target: ${nodeId('event.target')}, event: (window.__diagEventId ? window.__diagEventId(event) : null), trusted: event.isTrusted, phase: event.eventPhase`)} void keepSelection(true, openSaved); });\n` },
+]);
+
+const ALL_VERSION_LINES = [VERSION_LINE, EVENT_VERSION_LINE, SUCCESSOR_VERSION_LINE, SUCCESSOR_EVENT_VERSION_LINE];
+const probeSets = (events, successor = false) => successor ? (events ? [...SUCCESSOR_PROBES, ...SUCCESSOR_EVENT_PROBES] : SUCCESSOR_PROBES)
+  : (events ? [...PROBES, ...EVENT_PROBES] : PROBES);
+const versionLine = (events, successor = false) => successor ? (events ? SUCCESSOR_EVENT_VERSION_LINE : SUCCESSOR_VERSION_LINE)
+  : (events ? EVENT_VERSION_LINE : VERSION_LINE);
+
+export function applyProbes(source, { events = false, successor = false } = {}) {
   let out = source;
   const applied = [];
-  for (const probe of probeSets(events)) {
+  for (const probe of probeSets(events, successor)) {
     const count = out.split(probe.from).length - 1;
     if (count !== 1) throw new Error(`probe ${probe.id}: anchor occurs ${count} times`);
     const replacement = probe.insert === 'after' ? probe.from + probe.text : probe.text;
     out = out.replace(probe.from, () => replacement);
     applied.push(probe.id);
   }
-  if (out.includes(VERSION_LINE) || out.includes(EVENT_VERSION_LINE)) throw new Error('version witness already present');
-  return { source: versionLine(events) + out, applied: ['version', ...applied] };
+  if (ALL_VERSION_LINES.some((line) => out.includes(line))) throw new Error('version witness already present');
+  return { source: versionLine(events, successor) + out, applied: ['version', ...applied] };
 }
 
 /** True when undoing the version line and then each probe's own inserted text, exactly once and in
  * reverse order, gives back the original byte for byte: the served source carries no other edit. */
-export function probeOnlyDiff(original, probed, { events = false } = {}) {
-  const line = versionLine(events);
+export function probeOnlyDiff(original, probed, { events = false, successor = false } = {}) {
+  const line = versionLine(events, successor);
   if (!probed.startsWith(line) || probed.split(line).length - 1 !== 1) return false;
   let out = probed.slice(line.length);
-  for (const probe of [...probeSets(events)].reverse()) {
+  for (const probe of [...probeSets(events, successor)].reverse()) {
     const inserted = probe.insert === 'after' ? probe.from + probe.text : probe.text;
     if (out.split(inserted).length - 1 !== 1) return false;
     out = out.replace(inserted, () => probe.from);
@@ -113,6 +160,9 @@ export const MUTANTS = Object.freeze({
 export function applyMutant(probed, name) {
   const mutant = MUTANTS[name];
   if (!mutant) throw new Error(`unknown context mutant ${name}`);
+  // these exit mutants belong to the version-1 probes on the version-1 renderer; they are never successor proof
+  if (!probed.startsWith(VERSION_LINE) && !probed.startsWith(EVENT_VERSION_LINE))
+    throw new Error(`mutant ${name}: context mutants apply only to ${PROBE_VERSION} sources`);
   const count = probed.split(mutant.from).length - 1;
   if (count !== 1) throw new Error(`mutant ${name}: anchor occurs ${count} times`);
   return probed.replace(mutant.from, () => mutant.to);
@@ -120,10 +170,26 @@ export function applyMutant(probed, name) {
 
 /** The keepSelection closure's own text, for the Node exit-labelling harness. */
 export function keepSelectionText(source) {
+  if (source.includes("    const operation = begin(discuss ? 'open' : 'save', control);\n"))
+    throw new Error(`keepSelectionText is the ${PROBE_VERSION} harness; the corrected renderer is not its input`);
   const start = source.indexOf('  const keepSelection = async (discuss, control) => {');
   const endMark = '    } finally { pending = false; refresh(); }\n  };\n';
   const end = source.indexOf(endMark, start);
   if (start < 0 || end < 0 || source.indexOf('  const keepSelection = async (discuss, control) => {', start + 1) >= 0)
     throw new Error('keepSelection must occur exactly once');
   return source.slice(start, end + endMark.length);
+}
+
+/** The corrected renderer's whole function text (renderTextSourceContextSelection), exact-once, for the successor's actual-closure
+ * harness: the source must hold its start and its following-function boundary once each. */
+export const SUCCESSOR_RENDERER = Object.freeze({
+  start: 'function renderTextSourceContextSelection(main, saved, body, personal) {\n',
+  end: '\n}\n/** Whether this sentence already stands on the tutor page',
+});
+export function successorRendererText(source) {
+  const { start, end } = SUCCESSOR_RENDERER;
+  if (source.split(start).length !== 2 || source.split(end).length !== 2) throw new Error('the corrected renderer must occur exactly once');
+  const from = source.indexOf(start), to = source.indexOf(end) + 3;
+  if (!(from < to)) throw new Error('the corrected renderer boundaries are out of order');
+  return source.slice(from, to);
 }
