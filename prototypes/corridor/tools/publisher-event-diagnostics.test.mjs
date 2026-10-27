@@ -8,7 +8,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import { EVENT_PROBES, EVENT_PROBE_VERSION, PROBE_VERSION, applyProbes, probeOnlyDiff } from './publisher-context-probes.mjs';
-import { installEventDiagnostics, classifyOpen, EVENT_RECORDER_VERSION } from './publisher-event-diagnostics.mjs';
+import { installEventDiagnostics, openSnapshot, classifyOpen, EVENT_RECORDER_VERSION, GEOMETRY_ORDER, GEOMETRY_NODES } from './publisher-event-diagnostics.mjs';
 
 const source = readFileSync(new URL('../corridor.js', import.meta.url), 'utf8');
 const sha = (text) => createHash('sha256').update(Buffer.from(text)).digest('hex');
@@ -167,10 +167,12 @@ const open = (node) => ({ node: [node, 'button#publisher-context-open.chip'], co
 const row = (id, type, extra = {}) => ({ id, type, now: 200, t: 200, event: EV, trusted: true, target: [REG, 'button#publisher-context-open.chip'], open: open(REG), ...extra });
 const PRE = { now: 100, docId: DOC, byId: [REG, 'button#publisher-context-open'], live: [[REG, 'b']], hitInside: true, disabled: false };
 const POST = { now: 300, docId: DOC, byId: [REG, 'button#publisher-context-open'], live: [[REG, 'b']], hitInside: true, disabled: false };
-function evidence({ ctx = null, recorder = null, rows = null, pre = PRE, post = POST, click = { ok: true }, page = {} } = {}) {
+function evidence({ ctx = null, recorder = null, rows = null, pre = PRE, post = POST, click = { ok: true }, page = {}, docId = DOC } = {}) {
   return {
-    ctx: ctx ?? [{ id: 'reg-open', t: 5, node: REG }, { id: 'enter', t: 50, discuss: false }],
-    recorder: recorder ?? { version: EVENT_RECORDER_VERSION, docId: DOC, truncated: false, fault: null, rows: [{ id: 'install', now: 1, docId: DOC }, ...(rows ?? [])] },
+    // the action document's own trace: recorder and source probes read together in that document (W2 1928)
+    actionDoc: { docId,
+      ctx: ctx ?? [{ id: 'reg-open', t: 5, node: REG }, { id: 'enter', t: 50, discuss: false }],
+      recorder: recorder ?? { version: EVENT_RECORDER_VERSION, docId: DOC, truncated: false, fault: null, rows: [{ id: 'install', now: 1, docId: DOC }, ...(rows ?? [])] } },
     pre, post, click, page,
   };
 }
@@ -234,7 +236,7 @@ test('classifier: missing, truncated, faulted, unreadable or foreign-document ev
     ['recorder faulted', evidence({ recorder: recorderWith({ fault: { where: 'capture', message: 'x' } }) })],
     ['recorder truncated', evidence({ recorder: recorderWith({ truncated: true }) })],
     ['install row missing', evidence({ recorder: recorderWith({ rows: fullClick }) })],
-    ['probe records unreadable', { ...evidence(), ctx: null }],
+    ['probe records unreadable', evidence({ ctx: 'unreadable' })],
     ['no registration', evidence({ ctx: [{ id: 'enter', t: 50, discuss: false }] })],
     ['open not reached', evidence({ pre: null, click: null })],
     ['pre read failed', evidence({ pre: { snapshotError: 'Execution context was destroyed' } })],
@@ -251,4 +253,303 @@ test('classifier: missing, truncated, faulted, unreadable or foreign-document ev
     assert.equal(result.classification, null, label);
     assert(result.reasons.length > 0, label);
   }
+});
+
+/* ---------------------------------------------------------------- EV3 pressGeometry (W2 1937 + addendum 1945) */
+/** A fake page with the five live nodes and the source-verified surfaces; every geometry read is logged in order. */
+function geometryPage({ log = [], throwRect = null, opens = 1, menus = 1, dropSave = false, disconnect = null, animations = 0, depth = 1 } = {}) {
+  const matches = new Map();
+  const make = (name, id, y, parent, selectors = []) => {
+    const node = { __name: name, nodeType: 1, tagName: 'DIV', id, className: name === 'menu' ? 'vocabulary-list-popover is-save-menu is-inline' : name,
+      isConnected: disconnect !== name, hidden: false, parentElement: parent, offsetLeft: 0, offsetWidth: 100, offsetHeight: 45, offsetParent: null,
+      get offsetTop() { log.push(`${name}:offsets`); return y; },
+      getBoundingClientRect() { log.push(`${name}:rect`); if (throwRect === name) throw new Error('rect gone'); return { x: 10, y, width: 100, height: 45 }; },
+      getAnimations() { log.push(`${name}:animations`); return Array.from({ length: name === 'open' ? animations : 0 }, (_, i) => ({ id: `a${i}`, playState: 'running', currentTime: i })); },
+      getAttribute: () => null,
+      closest(selector) { for (let n = this; n; n = n.parentElement) if (matches.get(n)?.includes(selector)) return n; return null; },
+      contains(other) { for (let n = other; n; n = n.parentElement) if (n === this) return true; return false; },
+      querySelector(selector) { return selector.includes('teacher-source-quote') ? quote : selector.includes('teacher-note') ? prompt : null; },
+    };
+    matches.set(node, selectors);
+    return node;
+  };
+  const main = make('main', '', 0, null, ['main']);
+  const section = make('section', '', 300, main, ['.publisher-context-selection']);
+  const prompt = make('prompt', '', 310, section), quote = make('quote', '', 330, section);
+  const actions = make('actions', '', 400, section, ['[data-save-row]']);
+  const open = make('open', 'publisher-context-open', 400, actions, ['[id$="-context-open"]']);
+  const save = make('save', 'publisher-context-save', 400, actions);
+  const menu = make('menu', 'vocabulary-list-popover', 445, section);
+  const status = make('status', 'publisher-context-status', 470, section), timed = make('timed', 'publisher-selection-time', 360, section);
+  let chain = open;
+  for (let i = 1; i < depth; i += 1) { const parent = make(`offset${i}`, '', 0, null); chain.offsetParent = parent; chain = parent; }
+  const extraOpen = make('open2', 'source-context-open', 600, actions, ['[id$="-context-open"]']);
+  const extraMenu = make('menu2', 'vocabulary-list-popover', 700, section);
+  const byId = { 'publisher-context-open': open, 'publisher-context-save': dropSave ? null : save, 'publisher-context-status': status, 'publisher-selection-time': timed };
+  const document = {
+    get activeElement() { log.push('activeElement'); return open; },
+    documentElement: { addEventListener() {} },
+    visibilityState: 'visible',
+    querySelectorAll(selector) {
+      if (selector.includes('context-open')) return opens === 2 ? [open, extraOpen] : [open];
+      if (selector.includes('vocabulary-list-popover')) return menus === 2 ? [menu, extraMenu] : menus === 1 ? [menu] : [];
+      return [];
+    },
+    getElementById: (id) => byId[id] ?? null,
+    elementFromPoint() { log.push('hit'); return open; },
+    getAnimations() { log.push('documentAnimations'); return []; },
+  };
+  const win = fakeWindow({ document,
+    getComputedStyle(node) { log.push(`${node.__name}:style`); return { position: 'static', transform: 'none', translate: 'none', scale: 'none', pointerEvents: 'auto', visibility: 'visible', display: 'flex' }; } });
+  // getters stay getters (Object.assign would read them once and copy the values)
+  Object.defineProperties(win, {
+    scrollX: { get: () => 0 }, scrollY: { get: () => { log.push('scroll'); return 100; } },
+    visualViewport: { get: () => { log.push('visualViewport'); return { offsetLeft: 0, offsetTop: 0, pageLeft: 0, pageTop: 100, width: 1280, height: 800, scale: 1 }; } },
+  });
+  const listeners = [];
+  const add = win.addEventListener.bind(win);
+  win.addEventListener = (type, fn, capture) => { listeners.push({ type, fn, capture: !!capture }); add(type, fn, capture); };
+  return { win, log, nodes: { open, save, actions, menu, main }, listeners };
+}
+const expectedGeometryReads = ['scroll', 'visualViewport', 'activeElement',
+  ...['open', 'save', 'actions', 'menu', 'main'].flatMap((name) => [`${name}:rect`, `${name}:offsets`, `${name}:style`, `${name}:animations`]),
+  'prompt:rect', 'quote:rect', 'timed:rect', 'status:rect', 'documentAnimations'];
+const squash = (log) => log.filter((entry, i) => entry !== log[i - 1]);
+
+test('EV3: the page sampler reads scalars first, then each node and surface in the documented order, and records that order', () => {
+  const restore = keepEventPrototype();
+  try {
+    const { win, log } = geometryPage();
+    installEventDiagnostics(win);
+    log.length = 0;
+    const sample = win.__evDiagGeometry('snapshot:pre');
+    assert.deepEqual(squash(log), expectedGeometryReads);
+    assert.deepEqual(sample.order, GEOMETRY_ORDER, 'the page order and the exported order are one list');
+    assert.deepEqual(Object.keys(sample.nodes), GEOMETRY_NODES);
+    assert.equal(sample.nodes.menu.classes, 'vocabulary-list-popover is-save-menu is-inline');
+    assert.deepEqual([sample.error, sample.bounded, sample.ambiguous], [null, [], []]);
+    assert.equal(win.__evDiag.fault, null);
+  } finally { restore(); }
+});
+
+test('EV3: a relevant pointerdown reads geometry, then the existing hit once, then geometry again; bubble has geometry and no hit', () => {
+  const restore = keepEventPrototype();
+  try {
+    const { win, log, nodes, listeners } = geometryPage();
+    installEventDiagnostics(win);
+    const capture = listeners.find((l) => l.type === 'pointerdown' && l.capture).fn;
+    const bubble = listeners.find((l) => l.type === 'pointerdown' && !l.capture).fn;
+    const event = { type: 'pointerdown', target: nodes.open, currentTarget: win, isTrusted: true, timeStamp: 5, clientX: 20, clientY: 420, button: 0,
+      pointerType: 'mouse', eventPhase: 1, composedPath: () => [nodes.open, nodes.actions] };
+    log.length = 0;
+    capture(event);
+    const reads = squash(log);
+    const hit = reads.indexOf('hit');
+    assert.deepEqual(reads.slice(0, hit), expectedGeometryReads, 'geometry before the hit');
+    assert.equal(reads.filter((entry) => entry === 'hit').length, 1, 'the existing hit read happens once');
+    assert.deepEqual(reads.slice(hit + 1, hit + 1 + expectedGeometryReads.length), expectedGeometryReads, 'geometry after the hit');
+    log.length = 0;
+    bubble({ ...event, eventPhase: 3 });
+    assert.equal(log.includes('hit'), false, 'bubble adds no hit read');
+    const rows = win.__evDiag.rows.filter((row) => row.type === 'pointerdown');
+    assert.deepEqual(rows.map((row) => [row.id, row.geometry?.label, row.afterHit?.label ?? null, !!row.hit]),
+      [['capture', 'pointerdown:capture:beforeHit', 'pointerdown:capture:afterHit', true], ['bubble', 'pointerdown:bubble', null, false]]);
+    assert(rows[0].geometry.seq < rows[0].afterHit.seq && rows[0].afterHit.seq < rows[1].geometry.seq, 'monotonic sampling order');
+  } finally { restore(); }
+});
+
+test('EV3: a failing getter, a missing or disconnected node, ambiguity and bounds mark the sample; the recorder and native calls go on', () => {
+  const restore = keepEventPrototype();
+  try {
+    const cases = [
+      [{ throwRect: 'actions' }, (s) => assert.equal(s.error, 'rect gone')],
+      [{ dropSave: true }, (s) => assert.equal(s.nodes.save, null)],
+      [{ disconnect: 'actions' }, (s) => assert.equal(s.nodes.actions.connected, false)],
+      [{ opens: 2 }, (s) => assert.deepEqual(s.ambiguous, ['open'])],
+      [{ menus: 2 }, (s) => assert.deepEqual(s.ambiguous, ['menu'])],
+      [{ animations: 17 }, (s) => assert.deepEqual(s.bounded, ['animations:open'])],
+      [{ depth: 11 }, (s) => assert.deepEqual(s.bounded, ['offsets:open'])],
+    ];
+    for (const [options, check] of cases) {
+      const { win } = geometryPage(options);
+      installEventDiagnostics(win);
+      const sample = win.__evDiagGeometry('snapshot:pre');
+      check(sample);
+      assert(sampleIssues(sample).length > 0, JSON.stringify(options));
+      win.addEventListener('click', (event) => event.preventDefault());
+      const event = new Event('click', { cancelable: true });
+      win.dispatchEvent(event);
+      assert.equal(event.defaultPrevented, true, 'the native call still ran');
+      assert.equal(win.__evDiag.fault, null, `${JSON.stringify(options)}: a geometry failure is not a recorder fault`);
+    }
+    const { win } = geometryPage();
+    installEventDiagnostics(win);
+    for (let i = 0; i < 200; i += 1) win.__evDiagGeometry('fill');
+    assert.deepEqual(win.__evDiagGeometry('over'), { label: 'over', truncated: true });
+    assert.equal(win.__evDiag.geometryTruncated, true);
+  } finally { restore(); }
+});
+
+/* synthetic geometry samples for the classifier */
+let seqCounter = 0;
+const gnode = (id, y, extra = {}) => ({ node: [id, 'n'], connected: true, rect: { x: 10, y, width: 100, height: 45 },
+  offsets: [{ node: [id, 'n'], top: y, left: 0, width: 100, height: 45 }], style: { position: 'static', transform: 'none', translate: 'none', scale: 'none' }, animations: [], ...extra });
+function gsample({ scrollY = 100, shift = 0, transform = 'none', saveWidth = 100, menu = true, drop = null, label = 's', patch = {} } = {}) {
+  const y = (doc) => doc - scrollY;
+  // offsetTop is document-relative: it follows a layout shift, never a scroll
+  const docOffsets = (node) => ({ ...node, offsets: node.offsets.map((o) => ({ ...o, top: node.rect.y + scrollY })) });
+  const nodes = { open: gnode(REG, y(500) + shift, { style: { position: 'static', transform, translate: 'none', scale: 'none' } }),
+    save: gnode(13, y(500) + shift, { rect: { x: 120, y: y(500) + shift, width: saveWidth, height: 45 } }), actions: gnode(14, y(500) + shift),
+    menu: menu ? { ...gnode(15, y(545) + shift), classes: 'vocabulary-list-popover is-save-menu is-inline' } : null, main: gnode(16, y(0)) };
+  for (const name of Object.keys(nodes)) if (nodes[name]) nodes[name] = docOffsets(nodes[name]);
+  if (drop) nodes[drop] = null;
+  return { seq: ++seqCounter, label, t0: seqCounter, order: GEOMETRY_ORDER, bounded: [], error: null, ambiguous: [], scroll: { x: 0, y: scrollY },
+    visualViewport: { offsetLeft: 0, offsetTop: 0, pageLeft: 0, pageTop: scrollY, width: 1280, height: 800, scale: 1 }, active: [52, 'button#copy'],
+    nodes, surfaces: { prompt: null, quote: null, timed: null, status: null, sealStrip: null, mini: null, readerLayers: null, layersMark: null },
+    documentAnimations: [], ...patch };
+}
+const sampleIssues = (sample) => {
+  const result = classifyOpen(pressEvidence({ samples: { pdBefore: sample } }));
+  return result.geometry.verdict === 'INCONCLUSIVE' ? result.geometry.reasons : [];
+};
+/** The full press in sampling order: pre, pointerdown (before/after hit, brackets, bubble), mousedown (same), post. */
+function pressEvidence({ samples = {}, brackets = true, extraPointerdown = false, recorderPatch = {} } = {}) {
+  // samples are stamped in sampling order here, so a test's construction order never matters; pinSeq keeps a given seq
+  let order = 0;
+  const s = (key, opts) => {
+    const given = Object.hasOwn(samples, key) ? samples[key] : gsample(opts);
+    order += 1;
+    return given && !given.truncated && !given.pinSeq ? { ...given, seq: order } : given;
+  };
+  const pre = { ...PRE, geometry: s('pre', { label: 'pre' }) };
+  const pd = { pdBefore: s('pdBefore'), pdAfter: s('pdAfter'), pdLate: s('pdLate'), pdHtml: s('pdHtml'), pdBubble: s('pdBubble') };
+  const md = { mdBefore: s('mdBefore'), mdAfter: s('mdAfter'), mdLate: s('mdLate'), mdHtml: s('mdHtml'), mdBubble: s('mdBubble') };
+  const post = { ...POST, geometry: s('post', { label: 'post' }) };
+  const pressRows = (type, event, g, prefix) => [
+    row('capture', type, { event, geometry: g[`${prefix}Before`], afterHit: g[`${prefix}After`], hit: { node: [REG, 'span'], open: open(REG) } }),
+    ...(brackets ? [{ id: 'bracket', where: 'window-late', event, now: 200, type, geometry: g[`${prefix}Late`] },
+      { id: 'bracket', where: 'html', event, now: 200, type, geometry: g[`${prefix}Html`] }] : []),
+    row('bubble', type, { event, geometry: g[`${prefix}Bubble`] })];
+  const rows = [...pressRows('pointerdown', 98, pd, 'pd'), ...pressRows('mousedown', 97, md, 'md'),
+    ...(extraPointerdown ? [row('capture', 'pointerdown', { event: 96 })] : []),
+    row('capture', 'pointerup', { event: 99 }), row('capture', 'click', { target: [42, 'section'], open: null })];
+  const input = evidence({ rows, pre, post });
+  Object.assign(input.actionDoc.recorder, recorderPatch);
+  return input;
+}
+
+test('EV3: changed scroll with stable document geometry, stable scroll with changed transform or sibling, both, neither — described, not caused', () => {
+  const press = (mdBefore) => classifyOpen(pressEvidence({ samples: { pdBefore: gsample(), mdBefore } })).geometry.press;
+  assert.equal(press(gsample()).observed, 'none');
+  const scrolled = press(gsample({ scrollY: 124 }));
+  assert.deepEqual([scrolled.observed, scrolled.scroll.dy, scrolled.nodes.open.viewport.dy, scrolled.nodes.open.document.dy], ['scroll', 24, -24, 0]);
+  const transformed = press(gsample({ transform: 'matrix(1, 0, 0, 1, 0, -24)' }));
+  assert.deepEqual([transformed.observed, transformed.nodes.open.styleChanged], ['layout', ['transform']]);
+  const sibling = press(gsample({ saveWidth: 140 }));
+  assert.deepEqual([sibling.observed, sibling.nodes.save.viewport.dw], ['layout', 40]);
+  const menuGone = press(gsample({ menu: false }));
+  assert.deepEqual([menuGone.observed, menuGone.nodes.menu.presence], ['layout', 'disappeared']);
+  assert.equal(press(gsample({ scrollY: 124, shift: -24 })).observed, 'scroll+layout');
+  const result = classifyOpen(pressEvidence({ samples: { pdBefore: gsample(), mdBefore: gsample({ scrollY: 124 }) } }));
+  assert.equal(result.classification, 'click-landed-outside-open-button', 'geometry never changes the delivery class');
+  assert.equal(result.geometry.verdict, 'OBSERVED');
+  assert.equal(JSON.stringify(result.geometry).match(/cause|mover/giu), null, 'no cause label anywhere in the geometry facts');
+  assert.deepEqual(result.geometry.firstChange, { from: 'pointerdown:bubble', to: 'mousedown:capture:beforeHit', observed: 'scroll' });
+});
+
+test('EV3: unusable, out-of-order, ambiguous-press or truncated geometry is INCONCLUSIVE while the delivery class stands', () => {
+  const bad = [
+    ['missing sample', pressEvidence({ samples: { mdBubble: null } })],
+    ['failed read', pressEvidence({ samples: { pdAfter: gsample({ patch: { error: 'rect gone' } }) } })],
+    ['bounded', pressEvidence({ samples: { pre: gsample({ patch: { bounded: ['animations:open'] } }) } })],
+    ['ambiguous node', pressEvidence({ samples: { post: gsample({ patch: { ambiguous: ['open'] } }) } })],
+    ['missing node', pressEvidence({ samples: { mdBefore: gsample({ drop: 'save' }) } })],
+    ['disconnected', pressEvidence({ samples: { pdBefore: gsample({ patch: { nodes: { ...gsample().nodes, actions: { ...gnode(14, 400), connected: false } } } }) } })],
+    ['other read order', pressEvidence({ samples: { pdBefore: gsample({ patch: { order: [...GEOMETRY_ORDER].reverse() } }) } })],
+    ['truncated sample', pressEvidence({ samples: { mdAfter: { label: 'x', truncated: true } } })],
+    ['truncated recorder geometry', pressEvidence({ recorderPatch: { geometryTruncated: true } })],
+    ['two pointerdowns', pressEvidence({ extraPointerdown: true })],
+  ];
+  const outOfOrder = pressEvidence({ samples: { post: { ...gsample(), seq: 0, pinSeq: true } } });
+  bad.push(['out of order', outOfOrder]);
+  for (const [label, input] of bad) {
+    const result = classifyOpen(input);
+    assert.equal(result.verdict, 'OBSERVED', label);
+    assert.equal(result.classification, 'click-landed-outside-open-button', label);
+    assert.equal(result.geometry.verdict, 'INCONCLUSIVE', label);
+    assert(result.geometry.reasons.length > 0, label);
+  }
+});
+
+test('EV3: a missing or misplaced bracket stays unknown; it never invalidates the required samples or names a handler', () => {
+  const none = classifyOpen(pressEvidence({ brackets: false })).geometry;
+  assert.equal(none.verdict, 'OBSERVED');
+  assert.deepEqual(none.unknown, ['pointerdown:window-late: 0 bracket rows', 'pointerdown:html: 0 bracket rows', 'mousedown:window-late: 0 bracket rows', 'mousedown:html: 0 bracket rows']);
+  const misplaced = classifyOpen(pressEvidence({ samples: { pdHtml: { ...gsample(), seq: 10_000, pinSeq: true } } })).geometry;
+  assert.equal(misplaced.verdict, 'OBSERVED');
+  assert(misplaced.unknown.includes('pointerdown:html: out of place in the sampling order'));
+  const full = classifyOpen(pressEvidence()).geometry;
+  assert.deepEqual(full.unknown, []);
+  assert.deepEqual(full.steps.map((step) => step.to), ['pointerdown:capture:beforeHit', 'pointerdown:capture:afterHit', 'pointerdown:window-late', 'pointerdown:html',
+    'pointerdown:bubble', 'mousedown:capture:beforeHit', 'mousedown:capture:afterHit', 'mousedown:window-late', 'mousedown:html', 'mousedown:bubble', 'post']);
+});
+
+test('EV3 (W2 1928): a successful journey reload keeps the action trace; a missing, partial or later-document trace never stands in', () => {
+  const listener = [{ id: 'reg-open', t: 5, node: REG }, { id: 'listener-open', t: 210, node: REG, event: EV }, { id: 'enter', t: 211, discuss: true }];
+  const success = evidence({ rows: fullClick, ctx: listener });
+  assert.equal(classOf(success), 'listener-ran-and-keepSelection-entered', 'the action document read before the reload classifies the repaired click');
+  const later = { version: EVENT_RECORDER_VERSION, docId: 'doc-after-reload', truncated: false, fault: null,
+    rows: [{ id: 'install', now: 1, docId: 'doc-after-reload' }, ...fullClick] };
+  const cases = [
+    ['no action-document trace', { ...success, actionDoc: null }, 'the action-document trace was not captured'],
+    ['capture failed', { ...success, actionDoc: { captureError: 'Execution context was destroyed' } }, 'the action-document trace was not captured'],
+    ['later document substituted', { ...success, actionDoc: { docId: 'doc-after-reload', recorder: later, ctx: listener } }, 'the document changed between the Open action and capture'],
+    ['mixed documents', { ...success, actionDoc: { docId: DOC, recorder: later, ctx: listener } }, 'the action-document trace is not from one document'],
+  ];
+  for (const [label, input, reason] of cases) {
+    const result = classifyOpen(input);
+    assert.equal(result.verdict, 'INCONCLUSIVE', label);
+    assert(result.reasons.includes(reason), `${label}: ${JSON.stringify(result.reasons)}`);
+  }
+});
+
+test('EV3: approach rows are sampled only while armed, bounded, and the snapshot arms and disarms after its own reads', () => {
+  const restore = keepEventPrototype();
+  try {
+    const { win, nodes, listeners } = geometryPage();
+    installEventDiagnostics(win);
+    const move = listeners.find((l) => l.type === 'pointermove' && l.capture).fn;
+    const event = (i) => ({ type: 'pointermove', target: nodes.open, relatedTarget: null, isTrusted: true, timeStamp: i, clientX: 20, clientY: 420 });
+    move(event(1));
+    assert.equal(win.__evDiag.rows.filter((r) => r.id === 'approach').length, 0, 'not armed: nothing sampled');
+    win.__evDiagArm(true);
+    for (let i = 0; i < 30; i += 1) move(event(i));
+    const approach = win.__evDiag.rows.filter((r) => r.id === 'approach');
+    assert.equal(approach.length, 24);
+    assert.equal(win.__evDiag.approachTruncated, true);
+    assert.equal(approach[0].geometry.label, 'pointermove:approach');
+    win.__evDiagArm(false);
+    move(event(99));
+    assert.equal(win.__evDiag.rows.filter((r) => r.id === 'approach').length, 24);
+    assert.deepEqual(win.__evDiag.rows.filter((r) => r.id === 'arm').map((r) => r.on), [true, false]);
+  } finally { restore(); }
+});
+
+test('EV3: the init script and openSnapshot run as page source with no module bindings; the pre read arms after its own reads', () => {
+  const restore = keepEventPrototype();
+  try {
+    const { win } = geometryPage();
+    const page = vm.createContext({ window: win, document: win.document, getComputedStyle: win.getComputedStyle, performance });
+    vm.runInContext(`(${installEventDiagnostics.toString()})(window);`, page);
+    assert.equal(win.__evDiag.version, EVENT_RECORDER_VERSION);
+    const pre = vm.runInContext(`(${openSnapshot.toString()})('pre')`, page);
+    // values from another realm: compared as data
+    assert.deepEqual(JSON.parse(JSON.stringify([pre.phase, pre.geometry.label, pre.geometry.error, pre.geometry.order])), ['pre', 'snapshot:pre', null, GEOMETRY_ORDER]);
+    const arm = win.__evDiag.rows.find((row) => row.id === 'arm');
+    assert(arm.on === true && arm.now >= pre.geometry.t1, 'armed only after the snapshot and its geometry were read');
+    const post = vm.runInContext(`(${openSnapshot.toString()})('post')`, page);
+    assert.equal(post.geometry.label, 'snapshot:post');
+    assert.equal(JSON.stringify(win.__evDiag.rows.filter((row) => row.id === 'arm').map((row) => row.on)), '[true,false]');
+    assert.equal(win.__evDiag.fault, null);
+  } finally { restore(); }
 });

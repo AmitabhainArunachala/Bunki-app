@@ -20,6 +20,7 @@ import {
 import { homedir } from 'node:os';
 import { dirname, extname, isAbsolute, relative, resolve, sep } from 'node:path';
 import process from 'node:process';
+import { performance } from 'node:perf_hooks';
 import console from 'node:console';
 import { fileURLToPath, pathToFileURL, URL as WebUrl } from 'node:url';
 import { preparePublisherFixture } from '../../../tools/feed/publisher-fixture.mjs';
@@ -145,6 +146,14 @@ if (contextDiagnostics) {
 }
 const eventRecorderScript = `(${installEventDiagnostics.toString()})(window);`;
 let openEvidence = null;
+const playwrightApiLog = { cap: 400, truncated: false, entries: [],
+  sink: {
+    isEnabled: (name) => name === 'api',
+    log(name, severity, message) {
+      if (playwrightApiLog.entries.length >= playwrightApiLog.cap) { playwrightApiLog.truncated = true; return; }
+      playwrightApiLog.entries.push({ at: performance.now(), name, severity, message: String(message?.message ?? message).slice(0, 300) });
+    },
+  } };
 const stage = mkdtempSync(resolve(out, 'contracts-runtime-'));
 mkdirSync(resolve(stage, 'modules'));
 writeFileSync(
@@ -577,14 +586,17 @@ async function ui() {
   rmSync(cert);
   await new Promise((done) => server.listen(0, '127.0.0.1', done));
   const base = `https://127.0.0.1:${server.address().port}`;
-  const browser = await (browserName === 'webkit' ? webkit : chromium).launch(
-    browserName === 'chromium'
+  const browser = await (browserName === 'webkit' ? webkit : chromium).launch({
+    ...(browserName === 'chromium'
       ? {
           executablePath: process.env.CHROMIUM_PATH || undefined,
           args: ['--ignore-certificate-errors'],
         }
-      : {},
-  );
+      : {}),
+    // event diagnostics only: Playwright's own API envelope (call started/succeeded/failed), bounded. It is not its
+    // progress/debug channel, so it neither lists every scroll or retry nor proves that none happened (W2 1945)
+    ...(eventDiagnostics ? { logger: playwrightApiLog.sink } : {}),
+  });
   observations.runtime = {
     engine: browserName,
     version: browser.version(),
@@ -838,7 +850,10 @@ async function ui() {
     noDebt(kept);
     // event diagnostics: the button's state just before and just after the unchanged native click (the after read is
     // attempted whatever the click did), and the click's own outcome; no wait is added and the click is never substituted
-    if (eventDiagnostics) openEvidence = { pre: await page.evaluate(openSnapshot).catch((error) => ({ snapshotError: String(error) })) };
+    if (eventDiagnostics) {
+      openEvidence = { node: { beforePre: performance.now() } };
+      openEvidence.pre = await page.evaluate(openSnapshot, 'pre').catch((error) => ({ snapshotError: String(error) }));
+    }
     try {
       await page.locator('#publisher-context-open').click();
       if (openEvidence) openEvidence.click = { ok: true };
@@ -846,7 +861,16 @@ async function ui() {
       if (openEvidence) openEvidence.click = { ok: false, error: String(error?.stack || error) };
       throw error;
     } finally {
-      if (openEvidence) openEvidence.post = await page.evaluate(openSnapshot).catch((error) => ({ snapshotError: String(error) }));
+      if (openEvidence) {
+        openEvidence.post = await page.evaluate(openSnapshot, 'post').catch((error) => ({ snapshotError: String(error) }));
+        // the action document's own trace, read together in that document before anything later can replace it
+        // (W2 1928): recorder, source probes and their version, under the recorder's per-document nonce (docId)
+        openEvidence.actionDoc = await page.evaluate(() => ({ docId: window.__evDiag?.docId ?? null,
+          recorder: window.__evDiag ? JSON.parse(JSON.stringify(window.__evDiag)) : null,
+          ctx: Array.isArray(window.__ctxDiag) ? JSON.parse(JSON.stringify(window.__ctxDiag)) : null,
+          ctxVersion: window.__ctxDiagVersion ?? null })).catch((error) => ({ captureError: String(error) }));
+        openEvidence.node.afterActionDoc = performance.now();
+      }
     }
     await page.waitForSelector('#teacher-source-return');
     assert.equal(await page.locator('.teacher-context .teacher-source-quote').textContent(), text);
@@ -942,16 +966,20 @@ async function ui() {
         // event diagnostics: evidence from a missing, truncated, unreadable or replaced document is never classified
         let event = null;
         if (eventDiagnostics) {
-          const recorder = await context.page.evaluate(() => (window.__evDiag ? JSON.parse(JSON.stringify(window.__evDiag)) : null))
+          // the document open at the end of the case (after any reload) is kept as later evidence only; it never
+          // stands in for the action document (W2 1928)
+          const laterDocument = await context.page.evaluate(() => (window.__evDiag ? JSON.parse(JSON.stringify(window.__evDiag)) : null))
             .catch((error) => ({ captureError: String(error) }));
-          event = classifyOpen({ ctx: Array.isArray(records) ? records : null, recorder, pre: openEvidence?.pre ?? null,
+          event = classifyOpen({ actionDoc: openEvidence?.actionDoc ?? null, pre: openEvidence?.pre ?? null,
             post: openEvidence?.post ?? null, click: openEvidence?.click ?? null, page: context.lifecycle });
           if (event.verdict !== 'OBSERVED') reasons.push(...event.reasons.map((reason) => `event evidence: ${reason}`));
-          context.diagnostics.push({ kind: 'event-diagnostics', recorder, open: openEvidence, lifecycle: context.lifecycle, classification: event });
+          context.diagnostics.push({ kind: 'event-diagnostics', laterDocument, open: openEvidence, lifecycle: context.lifecycle, classification: event,
+            playwrightApi: { cap: playwrightApiLog.cap, truncated: playwrightApiLog.truncated, entries: playwrightApiLog.entries } });
         }
         const entry = { case: name, verdict: reasons.length ? 'INCONCLUSIVE' : 'OBSERVED', reasons, observed,
           appDocuments: context.witness.appDocuments, version,
-          ...(event ? { event: { verdict: event.verdict, classification: event.classification } } : {}) };
+          ...(event ? { event: { verdict: event.verdict, classification: event.classification,
+            geometry: event.geometry ? { verdict: event.geometry.verdict, firstChange: event.geometry.firstChange ?? null } : null } } : {}) };
         contextWitnesses.push(entry);
         context.diagnostics.push({ kind: 'context-diagnostics', records }, { kind: 'context-witness', ...entry });
       }
@@ -1451,7 +1479,10 @@ try {
         failed: results.filter((result) => !result.pass).length,
         limitations: [
           ...(contextDiagnostics ? ['Diagnostic-only served corridor.js with passive keepSelection probes; never an acceptance run'] : []),
-          ...(eventDiagnostics ? ['Event diagnostics add an init-script recorder (observing listeners, wrapped stopPropagation/stopImmediatePropagation/preventDefault that always call the original, a MutationObserver) and two page reads around the unchanged native Open click; never an acceptance run'] : []),
+          ...(eventDiagnostics ? ['Event diagnostics add an init-script recorder (observing listeners, wrapped stopPropagation/stopImmediatePropagation/preventDefault that always call the original, a MutationObserver) and two page reads around the unchanged native Open click; never an acceptance run',
+            'EV3 press geometry is ordinary DOM reads (rects, offsets, computed style, animations, elementFromPoint) that can flush layout and perturb settlement; a non-reproduction cannot disprove the original transient, and group brackets never identify a handler',
+            'The Playwright API log is the launch logger\'s API envelope only, not its progress/debug channel: it does not list every scroll or retry and does not prove that none happened',
+            'Mouse input at phone width is not a physical-finger result'] : []),
           'Synthetic selected publisher fixtures; no live publisher network in this verifier',
           'Receipt coherence is not independent source authority or editorial approval',
           'Contract mode runs exact compiled browser-target core in Node, not browser UI or native IPC',
