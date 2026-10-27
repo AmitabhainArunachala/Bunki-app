@@ -46,7 +46,7 @@ export const PROBES = Object.freeze([
 // build of the section, each Save/Open listener registration and the Open listener's own entry are recorded
 // with the recorder's private per-node ids (window.__diagId, a WeakMap installed before the app runs), so the
 // node that holds the listener can be told from a same-id node that replaced it. Diagnostic writes only.
-export const EVENT_PROBE_VERSION = 'publisher-context-probes/1+events/1';
+export const EVENT_PROBE_VERSION = 'publisher-context-probes/1+events/2';
 const EVENT_VERSION_LINE = `window.__ctxDiagVersion = ${JSON.stringify(EVENT_PROBE_VERSION)};\n`;
 const nodeId = (name) => `(window.__diagId ? window.__diagId(${name}) : null)`;
 const push = (id, fields) => `(window.__ctxDiag ||= []).push({ id: ${JSON.stringify(id)}, t: performance.now(), ${fields} });`;
@@ -63,7 +63,7 @@ export const EVENT_PROBES = Object.freeze([
     insert: 'replace',
     text: `  ${push('reg-open', `node: ${nodeId('openSaved')}, section: ${nodeId('section')}`)}\n` +
       `  openSaved.addEventListener('click', (event) => { ${push('listener-open',
-        `node: ${nodeId('openSaved')}, current: ${nodeId('event.currentTarget')}, target: ${nodeId('event.target')}, trusted: event.isTrusted, phase: event.eventPhase`)} void keepSelection(true, openSaved); });\n` },
+        `node: ${nodeId('openSaved')}, current: ${nodeId('event.currentTarget')}, target: ${nodeId('event.target')}, event: (window.__diagEventId ? window.__diagEventId(event) : null), trusted: event.isTrusted, phase: event.eventPhase`)} void keepSelection(true, openSaved); });\n` },
 ]);
 
 const probeSets = (events) => (events ? [...PROBES, ...EVENT_PROBES] : PROBES);

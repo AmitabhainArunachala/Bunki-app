@@ -836,8 +836,8 @@ async function ui() {
     assert.equal(kept.teacherContexts.activeRef, before.teacherContexts?.activeRef || null);
     assert.deepEqual(kept.publisherLibrary, before.publisherLibrary);
     noDebt(kept);
-    // event diagnostics: the button's state just before and just after the unchanged native click, and the
-    // click's own outcome; no wait is added and the click is never substituted
+    // event diagnostics: the button's state just before and just after the unchanged native click (the after read is
+    // attempted whatever the click did), and the click's own outcome; no wait is added and the click is never substituted
     if (eventDiagnostics) openEvidence = { pre: await page.evaluate(openSnapshot).catch((error) => ({ snapshotError: String(error) })) };
     try {
       await page.locator('#publisher-context-open').click();
@@ -845,8 +845,9 @@ async function ui() {
     } catch (error) {
       if (openEvidence) openEvidence.click = { ok: false, error: String(error?.stack || error) };
       throw error;
+    } finally {
+      if (openEvidence) openEvidence.post = await page.evaluate(openSnapshot).catch((error) => ({ snapshotError: String(error) }));
     }
-    if (openEvidence) openEvidence.post = await page.evaluate(openSnapshot).catch((error) => ({ snapshotError: String(error) }));
     await page.waitForSelector('#teacher-source-return');
     assert.equal(await page.locator('.teacher-context .teacher-source-quote').textContent(), text);
     assert.equal((await record(page)).teacherContexts.activeRef, selected.id);
