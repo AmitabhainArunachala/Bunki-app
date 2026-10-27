@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 import test from 'node:test';
+import ts from 'typescript';
 
 // Actual shipped renderer/handlers, deterministic DOM + async/storage seams.
 // This proves status/ownership only; it cannot prove native press geometry.
@@ -35,25 +36,60 @@ function harness({ personal = false, code = renderer, language = 'en', text = '�
   const pauses = new Map(), visits = [], patches = [], created = [], nodes = [];
   class Node {
     constructor(tag, cls = '', text = '') {
-      this.tag = tag; this.className = cls; this.text = text; this.children = []; this.parentNode = null;
+      this.tag = tag; this.className = cls || ''; this.text = text || ''; this.children = []; this.parentNode = null;
       this.listeners = new Map(); this.dataset = {}; this.history = []; this.attrs = new Map(); nodes.push(this);
+      const classes = () => this.className.split(' ').filter(Boolean);
+      this.classList = { contains: c => classes().includes(c),
+        add: c => { this.className = [...new Set([...classes(), c])].join(' '); },
+        remove: c => { this.className = classes().filter(x => x !== c).join(' '); },
+        toggle: (c, force) => { const on = force ?? !this.classList.contains(c);
+          this.classList[on ? 'add' : 'remove'](c); return on; } };
     }
     get isConnected() { return this === root || !!this.parentNode?.isConnected; }
-    get textContent() { return this.text; }
-    set textContent(value) { assert.equal(typeof value, 'string', 'status/text must remain real copy'); this.text = value; this.history.push(value); }
+    get parentElement() { return this.parentNode; }
+    get childNodes() { return this.children; }
+    get tagName() { return this.tag.toUpperCase(); }
+    hasAttribute(k) { return this.attrs.has(k); }
+    removeAttribute(k) { this.attrs.delete(k); }
+    focus() {}
+    scrollIntoView() {}
+    get textContent() { return this.text + this.children.map(child => child.textContent).join(''); }
+    set textContent(value) { assert.equal(typeof value, 'string', 'status/text must remain real copy');
+      this.replaceChildren(); this.text = value; this.history.push(value); }
     set disabled(value) { this.isDisabled = value; refreshed++; }
     get disabled() { return this.isDisabled; }
-    setAttribute(k, v) { this.attrs.set(k, v); }
-    append(...children) { for (const child of children) { child.parentNode = this; this.children.push(child); } }
-    prepend(child) { child.parentNode = this; this.children.unshift(child); }
-    replaceChildren(...children) { for (const child of this.children) child.parentNode = null; this.children = []; this.append(...children); }
+    setAttribute(k, v) { this.attrs.set(k, String(v)); }
+    getAttribute(k) { return this.attrs.get(k) ?? null; }
+    append(...children) { for (const child of children) { child.remove(); child.parentNode = this; this.children.push(child); } }
+    prepend(child) { child.remove(); child.parentNode = this; this.children.unshift(child); }
+    replaceChildren(...children) { for (const child of this.children) child.parentNode = null; this.children = []; this.text = ''; this.append(...children); }
+    replaceWith(...children) { const parent = this.parentNode; if (!parent) return;
+      for (const child of children) child.remove();
+      const index = parent.children.indexOf(this); parent.children.splice(index, 1, ...children);
+      for (const child of children) child.parentNode = parent; this.parentNode = null; }
     remove() { if (this.parentNode) this.parentNode.children.splice(this.parentNode.children.indexOf(this), 1); this.parentNode = null; }
     contains(node) { return node === this || this.children.some(child => child.contains(node)); }
+    matches(selector) {
+      if (selector.includes(',')) return selector.split(',').some(part => this.matches(part.trim()));
+      if (selector.startsWith('#')) return this.id === selector.slice(1);
+      if (selector.startsWith('.')) return this.classList.contains(selector.slice(1));
+      if (selector === '[hidden]') return !!this.hidden;
+      if (selector === '[inert]') return !!this.inert;
+      if (selector.startsWith('[data-')) { const [key, value] = selector.slice(6, -1).split('=');
+        const prop = key.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+        return prop in this.dataset && (value === undefined || this.dataset[prop] === value.replaceAll('"', '')); }
+      const [tag, cls] = selector.split('.'); return this.tag === tag && (!cls || this.classList.contains(cls));
+    }
+    closest(selector) { return this.matches(selector) ? this : this.parentNode?.closest(selector) || null; }
+    querySelectorAll(selector) { const direct = selector.startsWith(':scope > '); if (direct) selector = selector.slice(9);
+      return this.children.flatMap(child => [...(child.matches(selector) ? [child] : []), ...(direct ? [] : child.querySelectorAll(selector))]); }
+    querySelector(selector) { return this.querySelectorAll(selector)[0] || null; }
     addEventListener(type, fn) { const set = this.listeners.get(type) || new Set(); set.add(fn); this.listeners.set(type, set); }
-    emit(type) { return [...(this.listeners.get(type) || [])].map(fn => fn({ target: this })); }
+    emit(type, event = {}) { event.target ||= this; return [...(this.listeners.get(type) || [])].map(fn => fn(event)); }
     click() { this.emit('click'); }
   }
-  const root = new Node('main'), body = new Node('article', '', text); root.append(body);
+  const root = new Node('main'), body = new Node('article', '', text); root.id = 'main';
+  body.id = personal ? 'source-reader-body' : 'publisher-body'; root.append(body);
   const saved = { id: 'personal-1', receiptSha256: 'publisher-1', encounterUrl: 'https://source.test/personal',
     candidate: { article: { title: 'Reading', body: { text: body.textContent, contentSha256: 'body-digest' },
       source: { attribution: 'The source author' }, canonicalUrl: 'https://source.test/publisher',
@@ -119,7 +155,7 @@ function harness({ personal = false, code = renderer, language = 'en', text = '�
     context.publisherSelectionSurface.update();
   }
   const pause = name => { const held = { entered: deferred(), release: deferred(), error: null }; pauses.set(name, held); return held; };
-  return { context, root, body, saved, nodes, patches, created, visits, select, pause, find,
+  return { context, root, body, saved, nodes, patches, created, visits, select, pause, find, Node,
     get surface() { return context.publisherSelectionSurface; },
     get status() { return find('context-status'); },
     get live() { return live; }, set live(value) { live = value; },
@@ -488,4 +524,322 @@ test('new suite is registered exactly once without replacing a required suite', 
   const supplemental = readFileSync(new URL('../../../scripts/ci/supplemental.mjs', import.meta.url), 'utf8');
   assert.equal(supplemental.split("'prototypes/corridor/tools/publisher-context-open.test.mjs'").length - 1, 1);
   assert(supplemental.includes("'prototypes/corridor/tools/reader-english-rung.test.mjs'"));
+});
+
+// MOVER: actual declarations and DOM descendants, not a guessed body.textContent getter.
+async function moverKilled(label, run, pattern) {
+  let observed;
+  await killed(async () => { try { await run(); } catch (error) {
+    observed = { code: error.code, message: error.message.split('\n')[0] }; throw error;
+  } }, pattern);
+  console.log('MOVER_MUTANT ' + JSON.stringify({ label, outcome: 'killed-by-assertion', observed }));
+}
+const moverAst = ts.createSourceFile('corridor.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+const moverNames = ['ladderVisit', 'ladderCleanupGeneration', 'inlineWordReading', 'inlineGlossLine', 'setGlossLine',
+  'inlineWordGloss', 'seatGlossRow', 'activateWordLadder', 'ladderGlossRung', 'clearWordLadder', 'foldWordLadder', 'syncChromeKeep', 'back', 'installProseWordRoving', 'proseWordRovers'];
+const moverDeclarations = new Map();
+for (const statement of moverAst.statements) {
+  const names = ts.isFunctionDeclaration(statement) ? [statement.name?.text]
+    : ts.isVariableStatement(statement) ? statement.declarationList.declarations.map(n => n.name.getText(moverAst)) : [];
+  for (const name of names) if (moverNames.includes(name)) moverDeclarations.set(name, statement.getText(moverAst));
+}
+assert.equal(moverDeclarations.size, moverNames.length, 'Mover uses every actual ladder declaration');
+const moverProgram = [...new Set(moverDeclarations.values())].join('\n');
+function actualListener(needle) {
+  const found = moverAst.statements.filter(n => ts.isExpressionStatement(n) && n.getText(moverAst).includes(needle));
+  assert.equal(found.length, 1, needle); return found[0].getText(moverAst);
+}
+const ghostListener = actualListener('Date.now() < swallowClickUntil');
+const escapeListener = actualListener("if (event.key !== 'Escape') return;");
+
+function moverHarness({ personal = false, gloss = true, code = fold } = {}) {
+  const h = harness({ personal }), { context: c, Node } = h;
+  h.body.replaceChildren(new Node('#text', '', '町で'));
+  const anchor = new Node('span', 'japanese-lookup-word'); anchor.append(new Node('#text', '', '雨'));
+  h.body.append(anchor, new Node('#text', '', 'を見る。')); h.select(0, 3);
+  const original = h.body.textContent, listeners = [], timers = [];
+  let mini = null, focus = null, fitted = 0, closes = 0, entry = null;
+  const register = (owner, type, fn, capture = false) => listeners.push({ owner, type, fn, capture: capture === true || !!capture?.capture });
+  const unregister = (owner, type, fn) => { const i = listeners.findIndex(x => x.owner === owner && x.type === type && x.fn === fn); if (i >= 0) listeners.splice(i, 1); };
+  const emit = (owner, type, event = {}, captureOnly = false) => {
+    for (const row of [...listeners]) if (row.owner === owner && row.type === type && (!captureOnly || row.capture)) row.fn(event);
+  };
+  Object.assign(c.window, { addEventListener: (t, f, cap) => register('window', t, f, cap),
+    removeEventListener: (t, f) => unregister('window', t, f) });
+  Object.assign(c.document, { addEventListener: (t, f, cap) => register('document', t, f, cap),
+    getElementById: id => h.nodes.findLast(n => n.isConnected && n.id === id) || null });
+  Object.assign(c, { GESTURE: { MOVE_PX: 9 }, ladderPointers: new Set(), miniDiveOnAnchor: null, miniEntry: null,
+    sealPending: null, sealStrip: null, miniAnchor: null, readingSlipSerial: 0, chromeKeepPressed: null,
+    swallowClickUntil: 0, sheetTouchOrigin: null,
+    standingSlip: () => mini, slipAllowed: () => !c.disallowSlip,
+    closeSealStrip: () => { c.sealPending = null; c.sealStrip = null; },
+    closeVocabularyListPopover: () => { closes++; c.document.getElementById('vocabulary-list-popover')?.remove(); },
+    removeMini: () => { mini = null; }, clearReaderReadings: () => assert.fail('Source is not #reader'),
+    kataToHira: x => x, dressStage() {}, setTouchReadingShown(rt, shown) { rt.classList.toggle('hidden-rt', !shown); },
+    queueMicrotask() {}, syncWalkSentinel() {}, refreshLadderRoom() {},
+    worldPickerEls: null, roomTransitionUpdating: true, returnFromNavigation: () => { c.returned = (c.returned || 0) + 1; return true; },
+    japaneseLookupHelpId: () => 'lookup-help',
+    setTimeout: fn => timers.push(fn), focusProseWord: node => { focus = node; },
+    chromeKeep: () => { const button = new Node('button'); button.id = 'chrome-keep'; button.dataset.saveKey = 'new'; return button; },
+    paintKeepAside() {}, fitChromeKeep: () => { fitted++; } });
+  c.S.dials = { furigana: 1 }; c.S.navigationDepartures = 0; c.S.wordEntrySerial = 0;
+  runInNewContext(moverProgram + '\n' + ghostListener + '\n' + escapeListener + '\n' + code + `
+    this.mover = { get visit() { return ladderVisit; }, get generation() { return ladderCleanupGeneration; },
+      get pending() { return sourceLadderPress; }, activate: activateWordLadder, gloss: ladderGlossRung,
+      clear: clearWordLadder, fold: foldWordLadder, paint: setGlossLine,
+      owner: sourceLadderOwner, current: sourceLadderOwnerCurrent, back, roving: installProseWordRoving };
+  `, c, { timeout: 1000 });
+  const m = c.mover;
+  const options = { surface: '雨', reading: 'あめ', readingVisible: () => false,
+    gloss: () => c.inlineWordGloss(anchor, 'rain'), openStage: () => 'stage' };
+  assert.equal(m.activate(anchor, options), 'reading');
+  assert.equal(h.body.textContent, '町で雨あめを見る。', 'Actual ruby/rt contributes descendant text');
+  if (gloss) { assert.equal(m.activate(anchor, options), 'gloss'); assert.equal(h.body.textContent, '町で雨あめrainを見る。'); }
+  const button = h.find('context-open'), label = new Node('span', 'bi-label', 'Open'); button.append(label);
+  // Observed at the real target handler's entry, before its existing begin/currentSurface guard.
+  const handler = [...button.listeners.get('click')][0]; button.listeners.set('click', new Set([event => {
+    entry = { target: event.target, targetAlive: event.target.isConnected, buttonAlive: button.isConnected,
+      text: h.body.textContent, pendingBefore: h.surface.state.pending }; return handler(event);
+  }]));
+  const event = (target, rest = {}) => ({ target, button: 0, pointerId: 1, pointerType: 'mouse', isPrimary: true,
+    clientX: 200, clientY: 300, detail: 1, defaultPrevented: false, propagationStopped: false,
+    preventDefault() { this.defaultPrevented = true; }, stopPropagation() { this.propagationStopped = true; }, ...rest });
+  const down = (target = label, rest = {}) => { const ev = event(target, rest); c.ladderPointers.add(ev.pointerId);
+    emit('window', 'pointerdown', ev); emit('document', 'pointerdown', ev); return ev; };
+  const up = (target = label, rest = {}) => { const ev = event(target, rest); c.ladderPointers.delete(ev.pointerId);
+    emit('window', 'pointerup', ev); return ev; };
+  const click = (target = label, rest = {}) => { const ev = event(target, rest);
+    emit('window', 'click', ev); emit('document', 'click', ev);
+    if (!ev.propagationStopped && target.isConnected) (target.closest('button') || target).emit('click', ev);
+    return ev;
+  };
+  button.click = () => click(button, { detail: 0, pointerId: undefined, pointerType: undefined, isTrusted: false });
+  anchor.click = () => click(anchor, { detail: 0, pointerId: undefined, pointerType: undefined, isTrusted: false });
+  return { ...h, c, m, anchor, options, button, label, original, down, up, click, emit, event, listeners, timers,
+    get live() { return h.live; }, set live(value) { h.live = value; },
+    get entry() { return entry; }, get fitted() { return fitted; }, get focus() { return focus; }, get closes() { return closes; },
+    set mini(value) { mini = value; } };
+}
+
+async function delivered({ personal = false, gloss = true, code = fold, mode = 'pointer' } = {}) {
+  const h = moverHarness({ personal, gloss, code });
+  const assisted = h.body.textContent, visit = h.m.visit;
+  if (mode === 'pointer' || mode === 'compat' || mode === 'touch' || mode === 'pen') {
+    const pointer = mode === 'touch' || mode === 'pen' ? { pointerType: mode } : {};
+    h.down(h.label, pointer); assert.equal(h.body.textContent, assisted, 'Press must not remove assistance before click');
+    assert.equal(h.counts().navigation, 0); assert.equal(h.surface.state.pending, null);
+    // Ordinary focus transfer during mousedown reaches capturing blur listeners, not window blur.
+    h.emit('window', 'blur', { target: h.anchor }, true);
+    h.up(h.label, pointer); assert.equal(h.m.visit, visit, 'Pointerup never collapses assistance');
+    h.click(h.label, mode === 'compat' ? { pointerId: undefined, pointerType: undefined } : pointer);
+  } else {
+    h.emit('window', 'keydown', { key: mode === 'space' ? ' ' : 'Enter', target: h.button });
+    if (mode === 'AT/roving') h.button.click();
+    else h.click(h.label, { detail: 0, pointerId: undefined, pointerType: undefined, isTrusted: false });
+  }
+  await drain();
+  assert.equal(h.counts().navigation, 1, 'Actual source guard must admit Open once');
+  assert.equal(h.counts().commits, 1); assert.equal(h.counts().writes, 1);
+  assert.equal(h.entry.text, h.original); assert.equal(h.entry.target, mode === 'AT/roving' ? h.button : h.label);
+  assert(h.entry.targetAlive && h.entry.buttonAlive, 'Already-targeted descendant and action survive cleanup');
+  assert.deepEqual(h.created[0], { sourceKind: personal ? 'personal-reading' : 'publisher-reading', sourceId: personal ? 'personal-1' : 'publisher-1',
+    sourceDigest: 'body-digest', unit: 'utf16-code-unit', start: 0, end: 3, quote: '町で雨', index: 0,
+    title: 'Reading', attribution: 'The source author', url: `https://source.test/${personal ? 'personal' : 'publisher'}`, target: null });
+  assert.deepEqual(Object.keys(h.patches[0]), ['teacherContexts']);
+  return h;
+}
+for (const personal of [false, true]) for (const gloss of [false, true])
+  test(`mover real guard: ${personal ? 'personal' : 'publisher'} ${gloss ? 'ruby + gloss' : 'ruby'} stays through press, clears before handler`, () => delivered({ personal, gloss }));
+for (const mode of ['compat', 'touch', 'pen', 'enter', 'space', 'AT/roving'])
+  test(`mover ${mode} uses exact current source and target`, () => delivered({ mode }));
+
+test('mover counterexamples: parent sync and post-handler task each fail at the real fault', async () => {
+  const parent = fold.replace('if (!action) clearWordLadder();', 'if (true) clearWordLadder();');
+  assert.notEqual(parent, fold);
+  await moverKilled('parent-synchronous-clear', () => delivered({ code: parent }), /Press must not remove assistance before click/);
+  const late = fold.replace('  clearWordLadder(owner.visit);', '  setTimeout(() => clearWordLadder(owner.visit), 0);');
+  assert.notEqual(late, fold);
+  const h = moverHarness({ code: late }); h.down(); h.up(); h.click(); await drain();
+  assert.equal(h.entry.text, '町で雨あめrainを見る。'); assert.equal(h.surface.state.lastOutcome.code, 'O7');
+  assert.equal(h.counts().commits, 0, 'Actual begin/currentSurface refused contaminated body');
+  while (h.timers.length) h.timers.shift()(); await drain();
+  assert.equal(h.body.textContent, h.original); assert.equal(h.counts().navigation, 0, 'Late cleanup cannot resurrect missed action');
+  await moverKilled('post-handler-task', () => delivered({ code: late }), /Actual source guard must admit Open once/);
+});
+
+const cancellations = {
+  pointercancel: h => h.emit('window', 'pointercancel', h.event(h.label)),
+  movement: h => h.emit('window', 'pointermove', h.event(h.label, { clientX: 210 })),
+  scroll: h => h.emit('window', 'scroll', { target: h.body }),
+  drag: h => h.emit('window', 'dragstart', h.event(h.label)),
+  blur: h => h.emit('window', 'blur', { target: h.c.window }),
+  visibility: h => h.emit('document', 'visibilitychange', {}),
+  secondPointer: h => h.down(h.label, { pointerId: 2, isPrimary: false }),
+  secondPointerElsewhere: h => h.down(h.root, { pointerId: 2, isPrimary: false }),
+  mismatchedUp: h => h.up(h.label, { pointerId: 2 }),
+  releaseMovement: h => h.up(h.label, { clientX: 211 }),
+};
+for (const [name, cancel] of Object.entries(cancellations)) test(`mover cancellation ${name} retires authorization, leaves assist`, async () => {
+  const h = moverHarness(), visit = h.m.visit, text = h.body.textContent;
+  h.down(); cancel(h); h.up(); h.click(); await drain();
+  assert.equal(h.m.visit, visit); assert.equal(h.body.textContent, text);
+  assert.equal(h.m.pending, null); assert.equal(h.counts().commits, 0);
+});
+for (const miss of ['no-release', 'wrong-id', 'wrong-type', 'ancestor', 'sibling', 'detached', 'suppressed', 'stale-sheet'])
+  test(`mover click ${miss} cannot consume the cleanup`, async () => {
+    const h = moverHarness(), visit = h.m.visit;
+    const pointer = miss === 'stale-sheet' ? { pointerType: 'touch' } : {};
+    h.down(h.label, pointer); if (miss !== 'no-release') h.up(h.label, pointer);
+    let target = h.label, extra = {};
+    if (miss === 'wrong-id') extra.pointerId = 9;
+    if (miss === 'wrong-type') extra.pointerType = 'touch';
+    if (miss === 'ancestor') target = h.button.closest('.publisher-context-selection');
+    if (miss === 'sibling') target = h.find('sentence-practice');
+    if (miss === 'detached') h.label.remove();
+    if (miss === 'suppressed') h.c.swallowClickUntil = Date.now() + 10000;
+    if (miss === 'stale-sheet') { h.c.sheetTouchOrigin = { sheet: { isConnected: false }, pointerId: 1 }; extra.pointerType = 'touch'; }
+    h.click(target, extra); await drain(); assert.equal(h.m.visit, visit); assert.equal(h.counts().commits, 0);
+    assert.equal(h.m.pending, null);
+  });
+
+const invalidations = {
+  recordEpoch: h => h.c.recordEpoch++, pageEpoch: h => h.c.pageEpoch++,
+  view: h => { h.c.S.view = 'search'; }, sourceId: h => { h.c.S.publisherReceipt = 'other'; },
+  sourceRoot: h => { h.c.S.publisherLibrary = { entry: h.live }; },
+  sourceValue: h => { h.live = { ...h.live, candidate: { article: { ...h.live.candidate.article, title: 'Changed' } } }; },
+  stackPush: h => h.c.S.stack.push({ view: 'sheet' }), stackReplace: h => { h.c.S.stack = []; },
+  stackFrame: h => { h.c.S.stack[0] = { view: 'changed' }; },
+  detour: h => h.c.S.navigationDepartures++, wordEntry: h => h.c.S.wordEntrySerial++,
+  selectionGeneration: h => h.surface.state.generation++,
+  sourceRevoked: h => { h.surface.state.sourceRevoked = true; },
+  recordOwner: h => { h.c.recordReady = () => false; },
+  invalidLayer: h => { h.c.disallowSlip = true; },
+  hiddenSurface: h => { h.button.closest('.publisher-context-selection').hidden = true; },
+  inertSurface: h => { h.button.closest('.publisher-context-selection').inert = true; },
+  detachedAnchor: h => h.anchor.remove(), detachedAction: h => h.button.remove(),
+  replacedBody: h => { const body = new h.Node('article', '', h.original); body.id = 'publisher-body'; h.body.replaceWith(body); },
+  surfaceReplacement: h => h.repaint(),
+  miniArrival: h => { h.mini = new h.Node('aside'); },
+  sameRungPaint: h => h.m.paint(h.anchor.querySelector('.tok-en'), 'new rain'),
+  actualAdvance: h => h.m.activate(h.anchor, h.options),
+  sameAnchorNewVisit: h => { h.m.clear(); h.m.activate(h.anchor, h.options); h.m.activate(h.anchor, h.options); },
+  freshSuccessor: h => { const anchor = new h.Node('span', '', '雲'); h.body.append(anchor); h.m.activate(anchor, { ...h.options, surface: '雲' }); },
+};
+for (const [name, invalidate] of Object.entries(invalidations)) test(`mover owner invalidation ${name} preserves successor state`, async () => {
+  const h = moverHarness(); if (name === 'stackFrame') h.c.S.stack.push({ view: 'first' });
+  h.down(); invalidate(h); const visit = h.m.visit, text = h.body.textContent;
+  h.up(); h.click(); await drain(); assert.equal(h.m.visit, visit); assert.equal(h.body.textContent, text);
+  assert.equal(h.m.pending, null); assert.equal(h.counts().commits, 0);
+});
+
+async function aba(code = fold) {
+  const h = moverHarness({ code }); const visit = h.m.visit; h.down();
+  h.m.activate(h.anchor, h.options); assert.equal(visit.rung, 'stage');
+  h.m.gloss(visit); const successor = h.anchor.querySelector('.tok-en');
+  assert.equal(h.m.visit, visit); assert.equal(visit.rung, 'gloss');
+  h.up(); h.click(); await drain();
+  assert(successor.isConnected, 'Same-object/rung ABA must preserve new gloss');
+  assert.equal(h.m.visit, visit); assert.equal(h.counts().commits, 0);
+}
+test('mover monotone generation defeats same-object ABA; identity/rung-only mutant is killed', async () => {
+  await aba();
+  const mutant = fold.replace(' || owner.generation !== ladderCleanupGeneration', ''); assert.notEqual(mutant, fold);
+  await moverKilled('identity-rung-without-generation', () => aba(mutant), /Same-object\/rung ABA must preserve new gloss/);
+});
+
+test('mover no-click owner and listeners stay bounded; new intent cannot borrow old authorization', async () => {
+  const h = moverHarness(), count = h.listeners.length, visit = h.m.visit;
+  for (let i = 0; i < 100; i++) { h.down(); h.up(); assert(h.m.pending?.released); assert.equal(h.listeners.length, count); assert.equal(h.timers.length, 0); }
+  h.down(h.find('sentence-practice')); h.up(); h.click(h.label); await drain();
+  assert.equal(h.m.visit, visit); assert.equal(h.counts().commits, 0); assert.equal(h.m.pending, null);
+  h.down(); h.up(); h.click(); await drain(); assert.equal(h.counts().writes, 1);
+});
+
+test('mover actual syncChromeKeep replacement preserves the actual Open target', async () => {
+  const h = moverHarness(), old = new h.Node('button'); old.id = 'chrome-keep'; old.dataset.saveKey = 'old'; h.root.append(old);
+  h.down(); h.up(); h.click(); await drain();
+  assert.equal(old.isConnected, false); assert.equal(h.fitted, 1);
+  assert(h.entry.targetAlive && h.entry.buttonAlive); assert.equal(h.entry.target, h.label); assert.equal(h.counts().writes, 1);
+  const other = moverHarness(), chrome = new other.Node('button'); chrome.id = 'chrome-keep'; other.root.append(chrome);
+  const visit = other.m.visit; other.click(chrome, { detail: 0 }); assert.equal(other.m.visit, visit, 'Chrome is outside new keyboard cleanup scope');
+});
+
+test('mover fresh keyboard rejects stale original source and a still-connected former section', async () => {
+  const stale = moverHarness(); stale.live.candidate.article.title = 'new source';
+  const visit = stale.m.visit; stale.click(stale.label, { detail: 0 }); await drain(); assert.equal(stale.m.visit, visit); assert.equal(stale.counts().writes, 0);
+  const h = moverHarness(), old = h.button, oldVisit = h.m.visit;
+  // Actual renderer replacement without detaching the old section; global current surface alone is insufficient.
+  h.c.draw(h.root, clone(h.live), h.body, false);
+  h.click(old, { detail: 0 }); await drain(); assert.equal(h.m.visit, oldVisit); assert.equal(h.counts().writes, 0);
+});
+
+test('mover exclusions and one-level Escape/Back remain the actual ladder grammar', () => {
+  for (const id of ['seal-strip', 'vocabulary-list-popover']) {
+    const h = moverHarness(), wrap = new h.Node('div'); wrap.id = id; h.root.append(wrap); wrap.append(h.button.closest('.publisher-context-selection'));
+    const visit = h.m.visit; h.down(); h.up(); h.click(h.label, { detail: 0 }); assert.equal(h.m.visit, visit);
+  }
+  const anchor = moverHarness(), visit = anchor.m.visit; anchor.down(anchor.anchor); assert.equal(anchor.m.visit, visit);
+  const back = moverHarness(), control = new back.Node('button'); control.id = 'back'; back.root.append(control);
+  control.addEventListener('click', () => back.m.back());
+  back.down(control); assert(back.m.visit); back.up(control); back.click(control);
+  assert.equal(back.m.visit, null); assert.equal(back.c.returned, undefined, 'First Back only folds');
+  back.down(control); back.up(control); back.click(control); assert.equal(back.c.returned, 1, 'Second Back returns');
+  const escape = moverHarness(); escape.down(); escape.emit('window', 'keydown', { key: 'Escape' });
+  const event = escape.event(escape.anchor, { key: 'Escape' }); escape.emit('document', 'keydown', event);
+  assert.equal(escape.m.visit, null); assert.equal(escape.focus, escape.anchor); assert(event.defaultPrevented);
+});
+
+test('mover copy and existing source guard are unchanged; private generation owns page/restore seams', () => {
+  assert(renderer.includes('body.textContent === source.text'));
+  assert(renderer.includes("'選んだ文章をひらく', 'open selected text'"));
+  assert(source.includes("ladderCleanupGeneration++;\n      ladderOpening.rung = 'page';"));
+  assert(source.includes('ladderCleanupGeneration++;\n      ladderVisit = origin;'));
+});
+
+test('mover genuine roving Enter/Space calls word.click without outside cleanup or trust gate', () => {
+  for (const key of ['Enter', ' ']) {
+    const h = moverHarness({ gloss: false }), visit = h.m.visit;
+    h.anchor.dataset.lookupText = '雨'; h.anchor.addEventListener('click', () => h.m.activate(h.anchor, h.options));
+    h.m.roving(h.body); const event = h.event(h.body, { key, detail: 0 });
+    h.emit('window', 'keydown', event); h.body.emit('keydown', event);
+    assert(event.defaultPrevented); assert.equal(h.m.visit, visit); assert.equal(visit.rung, 'gloss');
+    assert.equal(h.body.textContent, '町で雨あめrainを見る。'); assert.equal(h.counts().commits, 0);
+  }
+});
+
+test('mover first-use demo and all navigation Back selectors retain parent outside semantics', () => {
+  for (const id of ['sheet-back', 'chrome-back', 'back', 'action-back', 'bar-back']) {
+    const h = moverHarness(), button = new h.Node('button'); button.id = id;
+    if (id === 'action-back') button.dataset.action = 'navigation.back';
+    if (id === 'bar-back') button.dataset.barBack = '';
+    h.root.append(button); const visit = h.m.visit; h.down(button); assert.equal(h.m.visit, visit);
+  }
+  const h = moverHarness(), button = new h.Node('button'); button.id = 'back'; h.root.append(button);
+  h.m.visit.demo = true; button.addEventListener('click', () => h.m.back());
+  h.down(button); assert.equal(h.m.visit, null, 'Demo clears on press as before');
+  h.up(button); h.click(button); assert.equal(h.c.returned, 1, 'Demo Back leaves on that click');
+});
+
+for (const kind of ['save', 'practice', 'lookup']) test(`mover ${kind} restores exact source before existing action; no extra debt`, async () => {
+  const h = moverHarness({ personal: kind === 'lookup' });
+  const button = h.find(kind === 'save' ? 'context-save' : kind === 'practice' ? 'sentence-practice' : 'selection-lookup');
+  // saveOne's keep callback is the existing renderer's real persistence boundary (saveOne itself is tested by Japanese suite).
+  if (kind === 'save') button.addEventListener('click', () => { void button.options.keep(); });
+  h.down(button); h.up(button); h.click(button); await drain();
+  assert.equal(h.created[0].quote, '町で雨'); assert.equal(h.created[0].start, 0); assert.equal(h.created[0].end, 3);
+  assert.equal(h.counts().writes, kind === 'save' ? 1 : 0); assert.equal(h.counts().navigation, kind === 'save' ? 0 : 1);
+  if (kind === 'save') { assert.equal(h.status.textContent, savedCopy); assert.deepEqual(Object.keys(h.patches[0]), ['teacherContexts']); }
+});
+
+test('mover defaultPrevented mutant cannot hide behind pointer-type mismatch', async () => {
+  async function suppressed(code) {
+    const h = moverHarness({ code }), visit = h.m.visit;
+    h.down(h.label, { pointerType: 'touch' }); h.up(h.label, { pointerType: 'touch' });
+    h.c.sheetTouchOrigin = { sheet: { isConnected: false }, pointerId: 1 };
+    h.click(h.label, { pointerType: 'touch' });
+    assert.equal(h.m.visit, visit, 'Suppressed same-pointer click must preserve assist');
+  }
+  await suppressed(fold);
+  const mutant = fold.replace('  if (event.defaultPrevented) return;', ''); assert.notEqual(mutant, fold);
+  await moverKilled('ignore-ghost-suppression', () => suppressed(mutant), /Suppressed same-pointer click must preserve assist/);
 });

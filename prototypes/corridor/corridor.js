@@ -9707,6 +9707,7 @@ const slipSummons = []; // the onClose of every slip whose entry is open, called
 // A visit belongs to an occurrence, not a spelling. Covered pages keep their own
 // visit, so a nested word returns to the stage that actually opened it.
 let ladderVisit = null;
+let ladderCleanupGeneration = 0; // private cleanup authority; same-object rung ABA must not revive a press
 let ladderOpening = null;
 let ladderReturning = null;
 let ladderRefreshing = false;
@@ -9757,6 +9758,7 @@ function inlineGlossLine(text, waiting = false) {
   return line;
 }
 function setGlossLine(line, text, waiting = false) {
+  if (ladderVisit?.anchor.contains(line)) ladderCleanupGeneration++;
   line.querySelector('.tok-en-text').textContent = text || '';
   line.classList.toggle('tok-en-wait', !text && waiting);
   line.classList.toggle('tok-en-miss', !text && !waiting);
@@ -10079,6 +10081,7 @@ if (typeof MutationObserver === 'function' && typeof document !== 'undefined' &&
 }
 function clearWordLadder(visit = ladderVisit) {
   if (!visit) return;
+  ladderCleanupGeneration++;
   if (ladderVisit === visit) ladderVisit = null;
   delete visit.anchor.dataset.ladderRung;
   visit.clearGloss?.();
@@ -10120,6 +10123,7 @@ document.addEventListener('keydown', event => {
 }, true);
 function activateWordLadder(anchor, options) {
   if (!anchor?.isConnected || !slipAllowed(anchor)) return null;
+  ladderCleanupGeneration++;
   // A reading or stage can arrive without a room render to arm device Back.
   queueMicrotask(syncWalkSentinel);
   if (ladderVisit?.anchor === anchor) {
@@ -10173,6 +10177,7 @@ function activateWordLadder(anchor, options) {
 }
 /** Ladder · the English rung: the word's English under it, the reading (if one was raised) staying over it. */
 function ladderGlossRung(visit) {
+  ladderCleanupGeneration++;
   visit.rung = visit.anchor.dataset.ladderRung = 'gloss';
   const undo = visit.gloss();
   visit.clearGloss = typeof undo === 'function' ? undo : null;
@@ -10259,6 +10264,88 @@ function foldMenuAfterPress(pop) {
   window.addEventListener('pointercancel', landed, true);
   menuFoldPending = stop;
 }
+/* A source action must receive its click before outside assistance can move it. Unlike the menu's
+ * post-handler fold, this cleanup precedes the handler: its exact-source guard must see bare prose.
+ * Restrict it to these stable page actions; chrome-keep can be replaced by syncChromeKeep. */
+let sourceLadderPress = null;
+function sourceLadderAction(target) {
+  const action = target?.closest?.('button');
+  if (!action || !/^(publisher|source)-(context-save|context-open|sentence-practice|selection-lookup)$/.test(action.id)) return null;
+  return action.closest('.publisher-context-selection') ? action : null;
+}
+function sourceLadderOwner(action) {
+  const visit = ladderVisit, surface = publisherSelectionSurface;
+  const bound = surface?.ladderOwner;
+  const personal = S.view === 'source-reader', prefix = personal ? 'source' : 'publisher';
+  if (!action?.isConnected || action.disabled || !recordReady(recordEpoch) || (!personal && S.view !== 'publisher') ||
+      !action.id.startsWith(`${prefix}-`) || !surface?.connected() || surface.state.sourceRevoked ||
+      standingSlip() || !visit?.anchor.isConnected || !slipAllowed(visit.anchor) ||
+      action.closest('#seal-strip, #vocabulary-list-popover, [inert], [hidden]') ||
+      !['reading', 'gloss'].includes(visit.rung)) return null;
+  const section = action.closest('.publisher-context-selection'), main = section?.closest('main');
+  const body = document.getElementById(personal ? 'source-reader-body' : 'publisher-body');
+  if (!bound || bound.section !== section || bound.main !== main || bound.body !== body ||
+      bound.page !== pageEpoch || bound.epoch !== recordEpoch || !main?.isConnected ||
+      !main.contains(body) || !body.contains(visit.anchor) || body.contains(action)) return null;
+  const sourceId = personal ? S.sourceCaptureId : S.publisherReceipt;
+  const sourceRoot = personal ? S.sourceInbox : S.publisherLibrary;
+  let source;
+  try {
+    source = personal ? sourceInboxModule.selectSourceCapture(sourceRoot, sourceId)
+      : publisherModule.selectPublisherReading(sourceRoot, sourceId);
+    if (!source?.candidate?.article?.body || bound.sourceId !== sourceId || bound.liveIdentity() !== bound.identity) return null;
+    source = JSON.stringify(source);
+  } catch { return null; }
+  return { visit, anchor: visit.anchor, rung: visit.rung, generation: ladderCleanupGeneration,
+    action, section, main, body, bodyText: body.textContent, surface, selection: JSON.stringify(surface.state.selection),
+    selectionGeneration: surface.state.generation, page: pageEpoch, epoch: recordEpoch,
+    view: S.view, sourceId, sourceRoot, source, stack: S.stack, frames: S.stack.slice(),
+    departures: S.navigationDepartures, wordEntry: S.wordEntrySerial };
+}
+function sourceLadderOwnerCurrent(owner) {
+  if (!owner || owner.visit !== ladderVisit || owner.anchor !== ladderVisit?.anchor ||
+      owner.rung !== ladderVisit.rung || owner.generation !== ladderCleanupGeneration) return false;
+  const fresh = sourceLadderOwner(owner.action);
+  return !!fresh && ['action', 'section', 'main', 'body', 'bodyText', 'surface', 'selection', 'selectionGeneration',
+    'page', 'epoch', 'view', 'sourceId', 'sourceRoot', 'source', 'stack', 'departures', 'wordEntry']
+    .every(key => fresh[key] === owner[key]) && fresh.frames.length === owner.frames.length &&
+    fresh.frames.every((frame, index) => frame === owner.frames[index]);
+}
+function retireSourceLadderPress() { sourceLadderPress = null; }
+// Fixed listeners; an unclicked release holds at most one inert owner until the next intent.
+window.addEventListener('pointerdown', retireSourceLadderPress, true);
+window.addEventListener('pointermove', event => {
+  const press = sourceLadderPress;
+  if (press && (event.pointerId !== press.pointerId ||
+      Math.hypot(event.clientX - press.x, event.clientY - press.y) > GESTURE.MOVE_PX)) retireSourceLadderPress();
+}, true);
+window.addEventListener('pointerup', event => {
+  const press = sourceLadderPress;
+  if (!press) return;
+  if (event.pointerId !== press.pointerId || event.button !== 0 ||
+      Math.hypot(event.clientX - press.x, event.clientY - press.y) > GESTURE.MOVE_PX) retireSourceLadderPress();
+  else press.released = true; // never collapse on pointerup; a compatibility click may still follow
+}, true);
+for (const type of ['pointercancel', 'scroll', 'dragstart', 'keydown'])
+  window.addEventListener(type, retireSourceLadderPress, true);
+window.addEventListener('blur', retireSourceLadderPress); // window departure, not ordinary descendant focus transfer
+document.addEventListener('visibilitychange', retireSourceLadderPress, true);
+// Installed after ghost-click suppression. stopPropagation alone does not stop same-node listeners.
+document.addEventListener('click', event => {
+  const press = sourceLadderPress;
+  retireSourceLadderPress();
+  if (event.defaultPrevented) return;
+  const action = sourceLadderAction(event.target);
+  const keyboard = event.detail === 0;
+  const owner = keyboard ? sourceLadderOwner(action) : press?.owner;
+  if (!keyboard && (!press?.released || event.button !== 0 ||
+      (event.pointerId !== undefined && event.pointerId !== press.pointerId) ||
+      (event.pointerType && event.pointerType !== press.pointerType))) return;
+  if (!owner || owner.action !== action || !owner.action.contains(event.target) ||
+      !event.target.isConnected || !sourceLadderOwnerCurrent(owner)) return;
+  // The already-targeted action and descendant live outside the body being restored. No replay.
+  clearWordLadder(owner.visit);
+}, true);
 document.addEventListener(
   'pointerdown',
   (ev) => {
@@ -10289,7 +10376,17 @@ document.addEventListener(
         (!ladderVisit.demo && target.closest?.('#back, [data-bar-back]')))) return;
     // an outside press returns the word bare from its reading or its English (Ladder: as now, in one step)
     if (!mini && (ladderVisit?.rung === 'reading' || ladderVisit?.rung === 'gloss') && !ladderVisit.anchor.contains(target) &&
-        !target.closest?.('#seal-strip, #vocabulary-list-popover')) clearWordLadder();
+        !target.closest?.('#seal-strip, #vocabulary-list-popover')) {
+      // A second contact cancels a press; it must not fold that press's assist from another target.
+      if (ev.isPrimary === false || ladderPointers.size > 1) return;
+      const action = sourceLadderAction(target);
+      if (!action) clearWordLadder();
+      else if (ev.button === 0 && ev.isPrimary !== false && ladderPointers.size === 1) {
+        const owner = sourceLadderOwner(action);
+        if (owner) sourceLadderPress = { owner, pointerId: ev.pointerId, pointerType: ev.pointerType,
+          x: ev.clientX, y: ev.clientY, released: false };
+      }
+    }
     const inText = ev.button === 0 && !!target.closest?.('#reader');
     if (mini && !mini.contains(target) && !target.closest?.('#vocabulary-list-popover, #reader-toast')) {
       if (miniAnchor?.isConnected && miniAnchor.contains(target)) {
@@ -24492,7 +24589,9 @@ function renderTextSourceContextSelection(main, saved, body, personal) {
   const status = el('p', 'teacher-note'); status.id = `${controlPrefix}-context-status`; status.setAttribute('role', 'status');
   const timedSelection = el('div'); timedSelection.id = `${controlPrefix}-selection-time`;
   const state = { selection: null, generation: 0, pending: null, lastOutcome: null, sourceRevoked: false };
-  const surface = { state, connected: () => section.isConnected, update: () => update() };
+  const surface = { state, connected: () => section.isConnected, update: () => update(),
+    // Passive binding for outside-assist cleanup; currentSurface still enforces exact bare source text at action entry.
+    ladderOwner: { section, main, body, page, epoch, sourceId, identity, liveIdentity: () => sourceIdentity(liveSource(S)) } };
   const controls = [];
   const refresh = () => {
     const allowed = saved.candidate.article.capabilities['quote-extract'].status === 'allowed';
@@ -42008,6 +42107,7 @@ function enterWord(node, { from = null, invoker = null, instant = false } = {}) 
   const show = () => {
     if (pushed.t === 'word' && scaleNodeBelongs(pushed) && (!S.stack.length || S.stack.at(-1)?.t === 'sent')) S.scaleVisit.word = pushed;
     if (ladderOpening) {
+      ladderCleanupGeneration++;
       ladderOpening.rung = 'page';
       ladderOpening.anchor.dataset.ladderRung = 'page';
       ladderPages.set(pushed, ladderOpening);
@@ -42082,6 +42182,7 @@ function recede({ all = false, viaRender = false, instant = false } = {}) {
       restoreDialogInvoker();
     }
     if (origin?.anchor.isConnected && !all) {
+      ladderCleanupGeneration++;
       ladderVisit = origin;
       origin.restoreNext = true;
       origin.rung = origin.anchor.dataset.ladderRung = 'stage';

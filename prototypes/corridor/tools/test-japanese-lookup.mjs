@@ -32,7 +32,7 @@ const names = ['lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'd
   'JA_COUNTER', 'JA_OPENS_WORD', 'JA_CLOSES',
   // G3 (2026-10-18): a tap climbs the word's ladder (activateWordLadder: reading, stage, page); a phonetic parenthetical is
   // no door (phoneticAnnotationRanges); a prose block is one roving stop (installProseWordRoving)
-  'activateWordLadder', 'clearWordLadder', 'ladderVisit', 'ladderReturning', 'readingSlipSerial',
+  'activateWordLadder', 'clearWordLadder', 'ladderVisit', 'ladderCleanupGeneration', 'ladderReturning', 'readingSlipSerial',
   'phoneticAnnotationRanges', 'phoneticAnnotationCandidates', 'installProseWordRoving', 'proseWordRovers',
   // G5 (2026-10-18): the slip's floor stops above the 層 mark where the two would share a column (placeFloating)
   'layersMarkTop',
