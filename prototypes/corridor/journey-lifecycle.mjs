@@ -90,6 +90,21 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
  let generation=null,activation=null,offDay=null,diagnostics=[],holdEpoch=0;
  const helpTickets=new WeakMap(),snapshots=new WeakMap(),preparations=new WeakMap(),dispatches=new WeakMap(),completions=new WeakMap();
  let bootToken=null,pendingByGoal=new Map();
+ /* U1 (W5 2030, W4 2035, W2 2043): a project work/retire attempt's own provenance. An opaque operation, claimed once at the
+  * public entry before queueing, binds this invocation. Only known target guards (guard) and the actual admit call record the
+  * exact escaping error, and only while still validating; dispatch is marked before port.commit is read, so nothing after it
+  * can become pre-dispatch proof. It proves only that THIS target was not dispatched, never that no control write happened. */
+ const attempts=new WeakMap();
+ const guard=(attempt,ok,reason)=>{if(ok)return;const error=new Error(reason);
+  if(attempt&&attempt.state==='validating')Object.assign(attempt,{state:'refused-before-dispatch',error,source:'lifecycle-guard',reason});throw error;};
+ const claim=(action,collection,operation)=>{if(operation===undefined)return null;
+  insist(operation!==null&&(typeof operation==='object'||typeof operation==='function'),'operation-invalid');
+  insist(!attempts.has(operation),'operation-reused'); // the reuse error is unwitnessed; the first attempt is untouched
+  const attempt={action,collection,boot:bootToken,owner:cp(owner),generation,state:'claimed',error:undefined,source:null,reason:null};
+  attempts.set(operation,attempt);return attempt;};
+ /** pure: identity reads on private state only; no property read, coercion or call on the supplied operation or error */
+ function preDispatchRefusal(operation,error){const a=attempts.get(operation);
+  return a&&a.state==='refused-before-dispatch'&&a.error===error?freeze({action:a.action,collection:a.collection,source:a.source,reason:a.reason}):null;}
  const dayEnd=t=>core.endOfDay(new Date(t));
  const current=()=>port.snapshot();
  const quality=s=>{const q=classify(s);return q==='valid'&&!s.daily.events.every(e=>
@@ -118,16 +133,17 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
  }
  function clearRetiredHold(){const w=witnesses();if(w.expiredHold){try{insist(device.remove(MARKERS.hold)===true,'device-clear-failed');}catch{diagnostics.push('hold-marker-clear-unavailable');}}}
  function held(reason,until=dayEnd(clock())){phase=reason;holdUntil=Math.max(holdUntil,until);holdEpoch++;return inspect();}
- function* write(next,action,{control=false,shrink=false,observe=null}={}){
-  insist(on,'switch-off');insist(owns(),'owner-epoch');
+ function* write(next,action,{control=false,shrink=false,observe=null,attempt=null}={}){
+  guard(attempt,on,'switch-off');guard(attempt,owns(),'owner-epoch');
   const before=current(),auth=authority(before);
-  insist(auth.generation===generation,'generation-changed');
+  guard(attempt,auth.generation===generation,'generation-changed');
   next.lastWriterBuild=buildId;
-  insist(classify(next)==='valid','root-invalid');
+  guard(attempt,classify(next)==='valid','root-invalid');
   // LIFECYCLE-SHRINK (W5 1850, W2 1902): a shrinking write borrows the control reserve only when its final candidate, writer
   // stamp included, is strictly smaller than the root this queued write replaces; explicit control writes keep theirs
   const prior=before.record.m4Journey,reserve=control||shrink&&classify(prior)==='valid'&&bytes(next)<bytes(prior);
-  insist(bytes(next)<=(reserve?LIMITS.bytes:LIMITS.dataBytes),'byte-bound');
+  guard(attempt,bytes(next)<=(reserve?LIMITS.bytes:LIMITS.dataBytes),'byte-bound');
+  if(attempt)attempt.state='dispatch-entered'; // before port.commit is read, called or awaited
   const sent=cp(next),result=yield port.commit({revision:before.revision,rootHash:digest(before.record.m4Journey??null),
    generation,epoch:owner.epoch,switchOn:on},sent,{action,generation,journeyId:next.id});
   // M4 S1 (W5 1750): this call's own observer sees its port result before the unchanged boolean below
@@ -136,9 +152,9 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
   if(result.outcome==='published'&&result.acknowledged===true){root=cp(current().record.m4Journey);return true;}
   held('publication-hold');return false;
  }
- function nextRoot(){const s=current();insist(classify(s.record.m4Journey)==='valid','root-unavailable');
-  insist(s.record.m4Journey.generation===generation,'generation-changed');
-  insist(s.record.m4Journey.revision===root.revision,'stale-root');return {...cp(root),revision:root.revision+1};}
+ function nextRoot(attempt=null){const s=current();guard(attempt,classify(s.record.m4Journey)==='valid','root-unavailable');
+  guard(attempt,s.record.m4Journey.generation===generation,'generation-changed');
+  guard(attempt,s.record.m4Journey.revision===root.revision,'stale-root');return {...cp(root),revision:root.revision+1};}
  function fresh(auth,retired=null){return {version:1,protocol:'journey-r2',lastWriterBuild:buildId,id:port.nextId(),generation:auth.generation,revision:1,
   dayEpoch:1,dayEnd:dayEnd(clock()),location:'reading',focus:null,goals:[],projects:[],nextGoal:0,nextProject:0,
   daily:{events:[],attempts:[],visits:0},guard:{reason:'cold-activation',until:dayEnd(clock())},
@@ -200,14 +216,14 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
   }
   return inspect();
  }
- function* usable(){yield* tick();insist(on,'switch-off');insist(owns(),'owner-epoch');
-  insist(root&&classify(root)==='valid'&&!['missing-root-hold','invalid-root-hold','unowned-root-hold','authority-unavailable'].includes(phase),'root-unavailable');
-  const a=authority(current());insist(a.generation===generation,'generation-changed');
-  insist(current().record.m4Journey?.revision===root.revision,'stale-root');
+ function* usable(attempt=null){yield* tick();guard(attempt,on,'switch-off');guard(attempt,owns(),'owner-epoch');
+  guard(attempt,root&&classify(root)==='valid'&&!['missing-root-hold','invalid-root-hold','unowned-root-hold','authority-unavailable'].includes(phase),'root-unavailable');
+  const a=authority(current());guard(attempt,a.generation===generation,'generation-changed');
+  guard(attempt,current().record.m4Journey?.revision===root.revision,'stale-root');
   const witness=witnesses();if(phase==='active'&&witness.doubt)yield* hold(witness.doubt,witness.until);}
  function* reviewable(){yield* usable();insist(phase==='active'&&clock()>holdUntil,'day-hold');}
- function* change(action,fn,{shrinkingControl=false,observe=null}={}){yield* usable();const next=nextRoot();fn(next);
-  insist((yield* write(next,action,{shrink:shrinkingControl,observe})),'publication-hold');return inspect();}
+ function* change(action,fn,{shrinkingControl=false,observe=null,attempt=null}={}){yield* usable(attempt);const next=nextRoot(attempt);fn(next);
+  insist((yield* write(next,action,{shrink:shrinkingControl,observe,attempt})),'publication-hold');return inspect();}
  function* hold(reason,until=dayEnd(clock())){
   held(reason,until);if(on&&owns()){
    if(!markHold(reason))diagnostics.push('hold-marker-unavailable');
@@ -231,18 +247,29 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
  function reconcile(){const s=current();let auth;try{auth=authority(s);}catch{return;}const host=s.record.m4Journey;
   if(auth.generation===generation&&classify(host)==='valid'&&host.id===root.id&&host.generation===generation&&host.revision>root.revision)root=cp(host);}
  function* enter(entrance,{observe=null}={}){return yield* change('visit',s=>{insist(s.daily.visits<LIMITS.visits,'visit-bound');s.daily.visits++;s.location=entrance;},{observe});}
- function* work(kind,data,{observe=null,admit=null}={}){insist(['goals','projects'].includes(kind),'work-kind');return yield* change('work',s=>{
+ /** a target attempt's body: anything that escapes it unbranded while still validating stays unproved, never proof */
+ function* attempted(attempt,body){if(attempt)attempt.state='validating';
+  try{const value=yield* body();if(attempt&&attempt.state==='dispatch-entered')attempt.state='completed';return value;}
+  catch(error){if(attempt&&attempt.state==='validating')attempt.state='refused-unproved';throw error;}}
+ function* work(kind,data,{observe=null,admit=null}={},attempt=null){return yield* attempted(attempt,function*(){guard(attempt,['goals','projects'].includes(kind),'work-kind');return yield* change('work',s=>{
   // M4 (W5 1901 F3): the caller's own recheck runs inside the queued mutation, against the root this write would replace
-  if(typeof admit==='function')admit(freeze(cp(s)));
-  insist(plain(data)&&s[kind].length<LIMITS[kind],'work-bound');
-  const key=kind==='goals'?'nextGoal':'nextProject';insist(Number.isSafeInteger(s[key]+1),'identity-exhausted');
+  if(typeof admit==='function'){const view=freeze(cp(s));
+   // U1: only the actual admit call is witnessed; an object it throws is kept by identity, a thrown primitive gets no proof
+   try{admit(view);}catch(error){if(attempt&&attempt.state==='validating')
+    Object.assign(attempt,error!==null&&(typeof error==='object'||typeof error==='function')?{state:'refused-before-dispatch',error,source:'admission',reason:null}:{state:'refused-unproved'});
+    throw error;}}
+  guard(attempt,plain(data)&&s[kind].length<LIMITS[kind],'work-bound');
+  const key=kind==='goals'?'nextGoal':'nextProject';guard(attempt,Number.isSafeInteger(s[key]+1),'identity-exhausted');
   s[key]++;s[kind].push({...cp(data),id:s.id+'/'+kind+'/'+s[key],status:data.status??'unfinished'});
- },{observe});}
- function* retire(kind,id,decision,{observe=null}={}){return yield* change('retire-work',s=>{
-  insist(['goals','projects'].includes(kind),'work-kind');const i=s[kind].findIndex(v=>v.id===id);insist(i>=0,'work-missing');
-  insist(decision==='retire-completed'&&s[kind][i].status==='completed'||decision==='abandon-and-retire','explicit-retirement');
+ },{observe,attempt});});}
+ function* retire(kind,id,decision,{observe=null}={},attempt=null){return yield* attempted(attempt,function*(){return yield* change('retire-work',s=>{
+  guard(attempt,['goals','projects'].includes(kind),'work-kind');const i=s[kind].findIndex(v=>v.id===id);guard(attempt,i>=0,'work-missing');
+  guard(attempt,decision==='retire-completed'&&s[kind][i].status==='completed'||decision==='abandon-and-retire','explicit-retirement');
   s[kind].splice(i,1);s.progress[kind==='goals'?'retiredGoals':'retiredProjects']++;
- },{shrinkingControl:true,observe});}
+ },{shrinkingControl:true,observe,attempt});});}
+ /** public project entries: the operation is claimed here, before run/queue, so a reuse throws before any queue or write */
+ const publicWork=(kind,data,options={})=>{const attempt=claim('work',kind,options?.operation);return run(()=>work(kind,data,options,attempt));};
+ const publicRetire=(kind,id,decision,options={})=>{const attempt=claim('retire-work',kind,options?.operation);return run(()=>retire(kind,id,decision,options,attempt));};
  /** M4 (W5 1901): an attempted goal write that stays unconfirmed holds this runtime, as an unpublished commit does; nothing persists */
  function holdUnconfirmed(){if(on&&owns())held('publication-hold');return inspect();}
  /** M4 S1 (W5 1746/1750): the quest adapter's proof that a bound Reading run qualified. Opaque and held here, one pending per
@@ -369,7 +396,7 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
    if(!result.pending)return result;
    await port.wait(t.operation,left());}}
  const ready=run(boot);
- return {ready,inspect,boot:op(boot),setSwitch:op(setSwitch),tick:op(tick),enter:op(enter),work:op(work),retire:op(retire),
+ return {ready,inspect,boot:op(boot),setSwitch:op(setSwitch),tick:op(tick),enter:op(enter),work:publicWork,retire:publicRetire,preDispatchRefusal,
   completionTicket,completeGoal:op(completeGoal),holdUnconfirmed,bootIdentity:()=>bootToken,
   beginHelp:op(beginHelp),finishHelp:op(finishHelp),awaitHelp,holdAtDeadline,beforeAnswer:op(beforeAnswer),prepare:op(prepare),reserve:op(reserve),
   admitAtLock,settle:op(settle),assertReviewable:op(reviewable),namespace:()=>root.id+'/'+root.dayEpoch+'/'};
