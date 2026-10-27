@@ -118,13 +118,16 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
  }
  function clearRetiredHold(){const w=witnesses();if(w.expiredHold){try{insist(device.remove(MARKERS.hold)===true,'device-clear-failed');}catch{diagnostics.push('hold-marker-clear-unavailable');}}}
  function held(reason,until=dayEnd(clock())){phase=reason;holdUntil=Math.max(holdUntil,until);holdEpoch++;return inspect();}
- function* write(next,action,{control=false,observe=null}={}){
+ function* write(next,action,{control=false,shrink=false,observe=null}={}){
   insist(on,'switch-off');insist(owns(),'owner-epoch');
   const before=current(),auth=authority(before);
   insist(auth.generation===generation,'generation-changed');
   next.lastWriterBuild=buildId;
   insist(classify(next)==='valid','root-invalid');
-  insist(bytes(next)<=(control?LIMITS.bytes:LIMITS.dataBytes),'byte-bound');
+  // LIFECYCLE-SHRINK (W5 1850, W2 1902): a shrinking write borrows the control reserve only when its final candidate, writer
+  // stamp included, is strictly smaller than the root this queued write replaces; explicit control writes keep theirs
+  const prior=before.record.m4Journey,reserve=control||shrink&&classify(prior)==='valid'&&bytes(next)<bytes(prior);
+  insist(bytes(next)<=(reserve?LIMITS.bytes:LIMITS.dataBytes),'byte-bound');
   const sent=cp(next),result=yield port.commit({revision:before.revision,rootHash:digest(before.record.m4Journey??null),
    generation,epoch:owner.epoch,switchOn:on},sent,{action,generation,journeyId:next.id});
   // M4 S1 (W5 1750): this call's own observer sees its port result before the unchanged boolean below
@@ -204,7 +207,7 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
   const witness=witnesses();if(phase==='active'&&witness.doubt)yield* hold(witness.doubt,witness.until);}
  function* reviewable(){yield* usable();insist(phase==='active'&&clock()>holdUntil,'day-hold');}
  function* change(action,fn,{shrinkingControl=false,observe=null}={}){yield* usable();const next=nextRoot();fn(next);
-  insist((yield* write(next,action,{control:shrinkingControl&&bytes(next)<bytes(root),observe})),'publication-hold');return inspect();}
+  insist((yield* write(next,action,{shrink:shrinkingControl,observe})),'publication-hold');return inspect();}
  function* hold(reason,until=dayEnd(clock())){
   held(reason,until);if(on&&owns()){
    if(!markHold(reason))diagnostics.push('hold-marker-unavailable');

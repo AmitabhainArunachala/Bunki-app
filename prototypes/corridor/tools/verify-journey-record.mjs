@@ -453,6 +453,124 @@ test('P6', 'a full root (128 events, 96 attempts, 32 visits, 8 goals, 16 project
   RELEASE.p6 = { rootBytes: bytes, backupBytes: new TextEncoder().encode(text).byteLength, journeyReceipts: c.rows(COMMANDS).filter((r) => r.type === 'journey.lifecycle/1').length,
     receiptBytesEach: Math.round(c.rows(COMMANDS).filter((r) => r.type === 'journey.lifecycle/1').reduce((sum, r) => sum + JSON.stringify(r).length, 0) / c.rows(COMMANDS).filter((r) => r.type === 'journey.lifecycle/1').length) };
 });
+/* LIFECYCLE-SHRINK (W5 1850, W2 1902): a retirement may borrow the control reserve only when its FINAL candidate, writer stamp
+ * included, is strictly smaller than the root it replaces at the queued write. A minimal in-memory port over the real lifecycle
+ * source (as W5's projects fixture uses) reaches the reserve band directly; setup writes are not counted as retirement writes. */
+export const jsonBytes = (value) => new TextEncoder().encode(JSON.stringify(value)).byteLength;
+function sized(root, n) {
+  const r = structuredClone(root); r.filler = ''; const len = n - jsonBytes(r);
+  assert.ok(len >= 0, 'cannot size down'); r.filler = 'x'.repeat(len); assert.equal(jsonBytes(r), n); return r;
+}
+export async function modelLifecycle(m, { buildId = 'build-a' } = {}) {
+  const saved = { status: 'active', migrationId: 'model-migration', scope: { profile: 'model', store: 'memory' }, revision: 0, commands: [], record: {} };
+  const binding = { epoch: 1 }, markers = new Map(), counts = { commit: 0 };
+  let id = 0;
+  const port = {
+    snapshot: () => structuredClone(saved), binding: () => ({ ...binding }), nextId: () => `model-journey-${++id}`,
+    async commit(expected, next, meta) {
+      counts.commit++;
+      if (expected.epoch !== binding.epoch || expected.rootHash !== m.lifecycle.digest(saved.record.m4Journey ?? null)
+        || expected.generation !== m.lifecycle.authority(saved).generation) return { outcome: 'not-published', acknowledged: false };
+      saved.record.m4Journey = JSON.parse(m.core.encodeLocalJson(next).text); saved.revision++;
+      saved.commands.push({ format: 'kairo-local-command-receipt', version: 1, changeId: `model-${saved.revision}`, type: 'journey.lifecycle/1',
+        scope: structuredClone(saved.scope), committedRevision: saved.revision, journey: meta });
+      return { outcome: 'published', acknowledged: true, rootHash: m.lifecycle.digest(next) };
+    },
+  };
+  const lc = m.lifecycle.createLifecycle({ port, buildId, core: corePort(), clock: () => Date.parse('2026-10-27T12:00:00+09:00'), enabled: true,
+    device: { read: (k) => structuredClone(markers.get(k)), write: (k, v) => (markers.set(k, structuredClone(v)), true), remove: (k) => markers.delete(k) || true },
+    validateCapture: (entries) => entries });
+  await lc.ready;
+  return { lc, saved, counts, root: () => saved.record.m4Journey, sync: async (root) => { saved.record.m4Journey = structuredClone(root); await lc.tick(); } };
+}
+/** a stored root holding one completed project, at a later revision, optionally re-stamped by another writer, sized to `bytes` */
+export async function reserveRoot(model, { writer = null, bytes }) {
+  await model.lc.work('projects', { status: 'completed' });
+  const r = structuredClone(model.root()); r.revision++; if (writer !== null) r.lastWriterBuild = writer;
+  return sized(r, bytes);
+}
+export const retireFirst = (model) => model.lc.retire('projects', model.root().projects[0].id, 'retire-completed');
+const canonicalRoot = (m, model) => m.core.encodeLocalJson(model.root()).text;
+/** the attempted retirement is refused (the byte bound, or past the absolute limit an invalid root): no commit, and the whole
+ * root unchanged. The lifecycle's guard throws before its first yield, so the call is wrapped to catch a synchronous throw. */
+async function refusedUnchanged(m, model, label, reason = /byte-bound/) {
+  const before = canonicalRoot(m, model), commits = model.counts.commit;
+  await assert.rejects(async () => retireFirst(model), reason, label);
+  assert.equal(model.counts.commit, commits, `${label}: no retirement commit`);
+  assert.equal(canonicalRoot(m, model), before, `${label}: the whole root is unchanged`);
+  (RELEASE.shrink ||= {})[label] = { rootBytes: jsonBytes(model.root()), commits: model.counts.commit - commits, outcome: 'refused' };
+}
+/** the bytes a retirement removes with an unchanged writer, measured on the real lifecycle (revision digits included) */
+async function retirementDelta(m, buildId, bytes) {
+  const dry = await modelLifecycle(m, { buildId });
+  await dry.sync(await reserveRoot(dry, { bytes }));
+  const before = jsonBytes(dry.root()); await retireFirst(dry); return before - jsonBytes(dry.root());
+}
+test('S1', 'W5 1850 direct control: a longer writer id cannot grow a reserve-band retirement past the root it replaces (refused, nothing published)', async (m) => {
+  const model = await modelLifecycle(m, { buildId: 'b'.repeat(512) });
+  await model.sync(await reserveRoot(model, { writer: 'x', bytes: m.lifecycle.LIMITS.dataBytes + 1 })); model.counts.commit = 0;
+  await refusedUnchanged(m, model, 'S1 long writer');
+});
+test('S2', 'the 512-unit escaped writer (\\u0001 x 512) at 258,049 bytes: 512 characters is not 512 JSON bytes; refused, nothing published', async (m) => {
+  const model = await modelLifecycle(m, { buildId: '\u0001'.repeat(512) });
+  const root = await reserveRoot(model, { writer: 'x', bytes: m.lifecycle.LIMITS.dataBytes + 1 });
+  assert.equal(jsonBytes(root), 258049);
+  await model.sync(root); model.counts.commit = 0;
+  await refusedUnchanged(m, model, 'S2 escaped writer');
+});
+test('S3', 'a true final shrink in the reserve band still publishes, strictly smaller than the root and above the ordinary limit', async (m) => {
+  const model = await modelLifecycle(m);
+  await model.sync(await reserveRoot(model, { bytes: m.lifecycle.LIMITS.bytes })); model.counts.commit = 0;
+  const before = jsonBytes(model.root()); await retireFirst(model); const after = jsonBytes(model.root());
+  assert.equal(model.counts.commit, 1); assert.ok(after < before && after > m.lifecycle.LIMITS.dataBytes, `${before} -> ${after}`);
+  (RELEASE.shrink ||= {})['S3 true shrink'] = { before, after, commits: 1, outcome: 'published' };
+});
+test('S4', 'in the reserve band an equal or growing final candidate is refused and a one-byte final shrink publishes (strictly smaller only)', async (m) => {
+  const buildId = 'b'.repeat(512), bytes = m.lifecycle.LIMITS.dataBytes + 200, removed = await retirementDelta(m, buildId, bytes);
+  assert.ok(removed > 1 && removed < 500, String(removed));
+  for (const grow of [0, 1]) {
+    const model = await modelLifecycle(m, { buildId });
+    await model.sync(await reserveRoot(model, { writer: 'b'.repeat(512 - removed - grow), bytes })); model.counts.commit = 0;
+    await refusedUnchanged(m, model, `S4 final ${grow ? 'one byte larger than' : 'equal to'} the root`);
+  }
+  const model = await modelLifecycle(m, { buildId });
+  await model.sync(await reserveRoot(model, { writer: 'b'.repeat(512 - removed + 1), bytes })); model.counts.commit = 0;
+  const before = jsonBytes(model.root()); await retireFirst(model);
+  assert.equal(model.counts.commit, 1); assert.equal(jsonBytes(model.root()), before - 1);
+  (RELEASE.shrink ||= {})['S4 one-byte shrink'] = { before, after: before - 1, removed, commits: 1, outcome: 'published' };
+});
+test('S5', 'ordinary band: a growing retirement within 258,048 bytes publishes (fallback kept), and one byte over without a strict shrink is refused', async (m) => {
+  const buildId = 'b'.repeat(512), { dataBytes } = m.lifecycle.LIMITS;
+  const removed = await retirementDelta(m, buildId, dataBytes - 2000);
+  for (const over of [0, 1]) {
+    const model = await modelLifecycle(m, { buildId });
+    // writer 'x' -> 512 'b's adds 511 bytes, so the final candidate is root - removed + 511
+    await model.sync(await reserveRoot(model, { writer: 'x', bytes: dataBytes + removed - 511 + over })); model.counts.commit = 0;
+    if (over) await refusedUnchanged(m, model, 'S5 ordinary limit plus one');
+    else { await retireFirst(model); assert.equal(model.counts.commit, 1); assert.equal(jsonBytes(model.root()), dataBytes); }
+  }
+});
+test('S6', 'absolute edges: 262,144 bytes is a valid root, 262,145 is not, and a growing retirement from a full root is refused unchanged', async (m) => {
+  const { bytes } = m.lifecycle.LIMITS;
+  const probe = await modelLifecycle(m);
+  const full = await reserveRoot(probe, { bytes });
+  assert.equal(m.lifecycle.classify(full), 'valid'); assert.equal(m.lifecycle.classify(sized(full, bytes + 1)), 'oversize');
+  const model = await modelLifecycle(m, { buildId: 'b'.repeat(512) });
+  await model.sync(await reserveRoot(model, { writer: 'x', bytes })); model.counts.commit = 0;
+  // past 262,144 bytes the final candidate is not a valid root at all, so it is refused before any byte-bound question
+  await refusedUnchanged(m, model, 'S6 full root growing', /root-invalid/);
+});
+test('S7', 'the comparison is with the authoritative root at the queued write (a newer host root reconciled by usable()), not a stale cached one', async (m) => {
+  const model = await modelLifecycle(m), { dataBytes } = m.lifecycle.LIMITS;
+  await model.lc.work('projects', { status: 'completed' });
+  const cached = structuredClone(model.root());
+  const newer = sized({ ...structuredClone(cached), revision: cached.revision + 1 }, dataBytes + 500);
+  model.saved.record.m4Journey = newer; model.counts.commit = 0;   // the host moved on; the lifecycle has not ticked yet
+  await retireFirst(model);
+  const after = jsonBytes(model.root());
+  assert.equal(model.counts.commit, 1);
+  assert.ok(after < jsonBytes(newer) && after > dataBytes && after > jsonBytes(cached), `${jsonBytes(cached)} / ${jsonBytes(newer)} -> ${after}`);
+});
 /** the release build (a8b9cbff, the same host and app bytes as 87dededd) for P3, and the measured findings */
 const RELEASE = {};
 for (const name of ['host', 'app']) RELEASE[name] = (await import('node:child_process')).execFileSync('git',
@@ -475,6 +593,10 @@ export const MUTANTS = {
   'no-reconcile': ['L5', 'lifecycle', [['  reconcile();\n', '']]],
   'rotation-clears-hold': ['L6', 'lifecycle', [["if(holdEpoch===holds){phase='active';holdUntil=-Infinity;}", "phase='active';holdUntil=-Infinity;"]]],
   'depth-24': ['D1', 'lifecycle', [[' if(depth>22)return false;', ' if(depth>24)return false;']]],
+  // LIFECYCLE-SHRINK: the old order (eligibility decided before the writer stamp), a non-strict shrink, and a reserve for every write
+  'shrink-before-stamp': ['S1', 'lifecycle', [['{shrink:shrinkingControl,observe}', '{control:shrinkingControl&&bytes(next)<bytes(root),observe}']]],
+  'shrink-not-strict': ['S4', 'lifecycle', [['bytes(next)<bytes(prior)', 'bytes(next)<=bytes(prior)']]],
+  'reserve-always': ['S5', 'lifecycle', [['reserve=control||shrink&&', 'reserve=true||shrink&&']]],
 };
 
 async function main() {
@@ -499,7 +621,8 @@ async function main() {
   }
   const failed = results.filter((r) => !r.passed), survived = controls.filter((c) => !c.killed);
   console.log(JSON.stringify({ cases: `${results.length - failed.length}/${results.length}`, failed,
-    findings: { releaseHostOpensJournaledRecord: RELEASE.rollback ? { status: RELEASE.rollback.status, reason: RELEASE.rollback.reason } : null, p6: RELEASE.p6 ?? null },
+    findings: { releaseHostOpensJournaledRecord: RELEASE.rollback ? { status: RELEASE.rollback.status, reason: RELEASE.rollback.reason } : null, p6: RELEASE.p6 ?? null,
+      shrink: RELEASE.shrink ?? null },
     controls: controls.length ? `${controls.length - survived.length}/${controls.length}` : 'not run', survived, controlDetails: controls }, null, 1));
   process.exitCode = failed.length || survived.length ? 1 : 0;
 }
