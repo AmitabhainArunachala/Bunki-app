@@ -19,6 +19,12 @@ import {
   validateMediaReport,
 } from './vh-media-report-contracts.mjs';
 import { validateGateEvidence } from './gate-evidence.mjs';
+import {
+  englishSourcePins,
+  englishExpectations,
+  ENGLISH_ROOT,
+} from '../../prototypes/corridor/tools/reader-english-rung.mjs';
+import { syntheticEnglishReceipt } from '../../prototypes/corridor/tools/reader-english-rung-controls.mjs';
 const A = 'a'.repeat(64),
   B = 'b'.repeat(64),
   C = 'c'.repeat(64);
@@ -39,6 +45,7 @@ const buildSidecar = (output) => ({
 writeFileSync(handoff + '.build.json', JSON.stringify(buildSidecar(handoff)));
 function fixture(name, engine = 'chromium') {
   const context = {
+    root: ENGLISH_ROOT,
     engine,
     artifactSha256: A,
     verifierSha256: B,
@@ -181,6 +188,14 @@ function fixture(name, engine = 'chromium') {
       cuesChecked: 5,
     });
   }
+  if (name === 'playback')
+    report.readerEnglishRung = syntheticEnglishReceipt(
+      englishExpectations(),
+      'playback',
+      englishSourcePins(),
+      A,
+      engine,
+    );
   return { report, context };
 }
 test('independent media rosters preserve every full journey and dynamically expanded case', () => {
@@ -580,3 +595,87 @@ test('import-provider requires actual allowed transport bindings, not constant s
   ])
     assert.equal(admit(transport), false, JSON.stringify(transport));
 });
+
+// Actual playback consumer: source pins and observed facts are mandatory in both engines.
+for (const engine of ['chromium', 'webkit']) {
+  test(`playback English complete synthetic receipt is admitted (${engine}); not native proof`, () => {
+    const f = fixture('playback', engine);
+    assert.equal(validateMediaReport('playback', f.report, f.context).passed, true);
+  });
+  for (const [name, change] of [
+    [
+      'absent',
+      (r) => {
+        delete r.readerEnglishRung;
+      },
+    ],
+    ['width missing', (r) => r.readerEnglishRung.observations.pop()],
+    [
+      'wrong English',
+      (r) => {
+        r.readerEnglishRung.observations[0].english = 'other';
+      },
+    ],
+    [
+      'hidden',
+      (r) => {
+        r.readerEnglishRung.observations[0].englishVisible = false;
+      },
+    ],
+    [
+      'deadline reset',
+      (r) => {
+        r.readerEnglishRung.observations[0].elapsedMs = 5001;
+      },
+    ],
+    [
+      'easier token',
+      (r) => {
+        r.readerEnglishRung.observations[0].occurrenceIndex++;
+      },
+    ],
+    [
+      'replacement',
+      (r) => {
+        r.readerEnglishRung.observations[0].sameOriginalElement = false;
+      },
+    ],
+    [
+      'unrun native controls',
+      (r) => {
+        r.readerEnglishRung.browserControls = null;
+      },
+    ],
+    [
+      'stale control artifact',
+      (r) => {
+        r.readerEnglishRung.browserControls.artifactSha256 = B;
+      },
+    ],
+    [
+      'failed control',
+      (r) => {
+        r.readerEnglishRung.browserControls.results[0].passed = false;
+      },
+    ],
+    ...['helper', 'expectations', 'controls'].flatMap((key) => [
+      [
+        `missing ${key}`,
+        (r) => {
+          delete r.readerEnglishRung.sources[key];
+        },
+      ],
+      [
+        `stale ${key}`,
+        (r) => {
+          r.readerEnglishRung.sources[key] = B;
+        },
+      ],
+    ]),
+  ])
+    test(`playback English refuses ${name} (${engine})`, () => {
+      const f = fixture('playback', engine);
+      change(f.report);
+      assert.equal(validateMediaReport('playback', f.report, f.context).passed, false);
+    });
+}

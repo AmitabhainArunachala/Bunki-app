@@ -2,6 +2,178 @@
 import { createHash } from 'node:crypto';
 import { existsSync, lstatSync, readFileSync, readdirSync, realpathSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
+import { isDeepStrictEqual } from 'node:util';
+// English expectations are independent literals in the source fixture, not the producer's report.
+export function validateReaderEnglishEvidence(
+  value,
+  { root, sources, usage, artifactSha256, engine, articleIds },
+) {
+  const demand = (ok, message) => {
+    if (!ok) throw new Error(`Reader English admission: ${message}`);
+  };
+  const equal = isDeepStrictEqual;
+  demand(root, 'missing source root');
+  const names = {
+    helper: 'reader-english-rung.mjs',
+    expectations: 'reader-english-rung-expectations.json',
+    controls: 'reader-english-rung-controls.mjs',
+  };
+  const pins = Object.fromEntries(
+    Object.entries(names).map(([key, path]) => [
+      key,
+      createHash('sha256')
+        .update(readFileSync(join(root, 'prototypes/corridor/tools', path)))
+        .digest('hex'),
+    ]),
+  );
+  demand(equal(sources, pins), 'expected source pins missing/stale');
+  demand(
+    value?.schemaVersion === 1 && equal(value.sources, pins),
+    'reported source pins missing/stale',
+  );
+  demand(value.failure == null, 'failed occurrence retained');
+  demand(
+    /^[a-f0-9]{64}$/u.test(artifactSha256 || '') && ['chromium', 'webkit'].includes(engine),
+    'artifact/engine absent',
+  );
+  const fixture = JSON.parse(
+    readFileSync(join(root, 'prototypes/corridor/tools', names.expectations), 'utf8'),
+  );
+  const entries = fixture.entries.filter((row) => row.usage === usage);
+  demand(entries.length === (usage === 'native' ? 30 : 1), 'fixture roster changed');
+  if (usage === 'native')
+    demand(
+      equal([...entries.map((row) => row.id)].sort(), [...(articleIds || [])].sort()),
+      'native article roster differs',
+    );
+  const wanted = entries.flatMap((row) =>
+    (usage === 'playback' ? [320, 390] : [390]).map((width) => ({ row, width })),
+  );
+  demand(
+    Array.isArray(value.observations) && value.observations.length === wanted.length,
+    'missing/duplicate observation',
+  );
+  const validObservation = (row, expected, width) => {
+    demand(
+      equal(
+        [row?.articleId, row?.occurrenceIndex, row?.surface, row?.lemma, row?.viewportWidth],
+        [expected.id, expected.occurrenceIndex, expected.surface, expected.lemma, width],
+      ),
+      'occurrence identity/width',
+    );
+    demand(
+      equal(row.readingSegments, expected.readingSegments) && row.english === expected.english,
+      'literal reading/English differs',
+    );
+    demand(
+      row.connected === true &&
+        row.sameOriginalElement === true &&
+        row.readingVisible === true &&
+        row.englishVisible === true,
+      'hidden/replaced occurrence',
+    );
+    demand(
+      row.rung === 'gloss' &&
+        row.hasEn === true &&
+        row.depthAside === 'meaning' &&
+        row.englishCount === 1,
+      'meaning rung markers absent',
+    );
+    demand(
+      row.stageSeen === false && row.sheetSeen === false && equal(row.hazards, []),
+      'stage/sheet/identity hazard',
+    );
+    demand(
+      row.armedBeforeTrigger === true &&
+        row.actionSettled === true &&
+        row.selectionAttempts === 1 &&
+        row.totalDeadlineMs === 5000 &&
+        Number.isFinite(row.elapsedMs) &&
+        row.elapsedMs >= 0 &&
+        row.elapsedMs < 5000,
+      'deadline/arming/fallback evidence',
+    );
+  };
+  wanted.forEach(({ row, width }, index) =>
+    validObservation(value.observations[index], row, width),
+  );
+  // Literal control roster is independent of producer/control-module exports.
+  const controls = [
+    ['delayed-valid', 'accepted'],
+    ['never-paints', 'deadline'],
+    ['wrong-reading', 'wrong-reading'],
+    ['wrong-English', 'wrong-English'],
+    ['hidden-correct', 'deadline'],
+    ['transparent-ink', 'deadline'],
+    ['filter-hidden', 'deadline'],
+    ['hidden-reading', 'deadline'],
+    ['detach', 'detached-or-replaced'],
+    ['replace', 'detached-or-replaced'],
+    ['transient-stage', 'premature-stage-or-sheet'],
+    ['transient-sheet', 'premature-stage-or-sheet'],
+    ['wrong-identity', 'wrong-identity'],
+    ['no-fallback', 'wrong-English'],
+    ['same-deadline', 'deadline'],
+  ];
+  for (const [kind, rows] of [
+    ['pure', value.pureControls],
+    ['browser', value.browserControls?.results],
+  ]) {
+    demand(
+      Array.isArray(rows) && rows.length === controls.length,
+      `${kind} controls absent/partial`,
+    );
+    controls.forEach(([id, expected], i) => {
+      const row = rows[i];
+      demand(
+        row.id === id &&
+          row.expected === expected &&
+          row.observed === expected &&
+          row.passed === true &&
+          row.triggerCount === 1,
+        `${kind} control ${id} not killed as intended`,
+      );
+      demand(
+        Number.isFinite(row.elapsedMs) && row.elapsedMs >= 0 && row.elapsedMs < 6000,
+        `${kind} control ${id} reset the deadline`,
+      );
+      if (kind === 'pure') demand(row.closed === true, 'pure monitor not closed');
+      if (expected === 'deadline') demand(row.elapsedMs >= 5000, 'deadline rejected early');
+      if (id === 'delayed-valid') {
+        demand(row.elapsedMs >= 350, 'positive control was not delayed');
+        if (kind === 'browser')
+          validObservation(
+            row.observation,
+            {
+              id: 'oracle-control',
+              occurrenceIndex: 0,
+              surface: '高い',
+              lemma: '高い',
+              readingSegments: ['たか'],
+              english: 'high',
+            },
+            390,
+          );
+      }
+    });
+  }
+  const native = value.browserControls;
+  demand(
+    native.artifactSha256 === artifactSha256 &&
+      native.engine === engine &&
+      typeof native.browserVersion === 'string' &&
+      native.browserVersion.length > 0 &&
+      equal(native.sources, pins),
+    'browser controls belong to another artifact/engine/source',
+  );
+  demand(
+    native.method ===
+      'isolated real DOM oracle controls at admitted artifact origin; not product journey evidence',
+    'native control method absent',
+  );
+  return true;
+}
+
 export const MEDIA_CASES = Object.freeze({
   'guided-journey': [
     'D1 the study hall lists the guided session as a door',
@@ -496,6 +668,30 @@ const definitions = {
       require(report.requestedBrowser !==
         'all', 'KAIRO_BROWSER=all silently runs one engine in this legacy producer');
       require(report.failures === 0, 'Playback failures absent/nonzero');
+      try {
+        const names = {
+          helper: 'reader-english-rung.mjs',
+          expectations: 'reader-english-rung-expectations.json',
+          controls: 'reader-english-rung-controls.mjs',
+        };
+        const sources = Object.fromEntries(
+          Object.entries(names).map(([key, path]) => [
+            key,
+            createHash('sha256')
+              .update(readFileSync(join(context.root, 'prototypes/corridor/tools', path)))
+              .digest('hex'),
+          ]),
+        );
+        validateReaderEnglishEvidence(report.readerEnglishRung, {
+          root: context.root,
+          sources,
+          usage: 'playback',
+          artifactSha256: context.artifactSha256,
+          engine: context.engine || 'chromium',
+        });
+      } catch (error) {
+        require(false, error.message);
+      }
       for (const row of rows)
         require(row.observed &&
           Array.isArray(row.observed.utterances) &&

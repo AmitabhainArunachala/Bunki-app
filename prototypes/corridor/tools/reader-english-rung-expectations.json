@@ -1,0 +1,3392 @@
+{
+  "schemaVersion": 1,
+  "review": "Proposed literals: W2 independent source key required; not native evidence.",
+  "selection": "Original candidate ordering retained. First selected occurrence only; rejection never advances to an easier token.",
+  "authoredSource": {
+    "path": "docs/content/bunki-originals-zoka-sanjin.jsonl",
+    "sha256": "e7c99e47407d71bbc805774ca649a1dbf84baa5769ad49c9edcda2dd1280a3a8"
+  },
+  "dictionaryIndex": {
+    "path": "prototypes/corridor/data/share_alike/dict-v2/index.json",
+    "sha256": "d20bb1fa3f968bd2f5e4e84c2ed0221fbd0d2d655f17dbc23713152995619b84"
+  },
+  "entries": [
+    {
+      "id": "bunki-graded-n3-zoka-sanjin-morning",
+      "usage": "native",
+      "occurrenceIndex": 0,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "朝",
+      "lemma": "朝",
+      "sourceReading": "あさ",
+      "readingSegments": [
+        "あさ"
+      ],
+      "english": "morning",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-graded-n3-zoka-sanjin-morning.json",
+        "sha256": "b05ec30977c04dba6b309de7e27441c0423451099a1fa16cc9174f1b8bfe1f53",
+        "pointer": "/tokens/0",
+        "token": {
+          "s": "朝",
+          "b": "朝",
+          "p": "名詞",
+          "r": "あさ",
+          "f": [
+            {
+              "t": "朝",
+              "r": "あさ"
+            }
+          ],
+          "c": true
+        },
+        "context": "朝の図書館で『古事記』を開くと、最初"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/08.json",
+        "sha256": "d13729245a01e56a14351a81fc534e109759657fb0ecdbd474490ee95f2595e9",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1462/3/0",
+        "seq": "1428280",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "朝",
+            1,
+            []
+          ]
+        ],
+        "kanaForms": [
+          [
+            "あさ",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "n",
+            "adv"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "morning",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "First literal of the cited context-compatible raw sense; independent proposal for W2 review.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-graded-n3-nakaima-diary",
+      "usage": "native",
+      "occurrenceIndex": 1,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "時",
+      "lemma": "時",
+      "sourceReading": "じ",
+      "readingSegments": [
+        "じ"
+      ],
+      "english": "hour",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-graded-n3-nakaima-diary.json",
+        "sha256": "f6dddf60553e3d9878ab8d16e6b1a3c9e82667d6da50296b0f9e389102104d8b",
+        "pointer": "/tokens/1",
+        "token": {
+          "s": "時",
+          "b": "時",
+          "p": "名詞",
+          "r": "じ",
+          "f": [
+            {
+              "t": "時",
+              "r": "じ"
+            }
+          ],
+          "c": true
+        },
+        "context": "六時半。目が覚めると、すぐにスマートフォンを見"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/09.json",
+        "sha256": "33ef6440ed4fccfcbe699e4649fe7b70a176b182e59ce727c3176e125b0fc10b",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/2213/3/0",
+        "seq": "2020680",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "時",
+            1,
+            []
+          ]
+        ],
+        "kanaForms": [
+          [
+            "じ",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "suf"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "hour",
+              null,
+              null
+            ],
+            [
+              "o'clock",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "六時半: source reading じ; suffix hour (2020680), not とき/time (1315840).",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-graded-n3-world-beginning",
+      "usage": "native",
+      "occurrenceIndex": 5,
+      "contentIndex": 1,
+      "candidateOrder": [
+        1,
+        0,
+        2
+      ],
+      "surface": "物語",
+      "lemma": "物語",
+      "sourceReading": "ものがたり",
+      "readingSegments": [
+        "ものがたり"
+      ],
+      "english": "story",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-graded-n3-world-beginning.json",
+        "sha256": "32efa64760d31ca7b9802494957d4b74295e860aaf2edab34c21e85b9aa3d58a",
+        "pointer": "/tokens/5",
+        "token": {
+          "s": "物語",
+          "b": "物語",
+          "p": "名詞",
+          "r": "ものがたり",
+          "f": [
+            {
+              "t": "物語",
+              "r": "ものがたり"
+            }
+          ],
+          "c": true
+        },
+        "context": "古事記』の物語は、天地の初めから始まる。ただし、そこには"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/07.json",
+        "sha256": "18f73ea54d406982efb862d10f5a480e069e097e085e8e8363cde57888eed033",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1618/3/0",
+        "seq": "1502480",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "物語",
+            1,
+            []
+          ],
+          [
+            "物語り",
+            0,
+            [
+              "io"
+            ]
+          ]
+        ],
+        "kanaForms": [
+          [
+            "ものがたり",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "n"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "story",
+              null,
+              null
+            ],
+            [
+              "tale",
+              null,
+              null
+            ],
+            [
+              "narrative",
+              null,
+              null
+            ],
+            [
+              "account",
+              null,
+              null
+            ],
+            [
+              "fable",
+              null,
+              null
+            ],
+            [
+              "legend",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "First literal of the cited context-compatible raw sense; independent proposal for W2 review.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-graded-n3-hidden-deity",
+      "usage": "native",
+      "occurrenceIndex": 1,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "先生",
+      "lemma": "先生",
+      "sourceReading": "せんせい",
+      "readingSegments": [
+        "せんせい"
+      ],
+      "english": "teacher",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-graded-n3-hidden-deity.json",
+        "sha256": "b1b8618fb1e5d7703c3ba16ef781c412f42a09d7c5740bab6870f47dc46373dc",
+        "pointer": "/tokens/1",
+        "token": {
+          "s": "先生",
+          "b": "先生",
+          "p": "名詞",
+          "r": "せんせい",
+          "f": [
+            {
+              "t": "先生",
+              "r": "せんせい"
+            }
+          ],
+          "c": true
+        },
+        "context": "「先生、『古事記』の最初の神さまたちは、"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/0a.json",
+        "sha256": "373d58f021180ce13ee15224cd79000c2e8406518fc05e7fdaddf7c15890308d",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1303/3/0",
+        "seq": "1387990",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "先生",
+            1,
+            []
+          ]
+        ],
+        "kanaForms": [
+          [
+            "せんせい",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "n"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "teacher",
+              null,
+              null
+            ],
+            [
+              "instructor",
+              null,
+              null
+            ],
+            [
+              "master",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "Direct address 先生: teacher proposed; W2 must review sense 1 (sensei/title of address) ambiguity.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-graded-n3-kojiki-book",
+      "usage": "native",
+      "occurrenceIndex": 0,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "教室",
+      "lemma": "教室",
+      "sourceReading": "きょうしつ",
+      "readingSegments": [
+        "きょうしつ"
+      ],
+      "english": "classroom",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-graded-n3-kojiki-book.json",
+        "sha256": "d980d87c781d8611f33f5b362642d63bf49424387e911a94d3f1edb1f040f2f9",
+        "pointer": "/tokens/0",
+        "token": {
+          "s": "教室",
+          "b": "教室",
+          "p": "名詞",
+          "r": "きょうしつ",
+          "f": [
+            {
+              "t": "教室",
+              "r": "きょうしつ"
+            }
+          ],
+          "c": true
+        },
+        "context": "教室の机に、一冊の薄い文庫本が置かれ"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/0a.json",
+        "sha256": "373d58f021180ce13ee15224cd79000c2e8406518fc05e7fdaddf7c15890308d",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/950/3/0",
+        "seq": "1237150",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "教室",
+            1,
+            []
+          ]
+        ],
+        "kanaForms": [
+          [
+            "きょうしつ",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "n"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "classroom",
+              null,
+              null
+            ],
+            [
+              "lecture room",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "First literal of the cited context-compatible raw sense; independent proposal for W2 review.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-graded-n3-hashira-counter",
+      "usage": "native",
+      "occurrenceIndex": 1,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "語",
+      "lemma": "語",
+      "sourceReading": "ご",
+      "readingSegments": [
+        "ご"
+      ],
+      "english": "language",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-graded-n3-hashira-counter.json",
+        "sha256": "663003ccaef50156e5ea34e277338eddace6aaf6d6b246eec5c0fc5877afbdcb",
+        "pointer": "/tokens/1",
+        "token": {
+          "s": "語",
+          "b": "語",
+          "p": "名詞",
+          "r": "ご",
+          "f": [
+            {
+              "t": "語",
+              "r": "ご"
+            }
+          ],
+          "c": true,
+          "rs": "lexicon"
+        },
+        "context": "日本語では、物によって数え方が変わる。本"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/0d.json",
+        "sha256": "c9124f3de90fc67f7c24d3ef4941896d3447f81d9f111607bc90f852e5365518",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1053/3/1",
+        "seq": "1270910",
+        "senseIndex": 1,
+        "kanjiForms": [
+          [
+            "語",
+            1,
+            []
+          ]
+        ],
+        "kanaForms": [
+          [
+            "ご",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "n",
+            "n-suf"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "language",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "日本語: language sense, not generic word sense.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-graded-n3-feel-jingu-forest",
+      "usage": "native",
+      "occurrenceIndex": 0,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "画面",
+      "lemma": "画面",
+      "sourceReading": "がめん",
+      "readingSegments": [
+        "がめん"
+      ],
+      "english": "screen (of a TV, computer, etc.)",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-graded-n3-feel-jingu-forest.json",
+        "sha256": "ebe40ec761f8a100528233e5e51a0905a1875b5840f722a266555ddb99fc8cf8",
+        "pointer": "/tokens/0",
+        "token": {
+          "s": "画面",
+          "b": "画面",
+          "p": "名詞",
+          "r": "がめん",
+          "f": [
+            {
+              "t": "画面",
+              "r": "がめん"
+            }
+          ],
+          "c": true
+        },
+        "context": "画面が開くと、先に届くのは説明ではなく"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/02.json",
+        "sha256": "9ac1638c2cb03d339ab51f8d8f736643e41e5a34a87e2ad3ce07b084e36c3d78",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/892/3/0",
+        "seq": "1197610",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "画面",
+            1,
+            []
+          ]
+        ],
+        "kanaForms": [
+          [
+            "がめん",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "n"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "screen (of a TV, computer, etc.)",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "First literal of the cited context-compatible raw sense; independent proposal for W2 review.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-graded-n3-musubi-visual",
+      "usage": "native",
+      "occurrenceIndex": 0,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "高い",
+      "lemma": "高い",
+      "sourceReading": "たかい",
+      "readingSegments": [
+        "たか"
+      ],
+      "english": "high",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-graded-n3-musubi-visual.json",
+        "sha256": "27c44e18a84ff82ac6c652af326cc77da88df9521698ba09dbcb60ab19a5484a",
+        "pointer": "/tokens/0",
+        "token": {
+          "s": "高い",
+          "b": "高い",
+          "p": "形容詞",
+          "r": "たかい",
+          "f": [
+            {
+              "t": "高",
+              "r": "たか"
+            },
+            {
+              "t": "い"
+            }
+          ],
+          "c": true
+        },
+        "context": "高い木の間から空が見える。地面には影が落ち、"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/0b.json",
+        "sha256": "d83924999832a2a8f08dfa60756b6bab1eb0307070982eb1d281988195c5a287",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1092/3/0",
+        "seq": "1283190",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "高い",
+            1,
+            []
+          ],
+          [
+            "高価い",
+            0,
+            [
+              "sK"
+            ]
+          ],
+          [
+            "高ーい",
+            0,
+            [
+              "sK"
+            ]
+          ]
+        ],
+        "kanaForms": [
+          [
+            "たかい",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ],
+          [
+            "たかーい",
+            0,
+            [
+              "sk"
+            ],
+            [
+              "*"
+            ]
+          ],
+          [
+            "たっけー",
+            0,
+            [
+              "sk"
+            ],
+            [
+              "*"
+            ]
+          ],
+          [
+            "たっかーい",
+            0,
+            [
+              "sk"
+            ],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "adj-i"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [
+            [
+              "低い",
+              1
+            ]
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "high",
+              null,
+              null
+            ],
+            [
+              "tall",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "高い木: high; source ruby covers 高 only (たか), full reading たかい.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-graded-n3-gratitude-week",
+      "usage": "native",
+      "occurrenceIndex": 0,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "これ",
+      "lemma": "これ",
+      "sourceReading": "これ",
+      "readingSegments": [],
+      "english": "this",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-graded-n3-gratitude-week.json",
+        "sha256": "4fcc810fd93b87660904c7b675b76bf5999675a34461a1de10af2433bfcca111",
+        "pointer": "/tokens/0",
+        "token": {
+          "s": "これ",
+          "b": "これ",
+          "p": "代名詞",
+          "r": "これ",
+          "f": [
+            {
+              "t": "これ"
+            }
+          ],
+          "c": true
+        },
+        "context": "これは、日本語を学ぶミナを主人公にした"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/00.json",
+        "sha256": "40bd35fc3605eed61db54b73e56e7fb9ca1ef670ba5d275acafc38d29a820685",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1893/3/0",
+        "seq": "1628530",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "此れ",
+            0,
+            [
+              "rK"
+            ]
+          ],
+          [
+            "是",
+            0,
+            [
+              "rK"
+            ]
+          ],
+          [
+            "之",
+            0,
+            [
+              "rK"
+            ]
+          ],
+          [
+            "維",
+            0,
+            [
+              "rK"
+            ]
+          ],
+          [
+            "惟",
+            0,
+            [
+              "rK"
+            ]
+          ],
+          [
+            "此",
+            0,
+            [
+              "sK"
+            ]
+          ],
+          [
+            "是れ",
+            0,
+            [
+              "sK"
+            ]
+          ],
+          [
+            "之れ",
+            0,
+            [
+              "sK"
+            ]
+          ]
+        ],
+        "kanaForms": [
+          [
+            "これ",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "pn"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [
+            [
+              "それ",
+              1
+            ],
+            [
+              "あれ",
+              1
+            ],
+            [
+              "どれ",
+              1
+            ]
+          ],
+          [],
+          [],
+          [],
+          [
+            "uk"
+          ],
+          [
+            "indicating an item near the speaker, the action of the speaker, or the current topic"
+          ],
+          [],
+          [
+            [
+              "this",
+              null,
+              null
+            ],
+            [
+              "this one",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "First literal of the cited context-compatible raw sense; independent proposal for W2 review.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-graded-n3-thanks-before-help",
+      "usage": "native",
+      "occurrenceIndex": 1,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "まだ",
+      "lemma": "まだ",
+      "sourceReading": "まだ",
+      "readingSegments": [],
+      "english": "(not) yet",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-graded-n3-thanks-before-help.json",
+        "sha256": "b560c2db9eea3bd8ffd2604f8e2681d88f85b239f3c4bf24356cdba04a34426a",
+        "pointer": "/tokens/1",
+        "token": {
+          "s": "まだ",
+          "b": "まだ",
+          "p": "副詞",
+          "r": "まだ",
+          "f": [
+            {
+              "t": "まだ"
+            }
+          ],
+          "c": true
+        },
+        "context": "「まだ助けてもらっていないのに、先に『ありがとう"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/0e.json",
+        "sha256": "4aba95e3b5185271ec61194e38ae67baed95e40104f2f5a8d96a748f735477b3",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1747/3/1",
+        "seq": "1527110",
+        "senseIndex": 1,
+        "kanjiForms": [
+          [
+            "未だ",
+            1,
+            []
+          ]
+        ],
+        "kanaForms": [
+          [
+            "まだ",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ],
+          [
+            "いまだ",
+            0,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "adv"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [
+            "uk"
+          ],
+          [
+            "with verb in the negative"
+          ],
+          [],
+          [
+            [
+              "(not) yet",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "Negative まだ助けてもらっていない: (not) yet.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-essay-n2-zoka-as-one",
+      "usage": "native",
+      "occurrenceIndex": 5,
+      "contentIndex": 1,
+      "candidateOrder": [
+        1,
+        0,
+        2
+      ],
+      "surface": "冒頭",
+      "lemma": "冒頭",
+      "sourceReading": "ぼうとう",
+      "readingSegments": [
+        "ぼうとう"
+      ],
+      "english": "beginning",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-essay-n2-zoka-as-one.json",
+        "sha256": "6073e1524df8873436bc1b654ef94f387aa7b5edabe58b2965ef34de63cf80c8",
+        "pointer": "/tokens/5",
+        "token": {
+          "s": "冒頭",
+          "b": "冒頭",
+          "p": "名詞",
+          "r": "ぼうとう",
+          "f": [
+            {
+              "t": "冒頭",
+              "r": "ぼうとう"
+            }
+          ],
+          "c": true
+        },
+        "context": "古事記』の冒頭には、天地が初めて起こった時、高天原に天之御中主"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/09.json",
+        "sha256": "33ef6440ed4fccfcbe699e4649fe7b70a176b182e59ce727c3176e125b0fc10b",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1688/3/0",
+        "seq": "1519860",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "冒頭",
+            1,
+            []
+          ]
+        ],
+        "kanaForms": [
+          [
+            "ぼうとう",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "n"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "beginning",
+              null,
+              null
+            ],
+            [
+              "opening",
+              null,
+              null
+            ],
+            [
+              "start",
+              null,
+              null
+            ],
+            [
+              "outset",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "First literal of the cited context-compatible raw sense; independent proposal for W2 review.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-essay-n2-nakaima-time",
+      "usage": "native",
+      "occurrenceIndex": 0,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "昨日",
+      "lemma": "昨日",
+      "sourceReading": "きのう",
+      "readingSegments": [
+        "きのう"
+      ],
+      "english": "yesterday",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-essay-n2-nakaima-time.json",
+        "sha256": "d28cfaa76579c46436043e4fa4c9c3c6fc8a6151cae715b111980af49f27777f",
+        "pointer": "/tokens/0",
+        "token": {
+          "s": "昨日",
+          "b": "昨日",
+          "p": "名詞",
+          "r": "きのう",
+          "f": [
+            {
+              "t": "昨日",
+              "r": "きのう"
+            }
+          ],
+          "c": true
+        },
+        "context": "昨日の失敗を何度も思い出し、明日の予定を心配"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/01.json",
+        "sha256": "e93dc8a5c97011032517db3a72e70975f632701dfd33971cb950d78e62ea03a6",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1785/3/0",
+        "seq": "1579260",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "昨日",
+            1,
+            []
+          ]
+        ],
+        "kanaForms": [
+          [
+            "きのう",
+            1,
+            [
+              "gikun"
+            ],
+            [
+              "*"
+            ]
+          ],
+          [
+            "さくじつ",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "n",
+            "adv"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "yesterday",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "First literal of the cited context-compatible raw sense; independent proposal for W2 review.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-essay-n2-creator-god",
+      "usage": "native",
+      "occurrenceIndex": 1,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "世界",
+      "lemma": "世界",
+      "sourceReading": "せかい",
+      "readingSegments": [
+        "せかい"
+      ],
+      "english": "the world",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-essay-n2-creator-god.json",
+        "sha256": "d07ee9f8216ac1ee12cce7226c3113330cb3a6c7b6efb1fdfd8c899cfd3cf669",
+        "pointer": "/tokens/1",
+        "token": {
+          "s": "世界",
+          "b": "世界",
+          "p": "名詞",
+          "r": "せかい",
+          "f": [
+            {
+              "t": "世界",
+              "r": "せかい"
+            }
+          ],
+          "c": true
+        },
+        "context": "「世界を創造した原初の神」と聞くと、多く"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/03.json",
+        "sha256": "8a9ad35425e81e993aab8cf7ef45ab80f2c16fa98ced5f78c5284becad17b82c",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1296/3/0",
+        "seq": "1373860",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "世界",
+            1,
+            []
+          ]
+        ],
+        "kanaForms": [
+          [
+            "せかい",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "n"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "the world",
+              null,
+              null
+            ],
+            [
+              "society",
+              null,
+              null
+            ],
+            [
+              "the universe",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "First literal of the cited context-compatible raw sense; independent proposal for W2 review.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-essay-n2-silent-amenominakanushi",
+      "usage": "native",
+      "occurrenceIndex": 0,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "物語",
+      "lemma": "物語",
+      "sourceReading": "ものがたり",
+      "readingSegments": [
+        "ものがたり"
+      ],
+      "english": "story",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-essay-n2-silent-amenominakanushi.json",
+        "sha256": "b2268b1cb38e65633ede972f707eaa9b53a28016cda3752e4612b1c19bbadfe0",
+        "pointer": "/tokens/0",
+        "token": {
+          "s": "物語",
+          "b": "物語",
+          "p": "名詞",
+          "r": "ものがたり",
+          "f": [
+            {
+              "t": "物語",
+              "r": "ものがたり"
+            }
+          ],
+          "c": true
+        },
+        "context": "物語の最初に名前を呼ばれながら、すぐに舞台から"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/07.json",
+        "sha256": "18f73ea54d406982efb862d10f5a480e069e097e085e8e8363cde57888eed033",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1618/3/0",
+        "seq": "1502480",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "物語",
+            1,
+            []
+          ],
+          [
+            "物語り",
+            0,
+            [
+              "io"
+            ]
+          ]
+        ],
+        "kanaForms": [
+          [
+            "ものがたり",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "n"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "story",
+              null,
+              null
+            ],
+            [
+              "tale",
+              null,
+              null
+            ],
+            [
+              "narrative",
+              null,
+              null
+            ],
+            [
+              "account",
+              null,
+              null
+            ],
+            [
+              "fable",
+              null,
+              null
+            ],
+            [
+              "legend",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "First literal of the cited context-compatible raw sense; independent proposal for W2 review.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-essay-n2-kojiki-myth-history",
+      "usage": "native",
+      "occurrenceIndex": 5,
+      "contentIndex": 1,
+      "candidateOrder": [
+        1,
+        0,
+        2
+      ],
+      "surface": "つい",
+      "lemma": "つく",
+      "sourceReading": "つい",
+      "readingSegments": [],
+      "english": "about",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-essay-n2-kojiki-myth-history.json",
+        "sha256": "e6111832dab4a2eb43c85c0807e188aa947604f8a1df770b3b402c42f701a549",
+        "pointer": "/tokens/5",
+        "token": {
+          "s": "つい",
+          "b": "つく",
+          "p": "動詞",
+          "r": "つい",
+          "f": [
+            {
+              "t": "つい"
+            }
+          ],
+          "c": true
+        },
+        "context": "古事記』について話す時、「神話なのか、歴史なの"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/00.json",
+        "sha256": "40bd35fc3605eed61db54b73e56e7fb9ca1ef670ba5d275acafc38d29a820685",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/41/3/0",
+        "seq": "1009780",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "に就いて",
+            0,
+            [
+              "rK"
+            ]
+          ],
+          [
+            "に就て",
+            0,
+            [
+              "sK"
+            ]
+          ]
+        ],
+        "kanaForms": [
+          [
+            "について",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "exp"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [
+            "uk"
+          ],
+          [],
+          [],
+          [
+            [
+              "about",
+              null,
+              null
+            ],
+            [
+              "on",
+              null,
+              null
+            ],
+            [
+              "regarding",
+              null,
+              null
+            ],
+            [
+              "concerning",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "Source tokens 4..6 に/つい/て form について: expression about (1009780). Token 5 keeps source lemma つく; reject 点く (1441400). No occurrence sense is supplied.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-essay-n2-myth-to-book",
+      "usage": "native",
+      "occurrenceIndex": 0,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "もし",
+      "lemma": "もし",
+      "sourceReading": "もし",
+      "readingSegments": [],
+      "english": "if",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-essay-n2-myth-to-book.json",
+        "sha256": "c461812d9fd4893f698c02edcca8c77cba5abb6b6042eb7db2c42ca088eeb96a",
+        "pointer": "/tokens/0",
+        "token": {
+          "s": "もし",
+          "b": "もし",
+          "p": "副詞",
+          "r": "もし",
+          "f": [
+            {
+              "t": "もし"
+            }
+          ],
+          "c": true
+        },
+        "context": "もし『古事記』成立のドキュメンタリーを作るなら、最初の"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/06.json",
+        "sha256": "1dd71f8cb516c9d70afcb51c2242967c59d44bbd9b65b3785a34faf97e0de1bd",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/47/3/0",
+        "seq": "1012500",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "若し",
+            0,
+            [
+              "rK"
+            ]
+          ]
+        ],
+        "kanaForms": [
+          [
+            "もし",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "adv"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [
+            "uk"
+          ],
+          [
+            "with a conditional sentence"
+          ],
+          [],
+          [
+            [
+              "if",
+              null,
+              null
+            ],
+            [
+              "in case",
+              null,
+              null
+            ],
+            [
+              "supposing",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "First literal of the cited context-compatible raw sense; independent proposal for W2 review.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-essay-n2-feel-jingu-musubi",
+      "usage": "native",
+      "occurrenceIndex": 1,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "神宮",
+      "lemma": "神宮",
+      "sourceReading": "じんぐう",
+      "readingSegments": [
+        "じんぐう"
+      ],
+      "english": "Ise Grand Shrine",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-essay-n2-feel-jingu-musubi.json",
+        "sha256": "eb7ab8f9c87335f5e484c0201bb50511ae8c89e5ac17ce3a644fa52869397020",
+        "pointer": "/tokens/1",
+        "token": {
+          "s": "神宮",
+          "b": "神宮",
+          "p": "名詞",
+          "r": "じんぐう",
+          "f": [
+            {
+              "t": "神宮",
+              "r": "じんぐう"
+            }
+          ],
+          "c": true
+        },
+        "context": "伊勢神宮の公式映像「産霊ダイジェスト」は、教室のように"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/0e.json",
+        "sha256": "4aba95e3b5185271ec61194e38ae67baed95e40104f2f5a8d96a748f735477b3",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1339/3/1",
+        "seq": "1364500",
+        "senseIndex": 1,
+        "kanjiForms": [
+          [
+            "神宮",
+            1,
+            []
+          ]
+        ],
+        "kanaForms": [
+          [
+            "じんぐう",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "n"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [
+            [
+              "伊勢神宮"
+            ]
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "Ise Grand Shrine",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "伊勢神宮 in the cited official video: Ise Grand Shrine. W2 must review the contextual referent vs generic shrine sense.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-essay-n2-prayer-on-screen",
+      "usage": "native",
+      "occurrenceIndex": 0,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "祈り",
+      "lemma": "祈り",
+      "sourceReading": "いのり",
+      "readingSegments": [
+        "いの"
+      ],
+      "english": "prayer",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-essay-n2-prayer-on-screen.json",
+        "sha256": "50b38a9f59739ecc5a0e2fb014d7fd700d1008102ad999b773449be1d3abfa90",
+        "pointer": "/tokens/0",
+        "token": {
+          "s": "祈り",
+          "b": "祈り",
+          "p": "名詞",
+          "r": "いのり",
+          "f": [
+            {
+              "t": "祈",
+              "r": "いの"
+            },
+            {
+              "t": "り"
+            }
+          ],
+          "c": true
+        },
+        "context": "祈りそのものに形はあるだろうか。心の内側だけ"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/05.json",
+        "sha256": "6dec1f4c2fb2338093d7bb9d753ec8b00bb55fc62ab7fa39e600a812cca3aed5",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/924/3/0",
+        "seq": "1222760",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "祈り",
+            1,
+            []
+          ],
+          [
+            "祷り",
+            0,
+            [
+              "rK"
+            ]
+          ]
+        ],
+        "kanaForms": [
+          [
+            "いのり",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "n"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "prayer",
+              null,
+              null
+            ],
+            [
+              "supplication",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "First literal of the cited context-compatible raw sense; independent proposal for W2 review.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-essay-n2-thanks-first",
+      "usage": "native",
+      "occurrenceIndex": 1,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "願い",
+      "lemma": "願い",
+      "sourceReading": "ねがい",
+      "readingSegments": [
+        "ねが"
+      ],
+      "english": "request",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-essay-n2-thanks-first.json",
+        "sha256": "e24b8e85ed7a9d0f173d440be80675cce343fec79b2106b79ef29dc6e77d6f07",
+        "pointer": "/tokens/1",
+        "token": {
+          "s": "願い",
+          "b": "願い",
+          "p": "名詞",
+          "r": "ねがい",
+          "f": [
+            {
+              "t": "願",
+              "r": "ねが"
+            },
+            {
+              "t": "い"
+            }
+          ],
+          "c": true
+        },
+        "context": "お願いがある場面では、日本語で「すみません"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/09.json",
+        "sha256": "33ef6440ed4fccfcbe699e4649fe7b70a176b182e59ce727c3176e125b0fc10b",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/946/3/1",
+        "seq": "1217900",
+        "senseIndex": 1,
+        "kanjiForms": [
+          [
+            "願い",
+            1,
+            []
+          ],
+          [
+            "願",
+            0,
+            [
+              "io"
+            ]
+          ]
+        ],
+        "kanaForms": [
+          [
+            "ねがい",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "n"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "request",
+              null,
+              null
+            ],
+            [
+              "entreaty",
+              null,
+              null
+            ],
+            [
+              "plea",
+              null,
+              null
+            ],
+            [
+              "appeal",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "お願いがある場面: request.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-essay-n2-testimony-literacy",
+      "usage": "native",
+      "occurrenceIndex": 0,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "ある",
+      "lemma": "ある",
+      "sourceReading": "ある",
+      "readingSegments": [],
+      "english": "a certain ...",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-essay-n2-testimony-literacy.json",
+        "sha256": "f10d2822881a8135ec979ca006a432f704e15387b4905488166269f946fbb771",
+        "pointer": "/tokens/0",
+        "token": {
+          "s": "ある",
+          "b": "ある",
+          "p": "連体詞",
+          "r": "ある",
+          "f": [
+            {
+              "t": "ある"
+            }
+          ],
+          "c": true
+        },
+        "context": "ある言葉を唱えた後に長く悩んでいた問題が"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/03.json",
+        "sha256": "8a9ad35425e81e993aab8cf7ef45ab80f2c16fa98ced5f78c5284becad17b82c",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1804/3/0",
+        "seq": "1586840",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "或る",
+            0,
+            []
+          ],
+          [
+            "或",
+            1,
+            []
+          ]
+        ],
+        "kanaForms": [
+          [
+            "ある",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "adj-pn"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [
+            "uk"
+          ],
+          [],
+          [],
+          [
+            [
+              "a certain ...",
+              null,
+              null
+            ],
+            [
+              "some ...",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "Source POS 連体詞, ある言葉/ある神: a certain ..., not 有る/to exist.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-essay-n1-cosmic-analogy",
+      "usage": "native",
+      "occurrenceIndex": 0,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "神話",
+      "lemma": "神話",
+      "sourceReading": "しんわ",
+      "readingSegments": [
+        "しんわ"
+      ],
+      "english": "myth",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-essay-n1-cosmic-analogy.json",
+        "sha256": "f9af86076032b49e9527f9d1895b6d2a2f83d1824e3f4e8cdd9f76acdaec491f",
+        "pointer": "/tokens/0",
+        "token": {
+          "s": "神話",
+          "b": "神話",
+          "p": "名詞",
+          "r": "しんわ",
+          "f": [
+            {
+              "t": "神話",
+              "r": "しんわ"
+            }
+          ],
+          "c": true
+        },
+        "context": "神話の冒頭と宇宙の始まりは、あまりにも似合いの"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/06.json",
+        "sha256": "1dd71f8cb516c9d70afcb51c2242967c59d44bbd9b65b3785a34faf97e0de1bd",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1287/3/0",
+        "seq": "1364940",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "神話",
+            1,
+            []
+          ]
+        ],
+        "kanaForms": [
+          [
+            "しんわ",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "n"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "myth",
+              null,
+              null
+            ],
+            [
+              "mythology",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "First literal of the cited context-compatible raw sense; independent proposal for W2 review.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-essay-n1-nakaima-time-theory",
+      "usage": "native",
+      "occurrenceIndex": 1,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "今",
+      "lemma": "今",
+      "sourceReading": "いま",
+      "readingSegments": [
+        "いま"
+      ],
+      "english": "now",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-essay-n1-nakaima-time-theory.json",
+        "sha256": "e5db90e07b5a0418580744f1e326b27e4f08b29127961571870c8fc0e280e27c",
+        "pointer": "/tokens/1",
+        "token": {
+          "s": "今",
+          "b": "今",
+          "p": "名詞",
+          "r": "いま",
+          "f": [
+            {
+              "t": "今",
+              "r": "いま"
+            }
+          ],
+          "c": true
+        },
+        "context": "「今を生きよ」という言葉は、簡潔であるほど"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/0b.json",
+        "sha256": "d83924999832a2a8f08dfa60756b6bab1eb0307070982eb1d281988195c5a287",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1113/3/0",
+        "seq": "1288850",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "今",
+            1,
+            []
+          ]
+        ],
+        "kanaForms": [
+          [
+            "いま",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "n",
+            "adj-no",
+            "adv"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "now",
+              null,
+              null
+            ],
+            [
+              "the present time",
+              null,
+              null
+            ],
+            [
+              "just now",
+              null,
+              null
+            ],
+            [
+              "soon",
+              null,
+              null
+            ],
+            [
+              "immediately",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "First literal of the cited context-compatible raw sense; independent proposal for W2 review.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-essay-n1-first-versus-supreme",
+      "usage": "native",
+      "occurrenceIndex": 0,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "物語",
+      "lemma": "物語",
+      "sourceReading": "ものがたり",
+      "readingSegments": [
+        "ものがたり"
+      ],
+      "english": "story",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-essay-n1-first-versus-supreme.json",
+        "sha256": "bb36d7deb554ed4b7f9488de244948a16bb35ada066d39dce2edbea333dbac4a",
+        "pointer": "/tokens/0",
+        "token": {
+          "s": "物語",
+          "b": "物語",
+          "p": "名詞",
+          "r": "ものがたり",
+          "f": [
+            {
+              "t": "物語",
+              "r": "ものがたり"
+            }
+          ],
+          "c": true
+        },
+        "context": "物語の最初に現れる者は、物語世界で最も偉いの"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/07.json",
+        "sha256": "18f73ea54d406982efb862d10f5a480e069e097e085e8e8363cde57888eed033",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1618/3/0",
+        "seq": "1502480",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "物語",
+            1,
+            []
+          ],
+          [
+            "物語り",
+            0,
+            [
+              "io"
+            ]
+          ]
+        ],
+        "kanaForms": [
+          [
+            "ものがたり",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "n"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "story",
+              null,
+              null
+            ],
+            [
+              "tale",
+              null,
+              null
+            ],
+            [
+              "narrative",
+              null,
+              null
+            ],
+            [
+              "account",
+              null,
+              null
+            ],
+            [
+              "fable",
+              null,
+              null
+            ],
+            [
+              "legend",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "First literal of the cited context-compatible raw sense; independent proposal for W2 review.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-essay-n1-silent-god-theology",
+      "usage": "native",
+      "occurrenceIndex": 0,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "ある",
+      "lemma": "ある",
+      "sourceReading": "ある",
+      "readingSegments": [],
+      "english": "a certain ...",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-essay-n1-silent-god-theology.json",
+        "sha256": "f95c8b87a75adb2ec50eecd437edd578c98b29a6743f9805124d73a7beefefd5",
+        "pointer": "/tokens/0",
+        "token": {
+          "s": "ある",
+          "b": "ある",
+          "p": "連体詞",
+          "r": "ある",
+          "f": [
+            {
+              "t": "ある"
+            }
+          ],
+          "c": true
+        },
+        "context": "ある神は、名を記された後に何も語ら"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/03.json",
+        "sha256": "8a9ad35425e81e993aab8cf7ef45ab80f2c16fa98ced5f78c5284becad17b82c",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1804/3/0",
+        "seq": "1586840",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "或る",
+            0,
+            []
+          ],
+          [
+            "或",
+            1,
+            []
+          ]
+        ],
+        "kanaForms": [
+          [
+            "ある",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "adj-pn"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [
+            "uk"
+          ],
+          [],
+          [],
+          [
+            [
+              "a certain ...",
+              null,
+              null
+            ],
+            [
+              "some ...",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "Source POS 連体詞, ある言葉/ある神: a certain ..., not 有る/to exist.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-essay-n1-kojiki-power",
+      "usage": "native",
+      "occurrenceIndex": 3,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "古典",
+      "lemma": "古典",
+      "sourceReading": "こてん",
+      "readingSegments": [
+        "こてん"
+      ],
+      "english": "classic (work, esp. book)",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-essay-n1-kojiki-power.json",
+        "sha256": "d8eb3c46c775b1975321a5f2d7533c6acf3c5e5b7a2166a4e24a34d0c14c2bf2",
+        "pointer": "/tokens/3",
+        "token": {
+          "s": "古典",
+          "b": "古典",
+          "p": "名詞",
+          "r": "こてん",
+          "f": [
+            {
+              "t": "古典",
+              "r": "こてん"
+            }
+          ],
+          "c": true
+        },
+        "context": "一冊の古典が「国の物語」になる時、その背後に"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/0f.json",
+        "sha256": "4949be91842f41d4ee3026d76c99b66dd3cd34054844bcb912dbda218c8f39fa",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1027/3/0",
+        "seq": "1265860",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "古典",
+            1,
+            []
+          ]
+        ],
+        "kanaForms": [
+          [
+            "こてん",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "n"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "classic (work, esp. book)",
+              null,
+              null
+            ],
+            [
+              "the classics",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "First literal of the cited context-compatible raw sense; independent proposal for W2 review.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-essay-n1-beyond-fact-fiction",
+      "usage": "native",
+      "occurrenceIndex": 0,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "神話",
+      "lemma": "神話",
+      "sourceReading": "しんわ",
+      "readingSegments": [
+        "しんわ"
+      ],
+      "english": "myth",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-essay-n1-beyond-fact-fiction.json",
+        "sha256": "0db45e13d1dd22d9fd5800c56ebac96ef87abf9b764fcde3f0709ab70b104de6",
+        "pointer": "/tokens/0",
+        "token": {
+          "s": "神話",
+          "b": "神話",
+          "p": "名詞",
+          "r": "しんわ",
+          "f": [
+            {
+              "t": "神話",
+              "r": "しんわ"
+            }
+          ],
+          "c": true
+        },
+        "context": "神話について語り始めると、しばしば二つの席しか"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/06.json",
+        "sha256": "1dd71f8cb516c9d70afcb51c2242967c59d44bbd9b65b3785a34faf97e0de1bd",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1287/3/0",
+        "seq": "1364940",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "神話",
+            1,
+            []
+          ]
+        ],
+        "kanaForms": [
+          [
+            "しんわ",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "n"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "myth",
+              null,
+              null
+            ],
+            [
+              "mythology",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "First literal of the cited context-compatible raw sense; independent proposal for W2 review.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-essay-n1-sacred-media",
+      "usage": "native",
+      "occurrenceIndex": 0,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "神聖",
+      "lemma": "神聖",
+      "sourceReading": "しんせい",
+      "readingSegments": [
+        "しんせい"
+      ],
+      "english": "holiness",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-essay-n1-sacred-media.json",
+        "sha256": "7327e14f05124ae3986c0bc4636b3f3f3c957a6278f49d54f450ccee0b3f176b",
+        "pointer": "/tokens/0",
+        "token": {
+          "s": "神聖",
+          "b": "神聖",
+          "p": "名詞",
+          "r": "しんせい",
+          "f": [
+            {
+              "t": "神聖",
+              "r": "しんせい"
+            }
+          ],
+          "c": true
+        },
+        "context": "神聖さは、カメラにそのまま写る物体ではない。"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/03.json",
+        "sha256": "8a9ad35425e81e993aab8cf7ef45ab80f2c16fa98ced5f78c5284becad17b82c",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1270/3/0",
+        "seq": "1364730",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "神聖",
+            1,
+            []
+          ]
+        ],
+        "kanaForms": [
+          [
+            "しんせい",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "n",
+            "adj-na"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "holiness",
+              null,
+              null
+            ],
+            [
+              "sacredness",
+              null,
+              null
+            ],
+            [
+              "sanctity",
+              null,
+              null
+            ],
+            [
+              "dignity",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "First literal of the cited context-compatible raw sense; independent proposal for W2 review.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-essay-n1-ise-time",
+      "usage": "native",
+      "occurrenceIndex": 0,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "水",
+      "lemma": "水",
+      "sourceReading": "みず",
+      "readingSegments": [
+        "みず"
+      ],
+      "english": "water (esp. cool or cold)",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-essay-n1-ise-time.json",
+        "sha256": "fb549945eea2c81f7bed778d022f39a16f9d75c127bd3ab1cb28c7063257729d",
+        "pointer": "/tokens/0",
+        "token": {
+          "s": "水",
+          "b": "水",
+          "p": "名詞",
+          "r": "みず",
+          "f": [
+            {
+              "t": "水",
+              "r": "みず"
+            }
+          ],
+          "c": true
+        },
+        "context": "水が流れる。枝の間から光が落ちる。白い布"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/03.json",
+        "sha256": "8a9ad35425e81e993aab8cf7ef45ab80f2c16fa98ced5f78c5284becad17b82c",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1287/3/0",
+        "seq": "1371260",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "水",
+            1,
+            []
+          ]
+        ],
+        "kanaForms": [
+          [
+            "みず",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "n"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [
+            [
+              "湯",
+              "ゆ・1",
+              1
+            ]
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "water (esp. cool or cold)",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "First literal of the cited context-compatible raw sense; independent proposal for W2 review.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-essay-n1-miracle-testimony",
+      "usage": "native",
+      "occurrenceIndex": 0,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "ある",
+      "lemma": "ある",
+      "sourceReading": "ある",
+      "readingSegments": [],
+      "english": "a certain ...",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-essay-n1-miracle-testimony.json",
+        "sha256": "134ffabe0047a897fe583dc44505ac854d3922cf8403fdc63fa00961292946b0",
+        "pointer": "/tokens/0",
+        "token": {
+          "s": "ある",
+          "b": "ある",
+          "p": "連体詞",
+          "r": "ある",
+          "f": [
+            {
+              "t": "ある"
+            }
+          ],
+          "c": true
+        },
+        "context": "ある言葉を唱えた後で思いがけない助けがあった、"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/03.json",
+        "sha256": "8a9ad35425e81e993aab8cf7ef45ab80f2c16fa98ced5f78c5284becad17b82c",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1804/3/0",
+        "seq": "1586840",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "或る",
+            0,
+            []
+          ],
+          [
+            "或",
+            1,
+            []
+          ]
+        ],
+        "kanaForms": [
+          [
+            "ある",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "adj-pn"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [
+            "uk"
+          ],
+          [],
+          [],
+          [
+            [
+              "a certain ...",
+              null,
+              null
+            ],
+            [
+              "some ...",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "Source POS 連体詞, ある言葉/ある神: a certain ..., not 有る/to exist.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "bunki-essay-n1-prayer-reality",
+      "usage": "native",
+      "occurrenceIndex": 0,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0,
+        1,
+        2
+      ],
+      "surface": "以下",
+      "lemma": "以下",
+      "sourceReading": "いか",
+      "readingSegments": [
+        "いか"
+      ],
+      "english": "the following",
+      "article": {
+        "path": "prototypes/corridor/data/articles/bunki-essay-n1-prayer-reality.json",
+        "sha256": "8e44e2e11775734e8c0ab11b3a37258be19f687f66179fb72dc3b0fd9d2fcc19",
+        "pointer": "/tokens/0",
+        "token": {
+          "s": "以下",
+          "b": "以下",
+          "p": "名詞",
+          "r": "いか",
+          "f": [
+            {
+              "t": "以下",
+              "r": "いか"
+            }
+          ],
+          "c": true
+        },
+        "context": "以下は、異なる立場を考えるために書いた架空の対話"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/05.json",
+        "sha256": "6dec1f4c2fb2338093d7bb9d753ec8b00bb55fc62ab7fa39e600a812cca3aed5",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/778/3/2",
+        "seq": "1155060",
+        "senseIndex": 2,
+        "kanjiForms": [
+          [
+            "以下",
+            1,
+            []
+          ],
+          [
+            "已下",
+            0,
+            [
+              "rK"
+            ]
+          ]
+        ],
+        "kanaForms": [
+          [
+            "いか",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ],
+          [
+            "いげ",
+            0,
+            [
+              "ok"
+            ],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "n",
+            "adj-no"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "the following",
+              null,
+              null
+            ],
+            [
+              "the below-mentioned",
+              null,
+              null
+            ],
+            [
+              "the rest",
+              null,
+              null
+            ],
+            [
+              "followed by ...",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "Opening 以下は introduces the following fictional dialogue, not a numeric ceiling.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    },
+    {
+      "id": "govonline:article-202609-radio-3741",
+      "usage": "playback",
+      "occurrenceIndex": 0,
+      "contentIndex": 0,
+      "candidateOrder": [
+        0
+      ],
+      "surface": "今回",
+      "lemma": "今回",
+      "sourceReading": "こんかい",
+      "readingSegments": [
+        "こんかい"
+      ],
+      "english": "this time",
+      "article": {
+        "path": "prototypes/corridor/data/articles/govonline-article-202609-radio-3741.json",
+        "sha256": "8655d613fd24f914d754b81059c443602f9dbb2024e234970f6cea7b3fa04f18",
+        "pointer": "/tokens/0",
+        "token": {
+          "s": "今回",
+          "b": "今回",
+          "p": "名詞",
+          "r": "こんかい",
+          "f": [
+            {
+              "t": "今回",
+              "r": "こんかい"
+            }
+          ],
+          "c": true
+        },
+        "context": "今回のテーマは「「伝える」をもっと豊かに！手話"
+      },
+      "dictionary": {
+        "path": "prototypes/corridor/data/share_alike/dict-v2/00.json",
+        "sha256": "40bd35fc3605eed61db54b73e56e7fb9ca1ef670ba5d275acafc38d29a820685",
+        "sourcePin": "3.6.2+20260803141815",
+        "pointer": "/entries/1094/3/0",
+        "seq": "1289070",
+        "senseIndex": 0,
+        "kanjiForms": [
+          [
+            "今回",
+            1,
+            []
+          ]
+        ],
+        "kanaForms": [
+          [
+            "こんかい",
+            1,
+            [],
+            [
+              "*"
+            ]
+          ]
+        ],
+        "sense": [
+          [
+            "n",
+            "adv"
+          ],
+          [
+            "*"
+          ],
+          [
+            "*"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            [
+              "this time",
+              null,
+              null
+            ],
+            [
+              "now",
+              null,
+              null
+            ]
+          ]
+        ]
+      },
+      "decision": "First literal of the cited context-compatible raw sense; independent proposal for W2 review.",
+      "senseRecord": {
+        "path": "prototypes/corridor/data/articles/senses.json",
+        "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",
+        "occurrencePresent": false
+      }
+    }
+  ]
+}

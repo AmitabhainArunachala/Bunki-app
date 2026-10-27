@@ -37,6 +37,12 @@ import {
   RELEASE_GROUPS,
 } from './ci/gate-evidence.mjs';
 import { commandCheckEvidence } from './ci/command-check-contracts.mjs';
+import { validateReaderEnglishEvidence } from './ci/vh-media-report-contracts.mjs';
+import {
+  englishSourcePins,
+  englishExpectations,
+} from '../prototypes/corridor/tools/reader-english-rung.mjs';
+import { syntheticEnglishReceipt } from '../prototypes/corridor/tools/reader-english-rung-controls.mjs';
 import {
   loadHfix2cPins,
   validateHfix2cFocused,
@@ -1007,6 +1013,9 @@ export function batteryGates(out, env = process.env) {
                       )
                     : null,
                 }
+              : {}),
+            ...(gate.report.type === 'native'
+              ? { readerEnglishRungSources: englishSourcePins(ROOT) }
               : {}),
             ...(['drift-hunt', 'native'].includes(gate.report.type) ? { engine: 'chromium' } : {}),
             ...([
@@ -2009,6 +2018,21 @@ export function validateHfix2aReport(
   return true;
 }
 
+/** English-only supplement; the native branch retains every pre-existing assertion. */
+export function validateNativeReaderEnglishRung(
+  value,
+  { readerEnglishRungSources, artifactSha256, engine },
+) {
+  return validateReaderEnglishEvidence(value.readerEnglishRung, {
+    root: ROOT,
+    sources: readerEnglishRungSources,
+    usage: 'native',
+    artifactSha256,
+    engine,
+    articleIds: NATIVE_ARTICLE_IDS,
+  });
+}
+
 function requireCompleteReport({
   runId,
   path,
@@ -2023,6 +2047,7 @@ function requireCompleteReport({
   siteDir,
   siteIdentity,
   practiceSource,
+  readerEnglishRungSources,
   mode,
 }) {
   let receiptPath = path;
@@ -2363,6 +2388,7 @@ function requireCompleteReport({
       );
     assert.deepEqual(value.failures, [], 'Native reading receipt reports failures');
     assert.deepEqual(value.noise, [], 'Native reading receipt reports browser errors');
+    validateNativeReaderEnglishRung(value, { readerEnglishRungSources, artifactSha256, engine });
   } else if (
     [
       'shelf-search',
@@ -3298,6 +3324,7 @@ async function verifyRunner(out) {
     );
     if (type === 'native') {
       assert.equal(selected.report.engine, 'chromium');
+      assert.deepEqual(selected.report.readerEnglishRungSources, englishSourcePins(ROOT));
       assert.equal(selected.env.KAIRO_BROWSER, 'chromium');
     } else {
       assert.deepEqual(selected.report.engines, ['chromium', 'webkit']);
@@ -3730,6 +3757,7 @@ async function verifyRunner(out) {
   // zero exit cannot promote omitted journeys, stale identity, or browser errors.
   const scopedArtifact = 'a'.repeat(64);
   const scopedVerifier = 'b'.repeat(64);
+  const nativeEnglishSources = englishSourcePins(ROOT);
   const bothEngines = ['chromium', 'webkit'];
   const nativeDial = {
     key: 'furigana',
@@ -3954,6 +3982,13 @@ async function verifyRunner(out) {
     native: {
       schemaVersion: 1,
       kind: 'native-bunki-readings-browser-verification',
+      readerEnglishRung: syntheticEnglishReceipt(
+        englishExpectations(ROOT),
+        'native',
+        nativeEnglishSources,
+        scopedArtifact,
+        'chromium',
+      ),
       completed: true,
       pass: true,
       touchEmulation: true,
@@ -3977,7 +4012,9 @@ async function verifyRunner(out) {
           type,
           artifactSha256: scopedArtifact,
           sourceSha256: scopedVerifier,
-          ...(type === 'native' ? { engine: 'chromium' } : { engines: bothEngines }),
+          ...(type === 'native'
+            ? { engine: 'chromium', readerEnglishRungSources: nativeEnglishSources }
+            : { engines: bothEngines }),
           ...(type === 'record-practice-finalize' ? { practiceSource: practiceSources } : {}),
           ...expected,
         },
@@ -4072,6 +4109,12 @@ async function verifyRunner(out) {
       );
     }
     if (type === 'native') {
+      mutations.push(['missing-English-evidence', { readerEnglishRung: undefined }]);
+      for (const key of ['helper', 'expectations', 'controls']) {
+        const wrong = JSON.parse(JSON.stringify(fixture.readerEnglishRung));
+        wrong.sources[key] = '0'.repeat(64);
+        mutations.push([`stale-English-${key}`, { readerEnglishRung: wrong }]);
+      }
       mutations.push(
         ['schema', { schemaVersion: 2 }],
         ['kind', { kind: 'other-reading-suite' }],
@@ -4336,6 +4379,15 @@ async function verifyRunner(out) {
     for (const [name, expected] of [
       ['missing-expected-artifact', { artifactSha256: null }],
       ['missing-expected-verifier', { sourceSha256: null }],
+      ...(type === 'native'
+        ? [
+            ['missing-expected-English-pins', { readerEnglishRungSources: null }],
+            ...Object.keys(nativeEnglishSources).map((key) => [
+              `stale-expected-English-${key}`,
+              { readerEnglishRungSources: { ...nativeEnglishSources, [key]: '0'.repeat(64) } },
+            ]),
+          ]
+        : []),
       [
         'wrong-expected-engine',
         type === 'native' ? { engine: 'webkit' } : { engines: ['chromium'] },

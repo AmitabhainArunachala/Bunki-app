@@ -34,6 +34,9 @@ import { chromium, webkit } from 'playwright-core';
 let CORRIDOR_DIR = null, startCorridorServer;
 import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
 import { runtimeLock } from './voice-lock.mjs';
+import { englishExpectation, englishSourcePins, assertEnglishSource, observeReaderEnglishRung } from './reader-english-rung.mjs';
+import { runPureEnglishControls, runBrowserEnglishControls } from './reader-english-rung-controls.mjs';
+const readerEnglishRung = { schemaVersion: 1, sources: englishSourcePins(), observations: [], pureControls: [], browserControls: null };
 
 const out = resolve(process.env.KAIRO_EVIDENCE_DIR || resolve(homedir(), '.dharma/bunki_audit/playback'));
 mkdirSync(out, { recursive: true });
@@ -378,6 +381,10 @@ try {
   browser = await LAUNCHERS[ENGINE].launch(ENGINE === 'chromium'
     ? { executablePath: process.env.CHROMIUM_PATH || undefined } : {});
   browserVersion = browser.version();
+  readerEnglishRung.pureControls = await runPureEnglishControls();
+  readerEnglishRung.browserControls = await runBrowserEnglishControls({ browser, base, engine: ENGINE,
+    artifactSha256: JSON.parse(readFileSync(resolve(CORRIDOR_DIR, 'build-identity.json'), 'utf8')).artifactSha256 });
+  assert(readerEnglishRung.pureControls.every(row => row.passed) && readerEnglishRung.browserControls.results.every(row => row.passed), 'English oracle controls failed');
   console.log(`engine ${ENGINE} ${browserVersion} (KAIRO_BROWSER=${REQUESTED})`);
 
   // --- the shipped state: no narration flag, no approved clip ---
@@ -436,6 +443,10 @@ try {
     });
     assert(selected?.reading && selected.paragraph >= 0 && selected.wordIndex >= 0, 'A hidden-reading occurrence belongs to a real paragraph controller');
     const word = page.locator(`#reader .tok[data-index="${selected.index}"]`);
+    const expectedEnglish = englishExpectation(FIRST, 'playback');
+    assertEnglishSource(JSON.parse(readFileSync(resolve(CORRIDOR_DIR, expectedEnglish.article.path.replace('prototypes/corridor/', '')), 'utf8')), expectedEnglish);
+    assert.equal(Number(selected.index), expectedEnglish.occurrenceIndex, 'Original candidate predicate must still select the pinned occurrence');
+    assert.equal(selected.word, expectedEnglish.lemma);
     const selectWord = async () => {
       await page.locator('#reader [data-prose-roving]').nth(selected.paragraph).focus();
       await page.keyboard.press('Home');
@@ -485,13 +496,16 @@ try {
       // Ladder (John, 10-19, a spec change): the second Enter no longer opens the stage. It sets the word's English under
       // it and no stage yet; that English is the meaning's first showing, so it (not the stage) writes the depth-2 row.
       // Only the observed English rung permits the third Enter.
-      await page.keyboard.press('Enter');
-      await page.waitForFunction(({ index }) => ['gloss', 'stage'].includes(document.querySelector(`#reader .tok[data-index="${index}"]`)?.dataset.ladderRung)
-        || !!document.getElementById('mini'), selected);
-      const english = await word.evaluate(n => ({ rung: n.dataset.ladderRung || null, text: n.querySelector(':scope > .tok-en .tok-en-text')?.textContent.trim() ?? null,
-        hasEn: n.classList.contains('has-en'), stage: !!document.getElementById('mini') }));
-      assert.equal(english.rung === 'gloss' && !!english.text && english.hasEn && !english.stage, true,
-        `The second Enter sets the word's English under it, no stage yet: ${JSON.stringify(english)}`);
+      const origin = await word.elementHandle();
+      assert(origin, 'The exact English occurrence must remain mounted');
+      try {
+        const observation = await observeReaderEnglishRung({ origin, expected: expectedEnglish,
+          trigger: budget => budget.call(() => page.keyboard.press('Enter')) });
+        readerEnglishRung.observations.push(observation);
+      } catch (error) {
+        readerEnglishRung.failure = { articleId: FIRST, code: error.code || error.message, observation: error.detail ?? null, elapsedMs: error.elapsedMs ?? null };
+        throw error;
+      } finally { await origin.dispose(); }
       const glossed = await waitForAppRecord(page, record => record.obslog.length === before.length + 2);
       assert.deepEqual(glossed.obslog.slice(0, -1), revealed.obslog);
       assert.deepEqual(glossed.obslog.at(-1).slice(1), ['tap', `word:${selected.word}`, 2, FIRST]);
@@ -862,6 +876,7 @@ try {
     engine: ENGINE, browserVersion, requestedBrowser: REQUESTED, enginesCovered: [ENGINE],
     simulatedBrowser: ENGINE, audio: 'deterministic media doubles; the speech double must never be called; no voice-quality claim',
     limits: ['one engine per process; KAIRO_BROWSER=all runs the default engine named above and is not evidence for any other'],
+    readerEnglishRung,
     results, failures: results.filter((row) => !row.pass).length,
   }, null, 2)}\n`);
   const failures = results.filter((row) => !row.pass).length;

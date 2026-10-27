@@ -40,6 +40,9 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
 import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
+import { englishExpectation, englishSourcePins, assertEnglishSource, observeReaderEnglishRung } from './reader-english-rung.mjs';
+import { runPureEnglishControls, runBrowserEnglishControls } from './reader-english-rung-controls.mjs';
+const readerEnglishRung = { schemaVersion: 1, sources: englishSourcePins(), observations: [], pureControls: [], browserControls: null };
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const CORRIDOR = resolveCorridorSite();
@@ -121,8 +124,8 @@ function startServer(rootDir) {
 
 const touchAttempts = [];
 
-async function touchAt(page, locator, holdMs = 0) {
-  await locator.scrollIntoViewIfNeeded();
+async function touchAt(page, locator, holdMs = 0, budget = null) {
+  await locator.scrollIntoViewIfNeeded(budget ? { timeout: budget.remaining() } : undefined);
   await page.waitForTimeout(35);
   const box = await locator.evaluate((node) => {
     const rect = node.getClientRects()[0] ?? node.getBoundingClientRect();
@@ -151,6 +154,7 @@ async function touchAt(page, locator, holdMs = 0) {
     force: 1,
   };
   const session = await page.context().newCDPSession(page);
+  budget?.remaining();
   await session.send('Input.dispatchTouchEvent', {
     type: 'touchStart',
     touchPoints: [point],
@@ -160,7 +164,7 @@ async function touchAt(page, locator, holdMs = 0) {
   await session.detach();
   if (!holdMs) {
     try {
-      await page.waitForFunction((count) => (window.__nativeTargetClicks ?? 0) > count, before, { timeout: 5000 });
+      await page.waitForFunction((count) => (window.__nativeTargetClicks ?? 0) > count, before, { timeout: budget ? budget.remaining() : 5000 });
     } finally {
       attempt.events = await page.evaluate(() => window.__nativeTouchTrace?.slice(-6) ?? []);
     }
@@ -266,37 +270,28 @@ async function setReaderDial(page, key, index) {
   }
 }
 
-async function openQuickLook(page, preferredIndex = 0) {
+async function openQuickLook(page, articleId, body, preferredIndex = 0) {
   const tokens = page.locator('#reader .tok.content');
   const count = await tokens.count();
   const candidates = [preferredIndex, 0, 1, 2].filter(
     (value, index, values) => value < count && values.indexOf(value) === index,
   );
-  for (const index of candidates) {
-    // Ladder (John, 10-19, a spec change): taps climb one observed rung at a time — the reading where it is not already up
-    // (this walk keeps readings always up, so none), then the English under the word, then the quick look (the stage); a tap
-    // is taken only once the rung before it is seen, and none opens a full entry. A press and hold opens the word menu instead
-    const token = tokens.nth(index);
-    await touchAt(page, token);
-    if (await page.locator('#sheet').count()) {
-      throw new Error(`a quick-lookup tap must not open a full entry: ${JSON.stringify(touchAttempts.at(-1))}`);
-    }
-    let rung = await page.waitForFunction((node) => (document.getElementById('mini') ? 'stage'
-      : ['reading', 'gloss'].includes(node.dataset.ladderRung) ? node.dataset.ladderRung : null),
-    await token.elementHandle(), { timeout: 5_000 }).then((handle) => handle.jsonValue());
-    if (rung === 'reading') {
-      await touchAt(page, token);
-      rung = await page.waitForFunction((node) => (document.getElementById('mini') ? 'stage' : node.dataset.ladderRung === 'gloss' ? 'gloss' : null),
-        await token.elementHandle(), { timeout: 5_000 }).then((handle) => handle.jsonValue());
-    }
-    if (rung !== 'gloss') {
-      throw new Error(`a quick-lookup climb must set the English under the word before its stage: ${JSON.stringify({ index, rung })}`);
-    }
-    const english = await token.evaluate((node) => ({ text: node.querySelector(':scope > .tok-en .tok-en-text')?.textContent.trim() ?? '',
-      marked: node.classList.contains('has-en') && node.dataset.depthAside === 'meaning', stage: !!document.getElementById('mini') }));
-    if (!english.text || !english.marked || english.stage) {
-      throw new Error(`the English rung must draw the word's English under it, with no stage yet: ${JSON.stringify({ index, english })}`);
-    }
+  const expected = englishExpectation(articleId, 'native');
+  assertEnglishSource(body, expected);
+  if (JSON.stringify(candidates) !== JSON.stringify(expected.candidateOrder) || candidates[0] !== expected.contentIndex)
+    throw new Error(`Original quick-look candidate ordering changed: ${articleId}`);
+  // Retain the first chosen object. No oracle failure may advance to an easier token.
+  const token = await tokens.nth(candidates[0]).elementHandle();
+  if (!token) throw new Error(`Quick-look occurrence missing: ${articleId}`);
+  try {
+    const observation = await observeReaderEnglishRung({ origin: token, expected,
+      trigger: async budget => {
+        await budget.call(() => touchAt(page, token, 0, budget));
+        const rung = await budget.waitUntil(() => token.evaluate(node =>
+          ['reading', 'gloss', 'stage'].includes(node.dataset.ladderRung) && node.dataset.ladderRung));
+        if (rung === 'reading') await budget.call(() => touchAt(page, token, 0, budget));
+      } });
+    readerEnglishRung.observations.push(observation);
     await touchAt(page, token);
     if (await page.locator('#sheet').count()) {
       throw new Error(`a quick-lookup tap must not open a full entry: ${JSON.stringify(touchAttempts.at(-1))}`);
@@ -314,12 +309,13 @@ async function openQuickLook(page, preferredIndex = 0) {
         gloss: mini.querySelector('.mini-gloss')?.textContent ?? '',
       };
     });
-    if (quick?.word && quick.gloss && !/語釈なし|no gloss|No dictionary entry for this spelling\.|この表記の辞書項目はありません。/.test(quick.gloss)) {
-      return quick;
-    }
-    await page.evaluate(() => document.getElementById('mini')?.remove());
-  }
-  return null;
+    if (!quick?.word || !quick.gloss || /語釈なし|no gloss|No dictionary entry for this spelling\.|この表記の辞書項目はありません。/.test(quick.gloss))
+      throw new Error(`The selected quick look has no dictionary answer: ${articleId}`);
+    return quick;
+  } catch (error) {
+    readerEnglishRung.failure = { articleId, code: error.code || error.message, observation: error.detail ?? null, elapsedMs: error.elapsedMs ?? null };
+    throw error;
+  } finally { await token.dispose(); }
 }
 
 // G3: furigana=2 keeps native ruby at rest; only the temporary word visit folds.
@@ -841,6 +837,11 @@ let failureEvidence = null;
 try {
   browser = await chromium.launch({ executablePath, args: ['--no-sandbox'] });
   browserVersion = await browser.version();
+  readerEnglishRung.pureControls = await runPureEnglishControls();
+  readerEnglishRung.browserControls = await runBrowserEnglishControls({ browser, base, engine: 'chromium',
+    artifactSha256: JSON.parse(readFileSync(resolve(CORRIDOR, 'build-identity.json'), 'utf8')).artifactSha256 });
+  if (!readerEnglishRung.pureControls.every(row => row.passed) || !readerEnglishRung.browserControls.results.every(row => row.passed))
+    throw new Error('English oracle controls failed');
   const context = await browser.newContext({
     viewport: VIEWPORT,
     screen: VIEWPORT,
@@ -1072,7 +1073,7 @@ try {
       );
     }
 
-    const quick = await openQuickLook(page, quickTokenIndex.get(id));
+    const quick = await openQuickLook(page, id, body, quickTokenIndex.get(id));
     let fullEntry = null, ladderReturn = null;
     if (quick) {
       const quickOrigin = await page.locator('#reader .tok[data-ladder-rung="stage"]').elementHandle();
@@ -1386,6 +1387,7 @@ writeFileSync(
       browser: browserVersion,
       completed: journeyCompleted,
       failureEvidence,
+      readerEnglishRung,
       touchAttempts,
       pass: journeyCompleted && failures.length === 0,
       completedAt: new Date().toISOString(),
