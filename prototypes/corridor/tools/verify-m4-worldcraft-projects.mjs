@@ -41,11 +41,11 @@ function encodeLocalJson(raw) {
 }
 const dataURL = s => 'data:text/javascript;base64,' + Buffer.from(s).toString('base64');
 const lifecycleSource = readFileSync(new URL('journey-lifecycle.mjs', base), 'utf8');
-const lifecycleHash = 'f21912d6f04bed041291c41d03ea52c723fe0ee316361448eb4eb30fec8d2a09';
+const lifecycleHash = '2b7adb9e74af464563ebc3106a178a5223035cc2f8894f6cc05bf4ea57095a93';
 assert.equal(sha(lifecycleSource), lifecycleHash);
 const shimURL = dataURL("import {createHash} from 'node:crypto'; export " + encodeLocalJson.toString());
-const { createLifecycle, digest, classify, authority, LIMITS } = await import(dataURL(
-  lifecycleSource.replace("'./modules/record-core.mjs'", JSON.stringify(shimURL))));
+const loadLifecycle = source => import(dataURL(source.replace("'./modules/record-core.mjs'", JSON.stringify(shimURL))));
+const { createLifecycle, digest, classify, authority, LIMITS } = await loadLifecycle(lifecycleSource);
 const bytes = Object.fromEntries(Object.entries(subject.SOURCE_PINS).map(([k, v]) => [k, readFileSync(new URL('data/share_alike/' + v.file, base))]));
 const catalogCache = new WeakMap();
 async function catalogFor(api) { if (!catalogCache.has(api)) catalogCache.set(api, actual(await api.createWorldcraftCatalog(bytes))); return catalogCache.get(api); }
@@ -75,7 +75,7 @@ async function fixture(api = subject, options = {}) {
     },
   };
   const boot = async () => {
-    lc = createLifecycle({ port, device: { read: k => markers.get(k), write: (k, v) => { markers.set(k, copy(v)); return true; }, remove: k => markers.delete(k) || true },
+    lc = (options.lifecycleFactory ?? createLifecycle)({ port, device: { read: k => markers.get(k), write: (k, v) => { markers.set(k, copy(v)); return true; }, remove: k => markers.delete(k) || true },
       buildId: options.buildId ?? '3A-2-test', core: { endOfDay: d => d.setHours(23, 59, 59, 999), validItem: () => false },
       clock: () => new Date('2026-10-27T12:00:00+09:00').getTime(), enabled: true, validateCapture: () => { throw Error('not-a-real-capture-service'); } });
     await lc.ready;
@@ -292,6 +292,54 @@ await test('actual lifecycle whole-root depth22 accepted, 23 refused before comm
   assert.equal(f.bytes(),before);assert.equal(f.counts.commit,count);
 });
 function sized(root,n){const r=copy(root);r.filler='';const len=n-size(r);assert.ok(len>=0);r.filler='x'.repeat(len);assert.equal(size(r),n);return r;}
+const retirementObservations = [];
+function beforeRetirement(f) {
+  return { root: JSON.stringify(f.root()), record: f.bytes(), revision: f.saved.revision,
+    receipts: JSON.stringify(f.saved.commands), authority: JSON.stringify(f.saved),
+    bytes: size(f.root()), projectId: f.root().projects[0].id };
+}
+function unchangedRetirement(f, before) {
+  assert.equal(f.counts.commit, 0, 'refused retirement never calls the commit port');
+  assert.equal(f.counts.hold, 0, 'capacity refusal never enters a new runtime hold');
+  assert.equal(JSON.stringify(f.root()), before.root);
+  assert.equal(f.bytes(), before.record);
+  assert.equal(f.saved.revision, before.revision);
+  assert.equal(JSON.stringify(f.saved.commands), before.receipts);
+  assert.equal(JSON.stringify(f.saved), before.authority);
+  assert.equal(classify(f.root()), 'valid');
+  assert.ok(f.root().projects.some(p => p.id === before.projectId));
+  assert.equal(size(f.root()), before.bytes);
+}
+function retirementObservation(path, variant, f, before, result) {
+  const row = { path, variant, before: before.bytes, after: size(f.root()),
+    rootUnchanged: JSON.stringify(f.root()) === before.root, recordUnchanged: f.bytes() === before.record,
+    commits: f.counts.commit, holds: f.counts.hold, result };
+  retirementObservations.push(row); console.log('RETIREMENT ' + JSON.stringify(row));
+}
+async function directRestampOracle(lifecycleFactory = createLifecycle, variant = 'accepted-A') {
+  const f = await fixture(subject, { buildId: 'b'.repeat(512), lifecycleFactory });
+  await f.lc().work('projects', { status: 'completed' });
+  let r = copy(f.root()); r.revision++; r.lastWriterBuild = 'x'; r = sized(r, LIMITS.dataBytes + 1);
+  await f.sync(r); f.reset(); const before = beforeRetirement(f);
+  let rejection = null;
+  try { await f.lc().retire('projects', before.projectId, 'retire-completed'); } catch (error) { rejection = error; }
+  retirementObservation('direct', variant, f, before, { rejected: rejection !== null, reason: rejection?.message ?? null });
+  assert.equal(rejection?.message, 'byte-bound', 'direct retirement must reject byte-bound');
+  assert.equal(before.bytes, 258049); unchangedRetirement(f, before);
+}
+async function canonicalRestampOracle(lifecycleFactory = createLifecycle, variant = 'accepted-A') {
+  const f = await fixture(subject, { buildId: '\u0001'.repeat(512), lifecycleFactory }), d = await f.assembled();
+  kind(await subject.keepBuild(f.state, d), 'published');
+  let r = copy(f.root()); r.revision++; r.lastWriterBuild = 'x'; r = sized(r, LIMITS.dataBytes + 1);
+  await f.sync(r); f.reset(); const before = beforeRetirement(f);
+  assert.equal(actual(subject.keptBuilds(f.root(), f.catalog))[0].actionable, true);
+  const result = await subject.removeBuild(f.state, before.projectId);
+  retirementObservation('canonical-removeBuild', variant, f, before, result);
+  assert.deepEqual(result, { kind: 'structural', reason: 'byte-bound', observed: null },
+    'canonical removeBuild must refuse structural byte-bound');
+  assert.equal(before.bytes, 258049); unchangedRetirement(f, before);
+  assert.equal(actual(subject.keptBuilds(f.root(), f.catalog))[0].actionable, true);
+}
 await test('actual lifecycle 252KiB ordinary inclusive; 256KiB absolute inclusive; one byte over refused',async()=>{
   for(const over of [0,1]){
     const f=await fixture(),next=copy(f.root());next.revision++;next.nextProject++;next.projects.push({id:next.id+'/projects/1',status:'completed',filler:''});
@@ -301,23 +349,14 @@ await test('actual lifecycle 252KiB ordinary inclusive; 256KiB absolute inclusiv
   }
   const f=await fixture();assert.equal(classify(sized(f.root(),LIMITS.bytes)),'valid');assert.equal(classify(sized(f.root(),LIMITS.bytes+1)),'oversize');
 });
-await test('strict-shrink reserve baseline; ordinary work refused; writer-restamp counterexample reported',async()=>{
+await test('strict final-shrink reserve succeeds; ordinary work and growing long-writer retirement refuse',async()=>{
   const f=await fixture();await f.lc().work('projects',{status:'completed'});let r=copy(f.root());r.revision++;r=sized(r,LIMITS.bytes);await f.sync(r);f.reset();
-  await f.lc().retire('projects',r.projects[0].id,'retire-completed');assert.ok(size(f.root())>LIMITS.dataBytes&&size(f.root())<LIMITS.bytes);
+  const before=size(f.root());await f.lc().retire('projects',r.projects[0].id,'retire-completed');
+  assert.ok(size(f.root())>LIMITS.dataBytes&&size(f.root())<before&&size(f.root())<=LIMITS.bytes);assert.equal(f.counts.commit,1);
   await assert.rejects(async()=>f.lc().work('projects',{status:'completed'}),/byte-bound/);assert.equal(f.counts.commit,1);
-  const g=await fixture(subject,{buildId:'b'.repeat(512)});await g.lc().work('projects',{status:'completed'});r=copy(g.root());r.revision++;r.lastWriterBuild='x';r=sized(r,LIMITS.dataBytes+1);await g.sync(r);g.reset();
-  const before=size(g.root());await g.lc().retire('projects',r.projects[0].id,'retire-completed');
-  assert.ok(size(g.root())>before);assert.equal(g.counts.commit,1);
-  unsupported.push('LIFECYCLE-SHRINK: protected change() tests shrink before write() stamps lastWriterBuild; longer build ID can grow a reserve retirement. Requires W4 authoritative queued fix; model-only PASS cannot establish final strict shrink.');
-  console.log('BOUNDARY '+unsupported.at(-1));
+  await directRestampOracle();
 });
-await test('module retirement reproduces protected writer-restamp boundary with an admitted project',async()=>{
-  const f=await fixture(subject,{buildId:'\u0001'.repeat(512)}),d=await f.assembled();
-  kind(await subject.keepBuild(f.state,d),'published');let r=copy(f.root());r.revision++;r.lastWriterBuild='x';r=sized(r,LIMITS.dataBytes+1);await f.sync(r);f.reset();
-  const before=size(f.root()),result=await subject.removeBuild(f.state,r.projects[0].id);
-  kind(result,'published');assert.ok(size(f.root())>before);assert.ok(size(f.root())<=LIMITS.bytes);
-  console.log('BOUNDARY model removeBuild also reaches LIFECYCLE-SHRINK: before='+before+' after='+size(f.root())+'; not an actionable PASS');
-});
+await test('canonical removeBuild refuses growing escaped-writer retirement without publication or hold',()=>canonicalRestampOracle());
 await test('structural and unsupported stored recipes stay diagnostic/nonactionable with no laundering',async()=>{
   const f=await fixture(),d=await f.assembled();kind(await subject.keepBuild(f.state,d),'published');
   let r=copy(f.root());r.revision++;r.projects[0].recipe.recipeDigest='unadmitted';await f.sync(r);f.reset();
@@ -352,7 +391,31 @@ for(const [name,before,after,oracle] of [
 ]){
   const api=await mutant(before,after);await assert.rejects(()=>oracle(api),{code:'ERR_ASSERTION'},name);killed++;console.log('KILLED '+name);
 }
-console.log(JSON.stringify({verifier:'m4-worldcraft-projects',cases,mutantsKilled:killed,passed:unsupported.length===0,controlsPassed:true,unsupported,lifecycleHash,
+// Only in memory: restore the parent's pre-stamp eligibility decision. Both
+// independent fixtures must reach their own behavioral assertion, not a pin or
+// setup failure. No protected file is edited, and the same digest shim is used.
+const newOrder = 'write(next,action,{shrink:shrinkingControl,observe})';
+const oldOrder = 'write(next,action,{control:shrinkingControl&&bytes(next)<bytes(root),observe})';
+assert.equal(lifecycleSource.split(newOrder).length, 2, 'unique lifecycle mutation target');
+const oldOrderSource = lifecycleSource.replace(newOrder, oldOrder);
+const oldLifecycle = await loadLifecycle(oldOrderSource);
+const oldOrderNegatives = [];
+for (const [path, oracle, message] of [
+  ['direct', directRestampOracle, 'direct retirement must reject byte-bound'],
+  ['canonical-removeBuild', canonicalRestampOracle, 'canonical removeBuild must refuse structural byte-bound'],
+]) {
+  await assert.rejects(() => oracle(oldLifecycle.createLifecycle, 'old-order-mutant'),
+    error => error.code === 'ERR_ASSERTION' && error.message.includes(message), path + ' must kill old-order behavior');
+  const observed = retirementObservations.at(-1);
+  assert.equal(observed.path, path); assert.equal(observed.variant, 'old-order-mutant');
+  assert.equal(observed.commits, 1); assert.ok(observed.after > observed.before);
+  assert.equal(observed.rootUnchanged, false); assert.equal(observed.recordUnchanged, false);
+  oldOrderNegatives.push(path); console.log('KILLED old-order independently: ' + path);
+}
+killed++;
+console.log(JSON.stringify({verifier:'m4-worldcraft-projects',cases,mutantsKilled:killed,moduleMutantsKilled:killed-1,
+  lifecycleMutantsKilled:1,oldOrderNegatives,oldOrderSourceSHA256:sha(oldOrderSource),retirementObservations,
+  passed:unsupported.length===0,controlsPassed:true,unsupported,lifecycleHash,
   evidence:'unchanged lifecycle rule body; in-memory record-core digest shim; simulated ON record/CAS/device/capture/settlement authority; no real host/storage/capture admission'}));
 
 if (unsupported.length) process.exitCode = 1; // A known failed lease obligation is never a green process.
