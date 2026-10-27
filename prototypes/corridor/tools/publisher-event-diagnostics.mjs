@@ -24,11 +24,12 @@
 
 import { EVENT_PROBE_VERSION } from './publisher-context-probes.mjs';
 
-export const EVENT_RECORDER_VERSION = 'publisher-event-diagnostics/3';
+export const EVENT_RECORDER_VERSION = 'publisher-event-diagnostics/4';
 export const GEOMETRY_NODES = ['open', 'save', 'actions', 'menu', 'main'];
 export const GEOMETRY_SURFACES = ['prompt', 'quote', 'timed', 'status', 'sealStrip', 'mini', 'readerLayers', 'layersMark'];
 export const GEOMETRY_ORDER = ['time', 'scroll', 'visualViewport', 'activeElement',
-  ...GEOMETRY_NODES.map((name) => `${name}:rect,offsets,style,animations`), 'surfaces:rect', 'documentAnimations'];
+  ...GEOMETRY_NODES.map((name) => `${name}:rect,offsets,style,animations`), 'surfaces:rect', 'ladder:rect', 'extra:rect', 'documentAnimations'];
+export const MUTATION_LIMITS = Object.freeze({ rows: 128, nodesPerRow: 8, field: 240, ladderDetails: 4, extraRects: 8 });
 const GEOMETRY_REQUIRED = ['open', 'save', 'actions', 'main'];
 
 export function installEventDiagnostics(win, cap = 5000) {
@@ -50,7 +51,7 @@ export function installEventDiagnostics(win, cap = 5000) {
   };
   win.__diagId = idOf;
   win.__diagEventId = eventIdOf;
-  const state = { version: 'publisher-event-diagnostics/3', docId: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`,
+  const state = { version: 'publisher-event-diagnostics/4', docId: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`,
     cap, truncated: false, fault: null, rows: [] };
   win.__evDiag = state;
   // a failure inside the recorder sets one durable fault (no clock, no row) and stops all further recording; it never
@@ -99,7 +100,9 @@ export function installEventDiagnostics(win, cap = 5000) {
   const NODE_NAMES = ['open', 'save', 'actions', 'menu', 'main'];
   const SURFACE_NAMES = ['prompt', 'quote', 'timed', 'status', 'sealStrip', 'mini', 'readerLayers', 'layersMark'];
   const ORDER = ['time', 'scroll', 'visualViewport', 'activeElement',
-    ...NODE_NAMES.map((name) => `${name}:rect,offsets,style,animations`), 'surfaces:rect', 'documentAnimations'];
+    ...NODE_NAMES.map((name) => `${name}:rect,offsets,style,animations`), 'surfaces:rect', 'ladder:rect', 'extra:rect', 'documentAnimations'];
+  // EV4 (W2 2037): bounded mutation stream; these repeat MUTATION_LIMITS for the same page-source reason
+  const MUTATION_ROWS = 128, NODES_PER_ROW = 8, FIELD = 240, LADDER_DETAILS = 4, EXTRA_RECTS = 8;
   const GEOMETRY_CAP = 200, ANIMATION_CAP = 16, OFFSET_DEPTH = 10, APPROACH_CAP = 24, ARMED_ROW_CAP = 64, MENU = 'vocabulary-list-popover';
   let geometrySeq = 0, armed = false, approachRows = 0, armedRows = 0;
   Object.assign(state, { geometryTruncated: false, approachTruncated: false, armedRowsTruncated: false });
@@ -141,7 +144,34 @@ export function installEventDiagnostics(win, cap = 5000) {
         readerLayers: byId('reader-layers'), layersMark: byId('layers-mark') },
     };
   };
-  const sampleGeometry = (label) => {
+  // the last rect each node had while it was connected and measured, with when and in which sample: a removed node's
+  // history is this cached value, never a detached node's zero rect
+  const lastLive = new WeakMap();
+  const liveRect = (node, sample) => {
+    const rect = rectOf(node);
+    lastLive.set(node, { rect, t: now(), sample: sample.seq });
+    return rect;
+  };
+  // source-verified ladder and body observables (corridor.js C:8877/8655 body, C:10164/10171/10176 rungs,
+  // C:9767-9776 gloss rows, C:9731-9745 readings); counts beyond the detail cap are marked partial
+  const ladderOf = (sample) => {
+    const body = doc().getElementById('publisher-body') || doc().getElementById('source-reader-body');
+    if (!body) return { body: null };
+    const detail = (selector, extra) => {
+      const all = Array.from(body.querySelectorAll(selector));
+      return { count: all.length, partial: all.length > LADDER_DETAILS,
+        details: all.slice(0, LADDER_DETAILS).map((node) => ({ node: ref(node), connected: node.isConnected, ...extra(node), rect: liveRect(node, sample) })) };
+    };
+    return {
+      body: { node: ref(body), id: body.id, rect: liveRect(body, sample) },
+      rungs: detail('[data-ladder-rung]', (node) => ({ rung: String(node.getAttribute('data-ladder-rung')).slice(0, FIELD) })),
+      gloss: detail('.tok-en', (node) => ({ wait: node.classList.contains('tok-en-wait'), miss: node.classList.contains('tok-en-miss') })),
+      ruby: detail('ruby[data-r]', () => ({})),
+      visibleReadings: body.querySelectorAll('rt:not(.hidden-rt)').length,
+      glossedWords: body.querySelectorAll('.has-en').length,
+    };
+  };
+  const sampleGeometry = (label, extra = []) => {
     if (geometrySeq >= GEOMETRY_CAP) { state.geometryTruncated = true; return { label, truncated: true }; }
     const sample = { seq: ++geometrySeq, label, t0: now(), order: ORDER, bounded: [], error: null };
     try {
@@ -165,6 +195,10 @@ export function installEventDiagnostics(win, cap = 5000) {
         const node = surfaces[name];
         sample.surfaces[name] = node ? { node: ref(node), connected: node.isConnected, hidden: !!node.hidden, rect: rectOf(node) } : null;
       }
+      sample.ladder = ladderOf(sample);
+      if (extra.length > EXTRA_RECTS) sample.bounded.push('extra');
+      sample.extra = extra.slice(0, EXTRA_RECTS).map((node) => ({ node: ref(node), connected: node.isConnected,
+        rect: node.isConnected ? liveRect(node, sample) : null }));
       sample.documentAnimations = animationsOf(doc().getAnimations ? doc().getAnimations() : [], sample.bounded, 'animations:document');
     } catch (error) { sample.error = String((error && error.message) || error); }
     sample.t1 = now();
@@ -176,10 +210,106 @@ export function installEventDiagnostics(win, cap = 5000) {
   };
   win.__evDiagGeometry = (label) => (state.fault ? null : sampleGeometry(String(label)));
   // the action arms approach, scroll and style rows between its two snapshots (openSnapshot 'pre' arms, 'post' disarms)
+  /* EV4 mutation stream: main's subtree, kept only for targets that precede the selection section or contain it. A row is
+   * delivery-time metadata: the record's own target and previous/next siblings (retained context, so a removed node keeps
+   * its place without asking a detached node for its order), oldValue for attributes (historical), current values read
+   * at delivery (not the mutation's own time), text lengths only. Scroll is read first, then at most one geometry sample
+   * per callback batch, which measures up to EXTRA_RECTS connected added nodes. A mutation's delivery is not its time
+   * and not its handler; these reads can themselves settle layout. */
+  let stream = null, binding = null, mutationSeq = 0, batchSeq = 0;
+  Object.assign(state, { binding: null, mutationTruncated: false, mutationFault: null, mutationSkipped: 0 });
+  const clip = (value, flags) => {
+    const text = String(value ?? '');
+    if (text.length <= FIELD) return text;
+    flags.truncated = true;
+    return text.slice(0, FIELD);
+  };
+  const nodeMeta = (node, flags) => {
+    if (!node) return null;
+    if (node.nodeType === 1) return { node: ref(node), kind: 'element', tag: String(node.tagName).toLowerCase(), id: clip(node.id, flags),
+      classes: clip(typeof node.className === 'string' ? node.className : '', flags), connected: node.isConnected };
+    if (node.nodeType === 3) return { node: ref(node), kind: 'text', length: String(node.data ?? '').length, connected: node.isConnected };
+    return { node: ref(node), kind: `node:${node.nodeType}`, connected: node.isConnected };
+  };
+  const relationOf = (target) => {
+    if (!target.isConnected) return 'detached'; // never compareDocumentPosition on a detached node
+    if (target === binding.section || binding.section.contains(target)) return 'inside-section';
+    if (target.contains(binding.section)) return 'ancestor';
+    const position = binding.section.compareDocumentPosition(target);
+    return position & 2 ? 'preceding' : position & 4 ? 'following' : 'unknown';
+  };
+  const bindingValid = () => !!binding && binding.main.isConnected && binding.section.isConnected && binding.main.contains(binding.section) &&
+    win.__evDiag === state;
+  const invalidate = (why) => {
+    if (!binding || state.binding.invalidated) return;
+    state.binding.invalidated = { why, at: now() };
+    add({ id: 'binding-invalidated', why });
+  };
+  const onMutations = (records) => {
+    if (!binding || state.mutationFault || !records.length) return;
+    try {
+      const t = now(), batch = ++batchSeq;
+      const scroll = { x: win.scrollX, y: win.scrollY }; // scalar, before any geometry
+      if (!bindingValid()) invalidate('main or section replaced');
+      const added = [];
+      for (const record of records) {
+        const target = record.target;
+        const relation = state.binding.invalidated ? 'unbound' : relationOf(target);
+        const retained = relation === 'detached' && record.type === 'childList';
+        if (!['preceding', 'ancestor', 'detached', 'unbound'].includes(relation)) { state.mutationSkipped += 1; continue; }
+        if (mutationSeq >= MUTATION_ROWS) { state.mutationTruncated = true; continue; }
+        const flags = { truncated: false };
+        const row = { id: 'mutation', seq: ++mutationSeq, batch, delivered: t, type: record.type, target: nodeMeta(target, flags),
+          relation, relationAt: 'delivery', retainedContext: retained,
+          previous: ref(record.previousSibling ?? null), next: ref(record.nextSibling ?? null) };
+        if (record.type === 'attributes') {
+          row.attribute = record.attributeName;
+          row.oldValue = record.oldValue == null ? null : clip(record.oldValue, flags); // historical
+          row.valueAtDelivery = target.getAttribute ? clip(target.getAttribute(record.attributeName), flags) : null;
+        } else if (record.type === 'characterData') {
+          row.lengthAtDelivery = String(target.data ?? '').length; // no raw text
+        } else {
+          const ad = Array.from(record.addedNodes || []), rm = Array.from(record.removedNodes || []);
+          row.addedCount = ad.length; row.removedCount = rm.length;
+          row.added = ad.slice(0, NODES_PER_ROW).map((node) => nodeMeta(node, flags));
+          row.removed = rm.slice(0, NODES_PER_ROW).map((node) => ({ ...nodeMeta(node, flags), rectAtDelivery: null,
+            lastLiveRect: lastLive.get(node) ?? null }));
+          if (ad.length > NODES_PER_ROW || rm.length > NODES_PER_ROW) flags.truncated = true;
+          for (const node of ad) if (node.nodeType === 1 && node.isConnected && added.length < EXTRA_RECTS + 1) added.push(node);
+        }
+        row.truncated = flags.truncated;
+        add(row);
+      }
+      add({ id: 'mutation-batch', batch, delivered: t, records: records.length, scroll, geometry: sampleGeometry('mutation-batch', added) });
+    } catch (error) {
+      state.mutationFault = String((error && error.message) || error);
+      try { stream?.disconnect(); } catch { /* the fault is already recorded */ }
+    }
+  };
+  // one binding per document, made at its first arm (the action); a later arm in the same document keeps it
+  const bind = () => {
+    const opens = openButtons();
+    const section = opens.length === 1 ? opens[0].closest(SECTION) : null;
+    const main = section?.closest('main') ?? null;
+    if (!section || !main) { add({ id: 'binding-missing', open: opens.length }); return; }
+    binding = { main, section };
+    state.binding = { docId: state.docId, main: ref(main), section: ref(section), at: now(), invalidated: null };
+    if (typeof win.MutationObserver !== 'function') { state.mutationFault = 'no MutationObserver'; return; }
+    stream = new win.MutationObserver(onMutations);
+    stream.observe(main, { childList: true, subtree: true, characterData: true, attributes: true, attributeOldValue: true,
+      attributeFilter: ['class', 'hidden', 'style', 'data-ladder-rung', 'data-depth-aside', 'aria-hidden'] });
+  };
+  const unbind = () => {
+    if (!stream) return;
+    try { onMutations(stream.takeRecords()); } finally { stream.disconnect(); stream = null; }
+    if (binding && !bindingValid()) invalidate('main or section replaced');
+  };
   win.__evDiagArm = guarded('arm', (on) => {
     armed = on === true;
     if (armed) { approachRows = 0; armedRows = 0; }
     add({ id: 'arm', on: armed });
+    if (armed && !binding) bind();
+    else if (!armed) unbind();
   });
   const GEOMETRY_TYPES = ['pointerdown', 'mousedown'];
   const TYPES = ['pointerdown', 'pointerup', 'mousedown', 'mouseup', 'click', 'pointercancel', 'touchstart', 'touchend'];
@@ -391,6 +521,7 @@ export function pressGeometry({ rows, from, to, pre, post, recorder = {} }) {
   const pointerdown = capture('pointerdown'), mousedown = capture('mousedown');
   const reasons = [];
   if (recorder.geometryTruncated) reasons.push('geometry samples were truncated');
+  if (recorder.binding?.invalidated) reasons.push(`the main/section binding was invalidated (${recorder.binding.invalidated.why})`);
   if (pointerdown.length !== 1) reasons.push(`${pointerdown.length} trusted pointerdown candidates in the action interval`);
   if (mousedown.length !== 1) reasons.push(`${mousedown.length} trusted mousedown candidates in the action interval`);
   if (reasons.length) return { verdict: 'INCONCLUSIVE', reasons, steps: null };
@@ -434,7 +565,21 @@ export function pressGeometry({ rows, from, to, pre, post, recorder = {} }) {
     approach: { truncated: recorder.approachTruncated === true, rows: approach.map((row) => ({ type: row.type, trusted: row.trusted, x: row.x, y: row.y,
       target: row.target, related: row.related, sinceSnapshot: geometryOk(row.geometry) ? diffGeometry('pre', pre.geometry, row.type, row.geometry).observed : 'unusable' })) },
     armedRows: { truncated: recorder.armedRowsTruncated === true, scroll: inAction.filter((row) => row.id === 'scroll'),
-      style: inAction.filter((row) => row.id === 'style-event') } };
+      style: inAction.filter((row) => row.id === 'style-event') },
+    stream: mutationStream({ rows: inAction, recorder }) };
+}
+/** The EV4 mutation stream inside the action interval, with its own verdict: absent binding, a stream fault or overflow
+ * makes it INCONCLUSIVE (absent rows then prove nothing). Rows are delivery-time metadata; none names a cause. */
+export function mutationStream({ rows, recorder = {} }) {
+  const reasons = [];
+  if (!recorder.binding) reasons.push('no main/section binding');
+  else if (recorder.binding.invalidated) reasons.push(`binding invalidated (${recorder.binding.invalidated.why})`);
+  if (recorder.mutationFault) reasons.push(`mutation stream faulted (${recorder.mutationFault})`);
+  if (recorder.mutationTruncated) reasons.push('mutation rows were truncated');
+  const mutations = rows.filter((row) => row.id === 'mutation');
+  return { verdict: reasons.length ? 'INCONCLUSIVE' : 'OBSERVED', reasons, binding: recorder.binding ?? null,
+    skippedOutsideScope: recorder.mutationSkipped ?? 0, batches: rows.filter((row) => row.id === 'mutation-batch').length,
+    truncatedRows: mutations.filter((row) => row.truncated).length, rows: mutations };
 }
 
 /** Pure: what the evidence says happened to the Open click. Never classifies from missing, truncated, faulted or

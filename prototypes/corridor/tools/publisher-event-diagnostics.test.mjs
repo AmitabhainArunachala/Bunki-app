@@ -8,7 +8,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import { EVENT_PROBES, EVENT_PROBE_VERSION, PROBE_VERSION, applyProbes, probeOnlyDiff } from './publisher-context-probes.mjs';
-import { installEventDiagnostics, openSnapshot, classifyOpen, EVENT_RECORDER_VERSION, GEOMETRY_ORDER, GEOMETRY_NODES } from './publisher-event-diagnostics.mjs';
+import { installEventDiagnostics, openSnapshot, classifyOpen, mutationStream, EVENT_RECORDER_VERSION, GEOMETRY_ORDER, GEOMETRY_NODES, MUTATION_LIMITS } from './publisher-event-diagnostics.mjs';
 
 const source = readFileSync(new URL('../corridor.js', import.meta.url), 'utf8');
 const sha = (text) => createHash('sha256').update(Buffer.from(text)).digest('hex');
@@ -571,4 +571,244 @@ test('EV3-V1: the action document must carry the exact events probe version; a l
     assert.equal(result.classification, null, label);
     assert.deepEqual(result.reasons, ["the action document's probe version is missing or another version"], label);
   }
+});
+
+/* ---------------------------------------------------------------- EV4 mutation stream (W2 2037) */
+class FakeMutationObserver {
+  constructor(callback) { this.callback = callback; this.pending = []; this.observed = null; this.disconnected = false; FakeMutationObserver.all.push(this); }
+  observe(target, options) { this.observed = { target, options }; }
+  takeRecords() { const out = this.pending; this.pending = []; return out; }
+  disconnect() { this.disconnected = true; }
+}
+FakeMutationObserver.all = [];
+/** geometryPage plus preceding content, a following node, an ordered section and a ladder body; compareDocumentPosition is a spy. */
+function streamPage(options = {}) {
+  FakeMutationObserver.all = [];
+  const page = geometryPage(options);
+  page.win.MutationObserver = FakeMutationObserver;
+  const { main } = page.nodes;
+  const section = page.nodes.open.closest('.publisher-context-selection');
+  const asked = [];
+  section.__order = 2;
+  section.compareDocumentPosition = (other) => { asked.push(other); if (!other.isConnected) return 1; return (other.__order ?? 99) < 2 ? 2 : 4; };
+  let rects = 0;
+  const element = (tag, order, extra = {}) => {
+    const attrs = { ...(extra.attrs || {}) };
+    const node = { nodeType: 1, tagName: tag, id: extra.id || '', className: extra.className || '', isConnected: true, parentElement: main, __order: order,
+      getAttribute: (name) => (extra.throwOnAttr ? (() => { throw new Error('attr gone'); })() : attrs[name] ?? null), setAttr: (name, value) => { attrs[name] = value; },
+      getBoundingClientRect() { rects += 1; page.log.push(`${tag}:rect`); return { x: 0, y: 100 + order, width: 50, height: extra.height ?? 24.5 }; },
+      contains(other) { for (let n = other; n; n = n.parentElement) if (n === this) return true; return false; },
+      classList: { contains: (name) => String(extra.className || '').split(/\s+/u).includes(name) }, querySelectorAll: () => [] };
+    return node;
+  };
+  // a Text node has Node.prototype.contains in a real DOM; it contains only itself
+  const text = (data, order) => { const node = { nodeType: 3, data, isConnected: true, parentElement: main, __order: order }; node.contains = (other) => other === node; return node; };
+  const deliver = (records) => page.streamObserver().callback(records);
+  page.streamObserver = () => FakeMutationObserver.all.find((o) => o.observed?.target === main);
+  return { ...page, section, asked, element, text, deliver, rects: () => rects };
+}
+const record = (type, target, extra = {}) => ({ type, target, addedNodes: [], removedNodes: [], previousSibling: null, nextSibling: null, attributeName: null, oldValue: null, ...extra });
+
+test('EV4: arming binds document, main and section and observes main with the documented options; version is /4', () => {
+  const restore = keepEventPrototype();
+  try {
+    const p = streamPage();
+    installEventDiagnostics(p.win);
+    assert.equal(p.win.__evDiag.version, 'publisher-event-diagnostics/4');
+    assert.equal(EVENT_RECORDER_VERSION, 'publisher-event-diagnostics/4');
+    p.win.__evDiagArm(true);
+    const b = p.win.__evDiag.binding;
+    assert.deepEqual([b.docId, b.main[1], b.section[1], b.invalidated], [p.win.__evDiag.docId, 'div.main', 'div.section', null]);
+    const o = p.streamObserver();
+    assert.equal(o.observed.target, p.nodes.main);
+    assert.deepEqual(o.observed.options, { childList: true, subtree: true, characterData: true, attributes: true, attributeOldValue: true,
+      attributeFilter: ['class', 'hidden', 'style', 'data-ladder-rung', 'data-depth-aside', 'aria-hidden'] });
+    assert.deepEqual(MUTATION_LIMITS, { rows: 128, nodesPerRow: 8, field: 240, ladderDetails: 4, extraRects: 8 });
+  } finally { restore(); }
+});
+
+test('EV4: transient add, removal and reinsertion keep delivery metadata; a removed node shows only its cached live rect with its own time', () => {
+  const restore = keepEventPrototype();
+  try {
+    const p = streamPage();
+    installEventDiagnostics(p.win);
+    p.win.__evDiagArm(true);
+    const para = p.element('P', 1);
+    const row = p.element('SPAN', 1, { className: 'tok-en' });
+    p.deliver([record('childList', para, { addedNodes: [row] })]);
+    const first = p.win.__evDiag.rows.filter((r) => r.id === 'mutation');
+    assert.deepEqual([first.length, first[0].relation, first[0].added[0].classes, first[0].addedCount], [1, 'preceding', 'tok-en', 1]);
+    assert.equal('rect' in first[0].added[0], false, 'rows carry metadata, not geometry');
+    const batch1 = p.win.__evDiag.rows.find((r) => r.id === 'mutation-batch');
+    assert.equal(batch1.geometry.extra[0].rect.height, 24.5, 'the batch geometry measures the connected added node');
+    row.isConnected = false;
+    p.deliver([record('childList', para, { removedNodes: [row] })]);
+    const removal = p.win.__evDiag.rows.filter((r) => r.id === 'mutation')[1];
+    assert.equal(removal.removed[0].rectAtDelivery, null, 'a detached node is not measured');
+    assert.equal(removal.removed[0].lastLiveRect.rect.height, 24.5);
+    assert.equal(removal.removed[0].lastLiveRect.sample, batch1.geometry.seq, 'the cached rect keeps its own sample');
+    assert(removal.removed[0].lastLiveRect.t <= removal.delivered, 'and its own time, not the removal time');
+    row.isConnected = true;
+    p.deliver([record('childList', para, { addedNodes: [row] })]);
+    const again = p.win.__evDiag.rows.filter((r) => r.id === 'mutation')[2];
+    assert.deepEqual([again.added[0].node[0], again.added[0].connected], [first[0].added[0].node[0], true], 'reinsertion keeps the node identity');
+  } finally { restore(); }
+});
+
+test('EV4: a detached target is never asked for its order; retained previous/next identities carry its place; an unmeasured removal has no rect', () => {
+  const restore = keepEventPrototype();
+  try {
+    const p = streamPage();
+    installEventDiagnostics(p.win);
+    p.win.__evDiagArm(true);
+    const parent = p.element('DIV', 1), before = p.element('B', 1), after = p.element('I', 1), gone = p.element('SPAN', 1);
+    parent.isConnected = false; gone.isConnected = false;
+    p.asked.length = 0;
+    p.deliver([record('childList', parent, { removedNodes: [gone], previousSibling: before, nextSibling: after })]);
+    const r = p.win.__evDiag.rows.find((x) => x.id === 'mutation');
+    assert.deepEqual([r.relation, r.retainedContext], ['detached', true]);
+    assert.equal(p.asked.includes(parent), false, 'compareDocumentPosition was not called on the detached target');
+    assert.equal(r.previous[0], p.win.__diagId(before));
+    assert.equal(r.next[0], p.win.__diagId(after));
+    assert.equal(r.removed[0].lastLiveRect, null, 'never measured while live: no historical rect is invented');
+  } finally { restore(); }
+});
+
+test('EV4: attribute oldValues are historical and the value at delivery is labelled so; text changes carry lengths, never text', () => {
+  const restore = keepEventPrototype();
+  try {
+    const p = streamPage();
+    installEventDiagnostics(p.win);
+    p.win.__evDiagArm(true);
+    const word = p.element('SPAN', 1, { attrs: { 'data-ladder-rung': 'gloss' } });
+    p.deliver([record('attributes', word, { attributeName: 'data-ladder-rung', oldValue: null }),
+      record('attributes', word, { attributeName: 'data-ladder-rung', oldValue: 'reading' })]);
+    const rows = p.win.__evDiag.rows.filter((r) => r.id === 'mutation');
+    assert.deepEqual(rows.map((r) => [r.oldValue, r.valueAtDelivery]), [[null, 'gloss'], ['reading', 'gloss']]);
+    const secret = 'ひみつの本文テキスト';
+    const t = p.text(secret, 1);
+    p.deliver([record('characterData', t)]);
+    const textRow = p.win.__evDiag.rows.filter((r) => r.id === 'mutation')[2];
+    assert.equal(textRow.lengthAtDelivery, secret.length);
+    assert.equal(JSON.stringify(p.win.__evDiag).includes(secret), false, 'no raw text anywhere in the recorder');
+  } finally { restore(); }
+});
+
+test('EV4: inside-section and following targets are skipped and counted; an ancestor change is kept', () => {
+  const restore = keepEventPrototype();
+  try {
+    const p = streamPage();
+    installEventDiagnostics(p.win);
+    p.win.__evDiagArm(true);
+    const following = p.element('FOOTER', 3);
+    p.deliver([record('attributes', p.nodes.actions, { attributeName: 'class', oldValue: 'a' }), record('attributes', following, { attributeName: 'class' }),
+      record('attributes', p.nodes.main, { attributeName: 'style', oldValue: '' })]);
+    const rows = p.win.__evDiag.rows.filter((r) => r.id === 'mutation');
+    assert.deepEqual(rows.map((r) => r.relation), ['ancestor']);
+    assert.equal(p.win.__evDiag.mutationSkipped, 2);
+  } finally { restore(); }
+});
+
+test('EV4: caps and truncation are explicit: rows, nodes per row and metadata fields', () => {
+  const restore = keepEventPrototype();
+  try {
+    const p = streamPage();
+    installEventDiagnostics(p.win);
+    p.win.__evDiagArm(true);
+    const parent = p.element('DIV', 1);
+    const many = Array.from({ length: 10 }, (_, i) => p.element('SPAN', 1, { className: i === 0 ? 'x'.repeat(300) : 'y' }));
+    p.deliver([record('childList', parent, { addedNodes: many })]);
+    const r = p.win.__evDiag.rows.find((x) => x.id === 'mutation');
+    assert.deepEqual([r.addedCount, r.added.length, r.added[0].classes.length, r.truncated], [10, 8, 240, true]);
+    const batch = p.win.__evDiag.rows.find((x) => x.id === 'mutation-batch');
+    assert(batch.geometry.bounded.includes('extra'), 'extra rects beyond 8 are bounded and flagged');
+    p.deliver(Array.from({ length: 130 }, () => record('attributes', parent, { attributeName: 'class' })));
+    assert.equal(p.win.__evDiag.rows.filter((x) => x.id === 'mutation').length, 128);
+    assert.equal(p.win.__evDiag.mutationTruncated, true);
+  } finally { restore(); }
+});
+
+test('EV4: one geometry sample per callback batch, scroll read before any rect; disarm drains takeRecords and disconnects', () => {
+  const restore = keepEventPrototype();
+  try {
+    const p = streamPage();
+    installEventDiagnostics(p.win);
+    p.win.__evDiagArm(true);
+    const a = p.element('P', 1), b = p.element('P', 1), c = p.element('P', 1);
+    const before = p.win.__evDiagGeometry('probe').seq;
+    p.log.length = 0;
+    p.deliver([record('attributes', a, { attributeName: 'class' }), record('attributes', b, { attributeName: 'class' }), record('attributes', c, { attributeName: 'class' })]);
+    const batches = p.win.__evDiag.rows.filter((x) => x.id === 'mutation-batch');
+    assert.equal(batches.length, 1);
+    assert.equal(batches[0].geometry.seq, before + 1, 'exactly one sample for the batch');
+    const firstRect = p.log.findIndex((entry) => entry.endsWith(':rect'));
+    assert(p.log.indexOf('scroll') >= 0 && p.log.indexOf('scroll') < firstRect, 'scroll first');
+    const o = p.streamObserver();
+    o.pending = [record('attributes', a, { attributeName: 'hidden' })];
+    p.win.__evDiagArm(false);
+    assert.equal(o.disconnected, true);
+    assert.equal(p.win.__evDiag.rows.filter((x) => x.id === 'mutation').length, 4, 'pending records drained at disarm');
+    p.win.__evDiagArm(false);
+    assert.equal(p.win.__evDiag.rows.filter((x) => x.id === 'mutation-batch').length, 2, 'an empty drain adds no batch or sample');
+  } finally { restore(); }
+});
+
+test('EV4: a stream fault stops only the stream; replaced main invalidates the binding and makes geometry and stream INCONCLUSIVE', () => {
+  const restore = keepEventPrototype();
+  try {
+    const p = streamPage();
+    installEventDiagnostics(p.win);
+    p.win.__evDiagArm(true);
+    const bad = p.element('P', 1, { throwOnAttr: true });
+    p.deliver([record('attributes', bad, { attributeName: 'class' })]);
+    assert.equal(p.win.__evDiag.mutationFault, 'attr gone');
+    assert.equal(p.streamObserver().disconnected, true);
+    assert.equal(p.win.__evDiag.fault, null, 'the recorder itself is not faulted');
+    p.win.addEventListener('click', () => {});
+    p.win.dispatchEvent(new Event('click'));
+    assert(p.win.__evDiag.rows.some((r) => r.id === 'capture' && r.type === 'click'), 'EV3 delivery rows continue');
+    const q = streamPage();
+    installEventDiagnostics(q.win);
+    q.win.__evDiagArm(true);
+    q.nodes.main.isConnected = false;
+    q.deliver([record('attributes', q.element('P', 1), { attributeName: 'class' })]);
+    assert.equal(q.win.__evDiag.binding.invalidated.why, 'main or section replaced');
+    assert(q.win.__evDiag.rows.some((r) => r.id === 'binding-invalidated'));
+    const recorder = { ...pressEvidence().actionDoc.recorder, binding: q.win.__evDiag.binding };
+    const input = pressEvidence(); input.actionDoc.recorder = recorder;
+    const result = classifyOpen(input);
+    assert.equal(result.classification, 'click-landed-outside-open-button', 'the delivery class stands');
+    assert.equal(result.geometry.verdict, 'INCONCLUSIVE');
+    assert(result.geometry.reasons.some((x) => x.includes('binding was invalidated')));
+  } finally { restore(); }
+});
+
+test('EV4: mutationStream gives its own verdict; missing binding, fault or overflow are INCONCLUSIVE, so absent rows prove nothing', () => {
+  const binding = { docId: DOC, main: [1, 'main'], section: [2, 'section'], at: 1, invalidated: null };
+  const rows = [{ id: 'mutation', seq: 1, truncated: false }, { id: 'mutation-batch', batch: 1 }];
+  assert.equal(mutationStream({ rows, recorder: { binding } }).verdict, 'OBSERVED');
+  assert.deepEqual(mutationStream({ rows, recorder: {} }).reasons, ['no main/section binding']);
+  assert.equal(mutationStream({ rows, recorder: { binding, mutationFault: 'x' } }).verdict, 'INCONCLUSIVE');
+  assert.equal(mutationStream({ rows, recorder: { binding, mutationTruncated: true } }).verdict, 'INCONCLUSIVE');
+  assert.equal(mutationStream({ rows: [], recorder: { binding } }).rows.length, 0);
+});
+
+test('EV4: ladder observables are source-verified selectors, bounded to four details per category and marked partial beyond', () => {
+  const restore = keepEventPrototype();
+  try {
+    const p = streamPage();
+    const words = Array.from({ length: 5 }, (_, i) => p.element('SPAN', 1, { attrs: { 'data-ladder-rung': i ? 'stage' : 'gloss' } }));
+    const gloss = [p.element('SPAN', 1, { className: 'tok-en tok-en-wait' })];
+    const body = p.element('DIV', 1, { id: 'publisher-body' });
+    body.querySelectorAll = (selector) => (selector === '[data-ladder-rung]' ? words : selector === '.tok-en' ? gloss : selector === '.has-en' ? [words[0]] : []);
+    const byId = p.win.document.getElementById;
+    p.win.document.getElementById = (id) => (id === 'publisher-body' ? body : byId(id));
+    installEventDiagnostics(p.win);
+    const sample = p.win.__evDiagGeometry('snapshot:pre');
+    assert.deepEqual([sample.ladder.body.id, sample.ladder.rungs.count, sample.ladder.rungs.partial, sample.ladder.rungs.details.length],
+      ['publisher-body', 5, true, 4]);
+    assert.equal(sample.ladder.rungs.details[0].rung, 'gloss');
+    assert.deepEqual([sample.ladder.gloss.details[0].wait, sample.ladder.gloss.details[0].miss], [true, false]);
+    assert.deepEqual([sample.ladder.glossedWords, sample.ladder.visibleReadings, sample.ladder.ruby.count], [1, 0, 0]);
+  } finally { restore(); }
 });
