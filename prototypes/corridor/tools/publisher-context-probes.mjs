@@ -42,26 +42,54 @@ export const PROBES = Object.freeze([
       `      if (recordReady(epoch) && section.isConnected) status.textContent = teacherSourceError(error);\n` },
 ]);
 
-export function applyProbes(source) {
+// Event-delivery probes (1830/1834, KAIRO_PUBLISHER_EVENT_DIAGNOSTICS=1, on top of the context probes): each
+// build of the section, each Save/Open listener registration and the Open listener's own entry are recorded
+// with the recorder's private per-node ids (window.__diagId, a WeakMap installed before the app runs), so the
+// node that holds the listener can be told from a same-id node that replaced it. Diagnostic writes only.
+export const EVENT_PROBE_VERSION = 'publisher-context-probes/1+events/1';
+const EVENT_VERSION_LINE = `window.__ctxDiagVersion = ${JSON.stringify(EVENT_PROBE_VERSION)};\n`;
+const nodeId = (name) => `(window.__diagId ? window.__diagId(${name}) : null)`;
+const push = (id, fields) => `(window.__ctxDiag ||= []).push({ id: ${JSON.stringify(id)}, t: performance.now(), ${fields} });`;
+
+export const EVENT_PROBES = Object.freeze([
+  { id: 'render',
+    from: "  const section = el('section', 'publisher-context-selection');\n",
+    insert: 'after', text: `  ${push('render', `personal, section: ${nodeId('section')}`)}\n` },
+  { id: 'reg-save',
+    from: '  controls.push(keepSave); actions.append(keepSave);\n',
+    insert: 'after', text: `  ${push('reg-save', `node: ${nodeId('keepSave')}, section: ${nodeId('section')}`)}\n` },
+  { id: 'reg-open',
+    from: "  openSaved.addEventListener('click', () => { void keepSelection(true, openSaved); });\n",
+    insert: 'replace',
+    text: `  ${push('reg-open', `node: ${nodeId('openSaved')}, section: ${nodeId('section')}`)}\n` +
+      `  openSaved.addEventListener('click', (event) => { ${push('listener-open',
+        `node: ${nodeId('openSaved')}, current: ${nodeId('event.currentTarget')}, target: ${nodeId('event.target')}, trusted: event.isTrusted, phase: event.eventPhase`)} void keepSelection(true, openSaved); });\n` },
+]);
+
+const probeSets = (events) => (events ? [...PROBES, ...EVENT_PROBES] : PROBES);
+const versionLine = (events) => (events ? EVENT_VERSION_LINE : VERSION_LINE);
+
+export function applyProbes(source, { events = false } = {}) {
   let out = source;
   const applied = [];
-  for (const probe of PROBES) {
+  for (const probe of probeSets(events)) {
     const count = out.split(probe.from).length - 1;
     if (count !== 1) throw new Error(`probe ${probe.id}: anchor occurs ${count} times`);
     const replacement = probe.insert === 'after' ? probe.from + probe.text : probe.text;
     out = out.replace(probe.from, () => replacement);
     applied.push(probe.id);
   }
-  if (out.includes(VERSION_LINE)) throw new Error('version witness already present');
-  return { source: VERSION_LINE + out, applied: ['version', ...applied] };
+  if (out.includes(VERSION_LINE) || out.includes(EVENT_VERSION_LINE)) throw new Error('version witness already present');
+  return { source: versionLine(events) + out, applied: ['version', ...applied] };
 }
 
 /** True when undoing the version line and then each probe's own inserted text, exactly once and in
  * reverse order, gives back the original byte for byte: the served source carries no other edit. */
-export function probeOnlyDiff(original, probed) {
-  if (!probed.startsWith(VERSION_LINE) || probed.split(VERSION_LINE).length - 1 !== 1) return false;
-  let out = probed.slice(VERSION_LINE.length);
-  for (const probe of [...PROBES].reverse()) {
+export function probeOnlyDiff(original, probed, { events = false } = {}) {
+  const line = versionLine(events);
+  if (!probed.startsWith(line) || probed.split(line).length - 1 !== 1) return false;
+  let out = probed.slice(line.length);
+  for (const probe of [...probeSets(events)].reverse()) {
     const inserted = probe.insert === 'after' ? probe.from + probe.text : probe.text;
     if (out.split(inserted).length - 1 !== 1) return false;
     out = out.replace(inserted, () => probe.from);

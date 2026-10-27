@@ -30,7 +30,8 @@ import {
   armRecordWriteFailure,
   clearRecordWriteFailure,
 } from './record-test-support.mjs';
-import { applyProbes, applyMutant, MUTANTS, PROBE_VERSION } from './publisher-context-probes.mjs';
+import { applyProbes, applyMutant, MUTANTS, PROBE_VERSION, EVENT_PROBE_VERSION } from './publisher-context-probes.mjs';
+import { installEventDiagnostics, openSnapshot, classifyOpen, EVENT_RECORDER_VERSION } from './publisher-event-diagnostics.mjs';
 
 /** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
  * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
@@ -117,6 +118,12 @@ const contextDiagnostics = process.env.KAIRO_PUBLISHER_CONTEXT_DIAGNOSTICS === '
 const contextMutant = process.env.KAIRO_PUBLISHER_CONTEXT_MUTANT || null;
 assert(!contextMutant || (contextDiagnostics && Object.hasOwn(MUTANTS, contextMutant)),
   'A context mutant needs KAIRO_PUBLISHER_CONTEXT_DIAGNOSTICS=1 and a known mutant name');
+// Event-delivery follow-up (1830/1834), on top of the context probes: the events probes in the served source,
+// the page recorder installed before any app script, and the Open button's state read just before and after
+// the unchanged native click. Observation only; no mutants; one round-trip case per run.
+const eventDiagnostics = process.env.KAIRO_PUBLISHER_EVENT_DIAGNOSTICS === '1';
+assert(!eventDiagnostics || (contextDiagnostics && !contextMutant),
+  'Event diagnostics need KAIRO_PUBLISHER_CONTEXT_DIAGNOSTICS=1 and no context mutant');
 let contextInstrumentation = null;
 const contextWitnesses = [];
 let servedCorridor = null;
@@ -124,13 +131,20 @@ if (contextDiagnostics) {
   const contextCase = process.argv.find((arg) => arg.startsWith('--case='))?.slice(7);
   assert(mode === 'ui' && CONTEXT_CASES.includes(contextCase), 'Context diagnostics run one round-trip case with --ui');
   const original = readFileSync(resolve(site, 'corridor.js'));
-  const { source: probed, applied } = applyProbes(original.toString('utf8'));
+  const { source: probed, applied } = applyProbes(original.toString('utf8'), { events: eventDiagnostics });
   servedCorridor = Buffer.from(contextMutant ? applyMutant(probed, contextMutant) : probed);
   const probesPath = resolve(repository, 'prototypes/corridor/tools/publisher-context-probes.mjs');
   sources.push({ path: probesPath, sha256: hash(readFileSync(probesPath)) });
+  if (eventDiagnostics) {
+    const recorderPath = resolve(repository, 'prototypes/corridor/tools/publisher-event-diagnostics.mjs');
+    sources.push({ path: recorderPath, sha256: hash(readFileSync(recorderPath)) });
+  }
   contextInstrumentation = { path: 'corridor.js', originalSha256: hash(original), servedSha256: hash(servedCorridor),
-    probes: applied, mutant: contextMutant, case: contextCase, diagnosticOnly: true };
+    probes: applied, mutant: contextMutant, case: contextCase, diagnosticOnly: true,
+    ...(eventDiagnostics ? { events: true, recorder: EVENT_RECORDER_VERSION } : {}) };
 }
+const eventRecorderScript = `(${installEventDiagnostics.toString()})(window);`;
+let openEvidence = null;
 const stage = mkdtempSync(resolve(out, 'contracts-runtime-'));
 mkdirSync(resolve(stage, 'modules'));
 writeFileSync(
@@ -641,6 +655,17 @@ async function ui() {
     });
     const diagnostics = [];
     const errors = [];
+    // Event diagnostics only: the recorder before any app script in every document, and the page's own
+    // lifecycle (navigation, crash, close), so evidence from a lost or replaced page is never classified.
+    const lifecycle = eventDiagnostics ? { navigations: [], crashed: false, closed: false } : null;
+    if (lifecycle) {
+      await context.addInitScript({ content: eventRecorderScript });
+      context.on('page', (page) => {
+        page.on('framenavigated', (frame) => { if (frame === page.mainFrame()) lifecycle.navigations.push({ at: Date.now(), url: frame.url() }); });
+        page.on('crash', () => { lifecycle.crashed = true; });
+        page.on('close', () => { lifecycle.closed = true; });
+      });
+    }
     // Context diagnostics only: every corridor.js body the browser actually received, and every app
     // document load, so the served bytes are observed rather than assumed.
     const witness = contextDiagnostics ? { corridorResponses: [], appDocuments: 0, pending: 0 } : null;
@@ -722,7 +747,7 @@ async function ui() {
     );
     await page.goto(`${base}/index.html?entry=shelf&ui=bi`);
     await ready(page);
-    return { context, page, errors, diagnostics, witness };
+    return { context, page, errors, diagnostics, witness, lifecycle };
   }
   const record = readAppRecord;
   async function shelf(page, native = true) {
@@ -811,7 +836,17 @@ async function ui() {
     assert.equal(kept.teacherContexts.activeRef, before.teacherContexts?.activeRef || null);
     assert.deepEqual(kept.publisherLibrary, before.publisherLibrary);
     noDebt(kept);
-    await page.locator('#publisher-context-open').click();
+    // event diagnostics: the button's state just before and just after the unchanged native click, and the
+    // click's own outcome; no wait is added and the click is never substituted
+    if (eventDiagnostics) openEvidence = { pre: await page.evaluate(openSnapshot).catch((error) => ({ snapshotError: String(error) })) };
+    try {
+      await page.locator('#publisher-context-open').click();
+      if (openEvidence) openEvidence.click = { ok: true };
+    } catch (error) {
+      if (openEvidence) openEvidence.click = { ok: false, error: String(error?.stack || error) };
+      throw error;
+    }
+    if (openEvidence) openEvidence.post = await page.evaluate(openSnapshot).catch((error) => ({ snapshotError: String(error) }));
     await page.waitForSelector('#teacher-source-return');
     assert.equal(await page.locator('.teacher-context .teacher-source-quote').textContent(), text);
     assert.equal((await record(page)).teacherContexts.activeRef, selected.id);
@@ -902,9 +937,20 @@ async function ui() {
           reasons.push('an observed corridor.js body is not the served bytes');
         if (observed.length < context.witness.appDocuments) reasons.push('fewer corridor.js bodies than app document loads');
         if (context.witness.pending > 0) reasons.push('a corridor.js body was still pending');
-        if (version !== PROBE_VERSION) reasons.push('the version witness did not execute in the page');
+        if (version !== (eventDiagnostics ? EVENT_PROBE_VERSION : PROBE_VERSION)) reasons.push('the version witness did not execute in the page');
+        // event diagnostics: evidence from a missing, truncated, unreadable or replaced document is never classified
+        let event = null;
+        if (eventDiagnostics) {
+          const recorder = await context.page.evaluate(() => (window.__evDiag ? JSON.parse(JSON.stringify(window.__evDiag)) : null))
+            .catch((error) => ({ captureError: String(error) }));
+          event = classifyOpen({ ctx: Array.isArray(records) ? records : null, recorder, pre: openEvidence?.pre ?? null,
+            post: openEvidence?.post ?? null, click: openEvidence?.click ?? null, page: context.lifecycle });
+          if (event.verdict !== 'OBSERVED') reasons.push(...event.reasons.map((reason) => `event evidence: ${reason}`));
+          context.diagnostics.push({ kind: 'event-diagnostics', recorder, open: openEvidence, lifecycle: context.lifecycle, classification: event });
+        }
         const entry = { case: name, verdict: reasons.length ? 'INCONCLUSIVE' : 'OBSERVED', reasons, observed,
-          appDocuments: context.witness.appDocuments, version };
+          appDocuments: context.witness.appDocuments, version,
+          ...(event ? { event: { verdict: event.verdict, classification: event.classification } } : {}) };
         contextWitnesses.push(entry);
         context.diagnostics.push({ kind: 'context-diagnostics', records }, { kind: 'context-witness', ...entry });
       }
@@ -1404,6 +1450,7 @@ try {
         failed: results.filter((result) => !result.pass).length,
         limitations: [
           ...(contextDiagnostics ? ['Diagnostic-only served corridor.js with passive keepSelection probes; never an acceptance run'] : []),
+          ...(eventDiagnostics ? ['Event diagnostics add an init-script recorder (observing listeners, wrapped stopPropagation/stopImmediatePropagation/preventDefault that always call the original, a MutationObserver) and two page reads around the unchanged native Open click; never an acceptance run'] : []),
           'Synthetic selected publisher fixtures; no live publisher network in this verifier',
           'Receipt coherence is not independent source authority or editorial approval',
           'Contract mode runs exact compiled browser-target core in Node, not browser UI or native IPC',
