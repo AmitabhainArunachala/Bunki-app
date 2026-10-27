@@ -170,7 +170,7 @@ const POST = { now: 300, docId: DOC, byId: [REG, 'button#publisher-context-open'
 function evidence({ ctx = null, recorder = null, rows = null, pre = PRE, post = POST, click = { ok: true }, page = {}, docId = DOC } = {}) {
   return {
     // the action document's own trace: recorder and source probes read together in that document (W2 1928)
-    actionDoc: { docId,
+    actionDoc: { docId, ctxVersion: EVENT_PROBE_VERSION,
       ctx: ctx ?? [{ id: 'reg-open', t: 5, node: REG }, { id: 'enter', t: 50, discuss: false }],
       recorder: recorder ?? { version: EVENT_RECORDER_VERSION, docId: DOC, truncated: false, fault: null, rows: [{ id: 'install', now: 1, docId: DOC }, ...(rows ?? [])] } },
     pre, post, click, page,
@@ -552,4 +552,23 @@ test('EV3: the init script and openSnapshot run as page source with no module bi
     assert.equal(JSON.stringify(win.__evDiag.rows.filter((row) => row.id === 'arm').map((row) => row.on)), '[true,false]');
     assert.equal(win.__evDiag.fault, null);
   } finally { restore(); }
+});
+
+test('EV3-V1: the action document must carry the exact events probe version; a later document\'s correct version never rescues it', () => {
+  const listener = [{ id: 'reg-open', t: 5, node: REG }, { id: 'listener-open', t: 210, node: REG, event: EV }, { id: 'enter', t: 211, discuss: true }];
+  const valid = evidence({ rows: fullClick, ctx: listener });
+  assert.equal(valid.actionDoc.ctxVersion, 'publisher-context-probes/1+events/2', 'positives carry the actual frozen probe version');
+  // the original action document is valid; the later document is different (after the journey reload) and is not consulted
+  assert.equal(classOf({ ...valid, laterDocument: { docId: 'doc-after-reload', version: EVENT_PROBE_VERSION } }), 'listener-ran-and-keepSelection-entered');
+  const withVersion = (ctxVersion) => {
+    const input = evidence({ rows: fullClick, ctx: listener });
+    if (ctxVersion === undefined) delete input.actionDoc.ctxVersion; else input.actionDoc.ctxVersion = ctxVersion;
+    return { ...input, laterDocument: { docId: 'doc-after-reload', version: EVENT_PROBE_VERSION } };
+  };
+  for (const [label, version] of [['missing', undefined], ['null', null], ['context-only', PROBE_VERSION], ['other', 'publisher-context-probes/1+events/1']]) {
+    const result = classifyOpen(withVersion(version));
+    assert.equal(result.verdict, 'INCONCLUSIVE', label);
+    assert.equal(result.classification, null, label);
+    assert.deepEqual(result.reasons, ["the action document's probe version is missing or another version"], label);
+  }
 });

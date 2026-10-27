@@ -22,6 +22,8 @@
 // document's own trace (recorder, source probes and version read together in that document before anything later can
 // replace it, W2 1928) and reports geometry differences between consecutive samples without naming a cause.
 
+import { EVENT_PROBE_VERSION } from './publisher-context-probes.mjs';
+
 export const EVENT_RECORDER_VERSION = 'publisher-event-diagnostics/3';
 export const GEOMETRY_NODES = ['open', 'save', 'actions', 'menu', 'main'];
 export const GEOMETRY_SURFACES = ['prompt', 'quote', 'timed', 'status', 'sealStrip', 'mini', 'readerLayers', 'layersMark'];
@@ -437,7 +439,8 @@ export function pressGeometry({ rows, from, to, pre, post, recorder = {} }) {
 
 /** Pure: what the evidence says happened to the Open click. Never classifies from missing, truncated, faulted or
  * unreadable evidence, or from a document other than the one the Open action ran in. The recorder and the source
- * probes come only from actionDoc, read together in the action's own document before any later navigation (W2 1928):
+ * probes and their witnessed version come only from actionDoc, read together in the action's own document before any
+ * later navigation (W2 1928, EV3-V1):
  * a later document's trace never stands in for it. Only the one trusted click inside the action interval (the pre
  * read to the post read, same document) is attributed, and its bubble, its stops and the Open listener entry are
  * joined to it by the private event id; untrusted, late or other events stay raw evidence. A failed native click is
@@ -459,6 +462,8 @@ export function classifyOpen({ actionDoc, pre, post = null, click, page = {} }) 
     }
     if (!Array.isArray(ctx)) reasons.push('the source probe records could not be read');
     else if (!ctx.some((row) => row.id === 'reg-open')) reasons.push('no Open listener registration was recorded');
+    // the probe version witnessed in the action document itself (W2 EV3-V1): a later document's version never stands in
+    if (actionDoc.ctxVersion !== EVENT_PROBE_VERSION) reasons.push('the action document\'s probe version is missing or another version');
   }
   if (!pre || !click) reasons.push('the Open action was not reached');
   else if (pre.snapshotError) reasons.push('the Open button state could not be read before the click');
