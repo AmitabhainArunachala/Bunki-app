@@ -5,7 +5,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
-import { PROBES, MUTANTS, applyProbes, applyMutant, probeOnlyDiff, keepSelectionText } from './publisher-context-probes.mjs';
+import { PROBES, PROBE_VERSION, MUTANTS, applyProbes, applyMutant, probeOnlyDiff, keepSelectionText } from './publisher-context-probes.mjs';
 
 const source = readFileSync(new URL('../corridor.js', import.meta.url), 'utf8');
 
@@ -30,7 +30,7 @@ async function runKeepSelection(text, discuss) {
 
 test('every probe anchor occurs exactly once in corridor.js, and a missing or doubled anchor stops the run', () => {
   const { applied } = applyProbes(source);
-  assert.deepEqual(applied, PROBES.map((probe) => probe.id));
+  assert.deepEqual(applied, ['version', ...PROBES.map((probe) => probe.id)]);
   assert.throws(() => applyProbes(source.replace(PROBES[1].from, '')), /anchor occurs 0 times/);
   assert.throws(() => applyProbes(source + '\n' + PROBES[3].from), /anchor occurs 2 times/);
   for (const name of Object.keys(MUTANTS)) {
@@ -46,6 +46,20 @@ test('the probed source differs from corridor.js only by the probe records (prob
   // a non-probe edit anywhere is caught
   assert.equal(probeOnlyDiff(source, probed.replace("'Saved with its source.'", "'Saved.'")), false);
   assert.equal(probeOnlyDiff(source, probed.replace('const keepSave = saveOne({', 'const keepSave = saveOne({ ')), false);
+});
+
+test('the served source starts with exactly one executed version witness, and the guard rejects it missing or doubled', () => {
+  const { source: probed } = applyProbes(source);
+  const line = `window.__ctxDiagVersion = ${JSON.stringify(PROBE_VERSION)};\n`;
+  assert.ok(probed.startsWith(line));
+  assert.equal(probed.split(line).length - 1, 1);
+  assert.equal(probeOnlyDiff(source, probed.slice(line.length)), false);
+  assert.equal(probeOnlyDiff(source, line + probed), false);
+  assert.throws(() => applyProbes(probed), /already present|anchor occurs/);
+  // it executes: evaluating the line in a fresh context sets the witness
+  const sandbox = { window: {} };
+  vm.runInNewContext(line, sandbox);
+  assert.equal(sandbox.window.__ctxDiagVersion, PROBE_VERSION);
 });
 
 test('the unprobed closure records nothing; the probed baseline names its path', async () => {

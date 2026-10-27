@@ -30,7 +30,7 @@ import {
   armRecordWriteFailure,
   clearRecordWriteFailure,
 } from './record-test-support.mjs';
-import { applyProbes, applyMutant, MUTANTS } from './publisher-context-probes.mjs';
+import { applyProbes, applyMutant, MUTANTS, PROBE_VERSION } from './publisher-context-probes.mjs';
 
 /** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
  * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
@@ -118,6 +118,7 @@ const contextMutant = process.env.KAIRO_PUBLISHER_CONTEXT_MUTANT || null;
 assert(!contextMutant || (contextDiagnostics && Object.hasOwn(MUTANTS, contextMutant)),
   'A context mutant needs KAIRO_PUBLISHER_CONTEXT_DIAGNOSTICS=1 and a known mutant name');
 let contextInstrumentation = null;
+const contextWitnesses = [];
 let servedCorridor = null;
 if (contextDiagnostics) {
   const contextCase = process.argv.find((arg) => arg.startsWith('--case='))?.slice(7);
@@ -640,6 +641,22 @@ async function ui() {
     });
     const diagnostics = [];
     const errors = [];
+    // Context diagnostics only: every corridor.js body the browser actually received, and every app
+    // document load, so the served bytes are observed rather than assumed.
+    const witness = contextDiagnostics ? { corridorResponses: [], appDocuments: 0, pending: 0 } : null;
+    if (witness) {
+      context.on('response', (response) => {
+        if (new WebUrl(response.url()).pathname !== '/corridor.js') return;
+        witness.pending += 1;
+        response.body().then(
+          (body) => witness.corridorResponses.push({ status: response.status(), sha256: hash(body) }),
+          (error) => witness.corridorResponses.push({ status: response.status(), error: String(error) }),
+        ).finally(() => { witness.pending -= 1; });
+      });
+      context.on('page', (page) => page.on('load', () => {
+        if (['/', '/index.html'].includes(new WebUrl(page.url()).pathname)) witness.appDocuments += 1;
+      }));
+    }
     context.on('page', (page) => {
       page.on('pageerror', (error) => {
         errors.push(error.message);
@@ -705,7 +722,7 @@ async function ui() {
     );
     await page.goto(`${base}/index.html?entry=shelf&ui=bi`);
     await ready(page);
-    return { context, page, errors, diagnostics };
+    return { context, page, errors, diagnostics, witness };
   }
   const record = readAppRecord;
   async function shelf(page, native = true) {
@@ -873,9 +890,24 @@ async function ui() {
         .screenshot({ path: resolve(out, `${name}-failure.png`), fullPage: true })
         .catch(() => {});
     } finally {
-      if (contextDiagnostics)
-        context.diagnostics.push({ kind: 'context-diagnostics',
-          records: await context.page.evaluate(() => window.__ctxDiag || []).catch((error) => ({ captureError: String(error) })) });
+      if (contextDiagnostics) {
+        const records = await context.page.evaluate(() => window.__ctxDiag || []).catch((error) => ({ captureError: String(error) }));
+        const version = await context.page.evaluate(() => window.__ctxDiagVersion ?? null).catch(() => null);
+        for (let waited = 0; context.witness.pending > 0 && waited < 2_000; waited += 50)
+          await new Promise((done) => setTimeout(done, 50));
+        const observed = [...context.witness.corridorResponses];
+        const reasons = [];
+        if (!observed.length) reasons.push('no corridor.js response was observed');
+        if (observed.some((row) => row.error || row.sha256 !== contextInstrumentation.servedSha256))
+          reasons.push('an observed corridor.js body is not the served bytes');
+        if (observed.length < context.witness.appDocuments) reasons.push('fewer corridor.js bodies than app document loads');
+        if (context.witness.pending > 0) reasons.push('a corridor.js body was still pending');
+        if (version !== PROBE_VERSION) reasons.push('the version witness did not execute in the page');
+        const entry = { case: name, verdict: reasons.length ? 'INCONCLUSIVE' : 'OBSERVED', reasons, observed,
+          appDocuments: context.witness.appDocuments, version };
+        contextWitnesses.push(entry);
+        context.diagnostics.push({ kind: 'context-diagnostics', records }, { kind: 'context-witness', ...entry });
+      }
       writeFileSync(
         resolve(out, `${name}-diagnostics.json`),
         JSON.stringify(context.diagnostics, null, 2) + '\n',
@@ -1365,7 +1397,7 @@ try {
           feedCore: files.find((file) => file.path === 'modules/feed-core.mjs'),
         },
         runtime: { node: process.version },
-        instrumentation: contextInstrumentation,
+        instrumentation: contextInstrumentation && { ...contextInstrumentation, witnesses: contextWitnesses },
         results,
         observations,
         passed: results.filter((result) => result.pass).length,
@@ -1382,4 +1414,7 @@ try {
     ) + '\n',
   );
   if (!results.length || results.some((result) => !result.pass)) process.exitCode = 1;
+  // a diagnostic case whose served bytes were not observed executing is inconclusive, whatever it printed
+  if (contextDiagnostics && (!contextWitnesses.length || contextWitnesses.some((entry) => entry.verdict !== 'OBSERVED')))
+    process.exitCode = 3;
 }

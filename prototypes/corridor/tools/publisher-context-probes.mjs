@@ -1,7 +1,11 @@
 // Diagnostic-only probes for keepSelection (corridor.js), served by verify-publisher-reading in
-// KAIRO_PUBLISHER_CONTEXT_DIAGNOSTICS=1 mode. Each probe records and nothing else: no await, no branch,
-// no state change. Every anchor must occur exactly once; the served source differs from the original
-// only by the inserted probe text (checked by probeOnlyDiff).
+// KAIRO_PUBLISHER_CONTEXT_DIAGNOSTICS=1 mode: diagnostic writes to window.__ctxDiag and branch
+// instrumentation only — no await, no app state change (recordWritable() is a pure read). A version line
+// at the top proves the probed bytes executed. Every anchor must occur exactly once; the served source
+// differs from the original only by the inserted probe text (checked by probeOnlyDiff).
+
+export const PROBE_VERSION = 'publisher-context-probes/1';
+const VERSION_LINE = `window.__ctxDiagVersion = ${JSON.stringify(PROBE_VERSION)};\n`;
 
 const record = (id, extra = '') =>
   `(window.__ctxDiag ||= []).push({ id: ${JSON.stringify(id)}, t: performance.now(), discuss, ` +
@@ -48,13 +52,15 @@ export function applyProbes(source) {
     out = out.replace(probe.from, () => replacement);
     applied.push(probe.id);
   }
-  return { source: out, applied };
+  if (out.includes(VERSION_LINE)) throw new Error('version witness already present');
+  return { source: VERSION_LINE + out, applied: ['version', ...applied] };
 }
 
-/** True when undoing each probe's own inserted text, exactly once and in reverse order, gives back the
- * original byte for byte: the served source carries no edit beyond the probes. */
+/** True when undoing the version line and then each probe's own inserted text, exactly once and in
+ * reverse order, gives back the original byte for byte: the served source carries no other edit. */
 export function probeOnlyDiff(original, probed) {
-  let out = probed;
+  if (!probed.startsWith(VERSION_LINE) || probed.split(VERSION_LINE).length - 1 !== 1) return false;
+  let out = probed.slice(VERSION_LINE.length);
   for (const probe of [...PROBES].reverse()) {
     const inserted = probe.insert === 'after' ? probe.from + probe.text : probe.text;
     if (out.split(inserted).length - 1 !== 1) return false;
