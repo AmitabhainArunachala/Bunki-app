@@ -100,11 +100,18 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
  const claim=(action,collection,operation)=>{if(operation===undefined)return null;
   insist(operation!==null&&(typeof operation==='object'||typeof operation==='function'),'operation-invalid');
   insist(!attempts.has(operation),'operation-reused'); // the reuse error is unwitnessed; the first attempt is untouched
-  const attempt={action,collection,boot:bootToken,owner:cp(owner),generation,state:'claimed',error:undefined,source:null,reason:null};
+  // C-U1-P1 (W2 2103): only a primitive kind is kept; a supplied object kind is never read, coerced, traversed or frozen (null)
+  const kind=collection===null||(typeof collection!=='object'&&typeof collection!=='function')?collection:null;
+  const attempt={action,collection:kind,boot:bootToken,owner:cp(owner),generation,state:'claimed',error:undefined,source:null,reason:null};
   attempts.set(operation,attempt);return attempt;};
- /** pure: identity reads on private state only; no property read, coercion or call on the supplied operation or error */
+ // C-U1-B1 (W2 2103): a claimed attempt runs only under the owner, generation and boot it was claimed in, checked when it starts
+ // and again at its last guard before dispatch, so a reboot queued ahead of it or re-entered inside it refuses it there
+ const stillBound=attempt=>{if(!attempt)return;guard(attempt,same(attempt.owner,owner),'attempt-owner-changed');
+  guard(attempt,attempt.generation===generation,'attempt-generation-changed');guard(attempt,attempt.boot===bootToken,'attempt-boot-changed');};
+ /** pure: identity reads on private state only; no property read, coercion or call on the supplied operation or error, and a
+  * shallow-frozen answer of primitives only */
  function preDispatchRefusal(operation,error){const a=attempts.get(operation);
-  return a&&a.state==='refused-before-dispatch'&&a.error===error?freeze({action:a.action,collection:a.collection,source:a.source,reason:a.reason}):null;}
+  return a&&a.state==='refused-before-dispatch'&&a.error===error?Object.freeze({action:a.action,collection:a.collection,source:a.source,reason:a.reason}):null;}
  const dayEnd=t=>core.endOfDay(new Date(t));
  const current=()=>port.snapshot();
  const quality=s=>{const q=classify(s);return q==='valid'&&!s.daily.events.every(e=>
@@ -143,6 +150,7 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
   // stamp included, is strictly smaller than the root this queued write replaces; explicit control writes keep theirs
   const prior=before.record.m4Journey,reserve=control||shrink&&classify(prior)==='valid'&&bytes(next)<bytes(prior);
   guard(attempt,bytes(next)<=(reserve?LIMITS.bytes:LIMITS.dataBytes),'byte-bound');
+  stillBound(attempt);
   if(attempt)attempt.state='dispatch-entered'; // before port.commit is read, called or awaited
   const sent=cp(next),result=yield port.commit({revision:before.revision,rootHash:digest(before.record.m4Journey??null),
    generation,epoch:owner.epoch,switchOn:on},sent,{action,generation,journeyId:next.id});
@@ -249,7 +257,7 @@ export function createLifecycle({port,device,buildId,core,clock,enabled,validate
  function* enter(entrance,{observe=null}={}){return yield* change('visit',s=>{insist(s.daily.visits<LIMITS.visits,'visit-bound');s.daily.visits++;s.location=entrance;},{observe});}
  /** a target attempt's body: anything that escapes it unbranded while still validating stays unproved, never proof */
  function* attempted(attempt,body){if(attempt)attempt.state='validating';
-  try{const value=yield* body();if(attempt&&attempt.state==='dispatch-entered')attempt.state='completed';return value;}
+  try{stillBound(attempt);const value=yield* body();if(attempt&&attempt.state==='dispatch-entered')attempt.state='completed';return value;}
   catch(error){if(attempt&&attempt.state==='validating')attempt.state='refused-unproved';throw error;}}
  function* work(kind,data,{observe=null,admit=null}={},attempt=null){return yield* attempted(attempt,function*(){guard(attempt,['goals','projects'].includes(kind),'work-kind');return yield* change('work',s=>{
   // M4 (W5 1901 F3): the caller's own recheck runs inside the queued mutation, against the root this write would replace

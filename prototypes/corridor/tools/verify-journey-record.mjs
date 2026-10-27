@@ -686,6 +686,107 @@ test('U1H', 'a control rotation committed before a target refusal: the witness h
   assert.equal(model.lc.preDispatchRefusal(operation, refusal).source, 'admission');
   assert.equal(model.counts.commit, 1, 'the rotation control write happened before the target refusal');
 });
+test('U1I', 'C-U1-P1: an object kind is refused as before, and the query never reads, freezes or throws on it (getter, revoked proxy, cyclic, counting proxy)', async (m) => {
+  for (const variant of ['getter', 'revoked-proxy', 'cyclic', 'counting-proxy']) {
+    const model = await modelLifecycle(m), operation = {};
+    let reads = 0, kind;
+    if (variant === 'getter') kind = { get x() { reads++; return 1; } };
+    if (variant === 'revoked-proxy') { const r = Proxy.revocable({}, {}); kind = r.proxy; r.revoke(); }
+    if (variant === 'cyclic') { kind = {}; kind.self = kind; }
+    if (variant === 'counting-proxy') kind = new Proxy({}, Object.fromEntries(['get', 'has', 'ownKeys', 'getOwnPropertyDescriptor', 'getPrototypeOf',
+      'isExtensible', 'preventExtensions', 'defineProperty', 'set'].map((trap) => [trap, (...args) => { reads++; return Reflect[trap](...args); }])));
+    const commits = model.counts.commit;
+    const error = await caught(() => model.lc.work(kind, {}, { operation }));
+    assert.equal(error?.message, 'work-kind', `${variant}: the original refusal stays`);
+    let proofs = [], thrown = null;
+    try { proofs = [model.lc.preDispatchRefusal(operation, error), model.lc.preDispatchRefusal(operation, error)]; } catch (e) { thrown = e; }
+    assert.equal(thrown, null, `${variant}: the query never throws`);
+    assert.equal(reads, 0, `${variant}: no getter or trap ran`);
+    for (const proof of proofs) {
+      assert.deepEqual(proof, { action: 'work', collection: null, source: 'lifecycle-guard', reason: 'work-kind' }, `${variant}: primitive-only proof`);
+      assert.ok(Object.isFrozen(proof));
+    }
+    if (variant === 'getter' || variant === 'cyclic') assert.equal(Object.isFrozen(kind), false, `${variant}: the caller's object is not frozen`);
+    assert.equal(model.counts.commit, commits);
+  }
+});
+/** C-U1-B1 (W2 2103): a project kept across a reboot, a blocker held in flight, then the reboot and the target queued behind it,
+ * so a claimed target was claimed under the original boot and runs under its successor. afterFirst runs once the blocker lands. */
+async function queuedBehindReboot(m, action, { legacy = false, reboot = true, afterFirst = () => {} } = {}) {
+  const model = await modelLifecycle(m);
+  await model.lc.work('projects', { status: 'completed', label: 'kept' });
+  const kept = model.root().projects[0].id, original = model.lc.bootIdentity(), real = model.port.commit, commits = [];
+  let release, first = true;
+  const barrier = new Promise((resolve) => { release = resolve; });
+  model.port.commit = async (expected, next, meta) => {
+    commits.push(meta.action);
+    if (!first) return real(expected, next, meta);
+    first = false; await barrier;
+    const result = await real(expected, next, meta); afterFirst(model); return result;
+  };
+  const blocker = model.lc.work('projects', { status: 'unfinished', label: 'blocker' });
+  const booted = reboot ? model.lc.boot() : null;
+  const operation = {}, options = legacy ? {} : { operation };
+  const target = action === 'work' ? model.lc.work('projects', { status: 'completed', label: 'target' }, options)
+    : model.lc.retire('projects', kept, 'retire-completed', options);
+  assert.equal(model.lc.bootIdentity(), original, 'claimed before the queued reboot ran');
+  release();
+  const [b, , t] = await Promise.allSettled([blocker, booted, target]);
+  assert.equal(b.status, 'fulfilled', 'the blocker published');
+  return { model, kept, commits, target: t, operation, rebooted: model.lc.bootIdentity() !== original,
+    keptPresent: model.root().projects.some((p) => p.id === kept), targetPresent: model.root().projects.some((p) => p.label === 'target') };
+}
+test('U1J', 'C-U1-B1: a reboot queued ahead of a claimed work or retire refuses it unwitnessed by dispatch: the kept project survives; positives and legacy unchanged', async (m) => {
+  for (const action of ['work', 'retire-work']) {
+    const stale = await queuedBehindReboot(m, action);
+    assert.ok(stale.rebooted);
+    assert.equal(stale.target.status, 'rejected', `${action}: refused under the successor boot`);
+    assert.equal(stale.target.reason?.message, 'attempt-boot-changed');
+    assert.deepEqual(stale.commits, ['work'], `${action}: only the blocker was dispatched`);
+    assert.equal(stale.keptPresent, true, `${action}: the kept project survives`); assert.equal(stale.targetPresent, false);
+    assert.deepEqual(stale.model.lc.preDispatchRefusal(stale.operation, stale.target.reason),
+      { action, collection: 'projects', source: 'lifecycle-guard', reason: 'attempt-boot-changed' });
+    const positive = await queuedBehindReboot(m, action, { reboot: false });
+    assert.equal(positive.target.status, 'fulfilled', `${action}: the same claimed target without a reboot dispatches`);
+    assert.deepEqual(positive.commits, ['work', action], `${action}: once`);
+    assert.equal(positive.keptPresent, action === 'work'); assert.equal(positive.targetPresent, action === 'work');
+    const legacy = await queuedBehindReboot(m, action, { legacy: true });
+    assert.equal(legacy.target.status, 'fulfilled', `${action}: an unclaimed (legacy) call keeps its old behaviour behind a reboot`);
+    assert.deepEqual(legacy.commits, ['work', action]);
+  }
+});
+test('U1K', 'C-U1-B1: an owner change or a generation change across the queued reboot refuses the claimed target by its own claimed identity, at its start', async (m) => {
+  const owner = await queuedBehindReboot(m, 'work', { afterFirst: (model) => { model.port.binding = () => ({ epoch: 2 }); } });
+  assert.equal(owner.target.reason?.message, 'attempt-owner-changed');
+  assert.deepEqual(owner.commits, ['work']); assert.equal(owner.targetPresent, false);
+  const generation = await queuedBehindReboot(m, 'retire-work', { afterFirst: (model) => { model.saved.migrationId = 'model-migration-2'; } });
+  assert.equal(generation.target.reason?.message, 'attempt-generation-changed', 'refused on its claim, before any hold-dependent guard');
+  assert.deepEqual(generation.commits, ['work']); assert.equal(generation.keptPresent, true);
+  assert.equal(generation.model.lc.preDispatchRefusal(generation.operation, generation.target.reason).reason, 'attempt-generation-changed');
+});
+test('U1L', 'C-U1-B1: a reboot re-entered inside the attempt (the caller\'s admit, the port\'s binding) is refused at the last guard before dispatch', async (m) => {
+  const idle = () => new Promise((resolve) => setTimeout(resolve, 0));   // an idle queue runs the attempt, and a nested op, inline
+  const viaAdmit = await modelLifecycle(m);
+  await viaAdmit.lc.work('projects', { status: 'completed', label: 'kept' }); await idle();
+  const opA = {}, bootA = viaAdmit.lc.bootIdentity(), commitsA = viaAdmit.counts.commit;
+  let nested = false;
+  const errorA = await caught(() => { const step = viaAdmit.lc.work('projects', { status: 'completed', label: 'target' },
+    { operation: opA, admit: () => { if (!nested) { nested = true; viaAdmit.lc.boot(); } } }); assert.ok(nested, 'the reboot ran inside the attempt'); return step; });
+  assert.notEqual(viaAdmit.lc.bootIdentity(), bootA);
+  assert.equal(errorA?.message, 'attempt-boot-changed', 'admit re-entry: refused at the final boundary');
+  assert.equal(viaAdmit.counts.commit, commitsA); assert.equal(viaAdmit.root().projects.some((p) => p.label === 'target'), false);
+  assert.deepEqual(viaAdmit.lc.preDispatchRefusal(opA, errorA), { action: 'work', collection: 'projects', source: 'lifecycle-guard', reason: 'attempt-boot-changed' });
+  const viaPort = await modelLifecycle(m);
+  await viaPort.lc.work('projects', { status: 'completed', label: 'kept' }); await idle();
+  const kept = viaPort.root().projects[0].id, opB = {}, bootB = viaPort.lc.bootIdentity(), commitsB = viaPort.counts.commit, binding = viaPort.port.binding;
+  let armed = true;
+  viaPort.port.binding = () => { if (armed) { armed = false; viaPort.lc.boot(); } return binding(); };
+  const errorB = await caught(() => viaPort.lc.retire('projects', kept, 'retire-completed', { operation: opB }));
+  assert.equal(armed, false); assert.notEqual(viaPort.lc.bootIdentity(), bootB);
+  assert.equal(errorB?.message, 'attempt-boot-changed', 'dependency re-entry: refused at the final boundary');
+  assert.equal(viaPort.counts.commit, commitsB); assert.ok(viaPort.root().projects.some((p) => p.id === kept), 'the kept project survives');
+  assert.equal(viaPort.lc.preDispatchRefusal(opB, errorB).reason, 'attempt-boot-changed');
+});
 
 /** the release build (a8b9cbff, the same host and app bytes as 87dededd) for P3, and the measured findings */
 const RELEASE = {};
@@ -725,7 +826,13 @@ export const MUTANTS = {
   'u1-primitive-proof': ['U1B', 'lifecycle', [["error!==null&&(typeof error==='object'||typeof error==='function')?", "true?"]]],
   'u1-claim-in-queue': ['U1E', 'lifecycle', [["const publicWork=(kind,data,options={})=>{const attempt=claim('work',kind,options?.operation);return run(()=>work(kind,data,options,attempt));};",
     "const publicWork=(kind,data,options={})=>run(()=>work(kind,data,options,claim('work',kind,options?.operation)));"]]],
-  'u1-proof-not-frozen': ['U1A', 'lifecycle', [["?freeze({action:a.action,collection:a.collection,source:a.source,reason:a.reason}):null;", "?{action:a.action,collection:a.collection,source:a.source,reason:a.reason}:null;"]]],
+  'u1-proof-not-frozen': ['U1A', 'lifecycle', [["?Object.freeze({action:a.action,collection:a.collection,source:a.source,reason:a.reason}):null;", "?{action:a.action,collection:a.collection,source:a.source,reason:a.reason}:null;"]]],
+  // C-U1-P1/B1 (W2 2103): the raw kind deep-frozen again, an attempt start that ignores its claim, a last guard that does, and
+  // neither check (the f4255d51 behaviour)
+  'u1-raw-kind-deep-freeze': ['U1I', 'lifecycle', [['const attempt={action,collection:kind,', 'const attempt={action,collection,'], ['?Object.freeze({action:a.action,', '?freeze({action:a.action,']]],
+  'u1-start-unbound': ['U1K', 'lifecycle', [['try{stillBound(attempt);const value=', 'try{const value=']]],
+  'u1-final-unbound': ['U1L', 'lifecycle', [["  stillBound(attempt);\n  if(attempt)attempt.state='dispatch-entered';", "  if(attempt)attempt.state='dispatch-entered';"]]],
+  'u1-binding-unenforced': ['U1J', 'lifecycle', [['const stillBound=attempt=>{if(!attempt)return;', 'const stillBound=attempt=>{return;']]],
 };
 
 async function main() {
