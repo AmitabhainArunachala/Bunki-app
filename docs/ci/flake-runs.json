@@ -27,16 +27,6 @@
     "result": "observed",
     "startedAt": "2026-10-12T07:09:14Z"
   },
-  "38198479220/1": {
-    "result": "observed",
-    "startedAt": "2026-10-12T03:06:54Z"
-  },
-  "38199020878/1": {
-    "result": "rejected",
-    "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
-    "startedAt": "2026-10-12T03:15:14Z",
-    "reason": "Producer verification policy differs from trusted default branch"
-  },
   "38201440424/1": {
     "result": "observed",
     "startedAt": "2026-10-12T03:51:51Z"
@@ -962,5 +952,9 @@
   "37925123360/32": {
     "result": "observed",
     "startedAt": "2026-10-26T19:47:18Z"
+  },
+  "37980085769/32": {
+    "result": "observed",
+    "startedAt": "2026-10-27T03:50:12Z"
   }
 }
