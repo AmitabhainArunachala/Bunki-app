@@ -1664,7 +1664,7 @@ export const SENSE_CASE_IDS = Object.freeze([
 // FULL-R1 E1: recomputed after the 31 reader-furigana bodies below (何を/何が → なに; wikinews:12024 放出 → はなてん, 間 → かん); every other entry unchanged
 // R2 E2: two article pins refreshed; seven local readings and four 何 lexicon provenance tags.
 export const SENSE_DATA_INVENTORY_SHA256 =
-  'd63c3a32f1cb71b0a84b9f79cf7495cbdff52b94de7bfec80085841deb470ba7';
+  '609ad5285d9ca1d8dd5700d0fbde7e99448549b210129b7b7d9f144badb1254d';
 export const SPEAK_CHECK_NAMES = Object.freeze({
   S1: [
     'the Learn room has one Speak door, a study-door row',
@@ -2104,7 +2104,7 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   // as before). Reviewed: the Sense fixtures on this article read tokens 210, 580, 977 and 1275, unchanged; no row names ばか
   [
     'data/articles/aozora-049966-2.json',
-    'e562f013161a7a243fd8c48e9f0c4bc9abeaeb96116c95b1aa2bba60cb9a52a8',
+    '1d9aa315eb1819b95feeb99b809113d3b12989228adf97e6c4cc6442e19749de',
   ],
   [
     'data/articles/aozora-051034.json',
@@ -5294,7 +5294,7 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
     'data/articles/govonline-article-202609-tv-6628.json',
     'c77a856a6ecca272724d452ef32c1e9469342e6952f4072db7565ce2af3e8eef',
   ],
-  ['data/articles/index.json', '9c29aab55cf7538dc3b3f3cbdbd07d5d4045f574ce67b89303373949ddbeba42'],
+  ['data/articles/index.json', '131991cc0ab9d56986bf5e1d270f14a5f5143ecb02c020a76566284ba49e5b8e'],
   [
     'data/articles/jawiki-3492442.json',
     '76a52a9b2fae5108f0897a0a714e26f39ea9982c958706758b715d3a961d2145',
