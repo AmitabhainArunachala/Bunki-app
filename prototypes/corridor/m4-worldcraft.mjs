@@ -1,6 +1,7 @@
 /**
  * WORLDCRAFT-3A: source admission and identity only (lease 1705, 2026-10-27).
- * No capture, projects, persistence, UI, network, timers or learner authority.
+ * 3A-2 adds isolated adapter-driven model operations, never a real host adapter.
+ * No persistence implementation, UI, network, timers or learner authority.
  * Existing UMD implementations are trusted packaged code; the verifier binds
  * their bytes. Callers cannot inject models, implementations or expected hashes.
  */
@@ -21,6 +22,11 @@ const ok = value => Object.freeze({ ok: true, value });
 const no = reason => Object.freeze({ ok: false, reason });
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const sameRef = (a, b) => a.type === b.type && a.id === b.id;
+const samePlain = (a, b) => {
+  const canonical = value => JSON.stringify(value, (key, row) => row && typeof row === 'object' && !Array.isArray(row)
+    ? Object.fromEntries(Object.keys(row).sort().map(k => [k, row[k]])) : row);
+  return canonical(a) === canonical(b);
+};
 const check = (condition, reason) => { if (!condition) throw new Error(reason); };
 const token = () => Object.freeze(Object.create(null));
 const ref = id => ({ type: 'kanji', id });
@@ -215,4 +221,353 @@ export function resolveWorldcraftWord(catalog, reference) {
   if (!node) return no('word-not-in-family');
   return ok(freeze({ reference: node.reference, evidence: node.evidence,
     examples: data.model.catalog().examples.filter(e => same(e.word, node.reference)) }));
+}
+
+// The configured callbacks are the trust boundary. Model tokens prove custody,
+// not actual host authority. See the external 3A-2 ADAPTER-CONTRACT receipt.
+const owners = new WeakMap(), views = new WeakMap(), states = new WeakMap(), drafts = new WeakMap();
+const identityFields = ['owner', 'record', 'epoch', 'generation', 'boot', 'journeyId'];
+const isObject = value => value !== null && typeof value === 'object';
+function plainCopy(value, depth = 0, seen = new Set()) {
+  check(depth <= 22, 'depth-bound');
+  if (value === null || typeof value === 'boolean') return value;
+  if (typeof value === 'string') { check(value.length <= 262144, 'byte-bound'); return value; }
+  if (typeof value === 'number') { check(Number.isFinite(value) && !Object.is(value, -0), 'plain-required'); return value; }
+  check(isObject(value) && !seen.has(value), 'plain-required');
+  const array = Array.isArray(value), proto = Object.getPrototypeOf(value);
+  check(proto === Object.prototype || proto === null || (array && proto === Array.prototype), 'plain-required');
+  const ds = Object.getOwnPropertyDescriptors(value), keys = Reflect.ownKeys(ds).filter(k => !(array && k === 'length'));
+  check(keys.length <= 32768 && (!array || keys.length === ds.length.value), 'plain-required');
+  seen.add(value);
+  const result = array ? [] : {};
+  for (let index = 0; index < keys.length; index++) {
+    const key = keys[index], d = ds[key];
+    check(typeof key === 'string' && d.enumerable && Object.hasOwn(d, 'value') &&
+      (!array || key === String(index)), 'plain-required');
+    Object.defineProperty(result, key, { value: plainCopy(d.value, depth + 1, seen), enumerable: true, writable: true, configurable: true });
+  }
+  seen.delete(value);
+  if (depth === 0) check(new TextEncoder().encode(JSON.stringify(result)).length <= 262144, 'byte-bound');
+  return result;
+}
+function copyCarried(catalog, raw) {
+  if (raw === null) return null;
+  const c = record(plainCopy(raw), ['word', 'sourceOccurrence', 'sense']);
+  check(c && resolveWorldcraftWord(catalog, c.word).ok, 'carried-word');
+  const source = c.sourceOccurrence, span = source?.sentence;
+  check(source && !Array.isArray(source) && source.source === 'passage' &&
+    typeof source.passage === 'string' && source.passage.length > 0 &&
+    !Object.hasOwn(source, 'article') && !Object.hasOwn(source, 'span') &&
+    Number.isSafeInteger(source.token) && source.token >= 0 &&
+    Array.isArray(span) && span.length === 2 && span.every(Number.isSafeInteger) &&
+    span[0] >= 0 && span[1] > span[0] && source.token >= span[0] && source.token < span[1], 'carried-occurrence');
+  return freeze(c);
+}
+function sample(owner) {
+  const o = owners.get(owner);
+  if (!o?.active || o.reading) return no('owner-unavailable');
+  const revision = o.revision;
+  o.reading = true;
+  try {
+    const s = record(o.ports.read(), ['owner', 'record', 'epoch', 'generation', 'boot', 'journeyId',
+      'view', 'navigation', 'visit', 'carried', 'root'], ['journeyWrites', 'worldcraftEnabled']);
+    check(s && ['owner', 'record', 'boot', 'view', 'navigation'].every(k => isObject(s[k])) &&
+      Number.isSafeInteger(s.epoch) && s.epoch >= 0 &&
+      ['generation', 'journeyId'].every(k => s[k] === null || (typeof s[k] === 'string' && s[k].length > 0)) &&
+      (s.visit === null || isObject(s.visit)), 'owner-snapshot');
+    if (o.identity && identityFields.some(k => s[k] !== o.identity[k])) {
+      o.active = false; o.revision++; return no('owner-changed');
+    }
+    const carried = copyCarried(o.catalog, s.carried);
+    if (!o.active || o.revision !== revision) return no('owner-changed');
+    if (!o.identity) o.identity = Object.fromEntries(identityFields.map(k => [k, s[k]]));
+    return ok({ ...s, carried, journeyWrites: s.journeyWrites === true, worldcraftEnabled: s.worldcraftEnabled === true });
+  } catch { return no('owner-unavailable'); }
+  finally { o.reading = false; }
+}
+export function createWorldOwner(catalog, ports) {
+  if (!catalogs.has(catalog)) return no('catalog-not-admitted');
+  ports = record(ports, ['read'], ['capture', 'lifecycle', 'digest', 'settledRead']);
+  if (!ports || typeof ports.read !== 'function') return no('adapter-shape');
+  const owner = token();
+  owners.set(owner, { catalog, ports, active: true, reading: false, revision: 0, identity: null });
+  const s = sample(owner);
+  if (!s.ok) { owners.delete(owner); return s; }
+  return ok(owner);
+}
+export function revokeWorldOwner(owner) {
+  const o = owners.get(owner);
+  if (!o?.active) return false;
+  o.active = false; o.revision++; return true;
+}
+export function readWorldOwner(owner) {
+  const result = sample(owner);
+  if (!result.ok) return result;
+  const { view, navigation, visit, carried, journeyWrites, worldcraftEnabled } = result.value;
+  // Shallow only: visit and navigation are live identities owned by the host.
+  return ok(Object.freeze({ catalog: owners.get(owner).catalog, view, navigation, visit, carried, journeyWrites, worldcraftEnabled }));
+}
+export function createWorldView(owner) {
+  const s = sample(owner);
+  if (!s.ok) return s;
+  const ticket = token(); views.set(ticket, { owner, view: s.value.view }); return ok(ticket);
+}
+function worldAccess(state, draft = null, requireView = false) {
+  const s = states.get(state), d = draft === null ? null : drafts.get(draft);
+  if (!s?.active || (draft !== null && (!d || d.state !== state))) return no('state-or-draft-not-owned');
+  const r = sample(s.owner);
+  if (!r.ok || !s.active) return no('owner-changed');
+  if (!r.value.journeyWrites || !r.value.worldcraftEnabled) return no('worldcraft-off');
+  if (requireView && (!d || views.get(d.view)?.owner !== s.owner || views.get(d.view)?.view !== r.value.view)) return no('view-stale');
+  return ok({ s, d, snapshot: r.value, ports: owners.get(s.owner).ports });
+}
+export function createWorldcraftState(owner) {
+  const r = sample(owner);
+  if (!r.ok) return r;
+  if (!r.value.journeyWrites || !r.value.worldcraftEnabled) return no('worldcraft-off');
+  const state = token();
+  states.set(state, { owner, active: true, prefix: crypto.randomUUID(), serial: 0, liveDrafts: 0,
+    inflight: new Map(), removals: new Map() });
+  return ok(state);
+}
+export function discardWorldcraftState(state) {
+  const s = states.get(state);
+  if (!s?.active) return false;
+  s.active = false; return true;
+}
+export function beginBuild(state, catalog, host) {
+  const a = worldAccess(state);
+  if (!a.ok) return a;
+  const { s } = a.value;
+  if (owners.get(s.owner).catalog !== catalog) return no('catalog-not-owned');
+  if (typeof host !== 'string' || !Object.hasOwn(hosts, host)) return no('unsupported-host');
+  const built = resolveBuild(catalog, { host, left: hosts[host], right: '戠' });
+  if (!built.ok) return built;
+  if (s.liveDrafts >= 16 || !Number.isSafeInteger(s.serial + 1)) return no('draft-bound');
+  const draft = token();
+  drafts.set(draft, { state, catalog, built: built.value, key: s.prefix + '/' + (++s.serial),
+    phase: 'new', placement: null, view: null, version: token(), uncertain: false, target: null, released: false });
+  s.liveDrafts++; return ok(draft);
+}
+export function inspectBuild(state, draft) {
+  const a = worldAccess(state, draft);
+  if (!a.ok) return a;
+  const d = a.value.d;
+  return ok(freeze({ buildKey: d.key, host: d.built.ref.host, phase: d.phase,
+    placement: d.placement, uncertain: d.uncertain, recipe: d.built.ref }));
+}
+export async function assembleBuild(state, draft, view) {
+  const d = drafts.get(draft);
+  if (!d || d.state !== state || d.phase !== 'new') return no('draft-not-new');
+  const version = token(); d.phase = 'assembling'; d.version = version; d.view = view;
+  const a = worldAccess(state, draft, true);
+  let proof = null, open = true, failed = false;
+  try {
+    if (!a.ok || typeof a.value.ports.capture !== 'function') throw new Error('capture-unavailable');
+    const settle = kind => { if (open && proof === null) proof = kind; };
+    await a.value.ports.capture(freeze({ host: d.built.ref.host, recipe: d.built.ref, buildKey: d.key }),
+      Object.freeze({ kept: () => settle('kept'), held: () => settle('held') }));
+  } catch { failed = true; }
+  finally { open = false; }
+  const valid = worldAccess(state, draft, true);
+  if (!valid.ok || d.version !== version || d.phase !== 'assembling' || failed || !proof) {
+    if (d.version === version) { d.phase = 'new'; d.view = null; d.version = token(); }
+    return !valid.ok ? valid : no('disclosure-unproved');
+  }
+  d.phase = 'assembled'; d.version = token(); return ok(draft);
+}
+export function placeBuild(state, draft, placement) {
+  const d = drafts.get(draft), witness = d?.version;
+  if (!d || d.state !== state || d.phase !== 'assembled' || d.uncertain || states.get(state)?.inflight.has(d.key)) return no('draft-not-placeable');
+  const a = worldAccess(state, draft, true);
+  if (!a.ok) return a;
+  if (placement !== null) {
+    placement = record(placement, ['x', 'y']);
+    if (!placement || !['x', 'y'].every(k => typeof placement[k] === 'number' && Number.isFinite(placement[k]) && !Object.is(placement[k], -0) && Math.abs(placement[k]) <= 1000)) return no('placement-invalid');
+  }
+  if (!worldAccess(state, draft, true).ok || d.version !== witness || d.phase !== 'assembled' || states.get(state)?.inflight.has(d.key)) return no('draft-changed');
+  d.placement = placement === null ? null : freeze(placement); d.version = token(); return ok(draft);
+}
+function rootRead(state) {
+  const a = worldAccess(state);
+  if (!a.ok) return a;
+  try {
+    const root = plainCopy(a.value.snapshot.root);
+    check(root && root.version === 1 && root.protocol === 'journey-r2' && root.id === a.value.snapshot.journeyId && root.generation === a.value.snapshot.generation &&
+      Number.isSafeInteger(root.revision) && root.revision >= 1 && Array.isArray(root.projects) && root.projects.length <= 16 &&
+      Number.isSafeInteger(root.nextProject) && Number.isSafeInteger(root.progress?.retiredProjects) &&
+      root.nextProject === root.projects.length + root.progress.retiredProjects, 'root-structure');
+    check(new Set(root.projects.map(p => p.id)).size === root.projects.length && root.projects.every(p =>
+      typeof p.id === 'string' && p.id.startsWith(root.id + '/projects/') &&
+      /^[1-9]\d*$/.test(p.id.split('/').at(-1)) && Number(p.id.split('/').at(-1)) <= root.nextProject), 'project-identity');
+    if (!worldAccess(state).ok) return no('owner-changed');
+    return ok(root);
+  } catch { return no('structural'); }
+}
+function projectData(d) { return { status: 'completed', recipe: d.built.ref, buildKey: d.key, placement: d.placement }; }
+function ownedProject(root, d) { return root.projects.find(p => p.buildKey === d.key && p.status === 'completed' && samePlain(p.recipe, d.built.ref) && samePlain(p.placement, d.placement)); }
+function outcome(kind, reason = null, observed = null, extra = {}) { return freeze({ kind, reason, observed, ...extra }); }
+function releaseDraft(s, d) { if (!d.released) { d.released = true; s.liveDrafts--; } }
+function lifecyclePort(ports) {
+  const p = record(ports.lifecycle, ['tick', 'inspect', 'work', 'retire', 'holdUnconfirmed']);
+  check(p && Object.values(p).every(v => typeof v === 'function') && typeof ports.digest === 'function', 'lifecycle-unavailable');
+  return p;
+}
+async function writeProject(state, target, start, requireView = null) {
+  let observed = null, count = 0, thrown = null, lc, ports;
+  const a = worldAccess(state);
+  if (!a.ok) return outcome('refused', a.reason);
+  ports = a.value.ports;
+  try { lc = lifecyclePort(ports); } catch { return outcome('refused', 'lifecycle-unavailable'); }
+  if (!worldAccess(state).ok) return outcome('owner-changed', 'owner-changed');
+  const observe = raw => {
+    count++;
+    const r = record(raw, ['action', 'outcome', 'acknowledged', 'rootHash', 'proposedHash']);
+    observed = r && Object.values(r).every(v => v === null || ['string', 'boolean'].includes(typeof v)) ? freeze(r) : null;
+  };
+  let open = true;
+  try { await start(lc, raw => { if (open) observe(raw); }); } catch (error) {
+    thrown = 'refused';
+    try {
+      const message = Object.getOwnPropertyDescriptor(error, 'message');
+      if (message && Object.hasOwn(message, 'value') && typeof message.value === 'string') thrown = message.value;
+    } catch { /* an untrusted thrown value cannot skip publication reconciliation */ }
+  }
+  finally { open = false; }
+  const owner = worldAccess(state);
+  if (!owner.ok) return outcome('owner-changed', owner.reason, observed);
+  const root = rootRead(state);
+  let exact = false;
+  try {
+    exact = !thrown && count === 1 && observed?.action === target.action && observed.outcome === 'published' &&
+      observed.acknowledged === true && /^[a-f0-9]{64}$/.test(observed.rootHash) &&
+      observed.rootHash === observed.proposedHash && root.ok && ports.digest(root.value) === observed.proposedHash;
+  } catch { /* failed digest is not acknowledgement */ }
+  if (!worldAccess(state).ok) return outcome('owner-changed', 'owner-changed', observed);
+  if (exact) return outcome('published', null, observed, { display: requireView === null || worldAccess(state, requireView, true).ok });
+  if (count === 1 && observed?.action === target.action && observed.outcome === 'not-published') return outcome('not-published', thrown, observed);
+  if (count === 0 && thrown && ['project-exists', 'work-bound', 'root-invalid', 'byte-bound', 'root-unavailable', 'switch-off',
+    'owner-epoch', 'generation-changed', 'stale-root', 'view-stale', 'draft-changed', 'work-missing', 'explicit-retirement'].includes(thrown)) {
+    return outcome(['root-invalid', 'byte-bound', 'root-unavailable'].includes(thrown) ? 'structural' : 'refused', thrown);
+  }
+  try { lc.holdUnconfirmed(); } catch { /* preserve uncertain target */ }
+  return outcome('uncertain', thrown || 'publication-unproved', observed);
+}
+function reserved(s, key, run) {
+  if (s.inflight.has(key)) return s.inflight.get(key);
+  // Schedule after reservation; even a synchronous callback sees the joined call.
+  const pending = Promise.resolve().then(run);
+  s.inflight.set(key, pending);
+  pending.finally(() => { if (s.inflight.get(key) === pending) s.inflight.delete(key); }).catch(() => {});
+  return pending;
+}
+export function keepBuild(state, draft) {
+  const s = states.get(state), d = drafts.get(draft);
+  if (!s?.active || !d || d.state !== state) return Promise.resolve(outcome('refused', 'state-or-draft-not-owned'));
+  return reserved(s, d.key, async () => {
+    const a = worldAccess(state, draft, true);
+    if (!a.ok) return outcome('refused', a.reason);
+    if (!['assembled', 'saved'].includes(d.phase)) return outcome('refused', 'disclosure-unproved');
+    if (d.uncertain) return outcome('uncertain', 'reconcile-required');
+    const root = rootRead(state);
+    if (!root.ok) return outcome('structural', root.reason);
+    const prior = ownedProject(root.value, d);
+    if (prior) { d.phase = 'saved'; releaseDraft(s, d); return outcome('exists', null, null, { projectId: prior.id }); }
+    if (d.phase === 'saved') return outcome('refused', 'saved-project-absent');
+    const version = d.version, target = freeze({ action: 'work', buildKey: d.key, projectId: null, operation: token() });
+    d.target = target;
+    const result = await writeProject(state, target, (lc, observe) => lc.work('projects', projectData(d), { observe,
+      admit(proposed) {
+        const access = worldAccess(state, draft, true);
+        if (!access.ok) throw new Error(access.reason);
+        if (d.version !== version || d.phase !== 'assembled') throw new Error('draft-changed');
+        const next = plainCopy(proposed);
+        if (next.id !== access.value.snapshot.journeyId || next.generation !== access.value.snapshot.generation) throw new Error('owner-epoch');
+        if (next.projects.some(p => p.buildKey === d.key)) throw new Error('project-exists');
+        if (!worldAccess(state, draft, true).ok || d.version !== version) throw new Error('draft-changed');
+      } }), draft);
+    if (result.kind === 'published' || result.reason === 'project-exists') {
+      const current = rootRead(state), found = current.ok && ownedProject(current.value, d);
+      const final = worldAccess(state, draft);
+      if (found && final.ok) {
+        d.phase = 'saved'; releaseDraft(s, d);
+        return outcome(result.kind === 'published' ? 'published' : 'exists', null, result.observed, { projectId: found.id, display: result.display === true && views.get(d.view)?.view === final.value.snapshot.view });
+      }
+      d.uncertain = true;
+      return final.ok ? outcome('uncertain', 'project-unconfirmed', result.observed) : outcome('owner-changed', final.reason, result.observed);
+    }
+    d.uncertain = ['uncertain', 'owner-changed'].includes(result.kind);
+    return result;
+  });
+}
+async function settledRoot(state, target) {
+  const a = worldAccess(state);
+  if (!a.ok) return a;
+  let signalled = false, open = true;
+  try {
+    if (typeof a.value.ports.settledRead !== 'function') return no('settlement-unavailable');
+    await a.value.ports.settledRead(target, () => { if (open) signalled = true; });
+  } catch { return no('settlement-unresolved'); }
+  finally { open = false; }
+  if (!signalled || !worldAccess(state).ok) return no('settlement-unresolved');
+  try {
+    const lc = lifecyclePort(a.value.ports);
+    if (!worldAccess(state).ok) return no('owner-changed');
+    await lc.tick();
+  } catch { return no('settlement-unresolved'); }
+  return rootRead(state);
+}
+export function reconcileBuild(state, draft) {
+  const s = states.get(state), d = drafts.get(draft);
+  if (!s?.active || !d || d.state !== state) return Promise.resolve(outcome('refused', 'state-or-draft-not-owned'));
+  if (s.inflight.has(d.key)) return Promise.resolve(outcome('unresolved', 'target-inflight'));
+  return reserved(s, d.key, async () => {
+    const root = d.uncertain ? await settledRoot(state, d.target) : rootRead(state);
+    if (!root.ok) return outcome('unresolved', root.reason);
+    if (!worldAccess(state, draft).ok) return outcome('refused', 'owner-changed');
+    const found = ownedProject(root.value, d);
+    if (found) { d.uncertain = false; d.phase = 'saved'; releaseDraft(s, d); return outcome('present', null, null, { projectId: found.id }); }
+    if (root.value.projects.some(p => p.buildKey === d.key)) return outcome('unresolved', 'stored-recipe-mismatch');
+    d.uncertain = false;
+    return outcome('absent');
+  });
+}
+export function removeBuild(state, projectId) {
+  const s = states.get(state);
+  if (!s?.active || typeof projectId !== 'string') return Promise.resolve(outcome('refused', 'state-or-project-not-owned'));
+  return reserved(s, 'remove:' + projectId, async () => {
+    const a = worldAccess(state);
+    if (!a.ok) return outcome('refused', a.reason);
+    const pending = s.removals.get(projectId);
+    const root = pending ? await settledRoot(state, pending) : rootRead(state);
+    if (!root.ok) return outcome(pending ? 'unresolved' : 'structural', root.reason);
+    const listing = keptBuilds(root.value, owners.get(s.owner).catalog);
+    if (!listing.ok) return outcome('structural', listing.reason);
+    const row = listing.value.find(p => p.projectId === projectId);
+    if (!row) { s.removals.delete(projectId); return outcome('absent'); }
+    if (!row.actionable) return outcome('refused', 'stored-recipe-unadmitted');
+    if (!worldAccess(state).ok) return outcome('owner-changed', 'owner-changed');
+    const target = freeze({ action: 'retire-work', buildKey: row.buildKey, projectId, operation: token() });
+    const result = await writeProject(state, target, (lc, observe) => lc.retire('projects', projectId, 'retire-completed', { observe }));
+    if (['uncertain', 'owner-changed'].includes(result.kind)) s.removals.set(projectId, target);
+    else s.removals.delete(projectId);
+    return result;
+  });
+}
+export function keptBuilds(root, catalog) {
+  const c = catalogs.get(catalog);
+  if (!c) return no('catalog-not-admitted');
+  try {
+    root = plainCopy(root);
+    check(Array.isArray(root.projects) && root.projects.length <= 16, 'root-structure');
+    return ok(freeze(root.projects.map(p => {
+      const known = c.recipes.get(p.recipe?.host);
+      const placement = p.placement === null || (record(p.placement, ['x', 'y']) &&
+        ['x', 'y'].every(k => typeof p.placement[k] === 'number' && Number.isFinite(p.placement[k]) && !Object.is(p.placement[k], -0) && Math.abs(p.placement[k]) <= 1000));
+      const actionable = p.status === 'completed' && typeof p.buildKey === 'string' && p.buildKey.length <= 512 &&
+        p.buildKey.length > 0 && known && samePlain(p.recipe, known.ref) && placement;
+      return { projectId: p.id, buildKey: p.buildKey ?? null, actionable: !!actionable,
+        reason: actionable ? null : 'stored-recipe-unadmitted', recipe: actionable ? known.ref : null, placement: actionable ? p.placement : null };
+    })));
+  } catch { return no('structural'); }
 }

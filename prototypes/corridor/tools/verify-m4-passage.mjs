@@ -1,7 +1,7 @@
 /** Executable finite-route model controls; no host, learner, timer or browser. */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { createWorldcraftCatalog, SOURCE_PINS } from '../m4-worldcraft.mjs';
+import { createWorldcraftCatalog, SOURCE_PINS, createWorldOwner, revokeWorldOwner } from '../m4-worldcraft.mjs';
 import * as subject from '../m4-passage.mjs';
 
 const base = new URL('../', import.meta.url);
@@ -27,7 +27,15 @@ function unchanged(api, page, command, reason) {
   assert.deepEqual(after, before);
   assert.strictEqual(after.motionTicket, before.motionTicket);
 }
-const newPage = (motion = 'full') => actual(subject.createPassage(catalog, route, { motion }));
+function ownerFixture(admitted = catalog) {
+  const current = { owner: {}, record: {}, boot: {}, epoch: 1, generation: null, journeyId: null,
+    view: {}, navigation: {}, visit: null, carried: null, root: null };
+  const hook = { read: null };
+  const owner = actual(createWorldOwner(admitted, { read: () => { if (hook.read) hook.read(); return { ...current }; } }));
+  return { owner, current, hook };
+}
+const ownerFor = (admitted = catalog) => ownerFixture(admitted).owner;
+const newPage = (motion = 'full') => actual(subject.createPassage(ownerFor(), route, { motion }));
 let cases = 0;
 async function test(name, body) { await body(); cases++; console.log('PASS ' + name); }
 
@@ -51,16 +59,16 @@ await test('route/page capability forgery and borrowed catalog reject', async ()
   const otherCatalog = actual(await createWorldcraftCatalog(bytes));
   refuse(subject.resolvePassage({}));
   refuse(subject.inspectRoute(otherCatalog, route), 'route-not-admitted');
-  refuse(subject.createPassage(otherCatalog, route, { motion: 'full' }), 'route-not-admitted');
+  refuse(subject.createPassage(ownerFor(otherCatalog), route, { motion: 'full' }), 'route-not-admitted');
   for (const forged of [{}, { ...route }, actual(subject.inspectRoute(catalog, route)),
     new Proxy(route, {}), Object.create(route)]) {
-    refuse(subject.createPassage(catalog, forged, { motion: 'full' }));
+    refuse(subject.createPassage(ownerFor(), forged, { motion: 'full' }));
   }
   const page = newPage();
   for (const forged of [{}, { ...page }, view(subject, page), new Proxy(page, {})]) {
     refuse(subject.reducePassage(forged, { type: 'next' }), 'page-not-live');
   }
-  refuse(subject.createPassage(catalog, route, { motion: 'automatic' }), 'motion-unsupported');
+  refuse(subject.createPassage(ownerFor(), route, { motion: 'automatic' }), 'motion-unsupported');
 });
 function nextTrace(motion) {
   const page = newPage(motion), sequence = [view(subject, page).stop.reference.id];
@@ -88,7 +96,7 @@ await test('full/reduced Next traces agree, paused Next stays paused, finish nev
   assert.deepEqual(nextTrace('full'), nextTrace('reduced'));
 });
 function unfinishedReplay(api, admittedRoute) {
-  const page = actual(api.createPassage(catalog, admittedRoute, { motion: 'full' }));
+  const page = actual(api.createPassage(ownerFor(), admittedRoute, { motion: 'full' }));
   unchanged(api, page, { type: 'replay' }, 'existing-ride-use-resume');
   step(api, page, { type: 'next' });
   unchanged(api, page, { type: 'start' }, 'existing-ride-use-resume');
@@ -129,7 +137,7 @@ await test('command and option getters never run; revoked proxies refuse unchang
   Object.defineProperty(progress, 'phase', { get: getter });
   unchanged(subject, page, progress, 'command-shape');
   const options = Object.defineProperty({}, 'motion', { get: getter });
-  refuse(subject.createPassage(catalog, route, options), 'motion-unsupported');
+  refuse(subject.createPassage(ownerFor(), route, options), 'motion-unsupported');
   const { proxy, revoke } = Proxy.revocable({}, {}); revoke();
   unchanged(subject, page, proxy, 'command-shape');
   assert.equal(called, 0);
@@ -146,7 +154,7 @@ function duringReflection(trap, action) {
 }
 function teardownDuringValidation(api, admittedRoute) {
   for (const trap of ['getPrototypeOf', 'ownKeys', 'getOwnPropertyDescriptor']) {
-    const page = actual(api.createPassage(catalog, admittedRoute, { motion: 'full' }));
+    const page = actual(api.createPassage(ownerFor(), admittedRoute, { motion: 'full' }));
     const { command, calls } = duringReflection(trap, () => assert.equal(api.discardPassage(page), true));
     refuse(api.reducePassage(page, command), 'page-state-changed');
     assert.equal(calls(), 1);
@@ -158,7 +166,7 @@ await test('3A-P1 live Proxy teardown refuses the outer transition at every refl
 function reentrantChange(api, admittedRoute) {
   for (const [initial, inner] of [['paused', 'next'], ['paused', 'pause'], ['playing', 'play']]) {
     for (const trap of ['getPrototypeOf', 'getOwnPropertyDescriptor']) {
-      const page = actual(api.createPassage(catalog, admittedRoute, { motion: 'full' }));
+      const page = actual(api.createPassage(ownerFor(), admittedRoute, { motion: 'full' }));
       if (initial === 'playing') step(api, page, { type: 'play' });
       const before = view(api, page);
       let afterInner;
@@ -199,7 +207,7 @@ await test('progress1 is distinct from finish; scheduled completion is exact-onc
   assert.equal(final.cursor.index, 6); assert.equal(final.cursor.phase, 1); assert.equal(final.motionTicket, null);
 });
 function reducedTimer(api, admittedRoute) {
-  const page = actual(api.createPassage(catalog, admittedRoute, { motion: 'reduced' }));
+  const page = actual(api.createPassage(ownerFor(), admittedRoute, { motion: 'reduced' }));
   step(api, page, { type: 'play' });
   unchanged(api, page, { type: 'progress', ticket: null, phase: 1 }, 'motion-progress-refused');
   unchanged(api, page, { type: 'finish-step', ticket: null }, 'motion-progress-refused');
@@ -238,6 +246,121 @@ await test('snapshots immutable; discard idempotent and late actions refused', (
   refuse(subject.reducePassage(page, { type: 'next' }), 'page-not-live');
   assert.equal(subject.discardPassage({}), false);
 });
+
+function carried() {
+  return { word: { type: 'word', id: '知識', reading: 'ちしき' },
+    sourceOccurrence: { source: 'passage', passage: 'fixture', token: 4, sentence: [3, 6], quote: 'fixture quote' }, sense: null };
+}
+await test('absent context invents nothing; actual occurrence is copied, unresolved sense retained', () => {
+  const absent = ownerFixture(), p = actual(subject.createPassage(absent.owner, route, { motion: 'full' }));
+  assert.equal(view(subject, p).carried, null); assert.equal(absent.current.visit, null); assert.equal(absent.current.root, null);
+  const f = ownerFixture(); f.current.carried = carried();
+  const page = actual(subject.createPassage(f.owner, route, { motion: 'full' }));
+  assert.deepEqual(view(subject, page).carried, f.current.carried);
+  f.current.carried.sourceOccurrence.quote = 'later';
+  assert.equal(view(subject, page).carried.sourceOccurrence.quote, 'fixture quote');
+  assert.equal(view(subject, page).carried.sense, null);
+  assert.throws(() => { view(subject, page).carried.word.id = '職'; }, TypeError);
+  for (const edit of [c => c.word.reading = 'invented', c => c.sourceOccurrence.token = 6, c => c.sourceOccurrence.sentence = [4, 4],
+    c => { c.sourceOccurrence.token = 90; c.sourceOccurrence.span = [0, 99]; },
+    c => { c.sourceOccurrence.article = 'other'; }, c => c.sourceOccurrence = {}, c => c.extra = 1]) {
+    const bad = ownerFixture(); bad.current.carried = carried(); edit(bad.current.carried);
+    refuse(subject.createPassage(bad.owner, route, { motion: 'full' }));
+  }
+});
+await test('model owner custody, one live page, stale identity and revoked owner', () => {
+  for (const forged of [{}, new Proxy(ownerFor(), {}), Object.create(ownerFor())]) refuse(subject.createPassage(forged, route, { motion: 'full' }));
+  const f = ownerFixture(), page = actual(subject.createPassage(f.owner, route, { motion: 'full' }));
+  refuse(subject.createPassage(f.owner, route, { motion: 'full' }), 'existing-ride-use-resume');
+  subject.discardPassage(page); actual(subject.createPassage(f.owner, route, { motion: 'full' }));
+  for (const field of ['owner', 'record', 'boot', 'epoch', 'generation', 'journeyId']) {
+    const x = ownerFixture(), p = actual(subject.createPassage(x.owner, route, { motion: 'full' }));
+    x.current[field] = field === 'epoch' ? 2 : ['generation', 'journeyId'].includes(field) ? 'other' : {};
+    refuse(subject.reducePassage(p, { type: 'next' }));
+    refuse(subject.inspectPassage(p));
+  }
+  revokeWorldOwner(f.owner); refuse(subject.createPassage(f.owner, route, { motion: 'full' }));
+});
+function returnsOracle(api, r) {
+  for (const motion of ['full', 'reduced']) {
+    const f = ownerFixture(); f.current.visit = { run: { answers: [] }, help: [] };
+    const p = actual(api.createPassage(f.owner, r, { motion }));
+    step(api, p, { type: 'next' });
+    const ticket = step(api, p, { type: 'play' }).motionTicket;
+    if (motion === 'full') step(api, p, { type: 'progress', ticket, phase: 0.375 });
+    const before = view(api, p), cap = actual(api.interruptPassage(p));
+    unchanged(api, p, { type: 'next' }, 'continuation-pending');
+    refuse(api.interruptPassage(p), 'continuation-pending');
+    for (const wrong of [{}, new Proxy(cap, {}), Object.create(cap)]) refuse(api.resumePassage(p, wrong, f.owner));
+    refuse(api.resumePassage(p, cap, ownerFor()));
+    f.current.visit.run.answers.push('retained'); f.current.visit.help.push('retained');
+    const resumed = actual(api.resumePassage(p, cap, f.owner));
+    assert.deepEqual(resumed.snapshot.cursor, { ...before.cursor, status: 'paused' });
+    assert.equal(resumed.snapshot.motionTicket, null); assert.equal(resumed.snapshot.interrupted, false);
+    assert.strictEqual(resumed.visit, f.current.visit); assert.equal(Object.isFrozen(resumed.visit), false);
+    assert.deepEqual(resumed.visit.run.answers, ['retained']); assert.deepEqual(resumed.visit.help, ['retained']);
+    assert.deepEqual(resumed.effects, []); refuse(api.resumePassage(p, cap, f.owner));
+    unchanged(api, p, { type: 'progress', ticket, phase: 1 }, 'motion-progress-refused');
+  }
+}
+await test('exact paused return, one-use capability, pending fence and detour learning retained', () => returnsOracle(subject, route));
+await test('completed cursor also returns paused without rewinding index or phase', () => {
+  for (const motion of ['full', 'reduced']) {
+    const f = ownerFixture(), p = actual(subject.createPassage(f.owner, route, { motion }));
+    for (let i = 0; i < 7; i++) step(subject, p, { type: 'next' });
+    const before = view(subject, p).cursor, cap = actual(subject.interruptPassage(p));
+    assert.equal(before.status, 'complete');
+    const r = actual(subject.resumePassage(p, cap, f.owner));
+    assert.deepEqual(r.snapshot.cursor, { ...before, status: 'paused' });
+    assert.equal(r.snapshot.motionTicket, null);
+    refuse(subject.resumePassage(p, cap, f.owner));
+    unchanged(subject, p, { type: 'finish-step', ticket: null }, 'motion-progress-refused');
+  }
+});
+function staleReturn(api, r) {
+  for (const field of ['navigation', 'visit']) {
+    const f = ownerFixture(); f.current.visit = {};
+    const p = actual(api.createPassage(f.owner, r, { motion: 'full' })), cap = actual(api.interruptPassage(p));
+    const old = f.current[field]; f.current[field] = {};
+    refuse(api.resumePassage(p, cap, f.owner), field === 'navigation' ? 'navigation-stale' : 'visit-stale');
+    f.current[field] = old; actual(api.resumePassage(p, cap, f.owner));
+  }
+}
+await test('stale navigation or actual visit refuses without consuming valid return', () => staleReturn(subject, route));
+await test('explicit null-to-visit adoption once; existing visit cannot be replaced', () => {
+  const f = ownerFixture(), p = actual(subject.createPassage(f.owner, route, { motion: 'full' }));
+  const cap = actual(subject.interruptPassage(p));
+  refuse(subject.adoptPassageVisit(p, cap, f.owner));
+  f.current.visit = { run: { answers: ['detour'] } };
+  refuse(subject.resumePassage(p, cap, f.owner), 'visit-stale');
+  actual(subject.adoptPassageVisit(p, cap, f.owner));
+  refuse(subject.adoptPassageVisit(p, cap, f.owner), 'visit-adoption-refused');
+  assert.strictEqual(actual(subject.resumePassage(p, cap, f.owner)).visit, f.current.visit);
+  const cap2 = actual(subject.interruptPassage(p)); f.current.visit = {};
+  refuse(subject.adoptPassageVisit(p, cap2, f.owner), 'visit-adoption-refused');
+  refuse(subject.resumePassage(p, cap2, f.owner), 'visit-stale');
+  subject.discardPassage(p); refuse(subject.resumePassage(p, cap2, f.owner));
+});
+function returnReentry(api, r) {
+  for (const action of ['discard', 'revoke']) {
+    for (const call of ['interrupt', 'resume', 'adopt']) {
+      const f = ownerFixture(), p = actual(api.createPassage(f.owner, r, { motion: 'full' }));
+      const cap = call === 'interrupt' ? null : actual(api.interruptPassage(p));
+      if (call === 'adopt') f.current.visit = {};
+      f.hook.read = () => { f.hook.read = null; if (action === 'discard') api.discardPassage(p); else revokeWorldOwner(f.owner); };
+      refuse(call === 'interrupt' ? api.interruptPassage(p) : call === 'resume' ? api.resumePassage(p, cap, f.owner) : api.adoptPassageVisit(p, cap, f.owner));
+    }
+  }
+}
+await test('owner callback teardown during interrupt, adopt and resume cannot revive a page', () => returnReentry(subject, route));
+await test('discarded continuation and its late timer cannot affect replacement page', () => {
+  const f = ownerFixture(), p = actual(subject.createPassage(f.owner, route, { motion: 'full' }));
+  const ticket = step(subject, p, { type: 'play' }).motionTicket, cap = actual(subject.interruptPassage(p));
+  subject.discardPassage(p); const replacement = actual(subject.createPassage(f.owner, route, { motion: 'full' }));
+  refuse(subject.resumePassage(p, cap, f.owner)); refuse(subject.resumePassage(replacement, cap, f.owner));
+  refuse(subject.reducePassage(p, { type: 'progress', ticket, phase: 1 }));
+  assert.equal(view(subject, replacement).cursor.index, 0);
+});
 async function mutant(replacements) {
   let source = readFileSync(new URL('m4-passage.mjs', base), 'utf8');
   for (const [before, after] of replacements) {
@@ -248,6 +371,10 @@ async function mutant(replacements) {
 }
 let killed = 0;
 for (const [name, replacements, oracle] of [
+  ['return navigation custody removed', [["if (owned.value.navigation !== held.navigation) return no('navigation-stale');", "if (false) return no('navigation-stale');"]], staleReturn],
+  ['return visit custody removed', [["if (owned.visit !== held.visit) return no('visit-stale');", "if (false) return no('visit-stale');"]], staleReturn],
+  ['return paused state removed', [["value.current = { ...held.retained, status: 'paused' };", "value.current = { ...held.retained, status: 'playing' };"]], returnsOracle],
+  ['return reentrant page fence removed', [["if (live(page) !== value || value.current !== current || value.pending !== capability || held.consumed) return no('page-state-changed');", "if (false) return no('page-state-changed');"], ["if (!b.ok || b.value.current !== current || b.value.owned.visit !== held.visit) return no('page-state-changed');", "if (false) return no('page-state-changed');"]], returnReentry],
   ['unfinished replay guard removed', [["if (current.status !== 'complete') return no('existing-ride-use-resume');", 'if (false) return no(\'existing-ride-use-resume\');']], unfinishedReplay],
   ['reduced timer progress admitted', [
     ["if (current.motion !== 'full' || current.status !== 'playing') return no('motion-progress-refused');", "if (current.status !== 'playing') return no('motion-progress-refused');"],
