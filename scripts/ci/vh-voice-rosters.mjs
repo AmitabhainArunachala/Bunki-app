@@ -553,7 +553,7 @@ export const SENSE_CASE_IDS = Object.freeze([
   'chromium/C.case.C3.aozora:000772-1.1304',
   'chromium/C.case.C3.aozora:000772-1.1454',
   'chromium/C.case.C3.aozora:000772-1.1516',
-  'chromium/C.case.C2.bunki-read-n2-shima-4004.564',
+  'chromium/C.case.C2.wikinews:12024.33',
   'chromium/C.case.C2.bunki-read-n1-optogenetics-nobel.164',
   'chromium/C.case.C3.bunki-read-n2-kobe-jain.199',
   'chromium/C.case.C3.bunki-read-n3-honda-quarter.35',

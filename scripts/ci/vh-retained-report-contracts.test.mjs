@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { retainedReportContracts, driftFastSchedule } from './vh-retained-report-contracts.mjs';
+import { accessibilitySourceInventory, compareInventory } from './vh-inventory-source-parity.mjs';
 import {
   INVENTORY as PRODUCER_WORD_INVENTORY,
   LEARNING_RECORD_CONTROLS,
@@ -166,7 +167,7 @@ test('reviewed inventories are independently fixed, including full fast schedule
       // merge 2: Hfix-1A item 18's three pending-save rows: 283 → 286
       // Ladder 82997bcb, accepted9a26f84d: two authored English-rung assertions,286 →288.
       corridor: 288,
-      'corridor-a11y': 62,
+      'corridor-a11y': 66,
       'drift-fast': 66,
       'word-saved-answer-mutation-controls': 38,
     },
@@ -833,3 +834,60 @@ test('Corridor accepts the full authored Ladder schedule and rejects old names, 
     );
   }
 });
+
+const A11Y_REPLACEMENTS = [
+  [
+    'pointer action two opens the stage with the reading and meaning, and writes nothing under the word',
+    'pointer action three opens the stage with the reading and meaning, and writes nothing under the word but its own English',
+  ],
+  [
+    'a third action on the same word opens its full entry — the popup gone, no English under the word, the word still the chosen one',
+    "a fourth action on the same word opens its full entry — the popup gone, the word's own English held under it, the word still the chosen one",
+  ],
+  [
+    'particle pointer tap opens its quick look, never the sheet or a reveal',
+    'particle pointer tap (its second, Ladder) opens its quick look, never the sheet or a reveal',
+  ],
+];
+const A11Y_ADDITIONS = [
+  'Shift+Enter next sets the English under the word, its reading kept, no stage yet',
+  'pointer action two sets the English under the word, its reading kept, no stage yet',
+  'keyboard Enter next sets the English under the word and keeps the selected occurrence',
+  'particle pointer tap first sets its role in English under it, never the sheet, a reveal or a stage',
+];
+test('a11y independent 66-name roster equals parsed producer expansion', () => {
+  const root = fileURLToPath(new URL('../..', import.meta.url));
+  const actual = accessibilitySourceInventory(root);
+  assert.equal(actual.rows.length, 66);
+  assert.deepEqual(actual.diagnostics, ['a pointer touch reaches its intended control']);
+  compareInventory(retainedReportContracts['corridor-a11y'].expectedCases(), actual.rows);
+});
+test('a11y shuffled complete receipt is accepted without weakening exact membership', () => {
+  const { report, context, contract } = fixture('corridor-a11y');
+  report.results.reverse();
+  const result = contract.validate(report, context);
+  assert.equal(result.passed, true, result.errors.join('; '));
+});
+for (const mutation of ['old62', 'missing', 'duplicate', 'extra', 'renamed', 'red'])
+  test(`a11y rejects ${mutation} through the actual consumer`, () => {
+    const { report, context, contract } = fixture('corridor-a11y');
+    if (mutation === 'old62') {
+      report.results = report.results.filter((row) => !A11Y_ADDITIONS.includes(row.name));
+      for (const row of report.results)
+        row.name = A11Y_REPLACEMENTS.find(([, current]) => current === row.name)?.[0] || row.name;
+      assert.equal(report.results.length, 62);
+    }
+    if (mutation === 'missing') report.results.pop();
+    if (mutation === 'duplicate') report.results[1] = structuredClone(report.results[0]);
+    if (mutation === 'extra') report.results.push({ name: 'unreviewed extra check', pass: true });
+    if (mutation === 'renamed') report.results[0].name = 'unreviewed renamed check';
+    if (mutation === 'red') report.results[0].pass = false;
+    report.summary = { total: report.results.length, failed: mutation === 'red' ? 1 : 0 };
+    const result = contract.validate(report, context);
+    assert.equal(result.passed, false);
+    if (mutation !== 'red')
+      assert(
+        result.errors.includes('Missing, duplicate, extra or renamed case'),
+        result.errors.join('; '),
+      );
+  });

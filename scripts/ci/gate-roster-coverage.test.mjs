@@ -10,10 +10,18 @@ import {
   runGates,
   validateKanjiTrustReport,
   validateHfix2aReport,
+  verifyStandaloneJourneyReports,
 } from '../verify-release-gates.mjs';
 import { BATCH3_SUITES, batch3NarrowingEnvironment } from './vh-batch3-report-contracts.mjs';
 import { supplementalGates } from './supplemental.mjs';
 import { gateEvidenceDeclaration } from './gate-evidence.mjs';
+import {
+  inventoryCensus,
+  requireInventoryCensusReady,
+  compareInventory,
+  standaloneModuleSourceInventory,
+  accessibilitySourceInventory,
+} from './vh-inventory-source-parity.mjs';
 import { acceptanceEnvironment, NARROWING_ENV } from './verification-admission.mjs';
 const root = fileURLToPath(new URL('../..', import.meta.url)),
   out = '/independent-coverage-only/no-execution';
@@ -788,4 +796,111 @@ put('lane-admission.json',admission);
       assert.equal(result.exitCode, mutation === 'good' ? 0 : 1, `${engine}/${mutation}`);
     }
   }
+});
+
+test('standalone module inventory independently equals the builder ordered map', () => {
+  const actual = standaloneModuleSourceInventory(root);
+  assert.equal(actual.rows.length, 9);
+  assert.deepEqual(actual.rows.slice(-3), [
+    './review-caller.mjs',
+    './help-relevance.mjs',
+    './journey-lifecycle.mjs',
+  ]);
+});
+test('standalone coherent receipt and build sidecar reject old6/missing/duplicate/reordered/extra modules', () => {
+  const parent = join(homedir(), '.dharma/bunki/verifier-receipts/W3-INVENTORY-01-standalone');
+  mkdirSync(parent, { recursive: true });
+  const output = mkdtempSync(join(parent, 'controls-'));
+  verifyStandaloneJourneyReports(output);
+  const receipt = JSON.parse(
+    readFileSync(join(output, 'standalone-journey-report-controls/controls.json'), 'utf8'),
+  );
+  for (const name of [
+    'old-six-record-modules',
+    'missing-record-module',
+    'duplicate-record-module',
+    'reordered-record-modules',
+    'unknown-extra-record-module',
+  ])
+    assert(
+      receipt.controls.some((row) => row.name === name && row.rejected === true),
+      name,
+    );
+});
+test('source expansion refuses unreviewed producer bytes instead of adopting its new inventory', () => {
+  const parent = join(homedir(), '.dharma/bunki/verifier-receipts/W3-INVENTORY-01-source-mutation');
+  mkdirSync(parent, { recursive: true });
+  const fixture = mkdtempSync(join(parent, 'mutation-'));
+  const directory = join(fixture, 'prototypes/corridor/tools');
+  mkdirSync(directory, { recursive: true });
+  writeFileSync(
+    join(directory, 'verify-corridor-accessibility.mjs'),
+    readFileSync(
+      join(root, 'prototypes/corridor/tools/verify-corridor-accessibility.mjs'),
+      'utf8',
+    ) + '\n// unreviewed selector or assertion change\n',
+  );
+  assert.throws(() => accessibilitySourceInventory(fixture), /Unreviewed producer expansion/u);
+});
+test('inventory comparison keeps ordering and repeated occurrence identity; no unknown mode defaults green', () => {
+  assert(compareInventory(['a', 'b'], ['b', 'a'], 'unordered-exact'));
+  assert(compareInventory(['a', 'a', 'b'], ['a', 'a', 'b'], 'indexed-occurrence'));
+  for (const [expected, actual, mode] of [
+    [['a', 'b'], ['a'], 'unordered-exact'],
+    [['a'], ['a', 'b'], 'unordered-exact'],
+    [['a', 'b'], ['b', 'a'], 'ordered'],
+    [['a', 'a', 'b'], ['a', 'b'], 'indexed-occurrence'],
+    [['a'], ['a'], 'unknown'],
+    [[], [], 'unordered-exact'],
+    [['a'], [null], 'ordered'],
+  ])
+    assert.throws(() => compareInventory(expected, actual, mode));
+});
+test('all 216 source inventory mappings expose unresolved expansion and closure as admission blockers', () => {
+  const census = inventoryCensus(root, gates, out);
+  assert.equal(census.count, 216);
+  assert.deepEqual(
+    census.rows.map((row) => row.name),
+    gates.map((gate) => gate.name),
+  );
+  assert.deepEqual(
+    census.rows.map((row) => row.declaration?.kind),
+    gates.map((gate) => gateEvidenceDeclaration(gate, root, out).kind),
+  );
+  for (const name of ['corridor-a11y', 'sense-truth', 'sense-truth-webkit'])
+    assert.equal(
+      census.rows.find((row) => row.name === name).sourceSchedule.status,
+      'VERIFIED',
+      name,
+    );
+  assert.equal(
+    census.rows.find((row) => row.name === 'standalone-journey').sourceSchedule.moduleInventory
+      .status,
+    'VERIFIED',
+  );
+  for (const row of census.rows) {
+    assert.equal(row.parity, 'BLOCKED', row.name);
+    assert(row.blockers.length > 0, row.name);
+    assert(row.closure.references.length > 0, row.name);
+    assert.equal(row.selectors.status, 'UNRESOLVED', row.name);
+  }
+  assert.equal(census.status, 'BLOCKED');
+  assert.equal(census.unresolved.length, 216);
+  assert.throws(() => requireInventoryCensusReady(census), /Inventory admission blocked/u);
+  const selfCertified = structuredClone(census);
+  selfCertified.status = 'VERIFIED';
+  for (const row of selfCertified.rows) {
+    row.parity = 'VERIFIED';
+    row.blockers = [];
+  }
+  assert.throws(
+    () => requireInventoryCensusReady(selfCertified),
+    /unproven producer schedule|unproven selectors|unproven closure/u,
+  );
+  for (const bad of [
+    gates.slice(1),
+    [...gates.slice(0, -1), gates[0]],
+    [{ ...gates[0], name: 'unmapped-gate' }, ...gates.slice(1)],
+  ])
+    assert.throws(() => inventoryCensus(root, bad, out));
 });

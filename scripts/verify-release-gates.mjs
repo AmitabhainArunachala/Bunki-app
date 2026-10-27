@@ -1843,6 +1843,9 @@ const STANDALONE_RECORD_MODULES = [
   './record-sync.mjs',
   './modules/record-core.mjs',
   './srs-core.mjs',
+  './review-caller.mjs',
+  './help-relevance.mjs',
+  './journey-lifecycle.mjs',
 ];
 const PRACTICE_HISTORY_CASES = [
   'two-completed-attempts-and-failed-save-actions',
@@ -6271,7 +6274,7 @@ function verifySearchReports(out) {
   ];
 }
 
-function verifyStandaloneJourneyReports(out) {
+export function verifyStandaloneJourneyReports(out) {
   const directory = join(out, 'standalone-journey-report-controls');
   mkdirSync(directory);
   const path = join(directory, 'results.json'),
@@ -6573,6 +6576,24 @@ window.__KAIRO_INK_URL__ = standaloneModuleUrl("${inkBytes.toString('base64')}")
       'foreign-output',
       (v) => {
         v.standalone.output += '-other';
+      },
+    ],
+    [
+      'old-six-record-modules',
+      (v) => {
+        v.standalone.inlinedRecordModules = v.standalone.inlinedRecordModules.slice(0, 6);
+      },
+    ],
+    [
+      'reordered-record-modules',
+      (v) => {
+        v.standalone.inlinedRecordModules.reverse();
+      },
+    ],
+    [
+      'unknown-extra-record-module',
+      (v) => {
+        v.standalone.inlinedRecordModules.push('./unknown-record-module.mjs');
       },
     ],
     [

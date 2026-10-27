@@ -3,7 +3,12 @@ import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { pathToFileURL, URL } from 'node:url';
+import { pathToFileURL, fileURLToPath, URL } from 'node:url';
+import {
+  senseSourceInventory,
+  senseShardEntry,
+  compareInventory,
+} from './vh-inventory-source-parity.mjs';
 import {
   voiceReportContracts,
   validateVoiceReport,
@@ -71,11 +76,11 @@ function speak(engine = 'chromium') {
   }
   return { report, context };
 }
-function sense() {
-  const { report, context } = base('sense-truth');
+function sense(engine = 'chromium') {
+  const { report, context } = base('sense-truth', engine);
   Object.assign(report, {
-    engines: ['chromium'],
-    versions: { chromium: '26.6' },
+    engines: [engine],
+    versions: { [engine]: '26.6' },
     complete: true,
     partial: false,
     vhControl: null,
@@ -957,4 +962,87 @@ test('independent admission requires all 22 WebKit or 21 Chromium applicable con
       );
     }
   }
+});
+
+test('Sense first eligible source/data representatives equal both independent engine rosters', () => {
+  const source = senseSourceInventory(fileURLToPath(new URL('../..', import.meta.url)));
+  assert.equal(source.data.length, 135);
+  assert.equal(source.browser.length, 1490);
+  assert.deepEqual(
+    Object.fromEntries(
+      ['C1', 'C2', 'C3', 'C4'].map((cls) => [
+        cls,
+        source.classes.filter((c) => c.cls === cls).length,
+      ]),
+    ),
+    { C1: 54, C2: 19, C3: 212, C4: 1029 },
+  );
+  assert.deepEqual(
+    source.occurrences.slice(0, 2).map(({ at, index }) => ({ at, index })),
+    [
+      { at: 'wikinews:12024', index: 33 },
+      { at: 'wikinews:12024', index: 348 },
+    ],
+  );
+  assert.equal(source.occurrences.length, 24);
+  assert.deepEqual(source.occurrences[3].at, 'bunki-read-n2-shima-4004');
+  assert.equal(source.occurrences[3].index, 564);
+  for (const engine of ['chromium', 'webkit'])
+    compareInventory(voiceReportContracts['sense-truth'].expectedCases(engine), [
+      ...source.data,
+      ...source.browser.map((id) => `${engine}/${id}`),
+    ]);
+  compareInventory(voiceReportContracts['sense-truth'].expectedCases('all'), [
+    ...source.data,
+    ...['chromium', 'webkit'].flatMap((engine) => source.browser.map((id) => `${engine}/${id}`)),
+  ]);
+});
+for (const engine of ['chromium', 'webkit']) {
+  test(`Sense ${engine} complete fixture retains 135 data + 1490 browser rows`, () => {
+    const { report, context } = sense(engine);
+    assert.equal(report.rows.filter((row) => row.engine === 'data').length, 135);
+    assert.equal(report.rows.filter((row) => row.engine === engine).length, 1490);
+    const result = validateVoiceReport('sense-truth', report, context);
+    assert.equal(result.passed, true, result.errors.join('; '));
+  });
+  for (const mutation of [
+    'old',
+    'later',
+    'same-count-swap',
+    'missing',
+    'duplicate',
+    'extra',
+    'wrong-engine',
+  ])
+    test(`Sense ${engine} coherently declared ${mutation} representative is rejected`, () => {
+      const { report, context } = sense(engine);
+      const index = report.rows.findIndex(
+        (row) => row.engine === engine && row.id === 'C.case.C2.wikinews:12024.33',
+      );
+      assert(index >= 0);
+      const canonical = report.rows[index];
+      if (mutation === 'old') canonical.id = 'C.case.C2.bunki-read-n2-shima-4004.564';
+      if (mutation === 'later') canonical.id = 'C.case.C2.wikinews:12024.348';
+      if (mutation === 'same-count-swap') canonical.id = 'C.case.C2.wikinews:12024.34';
+      if (mutation === 'missing') report.rows.splice(index, 1);
+      if (mutation === 'duplicate') report.rows[index + 1] = structuredClone(canonical);
+      if (mutation === 'extra')
+        report.rows.push({ engine, id: 'C.case.C2.unreviewed.0', ok: true });
+      if (mutation === 'wrong-engine')
+        canonical.engine = engine === 'chromium' ? 'webkit' : 'chromium';
+      report.expectedCases = report.rows.map((row) => `${row.engine}/${row.id}`);
+      report.observedCases = [...report.expectedCases];
+      const result = validateVoiceReport('sense-truth', report, context);
+      assert.equal(result.passed, false);
+      assert(
+        result.errors.includes('Missing, duplicate, extra or wrong-engine roster'),
+        result.errors.join('; '),
+      );
+    });
+}
+
+test('Sense lookup cannot borrow an entry from the wrong dictionary shard', () => {
+  const entry = ['2083100', '日', [], [[['ctr']]]];
+  assert.equal(senseShardEntry(new Map([['01', new Map([['2083100', entry]])]]), '2083100'), entry);
+  assert.equal(senseShardEntry(new Map([['00', new Map([['2083100', entry]])]]), '2083100'), null);
 });
