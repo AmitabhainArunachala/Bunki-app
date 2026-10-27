@@ -6,7 +6,7 @@ import { resolve } from 'node:path';
 import { englishSourcePins, englishExpectations, ENGLISH_ROOT, assertEnglishSource,
   observeEnglish, judgeEnglishSnapshot, installEnglishMonitor } from './reader-english-rung.mjs';
 import { ENGLISH_CONTROLS, CONTROL_EXPECTATION, syntheticEnglishSnapshot, syntheticEnglishBaseline,
-  runPureEnglishControls, syntheticEnglishReceipt } from './reader-english-rung-controls.mjs';
+  runPureEnglishControls, syntheticEnglishReceipt, pureMonitorFixture, controlExpectation } from './reader-english-rung-controls.mjs';
 import { validateNativeReaderEnglishRung, batteryGates } from '../../../scripts/verify-release-gates.mjs';
 import { supplementalGates } from '../../../scripts/ci/supplemental.mjs';
 const pins = englishSourcePins(), entries = englishExpectations(), artifact = 'a'.repeat(64);
@@ -48,6 +48,11 @@ test('context decisions do not substitute the easier dictionary spelling or flat
   assert.deepEqual(bySurface('高い').readingSegments, ['たか']);
   assert.equal(bySurface('高い').sourceReading, 'たかい');
   assert.equal(entries.filter(e => !e.readingSegments.length).length, 7);
+  const address = entries.find(e => e.id === 'bunki-graded-n3-hidden-deity');
+  assert.equal(address.occurrenceIndex, 1); assert.equal(address.english, 'sensei');
+  assert.equal(address.dictionary.seq, '1387990'); assert.equal(address.dictionary.senseIndex, 1);
+  assert.equal(address.dictionary.pointer, '/entries/1303/3/1');
+  assert.match(address.decision, /vocative/u);
 });
 const controls = await runPureEnglishControls();
 for (const [id, wanted] of ENGLISH_CONTROLS) test(`production loop: ${id} → ${wanted}`, () => {
@@ -76,11 +81,12 @@ test('source reading mismatch is not accepted even if joined text happens to mat
   const expected = { ...CONTROL_EXPECTATION, readingSegments: ['た', 'か'] };
   assert.throws(() => judgeEnglishSnapshot(syntheticEnglishSnapshot(), expected), /wrong-reading/u);
 });
-test('kana-only source legitimately needs no ruby but still needs visible English', () => {
+test('kana-only source needs visible source ink and English even with no ruby', () => {
   const expected = { ...CONTROL_EXPECTATION, readingSegments: [] };
   const row = syntheticEnglishSnapshot(expected);
   assert.equal(judgeEnglishSnapshot(row, expected), true);
-  row.englishVisible = false; assert.equal(judgeEnglishSnapshot(row, expected), false);
+  row.readingVisible = false; assert.equal(judgeEnglishSnapshot(row, expected), false);
+  row.readingVisible = true; row.englishVisible = false; assert.equal(judgeEnglishSnapshot(row, expected), false);
 });
 test('monitor installation is browser-serializable and imports start no browser', () => {
   assert.doesNotThrow(() => new Function(`return (${installEnglishMonitor.toString()})`));
@@ -135,3 +141,78 @@ test('source pin serialization order is immaterial; array occurrence order remai
   const receipt = nativeReceipt(); receipt.readerEnglishRung.observations.reverse();
   assert.throws(() => validateNativeReaderEnglishRung(receipt, context));
 });
+
+// These execute the browser-serializable production monitor, not manufactured snapshots.
+for (const [id, outcome] of ENGLISH_CONTROLS.slice(13, -2)) test(`actual monitor DOM double: ${id}`, () => {
+  const expected = controlExpectation(id), f = pureMonitorFixture(expected);
+  try {
+    assert.equal(judgeEnglishSnapshot(f.monitor.read(), expected, { baseline: true }), false);
+    f.paint(id);
+    if (outcome === 'wrong-identity') assert.throws(() => judgeEnglishSnapshot(f.monitor.read(), expected), /wrong-identity/u);
+    else assert.equal(judgeEnglishSnapshot(f.monitor.read(), expected), outcome === 'accepted');
+  } finally { f.monitor.close(); }
+});
+test('actual monitor rejects transparent fill and hidden base glyph with visible ruby', () => {
+  for (const id of ['transparent-ink', 'hidden-base']) {
+    const f = pureMonitorFixture();
+    try {
+      f.paint(id);
+      if (id === 'hidden-base') f.token.querySelector('ruby').style.webkitTextFillColor = 'transparent';
+      assert.equal(judgeEnglishSnapshot(f.monitor.read(), CONTROL_EXPECTATION), false);
+    } finally { f.monitor.close(); }
+  }
+});
+test('same-surface plain-to-ruby row repaint and repeated equal text remain valid', () => {
+  const f = pureMonitorFixture();
+  try {
+    // Product paintTok replaces .tok-word when its requested reading becomes visible.
+    const plain = f.word.cloneNode(true); plain.childNodes = [f.text('高い')]; plain.firstChild.parentElement = plain;
+    f.replace(f.word, plain); f.monitor.read();
+    f.replace(plain, f.word); f.paint('same-text-repaint');
+    assert.equal(judgeEnglishSnapshot(f.monitor.read(), CONTROL_EXPECTATION), true);
+  } finally { f.monitor.close(); }
+});
+test('newly added glyph text retains characterData history through restoration', () => {
+  const f = pureMonitorFixture();
+  try {
+    f.paint('same-text-word-repaint');
+    const glyph = f.token.querySelector('ruby').firstChild;
+    f.records.push({ type: 'characterData', target: glyph, oldValue: '高' },
+      { type: 'characterData', target: glyph, oldValue: '安' });
+    glyph.data = '高';
+    assert.throws(() => judgeEnglishSnapshot(f.monitor.read(), CONTROL_EXPECTATION), /wrong-identity/u);
+  } finally { f.monitor.close(); }
+});
+test('hit relation accepts ink/descendants/real ancestors, rejects its sibling and external cover', () => {
+  for (const target of ['ink', 'descendant', 'ancestor', 'sibling', 'external']) {
+    const f = pureMonitorFixture();
+    try {
+      f.paint('pointer-none-English'); const ink = f.token.querySelector('.tok-en-text');
+      f.realm.document.elementFromPoint = (_x, y) => y < 60 ? f.token :
+        target === 'ink' ? ink : target === 'descendant' ? ink.firstChild :
+          target === 'ancestor' ? f.token : target === 'sibling' ? f.word : f.text('cover');
+      assert.equal(judgeEnglishSnapshot(f.monitor.read(), CONTROL_EXPECTATION), ['ink', 'descendant', 'ancestor'].includes(target), target);
+    } finally { f.monitor.close(); }
+  }
+});
+test('color channels are not alpha; numeric/slash/percent alpha zero and fill are rejected', () => {
+  for (const [color, accepted] of [['rgb(0, 0, 0)', true], ['rgb(10, 20, 0)', true],
+    ['rgb(10 20 0)', true], ['rgba(0, 0, 0, 1)', true], ['rgb(0 0 0 / 100%)', true],
+    ['rgba(10, 20, 30, 0)', false], ['rgb(10 20 30 / 0)', false], ['rgb(10 20 30 / 0%)', false],
+    ['rgba(1, 2, 3, 0.0)', false], ['transparent', false]]) {
+    const f = pureMonitorFixture();
+    try {
+      f.paint('pointer-none-English'); const ink = f.token.querySelector('.tok-en-text');
+      ink.style.color = color; ink.style.webkitTextFillColor = color;
+      assert.equal(judgeEnglishSnapshot(f.monitor.read(), CONTROL_EXPECTATION), accepted, color);
+    } finally { f.monitor.close(); }
+  }
+});
+for (const kind of ['pureControls', 'browserControls']) for (const [id] of ENGLISH_CONTROLS.slice(13, -2)) {
+  test(`native admission requires expanded ${kind} ${id}`, () => {
+    const receipt = nativeReceipt();
+    const rows = kind === 'pureControls' ? receipt.readerEnglishRung.pureControls : receipt.readerEnglishRung.browserControls.results;
+    rows.splice(rows.findIndex(r => r.id === id), 1);
+    assert.throws(() => validateNativeReaderEnglishRung(receipt, context));
+  });
+}

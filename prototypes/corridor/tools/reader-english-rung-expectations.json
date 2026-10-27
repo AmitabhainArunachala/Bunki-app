@@ -344,7 +344,7 @@
       "readingSegments": [
         "せんせい"
       ],
-      "english": "teacher",
+      "english": "sensei",
       "article": {
         "path": "prototypes/corridor/data/articles/bunki-graded-n3-hidden-deity.json",
         "sha256": "b1b8618fb1e5d7703c3ba16ef781c412f42a09d7c5740bab6870f47dc46373dc",
@@ -368,9 +368,9 @@
         "path": "prototypes/corridor/data/share_alike/dict-v2/0a.json",
         "sha256": "373d58f021180ce13ee15224cd79000c2e8406518fc05e7fdaddf7c15890308d",
         "sourcePin": "3.6.2+20260803141815",
-        "pointer": "/entries/1303/3/0",
+        "pointer": "/entries/1303/3/1",
         "seq": "1387990",
-        "senseIndex": 0,
+        "senseIndex": 1,
         "kanjiForms": [
           [
             "先生",
@@ -390,7 +390,8 @@
         ],
         "sense": [
           [
-            "n"
+            "n",
+            "n-suf"
           ],
           [
             "*"
@@ -402,29 +403,26 @@
           [],
           [],
           [],
-          [],
+          [
+            "hon"
+          ],
           [],
           [],
           [
             [
-              "teacher",
+              "sensei",
               null,
               null
             ],
             [
-              "instructor",
+              "title or form of address for a teacher, master, doctor, lawyer, etc.",
               null,
-              null
-            ],
-            [
-              "master",
-              null,
-              null
+              "explanation"
             ]
           ]
         ]
       },
-      "decision": "Direct address 先生: teacher proposed; W2 must review sense 1 (sensei/title of address) ambiguity.",
+      "decision": "Direct address 「先生、…」 uses the vocative/title sense: sensei, raw sequence 1387990 sense 1; corrected per W2 C-L1. Profession sense 0 is not the occurrence oracle.",
       "senseRecord": {
         "path": "prototypes/corridor/data/articles/senses.json",
         "sha256": "f15405331c149f313d6e1f3823ba9f7d90ecc769f979fed2980a030daf760387",

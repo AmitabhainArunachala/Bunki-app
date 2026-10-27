@@ -132,22 +132,47 @@ export function installEnglishMonitor(node) {
     return copy?.textContent;
   };
   const originalSurface = surfaceOf(node?.querySelector(':scope > .tok-word'));
-  const wordText = new WeakMap();
-  const rememberText = () => {
-    const word = node?.querySelector(':scope > .tok-word');
-    if (!word) return;
-    const walk = document.createTreeWalker(word, NodeFilter.SHOW_TEXT);
-    for (let text = walk.nextNode(); text; text = walk.nextNode())
-      if (!text.parentElement?.closest('rt') && !wordText.has(text)) wordText.set(text, text.data);
+  const wordText = new WeakMap(), glyphNodes = new Set();
+  const glyphText = part => {
+    if (part.nodeType === 3) return part.data;
+    if (part.matches?.('rt')) return '';
+    return [...part.childNodes].map(glyphText).join('');
   };
-  rememberText();
+  const rememberGlyphs = (part, discovered = null) => {
+    if (!part || part.matches?.('rt')) return;
+    if (!glyphNodes.has(part)) { glyphNodes.add(part); discovered?.push(part); }
+    if (part.nodeType === 3) {
+      if (!wordText.has(part)) wordText.set(part, part.data);
+    } else for (const child of part.childNodes) rememberGlyphs(child, discovered);
+  };
+  rememberGlyphs(node?.querySelector(':scope > .tok-word'));
   const hazards = new Set(); let closed = false, raf;
   const danger = n => n?.nodeType === 1 && (n.matches('#mini,#sheet') || n.querySelector('#mini,#sheet'));
   const inspect = records => {
+    // Records reference live nodes. Discover ownership through BOTH removed and
+    // added branches before checking: a later repaint may detach an earlier
+    // mutated ruby. Queue each node once, so detached intermediate glyphs count.
+    const mutations = new Map(), discovered = [...glyphNodes];
+    for (const r of records) if (r.type === 'childList') {
+      if (!mutations.has(r.target)) mutations.set(r.target, []);
+      mutations.get(r.target).push(r);
+      if (r.target === node) for (const changed of [...r.addedNodes, ...r.removedNodes])
+        if (changed.matches?.('.tok-word')) rememberGlyphs(changed, discovered);
+    }
+    for (let i = 0; i < discovered.length; i++)
+      for (const r of mutations.get(discovered[i]) || [])
+        for (const changed of [...r.addedNodes, ...r.removedNodes]) rememberGlyphs(changed, discovered);
     for (const r of records) {
       if (r.type === 'characterData' && wordText.has(r.target) &&
           (r.oldValue !== wordText.get(r.target) || r.target.data !== wordText.get(r.target))) hazards.add('wrong-identity');
       if (r.type === 'childList') {
+        // Mutation records keep removed descendants even after a same-task restore.
+        // Compare glyph text, not DOM shape: plain→ruby and equal-text repaints are valid.
+        if (glyphNodes.has(r.target)) {
+          if ([...r.removedNodes].map(glyphText).join('') !== [...r.addedNodes].map(glyphText).join(''))
+            hazards.add('wrong-identity');
+          for (const added of r.addedNodes) rememberGlyphs(added);
+        }
         for (const removed of r.removedNodes) {
           if (ancestors.some(a => removed === a || removed.contains?.(a))) hazards.add('detached-or-replaced');
           if (danger(removed)) hazards.add('premature-stage-or-sheet');
@@ -155,7 +180,10 @@ export function installEnglishMonitor(node) {
         }
         for (const added of r.addedNodes) {
           if (danger(added)) hazards.add('premature-stage-or-sheet');
-          if (r.target === node && added.matches?.('.tok-word') && surfaceOf(added) !== originalSurface) hazards.add('wrong-identity');
+          if (r.target === node && added.matches?.('.tok-word')) {
+            if (surfaceOf(added) !== originalSurface) hazards.add('wrong-identity');
+            rememberGlyphs(added);
+          }
         }
         for (const changed of [...r.addedNodes, ...r.removedNodes]) {
           const rows = changed.nodeType === 1 ? [changed, ...changed.querySelectorAll('.listen-row[data-passage]')] : [];
@@ -176,13 +204,24 @@ export function installEnglishMonitor(node) {
   const observer = new MutationObserver(inspect);
   observer.observe(document.documentElement, { subtree: true, childList: true,
     attributes: true, attributeOldValue: true, characterData: true, characterDataOldValue: true });
-  const visible = el => {
-    if (!el?.isConnected) return false;
+  const visible = inkNode => {
+    if (!inkNode?.isConnected) return false;
+    const el = inkNode.nodeType === 3 ? inkNode.parentElement : inkNode;
     const inkStyle = getComputedStyle(el);
-    const transparent = color => color === 'transparent' || /(?:,|\/)\s*0(?:\.0+)?\s*\)$/u.test(color);
+    const transparent = color => {
+      const value = String(color || '').trim().toLowerCase();
+      if (value === 'transparent') return true;
+      const match = /^([a-z][a-z0-9-]*)\((.*)\)$/u.exec(value);
+      if (!match) return false;
+      const channels = match[2].split(',');
+      // Legacy RGB has three channels, not an implicit fourth/alpha channel.
+      const alpha = match[2].includes('/') ? match[2].split('/').at(-1)
+        : /^(?:rgba?|hsla?)$/u.test(match[1]) && channels.length === 4 ? channels[3] : null;
+      return alpha !== null && Number.parseFloat(alpha) === 0;
+    };
     if (transparent(inkStyle.color) || transparent(inkStyle.webkitTextFillColor)) return false;
     if (!(Number.parseFloat(inkStyle.fontSize) > 0)) return false;
-    const ink = document.createRange(); ink.selectNodeContents(el);
+    const ink = document.createRange(); ink.selectNodeContents(inkNode);
     const rect = ink.getBoundingClientRect();
     if (!(rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.right > 0 && rect.top < innerHeight && rect.left < innerWidth)) return false;
     for (let p = el; p; p = p.parentElement) {
@@ -194,21 +233,28 @@ export function installEnglishMonitor(node) {
         if (rect.right <= box.left || rect.left >= box.right || rect.bottom <= box.top || rect.top >= box.bottom) return false;
       }
     }
-    // pointer-events:none English still paints. Test occlusion with the nearest
-    // hit-testable ancestor, never require the English ink itself to be the hit.
-    let hitAncestor = el;
-    while (hitAncestor && getComputedStyle(hitAncestor).pointerEvents === 'none') hitAncestor = hitAncestor.parentElement;
+    // A pointer-events:none ink may hit its real ancestor. A covering sibling,
+    // even in this same token, is not ink or its ancestor and must fail.
+    // This single-point hit test cannot exclude pointer-transparent visual covers
+    // or occlusion elsewhere in a glyph; it is not a pixel/render proof.
     const x = Math.min(innerWidth - 1, Math.max(0, rect.x + rect.width / 2));
     const y = Math.min(innerHeight - 1, Math.max(0, rect.y + rect.height / 2));
     const hit = document.elementFromPoint(x, y);
-    return !!hit && !!hitAncestor && (hitAncestor === hit || hitAncestor.contains(hit) || hit.contains(el));
+    return !!hit && (inkNode === hit || inkNode.contains(hit) || hit.contains(inkNode));
   };
   const read = () => {
     inspect(observer.takeRecords());
     const base = node?.querySelector(':scope > .tok-word')?.cloneNode(true);
     base?.querySelectorAll('rt').forEach(rt => rt.remove());
     if (base?.textContent !== originalSurface) hazards.add('wrong-identity');
-    rememberText();
+    const word = node?.querySelector(':scope > .tok-word');
+    rememberGlyphs(word);
+    const sourceInk = [];
+    if (word) {
+      const walk = document.createTreeWalker(word, NodeFilter.SHOW_TEXT);
+      for (let text = walk.nextNode(); text; text = walk.nextNode())
+        if (text.data.trim() && !text.parentElement?.closest('rt')) sourceInk.push(text);
+    }
     const rts = [...(node?.querySelectorAll(':scope > .tok-word ruby > rt') || [])];
     const ens = [...(node?.querySelectorAll(':scope > .tok-en > .tok-en-text') || [])];
     if (document.querySelector('#mini,#sheet') || node?.dataset.ladderRung === 'stage') hazards.add('premature-stage-or-sheet');
@@ -220,7 +266,7 @@ export function installEnglishMonitor(node) {
     return { articleId: document.querySelector('.listen-row[data-passage]')?.dataset.passage, occurrenceIndex: Number(node?.dataset.index),
       surface: base?.textContent, lemma: node?.dataset.word, connected: !!node?.isConnected,
       sameOriginalElement: !!sameOriginalElement, readingSegments: rts.map(rt => rt.textContent),
-      readingVisible: rts.every(visible), english: ens[0]?.textContent.trim() || '',
+      readingVisible: sourceInk.length > 0 && sourceInk.every(visible) && rts.every(visible), english: ens[0]?.textContent.trim() || '',
       englishCount: ens.length, englishVisible: ens.length === 1 && visible(ens[0]),
       rung: node?.dataset.ladderRung || null, hasEn: node?.classList.contains('has-en'),
       depthAside: node?.dataset.depthAside || null, stageSeen: !!document.getElementById('mini'),

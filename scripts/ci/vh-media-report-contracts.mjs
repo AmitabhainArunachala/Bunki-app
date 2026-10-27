@@ -112,6 +112,20 @@ export function validateReaderEnglishEvidence(
     ['transient-stage', 'premature-stage-or-sheet'],
     ['transient-sheet', 'premature-stage-or-sheet'],
     ['wrong-identity', 'wrong-identity'],
+    ['visible-kana', 'accepted'],
+    ['hidden-kana', 'deadline'],
+    ['transparent-kana', 'deadline'],
+    ['same-token-cover', 'deadline'],
+    ['pointer-none-English', 'accepted'],
+    ['wrong-text-replace-restore', 'wrong-identity'],
+    ['same-text-repaint', 'accepted'],
+    ['same-text-word-repaint', 'accepted'],
+    ['repaint-then-wrong-descendant', 'wrong-identity'],
+    ['detached-intermediate-ruby', 'wrong-identity'],
+    ['opaque-black', 'accepted'],
+    ['zero-blue', 'accepted'],
+    ['rgba-alpha-zero', 'deadline'],
+    ['slash-alpha-zero', 'deadline'],
     ['no-fallback', 'wrong-English'],
     ['same-deadline', 'deadline'],
   ];
@@ -139,18 +153,18 @@ export function validateReaderEnglishEvidence(
       );
       if (kind === 'pure') demand(row.closed === true, 'pure monitor not closed');
       if (expected === 'deadline') demand(row.elapsedMs >= 5000, 'deadline rejected early');
-      if (id === 'delayed-valid') {
-        demand(row.elapsedMs >= 350, 'positive control was not delayed');
+      if (id === 'delayed-valid') demand(row.elapsedMs >= 350, 'positive control was not delayed');
+      if (expected === 'accepted') {
         if (kind === 'browser')
           validObservation(
             row.observation,
             {
               id: 'oracle-control',
               occurrenceIndex: 0,
-              surface: '高い',
-              lemma: '高い',
-              readingSegments: ['たか'],
-              english: 'high',
+              surface: id === 'visible-kana' ? 'これ' : '高い',
+              lemma: id === 'visible-kana' ? 'これ' : '高い',
+              readingSegments: id === 'visible-kana' ? [] : ['たか'],
+              english: id === 'visible-kana' ? 'this' : 'high',
             },
             390,
           );

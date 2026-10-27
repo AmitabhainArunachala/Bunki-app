@@ -679,3 +679,53 @@ for (const engine of ['chromium', 'webkit']) {
       assert.equal(validateMediaReport('playback', f.report, f.context).passed, false);
     });
 }
+
+// Correction controls are mandatory in the actual playback consumer, independently
+// of the producer roster. A legacy 15-control receipt must not be grandfathered in.
+for (const engine of ['chromium', 'webkit']) {
+  for (const id of [
+    'visible-kana',
+    'hidden-kana',
+    'transparent-kana',
+    'same-token-cover',
+    'pointer-none-English',
+    'wrong-text-replace-restore',
+    'same-text-repaint',
+    'same-text-word-repaint',
+    'repaint-then-wrong-descendant',
+    'detached-intermediate-ruby',
+    'opaque-black',
+    'zero-blue',
+    'rgba-alpha-zero',
+    'slash-alpha-zero',
+  ]) {
+    for (const kind of ['pure', 'browser'])
+      test(`playback requires ${kind} ${id} (${engine})`, () => {
+        const f = fixture('playback', engine);
+        const rows =
+          kind === 'pure'
+            ? f.report.readerEnglishRung.pureControls
+            : f.report.readerEnglishRung.browserControls.results;
+        rows.splice(
+          rows.findIndex((row) => row.id === id),
+          1,
+        );
+        assert.equal(validateMediaReport('playback', f.report, f.context).passed, false);
+      });
+  }
+  for (const id of [
+    'visible-kana',
+    'pointer-none-English',
+    'same-text-repaint',
+    'same-text-word-repaint',
+    'opaque-black',
+    'zero-blue',
+  ]) {
+    test(`playback requires actual positive observation ${id} (${engine})`, () => {
+      const f = fixture('playback', engine);
+      f.report.readerEnglishRung.browserControls.results.find((row) => row.id === id).observation =
+        null;
+      assert.equal(validateMediaReport('playback', f.report, f.context).passed, false);
+    });
+  }
+}
