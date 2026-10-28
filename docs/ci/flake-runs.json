@@ -1,22 +1,4 @@
 {
-  "38439105252/1": {
-    "result": "rejected",
-    "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
-    "startedAt": "2026-10-13T17:29:44Z",
-    "reason": "Producer verification policy differs from trusted default branch"
-  },
-  "38440037000/1": {
-    "result": "observed",
-    "startedAt": "2026-10-13T17:36:38Z"
-  },
-  "38440381352/1": {
-    "result": "observed",
-    "startedAt": "2026-10-13T17:39:13Z"
-  },
-  "38445046849/1": {
-    "result": "observed",
-    "startedAt": "2026-10-13T18:13:52Z"
-  },
   "37728173857/9": {
     "result": "observed",
     "startedAt": "2026-10-13T19:09:35Z"
@@ -916,5 +898,9 @@
   "37925123360/37": {
     "result": "observed",
     "startedAt": "2026-10-28T12:02:18Z"
+  },
+  "40737010924/1": {
+    "result": "observed",
+    "startedAt": "2026-10-28T17:34:31Z"
   }
 }
