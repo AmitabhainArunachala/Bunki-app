@@ -11,8 +11,27 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import ts from 'typescript';
 
+export const READER_TICKET_NAMES = [
+  'readerTicket', 'readerTicketGeneration', 'readerTicketIntent',
+  'readerTicketNotice', 'readerTicketPlacement', 'readerTicketFeedback',
+  'readerTicketFeedbackNode', 'readerTicketArrival', 'readerTicketArrivalQueued',
+  'READER_TICKET_COPY', 'readerTicketOwner', 'readerTicketOwns',
+  'readerTicketCopy', 'readerTicketFrame', 'readerTicketFramesEqual',
+  'readerTicketRoute', 'readerTicketRouteEqual', 'readerTicketOrdinary',
+  'readerTicketRoomAllowed', 'readerTicketSourceValid', 'readerTicketValid',
+  'readerTicketOverlay', 'readerTicketRetireFeedback', 'readerTicketFeedbackOwns',
+  'readerTicketFeedbackHost', 'readerTicketFeedbackOwner', 'readerTicketShowFeedback',
+  'readerTicketRetireNotice', 'readerTicketRevoke', 'readerTicketCapture',
+  'readerTicketDeparture', 'readerTicketSheetCandidate', 'readerTicketCommitSheet',
+  'readerTicketArrivalCheck', 'readerTicketQueueArrival', 'readerTicketReturned',
+  'readerTicketAttach', 'readerTicketSync', 'settleReaderTicketNotice',
+  'readerTicketBusy', 'readerTicketPlacementOwns', 'readerTicketPlacementDone',
+  'readerTicketRestore', 'renderReaderTicket',
+];
+
 /** Transient exit closure shared by grade and renderer lifts. */
 export const REVIEW_EXIT_NAMES = [
+  ...READER_TICKET_NAMES,
   'reviewExitStates', 'reviewExitAdmissions', 'reviewExitGeneration', 'reviewExitNotice', 'reviewExitIntent', 'REVIEW_EXIT_COPY',
   'reviewExitState', 'reviewExitActivity', 'reviewExitUi', 'reviewExitOwner', 'reviewExitOwns', 'reviewExitPhase',
   'restoreReviewExitControl', 'retireReviewExitNotice', 'syncReviewExitNotice', 'renderReviewExitNotice',
@@ -271,4 +290,101 @@ export function reviewExitFixture(source, { core, fsrsApi, pin, tailHeld = false
     holdLock: () => baseLocks.hold(), entered: () => entered, callbackDone: callbackDone.promise,
     releaseTail: () => tail.release(), main: () => main,
     roots: () => structuredClone(box.record), flushTransition: () => { assert(transitions.length <= 1); return transitions.shift()?.(); } };
+}
+
+/** Ticket controls use actual navigation/return/placement functions. This DOM is an explicit
+ * synchronous layout model, never a native fit, announcement or keyboard proof. */
+const readerTicketPrograms = new Map();
+export function readerTicketFixture(source, options) {
+  const f = reviewExitFixture(source, options);
+  const { sandbox: c, S, Element, box } = f;
+  let program = readerTicketPrograms.get(source);
+  if (!program) {
+    program = liftCorridor(source, [
+      'scaleTokenFingerprint', 'scaleSource', 'scalePassage', 'scaleReaderIndex',
+      'startReview', 'keepNavigationReturn', 'returnFromNavigation', 'go', 'enterWord', 'recede',
+      'settleScaleReturn', 'requestScaleReturn', 'retireScaleReturn',
+    ]);
+    readerTicketPrograms.set(source, program);
+  }
+  vm.runInContext(program, c);
+  const body = new Element('body');
+  const reader = new Element('div'); reader.id = 'reader';
+  const anchor = new Element('span', 'tok', '同じ');
+  anchor.dataset = { index: '2', indexEnd: '3', para: '0' };
+  const p = { id: 'article-a', file: 'archive/a.json', tokens: [
+    { s: '同', r: 'どう' }, { s: 'じ' }, { s: '同', r: 'どう' }, { s: 'じ' }, { s: '文' },
+  ] };
+  reader.append(anchor); body.append(reader);
+  const frames = [], queued = [];
+  let y = 125, focusCount = 0, scrollCount = 0, failureRoom = false;
+  let currentMain = null;
+  const oldPaint = c.render;
+  const all = (node, predicate) => [ ...(predicate(node) ? [node] : []), ...node.children.flatMap(child => all(child, predicate)) ];
+  Element.prototype.querySelector = function (selector) {
+    return all(this, node => selector.startsWith('#') && node.id === selector.slice(1))[0] || null;
+  };
+  Element.prototype.hasAttribute = function (name) { return name === 'data-para' || Object.hasOwn(this.attrs, name); };
+  Element.prototype.getBoundingClientRect = function () { return { top: y, bottom: y + 20, width: 60, height: 20 }; };
+  c.document = {
+    body, activeElement: anchor,
+    createTextNode: text => new Element('text', '', text),
+    getElementById(id) { return all(body, node => node.isConnected && node.id === id)[0] || null; },
+    querySelector(selector) { return selector === '#app > main .room-error' ? failureRoom : null; },
+    querySelectorAll(selector) { return selector.startsWith('#reader ') ? [anchor] : []; },
+  };
+  Object.assign(c, {
+    innerWidth: 390, innerHeight: 844, learningSourceVisit: null, worldPickerEls: null,
+    ladderVisit: null, ladderOpening: null, ladderReturning: null, ladderCleanupGeneration: 0,
+    ladderPages: new Map(), heroSource: new Map(), keptPages: new Map(),
+    standingSlip: () => c.slip || null, personalHost: null, referenceLibrary: null, pendingReferenceCollection: null,
+    recordInstallation: { policy: { binding: { sessionId: 'session-a', accountId: 'account-a', learnerId: 'learner-a' } }, assertCurrent: () => true },
+    recordWritable: epoch => (epoch === undefined || epoch === c.recordEpoch) && !S.storeReadOnly && !c.staleTab && !c.storeSealed && !c.recordDeparted,
+    passage: () => c.D.passages.find(row => row.id === S.passageId),
+    readerTokenAtIndex: index => index === 2 && reader.isConnected && anchor.isConnected ? anchor : null,
+    invokerKey: node => node === anchor ? { sel: '#reader [data-index="2"]' } : null,
+    scaleLineTop: () => y, teacherSentence: () => ({ start: 0, end: p.tokens.length }),
+    window: { scrollY: 900, scrollTo(_x, value) { scrollCount++; y += this.scrollY - value; this.scrollY = value; },
+      scrollBy(_x, value) { scrollCount++; if (!c.stuck) { y -= value; this.scrollY += value; } } },
+    focusProseWord: node => { focusCount++; c.document.activeElement = node; c.onFocus?.(); },
+    requestAnimationFrame: fn => { frames.push(fn); }, queueMicrotask: fn => { queued.push(fn); },
+    keepScroll() {}, rememberSheet() {}, rememberScaleEntry() {}, stopReadAloud() {}, restoreDialogInvoker() {},
+    restoreDialogFocus() {}, clearTimeout() {}, saveReaderPosition() { throw new Error('ticket unexpectedly writes readerPos'); },
+    finishPageTransition() {}, layerPathFor: () => false, takePrebuiltPage: () => null,
+    sampleWhere: () => null, pageCutAllowed: () => false, removeMini() {}, sampleTransition() {},
+    kanjiCourseReferenceHelp: () => null, scaleNodeBelongs: () => false, returnScroll() {},
+    clearReaderSummons() {}, syncWalkSentinel() {}, clearWordLadder(visit) { if (c.ladderVisit === visit) c.ladderVisit = null; },
+    todayQueue: (_now, scope) => ({ order: c.emptyQueue ? [] : scope || f.rv.queue, held: 0 }),
+    roomTransition: change => f.transitions.push(change),
+  });
+  c.D.passages = [p];
+  Object.assign(S, { view: 'reader', passageId: p.id, stack: [], navigationReturns: [], navigationDepartures: 0, wordEntrySerial: 0,
+    review: null, readerTake: { p: p.id, index: 2, id: '同じ' }, revealed: new Set([2]), glossed: new Set([2]), readerScroll: 900 });
+  c.render = () => {
+    c.readerTicketSync();
+    if (S.view === 'reader') {
+      if (c.renderError) { failureRoom = new Element('div', 'room-error'); reader.isConnected = false; return; }
+      reader.isConnected = true; anchor.isConnected = true;
+      c.settleScaleReturn(reader);
+    } else if (S.view === 'review') {
+      // Existing review fixture owns the complete actual review render.
+      oldPaint(); currentMain = f.main(); body.append(currentMain);
+    }
+  };
+  const api = {
+    ...f, c, p, anchor, reader, body, frames, microtasks: queued,
+    ticket: () => vm.runInContext('readerTicket', c),
+    placement: () => vm.runInContext('readerTicketPlacement', c),
+    feedback: () => vm.runInContext('readerTicketFeedback', c),
+    notice: () => vm.runInContext('readerTicketNotice', c),
+    start: () => { c.readerTicketDeparture('tray'); S.view = 'tray'; S.stack = []; c.startReview(); return S.review; },
+    door: () => { c.render(); const button = currentMain.querySelector('#review-reader-return'); assert(button, 'actual ticket door rendered'); return button; },
+    flushMicrotasks: () => { let guard = 0; while (queued.length) { assert(++guard < 100); queued.shift()(); } },
+    flushFrames: () => { let guard = 0; while (frames.length) { assert(++guard <= 12, 'placement has a finite frame bound'); frames.shift()(); } },
+    focusCount: () => focusCount, scrollCount: () => scrollCount, y: () => y, setY: value => { y = value; },
+    status: () => c.document.getElementById('reader-return-status-host'),
+    paint: kind => { const node = f.paint(kind); currentMain = node; body.append(node); return node; },
+  };
+  box.ticketFixture = true;
+  return api;
 }

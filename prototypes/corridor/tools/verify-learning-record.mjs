@@ -1,4 +1,4 @@
-import { REVIEW_EXIT_NAMES } from './srs-hooks-corridor-layer.mjs';
+import { REVIEW_EXIT_NAMES, readerTicketFixture, liftCorridor } from './srs-hooks-corridor-layer.mjs';
 /** Controlled acknowledgment tests of the actual authored learning handlers.
  * Frozen synthetic roots detect premature mutation. This verifies the UI save
  * contract; RecordApp/Host suites separately exercise real browser storage. */
@@ -1611,6 +1611,40 @@ await check('g2-a-kept-word-answers-cold-from-its-own-card', async () => {
   assert.equal(c.savedNodeRecord({ t: 'word', id: '年', seq: '2084840', reading: 'とし' }, saved), null);
   assert.equal(c.savedNodeRecord({ t: 'word', id: '年' }, saved), null, 'a door that names no entry is the dictionary\'s');
 });
+
+
+// The ticket writes no learner evidence. The accepted grade/undo and the separate
+// reader-position preference writer retain their own publication boundaries.
+if (!browserMode) {
+  const ticketPin = JSON.parse(readFileSync(resolve(root, 'data/fsrs-pin.json'), 'utf8'));
+  for (const acknowledged of [true, false]) await check(`ticket-return-retains-published-grade-${acknowledged ? 'acknowledged' : 'unacknowledged'}-without-an-extra-write`, async () => {
+    const f = readerTicketFixture(source, { core: srsCore, fsrsApi, pin: ticketPin });
+    const rv = f.start(); rv.revealed = true; rv.declared = 1;
+    const grade = f.grade(rv);
+    for (let i = 0; i < 12 && !f.queued.length; i++) await Promise.resolve();
+    assert(f.queued.length, 'actual shared grade reached its save');
+    f.ack({ acknowledged }); await grade; f.flushMicrotasks();
+    const roots = f.roots(), count = f.box.writes;
+    const reservation = f.storage.getItem('bunki-srs:answered-today');
+    f.door().fire(); f.flushTransition(); f.flushFrames();
+    assert.deepEqual(f.roots(), roots); assert.equal(f.box.writes, count);
+    assert.equal(f.storage.getItem('bunki-srs:answered-today'), reservation);
+    assert.equal(f.S.review, null); assert.equal(f.S.view, 'reader');
+    assert.equal(f.queued.length, 0);
+  });
+  await check('ticket-continuation-and-independent-reader-position-write-do-not-replay-grades', async () => {
+    const f = readerTicketFixture(source, { core: srsCore, fsrsApi, pin: ticketPin });
+    const old = f.start(); const ticket = f.ticket(); const roots = f.roots();
+    f.c.startReview(old.scope, { continueFrom: old });
+    assert.equal(f.ticket(), ticket); assert.notEqual(f.S.review, old); assert.equal(f.box.writes, 0);
+    f.door().fire(); f.flushTransition(); f.flushFrames();
+    vm.runInContext(liftCorridor(source, ['saveReaderPosition']), f.c);
+    const saved = f.c.saveReaderPosition(f.p.id, 321);
+    assert.equal(f.queued.length, 1); f.ack(); assert.equal(await saved, true);
+    const next = f.roots(); assert.equal(next.readerPos[f.p.id], 321); delete next.readerPos;
+    assert.deepEqual(next, roots); assert.equal(f.box.writes, 1, 'only independently invoked UI preference publication');
+  });
+}
 
 if (browserMode) await browserChecks();
 

@@ -10,6 +10,7 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 import ts from 'typescript';
+import { REVIEW_EXIT_NAMES, liftCorridor } from './srs-hooks-corridor-layer.mjs';
 import * as fsrs from '../vendor/ts-fsrs.mjs';
 import * as srsCore from '../srs-core.mjs';
 import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
@@ -59,7 +60,7 @@ function state(overrides = {}) {
     storeReadOnly: false,
     storeError: null,
     storeExtras: { futureField: { keep: true } },
-    view: 'drift',
+    view: 'drift', stack: [], navigationReturns: [],
     focus: null,
     taken: [{ t: 'word', id: 'old' }],
     lists: {},
@@ -132,12 +133,15 @@ class FakeElement {
   }
 
   set textContent(value) {
+    if (this.throwText) throw this.throwText;
     this._text = value;
+    for (const child of this.children) child.isConnected = false;
+    this.children = [];
     this.textWrites += 1;
   }
 
   get textContent() {
-    return this._text;
+    return this._text + this.children.map(child => child.textContent || '').join('');
   }
 
   setAttribute(name, value) {
@@ -152,11 +156,21 @@ class FakeElement {
     this.attributes.delete(name);
   }
 
+  get childNodes() { return this.children; }
+  contains(node) { return node === this || this.children.some(child => child.contains(node)); }
+  prepend(child) { this.append(child); this.children.unshift(this.children.pop()); }
+  remove() {
+    this.isConnected = false;
+    if (this.parentNode) this.parentNode.children = this.parentNode.children.filter(child => child !== this);
+    this.children.forEach(child => child.remove());
+  }
+  replaceChildren(...children) { this.children.slice().forEach(child => child.remove()); this._text = ''; children.forEach(child => this.append(child)); }
   addEventListener() {}
 
   append(child) {
     if (typeof child === 'string') return;
-    child.isConnected = true;
+    child.isConnected = this.isConnected;
+    child.parentNode = this;
     this.children.push(child);
     if (child.id) this.owner.byId.set(child.id, child);
   }
@@ -174,7 +188,7 @@ function fakeDocument() {
       return new FakeElement(tag, document);
     },
     getElementById(id) {
-      return document.byId.get(id) || null;
+      const node = document.byId.get(id); return node?.isConnected ? node : null;
     },
     querySelectorAll() {
       if (document.throwOnQuery) throw new Error('layout unavailable');
@@ -193,8 +207,10 @@ function fakeDocument() {
 const legacySchemaBlock = between("const STORE_KEY = 'kairo-corridor-v1';", '// Only acknowledged changed roots') + '\n' + definitions('storeEnvelope');
 const document = fakeDocument();
 const storeContext = vm.createContext({ S: state(), document, localStorage: storage(),
-  tx: (_ja, en) => en, window: {}, crypto: webcrypto, recordWritable: () => false });
-vm.runInContext(legacySchemaBlock + '\n;globalThis.__storeApi = { loadStore, hydrateStore, storeEnvelope, syncStoreAlert, safelySyncStoreAlert, validStoreEnvelope, setOwnRecordValue, srsParamsProblem, FSRS_WEIGHT_BOUNDS };', storeContext);
+  tx: (_ja, en) => en, window: {}, crypto: webcrypto, recordWritable: () => false,
+  recordApp: null, recordInstallation: null, recordEpoch: 1, recordDeparted: false, staleTab: false, storeSealed: false, queueMicrotask,
+  el: (tag, cls, text) => { const node = document.createElement(tag); node.className = cls || ''; node.textContent = text || ''; return node; } });
+vm.runInContext(liftCorridor(source, REVIEW_EXIT_NAMES) + '\n' + legacySchemaBlock + '\n;globalThis.__storeApi = { loadStore, hydrateStore, storeEnvelope, syncStoreAlert, safelySyncStoreAlert, validStoreEnvelope, setOwnRecordValue, srsParamsProblem, FSRS_WEIGHT_BOUNDS };', storeContext);
 const storeApi = storeContext.__storeApi;
 
 
@@ -647,6 +663,81 @@ verified('alert-layout-failure-stays-isolated-and-retryable', () => {
   document.throwOnQuery = false; assert(storeApi.safelySyncStoreAlert());
   assert.equal(document.getElementById('store-alert').hidden, false);
 });
+
+
+function noticeAlertFixture(bytes = source, kind = 'legacy') {
+  const doc = fakeDocument();
+  doc.querySelector = () => null;
+  const ctx = vm.createContext({ S: state(), document: doc, localStorage: storage(), tx: (_ja, en) => en,
+    window: { scrollY: 100 }, innerWidth: 390, innerHeight: 844, crypto: webcrypto,
+    recordApp: {}, recordInstallation: { policy: { binding: { sessionId: 'fixture', accountId: 'a', learnerId: 'b' } }, assertCurrent: () => true },
+    recordEpoch: 1, recordDeparted: false, staleTab: false, storeSealed: false, queueMicrotask,
+    personalHost: null, learningSourceVisit: null, worldPickerEls: null, ladderVisit: null, standingSlip: () => null,
+    el: (tag, cls, text) => { const n = doc.createElement(tag); n.className = cls || ''; n.textContent = text || ''; return n; },
+  });
+  ctx.recordWritable = epoch => (epoch === undefined || epoch === ctx.recordEpoch) && !ctx.S.storeReadOnly;
+  const schema = betweenIn(bytes, "const STORE_KEY = 'kairo-corridor-v1';", '// Only acknowledged changed roots');
+  vm.runInContext(liftCorridor(bytes, [...REVIEW_EXIT_NAMES, 'scaleTokenFingerprint']) + '\n' + schema, ctx);
+  const main = doc.createElement('main'), button = doc.createElement('button');
+  button.textContent = 'original'; main.append(button); doc.body.append(main); button.isConnected = true;
+  const rv = { pending: {}, queue: [], ix: 0 }; ctx.S = state({ view: 'review', review: rv });
+  if (kind === 'legacy') {
+    const control = { button, main, nodes: [], text: 'original', label: null };
+    ctx.showReviewExitNotice(ctx.reviewExitOwner(rv), 'busy', control, main);
+  } else {
+    const anchor = doc.createElement('span'); anchor.dataset = { index: '0' }; doc.body.append(anchor);
+    anchor.getBoundingClientRect = () => ({ top: 50, bottom: 70, height: 20, width: 20 });
+    const p = { id: 'a', file: 'archive/a.json', tokens: [{ s: '読' }] };
+    Object.assign(ctx, { D: { passages: [p] }, passage: () => p, readerTokenAtIndex: () => anchor,
+      invokerKey: () => ({ sel: '#source' }), scaleReaderIndex: () => 0, scaleLineTop: () => 50,
+      teacherSentence: () => ({ start: 0, end: 1 }) });
+    ctx.S.view = 'reader'; ctx.S.passageId = p.id;
+    ctx.readerTicketDeparture('tray'); ctx.S.view = 'tray'; ctx.readerTicketAttach(rv); ctx.S.view = 'review';
+    ctx.readerTicketBusy(vm.runInContext('readerTicket', ctx), 'busy', button, main);
+  }
+  const node = doc.getElementById(kind === 'legacy' ? 'review-exit-status' : 'review-reader-return-status');
+  assert(node?.isConnected, 'actual notifier has a connected notice before the experiment');
+  return { ctx, doc, node, button };
+}
+function noticeRetirementOracle(bytes, kind) {
+  const { ctx, doc, node, button } = noticeAlertFixture(bytes, kind);
+  ctx.S.storeReadOnly = true; ctx.S.storeError = 'Protected fixture';
+  const result = ctx.safelySyncStoreAlert();
+  assert(result && !result.hidden && result.textContent === 'Protected fixture', 'actual protection alert stays visible');
+  assert.equal(node.isConnected, false, 'actual notice DOM retires on protection');
+  assert.equal(button.getAttribute('aria-busy'), null);
+  assert.equal(button.getAttribute('aria-describedby'), null);
+  assert.equal(ctx.localStorage.attempts, 0); assert.equal(ctx.localStorage.writes, 0);
+  assert.equal(doc.getElementById(node.id), null);
+}
+function noticeThrowOracle(bytes, kind) {
+  const { ctx, doc, node } = noticeAlertFixture(bytes, kind);
+  ctx.S.storeError = 'Warning despite notifier failure'; node.throwText = new Error('notice presentation failed');
+  let result;
+  assert.doesNotThrow(() => { result = ctx.safelySyncStoreAlert(); }, 'UI notification cannot suppress the alert');
+  assert(result && !result.hidden && result.textContent === ctx.S.storeError);
+  node.throwText = null;
+  doc.throwOnQuery = true; assert.equal(ctx.safelySyncStoreAlert(), null);
+  doc.throwOnQuery = false; assert(ctx.safelySyncStoreAlert(), 'actual failed layout is retryable');
+  assert.equal(ctx.localStorage.attempts, 0); assert.equal(ctx.localStorage.writes, 0);
+}
+for (const kind of ['legacy', 'ticket']) {
+  verified(`ticket-storage-${kind}-actual-notice-retirement-zero-writes`, () => noticeRetirementOracle(source, kind));
+  verified(`ticket-storage-${kind}-throw-isolation-layout-retry`, () => noticeThrowOracle(source, kind));
+  for (const mutation of ['omitted', 'no-op', 'unisolated']) {
+    verified(`ticket-storage-${kind}-${mutation}-control`, () => {
+      const name = kind === 'legacy' ? 'syncReviewExitNotice' : 'readerTicketSync';
+      const original = definitions('safelySyncStoreAlert');
+      const line = `  reviewExitUi(${name});`;
+      assert(original.includes(line));
+      const changed = mutation === 'no-op' ? source.replace(`function ${name}() {`, `function ${name}() { return;`)
+        : source.replace(original, original.replace(line, mutation === 'omitted' ? '  /* omitted notifier */' : `  ${name}();`));
+      assert.notEqual(changed, source);
+      assert.throws(() => mutation === 'unisolated' ? noticeThrowOracle(changed, kind) : noticeRetirementOracle(changed, kind),
+        error => error.code === 'ERR_ASSERTION', 'control fails an observed UI assertion, not a missing-symbol/setup exception');
+    });
+  }
+}
 
 const articleBlock = between(
   'const bundledArticle = (p) =>',
@@ -1294,7 +1385,7 @@ verified('standard-review-serves-exactly-today-queue-and-names-the-held-back', (
     srsKey: (type, id) => type + ':' + id, render: () => {},
     // a DOM focus helper startReview calls after rendering; no scheduling effect
     focusKanjiReadingReview: () => {} });
-  vm.runInContext(definitions('startReview'), context);
+  vm.runInContext(liftCorridor(source, REVIEW_EXIT_NAMES) + '\n' + definitions('startReview'), context);
   context.startReview(); assert.equal(context.S.review.queue.length, 5); assert.equal(context.S.review.deferred, 3);
   assert.equal(pool.length, 8); assert.equal(context.S.review.declared, null); assert.equal(context.S.view, 'review');
   assert.equal(context.S.review.scope, null); assert.equal(calls[0], null);

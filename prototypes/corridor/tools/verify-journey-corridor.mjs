@@ -427,18 +427,33 @@ function dictionary(source, { immediate = false } = {}) {
   const body = (name) => { const anchor = `function ${name}(`; assert.equal(source.split(anchor).length, 2, name);
     const start = source.indexOf(anchor), end = source.indexOf('\n}', start) + 2; return source.slice(start, end); };
   const deferred = [];
-  const ctx = vm.createContext({ S: { stack: [], view: 'lessons', navigationReturns: [], kanjiCourse: { unitId: 'shiki-shoku', epoch: 1 }, wordEntrySerial: 0 },
+  const ctx = vm.createContext({ S: { stack: [], view: 'lessons', passageId: 'course-article', navigationReturns: [], kanjiCourse: { unitId: 'shiki-shoku', epoch: 1 }, wordEntrySerial: 0 },
     recordEpoch: 1, finishPageTransition() {}, layerPathFor: () => false, ladderOpening: null, heroSource: new Map(), sampleWhere: () => null,
     pageCutAllowed: () => false, removeMini() {}, document: { getElementById: () => null, activeElement: null }, sampleTransition() {},
     recordReady: (epoch) => epoch === ctx.recordEpoch, kanjiCourseApplyHelp() {},
     kanjiCourseRememberHelp: () => (immediate ? undefined : new Promise((resolve) => deferred.push(resolve))), render() {},
     // the Search detour and Back (W3 1542's path): its own state only
-    window: { scrollY: 0, scrollTo() {} }, keepScroll() {}, rememberSheet() {}, invokerKey: () => null, learningSourceVisit: null, referenceLibrary: null,
+    window: { scrollY: 0, scrollTo() {} }, keepScroll() {}, rememberSheet() {}, invokerKey: () => null, learningSourceVisit: null, personalHost: null, referenceLibrary: null,
     pendingReferenceCollection: null, restoreDialogInvoker() {}, worldPickerEls: null, foldWordLadder: () => false, roomTransitionUpdating: true, stopReadAloud() {} });
+  // Current navigation calls the real transient ticket closure, even when the
+  // course route cannot mint one. Keep the historical BASE/S1 lift separate.
+  vm.runInContext(layer.liftCorridor(source, [...layer.READER_TICKET_NAMES, 'reviewExitUi']), ctx);
   vm.runInContext(['kanjiCourseReferenceHelp', 'enterWord', 'keepNavigationReturn', 'returnFromNavigation', 'openSearchPage', 'back'].map(body).join('\n'), ctx);
+  const noReaderTicket = () => {
+    assert.equal(vm.runInContext('readerTicket', ctx), null, 'course navigation must not mint an ordinary reader ticket');
+    assert.equal(vm.runInContext('readerTicketArrival || readerTicketIntent || readerTicketPlacement', ctx), null,
+      'course navigation must not retain an ordinary reader return');
+  };
+  // A reader-looking origin does not turn the lessons room into an ordinary
+  // reader. Exercise the actual capture/candidate guards, not ticket doubles.
+  assert.equal(ctx.readerTicketCapture(0), null, 'course room cannot capture an ordinary reading');
+  assert.equal(ctx.readerTicketSheetCandidate({ t: 'kanji', id: '職', from: { passage: ctx.S.passageId, index: 0 } }), null,
+    'course entry cannot mint a ticket from a reader-looking origin');
+  noReaderTicket();
   const flush = async () => { for (let i = 0; i < 15; i++) await Promise.resolve(); };
-  return { ctx, open: (id = '職') => ctx.enterWord({ t: 'kanji', id }, { instant: true }),
-    finish: async (n = 0) => { deferred[n](); await flush(); }, shown: () => Array.from(ctx.S.stack, (node) => node.id) };
+  return { ctx, open: (id = '職') => { ctx.enterWord({ t: 'kanji', id }, { instant: true }); noReaderTicket(); },
+    finish: async (n = 0) => { deferred[n](); await flush(); noReaderTicket(); },
+    shown: () => { noReaderTicket(); return Array.from(ctx.S.stack, (node) => node.id); } };
 }
 const F8 = (id, name, navigate, expect) => test(id, name, async (P) => {
   const d = dictionary(P.source);

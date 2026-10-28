@@ -1788,6 +1788,7 @@ function syncStoreAlert() {
  * deliberately swallowed at this seam and remain retryable on the next sync. */
 function safelySyncStoreAlert() {
   reviewExitUi(syncReviewExitNotice);
+  reviewExitUi(readerTicketSync);
   try {
     return syncStoreAlert();
   } catch {
@@ -3616,6 +3617,7 @@ window.bunkiDriftDepth = (depth) => {
   }
 };
 addEventListener('pagehide', () => {
+  readerTicketRevoke();
   if (mockClock && S.assessmentLibrary?.activeAttemptId && recordReady()) {
     applyPractice('interruptPractice', { reason: 'process-stop' });
   }
@@ -3629,7 +3631,7 @@ addEventListener('pagehide', () => {
   }
 });
 addEventListener('pageshow', (event) => {
-  if (event.persisted) { recordDeparted = true; recordUnavailable(); }
+  if (event.persisted) { readerTicketRevoke(); recordDeparted = true; recordUnavailable(); }
 });
 document.addEventListener('visibilitychange', () => {
   syncPracticeClock();
@@ -5579,6 +5581,8 @@ function rememberScaleEntry(node) {
   }
 }
 function retireScaleReturn() {
+  if (readerTicketPlacement) readerTicketPlacementDone(readerTicketPlacement, 'cancelled');
+  reviewExitUi(readerTicketRetireFeedback);
   if (!S.scaleVisit) return;
   S.scaleVisit.returnRequest = null;
   S.scaleVisit.returnJob = null;
@@ -5635,40 +5639,66 @@ function requestScaleReturn(visit) {
 function settleScaleReturn(reader) {
   const visit = S.scaleVisit, request = visit?.returnRequest;
   const source = scaleSource(visit);
+  const ticketJob = visit?.ticketPlacement;
+  if (ticketJob && !readerTicketPlacementOwns(ticketJob)) {
+    readerTicketPlacementDone(ticketJob, readerTicketFeedbackOwns(ticketJob.feedback) ? 'unconfirmed' : 'cancelled');
+    return;
+  }
   if (!request || !source || S.view !== 'reader' || S.stack.length || S.passageId !== visit.passageId) return;
   const anchor = readerTokenAtIndex(visit.index, reader);
-  if (!anchor || Number(anchor.dataset.indexEnd || visit.index) !== visit.indexEnd) return; // Await the actual retained occurrence.
+  if (!anchor || Number(anchor.dataset.indexEnd || visit.index) !== visit.indexEnd) {
+    if (ticketJob) readerTicketPlacementDone(ticketJob, 'unconfirmed');
+    return;
+  } // Await the actual retained occurrence for ordinary (non-ticket) returns.
   const epoch = pageEpoch, owner = recordEpoch, job = {};
   visit.returnJob = job;
   const current = () => S.scaleVisit === visit && visit.returnRequest === request && visit.returnJob === job &&
     pageEpoch === epoch && recordEpoch === owner && S.view === 'reader' && !S.stack.length &&
     S.passageId === visit.passageId && reader.isConnected && anchor.isConnected &&
-    readerTokenAtIndex(visit.index, reader) === anchor && !!scaleSource(visit);
+    readerTokenAtIndex(visit.index, reader) === anchor && !!scaleSource(visit) &&
+    (!ticketJob || (readerTicketPlacementOwns(ticketJob) && Number(anchor.dataset.indexEnd || visit.index) === visit.indexEnd));
+  const authorized = () => {
+    if (current()) return true;
+    if (ticketJob) readerTicketPlacementDone(ticketJob, readerTicketFeedbackOwns(ticketJob.feedback) ? 'unconfirmed' : 'cancelled');
+    return false;
+  };
   let attempts = 0, stable = 0;
   // The live source owns the keyboard immediately; pixel placement settles
   // over the following frames without leaving focus on a removed page.
+  if (!authorized()) return;
   focusProseWord(anchor, { preventScroll: true });
+  if (!authorized()) return;
   requestAnimationFrame(() => {
-    if (!current()) return;
+    if (!authorized()) return;
     window.scrollTo(0, visit.scroll);
     const correct = () => {
-      if (!current()) return;
+      if (!authorized()) return;
       const delta = scaleLineTop(anchor) - visit.viewportY;
+      if (!authorized()) return;
       if (Math.abs(delta) > 0.5) window.scrollBy(0, delta);
+      if (!authorized()) return;
       const remaining = scaleLineTop(anchor) - visit.viewportY;
       stable = Math.abs(remaining) <= 0.5 ? stable + 1 : 0;
       attempts += 1;
       if (stable >= 2 || attempts >= 8) {
+        if (!authorized()) return;
         focusProseWord(anchor, { preventScroll: true });
+        if (!authorized()) return;
         // The prose rover may reveal its focused token with nearest-scroll;
         // the source-line constraint remains the final owner of placement.
         const afterFocus = scaleLineTop(anchor) - visit.viewportY;
+        if (!authorized()) return;
         if (Math.abs(afterFocus) > 0.5) window.scrollBy(0, afterFocus);
+        if (!authorized()) return;
         S.readerScroll = window.scrollY;
         reader.dataset.scaleReturnIndex = String(visit.index);
         reader.dataset.scaleReturnDelta = String(scaleLineTop(anchor) - visit.viewportY);
         visit.returnRequest = null;
         visit.returnJob = null;
+        if (ticketJob) {
+          ticketJob.delta = scaleLineTop(anchor) - visit.viewportY;
+          readerTicketPlacementDone(ticketJob, Math.abs(ticketJob.delta) <= 4 ? 'confirmed' : 'unconfirmed');
+        }
         return;
       }
       requestAnimationFrame(correct);
@@ -6218,6 +6248,7 @@ function installScaleBridge() {
 /** Search and source reading are detours, not destructive replacements.
  * A frame holds the same canonical nodes, with their exact place and origin. */
 function keepNavigationReturn(destination, invoker = document.activeElement) {
+  const ticket = readerTicketDeparture(destination);
   // every saved-state detour is a departure, even when its Back restores the same stack, room and visit (W3 1542). A separate
   // count from wordEntrySerial: only a page deferred for a journey keep reads it, so nothing else on the page changes
   S.navigationDepartures = (S.navigationDepartures || 0) + 1;
@@ -6242,8 +6273,10 @@ function keepNavigationReturn(destination, invoker = document.activeElement) {
   S.stack = [];
   S.dialogInvoker = null;
   S.scaleVisit = null;
+  if (ticket && readerTicket === ticket) ticket.route = { ...readerTicketRoute(), view: destination };
 }
 function returnFromNavigation() {
+  if (readerTicket && !readerTicketValid()) readerTicketRevoke();
   const home = S.navigationReturns.at(-1);
   if (!home || home.destination !== S.view) return false;
   // A course detour may contain ordinary Atlas/search frames. Check its owner
@@ -6252,6 +6285,7 @@ function returnFromNavigation() {
     (!recordReady(frame.kanjiCourseReturn.epoch) ||
       (frame.view === 'review' && S.review !== frame.kanjiCourseReturn.review)));
   if (staleCourse !== -1) {
+    readerTicketRevoke();
     S.navigationReturns.splice(staleCourse);
     S.stack = []; S.dialogInvoker = null; S.scaleVisit = null;
     learningSourceVisit = null;
@@ -6259,6 +6293,8 @@ function returnFromNavigation() {
     S.view = 'lessons'; render(); window.scrollTo(0, 0);
     return true;
   }
+  const ticketReturn = readerTicket ? { ...readerTicket.route, view: home.view, passageId: home.passageId,
+    stack: [...home.stack], frames: readerTicket.route.frames.slice(0, -1) } : null;
   S.navigationReturns.pop();
   if (home.kanjiCourseReturn) {
     S.kanjiCourse = home.kanjiCourseReturn.priorCourse;
@@ -6288,6 +6324,9 @@ function returnFromNavigation() {
     kdx: home.kdx || undefined, searchLens: home.searchLens,
     sheetReturnFocus: home.stack.at(-1)?.returnFocus || null,
   });
+  if (readerTicket && readerTicketRouteEqual(ticketReturn)) readerTicket.route = ticketReturn;
+  else if (readerTicket) readerTicketRevoke();
+  readerTicketReturned();
   render();
   window.scrollTo(0, home.scroll);
   if (!home.stack.length) {
@@ -6312,6 +6351,7 @@ function go(node, { invoker = null, from = null, instant = keyboardActivated(), 
     ? S.stack.at(-1)?.sourceContext || (S.view === 'search' ? S.navSourceContext : null) : null);
   if (sourceContext && !node.from?.passage) node = { ...node, sourceContext };
   if (node.t === 'kanji' && !node.referenceEntry) node.referenceEntry = referenceLibrary?.entry('kanji', node.id) || null;
+  const ticketCandidate = readerTicketSheetCandidate(node);
   if (S.scaleVisit) retireScaleReturn();
   rememberScaleEntry(node);
   keepScroll();
@@ -6319,7 +6359,7 @@ function go(node, { invoker = null, from = null, instant = keyboardActivated(), 
   if (!S.stack.length && !S.dialogInvoker) {
     S.dialogInvoker = invokerKey(invoker || document.activeElement);
   }
-  enterWord(node, { from, invoker, instant });
+  enterWord(node, { from, invoker, instant, ticketCandidate });
 }
 
 function back({ instant = false } = {}) {
@@ -6536,6 +6576,8 @@ let strokeHistorySerial = 0;
  * The sheet stays exactly where it was: its scrollTop rides along in the
  * layer's own state and is put back, unchanged, when the page closes. */
 function openStrokePage(id, { invoker = null, historyEntry = null } = {}) {
+  readerTicketIntent = null;
+  reviewExitUi(readerTicketRetireFeedback);
   const sheet = $('.sheet');
   S.strokeChromeAwake = !S.strokeMinimal;
   const sheetScroll = historyEntry?.sheetScroll ?? (sheet ? sheet.scrollTop : 0);
@@ -7331,6 +7373,7 @@ function renderShelfBody(search = null) {
   lanes.id = 'levels-link';
   lanes.append(el('span', 'l-ja', tx('参考書庫', 'reference library')));
   lanes.addEventListener('click', () => {
+    readerTicketDeparture('levels');
     keepScroll();
     pendingReferenceCollection = null;
     referenceLibrary?.reset();
@@ -7367,6 +7410,7 @@ function renderShelfBody(search = null) {
   decks.type = 'button';
   decks.id = 'decks-link';
   decks.addEventListener('click', () => {
+    readerTicketDeparture('dojo');
     keepScroll();
     S.deckPlay = null;
     S.view = 'dojo';
@@ -7390,6 +7434,7 @@ function renderShelfBody(search = null) {
   gram.id = 'grammar-link';
   gram.append(el('span', 'l-ja', tx('文法', 'grammar')));
   gram.addEventListener('click', () => {
+    readerTicketDeparture('grammar');
     keepScroll();
     S.view = 'grammar';
     render();
@@ -7412,6 +7457,7 @@ function renderShelfBody(search = null) {
   thes.id = 'thesaurus-link';
   thes.append(el('span', 'l-ja', tx('類語', 'synonyms')));
   thes.addEventListener('click', () => {
+    readerTicketDeparture('thesaurus');
     keepScroll();
     S.view = 'thesaurus';
     render();
@@ -7423,6 +7469,7 @@ function renderShelfBody(search = null) {
   yj.id = 'yoji-link';
   yj.append(el('span', 'l-ja', tx('四字熟語', 'idioms')));
   yj.addEventListener('click', () => {
+    readerTicketDeparture('yoji');
     keepScroll();
     S.view = 'yoji';
     render();
@@ -7434,6 +7481,7 @@ function renderShelfBody(search = null) {
   kdx.id = 'kanjidex-link';
   kdx.append(el('span', 'l-ja', tx('字引', 'kanji by shape')));
   kdx.addEventListener('click', () => {
+    readerTicketDeparture('kanjidex');
     keepScroll();
     S.view = 'kanjidex';
     render();
@@ -10095,6 +10143,8 @@ function clearWordLadder(visit = ladderVisit) {
   // Switching occurrences may clear and open in one event. History sees its
   // final rung, never the temporary bare state between those two operations.
   queueMicrotask(syncWalkSentinel);
+  // Only the pending reader trip installs this observer; ordinary ladder visits have none.
+  try { visit.ticketArrival?.(); } catch { /* an arrival observer cannot change ladder cleanup */ }
 }
 /** Folds the current rung; false when nothing visible folded, so the press reaches the layer below. A visit whose word
  * left with its surface (a deck card graded at the reading rung) is forgotten, not folded. */
@@ -18862,6 +18912,7 @@ function renderTray(main) {
     openList.append(document.createTextNode(`${label} — ${sec.items.length}`));
     openList.append(el('span', 'list-open-arrow', '›'));
     openList.addEventListener('click', () => {
+      readerTicketDeparture('list');
       S.listOpen = { name: sec.name, manual: sec.manual };
       keepScroll();
       S.view = 'list';
@@ -19231,6 +19282,7 @@ function renderSavedLists(main) {
     openList.append(document.createTextNode(`${label} — ${sec.items.length}`));
     openList.append(el('span', 'list-open-arrow', '›'));
     openList.addEventListener('click', () => {
+      readerTicketDeparture('list');
       S.listOpen = { name: sec.name, manual: sec.manual };
       keepScroll();
       S.view = 'list';
@@ -28785,6 +28837,7 @@ function renderSearchResults(main, query) {
     const door = biLabel('button', 'chip search-syn-door', '類語辞典へ', 'the synonym dictionary');
     door.type = 'button';
     door.addEventListener('click', () => {
+      readerTicketDeparture('thesaurus');
       keepScroll();
       S.view = 'thesaurus';
       render();
@@ -32030,6 +32083,364 @@ function dropReviewCard(rv) {
 }
 
 // Review exits own UI intent only: no record field, timer, lock release or grade replay.
+// One transient ordinary-reader trip. No ticket state is written to the learner record.
+let readerTicket = null;
+let readerTicketGeneration = 0;
+let readerTicketIntent = null;
+let readerTicketNotice = null;
+let readerTicketPlacement = null;
+let readerTicketFeedback = null;
+let readerTicketFeedbackNode = null;
+let readerTicketArrival = null;
+let readerTicketArrivalQueued = false;
+const READER_TICKET_COPY = {
+  door: ['読んでいたところへ戻る', 'Return to your reading'],
+  busy: ['復習の処理が続いている。終わったら、もう一度押すと読んでいたところへ戻れる。', 'This review action is still finishing. Tap again when it finishes to return to your reading.'],
+  ready: ['読んでいたところへ戻れる。', 'You can return to your reading.'],
+  unavailable: ['読んでいたところへ戻れなかった。復習の画面はそのまま開いている。', 'Couldn’t return to your reading. The review is still open.'],
+  unconfirmed: ['元の位置に戻れたか、確認できなかった。', 'Couldn’t confirm the original reading position.'],
+};
+function readerTicketOwner() {
+  const binding = recordInstallation?.policy?.binding;
+  return { app: recordApp, installation: recordInstallation, epoch: recordEpoch,
+    session: binding?.sessionId, account: binding?.accountId, learner: binding?.learnerId };
+}
+function readerTicketOwns(owner) {
+  if (!owner) return false;
+  try {
+    const now = readerTicketOwner();
+    return !!owner.app && !!owner.installation && Object.keys(owner).every(k => owner[k] === now[k]) &&
+      recordWritable(owner.epoch) && owner.installation.assertCurrent() === true;
+  } catch { return false; }
+}
+function readerTicketCopy(value) { return value == null ? value : JSON.parse(JSON.stringify(value)); }
+function readerTicketFrame(frame) {
+  return { frame, stack: [...(frame.stack || [])], scale: frame.scaleVisit, visit: frame.learningSourceVisit,
+    fields: JSON.stringify([frame.destination, frame.view, frame.passageId, frame.scroll, frame.readerScroll,
+      frame.readerTake, frame.searchFrom, frame.navQ, frame.kdx, frame.searchLens, frame.focus, frame.navSourceContext, frame.referenceState,
+      frame.scaleVisit && [frame.scaleVisit.origin, frame.scaleVisit.recordEpoch, frame.scaleVisit.passageId,
+        frame.scaleVisit.index, frame.scaleVisit.indexEnd, frame.scaleVisit.viewportY, frame.scaleVisit.scroll, frame.scaleVisit.fingerprint],
+      [...(frame.revealed || [])], [...(frame.glossed || [])]]), course: frame.kanjiCourseReturn };
+}
+function readerTicketFramesEqual(frames, actual = S.navigationReturns || []) {
+  return frames.length === actual.length && frames.every((saved, i) => {
+    const now = readerTicketFrame(actual[i]);
+    return saved.frame === now.frame && saved.fields === now.fields && saved.scale === now.scale &&
+      saved.visit === now.visit && !now.course && saved.stack.length === now.stack.length &&
+      saved.stack.every((node, j) => node === now.stack[j]);
+  });
+}
+function readerTicketRoute() {
+  return { view: S.view, passageId: S.passageId, stack: [...S.stack], frames: (S.navigationReturns || []).map(readerTicketFrame),
+    departures: S.navigationDepartures, wordEntry: S.wordEntrySerial };
+}
+function readerTicketRouteEqual(route) {
+  return !!route && route.view === S.view && route.passageId === S.passageId && route.departures === S.navigationDepartures &&
+    route.wordEntry === S.wordEntrySerial && route.stack.length === S.stack.length &&
+    route.stack.every((node, i) => node === S.stack[i]) && readerTicketFramesEqual(route.frames);
+}
+function readerTicketOrdinary() {
+  return !personalHost && !learningSourceVisit && !S.focus && !(S.navigationReturns || []).some(frame =>
+    frame.kanjiCourseReturn || frame.learningSourceVisit || ['lessons', 'guided', 'focus', 'sentence-practice'].includes(frame.view));
+}
+function readerTicketRoomAllowed(view) {
+  return ['search', 'kanjidex', 'grammar', 'yoji', 'thesaurus', 'tray', 'dojo', 'lists', 'list', 'browse', 'levels'].includes(view);
+}
+function readerTicketSourceValid(ticket) {
+  const s = ticket?.source;
+  if (!s || !readerTicketOwns(ticket.owner)) return false;
+  const p = D.passages.find(row => row.id === s.p.id);
+  return p === s.p && p.file === s.file && p.tokens === s.tokens && s.end >= s.index &&
+    s.end < p.tokens.length && s.fingerprints.every((value, i) => value === scaleTokenFingerprint(p.tokens[s.index + i]));
+}
+function readerTicketValid(ticket = readerTicket) {
+  return !!ticket && readerTicket === ticket && readerTicketSourceValid(ticket) && readerTicketOrdinary() &&
+    readerTicketRouteEqual(ticket.route) && (!ticket.rv || ticket.rv === S.review);
+}
+function readerTicketOverlay() {
+  return !!(S.stack.length || S.strokes || S.navOpen || worldPickerEls || ladderVisit || standingSlip() ||
+    document.querySelector('dialog[open], [role="dialog"][aria-modal="true"], #vocabulary-list-popover, #record-backup'));
+}
+function readerTicketRetireFeedback(owner = readerTicketFeedback) {
+  if (!owner || readerTicketFeedback !== owner) return;
+  readerTicketFeedback = null;
+  owner.observer?.disconnect();
+  if (readerTicketFeedbackNode) { readerTicketFeedbackNode.hidden = true; readerTicketFeedbackNode.replaceChildren(); }
+}
+function readerTicketFeedbackOwns(owner) {
+  return readerTicketFeedback === owner && readerTicketOwns(owner.record) && readerTicketRouteEqual(owner.route) &&
+    !readerTicketOverlay() && (owner.rv ? S.review === owner.rv && S.view === 'review' : S.view === 'reader' && !S.review);
+}
+function readerTicketFeedbackHost() {
+  if (!readerTicketFeedbackNode?.isConnected) {
+    const node = el('p', 'store-warning store-warning-live');
+    node.id = 'reader-return-status-host'; node.hidden = true;
+    node.setAttribute('role', 'status'); node.setAttribute('aria-live', 'polite'); node.setAttribute('aria-atomic', 'true');
+    document.body.append(node); readerTicketFeedbackNode = node;
+  }
+  return readerTicketFeedbackNode;
+}
+function readerTicketFeedbackOwner(rv = null) {
+  readerTicketRetireFeedback();
+  const owner = { generation: ++readerTicketGeneration, record: readerTicketOwner(), route: readerTicketRoute(), rv };
+  readerTicketFeedback = owner;
+  // One active observer, for overlays opened without a room render. It never moves focus or the route.
+  if (typeof MutationObserver !== 'undefined') {
+    owner.observer = new MutationObserver(() => {
+      if (readerTicketFeedback === owner && !readerTicketFeedbackOwns(owner)) readerTicketRetireFeedback(owner);
+    });
+    owner.observer.observe(document.body, { subtree: true, childList: true, attributes: true,
+      attributeFilter: ['open', 'aria-modal', 'hidden'] });
+  }
+  return owner;
+}
+function readerTicketShowFeedback(owner, kind) {
+  if (!readerTicketFeedbackOwns(owner)) { readerTicketRetireFeedback(owner); return; }
+  const node = readerTicketFeedbackHost();
+  let bottom = 0;
+  for (const item of document.querySelectorAll('.chrome, .record-band, #store-alert, #record-hint')) {
+    if (item.hidden || !item.isConnected) continue;
+    const box = item.getBoundingClientRect();
+    if (box.width > 0 && box.height > 0) bottom = Math.max(bottom, box.bottom);
+  }
+  if (!readerTicketFeedbackOwns(owner)) return;
+  node.style.setProperty('--store-alert-top', `${Math.max(0, bottom)}px`);
+  node.textContent = tx(...READER_TICKET_COPY[kind]); node.hidden = false;
+}
+function readerTicketRetireNotice() {
+  const notice = readerTicketNotice; readerTicketNotice = null;
+  notice?.node?.remove();
+  notice?.button?.removeAttribute('aria-busy');
+  notice?.button?.removeAttribute('aria-describedby');
+}
+function readerTicketRevoke({ feedback = true } = {}) {
+  if (readerTicketArrival?.ladder && readerTicketArrival.ladder.ticketArrival === readerTicketArrival.notify) delete readerTicketArrival.ladder.ticketArrival;
+  readerTicket = null; readerTicketIntent = null; readerTicketArrival = null;
+  const job = readerTicketPlacement;
+  if (job && job.visit.ticketPlacement === job) delete job.visit.ticketPlacement;
+  readerTicketPlacement = null; readerTicketGeneration++;
+  reviewExitUi(readerTicketRetireNotice);
+  if (feedback) reviewExitUi(readerTicketRetireFeedback);
+}
+function readerTicketCapture(occurrence = null) {
+  if (S.view !== 'reader' || S.stack.length || S.strokes || !readerTicketOrdinary()) return null;
+  const p = passage(), owner = readerTicketOwner();
+  if (!p?.tokens || !readerTicketOwns(owner)) return null;
+  const prior = S.scaleVisit;
+  const explicit = S.readerTake?.p === p.id ? S.readerTake.index : null;
+  const index = occurrence != null ? occurrence : prior?.origin === 'reader' && prior.passageId === p.id && !prior.readOn
+    ? prior.index : explicit != null ? explicit : scaleReaderIndex();
+  if (!Number.isInteger(index)) return null;
+  const anchor = readerTokenAtIndex(index), end = Number(anchor?.dataset.indexEnd || index);
+  if (!anchor?.isConnected || !Number.isInteger(end) || end < index || end >= p.tokens.length ||
+      (occurrence == null && prior?.origin === 'reader' && prior.passageId === p.id && !prior.readOn && !scaleSource(prior))) return null;
+  const viewportY = scaleLineTop(anchor), box = anchor.getBoundingClientRect();
+  if (!Number.isFinite(viewportY) || box.width <= 0 || box.height <= 0 || box.bottom <= 0 || box.top >= innerHeight) return null;
+  const sentence = teacherSentence({ from: { passage: p.id, index } });
+  if (!sentence) return null;
+  const prefix = (S.navigationReturns || []).map(readerTicketFrame);
+  const source = { p, file: p.file, tokens: p.tokens, index, end,
+    fingerprints: p.tokens.slice(index, end + 1).map(scaleTokenFingerprint), anchor,
+    sentence: { t: 'sent', id: `${p.id}:${sentence.start}`, passage: p.id, start: sentence.start,
+      tokens: p.tokens.slice(sentence.start, sentence.end), targetOffset: index - sentence.start },
+    focus: invokerKey(anchor), viewportY, scroll: window.scrollY, width: innerWidth, height: innerHeight,
+    take: readerTicketCopy(S.readerTake), revealed: S.revealed ? new Set(S.revealed) : null,
+    glossed: S.glossed ? new Set(S.glossed) : null };
+  return { generation: ++readerTicketGeneration, owner, source, prefix, route: readerTicketRoute(), rv: null };
+}
+function readerTicketDeparture(destination) {
+  if (readerTicketArrival) readerTicketRevoke();
+  let ticket = readerTicket;
+  if (!readerTicketRoomAllowed(destination)) { readerTicketRevoke(); return null; }
+  if (ticket && !readerTicketValid(ticket)) { readerTicketRevoke(); ticket = null; }
+  if (!ticket) ticket = readerTicketCapture();
+  if (!ticket) return null;
+  readerTicket = ticket; readerTicketArrival = null; readerTicketIntent = null;
+  reviewExitUi(readerTicketRetireFeedback);
+  ticket.route = { ...readerTicketRoute(), view: destination, stack: [] };
+  return ticket;
+}
+function readerTicketSheetCandidate(node) {
+  if (readerTicketArrival) readerTicketRevoke();
+  const allowed = ['word', 'kanji', 'radical'].includes(node.t) && !node.familyExample &&
+    (!node.from?.passage || node.from.passage === S.passageId);
+  if (!allowed || !readerTicketOrdinary()) { readerTicketRevoke(); return null; }
+  const ticket = readerTicket;
+  if (ticket && readerTicketValid(ticket)) return { ticket, route: readerTicketRoute() };
+  if (ticket) readerTicketRevoke();
+  const from = node.from;
+  if (!from?.passage || from.passage !== S.passageId || !Number.isInteger(from.index)) return null;
+  const captured = readerTicketCapture(from.index);
+  return captured ? { ticket: captured, route: readerTicketRoute() } : null;
+}
+function readerTicketCommitSheet(candidate, pushed, serial) {
+  if (!candidate) return;
+  const { ticket, route } = candidate;
+  // Serial advances at enterWord entry; all other identities must still be the actual caller's.
+  if (!readerTicketSourceValid(ticket) || !readerTicketOrdinary() ||
+      !readerTicketRouteEqual({ ...route, wordEntry: serial }) ||
+      (readerTicket && readerTicket !== ticket) || !['word', 'kanji', 'radical'].includes(pushed.t)) {
+    if (readerTicket === ticket) readerTicketRevoke();
+    return;
+  }
+  readerTicket = ticket; readerTicketIntent = null; readerTicketArrival = null;
+  ticket.route = { ...readerTicketRoute(), stack: [...S.stack, pushed] };
+  reviewExitUi(readerTicketRetireFeedback);
+}
+function readerTicketArrivalCheck() {
+  const arrival = readerTicketArrival;
+  if (!arrival) return;
+  const ticket = arrival.ticket;
+  if (readerTicket !== ticket || !readerTicketValid(ticket) || S.view !== 'reader' || S.passageId !== ticket.source.p.id ||
+      !ticket.source.anchor.isConnected || (ladderVisit && ladderVisit !== arrival.ladder)) {
+    readerTicketRevoke(); return;
+  }
+  if (!readerTicketOverlay()) readerTicketRevoke(); // A real bare arrival consumes; it never offers another trip.
+}
+function readerTicketQueueArrival() {
+  if (!readerTicketArrival || readerTicketArrivalQueued) return;
+  readerTicketArrivalQueued = true;
+  try { queueMicrotask(() => { readerTicketArrivalQueued = false; reviewExitUi(readerTicketArrivalCheck); }); }
+  catch { readerTicketArrivalQueued = false; readerTicketRevoke(); }
+}
+function readerTicketReturned() {
+  const ticket = readerTicket;
+  if (!ticket) return;
+  if (!readerTicketValid(ticket)) { readerTicketRevoke(); return; }
+  // The actual return may remove only frames this trip admitted.
+  const frames = (S.navigationReturns || []).map(readerTicketFrame);
+  if (frames.length < ticket.prefix.length || !readerTicketFramesEqual(ticket.prefix, (S.navigationReturns || []).slice(0, ticket.prefix.length)) ||
+      !readerTicketSourceValid(ticket) || !readerTicketOrdinary()) { readerTicketRevoke(); return; }
+  ticket.route = readerTicketRoute(); readerTicketIntent = null;
+  if (S.view === 'reader' && S.passageId === ticket.source.p.id && !S.stack.length) {
+    const arrival = { ticket, ladder: ladderVisit };
+    arrival.notify = () => { if (readerTicketArrival === arrival) readerTicketQueueArrival(); };
+    readerTicketArrival = arrival;
+    if (arrival.ladder) arrival.ladder.ticketArrival = arrival.notify;
+    readerTicketQueueArrival();
+  } else if (!readerTicketRoomAllowed(S.view) && S.view !== 'review' && S.view !== 'reader') readerTicketRevoke();
+}
+function readerTicketAttach(rv, continueFrom) {
+  const ticket = readerTicket;
+  if (!ticket) return;
+  const eligible = readerTicketValid(ticket) && !S.stack.length && !readerTicketArrival &&
+    (ticket.rv ? continueFrom === ticket.rv && S.review === continueFrom && !continueFrom.pending && !continueFrom.admitting
+      : continueFrom === undefined && readerTicketRoomAllowed(S.view));
+  if (!eligible) { readerTicketRevoke(); return; }
+  ticket.rv = rv; ticket.route = { ...readerTicketRoute(), view: 'review', stack: [] };
+  readerTicketIntent = null; reviewExitUi(readerTicketRetireNotice);
+}
+function readerTicketSync() {
+  if (readerTicketFeedback && !readerTicketFeedbackOwns(readerTicketFeedback)) readerTicketRetireFeedback();
+  const ticket = readerTicket;
+  if (!ticket) return;
+  // An owned invalid press still needs truthful feedback. Retire data authority but leave the current control's handler.
+  if (!readerTicketValid(ticket)) { readerTicketRevoke(); return; }
+  if (readerTicketIntent && readerTicketOverlay()) readerTicketIntent = null;
+  const notice = readerTicketNotice;
+  if (!notice) return;
+  if (notice.ticket !== ticket || !readerTicketRouteEqual(notice.route) ||
+      notice.activity !== reviewExitState(ticket.rv).activity) { readerTicketRetireNotice(); return; }
+  if (notice.kind === 'busy' && !ticket.rv.pending && !ticket.rv.admitting) notice.kind = 'ready';
+  if (notice.node) notice.node.textContent = tx(...READER_TICKET_COPY[notice.kind]);
+  if (notice.button?.isConnected) {
+    notice.button.setAttribute('aria-describedby', 'review-reader-return-status');
+    if (notice.kind === 'busy') notice.button.setAttribute('aria-busy', 'true');
+    else notice.button.removeAttribute('aria-busy');
+  }
+}
+function settleReaderTicketNotice() {
+  reviewExitUi(() => queueMicrotask(() => reviewExitUi(readerTicketSync)));
+}
+function readerTicketBusy(ticket, kind, button, main) {
+  if (readerTicket !== ticket || !readerTicketOwns(ticket.owner) || S.review !== ticket.rv || readerTicketOverlay()) return;
+  readerTicketRetireNotice();
+  const node = el('p', 'srs-forecast', tx(...READER_TICKET_COPY[kind]));
+  node.id = 'review-reader-return-status'; node.setAttribute('role', 'status'); node.setAttribute('aria-live', 'polite');
+  main.append(node);
+  readerTicketNotice = { ticket, kind, node, button, route: readerTicketRoute(), activity: reviewExitState(ticket.rv).activity };
+  readerTicketSync();
+}
+function readerTicketPlacementOwns(job) {
+  return readerTicketPlacement === job && readerTicketFeedbackOwns(job.feedback) && readerTicketSourceValid(job.ticket) &&
+    S.scaleVisit === job.visit && !readerTicketOverlay() && S.passageId === job.ticket.source.p.id;
+}
+function readerTicketPlacementDone(job, outcome) {
+  if (readerTicketPlacement !== job) return;
+  job.outcome = outcome; readerTicketPlacement = null;
+  if (job.visit.ticketPlacement === job) delete job.visit.ticketPlacement;
+  job.visit.returnRequest = null; job.visit.returnJob = null;
+  if (outcome === 'unconfirmed') reviewExitUi(() => readerTicketShowFeedback(job.feedback, 'unconfirmed'));
+  else readerTicketRetireFeedback(job.feedback);
+}
+function readerTicketRestore(ticket, button, main) {
+  const rv = ticket.rv;
+  if (S.view !== 'review' || S.review !== rv || readerTicketOverlay() || !readerTicketOwns(ticket.owner)) return;
+  if (!readerTicketValid(ticket)) {
+    const feedback = readerTicketFeedbackOwner(rv);
+    readerTicketRevoke({ feedback: false });
+    readerTicketShowFeedback(feedback, 'unavailable'); return;
+  }
+  if (rv.pending || rv.admitting) { readerTicketBusy(ticket, 'busy', button, main); return; }
+  if (readerTicketIntent) return;
+  const intent = { ticket, route: readerTicketRoute(), activity: reviewExitState(rv).activity, page: pageEpoch };
+  readerTicketIntent = intent;
+  roomTransition(() => {
+    if (readerTicketIntent !== intent) return;
+    readerTicketIntent = null;
+    if (pageEpoch !== intent.page || S.view !== intent.route.view || S.review !== rv || !readerTicketOwns(ticket.owner) || readerTicketOverlay() ||
+        S.wordEntrySerial !== intent.route.wordEntry || S.navigationDepartures !== intent.route.departures) return;
+    if (!readerTicketValid(ticket)) {
+      const feedback = readerTicketFeedbackOwner(rv); readerTicketRevoke({ feedback: false });
+      readerTicketShowFeedback(feedback, 'unavailable'); return;
+    }
+    if (rv.pending || rv.admitting || reviewExitState(rv).activity !== intent.activity) {
+      readerTicketBusy(ticket, rv.pending || rv.admitting ? 'busy' : 'ready', button, main); return;
+    }
+    const s = ticket.source;
+    readerTicket = null; readerTicketArrival = null; readerTicketRetireNotice();
+    S.review = null; S.view = 'reader'; S.stack = []; S.dialogInvoker = s.focus;
+    S.navigationReturns = ticket.prefix.map(saved => saved.frame);
+    S.passageId = s.p.id; S.readerTake = readerTicketCopy(s.take); S.readerScroll = s.scroll;
+    S.revealed = s.revealed ? new Set(s.revealed) : null; S.glossed = s.glossed ? new Set(s.glossed) : null;
+    const visit = { origin: 'reader', recordEpoch, passageId: s.p.id, index: s.index, indexEnd: s.end,
+      fingerprint: s.fingerprints[0], viewportY: s.viewportY, scroll: s.scroll, focus: s.focus,
+      viewport: { width: s.width, height: s.height }, sentence: s.sentence, returnRequest: {}, returnJob: null };
+    S.scaleVisit = visit;
+    const feedback = readerTicketFeedbackOwner();
+    const job = { ticket, visit, feedback, outcome: 'pending', routeCommitted: true };
+    readerTicketPlacement = job; visit.ticketPlacement = job;
+    try {
+      render();
+      if (readerTicketPlacement === job && (!document.getElementById('reader') ||
+          !readerTokenAtIndex(s.index) || document.querySelector('#app > main .room-error')))
+        readerTicketPlacementDone(job, 'unconfirmed');
+    } catch (error) {
+      job.error = error;
+      readerTicketPlacementDone(job, 'unconfirmed');
+    }
+  });
+}
+function renderReaderTicket(main, rv) {
+  const ticket = readerTicket;
+  if (!ticket || ticket.rv !== rv || !readerTicketValid(ticket) || S.view !== 'review' || readerTicketOverlay()) return;
+  if (main.querySelector?.('#review-reader-return')) return;
+  readerTicketFeedbackHost();
+  const button = biLabel('button', 'chip', ...READER_TICKET_COPY.door);
+  button.type = 'button'; button.id = 'review-reader-return';
+  button.dataset.readerReturnState = rv.ix >= rv.queue.length ? 'finished' : 'active';
+  const controlRoute = readerTicketRoute();
+  button.addEventListener('click', () => {
+    if (button.isConnected && controlRoute.view === S.view && controlRoute.wordEntry === S.wordEntrySerial &&
+        controlRoute.departures === S.navigationDepartures) readerTicketRestore(ticket, button, main);
+  });
+  main.append(button);
+  if (readerTicketNotice?.ticket === ticket) {
+    const kind = readerTicketNotice.kind;
+    readerTicketBusy(ticket, kind, button, main);
+  }
+}
+
 const reviewExitStates = new WeakMap();
 const reviewExitAdmissions = new WeakMap();
 let reviewExitGeneration = 0;
@@ -32052,6 +32463,7 @@ function reviewExitActivity(rv) {
   try {
     reviewExitState(rv).activity = ++reviewExitGeneration;
     reviewExitUi(syncReviewExitNotice);
+    reviewExitUi(readerTicketSync);
   }
   catch { reviewExitIntent = null; }
 }
@@ -32236,7 +32648,10 @@ async function commitReviewAction(rv, item, produce, advance, report = null) {
     if (rv.pending === pending) rv.pending = null;
     try {
       if (recordReady(epoch) && S.review === rv && S.view === 'review') { render(); focusKanjiReadingReview(rv, item); }
-    } finally { reviewExitUi(() => settleReviewExitNotice()); }
+    } finally {
+      reviewExitUi(() => settleReviewExitNotice());
+      reviewExitUi(() => settleReaderTicketNotice());
+    }
   }
 }
 
@@ -32299,6 +32714,7 @@ async function admitStandardGrade({ rv, item, key, skey, rating }) {
     if (reviewExitAdmissions.get(rv) === admission) reviewExitAdmissions.delete(rv);
     reviewExitUi(() => { if (reviewExitState(rv).admission === admission) reviewExitState(rv).admission = null; });
     reviewExitUi(() => settleReviewExitNotice());
+    reviewExitUi(() => settleReaderTicketNotice());
   }
   if (!admitted.admitted) refusal = admitted.reason;
   else if (!admitted.graded && !refusal && (admitted.outcome === 'published' || admitted.outcome === 'uncertain')) refusal = 'publish-uncertain';
@@ -32771,12 +33187,14 @@ function srsForecast(now = new Date()) {
  * button showed — until it runs out. Nothing is frozen behind the glass: the
  * only cards it leaves are the reviews the day's limit held back, and the
  * goodbye screen names them (`deferred`) with a door to raise today's limit. */
-function startReview(scope) {
+function startReview(scope, { continueFrom } = {}) {
   const today = todayQueue(new Date(), Array.isArray(scope) ? scope : null);
   const queue = today.order;
   if (!queue.length) return;
-  S.review = { queue, ix: 0, revealed: false, declared: null, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [],
+  const next = { queue, ix: 0, revealed: false, declared: null, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [],
     deferred: today.held, scope: Array.isArray(scope) ? scope : null, breakAt: 0, t0: Date.now() };
+  readerTicketAttach(next, continueFrom);
+  S.review = next;
   S.view = 'review';
   render();
   focusKanjiReadingReview(S.review);
@@ -32982,6 +33400,7 @@ function renderReviewNext(main) {
 }
 function renderReview(main) {
   const rv = S.review;
+  renderReaderTicket(main, rv);
   // a focus block keeps the queue full: when the cards run dry before the
   // clock, draw the next lap from the pool so drilling never stalls — and
   // laps after the first are PRACTICE (POL-12): the schedule already took
@@ -32999,6 +33418,7 @@ function renderReview(main) {
   // else left the close offers the steps still to come, early by the learner's choice, or they wait
   const step = !S.focus && !rv.pending && !rv.revealed && rv.ix < rv.queue.length ? reviewNextStep(rv) : null;
   const paused = step?.pause ? step : null;
+  if (paused) { const door = main.querySelector?.('#review-reader-return'); if (door) door.dataset.readerReturnState = 'paused'; }
   if (rv.ix >= rv.queue.length || paused) {
     main.append(withEn(el('p', 'eyebrow', S.focus ? '集中' : '復習'), S.focus ? 'focus' : 'review', 'en-inline'));
     // count grades pressed, not queue rows — re-inserted learning passes
@@ -33116,7 +33536,7 @@ function renderReview(main) {
           if (recordReady(epoch) && S.view === 'review') render();
           return;
         }
-        startReview(rv.scope);
+        startReview(rv.scope, { continueFrom: rv });
       });
       main.append(raise);
     }
@@ -34007,6 +34427,9 @@ document.addEventListener('keydown', reviewKeys);
 /** The optional break between cards (srsPrefs.pauseEvery). Nothing is hidden: the queue
  * waits whole, and leaving to the lists keeps today's number on the 復習する button. */
 function renderReviewBreak(main, rv, graded) {
+  renderReaderTicket(main, rv);
+  const returnDoor = main.querySelector?.('#review-reader-return');
+  if (returnDoor) returnDoor.dataset.readerReturnState = 'break';
   const left = rv.queue.length - rv.ix;
   main.append(withEn(el('p', 'eyebrow', '一息'), 'break', 'en-inline'));
   main.append(el('h1', 'view-title', tx(`一息 — ${graded} 枚すんだ`, `Take a breath — ${graded} done`)));
@@ -34687,6 +35110,7 @@ function studyHallDoors() {
         if (due) startReview();
         return;
       }
+      readerTicketDeparture('tray');
       keepScroll(); S.stack = []; S.trayFrom = { view: 'dojo', scroll: 0 }; S.view = 'tray'; render(); window.scrollTo(0, 0);
     }],
     ['mock', 'JLPT 模試・練習', 'JLPT tests & practice', readyTests
@@ -34709,6 +35133,7 @@ function studyHallDoors() {
       S.focusMode = 'yomi'; render(); window.scrollTo(0, 0);
     }],
     ['levels', ...levelsName, () => {
+      readerTicketDeparture('levels');
       keepScroll(); pendingReferenceCollection = null; referenceLibrary?.reset(); S.view = 'levels'; render(); window.scrollTo(0, 0);
     }],
   ];
@@ -42159,6 +42584,7 @@ function applyLayerLaw(root) {
 /** The page layer, alone: the top node's page mounted (or none), the layer law, the crumb under it, the store alert's
  * description, the walk sentinel. No room is rebuilt. */
 function renderLayer({ prebuilt = null, preserveRoom = false } = {}) {
+  reviewExitUi(readerTicketSync);
   // back on a room whose lists a page's Save changed: the room is drawn again, the whole app as render() draws it
   if (!S.stack.length && S.roomStale && !preserveRoom) { render(); return; }
   const root = document.getElementById('app');
@@ -42276,9 +42702,10 @@ function flyWord(leaves, target) {
 
 /** The page arrives. Called by go() after its bookkeeping; pushes the node (the page built ahead for it, when one is
  * waiting), mounts its page by the layer, or by render() in the rooms that keep it, and the word travels. */
-function enterWord(node, { from = null, invoker = null, instant = false } = {}) {
+function enterWord(node, { from = null, invoker = null, instant = false, ticketCandidate = null } = {}) {
   // A different page visit retires a pending keyboard lookup even if Back restores the same room and stack.
   S.wordEntrySerial = (S.wordEntrySerial || 0) + 1;
+  const ticketSerial = S.wordEntrySerial;
   finishPageTransition();
   const layered = layerPathFor();
   const depth = S.stack.length + 1;
@@ -42303,6 +42730,7 @@ function enterWord(node, { from = null, invoker = null, instant = false } = {}) 
     // the page this one covers is kept as it stands: Back mounts the same element, its words where Back's word goes home
     const below = depth > 1 ? document.getElementById('sheet') : null;
     if (below && layered) keptPages.set(S.stack.at(-1), { page: below, epoch: pageEpoch });
+    readerTicketCommitSheet(ticketCandidate, pushed, ticketSerial);
     S.stack.push(pushed);
     if (layered) renderLayer({ prebuilt: ready?.page || null });
     else render();
@@ -42331,6 +42759,9 @@ function enterWord(node, { from = null, invoker = null, instant = false } = {}) 
  * when that still stands on the screen (the reader keeps its tokens under the layer; a kept page keeps its words). */
 function recede({ all = false, viaRender = false, instant = false } = {}) {
   if (!S.stack.length) return null;
+  if (readerTicket && !readerTicketValid()) readerTicketRevoke();
+  const ticketReturn = readerTicket ? { ...readerTicket.route, stack: all ? [] : readerTicket.route.stack.slice(0, -1),
+    wordEntry: (S.wordEntrySerial || 0) + 1 } : null;
   const readerVisit = S.scaleVisit;
   const reader = S.view === 'reader' ? document.getElementById('reader') : null;
   const readerEpoch = pageEpoch;
@@ -42345,6 +42776,8 @@ function recede({ all = false, viaRender = false, instant = false } = {}) {
   const leaves = !instant && pageCutAllowed() ? glyphBox(heroOf(document.getElementById('sheet'))) : null;
   if (all) S.stack = [];
   else S.stack.pop();
+  if (readerTicket && readerTicketRouteEqual(ticketReturn)) readerTicket.route = ticketReturn;
+  else if (readerTicket) readerTicketRevoke();
   const top = S.stack.at(-1);
   S.sheetReturnFocus = top?.returnFocus || null;
   if (!S.stack.length && !origin) clearReaderSummons();
@@ -42383,6 +42816,7 @@ function recede({ all = false, viaRender = false, instant = false } = {}) {
     } else if (origin) clearWordLadder(origin);
   } finally {
     ladderReturning = previousReturn;
+    readerTicketReturned();
     syncWalkSentinel();
   }
   const home = heroSource.get(leaving);
@@ -43431,6 +43865,8 @@ function worldName(t) {
   }[t.id]);
 }
 function openWorldPicker(anchor) {
+  readerTicketIntent = null;
+  reviewExitUi(readerTicketRetireFeedback);
   closeWorldPicker();
   const scrim = el('div', 'world-picker-scrim');
   const pop = el('div', 'world-picker');
@@ -44071,6 +44507,7 @@ function buildGingaChrome(root) {
   if (due) review.append(el('span', 'nav-count', String(due)));
   review.setAttribute('aria-label', due ? tx(`復習 — 今日 ${due} 枚`, `review — ${due} due today`) : tx('復習', 'review'));
   review.addEventListener('click', () => {
+    readerTicketDeparture('tray');
     S.navOpen = false;
     keepScroll();
     S.stack = [];
@@ -44083,6 +44520,7 @@ function buildGingaChrome(root) {
   const dojo = biLabel('button', 'nav-dojo', '集中道場', 'focus');
   dojo.type = 'button';
   dojo.addEventListener('click', () => {
+    readerTicketDeparture('dojo');
     S.navOpen = false;
     keepScroll();
     S.view = 'dojo';
@@ -44140,6 +44578,7 @@ function buildPlacesMenu(root, bar) {
     station.addEventListener('click', () => {
       S.navOpen = false;
       if (tab.view === 'search') { openSearchPage(); return; }
+      readerTicketDeparture(tab.view);
       if (tab.view === 'me') keepNavigationReturn('me', station);
       else keepScroll();
       S.stack = [];
@@ -44417,6 +44856,7 @@ function buildPrimaryTabs(root, { personal = false } = {}) {
       S.navOpen = false;
       S.tabRoot = tab.view;
       if (tab.view === 'search') { openSearchPage(); return; }
+      readerTicketDeparture(tab.view);
       if (tab.view === 'me') keepNavigationReturn('me', button);
       else keepScroll();
       if (tab.view === 'tray') S.trayFrom = { view: S.view, scroll: Math.round(window.scrollY) };
@@ -45438,8 +45878,12 @@ const FOCUS_STATE_CLASSES = new Set(['on', 'on-list', 'dead', 'active', 'lit', '
 function render() {
   // Today folds into Review in the layout under test; anything that still names it opens
   // Review, its successor. The current layout is asked only when the view is Today.
-  if (S.view === 'tray' && placesLayout()) S.view = 'dojo';
+  if (S.view === 'tray' && placesLayout()) {
+    S.view = 'dojo';
+    if (readerTicket?.route.view === 'tray') readerTicket.route.view = 'dojo';
+  }
   reviewExitUi(syncReviewExitNotice);
+  reviewExitUi(readerTicketSync);
   // a page built ahead, or kept for Back, was built against the state this render is about to replace
   pageEpoch += 1;
   if (S.scaleVisit && S.scaleVisit.recordEpoch !== recordEpoch) S.scaleVisit = null;
@@ -45662,6 +46106,7 @@ function render() {
     if (inDojo) dojoDoor.setAttribute('aria-current', 'page');
     dojoDoor.addEventListener('click', () => roomTransition(() => {
       if (inDojo) return;
+      readerTicketDeparture('dojo');
       if (S.view === 'reader' && S.passageId) {
         clearTimeout(readerPosTimer);
         void saveReaderPosition(S.passageId, Math.round(window.scrollY));
@@ -45700,6 +46145,7 @@ function render() {
     if (S.view === 'tray') trayBtn.dataset.here = '';
   }
   trayBtn.addEventListener('click', () => roomTransition(() => {
+    readerTicketDeparture('tray');
     keepScroll();
     S.stack = [];
     // the tray remembers its door — WHICHEVER door it was. It is the one

@@ -6,7 +6,7 @@ import { test } from 'node:test';
 import vm from 'node:vm';
 import * as exitCore from '../srs-core.mjs';
 import * as exitFsrs from '../vendor/ts-fsrs.mjs';
-import { reviewExitFixture } from './srs-hooks-corridor-layer.mjs';
+import { reviewExitFixture, readerTicketFixture, liftCorridor, READER_TICKET_NAMES } from './srs-hooks-corridor-layer.mjs';
 
 const source = readFileSync(new URL('../corridor.js', import.meta.url), 'utf8');
 const exitPin = JSON.parse(readFileSync(new URL('../data/fsrs-pin.json', import.meta.url), 'utf8'));
@@ -27,6 +27,7 @@ function app() {
     learningSourceVisit: null, pendingReferenceCollection: null, retainedRetryView: null,
     activeTokenAlternatives: null, readerPosTimer: null, sheetActionVisit: null, sealStrip: null, sealSerial: 0, sealPending: null, readerLayers: null, personalHost: null,
     roomTransitionUpdating: false, activeRoomTransition: null, pageEpoch: 0, recordEpoch: 4,
+    recordApp: null, recordInstallation: null, readerTicket: null,
     reviewExitUi() {}, // This fixture stops before DOM drawing; exit suite below uses real helpers.
     syncReviewExitNotice() {},
     keepScroll() {}, rememberSheet() {}, invokerKey: value => value,
@@ -38,6 +39,7 @@ function app() {
     stopSentenceListening() { throw drawingBoundary; },
   });
   context.scaleSource = visit => visit?.recordEpoch === context.recordEpoch ? { token: {} } : null;
+  vm.runInContext(liftCorridor(source, READER_TICKET_NAMES), context);
   vm.runInContext(actualFunction('syncSheetActionVisit'), context);
   // G5 (2026-10-18): a render puts away the hold's strip and the 層 layers, where it once closed the word menu
   vm.runInContext(['closeSealStrip', 'foldReaderLayers'].map(actualFunction).join('\n'), context);
@@ -289,6 +291,8 @@ function readerBack({ joined = false } = {}) {
     scaleReaderIndex() { throw new Error('A retained source must not select a new visible occurrence'); },
     syncWalkSentinel() {}, sampleTransition() {},
   });
+  vm.runInContext(liftCorridor(source, READER_TICKET_NAMES), c);
+  c.reviewExitUi = work => { try { work(); } catch { /* this partial reader fixture has no review surface */ } };
   vm.runInContext(['scaleTokenFingerprint', 'scalePassage', 'scaleSource', 'scaleLineTop', 'readerTokenAtIndex',
     'captureScaleVisit', 'focusProseWord', 'recede', 'scaleName', 'scaleNavigationAllowed', 'retireScaleReturn',
     'retireScaleTransients', 'scaleNodeFrom', 'rememberScaleEntry', 'keyboardActivated', 'go', 'scaleIn']
@@ -751,7 +755,7 @@ test('UX15 original finally render error survives while notification scheduling 
   f.sandbox.queueMicrotask = () => { scheduled++; throw new Error('secondary enqueue error'); };
   const p = f.sandbox.commitReviewAction(f.rv, f.rv.queue[0], () => ({ obslog: [['one']] }), () => {});
   const observed = p.then(() => assert.fail('existing error suppressed'), error => assert.equal(error, original));
-  f.ack(); await observed; assert.equal(scheduled, 1); assert.equal(f.box.writes, 1);
+  f.ack(); await observed; assert.equal(scheduled, 2, 'independent legacy and ticket enqueues'); assert.equal(f.box.writes, 1);
 });
 
 test('UX13 exact keyed copy and idle accessibility labels; future ticket copy absent', () => {
@@ -890,7 +894,7 @@ test('M4b stack-array-only callback permission is rejected', () => mutationKille
 test('M5 missing activity generation is rejected after completed undo', () => mutationKilled('no-generation', bytes => replaceOne(bytes, 'reviewExitState(rv).activity === intent.activity &&', 'true &&'), abaOracle));
 test('M6a inner settlement is not final', () => mutationKilled('inner-is-final', bytes => replaceOne(bytes, "!['pending', 'entered'].includes(reviewExitPhase(notice.owner.rv))", '!notice.owner.rv.pending'), bytes => tailOracle(bytes)));
 test('M6b omitted outer notification leaves a stuck label', () => mutationKilled('no-outer-refresh', bytes => replaceOne(bytes,
-  "reviewExitUi(() => settleReviewExitNotice());\n  }\n  if (!admitted.admitted)", "/* missing outer refresh */\n  }\n  if (!admitted.admitted)"), bytes => tailOracle(bytes, true)));
+  "reviewExitUi(() => settleReviewExitNotice());\n    reviewExitUi(() => settleReaderTicketNotice());\n  }\n  if (!admitted.admitted)", "/* missing outer refresh */\n    reviewExitUi(() => settleReaderTicketNotice());\n  }\n  if (!admitted.admitted)"), bytes => tailOracle(bytes, true)));
 test('M7a settled never means saved', () => mutationKilled('saved-copy', bytes => replaceOne(bytes, READY, 'Saved'), bytes => tailOracle(bytes, true)));
 test('M7b settlement never automatically departs', () => mutationKilled('auto-depart', bytes => replaceOne(bytes,
   'function settleReviewExitNotice() {', "function settleReviewExitNotice() {\n  if (S.review && !S.review.pending && !S.review.admitting) { S.review = null; S.view = 'tray'; }"), bytes => tailOracle(bytes, true)));
@@ -914,7 +918,7 @@ test('M10 duplicate admission cannot replace the original waiting operation', ()
   assert.equal(same, true, 'refused duplicate cannot mint an admission generation');
 }));
 test('M11 a throwing settlement hook cannot replace an acknowledged grade', () => mutationKilled('throwing-finally', bytes => replaceOne(bytes,
-  'finally { reviewExitUi(() => settleReviewExitNotice()); }', 'finally { settleReviewExitNotice(); }'), async bytes => {
+  'finally {\n      reviewExitUi(() => settleReviewExitNotice());', 'finally {\n      settleReviewExitNotice();'), async bytes => {
   const f = candidateFixture(bytes); f.sandbox.settleReviewExitNotice = () => { throw new Error('UI-only notification'); };
   const { promise } = await queueGrade(f); f.ack(); const result = await promise;
   assert.equal(result, true, 'new notification error cannot change acknowledged grade'); assert.equal(f.rv.ix, 1);
@@ -977,3 +981,398 @@ test('UX12 newer same-review admission retires the previous action notice before
   assert.equal(noticeText(f), '', 'old action cannot say processing finished for a new waiting action');
   f.door().fire(); ownedStatus(f, DEPARTED); release(); await next; assert.equal(f.box.writes, 1);
 });
+
+const ticketFixture = (bytes = source, options = {}) => readerTicketFixture(bytes, { core: exitCore, fsrsApi: exitFsrs, pin: exitPin, ...options });
+test('RT01 actual ordinary departure attaches, preserves the second joined occurrence and consumes once', () => {
+  const f = ticketFixture(); const { c, S } = f;
+  const roots = f.roots(); const rv = f.start();
+  const ticket = f.ticket(); assert(ticket); assert.equal(ticket.source.index, 2); assert.equal(ticket.source.end, 3);
+  S.revealed.add(4); S.glossed.clear();
+  f.door().fire(); assert.equal(S.review, rv, 'deferred update has not yet committed');
+  f.flushTransition();
+  assert.equal(S.review, null); assert.equal(S.view, 'reader'); assert.equal(f.ticket(), null);
+  assert.deepEqual([...S.revealed], [2]); assert.deepEqual([...S.glossed], [2]);
+  const job = f.placement(); assert(job?.routeCommitted);
+  f.flushFrames(); assert.equal(job.outcome, 'confirmed'); assert(Math.abs(job.delta) <= 4);
+  assert.equal(c.document.activeElement, f.anchor); assert.deepEqual(f.roots(), roots); assert.equal(f.box.writes, 0);
+  assert.equal(S.scaleVisit.index, 2);
+});
+for (const flag of ['pending', 'admitting']) test(`RT02 ${flag} including A0 retains an owned visible busy door; no automatic return`, () => {
+  const f = ticketFixture(); const rv = f.start(); rv[flag] = true;
+  f.door().fire(); assert.match(f.notice().node.textContent, /still finishing/);
+  assert(f.ticket()); assert.equal(f.transitions.length, 0);
+  rv[flag] = false; f.c.settleReaderTicketNotice(); f.flushMicrotasks();
+  assert.equal(f.notice().node.textContent, 'You can return to your reading.');
+  assert.equal(f.S.review, rv); assert.equal(f.transitions.length, 0);
+  f.door().fire(); f.flushTransition(); assert.equal(f.S.view, 'reader');
+});
+for (const change of ['activity', 'pending', 'admitting', 'sheet-aba', 'binding', 'second-token', 'source-object', 'tokens-array', 'prefix']) {
+  test(`RT03 final transition revalidates ${change}`, () => {
+    const f = ticketFixture(); const rv = f.start(); f.door().fire();
+    if (change === 'activity') f.c.reviewExitActivity(rv);
+    if (change === 'pending' || change === 'admitting') rv[change] = true;
+    if (change === 'sheet-aba') { f.S.stack.push({ t: 'word' }); f.S.stack.pop(); f.S.wordEntrySerial += 2; }
+    if (change === 'binding') f.c.recordInstallation.policy.binding.sessionId = 'new';
+    if (change === 'second-token') f.p.tokens[3].s = '別';
+    if (change === 'source-object') f.c.D.passages = [{ ...f.p }];
+    if (change === 'tokens-array') f.p.tokens = [...f.p.tokens];
+    if (change === 'prefix') f.S.navigationReturns.push({ view: 'lessons', kanjiCourseReturn: {} });
+    f.flushTransition(); assert.equal(f.S.review, rv); assert.equal(f.S.view, 'review'); assert.equal(f.focusCount(), 0);
+    assert.equal(f.box.writes, 0);
+    if (['second-token', 'source-object', 'tokens-array'].includes(change)) {
+      assert.equal(f.status().hidden, false); assert.match(f.status().textContent, /review is still open/);
+    }
+  });
+}
+for (const failure of ['missing-anchor', 'room-error', 'escaping-render', 'exhausted']) test(`RT04 consumed route reports ${failure} through independent body host`, () => {
+  const f = ticketFixture(); f.start(); f.door().fire();
+  if (failure === 'room-error') f.c.renderError = true;
+  if (failure === 'escaping-render') f.c.render = () => { f.reader.remove(); throw new Error('reader render'); };
+  if (failure === 'missing-anchor') f.c.readerTokenAtIndex = () => null;
+  if (failure === 'exhausted') { f.c.stuck = true; f.setY(250); }
+  f.flushTransition(); f.flushFrames();
+  assert.equal(f.ticket(), null); assert.equal(f.S.review, null); assert.equal(f.S.view, 'reader');
+  const status = f.status(); assert(status?.isConnected); assert.equal(status.hidden, false);
+  assert.equal(status.textContent, 'Couldn’t confirm the original reading position.');
+  f.S.stack.push({ t: 'word' }); f.c.readerTicketSync(); assert.equal(status.hidden, true); assert.equal(status.textContent, '');
+});
+test('RT05 no placement effect before full owner or after synchronous focus re-entry', () => {
+  for (const when of ['before', 'focus']) {
+    const f = ticketFixture(); f.start(); f.door().fire();
+    if (when === 'before') { const render = f.c.render; f.c.render = () => { f.c.recordInstallation.policy.binding.accountId = 'other'; render(); }; }
+    else f.c.onFocus = () => { f.S.navOpen = true; };
+    f.flushTransition(); f.flushFrames();
+    assert.equal(f.scrollCount(), 0); assert.equal(f.focusCount(), when === 'before' ? 0 : 1);
+    assert.equal(f.status()?.hidden, true);
+  }
+});
+test('RT06 exact continuation only; zero queue is inert and unrelated restart cannot rebind', () => {
+  const f = ticketFixture(); const old = f.start(); const ticket = f.ticket();
+  f.c.emptyQueue = true; f.c.startReview(null, { continueFrom: old }); assert.equal(f.ticket(), ticket); assert.equal(f.S.review, old);
+  f.c.emptyQueue = false; f.c.startReview(null, { continueFrom: old }); assert.notEqual(f.S.review, old); assert.equal(f.ticket(), ticket); assert.equal(ticket.rv, f.S.review);
+  f.c.startReview(); assert.equal(f.ticket(), null);
+});
+test('RT07 same text with no live reader, course context, selected invalid occurrence and protection never mint', () => {
+  for (const cause of ['room', 'course', 'learning', 'selected', 'protection', 'stale', 'install']) {
+    const f = ticketFixture();
+    if (cause === 'room') f.S.view = 'tray';
+    if (cause === 'course') f.S.navigationReturns.push({ view: 'lessons', stack: [], kanjiCourseReturn: {} });
+    if (cause === 'learning') f.c.learningSourceVisit = {};
+    if (cause === 'selected') f.S.readerTake.index = 20;
+    if (cause === 'protection') f.S.storeReadOnly = true;
+    if (cause === 'stale') f.c.staleTab = true;
+    if (cause === 'install') f.c.recordInstallation.assertCurrent = () => false;
+    f.start(); assert.equal(f.ticket(), null, cause);
+  }
+});
+test('RT08 real go word/kanji/radical and recede consume only at final bare reader', () => {
+  const f = ticketFixture();
+  for (const node of [{ t: 'word', id: '同じ', from: { passage: f.p.id, index: 2 } }, { t: 'kanji', id: '同' }, { t: 'radical', id: '口' }]) {
+    f.c.go(node, { instant: true }); assert(f.ticket());
+  }
+  assert.equal(f.S.stack.length, 3);
+  f.c.recede({ instant: true }); f.flushMicrotasks(); assert(f.ticket());
+  f.c.recede({ instant: true }); f.flushMicrotasks(); assert(f.ticket());
+  f.c.recede({ instant: true }); f.flushMicrotasks(); assert.equal(f.ticket(), null);
+  f.S.view = 'tray'; f.c.startReview(); assert.equal(f.ticket(), null);
+});
+test('RT09 deferred arrival observes final ladder state and detachment; no focus/scroll from observer', () => {
+  for (const replacement of ['none', 'same', 'new', 'detached']) {
+    const f = ticketFixture(); f.c.go({ t: 'word', id: '同じ', from: { passage: f.p.id, index: 2 } }, { instant: true });
+    const visit = { anchor: f.anchor, rung: 'stage' }; f.c.ladderVisit = visit;
+    f.c.recede({ all: true, instant: true });
+    if (replacement === 'none') f.c.ladderVisit = null;
+    if (replacement === 'new') f.c.ladderVisit = { anchor: f.anchor, rung: 'reading' };
+    if (replacement === 'detached') f.anchor.isConnected = false;
+    f.flushMicrotasks(); assert.equal(!!f.ticket(), replacement === 'same');
+    assert.equal(f.focusCount(), 0); assert.equal(f.scrollCount(), 0);
+  }
+});
+test('RT10 source-less canonical entry carries only; pending ordinary arrival cannot be reused', () => {
+  const f = ticketFixture();
+  f.c.go({ t: 'word', id: '同じ' }, { instant: true }); assert.equal(f.ticket(), null);
+  f.S.stack = []; f.c.go({ t: 'word', id: '同じ', from: { passage: f.p.id, index: 2 } }, { instant: true });
+  const first = f.ticket(); assert(first);
+  f.c.go({ t: 'kanji', id: '同' }, { instant: true }); assert.equal(f.ticket(), first);
+  f.c.ladderVisit = { anchor: f.anchor }; f.c.recede({ all: true, instant: true });
+  f.c.readerTicketDeparture('tray'); assert.notEqual(f.ticket(), first); f.S.view = 'tray';
+  f.flushMicrotasks(); assert.notEqual(f.ticket(), first);
+});
+test('RT11 full copy is byte exact and ticket feedback survives missing source but not modal ownership', () => {
+  const f = ticketFixture();
+  const copy = JSON.parse(JSON.stringify(vm.runInContext('READER_TICKET_COPY', f.c)));
+  assert.deepEqual(copy, {
+    door: ['読んでいたところへ戻る', 'Return to your reading'],
+    busy: ['復習の処理が続いている。終わったら、もう一度押すと読んでいたところへ戻れる。', 'This review action is still finishing. Tap again when it finishes to return to your reading.'],
+    ready: ['読んでいたところへ戻れる。', 'You can return to your reading.'],
+    unavailable: ['読んでいたところへ戻れなかった。復習の画面はそのまま開いている。', 'Couldn’t return to your reading. The review is still open.'],
+    unconfirmed: ['元の位置に戻れたか、確認できなかった。', 'Couldn’t confirm the original reading position.'],
+  });
+  f.start(); const door = f.door(); f.p.tokens[3].s = '変'; door.fire();
+  assert.equal(f.status().hidden, false); assert.equal(f.ticket(), null);
+  f.c.worldPickerEls = {}; f.c.readerTicketSync(); assert.equal(f.status().hidden, true);
+});
+async function ticketNotices(bytes, { outer = false, throws = null, enqueueThrow = 0, exception = false } = {}) {
+  const f = ticketFixture(bytes, { tailHeld: outer }); const rv = f.start();
+  rv.revealed = true; rv.declared = 1;
+  const original = new Error('original final renderer failure');
+  const action = outer ? f.grade(rv) : f.c.commitReviewAction(rv, rv.queue[0], () => ({ obslog: [['ticket-control']] }), () => {});
+  const result = action.then(value => ({ value }), error => ({ error }));
+  for (let i = 0; i < 12 && !f.queued.length; i++) await Promise.resolve();
+  assert(f.queued.length, 'actual action reached record boundary');
+  const button = f.door(); button.fire();
+  const legacy = f.find(f.main(), node => node.id === 'zen-exit'); assert(legacy); legacy.fire();
+  assert.match(f.notice().node.textContent, /still finishing/);
+  const legacyNotice = vm.runInContext('reviewExitNotice', f.c); assert.match(legacyNotice.node.textContent, /still finishing/);
+  // In omission controls neither final repaint nor the other subscriber is allowed to mask the missing notification.
+  f.c.render = () => { if (exception) throw original; };
+  f.ack();
+  if (outer) {
+    await f.callbackDone;
+    f.flushMicrotasks();
+    assert.equal(rv.pending, null); assert.equal(rv.admitting, true);
+    assert.match(f.notice().node.textContent, /still finishing/);
+  }
+  if (throws) f.c[throws] = () => { throw new Error('injected subscriber failure'); };
+  if (enqueueThrow) {
+    let n = 0; f.c.queueMicrotask = fn => { if (++n === enqueueThrow) throw new Error('injected enqueue failure'); f.microtasks.push(fn); };
+  }
+  if (outer) f.releaseTail();
+  const outcome = await result; f.flushMicrotasks();
+  if (exception) assert.equal(outcome.error, original, 'UI notification preserves original renderer error');
+  else { assert.equal(outcome.error, undefined); assert.equal(outcome.value, true); }
+  assert.equal(f.box.writes, 1);
+  return { f, legacyNotice };
+}
+for (const outer of [false, true]) {
+  test(`RT12 ${outer ? 'outer' : 'inner'} settlement updates both real notices without repaint`, async () => {
+    const { f, legacyNotice } = await ticketNotices(source, { outer });
+    assert.equal(f.notice().node.textContent, 'You can return to your reading.');
+    assert.equal(legacyNotice.node.textContent, READY);
+  });
+  for (const throws of ['syncReviewExitNotice', 'readerTicketSync']) test(`RT13 ${outer ? 'outer' : 'inner'} independent ${throws} callback failure`, async () => {
+    const { f, legacyNotice } = await ticketNotices(source, { outer, throws });
+    if (throws === 'syncReviewExitNotice') assert.equal(f.notice().node.textContent, 'You can return to your reading.');
+    else assert.equal(legacyNotice.node.textContent, READY);
+  });
+}
+for (const enqueueThrow of [1, 2]) test(`RT14 independent enqueue failure ${enqueueThrow} cannot suppress the other subscriber`, async () => {
+  const { f, legacyNotice } = await ticketNotices(source, { outer: true, enqueueThrow });
+  if (enqueueThrow === 1) assert.equal(f.notice().node.textContent, 'You can return to your reading.');
+  else assert.equal(legacyNotice.node.textContent, READY);
+});
+test('RT15 exceptional inner finally still delivers both notices and preserves the original error', async () => {
+  const { f, legacyNotice } = await ticketNotices(source, { exception: true });
+  assert.equal(f.notice().node.textContent, 'You can return to your reading.'); assert.equal(legacyNotice.node.textContent, READY);
+});
+for (const outer of [false, true]) for (const target of ['settleReviewExitNotice', 'settleReaderTicketNotice']) {
+  test(`RTM omission ${outer ? 'outer' : 'inner'} ${target} is killed by its actual notice`, async () => {
+    const indent = outer ? '    ' : '      ';
+    const anchor = `\n${indent}reviewExitUi(() => ${target}());`;
+    const changed = replaceOne(source, anchor + '\n', `\n${indent}/* single subscriber omitted */\n`);
+    await mutationKilled(target, () => changed, async bytes => {
+      const { f, legacyNotice } = await ticketNotices(bytes, { outer });
+      assert.equal(target === 'settleReaderTicketNotice' ? f.notice().node.textContent : legacyNotice.node.textContent,
+        target === 'settleReaderTicketNotice' ? 'You can return to your reading.' : READY, 'omitted subscriber leaves its live busy notice');
+    });
+  });
+}
+for (const first of ['syncReviewExitNotice', 'readerTicketSync']) test(`RTM shared-try ${first} first loses the reciprocal notice`, async () => {
+  const second = first === 'syncReviewExitNotice' ? 'readerTicketSync' : 'syncReviewExitNotice';
+  const anchor = '    reviewExitUi(() => settleReviewExitNotice());\n    reviewExitUi(() => settleReaderTicketNotice());';
+  const mutant = replaceOne(source, anchor, `    reviewExitUi(() => queueMicrotask(() => reviewExitUi(() => { ${first}(); ${second}(); })));`);
+  await mutationKilled('shared-try', () => mutant, async bytes => {
+    const { f, legacyNotice } = await ticketNotices(bytes, { outer: true, throws: first });
+    assert.equal(first === 'syncReviewExitNotice' ? f.notice().node.textContent : legacyNotice.node.textContent,
+      first === 'syncReviewExitNotice' ? 'You can return to your reading.' : READY);
+  });
+});
+test('RT16 ordinary Back rejects mutation of an already admitted suffix, without blessing it', () => {
+  const f = ticketFixture(); f.c.keepNavigationReturn('search'); f.S.view = 'search';
+  assert(f.ticket()); f.S.navigationReturns[0].readerTake = { p: f.p.id, index: 0 };
+  f.c.returnFromNavigation(); assert.equal(f.ticket(), null);
+});
+test('RT17 focus re-entry to another article retires old feedback even when room and counters match', () => {
+  const f = ticketFixture(); f.start(); f.door().fire();
+  f.c.onFocus = () => { f.S.passageId = 'different-article'; };
+  f.flushTransition(); f.flushFrames();
+  assert.equal(f.focusCount(), 1); assert.equal(f.scrollCount(), 0); assert.equal(f.status().hidden, true);
+});
+for (const [name, from, to, change] of [
+  ['whole-span', 's.fingerprints.every((value, i) => value === scaleTokenFingerprint(p.tokens[s.index + i]))',
+    's.fingerprints[0] === scaleTokenFingerprint(p.tokens[s.index])', f => { f.p.tokens[3].s = 'changed'; }],
+  ['token-array-identity', 'p.tokens === s.tokens && s.end >= s.index', 's.end >= s.index', f => { f.p.tokens = [...f.p.tokens]; }],
+  ['source-identity', 'p === s.p && p.file === s.file', 'p.file === s.file', f => { f.c.D.passages = [{ ...f.p }]; }],
+  ['captured-marks', 'revealed: S.revealed ? new Set(S.revealed) : null,\n    glossed: S.glossed ? new Set(S.glossed) : null };',
+    'revealed: S.revealed,\n    glossed: S.glossed };', f => { f.S.revealed.add(4); }],
+]) test(`RTM ${name} guard is behaviorally necessary`, async () => {
+  await mutationKilled(name, bytes => replaceOne(bytes, from, to), async bytes => {
+    const f = ticketFixture(bytes); const rv = f.start(); const door = f.door(); change(f); door.fire(); f.flushTransition();
+    if (name === 'captured-marks') assert.deepEqual([...f.S.revealed], [2]);
+    else assert.equal(f.S.review, rv, 'changed source cannot navigate');
+  });
+});
+async function arrivalObserverOracle(bytes) {
+  const f = ticketFixture(bytes); const c = f.c;
+  vm.runInContext(liftCorridor(bytes, ['clearWordLadder']), c);
+  Object.assign(c, { readingSlipSerial: 0, syncChromeKeep() {}, refreshLadderRoom() {} });
+  c.go({ t: 'word', id: '同じ', from: { passage: f.p.id, index: 2 } }, { instant: true });
+  c.ladderVisit = { anchor: f.anchor, rung: 'stage' };
+  c.recede({ all: true, instant: true }); f.flushMicrotasks(); assert(f.ticket(), 'stage is not a bare arrival');
+  c.clearWordLadder(); assert(f.ticket(), 'observer waits for the final event state'); f.flushMicrotasks();
+  assert.equal(f.ticket(), null, 'actual clear observer consumes exactly at final bare state');
+  assert.equal(f.focusCount(), 0); assert.equal(f.scrollCount(), 0);
+}
+test('RT18 actual ladder cleanup observes final bare state without changing its timing', () => arrivalObserverOracle(source));
+test('RTM omitted pending-visit arrival callback is killed after actual clear', () => mutationKilled('missing-arrival-observer',
+  bytes => replaceOne(bytes, 'visit.ticketArrival?.();', '/* observer omitted */'), arrivalObserverOracle));
+for (const order of ['old-first', 'new-first']) test(`RT19 cancelled deferred callback remains inert (${order})`, () => {
+  const f = ticketFixture(); const rv = f.start(); f.door().fire(); const old = f.transitions.shift();
+  f.S.navOpen = true; f.c.readerTicketSync(); f.S.navOpen = false;
+  f.door().fire(); const current = f.transitions.shift(); assert(current);
+  if (order === 'old-first') { old(); assert.equal(f.S.review, rv); current(); }
+  else { current(); const job = f.placement(); old(); assert.equal(f.placement(), job); }
+  assert.equal(f.S.review, null); assert.equal(f.ticket(), null); assert.equal(f.box.writes, 0);
+});
+for (const throws of ['syncReviewExitNotice', 'readerTicketSync']) test(`RT20 original exceptional result survives ${throws} failure`, async () => {
+  const { f, legacyNotice } = await ticketNotices(source, { exception: true, throws });
+  if (throws === 'syncReviewExitNotice') assert.equal(f.notice().node.textContent, 'You can return to your reading.');
+  else assert.equal(legacyNotice.node.textContent, READY);
+});
+
+// W2 RT-B-POST-PLACEMENT: continue through the actual article/sentence doors
+// after the ticket's one return. The shared fixture and its layout model stay
+// unchanged; these additional authored functions replace its scale stubs here.
+function postTicketScaleFixture(bytes = source) {
+  const f = ticketFixture(bytes), c = f.c;
+  Object.assign(c, {
+    scaleNavigationAllowed: () => true,
+    scaleName: () => f.S.stack.at(-1)?.t === 'sent' ? 'sentence' : 'article',
+    scaleOutTarget: () => f.S.stack.at(-1)?.t === 'sent' ? 'article' : null,
+    adjacentScaleOutTarget: () => f.S.stack.at(-1)?.t === 'sent' ? 'article' : null,
+    clearReaderReadings() {}, stopSentenceListening() {}, keyboardActivated: () => true,
+  });
+  vm.runInContext(liftCorridor(bytes, ['scaleIn', 'scaleOut', 'retireScaleTransients', 'replaceScalePages',
+    'rememberScaleEntry', 'scaleNodeFrom', 'scaleNodeBelongs', 'captureScaleVisit']), c);
+  return f;
+}
+function startTicketPlacement(f) {
+  f.start(); f.door().fire();
+  const transition = f.transitions.shift(); assert(transition); transition();
+  const job = f.placement(); assert(job?.routeCommitted);
+  assert.equal(job.visit.ticketPlacement, job);
+  return { job, visit: job.visit, transition };
+}
+function finishTicketPlacement(f, kind) {
+  const result = startTicketPlacement(f);
+  if (kind === 'unconfirmed') { f.c.stuck = true; f.setY(250); }
+  if (kind === 'revoked') f.c.readerTicketRevoke();
+  else if (kind === 'cancelled') f.c.retireScaleReturn();
+  else f.flushFrames();
+  f.c.stuck = false;
+  if (kind !== 'revoked') assert.equal(result.job.outcome, kind);
+  assert.equal(f.placement(), null);
+  return result;
+}
+function ordinaryScaleRoundTrip(f, visit) {
+  assert.equal(f.c.scaleIn(), true);
+  assert.equal(f.S.scaleVisit, visit, 'the actual scaleIn/go path retains the source visit');
+  assert.equal(f.S.stack.at(-1), visit.sentence);
+  f.setY(250);
+  const before = { focus: f.focusCount(), scroll: f.scrollCount() };
+  assert.equal(f.c.scaleOut(), true); f.flushFrames();
+  assert.equal(f.y(), 125, 'subsequent ordinary return settles the original glyph position');
+  assert.equal(f.focusCount(), before.focus + 2, 'ordinary placement owns initial and final focus');
+  assert.equal(f.scrollCount(), before.scroll + 2, 'ordinary placement restores scroll and corrects the displacement');
+  assert.equal(visit.returnRequest, null); assert.equal(visit.returnJob, null);
+  assert.equal(f.box.writes, 0);
+}
+for (const kind of ['confirmed', 'unconfirmed', 'cancelled', 'revoked']) {
+  test(`RT21 ${kind} ticket placement retires its marker before the next actual article/sentence round trip`, () => {
+    const f = postTicketScaleFixture(), roots = f.roots();
+    const { visit } = finishTicketPlacement(f, kind);
+    assert.equal(Object.hasOwn(visit, 'ticketPlacement'), false, 'the terminal or revoked ticket no longer owns this visit');
+    ordinaryScaleRoundTrip(f, visit); assert.deepEqual(f.roots(), roots);
+    if (kind === 'confirmed') {
+      assert.equal(f.focusCount(), 4); assert.equal(f.scrollCount(), 3);
+    }
+  });
+}
+function placementEffects(f) {
+  const visit = f.S.scaleVisit;
+  return { visit, ticket: f.ticket(), placement: f.placement(), feedback: f.feedback(),
+    request: visit?.returnRequest, job: visit?.returnJob, marker: visit?.ticketPlacement,
+    focus: f.focusCount(), scroll: f.scrollCount(), y: f.y(),
+    statusHidden: f.status()?.hidden, statusText: f.status()?.textContent,
+    queuedFrames: f.frames.length, queuedTransitions: f.transitions.length, writes: f.box.writes };
+}
+function replayObsoletePlacement(f, transition, frames) {
+  const before = placementEffects(f);
+  transition(); for (const callback of frames) callback();
+  assert.deepEqual(placementEffects(f), before, 'obsolete callbacks cannot move, notify, clear a request or detach another job');
+}
+function placementCallbackOracle(bytes, { stage = 'initial', next = 'ticket', order = 'during', terminal = 'revoked' } = {}) {
+  const f = postTicketScaleFixture(bytes), roots = f.roots();
+  const old = startTicketPlacement(f);
+  if (terminal === 'unconfirmed') { f.c.stuck = true; f.setY(250); }
+  if (stage === 'correction') { assert.equal(f.frames.length, 1); f.frames.shift()(); }
+  const obsoleteFrames = f.frames.slice(); assert.equal(obsoleteFrames.length, 1);
+  if (terminal === 'revoked') { f.frames.splice(0); f.c.readerTicketRevoke(); }
+  else { f.flushFrames(); assert.equal(old.job.outcome, terminal); }
+  f.c.stuck = false;
+  const replay = () => replayObsoletePlacement(f, old.transition, obsoleteFrames);
+  if (order === 'before') replay();
+  let successor;
+  if (next === 'ordinary') {
+    assert.equal(f.c.scaleIn(), true); assert.equal(f.S.scaleVisit, old.visit);
+    f.setY(250); assert.equal(f.c.scaleOut(), true);
+    successor = { visit: f.S.scaleVisit, request: f.S.scaleVisit.returnRequest, job: f.S.scaleVisit.returnJob };
+    assert(successor.request); assert(successor.job);
+  } else {
+    successor = startTicketPlacement(f);
+    assert.notEqual(successor.visit, old.visit);
+    assert.equal(successor.visit.ticketPlacement, successor.job);
+  }
+  if (order === 'during') replay();
+  f.flushFrames();
+  if (order === 'after') replay();
+  assert.equal(f.y(), successor.visit.viewportY); assert.equal(successor.visit.returnRequest, null); assert.equal(successor.visit.returnJob, null);
+  if (next === 'ticket') {
+    assert.equal(successor.job.outcome, 'confirmed'); assert.equal(f.placement(), null);
+    assert.equal(Object.hasOwn(successor.visit, 'ticketPlacement'), false);
+  }
+  assert.equal(f.box.writes, 0); assert.deepEqual(f.roots(), roots);
+}
+for (const stage of ['initial', 'correction']) for (const next of ['ordinary', 'ticket']) for (const order of ['before', 'during', 'after']) {
+  test(`RT22 obsolete ${stage} RAF and transition are inert ${order} successor ${next} placement`, () =>
+    placementCallbackOracle(source, { stage, next, order }));
+}
+for (const terminal of ['confirmed', 'unconfirmed']) for (const next of ['ordinary', 'ticket']) for (const order of ['before', 'during', 'after']) {
+  test(`RT22 completed ${terminal} correction and transition are inert ${order} successor ${next} placement`, () =>
+    placementCallbackOracle(source, { stage: 'correction', terminal, next, order }));
+}
+test('RT23 revoke and completion remove only the matching visit marker', () => {
+  for (const action of ['revoke', 'complete']) {
+    const f = postTicketScaleFixture(); const { job, visit } = startTicketPlacement(f);
+    const replacement = { visit, generation: 'a different placement owner' };
+    visit.ticketPlacement = replacement;
+    if (action === 'revoke') f.c.readerTicketRevoke();
+    else f.c.readerTicketPlacementDone(job, 'cancelled');
+    assert.equal(visit.ticketPlacement, replacement, 'cleanup cannot delete a different marker');
+  }
+});
+test('RTM omitted terminal-marker retirement blocks the next ordinary request', () => mutationKilled('terminal-marker-left',
+  bytes => replaceOne(bytes, '  if (job.visit.ticketPlacement === job) delete job.visit.ticketPlacement;\n', ''), async bytes => {
+    const f = postTicketScaleFixture(bytes); const { visit } = finishTicketPlacement(f, 'confirmed');
+    f.setY(250); assert.equal(f.c.requestScaleReturn(visit), true); f.c.settleScaleReturn(f.reader); f.flushFrames();
+    assert.equal(f.y(), 125, 'ordinary placement must not be blocked by a completed ticket');
+    assert.equal(visit.returnRequest, null);
+  }));
+test('RTM omitted revoke-marker retirement blocks the next article/sentence return', () => mutationKilled('revoked-marker-left',
+  bytes => replaceOne(bytes, '  if (job && job.visit.ticketPlacement === job) delete job.visit.ticketPlacement;\n', ''), async bytes => {
+    const f = postTicketScaleFixture(bytes); const { visit } = finishTicketPlacement(f, 'revoked');
+    ordinaryScaleRoundTrip(f, visit);
+  }));
+test('RTM obsolete completion without the active-job fence detaches a newer ticket', () => mutationKilled('old-completion-unfenced',
+  bytes => replaceOne(bytes, '  if (readerTicketPlacement !== job) return;\n', ''), async bytes =>
+    placementCallbackOracle(bytes, { stage: 'correction', next: 'ticket', order: 'during' })));
