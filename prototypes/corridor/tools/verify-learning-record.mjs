@@ -1,3 +1,4 @@
+import { REVIEW_EXIT_NAMES } from './srs-hooks-corridor-layer.mjs';
 /** Controlled acknowledgment tests of the actual authored learning handlers.
  * Frozen synthetic roots detect premature mutation. This verifies the UI save
  * contract; RecordApp/Host suites separately exercise real browser storage. */
@@ -70,6 +71,7 @@ if (g2Control) {
 }
 const ast = ts.createSourceFile('corridor.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
 const names = new Set([
+  ...REVIEW_EXIT_NAMES,
   'srsKey', 'srsCardOf', 'srsStoredRecord', 'srsSchedulerInstant', 'srsReviewLogRow',
   'focusKanjiReadingReview', 'kanjiAnswerAvailable', 'retainedKanjiRecord', 'validKanjiRecord', 'nonEmptyString', 'safeJsonValue',
   'advanceReviewSession', 'resetAssessmentQuestionReview', 'commitReviewAction', 'commitDrillGrade', 'commitStandardGrade',
@@ -120,6 +122,8 @@ class Element {
   }
   append(...children) { this.children.push(...children); }
   setAttribute() {}
+  getAttribute() { return null; }
+  removeAttribute() {}
   addEventListener(kind, run) { this.events[kind] = run; }
   remove() { this.removed = true; }
   fire() { return this.events.click?.(); }
@@ -134,7 +138,7 @@ const questions = Array.from({ length: 3 }, (_, i) => ({ q: 'Synthetic question 
 const quiz = () => ({ qs: questions, ix: 0, picked: null, correct: 0, ts: 100 });
 function fixture(overrides = {}, options = {}) {
   const durableNames = ['taken', 'srs', 'revlog', 'obslog', 'stats', 'suspended', 'lessonsDone', 'deepWords', 'srsPrefs', 'aiQuiz'];
-  const S = { view: 'review', focus: null, review: run(), reviewMore: false, probe: null,
+  const S = { stack: [], view: 'review', focus: null, review: run(), reviewMore: false, probe: null,
     taken: [clone(item)], srs: {}, revlog: [], obslog: [], stats: {}, suspended: {}, lessonsDone: {}, deepWords: {},
     srsPrefs: { newPerDay: 20, reviewLimit: 20 }, aiQuiz: null, ...overrides };
   let durable = Object.fromEntries(durableNames.map((key) => [key, freeze(clone(S[key]))]));
@@ -144,7 +148,8 @@ function fixture(overrides = {}, options = {}) {
   let scrolls = 0;
   const sandbox = {
     S, Date: options.Date || Date, Math, JSON, Set, Map, console, fsrsApi, srsCore, scheduler: fsrsApi.fsrs({ enable_fuzz: false }), recordEpoch: 1,
-    assessmentQuestionReviewOwner: null,
+    assessmentQuestionReviewOwner: null, queueMicrotask, recordApp: null, recordInstallation: null,
+    recordDeparted: false, staleTab: false, storeSealed: false,
     recordReady: (epoch = 1) => epoch === sandbox.recordEpoch,
     recordWritable: (epoch = 1) => epoch === sandbox.recordEpoch,
     render: () => { paints += 1; },

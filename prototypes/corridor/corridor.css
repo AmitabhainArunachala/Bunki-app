@@ -6268,6 +6268,13 @@ body.zen main {
 .zen-exit {
   right: 6px;
 }
+.zen-exit[aria-busy='true'] {
+  width: auto;
+  min-width: var(--tap);
+  max-width: calc(100vw - 2 * var(--tap));
+  padding-inline: 10px;
+  font-size: var(--type-label);
+}
 .zen-more {
   left: 6px;
   letter-spacing: 0.08em;

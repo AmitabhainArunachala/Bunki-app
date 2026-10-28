@@ -1787,6 +1787,7 @@ function syncStoreAlert() {
 /** Storage truth never depends on presentation code. DOM/layout failures are
  * deliberately swallowed at this seam and remain retryable on the next sync. */
 function safelySyncStoreAlert() {
+  reviewExitUi(syncReviewExitNotice);
   try {
     return syncStoreAlert();
   } catch {
@@ -3207,6 +3208,8 @@ function preserveVisibleDrafts() {
     .every(Boolean) && captureKept;
 }
 function releaseRecordOwnership() {
+  reviewExitIntent = null;
+  retireReviewExitNotice();
   preserveVisibleDrafts();
   teacherDraftController?.close();
   sentenceDraftController?.close();
@@ -32026,11 +32029,184 @@ function dropReviewCard(rv) {
   resetAssessmentQuestionReview(rv);
 }
 
+// Review exits own UI intent only: no record field, timer, lock release or grade replay.
+const reviewExitStates = new WeakMap();
+const reviewExitAdmissions = new WeakMap();
+let reviewExitGeneration = 0;
+let reviewExitNotice = null;
+let reviewExitIntent = null;
+const REVIEW_EXIT_COPY = {
+  busyLabel: ['処理中…', 'Processing…'],
+  busy: ['復習の処理が続いている。終わったら、もう一度押すと出られる。', 'This review action is still finishing. Tap again when it finishes to leave the review.'],
+  ready: ['処理は終わった。もう一度押すと復習を閉じる。', 'Processing has finished. Tap again to leave the review.'],
+  departed: ['この答えは記録せずに復習を閉じた。', 'This answer was not recorded. You left the review.'],
+  recheck: ['復習の状態が変わった。もう一度押すと復習を閉じる。', 'The review state changed. Tap again to leave.'],
+};
+function reviewExitState(rv) {
+  let state = reviewExitStates.get(rv);
+  if (!state) { state = { activity: 0, admission: null }; reviewExitStates.set(rv, state); }
+  return state;
+}
+function reviewExitActivity(rv) {
+  // Failure of this UI-only counter fails closed for a retained exit, never a grade.
+  try {
+    reviewExitState(rv).activity = ++reviewExitGeneration;
+    reviewExitUi(syncReviewExitNotice);
+  }
+  catch { reviewExitIntent = null; }
+}
+function reviewExitUi(work) {
+  try { work(); } catch { /* feedback cannot redefine a publication outcome */ }
+}
+function reviewExitOwner(rv) {
+  const binding = recordInstallation?.policy?.binding;
+  let current = false;
+  try { current = recordInstallation?.assertCurrent() === true; } catch { /* an idle protected review can still close */ }
+  return { rv, view: S.view, stack: [...S.stack], app: recordApp, installation: recordInstallation,
+    epoch: recordEpoch, session: binding?.sessionId, account: binding?.accountId, learner: binding?.learnerId,
+    current, departed: recordDeparted, stale: staleTab, sealed: storeSealed, readOnly: S.storeReadOnly,
+    departures: S.navigationDepartures, wordEntry: S.wordEntrySerial };
+}
+function reviewExitOwns(owner) {
+  if (!owner) return false;
+  const now = reviewExitOwner(S.review);
+  return Object.keys(owner).every(key => key === 'stack'
+    ? owner.stack.length === now.stack.length && owner.stack.every((frame, i) => frame === now.stack[i])
+    : owner[key] === now[key]);
+}
+function reviewExitPhase(rv) {
+  if (rv.pending) return 'pending';
+  if (!rv.admitting) return 'idle';
+  const admission = reviewExitStates.get(rv)?.admission;
+  return admission && reviewExitAdmissions.get(rv) === admission && admission.entered === false &&
+    Number.isSafeInteger(admission.generation) && admission.generation === reviewExitStates.get(rv)?.admissionGeneration
+    ? 'waiting' : 'entered';
+}
+function restoreReviewExitControl(control) {
+  if (!control) return;
+  const { button, nodes, text, label } = control;
+  if (nodes.length) button.replaceChildren(...nodes);
+  else button.textContent = text;
+  if (label === null) button.removeAttribute('aria-label');
+  else button.setAttribute('aria-label', label);
+  button.removeAttribute('aria-busy');
+  button.removeAttribute('aria-describedby');
+}
+function retireReviewExitNotice() {
+  const old = reviewExitNotice;
+  reviewExitNotice = null;
+  reviewExitUi(() => { old?.node?.remove(); restoreReviewExitControl(old?.control); });
+}
+function syncReviewExitNotice() {
+  if (reviewExitIntent && !reviewExitOwns(reviewExitIntent.owner)) reviewExitIntent = null;
+  const notice = reviewExitNotice;
+  if (!notice) return;
+  if (!reviewExitOwns(notice.owner)) { retireReviewExitNotice(); return; }
+  if (notice.kind !== 'departed' && reviewExitStates.get(notice.owner.rv)?.activity !== notice.activity) {
+    retireReviewExitNotice(); return;
+  }
+  if (notice.kind === 'busy' && !['pending', 'entered'].includes(reviewExitPhase(notice.owner.rv))) notice.kind = 'ready';
+  if (notice.node) notice.node.textContent = tx(...REVIEW_EXIT_COPY[notice.kind]);
+  const control = notice.control;
+  if (!control?.button.isConnected) return;
+  restoreReviewExitControl(control);
+  control.button.setAttribute('aria-describedby', 'review-exit-status');
+  if (notice.kind === 'busy') {
+    control.button.textContent = tx(...REVIEW_EXIT_COPY.busyLabel);
+    control.button.setAttribute('aria-label', tx(...REVIEW_EXIT_COPY.busyLabel));
+    control.button.setAttribute('aria-busy', 'true');
+  }
+}
+function renderReviewExitNotice(main) {
+  syncReviewExitNotice();
+  const notice = reviewExitNotice;
+  if (!notice) return;
+  if (!notice.node || !main.contains(notice.node)) {
+    const node = el('p', 'srs-forecast', tx(...REVIEW_EXIT_COPY[notice.kind]));
+    node.id = 'review-exit-status';
+    node.setAttribute('role', 'status');
+    node.setAttribute('aria-live', 'polite');
+    notice.node = node;
+    main.prepend(node);
+  }
+  syncReviewExitNotice();
+}
+function showReviewExitNotice(owner, kind, control, main) {
+  // A transition can complete after an in-place repaint. Paint on the live
+  // replacement control, never only into the detached press-time main.
+  const current = reviewExitStates.get(owner.rv)?.control;
+  if (current && reviewExitOwns(current.owner) && current.button.isConnected) {
+    control = current;
+    main = current.main;
+  }
+  retireReviewExitNotice();
+  reviewExitNotice = { owner, kind, control, node: null, activity: reviewExitState(owner.rv).activity };
+  renderReviewExitNotice(main);
+}
+function settleReviewExitNotice() {
+  // The outer notification follows synchronous refusal classification. Enqueue
+  // and drawing errors are isolated separately, including an exceptional grade.
+  reviewExitUi(() => queueMicrotask(() => reviewExitUi(syncReviewExitNotice)));
+}
+function bindReviewExit(button, main, rv, deferred = false) {
+  const owner = reviewExitOwner(rv);
+  const control = { button, main, owner, nodes: [...button.childNodes], text: button.textContent, label: button.getAttribute('aria-label') };
+  reviewExitState(rv).control = control;
+  if (reviewExitNotice && reviewExitOwns(reviewExitNotice.owner) && reviewExitNotice.owner.rv === rv) {
+    reviewExitNotice.control = control;
+    reviewExitUi(() => renderReviewExitNotice(main));
+  }
+  button.addEventListener('click', () => {
+    // A protection warning can arrive without repainting this control. A fresh
+    // idle exit still works; only retained work pins the record's old authority.
+    if (!button.isConnected || S.review !== rv || S.view !== owner.view || S.view !== 'review' ||
+        S.stack.length !== owner.stack.length || owner.stack.some((frame, i) => frame !== S.stack[i]) ||
+        S.navigationDepartures !== owner.departures || S.wordEntrySerial !== owner.wordEntry) return;
+    const pressedOwner = reviewExitOwner(rv);
+    control.owner = pressedOwner;
+    const phase = reviewExitPhase(rv);
+    if (phase === 'pending' || phase === 'entered') {
+      reviewExitUi(() => showReviewExitNotice(pressedOwner, 'busy', control, main));
+      return;
+    }
+    if (reviewExitIntent && reviewExitOwns(reviewExitIntent.owner)) return;
+    const state = reviewExitState(rv);
+    const intent = { owner: pressedOwner, activity: state.activity, admission: phase === 'waiting' ? state.admission : null };
+    reviewExitIntent = intent;
+    const leave = () => {
+      if (reviewExitIntent !== intent) return;
+      reviewExitIntent = null;
+      if (!reviewExitOwns(pressedOwner)) return;
+      const current = reviewExitPhase(rv);
+      const same = reviewExitState(rv).activity === intent.activity &&
+        (!intent.admission || (reviewExitState(rv).admission === intent.admission && !intent.admission.entered && current === 'waiting'));
+      if (!same || current === 'pending' || current === 'entered') {
+        reviewExitUi(() => showReviewExitNotice(pressedOwner, current === 'pending' || current === 'entered' ? 'busy' : 'recheck', control, main));
+        return;
+      }
+      // No asynchronous gap from the final permission check to departure.
+      retireReviewExitNotice();
+      S.review = null;
+      S.view = 'tray';
+      if (intent.admission) {
+        const destination = reviewExitOwner(null);
+        destination.view = placesLayout() ? 'dojo' : 'tray';
+        reviewExitNotice = { owner: destination, kind: 'departed', control: null, node: null };
+      }
+      render();
+    };
+    if (deferred) roomTransition(leave);
+    else leave();
+  });
+}
+
 async function commitReviewAction(rv, item, produce, advance, report = null) {
   if (!rv || rv.pending || S.review !== rv || rv.queue[rv.ix] !== item || !recordWritable()) return false;
   const epoch = recordEpoch;
   const ix = rv.ix;
   const pending = {};
+  try { if (!reviewExitAdmissions.get(rv)?.entered) reviewExitActivity(rv); }
+  catch { reviewExitIntent = null; }
   rv.pending = pending;
   let failure = null;
   try {
@@ -32058,7 +32234,9 @@ async function commitReviewAction(rv, item, produce, advance, report = null) {
     return true;
   } finally {
     if (rv.pending === pending) rv.pending = null;
-    if (recordReady(epoch) && S.review === rv && S.view === 'review') { render(); focusKanjiReadingReview(rv, item); }
+    try {
+      if (recordReady(epoch) && S.review === rv && S.view === 'review') { render(); focusKanjiReadingReview(rv, item); }
+    } finally { reviewExitUi(() => settleReviewExitNotice()); }
   }
 }
 
@@ -32085,6 +32263,17 @@ async function commitDrillGrade({ rv, item, next, key, skey, rating, mode, now }
  */
 async function admitStandardGrade({ rv, item, key, skey, rating }) {
   if (!rv || rv.pending || rv.admitting || S.review !== rv || rv.queue[rv.ix] !== item || !rv.revealed) return false;
+  const admission = { generation: ++reviewExitGeneration, entered: false };
+  try {
+    reviewExitActivity(rv);
+    const state = reviewExitState(rv);
+    state.admission = admission;
+    state.admissionGeneration = admission.generation;
+    reviewExitAdmissions.set(rv, admission);
+  } catch {
+    reviewExitAdmissions.delete(rv);
+    reviewExitIntent = null;
+  }
   rv.admitting = true;
   // the record this page owned when the grade was given: one adopted while the grade waited for the lock never takes it
   const epoch = recordEpoch;
@@ -32097,6 +32286,7 @@ async function admitStandardGrade({ rv, item, key, skey, rating }) {
       storage: globalThis.localStorage,
       where: 'corridor',
       commit: async ({ now, answered, reserve }) => {
+        admission.entered = true;
         if (!recordWritable(epoch)) { refusal = 'publish-failed'; return { outcome: 'not-published', graded: false }; }
         const report = {};
         const graded = await commitStandardGrade({ rv, item, key, skey, rating, now, day: dayKey(now), answered, reserve, report,
@@ -32106,6 +32296,9 @@ async function admitStandardGrade({ rv, item, key, skey, rating }) {
     });
   } finally {
     rv.admitting = false;
+    if (reviewExitAdmissions.get(rv) === admission) reviewExitAdmissions.delete(rv);
+    reviewExitUi(() => { if (reviewExitState(rv).admission === admission) reviewExitState(rv).admission = null; });
+    reviewExitUi(() => settleReviewExitNotice());
   }
   if (!admitted.admitted) refusal = admitted.reason;
   else if (!admitted.graded && !refusal && (admitted.outcome === 'published' || admitted.outcome === 'uncertain')) refusal = 'publish-uncertain';
@@ -32979,11 +33172,7 @@ function renderReview(main) {
     const doors = el('div', 'close-doors');
     const out = placesLayout() ? biLabel('button', 'take quiet', '復習へ', 'Back to Review') : biLabel('button', 'take quiet', '今日へ', 'Back to Today');
     out.type = 'button';
-    out.addEventListener('click', () => roomTransition(() => {
-      S.review = null;
-      S.view = 'tray';
-      render();
-    }));
+    bindReviewExit(out, main, rv, true);
     doors.append(out);
     renderReviewUndo(doors, rv);
     main.append(doors);
@@ -33015,11 +33204,7 @@ function renderReview(main) {
     exit.type = 'button';
     exit.id = 'zen-exit';
     exit.setAttribute('aria-label', tx('復習を閉じる', 'leave the session'));
-    exit.addEventListener('click', () => {
-      S.review = null;
-      S.view = 'tray';
-      render();
-    });
+    bindReviewExit(exit, main, rv);
     main.append(exit);
   }
   const moreBtn = el('button', 'zen-more' + (S.reviewMore ? ' open' : ''), '…');
@@ -33838,11 +34023,7 @@ function renderReviewBreak(main, rv, graded) {
   });
   const out = placesLayout() ? biLabel('button', 'chip', '復習へ', 'Back to Review') : biLabel('button', 'chip', 'リストへ', 'back to lists');
   out.type = 'button';
-  out.addEventListener('click', () => {
-    S.review = null;
-    S.view = 'tray';
-    render();
-  });
+  bindReviewExit(out, main, rv);
   doors.append(go, out);
   main.append(doors);
 }
@@ -45258,6 +45439,7 @@ function render() {
   // Today folds into Review in the layout under test; anything that still names it opens
   // Review, its successor. The current layout is asked only when the view is Today.
   if (S.view === 'tray' && placesLayout()) S.view = 'dojo';
+  reviewExitUi(syncReviewExitNotice);
   // a page built ahead, or kept for Back, was built against the state this render is about to replace
   pageEpoch += 1;
   if (S.scaleVisit && S.scaleVisit.recordEpoch !== recordEpoch) S.scaleVisit = null;
@@ -45635,6 +45817,7 @@ function render() {
     main.replaceChildren();
     renderRoomError(main, S.view, error);
   }
+  reviewExitUi(() => renderReviewExitNotice(main));
   // the room's vertical sign hangs first in the page, floated into its right margin
   { const sign = main.querySelector('.room-error') ? null : buildRoomSign(); if (sign) main.prepend(sign); }
   // after the room, never inside its stage: the focused stage keeps its composition and every

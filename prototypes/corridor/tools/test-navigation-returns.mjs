@@ -4,8 +4,12 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import vm from 'node:vm';
+import * as exitCore from '../srs-core.mjs';
+import * as exitFsrs from '../vendor/ts-fsrs.mjs';
+import { reviewExitFixture } from './srs-hooks-corridor-layer.mjs';
 
 const source = readFileSync(new URL('../corridor.js', import.meta.url), 'utf8');
+const exitPin = JSON.parse(readFileSync(new URL('../data/fsrs-pin.json', import.meta.url), 'utf8'));
 function actualFunction(name) {
   const match = source.match(new RegExp(`^(?:async )?function ${name}\\([^]*?^\\}`, 'm'));
   assert(match, `Missing actual app function ${name}`);
@@ -23,6 +27,8 @@ function app() {
     learningSourceVisit: null, pendingReferenceCollection: null, retainedRetryView: null,
     activeTokenAlternatives: null, readerPosTimer: null, sheetActionVisit: null, sealStrip: null, sealSerial: 0, sealPending: null, readerLayers: null, personalHost: null,
     roomTransitionUpdating: false, activeRoomTransition: null, pageEpoch: 0, recordEpoch: 4,
+    reviewExitUi() {}, // This fixture stops before DOM drawing; exit suite below uses real helpers.
+    syncReviewExitNotice() {},
     keepScroll() {}, rememberSheet() {}, invokerKey: value => value,
     restoreDialogInvoker() {}, stopReadAloud() {}, clearTimeout() {},
     clearReaderReadings() {},
@@ -271,12 +277,14 @@ function readerBack({ joined = false } = {}) {
     passage: () => p, teacherSentence: () => ({ start: 0, end: p.tokens.length }),
     learnerSourceLabel: () => 'source', invokerKey: token => token.id ? { id: token.id } : { index: Number(token.dataset.index) },
     ladderPages: new Map([[word, origin]]), keptPages: new Map(), heroSource: new Map(),
-    ladderVisit: null, ladderReturning: null,
+    ladderVisit: null, ladderReturning: null, ladderCleanupGeneration: 0,
     finishPageTransition() {}, layerPathFor: () => true, sampleWhere: () => ({}), pageCutAllowed: () => false,
     renderLayer() { calls.push(['render']); }, render() { c.pageEpoch++; },
     returnScroll() { c.window.scrollY = 0; }, restoreDialogInvoker() { delayedFocus.push(() => { c.document.activeElement = anchor; }); },
     clearReaderSummons() {}, clearWordLadder(value = c.ladderVisit) { if (c.ladderVisit === value) c.ladderVisit = null; },
     removeMini() {}, clearReaderReadings() {}, stopReadAloud() {}, stopSentenceListening() {},
+    reviewExitUi() {}, // This fixture stops before DOM drawing; exit suite below uses real helpers.
+    syncReviewExitNotice() {},
     keepScroll() {}, rememberSheet() {}, enterWord(node, options) { calls.push(['enter', node, options]); c.S.stack.push(node); },
     scaleReaderIndex() { throw new Error('A retained source must not select a new visible occurrence'); },
     syncWalkSentinel() {}, sampleTransition() {},
@@ -375,4 +383,597 @@ test('the actual next scale entry retains the landed occurrence after simulated 
   assert.equal(f.c.S.scaleVisit, landed);
   assert.equal(landed.word, f.word); assert.equal(landed.index, 3);
   assert.equal(landed.scroll, 270, 'Later rail traversal does not silently move this source origin');
+});
+
+// W2 0917 preparation on 99811314. These normative cases intentionally expose
+// parent defects until a separately keyed product implementation exists. No
+// missing declaration, renderer exception or wait timeout counts as a defect.
+const exitFixture = options => reviewExitFixture(source, { core: exitCore, fsrsApi: exitFsrs, pin: exitPin, ...options });
+const microtasksUntil = async (predicate, label) => {
+  for (let i = 0; i < 30 && !predicate(); i++) await Promise.resolve();
+  assert(predicate(), `fixture boundary reached: ${label}`);
+};
+const exitNotice = f => f.main() && f.find(f.main(), n => n.getAttribute?.('role') === 'status' && n.textContent.trim());
+
+test('review exits fixture: genuine A0 waits outside callback, late departure reserves and writes nothing', async () => {
+  const f = exitFixture();
+  const release = f.holdLock();
+  const p = f.grade();
+  assert.equal(f.rv.admitting, true); assert.equal(f.rv.pending, null);
+  assert.equal(f.entered(), 0); assert.equal(f.box.producerRan, 0);
+  f.door().fire(); // Leaving A0 is allowed. Feedback is a separate failing claim.
+  assert.equal(f.S.review, null);
+  release(); assert.equal(await p, false);
+  assert.equal(f.box.producerRan, 0); assert.equal(f.box.writes, 0);
+  assert.equal(f.storage.getItem('bunki-srs:answered-today'), null);
+});
+
+test('review exits fixture: actual grade reaches P then published A1 then idle, with one reservation', async () => {
+  const f = exitFixture({ tailHeld: true });
+  const p = f.grade();
+  await microtasksUntil(() => f.queued.length === 1, 'real queued producer');
+  assert(f.rv.pending); assert.equal(f.rv.admitting, true); assert.equal(f.entered(), 1);
+  assert.equal(f.box.producerRan, 0); assert.equal(f.box.writes, 0);
+  f.ack(); await f.callbackDone;
+  assert.equal(f.rv.pending, null); assert.equal(f.rv.admitting, true);
+  assert.equal(f.box.writes, 1); assert.equal(f.box.record.revlog.length, 1);
+  assert(f.storage.getItem('bunki-srs:answered-today'));
+  f.releaseTail(); assert.equal(await p, true); assert.equal(f.rv.admitting, false);
+});
+
+test('review exits PREP: active P must retain the review and queued grade', async t => {
+  const f = exitFixture(); const p = f.grade();
+  await microtasksUntil(() => f.queued.length === 1, 'real queued producer');
+  const before = f.roots(); f.door().fire();
+  const retained = f.S.review === f.rv;
+  assert.deepEqual(f.roots(), before, 'the exit itself never writes');
+  f.ack(); const graded = await p;
+  t.diagnostic(JSON.stringify({ retained, graded, producerCalls: f.box.producerRan, writes: f.box.writes,
+    logRows: f.box.record.revlog.length, reservation: f.storage.getItem('bunki-srs:answered-today') }));
+  assert.equal(retained, true, 'P exit must retain the exact pending review');
+  assert.equal(graded, true, 'the original queued grade completes once');
+  assert.equal(f.box.writes, 1);
+});
+
+test('review exits PREP: natural summary undo P must retain the review and undo', async t => {
+  const f = exitFixture({ cards: 1 }); const p = f.grade();
+  await microtasksUntil(() => f.queued.length === 1, 'grade producer'); f.ack(); await p;
+  assert.equal(f.rv.ix, f.rv.queue.length);
+  f.paint(); const undo = f.find(f.main(), n => n.className?.split(' ').includes('review-undo'));
+  assert(undo, 'actual summary exposes its real undo');
+  const undoing = undo.fire(); assert.equal(f.queued.length, 1); assert(f.rv.pending);
+  f.door('summary').fire(); f.flushTransition(); const retained = f.S.review === f.rv;
+  f.ack(); await undoing;
+  t.diagnostic(JSON.stringify({ retained, writes: f.box.writes, logRows: f.box.record.revlog.length,
+    lastLogRating: f.box.record.revlog.at(-1)?.[2], undoHistoryRetained: f.rv.history.length }));
+  assert.equal(retained, true, 'summary must retain the exact undo owner while its producer is queued');
+  assert.equal(f.box.writes, 2, 'one grade and one undo, no duplicated grade');
+  assert.equal(f.box.record.revlog.at(-1)[2], 0, 'the undo is recorded as an append-only revocation');
+});
+
+for (const kind of ['active', 'summary', 'break']) {
+  test(`review exits PREP: ${kind} A1 holds after publication, without claiming grade loss`, async t => {
+    const f = exitFixture({ cards: kind === 'summary' ? 1 : 2, tailHeld: true, pauseEvery: kind === 'break' ? 1 : 0 });
+    const p = f.grade(); await microtasksUntil(() => f.queued.length === 1, 'grade producer');
+    f.ack(); await f.callbackDone;
+    assert.equal(f.rv.pending, null); assert.equal(f.rv.admitting, true);
+    assert.equal(f.box.writes, 1); const durable = f.roots();
+    f.door(kind).fire(); if (kind === 'summary') f.flushTransition();
+    const retained = f.S.review === f.rv;
+    f.releaseTail(); await p;
+    t.diagnostic(JSON.stringify({ retained, writes: f.box.writes, logRows: f.box.record.revlog.length,
+      gradeRetained: JSON.stringify(f.roots()) === JSON.stringify(durable) }));
+    assert.deepEqual(f.roots(), durable, 'A1 departure cannot erase an already durable grade');
+    assert.equal(retained, true, 'callback-entered A1 requires an owned visible hold and a fresh later tap');
+  });
+}
+
+test('review exits PREP: A0 departure leaves a perceivable non-save outcome on its destination', async () => {
+  const f = exitFixture(); const release = f.holdLock(); const p = f.grade();
+  assert.equal(f.entered(), 0); f.door().fire();
+  assert.equal(f.S.review, null); assert.equal(f.S.view, 'tray', 'A0 is an allowed immediate escape');
+  const notice = exitNotice(f);
+  release(); await p;
+  assert(notice, 'A0 must leave a destination-owned, perceivable not-recorded status; leaving alone is not a failure');
+  assert.equal(f.box.producerRan, 0); assert.equal(f.box.writes, 0);
+});
+
+test('review exits PREP: defensive break P handler cannot discard a live queued action', async () => {
+  // A pending grade is not a natural public break state. This deliberately
+  // exercises the actual break handler as a defensive owner-contract control.
+  const f = exitFixture(); const p = f.grade();
+  await microtasksUntil(() => f.queued.length === 1, 'grade producer');
+  f.door('break').fire(); const retained = f.S.review === f.rv;
+  f.ack(); await p;
+  assert.equal(retained, true, 'defensive break handler must hold P');
+});
+
+test('review exits PREP: delayed summary exit must not clear a replacement review', () => {
+  const f = exitFixture({ cards: 0 });
+  f.door('summary').fire(); const next = { queue: [], ix: 0 };
+  f.S.review = next; f.flushTransition();
+  assert.equal(f.S.review, next, 'deferred summary callback must recheck review identity');
+});
+
+test('review exits PREP: same-review activity between summary press and transition revokes stale exit', async () => {
+  const f = exitFixture({ cards: 1 }); const p = f.grade();
+  await microtasksUntil(() => f.queued.length === 1, 'grade producer'); f.ack(); await p;
+  f.door('summary').fire();
+  const undo = f.find(f.main(), n => n.className?.split(' ').includes('review-undo'));
+  assert(undo, 'actual summary undo present'); const undoing = undo.fire(); f.ack(); await undoing;
+  assert.equal(f.rv.pending, null); assert.equal(f.rv.admitting, false);
+  const before = f.roots(); f.flushTransition();
+  assert.deepEqual(f.roots(), before);
+  assert.equal(f.S.review, f.rv, 'idle flags after newer completed activity cannot revive an old exit intent');
+});
+
+for (const kind of ['active', 'summary', 'break']) {
+  test(`review exits fixture: ${kind} idle read-only review retains its ordinary escape`, () => {
+    const f = exitFixture({ cards: kind === 'summary' ? 0 : 2 }); f.box.mode = 'pre-write-refusal';
+    assert.equal(f.sandbox.recordWritable(), false);
+    const before = f.roots(); f.door(kind).fire(); if (kind === 'summary') f.flushTransition();
+    assert.equal(f.S.review, null); assert.equal(f.S.view, 'tray'); assert.deepEqual(f.roots(), before);
+  });
+}
+
+// Successor controls use the actual renderer callbacks, admission and producers.
+// Pending break/summary admission fixtures are defensive handler contracts.
+const candidateFixture = (bytes = source, options = {}) => reviewExitFixture(bytes, { core: exitCore, fsrsApi: exitFsrs, pin: exitPin, ...options });
+const drainExitMicrotasks = async () => { for (let i = 0; i < 12; i++) await Promise.resolve(); };
+const noticeText = f => exitNotice(f)?.textContent || '';
+const idleText = kind => kind === 'active' ? '×' : kind === 'summary' ? 'Back to Today' : 'back to lists';
+const queueGrade = async f => { const promise = f.grade(); await microtasksUntil(() => f.queued.length === 1, 'grade queued'); return { promise }; };
+const completeGrade = async f => { const { promise } = await queueGrade(f); f.ack(); await promise; await drainExitMicrotasks(); };
+function ownedStatus(f, text) {
+  const node = exitNotice(f); assert(node, 'owned exit feedback is present');
+  assert.equal(node.textContent, text); assert.equal(node.getAttribute('aria-live'), 'polite');
+  return node;
+}
+const BUSY = 'This review action is still finishing. Tap again when it finishes to leave the review.';
+const READY = 'Processing has finished. Tap again to leave the review.';
+const DEPARTED = 'This answer was not recorded. You left the review.';
+const RECHECK = 'The review state changed. Tap again to leave.';
+
+for (const kind of ['active', 'summary', 'break']) {
+  test(`UX01–03 ${kind}: P → A1 → idle, visible hold then one fresh exit`, async () => {
+    const f = candidateFixture(source, { cards: kind === 'summary' ? 1 : 2, tailHeld: true });
+    const { promise } = await queueGrade(f);
+    // Summary before publication is a defensive renderer state; natural undo is tested above.
+    if (kind === 'summary') f.rv.ix = f.rv.queue.length;
+    const button = f.door(kind); button.fire(); button.fire();
+    assert.equal(f.S.review, f.rv); assert.equal(f.transitions.length, 0);
+    ownedStatus(f, BUSY); assert.equal(button.textContent, 'Processing…');
+    assert.equal(button.getAttribute('aria-busy'), 'true'); assert.equal(button.disabled, false);
+    assert.equal(button.getAttribute('aria-describedby'), exitNotice(f).id);
+    if (kind === 'summary') f.rv.ix = 0;
+    f.publish(); const published = f.roots(); button.fire();
+    assert.equal(f.S.review, f.rv, 'published-before-ack still holds');
+    f.ack(); await f.callbackDone;
+    const current = f.door(kind); current.fire(); ownedStatus(f, BUSY);
+    assert.equal(current.getAttribute('aria-busy'), 'true', 'inner pending settlement is not final');
+    const paints = f.box.renders;
+    f.releaseTail(); assert.equal(await promise, true); await drainExitMicrotasks();
+    assert.equal(f.box.renders, paints, 'outer refresh does not require another full render');
+    ownedStatus(f, READY); assert.equal(current.textContent, idleText(kind));
+    assert.equal(current.getAttribute('aria-busy'), null); assert.equal(f.S.review, f.rv);
+    current.fire(); if (kind === 'summary') f.flushTransition();
+    assert.equal(f.S.review, null); assert.deepEqual(f.roots(), published); assert.equal(f.box.writes, 1);
+  });
+
+  test(`UX08 ${kind}: exact A0 escapes with zero notice writes and no late answer`, async () => {
+    const f = candidateFixture(); const release = f.holdLock(); const p = f.grade();
+    if (kind === 'summary') f.rv.ix = f.rv.queue.length;
+    const before = f.roots(), storage = [...f.storage.m];
+    f.door(kind).fire(); if (kind === 'summary') f.flushTransition();
+    assert.equal(f.S.review, null); ownedStatus(f, DEPARTED);
+    assert.deepEqual(f.roots(), before); assert.deepEqual([...f.storage.m], storage);
+    release(); assert.equal(await p, false); assert.equal(f.box.producerRan, 0);
+    assert.equal(f.box.writes, 0); assert.equal(f.storage.getItem('bunki-srs:answered-today'), null);
+  });
+}
+
+test('UX05 natural summary leech-rest remains owned until publication, then leaves without another write', async () => {
+  const f = candidateFixture(source, { cards: 1 }); await completeGrade(f);
+  f.sandbox.isLeech = item => item.id === '学校'; f.paint();
+  const rest = f.find(f.main(), n => n.dataset?.leechRest === '学校'); assert(rest);
+  const p = rest.fire(); assert(f.rv.pending); f.door('summary').fire(); ownedStatus(f, BUSY);
+  f.ack(); await p; await drainExitMicrotasks(); assert(f.box.record.suspended['word:学校']);
+  const before = f.roots(); f.door('summary').fire(); f.flushTransition();
+  assert.equal(f.S.review, null); assert.deepEqual(f.roots(), before); assert.equal(f.box.writes, 2);
+});
+
+for (const change of ['stack-push', 'stack-replace-frame', 'rv', 'epoch', 'app', 'installation', 'binding', 'readonly', 'departure', 'word-entry']) {
+  test(`UX07 delayed summary revokes on ${change}`, () => {
+    const f = candidateFixture(source, { cards: 0 }), c = f.sandbox;
+    c.recordInstallation = { policy: { binding: { sessionId: 'one', learnerId: 'learner', accountId: 'account' } }, assertCurrent: () => true };
+    f.S.stack = [{}]; f.door('summary').fire();
+    if (change === 'stack-push') f.S.stack.push({});
+    else if (change === 'stack-replace-frame') f.S.stack[0] = {};
+    else if (change === 'rv') f.S.review = { queue: [], ix: 0 };
+    else if (change === 'epoch') c.recordEpoch += 1;
+    else if (change === 'app') c.recordApp = {};
+    else if (change === 'installation') c.recordInstallation = { ...c.recordInstallation };
+    else if (change === 'binding') c.recordInstallation.policy.binding.sessionId = 'two';
+    else if (change === 'readonly') f.S.storeReadOnly = true;
+    else if (change === 'departure') f.S.navigationDepartures = 1;
+    else f.S.wordEntrySerial = 1;
+    const current = f.S.review; f.flushTransition();
+    assert.equal(f.S.review, current); assert.equal(f.S.view, 'review'); assert.equal(noticeText(f), '');
+  });
+}
+
+test('UX07 summary duplicate activation has one callback and cannot act twice after a replacement', () => {
+  const f = candidateFixture(source, { cards: 0 }); const button = f.door('summary');
+  button.fire(); button.fire(); assert.equal(f.transitions.length, 1);
+  const callback = f.transitions[0]; f.flushTransition(); assert.equal(f.S.review, null);
+  const next = { queue: [], ix: 0 }; f.S.review = next; f.S.view = 'review'; callback();
+  assert.equal(f.S.review, next); assert.equal(f.box.writes, 0);
+});
+
+for (const route of ['unsupported', 'reentry', 'deferred-native']) {
+  test(`UX07 transition ${route} reaches the owned exit callback`, () => {
+    const f = candidateFixture(source, { cards: 0 }), c = f.sandbox;
+    Object.assign(c, { roomTransitionUpdating: route === 'reentry', activeRoomTransition: null,
+      beginRoomTransition() {}, finishRoomTransition() {}, keepRoomFocus() {},
+      document: { ...c.document, hidden: false }, window: {}, requestAnimationFrame: fn => fn(),
+      S: f.S });
+    // withoutRoomTransition and the unsupported/reentry entry branches are real;
+    // native timing itself is separately covered by the held callback fixtures.
+    c.S.ready = false;
+    vm.runInContext(['withoutRoomTransition', 'roomTransition'].map(actualFunction).join('\n'), c);
+    if (route === 'deferred-native') c.roomTransition = change => f.transitions.push(change);
+    f.door('summary').fire(); if (route === 'deferred-native') f.flushTransition();
+    assert.equal(f.S.review, null); assert.equal(f.S.view, 'tray');
+  });
+}
+
+for (const completed of [false, true]) {
+  test(`P-C deferred A0 becomes callback-entered ${completed ? 'and completed' : 'and unfinished'}; old permission dies`, async () => {
+    const f = candidateFixture(); const release = f.holdLock(); const p = f.grade();
+    f.rv.ix = f.rv.queue.length; f.door('summary').fire(); f.rv.ix = 0;
+    release(); await microtasksUntil(() => f.queued.length === 1, 'A0 callback entered');
+    if (completed) { f.ack(); await p; }
+    f.paint(); f.flushTransition();
+    assert.equal(f.S.review, f.rv); ownedStatus(f, completed ? RECHECK : BUSY);
+    assert(!noticeText(f).includes('not recorded'));
+    if (!completed) { f.ack(); await p; }
+  });
+}
+
+test('P-A two reviews escape the same indefinitely held lock, with fresh notice and no abandoned writes', async () => {
+  const f = candidateFixture(); const release = f.holdLock(); const first = f.grade();
+  f.door().fire(); const oldNotice = ownedStatus(f, DEPARTED);
+  const next = { ...f.rv, queue: [{ ...f.rv.queue[0] }], history: [], ix: 0, admitting: false, pending: null };
+  f.S.review = next; f.S.view = 'review'; f.paint(); assert.equal(noticeText(f), '');
+  const second = f.grade(next); assert.equal(next.admitting, true); assert.equal(f.entered(), 0);
+  f.door().fire(); const newNotice = ownedStatus(f, DEPARTED); assert.notEqual(newNotice, oldNotice);
+  release(); assert.equal(await first, false); assert.equal(await second, false);
+  assert.equal(f.box.writes, 0); assert.equal(f.box.producerRan, 0); assert.equal(f.storage.m.size, 0);
+});
+
+for (const revoker of ['navigation', 'reload', 'pagehide', 'epoch', 'readonly', 'same-room-departure']) {
+  test(`P-D destination notice is transient and revoked by ${revoker}`, async () => {
+    const f = candidateFixture(); const release = f.holdLock(); const p = f.grade();
+    let writes = 0; const setItem = f.storage.setItem.bind(f.storage); f.storage.setItem = (...args) => { writes++; return setItem(...args); };
+    f.door().fire(); ownedStatus(f, DEPARTED); f.paint(); ownedStatus(f, DEPARTED);
+    if (revoker === 'navigation') { f.S.view = 'reader'; f.paint(); f.S.view = 'tray'; }
+    else if (revoker === 'reload') { const fresh = candidateFixture(); fresh.S.view = 'tray'; fresh.S.review = null; fresh.paint(); assert.equal(noticeText(fresh), ''); }
+    else if (revoker === 'pagehide') {
+      // Actual release's notification precedes all existing durable lifecycle work.
+      const boundary = new Error('existing record lifecycle');
+      f.sandbox.preserveVisibleDrafts = () => { throw boundary; };
+      vm.runInContext(actualFunction('releaseRecordOwnership'), f.sandbox);
+      assert.throws(() => f.sandbox.releaseRecordOwnership(), e => e === boundary);
+    } else if (revoker === 'epoch') f.sandbox.recordEpoch++;
+    else if (revoker === 'readonly') f.S.storeReadOnly = true;
+    else f.S.navigationDepartures = 1;
+    if (revoker !== 'reload') { f.paint(); assert.equal(noticeText(f), ''); }
+    assert.equal(writes, 0); release(); await p; assert.equal(writes, 0);
+  });
+}
+
+test('UX12 fresh mounted idle exit survives a protection warning without a repaint', () => {
+  const f = candidateFixture(), button = f.door(); f.S.storeReadOnly = true; f.sandbox.staleTab = true;
+  f.sandbox.syncReviewExitNotice(); button.fire(); assert.equal(f.S.review, null); assert.equal(f.box.writes, 0);
+});
+
+test('UX12 old settlement cannot overwrite replacement-session status; detach is inert', async () => {
+  const f = candidateFixture(); const { promise } = await queueGrade(f); const old = f.door(); old.fire();
+  const next = { ...f.rv, queue: [{ ...f.rv.queue[0] }], history: [], admitting: true, pending: null };
+  f.S.review = next; f.paint(); const current = f.door(); current.fire(); ownedStatus(f, BUSY);
+  const before = noticeText(f); f.ack({ publishWrite: false }); await promise; await drainExitMicrotasks();
+  assert.equal(noticeText(f), before); assert.equal(f.S.review, next);
+  // Directly dispatching a retained callback models a stale event without lying
+  // that a detached element receives a physical/keyboard click.
+  old.events.click[0](); assert.equal(f.S.review, next); assert.equal(noticeText(f), before);
+});
+
+for (const failure of ['not-published', 'unacknowledged', 'uncertain', 'missing-locks', 'rejected-lock']) {
+  test(`UX08 ${failure} settles without success text, replay, rollback or automatic departure`, async () => {
+    const f = candidateFixture(); let p;
+    if (failure === 'missing-locks') { f.sandbox.navigator.locks = null; p = f.grade(); }
+    else if (failure === 'rejected-lock') { f.sandbox.navigator.locks = { request: async () => { throw new Error('lock refused'); } }; p = f.grade(); }
+    else {
+      ({ promise: p } = await queueGrade(f)); f.door().fire(); ownedStatus(f, BUSY);
+      if (failure === 'not-published') f.ack({ publishWrite: false });
+      else if (failure === 'unacknowledged') f.ack({ acknowledged: false });
+      else f.ack({ publishWrite: false, outcome: { status: 'recovery-required', reason: 'publication-failed' } });
+    }
+    if (failure === 'rejected-lock') await assert.rejects(p, /lock refused/u);
+    else assert.equal(await p, false);
+    await drainExitMicrotasks();
+    assert.equal(f.S.review, f.rv); assert.equal(f.rv.pending || false, false); assert.equal(f.rv.admitting, false);
+    assert(!/Saved|recorded|saved/u.test(noticeText(f))); assert(failure === 'rejected-lock' || f.rv.answerRefusal || f.box.failures.length, 'existing refusal remains');
+    const before = f.roots(), mark = f.storage.getItem('bunki-srs:answered-today');
+    f.door().fire(); assert.equal(f.S.review, null); assert.deepEqual(f.roots(), before);
+    assert.equal(f.storage.getItem('bunki-srs:answered-today'), mark);
+    assert.equal(f.box.writes, failure === 'unacknowledged' ? 1 : 0);
+  });
+}
+
+test('UX10 duplicate grades while waiting and pending yield one admission, producer and history row', async () => {
+  const f = candidateFixture(); const release = f.holdLock(); const p = f.grade();
+  assert.equal(await f.grade(), false); release(); await microtasksUntil(() => f.queued.length === 1, 'producer');
+  assert.equal(await f.grade(), false); const button = f.door(); button.fire(); button.fire();
+  f.ack(); assert.equal(await p, true); assert.equal(f.box.writes, 1); assert.equal(f.box.producerRan, 1); assert.equal(f.rv.history.length, 1);
+  const mark = f.storage.getItem('bunki-srs:answered-today'); assert(mark);
+  const later = { ...f.rv, queue: [{ t: 'word', id: '学校', label: '学校' }], ix: 0, revealed: true, declared: 1, history: [] };
+  f.S.review = later; const again = f.grade(later); await microtasksUntil(() => f.queued.length === 1, 'repeat producer');
+  f.ack(); assert.equal(await again, false); assert.equal(f.box.writes, 1); assert.equal(f.storage.getItem('bunki-srs:answered-today'), mark);
+});
+
+test('UX11 raise-limit write remains independent: exit succeeds, one extra persists, no replacement review starts', async () => {
+  const f = candidateFixture(source, { cards: 0 }), c = f.sandbox;
+  f.rv.scope = 'all'; c.todayQueue = () => ({ held: 3 }); c.srsReviewsPerDay = () => 20;
+  c.dayKey = () => '2026-10-28'; let starts = 0; c.startReview = () => { starts++; };
+  f.paint(); const raise = f.find(f.main(), n => n.id === 'review-raise-limit'); assert(raise);
+  const p = raise.fire(); assert.equal(f.queued.length, 1); assert(!f.rv.pending && !f.rv.admitting);
+  f.door('summary').fire(); f.flushTransition(); assert.equal(f.S.review, null);
+  f.ack(); await p; assert.equal(f.box.record.stats['2026-10-28'].extra, 3); assert.equal(f.box.writes, 1); assert.equal(starts, 0);
+});
+
+for (const fault of ['activity', 'enqueue', 'refresh']) {
+  test(`UX15 ${fault} UI failure cannot change a confirmed grade`, async () => {
+    const f = candidateFixture();
+    if (fault === 'activity') Object.defineProperty(f.sandbox.reviewExitState(f.rv), 'activity', { set() { throw new Error('counter UI fault'); }, get: () => 0 });
+    if (fault === 'enqueue') f.sandbox.queueMicrotask = () => { throw new Error('enqueue UI fault'); };
+    if (fault === 'refresh') f.sandbox.syncReviewExitNotice = () => { throw new Error('refresh UI fault'); };
+    // Isolate the notification fault from the fixture's explicit renderer calls.
+    if (fault === 'refresh') f.sandbox.render = () => { f.box.renders++; };
+    const { promise } = await queueGrade(f); f.ack(); assert.equal(await promise, true); await drainExitMicrotasks();
+    assert.equal(f.box.writes, 1); assert.equal(f.box.record.revlog.length, 1); assert.equal(f.rv.ix, 1); assert(!f.rv.answerRefusal);
+  });
+}
+
+test('UX15 original finally render error survives while notification scheduling is attempted', async () => {
+  const f = candidateFixture(); let paints = 0, scheduled = 0; const original = new Error('original render failure');
+  f.sandbox.render = () => { if (++paints > 1) throw original; };
+  f.sandbox.queueMicrotask = () => { scheduled++; throw new Error('secondary enqueue error'); };
+  const p = f.sandbox.commitReviewAction(f.rv, f.rv.queue[0], () => ({ obslog: [['one']] }), () => {});
+  const observed = p.then(() => assert.fail('existing error suppressed'), error => assert.equal(error, original));
+  f.ack(); await observed; assert.equal(scheduled, 1); assert.equal(f.box.writes, 1);
+});
+
+test('UX13 exact keyed copy and idle accessibility labels; future ticket copy absent', () => {
+  const f = candidateFixture(); const copy = vm.runInContext('REVIEW_EXIT_COPY', f.sandbox);
+  assert.deepEqual(JSON.parse(JSON.stringify(copy)), {
+    busyLabel: ['処理中…', 'Processing…'],
+    busy: ['復習の処理が続いている。終わったら、もう一度押すと出られる。', BUSY],
+    ready: ['処理は終わった。もう一度押すと復習を閉じる。', READY],
+    departed: ['この答えは記録せずに復習を閉じた。', DEPARTED],
+    recheck: ['復習の状態が変わった。もう一度押すと復習を閉じる。', RECHECK],
+  });
+  const button = f.door(); assert.equal(button.textContent, '×'); assert.equal(button.getAttribute('aria-label'), 'leave the session');
+  assert(!Object.values(copy).flat().includes('Return to your reading'));
+  f.sandbox.tx = (ja) => ja; assert.equal(f.door().getAttribute('aria-label'), '復習を閉じる');
+});
+
+for (const invalid of ['missing', 'empty', 'replacement', 'generation']) {
+  test(`exact A0 marker ${invalid} is unknown and holds, never a never-entered inference`, async () => {
+    const f = candidateFixture(); const release = f.holdLock(); const p = f.grade();
+    const state = f.sandbox.reviewExitState(f.rv);
+    if (invalid === 'missing') state.admission = null;
+    else if (invalid === 'empty') state.admission = {};
+    else if (invalid === 'replacement') state.admission = { ...state.admission };
+    else state.admissionGeneration += 1;
+    f.door().fire(); const retained = f.S.review === f.rv; const status = noticeText(f);
+    release(); await microtasksUntil(() => f.queued.length === 1, 'unchanged original grade still queues'); f.ack(); await p;
+    assert.equal(retained, true); assert.equal(status, BUSY); assert.equal(f.box.writes, 1);
+  });
+}
+
+for (const fault of ['state-entry', 'state-finally', 'activity-call', 'settlement-call']) {
+  test(`UX15 ${fault} exception leaves the grade result unchanged`, async () => {
+    const f = candidateFixture(); const state = f.sandbox.reviewExitState;
+    if (fault === 'state-entry') f.sandbox.reviewExitState = () => { throw new Error('state UI fault'); };
+    if (fault === 'activity-call') f.sandbox.reviewExitActivity = () => { throw new Error('activity UI fault'); };
+    if (fault === 'settlement-call') f.sandbox.settleReviewExitNotice = () => { throw new Error('settlement UI fault'); };
+    f.sandbox.render = () => { f.box.renders++; };
+    const { promise } = await queueGrade(f);
+    if (fault === 'state-finally') f.sandbox.reviewExitState = () => { throw new Error('cleanup UI fault'); };
+    f.ack(); assert.equal(await promise, true); await drainExitMicrotasks();
+    assert.equal(f.box.writes, 1); assert.equal(f.rv.ix, 1); assert(!f.rv.answerRefusal);
+    f.sandbox.reviewExitState = state;
+  });
+}
+
+for (const type of ['word', 'kanji', 'drill']) {
+  test(`UX09 ${type} named roots and concurrent rows survive an explicit exit`, async () => {
+    const f = candidateFixture(); let p;
+    f.box.record.stats.foreign = { n: 4 }; f.box.record.obslog.push(['unrelated']);
+    if (type === 'kanji') { f.rv.queue[0] = { t: 'kanji', id: '火', label: '火', started: 1 }; f.box.record.taken[0] = { ...f.rv.queue[0] }; f.S.taken = structuredClone(f.box.record.taken); p = f.grade(); }
+    else if (type === 'drill') p = f.sandbox.commitDrillGrade({ rv: f.rv, item: f.rv.queue[0], next: f.scheduler.repeat(exitFsrs.createEmptyCard(), new Date())[exitFsrs.Rating.Easy].card, key: 'good', skey: 'word:学校', rating: 3, mode: 'kanji', now: new Date() });
+    else p = f.grade();
+    await microtasksUntil(() => f.queued.length === 1, 'real producer'); f.ack(); assert.equal(await p, true);
+    const roots = f.roots(), mark = f.storage.getItem('bunki-srs:answered-today');
+    f.door().fire(); assert.equal(f.S.review, null); assert.deepEqual(f.roots(), roots);
+    assert.equal(f.storage.getItem('bunki-srs:answered-today'), mark);
+    assert.deepEqual(f.box.record.stats.foreign, { n: 4 }); assert.deepEqual(f.box.record.obslog[0], ['unrelated']);
+    assert.equal(f.box.writes, 1);
+  });
+}
+
+test('destination notice uses the places dojo alias, retains one node and never saves', async () => {
+  const f = candidateFixture(); f.sandbox.placesLayout = () => true;
+  const release = f.holdLock(); const p = f.grade(); f.door().fire();
+  assert.equal(f.S.view, 'dojo'); ownedStatus(f, DEPARTED); f.paint(); ownedStatus(f, DEPARTED);
+  assert.equal(f.main().children.filter(n => n.id === 'review-exit-status').length, 1);
+  release(); await p; assert.equal(f.box.writes, 0);
+});
+
+function replaceOne(bytes, before, after) {
+  assert.equal(bytes.split(before).length - 1, 1, 'mutant anchor is unique');
+  return bytes.replace(before, after);
+}
+async function pendingOracle(bytes, kind = 'active') {
+  const f = candidateFixture(bytes, { cards: kind === 'summary' ? 1 : 2 });
+  const { promise } = await queueGrade(f);
+  if (kind === 'summary') f.rv.ix = f.rv.queue.length;
+  const button = f.door(kind); button.fire(); f.flushTransition();
+  const retained = f.S.review === f.rv, status = noticeText(f), label = button.textContent;
+  if (kind === 'summary') f.rv.ix = 0;
+  f.ack(); await promise;
+  assert.equal(retained, true, 'pending review preserved'); assert.equal(status, BUSY, 'held exit is visible'); assert.equal(label, 'Processing…');
+}
+async function tailOracle(bytes, checkReady = false) {
+  const f = candidateFixture(bytes, { tailHeld: true }); const { promise } = await queueGrade(f);
+  f.door().fire(); f.ack(); await f.callbackDone;
+  const button = f.find(f.main(), n => n.id === 'zen-exit');
+  const during = button.textContent;
+  f.releaseTail(); await promise; await drainExitMicrotasks();
+  if (checkReady) { assert.equal(button.textContent, '×', 'outer settlement restores idle label'); assert.equal(f.S.review, f.rv, 'settlement never navigates'); assert.equal(noticeText(f), READY); }
+  else assert.equal(during, 'Processing…', 'admitting tail is still processing');
+}
+async function abaOracle(bytes) {
+  const f = candidateFixture(bytes, { cards: 1 }); await completeGrade(f); f.door('summary').fire();
+  const undo = f.find(f.main(), n => n.className?.split(' ').includes('review-undo')); const p = undo.fire(); f.ack(); await p;
+  f.flushTransition(); assert.equal(f.S.review, f.rv, 'completed intervening action invalidates old exit'); assert.equal(noticeText(f), RECHECK);
+}
+async function markerOracle(bytes) {
+  const f = candidateFixture(bytes, { tailHeld: true }); let sampled;
+  f.sandbox.recordWritable = () => {
+    if (f.rv.admitting && f.entered() === 1 && !sampled) { sampled = f.sandbox.reviewExitPhase(f.rv); return false; }
+    return true;
+  };
+  const p = f.grade(); await f.callbackDone;
+  const button = f.door(); button.fire(); const retained = f.S.review === f.rv;
+  f.releaseTail(); await p;
+  assert.equal(sampled, 'entered', 'actual callback is marked BEFORE its first writable check');
+  assert.equal(retained, true, 'a refused callback is still A1 until admission returns');
+}
+async function mutationKilled(name, mutation, oracle) {
+  await oracle(source); // the very same behavioral oracle must pass first
+  const changed = mutation(source); assert.notEqual(changed, source);
+  await assert.rejects(() => oracle(changed), error => error?.name === 'AssertionError' && !/fixture boundary|mutant anchor|renderer bound|Missing actual|every tested definition/u.test(error.message), `${name} killed by a behavioral assertion, not a harness/setup error`);
+}
+for (const kind of ['active', 'summary', 'break']) {
+  test(`M1 restore exact ${kind} parent handler is rejected`, () => mutationKilled(`old-${kind}`, bytes => {
+    const line = kind === 'active' ? 'bindReviewExit(exit, main, rv);' : kind === 'summary' ? 'bindReviewExit(out, main, rv, true);' : 'bindReviewExit(out, main, rv);';
+    const target = kind === 'active' ? 'exit' : 'out';
+    const action = "S.review = null; S.view = 'tray'; render();";
+    return replaceOne(bytes, line, `${target}.addEventListener('click', () => ${kind === 'summary' ? `roomTransition(() => { ${action} })` : `{ ${action} }`});`);
+  }, bytes => pendingOracle(bytes, kind)));
+}
+
+test('M2 pending-only phase cannot call an admitting tail idle', () => mutationKilled('pending-only', bytes => replaceOne(bytes, "if (!rv.admitting) return 'idle';", "return 'idle';"), bytes => tailOracle(bytes)));
+test('M3 silent hold is rejected by live feedback', () => mutationKilled('silent-hold', bytes => replaceOne(bytes, "reviewExitUi(() => showReviewExitNotice(pressedOwner, 'busy', control, main));", '/* silent hold mutant */'), pendingOracle));
+
+test('M4a no callback ownership rejects replacement review incorrectly', () => mutationKilled('press-only', bytes => replaceOne(bytes, 'if (!reviewExitOwns(pressedOwner)) return;', '/* stale callback mutant */'), async bytes => {
+  const f = candidateFixture(bytes, { cards: 0 }); f.door('summary').fire(); const next = { queue: [], ix: 0 }; f.S.review = next;
+  f.flushTransition(); assert.equal(f.S.review, next, 'replacement review remains current');
+}));
+test('M4b stack-array-only callback permission is rejected', () => mutationKilled('stack-ignored', bytes => replaceOne(bytes,
+  "owner.stack.length === now.stack.length && owner.stack.every((frame, i) => frame === now.stack[i])", 'true'), async bytes => {
+  const f = candidateFixture(bytes, { cards: 0 }); f.door('summary').fire(); f.S.stack.push({});
+  f.flushTransition(); assert.equal(f.S.review, f.rv, 'same-array pushed sheet owns route');
+}));
+test('M5 missing activity generation is rejected after completed undo', () => mutationKilled('no-generation', bytes => replaceOne(bytes, 'reviewExitState(rv).activity === intent.activity &&', 'true &&'), abaOracle));
+test('M6a inner settlement is not final', () => mutationKilled('inner-is-final', bytes => replaceOne(bytes, "!['pending', 'entered'].includes(reviewExitPhase(notice.owner.rv))", '!notice.owner.rv.pending'), bytes => tailOracle(bytes)));
+test('M6b omitted outer notification leaves a stuck label', () => mutationKilled('no-outer-refresh', bytes => replaceOne(bytes,
+  "reviewExitUi(() => settleReviewExitNotice());\n  }\n  if (!admitted.admitted)", "/* missing outer refresh */\n  }\n  if (!admitted.admitted)"), bytes => tailOracle(bytes, true)));
+test('M7a settled never means saved', () => mutationKilled('saved-copy', bytes => replaceOne(bytes, READY, 'Saved'), bytes => tailOracle(bytes, true)));
+test('M7b settlement never automatically departs', () => mutationKilled('auto-depart', bytes => replaceOne(bytes,
+  'function settleReviewExitNotice() {', "function settleReviewExitNotice() {\n  if (S.review && !S.review.pending && !S.review.admitting) { S.review = null; S.view = 'tray'; }"), bytes => tailOracle(bytes, true)));
+test('M8 exit cannot release an answered-today reservation', () => mutationKilled('release-mark', bytes => replaceOne(bytes,
+  '// No asynchronous gap from the final permission check to departure.', "localStorage.setItem('bunki-srs:answered-today', '');\n      // No asynchronous gap from the final permission check to departure."), async bytes => {
+  const f = candidateFixture(bytes); await completeGrade(f); const mark = f.storage.getItem('bunki-srs:answered-today'); assert(mark);
+  f.door().fire(); assert.equal(f.storage.getItem('bunki-srs:answered-today'), mark, 'exit cannot change reservation');
+}));
+test('M9 stale notice cannot survive an unrelated departure', () => mutationKilled('stale-notice', bytes => replaceOne(bytes,
+  "if (!reviewExitOwns(notice.owner)) { retireReviewExitNotice(); return; }", '/* missing notice owner */'), async bytes => {
+  const f = candidateFixture(bytes); const release = f.holdLock(); const p = f.grade(); f.door().fire();
+  f.S.view = 'reader'; f.paint(); const text = noticeText(f); release(); await p; assert.equal(text, '', 'unrelated room has no old outcome');
+}));
+test('M10 duplicate admission cannot replace the original waiting operation', () => mutationKilled('weakened-admission', bytes => replaceOne(bytes,
+  'if (!rv || rv.pending || rv.admitting || S.review !== rv || rv.queue[rv.ix] !== item || !rv.revealed)',
+  'if (!rv || rv.pending || S.review !== rv || rv.queue[rv.ix] !== item || !rv.revealed)'), async bytes => {
+  const f = candidateFixture(bytes); const release = f.holdLock(); const p = f.grade();
+  const first = f.sandbox.reviewExitState(f.rv).admission; const duplicate = f.grade();
+  const same = f.sandbox.reviewExitState(f.rv).admission === first;
+  f.door().fire(); release(); await p; await duplicate;
+  assert.equal(same, true, 'refused duplicate cannot mint an admission generation');
+}));
+test('M11 a throwing settlement hook cannot replace an acknowledged grade', () => mutationKilled('throwing-finally', bytes => replaceOne(bytes,
+  'finally { reviewExitUi(() => settleReviewExitNotice()); }', 'finally { settleReviewExitNotice(); }'), async bytes => {
+  const f = candidateFixture(bytes); f.sandbox.settleReviewExitNotice = () => { throw new Error('UI-only notification'); };
+  const { promise } = await queueGrade(f); f.ack(); const result = await promise;
+  assert.equal(result, true, 'new notification error cannot change acknowledged grade'); assert.equal(f.rv.ix, 1);
+}));
+for (const position of ['after-writable', 'after-await']) {
+  test(`M12 callback marker ${position} is rejected by the never-entered oracle`, () => mutationKilled(position, bytes => {
+    const noMarker = replaceOne(bytes, '        admission.entered = true;\n', '');
+    const anchor = position === 'after-writable' ? "        const report = {};\n" : "        return { outcome: report.outcome || 'not-published', graded };";
+    // The report declaration exists only at this admission seam with this indentation.
+    return replaceOne(noMarker, anchor, `        admission.entered = true;\n${anchor}`);
+  }, markerOracle));
+}
+
+test('M8b an ordinary idle exit must not submit even a refused grade attempt', () => mutationKilled('replay-grade', bytes => replaceOne(bytes,
+  '// No asynchronous gap from the final permission check to departure.',
+  "void admitStandardGrade({ rv, item: rv.queue[rv.ix], key: 'easy', skey: 'word:学校', rating: 4 });\n      // No asynchronous gap from the final permission check to departure."), async bytes => {
+  const f = candidateFixture(bytes); f.door().fire(); await drainExitMicrotasks();
+  assert.equal(f.entered(), 0, 'exit never enters answer admission'); assert.equal(f.box.writes, 0);
+}));
+
+test('M12b unknown or replaced marker cannot authorize an A0 escape', () => mutationKilled('unattested-marker', bytes => replaceOne(bytes,
+  "admission && reviewExitAdmissions.get(rv) === admission && admission.entered === false &&\n    Number.isSafeInteger(admission.generation) && admission.generation === reviewExitStates.get(rv)?.admissionGeneration", "admission && !admission.entered"), async bytes => {
+  const f = candidateFixture(bytes); const release = f.holdLock(); const p = f.grade();
+  f.sandbox.reviewExitState(f.rv).admission = {}; f.door().fire(); const retained = f.S.review === f.rv;
+  release(); await drainExitMicrotasks(); if (f.queued.length) f.ack(); await p;
+  assert.equal(retained, true, 'unknown marker means hold');
+}));
+
+test('UX13 zero-detail keyboard/AT click activation follows the same busy/idle law without focus movement', async () => {
+  const f = candidateFixture(); const { promise } = await queueGrade(f); const button = f.door();
+  f.sandbox.document.activeElement = button;
+  button.events.click[0]({ detail: 0, currentTarget: button, target: button });
+  assert.equal(f.S.review, f.rv); ownedStatus(f, BUSY); assert.equal(f.sandbox.document.activeElement, button);
+  f.ack(); await promise; await drainExitMicrotasks(); const current = f.find(f.main(), n => n.id === 'zen-exit');
+  current.events.click[0]({ detail: 0, currentTarget: current, target: current });
+  assert.equal(f.S.review, null); assert.equal(f.box.writes, 1);
+});
+
+test('UX12 busy notice transfers through a pending repaint and old callback cannot clear a new notice', async () => {
+  const f = candidateFixture(); const { promise } = await queueGrade(f);
+  const old = f.door(); old.fire(); const oldStatus = exitNotice(f); f.paint();
+  const current = f.find(f.main(), n => n.id === 'zen-exit'); assert.notEqual(current, old); assert.equal(old.isConnected, false);
+  ownedStatus(f, BUSY); assert.notEqual(exitNotice(f), oldStatus); assert.equal(current.textContent, 'Processing…');
+  old.events.click[0](); assert.equal(f.S.review, f.rv); assert.equal(current.textContent, 'Processing…');
+  f.ack(); await promise; await drainExitMicrotasks(); ownedStatus(f, READY);
+});
+
+test('UX07 action begins after a summary press: live replacement surface gets visible busy feedback', async () => {
+  const f = candidateFixture(source, { cards: 1 }); await completeGrade(f); f.door('summary').fire();
+  const undo = f.find(f.main(), n => n.className?.split(' ').includes('review-undo')); const p = undo.fire();
+  f.paint(); f.flushTransition(); assert.equal(f.S.review, f.rv); ownedStatus(f, BUSY);
+  f.ack(); await p; await drainExitMicrotasks(); ownedStatus(f, READY); assert.equal(f.box.writes, 2);
+});
+
+test('UX12 newer same-review admission retires the previous action notice before waiting on a lock', async () => {
+  const f = candidateFixture(); const { promise } = await queueGrade(f); f.door().fire(); f.ack(); await promise; await drainExitMicrotasks();
+  ownedStatus(f, READY); f.rv.revealed = true; f.rv.declared = 1;
+  const release = f.holdLock(); const next = f.grade();
+  assert.equal(f.rv.admitting, true); assert.equal(f.rv.pending, null);
+  assert.equal(noticeText(f), '', 'old action cannot say processing finished for a new waiting action');
+  f.door().fire(); ownedStatus(f, DEPARTED); release(); await next; assert.equal(f.box.writes, 1);
 });

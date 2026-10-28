@@ -11,8 +11,17 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import ts from 'typescript';
 
+/** Transient exit closure shared by grade and renderer lifts. */
+export const REVIEW_EXIT_NAMES = [
+  'reviewExitStates', 'reviewExitAdmissions', 'reviewExitGeneration', 'reviewExitNotice', 'reviewExitIntent', 'REVIEW_EXIT_COPY',
+  'reviewExitState', 'reviewExitActivity', 'reviewExitUi', 'reviewExitOwner', 'reviewExitOwns', 'reviewExitPhase',
+  'restoreReviewExitControl', 'retireReviewExitNotice', 'syncReviewExitNotice', 'renderReviewExitNotice',
+  'showReviewExitNotice', 'settleReviewExitNotice', 'bindReviewExit',
+];
+
 /** the authored definitions under test, by name */
 export const CORRIDOR_NAMES = [
+  ...REVIEW_EXIT_NAMES,
   'commitStorePatchOutcome', 'commitStorePatch', 'PRODUCER_DECLINED', 'declineWrite', 'HELP_RELEVANCE_POLICY',
   'reportHookAttempt', 'hookCardFacts', 'srsKey', 'srsStoredRecord', 'srsSchedulerInstant', 'srsReviewLogRow',
   'sameWordIdentity', 'wordNodeIdentity', 'wordCardIdentity', 'wordAnswerIdentity', 'savedAnswerFor', 'nonBlankMeanings',
@@ -75,10 +84,11 @@ export function corridorSandbox(program, { core, fsrsApi, pin, record, dict = {}
     mode: 'confirmed', writes: 0, failures: [], producerRan: 0, renders: 0,
     record: JSON.parse(JSON.stringify(record)),
   };
-  const S = { view: 'review', focus: null, review: null };
+  const S = { view: 'review', focus: null, review: null, stack: [] };
   const sandbox = {
     console, JSON, Math, Set, Map, Object, Array, Error, Promise, crypto: globalThis.crypto,
     Date: clock ? class extends Date { constructor(...a) { if (a.length) super(...a); else super(clock()); } static now() { return clock().getTime(); } } : Date,
+    queueMicrotask, recordInstallation: null, recordDeparted: false, staleTab: false, storeSealed: false,
     S, D: { dict, kanji: {} }, srsCore: core, fsrsApi, scheduler,
     globalThis: null, window: {}, navigator: { locks }, localStorage: storage,
     recordEpoch: 1, recordApp: null, publishedRecord: {}, DEFAULT_LEARNER_RECORD: {},
@@ -127,3 +137,138 @@ export function corridorSandbox(program, { core, fsrsApi, pin, record, dict = {}
 }
 
 export { MemoryStorage, Locks };
+
+// Review-exit preparation: actual authored renderers and grade admission, with
+// controlled record/lock boundaries. No browser, layout, focus or storage claim.
+const reviewExitPrograms = new Map();
+export function reviewExitFixture(source, { core, fsrsApi, pin, tailHeld = false, pauseEvery = 0, cards = 2 } = {}) {
+  let program = reviewExitPrograms.get(source);
+  if (!program) {
+    program = liftCorridor(source, [...CORRIDOR_NAMES, 'renderReview', 'renderReviewBreak', 'renderReviewUndo', 'reviewNextStep', 'commitDrillGrade']);
+    reviewExitPrograms.set(source, program);
+  }
+  const latch = () => {
+    let release;
+    const promise = new Promise(resolve => { release = resolve; });
+    return { promise, release };
+  };
+  const callbackDone = latch(), tail = latch(), baseLocks = new Locks();
+  let entered = 0;
+  const locks = { request(name, callback) {
+    return baseLocks.request(name, async () => {
+      entered += 1;
+      const result = await callback();
+      callbackDone.release(result);
+      if (tailHeld) await tail.promise;
+      return result;
+    });
+  } };
+  const item = { t: 'word', id: '学校', label: '学校', started: 1 };
+  const queue = Array.from({ length: cards }, (_, i) => i === 0 ? { ...item }
+    : { t: 'kanji', id: '雨', label: '雨', started: 1 });
+  const record = { taken: queue, srs: {}, revlog: [], obslog: [], stats: {}, suspended: {}, deepWords: {},
+    sentencePractice: {}, m4Journey: {}, srsPrefs: {} };
+  const f = corridorSandbox(program, { core, fsrsApi, pin, record, locks,
+    dict: { 学校: { r: 'がっこう', m: ['school'] } }, clock: () => new Date('2026-10-28T00:00:00Z') });
+  const { sandbox: c, S, box } = f;
+  Object.assign(S, structuredClone(record), { stack: [] });
+  const rv = { queue, ix: 0, revealed: true, declared: 1,
+    pending: null, history: [], done: { again: 0, hard: 0, good: 0, easy: 0 } };
+  S.review = rv;
+  const queued = [], transitions = [];
+  const drawingBoundary = new Error('review exit: card-face drawing boundary');
+  class Element {
+    constructor(tag = 'div', cls = '', text = '') {
+      this.tag = tag; this.className = cls; this.ownText = text; this.children = []; this.events = {};
+      this.attrs = {}; this.dataset = {}; this.disabled = false; this.isConnected = true;
+      this.style = { setProperty() {} };
+      this.classList = { add: name => { this.className += ` ${name}`; }, remove: name => {
+        this.className = this.className.split(' ').filter(x => x !== name).join(' ');
+      } };
+    }
+    get textContent() { return this.ownText + this.children.map(x => x.textContent ?? String(x)).join(''); }
+    set textContent(value) { this.ownText = String(value); this.children = []; }
+    get childNodes() { return this.ownText ? [new Element('text', '', this.ownText), ...this.children] : this.children; }
+    contains(node) { return this === node || this.children.some(child => child.contains?.(node)); }
+    prepend(node) { node.parentNode = this; this.children.unshift(node); }
+    removeAttribute(k) { delete this.attrs[k]; }
+    append(...children) {
+      for (const child of children) { this.children.push(child); if (typeof child === 'object') child.parentNode = this; }
+      // The real exit has already been bound. The remaining card face is not
+      // needed for these event-handler tests; catch only this exact sentinel.
+      if (this.boundary && children.some(x => x.id === 'zen-exit')) throw drawingBoundary;
+    }
+    replaceChildren(...children) { this.children.forEach(x => { x.isConnected = false; }); this.children = []; this.ownText = ''; this.append(...children); }
+    remove() { this.isConnected = false; if (this.parentNode) this.parentNode.children = this.parentNode.children.filter(x => x !== this); }
+    setAttribute(k, v) { this.attrs[k] = String(v); }
+    getAttribute(k) { return this.attrs[k] ?? null; }
+    addEventListener(k, fn) { (this.events[k] ||= []).push(fn); }
+    fire() { assert(this.isConnected, 'fixture control is attached'); assert(!this.disabled, 'fixture control is enabled');
+      const results = (this.events.click || []).map(fn => fn({ currentTarget: this, target: this, preventDefault() {} }));
+      return results.at(-1);
+    }
+  }
+  const find = (node, predicate) => predicate(node) ? node : node.children?.map(child => find(child, predicate)).find(Boolean);
+  let main = null;
+  const paint = (kind = 'auto') => {
+    if (main) { const detach = node => { node.isConnected = false; node.children.forEach(detach); }; detach(main); }
+    main = new Element(); main.boundary = true;
+    if (S.view === 'tray' && c.placesLayout()) S.view = 'dojo';
+    c.syncReviewExitNotice();
+    try {
+      if (kind === 'break') c.renderReviewBreak(main, S.review, 1);
+      else if (S.view === 'review') c.renderReview(main);
+    } catch (error) { if (error !== drawingBoundary) throw error; }
+    c.renderReviewExitNotice(main);
+    return main;
+  };
+  Object.assign(c, {
+    queueMicrotask, setTimeout, clearTimeout, pageEpoch: 0,
+    document: { createTextNode: text => new Element('text', '', text), getElementById: id => main && find(main, n => n.id === id) },
+    el: (tag, cls, text) => new Element(tag, cls, text),
+    biLabel: (tag, cls, _ja, en) => new Element(tag, cls, en), tx: (_ja, en) => en, withEn: n => n,
+    todayLearning: (tag, cls, text) => new Element(tag, cls, text), TODAY_JA_WORD: /[一-龯]/,
+    placesLayout: () => false, srsPauseEvery: () => pauseEvery, isLeech: () => false,
+    renderAiCoach() {}, renderReviewNext() {}, roomTransition: change => { transitions.push(change); },
+    render() { box.renders += 1; paint(); },
+  });
+  c.recordApp.write = producer => new Promise(resolve => {
+    queued.push({ producer, resolve, staged: false, published: false });
+  });
+  const stage = () => {
+    const job = queued[0]; assert(job, 'actual handler enqueued its record producer');
+    if (!job.staged) {
+      job.staged = true; box.producerRan += 1;
+      try { job.output = job.producer(structuredClone(box.record), {}); }
+      catch (error) { job.error = error; }
+    }
+    return job;
+  };
+  const publish = () => {
+    const job = stage();
+    if (!job.error && !job.published) {
+      assert(job.output && Object.hasOwn(job.output, 'patch'), 'actual record producer returns an envelope patch');
+      box.record = { ...box.record, ...structuredClone(job.output.patch) };
+      Object.assign(S, structuredClone(box.record)); box.writes += 1; job.published = true;
+    }
+    return job;
+  };
+  const ack = ({ publishWrite = true, acknowledged = true, outcome = null } = {}) => {
+    const job = publishWrite ? publish() : stage(); queued.shift();
+    job.resolve(outcome || (job.error || !publishWrite
+      ? { status: 'recovery-required', reason: 'publication-failed' }
+      : { status: 'active', replayUiEffects: acknowledged }));
+    return job;
+  };
+  const door = (kind = 'active') => {
+    paint(kind === 'break' ? 'break' : 'auto');
+    const node = find(main, n => kind === 'active' ? n.id === 'zen-exit'
+      : n.tag === 'button' && (n.textContent === (kind === 'break' ? 'back to lists' : 'Back to Today') || n.getAttribute('aria-describedby') === 'review-exit-status' || n.textContent === 'Back to Review'));
+    assert(node, `actual ${kind} renderer bound its exit`); return node;
+  };
+  const grade = (current = rv) => f.lifted.admitStandardGrade({ rv: current, item: current.queue[current.ix], key: 'easy', skey: current.queue[current.ix]?.t + ':' + current.queue[current.ix]?.id, rating: fsrsApi.Rating.Easy });
+  return { ...f, rv, grade, queued, stage, publish, ack, door, paint, find, Element, transitions,
+    holdLock: () => baseLocks.hold(), entered: () => entered, callbackDone: callbackDone.promise,
+    releaseTail: () => tail.release(), main: () => main,
+    roots: () => structuredClone(box.record), flushTransition: () => { assert(transitions.length <= 1); return transitions.shift()?.(); } };
+}
