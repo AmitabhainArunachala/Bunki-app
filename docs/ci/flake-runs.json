@@ -1,26 +1,4 @@
 {
-  "38347847617/1": {
-    "result": "rejected",
-    "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
-    "startedAt": "2026-10-13T04:43:45Z",
-    "reason": "Producer verification policy differs from trusted default branch"
-  },
-  "38351384339/1": {
-    "result": "rejected",
-    "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
-    "startedAt": "2026-10-13T05:26:24Z",
-    "reason": "Producer verification policy differs from trusted default branch"
-  },
-  "38352431620/1": {
-    "result": "rejected",
-    "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
-    "startedAt": "2026-10-13T05:38:29Z",
-    "reason": "Producer verification policy differs from trusted default branch"
-  },
-  "38355950126/1": {
-    "result": "observed",
-    "startedAt": "2026-10-13T06:18:18Z"
-  },
   "37728173857/8": {
     "result": "observed",
     "startedAt": "2026-10-13T09:29:32Z"
@@ -948,5 +926,9 @@
   "38919512644/27": {
     "result": "observed",
     "startedAt": "2026-10-28T03:59:01Z"
+  },
+  "37925123360/36": {
+    "result": "observed",
+    "startedAt": "2026-10-28T03:59:16Z"
   }
 }
