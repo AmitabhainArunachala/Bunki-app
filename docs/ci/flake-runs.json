@@ -1,38 +1,4 @@
 {
-  "37728173857/9": {
-    "result": "observed",
-    "startedAt": "2026-10-13T19:09:35Z"
-  },
-  "38450903338/1": {
-    "result": "observed",
-    "startedAt": "2026-10-13T18:57:03Z"
-  },
-  "38451812965/1": {
-    "result": "observed",
-    "startedAt": "2026-10-13T19:03:40Z"
-  },
-  "37980085769/5": {
-    "result": "observed",
-    "startedAt": "2026-10-13T19:09:42Z"
-  },
-  "38452771630/1": {
-    "result": "rejected",
-    "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
-    "startedAt": "2026-10-13T19:10:46Z",
-    "reason": "Producer verification policy differs from trusted default branch"
-  },
-  "38453947574/1": {
-    "result": "observed",
-    "startedAt": "2026-10-13T19:19:39Z"
-  },
-  "37714882624/9": {
-    "result": "observed",
-    "startedAt": "2026-10-13T19:09:36Z"
-  },
-  "37925123360/6": {
-    "result": "observed",
-    "startedAt": "2026-10-13T19:25:18Z"
-  },
   "38488281442/1": {
     "result": "observed",
     "startedAt": "2026-10-14T00:06:59Z"
@@ -902,5 +868,9 @@
   "40737010924/1": {
     "result": "observed",
     "startedAt": "2026-10-28T17:34:31Z"
+  },
+  "37980085769/37": {
+    "result": "observed",
+    "startedAt": "2026-10-28T20:05:33Z"
   }
 }
