@@ -4872,6 +4872,40 @@ function biLabel(tag, cls, ja, en) {
 }
 
 /* ------------------------------------------------------------------ load */
+/** Discovery visibility never changes the source-resolution catalogue or learner records.
+ * Active policies may arrive only in a separately admitted catalogue artifact. The
+ * source-candidate importer cannot activate one; no URL/storage switch exists. */
+function libraryVisibilityPolicy(raw) {
+  if (raw == null) return null;
+  const ids = value => Array.isArray(value) && value.every(id => typeof id === 'string' && id.length > 0) && new Set(value).size === value.length;
+  if (raw.schema !== 1 || raw.kind !== 'bunki-library-visibility' || raw.id !== 'library-20261003-apply-cuts' ||
+      typeof raw.active !== 'boolean' || !['hideIds', 'alreadyAbsentIds', 'keepIds', 'laterIds'].every(key => ids(raw[key]))) {
+    throw new Error('Invalid library visibility policy');
+  }
+  if (raw.hideIds.some(id => raw.keepIds.includes(id) || raw.laterIds.includes(id) || raw.alreadyAbsentIds.includes(id))) {
+    throw new Error('Library visibility dispositions overlap');
+  }
+  if (!raw.active) return null;
+  const approval = raw.activationDecision;
+  if (!approval || approval.authority !== 'John' || approval.synthetic !== false ||
+      approval.policyId !== raw.id || !/^[0-9a-f]{64}$/.test(approval.evidenceSha256 || '') ||
+      !/^[0-9a-f]{40}$/.test(approval.sourceParent || '') || !ids(approval.selectedIds) ||
+      !Array.isArray(approval.hideIds) || JSON.stringify(approval.hideIds) !== JSON.stringify(raw.hideIds) ||
+      !approval.textHashes || Object.keys(approval.textHashes).length !== approval.selectedIds.length ||
+      approval.selectedIds.some(id => !/^[0-9a-f]{64}$/.test(approval.textHashes[id] || ''))) {
+    throw new Error('Library activation decision missing or inconsistent');
+  }
+  return Object.freeze({ active: true, hiddenIds: Object.freeze([...raw.hideIds]) });
+}
+function libraryDiscoverable(row, policy) {
+  return !policy?.active || !policy.hiddenIds.includes(row?.id);
+}
+function installLibraryVisibility(articleIndex) {
+  const policy = libraryVisibilityPolicy(articleIndex.libraryVisibility);
+  D.libraryVisibility = policy;
+  D.libraryDiscoverable = row => libraryDiscoverable(row, policy);
+}
+
 async function boot() {
   const params = new URLSearchParams(location.search);
   // A reload cannot reconstruct the entry sheet until data has booted, so the
@@ -5047,6 +5081,7 @@ async function boot() {
   // The shelf boots from a light index; each article's text + tokens live in
   // their own file, fetched on first open (and prefetched quietly after boot)
   // — dozens of articles cost nothing until read.
+  installLibraryVisibility(articleIndex);
   D.passages = articleIndex.articles;
   D.passageSources = articleIndex.sources.proprietary_safe;
   D.articleSources = articleIndex.sources;
@@ -5884,7 +5919,7 @@ function scaleIn(target = {}) {
   const scale = scaleName(), visit = S.scaleVisit;
   if (scale === 'sky') {
     const id = target.articleId || scalePassage(visit)?.id || passage()?.id ||
-      D.passages.find(p => !String(p.file || '').startsWith('archive/'))?.id;
+      D.passages.find(p => D.libraryDiscoverable?.(p) !== false && !String(p.file || '').startsWith('archive/'))?.id;
     if (id && !D.passages.some(p => p.id === id)) return false;
     const place = window.__DRIFT__?.capturePlace?.();
     if (visit?.recordEpoch === recordEpoch && visit.passageId === id) visit.skyPlace = place || visit.skyPlace;
@@ -6197,7 +6232,7 @@ function freshScaleKeptWord(key) {
   return record && typeof key === 'string' ? keptWordProjection(record).find(row => row.key === key) || null : null;
 }
 function installScaleBridge() {
-  const article = scalePassage() || passage() || D.passages.find(p => !String(p.file || '').startsWith('archive/'));
+  const article = scalePassage() || passage() || D.passages.find(p => D.libraryDiscoverable?.(p) !== false && !String(p.file || '').startsWith('archive/'));
   // Hfix-1A · the star's caption breaks only between the title's words (Q's one word rule)
   if (article) window.__DRIFT__?.focusArticle?.({ articleId: article.id, title: article.title, words: jaWords(article.title) });
   // Reading alone stays on the sky: its next tap must still reach the stage.
@@ -7228,7 +7263,7 @@ function renderShelfBody(search = null) {
   body.dataset.renderToken = shelfBodyToken();
   const main = el('div');
   main.id = 'shelf-content';
-  const curated = D.passages.filter(p => !String(p.file || '').startsWith('archive/'));
+  const curated = D.passages.filter(p => D.libraryDiscoverable?.(p) !== false && !String(p.file || '').startsWith('archive/'));
   // one card per story: an N3 rewrite whose original stands on the shelf is that story's
   // やさしい版, reached by the toggle inside the article, never a second card
   const stories = shelfStories(curated);
@@ -9438,10 +9473,10 @@ function storyKicker(p) {
 function storyVersions(p) {
   const originalId = p.adaptation?.basedOn;
   if (originalId) {
-    const original = D.passages.find((x) => x.id === originalId);
+    const original = D.passages.find((x) => x.id === originalId && D.libraryDiscoverable?.(x) !== false);
     return original ? { original, easy: p } : null;
   }
-  const easy = D.passages.find((x) => x.adaptation?.basedOn === p.id);
+  const easy = D.passages.find((x) => x.adaptation?.basedOn === p.id && D.libraryDiscoverable?.(x) !== false);
   return easy ? { original: p, easy } : null;
 }
 
@@ -16965,6 +17000,7 @@ function renderEntry(main) {
   field.id = 'field';
   const seeds = [];
   for (const p of D.passages) {
+    if (D.libraryDiscoverable?.(p) === false) continue;
     // index rows carry a seed list so the field is full before articles load
     for (const w of p.seeds || []) {
       if (seeds.length < 26 && !seeds.includes(w)) seeds.push(w);
@@ -18024,7 +18060,7 @@ function todaySecondsPerCard() {
  * the drop's own order, whatever else the record holds; once every leading drop is read, the unread story holding the
  * most saved words, else the shelf's first story that awaits no one. */
 function todayReadPick() {
-  const curated = (D.passages || []).filter((p) => !String(p.file || '').startsWith('archive/'));
+  const curated = (D.passages || []).filter((p) => D.libraryDiscoverable?.(p) !== false && !String(p.file || '').startsWith('archive/'));
   const stories = shelfStories(curated);
   const pool = stories.filter((p) => p.source !== 'isa-yasashii-glossary' && !owns(S.readDone || {}, p.id));
   if (!pool.length) return null;
@@ -27184,7 +27220,7 @@ function wwSentences(p, test, cap, out) {
 function wwPassages(w, cap = 2) {
   const out = [];
   for (const p of D.passages || []) {
-    if (!p.tokens || !wwPassageIndex(p).bases.has(w)) continue;
+    if (D.libraryDiscoverable?.(p) === false || !p.tokens || !wwPassageIndex(p).bases.has(w)) continue;
     wwSentences(p, (t) => t.b === w, cap, out);
     if (out.length >= cap) return out;
   }
@@ -27199,7 +27235,7 @@ function wwPassages(w, cap = 2) {
 function wwKanjiPassage(c) {
   const out = [];
   for (const p of D.passages || []) {
-    if (!p.tokens || !wwPassageIndex(p).text.includes(c)) continue;
+    if (D.libraryDiscoverable?.(p) === false || !p.tokens || !wwPassageIndex(p).text.includes(c)) continue;
     wwSentences(p, (t) => String(t.s).includes(c), 1, out);
     if (out.length) return out[0];
   }
@@ -30559,7 +30595,8 @@ function renderSentencePracticeLibrary(main) {
 }
 function sentenceReadingOptions(entryId) {
   const settings = readingModule.readingSettings(S.readingSettings);
-  return { startingLevel: settings.startingLevel, challenge: settings.challenge, entryId, limit: 1 };
+  return { startingLevel: settings.startingLevel, challenge: settings.challenge, entryId, limit: 1,
+    ...(D.libraryVisibility?.active ? { candidateIds: D.passages.filter(p => D.libraryDiscoverable(p)).map(p => p.id) } : {}) };
 }
 function renderSentenceReadingSuggestions(main, entryId = null) {
   if (!sentencePracticeModule || !readingModule || !(S.sentencePractice?.entries || []).some(entry =>
@@ -30578,7 +30615,7 @@ function renderSentenceReadingSuggestions(main, entryId = null) {
     // The regular reader queue already warms these bundled articles. Reuse its
     // in-flight promises; archive/publisher bodies are never bulk-loaded here.
     const sources = D.passages.filter(p => originals.has(p.id) ||
-      (['N5', 'N4', 'N3', 'N2', 'N1'].includes(p.authorLevel) && !String(p.file || '').startsWith('archive/')));
+      (D.libraryDiscoverable?.(p) !== false && ['N5', 'N4', 'N3', 'N2', 'N1'].includes(p.authorLevel) && !String(p.file || '').startsWith('archive/')));
     const loaded = await Promise.allSettled(sources.map(p => ensureArticle(p)));
     if (!current()) return;
     const failed = loaded.some(result => result.status === 'rejected');
@@ -36490,7 +36527,7 @@ function findExamples(id, cap = 4, node = null) {
   const out = [];
   const identity = node ? exampleIdentity(id, node) : null;
   for (const p of D.passages) {
-    if (!p.tokens) continue; // not yet fetched — prefetch fills these in
+    if (D.libraryDiscoverable?.(p) === false || !p.tokens) continue; // not yet fetched — prefetch fills these in
     let sentence = [];
     let start = 0;
     let hit = false;

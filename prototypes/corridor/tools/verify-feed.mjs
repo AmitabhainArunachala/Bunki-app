@@ -40,12 +40,97 @@
  */
 
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, lstatSync, readFileSync, readdirSync, realpathSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
+import { isDeepStrictEqual } from 'node:util';
 
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
+
+/** Separate unadmitted import contract. It cannot turn the existing deletion-cull
+ * disposition into hiding or authorize a share-alike row on the live shelf. */
+function libraryCandidateProblems(row, body, sourceRow, { activate = false } = {}) {
+  const problems = [];
+  const sha = text => createHash('sha256').update(text).digest('hex');
+  if (activate) problems.push('activation-held');
+  if (row?.libraryCandidate?.schema !== 1 || row.libraryCandidate.admission !== 'pending' ||
+      row.libraryCandidate.installable !== false || body?.libraryCandidate?.installable !== false) problems.push('candidate-scope');
+  if (!sourceRow || row?.id !== sourceRow.id || body?.id !== row?.id) return [...problems, 'source-identity'];
+  if (body.text !== sourceRow.admittedText.text || sha(body.text || '') !== sourceRow.admittedText.sha256 ||
+      sourceRow.admittedText.sha256 !== sourceRow.sourceText.sha256 || sourceRow.admittedText.editMap.length !== 0) problems.push('held-text-changed');
+  if (row.libraryCandidate?.sourceTextSha256 !== sourceRow.sourceText.sha256 ||
+      row.libraryCandidate?.admittedTextSha256 !== sourceRow.admittedText.sha256) problems.push('text-pins');
+  if (row.chars !== [...(body.text || '')].length || body.chars !== row.chars ||
+      row.textMetrics?.charsUnit !== 'unicode-codepoint' || row.textMetrics?.utf16Length !== body.text?.length ||
+      row.textMetrics?.readingAnchorUnit !== 'utf16' || row.textMetrics?.tokenPositionUnit !== 'token-index') problems.push('text-count-domain');
+  if (!isDeepStrictEqual(row.textMetrics, body.textMetrics)) problems.push('body-metrics');
+  if (row.authorLevel !== sourceRow.level.authorLevel || row.originalAuthorLevel !== sourceRow.level.originalLabel ||
+      !isDeepStrictEqual(row.authorLevelProvenance, sourceRow.level)) problems.push('ear-level-provenance');
+  for (const key of ['title', 'titleEn', 'author', 'url', 'licence', 'attribution', 'date']) {
+    if (row[key] !== sourceRow.candidate[key] || body[key] !== row[key]) problems.push('metadata-' + key);
+  }
+  const expectedPool = sourceRow.candidate.source === 'ja.wikipedia' ? 'share_alike' :
+    sourceRow.candidate.source === 'bunki-original' ? 'original' : 'proprietary_safe';
+  if (row.pool !== expectedPool || body.pool !== expectedPool || /(?:\bNC\b|\bND\b)/.test(row.licence || '')) problems.push('licence-pool');
+  if (!isDeepStrictEqual(body.provenance, sourceRow.candidate)) problems.push('lost-source-provenance');
+  if (!Array.isArray(body.tokens) || !body.tokens.length || !Array.isArray(body.paras) ||
+      body.paras.some(n => !Number.isInteger(n) || n <= 0 || n >= body.tokens.length)) problems.push('tokens-paragraphs');
+  const signals = body.grading?.signals;
+  if (!Number.isFinite(signals?.jreadability?.score) || !signals?.jlpt_lexicon ||
+      !isDeepStrictEqual(row.grading, body.grading) || !body.grading?.unavailable?.tmr) problems.push('computed-signals');
+  if (sourceRow.admission?.humanApproval !== null || sourceRow.admission?.status !== 'pending' ||
+      sourceRow.admission?.contentReviews?.length || sourceRow.admission?.titleReceipts?.length ||
+      !isDeepStrictEqual(body.admission, sourceRow.admission)) problems.push('unkeyed-admission');
+  return problems;
+}
+
+function verifyInactiveLibraryCandidate(root, repo) {
+  const insist = (ok, why) => { if (!ok) throw new Error(why); };
+  const sha = bytes => createHash('sha256').update(bytes).digest('hex');
+  const read = path => JSON.parse(readFileSync(path, 'utf8'));
+  insist(realpathSync(root) === resolve(root), 'candidate root is not canonical');
+  const manifest = read(resolve(root, 'MANIFEST.json'));
+  const seen = new Set();
+  for (const row of manifest.files) {
+    insist(typeof row.relativePath === 'string' && !row.relativePath.startsWith('/') &&
+      row.relativePath.split('/').every(p => p && p !== '.' && p !== '..') && !seen.has(row.relativePath), 'unsafe candidate path');
+    seen.add(row.relativePath);
+    const path = resolve(root, row.relativePath);
+    insist(realpathSync(path) === path && !lstatSync(path).isSymbolicLink(), 'candidate symlink');
+    const bytes = readFileSync(path); insist(bytes.length === row.bytes && sha(bytes) === row.sha256, 'candidate hash mismatch');
+  }
+  const diskFiles = readdirSync(root, { recursive: true }).filter(path => lstatSync(resolve(root, path)).isFile());
+  insist(diskFiles.length === seen.size + 1 && diskFiles.every(path => path === 'MANIFEST.json' || seen.has(path)), 'candidate extra/missing file');
+  const candidate = read(resolve(root, 'candidate-index.json'));
+  insist(candidate.kind === 'bunki-unadmitted-library-candidate' && candidate.installable === false &&
+    candidate.johnSelection === null && candidate.proposedVisibility?.active === false && candidate.missingInputs.length > 0, 'candidate activation or omissions');
+  const accepted = readFileSync(resolve(repo, 'prototypes/corridor/data/articles/index.json'));
+  insist(readFileSync(resolve(root, 'inactive-index.json')).equals(accepted), 'inactive shelf differs');
+  const original = JSON.parse(accepted);
+  insist(isDeepStrictEqual(candidate.existingRows, original.articles), 'existing shelf rows changed');
+  const rows = new Map(readFileSync(resolve(repo, 'docs/content/library-20261003.jsonl'), 'utf8').trim().split('\n').map(line => {
+    const row = JSON.parse(line); return [row.id, row];
+  }));
+  insist(rows.size === 110 && new Set(candidate.sampleIds).size === candidate.sampleIds.length &&
+    JSON.stringify(candidate.sampleIds) === JSON.stringify(candidate.candidateRows.map(row => row.id)), 'sample identity differs');
+  for (const row of candidate.candidateRows) {
+    insist(typeof row.file === 'string' && /^[A-Za-z0-9_-]+\.json$/.test(row.file), 'candidate body filename');
+    insist(seen.has('candidate-bodies/' + row.file), 'unbound body');
+    const problems = libraryCandidateProblems(row, read(resolve(root, 'candidate-bodies', row.file)), rows.get(row.id));
+    insist(!problems.length, row.id + ': ' + problems.join(','));
+  }
+  insist(seen.size === candidate.candidateRows.length + 3, 'unexpected candidate output set');
+  return { status: 'INACTIVE_CANDIDATE_CHECKED', rows: candidate.candidateRows.length, activation: false };
+}
+
+const libraryCandidateArg = process.argv.indexOf('--library-candidate');
+if (libraryCandidateArg !== -1) {
+  const root = process.argv[libraryCandidateArg + 1];
+  if (!root) throw new Error('--library-candidate requires an external candidate directory');
+  console.log(JSON.stringify(verifyInactiveLibraryCandidate(resolve(root), resolve(dirname(fileURLToPath(import.meta.url)), '../../..'))));
+  process.exit(0);
+}
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const CORRIDOR = resolveCorridorSite();
