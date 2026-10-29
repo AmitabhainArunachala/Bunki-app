@@ -118,7 +118,6 @@ const SHELL = [
   'kanji-world-encounter.mjs',
   'kanji-world-encounter.css',
   'kanji-world/rajomon-content.json',
-  'kanji-world/rajomon-r1.png',
   'data/share_alike/kanji-structure.json',
   'data/share_alike/kanji-family.json',
   'reference-ui.css',

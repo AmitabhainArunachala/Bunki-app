@@ -39773,6 +39773,7 @@ function kanjiWorldEligible() {
   const exploration = new Set(['entry', 'reader', 'kanjidex', 'search', 'levels']);
   const graded = new Set(['review', 'lessons', 'mock', 'tests', 'probe', 'deckplay', 'aiquiz', 'guided', 'sentence-practice', 'contextdeck']);
   return exploration.has(S.view) && !personalHost && !learningSourceVisit && !S.focus &&
+    kanjiReadingsState() !== 'pending' &&
     !S.navigationReturns.some(frame => frame.kanjiCourseReturn || frame.learningSourceVisit || graded.has(frame.view));
 }
 function openKanjiWorldEncounter(invoker, node) {

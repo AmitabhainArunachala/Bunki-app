@@ -39,9 +39,9 @@ for (const file of readdirSync(join(root, 'scripts/ci')).filter((f) =>
       for (const key of value) known.add(key);
     }
 }
-test('all 216 canonical and supplemental gates have unique names and mandatory declarations', () => {
-  assert.equal(gates.length, 216);
-  assert.equal(new Set(gates.map((g) => g.name)).size, 216);
+test('all 217 canonical and supplemental gates have unique names and mandatory declarations', () => {
+  assert.equal(gates.length, 217);
+  assert.equal(new Set(gates.map((g) => g.name)).size, 217);
   const expected = JSON.parse(
     readFileSync(new URL('./vh-required-gate-roster.json', import.meta.url), 'utf8'),
   );
@@ -856,9 +856,9 @@ test('inventory comparison keeps ordering and repeated occurrence identity; no u
   ])
     assert.throws(() => compareInventory(expected, actual, mode));
 });
-test('all 216 source inventory mappings expose unresolved expansion and closure as admission blockers', () => {
+test('all 217 source inventory mappings expose unresolved expansion and closure as admission blockers', () => {
   const census = inventoryCensus(root, gates, out);
-  assert.equal(census.count, 216);
+  assert.equal(census.count, 217);
   assert.deepEqual(
     census.rows.map((row) => row.name),
     gates.map((gate) => gate.name),
@@ -885,7 +885,7 @@ test('all 216 source inventory mappings expose unresolved expansion and closure 
     assert.equal(row.selectors.status, 'UNRESOLVED', row.name);
   }
   assert.equal(census.status, 'BLOCKED');
-  assert.equal(census.unresolved.length, 216);
+  assert.equal(census.unresolved.length, 217);
   assert.throws(() => requireInventoryCensusReady(census), /Inventory admission blocked/u);
   const selfCertified = structuredClone(census);
   selfCertified.status = 'VERIFIED';

@@ -2585,6 +2585,52 @@
       "limitations": ["No numeric timing is claimed for this unmeasured contract."]
     },
     {
+      "name": "kanji-world-encounter",
+      "measurementStatus": "measured-local-review",
+      "sampleCount": 1,
+      "samples": [
+        {
+          "source": "no-mistakes-review-r2-2026-10-30",
+          "seconds": 9.855,
+          "status": "passed",
+          "startedAt": "2026-10-29T15:33:55.087Z",
+          "completedAt": "2026-10-29T15:34:04.982Z",
+          "head": "5003737c4a31dc6753093b9ce2fb6587c34cfe62",
+          "sourceDirty": true,
+          "artifactSha256": "ce086e47a297153a7604a2400a76ef6dac5fe7d0ed8414f4093a01fa3a639892",
+          "producer": {
+            "path": "prototypes/corridor/tools/verify-kanji-world-encounter.mjs",
+            "sha256": "14f202776456648f770d6c504e89ef3806b2ebdd4d158a9b4d83682a283151a4"
+          },
+          "declaredInvocation": {
+            "command": "node",
+            "args": ["prototypes/corridor/tools/verify-kanji-world-encounter.mjs"],
+            "env": {
+              "KAIRO_BROWSER": "chromium"
+            }
+          },
+          "measurementBasis": "Completed PASS wall interval of the chromium verifier on a Mac review worktree against a fresh immutable build; not a GitHub runner observation."
+        }
+      ],
+      "currentContract": {
+        "producer": "prototypes/corridor/tools/verify-kanji-world-encounter.mjs",
+        "producerSha256": "14f202776456648f770d6c504e89ef3806b2ebdd4d158a9b4d83682a283151a4",
+        "command": ["node", "prototypes/corridor/tools/verify-kanji-world-encounter.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "KAIRO_EVIDENCE_DIR": "/unused/kanji-world-encounter"
+        }
+      },
+      "currentContractMeasured": true,
+      "maxSeconds": 9.855,
+      "minSeconds": 9.855,
+      "medianSeconds": 9.855,
+      "meanSeconds": 9.855,
+      "limitations": [
+        "One local Chromium sample on a Mac review worktree; a FULL battery sample should replace it and it is not a future bound."
+      ]
+    },
+    {
       "name": "hfix2d",
       "measurementStatus": "measured",
       "currentContract": {
@@ -7941,7 +7987,7 @@
         {
           "sampleCount": 1,
           "medianSeconds": 2188,
-          "meanSeconds": 2188.0,
+          "meanSeconds": 2188,
           "maxSeconds": 2188,
           "minSeconds": 2188,
           "successfulMedianSeconds": 2188,
@@ -12545,8 +12591,8 @@
       "historicalMeasurements": [
         {
           "sampleCount": 2,
-          "medianSeconds": 88.0,
-          "meanSeconds": 88.0,
+          "medianSeconds": 88,
+          "meanSeconds": 88,
           "maxSeconds": 88,
           "minSeconds": 88,
           "successfulMedianSeconds": 88,
@@ -12617,7 +12663,7 @@
         {
           "sampleCount": 3,
           "medianSeconds": 956,
-          "meanSeconds": 1042.0,
+          "meanSeconds": 1042,
           "maxSeconds": 1279,
           "minSeconds": 891,
           "successfulMedianSeconds": 923.5,
@@ -12805,11 +12851,11 @@
       "historicalMeasurements": [
         {
           "sampleCount": 2,
-          "medianSeconds": 1372.0,
-          "meanSeconds": 1372.0,
+          "medianSeconds": 1372,
+          "meanSeconds": 1372,
           "maxSeconds": 1427,
           "minSeconds": 1317,
-          "successfulMedianSeconds": 1372.0,
+          "successfulMedianSeconds": 1372,
           "provenance": "LOCAL measurement, INTG3 merge lane, 2026-10-18/19, Apple silicon M5, node v22.23.3, under fleet load 7-15. No CI run has executed this gate in this form yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers. WebKit: site-5 1427 s, site-6 1317 s.",
           "samples": [
             {
@@ -12864,7 +12910,7 @@
         {
           "sampleCount": 3,
           "medianSeconds": 1277,
-          "meanSeconds": 1282.0,
+          "meanSeconds": 1282,
           "maxSeconds": 1309,
           "minSeconds": 1260,
           "successfulMedianSeconds": null,
@@ -12928,7 +12974,7 @@
         {
           "sampleCount": 3,
           "medianSeconds": 1521,
-          "meanSeconds": 1518.0,
+          "meanSeconds": 1518,
           "maxSeconds": 1530,
           "minSeconds": 1503,
           "successfulMedianSeconds": null,

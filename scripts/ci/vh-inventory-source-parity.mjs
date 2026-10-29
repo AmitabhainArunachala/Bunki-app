@@ -455,8 +455,8 @@ const JSON_ROSTERS = {
 };
 /** Preserve declaration order and duplicate occurrences; never flatten a roster into a Set. */
 export function inventoryCensus(root, gates, out = '/inventory-census/no-execution') {
-  assert.equal(gates.length, 216, 'Required descriptor count changed');
-  assert.equal(new Set(gates.map((g) => g.name)).size, 216, 'Duplicate descriptor');
+  assert.equal(gates.length, 217, 'Required descriptor count changed');
+  assert.equal(new Set(gates.map((g) => g.name)).size, 217, 'Duplicate descriptor');
   const required = JSON.parse(
     readFileSync(resolve(root, 'scripts/ci/vh-required-gate-roster.json'), 'utf8'),
   );
@@ -800,9 +800,9 @@ export function inventoryCensus(root, gates, out = '/inventory-census/no-executi
 }
 /** Consistency check of this source-only census, never a launch key or proof authenticator. */
 export function requireInventoryCensusReady(census) {
-  assert.equal(census.count, 216, 'Census is incomplete');
-  assert.equal(census.rows.length, 216, 'Census rows missing');
-  assert.equal(new Set(census.rows.map((row) => row.name)).size, 216, 'Duplicate census row');
+  assert.equal(census.count, 217, 'Census is incomplete');
+  assert.equal(census.rows.length, 217, 'Census rows missing');
+  assert.equal(new Set(census.rows.map((row) => row.name)).size, 217, 'Duplicate census row');
   const blocked = census.rows.filter((row) => row.parity !== 'VERIFIED' || row.blockers.length);
   assert.equal(
     blocked.length,

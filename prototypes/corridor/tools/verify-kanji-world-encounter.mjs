@@ -1,7 +1,9 @@
 /** Exercise the Rajomon encounter through the real app in an owned browser.
  * KAIRO_SITE_DIR and KAIRO_EVIDENCE_DIR must point outside the checkout.
+ * Writes result.json and the checks-shaped verification-report.json the release battery reads.
  */
 import assert from 'node:assert/strict';
+import { randomUUID } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
@@ -17,6 +19,7 @@ mkdirSync(evidence, { recursive: true });
 const host = await startStaticHost({ site, port: 0 });
 const browser = await chromium.launch({ headless: true });
 const observations = [];
+const READINGS = '**/data/share_alike/reference-extra.json';
 let activePage;
 async function openEntry(page) {
   await page.goto(`${host.origin}/?entry=shelf&ui=bi`);
@@ -27,7 +30,20 @@ async function openEntry(page) {
   await page.locator('#kdx-kkld').fill('門');
   await page.locator('[data-kdx-hit="門"]').first().click();
   await page.locator('#kanji-world-door').waitFor();
-  await page.waitForFunction(() => !document.querySelector('[data-kanji-readings="pending"]'));
+}
+function writeReports(status, error) {
+  const results = observations.flatMap(({ viewport, checks }) =>
+    checks.map(check => ({ name: `${viewport.width}x${viewport.height}/${check}`, pass: true })));
+  if (error) results.push({ name: 'failure', pass: false, detail: String(error.stack || error) });
+  writeFileSync(resolve(evidence, 'result.json'), JSON.stringify({ status, error: error ? String(error.stack || error) : undefined, observations }, null, 2));
+  writeFileSync(resolve(evidence, 'verification-report.json'), JSON.stringify({
+    schemaVersion: 1,
+    runId: process.env.KAIRO_GATE_RUN_ID || randomUUID(),
+    runtime: { engine: 'chromium', version: browser.version() },
+    site,
+    summary: { total: results.length, failed: results.filter(row => !row.pass).length },
+    results,
+  }, null, 2) + '\n');
 }
 try {
   for (const viewport of [{ width: 1280, height: 900 }, { width: 390, height: 844 }]) {
@@ -36,8 +52,24 @@ try {
     let page = await context.newPage(); activePage = page;
     page.setDefaultTimeout(15000);
     const errors = []; page.on('pageerror', error => errors.push(error.message));
+    // Every reading arrives on its own clock, and a sheet drawn while they are still on their way is
+    // drawn again when they land. The door waits for that redraw instead of opening an encounter
+    // the redraw would close: a failed first load leaves the retry, whose actual response is held.
+    await page.route(READINGS, route => route.fulfill({ status: 503, body: '' }));
     await openEntry(page);
+    await page.unroute(READINGS);
+    let releaseReadings;
+    const held = new Promise(done => { releaseReadings = done; });
+    await page.route(READINGS, async route => { await held; await route.continue(); });
+    await page.locator('#kanji-readings-retry').click();
+    await page.locator('[data-kanji-readings="pending"]').waitFor();
+    assert.equal(await page.locator('#kanji-world-door').count(), 0, 'The door waits while every reading is still on its way');
+    releaseReadings();
+    await page.locator('[data-kanji-readings="complete"]').waitFor();
+    await page.unroute(READINGS);
     let door = page.locator('#kanji-world-door');
+    await door.waitFor();
+    assert.equal(await page.locator('[data-kanji-readings="pending"], [data-kanji-facts-state="pending"]').count(), 0);
     await door.scrollIntoViewIfNeeded();
     const origin = await page.evaluate(() => ({ node: document.querySelector('#sheet').dataset.node, y: window.scrollY, sheet: document.querySelector('#sheet').scrollTop }));
     const recordBefore = await readAppRecord(page);
@@ -129,14 +161,14 @@ try {
     await page.keyboard.press('Escape');
     assert.deepEqual(await readAppRecord(page), imageRecordBefore, 'All durable rows and revision remain unchanged');
     assert.deepEqual(errors, [], 'No page exceptions');
-    observations.push({ viewport, status: 'PASS', checks: ['actual-entry', 'actual-image', 'word-check', 'wrong-answer', 'reveal-retry', 'uncued-recall', 'exact-return', 'unchanged-record-rows-and-revision', 'repeat', 'escape', 'cancel-in-flight', 'content-failure-return', 'image-failure-practice'] });
+    observations.push({ viewport, status: 'PASS', checks: ['door-waits-for-readings', 'actual-entry', 'actual-image', 'word-check', 'wrong-answer', 'reveal-retry', 'uncued-recall', 'exact-return', 'unchanged-record-rows-and-revision', 'repeat', 'escape', 'cancel-in-flight', 'content-failure-return', 'image-failure-practice'] });
     await context.close(); activePage = null;
   }
-  writeFileSync(resolve(evidence, 'result.json'), JSON.stringify({ status: 'PASS', observations }, null, 2));
+  writeReports('PASS');
   console.log(JSON.stringify({ status: 'PASS', observations }));
 } catch (error) {
   if (activePage) await activePage.screenshot({ path: resolve(evidence, 'failure.png') }).catch(() => {});
-  writeFileSync(resolve(evidence, 'result.json'), JSON.stringify({ status: 'FAIL', error: String(error.stack || error), observations }, null, 2));
+  writeReports('FAIL', error);
   throw error;
 } finally {
   await browser.close(); await host.close();
