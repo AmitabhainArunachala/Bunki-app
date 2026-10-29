@@ -39768,6 +39768,8 @@ function renderKanjiStructure(sheet, node) {
 
 // An ungraded art encounter keeps the originating sheet in place. The modal
 // owns no record or schedule capability; any host render invalidates it.
+// So the door waits while the sheet's readings are still on their way: their
+// arrival draws the sheet again, and that render would close an open encounter.
 let kanjiWorldVisit = null;
 function kanjiWorldEligible() {
   const exploration = new Set(['entry', 'reader', 'kanjidex', 'search', 'levels']);
