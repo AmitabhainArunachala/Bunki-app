@@ -1,64 +1,4 @@
 {
-  "38488281442/1": {
-    "result": "observed",
-    "startedAt": "2026-10-14T00:06:59Z"
-  },
-  "38488422321/1": {
-    "result": "retry",
-    "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
-    "startedAt": "2026-10-14T01:09:56Z",
-    "failures": 19,
-    "attemptedAt": "2026-10-28T17:26:14.484Z",
-    "reason": "Observation artifact not yet available: bunki-plan-38488422321-1"
-  },
-  "38488451285/1": {
-    "result": "rejected",
-    "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
-    "startedAt": "2026-10-14T00:08:44Z",
-    "reason": "Producer verification policy differs from trusted default branch"
-  },
-  "38488422321/2": {
-    "result": "observed",
-    "startedAt": "2026-10-14T00:59:21Z"
-  },
-  "38488422321/3": {
-    "result": "observed",
-    "startedAt": "2026-10-14T01:09:56Z"
-  },
-  "38495348358/1": {
-    "result": "observed",
-    "startedAt": "2026-10-14T01:22:17Z"
-  },
-  "38336984136/2": {
-    "result": "observed",
-    "startedAt": "2026-10-14T01:52:56Z"
-  },
-  "38498169776/1": {
-    "result": "observed",
-    "startedAt": "2026-10-14T01:53:54Z"
-  },
-  "38496603525/1": {
-    "result": "observed",
-    "startedAt": "2026-10-14T01:36:02Z"
-  },
-  "38495339089/1": {
-    "result": "observed",
-    "startedAt": "2026-10-14T01:22:11Z"
-  },
-  "38498330375/1": {
-    "result": "rejected",
-    "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
-    "startedAt": "2026-10-14T01:55:43Z",
-    "reason": "Producer verification policy differs from trusted default branch"
-  },
-  "38501938471/1": {
-    "result": "observed",
-    "startedAt": "2026-10-14T02:36:43Z"
-  },
-  "38502929977/1": {
-    "result": "observed",
-    "startedAt": "2026-10-14T02:48:07Z"
-  },
   "38512826173/1": {
     "result": "observed",
     "startedAt": "2026-10-14T04:43:02Z"
@@ -884,5 +824,9 @@
   "37925123360/38": {
     "result": "observed",
     "startedAt": "2026-10-28T20:05:34Z"
+  },
+  "37980085769/38": {
+    "result": "observed",
+    "startedAt": "2026-10-29T04:08:13Z"
   }
 }
