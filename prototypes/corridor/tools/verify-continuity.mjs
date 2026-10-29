@@ -65,8 +65,8 @@ const VT_HOOK = () => {
 };
 const QUIET = () => { try { localStorage.setItem('kairo-tip-reader-v1', '1'); } catch { /* storage refused */ } };
 
-async function session(browser, { reduced = false } = {}) {
-  const ctx = await browser.newContext({ viewport: PHONE, deviceScaleFactor: 2, isMobile: true, hasTouch: true,
+async function session(browser, { reduced = false, deviceScaleFactor = 2 } = {}) {
+  const ctx = await browser.newContext({ viewport: PHONE, deviceScaleFactor, isMobile: true, hasTouch: true,
     serviceWorkers: 'block', reducedMotion: reduced ? 'reduce' : 'no-preference' });
   await silenceBrowserAudio(ctx);
   await ctx.addInitScript(VT_HOOK);
@@ -78,6 +78,99 @@ async function session(browser, { reduced = false } = {}) {
   page.on('pageerror', (error) => errors.push(String(error.message || error).slice(0, 200)));
   return { ctx, page, errors };
 }
+// Shelf40: fault data belongs only to an isolated verifier response, never the artifact.
+const SHELF_FALLBACK_ID = 'bunki-read-n2-shima-4004';
+function shelfFallbackIndex(index, mode) {
+  assert(['missing', 'failed', 'no-band'].includes(mode), 'Unknown shelf fallback fixture');
+  const copy = structuredClone(index);
+  const rows = copy.articles.filter((row) => row.id === SHELF_FALLBACK_ID);
+  assert.equal(rows.length, 1, 'The exact fallback article must exist once');
+  const row = rows[0];
+  assert.equal(row.heroKanji, '算', 'The fallback has a real attested key kanji');
+  assert(row.picture?.src && row.picture?.srcSmall, 'Both real responsive resources must exist');
+  if (mode !== 'failed') delete row.picture;
+  if (mode === 'no-band') delete row.heroKanji;
+  return copy;
+}
+async function installShelfFallback(page, mode) {
+  const original = JSON.parse(readFileSync(resolve(site, 'data/articles/index.json'), 'utf8'));
+  const picture = original.articles.find((row) => row.id === SHELF_FALLBACK_ID)?.picture;
+  const data = shelfFallbackIndex(original, mode);
+  const urls = ['src', 'srcSmall'].map((key) => `/data/${picture[key]}`);
+  const aborted = [], failed = [];
+  const indexRoute = (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) });
+  const imageRoute = (route) => {
+    const path = new URL(route.request().url()).pathname;
+    if (urls.includes(path)) { aborted.push(path); return route.abort('failed'); }
+    return route.fallback();
+  };
+  const recordFailure = (request) => {
+    const path = new URL(request.url()).pathname;
+    if (urls.includes(path)) failed.push({ path, error: request.failure()?.errorText || null });
+  };
+  const dispose = async () => {
+    const failures = [];
+    const cleanup = [() => page.unroute('**/data/articles/index.json', indexRoute)];
+    if (mode === 'failed') cleanup.push(
+      () => page.unroute('**/data/articles/pictures/*', imageRoute),
+      () => page.off('requestfailed', recordFailure));
+    for (const retire of cleanup) {
+      try { await retire(); } catch (error) { failures.push(error); }
+    }
+    if (failures.length) throw new AggregateError(failures, 'Shelf fixture cleanup did not complete');
+  };
+  try {
+    await page.route('**/data/articles/index.json', indexRoute);
+    if (mode === 'failed') {
+      page.on('requestfailed', recordFailure);
+      await page.route('**/data/articles/pictures/*', imageRoute);
+    }
+  } catch (error) {
+    try { await dispose(); }
+    catch (cleanupError) { throw new AggregateError([error, cleanupError], 'Shelf fixture setup and cleanup failed'); }
+    throw error;
+  }
+  return { id: SHELF_FALLBACK_ID, mode, urls, aborted, failed,
+    responseSHA256: createHash('sha256').update(JSON.stringify(data)).digest('hex'), dispose };
+}
+async function shelfFallbackObservation(page, fixture, expectedFailedPath, originalBox) {
+  const card = page.locator(`#shelf-body [data-passage="${fixture.id}"].story-card`).first();
+  await card.scrollIntoViewIfNeeded();
+  await card.locator('img.story-img').evaluateAll((images) => { for (const img of images) img.loading = 'eager'; });
+  await page.waitForFunction(({ id, mode }) => {
+    const card = document.querySelector(`#shelf-body [data-passage="${id}"].story-card`);
+    return !!card && (mode === 'no-band' ? !card.querySelector('.story-picture')
+      : !card.querySelector('.story-img') && !!card.querySelector('.story-picture.is-kanji .story-hero-kanji'));
+  }, { id: fixture.id, mode: fixture.mode });
+  const observed = await card.evaluate((node) => {
+    const bands = node.querySelectorAll('.story-picture'), band = bands[0], glyph = band?.querySelector('.story-hero-kanji');
+    const box = band?.getBoundingClientRect();
+    return { bands: bands.length, images: node.querySelectorAll('.story-img').length,
+      glyph: glyph?.textContent || '', text: band?.textContent.trim() || '',
+      size: glyph ? parseFloat(getComputedStyle(glyph).fontSize) : 0,
+      width: box?.width || 0, height: box?.height || 0,
+      placeholder: !!node.querySelector('.is-placeholder, .story-picture-word') };
+  });
+  assert.equal(observed.images, 0, 'No failed or absent image may stand over the fallback');
+  assert.equal(observed.placeholder, false, 'No category placeholder');
+  if (fixture.mode === 'no-band') assert.equal(observed.bands, 0, 'No picture and no kanji means no band');
+  else {
+    assert.equal(observed.bands, 1, 'Exactly one genuine fallback band');
+    assert.equal(observed.glyph, '算'); assert.equal(observed.text, '算');
+    assert(observed.size >= observed.height / 3, 'Key kanji occupies at least a third of the band');
+    assert(Math.abs(observed.width / observed.height - 1.5) <= .02, 'Fallback preserves the3:2 slot');
+    if (originalBox) assert(Math.abs(observed.width - originalBox.width) <= 1 && Math.abs(observed.height - originalBox.height) <= 1, 'Fallback preserves the loaded-picture box');
+  }
+  if (fixture.mode === 'failed') {
+    assert(expectedFailedPath && fixture.urls.includes(expectedFailedPath), 'Expected resource must be one of the original src/srcSmall');
+    assert(fixture.aborted.includes(expectedFailedPath), `Responsive request not aborted: ${expectedFailedPath}`);
+    assert(fixture.failed.some((row) => row.path === expectedFailedPath && row.error), `No actual transport failure: ${expectedFailedPath}`);
+  }
+  return { mode: fixture.mode, id: fixture.id, responseSHA256: fixture.responseSHA256,
+    expectedFailedPath, armedFailures: fixture.mode === 'failed' ? fixture.urls : [],
+    aborted: [...fixture.aborted], failed: [...fixture.failed], ...observed };
+}
+
 async function openShelf(page) {
   await page.goto(`${host.origin}/?entry=shelf&ui=bi`);
   await page.waitForFunction(() => document.body.dataset.ready === '1');
@@ -338,20 +431,46 @@ try {
       return { forwardFrames: forward.length, backFrames: back.length, lastOldFrame: forward.filter((r) => r.old > 0.02).at(-1), firstMainFrame: forward.find((r) => r.main > 0.02 && r.view === 'reader') };
     });
 
-    await run('H3-no-picture', async ({ page }) => {
-      await openShelf(page);
-      const id = await pictureCard(page, { withPicture: false });
-      await armFreeze(page);
-      await tapCard(page, id);
-      const frozen = await page.evaluate(() => window.__frozen);
-      assert.equal(frozen, 'ready');
-      const state = await transitionState(page);
-      assert.equal(state.named.filter((n) => n.name === 'hero').length, 0, 'nothing is named hero without a picture');
-      const leave = state.animations.find((a) => /::view-transition-old\(kairo-room\)/.test(a.pseudo));
-      assert(leave && leave.duration === state.motionRoom, `the ordinary room change: the departing room leaves in the full beat: ${JSON.stringify(leave)}`);
-      assert(!state.roomHero, 'no clip without a hero');
-      await settleAll(page);
-      return { id };
+    await run('H3-no-picture', async (initial) => {
+      const observations = [];
+      // Keep one case/engine; allthree isolated variants are mandatory within it.
+      for (const [mode, dpr] of [['missing', 2], ['failed', 2], ['failed', 1]]) {
+        const current = mode === 'missing' ? initial : await session(browser, { deviceScaleFactor: dpr });
+        const { page } = current;
+        let fixture;
+        try {
+          fixture = await installShelfFallback(page, mode);
+          await openShelf(page);
+          const expected = mode === 'failed' ? fixture.urls[dpr === 1 ? 1 : 0] : null;
+          const fallback = await shelfFallbackObservation(page, fixture, expected);
+          await armFreeze(page);
+          await tapCard(page, fixture.id);
+          const frozen = await page.evaluate(() => window.__frozen);
+          assert.equal(frozen, 'ready');
+          const state = await transitionState(page);
+          assert.equal(state.named.filter((n) => n.name === 'hero').length, 0, 'nothing is named hero without a picture');
+          const leave = state.animations.find((a) => /::view-transition-old\(kairo-room\)/.test(a.pseudo));
+          assert(leave && leave.duration === state.motionRoom, `the ordinary room change: the departing room leaves in the full beat: ${JSON.stringify(leave)}`);
+          assert(!state.roomHero, 'no clip without a hero');
+          await settleAll(page);
+          const after = await afterState(page);
+          assert.equal(after.named, 0, 'no retained hero name after fallback settles');
+          assert(!after.roomHero && !after.heroTop, 'no residual hero clip');
+          assert.equal(after.view, 'reader');
+          assert.deepEqual(current.errors, [], 'no page errors in each fallback variant');
+          observations.push({ dpr, fallback, roomDuration: leave.duration, after });
+        } catch (error) {
+          await page.screenshot({ path: resolve(evidence, `${engine}-H3-${mode}-DPR${dpr}-FAIL.png`) }).catch(() => {});
+          throw error;
+        } finally {
+          try { await fixture?.dispose(); }
+          finally { if (current !== initial) await current.ctx.close(); }
+        }
+      }
+      assert.deepEqual(observations.filter((row) => row.fallback.mode === 'failed').map((row) => row.fallback.expectedFailedPath).sort(),
+        ['/data/articles/pictures/bunki-read-n2-shima-4004-600.webp', '/data/articles/pictures/bunki-read-n2-shima-4004.webp'].sort(),
+        'Both actual responsive resources have independent failed-image motion proof');
+      return { id: SHELF_FALLBACK_ID, variants: observations };
     });
 
     await run('H4-interrupted', async ({ page }) => {

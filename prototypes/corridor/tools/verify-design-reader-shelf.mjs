@@ -202,6 +202,718 @@ const DIAGNOSTIC = /signals disagree|不一致|awaiting John/iu;
 const host = await startStaticHost({ site, port: 0 });
 const results = [];
 
+// Exact40 asset admission5e340029; independent of the index being checked.
+const SHELF40 = Object.freeze([
+  {
+    "id": "bunki-read-n2-shosoin-names",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-shosoin-names.webp",
+      "alt": "A long raised log storehouse on tall pillars among autumn maples, with deer resting in the sunlit grass.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-shosoin-names-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "bc26bb1e2cccfe5c81450bfb3249d89a5f9d8dc139bb0d3728e12ecfa1102518",
+      "768a1a4554e84f5133c0f5d0d64c0aaf36732b90cefd34850559dd09c4f5bdad"
+    ]
+  },
+  {
+    "id": "aozora:000772-1",
+    "picture": {
+      "src": "articles/pictures/aozora-000772-1.webp",
+      "alt": "A man in a long coat and hat walks a foggy brick-lined street at dawn, carrying a glowing lantern.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/aozora-000772-1-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "f27c9bdf83d997ef0a824b25833f724c055648de50fff37b28be1823b37b3892",
+      "c60d760e17071700e4c9c57eea54994138ae73be2b2262575b64dc100eaedfdb"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-shima-4004",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-shima-4004.webp",
+      "alt": "An open calculator showing its circuit board on a workbench beside a lamp and soldering iron, rain outside.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-shima-4004-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "c4240a196ca77adc52adbde8d9e42d6882a8b27252df5aceb10165f63fae675b",
+      "a8022462c0523868d52ce5fb7292dcab7b5d50004b7572ea01aab3018354f826"
+    ]
+  },
+  {
+    "id": "bunki-read-n1-optogenetics-nobel",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n1-optogenetics-nobel.webp",
+      "alt": "A glowing blue fibre over a microscope stage beside a flask of green algae, a researcher at the window behind.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n1-optogenetics-nobel-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "7139ffed48b76b4ab529fe04f3131c7ce85144ae06c2d3420440057c88b31984",
+      "eb975e25d7125c25c0c616442960e900c0c1dc262e1ca84eb9fe3b29f5efe714"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-kobe-jain",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-kobe-jain.webp",
+      "alt": "A small white Jain temple with a dome and short spire beside clapboard houses on a sloping lane above the bay.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-kobe-jain-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "abd9f04678084c37b95de3a055b8ce85ae41b7bacc2df0ba3eb6ed73b7cc5d40",
+      "5be0a482d4f9199a5e018d154589dc345ed27df2b46222f2a24bedbfe7bfb8ee"
+    ]
+  },
+  {
+    "id": "bunki-read-n3-honda-quarter",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n3-honda-quarter.webp",
+      "alt": "An abacus, a tied ledger and stacks of coins on a low desk, one stack on a blue cloth, young trees outside.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n3-honda-quarter-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "872acac9833776c443f4d3a87366ae4837bf70d79c28f8c904bbc9364297628f",
+      "a575615b689223b88fe5999be245c3df319b3158e7758d79b9916393007db0e7"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-bodhisena",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-bodhisena.webp",
+      "alt": "A monk on a scaffold paints the eye of the great bronze Buddha, blue cords running down to the crowd below.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-bodhisena-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "a0522f83fdfd1736dffed908920ef355a75e221e85af2168941a525b118b0b9e",
+      "cf5c38561b47734ebf3bba1cba5e5ebd10621134f62dc33640eb4798a8e058af"
+    ]
+  },
+  {
+    "id": "aozora:049966-1",
+    "picture": {
+      "src": "articles/pictures/aozora-049966-1.webp",
+      "alt": "A lamplit study with tied scrolls, a travel bundle, straw hat and staff, and snow falling in the garden.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/aozora-049966-1-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "87a7b253f1e06ea158b2778a091b9e0dc1486ca41708da4e0569088b1b0e1332",
+      "928a9c13f1093a1751aabc9b055c1078e337d7ec893a4742c0859714c563db52"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-forgetting-curve",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-forgetting-curve.webp",
+      "alt": "A dusk study desk with an hourglass, metronome, pocket watch, oil lamp and a row of blank cards.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-forgetting-curve-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "0bb02da6155dc86c3767e7cedf0a5bc99af51b9fc3a2976d6481ff50a8463331",
+      "8ffa52dcb18216a226c367626c60b56e295e2f74334ff9c2b6641d600fcda848"
+    ]
+  },
+  {
+    "id": "bunki-read-n1-neocognitron",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n1-neocognitron.webp",
+      "alt": "A researcher works under a desk lamp beside mainframe cabinets with tape reels, a circuit diagram on the wall.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n1-neocognitron-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "cb3910d3cfa11f829f5a691701ae8d58897ebc06fc1bee6b902423e973c253b0",
+      "e8b268e236e70ea0fefb00be5dfa75b020b356af79cbb6c8594ff14e99823f33"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-kokugo-survey",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-kokugo-survey.webp",
+      "alt": "Hands untie the cord of a closed string-bound book on a low table, with a stack of books and a tea bowl.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-kokugo-survey-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "0c120aaaed4b58dccb047d3423997af49b75e7195f0d78f73a570e85581e5743",
+      "31d4cc568108addbf4cf8d2b31e71453d114e730e3d10452d960bee08c917b20"
+    ]
+  },
+  {
+    "id": "bunki-read-n1-strange-loop",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n1-strange-loop.webp",
+      "alt": "A stone staircase winds around a mossy hill past a lit lantern, mirrored in a still pond at dusk.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n1-strange-loop-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "e31eaf041b1d0d99e6dae61cdd862f6431135946c29e89e2e22183a1477d8a8a",
+      "33c45999a2b0b20cf053809810b6d3861593454c1fecb7b1485b01e5a6b547cf"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-benzaiten",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-benzaiten.webp",
+      "alt": "A figure rinses coins in a bamboo basket at a spring in a candlelit grotto, red shrine gates beyond.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-benzaiten-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "66402cdc128d4d621f1368b3624a2e15caf6149f41c1453beebdcb9f8221da1a",
+      "01dbaa327886de1f40a097dac46dd18d4dddfcbfdbbeaca17bf68c3f641b01c4"
+    ]
+  },
+  {
+    "id": "bunki-read-n1-soai-nobel",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n1-soai-nobel.webp",
+      "alt": "Round glass flasks on a lab bench, crystals growing in the nearest, and a quartz crystal on the windowsill.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n1-soai-nobel-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "0eec5a93508352f13f748735d8853243508730ad6e6cc76c38080cb66dc0a024",
+      "2ed48566c821025b2558ca17d5ba7fca29f347502979d3a73cfa541223011bd8"
+    ]
+  },
+  {
+    "id": "bunki-read-n3-gojuon-sanskrit",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n3-gojuon-sanskrit.webp",
+      "alt": "A low writing desk with brush, inkstone, blank paper and a brass bell, open to a garden of white plum blossom.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n3-gojuon-sanskrit-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "30510206a848445fe0fee7beaca0faacac267848ff024f38bddf554d267ef667",
+      "15240d4380cfc36036d2a52e15f37b0c0db3500629dcea77497788308840d5ca"
+    ]
+  },
+  {
+    "id": "aozora:002359-1",
+    "picture": {
+      "src": "articles/pictures/aozora-002359-1.webp",
+      "alt": "A traveller in a straw hat stops on a mountain path to look at a wildflower, Mount Fuji above the mist.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/aozora-002359-1-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "4b2d8f4886dd0e3f3c0975f02235a41ee87f1f51a1927503d3f5d163b6ee53af",
+      "d6b1415da72af524b5111866a4b71d65d6047b8e397d20f7c524be4a297c5728"
+    ]
+  },
+  {
+    "id": "bunki-read-n1-nobel-economics",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n1-nobel-economics.webp",
+      "alt": "A grey stone bank with a green copper dome above a wet street, cars and people in winter coats with umbrellas.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n1-nobel-economics-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "a2c63f4c0334d41b08bd57f9062813bd7e1bbec306744023b05da5f2ca03ccf8",
+      "1534d521784ad3cf5db11c8c34d444f539a68d9d3ba742b34a1601f4c010b286"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-sleep-memory",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-sleep-memory.webp",
+      "alt": "A person asleep in a small room beside a desk with a lit lamp and an open book, snow outside the window.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-sleep-memory-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "e139ed969bbb725a73e3c43f24436cbddb500b92fc88e3b003c2abe65ba7dd7a",
+      "9cbb67dac78ad0dd27fe84f4850ada6ebe507c97170586e5953803098b861418"
+    ]
+  },
+  {
+    "id": "bunki-read-n3-transistor-class",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n3-transistor-class.webp",
+      "alt": "An open red transistor radio, a ring magnifier lamp, soldering iron and tweezers, an old tube radio behind.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n3-transistor-class-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "ae632f66823b7011137292d83c322d2a7275b44386d3f971f03afa16c1680749",
+      "f5fdeb0c35ec3e2f82490850299a6ce40f6b0f7a808a167a906c799157d911f2"
+    ]
+  },
+  {
+    "id": "bunki-read-n1-zazen-brainwaves",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n1-zazen-brainwaves.webp",
+      "alt": "A row of monks sit in meditation in a dim wooden hall, one lamp lit, the doors open to a night garden.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n1-zazen-brainwaves-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "5fae50ebc2eff53353c80e64dedf3f74056087095e337538187578186581cd9b",
+      "41f687f7a38753cf5a25b652a1544119c726c6210274469c9ae5a7094a337a5c"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-japan-us-chip-fab",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-japan-us-chip-fab.webp",
+      "alt": "A large white factory under construction on farmland, with tall cranes, trucks and red maples in front.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-japan-us-chip-fab-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "f7abd227d47efa33ac584fbf827aea3dff72b4c82a12c7282697d7ea1fb0cd3a",
+      "7c8170c572cd873ef2fef9d177dad6bb51af0633b34f1edb9d9b457c5c5ac1b6"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-shoten-ganesha",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-shoten-ganesha.webp",
+      "alt": "A red cable car climbs a forested slope toward a temple and pagoda, with white radishes on a stand in front.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-shoten-ganesha-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "2396bae24c5154b46e80199c963c80cebd4f65698feca172701855e817855d4c",
+      "29b0dbd3c1e0b71b5a8c01b660f60ecc20299c421b8f8ec7291d7da41240ffc3"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-icecube-nobel",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-icecube-nobel.webp",
+      "alt": "A two-storey lab on stilts on a white ice plain under a green aurora, with a few small figures nearby.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-icecube-nobel-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "e2ce0e87784ab2eb4862961b616dc0ec4248f9d8ea45860a6fb4548eecf22e69",
+      "5d822f0f0a4d3b3685fb0b20876f315194731dee2e310e5a7636ba8c05f4f9bc"
+    ]
+  },
+  {
+    "id": "aozora:058059-1",
+    "picture": {
+      "src": "articles/pictures/aozora-058059-1.webp",
+      "alt": "A monk crouches at a mossy stone basin to wash his face with a dipper, a frosty garden beside the veranda.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/aozora-058059-1-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "ce5f5974eb417b947c88e3d2df02b9d654f622f14b636f43d8ada409992eeba3",
+      "f26553c4c09a571bfa75fc09c107c73fcd28b591c33b580ff99c2637f12b64da"
+    ]
+  },
+  {
+    "id": "bunki-read-n3-rule-of-72",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n3-rule-of-72.webp",
+      "alt": "Two coin stacks, the right one twice as tall, beside an abacus and a passbook, city lights in the window.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n3-rule-of-72-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "95a6d4c5b6e34e706c7f319a849c00ad093e39852e0d2bc0153b027676a7fe2d",
+      "255e53b61cb0406ff04023632ac0182256bdbd7af95ef0a7056b966bc4d6bc98"
+    ]
+  },
+  {
+    "id": "global-voices:2026-08-03-65560",
+    "picture": {
+      "src": "articles/pictures/global-voices-2026-08-03-65560.webp",
+      "alt": "Two women forest guards in green uniforms walk a path through tall grass at dawn, a rhinoceros far ahead.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/global-voices-2026-08-03-65560-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "077660ae797e7e577f105123cc7f62406298bfd7b0236c309715159ec455115e",
+      "4cc6c8d0b709c723fef9b0dc9f5f77fc74d217a816b3e6245958e32c5bc14241"
+    ]
+  },
+  {
+    "id": "bunki-read-n1-kukai-sanskrit",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n1-kukai-sanskrit.webp",
+      "alt": "A young monk carrying scrolls crosses a moonlit temple courtyard, with a great pagoda and willows behind.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n1-kukai-sanskrit-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "8935c15d36c0b8f84d6d09a8a01a0695db92528c27e960d7081509292fd9546b",
+      "f2bdf99ca948ddc6888c47db3ea70905233ee01b9c9c1d5359d8e0c3b7f17211"
+    ]
+  },
+  {
+    "id": "global-voices:2026-07-28-65374",
+    "picture": {
+      "src": "articles/pictures/global-voices-2026-07-28-65374.webp",
+      "alt": "A hillside village of flat-roofed stone houses at dusk, one window glowing blue, a phone mast on the ridge.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/global-voices-2026-07-28-65374-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "17f1b0ee11a480e259cfb775da3cd9a8d861d7da080a9c881f626db7712ee91d",
+      "4800ac20f03d8a9627e39116b255f4a3aaa4f2bf604031c998971e583e07c3cf"
+    ]
+  },
+  {
+    "id": "govonline:202403-entry-5920-column",
+    "picture": {
+      "src": "articles/pictures/govonline-202403-entry-5920-column.webp",
+      "alt": "A woman holds a glowing phone in a lantern-lit hall of mirrors, her reflection repeating down the hall.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/govonline-202403-entry-5920-column-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "7a70def8e88709d76cdd04b60838884cff8f5d7f07687657acde00cdb246eee3",
+      "66a9fc9a9856187b7620403fa662ddeeb4c4024286bee351d7ec7cde113f840f"
+    ]
+  },
+  {
+    "id": "mext:b_menu-hakusho-html-hpaa202601-1421221_00020-column2-3",
+    "picture": {
+      "src": "articles/pictures/mext-b-menu-hakusho-html-hpaa202601-1421221-00020-column2-3.webp",
+      "alt": "A white robot arm and a server rack in a lab at dusk, the National Diet Building seen through the window.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/mext-b-menu-hakusho-html-hpaa202601-1421221-00020-column2-3-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "5431f44df83943ec9686033d3b7ba2f5c83832d53c27591382ac9f736208c734",
+      "278bd28cbd2e21b3ef5bc7ea1d85cd59bb957e0ecf0983f2ed3c6e1c4f6793b0"
+    ]
+  },
+  {
+    "id": "aozora:004668-1",
+    "picture": {
+      "src": "articles/pictures/aozora-004668-1.webp",
+      "alt": "A fishing village below a steep green hill on a calm morning, boats on the beach, a stone marker on the slope.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/aozora-004668-1-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "9393749d019846e0df6744c9092920e6bc9e5b4dd3b96e3a30c6346960b90cd1",
+      "464d0c71b89f07b76bf7b713c096bb01c44b3c008823f34469f1e26b008686d9"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-carson-nobel",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-carson-nobel.webp",
+      "alt": "A figure with red wings stands on black rocks by a dark sea at dusk, facing an island with faint lights.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-carson-nobel-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "dfeacd61020febcdac1498f397cf4108a5c477214ddcdc38743915eeb9855a26",
+      "2e5e986e3d89244826601b531345ff37603883fb07f8c3cd9ab1e838ce196d66"
+    ]
+  },
+  {
+    "id": "aozora:053224-1",
+    "picture": {
+      "src": "articles/pictures/aozora-053224-1.webp",
+      "alt": "A steam train with lit windows crosses a snowy field at night, its lights reflected in the flooded rice paddy.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/aozora-053224-1-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "b946dfb655067cd2b1638d6f211aed6cb524b02ce47b3d44263fae7a1cb410a1",
+      "b27795a5b9ac49ae506aa411a976dc42860a5486eb17c3b0cdc432498ebc791c"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-imf-outlook",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-imf-outlook.webp",
+      "alt": "Container ships at a misty quay under tall gantry cranes, stacked containers and a faint city skyline.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-imf-outlook-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "c87483d2e6a87f8129d9b43965d243a7043e70c8804c9ba486f11de057d66052",
+      "222b80a8029f01493dea52449ef6278c56b0685dd9bc7d3e3b28a9794b9ecb16"
+    ]
+  },
+  {
+    "id": "aozora:049966-2",
+    "picture": {
+      "src": "articles/pictures/aozora-049966-2.webp",
+      "alt": "A lone monk walks a ridge path between tea terraces toward a hilltop monastery under a wall of snow peaks.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/aozora-049966-2-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "360886ce46850dbecf4166d23676f5fe204009077fa71696e9f316e7d5ec5916",
+      "af7be2952576ce7e15b71d22e17ddd35f6cec5cc38e7244d5552fee4260dbb06"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-pillay-peace-nobel",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-pillay-peace-nobel.webp",
+      "alt": "A red-brick palace with a tall clock tower behind a gate, autumn trees and umbrellas on a wet forecourt.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-pillay-peace-nobel-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "2a9b3f5ae50546ef3449761d871f9f3c31475756b9ef88ae883f6a151e70cb79",
+      "8a69ee49db910ea78516ae5f66a87b61c6349573e78d9550105b8acdc30d8ba6"
+    ]
+  },
+  {
+    "id": "bunki-read-n1-suzuki-zen",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n1-suzuki-zen.webp",
+      "alt": "A figure in dark kimono climbs stone steps to a two-storey temple gate among tall cedars, a jet trail above.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n1-suzuki-zen-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "154965f5a72c7962e5f0bc03d0bec26b4748cd2d6d7304fca51465871104cafd",
+      "0101616992b0bde1cf7a1698ff6d8a2c8433b9432653c8c9587898d70acf2935"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-grit-checked",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-grit-checked.webp",
+      "alt": "A long file of cadets jogs along a rainy river road below stone buildings, one runner trailing the rest.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-grit-checked-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "c4599caecb936dce11b75b22fcbcf84dd574995275f31ec65cd4fcdb9e7d84c3",
+      "a65b0ea016711af3a1e09495cf54f9af8891d19a66d029e59b34a564db91d761"
+    ]
+  },
+  {
+    "id": "bunki-read-n3-felt-prices",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n3-felt-prices.webp",
+      "alt": "Shoppers with baskets in a small lit supermarket seen from the rainy street, crates of cabbages and apples.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n3-felt-prices-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "fe31e1a25563cbddd1519693059e8e47197df429b9ffcc13d9e778caf0dc22c6",
+      "fc8c90b67940a056f9c031684c11598bd22bccc51743594eefe47e4b1e5c4b4b"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-hofstadter-law",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-hofstadter-law.webp",
+      "alt": "A chessboard mid-game beside an old computer terminal and a coffee cup, grey dawn light in the window.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-hofstadter-law-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "0e15519fe761c6192c4d6b1ef96c376c8c919542c217a80cb4d503aafc831898",
+      "13b2d62268e2d45dcc960bc297085480b016a412bc8de87de86618e42c7f7f35"
+    ]
+  }
+]);
+function shelf40SourceProof() {
+  const index = JSON.parse(readFileSync(resolve(site, 'data/articles/index.json'), 'utf8'));
+  assert.equal(index.articles.length, 156, 'The complete curated index remains156 rows');
+  assert.equal(index.articles.filter((row) => row.picture?.src).length, 156, 'All156 rows carry real picture metadata');
+  assert.equal(new Set(SHELF40.map((row) => row.id)).size, 40);
+  for (const expected of SHELF40) {
+    const found = index.articles.filter((row) => row.id === expected.id);
+    assert.equal(found.length, 1, `Admitted article missing/duplicated: ${expected.id}`);
+    assert.deepEqual(found[0].picture, expected.picture, `Admitted picture metadata drift: ${expected.id}`);
+    for (const [i, key] of ['src', 'srcSmall'].entries()) {
+      const bytes = readFileSync(resolve(site, 'data', expected.picture[key]));
+      assert.equal(createHash('sha256').update(bytes).digest('hex'), expected.hashes[i], `Admitted bytes drift: ${expected.id}/${key}`);
+    }
+  }
+  return { ids: SHELF40.map((row) => row.id), images: SHELF40.length * 2 };
+}
+// Shelf40: fault data belongs only to an isolated verifier response, never the artifact.
+const SHELF_FALLBACK_ID = 'bunki-read-n2-shima-4004';
+function shelfFallbackIndex(index, mode) {
+  assert(['missing', 'failed', 'no-band'].includes(mode), 'Unknown shelf fallback fixture');
+  const copy = structuredClone(index);
+  const rows = copy.articles.filter((row) => row.id === SHELF_FALLBACK_ID);
+  assert.equal(rows.length, 1, 'The exact fallback article must exist once');
+  const row = rows[0];
+  assert.equal(row.heroKanji, '算', 'The fallback has a real attested key kanji');
+  assert(row.picture?.src && row.picture?.srcSmall, 'Both real responsive resources must exist');
+  if (mode !== 'failed') delete row.picture;
+  if (mode === 'no-band') delete row.heroKanji;
+  return copy;
+}
+async function installShelfFallback(page, mode) {
+  const original = JSON.parse(readFileSync(resolve(site, 'data/articles/index.json'), 'utf8'));
+  const picture = original.articles.find((row) => row.id === SHELF_FALLBACK_ID)?.picture;
+  const data = shelfFallbackIndex(original, mode);
+  const urls = ['src', 'srcSmall'].map((key) => `/data/${picture[key]}`);
+  const aborted = [], failed = [];
+  const indexRoute = (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) });
+  const imageRoute = (route) => {
+    const path = new URL(route.request().url()).pathname;
+    if (urls.includes(path)) { aborted.push(path); return route.abort('failed'); }
+    return route.fallback();
+  };
+  const recordFailure = (request) => {
+    const path = new URL(request.url()).pathname;
+    if (urls.includes(path)) failed.push({ path, error: request.failure()?.errorText || null });
+  };
+  const dispose = async () => {
+    const failures = [];
+    const cleanup = [() => page.unroute('**/data/articles/index.json', indexRoute)];
+    if (mode === 'failed') cleanup.push(
+      () => page.unroute('**/data/articles/pictures/*', imageRoute),
+      () => page.off('requestfailed', recordFailure));
+    for (const retire of cleanup) {
+      try { await retire(); } catch (error) { failures.push(error); }
+    }
+    if (failures.length) throw new AggregateError(failures, 'Shelf fixture cleanup did not complete');
+  };
+  try {
+    await page.route('**/data/articles/index.json', indexRoute);
+    if (mode === 'failed') {
+      page.on('requestfailed', recordFailure);
+      await page.route('**/data/articles/pictures/*', imageRoute);
+    }
+  } catch (error) {
+    try { await dispose(); }
+    catch (cleanupError) { throw new AggregateError([error, cleanupError], 'Shelf fixture setup and cleanup failed'); }
+    throw error;
+  }
+  return { id: SHELF_FALLBACK_ID, mode, urls, aborted, failed,
+    responseSHA256: createHash('sha256').update(JSON.stringify(data)).digest('hex'), dispose };
+}
+async function shelfFallbackObservation(page, fixture, expectedFailedPath, originalBox) {
+  const card = page.locator(`#shelf-body [data-passage="${fixture.id}"].story-card`).first();
+  await card.scrollIntoViewIfNeeded();
+  await card.locator('img.story-img').evaluateAll((images) => { for (const img of images) img.loading = 'eager'; });
+  await page.waitForFunction(({ id, mode }) => {
+    const card = document.querySelector(`#shelf-body [data-passage="${id}"].story-card`);
+    return !!card && (mode === 'no-band' ? !card.querySelector('.story-picture')
+      : !card.querySelector('.story-img') && !!card.querySelector('.story-picture.is-kanji .story-hero-kanji'));
+  }, { id: fixture.id, mode: fixture.mode });
+  const observed = await card.evaluate((node) => {
+    const bands = node.querySelectorAll('.story-picture'), band = bands[0], glyph = band?.querySelector('.story-hero-kanji');
+    const box = band?.getBoundingClientRect();
+    return { bands: bands.length, images: node.querySelectorAll('.story-img').length,
+      glyph: glyph?.textContent || '', text: band?.textContent.trim() || '',
+      size: glyph ? parseFloat(getComputedStyle(glyph).fontSize) : 0,
+      width: box?.width || 0, height: box?.height || 0,
+      placeholder: !!node.querySelector('.is-placeholder, .story-picture-word') };
+  });
+  assert.equal(observed.images, 0, 'No failed or absent image may stand over the fallback');
+  assert.equal(observed.placeholder, false, 'No category placeholder');
+  if (fixture.mode === 'no-band') assert.equal(observed.bands, 0, 'No picture and no kanji means no band');
+  else {
+    assert.equal(observed.bands, 1, 'Exactly one genuine fallback band');
+    assert.equal(observed.glyph, '算'); assert.equal(observed.text, '算');
+    assert(observed.size >= observed.height / 3, 'Key kanji occupies at least a third of the band');
+    assert(Math.abs(observed.width / observed.height - 1.5) <= .02, 'Fallback preserves the3:2 slot');
+    if (originalBox) assert(Math.abs(observed.width - originalBox.width) <= 1 && Math.abs(observed.height - originalBox.height) <= 1, 'Fallback preserves the loaded-picture box');
+  }
+  if (fixture.mode === 'failed') {
+    assert(expectedFailedPath && fixture.urls.includes(expectedFailedPath), 'Expected resource must be one of the original src/srcSmall');
+    assert(fixture.aborted.includes(expectedFailedPath), `Responsive request not aborted: ${expectedFailedPath}`);
+    assert(fixture.failed.some((row) => row.path === expectedFailedPath && row.error), `No actual transport failure: ${expectedFailedPath}`);
+  }
+  return { mode: fixture.mode, id: fixture.id, responseSHA256: fixture.responseSHA256,
+    expectedFailedPath, armedFailures: fixture.mode === 'failed' ? fixture.urls : [],
+    aborted: [...fixture.aborted], failed: [...fixture.failed], ...observed };
+}
+
 async function open(page, search = '') {
   await page.goto(`${host.origin}/?entry=shelf&ui=bi${search}`);
   await g6Wait(page, 'app-ready', () => document.body.dataset.ready === '1');
@@ -714,13 +1426,14 @@ try {
 
     for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
       await run(`S4-picture-cards-${label}`, viewport, async (page) => {
+        const admission = shelf40SourceProof();
         await open(page);
         // let every picture the index names arrive (they are lazy below the fold)
         await page.evaluate(async () => {
           for (const img of document.querySelectorAll('#shelf-body img.story-img')) img.loading = 'eager';
           await Promise.all([...document.querySelectorAll('#shelf-body img.story-img')].map((img) => img.decode().catch(() => {})));
         });
-        const probe = await page.evaluate(async () => {
+        const probe = await page.evaluate(async ({ admittedIds, fallbackId }) => {
           const index = await (await fetch('data/articles/index.json')).json();
           const byId = new Map(index.articles.map((row) => [row.id, row]));
           const cards = [...document.querySelectorAll('#shelf-body .story-card')];
@@ -776,21 +1489,37 @@ try {
           const sealBox = seal?.getBoundingClientRect();
           const named = index.articles.filter((row) => row.picture?.src && cards.some((card) => card.dataset.passage === row.id)).length;
           const keyed = index.articles.filter((row) => !row.picture?.src && row.heroKanji && cards.some((card) => card.dataset.passage === row.id)).length;
-          return { cards: cards.length, articles: articles.length, definitions: definitions.length, pictured, named, kanjiSheets, keyed, bad: bad.slice(0, 4), badCount: bad.length,
+          const fallbackBox = document.querySelector(`#shelf-body [data-passage="${fallbackId}"] .story-picture`)?.getBoundingClientRect();
+          const missingAdmitted = admittedIds.filter((id) => !cards.some((card) => card.dataset.passage === id));
+          return { missingAdmitted, fallbackBox: fallbackBox ? { width: fallbackBox.width, height: fallbackBox.height } : null, cards: cards.length, articles: articles.length, definitions: definitions.length, pictured, named, kanjiSheets, keyed, bad: bad.slice(0, 4), badCount: bad.length,
             incomplete: incomplete.slice(0, 4), incompleteCount: incomplete.length,
             lede: lead?.querySelector('.story-lede')?.textContent ?? '', sealInTitle: !!seal?.closest('.shelf-mast-title'),
             seal: sealBox ? Math.round(Math.max(sealBox.width, sealBox.height)) : 0 };
-        });
+        }, { admittedIds: admission.ids, fallbackId: SHELF_FALLBACK_ID });
         // N (2026-10-17) rewrites the pin "word definitions stand on the shelf, in their own band": the ten left through
         // the cull queue as not articles — none stands, and every card is an article wearing its picture slot
         assert(probe.cards > 20 && probe.articles === probe.cards && probe.definitions === 0, `${probe.cards} cards, ${probe.articles} articles, ${probe.definitions} word definitions`);
         assert.equal(probe.badCount, 0, `picture slots wrong: ${probe.bad.join(' | ')}`);
         assert(probe.named > 0 && probe.pictured === probe.named, `${probe.pictured} of the ${probe.named} pictures the index names stand on their cards`);
-        assert(probe.keyed > 0 && probe.kanjiSheets === probe.keyed, `${probe.kanjiSheets} of the ${probe.keyed} key kanji the index names stand on their cards`);
+        assert.equal(probe.keyed, 0, 'Shipped data now has no organically pictureless row');
+        assert.equal(probe.kanjiSheets, 0);
+        assert.deepEqual(probe.missingAdmitted, [], 'Every admitted article has its own rendered card');
+        assert(probe.fallbackBox, 'Exact fallback target is present in the real baseline');
         assert.equal(probe.incompleteCount, 0, `cards missing kicker, headline, English line or level: ${probe.incomplete.join(', ')}`);
         assert(/[。！？…]$/u.test(probe.lede), `the lead has no first-sentence teaser: "${probe.lede}"`);
         assert(probe.sealInTitle && probe.seal > 0 && probe.seal <= 48, `the 永 seal is not a small mark inside the title: ${JSON.stringify(probe)}`);
-        return { cards: probe.cards, pictured: probe.pictured, definitions: probe.definitions, lede: probe.lede.slice(0, 24), seal: probe.seal };
+        const fallback = [];
+        for (const mode of ['missing', 'failed', 'no-band']) {
+          const fixture = await installShelfFallback(page, mode);
+          try {
+            await open(page);
+            // Original srcset is retained:1368/DPR1 chooses1200,390/DPR1 chooses600.
+            const expected = mode === 'failed' ? fixture.urls[label === '390' ? 1 : 0] : null;
+            fallback.push(await shelfFallbackObservation(page, fixture, expected, probe.fallbackBox));
+          } finally { await fixture.dispose(); }
+        }
+        return { cards: probe.cards, pictured: probe.pictured, definitions: probe.definitions, lede: probe.lede.slice(0, 24), seal: probe.seal,
+          admittedIds: admission.ids, admittedImageBytesChecked: admission.images, fallback };
       });
     }
 

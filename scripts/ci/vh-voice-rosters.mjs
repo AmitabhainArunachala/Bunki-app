@@ -1664,7 +1664,7 @@ export const SENSE_CASE_IDS = Object.freeze([
 // FULL-R1 E1: recomputed after the 31 reader-furigana bodies below (何を/何が → なに; wikinews:12024 放出 → はなてん, 間 → かん); every other entry unchanged
 // R2 E2: two article pins refreshed; seven local readings and four 何 lexicon provenance tags.
 export const SENSE_DATA_INVENTORY_SHA256 =
-  '609ad5285d9ca1d8dd5700d0fbde7e99448549b210129b7b7d9f144badb1254d';
+  '0ed737568ac4e457a4eb67ab78fef96c866d25cb622d74de57c7e9d44e10666d';
 export const SPEAK_CHECK_NAMES = Object.freeze({
   S1: [
     'the Learn room has one Speak door, a study-door row',
@@ -5294,7 +5294,7 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
     'data/articles/govonline-article-202609-tv-6628.json',
     'c77a856a6ecca272724d452ef32c1e9469342e6952f4072db7565ce2af3e8eef',
   ],
-  ['data/articles/index.json', '131991cc0ab9d56986bf5e1d270f14a5f5143ecb02c020a76566284ba49e5b8e'],
+  ['data/articles/index.json', '21360568a5efa34c347ee3a9b3c6bdd15470c12392b59b8d9eaf7f60a8ea1b8f'],
   [
     'data/articles/jawiki-3492442.json',
     '76a52a9b2fae5108f0897a0a714e26f39ea9982c958706758b715d3a961d2145',
@@ -5392,6 +5392,30 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
     'd205950d8bea9e7a0348af81b9e1920f2e189504bf8296b317ab7e7e7588e95a',
   ],
   [
+    'data/articles/pictures/aozora-000772-1-600.webp',
+    'c60d760e17071700e4c9c57eea54994138ae73be2b2262575b64dc100eaedfdb',
+  ],
+  [
+    'data/articles/pictures/aozora-000772-1.webp',
+    'f27c9bdf83d997ef0a824b25833f724c055648de50fff37b28be1823b37b3892',
+  ],
+  [
+    'data/articles/pictures/aozora-002359-1-600.webp',
+    'd6b1415da72af524b5111866a4b71d65d6047b8e397d20f7c524be4a297c5728',
+  ],
+  [
+    'data/articles/pictures/aozora-002359-1.webp',
+    '4b2d8f4886dd0e3f3c0975f02235a41ee87f1f51a1927503d3f5d163b6ee53af',
+  ],
+  [
+    'data/articles/pictures/aozora-004668-1-600.webp',
+    '464d0c71b89f07b76bf7b713c096bb01c44b3c008823f34469f1e26b008686d9',
+  ],
+  [
+    'data/articles/pictures/aozora-004668-1.webp',
+    '9393749d019846e0df6744c9092920e6bc9e5b4dd3b96e3a30c6346960b90cd1',
+  ],
+  [
     'data/articles/pictures/aozora-046605-600.webp',
     'b3cbf0216b9c12b9d82db876c9c63402528c6be1efe2329e06b63353ef2cbffd',
   ],
@@ -5400,12 +5424,44 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
     'a2dec2d97509e606a494d8620c507a92f5d5cc7ae80605f7c426bb8a788c1d2e',
   ],
   [
+    'data/articles/pictures/aozora-049966-1-600.webp',
+    '928a9c13f1093a1751aabc9b055c1078e337d7ec893a4742c0859714c563db52',
+  ],
+  [
+    'data/articles/pictures/aozora-049966-1.webp',
+    '87a7b253f1e06ea158b2778a091b9e0dc1486ca41708da4e0569088b1b0e1332',
+  ],
+  [
+    'data/articles/pictures/aozora-049966-2-600.webp',
+    'af7be2952576ce7e15b71d22e17ddd35f6cec5cc38e7244d5552fee4260dbb06',
+  ],
+  [
+    'data/articles/pictures/aozora-049966-2.webp',
+    '360886ce46850dbecf4166d23676f5fe204009077fa71696e9f316e7d5ec5916',
+  ],
+  [
     'data/articles/pictures/aozora-051034-600.webp',
     '7bb6e371a49ed66612d308077d012c983a52f984760ff8c12bb8f3e2bde4feb3',
   ],
   [
     'data/articles/pictures/aozora-051034.webp',
     'eff7c3c942023e9a1a92a5cdf27b7967994025aacc48a9a2cbcf7df7e155aa22',
+  ],
+  [
+    'data/articles/pictures/aozora-053224-1-600.webp',
+    'b27795a5b9ac49ae506aa411a976dc42860a5486eb17c3b0cdc432498ebc791c',
+  ],
+  [
+    'data/articles/pictures/aozora-053224-1.webp',
+    'b946dfb655067cd2b1638d6f211aed6cb524b02ce47b3d44263fae7a1cb410a1',
+  ],
+  [
+    'data/articles/pictures/aozora-058059-1-600.webp',
+    'f26553c4c09a571bfa75fc09c107c73fcd28b591c33b580ff99c2637f12b64da',
+  ],
+  [
+    'data/articles/pictures/aozora-058059-1.webp',
+    'ce5f5974eb417b947c88e3d2df02b9d654f622f14b636f43d8ada409992eeba3',
   ],
   [
     'data/articles/pictures/bunki-essay-n1-ai-600.webp',
@@ -5800,6 +5856,238 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
     'a162cec502e35a27bf1aa20a16408e743099fd4f51536c68a73ef18b5640e420',
   ],
   [
+    'data/articles/pictures/bunki-read-n1-kukai-sanskrit-600.webp',
+    'f2bdf99ca948ddc6888c47db3ea70905233ee01b9c9c1d5359d8e0c3b7f17211',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n1-kukai-sanskrit.webp',
+    '8935c15d36c0b8f84d6d09a8a01a0695db92528c27e960d7081509292fd9546b',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n1-neocognitron-600.webp',
+    'e8b268e236e70ea0fefb00be5dfa75b020b356af79cbb6c8594ff14e99823f33',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n1-neocognitron.webp',
+    'cb3910d3cfa11f829f5a691701ae8d58897ebc06fc1bee6b902423e973c253b0',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n1-nobel-economics-600.webp',
+    '1534d521784ad3cf5db11c8c34d444f539a68d9d3ba742b34a1601f4c010b286',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n1-nobel-economics.webp',
+    'a2c63f4c0334d41b08bd57f9062813bd7e1bbec306744023b05da5f2ca03ccf8',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n1-optogenetics-nobel-600.webp',
+    'eb975e25d7125c25c0c616442960e900c0c1dc262e1ca84eb9fe3b29f5efe714',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n1-optogenetics-nobel.webp',
+    '7139ffed48b76b4ab529fe04f3131c7ce85144ae06c2d3420440057c88b31984',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n1-soai-nobel-600.webp',
+    '2ed48566c821025b2558ca17d5ba7fca29f347502979d3a73cfa541223011bd8',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n1-soai-nobel.webp',
+    '0eec5a93508352f13f748735d8853243508730ad6e6cc76c38080cb66dc0a024',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n1-strange-loop-600.webp',
+    '33c45999a2b0b20cf053809810b6d3861593454c1fecb7b1485b01e5a6b547cf',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n1-strange-loop.webp',
+    'e31eaf041b1d0d99e6dae61cdd862f6431135946c29e89e2e22183a1477d8a8a',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n1-suzuki-zen-600.webp',
+    '0101616992b0bde1cf7a1698ff6d8a2c8433b9432653c8c9587898d70acf2935',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n1-suzuki-zen.webp',
+    '154965f5a72c7962e5f0bc03d0bec26b4748cd2d6d7304fca51465871104cafd',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n1-zazen-brainwaves-600.webp',
+    '41f687f7a38753cf5a25b652a1544119c726c6210274469c9ae5a7094a337a5c',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n1-zazen-brainwaves.webp',
+    '5fae50ebc2eff53353c80e64dedf3f74056087095e337538187578186581cd9b',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-benzaiten-600.webp',
+    '01dbaa327886de1f40a097dac46dd18d4dddfcbfdbbeaca17bf68c3f641b01c4',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-benzaiten.webp',
+    '66402cdc128d4d621f1368b3624a2e15caf6149f41c1453beebdcb9f8221da1a',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-bodhisena-600.webp',
+    'cf5c38561b47734ebf3bba1cba5e5ebd10621134f62dc33640eb4798a8e058af',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-bodhisena.webp',
+    'a0522f83fdfd1736dffed908920ef355a75e221e85af2168941a525b118b0b9e',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-carson-nobel-600.webp',
+    '2e5e986e3d89244826601b531345ff37603883fb07f8c3cd9ab1e838ce196d66',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-carson-nobel.webp',
+    'dfeacd61020febcdac1498f397cf4108a5c477214ddcdc38743915eeb9855a26',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-forgetting-curve-600.webp',
+    '8ffa52dcb18216a226c367626c60b56e295e2f74334ff9c2b6641d600fcda848',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-forgetting-curve.webp',
+    '0bb02da6155dc86c3767e7cedf0a5bc99af51b9fc3a2976d6481ff50a8463331',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-grit-checked-600.webp',
+    'a65b0ea016711af3a1e09495cf54f9af8891d19a66d029e59b34a564db91d761',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-grit-checked.webp',
+    'c4599caecb936dce11b75b22fcbcf84dd574995275f31ec65cd4fcdb9e7d84c3',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-hofstadter-law-600.webp',
+    '13b2d62268e2d45dcc960bc297085480b016a412bc8de87de86618e42c7f7f35',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-hofstadter-law.webp',
+    '0e15519fe761c6192c4d6b1ef96c376c8c919542c217a80cb4d503aafc831898',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-icecube-nobel-600.webp',
+    '5d822f0f0a4d3b3685fb0b20876f315194731dee2e310e5a7636ba8c05f4f9bc',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-icecube-nobel.webp',
+    'e2ce0e87784ab2eb4862961b616dc0ec4248f9d8ea45860a6fb4548eecf22e69',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-imf-outlook-600.webp',
+    '222b80a8029f01493dea52449ef6278c56b0685dd9bc7d3e3b28a9794b9ecb16',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-imf-outlook.webp',
+    'c87483d2e6a87f8129d9b43965d243a7043e70c8804c9ba486f11de057d66052',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-japan-us-chip-fab-600.webp',
+    '7c8170c572cd873ef2fef9d177dad6bb51af0633b34f1edb9d9b457c5c5ac1b6',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-japan-us-chip-fab.webp',
+    'f7abd227d47efa33ac584fbf827aea3dff72b4c82a12c7282697d7ea1fb0cd3a',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-kobe-jain-600.webp',
+    '5be0a482d4f9199a5e018d154589dc345ed27df2b46222f2a24bedbfe7bfb8ee',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-kobe-jain.webp',
+    'abd9f04678084c37b95de3a055b8ce85ae41b7bacc2df0ba3eb6ed73b7cc5d40',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-kokugo-survey-600.webp',
+    '31d4cc568108addbf4cf8d2b31e71453d114e730e3d10452d960bee08c917b20',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-kokugo-survey.webp',
+    '0c120aaaed4b58dccb047d3423997af49b75e7195f0d78f73a570e85581e5743',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-pillay-peace-nobel-600.webp',
+    '8a69ee49db910ea78516ae5f66a87b61c6349573e78d9550105b8acdc30d8ba6',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-pillay-peace-nobel.webp',
+    '2a9b3f5ae50546ef3449761d871f9f3c31475756b9ef88ae883f6a151e70cb79',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-shima-4004-600.webp',
+    'a8022462c0523868d52ce5fb7292dcab7b5d50004b7572ea01aab3018354f826',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-shima-4004.webp',
+    'c4240a196ca77adc52adbde8d9e42d6882a8b27252df5aceb10165f63fae675b',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-shosoin-names-600.webp',
+    '768a1a4554e84f5133c0f5d0d64c0aaf36732b90cefd34850559dd09c4f5bdad',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-shosoin-names.webp',
+    'bc26bb1e2cccfe5c81450bfb3249d89a5f9d8dc139bb0d3728e12ecfa1102518',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-shoten-ganesha-600.webp',
+    '29b0dbd3c1e0b71b5a8c01b660f60ecc20299c421b8f8ec7291d7da41240ffc3',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-shoten-ganesha.webp',
+    '2396bae24c5154b46e80199c963c80cebd4f65698feca172701855e817855d4c',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-sleep-memory-600.webp',
+    '9cbb67dac78ad0dd27fe84f4850ada6ebe507c97170586e5953803098b861418',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n2-sleep-memory.webp',
+    'e139ed969bbb725a73e3c43f24436cbddb500b92fc88e3b003c2abe65ba7dd7a',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n3-felt-prices-600.webp',
+    'fc8c90b67940a056f9c031684c11598bd22bccc51743594eefe47e4b1e5c4b4b',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n3-felt-prices.webp',
+    'fe31e1a25563cbddd1519693059e8e47197df429b9ffcc13d9e778caf0dc22c6',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n3-gojuon-sanskrit-600.webp',
+    '15240d4380cfc36036d2a52e15f37b0c0db3500629dcea77497788308840d5ca',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n3-gojuon-sanskrit.webp',
+    '30510206a848445fe0fee7beaca0faacac267848ff024f38bddf554d267ef667',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n3-honda-quarter-600.webp',
+    'a575615b689223b88fe5999be245c3df319b3158e7758d79b9916393007db0e7',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n3-honda-quarter.webp',
+    '872acac9833776c443f4d3a87366ae4837bf70d79c28f8c904bbc9364297628f',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n3-rule-of-72-600.webp',
+    '255e53b61cb0406ff04023632ac0182256bdbd7af95ef0a7056b966bc4d6bc98',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n3-rule-of-72.webp',
+    '95a6d4c5b6e34e706c7f319a849c00ad093e39852e0d2bc0153b027676a7fe2d',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n3-transistor-class-600.webp',
+    'f5fdeb0c35ec3e2f82490850299a6ce40f6b0f7a808a167a906c799157d911f2',
+  ],
+  [
+    'data/articles/pictures/bunki-read-n3-transistor-class.webp',
+    'ae632f66823b7011137292d83c322d2a7275b44386d3f971f03afa16c1680749',
+  ],
+  [
     'data/articles/pictures/env-press-press-04591-600.webp',
     '362eb496d4cedc6ee4613dccd9d881c70faeb32961fefed849360a16ede5419c',
   ],
@@ -5904,12 +6192,36 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
     'd4592b108f11afa4b773b3c49a2536be85de3443a9fea79da9b7d976517f542f',
   ],
   [
+    'data/articles/pictures/global-voices-2026-07-28-65374-600.webp',
+    '4800ac20f03d8a9627e39116b255f4a3aaa4f2bf604031c998971e583e07c3cf',
+  ],
+  [
+    'data/articles/pictures/global-voices-2026-07-28-65374.webp',
+    '17f1b0ee11a480e259cfb775da3cd9a8d861d7da080a9c881f626db7712ee91d',
+  ],
+  [
+    'data/articles/pictures/global-voices-2026-08-03-65560-600.webp',
+    '4cc6c8d0b709c723fef9b0dc9f5f77fc74d217a816b3e6245958e32c5bc14241',
+  ],
+  [
+    'data/articles/pictures/global-voices-2026-08-03-65560.webp',
+    '077660ae797e7e577f105123cc7f62406298bfd7b0236c309715159ec455115e',
+  ],
+  [
     'data/articles/pictures/global-voices-2026-09-28-65726-600.webp',
     '8fae93228ac9fa313c25cacafbe5f1a26ba9dc2582ba635d8a2fc621d9483f19',
   ],
   [
     'data/articles/pictures/global-voices-2026-09-28-65726.webp',
     '135efed0b3b011154c0ae6ce0f5e1b59a1a5e8cf0cfea97a8ac9344d1201f401',
+  ],
+  [
+    'data/articles/pictures/govonline-202403-entry-5920-column-600.webp',
+    '66a9fc9a9856187b7620403fa662ddeeb4c4024286bee351d7ec7cde113f840f',
+  ],
+  [
+    'data/articles/pictures/govonline-202403-entry-5920-column.webp',
+    '7a70def8e88709d76cdd04b60838884cff8f5d7f07687657acde00cdb246eee3',
   ],
   [
     'data/articles/pictures/govonline-article-202609-radio-3739-600.webp',
@@ -6030,6 +6342,14 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
   [
     'data/articles/pictures/kantei-jp-105-discourse-20260923message.webp',
     '70dee28ccc2258a6fc9b5c46c976e5671d653e26878d8e5c8b82385dbd9bf831',
+  ],
+  [
+    'data/articles/pictures/mext-b-menu-hakusho-html-hpaa202601-1421221-00020-column2-3-600.webp',
+    '278bd28cbd2e21b3ef5bc7ea1d85cd59bb957e0ecf0983f2ed3c6e1c4f6793b0',
+  ],
+  [
+    'data/articles/pictures/mext-b-menu-hakusho-html-hpaa202601-1421221-00020-column2-3.webp',
+    '5431f44df83943ec9686033d3b7ba2f5c83832d53c27591382ac9f736208c734',
   ],
   [
     'data/articles/pictures/mext-b-menu-houdou-2025-mext-00009-600.webp',

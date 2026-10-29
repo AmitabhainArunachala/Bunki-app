@@ -27734,7 +27734,16 @@
     ],
     "fixesApplied": "FIXES-batch-2.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n2-shosoin-names.webp",
+    "alt": "A long raised log storehouse on tall pillars among autumn maples, with deer resting in the sunlit grass.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n2-shosoin-names-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#796E49"
   },
   {
    "id": "aozora:000772-1",
@@ -28232,7 +28241,16 @@
     ],
     "fixesApplied": "FIXES-batch-2.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/aozora-000772-1.webp",
+    "alt": "A man in a long coat and hat walks a foggy brick-lined street at dawn, carrying a glowing lantern.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/aozora-000772-1-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#52646F"
   },
   {
    "id": "bunki-read-n2-shima-4004",
@@ -28541,7 +28559,16 @@
     ],
     "fixesApplied": "FIXES.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n2-shima-4004.webp",
+    "alt": "An open calculator showing its circuit board on a workbench beside a lamp and soldering iron, rain outside.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n2-shima-4004-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#474761"
   },
   {
    "id": "bunki-read-n1-optogenetics-nobel",
@@ -28858,7 +28885,16 @@
     ],
     "fixesApplied": "FIXES-batch-2.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n1-optogenetics-nobel.webp",
+    "alt": "A glowing blue fibre over a microscope stage beside a flask of green algae, a researcher at the window behind.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n1-optogenetics-nobel-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#34414B"
   },
   {
    "id": "bunki-read-n2-kobe-jain",
@@ -29130,7 +29166,16 @@
     ],
     "fixesApplied": "FIXES.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n2-kobe-jain.webp",
+    "alt": "A small white Jain temple with a dome and short spire beside clapboard houses on a sloping lane above the bay.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n2-kobe-jain-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#6F6952"
   },
   {
    "id": "bunki-read-n3-honda-quarter",
@@ -29389,7 +29434,16 @@
     ],
     "fixesApplied": "FIXES.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n3-honda-quarter.webp",
+    "alt": "An abacus, a tied ledger and stacks of coins on a low desk, one stack on a blue cloth, young trees outside.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n3-honda-quarter-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#6F6952"
   },
   {
    "id": "bunki-read-n2-bodhisena",
@@ -29657,7 +29711,16 @@
     ],
     "fixesApplied": "FIXES.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n2-bodhisena.webp",
+    "alt": "A monk on a scaffold paints the eye of the great bronze Buddha, blue cords running down to the crowd below.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n2-bodhisena-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#585341"
   },
   {
    "id": "aozora:049966-1",
@@ -30154,7 +30217,16 @@
     ],
     "fixesApplied": "FIXES-batch-2.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/aozora-049966-1.webp",
+    "alt": "A lamplit study with tied scrolls, a travel bundle, straw hat and staff, and snow falling in the garden.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/aozora-049966-1-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#4E4331"
   },
   {
    "id": "bunki-read-n2-forgetting-curve",
@@ -30449,7 +30521,16 @@
     ],
     "fixesApplied": "FIXES.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n2-forgetting-curve.webp",
+    "alt": "A dusk study desk with an hourglass, metronome, pocket watch, oil lamp and a row of blank cards.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n2-forgetting-curve-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#4A4335"
   },
   {
    "id": "bunki-read-n1-neocognitron",
@@ -30743,7 +30824,16 @@
     ],
     "fixesApplied": "FIXES-batch-2.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n1-neocognitron.webp",
+    "alt": "A researcher works under a desk lamp beside mainframe cabinets with tape reels, a circuit diagram on the wall.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n1-neocognitron-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#364049"
   },
   {
    "id": "bunki-read-n2-kokugo-survey",
@@ -30990,7 +31080,16 @@
     ],
     "fixesApplied": "FIXES.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n2-kokugo-survey.webp",
+    "alt": "Hands untie the cord of a closed string-bound book on a low table, with a stack of books and a tea bowl.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n2-kokugo-survey-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#73664F"
   },
   {
    "id": "bunki-read-n1-strange-loop",
@@ -31323,7 +31422,16 @@
     ],
     "fixesApplied": "FIXES.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n1-strange-loop.webp",
+    "alt": "A stone staircase winds around a mossy hill past a lit lantern, mirrored in a still pond at dusk.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n1-strange-loop-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#3B4F45"
   },
   {
    "id": "bunki-read-n2-benzaiten",
@@ -31602,7 +31710,16 @@
     ],
     "fixesApplied": "FIXES-batch-2.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n2-benzaiten.webp",
+    "alt": "A figure rinses coins in a bamboo basket at a spring in a candlelit grotto, red shrine gates beyond.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n2-benzaiten-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#4C4539"
   },
   {
    "id": "bunki-read-n1-soai-nobel",
@@ -31908,7 +32025,16 @@
     ],
     "fixesApplied": "FIXES.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n1-soai-nobel.webp",
+    "alt": "Round glass flasks on a lab bench, crystals growing in the nearest, and a quartz crystal on the windowsill.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n1-soai-nobel-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#644A4A"
   },
   {
    "id": "bunki-read-n3-gojuon-sanskrit",
@@ -32169,7 +32295,16 @@
     ],
     "fixesApplied": "FIXES.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n3-gojuon-sanskrit.webp",
+    "alt": "A low writing desk with brush, inkstone, blank paper and a brass bell, open to a garden of white plum blossom.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n3-gojuon-sanskrit-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#6F6552"
   },
   {
    "id": "aozora:002359-1",
@@ -32585,7 +32720,16 @@
     ],
     "fixesApplied": "FIXES-batch-2.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/aozora-002359-1.webp",
+    "alt": "A traveller in a straw hat stops on a mountain path to look at a wildflower, Mount Fuji above the mist.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/aozora-002359-1-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#7C6946"
   },
   {
    "id": "bunki-read-n1-nobel-economics",
@@ -32883,7 +33027,16 @@
     ],
     "fixesApplied": "FIXES-batch-2.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n1-nobel-economics.webp",
+    "alt": "A grey stone bank with a green copper dome above a wet street, cars and people in winter coats with umbrellas.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n1-nobel-economics-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#6A6F52"
   },
   {
    "id": "bunki-read-n2-sleep-memory",
@@ -33182,7 +33335,16 @@
     ],
     "fixesApplied": "FIXES-batch-2.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n2-sleep-memory.webp",
+    "alt": "A person asleep in a small room beside a desk with a lit lamp and an open book, snow outside the window.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n2-sleep-memory-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#3D4936"
   },
   {
    "id": "bunki-read-n3-transistor-class",
@@ -33466,7 +33628,16 @@
     ],
     "fixesApplied": "FIXES-batch-2.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n3-transistor-class.webp",
+    "alt": "An open red transistor radio, a ring magnifier lamp, soldering iron and tweezers, an old tube radio behind.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n3-transistor-class-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#69564D"
   },
   {
    "id": "bunki-read-n1-zazen-brainwaves",
@@ -33755,7 +33926,16 @@
     ],
     "fixesApplied": "FIXES.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n1-zazen-brainwaves.webp",
+    "alt": "A row of monks sit in meditation in a dim wooden hall, one lamp lit, the doors open to a night garden.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n1-zazen-brainwaves-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#454936"
   },
   {
    "id": "bunki-read-n2-japan-us-chip-fab",
@@ -34051,7 +34231,16 @@
     ],
     "fixesApplied": "FIXES-batch-4.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n2-japan-us-chip-fab.webp",
+    "alt": "A large white factory under construction on farmland, with tall cranes, trucks and red maples in front.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n2-japan-us-chip-fab-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#6F5256"
   },
   {
    "id": "bunki-read-n2-shoten-ganesha",
@@ -34319,7 +34508,16 @@
     ],
     "fixesApplied": "FIXES-batch-4.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n2-shoten-ganesha.webp",
+    "alt": "A red cable car climbs a forested slope toward a temple and pagoda, with white radishes on a stand in front.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n2-shoten-ganesha-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#6F6D52"
   },
   {
    "id": "bunki-read-n2-icecube-nobel",
@@ -34605,7 +34803,16 @@
     ],
     "fixesApplied": "FIXES-batch-3.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n2-icecube-nobel.webp",
+    "alt": "A two-storey lab on stilts on a white ice plain under a green aurora, with a few small figures nearby.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n2-icecube-nobel-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#526F67"
   },
   {
    "id": "aozora:058059-1",
@@ -35114,7 +35321,16 @@
     ],
     "fixesApplied": "FIXES-batch-4.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/aozora-058059-1.webp",
+    "alt": "A monk crouches at a mossy stone basin to wash his face with a dipper, a frosty garden beside the veranda.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/aozora-058059-1-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#526F6D"
   },
   {
    "id": "bunki-read-n3-rule-of-72",
@@ -35336,7 +35552,16 @@
     ],
     "fixesApplied": "FIXES-batch-3.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n3-rule-of-72.webp",
+    "alt": "Two coin stacks, the right one twice as tall, beside an abacus and a passbook, city lights in the window.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n3-rule-of-72-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#33434D"
   },
   {
    "id": "global-voices:2026-08-03-65560",
@@ -35747,7 +35972,16 @@
     ],
     "fixesApplied": "FIXES-batch-3.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/global-voices-2026-08-03-65560.webp",
+    "alt": "Two women forest guards in green uniforms walk a path through tall grass at dawn, a rhinoceros far ahead.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/global-voices-2026-08-03-65560-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#7C7046"
   },
   {
    "id": "bunki-read-n1-kukai-sanskrit",
@@ -36044,7 +36278,16 @@
     ],
     "fixesApplied": "FIXES-batch-3.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n1-kukai-sanskrit.webp",
+    "alt": "A young monk carrying scrolls crosses a moonlit temple courtyard, with a great pagoda and willows behind.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n1-kukai-sanskrit-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#414D59"
   },
   {
    "id": "global-voices:2026-07-28-65374",
@@ -36421,7 +36664,16 @@
     ],
     "fixesApplied": "FIXES-batch-4.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/global-voices-2026-07-28-65374.webp",
+    "alt": "A hillside village of flat-roofed stone houses at dusk, one window glowing blue, a phone mast on the ridge.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/global-voices-2026-07-28-65374-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#443E53"
   },
   {
    "id": "govonline:202403-entry-5920-column",
@@ -36720,7 +36972,16 @@
     ],
     "fixesApplied": "FIXES-batch-4.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/govonline-202403-entry-5920-column.webp",
+    "alt": "A woman holds a glowing phone in a lantern-lit hall of mirrors, her reflection repeating down the hall.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/govonline-202403-entry-5920-column-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#404857"
   },
   {
    "id": "mext:b_menu-hakusho-html-hpaa202601-1421221_00020-column2-3",
@@ -37051,7 +37312,16 @@
     ],
     "fixesApplied": "FIXES-batch-3.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/mext-b-menu-hakusho-html-hpaa202601-1421221-00020-column2-3.webp",
+    "alt": "A white robot arm and a server rack in a lab at dusk, the National Diet Building seen through the window.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/mext-b-menu-hakusho-html-hpaa202601-1421221-00020-column2-3-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#52636F"
   },
   {
    "id": "aozora:004668-1",
@@ -37476,7 +37746,16 @@
     ],
     "fixesApplied": "FIXES-batch-4.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/aozora-004668-1.webp",
+    "alt": "A fishing village below a steep green hill on a calm morning, boats on the beach, a stone marker on the slope.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/aozora-004668-1-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#526F5B"
   },
   {
    "id": "bunki-read-n2-carson-nobel",
@@ -37739,7 +38018,16 @@
     ],
     "fixesApplied": "FIXES-batch-4.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n2-carson-nobel.webp",
+    "alt": "A figure with red wings stands on black rocks by a dark sea at dusk, facing an island with faint lights.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n2-carson-nobel-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#3B3B50"
   },
   {
    "id": "aozora:053224-1",
@@ -38147,7 +38435,16 @@
     ],
     "fixesApplied": "FIXES-batch-3.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/aozora-053224-1.webp",
+    "alt": "A steam train with lit windows crosses a snowy field at night, its lights reflected in the flooded rice paddy.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/aozora-053224-1-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#33434D"
   },
   {
    "id": "bunki-read-n2-imf-outlook",
@@ -38420,7 +38717,16 @@
     ],
     "fixesApplied": "FIXES-batch-3.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n2-imf-outlook.webp",
+    "alt": "Container ships at a misty quay under tall gantry cranes, stacked containers and a faint city skyline.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n2-imf-outlook-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#526D6F"
   },
   {
    "id": "aozora:049966-2",
@@ -38838,7 +39144,16 @@
     ],
     "fixesApplied": "FIXES-batch-4.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/aozora-049966-2.webp",
+    "alt": "A lone monk walks a ridge path between tea terraces toward a hilltop monastery under a wall of snow peaks.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/aozora-049966-2-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#505F72"
   },
   {
    "id": "bunki-read-n2-pillay-peace-nobel",
@@ -39101,7 +39416,16 @@
     ],
     "fixesApplied": "FIXES-batch-3.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n2-pillay-peace-nobel.webp",
+    "alt": "A red-brick palace with a tall clock tower behind a gate, autumn trees and umbrellas on a wet forecourt.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n2-pillay-peace-nobel-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#6F6452"
   },
   {
    "id": "bunki-read-n1-suzuki-zen",
@@ -39380,7 +39704,16 @@
     ],
     "fixesApplied": "FIXES-batch-3.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n1-suzuki-zen.webp",
+    "alt": "A figure in dark kimono climbs stone steps to a two-storey temple gate among tall cedars, a jet trail above.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n1-suzuki-zen-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#5F6F52"
   },
   {
    "id": "bunki-read-n2-grit-checked",
@@ -39680,7 +40013,16 @@
     ],
     "fixesApplied": "FIXES-batch-3.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n2-grit-checked.webp",
+    "alt": "A long file of cadets jogs along a rainy river road below stone buildings, one runner trailing the rest.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n2-grit-checked-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#526B6F"
   },
   {
    "id": "bunki-read-n3-felt-prices",
@@ -39920,7 +40262,16 @@
     ],
     "fixesApplied": "FIXES-batch-4.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n3-felt-prices.webp",
+    "alt": "Shoppers with baskets in a small lit supermarket seen from the rainy street, crates of cabbages and apples.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n3-felt-prices-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#526F5D"
   },
   {
    "id": "bunki-read-n2-hofstadter-law",
@@ -40199,7 +40550,16 @@
     ],
     "fixesApplied": "FIXES-batch-4.md",
     "humanApproval": "pending: John's own read"
-   }
+   },
+   "picture": {
+    "src": "articles/pictures/bunki-read-n2-hofstadter-law.webp",
+    "alt": "A chessboard mid-game beside an old computer terminal and a coffee cup, grey dawn light in the window.",
+    "w": 1200,
+    "h": 800,
+    "srcSmall": "articles/pictures/bunki-read-n2-hofstadter-law-600.webp",
+    "wSmall": 600
+   },
+   "accent": "#656F52"
   }
  ]
 }
