@@ -27914,6 +27914,67 @@ function confusablesFor(c) {
   return [...(CONFUSABLE_MAP[c] || [])];
 }
 
+// An ungraded art encounter keeps the originating sheet in place. The modal
+// owns no record or schedule capability; any host render invalidates it.
+// Here the kanji sheet draws its readings synchronously (kanjiDisplayRecord); no later
+// readings arrival redraws it, so no readings gate is needed on this door.
+let kanjiWorldVisit = null;
+function kanjiWorldEligible() {
+  const exploration = new Set(['entry', 'reader', 'kanjidex', 'search', 'levels']);
+  const graded = new Set(['review', 'lessons', 'mock', 'tests', 'probe', 'deckplay', 'aiquiz', 'guided', 'sentence-practice', 'contextdeck']);
+  return exploration.has(S.view) && !personalHost && !learningSourceVisit && !S.focus &&
+    !S.navigationReturns.some(frame => frame.learningSourceVisit || graded.has(frame.view));
+}
+function openKanjiWorldEncounter(invoker, node) {
+  if (kanjiWorldVisit || node.id !== '門' || !kanjiWorldEligible()) return;
+  const epoch = recordEpoch;
+  const origin = { view: S.view, node: S.stack.at(-1), x: window.scrollX, y: window.scrollY };
+  const dialog = document.createElement('dialog');
+  dialog.className = 'kw-dialog'; dialog.id = 'kanji-world-dialog';
+  dialog.setAttribute('aria-label', tx('羅城門で漢字の練習', 'Rajōmon kanji practice'));
+  const body = document.createElement('div'); dialog.append(body);
+  const controller = new AbortController();
+  let encounter = null, closed = false;
+  const current = () => !closed && recordEpoch === epoch && S.view === origin.view &&
+    S.stack.at(-1) === origin.node && invoker.isConnected;
+  const oldOverflow = document.body.style.overflow;
+  function close(restore = true) {
+    if (closed) return;
+    const ownsOrigin = current();
+    closed = true; controller.abort(); encounter?.destroy();
+    dialog.close(); dialog.remove(); document.body.style.overflow = oldOverflow;
+    if (kanjiWorldVisit?.dialog === dialog) kanjiWorldVisit = null;
+    if (restore && ownsOrigin) {
+      window.scrollTo(origin.x, origin.y); invoker.focus({ preventScroll: true });
+    }
+  }
+  kanjiWorldVisit = { dialog, close };
+  dialog.addEventListener('cancel', event => { event.preventDefault(); close(); });
+  const back = el('button', 'kw-button', tx('戻る', 'Return'));
+  back.type = 'button'; back.addEventListener('click', () => close());
+  body.append(el('p', 'kw-loading', tx('風景を読み込み中…', 'Loading the scene…')), back);
+  document.body.append(dialog); dialog.showModal(); document.body.style.overflow = 'hidden';
+  Promise.all([
+    import('./kanji-world-encounter.mjs'),
+    fetch('./kanji-world/rajomon-content.json', { signal: controller.signal }).then(response => {
+      if (!response.ok) throw new Error('Encounter content unavailable');
+      return response.json();
+    }),
+  ]).then(([module, content]) => {
+    if (!current()) { close(false); return; }
+    body.replaceChildren();
+    encounter = module.createKanjiWorldEncounter({ container: body, content,
+      imageUrl: new URL('./kanji-world/rajomon-r1.png', import.meta.url).href,
+      language: bi() ? 'en' : 'ja',
+      isCurrent: current, onReturn: () => close() });
+  }).catch(error => {
+    if (closed || error.name === 'AbortError') return;
+    if (!current()) { close(false); return; }
+    body.replaceChildren(el('p', 'kw-loading', tx('風景を読み込めませんでした。戻って、もう一度お試しください。', 'This scene could not load. Return and try again.')), back);
+    back.focus();
+  });
+}
+
 function renderKanjiNode(sheet, node) {
   const retained = retainedKanjiRecord(node.id);
   const k = retained || D.kanji[node.id] || window.BunkiSkipUI?.getKanji(S.skipUi, node.id);
@@ -27972,6 +28033,12 @@ function renderKanjiNode(sheet, node) {
   meta.append(chips);
   hero.append(meta);
   sheet.append(hero);
+  if (node.id === '門' && kanjiWorldEligible()) {
+    const worldDoor = el('button', 'chip kanji-world-door', tx('羅城門へ · 試作', 'Visit Rajōmon · preview'));
+    worldDoor.id = 'kanji-world-door'; worldDoor.type = 'button';
+    worldDoor.addEventListener('click', () => openKanjiWorldEncounter(worldDoor, node));
+    sheet.append(worldDoor);
+  }
   if (k.skipFallback) sheet.append(el('p', 'skip-fallback-note', tx(
     'SKIP 索引の KANJIDIC2 項目。このアプリの部品・用例・筆順が未収録のことがあります。',
     'KANJIDIC2 entry from the SKIP index. This app may not yet have its components, example words or stroke diagram.',
@@ -32714,6 +32781,7 @@ function crumbPlaces(parts) {
  * found again by the very press that moved the keyboard */
 const FOCUS_STATE_CLASSES = new Set(['on', 'on-list', 'dead', 'active', 'lit', 'primary', 'quiet']);
 function render() {
+  kanjiWorldVisit?.close(false);
   // Today folds into Review in the layout under test; anything that still names it opens
   // Review, its successor. The current layout is asked only when the view is Today.
   if (S.view === 'tray' && placesLayout()) S.view = 'dojo';
