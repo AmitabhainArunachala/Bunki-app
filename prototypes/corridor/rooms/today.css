@@ -520,6 +520,59 @@ html[data-arrive='sky'] #drift-layer.active {
    The session's close (review room, done): "The surface is clear." One next door, and
    tomorrow's first word half-shown over the horizon.
    ========================================================================================== */
+/* Completion is a light card on the zen stage, in every world. Rebind both
+   the modern roles and the inherited legacy aliases; counts and quiet exits
+   explicitly consume these roles rather than inheriting the main's color. */
+html[data-room='review'] #app > main.review-complete {
+  --color-ground: var(--color-card-ground);
+  --color-ground-2: var(--color-card-ground-2);
+  --color-paper: var(--color-card-ground);
+  --color-surface: var(--color-card-surface);
+  --color-ink: var(--color-card-ink);
+  --color-ink-2: var(--color-card-ink-2);
+  --color-muted: var(--color-card-ink-2);
+  --color-quiet: var(--color-card-ink-2);
+  --color-accent: var(--color-card-accent);
+  --color-rule: var(--color-card-line);
+  --color-rule-soft: var(--color-card-line-soft);
+  --ink: var(--color-card-ink);
+  --ink-2: var(--color-card-ink-2);
+  --faint: var(--color-card-ink-2);
+  --faint-2: var(--color-card-ink-2);
+  --ed-muted: var(--color-card-ink-2);
+  color: var(--color-card-ink);
+  background: var(--color-card-ground);
+  border: var(--stroke-relief) solid var(--color-card-line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--elevation-card);
+  box-sizing: border-box;
+  width: calc(100% - 32px);
+  max-width: 720px;
+  min-height: 0;
+  margin: 16px auto;
+  padding: 24px 18px;
+}
+html[data-room='review'] #app > main.review-complete .review-rise-w { opacity: 1; }
+html[data-room='review'] #app > main.review-complete .close-doors :is(button.take.quiet, button.chip.review-undo) {
+  color: var(--color-card-ink-2);
+}
+/* One anonymous text run, not an anonymous flex item shrinking around the
+   old parenthesis. Native phone geometry is checked separately. */
+html[data-room='review'] #app #review-ahead {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: min(100%, 18em);
+  max-width: 100%;
+  min-height: 48px;
+  padding-inline: 8px;
+  white-space: nowrap;
+  text-wrap: nowrap;
+  word-break: normal;
+  font-size: var(--type-body);
+  letter-spacing: 0;
+  flex-shrink: 0;
+}
 html[data-room='review'] body:not(.zen) .view-title:has(.review-clear) { margin-bottom: 18px; }
 html[data-room='review'] .review-clear {
   display: block;

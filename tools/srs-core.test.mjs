@@ -195,11 +195,21 @@ describe('the close counts the sitting', () => {
       core.pauseWords({ count: 5, at: at(8 * MIN).getTime(), canEarly: true }, 'en', T),
     ).toEqual({
       line: '5 words are in a learning step (the next is due in 8 min): review them now, early, or they will wait for you.',
-      now: 'Review now, early',
+      now: 'Start the next learning step early',
     });
     expect(
       core.pauseWords({ count: 1, at: at(25 * MIN).getTime(), canEarly: false }, 'en', T).now,
     ).toBe(null);
+  });
+  it('labels the same early/due/unavailable choice in Japanese without changing the pause', () => {
+    const early = { count: 1, at: at(8 * MIN).getTime(), canEarly: true };
+    const before = structuredClone(early);
+    expect(core.pauseWords(early, 'ja', T).now).toBe('次の学習ステップを少し早めに始める');
+    expect(early).toEqual(before);
+    expect(core.pauseWords({ ...early, at: T.getTime() }, 'ja', T).now).toBe('いま復習する');
+    expect(core.pauseWords({ ...early, at: T.getTime() }, 'en', T).now).toBe('Review now');
+    expect(core.pauseWords({ ...early, canEarly: false }, 'ja', T).now).toBe(null);
+    expect(core.pauseWords({ ...early, canEarly: false }, 'en', T).now).toBe(null);
   });
 });
 

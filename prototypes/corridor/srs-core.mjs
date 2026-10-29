@@ -215,13 +215,13 @@ export function pauseWords(pause, lang = 'en', now = new Date()) {
     const head = `${count} 語が学習ステップの途中です（${due ? '次はもう復習できます' : `次は ${waitWords(left, 'ja')}後`}）。`;
     return {
       line: canEarly ? `${head}${due ? 'いま復習するか' : 'いま少し早めに復習するか'}、そのまま待たせておけます。` : `${head}その時まで待っています。`,
-      now: canEarly ? (due ? 'いま復習する' : 'いま復習する（少し早め）') : null,
+      now: canEarly ? (due ? 'いま復習する' : '次の学習ステップを少し早めに始める') : null,
     };
   }
   const head = `${plural(count, 'word')} ${count === 1 ? 'is' : 'are'} in a learning step (${due ? 'the next is due now' : `the next is due in ${waitWords(left)}`})`;
   return {
     line: canEarly ? `${head}: review ${count === 1 ? 'it' : 'them'} now${due ? '' : ', early'}, or ${count === 1 ? 'it' : 'they'} will wait for you.` : `${head}; ${count === 1 ? 'it' : 'they'} will wait for you.`,
-    now: canEarly ? (due ? 'Review now' : 'Review now, early') : null,
+    now: canEarly ? (due ? 'Review now' : 'Start the next learning step early') : null,
   };
 }
 

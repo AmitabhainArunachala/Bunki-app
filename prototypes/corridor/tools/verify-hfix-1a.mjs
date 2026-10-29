@@ -516,13 +516,16 @@ async function itemEntry(browser, engine) {
   }
 }
 
-// 7 · the part page's sentence, word for word, for 糸 (round 1's page) and three other positions, in both languages
+// 7 · retained shape-membership totals, not a position assertion about every member, in both languages
 const PART_ORACLE = {
-  bi: { 糸: 'いとへん, the thread radical, on the left of 68 kanji.', 艹: 'くさかんむり, the grass radical, across the top of 82 kanji.',
-    辶: 'しんにょう, the walk radical, wrapping the left and foot of 57 kanji.', 戈: 'ほこづくり, the halberd radical, on the right of 48 kanji.' },
-  ja: { 糸: 'いとへんは「いと」の部首。68字の左側にある。', 艹: 'くさかんむりは「くさ」の部首。82字の上にのる。',
-    辶: 'しんにょうは部首のひとつ。57字の左から下を囲む。', 戈: 'ほこづくりは「ほこ」の部首。48字の右側にある。' },
+  bi: { 糸: 'In this collection, this shape appears as a component in 68 kanji.', 艹: 'In this collection, this shape appears as a component in 82 kanji.',
+    辶: 'In this collection, this shape appears as a component in 57 kanji.', 戈: 'In this collection, this shape appears as a component in 48 kanji.' },
+  ja: { 糸: 'この資料では、この形を部品に持つ字は全68字。', 艹: 'この資料では、この形を部品に持つ字は全82字。',
+    辶: 'この資料では、この形を部品に持つ字は全57字。', 戈: 'この資料では、この形を部品に持つ字は全48字。' },
 };
+function partNoteMatches(ui, part, note) {
+  return typeof PART_ORACLE[ui]?.[part] === 'string' && note === PART_ORACLE[ui][part];
+}
 async function itemPart(browser, engine) {
   // 7 · the part page says what the part is in plain words; its number and strokes stay in its chips
   for (const ui of ['bi', 'ja']) {
@@ -538,7 +541,7 @@ async function itemPart(browser, engine) {
         await page.evaluate(() => window.__H1A__.run('(() => { S.stack = []; render(); })()'));
         await delay(200);
       }
-      const wrong = Object.entries(PART_ORACLE[ui]).filter(([part, want]) => seen[part]?.note !== want);
+      const wrong = Object.entries(PART_ORACLE[ui]).filter(([part]) => !partNoteMatches(ui, part, seen[part]?.note));
       const chips = seen['糸']?.chips || [];
       const facts = chips.some((t) => /(部首|radical) 120/u.test(t)) && chips.some((t) => /68 (字|kanji)/u.test(t)) && chips.some((t) => /6 (画|strokes)/u.test(t));
       const technical = Object.values(seen).filter((f) => /Kangxi|康熙|Below:|下は、/u.test(f.note || ''));

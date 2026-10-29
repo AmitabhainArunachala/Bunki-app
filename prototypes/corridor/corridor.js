@@ -33436,6 +33436,8 @@ function renderReviewNext(main) {
   main.append(box);
 }
 function renderReview(main) {
+  // A reused main leaves its completion material when a new card is drawn.
+  main.classList.remove('review-complete');
   const rv = S.review;
   renderReaderTicket(main, rv);
   // a focus block keeps the queue full: when the cards run dry before the
@@ -33457,6 +33459,7 @@ function renderReview(main) {
   const paused = step?.pause ? step : null;
   if (paused) { const door = main.querySelector?.('#review-reader-return'); if (door) door.dataset.readerReturnState = 'paused'; }
   if (rv.ix >= rv.queue.length || paused) {
+    main.classList.add('review-complete');
     main.append(withEn(el('p', 'eyebrow', S.focus ? '集中' : '復習'), S.focus ? 'focus' : 'review', 'en-inline'));
     // count grades pressed, not queue rows — re-inserted learning passes
     // would otherwise inflate the goodbye number
@@ -42110,26 +42113,15 @@ function renderRadicalNode(sheet, node) {
   hero.append(meta);
   sheet.append(hero);
 
-  // Hfix-1A · the part in plain words (round 1, H-kaku-06: "Official Kangxi radical no. 120 — いとへん (へん · left). Below:
-  // the characters that contain this part."): its name, what it means, where it sits and in how many kanji; its number and
-  // strokes stand in the chips above
+  // RADK/KRAD membership is a shape grouping. A radical's canonical position
+  // does not describe every member (火 also groups bottom 灬 and other forms).
+  // Count this collection, not every kanji; the heading below reports the cap.
   const note = el('div', 'note');
-  const meaning = partGloss(null, r.c);
   const count = r.kanjiCount || 0;
-  const WHERE = {
-    へん: [`${count}字の左側にある`, `on the left of ${count} kanji`], つくり: [`${count}字の右側にある`, `on the right of ${count} kanji`],
-    かんむり: [`${count}字の上にのる`, `across the top of ${count} kanji`], あし: [`${count}字の下に置かれる`, `along the foot of ${count} kanji`],
-    たれ: [`${count}字の上から左へ垂れる`, `hanging over the top and left of ${count} kanji`],
-    にょう: [`${count}字の左から下を囲む`, `wrapping the left and foot of ${count} kanji`],
-    かまえ: [`${count}字のまわりを囲む`, `enclosing ${count} kanji`], 独立: [`${count}字に含まれる`, `in ${count} kanji`],
-  };
-  const where = official ? WHERE[official.pos] || WHERE.独立 : null;
-  note.textContent = official
-    ? tx(
-        `${official.name}は${official.base && official.base !== official.name ? `「${official.base}」の部首` : '部首のひとつ'}。${where[0]}。`,
-        `${official.name}, ${meaning ? `the ${meaning} radical` : 'a radical'}, ${where[1]}.`,
-      )
-    : tx(`${count}字に見られる形。214の部首には入らない。`, `A shape found in ${count} kanji; it is not one of the 214 radicals.`);
+  note.textContent = tx(
+    `この資料では、この形を部品に持つ字は全${count}字。`,
+    `In this collection, this shape appears as a component in ${count} kanji.`,
+  );
   sheet.append(note);
 
   if (r.isKanji && D.kanji[r.c]) {
@@ -42152,7 +42144,9 @@ function renderRadicalNode(sheet, node) {
           ? `この部品を含む字 — ${r.kanjiCount} 字のうち ${r.kanji.length} 字`
           : `この部品を含む字 — ${r.kanjiCount} 字`,
       ),
-      'kanji that contain this part',
+      r.kanjiCount > r.kanji.length
+        ? `kanji that contain this part — showing ${r.kanji.length} of ${r.kanjiCount}`
+        : `kanji that contain this part — ${r.kanjiCount}`,
       'en-inline',
     ),
   );

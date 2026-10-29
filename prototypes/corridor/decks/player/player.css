@@ -830,3 +830,19 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 /* Q · the answer's definition and note break only between their words (mount.js answerWords gives the <wbr>); a word
    wider than its whole line may still break */
 .kp .kp-words { word-break: keep-all; overflow-wrap: break-word; line-break: strict; }
+
+/* Same early-step choice as the review room: keep its single label together. */
+.kp .kp-ahead {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: min(100%, 18em);
+  max-width: 100%;
+  min-height: 48px;
+  padding-inline: 8px;
+  white-space: nowrap;
+  text-wrap: nowrap;
+  word-break: normal;
+  font-size: var(--type-body);
+  letter-spacing: 0;
+}
