@@ -229,7 +229,7 @@
    "passage": {
     "ja": "遠い昔、人は夕暮れの浜辺で貝を拾い、波の音を聞きながら夜を過ごしたのだろう。歴史書にも年表にも残らない、そうした名もない日々こそが、文明の最も深い層をなしている。発掘された貝塚は、王の墓や宮殿よりもずっと正直に、人々の食卓と暮らしを語ってくれる。どれほど栄えた都もやがて滅びるが、海辺で暮らす人々の営みは形を変えて続いていく。私たちが歴史と呼ぶものは、そのほんの薄い表面にすぎない。",
     "form": "浜辺",
-    "en": "Long ago, people must have gathered shellfish on the beach at dusk and spent their nights listening to the sound of the waves. Precisely such nameless days, which leave no trace in history books or chronologies, form the deepest layer of civilization. Excavated shell middens speak of people's tables and lives far more honestly than kings' tombs and palaces do. However flourishing, capitals fall, but the labors of those living by the sea continue in changing forms. What we call history is only the thinnest surface of that.",
+    "en": "Long ago, people must have gathered shellfish on the beach at dusk and spent their nights listening to the sound of the waves. Precisely such nameless days, which leave no trace in history books or chronologies, form the deepest layer of civilization. Excavated shell middens speak of people's tables and lives far more honestly than kings' tombs and palaces do. However flourishing, all capitals eventually fall, but the labors of those living by the sea continue in changing forms. What we call history is only the thinnest surface of that.",
     "register": "論",
     "topic": "history",
     "tipJa": "浜辺で貝を拾うなど、砂浜の情景に使う。海辺より具体的。",
@@ -449,7 +449,7 @@
    "passage": {
     "ja": "同じ漢字でも、場面に応じて「さける」と「よける」に読み分けられる。前者は嫌なことを遠ざける意味で、後者は飛んでくる物から身をかわす動作に近い。たとえば、雨上がりの道で水たまりを避けて歩くという場合は、「よける」の読みがしっくりくる。ややこしいときは、その動作が瞬間的かどうかを手がかりにするとよい。もっとも、辞書によっては両方を認める例もあり、厳密な線引きを行うのは難しい。",
     "form": "避けて",
-    "en": "Depending on the context, the same kanji is read either \"sakeru\" or \"yokeru.\" The former means keeping away from something unpleasant, while the latter is closer to the act of dodging something flying at you. For example, in the case of walking on a rainy road while avoiding a puddle, the reading \"yokeru\" feels right. When it gets confusing, it helps to use whether the action is momentary as a clue. That said, some dictionaries accept both, so a strict dividing line is hard to draw.",
+    "en": "Depending on the context, the same kanji is read either \"sakeru\" or \"yokeru.\" The former means keeping away from something unpleasant, while the latter is closer to the act of dodging something flying at you. For example, in the case of walking on a road after the rain while avoiding a puddle, the reading \"yokeru\" feels right. When it gets confusing, it helps to use whether the action is momentary as a clue. That said, some dictionaries accept both, so a strict dividing line is hard to draw.",
     "register": "報",
     "topic": "language",
     "tipJa": "読みは「よける」。さける(遠ざける)との読み分けが要点。",
@@ -471,7 +471,7 @@
    "passage": {
     "ja": "暗記がどうしても追いつかないとき、いっそ覚える量を半分に減らしてしまうのも一つの手だ。人工知能の研究では、細部まで覚えすぎて新しい問題に弱くなる「過学習」を防ぐために、モデルをあえて単純にする工夫がある。人間の勉強も同じで、試験に頻繁に出る核心だけを押さえるほうが、応用が利く。全部を覚えようとして共倒れになるどころか、半分を確実にした人のほうが点を伸ばすことが多い。",
     "form": "いっそ",
-    "en": "When memorization can't keep up, it is one option to simply cut the amount you memorize in half. In artificial intelligence research, there is a technique of deliberately simplifying a model to prevent overfitting, where it memorizes details so closely that it becomes weak on new problems. Human study is the same: grasping only the core that comes up frequently makes for better application. Far from collapsing together while trying to learn everything, those who secured half firmly often raise their scores more.",
+    "en": "When memorization can't keep up, it is one option to simply cut the amount you memorize in half. In artificial intelligence research, there is a technique of deliberately simplifying a model to prevent overfitting, where it memorizes details so closely that it becomes weak on new problems. Human study is the same: grasping only the core that comes up frequently on exams makes for better application. Far from collapsing together while trying to learn everything, those who secured half firmly often raise their scores more.",
     "register": "学",
     "topic": "ai",
     "tipJa": "いっそ辞めてしまおうのように、極端な選択へ踏み切る気持ち。",
@@ -537,7 +537,7 @@
    "passage": {
     "ja": "時間の浪費って、実は一番気づきにくいじゃないですか。ちょっとスマホを開いたが最後、気がつくと一時間たっている、みたいなことってありますよね。あれは意志が弱いというより、そうなるように作られた仕組みにやられているだけなんですよ。だから僕は、寝る前にスマホを別の部屋に置いて、朝まで触れないようにしました。そうしたら、休養がきちんと取れた感じがして、朝の頭の軽さが違ったんです。",
     "form": "浪費",
-    "en": "Wasting time is actually the hardest waste to notice, isn't it? You open your phone, and before you know it an hour has gone, right? That is not so much weak willpower as being worked over by a design built to do exactly that. So I put my phone in another room before bed and stopped touching it until morning. Then I felt properly rested, and my head felt different in the morning.",
+    "en": "Wasting time is actually the hardest waste to notice, isn't it? You open your phone, and before you know it an hour has gone, right? That is not so much weak willpower as being worked over by a design built to do exactly that. So I put my phone in another room before bed and stopped touching it until morning. Then I felt properly rested, and my head felt remarkably light in the morning.",
     "register": "話",
     "topic": "mind",
     "tipJa": "時間の浪費・お金の浪費のように、無駄に使う対象と結びつく。",
@@ -647,7 +647,7 @@
    "passage": {
     "ja": "怒りの中で送信ボタンを押したが最後、たった一通のメッセージが十年かけた信頼を壊すことがある。軽率な言葉は、口から出た瞬間に、もう取り消しがきかない。そう頭では分かっていながら、私たちは感情の波に押されて、つい指を動かしてしまう。そこで本当に賢明なのは、送る前に一晩置くという、ごく単純で確実な習慣だ。時間が経てば、怒りは嘘のように薄れ、残るのは本当に言うべきことだけになる。",
     "form": "軽率",
-    "en": "Once you press send in anger, a single message can destroy trust built over ten years. A careless word cannot be taken back the instant it leaves the mouth. Knowing this, we are still pushed by waves of emotion and move our fingers without thinking. So the wise course is the very simple habit of letting it sit overnight before sending. As time passes, anger fades, and only what truly needs saying remains.",
+    "en": "Once you press send in anger, a single message can destroy trust built over ten years. A careless word cannot be taken back the instant it leaves the mouth. Knowing this, we are still pushed by waves of emotion and move our fingers without thinking. So the wise course is the very simple and reliable habit of letting it sit overnight before sending. As time passes, anger fades as if it had all been a lie, and only what truly needs saying remains.",
     "register": "論",
     "topic": "mind",
     "tipJa": "軽率な行動・軽率な発言のように、深く考えない振る舞いを戒める。",
@@ -757,7 +757,7 @@
    "passage": {
     "ja": "取引先との丁寧な会話で「いかにも」と相づちを打つと、古風で堅い響きになる。同じ肯定の返事でも、「はい」はやわらかく、「ええ」は親しみがあり、「おっしゃるとおり」は敬意が強い。こうした相づちの使い分けが、話し手の人柄や育ち、立場まで映し出す。場面に応じて柔軟に肯定の言葉を選べる人は、聞き手に静かな安心感を与える。話す技術の差は、語彙の数よりも、この選び分けの感覚に表れるのだ。",
     "form": "いかにも",
-    "en": "Answering a client in polite conversation with \"indeed\" gives an old-fashioned, stiff ring. Even among affirmations, \"hai\" is soft, \"ee\" is friendly, and \"ossharu toori\" carries strong respect. This choice of responses reflects even the speaker's character and position. A person who can flexibly pick affirming words to suit the occasion gives listeners a sense of security. Skill in speaking shows less in the number of words than in this sense of selection.",
+    "en": "Answering a client in polite conversation with \"indeed\" gives an old-fashioned, stiff ring. Even among affirmations, \"hai\" is soft, \"ee\" is friendly, and \"ossharu toori\" carries strong respect. This choice of responses reflects even the speaker's character, upbringing, and position. A person who can flexibly pick affirming words to suit the occasion gives listeners a quiet sense of security. Skill in speaking shows less in the number of words than in this sense of selection.",
     "register": "語",
     "topic": "language",
     "tipJa": "「いかにも」と応じるのは、堅く古風な肯定の返事。",
@@ -779,7 +779,7 @@
    "passage": {
     "ja": "夕暮れのガンジス河畔は、いやに静かだった、と書き残した旅行者は多い。昼間はあれほど騒がしかった岸辺が、日が沈むと同時に、川面に揺れる光だけを残して息をひそめるからだ。ヒンドゥー教徒にとって、川は単なる水の流れではなく、人の穢れを洗い流す神聖な存在である。その静けさは、信仰が人々の日常に深く溶けこんでいる証でもある。外から来た私たちは、その深い静けさにただ圧倒されるばかりだ。",
     "form": "いやに",
-    "en": "Many travelers have left writing that the banks of the Ganges at dusk were strangely quiet. The shore that was so noisy by day holds its breath the moment the sun sets, leaving only the light that trembles on the water. For Hindus, a river is not merely a flow of water but a sacred presence that washes away people's impurity. That quiet is also proof that faith has melted into daily life. We who come from outside can only be overwhelmed by it.",
+    "en": "Many travelers have left writing that the banks of the Ganges at dusk were strangely quiet. The shore that was so noisy by day holds its breath the moment the sun sets, leaving only the light that trembles on the water. For Hindus, a river is not merely a flow of water but a sacred presence that washes away people's impurity. That quiet is also proof that faith has melted deeply into daily life. We who come from outside can only be overwhelmed by that deep stillness.",
     "register": "論",
     "topic": "india",
     "tipJa": "いやに静かだ・いやに暑いのように、普段と違う驚きを含む。",
@@ -845,7 +845,7 @@
    "passage": {
     "ja": "面接で極度に緊張している人ほど、終始うつむいて話してしまいがちだ。声はしだいに小さくなり、相手に伝わるのは話の内容ではなく、自信のなさだけになる。そこで私は、話の始まりと終わりという肝心な二か所だけ、意識して顔を上げるよう勧めている。全部をうまくやろうというより、要所だけを確実に押さえることのほうがずっと現実的だ。鏡の前で練習を重ねるうちに、視線は自然と相手を向くようになる。",
     "form": "終始",
-    "en": "The more extremely nervous people are in an interview, the more they end up speaking with their eyes down throughout. Their voices shrink, and what reaches the other person is not the content but only a lack of confidence. So I recommend consciously lifting the face at just two crucial places, the beginning and the end of the talk. Rather than trying to do everything well, it is far more realistic to firmly secure just the key points. As you keep practicing in front of a mirror, your gaze will naturally turn toward the listener.",
+    "en": "The more extremely nervous people are in an interview, the more they end up speaking with their eyes down throughout. Their voices gradually shrink, and what reaches the other person is not the content but only a lack of confidence. So I recommend consciously lifting the face at just two crucial places, the beginning and the end of the talk. Rather than trying to do everything well, it is far more realistic to firmly secure just the key points. As you keep practicing in front of a mirror, your gaze will naturally turn toward the listener.",
     "register": "語",
     "topic": "mind",
     "tipJa": "終始一貫・終始無言のように、最初から最後まで変わらない様子。",
