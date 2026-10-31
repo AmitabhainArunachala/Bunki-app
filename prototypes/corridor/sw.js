@@ -152,6 +152,7 @@ const SHELL = [
   'decks/n2/deck.json',
   'decks/n1/deck.json',
   'decks/senmon/deck.json',
+  'decks/kotoba-master/deck.json',
   // Their tokens side files (deck.tokens) are NOT precached: the fetch handler verifies
   // and caches them on first use, so the back's tap targets work offline after one sitting while
   // the install stays light (A52).

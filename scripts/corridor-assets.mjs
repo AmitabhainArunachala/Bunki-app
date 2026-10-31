@@ -107,6 +107,8 @@ export const CORRIDOR_REQUIRED_ROOTS = [
   'decks/n1/tokens.json',
   'decks/senmon/deck.json',
   'decks/senmon/tokens.json',
+  'decks/kotoba-master/deck.json',
+  'decks/kotoba-master/tokens.json',
   'data',
   'vendor',
   'design',

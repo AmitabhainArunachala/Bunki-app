@@ -270,10 +270,10 @@ describe('sw.js shell', () => {
     expect(record.deleted).toEqual([older]);
   });
 
-  it('installs the N2, N1 and specialist decks, leaving tokens for first use (A52)', async () => {
+  it('installs the N2, N1, specialist and own-words decks, leaving tokens for first use (A52)', async () => {
     const { run, record } = loadWorker([]);
     await run('install');
-    for (const id of ['n2', 'n1', 'senmon']) {
+    for (const id of ['n2', 'n1', 'senmon', 'kotoba-master']) {
       expect(record.added).toContain(new URL(`decks/${id}/deck.json`, SCOPE).href);
       expect(record.added).not.toContain(new URL(`decks/${id}/tokens.json`, SCOPE).href);
     }

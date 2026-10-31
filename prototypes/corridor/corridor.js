@@ -5029,9 +5029,9 @@ async function boot() {
   if (params.get('deck') === 'context' || location.hash === '#context') S.view = 'contextdeck';
   // ?deck=kotoba (or #kotoba) opens 言葉の鉱脈 straight away — a home-screen
   // shortcut that lands on the deck instead of the galaxy
-  if (['kotoba', 'mcd', 'n2', 'n1', 'senmon'].includes(params.get('deck')) || ['#kotoba', '#mcd'].includes(location.hash)) {
+  if (['kotoba', 'mcd', 'n2', 'n1', 'senmon', 'kotoba-master'].includes(params.get('deck')) || ['#kotoba', '#mcd'].includes(location.hash)) {
     S.view = 'deckplay';
-    S.deckPlay = ['n2', 'n1', 'senmon'].includes(params.get('deck')) ? params.get('deck') : params.get('deck') === 'mcd' || location.hash === '#mcd' ? 'kotoba-mcd' : 'kotoba-mine';
+    S.deckPlay = ['n2', 'n1', 'senmon', 'kotoba-master'].includes(params.get('deck')) ? params.get('deck') : params.get('deck') === 'mcd' || location.hash === '#mcd' ? 'kotoba-mcd' : 'kotoba-mine';
   }
   // Private collections leave through the same five destinations on a fresh
   // host page. These are UI routes only, never learner-record state.
@@ -35613,7 +35613,7 @@ function renderTests(main) {
 /* 集中道場 › デッキ — the SRS decks the learner can sit. Each deck keeps its
  * own schedule (its own localStorage ledger); 覚えるの札 is the corridor's
  * own word queue, opened as a plain review. */
-const DOJO_DECKS = [{ id: 'n2', ja: 'N2の語・短い文章で', en: 'N2 words · in short passages' }, { id: 'n1', ja: 'N1の語・短い文章で', en: 'N1 words · in short passages' }, { id: 'senmon', ja: '専門・あなたの分野', en: 'Your fields · master\'s level' }, { id: 'kotoba-mcd', ja: '調べた言葉・長文', en: 'Words you looked up · passages' }, { id: 'kotoba-mine', ja: '調べた言葉・例文', en: 'Words you looked up · sentences' }];
+const DOJO_DECKS = [{ id: 'n2', ja: 'N2の語・短い文章で', en: 'N2 words · in short passages' }, { id: 'n1', ja: 'N1の語・短い文章で', en: 'N1 words · in short passages' }, { id: 'senmon', ja: '専門・あなたの分野', en: 'Your fields · master\'s level' }, { id: 'kotoba-master', ja: 'わたしの言葉', en: 'My own words' }, { id: 'kotoba-mcd', ja: '調べた言葉・長文', en: 'Words you looked up · passages' }, { id: 'kotoba-mine', ja: '調べた言葉・例文', en: 'Words you looked up · sentences' }];
 // r4 (John, T2: "*Real Sentences read and recall.. is just very confusing, obtuse and way to generic
 // to mean anyhting at all"): the two 言葉の鉱脈 decks are the words he looked up in his Japanese app,
 // and this list names them exactly as their own deck homes do (the cards lane's titles, so a row and

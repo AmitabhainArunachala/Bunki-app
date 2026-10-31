@@ -286,7 +286,7 @@ defs['n2n1-decks-browser'] = {
   producer: 'prototypes/corridor/tools/verify-n2n1-decks.mjs',
   paths: ['n2n1-tour.json'],
   expectedCases: () =>
-    ['n2', 'n1', 'senmon'].flatMap((id) => [
+    ['n2', 'n1', 'senmon', 'kotoba-master'].flatMap((id) => [
       'data/' + id,
       ...['hokusai', 'yoru'].map((w) => `chromium/${id}/${w}`),
     ]),

@@ -10,9 +10,9 @@ import { startCorridorDev } from '../../../scripts/serve-corridor-dev.mjs';
 import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 import { cardTokens, defTokens, validateDeck } from '../decks/player/engine.js';
 
-const ids = ['n2', 'n1', 'senmon'];
-const chromeTitles = ['N2 words · in short passages', 'N1 words · in short passages', 'Your fields · master\'s level'];
-const titles = ['N2の語・短い文章で', 'N1の語・短い文章で', '専門・あなたの分野'];
+const ids = ['n2', 'n1', 'senmon', 'kotoba-master'];
+const chromeTitles = ['N2 words · in short passages', 'N1 words · in short passages', 'Your fields · master\'s level', 'My own words'];
+const titles = ['N2の語・短い文章で', 'N1の語・短い文章で', '専門・あなたの分野', 'わたしの言葉'];
 const out = resolveCorridorEvidence();
 const host = await startCorridorDev(0);
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });

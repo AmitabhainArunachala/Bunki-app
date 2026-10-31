@@ -146,8 +146,8 @@ function fixture(name, c = context(name)) {
     Object.assign(r, {
       status: 'passed',
       viewport: { width: 390, height: 844 },
-      decks: ['n2', 'n1', 'senmon'].map((id) => ({ id, words: 1, cards: 1 })),
-      tours: ['n2', 'n1', 'senmon'].flatMap((id) =>
+      decks: ['n2', 'n1', 'senmon', 'kotoba-master'].map((id) => ({ id, words: 1, cards: 1 })),
+      tours: ['n2', 'n1', 'senmon', 'kotoba-master'].flatMap((id) =>
         ['hokusai', 'yoru'].map((world) => ({
           id,
           world,
