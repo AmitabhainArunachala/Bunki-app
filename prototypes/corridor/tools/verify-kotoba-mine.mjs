@@ -198,6 +198,27 @@ function check(caseId, name, pass, detail = '') {
 }
 const readJson = (path) => JSON.parse(readFileSync(path, 'utf8'));
 
+/** The player admits a grade asynchronously — mount.js commit() awaits srs-core's admitAnswer under one Web Lock — so the
+ * ledger and the screen change some tens of milliseconds after the tap (26–27 ms measured on 2026-10-31). Act, then wait,
+ * within a bound, for the outcome: the deck's log grew (the write landed), or the player painted a toast it had not shown
+ * before (a refused or failed write: 保存できませんでした with #kp-to-backup, or a refusal line). Never a fixed sleep, and
+ * never a read of the ledger right after the tap. */
+async function settledGrade(page, ledgerKey, act, { timeout = 5000 } = {}) {
+  const probe = `(() => { const s = JSON.parse(localStorage.getItem(${JSON.stringify(ledgerKey)}) || 'null'); const toast = document.querySelector('.kp-toast');
+    return { log: s?.log?.length ?? 0, fresh: !!toast && !toast.dataset.kpSeen }; })()`;
+  const before = await page.evaluate(`(() => { document.querySelector('.kp-toast')?.setAttribute('data-kp-seen', '1'); return ${probe}; })()`);
+  await act();
+  await page.waitForFunction(`(() => { const now = ${probe}; return now.log > ${before.log} || now.fresh; })()`, null, { timeout });
+  return before;
+}
+const gradeClick = (page, ledgerKey, selector = '#kp-grade-good', options) => settledGrade(page, ledgerKey, () => page.click(selector), options);
+/** a grade that moves on: settled, and the next card is on screen (the card id changed) */
+async function gradeToNext(page, ledgerKey, selector = '#kp-grade-good', { timeout = 5000 } = {}) {
+  const was = await page.evaluate(`document.getElementById('kp-card')?.dataset.card ?? null`);
+  await gradeClick(page, ledgerKey, selector, { timeout });
+  await page.waitForFunction(`(document.getElementById('kp-card')?.dataset.card ?? null) !== ${JSON.stringify(was)}`, null, { timeout });
+}
+
 /** Actual renderer fonts on visible study-page text, plus self-contained face declarations. */
 async function studyFontEvidence(page) {
   // The just-opened popover can request another unicode-range face at its
@@ -401,12 +422,17 @@ async function verifyGradePath(browser, base) {
       await page.waitForSelector('#kp-grade-good');
       const before = await page.evaluate(`({ ledger: localStorage.getItem(${JSON.stringify(LEDGER)}), count: document.querySelector('.kp-count').textContent })`);
       await page.evaluate(`Storage.prototype.setItem = () => { throw new DOMException('full', 'QuotaExceededError'); }`);
-      await page.click('#kp-grade-good');
+      await gradeClick(page, LEDGER);
       const after = await page.evaluate(`({ ledger: localStorage.getItem(${JSON.stringify(LEDGER)}), count: document.querySelector('.kp-count')?.textContent, card: !!document.querySelector('#kp-card'), grades: !!document.querySelector('#kp-grade-good'), backup: !!document.querySelector('#kp-to-backup'), text: document.querySelector('.kp').innerText })`);
+      // Under the admission order (HOOKS-SPEC §3.3) the word's mark is written before the ledger, so a storage that refuses
+      // every write stops the grade at the mark and the player shows the refusal line for 'mark-unavailable' (lead 0128),
+      // not 保存できませんでした with バックアップへ, which is the line for a ledger write that fails after the mark landed.
+      // Either is the one plain line this check demands; the detail names the one shown.
+      const said = after.text.includes('Could not save.') && after.backup ? 'save-failed' : /couldn’t be saved safely|安全に保存できなかった/.test(after.text) ? 'mark-unavailable' : null;
       check(
-        "K010", 'when storage refuses the write, the card stays (1/N), the ledger is unchanged and the page says 保存できませんでした',
-        /^1\//.test(after.count || '') && after.count === before.count && after.card && after.grades && after.backup && after.ledger === before.ledger && after.text.includes('Could not save.'),
-        JSON.stringify({ count: after.count, card: after.card, grades: after.grades, backup: after.backup, ledgerUnchanged: after.ledger === before.ledger }),
+        "K010", 'when storage refuses the write, the card stays (1/N), the ledger is unchanged and the page says plainly that the answer was not saved (保存できませんでした, or the admission’s refusal line)',
+        /^1\//.test(after.count || '') && after.count === before.count && after.card && after.grades && after.ledger === before.ledger && said !== null,
+        JSON.stringify({ count: after.count, card: after.card, grades: after.grades, backup: after.backup, ledgerUnchanged: after.ledger === before.ledger, said }),
       );
     } finally {
       await context.close();
@@ -421,7 +447,7 @@ async function verifyGradePath(browser, base) {
       await page.waitForSelector('#kp-card');
       const a = await page.evaluate(SENTENCE);
       await page.click('#kp-reveal');
-      await page.click('#kp-grade-good'); // card A: next step in 10 minutes
+      await gradeClick(page, LEDGER); // card A: next step in 10 minutes
       const due = await page.evaluate(`(() => { const s = JSON.parse(localStorage.getItem(${JSON.stringify(LEDGER)})); const c = Object.values(s.cards)[0]; return (new Date(c.due) - Date.now()) / 60000; })()`);
       // a new sitting: A is not due yet, so it is not in the queue
       await page.click('#kp-quit');
@@ -438,8 +464,7 @@ async function verifyGradePath(browser, base) {
         a !== b && stillB === b && due > 9 && due <= 10.1,
         JSON.stringify({ dueInMinutes: Math.round(due * 10) / 10, same: stillB === b }),
       );
-      await page.click('#kp-grade-good');
-      await page.waitForSelector('#kp-card');
+      await gradeToNext(page, LEDGER);
       const shown = await page.evaluate(SENTENCE);
       check("K012", '…and it is the very next card once that one is answered', shown === a, shown?.slice(0, 24) ?? 'no card');
     } finally {
@@ -463,7 +488,7 @@ async function verifyRestore(browser, base) {
   const gradeOne = async () => {
     await page.click('#kp-start');
     await page.click('#kp-reveal');
-    await page.click('#kp-grade-good');
+    await gradeClick(page, LEDGER);
     await page.click('#kp-quit');
   };
   const restore = async (text) => {
@@ -631,7 +656,7 @@ async function verifyDelivery(browser, base) {
     const afterCancel = { count: await count(), log: await logLength('kotoba-mine') };
     const vertical = await gesture([[255, 400]], ['pointerup', 255, 400]);
     const afterVertical = { count: await count(), log: await logLength('kotoba-mine') };
-    await gesture([[200, 105], [260, 110]], ['pointerup', 260, 110]);
+    await settledGrade(page, 'bunki-cloze:kotoba-mine', () => gesture([[200, 105], [260, 110]], ['pointerup', 260, 110]));
     const afterSwipe = { count: await count(), log: await logLength('kotoba-mine'), rating: await page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mine') || 'null')?.log?.at(-1)?.[1] ?? null`) };
     check(
       "K017", 'a cancelled swipe and a mostly vertical one (dx 105, dy 300) never grade and put the card back; a sideways swipe grades 正解 (Good, rating 3)',
@@ -1456,7 +1481,7 @@ async function verifyTap(browser, base) {
       JSON.stringify({ same, lookups }),
     );
     await page.keyboard.press('Escape');
-    await page.click('#kp-grade-good');
+    await gradeClick(page, 'bunki-cloze:kotoba-mcd');
     const graded = await page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mcd'))`);
     check("K073", 'tap: the card still grades as before, and its lookups stay in the ledger beside the answer', graded.log.length === 1 && graded.lookups.length === 4, JSON.stringify({ log: graded.log.length, lookups: graded.lookups.length }));
     if (o.errors.length) check("K074", 'no page errors in the slip and entry cycle', false, o.errors.slice(0, 2).join(' | '));
@@ -1717,7 +1742,7 @@ async function verifyBack(browser, base) {
     const o = await open('?deck=kotoba', 'kotoba-mine');
     await o.page.click('#kp-reveal');
     await o.page.waitForSelector('#kp-rule');
-    await o.page.click('#kp-grade-good');
+    await gradeToNext(o.page, 'bunki-cloze:kotoba-mine');
     await o.page.click('#kp-reveal');
     await o.page.waitForSelector('.kp-grade');
     const next = await o.page.evaluate(`({ rule: !!document.getElementById('kp-rule'), seen: JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mine') || '{}').againCoachSeen })`);
@@ -2263,8 +2288,7 @@ async function verifyReview(browser, base) {
       await o.page.click('#kp-ladder-hint');
       await o.page.waitForSelector('.kp-grade');
       const hinted = { ladder: await o.page.locator('#kp-ladder').count(), ledger: await read(o.page, 'kotoba-mcd') };
-      await o.page.click('#kp-grade-good');
-      await o.page.waitForSelector('#kp-card');
+      await gradeToNext(o.page, 'bunki-cloze:kotoba-mcd');
       const second = await onScreen(o.page);
       await revealCard(o.page);
       const noLadder = await o.page.locator('#kp-ladder').count();
@@ -2296,8 +2320,7 @@ async function verifyReview(browser, base) {
       const f1 = await o.page.evaluate(`({ id: document.getElementById('kp-card').dataset.card, repaired: document.getElementById('kp-card').dataset.repaired ?? null, hint: document.querySelector('#kp-card .kp-rhint')?.textContent ?? null })`);
       await revealCard(o.page);
       const b1 = await o.page.evaluate(`({ rhint: document.querySelectorAll('#kp-card .kp-rhint').length, ladder: !!document.getElementById('kp-ladder') })`);
-      await o.page.click('#kp-grade-good');
-      await o.page.waitForSelector('#kp-card');
+      await gradeToNext(o.page, 'bunki-cloze:kotoba-mcd');
       const f2 = await o.page.evaluate(`({ id: document.getElementById('kp-card').dataset.card, repaired: document.getElementById('kp-card').dataset.repaired ?? null, hint: document.querySelectorAll('#kp-card .kp-rhint').length })`);
       check(
         "K116", 'b) the hint shows on the front of the repaired card only (marked data-repaired, gone after the reveal); the next card has none; no ladder until it lapses again',
@@ -3005,7 +3028,7 @@ async function main() {
     const back = await page.evaluate(`({ rt: document.querySelectorAll('#kp-card rt').length, target: !!document.querySelector('#kp-card .kp-target'), term: document.querySelector('.kp-term')?.textContent, src: !!document.querySelector('#kp-card .kp-src') })`);
     check("K150", 'the answer puts readings over the kanji, gives the meaning, and names the source', back.rt > 0 && back.target && !!back.term && back.src, JSON.stringify(back));
     const takenBefore = (await readAppRecord(page)).taken.length;
-    await page.click('#kp-grade-good');
+    await gradeClick(page, 'bunki-cloze:kotoba-mcd');
     const ledger = await ls('bunki-cloze:kotoba-mcd');
     const after = await readAppRecord(page);
     check("K151", 'a grade lands in the deck’s own ledger and never in the word queue', Object.keys(ledger?.cards || {}).length === 1 && after.taken.length === takenBefore && (after.revlog || []).length === 0, `${Object.keys(ledger?.cards || {}).length} card · ${after.taken.length} taken`);
