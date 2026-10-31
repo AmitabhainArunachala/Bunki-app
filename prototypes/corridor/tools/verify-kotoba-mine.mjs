@@ -425,14 +425,14 @@ async function verifyGradePath(browser, base) {
       await gradeClick(page, LEDGER);
       const after = await page.evaluate(`({ ledger: localStorage.getItem(${JSON.stringify(LEDGER)}), count: document.querySelector('.kp-count')?.textContent, card: !!document.querySelector('#kp-card'), grades: !!document.querySelector('#kp-grade-good'), backup: !!document.querySelector('#kp-to-backup'), text: document.querySelector('.kp').innerText })`);
       // Under the admission order (HOOKS-SPEC §3.3) the word's mark is written before the ledger, so a storage that refuses
-      // every write stops the grade at the mark and the player shows the refusal line for 'mark-unavailable' (lead 0128),
-      // not 保存できませんでした with バックアップへ, which is the line for a ledger write that fails after the mark landed.
-      // Either is the one plain line this check demands; the detail names the one shown.
-      const said = after.text.includes('Could not save.') && after.backup ? 'save-failed' : /couldn’t be saved safely|安全に保存できなかった/.test(after.text) ? 'mark-unavailable' : null;
+      // every write stops the grade at the mark and the player shows the refusal line for 'mark-unavailable' (lead 0128;
+      // that line stands, lead/Kimi 1250) — never 保存できませんでした with バックアップへ, which is the line for a ledger
+      // write that fails after the mark landed.
+      const refusal = /couldn’t be saved safely, so it didn’t change the card’s schedule|安全に保存できなかったため、札の予定は変わっていません/.test(after.text);
       check(
-        "K010", 'when storage refuses the write, the card stays (1/N), the ledger is unchanged and the page says plainly that the answer was not saved (保存できませんでした, or the admission’s refusal line)',
-        /^1\//.test(after.count || '') && after.count === before.count && after.card && after.grades && after.ledger === before.ledger && said !== null,
-        JSON.stringify({ count: after.count, card: after.card, grades: after.grades, backup: after.backup, ledgerUnchanged: after.ledger === before.ledger, said }),
+        "K010", 'when storage refuses the write, the card stays (1/N), the ledger is unchanged and the page shows the admission’s refusal line (the mark could not be written, HOOKS-SPEC §3.3), with no backup prompt',
+        /^1\//.test(after.count || '') && after.count === before.count && after.card && after.grades && after.ledger === before.ledger && refusal && !after.backup,
+        JSON.stringify({ count: after.count, card: after.card, grades: after.grades, backup: after.backup, ledgerUnchanged: after.ledger === before.ledger, refusal }),
       );
     } finally {
       await context.close();
