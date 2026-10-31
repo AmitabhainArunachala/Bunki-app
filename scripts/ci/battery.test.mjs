@@ -759,7 +759,7 @@ const DECK_APKGS = [
   'decks/kotoba-mine/release/public/kotoba-mine.apkg',
   'decks/kotoba-mine/release/public/kotoba-mcd.apkg',
 ];
-function deckRepo(extra = '') {
+function deckRepo(extra = '', n2n1Extra = '') {
   const repo = fresh();
   const files = {
     'decks/kotoba-mine/tools/build.py': [
@@ -771,8 +771,17 @@ function deckRepo(extra = '') {
       extra,
       '',
     ].join('\n'),
+    // the N2/N1 pack build the gate also runs (ruling 1250): it rewrites its committed pack with the same bytes
+    'decks/n2n1/tools/build_n2n1.py': [
+      'import pathlib',
+      "pack = pathlib.Path(__file__).resolve().parents[3] / 'prototypes/corridor/decks/n2/deck.json'",
+      'pack.write_text(pack.read_text())',
+      n2n1Extra,
+      '',
+    ].join('\n'),
     'decks/kotoba-mine/release/kotoba-mine.tsv': 'card\n',
     'prototypes/corridor/decks/index.json': '{}\n',
+    'prototypes/corridor/decks/n2/deck.json': '{"id":"n2"}\n',
     ...Object.fromEntries(DECK_APKGS.map((file) => [file, `original ${file}`])),
   };
   for (const [file, text] of Object.entries(files)) {
@@ -824,6 +833,12 @@ test('frozen deck build restores its timestamped APKGs and still rejects any oth
     assert.deepEqual(apkgBytes(repo), before, extra);
     assert.equal(dirty(repo), left, extra);
   }
+  // the N2/N1 packs are under the same parity: a rebuild that changes a committed pack is refused
+  const drifted = deckRepo('', 'pack.write_text(\'{"id":"n2","words":[]}\\n\')');
+  const before = apkgBytes(drifted);
+  assert.throws(() => frozenDeck(drifted), /Command failed: git diff/u);
+  assert.deepEqual(apkgBytes(drifted), before);
+  assert.equal(dirty(drifted), ' M prototypes/corridor/decks/n2/deck.json');
 });
 test('the per-gate source boundary admits the restoring frozen build and rejects an unrestored APKG rewrite', async () => {
   const supplemental = new globalThis.URL('./supplemental.mjs', import.meta.url).href;

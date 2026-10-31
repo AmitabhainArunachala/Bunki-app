@@ -128,6 +128,9 @@ export function frozenDeck(root = process.cwd()) {
         cwd: root,
         stdio: 'inherit',
       });
+    // the N2/N1 packs (n2, n1, senmon, kotoba-master) from source/cards + source/imported: the diff
+    // below is their byte parity with the committed packs (lead's ruling 1250, Option B)
+    execFileSync('python3', ['decks/n2n1/tools/build_n2n1.py'], { cwd: root, stdio: 'inherit' });
     execFileSync(
       'git',
       ['diff', '--stat', '--exit-code', '--', ...DECK_PATHS, ':(exclude)*.apkg'],

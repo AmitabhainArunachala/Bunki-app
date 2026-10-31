@@ -51,7 +51,11 @@ export const commandChecks = Object.freeze({
     first: 'scripts/ci/deck-frozen.mjs',
     tail: [],
     kind: 'frozen-build-parity',
-    inputs: ['scripts/ci/supplemental.mjs', 'decks/kotoba-mine/tools/build.py'],
+    inputs: [
+      'scripts/ci/supplemental.mjs',
+      'decks/kotoba-mine/tools/build.py',
+      'decks/n2n1/tools/build_n2n1.py',
+    ],
   },
   'runtime-syntax': {
     first: 'scripts/ci/runtime-syntax.mjs',
