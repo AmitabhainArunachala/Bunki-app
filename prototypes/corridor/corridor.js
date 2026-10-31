@@ -32858,7 +32858,7 @@ function hookCardFacts(latest, item, key) {
 /** HOOKS r8: the one help-relevance policy (W3's rule and catalog version, rebound to R2 with this branch's srs-core; the
  * version hashes the catalog's pinned files, not the head) whose annotations may exempt help from the cap. It lives here,
  * not in srs-core, because the catalog pins srs-core's bytes */
-const HELP_RELEVANCE_POLICY = 'w3-help-relevance-r8-v1:9f0691b2f04c3abcb5898ceebf148f879b112dd35831ae4ae814ac1fc1770a06';
+const HELP_RELEVANCE_POLICY = 'w3-help-relevance-r8-v1:d1f8121d24e1f7f9a9af7003a18a5859b5262b82cce8e191cb539bdd7d88e465';
 /** the admitted relevance rule: W3's module (help-relevance.mjs, byte-identical to W3's relevance.mjs) over srsCore with the
  * shipped catalog (data/help-relevance-catalog.json, whose pins a Node test checks against these sources). Null when it
  * cannot be installed: an annotated candidate is then refused, and the course prepares unannotated ones (r7's cap) */

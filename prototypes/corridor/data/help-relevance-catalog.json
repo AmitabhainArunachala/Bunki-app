@@ -1,10 +1,10 @@
 {
   "policy": "w3-help-relevance-r8-v1",
-  "sourceVersion": "9f0691b2f04c3abcb5898ceebf148f879b112dd35831ae4ae814ac1fc1770a06",
+  "sourceVersion": "d1f8121d24e1f7f9a9af7003a18a5859b5262b82cce8e191cb539bdd7d88e465",
   "pins": [
     {
       "path": "prototypes/corridor/srs-core.mjs",
-      "sha256": "e3814b711abc517421674514320d30bf3efd62fdadb68cf6592f71d6a3a3ae9a"
+      "sha256": "b4bb8f6080b209c1d8c8052a09ae00fd7e8a7f00f253d2a39da4b8b09040be45"
     },
     {
       "path": "prototypes/corridor/data/share_alike/kanji-structure.json",
