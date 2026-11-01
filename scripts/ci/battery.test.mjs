@@ -1,8 +1,8 @@
 import { syntheticEvidence, syntheticProof } from './test-evidence-fixture.mjs';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
-import { homedir } from 'node:os';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { homedir, tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import test from 'node:test';
 import { batteryGates, gateTimeoutMs, runGates } from '../verify-release-gates.mjs';
@@ -751,6 +751,165 @@ test('CI contracts provision pytest for actual framework admission regressions',
   assert(shard, 'Required CI contracts shard');
   assert.equal(shard.python, true);
   assert.equal(shard.corpus, true);
+});
+
+test('Vitest shared-browser guard receives the composed artifact and evidence environment in a real npm child', async (t) => {
+  const temporary = mkdtempSync(join(tmpdir(), 'bunki-ci-browser-env-'));
+  try {
+    const site = join(temporary, 'site');
+    mkdirSync(site);
+    // A tiny deliberately corrupted artifact stops the real browser guard at
+    // byte verification, after all required CI inputs have been consumed. No
+    // browser, dependency installation, or full corpus is needed for this test.
+    const assets = {
+      'index.html': '<!doctype html>',
+      'corridor.js': 'original',
+      'manifest.webmanifest': '{}',
+      'sw.js': `self.KAIRO_ASSET_VERSION = "${'a'.repeat(64)}";\n`,
+    };
+    const files = Object.entries(assets)
+      .sort()
+      .map(([path, bytes]) => {
+        writeFileSync(join(site, path), bytes);
+        return { path, bytes: Buffer.byteLength(bytes), sha256: digest(bytes) };
+      });
+    const artifactSha256 = digest(JSON.stringify(files));
+    writeFileSync(
+      join(site, 'build-identity.json'),
+      JSON.stringify({
+        schemaVersion: 1,
+        product: 'KAIRO',
+        gitSha: 'b'.repeat(40),
+        sourceDirty: false,
+        sourceAssetSha256: 'a'.repeat(64),
+        artifactSha256,
+        files,
+      }),
+    );
+    writeFileSync(join(site, 'corridor.js'), 'tampered');
+    const artifactEnv = {
+      KAIRO_SITE_DIR: site,
+      KAIRO_VERIFIED_ARTIFACT_SHA256: artifactSha256,
+      KAIRO_ARTIFACT_SHA256: artifactSha256,
+    };
+    const plan = createPlan({ identity });
+    const homes = plan.shards.filter((shard) => shard.gates.includes('vitest'));
+    assert.equal(homes.length, 1, 'The browser guard runs once per Vitest attempt');
+    for (const missing of [null, 'KAIRO_SITE_DIR', 'KAIRO_EVIDENCE_DIR']) {
+      const fixtureRoot = join(temporary, missing || 'complete');
+      const out = join(temporary, `${missing || 'complete'}-evidence`);
+      mkdirSync(fixtureRoot);
+      const observation = join(fixtureRoot, 'child-environment.json');
+      const browserResult = join(fixtureRoot, 'browser-preflight.json');
+      const browserScript = new globalThis.URL(
+        '../verify-shared-study-browser.mjs',
+        import.meta.url,
+      ).pathname;
+      // Keep the actual npm invocation and runner instrumentation. Substitute
+      // only the fixture package's test body so this tests the wrapper boundary
+      // without pretending to run the repository's full Vitest acceptance set.
+      writeFileSync(
+        join(fixtureRoot, 'package.json'),
+        JSON.stringify({
+          private: true,
+          scripts: { test: 'node probe.mjs' },
+        }),
+      );
+      writeFileSync(
+        join(fixtureRoot, 'probe.mjs'),
+        `
+        import {writeFileSync} from 'node:fs';
+        import {spawnSync} from 'node:child_process';
+        const keys=['CI','KAIRO_SITE_DIR','KAIRO_EVIDENCE_DIR','KAIRO_ARTIFACT_SHA256','KAIRO_VERIFIED_ARTIFACT_SHA256','KAIRO_BROWSER','KAIRO_FRAMEWORK_RECEIPT'];
+        writeFileSync(${JSON.stringify(observation)},JSON.stringify(Object.fromEntries(keys.map(key=>[key,process.env[key]]))));
+        const result=spawnSync(process.execPath,[${JSON.stringify(browserScript)},'--if-ci'],{encoding:'utf8',env:process.env});
+        writeFileSync(${JSON.stringify(browserResult)},JSON.stringify({status:result.status,stderr:result.stderr,stdout:result.stdout}));
+        process.exit(result.status??1);
+      `,
+      );
+      const original = batteryGates(out, {}).find((gate) => gate.name === 'vitest');
+      const selected = gateForShard(original, homes[0], artifactEnv);
+      // CI/RUNNER_TEMP are the runner-provided ambient values in the workflow.
+      // Declaring them here avoids borrowing or mutating this test's shell.
+      selected.env = { ...selected.env, CI: 'true', RUNNER_TEMP: temporary };
+      if (missing) selected.env[missing] = '';
+      const result = await runGates({ gates: [selected], root: fixtureRoot, out });
+      assert.equal(result.status, 'failed');
+      assert.equal(result.gates[0].processExitCode, 1);
+      const observed = JSON.parse(readFileSync(observation));
+      assert.equal(observed.CI, 'true');
+      assert.equal(observed.KAIRO_SITE_DIR, missing === 'KAIRO_SITE_DIR' ? '' : site);
+      assert.equal(
+        observed.KAIRO_EVIDENCE_DIR,
+        missing === 'KAIRO_EVIDENCE_DIR' ? '' : join(out, 'vitest'),
+      );
+      assert.equal(observed.KAIRO_ARTIFACT_SHA256, artifactSha256);
+      assert.equal(observed.KAIRO_VERIFIED_ARTIFACT_SHA256, artifactSha256);
+      assert.equal(observed.KAIRO_BROWSER, 'chromium');
+      assert.equal(observed.KAIRO_FRAMEWORK_RECEIPT, join(out, 'vitest/framework.json'));
+      const preflight = JSON.parse(readFileSync(browserResult));
+      assert.equal(preflight.status, 1);
+      assert.match(
+        preflight.stderr,
+        missing
+          ? /Explicit built site and external evidence directory required/
+          : /Asset digest mismatch: corridor\.js/,
+      );
+      assert.doesNotMatch(preflight.stdout, /not requested locally/);
+      t.diagnostic(
+        JSON.stringify({
+          case: missing || 'complete-environment',
+          observed,
+          stoppedAt: missing ? 'required-input-check' : 'artifact-digest-check',
+          processExitCode: result.gates[0].processExitCode,
+          browserLaunched: false,
+        }),
+      );
+    }
+  } finally {
+    rmSync(temporary, { recursive: true, force: true });
+  }
+});
+
+test('the single Vitest shard provisions Chromium through first-attempt and retry workflow setup', () => {
+  for (const scope of ['full', 'docs']) {
+    const homes = createPlan({ scope, identity }).shards.filter((shard) =>
+      shard.gates.includes('vitest'),
+    );
+    assert.equal(homes.length, 1);
+    assert.equal(homes[0].kind, 'fast');
+    const matrix = shardMatrix(homes).include;
+    assert.equal(matrix.length, 1);
+    assert(matrix[0].browsers.split(' ').includes('chromium'));
+  }
+  const fixtureState = fixture();
+  const row = fixtureState.receipts.find((receipt) =>
+    receipt.gates.some((gate) => gate.name === 'vitest'),
+  );
+  row.status = 'failed';
+  row.exitCode = 1;
+  Object.assign(
+    row.gates.find((gate) => gate.name === 'vitest'),
+    { status: 'failed', exitCode: 1 },
+  );
+  const retry = createRetryPlan(
+    fixtureState.plan,
+    fixtureState.receipts.filter(
+      (receipt) =>
+        fixtureState.plan.shards.find((shard) => shard.id === receipt.shardId).kind === 'fast',
+    ),
+    artifact,
+    undefined,
+    'fast',
+  );
+  assert.equal(retry.shards.length, 1);
+  assert.deepEqual(retry.shards[0].gates, ['vitest']);
+  assert(shardMatrix(retry.shards).include[0].browsers.split(' ').includes('chromium'));
+  const ci = workflow();
+  for (const lane of ['fast', 'fast-retry']) {
+    const setup = ci.jobs[lane].steps.find((step) => step.uses === './.github/actions/ci-setup');
+    assert.equal(setup.with.browsers, '${{ matrix.browsers }}');
+  }
 });
 
 const DECK_APKGS = [

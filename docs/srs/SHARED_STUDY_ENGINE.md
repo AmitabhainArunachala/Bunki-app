@@ -135,8 +135,13 @@ visit, the cached study route reopens offline.
 `npm run verify:shared-study:browser` requires `KAIRO_SITE_DIR` and
 `KAIRO_EVIDENCE_DIR`; it never builds or installs dependencies. `npm test` runs
 the same browser guard once in the existing CI Vitest lane, which supplies the
-immutable artifact and installed browser. Missing CI inputs fail. Local
-`npm test` explicitly skips the browser guard only when no site is supplied.
+immutable artifact and installed browser. Missing CI inputs fail.
+The gate mapper supplies the per-gate evidence directory; `gateForShard` adds
+the artifact path and hashes without replacing it. The Vitest shard requests
+Chromium in the first-attempt and retry matrices. A Node CI regression executes
+that composed npm child and checks the actual browser preflight, including
+missing-input and tampered-artifact failures, without launching a browser.
+Local `npm test` explicitly skips the browser guard only when no site is supplied.
 The existing site resolver verifies all stamped bytes before browser launch;
 `KAIRO_ARTIFACT_SHA256` can pin a previously built artifact while source is edited.
 It uses a fresh headless browser profile, no screenshots or
