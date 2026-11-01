@@ -14,7 +14,7 @@
   },
   "source": {
     "repository": "nihongo-srs",
-    "commit": "ba720c30c3cfc284aeea42ee0b76032612aff529",
+    "commit": "445d382c9f2ea2d6ac0691f865e0f12d00f36f6d",
     "mode": "committed",
     "changedFiles": []
   },
@@ -25,12 +25,12 @@
   "behavior": {
     "client/engine.mjs": "4e9f340ee20941b6f79a9ded2dc1b52d84950792de8d6d017c21ff1a9ac61cd7",
     "client/replay.mjs": "f564bd01906409b145419c33b5a4db688e94b163e2ca94e5ce36213909ce7430",
-    "client/player/replica-backend.mjs": "a79acaa15f293f23186ecfc3fde62e2440bce0942aba188356004f86c9015066",
-    "client/store.mjs": "3f668037de8911673c51155ac0b1f72818925a9cab719676843b459e86bd385e",
+    "client/player/replica-backend.mjs": "ede916d0014db9c2c1fd67c91eeced52400e0bdb6ad341e2b96267503f396aca",
+    "client/store.mjs": "f922dee2d10fa7074a48d4129602a00ff5ee1acefe6aca1ee03968d1f69b1089",
     "client/player/study-sessions.mjs": "acbaba57b3a8bd82b9edcd4783d1c0a797a679661251f4000bd30a038d3b3521",
     "client/app/local-budget.mjs": "f561b0f793d160cd5de57f52fca5a52025ae2973de7e8b7333af77c1012d6fbd",
-    "client/app/corpus-inventory.mjs": "aca5ad70bffb8afa0920f4fe5e7674ccfae1513f919a4276a4a64c2dc961f7f2",
-    "client/storage/indexeddb.mjs": "77d7ca213a5fb498c7e9217f1a05ecfb66c02fc841df69ed35bcc7a3ad033d2b",
+    "client/app/corpus-inventory.mjs": "805f9be37b9224d26775426750211cce106490743134c397eec95a377fdce0bd",
+    "client/storage/indexeddb.mjs": "991ea298d5a21d3d22bd6f722326e8667b8bbc0e74824a18499ec4a0f040133f",
     "client/sync.mjs": "35a10b3632b36a97c35067b0abf2a7f345e9a86ced5ee5f7f0ba9c3b1ca1ea08"
   },
   "reducerSha256": "f564bd01906409b145419c33b5a4db688e94b163e2ca94e5ce36213909ce7430",
@@ -39,23 +39,23 @@
   "files": [
     {
       "path": "client/app/app.css",
-      "bytes": 36776,
-      "sha256": "67f6fd39b4f64af1864328ab1bbcd60f85ee3483fe0cde6cb8b507578b649713"
+      "bytes": 37098,
+      "sha256": "087e8c5f6fd6d223360e70677bd68ad230f483d28dfa197b9ab551c3821ff3e9"
     },
     {
       "path": "client/app/app.mjs",
-      "bytes": 82803,
-      "sha256": "67ed53f89e724fff7b080f76ccf57c348090fdcc7d0f3bf352200b4e84e8534f"
+      "bytes": 82098,
+      "sha256": "b1048864a14edc04d082e83f81addf8fa0ec4a7ea1ca04ed6ff240f0967c4cc7"
     },
     {
       "path": "client/app/corpus-inventory.mjs",
-      "bytes": 7193,
-      "sha256": "aca5ad70bffb8afa0920f4fe5e7674ccfae1513f919a4276a4a64c2dc961f7f2"
+      "bytes": 7230,
+      "sha256": "805f9be37b9224d26775426750211cce106490743134c397eec95a377fdce0bd"
     },
     {
       "path": "client/app/custom-session.mjs",
-      "bytes": 6761,
-      "sha256": "be1e55e873c2829923c89612ff7eab9718b29f3686000853765057941e7fcf91"
+      "bytes": 6827,
+      "sha256": "e0f7f7ff3a4e0989f7a8641d22a47f5ae3022441e0fc4bf4a75dc3ccd2fb2a17"
     },
     {
       "path": "client/app/factory-status.mjs",
@@ -1324,8 +1324,8 @@
     },
     {
       "path": "client/app/interface-language.mjs",
-      "bytes": 37598,
-      "sha256": "0264ab5555aa458b854a51f28e65fc13dc469a740764bfb9dce355cffc652392"
+      "bytes": 39531,
+      "sha256": "f837e72a16f00f8737f839fa1fd159a7df5fae06e355641e65997461848f50cb"
     },
     {
       "path": "client/app/local-budget.mjs",
@@ -1384,8 +1384,8 @@
     },
     {
       "path": "client/player/replica-backend.mjs",
-      "bytes": 22451,
-      "sha256": "a79acaa15f293f23186ecfc3fde62e2440bce0942aba188356004f86c9015066"
+      "bytes": 23106,
+      "sha256": "ede916d0014db9c2c1fd67c91eeced52400e0bdb6ad341e2b96267503f396aca"
     },
     {
       "path": "client/player/study-sessions.mjs",
@@ -1394,8 +1394,8 @@
     },
     {
       "path": "client/player/vocabulary.mjs",
-      "bytes": 6885,
-      "sha256": "3c09e983f7dece292629f64c3ef6bf452e1629d26bda992b4a3106fcd0ce6d11"
+      "bytes": 6900,
+      "sha256": "89cb2784973770a06501d196f19980862a32b3dfaacfbc78840ba87e4e34b5be"
     },
     {
       "path": "client/replay.mjs",
@@ -1409,8 +1409,8 @@
     },
     {
       "path": "client/storage/indexeddb.mjs",
-      "bytes": 3353,
-      "sha256": "77d7ca213a5fb498c7e9217f1a05ecfb66c02fc841df69ed35bcc7a3ad033d2b"
+      "bytes": 3395,
+      "sha256": "991ea298d5a21d3d22bd6f722326e8667b8bbc0e74824a18499ec4a0f040133f"
     },
     {
       "path": "client/storage/memory.mjs",
@@ -1418,9 +1418,14 @@
       "sha256": "e983b5fed4a00af1aa322c0983b0c8b2ab30bfea51f7ed40042254a27e55b781"
     },
     {
+      "path": "client/storage/read-ownership.mjs",
+      "bytes": 368,
+      "sha256": "ab8cb002b0bc97c7f63a2ca1c15f19375428cb1b7823b6de6083a6d01c94d5e9"
+    },
+    {
       "path": "client/store.mjs",
-      "bytes": 17489,
-      "sha256": "3f668037de8911673c51155ac0b1f72818925a9cab719676843b459e86bd385e"
+      "bytes": 18811,
+      "sha256": "f922dee2d10fa7074a48d4129602a00ff5ee1acefe6aca1ee03968d1f69b1089"
     },
     {
       "path": "client/sync-compatibility.mjs",
@@ -1468,5 +1473,5 @@
       "sha256": "adab18734248871867be9cf62fa25b58cce3f3f37a34a81e714b0b1b26e10dba"
     }
   ],
-  "closureSha256": "65db858e701b34eef5261b8e64986e1a1cb5f9ba9a7962cdbba37050ff26a712"
+  "closureSha256": "08e15d1a7367d43dcdc34390d0c74730285405500d7797836ef9e018bb7dbea1"
 }

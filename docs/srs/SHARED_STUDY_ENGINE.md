@@ -1,9 +1,10 @@
 # Shared study consumer
 
 Bunki's N2, N1, senmon and kotoba-master deck doors, plus `?deck=shared-grammar`,
-now host the canonical Nihongo Study UI and v4 engine. `decks/player/mount.js`
-routes those IDs before it reads a legacy ledger. An unbound profile fails closed
-and offers an isolated preview; it never silently resumes legacy grading.
+host the canonical Nihongo Study UI and v4 engine only in explicit shared mode
+(`?sharedStudy=preview` or a bound host). `decks/player/mount.js` routes those IDs
+before it reads a legacy ledger in that mode. Ordinary routes retain their
+existing player, counts and history until an explicit migration/cutover occurs.
 
 The same-origin frame imports the byte-identical `mountStudyApp` and grammar
 renderer from `vendor/shared-study-engine`. This adopts subsequent canonical UI
@@ -56,7 +57,7 @@ unchanged. Canonical learner-created cards retain their own content.
 
 ## Isolated local preview
 
-Use `?deck=n2&sharedStudy=preview` (or the visible link from an unbound deck).
+Use `?deck=n2&sharedStudy=preview`.
 The ordinary Bunki deck route mounts the real canonical UI, backend and store.
 The preview uses `test-bunki-shared-preview`, its own IndexedDB database and
 appearance keys, and a Web Lock around installation creation. It preserves one
@@ -65,11 +66,11 @@ grant is limited to twenty introductions on the creation learner day. It has
 no live server or production permit authority; further/day-rollover grants need
 an explicit test transport. The shell does not claim this preview is paired.
 
-Mapped legacy pack writes are disabled. In shared mode, old kotoba-mine/MCD,
+In shared mode, mapped legacy pack writes are disabled. Old kotoba-mine/MCD,
 context-dense, personal collections, saved-word/kanji/sentence/question reviews
 and world/course hooks are fenced from grading. Their identities and histories
-have not been converted. Leaving preview mode retains their existing legacy
-behavior for contracts outside the mapped canonical packs.
+have not been converted. Leaving preview mode returns to the existing legacy
+routes and history, including the mapped packs.
 
 No learner migration is performed. No legacy grade is reinterpreted as a v4
 event, and no missing permit, parent, mode or hesitation evidence is invented.
@@ -119,8 +120,13 @@ Generate content with
 Run `node scripts/verify-shared-study.mjs`,
 `./node_modules/.bin/vitest run tools/shared-study.test.mjs`, and
 `npm run release:verify`. The web builder runs the distribution/content hash gate
-and refuses local builds below 8 GiB free space. The stamped service worker precaches
-the canonical module closure and bound content as one verified release.
+and refuses local builds below 8 GiB free space. `npm test` also runs the pinned
+distribution/content verifier before Vitest. A compact reviewed source excerpt
+exercises the same content generator in CI without depending on an external path.
+The stamped service worker verifies shared modules and content on first bound
+use. Shared fonts load lazily through its verified cache/reuse path; ordinary
+installation does not require the shared corpus or fonts. After an online bound
+visit, the cached study route reopens offline.
 
 `scripts/verify-shared-study-browser.mjs` takes `KAIRO_SITE_DIR` and
 `KAIRO_EVIDENCE_DIR`. It uses a fresh headless browser profile, no screenshots or

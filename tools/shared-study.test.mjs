@@ -7,6 +7,7 @@ import {tmpdir} from 'node:os';
 import {decodeSharedContent,SHARED_DECKS} from '../prototypes/corridor/shared-study-content.mjs';
 import {createBunkiStudyAdapter,createBunkiAttempt} from '../prototypes/corridor/study-engine-adapter.mjs';
 import {createStudyEngine,createMemoryAdapter,dayBounds,payloadHash,canonicalStringify} from '../prototypes/corridor/vendor/shared-study-engine/client/engine.mjs';
+import {buildSharedStudyBinding} from '../scripts/shared-study-binding.mjs';
 const root=new URL('../prototypes/corridor/',import.meta.url),read=p=>JSON.parse(readFileSync(new URL(p,root)));
 const binding=read('data/shared-study-content.json'),pin=read('vendor/shared-study-engine/client/vendor/fsrs-pin.json');
 const decks=Object.fromEntries(SHARED_DECKS.map(id=>[id,read(`decks/${id}/deck.json`)]));
@@ -19,6 +20,11 @@ function grant(installation,n=2,seq=1){const event={v:4,id:`@server:${seq}`,lear
 async function fixture(installation='test-bunki',storage=memory(),events=[grant(installation)]){let n=0;const adapter=await createBunkiStudyAdapter({content:small,storage,identity:{learner:'test-shared',environment:'test-shared',installation,mode:'fresh'},now:()=>NOW,uuid:()=>`${installation}-intent-${++n}`,initialize:async({store})=>store.reconcile({events,head:events.length})});return {adapter,storage};}
 
 describe('Bunki canonical shared study consumer',()=>{
+  it('runs the independently pinned distribution/content verifier in the unit test lane',()=>{
+    const result=spawnSync(process.execPath,[new URL('../scripts/verify-shared-study.mjs',import.meta.url).pathname],{encoding:'utf8'});
+    expect(result.status,result.stderr).toBe(0);
+    expect(JSON.parse(result.stdout).tasks).toEqual({tasks:8508,vocabulary:7930,grammar:578});
+  });
   it('authenticates the bundled verifier before a substituted successful no-op can execute',()=>{
     const fixture=mkdtempSync(join(tmpdir(),'bunki-verifier-mutation-')),scripts=join(fixture,'scripts'),vendor=join(fixture,'prototypes/corridor/vendor/shared-study-engine');
     try {
@@ -41,6 +47,26 @@ describe('Bunki canonical shared study consumer',()=>{
   });
   it('refuses changed frozen card identity before opening a learner store',()=>{
     const broken=structuredClone(binding);broken.rows[0][8]='renamed-card';expect(()=>decodeSharedContent(broken,decks,pin)).toThrow('shared-card-identity');
+  });
+  it('refuses a changed frozen word identity even when its existing card ID still matches',()=>{
+    const broken=structuredClone(binding);broken.rows[0][7]='different-word';expect(()=>decodeSharedContent(broken,decks,pin)).toThrow('shared-card-identity');
+  });
+  it('rebuilds a compact reviewed source excerpt with the same production generator',()=>{
+    const fixture=JSON.parse(readFileSync(new URL('./fixtures/shared-study-content-source.json',import.meta.url)));
+    const rebuilt=buildSharedStudyBinding(fixture.input);
+    expect(createHash('sha256').update(JSON.stringify(rebuilt)+'\n').digest('hex')).toBe(fixture.expectedBindingSha256);
+    expect(rebuilt.counts).toEqual({tasks:6,vocabulary:4,grammar:2});
+    for(const change of [input=>{input.catalog[0].ja+='違う';},input=>{input.catalog[0].en+='changed';},input=>{input.catalog[0].rubySegments=[];},input=>{input.catalog.at(-1).form='wrong';}]){
+      const changed=structuredClone(fixture.input);change(changed);expect(()=>buildSharedStudyBinding(changed)).toThrow();
+    }
+    const incomplete=structuredClone(fixture.input);delete incomplete.expected;expect(()=>buildSharedStudyBinding(incomplete)).toThrow('Incomplete frozen inventory');
+  });
+  it('refuses fixture initialization outside both test scopes before any storage write or callback',async()=>{
+    for(const [learner,environment]of [['real-learner','test-shared'],['test-shared','production'],['real-learner','production']]){
+      const storage=memory();let initialized=0;
+      await expect(createBunkiStudyAdapter({content:small,storage,identity:{learner,environment,installation:'test-bunki',mode:'fresh'},initialize:()=>{initialized++;}})).rejects.toThrow('shared-fixture-scope-required');
+      expect(initialized).toBe(0);expect(storage.writes).toBe(0);
+    }
   });
   it('same actual backend command has byte-identical events and projection in both consumers',async()=>{
     const {adapter:a}=await fixture();const engine=createStudyEngine({content:small,learner:'test-shared'}),store=await engine.createFreshStore({adapter:memory(),environment:'test-shared',newInstallationId:()=> 'test-bunki',now:()=>NOW});
@@ -71,6 +97,26 @@ describe('Bunki canonical shared study consumer',()=>{
     expect((await adapter.submit(adapter.backend.command('undo',{taskKey:task.taskKey,parent:task.head,target:grade.eventId}))).kind).toBe('durable');
     expect(adapter.backend.readProjection().tasks[task.taskKey].card).toBe(null);
     expect(await adapter.summary('n2')).toMatchObject({due:1,fresh:0,total:1,begun:1});
+  });
+  it('never includes another installation permits in a deck new-card count',async()=>{
+    const {adapter}=await fixture('test-bunki',memory(),[grant('test-bunki',1,1),grant('test-phone',8,2)]);
+    expect(adapter.backend.queue({module:'n2'})).toHaveLength(2);
+    expect(await adapter.summary('n2')).toMatchObject({due:0,fresh:1,total:1});
+  });
+  it('keeps the grammar deck limited to the exact canonical grammar task IDs',async()=>{
+    const {adapter}=await fixture();
+    expect(adapter.entries('shared-grammar').map(entry=>entry.taskKey)).toEqual([selected[3].taskKey]);
+    expect(await adapter.summary('shared-grammar')).toMatchObject({due:0,fresh:1,total:1,words:1});
+    expect(adapter.sitting('shared-grammar').entry.taskKey).toBe(selected[3].taskKey);
+  });
+  it('missed terms exclude passing grades, other decks, old cutoffs and undone Again reviews',async()=>{
+    const {adapter}=await fixture();
+    const again=createBunkiAttempt(adapter,selected[0].taskKey);again.reveal(1000);const grade=await again.grade(1);
+    expect(await adapter.missedTerms('n2')).toEqual([{term:selected[0].term,reading:selected[0].reading,at:NOW,deck:'n2'}]);
+    expect(await adapter.missedTerms('n1')).toEqual([]);expect(await adapter.missedTerms('n2',NOW+1)).toEqual([]);
+    const task=adapter.backend.readProjection().tasks[selected[0].taskKey];await adapter.submit(adapter.backend.command('undo',{taskKey:task.taskKey,parent:task.head,target:grade.eventId}));
+    expect(await adapter.missedTerms('n2')).toEqual([]);
+    const good=createBunkiAttempt(adapter,selected[0].taskKey);good.reveal(1000);await good.grade(3);expect(await adapter.missedTerms('n2')).toEqual([]);
   });
   it('refuses stale shown attempts and unbound legacy contract names',async()=>{
     const {adapter}=await fixture(),attempt=adapter.begin(selected[0].taskKey);await adapter.backend.mutate('suspend',attempt.taskKey,{on:true});

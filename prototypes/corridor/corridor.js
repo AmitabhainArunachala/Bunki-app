@@ -35630,7 +35630,7 @@ function renderTests(main) {
  * own schedule (its own localStorage ledger); 覚えるの札 is the corridor's
  * own word queue, opened as a plain review. */
 const DOJO_DECKS = [{ id: 'n2', ja: 'N2の語・短い文章で', en: 'N2 words · in short passages' }, { id: 'n1', ja: 'N1の語・短い文章で', en: 'N1 words · in short passages' }, { id: 'senmon', ja: '専門・あなたの分野', en: 'Your fields · master\'s level' }, { id: 'kotoba-master', ja: 'わたしの言葉', en: 'My own words' }, { id: 'kotoba-mcd', ja: '調べた言葉・長文', en: 'Words you looked up · passages' }, { id: 'kotoba-mine', ja: '調べた言葉・例文', en: 'Words you looked up · sentences' }];
-DOJO_DECKS.splice(4,0,{id:'shared-grammar',ja:'文法・意味と穴埋め',en:'Grammar · meaning and recall'});
+if (sharedStudyActive()) DOJO_DECKS.splice(4,0,{id:'shared-grammar',ja:'文法・意味と穴埋め',en:'Grammar · meaning and recall'});
 // r4 (John, T2: "*Real Sentences read and recall.. is just very confusing, obtuse and way to generic
 // to mean anyhting at all"): the two 言葉の鉱脈 decks are the words he looked up in his Japanese app,
 // and this list names them exactly as their own deck homes do (the cards lane's titles, so a row and
@@ -35673,7 +35673,7 @@ function openDeck(id, { autoStart = false } = {}) {
  * distinct word id among the scheduled card ids (`<word id>-<card>`). The slim
  * hairline under a deck row is this over the deck's real word count. */
 function deckWordsBegun(id) {
-  if (['n2','n1','senmon','kotoba-master','shared-grammar'].includes(id)) return deckSummaries[id]?.begun || 0;
+  if (sharedStudyActive() && ['n2','n1','senmon','kotoba-master','shared-grammar'].includes(id)) return deckSummaries[id]?.begun || 0;
   try {
     const raw = JSON.parse(localStorage.getItem(`bunki-cloze:${id}`) || 'null');
     const ids = raw && typeof raw.cards === 'object' && raw.cards ? Object.keys(raw.cards) : [];

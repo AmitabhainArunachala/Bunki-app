@@ -1,4 +1,5 @@
 /** Real IndexedDB adapter. Transaction completion, not request success, resolves writes. */
+import {registerOwnedReader} from './read-ownership.mjs';
 export function createIndexedDBAdapter({ indexedDB = globalThis.indexedDB, databaseName = 'nsrs-replica-qa-v1' } = {}) {
   if (!indexedDB || typeof indexedDB.open !== 'function') throw Error('indexeddb-unavailable');
   if (!/^[A-Za-z0-9._-]{1,96}$/.test(databaseName) || /^nsrs_(dev|bak|adm)_/.test(databaseName)) throw Error('invalid-database-name');
@@ -24,10 +25,9 @@ export function createIndexedDBAdapter({ indexedDB = globalThis.indexedDB, datab
     opening = pending;
     return pending;
   };
-  return Object.freeze({
+  return registerOwnedReader(Object.freeze({
     // Each IDB request materializes a new structured clone. The caller alone
     // owns it; mutating it cannot alter the database or a later read result.
-    readSnapshotOwnership: 'caller',
     async read(scope) {
       const database = await open();
       return new Promise((resolve, reject) => {
@@ -59,5 +59,5 @@ export function createIndexedDBAdapter({ indexedDB = globalThis.indexedDB, datab
       });
     },
     async close() { if (opening) { const database = await opening; database.close(); opening = undefined; } },
-  });
+  }));
 }

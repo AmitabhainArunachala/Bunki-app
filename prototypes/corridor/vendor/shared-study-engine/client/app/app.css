@@ -337,3 +337,6 @@ section:has(>.word-list)>h2~.setting-row textarea{width:100%;min-height:88px}
   #app:has([data-focus]) > main { padding: 16px 24px; }
   #app [data-focus] { gap: 12px; }
 }
+
+/* Interface bilingual copy; source cards keep their own typography. */
+:root{text-autospace:normal}.interface-twin{display:inline-flex;flex-direction:column;vertical-align:baseline;max-width:100%}.interface-twin > .interface-secondary{display:block;font-size:13px;font-weight:400;line-height:1.5;color:var(--secondary)}

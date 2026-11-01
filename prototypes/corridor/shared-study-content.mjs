@@ -1,6 +1,8 @@
 /** Bunki presentation content bound to the standalone's frozen task identities. */
 export const SHARED_DECKS = Object.freeze(['n2', 'n1', 'senmon', 'kotoba-master']);
 export const isSharedDeck = id => SHARED_DECKS.includes(id);
+export const isSharedStudyMode = () => !!globalThis.bunkiSharedStudyHost ||
+  new URLSearchParams(globalThis.location?.search || '').get('sharedStudy') === 'preview';
 
 export function decodeSharedContent(binding, decks, pin) {
   if (binding?.format !== 'bunki-shared-content/v1' || !Array.isArray(binding.rows)) throw Error('shared-content-format');

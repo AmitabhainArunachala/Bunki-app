@@ -50,6 +50,9 @@ function listPaths(text, name) {
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const FONT_A = 'fonts/a.woff2';
 const FONT_B = 'fonts/b.woff2';
+const SHARED_FONT = 'vendor/shared-study-engine/client/app/fonts/test.woff2';
+const SHARED_DATA = 'data/shared-study/grammar.json';
+const SHARED_MODULE = 'vendor/shared-study-engine/client/app/app.mjs';
 
 /** a stamped release sw.js accepts: its boot core plus two fonts, with synthetic bodies */
 function buildRelease() {
@@ -60,6 +63,9 @@ function buildRelease() {
     ...listPaths(SW, 'SPEAK_ROOM'),
     FONT_A,
     FONT_B,
+    SHARED_FONT,
+    SHARED_DATA,
+    SHARED_MODULE,
   ]);
   const bodies = new Map([...paths].map((path) => [path, Buffer.from(`body of ${path}`)]));
   const inputs = [...paths, 'sw.js']
@@ -291,6 +297,19 @@ describe('sw.js bundled fonts (R5-19)', () => {
       return bodies.has(path) ? new Response(bodies.get(path)) : new Response('', { status: 404 });
     };
   const isFont = (path) => path.startsWith('fonts/');
+
+  it('shared study content and fonts are lazy verified assets, never an install or background prerequisite', async () => {
+    const shared = [SHARED_FONT,SHARED_DATA,SHARED_MODULE];let unavailable=true;
+    const {run,request,stored,record}=loadWorker([],{source,network:serve(path=>unavailable&&shared.includes(path))});
+    await run('install');await run('activate');
+    await until(()=>[FONT_A,FONT_B].every(path=>record.fetched.includes(path)));
+    expect(record.fetched.filter(path=>shared.includes(path))).toEqual([]);
+    for(const path of shared)expect(await stored(cacheName,path)).toBeUndefined();
+    unavailable=false;
+    for(const path of shared){expect((await request(path)).status).toBe(200);expect(await stored(cacheName,path)).toBe(bodies.get(path).toString());}
+    unavailable=true;
+    for(const path of shared)expect((await request(path)).status).toBe(200);
+  });
 
   it('stamped install succeeds and caches the boot core when every font request fails', async () => {
     const { run, stored, record, stores } = loadWorker([], { source, network: serve(isFont) });

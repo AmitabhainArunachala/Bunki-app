@@ -3,8 +3,7 @@
 import {createStudyEngine,studyDayAllowance} from './vendor/shared-study-engine/client/engine.mjs';
 import {isSharedDeck} from './shared-study-content.mjs';
 
-export const isSharedStudyMode = () => !!globalThis.bunkiSharedStudyHost ||
-  new URLSearchParams(globalThis.location?.search || '').get('sharedStudy') === 'preview';
+export {isSharedStudyMode} from './shared-study-content.mjs';
 
 export async function createBunkiStudyAdapter({content, storage, identity, transport=null, now=Date.now, uuid, initialize=null, readPreviousRegistry=null}) {
   if (!storage || !identity || !['open','fresh'].includes(identity.mode)) throw Error('shared-host-binding-required');

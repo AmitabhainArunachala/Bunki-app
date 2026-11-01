@@ -25,23 +25,34 @@ export async function createReplicaBackend({ store, engine, catalog, localAuthor
   const catalogEntries=()=>[...catalog,...Object.values(projection.manualCards??{})];
   const refreshManualEntries=()=>{for(const entry of Object.values(projection.manualCards??{}))entries.set(entry.taskKey,entry);};
   refreshManualEntries();
-  let refreshGeneration=0, refreshedGeneration=0, refreshing=null;
+  let refreshGeneration=0, refreshedGeneration=0, refreshing=false;
+  const refreshWaiters=new Set();
+  function finishRefreshWaiters(through=Infinity,error=null){
+    for(const waiter of refreshWaiters)if(waiter.generation<=through){
+      refreshWaiters.delete(waiter);if(error)waiter.reject(error);else waiter.resolve();
+    }
+  }
   function refreshThrough(generation) {
     if(disposed||refreshedGeneration>=generation)return Promise.resolve();
-    if(!refreshing)refreshing=(async()=>{
-      while(!disposed&&refreshedGeneration<refreshGeneration){
-        const readingGeneration=refreshGeneration,next=await store.readState();
-        if(disposed)return;
-        // A write or explicit refresh during I/O requires a newer read. Never
-        // let its caller complete from the snapshot that preceded that request.
-        if(readingGeneration!==refreshGeneration)continue;
-        refreshedGeneration=readingGeneration;
-        if(next.storageRevision<state.storageRevision)continue;
-        state=next;projection=next.projection;refreshManualEntries();
-        for(const fn of listeners){try{fn(projection);}catch{/* presentation only */}}
-      }
-    })().finally(()=>{refreshing=null;});
-    return refreshing.then(()=>refreshThrough(generation));
+    const done=new Promise((resolve,reject)=>refreshWaiters.add({generation,resolve,reject}));
+    if(!refreshing){refreshing=true;(async()=>{
+      try{
+        while(!disposed&&refreshedGeneration<refreshGeneration){
+          const readingGeneration=refreshGeneration,next=await store.readState();
+          if(disposed)return;
+          refreshedGeneration=readingGeneration;
+          if(next.storageRevision>=state.storageRevision){
+            state=next;projection=next.projection;refreshManualEntries();
+            for(const fn of listeners){try{fn(projection);}catch{/* presentation only */}}
+          }
+          // Complete only callers covered by this read. Newer invalidations
+          // continue in the background without holding earlier saves hostage.
+          finishRefreshWaiters(readingGeneration);
+        }
+      }catch(error){finishRefreshWaiters(Infinity,error);}
+      finally{refreshing=false;if(disposed)finishRefreshWaiters();}
+    })();}
+    return done;
   }
   const refresh=()=>refreshThrough(++refreshGeneration);
   const stop=store.subscribe(()=>{refresh().catch(()=>{});});
@@ -73,16 +84,19 @@ export async function createReplicaBackend({ store, engine, catalog, localAuthor
         const find = snapshot => [...Object.values(snapshot.local), ...Object.values(snapshot.canonical)].find(r =>
           r.event.install === store.scope.installation && r.event.ts === intent.ts && r.event.type === intent.type &&
           canonicalStringify(r.event.data) === canonicalStringify(intent.data));
-        let existing = find(await store.readState()), appended;
-        if (!existing) {
-          try { appended = await store.append({ type: intent.type, data: intent.data, ts: intent.ts }); }
-          catch (error) { existing = find(await store.readState()); if (!existing) throw error; }
+        let existing, saved;
+        try { saved = await store.appendOrFind({ type: intent.type, data: intent.data, ts: intent.ts }); }
+        catch (error) {
+          // Only an uncertain storage reply is recoverable. Admission failures
+          // (including current byte limits/compatibility) must remain failures.
+          if (error.code && error.code !== 'storage-failed') throw error;
+          existing = find(await store.readState()); if (!existing) throw error;
         }
-        const event = existing?.event ?? appended.event;
+        const event = existing?.event ?? saved.event;
         if(localAuthority)await withLocalWrite(()=>canonicalizeLocalPending(store,{authority:localAuthority,now}));
         // A successful append already invalidates via the store subscription.
         // Lost commit replies have no notification, so force a read in that case.
-        await refreshThrough(appended&&refreshGeneration>beforeRefresh?refreshGeneration:++refreshGeneration);
+        await refreshThrough(saved?.appended&&refreshGeneration>beforeRefresh?refreshGeneration:++refreshGeneration);
         const outcome = projection.outcomes?.[event.id];
         const result = { kind: outcome?.status === 'applied' ? 'durable' : outcome?.status === 'observation' ? 'observation-only' : 'unsupported',
           commandId: intent.commandId, eventId: event.id, dseq: event.dseq,eventTs:event.ts, reason: outcome?.reason ?? projection.error?.reason ?? projection.updateRequired?.reason ?? null,
@@ -288,7 +302,7 @@ export async function createReplicaBackend({ store, engine, catalog, localAuthor
       await store.reconcile({ events: Object.values(backup.payload.canonical), head: Math.max(state.head, backup.payload.head) });
       await refresh();
     },
-    dispose() { disposed = true; stop(); listeners.clear(); },
+    dispose() { disposed = true; stop(); listeners.clear(); finishRefreshWaiters(); },
     installation: store.scope.installation, learner: store.scope.learner,
   });
 }

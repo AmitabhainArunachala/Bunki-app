@@ -22,7 +22,7 @@ export function renderVocabularyRelated(document,entry,{onWord=()=>{},relatedWor
  const glyphs=[...new Set([...entry.term].filter(c=>/\p{Script=Han}/u.test(c)))];
  for(const glyph of glyphs){const data=entry.kanji?.find(k=>k.c===glyph),words=relatedWords.filter(e=>e.taskKey!==entry.taskKey&&e.term.includes(glyph)).slice(0,6),info=h('div',{class:'kanji-info'});
   if(data)info.append(h('div',{class:'kanji-heading'},data.r?h('p',{class:'reading'},data.r):null,data.m?h('p',{lang:'en'},data.m):null),data.parts?.length?h('p',{class:'secondary'},h('span',{'data-interface-copy':''},'部品'),'：',h('span',{'data-vocabulary-source':''},data.parts.join('・')),data.st?[' · ',h('span',{'data-interface-copy':''},`${data.st}画`)]:null):null,h('p',{class:'source-label','data-interface-copy':''},'配布デッキの漢字データ'));
-  else info.append(h('p',{class:'secondary','data-interface-copy':''},'部品・字義のデータは未接続'));
+  else info.append(h('p',{class:'secondary','data-interface-copy':''},'この漢字の詳しい情報はまだありません'));
   if(words.length)info.append(h('div',{class:'related-words'},...words.map(e=>h('button',{type:'button',class:'text-link',onclick:()=>onRelated(e)},e.term))));
   panel.append(h('div',{class:'kanji-row'},h('strong',{class:'kanji'},glyph),info));
  }

@@ -124,14 +124,7 @@ const SHELL = [
   // 集中道場 › デッキ opens offline from install
   'decks/player/engine.js',
   'decks/player/mount.js',
-  'decks/player/shared-mount.mjs',
-  'decks/player/shared-frame.mjs',
-  'decks/player/shared-frame.html',
-  'study-engine-adapter.mjs',
   'shared-study-content.mjs',
-  'shared-study-runtime.mjs',
-  'shared-study-storage.mjs',
-  'shared-study-presentation.mjs',
   'decks/player/player.css',
   'decks/player/host.js',
   // …with what mount.js fetches at load, so a first visit then offline still opens a deck
@@ -219,12 +212,11 @@ const SPEAK_ROOM = [
   'rooms/speak.css',
 ];
 const guidedAsset = (path) => path.startsWith('guided/') && !path.endsWith('.md');
-// The shared player is one canonical module closure and its bound content. The
-// release manifest supplies the exact paths; installation verifies every byte.
-const sharedStudyAsset = (path) => path.startsWith('vendor/shared-study-engine/') ||
-  path.startsWith('data/shared-study/') || path === 'data/shared-study-content.json' ||
-  /^decks\/(n2|n1|senmon|kotoba-master)\/deck\.json$/.test(path);
-const fontAsset = (path) => /^fonts\/[^/]+\.woff2$/.test(path);
+// Shared study modules/content are verified and cached on first bound use.
+// Shared fonts use the same verified reuse path, but are fetched lazily rather
+// than joining every ordinary Bunki installation's background download.
+const backgroundFontAsset = (path) => /^fonts\/[^/]+\.woff2$/.test(path);
+const fontAsset = (path) => backgroundFontAsset(path) || /^vendor\/shared-study-engine\/client\/app\/fonts\/[^/]+\.woff2$/.test(path);
 const fontUrl = (url) => url.startsWith(SCOPE) && fontAsset(url.slice(SCOPE.length));
 const PRECACHE_URLS = new Set(
   [...SHELL, ...BOOT_DATA, ...GUIDED_ROOM, ...SPEAK_ROOM].map((path) => new URL(path, SCOPE).href),
@@ -401,7 +393,7 @@ self.addEventListener('install', (event) => {
         networkAsset(WORKER_URL),
       ]);
       const release = await validateRelease(identity, worker);
-      const guided = [...release.entries.values()].map((entry) => entry.path).filter(path=>guidedAsset(path)||sharedStudyAsset(path));
+      const guided = [...release.entries.values()].map((entry) => entry.path).filter(guidedAsset);
       const urls = [
         ...new Set(
           [...SHELL.filter((path) => path !== '.'), ...BOOT_DATA, ...GUIDED_ROOM, ...SPEAK_ROOM, ...guided].map(
@@ -500,7 +492,7 @@ async function fillFonts() {
     await drainGeneration(name, cache, release, held).catch(() => {});
   }
   const missing = [...release.entries].filter(
-    ([url, entry]) => fontAsset(entry.path) && !held.has(url),
+    ([url, entry]) => backgroundFontAsset(entry.path) && !held.has(url),
   );
   const lane = async () => {
     for (let next = missing.shift(); next; next = missing.shift()) {

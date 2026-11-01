@@ -1,4 +1,5 @@
 /** Transactional replica store, QA-only until schema/reducer and real adapters are independently verified. */
+import {ownsReadSnapshot} from './storage/read-ownership.mjs';
 const FORMAT = 'nsrs-replica-store/v1';
 const ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/;
 const HASH = /^[a-f0-9]{64}$/;
@@ -37,7 +38,7 @@ function replica(config) {
   const { scope, adapter, codec, materialize, now, maxRecords, maxBytes, maxEventBytes, epoch, maxConflicts } = config;
   // Opt-in adapter contract: every read transfers an exclusively owned snapshot.
   // Generic adapters retain the defensive copies at both public and write boundaries.
-  const ownsRead = adapter.readSnapshotOwnership === 'caller';
+  const ownsRead = ownsReadSnapshot(adapter);
   const subscriptions = new Set();
   const eventHash = event => {
     const hash = codec.payloadHash(event);
@@ -129,10 +130,12 @@ function replica(config) {
       }
     }
   };
-  const transact = async transform => {
+  const transact = async (transform, recover = null) => {
     for (let attempt = 0; attempt < maxConflicts; attempt++) {
       const current = await load();
       check(compatibility(current) === null, 'schema-unsupported');
+      const recovered = recover?.(current);
+      if (recovered) return recovered;
       const expectedRevision = current.storageRevision;
       const candidate = ownsRead ? current : copy(current);
       const result = transform(candidate);
@@ -144,6 +147,41 @@ function replica(config) {
       }
     }
     throw new StoreError('storage-conflict');
+  };
+  const checkEventSize = ({ event, bodyHash }) => {
+    check(new TextEncoder().encode(JSON.stringify({ event, bodyHash })).byteLength <= maxEventBytes, 'event-too-large');
+  };
+  const append = async (command, findExisting = false) => {
+    check(command && typeof command.type === 'string' && command.data && typeof command.data === 'object' &&
+      Object.keys(command).every(k => ['type', 'data', 'ts'].includes(k)), 'invalid-command');
+    // Recovery requires the caller's stable wire timestamp, never a new now().
+    check(!findExisting || integer(command.ts), 'invalid-command');
+    const frozen = copy(command); const timestamp = frozen.ts ?? now();
+    check(integer(timestamp), 'invalid-command');
+    const dataWire = findExisting ? codec.canonicalStringify(frozen.data) : null;
+    return transact(state => {
+      const dseq = state.nextDseq;
+      // A review's threshold window is frozen when the front is shown. Sync can
+      // move appliedSeq between reveal, tap and CAS without changing that window.
+      const base = frozen.type === 'review' && frozen.data.hesitation
+        ? frozen.data.hesitation.base : state.appliedSeq;
+      check(integer(base) && base <= state.appliedSeq, 'invalid-command');
+      const event = { v: 4, id: `${scope.installation}:${dseq}`, learner: scope.learner, install: scope.installation, dseq,
+        base, ts: timestamp, epoch, policy: 'nsrs-policy-v1', type: frozen.type, data: copy(frozen.data) };
+      const record = { event, bodyHash: eventHash(event), ackedSeq: null };
+      check(inspectEvent(record, false, true), 'schema-unsupported');
+      checkEventSize(record);
+      state.local[event.id] = record; state.nextDseq++; state.locallyDurable = dseq;
+      reproject(state);
+      return { status: 'durable', event: copy(event), bodyHash: record.bodyHash, ...(findExisting ? { appended: true } : {}) };
+    }, findExisting ? state => {
+      const found = [...Object.values(state.local), ...Object.values(state.canonical)].find(record =>
+        record.event.install === scope.installation && record.event.ts === timestamp && record.event.type === frozen.type &&
+        codec.canonicalStringify(record.event.data) === dataWire);
+      if (!found) return null;
+      checkEventSize(found);
+      return { status: 'durable', event: copy(found.event), bodyHash: found.bodyHash, appended: false };
+    } : null);
   };
   const publicStore = {
     scope: Object.freeze(copy(scope)),
@@ -167,28 +205,11 @@ function replica(config) {
       return Object.values(state.local).filter(record => record.ackedSeq === null).sort((a, b) => a.event.dseq - b.event.dseq)
         .slice(0, limit).map(({ event, bodyHash }) => copy({ event, bodyHash }));
     }),
-    append: sanitized(async command => {
-      check(command && typeof command.type === 'string' && command.data && typeof command.data === 'object' &&
-        Object.keys(command).every(k => ['type', 'data', 'ts'].includes(k)), 'invalid-command');
-      const frozen = copy(command); const timestamp = frozen.ts ?? now();
-      check(integer(timestamp), 'invalid-command');
-      return transact(state => {
-        const dseq = state.nextDseq;
-        // A review's threshold window is frozen when the front is shown. Sync can
-        // move appliedSeq between reveal, tap and CAS without changing that window.
-        const base = frozen.type === 'review' && frozen.data.hesitation
-          ? frozen.data.hesitation.base : state.appliedSeq;
-        check(integer(base) && base <= state.appliedSeq, 'invalid-command');
-        const event = { v: 4, id: `${scope.installation}:${dseq}`, learner: scope.learner, install: scope.installation, dseq,
-          base, ts: timestamp, epoch, policy: 'nsrs-policy-v1', type: frozen.type, data: copy(frozen.data) };
-        const record = { event, bodyHash: eventHash(event), ackedSeq: null };
-        check(inspectEvent(record, false, true), 'schema-unsupported');
-        check(new TextEncoder().encode(JSON.stringify({ event, bodyHash: record.bodyHash })).byteLength <= maxEventBytes, 'event-too-large');
-        state.local[event.id] = record; state.nextDseq++; state.locallyDurable = dseq;
-        reproject(state);
-        return { status: 'durable', event: copy(event), bodyHash: record.bodyHash };
-      });
-    }),
+    append: sanitized(command => append(command)),
+    // Exact wire recovery shares the validated transaction load and CAS retry.
+    // A found event has appended:false: no write, revision bump or notification.
+    // A new event has appended:true only after the ordinary durable CAS commit.
+    appendOrFind: sanitized(command => append(command, true)),
     acknowledge: sanitized(async ({ acks, head }) => transact(state => {
       check(integer(head) && Array.isArray(acks), 'invalid-head');
       check(head >= state.head, 'head-regressed');
