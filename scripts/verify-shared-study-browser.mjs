@@ -6,25 +6,47 @@ import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import {chromium} from 'playwright-core';
 import {startStaticHost} from '../prototypes/bunki-desktop/lib/static-host.cjs';
 import {silenceBrowserAudio} from '../prototypes/corridor/tools/browser-audio-silence.mjs';
-const site=process.env.KAIRO_SITE_DIR,out=process.env.KAIRO_EVIDENCE_DIR;
-assert(site&&out,'Explicit built site and external evidence directory required');
-assert(resolve(out).startsWith(`${process.env.HOME}/.dharma/`),'Evidence must remain outside checkout');
+import {resolveCorridorSite,resolveCorridorEvidence} from './resolve-corridor-site.mjs';
+if (process.argv.includes('--if-ci')&&!process.env.CI&&!process.env.KAIRO_SITE_DIR) {
+  console.log('Shared-study browser check not requested locally; use npm run verify:shared-study:browser with an explicit built artifact.');
+  process.exit(0);
+}
+assert(process.env.KAIRO_SITE_DIR&&process.env.KAIRO_EVIDENCE_DIR,'Explicit built site and external evidence directory required (mandatory in CI)');
+const out=resolveCorridorEvidence(),site=resolveCorridorSite();
 mkdirSync(out,{recursive:true});
 const host=await startStaticHost({site,port:0});let browser;const receipt={checks:[],errors:[],sourceBuild:JSON.parse(readFileSync(resolve(site,'build-identity.json'))).artifactSha256};
 try {
-  browser=await chromium.launch({headless:true});receipt.browser=browser.version();
+  browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||undefined});receipt.browser=browser.version();
   const normalContext=await browser.newContext({viewport:{width:1280,height:820},serviceWorkers:'block'});await silenceBrowserAudio(normalContext);
   const normal=await normalContext.newPage(),normalRequests=[];normal.on('request',request=>normalRequests.push(new URL(request.url()).pathname));normal.on('pageerror',error=>receipt.errors.push(error.message));
-  await normal.goto(`${host.origin}/?deck=n2&ui=en`,{waitUntil:'domcontentloaded'});await normal.locator('#kp-start').waitFor({timeout:60000});
+  // A copied shared-only URL must neither enter the legacy loader nor poison
+  // the next normal deck with a sticky load error.
+  await normal.goto(`${host.origin}/?deck=shared-grammar&dojo=1&ui=en`,{waitUntil:'domcontentloaded'});
+  await normal.locator('[data-deck="n2"]').waitFor({timeout:60000});
+  assert.equal(await normal.locator('[data-deck="shared-grammar"]').count(),0);
+  assert.equal(await normal.getByText('The deck could not be opened.',{exact:true}).count(),0);
+  await normal.locator('[data-deck="n2"]').click();await normal.locator('#kp-start').waitFor({timeout:60000});
   assert.equal(await normal.locator('[data-shared-study-frame]').count(),0);
-  await normal.locator('#kp-start').click();await normal.locator('#kp-card').waitFor();await normal.keyboard.press('Space');await normal.locator('#kp-grade-good').click();
+  await normal.locator('#kp-start').click();await normal.locator('#kp-card').waitFor();await normal.keyboard.press('Space');await normal.locator('#kp-grade-again').click();
   await normal.waitForFunction(()=>Object.keys(JSON.parse(localStorage.getItem('bunki-cloze:n2')||'{}').cards||{}).length===1);
   const normalLedger=await normal.evaluate(()=>localStorage.getItem('bunki-cloze:n2'));
-  await normal.reload({waitUntil:'domcontentloaded'});await normal.locator('#kp-start').waitFor({timeout:60000});
+  await normal.goto(`${host.origin}/?deck=n2&ui=en`,{waitUntil:'domcontentloaded'});await normal.locator('#kp-start').waitFor({timeout:60000});
   assert.equal(await normal.evaluate(()=>localStorage.getItem('bunki-cloze:n2')),normalLedger);
+  const legacyCounts=await normal.evaluate(async()=>{
+    const player=await import('/decks/player/mount.js'),summary=await player.summary('n2'),misses=await player.missedTerms('n2',localStorage,0);
+    return {summary,misses};
+  });
+  assert.equal(legacyCounts.misses.length,1,'A normal-mode Again remains available to missed terms');
+  assert.equal(legacyCounts.misses[0].deck,'n2');assert(legacyCounts.misses[0].term);
+  await normal.goto(`${host.origin}/?dojo=1&ui=en`,{waitUntil:'domcontentloaded'});
+  await normal.locator('[data-deck="n2"] .dojo-deck-bar').waitFor({timeout:60000});
+  const row=normal.locator('[data-deck="n2"]');
+  assert.equal(Number(await row.locator('.dojo-deck-due b').textContent()),legacyCounts.summary.due);
+  assert.equal(Number(await row.locator('.dojo-deck-new b').textContent()),legacyCounts.summary.fresh);
+  assert.equal(await row.locator('.dojo-deck-bar').evaluate(node=>Number(node.style.getPropertyValue('--begun'))),1/legacyCounts.summary.words);
   assert.equal(await normal.evaluate(()=>Object.keys(localStorage).some(key=>key.startsWith('bunki-shared-study:'))),false);
   assert.deepEqual(normalRequests.filter(path=>path.includes('/vendor/shared-study-engine/')||path.includes('/data/shared-study')),[]);
-  receipt.checks.push('normal-route-keeps-legacy-player-and-durable-history','normal-route-does-not-load-shared-engine-or-data');await normalContext.close();
+  receipt.checks.push('normal-route-ignores-shared-grammar-and-next-deck-opens','normal-route-keeps-legacy-player-and-durable-history','normal-deck-list-counts-begun-and-missed-terms-use-legacy-ledger','normal-route-does-not-load-shared-engine-or-data');await normalContext.close();
   const context=await browser.newContext({viewport:{width:1280,height:820},serviceWorkers:'block'});await silenceBrowserAudio(context);
   const page=await context.newPage();page.on('pageerror',e=>receipt.errors.push(e.message));
   await page.addInitScript(()=>{window.__legacyWrites=[];for(const method of['put','add','delete','clear']){const original=IDBObjectStore.prototype[method];IDBObjectStore.prototype[method]=function(...args){if(!this.transaction.db.name.startsWith('bunki-shared-study-'))window.__legacyWrites.push({database:this.transaction.db.name,store:this.name,method});return original.apply(this,args);};}if(window===window.top&&!localStorage.getItem('bunki-cloze:n2'))localStorage.setItem('bunki-cloze:n2','{"format":"synthetic-preserved-legacy","cards":{"not-a-frozen-task":{}}}');});

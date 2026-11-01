@@ -27,6 +27,14 @@ const DATA = {
 function sharedStudyActive() {
   return !!window.bunkiSharedStudyHost || new URLSearchParams(location.search).get('sharedStudy') === 'preview';
 }
+function queryDeckRoute(params, hash = location.hash) {
+  const deck = params.get('deck');
+  if (deck === 'shared-grammar') return sharedStudyActive() ? deck : null;
+  if (['n2', 'n1', 'senmon', 'kotoba-master'].includes(deck)) return deck;
+  if (deck === 'mcd' || hash === '#mcd') return 'kotoba-mcd';
+  if (deck === 'kotoba' || hash === '#kotoba') return 'kotoba-mine';
+  return null;
+}
 function sharedStudyFence(main) {
   main.append(el('p','card-kind',tx('この練習は共通の学習にまだ対応していません。記録は保持されています。','This practice is not mapped to shared study. Its existing history is preserved.')));
 }
@@ -5039,9 +5047,10 @@ async function boot() {
   if (params.get('deck') === 'context' || location.hash === '#context') S.view = 'contextdeck';
   // ?deck=kotoba (or #kotoba) opens 言葉の鉱脈 straight away — a home-screen
   // shortcut that lands on the deck instead of the galaxy
-  if (['kotoba', 'mcd', 'n2', 'n1', 'senmon', 'kotoba-master', 'shared-grammar'].includes(params.get('deck')) || ['#kotoba', '#mcd'].includes(location.hash)) {
+  const queryDeck = queryDeckRoute(params);
+  if (queryDeck) {
     S.view = 'deckplay';
-    S.deckPlay = ['n2', 'n1', 'senmon', 'kotoba-master', 'shared-grammar'].includes(params.get('deck')) ? params.get('deck') : params.get('deck') === 'mcd' || location.hash === '#mcd' ? 'kotoba-mcd' : 'kotoba-mine';
+    S.deckPlay = queryDeck;
   }
   // Private collections leave through the same five destinations on a fresh
   // host page. These are UI routes only, never learner-record state.
@@ -35660,8 +35669,10 @@ function loadDeckPlayer() {
 
 let deckOpenRequest = null;
 function openDeck(id, { autoStart = false } = {}) {
+  if (id === 'shared-grammar' && !sharedStudyActive()) return;
   if (!roomTransitionUpdating && (S.view !== 'deckplay' || S.deckPlay !== id)) return roomTransition(() => openDeck(id, { autoStart }));
   keepScroll();
+  deckPlayerError = false;
   deckOpenRequest = { id, autoStart };
   S.deckPlay = id;
   S.view = 'deckplay';
@@ -35814,8 +35825,10 @@ function renderDeckPlay(main) {
     })
     .catch((err) => {
       console.error(err);
-      deckPlayerError = true;
-      if (S.view === 'deckplay') render();
+      if (S.view === 'deckplay' && S.deckPlay === deckId) {
+        deckPlayerError = true;
+        render();
+      }
     });
 }
 

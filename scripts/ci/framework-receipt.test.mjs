@@ -427,9 +427,9 @@ test('the reviewed framework rosters are the exact real-tree discovery universes
     counts[gate] = [roster.files.length, roster.universe.files.length];
   }
   assert.deepEqual(counts, {
-    vitest: [153, 153],
-    replay: [3, 153],
-    export: [1, 153],
+    vitest: [155, 155],
+    replay: [3, 155],
+    export: [1, 155],
     e2e: [13, 13],
     'corpus-pytest': [15, 19],
     'reading-facets': [1, 1],

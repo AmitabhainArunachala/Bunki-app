@@ -123,13 +123,25 @@ Run `node scripts/verify-shared-study.mjs`,
 and refuses local builds below 8 GiB free space. `npm test` also runs the pinned
 distribution/content verifier before Vitest. A compact reviewed source excerpt
 exercises the same content generator in CI without depending on an external path.
+This six-entry excerpt is an input fixture for the pure builder test, not a full
+`--source` directory for the synchronization CLI. Run it with
+`./node_modules/.bin/vitest run tools/shared-study.test.mjs -t 'rebuilds a compact reviewed source excerpt'`.
+Full 8,508-task reproduction still requires the reviewed source directory above.
 The stamped service worker verifies shared modules and content on first bound
 use. Shared fonts load lazily through its verified cache/reuse path; ordinary
 installation does not require the shared corpus or fonts. After an online bound
 visit, the cached study route reopens offline.
 
-`scripts/verify-shared-study-browser.mjs` takes `KAIRO_SITE_DIR` and
-`KAIRO_EVIDENCE_DIR`. It uses a fresh headless browser profile, no screenshots or
+`npm run verify:shared-study:browser` requires `KAIRO_SITE_DIR` and
+`KAIRO_EVIDENCE_DIR`; it never builds or installs dependencies. `npm test` runs
+the same browser guard once in the existing CI Vitest lane, which supplies the
+immutable artifact and installed browser. Missing CI inputs fail. Local
+`npm test` explicitly skips the browser guard only when no site is supplied.
+The existing site resolver verifies all stamped bytes before browser launch;
+`KAIRO_ARTIFACT_SHA256` can pin a previously built artifact while source is edited.
+It uses a fresh headless browser profile, no screenshots or
 native apps, and verifies the actual route, grammar renderer, durable history,
 shared allowance, unsupported-contract fence and absence of legacy writes.
-Runtime evidence belongs under `~/.dharma/`, outside this checkout.
+Normal-mode checks include the ignored shared-only grammar URL, subsequent deck
+opening, durable legacy grading, list counts, words begun and missed terms.
+Runtime evidence belongs under `~/.dharma/` (or CI `RUNNER_TEMP`), outside this checkout.

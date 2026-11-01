@@ -167,6 +167,8 @@
         "tools/kotoba-player-host.test.mjs",
         "tools/official-content-guard.test.mjs",
         "tools/official-private-pack.test.mjs",
+        "tools/shared-study-fixtures.test.mjs",
+        "tools/shared-study.test.mjs",
         "tools/srs-core.test.mjs",
         "tools/srs-hooks.test.mjs",
         "tools/sw-shell.test.mjs"
@@ -383,6 +385,8 @@
         "tools/kotoba-player-host.test.mjs",
         "tools/official-content-guard.test.mjs",
         "tools/official-private-pack.test.mjs",
+        "tools/shared-study-fixtures.test.mjs",
+        "tools/shared-study.test.mjs",
         "tools/srs-core.test.mjs",
         "tools/srs-hooks.test.mjs",
         "tools/sw-shell.test.mjs"

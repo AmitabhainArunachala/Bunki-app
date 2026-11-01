@@ -4,6 +4,8 @@ import {createHash} from 'node:crypto';
 import {spawnSync} from 'node:child_process';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
+import vm from 'node:vm';
+import ts from 'typescript';
 import {decodeSharedContent,SHARED_DECKS} from '../prototypes/corridor/shared-study-content.mjs';
 import {createBunkiStudyAdapter,createBunkiAttempt} from '../prototypes/corridor/study-engine-adapter.mjs';
 import {createStudyEngine,createMemoryAdapter,dayBounds,payloadHash,canonicalStringify} from '../prototypes/corridor/vendor/shared-study-engine/client/engine.mjs';
@@ -18,8 +20,92 @@ const small={pin,catalog:selected,registry:{tasks:content.registry.tasks.filter(
 function memory(){let writes=0,failAfter=false;const adapter=createMemoryAdapter({afterCommit:()=>{writes++;if(failAfter){failAfter=false;throw Error('lost-ack');}}});return {...adapter,get writes(){return writes;},loseAck(){failAfter=true;}};}
 function grant(installation,n=2,seq=1){const event={v:4,id:`@server:${seq}`,learner:'test-shared',install:'@server',dseq:seq,base:seq-1,ts:NOW,epoch:0,policy:'nsrs-policy-v1',type:'permit-grant',data:{install:installation,permitIds:Array.from({length:n},(_,i)=>`permit-${seq}-${i}`),...dayBounds(NOW,'Asia/Tokyo')}};return {seq,rt:NOW,authority:'server',event,bodyHash:payloadHash(event)};}
 async function fixture(installation='test-bunki',storage=memory(),events=[grant(installation)]){let n=0;const adapter=await createBunkiStudyAdapter({content:small,storage,identity:{learner:'test-shared',environment:'test-shared',installation,mode:'fresh'},now:()=>NOW,uuid:()=>`${installation}-intent-${++n}`,initialize:async({store})=>store.reconcile({events,head:events.length})});return {adapter,storage};}
+// Execute the product's actual function bodies with synthetic host dependencies.
+// AST extraction avoids a second implementation of routing/authority decisions.
+const parsedSources=new Map();
+function productFunction(path,name){
+  if(!parsedSources.has(path))parsedSources.set(path,ts.createSourceFile(path,readFileSync(new URL(path,root),'utf8'),ts.ScriptTarget.Latest,true,ts.ScriptKind.JS));
+  const declaration=parsedSources.get(path).statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text===name);
+  if(!declaration)throw Error(`Missing product function ${path}:${name}`);
+  return declaration.getText().replace(/^export\s+/, '');
+}
+function productContext(path,names,dependencies){
+  const context=vm.createContext({...dependencies,URLSearchParams});
+  vm.runInContext(names.map(name=>productFunction(path,name)).join('\n'),context);
+  return context;
+}
 
 describe('Bunki canonical shared study consumer',()=>{
+  it('requires the existing artifact in CI and refuses tampered bytes before launching a browser',()=>{
+    const script=new URL('../scripts/verify-shared-study-browser.mjs',import.meta.url).pathname;
+    const env={...process.env,CI:'true'};delete env.KAIRO_SITE_DIR;delete env.KAIRO_EVIDENCE_DIR;delete env.KAIRO_ARTIFACT_SHA256;
+    const missing=spawnSync(process.execPath,[script,'--if-ci'],{encoding:'utf8',env});
+    expect(missing.status).not.toBe(0);expect(missing.stderr).toContain('Explicit built site and external evidence directory required');
+    const local=spawnSync(process.execPath,[script,'--if-ci'],{encoding:'utf8',env:{...env,CI:''}});
+    expect(local.status).toBe(0);expect(local.stdout).toContain('not requested locally');
+    const direct=spawnSync(process.execPath,[script],{encoding:'utf8',env:{...env,CI:''}});
+    expect(direct.status).not.toBe(0);
+    const temporary=mkdtempSync(join(tmpdir(),'bunki-browser-artifact-')),site=join(temporary,'site');
+    try {
+      mkdirSync(site);const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
+      const assets={'index.html':'<!doctype html>','corridor.js':'original','manifest.webmanifest':'{}','sw.js':`self.KAIRO_ASSET_VERSION = "${'a'.repeat(64)}";\n`};
+      const files=Object.entries(assets).sort().map(([path,bytes])=>{writeFileSync(join(site,path),bytes);return {path,bytes:Buffer.byteLength(bytes),sha256:hash(bytes)};});
+      const artifactSha256=hash(JSON.stringify(files));
+      writeFileSync(join(site,'build-identity.json'),JSON.stringify({schemaVersion:1,product:'KAIRO',gitSha:'b'.repeat(40),sourceDirty:false,sourceAssetSha256:'a'.repeat(64),artifactSha256,files}));
+      writeFileSync(join(site,'corridor.js'),'tampered');
+      const changed=spawnSync(process.execPath,[script,'--if-ci'],{encoding:'utf8',env:{...env,RUNNER_TEMP:temporary,KAIRO_SITE_DIR:site,KAIRO_EVIDENCE_DIR:join(temporary,'evidence'),KAIRO_ARTIFACT_SHA256:artifactSha256}});
+      expect(changed.status).not.toBe(0);expect(changed.stderr).toContain('Asset digest mismatch: corridor.js');
+    } finally {rmSync(temporary,{recursive:true,force:true});}
+    const scripts=JSON.parse(readFileSync(new URL('../package.json',import.meta.url))).scripts;
+    expect(scripts.test).toContain('node scripts/verify-shared-study-browser.mjs --if-ci');
+    expect(scripts['verify:shared-study:browser']).toBe('node scripts/verify-shared-study-browser.mjs');
+  });
+  it('ignores the grammar-only query unless preview or a bound host owns study, and recovers after a failed deck',()=>{
+    const state={view:'dojo',deckPlay:'n1'};
+    const c=productContext('corridor.js',['sharedStudyActive','queryDeckRoute','openDeck'],{
+      window:{scrollTo(){}},location:{search:'',hash:''},S:state,roomTransitionUpdating:true,keepScroll(){},render(){},deckPlayerError:true,
+    });
+    const params=deck=>new URLSearchParams({deck});
+    expect(c.queryDeckRoute(params('shared-grammar'))).toBe(null);
+    c.openDeck('shared-grammar');expect(state).toEqual({view:'dojo',deckPlay:'n1'});
+    for(const deck of SHARED_DECKS)expect(c.queryDeckRoute(params(deck))).toBe(deck);
+    expect(c.queryDeckRoute(params('mcd'))).toBe('kotoba-mcd');expect(c.queryDeckRoute(params('kotoba'))).toBe('kotoba-mine');
+    c.openDeck('n2');expect(state).toEqual({view:'deckplay',deckPlay:'n2'});expect(c.deckPlayerError).toBe(false);
+    for(const mode of ['preview','host']){
+      c.location.search=mode==='preview'?'?sharedStudy=preview':'';c.window.bunkiSharedStudyHost=mode==='host'?{}:null;
+      expect(c.queryDeckRoute(params('shared-grammar'))).toBe('shared-grammar');
+    }
+  });
+  it('retains normal legacy counts and missed terms while selecting shared authority only in shared mode',async()=>{
+    let shared=false,sharedCalls=0;
+    const storage={},deck={id:'n2',words:[{},{}],titleJa:'語',titleEn:'Words'},state={log:[['word-a-card',1,new Date(NOW).toISOString()]]};
+    const p=productContext('decks/player/mount.js',['summary','missedTerms'],{
+      isSharedStudyMode:()=>shared,isSharedDeck:id=>SHARED_DECKS.includes(id),window:{localStorage:storage},
+      loadDeck:async()=>({deck,index:{cards:new Map([['word-a-card',{word:{term:'語',reading:'ご'}}]])}}),
+      loadState:()=>({state}),prefsFor:()=>({newPerDay:5}),buildQueue:()=>({due:[1],fresh:[2,3],queue:[1,2,3]}),skipFor:()=>null,buriedToday:()=>[],RATINGS:{again:1},
+      sharedPlayer:async()=>({summary:async()=>{sharedCalls++;return {authority:'shared'};},missedTerms:async()=>{sharedCalls++;return [{term:'shared'}];}}),
+    });
+    expect(await p.summary('n2')).toMatchObject({due:1,fresh:2,total:3,words:2});
+    expect(await p.missedTerms('n2',storage,NOW)).toEqual([{term:'語',reading:'ご',at:NOW,deck:'n2'}]);expect(sharedCalls).toBe(0);
+    shared=true;expect(await p.summary('n2')).toEqual({authority:'shared'});expect(await p.missedTerms('n2')).toEqual([{term:'shared'}]);expect(sharedCalls).toBe(2);
+    expect(await p.summary('kotoba-mine')).toMatchObject({total:0,authority:'unmapped'});expect(await p.missedTerms('kotoba-mine')).toEqual([]);
+  });
+  it('preserves normal legacy save and begun counts but fences those paths when shared mode is bound',()=>{
+    let shared=false;const writes=[],ctx={deck:{id:'n2'},storage:{}};
+    const p=productContext('decks/player/mount.js',['save'],{ctx,isSharedStudyMode:()=>shared,stateKey:id=>`bunki-cloze:${id}`,writeRaw:(...args)=>{writes.push(args);return true;}});
+    expect(p.save({cards:{one:{}}})).toBe(true);expect(writes).toHaveLength(1);expect(writes[0][1]).toBe('bunki-cloze:n2');
+    shared=true;expect(p.save({cards:{two:{}}})).toBe(false);expect(writes).toHaveLength(1);
+    const c=productContext('corridor.js',['deckWordsBegun'],{sharedStudyActive:()=>shared,deckSummaries:{n2:{begun:99}},localStorage:{getItem:()=>JSON.stringify({cards:{'first-a':{},'first-b':{},'second-a':{}}})}});
+    shared=false;expect(c.deckWordsBegun('n2')).toBe(2);shared=true;expect(c.deckWordsBegun('n2')).toBe(99);
+  });
+  it('enters the real legacy render path normally and dynamically selects the shared mount only when bound',async()=>{
+    let shared=false;const calls=[],p=productContext('decks/player/mount.js',['render'],{
+      window:{localStorage:{}},isSharedStudyMode:()=>shared,isSharedDeck:id=>SHARED_DECKS.includes(id),mountRequest:0,ctx:null,pendingStart:null,
+      ensureCss(){throw Error('legacy-render-entered');},sharedPlayer:async()=>({render:()=>calls.push('shared'),renderSharedFence:()=>calls.push('fenced')}),
+    });
+    await expect(p.render({}, {deckId:'n2'})).rejects.toThrow('legacy-render-entered');expect(calls).toEqual([]);
+    shared=true;await p.render({}, {deckId:'n2'});await p.render({}, {deckId:'kotoba-mine'});expect(calls).toEqual(['shared','fenced']);
+  });
   it('runs the independently pinned distribution/content verifier in the unit test lane',()=>{
     const result=spawnSync(process.execPath,[new URL('../scripts/verify-shared-study.mjs',import.meta.url).pathname],{encoding:'utf8'});
     expect(result.status,result.stderr).toBe(0);
