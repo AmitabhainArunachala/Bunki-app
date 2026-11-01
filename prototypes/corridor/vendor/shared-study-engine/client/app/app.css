@@ -340,3 +340,20 @@ section:has(>.word-list)>h2~.setting-row textarea{width:100%;min-height:88px}
 
 /* Interface bilingual copy; source cards keep their own typography. */
 :root{text-autospace:normal}.interface-twin{display:inline-flex;flex-direction:column;vertical-align:baseline;max-width:100%}.interface-twin > .interface-secondary{display:block;font-size:13px;font-weight:400;line-height:1.5;color:var(--secondary)}
+
+/* Today: one current action, then a restrained view of upcoming work. */
+.today-plan { display:grid; gap:16px; }
+.today-plan > p { margin:0; }
+.today-counts { font-size:clamp(23px,3vw,32px); line-height:1.55; font-variant-numeric:tabular-nums; }
+.today-plan .today-actions { margin-top:8px; }
+.today-plan .today-actions .primary { min-width:180px; }
+.today-totals { border-top:1px solid var(--line); padding-top:16px; font-variant-numeric:tabular-nums; }
+.day-condition { max-width:65ch; }
+.forecast-strip { list-style:none; display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:12px; padding:0; margin:24px 0 16px; }
+.forecast-strip li { display:grid; grid-template-rows:auto 48px auto; justify-items:center; align-items:end; gap:6px; font-size:13px; font-variant-numeric:tabular-nums; text-align:center; }
+.forecast-bar { display:block; height:var(--forecast-height); min-height:1px; max-width:44px; width:75%; background:var(--accent); opacity:.65; }
+.today-forecast .secondary,.study-offer .secondary { font-size:13px; }
+.study-offer { margin:18px 0; }
+.study-offer p { margin:8px 0 0; }
+.continuity { margin-top:24px; }
+@media(max-width:640px){.today-plan { gap:14px; }.today-plan .today-actions { align-items:stretch; flex-direction:column; }.today-plan .today-actions button { width:100%; }.forecast-strip { gap:5px; }.forecast-strip li { font-size:12px; }.today-counts { font-size:24px; }}

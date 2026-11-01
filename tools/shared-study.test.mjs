@@ -6,7 +6,7 @@ import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import vm from 'node:vm';
 import ts from 'typescript';
-import {decodeSharedContent,SHARED_DECKS} from '../prototypes/corridor/shared-study-content.mjs';
+import {decodeSharedContent,SHARED_DECKS,moduleForSharedDeck} from '../prototypes/corridor/shared-study-content.mjs';
 import {createBunkiStudyAdapter,createBunkiAttempt} from '../prototypes/corridor/study-engine-adapter.mjs';
 import {createStudyEngine,createMemoryAdapter,dayBounds,payloadHash,canonicalStringify} from '../prototypes/corridor/vendor/shared-study-engine/client/engine.mjs';
 import {buildSharedStudyBinding} from '../scripts/shared-study-binding.mjs';
@@ -36,6 +36,34 @@ function productContext(path,names,dependencies){
 }
 
 describe('Bunki canonical shared study consumer',()=>{
+  it('maps each shared host door to the canonical initial-module API',()=>{
+    expect([...SHARED_DECKS,'shared-grammar'].map(moduleForSharedDeck)).toEqual(['n2','n1','senmon','kotoba','grammar']);
+    for(const id of ['kotoba-mine','kotoba-mcd','context',null,'all'])expect(()=>moduleForSharedDeck(id)).toThrow('unmapped-shared-contract');
+  });
+  it('offers only held permits without an explicitly enabled bound reserve authority',async()=>{
+    const {adapter}=await fixture();expect(adapter.platform.canRequestNewCards()).toBe(false);expect(adapter.platform.requestNewCards).toBeUndefined();
+    expect((await adapter.summary('n2')).fresh).toBe(2);expect(adapter.now()).toBe(NOW);
+    let calls=0;
+    const bound=await createBunkiStudyAdapter({content:small,storage:memory(),identity:{learner:'test-shared',environment:'test-shared',installation:'test-bunki',mode:'fresh'},now:()=>NOW,
+      transport:{reserveNewPermits:async()=>{calls++;}}});
+    expect(bound.platform.canRequestNewCards()).toBe(false);
+    await expect(bound.platform.requestNewCards()).rejects.toThrow('shared-permit-authority-unavailable');
+    expect(calls).toBe(0);expect((await bound.summary('n2')).fresh).toBe(0);
+  });
+  it('awaits the actual enabled host reserve and refuses disabled or offline requests without a grant',async()=>{
+    let enabled=false,online=true,calls=0,release;
+    const waiting=new Promise(resolve=>{release=resolve;});
+    const adapter=await createBunkiStudyAdapter({content:small,storage:memory(),identity:{learner:'test-shared',environment:'test-shared',installation:'test-bunki',mode:'fresh'},now:()=>NOW,
+      canRequestNewCards:()=>enabled,isOnline:()=>online,transport:{reserveNewPermits:async({store})=>{calls++;await waiting;await store.reconcile({events:[grant('test-bunki',1)],head:1});return {kind:'reserved'};}}});
+    expect(adapter.platform.canRequestNewCards()).toBe(false);
+    await expect(adapter.platform.requestNewCards()).rejects.toThrow('shared-permit-authority-unavailable');
+    enabled=true;online=false;expect(adapter.platform.isOnline()).toBe(false);
+    await expect(adapter.platform.requestNewCards()).rejects.toThrow('shared-permit-offline');expect(calls).toBe(0);
+    online=true;expect(adapter.platform.canRequestNewCards()).toBe(true);const pending=adapter.platform.requestNewCards();
+    expect(calls).toBe(1);expect((await adapter.summary('n2')).fresh).toBe(0);
+    release();expect(await pending).toEqual({kind:'reserved'});expect((await adapter.summary('n2')).fresh).toBe(1);
+    enabled=false;await expect(adapter.platform.requestNewCards()).rejects.toThrow('shared-permit-authority-unavailable');expect(calls).toBe(1);
+  });
   it('requires the existing artifact in CI and refuses tampered bytes before launching a browser',()=>{
     const script=new URL('../scripts/verify-shared-study-browser.mjs',import.meta.url).pathname;
     const env={...process.env,CI:'true'};delete env.KAIRO_SITE_DIR;delete env.KAIRO_EVIDENCE_DIR;delete env.KAIRO_ARTIFACT_SHA256;

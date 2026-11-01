@@ -14,7 +14,7 @@
   },
   "source": {
     "repository": "nihongo-srs",
-    "commit": "445d382c9f2ea2d6ac0691f865e0f12d00f36f6d",
+    "commit": "dccb2dc411c01b562729eb7037ed0d00a9f1c410",
     "mode": "committed",
     "changedFiles": []
   },
@@ -27,7 +27,7 @@
     "client/replay.mjs": "f564bd01906409b145419c33b5a4db688e94b163e2ca94e5ce36213909ce7430",
     "client/player/replica-backend.mjs": "ede916d0014db9c2c1fd67c91eeced52400e0bdb6ad341e2b96267503f396aca",
     "client/store.mjs": "f922dee2d10fa7074a48d4129602a00ff5ee1acefe6aca1ee03968d1f69b1089",
-    "client/player/study-sessions.mjs": "acbaba57b3a8bd82b9edcd4783d1c0a797a679661251f4000bd30a038d3b3521",
+    "client/player/study-sessions.mjs": "65894f30ff741cec3b37d7be2e692167fb827ef6904894c9732fc07dcb02af53",
     "client/app/local-budget.mjs": "f561b0f793d160cd5de57f52fca5a52025ae2973de7e8b7333af77c1012d6fbd",
     "client/app/corpus-inventory.mjs": "805f9be37b9224d26775426750211cce106490743134c397eec95a377fdce0bd",
     "client/storage/indexeddb.mjs": "991ea298d5a21d3d22bd6f722326e8667b8bbc0e74824a18499ec4a0f040133f",
@@ -39,13 +39,13 @@
   "files": [
     {
       "path": "client/app/app.css",
-      "bytes": 37098,
-      "sha256": "087e8c5f6fd6d223360e70677bd68ad230f483d28dfa197b9ab551c3821ff3e9"
+      "bytes": 38509,
+      "sha256": "f0a06d4ef8be7c5950060667ba884bb90e24eac707762f160559d95f000d9877"
     },
     {
       "path": "client/app/app.mjs",
-      "bytes": 82098,
-      "sha256": "b1048864a14edc04d082e83f81addf8fa0ec4a7ea1ca04ed6ff240f0967c4cc7"
+      "bytes": 94053,
+      "sha256": "ac0ce664c0f643407242543f69842dbd1ec1953cdca6cb062be3c89d36175d5d"
     },
     {
       "path": "client/app/corpus-inventory.mjs",
@@ -1324,13 +1324,18 @@
     },
     {
       "path": "client/app/interface-language.mjs",
-      "bytes": 39531,
-      "sha256": "f837e72a16f00f8737f839fa1fd159a7df5fae06e355641e65997461848f50cb"
+      "bytes": 42576,
+      "sha256": "1e767f8668f37eeaf3932f7de66a381e57a2ec30944cbb754994252c309c4756"
     },
     {
       "path": "client/app/local-budget.mjs",
       "bytes": 3770,
       "sha256": "f561b0f793d160cd5de57f52fca5a52025ae2973de7e8b7333af77c1012d6fbd"
+    },
+    {
+      "path": "client/app/study-loop.mjs",
+      "bytes": 13513,
+      "sha256": "da6241168286561cf4755f227c60c7cbf6f49acab6f4eee18ad44a0c4365f494"
     },
     {
       "path": "client/content/translation-coverage.mjs",
@@ -1389,8 +1394,8 @@
     },
     {
       "path": "client/player/study-sessions.mjs",
-      "bytes": 4199,
-      "sha256": "acbaba57b3a8bd82b9edcd4783d1c0a797a679661251f4000bd30a038d3b3521"
+      "bytes": 4354,
+      "sha256": "65894f30ff741cec3b37d7be2e692167fb827ef6904894c9732fc07dcb02af53"
     },
     {
       "path": "client/player/vocabulary.mjs",
@@ -1473,5 +1478,5 @@
       "sha256": "adab18734248871867be9cf62fa25b58cce3f3f37a34a81e714b0b1b26e10dba"
     }
   ],
-  "closureSha256": "08e15d1a7367d43dcdc34390d0c74730285405500d7797836ef9e018bb7dbea1"
+  "closureSha256": "055713f73d4281b63f07c0ce8e7998ac508b0b44dda74909bac8336c7f47f757"
 }

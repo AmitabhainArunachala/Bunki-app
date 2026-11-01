@@ -7,6 +7,7 @@ import { dayBounds } from '../replay.mjs';
 import {translateInterfaceText,formatInterfaceText,defaultInterfaceLanguage,renderInterfacePair} from './interface-language.mjs';
 import {nextStep} from '../vendor/engine.js';
 import {customSessionPanel} from './custom-session.mjs';
+import {studyDayView} from './study-loop.mjs';
 import {watchLocalDayBudget} from './local-budget.mjs';
 const MODULES = [['all','すべて','すべてのデッキ'],['n2','N2','日本語能力試験'],['n1','N1','日本語能力試験'],['senmon','専門','考えを深める言葉'],['kotoba','わたしの言葉','拾い集めた言葉'],['grammar','文法','意味・思い出す']];
 const GRADES = [[1,'もう一度','Again','再'],[2,'難しい','Hard','難'],[3,'正解','Good','良'],[4,'簡単','Easy','易']];
@@ -40,12 +41,13 @@ export function nextRapidFireStudy(backend,module='all',at=Date.now(),gradedTask
 }
 
 /** Actual DOM app; backend commands own every learner mutation. */
-export function mountStudyApp(root, { backend, catalog, themes, grammar = null, dictionary = null, platform = {}, corpus = null, legacyHistory = null, preferences = globalThis.localStorage, now = Date.now }) {
+export function mountStudyApp(root, { backend, catalog, themes, grammar = null, dictionary = null, platform = {}, corpus = null, legacyHistory = null, preferences = globalThis.localStorage, now = Date.now, initialModule = 'all' }) {
+  if(!MODULES.some(([id])=>id===initialModule))throw Error('invalid-initial-module');
   const document = root.ownerDocument, win = document.defaultView;
   const pairedPhone = ['paired-dev','paired-prod'].includes(platform.storageKind);
   const h = (tag, attrs, ...children) => createNode(document, tag, attrs, ...children);
   const button = (text, fn, attrs = {}) => h('button', { type:'button', onclick: fn, ...attrs }, text);
-  let screen = 'today', module = 'all', current = null, busy = false, notice = '', pendingIntent = null, pendingAction = null, factoryRetry = null, disposed = false, pop = null, lastReview = null;
+  let screen = 'today', module = initialModule, current = null, busy = false, notice = '', pendingIntent = null, pendingAction = null, factoryRetry = null, disposed = false, pop = null, lastReview = null;
   let nativeSyncState={paired:false,state:'idle',error:null},nativeSyncBusy=false,nativeStatusGeneration=0,nativeSyncActionError=null,nativePairDraft='';
   let saveStatusGeneration=0,noticeOwner=null;
   let saveBacklogSince=null,saveBacklogTimer=null,lastSaveStatus=null;
@@ -53,7 +55,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   let swipeGrading=false;try{swipeGrading=preferences.getItem('nihongo.swipe-grading.v1')==='true';}catch{}
   const shippedCatalog=catalog;
   const customOptions={mode:'review-ahead',aheadDays:1,size:20,untilDone:false,filters:{level:'',module:'all',tag:'',recentlyFailed:false,order:'due'}};
-  let customRun=null,customBusy=false;
+  let customRun=null,customBusy=false,pausedStudy=null,scheduledPage=0;
   let budgetWatcher=null;
   let pendingObservation=false;
   const manualDraft={word:'',reading:'',meaning:'',example:'',note:''};
@@ -62,6 +64,11 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   let weekdayDraft={},weekdayPending=null;
   let interfaceLanguage=defaultInterfaceLanguage(win.navigator);try{const stored=preferences.getItem('nihongo.interface-language.v1');if(['ja','en','both'].includes(stored))interfaceLanguage=stored;}catch{}
   const originalLabels=new WeakMap(),originalAttributes=new WeakMap(),cardViews=new WeakMap();
+  const copy=(tag,ja,en,attrs={})=>renderInterfacePair(h(tag,attrs),ja,en,interfaceLanguage,{inline:tag==='button'});
+  const copyButton=(ja,en,action,attrs={})=>copy('button',ja,en,{type:'button',onclick:action,...attrs});
+  const online=()=>typeof platform.isOnline==='function'?platform.isOnline():win.navigator.onLine!==false;
+  const canRequestNewCards=()=>typeof platform.requestNewCards==='function'&&(typeof platform.canRequestNewCards==='function'?platform.canRequestNewCards({nativeSyncState}):platform.canRequestNewCards===true);
+  const dayView=()=>studyDayView(backend.readProjection(),catalog,{at:now(),installation:backend.installation,queue:backend.queue(),offline:!online(),canRequestPermits:canRequestNewCards()});
   function localized(jp){return formatInterfaceText(jp,interfaceLanguage);}
   const sourceCopy='.passage,.grammar-front,.grammar-back,[data-vocabulary-entry],[data-vocabulary-source]';
   const isSourceCopy=element=>element.closest(sourceCopy)&&!element.closest('[data-interface-copy]');
@@ -140,7 +147,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     if (disposed||generation!==saveStatusGeneration) return;
     if(noticeOwner==='save-status')message('');
     paintSaveStatus(status);
-    if(platform.nativeSync&&!nativeSyncBusy){const generation=++nativeStatusGeneration;try{const sync=await platform.nativeSync.status();if(disposed||generation!==nativeStatusGeneration)return;const pairedChanged=nativeSyncState.paired!==sync.paired;nativeSyncState=sync;if(pairedChanged&&screen==='settings'){render();return;}const state=root.querySelector('[data-native-sync-status]');if(state){const description=nativeSyncDescription();renderInterfacePair(state,description,translateInterfaceText(description),interfaceLanguage);}}catch(error){if(!disposed&&generation===nativeStatusGeneration){nativeSyncState={...nativeSyncState,state:'error',error:['authentication-required','credential-storage-failed','invalid-credential'].includes(error?.message)?error.message:'status-unavailable'};const state=root.querySelector('[data-native-sync-status]');if(state){const description=nativeSyncDescription();renderInterfacePair(state,description,translateInterfaceText(description),interfaceLanguage);}}}}
+    if(platform.nativeSync&&!nativeSyncBusy){const generation=++nativeStatusGeneration;try{const sync=await platform.nativeSync.status();if(disposed||generation!==nativeStatusGeneration)return;const pairedChanged=nativeSyncState.paired!==sync.paired,couldRequest=canRequestNewCards();nativeSyncState=sync;if((pairedChanged||couldRequest!==canRequestNewCards())&&['today','settings'].includes(screen)){render();return;}const state=root.querySelector('[data-native-sync-status]');if(state){const description=nativeSyncDescription();renderInterfacePair(state,description,translateInterfaceText(description),interfaceLanguage);}}catch(error){if(!disposed&&generation===nativeStatusGeneration){nativeSyncState={...nativeSyncState,state:'error',error:['authentication-required','credential-storage-failed','invalid-credential'].includes(error?.message)?error.message:'status-unavailable'};const state=root.querySelector('[data-native-sync-status]');if(state){const description=nativeSyncDescription();renderInterfacePair(state,description,translateInterfaceText(description),interfaceLanguage);}}}}
     if(disposed||generation!==saveStatusGeneration)return;
     paintSaveStatus(status);
   }
@@ -148,7 +155,8 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     lastSaveStatus=status;
     const paired=['paired-dev','paired-prod','native-worker-qa'].includes(platform.storageKind)||nativeSyncState.paired;
     const synced=paired&&status.pendingUpload===0&&status.applied===status.head&&(!platform.nativeSync||nativeSyncState.state==='up-to-date');
-    const detail=nativeSyncNeedsAttention()?nativeSyncDescription():'';
+    const hostError=platform.getSyncError?.();
+    const detail=nativeSyncNeedsAttention()?nativeSyncDescription():hostError==='update-required'?'アプリの更新が必要です。記録は端末に残っています。':hostError==='authentication-required'?'同期の設定を確認してください。記録は端末に残っています。':hostError?'通信を確認できませんでした。未送信の記録は端末に残っています。同じ操作を再試行できます。':'';
     const jp=detail||(!paired?'この端末に保存しました。同期は未設定です。':`${synced?'同期済み':'同期を待っています'}${status.pendingUpload?`・未送信${status.pendingUpload}件`:''}`);
     const en=detail?translateInterfaceText(detail):!paired?'Saved on this device. Sync is not set up.':`${synced?'Synced':'Waiting to sync'}${status.pendingUpload?` · ${status.pendingUpload} records not sent yet`:''}`;
     renderInterfacePair(statusLine,jp,en,interfaceLanguage);
@@ -160,12 +168,13 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const pendingFor=saveBacklogSince===null?0:win.performance.now()-saveBacklogSince;
     if(platform.storageKind==='native-worker-prod'&&backlog&&pendingFor<3000&&saveBacklogTimer===null)
       saveBacklogTimer=win.setTimeout(()=>{saveBacklogTimer=null;updateStatus();},3000-pendingFor);
-    statusLine.dataset.studySync=platform.storageKind==='native-worker-prod'&&(nativeSyncNeedsAttention()||backlog&&(!autoSyncAllowed()||pendingFor>=3000))?'attention':'quiet';
+    statusLine.dataset.studySync=hostError?'attention':platform.storageKind==='native-worker-prod'&&(nativeSyncNeedsAttention()||backlog&&(!autoSyncAllowed()||pendingFor>=3000))?'attention':'quiet';
     localize();
   }
   function message(text,owner=null) { notice = text; noticeOwner=owner; live.textContent = text;localize(); }
   function navigate(next) {
     if (busy || typedBusy || customBusy || pendingIntent) return message('保存を確認してから移動してください。失敗した場合は再試行できます。');
+    if(screen==='study'&&current&&!current.committed&&current.attempt.mode!=='practice')pausedStudy={day:dayBounds(now(),backend.readProjection().settings.learnerTimezone).day,module,taskKey:current.entry.taskKey,run:customRun?{options:customRun.options,taskKeys:[current.entry,...customRun.remaining].map(entry=>entry.taskKey)}:null};
     if (current?.revealed && !current.committed && current.attempt.mode!=='practice') {
       // A target lookup on an abandoned attempt gets its own revision-checked boost.
       const p = backend.readProjection(), t = p.tasks[current.entry.taskKey];
@@ -198,6 +207,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     if(pendingIntent&&!busy&&!(pairedPhone&&screen==='study'&&pendingIntent.type==='review'))main.after(h('div',{'data-retry-panel':'',class:'retry-panel',role:'status'},h('p',{},'保存を確認できていません。同じ操作を再試行できます。'),button('保存を再試行',()=>run(pendingIntent),{class:'primary','data-retry':''})));
     root.querySelector('[data-factory-retry-panel]')?.remove();
     if(factoryRetry)main.after(h('div',{'data-factory-retry-panel':'',class:'retry-panel'},button('カード作成の依頼を再試行',()=>submitFactory(factoryRetry),{class:'quiet','data-factory-retry':''})));
+    platform.onScreenChange?.({screen,settingsHost:main.querySelector('[data-host-settings]')});
     live.textContent = notice;localize();
     if(previousView?.current===current&&previousView.revealed===current?.revealed){const card=main.querySelector('[data-card]');if(card)card.scrollTop=previousScroll;}
     if(screen==='study'&&!pop&&!document.querySelector('dialog[open]'))focusStudyCard();
@@ -205,18 +215,52 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     budgetWatcher?.schedule();
   }
   function todayScreen() {
-    const p = backend.readProjection(), queue = backend.queue({module}),step=backend.sitting({module});
-    const today=backend.todayAllowance?.();
-    if(today&&(todayTotalDraft.day!==today.day||todayTotalDraft.timezone!==today.timezone))todayTotalDraft={day:today.day,timezone:today.timezone};
-    const section = h('section',{class:'today'},h('div',{class:'section-heading screen-head'},h('h1',{},'今日の学習'),h('p',{},displayDate(now(),{month:'long',day:'numeric',weekday:'long'}))));
-    const due = queue.filter(e => p.tasks[e.taskKey].card).length, availablePermits=Object.values(p.permits).filter(x=>!x.usedBy&&x.install===backend.installation&&x.startsAt<=now()&&x.endsAt>now()).length, plannedNew=Math.min(queue.length-due,availablePermits);
-    section.append(h('div',{class:'daily-intro sheet hero'},h('div',{},h('p',{class:'lead'}, queue.length ? '言葉に会って、思い出す。' : '次の学習まで、少し休憩。'),
-      h('p',{class:'secondary'},`復習 ${due} · 新規カード ${plannedNew} · 1日の新規カード上限はすべてのデッキ共通`)),
-      h('div',{class:'today-actions'},button(step.entry&&!step.pause?'学習を始める':step.pause?'次の学習ステップを待っています':'今できる復習はありません',() => start(step.entry),{class:'primary',disabled:!step.entry||!!step.pause,'data-start':''}),lastReview?button('元に戻す',undoLast,{class:'quiet','data-undo':''}):null,overrideLastReviewButton(p))));
-    if(step.pause){const time=new Date(step.at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hourCycle:'h23',timeZone:p.settings.learnerTimezone});section.append(h('div',{class:'learning-pause','data-learning-pause':''},h('p',{},`学習ステップが ${step.count} 件あります。次の予定は ${time} です。`),step.canEarly?button('次の学習ステップを今（少し早め）',()=>{const early=backend.sitting({module,ahead:true});if(early.entry&&!early.pause)start(early.entry,false,early.early);},{class:'primary','data-learn-ahead':''}):null));}
-    const continued=catalog.filter(e=>p.tasks[e.taskKey]?.card),carried=new Set(p.baselines.map(b=>b.taskKey)),todayBounds=today??dayBounds(now(),p.settings.learnerTimezone),todayKeys=new Set(p.reviews.filter(r=>!r.undoneAt&&r.at>=todayBounds.startsAt&&r.at<todayBounds.endsAt).map(r=>r.taskKey));
-    function scheduledList(entries,label,attrs){if(entries.length)section.append(h('section',{class:'sheet list-sheet'},h('h2',{},label),h('ul',{class:'forecast',...attrs},...entries.sort((a,b)=>Date.parse(p.tasks[a.taskKey].card.due)-Date.parse(p.tasks[b.taskKey].card.due)).slice(0,20).map(e=>{const due=p.tasks[e.taskKey].card.due;return h('li',{'data-task-key':e.taskKey,'data-scheduled-due':due},button(e.term,()=>start(e,true),{class:'text-link','data-vocabulary-entry':''}),h('span',{},displayDate(due,{dateStyle:'short',timeStyle:'short',timeZone:p.settings.learnerTimezone})));}))));}
-    scheduledList(continued.filter(e=>carried.has(e.taskKey)),'引き継いだカード',{'data-continued-tasks':''});scheduledList(continued.filter(e=>!carried.has(e.taskKey)&&todayKeys.has(e.taskKey)),'今日の学習',{'data-today-learning':''});scheduledList(continued.filter(e=>!carried.has(e.taskKey)&&!todayKeys.has(e.taskKey)),'学習中のカード',{'data-ongoing-learning':''});
+    const p=backend.readProjection(),view=dayView(),today=view.today,queue=backend.queue({module});
+    if(todayTotalDraft.day!==today.day||todayTotalDraft.timezone!==today.timezone)todayTotalDraft={day:today.day,timezone:today.timezone};
+    if(pausedStudy&&(pausedStudy.day!==today.day||pausedStudy.module!==module))pausedStudy=null;
+    const section=h('section',{class:'today','data-today-state':view.firstDay?'first-day':view.finished?'finished':view.backlog?'backlog':'ready'},
+      h('div',{class:'section-heading screen-head'},h('h1',{},view.finished&&!view.firstDay?'今日の学習は終わりました':'今日の学習'),h('p',{},displayDate(now(),{month:'long',day:'numeric',weekday:'long',timeZone:today.timezone}))));
+    const hero=h('div',{class:'sheet today-plan','data-today-plan':''});
+    const dueText=view.backlog?`復習${view.due}枚（うち期日超過${view.overdue}枚）`:`復習${view.due}枚`;
+    const dueEnglish=view.backlog?`${view.due} due (${view.overdue} overdue)`:`${view.due} due`;
+    if(!view.finished||view.firstDay)hero.append(copy('p',view.firstDay&&!view.due?`新規カード${view.newToday}枚`:`${dueText}・新規${view.newToday}枚`,view.firstDay&&!view.due?`${view.newToday} new ${view.newToday===1?'card':'cards'}`:`${dueEnglish} · ${view.newToday} new`,{class:'today-counts','data-today-counts':''}));
+    if(view.estimateMinutes>0&&!view.firstDay)hero.append(copy('p',`約${view.estimateMinutes}分`,`About ${view.estimateMinutes} min`,{class:'secondary','data-study-estimate':''}));
+    hero.append(copy('p',`新規カード：1日${today.limit}枚（すべてのデッキ・iPhoneとMacで共通）`,`New cards: ${today.limit} a day, shared by all decks on iPhone and Mac`,{class:'secondary','data-shared-limit':''}));
+    if(view.firstDay)hero.append(h('p',{class:'secondary','data-first-day-help':''},today.limit===20?'学習したカードは翌日以降、復習として戻ってきます。1日20枚のペースを続けると、数か月後には1日およそ200枚の復習になります。':'学習したカードは翌日以降、復習として戻ってきます。'),button('1日の新規カード上限を変更',()=>{navigate('settings');main.querySelector('#study-pace-newPerDayTotal')?.focus();},{class:'text-link'}));
+    if(module!=='all'){const name=MODULES.find(([id])=>id===module)[1];hero.append(copy('p',`学習範囲：${name}`,`Studying: ${translateInterfaceText(name)}`,{class:'secondary','data-study-scope':''}));}
+    if(view.backlog)hero.append(h('p',{class:'secondary'},'復習が多い日は、まず復習だけを進めることをおすすめします。'));
+    const scopedDue=queue.filter(entry=>p.introductions[entry.taskKey]).length,scopedBacklog=view.backlog&&scopedDue>0;
+    const scopedNew=view.availability.eligibleNewIds.some(key=>module==='all'||p.tasks[key]?.module===module),canStart=queue.length>0||view.availability.requestableNew>0&&scopedNew;
+    const actions=h('div',{class:'today-actions'});
+    if(!view.finished&&canStart){
+      const label=pausedStudy?'続きから学習する':'学習を始める';
+      const action=()=>beginToday(scopedBacklog?50:null),attributes={class:'primary',disabled:customBusy||busy,'data-start':''};
+      actions.append(scopedBacklog&&!pausedStudy&&!customBusy?copyButton(`${Math.min(50,scopedDue)}枚学習する`,`Study ${Math.min(50,scopedDue)}`,action,attributes):button(customBusy?'学習を準備しています…':label,action,attributes));
+      if(scopedBacklog)actions.append(copyButton(`すべて学習する（${scopedDue}枚）`,`Study all (${scopedDue})`,()=>beginToday(null,true),{class:'quiet','data-study-all':''}),button('復習だけ学習する',()=>beginToday(null,true),{class:'quiet','data-reviews-only':''}));
+      if(pausedStudy){const remaining=pausedStudy.run?.taskKeys.length??(queue.filter(entry=>p.introductions[entry.taskKey]).length+Math.min(queue.filter(entry=>!p.introductions[entry.taskKey]).length,view.newToday));hero.append(copy('p',`前回の続き：残り${remaining}枚`,`${remaining} left from the last session`,{class:'secondary','data-study-continue':''}));}
+    }else if(!view.finished){hero.append(h('p',{class:'secondary'},'このデッキで今学習できるカードはありません。'),button('すべてのデッキを見る',()=>{module='all';pausedStudy=null;render();},{class:'quiet','data-show-all-decks':''}));}
+    if(lastReview)actions.append(button('元に戻す',undoLast,{class:'quiet','data-undo':''}),overrideLastReviewButton(p));
+    if(actions.childNodes.length){const help=hero.querySelector('[data-first-day-help]');if(help)hero.insertBefore(actions,help);else hero.append(actions);}
+    if(view.backlog)hero.append(h('p',{class:'secondary'},'スケジュール：通常の復習／今日の新規上限：変わりません'));
+    if(view.finished&&!view.firstDay){const total=view.totals;hero.append(copy('p',`今日：復習${total.reviewed}枚・新規${total.new}枚${total.minutes===null?'':`・${total.minutes}分`}`,`Today: ${total.reviewed} reviewed · ${total.new} new${total.minutes===null?'':` · ${total.minutes} min`}`,{'data-day-totals':'',class:'today-totals'}));}
+    appendDayConditions(hero,view);
+    section.append(hero);
+    if(!view.firstDay){
+      const forecast=h('section',{class:'sheet today-forecast','data-today-forecast':''},h('h2',{},'明日'));
+      forecast.append(copy('p',`復習${view.tomorrow.reviews}枚＋新規最大${view.tomorrow.new}枚${view.tomorrow.estimateMinutes>0?`・約${view.tomorrow.estimateMinutes}分`:''}`,`${view.tomorrow.reviews} ${view.tomorrow.reviews===1?'review':'reviews'} + up to ${view.tomorrow.new} new${view.tomorrow.estimateMinutes>0?` · About ${view.tomorrow.estimateMinutes} min`:''}`,{class:'tomorrow-counts'}));
+      const maximum=Math.max(1,...view.strip.map(day=>day.count)),strip=h('ol',{class:'forecast-strip','data-forecast-strip':''});
+      for(const day of view.strip){const date=new Date(day.startsAt),ja=date.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',timeZone:today.timezone}),en=date.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:today.timezone});strip.append(h('li',{},copy('span',ja,en),h('span',{class:'forecast-bar','aria-hidden':'true',style:`--forecast-height:${day.count/maximum*48}px`}),copy('span',`${day.count}枚`,`${day.count} ${day.count===1?'card':'cards'}`)));}
+      forecast.append(strip,h('p',{class:'secondary'},'今後7日間の復習予定（新規カードは含みません）'));section.append(forecast);
+    }
+    if(view.finished&&!view.firstDay&&backend.customSession){
+      const more=h('section',{class:'sheet today-more','data-study-more':''},h('h2',{},'さらに学習する'));
+      const offer=(ja,en,action,effect,key)=>more.append(h('div',{class:'study-offer'},copyButton(ja,en,action,{class:'quiet',[key]:''}),h('p',{class:'secondary'},effect)));
+      if(view.offers.practice.taskKeys.length)offer(`今日忘れたカードを練習（${view.offers.practice.taskKeys.length}枚）`,`Practise today's forgotten cards (${view.offers.practice.taskKeys.length})`,()=>beginCustomSession(view.offers.practice.options,view.offers.practice.taskKeys),'スケジュール：変わりません／今日の新規上限：変わりません','data-practice-today');
+      if(view.unseen&&today.limit<200&&canRequestNewCards()&&online())offer('新規カードを追加…','Add new cards…',()=>{const panel=main.querySelector('[data-custom-session]');if(panel){panel.open=true;panel.scrollIntoView({block:'start'});panel.querySelector('summary')?.focus();}},'スケジュール：新規カードを追加／今日の新規上限：増えます','data-add-new');
+      if(view.offers.ahead.taskKeys.length)offer(`明日の復習を先取り（${view.offers.ahead.taskKeys.length}枚）`,`Review tomorrow's cards early (${view.offers.ahead.taskKeys.length})`,()=>beginCustomSession(view.offers.ahead.options,view.offers.ahead.taskKeys),'スケジュール：早めに復習（間隔の伸びは控えめ）／今日の新規上限：変わりません','data-review-tomorrow');
+      more.append(button('カスタム学習',()=>{const panel=main.querySelector('[data-custom-session]');if(panel){panel.open=true;panel.scrollIntoView({block:'start'});panel.querySelector('summary')?.focus();}},{class:'quiet'}));section.append(more);
+    }
+    if(view.continuity)section.append(copy('p',`直近30日のうち${view.continuity.days}日学習`,`Studied ${view.continuity.days} of the last 30 days`,{class:'secondary continuity','data-study-continuity':''}));
     if(backend.customSession)section.append(customSessionPanel(document,{options:customOptions,manualDraft,weekdayDraft,today,todayTotalDraft,settings:plannedSettings(p),busy:customBusy,
       onStart:beginCustomSession,onMoreNew:count=>customAction(()=>backend.addNewToday(count),'今日の新規カードを追加しました。'),
       onTodayTotal:total=>{
@@ -241,6 +285,34 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     }
     shelf.append(library,h('p',{class:'content-note'},corpus?.release3FullCorpus?`語彙${corpus.vocabularyCount.toLocaleString('ja-JP')}件（わたしの言葉${corpus.personalVocabularyCount}件を含む）・文法${corpus.grammarTasks}カード。${corpus.generatedVocabularyCount?`引き継いだ${corpus.basePersonalVocabularyCount}件に、新しい言葉${corpus.generatedVocabularyCount}件を追加しています。`:''}全文英訳は配布内容を表示しています。`:`このプレビューは ${catalog.filter(contentReady).length} 件の確認済みカードを表示します。全8,508カードの導入・コンテンツ検証は別途確認が必要です。`));
     return section;
+  }
+  function appendDayConditions(parent,view){
+    const add=(ja,en)=>parent.append(copy('p',ja,en,{class:'secondary day-condition','data-day-condition':''}));
+    if(view.conditions.laterToday){const time=new Date(view.laterToday.nextAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hourCycle:'h23',timeZone:view.today.timezone});add(`今日中にあと${view.laterToday.count}枚が再出題されます（次は${time}）。`,`${view.laterToday.count} learning ${view.laterToday.count===1?'card returns':'cards return'} later today (next at ${time}).`);}
+    if(view.conditions.limitReached)add(`今日の新規カード上限（${view.today.limit}枚）に達しました。上限はすべてのデッキ・iPhoneとMacで共通です。`,`Today's new-card limit (${view.today.limit}) is reached. It is shared by all decks on iPhone and Mac.`);
+    if(view.conditions.noNewLeft)parent.append(h('p',{class:'secondary day-condition','data-day-condition':''},'未学習の新規カードはもうありません。'));
+    if(view.conditions.offline)add(`オフラインのため、新規カードはあと${view.availability.readyNew}枚まで学習できます。`,`Offline: up to ${view.availability.readyNew} more new ${view.availability.readyNew===1?'card is':'cards are'} available on this device.`);
+    if(view.conditions.reservedElsewhere)add(`新規カード${view.availability.reservedElsewhere}枚分は別の端末で利用できます。`,`${view.availability.reservedElsewhere} new-card ${view.availability.reservedElsewhere===1?'place is':'places are'} available on another device.`);
+    if(view.conditions.buriedNew)parent.append(h('p',{class:'secondary day-condition','data-day-condition':''},'関連するカードは明日以降に学習できます。'));
+    if(view.conditions.permitAuthorityUnavailable)parent.append(h('p',{class:'secondary day-condition','data-day-condition':''},'新規カードを受け取る接続が設定されていません。設定を確認してください。'));
+  }
+  async function beginToday(size=null,reviewsOnly=false){
+    if(customBusy||busy||pendingIntent)return;
+    if(pausedStudy&&!reviewsOnly){const paused=pausedStudy;pausedStudy=null;if(paused.run)return beginCustomSession(paused.run.options,paused.run.taskKeys);const entry=backend.queue({module}).find(entry=>entry.taskKey===paused.taskKey);if(entry)return start(entry);}
+    let view=dayView();
+    if(!reviewsOnly&&!backend.queue({module}).length&&view.availability.requestableNew>0){
+      if(!online()||!canRequestNewCards())return render();
+      customBusy=true;render();
+      try{const result=await platform.requestNewCards();if(result?.error||result?.kind==='failed'||result?.kind==='observation-only')throw Error('reserve-unavailable');await backend.refresh();}
+      catch{if(!disposed)message('新規カードを受け取れませんでした。通信と設定を確認して、もう一度お試しください。');return;}
+      finally{customBusy=false;if(!disposed)render();}
+      if(disposed)return;view=dayView();
+    }
+    const queue=backend.queue({module});
+    if(size!==null||reviewsOnly){const keys=queue.filter(entry=>backend.readProjection().introductions[entry.taskKey]).map(entry=>entry.taskKey).slice(0,size??Infinity);return beginCustomSession({mode:'due',untilDone:true,filters:{module}},keys);}
+    const entry=queue.find(entry=>entry.taskKey===pausedStudy?.taskKey)||queue[0];
+    if(!entry)return message('この条件で学習できるカードはありません。');
+    pausedStudy=null;start(entry);
   }
   async function customAction(action,success){
     if(customBusy||busy||pendingIntent)return;customBusy=true;render();
@@ -276,9 +348,9 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       return result;
     },'翌日の学習日から変更します。');
   }
-  function beginCustomSession(options){
+  function beginCustomSession(options,taskKeys=null){
     if(customBusy||busy||pendingIntent)return;
-    try{const selection=backend.customSession(options);if(!selection.entries.length)return message('この条件で学習できるカードはありません。');customRun={options:selection.options,remaining:[...selection.entries],completed:0,total:selection.entries.length};advanceCustomSession();}
+    try{const selection=backend.customSession(options);const selected=new Map(selection.entries.map(entry=>[entry.taskKey,entry]));const entries=taskKeys===null?selection.entries:taskKeys.filter(key=>selected.has(key)).map(key=>selected.get(key));if(!entries.length)return message('この条件で学習できるカードはありません。');customRun={options:selection.options,remaining:[...entries],completed:0,total:entries.length};advanceCustomSession();}
     catch{message('セッションの条件を確認してください。');}
   }
   function advanceCustomSession(){
@@ -613,10 +685,12 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   }
   function recordScreen(){const p=backend.readProjection(),reviews=p.reviews.filter(r=>!r.undoneAt),bounds=dayBounds(now(),p.settings.learnerTimezone),today=reviews.filter(r=>r.dayStart===bounds.startsAt),recall=today.filter(r=>r.effectiveRating>=2).length;
     const taps=new Map();for(const c of p.captures)taps.set(c.surface,(taps.get(c.surface)||0)+1);
-    const nextDue=Object.values(p.tasks).filter(t=>t.card&&!t.suspended).sort((a,b)=>Date.parse(a.card.due)-Date.parse(b.card.due)).slice(0,8);
+    const nextDue=Object.values(p.tasks).filter(t=>t.card&&!t.suspended).sort((a,b)=>Date.parse(a.card.due)-Date.parse(b.card.due));
+    scheduledPage=Math.min(scheduledPage,Math.max(0,Math.ceil(nextDue.length/50)-1));
     return h('section',{class:'record'},h('header',{class:'screen-head'},h('h1',{},'学習の記録')),
       h('div',{class:'sheet stat-sheet'},h('div',{class:'record-summary'},h('div',{},h('strong',{},String(today.length)),h('span',{},'今日の回答')),h('div',{},h('strong',{},today.length?`${Math.round(recall/today.length*100)}%`:'—'),h('span',{},'今日思い出せた割合')),h('div',{},h('strong',{},String(p.captures.length)),h('span',{},'言葉の記録')))),
-      h('section',{class:'sheet'},h('h2',{},'これからの復習'),nextDue.length?h('ul',{class:'forecast'},...nextDue.map(t=>h('li',{},h('span',{'data-vocabulary-entry':''},catalog.find(e=>e.taskKey===t.taskKey)?.term||'カード'),h('span',{},displayDate(t.card.due,{dateStyle:'short',timeStyle:'short'}))))):h('p',{class:'empty'},'学習を始めると、復習の予定がここに現れます。')),
+      h('section',{class:'sheet'},h('h2',{},'これからの復習'),nextDue.length?h('ul',{class:'forecast','data-scheduled-list':''},...nextDue.slice(scheduledPage*50,(scheduledPage+1)*50).map(t=>h('li',{},h('span',{'data-vocabulary-entry':''},catalog.find(e=>e.taskKey===t.taskKey)?.term||'カード'),h('span',{},displayDate(t.card.due,{dateStyle:'short',timeStyle:'short'}))))):h('p',{class:'empty'},'学習を始めると、復習の予定がここに現れます。')),
+      nextDue.length>50?h('div',{class:'row-actions','data-scheduled-pages':''},button('前の50枚',()=>{scheduledPage--;render();},{disabled:scheduledPage===0}),button('次の50枚',()=>{scheduledPage++;render();},{disabled:(scheduledPage+1)*50>=nextDue.length})):null,
       ...(legacyHistory?[legacyArchive()]:[]),
       h('section',{class:'sheet'},h('h2',{},'よく触れた言葉'),taps.size?h('ul',{class:'forecast'},...[...taps].sort((a,b)=>b[1]-a[1]).slice(0,10).map(([word,n])=>h('li',{},h('span',{'data-vocabulary-entry':''},word),h('span',{},`${n} 回`)))):h('p',{class:'empty'},'裏面の言葉をタップすると、ここに記録が残ります。')),
       h('section',{class:'sheet'},h('h2',{},'保存と取り出し'),h('div',{class:'sheet-actions'},button('すべての記録を書き出す',()=>downloadBackup(),{class:'primary','data-export':''})),h('p',{class:'secondary'},'テスト学習者のイベント・未送信記録・保存済みの範囲を含みます。Ankiのスケジュールとは別です。')));
@@ -697,7 +771,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     }});
     const file=h('input',{type:'file',accept:'.json,application/json','aria-label':'バックアップを選ぶ',onchange:async e=>{try{const backup=JSON.parse(await e.target.files[0].text());await backend.importBackup(backup);message('互換のある保存済み記録を追加しました。');render();}catch(error){message(error.message==='backup-has-pending-events-recovery-required'?'未送信の記録を含むため自動復元できません。元の端末とバックアップを保管してください。':'学習者・内容の整合性を確認できませんでした。記録は置き換えていません。');}}});
     const sheet=(id,kicker,title,description,...body)=>h('section',{class:'sheet','data-settings-section':id},h('div',{class:'sheet-head'},h('p',{class:'kicker'},kicker),h('h2',{},title),description?h('p',{class:'sheet-desc'},description):null),...body);
-    return h('section',{class:'settings'},h('header',{class:'screen-head stacked'},h('h1',{},'設定'),h('p',{class:'secondary'},'この端末の表示と、すべてのデッキ共通の学習設定。')),...(platform.nativeSync?[nativeSyncSettings()]:[]),
+    return h('section',{class:'settings'},h('header',{class:'screen-head stacked'},h('h1',{},'設定'),h('p',{class:'secondary'},'この端末の表示と、すべてのデッキ共通の学習設定。')),...(platform.nativeSync?[nativeSyncSettings()]:[]),platform.onScreenChange?h('section',{class:'sheet host-settings','data-host-settings':''}):null,
       sheet('appearance','表示','この端末の見え方','色はこの端末だけに保存します。学習履歴や他の端末の色は変わりません。',h('div',{class:'control-grid'},themePicker(),languagePicker()),h('label',{class:'swipe-grading-setting'},swipe,h('span',{},'スワイプで採点（この端末のみ）')),h('p',{id:'swipe-grading-help',class:'secondary'},'初期設定はオフです。左で「もう一度」、右で「正解」。')),
       ...(legacyHistory?[sheet('legacy-display','引き継ぎ','引き継いだ表示設定',null,...legacyHistory.decks.map(d=>h('p',{class:'secondary','data-legacy-settings':''},`${d.deckId} · 一日の新規 ${d.preferences.newPerDay} · 読み方 ${d.preferences.mode} · 全文英訳 ${d.preferences.gloss} · 文脈 ${d.preferences.zoom}`)),h('p',{class:'secondary'},themePreferenceSet?'色はこの端末の指定を使っています。':'以前の色指定は未設定です。自動表示のまま、設定値は書き込んでいません。'))]:[]),
       sheet('pace','学習','共通の学習ペース','1日の新規カード上限と学習日の区切りは、すべてのデッキ共通です。変更は翌日の学習日から有効です。',h('div',{class:'setting-row'},h('label',{},'1日の新規カード上限',newCount),button('翌日から変更',()=>{const value=newCount.valueAsNumber;if(!Number.isSafeInteger(value)||value<1||value>200)return message('1日の新規カード上限は1〜200の整数を入力してください。');savePace('newPerDayTotal',newCount,value);},{disabled:weekdayPolicy})),weekdayPolicy?h('p',{class:'secondary','data-weekday-policy-active':''},'曜日ごとの新規カード上限を使っています。今日のカスタム学習パネルで変更できます。'):null,
@@ -709,6 +783,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   }
   function onKey(event){if(event.defaultPrevented||event.repeat||event.isComposing||event.keyCode===229||event.metaKey||event.ctrlKey||event.altKey||busy||pop||document.querySelector('dialog[open]')||event.target.closest?.('button,input,select,textarea,summary,a,audio,video,[contenteditable]'))return;
     if(event.key.toLowerCase()==='u'&&lastReview){event.preventDefault();undoLast();return;}
+    if(screen==='today'&&event.key==='Enter'&&!event.shiftKey){const primary=main.querySelector('[data-start]:not(:disabled)');if(primary){event.preventDefault();primary.click();}return;}
     if(screen!=='study'||!current)return;
     if(!current.revealed&&!event.shiftKey&&[' ','Enter'].includes(event.key)&&win.getSelection()?.isCollapsed!==false){event.preventDefault();revealCard(current,'key');}
     else if(current.revealed&&!current.committed&&['1','2','3','4'].includes(event.key)){event.preventDefault();grade(Number(event.key),'key');}}
@@ -718,6 +793,8 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   const unsubscribe=backend.subscribe(()=>{updateStatus().catch(()=>{});if(screen!=='study'&&!busy)render();scheduleOutboxSync();});
   if(backend.refreshLocalDayBudget)budgetWatcher=watchLocalDayBudget({refresh:()=>backend.refreshLocalDayBudget(),getProjection:()=>backend.readProjection(),now,canRefresh:()=>!busy&&!typedBusy&&!customBusy&&!pendingIntent&&!(screen==='study'&&current?.revealed),onRefresh:()=>{if(screen!=='study')render();},schedule:(fn,delay)=>win.setTimeout(fn,delay),cancel:id=>win.clearTimeout(id)});
   const budgetWake=()=>{if(document.visibilityState!=='hidden')budgetWatcher?.check();};
+  const availabilityWake=()=>{if(screen==='today')render();else updateStatus();};
+  win.addEventListener('online',availabilityWake);win.addEventListener('offline',availabilityWake);
   win.addEventListener('focus',budgetWake);document.addEventListener('visibilitychange',budgetWake);
   // Local writes wake the same Sync action. Its refresh notifications must not
   // start another sync: only a durable, nonempty outbox requests this work.
@@ -745,5 +822,5 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   render();
   reconcileUnknownFactoryRows();
   if(platform.storageKind==='native-worker-prod'&&platform.nativeSync)updateStatus().then(autoSync).catch(()=>{});
-  return Object.freeze({showTask:start,read:()=>({screen,current,busy:busy||typedBusy||customBusy,pendingIntent,theme,themePreferenceSet,interfaceLanguage}),dispose(){disposed=true;nativeStatusGeneration++;win.clearTimeout(outboxSyncTimer);win.clearTimeout(saveBacklogTimer);budgetWatcher?.dispose();win.removeEventListener('focus',budgetWake);document.removeEventListener('visibilitychange',budgetWake);win.removeEventListener('focus',autoSync);document.removeEventListener('visibilitychange',autoSync);platform.nativeSync?.dispose?.();factoryStatuses.dispose();current?.timer.dispose();closePopover();unsubscribe();dark.removeEventListener('change',darkChanged);document.removeEventListener('keydown',onKey);document.removeEventListener('keydown',escape);document.removeEventListener('pointerdown',outsidePopover,true);root.replaceChildren();}});
+  return Object.freeze({showTask:start,refreshStatus:updateStatus,read:()=>({screen,module,current,busy:busy||typedBusy||customBusy,pendingIntent,theme,themePreferenceSet,interfaceLanguage}),dispose(){disposed=true;nativeStatusGeneration++;win.clearTimeout(outboxSyncTimer);win.clearTimeout(saveBacklogTimer);budgetWatcher?.dispose();win.removeEventListener('online',availabilityWake);win.removeEventListener('offline',availabilityWake);win.removeEventListener('focus',budgetWake);document.removeEventListener('visibilitychange',budgetWake);win.removeEventListener('focus',autoSync);document.removeEventListener('visibilitychange',autoSync);platform.nativeSync?.dispose?.();factoryStatuses.dispose();current?.timer.dispose();closePopover();unsubscribe();dark.removeEventListener('change',darkChanged);document.removeEventListener('keydown',onKey);document.removeEventListener('keydown',escape);document.removeEventListener('pointerdown',outsidePopover,true);root.replaceChildren();}});
 }

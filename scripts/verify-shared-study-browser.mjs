@@ -54,19 +54,65 @@ try {
   async function shared(deck){await page.goto(`${host.origin}/?deck=${deck}&sharedStudy=preview&ui=en`,{waitUntil:'domcontentloaded'});await page.locator('[data-shared-study-frame]').waitFor({timeout:60000});const frame=await(await page.locator('[data-shared-study-frame]').elementHandle()).contentFrame();assert(frame,'Canonical iframe must be mounted');await frame.waitForURL(/shared-frame\.html/);try{await frame.waitForFunction(()=>!!window.bunkiSharedStudy||!!document.querySelector('[role="alert"]'),null,{timeout:60000});assert(await frame.evaluate(()=>!!window.bunkiSharedStudy),await frame.locator('body').innerText());}catch(error){receipt.frameFailure={url:frame.url(),text:await frame.locator('body').innerText()};throw error;}return frame;}
   let frame=await shared('n2');const before=await legacy();
   assert.equal(await frame.evaluate(()=>bunkiSharedStudy.catalog.length),8508);
+  assert.equal(await frame.evaluate(()=>bunkiSharedStudy.app.read().module),'n2');
+  assert.equal(await frame.locator('.today-actions .primary').count(),1);
+  assert.match(await frame.locator('[data-today-counts]').innerText(),/20 new cards/);
+  assert.equal(await frame.evaluate(()=>frameElement.bunkiStudyPort.adapter.platform.canRequestNewCards()),false);
   await frame.locator('[data-start]').click();await frame.locator('[data-reveal]').click();await frame.locator('[data-grade="3"]').click();
   await frame.waitForFunction(()=>bunkiSharedStudy.backend.readProjection().reviews.length===1);
   assert.deepEqual(await legacy(),before);receipt.checks.push('explicit-preview-route-mounts-canonical-ui','full-8508-catalog','grade-durable-with-no-legacy-write');
   const due=await frame.evaluate(()=>{const p=bunkiSharedStudy.backend.readProjection(),r=p.reviews[0];return {taskKey:r.taskKey,card:p.tasks[r.taskKey].card,event:r.id,installation:bunkiSharedStudy.backend.installation};});
-  frame=await shared('n1');assert.equal(await frame.evaluate(()=>bunkiSharedStudy.backend.readProjection().reviews.length),1);assert.equal(await frame.evaluate(()=>Object.values(bunkiSharedStudy.backend.readProjection().permits).filter(p=>!p.usedBy).length),19);
+  frame=await shared('n1');assert.equal(await frame.evaluate(()=>bunkiSharedStudy.app.read().module),'n1');assert.equal(await frame.evaluate(()=>bunkiSharedStudy.backend.readProjection().reviews.length),1);assert.equal(await frame.evaluate(()=>Object.values(bunkiSharedStudy.backend.readProjection().permits).filter(p=>!p.usedBy).length),19);
+  assert.match(await frame.locator('[data-today-counts]').innerText(),/19 new/);assert.equal(await frame.locator('.today-actions .primary').count(),1);
   assert.deepEqual(await frame.evaluate(key=>bunkiSharedStudy.backend.readProjection().tasks[key].card,due.taskKey),due.card);receipt.checks.push('deck-switch-and-restart-retain-history-and-budget');
-  frame=await shared('shared-grammar');await frame.locator('[data-start]').click();assert.equal(await frame.evaluate(()=>bunkiSharedStudy.app.read().current.entry.module),'grammar');
+  frame=await shared('shared-grammar');assert.equal(await frame.evaluate(()=>bunkiSharedStudy.app.read().module),'grammar');await frame.locator('[data-start]').click();assert.equal(await frame.evaluate(()=>bunkiSharedStudy.app.read().current.entry.module),'grammar');
   assert(await frame.locator('.grammar-card').count()||await frame.locator('[class*="grammar"]').count(),'Canonical grammar face');
   await frame.locator('[data-reveal]').click();await frame.locator('[data-grade="3"]').click();await frame.waitForFunction(()=>bunkiSharedStudy.backend.readProjection().reviews.length===2);receipt.checks.push('canonical-grammar-renderer-grades-shared-ledger');
   const secondContract=await frame.evaluate(()=>{const last=bunkiSharedStudy.backend.readProjection().reviews.at(-1),first=bunkiSharedStudy.catalog.find(e=>e.taskKey===last.taskKey),wanted=first.contractId==='grammar.cloze.v1'?'grammar.meaning.v1':'grammar.cloze.v1';const entry=bunkiSharedStudy.catalog.find(e=>e.contractId===wanted&&bunkiSharedStudy.backend.queue({module:'grammar'}).some(x=>x.taskKey===e.taskKey));bunkiSharedStudy.app.showTask(entry);return wanted;});
   assert.equal(await frame.locator(secondContract==='grammar.meaning.v1'?'.grammar-pattern':'.grammar-cue').count(),1);
   await frame.locator('[data-reveal]').click();await frame.locator('[data-grade="3"]').click();await frame.waitForFunction(()=>bunkiSharedStudy.backend.readProjection().reviews.length===3);receipt.checks.push('meaning-and-cloze-use-their-own-canonical-fronts');
   await page.goto(`${host.origin}/?deck=kotoba&sharedStudy=preview&ui=en`,{waitUntil:'domcontentloaded'});await page.getByText('This practice contract is not mapped to shared study.').waitFor();receipt.checks.push('unmapped-legacy-deck-fenced');
+  receipt.checks.push('initial-module-api-preserves-host-selection-and-global-shared-counts');
+  const boundContext=await browser.newContext({viewport:{width:1280,height:820},serviceWorkers:'block'});await silenceBrowserAudio(boundContext);
+  const boundPage=await boundContext.newPage();boundPage.on('pageerror',error=>receipt.errors.push(error.message));
+  await boundPage.addInitScript(()=>{
+    if(window!==window.top)return;
+    const api=()=>import('/vendor/shared-study-engine/client/engine.mjs');
+    let memory;
+    const storage=()=>memory||=(api().then(module=>module.createMemoryAdapter()));
+    const authority=window.__boundStudyFixture={enabled:false,online:true,refuse:false,calls:0,release:null};
+    window.bunkiSharedStudyHost={
+      identity:{learner:'test-bunki-host',environment:'test-bunki-host',installation:'test-bunki-host-install',mode:'fresh'},
+      storage:{read:async scope=>(await storage()).read(scope),compareAndSwap:async(...args)=>(await storage()).compareAndSwap(...args)},
+      canRequestNewCards:()=>authority.enabled,isOnline:()=>authority.online,
+      transport:{reserveNewPermits:async({store})=>{
+        authority.calls++;if(authority.refuse)throw Error('synthetic-reserve-refusal');
+        await new Promise(resolve=>{authority.release=resolve;});
+        if(store.scope.learner!=='test-bunki-host'||store.scope.environment!=='test-bunki-host')throw Error('synthetic-host-scope');
+        const {dayBounds,payloadHash}=await api(),ts=Date.now();
+        const event={v:4,id:'@server:1',learner:store.scope.learner,install:'@server',dseq:1,base:0,ts,epoch:0,policy:'nsrs-policy-v1',type:'permit-grant',data:{install:store.scope.installation,permitIds:['bound-fixture-1'],...dayBounds(ts,'Asia/Tokyo')}};
+        await store.reconcile({events:[{seq:1,rt:ts,authority:'server',event,bodyHash:payloadHash(event)}],head:1});return {kind:'reserved'};
+      }},
+    };
+  });
+  await boundPage.goto(`${host.origin}/?deck=senmon&ui=en`,{waitUntil:'domcontentloaded'});await boundPage.locator('[data-shared-study-frame]').waitFor({timeout:60000});
+  const boundFrame=await(await boundPage.locator('[data-shared-study-frame]').elementHandle()).contentFrame();await boundFrame.waitForFunction(()=>!!window.bunkiSharedStudy,null,{timeout:60000});
+  assert.equal(await boundFrame.evaluate(()=>bunkiSharedStudy.app.read().module),'senmon');
+  assert.match(await boundFrame.locator('[data-today-counts]').innerText(),/^0 new cards$/);assert.equal(await boundFrame.locator('[data-start]').count(),0);
+  await boundPage.evaluate(()=>{__boundStudyFixture.enabled=true;__boundStudyFixture.online=false;});await boundFrame.evaluate(()=>dispatchEvent(new Event('offline')));
+  assert.equal(await boundFrame.locator('[data-start]').count(),0);assert.equal(await boundPage.evaluate(()=>__boundStudyFixture.calls),0);
+  await boundPage.evaluate(()=>{__boundStudyFixture.online=true;__boundStudyFixture.refuse=true;});await boundFrame.evaluate(()=>dispatchEvent(new Event('online')));
+  assert.equal(await boundFrame.locator('.today-actions .primary').count(),1);await boundFrame.locator('[data-start]').click();
+  await boundFrame.waitForFunction(()=>!bunkiSharedStudy.app.read().busy&&parent.__boundStudyFixture.calls===1);
+  assert.equal(await boundFrame.evaluate(()=>Object.keys(bunkiSharedStudy.backend.readProjection().permits).length),0);
+  await boundPage.evaluate(()=>{__boundStudyFixture.refuse=false;});await boundFrame.locator('[data-start]').click();
+  await boundPage.waitForFunction(()=>__boundStudyFixture.calls===2&&typeof __boundStudyFixture.release==='function');
+  assert.equal(await boundFrame.evaluate(()=>bunkiSharedStudy.app.read().current),null);assert.equal(await boundFrame.evaluate(()=>bunkiSharedStudy.backend.queue().length),0);
+  await boundPage.evaluate(()=>__boundStudyFixture.release());await boundFrame.waitForFunction(()=>!!bunkiSharedStudy.app.read().current);
+  assert.equal(await boundFrame.evaluate(()=>bunkiSharedStudy.app.read().current.entry.module),'senmon');
+  assert.equal(await boundFrame.evaluate(()=>Object.keys(bunkiSharedStudy.backend.readProjection().permits).length),1);
+  assert.equal(await boundPage.evaluate(()=>Object.keys(localStorage).some(key=>key.startsWith('bunki-cloze:'))),false);
+  receipt.checks.push('bound-host-requires-explicit-authority-and-online-state','bound-host-refusal-does-not-grant-new-cards','bound-host-awaits-real-reserve-before-selected-study');await boundContext.close();
   const response=await fetch(`${host.origin}/decks/player/shared-frame.html`);assert.equal(response.headers.get('content-security-policy'),"frame-ancestors 'self'");
   const other=await fetch(`${host.origin}/index.html`);assert.equal(other.headers.get('content-security-policy'),"frame-ancestors 'none'");receipt.checks.push('only-shared-frame-allows-same-origin-embedding');
   const offlineContext=await browser.newContext({viewport:{width:393,height:852}});await silenceBrowserAudio(offlineContext);const offlinePage=await offlineContext.newPage();

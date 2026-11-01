@@ -26,6 +26,8 @@ export function selectCustomSession(projection,catalog,input,{now,dayStart,dayEn
   if(f.tag&&!tags.some(tag=>tag.toLocaleLowerCase().includes(f.tag.toLocaleLowerCase())))return false;
   if(f.recentlyFailed&&!failed.has(t.taskKey))return false;
   if(options.mode==='practice')return true;
+  // Reviews-only sessions never introduce a card, even with unused permits.
+  if(options.mode==='due'&&!projection.introductions[t.taskKey])return false;
   if(!projection.introductions[t.taskKey]&&!availablePermit)return false;
   if(options.mode==='review-ahead')return !!projection.introductions[t.taskKey]&&t.card?.state===2&&Date.parse(t.card.due)<=now+options.aheadDays*DAY;
   if(!servable(t.card,new Date(now),{dayEnd}))return false;

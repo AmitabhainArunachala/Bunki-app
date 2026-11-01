@@ -1,6 +1,11 @@
 /** Bunki presentation content bound to the standalone's frozen task identities. */
 export const SHARED_DECKS = Object.freeze(['n2', 'n1', 'senmon', 'kotoba-master']);
 export const isSharedDeck = id => SHARED_DECKS.includes(id);
+export function moduleForSharedDeck(id) {
+  if (id === 'shared-grammar') return 'grammar';
+  if (!isSharedDeck(id)) throw Error('unmapped-shared-contract');
+  return id === 'kotoba-master' ? 'kotoba' : id;
+}
 export const isSharedStudyMode = () => !!globalThis.bunkiSharedStudyHost ||
   new URLSearchParams(globalThis.location?.search || '').get('sharedStudy') === 'preview';
 

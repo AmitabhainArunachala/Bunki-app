@@ -11,6 +11,9 @@ renderer from `vendor/shared-study-engine`. This adopts subsequent canonical UI
 changes through distribution refresh, including the accepted study-loop slices.
 It does not reimplement the study screen. The local static host permits embedding
 only `decks/player/shared-frame.html`, and only from the same origin.
+The frame selects its deck with the canonical `initialModule` option, using the
+adapter's clock and platform capabilities. Today counts still cover all decks
+and one shared learner-day allowance; selection no longer clicks a module button.
 
 ## Host contract
 
@@ -29,6 +32,8 @@ The shell may bind `globalThis.bunkiSharedStudyHost` before opening a deck:
     timezone: 'Asia/Tokyo', mode: 'open' // 'fresh' is explicit creation only
   },
   transport: {reserveNewPermits({store})},
+  canRequestNewCards: () => pairedAndEnabled,
+  isOnline: () => navigator.onLine !== false,
   readPreviousRegistry: async () => exactPreviouslyInstalledRegistry
 }
 ```
@@ -40,6 +45,14 @@ it implements no separate compare-and-swap or durability logic. Storage,
 credentials, pairing and transport remain host responsibilities. A missing
 store is an error; `open` never recreates it or adopts another installation.
 Existing Bunki record sync is not a v4 study transport.
+New-card requests require both a bound `transport.reserveNewPermits` and an
+explicit `canRequestNewCards: true` or callback returning `true`. A callback
+must reflect the host's actual current pairing/authority state; it is not inferred
+from a backend method. The adapter checks authority and connectivity again at
+request time and passes the same store to the transport. Today awaits that
+request and then refreshes the canonical queue. A transport alone defaults to
+disabled, and the initial-grant-only preview has no request callback. No host
+credentials or production pairing are supplied by this integration.
 
 Before connecting, Bunki calls canonical `refreshCorpus` with QA expansion
 disabled. Additions require the host's exact previously installed registry

@@ -1,6 +1,7 @@
 import {mountStudyApp} from '../../vendor/shared-study-engine/client/app/app.mjs';
 import * as grammar from '../../vendor/shared-study-engine/client/grammar/renderer.mjs';
 import {bindStudyPresentation} from '../../shared-study-presentation.mjs';
+import {moduleForSharedDeck} from '../../shared-study-content.mjs';
 
 const root=document.querySelector('#app');
 const json=async(path,hash)=>{
@@ -26,9 +27,8 @@ try {
   const preferences={getItem:key=>key==='nihongo.interface-language.v1'?localStorage.getItem(prefix+key)||params.get('ui'):localStorage.getItem(prefix+key),setItem:(key,value)=>localStorage.setItem(prefix+key,value)};
   const corpus={release3FullCorpus:true,vocabularyCount:binding.counts.vocabulary,grammarTasks:binding.counts.grammar,personalVocabularyCount:catalog.filter(e=>e.module==='kotoba').length};
   const backend=bindStudyPresentation(adapter.backend,catalog);
-  const app=mountStudyApp(root,{backend,catalog,themes,grammar,preferences,platform:{storageKind:'bunki-shared'},corpus});
-  const deck=params.get('deck'),mod=deck==='shared-grammar'?'grammar':deck==='kotoba-master'?'kotoba':deck;
-  root.querySelector(`[data-module="${['n1','n2','senmon','kotoba','grammar'].includes(mod)?mod:'all'}"]`)?.click();
+  const initialModule=moduleForSharedDeck(params.get('deck'));
+  const app=mountStudyApp(root,{backend,catalog,themes,grammar,preferences,platform:adapter.platform,now:adapter.now,initialModule,corpus});
   if(params.get('start')==='1')root.querySelector('[data-start]')?.click();
   window.bunkiSharedStudy=Object.freeze({app,backend:adapter.backend,store:adapter.store,catalog});
   window.addEventListener('pagehide',()=>app.dispose(),{once:true});
