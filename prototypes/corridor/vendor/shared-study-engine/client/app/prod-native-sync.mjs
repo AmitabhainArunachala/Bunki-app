@@ -128,8 +128,8 @@ export function createProdNativeSyncSession({transport, bridge, backend, store, 
     return {...transport.status(), paired,
       ...(!bridge.pairingEnabled?{state:'pairing-disabled',error:'pairing-disabled'}:{}),
       ...(!enabled&&paired&&bridge.pairingEnabled?{state:prefixState(prefixError),error:prefixError}:{}),
-      ...(pairingUnknown?{state:'error',error:'authentication-required'}:{}),
-      ...(actionError?{state:prefixState(actionError),error:actionError}:{})};
+      ...(actionError?{state:prefixState(actionError),error:actionError}:{}),
+      ...(pairingUnknown?{state:'error',error:'authentication-required'}:{})};
   };
   const synchronize = async () => {
     if (disposed) throw Error('native-sync-closed');

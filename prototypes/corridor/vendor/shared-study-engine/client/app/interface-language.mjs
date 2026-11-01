@@ -32,6 +32,7 @@ export const interfaceCopies = Object.freeze([
   ["記録は端末に保存されていますが、大きすぎるため処理できません。記録を残したまま対応方法を確認してください。", "The record is saved on this device, but it is too large to process. Keep the record and check how to handle it."],
   ["アプリの更新が必要です。保存できたかは未確認です。入力と同じ操作は残しています。", "An app update is required. The save is unconfirmed. Your input and original operation are retained."],
   ["この端末", "This device"],
+  ["端末", "device"],
   ["別の端末", "Another device"],
   ["同期中…", "Syncing…"],
   ["オフライン", "Offline"],

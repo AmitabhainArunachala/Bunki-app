@@ -1,5 +1,6 @@
 import {manualEntry} from '../player/manual-cards.mjs';
 import {payloadHash,validateEvent} from '../schema/event.mjs';
+export {createCorpusMaterializer} from '../materializer.mjs';
 /** Additive factory delivery keeps the frozen release-3 base inventory visible. */
 export function validateCorpusInventory(catalog,build){
  const fail=()=>{throw Error('Full corpus inventory mismatch');},integer=n=>Number.isSafeInteger(n)&&n>=0;
@@ -12,11 +13,6 @@ export function validateCorpusInventory(catalog,build){
  return Object.freeze({vocabulary:vocabulary.length,grammar:grammar.length,personal:personal.length,basePersonal,generated,total:catalog.length});
 }
 
-export function createCorpusMaterializer(engine,canonicalStringify){
- let preserve=null;
- const materialize=({canonical,provisional,provisionalNow})=>{const projection=engine.replay(canonical,{provisional,provisionalNow});if(preserve){for(const[key,task]of Object.entries(preserve.tasks))if(canonicalStringify(projection.tasks[key])!==canonicalStringify(task))throw Error('Existing task state changed during registry expansion');const {tasks:oldTasks,...oldRest}=preserve,{tasks:newTasks,...newRest}=projection;if(canonicalStringify(oldRest)!==canonicalStringify(newRest))throw Error('Existing learner state changed during registry expansion');}return projection;};
- materialize.preserving=async(projection,operation)=>{if(preserve)throw Error('Registry expansion already running');preserve=projection;try{return await operation();}finally{preserve=null;}};return materialize;
-}
 /** First native factory delivery uses the exact bundled base registry. Subsequent
  * delivery needs an explicit prior snapshot; never infer full rows from projection. */
 export async function refreshCorpusRegistry(store,registry,catalog,{materializer,canonicalStringify,readPreviousRegistry=null,allowQAExpansion=false}={}){

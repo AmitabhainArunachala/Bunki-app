@@ -5,7 +5,8 @@ import {createFreshStore, openStore} from './store.mjs';
 import {createReplicaBackend} from './player/replica-backend.mjs';
 import {EVENT_VERSION, POLICY_ID, SCHEDULED_CONTRACTS} from './schema/event.mjs';
 import {SYNC_COMPATIBILITY} from './sync-compatibility.mjs';
-import {createCorpusMaterializer,refreshCorpusRegistry} from './app/corpus-inventory.mjs';
+import {refreshCorpusRegistry} from './app/corpus-inventory.mjs';
+import {createCanonicalMaterializer} from './materializer.mjs';
 
 export {createReplayEngine, replay, previewReview, hesitationEvidence, canonicalStringify,
   payloadHash, validateEvent, dayBounds, newCardLimit, studyDayAllowance, baselineHash} from './replay.mjs';
@@ -15,6 +16,7 @@ export {customSessionOptions, selectCustomSession, sessionReviewEvidence} from '
 export {EVENT_VERSION, POLICY_ID, SCHEDULED_CONTRACTS, DEVICE_TYPES, SERVER_TYPES, taskKey, isTaskKey} from './schema/event.mjs';
 export {SYNC_COMPATIBILITY} from './sync-compatibility.mjs';
 export {createCorpusMaterializer,refreshCorpusRegistry,validateCorpusInventory} from './app/corpus-inventory.mjs';
+export {createCanonicalMaterializer} from './materializer.mjs';
 export {createIndexedDBAdapter} from './storage/indexeddb.mjs';
 export {createMemoryAdapter} from './storage/memory.mjs';
 export {createSyncTransport} from './sync.mjs';
@@ -60,12 +62,7 @@ export function createStudyEngine({content, learner, epoch = 0, timezone = 'Asia
     seen.add(entry.taskKey);
   }
   const codec = Object.freeze({canonicalStringify, payloadHash, validateEvent});
-  const guardedMaterializer=createCorpusMaterializer(engine,canonicalStringify);
-  const materialize = ({canonical, provisional, learner: scopedLearner, epoch: scopedEpoch, provisionalNow}) => {
-    if (scopedLearner !== learner || scopedEpoch !== epoch) throw Error('engine-store-scope');
-    return guardedMaterializer({canonical, provisional, provisionalNow});
-  };
-  materialize.preserving=guardedMaterializer.preserving;
+  const materialize=createCanonicalMaterializer(config,{requireScope:true});
   const options = storage => ({...storage, learner, epoch, codec, materialize});
   return Object.freeze({
     metadata: ENGINE_METADATA, ...engine, codec, materialize,

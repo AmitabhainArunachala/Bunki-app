@@ -7,6 +7,7 @@ import {ensureLocalDayBudget} from '../app/local-budget.mjs';
 import {canonicalizeLocalPending} from './local-canonical.mjs';
 import {contentReady} from './content-ready.mjs';
 import {createRestDayEvidenceReader} from './rest-day-evidence.mjs';
+import {createProjectionView} from './projection-view.mjs';
 import {StoreError} from '../store.mjs';
 import { canonicalStringify, payloadHash } from '../schema/event.mjs';
 import { dayBounds, studyDayAllowance } from '../replay.mjs';
@@ -17,9 +18,10 @@ const immutable = v => { if (v && typeof v === 'object') { Object.values(v).forE
 export async function createReplicaBackend({ store, engine, catalog, localAuthority = null, reserveNewPermits = null, now = Date.now, uuid = () => crypto.randomUUID() }) {
   let state = await store.readState(), projection = state.projection, disposed = false, lastTs = 0;
   const listeners = new Set(), intents = new Map();
+  const publicView=createProjectionView();
   const typedIntents = new Map();
   const resumptions = new Map();
-  const restDayEvidence=createRestDayEvidenceReader();
+  const restDayEvidence=createRestDayEvidenceReader({replayCanonical:canonical=>engine.replay(canonical,{provisional:[]})});
   const readVerifiedRestDays=()=>restDayEvidence(disposed?null:state,{at:now()});
   // Day grants and device canonical receipts share the local sequence. A wake
   // timer must not reserve the same sequence as a newly submitted command.
@@ -27,8 +29,9 @@ export async function createReplicaBackend({ store, engine, catalog, localAuthor
   const withLocalWrite=action=>{const result=localWrite.then(action);localWrite=result.catch(()=>{});return result;};
   let previewCache = null;
   const entries = new Map(catalog.map(entry => [entry.taskKey, entry]));
-  const catalogEntries=()=>[...catalog,...Object.values(projection.manualCards??{})];
-  const refreshManualEntries=()=>{for(const entry of Object.values(projection.manualCards??{}))entries.set(entry.taskKey,entry);};
+  const manualEntries=()=>Object.values(projection.manualCards??{}).map(publicView);
+  const catalogEntries=()=>[...catalog,...manualEntries()];
+  const refreshManualEntries=()=>{for(const entry of manualEntries())entries.set(entry.taskKey,entry);};
   refreshManualEntries();
   let refreshGeneration=0, refreshedGeneration=0, compatibleGeneration=0, refreshing=false;
   const refreshWaiters=new Set();
@@ -52,7 +55,7 @@ export async function createReplicaBackend({ store, engine, catalog, localAuthor
           refreshedGeneration=readingGeneration;
           if(next.storageRevision>=state.storageRevision){
             state=next;projection=next.projection;refreshManualEntries();
-            for(const fn of listeners){try{fn(projection);}catch{/* presentation only */}}
+            for(const fn of listeners){try{fn(publicView(projection));}catch{/* presentation only */}}
           }
           // Complete only callers covered by this read. Newer invalidations
           // continue in the background without holding earlier saves hostage.
@@ -214,13 +217,14 @@ export async function createReplicaBackend({ store, engine, catalog, localAuthor
   }
   function snapshotAttempt(taskKey, { practice = false,learnAhead=false,session=null } = {}) {
     const task = projection.tasks?.[taskKey], entry = entries.get(taskKey);
-    if (!task || !contentReady(entry)) throw Error('content-not-verified');
+    if (!task || typeof task.contentRevision!=='string' || !contentReady(entry)) throw Error('content-not-verified');
     return immutable({ id: uuid(), taskKey, parent: task.head, contentRevision: task.contentRevision,
-      base: projection.appliedSeq, module: task.module,...(sessionReviewEvidence(session??{})?{session:sessionReviewEvidence(session)}:{}),learnAhead:learnAhead===true, mode: practice ? 'practice' : 'scored',
+      base: projection.appliedSeq, module: task.module&&typeof task.module==='object'?clone(task.module):task.module,...(sessionReviewEvidence(session??{})?{session:sessionReviewEvidence(session)}:{}),learnAhead:learnAhead===true, mode: practice ? 'practice' : 'scored',
       hesitation: clone(engine.hesitationEvidence(projection, { module: task.module, base: projection.appliedSeq })) });
   }
   function reviewData(attempt, rawRating, thinkMs, reviewedAt=now()) {
     const task = projection.tasks[attempt.taskKey];
+    if (!task || typeof task.contentRevision!=='string') throw Error('content-not-verified');
     if (task.head !== attempt.parent || task.contentRevision !== attempt.contentRevision) throw Error('stale-attempt');
     // Sync may confirm the preceding review while this card is on screen.
     const evidence=engine.hesitationEvidence(projection,{module:task.module,base:attempt.base});
@@ -462,7 +466,7 @@ export async function createReplicaBackend({ store, engine, catalog, localAuthor
   return Object.freeze({
     ...(localAuthority?{refreshLocalDayBudget}:{}),
     catalogEntries,customSession,todayAllowance,addNewToday,setNewTodayTotal,createManualCard,practiceData:(attempt,rating=3,thinkMs=0)=>reviewData({...attempt,mode:'practice'},rating,thinkMs),practice:(attempt,rating=3,thinkMs=0)=>submitCommand(command('review',reviewData({...attempt,mode:'practice'},rating,thinkMs))),
-    readProjection: () => projection, subscribe(fn) { listeners.add(fn); return () => listeners.delete(fn); },
+    readProjection: () => publicView(projection), subscribe(fn) { listeners.add(fn); return () => listeners.delete(fn); },
     status, presentationStatus, refresh, command, submitCommand, snapshotAttempt, reviewData, queue,sitting,
     preview,reviewIntent,captureTyped,captureCommand,resumeCommand,readSharedActivity,readVerifiedRestDays,
     mutate(type, taskKey, data = {}) { const task = projection.tasks[taskKey]; return submitCommand(command(type, { taskKey, parent: task.head, ...data })); },

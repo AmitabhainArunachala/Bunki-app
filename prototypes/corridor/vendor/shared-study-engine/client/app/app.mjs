@@ -171,7 +171,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     if(nativeRequested)paintSaveStatus(status);
     // A render or backend notice can supersede the first status request. Only
     // the current native observation decides the one initial quiet sync.
-    if(nativeRequested&&startupSyncPending){startupSyncPending=false;if(!nativeSyncActionError&&!nativeSyncState.error)autoSync();}
+    if(nativeRequested&&startupSyncPending){startupSyncPending=false;if(!nativeSyncActionError&&!nativeSyncState.error)autoSync();else if(retryableSyncFailure())scheduleSyncRetry();}
   }
   function ageSaveBacklog(){
     saveBacklogTimer=null;
@@ -243,6 +243,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   let panelObserver=null;
   function render() {
     if (disposed) return;
+    expireLastReview();
     catalog=backend.catalogEntries?.()??shippedCatalog;
     factoryStatuses.leave();refreshFactoryRows=()=>{};
     for (const b of nav.querySelectorAll('button')) b.setAttribute('aria-current',b.dataset.nav === screen ? 'page' : 'false');
@@ -827,8 +828,13 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     if(!input.value.trim())return;const e=current.entry,form=e.form||e.term,start=Math.max(0,e.ja.indexOf(form));const capture={surface:form,kind:'correction',location:'passage',contextTaskKey:e.taskKey,contentRevision:current.attempt.contentRevision,revealed:true,
       span:{start,end:start+form.length,unit:'utf16-code-unit'},targetTaskKey:null,source:{venue:'standalone-qa',note:input.value.trim(),context:e.ja}};
     run(backend.captureCommand(current.attempt,capture),()=>{close();message('訂正の希望を記録しました。内容監査への配信は通信待ちです。');render();});});}
-  function undoLast(){const previous=lastReview;if(!previous)return;const p=backend.readProjection(),task=p.tasks[previous.entry.taskKey],effect=task&&p.effects[task.head];if(!effect||effect.root!==previous.eventId)return message('このカードは現在の状態から戻せません。');run(backend.command('undo',{taskKey:task.taskKey,parent:task.head,target:effect.root}),()=>{lastReview=null;customRun=previous.run?{...previous.run,remaining:[...previous.run.remaining]}:null;const review=p.reviews.find(row=>row.id===previous.eventId),labels=GRADES.find(([value])=>value===review?.effectiveRating),pressed=GRADES.find(([value])=>value===review?.rawRating),capped=review?.rawRating!==review?.effectiveRating;start(previous.entry,false,previous.learnAhead,previous.session,{source:'key',restore:{thinkMs:previous.thinkMs},preserveRun:!!previous.run});showToast(`[${capped?pressed?.[1]+' → ':''}${labels?.[1]||'評価'}]を元に戻しました`,`Undid [${capped?pressed?.[2]+' → ':''}${labels?.[2]||'rating'}]`);});}
-  function overrideLastReviewButton(p){if(!lastReview)return null;const review=p.reviews.find(r=>r.id===lastReview.eventId),task=p.tasks[lastReview.entry.taskKey];if(!review||review.rawRating===review.effectiveRating||!task)return null;return button('選んだ評価に戻す',()=>run(backend.command('hesitation-override',{taskKey:task.taskKey,parent:task.head,target:review.id}),()=>{message('選んだ評価に戻しました。');render();}),{class:'quiet','data-override':''});}
+  function expireLastReview(){
+    if(!lastReview)return;
+    const p=backend.readProjection(),review=p.reviews.find(row=>row.id===lastReview.eventId),at=now(),today=backend.todayAllowance?.()??dayBounds(at,p.settings.learnerTimezone);
+    if(!review||!Number.isSafeInteger(review.at)||review.at<today.startsAt||review.at>=today.endsAt)lastReview=null;
+  }
+  function undoLast(){expireLastReview();const previous=lastReview;if(!previous)return;const p=backend.readProjection(),task=p.tasks[previous.entry.taskKey],effect=task&&p.effects[task.head];if(!effect||effect.root!==previous.eventId)return message('このカードは現在の状態から戻せません。');run(backend.command('undo',{taskKey:task.taskKey,parent:task.head,target:effect.root}),()=>{lastReview=null;customRun=previous.run?{...previous.run,remaining:[...previous.run.remaining]}:null;const review=p.reviews.find(row=>row.id===previous.eventId),labels=GRADES.find(([value])=>value===review?.effectiveRating),pressed=GRADES.find(([value])=>value===review?.rawRating),capped=review?.rawRating!==review?.effectiveRating;start(previous.entry,false,previous.learnAhead,previous.session,{source:'key',restore:{thinkMs:previous.thinkMs},preserveRun:!!previous.run});showToast(`[${capped?pressed?.[1]+' → ':''}${labels?.[1]||'評価'}]を元に戻しました`,`Undid [${capped?pressed?.[2]+' → ':''}${labels?.[2]||'rating'}]`);});}
+  function overrideLastReviewButton(p){if(!lastReview)return null;const review=p.reviews.find(r=>r.id===lastReview.eventId),task=p.tasks[lastReview.entry.taskKey];if(!review||review.rawRating===review.effectiveRating||!task)return null;return button('選んだ評価に戻す',()=>{expireLastReview();if(lastReview?.eventId!==review.id)return;run(backend.command('hesitation-override',{taskKey:task.taskKey,parent:task.head,target:review.id}),()=>{message('選んだ評価に戻しました。');render();});},{class:'quiet','data-override':''});}
   function wordsScreen(){
     reconcileUnknownFactoryRows();
     const section=h('section',{},h('h1',{},'単語とカード'),h('p',{class:'secondary'},'文法の意味と想起は、別々のカードとして記録します。'));
@@ -922,7 +928,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       else if(noticeOwner==='native-sync-action')message('');
     }catch(error){
       if(!disposed){nativeSyncActionError=error?.message||'operation-failed';nativeSyncState={...nativeSyncState,state:'error',error:nativeSyncActionError};message(nativeSyncActionError==='native-sync-bootstrap-required'?'既存の学習履歴を先に安全に引き継ぐ必要があります。':'通信を確認できませんでした。未送信の記録は端末に残っています。同じ操作を再試行できます。','native-sync-action');}
-    }finally{nativeSyncBusy=false;nativeStatusGeneration++;if(!disposed)show();}
+    }finally{nativeSyncBusy=false;nativeStatusGeneration++;if(!disposed){show();if(quiet){if(retryableSyncFailure())scheduleSyncRetry();else clearSyncRetry();}}}
   }
   function nativeSyncSettings(){
     if(platform.storageKind==='native-worker-prod'){
@@ -1002,32 +1008,57 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   win.addEventListener('focus',budgetWake);document.addEventListener('visibilitychange',budgetWake);
   // Local writes wake the same Sync action. Its refresh notifications must not
   // start another sync: only a durable, nonempty outbox requests this work.
-  let outboxSyncTimer=null;
+  let outboxSyncTimer=null,syncRetryTimer=null,syncRetryStep=0;
+  const retryableSyncFailure=()=>[nativeSyncActionError,nativeSyncState.error].some(isRetryableProdSyncError);
   const autoSyncAllowed=(retryErrors=false)=>!disposed&&online()&&document.visibilityState!=='hidden'&&platform.storageKind==='native-worker-prod'&&platform.nativeSync?.pairingEnabled&&nativeSyncState.paired&&[nativeSyncActionError,nativeSyncState.error].every(error=>!error||retryErrors&&isRetryableProdSyncError(error))&&!['update-required','bootstrap-required','pairing-disabled'].includes(nativeSyncState.state);
-  const pendingAllowsSync=()=>{if(!pendingIntent)return true;const state=operationState(pendingOperation?.result,pendingOperation?.policy);return state.persisted&&!state.updateRequired&&state.reason!=='identity-conflict';};
+  const pendingAllowsSync=()=>{
+    if(!pendingIntent)return true;
+    const result=pendingOperation?.result,state=operationState(result,pendingOperation?.policy),resolution=result?.resolution;
+    // Only a proved provisional observation needs upload to learn its canonical
+    // outcome. Unknown saves and blocked projection/admission stay explicit.
+    return state.persisted&&state.phase==='pending'&&!state.updateRequired&&
+      (resolution?resolution.eventId===result.eventId&&resolution.status==='observation'&&resolution.outcome?.status==='observation':
+        result?.kind==='observation-only'&&result.outcome?.status==='observation');
+  };
+  function clearSyncRetry(){win.clearTimeout(syncRetryTimer);syncRetryTimer=null;syncRetryStep=0;}
+  function scheduleSyncRetry(){
+    if(syncRetryTimer!==null||!autoSyncAllowed(true))return;
+    const delay=[5000,30000,120000][Math.min(syncRetryStep++,2)];
+    syncRetryTimer=win.setTimeout(()=>{syncRetryTimer=null;attemptAutoSync(true);},delay);
+  }
   function scheduleOutboxSync(){
     if(disposed||platform.storageKind!=='native-worker-prod')return;
     win.clearTimeout(outboxSyncTimer);
     outboxSyncTimer=win.setTimeout(async()=>{
       outboxSyncTimer=null;
-      if(!autoSyncAllowed()||!pendingAllowsSync())return;
+      if(!autoSyncAllowed()||!pendingAllowsSync()){if(retryableSyncFailure())scheduleSyncRetry();return;}
       if(nativeSyncBusy||busy||typedBusy||customBusy){scheduleOutboxSync();return;}
       try{
         const status=await backend.status();
-        if(!autoSyncAllowed()||nativeSyncBusy||busy||typedBusy||customBusy||!pendingAllowsSync())return;
+        if(!autoSyncAllowed()||nativeSyncBusy||busy||typedBusy||customBusy||!pendingAllowsSync()){scheduleSyncRetry();return;}
         if(status.pendingUpload>0)await runNativeSync(()=>platform.nativeSync.sync(),{quiet:true});
       }catch{/* Save-status polling reports a failed local read. */}
     },300);
   }
-  // Production foreground sync: a paired Mac syncs quietly when it comes to the front, at most once a minute; errors still surface.
-  let lastAutoSync=0;
-  const autoSync=()=>{if(!autoSyncAllowed(true)||nativeSyncBusy||busy||typedBusy||customBusy||!pendingAllowsSync())return;
-    const at=now();if(at-lastAutoSync<60000)return;lastAutoSync=at;runNativeSync(()=>platform.nativeSync.sync(),{quiet:true});};
-  const reconnectSync=()=>{if([nativeSyncActionError,nativeSyncState.error].some(isRetryableProdSyncError))lastAutoSync=0;autoSync();};
+  // Foreground wakes are throttled. A dropped/failed wake gets one quiet retry
+  // timer: 5 s, 30 s, then at most once per 2 min while visible and online.
+  let lastAutoSync=-Infinity,lastReconnectReset=-Infinity;
+  function attemptAutoSync(retry=false){
+    if(!autoSyncAllowed(true)){clearSyncRetry();return;}
+    if(nativeSyncBusy||busy||typedBusy||customBusy||!pendingAllowsSync()){scheduleSyncRetry();return;}
+    const at=now();if(!retry&&at-lastAutoSync<60000){if(retryableSyncFailure())scheduleSyncRetry();return;}
+    win.clearTimeout(syncRetryTimer);syncRetryTimer=null;lastAutoSync=at;
+    runNativeSync(()=>platform.nativeSync.sync(),{quiet:true});
+  }
+  const autoSync=()=>attemptAutoSync();
+  const reconnectSync=()=>{
+    const at=now();if(retryableSyncFailure()&&at-lastReconnectReset>=10000){lastAutoSync=-Infinity;lastReconnectReset=at;}
+    scheduleOutboxSync();autoSync();
+  };
   win.addEventListener('online',reconnectSync);
   win.addEventListener('focus',autoSync);document.addEventListener('visibilitychange',autoSync);
   observeSharedActivity();render();
   reconcileUnknownFactoryRows();
   if(platform.storageKind==='native-worker-prod'&&platform.nativeSync)updateStatus().catch(()=>{});
-  return Object.freeze({showTask:(...args)=>{sessionShown=0;return start(...args);},refreshStatus:updateStatus,read:()=>({screen,module,current,busy:busy||typedBusy||customBusy,pendingIntent,theme,themePreferenceSet,interfaceLanguage}),dispose(){disposed=true;nativeStatusGeneration++;win.clearTimeout(outboxSyncTimer);win.clearTimeout(saveBacklogTimer);win.clearTimeout(toastTimer);win.clearTimeout(finishGuardTimer);panelObserver?.disconnect();budgetWatcher?.dispose();win.removeEventListener('online',availabilityWake);win.removeEventListener('online',reconnectSync);win.removeEventListener('offline',availabilityWake);win.removeEventListener('focus',budgetWake);document.removeEventListener('visibilitychange',budgetWake);win.removeEventListener('focus',autoSync);document.removeEventListener('visibilitychange',autoSync);platform.nativeSync?.dispose?.();factoryStatuses.dispose();current?.timer.dispose();closePopover();unsubscribe();unsubscribeSyncState?.();dark.removeEventListener('change',darkChanged);document.removeEventListener('keydown',onKey);document.removeEventListener('keydown',escape);document.removeEventListener('pointerdown',outsidePopover,true);root.replaceChildren();}});
+  return Object.freeze({showTask:(...args)=>{sessionShown=0;return start(...args);},refreshStatus:updateStatus,read:()=>({screen,module,current,busy:busy||typedBusy||customBusy,pendingIntent,theme,themePreferenceSet,interfaceLanguage}),dispose(){disposed=true;nativeStatusGeneration++;clearSyncRetry();win.clearTimeout(outboxSyncTimer);win.clearTimeout(saveBacklogTimer);win.clearTimeout(toastTimer);win.clearTimeout(finishGuardTimer);panelObserver?.disconnect();budgetWatcher?.dispose();win.removeEventListener('online',availabilityWake);win.removeEventListener('online',reconnectSync);win.removeEventListener('offline',availabilityWake);win.removeEventListener('focus',budgetWake);document.removeEventListener('visibilitychange',budgetWake);win.removeEventListener('focus',autoSync);document.removeEventListener('visibilitychange',autoSync);platform.nativeSync?.dispose?.();factoryStatuses.dispose();current?.timer.dispose();closePopover();unsubscribe();unsubscribeSyncState?.();dark.removeEventListener('change',darkChanged);document.removeEventListener('keydown',onKey);document.removeEventListener('keydown',escape);document.removeEventListener('pointerdown',outsidePopover,true);root.replaceChildren();}});
 }

@@ -1,5 +1,6 @@
 /** Transactional replica store; adapters own durable compare-and-swap completion. */
 import {ownsReadSnapshot} from './storage/read-ownership.mjs';
+import {ownsMaterializerOutput} from './materializer.mjs';
 const FORMAT = 'nsrs-replica-store/v1';
 const ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/;
 const HASH = /^[a-f0-9]{64}$/;
@@ -39,6 +40,7 @@ function replica(config) {
   // Opt-in adapter contract: every read transfers an exclusively owned snapshot.
   // Generic adapters retain the defensive copies at both public and write boundaries.
   const ownsRead = ownsReadSnapshot(adapter);
+  const ownsProjection = ownsMaterializerOutput(materialize);
   const subscriptions = new Set();
   const eventHash = event => {
     const hash = codec.payloadHash(event);
@@ -117,7 +119,7 @@ function replica(config) {
     check(projection && integer(projection.appliedSeq) && projection.appliedSeq <= end, 'invalid-projection');
     check(projection.appliedSeq >= state.appliedSeq, 'invalid-projection');
     state.appliedSeq = projection.appliedSeq;
-    state.projection = copy(projection);
+    state.projection = ownsProjection ? projection : copy(projection);
     if (projection.appliedSeq < end) state.blocked = { reason: 'reducer-unsupported', seq: projection.appliedSeq + 1 };
     // Canonical insertion, projection, retirement and applied cursor commit as one candidate.
     for (const [id, local] of Object.entries(state.local)) {
@@ -311,7 +313,7 @@ export const createFreshStore = sanitized(async options => {
     epoch: config.epoch, provisionalNow: config.now() });
   check(projection && projection.appliedSeq === 0, 'invalid-projection');
   const initial = { format: FORMAT, storageRevision: 1, scope: copy(config.scope), epoch: config.epoch, nextDseq: 1, locallyDurable: 0,
-    acknowledged: 0, appliedSeq: 0, head: 0, local: {}, canonical: {}, projection: copy(projection), blocked: null };
+    acknowledged: 0, appliedSeq: 0, head: 0, local: {}, canonical: {}, projection: ownsMaterializerOutput(config.materialize) ? projection : copy(projection), blocked: null };
   check(new TextEncoder().encode(JSON.stringify(initial)).byteLength <= config.maxBytes, 'storage-limit');
   check(await config.adapter.compareAndSwap(config.scope, null, initial), 'installation-exists');
   return openStore({ ...options, ...config });
