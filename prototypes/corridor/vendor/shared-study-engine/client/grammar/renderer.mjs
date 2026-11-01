@@ -1,6 +1,7 @@
 /** Grammar presentation only. All enrollment, timing, grades and capture effects
  * belong to the shared host/backend. Prepare once before starting an attempt. */
 import { reviewObjectHash, validateCoverageBinding } from '../content/translation-coverage.mjs';
+import { splitSourceRuby } from '../player/ruby-segments.mjs';
 
 const MEANING = 'grammar.meaning.v1';
 const CLOZE = 'grammar.cloze.v1';
@@ -189,11 +190,17 @@ function tokenBase(document, token, targetSpan) {
 
 function appendTokens(document, parent, tokens, origin, onCapture, targetSpan) {
   for (const token of tokens) {
-    let node = tokenBase(document, token, targetSpan);
-    if (token.reading) {
-      const ruby = document.createElement('ruby');
-      ruby.append(node, element(document, 'rt', '', token.reading));
-      node = ruby;
+    const node = document.createDocumentFragment();
+    const split = splitSourceRuby(token.surface, token.reading || '');
+    for (const part of split.segments) {
+      const base = tokenBase(document, {...part, start: token.start + part.start, end: token.start + part.end}, targetSpan);
+      if (part.reading) {
+        const ruby = document.createElement('ruby');
+        ruby.dataset.rubyAlignment = split.status;
+        if (split.reason) ruby.dataset.rubyFallback = split.reason;
+        ruby.append(base, element(document, 'rt', '', part.reading));
+        node.append(ruby);
+      } else node.append(base);
     }
     if (typeof onCapture === 'function' && /[ぁ-ヿ一-鿿㐀-䶿]/u.test(token.surface)) {
       const button = element(document, 'button', 'grammar-lookup');

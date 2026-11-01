@@ -8,15 +8,90 @@ export function defaultInterfaceLanguage(device = globalThis.navigator) {
  }
  return 'en';
 }
+
+/** Finish timestamps follow each interface language in the learner timezone. */
+export function formatStudyDate(value,timeZone,language='en'){
+ const date=new Date(value),zone=timeZone?{timeZone}:{};
+ const time=date.toLocaleTimeString(language==='ja'?'ja-JP':'en-US',{timeStyle:'short',...zone});
+ return language==='ja'?`${date.toLocaleDateString('ja-JP',{month:'long',day:'numeric',...zone})}（${date.toLocaleDateString('ja-JP',{weekday:'short',...zone})}）${time}`:`${date.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',...zone})} · ${time}`;
+}
+/** Preserve unknown timing; a known sub-minute metric is never presented as no time. */
+export function formatStudyMinutes(evidence,language='en'){
+ if(!Number.isFinite(evidence?.minutes)||evidence.minutes<0)return '';
+ if(evidence.minutes===0)return Number.isFinite(evidence.milliseconds)&&evidence.milliseconds>=0?(language==='ja'?'1分未満':'<1 min'):'';
+ return language==='ja'?`${evidence.minutes}分`:`${evidence.minutes} min`;
+}
+
 export const interfaceCopies = Object.freeze([
-  ["スケジュール：変わりません／今日の新規上限：変わりません","Schedule: unchanged / Today’s new-card limit: unchanged"],
-  ["スケジュール：早めに復習（間隔の伸びは控えめ）／今日の新規上限：変わりません","Schedule: early review (a smaller interval gain) / Today’s new-card limit: unchanged"],
+  ["今日の合計・日付・タイムゾーンを確認してください。合計は現在の上限から200枚までの整数で指定してください。", "Check today’s total, date and timezone. Enter a whole-number total from the current limit to 200."],
+  ["この上限変更は反映されませんでした。今日の上限を確認して選び直してください。", "This limit change was not applied. Check today’s limit before choosing again."],
+  ["回答を保存しました。新規カードを準備しています…", "Your answer is saved. Preparing new cards…"],
+  ["回答は保存されています。新規カードを受け取れませんでした。もう一度準備できます。", "Your answer is saved. New cards could not be reserved. Retry preparation."],
+  ["保存済み記録の照合に失敗しました。元の記録と操作を残しています。もう一度状況を確認してください。", "The saved record could not be matched. The original record and operation are retained. Check its status again."],
+  ["入力が大きすぎるため、この操作を処理できません。保存状態を確認してから入力を見直してください。", "The input is too large to process. Check its save status before revising the input."],
+  ["記録は端末に保存されていますが、大きすぎるため処理できません。記録を残したまま対応方法を確認してください。", "The record is saved on this device, but it is too large to process. Keep the record and check how to handle it."],
+  ["アプリの更新が必要です。保存できたかは未確認です。入力と同じ操作は残しています。", "An app update is required. The save is unconfirmed. Your input and original operation are retained."],
+  ["この端末", "This device"],
+  ["別の端末", "Another device"],
+  ["同期中…", "Syncing…"],
+  ["オフライン", "Offline"],
+  ["オフラインで起動しました", "Started offline"],
+  ["次のカードへ", "Next card"],
+  ["このカードの記録が更新されました。今回の評価は送信していません。", "This card’s record was updated. Your rating was not sent."],
+  ["回答の記録は端末に保存されていますが、今のカードには反映されませんでした。", "The answer record is saved on this device, but it was not applied to the current card."],
+  ["この操作は保存されていません。入力を確認してください。", "This operation was not saved. Check your input."],
+  ["記録は端末に保存されましたが、この操作は反映されませんでした。", "The record is saved on this device, but this operation was not applied."],
+  ["保存済み記録の処理を再試行", "Retry saved-record processing"],
+  ["保存できたか確認できません。入力と同じ操作を残しています。保存を再試行してください。", "The save could not be confirmed. Your input and original operation are retained. Retry the save."],
+  ["記録は端末に保存されています。処理が完了していません。同じ記録の処理を再試行できます。", "The record is saved on this device. Processing is not complete. Retry processing the same record."],
+  ["記録は端末に保存されています。アプリを更新してから処理状況を確認してください。", "The record is saved on this device. Update the app, then check its processing status."],
+  ["新規カードの準備を完了できませんでした。同じ操作を再試行してください。","New-card preparation did not finish. Retry the same operation."],
+  ["十分な記録がないため、1枚あたり約1.1回の復習を見込んでいます。","With limited history, the estimate uses about 1.1 later reviews per new card."],
+  ["上限を保存できたか確認できません。同じ合計を再試行してください。","The limit save could not be confirmed. Retry the same total."],
+  ["前の上限変更を先に再試行してください。別の変更は保存していません。","Retry the previous limit change first. No different change was saved."],
+  ["新規カードを受け取る接続がありません。設定を確認してください。","No connection can reserve new cards. Check Settings."],
+  ["上限は保存しました。新規カードを受け取れませんでした。同じ操作を再試行してください。","The limit is saved. New cards could not be reserved. Retry preparation."],
+  ["上限の記録は端末に保存されています。処理をもう一度確認してください。","The limit record is saved on this device. Retry processing."],
+  ["学習日が変わりました。今日の上限を確認してから選び直してください。","The study day changed. Check today’s limit before choosing again."],
+  ["別の操作で今日の上限が増えました。現在の上限を確認してください。","Another change raised today’s limit. Check the current limit."],
+  ["オフラインのため、新規カードを受け取れません。通信が戻ってから再試行してください。","New cards cannot be reserved offline. Retry when connected."],
+  ["今回の学習は終わりました","This session is done"],
+  ["追加練習を終えました","Practice is done"],
+  ["お疲れさまでした。","That's everything for today."],
+  ["今回の学習","This session"],
+  ["すべて表示","Show all"],
+  ["完了","Done"],
+  ["忘れた直後にもう一度思い出すと、定着を助けます。","One more recall right after a miss helps it stick."],
+  ["今日の新規を増やすと、今後数週間の復習も増えます。","More new cards today means more reviews over the next weeks."],
+  ["間隔が10日以上で、明日の予定のうち24時間以内のカードを出題します。","Only tomorrow's cards within the next 24 hours, with intervals of at least 10 days."],
+  ["スケジュール：新規カードを追加／今日の新規上限：変わりません","Schedule: new cards added · Today's new-card limit: unchanged"],
+  ["今日の新規カードを増やす","Add new cards today"],
+  ["追加する枚数","Cards to add"],
+  ["追加して学習する","Add and study"],
+  ["準備を再試行","Retry preparation"],
+  ["閉じて確認","Close and check"],
+  ["今学習できる新規カードはありません。","No new cards are ready to study now."],
+  ["上限は保存しましたが、今学習できる新規カードはありません。","The limit is saved, but no new cards are ready to study now."],
+  ["オフラインで学習できる新規カードはありません。復習は続けられます。","No new cards are available offline. You can continue reviewing."],
+  ["今後7日間の日付ごとの復習予定（新規カード・前日からの未完了分は含みません）","Reviews due, next 7 days, by scheduled date (new cards and earlier unfinished reviews excluded)"],
+  ["評価","rating"],
+  ["この端末に表示設定を保存できません。","Display settings could not be saved on this device."],
+  ["次の復習までの間隔を表示（この端末のみ）","Show review interval hints (this device only)"],
+  ["Space・Enter：解答を表示／1〜4：採点／U：元に戻す／Esc：学習を終える","Space / Enter: show answer · 1–4: grade · U: undo · Esc: end session"],
+  ["思い出せなかったときは、惜しくても[もう一度]を選んでください。","If you did not recall it, choose Again, even if it was close."],
+  ["もう一度：思い出せなかった・難しい：苦労して思い出せた（合格）・正解：思い出せた・簡単：すぐに思い出せた","Again: did not recall · Hard: recalled with real effort (a pass) · Good: recalled · Easy: instant"],
+  ["迷いがあったため間隔を短くしました","Interval shortened for hesitation"],
+  ["学習を終える","End session"],
+  ["Spaceで解答を表示","Press Space to show answer"],
+  ["タップで解答を表示","Tap to show answer"],
+  ["スケジュール：変わりません／今日の新規上限：変わりません","Schedule: unchanged · Today’s new-card limit: unchanged"],
+  ["スケジュール：早めの復習として更新（効果はやや小さめ）／今日の新規上限：変わりません","Schedule: updated as early reviews (smaller gain) · Today's new-card limit: unchanged"],
   ["学習したカードは翌日以降、復習として戻ってきます。1日20枚のペースを続けると、数か月後には1日およそ200枚の復習になります。","Cards you learn come back as reviews from tomorrow on. At 20 new cards a day, expect about 200 reviews a day after a few months."],
   ["アプリの更新が必要です。記録は端末に残っています。","The app needs an update. Your records remain on this device."],
   ["同期の設定を確認してください。記録は端末に残っています。","Check your sync setup. Your records remain on this device."],
   ["今日の学習は終わりました","Today's study is done"],
   ["学習したカードは翌日以降、復習として戻ってきます。","Cards you learn will return for review from tomorrow onward."],
-  ["1日の新規カード上限を変更","Change the daily new-card limit"],
+  ["1日の新規カード上限を変更","Change new cards per day"],
   ["復習が多い日は、まず復習だけを進めることをおすすめします。","When reviews pile up, we suggest starting with reviews only."],
   ["50枚学習する","Study 50"],
   ["続きから学習する","Continue"],
@@ -24,12 +99,12 @@ export const interfaceCopies = Object.freeze([
   ["復習だけ学習する","Study reviews only"],
   ["このデッキで今学習できるカードはありません。","No cards in this deck are ready to study now."],
   ["すべてのデッキを見る","See all decks"],
-  ["スケジュール：通常の復習／今日の新規上限：変わりません","Schedule: normal reviews / Today's new-card limit: unchanged"],
+  ["スケジュール：通常の復習／今日の新規上限：変わりません","Schedule: normal reviews · Today's new-card limit: unchanged"],
   ["明日","Tomorrow"],
   ["今後7日間の復習予定（新規カードは含みません）","Reviews scheduled over the next 7 days (new cards excluded)"],
   ["さらに学習する","Study more"],
   ["新規カードを追加…","Add new cards…"],
-  ["スケジュール：新規カードを追加／今日の新規上限：増えます","Schedule: new cards added / Today's new-card limit: raised"],
+  ["スケジュール：新規カードが加わります／今日の新規上限：両方の端末で引き上げ","Schedule: adds new cards · Today's new-card limit: raised on both devices"],
   ["未学習の新規カードはもうありません。","There are no unseen new cards left."],
   ["関連するカードは明日以降に学習できます。","Related cards will be available from tomorrow."],
   ["新規カードを受け取る接続が設定されていません。設定を確認してください。","No connection is set up to receive new cards. Check Settings."],
@@ -44,6 +119,7 @@ export const interfaceCopies = Object.freeze([
   ["前の曜日設定を先に再試行してください。", "Retry the previous weekday setting first."],
   ["曜日ごとの新規カード上限を使っています。今日のカスタム学習パネルで変更できます。", "Weekday new-card limits are in use. Change them in Today’s Custom session panel."],
   ["カスタム学習", "Custom session"],
+  ["カスタム学習…", "Custom session…"],
   ["学習方法", "Session mode"],
   ["予定どおりの復習", "Due reviews"],
   ["先取り復習", "Review ahead"],
@@ -433,6 +509,8 @@ export function translateInterfaceText(text,labels=interfaceLabels){
  if(!japanese.test(text))return text;
  if(labels.has(text))return labels.get(text);
  const dynamic=[
+  [/^(.*)現在の上限は(\d+)枚です。$/, (before,n)=>`${translateInterfaceText(before,labels)} Current limit: ${n}.`],
+  [/^(.*)再試行する合計は(\d+)枚です。$/, (before,n)=>`${translateInterfaceText(before,labels)} Retry total: ${n}.`],
   [/^(\d+)枚$/,n=>`${n} cards`],
   [/^復習 (\d+) · 新規カード (\d+) · 1日の新規カード上限はすべてのデッキ共通$/, (due,newCount)=>`Reviews ${due} · New cards ${newCount} · Daily new cards are shared across all decks`],
   [/^学習ステップが (\d+) 件あります。次の予定は (\d{1,2}:\d{2}) です。$/, (n,time)=>`${n} learning steps remain. The next is at ${time}.`],

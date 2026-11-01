@@ -75,10 +75,8 @@ export function studyReviewSummary(projection,{at=Date.now(),eventIds=null,start
    ...timing(rows,sessionSamples(projection,evidence,at)),matured:matured.size,misses,eventIds:rows.map(row=>row.id)};
 }
 
-/** These offers are explicit subsets of the CURRENT canonical selector. The
- * caller must restrict the run to taskKeys and revalidate at start. The old
- * recentlyFailed selector excludes initial/learning misses; expose that gap
- * instead of promising cards it cannot currently select. */
+/** These offers are explicit subsets of the current canonical selector. The
+ * caller must restrict the run to taskKeys and revalidate at start. */
 export function studyOfferView(projection,catalog,{at=Date.now(),installation,missedTaskKeys=[]}={}){
  const today=studyDayAllowance(projection,at),tomorrow=dayBounds(today.endsAt,today.timezone);
  const clock={now:at,dayStart:today.startsAt,dayEnd:today.endsAt-1,installation};
@@ -86,7 +84,7 @@ export function studyOfferView(projection,catalog,{at=Date.now(),installation,mi
  const missed=new Set(missedTaskKeys);
  const practice=selectCustomSession(projection,catalog.filter(entry=>missed.has(entry.taskKey)),practiceOptions,clock);
  const practiceIds=practice.entries.map(entry=>entry.taskKey),selected=new Set(practiceIds);
- const aheadOptions={mode:'review-ahead',aheadDays:1,size:200,untilDone:true};
+ const aheadOptions={mode:'review-ahead',aheadDays:1,size:200,untilDone:true,filters:{minIntervalDays:10}};
  const ahead=selectCustomSession(projection,catalog.filter(entry=>{
   const card=projection.tasks[entry.taskKey]?.card,due=Date.parse(card?.due);
   return card?.state===2&&card.scheduled_days>=10&&due>=tomorrow.startsAt&&due<tomorrow.endsAt;
@@ -95,20 +93,46 @@ export function studyOfferView(projection,catalog,{at=Date.now(),installation,mi
   ahead:{taskKeys:ahead.entries.map(entry=>entry.taskKey),options:ahead.options}};
 }
 
-/** Forecasts count current schedules, not future grade outcomes. queue must be
- * the full canonical queue. Online alone is not permit authority: only an
- * explicitly capable host may set canRequestPermits. Optional sessionTimings
- * enable evidence-based pace estimates; otherwise minutes remain absent. */
-export function studyDayView(projection,catalog,{at=Date.now(),installation,queue=[],offline=false,canRequestPermits=false,verifiedRestDays=[],sessionTimings=[]}={}){
- const today=studyDayAllowance(projection,at),timezone=today.timezone;
- const boundaries=[];let cursor=today.endsAt;
- for(let index=0;index<7;index++){const bounds=dayBounds(cursor,timezone);boundaries.push(bounds);cursor=bounds.endsAt;}
- const rows=validReviews(projection,at),eligible=catalog.filter(entry=>{const task=projection.tasks[entry.taskKey];return task&&contentReady(entry)&&!task.suspended&&!task.known&&!(projection.settings.topicsOff?.[task.module]??[]).includes(task.group);});
+/** Observed seven-day cost, not a second scheduling model. Use only known
+ * introductions with seven COMPLETE following learner days in the last 60-day
+ * cohort window. An interday review is the first active review of a card on a
+ * later learner day; intraday learning repeats do not inflate the estimate.
+ * Baseline imports, undone introductions and incomplete cohorts are excluded.
+ * When history spans fewer than 14 learner days (or no complete cohort),
+ * use the research fallback and identify it explicitly. */
+export function studyNewCardCost(projection,{at=Date.now()}={}){
+ const today=studyDayAllowance(projection,at),days=precedingDays(today,60),keyAt=dayKeys(today.timezone);
+ const rows=validReviews(projection,at),byId=new Map(rows.map(row=>[row.id,row]));
+ const hasHistory=rows.some(row=>row.at<days[12].startsAt);
+ const cohorts=new Map();
+ for(const [taskKey,introduction] of Object.entries(projection.introductions??{})){
+  if(introduction.baseline)continue;
+  const first=byId.get(introduction.id);
+  if(!first||first.taskKey!==taskKey||first.at<days.at(-1).startsAt)continue;
+  const bounds=dayBounds(first.at,today.timezone);let end=bounds.endsAt;
+  for(let i=0;i<7;i++)end=dayBounds(end,today.timezone).endsAt;
+  if(at<end)continue;
+  cohorts.set(taskKey,{after:bounds.endsAt,end,days:new Set()});
+ }
+ for(const row of rows){const cohort=cohorts.get(row.taskKey);if(cohort&&row.at>=cohort.after&&row.at<cohort.end)cohort.days.add(keyAt(row.at));}
+ const interdayReviews=[...cohorts.values()].reduce((sum,cohort)=>sum+cohort.days.size,0);
+ const source=hasHistory&&cohorts.size?'history':'fallback';
+ const r7=source==='history'?interdayReviews/cohorts.size:1.1;
+ return {r7,source,cohortCards:cohorts.size,interdayReviews,
+  fallbackReason:source==='history'?null:!hasHistory?'less-than-14-days':'no-complete-cohort',
+  choices:[5,10,20].filter(add=>today.limit+add<=200).map(add=>({add,total:today.limit+add,estimatedReviews:Math.round(add*r7)}))};
+}
+
+// Shared current-day availability only: no forecasts, session timings, offers
+// or continuity. The caller still supplies the canonical admission queue.
+function studyAvailabilityData(projection,catalog,{at=Date.now(),installation,queue=[],offline=false,canRequestPermits=false}={}){
+ const today=studyDayAllowance(projection,at);
+ const eligible=catalog.filter(entry=>{const task=projection.tasks[entry.taskKey];return task&&contentReady(entry)&&!task.suspended&&!task.known&&!(projection.settings.topicsOff?.[task.module]??[]).includes(task.group);});
  const admitted=new Set(queue.map(entry=>entry.taskKey));
  const due=eligible.filter(entry=>admitted.has(entry.taskKey)&&projection.introductions[entry.taskKey]);
  const unseen=eligible.filter(entry=>!projection.introductions[entry.taskKey]);
  // This is only the canonical sibling exclusion, not a second scheduler.
- const reviewedToday=rows.filter(row=>row.at>=today.startsAt&&row.at<today.endsAt);
+ const reviewedToday=projection.reviews.filter(row=>!row.undoneAt&&row.at<=at&&row.at>=today.startsAt&&row.at<today.endsAt);
  const reviewedLexemes=new Map();for(const row of reviewedToday){const key=projection.tasks[row.taskKey]?.lexicalKey;let keys=reviewedLexemes.get(key);if(!keys)reviewedLexemes.set(key,keys=new Set());keys.add(row.taskKey);}
  const eligibleNew=unseen.filter(entry=>{const keys=reviewedLexemes.get(projection.tasks[entry.taskKey].lexicalKey);return !keys||keys.size===1&&keys.has(entry.taskKey);});
  const permits=Object.values(projection.permits),overlapping=permit=>permit.startsAt<today.endsAt&&permit.endsAt>today.startsAt;
@@ -121,6 +145,24 @@ export function studyDayView(projection,catalog,{at=Date.now(),installation,queu
  const requestableNew=!offline&&canRequestPermits?Math.min(eligibleNew.length-readyNew,unallocated,remaining-readyNew):0;
  const newToday=readyNew+requestableNew,buried=unseen.length-eligibleNew.length;
  const reason=newToday?null:!unseen.length?'no-new-left':!eligibleNew.length?'siblings-buried':offline?'offline-permits-exhausted':reservedElsewhere?'reserved-on-another-device':spent>=today.limit?'daily-limit-reached':!canRequestPermits&&unallocated?'permit-authority-unavailable':'permits-unavailable';
+ const availability={allocated,unallocated,reservedElsewhere,readyNew,requestableNew,eligibleNewIds:eligibleNew.map(entry=>entry.taskKey),buried,reason};
+ return {today,eligible,due,unseen,newToday,held,spent,readyNew,requestableNew,buried,reason,reservedElsewhere,availability};
+}
+
+/** Current new-card eligibility and permit counts without the full Today model. */
+export function studyNewCardAvailability(projection,catalog,options={}){
+ const {today,availability}=studyAvailabilityData(projection,catalog,options);
+ return {today,availability};
+}
+
+/** Forecasts count current schedules, not future grade outcomes. queue must be
+ * the full canonical queue. Online alone is not permit authority: only an
+ * explicitly capable host may set canRequestPermits. Optional sessionTimings
+ * enable evidence-based pace estimates; otherwise minutes remain absent. */
+export function studyDayView(projection,catalog,{at=Date.now(),installation,queue=[],offline=false,canRequestPermits=false,verifiedRestDays=[],sessionTimings=[]}={}){
+ const {today,eligible,due,unseen,newToday,held,spent,readyNew,requestableNew,buried,reason,reservedElsewhere,availability}=studyAvailabilityData(projection,catalog,{at,installation,queue,offline,canRequestPermits});
+ const timezone=today.timezone,rows=validReviews(projection,at),boundaries=[];let cursor=today.endsAt;
+ for(let index=0;index<7;index++){const bounds=dayBounds(cursor,timezone);boundaries.push(bounds);cursor=bounds.endsAt;}
  const keyAt=dayKeys(timezone),historyDays=new Set(rows.map(row=>keyAt(row.at))),recentDays=precedingDays(today,14);
  const recentKeys=new Set(recentDays.map(day=>day.day)),counts=new Map(recentDays.map(day=>[day.day,0]));
  const samples=sessionSamples(projection,sessionTimings,at),newTimes=[],reviewTimes=[];
@@ -135,7 +177,8 @@ export function studyDayView(projection,catalog,{at=Date.now(),installation,queu
  const scheduled=eligible.map(entry=>({entry,task:projection.tasks[entry.taskKey]})).filter(({task})=>task.card&&Number.isFinite(Date.parse(task.card.due)));
  const overdue=due.filter(entry=>Date.parse(projection.tasks[entry.taskKey].card?.due)<today.startsAt).length;
  const strip=boundaries.map(bounds=>({...bounds,count:scheduled.filter(({task})=>{const time=Date.parse(task.card.due);return time>=bounds.startsAt&&time<bounds.endsAt;}).length}));
- const tomorrowReviews=scheduled.filter(({task})=>Date.parse(task.card.due)<boundaries[0].endsAt).length;
+ const carriedReviews=scheduled.filter(({task})=>Date.parse(task.card.due)<=at).length;
+ const tomorrowReviews=strip[0].count+carriedReviews;
  const tomorrowNew=Math.min(studyDayAllowance(projection,boundaries[0].startsAt).limit,unseen.length);
  const later=scheduled.filter(({task})=>[1,3].includes(task.card.state)&&Date.parse(task.card.due)>at&&Date.parse(task.card.due)<today.endsAt).sort((a,b)=>Date.parse(a.task.card.due)-Date.parse(b.task.card.due));
  const recentDayKeys=new Set(precedingDays(today,30).map(day=>day.day));
@@ -147,12 +190,12 @@ export function studyDayView(projection,catalog,{at=Date.now(),installation,queu
  const medianDailyReviews=median([...counts.values()]),backlog=overdue>0&&due.length>Math.max(50,1.5*medianDailyReviews);
  return {today,due:due.length,newToday,held,spent,unseen:unseen.length,overdue,backlog,firstDay:rows.length===0,
    finished:due.length===0&&newToday===0,waitingForNew:due.length===0&&readyNew===0&&requestableNew>0,estimateMinutes:estimate(due.length,newToday),totals,
-   availability:{allocated,unallocated,reservedElsewhere,readyNew,requestableNew,eligibleNewIds:eligibleNew.map(entry=>entry.taskKey),buried,reason},
+   availability,
    historyWindow:{days:recentDays.map(day=>day.day),reviewCounts:[...counts.values()],medianDailyReviews},
    estimateEvidence:{source:'known-session-grade-gaps',reviewSamples:reviewTimes.length,newSamples:newTimes.length},
-   tomorrow:{reviews:tomorrowReviews,new:tomorrowNew,estimateMinutes:estimate(tomorrowReviews,tomorrowNew)},strip,
+   tomorrow:{reviews:tomorrowReviews,scheduledReviews:strip[0].count,carriedReviews,new:tomorrowNew,estimateMinutes:estimate(tomorrowReviews,tomorrowNew)},strip,
    laterToday:{count:later.length,nextAt:later.length?Date.parse(later[0].task.card.due):null},ahead:offers.ahead.taskKeys,offers,
-   continuity:historyDays.size<3?null:{days:continuityDays.size,outOf:30},
+   continuity:rows.length===0?null:{days:continuityDays.size,outOf:30},
    conditions:{laterToday:later.length>0,limitReached:spent>=today.limit,noNewLeft:unseen.length===0,offline,
     reservedElsewhere:reservedElsewhere>0,buriedNew:buried>0,permitAuthorityUnavailable:reason==='permit-authority-unavailable'},
  };

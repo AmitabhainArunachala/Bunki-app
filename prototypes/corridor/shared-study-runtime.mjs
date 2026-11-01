@@ -21,7 +21,10 @@ export function sharedStudyRuntime() {
     const existing=localStorage.getItem(key),installation=existing||`test-bunki-${crypto.randomUUID()}`;
     const identity={learner:'test-bunki-shared-preview',environment:'test-bunki-shared-preview',installation,mode:existing?'open':'fresh'};
     const storage=createSharedStudyStorage({databaseName:'bunki-shared-study-preview-v1'});
-    const adapter=await createBunkiStudyAdapter({content,storage,identity,initialize:async({store})=>{
+    // The preview follows the shell's 600px phone layout once at mount. This is
+    // presentation only; bound hosts above supply their own explicit choice.
+    const presentation=globalThis.matchMedia?.('(max-width: 600px)')?.matches?'phone':'desktop';
+    const adapter=await createBunkiStudyAdapter({content,storage,identity,presentation,initialize:async({store})=>{
       if (existing) return;
       if (store.scope.learner!=='test-bunki-shared-preview'||store.scope.environment!=='test-bunki-shared-preview'||!store.scope.installation.startsWith('test-bunki-')) throw Error('preview-scope-required');
       const ts=Date.now(),event={v:4,id:'@server:1',learner:store.scope.learner,install:'@server',dseq:1,base:0,ts,epoch:0,policy:'nsrs-policy-v1',type:'permit-grant',

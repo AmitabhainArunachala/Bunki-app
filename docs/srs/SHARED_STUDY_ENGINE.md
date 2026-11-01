@@ -34,6 +34,15 @@ The shell may bind `globalThis.bunkiSharedStudyHost` before opening a deck:
   transport: {reserveNewPermits({store})},
   canRequestNewCards: () => pairedAndEnabled,
   isOnline: () => navigator.onLine !== false,
+  presentation: 'phone', // Optional 'phone' or 'desktop'; no pairing/authority claim
+  isPaired: () => authenticatedPairingExists,
+  getSyncState: () => actualSyncState, // e.g. syncing, up-to-date, error
+  getSyncError: () => actualSyncError,
+  subscribeSyncState: listener => subscribeToActualSync(listener), // returns unsubscribe
+  labelForInstallation: id => trustedDeviceLabels.get(id) ?? null,
+  // Optional startup facts if the host synchronized before mounting study:
+  startedOffline: offlineAtHostStartup,
+  activitySince: canonicalPrefixBeforeStartupSync,
   readPreviousRegistry: async () => exactPreviouslyInstalledRegistry
 }
 ```
@@ -53,6 +62,31 @@ request time and passes the same store to the transport. Today awaits that
 request and then refreshes the canonical queue. A transport alone defaults to
 disabled, and the initial-grant-only preview has no request callback. No host
 credentials or production pairing are supplied by this integration.
+
+Presentation callbacks report the bound host's actual state; they do not perform
+sync or grant permits. Pairing defaults to false even when a reserve transport is
+present. Without a trusted installation label the shared UI says another device.
+Offline startup is captured when the adapter opens unless the host supplies its
+earlier launch fact. The activity prefix defaults to the opened projection, so old
+history is not announced as newly received. A host that synchronized before mount
+can supply its pre-sync prefix. These ports feed the bundled canonical S5
+presentation; the manifest identifies the exact reviewed source and UI bytes.
+
+`presentation` selects canonical phone or desktop controls independently of
+storage, pairing and permit authority. Bound hosts choose it explicitly; viewport
+width never overrides their value or supplies a missing value. Omission retains
+the canonical default. The isolated preview selects once when mounted using
+`matchMedia('(max-width: 600px)')`, matching the shell's phone navigation layout.
+Changing width requires reloading the preview to change this choice. Its storage
+kind stays `bunki-shared`, pairing stays false, and no transport or grant is added.
+
+An explicitly retried Bunki attempt retains the same frozen rating command and
+delegates it to canonical `resumeCommand`. The first call uses `submitCommand`;
+simultaneous calls share one pending Promise. Bunki does not cache a saved-but-
+blocked result as final or re-create a review after a lost reply. Recovery keeps
+the original immutable save proof and adds the canonical current `resolution`;
+consumers must interpret that resolution rather than treating the old `kind` as
+a fresh outcome. The canonical study UI owns its corresponding recovery flow.
 
 Before connecting, Bunki calls canonical `refreshCorpus` with QA expansion
 disabled. Additions require the host's exact previously installed registry

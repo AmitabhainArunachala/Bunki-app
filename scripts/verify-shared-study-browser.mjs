@@ -45,8 +45,11 @@ try {
   assert.equal(Number(await row.locator('.dojo-deck-new b').textContent()),legacyCounts.summary.fresh);
   assert.equal(await row.locator('.dojo-deck-bar').evaluate(node=>Number(node.style.getPropertyValue('--begun'))),1/legacyCounts.summary.words);
   assert.equal(await normal.evaluate(()=>Object.keys(localStorage).some(key=>key.startsWith('bunki-shared-study:'))),false);
+  await normal.setViewportSize({width:393,height:852});await normal.goto(`${host.origin}/?deck=n2&ui=en`,{waitUntil:'domcontentloaded'});
+  await normal.locator('#kp-start').waitFor({timeout:60000});assert.equal(await normal.locator('[data-shared-study-frame]').count(),0);
+  assert.equal(await normal.evaluate(()=>localStorage.getItem('bunki-cloze:n2')),normalLedger);
   assert.deepEqual(normalRequests.filter(path=>path.includes('/vendor/shared-study-engine/')||path.includes('/data/shared-study')),[]);
-  receipt.checks.push('normal-route-ignores-shared-grammar-and-next-deck-opens','normal-route-keeps-legacy-player-and-durable-history','normal-deck-list-counts-begun-and-missed-terms-use-legacy-ledger','normal-route-does-not-load-shared-engine-or-data');await normalContext.close();
+  receipt.checks.push('normal-route-ignores-shared-grammar-and-next-deck-opens','normal-route-keeps-legacy-player-and-durable-history','normal-deck-list-counts-begun-and-missed-terms-use-legacy-ledger','normal-route-does-not-load-shared-engine-or-data','normal-phone-route-keeps-legacy-player-and-history');await normalContext.close();
   const context=await browser.newContext({viewport:{width:1280,height:820},serviceWorkers:'block'});await silenceBrowserAudio(context);
   const page=await context.newPage();page.on('pageerror',e=>receipt.errors.push(e.message));
   await page.addInitScript(()=>{window.__legacyWrites=[];for(const method of['put','add','delete','clear']){const original=IDBObjectStore.prototype[method];IDBObjectStore.prototype[method]=function(...args){if(!this.transaction.db.name.startsWith('bunki-shared-study-'))window.__legacyWrites.push({database:this.transaction.db.name,store:this.name,method});return original.apply(this,args);};}if(window===window.top&&!localStorage.getItem('bunki-cloze:n2'))localStorage.setItem('bunki-cloze:n2','{"format":"synthetic-preserved-legacy","cards":{"not-a-frozen-task":{}}}');});
@@ -58,7 +61,9 @@ try {
   assert.equal(await frame.locator('.today-actions .primary').count(),1);
   assert.match(await frame.locator('[data-today-counts]').innerText(),/20 new cards/);
   assert.equal(await frame.evaluate(()=>frameElement.bunkiStudyPort.adapter.platform.canRequestNewCards()),false);
-  await frame.locator('[data-start]').click();await frame.locator('[data-reveal]').click();await frame.locator('[data-grade="3"]').click();
+  assert.equal(await frame.evaluate(()=>frameElement.bunkiStudyPort.adapter.platform.presentation),'desktop');
+  await frame.locator('[data-start]:not(:disabled)').click();await frame.locator('[data-reveal]').click();
+  assert.equal(await frame.locator('[data-grade-key]').count(),4);await frame.locator('[data-grade="3"]').click();
   await frame.waitForFunction(()=>bunkiSharedStudy.backend.readProjection().reviews.length===1);
   assert.deepEqual(await legacy(),before);receipt.checks.push('explicit-preview-route-mounts-canonical-ui','full-8508-catalog','grade-durable-with-no-legacy-write');
   const due=await frame.evaluate(()=>{const p=bunkiSharedStudy.backend.readProjection(),r=p.reviews[0];return {taskKey:r.taskKey,card:p.tasks[r.taskKey].card,event:r.id,installation:bunkiSharedStudy.backend.installation};});
@@ -83,6 +88,7 @@ try {
     const authority=window.__boundStudyFixture={enabled:false,online:true,refuse:false,calls:0,release:null};
     window.bunkiSharedStudyHost={
       identity:{learner:'test-bunki-host',environment:'test-bunki-host',installation:'test-bunki-host-install',mode:'fresh'},
+      presentation:'phone',
       storage:{read:async scope=>(await storage()).read(scope),compareAndSwap:async(...args)=>(await storage()).compareAndSwap(...args)},
       canRequestNewCards:()=>authority.enabled,isOnline:()=>authority.online,
       transport:{reserveNewPermits:async({store})=>{
@@ -98,6 +104,8 @@ try {
   await boundPage.goto(`${host.origin}/?deck=senmon&ui=en`,{waitUntil:'domcontentloaded'});await boundPage.locator('[data-shared-study-frame]').waitFor({timeout:60000});
   const boundFrame=await(await boundPage.locator('[data-shared-study-frame]').elementHandle()).contentFrame();await boundFrame.waitForFunction(()=>!!window.bunkiSharedStudy,null,{timeout:60000});
   assert.equal(await boundFrame.evaluate(()=>bunkiSharedStudy.app.read().module),'senmon');
+  assert.equal(await boundFrame.evaluate(()=>frameElement.bunkiStudyPort.adapter.platform.presentation),'phone');
+  assert.equal(await boundFrame.evaluate(()=>frameElement.bunkiStudyPort.adapter.platform.isPaired()),false);
   assert.match(await boundFrame.locator('[data-today-counts]').innerText(),/^0 new cards$/);assert.equal(await boundFrame.locator('[data-start]').count(),0);
   await boundPage.evaluate(()=>{__boundStudyFixture.enabled=true;__boundStudyFixture.online=false;});await boundFrame.evaluate(()=>dispatchEvent(new Event('offline')));
   assert.equal(await boundFrame.locator('[data-start]').count(),0);assert.equal(await boundPage.evaluate(()=>__boundStudyFixture.calls),0);
@@ -111,8 +119,12 @@ try {
   await boundPage.evaluate(()=>__boundStudyFixture.release());await boundFrame.waitForFunction(()=>!!bunkiSharedStudy.app.read().current);
   assert.equal(await boundFrame.evaluate(()=>bunkiSharedStudy.app.read().current.entry.module),'senmon');
   assert.equal(await boundFrame.evaluate(()=>Object.keys(bunkiSharedStudy.backend.readProjection().permits).length),1);
+  assert.equal(await boundFrame.locator('[data-first-card-hint]').innerText(),'Tap to show answer');
+  await boundFrame.locator('[data-reveal]').click();assert.equal(await boundFrame.locator('[data-grade-key]').count(),0);
+  assert.match(await boundFrame.locator('[data-save-status]').innerText(),/Sync is not set up/);
+  assert.equal(await boundPage.evaluate(()=>__boundStudyFixture.calls),2);
   assert.equal(await boundPage.evaluate(()=>Object.keys(localStorage).some(key=>key.startsWith('bunki-cloze:'))),false);
-  receipt.checks.push('bound-host-requires-explicit-authority-and-online-state','bound-host-refusal-does-not-grant-new-cards','bound-host-awaits-real-reserve-before-selected-study');await boundContext.close();
+  receipt.checks.push('bound-host-requires-explicit-authority-and-online-state','bound-host-refusal-does-not-grant-new-cards','bound-host-awaits-real-reserve-before-selected-study','explicit-phone-presentation-overrides-wide-host-without-pairing-or-permit-side-effects');await boundContext.close();
   const response=await fetch(`${host.origin}/decks/player/shared-frame.html`);assert.equal(response.headers.get('content-security-policy'),"frame-ancestors 'self'");
   const other=await fetch(`${host.origin}/index.html`);assert.equal(other.headers.get('content-security-policy'),"frame-ancestors 'none'");receipt.checks.push('only-shared-frame-allows-same-origin-embedding');
   const offlineContext=await browser.newContext({viewport:{width:393,height:852}});await silenceBrowserAudio(offlineContext);const offlinePage=await offlineContext.newPage();
@@ -125,8 +137,19 @@ try {
   assert.deepEqual(sharedCached,[]);receipt.checks.push('normal-install-does-not-precache-shared-corpus-or-fonts');
   // First bound use downloads and verifies shared content through the active
   // worker; ordinary installation no longer preloads the optional corpus.
-  await offlinePage.goto(`${host.origin}/?deck=n2&sharedStudy=preview`,{waitUntil:'domcontentloaded'});
+  await offlinePage.goto(`${host.origin}/?deck=n2&sharedStudy=preview&ui=en`,{waitUntil:'domcontentloaded'});
   await offlinePage.locator('[data-shared-study-frame]').waitFor({timeout:60000});const onlineFrame=await(await offlinePage.locator('[data-shared-study-frame]').elementHandle()).contentFrame();await onlineFrame.waitForURL(/shared-frame\.html/);await onlineFrame.waitForFunction(()=>!!window.bunkiSharedStudy,null,{timeout:60000});
+  assert.deepEqual(await onlineFrame.evaluate(()=>{const p=frameElement.bunkiStudyPort.adapter.platform;return {presentation:p.presentation,storageKind:p.storageKind,paired:p.isPaired(),canRequest:p.canRequestNewCards(),requestBound:typeof p.requestNewCards==='function'};}),{presentation:'phone',storageKind:'bunki-shared',paired:false,canRequest:false,requestBound:false});
+  const phoneBefore=await onlineFrame.evaluate(()=>({permits:Object.keys(bunkiSharedStudy.backend.readProjection().permits).length,reviews:bunkiSharedStudy.backend.readProjection().reviews.length}));
+  assert.deepEqual(phoneBefore,{permits:20,reviews:0});
+  await onlineFrame.locator('[data-start]:not(:disabled)').click();assert.equal(await onlineFrame.locator('[data-first-card-hint]').innerText(),'Tap to show answer');
+  await onlineFrame.locator('[data-session-info]').click();assert.doesNotMatch(await onlineFrame.locator('#study-help').innerText(),/Space|Enter|1[–〜-]4/);await onlineFrame.locator('[data-session-info]').click();
+  await onlineFrame.locator('[data-reveal]').click();assert.equal(await onlineFrame.locator('[data-grade]').count(),4);assert.equal(await onlineFrame.locator('[data-grade-key]').count(),0);
+  assert.match(await onlineFrame.locator('[data-save-status]').innerText(),/Sync is not set up/);
+  await onlineFrame.evaluate(()=>bunkiSharedStudy.app.showTask(bunkiSharedStudy.app.read().current.entry,true));
+  await onlineFrame.locator('[data-reveal]').click();assert.equal(await onlineFrame.locator('[data-grade]').count(),0);assert.equal(await onlineFrame.locator('[data-finish-practice]').count(),1);
+  assert.deepEqual(await onlineFrame.evaluate(()=>({permits:Object.keys(bunkiSharedStudy.backend.readProjection().permits).length,reviews:bunkiSharedStudy.backend.readProjection().reviews.length})),phoneBefore);
+  receipt.checks.push('unpaired-preview-phone-controls-use-canonical-presentation','phone-practice-has-no-grade-or-permit-side-effect');
   await offlineContext.setOffline(true);await offlinePage.reload({waitUntil:'domcontentloaded'});
   await offlinePage.locator('[data-shared-study-frame]').waitFor({timeout:60000});const offlineFrame=await(await offlinePage.locator('[data-shared-study-frame]').elementHandle()).contentFrame();await offlineFrame.waitForURL(/shared-frame\.html/);
   await offlineFrame.waitForFunction(()=>!!window.bunkiSharedStudy||!!document.querySelector('[role="alert"]'),null,{timeout:60000});

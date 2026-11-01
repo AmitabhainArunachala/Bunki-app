@@ -40,8 +40,47 @@ describe('Bunki canonical shared study consumer',()=>{
     expect([...SHARED_DECKS,'shared-grammar'].map(moduleForSharedDeck)).toEqual(['n2','n1','senmon','kotoba','grammar']);
     for(const id of ['kotoba-mine','kotoba-mcd','context',null,'all'])expect(()=>moduleForSharedDeck(id)).toThrow('unmapped-shared-contract');
   });
+  it('forwards explicit presentation without pairing, permit authority, or ledger changes',async()=>{
+    for(const presentation of [undefined,'desktop','phone']){
+      let calls=0;const storage=memory();
+      const adapter=await createBunkiStudyAdapter({content:small,storage,identity:{learner:'test-shared',environment:'test-shared',installation:'test-bunki',mode:'fresh'},now:()=>NOW,presentation,
+        transport:{reserveNewPermits:async()=>{calls++;}}});
+      const before=canonicalStringify(await adapter.store.readState()),writes=storage.writes;
+      expect(adapter.platform.presentation).toBe(presentation);expect(Object.hasOwn(adapter.platform,'presentation')).toBe(presentation!==undefined);
+      expect(adapter.platform.storageKind).toBe('bunki-shared');expect(adapter.platform.isPaired()).toBe(false);
+      expect(adapter.platform.canRequestNewCards()).toBe(false);await expect(adapter.platform.requestNewCards()).rejects.toThrow('shared-permit-authority-unavailable');
+      expect(calls).toBe(0);expect(storage.writes).toBe(writes);expect(canonicalStringify(await adapter.store.readState())).toBe(before);
+      expect(Object.keys(adapter.backend.readProjection().permits)).toHaveLength(0);adapter.backend.dispose();
+    }
+  });
+  it('chooses phone presentation only for the preview shell and preserves an explicit bound host',async()=>{
+    async function mount({host,phone=false}){
+      const queries=[],created=[],values=new Map();
+      const context=productContext('shared-study-runtime.mjs',['sharedStudyRuntime'],{
+        bunkiSharedStudyHost:host,location:{search:'?sharedStudy=preview'},
+        matchMedia:query=>{queries.push(query);return {matches:phone};},
+        navigator:{locks:{request:async(_key,fn)=>fn()}},crypto:{randomUUID:()=> 'fixture'},
+        localStorage:{getItem:key=>values.get(key)||null,setItem:(key,value)=>values.set(key,value)},
+        loadSharedContent:async()=>({content:small}),createSharedStudyStorage:()=>({isolated:true}),
+        createBunkiStudyAdapter:async options=>{created.push(options);return options;},
+      });
+      vm.runInContext('let runtime=null;',context);
+      const result=await context.sharedStudyRuntime();expect(await context.sharedStudyRuntime()).toBe(result);expect(created).toHaveLength(1);
+      return {result,queries};
+    }
+    for(const phone of [false,true]){
+      const {result,queries}=await mount({phone});expect(result.presentation).toBe(phone?'phone':'desktop');
+      expect(queries).toEqual(['(max-width: 600px)']);expect(result.identity.learner).toBe('test-bunki-shared-preview');
+      expect(result.transport).toBeUndefined();expect(result.isPaired).toBeUndefined();
+    }
+    for(const presentation of [undefined,'phone','desktop']){
+      const host={identity:{learner:'test-bound'},presentation},bound=await mount({host,phone:presentation!=='phone'});
+      expect(bound.result.presentation).toBe(presentation);expect(bound.result.identity).toBe(host.identity);expect(bound.queries).toEqual([]);
+    }
+  });
   it('offers only held permits without an explicitly enabled bound reserve authority',async()=>{
     const {adapter}=await fixture();expect(adapter.platform.canRequestNewCards()).toBe(false);expect(adapter.platform.requestNewCards).toBeUndefined();
+    expect(adapter.platform.isPaired()).toBe(false);expect(adapter.platform.activitySince).toBe(1);
     expect((await adapter.summary('n2')).fresh).toBe(2);expect(adapter.now()).toBe(NOW);
     let calls=0;
     const bound=await createBunkiStudyAdapter({content:small,storage:memory(),identity:{learner:'test-shared',environment:'test-shared',installation:'test-bunki',mode:'fresh'},now:()=>NOW,
@@ -49,6 +88,26 @@ describe('Bunki canonical shared study consumer',()=>{
     expect(bound.platform.canRequestNewCards()).toBe(false);
     await expect(bound.platform.requestNewCards()).rejects.toThrow('shared-permit-authority-unavailable');
     expect(calls).toBe(0);expect((await bound.summary('n2')).fresh).toBe(0);
+  });
+  it('forwards actual host sync observations and trusted labels without inventing pairing or permit authority',async()=>{
+    let online=false,paired=true,state='idle',error=null,listener=null;const storage=memory();
+    const adapter=await createBunkiStudyAdapter({content:small,storage,identity:{learner:'test-shared',environment:'test-shared',installation:'test-bunki',mode:'fresh'},now:()=>NOW,
+      isOnline:()=>online,isPaired:()=>paired,activitySince:0,getSyncState:()=>state,getSyncError:()=>error,
+      labelForInstallation:id=>id==='test-phone'?'iPhone':null,subscribeSyncState:fn=>{listener=fn;return()=>{listener=null;};},
+      initialize:async({store})=>store.reconcile({events:[grant('test-bunki')],head:1})});
+    expect(adapter.platform.startedOffline).toBe(true);expect(adapter.platform.activitySince).toBe(0);expect(adapter.platform.isPaired()).toBe(true);
+    expect(adapter.platform.canRequestNewCards()).toBe(false);expect(adapter.platform.requestNewCards).toBeUndefined();
+    expect(adapter.platform.labelForInstallation('test-phone')).toBe('iPhone');expect(adapter.platform.labelForInstallation('unknown')).toBe(null);
+    const observed=[],stop=adapter.platform.subscribeSyncState(()=>observed.push(adapter.platform.getSyncState()));
+    const writes=storage.writes;online=true;state='syncing';listener();state='error';error='update-required';listener();
+    expect(observed).toEqual(['syncing','error']);expect(adapter.platform.getSyncError()).toBe('update-required');expect(adapter.platform.isOnline()).toBe(true);
+    expect(adapter.platform.startedOffline).toBe(true);expect(storage.writes).toBe(writes);paired=false;expect(adapter.platform.isPaired()).toBe(false);stop();expect(listener).toBe(null);
+    adapter.backend.dispose();
+  });
+  it('rejects malformed presentation bindings before creating a learner store',async()=>{
+    for(const options of [{presentation:'mobile'},{presentation:null},{presentation:()=> 'phone'},{isPaired:'yes'},{startedOffline:1},{activitySince:-1},{activitySince:0.5},{getSyncState:'synced'},{subscribeSyncState:true},{labelForInstallation:{}}]){
+      const storage=memory();await expect(createBunkiStudyAdapter({content:small,storage,identity:{learner:'test-shared',environment:'test-shared',installation:'test-bunki',mode:'fresh'},...options})).rejects.toThrow('shared-presentation-adapter');expect(storage.writes).toBe(0);
+    }
   });
   it('awaits the actual enabled host reserve and refuses disabled or offline requests without a grant',async()=>{
     let enabled=false,online=true,calls=0,release;
@@ -193,6 +252,50 @@ describe('Bunki canonical shared study consumer',()=>{
     const {adapter,storage}=await fixture(),attempt=createBunkiAttempt(adapter,selected[0].taskKey);attempt.reveal(1000);const before=storage.writes;storage.loseAck();
     const [a,b]=await Promise.all([attempt.grade(3),attempt.grade(3)]);expect(a.kind).toBe('durable');expect(b.eventId).toBe(a.eventId);expect(storage.writes-before).toBe(1);expect((await adapter.store.status()).locallyDurable).toBe(1);
     await expect(attempt.grade(1)).rejects.toThrow('retry-original-rating');
+  });
+  it('retries a lost caller reply through canonical recovery with the same frozen intent and no duplicate review',async()=>{
+    const {adapter,storage}=await fixture(),submitted=[],resumed=[];
+    const attempt=createBunkiAttempt({...adapter,
+      submit:async intent=>{submitted.push(intent);await adapter.submit(intent);throw Error('lost-caller-reply');},
+      resume:intent=>{resumed.push(intent);return adapter.resume(intent);},
+    },selected[0].taskKey);
+    const shown=attempt.reveal(1000),before=storage.writes;
+    await expect(attempt.grade(3)).rejects.toThrow('lost-caller-reply');
+    const first=attempt.grade(3),second=attempt.grade(3);expect(first).toBe(second);
+    const recovered=await first;
+    expect(recovered).toMatchObject({kind:'durable',persisted:true,resolution:{status:'applied',canonical:false,terminal:false}});
+    expect(recovered.resolution.eventId).toBe(recovered.eventId);expect(recovered.resolution.outcome.status).toBe('applied');
+    expect(submitted).toHaveLength(1);expect(resumed).toHaveLength(1);expect(submitted[0]).toBe(shown.intents[3]);expect(resumed[0]).toBe(submitted[0]);
+    expect(Object.isFrozen(submitted[0])).toBe(true);expect(Object.isFrozen(submitted[0].data)).toBe(true);
+    expect(storage.writes-before).toBe(1);expect((await adapter.store.outbox()).map(row=>row.event.id)).toEqual([recovered.eventId]);
+    expect(adapter.backend.readProjection().reviews).toHaveLength(1);await expect(attempt.grade(4)).rejects.toThrow('retry-original-rating');adapter.backend.dispose();
+  });
+  it('refreshes saved-but-blocked proof after actual post-commit storage failure without appending again',async()=>{
+    let armed=false,blocked=false,writes=0;
+    const base=createMemoryAdapter({afterCommit:()=>{writes++;if(armed){armed=false;blocked=true;}}});
+    const storage={...base,read:scope=>{if(blocked)throw Error('injected-read-failure');return base.read(scope);}};
+    const {adapter}=await fixture('test-bunki',storage),attempt=createBunkiAttempt(adapter,selected[0].taskKey);attempt.reveal(1000);
+    const before=writes;armed=true;const saved=await attempt.grade(3);
+    expect(saved.kind).toBe('persisted-blocked');expect(saved.persisted).toBe(true);expect(writes-before).toBe(1);
+    const waiting=await attempt.grade(3);expect(waiting.resolution.status).toBe('pending');expect(waiting.eventId).toBe(saved.eventId);
+    blocked=false;const recovered=await attempt.grade(3);
+    const {resolution,...originalProof}=recovered;expect(originalProof).toEqual(saved);
+    expect(recovered.kind).toBe('persisted-blocked');expect(resolution).toMatchObject({status:'applied',eventId:saved.eventId,outcome:{status:'applied'}});
+    expect(writes-before).toBe(1);expect((await adapter.store.outbox()).map(row=>row.event.id)).toEqual([saved.eventId]);
+    expect(adapter.backend.readProjection().reviews).toHaveLength(1);expect((await adapter.store.status()).locallyDurable).toBe(1);adapter.backend.dispose();
+  });
+  it('returns a fresh canonical refusal for an earlier provisional grade instead of caching its old durable outcome',async()=>{
+    const events=[grant('test-bunki',1,1),grant('test-phone',1,2)];
+    const {adapter:a}=await fixture('test-bunki',memory(),events),{adapter:b}=await fixture('test-phone',memory(),events);
+    const local=createBunkiAttempt(a,selected[0].taskKey),foreign=createBunkiAttempt(b,selected[0].taskKey);local.reveal(1000);foreign.reveal(1000);
+    const saved=await local.grade(3);expect(saved.kind).toBe('durable');await foreign.grade(3);
+    const [aRow]=await a.store.outbox(),[bRow]=await b.store.outbox();
+    await a.store.reconcile({events:[{...bRow,seq:3,rt:NOW,authority:'device'},{...aRow,seq:4,rt:NOW,authority:'device'}],head:4});
+    const recovered=await local.grade(3),{resolution,...originalProof}=recovered;
+    expect(originalProof).toEqual(saved);expect(recovered.kind).toBe('durable');
+    expect(resolution).toMatchObject({status:'observation',reason:'stale-parent',eventId:saved.eventId,canonical:true,terminal:true});
+    expect((await a.store.status()).locallyDurable).toBe(1);expect(await a.store.outbox()).toEqual([]);
+    expect(a.backend.readProjection().reviews.map(row=>row.id)).toEqual([bRow.event.id]);a.backend.dispose();b.backend.dispose();
   });
   it('shares permits across decks and leaves practice schedules unchanged',async()=>{
     const {adapter}=await fixture();const first=createBunkiAttempt(adapter,selected[0].taskKey);first.reveal(1000);await first.grade(3);

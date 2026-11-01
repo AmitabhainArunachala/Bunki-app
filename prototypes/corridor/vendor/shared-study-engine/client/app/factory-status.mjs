@@ -1,4 +1,5 @@
 import{contentReady}from'../player/content-ready.mjs';
+import{canonicalStringify}from'../schema/event.mjs';
 const HASH=/^[a-f0-9]{64}$/,ID=/^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/;
 const identifier=value=>typeof value==='string'&&ID.test(value);
 const state=(kind,label,extra={})=>Object.freeze({kind,label,taskKey:null,...extra});
@@ -41,7 +42,10 @@ function heldReason(reply){
 }
 /** Match the native request reconstructed from the durable capture. No guessed reading. */
 export function factoryRequest(result,capture,{learner,source}={}){
- if(result?.kind!=='durable'||typeof result.eventId!=='string'||!Number.isFinite(result.eventTs)||
+ const resolution=result?.resolution,applied=resolution?
+   result.persisted===true&&resolution.status==='applied'&&resolution.eventId===result.eventId&&resolution.outcome?.status==='applied'&&
+     resolution.capture&&capture&&canonicalStringify(resolution.capture)===canonicalStringify(capture):result?.kind==='durable';
+ if(!applied||typeof result.eventId!=='string'||!Number.isFinite(result.eventTs)||
    typeof learner!=='string'||typeof capture?.surface!=='string'||!['tap','typed'].includes(source))throw Error('factory-request-without-durable-capture');
  const request={captureEventId:result.eventId,learner,surface:capture.surface,capturedAt:new Date(result.eventTs).toISOString(),source};
  for(const key of ['lemma','reading','contextTaskKey','contentRevision'])if(capture[key])request[key]=capture[key];

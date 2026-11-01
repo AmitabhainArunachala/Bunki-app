@@ -1,4 +1,4 @@
-/** Transactional replica store, QA-only until schema/reducer and real adapters are independently verified. */
+/** Transactional replica store; adapters own durable compare-and-swap completion. */
 import {ownsReadSnapshot} from './storage/read-ownership.mjs';
 const FORMAT = 'nsrs-replica-store/v1';
 const ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/;
@@ -146,19 +146,48 @@ function replica(config) {
         return result;
       }
     }
+    // The last contender may have committed this exact command. Recover once
+    // without another allocation attempt; admission remains as strict as above.
+    if (recover) {
+      const current = await load();
+      check(compatibility(current) === null, 'schema-unsupported');
+      const finalResult = recover(current);
+      if (finalResult) return finalResult;
+    }
     throw new StoreError('storage-conflict');
   };
   const checkEventSize = ({ event, bodyHash }) => {
     check(new TextEncoder().encode(JSON.stringify({ event, bodyHash })).byteLength <= maxEventBytes, 'event-too-large');
   };
-  const append = async (command, findExisting = false) => {
+  const prepareCommand = (command, exact = false) => {
     check(command && typeof command.type === 'string' && command.data && typeof command.data === 'object' &&
       Object.keys(command).every(k => ['type', 'data', 'ts'].includes(k)), 'invalid-command');
     // Recovery requires the caller's stable wire timestamp, never a new now().
-    check(!findExisting || integer(command.ts), 'invalid-command');
+    check(!exact || integer(command.ts), 'invalid-command');
     const frozen = copy(command); const timestamp = frozen.ts ?? now();
     check(integer(timestamp), 'invalid-command');
-    const dataWire = findExisting ? codec.canonicalStringify(frozen.data) : null;
+    return { frozen, timestamp, dataWire: exact ? codec.canonicalStringify(frozen.data) : null };
+  };
+  const findCommand = (state, { frozen, timestamp, dataWire }) =>
+    [...Object.values(state.local), ...Object.values(state.canonical)].find(record =>
+      record.event.install === scope.installation && record.event.ts === timestamp && record.event.type === frozen.type &&
+      codec.canonicalStringify(record.event.data) === dataWire);
+  const lookupCommand = async command => {
+    const prepared = prepareCommand(command, true), state = await load();
+    const found = findCommand(state, prepared);
+    if (!found) return { persisted: false };
+    // Existence is independent of admission: never expose an incompatible cached
+    // projection as applied. A gap alone says nothing about reducer support.
+    let blockedReason = (compatibility(state) || ['unsupported', 'reducer-unsupported', 'update-required'].includes(state.blocked?.reason) ||
+      state.projection.updateRequired) ? 'update-required' : null;
+    try { checkEventSize(found); } catch (error) {
+      if (error.code !== 'event-too-large') throw error;
+      blockedReason ??= error.code;
+    }
+    return { persisted: true, event: copy(found.event), bodyHash: found.bodyHash, blockedReason };
+  };
+  const append = async (command, findExisting = false) => {
+    const prepared = prepareCommand(command, findExisting), { frozen, timestamp } = prepared;
     return transact(state => {
       const dseq = state.nextDseq;
       // A review's threshold window is frozen when the front is shown. Sync can
@@ -175,9 +204,7 @@ function replica(config) {
       reproject(state);
       return { status: 'durable', event: copy(event), bodyHash: record.bodyHash, ...(findExisting ? { appended: true } : {}) };
     }, findExisting ? state => {
-      const found = [...Object.values(state.local), ...Object.values(state.canonical)].find(record =>
-        record.event.install === scope.installation && record.event.ts === timestamp && record.event.type === frozen.type &&
-        codec.canonicalStringify(record.event.data) === dataWire);
+      const found = findCommand(state, prepared);
       if (!found) return null;
       checkEventSize(found);
       return { status: 'durable', event: copy(found.event), bodyHash: found.bodyHash, appended: false };
@@ -185,7 +212,13 @@ function replica(config) {
   };
   const publicStore = {
     scope: Object.freeze(copy(scope)),
-    readState: sanitized(async () => { const state = await load(); return ownsRead ? state : copy(state); }),
+    readState: sanitized(async (options = {}) => {
+      check(options && typeof options === 'object' && !Array.isArray(options) && Object.keys(options).every(key => key === 'requireCompatible') &&
+        (!Object.hasOwn(options, 'requireCompatible') || typeof options.requireCompatible === 'boolean'), 'invalid-command');
+      const state = await load();
+      if (options.requireCompatible) check(compatibility(state) === null, 'schema-unsupported');
+      return ownsRead ? state : copy(state);
+    }),
     readProjection: sanitized(async () => {
       const state = await load();
       check(compatibility(state) === null, 'schema-unsupported');
@@ -210,6 +243,8 @@ function replica(config) {
     // A found event has appended:false: no write, revision bump or notification.
     // A new event has appended:true only after the ordinary durable CAS commit.
     appendOrFind: sanitized(command => append(command, true)),
+    // Fresh validated proof of immutable bytes, never write/admission permission.
+    lookupCommand: sanitized(lookupCommand),
     acknowledge: sanitized(async ({ acks, head }) => transact(state => {
       check(integer(head) && Array.isArray(acks), 'invalid-head');
       check(head >= state.head, 'head-regressed');

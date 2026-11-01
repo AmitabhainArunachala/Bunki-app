@@ -5,9 +5,11 @@ const DAY=86400000;
 export function customSessionOptions(input={}) {
  const mode=input.mode??'practice',aheadDays=Number(input.aheadDays??1),size=Number(input.size??20),filters=input.filters??{};
  if(!['due','review-ahead','practice'].includes(mode)||![1,3,7].includes(aheadDays)||!Number.isInteger(size)||size<10||size>200||typeof (input.untilDone??false)!=='boolean')throw Error('invalid-custom-session');
+ const minIntervalDays=filters.minIntervalDays??0;
+ if(typeof minIntervalDays!=='number'||!Number.isFinite(minIntervalDays)||minIntervalDays<0)throw Error('invalid-custom-filter');
  const level=String(filters.level||'all').toUpperCase()==='ALL'?'all':String(filters.level).toUpperCase();
  if(!['all','N2','N1'].includes(level)||!['all','vocabulary','grammar','n1','n2','senmon','kotoba'].includes(filters.module??'all')||typeof(filters.tag??'')!=='string'||typeof(filters.recentlyFailed??false)!=='boolean'||!['due','hardest','newest'].includes(filters.order??'due'))throw Error('invalid-custom-filter');
- return Object.freeze({mode,aheadDays,size,untilDone:input.untilDone===true,filters:Object.freeze({level,module:filters.module??'all',tag:(filters.tag??'').trim(),recentlyFailed:filters.recentlyFailed===true,order:filters.order??'due'})});
+ return Object.freeze({mode,aheadDays,size,untilDone:input.untilDone===true,filters:Object.freeze({level,module:filters.module??'all',tag:(filters.tag??'').trim(),recentlyFailed:filters.recentlyFailed===true,minIntervalDays,order:filters.order??'due'})});
 }
 export function sessionReviewEvidence(options) {
  const value=customSessionOptions(options);
@@ -17,7 +19,7 @@ export function selectCustomSession(projection,catalog,input,{now,dayStart,dayEn
  const options=customSessionOptions(input),f=options.filters;
  if(!Number.isFinite(now)||!Number.isFinite(dayEnd))throw Error('custom-session-time-required');
  const availablePermit=Object.values(projection.permits).some(p=>p.install===installation&&!p.usedBy&&p.startsAt<=now&&p.endsAt>now);
- const failed=new Set(projection.reviews.filter(r=>!r.undoneAt&&r.at>=now-7*DAY&&r.at<=now&&r.effectiveRating===1&&projection.effects[r.id]?.before[r.taskKey]?.card?.state===2).map(r=>r.taskKey));
+ const failed=new Set(projection.reviews.filter(r=>!r.undoneAt&&r.at>=now-7*DAY&&r.at<=now&&r.effectiveRating===1).map(r=>r.taskKey));
  const selected=catalog.filter(entry=>{
   const t=projection.tasks[entry.taskKey];if(!t||!contentReady(entry)||t.suspended||t.known||(projection.settings.topicsOff[t.module]??[]).includes(t.group))return false;
   if(f.module!=='all'&&(f.module==='vocabulary'?!t.contract.startsWith('vocabulary.'):t.module!==f.module))return false;
@@ -25,6 +27,7 @@ export function selectCustomSession(projection,catalog,input,{now,dayStart,dayEn
   const tags=[entry.tag,entry.theme,entry.group,t.group,...(Array.isArray(entry.tags)?entry.tags:[])].filter(v=>typeof v==='string');
   if(f.tag&&!tags.some(tag=>tag.toLocaleLowerCase().includes(f.tag.toLocaleLowerCase())))return false;
   if(f.recentlyFailed&&!failed.has(t.taskKey))return false;
+  if(f.minIntervalDays>0&&!(t.card?.scheduled_days>=f.minIntervalDays))return false;
   if(options.mode==='practice')return true;
   // Reviews-only sessions never introduce a card, even with unused permits.
   if(options.mode==='due'&&!projection.introductions[t.taskKey])return false;

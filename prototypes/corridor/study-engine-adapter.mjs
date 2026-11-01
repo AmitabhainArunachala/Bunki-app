@@ -5,7 +5,7 @@ import {isSharedDeck,moduleForSharedDeck} from './shared-study-content.mjs';
 
 export {isSharedStudyMode} from './shared-study-content.mjs';
 
-export async function createBunkiStudyAdapter({content, storage, identity, transport=null, canRequestNewCards=false, isOnline=()=>globalThis.navigator?.onLine!==false, now=Date.now, uuid, initialize=null, readPreviousRegistry=null}) {
+export async function createBunkiStudyAdapter({content, storage, identity, transport=null, canRequestNewCards=false, isOnline=()=>globalThis.navigator?.onLine!==false, presentation, isPaired=false, startedOffline=null, activitySince=null, getSyncState=null, getSyncError=null, subscribeSyncState=null, labelForInstallation=null, now=Date.now, uuid, initialize=null, readPreviousRegistry=null}) {
   if (!storage || !identity || !['open','fresh'].includes(identity.mode)) throw Error('shared-host-binding-required');
   const {learner,environment,installation,epoch=0,timezone='Asia/Tokyo',mode} = identity;
   if (![learner,environment,installation].every(v=>typeof v==='string'&&v)) throw Error('shared-host-identity-required');
@@ -13,7 +13,12 @@ export async function createBunkiStudyAdapter({content, storage, identity, trans
   if (readPreviousRegistry !== null && typeof readPreviousRegistry !== 'function') throw Error('shared-content-history-adapter');
   if (!['boolean','function'].includes(typeof canRequestNewCards) || typeof isOnline !== 'function') throw Error('shared-permit-capability-adapter');
   if (transport !== null && typeof transport.reserveNewPermits !== 'function') throw Error('shared-permit-transport-adapter');
+  if (presentation!==undefined&&!['phone','desktop'].includes(presentation) ||
+      !['boolean','function'].includes(typeof isPaired) || startedOffline!==null&&typeof startedOffline!=='boolean' ||
+      activitySince!==null&&(!Number.isSafeInteger(activitySince)||activitySince<0) ||
+      [getSyncState,getSyncError,subscribeSyncState,labelForInstallation].some(value=>value!==null&&typeof value!=='function')) throw Error('shared-presentation-adapter');
   const online=()=>isOnline()===true;
+  const offlineAtOpen=startedOffline??!online();
   const canRequest=()=>!!transport&&(typeof canRequestNewCards==='function'?canRequestNewCards()===true:canRequestNewCards===true);
   // One explicit host reserve action serves both the canonical settings path
   // and Today. A backend method's existence never grants authority by itself.
@@ -33,7 +38,13 @@ export async function createBunkiStudyAdapter({content, storage, identity, trans
   // local permit issuer, legacy-ledger reader, or migration are hidden here.
   if (initialize) await initialize({store,engine});
   const backend = await engine.connect({store,transport:transport?{reserveNewPermits:reserve}:null,now,uuid});
-  const platform=Object.freeze({storageKind:'bunki-shared',isOnline:online,canRequestNewCards:canRequest,
+  const activityStart=activitySince??backend.readProjection().appliedSeq;
+  if(activityStart>backend.readProjection().appliedSeq){backend.dispose();throw Error('shared-activity-prefix');}
+  const platform=Object.freeze({storageKind:'bunki-shared',isOnline:online,startedOffline:offlineAtOpen,activitySince:activityStart,
+    ...(presentation===undefined?{}:{presentation}),
+    isPaired:()=>typeof isPaired==='function'?isPaired()===true:isPaired===true,canRequestNewCards:canRequest,
+    ...(getSyncState?{getSyncState}:{}),...(getSyncError?{getSyncError}:{}),
+    ...(subscribeSyncState?{subscribeSyncState}:{}),...(labelForInstallation?{labelForInstallation}:{}),
     ...(transport?{requestNewCards:()=>reserve({store})}:{})});
   const entries = new Map(content.catalog.map(entry=>[entry.taskKey,entry]));
   const inDeck = (entry,deckId) => deckId === 'shared-grammar' ? entry.module === 'grammar' : entry.player?.deckId === deckId;
@@ -45,6 +56,7 @@ export async function createBunkiStudyAdapter({content, storage, identity, trans
     begin(taskKey,options) { if (!entries.has(taskKey)) throw Error('unmapped-shared-task'); return backend.snapshotAttempt(taskKey,options); },
     preview:(attempt,thinkMs)=>backend.preview(attempt,thinkMs),
     submit:intent=>backend.submitCommand(intent),
+    resume:intent=>backend.resumeCommand(intent),
     async summary(deckId) {
       supported(deckId); await backend.refresh();
       const projection=backend.readProjection(),all=content.catalog.filter(e=>inDeck(e,deckId));
@@ -69,19 +81,20 @@ export async function createBunkiStudyAdapter({content, storage, identity, trans
   });
 }
 
-/** A displayed attempt owns its immutable intents until a durable acknowledgement.
- * Retrying an uncertain write cannot append another review or rebind its parent. */
+/** A displayed attempt retains its exact command across every explicit retry.
+ * Canonical recovery owns saved proof and fresh resolution; this host neither
+ * caches a stale outcome nor reconstructs whether a saved review applied. */
 export function createBunkiAttempt(adapter,taskKey,options) {
-  const attempt=adapter.begin(taskKey,options); let preview=null, pending=null, result=null, choice=null;
+  const attempt=adapter.begin(taskKey,options); let preview=null, pending=null, submitted=false, choice=null;
   return Object.freeze({attempt,
     reveal(thinkMs) { return preview ||= adapter.preview(attempt,thinkMs); },
     grade(rating) {
       if (!preview || !preview.intents[rating]) return Promise.reject(Error('answer-not-revealed'));
       if (choice!==null && choice!==rating) return Promise.reject(Error('retry-original-rating'));
       choice=rating;
-      if (result) return Promise.resolve(result);
       if (pending) return pending;
-      pending=adapter.submit(preview.intents[rating]).then(value=>{if(value.kind!=='failed')result=value;return value;}).finally(()=>{pending=null;});
+      const execute=submitted?adapter.resume:adapter.submit;submitted=true;
+      pending=Promise.resolve().then(()=>execute(preview.intents[rating])).finally(()=>{pending=null;});
       return pending;
     },
   });
