@@ -22,6 +22,15 @@ const DATA = {
   orig: ['grammar-v11'],
 };
 
+// Shared-mode contracts are scheduled only by the canonical v4 backend. Legacy
+// saved-word, personal, context and hook contracts await explicit reconciliation.
+function sharedStudyActive() {
+  return !!window.bunkiSharedStudyHost || new URLSearchParams(location.search).get('sharedStudy') === 'preview';
+}
+function sharedStudyFence(main) {
+  main.append(el('p','card-kind',tx('この練習は共通の学習にまだ対応していません。記録は保持されています。','This practice is not mapped to shared study. Its existing history is preserved.')));
+}
+
 /** Corridor-authored + harvested grammar, corridor entries winning on
  * duplicate patterns. Populated at boot; falls back to the authored seed. */
 function GRAMMARS() {
@@ -4985,6 +4994,7 @@ async function boot() {
   // A private collection boots from the cached app shell alone. Its content
   // arrives through the learner's file picker, never a public repository URL.
   if (params.get('deck') === 'personal' && window.__CORRIDOR_STANDALONE__ !== true) {
+    if (sharedStudyActive()) { sharedStudyFence($('#app')); return; }
     S.view = 'personaldeck';
     document.body.dataset.view = 'personaldeck';
     window.__DRIFT__?.hide();
@@ -5029,9 +5039,9 @@ async function boot() {
   if (params.get('deck') === 'context' || location.hash === '#context') S.view = 'contextdeck';
   // ?deck=kotoba (or #kotoba) opens 言葉の鉱脈 straight away — a home-screen
   // shortcut that lands on the deck instead of the galaxy
-  if (['kotoba', 'mcd', 'n2', 'n1', 'senmon', 'kotoba-master'].includes(params.get('deck')) || ['#kotoba', '#mcd'].includes(location.hash)) {
+  if (['kotoba', 'mcd', 'n2', 'n1', 'senmon', 'kotoba-master', 'shared-grammar'].includes(params.get('deck')) || ['#kotoba', '#mcd'].includes(location.hash)) {
     S.view = 'deckplay';
-    S.deckPlay = ['n2', 'n1', 'senmon', 'kotoba-master'].includes(params.get('deck')) ? params.get('deck') : params.get('deck') === 'mcd' || location.hash === '#mcd' ? 'kotoba-mcd' : 'kotoba-mine';
+    S.deckPlay = ['n2', 'n1', 'senmon', 'kotoba-master', 'shared-grammar'].includes(params.get('deck')) ? params.get('deck') : params.get('deck') === 'mcd' || location.hash === '#mcd' ? 'kotoba-mcd' : 'kotoba-mine';
   }
   // Private collections leave through the same five destinations on a fresh
   // host page. These are UI routes only, never learner-record state.
@@ -7196,6 +7206,7 @@ let contextDeckMod = null;
 let contextDeckLoading = false;
 let contextDeckError = false;
 function renderContextDeck(main) {
+  if (sharedStudyActive()) { sharedStudyFence(main); return; }
   if (contextDeckError) {
     main.append(el('p', 'shelf-snippet intro', tx('文脈札を開けませんでした。', 'The context deck could not be opened.')));
     return;
@@ -32650,6 +32661,7 @@ function bindReviewExit(button, main, rv, deferred = false) {
 }
 
 async function commitReviewAction(rv, item, produce, advance, report = null) {
+  if (sharedStudyActive()) { if(report)Object.assign(report,{outcome:'not-published',reason:'unmapped-shared-contract'}); return false; }
   if (!rv || rv.pending || S.review !== rv || rv.queue[rv.ix] !== item || !recordWritable()) return false;
   const epoch = recordEpoch;
   const ix = rv.ix;
@@ -32661,6 +32673,7 @@ async function commitReviewAction(rv, item, produce, advance, report = null) {
   try {
     if (S.view === 'review') render();
     const producer = (latest, snapshot) => {
+      if (sharedStudyActive()) throw declineWrite('unmapped-shared-contract');
       if (S.review !== rv || rv.ix !== ix || rv.queue[ix] !== item || rv.pending !== pending) {
         throw new Error('Review changed before its save');
       }
@@ -32921,6 +32934,7 @@ async function installHelpRelevance() {
   adoptHelpRelevance({ createRelevance, createCaller, catalog });
 }
 async function reportHookAttempt(evidence, binding = null) {
+  if (sharedStudyActive()) return {write:false,reason:'unmapped-shared-contract',line:'This contract is not mapped to shared study.'};
   const lang = bi() ? 'en' : 'ja';
   const refusedWith = (reason) => ({ write: false, reason, line: srsCore?.refusalWords(reason, lang) ?? null });
   if (!srsCore || !scheduler) return refusedWith('no-shared-admission');
@@ -32951,6 +32965,7 @@ async function reportHookAttempt(evidence, binding = null) {
     storage: globalThis.localStorage,
     where: evidence?.surface,
     commit: async ({ now, answered, reserve }) => {
+      if (sharedStudyActive()) return {outcome:'not-published'};
       if (!recordWritable(epoch)) return { outcome: 'not-published' };
       // rev 3.2 §7.9 (S1): with the journey on, a course review grades only under its admitted dispatch, rechecked here beside
       // the binding epoch and read-only: owner, generation, root, switch, clock, review day and today's markers
@@ -33436,6 +33451,7 @@ function renderReviewNext(main) {
   main.append(box);
 }
 function renderReview(main) {
+  if (sharedStudyActive()) { sharedStudyFence(main); return; }
   // A reused main leaves its completion material when a new card is drawn.
   main.classList.remove('review-complete');
   const rv = S.review;
@@ -35614,6 +35630,7 @@ function renderTests(main) {
  * own schedule (its own localStorage ledger); 覚えるの札 is the corridor's
  * own word queue, opened as a plain review. */
 const DOJO_DECKS = [{ id: 'n2', ja: 'N2の語・短い文章で', en: 'N2 words · in short passages' }, { id: 'n1', ja: 'N1の語・短い文章で', en: 'N1 words · in short passages' }, { id: 'senmon', ja: '専門・あなたの分野', en: 'Your fields · master\'s level' }, { id: 'kotoba-master', ja: 'わたしの言葉', en: 'My own words' }, { id: 'kotoba-mcd', ja: '調べた言葉・長文', en: 'Words you looked up · passages' }, { id: 'kotoba-mine', ja: '調べた言葉・例文', en: 'Words you looked up · sentences' }];
+DOJO_DECKS.splice(4,0,{id:'shared-grammar',ja:'文法・意味と穴埋め',en:'Grammar · meaning and recall'});
 // r4 (John, T2: "*Real Sentences read and recall.. is just very confusing, obtuse and way to generic
 // to mean anyhting at all"): the two 言葉の鉱脈 decks are the words he looked up in his Japanese app,
 // and this list names them exactly as their own deck homes do (the cards lane's titles, so a row and
@@ -35656,6 +35673,7 @@ function openDeck(id, { autoStart = false } = {}) {
  * distinct word id among the scheduled card ids (`<word id>-<card>`). The slim
  * hairline under a deck row is this over the deck's real word count. */
 function deckWordsBegun(id) {
+  if (['n2','n1','senmon','kotoba-master','shared-grammar'].includes(id)) return deckSummaries[id]?.begun || 0;
   try {
     const raw = JSON.parse(localStorage.getItem(`bunki-cloze:${id}`) || 'null');
     const ids = raw && typeof raw.cards === 'object' && raw.cards ? Object.keys(raw.cards) : [];

@@ -1,0 +1,7 @@
+{
+  "format": "bunki-shared-study-pin/v1",
+  "sourceCommit": "ba720c30c3cfc284aeea42ee0b76032612aff529",
+  "closureSha256": "65db858e701b34eef5261b8e64986e1a1cb5f9ba9a7962cdbba37050ff26a712",
+  "contentBindingSha256": "6176325efffd196d7ec77b434fa42ac77f6001e78b26ae68b1d6aadc1b5e909c",
+  "verifierSha256": "adab18734248871867be9cf62fa25b58cce3f3f37a34a81e714b0b1b26e10dba"
+}

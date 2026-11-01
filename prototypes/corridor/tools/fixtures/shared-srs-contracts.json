@@ -1,0 +1,710 @@
+{
+  "format": "shared-srs-adapter-contract-fixture",
+  "version": 1,
+  "purpose": "Synthetic cross-host adapter checks for the canonical Nihongo v4 replay/store/replica-backend boundary; not learner data, a migration source, or a production-v4 event corpus.",
+  "provenance": {
+    "canonicalRepository": "/Users/dhyana/worktrees/nihongo-srs/shared_engine_20261101",
+    "sourceRevision": "1f9596fd19ce3e9582232a4fbeb35c0379f3a0ff",
+    "sourceFiles": [
+      "client/replay.mjs",
+      "client/schema/event.mjs",
+      "client/store.mjs",
+      "client/player/replica-backend.mjs"
+    ],
+    "eventVersion": 4,
+    "policyId": "nsrs-policy-v1",
+    "schedulerPin": {
+      "path": "client/vendor/fsrs-pin.json",
+      "sha256": "550f96c24b706b834938f772dc8ac28d93a4d8a578a8cd62f72cbf61c847bda0",
+      "algorithm": "FSRS-6",
+      "package": "ts-fsrs",
+      "version": "5.4.1",
+      "parameterSetId": "bunki-fsrs6-r090-defaults-v1"
+    },
+    "containsWireEnvelopes": false,
+    "containsHistoricalEvidence": false
+  },
+  "scope": {
+    "environment": "qa-shared-srs",
+    "learner": "test-shared-srs",
+    "epoch": 0,
+    "installations": {
+      "deviceA": "fixture-device-a",
+      "deviceB": "fixture-device-b"
+    },
+    "clock": {
+      "mode": "fixed",
+      "initial": "2026-11-01T00:00:00.000Z",
+      "learnerTimezone": "Asia/Tokyo",
+      "advance": "never unless a future fixture adds an explicit advanceClock action"
+    },
+    "ratings": {
+      "1": "Again",
+      "2": "Hard",
+      "3": "Good",
+      "4": "Easy"
+    },
+    "newPerDayTotal": 20
+  },
+  "cards": [
+    {
+      "id": "vocab-kokage",
+      "taskKey": "[\"synthetic-note-kokage\",\"vocabulary.read.v1\",\"synthetic-passage-kokage\"]",
+      "noteGuid": "synthetic-note-kokage",
+      "contractId": "vocabulary.read.v1",
+      "passageId": "synthetic-passage-kokage",
+      "lexemeId": "synthetic-lexeme-kokage",
+      "module": "vocabulary",
+      "contentRevision": "identity-v1",
+      "translationVerified": true,
+      "term": "木陰",
+      "reading": "こかげ",
+      "meaning": "shade beneath trees",
+      "sentence": "木陰で休む。"
+    },
+    {
+      "id": "vocab-odayaka",
+      "taskKey": "[\"synthetic-note-odayaka\",\"vocabulary.read.v1\",\"synthetic-passage-odayaka\"]",
+      "noteGuid": "synthetic-note-odayaka",
+      "contractId": "vocabulary.read.v1",
+      "passageId": "synthetic-passage-odayaka",
+      "lexemeId": "synthetic-lexeme-odayaka",
+      "module": "vocabulary",
+      "contentRevision": "identity-v1",
+      "translationVerified": true,
+      "term": "穏やか",
+      "reading": "おだやか",
+      "meaning": "calm; gentle",
+      "sentence": "穏やかな朝です。"
+    },
+    {
+      "id": "grammar-bakari",
+      "taskKey": "[\"synthetic-note-bakari\",\"grammar.meaning.v1\",\"synthetic-passage-bakari\"]",
+      "noteGuid": "synthetic-note-bakari",
+      "contractId": "grammar.meaning.v1",
+      "passageId": "synthetic-passage-bakari",
+      "lexemeId": "synthetic-lexeme-bakari",
+      "module": "grammar",
+      "contentRevision": "identity-v1",
+      "translationVerified": true,
+      "term": "〜ばかり",
+      "reading": "〜ばかり",
+      "meaning": "only; nothing but",
+      "sentence": "彼は毎日読んでばかりいる。"
+    },
+    {
+      "id": "grammar-kotonisuru",
+      "taskKey": "[\"synthetic-note-kotonisuru\",\"grammar.cloze.v1\",\"synthetic-passage-kotonisuru\"]",
+      "noteGuid": "synthetic-note-kotonisuru",
+      "contractId": "grammar.cloze.v1",
+      "passageId": "synthetic-passage-kotonisuru",
+      "lexemeId": "synthetic-lexeme-kotonisuru",
+      "module": "grammar",
+      "contentRevision": "identity-v1",
+      "translationVerified": true,
+      "term": "〜ことにする",
+      "reading": "〜ことにする",
+      "meaning": "decide to",
+      "sentence": "毎朝歩くことにする。"
+    }
+  ],
+  "harnessContract": {
+    "isolation": "Run every scenario, and every four-ratings variant, with fresh in-memory stores and a fresh fake canonical permit authority. Never share projection objects or installation ids between runs.",
+    "registryTranslation": {
+      "tasks": "For each cards row, pass taskKey, noteGuid, contractId, passageId, and lexemeId unchanged.",
+      "notes": "Create one {noteGuid,module} row per card.",
+      "passages": [],
+      "examples": [],
+      "catalog": "Pass each complete card row to createReplicaBackend; translationVerified:true makes it content-ready. Presentation text is synthetic and is not a task identity."
+    },
+    "construction": [
+      "Load client/vendor/fsrs-pin.json and construct createStudyEngine({content:{registry,pin,catalog},learner:'test-shared-srs',epoch:0,timezone:'Asia/Tokyo'}) from the canonical facade imported by the Bunki adapter.",
+      "Use engine.createFreshStore with memory adapters, the real payloadHash/canonicalStringify/validateEvent codec, fixed now, and the scoped installation id; materialize through engine.replay.",
+      "Construct the canonical consumer through engine.connect({store,now,uuid}) and the Bunki consumer through createBunkiStudyAdapter for each device. Deterministic synthetic uuid sequences are allowed.",
+      "All durable commands must be produced by the real store/backend. The synthetic permit authority uses the documented test grant pattern with real event validation and payloadHash. Do not mutate projections or inject effectiveRating."
+    ],
+    "operations": {
+      "reservePermits": "For the selected device, derive the current learner-day limit and allocated count with the real studyDayAllowance/projection at the fixed clock. The synthetic authority grants exactly count permits when within budget, otherwise returns daily-permit-budget without an envelope; reconcile a real validated grant into that store and refresh. The authority result is saved when 'as' is present.",
+      "syncAll": "Converge both stores on the identical complete canonical prefix through store.reconcile, then backend.refresh on both. No transport or production service is used.",
+      "snapshotAttempt": "Call backend.snapshotAttempt(cards[card].taskKey,options) and save the frozen attempt as 'as'.",
+      "preview": "Call backend.preview(savedAttempt,thinkMs) and save the four alternatives as 'as'.",
+      "submitPreview": "Call backend.submitCommand(savedPreview.intents[rating]) exactly once and save the result.",
+      "makeReviewCommand": "Call backend.reviewData(savedAttempt,rating,thinkMs), then backend.command('review',data); save the immutable command. If expectError is present, reviewData must throw that exact message and no command is created.",
+      "submitCommand": "Call backend.submitCommand(savedCommand) and save the result.",
+      "submitChangedRetry": "Call backend.submitCommand({...savedCommand,ts:savedCommand.ts+1}) with the same commandId and save the result.",
+      "mutate": "Resolve $result.eventId references, then call backend.mutate(type,cards[card].taskKey,data) and save the result.",
+      "practice": "Call backend.practice(savedAttempt,rating,thinkMs) and save the result.",
+      "capture": "Resolve attempt/card references and call backend.capture(savedAttempt,capture); save the result.",
+      "checkpoint": "Save structured clones of backend.readProjection(), await store.status(), and store.head/applied cursors for the selected device under 'as'."
+    },
+    "references": "Card ids index the cards array. $rating selects the current variant. $name.eventId reads a saved result. Capture contextTaskKey/targetTaskKey come from the named card and contentRevision from the saved attempt.",
+    "invariants": {
+      "result": "The saved result has exactly the requested kind and, when supplied, reason.",
+      "reviewCount": "The selected device's final projection.reviews.length equals value.",
+      "reviewRating": "The sole final review has rawRating and effectiveRating equal to the requested values; no client-provided effectiveRating is used.",
+      "previewMatchesCommitted": "The result event identifies the sole review; final tasks[card].card deep-equals preview.cards[rating], and review effectiveRating/at deep-equal preview.ratings[rating].",
+      "permitUse": "Count final permits for the device installation whose usedBy is non-null; optionally also assert the total permits issued to that installation.",
+      "undoRestoresNewCard": "The reviewed card is null and its head is undo.eventId; the original review remains with non-null undoneAt; the original permit remains spent on the original review; no review or capture is deleted.",
+      "sharedBudget": "For the fixed learner day, studyDayAllowance/backend.todayAllowance on both devices reports limit=20, allocated permitGrants total 20, and used/unused permit counts per installation match the requested values.",
+      "sameEvent": "Two saved results have identical eventId, dseq, and eventTs; final reviewCount is one and locallyDurable is unchanged from the checkpoint taken after the first submission.",
+      "noNewDurableEvent": "The checkpoint and final store have identical head, locallyDurable, canonical count, and local count.",
+      "localEventDelta": "The selected store's locallyDurable minus the checkpoint value equals value; observation outcomes can therefore be durable without becoming reviews.",
+      "noScheduleMutation": "Deep-compare checkpoint versus final projection tasks, reviews, permits, introductions, and boostSources. Captures, attempts, outcomes, and observations are intentionally excluded.",
+      "captureCount": "The final projection.captures.length equals value.",
+      "practiceEvidence": "The durable submitted review attempt has mode='practice', revealed=true, helpBeforeAnswer=false; its outcome reason is practice-or-assisted.",
+      "crossHostParity": "After each scenario, independently replay/compare on every host adapter: deep-equal the complete scheduled card JSON, raw/effective rating and effective at, outcome disposition/reason, permit consumption, captures, reviews, and undo markers. Do not mask due, stability, difficulty, or state differences."
+    },
+    "numericExpectations": "No exact FSRS due, stability, difficulty, elapsed-day, or scheduled-day value is pinned. Expected card values come only from backend.preview executing the pinned canonical engine in the same fresh run; cross-host checks compare complete measured values."
+  },
+  "setups": {
+    "oneNewCardOnA": [
+      {
+        "op": "reservePermits",
+        "device": "deviceA",
+        "count": 1
+      },
+      {
+        "op": "syncAll"
+      }
+    ]
+  },
+  "scenarios": [
+    {
+      "id": "four-ratings",
+      "setup": "oneNewCardOnA",
+      "variants": [
+        {
+          "rating": 1
+        },
+        {
+          "rating": 2
+        },
+        {
+          "rating": 3
+        },
+        {
+          "rating": 4
+        }
+      ],
+      "variantIsolation": "Each rating starts from a new, unreviewed vocab-kokage card and one fresh deviceA permit; the four preview alternatives are never submitted sequentially.",
+      "actions": [
+        {
+          "op": "snapshotAttempt",
+          "device": "deviceA",
+          "card": "vocab-kokage",
+          "as": "attempt"
+        },
+        {
+          "op": "preview",
+          "device": "deviceA",
+          "attempt": "attempt",
+          "thinkMs": 1000,
+          "as": "candidates"
+        },
+        {
+          "op": "submitPreview",
+          "device": "deviceA",
+          "preview": "candidates",
+          "rating": "$rating",
+          "as": "grade"
+        }
+      ],
+      "expect": [
+        {
+          "invariant": "result",
+          "result": "grade",
+          "kind": "durable"
+        },
+        {
+          "invariant": "reviewCount",
+          "device": "deviceA",
+          "value": 1
+        },
+        {
+          "invariant": "reviewRating",
+          "device": "deviceA",
+          "rawRating": "$rating",
+          "effectiveRating": "$rating"
+        },
+        {
+          "invariant": "previewMatchesCommitted",
+          "device": "deviceA",
+          "card": "vocab-kokage",
+          "preview": "candidates",
+          "result": "grade",
+          "rating": "$rating"
+        },
+        {
+          "invariant": "permitUse",
+          "device": "deviceA",
+          "used": 1,
+          "issued": 1
+        },
+        {
+          "invariant": "crossHostParity"
+        }
+      ]
+    },
+    {
+      "id": "undo-current-review",
+      "setup": "oneNewCardOnA",
+      "actions": [
+        {
+          "op": "snapshotAttempt",
+          "device": "deviceA",
+          "card": "vocab-kokage",
+          "as": "attempt"
+        },
+        {
+          "op": "makeReviewCommand",
+          "device": "deviceA",
+          "attempt": "attempt",
+          "rating": 3,
+          "thinkMs": 1000,
+          "as": "gradeCommand"
+        },
+        {
+          "op": "submitCommand",
+          "device": "deviceA",
+          "command": "gradeCommand",
+          "as": "grade"
+        },
+        {
+          "op": "mutate",
+          "device": "deviceA",
+          "type": "undo",
+          "card": "vocab-kokage",
+          "data": {
+            "target": "$grade.eventId"
+          },
+          "as": "undo"
+        },
+        {
+          "op": "checkpoint",
+          "device": "deviceA",
+          "as": "afterUndo"
+        },
+        {
+          "op": "mutate",
+          "device": "deviceA",
+          "type": "undo",
+          "card": "vocab-kokage",
+          "data": {
+            "target": "$grade.eventId"
+          },
+          "as": "duplicateUndo"
+        }
+      ],
+      "expect": [
+        {
+          "invariant": "result",
+          "result": "grade",
+          "kind": "durable"
+        },
+        {
+          "invariant": "result",
+          "result": "undo",
+          "kind": "durable"
+        },
+        {
+          "invariant": "undoRestoresNewCard",
+          "device": "deviceA",
+          "card": "vocab-kokage",
+          "review": "grade",
+          "undo": "undo"
+        },
+        {
+          "invariant": "reviewCount",
+          "device": "deviceA",
+          "value": 1
+        },
+        {
+          "invariant": "permitUse",
+          "device": "deviceA",
+          "used": 1,
+          "issued": 1
+        },
+        {
+          "invariant": "result",
+          "result": "duplicateUndo",
+          "kind": "observation-only",
+          "reason": "undo-not-current-originating-group"
+        },
+        {
+          "invariant": "noScheduleMutation",
+          "device": "deviceA",
+          "checkpoint": "afterUndo"
+        },
+        {
+          "invariant": "crossHostParity"
+        }
+      ]
+    },
+    {
+      "id": "daily-budget-two-devices",
+      "actions": [
+        {
+          "op": "reservePermits",
+          "device": "deviceA",
+          "count": 10
+        },
+        {
+          "op": "syncAll"
+        },
+        {
+          "op": "reservePermits",
+          "device": "deviceB",
+          "count": 10
+        },
+        {
+          "op": "syncAll"
+        },
+        {
+          "op": "checkpoint",
+          "device": "deviceA",
+          "as": "beforeOverflowA"
+        },
+        {
+          "op": "checkpoint",
+          "device": "deviceB",
+          "as": "beforeOverflowB"
+        },
+        {
+          "op": "reservePermits",
+          "device": "deviceB",
+          "count": 1,
+          "as": "overflow"
+        },
+        {
+          "op": "syncAll"
+        }
+      ],
+      "expect": [
+        {
+          "invariant": "result",
+          "result": "overflow",
+          "reason": "daily-permit-budget"
+        },
+        {
+          "invariant": "sharedBudget",
+          "limit": 20,
+          "allocated": 20,
+          "deviceAIssued": 10,
+          "deviceBIssued": 10
+        },
+        {
+          "invariant": "noNewDurableEvent",
+          "device": "deviceA",
+          "checkpoint": "beforeOverflowA"
+        },
+        {
+          "invariant": "noNewDurableEvent",
+          "device": "deviceB",
+          "checkpoint": "beforeOverflowB"
+        },
+        {
+          "invariant": "reviewCount",
+          "device": "deviceA",
+          "value": 0
+        },
+        {
+          "invariant": "reviewCount",
+          "device": "deviceB",
+          "value": 0
+        },
+        {
+          "invariant": "crossHostParity"
+        }
+      ]
+    },
+    {
+      "id": "retry-same-command",
+      "setup": "oneNewCardOnA",
+      "actions": [
+        {
+          "op": "snapshotAttempt",
+          "device": "deviceA",
+          "card": "vocab-kokage",
+          "as": "attempt"
+        },
+        {
+          "op": "makeReviewCommand",
+          "device": "deviceA",
+          "attempt": "attempt",
+          "rating": 3,
+          "thinkMs": 1000,
+          "as": "gradeCommand"
+        },
+        {
+          "op": "submitCommand",
+          "device": "deviceA",
+          "command": "gradeCommand",
+          "as": "first"
+        },
+        {
+          "op": "checkpoint",
+          "device": "deviceA",
+          "as": "afterFirst"
+        },
+        {
+          "op": "submitCommand",
+          "device": "deviceA",
+          "command": "gradeCommand",
+          "as": "retry"
+        },
+        {
+          "op": "submitChangedRetry",
+          "device": "deviceA",
+          "command": "gradeCommand",
+          "as": "changedRetry"
+        }
+      ],
+      "expect": [
+        {
+          "invariant": "result",
+          "result": "first",
+          "kind": "durable"
+        },
+        {
+          "invariant": "result",
+          "result": "retry",
+          "kind": "durable"
+        },
+        {
+          "invariant": "sameEvent",
+          "device": "deviceA",
+          "first": "first",
+          "retry": "retry",
+          "checkpoint": "afterFirst"
+        },
+        {
+          "invariant": "result",
+          "result": "changedRetry",
+          "kind": "conflict",
+          "reason": "changed-retry"
+        },
+        {
+          "invariant": "noNewDurableEvent",
+          "device": "deviceA",
+          "checkpoint": "afterFirst"
+        },
+        {
+          "invariant": "reviewCount",
+          "device": "deviceA",
+          "value": 1
+        },
+        {
+          "invariant": "crossHostParity"
+        }
+      ]
+    },
+    {
+      "id": "stale-attempt-refusal",
+      "setup": "oneNewCardOnA",
+      "actions": [
+        {
+          "op": "snapshotAttempt",
+          "device": "deviceA",
+          "card": "vocab-kokage",
+          "as": "oldAttempt"
+        },
+        {
+          "op": "mutate",
+          "device": "deviceA",
+          "type": "suspend",
+          "card": "vocab-kokage",
+          "data": {
+            "on": true
+          },
+          "as": "suspension"
+        },
+        {
+          "op": "checkpoint",
+          "device": "deviceA",
+          "as": "beforeStaleSubmit"
+        },
+        {
+          "op": "makeReviewCommand",
+          "device": "deviceA",
+          "attempt": "oldAttempt",
+          "rating": 3,
+          "thinkMs": 1000,
+          "as": "staleCommand",
+          "expectError": "stale-attempt"
+        }
+      ],
+      "expect": [
+        {
+          "invariant": "result",
+          "result": "suspension",
+          "kind": "durable"
+        },
+        {
+          "invariant": "noNewDurableEvent",
+          "device": "deviceA",
+          "checkpoint": "beforeStaleSubmit"
+        },
+        {
+          "invariant": "noScheduleMutation",
+          "device": "deviceA",
+          "checkpoint": "beforeStaleSubmit"
+        },
+        {
+          "invariant": "reviewCount",
+          "device": "deviceA",
+          "value": 0
+        },
+        {
+          "invariant": "permitUse",
+          "device": "deviceA",
+          "used": 0,
+          "issued": 1
+        },
+        {
+          "invariant": "crossHostParity"
+        }
+      ]
+    },
+    {
+      "id": "practice-nonmutation",
+      "setup": "oneNewCardOnA",
+      "actions": [
+        {
+          "op": "snapshotAttempt",
+          "device": "deviceA",
+          "card": "vocab-kokage",
+          "options": {
+            "practice": true
+          },
+          "as": "practiceAttempt"
+        },
+        {
+          "op": "checkpoint",
+          "device": "deviceA",
+          "as": "beforePractice"
+        },
+        {
+          "op": "practice",
+          "device": "deviceA",
+          "attempt": "practiceAttempt",
+          "rating": 4,
+          "thinkMs": 1000,
+          "as": "practiceResult"
+        }
+      ],
+      "expect": [
+        {
+          "invariant": "result",
+          "result": "practiceResult",
+          "kind": "observation-only",
+          "reason": "practice-or-assisted"
+        },
+        {
+          "invariant": "practiceEvidence",
+          "device": "deviceA",
+          "result": "practiceResult"
+        },
+        {
+          "invariant": "localEventDelta",
+          "device": "deviceA",
+          "checkpoint": "beforePractice",
+          "value": 1
+        },
+        {
+          "invariant": "noScheduleMutation",
+          "device": "deviceA",
+          "checkpoint": "beforePractice"
+        },
+        {
+          "invariant": "reviewCount",
+          "device": "deviceA",
+          "value": 0
+        },
+        {
+          "invariant": "permitUse",
+          "device": "deviceA",
+          "used": 0,
+          "issued": 1
+        },
+        {
+          "invariant": "crossHostParity"
+        }
+      ]
+    },
+    {
+      "id": "context-capture-not-review",
+      "setup": "oneNewCardOnA",
+      "actions": [
+        {
+          "op": "snapshotAttempt",
+          "device": "deviceA",
+          "card": "vocab-kokage",
+          "as": "attempt"
+        },
+        {
+          "op": "checkpoint",
+          "device": "deviceA",
+          "as": "beforeCapture"
+        },
+        {
+          "op": "capture",
+          "device": "deviceA",
+          "attempt": "attempt",
+          "card": "vocab-kokage",
+          "capture": {
+            "surface": "木陰",
+            "kind": "lookup",
+            "location": "passage",
+            "contextTaskKey": "$card.taskKey",
+            "contentRevision": "$attempt.contentRevision",
+            "revealed": true,
+            "span": {
+              "start": 0,
+              "end": 2,
+              "unit": "unicode-codepoint"
+            },
+            "targetTaskKey": "$card.taskKey"
+          },
+          "as": "captureResult"
+        }
+      ],
+      "expect": [
+        {
+          "invariant": "result",
+          "result": "captureResult",
+          "kind": "durable"
+        },
+        {
+          "invariant": "captureCount",
+          "device": "deviceA",
+          "value": 1
+        },
+        {
+          "invariant": "localEventDelta",
+          "device": "deviceA",
+          "checkpoint": "beforeCapture",
+          "value": 1
+        },
+        {
+          "invariant": "noScheduleMutation",
+          "device": "deviceA",
+          "checkpoint": "beforeCapture"
+        },
+        {
+          "invariant": "reviewCount",
+          "device": "deviceA",
+          "value": 0
+        },
+        {
+          "invariant": "permitUse",
+          "device": "deviceA",
+          "used": 0,
+          "issued": 1
+        },
+        {
+          "invariant": "crossHostParity"
+        }
+      ]
+    }
+  ]
+}

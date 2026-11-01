@@ -50,6 +50,9 @@ import {
   validateDeck,
   wordStatus,
 } from './engine.js';
+import {isSharedDeck} from '../../shared-study-content.mjs';
+import {isSharedStudyMode} from '../../study-engine-adapter.mjs';
+import * as sharedPlayer from './shared-mount.mjs';
 
 const fsrsApi = window.__TSFSRS__ || (await import('../../vendor/ts-fsrs.mjs'));
 const pin = window.__CORRIDOR_BUNDLE__?.['fsrs-pin'] || (await fetchJson(new URL('../../data/fsrs-pin.json', import.meta.url)));
@@ -319,6 +322,7 @@ function loadState(storage, deck) {
 /** write a candidate ledger; the caller adopts it only when this returns true. The text written becomes this
  * window's revision of the ledger (writeLedger). */
 function save(state) {
+  if (!ctx || isSharedDeck(ctx.deck.id) || isSharedStudyMode()) return false;
   const text = JSON.stringify(state);
   if (!writeRaw(ctx.storage, stateKey(ctx.deck.id), text)) return false;
   ctx.ledgerText = text;
@@ -3509,6 +3513,14 @@ function ensureCss() {
 }
 
 export async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true, autoStart, presentation = null, next = null, focusRoom = false, words = null, learner = null } = {}) {
+  if (isSharedDeck(deckId) || deckId === 'shared-grammar') {
+    ++mountRequest; ctx = null; pendingStart = null;
+    return sharedPlayer.render(main, {deckId,onLeave,english,autoStart});
+  }
+  if (isSharedStudyMode()) {
+    ++mountRequest; ctx = null; pendingStart = null;
+    return sharedPlayer.renderSharedFence(main,{english,onLeave});
+  }
   const request = ++mountRequest;
   if (autoStart !== undefined) pendingStart = { deckId, autoStart };
   ensureCss();
@@ -3592,6 +3604,8 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
  * name its cards and writes nothing.
  */
 export async function missedTerms(deckId, storage = window.localStorage, since = 0) {
+  if (isSharedDeck(deckId) || deckId === 'shared-grammar') return sharedPlayer.missedTerms(deckId,since);
+  if (isSharedStudyMode()) return [];
   const { deck, index } = await loadDeck(deckId);
   const { state } = loadState(storage, deck);
   const latest = new Map();
@@ -3606,6 +3620,8 @@ export async function missedTerms(deckId, storage = window.localStorage, since =
 }
 
 export async function summary(deckId, storage = window.localStorage) {
+  if (isSharedDeck(deckId) || deckId === 'shared-grammar') return sharedPlayer.summary(deckId);
+  if (isSharedStudyMode()) return {due:0,fresh:0,total:0,words:0,authority:'unmapped'};
   const { deck } = await loadDeck(deckId);
   const { state } = loadState(storage, deck);
   const prefs = prefsFor(storage, deck);
