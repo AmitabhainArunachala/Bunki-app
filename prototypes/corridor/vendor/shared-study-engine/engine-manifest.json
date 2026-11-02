@@ -18,7 +18,7 @@
   },
   "source": {
     "repository": "nihongo-srs",
-    "commit": "c59adf2ded0dca69ece8d4cb61ae810a0d857ee6",
+    "commit": "2602ec65f79154616abb2f3666f3928929a93413",
     "mode": "committed",
     "changedFiles": []
   },
@@ -43,13 +43,13 @@
   "files": [
     {
       "path": "client/app/app.css",
-      "bytes": 57354,
-      "sha256": "a69d4778bb4f260bd1c267f60d02c9927f74a4520ebbe2ed064d5c5f9fddee45"
+      "bytes": 57468,
+      "sha256": "eb5f2610a19f417d3fef4f2a9735f33977492740641fafe9c62e07de2f67d989"
     },
     {
       "path": "client/app/app.mjs",
-      "bytes": 156862,
-      "sha256": "8cba4d6501061c6786abcfbbd931780e447d02ea952a1f66ee45cd0ae47677e8"
+      "bytes": 168637,
+      "sha256": "38b7d90fcb7ff6ff1fcd6a6d7444db576a58019c10e902b9601080b24cee94df"
     },
     {
       "path": "client/app/backup-status.mjs",
@@ -1353,8 +1353,8 @@
     },
     {
       "path": "client/app/prod-native-sync.mjs",
-      "bytes": 11300,
-      "sha256": "2a65052e69a1922c7c29fd23689f80f7545aed7319bdbd8f779b88e38bbf7d0c"
+      "bytes": 11599,
+      "sha256": "12c97e5245dd2c5af5606bbe04786002b6b2a1ec1312a8cffff8ef3a07c2d341"
     },
     {
       "path": "client/app/session-timings.mjs",
@@ -1370,6 +1370,16 @@
       "path": "client/app/sync-evidence.mjs",
       "bytes": 4739,
       "sha256": "85a2661be1b198bd5180a107ea7366f270ce29e2b891e98335d6e0985a2d2279"
+    },
+    {
+      "path": "client/app/trial-audio.mjs",
+      "bytes": 13283,
+      "sha256": "09794b3a80688b9942767651ecda3101f53478b2cb3ef62ac13e69c6ca0e4e36"
+    },
+    {
+      "path": "client/app/update-boundary.mjs",
+      "bytes": 3562,
+      "sha256": "4e12a612b5aa43e65ed26ebc22667714ba62db44e92d67a28484eeef82669a9e"
     },
     {
       "path": "client/content/translation-coverage.mjs",
@@ -1557,5 +1567,5 @@
       "sha256": "adab18734248871867be9cf62fa25b58cce3f3f37a34a81e714b0b1b26e10dba"
     }
   ],
-  "closureSha256": "a8bcfd6e8141f884fd42be7fbbe134da21d3fe4fe174d333daa6582998ebade2"
+  "closureSha256": "f3626961823781b8e2e3ae044973b70ba9b6446c6d34e009231f1dbe2e5cedf7"
 }

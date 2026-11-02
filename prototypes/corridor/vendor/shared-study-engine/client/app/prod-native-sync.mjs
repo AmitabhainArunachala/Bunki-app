@@ -108,7 +108,7 @@ export async function syncWithPermits({synchronize, transport, store, permitRequ
   }
 }
 
-export function createProdNativeSyncSession({transport, bridge, backend, store, enabled=false, pairingUnknown=false, verificationError=null, now=Date.now} = {}) {
+export function createProdNativeSyncSession({transport, bridge, backend, store, enabled=false, pairingUnknown=false, verificationError=null, now=Date.now, onSettled} = {}) {
   let disposed = false, flight = null, interactiveFlight = null, actionError = null, verified = null;
   let prefixError = enabled ? null : verificationError === null ? 'native-sync-bootstrap-required' : prefixFailure({message:verificationError});
   const verify = async (full = false) => {
@@ -143,17 +143,20 @@ export function createProdNativeSyncSession({transport, bridge, backend, store, 
   };
   const synchronizeWithPermits = () => syncWithPermits({synchronize, transport, store,
     permitRequest:state=>prodNativePermitRequest(state, {now})});
+  const observe=(result,error)=>{try{Promise.resolve(onSettled?.(result,error)).catch(()=>{});}catch{/* advisory only */}};
   function run(key, action) {
     if (disposed) return Promise.reject(Error('native-sync-closed'));
     if (flight) return flight.key === key ? flight.promise : Promise.reject(Error('native-sync-busy'));
-    const promise = Promise.resolve().then(async()=>{
+    const settled = Promise.resolve().then(async()=>{
       if(disposed) throw Error('native-sync-closed');
       const result = await action();
       if(disposed) throw Error('native-sync-closed');
       actionError = result?.error || null;
       return status();
-    }).catch(error=>{actionError=error?.message || 'operation-failed';throw error;})
-      .finally(()=>{flight=null;});
+    }).catch(error=>{actionError=error?.message || 'operation-failed';throw error;});
+    const promise = settled.finally(()=>{flight=null;});
+    settled.then(result=>{if(key==='sync'&&!disposed)observe(result,null);},
+      error=>{if(key==='sync'&&!disposed)observe(null,error);});
     flight = {key,promise};
     return promise;
   }

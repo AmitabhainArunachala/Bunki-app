@@ -371,6 +371,7 @@ section:has(>.word-list)>h2~.setting-row textarea{width:100%;min-height:88px}
 #app [data-focus]{position:relative}
 #app [data-focus] .study-heading{flex:none;min-height:44px}
 #app [data-focus] .study-actions{display:grid;grid-template-columns:44px minmax(0,1fr) auto auto;gap:0;width:100%}
+#app [data-focus] .study-actions:has([data-trial-audio]){grid-template-columns:44px 44px minmax(0,1fr) auto auto}
 #app [data-focus] .study-remaining{justify-self:center;font-size:13px;line-height:20px;text-align:center;color:var(--secondary);font-variant-numeric:tabular-nums}
 #app [data-focus] .study-card{position:relative;display:block;padding:24px 20px calc(var(--decision-height,0px) + 24px);margin:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--sheet-shadow);animation:none}
 #app [data-focus][data-study=front] .study-card{display:block;padding-bottom:48px}

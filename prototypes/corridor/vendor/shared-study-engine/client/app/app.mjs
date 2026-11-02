@@ -14,8 +14,10 @@ import {studyDayView,studyNewCardAvailability,studyReviewSummary,studyNewCardCos
 import {createSessionEvidence} from './session-timings.mjs';
 import {operationState,retainOperationProof} from './operation-result.mjs';
 import {createSharedActivityTracker} from './sync-evidence.mjs';
+import {createUpdateBoundary} from './update-boundary.mjs';
 import {isRetryableProdSyncError} from './prod-native-sync.mjs';
 import {watchLocalDayBudget} from './local-budget.mjs';
+import {createTrialAudio} from './trial-audio.mjs';
 const MODULES = [['all','すべて','すべてのデッキ'],['n2','N2','日本語能力試験'],['n1','N1','日本語能力試験'],['senmon','専門','考えを深める言葉'],['kotoba','わたしの言葉','拾い集めた言葉'],['grammar','文法','意味・思い出す']];
 const GRADES = [[1,'もう一度','Again','再'],[2,'難しい','Hard','難'],[3,'正解','Good','良'],[4,'簡単','Easy','易']];
 const interval = ms => ms < 60000 ? '1分未満' : ms < 3600000 ? `${Math.ceil(ms/60000)}分` : ms < 86400000 ? `${Math.ceil(ms/3600000)}時間` : `${Math.round(ms/86400000)}日`;
@@ -56,6 +58,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   const pairedPhone = ['paired-dev','paired-prod'].includes(platform.storageKind);
   if(platform.presentation!==undefined&&!['phone','desktop'].includes(platform.presentation))throw Error('invalid-study-presentation');
   const phonePresentation=platform.presentation===undefined?pairedPhone:platform.presentation==='phone';
+  const trialAudio=createTrialAudio({origin:platform.audioOrigin??win.nihongoNativeSync?.origin??win.location?.origin});
   const h = (tag, attrs, ...children) => createNode(document, tag, attrs, ...children);
   const button = (text, fn, attrs = {}) => h('button', { type:'button', onclick: fn, ...attrs }, text);
   let screen = 'today', module = initialModule, current = null, busy = false, notice = '', pendingIntent = null, pendingAction = null, factoryRetry = null, disposed = false, pop = null, lastReview = null;
@@ -64,6 +67,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   let saveStatusGeneration=0,noticeOwner=null;
   let saveBacklogSince=null,saveBacklogTimer=null,lastSaveStatus=null;
   let typedBusy=false,typedDraft='',typedSentence='';
+  const typedSaved={word:'',sentence:''};
   let swipeGrading=false;try{swipeGrading=preferences.getItem('nihongo.swipe-grading.v1')==='true';}catch{}
   const shippedCatalog=catalog;
   const activityTracker=createSharedActivityTracker({installation:backend.installation,afterSeq:platform.activitySince??backend.readProjection().appliedSeq,now,labelForInstallation:platform.labelForInstallation});
@@ -71,23 +75,93 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   const observeSharedActivity=()=>{sharedActivity=activityTracker.observe(backend.readSharedActivity?.(activityTracker.cursor),backend.readProjection());};
   const customOptions={mode:'review-ahead',aheadDays:1,size:20,untilDone:false,filters:{level:'',module:'all',tag:'',recentlyFailed:false,order:'due'}};
   let customRun=null,customBusy=false,pausedStudy=null,parkedStudy=null,scheduledPage=0,sessionShown=0,boundaryPreparation=null;
-  const sessionEvidence=createSessionEvidence({preferences,learner:backend.learner,installation:backend.installation,now});
+  const sessionPreferences=preferences&&typeof preferences.setItem==='function'?{
+    getItem:key=>preferences.getItem(key),
+    setItem(key,value){const result=preferences.setItem(key,value);trackPreferencePromise(result);return result;},
+  }:preferences;
+  const sessionEvidence=createSessionEvidence({preferences:sessionPreferences,learner:backend.learner,installation:backend.installation,now});
   let activeSession=null,finishState=null,finishGuardTimer=null,costState=null;const acknowledgedDays=new Set();
   let toastTimer=null,lastInputSource='pointer';const frontCache=new Map();
   let intervalHints=false;try{intervalHints=preferences.getItem('nihongo.interval-hints.v1')==='true';}catch{}
   let budgetWatcher=null;
   let pendingObservation=false,pendingOperation=null,operationSequence=0;
   const manualDraft={word:'',reading:'',meaning:'',example:'',note:''};
+  const manualSaved={word:'',reading:'',meaning:'',example:'',note:''};
   const paceDraft={};
   let todayTotalDraft={};
   let weekdayDraft={},weekdayPending=null;
-  let interfaceLanguage=defaultInterfaceLanguage(win.navigator);try{const stored=preferences.getItem('nihongo.interface-language.v1');if(['ja','en','both'].includes(stored))interfaceLanguage=stored;}catch{}
+  const defaultLanguage=defaultInterfaceLanguage(win.navigator);
+  let interfaceLanguage=defaultLanguage;try{const stored=preferences.getItem('nihongo.interface-language.v1');if(['ja','en','both'].includes(stored))interfaceLanguage=stored;}catch{}
   const originalLabels=new WeakMap(),originalAttributes=new WeakMap(),cardViews=new WeakMap();
   const copy=(tag,ja,en,attrs={})=>renderInterfacePair(h(tag,attrs),ja,en,interfaceLanguage,{inline:tag==='button'});
   const copyButton=(ja,en,action,attrs={})=>copy('button',ja,en,{type:'button',onclick:action,...attrs});
   const online=()=>typeof platform.isOnline==='function'?platform.isOnline():win.navigator.onLine!==false;
   let startedOffline=platform.startedOffline===true&&!online();
   const canRequestNewCards=()=>typeof platform.requestNewCards==='function'&&(typeof platform.canRequestNewCards==='function'?platform.canRequestNewCards({nativeSyncState}):platform.canRequestNewCards===true);
+  const actionFlights=new Map();let actionFlightSeq=0,updateBoundary=null;
+  function beginFlight(label){
+    if(disposed)return()=>{};
+    const id=++actionFlightSeq;actionFlights.set(id,label);updateBoundary?.sync();
+    let ended=false;return()=>{if(ended)return;ended=true;actionFlights.delete(id);updateBoundary?.sync();};
+  }
+  function trackPreferencePromise(result){
+    if(!result||typeof result.then!=='function')return result;
+    const end=beginFlight('preference');result.then(()=>end(),()=>end());return result;
+  }
+  function trackBudgetRefresh(){
+    const end=beginFlight('budget');
+    let result;
+    try{result=backend.refreshLocalDayBudget();}
+    catch(error){end();throw error;}
+    if(!result||typeof result.then!=='function'){end();return result;}
+    return result.then(value=>{end();return value;},error=>{end();throw error;});
+  }
+  function storedPreference(key){try{return preferences.getItem(key);}catch{return null;}}
+  function preferenceChanged(key,current,fallback,valid=()=>true){
+    const stored=storedPreference(key);
+    return stored==null||!valid(stored)?current!==fallback:String(stored)!==String(current);
+  }
+  function readUpdateBlockers(){
+    const blockers=new Set();
+    if(current&&!current.committed)blockers.add('attempt');
+    if(parkedStudy||pausedStudy)blockers.add('paused-attempt');
+    if(busy)blockers.add('busy');
+    if(typedBusy)blockers.add('typed-busy');
+    if(customBusy)blockers.add('custom-busy');
+    if(pendingIntent||pendingOperation)blockers.add('pending-operation');
+    if(boundaryPreparation)blockers.add('boundary-preparation');
+    if(factoryRetry)blockers.add('factory-retry');
+    if(weekdayPending)blockers.add('weekday-pending');
+    if(costState?.pending)blockers.add('cost-pending');
+    if(pop)blockers.add('lookup');
+    if(document.querySelector('dialog[open]'))blockers.add('dialog');
+    if((typedDraft&&typedDraft!==typedSaved.word)||(typedSentence&&typedSentence!==typedSaved.sentence))blockers.add('typed-draft');
+    if(Object.keys(manualDraft).some(key=>manualDraft[key]!==manualSaved[key]))blockers.add('manual-draft');
+    if(preferenceChanged('nihongo.interface-language.v1',interfaceLanguage,defaultLanguage,value=>['ja','en','both'].includes(value)))blockers.add('preference-language');
+    if(preferenceChanged('nihongo.qa.appearance.v1',theme,'auto',value=>value==='auto'||Object.hasOwn(themes.themes,value)))blockers.add('preference-theme');
+    if(preferenceChanged('nihongo.swipe-grading.v1',String(swipeGrading),'false',value=>value==='true'||value==='false'))blockers.add('preference-swipe');
+    if(preferenceChanged('nihongo.interval-hints.v1',String(intervalHints),'false',value=>value==='true'||value==='false'))blockers.add('preference-hints');
+    if(nativePairDraft.trim())blockers.add('pairing-draft');
+    for(const field of document.querySelectorAll('[data-host-settings] input,[data-host-settings] textarea')){
+      const hint=[field.id,field.name,field.getAttribute('data-pair-code'),field.getAttribute('data-invitation')].join(' ').toLowerCase();
+      if(/(pair|invit)/.test(hint)&&String(field.value??'').trim())blockers.add('host-pairing-draft');
+    }
+    try{
+      const planned=plannedSettings(backend.readProjection());
+      if(Object.keys(paceDraft).some(key=>String(paceDraft[key])!==String(planned[key]??'')))blockers.add('pace-draft');
+      const limits=planned.studyPolicy?.newByWeekday??Array(7).fill(planned.newPerDayTotal);
+      if(Object.entries(weekdayDraft).some(([day,value])=>String(value)!==String(limits[day])))blockers.add('weekday-draft');
+      if(todayTotalDraft.value!==undefined&&String(todayTotalDraft.value)!==String(backend.todayAllowance?.()?.limit??''))blockers.add('today-total-draft');
+    }catch{blockers.add('projection');}
+    for(const label of new Set(actionFlights.values()))blockers.add('flight:'+label);
+    return [...blockers];
+  }
+  updateBoundary=createUpdateBoundary({
+    readBlockers:readUpdateBlockers,
+    readFlights:()=>actionFlights.size,
+    onHold:()=>{root.setAttribute('inert','');trialAudio.stop();},
+    onRelease:()=>{root.removeAttribute('inert');},
+  });
   const dayView=({restEvidence=screen!=='study'}={})=>studyDayView(backend.readProjection(),catalog,{at:now(),installation:backend.installation,queue:backend.queue(),offline:!online(),canRequestPermits:canRequestNewCards(),verifiedRestDays:restEvidence?(backend.readVerifiedRestDays?.().days??[]):[],sessionTimings:sessionEvidence.read(backend.readProjection()).entries});
   const newCardAvailability=(queue=null)=>studyNewCardAvailability(backend.readProjection(),catalog,{at:now(),installation:backend.installation,queue:queue??backend.queue(),offline:!online(),canRequestPermits:canRequestNewCards()});
   function localized(jp){return formatInterfaceText(jp,interfaceLanguage);}
@@ -112,7 +186,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       }else{const rendered=localized(jp);originalLabels.set(node,{source:jp,rendered});if(node.nodeValue!==rendered)node.nodeValue=rendered;}
     }
     for(const element of root.querySelectorAll('[aria-label],[placeholder],[title]')){
-      if(isSourceCopy(element))continue;
+      if(isSourceCopy(element)||element.closest('[data-trial-audio]'))continue;
       const before=originalAttributes.get(element)||{},after={};
       for(const name of ['aria-label','placeholder','title'])if(element.hasAttribute(name)){
         const value=element.getAttribute(name),source=before[name]&&value===before[name].rendered?before[name].source:value,rendered=localized(source);
@@ -122,7 +196,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     }
     document.documentElement.lang=interfaceLanguage==='en'?'en':'ja';
   }
-  function languagePicker(compact=false){const select=h('select',{'aria-label':'表示言語','data-interface-language':'',onchange:async e=>{interfaceLanguage=e.target.value;for(const picker of root.querySelectorAll('[data-interface-language]'))picker.value=interfaceLanguage;try{await preferences.setItem('nihongo.interface-language.v1',interfaceLanguage);}catch{message('表示言語を保存できません。');}render();}},h('option',{value:'ja'},'日本語'),h('option',{value:'en'},'English'),h('option',{value:'both'},'両方'));select.value=interfaceLanguage;return h('label',{class:`language-picker${compact?' compact':''}`},h('span',{},'表示言語'),select);}
+  function languagePicker(compact=false){const select=h('select',{'aria-label':'表示言語','data-interface-language':'',onchange:async e=>{if(updateBoundary?.held)return;interfaceLanguage=e.target.value;for(const picker of root.querySelectorAll('[data-interface-language]'))picker.value=interfaceLanguage;const end=beginFlight('preference');try{await preferences.setItem('nihongo.interface-language.v1',interfaceLanguage);}catch{message('表示言語を保存できません。');}finally{end();render();}}},h('option',{value:'ja'},'日本語'),h('option',{value:'en'},'English'),h('option',{value:'both'},'両方'));select.value=interfaceLanguage;return h('label',{class:`language-picker${compact?' compact':''}`},h('span',{},'表示言語'),select);}
   let refreshFactoryRows=()=>{};
   const factoryStatuses=createFactoryStatusReader({inspect:platform.inspectCardFactory,catalog,getProjection:()=>backend.readProjection(),onUpdate:()=>{if(!disposed&&screen==='words')refreshFactoryRows();}});
   function reconcileUnknownFactoryRows(){factoryStatuses.inspectUnknown(backend.readProjection().captures.filter(c=>!c.targetTaskKey&&['unknown','unsure'].includes(c.kind)));}
@@ -137,8 +211,12 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     for (const [key, value] of Object.entries(tokens)) document.documentElement.style.setProperty(`--${key}`, value);
     document.documentElement.dataset.theme = resolved;
     document.documentElement.style.colorScheme = themes.themes[resolved].scheme;
-    if (save) try { const previousSet=themePreferenceSet,saved=preferences.setItem('nihongo.qa.appearance.v1', theme);themePreferenceSet=true;saved?.catch?.(()=>{themePreferenceSet=previousSet;message('この端末に色の設定を保存できません。');}); } catch { message('この端末に色の設定を保存できません。'); }
+    if (save) try {
+      const previousSet=themePreferenceSet,saved=preferences.setItem('nihongo.qa.appearance.v1', theme);themePreferenceSet=true;
+      if(saved&&typeof saved.then==='function'){const end=beginFlight('preference');saved.then(()=>end(),()=>{themePreferenceSet=previousSet;message('この端末に色の設定を保存できません。');end();});}
+    } catch { message('この端末に色の設定を保存できません。'); }
     for (const picker of root.querySelectorAll('[data-theme-picker]')) picker.value = theme;
+    updateBoundary?.sync();
   }
   const darkChanged = () => { if (theme === 'auto') applyTheme('auto', false); };
   dark.addEventListener('change', darkChanged);
@@ -255,6 +333,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   }
   function message(text,owner=null) { notice = text; noticeOwner=owner; live.textContent = text;localize(); }
   function navigate(next) {
+    if (updateBoundary?.held) return;
     if (busy || typedBusy || customBusy || pendingIntent) return message('保存を確認してから移動してください。失敗した場合は再試行できます。');
     if(screen==='study'&&current)return pauseStudy(next);
     boundaryPreparation=null;current?.timer.dispose(); current = null; customRun=null; activeSession=null;finishState=null;win.clearTimeout(finishGuardTimer);screen = next; closePopover(); render();
@@ -270,14 +349,16 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     });
   }
   function pauseStudy(next){
+    if(updateBoundary?.held)return;
     if(!current||current.committed||boundaryPreparation)return message('保存を確認してから移動してください。失敗した場合は再試行できます。');
-    setStudyMenu(false);closePopover();current.timer.pause();
+    trialAudio.stop();setStudyMenu(false);closePopover();current.timer.pause();
     parkedStudy={current,customRun,activeSession,boundaryQueue,boundaryNotice,sessionShown,module,scroll:main.querySelector('[data-card]')?.scrollTop??0};
     current=null;customRun=null;activeSession=null;screen=next;render();main.focus({preventScroll:true});
   }
   function studyDay(){const at=now(),today=backend.todayAllowance?.()??dayBounds(at,backend.readProjection().settings.learnerTimezone);return {day:today.day,timezone:today.timezone};}
   function parkedDayEnded(){if(!parkedStudy)return false;const today=studyDay(),started=parkedStudy.current.studyDay;return started.day!==today.day||started.timezone!==today.timezone;}
   function retireParkedStudy(next){
+    if(updateBoundary?.held)return;
     if(!parkedStudy)return next();
     if(busy||typedBusy||customBusy||pendingIntent)return message('保存を確認してから移動してください。失敗した場合は再試行できます。');
     // A lookup records an observation; leaving its card never schedules it.
@@ -290,6 +371,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     current.timer.resume();screen='study';return saved;
   }
   function resumeStudy(){
+    if(updateBoundary?.held)return;
     if(busy||typedBusy||customBusy||pendingIntent)return message('保存を確認してから移動してください。失敗した場合は再試行できます。');
     if(parkedDayEnded())return retireParkedStudy(()=>render());
     const saved=restoreStudy();if(!saved)return;render();const card=main.querySelector('[data-card]');if(card)card.scrollTop=saved.scroll;focusStudyCard();
@@ -357,6 +439,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     updateStatus({presentation:true});
     budgetWatcher?.schedule();
     if(parkedStudy&&!busy&&!pendingIntent&&parkedDayEnded()){const saved=parkedStudy;queueMicrotask(()=>{if(!disposed&&parkedStudy===saved&&parkedDayEnded())retireParkedStudy(()=>render());});}
+    updateBoundary?.sync();
   }
   function todayScreen() {
     const p=backend.readProjection(),view=dayView(),today=view.today,queue=backend.queue({module});
@@ -405,7 +488,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
         },'今日の新規カードの合計を保存しました。');
       },
       onWeekdays:saveWeekdays,
-      onManual:values=>runInput('manual',values,original=>backend.createManualCard(original),(result)=>{if(result.reused||result.existing)message('この言葉のカードは既にあります。既存のカードをそのまま使います。');else{for(const key of Object.keys(manualDraft))manualDraft[key]='';message('手入力のカードを保存しました。');}render();},{existing:true}),
+      onManual:values=>runInput('manual',values,original=>backend.createManualCard(original),(result)=>{Object.assign(manualSaved,values);if(result.reused||result.existing)message('この言葉のカードは既にあります。既存のカードをそのまま使います。');else{for(const key of Object.keys(manualDraft))manualDraft[key]='';Object.assign(manualSaved,{word:'',reading:'',meaning:'',example:'',note:''});message('手入力のカードを保存しました。');}render();},{existing:true}),
       onFactory:values=>{typedDraft=values.word;typedSentence=values.example;navigate('words');}}));
     const shelf=h('section',{class:'sheet library-sheet'},h('div',{class:'sheet-head'},h('h2',{},'本棚'),h('p',{class:'sheet-desc'},'学ぶ範囲を選びます。範囲を変えても、1日の新規カード上限は増えません。')));section.append(shelf);
     const library = h('div',{class:'library',role:'group','aria-label':'学習範囲'});
@@ -438,26 +521,30 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function readyCount(entries){const p=backend.readProjection(),at=now(),today=backend.todayAllowance?.()??dayBounds(at,p.settings.learnerTimezone),permits=Object.values(p.permits),held=permits.filter(permit=>!permit.usedBy&&permit.install===backend.installation&&permit.startsAt<=at&&permit.endsAt>at).length,spent=permits.filter(permit=>permit.usedBy&&permit.startsAt<today.endsAt&&permit.endsAt>today.startsAt).length;let reviews=0,fresh=0;for(const entry of entries){if(p.introductions[entry.taskKey])reviews++;else fresh++;}return reviews+Math.min(fresh,held,Math.max(0,(today.limit??Infinity)-spent));}
   function showToast(ja,en){win.clearTimeout(toastTimer);root.querySelector('[data-study-toast]')?.remove();const toast=copy('p',ja,en,{class:'study-toast',role:'status','data-study-toast':''});root.append(toast);toastTimer=win.setTimeout(()=>toast.remove(),2000);}
   async function beginToday(size=null,reviewsOnly=false,source=lastInputSource,newSession=false){
+    if(updateBoundary?.held)return;
     if(customBusy||busy||pendingIntent)return;
-    if(parkedStudy){if(size!==null||reviewsOnly||newSession)return retireParkedStudy(()=>beginToday(size,reviewsOnly,source,newSession));return resumeStudy();}
-    if(pausedStudy&&!reviewsOnly){const paused=pausedStudy;pausedStudy=null;if(paused.run)return paused.run.newOnly?beginNewSession(paused.run.taskKeys):beginCustomSession(paused.run.options,paused.run.taskKeys);const entry=backend.queue({module}).find(entry=>entry.taskKey===paused.taskKey);if(entry)return start(entry,false,false,null,{source});}
-    let view=dayView();
-    if(!reviewsOnly&&!backend.queue({module}).length&&view.availability.requestableNew>0){
-      if(!online()||!canRequestNewCards())return render();
-      customBusy=true;render();
-      try{const result=await platform.requestNewCards();if(result?.error||result?.kind==='failed'||result?.kind==='observation-only')throw Error('reserve-unavailable');await backend.refresh();}
-      catch{if(!disposed)message('新規カードを受け取れませんでした。通信と設定を確認して、もう一度お試しください。');return;}
-      finally{customBusy=false;if(!disposed)render();}
-      if(disposed)return;view=dayView();
-    }
-    const backlog=view.backlog,queue=backend.queue({module,backlog});
-    if(size!==null||reviewsOnly){const keys=queue.filter(entry=>backend.readProjection().introductions[entry.taskKey]).map(entry=>entry.taskKey).slice(0,size??Infinity);return beginCustomSession({mode:'due',untilDone:true,filters:{module}},keys,source);}
-    const entry=queue.find(entry=>entry.taskKey===pausedStudy?.taskKey)||queue[0];
-    if(!entry){if(dayView().finished){render();return;}return message('この条件で学習できるカードはありません。');}
-    pausedStudy=null;await frontFor(entry).promise;if(!disposed)start(entry,false,false,null,{source,backlog});
+    const endFlight=beginFlight('begin');
+    try{
+      if(parkedStudy){if(size!==null||reviewsOnly||newSession)return retireParkedStudy(()=>beginToday(size,reviewsOnly,source,newSession));return resumeStudy();}
+      if(pausedStudy&&!reviewsOnly){const paused=pausedStudy;pausedStudy=null;if(paused.run)return paused.run.newOnly?beginNewSession(paused.run.taskKeys):beginCustomSession(paused.run.options,paused.run.taskKeys);const entry=backend.queue({module}).find(entry=>entry.taskKey===paused.taskKey);if(entry)return start(entry,false,false,null,{source});}
+      let view=dayView();
+      if(!reviewsOnly&&!backend.queue({module}).length&&view.availability.requestableNew>0){
+        if(!online()||!canRequestNewCards())return render();
+        customBusy=true;render();
+        try{const result=await platform.requestNewCards();if(result?.error||result?.kind==='failed'||result?.kind==='observation-only')throw Error('reserve-unavailable');await backend.refresh();}
+        catch{if(!disposed)message('新規カードを受け取れませんでした。通信と設定を確認して、もう一度お試しください。');return;}
+        finally{customBusy=false;if(!disposed)render();}
+        if(disposed)return;view=dayView();
+      }
+      const backlog=view.backlog,queue=backend.queue({module,backlog});
+      if(size!==null||reviewsOnly){const keys=queue.filter(entry=>backend.readProjection().introductions[entry.taskKey]).map(entry=>entry.taskKey).slice(0,size??Infinity);return beginCustomSession({mode:'due',untilDone:true,filters:{module}},keys,source);}
+      const entry=queue.find(entry=>entry.taskKey===pausedStudy?.taskKey)||queue[0];
+      if(!entry){if(dayView().finished){render();return;}return message('この条件で学習できるカードはありません。');}
+      pausedStudy=null;await frontFor(entry).promise;if(!disposed)start(entry,false,false,null,{source,backlog});
+    }finally{endFlight();}
   }
   async function customAction(action,success){
-    if(customBusy||busy||pendingIntent)return;customBusy=true;render();
+    if(updateBoundary?.held||customBusy||busy||pendingIntent)return;customBusy=true;render();
     try{const result=await action();if(disposed)return;
       if(result?.preparation&&!allowanceReady(result)){message(allowanceReason(result.preparation.reason||result.reason||'setting-processing-required',{current:result.preparation.current??backend.todayAllowance()})[0]);return;}if(result?.kind!=='durable'&&!allowanceReady(result))throw Error(result?.reason||'custom-action-failed');message(success);}
     catch(error){
@@ -466,6 +553,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     finally{customBusy=false;if(!disposed)render();}
   }
   function saveWeekdays(values){
+    if(updateBoundary?.held)return;
     if(values.length!==7||values.some(n=>!Number.isInteger(n)||n<0||n>200))return message('曜日の新規カード上限は0〜200の整数を入力してください。');
     if(customBusy||busy||pendingIntent)return;
     const body=JSON.stringify(values);
@@ -483,10 +571,10 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function acknowledgeDay(today){
     const key=`nihongo.finish-ack.v1:${backend.learner}:${today.timezone}:${today.day}`;
     if(acknowledgedDays.has(key))return false;acknowledgedDays.add(key);
-    try{const stored=preferences.getItem(key);if(stored!==null)return false;const result=preferences.setItem(key,'1');if(result&&typeof result.then==='function'){Promise.resolve(result).catch(()=>{});return false;}return true;}catch{return false;}
+    try{const stored=preferences.getItem(key);if(stored!==null)return false;const result=preferences.setItem(key,'1');if(result&&typeof result.then==='function'){trackPreferencePromise(result);return false;}return true;}catch{return false;}
   }
   function completeSitting(){
-    const p=backend.readProjection(),at=now(),session=activeSession,view=dayView({restEvidence:true}),practice=!!session?.practice;
+    trialAudio.stop();const p=backend.readProjection(),at=now(),session=activeSession,view=dayView({restEvidence:true}),practice=!!session?.practice;
     const summary=studyReviewSummary(p,{at,eventIds:session?.eventIds??[],startedAt:session?.startedAt,installation:backend.installation});
     const offers=view.offers;
     finishState={at,summary,view,offers,projection:p,online:online(),practice,practised:practice?customRun?.completed??0:0,ack:!practice&&summary.reviewed>0&&view.finished&&acknowledgeDay(view.today),until:win.performance.now()+400,showAll:false,source:current?.gradeSource||session?.source||lastInputSource};
@@ -494,9 +582,9 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     win.clearTimeout(finishGuardTimer);finishGuardTimer=win.setTimeout(()=>{if(screen==='finish'&&finishState)for(const control of main.querySelectorAll('[data-finish-action]'))control.disabled=false;},400);
   }
   const finishBlocked=()=>screen==='finish'&&finishState&&win.performance.now()<finishState.until;
-  function finishAction(action){return event=>{if(finishBlocked()||busy||customBusy||pendingIntent){event?.preventDefault();return;}action(event);};}
-  function finishDone(){if(finishBlocked())return;navigate('today');main.focus({preventScroll:true});}
-  function openCustomSession(){if(finishBlocked())return;navigate('today');const panel=main.querySelector('[data-custom-session]');if(panel){panel.open=true;panel.scrollIntoView({block:'start'});panel.querySelector('summary')?.focus();}}
+  function finishAction(action){return event=>{if(updateBoundary?.held||finishBlocked()||busy||customBusy||pendingIntent){event?.preventDefault();return;}action(event);};}
+  function finishDone(){if(updateBoundary?.held||finishBlocked())return;navigate('today');main.focus({preventScroll:true});}
+  function openCustomSession(){if(updateBoundary?.held||finishBlocked())return;navigate('today');const panel=main.querySelector('[data-custom-session]');if(panel){panel.open=true;panel.scrollIntoView({block:'start'});panel.querySelector('summary')?.focus();}}
   function appendTomorrow(parent,view){
     const section=h('section',{class:'sheet today-forecast','data-today-forecast':''},h('h2',{},'明日'));
     section.append(copy('p',`復習${view.tomorrow.reviews}枚＋新規最大${view.tomorrow.new}枚${view.tomorrow.estimateMinutes>0?`・約${view.tomorrow.estimateMinutes}分`:''}`,`${view.tomorrow.reviews} ${view.tomorrow.reviews===1?'review':'reviews'} + up to ${view.tomorrow.new} new${view.tomorrow.estimateMinutes>0?` · about ${view.tomorrow.estimateMinutes} min`:''}`,{class:'tomorrow-counts'}));
@@ -537,7 +625,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function allowanceReady(result){const preparation=result?.preparation,setting=preparation?.setting;return preparation?.status==='ready'&&(setting?.status==='unchanged'||setting?.status==='applied'&&setting.eventId===result.eventId&&setting.outcome?.status==='applied');}
   function allowanceReason(reason,{current=null,total=null}={}){const pair=({'invalid-today-total':['今日の合計・日付・タイムゾーンを確認してください。合計は現在の上限から200枚までの整数で指定してください。','Check today’s total, date and timezone. Enter a whole-number total from the current limit to 200.'],'setting-not-applied':['この上限変更は反映されませんでした。今日の上限を確認して選び直してください。','This limit change was not applied. Check today’s limit before choosing again.'],'setting-save-required':['上限を保存できたか確認できません。同じ合計を再試行してください。','The limit save could not be confirmed. Retry the same total.'],'retry-existing-new-override':['前の上限変更を先に再試行してください。別の変更は保存していません。','Retry the previous limit change first. No different change was saved.'],'server-permit-required':['新規カードを受け取る接続がありません。設定を確認してください。','No connection can reserve new cards. Check Settings.'],'new-permits-retry-required':['上限は保存しました。新規カードを受け取れませんでした。同じ操作を再試行してください。','The limit is saved. New cards could not be reserved. Retry preparation.'],'setting-processing-required':['上限の記録は端末に保存されています。処理をもう一度確認してください。','The limit record is saved on this device. Retry processing.'],'override-day-ended':['学習日が変わりました。今日の上限を確認してから選び直してください。','The study day changed. Check today’s limit before choosing again.'],'today-total-already-higher':['別の操作で今日の上限が増えました。現在の上限を確認してください。','Another change raised today’s limit. Check the current limit.'],'offline':['オフラインのため、新規カードを受け取れません。通信が戻ってから再試行してください。','New cards cannot be reserved offline. Retry when connected.']})[reason]??['新規カードの準備を完了できませんでした。同じ操作を再試行してください。','New-card preparation did not finish. Retry the same operation.'];if(['today-total-already-higher','invalid-today-total'].includes(reason)&&Number.isInteger(current?.limit))return[pair[0]+`現在の上限は${current.limit}枚です。`,pair[1]+` Current limit: ${current.limit}.`];if(['setting-save-required','setting-processing-required','new-permits-retry-required','retry-existing-new-override'].includes(reason)&&Number.isInteger(total))return[pair[0]+`再試行する合計は${total}枚です。`,pair[1]+` Retry total: ${total}.`];return pair;}
   function openNewCardsSheet(){
-    if(finishBlocked()||busy||customBusy||pendingIntent||document.querySelector('dialog[open]'))return;
+    if(updateBoundary?.held||finishBlocked()||busy||customBusy||pendingIntent||document.querySelector('dialog[open]'))return;
     const view=dayView();if(!costState)costState={day:{day:view.today.day,timezone:view.today.timezone},base:view.today.limit,choices:studyNewCardCost(backend.readProjection(),{at:now()}),eligible:view.availability.eligibleNewIds,selected:null,pending:false,result:null};
     if(!costState.pending&&!costState.choices.choices.some(choice=>choice.add<=costState.eligible.length)){
       const available=costState.eligible.length;costState=null;openCustomSession();
@@ -558,16 +646,17 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     },{class:'primary','data-confirm-new-cards':'',disabled:state.selected===null});
     for(const choice of state.choices.choices.filter(choice=>choice.add<=state.eligible.length)){const input=h('input',{type:'radio',name:'additional-new-cards',value:choice.add,checked:state.selected===choice.add,disabled:state.pending,'data-new-card-choice':choice.add,onchange:()=>{state.selected=choice.add;confirm.disabled=false;}});rows.append(h('label',{},input,copy('span',`＋${choice.add}枚（上限${choice.total}枚）・7日間の復習 約${choice.estimatedReviews}枚増`,`+${choice.add} → limit ${choice.total} · about ${choice.estimatedReviews} more reviews in 7 days`)));}
     node.append(rows,copy('p',state.choices.source==='history'?`過去の学習記録（${state.choices.cohortCards}枚）に基づく見積もりです。`:'十分な記録がないため、1枚あたり約1.1回の復習を見込んでいます。',state.choices.source==='history'?`Estimated from ${state.choices.cohortCards} completed card histories.`:'With limited history, the estimate uses about 1.1 later reviews per new card.',{class:'secondary','data-new-card-cost-source':''}),status,h('div',{class:'dialog-actions'},button('キャンセル',()=>{if(customBusy)return;node.close();node.remove();if(!state.pending)costState=null;main.querySelector('[data-finish]')?.focus({preventScroll:true});},{'data-cancel-new-cards':''}),confirm));
-    if(state.pending){const [ja,en]=allowanceReason(state.result?.preparation?.reason||state.result?.reason,{current:state.result?.preparation?.current??backend.todayAllowance(),total:state.base+state.selected});renderInterfacePair(status,ja,en,interfaceLanguage);}node.addEventListener('cancel',event=>{if(customBusy){event.preventDefault();return;}if(!state.pending)costState=null;});root.append(node);localize();node.showModal();
+    if(state.pending){const [ja,en]=allowanceReason(state.result?.preparation?.reason||state.result?.reason,{current:state.result?.preparation?.current??backend.todayAllowance(),total:state.base+state.selected});renderInterfacePair(status,ja,en,interfaceLanguage);}node.addEventListener('cancel',event=>{if(customBusy){event.preventDefault();return;}if(!state.pending)costState=null;});node.addEventListener('close',()=>updateBoundary?.sync());root.append(node);localize();node.showModal();updateBoundary?.sync();
   }
   function beginCustomSession(options,taskKeys=null,source=lastInputSource){
+    if(updateBoundary?.held)return;
     if(parkedStudy)return retireParkedStudy(()=>beginCustomSession(structuredClone(options),taskKeys&&[...taskKeys],source));
     if(customBusy||busy||pendingIntent)return;
     try{const selection=backend.customSession(options);const selected=new Map(selection.entries.map(entry=>[entry.taskKey,entry]));const entries=taskKeys===null?selection.entries:taskKeys.filter(key=>selected.has(key)).map(key=>selected.get(key));if(!entries.length)return message('この条件で学習できるカードはありません。');customRun={options:selection.options,remaining:[...entries],completed:0,total:entries.length,source};advanceCustomSession();}
     catch{message('セッションの条件を確認してください。');}
   }
   function requestBoundaryCards(record){
-    if(record.waiting||disposed||boundaryPreparation!==record)return;
+    if(updateBoundary?.held||record.waiting||disposed||boundaryPreparation!==record)return;
     if(!online()||!canRequestNewCards()){record.waiting=false;render();return;}
     record.waiting=true;render();
     Promise.resolve().then(()=>platform.requestNewCards()).then(async result=>{
@@ -590,6 +679,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     return true;
   }
   function advanceCustomSession(allowRequest=true){
+    if(updateBoundary?.held)return;
     const ready=customRun?.newOnly?backend.queue():null;
     const eligible=customRun?new Set((ready?ready.filter(entry=>!backend.readProjection().introductions[entry.taskKey]):backend.customSession({...customRun.options,untilDone:true}).entries).map(entry=>entry.taskKey)):new Set();
     let availabilityView=null;
@@ -603,7 +693,8 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     completeSitting();
   }
   function start(entry, practice = false,learnAhead=false,session=null,{source=lastInputSource,remaining=null,restore=null,preserveRun=false,readyTaskKeys=null,backlog=false}={}) {
-    if (!entry) return;
+    if (updateBoundary?.held || !entry) return;
+    trialAudio.stop();
     if(parkedStudy)return retireParkedStudy(()=>start(entry,practice,learnAhead,session,{source,remaining,restore,preserveRun,readyTaskKeys,backlog}));
     try {
       boundaryPreparation=null;
@@ -623,15 +714,47 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function keySheet(){
     const rows=[['Space・Return','Space / Return','解答を表示','Show answer'],['Space・Return（解答後）','Space / Return (back)','正解','Good'],['1〜4','1–4','採点：もう一度・難しい・正解・簡単','Grade: Again · Hard · Good · Easy'],['U・⌘Z','U / ⌘Z','最後の採点を元に戻す','Undo last rating'],['E','E','英訳の表示を切り替える','Show or hide the English'],['Esc','Esc','学習を終える','End session'],['?','?','この一覧','This list']];
     const node=h('dialog',{class:'key-sheet','data-key-sheet':''},h('h2',{},copy('span','キー操作','Keys')),h('dl',{},...rows.flatMap(([keyJa,keyEn,ja,en])=>[h('dt',{},copy('kbd',keyJa,keyEn)),h('dd',{},copy('span',ja,en))])),
+      trialAudioMember()?h('p',{class:'grade-rule','data-trial-audio-help':''},copy('span',`P：単語と文を再生`,'P: Play word and sentence')):null,
       h('div',{class:'dialog-actions'},button('閉じる',()=>{node.close();node.remove();focusStudyCard();},{class:'primary'})));
-    node.addEventListener('close',()=>{node.remove();focusStudyCard();});
-    root.append(node);node.showModal();localize();
+    node.addEventListener('close',()=>{node.remove();focusStudyCard();updateBoundary?.sync();});
+    root.append(node);node.showModal();localize();updateBoundary?.sync();
   }
   function focusStudyCard(){main.querySelector('[data-card]')?.focus({preventScroll:true});}
   function clearCardSelection(){const selection=win.getSelection(),card=main.querySelector('[data-card]');if(selection&&card&&(card.contains(selection.anchorNode)||card.contains(selection.focusNode)))selection.removeAllRanges();}
+  function trialAudioMember(c=current){return !!c?.entry?.noteGuid&&trialAudio.has(c.entry.noteGuid);}
+  function trialAudioLabel(){
+    const ja=`単語と文を再生（P）`,en='Play word and sentence (P)';
+    return interfaceLanguage==='en'?en:interfaceLanguage==='both'?`${ja} / ${en}`:ja;
+  }
+  function trialAudioButton(){
+    const label=trialAudioLabel();
+    return button('🔊',event=>{event.preventDefault();event.stopPropagation();playTrialAudio();focusStudyCard();},
+      {class:'quiet study-icon','aria-label':label,title:label,'data-trial-audio':'','aria-busy':'false'});
+  }
+  function syncTrialAudioControl(){
+    if(disposed||screen!=='study'||!current)return;
+    const actions=main.querySelector('.study-actions');if(!actions)return;
+    const existing=actions.querySelector('[data-trial-audio]');
+    if(!trialAudioMember(current)){existing?.remove();return;}
+    if(existing)return;
+    const node=trialAudioButton(),remaining=actions.querySelector('[data-study-remaining]');
+    if(remaining)actions.insertBefore(node,remaining);else actions.prepend(node);
+  }
+  function trialAudioFailure(){
+    const ja=`音声を再生できません。もう一度タップしてください。`,en='Audio could not play. Tap to try again.';
+    message(interfaceLanguage==='en'?en:interfaceLanguage==='both'?`${ja} / ${en}`:ja);
+  }
+  function playTrialAudio(){
+    const c=current;
+    if(disposed||screen!=='study'||!c||!trialAudioMember(c))return;
+    const control=main.querySelector('[data-trial-audio]');
+    control?.setAttribute('aria-busy','true');
+    trialAudio.play(c.entry.noteGuid).catch(()=>{if(!disposed)trialAudioFailure();})
+      .finally(()=>{if(control?.isConnected)control.setAttribute('aria-busy','false');});
+  }
   let lastCardActionAt=-Infinity;
   function revealCard(c=current,source=lastInputSource){
-    if(!c||c!==current||c.revealed||c.sessionInfoOpen||busy||pendingIntent||pop||document.querySelector('dialog[open]'))return;
+    if(updateBoundary?.held||!c||c!==current||c.revealed||c.sessionInfoOpen||busy||pendingIntent||pop||document.querySelector('dialog[open]'))return;
     clearCardSelection();c.thinkMs=c.timer.freeze();c.revealed=true;c.revealSource=source;c.revealedAt=lastCardActionAt=win.performance.now();render();focusStudyCard();
   }
   function passage(text, options = {}) { return renderVocabularyPassage(document,current.entry,text,{...options,onWord:openWord,dictionary}); }
@@ -647,6 +770,8 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       copy('span',`残り${c.remaining}枚`,`${c.remaining} left`,{class:'study-remaining','data-study-remaining':''}),lastReview?studyAction('元に戻す','↶',undoLast,{'data-undo':''}):null);
     actions.append(studyAction('メニュー','⋯',()=>{if(!current.sessionInfoOpen){const undo=main.querySelector('[data-menu-undo]');if(undo&&!availableUndo())undo.remove();}setStudyMenu(!c.sessionInfoOpen);},
       {'data-session-info':'','aria-haspopup':'menu','aria-expanded':String(!!c.sessionInfoOpen),'aria-controls':'study-help'}));
+    const trialAudioControl=trialAudioMember(c)?trialAudioButton():null;
+    if(trialAudioControl)actions.insertBefore(trialAudioControl,actions.querySelector('[data-study-remaining]'));
     const context=h('span',{id:'study-context'},`${MODULES.find(m=>m[0]===e.module)?.[1]||'文法'} · ${c.attempt.learnAhead?'学習ステップ（少し早め） · ':''}${c.attempt.mode==='practice'?'追加練習（採点なし）':e.contractId==='grammar.cloze.v1'?'思い出す':e.contractId==='grammar.meaning.v1'?'意味':'読んで思い出す'}`);
     const heading=h('div',{class:'study-heading'},actions,context);if(boundaryNotice)heading.append(copy('p',boundaryNotice.ja,boundaryNotice.en,{class:'boundary-notice',role:'status','data-boundary-update':''}));section.append(heading);
     const card=h('article',{class:'study-card','data-card':'',tabindex:'0',
@@ -678,7 +803,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const themeChips=()=>[['auto','自動'],...Object.entries(themes.themes).map(([id,t])=>[id,t.name])].map(([id,name])=>{
       const t=themes.themes[id==='auto'?(dark.matches?'dark':'washi'):id].tokens;
       return chip([h('i',{style:`background:${t.ground};border-color:${t.accent}`}),name],theme===id,ev=>{applyTheme(id);for(const b of guide.querySelectorAll('[data-menu-theme]'))b.setAttribute('aria-checked',String(b.dataset.menuTheme===theme));ev.currentTarget.focus();},{'data-menu-theme':id});});
-    const setLanguage=async value=>{interfaceLanguage=value;for(const picker of root.querySelectorAll('[data-interface-language]'))picker.value=value;try{await preferences.setItem('nihongo.interface-language.v1',value);}catch{message('表示言語を保存できません。');}render();main.querySelector(`[data-menu-language="${value}"]`)?.focus({preventScroll:true});};
+    const setLanguage=async value=>{if(updateBoundary?.held)return;interfaceLanguage=value;for(const picker of root.querySelectorAll('[data-interface-language]'))picker.value=value;const end=beginFlight('preference');try{await preferences.setItem('nihongo.interface-language.v1',value);}catch{message('表示言語を保存できません。');}finally{end();}render();main.querySelector(`[data-menu-language="${value}"]`)?.focus({preventScroll:true});};
     const guide=h('div',{id:'study-help',class:'study-help study-menu',role:'menu','aria-label':'メニュー'},
       item('学習を終える','End session',endStudy,{'data-menu-end':''},'Esc'),
       availableUndo()?item('最後の採点を元に戻す','Undo last rating',()=>{setStudyMenu(false);undoLast();},{'data-menu-undo':''},'U'):null,
@@ -769,8 +894,9 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   }
   function staleControls(c){return h('div',{class:'decision-panel operation-status','data-decision-panel':'','data-stale-attempt':'',role:'status'},h('p',{},c.stale.persisted?'回答の記録は端末に保存されていますが、今のカードには反映されませんでした。':'このカードの記録が更新されました。今回の評価は送信していません。'),button('次のカードへ',()=>{if(busy||pendingIntent||current!==c)return;advanceStudy(c.entry.taskKey);},{class:'primary','data-next-card':''}));}
   async function refreshPhoneRatings(c){
-    if(disposed||current!==c||c.refreshingRatings||busy||pendingIntent)return;
+    if(updateBoundary?.held||disposed||current!==c||c.refreshingRatings||busy||pendingIntent)return;
     c.refreshingRatings=true;
+    const endFlight=beginFlight('ratings');
     try{
       await backend.refresh();
       if(disposed||current!==c||busy||pendingIntent)return;
@@ -798,11 +924,12 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       }
     }catch{/* A local read can fail. Keep this card and the retry control. */}
     finally{
-      c.refreshingRatings=false;
-      if(!disposed&&current===c&&!busy&&!pendingIntent)render();
+      c.refreshingRatings=false;endFlight();
+      if(!disposed&&current===c&&!busy&&!pendingIntent&&!updateBoundary?.held)render();
     }
   }
   function advanceStudy(previousKey,source=lastInputSource,allowRequest=true){
+    if(updateBoundary?.held)return;
     consumeStudyBoundary();
     if(customRun){customRun.source=source;advanceCustomSession(allowRequest);return;}
     let remaining=1,readyTaskKeys=null;const next=nextRapidFireStudy(backend,module,now(),previousKey,entries=>{remaining=readyCount(entries);readyTaskKeys=Object.freeze(entries.map(entry=>entry.taskKey));},activeSession?.backlog===true);
@@ -827,34 +954,39 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function operationRetryLabel(){const state=operationState(pendingOperation?.result,pendingOperation?.policy);return ['storage-limit','native-receipt-limit'].includes(state.reason)?'保存領域の復旧後に確認':state.persisted?'保存済み記録の処理を再試行':'保存を再試行';}
   function retryOperation(){return pendingOperation?performOperation(pendingOperation):Promise.resolve(null);}
   async function performOperation(record){
-    if(busy||disposed)return null;
+    if(busy||disposed||updateBoundary?.held)return null;
     if(pendingOperation&&pendingOperation!==record){message('前の保存を先に確認してください。');return null;}
     pendingOperation=record;pendingIntent=record.intent??{commandId:record.key,type:record.kind};pendingAction=record.onSuccess;pendingObservation=!!record.policy?.observations?.length;
     busy=true;root.setAttribute('aria-busy','true');lockOperationControls(record);
-    if(!online())paintSharedStatus();
-    for(const control of main.querySelectorAll('[data-grade]'))control.disabled=true;
-    let result;try{result=await record.execute();}catch{result={kind:'failed',reason:'storage-failed'};}
-    if(disposed)return null;
-    result=retainOperationProof(record.result,result);record.result=result;busy=false;root.removeAttribute('aria-busy');
-    if(!online())paintSharedStatus();
-    const state=operationState(result,record.policy);
-    if(state.phase==='pending'&&state.persisted)scheduleOutboxSync();
-    if(state.phase==='pending'){message(operationCopy(record));render();return result;}
-    pendingOperation=null;pendingIntent=null;pendingAction=null;pendingObservation=false;unlockOperationControls(record);
-    if(state.phase==='refused'){
-      message(state.persisted?'記録は端末に保存されましたが、この操作は反映されませんでした。':'この操作は保存されていません。入力を確認してください。');
-      if(record.intent?.type==='review'&&current===record.current)current.stale={submitted:true,persisted:state.persisted,reason:state.reason};
-      record.onRefused?.(result);render();return result;
-    }
-    await record.onSuccess?.(result,state);if(!disposed)await updateStatus({presentation:true});return result;
+    const endFlight=beginFlight('operation');
+    try{
+      if(!online())paintSharedStatus();
+      for(const control of main.querySelectorAll('[data-grade]'))control.disabled=true;
+      let result;try{result=await record.execute();}catch{result={kind:'failed',reason:'storage-failed'};}
+      if(disposed)return null;
+      result=retainOperationProof(record.result,result);record.result=result;busy=false;root.removeAttribute('aria-busy');
+      if(!online())paintSharedStatus();
+      const state=operationState(result,record.policy);
+      if(state.phase==='pending'&&state.persisted)scheduleOutboxSync();
+      if(state.phase==='pending'){message(operationCopy(record));render();return result;}
+      pendingOperation=null;pendingIntent=null;pendingAction=null;pendingObservation=false;unlockOperationControls(record);
+      if(state.phase==='refused'){
+        message(state.persisted?'記録は端末に保存されましたが、この操作は反映されませんでした。':'この操作は保存されていません。入力を確認してください。');
+        if(record.intent?.type==='review'&&current===record.current)current.stale={submitted:true,persisted:state.persisted,reason:state.reason};
+        record.onRefused?.(result);render();return result;
+      }
+      await record.onSuccess?.(result,state);if(!disposed)await updateStatus({presentation:true});return result;
+    }finally{endFlight();}
   }
   function run(intent,onSuccess=pendingAction||(()=>{}),allowObservation=pendingObservation,extra={}) {
+    if(updateBoundary?.held)return Promise.resolve(null);
     if(pendingOperation){if(pendingIntent?.commandId===intent.commandId)return retryOperation();message('前の保存を先に確認してください。');return Promise.resolve(null);}
     const record={key:intent.commandId,intent,kind:intent.type,current,onSuccess,policy:{observations:allowObservation?['practice-or-assisted']:[]},...extra};
     record.execute=()=>{const retry=record.attempted===true;record.attempted=true;return retry&&backend.resumeCommand?backend.resumeCommand(intent):backend.submitCommand(intent);};
     return performOperation(record);
   }
   function runInput(kind,input,execute,onSuccess,policy={}){
+    if(updateBoundary?.held)return Promise.resolve(null);
     if(pendingOperation){message('前の保存を先に確認してください。');return Promise.resolve(null);}
     const original=structuredClone(input),record={key:kind+':'+(++operationSequence),kind,input:original,current,onSuccess,policy};record.execute=()=>execute(original);return performOperation(record);
   }
@@ -868,12 +1000,14 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       if(!practice&&activeSession){const projection=backend.readProjection(),review=projection.reviews.find(row=>row.id===result.eventId);if(operationState(result).phase==='applied'&&review?.install===backend.installation&&projection.outcomes?.[result.eventId]?.status==='applied'){if(!activeSession.eventIds.includes(result.eventId))activeSession.eventIds.push(result.eventId);sessionEvidence.record(activeSession.handle,{eventId:result.eventId,projection,durable:true});}}
       c.committed=true;if(!practice)lastReview={...result,entry:c.entry,thinkMs:c.thinkMs,...admission};
       if(customRun)customRun.completed++;
-      advanceStudy(c.entry.taskKey,c.gradeSource||'pointer');
+      const continuation=()=>advanceStudy(c.entry.taskKey,c.gradeSource||'pointer');
+      const persisted=operationState(result,{observations:practice?['practice-or-assisted']:[]}).persisted;
+      if(!(persisted&&updateBoundary?.hold(continuation))&&!updateBoundary?.held)continuation();
     },practice);
   }
   function grade(rating,source) {
     const c=current;
-    if(busy||pendingIntent||pop||document.querySelector('dialog[open]')||c?.sessionInfoOpen||!c?.revealed||c.committed||c.ratingsUnavailable||c.stale||c.attempt.mode!=='scored'&&!customRun)return;
+    if(updateBoundary?.held||busy||pendingIntent||pop||document.querySelector('dialog[open]')||c?.sessionInfoOpen||!c?.revealed||c.committed||c.ratingsUnavailable||c.stale||c.attempt.mode!=='scored'&&!customRun)return;
     let intent;
     try{intent=gradeIntent(c,rating);}
     catch{
@@ -884,23 +1018,35 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     c.gradeSource=source;lastCardActionAt=win.performance.now();main.querySelector('[data-card]')?.setAttribute('data-grade-source',source);submitGrade(c,intent);
   }
   async function requestCard(result,capture,source){
+    if(updateBoundary?.held)return;
     if(!platform.requestCard){message('言葉を保存しました。カード作成の通信は準備中です。');return;}
     await submitFactory(factoryRequest(result,capture,{learner:backend.learner,source}));
   }
   async function submitFactory(request){
-    let timeout;
-    try{const result=await Promise.race([platform.requestCard(request),new Promise((_,reject)=>{timeout=win.setTimeout(()=>reject(Error('factory-timeout')),10000);})]);if(disposed)return;if(result?.captureEventId!==request.captureEventId||!['queued','joined','already-card','held','ignored'].includes(result?.status)||['queued','joined','held'].includes(result.status)&&!result.jobId&&!(result.status==='held'&&result.reason==='daily-job-cap'))throw Error('factory-response');factoryRetry=null;message(result.status==='queued'||result.status==='joined'&&result.jobStatus!=='held'?'カード作成を依頼しました。校閲を終えてから届きます。':result.status==='already-card'?'この言葉のカードはすでにあります。':result.status==='held'&&result.reason==='daily-job-cap'?'今日のカード作成の上限を使い切りました。言葉の記録は保存しています。':result.status==='held'||result.status==='joined'&&result.jobStatus==='held'?'読み・語義の確認待ちとして保存しました。':'作成の希望を記録しました。');}
+    if(updateBoundary?.held)return;
+    let timeout;const endFlight=beginFlight('factory');
+    try{
+      const endRequest=beginFlight('factory-request');
+      let pending;
+      try{pending=Promise.resolve(platform.requestCard(request));}
+      catch(error){endRequest();throw error;}
+      const admitted=pending.then(value=>{endRequest();return value;},error=>{endRequest();throw error;});
+      // The UI timeout only stops waiting; the admitted request keeps its own
+      // flight until it actually settles so readiness cannot outrun it.
+      admitted.catch(()=>{});
+      const result=await Promise.race([admitted,new Promise((_,reject)=>{timeout=win.setTimeout(()=>reject(Error('factory-timeout')),10000);})]);
+      if(disposed)return;if(result?.captureEventId!==request.captureEventId||!['queued','joined','already-card','held','ignored'].includes(result?.status)||['queued','joined','held'].includes(result.status)&&!result.jobId&&!(result.status==='held'&&result.reason==='daily-job-cap'))throw Error('factory-response');factoryRetry=null;message(result.status==='queued'||result.status==='joined'&&result.jobStatus!=='held'?'カード作成を依頼しました。校閲を終えてから届きます。':result.status==='already-card'?'この言葉のカードはすでにあります。':result.status==='held'&&result.reason==='daily-job-cap'?'今日のカード作成の上限を使い切りました。言葉の記録は保存しています。':result.status==='held'||result.status==='joined'&&result.jobStatus==='held'?'読み・語義の確認待ちとして保存しました。':'作成の希望を記録しました。');}
     catch{if(disposed)return;factoryRetry=request;message('言葉は保存しましたが、カード作成の依頼を送れませんでした。同じ依頼を再試行できます。');}
-    finally{win.clearTimeout(timeout);if(!disposed){if(screen!=='finish')render();else updateStatus({presentation:true}).catch(()=>{});}}
+    finally{win.clearTimeout(timeout);if(!disposed){if(screen!=='finish')render();else updateStatus({presentation:true}).catch(()=>{});}endFlight();}
   }
   function resolveWord(surface) {
     const exact=catalog.filter(e=>e.contractId==='vocabulary.read.v1'&&[e.term,e.form].includes(surface));
     const unique=new Map(exact.map(e=>[e.noteGuid,e]));
     return unique.size===1?[...unique.values()][0]:null;
   }
-  function closePopover() { const wasOpen=!!pop;pop?.node.remove();pop=null;if(wasOpen&&!disposed&&screen==='study')focusStudyCard(); }
+  function closePopover() { const wasOpen=!!pop;pop?.node.remove();pop=null;if(wasOpen&&!disposed&&screen==='study')focusStudyCard();updateBoundary?.sync(); }
   async function openWord(info,anchor) {
-    if(!current?.revealed||busy||pendingIntent)return;
+    if(updateBoundary?.held||!current?.revealed||busy||pendingIntent)return;
     closePopover();
     const e=current.entry,resolved=dictionary?.resolve(info),target=info.isTarget&&e.contractId==='vocabulary.read.v1'?e:resolved?resolved.deck||null:resolveWord(info.surface),p=backend.readProjection();
     const meaning=target?.defJa||(resolved?.kind==='dictionary'?resolved.glosses.join('; '):resolved?.kind==='kanji'?resolved.meanings.join('; '):null);
@@ -960,7 +1106,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   }
   function dialog(title,body,save) {
     const node=h('dialog',{},h('form',{method:'dialog'},h('h2',{},title),body,h('div',{class:'dialog-actions'},button('キャンセル',()=>{if(busy)return;node.close();node.remove();if(pendingIntent)render();}),button('記録する',()=>{if(busy||pendingIntent)return;save(()=>{node.close();node.remove();});},{class:'primary'}))));
-    root.append(node);node.showModal();localize();return node;
+    node.addEventListener('close',()=>updateBoundary?.sync());root.append(node);node.showModal();localize();updateBoundary?.sync();return node;
   }
   function hintDialog(task){const input=h('textarea',{'aria-label':'ヒント',required:true});dialog('このカードのヒント',input,close=>{if(input.value.trim())repair(task,{action:'hint',hint:input.value.trim()},()=>{close();message('ヒントを記録しました。');render();});});}
   function correctionDialog(){const input=h('textarea',{'aria-label':'気になったところ',required:true});dialog('気になったところ',input,close=>{
@@ -1008,11 +1154,16 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const typed=h('input',{'aria-label':'新しい言葉',placeholder:'覚えたい言葉を入力',value:typedDraft,disabled:typedBusy||busy||!!pendingIntent,'data-typed-word':'',oninput:e=>{typedDraft=e.target.value;}});
     const sentence=h('textarea',{'aria-label':'自分の例文（任意）',placeholder:'自分の例文（任意）',disabled:typedBusy||busy||!!pendingIntent,'data-typed-sentence':'',oninput:e=>{typedSentence=e.target.value;}},typedSentence);
     const saveTyped=()=>{
-      if(typedBusy||busy||pendingIntent||disposed||!typed.value.trim())return;
+      if(updateBoundary?.held||typedBusy||busy||pendingIntent||disposed||!typed.value.trim())return;
       typedDraft=typed.value;typedSentence=sentence.value;
       return runInput('typed',{word:typedDraft,sentence:typedSentence},original=>backend.captureTyped(original.word,{sentence:original.sentence}),async result=>{
-        if(result.kind==='existing'){query=result.surface;wordFilter='all';wordPage=0;message(result.taskKeys.length===1?'本棚にあります。':'同じ表記のカードが複数あります。読み・意味を確認して選んでください。');}
-        else{typedDraft='';typedSentence='';render();await requestCard(result,result.capture,'typed');}
+        if(result.kind==='existing'){
+          // captureTyped returns an existing word without persisting the
+          // supplied sentence, so only the word itself is saved here. A new
+          // sentence stays dirty until it is actually saved or cleared.
+          typedSaved.word=typedDraft;
+          query=result.surface;wordFilter='all';wordPage=0;message(result.taskKeys.length===1?'本棚にあります。':'同じ表記のカードが複数あります。読み・意味を確認して選んでください。');}
+        else{typedDraft='';typedSentence='';typedSaved.word='';typedSaved.sentence='';render();await requestCard(result,result.capture,'typed');}
         if(!disposed&&screen!=='finish')render();
       },{existing:true});
     };
@@ -1039,7 +1190,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       h('ul',{class:'forecast'},...rows.map(({deck,row})=>h('li',{'data-legacy-review':''},h('span',{'data-vocabulary-entry':''},term(row[0])),h('span',{},`${deck} · 評価 ${row[1]} · ${row[2]}`)))),
       fold('調べた言葉の記録',h('ul',{class:'forecast'},...lookups.map(({deck,row})=>h('li',{'data-legacy-lookup':''},h('span',{'data-vocabulary-entry':''},row[3]||term(row[1])),h('span',{},`${deck} · ${row[0]}`))))));
   }
-  async function downloadBackup(){const backup=await backend.exportBackup(),blob=new win.Blob([JSON.stringify(backup,null,2)],{type:'application/json'}),url=win.URL.createObjectURL(blob),link=h('a',{href:url,download:`nihongo-${backend.learner}-${now()}.json`});link.click();setTimeout(()=>win.URL.revokeObjectURL(url),1000);message('バックアップを書き出しました。');}
+  async function downloadBackup(){if(updateBoundary?.held)return;const endFlight=beginFlight('backup');try{const backup=await backend.exportBackup(),blob=new win.Blob([JSON.stringify(backup,null,2)],{type:'application/json'}),url=win.URL.createObjectURL(blob),link=h('a',{href:url,download:`nihongo-${backend.learner}-${now()}.json`});link.click();setTimeout(()=>win.URL.revokeObjectURL(url),1000);message('バックアップを書き出しました。');}finally{endFlight();}}
   function nativeSyncNeedsAttention(){return !!(nativeSyncActionError||nativeSyncState.error||nativeSyncState.state==='update-required');}
   function nativeSyncDescription(){
     if(nativeSyncBusy)return '通信を確認中…';
@@ -1054,9 +1205,10 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     return nativeSyncState.state==='up-to-date'?'同期済み · 記録を保存しました。':'同期設定済み · 今すぐ同期できます。';
   }
   async function runNativeSync(action,{quiet=false,onSuccess}={}){
-    if(nativeSyncBusy||disposed)return;
+    if(updateBoundary?.held||nativeSyncBusy||disposed)return;
     const show=()=>{if(quiet&&screen!=='settings')updateStatus().catch(()=>{});else render();};
     nativeSyncBusy=true;nativeStatusGeneration++;show();
+    const endFlight=beginFlight('native-sync');
     try{
       const result=await action();
       if(disposed)return;
@@ -1066,7 +1218,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       else if(noticeOwner==='native-sync-action')message('');
     }catch(error){
       if(!disposed){nativeSyncActionError=error?.message||'operation-failed';nativeSyncState={...nativeSyncState,state:'error',error:nativeSyncActionError};message(nativeSyncActionError==='native-sync-bootstrap-required'?'既存の学習履歴を先に安全に引き継ぐ必要があります。':'通信を確認できませんでした。未送信の記録は端末に残っています。同じ操作を再試行できます。','native-sync-action');}
-    }finally{nativeSyncBusy=false;nativeStatusGeneration++;if(!disposed){show();if(quiet){if(retryableSyncFailure())scheduleSyncRetry();else clearSyncRetry();}}}
+    }finally{nativeSyncBusy=false;nativeStatusGeneration++;if(!disposed){show();if(quiet){if(retryableSyncFailure())scheduleSyncRetry();else clearSyncRetry();}}endFlight();}
   }
   function nativeSyncSettings(){
     if(platform.storageKind==='native-worker-prod'){
@@ -1105,14 +1257,16 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       });
     }
     const swipe=h('input',{type:'checkbox',checked:swipeGrading,'data-swipe-grading':'','aria-describedby':'swipe-grading-help',onchange:async event=>{
-      const input=event.currentTarget,previous=swipeGrading;swipeGrading=input.checked;
+      if(updateBoundary?.held)return;const input=event.currentTarget,previous=swipeGrading;swipeGrading=input.checked;
+      const end=beginFlight('preference');
       try{await preferences.setItem('nihongo.swipe-grading.v1',String(swipeGrading));}
       catch{swipeGrading=previous;input.checked=previous;message('この端末に操作の設定を保存できません。');}
+      finally{end();}
     }});
-    const file=h('input',{type:'file',accept:'.json,application/json','aria-label':'バックアップを選ぶ',onchange:async e=>{try{const backup=JSON.parse(await e.target.files[0].text());await backend.importBackup(backup);message('互換のある保存済み記録を追加しました。');render();}catch(error){message(error.message==='backup-has-pending-events-recovery-required'?'未送信の記録を含むため自動復元できません。元の端末とバックアップを保管してください。':'学習者・内容の整合性を確認できませんでした。記録は置き換えていません。');}}});
+    const file=h('input',{type:'file',accept:'.json,application/json','aria-label':'バックアップを選ぶ',onchange:async e=>{if(updateBoundary?.held)return;const end=beginFlight('import');try{const backup=JSON.parse(await e.target.files[0].text());await backend.importBackup(backup);message('互換のある保存済み記録を追加しました。');render();}catch(error){message(error.message==='backup-has-pending-events-recovery-required'?'未送信の記録を含むため自動復元できません。元の端末とバックアップを保管してください。':'学習者・内容の整合性を確認できませんでした。記録は置き換えていません。');}finally{end();}}});
     const sheet=(id,kicker,title,description,...body)=>h('section',{class:'sheet','data-settings-section':id},h('div',{class:'sheet-head'},h('p',{class:'kicker'},kicker),h('h2',{},title),description?h('p',{class:'sheet-desc'},description):null),...body);
     return h('section',{class:'settings'},h('header',{class:'screen-head stacked'},h('h1',{},'設定'),h('p',{class:'secondary'},'この端末の表示と、すべてのデッキ共通の学習設定。')),...(platform.nativeSync?[nativeSyncSettings()]:[]),...(typeof platform.backupStatus==='function'?[backupDetail()]:[]),platform.onScreenChange?h('section',{class:'sheet host-settings','data-host-settings':''}):null,
-      sheet('appearance','表示','この端末の見え方','色はこの端末だけに保存します。学習履歴や他の端末の色は変わりません。',h('div',{class:'control-grid'},themePicker(),languagePicker()),h('label',{class:'swipe-grading-setting'},swipe,h('span',{},'スワイプで採点（この端末のみ）')),h('p',{id:'swipe-grading-help',class:'secondary'},'初期設定はオフです。左で「もう一度」、右で「正解」。'),h('label',{class:'swipe-grading-setting'},h('input',{type:'checkbox',checked:intervalHints,'data-interval-hints':'',onchange:async event=>{intervalHints=event.target.checked;try{await preferences.setItem('nihongo.interval-hints.v1',String(intervalHints));}catch{message('この端末に表示設定を保存できません。');}}}),h('span',{},'次の復習までの間隔を表示（この端末のみ）'))),
+      sheet('appearance','表示','この端末の見え方','色はこの端末だけに保存します。学習履歴や他の端末の色は変わりません。',h('div',{class:'control-grid'},themePicker(),languagePicker()),h('label',{class:'swipe-grading-setting'},swipe,h('span',{},'スワイプで採点（この端末のみ）')),h('p',{id:'swipe-grading-help',class:'secondary'},'初期設定はオフです。左で「もう一度」、右で「正解」。'),h('label',{class:'swipe-grading-setting'},h('input',{type:'checkbox',checked:intervalHints,'data-interval-hints':'',onchange:async event=>{if(updateBoundary?.held)return;intervalHints=event.target.checked;const end=beginFlight('preference');try{await preferences.setItem('nihongo.interval-hints.v1',String(intervalHints));}catch{message('この端末に表示設定を保存できません。');}finally{end();}}}),h('span',{},'次の復習までの間隔を表示（この端末のみ）'))),
       ...(legacyHistory?[sheet('legacy-display','引き継ぎ','引き継いだ表示設定',null,...legacyHistory.decks.map(d=>h('p',{class:'secondary','data-legacy-settings':''},`${d.deckId} · 一日の新規 ${d.preferences.newPerDay} · 読み方 ${d.preferences.mode} · 全文英訳 ${d.preferences.gloss} · 文脈 ${d.preferences.zoom}`)),h('p',{class:'secondary'},themePreferenceSet?'色はこの端末の指定を使っています。':'以前の色指定は未設定です。自動表示のまま、設定値は書き込んでいません。'))]:[]),
       sheet('pace','学習','共通の学習ペース','1日の新規カード上限と学習日の区切りは、すべてのデッキ共通です。変更は翌日の学習日から有効です。',h('div',{class:'setting-row'},h('label',{},'1日の新規カード上限',newCount),button('翌日から変更',()=>{const value=newCount.valueAsNumber;if(!Number.isSafeInteger(value)||value<1||value>200)return message('1日の新規カード上限は1〜200の整数を入力してください。');savePace('newPerDayTotal',newCount,value);},{disabled:weekdayPolicy})),weekdayPolicy?h('p',{class:'secondary','data-weekday-policy-active':''},'曜日ごとの新規カード上限を使っています。今日のカスタム学習パネルで変更できます。'):null,
       h('div',{class:'setting-row'},h('label',{},'学習日のタイムゾーン',tz),button('翌日から変更',()=>savePace('learnerTimezone',tz,tz.value))),
@@ -1122,6 +1276,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       h('details',{'data-study-diagnostics':'',class:'sheet'},h('summary',{},'診断情報'),h('p',{},'技術的な保存・同期の情報です。'),h('pre',{'data-study-diagnostics-values':''},diagnosticValues())));
   }
   function onKey(event){
+    if(typeof updateBoundary!=='undefined'&&updateBoundary?.held)return;
     lastInputSource='key';
     if(event.defaultPrevented)return;
     if(current?.sessionInfoOpen&&!document.querySelector('dialog[open]')){menuKey(event);return;}
@@ -1134,6 +1289,10 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const rating=/^(?:Digit|Numpad)([1-4])$/.exec(event.code)?.[1]??(/^[1-4]$/.test(event.key)?event.key:null);
     if(pop&&rating&&!editing&&current?.revealed){event.preventDefault();closePopover();grade(Number(rating),'key');return;}
     if(pop||document.querySelector('dialog[open]')||event.target.closest?.('button,input,select,textarea,summary,a,audio,video,[contenteditable]'))return;
+    if(screen==='study'&&current&&event.key.toLowerCase()==='p'){
+      if(trialAudioMember(current)){event.preventDefault();playTrialAudio();}
+      return;
+    }
     if(event.key.toLowerCase()==='u'&&lastReview){event.preventDefault();undoLast();return;}
     if(screen==='study'&&event.key==='?'){event.preventDefault();keySheet();return;}
     if(screen==='study'&&current?.revealed&&event.key.toLowerCase()==='e'){const fold=main.querySelector('[data-card] details:has([data-full-translation]),[data-card] details.grammar-translation');if(fold){event.preventDefault();fold.open=!fold.open;}return;}
@@ -1144,11 +1303,11 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     else if(current.revealed&&!current.committed&&rating){event.preventDefault();grade(Number(rating),'key');}}
   document.addEventListener('keydown',onKey);
   const outsidePopover=event=>{lastInputSource='pointer';if(pop&&!pop.node.contains(event.target)&&!pop.anchor?.contains(event.target))closePopover();};document.addEventListener('pointerdown',outsidePopover,true);
-  const escape=event=>{if(event.defaultPrevented||event.repeat||event.isComposing||event.keyCode===229)return;if(event.key==='Escape'){if(pop){event.preventDefault();closePopover();}else{const modal=root.querySelector('dialog[open]');if(modal){event.preventDefault();if(customBusy&&modal.hasAttribute('data-new-card-sheet'))return;modal.dispatchEvent(new Event('cancel',{cancelable:true}));modal.close();modal.remove();if(pendingIntent)render();}else if(screen==='finish'){event.preventDefault();finishDone();}else if(screen==='study'){event.preventDefault();if(current?.sessionInfoOpen)setStudyMenu(false);else endStudy();}}}};document.addEventListener('keydown',escape);
+  const escape=event=>{if(updateBoundary?.held||event.defaultPrevented||event.repeat||event.isComposing||event.keyCode===229)return;if(event.key==='Escape'){if(pop){event.preventDefault();closePopover();}else{const modal=root.querySelector('dialog[open]');if(modal){event.preventDefault();if(customBusy&&modal.hasAttribute('data-new-card-sheet'))return;modal.dispatchEvent(new Event('cancel',{cancelable:true}));modal.close();modal.remove();if(pendingIntent)render();}else if(screen==='finish'){event.preventDefault();finishDone();}else if(screen==='study'){event.preventDefault();if(current?.sessionInfoOpen)setStudyMenu(false);else endStudy();}}}};document.addEventListener('keydown',escape);
   const unsubscribe=backend.subscribe(()=>{observeSharedActivity();updateStatus({presentation:true}).catch(()=>{});if(!['study','finish'].includes(screen)&&!busy)render();scheduleOutboxSync();});
-  if(backend.refreshLocalDayBudget)budgetWatcher=watchLocalDayBudget({refresh:()=>backend.refreshLocalDayBudget(),getProjection:()=>backend.readProjection(),now,canRefresh:()=>!busy&&!typedBusy&&!customBusy&&!pendingIntent&&!(screen==='study'&&current?.revealed),onRefresh:()=>{if(!['study','finish'].includes(screen))render();},schedule:(fn,delay)=>win.setTimeout(fn,delay),cancel:id=>win.clearTimeout(id)});
-  const budgetWake=()=>{if(document.visibilityState!=='hidden'){if(parkedStudy)render();budgetWatcher?.check();}};
-  const availabilityWake=()=>{if(online())startedOffline=false;observeSharedActivity();if(screen==='today')render();else updateStatus();};
+  if(backend.refreshLocalDayBudget)budgetWatcher=watchLocalDayBudget({refresh:trackBudgetRefresh,getProjection:()=>backend.readProjection(),now,canRefresh:()=>!updateBoundary?.held&&!busy&&!typedBusy&&!customBusy&&!pendingIntent&&!(screen==='study'&&current?.revealed),onRefresh:()=>{if(!['study','finish'].includes(screen))render();},schedule:(fn,delay)=>win.setTimeout(fn,delay),cancel:id=>win.clearTimeout(id)});
+  const budgetWake=()=>{if(updateBoundary?.held||document.visibilityState==='hidden')return;if(parkedStudy)render();budgetWatcher?.check();};
+  const availabilityWake=()=>{if(online())startedOffline=false;observeSharedActivity();if(updateBoundary?.held)return;if(screen==='today')render();else updateStatus();};
   const unsubscribeSyncState=platform.subscribeSyncState?.(()=>updateStatus({presentation:true}).catch(()=>{}));
   win.addEventListener('online',availabilityWake);win.addEventListener('offline',availabilityWake);
   win.addEventListener('focus',budgetWake);document.addEventListener('visibilitychange',budgetWake);
@@ -1156,7 +1315,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   // start another sync: only a durable, nonempty outbox requests this work.
   let outboxSyncTimer=null,syncRetryTimer=null,syncRetryStep=0;
   const retryableSyncFailure=()=>[nativeSyncActionError,nativeSyncState.error].some(isRetryableProdSyncError);
-  const autoSyncAllowed=(retryErrors=false)=>!disposed&&online()&&document.visibilityState!=='hidden'&&platform.storageKind==='native-worker-prod'&&platform.nativeSync?.pairingEnabled&&nativeSyncState.paired&&[nativeSyncActionError,nativeSyncState.error].every(error=>!error||retryErrors&&isRetryableProdSyncError(error))&&!['update-required','bootstrap-required','pairing-disabled'].includes(nativeSyncState.state);
+  const autoSyncAllowed=(retryErrors=false)=>!disposed&&!updateBoundary?.held&&online()&&document.visibilityState!=='hidden'&&platform.storageKind==='native-worker-prod'&&platform.nativeSync?.pairingEnabled&&nativeSyncState.paired&&[nativeSyncActionError,nativeSyncState.error].every(error=>!error||retryErrors&&isRetryableProdSyncError(error))&&!['update-required','bootstrap-required','pairing-disabled'].includes(nativeSyncState.state);
   const pendingAllowsSync=()=>{
     if(!pendingIntent)return true;
     const result=pendingOperation?.result,state=operationState(result,pendingOperation?.policy),resolution=result?.resolution;
@@ -1173,11 +1332,11 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     syncRetryTimer=win.setTimeout(()=>{syncRetryTimer=null;attemptAutoSync(true);},delay);
   }
   function scheduleOutboxSync(){
-    if(disposed||platform.storageKind!=='native-worker-prod')return;
+    if(disposed||updateBoundary?.held||platform.storageKind!=='native-worker-prod')return;
     win.clearTimeout(outboxSyncTimer);
     outboxSyncTimer=win.setTimeout(async()=>{
       outboxSyncTimer=null;
-      if(!autoSyncAllowed()||!pendingAllowsSync()){if(retryableSyncFailure())scheduleSyncRetry();return;}
+      if(updateBoundary?.held||!autoSyncAllowed()||!pendingAllowsSync()){if(retryableSyncFailure())scheduleSyncRetry();return;}
       if(nativeSyncBusy||busy||typedBusy||customBusy){scheduleOutboxSync();return;}
       try{
         const status=await backend.status();
@@ -1205,9 +1364,16 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   win.addEventListener('focus',autoSync);document.addEventListener('visibilitychange',autoSync);
   const backupWake=()=>backupObserver.wake();
   if(typeof platform.backupStatus==='function'){win.addEventListener('focus',backupWake);document.addEventListener('visibilitychange',backupWake);}
+  const updateDraftWake=()=>updateBoundary?.sync();root.addEventListener('input',updateDraftWake);root.addEventListener('change',updateDraftWake);
   observeSharedActivity();render();
+  const loadTrialAudio=()=>{
+    if(disposed||updateBoundary?.held||document.visibilityState==='hidden')return;
+    trialAudio.load().then(()=>{if(!disposed)syncTrialAudioControl();},()=>{if(!disposed)syncTrialAudioControl();});
+  };
+  win.addEventListener('online',loadTrialAudio);win.addEventListener('focus',loadTrialAudio);document.addEventListener('visibilitychange',loadTrialAudio);
+  loadTrialAudio();
   backupObserver.start();
   reconcileUnknownFactoryRows();
   if(platform.storageKind==='native-worker-prod'&&platform.nativeSync)updateStatus().catch(()=>{});
-  return Object.freeze({showTask:(...args)=>{sessionShown=0;return start(...args);},refreshStatus:updateStatus,read:()=>({screen,module,current,busy:busy||typedBusy||customBusy,pendingIntent,theme,themePreferenceSet,interfaceLanguage}),dispose(){disposed=true;backupObserver.dispose();win.removeEventListener('focus',backupWake);document.removeEventListener('visibilitychange',backupWake);nativeStatusGeneration++;clearSyncRetry();win.clearTimeout(outboxSyncTimer);win.clearTimeout(saveBacklogTimer);win.clearTimeout(toastTimer);win.clearTimeout(finishGuardTimer);panelObserver?.disconnect();budgetWatcher?.dispose();win.removeEventListener('online',availabilityWake);win.removeEventListener('online',reconnectSync);win.removeEventListener('offline',availabilityWake);win.removeEventListener('focus',budgetWake);document.removeEventListener('visibilitychange',budgetWake);win.removeEventListener('focus',autoSync);document.removeEventListener('visibilitychange',autoSync);platform.nativeSync?.dispose?.();factoryStatuses.dispose();rubyLayout.dispose();current?.timer.dispose();parkedStudy?.current.timer.dispose();closePopover();unsubscribe();unsubscribeSyncState?.();dark.removeEventListener('change',darkChanged);document.removeEventListener('keydown',onKey);document.removeEventListener('keydown',escape);document.removeEventListener('pointerdown',outsidePopover,true);root.replaceChildren();}});
+  return Object.freeze({requestUpdateBoundary:token=>updateBoundary.request(token),readUpdateState:()=>updateBoundary.read(),releaseUpdateBoundary:token=>updateBoundary.release(token),subscribeUpdateState:listener=>updateBoundary.subscribe(listener),showTask:(...args)=>{if(updateBoundary.held)return;sessionShown=0;return start(...args);},refreshStatus:updateStatus,read:()=>({screen,module,current,busy:busy||typedBusy||customBusy,pendingIntent,theme,themePreferenceSet,interfaceLanguage}),dispose(){disposed=true;updateBoundary.dispose();root.removeEventListener('input',updateDraftWake);root.removeEventListener('change',updateDraftWake);backupObserver.dispose();win.removeEventListener('focus',backupWake);document.removeEventListener('visibilitychange',backupWake);nativeStatusGeneration++;clearSyncRetry();win.clearTimeout(outboxSyncTimer);win.clearTimeout(saveBacklogTimer);win.clearTimeout(toastTimer);win.clearTimeout(finishGuardTimer);panelObserver?.disconnect();budgetWatcher?.dispose();win.removeEventListener('online',availabilityWake);win.removeEventListener('online',reconnectSync);win.removeEventListener('offline',availabilityWake);win.removeEventListener('focus',budgetWake);document.removeEventListener('visibilitychange',budgetWake);win.removeEventListener('focus',autoSync);document.removeEventListener('visibilitychange',autoSync);platform.nativeSync?.dispose?.();factoryStatuses.dispose();rubyLayout.dispose();current?.timer.dispose();parkedStudy?.current.timer.dispose();closePopover();unsubscribe();unsubscribeSyncState?.();dark.removeEventListener('change',darkChanged);document.removeEventListener('keydown',onKey);document.removeEventListener('keydown',escape);document.removeEventListener('pointerdown',outsidePopover,true);win.removeEventListener('online',loadTrialAudio);win.removeEventListener('focus',loadTrialAudio);document.removeEventListener('visibilitychange',loadTrialAudio);trialAudio.dispose();root.replaceChildren();}});
 }
