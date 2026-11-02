@@ -1,13 +1,17 @@
 import {createNode,wordSegments} from './presentation.mjs';
 import {applyKinsoku} from './kinsoku.mjs';
 import {splitSourceRuby} from './ruby-segments.mjs';
+import {sha256} from '../schema/event.mjs';
+import {passageReadingRules} from './passage-reading-rules.mjs';
+const reviewedByGuid=new Map();
+for(const rule of passageReadingRules){const rules=reviewedByGuid.get(rule.guid)??[];rules.push(rule);reviewedByGuid.set(rule.guid,rules);}
 const hasKanji=text=>/\p{Script=Han}/u.test(text);
 const sourceReadings=(surface,reading,start)=>{
  const split=splitSourceRuby(surface,reading);
  return split.segments.filter(part=>part.reading).map(part=>({start:start+part.start,end:start+part.end,reading:part.reading,alignment:split.status,reason:split.reason}));
 };
 /** Keep readings bound to their exact source offsets, never dictionary lemmas. */
-function passageReadings(entry,text,field){
+function sourcePassageReadings(entry,text,field){
  if(field!=='passage'||text!==entry.ja)return [];
  if(Array.isArray(entry.rubySegments)){
   if(entry.rubySegments.map(([surface])=>surface).join('')!==text)return [];
@@ -26,6 +30,23 @@ function passageReadings(entry,text,field){
   if(start>=0&&hasKanji(target))spans.push(...sourceReadings(target,entry.reading,start));}
  return spans;
 }
+/** Reviewed overrides bind an entire source span, independent of lookup tokens. */
+function passageReadings(entry,text,field){
+ if(field!=='passage'||text!==entry.ja)return [];
+ const rules=reviewedByGuid.get(entry.noteGuid);
+ if(!rules)return sourcePassageReadings(entry,text,field);
+ // Only the few reviewed GUIDs pay for hashing. A stale binding cannot reuse
+ // the known-wrong passage readings, or infer a pronunciation from the term.
+ const digest=sha256(text),points=[...text],overrides=[];
+ for(const rule of rules){
+  if(entry.taskKey!==rule.sourceTaskKey||digest!==rule.sourceJaSha256||points.slice(rule.span.start,rule.span.end).join('')!==rule.surface)return [];
+  const start=points.slice(0,rule.span.start).join('').length,end=start+rule.surface.length;
+  overrides.push({start,end,readings:sourceReadings(rule.surface,rule.reading,start)});
+ }
+ // If an old ruby overlaps a reviewed suffix, discard the complete old ruby:
+ // splitting its pronunciation to preserve the unreviewed prefix would guess.
+ return [...sourcePassageReadings(entry,text,field).filter(old=>!overrides.some(span=>old.start<span.end&&old.end>span.start)),...overrides.flatMap(span=>span.readings)].sort((a,b)=>a.start-b.start);
+}
 /** Readings belong to their exact passage. Definition homographs never borrow passage ruby. */
 export function renderVocabularyPassage(document,entry,text,{front=false,field='passage',onWord=()=>{},dictionary=null}={}){
  const h=(tag,attrs,...children)=>createNode(document,tag,attrs,...children),node=h('p',{class:'passage','data-passage':field,'data-readings':front?'reserved':'visible',lang:'ja'});
@@ -43,7 +64,7 @@ export function renderVocabularyPassage(document,entry,text,{front=false,field='
   while(readingIndex<readings.length&&readings[readingIndex].end<=start)readingIndex++;
   while(withRuby&&readingIndex<readings.length&&readings[readingIndex].start<end){
    const r=readings[readingIndex];if(r.start<start||r.end>end)break;
-   children.push(text.slice(cursor,r.start),h('ruby',{'data-ruby-alignment':r.alignment,'data-ruby-fallback':r.reason},text.slice(r.start,r.end),h('rt',{'aria-hidden':front?'true':null,style:front?'visibility:hidden':null},r.reading)));cursor=r.end;readingIndex++;
+   children.push(text.slice(cursor,r.start),h('ruby',{'data-ruby-alignment':r.alignment,'data-ruby-fallback':r.reason},text.slice(r.start,r.end),h('rt',{'aria-hidden':front?'true':null,style:front?'visibility:hidden':null},h('span',{class:'ruby-reading'},r.reading))));cursor=r.end;readingIndex++;
   }
   children.push(text.slice(cursor,end));return children;
  };
@@ -61,7 +82,7 @@ export function renderVocabularyPassage(document,entry,text,{front=false,field='
   return children;
  };
  let cursor=0;
- for(const r of crossing){node.append(...renderRange(cursor,r.start),h('ruby',{'data-ruby-alignment':r.alignment,'data-ruby-fallback':r.reason},...renderRange(r.start,r.end,false),h('rt',{'aria-hidden':front?'true':null,style:front?'visibility:hidden':null},r.reading)));cursor=r.end;}
+ for(const r of crossing){node.append(...renderRange(cursor,r.start),h('ruby',{'data-ruby-alignment':r.alignment,'data-ruby-fallback':r.reason},...renderRange(r.start,r.end,false),h('rt',{'aria-hidden':front?'true':null,style:front?'visibility:hidden':null},h('span',{class:'ruby-reading'},r.reading))));cursor=r.end;}
  node.append(...renderRange(cursor,text.length));return applyKinsoku(node);
 }
 /** Compact source-backed relationships; no inferred kanji facts or readings. */

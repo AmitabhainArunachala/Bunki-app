@@ -1,4 +1,4 @@
-// REPLAY_DEPENDENCIES_SHA256: 0de3b91551b0c4bc5330eb88ce7f325575880062a51263f85d904174dc500c03
+// REPLAY_DEPENDENCIES_SHA256: 06d8a24130b73fae7623e5233cc3292df943c5f72d138a2ee98b264f395b650f
 /** Pure SYNC v4 full-prefix replay. No storage, network, environment clock or DOM. */
 import {manualEntry} from './player/manual-cards.mjs';
 import * as fsrsApi from './vendor/ts-fsrs.mjs';
@@ -286,7 +286,8 @@ function apply(p,event,rt,seq,scheduler,provisional){
     const introductionPermit=!p.introductions[task.taskKey]?p.permits[d.permitId]:null;
     const at=effectiveTime(task,event,rt),a=d.attempt;
     const slow=a.foregroundValid&&a.thinkMs!==null&&a.thinkMs>d.hesitation.thresholdMs;
-    const cap=slow||d.hesitation.signalIds.length>0;
+    // An absent marker preserves the immutable legacy policy, including retries.
+    const cap=d.ratingPolicy!=='chosen-v1'&&(slow||d.hesitation.signalIds.length>0);
     const effectiveRating=cap&&d.rawRating>=3?d.rawRating-1:d.rawRating;
     const rawCard=gradeCard(scheduler,task,d.rawRating,at),card=gradeCard(scheduler,task,effectiveRating,at);
     if(effectiveRating!==d.rawRating){

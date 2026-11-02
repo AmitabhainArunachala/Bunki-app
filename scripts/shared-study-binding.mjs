@@ -1,6 +1,11 @@
 /** Pure frozen-content binding builder. Production inventory counts stay pinned;
  * small reviewed source excerpts can exercise this same builder in CI. */
-export function buildSharedStudyBinding({registry,catalog,packs,source,grammarAssets,expected={tasks:8508,vocabulary:7930}}) {
+import {createHash} from 'node:crypto';
+import {createGunzip} from 'node:zlib';
+import {Readable} from 'node:stream';
+import {sharedDictionaryBuild} from '../prototypes/corridor/shared-study-content.mjs';
+
+export function buildSharedStudyBinding({registry,catalog,packs,source,grammarAssets,dictionary,dictionaryBuild,expected={tasks:8508,vocabulary:7930}}) {
 const cards = new Map();
 for (const [id, pack] of Object.entries(packs)) for (const word of pack.deck.words) for (const card of word.cards) {
   const key = JSON.stringify([id, card.id]);
@@ -46,5 +51,23 @@ const manifest = {format:'bunki-shared-content/v1', source,
   packs:Object.fromEntries(Object.entries(packs).map(([id,pack])=>[id,{sha256:pack.sha256,cards:[...cards.keys()].filter(k=>JSON.parse(k)[0]===id).length}])),
   counts:{tasks:rows.length,vocabulary:bound.size,grammar:grammar.length}, rows, grammar, presentation};
 manifest.grammarAssets=grammarAssets;
+if(dictionary!==undefined){manifest.dictionary=structuredClone(dictionary);sharedDictionaryBuild(manifest,dictionaryBuild);}
 return manifest;
+}
+
+/** Streaming artifact check used by generation and the pinned-build verifier.
+ * No dictionary model is reimplemented or parsed here; runtime uses canonical JS. */
+export async function verifySharedDictionaryArtifact(binding,buildBytes,gzip) {
+  const hash=bytes=>createHash('sha256').update(bytes).digest('hex'),d=binding?.dictionary;
+  const build=sharedDictionaryBuild(binding,JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(buildBytes)));
+  if(hash(buildBytes)!==d.buildSha256)throw Error('shared-dictionary-build-hash');
+  if(gzip.byteLength!==d.bytes||hash(gzip)!==d.sha256)throw Error('shared-dictionary-gzip-mismatch');
+  const jsonHash=createHash('sha256');let bytes=0;
+  for await(const chunk of Readable.from([gzip]).pipe(createGunzip())){
+    bytes+=chunk.byteLength;
+    if(bytes>d.jsonBytes)throw Error('shared-dictionary-json-byte-limit');
+    jsonHash.update(chunk);
+  }
+  if(bytes!==d.jsonBytes||jsonHash.digest('hex')!==d.jsonSha256)throw Error('shared-dictionary-json-mismatch');
+  return build;
 }

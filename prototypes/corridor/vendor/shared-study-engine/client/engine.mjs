@@ -89,7 +89,7 @@ export function createStudyEngine({content, learner, epoch = 0, timezone = 'Asia
           [key, Object.fromEntries(['noteGuid','contract','passageId','module','group','lexicalKey','contentRevision'].map(field => [field,task[field]]))]))});
       if (canonicalStringify(identity(rebuilt)) !== canonicalStringify(identity(state.projection))) throw Error('engine-store-projection');
       if (transport !== null && typeof transport.reserveNewPermits !== 'function') throw Error('engine-transport-adapter');
-      return createReplicaBackend({store, engine, catalog: frozen.catalog, localAuthority, now,
+      return createReplicaBackend({store, engine, catalog: frozen.catalog, pin: frozen.pin, localAuthority, now,
         ...(uuid ? {uuid} : {}), reserveNewPermits: transport ? () => transport.reserveNewPermits({store}) : null});
     },
   });

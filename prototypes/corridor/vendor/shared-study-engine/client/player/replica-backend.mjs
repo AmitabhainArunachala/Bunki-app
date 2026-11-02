@@ -11,13 +11,27 @@ import {createProjectionView} from './projection-view.mjs';
 import {StoreError} from '../store.mjs';
 import { canonicalStringify, payloadHash } from '../schema/event.mjs';
 import { dayBounds, studyDayAllowance } from '../replay.mjs';
-import { servable,nextStep } from '../vendor/engine.js';
+import { servable,nextStep,createScheduler } from '../vendor/engine.js';
+import * as fsrsApi from '../vendor/ts-fsrs.mjs';
+import {orderBacklogReviews} from './backlog-order.mjs';
 const clone = v => structuredClone(v);
 const immutable = v => { if (v && typeof v === 'object') { Object.values(v).forEach(immutable); Object.freeze(v); } return v; };
 
-export async function createReplicaBackend({ store, engine, catalog, localAuthority = null, reserveNewPermits = null, now = Date.now, uuid = () => crypto.randomUUID() }) {
+export async function createReplicaBackend({ store, engine, catalog, pin = null, localAuthority = null, reserveNewPermits = null, now = Date.now, uuid = () => crypto.randomUUID() }) {
   let state = await store.readState(), projection = state.projection, disposed = false, lastTs = 0;
   const listeners = new Set(), intents = new Map();
+  // Snapshot the host's accepted pin; the first explicit backlog selection
+  // validates it through the canonical engine instead of duplicating pin rules.
+  const backlogPin=pin===null?null:clone(pin);let backlogScheduler=null;
+  function rankedBacklog(ready,at){
+    if(!backlogPin)throw new Error('backlog-scheduler-pin-required');
+    if(!backlogScheduler){engine.replay([],{pin:backlogPin});backlogScheduler=createScheduler(fsrsApi,backlogPin);}
+    const rankable=entry=>!!projection.introductions[entry.taskKey]&&!!projection.tasks[entry.taskKey].card;
+    const ranked=orderBacklogReviews(projection,ready.filter(rankable),{scheduler:backlogScheduler,now:()=>at});
+    let index=0;
+    // New cards and introduced null-card debt retain their exact queue slots.
+    return ready.map(entry=>rankable(entry)?ranked[index++]:entry);
+  }
   const publicView=createProjectionView();
   const typedIntents = new Map();
   const resumptions = new Map();
@@ -209,10 +223,9 @@ export async function createReplicaBackend({ store, engine, catalog, localAuthor
     return immutable({available,epoch:state.epoch,through,events});
   }
   function captureCommand(attempt,capture){
-    const target=capture.targetTaskKey&&projection.tasks[capture.targetTaskKey],ownTarget=target?.taskKey===attempt?.taskKey;
     const raw={...capture,...(attempt?{attemptId:attempt.id}:{})};
-    if(attempt?.mode!=='practice'&&target&&!ownTarget&&!target.suspended&&!target.known&&['lookup','unknown','unsure'].includes(raw.kind))
-      return command('capture-boost',{taskKey:target.taskKey,parent:target.head,capture:raw});
+    // New lookup actions record evidence; they never change a target's schedule.
+    // Explicit retained legacy capture-boost commands still replay and retry intact.
     return command('capture',raw);
   }
   function snapshotAttempt(taskKey, { practice = false,learnAhead=false,session=null } = {}) {
@@ -231,13 +244,12 @@ export async function createReplicaBackend({ store, engine, catalog, localAuthor
     if(['windowHash','thresholdMs','sampleCount'].some(k=>evidence[k]!==attempt.hesitation[k]))throw Error('stale-attempt');
     const signals = projection.captures.filter(c => c.install === store.scope.installation && c.attemptId === attempt.id &&
       c.contextTaskKey === attempt.taskKey && c.targetTaskKey === attempt.taskKey && ['lookup','unknown','unsure'].includes(c.kind));
-    const data = { ...(attempt.session?{session:clone(attempt.session)}:{}),taskKey: attempt.taskKey, parent: attempt.parent, contentRevision: attempt.contentRevision, rawRating,
+    const data = { ...(attempt.mode==='scored'?{ratingPolicy:'chosen-v1'}:{}),...(attempt.session?{session:clone(attempt.session)}:{}),taskKey: attempt.taskKey, parent: attempt.parent, contentRevision: attempt.contentRevision, rawRating,
       attempt: { id: attempt.id, mode: attempt.mode, revealed: true, foregroundValid: true, thinkMs, helpBeforeAnswer: false },
       hesitation: { ...evidence, signalIds: signals.map(c => c.id) }, learnAhead: attempt.learnAhead===true };
     const bounds = dayBounds(reviewedAt, projection.settings.learnerTimezone);
     const permit = attempt.mode==='practice'?null:Object.values(projection.permits).find(p => p.install === store.scope.installation && !p.usedBy && p.startsAt === bounds.startsAt && p.endsAt > reviewedAt);
     if (permit) data.permitId = permit.id;
-    if (attempt.mode!=='practice' && signals.length && !task.suspended && !task.known && task.contract === 'vocabulary.read.v1') data.boost = { observationId: signals[0].id };
     return data;
   }
   function previewEntry(attempt,thinkMs) {
@@ -278,10 +290,10 @@ export async function createReplicaBackend({ store, engine, catalog, localAuthor
     if(!Number.isInteger(rating)||rating<1||rating>4)throw Error('invalid-review-rating');
     return reviewAlternative(attempt,rating,thinkMs,previewEntry(attempt,thinkMs)).intent;
   }
-  function queue({ module = 'all',learningOnly=false } = {}) {
+  function queue({ module = 'all',learningOnly=false,backlog=false } = {}) {
     const bounds = dayBounds(now(), projection.settings.learnerTimezone);
     const hasPermit = Object.values(projection.permits).some(p => p.install === store.scope.installation && !p.usedBy && p.startsAt <= now() && p.endsAt > now());
-    return catalogEntries().filter(entry => {
+    const ready=catalogEntries().filter(entry => {
       const t = projection.tasks[entry.taskKey];
       if (!t || !contentReady(entry) || (module !== 'all' && t.module !== module) || t.suspended || t.known) return false;
       if ((projection.settings.topicsOff[t.module] ?? []).includes(t.group)) return false;
@@ -296,6 +308,7 @@ export async function createReplicaBackend({ store, engine, catalog, localAuthor
       return Number(!x.card) - Number(!y.card) || Number(y.priority) - Number(x.priority) ||
         (Date.parse(x.card?.due ?? '') || 0) - (Date.parse(y.card?.due ?? '') || 0);
     });
+    return backlog&&!learningOnly?rankedBacklog(ready,now()):ready;
   }
   function sitting({module='all',ahead=false}={}){
     const ready=queue({module}),learning=queue({module,learningOnly:true}).map(e=>({id:e.taskKey,due:Date.parse(projection.tasks[e.taskKey].card.due)}));

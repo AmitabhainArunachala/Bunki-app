@@ -360,9 +360,13 @@ section:has(>.word-list)>h2~.setting-row textarea{width:100%;min-height:88px}
 @media(max-width:640px){.today-plan { gap:14px; }.today-plan .today-actions { align-items:stretch; flex-direction:column; }.today-plan .today-actions button { width:100%; }.forecast-strip { gap:5px; }.forecast-strip li { font-size:12px; }.today-counts { font-size:24px; }}
 
 /* Study geometry: the same passage boxes survive reveal; only readings appear. */
-.passage rt{font-family:var(--passageFont);color:inherit;font-size:12px;letter-spacing:0;line-height:1.4;font-feature-settings:"ruby" 1;ruby-align:center}
+.passage ruby{display:inline-flex;position:relative;line-height:1;vertical-align:baseline}
+.passage rt{display:contents;font-family:var(--passageFont);color:inherit;font-size:12px;letter-spacing:0;line-height:1;font-feature-settings:"ruby" 1}
+.passage .ruby-reading{display:block;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);white-space:nowrap;font:inherit;line-height:1}
 .passage[data-readings=reserved] rt{visibility:hidden;opacity:0}
 .passage .word{display:inline-block;line-height:1.4;vertical-align:baseline}
+/* A whole reading wraps lookup words; their line boxes must match its glyph line. */
+.passage ruby[data-ruby-alignment=whole]>.word{line-height:1;padding-block:0}
 .passage[data-readings=reserved] .word{cursor:inherit;pointer-events:none}
 #app [data-focus]{position:relative}
 #app [data-focus] .study-heading{flex:none;min-height:44px}
@@ -372,7 +376,7 @@ section:has(>.word-list)>h2~.setting-row textarea{width:100%;min-height:88px}
 #app [data-focus][data-study=front] .study-card{display:block;padding-bottom:48px}
 #app [data-focus][data-study=front] .study-card>:first-child{margin-block-start:0}
 #app [data-focus][data-study=front] .study-card>:last-child{margin-block-end:0}
-#app [data-focus] [data-passage=passage]{font-size:20px;line-height:40px;max-width:16em;margin:0 auto;letter-spacing:0}
+#app [data-focus] [data-passage=passage]{font-size:20px;line-height:36px;max-width:16em;margin:0 auto;letter-spacing:0}
 #app [data-focus] [data-passage=passage] [data-target-token]{color:var(--accent);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.2em}
 #app [data-focus] .first-card-hint{position:absolute;bottom:16px;inset-inline:20px;margin:0;text-align:center;font-size:13px;line-height:20px;color:var(--muted);pointer-events:none}
 #app [data-focus] .study-card .term-block{margin-top:40px;padding-top:0;border-top:0}
@@ -384,8 +388,11 @@ section:has(>.word-list)>h2~.setting-row textarea{width:100%;min-height:88px}
 #app [data-focus] .grade-bar button:nth-child(2){grid-column:3}
 #app [data-focus] .grade-bar button:nth-child(3){grid-column:4}
 #app [data-focus] .grade-bar button:nth-child(4){grid-column:5}
-#app [data-focus] .grade-bar button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:52px;padding:8px 3px;border:1px solid var(--line-strong);border-radius:8px;background:var(--raised);color:var(--ink);font-size:15px;line-height:20px;font-weight:600;transform:none}
-#app [data-focus] .grade-bar button.rating-1{color:var(--accent)}
+#app [data-focus] .grade-bar button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:52px;padding:8px 3px;border:1px solid var(--line-strong);border-top:3px solid currentColor;border-radius:8px;background:var(--raised);color:var(--ink);font-size:15px;line-height:20px;font-weight:600;transform:none}
+#app [data-focus] .grade-bar button.rating-1{color:var(--again)}
+#app [data-focus] .grade-bar button.rating-2{color:var(--hard)}
+#app [data-focus] .grade-bar button.rating-3{color:var(--good)}
+#app [data-focus] .grade-bar button.rating-4{color:var(--easy)}
 #app [data-focus] .grade-bar button:active{background:var(--ground);transform:none}
 #app [data-focus] .grade-caption>.interface-secondary{font-size:13px;line-height:16px}
 #app [data-focus] .grade-hints{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;color:var(--muted)}
@@ -394,9 +401,7 @@ section:has(>.word-list)>h2~.setting-row textarea{width:100%;min-height:88px}
 #app [data-focus] .study-help{position:absolute;z-index:5;top:52px;right:0;max-width:520px;max-height:calc(100% - 64px);overflow:auto;padding:20px;background:var(--raised);border:1px solid var(--line-strong);border-radius:10px;box-shadow:var(--sheet-shadow)}
 #app [data-focus] .study-help #study-context{display:block;font-size:13px;margin-bottom:12px;color:var(--secondary)}
 #app [data-focus] .study-help .grade-rule{font-size:13px;line-height:1.7;margin-bottom:12px}
-#app [data-focus] .hesitation-chip{flex:none;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;line-height:20px;color:var(--secondary)}
-#app [data-focus] .hesitation-chip .quiet{font-size:13px;min-height:44px}
-#app [data-focus="simple"] .hesitation-chip [data-override]{display:inline-block}
+.answer-time{display:inline-block;margin-inline-start:12px;font:400 12px/1.5 system-ui;white-space:nowrap}
 .study-toast{position:fixed;z-index:30;top:calc(env(safe-area-inset-top) + 64px);left:50%;transform:translateX(-50%);max-width:calc(100% - 32px);padding:8px 16px;background:var(--raised);border:1px solid var(--line);border-radius:8px;box-shadow:var(--sheet-shadow);font-size:13px;pointer-events:none}
 #app [data-focus][data-study=front]:is([data-entry-source=pointer],[data-entry-source=click],[data-entry-source=swipe]) .study-card{animation:study-enter var(--m-enter) var(--e-enter) both}
 #app [data-focus][data-study=back][data-reveal-source=pointer] .passage rt{animation:study-ruby var(--m-enter) var(--e-enter) both}
@@ -411,7 +416,7 @@ section:has(>.word-list)>h2~.setting-row textarea{width:100%;min-height:88px}
  #app:has([data-focus])>main{width:min(100%,864px);padding:16px 24px 24px}
  #app [data-focus] .study-heading{min-height:40px;margin-bottom:12px}
  #app [data-focus] .study-card{padding:32px 48px calc(var(--decision-height,0px) + 32px);border-radius:12px}
- #app [data-focus] [data-passage=passage]{font-size:24px;line-height:48px;max-width:30em}
+ #app [data-focus] [data-passage=passage]{font-size:24px;line-height:42px;max-width:30em}
  #app [data-focus] .decision-panel{left:0;right:0;padding:12px 24px 16px;border:1px solid var(--line-strong);border-radius:12px}
  #app [data-focus] .answer-line{font-size:20px;line-height:28px}
  #app [data-focus] .grade-bar button{min-height:44px;padding:4px}
@@ -438,7 +443,6 @@ section:has(>.word-list)>h2~.setting-row textarea{width:100%;min-height:88px}
 @keyframes finish-fade{from{opacity:0}to{opacity:1}}
 .finish-screen[data-finish-source=key]{animation:none}
 
-#app [data-focus] .study-heading .hesitation-chip{flex-basis:100%;padding-inline:8px;min-width:0}
 
 /* Shared host status stays above the card without repainting its reading area. */
 .shared-status{flex:none;width:min(100%,864px);margin-inline:auto;padding:8px 24px;font-size:13px;line-height:20px}.shared-status p{margin:0}.shared-status>[hidden]{display:none}.shared-status [data-shared-activity]:empty{display:none}
@@ -467,6 +471,7 @@ small{font-size:max(12px,.833333em)}
 .qa-banner,.module-count small,.content-note{font-size:13px}
 .screen-head,footer,.shared-status{background:var(--ground)}
 .screen-head h1,.finish-screen h1,section:has(>.word-list)>h1{font-size:28px;line-height:36px}
+.study-card,.passage,.answer-line{color:var(--ink)}
 .passage{font-weight:400;font-feature-settings:"chws" 1;line-break:strict;text-autospace:normal}
 :root[data-theme=dark] .passage,:root[data-theme=ai] .passage,:root[data-theme=matcha] .passage,:root[data-theme=kokuban] .passage,:root[data-theme=contrast] .passage{font-weight:500}
 .passage rt,.word rt{font-family:var(--passageFont);font-size:12px;color:var(--ink);font-feature-settings:"ruby" 1;ruby-align:center}
@@ -493,3 +498,34 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 @media(min-width:900px){:root{--t-lg:22px;--t-xl:26px;--t-2xl:26px}.screen-head h1,.finish-screen h1,section:has(>.word-list)>h1{font-size:26px;line-height:32px}#app [data-focus] .study-card .term-block{margin-top:48px}#app [data-focus] .study-card .definition .passage{font-size:17px;line-height:28px}.english{font-size:18px;line-height:28px}}
 @media(prefers-contrast:more){:root{--line-strong:var(--secondary)!important;--rule-strong:var(--secondary);--texture:none!important}}
 @media(prefers-reduced-motion:reduce){.finish-screen:not([data-finish-source=key]){animation:finish-fade 150ms linear both!important}button:active:not(:disabled){transform:none!important}}
+
+/* Study actions, navigation and display preferences. */
+#app [data-focus] .study-help.study-menu{padding:6px;width:min(360px,calc(100vw - 32px));max-width:none}
+#app [data-focus] .study-menu #study-context{display:block;margin:0;padding:8px 10px 6px;font-size:12px;color:var(--secondary)}
+.study-menu-item,.study-menu-help>summary{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;min-height:40px;margin:0;padding:8px 10px;border:0;border-radius:6px;background:transparent;color:var(--ink);font:inherit;font-size:14px;text-align:start;cursor:pointer;list-style:none}
+.study-menu-help>summary::-webkit-details-marker{display:none}
+.study-menu-help>summary::after{content:'›';color:var(--secondary);transition:transform 120ms}
+.study-menu-help[open]>summary::after{transform:rotate(90deg)}
+.study-menu-item:hover,.study-menu-item:focus-visible,.study-menu-help>summary:hover,.study-menu-help>summary:focus-visible{background:var(--surface);outline:none}
+.study-menu-item:focus-visible,.study-menu-help>summary:focus-visible,.study-menu-chip:focus-visible{box-shadow:inset 0 0 0 2px var(--accent)}
+.study-menu kbd{font:500 12px/1 var(--uiFont,system-ui);color:var(--secondary);border:1px solid var(--line);border-radius:4px;padding:3px 6px}
+.study-menu hr{border:0;border-top:1px solid var(--line);margin:6px 4px}
+.study-menu-group{padding:6px 10px 8px}
+#app .study-menu .study-menu-label{margin:0 0 6px;font-size:12px;letter-spacing:.06em;color:var(--secondary)}
+.study-menu-chips{display:flex;flex-wrap:wrap;gap:6px}
+.study-menu-chip{display:inline-flex;align-items:center;gap:6px;min-height:32px;margin:0;padding:4px 10px;border:1px solid var(--line-strong);border-radius:999px;background:transparent;color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
+.study-menu-chip:hover{background:var(--surface)}
+.study-menu-chip[aria-checked="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);font-weight:600}
+.study-menu-chip i{width:12px;height:12px;border-radius:50%;border:2px solid;display:block;flex:none}
+.study-menu-help{margin:0}
+#app [data-focus] .study-menu-help .grade-rule{margin:4px 10px 10px;font-size:13px;line-height:1.7;color:var(--secondary)}
+@media (prefers-reduced-motion:reduce){.study-menu-help>summary::after{transition:none}}
+
+/* Claude draft (2 Nov 09:20): key sheet, lookup hints. */
+dialog.key-sheet{max-width:min(440px,calc(100vw - 32px));padding:20px 22px}
+dialog.key-sheet h2{margin:0 0 12px;font-size:17px}
+dialog.key-sheet dl{display:grid;grid-template-columns:max-content 1fr;gap:8px 16px;margin:0 0 16px;font-size:14px}
+dialog.key-sheet dt{margin:0}dialog.key-sheet dd{margin:0;color:var(--ink)}
+dialog.key-sheet kbd{font:500 12px/1 system-ui;border:1px solid var(--line-strong);border-radius:4px;padding:3px 6px;white-space:nowrap}
+.capture-help{font-size:13px;line-height:1.6;margin:10px 0 8px;color:var(--secondary)}
+#app .back-lookup-hint{margin:16px 0 0;font-size:13px;line-height:20px;color:var(--secondary)}

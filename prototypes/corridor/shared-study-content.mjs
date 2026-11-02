@@ -68,3 +68,20 @@ export async function loadSharedContent({fetcher=globalThis.fetch}={}) {
     ...SHARED_DECKS.map(id=>json(`./decks/${id}/deck.json`,binding.packs[id]?.sha256))]);
   return {content:decodeSharedContent(binding,Object.fromEntries(SHARED_DECKS.map((id,i)=>[id,packs[i]])),pin),binding};
 }
+
+/** Bind the canonical loader to this exact reviewed catalog and build artifact.
+ * This validates metadata only; the canonical loader authenticates gzip/JSON,
+ * and prepareOfflineDictionary authenticates each actual passage/token source. */
+export function sharedDictionaryBuild(binding,build) {
+  const d=binding?.dictionary,hash=value=>typeof value==='string'&&/^[a-f0-9]{64}$/.test(value);
+  if(d?.format!=='bunki-shared-dictionary/v1'||!hash(d.buildSha256)||!hash(d.sha256)||!hash(d.jsonSha256)||
+      !Number.isSafeInteger(d.bytes)||d.bytes<1||d.bytes>64*1024*1024||
+      !Number.isSafeInteger(d.jsonBytes)||d.jsonBytes<1||d.jsonBytes>256*1024*1024)throw Error('shared-dictionary-binding-required');
+  if(!hash(binding.source?.catalogSha256)||!hash(binding.source?.registrySha256)||build?.release3FullCorpus!==true||
+      build.files?.['catalog.json']!==binding.source.catalogSha256||build.files?.['registry.json']!==binding.source.registrySha256)
+    throw Error('shared-dictionary-source-mismatch');
+  if(build.dictionarySha256!==d.sha256||build.files?.['dictionary.json.gz']!==d.sha256||
+      build.dictionaryJSONSha256!==d.jsonSha256||build.dictionaryJSONBytes!==d.jsonBytes)
+    throw Error('shared-dictionary-build-mismatch');
+  return build;
+}

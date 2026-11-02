@@ -2,7 +2,7 @@
  * Regenerate with node tools/reducer_pin.mjs --write when replay or its imports change.
  */
 export const SYNC_COMPATIBILITY = Object.freeze({
-  reducerSha256:'f564bd01906409b145419c33b5a4db688e94b163e2ca94e5ce36213909ce7430',
+  reducerSha256:'a2739393b11ae01d3f4e39f0519d3a8c8cd05d965e8afdaa3d4433315b089ce4',
 });
 export function compatibilityHeaders(value=SYNC_COMPATIBILITY){
   if(!value||Object.keys(value).length!==1||typeof value.reducerSha256!=='string'||

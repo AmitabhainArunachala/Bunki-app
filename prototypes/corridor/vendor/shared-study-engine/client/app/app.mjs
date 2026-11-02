@@ -1,8 +1,10 @@
 import {createFactoryStatusReader,factoryRequest} from './factory-status.mjs';
 import {applyKinsoku} from '../player/kinsoku.mjs';
+import {watchRubyLayout} from '../player/ruby-layout.mjs';
 import { createRecallTimer, createNode } from '../player/presentation.mjs';
 import { renderVocabularyPassage,renderVocabularyBack,renderVocabularyRelated,renderVocabularyEntry } from '../player/vocabulary.mjs';
 import {contentReady} from '../player/content-ready.mjs';
+import {lookupReadingPresentation,reviewedDictionaryEntry,reviewedActionCapture} from '../player/passage-reading-evidence.mjs';
 import { dayBounds } from '../replay.mjs';
 import {translateInterfaceText,formatInterfaceText,defaultInterfaceLanguage,renderInterfacePair,formatStudyDate,formatStudyMinutes} from './interface-language.mjs';
 import {nextStep} from '../vendor/engine.js';
@@ -18,9 +20,9 @@ const GRADES = [[1,'もう一度','Again','再'],[2,'難しい','Hard','難'],[3
 const interval = ms => ms < 60000 ? '1分未満' : ms < 3600000 ? `${Math.ceil(ms/60000)}分` : ms < 86400000 ? `${Math.ceil(ms/3600000)}時間` : `${Math.round(ms/86400000)}日`;
 
 /** Select only from scheduler-admitted queues; daily permits and topic filters remain backend-owned. */
-export function nextRapidFireStudy(backend,module='all',at=Date.now(),gradedTaskKey=null,onReadyQueue=null) {
+export function nextRapidFireStudy(backend,module='all',at=Date.now(),gradedTaskKey=null,onReadyQueue=null,backlog=false) {
   const another=entry=>entry.taskKey!==gradedTaskKey;
-  const tasks=backend.readProjection().tasks,scoped=backend.queue({module}).filter(another);
+  const tasks=backend.readProjection().tasks,scoped=backend.queue({module,backlog}).filter(another);
   const chooseDue=(scope,ready,ahead)=>{
     const learning=backend.queue({module:scope,learningOnly:true}).filter(another);
     const entries=new Map([...ready,...learning].map(entry=>[entry.taskKey,entry]));
@@ -29,7 +31,7 @@ export function nextRapidFireStudy(backend,module='all',at=Date.now(),gradedTask
       learning:learning.map(entry=>({id:entry.taskKey,due:Date.parse(tasks[entry.taskKey].card.due)}))});
     return step.show?{entry:entries.get(step.show),early:step.early}:null;
   };
-  let fullReady;const allReady=()=>fullReady??=(module==='all'?scoped:backend.queue({module:'all'}).filter(another));
+  let fullReady;const allReady=()=>fullReady??=(module==='all'?scoped:backend.queue({module:'all',backlog}).filter(another));
   const selected=result=>{if(result?.entry&&onReadyQueue)onReadyQueue(allReady());return result;};
   const withinModule=chooseDue(module,scoped,false);
   if(withinModule?.entry)return selected(withinModule);
@@ -67,7 +69,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   let sharedActivity=activityTracker.snapshot(),boundaryQueue=[],boundaryNotice=null,lastSharedActivityKey=null;
   const observeSharedActivity=()=>{sharedActivity=activityTracker.observe(backend.readSharedActivity?.(activityTracker.cursor),backend.readProjection());};
   const customOptions={mode:'review-ahead',aheadDays:1,size:20,untilDone:false,filters:{level:'',module:'all',tag:'',recentlyFailed:false,order:'due'}};
-  let customRun=null,customBusy=false,pausedStudy=null,scheduledPage=0,sessionShown=0,boundaryPreparation=null;
+  let customRun=null,customBusy=false,pausedStudy=null,parkedStudy=null,scheduledPage=0,sessionShown=0,boundaryPreparation=null;
   const sessionEvidence=createSessionEvidence({preferences,learner:backend.learner,installation:backend.installation,now});
   let activeSession=null,finishState=null,finishGuardTimer=null,costState=null;const acknowledgedDays=new Set();
   let toastTimer=null,lastInputSource='pointer';const frontCache=new Map();
@@ -155,6 +157,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   root.replaceChildren(h('header',{class:'app-header'},h('a',{class:'brand',href:'#',onclick:e=>{e.preventDefault();navigate('today');}},'集中道場',h('span',{},'Nihongo Study')),h('div',{class:'header-controls'},languagePicker(true),themePicker())),
     h('div',{class:'qa-banner'},corpus?.release3FullCorpus?'全デッキ · 全文英訳付き。':'QAプレビュー · テスト用の記録です。実際の学習履歴には影響しません。'),nav,sharedStatus,main,live,
     h('footer',{},h('span',{},'一つずつ、確かに。')));
+  const rubyLayout=watchRubyLayout(root);
   async function updateStatus({presentation=false}={}) {
     const generation=++saveStatusGeneration;
     let status;
@@ -228,17 +231,70 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function message(text,owner=null) { notice = text; noticeOwner=owner; live.textContent = text;localize(); }
   function navigate(next) {
     if (busy || typedBusy || customBusy || pendingIntent) return message('保存を確認してから移動してください。失敗した場合は再試行できます。');
-    if(screen==='study'&&current&&!current.committed&&current.attempt.mode!=='practice')pausedStudy={day:dayBounds(now(),backend.readProjection().settings.learnerTimezone).day,module,taskKey:current.entry.taskKey,run:customRun?{options:customRun.options,newOnly:!!customRun.newOnly,taskKeys:[current.entry,...customRun.remaining].map(entry=>entry.taskKey)}:null};
-    if (current?.revealed && !current.committed && current.attempt.mode!=='practice') {
-      // A target lookup on an abandoned attempt gets its own revision-checked boost.
-      const p = backend.readProjection(), t = p.tasks[current.entry.taskKey];
-      const capture = t && p.captures.find(c => c.attemptId === current.attempt.id && c.targetTaskKey === t.taskKey && !p.boostSources[`${c.id}|${t.taskKey}`] && ['lookup','unknown','unsure'].includes(c.kind));
-      if (capture && !t.suspended && !t.known && t.contract === 'vocabulary.read.v1') {
-        run(backend.command('boost',{taskKey:t.taskKey,parent:t.head,observationId:capture.id}),() => { current?.timer.dispose(); current=null; customRun=null; activeSession=null; finishState=null; win.clearTimeout(finishGuardTimer); screen=next; closePopover(); render(); });
-        return;
-      }
-    }
+    if(screen==='study'&&current)return pauseStudy(next);
     boundaryPreparation=null;current?.timer.dispose(); current = null; customRun=null; activeSession=null;finishState=null;win.clearTimeout(finishGuardTimer);screen = next; closePopover(); render();
+  }
+  // Keep the same timer facade and elapsed visible recall across a paused screen.
+  function studyTimer(){
+    let clock=createRecallTimer(document),elapsed=0,paused=false,frozen=false;
+    return Object.freeze({
+      pause(){if(!paused&&!frozen){elapsed+=clock.freeze();paused=true;}},
+      resume(){if(paused&&!frozen){clock=createRecallTimer(document);paused=false;}},
+      freeze(){if(!frozen){if(!paused)elapsed+=clock.freeze();frozen=true;}return elapsed;},
+      dispose(){clock.dispose();frozen=true;}
+    });
+  }
+  function pauseStudy(next){
+    if(!current||current.committed||boundaryPreparation)return message('保存を確認してから移動してください。失敗した場合は再試行できます。');
+    setStudyMenu(false);closePopover();current.timer.pause();
+    parkedStudy={current,customRun,activeSession,boundaryQueue,boundaryNotice,sessionShown,module,scroll:main.querySelector('[data-card]')?.scrollTop??0};
+    current=null;customRun=null;activeSession=null;screen=next;render();main.focus({preventScroll:true});
+  }
+  function studyDay(){const at=now(),today=backend.todayAllowance?.()??dayBounds(at,backend.readProjection().settings.learnerTimezone);return {day:today.day,timezone:today.timezone};}
+  function parkedDayEnded(){if(!parkedStudy)return false;const today=studyDay(),started=parkedStudy.current.studyDay;return started.day!==today.day||started.timezone!==today.timezone;}
+  function retireParkedStudy(next){
+    if(!parkedStudy)return next();
+    if(busy||typedBusy||customBusy||pendingIntent)return message('保存を確認してから移動してください。失敗した場合は再試行できます。');
+    // A lookup records an observation; leaving its card never schedules it.
+    parkedStudy.current.timer.dispose();parkedStudy=null;pausedStudy=null;
+    return next();
+  }
+  function restoreStudy(){
+    if(!parkedStudy)return null;const saved=parkedStudy;parkedStudy=null;
+    ({current,customRun,activeSession,boundaryQueue,boundaryNotice,sessionShown,module}=saved);
+    current.timer.resume();screen='study';return saved;
+  }
+  function resumeStudy(){
+    if(busy||typedBusy||customBusy||pendingIntent)return message('保存を確認してから移動してください。失敗した場合は再試行できます。');
+    if(parkedDayEnded())return retireParkedStudy(()=>render());
+    const saved=restoreStudy();if(!saved)return;render();const card=main.querySelector('[data-card]');if(card)card.scrollTop=saved.scroll;focusStudyCard();
+  }
+  function endStudy(){navigate('today');}
+  function availableUndo(){
+    expireLastReview();const p=backend.readProjection(),task=lastReview&&p.tasks[lastReview.entry.taskKey];
+    return !!(task&&p.effects[task.head]?.root===lastReview.eventId);
+  }
+  function menuItems(){return [...main.querySelectorAll('#study-help [role^=menuitem]')].filter(node=>!node.disabled&&node.getClientRects().length);}
+  function setStudyMenu(open){
+    if(!current)return;current.sessionInfoOpen=open;
+    const section=main.querySelector('[data-focus]'),toggle=main.querySelector('[data-session-info]');
+    if(section)section.dataset.focus=open?'session-info':'simple';toggle?.setAttribute('aria-expanded',String(open));
+    if(open){closePopover();menuItems()[0]?.focus({preventScroll:true});}
+    else{current.menuHelpOpen=false;const help=main.querySelector('[data-menu-help]');if(help)help.open=false;focusStudyCard();}
+  }
+  function menuKey(event){
+    if(event.repeat||event.isComposing||event.keyCode===229){event.preventDefault();return;}
+    if(event.metaKey||event.ctrlKey||event.altKey)return;
+    const items=menuItems(),at=items.indexOf(document.activeElement);
+    if(['ArrowDown','ArrowUp','Home','End'].includes(event.key)){
+      event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?items.length-1:(at+(event.key==='ArrowDown'?1:-1)+items.length)%items.length;items[next]?.focus({preventScroll:true});return;
+    }
+    if(event.key==='Escape'){event.preventDefault();setStudyMenu(false);return;}
+    if(/^[1-4]$/.test(event.key)&&current.revealed){event.preventDefault();if(!busy&&!pendingIntent){setStudyMenu(false);grade(Number(event.key),'key');}return;}
+    if(event.key.toLowerCase()==='u'){event.preventDefault();if(!busy&&!pendingIntent&&availableUndo()){setStudyMenu(false);undoLast();}return;}
+    // Native button/summary Enter and Space activation only; a focused card
+    // behind an open menu must never reveal or grade on an async focus change.
+    if(!event.target.closest?.('#study-help')&&['Enter',' '].includes(event.key)){event.preventDefault();menuItems()[0]?.focus({preventScroll:true});}
   }
   let panelObserver=null;
   function render() {
@@ -248,11 +304,13 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     factoryStatuses.leave();refreshFactoryRows=()=>{};
     for (const b of nav.querySelectorAll('button')) b.setAttribute('aria-current',b.dataset.nav === screen ? 'page' : 'false');
     const focusedField=document.activeElement;
+    const menuFocus=focusedField?.closest?.('#study-help')?[...main.querySelectorAll('#study-help [role^=menuitem]')].indexOf(focusedField):null;
     const paceFieldId=focusedField?.id.startsWith('study-pace-')?focusedField.id:null;
     const selection=paceFieldId&&focusedField.selectionStart!=null?[focusedField.selectionStart,focusedField.selectionEnd,focusedField.selectionDirection]:null;
     const previousCard=main.querySelector('[data-card]'),previousView=previousCard&&cardViews.get(previousCard),previousScroll=previousCard?.scrollTop??0;
     const openPanels=screen==='today'?['[data-custom-session]','[data-weighted-days]','[data-manual-card]'].filter(selector=>main.querySelector(selector)?.open):[];
     main.replaceChildren(screen === 'finish' ? finishScreen() : screen === 'study' ? studyScreen() : screen === 'words' ? wordsScreen() : screen === 'record' ? recordScreen() : screen === 'settings' ? settingsScreen() : todayScreen());
+    if(parkedStudy&&!['study','today'].includes(screen))main.prepend(h('div',{class:'sheet-actions','data-paused-session':''},button('学習に戻る',resumeStudy,{'data-resume-study':'',class:'primary'})));
     for(const selector of openPanels)main.querySelector(selector)?.setAttribute('open','');
     if(paceFieldId){
       const field=document.getElementById(paceFieldId);
@@ -265,14 +323,15 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     if(factoryRetry)main.after(h('div',{'data-factory-retry-panel':'',class:'retry-panel'},button('カード作成の依頼を再試行',()=>submitFactory(factoryRetry),{class:'quiet','data-factory-retry':''})));
     platform.onScreenChange?.({screen,settingsHost:main.querySelector('[data-host-settings]')});
     if(pendingOperation)lockOperationControls(pendingOperation);
-    live.textContent = notice;localize();
+    live.textContent = notice;localize();rubyLayout.fit();
     panelObserver?.disconnect();panelObserver=null;const panel=main.querySelector('[data-decision-panel]'),readingCard=main.querySelector('[data-card]');if(panel&&readingCard){const fit=()=>readingCard.style.setProperty('--decision-height',panel.getBoundingClientRect().height+'px');fit();if(win.ResizeObserver){panelObserver=new win.ResizeObserver(fit);panelObserver.observe(panel);}}
     if(previousView?.current===current&&previousView.revealed===current?.revealed){const card=main.querySelector('[data-card]');if(card)card.scrollTop=previousScroll;}
-    if(screen==='study'&&!pop&&!document.querySelector('dialog[open]'))focusStudyCard();
+    if(screen==='study'&&!pop&&!document.querySelector('dialog[open]')){if(current?.sessionInfoOpen)(menuItems()[menuFocus]??menuItems()[0])?.focus({preventScroll:true});else focusStudyCard();}
     if(screen==='study'&&current?.revealed)current.revealSource='settled';
     if(screen==='study'&&current&&!current.revealed)current.entrySource='settled';
     updateStatus({presentation:true});
     budgetWatcher?.schedule();
+    if(parkedStudy&&!busy&&!pendingIntent&&parkedDayEnded()){const saved=parkedStudy;queueMicrotask(()=>{if(!disposed&&parkedStudy===saved&&parkedDayEnded())retireParkedStudy(()=>render());});}
   }
   function todayScreen() {
     const p=backend.readProjection(),view=dayView(),today=view.today,queue=backend.queue({module});
@@ -293,15 +352,15 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const scopedDue=queue.filter(entry=>p.introductions[entry.taskKey]).length,scopedBacklog=view.backlog&&scopedDue>0;
     const scopedNew=view.availability.eligibleNewIds.some(key=>module==='all'||p.tasks[key]?.module===module),canStart=queue.length>0||view.availability.requestableNew>0&&scopedNew;
     const actions=h('div',{class:'today-actions'});
-    if(!view.finished&&canStart){
-      const label=pausedStudy?'続きから学習する':'学習を始める';
-      const prepared=queue[0]?frontFor(queue[0]):null;
-      const action=event=>beginToday(scopedBacklog?50:null,false,event?.detail===0?'key':'pointer'),attributes={class:'primary',disabled:customBusy||busy||prepared&&!prepared.ready,'data-start':''};
-      actions.append(scopedBacklog&&!pausedStudy&&!customBusy?copyButton(`${Math.min(50,scopedDue)}枚学習する`,`Study ${Math.min(50,scopedDue)}`,action,attributes):button(customBusy?'学習を準備しています…':label,action,attributes));
-      if(scopedBacklog)actions.append(copyButton(`すべて学習する（${view.due+view.newToday}枚）`,`Study all (${view.due+view.newToday})`,()=>{pausedStudy=null;beginToday();},{class:'quiet','data-study-all':''}),h('div',{class:'review-only-offer','data-review-only-offer':''},button('復習だけ学習する',()=>beginToday(null,true),{class:'quiet','data-reviews-only':''}),h('p',{class:'secondary'},'スケジュール：通常の復習／今日の新規上限：変わりません')));
-      if(pausedStudy){const remaining=pausedStudy.run?.taskKeys.length??(queue.filter(entry=>p.introductions[entry.taskKey]).length+Math.min(queue.filter(entry=>!p.introductions[entry.taskKey]).length,view.newToday));hero.append(copy('p',`前回の続き：残り${remaining}枚`,`${remaining} left from the last session`,{class:'secondary','data-study-continue':''}));}
+    if(!view.finished&&canStart||parkedStudy){
+      const label=parkedStudy||pausedStudy?'続きから学習する':'学習を始める';
+      const prepared=!parkedStudy&&queue[0]?frontFor(queue[0]):null;
+      const action=event=>beginToday(scopedBacklog&&!parkedStudy?50:null,false,event?.detail===0?'key':'pointer'),attributes={class:'primary',disabled:customBusy||busy||prepared&&!prepared.ready,'data-start':''};
+      actions.append(scopedBacklog&&!parkedStudy&&!pausedStudy&&!customBusy?copyButton(`${Math.min(50,scopedDue)}枚学習する`,`Study ${Math.min(50,scopedDue)}`,action,attributes):button(customBusy?'学習を準備しています…':label,action,attributes));
+      if(scopedBacklog)actions.append(copyButton(`すべて学習する（${view.due+view.newToday}枚）`,`Study all (${view.due+view.newToday})`,()=>{pausedStudy=null;beginToday(null,false,lastInputSource,true);},{class:'quiet','data-study-all':''}),h('div',{class:'review-only-offer','data-review-only-offer':''},button('復習だけ学習する',()=>beginToday(null,true),{class:'quiet','data-reviews-only':''}),h('p',{class:'secondary'},'スケジュール：通常の復習／今日の新規上限：変わりません')));
+      if(parkedStudy||pausedStudy){const remaining=parkedStudy?.current.remaining??pausedStudy?.run?.taskKeys.length??(queue.filter(entry=>p.introductions[entry.taskKey]).length+Math.min(queue.filter(entry=>!p.introductions[entry.taskKey]).length,view.newToday));hero.append(copy('p',`前回の続き：残り${remaining}枚`,`${remaining} left from the last session`,{class:'secondary','data-study-continue':''}));}
     }else if(!view.finished){hero.append(h('p',{class:'secondary'},'このデッキで今学習できるカードはありません。'),button('すべてのデッキを見る',()=>{module='all';pausedStudy=null;render();},{class:'quiet','data-show-all-decks':''}));}
-    if(lastReview)actions.append(button('元に戻す',undoLast,{class:'quiet','data-undo':''}),overrideLastReviewButton(p));
+    if(lastReview)actions.append(button('元に戻す',undoLast,{class:'quiet','data-undo':''}));
     if(actions.childNodes.length){const help=hero.querySelector('[data-first-day-help]');if(help)hero.insertBefore(actions,help);else hero.append(actions);}
     if(view.finished&&!view.firstDay){const total=view.totals;hero.append(copy('p',`今日：復習${total.reviewed}枚・新規${total.new}枚${formatStudyMinutes(total,'ja')?`・${formatStudyMinutes(total,'ja')}`:''}`,`Today: ${total.reviewed} reviewed · ${total.new} new${formatStudyMinutes(total,'en')?` · ${formatStudyMinutes(total,'en')}`:''}`,{'data-day-totals':'',class:'today-totals'}));}
     const introductions=activityTracker.newByDevice(p,today.day);if(introductions.length)hero.append(copy('p',introductions.map(row=>`${row.local?'この端末':row.label??'別の端末'}：新規${row.count}枚`).join('・'),introductions.map(row=>`${row.local?'This device':row.label??'Another device'}: ${row.count} new`).join(' · '),{class:'secondary','data-new-by-device':''}));
@@ -353,8 +412,9 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   }
   function readyCount(entries){const p=backend.readProjection(),at=now(),today=backend.todayAllowance?.()??dayBounds(at,p.settings.learnerTimezone),permits=Object.values(p.permits),held=permits.filter(permit=>!permit.usedBy&&permit.install===backend.installation&&permit.startsAt<=at&&permit.endsAt>at).length,spent=permits.filter(permit=>permit.usedBy&&permit.startsAt<today.endsAt&&permit.endsAt>today.startsAt).length;let reviews=0,fresh=0;for(const entry of entries){if(p.introductions[entry.taskKey])reviews++;else fresh++;}return reviews+Math.min(fresh,held,Math.max(0,(today.limit??Infinity)-spent));}
   function showToast(ja,en){win.clearTimeout(toastTimer);root.querySelector('[data-study-toast]')?.remove();const toast=copy('p',ja,en,{class:'study-toast',role:'status','data-study-toast':''});root.append(toast);toastTimer=win.setTimeout(()=>toast.remove(),2000);}
-  async function beginToday(size=null,reviewsOnly=false,source=lastInputSource){
+  async function beginToday(size=null,reviewsOnly=false,source=lastInputSource,newSession=false){
     if(customBusy||busy||pendingIntent)return;
+    if(parkedStudy){if(size!==null||reviewsOnly||newSession)return retireParkedStudy(()=>beginToday(size,reviewsOnly,source,newSession));return resumeStudy();}
     if(pausedStudy&&!reviewsOnly){const paused=pausedStudy;pausedStudy=null;if(paused.run)return paused.run.newOnly?beginNewSession(paused.run.taskKeys):beginCustomSession(paused.run.options,paused.run.taskKeys);const entry=backend.queue({module}).find(entry=>entry.taskKey===paused.taskKey);if(entry)return start(entry,false,false,null,{source});}
     let view=dayView();
     if(!reviewsOnly&&!backend.queue({module}).length&&view.availability.requestableNew>0){
@@ -365,11 +425,11 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       finally{customBusy=false;if(!disposed)render();}
       if(disposed)return;view=dayView();
     }
-    const queue=backend.queue({module});
+    const backlog=view.backlog,queue=backend.queue({module,backlog});
     if(size!==null||reviewsOnly){const keys=queue.filter(entry=>backend.readProjection().introductions[entry.taskKey]).map(entry=>entry.taskKey).slice(0,size??Infinity);return beginCustomSession({mode:'due',untilDone:true,filters:{module}},keys,source);}
     const entry=queue.find(entry=>entry.taskKey===pausedStudy?.taskKey)||queue[0];
     if(!entry){if(dayView().finished){render();return;}return message('この条件で学習できるカードはありません。');}
-    pausedStudy=null;await frontFor(entry).promise;if(!disposed)start(entry,false,false,null,{source});
+    pausedStudy=null;await frontFor(entry).promise;if(!disposed)start(entry,false,false,null,{source,backlog});
   }
   async function customAction(action,success){
     if(customBusy||busy||pendingIntent)return;customBusy=true;render();
@@ -390,6 +450,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     run(record.intent,()=>{weekdayPending=null;weekdayDraft={};message('翌日の学習日から変更します。');render();},false,{onRefused:()=>{weekdayPending=null;}});
   }
   function beginNewSession(taskKeys,source=lastInputSource){
+    if(parkedStudy)return retireParkedStudy(()=>beginNewSession([...taskKeys],source));
     const wanted=new Set(taskKeys),p=backend.readProjection(),entries=backend.queue().filter(entry=>wanted.has(entry.taskKey)&&!p.introductions[entry.taskKey]);
     if(!entries.length)return message('今学習できる新規カードはありません。');
     customRun={options:null,newOnly:true,remaining:entries,completed:0,total:entries.length,source};advanceCustomSession();
@@ -475,6 +536,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     if(state.pending){const [ja,en]=allowanceReason(state.result?.preparation?.reason||state.result?.reason,{current:state.result?.preparation?.current??backend.todayAllowance(),total:state.base+state.selected});renderInterfacePair(status,ja,en,interfaceLanguage);}node.addEventListener('cancel',event=>{if(customBusy){event.preventDefault();return;}if(!state.pending)costState=null;});root.append(node);localize();node.showModal();
   }
   function beginCustomSession(options,taskKeys=null,source=lastInputSource){
+    if(parkedStudy)return retireParkedStudy(()=>beginCustomSession(structuredClone(options),taskKeys&&[...taskKeys],source));
     if(customBusy||busy||pendingIntent)return;
     try{const selection=backend.customSession(options);const selected=new Map(selection.entries.map(entry=>[entry.taskKey,entry]));const entries=taskKeys===null?selection.entries:taskKeys.filter(key=>selected.has(key)).map(key=>selected.get(key));if(!entries.length)return message('この条件で学習できるカードはありません。');customRun={options:selection.options,remaining:[...entries],completed:0,total:entries.length,source};advanceCustomSession();}
     catch{message('セッションの条件を確認してください。');}
@@ -515,25 +577,37 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     if(customRun?.newOnly&&customRun.remaining.length&&waitForBoundaryCards(advanceCustomSession,allowRequest,customRun.remaining,availabilityView))return;
     completeSitting();
   }
-  function start(entry, practice = false,learnAhead=false,session=null,{source=lastInputSource,remaining=null,restore=null,preserveRun=false,readyTaskKeys=null}={}) {
+  function start(entry, practice = false,learnAhead=false,session=null,{source=lastInputSource,remaining=null,restore=null,preserveRun=false,readyTaskKeys=null,backlog=false}={}) {
     if (!entry) return;
+    if(parkedStudy)return retireParkedStudy(()=>start(entry,practice,learnAhead,session,{source,remaining,restore,preserveRun,readyTaskKeys,backlog}));
     try {
       boundaryPreparation=null;
       boundaryQueue=customRun?[entry,...customRun.remaining].map(item=>item.taskKey):readyTaskKeys??backend.queue().map(item=>item.taskKey);
-      const beginning=screen!=='study';if(beginning){boundaryNotice=null;sessionShown=0;const startedAt=now();activeSession={startedAt,eventIds:[],handle:practice?null:sessionEvidence.begin({startedAt}),practice,source};finishState=null;win.clearTimeout(finishGuardTimer);}
+      const beginning=screen!=='study';if(beginning){boundaryNotice=null;sessionShown=0;const startedAt=now();activeSession={startedAt,eventIds:[],handle:practice?null:sessionEvidence.begin({startedAt}),practice,source,backlog};finishState=null;win.clearTimeout(finishGuardTimer);}
       current?.timer.dispose();
       if(!session&&!preserveRun)customRun=null;
       clearCardSelection();
-      current={entry,attempt:backend.snapshotAttempt(entry.taskKey,{practice,learnAhead,...(session?{session}:{})}),revealed:!!restore,committed:false,timer:createRecallTimer(document),thinkMs:restore?.thinkMs??null,entrySource:source,revealSource:restore?'key':null,firstInSession:sessionShown++===0,firstEver:!backend.readProjection().reviews.some(row=>!row.undoneAt),remaining:Math.max(1,remaining??(customRun?customRun.remaining.length+1:practice?1:readyCount(backend.queue())))};
-      if(restore)current.timer.freeze();
+      current={entry,studyDay:studyDay(),attempt:backend.snapshotAttempt(entry.taskKey,{practice,learnAhead,...(session?{session}:{})}),revealed:!!restore,committed:false,timer:studyTimer(),thinkMs:restore?.thinkMs??null,entrySource:source,revealSource:restore?'key':null,firstInSession:sessionShown++===0,firstEver:!backend.readProjection().reviews.some(row=>!row.undoneAt),remaining:Math.max(1,remaining??(customRun?customRun.remaining.length+1:practice?1:readyCount(backend.queue())))};
+      if(restore){current.timer.freeze();current.revealedAt=win.performance.now();}
       screen='study';if(noticeOwner!=='native-sync-action'||!nativeSyncNeedsAttention())message('');render();focusStudyCard();win.scrollTo(0,0);
     } catch { message('翻訳・カードの確認が完了していないため、採点を開始できません。'); }
   }
+  function gradeScopeCopy(entry=current?.entry){
+    return entry?.contractId==='vocabulary.read.v1'&&!entry.manual?['採点は下線の語だけです。ほかの語は採点に影響しません。','You grade only the underlined word. Other words never change the grade.']:['採点はこのカードの学習対象だけです。ほかの語は採点に影響しません。',"You grade only this card’s target. Other words never change the grade."];
+  }
+  function keySheet(){
+    const rows=[['Space・Return','Space / Return','解答を表示','Show answer'],['Space・Return（解答後）','Space / Return (back)','正解','Good'],['1〜4','1–4','採点：もう一度・難しい・正解・簡単','Grade: Again · Hard · Good · Easy'],['U・⌘Z','U / ⌘Z','最後の採点を元に戻す','Undo last rating'],['E','E','英訳の表示を切り替える','Show or hide the English'],['Esc','Esc','学習を終える','End session'],['?','?','この一覧','This list']];
+    const node=h('dialog',{class:'key-sheet','data-key-sheet':''},h('h2',{},copy('span','キー操作','Keys')),h('dl',{},...rows.flatMap(([keyJa,keyEn,ja,en])=>[h('dt',{},copy('kbd',keyJa,keyEn)),h('dd',{},copy('span',ja,en))])),
+      h('div',{class:'dialog-actions'},button('閉じる',()=>{node.close();node.remove();focusStudyCard();},{class:'primary'})));
+    node.addEventListener('close',()=>{node.remove();focusStudyCard();});
+    root.append(node);node.showModal();localize();
+  }
   function focusStudyCard(){main.querySelector('[data-card]')?.focus({preventScroll:true});}
   function clearCardSelection(){const selection=win.getSelection(),card=main.querySelector('[data-card]');if(selection&&card&&(card.contains(selection.anchorNode)||card.contains(selection.focusNode)))selection.removeAllRanges();}
+  let lastCardActionAt=-Infinity;
   function revealCard(c=current,source=lastInputSource){
-    if(!c||c!==current||c.revealed||busy||pendingIntent||pop||document.querySelector('dialog[open]'))return;
-    clearCardSelection();c.thinkMs=c.timer.freeze();c.revealed=true;c.revealSource=source;render();focusStudyCard();
+    if(!c||c!==current||c.revealed||c.sessionInfoOpen||busy||pendingIntent||pop||document.querySelector('dialog[open]'))return;
+    clearCardSelection();c.thinkMs=c.timer.freeze();c.revealed=true;c.revealSource=source;c.revealedAt=lastCardActionAt=win.performance.now();render();focusStudyCard();
   }
   function passage(text, options = {}) { return renderVocabularyPassage(document,current.entry,text,{...options,onWord:openWord,dictionary}); }
   const fold = (label, ...contents) => h('details',{class:'fold'},h('summary',{},label),...contents);
@@ -543,18 +617,11 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       'data-entry-source':c.entrySource,'data-focus':c.sessionInfoOpen?'session-info':'simple'});
     const studyAction=(label,icon,action,attrs)=>button(icon,action,
       {class:'quiet study-icon','aria-label':label,title:label,...attrs});
-    const override=overrideLastReviewButton(p);
-    if(override)override.id='study-override';
     const actions=h('div',{class:'study-actions'},
       studyAction('学習を終える','×',()=>navigate('today'),{'data-study-exit':''}),
       copy('span',`残り${c.remaining}枚`,`${c.remaining} left`,{class:'study-remaining','data-study-remaining':''}),lastReview?studyAction('元に戻す','↶',undoLast,{'data-undo':''}):null);
-    actions.append(studyAction('セッション情報','⋯',event=>{
-        c.sessionInfoOpen=!c.sessionInfoOpen;
-        section.dataset.focus=c.sessionInfoOpen?'session-info':'simple';
-        event.currentTarget.setAttribute('aria-expanded',String(c.sessionInfoOpen));
-        focusStudyCard();
-      },{'data-session-info':'','aria-expanded':String(!!c.sessionInfoOpen),
-        'aria-controls':['study-context',customRun?'study-progress':null,'study-help'].filter(Boolean).join(' ')}));
+    actions.append(studyAction('メニュー','⋯',()=>{if(!current.sessionInfoOpen){const undo=main.querySelector('[data-menu-undo]');if(undo&&!availableUndo())undo.remove();}setStudyMenu(!c.sessionInfoOpen);},
+      {'data-session-info':'','aria-haspopup':'menu','aria-expanded':String(!!c.sessionInfoOpen),'aria-controls':'study-help'}));
     const context=h('span',{id:'study-context'},`${MODULES.find(m=>m[0]===e.module)?.[1]||'文法'} · ${c.attempt.learnAhead?'学習ステップ（少し早め） · ':''}${c.attempt.mode==='practice'?'追加練習（採点なし）':e.contractId==='grammar.cloze.v1'?'思い出す':e.contractId==='grammar.meaning.v1'?'意味':'読んで思い出す'}`);
     const heading=h('div',{class:'study-heading'},actions,context);if(boundaryNotice)heading.append(copy('p',boundaryNotice.ja,boundaryNotice.en,{class:'boundary-notice',role:'status','data-boundary-update':''}));section.append(heading);
     const card=h('article',{class:'study-card','data-card':'',tabindex:'0',
@@ -576,10 +643,36 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     else card.querySelector('h1,h2').id='study-card-term';
     for(const passage of card.querySelectorAll('.grammar-front .passage,.grammar-back .passage'))applyKinsoku(passage);
     if (c.revealed && (task?.card?.lapses??0)>=5) card.append(leechPanel(task));
+    if(c.revealed&&c.firstInSession&&!e.manual)card.append(copy('p',phonePresentation?'本文の語をタップすると、読みと意味を確認できます。':'本文の語をクリックすると、読みと意味を確認できます。',phonePresentation?'Tap any word in the passage to see its reading and meaning.':'Click any word in the passage to see its reading and meaning.',{class:'back-lookup-hint','data-back-lookup-hint':''}));
     if(!c.revealed&&c.firstInSession)card.append(h('p',{class:'first-card-hint','data-first-card-hint':''},phonePresentation?'タップで解答を表示':'Spaceで解答を表示'));
     section.append(card);
-    if(override)heading.append(h('div',{class:'hesitation-chip',role:'status','data-hesitation-chip':''},h('span',{},'迷いがあったため間隔を短くしました'),override));
-    const guide=h('div',{id:'study-help',class:'study-help'},h('p',{class:'grade-rule'},'もう一度：思い出せなかった・難しい：苦労して思い出せた（合格）・正解：思い出せた・簡単：すぐに思い出せた'),h('p',{class:'grade-rule'},'思い出せなかったときは、惜しくても[もう一度]を選んでください。'),!phonePresentation?h('p',{class:'grade-rule'},'Space・Enter：解答を表示／1〜4：採点／U：元に戻す／Esc：学習を終える'):null,c.revealed?button('内容の誤りを報告',()=>correctionDialog(),{class:'quiet','data-report-problem':''}):null);
+    // ⋯ is a real menu: actions first, then where to go, then how it looks; the grading guide folds into Help.
+    const item=(ja,en,fn,attrs={},key=null)=>h('button',{type:'button',class:'study-menu-item',role:'menuitem',onclick:fn,...attrs},copy('span',ja,en),key?h('kbd',{},key):null);
+    const chip=(label,checked,fn,attrs={})=>h('button',{type:'button',class:'study-menu-chip',role:'menuitemradio','aria-checked':String(checked),onclick:fn,...attrs},...label);
+    const group=(ja,en,...children)=>h('div',{class:'study-menu-group',role:'group','aria-label':ja},copy('p',ja,en,{class:'study-menu-label'}),h('div',{class:'study-menu-chips'},...children));
+    const themeChips=()=>[['auto','自動'],...Object.entries(themes.themes).map(([id,t])=>[id,t.name])].map(([id,name])=>{
+      const t=themes.themes[id==='auto'?(dark.matches?'dark':'washi'):id].tokens;
+      return chip([h('i',{style:`background:${t.ground};border-color:${t.accent}`}),name],theme===id,ev=>{applyTheme(id);for(const b of guide.querySelectorAll('[data-menu-theme]'))b.setAttribute('aria-checked',String(b.dataset.menuTheme===theme));ev.currentTarget.focus();},{'data-menu-theme':id});});
+    const setLanguage=async value=>{interfaceLanguage=value;for(const picker of root.querySelectorAll('[data-interface-language]'))picker.value=value;try{await preferences.setItem('nihongo.interface-language.v1',value);}catch{message('表示言語を保存できません。');}render();main.querySelector(`[data-menu-language="${value}"]`)?.focus({preventScroll:true});};
+    const guide=h('div',{id:'study-help',class:'study-help study-menu',role:'menu','aria-label':'メニュー'},
+      item('学習を終える','End session',endStudy,{'data-menu-end':''},'Esc'),
+      availableUndo()?item('最後の採点を元に戻す','Undo last rating',()=>{setStudyMenu(false);undoLast();},{'data-menu-undo':''},'U'):null,
+      item('このカードの誤りを報告','Report a problem with this card',()=>{setStudyMenu(false);correctionDialog();},{'data-report-problem':''}),
+      h('hr',{role:'separator'}),
+      group('移動','Go to',...[['today','今日','Today'],['words','単語','Words'],['record','記録','Record'],['settings','設定','Settings']].map(([id,ja,en])=>chip([copy('span',ja,en)],false,()=>navigate(id),{role:'menuitem','aria-checked':null,'data-menu-nav':id}))),
+      group('色','Theme',...themeChips()),
+      group('表示言語','Language',...[['ja','日本語'],['en','English'],['both','両方']].map(([value,label])=>chip([label],interfaceLanguage===value,()=>setLanguage(value),{'data-menu-language':value}))),
+      h('hr',{role:'separator'}),
+      h('details',{class:'study-menu-help','data-menu-help':'',open:!!c.menuHelpOpen,ontoggle:event=>{if(event.currentTarget.isConnected)c.menuHelpOpen=event.currentTarget.open;}},h('summary',{role:'menuitem'},copy('span','採点の目安とキー','Grading guide and keys')),copy('p',...gradeScopeCopy(e),{class:'grade-rule','data-grade-scope':''}),!phonePresentation?copy('p','?キーですべてのキー操作を表示します。','Press ? to see every key.',{class:'grade-rule'}):null,h('p',{class:'grade-rule'},'もう一度：思い出せなかった・難しい：苦労して思い出せた（合格）・正解：思い出せた・簡単：すぐに思い出せた'),h('p',{class:'grade-rule'},'思い出せなかったときは、惜しくても[もう一度]を選んでください。'),!phonePresentation?h('p',{class:'grade-rule'},'Space・Return：解答を表示・解答後は正解／1〜4：採点／U：元に戻す／E：英訳／?：キー操作／Esc：学習を終える'):null));
+    let dismissPointer=null,swallowClick=false;
+    section.addEventListener('pointerdown',ev=>{
+      dismissPointer=null;swallowClick=false;
+      if(c.sessionInfoOpen&&!guide.contains(ev.target)&&!ev.target.closest('[data-session-info]')){
+        dismissPointer=ev.pointerId;swallowClick=true;ev.preventDefault();ev.stopPropagation();setStudyMenu(false);
+      }
+    },true);
+    for(const type of ['pointermove','pointerup','pointercancel'])section.addEventListener(type,ev=>{if(ev.pointerId===dismissPointer){ev.preventDefault();ev.stopPropagation();}},true);
+    section.addEventListener('click',ev=>{if(swallowClick){swallowClick=false;ev.preventDefault();ev.stopPropagation();}},true);
     guide.prepend(context);section.append(guide);
     if (c.revealed&&!c.committed) appendStudyControls(section,c);
     if(boundaryPreparation)section.append(h('div',{class:'decision-panel operation-status',role:'status','data-decision-panel':'','data-boundary-preparation':''},h('p',{},boundaryPreparation.waiting?'回答を保存しました。新規カードを準備しています…':'回答は保存されています。新規カードを受け取れませんでした。もう一度準備できます。'),boundaryPreparation.waiting?null:button('準備を再試行',()=>requestBoundaryCards(boundaryPreparation),{class:'primary','data-retry-boundary':''})));
@@ -603,13 +696,13 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     card.addEventListener('pointercancel',()=>{pointer=null;clickReady=false;});
     card.addEventListener('click',ev=>{
       const activate=ev.detail===0||clickReady;clickReady=false;
-      if(activate&&ev.button===0&&!interactive(ev.target)&&!selected())revealCard(c);
+      if(activate&&ev.button===0&&!interactive(ev.target)&&!selected()&&(ev.detail===0||win.performance.now()-lastCardActionAt>=400))revealCard(c);
     });
     return section;
   }
   function appendStudyControls(section,c) {
     const practice=c.attempt.mode==='practice';
-    const finishPractice=()=>button('追加練習を終える',()=>navigate('today'),{class:'primary','data-finish-practice':''});
+    const finishPractice=()=>button('追加練習を終える',endStudy,{class:'primary','data-finish-practice':''});
     if(pendingIntent){
       section.append(h('div',{class:'decision-panel operation-status','data-decision-panel':'','data-operation-status':'',role:'status'},h('p',{},operationCopy()),root.querySelector('dialog[open]')?null:button(operationRetryLabel(),retryOperation,{class:'primary','data-retry':'',disabled:busy})));
       return;
@@ -629,7 +722,9 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       return;
     }
     const panel=h('div',{class:'decision-panel','data-decision-panel':''}),answer=[c.entry.reading||c.entry.term,c.entry.meaning].filter(Boolean).join(' · ');
-    panel.append(h('p',{class:'answer-line','data-vocabulary-source':''},answer));
+    const answerLine=h('p',{class:'answer-line'},h('span',{'data-vocabulary-source':''},answer));
+    if(Number.isFinite(c.thinkMs)&&c.thinkMs>=0){const seconds=Math.round(c.thinkMs/1000);answerLine.append(copy('span',`${seconds}秒`,`${seconds} s`,{class:'secondary answer-time','data-answer-time':''}));}
+    panel.append(answerLine);
     if(c.firstInSession&&c.firstEver)panel.append(h('p',{class:'first-grade-guide','data-first-grade-guide':''},'もう一度：思い出せなかった・難しい：苦労して思い出せた（合格）・正解：思い出せた・簡単：すぐに思い出せた'),h('p',{class:'first-grade-guide'},'思い出せなかったときは、惜しくても[もう一度]を選んでください。'));
     const bar=h('div',{class:'grade-bar','aria-label':'思い出せた度合い'});
     for(const [rating,jp,en,seal] of GRADES) {
@@ -685,7 +780,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function advanceStudy(previousKey,source=lastInputSource,allowRequest=true){
     consumeStudyBoundary();
     if(customRun){customRun.source=source;advanceCustomSession(allowRequest);return;}
-    let remaining=1,readyTaskKeys=null;const next=nextRapidFireStudy(backend,module,now(),previousKey,entries=>{remaining=readyCount(entries);readyTaskKeys=Object.freeze(entries.map(entry=>entry.taskKey));});
+    let remaining=1,readyTaskKeys=null;const next=nextRapidFireStudy(backend,module,now(),previousKey,entries=>{remaining=readyCount(entries);readyTaskKeys=Object.freeze(entries.map(entry=>entry.taskKey));},activeSession?.backlog===true);
     if(next?.entry)start(next.entry,false,next.early,null,{source,remaining,readyTaskKeys});
     else if(!waitForBoundaryCards(allow=>advanceStudy(previousKey,source,allow),allowRequest))completeSitting();
   }
@@ -750,7 +845,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   }
   function grade(rating,source) {
     const c=current;
-    if(busy||pendingIntent||pop||document.querySelector('dialog[open]')||!c?.revealed||c.committed||c.ratingsUnavailable||c.stale||c.attempt.mode!=='scored'&&!customRun)return;
+    if(busy||pendingIntent||pop||document.querySelector('dialog[open]')||c?.sessionInfoOpen||!c?.revealed||c.committed||c.ratingsUnavailable||c.stale||c.attempt.mode!=='scored'&&!customRun)return;
     let intent;
     try{intent=gradeIntent(c,rating);}
     catch{
@@ -758,7 +853,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       else{c.stale={submitted:false,persisted:false,reason:'card-updated'};render();}
       return;
     }
-    c.gradeSource=source;main.querySelector('[data-card]')?.setAttribute('data-grade-source',source);submitGrade(c,intent);
+    c.gradeSource=source;lastCardActionAt=win.performance.now();main.querySelector('[data-card]')?.setAttribute('data-grade-source',source);submitGrade(c,intent);
   }
   async function requestCard(result,capture,source){
     if(!platform.requestCard){message('言葉を保存しました。カード作成の通信は準備中です。');return;}
@@ -782,23 +877,39 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const e=current.entry,resolved=dictionary?.resolve(info),target=info.isTarget&&e.contractId==='vocabulary.read.v1'?e:resolved?resolved.deck||null:resolveWord(info.surface),p=backend.readProjection();
     const meaning=target?.defJa||(resolved?.kind==='dictionary'?resolved.glosses.join('; '):resolved?.kind==='kanji'?resolved.meanings.join('; '):null);
     const reading=target?.reading||resolved?.reading||(resolved?.kind==='kanji'?resolved.readings.join('・'):null);
+    const reviewedEntry=reviewedDictionaryEntry(e,info,dictionary);
     const hasEntry=!!target||resolved&&resolved.kind!=='pending';
     const capture={surface:info.surface,kind:'lookup',location:info.location,contextTaskKey:e.taskKey,contentRevision:current.attempt.contentRevision,revealed:true,
       span:info.span,targetTaskKey:target?.taskKey??null,depth:info.depth??1,source:info.source??{context:info.location==='definition'?e.defJa:e.ja},...(target?{lemma:target.term,reading:target.reading,resolution:{status:'catalog-exact',guid:target.noteGuid}}:resolved?.lemma?{lemma:resolved.lemma,...(resolved.reading?{reading:resolved.reading}:{}),resolution:{status:hasEntry?'dictionary':'unresolved',source:resolved.source||null}}:{})};
-    const lookupEntry=target&&resolved?.kind!=='chunk'?target:{term:resolved?.kind==='chunk'?resolved.surface:resolved?.lemma||info.surface,reading,pos:Array.isArray(resolved?.pos)?resolved.pos.join(' · '):null,meaning:resolved?.glosses?.join('; ')||meaning,sourceIsInterfaceCopy:resolved?.kind==='chunk',source:resolved?.kind==='chunk'?'形態素解析による語のまとまり。各部分の語義・文法は配布デッキとJMdictに基づきます。':resolved?.source?`${resolved.source} · EDRDG · ${resolved.sourceId||''}`:null};
+    const familiarityCapture=reviewedActionCapture(e,info,dictionary,catalog,capture)??capture;
+    const lookupTarget=reviewedEntry?catalog.find(entry=>entry.taskKey===familiarityCapture.targetTaskKey)??null:target;
+    const lookupEntry=reviewedEntry?{term:reviewedEntry.lemma,reading:reviewedEntry.reading,meaning:reviewedEntry.glosses.join('; '),source:`${reviewedEntry.source} · EDRDG · ${reviewedEntry.sourceId||''}`} :target&&resolved?.kind!=='chunk'?target:{term:resolved?.kind==='chunk'?resolved.surface:resolved?.lemma||info.surface,reading,pos:Array.isArray(resolved?.pos)?resolved.pos.join(' · '):null,meaning:resolved?.glosses?.join('; ')||meaning,sourceIsInterfaceCopy:resolved?.kind==='chunk',source:resolved?.kind==='chunk'?'形態素解析による語のまとまり。各部分の語義・文法は配布デッキとJMdictに基づきます。':resolved?.source?`${resolved.source} · EDRDG · ${resolved.sourceId||''}`:null};
+    const lexicalSource=reviewedEntry?'dictionary':lookupEntry===target?'card':['dictionary','kanji'].includes(resolved?.kind)?'dictionary':null;
+    const readingPresentation=lookupReadingPresentation(e,info,lookupEntry,{lexicalSource});
+    const renderLookupEntry=(entry,options,lexicalSource=null)=>{
+      const presentation=lookupReadingPresentation(e,info,entry,{lexicalSource});
+      if(!presentation.passageReadings.length)return renderVocabularyEntry(document,entry,options);
+      return h('div',{},renderVocabularyEntry(document,presentation.displayEntry,options),
+        presentation.headwordReading?h('p',{class:'reading','data-lexical-reading':''},
+          copy('span',lexicalSource==='card'?'カードの見出しの読み':'辞書の見出しの読み',lexicalSource==='card'?'Card headword reading':'Dictionary headword reading'),
+          '：',h('span',{'data-vocabulary-source':''},presentation.headwordReading)):null);
+    };
     const card=current,attempt=current.attempt,gate={card,applied:false,action:null,rating:null};let actionAccepted=false;
     const afterLookup=action=>{if(actionAccepted)return;actionAccepted=true;closePopover();if(!gate.applied){gate.action=action;return;}if(!pendingIntent&&!busy)action();};
     const openRelated=term=>afterLookup(()=>{query=term;wordFilter='all';wordPage=0;navigate('words');});
     const node=h('aside',{class:'word-popover',role:'dialog','aria-label':`${info.surface}の言葉`},
       button('閉じる',closePopover,{class:'popover-close'}),
-      hasEntry?renderVocabularyEntry(document,lookupEntry,{dictionary,hideUnavailable:!target,onWord:nested=>openWord({...nested,depth:(info.depth||1)+1},null),relatedWords:catalog}):h('div',{},h('h2',{'data-vocabulary-entry':''},info.surface),h('p',{},'この語は辞書に見つかりませんでした。記録して確認に回します。')),
+      ...readingPresentation.passageReadings.map(proof=>h('p',{'data-reviewed-passage-reading':''},
+        copy('span','本文の読み','Reading in this passage'),'：',h('span',{'data-vocabulary-source':''},`${proof.surface}（${proof.reading}）`))),
+      reviewedEntry||hasEntry?renderLookupEntry(lookupEntry,{dictionary,hideUnavailable:!!reviewedEntry||!target,onWord:nested=>openWord({...nested,depth:(info.depth||1)+1},null),relatedWords:catalog},lexicalSource):h('div',{},h('h2',{'data-vocabulary-entry':''},info.surface),h('p',{},'この語は辞書に見つかりませんでした。記録して確認に回します。')),
       info.surface!==lookupEntry.term?h('p',{class:'surface-form'},h('span',{'data-interface-copy':''},'本文のタップ'),'：',h('span',{'data-vocabulary-source':''},info.surface)):null,
-      target?button('この言葉のカードへ',()=>openRelated(target.term),{class:'text-link','data-dictionary-card':''}):null,
-      resolved?.kind==='chunk'?h('div',{class:'lookup-parts','data-lookup-chunk':''},h('h3',{},'組み立て'),...resolved.parts.map(part=>fold(h('span',{'data-vocabulary-source':''},`${part.surface} → ${part.lemma||part.surface}`),renderVocabularyEntry(document,{term:part.lemma||part.surface,reading:part.reading,meaning:part.glosses?.join('; '),source:part.source||null},{dictionary,hideUnavailable:true}),part.deck?button('この言葉のカードへ',()=>openRelated(part.deck.term),{class:'text-link'}):null)),resolved.grammar?h('div',{'data-chunk-grammar':''},h('h3',{'data-vocabulary-source':''},resolved.grammar.term),h('p',{lang:'en'},resolved.grammar.meaning),button('文法カードへ',()=>openRelated(resolved.grammar.term),{class:'text-link','data-grammar-card':''})):null):null,
+      lookupTarget?button('この言葉のカードへ',()=>openRelated(lookupTarget.term),{class:'text-link','data-dictionary-card':''}):null,
+      !reviewedEntry&&resolved?.kind==='chunk'?h('div',{class:'lookup-parts','data-lookup-chunk':''},h('h3',{},'組み立て'),...resolved.parts.map(part=>fold(h('span',{'data-vocabulary-source':''},`${part.surface} → ${part.lemma||part.surface}`),renderLookupEntry({term:part.lemma||part.surface,reading:part.reading,meaning:part.glosses?.join('; '),source:part.source||null},{dictionary,hideUnavailable:true},part.source==='deck'?'card':['JMdict','KANJIDIC2'].includes(part.source)?'dictionary':null),part.deck?button('この言葉のカードへ',()=>openRelated(part.deck.term),{class:'text-link'}):null)),resolved.grammar?h('div',{'data-chunk-grammar':''},h('h3',{'data-vocabulary-source':''},resolved.grammar.term),h('p',{lang:'en'},resolved.grammar.meaning),button('文法カードへ',()=>openRelated(resolved.grammar.term),{class:'text-link','data-grammar-card':''})):null):null,
+      copy('p','「知らない」は、この語のカード作成を依頼します。「うろ覚え」も、デッキにない語なら作成を依頼します。「知っている」は記録だけです。'+gradeScopeCopy(e)[0],'Unknown requests a card for this word. Not sure also requests one if the word is not already in your deck. Know it only records familiarity. '+gradeScopeCopy(e)[1],{class:'secondary capture-help','data-capture-help':''}),
       h('div',{class:'capture-actions'},...[['unknown','知らない'],['unsure','うろ覚え'],['known','知っている']].map(([kind,label])=>button(label,()=>afterLookup(()=>{
-        if(pendingIntent||busy)return;const intent=backend.captureCommand(attempt,{...capture,kind}),payload=intent.type==='capture-boost'?intent.data.capture:intent.data;
-        run(intent,async result=>{if(kind==='unknown'||kind==='unsure'&&!target)await requestCard(result,payload,'tap');else message(kind==='unsure'?'迷いを記録しました。':'知っているという記録を残しました。');if(!disposed&&screen!=='finish')render();});
-      })))),h('p',{class:'secondary','data-dictionary-source':''},resolved?.kind==='chunk'?'語のまとまり · 配布デッキ / JMdict':target?'配布デッキ · 本棚にあります。':resolved?.kind==='dictionary'?'JMdict · EDRDG · CC BY-SA 4.0':resolved?.kind==='kanji'?'KANJIDIC2 · EDRDG · CC BY-SA 4.0':'辞書未収録 · 読み・語義の確認待ち'));
+        if(pendingIntent||busy)return;const intent=backend.captureCommand(attempt,{...familiarityCapture,kind}),payload=intent.type==='capture-boost'?intent.data.capture:intent.data;
+        run(intent,async result=>{if(kind==='unknown'||kind==='unsure'&&!familiarityCapture.targetTaskKey)await requestCard(result,payload,'tap');else message(kind==='unsure'?'迷いを記録しました。':'知っているという記録を残しました。');if(!disposed&&screen!=='finish')render();});
+      })))),h('p',{class:'secondary','data-dictionary-source':''},reviewedEntry?`${reviewedEntry.source} · EDRDG · CC BY-SA 4.0`:resolved?.kind==='chunk'?'語のまとまり · 配布デッキ / JMdict':target?'配布デッキ · 本棚にあります。':resolved?.kind==='dictionary'?'JMdict · EDRDG · CC BY-SA 4.0':resolved?.kind==='kanji'?'KANJIDIC2 · EDRDG · CC BY-SA 4.0':'辞書未収録 · 読み・語義の確認待ち'));
     pop={node,anchor};root.append(node);localize();node.querySelector('button').focus({preventScroll:true});
     const intent=backend.captureCommand(attempt,capture);
     await run(intent,async()=>{
@@ -825,7 +936,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   }
   function hintDialog(task){const input=h('textarea',{'aria-label':'ヒント',required:true});dialog('このカードのヒント',input,close=>{if(input.value.trim())repair(task,{action:'hint',hint:input.value.trim()},()=>{close();message('ヒントを記録しました。');render();});});}
   function correctionDialog(){const input=h('textarea',{'aria-label':'気になったところ',required:true});dialog('気になったところ',input,close=>{
-    if(!input.value.trim())return;const e=current.entry,form=e.form||e.term,start=Math.max(0,e.ja.indexOf(form));const capture={surface:form,kind:'correction',location:'passage',contextTaskKey:e.taskKey,contentRevision:current.attempt.contentRevision,revealed:true,
+    if(!input.value.trim())return;const e=current.entry,form=e.form||e.term,start=Math.max(0,e.ja.indexOf(form));const capture={surface:form,kind:'correction',location:current.revealed?'passage':'typed',contextTaskKey:e.taskKey,contentRevision:current.attempt.contentRevision,revealed:!!current.revealed,
       span:{start,end:start+form.length,unit:'utf16-code-unit'},targetTaskKey:null,source:{venue:'standalone-qa',note:input.value.trim(),context:e.ja}};
     run(backend.captureCommand(current.attempt,capture),()=>{close();message('訂正の希望を記録しました。内容監査への配信は通信待ちです。');render();});});}
   function expireLastReview(){
@@ -833,8 +944,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const p=backend.readProjection(),review=p.reviews.find(row=>row.id===lastReview.eventId),at=now(),today=backend.todayAllowance?.()??dayBounds(at,p.settings.learnerTimezone);
     if(!review||!Number.isSafeInteger(review.at)||review.at<today.startsAt||review.at>=today.endsAt)lastReview=null;
   }
-  function undoLast(){expireLastReview();const previous=lastReview;if(!previous)return;const p=backend.readProjection(),task=p.tasks[previous.entry.taskKey],effect=task&&p.effects[task.head];if(!effect||effect.root!==previous.eventId)return message('このカードは現在の状態から戻せません。');run(backend.command('undo',{taskKey:task.taskKey,parent:task.head,target:effect.root}),()=>{lastReview=null;customRun=previous.run?{...previous.run,remaining:[...previous.run.remaining]}:null;const review=p.reviews.find(row=>row.id===previous.eventId),labels=GRADES.find(([value])=>value===review?.effectiveRating),pressed=GRADES.find(([value])=>value===review?.rawRating),capped=review?.rawRating!==review?.effectiveRating;start(previous.entry,false,previous.learnAhead,previous.session,{source:'key',restore:{thinkMs:previous.thinkMs},preserveRun:!!previous.run});showToast(`[${capped?pressed?.[1]+' → ':''}${labels?.[1]||'評価'}]を元に戻しました`,`Undid [${capped?pressed?.[2]+' → ':''}${labels?.[2]||'rating'}]`);});}
-  function overrideLastReviewButton(p){if(!lastReview)return null;const review=p.reviews.find(r=>r.id===lastReview.eventId),task=p.tasks[lastReview.entry.taskKey];if(!review||review.rawRating===review.effectiveRating||!task)return null;return button('選んだ評価に戻す',()=>{expireLastReview();if(lastReview?.eventId!==review.id)return;run(backend.command('hesitation-override',{taskKey:task.taskKey,parent:task.head,target:review.id}),()=>{message('選んだ評価に戻しました。');render();});},{class:'quiet','data-override':''});}
+  function undoLast(){if(parkedStudy)return message('中断中の学習に戻ってから、別のカードを開いてください。');expireLastReview();const previous=lastReview;if(!previous)return;const p=backend.readProjection(),task=p.tasks[previous.entry.taskKey],effect=task&&p.effects[task.head];if(!effect||effect.root!==previous.eventId)return message('このカードは現在の状態から戻せません。');run(backend.command('undo',{taskKey:task.taskKey,parent:task.head,target:effect.root}),()=>{lastReview=null;customRun=previous.run?{...previous.run,remaining:[...previous.run.remaining]}:null;const review=p.reviews.find(row=>row.id===previous.eventId),labels=GRADES.find(([value])=>value===review?.effectiveRating),pressed=GRADES.find(([value])=>value===review?.rawRating),capped=review?.rawRating!==review?.effectiveRating;start(previous.entry,false,previous.learnAhead,previous.session,{source:'key',restore:{thinkMs:previous.thinkMs},preserveRun:!!previous.run});showToast(`[${capped?pressed?.[1]+' → ':''}${labels?.[1]||'評価'}]を元に戻しました`,`Undid [${capped?pressed?.[2]+' → ':''}${labels?.[2]||'rating'}]`);});}
   function wordsScreen(){
     reconcileUnknownFactoryRows();
     const section=h('section',{},h('h1',{},'単語とカード'),h('p',{class:'secondary'},'文法の意味と想起は、別々のカードとして記録します。'));
@@ -981,7 +1091,9 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   }
   function onKey(event){
     lastInputSource='key';
-    if(event.defaultPrevented||event.repeat||event.isComposing||event.keyCode===229)return;
+    if(event.defaultPrevented)return;
+    if(current?.sessionInfoOpen&&!document.querySelector('dialog[open]')){menuKey(event);return;}
+    if(event.repeat||event.isComposing||event.keyCode===229)return;
     if(busy){const gate=pendingOperation?.kind==='lookup'?pendingOperation.lookupGate:null;const rating=/^[1-4]$/.test(event.key)?Number(event.key):null;if(gate&&rating&&current===gate.card&&!gate.action&&!event.metaKey&&!event.ctrlKey&&!event.altKey&&!event.target.closest?.('input,textarea,select,[contenteditable]')){event.preventDefault();if(gate.rating===null)gate.rating=rating;closePopover();}return;}
     const editing=event.target.closest?.('input,select,textarea,[contenteditable]');
     if(screen==='finish'&&!document.querySelector('dialog[open]')){if(event.metaKey||event.ctrlKey||event.altKey)return;if(event.key===' '){event.preventDefault();return;}if(finishBlocked()){event.preventDefault();return;}if(editing||event.target.closest?.('button,a,summary'))return;const action=event.key==='Enter'||event.key==='Escape'?finishDone:({p:()=>main.querySelector('[data-practice-today]')?.click(),n:()=>main.querySelector('[data-add-new]')?.click(),a:()=>main.querySelector('[data-review-tomorrow]')?.click(),c:openCustomSession})[event.key.toLowerCase()];if(action){event.preventDefault();action();}return;}
@@ -991,17 +1103,19 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     if(pop&&rating&&!editing&&current?.revealed){event.preventDefault();closePopover();grade(Number(rating),'key');return;}
     if(pop||document.querySelector('dialog[open]')||event.target.closest?.('button,input,select,textarea,summary,a,audio,video,[contenteditable]'))return;
     if(event.key.toLowerCase()==='u'&&lastReview){event.preventDefault();undoLast();return;}
+    if(screen==='study'&&event.key==='?'){event.preventDefault();keySheet();return;}
+    if(screen==='study'&&current?.revealed&&event.key.toLowerCase()==='e'){const fold=main.querySelector('[data-card] details:has([data-full-translation]),[data-card] details.grammar-translation');if(fold){event.preventDefault();fold.open=!fold.open;}return;}
     if(screen==='today'&&event.key==='Enter'&&!event.shiftKey){const primary=main.querySelector('[data-start]:not(:disabled)');if(primary){event.preventDefault();primary.click();}return;}
     if(screen!=='study'||!current)return;
     if(!current.revealed&&!event.shiftKey&&[' ','Enter'].includes(event.key)&&win.getSelection()?.isCollapsed!==false){event.preventDefault();revealCard(current,'key');}
-    else if(current.revealed&&[' ','Enter'].includes(event.key)){event.preventDefault();}
+    else if(current.revealed&&[' ','Enter'].includes(event.key)){event.preventDefault();if(!current.committed&&!event.shiftKey&&win.performance.now()-(current.revealedAt??Infinity)>=300)grade(3,'key');}
     else if(current.revealed&&!current.committed&&rating){event.preventDefault();grade(Number(rating),'key');}}
   document.addEventListener('keydown',onKey);
   const outsidePopover=event=>{lastInputSource='pointer';if(pop&&!pop.node.contains(event.target)&&!pop.anchor?.contains(event.target))closePopover();};document.addEventListener('pointerdown',outsidePopover,true);
-  const escape=event=>{if(event.repeat||event.isComposing||event.keyCode===229)return;if(event.key==='Escape'){if(pop){event.preventDefault();closePopover();}else{const modal=root.querySelector('dialog[open]');if(modal){event.preventDefault();if(customBusy&&modal.hasAttribute('data-new-card-sheet'))return;modal.dispatchEvent(new Event('cancel',{cancelable:true}));modal.close();modal.remove();if(pendingIntent)render();}else if(screen==='finish'){event.preventDefault();finishDone();}else if(screen==='study'){event.preventDefault();navigate('today');}}}};document.addEventListener('keydown',escape);
+  const escape=event=>{if(event.defaultPrevented||event.repeat||event.isComposing||event.keyCode===229)return;if(event.key==='Escape'){if(pop){event.preventDefault();closePopover();}else{const modal=root.querySelector('dialog[open]');if(modal){event.preventDefault();if(customBusy&&modal.hasAttribute('data-new-card-sheet'))return;modal.dispatchEvent(new Event('cancel',{cancelable:true}));modal.close();modal.remove();if(pendingIntent)render();}else if(screen==='finish'){event.preventDefault();finishDone();}else if(screen==='study'){event.preventDefault();if(current?.sessionInfoOpen)setStudyMenu(false);else endStudy();}}}};document.addEventListener('keydown',escape);
   const unsubscribe=backend.subscribe(()=>{observeSharedActivity();updateStatus({presentation:true}).catch(()=>{});if(!['study','finish'].includes(screen)&&!busy)render();scheduleOutboxSync();});
   if(backend.refreshLocalDayBudget)budgetWatcher=watchLocalDayBudget({refresh:()=>backend.refreshLocalDayBudget(),getProjection:()=>backend.readProjection(),now,canRefresh:()=>!busy&&!typedBusy&&!customBusy&&!pendingIntent&&!(screen==='study'&&current?.revealed),onRefresh:()=>{if(!['study','finish'].includes(screen))render();},schedule:(fn,delay)=>win.setTimeout(fn,delay),cancel:id=>win.clearTimeout(id)});
-  const budgetWake=()=>{if(document.visibilityState!=='hidden')budgetWatcher?.check();};
+  const budgetWake=()=>{if(document.visibilityState!=='hidden'){if(parkedStudy)render();budgetWatcher?.check();}};
   const availabilityWake=()=>{if(online())startedOffline=false;observeSharedActivity();if(screen==='today')render();else updateStatus();};
   const unsubscribeSyncState=platform.subscribeSyncState?.(()=>updateStatus({presentation:true}).catch(()=>{}));
   win.addEventListener('online',availabilityWake);win.addEventListener('offline',availabilityWake);
@@ -1060,5 +1174,5 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   observeSharedActivity();render();
   reconcileUnknownFactoryRows();
   if(platform.storageKind==='native-worker-prod'&&platform.nativeSync)updateStatus().catch(()=>{});
-  return Object.freeze({showTask:(...args)=>{sessionShown=0;return start(...args);},refreshStatus:updateStatus,read:()=>({screen,module,current,busy:busy||typedBusy||customBusy,pendingIntent,theme,themePreferenceSet,interfaceLanguage}),dispose(){disposed=true;nativeStatusGeneration++;clearSyncRetry();win.clearTimeout(outboxSyncTimer);win.clearTimeout(saveBacklogTimer);win.clearTimeout(toastTimer);win.clearTimeout(finishGuardTimer);panelObserver?.disconnect();budgetWatcher?.dispose();win.removeEventListener('online',availabilityWake);win.removeEventListener('online',reconnectSync);win.removeEventListener('offline',availabilityWake);win.removeEventListener('focus',budgetWake);document.removeEventListener('visibilitychange',budgetWake);win.removeEventListener('focus',autoSync);document.removeEventListener('visibilitychange',autoSync);platform.nativeSync?.dispose?.();factoryStatuses.dispose();current?.timer.dispose();closePopover();unsubscribe();unsubscribeSyncState?.();dark.removeEventListener('change',darkChanged);document.removeEventListener('keydown',onKey);document.removeEventListener('keydown',escape);document.removeEventListener('pointerdown',outsidePopover,true);root.replaceChildren();}});
+  return Object.freeze({showTask:(...args)=>{sessionShown=0;return start(...args);},refreshStatus:updateStatus,read:()=>({screen,module,current,busy:busy||typedBusy||customBusy,pendingIntent,theme,themePreferenceSet,interfaceLanguage}),dispose(){disposed=true;nativeStatusGeneration++;clearSyncRetry();win.clearTimeout(outboxSyncTimer);win.clearTimeout(saveBacklogTimer);win.clearTimeout(toastTimer);win.clearTimeout(finishGuardTimer);panelObserver?.disconnect();budgetWatcher?.dispose();win.removeEventListener('online',availabilityWake);win.removeEventListener('online',reconnectSync);win.removeEventListener('offline',availabilityWake);win.removeEventListener('focus',budgetWake);document.removeEventListener('visibilitychange',budgetWake);win.removeEventListener('focus',autoSync);document.removeEventListener('visibilitychange',autoSync);platform.nativeSync?.dispose?.();factoryStatuses.dispose();rubyLayout.dispose();current?.timer.dispose();parkedStudy?.current.timer.dispose();closePopover();unsubscribe();unsubscribeSyncState?.();dark.removeEventListener('change',darkChanged);document.removeEventListener('keydown',onKey);document.removeEventListener('keydown',escape);document.removeEventListener('pointerdown',outsidePopover,true);root.replaceChildren();}});
 }

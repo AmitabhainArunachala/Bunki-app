@@ -198,7 +198,9 @@ function appendTokens(document, parent, tokens, origin, onCapture, targetSpan) {
         const ruby = document.createElement('ruby');
         ruby.dataset.rubyAlignment = split.status;
         if (split.reason) ruby.dataset.rubyFallback = split.reason;
-        ruby.append(base, element(document, 'rt', '', part.reading));
+        const reading = element(document, 'rt', '');
+        reading.append(element(document, 'span', 'ruby-reading', part.reading));
+        ruby.append(base, reading);
         node.append(ruby);
       } else node.append(base);
     }
