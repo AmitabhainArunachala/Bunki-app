@@ -50,16 +50,18 @@ export async function checkSharedBacklog({browser,origin,receipt}) {
       assert.match(await frame.locator('[data-study-all]').innerText(),/Study all \(60\)/);
       assert.equal(await frame.evaluate(()=>frameElement.bunkiStudyPort.adapter.platform.presentation),presentation);
       const legacy=await page.evaluate(()=>localStorage.getItem('bunki-cloze:n2'));
+      // The store belongs to the parent host. Clone its JSON into the frame
+      // before invoking that frame's strict plain-object serializer.
       await frame.evaluate(async()=>{
         const {canonicalStringify}=await import('/vendor/shared-study-engine/client/engine.mjs');
-        window.__beforeBacklogSelection=canonicalStringify(await bunkiSharedStudy.store.readState());
+        window.__beforeBacklogSelection=canonicalStringify(structuredClone(await bunkiSharedStudy.store.readState()));
       });
       await frame.locator(start).click();await frame.waitForSelector('[data-study=front]');
       assert.equal(await frame.evaluate(()=>bunkiSharedStudy.app.read().current.entry.taskKey),expected[0],
         `${presentation}: backlog must lead with weakest old-position60 review`);
       assert.equal(await frame.evaluate(async()=>{
         const {canonicalStringify}=await import('/vendor/shared-study-engine/client/engine.mjs');
-        return canonicalStringify(await bunkiSharedStudy.store.readState())===window.__beforeBacklogSelection;
+        return canonicalStringify(structuredClone(await bunkiSharedStudy.store.readState()))===window.__beforeBacklogSelection;
       }),true,'backlog selection must not write an event or mutate a schedule');
       await page.keyboard.press('Enter');await frame.waitForSelector('[data-study=back]');
       await page.keyboard.press('4');
