@@ -1,12 +1,12 @@
 /** Canonical runtime-neutral v4 study API. Content, storage and transport belong
  * to the consuming shell. Importing this module opens no storage or network. */
-import {createReplayEngine, canonicalStringify, payloadHash, validateEvent} from './replay.mjs';
+import {canonicalStringify, payloadHash, validateEvent} from './replay.mjs';
 import {createFreshStore, openStore} from './store.mjs';
 import {createReplicaBackend} from './player/replica-backend.mjs';
 import {EVENT_VERSION, POLICY_ID, SCHEDULED_CONTRACTS} from './schema/event.mjs';
 import {SYNC_COMPATIBILITY} from './sync-compatibility.mjs';
 import {refreshCorpusRegistry} from './app/corpus-inventory.mjs';
-import {createCanonicalMaterializer} from './materializer.mjs';
+import {createCanonicalRuntime} from './materializer.mjs';
 
 export {createReplayEngine, replay, previewReview, hesitationEvidence, canonicalStringify,
   payloadHash, validateEvent, dayBounds, newCardLimit, studyDayAllowance, baselineHash} from './replay.mjs';
@@ -16,7 +16,7 @@ export {customSessionOptions, selectCustomSession, sessionReviewEvidence} from '
 export {EVENT_VERSION, POLICY_ID, SCHEDULED_CONTRACTS, DEVICE_TYPES, SERVER_TYPES, taskKey, isTaskKey} from './schema/event.mjs';
 export {SYNC_COMPATIBILITY} from './sync-compatibility.mjs';
 export {createCorpusMaterializer,refreshCorpusRegistry,validateCorpusInventory} from './app/corpus-inventory.mjs';
-export {createCanonicalMaterializer} from './materializer.mjs';
+export {createCanonicalMaterializer,createCanonicalRuntime} from './materializer.mjs';
 export {createIndexedDBAdapter} from './storage/indexeddb.mjs';
 export {createMemoryAdapter} from './storage/memory.mjs';
 export {createSyncTransport} from './sync.mjs';
@@ -52,7 +52,7 @@ export function createStudyEngine({content, learner, epoch = 0, timezone = 'Asia
   if (typeof learner !== 'string' || !learner || !Number.isSafeInteger(epoch) || epoch < 0) throw Error('engine-scope-required');
   const frozen = freeze(structuredClone(content));
   const config = {registry: frozen.registry, pin: frozen.pin, learner, epoch, timezone};
-  const engine = createReplayEngine(config);
+  const {engine,materialize} = createCanonicalRuntime(config,{requireScope:true});
   const initial = engine.replay([]); // Reject an unsupported pin/registry before opening storage.
   const seen = new Set();
   for (const entry of frozen.catalog) {
@@ -62,7 +62,6 @@ export function createStudyEngine({content, learner, epoch = 0, timezone = 'Asia
     seen.add(entry.taskKey);
   }
   const codec = Object.freeze({canonicalStringify, payloadHash, validateEvent});
-  const materialize=createCanonicalMaterializer(config,{requireScope:true});
   const options = storage => ({...storage, learner, epoch, codec, materialize});
   return Object.freeze({
     metadata: ENGINE_METADATA, ...engine, codec, materialize,

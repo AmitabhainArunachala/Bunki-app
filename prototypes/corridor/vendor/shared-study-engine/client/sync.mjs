@@ -5,18 +5,19 @@ const copy = value => structuredClone(value);
 const scopeKey = scope => JSON.stringify([scope?.environment, scope?.learner, scope?.installation]);
 const integer = n => Number.isSafeInteger(n) && n >= 0;
 const CODES = new Set(['invalid-config', 'authentication-required', 'scope-mismatch', 'invalid-response', 'network-failed',
-  'server-failed', 'update-required', 'conflict', 'retry-later', 'store-failed', 'request-limit']);
+  'server-failed', 'update-required', 'conflict', 'retry-later', 'store-failed', 'request-limit', 'host-paused']);
 class SyncError extends Error {
   constructor(code, retryAt = null) { super(CODES.has(code) ? code : 'invalid-response'); this.code = this.message; this.retryAt = retryAt; }
 }
 const check = (ok, code) => { if (!ok) throw new SyncError(code); };
 export function createSyncTransport({ store, origin, getCredential, compatibility=SYNC_COMPATIBILITY, fetch: request = globalThis.fetch,
   now = Date.now, wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds)),
+  canContinue = () => true, yieldTurn = () => new Promise(resolve => setTimeout(resolve, 50)),
   maxRetries = 2, maxPasses = 8, maxDelayMs = 30000, maxResponseBytes = 1024 * 1024,
   requestTimeoutMs = 15000, maxRequestBytes = 256 * 1024 } = {}) {
   try { const parsed = new URL(origin); check(parsed.protocol === 'https:' && parsed.origin === origin && !parsed.username && !parsed.password, 'invalid-config'); }
   catch { throw new SyncError('invalid-config'); }
-  check(store && typeof getCredential === 'function' && typeof request === 'function' && integer(maxRetries) && maxRetries <= 5 &&
+  check(store && typeof getCredential === 'function' && typeof request === 'function' && typeof canContinue === 'function' && typeof yieldTurn === 'function' && integer(maxRetries) && maxRetries <= 5 &&
     integer(maxPasses) && maxPasses > 0 && maxPasses <= 100 && integer(maxDelayMs) && maxDelayMs > 0 && integer(maxResponseBytes) && maxResponseBytes > 0 &&
     integer(requestTimeoutMs) && requestTimeoutMs > 0 && requestTimeoutMs <= 30000 && integer(maxRequestBytes) && maxRequestBytes > 0, 'invalid-config');
   let capability;try{capability=compatibilityHeaders(compatibility);}catch{throw new SyncError('invalid-config');}
@@ -62,6 +63,7 @@ export function createSyncTransport({ store, origin, getCredential, compatibilit
   const send = async (url, body = null) => {
     const encodedBody = body === null ? undefined : JSON.stringify(body);
     for (let attemptIndex = 0; attemptIndex <= maxRetries; attemptIndex++) {
+      check(canContinue(), 'host-paused');
       let response;
       let delay;
       try {
@@ -102,17 +104,35 @@ export function createSyncTransport({ store, origin, getCredential, compatibilit
       await wait(delay);
     }
   };
-  const pull = async () => {
+  // A turn remains bounded. Only advancing an ordinary canonical gap earns
+  // continuation; a stalled/unsupported prefix must not become a retry loop.
+  const pullTurn = async targetHead => {
     for (let pageIndex = 0; pageIndex < maxPasses; pageIndex++) {
+      if (!canContinue()) return {kind:'paused',targetHead};
       const before = await store.status();
       const reply = await send(origin + '/v1/events?after=' + before.applied + '&limit=1000');
       check(Array.isArray(reply.events) && integer(reply.head), 'invalid-response');
+      targetHead ??= reply.head;
       await store.reconcile({ events: reply.events, head: reply.head });
       const after = await store.status();
-      if (after.applied >= reply.head || after.blocked?.reason !== 'gap' || after.applied === before.applied) return;
+      if (after.blocked?.reason !== 'gap' || after.applied === before.applied) return {kind:'settled'};
+      if (after.applied >= reply.head) return {kind:'settled'};
+      // Remote writers may keep increasing head. Finish this finite target,
+      // defer that newer tail, and never upload/reserve against the remaining gap.
+      if (after.applied >= targetHead) return {kind:'new-head',targetHead};
     }
-    throw new SyncError('request-limit');
+    return {kind:'productive-gap',targetHead};
   };
+  const pull = async () => {
+    let result = await pullTurn(null);
+    while (result.kind === 'productive-gap') {
+      await yieldTurn();
+      result = await pullTurn(result.targetHead);
+    }
+    return result;
+  };
+  const pendingPull = result => ({state:'pending',error:null,retryAt:null,
+    catchUp:{reason:result.kind,targetHead:result.targetHead ?? null}});
   const run = async () => {
     if (authPaused) return { state: 'paused-auth', error: 'authentication-required', retryAt: null };
     if (retryAt > now()) return { state: 'backoff', error: 'retry-later', retryAt };
@@ -122,9 +142,11 @@ export function createSyncTransport({ store, origin, getCredential, compatibilit
         state = { state: 'blocked', error: 'update-required', retryAt: null };
         return copy(state);
       }
-      await pull();
+      const pulled = await pull();
+      if (pulled.kind !== 'settled') { state = pendingPull(pulled); return copy(state); }
+      if (!canContinue()) { state = pendingPull({kind:'paused'}); return copy(state); }
       const beforeBatch = await store.status();
-      if (beforeBatch.blocked && beforeBatch.blocked.reason !== 'gap') {
+      if (beforeBatch.blocked) {
         state = { state: 'blocked', error: null, retryAt: null };
         return copy(state);
       }
@@ -142,12 +164,14 @@ export function createSyncTransport({ store, origin, getCredential, compatibilit
         check(reply.acks.every(ack => expected.get(ack.id) === ack.bodyHash) && new Set(reply.acks.map(ack => ack.id)).size === batch.length, 'invalid-response');
         await store.acknowledge({ acks: reply.acks, head: reply.head });
         // Ack is not applied. Pull from the actual contiguous cursor, never reply.head.
-        await pull();
+        const pulled = await pull();
+        if (pulled.kind !== 'settled') { state = pendingPull(pulled); return copy(state); }
       }
       const status = await store.status();
       state = { state: status.upToDate ? 'up-to-date' : status.blocked ? 'blocked' : 'pending', error: null, retryAt: null };
     } catch (error) {
       const code = error instanceof SyncError ? error.code : 'store-failed';
+      if (code === 'host-paused') { state = pendingPull({kind:'paused'}); return copy(state); }
       if (code === 'authentication-required') authPaused = true;
       retryAt = error instanceof SyncError && error.retryAt !== null ? error.retryAt : 0;
       state = { state: code === 'update-required' ? 'update-required' : authPaused ? 'paused-auth' : retryAt > now() ? 'backoff' : 'error', error: code, retryAt: retryAt || null };

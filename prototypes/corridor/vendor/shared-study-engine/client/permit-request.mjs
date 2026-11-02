@@ -27,7 +27,7 @@ export const onlyLocalPending=status=>status?.blocked===null&&Number.isSafeInteg
 /** One Sync drains a multi-batch outbox while each pass applies more of the shared log; arriving writes or a stalled transport stop at the bound. */
 export async function drainOutbox(synchronize,store,maxPasses=8){
  let result=await synchronize();
- for(let pass=1;pass<maxPasses&&!result?.error;pass++){
+ for(let pass=1;pass<maxPasses&&!result?.error&&!result?.catchUp;pass++){
   const before=await store.status();if(!onlyLocalPending(before))break;
   result=await synchronize();
   if(!((await store.status()).applied>before.applied))break;

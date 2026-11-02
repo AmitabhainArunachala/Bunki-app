@@ -10,7 +10,7 @@ const safeId = value => typeof value === 'string' && ID.test(value) && !/^nsrs_/
 const scopeKey = scope => JSON.stringify([scope.environment, scope.learner, scope.installation]);
 const CODES = new Set(['invalid-scope', 'invalid-codec', 'missing-store', 'installation-exists', 'invalid-state', 'schema-unsupported',
   'invalid-event', 'invalid-hash', 'scope-mismatch', 'epoch-mismatch', 'immutable-conflict', 'sequence-conflict', 'invalid-ack',
-  'invalid-head', 'head-regressed', 'invalid-projection', 'storage-conflict', 'storage-failed', 'storage-limit', 'invalid-command', 'event-too-large']);
+  'invalid-head', 'head-regressed', 'invalid-projection', 'storage-conflict', 'storage-failed', 'storage-limit', 'native-receipt-limit', 'invalid-command', 'event-too-large']);
 export class StoreError extends Error {
   constructor(code) { const value = CODES.has(code) ? code : 'storage-failed'; super(value); this.name = 'StoreError'; this.code = value; }
 }
@@ -27,12 +27,12 @@ function setup(options) {
   const { adapter, codec, materialize } = options;
   check(adapter && typeof adapter.read === 'function' && typeof adapter.compareAndSwap === 'function' && codec &&
     ['payloadHash', 'canonicalStringify', 'validateEvent'].every(k => typeof codec[k] === 'function') && typeof materialize === 'function', 'invalid-codec');
-  check(integer(options.epoch ?? 0) && Number.isSafeInteger(options.maxRecords ?? 10000) && (options.maxRecords ?? 10000) > 0 &&
-    Number.isSafeInteger(options.maxBytes ?? 16 * 1024 * 1024) && (options.maxBytes ?? 16 * 1024 * 1024) > 0 &&
+  check(integer(options.epoch ?? 0) && Number.isSafeInteger(options.maxRecords ?? 20000) && (options.maxRecords ?? 20000) > 0 &&
+    Number.isSafeInteger(options.maxBytes ?? 64 * 1024 * 1024) && (options.maxBytes ?? 64 * 1024 * 1024) > 0 &&
     Number.isSafeInteger(options.maxEventBytes ?? 240 * 1024) && (options.maxEventBytes ?? 240 * 1024) > 0 && (options.maxEventBytes ?? 240 * 1024) <= 240 * 1024 &&
     Number.isSafeInteger(options.maxConflicts ?? 32) && (options.maxConflicts ?? 32) > 0 && typeof (options.now ?? Date.now) === 'function', 'invalid-codec');
-  return { scope, adapter, codec, materialize, now: options.now ?? Date.now, maxRecords: options.maxRecords ?? 10000,
-    maxBytes: options.maxBytes ?? 16 * 1024 * 1024, maxEventBytes: options.maxEventBytes ?? 240 * 1024,
+  return { scope, adapter, codec, materialize, now: options.now ?? Date.now, maxRecords: options.maxRecords ?? 20000,
+    maxBytes: options.maxBytes ?? 64 * 1024 * 1024, maxEventBytes: options.maxEventBytes ?? 240 * 1024,
     epoch: options.epoch ?? 0, maxConflicts: options.maxConflicts ?? 32 };
 }
 function replica(config) {

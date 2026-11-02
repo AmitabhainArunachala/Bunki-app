@@ -84,7 +84,7 @@ export async function syncWithPermits({synchronize, transport, store, permitRequ
   // A second device can win a grant against the same prefix. Refetch and
   // recompute that one conflict; network/auth failures remain explicit retries.
   for(let attempt=0;attempt<2;attempt++) {
-    if (result.error || !await transport.isPaired()) return result;
+    if (result.error || result.catchUp || !await transport.isPaired()) return result;
     const stored = await store.status();
     if (!stored.upToDate) {
       if (onlyLocalPending(stored)) return result;
@@ -100,7 +100,7 @@ export async function syncWithPermits({synchronize, transport, store, permitRequ
       result=await synchronize();continue;
     }
     const applied = await synchronize();
-    if (!applied.error) {
+    if (!applied.error && !applied.catchUp) {
       const after = await store.status();
       if (!after.upToDate && !onlyLocalPending(after)) throw Error('native-sync-replay-blocked');
     }

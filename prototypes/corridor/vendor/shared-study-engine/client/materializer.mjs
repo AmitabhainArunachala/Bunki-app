@@ -1,6 +1,6 @@
 /** Materializers own their results only when constructed here from private
  * canonical inputs. Generic callbacks keep the store's defensive copy. */
-import {replay,canonicalStringify} from './replay.mjs';
+import {replay,canonicalStringify,createCachedReplayJSON,previewReview,hesitationEvidence} from './replay.mjs';
 
 const owned = new WeakSet();
 export const ownsMaterializerOutput = materialize => owned.has(materialize);
@@ -90,4 +90,90 @@ export function createCanonicalMaterializer(config,{requireScope=false}={}) {
  materialize.preserving=guarded.preserving;
  if(qualified)owned.add(materialize);
  return Object.freeze(materialize);
+}
+
+
+// Inspect only structured-cloned private data. JSON must preserve values,
+// array shape and object identity topology, not merely accept serialization.
+function losslessJSON(value){
+ const pending=[value],seen=new Set();
+ while(pending.length){
+  const item=pending.pop();
+  if(item===null||typeof item==='string'||typeof item==='boolean')continue;
+  if(typeof item==='number'){if(!Number.isFinite(item)||Object.is(item,-0))return false;continue;}
+  if(typeof item!=='object'||seen.has(item))return false;
+  seen.add(item);
+  if(Array.isArray(item)){
+   const keys=Object.keys(item);if(keys.length!==item.length)return false;
+   for(let i=0;i<item.length;i++){if(keys[i]!==String(i))return false;pending.push(item[i]);}
+  }else{
+   if(Object.getPrototypeOf(item)!==Object.prototype)return false;
+   for(const key of Object.keys(item))pending.push(item[key]);
+  }
+ }
+ return true;
+}
+
+/** One canonical snapshot boundary and one JSON cache for store + previews.
+ * Normal engine replay follows canonical materializer snapshot semantics, not
+ * the generic raw engine's caller-graph contract. Clone failures use raw input
+ * plus detached output; cloneable non-JSON data uses its private clone in raw
+ * replay. Overlay overrides never use the JSON cache. The existing raw engine
+ * and existing createCanonicalMaterializer remain unchanged.
+ */
+export function createCanonicalRuntime(config,{requireScope=false}={}){
+ let snapshot=structuredClone(compactConfig(config));rejectSharedMemory(snapshot);
+ const qualified=qualifiedConfig(snapshot),learner=snapshot?.learner,epoch=snapshot?.epoch??0,pin=snapshot?.pin;
+ let configJSON=null,cached=null,configCacheFailure='config-unavailable',runtimeCacheFallback=null;
+ if(qualified&&record(snapshot)&&losslessJSON(snapshot)){try{configJSON=JSON.stringify(snapshot);}catch{/* Encoding availability is not an admission rule. */}}
+ if(configJSON!==null){try{cached=createCachedReplayJSON(configJSON);}catch(error){
+  if(!(error instanceof RangeError)||error.message!=='config-json-too-large')throw error;
+  configCacheFailure='config-budget';
+  configJSON=null; // Cache ceilings must not become new runtime admission rules.
+ }}
+ // Keep one parsed config inside the JSON cache. Raw fallbacks parse a temporary
+ // config from this fixed string; exotic configs retain their original snapshot.
+ if(cached)snapshot=null;
+ const rawConfig=()=>cached?JSON.parse(configJSON):snapshot;
+ const detached=projection=>{const result=structuredClone(projection);rejectSharedMemory(result);return result;};
+ const engine=Object.freeze({
+  cacheDiagnostics:()=>runtimeCacheFallback??cached?.cacheDiagnostics?.()??Object.freeze({path:'raw',reason:configCacheFailure,phase:'config',rows:null,cachedRows:0,retainedBytes:0}),
+  replay(canonical,overlay={}){
+   runtimeCacheFallback=null;
+   let source={canonical,overlay},privateInput=false;
+   try{source=structuredClone(source);privateInput=true;}catch{/* Preserve canonical materializer's raw-input fallback. */}
+   if(privateInput)rejectSharedMemory(source);
+   const options=source.overlay;
+   const ordinary=privateInput&&record(options)&&Object.keys(options).every(key=>['provisional','provisionalNow'].includes(key));
+   if(cached&&ordinary&&Array.isArray(source.canonical)&&
+      (!Object.hasOwn(options,'provisional')||Array.isArray(options.provisional))&&
+      (!Object.hasOwn(options,'provisionalNow')||typeof options.provisionalNow==='number')&&losslessJSON(source)){
+    const input={};let canonicalJSON,encoded=false;
+    try{
+     canonicalJSON=JSON.stringify(source.canonical);
+     if(Object.hasOwn(options,'provisional'))input.provisionalJSON=JSON.stringify(options.provisional);
+     if(Object.hasOwn(options,'provisionalNow'))input.provisionalNow=options.provisionalNow;
+     encoded=true;
+    }catch{/* A private graph that cannot be encoded keeps raw semantics. */}
+    if(encoded)try{const projection=cached.replay(canonicalJSON,input);return projection.error||projection.updateRequired?detached(projection):projection;}catch(error){
+     if(!(error instanceof RangeError)||!['canonical-json-too-large','provisional-json-too-large'].includes(error.message))throw error;
+     runtimeCacheFallback=Object.freeze({...cached.cacheDiagnostics?.(),path:'raw',reason:'input-budget',phase:error.message.split('-')[0]});
+     // An over-limit private snapshot keeps raw replay semantics.
+    }
+   }
+   runtimeCacheFallback??=Object.freeze({...cached?.cacheDiagnostics?.(),path:'raw',reason:cached?'input-shape':configCacheFailure,phase:cached?'input':'config',rows:privateInput&&Array.isArray(source.canonical)?source.canonical.length:null});
+   const projection=replay(source.canonical,{...rawConfig(),...options});
+   return qualified&&privateInput&&!projection.error&&!projection.updateRequired?projection:detached(projection);
+  },
+  previewReview:(projection,data,context)=>previewReview(projection,data,{pin,...context}),
+  hesitationEvidence,
+ });
+ const guarded=createCorpusMaterializer(engine,canonicalStringify);
+ const materialize=input=>{
+  if(requireScope&&(input.learner!==learner||input.epoch!==epoch))throw Error('engine-store-scope');
+  return guarded(input);
+ };
+ materialize.preserving=guarded.preserving;
+ if(qualified)owned.add(materialize);
+ return Object.freeze({engine,materialize:Object.freeze(materialize)});
 }

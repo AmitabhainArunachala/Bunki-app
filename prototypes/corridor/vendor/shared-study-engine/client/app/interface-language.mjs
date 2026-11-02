@@ -23,6 +23,17 @@ export function formatStudyMinutes(evidence,language='en'){
 }
 
 export const interfaceCopies = Object.freeze([
+  ["バックアップに失敗しました。サーバーのエクスポートが大きすぎます。新しいバックアップは作成されませんでした。", "Backup failed: the server export is too large. No new backup was created."],
+  ["バックアップ先への保存を完了できませんでした。一部の保存先にはコピーがある場合があります。", "Backup destinations could not all be written. Some destinations may contain a copy."],
+  ["バックアップが中断されました。完了を確認できません。", "The backup was interrupted. Completion is unconfirmed."],
+  ["バックアップに失敗しました。設定でバックアップの状態を確認してください。", "Backup failed. Check the backup status in Settings."],
+  ["バックアップの状態を読み取れません。完了したかは未確認です。", "Backup status could not be read. Completion is unconfirmed."],
+  ["この保存先でバックアップの実行記録はまだ確認されていません。", "No backup attempt has been observed for this backup source."],
+  ["バックアップを作成中です。", "Creating a backup."],
+  ["指定された保存先へのバックアップを作成しました。", "A backup was created at the requested destinations."],
+  ["直近のバックアップは失敗しました。", "The latest backup failed."],
+  ["この表示は確認できたバックアップ実行だけを示します。クラウドへのアップロード完了を示すものではありません。", "This reports only observed backup attempts. It does not confirm cloud upload."],
+
   ["採点は下線の語だけです。ほかの語は採点に影響しません。", "You grade only the underlined word. Other words never change the grade."],
   ["採点はこのカードの学習対象だけです。ほかの語は採点に影響しません。", "You grade only this card’s target. Other words never change the grade."],
   ["Space・Return（解答後）", "Space / Return (back)"],
@@ -62,6 +73,11 @@ export const interfaceCopies = Object.freeze([
   ["この操作は保存されていません。入力を確認してください。", "This operation was not saved. Check your input."],
   ["記録は端末に保存されましたが、この操作は反映されませんでした。", "The record is saved on this device, but this operation was not applied."],
   ["保存済み記録の処理を再試行", "Retry saved-record processing"],
+  ["学習用ストレージが上限に達しました。記録は端末に保存されていますが、処理が止まっています。この画面と学習データを残し、保存領域の復旧を依頼してください。", "The study storage limit has been reached. Your record is saved on this device, but processing is blocked. Keep this screen open and keep your study data. Ask for help recovering study storage."],
+  ["学習用ストレージが上限に達しました。保存できたかは未確認です。入力と元の操作を残しています。この画面と学習データを残し、保存領域の復旧を依頼してください。", "The study storage limit has been reached. The save is unconfirmed. Your input and original operation are retained. Keep this screen open and keep your study data. Ask for help recovering study storage."],
+  ["同期の保存確認記録が学習用ストレージの上限に達しました。記録は端末に保存されていますが、処理が止まっています。この画面と学習データを残し、保存領域の復旧を依頼してください。", "The study storage limit for sync receipts has been reached. Your record is saved on this device, but processing is blocked. Keep this screen open and keep your study data. Ask for help recovering study storage."],
+  ["同期の保存確認記録が学習用ストレージの上限に達しました。保存できたかは未確認です。入力と元の操作を残しています。この画面と学習データを残し、保存領域の復旧を依頼してください。", "The study storage limit for sync receipts has been reached. The save is unconfirmed. Your input and original operation are retained. Keep this screen open and keep your study data. Ask for help recovering study storage."],
+  ["保存領域の復旧後に確認", "Check after storage recovery"],
   ["保存できたか確認できません。入力と同じ操作を残しています。保存を再試行してください。", "The save could not be confirmed. Your input and original operation are retained. Retry the save."],
   ["記録は端末に保存されています。処理が完了していません。同じ記録の処理を再試行できます。", "The record is saved on this device. Processing is not complete. Retry processing the same record."],
   ["記録は端末に保存されています。アプリを更新してから処理状況を確認してください。", "The record is saved on this device. Update the app, then check its processing status."],
@@ -512,6 +528,7 @@ export const interfaceCopies = Object.freeze([
   ["思い出す", "Recall"],
   ["診断情報", "Diagnostics"],
   ["技術的な保存・同期の情報です。", "Technical storage and sync details."],
+  ["履歴が高速処理の上限に達しています。学習は続けられますが、表示が遅くなることがあります。", "History exceeds the fast-processing limit. You can keep studying, but responses may be slower."],
   ["この端末に保存しました。同期は未設定です。", "Saved on this device. Sync is not set up."],
   ["同期済み", "Synced"],
   ["同期を待っています", "Waiting to sync"],

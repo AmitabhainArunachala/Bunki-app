@@ -1,4 +1,4 @@
-// REPLAY_DEPENDENCIES_SHA256: 06d8a24130b73fae7623e5233cc3292df943c5f72d138a2ee98b264f395b650f
+// REPLAY_DEPENDENCIES_SHA256: fc69124ae998df5756d3965e249ae72ac3045cdfa349d0400b97a41fcd653c66
 /** Pure SYNC v4 full-prefix replay. No storage, network, environment clock or DOM. */
 import {manualEntry} from './player/manual-cards.mjs';
 import * as fsrsApi from './vendor/ts-fsrs.mjs';
@@ -15,10 +15,18 @@ const validInstant = value => {
 };
 const upperTime = (event, received) => Math.min(event.ts, received);
 
+// Pure date results are shared across replay engines, never learner state.
+// FIFO bound: only complete successful exact-input computations enter this map.
+const dayBoundsCache = new Map(), DAY_BOUNDS_CACHE_LIMIT = 4096;
 /** Dates are computed in the synced learner zone, never the runtime's zone. */
 export function dayBounds(ms, timezone = 'Asia/Tokyo') {
   if(!Number.isSafeInteger(ms)||ms<0||ms>MAX_SYNC_TIME||typeof timezone!=='string'||!timezone)
     throw new RangeError('invalid-learner-day');
+  // Preserve the exact supplied zone spelling and even the sign of zero. A
+  // civil-day key is unsafe around historical repeated-midnight transitions.
+  const cacheKey = `${Object.is(ms,-0)?'-0':ms}\0${timezone}`;
+  const cached = dayBoundsCache.get(cacheKey);
+  if(cached)return {...cached};
   const formatter = new Intl.DateTimeFormat('en-US-u-ca-iso8601-nu-latn', {timeZone:timezone,year:'numeric',month:'2-digit',day:'2-digit'});
   const keyAt = time => {
     const parts=Object.fromEntries(formatter.formatToParts(new Date(time)).map(p=>[p.type,p.value]));
@@ -31,7 +39,10 @@ export function dayBounds(ms, timezone = 'Asia/Tokyo') {
     while(lo<hi){const mid=Math.floor((lo+hi)/2);if(keyAt(mid)<key)lo=mid+1;else hi=mid;}
     return lo;
   };
-  return {day,timezone,startsAt:boundary(day),endsAt:boundary(next)};
+  const result = {day,timezone,startsAt:boundary(day),endsAt:boundary(next)};
+  if(dayBoundsCache.size>=DAY_BOUNDS_CACHE_LIMIT)dayBoundsCache.delete(dayBoundsCache.keys().next().value);
+  dayBoundsCache.set(cacheKey,result);
+  return {...result};
 }
 
 export function newCardLimit(settings,at){
@@ -347,10 +358,10 @@ function apply(p,event,rt,seq,scheduler,provisional){
   return result(p,event,'applied',null,extra);
 }
 
-export function replay(envelopes,options) {
-  const p=initialProjection(options),scheduler=engine.createScheduler(fsrsApi,options.pin);
-  const seen=new Map(),streams=new Map();
-  let lastReceiptTime=-1;
+function canonicalReplayPass(envelopes,options,checkpoint=null) {
+  const p=checkpoint?checkpoint.p:initialProjection(options),scheduler=engine.createScheduler(fsrsApi,options.pin);
+  const seen=new Map(checkpoint?.seen),streams=new Map(checkpoint?.streams);
+  let lastReceiptTime=checkpoint?checkpoint.lastReceiptTime:-1;
   function receive(envelope,provisional=false){
     const {event,bodyHash}=envelope;
     if(!provisional&&envelope.authority!==(event?.install==='@server'?'server':'device')){
@@ -382,6 +393,11 @@ export function replay(envelopes,options) {
     if(!receive(envelope))break;
     p.appliedSeq=envelope.seq;
   }
+  // Private canonical state and admission cursors, before any provisional work.
+  return {p,receive,seen,streams,lastReceiptTime};
+}
+
+function applyProvisional({p,receive},options) {
   const provisional=options.provisional||[];
   if(!p.error&&!p.updateRequired&&provisional.length){
     if(!Number.isSafeInteger(options.provisionalNow)||options.provisionalNow<0||options.provisionalNow>MAX_SYNC_TIME){
@@ -390,6 +406,178 @@ export function replay(envelopes,options) {
     for(const row of provisional){const received=receive(row,true);if(!received)break;if(received!=='duplicate')p.pending.push(row.event.id);}
   }
   return p;
+}
+
+
+export function replay(envelopes,options) {
+  return applyProvisional(canonicalReplayPass(envelopes,options),options);
+}
+
+// This separate opt-in API accepts serialized JSON, never caller-owned event
+// graphs. Limits count UTF-16 bytes, a conservative bound for the input strings.
+const REPLAY_JSON_INPUT_BYTES = 128 * 1024 * 1024;
+const REPLAY_JSON_CACHE_BYTES = 128 * 1024 * 1024;
+const REPLAY_JSON_CACHE_ROWS = 20000;
+function parseReplayJSON(text,name,array=false) {
+  if(typeof text!=='string')throw new TypeError(`${name}-json-string-required`);
+  if(text.length*2>REPLAY_JSON_INPUT_BYTES)throw new RangeError(`${name}-json-too-large`);
+  const value=JSON.parse(text);
+  if(array?!Array.isArray(value):!value||typeof value!=='object'||Array.isArray(value))
+    throw new TypeError(`${name}-json-${array?'array':'object'}-required`);
+  return value;
+}
+// All values here originated in JSON.parse or the lexical reducer. Preserve
+// null-prototype dictionaries, undefined, -0 and alias topology in its output.
+function detachReplayValue(value) {
+  if(value===null||typeof value!=='object')return value;
+  const make=source=>Array.isArray(source)?new Array(source.length):Object.create(Object.getPrototypeOf(source));
+  const result=make(value),seen=new Map([[value,result]]),pending=[[value,result]];
+  while(pending.length){
+    const [source,target]=pending.pop();
+    for(const key of Object.keys(source)){
+      const child=source[key];let copy=child;
+      if(child!==null&&typeof child==='object'){
+        if(seen.has(child))copy=seen.get(child);
+        else{copy=make(child);seen.set(child,copy);pending.push([child,copy]);}
+      }
+      Object.defineProperty(target,key,{value:copy,writable:true,enumerable:true,configurable:true});
+    }
+  }
+  return result;
+}
+// Full ordered value encoding; unlike JSON.stringify it distinguishes -0 and
+// JSON number overflow. Keys and all envelope metadata participate, not hashes.
+// Stop before constructing an over-budget encoded string. Iteration also keeps
+// deeply nested parsed metadata off the JavaScript call stack.
+function walkReplayValue(value,limit,collect) {
+  const parts=collect?[]:null,stack=[{value}];let bytes=0;
+  while(stack.length){
+    const item=stack.pop();let part=item.text;
+    if(part===undefined){
+      const value=item.value;
+      if(value===null)part='null';
+      else if(typeof value==='string')part='s'+JSON.stringify(value);
+      else if(typeof value==='number')part='n'+(Object.is(value,-0)?'-0':String(value));
+      else if(typeof value==='boolean')part=value?'true':'false';
+      else if(value===undefined)part='undefined';
+      else if(Array.isArray(value)){
+        part='[';stack.push({text:']'});
+        for(let i=value.length-1;i>=0;i--){stack.push({value:value[i]});if(i)stack.push({text:','});}
+      }else{
+        part='{';stack.push({text:'}'});const keys=Object.keys(value);
+        for(let i=keys.length-1;i>=0;i--){const key=keys[i];stack.push({value:value[key]},{text:JSON.stringify(key)+':'});if(i)stack.push({text:','});}
+      }
+    }
+    bytes+=part.length*2;if(bytes>limit)return null;if(parts)parts.push(part);
+  }
+  return parts?parts.join(''):bytes;
+}
+function replayValueBytes(value,limit) { return walkReplayValue(value,limit,true); }
+// Admission only needs length. Use exactly the same ordered token traversal,
+// without retaining all fragments or joining a complete checkpoint/config.
+function replayValueSize(value,limit) { return walkReplayValue(value,limit,false); }
+// Exact compactConfig consumed-field selection from the canonical materializer.
+// This path only sees an internally parsed JSON graph. Malformed collections
+// retain their original config and therefore their original reducer behavior.
+const record = value => value!==null&&typeof value==='object'&&[Object.prototype,null].includes(Object.getPrototypeOf(value));
+// Match structuredClone's own enumerable-property selection, including a single
+// read of a consumed accessor. Omitted content is never traversed or retained.
+const fields = (value,keys) => Object.fromEntries(keys.filter(key=>Object.getOwnPropertyDescriptor(value,key)?.enumerable).map(key=>[key,value[key]]));
+function compactConfig(config){
+ if(!record(config))return config;
+ const {registry,taskMetadata}=fields(config,['registry','taskMetadata']);
+ if(!record(registry))return config;
+ const tables=fields(registry,['tasks','notes','passages','examples']);
+ if(!Array.isArray(tables.tasks)||Object.values(tables).some(rows=>!Array.isArray(rows)||!rows.every(record)))return config;
+ const rows={
+  tasks:tables.tasks.map(row=>{const task=fields(row,['taskKey','noteGuid','contractId','passageId','group','lexemeId','player']);if(record(task.player))task.player=fields(task.player,['deckId']);return task;}),
+ };
+ for(const [table,keys]of [['notes',['noteGuid','module']],['passages',['passageId','sourceJaSha256']],['examples',['exampleId','sourceJaSha256']]])if(Object.hasOwn(tables,table))rows[table]=tables[table].map(row=>fields(row,keys));
+ const compact={...fields(config,['learner','epoch','timezone','pin']),registry:rows};
+ if(taskMetadata!==undefined){
+  if(!record(taskMetadata)||rows.tasks.some(row=>typeof row.taskKey!=='string'))return config;
+  compact.taskMetadata=Object.fromEntries(rows.tasks.flatMap(({taskKey})=>{
+   const selected=fields(taskMetadata,[taskKey]);if(!Object.hasOwn(selected,taskKey))return [];
+   const meta=selected[taskKey];return [[taskKey,record(meta)?fields(meta,['contentRevision']):meta]];
+  }));
+ }
+ return compact;
+}
+function replayJSONOverlay(options) {
+  if(!options||typeof options!=='object'||Array.isArray(options)||Object.getPrototypeOf(options)!==Object.prototype)
+    throw new TypeError('replay-json-options-object-required');
+  const fields=Object.getOwnPropertyDescriptors(options);
+  if(Object.keys(fields).some(key=>!['provisionalJSON','provisionalNow'].includes(key)||!Object.hasOwn(fields[key],'value')))
+    throw new TypeError('replay-json-options-data-fields-required');
+  const provisionalJSON=fields.provisionalJSON?.value===undefined?'[]':fields.provisionalJSON.value,provisionalNow=fields.provisionalNow?.value;
+  if(provisionalNow!==undefined&&typeof provisionalNow!=='number')throw new TypeError('provisional-time-number-required');
+  return {provisional:parseReplayJSON(provisionalJSON,'provisional',true),provisionalNow};
+}
+/**
+ * Owned JSON-only replay prototype. Opaque config/canonical/provisional objects
+ * are rejected, not inspected or passed through raw replay. Ordinary options
+ * contain only primitive provisionalJSON/provisionalNow data properties.
+ * Cache bounds govern serialized retained state, not total VM heap overhead.
+ */
+export function createCachedReplayJSON(configJSON) {
+  const config=compactConfig(parseReplayJSON(configJSON,'config'));
+  const measuredConfigBytes=replayValueSize(config,REPLAY_JSON_CACHE_BYTES);
+  const configBytes=measuredConfigBytes===null?REPLAY_JSON_CACHE_BYTES+1:measuredConfigBytes;
+  let cache=null,retainedBytes=0,last={path:'idle',reason:null,phase:null,rows:null};
+  const diagnose=(path,reason,phase,rows)=>{last={path,reason,phase,rows};};
+  const retire=()=>{cache=null;retainedBytes=0;};
+  return Object.freeze({
+    // Presentation/diagnostic facts only: no event, projection or authority.
+    // Each read returns an immutable scalar snapshot; never the retained graph.
+    cacheDiagnostics(){return Object.freeze({...last,cachedRows:cache?.keys.length??0,retainedBytes,
+      rowLimit:REPLAY_JSON_CACHE_ROWS,inputByteLimit:REPLAY_JSON_INPUT_BYTES,cacheByteLimit:REPLAY_JSON_CACHE_BYTES});},
+    replay(canonicalJSON,overlay={}) {
+    let rows=null;
+    try{
+    // Check the canonical primitive before inspecting even the options record.
+    const envelopes=parseReplayJSON(canonicalJSON,'canonical',true);rows=envelopes.length;
+    const options={...config,...replayJSONOverlay(overlay)};
+    if(envelopes.length>REPLAY_JSON_CACHE_ROWS||configBytes>REPLAY_JSON_CACHE_BYTES){
+      retire();diagnose('raw',envelopes.length>REPLAY_JSON_CACHE_ROWS?'row-budget':'config-budget',envelopes.length>REPLAY_JSON_CACHE_ROWS?'canonical':'config',rows);
+      return detachReplayValue(replay(envelopes,options));
+    }
+    const keys=[];let bytes=configBytes;
+    for(const envelope of envelopes){
+      const key=replayValueBytes(envelope,REPLAY_JSON_CACHE_BYTES-bytes);
+      if(key===null){retire();diagnose('raw','retained-budget','envelopes',rows);return detachReplayValue(replay(envelopes,options));}
+      keys.push(key);bytes+=key.length*2;
+    }
+    const reusable=cache&&keys.length>=cache.keys.length&&cache.keys.every((key,i)=>key===keys[i]);
+    if(reusable&&keys.length===cache.keys.length){
+      diagnose('warm',null,null,rows);
+      // Complete-envelope equality proves that the retained canonical checkpoint
+      // and its measured budget are unchanged. Public reads detach once; an
+      // overlay receives its own private working checkpoint and never rewrites
+      // the canonical cache or returns a reference into it.
+      if(!options.provisional.length)return detachReplayValue(cache.checkpoint.p);
+      const working=detachReplayValue(cache.checkpoint);
+      return applyProvisional(canonicalReplayPass([],options,working),options);
+    }
+    const checkpoint=reusable?detachReplayValue(cache.checkpoint):null;
+    const pass=canonicalReplayPass(reusable?envelopes.slice(cache.keys.length):envelopes,options,checkpoint);
+    if(!pass.p.error&&!pass.p.updateRequired){
+      const next={p:pass.p,seen:[...pass.seen],streams:[...pass.streams],lastReceiptTime:pass.lastReceiptTime};
+      const checkpointBytes=replayValueSize(next,REPLAY_JSON_CACHE_BYTES-bytes);
+      cache=checkpointBytes!==null?{keys,checkpoint:detachReplayValue(next)}:null;
+      retainedBytes=cache?bytes+checkpointBytes:0;
+      diagnose(reusable?'extension':'cold',cache?null:'retained-budget',cache?null:'checkpoint',rows);
+    }else{retire();diagnose(reusable?'extension':'cold',pass.p.updateRequired?'update-required':'canonical-error','canonical',rows);}
+    // Cache owns the canonical checkpoint before an overlay can mutate any
+    // projection, stream, seen identity or pending/error field.
+    return detachReplayValue(applyProvisional(pass,options));
+    }catch(error){
+      // As before, thrown input/replay errors do not destroy an older successful
+      // checkpoint. Report the rejected call without exposing its contents.
+      const tooLarge=error instanceof RangeError&&/^(canonical|provisional)-json-too-large$/.test(error.message);
+      diagnose('rejected',tooLarge?'input-budget':'invalid-input',tooLarge?error.message.split('-')[0]:null,rows);
+      throw error;
+    }
+  }});
 }
 
 export function previewReview(projection,data,{pin,now}) {

@@ -11,7 +11,10 @@ export function retainOperationProof(previous,result={kind:'failed'}){
 }
 export function operationState(result,{observations=[],existing=false}={}){
  const persisted=result?.persisted===true||result?.kind==='durable',resolution=result?.resolution;
- const reason=resolution?.reason??result?.blockedReason??result?.reason??null;
+ // Recovery retains an unconfirmed save as pending; its current admission
+ // failure can still explain why storage recovery is needed before retrying.
+ const capacityAdmission=!persisted&&resolution?.status==='pending'&&resolution.reason==='save-unconfirmed'&&['storage-limit','native-receipt-limit'].includes(result?.reason);
+ const reason=capacityAdmission?result.reason:resolution?.reason??result?.blockedReason??result?.reason??null;
  const view=phase=>({phase,persisted,reason,updateRequired:['update-required','schema-newer','schema-unsupported'].includes(reason)});
  if(existing&&result?.kind==='existing')return view('existing');
  if(existing&&persisted&&result?.reused&&typeof result.eventId==='string'&&resolution?.eventId===result.eventId&&typeof result.taskKey==='string'&&result.entry?.taskKey===result.taskKey&&resolution.status==='observation'&&resolution.outcome?.status==='observation'&&reason==='manual-card-content-occupied'&&resolution.canonical===true&&resolution.terminal===true)return view('existing');

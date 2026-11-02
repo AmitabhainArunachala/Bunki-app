@@ -293,6 +293,24 @@ export async function createReplicaBackend({ store, engine, catalog, pin = null,
   function queue({ module = 'all',learningOnly=false,backlog=false } = {}) {
     const bounds = dayBounds(now(), projection.settings.learnerTimezone);
     const hasPermit = Object.values(projection.permits).some(p => p.install === store.scope.installation && !p.usedBy && p.startsAt <= now() && p.endsAt > now());
+    // Build once only if this call reaches a sibling-sensitive candidate. The
+    // private index is read-only after construction and never survives a call.
+    // Queue uses recorded dayStart, unlike custom sessions' inclusive at range.
+    let reviewedByLexicalKey=null;
+    const hasReviewedSibling=task=>{
+      if(reviewedByLexicalKey===null){
+        reviewedByLexicalKey=new Map();
+        for(const review of projection.reviews){
+          if(review.undoneAt||review.dayStart!==bounds.startsAt)continue;
+          const lexicalKey=projection.tasks[review.taskKey].lexicalKey;
+          let tasks=reviewedByLexicalKey.get(lexicalKey);
+          if(!tasks){tasks=new Set();reviewedByLexicalKey.set(lexicalKey,tasks);}
+          tasks.add(review.taskKey);
+        }
+      }
+      const tasks=reviewedByLexicalKey.get(task.lexicalKey);
+      return !!tasks&&(tasks.size>1||!tasks.has(task.taskKey));
+    };
     const ready=catalogEntries().filter(entry => {
       const t = projection.tasks[entry.taskKey];
       if (!t || !contentReady(entry) || (module !== 'all' && t.module !== module) || t.suspended || t.known) return false;
@@ -300,8 +318,7 @@ export async function createReplicaBackend({ store, engine, catalog, pin = null,
       if (!projection.introductions[t.taskKey] && !hasPermit) return false;
       if(learningOnly){if(!t.card||![1,3].includes(t.card.state)||!Number.isFinite(Date.parse(t.card.due)))return false;}
       else if (!servable(t.card, new Date(now()), {dayEnd:bounds.endsAt-1})) return false;
-      if ((!t.card || t.card.state === 0 || t.card.state === 2) && projection.reviews.some(r => !r.undoneAt && r.taskKey !== t.taskKey &&
-          projection.tasks[r.taskKey].lexicalKey === t.lexicalKey && r.dayStart === bounds.startsAt)) return false;
+      if ((!t.card || t.card.state === 0 || t.card.state === 2) && hasReviewedSibling(t)) return false;
       return true;
     }).sort((a, b) => {
       const x = projection.tasks[a.taskKey], y = projection.tasks[b.taskKey];
@@ -481,6 +498,7 @@ export async function createReplicaBackend({ store, engine, catalog, pin = null,
     catalogEntries,customSession,todayAllowance,addNewToday,setNewTodayTotal,createManualCard,practiceData:(attempt,rating=3,thinkMs=0)=>reviewData({...attempt,mode:'practice'},rating,thinkMs),practice:(attempt,rating=3,thinkMs=0)=>submitCommand(command('review',reviewData({...attempt,mode:'practice'},rating,thinkMs))),
     readProjection: () => publicView(projection), subscribe(fn) { listeners.add(fn); return () => listeners.delete(fn); },
     status, presentationStatus, refresh, command, submitCommand, snapshotAttempt, reviewData, queue,sitting,
+    readReplayDiagnostics:()=>typeof engine.cacheDiagnostics==='function'?immutable(clone(engine.cacheDiagnostics())):null,
     preview,reviewIntent,captureTyped,captureCommand,resumeCommand,readSharedActivity,readVerifiedRestDays,
     mutate(type, taskKey, data = {}) { const task = projection.tasks[taskKey]; return submitCommand(command(type, { taskKey, parent: task.head, ...data })); },
     capture(attempt,capture){return submitCommand(captureCommand(attempt,capture));},

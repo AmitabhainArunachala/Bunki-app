@@ -507,7 +507,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .study-menu-help>summary::after{content:'›';color:var(--secondary);transition:transform 120ms}
 .study-menu-help[open]>summary::after{transform:rotate(90deg)}
 .study-menu-item:hover,.study-menu-item:focus-visible,.study-menu-help>summary:hover,.study-menu-help>summary:focus-visible{background:var(--surface);outline:none}
-.study-menu-item:focus-visible,.study-menu-help>summary:focus-visible,.study-menu-chip:focus-visible{box-shadow:inset 0 0 0 2px var(--accent)}
+.study-menu-item:focus-visible,.study-menu-help>summary:focus-visible,.study-menu-chip:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .study-menu kbd{font:500 12px/1 var(--uiFont,system-ui);color:var(--secondary);border:1px solid var(--line);border-radius:4px;padding:3px 6px}
 .study-menu hr{border:0;border-top:1px solid var(--line);margin:6px 4px}
 .study-menu-group{padding:6px 10px 8px}
@@ -529,3 +529,8 @@ dialog.key-sheet dt{margin:0}dialog.key-sheet dd{margin:0;color:var(--ink)}
 dialog.key-sheet kbd{font:500 12px/1 system-ui;border:1px solid var(--line-strong);border-radius:4px;padding:3px 6px;white-space:nowrap}
 .capture-help{font-size:13px;line-height:1.6;margin:10px 0 8px;color:var(--secondary)}
 #app .back-lookup-hint{margin:16px 0 0;font-size:13px;line-height:20px;color:var(--secondary)}
+
+/* Backup failure stays independent of sync/save notices and the grade panel. */
+.backup-alert{flex:none;width:min(100%,864px);align-self:center;margin:0 auto;padding:10px 14px;border:2px solid var(--accent);background:var(--surface);color:var(--ink);font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+.backup-alert[hidden]{display:none}
+#app:has([data-focus])>.backup-alert,#app:has([data-finish])>.backup-alert{order:-2;max-height:24dvh;overflow:auto}

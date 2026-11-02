@@ -1,3 +1,4 @@
+import {createBackupStatusObserver} from './backup-status.mjs';
 import {createFactoryStatusReader,factoryRequest} from './factory-status.mjs';
 import {applyKinsoku} from '../player/kinsoku.mjs';
 import {watchRubyLayout} from '../player/ruby-layout.mjs';
@@ -157,6 +158,30 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   root.replaceChildren(h('header',{class:'app-header'},h('a',{class:'brand',href:'#',onclick:e=>{e.preventDefault();navigate('today');}},'集中道場',h('span',{},'Nihongo Study')),h('div',{class:'header-controls'},languagePicker(true),themePicker())),
     h('div',{class:'qa-banner'},corpus?.release3FullCorpus?'全デッキ · 全文英訳付き。':'QAプレビュー · テスト用の記録です。実際の学習履歴には影響しません。'),nav,sharedStatus,main,live,
     h('footer',{},h('span',{},'一つずつ、確かに。')));
+  const backupAlert=h('aside',{class:'backup-alert',role:'alert','data-backup-alert':'',hidden:true});
+  if(typeof platform.backupStatus==='function')main.before(backupAlert);
+  const backupObserver=createBackupStatusObserver({read:platform.backupStatus,isVisible:()=>document.visibilityState!=='hidden',onChange:()=>paintBackupStatus(),schedule:(fn,delay)=>win.setTimeout(fn,delay),cancel:id=>win.clearTimeout(id)});
+  function backupFailureCopy(code){
+    if(code==='export-too-large')return 'バックアップに失敗しました。サーバーのエクスポートが大きすぎます。新しいバックアップは作成されませんでした。';
+    if(code==='backup-write-failed')return 'バックアップ先への保存を完了できませんでした。一部の保存先にはコピーがある場合があります。';
+    if(code==='backup-interrupted')return 'バックアップが中断されました。完了を確認できません。';
+    return 'バックアップに失敗しました。設定でバックアップの状態を確認してください。';
+  }
+  function paintBackupStatus(){
+    if(disposed)return;const status=backupObserver.read(),code=status.failure?.code??(status.unavailable?'backup-status-unavailable':null);
+    backupAlert.hidden=!code;
+    if(code){const text=code==='backup-status-unavailable'?'バックアップの状態を読み取れません。完了したかは未確認です。':backupFailureCopy(code);renderInterfacePair(backupAlert,text,translateInterfaceText(text),interfaceLanguage);}
+    const detail=root.querySelector('[data-backup-detail]');if(detail){detail.replaceChildren(...backupDetail().childNodes);localize();}
+  }
+  function backupDetail(){
+    const status=backupObserver.read(),record=status.record,section=h('section',{'data-backup-detail':''},h('h2',{},'バックアップ'));
+    const description=status.unavailable?'バックアップの状態を読み取れません。完了したかは未確認です。':!record?'この保存先でバックアップの実行記録はまだ確認されていません。':record.observation==='running'?'バックアップを作成中です。':record.observation==='interrupted'?'バックアップが中断されました。完了を確認できません。':record.observation==='completed'?'指定された保存先へのバックアップを作成しました。':'直近のバックアップは失敗しました。';
+    section.append(h('p',{},description));
+    if(status.failure)section.append(h('p',{},backupFailureCopy(status.failure.code)));
+    if(record){section.append(copy('p',`保存先：${record.attempt.completedTargets} / ${record.attempt.expectedTargets}完了`,`Destinations completed: ${record.attempt.completedTargets} / ${record.attempt.expectedTargets}`));
+      if(record.lastSuccess&&Number.isFinite(new Date(record.lastSuccess.finishedAt).getTime()))section.append(copy('p',`直近の完了：${formatStudyDate(record.lastSuccess.finishedAt,backend.readProjection().settings.learnerTimezone,'ja')}`,`Last completion: ${formatStudyDate(record.lastSuccess.finishedAt,backend.readProjection().settings.learnerTimezone,'en')}`));}
+    section.append(h('p',{class:'secondary'},'この表示は確認できたバックアップ実行だけを示します。クラウドへのアップロード完了を示すものではありません。'));return section;
+  }
   const rubyLayout=watchRubyLayout(root);
   async function updateStatus({presentation=false}={}) {
     const generation=++saveStatusGeneration;
@@ -318,12 +343,12 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       if(selection)field?.setSelectionRange(...selection);
     }
     root.querySelector('[data-retry-panel]')?.remove();
-    if(pendingIntent&&!busy&&(screen!=='study'||root.querySelector('dialog[open]'))){const retry=h('div',{'data-retry-panel':'',class:'retry-panel',role:'status'},h('p',{},operationCopy()),button(operationRetryLabel(),retryOperation,{class:'primary','data-retry':''}));const modal=root.querySelector('dialog[open]');if(modal)modal.append(retry);else main.after(retry);}
+    if(pendingIntent&&!busy&&(screen!=='study'||root.querySelector('dialog[open]'))){const retry=h('div',{'data-retry-panel':'',class:'retry-panel',role:operationRole()},h('p',{},operationCopy()),button(operationRetryLabel(),retryOperation,{class:'primary','data-retry':''}));const modal=root.querySelector('dialog[open]');if(modal)modal.append(retry);else main.after(retry);}
     root.querySelector('[data-factory-retry-panel]')?.remove();
     if(factoryRetry)main.after(h('div',{'data-factory-retry-panel':'',class:'retry-panel'},button('カード作成の依頼を再試行',()=>submitFactory(factoryRetry),{class:'quiet','data-factory-retry':''})));
     platform.onScreenChange?.({screen,settingsHost:main.querySelector('[data-host-settings]')});
     if(pendingOperation)lockOperationControls(pendingOperation);
-    live.textContent = notice;localize();rubyLayout.fit();
+    live.textContent = notice;localize();paintBackupStatus();rubyLayout.fit();
     panelObserver?.disconnect();panelObserver=null;const panel=main.querySelector('[data-decision-panel]'),readingCard=main.querySelector('[data-card]');if(panel&&readingCard){const fit=()=>readingCard.style.setProperty('--decision-height',panel.getBoundingClientRect().height+'px');fit();if(win.ResizeObserver){panelObserver=new win.ResizeObserver(fit);panelObserver.observe(panel);}}
     if(previousView?.current===current&&previousView.revealed===current?.revealed){const card=main.querySelector('[data-card]');if(card)card.scrollTop=previousScroll;}
     if(screen==='study'&&!pop&&!document.querySelector('dialog[open]')){if(current?.sessionInfoOpen)(menuItems()[menuFocus]??menuItems()[0])?.focus({preventScroll:true});else focusStudyCard();}
@@ -704,7 +729,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const practice=c.attempt.mode==='practice';
     const finishPractice=()=>button('追加練習を終える',endStudy,{class:'primary','data-finish-practice':''});
     if(pendingIntent){
-      section.append(h('div',{class:'decision-panel operation-status','data-decision-panel':'','data-operation-status':'',role:'status'},h('p',{},operationCopy()),root.querySelector('dialog[open]')?null:button(operationRetryLabel(),retryOperation,{class:'primary','data-retry':'',disabled:busy})));
+      section.append(h('div',{class:'decision-panel operation-status','data-decision-panel':'','data-operation-status':'',role:operationRole()},h('p',{},operationCopy()),root.querySelector('dialog[open]')?null:button(operationRetryLabel(),retryOperation,{class:'primary','data-retry':'',disabled:busy})));
       return;
     }
     if(c.stale){section.append(staleControls(c));return;}
@@ -791,12 +816,15 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function unlockOperationControls(record){for(const [control,disabled] of record.controls??[])if(control.isConnected)control.disabled=disabled;record.controls?.clear();}
   function operationCopy(record=pendingOperation){
     const state=operationState(record?.result,record?.policy);
+    if(state.reason==='native-receipt-limit')return state.persisted?'同期の保存確認記録が学習用ストレージの上限に達しました。記録は端末に保存されていますが、処理が止まっています。この画面と学習データを残し、保存領域の復旧を依頼してください。':'同期の保存確認記録が学習用ストレージの上限に達しました。保存できたかは未確認です。入力と元の操作を残しています。この画面と学習データを残し、保存領域の復旧を依頼してください。';
+    if(state.reason==='storage-limit')return state.persisted?'学習用ストレージが上限に達しました。記録は端末に保存されていますが、処理が止まっています。この画面と学習データを残し、保存領域の復旧を依頼してください。':'学習用ストレージが上限に達しました。保存できたかは未確認です。入力と元の操作を残しています。この画面と学習データを残し、保存領域の復旧を依頼してください。';
     if(state.updateRequired)return state.persisted?'記録は端末に保存されています。アプリを更新してから処理状況を確認してください。':'アプリの更新が必要です。保存できたかは未確認です。入力と同じ操作は残しています。';
     if(state.reason==='event-too-large')return state.persisted?'記録は端末に保存されていますが、大きすぎるため処理できません。記録を残したまま対応方法を確認してください。':'入力が大きすぎるため、この操作を処理できません。保存状態を確認してから入力を見直してください。';
     if(state.reason==='identity-conflict')return '保存済み記録の照合に失敗しました。元の記録と操作を残しています。もう一度状況を確認してください。';
     return state.persisted?'記録は端末に保存されています。処理が完了していません。同じ記録の処理を再試行できます。':'保存できたか確認できません。入力と同じ操作を残しています。保存を再試行してください。';
   }
-  function operationRetryLabel(){return operationState(pendingOperation?.result,pendingOperation?.policy).persisted?'保存済み記録の処理を再試行':'保存を再試行';}
+  function operationRole(){return ['storage-limit','native-receipt-limit'].includes(operationState(pendingOperation?.result,pendingOperation?.policy).reason)?'alert':'status';}
+  function operationRetryLabel(){const state=operationState(pendingOperation?.result,pendingOperation?.policy);return ['storage-limit','native-receipt-limit'].includes(state.reason)?'保存領域の復旧後に確認':state.persisted?'保存済み記録の処理を再試行':'保存を再試行';}
   function retryOperation(){return pendingOperation?performOperation(pendingOperation):Promise.resolve(null);}
   async function performOperation(record){
     if(busy||disposed)return null;
@@ -1059,7 +1087,11 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function plannedSettings(projection){
     return {...projection.settings,...Object.fromEntries(projection.pendingSettings.map(({key,value})=>[key,value]))};
   }
-  function diagnosticValues(){return JSON.stringify({learner:backend.learner,installation:backend.installation,storage:platform.storageKind,replica:lastSaveStatus,sync:nativeSyncState},null,2);}
+  function diagnosticValues(){return JSON.stringify({learner:backend.learner,installation:backend.installation,storage:platform.storageKind,replica:lastSaveStatus,sync:nativeSyncState,replayCache:backend.readReplayDiagnostics?.()??null},null,2);}
+  function cacheLimitNotice(){
+    const reason=backend.readReplayDiagnostics?.()?.reason;
+    return ['row-budget','input-budget','config-budget','retained-budget'].includes(reason)?h('p',{'data-cache-limit':reason,role:'status'},'履歴が高速処理の上限に達しています。学習は続けられますが、表示が遅くなることがあります。'):null;
+  }
   function settingsScreen(){
     const p=backend.readProjection(),planned=plannedSettings(p),weekdayPolicy=!!planned.studyPolicy;
     const paceInput=(key,attrs)=>h('input',{...attrs,id:'study-pace-'+key,value:paceDraft[key]??planned[key],oninput:event=>{paceDraft[key]=event.currentTarget.value;}});
@@ -1079,14 +1111,14 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     }});
     const file=h('input',{type:'file',accept:'.json,application/json','aria-label':'バックアップを選ぶ',onchange:async e=>{try{const backup=JSON.parse(await e.target.files[0].text());await backend.importBackup(backup);message('互換のある保存済み記録を追加しました。');render();}catch(error){message(error.message==='backup-has-pending-events-recovery-required'?'未送信の記録を含むため自動復元できません。元の端末とバックアップを保管してください。':'学習者・内容の整合性を確認できませんでした。記録は置き換えていません。');}}});
     const sheet=(id,kicker,title,description,...body)=>h('section',{class:'sheet','data-settings-section':id},h('div',{class:'sheet-head'},h('p',{class:'kicker'},kicker),h('h2',{},title),description?h('p',{class:'sheet-desc'},description):null),...body);
-    return h('section',{class:'settings'},h('header',{class:'screen-head stacked'},h('h1',{},'設定'),h('p',{class:'secondary'},'この端末の表示と、すべてのデッキ共通の学習設定。')),...(platform.nativeSync?[nativeSyncSettings()]:[]),platform.onScreenChange?h('section',{class:'sheet host-settings','data-host-settings':''}):null,
+    return h('section',{class:'settings'},h('header',{class:'screen-head stacked'},h('h1',{},'設定'),h('p',{class:'secondary'},'この端末の表示と、すべてのデッキ共通の学習設定。')),...(platform.nativeSync?[nativeSyncSettings()]:[]),...(typeof platform.backupStatus==='function'?[backupDetail()]:[]),platform.onScreenChange?h('section',{class:'sheet host-settings','data-host-settings':''}):null,
       sheet('appearance','表示','この端末の見え方','色はこの端末だけに保存します。学習履歴や他の端末の色は変わりません。',h('div',{class:'control-grid'},themePicker(),languagePicker()),h('label',{class:'swipe-grading-setting'},swipe,h('span',{},'スワイプで採点（この端末のみ）')),h('p',{id:'swipe-grading-help',class:'secondary'},'初期設定はオフです。左で「もう一度」、右で「正解」。'),h('label',{class:'swipe-grading-setting'},h('input',{type:'checkbox',checked:intervalHints,'data-interval-hints':'',onchange:async event=>{intervalHints=event.target.checked;try{await preferences.setItem('nihongo.interval-hints.v1',String(intervalHints));}catch{message('この端末に表示設定を保存できません。');}}}),h('span',{},'次の復習までの間隔を表示（この端末のみ）'))),
       ...(legacyHistory?[sheet('legacy-display','引き継ぎ','引き継いだ表示設定',null,...legacyHistory.decks.map(d=>h('p',{class:'secondary','data-legacy-settings':''},`${d.deckId} · 一日の新規 ${d.preferences.newPerDay} · 読み方 ${d.preferences.mode} · 全文英訳 ${d.preferences.gloss} · 文脈 ${d.preferences.zoom}`)),h('p',{class:'secondary'},themePreferenceSet?'色はこの端末の指定を使っています。':'以前の色指定は未設定です。自動表示のまま、設定値は書き込んでいません。'))]:[]),
       sheet('pace','学習','共通の学習ペース','1日の新規カード上限と学習日の区切りは、すべてのデッキ共通です。変更は翌日の学習日から有効です。',h('div',{class:'setting-row'},h('label',{},'1日の新規カード上限',newCount),button('翌日から変更',()=>{const value=newCount.valueAsNumber;if(!Number.isSafeInteger(value)||value<1||value>200)return message('1日の新規カード上限は1〜200の整数を入力してください。');savePace('newPerDayTotal',newCount,value);},{disabled:weekdayPolicy})),weekdayPolicy?h('p',{class:'secondary','data-weekday-policy-active':''},'曜日ごとの新規カード上限を使っています。今日のカスタム学習パネルで変更できます。'):null,
       h('div',{class:'setting-row'},h('label',{},'学習日のタイムゾーン',tz),button('翌日から変更',()=>savePace('learnerTimezone',tz,tz.value))),
       p.pendingSettings.length?h('p',{class:'sheet-note'},'翌日からの設定変更を保存しています。'):null),
       sheet('backup','データ','バックアップ','記録をすべて書き出すか、互換のあるバックアップを追加します。',h('div',{class:'sheet-actions'},button('すべて書き出す',()=>downloadBackup(),{class:'quiet'})),h('label',{class:'file-field'},h('span',{},'バックアップを選ぶ'),file),h('p',{class:'secondary'},'同じ端末の互換な保存済み記録だけを追加します。別端末ごとに作った模擬割当の履歴は統合できません。未送信記録は自動移行せず、元の端末とバックアップの保管が必要です。')),
-      h('p',{class:'content-note'},nativeSyncState.paired?'記録はこのMacに保存され、iPhoneと同期されます。':'記録はこの端末に保存されます。'),
+      cacheLimitNotice(),h('p',{class:'content-note'},nativeSyncState.paired?'記録はこのMacに保存され、iPhoneと同期されます。':'記録はこの端末に保存されます。'),
       h('details',{'data-study-diagnostics':'',class:'sheet'},h('summary',{},'診断情報'),h('p',{},'技術的な保存・同期の情報です。'),h('pre',{'data-study-diagnostics-values':''},diagnosticValues())));
   }
   function onKey(event){
@@ -1160,7 +1192,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function attemptAutoSync(retry=false){
     if(!autoSyncAllowed(true)){clearSyncRetry();return;}
     if(nativeSyncBusy||busy||typedBusy||customBusy||!pendingAllowsSync()){scheduleSyncRetry();return;}
-    const at=now();if(!retry&&at-lastAutoSync<60000){if(retryableSyncFailure())scheduleSyncRetry();return;}
+    const at=now();if(!retry&&nativeSyncState.catchUp?.reason!=='paused'&&at-lastAutoSync<60000){if(retryableSyncFailure())scheduleSyncRetry();return;}
     win.clearTimeout(syncRetryTimer);syncRetryTimer=null;lastAutoSync=at;
     runNativeSync(()=>platform.nativeSync.sync(),{quiet:true});
   }
@@ -1171,8 +1203,11 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   };
   win.addEventListener('online',reconnectSync);
   win.addEventListener('focus',autoSync);document.addEventListener('visibilitychange',autoSync);
+  const backupWake=()=>backupObserver.wake();
+  if(typeof platform.backupStatus==='function'){win.addEventListener('focus',backupWake);document.addEventListener('visibilitychange',backupWake);}
   observeSharedActivity();render();
+  backupObserver.start();
   reconcileUnknownFactoryRows();
   if(platform.storageKind==='native-worker-prod'&&platform.nativeSync)updateStatus().catch(()=>{});
-  return Object.freeze({showTask:(...args)=>{sessionShown=0;return start(...args);},refreshStatus:updateStatus,read:()=>({screen,module,current,busy:busy||typedBusy||customBusy,pendingIntent,theme,themePreferenceSet,interfaceLanguage}),dispose(){disposed=true;nativeStatusGeneration++;clearSyncRetry();win.clearTimeout(outboxSyncTimer);win.clearTimeout(saveBacklogTimer);win.clearTimeout(toastTimer);win.clearTimeout(finishGuardTimer);panelObserver?.disconnect();budgetWatcher?.dispose();win.removeEventListener('online',availabilityWake);win.removeEventListener('online',reconnectSync);win.removeEventListener('offline',availabilityWake);win.removeEventListener('focus',budgetWake);document.removeEventListener('visibilitychange',budgetWake);win.removeEventListener('focus',autoSync);document.removeEventListener('visibilitychange',autoSync);platform.nativeSync?.dispose?.();factoryStatuses.dispose();rubyLayout.dispose();current?.timer.dispose();parkedStudy?.current.timer.dispose();closePopover();unsubscribe();unsubscribeSyncState?.();dark.removeEventListener('change',darkChanged);document.removeEventListener('keydown',onKey);document.removeEventListener('keydown',escape);document.removeEventListener('pointerdown',outsidePopover,true);root.replaceChildren();}});
+  return Object.freeze({showTask:(...args)=>{sessionShown=0;return start(...args);},refreshStatus:updateStatus,read:()=>({screen,module,current,busy:busy||typedBusy||customBusy,pendingIntent,theme,themePreferenceSet,interfaceLanguage}),dispose(){disposed=true;backupObserver.dispose();win.removeEventListener('focus',backupWake);document.removeEventListener('visibilitychange',backupWake);nativeStatusGeneration++;clearSyncRetry();win.clearTimeout(outboxSyncTimer);win.clearTimeout(saveBacklogTimer);win.clearTimeout(toastTimer);win.clearTimeout(finishGuardTimer);panelObserver?.disconnect();budgetWatcher?.dispose();win.removeEventListener('online',availabilityWake);win.removeEventListener('online',reconnectSync);win.removeEventListener('offline',availabilityWake);win.removeEventListener('focus',budgetWake);document.removeEventListener('visibilitychange',budgetWake);win.removeEventListener('focus',autoSync);document.removeEventListener('visibilitychange',autoSync);platform.nativeSync?.dispose?.();factoryStatuses.dispose();rubyLayout.dispose();current?.timer.dispose();parkedStudy?.current.timer.dispose();closePopover();unsubscribe();unsubscribeSyncState?.();dark.removeEventListener('change',darkChanged);document.removeEventListener('keydown',onKey);document.removeEventListener('keydown',escape);document.removeEventListener('pointerdown',outsidePopover,true);root.replaceChildren();}});
 }
