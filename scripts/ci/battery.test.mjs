@@ -163,11 +163,13 @@ test('budgeted deterministic partition covers every original and supplemental ga
   // narration-media, the first gate to play a shipped clip through a real media element.
   // 145 with the one-hand integration (FINDINGS M-2): F's type-ruby and continuity, R3's
   // sense-truth and the whole word grammar (G1–G6) with its controls, each of the last two
-  // one gate per engine. 194 with Kanji-trust, Hfix-2a, SRS, Hfix-2c, Hfix-2d and six Batch 3 lanes, each in both engines, plus FIXR’s gloss classifier.
-  assert.equal(f.plan.batteryNames.length, 194);
+  // one gate per engine. 194 with Kanji-trust, Hfix-2a, SRS, Hfix-2c, Hfix-2d and six Batch 3 lanes, each in both engines, plus FIXR’s gloss classifier;
+  // 195 with the Rajōmon kanji-world encounter.
+  assert.equal(f.plan.batteryNames.length, 195);
   // 157 since 1.2.0 added the places-layout gate (the layout under test), 161 with V's four,
-  // 167 with the one-hand integration's six; 216 with Kanji-trust, Hfix-2a, SRS, Hfix-2c, Hfix-2d and six Batch 3 lanes
-  assert.equal(f.plan.requiredNames.length, 216);
+  // 167 with the one-hand integration's six; 216 with Kanji-trust, Hfix-2a, SRS, Hfix-2c, Hfix-2d and six Batch 3 lanes;
+  // 217 with the Rajōmon kanji-world encounter.
+  assert.equal(f.plan.requiredNames.length, 217);
   assert(
     f.plan.shards.filter((s) => s.id.startsWith('balanced-')).length > 10,
     'Actual execution ceilings require deterministic overflow lanes beyond the original ten',
@@ -200,7 +202,7 @@ test('complete successful evidence promotes full proof and unified summary', () 
   const f = fixture();
   const result = aggregate(f);
   assert.equal(result.kind, 'bunki-full-battery');
-  assert.equal(result.gates.length, 216);
+  assert.equal(result.gates.length, 217);
   assert.match(summary(result), /Slowest ten/);
 });
 const mutations = {
@@ -1163,11 +1165,11 @@ function rehash(value, key) {
   value[key] = digest(body);
   return value;
 }
-test('scheduling budgets bind all 216 actual descriptor ceilings and normalized workflow caps', () => {
+test('scheduling budgets bind all 217 actual descriptor ceilings and normalized workflow caps', () => {
   const plan = createPlan({ identity });
   const descriptors = [...batteryGates('/unused', {}), ...supplementalGates('/unused')];
-  assert.equal(plan.requiredNames.length, 216);
-  assert.equal(new Set(plan.shards.flatMap((s) => s.gates)).size, 216);
+  assert.equal(plan.requiredNames.length, 217);
+  assert.equal(new Set(plan.shards.flatMap((s) => s.gates)).size, 217);
   assert.equal(validateWorkflowSchedule(workflow(), budgetLanes(plan.shards)), true);
   for (const shard of plan.shards) {
     const expected = shard.gates.map((name) => ({

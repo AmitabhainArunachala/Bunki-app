@@ -40,6 +40,7 @@
     "verify:drift:full": "node prototypes/corridor/tools/verify-drift-consistency.mjs --mode full",
     "verify:release-gates": "node scripts/verify-release-gates.mjs",
     "verify:corridor-build": "node scripts/verify-corridor-build.mjs",
+    "verify:kanji-world": "node prototypes/corridor/tools/verify-kanji-world-encounter.mjs",
     "verify:assessment:question": "node prototypes/corridor/tools/verify-assessment-question-practice.mjs",
     "verify:assessment:question-source": "node prototypes/corridor/tools/verify-assessment-question-source.mjs",
     "verify:assessment:question-view": "node prototypes/corridor/tools/verify-assessment-question-view.mjs",

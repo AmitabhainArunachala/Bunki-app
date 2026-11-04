@@ -60,6 +60,7 @@
     "excerpt-narration-contract",
     "source-kanji-practice-contract",
     "source-kanji-practice-integration",
+    "kanji-world-encounter",
     "source-inbox-contract",
     "source-inbox-integration",
     "listening-intake-integration",
@@ -280,6 +281,7 @@
     "excerpt-narration-contract",
     "source-kanji-practice-contract",
     "source-kanji-practice-integration",
+    "kanji-world-encounter",
     "source-inbox-contract",
     "source-inbox-integration",
     "listening-intake-integration",
@@ -461,7 +463,8 @@
     "design-reader-shelf-webkit",
     "vh-voice-controls",
     "word-saved-answer-mutation-controls",
-    "gloss-text"
+    "gloss-text",
+    "kanji-world-encounter"
   ],
   "removed": []
 }

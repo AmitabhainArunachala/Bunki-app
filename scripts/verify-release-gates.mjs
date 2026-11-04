@@ -459,6 +459,12 @@ export function batteryGates(out, env = process.env) {
     },
     node('source-kanji-practice-contract', tool('source-kanji-practice.test')),
     node('source-kanji-practice-integration', tool('verify-source-kanji-practice')),
+    node(
+      'kanji-world-encounter',
+      tool('verify-kanji-world-encounter'),
+      [],
+      report('kanji-world-encounter', 'checks'),
+    ),
     {
       name: 'source-inbox-contract',
       command: process.execPath,
@@ -3204,6 +3210,7 @@ async function verifyRunner(out) {
     'excerpt-narration-contract',
     'source-kanji-practice-contract',
     'source-kanji-practice-integration',
+    'kanji-world-encounter',
     'source-inbox-contract',
     'source-learning-integration',
     'sentence-practice-integration',
