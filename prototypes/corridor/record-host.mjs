@@ -425,6 +425,8 @@ class RecordHost {
   #assessmentPresentationResolver;
   #tail = Promise.resolve(); #closed = false; #published = Object.freeze({ status: 'uninitialized' }); #publishedWriter = null;
   #journey = Object.freeze({ status: 'uninitialized' });
+  // Opaque, instance-local command custody; never a public changeId lookup.
+  #journeyCommits = new WeakMap();
   constructor(options) {
     this.#controller = options.controller; this.#writer = options.writer; this.#binding = copy(options.binding);
     this.#validateRecord = options.validateRecord; this.#validateArchive = options.validateArchive;
@@ -437,9 +439,9 @@ class RecordHost {
     insist(!this.#closed, 'closed');
     insist(captured.sessionId === this.#binding.sessionId && this.#writer.assert(captured) === true, 'writer-required');
   }
-  #queue(action) {
+  #queue(action, retainCapture = null) {
     let captured;
-    try { insist(!this.#closed, 'closed'); captured = capture(this.#writer, this.#binding); }
+    try { insist(!this.#closed, 'closed'); captured = capture(this.#writer, this.#binding); if (retainCapture) retainCapture(captured); }
     catch (error) { return Promise.reject(error); }
     const run = this.#tail.then(() => { this.#guard(captured); return action(captured); });
     this.#tail = run.catch(() => undefined);
@@ -992,7 +994,7 @@ class RecordHost {
    * transaction. The precondition is the root's own hash and the journey's generation, never the record revision, so an
    * ordinary grade between two journey writes moves nothing. A refusal (moved root, other generation, closed gate) rejects
    * before any commit and leaves the host as it was */
-  async #journeyCommit(captured, value, gate) {
+  async #journeyCommit(captured, value, gate, custody = null) {
     let state;
     try { state = await this.#read(captured); }
     catch (error) { return this.#failure(error, { changeId: value.changeId }); }
@@ -1031,6 +1033,9 @@ class RecordHost {
     let receipt;
     try {
       this.#guard(captured);
+      // Mark before reading/calling the dependency. A getter, wrapper rejection
+      // or missing durability flag after this point cannot prove nonpublication.
+      if (custody) custody.dispatched = true;
       const outcome = await this.#controller.commitLocal(request);
       receipt = outcome.receipt || outcome.targetReceipt;
       this.#guard(captured);
@@ -1058,11 +1063,53 @@ class RecordHost {
   }
   /** the one way to write m4Journey; gate() is asked again at the commit boundary (rev 3.2 §7.8: OFF or an owner change
    * cancels an unapplied capture) */
+  beginJourneyCommit(raw, input, gate = () => true) {
+    insist(typeof gate === 'function', 'invalid-command');
+    const value = baseCommand(raw, JOURNEY_LIFECYCLE, copy(input));
+    const handle = Object.freeze(Object.create(null));
+    const custody = { value, captured: null, dispatched: false, finished: false };
+    this.#journeyCommits.set(handle, custody);
+    const run = this.#queue((captured) => this.#journeyCommit(captured, value, gate, custody),
+      (captured) => { custody.captured = captured; });
+    const completion = run.then((outcome) => { custody.finished = true; return outcome; },
+      (error) => { custody.finished = true; throw error; });
+    return Object.freeze({ handle, completion });
+  }
   commitJourney(raw, input, gate = () => true) {
-    let value;
-    try { insist(typeof gate === 'function', 'invalid-command'); value = baseCommand(raw, JOURNEY_LIFECYCLE, copy(input)); }
+    try { return this.beginJourneyCommit(raw, input, gate).completion; }
     catch (error) { return Promise.reject(error); }
-    return this.#queue((captured) => this.#journeyCommit(captured, value, gate));
+  }
+  /** Handle-only read of the original command. Absence after dispatch never
+   * proves abort: the store currently exports no authenticated abort witness.
+   * A confirmed exact durable receipt proves publication even if its reply was
+   * lost. A later root revision is allowed; generation/ownership must still match. */
+  settleJourneyCommit(handle) {
+    const custody = this.#journeyCommits.get(handle);
+    const unresolved = () => Object.freeze({ state: 'unresolved' });
+    if (!custody?.finished || !custody.captured || this.#journey.status !== 'active')
+      return Promise.resolve(unresolved());
+    return this.#queue(async () => {
+      this.#guard(custody.captured);
+      const state = await this.#read(custody.captured);
+      this.#guard(custody.captured);
+      if (state.outcome.status !== 'active') return unresolved();
+      const { value } = custody, { expected, root, journey } = value.input;
+      const generation = journeyGeneration(state.outcome.migrationId, this.#binding, state.receipts);
+      if (generation !== expected.generation || root.generation !== generation) return unresolved();
+      const row = state.receipts.get(value.changeId);
+      let publication;
+      if (row) {
+        const fingerprint = digest({ scope: scopeOf(this.#binding), type: value.type, occurredAt: value.occurredAt, input: value.input });
+        if (row.type !== JOURNEY_LIFECYCLE || row.occurredAt !== value.occurredAt || row.commandSha256 !== fingerprint ||
+          row.journey.action !== journey.action || row.journey.journeyId !== journey.journeyId ||
+          row.journey.generation !== generation || row.journey.rootSha256 !== digest(root)) return unresolved();
+        publication = 'published';
+      } else if (!custody.dispatched) publication = 'not-published';
+      else return unresolved();
+      this.#guard(custody.captured);
+      this.#publish(custody.captured, state);
+      return Object.freeze({ state: 'terminal', publication, authority: this.#journey });
+    }).catch(unresolved);
   }
 
   /** Last confirmed authority only. During a write it does not expose proposed

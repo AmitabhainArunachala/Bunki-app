@@ -453,6 +453,341 @@ test('P6', 'a full root (128 events, 96 attempts, 32 visits, 8 goals, 16 project
   RELEASE.p6 = { rootBytes: bytes, backupBytes: new TextEncoder().encode(text).byteLength, journeyReceipts: c.rows(COMMANDS).filter((r) => r.type === 'journey.lifecycle/1').length,
     receiptBytesEach: Math.round(c.rows(COMMANDS).filter((r) => r.type === 'journey.lifecycle/1').reduce((sum, r) => sum + JSON.stringify(r).length, 0) / c.rows(COMMANDS).filter((r) => r.type === 'journey.lifecycle/1').length) };
 });
+/* LIFECYCLE-SHRINK (W5 1850, W2 1902): a retirement may borrow the control reserve only when its FINAL candidate, writer stamp
+ * included, is strictly smaller than the root it replaces at the queued write. A minimal in-memory port over the real lifecycle
+ * source (as W5's projects fixture uses) reaches the reserve band directly; setup writes are not counted as retirement writes. */
+export const jsonBytes = (value) => new TextEncoder().encode(JSON.stringify(value)).byteLength;
+function sized(root, n) {
+  const r = structuredClone(root); r.filler = ''; const len = n - jsonBytes(r);
+  assert.ok(len >= 0, 'cannot size down'); r.filler = 'x'.repeat(len); assert.equal(jsonBytes(r), n); return r;
+}
+export async function modelLifecycle(m, { buildId = 'build-a', clock = () => Date.parse('2026-10-27T12:00:00+09:00') } = {}) {
+  const saved = { status: 'active', migrationId: 'model-migration', scope: { profile: 'model', store: 'memory' }, revision: 0, commands: [], record: {} };
+  const binding = { epoch: 1 }, markers = new Map(), counts = { commit: 0 };
+  let id = 0;
+  const port = {
+    snapshot: () => structuredClone(saved), binding: () => ({ ...binding }), nextId: () => `model-journey-${++id}`,
+    async commit(expected, next, meta) {
+      counts.commit++;
+      if (expected.epoch !== binding.epoch || expected.rootHash !== m.lifecycle.digest(saved.record.m4Journey ?? null)
+        || expected.generation !== m.lifecycle.authority(saved).generation) return { outcome: 'not-published', acknowledged: false };
+      saved.record.m4Journey = JSON.parse(m.core.encodeLocalJson(next).text); saved.revision++;
+      saved.commands.push({ format: 'kairo-local-command-receipt', version: 1, changeId: `model-${saved.revision}`, type: 'journey.lifecycle/1',
+        scope: structuredClone(saved.scope), committedRevision: saved.revision, journey: meta });
+      return { outcome: 'published', acknowledged: true, rootHash: m.lifecycle.digest(next) };
+    },
+  };
+  const lc = m.lifecycle.createLifecycle({ port, buildId, core: corePort(), clock, enabled: true,
+    device: { read: (k) => structuredClone(markers.get(k)), write: (k, v) => (markers.set(k, structuredClone(v)), true), remove: (k) => markers.delete(k) || true },
+    validateCapture: (entries) => entries });
+  await lc.ready;
+  return { lc, saved, counts, port, root: () => saved.record.m4Journey, sync: async (root) => { saved.record.m4Journey = structuredClone(root); await lc.tick(); } };
+}
+/** a stored root holding one completed project, at a later revision, optionally re-stamped by another writer, sized to `bytes` */
+export async function reserveRoot(model, { writer = null, bytes }) {
+  await model.lc.work('projects', { status: 'completed' });
+  const r = structuredClone(model.root()); r.revision++; if (writer !== null) r.lastWriterBuild = writer;
+  return sized(r, bytes);
+}
+export const retireFirst = (model) => model.lc.retire('projects', model.root().projects[0].id, 'retire-completed');
+const canonicalRoot = (m, model) => m.core.encodeLocalJson(model.root()).text;
+/** the attempted retirement is refused (the byte bound, or past the absolute limit an invalid root): no commit, and the whole
+ * root unchanged. The lifecycle's guard throws before its first yield, so the call is wrapped to catch a synchronous throw. */
+async function refusedUnchanged(m, model, label, reason = /byte-bound/) {
+  const before = canonicalRoot(m, model), commits = model.counts.commit;
+  await assert.rejects(async () => retireFirst(model), reason, label);
+  assert.equal(model.counts.commit, commits, `${label}: no retirement commit`);
+  assert.equal(canonicalRoot(m, model), before, `${label}: the whole root is unchanged`);
+  (RELEASE.shrink ||= {})[label] = { rootBytes: jsonBytes(model.root()), commits: model.counts.commit - commits, outcome: 'refused' };
+}
+/** the bytes a retirement removes with an unchanged writer, measured on the real lifecycle (revision digits included) */
+async function retirementDelta(m, buildId, bytes) {
+  const dry = await modelLifecycle(m, { buildId });
+  await dry.sync(await reserveRoot(dry, { bytes }));
+  const before = jsonBytes(dry.root()); await retireFirst(dry); return before - jsonBytes(dry.root());
+}
+test('S1', 'W5 1850 direct control: a longer writer id cannot grow a reserve-band retirement past the root it replaces (refused, nothing published)', async (m) => {
+  const model = await modelLifecycle(m, { buildId: 'b'.repeat(512) });
+  await model.sync(await reserveRoot(model, { writer: 'x', bytes: m.lifecycle.LIMITS.dataBytes + 1 })); model.counts.commit = 0;
+  await refusedUnchanged(m, model, 'S1 long writer');
+});
+test('S2', 'the 512-unit escaped writer (\\u0001 x 512) at 258,049 bytes: 512 characters is not 512 JSON bytes; refused, nothing published', async (m) => {
+  const model = await modelLifecycle(m, { buildId: '\u0001'.repeat(512) });
+  const root = await reserveRoot(model, { writer: 'x', bytes: m.lifecycle.LIMITS.dataBytes + 1 });
+  assert.equal(jsonBytes(root), 258049);
+  await model.sync(root); model.counts.commit = 0;
+  await refusedUnchanged(m, model, 'S2 escaped writer');
+});
+test('S3', 'a true final shrink in the reserve band still publishes, strictly smaller than the root and above the ordinary limit', async (m) => {
+  const model = await modelLifecycle(m);
+  await model.sync(await reserveRoot(model, { bytes: m.lifecycle.LIMITS.bytes })); model.counts.commit = 0;
+  const before = jsonBytes(model.root()); await retireFirst(model); const after = jsonBytes(model.root());
+  assert.equal(model.counts.commit, 1); assert.ok(after < before && after > m.lifecycle.LIMITS.dataBytes, `${before} -> ${after}`);
+  (RELEASE.shrink ||= {})['S3 true shrink'] = { before, after, commits: 1, outcome: 'published' };
+});
+test('S4', 'in the reserve band an equal or growing final candidate is refused and a one-byte final shrink publishes (strictly smaller only)', async (m) => {
+  const buildId = 'b'.repeat(512), bytes = m.lifecycle.LIMITS.dataBytes + 200, removed = await retirementDelta(m, buildId, bytes);
+  assert.ok(removed > 1 && removed < 500, String(removed));
+  for (const grow of [0, 1]) {
+    const model = await modelLifecycle(m, { buildId });
+    await model.sync(await reserveRoot(model, { writer: 'b'.repeat(512 - removed - grow), bytes })); model.counts.commit = 0;
+    await refusedUnchanged(m, model, `S4 final ${grow ? 'one byte larger than' : 'equal to'} the root`);
+  }
+  const model = await modelLifecycle(m, { buildId });
+  await model.sync(await reserveRoot(model, { writer: 'b'.repeat(512 - removed + 1), bytes })); model.counts.commit = 0;
+  const before = jsonBytes(model.root()); await retireFirst(model);
+  assert.equal(model.counts.commit, 1); assert.equal(jsonBytes(model.root()), before - 1);
+  (RELEASE.shrink ||= {})['S4 one-byte shrink'] = { before, after: before - 1, removed, commits: 1, outcome: 'published' };
+});
+test('S5', 'ordinary band: a growing retirement within 258,048 bytes publishes (fallback kept), and one byte over without a strict shrink is refused', async (m) => {
+  const buildId = 'b'.repeat(512), { dataBytes } = m.lifecycle.LIMITS;
+  const removed = await retirementDelta(m, buildId, dataBytes - 2000);
+  for (const over of [0, 1]) {
+    const model = await modelLifecycle(m, { buildId });
+    // writer 'x' -> 512 'b's adds 511 bytes, so the final candidate is root - removed + 511
+    await model.sync(await reserveRoot(model, { writer: 'x', bytes: dataBytes + removed - 511 + over })); model.counts.commit = 0;
+    if (over) await refusedUnchanged(m, model, 'S5 ordinary limit plus one');
+    else { await retireFirst(model); assert.equal(model.counts.commit, 1); assert.equal(jsonBytes(model.root()), dataBytes); }
+  }
+});
+test('S6', 'absolute edges: 262,144 bytes is a valid root, 262,145 is not, and a growing retirement from a full root is refused unchanged', async (m) => {
+  const { bytes } = m.lifecycle.LIMITS;
+  const probe = await modelLifecycle(m);
+  const full = await reserveRoot(probe, { bytes });
+  assert.equal(m.lifecycle.classify(full), 'valid'); assert.equal(m.lifecycle.classify(sized(full, bytes + 1)), 'oversize');
+  const model = await modelLifecycle(m, { buildId: 'b'.repeat(512) });
+  await model.sync(await reserveRoot(model, { writer: 'x', bytes })); model.counts.commit = 0;
+  // past 262,144 bytes the final candidate is not a valid root at all, so it is refused before any byte-bound question
+  await refusedUnchanged(m, model, 'S6 full root growing', /root-invalid/);
+});
+test('S7', 'the comparison is with the authoritative root at the queued write (a newer host root reconciled by usable()), not a stale cached one', async (m) => {
+  const model = await modelLifecycle(m), { dataBytes } = m.lifecycle.LIMITS;
+  await model.lc.work('projects', { status: 'completed' });
+  const cached = structuredClone(model.root());
+  const newer = sized({ ...structuredClone(cached), revision: cached.revision + 1 }, dataBytes + 500);
+  model.saved.record.m4Journey = newer; model.counts.commit = 0;   // the host moved on; the lifecycle has not ticked yet
+  await retireFirst(model);
+  const after = jsonBytes(model.root());
+  assert.equal(model.counts.commit, 1);
+  assert.ok(after < jsonBytes(newer) && after > dataBytes && after > jsonBytes(cached), `${jsonBytes(cached)} / ${jsonBytes(newer)} -> ${after}`);
+});
+/* U1 (W5 2030, W4 2035, W2 2043): a project attempt's pre-dispatch provenance. preDispatchRefusal(operation, error) answers
+ * only for the exact error object that escaped this lifecycle's own known guard or the actual admit call, before this target
+ * was dispatched. It never proves that no control write happened, and an error's name, message or copy proves nothing. */
+const caught = async (fn) => { try { await fn(); return null; } catch (error) { return error; } };
+async function guardRefusal(m) {
+  const model = await modelLifecycle(m, { buildId: 'b'.repeat(512) });
+  await model.sync(await reserveRoot(model, { writer: 'x', bytes: m.lifecycle.LIMITS.dataBytes + 1 })); model.counts.commit = 0;
+  const operation = {}, before = canonicalRoot(m, model);
+  const error = await caught(() => model.lc.retire('projects', model.root().projects[0].id, 'retire-completed', { operation }));
+  return { model, operation, error, before };
+}
+test('U1A', 'a genuine lifecycle guard (byte-bound) yields exact proof for its own operation: zero commits, root and hold unchanged', async (m) => {
+  const { model, operation, error, before } = await guardRefusal(m);
+  assert.match(error?.message, /byte-bound/);
+  const proof = model.lc.preDispatchRefusal(operation, error);
+  assert.deepEqual(proof, { action: 'retire-work', collection: 'projects', source: 'lifecycle-guard', reason: 'byte-bound' });
+  assert.ok(Object.isFrozen(proof), 'the answer cannot mutate the witness');
+  assert.equal(model.counts.commit, 0); assert.equal(canonicalRoot(m, model), before);
+  assert.notEqual(model.lc.inspect().phase, 'publication-hold');
+});
+test('U1B', 'admission: an object thrown by admit is witnessed as admission/reason null; a thrown primitive gets no proof', async (m) => {
+  const model = await modelLifecycle(m); model.counts.commit = 0;
+  const operation = {}, refusal = new Error('project-exists');
+  const error = await caught(() => model.lc.work('projects', { status: 'unfinished' }, { operation, admit: () => { throw refusal; } }));
+  assert.equal(error, refusal, 'the exact escaping object');
+  assert.deepEqual(model.lc.preDispatchRefusal(operation, refusal), { action: 'work', collection: 'projects', source: 'admission', reason: null });
+  assert.equal(model.counts.commit, 0);
+  const op2 = {};
+  const thrown = await caught(() => model.lc.work('projects', { status: 'unfinished' }, { operation: op2, admit: () => { throw 'project-exists'; } }));
+  assert.equal(thrown, 'project-exists');
+  assert.equal(model.lc.preDispatchRefusal(op2, thrown), null, 'a primitive carries no exact-object proof');
+});
+test('U1C', 'a genuine guard error replayed through a fresh admit proves only admission/reason null; the first proof stays bound to its own attempt', async (m) => {
+  const { model, operation, error } = await guardRefusal(m);
+  const fresh = await modelLifecycle(m), op2 = {};
+  const replayed = await caught(() => fresh.lc.work('projects', { status: 'unfinished' }, { operation: op2, admit: () => { throw error; } }));
+  assert.equal(replayed, error);
+  assert.deepEqual(fresh.lc.preDispatchRefusal(op2, error), { action: 'work', collection: 'projects', source: 'admission', reason: null });
+  assert.equal(model.lc.preDispatchRefusal(operation, error).source, 'lifecycle-guard');
+  assert.equal(fresh.lc.preDispatchRefusal(operation, error), null, 'another lifecycle instance never answers for this operation');
+});
+test('U1D', 'same-name, forged, copied, proxied and wrong-pairing errors prove nothing; the query reads no supplied property', async (m) => {
+  const { model, operation, error } = await guardRefusal(m);
+  let traps = 0;
+  const trap = { get() { traps++; return undefined; }, getPrototypeOf() { traps++; return null; }, has() { traps++; return false; } };
+  assert.equal(model.lc.preDispatchRefusal(operation, new Error('byte-bound')), null, 'same text, other object');
+  assert.equal(model.lc.preDispatchRefusal(operation, Object.assign(Object.create(Error.prototype), error)), null, 'copied fields');
+  assert.equal(model.lc.preDispatchRefusal(operation, new Proxy(error, trap)), null, 'a proxy is another object');
+  assert.equal(model.lc.preDispatchRefusal(new Proxy(operation, trap), error), null, 'a proxied operation is another key');
+  assert.equal(model.lc.preDispatchRefusal({}, error), null, 'an unclaimed operation');
+  assert.equal(model.lc.preDispatchRefusal(operation, 'byte-bound'), null);
+  assert.equal(traps, 0, 'no trap ran: no property read, coercion or prototype check on supplied values');
+  // a dependency failure with no guard behind it: the port's snapshot throws an Error named like a guard inside the attempt
+  const other = await modelLifecycle(m), op = {};
+  other.port.snapshot = () => { throw new Error('stale-root'); };
+  const failure = await caught(() => other.lc.work('projects', { status: 'unfinished' }, { operation: op }));
+  assert.equal(failure?.message, 'stale-root');
+  assert.equal(other.lc.preDispatchRefusal(op, failure), null, 'a same-name dependency error is not a guard');
+});
+test('U1E', 'reuse throws before any queue or write and never overwrites the first attempt; the reuse error is unwitnessed', async (m) => {
+  const { model, operation, error } = await guardRefusal(m);
+  const commits = model.counts.commit;
+  let reuse = null;
+  try { model.lc.work('projects', { status: 'unfinished' }, { operation }); } catch (e) { reuse = e; }
+  assert.ok(reuse, 'a synchronous refusal at the public entry'); assert.match(reuse.message, /operation-reused/);
+  assert.equal(model.counts.commit, commits);
+  assert.equal(model.lc.preDispatchRefusal(operation, reuse), null);
+  assert.equal(model.lc.preDispatchRefusal(operation, error).reason, 'byte-bound', 'the first witness is unchanged');
+  // reuse while the first attempt is still queued behind an in-flight write: still synchronous, still no second dispatch
+  const busy = await modelLifecycle(m), op = {};
+  const first = busy.lc.work('projects', { status: 'unfinished' });
+  const queued = busy.lc.work('projects', { status: 'unfinished' }, { operation: op });
+  let again = null;
+  try { busy.lc.work('projects', { status: 'unfinished' }, { operation: op }); } catch (e) { again = e; }
+  assert.ok(again, 'reuse behind a busy queue is still refused synchronously'); assert.match(again.message, /operation-reused/);
+  await first; await queued;
+  assert.equal(busy.root().projects.length, 2, 'one write per operation');
+});
+test('U1F', 'after dispatch nothing is pre-dispatch proof: a throwing commit getter, a throwing call, a rejection, or a not-published hold', async (m) => {
+  for (const variant of ['getter', 'call', 'reject', 'not-published']) {
+    const model = await modelLifecycle(m), operation = {};
+    const real = model.port.commit;
+    if (variant === 'getter') Object.defineProperty(model.port, 'commit', { configurable: true, get() { throw new Error('byte-bound'); } });
+    if (variant === 'call') model.port.commit = () => { throw new Error('byte-bound'); };
+    if (variant === 'reject') model.port.commit = async () => { throw new Error('byte-bound'); };
+    if (variant === 'not-published') model.port.commit = async () => ({ outcome: 'not-published', acknowledged: false });
+    const error = await caught(() => model.lc.work('projects', { status: 'unfinished' }, { operation }));
+    assert.ok(error, `${variant}: the attempt failed`);
+    assert.equal(model.lc.preDispatchRefusal(operation, error), null, `${variant}: no pre-dispatch proof after dispatch`);
+    Object.defineProperty(model.port, 'commit', { configurable: true, writable: true, value: real });
+  }
+});
+test('U1G', 'both a synchronous guard throw and an asynchronous queued rejection reach the caller as the exact witnessed object', async (m) => {
+  const model = await modelLifecycle(m), syncOp = {};
+  let syncError = null;
+  try { model.lc.work('bogus', {}, { operation: syncOp }); } catch (e) { syncError = e; }
+  assert.equal(syncError?.message, 'work-kind', 'an idle queue throws synchronously');
+  assert.equal(model.lc.preDispatchRefusal(syncOp, syncError).reason, 'work-kind');
+  const asyncOp = {};
+  const first = model.lc.work('projects', { status: 'unfinished' });
+  const queued = model.lc.work('bogus', {}, { operation: asyncOp });
+  assert.ok(typeof queued?.then === 'function', 'a busy queue defers the attempt');
+  const asyncError = await caught(() => queued); await first;
+  assert.equal(model.lc.preDispatchRefusal(asyncOp, asyncError).reason, 'work-kind');
+});
+test('U1H', 'a control rotation committed before a target refusal: the witness holds and total commits are 1, so it never means "nothing was written"', async (m) => {
+  let now = Date.parse('2026-10-27T12:00:00+09:00');
+  const model = await modelLifecycle(m, { clock: () => now });
+  now = Date.parse('2026-10-28T12:00:00+09:00'); model.counts.commit = 0;   // the next day: tick() rotates before the target
+  const operation = {}, refusal = new Error('view-stale');
+  const error = await caught(() => model.lc.work('projects', { status: 'unfinished' }, { operation, admit: () => { throw refusal; } }));
+  assert.equal(error, refusal);
+  assert.equal(model.lc.preDispatchRefusal(operation, refusal).source, 'admission');
+  assert.equal(model.counts.commit, 1, 'the rotation control write happened before the target refusal');
+});
+test('U1I', 'C-U1-P1: an object kind is refused as before, and the query never reads, freezes or throws on it (getter, revoked proxy, cyclic, counting proxy)', async (m) => {
+  for (const variant of ['getter', 'revoked-proxy', 'cyclic', 'counting-proxy']) {
+    const model = await modelLifecycle(m), operation = {};
+    let reads = 0, kind;
+    if (variant === 'getter') kind = { get x() { reads++; return 1; } };
+    if (variant === 'revoked-proxy') { const r = Proxy.revocable({}, {}); kind = r.proxy; r.revoke(); }
+    if (variant === 'cyclic') { kind = {}; kind.self = kind; }
+    if (variant === 'counting-proxy') kind = new Proxy({}, Object.fromEntries(['get', 'has', 'ownKeys', 'getOwnPropertyDescriptor', 'getPrototypeOf',
+      'isExtensible', 'preventExtensions', 'defineProperty', 'set'].map((trap) => [trap, (...args) => { reads++; return Reflect[trap](...args); }])));
+    const commits = model.counts.commit;
+    const error = await caught(() => model.lc.work(kind, {}, { operation }));
+    assert.equal(error?.message, 'work-kind', `${variant}: the original refusal stays`);
+    let proofs = [], thrown = null;
+    try { proofs = [model.lc.preDispatchRefusal(operation, error), model.lc.preDispatchRefusal(operation, error)]; } catch (e) { thrown = e; }
+    assert.equal(thrown, null, `${variant}: the query never throws`);
+    assert.equal(reads, 0, `${variant}: no getter or trap ran`);
+    for (const proof of proofs) {
+      assert.deepEqual(proof, { action: 'work', collection: null, source: 'lifecycle-guard', reason: 'work-kind' }, `${variant}: primitive-only proof`);
+      assert.ok(Object.isFrozen(proof));
+    }
+    if (variant === 'getter' || variant === 'cyclic') assert.equal(Object.isFrozen(kind), false, `${variant}: the caller's object is not frozen`);
+    assert.equal(model.counts.commit, commits);
+  }
+});
+/** C-U1-B1 (W2 2103): a project kept across a reboot, a blocker held in flight, then the reboot and the target queued behind it,
+ * so a claimed target was claimed under the original boot and runs under its successor. afterFirst runs once the blocker lands. */
+async function queuedBehindReboot(m, action, { legacy = false, reboot = true, afterFirst = () => {} } = {}) {
+  const model = await modelLifecycle(m);
+  await model.lc.work('projects', { status: 'completed', label: 'kept' });
+  const kept = model.root().projects[0].id, original = model.lc.bootIdentity(), real = model.port.commit, commits = [];
+  let release, first = true;
+  const barrier = new Promise((resolve) => { release = resolve; });
+  model.port.commit = async (expected, next, meta) => {
+    commits.push(meta.action);
+    if (!first) return real(expected, next, meta);
+    first = false; await barrier;
+    const result = await real(expected, next, meta); afterFirst(model); return result;
+  };
+  const blocker = model.lc.work('projects', { status: 'unfinished', label: 'blocker' });
+  const booted = reboot ? model.lc.boot() : null;
+  const operation = {}, options = legacy ? {} : { operation };
+  const target = action === 'work' ? model.lc.work('projects', { status: 'completed', label: 'target' }, options)
+    : model.lc.retire('projects', kept, 'retire-completed', options);
+  assert.equal(model.lc.bootIdentity(), original, 'claimed before the queued reboot ran');
+  release();
+  const [b, , t] = await Promise.allSettled([blocker, booted, target]);
+  assert.equal(b.status, 'fulfilled', 'the blocker published');
+  return { model, kept, commits, target: t, operation, rebooted: model.lc.bootIdentity() !== original,
+    keptPresent: model.root().projects.some((p) => p.id === kept), targetPresent: model.root().projects.some((p) => p.label === 'target') };
+}
+test('U1J', 'C-U1-B1: a reboot queued ahead of a claimed work or retire refuses it unwitnessed by dispatch: the kept project survives; positives and legacy unchanged', async (m) => {
+  for (const action of ['work', 'retire-work']) {
+    const stale = await queuedBehindReboot(m, action);
+    assert.ok(stale.rebooted);
+    assert.equal(stale.target.status, 'rejected', `${action}: refused under the successor boot`);
+    assert.equal(stale.target.reason?.message, 'attempt-boot-changed');
+    assert.deepEqual(stale.commits, ['work'], `${action}: only the blocker was dispatched`);
+    assert.equal(stale.keptPresent, true, `${action}: the kept project survives`); assert.equal(stale.targetPresent, false);
+    assert.deepEqual(stale.model.lc.preDispatchRefusal(stale.operation, stale.target.reason),
+      { action, collection: 'projects', source: 'lifecycle-guard', reason: 'attempt-boot-changed' });
+    const positive = await queuedBehindReboot(m, action, { reboot: false });
+    assert.equal(positive.target.status, 'fulfilled', `${action}: the same claimed target without a reboot dispatches`);
+    assert.deepEqual(positive.commits, ['work', action], `${action}: once`);
+    assert.equal(positive.keptPresent, action === 'work'); assert.equal(positive.targetPresent, action === 'work');
+    const legacy = await queuedBehindReboot(m, action, { legacy: true });
+    assert.equal(legacy.target.status, 'fulfilled', `${action}: an unclaimed (legacy) call keeps its old behaviour behind a reboot`);
+    assert.deepEqual(legacy.commits, ['work', action]);
+  }
+});
+test('U1K', 'C-U1-B1: an owner change or a generation change across the queued reboot refuses the claimed target by its own claimed identity, at its start', async (m) => {
+  const owner = await queuedBehindReboot(m, 'work', { afterFirst: (model) => { model.port.binding = () => ({ epoch: 2 }); } });
+  assert.equal(owner.target.reason?.message, 'attempt-owner-changed');
+  assert.deepEqual(owner.commits, ['work']); assert.equal(owner.targetPresent, false);
+  const generation = await queuedBehindReboot(m, 'retire-work', { afterFirst: (model) => { model.saved.migrationId = 'model-migration-2'; } });
+  assert.equal(generation.target.reason?.message, 'attempt-generation-changed', 'refused on its claim, before any hold-dependent guard');
+  assert.deepEqual(generation.commits, ['work']); assert.equal(generation.keptPresent, true);
+  assert.equal(generation.model.lc.preDispatchRefusal(generation.operation, generation.target.reason).reason, 'attempt-generation-changed');
+});
+test('U1L', 'C-U1-B1: a reboot re-entered inside the attempt (the caller\'s admit, the port\'s binding) is refused at the last guard before dispatch', async (m) => {
+  const idle = () => new Promise((resolve) => setTimeout(resolve, 0));   // an idle queue runs the attempt, and a nested op, inline
+  const viaAdmit = await modelLifecycle(m);
+  await viaAdmit.lc.work('projects', { status: 'completed', label: 'kept' }); await idle();
+  const opA = {}, bootA = viaAdmit.lc.bootIdentity(), commitsA = viaAdmit.counts.commit;
+  let nested = false;
+  const errorA = await caught(() => { const step = viaAdmit.lc.work('projects', { status: 'completed', label: 'target' },
+    { operation: opA, admit: () => { if (!nested) { nested = true; viaAdmit.lc.boot(); } } }); assert.ok(nested, 'the reboot ran inside the attempt'); return step; });
+  assert.notEqual(viaAdmit.lc.bootIdentity(), bootA);
+  assert.equal(errorA?.message, 'attempt-boot-changed', 'admit re-entry: refused at the final boundary');
+  assert.equal(viaAdmit.counts.commit, commitsA); assert.equal(viaAdmit.root().projects.some((p) => p.label === 'target'), false);
+  assert.deepEqual(viaAdmit.lc.preDispatchRefusal(opA, errorA), { action: 'work', collection: 'projects', source: 'lifecycle-guard', reason: 'attempt-boot-changed' });
+  const viaPort = await modelLifecycle(m);
+  await viaPort.lc.work('projects', { status: 'completed', label: 'kept' }); await idle();
+  const kept = viaPort.root().projects[0].id, opB = {}, bootB = viaPort.lc.bootIdentity(), commitsB = viaPort.counts.commit, binding = viaPort.port.binding;
+  let armed = true;
+  viaPort.port.binding = () => { if (armed) { armed = false; viaPort.lc.boot(); } return binding(); };
+  const errorB = await caught(() => viaPort.lc.retire('projects', kept, 'retire-completed', { operation: opB }));
+  assert.equal(armed, false); assert.notEqual(viaPort.lc.bootIdentity(), bootB);
+  assert.equal(errorB?.message, 'attempt-boot-changed', 'dependency re-entry: refused at the final boundary');
+  assert.equal(viaPort.counts.commit, commitsB); assert.ok(viaPort.root().projects.some((p) => p.id === kept), 'the kept project survives');
+  assert.equal(viaPort.lc.preDispatchRefusal(opB, errorB).reason, 'attempt-boot-changed');
+});
+
 /** the release build (a8b9cbff, the same host and app bytes as 87dededd) for P3, and the measured findings */
 const RELEASE = {};
 for (const name of ['host', 'app']) RELEASE[name] = (await import('node:child_process')).execFileSync('git',
@@ -475,6 +810,29 @@ export const MUTANTS = {
   'no-reconcile': ['L5', 'lifecycle', [['  reconcile();\n', '']]],
   'rotation-clears-hold': ['L6', 'lifecycle', [["if(holdEpoch===holds){phase='active';holdUntil=-Infinity;}", "phase='active';holdUntil=-Infinity;"]]],
   'depth-24': ['D1', 'lifecycle', [[' if(depth>22)return false;', ' if(depth>24)return false;']]],
+  // LIFECYCLE-SHRINK: the old order (eligibility decided before the writer stamp), a non-strict shrink, and a reserve for every write
+  'shrink-before-stamp': ['S1', 'lifecycle', [['{shrink:shrinkingControl,observe,attempt}', '{control:shrinkingControl&&bytes(next)<bytes(root),observe,attempt}']]],
+  'shrink-not-strict': ['S4', 'lifecycle', [['bytes(next)<bytes(prior)', 'bytes(next)<=bytes(prior)']]],
+  'reserve-always': ['S5', 'lifecycle', [['reserve=control||shrink&&', 'reserve=true||shrink&&']]],
+  // U1: each boundary mutant must fail its own case at an assertion
+  'u1-catch-all-brand': ['U1D', 'lifecycle', [["catch(error){if(attempt&&attempt.state==='validating')attempt.state='refused-unproved';throw error;}",
+    "catch(error){if(attempt&&attempt.state==='validating')Object.assign(attempt,{state:'refused-before-dispatch',error,source:'lifecycle-guard',reason:String(error&&error.message)});throw error;}"]]],
+  'u1-admission-as-guard': ['U1C', 'lifecycle', [["{state:'refused-before-dispatch',error,source:'admission',reason:null}", "{state:'refused-before-dispatch',error,source:'lifecycle-guard',reason:error.message}"]]],
+  'u1-reuse-overwrites': ['U1E', 'lifecycle', [["insist(!attempts.has(operation),'operation-reused');", ""]]],
+  'u1-post-dispatch-branded': ['U1F', 'lifecycle', [["  if(attempt)attempt.state='dispatch-entered'; // before port.commit is read, called or awaited\n", ""],
+    ["insist((yield* write(next,action,{shrink:shrinkingControl,observe,attempt})),'publication-hold');", "guard(attempt,(yield* write(next,action,{shrink:shrinkingControl,observe,attempt})),'publication-hold');"],
+    ["result=yield port.commit(", "result=yield (()=>{try{return port.commit;}catch(e){guard(attempt,false,'byte-bound');}})()("]]],
+  'u1-message-match': ['U1D', 'lifecycle', [["a.error===error?", "(a.error===error||String(a.error?.message)===String(error?.message))?"]]],
+  'u1-primitive-proof': ['U1B', 'lifecycle', [["error!==null&&(typeof error==='object'||typeof error==='function')?", "true?"]]],
+  'u1-claim-in-queue': ['U1E', 'lifecycle', [["const publicWork=(kind,data,options={})=>{const attempt=claim('work',kind,options?.operation,options?.target);return run(()=>work(kind,data,options,attempt));};",
+    "const publicWork=(kind,data,options={})=>run(()=>work(kind,data,options,claim('work',kind,options?.operation,options?.target)));"]]],
+  'u1-proof-not-frozen': ['U1A', 'lifecycle', [["?Object.freeze({action:a.action,collection:a.collection,source:a.source,reason:a.reason}):null;", "?{action:a.action,collection:a.collection,source:a.source,reason:a.reason}:null;"]]],
+  // C-U1-P1/B1 (W2 2103): the raw kind deep-frozen again, an attempt start that ignores its claim, a last guard that does, and
+  // neither check (the f4255d51 behaviour)
+  'u1-raw-kind-deep-freeze': ['U1I', 'lifecycle', [['const attempt={action,collection:kind,', 'const attempt={action,collection,'], ['?Object.freeze({action:a.action,', '?freeze({action:a.action,']]],
+  'u1-start-unbound': ['U1K', 'lifecycle', [['try{stillBound(attempt);const value=', 'try{const value=']]],
+  'u1-final-unbound': ['U1L', 'lifecycle', [["  stillBound(attempt);\n  if(attempt)attempt.state='dispatch-entered';", "  if(attempt)attempt.state='dispatch-entered';"]]],
+  'u1-binding-unenforced': ['U1J', 'lifecycle', [['const stillBound=attempt=>{if(!attempt)return;', 'const stillBound=attempt=>{return;']]],
 };
 
 async function main() {
@@ -499,7 +857,8 @@ async function main() {
   }
   const failed = results.filter((r) => !r.passed), survived = controls.filter((c) => !c.killed);
   console.log(JSON.stringify({ cases: `${results.length - failed.length}/${results.length}`, failed,
-    findings: { releaseHostOpensJournaledRecord: RELEASE.rollback ? { status: RELEASE.rollback.status, reason: RELEASE.rollback.reason } : null, p6: RELEASE.p6 ?? null },
+    findings: { releaseHostOpensJournaledRecord: RELEASE.rollback ? { status: RELEASE.rollback.status, reason: RELEASE.rollback.reason } : null, p6: RELEASE.p6 ?? null,
+      shrink: RELEASE.shrink ?? null },
     controls: controls.length ? `${controls.length - survived.length}/${controls.length}` : 'not run', survived, controlDetails: controls }, null, 1));
   process.exitCode = failed.length || survived.length ? 1 : 0;
 }
