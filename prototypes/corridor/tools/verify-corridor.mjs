@@ -1371,7 +1371,10 @@ async function main() {
   // English under it and opens nothing; the third, taken only once that English is seen, opens the stage
   await page.waitForFunction((n) => n.dataset.ladderRung === 'reading', await tapWord(), { timeout: 8000 });
   await touchAt(page, '#reader .tok.content', tapIdx, 0, false);
-  await page.waitForFunction((n) => n.dataset.ladderRung !== 'reading' || !!document.getElementById('mini'), await tapWord(), { timeout: 8000 });
+  // the English rung seats its row at once and writes the English when the word's reading and sense settle (tok-en-wait):
+  // wait for that English within the same 8 s, then the check judges what landed
+  await page.waitForFunction((n) => (n.dataset.ladderRung !== 'reading' && !!n.querySelector(':scope > .tok-en .tok-en-text')?.textContent.trim()) ||
+    !!document.getElementById('mini'), await tapWord(), { timeout: 8000 }).catch(() => {});
   const englishOnly = await page.locator('#reader .tok.content').nth(tapIdx).evaluate((node) => ({
     rung: node.dataset.ladderRung, readings: node.querySelectorAll('rt:not(.hidden-rt)').length,
     english: node.querySelector(':scope > .tok-en .tok-en-text')?.textContent.trim() ?? '', rows: document.querySelectorAll('#reader .tok-en').length,
@@ -2217,6 +2220,7 @@ async function main() {
   await page.fill('#note-input', '読み物のふりがなが小さい');
   await tap(page, '#note-send');
   await page.waitForTimeout(300);
+  await waitForAppRecord(page, (r) => (r.obslog || []).some((x) => x[1] === 'note' && x[3] === '読み物のふりがなが小さい'), { timeout: 8000 }).catch(() => {});
   const noteRow = await evaluateAppRecord(page, `(() => {
     const s = record;
     const rows = (s.obslog || []).filter((r) => r[1] === 'note');
@@ -2773,6 +2777,7 @@ async function main() {
   await holdWord(page, '#reader .tok.content', 3); // reading (1), English (2), stage (no row), entry (3) again
   await page.waitForSelector('#sheet');
   await page.waitForTimeout(1600); // the trailing debounce persists the rows
+  await waitForAppRecord(page, (r) => (r.obslog || []).slice(obsBefore).filter((x) => x[1] === 'tap').length >= 6, { timeout: 8000 }).catch(() => {});
   const obs = await evaluateAppRecord(page, `(() => {
     const env = record;
     const rows = (env.obslog || []).slice(${obsBefore});
@@ -2833,6 +2838,7 @@ async function main() {
   );
   await page.locator('[data-probe="wrong"]').click();
   await page.waitForTimeout(300);
+  await waitForAppRecord(page, (r) => (r.taken || []).length === probeEnvBefore.taken + 1, { timeout: 8000 }).catch(() => {});
   const probeAfter = await evaluateAppRecord(page, `(() => {
     const e = record;
     const rows = (e.obslog || []).filter((r) => r[1] === 'probe');
@@ -2888,6 +2894,7 @@ async function main() {
   await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
   await page.waitForTimeout(400);
   const dojoDay = `(() => { const d = new Date(); const p = (n) => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); })()`;
+  await waitForAppRecord(page, (r) => (r.revlog || []).length === 1, { timeout: 8000 }).catch(() => {});
   const dojoTakenAfter = await evaluateAppRecord(page, `(() => {
     const e = record;
     const day = ${dojoDay};
@@ -2919,6 +2926,7 @@ async function main() {
   // new-card budget unburned, one obslog row naming the drill room
   await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
   await page.waitForTimeout(400);
+  await waitForAppRecord(page, (r) => (r.obslog || []).some((x) => x[1] === 'dojo'), { timeout: 8000 }).catch(() => {});
   const dojoDrillAfter = await evaluateAppRecord(page, `(() => {
     const e = record;
     const day = ${dojoDay};
@@ -3090,6 +3098,7 @@ async function main() {
   if (await page.locator('#vocabulary-list-popover').count()) { await page.keyboard.press('Escape'); await page.waitForTimeout(200); }
   await tap(page, '[data-ctx-scope="sent"]');
   await page.waitForTimeout(300);
+  await waitForAppRecord(page, (r) => (r.taken || []).some((t) => t.ctx?.scope === 'sent'), { timeout: 8000 }).catch(() => {});
   const ctxStored = await evaluateAppRecord(page, `(() => {
     const e = record;
     const it = (e.taken || []).find((t) => t.ctx);
@@ -3194,6 +3203,7 @@ async function main() {
   await page.waitForSelector('[data-dial="furigana:2"]', { state: 'attached', timeout: 8000 });
   await page.locator('[data-dial="furigana:2"]').dispatchEvent('click');
   await page.waitForTimeout(300);
+  await waitForAppRecord(page, (r) => r.dials?.furigana === 2, { timeout: 8000 }).catch(() => {});
   const dialPersist = await evaluateAppRecord(page,
     `record.dials?.furigana`,
   );
@@ -3301,6 +3311,7 @@ async function main() {
   await page.keyboard.press('Escape');
   await page.waitForSelector('#vocabulary-list-popover', { state: 'detached' });
   await page.waitForTimeout(300);
+  await waitForAppRecord(page, (r) => (r.taken || []).length === 0, { timeout: 8000 }).catch(() => {});
   const afterUntake = await evaluateAppRecord(page, `(() => {
     const e = record;
     return { taken: (e.taken || []).length, revlog: (e.revlog || []).length,
@@ -3325,6 +3336,7 @@ async function main() {
   await page.waitForSelector('#sheet #sheet-take');
   await tap(page, '#sheet-take');
   await page.waitForTimeout(300);
+  await waitForAppRecord(page, (r) => (r.taken || []).length === 1, { timeout: 8000 }).catch(() => {});
   const reTaken = await evaluateAppRecord(page, `(() => {
     const e = record;
     const rec = e.srs?.['word:学校'];
@@ -3351,6 +3363,7 @@ async function main() {
   await page.fill('#list-maker-field', '読書');
   await page.locator('#list-maker-make').click();
   await page.waitForTimeout(150);
+  await waitForAppRecord(page, (r) => Object.hasOwn(r.lists || {}, '読書'), { timeout: 8000 }).catch(() => {});
   const dupeState = await evaluateAppRecord(page, `(() => {
     const e = record;
     const f = document.querySelector('#list-maker-field');
@@ -3374,6 +3387,7 @@ async function main() {
   await page.fill('.list-rename .list-maker-field', '精読');
   await page.locator('.list-rename .list-maker-make').click();
   await page.waitForTimeout(250);
+  await waitForAppRecord(page, (r) => Object.hasOwn(r.lists || {}, '精読'), { timeout: 8000 }).catch(() => {});
   const renamed = await evaluateAppRecord(page, `(() => {
     const e = record;
     return Object.keys(e.lists || {});
@@ -3388,6 +3402,7 @@ async function main() {
   })()`);
   await page.locator('.list-op.armed').click();
   await page.waitForTimeout(250);
+  await waitForAppRecord(page, (r) => Object.keys(r.lists || {}).length === 0, { timeout: 8000 }).catch(() => {});
   const deleted = await evaluateAppRecord(page, `(() => {
     const e = record;
     return { lists: Object.keys(e.lists || {}).length, taken: (e.taken || []).length,
@@ -3605,6 +3620,7 @@ async function main() {
     sentSeal.present && sentSeal.label.includes('半島'), JSON.stringify(sentSeal));
   await tap(page, '#sheet-take');
   await page.waitForTimeout(300);
+  await waitForAppRecord(page, (r) => (r.taken || []).at(-1)?.id === '半島', { timeout: 8000 }).catch(() => {});
   const sentCap = await evaluateAppRecord(page, `(() => {
     const e = record;
     const it = (e.taken || [])[(e.taken || []).length - 1];
@@ -3684,6 +3700,7 @@ async function main() {
     `"${trayBefore.button.trim()}" · forecast "${trayBefore.forecast}"`);
   await page.locator('[data-srs-start="word:人々"]').click();
   await page.waitForTimeout(300);
+  await waitForAppRecord(page, (r) => typeof (r.taken || []).find((t) => t.id === '人々')?.started === 'number', { timeout: 8000 }).catch(() => {});
   const trayAfter = await evaluateAppRecord(page, `(() => {
     const e = record;
     const row = e.taken.find((t) => t.id === '人々');
@@ -3725,6 +3742,7 @@ async function main() {
   await page.waitForSelector('.grade.g-good');
   await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
   await page.waitForTimeout(400);
+  await waitForAppRecord(page, (r) => (r.revlog || []).length > 0, { timeout: 8000 }).catch(() => {});
   const backProbe = await evaluateAppRecord(page, `(() => {
     const e = record;
     const rec = e.srs['word:学校'];
@@ -4023,6 +4041,7 @@ async function main() {
   await page.waitForSelector('.anki-undo-slot .review-undo', { timeout: 8000 });
   await page.evaluate(`document.querySelector('.review-undo')?.click()`);
   await page.waitForTimeout(300);
+  await waitForAppRecord(page, (r) => (r.revlog || []).at(-1)?.[1] === 'word:先生' && r.revlog.at(-1)[2] === 0, { timeout: 8000 }).catch(() => {});
   const undoneR3C = await evaluateAppRecord(page, `(() => {
     const e = record;
     const last = e.revlog[e.revlog.length - 1];
@@ -4613,6 +4632,7 @@ async function main() {
   await page.waitForSelector('.grade-row .grade.g-good');
   await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
   await page.waitForTimeout(400);
+  await waitForAppRecord(page, (r) => (r.revlog || []).length > 0, { timeout: 8000 }).catch(() => {});
   const gradedR3D = await evaluateAppRecord(page, `(() => {
     const e = record;
     return { rec: e.srs['word:学校'], row: e.revlog[e.revlog.length - 1] };
@@ -4783,6 +4803,7 @@ async function main() {
   }, { x: restBox.cx, y: edgeY }), 'rest edge must hit the intended rest button');
   await page.mouse.click(restBox.cx, edgeY);
   await page.waitForTimeout(300);
+  await waitForAppRecord(page, (r) => Object.keys(r.suspended || {}).length === 1, { timeout: 8000 }).catch(() => {});
   const afterEdge = await evaluateAppRecord(page, `(() => ({
     suspended: Object.keys(record.suspended || {}),
     sheet: !!document.querySelector('#sheet'),
@@ -4867,6 +4888,7 @@ async function main() {
     );
     await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
     await page.waitForTimeout(400);
+    await waitForAppRecord(page, (r) => (r.obslog || []).some((x) => x[1] === 'dojo'), { timeout: 8000 }).catch(() => {});
     const afterUnstarted = await evaluateAppRecord(page, `(() => {
       const e = record;
       const day = Object.values(e.stats || {}).reduce((a, s) => a + (s.nnew || 0), 0);
@@ -4950,6 +4972,7 @@ async function main() {
   const chosenWord = await page.evaluate(`document.querySelector('[data-enroll]')?.dataset.enroll ?? null`);
   await page.evaluate(`document.querySelector('[data-enroll]').click()`);
   await page.waitForTimeout(250);
+  await waitForAppRecord(page, (r) => (r.taken || []).length === 1 && Number.isFinite(r.taken[0].started), { timeout: 8000 }).catch(() => {});
   const afterOne = await evaluateAppRecord(page, `(() => {
     const e = record;
     return {
@@ -4964,6 +4987,7 @@ async function main() {
   await shoot(page, shotsDir, '23-r4b-lesson-enroll-choice');
   await page.evaluate(`document.querySelector('#lesson-enroll-all').click()`);
   await page.waitForTimeout(250);
+  await waitForAppRecord(page, (r) => (r.taken || []).length === 10 && r.taken.every((t) => Number.isFinite(t.started)), { timeout: 8000 }).catch(() => {});
   const afterAll = await evaluateAppRecord(page, `(() => {
     const e = record;
     const ids = (e.taken || []).map((t) => t.id);
@@ -5032,6 +5056,7 @@ async function main() {
     await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
     await page.waitForTimeout(300);
   }
+  await waitForAppRecord(page, (r) => (r.revlog || []).length === 2, { timeout: 8000 }).catch(() => {});
   const lap1After = await evaluateAppRecord(page, `(() => {
     const e = record;
     return {
@@ -5059,6 +5084,7 @@ async function main() {
   await shoot(page, shotsDir, '24-r4b-dojo-second-lap');
   await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
   await page.waitForTimeout(300);
+  await waitForAppRecord(page, (r) => (r.obslog || []).some((x) => x[1] === 'dojo'), { timeout: 8000 }).catch(() => {});
   const lap2After = await evaluateAppRecord(page, `(() => {
     const e = record;
     const rows = (e.obslog || []).filter((r) => r[1] === 'dojo');
