@@ -281,7 +281,7 @@ describe('operation journal restore — two real SQLite files (ci-substitute)', 
     expect(
       final.replica.operations.filter((op) => op.actor.deviceId === sourceActor.deviceId),
     ).toEqual(backup.operations);
-  }, 120_000);
+  }, 30_000);
 
   it('preserves pending facts and later quarantine while merging genuine predecessors', async () => {
     const current = open().store;
