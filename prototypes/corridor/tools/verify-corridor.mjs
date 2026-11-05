@@ -1759,7 +1759,7 @@ async function main() {
   // radical → back out to another kanji that uses it
   const markFamilyChip = async () => page.evaluate(`(() => {
     const heads = [...document.querySelectorAll('#sheet .eyebrow')];
-    const h = heads.find((x) => x.textContent === 'kanji that contain this part');
+    const h = heads.find((x) => x.textContent.startsWith('kanji that contain this part'));
     if (!h) return 0;
     const chips = [...(h.nextElementSibling?.querySelectorAll('.chip') ?? [])];
     const pick = chips[chips.length > 1 ? 1 : 0];
