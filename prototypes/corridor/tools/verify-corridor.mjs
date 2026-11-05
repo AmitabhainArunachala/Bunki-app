@@ -1730,10 +1730,7 @@ async function main() {
 
   // kanji → radical
   const markPartChip = async () => page.evaluate(`(() => {
-    const heads = [...document.querySelectorAll('#sheet .eyebrow')];
-    const h = heads.find((x) => x.textContent === 'main components');
-    if (!h) return 0;
-    const first = h.nextElementSibling?.querySelector('.entry-row');
+    const first = document.querySelector('#sheet .entry-row[data-component]');
     if (!first) return 0;
     first.dataset.probe = 'partchip';
     return 1;
