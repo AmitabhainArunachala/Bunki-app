@@ -112,6 +112,7 @@ export function corridorSandbox(program, { core, fsrsApi, pin, record, dict = {}
     globalThis: null, window: {}, navigator: { locks }, localStorage: storage,
     recordEpoch: 1, recordApp: null, publishedRecord: {}, DEFAULT_LEARNER_RECORD: {},
     personalHost: undefined,
+    sharedStudyActive: () => false,
     recordWritable: (epoch = sandbox.recordEpoch) => box.mode !== 'pre-write-refusal' && epoch === sandbox.recordEpoch,
     recordReady: (epoch = sandbox.recordEpoch) => epoch === sandbox.recordEpoch,
     safelySyncStoreAlert: () => {},

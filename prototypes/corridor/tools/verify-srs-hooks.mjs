@@ -907,6 +907,21 @@ async function glueSuite(core, engines, corridorProgram, mods = R8_MODS) {
     assert.equal((await box.lifted.reportHookAttempt(hookEvidence())).write, true, 'an unannotated candidate keeps the r7 path');
     return 'HOOKS r8: an annotated candidate without the admitted rule and a verified admission is refused (not-recorded line, no write); an unannotated one grades as in r7';
   });
+  await check('C12', 4, async () => {
+    const normal = corridorBox();
+    assert.equal((await normal.lifted.reportHookAttempt(hookEvidence())).write, true, 'shared study off: the normal hook still grades');
+    assert.equal(normal.box.writes, 1);
+    const box = corridorBox();
+    box.sandbox.sharedStudyActive = () => true;
+    const r = await box.lifted.reportHookAttempt(hookEvidence());
+    assert.deepEqual([r.write, r.reason], [false, 'unmapped-shared-contract']);
+    assert.equal(r.line, 'This contract is not mapped to shared study.');
+    assert.ok(r.line.length > 20, 'a plain line');
+    assert.equal(box.box.writes, 0, 'no write');
+    assert.equal(box.box.producerRan, 0, 'the record app never runs');
+    assert.equal(box.storage.getItem(KEY), null, 'no answer mark');
+    return 'shared study on: reportHookAttempt refuses unmapped-shared-contract with its line before the record app, writing nothing and leaving no mark (even though the lower shared write guard also refuses); shared study off: the normal hook grades';
+  });
   await r8.r8Cases({ check, layer, program: corridorProgram, core, fsrsApi, pin, mods, sources: R8_SOURCES });
   return cases;
 }
@@ -986,6 +1001,7 @@ const CORRIDOR_MUTANTS = {
   'review-owner-unpinned': [["        if (!recordWritable(epoch)) { refusal = 'publish-failed'; return { outcome: 'not-published', graded: false }; }\n", '']],
   'hook-ignores-binding-epoch': [['  const epoch = Number.isSafeInteger(binding?.epoch) ? binding.epoch : recordEpoch;', '  const epoch = recordEpoch;']],
   'hook-skips-admission': [["    if (!admitted) return refusedWith('review-unverified');\n", '']],
+  'hook-shared-study-guard': [["  if (sharedStudyActive()) return {write:false,reason:'unmapped-shared-contract',line:'This contract is not mapped to shared study.'};\n", '']],
   'hook-stale-clock': [["    clock: () => new Date(),\n    storage: globalThis.localStorage,\n    where: evidence?.surface,", "    clock: ((sampled) => () => sampled)(new Date()),\n    storage: globalThis.localStorage,\n    where: evidence?.surface,"]],
   ...r8.R8_CORRIDOR_MUTANTS,
 };
@@ -994,6 +1010,7 @@ const EXPECT = {
   'corridor-no-reservation': ['C2'], 'corridor-false-ack': ['C1', 'C3'], 'corridor-durable-unknown': ['C1', 'C3'], 'corridor-declined-alerts': ['C1'],
   'review-no-recheck': ['C6'], 'review-unlocked': ['C6'], 'review-stale-clock': ['C8'], 'hook-stale-clock': ['C8'],
   'hook-owner-unpinned': ['C9'], 'review-owner-unpinned': ['C9'], 'hook-ignores-binding-epoch': ['C10'], 'hook-skips-admission': ['C11'],
+  'hook-shared-study-guard': ['C12'],
   'r8-line-drift': ['P22'], 'r7-help-cap': ['P23'], 'policy-unpinned': ['P23'], 'shown-answer-honours-label': ['P23'],
   'grade-passive': ['P1'], 'trust-target': ['P14'], 'open-surface': ['P13'], 'ignore-help': ['P3', 'P4'], 'late-help-counts': ['P4'],
   'facet-optional': ['P13'], 'loose-time': ['P13'], 'trust-tap': ['P6'], 'reveal-is-recall': ['P6'], 'no-day-cap': ['P7', 'P8'],
