@@ -1,0 +1,6042 @@
+{
+  "schemaVersion": "1.1.0",
+  "status": "calculated_radicals_first_decided",
+  "generatedOn": "2026-10-28",
+  "decisionSource": "JOHN-DECISIONS.md",
+  "revision": "FIXES-2-before-H6",
+  "rule": {
+    "normalizeVariantsFirst": true,
+    "excludeStrokeOnlyWorldSlots": [
+      "丿",
+      "丶",
+      "丨",
+      "亅"
+    ],
+    "excludeShapeOnlyWorldSlots": [
+      "䒑",
+      "业",
+      "关",
+      "圣",
+      "开",
+      "彑",
+      "龶"
+    ],
+    "seed": "canonical radicals actually referenced by Jōyō kanji.json rad fields after variant/local-only normalization, union atomic Jōyō after the same normalization",
+    "fill": "remaining component identities by descending count of Jōyō hosts, then descending summed Wikipedia host-token frequency, then canonical glyph",
+    "singleOrderingForAllMetrics": true,
+    "coverageModel": "normalized wwParts minus stroke-only and reviewed shape-only local geometry; complete means all world-required main parts selected; attached means at least one selected world or selected atomic self",
+    "localResiduals": "Reviewed shape-only pieces remain residualParts taught inside their hosts; they never consume painted-world slots."
+  },
+  "variantGroups": [
+    [
+      "艸",
+      "艹"
+    ],
+    [
+      "水",
+      "氵",
+      "氺"
+    ],
+    [
+      "人",
+      "亻"
+    ],
+    [
+      "手",
+      "扌"
+    ],
+    [
+      "心",
+      "忄"
+    ],
+    [
+      "示",
+      "礻"
+    ],
+    [
+      "衣",
+      "衤"
+    ],
+    [
+      "玉",
+      "王"
+    ],
+    [
+      "火",
+      "灬"
+    ],
+    [
+      "刀",
+      "刂"
+    ],
+    [
+      "辵",
+      "辶"
+    ],
+    [
+      "肉",
+      "⺼"
+    ],
+    [
+      "食",
+      "飠"
+    ],
+    [
+      "爪",
+      "爫"
+    ],
+    [
+      "牛",
+      "牜"
+    ],
+    [
+      "犬",
+      "犭"
+    ],
+    [
+      "老",
+      "耂"
+    ],
+    [
+      "戸",
+      "戶"
+    ],
+    [
+      "青",
+      "靑"
+    ],
+    [
+      "罒",
+      "网"
+    ],
+    [
+      "黄",
+      "黃"
+    ],
+    [
+      "亀",
+      "龜"
+    ],
+    [
+      "麦",
+      "麥"
+    ],
+    [
+      "攴",
+      "攵"
+    ]
+  ],
+  "shapePieceReview": [
+    {
+      "id": "䒑",
+      "decision": "residual_local",
+      "reason": "No standalone app record; sheep-bearing hosts already carry 羊, while other hosts use only shape. Do not create a second sheep world."
+    },
+    {
+      "id": "龶",
+      "decision": "residual_local",
+      "reason": "A recurring top form across 青, 責, 麦, 害 and others, with no stable teachable meaning across those hosts."
+    },
+    {
+      "id": "业",
+      "decision": "residual_local",
+      "reason": "A shape in 並, 業, 虚 and others; a simplified standalone gloss cannot be transferred into those Japanese hosts."
+    },
+    {
+      "id": "开",
+      "decision": "residual_local",
+      "reason": "A local shape/role inside 刑, 形, 研 and 開; it does not consistently teach open."
+    },
+    {
+      "id": "关",
+      "decision": "residual_local",
+      "reason": "A local shape inside 咲, 送, 関 and 朕; it supplies no stable close/connection meaning across hosts."
+    },
+    {
+      "id": "圣",
+      "decision": "residual_local",
+      "reason": "The app gloss Holy does not explain its Jōyō hosts 径, 怪, 経, 茎 and 軽; keep its local shape/phonetic role instead."
+    },
+    {
+      "id": "彑",
+      "decision": "residual_local",
+      "reason": "The pig-head radical gloss does not recur as pig meaning in its Jōyō hosts; teach local geometry rather than a separate world."
+    }
+  ],
+  "inputs": {
+    "kanji.json": {
+      "path": "/Users/dhyana/.dharma/bunki_review/2026-10-15/site-main-5559ee3/data/share_alike/kanji.json",
+      "sha256": "8ce7ad0151a2bf487bda72c384460eca908fc1bdc2a4073042b9e3db7342d2ce"
+    },
+    "radicals214.json": {
+      "path": "/Users/dhyana/.dharma/bunki_review/2026-10-15/site-main-5559ee3/data/share_alike/radicals214.json",
+      "sha256": "b5c0df196761eb1979a8d61b2d54176b8b0c62dc990d5d08837b10a075d2eb86"
+    },
+    "joyoSource": {
+      "path": "/Users/dhyana/.dharma/bunki/LEAD/sweeps/20261022-combined-0d854bea/reading-truth-data-gaps/upstream/kanjidic-20261022-060735/kanjidic2-en-3.6.2+20260803141815.json.zip",
+      "sha256": "5dfb850ee88c7bccecf4694cc4d7b1338e608440c5edcb8fefc93216b3471fe6",
+      "normalization": "replace 剝/𠮟 with 剥/叱 for calculation only"
+    },
+    "frequency": {
+      "url": "https://raw.githubusercontent.com/scriptin/kanji-frequency/master/data/wikipedia_characters.csv",
+      "sha256": "d92c147b27ae9616461f6082b831213ac0027fed919f3a9815cce44711165567",
+      "role": "tie-break after Jōyō host count"
+    }
+  },
+  "counts": {
+    "joyo": 2136,
+    "radicalIdentitiesUsed": 197,
+    "atomicJoyoAfterNormalization": 72,
+    "seedWorlds": 200,
+    "requiredMainPartIdentities": 804,
+    "allWorldsForCompleteDecomposition": 819,
+    "exactMinimumUniversalAttachment": 421,
+    "exactMinimumUniversalAttachmentDualBound": 421,
+    "grossOldIdentitiesRemoved": 14,
+    "canonicalIdentitiesAdded": 1,
+    "netWorldSlotsFreed": 13,
+    "localOnlyShapePieceOccurrences": 59
+  },
+  "attachmentOptimization": {
+    "solver": "scipy.optimize.milp / HiGHS",
+    "status": "optimal",
+    "objective": 421,
+    "dualBound": 421
+  },
+  "curve": [
+    {
+      "worlds": 200,
+      "complete": 815,
+      "completePct": 38.16,
+      "attached": 1856,
+      "attachedPct": 86.89,
+      "kanjiWithResidual": 1321,
+      "residualOccurrences": 1366
+    },
+    {
+      "worlds": 250,
+      "complete": 1147,
+      "completePct": 53.7,
+      "attached": 1868,
+      "attachedPct": 87.45,
+      "kanjiWithResidual": 989,
+      "residualOccurrences": 998
+    },
+    {
+      "worlds": 300,
+      "complete": 1349,
+      "completePct": 63.16,
+      "attached": 1870,
+      "attachedPct": 87.55,
+      "kanjiWithResidual": 787,
+      "residualOccurrences": 793
+    },
+    {
+      "worlds": 350,
+      "complete": 1498,
+      "completePct": 70.13,
+      "attached": 1872,
+      "attachedPct": 87.64,
+      "kanjiWithResidual": 638,
+      "residualOccurrences": 643
+    },
+    {
+      "worlds": 400,
+      "complete": 1610,
+      "completePct": 75.37,
+      "attached": 1873,
+      "attachedPct": 87.69,
+      "kanjiWithResidual": 526,
+      "residualOccurrences": 530
+    },
+    {
+      "worlds": 421,
+      "complete": 1651,
+      "completePct": 77.29,
+      "attached": 1881,
+      "attachedPct": 88.06,
+      "kanjiWithResidual": 485,
+      "residualOccurrences": 488
+    },
+    {
+      "worlds": 500,
+      "complete": 1807,
+      "completePct": 84.6,
+      "attached": 1887,
+      "attachedPct": 88.34,
+      "kanjiWithResidual": 329,
+      "residualOccurrences": 330
+    },
+    {
+      "worlds": 600,
+      "complete": 1918,
+      "completePct": 89.79,
+      "attached": 1963,
+      "attachedPct": 91.9,
+      "kanjiWithResidual": 218,
+      "residualOccurrences": 219
+    },
+    {
+      "worlds": 700,
+      "complete": 2017,
+      "completePct": 94.43,
+      "attached": 2039,
+      "attachedPct": 95.46,
+      "kanjiWithResidual": 119,
+      "residualOccurrences": 119
+    },
+    {
+      "worlds": 800,
+      "complete": 2117,
+      "completePct": 99.11,
+      "attached": 2122,
+      "attachedPct": 99.34,
+      "kanjiWithResidual": 19,
+      "residualOccurrences": 19
+    },
+    {
+      "worlds": 819,
+      "complete": 2136,
+      "completePct": 100.0,
+      "attached": 2136,
+      "attachedPct": 100.0,
+      "kanjiWithResidual": 0,
+      "residualOccurrences": 0
+    }
+  ],
+  "orderedWorlds": [
+    {
+      "rank": 1,
+      "id": "一",
+      "kind": "seed",
+      "joyoHostCount": 81,
+      "wikipediaHostTokenFrequency": 3017962
+    },
+    {
+      "rank": 2,
+      "id": "乙",
+      "kind": "seed",
+      "joyoHostCount": 16,
+      "wikipediaHostTokenFrequency": 213287
+    },
+    {
+      "rank": 3,
+      "id": "了",
+      "kind": "seed",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 51805
+    },
+    {
+      "rank": 4,
+      "id": "二",
+      "kind": "seed",
+      "joyoHostCount": 18,
+      "wikipediaHostTokenFrequency": 767926
+    },
+    {
+      "rank": 5,
+      "id": "亠",
+      "kind": "seed",
+      "joyoHostCount": 51,
+      "wikipediaHostTokenFrequency": 2342840
+    },
+    {
+      "rank": 6,
+      "id": "人",
+      "kind": "seed",
+      "joyoHostCount": 138,
+      "wikipediaHostTokenFrequency": 4339719
+    },
+    {
+      "rank": 7,
+      "id": "儿",
+      "kind": "seed",
+      "joyoHostCount": 21,
+      "wikipediaHostTokenFrequency": 774320
+    },
+    {
+      "rank": 8,
+      "id": "入",
+      "kind": "seed",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 34755
+    },
+    {
+      "rank": 9,
+      "id": "八",
+      "kind": "seed",
+      "joyoHostCount": 102,
+      "wikipediaHostTokenFrequency": 2320293
+    },
+    {
+      "rank": 10,
+      "id": "冂",
+      "kind": "seed",
+      "joyoHostCount": 20,
+      "wikipediaHostTokenFrequency": 1045200
+    },
+    {
+      "rank": 11,
+      "id": "冖",
+      "kind": "seed",
+      "joyoHostCount": 27,
+      "wikipediaHostTokenFrequency": 1077679
+    },
+    {
+      "rank": 12,
+      "id": "冫",
+      "kind": "seed",
+      "joyoHostCount": 10,
+      "wikipediaHostTokenFrequency": 206737
+    },
+    {
+      "rank": 13,
+      "id": "几",
+      "kind": "seed",
+      "joyoHostCount": 7,
+      "wikipediaHostTokenFrequency": 61675
+    },
+    {
+      "rank": 14,
+      "id": "凵",
+      "kind": "seed",
+      "joyoHostCount": 10,
+      "wikipediaHostTokenFrequency": 497691
+    },
+    {
+      "rank": 15,
+      "id": "刀",
+      "kind": "seed",
+      "joyoHostCount": 38,
+      "wikipediaHostTokenFrequency": 1139348
+    },
+    {
+      "rank": 16,
+      "id": "力",
+      "kind": "seed",
+      "joyoHostCount": 18,
+      "wikipediaHostTokenFrequency": 542948
+    },
+    {
+      "rank": 17,
+      "id": "勹",
+      "kind": "seed",
+      "joyoHostCount": 21,
+      "wikipediaHostTokenFrequency": 556687
+    },
+    {
+      "rank": 18,
+      "id": "匕",
+      "kind": "seed",
+      "joyoHostCount": 13,
+      "wikipediaHostTokenFrequency": 376089
+    },
+    {
+      "rank": 19,
+      "id": "匚",
+      "kind": "seed",
+      "joyoHostCount": 9,
+      "wikipediaHostTokenFrequency": 66308
+    },
+    {
+      "rank": 20,
+      "id": "匸",
+      "kind": "seed",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 154239
+    },
+    {
+      "rank": 21,
+      "id": "十",
+      "kind": "seed",
+      "joyoHostCount": 54,
+      "wikipediaHostTokenFrequency": 1088724
+    },
+    {
+      "rank": 22,
+      "id": "卜",
+      "kind": "seed",
+      "joyoHostCount": 16,
+      "wikipediaHostTokenFrequency": 825297
+    },
+    {
+      "rank": 23,
+      "id": "卩",
+      "kind": "seed",
+      "joyoHostCount": 12,
+      "wikipediaHostTokenFrequency": 201004
+    },
+    {
+      "rank": 24,
+      "id": "厂",
+      "kind": "seed",
+      "joyoHostCount": 15,
+      "wikipediaHostTokenFrequency": 423893
+    },
+    {
+      "rank": 25,
+      "id": "厶",
+      "kind": "seed",
+      "joyoHostCount": 20,
+      "wikipediaHostTokenFrequency": 591123
+    },
+    {
+      "rank": 26,
+      "id": "又",
+      "kind": "seed",
+      "joyoHostCount": 25,
+      "wikipediaHostTokenFrequency": 665996
+    },
+    {
+      "rank": 27,
+      "id": "口",
+      "kind": "seed",
+      "joyoHostCount": 127,
+      "wikipediaHostTokenFrequency": 4027469
+    },
+    {
+      "rank": 28,
+      "id": "囗",
+      "kind": "seed",
+      "joyoHostCount": 13,
+      "wikipediaHostTokenFrequency": 733894
+    },
+    {
+      "rank": 29,
+      "id": "土",
+      "kind": "seed",
+      "joyoHostCount": 75,
+      "wikipediaHostTokenFrequency": 2278811
+    },
+    {
+      "rank": 30,
+      "id": "士",
+      "kind": "seed",
+      "joyoHostCount": 10,
+      "wikipediaHostTokenFrequency": 235823
+    },
+    {
+      "rank": 31,
+      "id": "夂",
+      "kind": "seed",
+      "joyoHostCount": 17,
+      "wikipediaHostTokenFrequency": 579058
+    },
+    {
+      "rank": 32,
+      "id": "夊",
+      "kind": "seed",
+      "joyoHostCount": 0,
+      "wikipediaHostTokenFrequency": 0
+    },
+    {
+      "rank": 33,
+      "id": "夕",
+      "kind": "seed",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 494856
+    },
+    {
+      "rank": 34,
+      "id": "大",
+      "kind": "seed",
+      "joyoHostCount": 34,
+      "wikipediaHostTokenFrequency": 750006
+    },
+    {
+      "rank": 35,
+      "id": "女",
+      "kind": "seed",
+      "joyoHostCount": 35,
+      "wikipediaHostTokenFrequency": 449873
+    },
+    {
+      "rank": 36,
+      "id": "子",
+      "kind": "seed",
+      "joyoHostCount": 12,
+      "wikipediaHostTokenFrequency": 743332
+    },
+    {
+      "rank": 37,
+      "id": "宀",
+      "kind": "seed",
+      "joyoHostCount": 37,
+      "wikipediaHostTokenFrequency": 1054148
+    },
+    {
+      "rank": 38,
+      "id": "寸",
+      "kind": "seed",
+      "joyoHostCount": 27,
+      "wikipediaHostTokenFrequency": 708824
+    },
+    {
+      "rank": 39,
+      "id": "小",
+      "kind": "seed",
+      "joyoHostCount": 16,
+      "wikipediaHostTokenFrequency": 722724
+    },
+    {
+      "rank": 40,
+      "id": "尢",
+      "kind": "seed",
+      "joyoHostCount": 0,
+      "wikipediaHostTokenFrequency": 0
+    },
+    {
+      "rank": 41,
+      "id": "尸",
+      "kind": "seed",
+      "joyoHostCount": 18,
+      "wikipediaHostTokenFrequency": 256528
+    },
+    {
+      "rank": 42,
+      "id": "屮",
+      "kind": "seed",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2233
+    },
+    {
+      "rank": 43,
+      "id": "山",
+      "kind": "seed",
+      "joyoHostCount": 21,
+      "wikipediaHostTokenFrequency": 759810
+    },
+    {
+      "rank": 44,
+      "id": "巛",
+      "kind": "seed",
+      "joyoHostCount": 8,
+      "wikipediaHostTokenFrequency": 131948
+    },
+    {
+      "rank": 45,
+      "id": "川",
+      "kind": "seed",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 108130
+    },
+    {
+      "rank": 46,
+      "id": "工",
+      "kind": "seed",
+      "joyoHostCount": 15,
+      "wikipediaHostTokenFrequency": 426190
+    },
+    {
+      "rank": 47,
+      "id": "己",
+      "kind": "seed",
+      "joyoHostCount": 11,
+      "wikipediaHostTokenFrequency": 378413
+    },
+    {
+      "rank": 48,
+      "id": "巾",
+      "kind": "seed",
+      "joyoHostCount": 15,
+      "wikipediaHostTokenFrequency": 516796
+    },
+    {
+      "rank": 49,
+      "id": "干",
+      "kind": "seed",
+      "joyoHostCount": 11,
+      "wikipediaHostTokenFrequency": 1987094
+    },
+    {
+      "rank": 50,
+      "id": "幺",
+      "kind": "seed",
+      "joyoHostCount": 12,
+      "wikipediaHostTokenFrequency": 316466
+    },
+    {
+      "rank": 51,
+      "id": "广",
+      "kind": "seed",
+      "joyoHostCount": 22,
+      "wikipediaHostTokenFrequency": 511863
+    },
+    {
+      "rank": 52,
+      "id": "廴",
+      "kind": "seed",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 79775
+    },
+    {
+      "rank": 53,
+      "id": "廾",
+      "kind": "seed",
+      "joyoHostCount": 11,
+      "wikipediaHostTokenFrequency": 263641
+    },
+    {
+      "rank": 54,
+      "id": "弋",
+      "kind": "seed",
+      "joyoHostCount": 26,
+      "wikipediaHostTokenFrequency": 1106006
+    },
+    {
+      "rank": 55,
+      "id": "弓",
+      "kind": "seed",
+      "joyoHostCount": 9,
+      "wikipediaHostTokenFrequency": 166058
+    },
+    {
+      "rank": 56,
+      "id": "彐",
+      "kind": "seed",
+      "joyoHostCount": 0,
+      "wikipediaHostTokenFrequency": 0
+    },
+    {
+      "rank": 57,
+      "id": "彡",
+      "kind": "seed",
+      "joyoHostCount": 10,
+      "wikipediaHostTokenFrequency": 248441
+    },
+    {
+      "rank": 58,
+      "id": "彳",
+      "kind": "seed",
+      "joyoHostCount": 17,
+      "wikipediaHostTokenFrequency": 860329
+    },
+    {
+      "rank": 59,
+      "id": "心",
+      "kind": "seed",
+      "joyoHostCount": 64,
+      "wikipediaHostTokenFrequency": 793429
+    },
+    {
+      "rank": 60,
+      "id": "戈",
+      "kind": "seed",
+      "joyoHostCount": 13,
+      "wikipediaHostTokenFrequency": 538740
+    },
+    {
+      "rank": 61,
+      "id": "戸",
+      "kind": "seed",
+      "joyoHostCount": 9,
+      "wikipediaHostTokenFrequency": 226530
+    },
+    {
+      "rank": 62,
+      "id": "手",
+      "kind": "seed",
+      "joyoHostCount": 79,
+      "wikipediaHostTokenFrequency": 916321
+    },
+    {
+      "rank": 63,
+      "id": "支",
+      "kind": "seed",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 76803
+    },
+    {
+      "rank": 64,
+      "id": "攴",
+      "kind": "seed",
+      "joyoHostCount": 23,
+      "wikipediaHostTokenFrequency": 780669
+    },
+    {
+      "rank": 65,
+      "id": "文",
+      "kind": "seed",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 140363
+    },
+    {
+      "rank": 66,
+      "id": "斗",
+      "kind": "seed",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 122603
+    },
+    {
+      "rank": 67,
+      "id": "斤",
+      "kind": "seed",
+      "joyoHostCount": 12,
+      "wikipediaHostTokenFrequency": 501205
+    },
+    {
+      "rank": 68,
+      "id": "方",
+      "kind": "seed",
+      "joyoHostCount": 14,
+      "wikipediaHostTokenFrequency": 321125
+    },
+    {
+      "rank": 69,
+      "id": "无",
+      "kind": "seed",
+      "joyoHostCount": 0,
+      "wikipediaHostTokenFrequency": 0
+    },
+    {
+      "rank": 70,
+      "id": "日",
+      "kind": "seed",
+      "joyoHostCount": 86,
+      "wikipediaHostTokenFrequency": 2460950
+    },
+    {
+      "rank": 71,
+      "id": "曰",
+      "kind": "seed",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 421583
+    },
+    {
+      "rank": 72,
+      "id": "月",
+      "kind": "seed",
+      "joyoHostCount": 59,
+      "wikipediaHostTokenFrequency": 943549
+    },
+    {
+      "rank": 73,
+      "id": "木",
+      "kind": "seed",
+      "joyoHostCount": 121,
+      "wikipediaHostTokenFrequency": 3441356
+    },
+    {
+      "rank": 74,
+      "id": "欠",
+      "kind": "seed",
+      "joyoHostCount": 11,
+      "wikipediaHostTokenFrequency": 107322
+    },
+    {
+      "rank": 75,
+      "id": "止",
+      "kind": "seed",
+      "joyoHostCount": 16,
+      "wikipediaHostTokenFrequency": 469257
+    },
+    {
+      "rank": 76,
+      "id": "歹",
+      "kind": "seed",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 125631
+    },
+    {
+      "rank": 77,
+      "id": "殳",
+      "kind": "seed",
+      "joyoHostCount": 14,
+      "wikipediaHostTokenFrequency": 432502
+    },
+    {
+      "rank": 78,
+      "id": "毋",
+      "kind": "seed",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 52912
+    },
+    {
+      "rank": 79,
+      "id": "比",
+      "kind": "seed",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 29886
+    },
+    {
+      "rank": 80,
+      "id": "毛",
+      "kind": "seed",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 28172
+    },
+    {
+      "rank": 81,
+      "id": "氏",
+      "kind": "seed",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 120046
+    },
+    {
+      "rank": 82,
+      "id": "气",
+      "kind": "seed",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 81445
+    },
+    {
+      "rank": 83,
+      "id": "水",
+      "kind": "seed",
+      "joyoHostCount": 98,
+      "wikipediaHostTokenFrequency": 1494708
+    },
+    {
+      "rank": 84,
+      "id": "火",
+      "kind": "seed",
+      "joyoHostCount": 45,
+      "wikipediaHostTokenFrequency": 629251
+    },
+    {
+      "rank": 85,
+      "id": "爪",
+      "kind": "seed",
+      "joyoHostCount": 10,
+      "wikipediaHostTokenFrequency": 199730
+    },
+    {
+      "rank": 86,
+      "id": "父",
+      "kind": "seed",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 72895
+    },
+    {
+      "rank": 87,
+      "id": "爿",
+      "kind": "seed",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 80602
+    },
+    {
+      "rank": 88,
+      "id": "片",
+      "kind": "seed",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 88092
+    },
+    {
+      "rank": 89,
+      "id": "牙",
+      "kind": "seed",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 13725
+    },
+    {
+      "rank": 90,
+      "id": "牛",
+      "kind": "seed",
+      "joyoHostCount": 9,
+      "wikipediaHostTokenFrequency": 474489
+    },
+    {
+      "rank": 91,
+      "id": "犬",
+      "kind": "seed",
+      "joyoHostCount": 14,
+      "wikipediaHostTokenFrequency": 158773
+    },
+    {
+      "rank": 92,
+      "id": "玄",
+      "kind": "seed",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 35426
+    },
+    {
+      "rank": 93,
+      "id": "玉",
+      "kind": "seed",
+      "joyoHostCount": 27,
+      "wikipediaHostTokenFrequency": 1185882
+    },
+    {
+      "rank": 94,
+      "id": "瓦",
+      "kind": "seed",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1793
+    },
+    {
+      "rank": 95,
+      "id": "甘",
+      "kind": "seed",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 1741
+    },
+    {
+      "rank": 96,
+      "id": "生",
+      "kind": "seed",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 243888
+    },
+    {
+      "rank": 97,
+      "id": "用",
+      "kind": "seed",
+      "joyoHostCount": 10,
+      "wikipediaHostTokenFrequency": 153663
+    },
+    {
+      "rank": 98,
+      "id": "田",
+      "kind": "seed",
+      "joyoHostCount": 37,
+      "wikipediaHostTokenFrequency": 718685
+    },
+    {
+      "rank": 99,
+      "id": "疋",
+      "kind": "seed",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 212103
+    },
+    {
+      "rank": 100,
+      "id": "疒",
+      "kind": "seed",
+      "joyoHostCount": 13,
+      "wikipediaHostTokenFrequency": 74880
+    },
+    {
+      "rank": 101,
+      "id": "癶",
+      "kind": "seed",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 306109
+    },
+    {
+      "rank": 102,
+      "id": "白",
+      "kind": "seed",
+      "joyoHostCount": 14,
+      "wikipediaHostTokenFrequency": 492739
+    },
+    {
+      "rank": 103,
+      "id": "皮",
+      "kind": "seed",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 131082
+    },
+    {
+      "rank": 104,
+      "id": "皿",
+      "kind": "seed",
+      "joyoHostCount": 8,
+      "wikipediaHostTokenFrequency": 129520
+    },
+    {
+      "rank": 105,
+      "id": "目",
+      "kind": "seed",
+      "joyoHostCount": 75,
+      "wikipediaHostTokenFrequency": 1482585
+    },
+    {
+      "rank": 106,
+      "id": "矛",
+      "kind": "seed",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 95383
+    },
+    {
+      "rank": 107,
+      "id": "矢",
+      "kind": "seed",
+      "joyoHostCount": 9,
+      "wikipediaHostTokenFrequency": 204544
+    },
+    {
+      "rank": 108,
+      "id": "石",
+      "kind": "seed",
+      "joyoHostCount": 15,
+      "wikipediaHostTokenFrequency": 170736
+    },
+    {
+      "rank": 109,
+      "id": "示",
+      "kind": "seed",
+      "joyoHostCount": 21,
+      "wikipediaHostTokenFrequency": 563003
+    },
+    {
+      "rank": 110,
+      "id": "禾",
+      "kind": "seed",
+      "joyoHostCount": 26,
+      "wikipediaHostTokenFrequency": 622652
+    },
+    {
+      "rank": 111,
+      "id": "穴",
+      "kind": "seed",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 154284
+    },
+    {
+      "rank": 112,
+      "id": "立",
+      "kind": "seed",
+      "joyoHostCount": 12,
+      "wikipediaHostTokenFrequency": 525228
+    },
+    {
+      "rank": 113,
+      "id": "竹",
+      "kind": "seed",
+      "joyoHostCount": 20,
+      "wikipediaHostTokenFrequency": 483849
+    },
+    {
+      "rank": 114,
+      "id": "米",
+      "kind": "seed",
+      "joyoHostCount": 19,
+      "wikipediaHostTokenFrequency": 408796
+    },
+    {
+      "rank": 115,
+      "id": "糸",
+      "kind": "seed",
+      "joyoHostCount": 51,
+      "wikipediaHostTokenFrequency": 1189845
+    },
+    {
+      "rank": 116,
+      "id": "缶",
+      "kind": "seed",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2438
+    },
+    {
+      "rank": 117,
+      "id": "罒",
+      "kind": "seed",
+      "joyoHostCount": 14,
+      "wikipediaHostTokenFrequency": 200950
+    },
+    {
+      "rank": 118,
+      "id": "羊",
+      "kind": "seed",
+      "joyoHostCount": 17,
+      "wikipediaHostTokenFrequency": 600545
+    },
+    {
+      "rank": 119,
+      "id": "羽",
+      "kind": "seed",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 53930
+    },
+    {
+      "rank": 120,
+      "id": "老",
+      "kind": "seed",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 282022
+    },
+    {
+      "rank": 121,
+      "id": "而",
+      "kind": "seed",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 7779
+    },
+    {
+      "rank": 122,
+      "id": "耒",
+      "kind": "seed",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 28746
+    },
+    {
+      "rank": 123,
+      "id": "耳",
+      "kind": "seed",
+      "joyoHostCount": 8,
+      "wikipediaHostTokenFrequency": 178342
+    },
+    {
+      "rank": 124,
+      "id": "聿",
+      "kind": "seed",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 236262
+    },
+    {
+      "rank": 125,
+      "id": "肉",
+      "kind": "seed",
+      "joyoHostCount": 42,
+      "wikipediaHostTokenFrequency": 471059
+    },
+    {
+      "rank": 126,
+      "id": "臣",
+      "kind": "seed",
+      "joyoHostCount": 9,
+      "wikipediaHostTokenFrequency": 153986
+    },
+    {
+      "rank": 127,
+      "id": "自",
+      "kind": "seed",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 61770
+    },
+    {
+      "rank": 128,
+      "id": "至",
+      "kind": "seed",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 113579
+    },
+    {
+      "rank": 129,
+      "id": "臼",
+      "kind": "seed",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 24205
+    },
+    {
+      "rank": 130,
+      "id": "舌",
+      "kind": "seed",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 195949
+    },
+    {
+      "rank": 131,
+      "id": "舛",
+      "kind": "seed",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 24696
+    },
+    {
+      "rank": 132,
+      "id": "舟",
+      "kind": "seed",
+      "joyoHostCount": 7,
+      "wikipediaHostTokenFrequency": 132899
+    },
+    {
+      "rank": 133,
+      "id": "艮",
+      "kind": "seed",
+      "joyoHostCount": 13,
+      "wikipediaHostTokenFrequency": 213232
+    },
+    {
+      "rank": 134,
+      "id": "色",
+      "kind": "seed",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 15159
+    },
+    {
+      "rank": 135,
+      "id": "艸",
+      "kind": "seed",
+      "joyoHostCount": 39,
+      "wikipediaHostTokenFrequency": 466989
+    },
+    {
+      "rank": 136,
+      "id": "虍",
+      "kind": "seed",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 11818
+    },
+    {
+      "rank": 137,
+      "id": "虫",
+      "kind": "seed",
+      "joyoHostCount": 14,
+      "wikipediaHostTokenFrequency": 144824
+    },
+    {
+      "rank": 138,
+      "id": "血",
+      "kind": "seed",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 31058
+    },
+    {
+      "rank": 139,
+      "id": "行",
+      "kind": "seed",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 128468
+    },
+    {
+      "rank": 140,
+      "id": "衣",
+      "kind": "seed",
+      "joyoHostCount": 23,
+      "wikipediaHostTokenFrequency": 460515
+    },
+    {
+      "rank": 141,
+      "id": "襾",
+      "kind": "seed",
+      "joyoHostCount": 0,
+      "wikipediaHostTokenFrequency": 0
+    },
+    {
+      "rank": 142,
+      "id": "西",
+      "kind": "seed",
+      "joyoHostCount": 0,
+      "wikipediaHostTokenFrequency": 0
+    },
+    {
+      "rank": 143,
+      "id": "見",
+      "kind": "seed",
+      "joyoHostCount": 7,
+      "wikipediaHostTokenFrequency": 324886
+    },
+    {
+      "rank": 144,
+      "id": "角",
+      "kind": "seed",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 66464
+    },
+    {
+      "rank": 145,
+      "id": "言",
+      "kind": "seed",
+      "joyoHostCount": 59,
+      "wikipediaHostTokenFrequency": 1317912
+    },
+    {
+      "rank": 146,
+      "id": "谷",
+      "kind": "seed",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 54951
+    },
+    {
+      "rank": 147,
+      "id": "豆",
+      "kind": "seed",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 175338
+    },
+    {
+      "rank": 148,
+      "id": "豕",
+      "kind": "seed",
+      "joyoHostCount": 7,
+      "wikipediaHostTokenFrequency": 258252
+    },
+    {
+      "rank": 149,
+      "id": "豸",
+      "kind": "seed",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 1384
+    },
+    {
+      "rank": 150,
+      "id": "貝",
+      "kind": "seed",
+      "joyoHostCount": 35,
+      "wikipediaHostTokenFrequency": 500234
+    },
+    {
+      "rank": 151,
+      "id": "赤",
+      "kind": "seed",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 919
+    },
+    {
+      "rank": 152,
+      "id": "走",
+      "kind": "seed",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 87488
+    },
+    {
+      "rank": 153,
+      "id": "足",
+      "kind": "seed",
+      "joyoHostCount": 10,
+      "wikipediaHostTokenFrequency": 124184
+    },
+    {
+      "rank": 154,
+      "id": "身",
+      "kind": "seed",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 17999
+    },
+    {
+      "rank": 155,
+      "id": "車",
+      "kind": "seed",
+      "joyoHostCount": 21,
+      "wikipediaHostTokenFrequency": 625003
+    },
+    {
+      "rank": 156,
+      "id": "辛",
+      "kind": "seed",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 17345
+    },
+    {
+      "rank": 157,
+      "id": "辰",
+      "kind": "seed",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 55421
+    },
+    {
+      "rank": 158,
+      "id": "辵",
+      "kind": "seed",
+      "joyoHostCount": 46,
+      "wikipediaHostTokenFrequency": 1186441
+    },
+    {
+      "rank": 159,
+      "id": "邑",
+      "kind": "seed",
+      "joyoHostCount": 12,
+      "wikipediaHostTokenFrequency": 591491
+    },
+    {
+      "rank": 160,
+      "id": "酉",
+      "kind": "seed",
+      "joyoHostCount": 12,
+      "wikipediaHostTokenFrequency": 85096
+    },
+    {
+      "rank": 161,
+      "id": "釆",
+      "kind": "seed",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 116517
+    },
+    {
+      "rank": 162,
+      "id": "里",
+      "kind": "seed",
+      "joyoHostCount": 13,
+      "wikipediaHostTokenFrequency": 628387
+    },
+    {
+      "rank": 163,
+      "id": "金",
+      "kind": "seed",
+      "joyoHostCount": 29,
+      "wikipediaHostTokenFrequency": 280538
+    },
+    {
+      "rank": 164,
+      "id": "長",
+      "kind": "seed",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 31327
+    },
+    {
+      "rank": 165,
+      "id": "門",
+      "kind": "seed",
+      "joyoHostCount": 11,
+      "wikipediaHostTokenFrequency": 677305
+    },
+    {
+      "rank": 166,
+      "id": "阜",
+      "kind": "seed",
+      "joyoHostCount": 25,
+      "wikipediaHostTokenFrequency": 422429
+    },
+    {
+      "rank": 167,
+      "id": "隶",
+      "kind": "seed",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 23707
+    },
+    {
+      "rank": 168,
+      "id": "隹",
+      "kind": "seed",
+      "joyoHostCount": 21,
+      "wikipediaHostTokenFrequency": 347366
+    },
+    {
+      "rank": 169,
+      "id": "雨",
+      "kind": "seed",
+      "joyoHostCount": 10,
+      "wikipediaHostTokenFrequency": 129422
+    },
+    {
+      "rank": 170,
+      "id": "青",
+      "kind": "seed",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 125164
+    },
+    {
+      "rank": 171,
+      "id": "非",
+      "kind": "seed",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 41918
+    },
+    {
+      "rank": 172,
+      "id": "面",
+      "kind": "seed",
+      "joyoHostCount": 0,
+      "wikipediaHostTokenFrequency": 0
+    },
+    {
+      "rank": 173,
+      "id": "革",
+      "kind": "seed",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1617
+    },
+    {
+      "rank": 174,
+      "id": "韋",
+      "kind": "seed",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 73749
+    },
+    {
+      "rank": 175,
+      "id": "音",
+      "kind": "seed",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 101779
+    },
+    {
+      "rank": 176,
+      "id": "頁",
+      "kind": "seed",
+      "joyoHostCount": 19,
+      "wikipediaHostTokenFrequency": 302795
+    },
+    {
+      "rank": 177,
+      "id": "風",
+      "kind": "seed",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3667
+    },
+    {
+      "rank": 178,
+      "id": "飛",
+      "kind": "seed",
+      "joyoHostCount": 0,
+      "wikipediaHostTokenFrequency": 0
+    },
+    {
+      "rank": 179,
+      "id": "食",
+      "kind": "seed",
+      "joyoHostCount": 11,
+      "wikipediaHostTokenFrequency": 122897
+    },
+    {
+      "rank": 180,
+      "id": "首",
+      "kind": "seed",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 192622
+    },
+    {
+      "rank": 181,
+      "id": "香",
+      "kind": "seed",
+      "joyoHostCount": 0,
+      "wikipediaHostTokenFrequency": 0
+    },
+    {
+      "rank": 182,
+      "id": "馬",
+      "kind": "seed",
+      "joyoHostCount": 10,
+      "wikipediaHostTokenFrequency": 197079
+    },
+    {
+      "rank": 183,
+      "id": "骨",
+      "kind": "seed",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 6868
+    },
+    {
+      "rank": 184,
+      "id": "高",
+      "kind": "seed",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 5961
+    },
+    {
+      "rank": 185,
+      "id": "髟",
+      "kind": "seed",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 7048
+    },
+    {
+      "rank": 186,
+      "id": "鬯",
+      "kind": "seed",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 804
+    },
+    {
+      "rank": 187,
+      "id": "鬼",
+      "kind": "seed",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 39567
+    },
+    {
+      "rank": 188,
+      "id": "魚",
+      "kind": "seed",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 18949
+    },
+    {
+      "rank": 189,
+      "id": "鳥",
+      "kind": "seed",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 138796
+    },
+    {
+      "rank": 190,
+      "id": "鹿",
+      "kind": "seed",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 6342
+    },
+    {
+      "rank": 191,
+      "id": "麦",
+      "kind": "seed",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1056
+    },
+    {
+      "rank": 192,
+      "id": "麻",
+      "kind": "seed",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 44248
+    },
+    {
+      "rank": 193,
+      "id": "黄",
+      "kind": "seed",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 30918
+    },
+    {
+      "rank": 194,
+      "id": "黑",
+      "kind": "seed",
+      "joyoHostCount": 0,
+      "wikipediaHostTokenFrequency": 0
+    },
+    {
+      "rank": 195,
+      "id": "鼓",
+      "kind": "seed",
+      "joyoHostCount": 0,
+      "wikipediaHostTokenFrequency": 0
+    },
+    {
+      "rank": 196,
+      "id": "鼻",
+      "kind": "seed",
+      "joyoHostCount": 0,
+      "wikipediaHostTokenFrequency": 0
+    },
+    {
+      "rank": 197,
+      "id": "齊",
+      "kind": "seed",
+      "joyoHostCount": 0,
+      "wikipediaHostTokenFrequency": 0
+    },
+    {
+      "rank": 198,
+      "id": "齒",
+      "kind": "seed",
+      "joyoHostCount": 0,
+      "wikipediaHostTokenFrequency": 0
+    },
+    {
+      "rank": 199,
+      "id": "龍",
+      "kind": "seed",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 28138
+    },
+    {
+      "rank": 200,
+      "id": "亀",
+      "kind": "seed",
+      "joyoHostCount": 0,
+      "wikipediaHostTokenFrequency": 0
+    },
+    {
+      "rank": 201,
+      "id": "乂",
+      "kind": "frequency_fill",
+      "joyoHostCount": 38,
+      "wikipediaHostTokenFrequency": 1457827
+    },
+    {
+      "rank": 202,
+      "id": "中",
+      "kind": "frequency_fill",
+      "joyoHostCount": 20,
+      "wikipediaHostTokenFrequency": 210554
+    },
+    {
+      "rank": 203,
+      "id": "三",
+      "kind": "frequency_fill",
+      "joyoHostCount": 15,
+      "wikipediaHostTokenFrequency": 245480
+    },
+    {
+      "rank": 204,
+      "id": "由",
+      "kind": "frequency_fill",
+      "joyoHostCount": 11,
+      "wikipediaHostTokenFrequency": 233564
+    },
+    {
+      "rank": 205,
+      "id": "且",
+      "kind": "frequency_fill",
+      "joyoHostCount": 10,
+      "wikipediaHostTokenFrequency": 193793
+    },
+    {
+      "rank": 206,
+      "id": "者",
+      "kind": "frequency_fill",
+      "joyoHostCount": 9,
+      "wikipediaHostTokenFrequency": 162033
+    },
+    {
+      "rank": 207,
+      "id": "少",
+      "kind": "frequency_fill",
+      "joyoHostCount": 9,
+      "wikipediaHostTokenFrequency": 85167
+    },
+    {
+      "rank": 208,
+      "id": "丁",
+      "kind": "frequency_fill",
+      "joyoHostCount": 8,
+      "wikipediaHostTokenFrequency": 249563
+    },
+    {
+      "rank": 209,
+      "id": "各",
+      "kind": "frequency_fill",
+      "joyoHostCount": 8,
+      "wikipediaHostTokenFrequency": 184575
+    },
+    {
+      "rank": 210,
+      "id": "夫",
+      "kind": "frequency_fill",
+      "joyoHostCount": 8,
+      "wikipediaHostTokenFrequency": 114777
+    },
+    {
+      "rank": 211,
+      "id": "莫",
+      "kind": "frequency_fill",
+      "joyoHostCount": 8,
+      "wikipediaHostTokenFrequency": 64127
+    },
+    {
+      "rank": 212,
+      "id": "寺",
+      "kind": "frequency_fill",
+      "joyoHostCount": 7,
+      "wikipediaHostTokenFrequency": 525427
+    },
+    {
+      "rank": 213,
+      "id": "云",
+      "kind": "frequency_fill",
+      "joyoHostCount": 7,
+      "wikipediaHostTokenFrequency": 473311
+    },
+    {
+      "rank": 214,
+      "id": "昜",
+      "kind": "frequency_fill",
+      "joyoHostCount": 7,
+      "wikipediaHostTokenFrequency": 295405
+    },
+    {
+      "rank": 215,
+      "id": "龰",
+      "kind": "frequency_fill",
+      "joyoHostCount": 7,
+      "wikipediaHostTokenFrequency": 262723
+    },
+    {
+      "rank": 216,
+      "id": "尺",
+      "kind": "frequency_fill",
+      "joyoHostCount": 7,
+      "wikipediaHostTokenFrequency": 205446
+    },
+    {
+      "rank": 217,
+      "id": "反",
+      "kind": "frequency_fill",
+      "joyoHostCount": 7,
+      "wikipediaHostTokenFrequency": 145722
+    },
+    {
+      "rank": 218,
+      "id": "分",
+      "kind": "frequency_fill",
+      "joyoHostCount": 7,
+      "wikipediaHostTokenFrequency": 13242
+    },
+    {
+      "rank": 219,
+      "id": "咅",
+      "kind": "frequency_fill",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 334603
+    },
+    {
+      "rank": 220,
+      "id": "廿",
+      "kind": "frequency_fill",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 276102
+    },
+    {
+      "rank": 221,
+      "id": "其",
+      "kind": "frequency_fill",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 175563
+    },
+    {
+      "rank": 222,
+      "id": "吉",
+      "kind": "frequency_fill",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 162841
+    },
+    {
+      "rank": 223,
+      "id": "正",
+      "kind": "frequency_fill",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 147208
+    },
+    {
+      "rank": 224,
+      "id": "林",
+      "kind": "frequency_fill",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 137747
+    },
+    {
+      "rank": 225,
+      "id": "召",
+      "kind": "frequency_fill",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 128228
+    },
+    {
+      "rank": 226,
+      "id": "早",
+      "kind": "frequency_fill",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 125677
+    },
+    {
+      "rank": 227,
+      "id": "九",
+      "kind": "frequency_fill",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 116196
+    },
+    {
+      "rank": 228,
+      "id": "兄",
+      "kind": "frequency_fill",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 93195
+    },
+    {
+      "rank": 229,
+      "id": "兌",
+      "kind": "frequency_fill",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 86540
+    },
+    {
+      "rank": 230,
+      "id": "今",
+      "kind": "frequency_fill",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 72246
+    },
+    {
+      "rank": 231,
+      "id": "古",
+      "kind": "frequency_fill",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 62113
+    },
+    {
+      "rank": 232,
+      "id": "亡",
+      "kind": "frequency_fill",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 33645
+    },
+    {
+      "rank": 233,
+      "id": "氷",
+      "kind": "frequency_fill",
+      "joyoHostCount": 6,
+      "wikipediaHostTokenFrequency": 24453
+    },
+    {
+      "rank": 234,
+      "id": "重",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 219395
+    },
+    {
+      "rank": 235,
+      "id": "交",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 197664
+    },
+    {
+      "rank": 236,
+      "id": "台",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 165102
+    },
+    {
+      "rank": 237,
+      "id": "主",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 146983
+    },
+    {
+      "rank": 238,
+      "id": "覀",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 137156
+    },
+    {
+      "rank": 239,
+      "id": "申",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 132547
+    },
+    {
+      "rank": 240,
+      "id": "毎",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 127991
+    },
+    {
+      "rank": 241,
+      "id": "千",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 115914
+    },
+    {
+      "rank": 242,
+      "id": "奇",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 86952
+    },
+    {
+      "rank": 243,
+      "id": "共",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 80896
+    },
+    {
+      "rank": 244,
+      "id": "㑒",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 78468
+    },
+    {
+      "rank": 245,
+      "id": "旦",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 74534
+    },
+    {
+      "rank": 246,
+      "id": "甫",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 67656
+    },
+    {
+      "rank": 247,
+      "id": "令",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 67424
+    },
+    {
+      "rank": 248,
+      "id": "次",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 65135
+    },
+    {
+      "rank": 249,
+      "id": "未",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 53521
+    },
+    {
+      "rank": 250,
+      "id": "束",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 51305
+    },
+    {
+      "rank": 251,
+      "id": "曽",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 50531
+    },
+    {
+      "rank": 252,
+      "id": "余",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 45978
+    },
+    {
+      "rank": 253,
+      "id": "戋",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 45177
+    },
+    {
+      "rank": 254,
+      "id": "同",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 40296
+    },
+    {
+      "rank": 255,
+      "id": "啇",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 37285
+    },
+    {
+      "rank": 256,
+      "id": "昔",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 34226
+    },
+    {
+      "rank": 257,
+      "id": "包",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 32684
+    },
+    {
+      "rank": 258,
+      "id": "果",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 29987
+    },
+    {
+      "rank": 259,
+      "id": "兆",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 26755
+    },
+    {
+      "rank": 260,
+      "id": "東",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 24581
+    },
+    {
+      "rank": 261,
+      "id": "亥",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 22184
+    },
+    {
+      "rank": 262,
+      "id": "匂",
+      "kind": "frequency_fill",
+      "joyoHostCount": 5,
+      "wikipediaHostTokenFrequency": 15671
+    },
+    {
+      "rank": 263,
+      "id": "也",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 391714
+    },
+    {
+      "rank": 264,
+      "id": "乍",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 302133
+    },
+    {
+      "rank": 265,
+      "id": "勺",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 231852
+    },
+    {
+      "rank": 266,
+      "id": "予",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 153910
+    },
+    {
+      "rank": 267,
+      "id": "占",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 152375
+    },
+    {
+      "rank": 268,
+      "id": "尚",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 132253
+    },
+    {
+      "rank": 269,
+      "id": "直",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 115256
+    },
+    {
+      "rank": 270,
+      "id": "亦",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 113119
+    },
+    {
+      "rank": 271,
+      "id": "畐",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 103764
+    },
+    {
+      "rank": 272,
+      "id": "曲",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 94964
+    },
+    {
+      "rank": 273,
+      "id": "良",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 93812
+    },
+    {
+      "rank": 274,
+      "id": "冓",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 79022
+    },
+    {
+      "rank": 275,
+      "id": "壬",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 70478
+    },
+    {
+      "rank": 276,
+      "id": "可",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 64147
+    },
+    {
+      "rank": 277,
+      "id": "巴",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 59394
+    },
+    {
+      "rank": 278,
+      "id": "監",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 48503
+    },
+    {
+      "rank": 279,
+      "id": "責",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 47535
+    },
+    {
+      "rank": 280,
+      "id": "京",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 43678
+    },
+    {
+      "rank": 281,
+      "id": "元",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 42318
+    },
+    {
+      "rank": 282,
+      "id": "司",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 40186
+    },
+    {
+      "rank": 283,
+      "id": "咼",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 39503
+    },
+    {
+      "rank": 284,
+      "id": "卯",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 37087
+    },
+    {
+      "rank": 285,
+      "id": "肖",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 33263
+    },
+    {
+      "rank": 286,
+      "id": "爰",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 28489
+    },
+    {
+      "rank": 287,
+      "id": "尞",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 26378
+    },
+    {
+      "rank": 288,
+      "id": "区",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 24800
+    },
+    {
+      "rank": 289,
+      "id": "辟",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 20433
+    },
+    {
+      "rank": 290,
+      "id": "兼",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 15214
+    },
+    {
+      "rank": 291,
+      "id": "卆",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 14469
+    },
+    {
+      "rank": 292,
+      "id": "㐮",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 13027
+    },
+    {
+      "rank": 293,
+      "id": "禺",
+      "kind": "frequency_fill",
+      "joyoHostCount": 4,
+      "wikipediaHostTokenFrequency": 9492
+    },
+    {
+      "rank": 294,
+      "id": "冋",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 253579
+    },
+    {
+      "rank": 295,
+      "id": "単",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 249162
+    },
+    {
+      "rank": 296,
+      "id": "甬",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 160771
+    },
+    {
+      "rank": 297,
+      "id": "官",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 112198
+    },
+    {
+      "rank": 298,
+      "id": "呂",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 110922
+    },
+    {
+      "rank": 299,
+      "id": "扁",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 107962
+    },
+    {
+      "rank": 300,
+      "id": "義",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 85946
+    },
+    {
+      "rank": 301,
+      "id": "是",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 79720
+    },
+    {
+      "rank": 302,
+      "id": "袁",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 76463
+    },
+    {
+      "rank": 303,
+      "id": "成",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 75330
+    },
+    {
+      "rank": 304,
+      "id": "失",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 74077
+    },
+    {
+      "rank": 305,
+      "id": "旨",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 73990
+    },
+    {
+      "rank": 306,
+      "id": "周",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 71042
+    },
+    {
+      "rank": 307,
+      "id": "戠",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 69305
+    },
+    {
+      "rank": 308,
+      "id": "公",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 65413
+    },
+    {
+      "rank": 309,
+      "id": "句",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 64573
+    },
+    {
+      "rank": 310,
+      "id": "丂",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 61784
+    },
+    {
+      "rank": 311,
+      "id": "侖",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 60962
+    },
+    {
+      "rank": 312,
+      "id": "半",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 60178
+    },
+    {
+      "rank": 313,
+      "id": "及",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 59794
+    },
+    {
+      "rank": 314,
+      "id": "复",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 56843
+    },
+    {
+      "rank": 315,
+      "id": "付",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 54103
+    },
+    {
+      "rank": 316,
+      "id": "才",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 53454
+    },
+    {
+      "rank": 317,
+      "id": "㕣",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 52528
+    },
+    {
+      "rank": 318,
+      "id": "劦",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 51406
+    },
+    {
+      "rank": 319,
+      "id": "蒦",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 50684
+    },
+    {
+      "rank": 320,
+      "id": "化",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 49172
+    },
+    {
+      "rank": 321,
+      "id": "叔",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 47587
+    },
+    {
+      "rank": 322,
+      "id": "朱",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 47412
+    },
+    {
+      "rank": 323,
+      "id": "能",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 46109
+    },
+    {
+      "rank": 324,
+      "id": "翟",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 45819
+    },
+    {
+      "rank": 325,
+      "id": "亢",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 44363
+    },
+    {
+      "rank": 326,
+      "id": "斉",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 40751
+    },
+    {
+      "rank": 327,
+      "id": "甲",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 39582
+    },
+    {
+      "rank": 328,
+      "id": "列",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 36858
+    },
+    {
+      "rank": 329,
+      "id": "旧",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 36692
+    },
+    {
+      "rank": 330,
+      "id": "帚",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 36559
+    },
+    {
+      "rank": 331,
+      "id": "圭",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 35231
+    },
+    {
+      "rank": 332,
+      "id": "采",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 34356
+    },
+    {
+      "rank": 333,
+      "id": "天",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 32033
+    },
+    {
+      "rank": 334,
+      "id": "相",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 31449
+    },
+    {
+      "rank": 335,
+      "id": "固",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 29159
+    },
+    {
+      "rank": 336,
+      "id": "更",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 25128
+    },
+    {
+      "rank": 337,
+      "id": "夋",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 24605
+    },
+    {
+      "rank": 338,
+      "id": "合",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 24587
+    },
+    {
+      "rank": 339,
+      "id": "皆",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 24419
+    },
+    {
+      "rank": 340,
+      "id": "亘",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 23259
+    },
+    {
+      "rank": 341,
+      "id": "喿",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 22809
+    },
+    {
+      "rank": 342,
+      "id": "井",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 21289
+    },
+    {
+      "rank": 343,
+      "id": "俞",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 18018
+    },
+    {
+      "rank": 344,
+      "id": "夭",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 16663
+    },
+    {
+      "rank": 345,
+      "id": "屈",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 16168
+    },
+    {
+      "rank": 346,
+      "id": "岡",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 15897
+    },
+    {
+      "rank": 347,
+      "id": "意",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 14346
+    },
+    {
+      "rank": 348,
+      "id": "氐",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 14134
+    },
+    {
+      "rank": 349,
+      "id": "折",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 13740
+    },
+    {
+      "rank": 350,
+      "id": "市",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 13558
+    },
+    {
+      "rank": 351,
+      "id": "屯",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 12911
+    },
+    {
+      "rank": 352,
+      "id": "垂",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 11524
+    },
+    {
+      "rank": 353,
+      "id": "凡",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 11343
+    },
+    {
+      "rank": 354,
+      "id": "兹",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 10721
+    },
+    {
+      "rank": 355,
+      "id": "夹",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 10267
+    },
+    {
+      "rank": 356,
+      "id": "戍",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 10193
+    },
+    {
+      "rank": 357,
+      "id": "免",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 9105
+    },
+    {
+      "rank": 358,
+      "id": "歩",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 9068
+    },
+    {
+      "rank": 359,
+      "id": "賁",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 8383
+    },
+    {
+      "rank": 360,
+      "id": "呉",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 6577
+    },
+    {
+      "rank": 361,
+      "id": "童",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 5889
+    },
+    {
+      "rank": 362,
+      "id": "因",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 4890
+    },
+    {
+      "rank": 363,
+      "id": "敝",
+      "kind": "frequency_fill",
+      "joyoHostCount": 3,
+      "wikipediaHostTokenFrequency": 3289
+    },
+    {
+      "rank": 364,
+      "id": "弔",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 263860
+    },
+    {
+      "rank": 365,
+      "id": "勿",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 159439
+    },
+    {
+      "rank": 366,
+      "id": "泉",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 143072
+    },
+    {
+      "rank": 367,
+      "id": "央",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 142824
+    },
+    {
+      "rank": 368,
+      "id": "吾",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 139448
+    },
+    {
+      "rank": 369,
+      "id": "本",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 138587
+    },
+    {
+      "rank": 370,
+      "id": "取",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 130421
+    },
+    {
+      "rank": 371,
+      "id": "去",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 124547
+    },
+    {
+      "rank": 372,
+      "id": "孝",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 124333
+    },
+    {
+      "rank": 373,
+      "id": "娄",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 108859
+    },
+    {
+      "rank": 374,
+      "id": "祭",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 96700
+    },
+    {
+      "rank": 375,
+      "id": "朮",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 90254
+    },
+    {
+      "rank": 376,
+      "id": "売",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 89092
+    },
+    {
+      "rank": 377,
+      "id": "軍",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 88660
+    },
+    {
+      "rank": 378,
+      "id": "彔",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 86693
+    },
+    {
+      "rank": 379,
+      "id": "幸",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 75505
+    },
+    {
+      "rank": 380,
+      "id": "君",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 75030
+    },
+    {
+      "rank": 381,
+      "id": "夬",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 73960
+    },
+    {
+      "rank": 382,
+      "id": "求",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 65835
+    },
+    {
+      "rank": 383,
+      "id": "尓",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 63517
+    },
+    {
+      "rank": 384,
+      "id": "告",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 62144
+    },
+    {
+      "rank": 385,
+      "id": "或",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 62064
+    },
+    {
+      "rank": 386,
+      "id": "㐬",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 61771
+    },
+    {
+      "rank": 387,
+      "id": "充",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 61366
+    },
+    {
+      "rank": 388,
+      "id": "我",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 59424
+    },
+    {
+      "rank": 389,
+      "id": "兀",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 58287
+    },
+    {
+      "rank": 390,
+      "id": "具",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 55815
+    },
+    {
+      "rank": 391,
+      "id": "則",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 52518
+    },
+    {
+      "rank": 392,
+      "id": "壮",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 52321
+    },
+    {
+      "rank": 393,
+      "id": "喬",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 51960
+    },
+    {
+      "rank": 394,
+      "id": "丘",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 51364
+    },
+    {
+      "rank": 395,
+      "id": "戌",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 49384
+    },
+    {
+      "rank": 396,
+      "id": "式",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 46020
+    },
+    {
+      "rank": 397,
+      "id": "左",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 45834
+    },
+    {
+      "rank": 398,
+      "id": "咸",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 45647
+    },
+    {
+      "rank": 399,
+      "id": "升",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 42660
+    },
+    {
+      "rank": 400,
+      "id": "系",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 42215
+    },
+    {
+      "rank": 401,
+      "id": "攸",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 41292
+    },
+    {
+      "rank": 402,
+      "id": "埶",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 39772
+    },
+    {
+      "rank": 403,
+      "id": "景",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 37264
+    },
+    {
+      "rank": 404,
+      "id": "㓁",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 35596
+    },
+    {
+      "rank": 405,
+      "id": "丙",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 34934
+    },
+    {
+      "rank": 406,
+      "id": "七",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 34573
+    },
+    {
+      "rank": 407,
+      "id": "离",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 33999
+    },
+    {
+      "rank": 408,
+      "id": "坐",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 33922
+    },
+    {
+      "rank": 409,
+      "id": "既",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 32261
+    },
+    {
+      "rank": 410,
+      "id": "尃",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 32249
+    },
+    {
+      "rank": 411,
+      "id": "平",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 31309
+    },
+    {
+      "rank": 412,
+      "id": "敬",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 31135
+    },
+    {
+      "rank": 413,
+      "id": "加",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 30981
+    },
+    {
+      "rank": 414,
+      "id": "竟",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 30891
+    },
+    {
+      "rank": 415,
+      "id": "原",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 30733
+    },
+    {
+      "rank": 416,
+      "id": "丗",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 29605
+    },
+    {
+      "rank": 417,
+      "id": "睘",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 29138
+    },
+    {
+      "rank": 418,
+      "id": "从",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 27862
+    },
+    {
+      "rank": 419,
+      "id": "于",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 26995
+    },
+    {
+      "rank": 420,
+      "id": "害",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 26291
+    },
+    {
+      "rank": 421,
+      "id": "動",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 25521
+    },
+    {
+      "rank": 422,
+      "id": "朿",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 25325
+    },
+    {
+      "rank": 423,
+      "id": "尤",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 24899
+    },
+    {
+      "rank": 424,
+      "id": "苗",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 24357
+    },
+    {
+      "rank": 425,
+      "id": "壴",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 23043
+    },
+    {
+      "rank": 426,
+      "id": "建",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 22542
+    },
+    {
+      "rank": 427,
+      "id": "乇",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 22494
+    },
+    {
+      "rank": 428,
+      "id": "炎",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 22385
+    },
+    {
+      "rank": 429,
+      "id": "并",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 22362
+    },
+    {
+      "rank": 430,
+      "id": "般",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 21671
+    },
+    {
+      "rank": 431,
+      "id": "貴",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 21577
+    },
+    {
+      "rank": 432,
+      "id": "争",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 21108
+    },
+    {
+      "rank": 433,
+      "id": "票",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 20733
+    },
+    {
+      "rank": 434,
+      "id": "奐",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 20649
+    },
+    {
+      "rank": 435,
+      "id": "丰",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 19677
+    },
+    {
+      "rank": 436,
+      "id": "荅",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 19621
+    },
+    {
+      "rank": 437,
+      "id": "章",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 19188
+    },
+    {
+      "rank": 438,
+      "id": "広",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 18117
+    },
+    {
+      "rank": 439,
+      "id": "曼",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 17875
+    },
+    {
+      "rank": 440,
+      "id": "廷",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 17506
+    },
+    {
+      "rank": 441,
+      "id": "番",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 17345
+    },
+    {
+      "rank": 442,
+      "id": "宓",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 17242
+    },
+    {
+      "rank": 443,
+      "id": "电",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 17080
+    },
+    {
+      "rank": 444,
+      "id": "午",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 15154
+    },
+    {
+      "rank": 445,
+      "id": "不",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 14694
+    },
+    {
+      "rank": 446,
+      "id": "布",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 14586
+    },
+    {
+      "rank": 447,
+      "id": "卬",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 14394
+    },
+    {
+      "rank": 448,
+      "id": "帝",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 14386
+    },
+    {
+      "rank": 449,
+      "id": "巨",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 13900
+    },
+    {
+      "rank": 450,
+      "id": "孚",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 13630
+    },
+    {
+      "rank": 451,
+      "id": "弗",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 13535
+    },
+    {
+      "rank": 452,
+      "id": "必",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 13000
+    },
+    {
+      "rank": 453,
+      "id": "育",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 12831
+    },
+    {
+      "rank": 454,
+      "id": "奞",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 12800
+    },
+    {
+      "rank": 455,
+      "id": "母",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 12331
+    },
+    {
+      "rank": 456,
+      "id": "尭",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 12266
+    },
+    {
+      "rank": 457,
+      "id": "龷",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 12265
+    },
+    {
+      "rank": 458,
+      "id": "秀",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 12095
+    },
+    {
+      "rank": 459,
+      "id": "鬲",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 11962
+    },
+    {
+      "rank": 460,
+      "id": "真",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 11103
+    },
+    {
+      "rank": 461,
+      "id": "凶",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 10307
+    },
+    {
+      "rank": 462,
+      "id": "内",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 10251
+    },
+    {
+      "rank": 463,
+      "id": "男",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 10206
+    },
+    {
+      "rank": 464,
+      "id": "代",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 9953
+    },
+    {
+      "rank": 465,
+      "id": "戊",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 9814
+    },
+    {
+      "rank": 466,
+      "id": "異",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 9018
+    },
+    {
+      "rank": 467,
+      "id": "叟",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 8708
+    },
+    {
+      "rank": 468,
+      "id": "菐",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 8685
+    },
+    {
+      "rank": 469,
+      "id": "朋",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 8501
+    },
+    {
+      "rank": 470,
+      "id": "員",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 8497
+    },
+    {
+      "rank": 471,
+      "id": "孰",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 8490
+    },
+    {
+      "rank": 472,
+      "id": "奴",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 8373
+    },
+    {
+      "rank": 473,
+      "id": "之",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 8269
+    },
+    {
+      "rank": 474,
+      "id": "朝",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 8247
+    },
+    {
+      "rank": 475,
+      "id": "某",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 8184
+    },
+    {
+      "rank": 476,
+      "id": "利",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 8126
+    },
+    {
+      "rank": 477,
+      "id": "万",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 7898
+    },
+    {
+      "rank": 478,
+      "id": "厓",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 7349
+    },
+    {
+      "rank": 479,
+      "id": "夆",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 7317
+    },
+    {
+      "rank": 480,
+      "id": "酋",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 6824
+    },
+    {
+      "rank": 481,
+      "id": "溥",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 6662
+    },
+    {
+      "rank": 482,
+      "id": "家",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 6469
+    },
+    {
+      "rank": 483,
+      "id": "此",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 6456
+    },
+    {
+      "rank": 484,
+      "id": "冘",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 6395
+    },
+    {
+      "rank": 485,
+      "id": "復",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 5925
+    },
+    {
+      "rank": 486,
+      "id": "䍃",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 5145
+    },
+    {
+      "rank": 487,
+      "id": "奉",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 4923
+    },
+    {
+      "rank": 488,
+      "id": "陏",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 4566
+    },
+    {
+      "rank": 489,
+      "id": "帛",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 4559
+    },
+    {
+      "rank": 490,
+      "id": "瓜",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 4452
+    },
+    {
+      "rank": 491,
+      "id": "曹",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 4414
+    },
+    {
+      "rank": 492,
+      "id": "宗",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 4396
+    },
+    {
+      "rank": 493,
+      "id": "永",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 4184
+    },
+    {
+      "rank": 494,
+      "id": "奚",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 3930
+    },
+    {
+      "rank": 495,
+      "id": "黒",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 3924
+    },
+    {
+      "rank": 496,
+      "id": "尗",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 3385
+    },
+    {
+      "rank": 497,
+      "id": "出",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 3030
+    },
+    {
+      "rank": 498,
+      "id": "甚",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 3030
+    },
+    {
+      "rank": 499,
+      "id": "疑",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 2698
+    },
+    {
+      "rank": 500,
+      "id": "冊",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 2557
+    },
+    {
+      "rank": 501,
+      "id": "有",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 2549
+    },
+    {
+      "rank": 502,
+      "id": "斬",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 2504
+    },
+    {
+      "rank": 503,
+      "id": "丩",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 2422
+    },
+    {
+      "rank": 504,
+      "id": "太",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 2360
+    },
+    {
+      "rank": 505,
+      "id": "若",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 2162
+    },
+    {
+      "rank": 506,
+      "id": "夗",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 1740
+    },
+    {
+      "rank": 507,
+      "id": "定",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 1686
+    },
+    {
+      "rank": 508,
+      "id": "居",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 1612
+    },
+    {
+      "rank": 509,
+      "id": "善",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 1278
+    },
+    {
+      "rank": 510,
+      "id": "朔",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 1263
+    },
+    {
+      "rank": 511,
+      "id": "全",
+      "kind": "frequency_fill",
+      "joyoHostCount": 2,
+      "wikipediaHostTokenFrequency": 856
+    },
+    {
+      "rank": 512,
+      "id": "巽",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 131952
+    },
+    {
+      "rank": 513,
+      "id": "寅",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 130859
+    },
+    {
+      "rank": 514,
+      "id": "幾",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 121754
+    },
+    {
+      "rank": 515,
+      "id": "劵",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 97496
+    },
+    {
+      "rank": 516,
+      "id": "吏",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 94520
+    },
+    {
+      "rank": 517,
+      "id": "䏍",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 84356
+    },
+    {
+      "rank": 518,
+      "id": "介",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 76907
+    },
+    {
+      "rank": 519,
+      "id": "却",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 76062
+    },
+    {
+      "rank": 520,
+      "id": "憂",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 75273
+    },
+    {
+      "rank": 521,
+      "id": "完",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 73473
+    },
+    {
+      "rank": 522,
+      "id": "呆",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 67035
+    },
+    {
+      "rank": 523,
+      "id": "哥",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 66725
+    },
+    {
+      "rank": 524,
+      "id": "滕",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 65448
+    },
+    {
+      "rank": 525,
+      "id": "冬",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 64793
+    },
+    {
+      "rank": 526,
+      "id": "刑",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 62631
+    },
+    {
+      "rank": 527,
+      "id": "㝵",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 61074
+    },
+    {
+      "rank": 528,
+      "id": "制",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 58746
+    },
+    {
+      "rank": 529,
+      "id": "禹",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 58302
+    },
+    {
+      "rank": 530,
+      "id": "忩",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 57603
+    },
+    {
+      "rank": 531,
+      "id": "多",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 55382
+    },
+    {
+      "rank": 532,
+      "id": "冉",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 53289
+    },
+    {
+      "rank": 533,
+      "id": "吊",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 49115
+    },
+    {
+      "rank": 534,
+      "id": "乎",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 47862
+    },
+    {
+      "rank": 535,
+      "id": "夅",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 41452
+    },
+    {
+      "rank": 536,
+      "id": "忍",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 39482
+    },
+    {
+      "rank": 537,
+      "id": "枼",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 39048
+    },
+    {
+      "rank": 538,
+      "id": "豦",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 38454
+    },
+    {
+      "rank": 539,
+      "id": "坴",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 36431
+    },
+    {
+      "rank": 540,
+      "id": "崔",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 35553
+    },
+    {
+      "rank": 541,
+      "id": "冏",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 34230
+    },
+    {
+      "rank": 542,
+      "id": "妾",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 33589
+    },
+    {
+      "rank": 543,
+      "id": "禸",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 32578
+    },
+    {
+      "rank": 544,
+      "id": "洛",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 31727
+    },
+    {
+      "rank": 545,
+      "id": "道",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 31532
+    },
+    {
+      "rank": 546,
+      "id": "南",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 31278
+    },
+    {
+      "rank": 547,
+      "id": "兵",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 30031
+    },
+    {
+      "rank": 548,
+      "id": "巷",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 29976
+    },
+    {
+      "rank": 549,
+      "id": "隼",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 29882
+    },
+    {
+      "rank": 550,
+      "id": "吅",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 29242
+    },
+    {
+      "rank": 551,
+      "id": "受",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 28921
+    },
+    {
+      "rank": 552,
+      "id": "度",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 28877
+    },
+    {
+      "rank": 553,
+      "id": "倉",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 28769
+    },
+    {
+      "rank": 554,
+      "id": "発",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 28479
+    },
+    {
+      "rank": 555,
+      "id": "卸",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 28473
+    },
+    {
+      "rank": 556,
+      "id": "象",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 26906
+    },
+    {
+      "rank": 557,
+      "id": "厷",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 26440
+    },
+    {
+      "rank": 558,
+      "id": "隺",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 26412
+    },
+    {
+      "rank": 559,
+      "id": "郷",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 25707
+    },
+    {
+      "rank": 560,
+      "id": "呈",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 25294
+    },
+    {
+      "rank": 561,
+      "id": "亜",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 23086
+    },
+    {
+      "rank": 562,
+      "id": "志",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 22522
+    },
+    {
+      "rank": 563,
+      "id": "筑",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 22446
+    },
+    {
+      "rank": 564,
+      "id": "右",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 21987
+    },
+    {
+      "rank": 565,
+      "id": "亭",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 21949
+    },
+    {
+      "rank": 566,
+      "id": "戉",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 21755
+    },
+    {
+      "rank": 567,
+      "id": "乃",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 21736
+    },
+    {
+      "rank": 568,
+      "id": "与",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 21407
+    },
+    {
+      "rank": 569,
+      "id": "昏",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 21134
+    },
+    {
+      "rank": 570,
+      "id": "昭",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 20853
+    },
+    {
+      "rank": 571,
+      "id": "丆",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 20790
+    },
+    {
+      "rank": 572,
+      "id": "両",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 20691
+    },
+    {
+      "rank": 573,
+      "id": "安",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 19999
+    },
+    {
+      "rank": 574,
+      "id": "頼",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 19933
+    },
+    {
+      "rank": 575,
+      "id": "敕",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 19904
+    },
+    {
+      "rank": 576,
+      "id": "亟",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 19681
+    },
+    {
+      "rank": 577,
+      "id": "楽",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 19454
+    },
+    {
+      "rank": 578,
+      "id": "会",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 18713
+    },
+    {
+      "rank": 579,
+      "id": "乡",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 17820
+    },
+    {
+      "rank": 580,
+      "id": "佰",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 17529
+    },
+    {
+      "rank": 581,
+      "id": "冢",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 17478
+    },
+    {
+      "rank": 582,
+      "id": "潘",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 17320
+    },
+    {
+      "rank": 583,
+      "id": "昷",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 17177
+    },
+    {
+      "rank": 584,
+      "id": "耑",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 16651
+    },
+    {
+      "rank": 585,
+      "id": "最",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 16507
+    },
+    {
+      "rank": 586,
+      "id": "明",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 16480
+    },
+    {
+      "rank": 587,
+      "id": "习",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 16139
+    },
+    {
+      "rank": 588,
+      "id": "並",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 15808
+    },
+    {
+      "rank": 589,
+      "id": "友",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 15268
+    },
+    {
+      "rank": 590,
+      "id": "暴",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 15060
+    },
+    {
+      "rank": 591,
+      "id": "処",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 15047
+    },
+    {
+      "rank": 592,
+      "id": "即",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 14771
+    },
+    {
+      "rank": 593,
+      "id": "北",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 14604
+    },
+    {
+      "rank": 594,
+      "id": "到",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 14221
+    },
+    {
+      "rank": 595,
+      "id": "斿",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 13550
+    },
+    {
+      "rank": 596,
+      "id": "弯",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 13507
+    },
+    {
+      "rank": 597,
+      "id": "丸",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 13270
+    },
+    {
+      "rank": 598,
+      "id": "卦",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 13220
+    },
+    {
+      "rank": 599,
+      "id": "敫",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 12835
+    },
+    {
+      "rank": 600,
+      "id": "粦",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 12690
+    },
+    {
+      "rank": 601,
+      "id": "以",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 11975
+    },
+    {
+      "rank": 602,
+      "id": "亚",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 11841
+    },
+    {
+      "rank": 603,
+      "id": "隽",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 11813
+    },
+    {
+      "rank": 604,
+      "id": "尹",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 11797
+    },
+    {
+      "rank": 605,
+      "id": "屰",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 11652
+    },
+    {
+      "rank": 606,
+      "id": "旉",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 11243
+    },
+    {
+      "rank": 607,
+      "id": "㔾",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 11172
+    },
+    {
+      "rank": 608,
+      "id": "胡",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 11035
+    },
+    {
+      "rank": 609,
+      "id": "菫",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 10854
+    },
+    {
+      "rank": 610,
+      "id": "㳟",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 10746
+    },
+    {
+      "rank": 611,
+      "id": "彦",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 10743
+    },
+    {
+      "rank": 612,
+      "id": "路",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 10708
+    },
+    {
+      "rank": 613,
+      "id": "延",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 10606
+    },
+    {
+      "rank": 614,
+      "id": "厄",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 10325
+    },
+    {
+      "rank": 615,
+      "id": "客",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 10226
+    },
+    {
+      "rank": 616,
+      "id": "品",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 10170
+    },
+    {
+      "rank": 617,
+      "id": "寉",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 10032
+    },
+    {
+      "rank": 618,
+      "id": "昌",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 9803
+    },
+    {
+      "rank": 619,
+      "id": "舄",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 9674
+    },
+    {
+      "rank": 620,
+      "id": "昆",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 9379
+    },
+    {
+      "rank": 621,
+      "id": "甶",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 9192
+    },
+    {
+      "rank": 622,
+      "id": "斥",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 8799
+    },
+    {
+      "rank": 623,
+      "id": "夜",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 8644
+    },
+    {
+      "rank": 624,
+      "id": "巻",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 8546
+    },
+    {
+      "rank": 625,
+      "id": "匀",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 8450
+    },
+    {
+      "rank": 626,
+      "id": "旡",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 8195
+    },
+    {
+      "rank": 627,
+      "id": "替",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 8101
+    },
+    {
+      "rank": 628,
+      "id": "彖",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 8065
+    },
+    {
+      "rank": 629,
+      "id": "農",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 8054
+    },
+    {
+      "rank": 630,
+      "id": "然",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 7911
+    },
+    {
+      "rank": 631,
+      "id": "何",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 7652
+    },
+    {
+      "rank": 632,
+      "id": "莧",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 7629
+    },
+    {
+      "rank": 633,
+      "id": "光",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 7509
+    },
+    {
+      "rank": 634,
+      "id": "宛",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 7440
+    },
+    {
+      "rank": 635,
+      "id": "肋",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 7385
+    },
+    {
+      "rank": 636,
+      "id": "敏",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 7299
+    },
+    {
+      "rank": 637,
+      "id": "敢",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 7283
+    },
+    {
+      "rank": 638,
+      "id": "宿",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 7179
+    },
+    {
+      "rank": 639,
+      "id": "歯",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 7132
+    },
+    {
+      "rank": 640,
+      "id": "恵",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 7111
+    },
+    {
+      "rank": 641,
+      "id": "苟",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 7034
+    },
+    {
+      "rank": 642,
+      "id": "匊",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 7004
+    },
+    {
+      "rank": 643,
+      "id": "䩗",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 6847
+    },
+    {
+      "rank": 644,
+      "id": "間",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 6685
+    },
+    {
+      "rank": 645,
+      "id": "貞",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 6682
+    },
+    {
+      "rank": 646,
+      "id": "串",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 6668
+    },
+    {
+      "rank": 647,
+      "id": "維",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 6580
+    },
+    {
+      "rank": 648,
+      "id": "允",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 6225
+    },
+    {
+      "rank": 649,
+      "id": "竜",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 6101
+    },
+    {
+      "rank": 650,
+      "id": "楚",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 5878
+    },
+    {
+      "rank": 651,
+      "id": "戒",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 5828
+    },
+    {
+      "rank": 652,
+      "id": "刃",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 5817
+    },
+    {
+      "rank": 653,
+      "id": "沓",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 5726
+    },
+    {
+      "rank": 654,
+      "id": "頃",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 5689
+    },
+    {
+      "rank": 655,
+      "id": "灰",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 5604
+    },
+    {
+      "rank": 656,
+      "id": "罔",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 5497
+    },
+    {
+      "rank": 657,
+      "id": "普",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 5487
+    },
+    {
+      "rank": 658,
+      "id": "従",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 5406
+    },
+    {
+      "rank": 659,
+      "id": "射",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 5277
+    },
+    {
+      "rank": 660,
+      "id": "雇",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 5152
+    },
+    {
+      "rank": 661,
+      "id": "死",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 4951
+    },
+    {
+      "rank": 662,
+      "id": "先",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 4776
+    },
+    {
+      "rank": 663,
+      "id": "賞",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 4458
+    },
+    {
+      "rank": 664,
+      "id": "為",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 4399
+    },
+    {
+      "rank": 665,
+      "id": "显",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 4386
+    },
+    {
+      "rank": 666,
+      "id": "守",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 4265
+    },
+    {
+      "rank": 667,
+      "id": "迷",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 4255
+    },
+    {
+      "rank": 668,
+      "id": "民",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 4254
+    },
+    {
+      "rank": 669,
+      "id": "涂",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 4239
+    },
+    {
+      "rank": 670,
+      "id": "垔",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 4197
+    },
+    {
+      "rank": 671,
+      "id": "容",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 4095
+    },
+    {
+      "rank": 672,
+      "id": "契",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 4055
+    },
+    {
+      "rank": 673,
+      "id": "夌",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 4037
+    },
+    {
+      "rank": 674,
+      "id": "思",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 4014
+    },
+    {
+      "rank": 675,
+      "id": "任",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3992
+    },
+    {
+      "rank": 676,
+      "id": "匈",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3909
+    },
+    {
+      "rank": 677,
+      "id": "将",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3856
+    },
+    {
+      "rank": 678,
+      "id": "舎",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3844
+    },
+    {
+      "rank": 679,
+      "id": "卑",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3824
+    },
+    {
+      "rank": 680,
+      "id": "匃",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3817
+    },
+    {
+      "rank": 681,
+      "id": "帯",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3779
+    },
+    {
+      "rank": 682,
+      "id": "名",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3693
+    },
+    {
+      "rank": 683,
+      "id": "屋",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3676
+    },
+    {
+      "rank": 684,
+      "id": "忝",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3576
+    },
+    {
+      "rank": 685,
+      "id": "乞",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3405
+    },
+    {
+      "rank": 686,
+      "id": "戎",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3386
+    },
+    {
+      "rank": 687,
+      "id": "烝",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3385
+    },
+    {
+      "rank": 688,
+      "id": "夸",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3245
+    },
+    {
+      "rank": 689,
+      "id": "蔵",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3234
+    },
+    {
+      "rank": 690,
+      "id": "務",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3208
+    },
+    {
+      "rank": 691,
+      "id": "聶",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3201
+    },
+    {
+      "rank": 692,
+      "id": "舜",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3187
+    },
+    {
+      "rank": 693,
+      "id": "貫",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3164
+    },
+    {
+      "rank": 694,
+      "id": "上",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3151
+    },
+    {
+      "rank": 695,
+      "id": "下",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3151
+    },
+    {
+      "rank": 696,
+      "id": "奄",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3122
+    },
+    {
+      "rank": 697,
+      "id": "唐",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3078
+    },
+    {
+      "rank": 698,
+      "id": "登",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3066
+    },
+    {
+      "rank": 699,
+      "id": "䚯",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3053
+    },
+    {
+      "rank": 700,
+      "id": "空",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 3039
+    },
+    {
+      "rank": 701,
+      "id": "縣",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2970
+    },
+    {
+      "rank": 702,
+      "id": "閏",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2961
+    },
+    {
+      "rank": 703,
+      "id": "戻",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2864
+    },
+    {
+      "rank": 704,
+      "id": "宁",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2858
+    },
+    {
+      "rank": 705,
+      "id": "虚",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2733
+    },
+    {
+      "rank": 706,
+      "id": "盾",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2726
+    },
+    {
+      "rank": 707,
+      "id": "愛",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2692
+    },
+    {
+      "rank": 708,
+      "id": "畀",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2645
+    },
+    {
+      "rank": 709,
+      "id": "孟",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2630
+    },
+    {
+      "rank": 710,
+      "id": "雍",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2588
+    },
+    {
+      "rank": 711,
+      "id": "旁",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2543
+    },
+    {
+      "rank": 712,
+      "id": "隊",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2374
+    },
+    {
+      "rank": 713,
+      "id": "寍",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2369
+    },
+    {
+      "rank": 714,
+      "id": "要",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2323
+    },
+    {
+      "rank": 715,
+      "id": "尉",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2281
+    },
+    {
+      "rank": 716,
+      "id": "它",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2163
+    },
+    {
+      "rank": 717,
+      "id": "亶",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2112
+    },
+    {
+      "rank": 718,
+      "id": "孛",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2087
+    },
+    {
+      "rank": 719,
+      "id": "尼",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2080
+    },
+    {
+      "rank": 720,
+      "id": "桀",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2023
+    },
+    {
+      "rank": 721,
+      "id": "府",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 2010
+    },
+    {
+      "rank": 722,
+      "id": "冒",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1992
+    },
+    {
+      "rank": 723,
+      "id": "就",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1953
+    },
+    {
+      "rank": 724,
+      "id": "畜",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1916
+    },
+    {
+      "rank": 725,
+      "id": "享",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1906
+    },
+    {
+      "rank": 726,
+      "id": "壳",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1899
+    },
+    {
+      "rank": 727,
+      "id": "皃",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1811
+    },
+    {
+      "rank": 728,
+      "id": "盍",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1779
+    },
+    {
+      "rank": 729,
+      "id": "鼡",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1748
+    },
+    {
+      "rank": 730,
+      "id": "留",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1744
+    },
+    {
+      "rank": 731,
+      "id": "徴",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1645
+    },
+    {
+      "rank": 732,
+      "id": "彭",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1628
+    },
+    {
+      "rank": 733,
+      "id": "郎",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1625
+    },
+    {
+      "rank": 734,
+      "id": "段",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1624
+    },
+    {
+      "rank": 735,
+      "id": "乗",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1620
+    },
+    {
+      "rank": 736,
+      "id": "参",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1601
+    },
+    {
+      "rank": 737,
+      "id": "易",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1552
+    },
+    {
+      "rank": 738,
+      "id": "絜",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1496
+    },
+    {
+      "rank": 739,
+      "id": "伐",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1485
+    },
+    {
+      "rank": 740,
+      "id": "胃",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1465
+    },
+    {
+      "rank": 741,
+      "id": "州",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1419
+    },
+    {
+      "rank": 742,
+      "id": "星",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1414
+    },
+    {
+      "rank": 743,
+      "id": "庄",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1397
+    },
+    {
+      "rank": 744,
+      "id": "寿",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1377
+    },
+    {
+      "rank": 745,
+      "id": "六",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1372
+    },
+    {
+      "rank": 746,
+      "id": "知",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1358
+    },
+    {
+      "rank": 747,
+      "id": "愈",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1335
+    },
+    {
+      "rank": 748,
+      "id": "闌",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1301
+    },
+    {
+      "rank": 749,
+      "id": "卓",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1258
+    },
+    {
+      "rank": 750,
+      "id": "量",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1248
+    },
+    {
+      "rank": 751,
+      "id": "焦",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1246
+    },
+    {
+      "rank": 752,
+      "id": "保",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1210
+    },
+    {
+      "rank": 753,
+      "id": "末",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1209
+    },
+    {
+      "rank": 754,
+      "id": "躬",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1207
+    },
+    {
+      "rank": 755,
+      "id": "匹",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1196
+    },
+    {
+      "rank": 756,
+      "id": "庶",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1180
+    },
+    {
+      "rank": 757,
+      "id": "肙",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1180
+    },
+    {
+      "rank": 758,
+      "id": "叚",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1177
+    },
+    {
+      "rank": 759,
+      "id": "勇",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1159
+    },
+    {
+      "rank": 760,
+      "id": "百",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1151
+    },
+    {
+      "rank": 761,
+      "id": "表",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1130
+    },
+    {
+      "rank": 762,
+      "id": "桼",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1122
+    },
+    {
+      "rank": 763,
+      "id": "波",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1116
+    },
+    {
+      "rank": 764,
+      "id": "矣",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1099
+    },
+    {
+      "rank": 765,
+      "id": "需",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1085
+    },
+    {
+      "rank": 766,
+      "id": "胥",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1075
+    },
+    {
+      "rank": 767,
+      "id": "咢",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1043
+    },
+    {
+      "rank": 768,
+      "id": "放",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1036
+    },
+    {
+      "rank": 769,
+      "id": "卉",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1028
+    },
+    {
+      "rank": 770,
+      "id": "察",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1004
+    },
+    {
+      "rank": 771,
+      "id": "息",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 1002
+    },
+    {
+      "rank": 772,
+      "id": "卂",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 999
+    },
+    {
+      "rank": 773,
+      "id": "逢",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 983
+    },
+    {
+      "rank": 774,
+      "id": "妻",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 980
+    },
+    {
+      "rank": 775,
+      "id": "禁",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 932
+    },
+    {
+      "rank": 776,
+      "id": "澡",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 891
+    },
+    {
+      "rank": 777,
+      "id": "弱",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 882
+    },
+    {
+      "rank": 778,
+      "id": "雲",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 848
+    },
+    {
+      "rank": 779,
+      "id": "羔",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 841
+    },
+    {
+      "rank": 780,
+      "id": "丈",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 823
+    },
+    {
+      "rank": 781,
+      "id": "属",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 821
+    },
+    {
+      "rank": 782,
+      "id": "荒",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 819
+    },
+    {
+      "rank": 783,
+      "id": "旬",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 801
+    },
+    {
+      "rank": 784,
+      "id": "疾",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 785
+    },
+    {
+      "rank": 785,
+      "id": "考",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 768
+    },
+    {
+      "rank": 786,
+      "id": "侯",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 757
+    },
+    {
+      "rank": 787,
+      "id": "駦",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 755
+    },
+    {
+      "rank": 788,
+      "id": "蜀",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 719
+    },
+    {
+      "rank": 789,
+      "id": "豊",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 679
+    },
+    {
+      "rank": 790,
+      "id": "武",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 641
+    },
+    {
+      "rank": 791,
+      "id": "咨",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 585
+    },
+    {
+      "rank": 792,
+      "id": "念",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 585
+    },
+    {
+      "rank": 793,
+      "id": "堇",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 560
+    },
+    {
+      "rank": 794,
+      "id": "兪",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 527
+    },
+    {
+      "rank": 795,
+      "id": "秋",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 504
+    },
+    {
+      "rank": 796,
+      "id": "乕",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 470
+    },
+    {
+      "rank": 797,
+      "id": "爻",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 461
+    },
+    {
+      "rank": 798,
+      "id": "窄",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 445
+    },
+    {
+      "rank": 799,
+      "id": "切",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 436
+    },
+    {
+      "rank": 800,
+      "id": "尊",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 422
+    },
+    {
+      "rank": 801,
+      "id": "前",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 408
+    },
+    {
+      "rank": 802,
+      "id": "敖",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 371
+    },
+    {
+      "rank": 803,
+      "id": "屏",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 355
+    },
+    {
+      "rank": 804,
+      "id": "新",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 338
+    },
+    {
+      "rank": 805,
+      "id": "臭",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 318
+    },
+    {
+      "rank": 806,
+      "id": "亩",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 288
+    },
+    {
+      "rank": 807,
+      "id": "孫",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 276
+    },
+    {
+      "rank": 808,
+      "id": "栗",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 264
+    },
+    {
+      "rank": 809,
+      "id": "致",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 260
+    },
+    {
+      "rank": 810,
+      "id": "委",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 209
+    },
+    {
+      "rank": 811,
+      "id": "戔",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 187
+    },
+    {
+      "rank": 812,
+      "id": "赫",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 178
+    },
+    {
+      "rank": 813,
+      "id": "爾",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 157
+    },
+    {
+      "rank": 814,
+      "id": "丑",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 156
+    },
+    {
+      "rank": 815,
+      "id": "朕",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 154
+    },
+    {
+      "rank": 816,
+      "id": "執",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 149
+    },
+    {
+      "rank": 817,
+      "id": "感",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 146
+    },
+    {
+      "rank": 818,
+      "id": "夾",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 10
+    },
+    {
+      "rank": 819,
+      "id": "眞",
+      "kind": "frequency_fill",
+      "joyoHostCount": 1,
+      "wikipediaHostTokenFrequency": 5
+    }
+  ]
+}
