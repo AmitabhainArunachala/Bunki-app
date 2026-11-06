@@ -26,7 +26,9 @@ const P = 'prototypes/corridor/tools/';
 const PRODUCER_PINS = Object.freeze({
   [`${P}verify-corridor-accessibility.mjs`]:
     '91974d35c3c352cf013e29798d298ba44c0d25d41a0f32b0fd6c90176ed13064',
-  [`${P}build-standalone.mjs`]: 'f12afe0cfce59c5cc35b99adf2df4dba3e0bc3356ba18e9de8487781e0411557',
+  // 2026-11-06 (G3): the builder folds the eleven corridor seams back into the standalone document; the recordImports
+  // map it declares is unchanged (9 rows) — reviewed re-pin of the producer bytes only
+  [`${P}build-standalone.mjs`]: '9ed12a3dad5da915a63f9d543bb1751906a58e72d41335f19119dc2953138422',
   [`${P}verify-sense-truth.mjs`]:
     '315786beb7763d8d847d5eb04a8e399df769aa1a07ece364a15795181c6854f6',
   [`${P}sense-grok-case.mjs`]: 'f968617684b38ece18d40cde2d645ae3f8c2de0eb0e59d5b7f7f0e5e3eaab367',
