@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {readFileSync,writeFileSync,mkdirSync,mkdtempSync,rmSync} from 'node:fs';
+import {readFileSync,writeFileSync,mkdirSync,mkdtempSync,rmSync,readdirSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {spawnSync} from 'node:child_process';
 import {join} from 'node:path';
@@ -23,11 +23,17 @@ async function fixture(installation='test-bunki',storage=memory(),events=[grant(
 // Execute the product's actual function bodies with synthetic host dependencies.
 // AST extraction avoids a second implementation of routing/authority decisions.
 const parsedSources=new Map();
+// G3 (2026-11-06): corridor.js keeps its product functions in eleven seam modules under modules/ (pure moves,
+// verify-seams.mjs); a function asked of corridor.js is read from the seam that now declares it. Same bodies, same
+// assertions — only the lookup follows the move. Judge files (verify-*) are not product code.
+const seamSources=()=>readdirSync(new URL('modules/',root)).filter(f=>f.endsWith('.mjs')&&!f.startsWith('verify-')).sort().map(f=>`modules/${f}`);
 function productFunction(path,name){
-  if(!parsedSources.has(path))parsedSources.set(path,ts.createSourceFile(path,readFileSync(new URL(path,root),'utf8'),ts.ScriptTarget.Latest,true,ts.ScriptKind.JS));
-  const declaration=parsedSources.get(path).statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text===name);
-  if(!declaration)throw Error(`Missing product function ${path}:${name}`);
-  return declaration.getText().replace(/^export\s+/, '');
+  for(const file of [path,...(path==='corridor.js'?seamSources():[])]){
+    if(!parsedSources.has(file))parsedSources.set(file,ts.createSourceFile(file,readFileSync(new URL(file,root),'utf8'),ts.ScriptTarget.Latest,true,ts.ScriptKind.JS));
+    const declaration=parsedSources.get(file).statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text===name);
+    if(declaration)return declaration.getText().replace(/^export\s+/, '');
+  }
+  throw Error(`Missing product function ${path}:${name}`);
 }
 function productContext(path,names,dependencies){
   const context=vm.createContext({...dependencies,URLSearchParams});
