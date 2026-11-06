@@ -1,3 +1,15 @@
+import { activeDictionaryQuery, alternateLemmaDoor, annotationPieceReadings, annotationReadsAs, appendJapaneseLookup, bankExamplesFor, conjugations, dictionaryAnsweredForm, dictionaryCoreMatch, dictionaryDetailRowsFor, dictionaryDetailsFor, dictionaryEpoch, dictionaryGlossSummary, dictionaryHomographChoices, dictionaryLoneDoor, dictionaryQueryError, dictionaryQueryKey, dictionaryQueryToken, dictionaryReadingSupportsForm, dictionaryRelationRoute, dictionaryRowsFor, dictionaryRowsForForm, dictionaryRowsReadAs, dictionarySearchContext, dictionaryShardId, dictionaryShardNumber, dictionarySummaryFor, dictionaryTag, displayKunReading, displayPairs, embeddedDictionaryJson, ensureDictionaryDetails, ensureDictionaryRowBySeq, ensureDictionaryRowsForForm, ensureDictionaryRowsForNode, ensureSense, ensureTeFormAnswer, exampleFnv, exampleHoldsWord, exampleIdentity, exampleKanji, exampleOrder, exampleOwnRows, exampleSenseKey, exampleTokenIsWord, fetchExampleJson, findExamples, glossaryCrossRefPlan, hasEmbeddedDictionaryIndex, hiraToKata, homographLines, inlineGloss, inlineGlossLine, inlineTokenGloss, inlineWordGloss, inlineWordReading, japaneseLookupEntryRecord, japaneseLookupHelpId, japaneseLookupRecord, kanaIru, kanjiReadingsInWord, kanjiReadingsOf, lemmaReading, lemmaTakesForm, loadDictionaryJson, lookup, lookupBlockWords, lookupItemBlocks, lookupOccurrence, nameReaderToken, narrowLemmaEntries, normalizeGloss, partGloss, partMeaning, phoneticAnnotationCandidates, phoneticAnnotationIndices, phoneticAnnotationRanges, posCode, posLine, readerDoorGloss, readerDoorLead, readerGlossLine, readerGlossMissText, readerHelp, readerLayerParagraph, readerLayerReading, readerLookupAnswer, readerRenderedTokens, readerTokenAt, readerTokenAtIndex, readerTokenNode, readerTokenState, readerWordHint, readerWordNote, readingAsksIndex, readingExpected, readingForm, readingLine, readingPlaceFailure, readingTargets, readingToken, readingTokenEntry, readyTokenReading, relationReadingQualifier, relationTarget, renderConjugation, renderDictionaryDetails, renderDictionaryHomographs, renderDictionaryRelations, renderThesaurus, requestDictionaryDetails, senseChoice, senseDoor, senseExpression, senseFillInPlace, senseIsQuick, senseMoreElement, senseMoreLine, senseMustRun, senseNameHeldText, senseNegation, senseNeighbours, senseRecord, senseRefine, senseSpelledReading, senseWithin, sidecarSense, soundChangeDoor, soundChangeReadings, tapLadderHint, teFormAnswer, teFormRecord, teFormSenseGlosses, thesClusters, tokenGlossLine, tokenReading, validDictionaryRow, yomiReadingType, yomiVariantsOf } from './modules/dictionary.mjs';
+import { blankSlip, drawSheetActionLine, entryCueReading, findSheetDoor, flySeal, foldEntryForms, holdRing, keepFloatingBeside, keepMenuInCard, keptItemNode, keptStarWhy, keptState, keptWordProjection, listGloss, listReading, listToMarkdown, listeningField, listsWithout, markStripMore, miniKanjiWeb, note, noteSealListUse, noteSlipDepth, noteText, openSlip, openWordWebLadder, paintWordSave, placeSaveMenu, rememberSheet, renderWordCaptureNote, reopenSaveMenu, replaceWordCard, saveAiDeviceConfig, saveDrawerScroller, saveOne, saveReaderPosition, saveReportRelay, saveReportRelayLink, savedNodeRecord, savedRecordNoteDraft, sealHostedWord, sealListOrder, sealTarget, setSaveDrawerPush, sheetActionVisitHolds, sheetDoorKey, sheetTakeLabel, slipAllowed, slipHeadword, slipScroller, standingSlip, takenContext, toggleTaken, travelSlip, unsaveEverywhere, wordArchiveRef, wordCaptureBasis, wordCaptureHeldText, wordCaptureNoteText, wordCaptureOpenLabel, wordCaptureReadingMismatch, wordCaptureState, wordClipFor, wordClipKey, wordDepth, wordIdentityRelation, wordPresentationKey, wordRow, wordSaveFacts } from './modules/word-entry.mjs';
+import { clearTouchReadingSeat, encounterIdentity, encounterPatch, encounterTrail, fileIntakeFailure, filePageLabel, finishTouchReadingFade, holdReaderCapture, pinTouchRows, readerCaptureReason, readerCaptureReasonText, readerQuickRecord, readerQuickRecordAsRead, readerTakeCurrent, readerTakeNode, reconcileSourceInboxEntries, rememberFileDraft, renderEncounterTrail, seatGlossRow, seatInlineGloss, seatTouchReading, setTouchReadingShown, sourceInboxEntries, sourceLadderAction, sourceProcessingScope, stopTouchReadingFade, syncReaderTakeSeal, touchReading, touchReadingFading, touchRows, unpinTouchRows } from './modules/capture.mjs';
+import { cardDepth, cardInk, deckCounts, deckSittingButton, deckWordsBegun, focusPool, focusProseWord, focusReturnMarkOnce, focusSentencePracticeTarget, gradeTag, guidedCardStatus, guidedDoorInJlptRoom, learnHead, learnerModel, learnerSourceLabel, learningContextRef, learningEnrollHeldText, learningItemNode, lessonChoices, lessonGloss, lessonLaneIds, lessonMissedLast, lessonPlan, lessonPreviousRuns, markCardMore, mockSubjectKey, practiceIdentity, presentReviewAnswer, renderFocus, renderLearnStage, renderSrsStats, reviewAnswerAvailable, reviewBack, reviewCardBack, reviewCounts, sharedStudyActive, sharedStudyFence, srsCardKind, srsDecks, srsForecast, srsLearnerPolicy, srsPrefStep, srsPrefValue, srsPresetState, srsWhen } from './modules/study-host.mjs';
+import { adjacentScaleOutTarget, backupCounts, keepSentencePracticeFocusVisible, paintRoomScaleThread, refreshScaleOrigin, requestScaleReturn, resumeAssessmentV2, retireScaleDestination, retireScaleTransients, retryMockLoad, revealFocusedChromeDoor, revealMountedScaleCurrent, scaleFallbackOut, scaleInTarget, scaleKanjiParts, scaleLabel, scaleLineTop, scaleName, scaleNodeBelongs, scaleNodeFrom, scaleOutTarget, scaleParentIndex, scalePathData, scaleReaderIndex, scaleShelfView, scaleSource, scaleThread, scaleWordKanji, threadRest } from './modules/return.mjs';
+import { GRAMMARS, _allSub, _componentsOf, _strokeOf, activateKanjiFamily, activateKanjiStructure, animcjkGlyphFor, beyondJoyo, classicalRadicalHits, clearStoryHero, componentLabel, heroOf, inkCeremony, inkSpecFor, inkStrokeMs, joyoOnNote, kanjiChooseRoom, kanjiCourseEntryNode, kanjiCourseEvidencePatch, kanjiCourseNodeUnit, kanjiCourseReferenceHelp, kanjiCourseReturnFrame, kanjiCourseRunKind, kanjiCourseTeachingHelp, kanjiEnterCourseDoor, kanjiEntryRecord, kanjiFacts, kanjiFactsState, kanjiFactsStatus, kanjiFamilyAuthorize, kanjiFamilyCitations, kanjiFamilyControlId, kanjiFamilyCourseExpectation, kanjiFamilyHasExampleOrigin, kanjiFamilyHelpRow, kanjiFamilyLiveVisit, kanjiFamilyRefusal, kanjiFamilyStatus, kanjiFinderUniverse, kanjiQuestAct, kanjiQuestBinding, kanjiQuestBound, kanjiQuestClear, kanjiQuestCreate, kanjiQuestEnd, kanjiQuestLine, kanjiQuestLines, kanjiQuestOpen, kanjiQuestPool, kanjiQuestQuote, kanjiQuestRedraw, kanjiQuestRender, kanjiQuestRunStarted, kanjiQuestSeed, kanjiQuestSelfCheck, kanjiQuestSentences, kanjiQuestSettle, kanjiQuestStage, kanjiQuestStale, kanjiQuestStructural, kanjiQuestSummary, kanjiQuestWordsDone, kanjiReference, kanjiReferenceView, kanjiRoomEntry, kanjiSlipReading, kankenLevels, kdxDrawResults, kdxFrequencyHits, kdxGlyphName, kdxGridShown, kdxLoadFailed, kdxPartHits, kdxRadicalResults, kdxTextResults, kkldLine, kkldNumberGlyphs, kkldOf, mainParts, nameStoryHero, openKanjiRooms, paintStrokes, paintTok, recognizeKanji, renderGrammarNode, renderIdiomNode, renderKanjiClassifications, renderKanjiFamilyDisclosure, renderKanjiNode, renderKanjiRoomChooser, renderKdxDraw, renderParticleNode, renderRadicalNode, renderSentenceNode, sentenceDoor, sentenceDraftCopyButton, sentenceDraftInputMatches, sentenceDraftStatus, sentenceKept, sentencePracticeError, sentenceSource, storyAccent, storyBlock, storyDate, storyHeroArriving, storyHeroKanji, storyHeroOnScreen, storyInstrument, storyKicker, storyLede, storyLevel, storyPicture, storyPictureSource, storySeries, storyTopic, storyTopicKey, storyVersions, storyYourWords, strokeAwakeField, strokeClassicReadings, strokeClassificationLine, strokeControl, strokeDoor, strokeMissing, strokeReadingField, strokeReadingRow, strokeReadingsStatus, strokeReferenceStatus, strokeRoomRecord, strokeStart, strokeThumb, worldName, worldPickerEsc, wwDefault, wwDueToday, wwExcerpt, wwGrammarFor, wwInkLabel, wwKanjiCap, wwKanjiOf, wwKanjiPassage, wwLearn, wwMine, wwModel, wwOpenPassage, wwPartCap, wwPartName, wwParts, wwPassageIndex, wwPassages, wwPush, wwReadingChoices, wwRecentre, wwSaveTrail, wwSentences, wwSlipNode, wwValid, wwWord } from './modules/worlds.mjs';
+import { approvedNarrationClip, approvedNarrationManifest, availableSentenceListeningCue, excerptListenLabel, paintListenProgress, placeListenRow, receivedPracticeAlternativeLabel, receivedPracticeLoadKey, reconcileAssessmentResults, reconcileSheetActionLines, recordFrameRow, recordNoteEditable, recordNoteExpected, recordPickerSurface, recordSha256, recordSyncStatus, recordUnavailable, recordViewSurface, refreshListenRow, resolveSentenceListeningCue, speakChip, speakGateEvidence, speakSentence, stopReadAloud, transcriptRangeLabel, voiceForRole, voicePendingNote } from './modules/voice.mjs';
+import { maintenanceScreenName, meBreakable, meCameHome, meCameHomePart, meCopiedLine, meDate, meDays, meDaysToSitting, meDeckLedger, meDeckWords, meHelpLine, meHorizonRow, meHorizons, meHorizonsPart, meLinePart, meN1Plate, meN1Sitting, meReadUnaided, meRevoked, meSeam, meSection, mergeGrammar, portableRecord, primaryTabs, readRecordDrafts, renderLayoutChoice, renderMe, renderWritingChoice, showRecordBackup, stampRegister, storedArchiveRow, syncTrayCount, themeId, themeIx, updateMeasurements, validArchiveRows, validArchiveTurn, validImportJournal, validStoredArchiveRows } from './modules/learner.mjs';
+import { byLeadingDrops, byNewest, dateStamp, dayAge, dayKey, depthBasisParts, depthDot, depthIdentityMatch, depthIndex, depthNodeOf, helpByMonth, kagamiBand, kagamiEdge, kagamiKeptReading, kagamiNote, landOnKeptWords, leadingDropDays, localDayOrdinal, localMonthKey, luminance, monthKey, monthLabel, newestDropDay, notYetMarks, readerDateStamp, renderDrift, renderKagami, renderTodayLine, renderTodayWord, roughestThisWeek, startOfDay, syncDriftTheme, todayCity, todayDateline, todayDueKeys, todayHash, todayHook, todayIsRadical, todayKanji, todayLargestPart, todayLearning, todayPartStrokes, todayPhrases, todayPlaceSky, todayReadPick, todayRedrawSky, todayRng, todaySecondsPerCard, todaySharedPart, todaySkyWhy, todaySkyWord, todayWhen, trailLastPhrase, trayLine } from './modules/drift.mjs';
+import { articleFingerprint, articleReadChars, catalogChip, catalogEn, catalogLabel, catalogMatch, feedDate, levelChip, levelPhrase, libraryDiscoverable, libraryVisibilityPolicy, openReferenceEntry, placeSealStrip, publisherLink, readerChoiceMatch, readerChoiceTokenHolds, readerEntryNode, readerPictureCredit, readerReadingMissText, referenceCollectionChip, refreshReadingPlacesSurface, renderCatalogNode, renderPublisherContextSelection, renderReaderChoice, renderReaderChoiceNote, renderReferenceMetadata, renderReferenceNode, resolveReadingPlace, searchRowShownByCore, shelfBodyToken, shelfCurrentDay, shelfDailyOrder, shelfDateLabel, shelfDateline, shelfStories, shelfTallyText } from './modules/library.mjs';
+import { activeTeacherContext, aiAsk, aiChatTurns, aiCreateCards, aiKey, aiLastReply, aiProvider, aiQuizParse, aiReadingSegments, aiRequestTimeoutMs, aiSheetSettle, aiSheetTurn, aiTeachingSubject, aiTransport, askOnRequest, canonicalAiBaseUrl, refreshTeacherChatHistory, renderAiCoach, renderAiExamples, renderAiTutor, sizeTeacherQuestion, teacherChatStatus, teacherDoorKey, teacherDraftCopyButton, teacherDraftStatus, teacherSentence, teacherSourceError, teacherWindowDraftKey, validAiEvidenceTurn } from './modules/teacher.mjs';
+
 /**
  * 回廊 KAIRO — the corridor prototype.
  *
@@ -11,22 +23,16 @@
  * never averaged, with disagreement surfaced. The schedule preview is real
  * FSRS-6 (ts-fsrs 5.4.1) under packages/domain's pinned parameters.
  */
-
 // BEGIN GENERATED RELEASE IDENTITY — npm run release:sync
 const APP_RELEASE = Object.freeze({"version":"1.2.1","channel":"stable","releasedOn":"2026-10-14","learnerDataEpoch":1});
 // END GENERATED RELEASE IDENTITY
-
 const DATA = {
   safe: ['kanken', 'sem'],
   sa: ['kanji', 'words', 'idioms', 'dict', 'strokes', 'radicals214'],
   orig: ['grammar-v11'],
 };
-
 // Shared-mode contracts are scheduled only by the canonical v4 backend. Legacy
 // saved-word, personal, context and hook contracts await explicit reconciliation.
-function sharedStudyActive() {
-  return !!window.bunkiSharedStudyHost || new URLSearchParams(location.search).get('sharedStudy') === 'preview';
-}
 function queryDeckRoute(params, hash = location.hash) {
   const deck = params.get('deck');
   if (deck === 'shared-grammar') return sharedStudyActive() ? deck : null;
@@ -35,62 +41,10 @@ function queryDeckRoute(params, hash = location.hash) {
   if (deck === 'kotoba' || hash === '#kotoba') return 'kotoba-mine';
   return null;
 }
-function sharedStudyFence(main) {
-  main.append(el('p','card-kind',tx('この練習は共通の学習にまだ対応していません。記録は保持されています。','This practice is not mapped to shared study. Its existing history is preserved.')));
-}
-
 /** Corridor-authored + harvested grammar, corridor entries winning on
  * duplicate patterns. Populated at boot; falls back to the authored seed. */
-function GRAMMARS() {
-  return D.grammar || GRAMMAR;
-}
-
-function mergeGrammar(harvested) {
-  const norm = (p) => p.replace(/[〜～\s（）()]/g, '');
-  const have = new Set(GRAMMAR.map((g) => norm(g.p)));
-  const extra = (harvested || []).filter((g) => !have.has(norm(g.p)));
-  const order = { N5: 0, N4: 1, N3: 2, N2: 3, N1: 4 };
-  return [...GRAMMAR, ...extra].sort((a, b) => (order[a.lv] ?? 9) - (order[b.lv] ?? 9));
-}
-
 /** Turn the grader's three signals into one sentence a learner can use.
  * The raw signals stay one 詳細 tap away — translated, not discarded. */
-function levelPhrase(grading) {
-  const band = grading.signals.jreadability.band || '';
-  const levelMap = {
-    初級前半: 'Beginner',
-    初級後半: 'Upper beginner',
-    中級前半: 'Intermediate',
-    中級後半: 'Upper intermediate',
-    上級前半: 'Advanced',
-    上級後半: 'Upper advanced',
-  };
-  const level = levelMap[band] || 'Ungraded';
-  // vocabulary-load phrasing prefers the NINJAL pair where it was measured;
-  // otherwise the live JLPT-lexicon coverage (substrate named in the hint)
-  const ninjal = grading.signals.lexical_coverage?.coverage;
-  const jlpt = grading.signals.jlpt_lexicon?.coverage;
-  const cov = ninjal ?? jlpt;
-  let vocabNote = '';
-  let vocabNoteJa = '';
-  if (cov != null && cov < 1) {
-    // the number is THIS card's measured coverage, never a floor or an
-    // average (the #42 law). Below one-in-two the ratio phrasing stops
-    // being true — say plainly that most words fall outside instead.
-    const oneIn = Math.round(1 / (1 - cov));
-    const outside = ninjal != null ? 'the everyday core vocabulary' : 'the JLPT word lists';
-    const outsideJa = ninjal != null ? '基本語彙の外' : 'JLPT語彙の外';
-    if (oneIn < 2) {
-      vocabNote = ` · most words are outside ${outside}`;
-      vocabNoteJa = `・大半が${outsideJa}`;
-    } else {
-      vocabNote = ` · about 1 word in ${oneIn} is outside ${outside}`;
-      vocabNoteJa = `・約${oneIn}語に1語が${outsideJa}`;
-    }
-  }
-  return { level, ja: band, note: vocabNote, noteJa: vocabNoteJa };
-}
-
 /** The four open decisions. Crude and obvious on purpose — it is an instrument.
  * Each option carries [id, 日本語, english]; the strip renders both. `depth`
  * and `ui` are not Wayfinder tickets — they are operator feedback on v1.0
@@ -173,7 +127,6 @@ const VARIANTS = {
     ],
   },
 };
-
 const REL = {
   syn: ['類義', 'everyday synonyms and near-neighbours'],
   ant: ['対義', 'opposites'],
@@ -182,7 +135,6 @@ const REL = {
   col: ['共起', 'what it actually appears with'],
   thm: ['主題', 'the theme it lives in'],
 };
-
 /** Grammar seed — DoJG-CLASS coverage begins here (operator 2026-08-07: the
  * three Makino/Tsutsui volumes as the bar). Their text is copyrighted, so
  * every explanation and example below is ORIGINAL, authored for KAIRO; the
@@ -409,7 +361,6 @@ const GRAMMAR = [
   { id: 'temiru', p: '〜てみる', lv: 'N4', mEn: 'try …ing (and see)', mJa: '試行', form: '動詞テ形 + みる', ex: [{ ja: '一度食べてみてください。', en: 'Try it once (and see).' }, { ja: '辞書で調べてみた。', en: 'I tried looking it up in the dictionary.' }], note: 'Attempt with an eye on the result — not effort (that is 〜ようとする) but experiment.' },
   { id: 'age-kure-morau', p: '〜てあげる・くれる・もらう', lv: 'N4', mEn: 'do for someone / for me / have done for one', mJa: '授受', form: '動詞テ形 + あげる／くれる／もらう', ex: [{ ja: '友だちが手伝ってくれた。', en: 'A friend helped me (a favour inward).' }, { ja: '先生に見てもらった。', en: 'I had the teacher look at it.' }], note: 'The camera position of favours: あげる points away from me, くれる toward me, もらう has the receiver as subject. The politeness ladder (さしあげる・くださる・いただく) climbs from here.' },
 ];
-
 const S = {
   ready: false,
   view: 'shelf',
@@ -632,7 +583,6 @@ const S = {
   /** Element id inside the sheet that should take focus on the next render. */
   sheetFocus: null,
 };
-
 /* ------------------------------------------------ durable learner record */
 const DEFAULT_LEARNER_RECORD = JSON.parse(JSON.stringify(storeEnvelope(S)));
 const STORE_KEY = 'kairo-corridor-v1';
@@ -2008,7 +1958,6 @@ function publishRecordSnapshot(snapshot) {
   // G2 · every word on the glass is read again against the confirmed record (the dot never runs ahead of a save)
   if (typeof scheduleDepthPaint === 'function') scheduleDepthPaint();
 }
-
 /** Foreground reads publish only derived views. Command callbacks keep their
  * acknowledged one-time effects; a refresh never replays those effects or
  * replaces a feedback/chat/list draft. Another foreground request coalesces
@@ -2062,7 +2011,6 @@ function refreshCommittedRecordNotes() {
   recordNotesRefresh = completion;
   return completion;
 }
-
 function storeEnvelope(state) {
   return {
     ...(state.storeExtras || {}),
@@ -2144,15 +2092,6 @@ function closeRecordSync() {
     catch { /* The local endpoint is already closed. */ }
   }
   refreshRecordSyncSurface();
-}
-function recordSyncStatus(raw) {
-  if (!plainRecord(raw) || !['unavailable', 'disconnected', 'connecting', 'ready', 'syncing', 'error'].includes(raw.state))
-    throw new Error('invalid-sync-status');
-  const result = raw.result;
-  return { state: raw.state, code: typeof raw.code === 'string' ? raw.code : null,
-    ...(result && Number.isSafeInteger(result.pendingOutbox) && result.pendingOutbox >= 0 &&
-      Number.isSafeInteger(result.pendingCausal) && result.pendingCausal >= 0 && typeof result.hasMore === 'boolean'
-      ? { result: { pendingOutbox: result.pendingOutbox, pendingCausal: result.pendingCausal, hasMore: result.hasMore } } : {}) };
 }
 async function refreshRecordSyncSnapshot(slot) {
   const outcome = await slot.app.snapshot();
@@ -2438,13 +2377,6 @@ function recordRoomState(epoch = recordEpoch) {
   if (S.storeReadOnly || recordDeparted || staleTab || S.storeError)
     return { kind: 'blocked', message: S.storeError || '' };
   return { kind: 'booting' };
-}
-function recordUnavailable() {
-  invalidateRecordNoteViews();
-  protectStore(
-    'この窓は読み取り専用。ほかの KAIRO の窓を閉じ、再読み込みして続ける。未送信のメモと質問はこの窓に残る。',
-    'This window is read-only. Close other KAIRO windows, then reload to continue. Unsent note and chat drafts stay in this window.',
-  );
 }
 async function acquireRecordOwnership() {
   if (!navigator.locks?.request || !globalThis.isSecureContext) {
@@ -2784,10 +2716,6 @@ if (typeof document !== 'undefined') {
     if (recordHint.active && !recordHint.suspended) wakeRecordHint(0);
   });
 }
-function readRecordDrafts() {
-  try { const value = JSON.parse(sessionStorage.getItem(DRAFT_KEY) || '{}'); return plainRecord(value) ? value : {}; }
-  catch { return {}; }
-}
 function rememberRecordDraft(input) {
   try {
     const drafts = readRecordDrafts();
@@ -2819,9 +2747,6 @@ function teacherWindowDraftPrefix() {
     : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
   return `chat-window:unbound:${teacherUnboundWindowId}:`;
 }
-function teacherWindowDraftKey(contextRef) {
-  return `${teacherWindowDraftPrefix()}${contextRef || 'general'}`;
-}
 function rememberTeacherDraft(input) {
   const contextRef = input.dataset.teacherContextRef || null;
   if (!teacherDraftController || !recordWritable()) {
@@ -2850,22 +2775,6 @@ function rememberTeacherDraft(input) {
     teacherDraftInputEdits.delete(input);
     refreshTeacherDraftSurface(false);
   }
-}
-function teacherDraftStatus(view, input) {
-  if (teacherDraftWindowEdits.has(input)) return tx('この質問はこの窓に残る。記録を保存できないため、アプリを閉じる前にコピーする。',
-    'This question stays in this window. Record saving is unavailable; copy it before closing the app.');
-  if (teacherDraftInputErrors.has(input)) return tx('この質問を保存できない。書いた文をコピーしてから確認する。',
-    'This question could not be kept. Copy your text before checking it.');
-  if (view.state === 'conflict') return tx('保存済みの質問と、閉じる前の下書きが異なる。下で続きを選ぶ。',
-    'The saved question differs from the recovered draft. Choose which one to continue below.');
-  if (view.error || view.state === 'unavailable') return tx('閉じる前の下書きを復旧できない。未保存の文をコピーしてから再読み込みする。',
-    'Draft recovery is unavailable. Copy any unsaved text before reloading.');
-  if (view.state === 'pending' || view.state === 'saving') return tx('質問を保存中…', 'Saving your question…');
-  if (!view.draft) return '';
-  return view.draft.consumed ? tx('質問と返事を保存した。次の質問を書ける。',
-    'Your question and reply are saved. You can write the next question.')
-    : tx('下書きをこの端末に保存した。閉じても続きを書ける。',
-      'Draft saved on this device. You can close the app and continue later.');
 }
 function updateTeacherDraftRecovery(container, contextRef, view) {
   const signature = JSON.stringify(view.state === 'conflict' ? [view.draft, view.recoveryDraft] : null);
@@ -2920,17 +2829,6 @@ function refreshTeacherDraftSurface(updateValue = true) {
   const unavailable = document.getElementById('teacher-unavailable-drafts');
   if (unavailable) renderUnavailableTeacherDrafts(unavailable);
 }
-function sizeTeacherQuestion(input) {
-  if (!input.isConnected) return;
-  const scroll = input.scrollTop;
-  input.style.height = 'auto';
-  const style = getComputedStyle(input);
-  const border = parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth);
-  const limit = Math.max(144, Math.min(360, Math.floor(innerHeight * 0.45)));
-  input.style.height = `${Math.min(limit, Math.max(92, input.scrollHeight + border))}px`;
-  input.style.overflowY = input.scrollHeight > input.clientHeight ? 'auto' : 'hidden';
-  input.scrollTop = scroll;
-}
 addEventListener('resize', () => {
   const input = document.getElementById('chat-input');
   if (input) sizeTeacherQuestion(input);
@@ -2954,11 +2852,6 @@ function sentenceDraftView(input) {
   const view = sentenceDraftController?.view(binding.key) || { draft: null, text: input.value,
     state: 'unavailable', error: 'owner-unavailable', recoveryDraft: null };
   return !recordWritable() && view.state !== 'conflict' ? { ...view, state: 'unavailable', error: 'owner-unavailable' } : view;
-}
-function sentenceDraftInputMatches(input, view) {
-  const binding = sentenceDraftBindings.get(input);
-  return binding?.revision === (view.draft?.revision || null) &&
-    binding.consumed === !!view.draft?.consumed && binding.displayText === input.value;
 }
 function rememberSentenceDraft(input, { edited = false, transcriptOpened } = {}) {
   const binding = sentenceDraftBindings.get(input);
@@ -3009,29 +2902,6 @@ function rememberSentenceDraft(input, { edited = false, transcriptOpened } = {})
     sentenceDraftInputEdits.delete(input);
     refreshSentenceDraftSurfaces(false);
   }
-}
-function sentenceDraftStatus(view, input) {
-  if (sentenceDraftWindowEdits.has(input)) return tx('下書きはこの窓に残る。保存を利用できないため、閉じる前にコピーする。',
-    'This draft stays in this window. Saving is unavailable; copy it before closing.');
-  if (sentenceDraftInputErrors.has(input)) return tx('この編集を保存できない。下書きをコピーしてから確認する。',
-    'This edit could not be kept. Copy the draft before checking it.');
-  if (view.state === 'conflict') return tx('保存済みの文と復旧した下書きが異なる。下で続きを選ぶ。',
-    'The saved text differs from the recovered draft. Choose which one to continue below.');
-  if (view.error || view.state === 'unavailable') return tx('下書きの保存を確認できない。未保存の文をコピーしてから再読み込みする。',
-    'Draft saving is unconfirmed. Copy any unsaved text before reloading.');
-  if (view.state === 'pending' || view.state === 'saving') return tx('下書きを保存中…', 'Saving your draft…');
-  if (!view.draft || view.state !== 'saved') return '';
-  return view.draft.consumed ? tx('回答を保存した。次の文を書ける。', 'Response saved. You can write the next one.')
-    : !view.draft.text && !view.draft.transcriptOpened ? tx('下書きを空にして、この端末に保存した。', 'Draft cleared on this device.')
-    : tx('下書きをこの端末に保存した。閉じても続きを書ける。', 'Draft saved on this device. You can close the app and continue later.');
-}
-function sentenceDraftCopyButton(getText, note) {
-  const button = biLabel('button', 'chip', '下書きをコピー', 'copy draft'); button.type = 'button';
-  button.addEventListener('click', async () => {
-    try { await navigator.clipboard.writeText(getText()); note.textContent = tx('下書きをコピーした。', 'Draft copied.'); }
-    catch { note.textContent = tx('文を選択してコピーする。', 'Select the draft text and copy it.'); }
-  });
-  return button;
 }
 function updateSentenceDraftRecovery(container, key, view) {
   const signature = JSON.stringify(view.state === 'conflict' ? [view.draft, view.recoveryDraft, recordWritable()] : null);
@@ -3476,27 +3346,6 @@ function noteIgnoredSrsParams(reason) {
 /** G6 projection: a seal is membership in Review or a learner list, never a
  * Drift grade. Read one committed snapshot; preserve its saved lexical identity.
  * This function never mutates the record or invents a second persisted shape. */
-function keptWordProjection(record) {
-  const words = new Map();
-  const remember = row => {
-    if (row?.t === 'word' && nonEmptyString(row.id) && !words.has(row.id)) words.set(row.id, row);
-  };
-  for (const row of record.taken || []) remember(row);
-  for (const list of Object.values(record.lists || {})) for (const row of list || []) remember(row);
-  // Hfix-2b · X-1 — the not-yet marks are gathered once for the whole shelf, not once per word
-  const notYet = new Set(notYetMarks(record).map((mark) => mark.id));
-  const now = Date.now();
-  return [...words.values()].map(row => {
-    const identity = wordCardIdentity(record, row.id);
-    const answer = savedAnswerFor({ t: 'word', id: row.id }, record);
-    const key = JSON.stringify([row.id, identity.kind, identity.seq || null,
-      identity.reading ?? null, identity.gloss ?? null]);
-    return { key, id: row.id, label: row.label || row.id, identity,
-      reading: identity.reading || answer?.reading || '', status: answer?.status || 'unavailable', answer,
-      // why this word's star stands in the 宙 sky; '' when the record holds no reason
-      why: keptStarWhy(record, row.id, now, notYet) };
-  }).sort((a, b) => a.key < b.key ? -1 : a.key > b.key ? 1 : 0);
-}
 
 /** A kept star opens the saved answer it names. Broken snapshots stay visible
  * without silently borrowing today's dictionary answer for a different entry. */
@@ -3665,98 +3514,13 @@ addEventListener('focus', () => {
 });
 
 /** Local calendar day for the review trace — the learner's day, not UTC's. */
-function dayKey(d = new Date()) {
-  const p = (n) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
-}
 
 /** Month bucket label for an epoch ms — the automatic Renzo-style list. */
-function monthKey(ts) {
-  const d = new Date(ts);
-  return `${d.getFullYear()}年${d.getMonth() + 1}月`;
-}
 
 /** Localised display only: automatic list identities remain the original month keys. */
-function monthLabel(key) {
-  const match = String(key).match(/^(\d{4})年(\d{1,2})月$/u);
-  if (!match || !bi()) return key;
-  const month = Number(match[2]);
-  if (month < 1 || month > 12) return key;
-  return `${['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][month - 1]} ${match[1]}`;
-}
 
 /** Full dictionary record for a written form: kotobako (all senses, most
  * common first) with the original 6,687-word layer as fallback. */
-function lookup(id, seq = null, requestedReading = '', requestedGloss = '') {
-  const full = D.dict[id];
-  // Reader and lesson tokens were editorially resolved into the boot core.
-  // Opening the larger index must never make their immediate reading/meaning
-  // jump to a different homograph merely because its ent_seq sorts first.
-  // R · that holds with no reading asked, or the core's own. A reading the
-  // text gives that the core does not carry (年 read ねん in 令和8年; the
-  // core's 年 is とし) names the full dictionary's first entry read that way
-  // once the form's rows are at hand; with none at hand the core answers, and
-  // its caller sees that the two readings differ.
-  const wanted = !seq && full && requestedReading ? kataToHira(String(requestedReading)) : '';
-  const readAs = wanted && wanted !== kataToHira(String(full.r || ''))
-    ? dictionaryRowsForForm(id).find((row) => dictionaryReadingSummaries(row).some((summary) =>
-      kataToHira(summary[0]) === wanted && dictionaryReadingSupportsForm(row, summary[0], id))) || null
-    : null;
-  if (!seq && full && !readAs) {
-    return { head: id, r: full.r, m: full.m, p: full.p, jlpt: full.jlpt, k: full.k || [], alt: full.alt };
-  }
-  const indexed = seq ? dictionaryRowBySeq(seq) : readAs || dictionaryRowsForForm(id)[0];
-  if (indexed) {
-    const [entrySeq, defaultHead, defaultReading, defaultGloss, written, kana, glosses] = indexed;
-    const glossIndex = requestedGloss
-      ? indexed[6]?.findIndex((gloss) => normalizeGloss(gloss) === normalizeGloss(requestedGloss))
-      : -1;
-    const glossSummary = glossIndex >= 0 ? dictionaryGlossSummary(indexed, glossIndex) : null;
-    const requestedSummary =
-      glossSummary && (!requestedReading || kataToHira(glossSummary[0]) === kataToHira(requestedReading))
-        ? glossSummary
-        : dictionarySummaryFor(indexed, requestedReading, id);
-    const [reading, head, firstGloss] = requestedSummary ||
-      dictionarySummaryFor(indexed, requestedReading, id) || [defaultReading, defaultHead, defaultGloss];
-    const core = D.dict[id] || D.dict[head];
-    const orderedMeanings = firstGloss
-      ? [firstGloss, ...(glosses || []).filter((gloss) => gloss !== firstGloss)]
-      : glosses || [];
-    return {
-      seq: entrySeq,
-      head,
-      r: reading,
-      m: orderedMeanings,
-      p: core?.p,
-      jlpt: core?.jlpt,
-      k: [...head].filter((c) => /[一-鿌々]/.test(c)),
-      alt: written?.find((form) => form !== head) || null,
-      written: written || [],
-      kana: kana || [],
-    };
-  }
-  // A word taken from the deep tier keeps a snapshot in the record itself, so
-  // reviews and lists resolve it on any device without re-opening the index.
-  const kept = !seq && S.deepWords ? S.deepWords[id] : null;
-  if (kept) {
-    return {
-      head: id,
-      r: kept.r || '',
-      m: kept.m || [],
-      p: kept.p,
-      jlpt: kept.jlpt,
-      k: kept.k || [...id].filter((c) => /[一-鿌々]/.test(c)),
-      alt: kept.alt,
-    };
-  }
-  // A stable JMdict sequence names one lexical entry, not merely its printed
-  // spelling. Falling back to the spelling-keyed core here would silently
-  // answer a homograph with whichever sense happened to win the legacy bundle.
-  if (seq != null && seq !== '') return null;
-  const old = D.words[id];
-  if (old) return { head: id, r: old.r, m: old.g ? [old.g] : [], jlpt: old.jlpt, k: old.k || [] };
-  return null;
-}
 
 const D = {};
 let personalHost = null;
@@ -3937,16 +3701,6 @@ let dictionarySearchTimer = null;
 let navSearchRepaint = null;
 const dictionaryWorkerRequests = new Map();
 
-function embeddedDictionaryJson(name) {
-  const node = document.getElementById(`corridor-dictionary-${name}`);
-  if (!node) return null;
-  const parsed = JSON.parse(node.textContent);
-  // The standalone keeps source bytes in inert nodes for self-containment.
-  // Once a file has become real JS data, retaining the raw text as well would
-  // nearly double its phone-memory cost.
-  node.remove();
-  return parsed;
-}
 
 /** Hfix-1A (W-2, W-1) · the app's own data loads. The page abandons them itself when it goes (pagehide): a load the
  * navigation would cut became a page error in WebKit ("… examples/manifest.json due to access control checks", R3's
@@ -3972,18 +3726,7 @@ async function fetchData(path) {
     }
   }
 }
-async function loadDictionaryJson(name) {
-  const embedded = embeddedDictionaryJson(name);
-  if (embedded) return embedded;
-  const path = name === 'index' ? DICTIONARY_INDEX_PATH : DICTIONARY_SHARD_PATH(name);
-  const res = await fetchData(path);
-  if (!res.ok) throw new Error(`${path} → ${res.status}`);
-  return res.json();
-}
 
-function hasEmbeddedDictionaryIndex() {
-  return window.__CORRIDOR_STANDALONE__ === true || !!document.getElementById('corridor-dictionary-index');
-}
 
 function dictionaryWorkerRequest(type, payload = {}, generation = 0) {
   if (!dictionaryWorker) return Promise.reject(new Error('dictionary worker is unavailable'));
@@ -4038,24 +3781,6 @@ function recordDictionaryPerformance(performanceRecord) {
   );
 }
 
-function dictionaryCoreMatch(form, row) {
-  const core = D.dict?.[form];
-  if (!core) return { compatible: false, reading: false, gloss: false };
-  const coreGlosses = new Set((core.m || []).map(normalizeGloss));
-  const summaries = dictionaryReadingSummaries(row)
-    .filter((summary) => dictionaryReadingSupportsForm(row, summary[0], form))
-    .map((summary) => [summary[0], form, summary[2]]);
-  const reading = summaries.some((summary) => !!core.r && kataToHira(core.r) === kataToHira(summary[0]));
-  const gloss = summaries.some((summary) => !!summary[2] && coreGlosses.has(normalizeGloss(summary[2])));
-  const compatible = summaries.some(
-    (summary) =>
-      !!core.r &&
-      kataToHira(core.r) === kataToHira(summary[0]) &&
-      !!summary[2] &&
-      coreGlosses.has(normalizeGloss(summary[2])),
-  );
-  return { compatible, reading, gloss };
-}
 
 /** Decode the compact per-reading summaries without allocating an expanded
  * 70k index. Current data aligns row[9] with row[5]: the reading is inferred
@@ -4081,78 +3806,12 @@ function dictionaryReadingSummaries(row) {
 /** Decode the restriction-compatible cue for one flattened English gloss.
  * Cell 10 is aligned 1:1 with cells 6/7; its kana index selects the exact
  * JMdict reading permitted by the source sense. */
-function dictionaryGlossSummary(row, glossIndex) {
-  if (!Array.isArray(row) || !Number.isInteger(glossIndex) || glossIndex < 0) return null;
-  const glosses = Array.isArray(row[6]) ? row[6] : [];
-  const kana = Array.isArray(row[5]) ? row[5] : [];
-  const encoded = Array.isArray(row[10]) ? row[10] : [];
-  const mapping = encoded[glossIndex];
-  if (
-    glossIndex >= glosses.length ||
-    !Array.isArray(mapping) ||
-    !Number.isInteger(mapping[0]) ||
-    mapping[0] < 0 ||
-    mapping[0] >= kana.length
-  ) {
-    return null;
-  }
-  return [kana[mapping[0]] || row[2] || '', mapping[1] || row[1] || '', glosses[glossIndex] || row[3] || ''];
-}
 
 /** Whether a source reading may be printed with this exact spelling. Cell 11
  * is aligned with kana forms: 0 means every written form, 1 means no written
  * form, and an array names the permitted row[4] indexes. */
-function dictionaryReadingSupportsForm(row, reading, form) {
-  if (!Array.isArray(row) || !form) return false;
-  const kana = Array.isArray(row[5]) ? row[5] : [];
-  const kanaIndex = kana.findIndex((candidate) => kataToHira(candidate) === kataToHira(reading || ''));
-  if (kanaIndex < 0) return false;
-  if (kataToHira(kana[kanaIndex]) === kataToHira(form) && kana.includes(form)) return true;
-  const written = Array.isArray(row[4]) ? row[4] : [];
-  const writtenIndex = written.indexOf(form);
-  if (writtenIndex < 0) return false;
-  const scope = Array.isArray(row[11]) ? row[11][kanaIndex] : null;
-  if (scope === 0) return true;
-  if (scope === 1) return false;
-  return Array.isArray(scope) && scope.includes(writtenIndex);
-}
 
-function dictionarySummaryFor(row, requestedReading = '', requestedHead = '') {
-  const summaries = dictionaryReadingSummaries(row);
-  if (!summaries.length) return null;
-  const reading = kataToHira(requestedReading || '');
-  if (reading) {
-    const exact = summaries.find(
-      (summary) =>
-        kataToHira(summary[0]) === reading &&
-        (!requestedHead || dictionaryReadingSupportsForm(row, summary[0], requestedHead)),
-    );
-    if (exact) return requestedHead ? [exact[0], requestedHead, exact[2]] : exact;
-    return summaries.find((summary) => kataToHira(summary[0]) === reading) || summaries[0];
-  }
-  const forHead = requestedHead
-    ? summaries.find((summary) => dictionaryReadingSupportsForm(row, summary[0], requestedHead))
-    : null;
-  return forHead ? [forHead[0], requestedHead, forHead[2]] : summaries[0];
-}
 
-function validDictionaryRow(row, previousSeq = -1) {
-  return (
-    Array.isArray(row) &&
-    row.length >= 12 &&
-    /^\d+$/.test(String(row[0])) &&
-    Array.isArray(row[4]) &&
-    Array.isArray(row[5]) &&
-    Array.isArray(row[6]) &&
-    Array.isArray(row[7]) &&
-    Array.isArray(row[9]) &&
-    Array.isArray(row[10]) &&
-    Array.isArray(row[11]) &&
-    row[10].length === row[6].length &&
-    row[11].length === row[5].length &&
-    Number(row[0]) > previousSeq
-  );
-}
 
 function installDictionaryIndex(index, { mode = 'main', performanceRecord = null } = {}) {
   const mainEntries = Array.isArray(index?.entries) ? index.entries : null;
@@ -4262,35 +3921,6 @@ function dictionaryRowBySeq(seq) {
   return null;
 }
 
-function dictionaryRowsForForm(form) {
-  if (!D.dictionaryIndex || !form) return [];
-  const key = String(form);
-  if (D.dictionaryCompleteForms?.has(key) && D.dictionaryByForm?.has(key)) {
-    return D.dictionaryByForm.get(key);
-  }
-  if (!Array.isArray(D.dictionaryIndex.entries)) return [];
-  const rows = [];
-  for (const row of D.dictionaryIndex.entries) {
-    if (row[1] === key || row[4].includes(key) || row[5].includes(key)) rows.push(row);
-  }
-  const core = D.dict?.[key];
-  const score = (row) => {
-    const [, head, , , written, kana, , , common] = row;
-    const match = dictionaryCoreMatch(key, row);
-    return (
-      Number(match.compatible) * 32 +
-      Number(match.gloss) * 16 +
-      Number(match.reading) * 8 +
-      Number(head === key) * 2 +
-      Number(common) +
-      Number(!!core?.alt && [...written, ...kana].includes(core.alt))
-    );
-  };
-  rows.sort((left, right) => score(right) - score(left) || Number(left[0]) - Number(right[0]));
-  D.dictionaryByForm.set(key, rows);
-  D.dictionaryCompleteForms?.add(key);
-  return rows;
-}
 
 function ensureDictionaryIndex() {
   if (D.dictionaryIndex) return Promise.resolve(D.dictionaryIndex);
@@ -4326,87 +3956,12 @@ function ensureDictionaryIndex() {
   return dictionaryIndexPromise;
 }
 
-async function ensureDictionaryRowBySeq(seq) {
-  await ensureDictionaryIndex();
-  const cached = dictionaryRowBySeq(seq);
-  if (cached || D.dictionaryMode === 'main') return cached;
-  const message = await dictionaryWorkerRequest('rowBySeq', { seq: String(seq) });
-  return message.result.row ? cacheDictionaryRow(message.result.row) : null;
-}
 
-async function ensureDictionaryRowsForForm(form) {
-  await ensureDictionaryIndex();
-  const key = String(form || '');
-  if (!key) return [];
-  if (D.dictionaryCompleteForms?.has(key) || D.dictionaryMode === 'main') {
-    return dictionaryRowsForForm(key);
-  }
-  const message = await dictionaryWorkerRequest('rowsForForm', { form: key });
-  if (message.result.form !== key) throw new Error('dictionary worker returned the wrong form');
-  return cacheDictionaryFormRows(key, message.result.rows);
-}
 
-async function ensureDictionaryRowsForNode(node) {
-  if (!node) return [];
-  if (node.seq) {
-    const row = await ensureDictionaryRowBySeq(node.seq);
-    return row ? [row] : [];
-  }
-  const rows = await ensureDictionaryRowsForForm(node.id);
-  if (node.reading && rows.length) {
-    const reading = kataToHira(node.reading);
-    const chosen = rows.find((row) =>
-      dictionaryReadingSummaries(row).some(
-        (summary) =>
-          kataToHira(summary[0]) === reading && dictionaryReadingSupportsForm(row, summary[0], node.id),
-      ),
-    );
-    if (chosen) node.dictionaryResolvedSeq = String(chosen[0]);
-  }
-  // R · a core spelling's node carrying a reading the core does not becomes the entry that reading names (or the
-  // closest), so its header, senses and Save agree once the rows are here (readingToken)
-  if (!node.seq && D.dict?.[node.id] && readingAsksIndex(node.id, node.reading)) {
-    const named = readingToken({ b: node.id, s: node.id, r: node.reading });
-    if (named.seq) node.seq = named.seq;
-  }
-  return rows;
-}
 
-function dictionaryRowsFor(node) {
-  if (!D.dictionaryIndex || !node) return [];
-  if (node.seq) {
-    const row = dictionaryRowBySeq(node.seq);
-    return row ? [row] : [];
-  }
-  return dictionaryRowsForForm(node.id);
-}
 
-function dictionaryDetailRowsFor(node) {
-  const rows = dictionaryRowsFor(node);
-  if (node?.seq || !rows.length) return rows;
-  const core = D.dict?.[node.id];
-  const compatibleRows = core ? rows.filter((row) => dictionaryCoreMatch(node.id, row).compatible) : rows;
-  if (core && !compatibleRows.length) return [];
-  if (compatibleRows.length <= 1) return compatibleRows;
-  const chosen =
-    compatibleRows.find((row) => String(row[0]) === String(node.dictionaryResolvedSeq || '')) ||
-    compatibleRows[0];
-  if (chosen) node.dictionaryResolvedSeq = String(chosen[0]);
-  return chosen ? [chosen] : [];
-}
 
-function dictionaryShardNumber(seq) {
-  let hash = 0x811c9dc5;
-  for (const character of String(seq)) {
-    hash ^= character.charCodeAt(0);
-    hash = Math.imul(hash, 0x01000193) >>> 0;
-  }
-  return hash & (D.dictionaryIndex.shardCount - 1);
-}
 
-function dictionaryShardId(seq) {
-  return dictionaryShardNumber(seq).toString(16).padStart(2, '0');
-}
 
 function ensureDictionaryShard(id) {
   if (D.dictionaryShards?.has(id)) return Promise.resolve(D.dictionaryShards.get(id));
@@ -4439,20 +3994,7 @@ function ensureDictionaryShard(id) {
   return promise;
 }
 
-async function ensureDictionaryDetails(node) {
-  await ensureDictionaryIndex();
-  await ensureDictionaryRowsForNode(node);
-  const rows = dictionaryDetailRowsFor(node);
-  const shards = [...new Set(rows.map((row) => dictionaryShardId(row[0])))];
-  await Promise.all(shards.map(ensureDictionaryShard));
-  return rows.map((row) => D.dictionaryDetails?.get(String(row[0]))).filter(Boolean);
-}
 
-function dictionaryDetailsFor(node) {
-  return dictionaryDetailRowsFor(node)
-    .map((row) => D.dictionaryDetails?.get(String(row[0])))
-    .filter(Boolean);
-}
 
 /* Hfix-1A · a sense's tags in plain words (round 1: "noun (common) (futsuumeishi)", "adjective (keiyoushi)" on the word page,
  * L-3, H-kaku-05, H-sumi-03): parts of speech as a learner names them, in the interface's language; usage, field and
@@ -4499,12 +4041,6 @@ const SENSE_TAG_JA = {
   tsb: '土佐方言', tsug: '津軽方言'
 };
 const SENSE_TAG_EN = { hon: 'honorific language', hum: 'humble language', pol: 'polite language', uk: 'usually written in kana' };
-function dictionaryTag(tag) {
-  const pos = POS_PLAIN[tag] || POS_FAMILY.find(([family]) => family.test(tag))?.[1];
-  if (pos) return tx(pos[0], pos[1]);
-  const description = D.dictionaryIndex?.tags?.[tag] || tag;
-  return tx(SENSE_TAG_JA[tag] || description, SENSE_TAG_EN[tag] || description);
-}
 /* Hfix-2d r2 · a field, dialect or usage tag beside its own sense: quiet brackets in 日本語 (〔スポーツ〕),
  * plain small words in EN (sports · martial arts) — never `·`-joined into the part-of-speech line. */
 function quietUsageTags(codes) {
@@ -4532,79 +4068,6 @@ const POS_SEGMENT_CODE = {
   'pre-noun adjective': 'adj-pn', 'used before a noun': 'adj-f', 'noun suffix': 'n-suf', 'noun prefix': 'n-pref',
   'i-adjective (いい/よい)': 'adj-ix', 'ku-adjective': 'adj-ku',
 };
-function posCode(tag) {
-  return POS_PLAIN[tag] || POS_FAMILY.some(([family]) => family.test(tag)) ? tag : POS_SEGMENT_CODE[tag] || tag;
-}
-function posLine(tags) {
-  const codes = tags.map(posCode);
-  const verbClass = codes.some((code) => /^v5/u.test(code)) ? 'v5' : codes.some((code) => /^v1($|-)/u.test(code)) ? 'v1'
-    : codes.some((code) => /^v2/u.test(code)) ? 'v2' : codes.some((code) => /^v4/u.test(code)) ? 'v4' : null;
-  const transitivity = ['vi', 'vt'].filter((code) => codes.includes(code));
-  const jaTrans = transitivity.map((code) => (code === 'vi' ? '自動詞' : '他動詞')).join('・');
-  const enTrans = transitivity.map((code) => (code === 'vi' ? 'intransitive' : 'transitive')).join(' and ');
-  const suru = codes.some((code) => /^vs($|-)/u.test(code));
-  const kuru = codes.includes('vk');
-  const zuru = codes.includes('vz');
-  const auxVerb = codes.includes('aux-v');
-  const JA_CLASS = { v5: '五段', v1: '一段', v2: '二段', v4: '四段' };
-  const EN_CLASS = { v5: 'godan', v1: 'ichidan', v2: 'nidan', v4: 'yodan' };
-  const classText = verbClass
-    ? S.lang === 'ja'
-      ? transitivity.length
-        ? `動詞（${JA_CLASS[verbClass]}・${jaTrans}${verbClass === 'v2' || verbClass === 'v4' ? '・古語' : ''}）`
-        : `${JA_CLASS[verbClass]}動詞${verbClass === 'v2' || verbClass === 'v4' ? '（古語）' : ''}`
-      : `${verbClass === 'v2' || verbClass === 'v4' ? 'archaic ' : ''}${EN_CLASS[verbClass]} verb${transitivity.length ? `, ${enTrans}` : ''}`
-    : null;
-  const suruOwn = !verbClass && transitivity.length;
-  const suruText = suru
-    ? S.lang === 'ja'
-      ? suruOwn ? `する動詞（${jaTrans}）` : 'する動詞'
-      : `suru verb${suruOwn ? `, ${enTrans}` : ''}`
-    : null;
-  const kuruText = kuru
-    ? S.lang === 'ja'
-      ? transitivity.length ? `動詞（カ変・${jaTrans}）` : 'カ変動詞'
-      : `kuru verb${transitivity.length ? `, ${enTrans}` : ''}`
-    : null;
-  const zuruText = zuru
-    ? S.lang === 'ja'
-      // Hfix-2d r3 · school grammar files 信ずる・感ずる under サ変; the label names the ずる form inside the
-      // one pair of parens (no nesting, no wave dash: the JA label set is kana, kanji, parens, ・)
-      ? transitivity.length ? `動詞（サ変・ずる・${jaTrans}）` : '動詞（サ変・ずる）'
-      : `zuru verb${transitivity.length ? `, ${enTrans}` : ''}`
-    : null;
-  // 〜ていく・〜てみる: an aux-v with a class is the subsidiary verb, in that class, not a 助動詞
-  const auxClass = auxVerb && (verbClass || suru || kuru || zuru)
-    ? S.lang === 'ja'
-      ? `補助動詞（${verbClass ? JA_CLASS[verbClass] : suru ? 'サ変' : kuru ? 'カ変' : 'サ変・ずる'}）`
-      : `${verbClass ? EN_CLASS[verbClass] : suru ? 'suru' : kuru ? 'kuru' : 'zuru'} subsidiary verb`
-    : null;
-  const pieces = [];
-  let verbsEmitted = false;
-  for (const code of codes) {
-    if (/^v[1254]/u.test(code) || /^vs($|-)/u.test(code) || code === 'vk' || code === 'vz') {
-      if (!verbsEmitted) {
-        // 〜ていく・〜てみる: the subsidiary verb stands instead of the class composite
-        for (const text of auxClass ? [auxClass] : [classText, suruText, kuruText, zuruText]) if (text) pieces.push(text);
-        verbsEmitted = true;
-      }
-      continue;
-    }
-    if (code === 'vi' || code === 'vt') {
-      if (!verbsEmitted && !classText && !suruText && !kuruText && !zuruText && !auxClass) pieces.push(dictionaryTag(code));
-      continue;
-    }
-    if (code === 'aux-v') {
-      // alone it stays 助動詞; with a class it is the auxClass composite above; beside the copula the
-      // copula's own line already says it (です・だ read 助動詞（断定） once, Hfix-2d r3)
-      if (!auxClass && !codes.includes('cop')) pieces.push(dictionaryTag(code));
-      continue;
-    }
-    if (code === 'adv' && codes.includes('adv-to')) continue; // one family once: 副詞（と） / to-adverb covers it
-    pieces.push(dictionaryTag(code));
-  }
-  return [...new Set(pieces)].join(' · ');
-}
 /* Hfix-2d r4 · the reading each of a word's kanji uses in that word, one left-to-right pass over the word's
  * own reading with backtracking: longest first, but a candidate stands only when every later kanji can still
  * match (r3's span could eat the next kanji's kana — 一月 showed ひとつ・∅, now ひと・つき; 口調 ク・チョウ,
@@ -4617,101 +4080,6 @@ function posLine(tags) {
  * (組合 → くみ・あい, never あ（い）), and a dotted kun's bare stem stands when the rest of the word needs
  * the kana back. A kanji nothing matches shows '' (今日, 大人: their words are jukujikun). Only data the
  * app ships: the written word, the word's reading and each kanji's own on/kun lists. */
-function kanjiReadingsInWord(chars, reading, word = '') {
-  const hira = String(reading || '').replace(/[\u30a1-\u30f6]/gu, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0x60));
-  const kata = String(reading || '').replace(/[\u3041-\u3096]/gu, (ch) => String.fromCharCode(ch.charCodeAt(0) + 0x60));
-  // one candidate list per kanji, built once; w is the kana the word itself writes right after the kanji
-  // (hiragana only; 々, another kanji, katakana or the word's end stop the run)
-  const candLists = [];
-  let wordPos = 0;
-  for (const c of chars) {
-    const k = D.kanji[c];
-    const at = word ? word.indexOf(c, wordPos) : -1;
-    const w = at < 0 ? '' : /^[ぁ-ゖ]+/u.exec(word.slice(at + 1))?.[0] || '';
-    if (at >= 0) wordPos = at + 1;
-    const list = [];
-    if (k) {
-      for (const on of k.on || []) list.push({ on: true, base: on, suffix: '', w });
-      for (const kun of k.kun || []) {
-        const dot = kun.indexOf('.');
-        list.push({ on: false, base: dot < 0 ? kun : kun.slice(0, dot), suffix: dot < 0 ? '' : kun.slice(dot + 1), w });
-      }
-    }
-    candLists.push(list);
-  }
-  // the fits at a position, longest first: a parenthesised written okurigana (書く か（く）, 三つ みっ（つ）,
-  // 食べ物 た（べ） from た.べる), a plain reading, then a compound's unwritten span (試合 あい)
-  const fitsFor = (i, pos) => {
-    const fits = [];
-    for (const cand of candLists[i]) {
-      const space = (cand.on ? kata : hira).slice(pos);
-      if (!cand.base || !space.startsWith(cand.base)) continue;
-      if (cand.suffix) {
-        if (cand.w) {
-          // a dotted kun asks the word to write its okurigana — exactly it or its written first part when a
-          // compound cuts it; the rest of the suffix is the stem's own grammar, not something this word writes
-          if (!(cand.suffix === cand.w || cand.suffix.startsWith(cand.w))) continue;
-          if (!space.startsWith(cand.w, cand.base.length)) continue;
-          fits.push({ display: `${cand.base}（${cand.w}）`, consume: cand.base.length + cand.w.length, rank: 0, consumedW: true });
-        } else {
-          // nothing written after the kanji (a compound's inside, or 々): the kun may name the whole
-          // span this kanji reads here, without claiming okurigana (試合 あい, never あ（い）)
-          if (!space.startsWith(cand.suffix, cand.base.length)) continue;
-          fits.push({ display: cand.base + cand.suffix, consume: cand.base.length + cand.suffix.length, rank: 2 });
-        }
-      } else {
-        fits.push({ display: cand.base, consume: cand.base.length, rank: 1 });
-      }
-    }
-    fits.sort((a, b) => b.consume - a.consume || a.rank - b.rank);
-    const seen = new Set();
-    return fits.filter((fit) => !seen.has(fit.display) && (seen.add(fit.display), true));
-  };
-  // a dotted kun's bare stem (死人 シ・ニン, 古巣 ふる・す, 一月 ひと・つき, 見本 み・ホン): never a greedy
-  // choice — it stands only when every later kanji still matches (r4: a span may not eat the next kanji's kana)
-  const stemsFor = (i, pos) => {
-    const stems = [];
-    for (const cand of candLists[i]) {
-      if (cand.on || !cand.suffix || cand.w || !cand.base) continue;
-      if (hira.slice(pos).startsWith(cand.base) && !stems.some((s) => s.display === cand.base)) stems.push({ display: cand.base, consume: cand.base.length });
-    }
-    return stems.sort((a, b) => b.consume - a.consume);
-  };
-  // the move after a fit: the reading position plus, when the fit didn't itself spend it, the kana the word
-  // writes between this kanji and the next (男の人: おとこ steps の before ひと). No kana, no step.
-  const advance = (i, pos, f) => {
-    let mid = pos + f.consume;
-    const w = candLists[i][0]?.w || '';
-    if (!f.consumedW && w) {
-      if (!hira.startsWith(w, mid)) return -1;
-      mid += w.length;
-    }
-    return mid;
-  };
-  // a path is complete only at the end of the reading, and no kanji may match after a blank one
-  // (r4 review: 男の人 is not お・と, 一生 is not い, 脱出 is not だ)
-  const fullFrom = (i, pos, memo) => {
-    if (i >= chars.length) return pos === hira.length;
-    const key = `${i}:${pos}`;
-    if (!memo.has(key)) memo.set(key, [...fitsFor(i, pos), ...stemsFor(i, pos)].some((f) => {
-      const mid = advance(i, pos, f);
-      return mid >= 0 && fullFrom(i + 1, mid, memo);
-    }));
-    return memo.get(key);
-  };
-  const out = [];
-  let pos = 0;
-  for (let i = 0; i < chars.length; i++) {
-    const memo = new Map();
-    const fits = hira ? fitsFor(i, pos) : [];
-    let chosen = fits.find((f) => { const mid = advance(i, pos, f); return mid >= 0 && fullFrom(i + 1, mid, memo); });
-    if (!chosen) chosen = stemsFor(i, pos).find((f) => { const mid = advance(i, pos, f); return mid >= 0 && fullFrom(i + 1, mid, memo); });
-    if (chosen) pos = advance(i, pos, chosen);
-    else if (fits[0]) pos += fits[0].consume; // no full path: the r3 greedy seat, unchanged
-    out.push((chosen || fits[0]) ? (chosen || fits[0]).display : '');
-  }
-  return out;
-}
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const el = (tag, cls, text) => {
@@ -4869,16 +4237,6 @@ const NOTE_TEXT = Object.freeze({
   guide: ['目安です。公式の一覧ではありません。', 'A guide, not the official list.'],
   record: ['ここでの答えは記録に残ります。', 'What you answer here is kept.'],
 });
-function noteText(kind) {
-  return tx(...NOTE_TEXT[kind]);
-}
-function note(kind) {
-  // a kind the house no longer says (the retired "ai" provenance line) draws nothing
-  if (!NOTE_TEXT[kind]) return document.createDocumentFragment();
-  const line = el('p', 'note', noteText(kind));
-  line.dataset.kind = kind;
-  return line;
-}
 /** One visible, accessible label in the chosen interface language. */
 function biLabel(tag, cls, ja, en) {
   const node = el(tag, cls);
@@ -4892,31 +4250,6 @@ function biLabel(tag, cls, ja, en) {
 /** Discovery visibility never changes the source-resolution catalogue or learner records.
  * Active policies may arrive only in a separately admitted catalogue artifact. The
  * source-candidate importer cannot activate one; no URL/storage switch exists. */
-function libraryVisibilityPolicy(raw) {
-  if (raw == null) return null;
-  const ids = value => Array.isArray(value) && value.every(id => typeof id === 'string' && id.length > 0) && new Set(value).size === value.length;
-  if (raw.schema !== 1 || raw.kind !== 'bunki-library-visibility' || raw.id !== 'library-20261003-apply-cuts' ||
-      typeof raw.active !== 'boolean' || !['hideIds', 'alreadyAbsentIds', 'keepIds', 'laterIds'].every(key => ids(raw[key]))) {
-    throw new Error('Invalid library visibility policy');
-  }
-  if (raw.hideIds.some(id => raw.keepIds.includes(id) || raw.laterIds.includes(id) || raw.alreadyAbsentIds.includes(id))) {
-    throw new Error('Library visibility dispositions overlap');
-  }
-  if (!raw.active) return null;
-  const approval = raw.activationDecision;
-  if (!approval || approval.authority !== 'John' || approval.synthetic !== false ||
-      approval.policyId !== raw.id || !/^[0-9a-f]{64}$/.test(approval.evidenceSha256 || '') ||
-      !/^[0-9a-f]{40}$/.test(approval.sourceParent || '') || !ids(approval.selectedIds) ||
-      !Array.isArray(approval.hideIds) || JSON.stringify(approval.hideIds) !== JSON.stringify(raw.hideIds) ||
-      !approval.textHashes || Object.keys(approval.textHashes).length !== approval.selectedIds.length ||
-      approval.selectedIds.some(id => !/^[0-9a-f]{64}$/.test(approval.textHashes[id] || ''))) {
-    throw new Error('Library activation decision missing or inconsistent');
-  }
-  return Object.freeze({ active: true, hiddenIds: Object.freeze([...raw.hideIds]) });
-}
-function libraryDiscoverable(row, policy) {
-  return !policy?.active || !policy.hiddenIds.includes(row?.id);
-}
 function installLibraryVisibility(articleIndex) {
   const policy = libraryVisibilityPolicy(articleIndex.libraryVisibility);
   D.libraryVisibility = policy;
@@ -5478,10 +4811,6 @@ function returnScroll() {
 /* The reader remembers your place per article, surviving reloads — the
  * debounce keeps localStorage writes rare while a thumb is scrolling. */
 let readerPosTimer = null;
-function saveReaderPosition(articleId, position) {
-  if (!articleId) return Promise.resolve(false);
-  return commitStorePatch((latest) => ({ readerPos: { ...latest.readerPos, [articleId]: Math.max(0, position) } }));
-}
 addEventListener(
   'scroll',
   () => {
@@ -5502,45 +4831,11 @@ addEventListener(
 
 /** A sheet is rebuilt on each recursive step. Remember the actual door,
  * not a DOM reference (nor a row number that async dictionary senses shift). */
-function sheetDoorKey(target, sheet = $('.sheet')) {
-  if (!target || !sheet?.contains(target)) return null;
-  if (target.id) return { id: target.id };
-  const signature = (item) => `${item.tagName}|${item.className}|${item.textContent}`;
-  const value = signature(target);
-  const matches = [...sheet.querySelectorAll('button, a, input, summary')].filter((item) => signature(item) === value);
-  return { value, index: matches.indexOf(target) };
-}
-function findSheetDoor(sheet, key) {
-  if (!key) return null;
-  if (key.id) return sheet.querySelector(`#${CSS.escape(key.id)}`);
-  return [...sheet.querySelectorAll('button, a, input, summary')].filter(
-    (item) => `${item.tagName}|${item.className}|${item.textContent}` === key.value,
-  )[key.index];
-}
-function rememberSheet(invoker = document.activeElement) {
-  const parent = S.stack.at(-1);
-  const sheet = $('.sheet');
-  if (!parent || !sheet) return;
-  parent.sheetScroll = sheet.scrollTop;
-  parent.returnFocus = sheetDoorKey(invoker, sheet);
-}
 
 /* G6 · a scale is a projection of the room and canonical page stack. The one
  * retained visit records where this journey began; it is neither a second
  * history nor learner evidence. Ordinary Back still owns recursion and the
  * G3 page → stage → bare ladder. 宙 walks one enclosing structural edge. */
-function scaleName(node = S.stack.at(-1)) {
-  if (node) return ({ radical: 'part', kanji: 'kanji', word: 'word', sent: 'sentence' })[node.t] || null;
-  return ({ reader: 'article', shelf: 'shelf', archive: 'shelf', drift: 'sky' })[S.view] || null;
-}
-function scaleShelfView(article = passage()) {
-  return String(article?.file || '').startsWith('archive/') ? 'archive' : 'shelf';
-}
-function scaleLabel(scale) {
-  const names = { part: ['部品', 'part'], kanji: ['漢字', 'kanji'], word: ['語', 'word'],
-    sentence: ['文', 'sentence'], article: ['記事', 'article'], shelf: ['本棚', 'shelf'], sky: ['宙', 'sky'] };
-  return names[scale] ? tx(...names[scale]) : '';
-}
 function scaleTokenFingerprint(token) {
   return token ? JSON.stringify([token.s || '', token.b || '', token.r || '']) : null;
 }
@@ -5552,58 +4847,9 @@ function scalePassage(visit = S.scaleVisit) {
   }
   return visit.passageId ? D.passages.find(item => item.id === visit.passageId) || null : null;
 }
-function scaleSource(visit = S.scaleVisit) {
-  const p = scalePassage(visit);
-  if (!p || !Number.isInteger(visit.index)) return null;
-  const token = p?.tokens?.[visit.index];
-  return token && scaleTokenFingerprint(token) === visit.fingerprint ? { p, token } : null;
-}
-function scaleNodeFrom(node) {
-  if (node?.from?.passage && Number.isInteger(node.from.index)) return node.from;
-  const context = node?.sourceContext;
-  return context?.sourceKind === 'bundled-passage' && Number.isInteger(context.index)
-    ? { passage: context.sourceId, index: context.index } : null;
-}
-function scaleNodeBelongs(node, visit = S.scaleVisit) {
-  if (!scaleSource(visit)) return false;
-  if (node?.t === 'sent') return node.passage === visit.passageId && node.start === visit.sentence.start &&
-    node.tokens.length === visit.sentence.tokens.length;
-  const from = scaleNodeFrom(node);
-  return from?.passage === visit.passageId && from.index >= visit.sentence.start &&
-    from.index < visit.sentence.start + visit.sentence.tokens.length;
-}
-function scaleReaderIndex() {
-  const p = passage();
-  if (!p?.tokens || S.view !== 'reader' || S.stack.length) return null;
-  const visible = (index) => {
-    const token = readerTokenAtIndex(index);
-    if (!token?.isConnected || !token.hasAttribute('data-para')) return false;
-    const box = token.getBoundingClientRect();
-    return box.width > 0 && box.height > 0 && box.bottom > 0 && box.top < innerHeight;
-  };
-  const selected = S.readerTake;
-  if (selected?.p === p.id && visible(selected.index)) return selected.index;
-  const focused = document.activeElement?.closest?.('#reader .tok[data-index]');
-  if (focused && visible(Number(focused.dataset.index))) return Number(focused.dataset.index);
-  const token = [...document.querySelectorAll('#reader .tok[data-index][data-para]')]
-    .find(item => visible(Number(item.dataset.index)));
-  return token ? Number(token.dataset.index) : null;
-}
 /** The source line's place: its word's glyphs, never a reading raised over them. F's one ruby sets a reading as the
  * word's own native rt, which grows the word's box upward, so a line left with its reading up (the stage's) and
  * returned to bare would otherwise come back a reading's height lower (F × G6, the merge). */
-function scaleLineTop(anchor) {
-  const walker = document.createTreeWalker(anchor, NodeFilter.SHOW_TEXT,
-    { acceptNode: (node) => (node.parentElement?.closest('rt, rp') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
-  let top = Infinity;
-  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-    if (!node.textContent.trim()) continue;
-    const range = document.createRange();
-    range.selectNodeContents(node);
-    for (const box of range.getClientRects()) if (box.width > 0 && box.height > 0) top = Math.min(top, box.top);
-  }
-  return Number.isFinite(top) ? top : anchor.getBoundingClientRect().top;
-}
 function captureScaleVisit(index, word = null) {
   const p = passage(), anchor = readerTokenAtIndex(index);
   if (S.view !== 'reader' || !p?.tokens?.[index] || !anchor?.isConnected) return null;
@@ -5647,10 +4893,6 @@ for (const type of ['pointerdown', 'touchstart', 'wheel', 'keydown']) {
   addEventListener(type, event => { if (event.isTrusted) retireScaleReturn(); }, { capture: true, passive: true });
 }
 let scaleReadingInput = false, scaleReadTimer = null;
-function refreshScaleOrigin() {
-  const index = scaleReaderIndex();
-  if (index != null) captureScaleVisit(index);
-}
 function settleScaleReading() {
   clearTimeout(scaleReadTimer);
   scaleReadTimer = null;
@@ -5679,17 +4921,6 @@ addEventListener('scroll', () => {
   clearTimeout(scaleReadTimer);
   scaleReadTimer = setTimeout(settleScaleReading, 900);
 }, { passive: true });
-function requestScaleReturn(visit) {
-  if (S.scaleVisit !== visit || !scaleSource(visit)) return false;
-  visit.returnRequest = {};
-  visit.returnJob = null;
-  const reader = document.getElementById('reader');
-  if (reader) {
-    delete reader.dataset.scaleReturnIndex;
-    delete reader.dataset.scaleReturnDelta;
-  }
-  return true;
-}
 function settleScaleReturn(reader) {
   const visit = S.scaleVisit, request = visit?.returnRequest;
   const source = scaleSource(visit);
@@ -5760,84 +4991,9 @@ function settleScaleReturn(reader) {
     requestAnimationFrame(correct);
   });
 }
-function scaleWordKanji(node) {
-  if (node?.t !== 'word') return [];
-  if (Object.hasOwn(node, 'keptAnswer')) return [...node.id].filter(ch => D.kanji[ch]);
-  const rec = lookup(node.id, node.seq, node.reading, node.matchedGloss);
-  return (rec?.k?.length ? rec.k : [...node.id]).filter(ch => D.kanji[ch]);
-}
-function scaleKanjiParts(node) {
-  if (node?.t !== 'kanji') return [];
-  const parts = mainParts(node.id).filter(ch => D.radicals[ch]);
-  const rad = D.radInfo?.[D.kanji[node.id]?.rad]?.c;
-  if (rad && D.radicals[rad] && !parts.includes(rad)) parts.push(rad);
-  return parts;
-}
-function scaleParentIndex() {
-  const node = S.stack.at(-1), scale = scaleName(node);
-  for (let index = S.stack.length - 2; index >= 0; index -= 1) {
-    const parent = S.stack[index];
-    if (scale === 'part' && parent.t === 'kanji' && scaleKanjiParts(parent).includes(node.id)) return index;
-    if (scale === 'kanji' && parent.t === 'word' && scaleWordKanji(parent).includes(node.id)) return index;
-    if (scale === 'word' && parent.t === 'sent' && scaleNodeBelongs(parent) && scaleNodeBelongs(node)) return index;
-  }
-  return -1;
-}
 function scaleNavigationAllowed() {
   if (S.scaleVisit && S.scaleVisit.recordEpoch !== recordEpoch) S.scaleVisit = null;
   return !S.strokes && !worldPickerEls && !S.navOpen && window.__DRIFT__?.canNavigate?.() !== false;
-}
-function adjacentScaleOutTarget() {
-  const scale = scaleName(), node = S.stack.at(-1);
-  if (scale === 'part' || scale === 'kanji') return scaleParentIndex() >= 0 ? (scale === 'part' ? 'kanji' : 'word') : null;
-  if (scale === 'word') return scaleNodeBelongs(node) ? 'sentence' : null;
-  if (scale === 'sentence') return scaleNodeBelongs(node) ? 'article' : null;
-  if (scale === 'article') return 'shelf';
-  if (scale === 'shelf') return 'sky';
-  return null;
-}
-function scaleFallbackOut() {
-  if (!S.stack.length) return null;
-  if (S.stack.length > 1) {
-    const index = S.stack.length - 2, node = S.stack[index];
-    return { index, node, scale: scaleName(node) || 'entry' };
-  }
-  return { view: S.view, scale: ({ reader: 'article', shelf: 'shelf', archive: 'shelf', drift: 'sky' })[S.view] || 'room' };
-}
-function scaleOutTarget() {
-  return adjacentScaleOutTarget() || scaleFallbackOut()?.scale ||
-    (S.view === 'drift' && !S.stack.length && S.driftDepth > 0 ? 'sky' : null);
-}
-function retireScaleDestination(view = S.view) {
-  // Explicitly leaving this destination abandons this one detour. Its older,
-  // unrelated review/source callers keep their own canonical frames.
-  if (S.navigationReturns.at(-1)?.destination === view) S.navigationReturns.pop();
-}
-function scaleInTarget() {
-  const scale = scaleName(), node = S.stack.at(-1), visit = S.scaleVisit;
-  if (scale === 'sky') return 'shelf';
-  if (scale === 'shelf') return scalePassage(visit) ? 'article' : null;
-  if (scale === 'article') return passage()?.tokens?.length ? 'sentence' : null;
-  if (scale === 'sentence' && scaleNodeBelongs(node)) {
-    const source = scaleSource(visit), word = visit.word || readerEntryNode(source.token, visit.index, source.p);
-    return word?.t === 'word' ? 'word' : null;
-  }
-  // Hfix-1A (round 1, H-hakuu-09, H-nami-08: a trailing "kanji ›" on 総理's page, a level he had not entered): a word's
-  // rail offers its way in only back to the kanji entered from it in this visit; the first way in is the page's own kanji
-  // rows, which name each kanji
-  if (scale === 'word') return node?.enteredKanji && scaleWordKanji(node).includes(node.enteredKanji) ? 'kanji' : null;
-  if (scale === 'kanji') return scaleKanjiParts(node).length ? 'part' : null;
-  return null;
-}
-function retireScaleTransients() {
-  retireScaleReturn();
-  finishPageTransition();
-  removeMini();
-  clearWordLadder();
-  clearReaderReadings();
-  clearReaderSummons();
-  stopReadAloud();
-  stopSentenceListening();
 }
 function replaceScalePages(path, { paint = true } = {}) {
   const retained = new Set(path);
@@ -6067,172 +5223,13 @@ function returnToScaleBead(bead) {
   }
   return false;
 }
-function scaleThread() {
-  const scale = scaleName() || (S.stack.length ? 'entry' : null);
-  if (!scale) return null;
-  // Hfix-1A · a word remembers the kanji entered from it in this visit (its rail's way back in goes there, and only there)
-  const shown = S.stack.at(-1), under = S.stack.at(-2);
-  if (shown?.t === 'kanji' && under?.t === 'word' && scaleWordKanji(under).includes(shown.id)) under.enteredKanji = shown.id;
-  const thread = el('nav', 'scale-thread');
-  thread.dataset.scale = scale;
-  thread.setAttribute('aria-label', tx('ことばの道すじ', 'The way through the text'));
-  thread.setAttribute('data-drift-chrome', '');
-  const visit = S.scaleVisit;
-  if (scaleSource(visit)) {
-    thread.dataset.passageId = visit.passageId;
-    thread.dataset.tokenIndex = String(visit.index);
-    thread.dataset.sentenceStart = String(visit.sentence.start);
-    thread.dataset.sentenceEnd = String(visit.sentence.start + visit.sentence.tokens.length);
-  }
-  const path = scaleThreadPath(), top = S.stack.at(-1), view = S.view;
-  for (const [index, bead] of path.entries()) {
-    const current = index === path.length - 1;
-    const button = el(current && !bead.out ? 'span' : 'button',
-      bead.out ? 'scale-out' : current ? 'scale-current' : 'scale-bead');
-    // a bead is one ellipsized line (white-space: nowrap), so its label is set as text, never through the word rule's
-    // <wbr>: Blink and WebKit break at a <wbr> even in a nowrap line (Q × G6, the merge: the article's title stood three
-    // lines tall in the room's rail, and the reader under it jumped when the rail settled to one line)
-    button.textContent = bead.label;
-    if (button.tagName === 'BUTTON') button.type = 'button';
-    button.dataset.scaleBead = bead.scale;
-    button.title = bead.description || bead.label;
-    if (current) button.setAttribute('aria-current', 'step');
-    if (bead.node) {
-      button.dataset.node = `${bead.node.t}:${bead.node.id}`;
-      button.dataset.stackIndex = String(bead.index);
-      button.dataset.reading = bead.node.reading || '';
-      if (bead.node.seq != null) button.dataset.seq = String(bead.node.seq);
-    }
-    if (bead.out) {
-      const outside = scaleOutTarget();
-      button.dataset.scaleOut = ''; button.dataset.scaleTarget = outside || '';
-      const shortcut = !adjacentScaleOutTarget() && scaleFallbackOut();
-      if (shortcut) button.dataset.scaleShortcut = 'caller';
-      button.disabled = !outside || !scaleNavigationAllowed();
-      button.setAttribute('aria-label', shortcut ? tx('この項目をひらいた場所へ戻る', 'Return to the place that opened this entry')
-        : outside ? tx(`ひとつ外へ · ${scaleLabel(outside)}`, `One scale out · ${scaleLabel(outside)}`)
-        : scale === 'sky' ? tx('宙 · いちばん外側', 'Sky · outermost scale')
-          : tx('この訪問の外側の出典はありません', 'No enclosing source in this visit'));
-      button.addEventListener('click', event => {
-        event.stopPropagation();
-        if (button.isConnected && S.view === view && S.stack.at(-1) === top) scaleOut();
-      });
-    } else {
-      if (!current) button.disabled = !scaleNavigationAllowed();
-      const label = bead.description || bead.label;
-      button.setAttribute('aria-label', current ? tx(`現在 · ${label}`, `Current · ${label}`)
-        : tx(`${label}へ戻る`, `Return to ${label}`));
-      if (!current) button.addEventListener('click', event => {
-        event.stopPropagation();
-        if (button.isConnected && S.view === view && S.stack.at(-1) === top) returnToScaleBead(bead);
-      });
-    }
-    thread.append(button);
-  }
-  const inside = scaleInTarget();
-  if (inside) {
-    const enter = el('button', 'scale-in');
-    enter.textContent = `${scaleLabel(inside)} ›`; // one nowrap line, as a bead (above)
-    enter.type = 'button'; enter.dataset.scaleIn = ''; enter.dataset.scaleTarget = inside;
-    enter.disabled = !scaleNavigationAllowed();
-    enter.setAttribute('aria-label', tx(`ひとつ内へ · ${scaleLabel(inside)}`, `One scale in · ${scaleLabel(inside)}`));
-    enter.addEventListener('click', event => {
-      event.stopPropagation();
-      if (enter.isConnected && S.view === view && S.stack.at(-1) === top) scaleIn();
-    });
-    thread.append(enter);
-  }
-  return thread;
-}
 /** Hfix-1A · where the rail may rest: with a bead's start at 宙's edge (H1: "shelf" stood half under the sticky 宙 at part
  * depth and read "elf"). 宙's width and the gap after it are the scroller's reserved start (--thread-reserve, its
  * scroll-padding), every other bead is a snap point (editorial.css), and the rail's end gives way just enough that its
  * furthest rest holds its last bead whole with no bead half under 宙. Returns the first rest at or past `target`. */
-function threadRest(thread, target = thread.scrollLeft) {
-  const outside = thread.querySelector(':scope > [data-scale-out]');
-  if (!outside || !thread.isConnected) return target;
-  const port = thread.getBoundingClientRect().left + thread.clientLeft;
-  const gap = parseFloat(getComputedStyle(thread).columnGap) || 0;
-  // 宙 sticks at the scroller's start, so its right edge is the same at rest and while the rail is scrolled
-  const reserve = Math.round(outside.getBoundingClientRect().right - port + gap);
-  if (thread.style.getPropertyValue('--thread-reserve') !== `${reserve}px`) thread.style.setProperty('--thread-reserve', `${reserve}px`);
-  // the rail's own end padding, read once before any room is added to it
-  thread.dataset.threadPad ??= String(parseFloat(getComputedStyle(thread).paddingInlineEnd) || 0);
-  const pad = Number(thread.dataset.threadPad), added = Math.max(0, (parseFloat(getComputedStyle(thread).paddingInlineEnd) || 0) - pad);
-  if (thread.scrollWidth <= thread.clientWidth + 1) return 0;
-  const beads = [...thread.children].filter((node) => node !== outside && node.getClientRects().length);
-  const rests = beads.map((node) => node.getBoundingClientRect().left - port + thread.scrollLeft - reserve).filter((x) => x >= -0.5);
-  const end = thread.scrollWidth - thread.clientWidth - added;
-  const furthest = rests.filter((x) => x >= end - 0.5).sort((a, b) => a - b)[0];
-  // a rest a fraction past the end is no rest in either engine (they snap back to the start): a pixel's slack
-  const room = furthest > end - 0.5 ? Math.ceil(furthest - end + 1) : 0;
-  if (room !== Math.round(added)) {
-    thread.style.paddingInlineEnd = room ? `${pad + room}px` : '';
-    // laid out now, so the snap positions a scroll set in this task is measured against include the new end
-    void thread.scrollWidth;
-  }
-  return Math.max(0, Math.ceil(rests.filter((x) => x >= target - 0.5).sort((a, b) => a - b)[0] ?? furthest ?? target));
-}
 /** Reveal the current bead once, on this newly mounted rail only. Page/reader
  * restoration and focus keep their existing owners; native rail use wins. */
-function revealMountedScaleCurrent(thread) {
-  const parent = thread?.parentElement;
-  const current = thread?.querySelector(':scope > [aria-current="step"]');
-  const outside = thread?.querySelector(':scope > [data-scale-out]');
-  if (!parent || !current || current === outside) return;
-  const initialLeft = thread.scrollLeft;
-  let cancelled = false;
-  const events = ['pointerdown', 'wheel', 'keydown'];
-  const cleanup = () => {
-    for (const type of events) thread.removeEventListener(type, cancel, true);
-  };
-  const cancel = () => { cancelled = true; cleanup(); };
-  for (const type of events) thread.addEventListener(type, cancel, { capture: true, passive: true });
-  const reveal = () => {
-    cleanup();
-    // Hfix-1A · the rail's rests are set whoever moves it next (this reveal, or a finger); a finger's move is judged on
-    // the offset before they are set (setting them may re-snap the rail)
-    const left0 = thread.scrollLeft;
-    if (thread.isConnected) threadRest(thread, thread.scrollLeft);
-    if (cancelled || !thread.isConnected || thread.parentElement !== parent ||
-        current.parentElement !== thread || current.getAttribute('aria-current') !== 'step' ||
-        left0 !== initialLeft || thread.closest('[inert], [hidden], [aria-hidden="true"]') ||
-        (thread.contains(document.activeElement) && document.activeElement !== outside && document.activeElement !== current)) return;
-    const rect = thread.getBoundingClientRect(), bead = current.getBoundingClientRect();
-    if (!rect.width || !rect.height || !bead.width || !bead.height || thread.scrollWidth <= thread.clientWidth) return;
-    let left = Math.max(0, rect.left + thread.clientLeft);
-    let right = Math.min(document.documentElement.clientWidth, rect.left + thread.clientLeft + thread.clientWidth);
-    // Reserve the sticky control's actual occupied edge, without assuming a
-    // positive scrollLeft or a particular inline direction.
-    const out = outside?.getBoundingClientRect();
-    if (out?.width && out.right > left && out.left < right) {
-      if (out.left + out.width / 2 <= (left + right) / 2) left = Math.max(left, out.right);
-      else right = Math.min(right, out.left);
-    }
-    if (bead.width > right - left) return;
-    const delta = bead.right > right ? Math.ceil(bead.right - right)
-      : bead.left < left ? Math.floor(bead.left - left) : 0;
-    // Hfix-1A · the least move that shows the current bead, carried on to the next rest: no bead left half under 宙
-    if (delta) thread.scrollLeft = threadRest(thread, thread.scrollLeft + delta);
-  };
-  // The actual sheet is untransformed; only its separate cut-word animates.
-  // Read this mount's layout once, after layer law and before any later use.
-  requestAnimationFrame(reveal);
-}
 
-function paintRoomScaleThread(root) {
-  const old = root.querySelector(':scope > .scale-thread');
-  const thread = scaleThread();
-  if (!thread) { old?.remove(); return; }
-  thread.dataset.scaleRoom = '';
-  if (old) old.replaceWith(thread);
-  else {
-    const chrome = root.querySelector(':scope > .chrome');
-    if (chrome) chrome.after(thread);
-    else root.prepend(thread);
-  }
-  revealMountedScaleCurrent(thread);
-}
 function renderScaleArticleReturn(main) {
   const visit = S.scaleVisit, article = scalePassage(visit);
   if (!article) return;
@@ -6911,17 +5908,6 @@ const JOYO_JUDGEABLE = /[\u3400-\u4dbf\u4e00-\u9fff]/;
 // read as rare and the dial turned 人々, 様々, 日々 and 国々 to kana. A mark takes the verdict of
 // the kanji before it instead (displayPairs), and with none before it is not judged at all.
 const JOYO_MARKS = /[々〆ヶ]/;
-function beyondJoyo(ch) {
-  // kana, numerals and marks are never "beyond" anything on their own — the dial replaces
-  // KANJI a learner at this level would not have met
-  if (!JOYO_JUDGEABLE.test(ch)) return false;
-  const k = D.kanken[ch];
-  // …and a kanji the 漢検 table does not carry is not 常用. The table holds
-  // 2,453 characters and every common one is in it; 硯, 蟹, 學, 國, 纂, 鐵 are
-  // not. Reading "unknown" as jōyō made the dial inert for precisely the
-  // characters it exists to replace (PR #77 b4d6b825, E3 round-D, reader lens).
-  return !k || BEYOND_JOYO.has(k.kk);
-}
 
 /** Hfix-1A (L-4: Ｍｕｊｉｎ and ２０２６ set letter-spaced in government prose): a run of full-width Latin letters or
  * digits is one span (.fw-run) that takes the face's proportional widths (palt) and never breaks inside; its text is
@@ -6966,44 +5952,9 @@ function rubyNode(pairs, { furigana, revealed }) {
  * tear into stacked rows (含 over め). Wrapping the word in this single child
  * keeps the column at exactly [word row, optional .tok-en gloss row].
  */
-function wordRow(pairs, opts) {
-  const row = el('span', 'tok-word');
-  row.append(rubyNode(pairs, opts));
-  return row;
-}
 
 /** Kanji dial: 0 as written · 1 above-常用 replaced by its reading · 2 all kana. */
-function displayPairs(token) {
-  const mode = S.dials.kanji;
-  if (mode === 0) return token.f;
-  if (mode === 2) {
-    // all-kana converts KANJI runs to their readings and leaves kana runs
-    // as written — flattening the whole token to its hiragana reading
-    // rewrote katakana loanwords and proper nouns (みなみあふりか…),
-    // misteaching standard orthography (P2, full-instrument review)
-    if (!token.f) return [{ t: token.r || token.s }];
-    return token.f.map((pair) => (pair.r ? { t: pair.r } : pair));
-  }
-  let before = '';
-  return token.f.map((pair) => {
-    let rare = false;
-    for (const ch of pair.t) {
-      const mark = JOYO_MARKS.test(ch);
-      if (beyondJoyo(mark ? before : ch)) rare = true;
-      if (!mark) before = ch;
-    }
-    if (!pair.r) return pair;
-    return rare ? { t: pair.r } : pair;
-  });
-}
 
-function luminance(rgb) {
-  const [r, g, b] = rgb.map((v) => {
-    const c = v / 255;
-    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-  });
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-}
 
 function parseColor(str) {
   const m = str.match(/rgba?\(([^)]+)\)/);
@@ -7173,41 +6124,11 @@ function renderSignals(grading, { compact = false } = {}) {
 
 /* The shelf's one count. A story is a reading on the shelf; an N3 rewrite whose original stands
  * beside it is that story's やさしい版, not a second story. Glossary entries are counted apart. */
-function shelfStories(curated) {
-  const standing = new Set(curated.map((p) => p.id));
-  return curated.filter((p) => !(p.adaptation?.basedOn && standing.has(p.adaptation.basedOn)));
-}
 /** One number for the shelf: every card counts, and the line says what it includes. */
-function shelfTallyText(list) {
-  const glossary = list.filter((p) => p.source === 'isa-yasashii-glossary').length;
-  if (!glossary) return tx(`読み物 ${list.length} 本`, `${list.length} articles`);
-  return tx(`読み物 ${list.length} 本（うち用語集 ${glossary}）`, `${list.length} articles, ${glossary} of them short word definitions`);
-}
-function shelfDateline(day) {
-  const [y, m, d] = day.split('-').map(Number);
-  const weekday = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
-  return tx(`${y}年${m}月${d}日（${'日月火水木金土'[weekday]}）`,
-    `${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][weekday]} ${d} ${MONTHS_EN[m - 1]} ${y}`);
-}
 
-function shelfCurrentDay() {
-  let override = null;
-  try { override = localStorage.getItem('kairo-shelf-day'); } catch { /* existing verifier seam */ }
-  return /^\d{4}-\d{2}-\d{2}$/.test(override || '') && Number.isFinite(Date.parse(`${override}T00:00:00Z`))
-    ? override : dayKey();
-}
 
 /** The default opens on three different recent stories each day. An explicit sort or filter
  * keeps its own order; the source collection and every story's identity stay untouched. */
-function shelfDailyOrder(stories, day) {
-  const recent = stories.filter(p => p.source !== 'isa-yasashii-glossary').slice(0, 12);
-  if (!recent.length) return stories;
-  const ordinal = Math.floor(Date.parse(`${day}T00:00:00Z`) / 86400000);
-  const offset = ((ordinal * 3) % recent.length + recent.length) % recent.length;
-  const leading = Array.from({ length: Math.min(3, recent.length) }, (_, i) => recent[(offset + i) % recent.length]);
-  const heads = new Set(leading.map(p => p.id));
-  return [...leading, ...stories.filter(p => !heads.has(p.id))];
-}
 
 /* ---------------------------------------------------------------- views */
 /** Context-dense deck. Its schedule is its own ledger, loaded on demand. */
@@ -7798,19 +6719,7 @@ function renderShelfBody(search = null) {
   return body;
 }
 
-function feedDate(value) {
-  if (!value || !Number.isFinite(Date.parse(value))) return tx('日付不明', 'date unavailable');
-  return new Intl.DateTimeFormat(bi() ? 'en-GB' : 'ja-JP', {
-    year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
-    timeZone: 'Asia/Tokyo', timeZoneName: 'short',
-  }).format(new Date(value));
-}
 
-function publisherLink(label, url, className = '') {
-  const link = el('a', className, label);
-  link.href = url; link.target = '_blank'; link.rel = 'noopener noreferrer';
-  return link;
-}
 function captureDraftInput() {
   return Object.fromEntries(['title', 'url', 'text'].map((key) =>
     [key, document.getElementById(`source-capture-${key}`)?.value ?? sourceCaptureDraft?.input[key] ?? '']));
@@ -7846,22 +6755,6 @@ function fileCaptureDraft() {
     state.draft = state.recovery.read();
   } catch { state.error = true; }
   fileCaptureDrafts.set(epoch, state); return state;
-}
-function rememberFileDraft(state, input) {
-  if (state.draft && JSON.stringify(input) === JSON.stringify(state.draft.input)) return;
-  state.draft = { revision: crypto.randomUUID(), editedAt: new Date().toISOString(), input };
-  try { state.recovery.edit(input, state.draft.revision, state.draft.editedAt); state.error = false; }
-  catch { state.error = true; }
-}
-function fileIntakeFailure(code) {
-  if (code === 'file-mismatch') return tx('保存したファイルとは内容が違う。同じ版のファイルを選ぶ。', 'That file differs from the saved source. Choose the same version.');
-  if (code === 'file-selection-expired') return tx('もう一度同じファイルを選ぶ。下書きはここに残る。', 'Choose the file again. Your draft stays here.');
-  if (code === 'extraction-timeout' || code === 'text-capacity' || code === 'extraction-capacity')
-    return tx('この範囲の取り込みを完了できなかった。ページ数を減らしてもう一度試す。', 'This page range could not finish. Try fewer pages.');
-  if (code === 'locked-pdf' || code === 'copy-restricted-pdf') return tx('このPDFはロックされているか、文章のコピーが制限されている。', 'This PDF is locked or restricts copying text.');
-  if (code === 'file-size' || code === 'image-size') return tx('20 MB 以下、画像は4000万画素以下のファイルを選ぶ。', 'Choose a file up to 20 MB and an image up to 40 megapixels.');
-  return tx('取り込みを完了できなかった。対応する画像かPDFを選び、もう一度試す。下書きはここに残る。',
-    'Intake could not finish. Choose a supported image or PDF and try again. Your draft stays here.');
 }
 function renderFileIntake(main, parent = null) {
   const module = sourceInboxModule, state = fileCaptureDraft(), epoch = recordEpoch;
@@ -8013,7 +6906,6 @@ function renderFileIntake(main, parent = null) {
     if (current()) { state.available = available === true; state.updateControls?.(); }
   }).catch(() => { if (current()) { state.available = false; state.updateControls?.(); } });
 }
-function filePageLabel(pages) { return tx(`${pages.join('・')} ページ`, `Page${pages.length === 1 ? '' : 's'} ${pages.join(', ')}`); }
 function appendFileSourceRange(main, saved, selection) {
   const range = sourceInboxModule.selectFileTextRange(S.sourceInbox, saved.id, selection);
   if (!range) return;
@@ -8071,11 +6963,6 @@ function renderFileSource(main, saved, link) {
 }
 function sourceInboxShelf(inbox) {
   return sourceInboxModule.sourceReferenceShelf(inbox, currentRecordNoteView()?.sourceReferenceViews || []);
-}
-function sourceInboxEntries(inbox) {
-  const children = new Set([...(inbox.excerpts || []), ...(inbox.transcripts || []), ...(inbox.files || []).filter(entry => entry.sourceId)].map(entry => entry.captureId));
-  return sourceInboxShelf(inbox).entries.filter(entry => !children.has(entry.id))
-    .sort((a, b) => b.capturedAt.localeCompare(a.capturedAt) || a.id.localeCompare(b.id));
 }
 function availableSourceCapture(id) {
   if (!sourceInboxModule) return null;
@@ -8210,36 +7097,6 @@ function renderSourceInbox(main) {
     const shortcut = document.getElementById('source-inbox-kept-link'), count = sourceInboxEntries(latest).length;
     if (shortcut) shortcut.textContent = tx(`残した出典へ · ${count}`, `Your kept sources · ${count}`);
   };
-}
-function reconcileSourceInboxEntries(section, inbox) {
-  const next = el('section'); renderSourceInboxEntries(next, inbox);
-  const key = node => node.id || (node.dataset.sourceReferenceConflict ? `conflict:${node.dataset.sourceReferenceConflict}`
-    : node.querySelector('[data-source-capture]')?.dataset.sourceCapture || null);
-  const previous = new Map([...section.children].filter(node => key(node)).map(node => [key(node), node]));
-  const active = section.contains(document.activeElement) ? document.activeElement : null;
-  const focusedCapture = active?.dataset.sourceCapture;
-  const focusedConflict = active?.closest('[data-source-reference-conflict]')?.dataset.sourceReferenceConflict;
-  const focusedUrl = active?.getAttribute('href');
-  const planned = [...next.children].map(node => {
-    const old = previous.get(key(node));
-    if (old?.id === 'source-inbox-kept') { old.textContent = node.textContent; return old; }
-    return old?.outerHTML === node.outerHTML ? old : node;
-  });
-  const retained = new Set(planned);
-  // Removing obsolete siblings first keeps unchanged rows in their relative
-  // order. A received neighbor can be inserted without detaching a focused row.
-  for (const child of [...section.children]) if (!retained.has(child)) child.remove();
-  planned.forEach((child, index) => {
-    if (section.children[index] !== child) section.insertBefore(child, section.children[index] || null);
-  });
-  if (active && document.activeElement !== active) {
-    const replacement = active.isConnected ? active : focusedCapture
-      ? [...section.querySelectorAll('[data-source-capture]')].find(node => node.dataset.sourceCapture === focusedCapture)
-      : focusedConflict && focusedUrl ? [...section.querySelectorAll('[data-source-reference-conflict] a')].find(node =>
-        node.closest('[data-source-reference-conflict]').dataset.sourceReferenceConflict === focusedConflict &&
-        node.getAttribute('href') === focusedUrl) : null;
-    if (replacement) replacement.focus({ preventScroll: true });
-  }
 }
 function renderSourceInboxEntries(main, inbox) {
   const entries = sourceInboxEntries(inbox);
@@ -8414,13 +7271,6 @@ function listeningExcerptDraft(sourceId) {
   } catch { state.error = true; }
   listeningExcerptDrafts.set(key, state); return state;
 }
-function listeningField(form, id, label, value = '', multiline = false) {
-  const wrap = el('div'), caption = el('label', '', label); caption.htmlFor = id;
-  const input = el(multiline ? 'textarea' : 'input', 'chat-field'); input.id = id;
-  if (!multiline) { input.type = 'text'; input.autocomplete = 'off'; }
-  else { input.rows = 5; input.lang = 'ja'; }
-  input.value = value; wrap.append(caption, input); form.append(wrap); return input;
-}
 function appendListeningLink(main, url, seconds, id) {
   const link = sourceInboxModule.listeningResumeLink(url, seconds), time = sourceInboxModule.formatMediaTime(seconds);
   const control = publisherLink(link.timestampLink ? tx(`${time} から元の動画を開く ↗`, `Open source at ${time} ↗`)
@@ -8584,7 +7434,6 @@ function transcriptTime(milliseconds) {
   const seconds = Math.floor(milliseconds / 1000), fraction = milliseconds % 1000;
   return `${sourceInboxModule.formatMediaTime(seconds)}${fraction ? `.${String(fraction).padStart(3, '0')}` : ''}`;
 }
-function transcriptRangeLabel(range) { return `${transcriptTime(range.startMs)}–${transcriptTime(range.endMs)}`; }
 function appendTranscriptTime(main, saved, selection, id) {
   const range = sourceInboxModule.selectListeningTranscriptRange(S.sourceInbox, saved.id, selection);
   if (!range) return;
@@ -9254,53 +8103,17 @@ const MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'
 
 /** Newest first; within one day the later publication first; undated last,
  * in the order they arrived (Array#sort is stable). */
-function byNewest(a, b) {
-  const da = shelfDay(a);
-  const db = shelfDay(b);
-  if (da !== db) {
-    if (!da) return 1;
-    if (!db) return -1;
-    return da < db ? 1 : -1;
-  }
-  return (Date.parse(b.publishedAt || '') || 0) - (Date.parse(a.publishedAt || '') || 0);
-}
 /** The newest drop leads (N, 2026-10-17): the rows that share the shelf's newest addedAt day stand first, in the order
  * they arrived (the drop's own reading order in the index); every other row keeps byNewest. */
-function newestDropDay(rows) {
-  let day = '';
-  for (const p of rows) if (ISO_DAY.test(String(p?.addedAt || '')) && p.addedAt > day) day = p.addedAt;
-  return day;
-}
 /** The leading drops (N2, 2026-10-17): a drop is the rows that share one addedAt day. The newest drop, and every drop
  * added within LEADING_DROP_DAYS of it, lead the shelf: newest drop first, each in its own reading order (the order it
  * arrived in the index). A drop older than that has joined the shelf, and keeps byNewest with every other row. */
 const LEADING_DROP_DAYS = 7;
-function leadingDropDays(rows) {
-  const newest = newestDropDay(rows);
-  if (!newest) return [];
-  const floor = Date.parse(`${newest}T00:00:00Z`) - LEADING_DROP_DAYS * 86400000;
-  return [...new Set(rows.map((p) => String(p?.addedAt || '')).filter((day) => ISO_DAY.test(day) && Date.parse(`${day}T00:00:00Z`) >= floor))]
-    .sort((a, b) => (a < b ? 1 : a > b ? -1 : 0));
-}
-function byLeadingDrops(days) {
-  const rank = new Map(days.map((day, i) => [day, i]));
-  return (a, b) => {
-    const ra = rank.get(a.addedAt) ?? Infinity;
-    const rb = rank.get(b.addedAt) ?? Infinity;
-    if (ra !== rb) return ra - rb;
-    return ra === Infinity ? byNewest(a, b) : 0;
-  };
-}
 /** Series in book order (N2; Kimi, via the writer: "a later cut of a work never precedes its earlier cut"). The pieces
  * of one Aozora author on the shelf are one series: the cuts of one work in cut order (aozora:<work>-<cut>), works in
  * the order they joined the shelf. In the default order a series stands together where its first member stands, so an
  * earlier cut from an older drop is pulled forward beside the later cut a newer drop brought. The rule reads only the
  * row's id and its Aozora credit (青空文庫 <author>「…」); no story is named here. */
-function storySeries(p) {
-  const cut = /^aozora:(\d+)(?:-(\d+))?$/u.exec(String(p?.id || ''));
-  const author = /^青空文庫\s+([^\s「『]+)[「『]/u.exec(String(p?.attribution || ''))?.[1];
-  return cut && author ? { key: author, work: cut[1], cut: Number(cut[2] || 1) } : null;
-}
 function gatherSeries(list) {
   const arrived = new Map((D.passages || []).map((p, i) => [p.id, i]));
   const members = new Map();
@@ -9326,71 +8139,18 @@ function gatherSeries(list) {
 }
 
 /** Days since a calendar day, counted on the reader's own calendar. */
-function dayAge(day) {
-  const [y, m, d] = day.split('-').map(Number);
-  const now = new Date();
-  return Math.round((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(y, m - 1, d)) / 86400000);
-}
 
-function shelfDateLabel(day) {
-  const [y, m, d] = day.split('-').map(Number);
-  const age = dayAge(day);
-  const when =
-    age === 0 ? tx('今日', 'today') : age === 1 ? tx('昨日', 'yesterday') : age > 1 && age < 7 ? tx(`${age}日前`, `${age} days ago`) : '';
-  const base = bi() ? `${d} ${MONTHS_EN[m - 1]} ${y}` : `${y}年${m}月${d}日`;
-  return when ? `${base} · ${when}` : base;
-}
 
-function dateStamp(day, cls) {
-  const stamp = el('time', cls, shelfDateLabel(day));
-  stamp.dateTime = day;
-  return stamp;
-}
 
 /* ------------------------------------------- the learner's labels (design pass 2026-09-30)
  * What a learner sees about a reading: where it is from, how hard it is, what it is about, and
  * whether a person has checked it yet. Grader diagnostics ("signals disagree", coverage ratios,
  * licence codes) stay in the article's own footer, never on the shelf. */
 /** The reader's date: the day itself, then how long ago in its own span (a phone drops it). */
-function readerDateStamp(day) {
-  const stamp = el('time', 'shelf-date');
-  stamp.dateTime = day;
-  const [whole, ago] = shelfDateLabel(day).split(' · ');
-  const [y] = day.split('-');
-  const thisYear = String(new Date().getFullYear()) === y;
-  // the day, with its year in a span a phone may drop when it is this year
-  const abs = el('span', 'date-abs');
-  if (bi()) abs.append(whole.replace(` ${y}`, ''), el('span', thisYear ? 'date-year is-current' : 'date-year', ` ${y}`));
-  else abs.append(el('span', thisYear ? 'date-year is-current' : 'date-year', `${y}年`), whole.replace(`${y}年`, ''));
-  stamp.append(abs);
-  if (ago) stamp.append(el('span', 'date-rel', ` · ${ago}`));
-  return stamp;
-}
-function learnerSourceLabel(p) {
-  return String(p.sourceLabel || '').replace(/\s*·\s*検収前/gu, '').replace(/^N3書き換え\s*·\s*/u, '').trim();
-}
 /** A story's one level (N, 2026-10-17: one level per card), shown on its chip and taken by the level filter: the level its
  * text was written for where the record carries it (authorLevel, the level its reviewers accepted), else the JLPT
  * vocabulary estimate. `step` is its JLPT step (N1+ steps at N1). */
-function storyLevel(p) {
-  const authored = /^N[1-5]\+?$/u.test(p?.authorLevel || '') ? p.authorLevel : '';
-  const level = authored || p?.readingFacets?.jlpt || '';
-  return { level, authored, step: level.replace(/\+$/u, '') };
-}
 /** The chip carries the story's one level, with the sentence band beside it. */
-function levelChip(p, extra = '') {
-  const jlpt = p.readingFacets?.jlpt;
-  const { level, authored, step } = storyLevel(p);
-  const lv = levelPhrase(p.grading);
-  const chip = el('span', `level-chip${extra ? ` ${extra}` : ''}`, level || (bi() ? lv.level : lv.ja));
-  if (level) chip.dataset.level = step;
-  chip.title = authored
-    ? tx(`レベル ${authored} · 文の難しさ ${lv.ja}`, `Level ${authored} · sentences ${lv.level}`)
-    : jlpt
-      ? tx(`JLPT ${jlpt} 程度の語彙（目安）· 文の難しさ ${lv.ja}`, `JLPT ${jlpt} vocabulary (estimate) · sentences ${lv.level}`)
-      : tx(`文の難しさ ${lv.ja}`, `sentences ${lv.level}`);
-  return chip;
-}
 const TOPIC_KICKERS = {
   politics: ['政治', 'Politics'], economy: ['経済', 'Economy'], science: ['科学', 'Science'],
   technology: ['テクノロジー', 'Technology'], international: ['国際', 'World'], environment: ['環境', 'Environment'],
@@ -9411,94 +8171,19 @@ const TOPIC_BLOCKS = {
   news: 'ai', essay: 'sumi', graded: 'sumi', primary: 'sumi', glossary: 'ai', reading: 'ai',
 };
 /** The key a story's topic is known by: its own topic, its first facet in the filter's order, or its lane. */
-function storyTopicKey(p) {
-  if (p.source === 'isa-yasashii-glossary') return 'glossary';
-  if (TOPIC_KICKERS[p.topic]) return p.topic;
-  const topics = p.readingFacets?.topics || [];
-  for (const topic of TOPIC_ORDER) if (topics.includes(topic)) return topic;
-  return ['essay', 'graded', 'primary'].includes(p.lane) ? p.lane : 'reading';
-}
 /** One topic per story, from the facets the 分野 filter already uses. */
-function storyTopic(p) {
-  const key = storyTopicKey(p);
-  if (key === 'glossary') return ['用語集', 'Glossary'];
-  if (TOPIC_KICKERS[key]) return TOPIC_KICKERS[key];
-  return { essay: ['随筆', 'Essay'], graded: ['読み物', 'Graded reading'], primary: ['資料', 'Source'] }[key] || ['読み物', 'Reading'];
-}
 /** The world block a story's topic prints from, as a CSS value (`var(--kicker-ai)` …). */
-function storyBlock(p) {
-  return `var(--kicker-${TOPIC_BLOCKS[storyTopicKey(p)] || 'ai'})`;
-}
-function storyAccent(p) {
-  return /^#[0-9a-f]{6}$/iu.test(p.accent || '') ? p.accent : storyBlock(p);
-}
 /* A story's picture (FEEL pass 2026-10-02): data/articles/index.json may carry
  *   "picture": { "src": "articles/pictures/<file>.webp", "alt": "…", "w": 1200, "h": 800 }
  * (src relative to data/), and an optional "srcSmall" with "wSmall" for a narrow screen. The slot
  * is always a fixed 3:2 box, so nothing jumps while a picture loads. Until a picture exists — or
  * if it cannot load, or in the single-file build that carries no pictures — the slot is a calm
  * block in the story's colour with its topic word, never a big decorative kanji. */
-function storyPictureSource(p) {
-  const pic = p.picture;
-  if (!pic || typeof pic.src !== 'string' || !/^articles\/pictures\/[\w.-]+\.(webp|jpe?g|png|avif)$/u.test(pic.src)) return null;
-  if (window.__CORRIDOR_STANDALONE__ === true) return null;
-  return pic;
-}
 /** N · a picture-less story's key kanji (its row's heroKanji): one or two kanji, else none. */
-function storyHeroKanji(p) {
-  return typeof p?.heroKanji === 'string' && /^[\p{Script=Han}々]{1,2}$/u.test(p.heroKanji) ? p.heroKanji : '';
-}
 /** The picture band, or null: a story with no picture shows its key kanji set large in the world's ink on the world's
  * paper — one 書 sheet, no category word — and a story with neither has no band at all, never a placeholder block
  * (N, the lead 2026-10-17: the first screen had a plain "CULTURE" block where a print stood). */
-function storyPicture(p, { eager = false, cls = 'story-picture' } = {}) {
-  const frame = el('span', cls);
-  const kanjiSheet = () => {
-    const kanji = storyHeroKanji(p);
-    if (!kanji) return false;
-    frame.classList.add('is-kanji');
-    frame.querySelector('.story-img')?.remove();
-    const glyph = el('span', 'story-hero-kanji', kanji);
-    glyph.lang = 'ja';
-    glyph.dataset.uiContent = 'learning';
-    glyph.setAttribute('aria-hidden', 'true');
-    frame.prepend(glyph);
-    return true;
-  };
-  const pic = storyPictureSource(p);
-  if (!pic) return kanjiSheet() ? frame : null;
-  const img = el('img', 'story-img');
-  img.src = `data/${pic.src}`;
-  if (pic.srcSmall && /^articles\/pictures\/[\w.-]+$/u.test(pic.srcSmall) && pic.wSmall && pic.w) {
-    img.srcset = `data/${pic.srcSmall} ${pic.wSmall}w, data/${pic.src} ${pic.w}w`;
-    img.sizes = '(max-width: 520px) 100vw, 50vw';
-  }
-  // inside a card the headline already names the story, so the picture is quiet to a screen reader
-  img.alt = '';
-  if (pic.w && pic.h) { img.width = pic.w; img.height = pic.h; }
-  img.loading = eager ? 'eager' : 'lazy';
-  img.decoding = 'async';
-  // a picture that cannot load gives way to the key kanji, or takes its band with it
-  img.addEventListener('error', () => { if (!kanjiSheet()) frame.remove(); }, { once: true });
-  frame.append(img);
-  return frame;
-}
-function storyKicker(p) {
-  const [ja, en] = storyTopic(p);
-  const kicker = el('span', 'story-kicker');
-  kicker.append(el('span', 'l-ja', tx(ja, en)));
-  return kicker;
-}
 /** An original and its N3 rewrite are one story with two versions (adaptation.basedOn). */
-function storyVersions(p) {
-  const originalId = p.adaptation?.basedOn;
-  if (originalId) {
-    const original = D.passages.find((x) => x.id === originalId && D.libraryDiscoverable?.(x) !== false);
-    return original ? { original, easy: p } : null;
-  }
-  const easy = D.passages.find((x) => x.adaptation?.basedOn === p.id && D.libraryDiscoverable?.(x) !== false);
-  return easy ? { original: p, easy } : null;
-}
 
 // This is a device demonstration, never a learner observation or review event.
 const WORD_LADDER_DEMO_KEY = 'kairo-word-ladder-demo-v1';
@@ -9547,19 +8232,6 @@ function demonstrateWordLadder(reader) {
 }
 
 /** The kanji school grade an article's characters reach (the 学年 filter's measure), as a quiet tag. */
-function gradeTag(p) {
-  const grade = p.readingFacets?.schoolGrade;
-  if (!grade) return document.createTextNode('');
-  // H2-fix (H2-8): plain words, not "Kanji secondary+". The measure: the school year by which nine in ten of the
-  // story's kanji are taught (reading_facets.py), so "secondary" means more than one in ten come after elementary school
-  const secondary = grade === 'secondary';
-  const tag = el('span', 'grade-tag', secondary ? tx('中学以上の漢字', 'Kanji beyond elementary school') : tx(`漢字 小${grade}`, `Kanji grade ${grade}`));
-  // a label, like the level beside it: not prose to look up
-  tag.dataset.japaneseLookup = 'off';
-  tag.title = secondary ? tx('小学校のあとで習う漢字が、1割より多く使われている', 'More than one in ten of its kanji are taught after elementary school')
-    : tx(`漢字の9割は小学${grade}年までに習うもの`, `Nine in ten of its kanji are taught by school grade ${grade}`);
-  return tag;
-}
 /** The article's picture under its headline, when one has been drawn (FEEL pass 2026-10-02): the
  * same picture as its shelf card, full text width, captioned. An N3 rewrite shows its original's. */
 function readerPicture(p) {
@@ -9586,13 +8258,6 @@ function readerPicture(p) {
 }
 let readerPictureImg = null;
 /** D3 (John: "回廊 KAIRO"): the credit names the app; 回廊 is a named mark in either language */
-function readerPictureCredit() {
-  const credit = el('figcaption', 'reader-picture-caption', tx('挿絵 · ', 'Illustration · '));
-  const mark = el('span', 'kairo-mark', '回廊');
-  mark.lang = 'ja';
-  credit.append(mark, ' KAIRO');
-  return credit;
-}
 
 /** One shelf card, text first (polish pass 2026-10-01: a brushed headline kanji on a navy slab
  * read as a random symbol to anyone who is not already a learner). A topic kicker, the Japanese
@@ -9672,52 +8337,13 @@ function shelfCard(p, rank = 'grid') {
 
 /** How many of the learner's saved words an article holds: the saved word ids met in the article's
  * own word forms (readingFacets.forms, from the index). Real data only; 0 when the record has none. */
-function storyYourWords(p) {
-  const forms = p.readingFacets?.forms;
-  if (!Array.isArray(forms) || !forms.length) return 0;
-  const inText = new Set(forms), seen = new Set();
-  for (const t of S.taken) if (t.t === 'word' && inText.has(t.id)) seen.add(t.id);
-  return seen.size;
-}
 /** A story's instrument line: level · topic · characters · your words. Every figure is the record's
  * own (chars from the index, words from the learner's saved cards); there is no time estimate,
  * because no real reading timings exist to make one honest. */
-function storyInstrument(p, full = false) {
-  const line = el('div', 'story-instrument');
-  line.append(levelChip(p), storyKicker(p));
-  const fact = (text, cls = '') => {
-    const span = el('span', `story-fact${cls ? ` ${cls}` : ''}`, text);
-    line.append(span);
-    return span;
-  };
-  if (full && p.chars) fact(tx(`${p.chars.toLocaleString('ja-JP')}字`, `${p.chars.toLocaleString('en-GB')} chars`), 'story-chars');
-  const mine = full ? storyYourWords(p) : 0;
-  if (mine) fact(tx(`保存した語 ${mine}`, `${mine} of your words`), 'story-mine');
-  return line;
-}
 
 /** The lead's teaser: the story's own first sentence, from the snippet the record carries. */
-function storyLede(p) {
-  const text = String(p.snippet || '').replace(/\s+/gu, ' ').trim();
-  if (!text) return '';
-  const end = text.search(/[。！？]/u);
-  return end >= 0 ? text.slice(0, end + 1) : `${text}…`;
-}
 
 /** A card's date: the day with how long ago while it is fresh; a teaser keeps the day alone. */
-function storyDate(p, short = false) {
-  const day = shelfDay(p);
-  if (!day) return null;
-  const stamp = el('time', 'story-date');
-  stamp.dateTime = day;
-  if (!short) stamp.textContent = shelfDateLabel(day);
-  else {
-    const [y, m, d] = day.split('-').map(Number);
-    const thisYear = new Date().getFullYear() === y;
-    stamp.textContent = bi() ? `${d} ${MONTHS_EN[m - 1]}${thisYear ? '' : ` ${y}`}` : `${thisYear ? '' : `${y}年`}${m}月${d}日`;
-  }
-  return stamp;
-}
 
 function dialRow(labelJa, labelEn, key, options) {
   const row = el('div', 'dial');
@@ -9835,21 +8461,6 @@ for (const type of ['pointerup', 'pointercancel']) window.addEventListener(type,
   refreshLadderRoom();
 }, { capture: true, passive: true });
 window.addEventListener('blur', () => { ladderPointers.clear(); refreshLadderRoom(); });
-function inlineWordReading(anchor, reading) {
-  const ruby = anchor.querySelector('ruby');
-  if (ruby) {
-    const hidden = [...ruby.querySelectorAll('rt.hidden-rt')];
-    hidden.forEach(rt => setTouchReadingShown(rt, true));
-    return () => hidden.forEach(rt => setTouchReadingShown(rt, false));
-  }
-  const children = [...anchor.childNodes];
-  const row = el('ruby');
-  row.dataset.r = reading; // the reader's floating reading paints this value
-  row.append(...children);
-  row.append(el('rt', null, reading));
-  anchor.append(row);
-  return () => { if (row.parentNode === anchor) row.replaceWith(...children); };
-}
 /** Ladder · the English rung: the word's English in a row of its own under the word (John, 10-19: "two taps should be
  * the furigana plus the english word underneath"). The row stands in the word's own column (.has-en), so the line breathes
  * down to make room and nothing on the next line is covered; it is zero-wide, so the word never widens and the line never
@@ -9857,35 +8468,13 @@ function inlineWordReading(anchor, reading) {
  * occurrence's depth dot steps aside (data-depth-aside, the DOTS slice's hook). Ladder R2 (the lead's round 2, 10-20: "it
  * never shows —"): an empty text shows nothing. A row whose answer may still come keeps its line (tok-en-wait), so its
  * English lands without moving the next line; a row with no English at all is not drawn (tok-en-miss), and the rung stands. */
-function inlineGlossLine(text, waiting = false) {
-  const line = el('span', 'tok-en');
-  line.append(el('span', 'tok-en-text'));
-  setGlossLine(line, text, waiting);
-  return line;
-}
 function setGlossLine(line, text, waiting = false) {
   if (ladderVisit?.anchor.contains(line)) ladderCleanupGeneration++;
   line.querySelector('.tok-en-text').textContent = text || '';
   line.classList.toggle('tok-en-wait', !text && waiting);
   line.classList.toggle('tok-en-miss', !text && !waiting);
 }
-function inlineWordGloss(anchor, text) {
-  return seatGlossRow(anchor, inlineGlossLine(text));
-}
-function seatGlossRow(anchor, line) {
-  anchor.querySelector(':scope > .tok-en')?.remove();
-  anchor.append(line);
-  anchor.classList.add('has-en');
-  anchor.dataset.depthAside = 'meaning';
-  return () => {
-    line.remove();
-    if (!anchor.querySelector(':scope > .tok-en')) { anchor.classList.remove('has-en'); delete anchor.dataset.depthAside; }
-  };
-}
 /** A text token's English rung outside the reader (a sentence's words): the reader's own (tokenGlossLine). */
-function inlineTokenGloss(anchor, token) {
-  return seatGlossRow(anchor, tokenGlossLine(token));
-}
 /** Ladder R2/R4 · a text token's English row. It says the gloss the word's box leads with (readerTokenLead: the sense its
  * sentence uses, from the article's sense data or the box's own rules, as the box draws it) and nothing else. R4 (the
  * lead's ruling on the critic's r2 read, 10-20: "never show an English word that later changes"): until that gloss is
@@ -9893,21 +8482,6 @@ function inlineTokenGloss(anchor, token) {
  * says it once; round 2 painted the quick dictionary's gloss first and swapped it (また "again" → "and"). The reading's rows
  * and the sense are asked for from the word's first rung (senseAhead), the full dictionary from the first press on the
  * text (below). With no gloss at all it says nothing. `painted` hears the gloss land. */
-function tokenGlossLine(token, painted = null) {
-  const reading = readyTokenReading(token);
-  const sensing = () => !SENSE_GAVE_UP.has(token) && !!senseChoice(token, readingTokenEntry(token))?.need;
-  const settled = !reading && !sensing();
-  const line = inlineGlossLine(settled ? readerTokenLead(token) : '', !settled);
-  if (settled) return line;
-  Promise.resolve(reading).then(() => ensureSense(token, readingTokenEntry(token))).catch(() => {}).then(() => {
-    if (!line.isConnected) return;
-    // what the box leads with now: the sense's gloss, or (a sense that cannot be had) the word's own meaning, as the box
-    const found = readerTokenLead(token);
-    setGlossLine(line, found);
-    if (found) { seatInlineGloss(line); painted?.(line); }
-  });
-  return line;
-}
 /** Ladder R4 (F1's prefetch, the lead's ruling, 10-20) · the first press on the text being read opens the full dictionary, so
  * a word's sense is usually at hand by its second tap: a finger touching the text, to scroll it or to tap a word, starts the
  * index then, not at the tap's click (each word's own rows and sense still start at its first rung, senseAhead). A reader
@@ -9927,17 +8501,6 @@ function boxLeadGloss(rec) {
   return plain.length > 18 && plain.includes(',') ? plain.split(',')[0].trim() : plain;
 }
 /** The English row's words: centred under their word, never past the edge of the line they stand in. */
-function seatInlineGloss(line) {
-  const ink = line?.firstElementChild;
-  if (!ink?.isConnected || !line.isConnected) return;
-  ink.style.removeProperty('translate');
-  const box = ink.getBoundingClientRect();
-  if (!box.width) return;
-  const edges = readingLine(line);
-  if (!edges) return;
-  const shift = box.left < edges.left ? edges.left - box.left : box.right > edges.right ? edges.right - box.right : 0;
-  if (Math.abs(shift) > 0.5) ink.style.translate = `${shift}px 0`;
-}
 /* A reading revealed on touch stands over its word without widening it (the lead's ruling, 2026-10-19; type-ruby R1 at
  * 320 px: ひょうしょう over 表彰 widened the word 21 px and re-wrapped its line). When it is wider than its word it overhangs
  * the neighbouring kana by half its excess on each side, as Japanese typesetting lets ruby overhang, so a tap never reflows
@@ -9947,195 +8510,20 @@ function seatInlineGloss(line) {
  * Every reveal path (the ladder's rung, the reader's lit word, a re-render) passes through the DOM, so one observer seats
  * each reading before it is painted. */
 const TOUCH_READING_GAP = 2;
-function touchReading(rt) {
-  const ruby = rt?.parentElement;
-  if (!rt?.isConnected || ruby?.tagName !== 'RUBY' || rt.classList.contains('hidden-rt')) return false;
-  if (ruby.dataset.r != null) return true; // the ladder's own inline reading (inlineWordReading)
-  const reader = rt.closest('#reader');
-  return !!reader && !reader.classList.contains('fg-always');
-}
-function readingLine(rt) {
-  // the block whose lines the word stands in: past every inline box, and past a block that is itself the inside of an
-  // inline box (the reader's word is an inline-flex door around a block row: its line is the paragraph's)
-  const inlineLevel = (node) => !!node && /^inline|^ruby|^contents$/.test(getComputedStyle(node).display);
-  let block = rt.parentElement;
-  while (block && block !== document.body && (inlineLevel(block) || inlineLevel(block.parentElement))) block = block.parentElement;
-  if (!block) return null;
-  const box = block.getBoundingClientRect(), cs = getComputedStyle(block);
-  return { left: box.left + parseFloat(cs.borderLeftWidth) + parseFloat(cs.paddingLeft),
-    right: box.right - parseFloat(cs.borderRightWidth) - parseFloat(cs.paddingRight), block };
-}
 /** A block row that is the inside of an inline box (the reader's word: an inline-flex door around a block row): WebKit
  * sizes it to its reading's full width, overhang or not, so while a touch reading overhangs, each such row between the
  * ruby and its line keeps the width it has without the reading (data-touch-pin), and lets it go again after. */
-function touchRows(rt, block) {
-  const rows = [];
-  for (let n = rt.parentElement?.parentElement; n && n !== block && n !== document.body; n = n.parentElement) {
-    if (!/^inline|^ruby|^contents$/.test(getComputedStyle(n).display) && /^inline/.test(getComputedStyle(n.parentElement).display)) rows.push(n);
-  }
-  return rows;
-}
 // Seats belong to readings, not to whichever ancestor happens to carry a pin. Keeping the
 // actual rows also lets a detached reading release its old seat without touching a sibling's.
 const TOUCH_READING_ROWS = new Map();
 const TOUCH_ROW_PINS = new WeakMap();
-function pinTouchRows(rt, rows, widths) {
-  if (!rows.length) return;
-  TOUCH_READING_ROWS.set(rt, rows);
-  rows.forEach((row, i) => {
-    let pin = TOUCH_ROW_PINS.get(row);
-    if (!pin) {
-      pin = { owners: new Map(), width: row.style.width, priority: row.style.getPropertyPriority('width'),
-        attribute: row.getAttribute('data-touch-pin') };
-      TOUCH_ROW_PINS.set(row, pin);
-    }
-    pin.owners.set(rt, widths[i]);
-    row.style.width = [...pin.owners.values()].reduce((a, b) => parseFloat(a) >= parseFloat(b) ? a : b);
-    row.setAttribute('data-touch-pin', '');
-  });
-}
-function unpinTouchRows(rt) {
-  const rows = TOUCH_READING_ROWS.get(rt) || [];
-  TOUCH_READING_ROWS.delete(rt);
-  for (const row of rows) {
-    const pin = TOUCH_ROW_PINS.get(row);
-    if (!pin) continue;
-    pin.owners.delete(rt);
-    if (pin.owners.size) {
-      row.style.width = [...pin.owners.values()].reduce((a, b) => parseFloat(a) >= parseFloat(b) ? a : b);
-    } else {
-      if (pin.width) row.style.setProperty('width', pin.width, pin.priority);
-      else row.style.removeProperty('width');
-      if (pin.attribute == null) row.removeAttribute('data-touch-pin');
-      else row.setAttribute('data-touch-pin', pin.attribute);
-      TOUCH_ROW_PINS.delete(row);
-    }
-  }
-}
 /** A conceal owns its box and seat until opacity finishes. Reveal invalidates that ownership
  * before changing the class. No already-hidden construction starts a fade. */
 const TOUCH_READING_FADES = new Map();
 const TOUCH_READING_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)');
-function clearTouchReadingSeat(rt) {
-  rt.style.removeProperty('margin-inline');
-  unpinTouchRows(rt);
-}
-function stopTouchReadingFade(rt) {
-  const cycle = TOUCH_READING_FADES.get(rt);
-  if (cycle) {
-    TOUCH_READING_FADES.delete(rt);
-    clearTimeout(cycle.timer);
-    rt.removeEventListener('transitionend', cycle.event);
-    rt.removeEventListener('transitioncancel', cycle.event);
-  }
-  rt.removeAttribute('data-touch-fading');
-}
-function finishTouchReadingFade(rt, cycle) {
-  if (TOUCH_READING_FADES.get(rt) !== cycle) return;
-  stopTouchReadingFade(rt);
-  // Box removal and seat release share this task: no intervening painted frame.
-  clearTouchReadingSeat(rt);
-  if (touchReading(rt)) seatTouchReading(rt);
-}
-function touchReadingFading(rt) {
-  return TOUCH_READING_FADES.has(rt);
-}
-function setTouchReadingShown(rt, shown) {
-  if (shown) {
-    stopTouchReadingFade(rt);
-    rt.classList.remove('hidden-rt');
-    seatTouchReading(rt);
-    return;
-  }
-  const current = TOUCH_READING_FADES.get(rt);
-  const reader = rt.closest('#reader');
-  const canFade = rt.isConnected && rt.parentElement?.tagName === 'RUBY' && reader &&
-    !reader.classList.contains('fg-always') && !TOUCH_READING_MOTION.matches;
-  if (current) {
-    if (!canFade) finishTouchReadingFade(rt, current);
-    return; // repeated conceal cannot restart the fade or extend its deadline
-  }
-  const hidden = rt.classList.contains('hidden-rt');
-  const before = canFade && !hidden ? getComputedStyle(rt) : null;
-  const visible = before && before.display !== 'none' && before.visibility !== 'hidden' && Number(before.opacity) > 0;
-  if (!visible) {
-    stopTouchReadingFade(rt);
-    rt.classList.add('hidden-rt');
-    clearTouchReadingSeat(rt);
-    return;
-  }
-  const cycle = { timer: 0, animation: null, started: performance.now(), event: null };
-  const complete = () => finishTouchReadingFade(rt, cycle);
-  cycle.event = (event) => {
-    if (event.target !== rt || event.propertyName !== 'opacity' || event.pseudoElement || event.timeStamp < cycle.started) return;
-    // A queued event from an interrupted old transition cannot finish a new running one.
-    if (cycle.animation && ['running', 'pending'].includes(cycle.animation.playState)) return;
-    complete();
-  };
-  TOUCH_READING_FADES.set(rt, cycle);
-  rt.addEventListener('transitionend', cycle.event);
-  rt.addEventListener('transitioncancel', cycle.event);
-  rt.setAttribute('data-touch-fading', '');
-  rt.classList.add('hidden-rt');
-  const style = getComputedStyle(rt);
-  const seconds = value => parseFloat(value) * (value.trim().endsWith('ms') ? 1 : 1000);
-  const properties = style.transitionProperty.split(',').map(value => value.trim());
-  const durations = style.transitionDuration.split(',').map(seconds);
-  const delays = style.transitionDelay.split(',').map(seconds);
-  const time = Math.max(0, ...properties.map((property, i) => property === 'opacity'
-    ? durations[i % durations.length] + delays[i % delays.length] : 0));
-  if (!(time > 0)) { complete(); return; }
-  cycle.animation = rt.getAnimations?.().find(animation => animation.transitionProperty === 'opacity' && animation.effect?.target === rt) || null;
-  // The promise belongs to this actual transition; both outcomes still check this cycle's identity.
-  cycle.animation?.finished.then(complete, complete);
-  cycle.timer = setTimeout(complete, time + 50); // only a lost-completion fallback, not the normal fade clock
-}
 TOUCH_READING_MOTION.addEventListener('change', () => {
   if (TOUCH_READING_MOTION.matches) for (const [rt, cycle] of TOUCH_READING_FADES) finishTouchReadingFade(rt, cycle);
 });
-function seatTouchReading(rt) {
-  if (!rt?.style) return;
-  if (touchReadingFading(rt)) return;
-  clearTouchReadingSeat(rt);
-  if (!touchReading(rt)) return;
-  const style = getComputedStyle(rt);
-  if (style.display === 'none' || style.visibility === 'hidden') return;
-  const line = readingLine(rt);
-  if (!line) return;
-  const rows = touchRows(rt, line.block);
-  // the word under this reading: the ruby's own text before it, back to the reading before, measured with the reading
-  // set aside (Chromium reports a base already widened to its reading), and the rows it stands in, as wide
-  const range = document.createRange();
-  let left = Infinity, right = -Infinity;
-  const shown = rt.style.display;
-  rt.style.display = 'none';
-  for (let node = rt.previousSibling; node && node.nodeName !== 'RT'; node = node.previousSibling) {
-    if (node.nodeName === 'RP') continue;
-    range.selectNodeContents(node);
-    for (const box of range.getClientRects()) if (box.width > 0) { left = Math.min(left, box.left); right = Math.max(right, box.right); }
-  }
-  const rowWidths = rows.map((n) => getComputedStyle(n).width);
-  rt.style.display = shown;
-  const own = rt.getBoundingClientRect();
-  const excess = own.width - (right - left);
-  if (!Number.isFinite(excess) || excess <= 0.5) return;
-  let roomLeft = Math.max(0, left - line.left), roomRight = Math.max(0, line.right - right);
-  // another reading shown on this line keeps its paper: the nearest on each side bounds the overhang
-  for (const other of line.block.querySelectorAll('rt')) {
-    if (other === rt || (other.classList.contains('hidden-rt') && !touchReadingFading(other))) continue;
-    const box = other.getBoundingClientRect();
-    if (!box.width || box.bottom <= own.top || box.top >= own.bottom) continue;
-    if (box.right <= left) roomLeft = Math.min(roomLeft, Math.max(0, left - box.right - TOUCH_READING_GAP));
-    else if (box.left >= right) roomRight = Math.min(roomRight, Math.max(0, box.left - right - TOUCH_READING_GAP));
-  }
-  let start = Math.min(excess / 2, roomLeft), end = Math.min(excess / 2, roomRight);
-  // at a line's edge the reading slides inward: what one side cannot take, the other may
-  const short = excess - start - end;
-  if (short > 0) { const more = Math.min(roomLeft - start, short); start += more; end += Math.min(roomRight - end, short - more); }
-  if (start + end <= 0.5) return;
-  rt.style.marginInline = `${-start}px ${-end}px`;
-  pinTouchRows(rt, rows, rowWidths);
-}
 if (typeof MutationObserver === 'function' && typeof document !== 'undefined' && document.documentElement) {
   new MutationObserver((records) => {
     const seen = new Set(), glosses = new Set();
@@ -10312,23 +8700,10 @@ function removeMini({ keep = null } = {}) {
   closing(miniDiving ? 'dive' : 'dismiss');
 }
 /** The slip that stands for a word now. */
-function standingSlip() {
-  return document.getElementById('mini');
-}
 /** Hfix-1A (19) · a standing slip made ready to be drawn again in place: what it says goes (its content, its attributes but
  * its id, what the slip maps hold for it), and it is drawn from nothing as a new slip is; its element, its arrival still
  * running, its listeners and observers stay. */
-function blankSlip(card) {
-  card.replaceChildren();
-  for (const { name } of [...card.attributes]) if (name !== 'id') card.removeAttribute(name);
-  SLIP_NODE.delete(card);
-  SLIP_OWN_MEANING.delete(card);
-  return card;
-}
 /** The standing slip's headword: where the word leaves from when the slip is the door into the page. */
-function slipHeadword() {
-  return standingSlip()?.querySelector('.mini-word') || null;
-}
 
 /* One tap grammar for every Japanese word (John, 2026-10-14: "I should be able to tap ANY word … and it
  * should be able to cycle through the layers to full entry"; "there is NO WAY to return to the
@@ -10376,11 +8751,6 @@ function foldMenuAfterPress(pop) {
  * post-handler fold, this cleanup precedes the handler: its exact-source guard must see bare prose.
  * Restrict it to these stable page actions; chrome-keep can be replaced by syncChromeKeep. */
 let sourceLadderPress = null;
-function sourceLadderAction(target) {
-  const action = target?.closest?.('button');
-  if (!action || !/^(publisher|source)-(context-save|context-open|sentence-practice|selection-lookup)$/.test(action.id)) return null;
-  return action.closest('.publisher-context-selection') ? action : null;
-}
 function sourceLadderOwner(action) {
   const visit = ladderVisit, surface = publisherSelectionSurface;
   const bound = surface?.ladderOwner;
@@ -10552,46 +8922,12 @@ const LOOKUP_HELPER_POS = new Set(['助動詞', '助詞', '接尾辞', '接頭�
  * entries of that spelling and is never replaced by another entry's reading. A kana spelling
  * (an ending, a helper word, a segmenter fragment) never borrows a kanji entry through its
  * kana form: ます is not 升. */
-function japaneseLookupRecord(text, { reading = '', pos = '', sense = null } = {}) {
-  // R3 · the sense its text uses (senseChoice): an expression read whole (んだ, いけない), a name, another entry read
-  // alike (もの the noun), or a sense of its own entry — its glosses first (senseRecord)
-  if (sense?.door) {
-    const door = sense.door;
-    if (door.senseName) return senseRecord(null, door.sense);
-    const rec = lookup(door.b, door.seq, door.r);
-    return rec ? { ...senseRecord(rec, door.sense), head: door.b, r: door.r } : null;
-  }
-  const own = japaneseLookupEntryRecord(text, { reading, pos });
-  if (!sense?.seq) return own;
-  if (own?.seq ? String(own.seq) === sense.seq : senseIsQuick({ b: text, s: text, r: reading }, sense.seq)) return senseRecord(own, sense);
-  return senseRecord(lookup(text, sense.seq, reading), sense);
-}
 
 /** japaneseLookupRecord's entry before its sense (R, R2). */
-function japaneseLookupEntryRecord(text, { reading = '', pos = '' } = {}) {
-  const wanted = kataToHira(String(reading || ''));
-  const fits = (value) => !wanted || kataToHira(String(value || '')) === wanted;
-  if (D.dict[text] && fits(D.dict[text].r)) return lookup(text);
-  const helper = LOOKUP_HELPER_POS.has(pos);
-  const rows = dictionaryRowsForForm(text);
-  const row = rows.find((candidate) => (candidate[1] === text || (!helper && candidate[4].includes(text))) &&
-    (!wanted || dictionaryReadingSummaries(candidate).some((summary) =>
-      fits(summary[0]) && dictionaryReadingSupportsForm(candidate, summary[0], text))));
-  if (row) return lookup(text, row[0], wanted ? reading : '');
-  if (rows.length) return null;
-  const kept = lookup(text);
-  return kept && fits(kept.r) ? kept : null;
-}
 
 /* Prose remains prose in the accessibility tree. Only its paragraph is in the Tab order;
  * an explicitly selected word temporarily becomes a named group while it has keyboard focus. */
 const proseWordRovers = new WeakMap();
-function focusProseWord(word, options = { preventScroll: true }) {
-  const block = word?.closest?.('[data-prose-roving]');
-  const rover = block && proseWordRovers.get(block);
-  if (rover && word.matches(rover.selector)) rover.focus(word, options);
-  else word?.focus?.(options);
-}
 function installProseWordRoving(block, selector = '.japanese-lookup-word') {
   if (!block?.querySelectorAll) return;
   let rover = proseWordRovers.get(block);
@@ -10685,9 +9021,6 @@ function installProseWordRoving(block, selector = '.japanese-lookup-word') {
   }
 }
 
-function lookupBlockWords(block) {
-  return [...block.querySelectorAll('.japanese-lookup-word')].filter(word => word.closest('[data-lookup-block]') === block);
-}
 
 function setLookupStop(word) {
   const block = word.closest('[data-lookup-block]');
@@ -10698,33 +9031,10 @@ function setLookupStop(word) {
 
 /** The keyboard help every lookup word shares. It lives outside the prose so that no question
  * text, excerpt or narration source ever contains it. */
-function japaneseLookupHelpId() {
-  let help = document.getElementById('japanese-lookup-help');
-  if (!help) {
-    help = el('span');
-    help.id = 'japanese-lookup-help';
-    help.hidden = true;
-    document.body.append(help);
-  }
-  // G5 · Shift+F10 is a hold: it keeps the word and opens its strip, and the help says so
-  help.textContent = tx('←→: 語を選ぶ · Enter: ひらく · Shift+F10: 保存とほかの操作', '←/→: choose a word · Enter: open · Shift+F10: save and more');
-  return help.id;
-}
 
 /** Where a question's word sits — which of that question's blocks, which word in it — so a
  * re-render that commits assistance returns to this occurrence, never an earlier repeat. */
-function lookupOccurrence(word) {
-  const item = word.dataset.lookupItem, block = word.closest('[data-lookup-block]');
-  if (!item || !block) return null;
-  const twins = lookupItemBlocks(item).filter(other => other.textContent === block.textContent);
-  return { item, text: word.dataset.lookupText, blockText: block.textContent, block: twins.indexOf(block),
-    word: lookupBlockWords(block).indexOf(word) };
-}
 
-function lookupItemBlocks(item) {
-  const words = [...document.querySelectorAll('[data-lookup-item]')].filter(word => word.dataset.lookupItem === item);
-  return [...new Set(words.map(word => word.closest('[data-lookup-block]')).filter(Boolean))];
-}
 
 function findLookupOccurrence(occurrence) {
   if (!occurrence) return null;
@@ -11028,78 +9338,11 @@ const ANNOTATION_DIGITS = { 0: ['ぜろ', 'れい'], 1: ['いち'], 2: ['に'], 
 const annotationKana = value => kataToHira(String(value || '')).replace(/[\s・]/gu, '');
 /** The readings one written piece is known by: its token's, the quick dictionary's, a lone kanji's (on, kun and the
  * kun's stem: 拓 ひら of ひら.く), a lone digit's, or a kana as written. */
-function annotationPieceReadings(piece, tokenReadings = []) {
-  const out = new Set(tokenReadings);
-  if (D.dict?.[piece]?.r) out.add(annotationKana(D.dict[piece].r));
-  if ([...piece].length === 1) {
-    const k = D.kanji?.[piece];
-    for (const name of D.annotationNameReadings?.[piece] || []) out.add(annotationKana(name));
-    for (const on of k?.on || []) out.add(annotationKana(on));
-    for (const kun of k?.kun || []) {
-      const bare = String(kun).replace(/-/gu, '');
-      out.add(annotationKana(bare.replace(/\./gu, '')));
-      out.add(annotationKana(bare.split('.')[0]));
-    }
-    for (const reading of ANNOTATION_DIGITS[piece.replace(/[０-９]/u, ch => String.fromCharCode(ch.charCodeAt(0) - 0xfee0))] || []) out.add(reading);
-    if (/^[\p{Script=Hiragana}\p{Script=Katakana}ー]$/u.test(piece)) out.add(annotationKana(piece));
-  }
-  out.delete('');
-  return out;
-}
 /** Whether `wanted` reads the written run that ends at `end`: some run of the pieces just before it, starting where a
  * word starts, reads exactly so (帯 of 地帯 is no word of its own: 森林地帯（タイ） names Thailand). */
-function annotationReadsAs(text, end, wanted, tokenReadings, wordStarts) {
-  if (!wanted) return false;
-  const chars = [...text.slice(Math.max(0, end - 32), end)];
-  let first = chars.length;
-  while (first > 0 && /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}ー々〆ヶ0-9０-９]/u.test(chars[first - 1])) first--;
-  const run = chars.slice(first);
-  const offsets = [end];
-  for (let i = run.length - 1; i >= 0; i--) offsets.unshift(offsets[0] - run[i].length);
-  const reach = Array.from({ length: run.length + 1 }, () => new Set());
-  reach[run.length].add(wanted.length);
-  for (let i = run.length - 1; i >= 0; i--) {
-    for (let k = i + 1; k <= run.length; k++) {
-      if (!reach[k].size) continue;
-      const own = (tokenReadings.get(offsets[i]) || []).filter(([stop]) => stop === offsets[k]).map(([, reading]) => reading);
-      for (const reading of annotationPieceReadings(run.slice(i, k).join(''), own)) {
-        for (const at of reach[k]) if (at >= reading.length && wanted.slice(at - reading.length, at) === reading) reach[i].add(at - reading.length);
-      }
-    }
-    if (reach[i].has(0) && (wordStarts ? wordStarts.has(offsets[i]) : i === 0)) return true;
-  }
-  return false;
-}
 /** A kana-only parenthetical directly after a written form is its pronunciation, not a second set of lexical targets,
  * only when it reads that form (第2次高市改造内閣（だいにじたかいちかいぞうないかく）, 切り拓（ひら）く). One that reads
  * no written run before it stays prose with its own doors (要因（ボトルネック）, 鯨渓谷（エジプト）). */
-function phoneticAnnotationCandidates(text) {
-  return [...String(text).matchAll(/[\p{Script=Han}々〆ヶ][（(]([\p{Script=Hiragana}\p{Script=Katakana}ー・\s]+)[）)]/gu)]
-    .map(match => [match.index + [...match[0]][0].length, match.index + match[0].length, match[1]]);
-}
-function phoneticAnnotationRanges(text, tokens = null) {
-  const source = String(text);
-  const matches = phoneticAnnotationCandidates(source);
-  if (!matches.length) return [];
-  const tokenReadings = new Map();
-  let wordStarts = null;
-  if (tokens) {
-    wordStarts = new Set();
-    let at = 0;
-    for (const token of tokens) {
-      const s = String(token.s || '');
-      const reading = token.r || (/^[\p{Script=Hiragana}\p{Script=Katakana}ー]+$/u.test(s) ? s : '');
-      if (reading) tokenReadings.set(at, [...(tokenReadings.get(at) || []), [at + s.length, annotationKana(reading)]]);
-      wordStarts.add(at);
-      at += s.length;
-    }
-  } else if (typeof Intl.Segmenter === 'function') {
-    wordStarts = new Set([...new Intl.Segmenter('ja', { granularity: 'word' }).segment(source)].map(part => part.index));
-  }
-  return matches
-    .filter(([open, , inner]) => annotationReadsAs(source, open, annotationKana(inner), tokenReadings, wordStarts))
-    .map(([open, close]) => [open, close]);
-}
 let annotationNamesPending = null;
 let annotationNamesError = null;
 /** Name readings are lexical data, never a learner-record root. Demand them only for mounted prose whose
@@ -11207,112 +9450,6 @@ function waitForLookupNameReadings(wrapper, text, context, block) {
   // Normal prose is inserted synchronously. A detached page built ahead waits for mountPageEffects instead.
   queueMicrotask(load);
 }
-function phoneticAnnotationIndices(tokens) {
-  const ranges = phoneticAnnotationRanges(tokens.map(token => token.s).join(''), tokens);
-  const marked = new Set();
-  let offset = 0;
-  tokens.forEach((token, index) => {
-    if (ranges.some(([start, end]) => offset >= start && offset < end)) marked.add(index);
-    offset += token.s.length;
-  });
-  return marked;
-}
-function appendJapaneseLookup(container, text, context = {}) {
-  const segmenter = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter('ja', { granularity: 'word' }) : null;
-  const segments = segmenter ? [...segmenter.segment(String(text))].map(part => part.segment)
-    : String(text).split(/([\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]+)/u);
-  // Q · one door per segment, as before; the segments of one word (jaGroupSegments) share a no-break span, so a line
-  // never ends inside a word (挑|ん|だ, 正|倉|院) or a number (２０２６); a word too long for a short line (over 12
-  // characters) keeps its doors' own breaks
-  const groups = segmenter ? jaGroupSegments(segments.filter(Boolean)) : segments.map((segment) => [segment]);
-  const wrapper = el('span', 'japanese-lookup-text');
-  wrapper.dataset.japaneseLookup = 'true';
-  // A caller whose block is split across several calls (a prompt around its underlined
-  // target) names it, so the block still keeps exactly one Tab stop.
-  const block = context.block || (container.dataset ? container : wrapper);
-  block.dataset.lookupBlock = 'true';
-  const help = japaneseLookupHelpId();
-  // G3 · a phonetic parenthetical (a name's reading set after it) is not a door; when the name readings are not loaded
-  // yet and the text may hold one, the prose waits for them (waitForLookupNameReadings)
-  const annotations = phoneticAnnotationRanges(text);
-  if (!D.annotationNameReadings && phoneticAnnotationCandidates(text).length > annotations.length) {
-    waitForLookupNameReadings(wrapper, text, context, block);
-    container.append(wrapper);
-    return wrapper;
-  }
-  // the groups hold the same segments in the same order (jaGroupSegments mends and splits only within them), so the
-  // offset of each segment is its place in the text
-  let offset = 0;
-  for (const group of groups) {
-    // a number or a Latin word set as text is one unit too (full-width digits otherwise break between them: ２０|２６)
-    const whole = group.length > 1 || /^[0-9０-９A-Za-zＡ-Ｚａ-ｚ.．,，%％]{2,}$/u.test(group[0]);
-    const unit = whole && [...group.join('')].length <= 12 ? el('span', 'ja-unit') : null;
-    // a line may end between two words: WebKit offers no break between two no-break spans side by side (Guided's lede
-    // ran 考え方をひらき、 off the phone), so a <wbr> stands between the words
-    if (wrapper.lastChild && !/^\s/u.test(group[0]) && !/[ \u00a0]$/u.test(wrapper.lastChild.textContent || '')) wrapper.append(document.createElement('wbr'));
-    if (unit) wrapper.append(unit);
-    const place = (node, segment) => {
-      if (unit) unit.append(node);
-      else if (context.kinsoku) placeKinsoku(wrapper, node, segment);
-      else wrapper.append(node);
-    };
-    for (const segment of group) {
-      const annotation = annotations.some(([start, end]) => offset >= start && offset < end);
-      offset += segment.length;
-      if (annotation || !/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(segment)) {
-        place(document.createTextNode(segment), segment);
-        continue;
-      }
-      // The visible word is its own accessible name; the shared help says what it does. G3 · a word is a span, not a
-      // button: the paragraph is one VoiceOver stop, and its words rove (installProseWordRoving, below)
-      const word = el('span', 'japanese-lookup-word', segment);
-      word.lang = 'ja';
-      word.dataset.lookupText = segment;
-      if (context.itemId) word.dataset.lookupItem = context.itemId;
-      word.setAttribute('aria-describedby', help);
-      word.setAttribute('aria-haspopup', 'dialog');
-      word.addEventListener('click', event => {
-        event.stopPropagation();
-        if (diveFromMini(word, event)) return;
-        void openJapaneseLookup(word, segment, context);
-      });
-      word.addEventListener('keydown', event => lookupWordKey(event, word));
-      word.addEventListener('focus', () => setLookupStop(word));
-      let menuRecord = null;
-      const occurrence = () => context.itemId ? lookupOccurrence(word) : null;
-      let menuOccurrence = null;
-      const current = () => word.isConnected ? word : menuOccurrence && findLookupOccurrence(menuOccurrence);
-      const entry = () => menuRecord ? { t: 'word', id: menuRecord.head || segment, ...(menuRecord.seq ? { seq: menuRecord.seq, reading: menuRecord.r } : {}) }
-        : [...segment].length === 1 && D.kanji[segment] ? { t: 'kanji', id: segment } : null;
-      wireReaderWordMenu(word, {
-        target: { kind: 'word', id: segment }, label: segment, copyText: segment,
-        prepare: async () => {
-          menuOccurrence = occurrence();
-          if (context.beforeOpen && !(await context.admit?.())) return false;
-          await ensureDictionaryRowsForForm(segment).catch(() => {});
-          menuRecord = japaneseLookupRecord(segment, context);
-        },
-        resolveAnchor: current,
-        get entryAvailable() { return !!entry(); },
-        save: () => wordSaveFacts({ s: segment, b: menuRecord?.head || segment, r: menuRecord?.r || '', c: !!menuRecord,
-          ...(menuRecord?.seq ? { seq: menuRecord.seq } : {}) }, { record: menuRecord }),
-        quickLook: () => { const anchor = current(); if (anchor) void openJapaneseLookup(anchor, segment, context); },
-        openEntry: async mode => {
-          if (!entry() || (context.beforeOpen && !(await context.beforeOpen()))) return;
-          const node = entry(), anchor = current();
-          if (node && anchor) go(node, { invoker: anchor, instant: mode === 'keyboard' });
-        },
-      });
-      place(word, segment);
-    }
-  }
-  container.append(wrapper);
-  installProseWordRoving(block, '.japanese-lookup-word');
-  // A fragment or underlined assessment target may not be inside its named block yet.
-  // Retire these newly created words directly; insertion order must not expose word controls.
-  for (const word of wrapper.querySelectorAll('.japanese-lookup-word')) proseWordRovers.get(block).retire(word);
-  return wrapper;
-}
 
 function enhanceJapaneseProse(root) {
   // The assessment room owns assistance and test conditions; review-card fronts
@@ -11364,38 +9501,6 @@ function enhanceJapaneseProse(root) {
  * commitCapture), so the same FSRS ledger path and the same one-word-one-card identity (wordCaptureState).
  * A held word stays held and says why. The button then reads "Saved ✓"; pressing it again, or the
  * toast's Undo, takes the card back out, its review history kept (the door swings both ways, §3). */
-function paintWordSave(button, on) {
-  // S · the one Save says its two words and nothing more (John, 2026-10-16: ":goes into review is excessive and 無駄");
-  // a bar's Save names its word (the reader's keep: Save 総理 · Saved 総理 ✓)
-  const word = button.dataset.saveWord || '';
-  const all = button.dataset.saveAll || '';
-  // Q · the reader's bar holds its Save on ONE line in the bar's own type, the verb and then the word it keeps (Save 総理).
-  // It never cuts and never wraps (Grok's walk: SAVE / a word, 保存 / 語をタ…): fitChromeKeep sheds the word, then the
-  // ✓, until the line fits the room the bar's doors leave; its accessible name always says the whole of it
-  if (button.dataset.saveBar != null) {
-    // one word on one line: set as plain text, never with the word rule's breaks (Chromium honours a <wbr> in a no-break label)
-    const name = el('span', `save-bar-word${word ? '' : ' is-rest'}`);
-    name.textContent = word || tx('語をタップ', 'a word');
-    button.replaceChildren(el('span', 'save-bar-verb', on ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save')),
-      document.createTextNode(' '), name);
-    button.classList.remove('is-verb-only', 'is-short');
-    button.classList.toggle('taken', on);
-    button.setAttribute('aria-pressed', String(on));
-    button.title = '';
-    if (button.isConnected) fitChromeKeep(button);
-    return;
-  }
-  button.textContent = all
-    ? tx(`${all} 語をぜんぶ保存`, `Save all ${all}`)
-    // the reader's keep before a word is touched: what it does, in words (never an unlabelled glyph)
-    : button.dataset.saveRest != null && !word ? tx('語を保存', 'Save a word')
-    : word
-      ? (on ? tx(`「${word}」保存済み ✓`, `Saved ${word} ✓`) : tx(`「${word}」を保存`, `Save ${word}`))
-      : (on ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save'));
-  button.classList.toggle('taken', on);
-  button.setAttribute('aria-pressed', String(on));
-  button.title = '';
-}
 /** The popup's one path: once saved, Save ▾ holds the rest. */
 function paintMiniPath(actions, saved) {
   if (!actions) return;
@@ -11411,90 +9516,13 @@ function paintMiniPath(actions, saved) {
  * new list asks its name once), then the surface's own rows (Copy, Ask the tutor, Remove); an item that has no lists
  * (a sentence, a link) shows only those rows. The menu stands inside the control's own card or row ('inline'), or as a
  * drawer under a bar ('drawer'): never over another control. Each surface keeps its own keep path. */
-function saveOne({ id = '', cls = '', label = '', saved, keep, review = null, node = null, more = () => [], place = null,
-  held = false, word = '', all = 0, data = {} } = {}) {
-  const button = el('button', `save-one btn-primary${cls ? ` ${cls}` : ''}`);
-  button.type = 'button';
-  if (id) button.id = id;
-  button.dataset.saveOne = '';
-  button.dataset.saveMenu = 'true';
-  if (word) button.dataset.saveWord = word;
-  // a batch (a lesson's or a test's words, all at once) keeps them in one press; its rows hold each word's own menu
-  if (all) button.dataset.saveAll = String(all);
-  button.setAttribute('aria-haspopup', 'dialog');
-  button.setAttribute('aria-expanded', 'false');
-  // a surface's own hooks (data-enroll, data-airead-take, data-feed-save, data-save-bar) ride the dataset
-  Object.assign(button.dataset, data);
-  paintWordSave(button, !!saved());
-  if (held) {
-    button.disabled = true;
-    button.classList.add('reader-capture-held');
-  }
-  let pressedAt = -Infinity;
-  const openMenu = () => (node
-    ? openVocabularyListPopover(node, label, button, { menu: true, review: review || { saved, toggle: keep }, more: more(), place })
-    : openPlainSaveMenu(button, { more: more(), place }));
-  button.saveOneOpen = openMenu;
-  button.saveOnePaint = () => paintWordSave(button, !!saved());
-  button.addEventListener('click', (event) => {
-    event.stopPropagation();
-    if (button.disabled || button.getAttribute('aria-busy') === 'true' || Date.now() - pressedAt < SAVE_PRESS_MS) return undefined;
-    pressedAt = Date.now();
-    if (saved()) return openMenu();
-    // busy, never disabled, while the item is kept: a disabled button drops the keyboard to the page
-    button.setAttribute('aria-busy', 'true');
-    const settle = (ok) => {
-      // idle again, said in the attribute itself (one write, the same in every DOM the corridor runs in)
-      button.setAttribute('aria-busy', 'false');
-      if (!button.isConnected) {
-        // the keep drew its control again (the reader's bar names its word afresh after a save): the Save standing in its
-        // place opens the menu, so one press keeps and opens wherever the press was made
-        const fresh = id && typeof document !== 'undefined' ? document.getElementById?.(id) : null;
-        if (fresh && fresh !== button && fresh.getAttribute('aria-pressed') === 'true' && fresh.getAttribute('aria-expanded') !== 'true') {
-          fresh.saveOneOpen?.();
-        }
-        return ok;
-      }
-      const now = !!saved();
-      paintWordSave(button, now);
-      paintMiniPath(button.closest('.mini-actions'), now);
-      // the menu follows a keep that went through (as the slip's Save did: its menu on the keep's own answer)
-      if (now || ok) openMenu();
-      return ok;
-    };
-    return Promise.resolve(keep()).then(settle, () => settle(false));
-  });
-  return button;
-}
 /** After a keep that drew its room again, the fresh Save standing where the pressed one stood opens its menu. */
-function reopenSaveMenu(match) {
-  try {
-    const fresh = [...document.querySelectorAll('#app button.save-one')].find(match);
-    fresh?.saveOneOpen?.();
-  } catch { /* nothing to reopen: the press already did its keep */ }
-}
 /* S · a bar's Save hangs its menu from the bar as a drawer, and while it is open the page under that bar steps down by the
  * drawer's height (the brief: "never covering another control"): the bar's own margin grows (editorial.css,
  * html[data-save-drawer]) and its scroller keeps its offset, so what stood under the bar stands under the drawer. Both
  * engines anchor scrolling, which would hold the page still and slide it beneath the drawer; the offset kept undoes that.
  * The drawer lives on <body>, so a render under it keeps it; the margin is a rule on <html>, so a render keeps that too. */
 let saveDrawerWatch = null;
-function saveDrawerScroller(kind) {
-  return kind === 'sheet' ? document.getElementById('sheet') : document.scrollingElement || document.documentElement;
-}
-function setSaveDrawerPush(kind, px) {
-  const root = document.documentElement;
-  const scroller = saveDrawerScroller(kind);
-  const top = scroller ? scroller.scrollTop : 0;
-  if (px == null) {
-    delete root.dataset.saveDrawer;
-    root.style.removeProperty('--save-drawer-push');
-  } else {
-    root.dataset.saveDrawer = kind;
-    root.style.setProperty('--save-drawer-push', `${Math.ceil(px)}px`);
-  }
-  if (scroller && scroller.scrollTop !== top) scroller.scrollTop = top;
-}
 function holdPageUnderDrawer(pop, kind) {
   if (!kind || !document.documentElement?.dataset) return;
   pop.dataset.drawerFor = kind;
@@ -11567,67 +9595,12 @@ function openPlainSaveMenu(invoker, { more = [], place = null } = {}) {
 }
 /** A card that has grown to all the room it has scrolls itself, never the page, until its unfolded menu stands whole in
  * it: the menu's foot comes into view without its head leaving the card's top. */
-function keepMenuInCard(pop) {
-  const card = pop.closest?.('#mini');
-  if (!card || !(card.scrollHeight > card.clientHeight + 1) || typeof pop.getBoundingClientRect !== 'function') return;
-  const box = pop.getBoundingClientRect(), view = card.getBoundingClientRect();
-  const top = view.top + card.clientTop, foot = top + card.clientHeight;
-  const lift = Math.min(box.bottom - foot, box.top - top);
-  if (lift > 0) card.scrollTop += Math.ceil(lift);
-}
 /** Where the one Save's menu stands: inside its card or row (the card grows; nothing is covered), as a drawer under its bar,
  * or (the lists popover of a surface with neither) beside its invoker. */
-function placeSaveMenu(pop, invoker, place = null) {
-  // single selectors only: the corridor's own fake DOM (test-word-saved-answer) reads one selector at a time
-  const where = place || (invoker?.closest?.('#mini') || invoker?.closest?.('[data-save-row]') ? 'inline' : 'popover');
-  if (where === 'inline') {
-    pop.classList.add('is-inline');
-    (invoker.closest('.mini-actions') || invoker.closest('[data-save-row]') || invoker).after(pop);
-    keepMenuInCard(pop);
-  } else if (where === 'drawer') {
-    pop.classList.add('is-inline', 'is-drawer');
-    const bar = invoker?.closest?.('[data-bar]');
-    const bottom = bar ? bar.getBoundingClientRect().bottom : 0;
-    pop.style.setProperty('--drawer-top', `${Math.max(0, Math.round(bottom))}px`);
-    document.body.append(pop);
-    if (bar) holdPageUnderDrawer(pop, bar.dataset.bar);
-  } else {
-    document.body.append(pop);
-    const anchor = invoker?.getBoundingClientRect();
-    const box = pop.getBoundingClientRect();
-    if (anchor) {
-      const below = anchor.bottom + 6;
-      const top = below + box.height <= window.innerHeight - 8 ? below : Math.max(8, anchor.top - box.height - 6);
-      pop.style.left = `${Math.max(8, Math.min(window.innerWidth - box.width - 8, anchor.left))}px`;
-      pop.style.top = `${top}px`;
-      // a phone lays the list popover out as a sheet at the foot; Save ▾'s menu keeps this place (CSS)
-      pop.style.setProperty('--pop-left', pop.style.left);
-      pop.style.setProperty('--pop-top', pop.style.top);
-    }
-  }
-  (pop.querySelector('input[type="checkbox"]:not(:disabled)') || pop.querySelector('button:not(:disabled)') || pop).focus({ preventScroll: true });
-}
 
 /** What a word's Save stands for: the entry it would capture, and whether it is held (D11: a reader
  * word the core dictionary lacks; D23: another entry's card holds the spelling). The popup and the
  * word menu read the same facts, so they can never disagree about what Save does. */
-function wordSaveFacts(token, { reader = false, from = null, record } = {}) {
-  // a caller that already chose the entry (the shared lookup door) hands it over as is
-  // N2 · a te-form auxiliary's card leads with its senses for the te-form, however its entry is looked up (teFormRecord)
-  const g = record !== undefined ? record : reader ? readerQuickRecord(token)
-    : senseRecord(teFormRecord(lookup(token.b, token.seq, token.r), token.te), token.sense);
-  // R3 · a name in this text, or a reading the text quotes, is held: it is not a word to review (V-07)
-  const special = g?.senseName ? (g.senseKind || (token?.sense?.reading ? 'reading' : 'name')) : null;
-  const held = !!special || (reader && !D.dict[token.b]) || !g?.m?.some(meaning => typeof meaning === 'string' && meaning.trim());
-  const node = { t: 'word', id: token.b, ...(token.seq ? { seq: token.seq, reading: token.r || g?.r } : {}),
-    ...(from ? { from, ctxScope: 'sent' } : {}) };
-  // R · a reading of its own the core does not carry, with no entry named yet, rides the node, so its Save waits
-  // (wordCaptureState) instead of saving the core's word for a reading the core does not have
-  const own = !token.b || token.b === token.s ? String(token.r || '') : '';
-  if (!token.seq && D.dict[token.b] && own && kataToHira(own) !== kataToHira(String(D.dict[token.b].r || ''))) node.reading = own;
-  const state = held ? null : wordCaptureState(node);
-  return { g, held, node, state, identityHeld: state === 'conflict' || state === 'unavailable', heldReason: special ? senseNameHeldText(special) : null };
-}
 
 /** After a save or an undo: the open popup's Save, the reader's learning marks and the chrome seal repaint
  * in place, so nothing under the finger moves. */
@@ -12211,113 +10184,11 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
 
 /** Whether a slip may stand beside this element: always, unless a layer stands over the room (the writing room, else a
  * page) and the element is not on that top layer. */
-function slipAllowed(anchor) {
-  const top = document.getElementById('stroke-page') || document.getElementById('sheet');
-  return !top || !!top.contains?.(anchor);
-}
 
 /** The quick look's kanji line (Read lane, redesign): each kanji of the word with its parts, the saved
  * words that share one of them, and one door into the web of the word. Every part comes from the
  * kanji data (D.kanji[c].parts through mainParts, named from D.radicals), never chosen by hand; the
  * cards line comes from the learner's own saved words. Nothing is drawn when the word has no kanji. */
-function miniKanjiWeb(word, anchor, wordReading = '', sourceFrom = null) {
-  const chars = [...new Set([...String(word || '')].filter((c) => D.kanji?.[c]))].slice(0, 3);
-  if (!chars.length) return null;
-  const box = el('div', 'mini-web');
-  box.dataset.japaneseLookup = 'off';
-  // a kanji row (or a card word) opens its page from its own glyph; the slip leaves inside the cut (enterWord)
-  const open = (node) => (event) => {
-    event.stopPropagation();
-    const row = event.currentTarget;
-    go(node, { invoker: anchor, from: row?.querySelector?.('.mini-kanji-glyph') || row || null });
-  };
-  // the band's head names it, so its tiles read as the word's kanji, not as more words; the door into the
-  // word's web stands at the head's end, the way a list's "See all" does
-  const top = el('div', 'mini-band-head');
-  top.append(el('p', 'mini-band-label', tx('漢字', 'Kanji')));
-  box.append(top);
-  const list = el('div', 'mini-kanji');
-  for (const c of chars) {
-    const k = D.kanji[c];
-    const row = el('button', 'mini-kanji-row');
-    row.type = 'button';
-    row.dataset.kanji = c;
-    const glyph = el('span', 'mini-kanji-glyph', c);
-    glyph.lang = 'ja'; glyph.dataset.uiContent = 'learning';
-    row.append(glyph);
-    const what = el('span', 'mini-kanji-what');
-    if (bi() && k.m) what.append(el('span', 'mini-kanji-meaning', k.m));
-    // Ladder · D7 · its readings (on, then kun), for the compact card's one line per kanji (glyph, keyword, readings); the
-    // full card shows its parts there instead. A kanji that is the whole word reads only as the word reads here: its card's
-    // answer is that reading, never another of the kanji's (年 read ねん shows ネン, never とし: record-depth R.reader)
-    const own = [...String(word || '')].length === 1 && String(wordReading || '').trim();
-    const readings = own ? [own]
-      : [...(k.on || []).slice(0, 2), ...(k.kun || []).slice(0, 1).map((kun) => String(kun).replace('.', ''))].filter(Boolean);
-    if (readings.length) {
-      const line = el('span', 'mini-kanji-readings', readings.join(' · '));
-      line.lang = 'ja'; line.dataset.uiContent = 'learning';
-      what.append(line);
-    }
-    const parts = mainParts(c).filter((part) => part !== c);
-    if (parts.length) {
-      const set = el('span', 'mini-kanji-parts');
-      parts.forEach((part, i) => {
-        if (i) { const plus = el('span', 'mini-kanji-plus', '+'); plus.setAttribute('aria-hidden', 'true'); set.append(plus); }
-        const piece = el('span', 'mini-kanji-part', part);
-        piece.lang = 'ja'; piece.dataset.uiContent = 'learning';
-        set.append(piece);
-        // the part's name follows the page's language (review round 2 #7): in English its meaning, from
-        // the kanji data; in 日本語 its reading, from the radical names. A part with neither shows none.
-        if (bi()) {
-          const meaning = partGloss(c, part);
-          if (meaning) set.append(el('span', 'mini-kanji-part-name mini-kanji-part-meaning', meaning));
-        } else {
-          const name = D.radicals?.[part]?.name;
-          if (name) { const n = el('span', 'mini-kanji-part-name', name); n.lang = 'ja'; n.dataset.uiContent = 'learning'; set.append(n); }
-        }
-      });
-      what.append(set);
-    }
-    row.append(what);
-    row.addEventListener('click', open({ t: 'kanji', id: c, ...(sourceFrom ? { from: sourceFrom } : {}) }));
-    list.append(row);
-  }
-  box.append(list);
-  // also in your cards: saved words that share a kanji with this one
-  const kin = [];
-  for (const t of S.taken) {
-    if (t.t !== 'word' || t.id === word || kin.includes(t.id)) continue;
-    if (chars.some((c) => String(t.id).includes(c))) kin.push(t.id);
-    if (kin.length >= 4) break;
-  }
-  if (kin.length) {
-    const cards = el('p', 'mini-cards');
-    cards.append(el('span', 'mini-cards-label', tx('あなたのカードにも', 'Also in your cards')));
-    for (const w of kin) {
-      const b = el('button', 'mini-card-word', w);
-      b.type = 'button'; b.lang = 'ja'; b.dataset.uiContent = 'learning';
-      b.addEventListener('click', open({ t: 'word', id: w }));
-      cards.append(b);
-    }
-    box.append(cards);
-  }
-  // the web: the Words room's word web when it is there, otherwise the first kanji's own entry (its
-  // parts and family). The door says what it shows, in plain words (John T5: "Open the web?? what does
-  // that even mean."): the words related to this one through its kanji.
-  const web = el('button', 'mini-web-open');
-  web.type = 'button';
-  web.append(el('span', 'mini-web-label', tx('関連語', 'Related words')));
-  const chevron = el('span', 'mini-entry-chevron', '›');
-  chevron.setAttribute('aria-hidden', 'true');
-  web.append(chevron);
-  web.addEventListener('click', (event) => {
-    event.stopPropagation();
-    if (typeof window.openWordWeb === 'function') { removeMini(); window.openWordWeb(word); return; }
-    open({ t: 'kanji', id: chars[0], ...(sourceFrom ? { from: sourceFrom } : {}) })(event);
-  });
-  top.append(web);
-  return box;
-}
 
 /** Q · a word's box with its reading (Q/DESIGN.md §3): a card set 10 px from the word's own box stood on its reading
  * (Grok's walk: そうり under the card's edge), because the reading is drawn outside that box: the reader's label over a
@@ -12357,62 +10228,6 @@ function frameFoot(onPage, fixedEdge) {
   return bar == null && thread == null ? null : Math.max(bar ?? 0, thread ?? 0);
 }
 /** Place a popup beside its word, and again whenever its own size settles (a late font, a held reason). */
-function keepFloatingBeside(card, anchor, { follow = false } = {}) {
-  // Hfix-1A (19) · a slip drawn again in place keeps its wiring (below): it is only seated again from what it now says
-  if (card._kept?.anchor === anchor) { card._kept.again(); return; }
-  let watch = null, watched = [], last = 0, lastContent = 0;
-  card._kept = { anchor, again: () => {
-    placeFloating(card, anchorBox(anchor));
-    if (watch) { for (const band of watched) watch.unobserve(band); watched = [...card.children]; for (const band of watched) watch.observe(band); }
-    last = card.getBoundingClientRect().height;
-    lastContent = card.scrollHeight;
-  } };
-  placeFloating(card, anchorBox(anchor));
-  card.addEventListener('scroll', () => markCardMore(card), { passive: true });
-  card.addEventListener('focusin', () => {
-    requestAnimationFrame(() => { if (card.isConnected) revealFloatingFocus(card); });
-  });
-  // a word that moves (the sky's words glide as a family blooms and the camera settles) keeps its slip beside it
-  if (follow) {
-    let was = anchor.getBoundingClientRect();
-    const tick = setInterval(() => {
-      if (!card.isConnected || !anchor.isConnected) { clearInterval(tick); return; }
-      const now = anchor.getBoundingClientRect();
-      if (Math.abs(now.left - was.left) < 1 && Math.abs(now.top - was.top) < 1) return;
-      was = now;
-      placeFloating(card, anchorBox(anchor));
-    }, 120);
-  }
-  if (typeof ResizeObserver !== 'function') return;
-  // Hfix-1A · a card cut to its room keeps its box when what is inside it grows (the sense arriving after "…"), so its
-  // content's own height is watched too: the cut is chosen again on the rows as they now stand
-  last = card.getBoundingClientRect().height;
-  lastContent = card.scrollHeight;
-  let grow = null, frame = 0;
-  const seat = () => {
-    if (!card.isConnected || !anchor.isConnected) { watch?.disconnect(); grow?.disconnect(); return; }
-    if (Math.abs(card.getBoundingClientRect().height - last) < 1 && Math.abs(card.scrollHeight - lastContent) < 1) return;
-    placeFloating(card, anchorBox(anchor));
-    last = card.getBoundingClientRect().height;
-    lastContent = card.scrollHeight;
-  };
-  // L · seating the card resizes the very element the ResizeObserver watches (maxHeight), and a size changed inside
-  // its own callback is left undelivered in that frame (WebKit raises it as a page error: Save ▾'s menu unfolding grew
-  // #mini 476 → 399 inside one callback). So the ResizeObserver never writes: a change of the card's own content (the
-  // menu unfolding or folding, a reason line, Save's note) is seated by a MutationObserver before the frame paints, and
-  // a size that changes with no content change (a late font) is seated in the next frame
-  if (typeof MutationObserver === 'function') {
-    grow = new MutationObserver(seat);
-    grow.observe(card, { childList: true, subtree: true, characterData: true });
-  }
-  watch = new ResizeObserver(() => {
-    if (frame) return;
-    frame = requestAnimationFrame(() => { frame = 0; seat(); });
-  });
-  watch.observe(card);
-  watched = [...card.children];
-  for (const band of watched) watch.observe(band);
-}
 
 /** A card beside its word: short cards fit above or below the fixed chrome; a tall sentence on a
  * phone becomes a full document card below its word, with the page carrying the text and actions. */
@@ -12447,28 +10262,6 @@ const MINI_FADE_ROWS = '.mini-head, .mini-word-note, .mini-actions, .mini-take-r
 const MINI_INK = '.mini-kanji-glyph, .mini-take, .mini-actions button';
 /** Ladder R4 · D7 · a card's ink as bands of its own scroll's height ([top, bottom], from its outer top), merged where they
  * meet: the text it draws (not text kept for a screen reader alone) and its tiles and keys. */
-function cardInk(card) {
-  const box = card.getBoundingClientRect(), range = document.createRange(), spans = [];
-  const add = (r) => { if (r.width > 0.5 && r.height > 0.5) spans.push([r.top - box.top + card.scrollTop, r.bottom - box.top + card.scrollTop]); };
-  const walker = document.createTreeWalker(card, NodeFilter.SHOW_TEXT);
-  for (let text = walker.nextNode(); text; text = walker.nextNode()) {
-    const host = text.parentElement;
-    if (!text.nodeValue.trim() || !host?.getClientRects().length || host.closest('.visually-hidden, [hidden]')) continue;
-    const style = getComputedStyle(host);
-    if (style.visibility === 'hidden' || Number(style.opacity) === 0) continue;
-    range.selectNodeContents(text);
-    for (const r of range.getClientRects()) add(r);
-  }
-  for (const node of card.querySelectorAll(MINI_INK)) if (node.getClientRects().length) add(node.getBoundingClientRect());
-  spans.sort((a, b) => a[0] - b[0]);
-  const merged = [];
-  for (const [top, bottom] of spans) {
-    const last = merged.at(-1);
-    if (last && top <= last[1]) last[1] = Math.max(last[1], bottom);
-    else merged.push([top, bottom]);
-  }
-  return merged;
-}
 /** Ladder R2/R4 · D7. A compact card cut to its room keeps its fade off every row's ink; the fade may lie on a row's blank
  * padding (the lead's ruling on the critic's r2 read, 10-20; round 2 folded rows apart instead, and a scrolled box showed a
  * 33 px gap between 総 and 理). In order:
@@ -12513,16 +10306,6 @@ function fadeCut(card, room) {
 }
 /** Hfix-1A · a card with more below its cut says so: its foot fades into the band the cut falls in (data-more, the
  * strip's own sign), and it scrolls by touch and by keyboard (its rows are buttons; revealFloatingFocus follows them). */
-function markCardMore(card) {
-  const more = card.style.overflowY === 'auto' && card.scrollHeight - card.scrollTop - card.clientHeight > 1;
-  if (card.dataset.more !== String(more)) card.dataset.more = String(more);
-  if (!more) return;
-  const box = card.getBoundingClientRect(), cut = box.top + card.clientHeight + card.scrollTop - 1;
-  const band = [...card.children].find((node) => { const b = node.getBoundingClientRect(); return b.top + card.scrollTop <= cut && b.bottom + card.scrollTop > cut; });
-  const ground = band ? getComputedStyle(band).backgroundColor : '';
-  if (ground && ground !== 'transparent' && !/[,/]\s*0\)$/u.test(ground)) card.style.setProperty('--mini-more-ground', ground);
-  else card.style.removeProperty('--mini-more-ground');
-}
 function placeFloating(card, r) {
   const wasDocument = card.dataset.flow === 'document';
   if (wasDocument && !card.classList.contains('is-sentence')) {
@@ -12772,29 +10555,7 @@ function roomForCard(r, ceiling, floor, scroller, heights, at = scroller === 'wi
 /** Ladder · where a word's card travels: 'window' for a word that scrolls with the page, the element that scrolls it inside
  * a scrolling surface (a page), or null: a word that does not scroll (a fixed surface), a word inside a card, or no word set
  * in text (the sky, the Words room and the deck keep their cards where they are). */
-function slipScroller(anchor) {
-  if (!anchor?.isConnected || !anchor.matches?.('#reader .tok, .japanese-lookup-word, .sentence-tok')) return null;
-  for (let n = anchor.parentElement; n && n !== document.body && n !== document.documentElement; n = n.parentElement) {
-    if (n.id === 'mini') return null;
-    const style = getComputedStyle(n);
-    if (/(auto|scroll|overlay)/.test(style.overflowY) && n.scrollHeight > n.clientHeight + 1) return n;
-    if (style.position === 'fixed') return null;
-  }
-  return 'window';
-}
 /** A card in a scrolling page moves as its word does, and is hidden where the text is (under the page's bar, past its foot). */
-function travelSlip(card) {
-  const seat = card._seat, anchor = card._kept?.anchor;
-  if (!seat || !card.isConnected || !anchor?.isConnected) return;
-  const now = anchor.getBoundingClientRect();
-  const top = seat.top + (now.top - seat.anchor.top), left = seat.left + (now.left - seat.anchor.left);
-  card.style.top = `${top}px`;
-  card.style.left = `${left}px`;
-  card.dataset.floatingTop = String(top);
-  const box = card.getBoundingClientRect();
-  const cutTop = Math.max(0, seat.frame.top - box.top), cutBottom = Math.max(0, box.bottom - seat.frame.bottom);
-  card.style.clipPath = cutTop || cutBottom ? `inset(${cutTop}px 0 ${cutBottom}px 0)` : '';
-}
 // a scroll inside a page (any scroller but the window, whose cards ride in its own layer) carries its word's card along
 if (typeof document !== 'undefined') document.addEventListener('scroll', (event) => {
   const card = standingSlip();
@@ -13006,21 +10767,12 @@ async function sendSentenceToTutor(node, discuss, currentSurface, say) {
 
 /* G5 · his lists in the order he uses them this session (the strip's first row reads it) */
 const sealListRecency = []; // list names this session touched, newest first (no learner-history timestamp is invented)
-function noteSealListUse(name) {
-  const at = sealListRecency.indexOf(name);
-  if (at >= 0) sealListRecency.splice(at, 1);
-  sealListRecency.unshift(name);
-}
 /* G5 · THE ONE KEEP. Add-only: it never calls the door that swings both ways (toggleTaken), whose second press removes —
  * reused for a hold, a second hold would un-keep (Codex's G5 prep). One card, one write: a keep already on its way for the
  * same card is joined, a toggle already on its way is waited out, and the latest record decides inside the transaction
  * (captureStorePatch dedupes a card that is already there). "Kept" is read back from the record the write published:
  * the seal, the count and the ring are consequences of durable success, never a guess. */
 const keepInFlight = new Map(); // srsKey → Promise<boolean>
-function keptState(node) {
-  if (node.t === 'word') return wordCaptureState(node);
-  return S.taken.some((row) => row.t === node.t && row.id === node.id) ? 'taken' : 'take';
-}
 async function keepWord(node, label) {
   const key = srsKey(node.t, node.id);
   const allowed = personalHost?.captureAccess?.() || (() => true);
@@ -13088,52 +10840,6 @@ async function removeKept(node, label) {
  * row, with their places — comes back with Undo, in one write. A record that keeps assessment learning removes its card
  * through that root's own suppression (the host's command), then its lists in a second write. */
 const sameItem = (node) => (row) => !!row && row.t === node.t && row.id === node.id;
-function listsWithout(latest, node) {
-  const same = sameItem(node), lists = { ...latest.lists }, memberships = [];
-  for (const name of Object.keys(latest.lists || {})) {
-    const rows = latest.lists[name];
-    if (!Array.isArray(rows) || !rows.some(same)) continue;
-    rows.forEach((row, index) => { if (same(row)) memberships.push({ name, index, row }); });
-    setOwnRecordValue(lists, name, rows.filter((row) => !same(row)));
-  }
-  return { lists, memberships };
-}
-async function unsaveEverywhere(node) {
-  const key = srsKey(node.t, node.id);
-  if (capturePending.has(key) || !recordWritable()) return null;
-  capturePending.add(key);
-  try {
-    const same = sameItem(node);
-    // D23: the removal names the card this control stood for when it was painted; another entry's card is never touched
-    const expected = node.t === 'word' ? wordNodeIdentity(node, S) : null;
-    const holds = (record) => {
-      if (expected && !sameWordIdentity(expected, wordCardIdentity(record, node.id))) {
-        throw Object.assign(new Error('word-identity-conflict'), { code: 'word-identity-conflict' });
-      }
-    };
-    if (S.assessmentLearning && ['word', 'kanji', 'grammar', 'particle', 'sentence', 'question'].includes(node.t)) {
-      const rows = S.taken.map((row, index) => ({ row, index })).filter(({ row }) => same(row));
-      if (!await suppressAssessmentCards({ kind: 'remove', key }, expected ? holds : null)) return null;
-      let memberships = [];
-      const listed = await commitStorePatch((latest) => {
-        const out = listsWithout(latest, node);
-        memberships = out.memberships;
-        return memberships.length ? { lists: out.lists } : {};
-      });
-      return listed ? { assessment: true, rows, memberships } : null;
-    }
-    let took = null;
-    const ok = await commitStorePatch((latest) => {
-      holds(latest);
-      const rows = latest.taken.map((row, index) => ({ row, index })).filter(({ row }) => same(row));
-      const out = listsWithout(latest, node);
-      took = { assessment: false, rows, memberships: out.memberships };
-      return { taken: latest.taken.filter((row) => !same(row)), ...(out.memberships.length ? { lists: out.lists } : {}) };
-    });
-    return ok ? took : null;
-  } catch { return null; }
-  finally { capturePending.delete(key); }
-}
 /** Undo of a Remove: the card's row and every list row it took out, back in their places, in one write (a row the word
  * already has again is not doubled). */
 async function restoreKept(node, label, took) {
@@ -13232,53 +10938,12 @@ async function writeListMembership(node, label, listName, on) {
  * beside the word, and covers no button. The old word menu became it. */
 const SEAL_LISTS_SHOWN = 6;
 /** His lists in the strip's order: the ones he used this session first, newest first, then the record's own order. */
-function sealListOrder() {
-  const names = Object.keys(S.lists);
-  const recent = sealListRecency.filter((name) => owns(S.lists, name));
-  return [...recent, ...names.filter((name) => !recent.includes(name))];
-}
 
 /* The ring under the finger: it begins at RING_MS and is whole at the commit (MENU_MS); a hold that moves, a second
  * finger, a cancel or a lift before the commit takes it away. It fills clockwise from twelve by transform alone (the
  * motion law: transform and opacity): two half rings, each clipped to its half of the disc, turn into view one after the
  * other. Decorative (aria-hidden, no pointer events): the strip and its status line answer the hold in words. Reduced
  * motion draws it whole at once. */
-function holdRing(x, y) {
-  const ring = el('span', 'hold-ring');
-  ring.setAttribute('aria-hidden', 'true');
-  const track = el('span', 'hold-ring-track');
-  const right = el('span', 'hold-ring-half is-right');
-  const left = el('span', 'hold-ring-half is-left');
-  const rightArc = el('span', 'hold-ring-arc');
-  const leftArc = el('span', 'hold-ring-arc');
-  right.append(rightArc);
-  left.append(leftArc);
-  ring.append(track, right, left);
-  ring.style.left = `${Math.round(x)}px`;
-  ring.style.top = `${Math.round(y)}px`;
-  document.body.append(ring);
-  const runs = [];
-  if (pageCutAllowed()) {
-    const half = (GESTURE.MENU_MS - GESTURE.RING_MS) / 2;
-    const turn = [{ transform: 'rotate(-135deg)' }, { transform: 'rotate(45deg)' }];
-    runs.push(rightArc.animate(turn, { duration: half, easing: 'linear', fill: 'both', id: 'kairo-hold-ring' }));
-    runs.push(leftArc.animate(turn, { duration: half, delay: half, easing: 'linear', fill: 'both', id: 'kairo-hold-ring-2' }));
-  } else ring.classList.add('is-whole');
-  let gone = false;
-  const leave = (cls, ms) => {
-    if (gone) return;
-    gone = true;
-    ring.classList.add(cls);
-    setTimeout(() => ring.remove(), ms);
-  };
-  return {
-    cancel() { for (const run of runs) run.cancel(); leave('is-leaving', 160); },
-    settle(kept) {
-      for (const run of runs) { try { run.finish(); } catch { /* already done */ } }
-      leave(kept ? 'is-kept' : 'is-leaving', 220);
-    },
-  };
-}
 
 /* The seal flies: on a keep's durable success a vermilion 印 presses onto the word at its shoulder, rests a beat, and
  * travels — the X and the Y on two nested layers, each on its own house curve, so the path bows — to the top bar's
@@ -13286,73 +10951,6 @@ function holdRing(x, y) {
  * and data-count already say it; the digit the eye reads turns as the seal lands. Transform and opacity only. Reduced
  * motion, a hidden page or no Web Animations: the seal shows where it pressed and leaves; nothing travels. Decorative
  * throughout (aria-hidden, no pointer events): the strip's status line says it in words. */
-function sealTarget() {
-  for (const id of ['tray', 'tab-review', 'tab-today']) {
-    const node = document.getElementById(id);
-    const box = node?.getBoundingClientRect();
-    if (box?.width && box.height && getComputedStyle(node).visibility !== 'hidden') return node;
-  }
-  return null;
-}
-function flySeal(anchor, { countFrom = null } = {}) {
-  const word = glyphBox(anchor) || anchor.getBoundingClientRect();
-  if (!word?.width || !word.height) return null;
-  const size = 26;
-  const flight = el('span', 'seal-flight');
-  flight.setAttribute('aria-hidden', 'true');
-  const rise = el('span', 'seal-rise');
-  const stamp = el('span', 'seal-stamp', '印');
-  stamp.lang = 'ja';
-  rise.append(stamp);
-  flight.append(rise);
-  // pressed at the word's upper right shoulder, over its last glyph's corner, never over the whole word
-  const x = Math.round(word.left + word.width - size * 0.4);
-  const y = Math.round(word.top - size * 0.45);
-  flight.style.left = `${x}px`;
-  flight.style.top = `${y}px`;
-  document.body.append(flight);
-  const done = () => flight.remove();
-  if (!pageCutAllowed()) {
-    flight.classList.add('is-still');
-    setTimeout(done, 700);
-    return null;
-  }
-  const press = stamp.animate([
-    { transform: 'scale(1.6) rotate(-9deg)', opacity: 0 },
-    { transform: 'scale(0.94) rotate(-9deg)', opacity: 1, offset: 0.72 },
-    { transform: 'scale(1) rotate(-9deg)', opacity: 1 },
-  ], { duration: motionMs('--motion-fast', 180), easing: motionEase('--ease-enter'), fill: 'both', id: 'kairo-seal-press' });
-  const target = sealTarget();
-  const count = target?.querySelector('.tray-count');
-  const truth = count?.textContent;
-  if (count && countFrom != null) count.textContent = String(countFrom);
-  if (!target) {
-    press.finished.then(() => stamp.animate([{ opacity: 1 }, { opacity: 0 }],
-      { duration: motionMs('--motion-quick', 160), delay: motionMs('--motion-long', 400), fill: 'both' }).finished).then(done, done);
-    return press;
-  }
-  const to = target.getBoundingClientRect();
-  const dx = to.left + to.width / 2 - (x + size / 2), dy = to.top + to.height / 2 - (y + size / 2);
-  const wait = motionMs('--motion-fast', 180) + motionMs('--motion-ma', 120);
-  const travel = motionMs('--motion-long', 400);
-  const across = flight.animate([{ transform: 'translate3d(0, 0, 0)' }, { transform: `translate3d(${dx}px, 0, 0)` }],
-    { duration: travel, delay: wait, easing: motionEase('--ease-ink'), fill: 'both', id: 'kairo-seal' });
-  rise.animate([{ transform: 'translate3d(0, 0, 0)' }, { transform: `translate3d(0, ${dy}px, 0)` }],
-    { duration: travel, delay: wait, easing: motionEase('--ease-enter'), fill: 'both', id: 'kairo-seal-rise' });
-  stamp.animate([
-    { transform: 'scale(1) rotate(-9deg)', opacity: 1 },
-    { transform: 'scale(0.62) rotate(0deg)', opacity: 1, offset: 0.82 },
-    { transform: 'scale(0.4) rotate(0deg)', opacity: 0 },
-  ], { duration: travel, delay: wait, easing: 'linear', fill: 'forwards', composite: 'replace', id: 'kairo-seal-shrink' });
-  across.finished.then(() => {
-    if (count?.isConnected && countFrom != null && count.textContent === String(countFrom)) count.textContent = truth;
-    if (target.isConnected) {
-      target.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.1)' }, { transform: 'scale(1)' }],
-        { duration: motionMs('--motion-quick', 160), easing: motionEase('--ease-standard'), id: 'kairo-seal-land' });
-    }
-  }, () => { if (count?.isConnected && truth != null) count.textContent = truth; }).finally(done);
-  return across;
-}
 
 /* The strip. role=dialog (it holds a name field), labelled by its word; ↑↓←→ walk its controls, Home/End, Tab stays
  * inside, Escape closes and gives focus back to the word. A press anywhere else closes it (the document's pointerdown).
@@ -13406,141 +11004,6 @@ function controlsUnder(rect, strip, anchor) {
  * else above it, else shortened to the room before the first control it would meet; where no seat of two rows is left,
  * the strip takes a room of its own in the text under the word's paragraph (the text below steps down while it is open,
  * as Save ▾'s drawer does), so it still covers nothing. */
-function placeSealStrip(open) {
-  const { strip, anchor } = open;
-  const fixedEdge = (selector, edge) => {
-    const node = document.querySelector(selector);
-    if (!node || !['fixed', 'sticky'].includes(getComputedStyle(node).position)) return null;
-    const box = node.getBoundingClientRect();
-    return box.height ? box[edge] : null;
-  };
-  // the glass is the visual viewport (a zoomed-out or keyboard-shortened page shows less than its layout viewport)
-  const vv = window.visualViewport;
-  const glassTop = vv ? vv.offsetTop : 0, glassBottom = vv ? vv.offsetTop + vv.height : window.innerHeight;
-  const glassLeft = vv ? vv.offsetLeft : 0, glassRight = vv ? vv.offsetLeft + vv.width : window.innerWidth;
-  const onPage = !!anchor.closest('#sheet');
-  const scroller = onPage ? anchor.closest('#sheet') : null;
-  const ceiling = Math.max(glassTop + 8, frameFoot(onPage, fixedEdge) ?? 0);
-  const view = vv?.height || window.innerHeight;
-  strip.style.maxHeight = `${Math.max(96, Math.floor(view * 0.4))}px`;
-  // Hfix-1A · measured without its own "more" fade: in Chromium the fade's sticky foot adds 4 px of overflow, so a strip
-  // seated again while it showed measured as not fitting, was cut a row short, and kept its fade (markStripMore sets it
-  // again once seated)
-  delete strip.dataset.more;
-  strip.style.left = '0px';
-  strip.style.top = '0px';
-  // as wide as the glass allows (a page wider than the phone's screen still shows the strip whole)
-  strip.style.maxWidth = `${Math.floor(glassRight - glassLeft - 16)}px`;
-  const w = strip.offsetWidth;
-  const leftOf = (word) => Math.max(glassLeft + 8, Math.min(glassRight - w - 8, word.left + word.width / 2 - w / 2));
-  let word = glyphBox(anchor) || anchor.getBoundingClientRect();
-  let left = leftOf(word);
-  const floorAt = (x) => Math.min(glassBottom, fixedEdge('.listen-row', 'top') ?? glassBottom, fixedEdge('#primary-tabs', 'top') ?? glassBottom,
-    fixedEdge('.kp-grades', 'top') ?? glassBottom, layersMarkTop(x, w) ?? glassBottom) - 8;
-  let floor = floorAt(left);
-  const cap = Math.max(96, Math.floor(Math.min(view * 0.4, floor - ceiling)));
-  strip.style.maxHeight = `${cap}px`;
-  const h = Math.min(strip.offsetHeight, cap);
-  const rect = (top, tall) => ({ left, right: left + w, top, bottom: top + tall });
-  const free = (s) => !controlsUnder(rect(s.top, s.tall), strip, anchor).length;
-  const seatsNow = () => {
-    const below = word.top + word.height + 10, above = word.top - 10, seats = [];
-    if (below + h <= floor) seats.push({ top: below, tall: h, side: 'below' });
-    if (above - h >= ceiling) seats.push({ top: above - h, tall: h, side: 'above' });
-    return seats.find(free) || null;
-  };
-  // the reading moves only as far as the strip needs to stand wholly on the glass, and never so far the word leaves it
-  const scrollRoom = () => (scroller
-    ? { up: scroller.scrollTop, down: scroller.scrollHeight - scroller.clientHeight - scroller.scrollTop }
-    : { up: window.scrollY, down: document.documentElement.scrollHeight - window.innerHeight - window.scrollY });
-  const scrollBy = (dy) => {
-    if (scroller) scroller.scrollTop += dy;
-    else window.scrollTo({ top: window.scrollY + dy, behavior: 'instant' });
-  };
-  const remeasure = () => { word = glyphBox(anchor) || anchor.getBoundingClientRect(); left = leftOf(word); floor = floorAt(left); };
-  let seat = seatsNow();
-  if (!seat) {
-    const room = scrollRoom();
-    const moves = [];
-    const downBy = Math.ceil(word.top + word.height + 10 + h - floor);
-    if (downBy > 0 && downBy <= room.down && word.top - downBy >= ceiling) moves.push(downBy);
-    const upBy = Math.ceil(ceiling - (word.top - 10 - h));
-    if (upBy > 0 && upBy <= room.up && word.top + word.height + upBy <= floor) moves.push(-upBy);
-    for (const dy of moves.sort((a, b) => Math.abs(a) - Math.abs(b))) {
-      scrollBy(dy);
-      remeasure();
-      seat = seatsNow();
-      if (seat) break;
-      scrollBy(-dy);
-      remeasure();
-    }
-  }
-  if (!seat) {
-    // shortened to the room before the nearest control on either side, two rows at least
-    const below = word.top + word.height + 10, above = word.top - 10;
-    const room = (top, tall, side) => {
-      const hits = controlsUnder(rect(top, tall), strip, anchor);
-      if (side === 'below') {
-        const edge = Math.min(floor, ...hits.map((box) => box.top)) - 6;
-        return { top, tall: Math.min(tall, edge - top), side };
-      }
-      const edge = Math.max(ceiling, ...hits.map((box) => box.bottom)) + 6;
-      return { top: Math.max(edge, top + tall - (above - edge)), tall: Math.min(tall, above - edge), side };
-    };
-    const tries = [room(below, Math.max(0, Math.min(h, floor - below)), 'below'), room(Math.max(ceiling, above - h), Math.min(h, above - ceiling), 'above')]
-      .filter((s) => s.tall >= 104 && free(s))
-      .sort((a, b) => b.tall - a.tall);
-    seat = tries[0] || null;
-  }
-  const origin = scroller ? scroller.getBoundingClientRect() : { left: -window.scrollX, top: -window.scrollY };
-  const scrollTop = scroller ? scroller.scrollTop : 0, scrollLeft = scroller ? scroller.scrollLeft : 0;
-  if (seat) {
-    open.room?.remove();
-    open.room = null;
-    // a strip shortened to its room ends between two rows, never across a control; what is below it scrolls inside it
-    const tall = Math.floor(seat.tall);
-    let fit = tall;
-    if (strip.scrollHeight > tall) {
-      const bottoms = [...strip.querySelectorAll('button, input, .seal-strip-status')]
-        .filter((node) => node.getClientRects().length && !node.closest('[hidden]')).map((node) => node.offsetTop + node.offsetHeight);
-      const rows = bottoms.filter((bottom) => bottom + 6 <= tall);
-      if (rows.length) fit = Math.max(...rows) + 6;
-    }
-    strip.style.maxHeight = `${fit}px`;
-    strip.dataset.side = seat.side;
-    if (seat.side === 'above') seat.top += tall - fit;
-    strip.style.left = `${Math.round(left - origin.left + scrollLeft)}px`;
-    strip.style.top = `${Math.round(seat.top - origin.top + scrollTop)}px`;
-    markStripMore(strip);
-    return seat;
-  }
-  // a room of its own under the word's paragraph: nothing is laid over a control; then the reading moves the least that
-  // brings the whole strip onto the glass
-  // Hfix-2e · a word in the word web's plate (its nodes stand at absolute places) takes its room under the whole plate,
-  // never at the top of its layer over the plate's other nodes
-  const block = anchor.closest('p, li, dd, blockquote, [data-reader-prose], [data-lookup-block], .example-ja, .sent-reader, .ww-plate') || anchor.parentElement;
-  if (!open.room) {
-    open.room = el('div', 'seal-strip-room');
-    open.room.setAttribute('aria-hidden', 'true');
-    block.after(open.room);
-  }
-  const tall = Math.floor(Math.min(h, cap, floor - ceiling));
-  open.room.style.height = `${Math.ceil(tall) + 12}px`;
-  let box = open.room.getBoundingClientRect();
-  const past = box.top + 6 + tall - floor, before = ceiling - (box.top + 6);
-  if (past > 0) scrollBy(Math.min(past, scrollRoom().down));
-  else if (before > 0) scrollBy(-Math.min(before, scrollRoom().up));
-  remeasure();
-  box = open.room.getBoundingClientRect();
-  const placed = scroller ? scroller.getBoundingClientRect() : { left: -window.scrollX, top: -window.scrollY };
-  const placedTop = scroller ? scroller.scrollTop : 0, placedLeft = scroller ? scroller.scrollLeft : 0;
-  strip.dataset.side = 'room';
-  strip.style.maxHeight = `${tall}px`;
-  strip.style.left = `${Math.round(left - placed.left + placedLeft)}px`;
-  strip.style.top = `${Math.round(box.top + 6 - placed.top + placedTop)}px`;
-  markStripMore(strip);
-  return { top: box.top + 6, tall, side: 'room' };
-}
 // Escape closes the strip wherever the keyboard stands (a touch hold can leave focus on the paragraph); the strip's own
 // keydown closes it when focus is inside it
 document.addEventListener('keydown', (event) => {
@@ -13550,10 +11013,6 @@ document.addEventListener('keydown', (event) => {
   closeSealStrip({ restoreFocus: true });
 }, true);
 /** A strip with more below its fold says so with a soft fade at its foot (focus: the eye goes where there is more). */
-function markStripMore(strip) {
-  const more = strip.scrollHeight - strip.scrollTop - strip.clientHeight > 1;
-  if (strip.dataset.more !== String(more)) strip.dataset.more = String(more);
-}
 function focusSealStrip(keyboard) {
   const open = sealStrip;
   if (!open) return;
@@ -13621,17 +11080,6 @@ function warmSealStripFaces() {
 /* A surface that keeps its words through its host (the deck's card back, G5): the word is already kept by the one keep when
  * it asks, so the strip opens beside it, and a word this hold kept gets its seal. The keep's toast steps aside: the strip
  * says it. A second hold on a kept word opens the same strip again; nothing is un-kept. */
-function sealHostedWord(node, label, anchor, { created = false, keyboard = false } = {}) {
-  if (!anchor?.isConnected || !closeSealStrip()) return;
-  if (!standingSlip()?.contains(anchor)) removeMini();
-  hideReaderToast();
-  const facts = { g: null, held: false, node, state: keptState(node), identityHeld: false };
-  const door = { label, copyText: label, entryAvailable: true, save: () => facts,
-    openEntry: (mode) => go(node, { invoker: anchor, instant: mode === 'keyboard' }) };
-  const countFrom = S.taken.length - (created ? 1 : 0);
-  openSealStrip(anchor, door, facts, { status: created ? 'created' : keptState(node) === 'taken' ? 'already-kept' : 'failed' }, { keyboard });
-  if (created) requestAnimationFrame(() => { if (anchor.isConnected) flySeal(anchor, { countFrom }); });
-}
 // the ring under the finger, for a surface that runs its own hold (the deck's card back): one ring in the house
 if (typeof window !== 'undefined') window.__KAIRO_HOLD_RING__ = (x, y) => holdRing(x, y);
 function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) {
@@ -14034,27 +11482,6 @@ function wireReaderWordMenu(span, door) {
  * round). JMdict first senses are wordy; the most compact sense makes the
  * best hint — the full numbered senses are one hold away. Parentheticals
  * drop; if everything is long, the clause before the first comma wins. */
-function inlineGloss(rec) {
-  if (!rec?.m?.length) return null;
-  const candidates = rec.m
-    .slice(0, 3)
-    .map((s) => s.replace(/\([^)]*\)/g, '').replace(/\s+/g, ' ').trim())
-    .filter(Boolean);
-  if (!candidates.length) return rec.m[0];
-  // THE FIRST SENSE WINS. JMdict orders senses by importance; picking the
-  // shortest string across senses surfaced tag-stripped minor senses as THE
-  // meaning — 半島 glossed "Korea" instead of "peninsula" (operator, on a
-  // real phone, 2026-08-12). Shortening happens WITHIN the first sense
-  // (comma cut); a later sense is a last resort only when the first cannot
-  // be made to fit at all.
-  let best = candidates[0];
-  if (best.length > 18 && best.includes(',')) best = best.split(',')[0].trim();
-  if (best.length > 24) {
-    const shorter = candidates.slice(1).find((c) => c.length <= 18);
-    if (shorter) best = shorter;
-  }
-  return best;
-}
 
 /* D11 · the reader's quick look at ONE content token: its tap-2 line, its
  * mini and its label. A core hit is lookup() itself, so it renders exactly as
@@ -14065,46 +11492,10 @@ function inlineGloss(rec) {
  * rows are cached: that row is a guess about this token (いう → 結う "to do up
  * (hair)"). With nothing to show, the reader says so instead of staying
  * silent. lookup() is unchanged for every other caller. */
-function readerQuickRecord(token) {
-  // R · read in the token's own reading (tokenReading's rule): a door that names its entry (readingToken) answers
-  // by it, and a core spelling read otherwise answers with the entry so read once the full dictionary has it
-  const own = !token.b || token.b === token.s ? String(token.r || '') : '';
-  // R3 · a name in its text has no dictionary meaning (senseRecord)
-  if (token.senseName) return senseRecord(null, token.sense);
-  // N2 · a te-form auxiliary's entry leads with its senses for the te-form (teFormRecord); R3 · any other with its sense
-  if (token.seq != null && token.seq !== '') return senseRecord(teFormRecord(lookup(token.b, token.seq, own), token.te), token.sense);
-  // R2 · a door marked unfit (a verb whose kana form the quick dictionary has only as a noun) never takes that noun
-  if (D.dict[token.b] && !token.unfit) return senseRecord(lookup(token.b, null, own), token.sense);
-  const kept = S.deepWords?.[token.b];
-  if (kept) return { r: kept.r || '', m: kept.m || [] };
-  const old = D.words[token.b];
-  return old ? { r: old.r, m: old.g ? [old.g] : [] } : null;
-}
 
 /** N · an article's own note on one of its words: its index row's `wordNotes` ([{ surface, note: { ja, en } }], from the
  * editorial word list), matched on the token's surface; null everywhere else. */
-function readerWordNote(p, token) {
-  const hit = (Array.isArray(p?.wordNotes) ? p.wordNotes : []).find((n) => n && n.surface === token?.s && typeof n.note?.en === 'string' && n.note.en);
-  return hit ? hit.note : null;
-}
 
-function readerGlossMissText(form = '', reading = '', several = null) {
-  if (form && D.dictionaryIndex && (D.dictionaryMode === 'main' || D.dictionaryCompleteForms?.has(String(form)))) {
-    // R · asked, the full dictionary lists nothing for this spelling: the line says so, and promises no other look
-    const rows = dictionaryRowsForForm(form);
-    if (!rows.length) return tx('この表記の辞書項目はありません。', 'No dictionary entry for this spelling.');
-    // R2 · asked and answered, it never says "Not in the quick dictionary" again: several entries read the text's way
-    // stay the full entry's choice and are named (those the door narrowed to, when it did); none read so is said plainly
-    const wanted = kataToHira(String(reading || ''));
-    const read = wanted ? rows.filter((row) => row[5].some((kana, k) => kataToHira(kana) === wanted && readerReadingFits(row, k, form))) : [];
-    if ((Array.isArray(several) && several.length > 1) || read.length > 1) {
-      const heads = (Array.isArray(several) && several.length > 1 ? several : [...new Set(read.map((row) => row[1]))]).slice(0, 4);
-      return tx(`複数の項目：${heads.join('・')}`, `Several entries: ${heads.join(' · ')}`);
-    }
-    if (wanted && !read.length) return tx('この読みの辞書項目はありません。', 'No dictionary entry for this reading.');
-  }
-  return tx('この語は簡易辞書にありません。「全項目」で全辞書を引けます。', 'Not in the quick dictionary. Full entry looks it up in the whole dictionary.');
-}
 
 /* R · reading truth (2026-10-16). A word door that carries a token shows the reading the text gives that token and
  * stands for the entry read that way: 年 is ねん in 令和8年 though the quick dictionary's 年 is とし, 月 is がつ in 9月
@@ -14115,9 +11506,6 @@ function readerGlossMissText(form = '', reading = '', several = null) {
 
 /** The reading a token carries for its dictionary form: its own when the token is that form (uninflected). R2: an
  * inflected token's is its dictionary form's reading, derived from its own (lemmaReading), or '' when it cannot be. */
-function tokenReading(token) {
-  return !token?.b || token.b === token.s ? String(token?.r || '') : lemmaReading(token);
-}
 
 /* R2 · reading truth for inflected words (2026-10-17). An inflected token's door stands for its dictionary form read
  * the way the text reads it: おい (base おく) is おく, 云っ read いっ is 云う read いう, 開か read ひらか is 開く read ひらく,
@@ -14135,39 +11523,6 @@ const LEMMA_NIDAN = Object.fromEntries([...'えけげせぜてでねへべぺめ
  * its class takes before an ending — godan (書か 書き 書く 書け 書こ 書こう 書い), ichidan (食べ 食べれ 食べろ 食べよう),
  * サ変 (愛し 愛さ 愛せ; 信じ), カ変 (来 read こ き く), the i-adjective (高 高く 高かっ 高けれ) and the 文語 forms (教うる, 高き,
  * しかれ). A word that does not inflect reads only its own reading. */
-function lemmaTakesForm(lemma, reading, pos = '', base = '') {
-  const L = kataToHira(String(lemma || '')), r = kataToHira(String(reading || ''));
-  if (!L || !r) return false;
-  if (L === r) return true;
-  const last = L.slice(-1), stem = L.slice(0, -1);
-  const verb = ['動詞', '助動詞', '接尾辞', ''].includes(pos);
-  const adjective = ['形容詞', '助動詞', '接尾辞', ''].includes(pos);
-  const forms = [];
-  if (adjective && last === 'い') forms.push(...['', 'く', 'かっ', 'けれ', 'かろ', 'き', 'し', 'かれ', 'から', 'かり', 'う', 'さ', 'け'].map((end) => stem + end));
-  if (adjective && last === 'し') forms.push(...['', 'く', 'き', 'けれ', 'から', 'かり', 'かれ', 'かる', 'う'].map((end) => stem + end));
-  if (verb) {
-    if (/[すず]る$/u.test(L)) {
-      const root = L.slice(0, -2);
-      const ends = L.endsWith('ずる') ? ['じ', 'ざ', 'ぜ', 'ず', 'ずる', 'ずれ', 'じろ', 'ぜよ', 'じよう'] : ['し', 'さ', 'せ', 'す', 'する', 'すれ', 'しろ', 'せよ', 'しよう'];
-      forms.push(...ends.map((end) => root + end));
-    }
-    if (L === 'くる' || (L.endsWith('くる') && /来る$/u.test(String(base)))) {
-      forms.push(...['こ', 'き', 'く', 'くる', 'くれ', 'こい', 'こよ', 'こよう'].map((end) => L.slice(0, -2) + end));
-    }
-    const row = GODAN_ROW[last];
-    if (row) {
-      forms.push(...[...row, last, ...(LEMMA_ONBIN[last] || [])].map((kana) => stem + kana), `${stem}${row[3]}う`);
-      if (/[いゆ]く$/u.test(L)) forms.push(`${stem}っ`);
-    }
-    if (last === 'る') {
-      forms.push(...['', 'れ', 'ろ', 'よ', 'よう', 'ん'].map((end) => stem + end));
-      const u = LEMMA_NIDAN[stem.slice(-1)];
-      if (u) forms.push(...['', 'る', 'れ'].map((end) => stem.slice(0, -1) + u + end));
-    }
-    if (last === 'り') forms.push(...['ら', 'り', 'る', 'れ'].map((kana) => stem + kana));
-  }
-  return forms.includes(r);
-}
 
 /** The reading of an inflected token's dictionary form, from the token's own: a kana dictionary form is its own
  * reading; otherwise the reading of the stem the surface and the dictionary form share (the token's reading less its
@@ -14176,59 +11531,16 @@ function lemmaTakesForm(lemma, reading, pos = '', base = '') {
  * ruby hides the ending (生 read うま is 生む, read うむ), a reading the dictionary lists for the form, one that can read
  * the token's, stands instead; an adjective's bare stem (古 read こ) needs the dictionary to confirm it. '' when nothing
  * can be shown: the token is then read as the text writes it (readingForm). */
-function lemmaReading(token) {
-  const s = String(token?.s || ''), b = String(token?.b || ''), r = kataToHira(String(token?.r || ''));
-  if (!b || b === s || !r) return '';
-  if (READER_KANA.test(b)) return b;
-  const pos = String(token.p || '');
-  const takes = (lemma) => lemmaTakesForm(lemma, r, pos, b);
-  const listed = [...new Set([D.dict?.[b]?.r, ...dictionaryRowsForForm(b).flatMap((row) =>
-    row[5].filter((kana, k) => readerReadingFits(row, k, b)))].filter(Boolean).map((kana) => kataToHira(String(kana))))];
-  const surface = [...s], base = [...b];
-  let shared = 0;
-  while (shared < surface.length && shared < base.length && surface[shared] === base[shared]) shared += 1;
-  const sTail = surface.slice(shared).join(''), bTail = base.slice(shared).join('');
-  const kanaOnly = /^[\p{Script=Hiragana}\p{Script=Katakana}ー]*$/u;
-  const ending = kataToHira(sTail);
-  const aligned = shared && kanaOnly.test(sTail) && kanaOnly.test(bTail) && r.endsWith(ending) && r.length > ending.length
-    ? r.slice(0, r.length - ending.length) + kataToHira(bTail) : '';
-  const confirmed = listed.includes(aligned);
-  if (aligned && takes(aligned) && (confirmed || (!(sTail === '' && pos === '形容詞') && !listed.some(takes)))) return aligned;
-  const read = listed.filter(takes);
-  return read.length === 1 ? read[0] : '';
-}
 
 /** N2 (the lead, 2026-10-18, on Grok 0036) · the quick dictionary's kana いる is 要る, "to be needed": a word a text
  * writes 要る, and means in kana only in a few phrases (お金がいる). A verb the text writes いる in kana, in any form, is the
  * verb of being, 居る, the entry JMdict heads いる: the quick dictionary's word never answers for it. Like its bare stem
  * (R2), its door is marked unfit and its entry is chosen among the verbs read いる (readingToken, narrowLemmaEntries).
  * 要る stays one tap away: the full entry lists every entry of the form. */
-function kanaIru(token) {
-  return token?.p === '動詞' && token.b === 'いる' && READER_KANA.test(String(token.s || ''));
-}
 
 /** R2 · a token as its dictionary form, read the way the text reads it: an inflected token with a derived reading is
  * that form read so (おい → おく; the surface it came from rides as `inflected`); one without is the word as the text
  * writes and reads it, so its door never shows a reading the text does not use. An uninflected token is itself. */
-function readingForm(token) {
-  if (!token?.b || token.b === token.s) return kanaIru(token) ? { ...token, unfit: true } : token;
-  const reading = lemmaReading(token);
-  if (!reading) return { ...token, b: token.s };
-  // a verb whose kana dictionary form the quick dictionary has only as a word of another class (かえる is 蛙 "frog", なす
-  // 茄子 "eggplant", さる 猿 "monkey", かり 雁 "wild goose"), or as a verb of a class that cannot take the text's form (a
-  // godan verb never stands as its bare stem: the い of ている is the ichidan 居る's, never the quick dictionary's godan
-  // いる, 要る "to be needed"), is not that word: the form keeps its own reading — the label and the reading always name
-  // the same form — and is marked unfit, so the quick dictionary's word never answers for it and its entry is chosen
-  // among the verbs read so (readingToken: かえり → 帰る, なさ → 為す, い → いる 居る), or none (the quick dictionary's
-  // class: its parts — "godan verb", "ichidan verb", a JMdict v… code)
-  const core = D.dict?.[token.b];
-  const parts = String(core?.p || '').split(' · ');
-  const stemOnly = parts.some((part) => /^godan verb$|^v5/u.test(part)) && !parts.some((part) => /^ichidan verb$|^v1/u.test(part)) &&
-    /る$/u.test(reading) && kataToHira(String(token.r || '')) === kataToHira(reading).slice(0, -1);
-  const unfit = token.p === '動詞' && !!core?.p && kataToHira(String(core.r || '')) === kataToHira(reading) &&
-    (!parts.some((part) => /verb/u.test(part) || /^v[0-9a-z]/u.test(part)) || stemOnly);
-  return { ...token, s: token.b, r: reading, inflected: token.s, ...(unfit || kanaIru(token) ? { unfit: true } : {}) };
-}
 
 /* N2 · the te-form's auxiliaries (Grok 0036; the lead, 2026-10-18). A verb the text writes in kana right after the
  * te-form (the particle て or で after a verb or an auxiliary verb: 残って いる, 済んで い ます, 書いて おく, 降って き た) is
@@ -14254,63 +11566,20 @@ function markTeFormAuxiliaries(tokens) {
 }
 
 /** The glosses of the senses JMdict lists for an entry's use after the te-form (its detail entry), sense by sense. */
-function teFormSenseGlosses(detail) {
-  return (detail?.[3] || [])
-    .filter((sense) => (sense?.[0] || []).some((pos) => pos === 'aux-v' || pos === 'exp')
-      && (sense?.[8] || []).some((note) => TE_FORM_NOTE.test(String(note))))
-    .map((sense) => (sense[10] || []).map((gloss) => String(gloss?.[0] || '')).filter(Boolean))
-    .filter((glosses) => glosses.length);
-}
 
 /** A te-form auxiliary's answer: { door } names the entry and carries its te-form senses (`te`, glosses by sense);
  * { none: true } when JMdict lists no such sense for the word; { need: { forms, shards } } while the rows or detail
  * shards the answer depends on are still to come; null for any other token. The entries asked, in order: those read as
  * the dictionary form that fit the token (narrowLemmaEntries: いる → 居る, くる → 来る), then the quick dictionary's own
  * entry for the text's form (ください → 下さい). The first with such a sense is the answer. */
-function teFormAnswer(token, door = readingForm(token)) {
-  if (!TE_FORM_AUXILIARY.has(token)) return null;
-  const forms = [{ form: door.b, reading: tokenReading(door), lemma: true }];
-  if (token.s !== door.b && D.dict?.[token.s]) forms.push({ form: token.s, reading: String(token.r || ''), lemma: false });
-  for (const { form, reading, lemma } of forms) {
-    if (!dictionaryAnsweredForm(form)) return { need: { forms: [form], shards: [] } };
-    const read = dictionaryRowsReadAs(form, reading);
-    const alt = D.dict?.[form]?.alt;
-    const rows = lemma ? narrowLemmaEntries(read, reading, form, '動詞') : read.filter((row) => row[1] === form || (!!alt && row[4].includes(alt)));
-    const missing = rows.filter((row) => !D.dictionaryDetails?.get(String(row[0])));
-    if (missing.length) return { need: { forms: [], shards: [...new Set(missing.map((row) => dictionaryShardId(row[0])))] } };
-    for (const row of rows) {
-      const te = teFormSenseGlosses(D.dictionaryDetails.get(String(row[0])));
-      if (!te.length) continue;
-      if (lemma) return { door: { ...door, seq: String(row[0]), te } };
-      // the text's own form is the word: no dictionary form rides beside it
-      const written = { ...door, s: form, b: form, r: reading, seq: String(row[0]), te };
-      delete written.inflected;
-      delete written.unfit;
-      return { door: written };
-    }
-  }
-  return { none: true };
-}
 
 /** Ask for what a te-form auxiliary's answer needs until it is answered: the dictionary form's rows, its entries'
  * senses, then the text's own form's rows and senses. */
-async function ensureTeFormAnswer(token, door) {
-  for (let round = 0; round < 4; round += 1) {
-    const need = teFormAnswer(token, door)?.need;
-    if (!need) return;
-    await Promise.all([...need.forms.map((form) => ensureDictionaryRowsForForm(form)), ...need.shards.map((id) => ensureDictionaryShard(id))]);
-  }
-}
 
 /** A te-form auxiliary's record leads with JMdict's senses for its use after the te-form: each sense's first gloss, then
  * the rest of those senses' glosses, then the entry's other meanings — every one a gloss of the entry, in JMdict's words.
  * Its card shows the first, and a second such sense on a line of its own (居る: "to be ...-ing", "to have ...-ed").
  * Any other record is returned as it is. */
-function teFormRecord(rec, te) {
-  if (!rec || !Array.isArray(te) || !te.length) return rec;
-  const senses = te.flat();
-  return { ...rec, m: [...new Set([...te.map((glosses) => glosses[0]), ...senses, ...(rec.m || []).filter((gloss) => !senses.includes(gloss))])] };
-}
 
 /* R3 · sense truth (Grok 0315; the lead's R3 brief, 2026-10-18). An entry has senses, and the slip showed its first
  * gloss whatever the sentence meant: ない "nonexistent" for the auxiliary "not", 一つ's つ "indicates two contrasting
@@ -14371,11 +11640,6 @@ function markSenseContext(tokens, passage = null) {
  * tabindex a mouse or finger press on the highlight focused the mark instead of starting a text selection, so a drag
  * that began on the saved words selected nothing. The tabindex goes at the mark's first blur, or at the first press on
  * it, before the press's default action; the highlight looks the same. */
-function focusReturnMarkOnce(mark) {
-  const release = () => mark.removeAttribute('tabindex');
-  mark.addEventListener('blur', release, { once: true });
-  mark.addEventListener('pointerdown', release, { once: true, capture: true });
-}
 
 /** The shelf's sense sidecar (data/articles/senses.json, R3 part 2), asked for once. The single file carries it with
  * the articles (articles/senses), as it carries their bodies; it has no sibling file to fetch. */
@@ -14391,26 +11655,10 @@ function ensureSenseSidecar() {
 }
 
 /** A word's neighbours in its text, with its article and index; null for a word no text was marked for. */
-function senseNeighbours(token) {
-  const at = TOKEN_CONTEXT.get(token);
-  if (!at) return null;
-  const { tokens, index } = at;
-  return { prev: tokens[index - 1] || null, prev2: tokens[index - 2] || null, next: tokens[index + 1] || null,
-    next2: tokens[index + 2] || null, before: tokens.slice(Math.max(0, index - 8), index), passage: at.passage, index,
-    at: (offset) => tokens[index + offset] || null };
-}
 
 /** The sidecar's sense for this token in its article: { seq, k, source, lead }, a name ({ name: true }), a reading the
  * text talks about ({ reading: true }), or null. lead,
  * when the row has one, is the gloss of that sense the sentence's meaning is (遺産 in 世界遺産: "heritage", its fourth). */
-function sidecarSense(near) {
-  const row = near?.passage ? D.senseSidecar?.[near.passage]?.[near.index] : null;
-  if (!Array.isArray(row)) return null;
-  if (row[0] === 'name') return { name: true, source: String(row[1] || '') };
-  // a reading the text talks about, not a word (「いちちゅう」「さんちゅう」とは読まない): no dictionary meaning
-  if (row[0] === 'reading') return { reading: true, source: String(row[1] || '') };
-  return { seq: String(row[0]), k: Number(row[1]), source: String(row[2] || ''), ...(Number.isInteger(row[3]) ? { lead: row[3] } : {}) };
-}
 /** A sense's glosses led by the one the sidecar names, then the rest as JMdict lists them but its first: the sidecar
  * names a lead only where that first gloss misleads in the sentence (遺産 "inheritance" in 世界遺産), so the slip never
  * shows it there; the page still lists every gloss. */
@@ -14422,39 +11670,9 @@ const senseNumberBefore = (near) => !!near?.prev && (SENSE_NUMBER.test(String(ne
 const senseCounting = (token) => token?.p === '接尾辞' && senseNumberBefore(senseNeighbours(token));
 const senseWeekdayBracket = (token, near) => /^[日月火水木金土]$/u.test(String(token.s || '')) && /^[（(]$/u.test(String(near?.prev?.s || ''))
   && /^[）)]$/u.test(String(near?.next?.s || ''));
-function senseNegation(token, near) {
-  if (token.p !== '形容詞' || !['ない', '無い'].includes(String(token.b || '')) || !near?.prev) return false;
-  const prev = String(near.prev.s || ''), prev2 = String(near.prev2?.s || '');
-  // an adjective's く form, or an auxiliary's (たく: 行きたくない)
-  const adjectiveKu = (t) => ['形容詞', '助動詞'].includes(t?.p) && /く$/u.test(String(t.s || ''));
-  if (['で', 'じゃ', 'じゃあ'].includes(prev) || adjectiveKu(near.prev)) return true;
-  // さも's: "if not so" (さもなくとも, さもなければ — 然もなければ is not in the shipped dictionary, and its ば is read
-  // into the next word by the tokenizer: さも/なけれ/ばか)
-  if (prev === 'さも') return true;
-  return ['は', 'も', 'さえ'].includes(prev) && (['で', 'じゃ'].includes(prev2) || adjectiveKu(near.prev2));
-}
 
 /** Whether a kana word stands inside brackets that spell the reading of the word before them (悉曇（しったん）: しっ, た
  * and ん spell しったん): the bracket holds kana alone, and the one to four words before it read exactly that. */
-function senseSpelledReading(token, near) {
-  if (!near?.at || !READER_KANA.test(String(token?.s || ''))) return false;
-  const kana = (t) => !!t && READER_KANA.test(String(t.s || ''));
-  let open = -1, close = 1;
-  while (kana(near.at(open))) open -= 1;
-  while (kana(near.at(close))) close += 1;
-  if (!/^[（(]$/u.test(String(near.at(open)?.s || '')) || !/^[）)]$/u.test(String(near.at(close)?.s || ''))) return false;
-  let spelled = '';
-  for (let k = open + 1; k < close; k += 1) spelled += String(near.at(k).s || '');
-  spelled = kataToHira(spelled);
-  let read = '';
-  for (let back = 1; back <= 4 && near.at(open - back); back += 1) {
-    const word = near.at(open - back);
-    if (!word.r) return false;
-    read = kataToHira(String(word.r)) + read;
-    if (read === spelled) return true;
-  }
-  return false;
-}
 
 /** The must family, read whole (Grok 2029; the lead): なくてはいけない, なくてはならない, なければならない (なければいけない,
  * なければなりません, ねばならない), なくちゃ. After a verb's, an adjective's or the copula's stem the run is "have to do";
@@ -14464,114 +11682,8 @@ function senseSpelledReading(token, near) {
  * verb's place from the token, or null where no run starts there. */
 const SENSE_MUST_NOT = new Set(['ない', 'ず', 'ぬ', 'ん', 'ませ', 'なかっ', 'なく', 'なけれ', 'ね']);
 const SENSE_MUST_END = /^(?:[」』）)。、！？!?…]|よ|ね|な|わ|ぞ)$/u;
-function senseMustRun(near, h) {
-  const head = near.at(h);
-  if (!head) return null;
-  const s = String(head.s || ''), nai = ['ない', '無い'].includes(String(head.b || ''));
-  const word = (k) => String(near.at(h + k)?.s || '');
-  // the stem it follows: a verb's, an adjective's, an auxiliary's, or the copula's (でなければ, じゃなくちゃ)
-  const before = near.at(h - 1);
-  const stem = head.p === '助動詞' || ['動詞', '形容詞', '助動詞'].includes(before?.p) || ['で', 'じゃ'].includes(String(before?.s || ''));
-  let verb, expression;
-  if (nai && s === 'なく' && word(1) === 'て' && word(2) === 'は' && ['いけ', 'なら'].includes(word(3))) {
-    verb = 3;
-    expression = word(3) === 'いけ'
-      ? { s: 'なくてはいけない', b: 'なくてはいけない', r: 'なくてはいけない', seq: '2255320', k: stem ? 1 : 0 }
-      : { s: 'なくてはならない', b: 'なくてはならない', r: 'なくてはならない', seq: '2098150', k: stem ? 1 : 0 };
-  } else if (nai && s === 'なく' && ['ちゃ', 'っちゃ'].includes(word(1))) {
-    verb = ['いけ', 'なら'].includes(word(2)) ? 2 : null;
-    // bare, it is "have to" only where the sentence ends on it (考えなくちゃ」); before a clause it is "unless"
-    const must = stem && (verb !== null || !near.at(h + 2) || SENSE_MUST_END.test(word(2)));
-    expression = { s: 'なくちゃ', b: 'なくちゃ', r: 'なくちゃ', seq: '2098160', k: must ? 1 : 0 };
-  } else if (((nai && s === 'なけれ') || (head.b === 'ぬ' && s === 'ね')) && word(1) === 'ば' && ['なら', 'いけ', 'なり'].includes(word(2))) {
-    verb = 2;
-    expression = { s: 'なければならない', b: 'なければならない', r: 'なければならない', seq: '1632350', k: 0 };
-  } else return null;
-  // the verb is itself negated (ならない, ならぬ, ならん, なりません, いけません, ならなくなる)
-  if (verb !== null && !SENSE_MUST_NOT.has(word(verb + 1))) return null;
-  return { verb: verb === null ? null : h + verb, expression,
-    ownHead: (head.p === '形容詞' && !stem) || (expression.seq === '2098160' && verb === null) };
-}
 
 /** The expressions read whole: { s, b, r, seq, k } for the expression's door, or null. */
-function senseExpression(token, near) {
-  if (!near) return null;
-  const next = String(near.next?.s || ''), prev = String(near.prev?.s || ''), prev2 = String(near.prev2?.s || '');
-  const word = (offset) => String(near.at(offset)?.s || '');
-  // the must family (senseMustRun): the token is the run's verb, its existence ない or a bare なくちゃ; the run's ん is
-  // ぬ "not" (しなければならん), never the interjection the tokenizer's む is
-  for (let h = 0; h >= -4; h -= 1) {
-    const run = senseMustRun(near, h);
-    if (!run) continue;
-    if (run.verb === 0 || (h === 0 && run.ownHead)) return run.expression;
-    if (run.verb === -1 && token.s === 'ん' && token.b === 'む') return { s: 'ん', b: 'ん', r: 'ん', seq: '2441300', k: 0 };
-  }
-  // the explanatory ん is the particle (の); the auxiliary ん is negation (ませんでした, 知らん) and stays itself
-  // (and before じゃ: いうんじゃア, the explanatory ん of んじゃ, as Grok's row has it)
-  if (token.s === 'ん' && token.p !== '助動詞' && ['だ', 'だっ', 'だろ', 'だろう', 'じゃ', 'じゃあ', 'じゃア'].includes(next)) return { s: 'んだ', b: 'んだ', r: 'んだ', seq: '2849387' };
-  if (token.s === 'ん' && token.p !== '助動詞' && ['です', 'でし', 'でしょ'].includes(next)) return { s: 'んです', b: 'んです', r: 'んです', seq: '2087820' };
-  // いけない after ては/ちゃ is "must not" (its sense after the te-form); elsewhere "no good" (注意しないからいけない,
-  // なかなかいけない) — never いける "to be good (at)"; いけ after に/へ (学校へはいけない) may be 行ける "can go", and stays
-  if (token.b === 'いける' && token.s === 'いけ' && ['ない', 'ませ', 'ず'].includes(next)) {
-    if (['ちゃ', 'じゃ'].includes(prev) || (prev === 'は' && ['て', 'で'].includes(prev2))) return { s: 'いけない', b: 'いけない', r: 'いけない', seq: '1000730' };
-    const going = ['に', 'へ'].includes(prev) || (['は', 'も'].includes(prev) && ['に', 'へ'].includes(prev2));
-    if (!going) return { s: 'いけない', b: 'いけない', r: 'いけない', seq: '1000730', k: 2 };
-  }
-  // 床に就く, "to go to bed; to be laid up" (床についていて, 床 read とこ), never 就く "to take (a seat)" nor 点く "to be lit"
-  if (token.b === 'つく' && prev === 'に' && prev2 === '床' && kataToHira(String(near.prev2?.r || '')) === 'とこ') {
-    return { s: '床につく', b: '床につく', r: 'とこにつく', seq: '1854590' };
-  }
-  // について, "about" (日本について), never つく "to be attached" or "to be lit"; 床について + いる (taken to bed) stays つく
-  if (token.s === 'つい' && prev === 'に' && next === 'て' && !['い', 'いる', 'いた', 'いて', 'おり', 'おる'].includes(String(near.next2?.s || ''))) {
-    return { s: 'について', b: 'について', r: 'について', seq: '1009780' };
-  }
-  // にとって, "to; for; concerning" (私にとって), never とる "to have (e.g. lunch)" or "to take (e.g. a joke)"
-  if (token.s === 'とっ' && prev === 'に' && next === 'て') return { s: 'にとって', b: 'にとって', r: 'にとって', seq: '1009600' };
-  // ない in its idioms: 勿体ない "wasteful", 違いない "sure", 間もなく "soon" — never "nonexistent"
-  if (['ない', '無い'].includes(String(token.b || '')) && ['勿体', 'もったい'].includes(prev)) return { s: '勿体ない', b: '勿体ない', r: 'もったいない', seq: '1605250' };
-  if (['ない', '無い'].includes(String(token.b || '')) && ['違い', 'ちがい'].includes(prev)) return { s: '違いない', b: '違いない', r: 'ちがいない', seq: '1610740' };
-  if (token.s === 'なく' && prev === 'も' && prev2 === '間') return { s: '間もなく', b: '間もなく', r: 'まもなく', seq: '1215290' };
-  // and more of them (Grok 2029): 相違ない "without doubt; certain", 間違いない "certain; sure", 何度となく "time after
-  // time" (each of 何, 度 and なく), ともなく "without knowing (it)" (いつともなく), となく after a count the dictionary has no
-  // entry for (何遍となく, いくつとなく), そこはかとなく "somehow; faintly" (そこ, かと and なく: the tokenizer's そこ/は/かと/なく)
-  const nai = ['ない', '無い'].includes(String(token.b || ''));
-  if (nai && prev === '相違') return { s: '相違ない', b: '相違ない', r: 'そういない', seq: '2027060' };
-  if (nai && prev === '間違い') return { s: '間違いない', b: '間違いない', r: 'まちがいない', seq: '2006640', k: 0 };
-  const nando = (h) => word(h) === '何' && word(h + 1) === '度' && word(h + 2) === 'と' && word(h + 3) === 'なく';
-  if ([0, -1, -3].some(nando)) return { s: '何度となく', b: '何度となく', r: 'なんどとなく', seq: '2840609' };
-  if (nai && token.s === 'なく' && prev === 'も' && prev2 === 'と') return { s: 'ともなく', b: 'ともなく', r: 'ともなく', seq: '2137120' };
-  if (nai && token.s === 'なく' && prev === 'と' && (['何遍', '何回', 'いくつ', '幾つ'].includes(prev2)
-    || (prev2 === 'つ' && ['いく', '幾'].includes(word(-3))))) return { s: 'となく', b: 'となく', r: 'となく', seq: '2208050' };
-  const sokohaka = (h) => word(h) === 'そこ' && word(h + 1) === 'は' && word(h + 2) === 'かと' && word(h + 3) === 'なく';
-  if ([0, -2, -3].some(sokohaka)) return { s: 'そこはかとなく', b: 'そこはかとなく', r: 'そこはかとなく', seq: '2569820' };
-  // にかけて, a span (1月から3月にかけて), never かける "to hang up": かけ between に and て, with から before it
-  if (token.s === 'かけ' && ['かける', '掛ける', '懸ける', '架ける'].includes(String(token.b || '')) && prev === 'に' && next === 'て'
-    && (near.before || []).some((t) => t?.s === 'から')) return { s: 'にかけて', b: 'にかけて', r: 'にかけて', seq: '2034300', k: 0 };
-  // につき, never つく "to be attached": "per" by a count (記事につき三行, １団体につき), につきまして "regarding" (never
-  // 目につきました, "caught the eye")
-  if (token.s === 'つき' && token.b === 'つく' && prev === 'に') {
-    if (next === 'まし' && String(near.next2?.s || '') === 'て') return { s: 'につきまして', b: 'につきまして', r: 'につきまして', seq: '2872401' };
-    const counted = (t) => !!t && (SENSE_NUMBER.test(String(t.s || '')) || SENSE_NUMBER_WORD.has(String(t.s || '')));
-    if (counted(near.next) || counted(near.at(-3))) return { s: 'につき', b: 'につき', r: 'につき', seq: '1009850', k: 2 };
-  }
-  // 一発退場, sent off at once: 一発 "one try", never 発 the counter of gunshots; 性暴力, "sexual violence", never 性
-  // "nature (of a person)"
-  if (token.s === '発' && ['一', '１', '1'].includes(prev) && next === '退場') return { s: '一発', b: '一発', r: 'いっぱつ', seq: '1165730', k: 3 };
-  if (token.s === '性' && next === '暴力') return { s: '性暴力', b: '性暴力', r: 'せいぼうりょく', seq: '2456730' };
-  // 〜なりに, "in one's own way" (自分なりに), never the particle なり "or" nor 也's "sum of money"; a listing's last なり
-  // before に (父母なり友なりに) is still the listing's
-  if (token.s === 'なり' && ['接尾辞', '助詞'].includes(token.p) && next === 'に' && !(near.before || []).some((t) => t?.s === 'なり')) {
-    return { s: 'なりに', b: 'なりに', r: 'なりに', seq: '2038230' };
-  }
-  // 一枚岩, the idiom (monolith; unity), never 枚 the counter of flat things
-  if (token.s === '枚' && prev === '一' && next === '岩') return { s: '一枚岩', b: '一枚岩', r: 'いちまいいわ', seq: '1166750' };
-  // 〜方がいい after a verb: "had better", after a negative "had better not" (しない方がいい), never one side of a comparison
-  if (token.s === '方' && kataToHira(String(token.r || '')) === 'ほう' && next === 'が' && ['動詞', '助動詞'].includes(near.prev?.p)
-    && ['いい', 'よい', '良い', 'よかっ', '良かっ'].includes(String(near.next2?.s || ''))) {
-    return { s: '方がいい', b: '方がいい', r: 'ほうがいい', seq: '2160680', k: ['ない', 'ぬ', 'ん'].includes(prev) ? 1 : 0 };
-  }
-  return null;
-}
 
 /** The glosses of one sense of a detail entry, as JMdict lists them. */
 const senseGlosses = (sense) => (sense?.[10] || []).map((gloss) => String(gloss?.[0] || '')).filter(Boolean);
@@ -14579,226 +11691,31 @@ const senseGlosses = (sense) => (sense?.[10] || []).map((gloss) => String(gloss?
 /** The sense a word in its text uses (the section's rules): { seq, k, glosses, why, left, entry } — entry true when it is
  * another entry than the door's own — or { door } for an expression read whole or a name, { need: { forms, shards } }
  * while rows or senses are still to come, null when there is nothing to choose. */
-function senseChoice(token, door) {
-  if (!door || door.te || door.senseName) return null;
-  const near = senseNeighbours(token);
-  // a reading, not a word: the kana the text spells a word's reading in after it (悉曇（しったん）: never 知る "to know"
-  // for しっ, nor "yes" for ん, whatever entry its kana could name), or one the sidecar names. It has no dictionary
-  // meaning; its card shows the text's own form
-  const asReading = (why) => ({ door: { ...door, s: token.s, b: token.s, r: token.r, seq: undefined, senseName: true, inflected: undefined,
-    unfit: undefined, several: undefined, noFit: undefined, readMiss: undefined, sense: { name: true, reading: true, why: [why] } } });
-  if (senseSpelledReading(token, near)) return asReading('reading');
-  if (door.kanjiOnly || door.noFit) return null;
-  // the sidecar is asked for with its article; a word tapped before it came waits for it (ensureSense)
-  if (near?.passage && D.senseSidecar === undefined) return { need: { forms: [], shards: [] } };
-  const side = sidecarSense(near);
-  if (side?.reading) return asReading(`sidecar:${side.source}`);
-  const expression = senseExpression(token, near);
-  if (expression) {
-    if (!dictionaryAnsweredForm(expression.b)) return { need: { forms: [expression.b], shards: [] } };
-    const row = dictionaryRowsReadAs(expression.b, expression.r).find((candidate) => String(candidate[0]) === expression.seq);
-    const detail = row ? D.dictionaryDetails?.get(expression.seq) : null;
-    if (row && !detail) return { need: { forms: [], shards: [dictionaryShardId(expression.seq)] } };
-    if (!detail) return null;
-    // the sidecar's sense of the expression where it names one (一枚岩: the rock, or unity); else the expression's own
-    // (方がいい after a negative: "had better not"), else the sense noted as following the te-form (いけない: "must
-    // not"), else its first (んだ, んです: their one sense)
-    const sided = side?.seq === expression.seq && detail[3][side.k] ? side : null;
-    const k = sided ? sided.k : Number.isInteger(expression.k) ? expression.k
-      : Math.max(0, detail[3].findIndex((sense) => (sense[8] || []).some((note) => TE_FORM_NOTE.test(String(note)))));
-    const sense = { seq: expression.seq, k, glosses: senseLed(senseGlosses(detail[3][k]), sided?.lead),
-      why: sided ? ['expression', `sidecar:${sided.source}`] : ['expression'], left: 1, entry: true };
-    return { door: { ...door, s: expression.s, b: expression.b, r: expression.r, seq: expression.seq, sense, inflected: undefined, unfit: undefined, several: undefined } };
-  }
-  if (side?.name) return { door: { ...door, senseName: true, sense: { name: true, why: [`sidecar:${side.source}`] } } };
-  const form = String(door.b || ''), reading = kataToHira(String(tokenReading(door) || ''));
-  if (!form || !reading) return null;
-  if (!dictionaryAnsweredForm(form)) return { need: { forms: [form], shards: [] } };
-  // a grammar word (an auxiliary verb, a suffix, a prefix) is only ever an entry headed by its own spelling, as the
-  // lookup door has always chosen (ます is never 升 "measuring container"), or — written in kana — one JMdict usually
-  // writes in kana (the classical copula なり: 也); a counter after a number may be one written otherwise and read
-  // alike (一つ's つ: 箇, the general counter)
-  const helper = LOOKUP_HELPER_POS.has(token.p);
-  const counting = token.p === '接尾辞' && senseNumberBefore(near);
-  const read = dictionaryRowsReadAs(form, reading);
-  const hasCounter = (row) => (D.dictionaryDetails?.get(String(row[0]))?.[3] || []).some((sense) => (sense[0] || []).includes('ctr'));
-  // the door's own entry: the one it names, else the one whose meaning the quick dictionary gives (お: 御, the polite prefix)
-  const shown = door.seq ? null : D.dict?.[form]?.m?.[0];
-  const mine = (row) => (door.seq ? String(row[0]) === String(door.seq) : !!shown && (row[6] || []).includes(shown));
-  const usuallyKana = (row) => READER_KANA.test(form) && (D.dictionaryDetails?.get(String(row[0]))?.[3] || []).some((sense) => (sense[7] || []).includes('uk'));
-  const rows = read.filter((row) => !helper || row[1] === form || mine(row) || usuallyKana(row) || (counting && hasCounter(row)))
-    .sort((a, b) => mine(b) - mine(a));
-  const asked = helper || counting ? read : rows;
-  const missing = asked.filter((row) => !D.dictionaryDetails?.get(String(row[0])));
-  if (missing.length) return { need: { forms: [], shards: [...new Set(missing.map((row) => dictionaryShardId(row[0])))] } };
-  if (!rows.length) return null;
-  let pairs = rows.flatMap((row, r) => (D.dictionaryDetails.get(String(row[0]))[3] || [])
-    .map((sense, k) => ({ row, r, k, sense, seq: String(row[0]) })));
-  // the sense the slip has shown: the door's own entry's sense holding the meaning it shows (the quick dictionary's
-  // first gloss for a spelling it has), else its first
-  const own = (pair) => pair.r === 0 && mine(pair.row);
-  const before = pairs.find((pair) => own(pair) && shown && senseGlosses(pair.sense).includes(shown)) || pairs.find(own) || pairs[0];
-  // candidates: the senses the rules left, [entry, sense], in order (the sidecar's builder asks two models among these)
-  const result = (pair, why) => ({ seq: pair.seq, k: pair.k, glosses: senseGlosses(pair.sense), why, left: pairs.length,
-    entries: new Set(pairs.map((candidate) => candidate.seq)).size, entry: !own(pair),
-    candidates: pairs.map((candidate) => [candidate.seq, candidate.k]) });
-  if (side) {
-    const hit = pairs.find((pair) => pair.seq === side.seq && pair.k === side.k);
-    if (hit) {
-      const chosen = result(hit, [`sidecar:${side.source}`]);
-      return Number.isInteger(side.lead) ? { ...chosen, glosses: senseLed(chosen.glosses, side.lead), lead: side.lead } : chosen;
-    }
-  }
-  // the rules, each a test a sense passes or fails; the shown sense stays while it passes them all
-  const pos = (pair) => pair.sense[0] || [];
-  const written = READER_KANA.test(form) ? '' : form;
-  const bracket = senseWeekdayBracket(token, near);
-  const weekday = (pair) => senseGlosses(pair.sense).some((gloss) => SENSE_WEEKDAY.test(gloss));
-  // a month counted: 月 read つき after a number (一月 ひとつき) or before に and a number (月に五十円), never the Moon
-  const month = form === '月' && reading === 'つき' && (senseNumberBefore(near)
-    || (String(near?.next?.s || '') === 'に' && SENSE_NUMBER.test(String(near?.next2?.s || ''))));
-  const rules = [
-    ['reading', (pair) => {
-      const kana = pair.sense[2] || [], kanji = pair.sense[1] || [];
-      return (!kana.length || kana[0] === '*' || kana.some((r) => kataToHira(String(r)) === reading))
-        && (!written || !kanji.length || kanji[0] === '*' || kanji.includes(written));
-    }],
-    ...(counting ? [['counter', (pair) => pos(pair).some((code) => code === 'ctr' || code === 'suf' || code === 'n-suf')]] : []),
-    ['weekday', (pair) => (bracket ? weekday(pair) : !weekday(pair))],
-    ...(month ? [['month', (pair) => senseGlosses(pair.sense).includes('month')]] : []),
-    ...(senseNegation(token, near) ? [['negation', (pair) => pos(pair).includes('aux-adj')]] : []),
-    ...(SENSE_CLASS[token.p] ? [['class', (pair) => SENSE_CLASS[token.p](pos(pair))]] : []),
-  ];
-  if (before && rules.every(([, test]) => test(before))) return result(before, []);
-  // the shown sense fails: each rule narrows the senses in turn, keeping at least one; within an entry a late sense
-  // (archaic, obsolete, rare, dated, slang, vulgar) comes after the others; across entries the door's own first, then —
-  // for a word written in kana — an entry JMdict usually writes in kana
-  const why = [];
-  for (const [name, test] of rules) {
-    const fit = pairs.filter(test);
-    if (fit.length && fit.length < pairs.length) { pairs = fit; why.push(name); }
-  }
-  const late = (pair) => (pair.sense[7] || []).some((code) => SENSE_LATE.has(code));
-  const kanaWord = (pair) => READER_KANA.test(String(token.s || '')) && (D.dictionaryDetails.get(pair.seq)[3] || []).some((sense) => (sense[7] || []).includes('uk'));
-  pairs = pairs.map((pair, at) => ({ pair, at }))
-    .sort((a, b) => (own(b.pair) - own(a.pair)) || (kanaWord(b.pair) - kanaWord(a.pair)) || a.pair.r - b.pair.r
-      || late(a.pair) - late(b.pair) || a.at - b.at)
-    .map(({ pair }) => pair);
-  return result(pairs[0], why);
-}
 
 /** A door with the sense its text uses (senseChoice): an expression read whole or a name is its own door; another
  * entry, when the word's own has no sense left, is named by its entry number; a door that named several entries names
  * one only when one entry is left. Any other door is unchanged. */
-function senseDoor(token, door) {
-  const choice = senseChoice(token, door);
-  if (!choice || choice.need) return door;
-  if (choice.door) return choice.door;
-  if (door.several && choice.entries > 1) return door;
-  // a door keeps its identity (the quick dictionary's word, or its named entry) unless a rule or the sidecar moved its
-  // sense to another entry; a door that named several entries is named by the one left
-  const renamed = door.several || (choice.why.length > 0 && choice.entry && !senseIsQuick(door, choice.seq));
-  return { ...door, ...(renamed ? { seq: choice.seq, several: undefined } : {}), sense: choice };
-}
 
 /** Whether an entry is the one the quick dictionary answers for this door: the entry read alike whose glosses hold the
  * meaning the quick dictionary gives for its spelling. */
-function senseIsQuick(door, seq) {
-  const shown = !door.seq && D.dict?.[door.b]?.m?.[0];
-  if (!shown) return false;
-  const row = dictionaryRowsReadAs(door.b, tokenReading(door)).find((candidate) => (candidate[6] || []).includes(shown));
-  return !!row && String(row[0]) === String(seq);
-}
 
 /** A record shaped by its door's sense: the chosen sense's glosses first, then the rest (every one the entry's own);
  * its glosses ride as senseGlosses for the slip's second line. A name has no dictionary meaning. */
-function senseRecord(rec, sense) {
-  if (!sense) return rec;
-  if (sense.name) return { r: rec?.r || '', m: [sense.reading ? tx('この文では読み方', 'a reading in this text') : tx('この文では名前', 'a name in this text')], senseName: true,
-    senseKind: sense.reading ? 'reading' : 'name' };
-  if (!rec || !Array.isArray(sense.glosses) || !sense.glosses.length) return rec;
-  return { ...rec, m: [...new Set([...sense.glosses, ...(rec.m || [])])], senseGlosses: sense.glosses, sense: { seq: sense.seq, k: sense.k } };
-}
 
 /** R3's special cards (the lead's ruling, 2026-10-19; V-07): a token the card says is a name in this text, or a reading
  * the text quotes, is not a word to review. Its Save is held, and says why in one quiet line, wherever a held Save explains
  * itself (the slip, the hold's strip, the bar). */
-function senseNameHeldText(kind) {
-  return kind === 'reading' ? tx('文中に引かれた読み方で、復習する語ではありません。', 'A reading quoted in the text, not a word to review.')
-    : tx('この文の名前で、復習する語ではありません。', 'A name in this text, not a word to review.');
-}
 
 /** The quiet second line itself: one line, never more (a long gloss ends in "…"; the page lists it whole), so the slip
  * grows by one line at most and Save ▾'s menu still unfolds inside it on a phone. */
-function senseMoreElement(text) {
-  const more = el('span', 'mini-gloss-more', text);
-  more.lang = 'en';
-  more.title = text;
-  Object.assign(more.style, { fontWeight: '400', color: 'var(--mini-head-ink-2)', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden',
-    textOverflow: 'ellipsis', maxWidth: '100%' });
-  return more;
-}
 
 /** The second line of a sense on the slip: its next glosses, at most two more, while the line stays short. */
-function senseMoreLine(glosses) {
-  const more = [];
-  for (const gloss of (glosses || []).slice(1, 3)) {
-    if ([...more, gloss].join('; ').length > 64 && more.length) break;
-    more.push(gloss);
-  }
-  return more.join('; ');
-}
 
 /** Ask for what a word's sense needs (its rows, its entries' senses, the sidecar) until it is answered. */
-async function ensureSense(token, door) {
-  await ensureSenseSidecar();
-  for (let round = 0; round < 4; round += 1) {
-    const need = senseChoice(token, door)?.need;
-    if (!need) return;
-    await Promise.all([...need.forms.map((form) => ensureDictionaryRowsForForm(form)), ...need.shards.map((id) => ensureDictionaryShard(id))]);
-  }
-}
 
 /** A slip drawn before its word's sense was at hand: marked pending, then drawn again with it if it is still the open
  * slip and nobody has touched it (a press or a key inside it: a menu opened, Save pressed, a pane open stay as they are;
  * the sense shows on the next look). */
-function senseRefine(token, door, slip, redraw, anchor = null) {
-  if (!slip || !senseChoice(token, door)?.need) return;
-  slip.dataset.sense = 'pending';
-  let touched = false, pressing = false;
-  const touch = () => { touched = true; };
-  const press = () => { touched = true; pressing = true; };
-  const lift = () => { pressing = false; };
-  slip.addEventListener('pointerdown', press, { capture: true });
-  slip.addEventListener('keydown', touch, { capture: true });
-  window.addEventListener('pointerup', lift, true);
-  window.addEventListener('pointercancel', lift, true);
-  const after = () => {
-    // Hfix-1A · a press still down on the slip lands first (its click opens Save's menu or keeps the word); its meaning
-    // arrives after it, in place
-    if (pressing && slip.isConnected) { afterPressLands(after); return; }
-    slip.removeEventListener('pointerdown', press, { capture: true });
-    slip.removeEventListener('keydown', touch, { capture: true });
-    window.removeEventListener('pointerup', lift, true);
-    window.removeEventListener('pointercancel', lift, true);
-    // a sense that cannot be had (the dictionary cannot answer) is not waited for again: the word's own meaning stands
-    if (senseChoice(token, door)?.need) SENSE_GAVE_UP.add(token);
-    if (!slip.isConnected) return;
-    const waiting = !!slip.querySelector('[data-sense-wait]');
-    // a word the sense leaves as it was (no sense chosen; several entries still named) keeps its slip untouched
-    if (senseDoor(token, door) === door && !waiting) { delete slip.dataset.sense; return; }
-    // brought up to its sense in place where its word and entry stay; drawn again only where they move — and a slip still
-    // at its placeholder is never left there, touched or not. Hfix-1A (the lead's item 18): a slip a press has touched
-    // (Save pressed, its menu open) is never drawn again; its meaning lands in place, the word's own where the sense
-    // belongs to another door
-    if ((!touched || waiting) && document.getElementById('mini') === slip && !sensePatch(slip, token, door, anchor)) {
-      if (touched) senseFillInPlace(slip);
-      else redraw();
-    }
-    else delete slip.dataset.sense;
-  };
-  ensureSense(token, door).then(after, after);
-}
 /** Hfix-1A · run `then` once the press now down has landed: after its click (its own act first), on its cancel, or at
  * most 800 ms on (a press that never clicks: a drag off its button). */
 function afterPressLands(then) {
@@ -14818,19 +11735,6 @@ function afterPressLands(then) {
 /** Hfix-1A · a touched slip still at its placeholder, whose sense cannot be brought in place: its meaning line takes the
  * word's own meaning where the "…" stood (the meaning that stands when a sense cannot be had), nothing else moves. */
 const SLIP_OWN_MEANING = new WeakMap();
-function senseFillInPlace(slip) {
-  const wait = slip.querySelector('.mini-gloss[data-sense-wait]');
-  const own = SLIP_OWN_MEANING.get(slip);
-  delete slip.dataset.sense;
-  if (!wait || !own) return;
-  wait.className = 'mini-gloss';
-  delete wait.dataset.senseWait;
-  wait.style.removeProperty('font-weight');
-  wait.style.removeProperty('color');
-  if (!wait.getAttribute('style')) wait.removeAttribute('style');
-  wait.textContent = own;
-  slip.removeAttribute('aria-busy');
-}
 /** Hfix-1A · a meaning still to come lands in place (the lead's item 18: Saved ✓ pressed as the sense arrived met the word
  * band, which dove into the page, 3–4 times in 5 on a cold page): from first paint the band keeps the room the word's own
  * meaning takes, its line and, where it has more, its quiet second line. The room is measured on hidden copies set and
@@ -14903,13 +11807,6 @@ const SLIP_NODE = new WeakMap();
 
 /** A lookup word's sense, waited for a moment at most (SENSE_WAIT_MS, as a reading's answer is): whether it is at hand. */
 const SENSE_WAIT_MS = 400;
-async function senseWithin(token, door, ms = SENSE_WAIT_MS) {
-  if (!senseChoice(token, door)?.need) return true;
-  let timer = null;
-  await Promise.race([ensureSense(token, door).catch(() => {}), new Promise((resolve) => { timer = setTimeout(resolve, ms); })]);
-  clearTimeout(timer);
-  return !senseChoice(token, door)?.need;
-}
 
 /** The sense each word's slip showed, by the word in its text: the page that word opens marks it (heroSource). */
 const SENSE_BY_ANCHOR = new WeakMap();
@@ -14966,44 +11863,11 @@ function senseLaterDraw(anchor) {
  * in kana, read alike by several words — the one the quick dictionary teaches earliest (its JLPT level). Each step
  * keeps at least one (おく: 奥, 億, 置く → 置く; いう: 結う, 言う → 言う; くる: 繰る, 来る → 来る); a tie stays the full
  * entry's explicit choice (きる: 切る and 着る, both N5). */
-function narrowLemmaEntries(rows, reading, form, pos = '') {
-  const wanted = kataToHira(String(reading || ''));
-  const level = (row) => Number(String(D.dict?.[row[1]]?.jlpt || '').match(/^N?([1-5])$/u)?.[1] || 0);
-  const steps = [
-    pos === '動詞' ? (row) => (row[6] || []).some((gloss) => /^to /u.test(String(gloss))) : null,
-    pos === '形容詞' ? (row) => [row[1], ...row[4]].some((spelling) => /i-adjective|adj-ix|adj-ku/u.test(String(D.dict?.[spelling]?.p || ''))) : null,
-    (row) => kataToHira(String(row[2] || '')) === wanted,
-    (row) => row[1] === form,
-    READER_KANA.test(String(form)) ? (row, kept) => level(row) > 0 && level(row) === Math.max(...kept.map(level)) : null,
-  ];
-  let kept = rows;
-  for (const step of steps) {
-    if (!step || kept.length < 2) continue;
-    const fit = kept.filter((row) => step(row, kept));
-    if (fit.length) kept = fit;
-  }
-  return kept;
-}
 
 /** The entries (at hand) that write `form` and read it `reading`, by that reading's own restriction (readerReadingFits). */
-function dictionaryRowsReadAs(form, reading) {
-  const wanted = kataToHira(String(reading || ''));
-  return wanted ? dictionaryRowsForForm(form).filter((row) => row[5].some((kana, k) => kataToHira(kana) === wanted && readerReadingFits(row, k, form))) : [];
-}
 
 /** R2 · a lemma door read so by no entry: a サ変 dictionary form's other spelling (解する read げする is 解す read げす,
  * 応ずる read おうずる is 応じる read おうじる), when the quick dictionary or one entry at hand reads it so. */
-function alternateLemmaDoor(door) {
-  const pairs = [[/する$/u, 'す', /する$/u, 'す'], [/ずる$/u, 'じる', /ずる$/u, 'じる']];
-  for (const [spelt, written, read, reading] of pairs) {
-    if (!spelt.test(door.b) || !read.test(door.r)) continue;
-    const b = door.b.replace(spelt, written), r = door.r.replace(read, reading);
-    if (D.dict?.[b] && kataToHira(String(D.dict[b].r || '')) === kataToHira(r)) return { ...door, s: b, b, r };
-    const rows = narrowLemmaEntries(dictionaryRowsReadAs(b, r), r, b, door.p);
-    if (rows.length === 1) return { ...door, s: b, b, r, seq: String(rows[0][0]) };
-  }
-  return null;
-}
 
 /** R2 (addendum 1) · the readings a sound change in a compound comes from, those keeping the text's voicing first: a
  * final っ undone (いっ → いち, はっ → はち, じゅっ → じゅう), then a voiced or ぱ-row first kana made plain (ぽん, ぼん →
@@ -15012,19 +11876,8 @@ function alternateLemmaDoor(door) {
  * never ふつ, France: Codex's f2e3015e review). */
 const SOUND_VOICED = 'がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ';
 const SOUND_PLAIN = 'かきくけこさしすせそたちつてとはひふへほはひふへほ';
-function soundChangeReadings(reading, listed = []) {
-  const r = kataToHira(String(reading || ''));
-  const plain = (text) => { const at = SOUND_VOICED.indexOf(text[0]); return at >= 0 ? SOUND_PLAIN[at] + text.slice(1) : ''; };
-  const undone = r.endsWith('っ') ? [...'ちつくきう'].map((end) => r.slice(0, -1) + end) : [];
-  const out = [...new Set([...undone, plain(r), ...undone.map(plain)])].filter((text) => text && text !== r);
-  return undone.some((text) => listed.includes(text)) ? out.filter((text) => undone.includes(text)) : out;
-}
 
 /** The readings the kanji data lists for one kanji, in hiragana (on and kun; a kun reading's okurigana mark dropped). */
-function kanjiReadingsOf(char) {
-  const k = D.kanji?.[char];
-  return k ? { on: (k.on || []).map((on) => kataToHira(String(on))), kun: (k.kun || []).map((kun) => String(kun).replace(/\./gu, '')) } : null;
-}
 
 /** R2 (addendum 1, 2) · a word no entry is read the text's way for, once the full dictionary has answered: a sound change
  * of an entry's reading names that entry, by the entry's own reading, and its card still shows the text's (一 read いっ
@@ -15032,67 +11885,15 @@ function kanjiReadingsOf(char) {
  * (仏 read ぶつ is not 仏 ふつ, France), nor by a voicing change once undoing the っ alone gives one (仏 read ぶっ); a lone
  * kanji read by one of its on'yomi, or a sound change of one (寺 じ, 国 こく, 所 じょ, 仏 ぶっ), is that kanji (kanjiOnly:
  * its meaning from the kanji data, its page, its Save). null when neither holds. */
-function soundChangeDoor(door) {
-  const own = kataToHira(String(door.r || ''));
-  const lone = [...String(door.b || '')].length === 1 ? kanjiReadingsOf(door.b) : null;
-  if (!own) return null;
-  if (!lone || ![...lone.on, ...lone.kun].includes(own)) {
-    for (const reading of soundChangeReadings(own, lone ? [...lone.on, ...lone.kun] : [])) {
-      if (D.dict?.[door.b] && kataToHira(String(D.dict[door.b].r || '')) === reading) return { ...door, r: reading, shown: door.r };
-      const named = D.dict?.[door.b] ? lookup(door.b, null, reading)?.seq : null;
-      if (named) return { ...door, r: reading, shown: door.r, seq: String(named) };
-      const rows = D.dict?.[door.b] ? [] : dictionaryRowsReadAs(door.b, reading);
-      if (rows.length === 1) return { ...door, r: reading, shown: door.r, seq: String(rows[0][0]) };
-    }
-  }
-  if (lone && [own, ...soundChangeReadings(own)].some((reading) => lone.on.includes(reading))) return { ...door, kanjiOnly: true };
-  return null;
-}
 
 /** R2 (addendum 1, 2) · the same answer for a reader word the lookup door opens (a counter, a suffix, an ending): with no
  * entry read the text's way, { reading, shown } names the entry a sound change comes from, or { kanjiOnly } the lone
  * kanji; {} otherwise. The form's rows must be at hand (openJapaneseLookup asks for them first). */
-function readerLookupAnswer(text, context = {}) {
-  const reading = String(context.reading || '');
-  if (!reading || !dictionaryAnsweredForm(text) || japaneseLookupRecord(text, context)) return {};
-  const lone = [...String(text)].length === 1 ? kanjiReadingsOf(text) : null;
-  const own = kataToHira(reading);
-  if (!lone || ![...lone.on, ...lone.kun].includes(own)) {
-    for (const variant of soundChangeReadings(own, lone ? [...lone.on, ...lone.kun] : [])) {
-      if (japaneseLookupRecord(text, { ...context, reading: variant })) return { reading: variant, shown: reading };
-    }
-  }
-  if (lone && [own, ...soundChangeReadings(own)].some((variant) => lone.on.includes(variant))) return { kanjiOnly: true };
-  return {};
-}
 
 /** Whether a reading needs the full dictionary: the quick one lacks the spelling, or reads it otherwise. */
-function readingAsksIndex(form, reading) {
-  if (!form || !reading) return false;
-  const core = D.dict?.[form];
-  return !core || kataToHira(String(core.r || '')) !== kataToHira(String(reading));
-}
 
 /** Ask the full dictionary for a token's spelling when its own reading needs it and the form's rows are not at
  * hand: a promise that settles once they are, or once the index cannot answer; null when nothing needs asking. */
-function readyTokenReading(token) {
-  const door = readingForm(token);
-  const forms = new Set();
-  // R2 · a door the quick dictionary cannot answer for (another class's word read alike) asks the full one too
-  if (readingAsksIndex(door.b, tokenReading(door)) || door.unfit) forms.add(door.b);
-  // R2 · an inflected word the quick dictionary does not settle asks for its dictionary form's rows (they may read it, or
-  // name its entry), and a する/ずる form the quick dictionary lacks for its other spelling too (解する → 解す)
-  if (token?.b && token.b !== token.s && (!D.dict?.[token.b] || door.b !== token.b)) {
-    forms.add(token.b);
-    if (!D.dict?.[token.b]) forms.add(token.b.replace(/する$/u, 'す').replace(/ずる$/u, 'じる'));
-  }
-  const asked = [...forms].filter((form) => form && !dictionaryAnsweredForm(form));
-  // N2 · a te-form auxiliary asks for the rows and the senses its answer needs (teFormAnswer)
-  const auxiliary = teFormAnswer(token, door)?.need ? ensureTeFormAnswer(token, door) : null;
-  if (!asked.length && !auxiliary) return null;
-  return Promise.all([...asked.map((form) => ensureDictionaryRowsForForm(form)), ...(auxiliary ? [auxiliary] : [])])
-    .then(() => undefined, () => undefined);
-}
 
 /** The token a word door stands for. One whose own reading the quick dictionary does not carry stands, by entry
  * number (seq), for the entry read that way: on a spelling the quick dictionary has, the full dictionary's first
@@ -15100,46 +11901,8 @@ function readyTokenReading(token) {
  * missing; it was the form's first row, whose meaning belonged to another reading); on a spelling it lacks, only the
  * one entry so read and so permitted (several stay the full entry's explicit choice, D11). Until the form's rows are
  * at hand, and for every other token, it is the token as it was. */
-function readingToken(token) {
-  // R3 · and the door carries the sense its text uses (senseDoor)
-  return senseDoor(token, readingTokenEntry(token));
-}
 
 /** readingToken's door before its sense: the entry the token's reading names (R, R2, N2). */
-function readingTokenEntry(token) {
-  // R2 · the door is the token as its dictionary form, read the way the text reads it (readingForm)
-  const door = readingForm(token);
-  // N2 · a te-form auxiliary is its auxiliary's entry, once JMdict's senses for it are at hand (teFormAnswer)
-  const auxiliary = teFormAnswer(token, door)?.door;
-  if (auxiliary) return auxiliary;
-  const own = tokenReading(door);
-  if (!own || (door.seq != null && door.seq !== '') || (!readingAsksIndex(door.b, own) && !door.unfit) || !D.dictionaryIndex) return door;
-  const rows = dictionaryRowsForForm(door.b);
-  // R2 · once the full dictionary has answered for the spelling, a word no entry is read so for may still be named: a
-  // dictionary form's other spelling (解する → 解す), a sound change of an entry's reading (いっ → いち), a lone kanji (寺 じ)
-  const unnamed = () => (!dictionaryAnsweredForm(door.b) ? door
-    : door.inflected ? alternateLemmaDoor(door) || door : soundChangeDoor(door) || door);
-  if (!rows.length) return unnamed();
-  // N · an entry read otherwise counts as missing: the door names the full dictionary's entry read the token's way, or
-  // none — never the form's first row, whose meaning belongs to another reading (訳 read やく is not わけ · reason)
-  if (D.dict[door.b] && !door.unfit) {
-    const named = lookup(door.b, null, own)?.seq;
-    return named ? { ...door, seq: String(named) } : unnamed();
-  }
-  // a spelling the core lacks: only the one entry that lists this reading and permits it with this spelling, by that
-  // reading's own restriction (readerReadingFits); several stay the full entry's explicit choice (D11's own matcher).
-  // R2 · for a dictionary form, several narrow to the one that fits the token (おく: 置く, never 奥 or 億)
-  let read = dictionaryRowsReadAs(door.b, own);
-  // R2 · an unfit door's entry is a verb, never the noun read alike (かえる: 帰る, 変える, 返る, 替える — never 蛙)
-  if (door.unfit) read = read.filter((row) => (row[6] || []).some((gloss) => /^to /u.test(String(gloss))));
-  // N2 · and so does an unfit word itself (a kana いる: 居る, the entry headed いる, never 要る or 射る)
-  if ((door.inflected || door.unfit) && read.length > 1) read = narrowLemmaEntries(read, own, door.b, door.p);
-  // several left: the card names them (the narrowed ones: 炊く · 焚く for a verb, never the nouns 卓 · 宅)
-  if (read.length === 1) return { ...door, seq: String(read[0][0]) };
-  if (read.length) return { ...door, several: [...new Set(read.map((row) => row[1]))] };
-  // an unfit door no verb is read so for (Kawaguchi's 同じかるべき: かり is only nouns) says so, never the nouns' names
-  return door.unfit && dictionaryAnsweredForm(door.b) ? { ...door, noFit: true } : unnamed();
-}
 
 /** A word slip for a token whose own reading needs the full dictionary. With the dictionary open, its answer is a
  * moment away and the slip waits for it (READING_WAIT_MS at most); with the dictionary still to open, the slip comes
@@ -15214,152 +11977,37 @@ function openReadingSlip(anchor, token, draw) {
 
 /** Source indices remain those of the original article. A displayed name can cover several
  * segmenter pieces, so an old bookmark on any of them still finds that same visible word. */
-function readerTokenAtIndex(index, reader = document.getElementById('reader')) {
-  const sourceIndex = Number(index);
-  if (!reader || !Number.isInteger(sourceIndex) || sourceIndex < 0) return null;
-  return reader.querySelector(`.tok[data-index="${sourceIndex}"]`) ||
-    [...reader.querySelectorAll('.tok[data-index-end]')].find(token =>
-      Number(token.dataset.index) <= sourceIndex && sourceIndex <= Number(token.dataset.indexEnd)) || null;
-}
 
 /** A foreign name such as ジャラマナ must not borrow マナ's unrelated dictionary sense.
  * Join only contiguous noun pieces of at least two Katakana characters where the grader
  * excluded a piece. Ordinary content compounds and short classical kana stay as authored.
  * This is a display plan: no original token, paragraph index or source digest is rewritten. */
-function readerRenderedTokens(p, crossRefs) {
-  const result = [];
-  const breaks = new Set(p.paras || []);
-  const katakanaNoun = token => token?.p === '名詞' && /^[\p{Script=Katakana}ー]{2,}$/u.test(token.s || '');
-  const bounded = index => breaks.has(index) || crossRefs?.doors.has(index) || crossRefs?.skip.has(index);
-  for (let index = 0; index < p.tokens.length; index += 1) {
-    const original = p.tokens[index];
-    let end = index;
-    if (katakanaNoun(original) && !crossRefs?.doors.has(index) && !crossRefs?.skip.has(index)) {
-      while (end + 1 < p.tokens.length && !bounded(end + 1) && katakanaNoun(p.tokens[end + 1])) end += 1;
-    }
-    const pieces = p.tokens.slice(index, end + 1);
-    if (end > index && pieces.some(piece => !piece.c)) {
-      const surface = pieces.map(piece => piece.s).join('');
-      result.push({ index, token: { s: surface, b: surface, p: '名詞', r: pieces.map(piece => piece.r || '').join(''),
-        f: [{ t: surface }], c: false, readerSourceEnd: end } });
-      index = end;
-    } else result.push({ index, token: original });
-  }
-  return result;
-}
 
 /** N · the quick record as the text reads the word: an entry read otherwise counts as missing (the lead, 2026-10-17),
  * so no line or spoken state lends another reading's meaning (訳 read やく never says わけ's "reason"). An inflected
  * word answers by its dictionary form, as before. */
-function readerQuickRecordAsRead(token, record = readerQuickRecord(token)) {
-  const own = !token.b || token.b === token.s ? String(token.r || '') : '';
-  return record && own && record.r && kataToHira(String(record.r)) !== kataToHira(own) ? null : record;
-}
 
 /** N · the miss said for a word whose entries at hand are all read otherwise: once the full dictionary has answered for
  * the spelling and names none read the text's way, "No dictionary entry for this reading."; until then, the quick
  * dictionary's own miss. */
-function readerReadingMissText(form = '') {
-  if (dictionaryAnsweredForm(form) && dictionaryRowsForForm(form).length) return tx('この読みの辞書項目はありません。', 'No dictionary entry for this reading.');
-  return readerGlossMissText(form);
-}
 
 /** N · the full dictionary has answered for this spelling: its index is in, and the spelling's rows are complete. */
-function dictionaryAnsweredForm(form = '') {
-  return !!form && !!D.dictionaryIndex && (D.dictionaryMode === 'main' || !!D.dictionaryCompleteForms?.has(String(form)));
-}
 
 /** The line under a content word on the ladder's English rung: its gloss, or nothing where it has none (Ladder R2: never the
  * dash). N · a word whose entry at hand is read otherwise shows nothing until the full dictionary answers, then that
  * answer's gloss if it has one read so. */
 /** R2 · a reader word's gloss speaks for its door (readingToken): an inflected word's dictionary form read the text's
  * way, a sound change's entry, a lone kanji's meaning; '' when the entry at hand has none read so. */
-function readerDoorGloss(door) {
-  const kanji = door.kanjiOnly ? D.kanji?.[door.b] : null;
-  if (kanji) return String(kanji.m || '').toLowerCase();
-  const record = readerQuickRecordAsRead(door);
-  return record?.m?.length ? inlineGloss(record) : '';
-}
 const readerTokenGloss = (token) => readerDoorGloss(readingToken(token));
 /** Ladder R4 · the English row's gloss for a reader door: the box's lead (boxLeadGloss) where readerDoorGloss gave its
  * shortest candidate; a lone kanji's meaning as before. */
-function readerDoorLead(door) {
-  const kanji = door.kanjiOnly ? D.kanji?.[door.b] : null;
-  if (kanji) return String(kanji.m || '').toLowerCase();
-  return boxLeadGloss(readerQuickRecordAsRead(door));
-}
 const readerTokenLead = (token) => readerDoorLead(readingToken(token));
-function readerGlossLine(token) {
-  // Ladder R2 · the sense its sentence uses, followed to its answer (tokenGlossLine); its spoken state follows the row
-  return tokenGlossLine(token, (line) => {
-    const word = line.closest('.tok[data-index]');
-    if (word) nameReaderToken(word, token, Number(word.dataset.index), 'word');
-  });
-}
 
 /** How the reader's words work, in plain words: the text settings say it whole (John, 2026-10-02 #8). */
-function tapLadderHint() {
-  // G5 · a hold keeps the word (hold = seal) and opens its strip
-  return tx('タップするたびに、読み、意味、詳しい項目へと進みます。長押し（または右クリック）で保存し、ほかの操作も。',
-    'Tap for the reading, tap again for the meaning, then open the word. Press and hold to save it, and for more.');
-}
 
 /* R4 (2026-09-30) — a reader word is named by the word itself. How to work it and what it shows now
  * ride as its description: the kind and the keyboard help are shared by the whole reader
  * (#reader-help-*); only a word that shows its reading carries a state line of its own. */
-function readerWordHint() {
-  return tx('Enterで次の表示へ。Shift+F10で保存とほかの操作。Ctrl+Enterで詳しい項目。',
-    'Enter: next word layer · Shift+F10: save and more · Ctrl+Enter: full entry');
-}
-function readerTokenState(token, index, kind) {
-  if (kind === 'named') return S.revealed?.has(index) ? token.r || '' : '';
-  if (kind !== 'word') return '';
-  const showing = S.dials.furigana === 2 || S.revealed?.has(index);
-  if (!showing && !S.glossed?.has(index)) return '';
-  // R2 · the word's door (readingToken): an inflected word speaks for its dictionary form read the text's way
-  const door = readingToken(token);
-  const kanji = door.kanjiOnly ? D.kanji?.[door.b] : null;
-  // N · as the text reads it: a word whose entry at hand is read otherwise says no meaning of another reading
-  const quick = kanji ? null : readerQuickRecord(door);
-  const record = kanji ? null : readerQuickRecordAsRead(door, quick);
-  const parts = [];
-  // R · the reading said is the one its ruby shows: the token's own, where its entry is read otherwise (R2: an inflected
-  // word's ruby is its own reading too, never another row's reading of its dictionary form)
-  const own = door.shown || tokenReading(door);
-  const said = token.b && token.b !== token.s ? String(token.r || '')
-    : own && !(record?.r && kataToHira(String(record.r)) === kataToHira(own)) ? own : record?.r;
-  if (showing && said && said !== token.s) parts.push(said);
-  if (S.glossed?.has(index)) parts.push(kanji ? String(kanji.m || '').toLowerCase() : record?.m?.length ? boxLeadGloss(record)
-    : quick && !record ? readerReadingMissText(door.b) : readerGlossMissText(door.b, door.r, door.several));
-  return parts.join(' · ');
-}
-function nameReaderToken(span, token, index, kind) {
-  span.dataset.proseLabel = token.s || token.b;
-  if (span.dataset.proseSelected === 'true') span.setAttribute('aria-label', token.s || token.b);
-  else span.removeAttribute('aria-label');
-  const state = readerTokenState(token, index, kind);
-  const host = span.parentElement?.classList.contains('token-door') ? span.parentElement : null;
-  let node = host?.querySelector(':scope > .tok-state') || null;
-  if (state && host) {
-    if (!node) { node = el('span', 'tok-state visually-hidden'); node.id = `tok-state-${index}`; host.append(node); }
-    node.hidden = true;
-    node.textContent = state;
-  } else { node?.remove(); node = null; }
-  const ids = kind === 'word' ? ['reader-help-kind', node?.id, 'reader-help-word']
-    : [node?.id, kind === 'named' ? 'reader-help-named' : 'reader-help-lookup'];
-  span.dataset.proseDescription = ids.filter(Boolean).join(' ');
-  if (span.dataset.proseSelected === 'true') span.setAttribute('aria-describedby', span.dataset.proseDescription);
-  else span.removeAttribute('aria-describedby');
-}
-function readerHelp() {
-  const help = el('div', 'visually-hidden reader-help');
-  for (const [id, text] of [['reader-help-kind', tx('語', 'word')], ['reader-help-word', readerWordHint()],
-    ['reader-help-named', tx('Enterで次の表示へ。Shift+F10で保存とほかの操作。', 'Enter: next word layer · Shift+F10: save and more')],
-    ['reader-help-lookup', tx('読みと意味', 'reading and meaning')]]) {
-    const line = el('span', null, text); line.id = id; help.append(line);
-  }
-  return help;
-}
 /** Keep the existing inline layout and paragraph breaks, but give the accessibility tree real paragraphs.
  * The paragraph owns Tab; explicit word selection uses the shared prose controller. */
 function installReaderRoving(reader) {
@@ -15401,45 +12049,6 @@ function paintNamedTok(span, token, index) {
   nameReaderToken(span, token, index, 'named');
 }
 /** Apply one token's reveal state straight to its DOM — no re-render. */
-function paintTok(span, token, index) {
-  // Ladder · ふりがな なし: a touched word shows its own reading too (the tap's first rung)
-  const hasReading = S.dials.furigana === 2 || !!S.revealed?.has(index);
-  const hasEn = S.glossed?.has(index);
-  if (S.dials.furigana === 1) {
-    for (const rt of span.querySelectorAll('rt')) setTouchReadingShown(rt, hasReading);
-  } else if (S.dials.furigana === 0) {
-    // Off never borrows the reveal rung. Replacing only the word row keeps
-    // an explicitly requested English gloss in its original position.
-    const built = span.querySelector('ruby');
-    if (hasReading !== !!built) {
-      const next = wordRow(displayPairs(token), {
-        furigana: hasReading ? 1 : 0,
-        revealed: hasReading,
-      });
-      const row = span.querySelector('.tok-word');
-      if (row) {
-        row.replaceWith(next);
-      } else {
-        span.querySelector('.tok-en')?.remove();
-        span.textContent = '';
-        span.append(next);
-      }
-    }
-  }
-  span.classList.toggle('lit', !!(S.revealed?.has(index) || hasEn));
-  const existingEn = span.querySelector('.tok-en');
-  if (hasEn && !existingEn) {
-    span.classList.add('has-en');
-    span.append(readerGlossLine(token));
-  } else if (!hasEn && existingEn) {
-    span.classList.remove('has-en');
-    existingEn.remove();
-  }
-  // Ladder · while its English shows, this occurrence's depth dot steps aside (the DOTS slice's hook)
-  if (hasEn) span.dataset.depthAside = 'meaning';
-  else delete span.dataset.depthAside;
-  nameReaderToken(span, token, index, 'word');
-}
 
 /* ふりがな 触れて (on touch): the word you touched shows its reading, and touching another moves it
  * there. つねに shows every reading, なし none. Taps never cycle the text: the popup carries the reading and
@@ -15671,23 +12280,6 @@ async function commitReadDone(articleId, now = Date.now()) {
  * that entry; a citation into the missing rest drops its dead number and
  * keeps the term. The licensed text and tokens are untouched on disk —
  * this is presentation, not adaptation. */
-function glossaryCrossRefPlan(p) {
-  if (p.source !== 'isa-yasashii-glossary' || !p.tokens) return null;
-  const skip = new Set();
-  const doors = new Map();
-  const toks = p.tokens;
-  for (let i = 0; i + 4 < toks.length; i++) {
-    if (toks[i].s !== '(' && toks[i].s !== '（') continue;
-    if (toks[i + 1]?.s !== 'No' || toks[i + 2]?.s !== '.') continue;
-    if (!/^[0-9]+$/.test(toks[i + 3]?.s || '')) continue;
-    if (toks[i + 4].s !== ')' && toks[i + 4].s !== '）') continue;
-    const target = D.passages.find((x) => x.id === `yasashii:${Number(toks[i + 3].s)}`);
-    for (let k = i; k <= i + 4; k++) skip.add(k);
-    if (target) doors.set(i, target);
-    i += 4;
-  }
-  return skip.size ? { skip, doors } : null;
-}
 
 /* 聞く — the reader's play bar. The voice is decided: the operator's blind audition
  * (2026-09-29) locked Google Gemini TTS Kore, with Charon as the second speaker. No approved
@@ -15726,9 +12318,6 @@ const VOICE_LOCK = {
 const NARRATION_VOICES = VOICE_LOCK.voices;
 /** Which voice a surface may use. An unnamed surface is single-speaker, so it resolves to the
  * main voice — never to the second one. */
-function voiceForRole(role) {
-  return (role && VOICE_LOCK.roles[role]) || VOICE_LOCK.main;
-}
 const LISTEN_RATES = [1, 1.25, 0.8];
 let articleNarration, articleNarrationWait;
 let excerptPlayback = 0, excerptControl = null;
@@ -15737,31 +12326,9 @@ let excerptPlayback = 0, excerptControl = null;
 /** One clip's admission. Identity is per clip, never per manifest: its own voice, its own role,
  * its own model. v1 carried ONE global voice, so a dialogue's second speaker was unreachable and
  * no clip could state what it was. */
-function approvedNarrationClip(clip, article = null) {
-  if (!clip || typeof clip.text !== 'string' || !clip.text.trim() || typeof clip.src !== 'string') return false;
-  // v2 identity is stated, never defaulted: a clip that does not say its role and model is not one
-  const role = clip.speakerRole;
-  if (typeof role !== 'string' || clip.model !== VOICE_LOCK.model) return false;
-  if (!Object.hasOwn(NARRATION_VOICES, clip.voice)) return false;
-  // the role law at the point of load: a clip whose voice disagrees with its role is refused,
-  // which is what keeps the second speaker from reading prose
-  if (clip.voice !== voiceForRole(role)) return false;
-  // a second speaker exists only in a dialogue: prose cannot promote itself to one by its label
-  if (role !== 'narrator' && article?.kind !== 'dialogue') return false;
-  return new RegExp(`^audio/narration/${clip.voice}/[a-zA-Z0-9_-]+\\.(?:m4a|mp3|wav|ogg)$`, 'u').test(clip.src);
-}
 /** Narration manifest v2 only: { v:2, lock:{model}, articles:{ <id>:{ clips:[…] } } }. A v1
  * manifest is legacy — readable, but it declares no approved clips. A manifest from any other
  * model is refused outright: that is how an unauditioned voice would otherwise slip in. */
-function approvedNarrationManifest(value) {
-  if (!value || typeof value !== 'object') return null;
-  if (value.v !== 2 || value.lock?.model !== VOICE_LOCK.model) return null;
-  if (!value.articles || typeof value.articles !== 'object' || Array.isArray(value.articles)) return null;
-  for (const article of Object.values(value.articles)) {
-    if (!Array.isArray(article?.clips) || !article.clips.every((clip) => approvedNarrationClip(clip, article))) return null;
-  }
-  return value;
-}
 function ensureArticleNarration() {
   if (typeof window === 'undefined' || !window.__KAIRO_NARRATION__) { articleNarration = null; return Promise.resolve(null); }
   if (articleNarration !== undefined) return Promise.resolve(articleNarration);
@@ -15778,10 +12345,6 @@ if (typeof window !== 'undefined') void ensureArticleNarration();
 const narrationVoiceName = (role = 'narrator') => NARRATION_VOICES[voiceForRole(role)] || '';
 const narrationClips = (p) => (p && articleNarration?.articles?.[p.id]?.clips) || [];
 
-function excerptListenLabel() {
-  // This click plays the excerpt in the locked narration voice; it writes no preference.
-  return tx(`${narrationVoiceName()}の声で聞く`, `Listen · ${narrationVoiceName()}`);
-}
 
 /** Only one excerpt plays: a handoff returns the previous control to its idle label. */
 function retireExcerptControl() {
@@ -15877,10 +12440,6 @@ async function playNarratedExcerpt(text, button, sourceId = null) {
  * the view or pressing Back stopped the read but left the excerpt's control reading "Stop ·"
  * for ever, and a late finish could repaint a button the learner had already left. Every caller
  * of stopReadAloud — openPassage, Back, the view change in render — now ends both voices. */
-function stopReadAloud() {
-  cancelExcerptPlayback();
-  stopPassageRead();
-}
 /** Stop the passage read and nothing else. The quote is the room's other voice and it is
  * retired on its own, so a quote can take over from a read without cancelling itself. */
 function stopPassageRead() {
@@ -15919,13 +12478,6 @@ function speakPassage(p, onDone) {
 }
 
 /** The play bar's progress: clips done plus the fraction of the one playing, painted in place. */
-function paintListenProgress(fraction = 0) {
-  const bar = document.getElementById('listen-progress');
-  if (!bar || !readAloud.total) return;
-  const done = Math.min(1, (readAloud.clip + Math.max(0, Math.min(1, fraction))) / readAloud.total);
-  bar.style.setProperty('--played', String(done));
-  bar.setAttribute('aria-valuenow', String(Math.round(done * 100)));
-}
 
 
 /* ------------------------------------------------ 収録の声 the recorded voice
@@ -16031,28 +12583,9 @@ function approvedWordManifest(m) {
 }
 /** The word-clip key. Identity is the surface AND the reading the learner was shown — the same
  * identity R persists as cueReading/entrySeq. A spelling alone is never a key. */
-function wordClipKey(surface, reading) {
-  return surface && reading ? `${surface}|${reading}` : null;
-}
 /** The one admissible clip for a (surface, reading) on a single-speaker surface. Returns null
  * rather than guessing: no spelling-only match, no other reading, no other voice, no other
  * model. `entrySeq`, when the card knows which dictionary entry it is showing, must agree too. */
-function wordClipFor(m, surface, reading, role = 'word', entrySeq = null) {
-  const key = wordClipKey(surface, reading);
-  if (!m || m.legacy || !key) return null;
-  const entry = m.words?.[key];
-  if (!entry || typeof entry.src !== 'string') return null;
-  const wanted = voiceForRole(role);
-  // the role law, enforced at the point of play: the second voice is not a fallback
-  if (entry.voice !== wanted) return null;
-  // identity is stated, never defaulted: the clip names the very role it is asked for, and the
-  // locked model; a clip with no role or no model is not an approved clip
-  if (entry.speakerRole !== role || entry.model !== VOICE_LOCK.model) return null;
-  // the clip must live in its own voice's folder: a path is a claim and it is checked
-  if (!new RegExp(`^audio/w/${entry.voice}/[a-zA-Z0-9_-]+\\.(?:m4a|mp3|wav|ogg)$`, 'u').test(entry.src)) return null;
-  if (entrySeq && entry.entrySeq && String(entry.entrySeq) !== String(entrySeq)) return null;
-  return entry;
-}
 /** 音 — the answer card's voice door. The recorded clip in the approved voice, when
  * the word has one; otherwise a visible reason and silence. One tap speaks; a retap restarts. */
 let cardAudioSerial = 0, cardFaceKey = '';
@@ -16102,35 +12635,10 @@ function speakCardReading(text, btn, word) {
 }
 
 
-function refreshListenRow() {
-  const row = document.querySelector('#app main .listen-row');
-  const p = passage();
-  if (!row || !p || row.dataset.passage !== p.id) return;
-  const focusedId = row.contains(document.activeElement) ? document.activeElement.id : null;
-  const next = buildListenRow(p);
-  // the row swaps in its state's place (placeListenRow); the keyboard stays on the mark or the control it was on
-  placeListenRow(row, next);
-  if (focusedId) document.getElementById(focusedId)?.focus({ preventScroll: true });
-}
 /** F · the listen door's two places (the lead's ruling on Grok f-86, 2026-10-18): folded, its one glyph stands at the
  * right end of the reader's instrument line, in the head's flow, so it never sits over the reading column at any scroll;
  * open (playing, or held open), the bar stands where it always has — the phone's foot, a desk's own line under the head,
  * just before the text. With no recording the row is an empty, hidden place in the head (buildListenRow). */
-function placeListenRow(row, next) {
-  const head = document.querySelector('#app > main .reader-head');
-  if (next.dataset.open === 'false' && head) {
-    if (row !== next) row?.remove();
-    head.prepend(next);
-    return;
-  }
-  const reader = document.getElementById('reader');
-  if (row?.closest('.reader-head') && reader) {
-    row.remove();
-    reader.before(next);
-    return;
-  }
-  row.replaceWith(next);
-}
 /* One drawn icon set for the reader and the shelf: a 24-unit grid, 1.6 stroke, round joins,
  * currentColor — never a font glyph standing in for an icon. */
 const UI_ICONS = {
@@ -16150,21 +12658,6 @@ function uiIcon(name, cls = 'ui-icon') {
   return holder.firstChild;
 }
 
-function voicePendingNote(id) {
-  const pending = el('p', 'play-pending');
-  pending.id = id;
-  // a status label, like a button's: not prose, so no lookup doors (they were three Tab stops)
-  pending.dataset.japaneseLookup = 'off';
-  // the two names come from the lock, never from a literal: one value decides what this says
-  const mainName = NARRATION_VOICES[VOICE_LOCK.main], secondName = NARRATION_VOICES[VOICE_LOCK.second];
-  pending.setAttribute('aria-description', tx(`音声は ${mainName}、第二話者は ${secondName} に固定されています。`,
-    `Approved voices: ${mainName} (main), ${secondName} (second).`));
-  const sentence = id === 'sentence-listening-pending';
-  pending.append(uiIcon('speaker'), el('span', 'l-ja', sentence
-    ? tx('この文の収録音声はありません', 'No recording for this sentence')
-    : tx('この記事の収録音声はありません', 'No recording for this article')));
-  return pending;
-}
 
 /** The reader's play bar, built on its own so a late narration manifest can refresh just this
  * row in place — the focused token or glossary entry elsewhere in the reader is never replaced.
@@ -16256,20 +12749,6 @@ function buildListenRow(p) {
  * leaving the article. Nothing persists; no other gesture opens them. */
 let readerLayers = null; // { paragraph, block, mark }
 const READER_LAYER_WORDS = 24;
-function readerLayerParagraph() {
-  const paragraphs = [...document.querySelectorAll('#reader > [data-reader-prose]')].filter((node) => node.querySelector('.tok[data-index]'));
-  if (!paragraphs.length) return null;
-  const ceiling = Math.max(0, document.querySelector('#app > .chrome')?.getBoundingClientRect().bottom || 0);
-  const floor = Math.min(innerHeight, document.getElementById('primary-tabs')?.getBoundingClientRect().top || innerHeight);
-  const box = (node) => node.getBoundingClientRect();
-  const onGlass = (node) => box(node).bottom > ceiling + 24 && box(node).top < floor - 24;
-  const current = readerTakeCurrent();
-  const own = current ? readerTokenAtIndex(current.index)?.closest('[data-reader-prose]') : null;
-  if (own && onGlass(own)) return own;
-  const line = ceiling + (floor - ceiling) / 3;
-  return paragraphs.find((node) => box(node).top <= line && box(node).bottom >= line)
-    || paragraphs.find((node) => box(node).top >= ceiling && onGlass(node)) || paragraphs.find(onGlass) || null;
-}
 function foldReaderLayers() {
   const open = readerLayers;
   if (!open) return false;
@@ -16384,10 +12863,6 @@ function openReaderLayers(mark) {
   return true;
 }
 /** A token as read: each written piece by its reading where it has one (the text's own furigana), kana and marks as written. */
-function readerLayerReading(token) {
-  const pairs = Array.isArray(token.f) && token.f.length ? token.f : null;
-  return pairs ? pairs.map((pair) => pair.r || pair.t).join('') : String(token.s || '');
-}
 function readerLayersMark() {
   const mark = el('button', 'layers-mark', '層');
   mark.type = 'button';
@@ -16849,14 +13324,6 @@ function renderReader(main) {
  * its own layer beneath the chrome; the corridor contributes exactly one
  * thing here — the door into the shelf. 藍 indigo, per the palette law:
  * "you can go here". */
-function renderDrift(main) {
-  // 銀河 is the hero: the galaxy fills the view and the corridor adds nothing
-  // over it here. The way in to the shelf, the tutor, search and the dojo all
-  // live behind the single symbol (buildGingaChrome) — the galaxy stays clear.
-  main.style.padding = '0';
-  installScaleBridge();
-  window.__DRIFT__?.setPracticePriorities?.(allAssessmentEvidence().priorities);
-}
 
 /* ------------------------------------------- the Drift card's study door
  * The drift universe is generated from its own source and knows nothing about
@@ -16905,69 +13372,7 @@ window.__BUNKI_OPEN_ENTRY = {
  *   entry   false: no door; a function: the surface's own way into the entry; otherwise go(node)
  *   redo    the caller already read the press (the reader's doors): never treat this call as the second tap
  * Returns 'reading', the stage element, or null after entering the page or dismissing a held stage. */
-function openSlip(node, { anchor, from = 'lookup', host = null, look = null, note = null, sentence = null, focus = false,
-  onClose = null, entry, key = null, redo = false, why = '', reveal = null, clearReveal = null, readingVisible = null, onStage = null,
-  gloss = null } = {}) {
-  if (!anchor?.isConnected) return null;
-  if (!redo && diveFromSlip(anchor)) return null;
-  const kind = node?.t === 'kanji' ? 'kanji' : node?.t === 'particle' ? 'particle' : node?.t === 'grammar' ? 'grammar' : 'word';
-  let token;
-  let record = null;
-  let save = host ? 'host' : 'default';
-  let kanji = true;
-  let entryAvailable = entry !== false;
-  if (!node) {
-    const label = look?.label || look?.surface || '';
-    token = { s: look?.surface || label, b: label, r: look?.reading || '', c: false };
-    save = 'none';
-    entryAvailable = typeof entry === 'function';
-  } else if (kind === 'word') {
-    // G2 · a kept word's door names its entry: when the dictionary cannot (cold, offline), its card's own answer speaks
-    record = lookup(node.id, node.seq ?? null, node.reading || '') || savedNodeRecord(node);
-    token = { s: look?.surface || node.id, b: node.id, r: node.reading || record?.r || look?.reading || '', c: !!record,
-      ...(node.seq != null && node.seq !== '' ? { seq: node.seq } : {}) };
-    // R · a reading of its own the quick dictionary does not carry asks the full dictionary now: its entry sheet
-    // resolves it, and the next look at the word stands for the entry read that way
-    void readyTokenReading(token);
-    if (entry === undefined) entryAvailable = !!record;
-  } else if (kind === 'kanji') {
-    const k = D.kanji?.[node.id];
-    token = { s: node.id, b: node.id, r: look?.reading || kanjiSlipReading(k), c: !!k };
-    look = { ...(look || {}), ...(!String(look?.gloss || '').trim() && String(k?.m || '').trim()
-      ? { gloss: String(k.m).toLowerCase(), glossLang: 'en' } : {}) };
-    kanji = false;
-    if (entry === undefined) entryAvailable = !!k;
-  } else if (kind === 'particle') {
-    token = { s: look?.surface || look?.label || node.id, b: look?.label || node.id, r: look?.reading || '' };
-    save = 'none';
-    kanji = false;
-  } else {
-    token = { s: look?.surface || look?.label || node.id, b: look?.label || node.id, r: look?.reading || '' };
-    kanji = false;
-  }
-  const onEntry = (modality) => {
-    if (typeof entry === 'function') {
-      removeMini();
-      entry(modality);
-    } else if (node) go(node, { invoker: anchor, from: slipHeadword() || anchor, instant: modality === 'keyboard' }); // the slip leaves inside the cut (enterWord)
-  };
-  // Ladder · a caller whose word stands in a line of text passes its English rung (`gloss`); the sky, the Words room and
-  // the deck pass none and keep reading → stage
-  return activateWordLadder(anchor, { surface: token.s, reading: look?.reading || token.r, reveal, clearReveal, readingVisible, redo, from,
-    ...(gloss ? { gloss } : {}),
-    openStage: () => {
-      const stage = showMini(anchor, token, onEntry, { focusEntry: focus, record, entryAvailable, sentence, look, kind, save, host, note,
-        source: from, key, kanji, onClose, follow: from === 'drift' || from === 'sky', nodeFor: node && kind !== 'word' ? { t: node.t, id: node.id } : null,
-        entryNode: typeof entry === 'function' ? null : node, why });
-      if (stage) onStage?.(stage);
-      return stage;
-    } });
-}
 /** A kanji's first reading for the slip's band: its first on reading in kana, else its first kun stem. */
-function kanjiSlipReading(k) {
-  if (!k) return '';
-  return kataToHira(String(k.on?.[0] || '')) || String(k.kun?.[0] || '').split('.')[0];
-}
 window.__BUNKI_OPEN_SLIP = {
   /** Canonical hosted annotations; reading a label never opens or records a visit. */
   reading(kind, key) {
@@ -17083,22 +13488,7 @@ const SRS_PRESET_DETAIL = {
 };
 /** Which preset the record is on: { base, custom, label }. A record that never chose reads as
  * Standard — or Custom (from Standard) when its own numbers already differ from Standard's. */
-function srsPresetState(prefs = S.srsPrefs) {
-  if (validPreset(prefs?.preset)) {
-    return { base: prefs.preset.replace(/^custom:/u, ''), custom: prefs.preset.startsWith('custom:'), label: prefs.preset };
-  }
-  const std = SRS_PRESETS.standard;
-  const custom = (validNewPerDay(prefs?.newPerDay) && prefs.newPerDay !== std.newPerDay) ||
-    (validReviewsPerDay(prefs?.reviewsPerDay) && prefs.reviewsPerDay !== std.reviewsPerDay) ||
-    (validRetention(prefs?.retention) && prefs.retention !== std.retention);
-  return { base: 'standard', custom, label: custom ? 'custom:standard' : 'standard' };
-}
 /** The number a pacing key holds in a record (absent → the Standard default). */
-function srsPrefValue(prefs, key) {
-  if (key === 'newPerDay') return validNewPerDay(prefs?.newPerDay) ? prefs.newPerDay : NEW_PER_DAY_DEFAULT;
-  if (key === 'reviewsPerDay') return validReviewsPerDay(prefs?.reviewsPerDay) ? prefs.reviewsPerDay : REVIEWS_PER_DAY_DEFAULT;
-  return Number.isInteger(prefs?.pauseEvery) && validPauseEvery(prefs.pauseEvery) ? prefs.pauseEvery : null;
-}
 /** The stepper ladders: fine steps where the numbers are small, then the 9999 "no cap". */
 const SRS_PREF_LADDERS = {
   newPerDay: Array.from({ length: NEW_PER_DAY_MAX / 5 + 1 }, (_, i) => i * 5),
@@ -17110,13 +13500,6 @@ const SRS_PREF_LADDERS = {
   ],
   pauseEvery: [null, ...Array.from({ length: 10 }, (_, i) => (i + 1) * 10)],
 };
-function srsPrefStep(key, value, direction) {
-  const ladder = SRS_PREF_LADDERS[key];
-  const rank = (v) => (v === null ? -1 : v);
-  if (direction > 0) return ladder.find((v) => rank(v) > rank(value)) ?? value;
-  const lower = ladder.filter((v) => rank(v) < rank(value));
-  return lower.length ? lower[lower.length - 1] : value;
-}
 /** One preset press: its numbers and retention into srsPrefs, and — when the schedule policy
  * (retention or learning steps) changes — one params row in the same commit, so a replay knows
  * which policy priced every later due date. The scheduler rebuilds when the record publishes. */
@@ -17255,13 +13638,6 @@ const listRecordPending = new Set();
 const trayItemPending = new Set();
 let noteRecordPending = false;
 
-function recordViewSurface() {
-  const view = S.view;
-  const listName = S.listOpen?.name;
-  const manualList = S.listOpen?.manual;
-  return () => S.view === view && !S.stack.length &&
-    (view !== 'list' || (S.listOpen?.name === listName && S.listOpen?.manual === manualList));
-}
 
 function currentRecordNoteView() {
   const snapshot = publishedNoteSnapshot;
@@ -17348,21 +13724,9 @@ function renderPersonalNoteComposer() {
 }
 const recordNoteStates = new WeakMap();
 const recordNoteEditStates = new WeakMap();
-function recordNoteExpected(view) {
-  return { heads: view.projection.heads, tombstones: view.projection.tombstones,
-    activeRestoreGenerations: view.projection.activeRestoreGenerations };
-}
 function recordNoteDraftKey(noteId) {
   const binding = recordInstallation?.policy.binding;
   return JSON.stringify(['saved-note-edit', binding?.accountId || null, binding?.learnerId || null, noteId]);
-}
-function recordNoteEditable(view) {
-  if (view.headVersions.length === 1 && view.headVersions[0].payload.segments.every((segment) => segment.kind === 'original'))
-    return { generation: view.headVersions[0].payload.generation,
-      text: view.headVersions[0].payload.segments.map((segment) => segment.text).join('') };
-  if (!view.headVersions.length && view.projection.activeRestoreGenerations.length === 1)
-    return { generation: view.projection.activeRestoreGenerations[0], text: '' };
-  return null;
 }
 function rememberRecordNoteEdit(editor) {
   try {
@@ -17436,14 +13800,6 @@ async function commitRecordNoteAction(state, method, input, onSaved) {
     state.pending = false; delete state.article.dataset.pending;
     if (state.article.isConnected) updateRecordNoteActions(state);
   }
-}
-function savedRecordNoteDraft(key) {
-  const drafts = readRecordDrafts(); const text = drafts[key];
-  if (typeof text !== 'string') return null;
-  let basis;
-  try { basis = JSON.parse(drafts[`${key}:basis`] || 'null'); } catch { /* A saved draft never supplies authority. */ }
-  return { text, expected: basis?.expected || null, generation: basis?.generation || null,
-    baselineText: typeof basis?.baselineText === 'string' ? basis.baselineText : null };
 }
 function openRecordNoteEditor(state, savedDraft, focusEditor = true) {
   if (state.editor) { state.editor.input.focus({ preventScroll: true }); return; }
@@ -17781,28 +14137,6 @@ function refreshRecordSyncSurface() {
   if (container?.isConnected) updateRecordSyncSurface(container);
 }
 const renderedReadingPlaces = new WeakMap();
-function readingExpected(view) {
-  return view ? recordNoteExpected(view) : { heads: [], tombstones: [], activeRestoreGenerations: [] };
-}
-async function resolveReadingPlace(anchor) {
-  if (!anchor.source.sourceId.startsWith('bundled-reading:')) return null;
-  const id = anchor.source.sourceId.slice('bundled-reading:'.length);
-  let p = D.passages.find((entry) => entry.id === id);
-  if (!p && !D.archive && window.__CORRIDOR_STANDALONE__ !== true) {
-    await ensureArchiveIndex();
-    p = D.passages.find((entry) => entry.id === id);
-  }
-  if (!p) return null;
-  if (!p.tokens) await ensureArticle(p);
-  const module = await ensureReadingPositionModule();
-  const resolved = await module.resolveBundledReadingAnchor(p, anchor);
-  return resolved ? { p, ...resolved } : null;
-}
-function readingPlaceFailure(status, error) {
-  status.textContent = ['reading-position-superseded', 'reading-position-choice-required'].includes(error?.code)
-    ? tx('保存した場所が変わった。表示を確認して、続ける場所を選ぶ。', 'Your saved places changed. Check the choices and choose where to continue.')
-    : tx('この場所を確認できなかった。保存した場所は残っている。', 'This place could not be verified. Your saved places are preserved.');
-}
 function updateReaderPlaceSave() {
   const button = document.getElementById('reader-place-save');
   if (!button) return;
@@ -17884,10 +14218,6 @@ function updateReadingPlaces(container) {
   }
   updateReaderPlaceSave();
 }
-function refreshReadingPlacesSurface() {
-  const container = document.getElementById('record-reading-places');
-  if (container?.isConnected) updateReadingPlaces(container);
-}
 function renderReadingPlaces(p = null) {
   const container = el('section', 'reading-places'); container.id = 'record-reading-places';
   if (p) container.dataset.sourceId = `bundled-reading:${p.id}`;
@@ -17961,53 +14291,15 @@ function refreshRecordNotesSurface() {
  * the word walk, under one primary door (#review-start). The deck counts stay, folded below.
  * Honest data only: every number is read from the record or computed from it; the day's word is
  * never a card due today; minutes appear only when the learner's own review timings support them. */
-function todayHash(text) {
-  let h = 2166136261;
-  for (const ch of String(text)) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); }
-  return h >>> 0;
-}
-function todayRng(seed) {
-  let s = seed >>> 0 || 1;
-  return () => ((s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296);
-}
 const TODAY_JA_WORD = /^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}ー々〆ヶ]{1,7}$/u;
-function todayKanji(word) {
-  return [...new Set([...String(word || '')].filter((c) => D.kanji?.[c]))];
-}
-function todayPartStrokes(part) {
-  return D.radicals?.[part]?.st || D.kanji?.[part]?.st || 0;
-}
 /* Q · a hook is true and useful, or it is not shown (Q/DESIGN.md §7; Grok's walks: Today taught 冋 "desert" as the part
  * 高 and 尚 share — the shape is in both, but the desert is in neither; 128 of the 225 first-tier day words named a part
  * like it). Today names a part only when that part is the classical radical (部首) of every kanji it is said to hide in:
  * the radical is the kanji's meaning family, so its meaning is a true clue (洗濯: 水 water; 議論: 言 say). */
-function todayIsRadical(part, c) {
-  const row = D.radByGlyph?.[part] || D.radByGlyph?.[(PART_WRITTEN[part] || [])[0]];
-  return !!row && row.n === D.kanji?.[c]?.rad;
-}
 /** The one part every kanji of the word carries, from D.kanji parts only, and that is every one's radical; the part
  * with the most strokes wins, so 隹 outranks the 亻 hiding inside it. */
-function todaySharedPart(ks) {
-  if (ks.length < 2) return null;
-  const lists = ks.map((c) => D.kanji[c].parts || []);
-  const shared = [...new Set(lists[0])]
-    .filter((p) => !ks.includes(p) && D.radicals?.[p] && lists.slice(1).every((l) => l.includes(p)) && ks.every((c) => todayIsRadical(p, c)));
-  shared.sort((a, b) => todayPartStrokes(b) - todayPartStrokes(a) || (a < b ? -1 : 1));
-  return shared[0] || null;
-}
 /** A kanji's own radical, when the kanji's parts name it (海 → 氵): the one part of a single kanji worth a hook. */
-function todayLargestPart(c) {
-  const parts = [...new Set(D.kanji?.[c]?.parts || [])].filter((p) => p !== c && D.radicals?.[p] && todayIsRadical(p, c));
-  parts.sort((a, b) => todayPartStrokes(b) - todayPartStrokes(a) || (a < b ? -1 : 1));
-  return parts[0] || null;
-}
 /** Every card the learner meets today: today's queue plus anything whose due falls before midnight. */
-function todayDueKeys(today) {
-  const keys = new Set((today?.order || []).map((item) => srsKey(item.t, item.id)));
-  const end = startOfDay(new Date()) + 86400000;
-  for (const [key, rec] of Object.entries(S.srs || {})) if (Date.parse(rec?.due) < end) keys.add(key);
-  return keys;
-}
 let todayFreshPool = null;
 /** The day's word: one of the learner's saved words that is NOT due today (gate 1), else a fresh
  * graded word they have not saved. Deterministic per date; words whose kanji share a part first. */
@@ -18042,150 +14334,22 @@ function todayWordOfDay(today) {
 }
 /** The hook of wonder, from data: the part the word's kanji share, how many kanji carry it, and
  * how many of those already stand in the learner's own words. */
-function todayHook(word) {
-  const ks = todayKanji(word);
-  let part = todaySharedPart(ks);
-  const shared = !!part;
-  let host = null;
-  if (!part) {
-    host = ks.map((c) => [c, todayLargestPart(c)]).filter(([, p]) => p)
-      .sort((a, b) => todayPartStrokes(b[1]) - todayPartStrokes(a[1]))[0] || null;
-    part = host?.[1] || null;
-  }
-  if (!part) return null;
-  // the word web's own count (wwPartCap over wwMine), so Today and the web it opens say one number
-  const cap = wwPartCap(part, wwMine());
-  const family = cap.count;
-  const mine = cap.mine;
-  // its plain meaning (the written form's own, else its standalone form's: 氵 is water), never the catalogue's words
-  const meaning = partMeaning(D.kanji?.[part]?.m) || partMeaning(D.kanji?.[(PART_WRITTEN[part] || [])[0]]?.m);
-  return { part, shared, host: host?.[0] || null, count: ks.length, family, mine, meaning };
-}
 /** Seconds a card takes this learner: the median gap between consecutive grades in their own
  * review log (gaps over two minutes are breaks, not cards). Null until there are enough to say. */
-function todaySecondsPerCard() {
-  const times = (S.revlog || []).filter((row) => Array.isArray(row) && row[2] >= 1 && row[2] <= 4)
-    .map((row) => row[0]).sort((a, b) => a - b).slice(-400);
-  const gaps = [];
-  for (let i = 1; i < times.length; i += 1) {
-    const gap = times[i] - times[i - 1];
-    if (gap >= 1500 && gap <= 120000) gaps.push(gap);
-  }
-  if (gaps.length < 10) return null;
-  gaps.sort((a, b) => a - b);
-  return gaps[Math.floor(gaps.length / 2)] / 1000;
-}
 /** The reading on today's line (N, 2026-10-17; N2): while a leading drop has an unread story — the newest such drop —
  * one of its stories: the one holding the most of the learner's saved words (readingFacets.forms), else the first in
  * the drop's own order, whatever else the record holds; once every leading drop is read, the unread story holding the
  * most saved words, else the shelf's first story that awaits no one. */
-function todayReadPick() {
-  const curated = (D.passages || []).filter((p) => D.libraryDiscoverable?.(p) !== false && !String(p.file || '').startsWith('archive/'));
-  const stories = shelfStories(curated);
-  const pool = stories.filter((p) => p.source !== 'isa-yasashii-glossary' && !owns(S.readDone || {}, p.id));
-  if (!pool.length) return null;
-  const dropDays = leadingDropDays(stories);
-  const order = byLeadingDrops(dropDays);
-  const dropDay = dropDays.find((day) => pool.some((p) => p.addedAt === day)) || '';
-  const fresh = dropDay ? pool.filter((p) => p.addedAt === dropDay) : [];
-  const mine = new Set(S.taken.filter((i) => i.t === 'word').map((i) => i.id));
-  let best = null;
-  for (const p of fresh.length ? fresh : pool) {
-    const count = mine.size ? (p.readingFacets?.forms || []).filter((f) => mine.has(f)).length : 0;
-    if (!best || count > best.count || (count === best.count && order(p, best.passage) < 0)) best = { passage: p, count };
-  }
-  if (best.count || fresh.length) return best;
-  const ready = pool.filter((p) => !/-pending$/u.test(p.review || '') && !p.pendingVerification);
-  return { passage: [...(ready.length ? ready : pool)].sort(order)[0], count: 0 };
-}
-function todayLearning(tag, cls, text) {
-  const node = el(tag, cls, text);
-  node.lang = 'ja';
-  node.dataset.uiContent = 'learning';
-  return node;
-}
 /** Japanese that breaks only between its words, never inside one (「虚構 / か」): the app's one rule (jaWords). */
-function todayPhrases(node, text) {
-  return setJaWords(node, text);
-}
-function todayDateline() {
-  const now = new Date();
-  const [y, m, d, w] = [now.getFullYear(), now.getMonth(), now.getDate(), now.getDay()];
-  return tx(`${y}年${m + 1}月${d}日（${'日月火水木金土'[w]}）`,
-    `${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][w]} · ${d} ${MONTHS_EN[m]} ${y}`);
-}
 /** A horizon of roofs under the word; by night its windows are lit (the city through the paper). */
-function todayCity() {
-  const NS = 'http://www.w3.org/2000/svg';
-  const svg = document.createElementNS(NS, 'svg');
-  svg.setAttribute('class', 'today-city');
-  svg.setAttribute('viewBox', '0 0 400 80');
-  svg.setAttribute('preserveAspectRatio', 'xMidYMax slice');
-  svg.setAttribute('aria-hidden', 'true');
-  svg.setAttribute('focusable', 'false');
-  const roofs = document.createElementNS(NS, 'path');
-  roofs.setAttribute('class', 'today-roofs');
-  const wins = document.createElementNS(NS, 'path');
-  wins.setAttribute('class', 'today-wins');
-  const lamps = document.createElementNS(NS, 'path');
-  lamps.setAttribute('class', 'today-lamps');
-  const r = todayRng(9);
-  let roof = '';
-  let win = '';
-  let lamp = '';
-  for (let x = 0, n = 0; x < 400; n += 1) {
-    const w = 14 + Math.floor(r() * 26);
-    const h = 10 + Math.floor(r() * (x > 130 && x < 270 ? 16 : 40));
-    roof += `M${x} 80V${80 - h}h${w - 1}V80z`;
-    for (let wy = 80 - h + 4; wy < 77; wy += 5) {
-      for (let wx = x + 3; wx < x + w - 4; wx += 4) {
-        if (r() > 0.62) {
-          if ((n + wx + wy) % 11 === 0) lamp += `M${wx} ${wy}h1.6v2h-1.6z`;
-          else win += `M${wx} ${wy}h1.6v2h-1.6z`;
-        }
-      }
-    }
-    x += w;
-  }
-  roofs.setAttribute('d', roof);
-  wins.setAttribute('d', win);
-  lamps.setAttribute('d', lamp);
-  const horizon = document.createElementNS(NS, 'path');
-  horizon.setAttribute('class', 'today-horizon');
-  horizon.setAttribute('d', 'M0 79.5H400');
-  svg.append(roofs, wins, lamps, horizon);
-  return svg;
-}
 /** A content word worth a star: kanji-bearing, two to four characters, and an entry the sheet opens. */
 const TODAY_SKY_WORD = /\p{Script=Han}/u;
-function todaySkyWord(w) {
-  const n = [...String(w || '')].length;
-  return n >= 2 && n <= 4 && TODAY_JA_WORD.test(w) && TODAY_SKY_WORD.test(w) && !!lookup(w);
-}
 /** At most this many stars: a sky, not a scatter (round 4 review). */
 const TODAY_SKY_CAP = 10;
 /** How far back a miss still counts for the sky. */
 const TODAY_SKY_MISS_DAYS = 14;
 /** When a moment was, in words a learner says: today · yesterday · 3 days ago (by calendar day). */
-function todayWhen(at) {
-  const days = Math.round((new Date(dayKey()).getTime() - new Date(dayKey(new Date(at))).getTime()) / 86400000);
-  return days <= 0 ? 'today' : days === 1 ? 'yesterday' : days;
-}
 /** The one plain line a star says about why it is in the sky. */
-function todaySkyWhy(kind, detail = {}) {
-  const when = detail.at ? todayWhen(detail.at) : null;
-  if (kind === 'missed') {
-    if (detail.test) return tx('テストでまちがえた', 'missed in a test');
-    return when === 'today' ? tx('今日まちがえた', 'missed today') : when === 'yesterday' ? tx('きのうまちがえた', 'missed yesterday')
-      : tx(`${when}日前にまちがえた`, `missed ${when} days ago`);
-  }
-  if (kind === 'unknown') return tx('「まだ」にした', 'you marked it not yet');
-  if (kind === 'looked') return detail.times === 2 ? tx('2回調べた', 'you looked it up twice') : tx(`${detail.times}回調べた`, `you looked it up ${detail.times} times`);
-  if (kind === 'due') return tx('今日の復習', 'due today');
-  if (kind === 'read' || kind === 'glyph') return tx('今日の読み物から', "from today's story");
-  if (kind === 'kin') return tx(`今日のことばと「${detail.kanji}」が同じ`, `shares ${detail.kanji} with today's word`);
-  return '';
-}
 
 /** Hfix-2b · X-9 — every word standing under his own "Not yet", read where the WORD PAGE writes
  * it: `met.entries[<encounterKey>].said = { value:'not-yet', at, cursor }`.
@@ -18200,25 +14364,6 @@ function todaySkyWhy(kind, detail = {}) {
  * dictionary entry has since moved is still counted as the word he marked.
  *
  * Pure: reads the record, writes nothing, adds no field, and touches no SRS ledger or schedule. */
-function notYetMarks(record = S) {
-  const root = record?.met;
-  if (!metReadable(root)) return [];
-  const marks = [];
-  for (const [key, entry] of Object.entries(root.entries || {})) {
-    const said = plainRecord(entry) && plainRecord(entry.said) ? entry.said : null;
-    if (said?.value !== 'not-yet') continue;
-    let parsed;
-    try { parsed = JSON.parse(key); } catch { parsed = null; }
-    // [1, 'word', id, kind, seq, reading] — what he met, never the spelling alone
-    if (!Array.isArray(parsed) || parsed[0] !== 1 || parsed[1] !== 'word' || !nonEmptyString(parsed[2])) continue;
-    const identity = { t: 'word', id: parsed[2], kind: parsed[3], seq: parsed[4] ?? null, reading: parsed[5] ?? null };
-    const skey = srsKey('word', identity.id);
-    const match = depthIdentityMatch(identity, wordCardIdentity(record, identity.id));
-    if (match === 'same' && notYetReleased(record, skey, said.cursor)) continue;
-    marks.push({ id: identity.id, key: skey, at: finiteNumber(said.at) ? said.at : 0 });
-  }
-  return marks.sort((a, b) => b.at - a.at);
-}
 
 /** Hfix-2b · X-1 — why one 宙 star is there, in the same words and from the same recorded sources
  * as Today's sky (MASTER_SPEC §7 line 39: "each star says why it is there").
@@ -18229,38 +14374,6 @@ function notYetMarks(record = S) {
  *
  * `notYet` is the set from notYetMarks, passed in so a shelf of kept words costs one pass, not one
  * pass per word. Pure: reads the record only. */
-function keptStarWhy(record, id, now = Date.now(), notYet = null) {
-  if (!nonEmptyString(id)) return '';
-  const skey = srsKey('word', id);
-  const since = now - TODAY_SKY_MISS_DAYS * 86400000;
-  // 1 · missed lately: the review log's Again, and a practice or test answer wrong
-  let miss = null;
-  const later = (row, test) => { if (!miss || row[0] > miss.at) miss = { at: row[0], test }; };
-  for (const row of record.revlog || []) {
-    if (Array.isArray(row) && row[1] === skey && row[2] === 1 && row[0] >= since) later(row, false);
-  }
-  for (const row of record.obslog || []) {
-    if (!Array.isArray(row) || row[0] < since || !['probe', 'dojo', 'lesson', 'mock'].includes(row[1])) continue;
-    if (row[3] === 1 && row[2] === skey) later(row, row[1] === 'mock');
-  }
-  if (miss) return todaySkyWhy('missed', miss);
-  // 2 · his own "Not yet", the same read X-9 gives Today's sky
-  const marked = notYet || new Set(notYetMarks(record).map((mark) => mark.id));
-  if (marked.has(id)) return todaySkyWhy('unknown');
-  // 3 · looked up on two or more occasions, ten minutes apart
-  const times = [];
-  for (const row of record.obslog || []) {
-    if (!Array.isArray(row) || row[1] !== 'tap' || row[3] < 2 || row[2] !== skey) continue;
-    if (!times.length || row[0] - times[times.length - 1] >= 10 * 60000) times.push(row[0]);
-  }
-  if (times.length >= 2) return todaySkyWhy('looked', { times: times.length });
-  // 4 · due today, by the card's own instant
-  const card = plainRecord(record.srs) && owns(record.srs, skey) && plainRecord(record.srs[skey]) ? record.srs[skey] : null;
-  const end = new Date(now);
-  end.setHours(23, 59, 59, 999);
-  if (card && validInstant(card.due) && Date.parse(card.due) <= end.getTime()) return todaySkyWhy('due');
-  return '';
-}
 /* The deck ledgers' misses (localStorage, the deck's own schedule), read once a day through the deck's own read-only
  * export; the sky draws without them and is drawn again in place when they arrive. */
 let todayDeckMisses = null;
@@ -18285,14 +14398,6 @@ function todaySkyDeckMisses() {
   return [];
 }
 /** The sky drawn again in place (the deck misses arrived): never under an open card, never by a full render. */
-function todayRedrawSky() {
-  const hero = document.querySelector('#app main .today-hero');
-  const old = hero?.querySelector('.today-sky');
-  if (S.view !== 'tray' || !old || document.getElementById('mini') || !old.todayArgs) return;
-  const fresh = todaySky(...old.todayArgs);
-  old.replaceWith(fresh);
-  todayPlaceSky(hero);
-}
 /** S · the sky's stars come from his learning, never by chance (John, 2026-10-16: "are those cards in the sky correlated
  * with missed reviews? with words that are marked as not known? or are they random? if so, make it logical"). In this
  * order, each once: words he missed lately (his reviews' Again, a practice or test answer wrong, a deck's Again), words he
@@ -18454,161 +14559,10 @@ function todayOpenUniverse(from) {
  * all. Each star takes a spot at random in its lane where its 44px touch area meets no other (so
  * the field scatters across five heights instead of standing in rows), and the far lanes' stars are
  * set to float by on one ring per lane, so stars of one lane never meet. */
-function todayPlaceSky(hero) {
-  const sky = hero.querySelector('.today-sky');
-  if (!sky?.isConnected || !sky.todayLanes) return;
-  const R = sky.getBoundingClientRect();
-  if (!R.width || !R.height) return;
-  const r = todayRng(todayHash(`${dayKey()}:sky`));
-  const W = R.width;
-  const n = sky.todayLanes.length;
-  // lane centres stand 23px inside the band, so every touch area is whole inside it
-  const pitch = (R.height - 46) / Math.max(1, n - 1);
-  // the caption that names the band sits on the near lane's right end; its whole touch area is
-  // taken, so no star's own touch area runs under it
-  const up = hero.querySelector('.today-universe')?.getBoundingClientRect();
-  const nearRight = up?.width ? Math.min(W, up.left - R.left - 6) : W;
-  const caption = up?.width ? [{ x: up.left - R.left - 4, y: up.top - R.top, w: up.width + 8, h: up.height }] : [];
-  // his learning reads largest, the story and the family quieter (S)
-  const SIZE = { glyph: 24, missed: 19, unknown: 19, looked: 18, due: 18, read: 16, kin: 16 };
-  // per lane, top to bottom: does it float by, how far it sways each way, how many stars it keeps
-  const FLOAT = [true, false, true, false, false];
-  const SWAY = [0, 12, 0, 14, 4];
-  const LIMIT = [2, 2, 2, 2, 2];
-  const SPEED = [5, 0, 7, 0, 0];
-  const placed = [...caption];
-  const order = [4, 1, 3, 0, 2].filter((i) => i < n);
-  const kept = sky.todayLanes.map(() => []);
-  const laneBox = (li) => {
-    const cy = 23 + li * pitch;
-    const inset = FLOAT[li] ? 10 : 8 + SWAY[li];
-    return { cy, left: inset, right: (li === n - 1 ? nearRight : W) - inset };
-  };
-  sky.todayLanes.forEach(({ lane }, li) => {
-    lane.style.top = `${(laneBox(li).cy - 22).toFixed(1)}px`;
-    lane.style.height = '44px';
-  });
-  // S · stars are seated in rank order (his learning first), each in its own lane when it has room, else in the next lane
-  // that does: a star chosen for a reason is never dropped for want of luck while the sky has a place for it
-  const ranked = sky.todayLanes.flatMap(({ stars }, li) => stars.map((star) => ({ star, li })))
-    .sort((x, y) => Number(x.star.dataset.rank || 0) - Number(y.star.dataset.rank || 0));
-  for (const { star, li: home } of ranked) {
-    star.hidden = true;
-    if (kept.flat().length >= TODAY_SKY_CAP) continue;
-    const kind = Object.keys(SIZE).find((k) => star.classList.contains(k)) || 'read';
-    const size = SIZE[kind];
-    const w = [...star.textContent].length * size;
-    // a touch area of at least 44 x 44 around the word that meets no other at rest: a place at random in the lane, else
-    // the first free place from its left edge
-    const hitW = Math.max(44, w + 16);
-    let seat = null;
-    for (const li of [home, ...order.filter((i) => i !== home)]) {
-      if (kept[li].length >= LIMIT[li]) continue;
-      const { cy, left, right } = laneBox(li);
-      const span = right - left - w;
-      if (span < 0) continue;
-      const tries = [...Array.from({ length: 48 }, () => left + r() * span), ...Array.from({ length: Math.floor(span / 6) + 1 }, (_, k) => left + k * 6)];
-      for (const x of tries) {
-        const box = { x: x + w / 2 - hitW / 2, y: cy - 22, w: hitW, h: 44 };
-        if (placed.some((o) => box.x < o.x + o.w && o.x < box.x + box.w && box.y < o.y + o.h && o.y < box.y + box.h)) continue;
-        placed.push(box);
-        seat = { li, x };
-        break;
-      }
-      if (seat) break;
-    }
-    if (!seat) continue;
-    const lane = sky.todayLanes[seat.li].lane;
-    if (star.parentElement !== lane) lane.append(star);
-    kept[seat.li].push({ star, x: seat.x, w, size });
-  }
-  kept.forEach((seated, li) => {
-    const ringW = W + Math.max(0, ...seated.map((s) => s.w)) + 48;
-    for (const { star, x, size } of seated) {
-      star.style.fontSize = `${size}px`;
-      star.style.left = `${((x / W) * 100).toFixed(2)}%`;
-      star.style.top = `${(22 - size / 2).toFixed(1)}px`;
-      for (const name of ['--from', '--to', '--lag', '--ring']) star.style.removeProperty(name);
-      if (FLOAT[li]) {
-        // one ring for the whole lane: its stars move at one pace and wrap out of sight, so their
-        // spacing never changes; at rest (and with reduced motion) each sits at x
-        const start = W + 24;
-        star.style.setProperty('--from', `${(start - x).toFixed(1)}px`);
-        star.style.setProperty('--to', `${(start - ringW - x).toFixed(1)}px`);
-        star.style.setProperty('--lag', `${(-(start - x) / SPEED[li]).toFixed(2)}s`);
-        star.style.setProperty('--ring', `${(ringW / SPEED[li]).toFixed(2)}s`);
-      }
-      star.hidden = false;
-    }
-  });
-}
 /** The day's word, large, with its reading, its hook and the door that follows its part. */
-function renderTodayWord(pick) {
-  const block = el('div', 'today-dayword');
-  const label = el('p', 'dw-label', tx('今日のことば', "Today's word"));
-  label.dataset.japaneseLookup = 'off';
-  block.append(label);
-  const word = el('button', 'dw-word');
-  word.type = 'button';
-  word.dataset.uiContentValue = `語|${pick.word}`;
-  const glyph = todayLearning('span', 'dw-glyph');
-  for (const ch of pick.word) glyph.append(el('span', 'dw-k', ch));
-  glyph.style.setProperty('--n', String(Math.max(2, [...pick.word].length)));
-  word.append(glyph);
-  if (pick.reading) word.append(todayLearning('span', 'dw-r', pick.reading));
-  word.addEventListener('click', () => go(pick.item ? learningItemNode(pick.item) : { t: 'word', id: pick.word }, { invoker: word }));
-  block.append(word);
-  const hook = todayHook(pick.word);
-  if (!hook) return block;
-  const pk = () => todayLearning('span', 'dw-pk', hook.part);
-  const line = el('p', 'dw-hook');
-  const gloss = hook.meaning ? ` “${hook.meaning}”` : '';
-  if (hook.shared) {
-    const howMany = hook.count === 2 ? tx('二つの', 'both') : tx(`${hook.count}つの`, `all ${hook.count}`);
-    line.append(tx(`${howMany}漢字に、同じ部品 `, 'One part, '), pk(), tx(' が隠れている。', `${gloss}, hides inside ${howMany} kanji.`));
-  } else {
-    line.append(tx('', 'Inside '), todayLearning('span', 'dw-pk', hook.host), tx(' の中に、部品 ', ' hides '), pk(),
-      tx(' が隠れている。', `${gloss}.`));
-  }
-  block.append(line);
-  if (hook.family) {
-    block.append(el('p', 'dw-fam', hook.mine
-      ? tx(`この部品の漢字 ${hook.family} 字・うち ${hook.mine} 字はあなたの語に`, `${hook.family} kanji contain it · ${hook.mine} in your words`)
-      : tx(`この部品の漢字 ${hook.family} 字`, `${hook.family} kanji contain it`)));
-  }
-  // plain words (LABELS.md, round 4): the door names where it goes, the kanji that hold this part
-  const follow = el('button', 'dw-go');
-  follow.type = 'button';
-  follow.dataset.uiContentValue = `部品|${hook.part}`;
-  follow.append(el('span', 'dw-go-l', tx('', 'Kanji with')), pk(), el('span', 'dw-go-l', tx('を含む漢字', '')));
-  follow.append(el('i', 'today-arrow'));
-  follow.addEventListener('click', () => {
-    // the word web, centred on the shared part; the part's own sheet when the web isn't ready
-    if (typeof window.openWordWeb === 'function' && window.openWordWeb(hook.part, { type: 'part', invoker: follow }) !== false) return;
-    go(D.radicals?.[hook.part] ? { t: 'radical', id: hook.part } : { t: 'kanji', id: hook.part }, { invoker: follow });
-  });
-  block.append(follow);
-  return block;
-}
 /** Today's line (S, John 2026-10-16: "i hate the plus symbols above the artile and word box. the box in general is bad
  * taste"): two plain lines on the page and no box — the cards waiting (#review-start, the one door into today's review,
  * built by renderTray) and today's reading — each under a hairline, in the house's type, the room's arrow at its end. */
-function renderTodayLine(today, door, read) {
-  const line = el('section', 'today-line');
-  line.setAttribute('aria-label', tx('今日', 'Today'));
-  if (door) line.append(door);
-  if (read) {
-    const then = el('button', 'today-then');
-    then.type = 'button';
-    then.append(el('span', 'today-then-l', tx('今日の読み物', "Today's reading")),
-      todayPhrases(todayLearning('span', 'today-then-title'), read.passage.title));
-    if (read.count) then.append(el('span', 'today-then-n', tx(`あなたの語 ${read.count}`, `${read.count} of your words`)));
-    then.append(el('i', 'today-arrow'));
-    then.addEventListener('click', () => openPassage(read.passage.id));
-    line.append(then);
-  }
-  return line;
-}
 const TODAY_DETAIL_KEY = 'bunki-today-detail';
 /** The deck room, folded under the line: the counts, the forecast, the deck rows, the doors and
  * the pace. Open by default; a learner who folds it finds it folded next time (this device only). */
@@ -18645,9 +14599,6 @@ function renderTodayDetail(today) {
  * so the two can never disagree about what the button is called (round 4 review, LABELS.md). One verb
  * for one act (one-hand pass, 2026-10-15): 保存 · Save and 保存済み ✓ · Saved ✓, as the slip and the
  * word menu say it. */
-function sheetTakeLabel(saved = false) {
-  return saved ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save');
-}
 function renderTray(main) {
   const currentSurface = recordViewSurface();
   const trayToday = S.taken.length && scheduler ? todayQueue() : null;
@@ -19482,151 +15433,14 @@ function renderSavedLists(main) {
  * browsing a list never starts a review — 'Review this list' is its own button"). Today opens at its kept words, not at
  * the sky above them: the newest kept word's row in its month stands a third of the way down the glass under the bar,
  * marked a moment, with the keyboard on it. A row opens its word's page; only "Review this list" starts a review. */
-function landOnKeptWords() {
-  if (S.view !== 'tray' || !S.taken.length) return;
-  const newest = S.taken.reduce((best, row) => (!best || (row.ts || 0) >= (best.ts || 0) ? row : best), null);
-  const key = newest ? srsKey(newest.t, newest.id) : '';
-  // a named list carries copies; the month buckets follow the lists, so the last row for the word is its month's
-  const row = [...document.querySelectorAll('#app main .tray-line[data-kept-key]')].filter((node) => node.dataset.keptKey === key).at(-1)
-    || document.getElementById('kept-words');
-  if (!row) return;
-  const ceiling = Math.max(0, document.querySelector('#app > .chrome')?.getBoundingClientRect().bottom || 0);
-  const box = row.getBoundingClientRect();
-  window.scrollTo({ top: Math.max(0, Math.round(window.scrollY + box.top - ceiling - (innerHeight - ceiling) * 0.3)), behavior: 'instant' });
-  if (!row.matches('.tray-line')) return;
-  row.dataset.landed = '';
-  setTimeout(() => { if (row.isConnected) delete row.dataset.landed; }, 2000);
-  row.focus({ preventScroll: true });
-}
-function trayLine(item, dueKeys) {
-  const currentSurface = recordViewSurface();
-  const line = el('div', 'tray-line');
-  line.tabIndex = 0;
-  line.setAttribute('role', 'button');
-  const key = srsKey(item.t, item.id);
-  line.dataset.keptKey = key;
-  line.append(el('span', 'w', item.label));
-  // G2 · the saved word's dot, for the entry and reading it was saved as
-  if (item.t === 'word') line.append(depthDot(learningItemNode(item)));
-  // a words list wearing a [word] chip on every row was chip noise
-  // (operator, 2026-08-20): the kind speaks only when it differs from
-  // the default. Rows stored before the kind fields existed still heal.
-  if (item.t !== 'word') {
-    const kindJa = item.kind || NODE_KIND[item.t]?.[0] || '';
-    const kindEn = item.kindEn || item.kind || NODE_KIND[item.t]?.[1] || '';
-    line.append(el('span', 'pool-tag', tx(kindJa, kindEn)));
-  }
-  if (isLeech(item)) line.append(el('span', 'pool-tag read-tag', tx('苦手', 'struggling')));
-  // provenance, not authority: the tutor made this row, and saying so is
-  // what keeps its autonomy honest (operator's word, 2026-08-24)
-  if (item.by === 'sensei') line.append(el('span', 'pool-tag', tx('先生', 'tutor-made')));
-  const when = el('span', 'when', srsWhen(item));
-  // red is for NOW — a whole column of red "due" was noise wearing urgency
-  if (dueKeys.has(key)) when.classList.add('due-now');
-  line.append(when);
-  if (!S.srs[key] && !finiteNumber(item.started) && !S.suspended[key]) {
-    // a no-debt row (legacy or imported) wakes by hand: one quiet
-    // affordance in the row itself, and only this press mints the card
-    // into the review cycle — 始める is the explicit promotion
-    const start = el('button', 'rest-toggle srs-start', tx('始める', 'start'));
-    start.type = 'button';
-    start.dataset.srsStart = key;
-    start.setAttribute('aria-label', tx(`「${item.label}」の復習を始める`, `start learning ${item.label}`));
-    start.disabled = trayItemPending.has(key) || !recordWritable();
-    start.addEventListener('click', async (ev) => {
-      ev.stopPropagation();
-      if (trayItemPending.has(key) || !recordWritable()) return;
-      // matched by identity ON THE DECK ROW: a named list carries copies,
-      // so the promotion must find the deck row by t/id, not by reference
-      const now = Date.now();
-      trayItemPending.add(key);
-      start.disabled = true;
-      let saved;
-      try {
-        saved = await commitStorePatch((latest) => ({
-          taken: latest.taken.map((row) => row.t === item.t && row.id === item.id && !finiteNumber(row.started)
-            ? { ...row, started: now } : row),
-        }));
-      } finally {
-        trayItemPending.delete(key);
-        start.disabled = !recordWritable();
-      }
-      if (saved && currentSurface()) render();
-    });
-    line.append(start);
-  } else {
-    // rest / wake — the card stays on the list, reviews skip it
-    const rest = el('button', S.suspended[key] ? 'rest-toggle resting' : 'rest-toggle', S.suspended[key] ? '▶' : '');
-    if (!S.suspended[key]) rest.append(uiIcon('pause', 'rest-icon'));
-    rest.type = 'button';
-    rest.setAttribute('aria-label', S.suspended[key] ? tx('復習にもどす', 'wake this card') : tx('休ませる', 'rest this card'));
-    rest.title = S.suspended[key] ? tx('この札を復習にもどす', 'resume this card in reviews') : tx('この札を休ませる（復習で出さない）', 'pause this card: reviews skip it');
-    rest.disabled = trayItemPending.has(key) || !recordWritable();
-    const wasSuspended = !!S.suspended[key];
-    rest.addEventListener('click', async (ev) => {
-      ev.stopPropagation();
-      if (trayItemPending.has(key) || !recordWritable()) return;
-      // rest/wake is deck state: it rides the guarded boundary, so a
-      // failed persist changes nothing (the alert names the failure)
-      const now = Date.now();
-      trayItemPending.add(key);
-      rest.disabled = true;
-      let saved;
-      try {
-        saved = await commitStorePatch((latest) => {
-          const suspended = { ...latest.suspended };
-          if (wasSuspended) delete suspended[key];
-          else setOwnRecordValue(suspended, key, now);
-          return { suspended };
-        });
-      } finally {
-        trayItemPending.delete(key);
-        rest.disabled = !recordWritable();
-      }
-      if (saved && currentSurface()) render();
-    });
-    line.append(rest);
-  }
-  const openRow = () => item.t === 'question' ? openAssessmentQuestionReview(item) : item.t === 'sentence' ? openSentencePractice(item.id) : go(learningItemNode(item));
-  line.setAttribute('aria-label', tx(`${item.label} の全項目`, `${item.label} — full entry`));
-  line.addEventListener('click', openRow);
-  line.addEventListener('keydown', (ev) => {
-    if (ev.key !== 'Enter' && ev.key !== ' ') return;
-    // the row's own controls keep their keys
-    if (ev.target !== line) return;
-    ev.preventDefault();
-    openRow();
-  });
-  return line;
-}
 
 /* リストの間 — every list, named or monthly, opens to its own page
  * (operator, 2026-08-27): the rows, a review door for just this list, and
  * the list compiled outward as a note (.md download or clipboard). */
 // D23: a list note carries the card's own saved answer (savedAnswerFor), the reading and first
 // meaning its review shows, never the legacy word layer or a cache row laid over it
-function listReading(item) {
-  if (item.t !== 'word') return '';
-  const answer = savedAnswerFor(item);
-  return answer?.status === 'available' ? answer.reading : '';
-}
 
-function listGloss(item) {
-  if (item.t !== 'word') return '';
-  const answer = savedAnswerFor(item);
-  return answer?.status === 'available' ? answer.meanings[0] : '';
-}
 
-function listToMarkdown(name, items) {
-  const lines = [`# ${name} — 回廊 KAIRO`, '', `${items.length} 件 · ${dayKey()}`, ''];
-  for (const item of items) {
-    const r = listReading(item);
-    const g = listGloss(item);
-    const kind = item.t !== 'word' ? `［${item.kind || NODE_KIND[item.t]?.[0] || item.t}］` : '';
-    lines.push(`- ${item.label}${r ? `（${r}）` : ''}${kind}${g ? ` — ${g}` : ''}`);
-  }
-  return lines.join('\n') + '\n';
-}
 
 function renderListPage(main) {
   const open = S.listOpen;
@@ -19707,18 +15521,6 @@ function renderListPage(main) {
 /** A complete backup is one consistent owner snapshot of both stores. Raw
  * unreadable learner bytes remain exportable as explicitly limited recovery
  * material; an unproven archive snapshot never masquerades as complete. */
-async function recordSha256(value) {
-  const bytes = new TextEncoder().encode(canonicalRecordJson(value));
-  return [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))].map((byte) => byte.toString(16).padStart(2, '0')).join('');
-}
-function backupCounts(record, turns, journal) {
-  return { archiveTurns: turns.length, chatTurns: record.aiChat?.length || 0,
-    readingVersions: (record.aiReadings?.length || 0) + (record.aiReading ? 1 : 0),
-    ...(journal ? { syncOperations: journal.operations.length } : {}) };
-}
-function portableRecord(record) {
-  return Object.fromEntries(Object.entries(record).filter(([key]) => !['ai', 'aiEvidence', 'recordGeneration'].includes(key)));
-}
 async function buildExportRecord() {
   const epoch = recordEpoch;
   // K · a copy is a read: it is offered while saving is paused (the record band's Export now), never to a window
@@ -19739,9 +15541,6 @@ async function buildExportRecord() {
   } catch { return { text: null, warning: 'snapshot-unavailable' }; }
 }
 const AI_EVIDENCE_ROLES = new Set(['user', 'assistant', 'tutor', 'app']);
-function validAiEvidenceTurn(turn) {
-  return validArchiveTurn(turn) && nonEmptyString(turn.content);
-}
 function legacyEvidenceRows(value) {
   const evidence = [];
   if (owns(value, 'aiEvidence')) {
@@ -20214,50 +16013,9 @@ function laneMembers() {
  * and the deck gains nothing. One shared learner model; no separate
  * notion of "known". */
 const LESSON_SIZE = 10;
-function lessonLaneIds(kind, lvl) {
-  return (kind === 'kanji' ? laneMembers().kanken[lvl] : laneMembers().jlpt[lvl]) || [];
-}
-function lessonPlan(kind, lvl) {
-  const ids = lessonLaneIds(kind, lvl);
-  const out = [];
-  // K08 · a lane's last few items are a short lesson of their own (鹿 alone in 7級): never dropped, and the
-  // lessons before keep their ids and items, so a kept score still names the same ten
-  for (let i = 0; i < ids.length; i += LESSON_SIZE) {
-    const words = ids.slice(i, i + LESSON_SIZE);
-    out.push({ id: `${lvl}-${out.length + 1}`, lvl, kind, words });
-  }
-  return out;
-}
 /** K08 · the items the lesson's latest full run missed, from its own evidence rows (the record's shape is
  * unchanged: one score per lesson, and one obslog row per item per run, stamped with the score's time). */
-function lessonMissedLast(lesson) {
-  const done = S.lessonsDone?.[lesson.id];
-  if (!done) return [];
-  const kind = lesson.kind || 'word';
-  const missed = new Set((S.obslog || [])
-    .filter((row) => row[1] === 'lesson' && row[4] === lesson.id && row[0] === done.ts && row[3] === 1)
-    .map((row) => row[2]));
-  return lesson.words.filter((w) => missed.has(srsKey(kind, w)));
-}
 /** The run before a lesson's latest one, read back from the evidence rows: id → { score, total }. */
-function lessonPreviousRuns() {
-  const runs = new Map();
-  for (const row of S.obslog || []) {
-    if (row[1] !== 'lesson' || !S.lessonsDone?.[row[4]]) continue;
-    const byTime = runs.get(row[4]) || new Map();
-    const run = byTime.get(row[0]) || { score: 0, total: 0 };
-    run.total += 1;
-    if (row[3] === 3) run.score += 1;
-    byTime.set(row[0], run);
-    runs.set(row[4], byTime);
-  }
-  const previous = new Map();
-  for (const [id, byTime] of runs) {
-    const before = [...byTime.keys()].filter((ts) => ts < S.lessonsDone[id].ts).sort((a, b) => b - a)[0];
-    if (before != null) previous.set(id, byTime.get(before));
-  }
-  return previous;
-}
 /** Start a lesson: all of it, or only `only` (its missed items, which never touch its score). */
 function startLesson(lesson, { only = null } = {}) {
   S.lessonsScroll = window.scrollY; // the list keeps the learner's place
@@ -20277,25 +16035,6 @@ function endLessonRun() {
   window.scrollTo(0, S.lessonsScroll || 0);
 }
 /** The one-line meaning an item is quizzed on, by kind. */
-function lessonGloss(kind, id) {
-  return kind === 'kanji' ? D.kanji[id]?.m || '' : lookup(id)?.m?.[0] || '';
-}
-function lessonChoices(run) {
-  const word = run.words[run.ix];
-  const right = lessonGloss(run.kind, word);
-  const pool = lessonLaneIds(run.kind, run.lvl).filter((w) => w !== word);
-  const wrong = new Set();
-  while (wrong.size < 3 && wrong.size < pool.length) {
-    const cand = lessonGloss(run.kind, pool[Math.floor(Math.random() * pool.length)]);
-    if (cand && cand !== right) wrong.add(cand);
-  }
-  const opts = [right, ...wrong];
-  for (let i = opts.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [opts[i], opts[j]] = [opts[j], opts[i]];
-  }
-  return { right, opts };
-}
 const learningEnrollmentPending = new Set();
 async function commitLearningEnrollment(owner, nodes, isCurrent, { listName = null } = {}) {
   if (learningEnrollmentPending.has(owner) || !recordWritable() || !isCurrent()) return false;
@@ -20334,11 +16073,6 @@ async function commitLearningEnrollment(owner, nodes, isCurrent, { listName = nu
  * card or history stands for an identity this spelling-only door does not, or the answer
  * cannot be confirmed; otherwise null. The lesson and older-set rows show it before any
  * commit; commitLearningEnrollment's skip stays the producer's guard for a later change. */
-function learningEnrollHeldText(node) {
-  if (node?.t !== 'word') return null;
-  const state = wordCaptureState(node);
-  return state === 'conflict' || state === 'unavailable' ? wordCaptureHeldText(node) : null;
-}
 
 /** The held enroll row's route (D23): a spelling held by a card, or kept history, this door does
  * not stand for opens that card or entry from the row too, as the mini's and the full note's route
@@ -20353,23 +16087,8 @@ function heldEnrollRoute(node, id) {
 }
 /** Authored checks use the existing lesson evidence envelope. The live run is
  * session state only; no part, view, reveal or skip creates a scheduled card. */
-function kanjiCourseEvidencePatch(latest, evidence) {
-  const seen = new Set((latest.obslog || []).map((row) => JSON.stringify(row)));
-  const rows = evidence.obslog.filter((row) => !seen.has(JSON.stringify(row)));
-  const lessonsDone = { ...latest.lessonsDone };
-  for (const [id, result] of Object.entries(evidence.lessonsDone)) {
-    if (!lessonsDone[id] || lessonsDone[id].ts <= result.ts) lessonsDone[id] = result;
-  }
-  return { lessonsDone, obslog: [...(latest.obslog || []), ...rows] };
-}
 /** W3 owns the attempt and help history. The schedule is reached only through
  * W4's accepted hook once it is integrated; there is no fallback writer. */
-function kanjiCourseNodeUnit(node) {
-  const course = window.BunkiKanjiCourse;
-  if (node?.t === 'kanji') return course?.unitForCharacter(node.id) || null;
-  if (node?.t !== 'word' || typeof node.reading !== 'string') return null;
-  return course?.unitForTask?.({ type: 'word', id: node.id, reading: node.reading }) || null;
-}
 function kanjiCourseApplyHelp(visit) {
   const course = window.BunkiKanjiCourse;
   if (visit?.run?.schemaVersion !== 2 || visit.run.complete || visit.feedback) return;
@@ -20803,28 +16522,6 @@ function kanjiJourneySettle(attemptId, outcome) {
   const settled = outcome?.write === true ? { write: true, rating: outcome.rating } : { write: false, reason: outcome?.reason || 'publish-uncertain' };
   return kanjiJourneyRun(journey, () => journey.lifecycle.settle(dispatch, settled)).catch(() => {});
 }
-function kanjiCourseTeachingHelp(visit, target) {
-  if (visit?.unitId !== 'shiki-shoku' || !recordReady(visit.epoch)) return;
-  const at = Date.now();
-  return kanjiCourseRememberHelp(visit, [
-    { what: 'teaching-card', about: { kind: 'kanji', literal: target.kanji }, reveals: ['meaning', 'form'], at },
-    { what: 'teaching-card', about: { kind: 'word', term: target.wordKey, reading: target.readings[0] },
-      reveals: ['reading', 'meaning', 'form'], at },
-  ]);
-}
-function kanjiCourseReferenceHelp(visit, node) {
-  if (visit?.unitId !== 'shiki-shoku' || !recordReady(visit.epoch) ||
-      !['kanji', 'word'].includes(node?.t)) return;
-  const about = node.t === 'kanji' ? { kind: 'kanji', literal: node.id }
-    : typeof node.reading === 'string' && node.reading.trim()
-      ? { kind: 'word', term: node.id, reading: node.reading } : null;
-  const help = { what: 'dictionary-entry', ...(about ? { about } : {}),
-    reveals: node.t === 'word' ? ['reading', 'meaning', 'form'] : ['meaning', 'form'], at: Date.now() };
-  const kept = kanjiCourseRememberHelp(visit, [help]);
-  visit.supportedPractice = true;
-  if (kept?.then) return kept.then(() => kanjiCourseApplyHelp(visit));
-  kanjiCourseApplyHelp(visit);
-}
 function kanjiCourseHookLine(outcome) {
   if (outcome?.write === true) return tx(
     `復習に記録しました（評価 ${outcome.rating}）。`, `Recorded for review (rating ${outcome.rating}).`,
@@ -20889,30 +16586,9 @@ async function reportKanjiCourseAttempt(visit, attemptId, choice) {
   visit.pending = false;
   if (S.kanjiCourse === visit && S.view === 'lessons' && recordReady(visit.epoch)) render();
 }
-function kanjiCourseReturnFrame() {
-  const frame = S.navigationReturns.at(-1);
-  return frame?.destination === 'lessons' && frame.kanjiCourseReturn?.visit === S.kanjiCourse ? frame : null;
-}
 /** This is an authored character unit, not a reading test for the source token.
  * The original node is retained only for returning to that exact dictionary
  * entry. Other teaching words/characters never acquire its source provenance. */
-function kanjiCourseEntryNode(visit, target, type) {
-  // A finder/Atlas detour can put generic frames above this course's caller.
-  // Keep the nearest live capsule for this visit without rewriting older ones.
-  // A visit's creation-time origin is not evidence of the current source.
-  const live = visit && visit === S.kanjiCourse && recordReady(visit.epoch) &&
-    !S.navigationReturns.some((frame) => frame.kanjiCourseReturn &&
-      (!recordReady(frame.kanjiCourseReturn.epoch) ||
-        (frame.view === 'review' && S.review !== frame.kanjiCourseReturn.review)));
-  const frame = live ? [...S.navigationReturns].reverse().find((candidate) =>
-    candidate.destination === 'lessons' && candidate.kanjiCourseReturn?.visit === visit) : null;
-  const origin = frame?.kanjiCourseReturn.originNode;
-  if (type === 'kanji' && origin?.t === 'kanji' && origin.id === target.kanji) return { ...origin };
-  if (type === 'word' && origin?.t === 'word' && origin.id === target.wordKey &&
-      target.readings?.includes(origin.reading)) return { ...origin };
-  return { t: type, id: type === 'kanji' ? target.kanji : target.wordKey,
-    ...(type === 'word' && target.readings?.length === 1 ? { reading: target.readings[0] } : {}) };
-}
 function openKanjiCourseUnit(node, invoker) {
   const course = window.BunkiKanjiCourse;
   const unit = kanjiCourseNodeUnit(node);
@@ -21028,55 +16704,11 @@ const M4_COPY = Object.freeze({
   'Q-27u': ['このクエストを、もとの文で選んだことばと結びつけられないため、再開できません。このクエストはやめられます。新しいクエストは、ことば「職業」からつくれます。', 'We can’t link this quest to the word selected in the sentence it came from, so this quest can’t be resumed. You can end it, and you can make a new quest from the word 職業.'],
 });
 /** M4 rooms (UX r4.2 §3.3): the facet a visit's unfinished run practises, or null when no run is left to finish */
-function kanjiCourseRunKind(run) {
-  if (!run || run.complete || run.schemaVersion !== 2) return null;
-  return run.targets.length === 1 ? run.targets[0] : 'mixed';
-}
 /** One run at a time, both ways: an entry resumes the unfinished run of its own kind, starts one when none is unfinished,
  * and is otherwise blocked by the run that occupies the visit, which keeps its attempt, draft and help */
-function kanjiRoomEntry(visit, entry) {
-  const occupying = kanjiCourseRunKind(visit?.run);
-  if (!occupying) return 'start';
-  return occupying === entry ? 'resume' : `blocked-${occupying}`;
-}
-function kanjiChooseRoom(visit, room) {
-  const entry = kanjiRoomEntry(visit, room);
-  visit.chooser = false;
-  visit.blocked = entry.startsWith('blocked-') ? entry.slice('blocked-'.length) : null;
-  if (entry === 'start') Object.assign(visit, { room, stage: 'intro', index: 0, feedback: null });
-}
 /** the course door: the mixed run, subject to the same one-run rule */
-function kanjiEnterCourseDoor(node, invoker) {
-  if (!openKanjiCourseUnit(node, invoker)) return false;
-  const visit = S.kanjiCourse, entry = kanjiRoomEntry(visit, 'mixed');
-  visit.chooser = false;
-  visit.blocked = entry.startsWith('blocked-') ? entry.slice('blocked-'.length) : null;
-  if (entry === 'start' && visit.room) Object.assign(visit, { room: null, stage: 'intro', index: 0, feedback: null });
-  render();
-  return true;
-}
 /** R-01 from a word page: the chooser, carrying the word it came from (R-07) */
-function openKanjiRooms(node, invoker) {
-  if (!openKanjiCourseUnit(node, invoker)) return false;
-  Object.assign(S.kanjiCourse, { chooser: true, blocked: null, carried: node.t === 'word' ? node.id : null });
-  render(); document.getElementById('kanji-course-title')?.focus();
-  return true;
-}
 /** R-02: two study doors, each with its scope as the live line, and nothing else */
-function renderKanjiRoomChooser(main, visit, redraw) {
-  main.append(el('h2', 'list-head', tx(...M4_COPY['R-02'])));
-  for (const [room, scope] of [['reading', 'R-04'], ['meaning', 'R-06']]) {
-    const door = el('button', 'study-door');
-    door.type = 'button'; door.id = `kanji-room-${room}`; door.dataset.studyDoor = `room-${room}`;
-    door.append(el('span', 'study-door-t', tx(...ROOM_NAMES.rooms[`room-${room}`])), el('span', 'study-door-sub', tx(...M4_COPY[scope])));
-    door.disabled = !!visit.pending;
-    door.addEventListener('click', () => {
-      if (S.kanjiCourse !== visit || visit.pending) return;
-      kanjiChooseRoom(visit, room); redraw();
-    });
-    main.append(door);
-  }
-}
 /** M4 v0 quests (UX r4.2 §2; lead 1709: they exist only with the switch ON): the adapter, loaded once beside the lifecycle */
 let kanjiQuestModule = null;
 /** the lifecycle phases of a structural hold (§5: J1/P4 roots, JLp:195–196): no quest starts or advances, the rooms still work */
@@ -21102,40 +16734,12 @@ function kanjiQuestFor(visit = { epoch: recordEpoch }) {
   const journey = kanjiJourneyFor(visit);
   return journey?.quest ? journey : null;
 }
-function kanjiQuestStructural(journey) {
-  const view = journey.lifecycle.inspect();
-  return !view.root || KANJI_QUEST_STRUCTURAL.includes(view.phase);
-}
 /** the reader occurrence a 職業 word page came from, as content (W2 2004/2020 S3B-2; W12 2024 (a)): its passage, the exact sentence
  * text, which occurrence of that text in the passage it is, and the selected word's surface, base and character offset in it. No
  * token index is kept: a retokenized passage with the same text is the same occurrence, and any change of the text is another
  * one. A page opened without an occurrence (search, lists, an imported source in v0) offers no quest */
-function kanjiQuestSeed(node, module) {
-  // an imported source's context beside a passage index is conflicting provenance (W5 2000): no quest, never a passage seed
-  if (node?.t !== 'word' || node.id !== '職業' || node.sourceContext != null) return null;
-  const sentence = teacherSentence(node);
-  const token = sentence?.p.tokens[sentence.index];
-  if (!sentence || token?.b !== node.id) return null;
-  const nth = kanjiQuestSentences(sentence.p).filter((s) => s.end <= sentence.start && s.quote === sentence.quote).length;
-  return module.questSeed({ source: 'passage', passage: sentence.p.id, quote: sentence.quote, nth,
-    offset: sentence.p.tokens.slice(sentence.start, sentence.index).map((t) => t.s).join('').length, surface: token.s, word: node.id });
-}
 /** a loaded passage's whole sentences, as the reader cuts them (teacherSentence over takenContext), in order */
-function kanjiQuestSentences(p) {
-  const sentences = [];
-  for (let index = 0; index < p.tokens.length;) {
-    const sentence = teacherSentence({ from: { passage: p.id, index } });
-    if (!sentence || sentence.end <= index) break;
-    sentences.push({ start: sentence.start, end: sentence.end, quote: sentence.quote });
-    index = sentence.end;
-  }
-  return sentences;
-}
 /** the sentence the quest was made from, as it was read (Q-04, the Lessons and pool rows), never the passage's text now */
-function kanjiQuestQuote(seed) {
-  const quote = seed?.sourceOccurrence?.quote;
-  return typeof quote === 'string' ? quote : null;
-}
 /** what this page is loading for a stale check (a passage's text, the archive index): { state: 'pending' | 'failed', waiters },
  * where every current page that asked while it was pending is redrawn when it settles (W2 2037 S3B-2d) */
 const kanjiQuestLoading = new Map();
@@ -21145,160 +16749,21 @@ const kanjiQuestLoading = new Map();
  * prove either: a seed without its content identity, the same sentence with the selected word no longer re-identified there, a
  * passage absent once every index has loaded, or a text or index that failed to load; null while the archive index or the
  * passage's text is still loading. A load starts once; every caller with a redraw joins it. Only false resumes or binds */
-function kanjiQuestStale(seed, redraw = null) {
-  const at = seed?.sourceOccurrence;
-  if (at?.source !== 'passage' || typeof at.quote !== 'string' || !Number.isInteger(at.nth) || !Number.isInteger(at.offset) ||
-      typeof at.surface !== 'string' || at.quote.slice(at.offset, at.offset + at.surface.length) !== at.surface) return 'unverifiable';
-  const load = (key, start) => {
-    let entry = kanjiQuestLoading.get(key);
-    if (!entry) {
-      const loading = { state: 'pending', waiters: new Set() };
-      kanjiQuestLoading.set(key, entry = loading);
-      start().then(() => kanjiQuestLoading.delete(key), () => { loading.state = 'failed'; }).finally(() => {
-        // each waiter is its own page's redraw, which draws nothing once that page is no longer current
-        const waiters = [...loading.waiters];
-        loading.waiters.clear();
-        for (const wake of waiters) wake();
-      });
-    }
-    if (entry.state === 'pending' && redraw) entry.waiters.add(redraw);
-    return entry.state === 'failed' ? 'unverifiable' : null;
-  };
-  const p = D.passages?.find((entry) => entry.id === at.passage);
-  // the main index boots first; an archive passage is known only once the archive index has loaded (the standalone build has none)
-  if (!p) return D.archive || window.__CORRIDOR_STANDALONE__ === true || typeof ensureArchiveIndex !== 'function' ? 'unverifiable'
-    : load('archive-index', () => ensureArchiveIndex());
-  if (!p.tokens) return typeof ensureArticle === 'function' ? load(`passage:${p.id}`, () => ensureArticle(p)) : 'unverifiable';
-  const sentence = kanjiQuestSentences(p).filter((s) => s.quote === at.quote)[at.nth];
-  if (!sentence) return 'changed';
-  // the selected word, recomputed in the current tokens: a token starting at the stored offset with the stored surface and base
-  let offset = 0;
-  for (let index = sentence.start; index < sentence.end; index += 1) {
-    if (offset === at.offset) return p.tokens[index].s === at.surface && p.tokens[index].b === at.word ? false : 'unverifiable';
-    offset += p.tokens[index].s.length;
-  }
-  return 'unverifiable';
-}
 /** one learner line by id; K-26 is the course's own record-changed line (C:20697) */
-function kanjiQuestLine(id, n = 0) {
-  if (id === 'K-26') return tx('記録が切り替わったため、この練習は保存できません。', 'The learner record changed. This session cannot be saved.');
-  return tx(...M4_COPY[id].map((text) => text.replace('${n}', n)));
-}
 /** a quest write's lines (§2.3): nothing for a published one; K-26 or Q-17 for a refusal before commit; the action's own line for a
  * known non-publication, Q-21 for an unproved one. Q-25 joins once, and only while a commit has left this page held (lead 1823) */
-function kanjiQuestLines(journey, action, out) {
-  if (['published', 'already-completed', 'exists', 'absent', 'pool-full'].includes(out.kind)) return [];
-  if (out.kind === 'owner-changed' || out.kind === 'structural') return action === 'retire' ? [] : [out.kind === 'structural' ? 'Q-17' : 'K-26'];
-  const own = out.kind === 'uncertain' ? 'Q-21' : KANJI_QUEST_FAILED[action];
-  const lines = own && action !== 'retire' ? [own] : [];
-  const view = journey.lifecycle.inspect();
-  if (view.phase === 'publication-hold' && Date.now() < view.holdUntil && !journey.quest.toldHold) {
-    journey.quest.toldHold = true; lines.push('Q-25');
-  }
-  return lines;
-}
 /** the binding this run took at its creation, while it still holds a quest */
-function kanjiQuestBinding(journey, run) {
-  const binding = journey.quest.state.sessions.get(run?.sessionId)?.binding;
-  return binding?.goals.length ? binding : null;
-}
 /** inside a quest, Q-16 replaces K-03 and the self-check is always offered (decision 8a) */
-function kanjiQuestBound(visit) {
-  const journey = kanjiQuestFor(visit);
-  return !!(journey && visit.run && kanjiQuestBinding(journey, visit.run));
-}
 /** words done in a run: answered, with feedback and a self-check (participation, never recall) */
-function kanjiQuestWordsDone(run) {
-  return run.attempts.filter((attempt, index) => run.responses[index]?.action === 'answer' && attempt.feedbackAt !== null &&
-    attempt.selfCheck !== null).length;
-}
 /** at a run's creation only (W2 1928): a fresh Reading run binds the unfinished quests present now; any other run binds none */
-function kanjiQuestRunStarted(visit) {
-  const journey = kanjiQuestFor(visit);
-  if (!journey) return;
-  visit.questSettle = null;
-  journey.quest.module.bindRun(journey.quest.state, journey.lifecycle, visit.run, { eligible: (goal) => kanjiQuestStale(goal.seed) === false });
-}
 /** at the last required self-check, before anything can replace the run (W5 1746; W2 1928): a qualifying bound run settles its
  * quests. The adapter reserves each one before its first write; the course's review write goes on beside it */
-function kanjiQuestSettle(visit) {
-  const journey = kanjiQuestFor(visit), course = window.BunkiKanjiCourse, run = visit.run;
-  const binding = journey && run ? kanjiQuestBinding(journey, run) : null;
-  if (!binding || !journey.quest.module.runQualifies(run, binding, course)) return null;
-  const settle = { sessionId: run.sessionId, pending: true, lines: [] };
-  visit.questSettle = settle;
-  const owned = kanjiQuestOwner(journey);
-  return journey.quest.module.settleRun(journey.lifecycle, journey.quest.state, run, { course, owned }).then((results) => {
-    // a binding made under another activation, journey or generation wrote nothing here, and the quest's state now is unknown
-    // to this page (W12 2000 L3): Q-21, never "still in progress"
-    if (!results.length) { settle.lines = owned() ? ['Q-21'] : ['K-26']; return; }
-    for (const { goalId, complete, retire } of results) {
-      const done = ['published', 'already-completed'].includes(complete.kind);
-      if (done && visit.quest?.goalId === goalId) visit.quest.done = true;
-      for (const id of done ? ['Q-12', ...(retire ? kanjiQuestLines(journey, 'retire', retire) : [])] : kanjiQuestLines(journey, 'complete', complete))
-        if (!settle.lines.includes(id)) settle.lines.push(id);
-    }
-  }, () => { settle.lines = kanjiQuestLines(journey, 'complete', { kind: 'uncertain' }); }).finally(() => {
-    settle.pending = false;
-    kanjiQuestRedraw(visit);
-  });
-}
 /** Q-16 with no review hook: inside a quest the self-check is still kept and counts toward it, and the line says recording is
  * unavailable (K-20) */
-function kanjiQuestSelfCheck(visit, attemptId, choice) {
-  if (!kanjiQuestBound(visit)) return false;
-  visit.run = window.BunkiKanjiCourse.selfCheck(visit.run, attemptId, choice, Date.now());
-  visit.hookOutcomes[attemptId] = { write: false, reason: 'hook-unavailable' };
-  kanjiQuestSettle(visit);
-  render();
-  return true;
-}
-function kanjiQuestRedraw(visit) {
-  if (S.kanjiCourse !== visit || S.view !== 'lessons' || !recordReady(visit.epoch)) return;
-  render(); document.getElementById('kanji-course-title')?.focus({ preventScroll: true });
-}
 /** one quest write from a quest stage: the visit waits, then the stage shows that write's own outcome */
-async function kanjiQuestAct(visit, act) {
-  const journey = kanjiQuestFor(visit), quest = visit.quest;
-  if (!journey || !quest || visit.pending) return null;
-  visit.pending = true; quest.lines = []; render();
-  let out;
-  try { out = await act(journey.quest.module, journey.lifecycle, journey.quest.state, { owned: kanjiQuestOwner(journey) }); }
-  catch { out = { kind: 'uncertain' }; }
-  visit.pending = false;
-  return visit.quest === quest ? { journey, quest, out } : null;
-}
 /** Q-05: the quest page opens only on a published create; an occurrence's unfinished quest is resumed, a finished one shows done */
-async function kanjiQuestCreate(visit) {
-  const acted = await kanjiQuestAct(visit, (module, lc, state, opts) => module.createQuest(lc, state, visit.quest.seed, opts));
-  if (acted) {
-    const { journey, quest, out } = acted;
-    if ((out.kind === 'published' && out.goalId != null) || (out.kind === 'exists' && out.status === 'unfinished'))
-      Object.assign(quest, { goalId: out.goalId, view: 'page' });
-    else if (out.kind === 'pool-full') quest.view = 'pool';
-    // an End still pending for this occurrence, or a create already in flight that has not resolved, is not known either way
-    else quest.lines = kanjiQuestLines(journey, 'create', out.kind === 'published' || out.kind === 'pending-end' ||
-      out.reason === 'create-unresolved' ? { kind: 'uncertain' } : out);
-  }
-  kanjiQuestRedraw(visit);
-}
 /** Q-11b End it: abandon-and-retire. Q-24 only once it is published; the run is left as it is (§3.3) */
-async function kanjiQuestEnd(visit) {
-  const acted = await kanjiQuestAct(visit, (module, lc, state, opts) => module.endQuest(lc, state, visit.quest.goalId, opts));
-  if (acted) {
-    const { journey, quest, out } = acted;
-    quest.confirmEnd = false;
-    if (out.kind === 'published' || out.kind === 'absent') Object.assign(quest, { view: 'ended', lines: out.kind === 'published' ? ['Q-24'] : [] });
-    else quest.lines = kanjiQuestLines(journey, 'end', out);
-  }
-  kanjiQuestRedraw(visit);
-}
 /** Q-26: clear one finished quest still in the pool (owned retirement recovery); a published one leaves the list */
-async function kanjiQuestClear(visit, goalId) {
-  const acted = await kanjiQuestAct(visit, (module, lc, state, opts) => module.clearCompleted(lc, state, goalId, opts));
-  if (acted) acted.quest.lines = kanjiQuestLines(acted.journey, 'retire', acted.out);
-  kanjiQuestRedraw(visit);
-}
 /** Q-01 / Q-01r beside the course door on the 職業 word page (window 4 1926; W12 1928): one quest per occurrence */
 function kanjiQuestDoor(sheet, node, disabled) {
   const journey = kanjiQuestFor();
@@ -21314,13 +16779,6 @@ function kanjiQuestDoor(sheet, node, disabled) {
   sheet.append(door);
 }
 /** the door takes the course's own help path from the page (K-25, §2.1): the objective card, or the quest page to resume */
-function kanjiQuestOpen(node, invoker, seed, goalId) {
-  if (!openKanjiCourseUnit(node, invoker)) return false;
-  Object.assign(S.kanjiCourse, { chooser: false, blocked: null,
-    quest: { seed, goalId, view: goalId === null ? 'objective' : 'page', lines: [], confirmEnd: false, done: false } });
-  render(); document.getElementById('kanji-course-title')?.focus();
-  return true;
-}
 /** Q-08 rows in Lessons, ON only, one per unfinished quest; a finished one is never shown in progress (§2.3) */
 function kanjiQuestLessonRows(section) {
   const journey = kanjiQuestFor();
@@ -21349,13 +16807,6 @@ function kanjiQuestLessonRows(section) {
 }
 /** the visit's quest stage after this owner's root is read: null with no quest, 'ended' once its goal has left the root (absence
  * proves only absence, W5 1746: no ended or retired line after the fact) */
-function kanjiQuestStage(visit) {
-  const quest = visit.quest, journey = quest ? kanjiQuestFor(visit) : null;
-  if (!journey) { if (quest) visit.quest = null; return null; }
-  if (quest.view === 'page' && !quest.done &&
-      !journey.quest.module.quests(journey.lifecycle.inspect().root).some((goal) => goal.id === quest.goalId)) quest.view = 'ended';
-  return quest.view;
-}
 /** K-22 Back on a quest stage. In a room it goes up to the quest page; elsewhere it is "leave for now" (§2.1, condition B): the visit
  * keeps its run, attempt, draft and help and only the view changes, never "Back to course list". Q-07 only for a quest in the
  * last confirmed root, otherwise Q-21 */
@@ -21374,100 +16825,10 @@ function kanjiQuestLeave(visit) {
 }
 /** Q-13r: eight quests present, finished ones too (W5 1746). Each is listed: an unfinished one to resume or end, a finished one to
  * clear (Q-26); none is evicted to make room */
-function kanjiQuestPool(main, visit, journey, button, redraw) {
-  main.append(el('p', 'gloss', kanjiQuestLine('Q-13r')));
-  const go = (goal, confirmEnd) => {
-    visit.quest = { seed: goal.seed, goalId: goal.id, view: 'page', lines: [], confirmEnd, done: false }; redraw();
-  };
-  for (const goal of journey.quest.module.quests(journey.lifecycle.inspect().root)) {
-    if (goal.status === 'unfinished') {
-      main.append(el('p', 'fine', kanjiQuestLine('Q-08')));
-      const sentence = kanjiQuestQuote(goal.seed);
-      if (sentence) main.append(el('p', 'fine', sentence));
-      main.append(button(`kanji-quest-resume-${goal.id}`, ...M4_COPY['Q-08b'], () => go(goal, false)),
-        button(`kanji-quest-end-${goal.id}`, ...M4_COPY['Q-10'], () => go(goal, true)));
-    } else if (goal.status === 'completed') {
-      main.append(button(`kanji-quest-clear-${goal.id}`, ...M4_COPY['Q-26'], () => kanjiQuestClear(visit, goal.id)));
-    }
-  }
-}
 /** the quest's own stages in this visit (§2.1–§2.2): the objective card, the quest page and the full pool; true when it drew the
  * whole stage. In a room, or once the quest has ended, the course draws below the quest's lines */
-function kanjiQuestRender(main, visit, redraw, button) {
-  const quest = visit.quest, journey = kanjiQuestFor(visit);
-  if (!quest || !journey) return false;
-  const { module } = journey.quest;
-  const lines = (ids) => {
-    for (const id of ids) { const line = el('p', 'gloss', kanjiQuestLine(id)); line.setAttribute('role', 'status'); main.append(line); }
-  };
-  if (journey.quest.restarted && quest.view === 'page') { journey.quest.restarted = false; lines(['Q-15r']); }
-  lines(quest.lines);
-  if (quest.view === 'room' || quest.view === 'ended') return false;
-  main.append(el('h2', 'list-head', kanjiQuestLine('Q-02')));
-  if (kanjiQuestStructural(journey)) { lines(['Q-17']); return true; }
-  const root = journey.lifecycle.inspect().root;
-  if (quest.view === 'pool') { kanjiQuestPool(main, visit, journey, button, redraw); return true; }
-  if (quest.view === 'objective') {
-    // no reading: the next thing asked is the reading (§2.1)
-    main.append(el('p', 'gloss', kanjiQuestLine('Q-03')));
-    const sentence = kanjiQuestQuote(quest.seed);
-    if (sentence) main.append(el('p', 'fine', kanjiQuestLine('Q-04')), el('p', 'gloss', sentence));
-    main.append(el('p', 'fine', kanjiQuestLine('Q-14')), el('p', 'fine', kanjiQuestLine('Q-06')));
-    const goal = module.questFor(root, quest.seed);
-    if (goal?.status === 'completed') {
-      lines(['Q-12']);
-      main.append(button('kanji-quest-clear', ...M4_COPY['Q-26'], () => kanjiQuestClear(visit, goal.id)));
-    } else if (module.quests(root).length >= journey.module.LIMITS.goals) kanjiQuestPool(main, visit, journey, button, redraw);
-    else main.append(button('kanji-quest-start', ...M4_COPY['Q-05'], () => kanjiQuestCreate(visit), 'take'));
-    return true;
-  }
-  // the quest page: no score, only words done (§4)
-  const goal = module.quests(root).find((g) => g.id === quest.goalId);
-  if (quest.done || goal?.status === 'completed') {
-    lines(['Q-12']);
-    main.append(el('p', 'fine', tx('この回の練習結果です。習得・長期記憶を示す点数ではありません。', 'These results describe this practice session. They do not establish mastery or long-term retention.')));
-    return true;
-  }
-  const occupying = kanjiCourseRunKind(visit.run);
-  const bound = !!kanjiQuestBinding(journey, visit.run)?.goals.some((g) => g.id === quest.goalId);
-  const toRoom = () => { quest.view = 'room'; quest.lines = []; quest.confirmEnd = false; Object.assign(visit, { chooser: false, blocked: null }); };
-  const stale = goal ? kanjiQuestStale(goal.seed, redraw) : false;
-  if (stale !== false) {
-    // lead 2005: a changed sentence refuses to resume, with its line and End only (W12 2008); an unloaded passage can't be checked yet
-    lines([{ changed: 'Q-27', unverifiable: 'Q-27u' }[stale] ?? 'Q-17']);
-  } else if (occupying && !(occupying === 'reading' && bound)) {
-    // §3.3: a pre-goal, Meaning or mixed run is never answered, bound or reset from here; R-11 goes back to it as it is
-    lines(['Q-19']);
-    main.append(button('kanji-room-return', ...M4_COPY['R-11'], () => { toRoom(); redraw(); }));
-  } else {
-    const door = el('button', 'study-door');
-    door.type = 'button'; door.id = 'kanji-quest-reading'; door.dataset.studyDoor = 'room-reading';
-    door.append(el('span', 'study-door-t', tx(...ROOM_NAMES.rooms['room-reading'])),
-      el('span', 'study-door-sub', kanjiQuestLine('Q-09', occupying ? kanjiQuestWordsDone(visit.run) : 0)));
-    door.disabled = !!visit.pending;
-    door.addEventListener('click', () => {
-      if (S.kanjiCourse !== visit || visit.pending) return;
-      toRoom(); kanjiChooseRoom(visit, 'reading'); redraw();
-    });
-    main.append(door, button('kanji-quest-rooms', ...M4_COPY['R-01'], () => { toRoom(); visit.chooser = true; redraw(); }));
-  }
-  if (quest.confirmEnd) {
-    main.append(el('p', 'fine', kanjiQuestLine('Q-11')));
-    const [endJa, keepJa] = M4_COPY['Q-11b'][0].split(' · '), [endEn, keepEn] = M4_COPY['Q-11b'][1].split(' · ');
-    main.append(button('kanji-quest-end-confirm', endJa, endEn, () => kanjiQuestEnd(visit)),
-      button('kanji-quest-end-keep', keepJa, keepEn, () => { quest.confirmEnd = false; redraw(); }));
-  } else main.append(button('kanji-quest-end', ...M4_COPY['Q-10'], () => { quest.confirmEnd = true; quest.lines = []; redraw(); }));
-  return true;
-}
 /** at a bound run's results (§2.1): Q-12 only once its completion is published (K-21 stands below), the write's own line when not,
  * and Q-18 with Q-18b when the set finished without every self-check */
-function kanjiQuestSummary(main, visit, button, start) {
-  if (!kanjiQuestBound(visit)) return;
-  const settle = visit.questSettle?.sessionId === visit.run.sessionId ? visit.questSettle : null;
-  const line = (id) => { const p = el('p', 'gloss', kanjiQuestLine(id)); p.setAttribute('role', 'status'); main.append(p); };
-  if (!settle) { line('Q-18'); main.append(button('kanji-quest-again', ...M4_COPY['Q-18b'], () => start('check'), 'take')); return; }
-  for (const id of settle.pending ? [] : settle.lines) line(id);
-}
 function renderKanjiCourseMenu(main) {
   const course = window.BunkiKanjiCourse;
   if (!course) return;
@@ -22131,9 +17492,6 @@ function resolveReceivedAssessmentForm(reference) {
     ? { form, editorialAtStart: entry.editorialAtStart, presentation: resolveAssessmentPresentation(form) } : null;
 }
 let assessmentReconcilePending = false, assessmentReconcileLast = 0;
-function reconcileAssessmentResults() {
-  return queueAssessmentWork(performAssessmentReconciliation);
-}
 async function performAssessmentReconciliation() {
   const epoch = recordEpoch;
   if (assessmentReconcilePending || !recordWritable(epoch) || !assessmentReceivedModule) return false;
@@ -22374,12 +17732,6 @@ async function performAssessmentV2(action) {
     return await commitStorePatch(latest => ({ v: 2, assessmentLibraryV2: assessmentV2Module.commandAssessmentV2(latest.assessmentLibraryV2, command) }));
   } catch { return false; }
   finally { assessmentV2Pending = false; if (recordReady(epoch) && S.view === 'mock') render(); }
-}
-async function resumeAssessmentV2() {
-  const selected = currentAssessmentV2();
-  if (!selected || selected.attempt.status !== 'in-progress' ||
-      (selected.attempt.clock.sessionId === assessmentClockSession && !selected.attempt.clock.interrupted)) return true;
-  return applyAssessmentV2({ kind: 'resume' });
 }
 let assessmentEnrichmentPending = false, assessmentEnrichmentLast = 0, assessmentEnrichmentRetry = null;
 function enrichAssessmentCards() {
@@ -22914,10 +18266,6 @@ function ensureMockSet(setId) {
 
 /** One flat sitting order, each item still knowing the section it came from
  * (its passage, its name) — the paper's shape without the nesting. */
-function practiceIdentity(prefix) {
-  if (!globalThis.crypto?.randomUUID) throw new Error('Practice identity unavailable');
-  return `${prefix}:${globalThis.crypto.randomUUID()}`;
-}
 let mockPending = null;
 function practiceSelection() {
   if (!assessmentModule || !S.assessmentLibrary) return null;
@@ -23119,17 +18467,6 @@ function markMockFailed(key) {
   render();
 }
 /** the one door out of a settled failure: forget it, and try once more */
-function retryMockLoad(main, key, start) {
-  const again = biLabel('button', 'chip', 'もう一度', 'try again');
-  again.type = 'button';
-  again.id = 'mock-retry';
-  again.addEventListener('click', () => {
-    D.mockFailed?.delete(key);
-    start();
-    render();
-  });
-  main.append(again);
-}
 
 function latestPracticeBySet() {
   const results = new Map();
@@ -23176,12 +18513,6 @@ function practiceHistoryRows() {
   const snapshot = currentRecordNoteView();
   return assessmentModule.receivedPracticeHistory(S.assessmentLibrary, snapshot?.examAttemptViews || [],
     snapshot ? { scope: snapshot.identity } : {}).entries;
-}
-function receivedPracticeAlternativeLabel(attemptId, payloadSha256) {
-  const heads = currentRecordNoteView()?.examAttemptViews.find((entry) => entry.attemptId === attemptId)?.headAttempts || [];
-  if (heads.length < 2) return null;
-  const index = heads.map((head) => head.payloadSha256).sort().indexOf(payloadSha256);
-  return index < 0 ? null : `${tx('記録', 'Record')} ${index + 1}`;
 }
 function fillPracticeHistory(history) {
   const entries = practiceHistoryRows();
@@ -23257,7 +18588,6 @@ function refreshReceivedPracticeSurfaces() {
   if (key && !focused.isConnected) (wanted.find((node) => node.dataset.historyKey === key) || document.getElementById('mock-history-title'))?.focus({ preventScroll: true });
 }
 const receivedDetailRendered = new WeakMap();
-function receivedPracticeLoadKey(payload) { return canonicalRecordJson(payload.form); }
 function startReceivedPracticeLoad(current) {
   const key = receivedPracticeLoadKey(current.head.payload), previous = receivedPracticeLoads.get(key);
   const state = previous || { status: 'loading', set: null, subscribers: new Map() };
@@ -23620,17 +18950,6 @@ function renderMockItem(main, set, flat, run) {
 
 /** A subject the dictionary confirms, or nothing at all — the same law the
  * tutor's cards obey (2026-08-24 amendment): no dictionary truth, no row. */
-function mockSubjectKey(subject) {
-  if (!nonEmptyString(subject)) return null;
-  const cut = subject.indexOf(':');
-  if (cut < 1) return null;
-  const t = subject.slice(0, cut);
-  const id = subject.slice(cut + 1);
-  if (!id || !['word', 'kanji'].includes(t)) return null;
-  const known = t === 'kanji' ? !!D.kanji?.[id] : !!lookup(id);
-  if (!known && !S.taken.some((item) => item.t === t && item.id === id)) return null;
-  return srsKey(t, id);
-}
 
 function renderMockResult(main, set, flat, run, selected) {
   const right = flat.reduce((n, f, i) => n + (run.answers[i] === f.item.right ? 1 : 0), 0);
@@ -23832,9 +19151,6 @@ const kagamiLevelOf = (key) => {
   return null;
 };
 
-function kagamiBand() {
-  return { levels: {}, edge: null, evidence: 0, measured: 0, observed: 0, disagreement: false, sampled: false };
-}
 
 /** One judged answer, filed where it belongs. A level's cell keeps measured
  * and observed apart (review round 11): the campaign's law is that mined
@@ -23843,217 +19159,16 @@ function kagamiBand() {
  * mined misses could dilute measured ones at full weight. seen/right are
  * MEASURED; what the sensei observed rides beside them and is shown, but
  * never decides. */
-function kagamiNote(band, level, right, measured) {
-  band.evidence += 1;
-  if (measured) band.measured += 1;
-  else band.observed += 1;
-  // a judged answer on a word the graded lists never tagged is still an
-  // answer (review round 11): counting it in the totals and then dropping it
-  // from every cell left the page reporting evidence it could not show.
-  // 級外 is a cell like any other — it simply clears nothing, since it
-  // names no level.
-  const at = level || KAGAMI_OOV;
-  const cell = band.levels[at] || (band.levels[at] = { seen: 0, right: 0, obsSeen: 0, obsRight: 0 });
-  if (measured) {
-    cell.seen += 1;
-    if (right) cell.right += 1;
-  } else {
-    cell.obsSeen += 1;
-    if (right) cell.obsRight += 1;
-  }
-}
 
 /** The hardest level the evidence actually clears — and a flag when the
  * levels disagree (an easier band failing under a harder one passing means
  * the sample is telling two stories, and the page says so rather than
  * smoothing it). */
-function kagamiEdge(band) {
-  let edge = null;
-  let failedAt = -1;
-  band.sampled = false;
-  KAGAMI_LEVELS.forEach((level, ix) => {
-    const cell = band.levels[level];
-    if (!cell || cell.seen < KAGAMI_MIN_SEEN) return;
-    band.sampled = true;
-    if (cell.right / cell.seen >= KAGAMI_CLEAR) {
-      edge = level;
-      // clearing something HARDER than a level already failed is the only
-      // real contradiction. Failing the harder level after clearing the
-      // easier one is not disagreement — it is what learning looks like.
-      if (failedAt >= 0 && ix > failedAt) band.disagreement = true;
-    } else if (failedAt < 0) failedAt = ix;
-  });
-  return edge;
-}
 
 /** Recompute from the current acknowledged record when the mirror or article
  * request asks. Equal ledger lengths do not mean equal evidence or rested
  * identities. This synchronous read stores no model and changes no learning
  * state; neither caller runs on a drawing or pointer-movement loop. */
-function learnerModel() {
-  const state = S;
-  const bands = {
-    lexis: kagamiBand(),
-    readings: kagamiBand(),
-    syntax: kagamiBand(),
-    production: kagamiBand(),
-  };
-  const nodes = {};
-  const pairs = new Map();
-  const unverifiedPractice = { rows: 0, byBand: { lexis: 0, readings: 0, syntax: 0, production: 0 } };
-  const touch = (key, right, measured, kind) => {
-    const node = nodes[key] || (nodes[key] = { seen: 0, right: 0, measured: 0, observed: 0, kinds: {} });
-    node.kinds[kind] = (node.kinds[kind] || 0) + 1;
-    if (right === null) return;
-    node.seen += 1;
-    if (right) node.right += 1;
-    if (measured) node.measured += 1;
-    else node.observed += 1;
-  };
-
-  // A drill undo is a bare [t,'dojo',key,0] row that revokes the most recent
-  // standing dojo grade for that key (review round 10). Counting it as a
-  // failure AND keeping the grade it withdrew made undoing practice lower the
-  // mirror twice over. Both rows are struck here, in append order, so
-  // repeated grades and repeated undos unwind the way they were made.
-  const obslog = state.obslog || [];
-  const struck = new Set();
-  const standing = new Map();
-  obslog.forEach((row, ix) => {
-    if (!Array.isArray(row) || row[1] !== 'dojo' || !nonEmptyString(row[2])) return;
-    const stack = standing.get(row[2]) || [];
-    if (row[3] === 0) {
-      struck.add(ix);
-      if (stack.length) struck.add(stack.pop());
-    } else {
-      stack.push(ix);
-    }
-    standing.set(row[2], stack);
-  });
-
-  obslog.forEach((row, ix) => {
-    if (!Array.isArray(row) || struck.has(ix)) return;
-    const kind = row[1];
-    const key = row[2];
-    if (kind === 'note' || !nonEmptyString(key)) return;
-    const level = kagamiLevelOf(key);
-    if (kind === 'probe') {
-      touch(key, row[3] === 3, true, kind);
-      kagamiNote(bands.readings, level, row[3] === 3, true);
-    } else if (kind === 'mock') {
-      // Legacy rows contain no immutable form/item revision, editorial
-      // decision, attempt identity or assistance record. Keep the encounter
-      // and its modality, but never infer measured recall from that key.
-      touch(key, null, false, kind);
-      unverifiedPractice.rows += 1;
-      const dimension = kagamiMockBand(row[4], key);
-      if (owns(unverifiedPractice.byBand, dimension)) unverifiedPractice.byBand[dimension] += 1;
-    } else if (kind === 'lesson' || kind === 'dojo') {
-      // Again alone is the miss: Hard is a recall that came hard, as Anki's
-      // buttons mean it (review round 11); lesson and mock rows use 1|3 and
-      // read the same either way.
-      const right = row[3] >= 2;
-      touch(key, right, true, kind);
-      const band = bands[kagamiBandFor(key)];
-      if (band) kagamiNote(band, level, right, true);
-    } else if (kind === 'sensei') {
-      const right = row[3] === 3;
-      const band = bands[KAGAMI_CODE_BAND[row[4]]];
-      touch(key, right, false, kind);
-      if (band) kagamiNote(band, level, right, false);
-    } else if (kind === 'confuse') {
-      const other = row[3];
-      if (!nonEmptyString(other) || other === key) return;
-      touch(key, null, false, kind);
-      touch(other, null, false, kind);
-      const pair = key < other ? `${key}\u0000${other}` : `${other}\u0000${key}`;
-      pairs.set(pair, (pairs.get(pair) || 0) + 1);
-    } else {
-      // tap · reveal · drift — encounters and friction, never a verdict
-      touch(key, null, true, kind);
-    }
-  });
-
-  // Real reviews are the heaviest measured evidence there is. A revocation
-  // names the row it undoes ([t, key, 0, revokedIndex]), so an undone grade
-  // is not counted — the mirror shows what stands, not what was withdrawn.
-  const revlog = state.revlog || [];
-  const revoked = new Set();
-  for (const row of revlog) if (Array.isArray(row) && row[2] === 0) revoked.add(row[3]);
-  revlog.forEach((row, ix) => {
-    if (!Array.isArray(row) || row[2] === 0 || revoked.has(ix)) return;
-    const key = row[1];
-    if (!nonEmptyString(key)) return;
-    const right = row[2] >= 2;
-    touch(key, right, true, 'review');
-    const band = bands[kagamiBandFor(key)];
-    if (band) kagamiNote(band, kagamiLevelOf(key), right, true);
-  });
-
-  for (const band of Object.values(bands)) band.edge = kagamiEdge(band);
-
-  const edges = [...pairs.entries()]
-    .map(([pair, n]) => {
-      const [a, b] = pair.split('\u0000');
-      return { a, b, n };
-    })
-    .sort((x, y) => y.n - x.n || (x.a < y.a ? -1 : x.a > y.a ? 1 : 0))
-    .slice(0, 12);
-
-  // the frontier: nodes the learner has met and not yet settled — mixed or
-  // failing evidence, hardest-looking first. These are the doors the drift
-  // and the custom papers will pull from; here they are only shown.
-  const frontier = Object.entries(nodes)
-    .filter(([, node]) => node.seen >= 2 && node.right < node.seen)
-    .map(([key, node]) => ({ key, seen: node.seen, right: node.right }))
-    .sort(
-      (x, y) =>
-        x.right / x.seen - y.right / y.seen ||
-        y.seen - x.seen ||
-        (x.key < y.key ? -1 : x.key > y.key ? 1 : 0),
-    )
-    .slice(0, 12);
-
-  const leeches = (state.taken || [])
-    .filter((item) => isLeech(item))
-    .map((item) => srsKey(item.t, item.id))
-    .sort();
-
-  const totals = Object.values(bands).reduce(
-    (acc, band) => ({
-      rows: acc.rows + band.evidence,
-      measured: acc.measured + band.measured,
-      observed: acc.observed + band.observed,
-    }),
-    { rows: 0, measured: 0, observed: 0 },
-  );
-
-  const assessments = allAssessmentEvidence(state);
-  const assessmentEdges = [];
-  for (const focus of assessments.focus) {
-    if (!/^(word|kanji|grammar|particle):/u.test(focus.subject)) continue;
-    const node = nodes[focus.subject] ||= { seen: 0, right: 0, measured: 0, observed: 0, kinds: {} };
-    node.assessment = { misses: focus.misses, evidenceIds: [...focus.evidenceIds] };
-    for (const evidenceId of focus.evidenceIds.slice(-8))
-      assessmentEdges.push({ from: evidenceId, to: focus.subject, kind: 'assessment-miss', modality: 'observed' });
-  }
-  // Re-encounter suggestions remain a separate modality. In particular, a
-  // provisional answer key cannot increment measured/observed right or seen.
-  for (const target of assessments.priorities.targets) {
-    if (target.suppressed || !/^(word|kanji|grammar|particle):/u.test(target.subject)) continue;
-    const node = nodes[target.subject] ||= { seen: 0, right: 0, measured: 0, observed: 0, kinds: {} };
-    node.practicePriority = { misses: target.misses, provisionalMisses: target.provisionalMisses,
-      evidenceIds: target.evidence.map(row => row.evidenceId) };
-    for (const evidence of target.evidence.slice(-8)) assessmentEdges.push({
-      from: evidence.evidenceId, to: target.subject, kind: 'practice-reencounter',
-      modality: evidence.provisional ? 'provisional' : 'practice',
-    });
-  }
-  const model = { modelVersion: KAGAMI_MODEL_VERSION, admissionPolicyVersion: 'kagami-admission/2',
-    bands, nodes, edges, frontier, leeches, totals, unverifiedPractice,
-    assessments, assessmentEdges };
-  return model;
-}
 
 /* An instrument handle for the verification suites (the __KAIRO_* idiom):
  * the model itself, so a determinism check exercises the real function
@@ -24075,215 +19190,6 @@ const KAGAMI_BAND_NAMES = {
  * the ledger back to the learner, and every line it prints stands on rows
  * that exist. Where the evidence is thin it says so; it never fills a gap
  * with a guess, and it never says what level the learner IS. */
-function renderKagami(main) {
-  const model = learnerModel();
-  main.append(withEn(el('p', 'eyebrow', '鏡'), 'the mirror', 'en-inline'));
-  main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.kagami)));
-  main.append(
-    el(
-      'p',
-      'gloss',
-      tx(
-        'ここに出るのは、これまでの記録そのもの。級を言い当てるのではなく、どの級の問題をどれだけ通したかを並べる — 合否は、ここでは分からない。',
-        'What follows is the record itself. It does not name your level; it lays out how much of each level’s material you have actually cleared — and whether you would pass is not knowable from here.',
-      ),
-    ),
-  );
-  // Bands need judged answers; confusions, the frontier and the leeches do
-  // not. Treating an empty band set as an empty ledger hid pairs the sensei
-  // had actually recorded (review round 10) — only a record with nothing at
-  // all in it gets the bare line.
-  const anything =
-    model.totals.rows || model.unverifiedPractice.rows || model.edges.length || model.frontier.length || model.leeches.length;
-  if (!anything) {
-    main.append(
-      el(
-        'p',
-        'card-kind',
-        tx(
-          'まだ何も映っていない。読んで、練習すると、ここに映る。',
-          'Nothing here yet. Read and practise, and what you learn shows up here.',
-        ),
-      ),
-    );
-    return;
-  }
-  main.append(
-    el(
-      'p',
-      'card-kind',
-      model.totals.rows
-        ? tx(
-            `記録 ${model.totals.rows} 件 — 測定 ${model.totals.measured} · 観察 ${model.totals.observed}`,
-            `${model.totals.rows} judged answers — ${model.totals.measured} measured · ${model.totals.observed} observed`,
-          )
-        : tx(
-            '採点のついた記録はまだない。下は、それ以外に残ったもの。',
-            'No judged answers yet — what follows is what the record holds besides them.',
-          ),
-    ),
-  );
-
-  if (model.unverifiedPractice.rows) {
-    const practice = el('p', 'card-kind', tx(
-      `過去の練習解答 ${model.unverifiedPractice.rows} 件を記録に残している。問題の版と解答の条件が分からないので、能力の測定には使っていない。`,
-      `${model.unverifiedPractice.rows} earlier practice answers remain in your record. Their question versions and answer conditions are unknown, so they are not used to measure ability.`,
-    ));
-    practice.id = 'kagami-unverified-practice'; main.append(practice);
-  }
-
-  for (const [id, band] of Object.entries(model.totals.rows ? model.bands : {})) {
-    const [ja, en] = KAGAMI_BAND_NAMES[id];
-    const block = el('div', 'kagami-band');
-    block.dataset.band = id;
-    const head = el('p', 'eyebrow list-head');
-    head.append(document.createTextNode(tx(ja, en)));
-    block.append(head);
-    if (!band.evidence) {
-      block.append(el('p', 'kagami-thin', tx('まだない。', 'nothing yet')));
-      main.append(block);
-      continue;
-    }
-    const cells = el('div', 'kagami-levels');
-    for (const level of [...KAGAMI_LEVELS, KAGAMI_OOV]) {
-      const cell = band.levels[level];
-      if (!cell || (!cell.seen && !cell.obsSeen)) continue;
-      const box = el('div', 'kagami-cell' + (cell.seen < KAGAMI_MIN_SEEN ? ' thin' : ''));
-      box.dataset.kagamiCell = `${id}:${level}`;
-      box.append(el('span', 'kagami-level', level === KAGAMI_OOV ? tx('級外', 'untagged') : level));
-      // the measured count is the claim; what was merely observed sits
-      // beside it, visible and powerless
-      box.append(el('span', 'kagami-count', cell.seen ? `${cell.right}/${cell.seen}` : '—'));
-      if (cell.obsSeen) {
-        box.append(el('span', 'kagami-obs', `${cell.obsRight}/${cell.obsSeen}${tx('観', ' obs')}`));
-      }
-      cells.append(box);
-    }
-    if (cells.children.length) block.append(cells);
-    // the one sentence about this band — a description of rows, never a verdict
-    block.append(
-      el(
-        'p',
-        'kagami-read',
-        band.edge
-          ? tx(
-              `${band.edge} の問題は通っている。その上はまだ足りない。`,
-              `${band.edge} material is coming through; above it, not yet.`,
-            )
-          : band.sampled
-            ? tx(
-                '答えた級はあるが、どれもまだ通っていない。',
-                'levels have been answered, and none is coming through yet.',
-              )
-            : tx(
-                `どの級もまだ測定 ${KAGAMI_MIN_SEEN} 件に届かない — 判断はしない。`,
-                `no level has reached ${KAGAMI_MIN_SEEN} measured answers yet — so nothing is claimed.`,
-              ),
-      ),
-    );
-    const tag = el('p', 'kagami-prov');
-    tag.append(
-      document.createTextNode(
-        tx(
-          `測定 ${band.measured} · 観察 ${band.observed}`,
-          `${band.measured} measured · ${band.observed} observed`,
-        ),
-      ),
-    );
-    if (band.measured === 0) {
-      tag.append(
-        el(
-          'span',
-          'kagami-warn',
-          tx('（会話からの観察だけ）', '(mined from conversation only)'),
-        ),
-      );
-    }
-    if (band.disagreement) {
-      tag.append(
-        el('span', 'kagami-warn', tx('（級ごとに食い違いあり）', '(the levels disagree)')),
-      );
-    }
-    block.append(tag);
-    main.append(block);
-  }
-
-  // what a key is CALLED on the page. Every deck type's id is already the
-  // Japanese itself except a grammar point, whose id is an ascii handle
-  // ('teiru') — printing it raw put "te / teiru" on the frontier where
-  // 〜ている belongs. The id itself stays separate: the doors below navigate
-  // by it, and a display name is not an address.
-  const label = (key) => {
-    const id = key.slice(key.indexOf(':') + 1);
-    if (!key.startsWith('grammar:')) return id;
-    return GRAMMARS().find((g) => g.id === id)?.p || id;
-  };
-  const glyph = (name) => name.replace(/^[〜~]/u, '').slice(0, 2);
-  if (model.edges.length) {
-    main.append(withEn(el('p', 'eyebrow list-head', '迷い'), 'pairs that trade places', 'en-inline'));
-    const list = el('div', 'kagami-edges');
-    for (const edge of model.edges) {
-      const row = el('div', 'kagami-edge-row');
-      row.dataset.kagamiEdge = `${edge.a}|${edge.b}`;
-      row.append(el('span', 'kagami-pair', `${label(edge.a)} ↔ ${label(edge.b)}`));
-      row.append(el('span', 'kagami-count', `${edge.n}`));
-      list.append(row);
-    }
-    main.append(list);
-  }
-
-  if (model.frontier.length) {
-    main.append(withEn(el('p', 'eyebrow list-head', '際'), 'the edge you are working', 'en-inline'));
-    main.append(
-      el(
-        'p',
-        'kagami-thin',
-        tx('会って、まだ落ち着いていない言葉。', 'Met, and not yet settled.'),
-      ),
-    );
-    const list = el('div', 'kagami-frontier');
-    for (const item of model.frontier) {
-      const cut = item.key.indexOf(':');
-      const t = item.key.slice(0, cut);
-      const id = item.key.slice(cut + 1);
-      const name = label(item.key);
-      const row = el('button', 'entry-row kagami-row');
-      row.type = 'button';
-      row.dataset.kagamiFrontier = item.key;
-      // G2 · a kept word's door is its capture (keptItemNode): the entry and reading he saved, never the spelling alone
-      const door = keptItemNode(t, id);
-      row.append(el('span', 'row-glyph', glyph(name)));
-      row.append(el('span', 'row-main', `${name}　${item.right}/${item.seen}`));
-      if (door.t === 'word') kagamiKeptReading(row, door);
-      row.append(el('span', 'row-go', '›'));
-      row.addEventListener('click', () => go(door));
-      list.append(row);
-    }
-    main.append(list);
-  }
-
-  if (model.leeches.length) {
-    main.append(withEn(el('p', 'eyebrow list-head', '手こずり'), 'the ones that keep slipping', 'en-inline'));
-    const list = el('div', 'kagami-frontier');
-    for (const key of model.leeches.slice(0, 12)) {
-      const cut = key.indexOf(':');
-      const t = key.slice(0, cut);
-      const id = key.slice(cut + 1);
-      const name = label(key);
-      const row = el('button', 'entry-row kagami-row');
-      row.type = 'button';
-      row.dataset.kagamiLeech = key;
-      const door = keptItemNode(t, id);
-      row.append(el('span', 'row-glyph', glyph(name)));
-      row.append(el('span', 'row-main', name));
-      if (door.t === 'word') kagamiKeptReading(row, door);
-      row.append(el('span', 'row-go', '›'));
-      row.addEventListener('click', () => go(door));
-      list.append(row);
-    }
-    main.append(list);
-  }
-}
 
 /* The one place the app asks for a key — once, plainly, stored on-device. */
 /* The tutor's quiz — the operator's 'many layers of testing', first layer.
@@ -24294,30 +19200,6 @@ function renderKagami(main) {
  * quiet one-line failure as every other tutor door. The RUN is durable
  * (POL-13): every step commits, so a mid-quiz reload resumes with not a
  * word of the tutor's lost; only the learner's own door closes it. */
-function aiQuizParse(raw) {
-  const m = raw.match(/\[[\s\S]*\]/);
-  if (!m) return null;
-  let qs;
-  try {
-    qs = JSON.parse(m[0]);
-  } catch {
-    return null;
-  }
-  if (!Array.isArray(qs)) return null;
-  const ok = qs.filter(
-    (q) =>
-      q &&
-      typeof q.q === 'string' &&
-      Array.isArray(q.opts) &&
-      q.opts.length === 4 &&
-      q.opts.every((o) => typeof o === 'string') &&
-      Number.isInteger(q.right) &&
-      q.right >= 0 &&
-      q.right < 4 &&
-      typeof q.why === 'string',
-  );
-  return ok.length >= 3 ? ok.slice(0, 5) : null;
-}
 /** A failed save keeps the last acknowledged question, answer and result.
  * The storage alert explains the failure; no unsaved progress is presented. */
 let aiQuizPending = null;
@@ -24431,10 +19313,6 @@ const TEACHER_ORIGINAL_CATALOGS = new Set([
   'bunki-original-reading-catalog', 'bunki-wp9b-reading-catalog', 'bunki-v11-reading-catalog',
 ]);
 let teacherContextSelectionSerial = 0;
-function activeTeacherContext() {
-  const root = S.teacherContexts;
-  return root?.entries.find((entry) => entry.id === root.activeRef) || null;
-}
 function teacherSourceProcessingUnavailable(context) {
   if (context?.sourceKind === 'personal-reading') {
     try {
@@ -24447,10 +19325,6 @@ function teacherSourceProcessingUnavailable(context) {
     const saved = publisherModule?.selectPublisherReading(S.publisherLibrary, context.sourceId);
     return saved?.candidate.article.capabilities['ai-transform'].status !== 'allowed';
   } catch { return true; }
-}
-function sourceProcessingScope(context, transport = aiTransport()) {
-  return { sourceKind: context.sourceKind, sourceId: context.sourceId, sourceDigest: context.sourceDigest,
-    baseUrl: transport.baseUrl, model: transport.model, providerConfigId: transport.configId };
 }
 const sourceProcessingNotices = new Map();
 function buildSourceProcessingSurface(context) {
@@ -24572,15 +19446,6 @@ function monitorTutorRequest(continuation, transport) {
   return { controller, assertCurrent: validate, close: () => pendingTutorRequests.delete(check) };
 }
 
-function teacherSentence(node) {
-  const from = node?.from;
-  const p = from && D.passages.find((entry) => entry.id === from.passage);
-  if (!p?.tokens || !Number.isInteger(from.index) || from.index < 0 || from.index >= p.tokens.length) return null;
-  const context = takenContext({ ctx: { p: p.id, i: from.index, scope: 'sent' } });
-  if (!context?.tokens.length) return null;
-  return { p, index: from.index, start: context.start, end: context.start + context.tokens.length,
-    quote: context.tokens.map((token) => token.s).join('') };
-}
 async function contextFromTeacherNode(node) {
   if (node?.sourceContext) {
     const { context } = await resolveTeacherSource(node.sourceContext);
@@ -24654,26 +19519,11 @@ async function resolveTeacherSource(raw) {
     throw new Error('source-changed');
   return { context, p, aiAllowed: p.pool === 'original' && TEACHER_ORIGINAL_CATALOGS.has(p.source) };
 }
-function teacherSourceError(error) {
-  if (error?.message?.startsWith('source-approval')) return tx(
-    'この出典を先生へ送る許可が必要か、許可や接続先が変わった。送信を止めた。質問は残っている。許可と接続先を確認する。',
-    'Source approval is needed or has changed. Sending stopped and your question is kept. Check the source approval and connected tutor.',
-  );
-  if (error?.message === 'source-processing-unavailable') return tx(
-    'この文は保存できるが、まだ先生へ送れない。元の文章を読み返せる。',
-    'This sentence is saved, but this source is not available for tutor processing yet. You can return to the reading.',
-  );
-  return tx('元の文を確認できない。文章をひらき直し、この文を選び直す。保存した文はここに残る。',
-    'The original sentence could not be verified. Reopen the reading and select it again. Your saved sentence stays here.');
-}
 let publisherSelectionSurface = null;
 document.addEventListener('selectionchange', () => {
   if (publisherSelectionSurface?.connected()) publisherSelectionSurface.update();
   else publisherSelectionSurface = null;
 });
-function renderPublisherContextSelection(main, saved, body) {
-  renderTextSourceContextSelection(main, saved, body, false);
-}
 function renderTextSourceContextSelection(main, saved, body, personal) {
   const controlPrefix = personal ? 'source' : 'publisher';
   const sourceKind = personal ? 'personal-reading' : 'publisher-reading';
@@ -24933,14 +19783,7 @@ function renderTextSourceContextSelection(main, saved, body, personal) {
   refresh();
 }
 /** Whether this sentence already stands on the tutor page (a kept sentence): read-only, from the record's entries. */
-function sentenceKept(node) {
-  const quote = node?.sourceContext?.quote || teacherSentence(node)?.quote || '';
-  return !!quote && (S.teacherContexts?.entries || []).some((entry) => entry.quote === quote);
-}
 /** A tutor door's item and the encounter it was met in: every drawing of one page's door agrees on it. */
-function teacherDoorKey(node) {
-  return JSON.stringify([node?.t, node?.id, node?.from?.passage, node?.from?.index, node?.sourceContext?.id]);
-}
 function renderTeacherDoor(container, getNode) {
   const node = typeof getNode === 'function' ? getNode() : getNode;
   const wrap = el('div', 'teacher-door');
@@ -25107,9 +19950,6 @@ const AI_CHAT_PAGE = 40; // turns unfolded per 前の会話 step
 const aiChatLog = { turns: null, loading: false, pending: false, pendingRef: null, errors: new Map() };
 
 /** The log the chat renders: the archive once hydrated, else the store. */
-function aiChatTurns() {
-  return aiChatLog.turns || S.aiChat;
-}
 
 /** Hydrate the session's chat log from the archive, once. On the archive's
  * first-ever open, what survives of the old capped store seeds it — the
@@ -25182,25 +20022,6 @@ function buildTeacherChatLog(context = null) {
   if (aiChatLog.pending && aiChatLog.pendingRef === contextRef)
     log.append(el('p', 'chat-turn tutor thinking', tx('考え中…', 'thinking…')));
   return log;
-}
-function refreshTeacherChatHistory(contextRef = activeTeacherContext()?.id || null) {
-  if (S.view !== 'ai' || (activeTeacherContext()?.id || null) !== contextRef) return;
-  const log = document.querySelector('.chat-log');
-  if (log) { const updated = buildTeacherChatLog(activeTeacherContext()); log.replaceWith(updated); enhanceJapaneseProse(updated); }
-}
-function teacherChatStatus(context) {
-  if (context?.sourceKind === 'personal-reading' && teacherSourceProcessingUnavailable(context)) return tx(
-    '質問はこの端末に残る。この出典について話すには、接続した先生への送信を上で許可する。',
-    'Your question stays on this device. Approve this source above to discuss it with your connected tutor.',
-  );
-  return aiChatLog.errors.get(context?.id || null) || (teacherSourceProcessingUnavailable(context) ? tx(
-    '質問はこの端末に残る。この出典の文章は、まだ先生に送れない。',
-    'Your question stays on this device. This source text cannot be sent to the tutor yet.',
-  ) : !aiKey() ? tx(
-    '文と会話はこの端末に残る。下で先生を接続すると質問を送れる。',
-    'Your sentences and conversations stay here. Connect a tutor below to send a question.',
-  ) : context ? tx('送ると、この文とこの会話の最近のやり取りを接続した先生に渡す。',
-    'Sending shares this sentence and recent turns from this conversation with your connected tutor.') : '');
 }
 function renderAiChat(main, context = null) {
   aiChatHydrate();
@@ -25315,17 +20136,6 @@ function renderAiChat(main, context = null) {
   requestAnimationFrame(() => sizeTeacherQuestion(input));
 }
 
-function teacherDraftCopyButton(text, note) {
-  const button = biLabel('button', 'chip', '質問をコピー', 'copy question');
-  button.type = 'button';
-  button.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(text);
-      note.textContent = tx('質問をコピーした。', 'Question copied.');
-    } catch { note.textContent = tx('文を選択してコピーする。', 'Select the question text and copy it.'); }
-  });
-  return button;
-}
 function renderUnavailableTeacherDrafts(container) {
   const contexts = new Set((S.teacherContexts?.entries || []).map((entry) => entry.id));
   const topics = new Set([...(S.teacherDrafts?.entries || []).map((entry) => entry.contextRef),
@@ -25682,13 +20492,6 @@ function renderLevels(main) {
 /** Extended source records can be consulted without inventing missing study
  * metadata. They use the same accessible sheet, but no misleading capture.
  * Canonical word/kanji records still use their full existing entry sheets. */
-function openReferenceEntry(entry, invoker) {
-  const target = entry.canonicalTarget;
-  const origin = S.stack.at(-1)?.from;
-  go({ t: target ? target.type : 'reference', id: target ? target.id : entry.key,
-    ...(target?.reading ? { reading: target.reading } : {}), ...(origin ? { from: origin } : {}),
-    referenceEntry: entry }, { invoker });
-}
 
 /* Kanji-trust K01 · one reference record for every kanji door. kanji.json's short reading lists stay what the
  * lessons teach; the reference sidecar carries every KANJIDIC2 reading of each kanji.json or Jōyō glyph, the
@@ -25729,75 +20532,9 @@ function kanjiReadingsState() {
 /** Reference facts never replace a lesson keyword or a learner's saved answer.
  * A present, valid source can explicitly lack a glyph; pending/failed is a
  * different state. Exact literal identity is preserved, including astral forms. */
-function kanjiFactsState() {
-  if (!D.referenceExtra) return kanjiReadingsState();
-  return window.BunkiReferenceCore?.validateKanjiFacts(D.referenceExtra) ? 'complete' : 'failed';
-}
-function kanjiFacts(id) {
-  return kanjiFactsState() === 'complete' ? window.BunkiReferenceCore.kanjiReferenceFacts(D.referenceExtra, id) : null;
-}
-function kanjiReferenceView(id, fallback = null) {
-  const facts = kanjiFacts(id);
-  const state = kanjiFactsState();
-  const meanings = facts?.completeMeanings || (fallback?.meanings?.length ? fallback.meanings : fallback?.m ? [fallback.m] : []);
-  return { ...facts, meanings: [...meanings], state: facts ? 'complete' : state === 'complete' ? 'absent' : state };
-}
-function kanjiFactsStatus(host, state, retryId, refresh) {
-  if (state !== 'pending' && state !== 'failed') return;
-  const line = el('p', 'fine reading-source-note', state === 'failed'
-    ? tx('辞書の意味・部首分類を読み込めませんでした。', 'Dictionary meanings and radical classifications could not load.')
-    : tx('辞書の意味・部首分類を読み込み中…', 'Loading dictionary meanings and radical classifications…'));
-  line.dataset.kanjiFactsState = state;
-  line.setAttribute('role', 'status');
-  host.append(line);
-  if (state !== 'failed') return;
-  const retry = biLabel('button', 'chip', '再試行', 'Try again');
-  retry.type = 'button';
-  retry.id = retryId;
-  retry.addEventListener('click', () => {
-    const task = loadReferenceExtra();
-    refresh();
-    void task.then(() => { if (host.isConnected) refresh(); });
-  });
-  host.append(retry);
-}
 /** The whole record of one kanji: the listed readings first, then each further KANJIDIC2 reading, then the
  * 常用漢字表 ones KANJIDIC2 lacks (named in officialReadings). lessonOn/lessonKun keep the lessons' selection.
  * readingsState: complete · listed (no KANJIDIC2 record) · pending · failed. */
-function kanjiReference(id) {
-  const rows = kanjiReferenceRows();
-  const row = rows?.readings.get(id);
-  const added = rows?.official.get(id) || [];
-  const helpers = window.BunkiReferenceCore;
-  const core = D.kanji?.[id];
-  if (!helpers?.mergeReadings || !helpers?.joyoKunDisplay || !helpers?.joyoOnDisplay) {
-    return core ? { ...core, lessonOn: [...(core.on || [])], lessonKun: [...(core.kun || [])], officialReadings: [], readingsState: 'failed' } : null;
-  }
-  const isOn = (reading) => helpers.readingKey(reading).startsWith('on:');
-  const completeKun = helpers.mergeReadings(core?.kun, row?.[2], added.filter((reading) => !isOn(reading)));
-  const kunView = helpers.joyoKunDisplay(core?.kun, rows?.joyoKun.get(id), row?.[2], id);
-  const completeOn = helpers.mergeReadings(core?.on, row?.[1], added.filter(isOn));
-  const onView = helpers.joyoOnDisplay(core?.on, rows?.joyoOn.get(id), completeOn);
-  if (core) {
-    return {
-      ...core,
-      ...onView,
-      completeOn,
-      ...kunView,
-      completeKun,
-      lessonOn: [...(core.on || [])],
-      lessonKun: [...(core.kun || [])],
-      officialReadings: added,
-      readingsState: row ? 'complete' : rows ? 'listed' : kanjiReadingsState(),
-    };
-  }
-  const record = rows?.records.get(id);
-  if (!record) return null;
-  return {
-    c: id, ...onView, completeOn, ...kunView, completeKun, m: record[1].join('; '), meanings: [...record[1]],
-    st: record[2], rad: record[3], parts: [], officialReadings: added, readingsState: 'complete', joyoOutsideCore: true,
-  };
-}
 /** Current official reference is separate from a learner's preserved saved answer. */
 function currentJoyoKunNote(id, tag = 'p', className = 'fine') {
   if (!retainedKanjiRecord(id)) return null;
@@ -25809,25 +20546,7 @@ function currentJoyoKunNote(id, tag = 'p', className = 'fine') {
   return note;
 }
 /** Explicit table status for the readings actually shown, including preserved saved answers. */
-function joyoOnNote(id, shown, tag = 'p', className = 'fine') {
-  const current = kanjiReference(id);
-  if (!current?.joyoOn) return null;
-  const parts = [];
-  if (retainedKanjiRecord(id)) parts.push(tx('常用漢字表（2010年）の音読み', 'Jōyō on readings (2010 table)') +
-    ' — ' + (current.joyoOn.join('・') || '—'));
-  const outside = (shown || []).filter(reading => !current.joyoOn.includes(reading));
-  if (outside.length) parts.push(tx('常用漢字表外の音読み', 'On readings outside the jōyō table') + ' — ' + outside.join('・'));
-  if (!parts.length) return null;
-  const note = el(tag, className, parts.join(' / '));
-  note.dataset.joyoOnStatus = id;
-  return note;
-}
 /** Every kanji the finder lists, including official forms absent from the lesson source. */
-function kanjiFinderUniverse() {
-  const rows = kanjiReferenceRows();
-  const keys = Object.keys(D.kanji || {});
-  return rows ? [...keys, ...[...rows.records.keys()].filter((glyph) => !D.kanji[glyph])] : keys;
-}
 
 /** Display-only enrichment. Canonical facts and scheduling records are never
  * overwritten: the complete readings ride beside them (kanjiReference), and an
@@ -25848,33 +20567,7 @@ function kanjiDisplayRecord(id, reference = null) {
 }
 /** K01 · the one record a kanji's entry and its writing room both show: the learner's saved copy, else the whole
  * reference record, else the wider SKIP index's KANJIDIC2 entry (胤); null only while none of them holds it. */
-function kanjiEntryRecord(id, reference = null) {
-  return retainedKanjiRecord(id) || kanjiDisplayRecord(id, reference) || D.kanji[id] || window.BunkiSkipUI?.getKanji(S.skipUi, id) || null;
-}
 /** The writing room's record: its entry's, with the reference entry that entry was opened from. */
-function strokeRoomRecord(id) {
-  return kanjiEntryRecord(id, S.stack.findLast((node) => node.t === 'kanji' && node.id === id)?.referenceEntry);
-}
-function renderReferenceMetadata(container, entry) {
-  if (entry.type === 'word' && entry.variants?.length) {
-    for (const variant of entry.variants) {
-      const text = [variant.reading, variant.meanings?.join('; ')].filter(Boolean).join(' — ');
-      container.append(el('p', 'reference-source-sense', text));
-      container.append(el('p', 'sense-pos', [variant.source, variant.sourceId, variant.level].filter(Boolean).join(' · ')));
-    }
-  }
-  const grouped = new Map();
-  const labels = { on: '音読み', kun: '訓読み', meanings: tx('意味', 'meanings'), completeMeanings: tx('辞書の全語義', 'complete dictionary meanings'),
-    radicalSchemes: tx('辞書の部首分類', 'dictionary radical classifications'), strokeCount: tx('画数', 'stroke count'),
-    readings: tx('すべての読み', 'every reading'), officialReadings: tx('常用漢字表の読み', 'Jōyō table readings') };
-  for (const [field, credit] of Object.entries(entry.metadataSources || {})) {
-    if (credit.source === 'kanji' || credit.source === 'kmeta') continue;
-    const source = `${credit.source} · ${credit.sourceId}`;
-    if (!grouped.has(source)) grouped.set(source, []);
-    grouped.get(source).push(labels[field] || field);
-  }
-  for (const [source, fields] of grouped) container.append(el('p', 'sense-pos', `${fields.join('・')} · ${source}`));
-}
 
 function renderReferenceConnections(sheet, entry) {
   const doors = [];
@@ -25911,61 +20604,7 @@ function openReferenceCollection(collectionId, invoker = document.activeElement)
   render(); // initialize the shared controller, or show its honest retry state
   window.scrollTo(0, 0);
 }
-function referenceCollectionChip(label, collectionId) {
-  const translated = collectionId.startsWith('kanken:') ? `Kanji Kentei ${kankenGradeLabel(collectionId.slice(7))}` : label;
-  const shown = tx(label, translated);
-  const chip = el('button', 'pool-tag cat-chip', shown);
-  chip.type = 'button';
-  chip.dataset.referenceDoor = collectionId;
-  chip.setAttribute('aria-label', tx(`${label} の参考書庫をひらく`, `open ${shown} in the reference library`));
-  chip.addEventListener('click', () => openReferenceCollection(collectionId, chip));
-  return chip;
-}
 
-function renderReferenceNode(sheet, node) {
-  const entry = node.referenceEntry;
-  sheet.append(withEn(el('p', 'eyebrow', '収録資料の項目'), 'reference-only source record', 'en-inline'));
-  sheet.append(el('h2', 'headword', entry.missingGlyph
-    ? tx(`字形未収録 (${entry.id})`, `Glyph not supplied (${entry.id})`)
-    : entry.text || entry.id));
-  const displayReadings = entry.displayReadings || entry.readings;
-  sheet.append(el('p', 'reading', displayReadings?.length
-    ? displayReadings.join('・')
-    : entry.reading || tx('読みなし', 'No reading')));
-  const meanings = entry.type === 'kanji' ? entry.completeMeanings || entry.meanings : entry.meanings;
-  sheet.append(el('p', 'gloss', meanings?.length
-    ? meanings.join('; ')
-    : tx('意味未収録', 'Meaning not supplied')));
-  if (entry.type === 'kanji') {
-    const readings = el('dl', 'kv');
-    readings.append(el('dt', null, '音読み'), el('dd', null, (entry.displayOn || entry.on)?.join('・') || tx('未収録', 'Not supplied')), el('dt', null, '訓読み'), el('dd', null, (entry.displayKun || entry.kun)?.join('・') || tx('未収録', 'Not supplied')));
-    sheet.append(readings);
-    const tableStatus = joyoOnNote(entry.id, entry.displayOn || entry.on);
-    if (tableStatus) sheet.append(tableStatus);
-    if (entry.strokeCount != null) sheet.append(el('p', 'sense-pos', tx(`${entry.strokeCount} 画`, `${entry.strokeCount} strokes`)));
-    renderKanjiClassifications(sheet, entry.id, node);
-  }
-  renderReferenceMetadata(sheet, entry);
-  renderReferenceConnections(sheet, entry);
-  sheet.append(el('p', 'sense-pos', (entry.levelSources || []).map((source) => `${source.source}: ${/級/u.test(source.level) ? tx(source.level, kankenGradeLabel(source.level)) : source.level}`).join(' · ')));
-  for (const source of entry.sourceRecords || []) {
-    const info = el('p', 'sense-pos', `${source.sourceId} · ${source.form || ''} · ${source.level || ''}`);
-    // Consult the source only on an explicit link. No glyph images or
-    // dictionaries are fetched in the reference browsing path.
-    if (source.url && /^https:\/\//.test(source.url)) {
-      const link = el('a', null, tx(' 出典の項目を開く', ' Open source record'));
-      link.href = source.url;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      info.append(link);
-    }
-    sheet.append(info);
-  }
-  sheet.append(el('p', 'note', tx(
-    'この項目は参考資料にはありますが、学習用の項目データは未収録です。My Study への登録はまだできません。読み・意味などの未収録情報は推測で補っていません。',
-    'This source record is available for reference, but its study-entry data is not bundled. It cannot yet be added to My Study. Missing readings or meanings have not been guessed.',
-  )));
-}
 
 /* ------------------------------------------------------------ 四字熟語
  * The four-character idioms as their own shelf — 900 of them, ordered by
@@ -26162,17 +20801,9 @@ function renderSkipLookup(host, options = {}) {
 }
 
 /** What a capped grid shows: its first `cap` hits, or every hit once its "show all" is open (K05). */
-function kdxGridShown(chars, cap, open) {
-  return open ? chars : chars.slice(0, cap);
-}
 /** Hfix-2e (KT-3) · a grid glyph's name says the kanji itself, then its meaning (「稿 — draft」), with the reading its
  * grid found it by where it has one (「食 たべる — eat」): the gloss alone hid the glyph from VoiceOver. A kanji the
  * lessons lack keeps its reference meaning. */
-function kdxGlyphName(c, reading = '') {
-  const gloss = kanjiReferenceView(c, D.kanji[c] || kanjiReference(c)).meanings.join('; ').toLowerCase();
-  const head = reading ? `${c} ${reading}` : c;
-  return gloss ? `${head} — ${gloss}` : head;
-}
 /** The shared results grid — every hit opens the same kanji entry. The count is the true one, and a grid longer
  * than its first page carries one "show all" door (K05). `key` names the query: an opened grid stays open for that
  * query in this session (S.kdx, never the record), so Back from an entry lands on the same place. `empty: false`
@@ -26222,22 +20853,6 @@ function renderKdxGrid(host, chars, CAP = 200, key = '', { empty = true, mark = 
  * kanji containing ALL of them, and components that can no longer co-occur
  * grey out. A filter names the grid — Jisho's single most-hated screen is its
  * unlabelled radical wall; this one you can search and it collapses as you go. */
-function kdxPartHits() {
-  const sel = S.kdx.parts;
-  let chars;
-  if (sel.length) {
-    chars = [...(D.radicals[sel[0]]?.kanji || [])];
-    for (const p of sel.slice(1)) {
-      const set = new Set(D.radicals[p]?.kanji || []);
-      chars = chars.filter((c) => set.has(c));
-    }
-  } else {
-    chars = S.kdx.st ? Object.keys(D.kanji) : [];
-  }
-  chars = chars.filter((c) => D.kanji[c] && (!S.kdx.st || D.kanji[c].st === S.kdx.st));
-  chars.sort((a, b) => D.kanji[a].st - D.kanji[b].st || (a < b ? -1 : 1));
-  return chars;
-}
 function renderKdxParts(main) {
   if (S.kdx.parts.length) {
     const chosen = el('div', 'kdx-chosen');
@@ -26385,27 +21000,6 @@ function renderKdxRadical(main) {
   main.append(row);
   main.append(kdxRadicalResults());
 }
-function classicalRadicalHits(radical) {
-  if (kanjiFactsState() !== 'complete') return [];
-  const rec = (c) => D.kanji[c] || kanjiReference(c);
-  return kanjiFinderUniverse()
-    .filter((c) => kanjiFacts(c)?.radicalSchemes.classical === radical)
-    .sort((a, b) => (rec(a)?.st ?? 99) - (rec(b)?.st ?? 99) || (a < b ? -1 : 1));
-}
-function kdxRadicalResults() {
-  const wrap = el('div');
-  wrap.id = 'kdx-radical-results';
-  const state = kanjiFactsState();
-  kanjiFactsStatus(wrap, state, 'kdx-radical-retry', () => {
-    document.getElementById('kdx-radical-results')?.replaceWith(kdxRadicalResults());
-  });
-  if (state !== 'complete' || !S.kdx.rad) return wrap;
-  renderKdxGrid(wrap, classicalRadicalHits(S.kdx.rad), 300, `classical:${S.kdx.rad}`, {
-    mark: (b) => { b.dataset.rad = String(S.kdx.rad); },
-  });
-  wrap.append(el('p', 'fine', tx('字引に収録した字の辞書分類です。見える部品で探すには「部品」へ。', 'Dictionary classification within this finder. Use “by its parts” to search visible components.')));
-  return wrap;
-}
 
 /* 頻度 — newspaper frequency rank (KANJIDIC2's 2,501 most used, carried by
  * the SKIP sidecar). Loaded once, on first use. */
@@ -26440,29 +21034,8 @@ function ensureKanjiFrequency() {
   return kanjiFreqPromise;
 }
 /** The kanji one newspaper-frequency band lists, commonest first, over the finder's universe (K05). */
-function kdxFrequencyHits(lo, hi) {
-  return kanjiFinderUniverse()
-    .filter((c) => D.kanjiFreq?.[c] >= lo && D.kanjiFreq[c] <= hi)
-    .sort((a, b) => D.kanjiFreq[a] - D.kanjiFreq[b]);
-}
 /** The honest line for a lookup table that could not load, with the one retry: the retry answers the query the
  * learner already has (S.kdx keeps it), without a reload (K06). */
-function kdxLoadFailed(host, id, ja, en, retry) {
-  const line = el('p', 'sem-empty', tx(ja, en));
-  line.dataset.kdxLoad = 'failed';
-  line.setAttribute('role', 'status');
-  const button = biLabel('button', 'chip', '再試行', 'Try again');
-  button.type = 'button';
-  button.id = id;
-  button.addEventListener('click', () => {
-    const pending = retry();
-    render();
-    pending.then(() => {
-      if (S.view === 'search' || S.view === 'kanjidex') render();
-    });
-  });
-  host.append(line, button);
-}
 const FREQ_BANDS = [
   [1, 100],
   [101, 500],
@@ -26512,16 +21085,6 @@ function renderKdxFrequency(main) {
 /* 漢検 — by Kanji Kentei level, the graded ladder the data already carries
  * (operator, 2026-09-17: "by grade search"). 10級 is the first school year;
  * 1級 the summit. */
-function kankenLevels() {
-  const seen = new Set();
-  for (const c of Object.keys(D.kanji)) if (D.kanji[c].kk) seen.add(D.kanji[c].kk);
-  const order = (s) => {
-    const m = String(s).match(/(準)?(\d+)級/);
-    if (!m) return 0;
-    return Number(m[2]) * 2 + (m[1] ? 1 : 0);
-  };
-  return [...seen].sort((a, b) => order(b) - order(a));
-}
 function renderKdxLevel(main) {
   main.append(withEn(el('p', 'eyebrow', '漢検'), 'by Kanji Kentei level — grade 10 first, grade 1 last', 'en-inline'));
   const row = el('div', 'kdx-row');
@@ -26585,21 +21148,6 @@ function ensureKkld() {
 }
 /** The kanji one Kodansha number names in one edition: every glyph the table maps, none filtered by the core
  * layer (K04 · #8 is 胤 in both editions; a glyph outside kanji.json opens its KANJIDIC2 entry). */
-function kkldNumberGlyphs(ed, number) {
-  const table = ed === 'ed1999' ? D.kkld?.byNumber1999 : D.kkld?.byNumber2013;
-  return [...(table?.[String(Number(number))] || [])];
-}
-function kkldOf(c) {
-  return D.kkld?.entries?.[c] || null;
-}
-function kkldLine(c) {
-  const k = kkldOf(c);
-  if (!k) return '';
-  const parts = [];
-  if (k.ed2013) parts.push(tx(`2013年版 #${k.ed2013}`, `2013 ed. #${k.ed2013}`));
-  if (k.ed1999) parts.push(tx(`1999年版 #${k.ed1999}`, `1999 ed. #${k.ed1999}`));
-  return parts.join(' · ');
-}
 function renderKdxKkld(main) {
   main.append(withEn(el('p', 'eyebrow', 'Kodansha 番号'), "Kodansha Kanji Learner's Dictionary entry number", 'en-inline'));
   const edRow = el('div', 'kdx-row');
@@ -26696,171 +21244,11 @@ function renderKdxText(main, kind) {
   main.append(inp);
   main.append(kdxTextResults(kind));
 }
-function kdxTextResults(kind) {
-  const wrap = el('div');
-  wrap.id = 'kdx-results';
-  const q = ((kind === 'reading' ? S.kdx.reading : S.kdx.meaning) || '').trim();
-  if (!q) return wrap;
-  const strokesOf = (c) => (D.kanji[c] || kanjiReference(c))?.st ?? 99;
-  if (kind === 'reading') {
-    // K03 · the whole reading or its stem, one reading at a time (never concatenated — else 介 + い.う would read
-    // かいう ⊇ かい), over every reading the kanji has (K01): たべる, taberu, タベル, ﾀﾍﾞﾙ and an IME's たべr all find
-    // 食, and た still does; a reading that IS the query (whole or stem) comes before one that only begins with it.
-    const helpers = window.BunkiReferenceCore;
-    const qh = helpers.normalizeReadingQuery(q, ROMAJI);
-    const rank = new Map();
-    if (qh) {
-      for (const c of kanjiFinderUniverse()) {
-        const k = kanjiReference(c) || D.kanji[c];
-        const level = helpers.readingMatch([...(k?.on || []), ...(k?.kun || [])], qh);
-        if (level) rank.set(c, level);
-      }
-    }
-    const chars = [...rank.keys()].sort((a, b) => rank.get(b) - rank.get(a) || strokesOf(a) - strokesOf(b) || (a < b ? -1 : 1));
-    // until every reading has arrived the search runs over the lessons' readings only, and says so: a miss
-    // then is not a "no match" (K06)
-    const state = kanjiReadingsState();
-    if (state !== 'complete') {
-      const line = el('p', 'sem-empty', state === 'failed'
-        ? tx('すべての読みを読み込めなかった。いまはレッスン用に選んだ読みだけで探している。', 'Every reading could not be loaded — searching only the readings chosen for lessons.')
-        : tx('すべての読みを読み込み中。いまはレッスン用に選んだ読みだけで探している。', 'Loading every reading — searching only the readings chosen for lessons for now.'));
-      line.dataset.kdxReadings = state;
-      line.setAttribute('role', 'status');
-      wrap.append(line);
-      if (state === 'failed') {
-        const retry = biLabel('button', 'chip', '再試行', 'Try again');
-        retry.type = 'button';
-        retry.id = 'kdx-readings-retry';
-        retry.addEventListener('click', () => {
-          const pending = loadReferenceExtra();
-          document.getElementById('kdx-results')?.replaceWith(kdxTextResults(kind));
-          pending.then(() => document.getElementById('kdx-results')?.replaceWith(kdxTextResults(kind)));
-        });
-        wrap.append(retry);
-      }
-    }
-    // Hfix-2e (KT-3) · each glyph's name carries the reading it was found by (た.べる is said たべる)
-    const readingOf = (c) => {
-      const k = kanjiReference(c) || D.kanji[c];
-      const hit = [...(k?.on || []), ...(k?.kun || [])].find((r) => helpers.readingMatch([r], qh) === rank.get(c));
-      return hit ? String(hit).replace(/[.-]/gu, '') : '';
-    };
-    renderKdxGrid(wrap, chars, 200, `reading:${qh}`, { empty: state === 'complete', readingOf });
-    return wrap;
-  }
-  const ql = q.toLowerCase();
-  const chars = kanjiFinderUniverse()
-    .filter((c) => kanjiReferenceView(c, D.kanji[c] || kanjiReference(c)).meanings.some((meaning) => meaning.toLowerCase().includes(ql)))
-    .sort((a, b) => strokesOf(a) - strokesOf(b) || (a < b ? -1 : 1));
-  const state = kanjiFactsState();
-  kanjiFactsStatus(wrap, state, 'kdx-meanings-retry', () => {
-    document.getElementById('kdx-results')?.replaceWith(kdxTextResults(kind));
-  });
-  if (state !== 'complete') wrap.append(el('p', 'fine', tx('いまはレッスン用の語義だけで検索しています。', 'Searching the lesson keywords only for now.')));
-  renderKdxGrid(wrap, chars, 200, `meaning:${ql}`, { empty: state === 'complete' });
-  return wrap;
-}
 
 /* 手書き — draw the character. Recognition matches the ink against the KanjiVG
  * stroke templates we already ship, sampled through the DOM; it is stroke-
  * order- and (±) stroke-count-tolerant, re-ranking as you draw. Offline, open
  * data, exactly the "saw-it-on-a-sign" path the operator asked for. */
-function renderKdxDraw(main) {
-  main.append(withEn(el('p', 'eyebrow', '手書き'), 'draw it — stroke order need not be perfect', 'en-inline'));
-  const stage = el('div', 'kdx-draw');
-  const canvas = el('canvas', 'kdx-canvas');
-  stage.append(canvas);
-  main.append(stage);
-  const ctrl = el('div', 'kdx-draw-ctrl');
-  const undo = el('button', 'kdx-clear', tx('一画消す', 'undo stroke'));
-  const clear = el('button', 'kdx-clear', tx('消す', 'clear'));
-  undo.type = clear.type = 'button';
-  ctrl.append(undo, clear);
-  main.append(ctrl);
-  const results = el('div');
-  results.id = 'kdx-results';
-  main.append(results);
-
-  const SIZE = 300;
-  const dpr = Math.min(2, window.devicePixelRatio || 1);
-  canvas.width = SIZE * dpr;
-  canvas.height = SIZE * dpr;
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
-  const strokes = [];
-  let cur = null;
-  const inkColor = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#14181c';
-  const redraw = () => {
-    ctx.clearRect(0, 0, SIZE, SIZE);
-    ctx.strokeStyle = inkColor();
-    ctx.lineWidth = 7;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    const draw = (s) => {
-      ctx.beginPath();
-      s.forEach((p, i) => (i ? ctx.lineTo(p.x * SIZE, p.y * SIZE) : ctx.moveTo(p.x * SIZE, p.y * SIZE)));
-      ctx.stroke();
-    };
-    strokes.forEach(draw);
-    if (cur) draw(cur);
-  };
-  const at = (e) => {
-    const r = canvas.getBoundingClientRect();
-    return { x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height };
-  };
-  const recognize = () => {
-    document.getElementById('kdx-results')?.replaceWith(kdxDrawResults(recognizeKanji(strokes)));
-  };
-  canvas.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    canvas.setPointerCapture?.(e.pointerId);
-    cur = [at(e)];
-    redraw();
-  });
-  canvas.addEventListener('pointermove', (e) => {
-    if (!cur) return;
-    e.preventDefault();
-    cur.push(at(e));
-    redraw();
-  });
-  const finish = () => {
-    if (!cur) return;
-    if (cur.length > 1) strokes.push(cur);
-    cur = null;
-    redraw();
-    recognize();
-  };
-  canvas.addEventListener('pointerup', finish);
-  canvas.addEventListener('pointercancel', finish);
-  undo.addEventListener('click', () => {
-    strokes.pop();
-    redraw();
-    if (strokes.length) recognize();
-    else document.getElementById('kdx-results')?.replaceWith(Object.assign(el('div'), { id: 'kdx-results' }));
-  });
-  clear.addEventListener('click', () => {
-    strokes.length = 0;
-    cur = null;
-    redraw();
-    document.getElementById('kdx-results')?.replaceWith(Object.assign(el('div'), { id: 'kdx-results' }));
-  });
-}
-function kdxDrawResults(chars) {
-  const wrap = el('div');
-  wrap.id = 'kdx-results';
-  if (!chars.length) return wrap;
-  wrap.append(withEn(el('p', 'eyebrow', 'にた字'), 'closest matches — tap to open', 'en-inline'));
-  const grid = el('div', 'kdx-grid');
-  for (const c of chars) {
-    const b = el('button', 'kdx-glyph', c);
-    b.type = 'button';
-    b.setAttribute('aria-label', kdxGlyphName(c));
-    b.addEventListener('click', () => go({ t: 'kanji', id: c }));
-    grid.append(b);
-  }
-  wrap.append(grid);
-  return wrap;
-}
 
 /* ---- handwriting recogniser: resample strokes to fixed point-counts, scale
  * each character into a unit box, and score by greedy order-tolerant stroke
@@ -26966,26 +21354,6 @@ function _kdxDist(user, tmpl) {
   }
   return (total + (big.length - small.length) * 0.28) / big.length;
 }
-function recognizeKanji(strokes) {
-  if (!strokes.length) return [];
-  const user = _kdxNorm(strokes).map((s) => _kdxResample(s, _KDX_NPTS));
-  const n = user.length;
-  const cands = [];
-  for (const dn of [n, n - 1, n + 1, n - 2, n + 2]) {
-    if (dn < 1) continue;
-    for (const t of _kdxTemplates(dn)) cands.push({ c: t.c, d: _kdxDist(user, t.strokes) });
-  }
-  cands.sort((a, b) => a.d - b.d);
-  const seen = new Set();
-  const out = [];
-  for (const x of cands) {
-    if (seen.has(x.c)) continue;
-    seen.add(x.c);
-    out.push(x.c);
-    if (out.length >= 24) break;
-  }
-  return out;
-}
 
 /* ------------------------------------------------------------ thesaurus
  * 類語 — the synonym dictionary as its own page, not a footnote at the foot
@@ -26996,57 +21364,7 @@ function recognizeKanji(strokes) {
  * kanji families, collocations and themes stay on the entry pages. */
 const THES_RELS = ['syn', 'ant', 'reg'];
 
-function thesClusters() {
-  const out = [];
-  for (const [w, edges] of Object.entries(D.sem)) {
-    const near = edges.filter((e) => THES_RELS.includes(e.rel));
-    if (near.length) out.push({ w, near });
-  }
-  // a paper thesaurus orders by reading, not by codepoint
-  const key = (c) => lookup(c.w)?.r || c.w;
-  out.sort((a, b) => (key(a) < key(b) ? -1 : key(a) > key(b) ? 1 : 0));
-  return out;
-}
 
-function renderThesaurus(main) {
-  // the word-web room: the plate first (window.openWordWeb lands here), the
-  // paper thesaurus beneath it as the room's index of hand-written clusters
-  main.append(el('h1', 'view-title ww-room-title', tx(...ROOM_NAMES.rooms.thesaurus)));
-  const web = renderWordWeb();
-  if (web) main.append(web);
-  main.append(withEn(el('p', 'eyebrow thes-eyebrow', '類語 · 使い分け'), 'synonyms — and how they differ', 'en-inline'));
-  main.append(el('h2', 'view-title thes-title', tx('類語辞典', 'Thesaurus')));
-  const clusters = thesClusters();
-  const sub = el('p', 'shelf-snippet intro');
-  sub.textContent = tx(
-    `${clusters.length} 語群。どの語もそのまま項目へひらく。`,
-    `${clusters.length} clusters, every note hand-written. Any word opens its full entry.`,
-  );
-  main.append(sub);
-  for (const { w, near } of clusters) {
-    const block = el('div', 'thes-block');
-    const rec = lookup(w);
-    const head = el('button', 'thes-head');
-    head.type = 'button';
-    head.dataset.thes = w;
-    head.append(el('span', 'thes-word', w));
-    if (rec?.r && rec.r !== w) head.append(el('span', 'thes-reading', rec.r));
-    if (rec?.m?.length) head.append(el('span', 'thes-gloss', rec.m[0]));
-    head.addEventListener('click', () => go({ t: 'word', id: w }));
-    block.append(head);
-    for (const edge of near) {
-      const row = el('button', 'sem-row');
-      row.type = 'button';
-      row.dataset.thesRow = edge.w;
-      row.append(el('span', 'sem-word', edge.w));
-      if (edge.rel !== 'syn') row.append(el('span', 'thes-rel', tx(...REL[edge.rel])));
-      row.append(el('span', 'sem-note', edge.note));
-      row.addEventListener('click', () => go({ t: 'word', id: edge.w }));
-      block.append(row);
-    }
-    main.append(block);
-  }
-}
 
 /* =================================================== BEGIN WORD WEB (Words lane)
  * 言葉の網 — "the recursive quality of the language", as one drafting plate
@@ -27093,23 +21411,8 @@ function wwTrail() {
   }
   return wordWeb.trail;
 }
-function wwSaveTrail() {
-  try { sessionStorage.setItem(WW_WALK_KEY, JSON.stringify(wordWeb.trail || [])); } catch { /* per-viewer convenience only */ }
-}
 /** Walk to a node: a node already on the walk cuts the walk back to it. */
-function wwPush(node) {
-  const trail = wwTrail();
-  const at = trail.findIndex((n) => n.type === node.type && n.key === node.key);
-  if (at >= 0) trail.splice(at + 1);
-  else trail.push({ type: node.type, key: node.key, why: node.why || null });
-  if (trail.length > WW_TRAIL_MAX) trail.splice(0, trail.length - WW_TRAIL_MAX);
-  wwSaveTrail();
-}
 
-function wwKanjiOf(w) {
-  const k = D.words[w]?.k?.length ? D.words[w].k : D.dict[w]?.k?.length ? D.dict[w].k : [...w];
-  return [...new Set(k)].filter((c) => D.kanji[c]);
-}
 /** part → every kanji whose own parts list names it (the full family in the bundle). */
 function wwPartMembers(p) {
   if (!wwPartIndex) {
@@ -27127,168 +21430,22 @@ function wwPartMembers(p) {
 /** A kanji's parts from D.kanji[c].parts, minus those another listed part
  * already implies across the whole data set (亻 inside every 隹 kanji, 人
  * inside every 亻 one): the decomposition stays the data's, only deduplicated. */
-function wwParts(c) {
-  const parts = [...new Set(D.kanji[c]?.parts || [])].filter((p) => p !== c);
-  const sets = parts.map(wwPartMembers);
-  const kept = parts.filter((p, i) => !parts.some((q, j) => {
-    if (j === i) return false;
-    const a = sets[j];
-    const b = sets[i];
-    if (!a.size || a.size > b.size || (a.size === b.size && j > i)) return false;
-    for (const x of a) if (!b.has(x)) return false;
-    return true;
-  }));
-  // the most telling parts first: a part few kanji share (隹, 40) says more than 亻 (185)
-  const size = new Map(parts.map((p, i) => [p, sets[i].size]));
-  return kept.sort((a, b) => size.get(a) - size.get(b));
-}
-function wwWord(w) {
-  let rec;
-  try { rec = lookup(w); } catch { rec = null; }
-  const graded = D.words[w];
-  const senses = rec?.m?.length ? rec.m : graded?.g ? [graded.g] : [];
-  return { reading: rec?.r || graded?.r || '', senses, jlpt: graded?.jlpt || null };
-}
 const wwShort = (s) => String(s || '').replace(/\s*\([^)]*\)/g, '').split(/[;,]/)[0].trim();
-function wwMine() {
-  const words = new Set();
-  const kanji = new Set();
-  for (const row of S.taken) {
-    if (row.t === 'word') {
-      words.add(row.id);
-      for (const c of wwKanjiOf(row.id)) kanji.add(c);
-    } else if (row.t === 'kanji') kanji.add(row.id);
-  }
-  return { words, kanji };
-}
 /** A card the learner holds that reviews today is never the default plate:
  * the web is the reward after the cards, never the answer before them. */
-function wwDueToday(w) {
-  if (!S.taken.some((row) => row.t === 'word' && row.id === w)) return false;
-  const rec = S.srs[srsKey('word', w)];
-  if (!rec) return true;
-  const end = new Date();
-  end.setHours(23, 59, 59, 999);
-  return Date.parse(rec.due) <= end.getTime();
-}
 /** The plate's opening word: the walk in progress, else the word last looked
  * up in a reading (obslog tap rows), else the newest saved word not due today,
  * else the day's word — a thesaurus head, chosen by date, not yet in your words. */
-function wwDefault() {
-  const trail = wwTrail();
-  if (trail.length) return trail.at(-1);
-  const ok = (w) => w && (D.dict[w] || D.words[w]) && wwKanjiOf(w).length && !wwDueToday(w);
-  const log = S.obslog || [];
-  for (let i = log.length - 1; i >= 0 && i >= log.length - 400; i -= 1) {
-    const row = log[i];
-    if (row[1] === 'tap' && row[3] >= 2 && typeof row[2] === 'string' && row[2].startsWith('word:') && ok(row[2].slice(5))) {
-      return { type: 'word', key: row[2].slice(5), why: 'looked' };
-    }
-  }
-  for (let i = S.taken.length - 1; i >= 0; i -= 1) {
-    const row = S.taken[i];
-    if (row.t === 'word' && ok(row.id)) return { type: 'word', key: row.id, why: 'saved' };
-  }
-  const held = new Set(S.taken.filter((row) => row.t === 'word').map((row) => row.id));
-  const heads = Object.keys(D.sem || {}).filter((w) => !held.has(w) && wwKanjiOf(w).length >= 2 && (D.dict[w] || D.words[w])).sort();
-  if (heads.length) {
-    const now = new Date();
-    const day = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
-    return { type: 'word', key: heads[day % heads.length], why: 'day' };
-  }
-  return null;
-}
 
 /* The shelf is indexed once per fetched article (content bases + text), so a
  * re-centre asks ~130 Set lookups instead of re-walking every token. */
 const wwTokenIndex = new WeakMap();
-function wwPassageIndex(p) {
-  let ix = wwTokenIndex.get(p.tokens);
-  if (!ix) {
-    const bases = new Set();
-    let text = '';
-    for (const t of p.tokens) {
-      if (!t.c) continue;
-      bases.add(t.b);
-      text += t.s;
-    }
-    ix = { bases, text };
-    wwTokenIndex.set(p.tokens, ix);
-  }
-  return ix;
-}
 /** The sentences of one article whose tokens pass test, as findExamples shapes them. */
-function wwSentences(p, test, cap, out) {
-  let sentence = [];
-  let start = 0;
-  let hit = -1;
-  for (const [index, t] of p.tokens.entries()) {
-    sentence.push(t);
-    if (hit < 0 && t.c && test(t)) hit = sentence.length - 1;
-    if ('。！？'.includes(t.s)) {
-      if (hit >= 0 && sentence.length <= 80) {
-        out.push({ tokens: sentence, source: learnerSourceLabel(p), passage: p.id, start, target: sentence[hit].b });
-        if (out.length >= cap) return;
-      }
-      sentence = [];
-      start = index + 1;
-      hit = -1;
-    }
-  }
-}
 /** The shelf sentences (then fetched bank lines) that hold a word. */
-function wwPassages(w, cap = 2) {
-  const out = [];
-  for (const p of D.passages || []) {
-    if (D.libraryDiscoverable?.(p) === false || !p.tokens || !wwPassageIndex(p).bases.has(w)) continue;
-    wwSentences(p, (t) => t.b === w, cap, out);
-    if (out.length >= cap) return out;
-  }
-  // KT-6 · only the word's own bank lines: a kana key's homophones are not its passages
-  for (const ex of bankExamplesFor(w)) {
-    if (out.length >= cap) break;
-    out.push({ ...ex, target: w });
-  }
-  return out;
-}
 /** A shelf sentence that holds a kanji, from the articles already fetched. */
-function wwKanjiPassage(c) {
-  const out = [];
-  for (const p of D.passages || []) {
-    if (D.libraryDiscoverable?.(p) === false || !p.tokens || !wwPassageIndex(p).text.includes(c)) continue;
-    wwSentences(p, (t) => String(t.s).includes(c), 1, out);
-    if (out.length) return out[0];
-  }
-  return null;
-}
 /** A grammar point linked to the word: its pattern, else one of its examples. */
-function wwGrammarFor(w) {
-  if ([...w].length < 2) return null;
-  const norm = (p) => String(p).replace(/[〜～\s（）()]/g, '');
-  const all = GRAMMARS();
-  return all.find((g) => norm(g.p).split('／').includes(w)) || all.find((g) => (g.ex || []).some((e) => String(e.ja || '').includes(w))) || null;
-}
 /** '…学の推進に道…' — a few characters either side of the word. */
-function wwExcerpt(ex, target) {
-  const text = ex.tokens.map((t) => t.s).join('');
-  const ti = ex.tokens.findIndex((t) => t.b === target || String(t.s).includes(target));
-  if (ti < 0) return { before: '', word: text.slice(0, 8), after: '' };
-  const before = ex.tokens.slice(0, ti).map((t) => t.s).join('');
-  const after = ex.tokens.slice(ti + 1).map((t) => t.s).join('');
-  return { before: before.slice(-3), word: ex.tokens[ti].s, after: after.slice(0, 2), full: text, ti };
-}
 /** Walk back into the article at the sentence, or open the bank line on its own page. */
-function wwOpenPassage(ex, target, invoker) {
-  const home = ex.passage && D.passages.some((p) => p.id === ex.passage) ? ex.passage : null;
-  if (home) {
-    keepNavigationReturn('reader', invoker);
-    const from = sentenceSource(ex.tokens, home, ex.start);
-    const ti = ex.tokens.findIndex((t) => t.b === target);
-    openPassage(home, from ? { index: from.index + Math.max(0, ti) } : null);
-    return;
-  }
-  go({ t: 'sent', tokens: ex.tokens, en: ex.en || '', source: ex.source || '', passage: null, start: ex.start, target }, { invoker });
-}
 
 const WW_REL = { syn: ['類義', 'near'], ant: ['対義', 'opposite'], reg: ['語感', 'register'], fam: ['同族', 'family'], col: ['共起', 'goes with'], thm: ['主題', 'theme'] };
 const wwP = (deg, rx, ry = rx) => [WW_CX + rx * Math.cos((deg * Math.PI) / 180), WW_CY + ry * Math.sin((deg * Math.PI) / 180)];
@@ -27297,229 +21454,17 @@ const WW_RING2_SLOTS = [[180, 304], [66, 262], [294, 262], [108, 350], [252, 350
 const WW_RING2_ORDER = { 1: [0], 2: [1, 2], 3: [0, 1, 2], 4: [1, 2, 3, 4], 5: [0, 1, 2, 3, 4] };
 const WW_KANJI_ANGLES = { 1: [-90], 2: [-126, -54], 3: [-150, -90, -30], 4: [-160, -117, -63, -20] };
 
-function wwKanjiCap(c) {
-  const k = D.kanji[c];
-  if (!k) return { en: '', ja: '' };
-  // Q · a caption is a name: the plain meaning a part's row gives (partMeaning); the whole meaning is the slip's, a hold away
-  return { en: partMeaning(kanjiReferenceView(c, k).meanings.join('; ')), ja: String((k.kun || [])[0] || (k.on || [])[0] || '').replace(/\..*$/, '') };
-}
 /** A part's name, never a reading posing as one: the official 部首 name (radicals214: 日 → ひへん),
  * else the part table's own name when it is more than the kanji's kun or on reading; else none. */
-function wwPartName(p) {
-  const official = D.radByGlyph?.[p]?.name;
-  if (official) return official;
-  const named = String(D.radicals?.[p]?.name || '');
-  if (!named) return '';
-  const k = D.kanji[p];
-  const readings = new Set([...(k?.kun || []), ...(k?.on || [])].map((r) => String(r).replace(/\..*$/, '').replace(/-/g, '')));
-  const kata = named.replace(/[\u3041-\u3096]/g, (ch) => String.fromCharCode(ch.charCodeAt(0) + 0x60));
-  return readings.has(named) || readings.has(kata) ? '' : named;
-}
-function wwPartCap(p, mine) {
-  const members = wwPartMembers(p);
-  const count = D.radicals?.[p]?.kanjiCount || members.size;
-  return {
-    en: partGloss(null, p) || `${count} kanji`,
-    ja: wwPartName(p),
-    count,
-    mine: [...members].filter((c) => mine.kanji.has(c)).length,
-  };
-}
 
 /** Build the plate's model: centre, nodes with positions, and the data marks. */
-function wwModel(centre, mine) {
-  const nodes = [];
-  const trail = wwTrail();
-  const prev = trail.length > 1 ? trail.at(-2) : null;
-  // ring 2 sits in fixed slots under the centre, so captions never collide
-  const ring2 = (list, from) => {
-    const use = WW_RING2_ORDER[Math.min(list.length, 5)] || [];
-    use.forEach((slot, i) => {
-      const [x, y] = WW_RING2_SLOTS[slot];
-      nodes.push({ ...list[i], x, y, from: [from] });
-    });
-  };
-  if (centre.type === 'word') {
-    const w = centre.key;
-    const info = wwWord(w);
-    const ks = wwKanjiOf(w).slice(0, 4);
-    const angles = WW_KANJI_ANGLES[ks.length] || [];
-    const kpos = ks.map((c, i) => wwP(angles[i], 102, 92));
-    ks.forEach((c, i) => {
-      const cap = wwKanjiCap(c);
-      nodes.push({ type: 'kanji', key: c, x: kpos[i][0], y: kpos[i][1], from: [[WW_CX, WW_CY]], cap: cap.en, capJa: cap.ja, mine: mine.kanji.has(c) });
-    });
-    // parts: one or two per kanji, a part two kanji share hung between them
-    const owners = new Map();
-    ks.forEach((c, i) => wwParts(c).slice(0, ks.length > 2 ? 1 : 2).forEach((p) => owners.set(p, [...(owners.get(p) || []), i])));
-    const shared = [...owners.entries()].filter(([, o]) => o.length > 1).map(([p]) => p);
-    let placed = 0;
-    for (const [p, o] of owners) {
-      if (placed >= 5) break;
-      let x;
-      let y;
-      if (o.length > 1) {
-        x = o.reduce((s, i) => s + kpos[i][0], 0) / o.length;
-        y = Math.min(...o.map((i) => kpos[i][1])) - 76;
-      } else {
-        const i = o[0];
-        const own = [...owners.entries()].filter(([, oo]) => oo.length === 1 && oo[0] === i).map(([q]) => q);
-        const hasShared = shared.some((q) => owners.get(q).includes(i));
-        const a = angles[i];
-        const side = a < -90 ? -1 : a > -90 ? 1 : 0;
-        let off = 0;
-        if (own.length > 1) off = (own.indexOf(p) ? 1 : -1) * 22;
-        else if (hasShared) off = side * 26;
-        [x, y] = wwP(a + off, ks.length > 2 ? 158 : 164, ks.length > 2 ? 150 : 168);
-      }
-      const cap = wwPartCap(p, mine);
-      nodes.push({ type: 'part', key: p, x, y, from: o.map((i) => kpos[i]), cap: cap.en, capJa: cap.ja, live: o.length > 1 });
-      placed += 1;
-    }
-    // ring 2: hand-written neighbours first, then words that share a kanji
-    const seen = new Set([w]);
-    const below = [];
-    for (const edge of D.sem[w] || []) {
-      if (below.length >= 2) break;
-      if (seen.has(edge.w) || [...edge.w].length > 4) continue;
-      seen.add(edge.w);
-      below.push({ type: 'word', key: edge.w, cap: tx(...(WW_REL[edge.rel] || ['関連', 'related'])), capJa: tx(...(WW_REL[edge.rel] || ['関連', 'related'])), rel: true, hi: ks, mine: mine.words.has(edge.w) });
-    }
-    const lists = ks.map((c) => (D.kanjiWords[c] || []).filter((x) => [...x].length <= 4));
-    const siblings = new Set();
-    for (const list of lists) for (const x of list) if (x !== w) siblings.add(x);
-    for (let round = 0; below.length < 5 && round < 12; round += 1) {
-      for (const list of lists) {
-        const x = list.find((cand) => !seen.has(cand));
-        if (!x || below.length >= 5) continue;
-        seen.add(x);
-        const wi = wwWord(x);
-        below.push({ type: 'word', key: x, cap: wwShort(wi.senses[0]), capJa: wi.reading, hi: ks, mine: mine.words.has(x) });
-      }
-    }
-    ring2(below, [WW_CX, WW_CY]);
-    // side cards: a real passage (left) and a linked grammar point or a second passage (right)
-    const ex = wwPassages(w, 2);
-    const side = [];
-    if (ex[0]) side.push({ type: 'passage', key: `${ex[0].passage || 'bank'}:${ex[0].start}`, ex: ex[0], target: w });
-    const g = wwGrammarFor(w);
-    if (g) side.push({ type: 'grammar', key: g.id, label: g.p, cap: wwShort(g.mEn), capJa: g.lv || '' });
-    else if (ex[1]) side.push({ type: 'passage', key: `${ex[1].passage || 'bank'}:${ex[1].start}`, ex: ex[1], target: w });
-    side.forEach((s, i) => {
-      const [x, y] = wwP(i ? 0 : 180, 136, 0);
-      nodes.push({ ...s, x, y: y - 4, from: [[WW_CX, WW_CY]], card: true });
-    });
-    const strokes = ks.reduce((s, c) => s + (D.kanji[c]?.st || 0), 0);
-    const kk = ks.map((c) => D.kanji[c]?.kk).filter(Boolean);
-    const kkOrder = (v) => { const n = parseFloat(String(v).replace('準', '')); return (Number.isFinite(n) ? n : 99) + (String(v).startsWith('準') ? 0.5 : 0); };
-    const hardest = kk.sort((a, b) => kkOrder(a) - kkOrder(b))[0];
-    const met = encounterTrail(srsKey('word', w));
-    const saved = S.taken.find((row) => row.t === 'word' && row.id === w);
-    const marks = [];
-    if (info.reading) marks.push([tx('読み', 'Reading'), info.reading, true]);
-    if (info.jlpt) marks.push(['JLPT', `N${info.jlpt}`]);
-    if (ks.length) marks.push([tx('漢字', 'Kanji'), String(ks.length)]);
-    if (strokes) marks.push([tx('画数', 'Strokes'), String(strokes)]);
-    if (hardest) marks.push([tx('漢検', 'Kanken'), bi() ? kankenGradeLabel(hardest) : hardest]);
-    if (shared.length) marks.push([tx('共通部品', 'Shared part'), shared[0], true]);
-    if (siblings.size) marks.push([tx('仲間の語', 'Siblings'), String(siblings.size)]);
-    if (met) marks.push([tx('初めて', 'First met'), new Date(met.first).toLocaleDateString()]);
-    if (saved?.ts) marks.push([tx('覚え始め', 'Saved'), new Date(saved.ts).toLocaleDateString()]);
-    const follow = shared.length ? { part: shared[0], kanji: owners.get(shared[0]).map((i) => ks[i]), ...wwPartCap(shared[0], mine) } : null;
-    return { centre: { ...centre, glyph: w, reading: info.reading, gloss: bi() ? wwShort(info.senses[0]) : '', strokes }, nodes, marks, senses: info.senses, examples: ex, follow };
-  }
-  if (centre.type === 'kanji') {
-    const c = centre.key;
-    const k = D.kanji[c] || {};
-    const parts = wwParts(c).slice(0, 4);
-    const prevParts = prev?.type === 'word' ? new Set(wwKanjiOf(prev.key).filter((x) => x !== c).flatMap((x) => wwParts(x))) : new Set();
-    const angles = WW_KANJI_ANGLES[parts.length] || [];
-    parts.forEach((p, i) => {
-      const [x, y] = wwP(angles[i], 124, parts.length > 2 ? 128 : 136);
-      const cap = wwPartCap(p, mine);
-      nodes.push({ type: 'part', key: p, x, y, from: [[WW_CX, WW_CY]], cap: cap.en, capJa: cap.ja, live: prevParts.has(p) || (prev?.type === 'part' && prev.key === p) });
-    });
-    const words = (D.kanjiWords[c] || []).filter((x) => [...x].length <= 4 && x !== c);
-    const pick = [];
-    if (prev?.type === 'word' && words.includes(prev.key)) pick.push(prev.key);
-    for (const x of words) if (pick.length < 5 && !pick.includes(x)) pick.push(x);
-    ring2(pick.map((x) => { const wi = wwWord(x); return { type: 'word', key: x, cap: wwShort(wi.senses[0]), capJa: wi.reading, hi: [c], mine: mine.words.has(x) }; }), [WW_CX, WW_CY]);
-    const ex = wwKanjiPassage(c);
-    if (ex) {
-      const [x, y] = wwP(180, 136, 0);
-      nodes.push({ type: 'passage', key: `${ex.passage}:${ex.start}`, ex, target: ex.target, x, y: y - 4, from: [[WW_CX, WW_CY]], card: true });
-    }
-    const facts = kanjiFacts(c);
-    const rad = facts && D.radInfo?.[facts.radicalSchemes.classical];
-    const inMine = [...mine.words].filter((x) => wwKanjiOf(x).includes(c)).length;
-    const met = encounterTrail(srsKey('kanji', c));
-    const marks = [];
-    if (k.st) marks.push([tx('画数', 'Strokes'), String(k.st)]);
-    if (k.kk) marks.push([tx('漢検', 'Kanken'), bi() ? kankenGradeLabel(k.kk) : k.kk]);
-    if (k.on?.length) marks.push([tx('音読み', 'On'), k.on.slice(0, 2).join('・'), true]);
-    if (k.kun?.length) marks.push([tx('訓読み', 'Kun'), k.kun.slice(0, 2).map((r) => r.replace(/\.(.+)$/, '($1)')).join('・'), true]);
-    if (rad) marks.push([tx('伝統部首（KANJIDIC2）', 'Classical radical (KANJIDIC2)'), `${rad.c} ${rad.n}`, true]);
-    if (D.kanjiWords[c]?.length) marks.push([tx('この字の語', 'Words with it'), String(D.kanjiWords[c].length)]);
-    marks.push([tx('あなたの語', 'In your words'), String(inMine)]);
-    if (D.kanjiFreq?.[c]) marks.push([tx('頻度順位', 'Frequency rank'), String(D.kanjiFreq[c])]);
-    if (met) marks.push([tx('初めて', 'First met'), new Date(met.first).toLocaleDateString()]);
-    const cap = wwKanjiCap(c);
-    return { centre: { ...centre, glyph: c, reading: (k.on || [])[0] || '', gloss: bi() ? cap.en : cap.ja, strokes: k.st || 0 }, nodes, marks, senses: kanjiReferenceView(c, k).meanings, examples: ex ? [ex] : [] };
-  }
-  // a part: its family on one ring — your kanji first, the kanji you came from among them
-  const p = centre.key;
-  const members = [...wwPartMembers(p)];
-  const words = (c) => D.kanjiWords[c]?.length || 0;
-  members.sort((a, b) => (mine.kanji.has(b) - mine.kanji.has(a)) || (words(b) - words(a)) || (a < b ? -1 : 1));
-  if (prev?.type === 'kanji' && members.includes(prev.key)) {
-    members.splice(members.indexOf(prev.key), 1);
-    members.unshift(prev.key);
-  }
-  const ring = members.slice(0, 10);
-  const big = ring.length > 6;
-  wwSpread(ring.length, -90, 270 - 360 / Math.max(ring.length, 1)).forEach((ang, i) => {
-    const [x, y] = wwP(ang, big ? 136 : 112, big ? 142 : 116);
-    const cap = wwKanjiCap(ring[i]);
-    nodes.push({ type: 'kanji', key: ring[i], x, y, from: [[WW_CX, WW_CY]], cap: cap.en, capJa: cap.ja, mine: mine.kanji.has(ring[i]), live: prev?.key === ring[i] });
-  });
-  const cap = wwPartCap(p, mine);
-  const st = D.radicals?.[p]?.st || D.kanji[p]?.st || 0;
-  const rad = D.radByGlyph?.[p] || null;
-  const marks = [];
-  if (cap.ja) marks.push([tx('名前', 'Name'), cap.ja, true]);
-  if (st) marks.push([tx('画数', 'Strokes'), String(st)]);
-  // the family line above the marks already carries the count and how many are yours; the
-  // marks hold only what it does not say
-  if (rad) marks.push([tx('部首番号', 'Radical no.'), String(rad.n)]);
-  if (D.kanji[p]?.m && bi()) marks.push(['Meaning', String(D.kanji[p].m).toLowerCase()]);
-  if (D.kanji[p]?.kk) marks.push([tx('漢検', 'Kanken'), bi() ? kankenGradeLabel(D.kanji[p].kk) : D.kanji[p].kk]);
-  if (D.kanjiFreq?.[p]) marks.push([tx('頻度順位', 'Frequency rank'), String(D.kanjiFreq[p])]);
-  return {
-    centre: { ...centre, glyph: p, reading: cap.ja, gloss: bi() ? partGloss(null, p) : '', strokes: st },
-    nodes, marks, senses: [], examples: [], family: members, familyCount: cap.count, familyMine: cap.mine,
-  };
-}
 
 const wwSvg = (tag, attrs = {}) => {
   const n = document.createElementNS(SVG_NS, tag);
   for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, String(v));
   return n;
 };
-function wwLearn(tag, cls, text) {
-  const n = el(tag, cls, text);
-  n.lang = 'ja';
-  n.dataset.uiContent = 'learning';
-  return n;
-}
 /** A label whose shared kanji are inked in 藍 (concept: siblings ink the shared kanji). */
-function wwInkLabel(text, hi) {
-  const n = wwLearn('span', 'ww-g');
-  for (const ch of [...text]) {
-    if (hi?.includes(ch)) n.append(el('b', null, ch));
-    else n.append(document.createTextNode(ch));
-  }
-  return n;
-}
 
 function wwPlate(model, section) {
   const liveNode = model.nodes.find((node) => node.live);
@@ -27696,40 +21641,6 @@ function wwReadingDoor(c, section, className = '') {
 
 /** These are session-only room choices. A normal room refresh after closing a
  * slip must retain them; an answer for an older centre cannot replace them. */
-function wwReadingChoices(c) {
-  const choices = el('div', 'ww-reading-choices');
-  choices.dataset.japaneseLookup = 'off';
-  const state = wordWeb.readingChoices;
-  if (!state || c.type !== 'word' || state.key !== c.key || state.reading !== c.reading) return choices;
-  if (state.rows === null && !state.error) {
-    state.loading ||= ensureDictionaryRowsForForm(c.reading).then((rows) => {
-      state.rows = readerChoiceMatch({ b: c.reading, s: c.reading, r: c.reading }, rows).rows;
-    }).catch(() => { state.error = true; });
-    state.loading.then(() => {
-      if (choices.isConnected && wordWeb.readingChoices === state) choices.replaceWith(wwReadingChoices(c));
-    });
-    return choices;
-  }
-  if (state.error) {
-    choices.append(el('p', 'note', tx('同じ読みのほかの語を読み込めなかった。読みをもう一度押すと再試行する。',
-      'Other words with this reading could not load. Tap the reading again to retry.')));
-    return choices;
-  }
-  if (state.rows.length < 2) return choices;
-  choices.setAttribute('role', 'group');
-  choices.setAttribute('aria-label', tx(`「${c.reading}」と読む語`, `Words read ${c.reading}`));
-  choices.append(el('p', 'note', tx(`「${c.reading}」と読む語`, `Words read ${c.reading}`)));
-  for (const match of state.rows) {
-    const choice = wwLearn('button', 'chip ww-reading-choice', `${match.head} · ${match.reading}`);
-    choice.type = 'button'; choice.dataset.seq = match.seq;
-    choice.append(el('span', null, ` — ${match.gloss}`));
-    choice.addEventListener('click', (click) => openSlip({ t: 'word', id: match.head, seq: match.seq, reading: match.reading }, {
-      anchor: choice, from: 'lookup', focus: click.detail === 0, readingVisible: () => true,
-    }));
-    choices.append(choice);
-  }
-  return choices;
-}
 
 function wwDetail(model, section) {
   const c = model.centre;
@@ -27844,33 +21755,8 @@ function wwDetail(model, section) {
 
 /** The dictionary node a web node's slip stands for: a word, a kanji, or a part that is itself a kanji; null
  * for a radical that is not (it has an entry, not a slip). */
-function wwSlipNode(n) {
-  if (n.type === 'word') return { t: 'word', id: n.key };
-  if (n.type === 'kanji' || (n.type === 'part' && D.kanji?.[n.key])) return { t: 'kanji', id: n.key };
-  return null;
-}
 /** A peripheral word is still a word. Keep the plate intact through its
  * reading, stage and page; re-centring is an explicit action on that stage. */
-function openWordWebLadder(item, section, anchor, keyboard = false, redo = false) {
-  const node = wwSlipNode(item);
-  if (!node) { wwRecentre({ type: item.type, key: item.key }, section, anchor); return; }
-  const reading = node.t === 'kanji' ? kanjiSlipReading(D.kanji?.[node.id]) : lookup(node.id)?.r || '';
-  const glyph = anchor.querySelector('.ww-g') || anchor.querySelector('span') || anchor;
-  openSlip(node, { anchor, from: 'lookup', focus: keyboard, redo,
-    reveal: () => inlineWordReading(glyph, reading),
-    readingVisible: () => !!reading && !bi() && kataToHira(anchor.querySelector('.ww-cap')?.textContent || '') === kataToHira(reading),
-    onStage(stage) {
-      const follow = stage.querySelector('.mini-web-open') || el('button', 'mini-web-open');
-      if (!follow.isConnected) { follow.type = 'button'; stage.append(follow); }
-      // Replace the generic Related words callback with this exact typed node.
-      const action = follow.cloneNode(false);
-      action.dataset.action = 'word-web.centre';
-      action.textContent = tx('この語を中心に', 'Centre the web here');
-      action.addEventListener('click', event => { event.stopPropagation(); wwRecentre({ type: item.type, key: item.key }, section, anchor); });
-      follow.replaceWith(action);
-    },
-  });
-}
 /** Hfix-2e · the Words room's hold is the reader's hold (John, 10-19 17:19, on the Mac: "HOLDING A WORD does nothing at
  * all"; checklist S1): a finger, a pen, or a mouse or trackpad press held still on a web node's word or kanji fills the
  * ring from RING_MS and seals it at MENU_MS (sealWord: the 印 presses on, the word is kept, the strip opens; a second hold
@@ -27998,11 +21884,6 @@ function wireWordWebHold(button, nodeOf, activate = null) {
   });
 }
 
-function wwValid(n) {
-  if (n.type === 'word') return !!(D.dict[n.key] || D.words[n.key]);
-  if (n.type === 'kanji') return !!D.kanji[n.key];
-  return n.type === 'part' && (wwPartMembers(n.key).size > 0 || !!D.radicals?.[n.key]);
-}
 
 /** The shelf warms in the background (prefetchArticles) and bank sentences
  * arrive lazily; when a sentence for this centre lands, the plate gains its
@@ -28081,43 +21962,6 @@ function renderWordWeb({ quiet = false } = {}) {
 /** Re-centre on a node: the tapped glyph flies to the middle while the rest
  * fade (transform and opacity only, ≤300ms), then only this section is swapped
  * — the room never re-renders, the scroll and the search field stay put. */
-function wwRecentre(node, section, invoker) {
-  if (!section?.isConnected) return;
-  removeMini(); // the web moves under a slip: the slip goes with the plate it stood on
-  const swap = () => {
-    wwPush(node);
-    const next = renderWordWeb();
-    if (!next) return;
-    const hadFocus = section.contains(document.activeElement);
-    // read before writing: the new section lands exactly where the old one stood
-    const top = section.getBoundingClientRect().top;
-    section.replaceWith(next);
-    if (top < 0) window.scrollBy(0, top - 64);
-    const glyph = next.querySelector('.ww-c-glyph');
-    if (glyph?.animate) glyph.animate(wwReduced()
-      ? [{ opacity: 0.35 }, { opacity: 1 }]
-      : [{ opacity: 0.55, transform: 'scale(.94)' }, { opacity: 1, transform: 'none' }],
-      { duration: motionMs('--motion-ma', 120), easing: motionEase('--ease-enter') });
-    if (hadFocus) next.querySelector('.ww-centre')?.focus({ preventScroll: true });
-  };
-  const from = invoker?.querySelector('.ww-g') || invoker?.querySelector('span');
-  const to = section.querySelector('.ww-c-glyph');
-  if (wwReduced() || !from || !to || !from.animate) {
-    swap();
-    return;
-  }
-  const r0 = from.getBoundingClientRect();
-  const r1 = to.getBoundingClientRect();
-  section.classList.add('ww-leaving');
-  if (invoker.closest('.ww-detail')) section.classList.add('ww-leaving-detail');
-  invoker.classList.add('ww-chosen');
-  const scale = Math.min(3.2, r1.height / Math.max(r0.height, 1));
-  from.animate(
-    [{ transform: 'none' }, { transform: `translate(${(r1.left + r1.width / 2 - (r0.left + r0.width / 2)).toFixed(1)}px, ${(r1.top + r1.height / 2 - (r0.top + r0.height / 2)).toFixed(1)}px) scale(${scale.toFixed(2)})` }],
-    { duration: motionMs('--motion-standard', 200), easing: motionEase('--ease-enter'), fill: 'forwards' },
-  );
-  setTimeout(swap, motionMs('--motion-standard', 200));
-}
 
 /** Other rooms' "Open the web" buttons call this. */
 function openWordWeb(term, { type = null, invoker = null } = {}) {
@@ -28165,39 +22009,6 @@ const PARTICLES = [
 ];
 const PARTICLE_BY_SURFACE = Object.fromEntries(PARTICLES.map((p) => [p.p, p]));
 
-function renderParticleNode(sheet, node) {
-  const pt = PARTICLES.find((x) => x.id === node.id);
-  if (!pt) {
-    sheet.append(el('div', 'sem-empty', tx('この助詞はまだない。', 'This particle page does not exist yet.')));
-    return;
-  }
-  const head = el('h2', 'headword', pt.p);
-  head.append(el('span', 'headword-alt', tx('　助詞', '　particle')));
-  sheet.append(head);
-  if (pt.r !== pt.p) sheet.append(el('p', 'reading', pt.r));
-  sheet.append(el('p', 'sense-pos', bi() ? pt.role : pt.roleJa));
-  const explanation = el('p', 'gloss', pt.exp);
-  explanation.dataset.uiContentValue = (pt.exp.match(/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]+/gu) || []).join('|');
-  sheet.append(explanation);
-  sheet.append(withEn(el('p', 'eyebrow', '用例'), 'examples', 'en-inline'));
-  for (const ex of pt.ex) {
-    const line = el('div', 'example');
-    line.append(el('p', 'example-ja', ex.ja));
-    if (bi()) line.append(el('p', 'example-en', ex.en));
-    sheet.append(line);
-  }
-  if (pt.see && GRAMMARS().some((g) => g.id === pt.see)) {
-    sheet.append(withEn(el('p', 'eyebrow', '文法へ'), 'related grammar', 'en-inline'));
-    const g = GRAMMARS().find((x) => x.id === pt.see);
-    const row = el('button', 'entry-row');
-    row.type = 'button';
-    row.append(el('span', 'row-glyph', '文'));
-    row.append(el('span', 'row-main grammar-related-content', `${g.p} — ${bi() ? g.mEn : g.mJa}`));
-    row.append(el('span', 'row-go', '›'));
-    row.addEventListener('click', () => go({ t: 'grammar', id: g.id }));
-    sheet.append(row);
-  }
-}
 
 /** Particles use the same quick-lookup door; holding still opens their grammar entry. */
 function wireParticleGestures(span, particle, index, p) {
@@ -28251,9 +22062,6 @@ function kataToHira(s) {
   return s.replace(/[ァ-ヶ]/g, (ch) => String.fromCharCode(ch.charCodeAt(0) - KATA_TO_HIRA_OFFSET));
 }
 
-function hiraToKata(s) {
-  return String(s || '').replace(/[぀-ゖ]/g, (ch) => String.fromCharCode(ch.charCodeAt(0) + KATA_TO_HIRA_OFFSET));
-}
 
 /** Hepburn-ish romaji → hiragana, table-driven longest match. Returns null
  * when the input cannot be fully converted (then it is English, not romaji). */
@@ -28337,18 +22145,6 @@ const ROMAJI = (() => {
  */
 const GLOSS_MESSY = /[(]|\s\s|[^\S ]/; // parenthesis, doubled space, or exotic whitespace
 const GLOSS_LEAD = new Set(['the', 'a', 'an', 'to']);
-function normalizeGloss(s) {
-  let bare = String(s).toLowerCase();
-  // the regex work is the whole index-build cost, and ~80% of glosses are
-  // already clean — so pay for it only when the string actually needs it.
-  if (GLOSS_MESSY.test(bare)) {
-    bare = bare.replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ');
-  }
-  bare = bare.trim();
-  const sp = bare.indexOf(' ');
-  if (sp > 0 && GLOSS_LEAD.has(bare.slice(0, sp))) return bare.slice(sp + 1);
-  return bare;
-}
 
 // commonness rank for the exact-gloss tiers: a graded (JLPT) word is the one a
 // learner means. 0 = N5 … 4 = N1, 5 = ungraded.
@@ -28424,25 +22220,7 @@ function buildSearchIndex() {
  * the same word, reading and gloss and the core sheet offers that exact
  * entry as a door (searchRowShownByCore); every other deep row keeps its own
  * numbered door. */
-function dictionarySearchContext(query) {
-  const q = String(query || '').trim();
-  const hasKanji = /[一-鿌]/.test(q);
-  const hasKana = /[぀-ゖァ-ヺ]/.test(q);
-  const qh = hasKana ? kataToHira(q) : ROMAJI(q);
-  return {
-    q,
-    hasKanji,
-    hasKana,
-    qh,
-    qk: qh ? hiraToKata(qh) : null,
-    ql: q.toLowerCase(),
-    qn: hasKanji || hasKana ? '' : normalizeGloss(q),
-  };
-}
 
-function dictionaryQueryKey(query) {
-  return String(query || '').trim();
-}
 
 function dictionaryQueryOpening(query) {
   const key = dictionaryQueryKey(query);
@@ -28453,22 +22231,8 @@ function dictionaryQueryOpening(query) {
   );
 }
 
-function dictionaryQueryError(query) {
-  const key = dictionaryQueryKey(query);
-  return D.dictionaryError || D.dictionarySearchErrors?.get(key) || null;
-}
 
-function dictionaryQueryToken(query) {
-  const key = dictionaryQueryKey(query);
-  if (dictionaryQueryError(key)) return 'error';
-  if (dictionaryQueryOpening(key)) return 'opening';
-  if (D.dictionarySearchCache?.has(key)) return 'full';
-  return D.dictionaryState || 'core';
-}
 
-function shelfBodyToken() {
-  return `${S.query?.trim() || ''}\u0000${dictionaryQueryToken(S.query)}\u0000${JSON.stringify(S.shelfFilters || null)}\u0000${shelfCurrentDay()}`;
-}
 
 let shelfBodyRefreshing = false;
 function refreshShelfBody() {
@@ -28504,12 +22268,6 @@ function refreshDictionaryBodies() {
   if (typeof navSearchRepaint === 'function') navSearchRepaint();
 }
 
-function activeDictionaryQuery() {
-  const nav = document.getElementById('nav-search-input');
-  if (nav?.value.trim()) return dictionaryQueryKey(nav.value);
-  if (S.view === 'shelf') return dictionaryQueryKey(S.query);
-  return '';
-}
 
 function clearDictionarySearchTimer() {
   if (dictionarySearchTimer != null) clearTimeout(dictionarySearchTimer);
@@ -28823,12 +22581,6 @@ function searchResults(query) {
  *     door (dictionaryHomographChoices, the list that sheet renders).
  * Otherwise the row keeps its own numbered door: another gloss, another exact reading
  * (even one that normalises equal), another spelling, or no scored core row at all. */
-function searchRowShownByCore(e, core) {
-  if (!core || !e?.seq || core.w !== e.w || core.r !== e.r || core.g !== e.g) return false;
-  return dictionaryHomographChoices(core.id).some(
-    (choice) => choice.enabledOnCore && String(choice.row[0]) === String(e.seq) && choice.summary[0] === e.reading,
-  );
-}
 
 function renderSearchResults(main, query) {
   const results = searchResults(query);
@@ -28954,30 +22706,6 @@ function renderGrammar(main) {
   main.append(rows);
 }
 
-function renderGrammarNode(sheet, node) {
-  const g = GRAMMARS().find((x) => x.id === node.id);
-  if (!g) {
-    sheet.append(el('div', 'sem-empty', tx('この項目はまだない。', 'This entry does not exist yet.')));
-    return;
-  }
-  sheet.append(el('h2', 'headword', g.p));
-  sheet.append(el('p', 'sense-pos', g.lv));
-  const meaning = bi() ? (g.mJa ? `${g.mEn} — ${g.mJa}` : g.mEn) : g.mJa || g.mEn;
-  sheet.append(el('p', 'gloss grammar-meaning', meaning));
-  sheet.append(withEn(el('p', 'eyebrow', '接続'), 'formation', 'en-inline'));
-  sheet.append(el('p', 'formation', g.form));
-  sheet.append(withEn(el('p', 'eyebrow', '用例'), 'examples', 'en-inline'));
-  for (const ex of g.ex) {
-    const line = el('div', 'example');
-    line.append(el('p', 'example-ja', ex.ja));
-    if (bi()) line.append(el('p', 'example-en', ex.en));
-    sheet.append(line);
-  }
-  if (g.note) {
-    sheet.append(withEn(el('p', 'eyebrow', '使い分け'), 'usage', 'en-inline'));
-    sheet.append(el('p', 'sem-note grammar-note', g.note));
-  }
-}
 
 /* ---------------------------------------------------------------- nodes */
 function nodeTitle(node) {
@@ -29002,144 +22730,15 @@ function nodeTitle(node) {
  * gesture grammar — the tap circle, the hold for the simple definition,
  * the long hold for the entry. The translation and the source sit beneath,
  * quiet. It rides the sheet stack, so 戻る returns exactly one step. */
-function renderSentenceNode(sheet, node) {
-  if (node.familyExample) { renderFamilyExampleNode(sheet, node); return; }
-  sheet.append(withEn(el('p', 'eyebrow', '文'), 'one sentence, read closely', 'en-inline'));
-  const line = el('p', 'sent-reader');
-  // on its own page the sentence is ALL reader: the highlighted word keeps
-  // its mark but joins the ladder like every neighbour
-  renderSentenceTokens(line, node.tokens, {
-    targetId: node.target || null,
-    targetLive: true,
-    contextId: node.passage || 'bank',
-    start: node.start,
-  });
-  sheet.append(line);
-  if (node.en) sheet.append(el('p', 'sent-reader-en', node.en));
-  if (node.source) sheet.append(el('p', 'example-src', node.source));
-  // …and on to the whole article. The rubric asks a review answer to return
-  // the learner to the source sentence AND its article (§9.5); the C1
-  // demonstration found the sentence half present and this half missing.
-  // The door appears only when the sentence really came from a shelf
-  // article — a bank example has no article to walk into, and an honest
-  // absence beats a door onto nothing.
-  const home = node.passage && D.passages.some((p) => p.id === node.passage) ? node.passage : null;
-  if (home) {
-    const doorRow = el('div', 'sent-home-row');
-    const door = biLabel('button', 'chip sent-home', 'この記事を読む', 'read the source article');
-    door.type = 'button';
-    door.id = 'sent-home';
-    door.addEventListener('click', () => {
-      if (scaleNodeBelongs(node) && scaleOut()) return;
-      keepNavigationReturn('reader', door);
-      const from = sentenceSource(node.tokens, home, node.start);
-      const targetIndex = Number.isInteger(node.targetOffset) ? node.targetOffset : node.tokens.findIndex((token) => token.b === node.target);
-      openPassage(home, from ? { index: from.index + Math.max(0, targetIndex) } : null);
-    });
-    doorRow.append(door);
-    sheet.append(doorRow);
-  }
-  sheet.append(el('p', 'gloss', tapLadderHint()));
-}
 
 /** The quiet door every example line carries into its own reading page. */
-function sentenceDoor(ex, target) {
-  const door = el('button', 'sent-door', '▷');
-  door.type = 'button';
-  door.setAttribute('aria-label', tx('この文だけをひらく', 'open this sentence on its own page'));
-  door.addEventListener('click', (ev) => {
-    ev.stopPropagation();
-    go({
-      t: 'sent',
-      tokens: ex.tokens,
-      en: ex.en || '',
-      source: ex.source || '',
-      passage: ex.passage || null,
-      start: ex.start,
-      target: target || null,
-    });
-  });
-  return door;
-}
 
 /* ------------------------------------------------------ category catalogs
  * Operator (2026-08-10): a level or count on an entry should be a door — tap
  * 漢検 3級 / JLPT N1 / 12 画 and see EVERY kanji in that group, exhaustively.
  * The same node opens the same way everywhere the chip appears. */
-function catalogLabel(by, value) {
-  if (by === 'classical-radical') return tx(`伝統部首 ${value}・${D.radInfo?.[value]?.c || ''}`, `Classical radical ${value} · ${D.radInfo?.[value]?.c || ''}`);
-  if (by === 'strokes') return tx(`${value} 画`, `${value} strokes`);
-  if (by === 'kanken') return tx(`漢検 ${value}`, `Kanji Kentei ${kankenGradeLabel(value)}`);
-  if (by === 'jlpt') return `JLPT ${value}`;
-  return String(value);
-}
-function catalogEn(by, value) {
-  if (by === 'classical-radical') return 'KANJIDIC2 dictionary classification';
-  if (by === 'strokes') return `${value}-stroke kanji`;
-  if (by === 'kanken') return `Kanji Kentei ${kankenGradeLabel(value)} kanji`;
-  if (by === 'jlpt') return `JLPT ${value} kanji`;
-  return '';
-}
 /** Every kanji in a category, ordered common-first (by 漢検 rank) then simpler. */
-function catalogMatch(by, value) {
-  if (by === 'classical-radical') return classicalRadicalHits(value);
-  const out = [];
-  for (const [c, k] of Object.entries(D.kanji)) {
-    const hit =
-      by === 'strokes'
-        ? k.st === value
-        : by === 'kanken'
-          ? k.kk === value
-          : by === 'jlpt'
-            ? D.kmeta?.[c]?.jlpt === value
-            : false;
-    if (hit) out.push(c);
-  }
-  out.sort(
-    (a, b) =>
-      (D.kanji[a].kr || 9999) - (D.kanji[b].kr || 9999) || D.kanji[a].st - D.kanji[b].st || a.localeCompare(b),
-  );
-  return out;
-}
 /** A tappable chip that opens the catalog for its category. */
-function catalogChip(ja, en, by, value, from) {
-  // Level categories share one exhaustive collection; other categories
-  // retain their existing canonical catalog (for example stroke count).
-  if (by === 'kanken') return referenceCollectionChip(ja, `kanken:${value}`);
-  if (by === 'jlpt') return referenceCollectionChip(ja, `jlpt-kanji:${value}`);
-  const chip = el('button', 'pool-tag cat-chip', bi() && en ? en : ja);
-  chip.type = 'button';
-  chip.setAttribute('aria-label', tx(`${ja} の漢字をすべて見る`, `see every ${en} kanji`));
-  chip.addEventListener('click', () => go({ t: 'catalog', id: `${by}:${value}`, by, value, from }, { invoker: chip }));
-  return chip;
-}
-function renderCatalogNode(sheet, node) {
-  const { by, value } = node;
-  const chars = catalogMatch(by, value);
-  sheet.append(withEn(el('h1', 'view-title', catalogLabel(by, value)), catalogEn(by, value), 'en-inline'));
-  if (by === 'classical-radical') {
-    kanjiFactsStatus(sheet, kanjiFactsState(), 'catalog-facts-retry', () => { if (sheet.isConnected) render(); });
-    if (kanjiFactsState() !== 'complete') return;
-    sheet.append(el('p', 'fine', tx('字引に収録した字の分類。部品の形や語源の説明ではありません。', 'Classification of characters in this finder. This does not describe their visible parts or origins.')));
-  }
-  sheet.append(
-    el('p', 'gloss', tx(`このくくりの漢字 — 全 ${chars.length} 字`, `every kanji in this group — all ${chars.length}`)),
-  );
-  if (!chars.length) {
-    sheet.append(el('div', 'sem-empty', tx('この層に該当する字がない。', 'No kanji in this layer match.')));
-    return;
-  }
-  const grid = el('div', 'cat-grid');
-  for (const c of chars) {
-    const cell = el('button', 'cat-cell');
-    cell.type = 'button';
-    cell.append(el('span', 'cat-glyph', c));
-    cell.append(el('span', 'cat-mean', kanjiReferenceView(c, D.kanji[c] || kanjiReference(c)).meanings.join('; ')));
-    cell.addEventListener('click', () => go({ t: 'kanji', id: c, from: node.from }, { invoker: cell }));
-    grid.append(cell);
-  }
-  sheet.append(grid);
-}
 
 function chipsFor(items, onTap, sub, kind) {
   const wrap = el('div', 'chips');
@@ -29171,55 +22770,6 @@ const NODE_KIND = {
 /** The context a learner chose at capture — resolved fresh from the article
  * each time (the store carries only {p, i, scope}; the text stays in its
  * source file, never duplicated into the envelope). */
-function takenContext(item) {
-  const ctx = item.ctx;
-  if (!ctx) return null;
-  const p = D.passages.find((x) => x.id === ctx.p);
-  if (!p) {
-    // an archive capture on a fresh boot: pull the stack's index in quietly
-    if (!D.archive && !D.archiveLoading && window.__CORRIDOR_STANDALONE__ !== true) {
-      ensureArchiveIndex()
-        .then(() => {
-          if (S.view === 'review') render();
-        })
-        .catch(() => {});
-    }
-    return null;
-  }
-  if (!p.tokens) {
-    ensureArticle(p)
-      .then(() => {
-        if (S.view === 'review') render();
-      })
-      .catch(() => {});
-    return null;
-  }
-  let start = 0;
-  let end = p.tokens.length;
-  if (ctx.scope === 'para' && Array.isArray(p.paras) && p.paras.length) {
-    for (const ps of p.paras) {
-      if (ps <= ctx.i) start = ps;
-      else {
-        end = ps;
-        break;
-      }
-    }
-  } else {
-    for (let k = ctx.i - 1; k >= 0; k--) {
-      if ('。！？'.includes(p.tokens[k].s)) {
-        start = k + 1;
-        break;
-      }
-    }
-    for (let k = ctx.i; k < p.tokens.length; k++) {
-      if ('。！？'.includes(p.tokens[k].s)) {
-        end = k + 1;
-        break;
-      }
-    }
-  }
-  return { tokens: p.tokens.slice(start, end), source: learnerSourceLabel(p), passage: p.id, start };
-}
 
 /* ------------------------------------------------ D23 · the saved word answer
  * A learner's word card answers from its own record: the taken row's entrySeq
@@ -29336,12 +22886,6 @@ function sameWordIdentity(a, b) {
  *   other-reading  both name the same entry, with two different known readings.
  *   unestablished  anything else: the core record beside an entry (上手 beside 上手#1353320),
  *                  saved text, unknown, or a reading nothing records. */
-function wordIdentityRelation(node, card) {
-  if (node?.kind !== 'seq' || card?.kind !== 'seq') return 'unestablished';
-  if (node.seq !== card.seq) return 'other-entry';
-  if (nonEmptyString(node.reading) && nonEmptyString(card.reading) && node.reading !== card.reading) return 'other-reading';
-  return 'unestablished';
-}
 
 /** Whether this spelling's card has schedule history. This is the assessment
  * modules' own predicate (assessment-received.mjs `studied`). */
@@ -29431,13 +22975,6 @@ function entryKanaIndex(row, reading) {
  * the full entry (read ダマスカス) are one identity and make one card. One word, one card (John,
  * 2026-10-01). When the row is not at hand, or the reading names no form, it is the door's reading
  * as given. The reader may still show the article's own reading. */
-function entryCueReading(node) {
-  if (node?.seq == null || node.seq === '' || !nonEmptyString(node.reading)) return node?.reading;
-  const row = dictionaryRowBySeq(node.seq);
-  if (!Array.isArray(row) || String(row[0]) !== String(node.seq)) return node.reading;
-  const kana = entryKanaIndex(row, node.reading);
-  return kana >= 0 ? row[5][kana] : node.reading;
-}
 
 /** The answer an explicit door selected, validated against that entry's own index
  * row. The rules:
@@ -29671,18 +23208,6 @@ function assertKanjiPracticeSource(record, entry) {
   } catch (error) { throw Object.assign(error, { code: 'kanji-reading-source-unverified' }); }
 }
 
-function learningContextRef(item) {
-  return item.sourceContextRef || S.taken.find((row) => row.t === item.t && row.id === item.id)?.sourceContextRef || null;
-}
-function learningItemNode(item) {
-  const saved = S.taken.find((row) => row.t === item.t && row.id === item.id) || item;
-  const sourceContextRef = learningContextRef(item);
-  const context = S.teacherContexts?.entries.find((entry) => entry.id === sourceContextRef);
-  return { t: item.t, id: item.id, from: saved.from || null,
-    ...(saved.entrySeq ? { seq: saved.entrySeq } : {}),
-    ...(saved.cueReading ? { reading: saved.cueReading } : {}),
-    ...(context ? { sourceContext: context, sourceContextRef } : {}) };
-}
 
 /* ------------------------------------------------ G2 · 深さ — the quiet dot that knows him
  * John (10-15): "I do like the color dot idea… in the most subtle way possible… layers of depth dictated by a subtle color
@@ -29716,14 +23241,6 @@ const depthRank = (depth) => DEPTH_ORDER.indexOf(depth);
 const deeperDepth = (a, b) => (depthRank(a) >= depthRank(b) ? a : b);
 const shallowerDepth = (a, b) => (depthRank(a) <= depthRank(b) ? a : b);
 
-function localDayOrdinal(ms) {
-  const d = new Date(ms);
-  return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
-}
-function localMonthKey(ms) {
-  const d = new Date(ms);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-}
 
 /** What he met: a word door's lexical identity as it reads where he met it. `node` is { id, seq?, reading? }: the reading is
  * the one shown (the text's), never assumed.
@@ -29733,29 +23250,6 @@ function localMonthKey(ms) {
  *   text         no entry: the spelling read this way, nothing more
  *   unresolved   read otherwise than the entry or record at hand (訳 read やく beside わけ's #1538330, 年 read ねん before
  *                the full dictionary names its entry), or no reading at all: it borrows no entry, sense or card */
-function encounterIdentity(node) {
-  if (!node || (node.t && node.t !== 'word') || !nonEmptyString(node.id)) return null;
-  const id = node.id;
-  const shown = nonEmptyString(node.reading) ? node.reading : null;
-  const reading = shown ? kanaReadingKey(shown) || null : null;
-  const make = (kind, seq, read) => ({ t: 'word', id, kind, seq, reading: read });
-  if (node.seq != null && node.seq !== '') {
-    const seq = String(node.seq);
-    if (!reading) return make('unresolved', null, null);
-    const row = dictionaryRowBySeq(seq);
-    if (Array.isArray(row) && String(row[0]) === seq) {
-      const kana = entryKanaIndex(row, shown);
-      return kana >= 0 ? make('seq', seq, kanaReadingKey(row[5][kana]) || reading) : make('unresolved', null, reading);
-    }
-    return make('seq', seq, reading);
-  }
-  const core = D.dict?.[id];
-  if (core) {
-    const coreReading = kanaReadingKey(core.r || '') || null;
-    return !reading || reading === coreReading ? make('core', null, coreReading) : make('unresolved', null, reading);
-  }
-  return reading ? make('text', null, reading) : make('unresolved', null, null);
-}
 const encounterKey = (identity) => JSON.stringify([1, 'word', identity.id, identity.kind, identity.seq, identity.reading]);
 
 /** How what he met stands to the identity his card (or list row) holds for the spelling (wordCardIdentity):
@@ -29763,47 +23257,10 @@ const encounterKey = (identity) => JSON.stringify([1, 'word', identity.id, ident
  *   compatible  not contradicted (the same known reading, the entry not established): the ring may show, the rank may not
  *   other       a different reading or a different entry (ポンド#1126030 is not #2855351): at most "met", no ring
  *   unknown     nothing to compare (a reading nothing records): no ring, no rank */
-function depthIdentityMatch(occ, card) {
-  if (!occ || !card || card.kind === 'unknown') return 'unknown';
-  const cardReading = card.kind === 'core' ? kanaReadingKey(D.dict?.[occ.id]?.r || '') || null
-    : nonEmptyString(card.reading) ? kanaReadingKey(card.reading) || null : null;
-  const readings = occ.reading && cardReading ? (occ.reading === cardReading ? 'same' : 'other') : 'unknown';
-  if (readings === 'other') return 'other';
-  if (occ.kind === 'seq' && card.kind === 'seq') {
-    if (occ.seq !== String(card.seq)) return 'other';
-    return readings === 'same' ? 'same' : 'compatible';
-  }
-  if (occ.kind === 'core' && card.kind === 'core') return 'same';
-  if (occ.kind === 'text' && card.kind === 'text') return readings === 'same' ? 'same' : 'unknown';
-  if (readings !== 'same') return 'unknown';
-  // the core record beside an entry read alike: one word only where the full dictionary, asked for this spelling, has exactly
-  // one entry written and read so, and it is the entry named (the core is that entry's editorial pick). Not asked: compatible.
-  if ((occ.kind === 'core' && card.kind === 'seq') || (occ.kind === 'seq' && card.kind === 'core')) {
-    const seq = String(occ.kind === 'seq' ? occ.seq : card.seq);
-    const rows = dictionaryAnsweredForm(occ.id) ? dictionaryRowsReadAs(occ.id, occ.reading) : [];
-    return rows.length === 1 && String(rows[0][0]) === seq ? 'same' : 'compatible';
-  }
-  return 'compatible';
-}
 
 /** The record read once per change for the dot: who is kept, which keys have review history, and the undo revocations.
  * Keyed on the roots' own objects, which a confirmed write replaces, so a stale index is never read. */
 const depthIndexMemo = new WeakMap();
-function depthIndex(record) {
-  const anchor = Array.isArray(record.revlog) ? record.revlog : depthIndex;
-  const memo = depthIndexMemo.get(anchor);
-  if (memo && memo.taken === record.taken && memo.lists === record.lists && memo.srs === record.srs) return memo;
-  const taken = new Map();
-  for (const row of Array.isArray(record.taken) ? record.taken : []) if (row?.t === 'word' && !taken.has(row.id)) taken.set(row.id, row);
-  const listed = new Set();
-  for (const items of Object.values(plainRecord(record.lists) ? record.lists : {}))
-    for (const item of Array.isArray(items) ? items : []) if (item?.t === 'word') listed.add(item.id);
-  const reviewed = new Set();
-  for (const row of Array.isArray(record.revlog) ? record.revlog : []) if (Array.isArray(row)) reviewed.add(row[1]);
-  const index = { taken: record.taken, lists: record.lists, srs: record.srs, takenRows: taken, listed, reviewed };
-  if (anchor !== depthIndex) depthIndexMemo.set(anchor, index);
-  return index;
-}
 
 /** Present recall: the pinned scheduler's retrievability of the stored card now, at the clamped scheduler instant
  * (srsSchedulerInstant, so a clock behind the card's last review reads as that review). No scheduler, no last review, or
@@ -29833,45 +23290,6 @@ function notYetReleased(record, skey, cursor) {
 
 /** The depth of one word door for this learner, now. Pure: reads the record only. null for anything that is not a word.
  * { depth, kept, otherKept, match, identity, key, days, first, last, said, review: { state, stability, r } | null, cap } */
-function wordDepth(node, record = S, now = Date.now()) {
-  const identity = encounterIdentity(node);
-  if (!identity) return null;
-  const key = encounterKey(identity);
-  const met = metReadable(record.met) && owns(record.met.entries, key) && plainRecord(record.met.entries[key]) ? record.met.entries[key] : null;
-  const index = depthIndex(record);
-  const skey = srsKey('word', identity.id);
-  const stored = plainRecord(record.srs) && owns(record.srs, skey) && plainRecord(record.srs[skey]) ? record.srs[skey] : null;
-  const row = index.takenRows.get(identity.id) || null;
-  const listed = index.listed.has(identity.id);
-  const held = !!row || listed || !!stored || index.reviewed.has(skey);
-  const match = held ? depthIdentityMatch(identity, wordCardIdentity(record, identity.id)) : 'none';
-  const days = met ? met.days : 0;
-  let depth = days >= 2 ? 'again' : days >= 1 ? 'met' : 'unmet';
-  let review = null;
-  if (match === 'same' && stored) {
-    const state = Number.isInteger(stored.state) ? stored.state : 0;
-    const stability = finiteNumber(stored.stability) ? stored.stability : 0;
-    const r = depthRetrievability(stored, now);
-    review = { state, stability, r };
-    const recalling = state === 2 && r !== null && r >= DEPTH_RECALL_R;
-    depth = deeperDepth(depth, recalling && stability >= DEPTH_OWNED_S ? 'owned'
-      : recalling && stability >= DEPTH_RECALLED_S ? 'recalled' : state >= 1 ? 'again' : 'met');
-  } else if (match === 'same' && row) depth = deeperDepth(depth, 'met');
-  const said = met && plainRecord(met.said) ? met.said : null;
-  if (said?.value === 'known') depth = deeperDepth(depth, 'again');
-  let cap = null;
-  if (said?.value === 'not-yet' && !(match === 'same' && notYetReleased(record, skey, said.cursor))) {
-    if (depthRank(depth) > depthRank('again')) cap = 'not-yet';
-    depth = shallowerDepth(depth, 'again');
-  }
-  if (identity.kind === 'unresolved' || match === 'other') {
-    if (depthRank(depth) > depthRank('met')) cap = 'identity';
-    depth = shallowerDepth(depth, 'met');
-  }
-  const keptRow = !!row || listed;
-  return { depth, kept: keptRow && (match === 'same' || match === 'compatible'), otherKept: keptRow && match === 'other',
-    match, identity, key, days, first: met?.first ?? null, last: met?.last ?? null, said: said?.value || null, review, cap };
-}
 
 /* ----- the ledger's writes: at his own activation only (a reading raised, a card opened, a page opened), never at render,
  * restore, a network retry or the one-time demonstration (G3), and never a review: a look-up is friction, not a grade. */
@@ -29883,14 +23301,6 @@ function copyRecordWith(record, key, value) {
 }
 /** The text he reads in a bundled article, frozen for the help signal: its fingerprint (FNV-1a 32 over the tokens'
  * surfaces), its length in code points without whitespace, and its one level (storyLevel). */
-function articleFingerprint(p) {
-  const text = (p?.tokens || []).map((token) => String(token?.s || '')).join('');
-  let hash = 0x811c9dc5;
-  for (let i = 0; i < text.length; i += 1) { hash ^= text.charCodeAt(i); hash = Math.imul(hash, 0x01000193) >>> 0; }
-  const level = storyLevel(p).step;
-  return { src: hash.toString(16).padStart(8, '0'), chars: [...text].filter((ch) => !/\s/u.test(ch)).length,
-    level: /^N[1-5]$/u.test(level) ? level : null };
-}
 /** One distinct word he asked about in an article he has not yet finished for the first time. An article finished before
  * counting began is not a first reading (no row); after the first finish, or once its text changed, nothing more counts. */
 function readHelpPatch(latest, articleId, key, now) {
@@ -29925,25 +23335,6 @@ function readHelpFinishPatch(latest, articleId, now) {
 }
 /** The copied roots one activation adds: met's day for this identity (none on a day already counted) and, in an article,
  * the help signal's word. {} when nothing would change. */
-function encounterPatch(latest, node, now, { article = null } = {}) {
-  const identity = encounterIdentity(node);
-  if (!identity || !Number.isFinite(now)) return {};
-  const key = encounterKey(identity);
-  const patch = {};
-  const root = latest.met;
-  if (root == null || metReadable(root)) {
-    const entries = root?.entries || {};
-    const prior = owns(entries, key) && plainRecord(entries[key]) ? entries[key] : null;
-    const day = localDayOrdinal(now);
-    if (!prior || day > prior.last) {
-      const next = prior ? { ...prior, last: day, days: prior.days + 1 } : { first: day, last: day, days: 1 };
-      patch.met = { ...(root || {}), version: 1, entries: copyRecordWith(entries, key, next) };
-    }
-  }
-  const help = article ? readHelpPatch(latest, article, key, now) : null;
-  if (help) patch.readHelp = help;
-  return patch;
-}
 /** One look-up's write. Coalesced: an identical activation already on its way, or one the confirmed record already holds
  * (encounterPatch says nothing changes), writes nothing. Returns whether a write was made and confirmed. */
 const encounterPending = new Set();
@@ -29973,38 +23364,10 @@ function readerTapEncounter(key, articleId) {
   return node && node.id === take.id ? node : null;
 }
 /** A reader token as its door stands for it: a katakana run the reader joined into one word is that word (readerRenderedTokens). */
-function readerTokenAt(articleId, index) {
-  const p = D.passages?.find((entry) => entry.id === articleId);
-  if (!p?.tokens || !Number.isInteger(index) || !p.tokens[index]) return null;
-  const span = typeof document !== 'undefined' ? document.querySelector(`#reader .tok[data-index="${index}"]`) : null;
-  const end = span?.dataset.indexEnd != null ? Number(span.dataset.indexEnd) : null;
-  if (!Number.isInteger(end) || end <= index) return p.tokens[index];
-  const pieces = p.tokens.slice(index, end + 1);
-  const surface = pieces.map((piece) => piece.s).join('');
-  return { s: surface, b: surface, p: '名詞', r: pieces.map((piece) => piece.r || '').join(''), f: [{ t: surface }], c: false, readerSourceEnd: end };
-}
-function readerTokenNode(token) {
-  if (!token || !/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(String(token.s || ''))) return null;
-  if (!token.c && PARTICLE_BY_SURFACE[token.s]) return null;
-  const door = readingToken(token);
-  if (!door || door.kanjiOnly || !nonEmptyString(door.b)) return null;
-  return { t: 'word', id: door.b, ...(door.seq != null && door.seq !== '' ? { seq: String(door.seq) } : {}), reading: tokenReading(door) || '' };
-}
 /** The slip, in every room: what it stands for (the dot on its headword) and the look-up itself. A card drawn again on the
  * same word counts only what its arrival could not: the entry the full dictionary has just named for a reading the quick
  * one lacked (a reading still being asked about is never counted under a guess; one the dictionary has answered with no
  * entry counts as itself). The same day writes nothing twice; the one-time demonstration (G3: data-demo) counts nothing. */
-function noteSlipDepth(mini, token, kind, { arriving = true, from = null } = {}) {
-  if (kind !== 'word' || !nonEmptyString(token?.b)) return;
-  const node = { t: 'word', id: token.b, ...(token.seq != null && token.seq !== '' ? { seq: String(token.seq) } : {}),
-    reading: String(token.r || '') };
-  mini.dataset.depthNode = JSON.stringify({ id: node.id, ...(node.seq ? { seq: node.seq } : {}), reading: node.reading });
-  if (mini.dataset.demo === 'true') return;
-  const identity = encounterIdentity(node);
-  if (identity?.kind === 'unresolved' && !dictionaryAnsweredForm(node.id) && D.dictionaryState !== 'error') return;
-  if (!arriving && identity?.kind === 'unresolved') return;
-  void noteEncounter(node, { article: from?.passage && from.passage === S.passageId ? from.passage : null });
-}
 
 /** "I know this" / "Not yet": his own statement about the word as it reads here, kept in met with the review log's length.
  * Pressing the standing one again takes it back. Writes met only — never taken, srs, revlog, stats or suspended. */
@@ -30039,32 +23402,6 @@ const DEPTH_SLICE_MS = 6;
 const depthNodeCache = new WeakMap();
 let depthMemo = new Map();
 let depthMemoRoots = null;
-function dictionaryEpoch() {
-  return `${D.dictionaryIndex ? 1 : 0}:${D.dictionaryMode || ''}:${D.dictionaryState || ''}:${D.dictionaryCompleteForms?.size || 0}:${D.dictionaryByForm?.size || 0}`;
-}
-function depthNodeOf(element) {
-  const raw = element.dataset.depthNode;
-  if (raw) {
-    try {
-      const node = JSON.parse(raw);
-      return plainRecord(node) && nonEmptyString(node.id) ? { t: 'word', id: node.id,
-        ...(nonEmptyString(node.seq) ? { seq: node.seq } : {}), reading: nonEmptyString(node.reading) ? node.reading : '' } : null;
-    } catch { return null; }
-  }
-  if (element.matches('.japanese-lookup-word')) {
-    const text = element.dataset.lookupText;
-    // the page's own headword stays bare: its dot stands at the head of the basis line under it, with the words that say why
-    if (element.closest('.headword')) return null;
-    return /[\p{Script=Han}\p{Script=Katakana}]/u.test(text) || D.dict?.[text] ? { t: 'word', id: text } : null;
-  }
-  if (!element.closest('#reader') || element.dataset.targetKind === 'particle' || element.classList.contains('annotation')) return null;
-  const epoch = dictionaryEpoch();
-  const cached = depthNodeCache.get(element);
-  if (cached && cached.epoch === epoch && cached.passage === S.passageId && cached.index === element.dataset.index) return cached.node;
-  const node = readerTokenNode(readerTokenAt(S.passageId, Number(element.dataset.index)));
-  depthNodeCache.set(element, { epoch, passage: S.passageId, index: element.dataset.index, node });
-  return node;
-}
 function paintDepth(element, now) {
   const node = depthNodeOf(element);
   let result = null;
@@ -30144,40 +23481,11 @@ if (typeof window !== 'undefined') window.__KAIRO_DEPTH__ = Object.freeze({
 });
 /** A dot of its own beside a word that is not in running text (a headword, a list row, a star): aria-hidden — the page's
  * basis line says in words what it shows. */
-function depthDot(node) {
-  const dot = el('span', 'depth-dot');
-  dot.setAttribute('aria-hidden', 'true');
-  dot.dataset.depthNode = JSON.stringify({ id: node.id, ...(node.seq != null && node.seq !== '' ? { seq: String(node.seq) } : {}),
-    reading: String(node.reading || '') });
-  return dot;
-}
 
 /* ----- the page names the basis: one quiet line under the reading — the days he met it, its review state, the reading —
  * and his two words, "I know this" and "Not yet" (Fugu R3.3). A dot is "familiar" at most, never "mastered". */
 const DEPTH_NAMES = { unmet: ['はじめて', 'New to you'], met: ['出会った', 'Met'], again: ['再会', 'Seen again'],
   recalled: ['思い出せる', 'Recalled'], owned: ['なじみ', 'Familiar'] };
-function depthBasisParts(result) {
-  const parts = [];
-  const name = DEPTH_NAMES[result.depth] || DEPTH_NAMES.unmet;
-  const days = result.days;
-  parts.push(!days ? tx(name[0], name[1])
-    : result.depth === 'met' ? (days === 1 ? tx('一度出会った', 'Met once') : tx(`${days}日出会った`, `Met on ${days} days`))
-      : result.depth === 'again' ? (days === 1 ? tx(name[0], name[1]) : tx(`再会・${days}日`, `Seen again, on ${days} days`))
-        : tx(`${name[0]}・${days}日出会った`, `${name[1]} · met on ${days} day${days === 1 ? '' : 's'}`));
-  const review = result.review;
-  if (review) {
-    const r = review.r === null ? null : Math.round(review.r * 100);
-    parts.push(review.state === 0 ? tx('保存済み・まだ復習なし', 'saved, not yet reviewed')
-      : review.state === 2 ? (r === null ? tx('復習中', 'in review') : tx(`復習中・いま思い出せる見込み ${r}%`, `in review · recall now ${r}%`))
-        : tx('覚えている途中', 'still learning'));
-  } else if (result.match === 'other') parts.push(tx('保存したのは別の読み', 'your saved card is another reading'));
-  else if (result.identity.kind === 'unresolved') parts.push(tx('この読みの項目はまだ定まらない', 'this reading’s entry is not settled'));
-  if (result.identity.reading) parts.push(tx(`読み ${result.identity.reading}`, `read ${result.identity.reading}`));
-  if (result.said === 'known') parts.push(tx('自分で「知っている」', 'you said you know it'));
-  if (result.said === 'not-yet') parts.push(result.cap === 'not-yet' || result.depth === 'again' || result.depth === 'met'
-    ? tx('「まだ」— 次によく思い出せるまで', '“not yet” — until your next good review') : tx('「まだ」', '“not yet”'));
-  return parts;
-}
 function renderDepthBasis(sheet, node, reading = '') {
   if (personalHost || node?.t !== 'word' || !nonEmptyString(node.id)) return null;
   const shown = { t: 'word', id: node.id, ...(node.seq != null && node.seq !== '' ? { seq: String(node.seq) } : {}),
@@ -30228,99 +23536,20 @@ function renderDepthBasis(sheet, node, reading = '') {
  * alike, so the card never says more were read unaided than were read: the first reading the help signal sealed (the
  * article's own text, whitespace aside, as he first finished it); else the same count from its text, when the text is at
  * hand; else, for an article finished before the help signal began and not yet loaded, the index's figure. null: no count. */
-function articleReadChars(articleId, record = S, p = null) {
-  const root = readHelpReadable(record.readHelp) ? record.readHelp : null;
-  const row = root && owns(root.articles, articleId) ? root.articles[articleId] : null;
-  if (row && owns(row, 'done') && finiteNumber(row.chars)) return row.chars;
-  const passage = p || D.passages?.find((entry) => entry.id === articleId) || null;
-  if (passage?.tokens?.length) return articleFingerprint(passage).chars;
-  return finiteNumber(passage?.chars) ? passage.chars : null;
-}
 /* ----- the help signal in Me (Fugu R4.1; Codex: a declared denominator): help per 1,000 characters of the first readings of
  * articles he finished that month — repeats and the same word asked twice count once — shown beside the month's exposure
  * and its average level. A signal, never proof; nothing before `since` is counted or estimated. */
-function helpByMonth(record = S) {
-  const root = readHelpReadable(record.readHelp) ? record.readHelp : null;
-  if (!root) return null;
-  const months = new Map();
-  for (const [articleId, row] of Object.entries(root.articles)) {
-    if (!owns(row, 'done')) continue;
-    const month = months.get(row.month) || { month: row.month, articles: 0, chars: 0, help: 0, levels: [], unlevelled: 0 };
-    month.articles += 1;
-    month.chars += articleReadChars(articleId, record);
-    month.help += row.helped.length;
-    if (row.level) month.levels.push(Number(row.level.slice(1)));
-    else month.unlevelled += 1;
-    months.set(row.month, month);
-  }
-  return { since: root.since, months: [...months.values()].sort((a, b) => (a.month < b.month ? 1 : -1)).map((month) => ({
-    month: month.month, articles: month.articles, chars: month.chars, help: month.help, unlevelled: month.unlevelled,
-    per1000: month.chars > 0 ? (1000 * month.help) / month.chars : null,
-    level: month.levels.length ? `N${Math.round(month.levels.reduce((sum, n) => sum + n, 0) / month.levels.length)}` : null })) };
-}
-function meHelpLine() {
-  const signal = helpByMonth();
-  const line = el('p', 'me-help');
-  line.id = 'me-help';
-  const since = signal ? meDate(new Date(signal.since), true) : null;
-  const month = signal?.months[0];
-  if (!month) {
-    // Q · through the one word rule (flowText), as every line the app sets: it broke 読み終｜えた at 320
-    flowText(line, since
-      ? tx(`千字あたりの手助けは、次に読み終えた記事から数える（${since}から）。`, `Help per 1,000 characters counts from the next article you finish (since ${since}).`)
-      : tx('千字あたりの手助けは、次に読み終えた記事から数える。', 'Help per 1,000 characters counts from the next article you finish.'));
-    return line;
-  }
-  const [year, mm] = month.month.split('-').map(Number);
-  const label = bi() ? new Date(year, mm - 1, 1).toLocaleDateString('en-GB', { month: 'long' }) : `${mm}月`;
-  const per = month.per1000 === null ? '—' : month.per1000.toFixed(1);
-  line.append(el('b', 'me-help-n', per), el('span', 'me-help-l', tx('千字あたりの手助け', 'help per 1,000 characters')),
-    el('span', 'me-help-m', tx(
-      `${label}・はじめて読み終えた ${month.articles} 編、${month.chars.toLocaleString('ja-JP')} 字、調べた語 ${month.help}${month.level ? `・平均 ${month.level}` : ''}。${since}から数えた目安で、証明ではない`,
-      `${label} · ${month.articles} first reading${month.articles === 1 ? '' : 's'}, ${month.chars.toLocaleString('en-GB')} characters, ${month.help} word${month.help === 1 ? '' : 's'} asked${month.level ? ` · about ${month.level}` : ''} · counted since ${since}; a signal, not proof`)));
-  return line;
-}
 
 /* ----- R's identity wherever a kept word shows (G2): a saved card's own answer stands in for the dictionary when the
  * dictionary cannot name its entry (cold, offline, the full index not open), and every door to a kept word carries the
  * capture's entry and reading — never the spelling alone, which would open 年 read とし for a card saved as ねん. */
 /** A kept word's own record for a node that names its entry: the card's saved answer (savedAnswerFor), when it stands for
  * exactly that entry. null for anything else; never the first row of the spelling. */
-function savedNodeRecord(node, record = S) {
-  if (node?.t !== 'word' || node.seq == null || node.seq === '') return null;
-  const answer = savedAnswerFor({ t: 'word', id: node.id }, record);
-  if (answer?.status !== 'available' || String(answer.seq || '') !== String(node.seq)) return null;
-  if (nonEmptyString(node.reading) && nonEmptyString(answer.reading) && kanaReadingKey(answer.reading) !== kanaReadingKey(node.reading)) return null;
-  const head = nonEmptyString(answer.head) ? answer.head : node.id;
-  return { seq: String(node.seq), head, r: answer.reading, m: answer.meanings, k: [...head].filter((c) => /[一-鿌々]/.test(c)), saved: true };
-}
 /** The door to a word he keeps: the capture's own node (learningItemNode — its entry and reading); any other key as it was. */
-function keptItemNode(t, id) {
-  return S.taken.some((row) => row.t === t && row.id === id) ? learningItemNode({ t, id }) : { t, id };
-}
 /** A mirror row for a word he keeps names the reading he kept it as, and wears its dot. */
-function kagamiKeptReading(row, door) {
-  if (!S.taken.some((item) => item.t === 'word' && item.id === door.id)) return;
-  const answer = savedAnswerFor({ t: 'word', id: door.id });
-  const reading = door.reading || (answer?.status === 'available' ? answer.reading : '');
-  if (reading) {
-    const span = el('span', 'row-reading', reading);
-    span.lang = 'ja';
-    row.append(span);
-  }
-  row.append(depthDot(door));
-}
 /** The tutor's and the examples' archive key for a word page: the core record keeps the spelling's own key (its replies were
  * written for that record); an entry, and a reading nothing at hand settles, each key by spelling + reading (+ entry), so
  * 訳's archived わけ reply never answers 訳 read やく. Old rows are read, never rewritten. */
-function wordArchiveRef(node, rec) {
-  const id = node.id;
-  const reading = kanaReadingKey(nonEmptyString(rec?.r) ? rec.r : node.reading || '') || '';
-  if (rec?.seq != null && rec.seq !== '') return `word:${id}${JSON.stringify({ seq: String(rec.seq), r: reading })}`;
-  const core = D.dict?.[id];
-  if (core && Array.isArray(rec?.m) && rec.m.length && reading === (kanaReadingKey(core.r || '') || '')) return `word:${id}`;
-  return `word:${id}${JSON.stringify({ r: reading })}`;
-}
 
 function renderLearningSource(container, item, review = false, disclosure = item) {
   const ref = learningContextRef(item);
@@ -30395,28 +23624,12 @@ const sheetActionLines = new WeakMap(); // visit → Map(door key → its latest
 const sheetActionLineKeys = new WeakMap(); // a door's status node → its door key
 /** The test syncSheetActionVisit makes, read-only (keep the two in step): a page built ahead lends buildPage its path
  * while it is drawn, and nothing read while a page is drawn may move the visit. */
-function sheetActionVisitHolds(visit) {
-  return !!visit && S.stack.length > 0 && !S.strokes && visit.view === S.view && visit.passageId === S.passageId &&
-    visit.stack === S.stack && visit.path.length === S.stack.length && visit.path.every((node, index) => node === S.stack[index]);
-}
 /** The line a door shows now: the standing visit's, or none (a page built ahead, a visit that has ended). */
 function sheetActionLine(key) {
   return (sheetActionVisitHolds(sheetActionVisit) && sheetActionLines.get(sheetActionVisit)?.get(key)) || '';
 }
-function drawSheetActionLine(note, key) {
-  sheetActionLineKeys.set(note, key);
-  note.textContent = sheetActionLine(key);
-}
 /** A page as it is mounted shows its doors' lines as the standing visit holds them. Back mounts again the very page a
  * deeper one covered (keptPages), nodes and all: the line its old visit said ended with that visit. */
-function reconcileSheetActionLines(sheet) {
-  for (const note of sheet.querySelectorAll('.teacher-note')) {
-    const key = sheetActionLineKeys.get(note);
-    if (key === undefined) continue;
-    const line = sheetActionLine(key);
-    if (note.textContent !== line) note.textContent = line;
-  }
-}
 /** The line writer for one press of a door's action. It speaks only while the press's visit stands: into the door as it
  * is drawn now (its own node, or the one a redraw put in its place) and into the visit's line every later drawing reads.
  * A visit that has ended writes nothing, not even into its own node, which Back may mount again. A press made outside
@@ -30458,14 +23671,6 @@ function currentSentenceListeningCue(context) {
     D.passages.find(p => p.id === context.sourceId)?.tokens?.map(token => token.s), sentenceListeningCatalog);
   if (!approvedSentenceCue(cue)) throw new Error('listening-cue-unavailable');
   return cue;
-}
-function availableSentenceListeningCue(context) {
-  try { return currentSentenceListeningCue(context); } catch { return null; }
-}
-async function resolveSentenceListeningCue(context) {
-  await resolveTeacherSource(context); await ensureSentenceListeningCatalog();
-  assertLearningSource(S, context);
-  return currentSentenceListeningCue(context);
 }
 async function verifiedSentenceAudio(cue, signal) {
   const response = await fetch(cue.path, { signal });
@@ -30542,18 +23747,6 @@ function renderSourceKanjiDoor(sheet, node) {
     finally { button.disabled = !recordWritable(); }
   });
   section.append(button, note); sheet.append(section);
-}
-function keepSentencePracticeFocusVisible(target) {
-  if (!target?.isConnected || S.view !== 'sentence-practice') return;
-  const rect = target.getBoundingClientRect();
-  if (rect.top < 80 || rect.bottom > window.innerHeight) target.scrollIntoView({ block: 'center' });
-}
-function focusSentencePracticeTarget(id, state = S.sentencePracticeView) {
-  requestAnimationFrame(() => {
-    if (S.view !== 'sentence-practice' || S.sentencePracticeView !== state) return;
-    const target = document.getElementById(id);
-    target?.focus({ preventScroll: true }); keepSentencePracticeFocusVisible(target);
-  });
 }
 function openSentencePractice(id, mode = null) {
   const entry = sentencePracticeModule?.selectSentencePractice(S.sentencePractice, id);
@@ -30719,20 +23912,6 @@ function renderSentenceReadingSuggestions(main, entryId = null) {
       keepSentencePracticeFocusVisible(focused);
   };
   void show();
-}
-function sentencePracticeError(error) {
-  if (!recordWritable()) return tx('この窓は保存を停止した。未保存の回答をコピーし、再読み込みして続ける。',
-    'This window stopped saving. Copy any unsaved response, then reload to continue.');
-  if (error?.message === 'sentence-practice-capacity') return tx(
-    'この版の保存上限に達した。文章と前の記録は残っている。', 'This version’s practice storage is full. Your text and earlier records are kept.');
-  if (/reading-cue|kanji-reading/u.test(`${error?.code || ''} ${error?.message || ''}`)) return tx(
-    'この文の読みを確認できなかった。保存した出典と前の練習記録は残っている。元の文を開いて確認する。',
-    'The reading for this word could not be verified. Your saved source and earlier practice are kept. Open the original sentence to check it.');
-  if (/listening-(cue|audio)/u.test(error?.message || '')) return tx(
-    'この文の音声を確認できなかった。出典と回答は残っている。接続を確認して、もう一度試す。',
-    'The recording for this sentence could not be verified. Your source and responses are kept. Check your connection and try again.');
-  return tx('練習を保存できなかった。文章はここに残っている。もう一度試す。',
-    'Practice could not be saved. Your text is kept here. Try again.');
 }
 let sentenceTeacherVisit = null;
 function renderSentenceTeacherReturn(main, context) {
@@ -31415,43 +24594,11 @@ function renderSentenceRecallControls(main, rv, item) {
  * of pretending the card is new. Both directions ride the guarded
  * transactional store path. */
 const capturePending = new Set();
-async function toggleTaken(node, label) {
-  const key = srsKey(node.t, node.id);
-  if (capturePending.has(key)) return false;
-  capturePending.add(key);
-  try {
-    const taking = !S.taken.some((entry) => entry.t === node.t && entry.id === node.id);
-    if (taking) return await commitCapture(node, label);
-    // D23: a word's removal names the card this control stood for when it was painted.
-    // The latest record must still hold that card, or nothing is removed or suppressed:
-    // a stale door, or another entry's door on the same spelling (the core mini on a
-    // 上手#1580400 card).
-    const expected = node.t === 'word' ? wordNodeIdentity(node, S) : null;
-    const holds = (record) => {
-      if (expected && !sameWordIdentity(expected, wordCardIdentity(record, node.id))) {
-        throw Object.assign(new Error('word-identity-conflict'), { code: 'word-identity-conflict' });
-      }
-    };
-    if (S.assessmentLearning && ['word', 'kanji', 'grammar', 'particle', 'sentence', 'question'].includes(node.t))
-      return await suppressAssessmentCards({ kind: 'remove', key }, expected ? holds : null);
-    return await commitStorePatch((latest) => {
-      holds(latest);
-      return { taken: latest.taken.filter((entry) => entry.t !== node.t || entry.id !== node.id) };
-    });
-  } finally { capturePending.delete(key); }
-}
 
 /** 置き換える (D23): this entry takes the place of another entry's card under the
  * same spelling. It is one guarded write that re-checks, against the latest record,
  * that the old card was never studied (wordCapturePlan). Lists, observations and a
  * rest mark stay with the spelling; they do not become evidence about the new entry. */
-async function replaceWordCard(node, label) {
-  const key = srsKey(node.t, node.id);
-  if (capturePending.has(key)) return false;
-  capturePending.add(key);
-  try { return await commitCapture(node, label, Date.now(), { replace: true }); }
-  finally { capturePending.delete(key); }
-}
 
 /** One capture state for every word control: the sheet foot, the sheet bar, the mini
  * and the reader's panel.
@@ -31459,110 +24606,20 @@ async function replaceWordCard(node, label) {
  *   conflict     another entry's card, or that entry's studied history, holds the
  *                spelling.
  *   unavailable  an explicit entry's answer cannot be validated yet. */
-function wordCaptureState(node, record = S) {
-  const row = (record.taken || []).some((entry) => entry.t === node.t && entry.id === node.id);
-  if (node.t !== 'word') return row ? 'taken' : 'take';
-  const explicit = node.seq != null && node.seq !== '';
-  // R · a door on a core spelling carrying a reading the core does not, and naming no entry yet, is not the core's
-  // word: its answer stays unconfirmed until the entry read that way is known (readingToken), so it saves nothing
-  if (!explicit && node.reading && D.dict?.[node.id] &&
-    kataToHira(String(node.reading)) !== kataToHira(String(D.dict[node.id].r || ''))) return 'unavailable';
-  if (!row && !wordStudied(record, node.id)) return explicit && !explicitWordSnapshot(node, record) ? 'unavailable' : 'take';
-  if (!sameWordIdentity(wordNodeIdentity(node, record), wordCardIdentity(record, node.id))) return 'conflict';
-  if (row) return 'taken';
-  return explicit && !explicitWordSnapshot(node, record) ? 'unavailable' : 'take';
-}
 
 /** Why an explicit entry's answer is unavailable, in the learner's terms, when its dictionary row
  * is at hand: the reading this word carries here names none of the entry's own kana forms, even
  * across scripts (entryKanaIndex) — a genuinely different reading, such as 生 read せい at an entry
  * read なま. Returns both readings to name, or null when the row is not at hand or the reading names
  * one of its forms (the answer is then held for another reason, said in the older words). */
-function wordCaptureReadingMismatch(node) {
-  if (node?.seq == null || node.seq === '' || !nonEmptyString(node.reading)) return null;
-  const row = dictionaryRowBySeq(node.seq);
-  if (!Array.isArray(row) || String(row[0]) !== String(node.seq) || !Array.isArray(row[5]) || entryKanaIndex(row, node.reading) >= 0) return null;
-  return { here: node.reading, dictionary: row[5][0] || row[1] };
-}
 
 /** The one-line reason a word control is held (D23), for surfaces without the full note. It
  * claims only what the door's and the card's identities establish (wordIdentityRelation). A
  * surface that cannot offer the card's route (route: false) says only what cannot be done here. */
-function wordCaptureHeldText(node, { route = true } = {}) {
-  if (wordCaptureState(node) === 'unavailable') {
-    // glance pass 2026-10-01: a learner reads why in plain words, never "the entry's answer"
-    const mismatch = wordCaptureReadingMismatch(node);
-    if (mismatch) {
-      return tx(`この語は保存できない。記事の読み「${mismatch.here}」が辞書の読み「${mismatch.dictionary}」と一致しないため。`,
-        `Can’t save this word: the article reads it ${mismatch.here}, the dictionary ${mismatch.dictionary}.`);
-    }
-    return tx('この項目の答えをまだ確かめられないため、覚えられない。', 'This entry’s answer cannot be confirmed yet, so it cannot be memorized.');
-  }
-  const relation = wordIdentityRelation(wordNodeIdentity(node, S), wordCardIdentity(S, node.id));
-  if (wordCaptureBasis(S, node.id) === 'history') {
-    if (relation === 'other-entry') {
-      return tx(`「${node.id}」には別の項目の以前のカードの記録が残っているため、ここでは覚える・やめるができない。`,
-        `${node.id} keeps history from an earlier card for another entry, so it cannot be memorized or stopped here.`);
-    }
-    if (relation === 'other-reading') {
-      return tx(`「${node.id}」には別の読みの以前のカードの記録が残っているため、ここでは覚える・やめるができない。`,
-        `${node.id} keeps history from an earlier card for another reading, so it cannot be memorized or stopped here.`);
-    }
-    return tx(`「${node.id}」には以前のカードの復習の記録が残っているため、ここでは覚える・やめるができない。`,
-      `${node.id} keeps review history from an earlier card, so it cannot be memorized or stopped here.`);
-  }
-  if (relation === 'other-entry') {
-    return tx(`「${node.id}」には別の項目のカードがあるため、ここでは覚える・やめるができない。`,
-      `${node.id} holds a card for another entry, so it cannot be memorized or stopped here.`);
-  }
-  if (relation === 'other-reading') {
-    return tx(`「${node.id}」には別の読みのカードがあるため、ここでは覚える・やめるができない。`,
-      `${node.id} holds a card for another reading, so it cannot be memorized or stopped here.`);
-  }
-  if (!route) {
-    return tx(`「${node.id}」には保存済みのカードがあるため、ここでは覚える・やめるができない。`,
-      `A saved card exists for ${node.id}, so it cannot be memorized or stopped here.`);
-  }
-  return tx(`「${node.id}」には保存済みのカードがある。管理するには、そのカードを開く。`,
-    `A saved card exists for ${node.id}. Open that card to manage it.`);
-}
 
 /** The full note's line for a held spelling (D23), by what the door's and the card's
  * identities establish (wordIdentityRelation), whether a card is there at all
  * (wordCaptureBasis) and whether the card has review history. */
-function wordCaptureNoteText(relation, basis, id, shown, studied) {
-  if (basis === 'history') {
-    if (relation === 'other-entry') {
-      return tx(`「${id}」には別の項目の以前のカード（${shown}）の復習の記録が残っている。この入り口はその記録を表していない。表記一つにカード一枚なので、そのまま残す。`,
-        `${id} keeps review history from an earlier card for another entry (${shown}). This door doesn't stand for it. One spelling holds one card, so it stays as it is.`);
-    }
-    if (relation === 'other-reading') {
-      return tx(`「${id}」には別の読みの以前のカード（${shown}）の復習の記録が残っている。この入り口はその記録を表していない。表記一つにカード一枚なので、そのまま残す。`,
-        `${id} keeps review history from an earlier card for another reading (${shown}). This door doesn't stand for it. One spelling holds one card, so it stays as it is.`);
-    }
-    return tx(`「${id}」には以前のカード（${shown}）の復習の記録が残っている。この入り口はその記録を表していない。表記一つにカード一枚なので、そのまま残す。`,
-      `${id} keeps review history from an earlier card (${shown}). This door doesn't stand for it. One spelling holds one card, so it stays as it is.`);
-  }
-  if (relation === 'other-entry') {
-    return studied
-      ? tx(`「${id}」には別の項目（${shown}）のカードと復習の記録があります。表記一つにカード一枚なので、そのまま残します。`,
-        `${id} already has a card, with review history, for another entry (${shown}). One spelling holds one card, so it stays as it is.`)
-      : tx(`「${id}」には、まだ復習していない別の項目（${shown}）のカードがあります。そのままにすると、いまのカードが残ります。`,
-        `${id} has a card for another entry (${shown}) that has not been reviewed yet. Leaving it keeps that card.`);
-  }
-  if (relation === 'other-reading') {
-    return studied
-      ? tx(`「${id}」には別の読み（${shown}）のカードと復習の記録があります。表記一つにカード一枚なので、そのまま残します。`,
-        `${id} already has a card, with review history, for another reading (${shown}). One spelling holds one card, so it stays as it is.`)
-      : tx(`「${id}」には、まだ復習していない別の読み（${shown}）のカードがあります。そのままにすると、いまのカードが残ります。`,
-        `${id} has a card for another reading (${shown}) that has not been reviewed yet. Leaving it keeps that card.`);
-  }
-  return studied
-    ? tx(`「${id}」には保存済みのカード（${shown}）と復習の記録がある。この入り口はそのカードを表していない。表記一つにカード一枚なので、そのまま残す。`,
-      `A saved card exists for ${id} (${shown}), with review history. This door doesn't stand for it. One spelling holds one card, so it stays as it is.`)
-    : tx(`「${id}」には、まだ復習していない保存済みのカード（${shown}）がある。この入り口はそのカードを表していない。そのままにすると、いまのカードが残る。`,
-      `A saved card exists for ${id} (${shown}) that has not been reviewed yet. This door doesn't stand for it. Leaving it keeps that card.`);
-}
 
 /** The door to the card the record holds for a spelling, or to the entry its kept history
  * belongs to (D23): its own entry and exact reading when it names one, otherwise the spelling.
@@ -31577,67 +24634,15 @@ function heldWordCardNode(record, id) {
 /** Whether a held spelling still has a card (D23 r3.3), for copy only: 'card' when the
  * record's taken list has a word row for it; otherwise 'history', a hold that comes from the
  * studied history a removed card left (wordCardIdentity reads both alike). */
-function wordCaptureBasis(record, id) {
-  return (record.taken || []).some((entry) => entry.t === 'word' && entry.id === id) ? 'card' : 'history';
-}
 
 /** The route's label, by basis: a current card is opened as a card; kept history, which has no
  * card left to open, opens the entry it belongs to. */
-function wordCaptureOpenLabel(basis) {
-  return basis === 'history' ? ['その項目を開く', 'open that entry'] : ['そのカードを開く', 'open that card'];
-}
 
 /** Why a word control is held (D23): a card this door does not stand for holds the spelling
  * (worded by wordIdentityRelation), or the selected entry's answer cannot be validated
  * yet. Keeping the existing card is the default and writes nothing. A card that has never
  * been studied may give way to this entry (replaceWordCard). A studied card is never
  * replaced here; starting another entry fresh is a separate decision. */
-function renderWordCaptureNote(container, node, label = node.id) {
-  if (node?.t !== 'word') return;
-  const state = wordCaptureState(node);
-  if (state !== 'conflict' && state !== 'unavailable') return;
-  const note = el('div', 'word-capture-note');
-  note.id = 'word-capture-note';
-  note.setAttribute('role', 'status');
-  if (state === 'unavailable') {
-    note.append(el('p', null, wordCaptureReadingMismatch(node) ? wordCaptureHeldText(node)
-      : tx('この項目の答えをまだ確かめられないため、ここでは覚えられない。',
-        'This entry’s answer cannot be confirmed yet, so it cannot be memorized here.')));
-    container.append(note);
-    return;
-  }
-  const card = savedAnswerFor({ t: 'word', id: node.id });
-  const shown = card?.status === 'available'
-    ? `${card.head}〔${card.reading}〕${card.meanings[0] ? ` ${card.meanings[0]}` : ''}`
-    : node.id;
-  const studied = wordStudied(S, node.id);
-  const enrolled = S.taken.some((entry) => entry.t === 'word' && entry.id === node.id);
-  const relation = wordIdentityRelation(wordNodeIdentity(node, S), wordCardIdentity(S, node.id));
-  const basis = wordCaptureBasis(S, node.id);
-  note.append(el('p', null, wordCaptureNoteText(relation, basis, node.id, shown, studied)));
-  const actions = el('div', 'teacher-actions');
-  if (!studied && enrolled) {
-    const replace = biLabel('button', 'chip', 'この項目に置き換える', 'replace it with this entry');
-    replace.type = 'button';
-    replace.id = 'word-capture-replace';
-    replace.disabled = !recordWritable();
-    replace.addEventListener('click', async () => {
-      if (replace.disabled) return;
-      replace.disabled = true;
-      const saved = await replaceWordCard(node, label);
-      replace.disabled = false;
-      if (saved) render();
-    });
-    actions.append(replace);
-  }
-  const open = biLabel('button', 'chip', ...wordCaptureOpenLabel(basis));
-  open.type = 'button';
-  open.id = 'word-capture-open';
-  open.addEventListener('click', () => go(heldWordCardNode(S, node.id)));
-  actions.append(open);
-  note.append(actions);
-  container.append(note);
-}
 
 /* ------------------------------------------- 覚える top-right (directive §3)
  * One button in the top-right corner of every capture-eligible surface. The
@@ -31647,12 +24652,6 @@ function renderWordCaptureNote(container, node, label = node.id) {
  * no capturable thing (the shelf, the tray, the dojo, the galaxy — they are
  * navigation and curation, not content) honestly carry none, and 書の間
  * keeps its total quiet: its kanji's seal waits on the sheet beneath. */
-function readerTakeCurrent() {
-  if (S.view !== 'reader' || !S.passageId) return null;
-  const cur = S.readerTake;
-  if (!cur || cur.p !== S.passageId) return null;
-  return cur;
-}
 
 /** S · what the reader's keep stands for: the word last touched, read as the slip reads it (readingToken, the R slice's
  * reading truth), with the slip's own save facts — so the bar and the card can never disagree about what Save keeps. */
@@ -31783,9 +24782,6 @@ function fitChromeKeep(button = document.getElementById('chrome-keep')) {
 
 /** The capture node the reader's door commits: the word as encountered —
  * provenance and the sentence scope travel with it. */
-function readerTakeNode(cur) {
-  return { t: 'word', id: cur.id, from: { passage: cur.p, index: cur.index }, ctxScope: 'sent' };
-}
 
 /** Remember the word under the learner's finger and repaint its mark in place — token taps deliberately
  * never trigger a full re-render. */
@@ -31796,26 +24792,8 @@ function setReaderTake(id, index, passageId) {
 
 /** The chrome's Today bookmark carries the saved-word count: after a save or an undo it repaints in place,
  * so the room under the slip is never redrawn for it (the guided session's word stays where the finger is). */
-function syncTrayCount() {
-  const tray = document.getElementById('tray');
-  if (!tray) return;
-  const saved = S.taken.length;
-  const count = tray.querySelector('.tray-count');
-  if (count) count.textContent = String(saved);
-  tray.dataset.count = String(saved);
-  const name = tx(`今日 · 保存した語 ${saved}`, `Today · ${saved} saved word${saved === 1 ? '' : 's'}`);
-  tray.setAttribute('aria-label', name);
-  tray.title = name;
-}
 /** The touched word wears its mark (the slip's anchor); the bookmark line reads it. The bar carries no Save of
  * its own (one Save: the slip's and the sheet's — John, 2026-10-15 17:20), so nothing up there repaints. */
-function syncReaderTakeSeal() {
-  updateReaderPlaceSave();
-  syncChromeKeep();
-  const selected = readerTakeCurrent();
-  for (const node of document.querySelectorAll('#reader .tok-current')) node.classList.remove('tok-current');
-  if (selected) readerTokenAtIndex(selected.index)?.classList.add('tok-current');
-}
 
 /** After 覚える: the item lands in this month's bucket automatically (the
  * operator's Renzo habit, automated) and can join any named list too. */
@@ -31823,18 +24801,6 @@ function syncReaderTakeSeal() {
  * the word was taken from a real passage (the provenance {passage, index}
  * rides on the node); the choice stores {p, i, scope} on the taken item and
  * the review card resolves the text fresh from the article every time. */
-function recordPickerSurface(node) {
-  const view = S.view;
-  const stacked = S.stack.length > 0;
-  const type = node.t;
-  const id = node.id;
-  return () => {
-    if (S.view !== view) return false;
-    const top = S.stack[S.stack.length - 1];
-    // the picker's only surface is the word's own entry sheet (the bar's capture panel is gone)
-    return stacked ? top?.t === type && top.id === id : false;
-  };
-}
 
 /** A page Save, including its context scope, redraws the page while the originating word keeps its ladder. */
 function refreshSavedPage(node, label = nodeTitle(node)) {
@@ -32015,12 +24981,6 @@ function syncSrsScheduler() {
 /** The learner's schedule policy as srs-core takes it ({ w, retention, learningSteps }): exactly what buildSrsScheduler
  * gives the corridor's own scheduler, handed to every deck the corridor opens, so one preset, one retention and one
  * set of fitted weights schedule every surface (lead's ruling 10-19). Null before the pin is loaded. */
-function srsLearnerPolicy() {
-  if (!D.pin) return null;
-  const fitted = S.srsPrefs?.fsrs;
-  const policy = srsSchedulePolicy(D.pin);
-  return { w: fitted !== undefined && !srsParamsProblem(fitted) ? fitted.w.slice() : null, retention: policy.retention, learningSteps: policy.learningSteps };
-}
 function srsStoredRecord(card) {
   return {
     ...card,
@@ -33193,54 +26153,10 @@ function todayQueue(now = new Date(), scope = null) {
   return { learn, review, new: fresher, order, held, reviewRoom, buried };
 }
 /** Midnight at the start of a date, in the learner's own calendar. */
-function startOfDay(d) {
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
-}
 /** Relative due label for a tray line — the row tells the truth per item,
  * in calendar terms a person uses: minutes, hours, 明日, then real days. */
-function srsWhen(item) {
-  if (S.suspended[srsKey(item.t, item.id)]) return tx('休み中', 'resting');
-  const rec = S.srs[srsKey(item.t, item.id)];
-  // an unstarted row tells the truth: it holds no card and owes no review
-  if (!rec) return finiteNumber(item.started) ? tx('新規', 'new') : tx('未着手', 'not started');
-  const now = new Date();
-  const due = new Date(rec.due);
-  const ms = due.getTime() - now.getTime();
-  if (ms <= 0) return tx('いま', 'due now');
-  const mins = Math.round(ms / 60000);
-  if (mins < 60) return tx(`${mins} 分後`, `in ${mins} min`);
-  const dayGap = Math.round((startOfDay(due) - startOfDay(now)) / 86400000);
-  if (dayGap === 0) return tx(`${Math.round(mins / 60)} 時間後`, `in ${Math.round(mins / 60)} h`);
-  if (dayGap === 1) return tx('明日', 'tomorrow');
-  return tx(`${dayGap} 日後`, `in ${dayGap} d`);
-}
 /** Anki's stats screen, reduced to one honest line: what today, tomorrow
  * and the coming week actually hold, plus the untouched new cards. */
-function srsForecast(now = new Date()) {
-  const f = { today: 0, tomorrow: 0, week: 0, fresh: 0, unstarted: 0 };
-  const DAY = 86400000;
-  // Calendar buckets, the way a person counts: everything due before tonight's
-  // midnight is TODAY (a card due in three hours is not 明日), tomorrow is
-  // tomorrow's calendar day, and the week is the six days after that.
-  const endToday = startOfDay(now) + DAY;
-  const endTomorrow = endToday + DAY;
-  const endWeek = endToday + 7 * DAY;
-  for (const item of S.taken) {
-    const key = srsKey(item.t, item.id);
-    if (S.suspended[key]) continue;
-    const rec = S.srs[key];
-    if (!rec) {
-      if (finiteNumber(item.started)) f.fresh += 1;
-      else f.unstarted += 1;
-      continue;
-    }
-    const due = new Date(rec.due).getTime();
-    if (due < endToday) f.today += 1;
-    else if (due < endTomorrow) f.tomorrow += 1;
-    else if (due < endWeek) f.week += 1;
-  }
-  return f;
-}
 /* Anki's filtered deck, simplified: pass a scope (one list's items) and
  * the session holds only what is due inside it — same cards, same FSRS
  * schedule, just a narrower door. No scope reviews everything due.
@@ -33308,27 +26224,15 @@ window.__KAIRO_SRS__ = Object.freeze({
 /** D23 · whether a review card has an answer to show and grade. A word needs its
  * saved answer (savedAnswerFor); a kanji needs its retained or bundled record; other
  * kinds keep their own. */
-function reviewAnswerAvailable(item, record = S) {
-  return item.t === 'word' ? savedAnswerFor(item, record)?.status === 'available' : kanjiAnswerAvailable(item, record);
-}
 
 /** The back a review card shows. A word shows its saved answer, the one resolved
  * instance that the face binds (presentReviewAnswer) and the 音 door speaks. Every
  * other kind keeps reviewBack, and so do lessons for their own words. */
-function reviewCardBack(item, answer = null) {
-  if (item.t !== 'word') return reviewBack(item);
-  const resolved = answer || savedAnswerFor(item);
-  return resolved?.status === 'available' ? { reading: resolved.reading, senses: resolved.meanings.slice(0, 4) } : null;
-}
 
 /** The answer a word card presents, as one canonical string: its card key, the kind
  * and number of its entry, the head, the exact reading and the meanings the face
  * shows. The displayed meaning is part of it, so a same-entry answer whose text
  * changed is a different presentation. */
-function wordPresentationKey(item, answer) {
-  return JSON.stringify([srsKey('word', item.id), answer.seq ? 'seq' : answer.source, answer.seq, answer.head,
-    answer.reading, answer.meanings.slice(0, 4)]);
-}
 
 /** Bind the answer a revealed word card shows to this sitting position, once; a
  * later render never refreshes the binding. Returns null for anything but a revealed
@@ -33336,19 +26240,6 @@ function wordPresentationKey(item, answer) {
  *   shown        the record still gives the bound answer.
  *   changed      the record now answers otherwise.
  *   unavailable  there is no answer. */
-function presentReviewAnswer(rv, record = S) {
-  const item = rv?.queue?.[rv.ix];
-  if (!rv?.revealed || item?.t !== 'word') return null;
-  const answer = savedAnswerFor(item, record);
-  if (answer?.status !== 'available') return { state: 'unavailable', answer };
-  const key = wordPresentationKey(item, answer);
-  const bound = rv.presented;
-  if (!bound || bound.item !== item || bound.ix !== rv.ix) {
-    rv.presented = { item, ix: rv.ix, key };
-    return { state: 'shown', answer };
-  }
-  return { state: bound.key === key ? 'shown' : 'changed', answer };
-}
 
 /** A word grade, standard or drill, is authorized only for the answer this card
  * presented, and only while the latest record still gives exactly that answer:
@@ -33369,49 +26260,6 @@ function assertWordAnswerPresented(rv, item, record) {
 
 /** The card back, by kind — reading and meaning from the same records the
  * entry sheets read, so the session and the dictionary never disagree. */
-function reviewBack(item) {
-  if (item.t === 'word') {
-    const rec = lookup(item.id);
-    if (rec) return { reading: rec.r || '', senses: (rec.m || []).slice(0, 4) };
-  }
-  if (item.t === 'kanji') {
-    const k = retainedKanjiRecord(item.id) || D.kanji[item.id];
-    if (k)
-      return {
-        reading: [...(k.on || []), ...(k.kun || [])].slice(0, 6).join('・'),
-        senses: [k.m].filter(Boolean),
-      };
-  }
-  if (item.t === 'radical') {
-    const r = D.radicals[item.id];
-    if (r) return { reading: '', senses: [r.name || tx('名称のない部品', 'an unnamed part')] };
-  }
-  if (item.t === 'idiom') {
-    const i = D.idioms[item.id];
-    if (i) return { reading: i.r || '', senses: (i.g || []).slice(0, 3) };
-  }
-  if (item.t === 'grammar') {
-    const g = GRAMMARS().find((x) => x.id === item.id);
-    if (g) {
-      const ex = g.ex?.[0];
-      return {
-        reading: g.form || '',
-        senses: [bi() ? g.mEn : g.mJa || g.mEn, ...(ex ? [`${ex.ja} — ${ex.en}`] : [])],
-      };
-    }
-  }
-  if (item.t === 'particle') {
-    const pt = PARTICLES.find((x) => x.id === item.id);
-    if (pt) {
-      const ex = pt.ex?.[0];
-      return {
-        reading: pt.r && pt.r !== pt.p ? pt.r : '',
-        senses: [bi() ? pt.role : pt.roleJa || pt.role, ...(ex ? [`${ex.ja} — ${ex.en}`] : [])],
-      };
-    }
-  }
-  return { reading: '', senses: [tx('この層に記録がない。', 'No record in this layer.')], unrecorded: true };
-}
 /** The session's close (Today lane): one next door — the room's primary — the reading that holds
  * the learner's words, and tomorrow's first word coming back, whole. Both from the record; absent
  * when unknown. */
@@ -34138,53 +26986,8 @@ function renderReview(main) {
  * "the anki page is bad and hard to understand … it should be at least more like anki AT A
  * BARE MINIMUM" — and his standing ask, "an amazing Anki-grade SRS — all of Anki's function,
  * simplified". Anki's deck screen, counts, browser and stats, on the same FSRS state. */
-function srsCardKind(item) {
-  const rec = S.srs[srsKey(item.t, item.id)];
-  if (!rec || !rec.state) return 'new';
-  return rec.state === 2 ? 'due' : 'learn';
-}
 const SRS_KINDS = [['new', '新規', 'New'], ['learn', '学習中', 'Learning'], ['due', '復習', 'To review']];
-function reviewCounts(rv) {
-  const n = { new: 0, learn: 0, due: 0 };
-  for (const item of rv.queue.slice(rv.ix)) n[srsCardKind(item)] += 1;
-  const current = rv.queue[rv.ix] ? srsCardKind(rv.queue[rv.ix]) : null;
-  const box = el('div', 'anki-counts');
-  box.id = 'review-counts';
-  box.setAttribute('role', 'status');
-  box.setAttribute('aria-label', tx(`残り — 新規 ${n.new}・学習中 ${n.learn}・復習 ${n.due}`,
-    `left — ${n.new} new, ${n.learn} learning, ${n.due} to review`));
-  for (const [kind, ja, en] of SRS_KINDS) {
-    const c = el('span', `c-${kind}${current === kind ? ' now' : ''}`, String(n[kind]));
-    c.title = tx(ja, en);
-    box.append(c);
-  }
-  return box;
-}
-function deckCounts(today) {
-  const n = { new: today.new.length, learn: today.learn.length, due: today.review.length };
-  const row = el('div', 'deck-counts');
-  row.id = 'deck-counts';
-  for (const [kind, ja, en] of SRS_KINDS) {
-    const cell = el('div', `deck-count c-${kind}`);
-    cell.append(el('span', 'deck-count-n', String(n[kind])));
-    cell.append(el('span', 'deck-count-l', tx(ja, en)));
-    row.append(cell);
-  }
-  return row;
-}
 /** The decks: named lists above the months that fill themselves — the lists page's own sections. */
-function srsDecks() {
-  const buckets = new Map();
-  for (const item of S.taken) {
-    const key = monthKey(item.ts || 0);
-    if (!buckets.has(key)) buckets.set(key, []);
-    buckets.get(key).push(item);
-  }
-  return [
-    ...Object.entries(S.lists).map(([name, items]) => ({ name, items })),
-    ...[...buckets.entries()].map(([name, items]) => ({ name, label: monthLabel(name), items })),
-  ];
-}
 function renderDeckTable(main, today) {
   const now = new Date();
   const table = el('div', 'deck-table');
@@ -34366,98 +27169,6 @@ function renderBrowse(main) {
 }
 /** Anki's statistics, the parts a learner reads: today, the month's reviews, what is coming,
  * where every card stands, and how often reviews are remembered. */
-function renderSrsStats(main) {
-  srsRoomBack(main);
-  main.append(withEn(el('p', 'eyebrow', '統計'), 'statistics', 'en-inline'));
-  main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms['srs-stats'])));
-  const DAY = 86400000;
-  const now = new Date();
-  const today = S.stats[dayKey(now)] || {};
-  const todayN = today.n || 0;
-  const todayAgain = today.again || 0;
-  main.append(el('p', 'stats-today', todayN
-    ? tx(`今日 ${todayN} 枚 · もう一度 ${todayAgain} · 正答 ${Math.round(((todayN - todayAgain) / todayN) * 100)}%`,
-      `Today: ${todayN} card${todayN === 1 ? '' : 's'} studied · Again ${todayAgain} · ${Math.round(((todayN - todayAgain) / todayN) * 100)}% correct`)
-    : tx('今日はまだ復習していない。', 'No reviews yet today.')));
-  const counts = { new: 0, learn: 0, young: 0, mature: 0, rest: 0, unstarted: 0 };
-  for (const item of S.taken) {
-    const key = srsKey(item.t, item.id);
-    const rec = S.srs[key];
-    if (S.suspended[key]) counts.rest += 1;
-    else if (!rec || !rec.state) counts[finiteNumber(item.started) ? 'new' : 'unstarted'] += 1;
-    else if (rec.state === 1 || rec.state === 3) counts.learn += 1;
-    else if ((rec.scheduled_days || 0) >= 21) counts.mature += 1;
-    else counts.young += 1;
-  }
-  const standing = el('div', 'stats-standing');
-  for (const [kind, ja, en] of [['new', '新規', 'New'], ['learn', '学習中', 'Learning'], ['young', '若い', 'Young'], ['mature', '定着', 'Mature'], ['rest', '休み中', 'Resting'], ['unstarted', '未着手', 'Not started']]) {
-    if (kind === 'unstarted' && !counts.unstarted) continue;
-    const cell = el('div', `stats-cell s-${kind}`);
-    cell.append(el('span', 'stats-n', String(counts[kind])), el('span', 'stats-l', tx(ja, en)));
-    standing.append(cell);
-  }
-  main.append(withEn(el('p', 'eyebrow list-head', '札の状態'), 'where your cards stand', 'en-inline'), standing);
-  const bars = (title, en, values, labels, cls) => {
-    main.append(withEn(el('p', 'eyebrow list-head', title), en, 'en-inline'));
-    const chart = el('div', `stats-bars ${cls}`);
-    const max = Math.max(1, ...values);
-    chart.setAttribute('role', 'img');
-    chart.setAttribute('aria-label', tx(`${title}: 合計 ${values.reduce((a, v) => a + v, 0)}、最大 ${Math.max(...values)}`,
-      `${en}: ${values.reduce((a, v) => a + v, 0)} in all, at most ${Math.max(...values)} a day`));
-    values.forEach((v, i) => {
-      const col = el('div', 'stats-col');
-      col.title = `${labels[i]}: ${v}`;
-      const bar = el('i');
-      bar.style.height = `${Math.round((v / max) * 100)}%`;
-      col.append(bar);
-      chart.append(col);
-    });
-    main.append(chart);
-    main.append(el('p', 'fine stats-axis', `${labels[0]} … ${labels[labels.length - 1]} · ${tx('最大', 'max')} ${max}`));
-  };
-  // calendar days, never fixed 24-hour blocks: where the clocks change a day is 23 or 25 hours,
-  // and stepping by 24 h skipped a day (or showed one twice); a DST-free zone is unchanged
-  const pastDays = [];
-  const pastLabels = [];
-  for (let i = 29; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
-    pastDays.push(S.stats[dayKey(d)]?.n || 0);
-    pastLabels.push(`${d.getMonth() + 1}/${d.getDate()}`);
-  }
-  bars('この30日', 'reviews, last 30 days', pastDays, pastLabels, 'past');
-  const ahead = new Array(14).fill(0);
-  const aheadLabels = [];
-  const base = startOfDay(now);
-  for (let i = 0; i < 14; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
-    aheadLabels.push(`${d.getMonth() + 1}/${d.getDate()}`);
-  }
-  for (const item of S.taken) {
-    const key = srsKey(item.t, item.id);
-    const rec = S.srs[key];
-    if (!rec || S.suspended[key]) continue;
-    // two midnights can be 23 or 25 hours apart: round, as srsWhen does — floor put a card due the
-    // day after spring-forward one day early
-    const i = Math.max(0, Math.round((startOfDay(new Date(rec.due)) - base) / DAY));
-    if (i < 14) ahead[i] += 1;
-  }
-  bars('これから14日', 'due, next 14 days', ahead, aheadLabels, 'ahead');
-  const revoked = new Set();
-  for (const row of S.revlog || []) if (row[2] === 0 && Number.isInteger(row[3])) revoked.add(row[3]);
-  let reviewed = 0;
-  let remembered = 0;
-  const since = now.getTime() - 30 * DAY;
-  (S.revlog || []).forEach((row, i) => {
-    if (revoked.has(i) || row[2] === 0 || row[0] < since || row[3] !== 2) return;
-    reviewed += 1;
-    if (row[2] > 1) remembered += 1;
-  });
-  main.append(withEn(el('p', 'eyebrow list-head', '定着率'), 'retention', 'en-inline'));
-  main.append(el('p', 'stats-retention', reviewed
-    ? tx(`この30日、復習 ${reviewed} 回のうち ${Math.round((remembered / reviewed) * 100)}% を思い出した。`,
-      `In the last 30 days you remembered ${Math.round((remembered / reviewed) * 100)}% of ${reviewed} review${reviewed === 1 ? '' : 's'}.`)
-    : tx('まだ復習（学習済みの札）の記録がない。', 'No reviews of learned cards yet.')));
-}
 /* Anki's keys: Space or Enter shows the answer, then 1–4 grade (Space or Enter = Good),
  * Z or U takes the last grade back. Never while typing, never under an open sheet, dialog or
  * picker: the report form is a native modal over the card, and a key pressed in it graded or
@@ -34667,24 +27378,6 @@ const focusKanjiItem = (ch) => ({ t: 'kanji', id: ch, label: ch, kind: '漢字',
 
 /** The card pool for a mode: due cards from the list, or a kanji study run
  * (your taken kanji first, then common kanji easiest-first). */
-function focusPool(mode) {
-  if (mode === 'kanji') {
-    const seen = new Set();
-    const out = [];
-    for (const i of S.taken) {
-      if (i.t === 'kanji' && !seen.has(i.id)) { seen.add(i.id); out.push(i); }
-    }
-    const deck = Object.values(D.kanji)
-      .filter((k) => D.kmeta?.[k.c]?.jlpt)
-      .sort((a, b) => jlptRank(D.kmeta[a.c].jlpt) - jlptRank(D.kmeta[b.c].jlpt) || a.st - b.st);
-    for (const k of deck) {
-      if (!seen.has(k.c)) { seen.add(k.c); out.push(focusKanjiItem(k.c)); }
-    }
-    return out;
-  }
-  // Typed source clozes use the bounded recall room; the rapid drill has no typed-response contract.
-  return srsDueItems().filter((item) => !['sentence', 'question'].includes(item.t));
-}
 function refillFocusQueue(rv) {
   const f = S.focus;
   if (!f || !f.pool.length) return false;
@@ -34765,17 +27458,6 @@ function ensureGuidedModule() {
   return guidedModulePromise;
 }
 const guidedTaken = (node) => S.taken.find((row) => row.t === node.t && row.id === node.id) || null;
-function guidedCardStatus(node) {
-  const word = node.t === 'word';
-  const state = word ? wordCaptureState(node) : guidedTaken(node) ? 'taken' : 'take';
-  if (state === 'taken') return { state: 'taken' };
-  if (word && !D.dict?.[node.id]) return { state: 'held', reason: readerCaptureReasonText(node.id) };
-  if (word && state !== 'take') return { state: 'held', reason: wordCaptureHeldText(node, { route: false }) };
-  if (node.t === 'grammar' && !GRAMMARS().some((g) => g.id === node.id))
-    return { state: 'held', reason: tx('この文法はまだ一覧にないため、札にできない。', 'This grammar pattern isn’t in KAIRO’s grammar list yet, so it can’t become a card.') };
-  if (!word && node.t !== 'grammar') return { state: 'held', reason: tx('この種類の札は、ここでは覚えられない。', 'This kind of card can’t be memorized here.') };
-  return { state: 'take' };
-}
 function guidedCardInfo(nodes) {
   const rows = nodes.map(guidedTaken).filter(Boolean);
   const ready = new Set(scheduler ? todayQueue(new Date(), rows).order.map((item) => srsKey(item.t, item.id)) : []);
@@ -34913,51 +27595,9 @@ function loadSpeakRoom() {
 /** The sensei mine's subject gate (aiMineObservations), copied whole so the speaking room keeps its law without an edit
  * to it: a subject counts only when the dictionary or his deck confirms it, a code only from SENSEI_OBS_CODES, at most
  * AI_MINE_MAX_ROWS rows per exchange. verify-speak asserts that the two gates agree on one fixture. */
-function speakGateEvidence(found, xid, now = Date.now()) {
-  const subjectKey = (raw, type) => {
-    if (type !== 'word' && type !== 'kanji') return null;
-    const w = String(raw || '').trim();
-    if (!w || w.length > 12 || !/[぀-ヿ㐀-鿿豈-﫿]/u.test(w)) return null;
-    if (type === 'kanji' && [...w].length !== 1) return null;
-    const inDeck = S.taken.some((item) => item.t === type && item.id === w);
-    const inDict = type === 'kanji' ? !!D.kanji?.[w] : !!lookup(w);
-    return inDeck || inDict ? srsKey(type, w) : null;
-  };
-  const rows = [];
-  for (const f of Array.isArray(found) ? found : []) {
-    if (rows.length >= AI_MINE_MAX_ROWS || !plainRecord(f)) continue;
-    const key = subjectKey(f.subject, f.subjectType);
-    if (!key) continue;
-    if (f.kind === 'sensei' && [1, 3].includes(f.polarity) && SENSEI_OBS_CODES.has(f.code)) {
-      rows.push([now, 'sensei', key, f.polarity, f.code, xid]);
-    } else if (f.kind === 'confuse') {
-      const other = subjectKey(f.other, f.otherType);
-      if (other && other !== key) rows.push([now, 'confuse', key, other]);
-    }
-  }
-  return rows;
-}
 /** Kore's lines: each token she gave ({s, b, r, f}) becomes the door a sentence's word is everywhere
  * (renderSentenceTokens: a tap writes 'tap' evidence under the conversation's id); a word the dictionary does not
  * confirm still opens, as a plain lookup door. Each door carries its word and reading for the top bar's Save. */
-function speakSentence(container, tokens, { contextId }) {
-  for (const raw of tokens) {
-    const s = String(raw?.s || ''), b = String(raw?.b || s), r = String(raw?.r || '');
-    if (!s) continue;
-    if (!SPEAK_JA.test(s)) { renderSentenceTokens(container, [{ s, b: s, r: '', c: false }], { contextId }); continue; }
-    if (!lookup(b)) {
-      const wrap = appendJapaneseLookup(container, s, { block: container, kinsoku: true });
-      for (const word of wrap.querySelectorAll('.japanese-lookup-word')) { word.dataset.speakS = word.dataset.speakB = word.dataset.lookupText; word.dataset.speakR = ''; }
-      continue;
-    }
-    const f = Array.isArray(raw.f) && raw.f.length ? raw.f : [{ t: s, ...(r && r !== s ? { r } : {}) }];
-    renderSentenceTokens(container, [{ s, b, r, c: true, f }], { contextId });
-    const door = container.lastElementChild;
-    // the whole token rides the door (surface, base, the surface's reading): an inflected form keeps what R needs. G3 · a
-    // sentence's word is a span in a roving paragraph now, not a button: the door is still the word
-    if (door?.matches('.sentence-tok')) { door.dataset.speakS = s; door.dataset.speakB = b; door.dataset.speakR = r; }
-  }
-}
 /** The room's one door into the app: closures over the app's own lexicon, doors, Save, record and sound. */
 function speakHost() {
   return Object.freeze({
@@ -35105,29 +27745,7 @@ function speakBack() {
   return true;
 }
 /** The article's foot: one quiet chip beside 読み終えた. */
-function speakChip(p) {
-  if (!speakAvailable()) return document.createDocumentFragment();
-  const chip = el('button', 'chip speak-door', tx('話してみる', '話す · Talk it over'));
-  chip.type = 'button';
-  chip.id = 'read-speak';
-  chip.lang = bi() ? 'en' : 'ja';
-  chip.addEventListener('click', (event) => openSpeakRoom({ reader: p.id, scroll: Math.round(window.scrollY) }, { kind: 'article', id: p.id }, event.currentTarget));
-  return chip;
-}
 /** The JLPT room's own door to the guided session, beside the level and length chooser. */
-function guidedDoorInJlptRoom(main) {
-  const lengths = main.querySelector('.exam-lengths');
-  if (!lengths || main.querySelector('[data-guided-door]')) return;
-  const row = el('div', 'study-hall guided-entry');
-  const door = el('button', 'study-door');
-  door.type = 'button';
-  door.dataset.guidedDoor = 'mock';
-  door.append(withEn(el('span', 'study-door-t', '案内つきの練習'), 'Guided test practice', 'en-inline'));
-  door.append(el('span', 'study-door-sub', tx('N2 筆記 6問 · 解説と語の意味つき', 'N2 written · 6 questions · explanations and word meanings as you go')));
-  door.addEventListener('click', () => openGuidedRoom('mock'));
-  row.append(door);
-  lengths.after(row);
-}
 
 /** 稽古の間 — the study hall (operator, 2026-09-18: "we should have a whole
  * corpus of test from JLPT levels and others, as well as SRS cards. and other
@@ -35220,14 +27838,6 @@ function studyHallDoors() {
 
 /** A numbered block head (A's numbered sections, C's 01 in the gutter): the
  * number, the name, and one live count on the right when there is one. */
-function learnHead(n, ja, en, count) {
-  const head = el('header', 'learn-head');
-  const num = el('span', 'learn-n', n);
-  num.setAttribute('aria-hidden', 'true');
-  head.append(num, el('h2', 'learn-h', tx(ja, en)));
-  if (count) head.append(el('span', 'learn-count', count));
-  return head;
-}
 
 /* the stage's split names the three passage decks in short */
 const LEARN_STAGE_DECKS = [['n2', 'N2', 'N2'], ['n1', 'N1', 'N1'], ['senmon', '専門', 'Fields']];
@@ -35287,165 +27897,7 @@ function learnStageFace(order) {
 }
 
 /** The stage (concept C): a lacquer proscenium holding one lit washi card. */
-function renderLearnStage(main, doors) {
-  const stage = el('section', 'learn-stage');
-  stage.setAttribute('aria-labelledby', 'learn-stage-title');
-  // in the layout under test this stage is Review's: the day, the place's name, the first job
-  const places = placesLayout();
-  const head = el('header', 'learn-stage-head');
-  head.append(el('p', 'learn-stage-eyebrow', places ? todayDateline() : tx('学ぶ・今日', 'Learn · today')));
-  const title = el('h1', 'view-title', tx(...roomName('dojo')));
-  title.id = 'learn-stage-title';
-  head.append(title);
-  stage.append(head);
-
-  const due = doors.due;
-  // one practice, one home: Today's queue is reviewed on Today. When it holds cards and a deck
-  // has a sitting ready, the stage belongs to that deck (the one with the most due, then new),
-  // and the review stays one quiet line pointing home
-  const sums = LEARN_STAGE_DECKS.map(([id, ja, en]) => [id, tx(ja, en), learnDeckSummary(id)]);
-  const loaded = sums.filter(([, , sum]) => sum);
-  const best = loaded.slice().sort((a, b) => b[2].due - a[2].due || b[2].fresh - a[2].fresh)[0];
-  const sitting = best && (best[2].due || best[2].fresh) ? best : null;
-  // Review is every card's home in the layout under test: the learner's own saved words lead when
-  // they wait (the founding need: "I don't want to lose it"), else the deck with a sitting ready
-  const deckStage = places ? !due && !!sitting : !!sitting;
-  const order = due && !deckStage ? todayQueue().order : [];
-  const face = deckStage ? { item: null } : due ? learnStageFace(order) : { item: null };
-  const fan = el('div', 'learn-fan');
-  for (const k of [0, 1]) {
-    const ghost = el('span', `learn-ghost g${k}`);
-    ghost.setAttribute('aria-hidden', 'true');
-    fan.append(ghost);
-  }
-  const card = el('div', 'learn-card');
-  const meta = el('p', 'learn-card-meta');
-  const text = el('p', 'learn-card-text');
-  if (deckStage) {
-    const deck = DOJO_DECKS.find((d) => d.id === sitting[0]);
-    meta.textContent = tx('次の一席 · デッキ', 'next sitting · deck');
-    text.classList.add('is-deck');
-    text.textContent = deck ? tx(deck.ja, deck.en) : sitting[1];
-  } else if (face?.parts) {
-    meta.textContent = tx('次の札 · 保存した文から', 'next card · your sentence');
-    text.lang = 'ja';
-    text.dataset.uiContent = 'learning';
-    for (const part of face.parts) {
-      if (part.text) text.append(document.createTextNode(part.text));
-      if (part.at >= 0) {
-        const gap = el('span', 'learn-gap', '　　');
-        gap.setAttribute('aria-label', tx('空欄', 'blank'));
-        text.append(gap);
-      }
-    }
-  } else if (face?.label) {
-    meta.textContent = face.item.t === 'kanji' ? tx('次の札 · 漢字', 'next card · kanji') : tx('次の札 · 語', 'next card · word');
-    text.classList.add('is-word');
-    text.lang = 'ja';
-    text.dataset.uiContent = 'learning';
-    text.textContent = face.label;
-  } else if (due) {
-    meta.textContent = tx('次の札', 'next card');
-    text.classList.add('is-quiet');
-    text.textContent = face === null ? tx('文を開いています…', 'Opening its sentence…') : tx('札はリストで待っている。', 'Your cards wait on the list.');
-  } else {
-    meta.textContent = tx('今日', 'today');
-    text.classList.add('is-quiet');
-    text.textContent = tx('復習を待つ札はまだない。', 'No saved words to review yet.');
-  }
-  card.prepend(meta);
-  card.append(text);
-  fan.append(card);
-  stage.append(fan);
-
-  // the count and the split: the big number is the sitting the primary opens
-  // (todayQueue, the Line's own number); the decks keep their own ledgers, so
-  // their split is named apart and never added in
-  const row = el('div', 'learn-stage-row');
-  const count = el('p', 'learn-due');
-  if (deckStage) {
-    const [, short, sum] = sitting;
-    const n = sum.due || sum.fresh;
-    count.append(el('b', 'learn-due-n', String(n)));
-    count.append(el('span', 'learn-due-u', sum.due
-      ? tx(`枚 · ${short} 復習待ち`, `${short} card${n === 1 ? '' : 's'} due`)
-      : tx(`枚 · ${short} 新規`, `new ${short} card${n === 1 ? '' : 's'}`)));
-  } else {
-    count.append(el('b', 'learn-due-n', String(due)));
-    count.append(el('span', 'learn-due-u', places
-      ? tx('枚 · 今日', due === 1 ? 'card for today' : 'cards for today')
-      : tx('枚 復習待ち', due === 1 ? 'card due today' : 'cards due today')));
-  }
-  row.append(count);
-  if (loaded.length) {
-    const anyDue = loaded.some(([, , sum]) => sum.due);
-    const split = el('p', 'learn-split');
-    split.append(el('span', 'learn-split-h', places
-      ? anyDue ? tx('デッキ · 今日の復習', 'Decks · due today') : tx('デッキ · 今日の新しい札', 'Decks · new today')
-      : anyDue ? tx('今日の復習', 'due today') : tx('今日の新しい札', 'new today')));
-    const line = el('span', 'learn-split-line');
-    for (const [id, name, sum] of loaded) {
-      const cell = el('span', 'learn-split-cell');
-      cell.dataset.stageDeck = id;
-      cell.append(el('span', 'learn-split-name', name), el('b', 'learn-split-n', String(anyDue ? sum.due : sum.fresh)));
-      line.append(cell);
-    }
-    split.append(line);
-    row.append(split);
-  }
-  stage.append(row);
-
-  // The ready deck's primary starts its sitting. Today's saved cards keep their own
-  // quiet door; without a deck sitting, that review door leads the stage.
-  const review = doors.review;
-  review.classList.add('learn-go');
-  if (due && !deckStage && places) {
-    // the saved words' Begin, with the minutes the learner's own pace gives (gate 3)
-    review.id = 'review-start';
-    review.querySelector('.study-door-t').textContent = tx(`はじめる · ${due} 枚`, `Begin · ${due} card${due === 1 ? '' : 's'}`);
-    const perCard = todaySecondsPerCard();
-    const minutes = perCard ? Math.max(1, Math.round((due * perCard) / 60)) : 0;
-    review.querySelector('.study-door-sub').textContent = minutes
-      ? tx(`保存した語 · 約 ${minutes} 分`, `Your saved words · about ${minutes} min`)
-      : tx('保存した語', 'Your saved words');
-    stage.append(review);
-  } else if (due && !deckStage) {
-    review.querySelector('.study-door-t').textContent = tx(`${due} 枚を復習する`, `Review ${due} card${due === 1 ? '' : 's'}`);
-    review.querySelector('.study-door-sub').textContent = tx('今日のリストから始める', 'starts from today’s list');
-    stage.append(review);
-  } else if (places) {
-    if (sitting) stage.append(deckSittingButton(sitting));
-    // no saved word waits: the door stays, quiet and closed, saying so
-    review.classList.replace('learn-go', 'learn-go-quiet');
-    review.disabled = true;
-    stage.append(review);
-  } else {
-    if (sitting) {
-      stage.append(deckSittingButton(sitting));
-      review.classList.replace('learn-go', 'learn-go-quiet');
-      if (due) {
-        // Today's queue keeps its one home; here it is a line that points there
-        review.classList.add('learn-go-home');
-        review.querySelector('.study-door-t').textContent = tx(`今日に ${due} 枚が待っている`, `${due} card${due === 1 ? '' : 's'} waiting on Today`);
-        review.querySelector('.study-door-sub').textContent = '';
-      }
-    }
-    stage.append(review);
-  }
-  main.append(stage);
-}
 /** The stage's primary for a deck with a sitting ready: begin its due cards, or its new ones. */
-function deckSittingButton([id, short, sum]) {
-  const go = el('button', 'learn-go learn-go-deck');
-  go.type = 'button';
-  go.dataset.stageDeck = id;
-  const total = sum.total;
-  go.append(el('span', 'learn-go-t', sum.due
-    ? tx(`${short}の ${total} 枚を始める`, `Begin ${total} ${short} card${total === 1 ? '' : 's'}`)
-    : tx(`${short}の新規 ${total} 枚を始める`, `Begin ${total} new ${short} card${total === 1 ? '' : 's'}`)));
-  go.addEventListener('click', () => openDeck(id, { autoStart: true }));
-  return go;
-}
 
 /** The five numbered blocks under the stage, inside #study-hall. */
 function renderStudyHall(main, doors) {
@@ -35683,16 +28135,6 @@ function openDeck(id, { autoStart = false } = {}) {
 /** Words begun in a deck, read (never written) from its own ledger: one per
  * distinct word id among the scheduled card ids (`<word id>-<card>`). The slim
  * hairline under a deck row is this over the deck's real word count. */
-function deckWordsBegun(id) {
-  if (sharedStudyActive() && ['n2','n1','senmon','kotoba-master','shared-grammar'].includes(id)) return deckSummaries[id]?.begun || 0;
-  try {
-    const raw = JSON.parse(localStorage.getItem(`bunki-cloze:${id}`) || 'null');
-    const ids = raw && typeof raw.cards === 'object' && raw.cards ? Object.keys(raw.cards) : [];
-    return new Set(ids.map((cardId) => cardId.replace(/-[^-]+$/, ''))).size;
-  } catch {
-    return 0;
-  }
-}
 
 function renderDojoDecks(main, n = '02') {
   const list = el('div', 'dojo-decks');
@@ -35834,12 +28276,6 @@ function renderDeckPlay(main) {
 
 /** 学ぶ — the Learn room: the stage, then the numbered blocks (renderStudyHall). In the layout under
  * test this room is Review: the stage, then the decks, the timed practice and the saved words. */
-function renderFocus(main) {
-  const doors = studyHallDoors();
-  renderLearnStage(main, doors);
-  if (placesLayout()) renderReviewHall(main);
-  else renderStudyHall(main, doors);
-}
 
 /** 03 · the focus sitting: choose a length and what to drill, then begin. */
 function renderFocusSitting(focus, n = '03') {
@@ -35944,64 +28380,11 @@ const YOMI_DAKUTEN = {
 };
 const YOMI_HANDAKU = { は: 'ぱ', ひ: 'ぴ', ふ: 'ぷ', へ: 'ぺ', ほ: 'ぽ' };
 const yomiVariantCache = new Map();
-function yomiVariantsOf(ch) {
-  if (yomiVariantCache.has(ch)) return yomiVariantCache.get(ch);
-  const k = D.kanji?.[ch];
-  const out = [];
-  const add = (reading, type) => {
-    const base = kataToHira(reading).replace(/-/g, '');
-    if (!base) return;
-    const seen = new Set();
-    const sokuon = base.length >= 2 && 'つちくき'.includes(base.at(-1)) ? base.slice(0, -1) + 'っ' : null;
-    for (const v of sokuon ? [base, sokuon] : [base]) {
-      for (const head of [v[0], YOMI_DAKUTEN[v[0]], YOMI_HANDAKU[v[0]]]) {
-        if (!head) continue;
-        const form = head + v.slice(1);
-        if (!seen.has(form)) {
-          seen.add(form);
-          out.push([form, type]);
-        }
-      }
-    }
-  };
-  for (const on of k?.on || []) add(on, 'on');
-  for (const kun of k?.kun || []) {
-    add(kun.split('.')[0], 'kun'); // the stem alone (compound position)
-    if (kun.includes('.')) add(kun.replace('.', ''), 'kun'); // stem + okurigana
-  }
-  out.sort((a, b) => b[0].length - a[0].length); // greedy: longest first
-  yomiVariantCache.set(ch, out);
-  return out;
-}
 
 /** Classify how a compound is read against its kanji's own readings:
  * 音 (all on), 訓 (all kun), 混 (湯桶/重箱 mixes), 熟 (no per-kanji parse —
  * jukujikun, gikun, or readings beyond the variant model). Honest about
  * its limits: 熟 means "not resolvable here", never a claim about origin. */
-function yomiReadingType(word, reading) {
-  const target = kataToHira(reading || '');
-  if (!target) return '熟';
-  const chars = [...word];
-  const step = (ci, rest, sawOn, sawKun) => {
-    if (ci === chars.length) return rest === '' ? { sawOn, sawKun } : null;
-    const ch = chars[ci];
-    if (!/[一-鿿々]/.test(ch)) {
-      const lit = kataToHira(ch);
-      return rest.startsWith(lit) ? step(ci + 1, rest.slice(lit.length), sawOn, sawKun) : null;
-    }
-    const source = ch === '々' ? chars[ci - 1] : ch;
-    for (const [form, type] of source ? yomiVariantsOf(source) : []) {
-      if (!rest.startsWith(form)) continue;
-      const hit = step(ci + 1, rest.slice(form.length), sawOn || type === 'on', sawKun || type === 'kun');
-      if (hit) return hit;
-    }
-    return null;
-  };
-  const parsed = step(0, target, false, false);
-  if (!parsed) return '熟';
-  if (parsed.sawOn && parsed.sawKun) return '混';
-  return parsed.sawOn ? '音' : '訓';
-}
 
 /** The probe pool: every core-dictionary compound (2+ kanji) the learner has
  * neither taken nor probed, carrying its hardest kanji's Kanken band and its
@@ -36488,130 +28871,19 @@ function renderCardVariant(container, target) {
  * the index has its entry, that entry's spellings (引き返す for 引きかえす; a word with no kanji, its kana forms). Never
  * a kana another entry shares. A page that names its sense (an entry number or a reading) also asks an uninflected
  * token to be read one of that entry's ways, so 一日 read ついたち is not an example of いちにち. */
-function exampleIdentity(id, node = null) {
-  const key = String(id || '');
-  const forms = new Set(key ? [key] : []);
-  const alt = D.dict?.[key]?.alt;
-  if (alt) forms.add(alt);
-  const own = node && node.id === key ? node : { t: 'word', id: key };
-  const rows = key && D.dictionaryIndex ? dictionaryDetailRowsFor(own) : [];
-  for (const row of rows) {
-    const written = Array.isArray(row?.[4]) ? row[4] : [];
-    for (const form of written.length ? written : Array.isArray(row?.[5]) ? row[5] : []) forms.add(form);
-  }
-  // KT-6 (the lead's final ruling, 05:4x): the word's own entry is the one entry that writes its key with the word's own
-  // reading and sense (exampleOwnRows; never a homograph: 首's こうべ entry is 頭's, 才's sense is not 歳's). Of its
-  // spellings only those written with the key's own kanji are the word's (another okurigana: 押さえる, 代わる, 或る): a
-  // sentence written with other kanji does not hold this word's written form (依る is not 因る, 機械 is not 器械, 表す is
-  // not 現す), whatever entry the dictionary files it under. Never another entry's spelling.
-  for (const row of exampleOwnRows(key)) {
-    for (const form of row[4]) if (!forms.has(form) && exampleKanji(form) === exampleKanji(key)) forms.add(form);
-  }
-  let readings = null;
-  if (own === node && (node.seq || node.reading) && rows.length) {
-    readings = new Set(rows.flatMap((row) => (Array.isArray(row?.[5]) ? row[5] : []).map((kana) => kataToHira(String(kana)))));
-    if (node.reading) readings.add(kataToHira(String(node.reading)));
-  }
-  // a kana spelling is the same spelling in either kana: ドキドキ is どきどき, ガン is がん (癌)
-  const kana = new Set([...forms].filter((form) => READER_KANA.test(form)).map((form) => kataToHira(form)));
-  return { forms, kana, readings };
-}
 /** The kanji a spelling is written with, in order (押さえる and 押える: 押). */
-function exampleKanji(form) {
-  return (String(form || '').match(/\p{Script=Han}/gu) || []).join('');
-}
 /** A gloss as the sense test compares it: the dictionary's own normalisation, its ellipses and spacing set aside ("a certain
  * ..." and "a certain..." are one sense). */
-function exampleSenseKey(gloss) {
-  return normalizeGloss(String(gloss || '')).replace(/[.…]+/gu, ' ').replace(/\s+/gu, ' ').trim();
-}
 /** The word's own entry: of the entries at hand that write `key`, the one read the core word's way (that reading allowed
  * for this spelling) and holding one of its senses. A kanji key with a core word only: a kana key, or a word with no core
  * reading and sense, names no entry by itself. */
-function exampleOwnRows(key) {
-  const core = D.dict?.[key];
-  if (!key || !core?.r || !D.dictionaryIndex || !exampleKanji(key)) return [];
-  const reading = kataToHira(core.r);
-  const senses = new Set((core.m || []).flatMap((gloss) => String(gloss).split(/;\s*/u)).map(exampleSenseKey).filter(Boolean));
-  return dictionaryRowsForForm(key).filter((row) => Array.isArray(row?.[4]) && row[4].includes(key) &&
-    (row[5] || []).some((kana) => kataToHira(kana) === reading && dictionaryReadingSupportsForm(row, kana, key)) &&
-    (row[6] || []).some((gloss) => senses.has(exampleSenseKey(gloss))));
-}
-function exampleTokenIsWord(token, identity) {
-  if (!token?.c) return false;
-  const spelled = identity.forms.has(token.b) || (READER_KANA.test(String(token.b || '')) && identity.kana.has(kataToHira(String(token.b))));
-  if (!spelled) return false;
-  // an inflected token's reading is its ending's too: its dictionary spelling speaks for it
-  return !identity.readings || token.s !== token.b || !token.r || identity.readings.has(kataToHira(String(token.r)));
-}
-function exampleHoldsWord(tokens, identity) {
-  return Array.isArray(tokens) && tokens.some((token) => exampleTokenIsWord(token, identity));
-}
 /** The bank's fetched sentences that are this word's own (ensureBankExamples keeps the key's whole list). */
-function bankExamplesFor(id, node = null) {
-  const banked = D.exampleBank?.get(id);
-  if (!banked?.length) return [];
-  const identity = exampleIdentity(id, node);
-  return banked.filter((ex) => exampleHoldsWord(ex.tokens, identity));
-}
 
 /** Real usages from the committed shelf: sentences containing the word. A page passes its node, so a sense it names
  * keeps its examples to that sense (KT-6). */
-function findExamples(id, cap = 4, node = null) {
-  const out = [];
-  const identity = node ? exampleIdentity(id, node) : null;
-  for (const p of D.passages) {
-    if (D.libraryDiscoverable?.(p) === false || !p.tokens) continue; // not yet fetched — prefetch fills these in
-    let sentence = [];
-    let start = 0;
-    let hit = false;
-    for (const [index, t] of p.tokens.entries()) {
-      sentence.push(t);
-      if (t.c && t.b === id && (!identity || exampleTokenIsWord(t, identity))) hit = true;
-      if ('。！？'.includes(t.s)) {
-        if (hit) out.push({ tokens: sentence, source: learnerSourceLabel(p), passage: p.id, start });
-        sentence = [];
-        start = index + 1;
-        hit = false;
-        if (out.length >= cap) return out;
-      }
-    }
-    if (hit && sentence.length) out.push({ tokens: sentence, source: learnerSourceLabel(p), passage: p.id, start });
-    if (out.length >= cap) return out;
-  }
-  // the bank fills what the shelf cannot — already-fetched sentences only
-  // (ensureBankExamples warms this cache; callers refresh once it lands), and only the word's own (KT-6)
-  const banked = bankExamplesFor(id, node);
-  if (banked.length) {
-    const seen = new Set(out.map((ex) => ex.tokens.map((t) => t.s).join('')));
-    for (const ex of banked) {
-      if (out.length >= cap) break;
-      const text = ex.tokens.map((t) => t.s).join('');
-      if (!seen.has(text)) {
-        seen.add(text);
-        out.push(ex);
-      }
-    }
-  }
-  return out;
-}
 
 /** Resolve an exact sentence occurrence. Repeated identical sentences need
  * their retained start; an ambiguous text match never invents a position. */
-function sentenceSource(tokens, passageId, startHint) {
-  const p = D.passages.find((entry) => entry.id === passageId);
-  if (!tokens?.length || !p?.tokens?.length) return null;
-  const matches = (start) => start >= 0 && start + tokens.length <= p.tokens.length &&
-    tokens.every((token, offset) => token.s === p.tokens[start + offset].s && token.b === p.tokens[start + offset].b);
-  if (Number.isInteger(startHint)) return matches(startHint) ? { passage: passageId, index: startHint } : null;
-  let found = -1;
-  for (let start = 0; start <= p.tokens.length - tokens.length; start += 1) {
-    if (!matches(start)) continue;
-    if (found !== -1) return null;
-    found = start;
-  }
-  return found === -1 ? null : { passage: passageId, index: found };
-}
 
 /* ------------------------------------------------- 用例の蔵 (example bank)
  * SNOW T15/T23 sentences (CC BY 4.0), tokenised at build time into the
@@ -36620,23 +28892,9 @@ function sentenceSource(tokens, passageId, startHint) {
  * Served build only — the single file keeps shelf sentences and stays
  * honest about the rest. See tools/build_examples.py. */
 const EXAMPLE_DIR = 'data/proprietary_safe/examples';
-function exampleFnv(word) {
-  let h = 0x811c9dc5;
-  const bytes = new TextEncoder().encode(word);
-  for (const b of bytes) {
-    h ^= b;
-    h = Math.imul(h, 0x01000193) >>> 0;
-  }
-  return h & 15;
-}
 function inflateExampleToken(row) {
   const [s, b, r, c, p, f] = row;
   return { s, b, r, c: !!c, p, f: (f || []).map((pair) => (pair[1] ? { t: pair[0], r: pair[1] } : { t: pair[0] })) };
-}
-async function fetchExampleJson(path) {
-  const res = await fetchData(`${EXAMPLE_DIR}/${path}`);
-  if (!res.ok) throw new Error(`${path} → ${res.status}`);
-  return res.json();
 }
 async function ensureBankExamples(word) {
   if (window.__CORRIDOR_STANDALONE__ === true) return [];
@@ -36793,24 +29051,10 @@ function renderSentenceTokens(container, tokens, opts = {}) {
  * without one they are quietly absent — never broken, never nagging. */
 const AI_KEY_STORE = 'kairo-ai-key';
 const AI_DEVICE_STORE = 'kairo-ai-provider-v1';
-function aiKey() {
-  return aiTransport().key;
-}
 const AI_TEACHING_SURFACES = new Set(['chat', 'word-tutor', 'quiz', 'cards', 'examples', 'coach']);
 const AI_TEACHING_CONTEXT_LABEL = '\n\nDerived learning context (guidance only):\n';
 /** Resolve only existing local forms. Imported keys and displayed learner text
  * cannot become teaching targets merely by appearing in a derived node map. */
-function aiTeachingSubject(key) {
-  if (typeof key !== 'string') return null;
-  const cut = key.indexOf(':');
-  if (cut < 1) return null;
-  const kind = key.slice(0, cut), id = key.slice(cut + 1);
-  const form = kind === 'word' && (owns(D.dict, id) || owns(D.words, id) || dictionaryRowsForForm(id).length > 0) ? id :
-    kind === 'grammar' ? GRAMMARS().find((grammar) => grammar.id === id)?.p :
-    kind === 'kanji' && (owns(D.kanji, id) || window.BunkiSkipUI?.getKanji(S.skipUi, id)) ? id : null;
-  if (typeof form !== 'string' || !form.trim() || form.length > 80) return null;
-  return { kind, form };
-}
 /** One pure query immediately before dispatch. This value grants no capture,
  * assessment, source-processing or scheduling authority. */
 function aiTeachingContext() {
@@ -36863,71 +29107,13 @@ const AI_TIMEOUT_MS = 10000;
  * its cancel control throughout; every other surface keeps ten seconds. */
 const AI_READING_TOKENS_PER_SECOND = 25;
 const AI_READING_TIMEOUT_CAP_MS = 600000;
-function aiRequestTimeoutMs(meta = {}) {
-  if (meta.surface !== 'reading' || !Number.isInteger(meta.maxTokens) || meta.maxTokens <= 0) return AI_TIMEOUT_MS;
-  const writing = Math.ceil(Math.min(meta.maxTokens, 16000) / AI_READING_TOKENS_PER_SECOND) * 1000;
-  return Math.min(AI_READING_TIMEOUT_CAP_MS, AI_TIMEOUT_MS + writing);
-}
-function canonicalAiBaseUrl(value) {
-  if (!nonEmptyString(value) || value.length > 2048 || /[\s\\]/u.test(value) ||
-      Array.from(value).some((character) => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127)) return null;
-  try {
-    const url = new URL(value);
-    if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash) return null;
-    return `${url.origin}${url.pathname.replace(/\/+$/, '')}`;
-  } catch {
-    return null;
-  }
-}
 
 /** Read one atomic settings snapshot. A damaged or mismatched configuration
  * cannot fall back to an old key. Legacy bare keys have no trusted origin:
  * even an old learner record may have imported its provider settings. Keep
  * those bytes locally, but require explicit reconnection before using them. */
-function aiTransport() {
-  const defaults = { baseUrl: AI_DEFAULT_BASE_URL, model: AI_DEFAULT_MODEL, origin: AI_DEFAULT_BASE_URL, key: '' };
-  try {
-    const raw = localStorage.getItem(AI_DEVICE_STORE);
-    if (raw === null) return { ...defaults, requiresBinding: !!localStorage.getItem(AI_KEY_STORE) };
-    const config = JSON.parse(raw);
-    const baseUrl = plainRecord(config) && canonicalAiBaseUrl(config.baseUrl);
-    if (!baseUrl || config.v !== 1 || !nonEmptyString(config.model) || config.model.length > 200) return { ...defaults, invalid: true };
-    const origin = new URL(baseUrl).origin;
-    if (!plainRecord(config.credential) || config.credential.origin !== origin || typeof config.credential.key !== 'string' || config.credential.key.length > 8192 ||
-        ['\r', '\n', '\0'].some((character) => config.credential.key.includes(character))) {
-      return { ...defaults, invalid: true };
-    }
-    if (config.configId !== undefined && !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u.test(config.configId))
-      return { ...defaults, invalid: true };
-    return { baseUrl, model: config.model, origin, key: config.credential.key, configId: config.configId || 'legacy-v1' };
-  } catch {
-    return { ...defaults, invalid: true };
-  }
-}
 
-function aiProvider() {
-  const { baseUrl, model } = aiTransport();
-  return { baseUrl, model };
-}
 
-function saveAiDeviceConfig(baseUrl, model, key) {
-  const canonical = canonicalAiBaseUrl(baseUrl);
-  if (!canonical || !nonEmptyString(model) || model.length > 200 || typeof key !== 'string' || key.length > 8192 ||
-      ['\r', '\n', '\0'].some((character) => key.includes(character))) return false;
-  try {
-    localStorage.setItem(AI_DEVICE_STORE, JSON.stringify({
-      v: 1, baseUrl: canonical, model, configId: crypto.randomUUID(),
-      credential: { origin: new URL(canonical).origin, key },
-    }));
-  } catch {
-    return false;
-  }
-  // The atomic settings write is authoritative even if legacy cleanup fails.
-  // A key removal saves an empty credential rather than reviving this fallback.
-  try { localStorage.removeItem(AI_KEY_STORE); } catch { /* inert legacy bytes */ }
-  revalidateTutorRequests();
-  return true;
-}
 
 /* --------------------------------------------------- AIの記録 (the archive)
  * "Not a word is lost" (ledger P1): every learner message and every reply,
@@ -36997,23 +29183,6 @@ function canonicalRecordJson(value) {
   if (plainRecord(value)) return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${canonicalRecordJson(value[key])}`).join(',')}}`;
   return JSON.stringify(value);
 }
-function validArchiveTurn(row) {
-  return plainRecord(row) && safeJsonValue(row) && nonEmptyString(row.surface) &&
-    AI_EVIDENCE_ROLES.has(row.role) && typeof row.content === 'string' &&
-    Number.isSafeInteger(row.ts) && row.ts > 0 && optional(row, 'model', nonEmptyString) &&
-    optional(row, 'xid', nonEmptyString) && optional(row, 'contextRef', nonEmptyString) &&
-    optional(row, 'id', (id) => (Number.isSafeInteger(id) && id > 0) || nonEmptyString(id));
-}
-function validArchiveRows(rows) {
-  if (!Array.isArray(rows) || !rows.every(validArchiveTurn)) return false;
-  const keys = rows.filter((row) => owns(row, 'id')).map((row) => JSON.stringify(row.id));
-  return new Set(keys).size === keys.length;
-}
-function storedArchiveRow(row) {
-  return plainRecord(row) && row.format === 'kairo-archive-row' && row.v === 1 &&
-    Number.isSafeInteger(row.id) && row.id > 0 &&
-    Object.keys(row).every((key) => ['format', 'v', 'id', 'turn'].includes(key)) && validArchiveTurn(row.turn);
-}
 function logicalArchiveRows(rows) {
   if (!Array.isArray(rows)) throw new Error('unreadable archive');
   const logical = rows.map((row) => storedArchiveRow(row) ? row.turn : row);
@@ -37026,22 +29195,8 @@ function physicalArchiveRows(rows) {
   // this generation's private physical key and conversation replay order.
   return rows.map((turn, index) => ({ format: 'kairo-archive-row', v: 1, id: index + 1, turn }));
 }
-function validStoredArchiveRows(rows) {
-  try {
-    logicalArchiveRows(rows);
-    return rows.every((row) => storedArchiveRow(row) || validArchiveTurn(row)) &&
-      new Set(rows.map((row) => JSON.stringify(row.id))).size === rows.length;
-  } catch { return false; }
-}
 function inRecordTransaction(tx, action) {
   return () => { try { action(); } catch { try { tx.abort(); } catch { /* already aborted */ } } };
-}
-function validImportJournal(journal) {
-  if (!plainRecord(journal) || journal.v !== 1 || journal.id !== 'active' || !nonEmptyString(journal.token) ||
-    !(journal.beforeText === null || typeof journal.beforeText === 'string') || typeof journal.afterText !== 'string' ||
-    journal.beforeText === journal.afterText || !validStoredArchiveRows(journal.beforeRows) || !validStoredArchiveRows(journal.afterRows)) return false;
-  try { const record = JSON.parse(journal.afterText); return validStoreEnvelope(record) && record.recordGeneration === journal.token; }
-  catch { return false; }
 }
 
 /** Boot and failed-import recovery run exclusively before any archive reader.
@@ -37306,9 +29461,6 @@ async function aiConverse(system, messages, meta = {}) {
     return reply;
   } finally { requestGuard?.close(); }
 }
-async function aiAsk(system, prompt, meta = {}) {
-  return aiConverse(system, [{ role: 'user', content: prompt }], meta);
-}
 
 /* -------------------------------------------------- 鏡 · the ledger's ear
  * The sensei listens to its own conversations. After each exchange on a
@@ -37390,21 +29542,6 @@ async function aiMineObservations(fromSurface, learnerInk, reply, xid, processin
  * come from the pinned dictionary, never from the model's own text. And
  * every tutor-made card is an ordinary deck row (by: 'sensei'): the same
  * 覚える door swings it back out, the same scheduler owns its reviews. */
-async function aiCreateCards(words, max = 5) {
-  const made = [];
-  for (const raw of Array.isArray(words) ? words : []) {
-    if (made.length >= max) break;
-    const w = String(raw || '')
-      .trim()
-      .replace(/[。、．，,.\s]+$/u, '');
-    if (!w || w.length > 12 || !/[぀-ヿ㐀-鿿豈-﫿]/u.test(w)) continue;
-    if (S.taken.some((t) => t.t === 'word' && t.id === w)) continue;
-    if (!lookup(w)) continue; // no dictionary truth, no card — fail closed
-    if (!await commitCapture({ t: 'word', id: w, from: null, by: 'sensei' }, w)) break;
-    made.push(w);
-  }
-  return made;
-}
 
 /* An instrument handle for the verification suites (the __KAIRO_* idiom):
  * read-only access to the archive, the provider seam, and the budget, so
@@ -37430,13 +29567,6 @@ window.__KAIRO_RECORD_SAFETY__ = Object.freeze({
 /** The newest archived reply for one surface and one word — the read-back
  * seam: an answer that arrived after its sheet closed is not lost, it waits
  * in the archive and the reopened sheet shows it. */
-async function aiLastReply(surface, ref) {
-  const rows = await aiLogAll(surface);
-  for (let i = rows.length - 1; i >= 0; i -= 1) {
-    if (rows[i].role === 'assistant' && rows[i].contextRef === ref) return rows[i].content;
-  }
-  return null;
-}
 
 /* A failure is not an assistant turn and is never archived, so a repaint mid-request replaced the
  * sheet's quiet "could not answer just now" with silence and a re-armed door (PR #77 007479d0).
@@ -37448,60 +29578,8 @@ const aiSheetNotes = new Map();
  * ask takes a turn: only the newest may leave the line, and a reply clears it — a late failure of an
  * older ask never stands over a saved reply. */
 const aiSheetTurns = new Map();
-function aiSheetTurn(key) {
-  const turn = (aiSheetTurns.get(key) || 0) + 1;
-  aiSheetTurns.set(key, turn);
-  return turn;
-}
-function aiSheetSettle(box, paint) {
-  if (box.isConnected) paint();
-  else if ($('.sheet')) render();
-}
 
 /** The tutor door on a word entry — present only when a key is stored. */
-function renderAiTutor(sheet, node, rec) {
-  if (node.from?.passage || node.sourceContext) {
-    renderTeacherDoor(sheet, node);
-  }
-  if (!aiKey()) return;
-  const wrap = el('div', 'ai-tutor');
-  const btn = biLabel('button', 'chip ai-ask', node.from?.passage || node.sourceContext ? 'この語だけ先生に聞く' : '先生に聞く',
-    node.from?.passage || node.sourceContext ? 'ask about the word alone' : 'ask the tutor');
-  btn.type = 'button';
-  const out = el('div', 'ai-answer');
-  // G2 · the archive is read back by the word as this page reads it: 訳's わけ reply never answers 訳 read やく
-  const ref = wordArchiveRef(node, rec);
-  const note = aiSheetNotes.get(`word-tutor|${ref}`);
-  if (note) out.textContent = note;
-  else aiLastReply('word-tutor', ref).then((prev) => {
-    if (prev && !out.textContent) out.textContent = prev;
-  });
-  btn.addEventListener('click', async () => {
-    const turn = aiSheetTurn(`word-tutor|${ref}`);
-    aiSheetNotes.delete(`word-tutor|${ref}`);
-    btn.disabled = true;
-    out.textContent = tx('考え中…', 'thinking…');
-    try {
-      const senses = (rec?.m || []).slice(0, 4).join('; ');
-      const said = await aiAsk(
-        'You are a Japanese tutor inside a dictionary app. In under 120 words: explain the word\'s nuance and typical use using the separate learning dimensions, then give two natural example sentences, each on its own line as: Japanese sentence — reading in kana — English. Plain text only, no headers or markdown.',
-        `Word: ${node.id}${rec?.r ? ` (${rec.r})` : ''}. Dictionary senses: ${senses || 'none recorded'}.`,
-        { surface: 'word-tutor', ref },
-      );
-      aiSheetNotes.delete(`word-tutor|${ref}`);
-      aiSheetSettle(out, () => { out.textContent = said; });
-    } catch {
-      if (aiSheetTurns.get(`word-tutor|${ref}`) === turn) {
-        const line = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
-        aiSheetNotes.set(`word-tutor|${ref}`, line);
-        aiSheetSettle(out, () => { out.textContent = line; });
-      }
-    }
-    btn.disabled = false;
-  });
-  wrap.append(btn, out);
-  sheet.append(wrap);
-}
 
 /* Copious example sentences at every applicable level — generated on demand
  * (operator: "every single word needs copious example sentences at all
@@ -37509,117 +29587,11 @@ function renderAiTutor(sheet, node, rec) {
  * absent without one, per the Phase-3 rule. The shelf's own 用例 above stay
  * the always-on, key-free baseline; these layer graded, made-to-order
  * sentences on top. A missing source classification remains unknown. */
-function renderAiExamples(sheet, node, rec) {
-  if (!aiKey()) return;
-  sheet.append(withEn(el('p', 'eyebrow', '例文 — レベル別'), 'examples at every level', 'en-inline'));
-  const wrap = el('div', 'ai-tutor');
-  const btn = biLabel('button', 'chip ai-ask', '例文をつくる', 'write examples at my level');
-  btn.type = 'button';
-  const out = el('div', 'ai-examples');
-  const paint = (raw) => {
-    out.textContent = '';
-    let shown = 0;
-    for (const line of raw.split('\n').map((l) => l.trim()).filter(Boolean)) {
-      const parts = line.split('|').map((s) => s.trim());
-      if (parts.length < 4) continue;
-      const [lv, ja, read, en] = parts;
-      const card = el('div', 'ai-ex');
-      const head = el('p', 'ai-ex-ja');
-      if (/^N[1-5]$/i.test(lv)) head.append(el('span', 'ai-ex-lv', lv.toUpperCase()));
-      head.append(document.createTextNode(ja));
-      card.append(head);
-      if (read) card.append(el('p', 'ai-ex-read', read));
-      if (bi() && en) card.append(el('p', 'ai-ex-en', en));
-      out.append(card);
-      shown += 1;
-    }
-    return shown;
-  };
-  const exRef = wordArchiveRef(node, rec);
-  const note = aiSheetNotes.get(`examples|${exRef}`);
-  if (note) out.append(el('p', 'ai-ex-note', note));
-  else aiLastReply('examples', exRef).then((prev) => {
-    if (prev && !out.childElementCount && !btn.disabled) paint(prev);
-  });
-  btn.addEventListener('click', async () => {
-    const turn = aiSheetTurn(`examples|${exRef}`);
-    aiSheetNotes.delete(`examples|${exRef}`);
-    btn.disabled = true;
-    out.textContent = '';
-    out.append(el('p', 'ai-ex-note', tx('つくっています…', 'writing examples…')));
-    try {
-      const senses = (rec?.m || []).slice(0, 4).join('; ');
-      const wordLv = kagamiLevel(rec?.jlpt);
-      const raw = await aiAsk(
-        'You are a Japanese tutor inside a dictionary app. Write 6 to 8 natural example sentences for the given word across a useful range of difficulty, easiest first, using the separate learning dimensions. Keep an unrecorded word classification unknown; a word tag alone does not establish a sentence\'s difficulty. Output ONE sentence per line and nothing else. Each line MUST be exactly: Nx | Japanese sentence | full reading of the sentence in hiragana | English. Nx is your provisional N5–N1 difficulty estimate for that example, not an official classification or a claim about the learner. No numbering, no markdown, no extra commentary.',
-        `Word: ${node.id}${rec?.r ? ` (${rec.r})` : ''}. Source word JLPT classification: ${wordLv || 'not recorded'}. Dictionary senses: ${senses || 'none recorded'}.`,
-        { surface: 'examples', ref: exRef },
-      );
-      aiSheetNotes.delete(`examples|${exRef}`);
-      aiSheetSettle(out, () => {
-        if (!paint(raw)) out.append(el('p', 'ai-ex-note', tx('うまく作れなかった。もう一度どうぞ。', 'Could not format the examples — try once more.')));
-      });
-    } catch {
-      if (aiSheetTurns.get(`examples|${exRef}`) === turn) {
-        const line = tx('いまは作れない。あとでもう一度。', 'The tutor could not write examples just now — try again in a moment.');
-        aiSheetNotes.set(`examples|${exRef}`, line);
-        aiSheetSettle(out, () => {
-          out.textContent = '';
-          out.append(el('p', 'ai-ex-note', line));
-        });
-      }
-    }
-    btn.disabled = false;
-  });
-  wrap.append(btn, out);
-  sheet.append(wrap);
-}
 
 /* The coach at the end of a review session — the tutor reads the grades
  * and says where to press next. Advice only: the canon's line is AI
  * proposing, never scheduling — FSRS alone decides when cards return, and
  * nothing here writes to the SRS state. Absent without a key. */
-function renderAiCoach(main, rv) {
-  if (!aiKey()) return;
-  const wrap = el('div', 'ai-tutor');
-  const btn = biLabel('button', 'chip ai-ask', '先生の一言', 'a word from the tutor');
-  btn.type = 'button';
-  btn.id = 'ai-coach';
-  const out = el('div', 'ai-answer');
-  // 考え中 and what the tutor said live on the session, not in this closure: a repaint
-  // mid-request killed the spinner, re-armed the door and lost the arriving reply
-  // (PR #77 d9f0b984)
-  const thinking = tx('考え中…', 'thinking…');
-  if (rv.coach?.pending) {
-    btn.disabled = true;
-    out.textContent = thinking;
-  } else if (rv.coach?.said) out.textContent = rv.coach.said;
-  btn.addEventListener('click', async () => {
-    if (rv.coach?.pending) return;
-    rv.coach = { pending: true };
-    btn.disabled = true;
-    out.textContent = thinking;
-    let said;
-    try {
-      // history is queue-ordered (grades push sequentially, undo pops)
-      const lines = rv.queue.map((item, i) => `${item.label} (${item.t}): ${rv.history[i]?.key || 'ungraded'}`);
-      said = await aiAsk(
-        "You are a Japanese tutor inside a flashcard app, speaking just after a review session. In under 110 words of plain text (no headers, no markdown): one sentence on what the session shows, then name the items graded 'again' or 'hard' that deserve another look, then ONE concrete memory hook for the single hardest item. You only advise — the app's scheduler alone decides when cards return, so never promise timings.",
-        `Session grades:\n${lines.join('\n')}`,
-        { surface: 'coach' },
-      );
-    } catch {
-      said = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
-    }
-    rv.coach = { pending: false, said };
-    if (out.isConnected) {
-      out.textContent = said;
-      btn.disabled = false;
-    } else if (S.view === 'review' && S.review === rv) render();
-  });
-  wrap.append(btn, out);
-  main.append(wrap);
-}
 
 /* The tutor's reading room — 私の読み物. The operator's words for phase 3:
  * the AI "creates custom readings at your level." The passage arrives with
@@ -37628,54 +29600,11 @@ function renderAiCoach(main, rv) {
  * dictionary knows becomes a door into its entry — the same tap the reader
  * teaches. Persisted, so the reading survives reloads; the whole room is
  * quietly absent without a key. */
-function aiReadingSegments(text) {
-  const out = [];
-  const re = /([㐀-鿿豈-﫿々〆ヶ]+[ぁ-ゖー]*)（([ぁ-ゖァ-ヶー・]+)）/g;
-  let last = 0;
-  for (const m of text.matchAll(re)) {
-    if (m.index > last) out.push(text.slice(last, m.index));
-    out.push({ base: m[1], ruby: m[2] });
-    last = m.index + m[0].length;
-  }
-  if (last < text.length) out.push(text.slice(last));
-  return out;
-}
 
 let aiReadingJob = null;
 let aiReadingNotice = null;
 let aiReadingSession = null;
 
-function readingTargets(model) {
-  const result = [];
-  // Reserve a few natural encounters for recent practice before filling the
-  // rest from the established frontier. Provisional keys express interest,
-  // not a claim of a measured struggle; exact evidence refs remain attached.
-  for (const item of model.assessments?.priorities?.targets || []) {
-    if (item.suppressed || result.length >= 4) continue;
-    const subject = aiTeachingSubject(item.subject);
-    if (!subject || !['word', 'grammar'].includes(subject.kind) ||
-        result.some(target => target.kind === subject.kind && target.form === subject.form)) continue;
-    result.push({ ...subject, reason: item.provisionalMisses ? 'interest' : 'recent-struggle',
-      evidenceRefs: item.evidence.slice(-8).map(row => row.evidenceId) });
-  }
-  for (const item of model.frontier || []) {
-    const [kind, ...parts] = item.key.split(':');
-    const id = parts.join(':');
-    const form = kind === 'word' && lookup(id) ? id :
-      kind === 'grammar' ? GRAMMARS().find((grammar) => grammar.id === id)?.p : null;
-    if (!form || form.length > 80 || result.some((target) => target.kind === kind && target.form === form)) continue;
-    result.push({ kind, form, reason: 'recent-struggle' });
-    if (result.length >= 12) break;
-  }
-  for (const item of model.assessments?.focus || []) {
-    if (result.length >= 12) break;
-    const subject = aiTeachingSubject(item.subject);
-    if (!subject || !['word', 'grammar'].includes(subject.kind) ||
-        result.some(target => target.kind === subject.kind && target.form === subject.form)) continue;
-    result.push({ ...subject, reason: 'recent-struggle', evidenceRefs: item.evidenceIds.slice(-8) });
-  }
-  return result;
-}
 
 async function generatePersonalReading(settings) {
   if (aiReadingJob || !recordWritable()) return;
@@ -38025,83 +29954,7 @@ const GODAN_ROW = {
   ぶ: ['ば', 'び', 'べ', 'ぼ'], む: ['ま', 'み', 'め', 'も'], る: ['ら', 'り', 'れ', 'ろ'],
 };
 const GODAN_TE = { う: 'って', つ: 'って', る: 'って', ぬ: 'んで', ぶ: 'んで', む: 'んで', く: 'いて', ぐ: 'いで', す: 'して' };
-function conjugations(word, pos) {
-  if (!pos || !word) return null;
-  if (/godan verb/.test(pos)) {
-    const last = word.slice(-1);
-    const row = GODAN_ROW[last];
-    if (!row) return null;
-    const stem = word.slice(0, -1);
-    const [a, i, e, o] = row;
-    const te = word.endsWith('行く') || word === '行く' ? `${stem}って` : stem + GODAN_TE[last];
-    return [
-      ['ます形', 'polite', `${stem}${i}ます`],
-      ['て形', 'te-form', te],
-      ['た形', 'past', te.replace(/て$/, 'た').replace(/で$/, 'だ')],
-      ['ない形', 'negative', `${stem}${a}ない`],
-      ['可能', 'potential', `${stem}${e}る`],
-      ['ば形', 'conditional', `${stem}${e}ば`],
-      ['意向形', 'volitional', `${stem}${o}う`],
-      ['受身', 'passive', `${stem}${a}れる`],
-      ['使役', 'causative', `${stem}${a}せる`],
-      ['命令形', 'imperative', `${stem}${e}`],
-    ];
-  }
-  if (/ichidan verb/.test(pos) && word.endsWith('る')) {
-    const stem = word.slice(0, -1);
-    return [
-      ['ます形', 'polite', `${stem}ます`],
-      ['て形', 'te-form', `${stem}て`],
-      ['た形', 'past', `${stem}た`],
-      ['ない形', 'negative', `${stem}ない`],
-      ['可能・受身', 'potential / passive', `${stem}られる`],
-      ['ば形', 'conditional', `${stem}れば`],
-      ['意向形', 'volitional', `${stem}よう`],
-      ['使役', 'causative', `${stem}させる`],
-      ['命令形', 'imperative', `${stem}ろ`],
-    ];
-  }
-  if (/suru verb/.test(pos) && !/godan|ichidan/.test(pos) && !/する$/.test(word)) {
-    return [
-      ['ます形', 'polite', `${word}します`],
-      ['て形', 'te-form', `${word}して`],
-      ['た形', 'past', `${word}した`],
-      ['ない形', 'negative', `${word}しない`],
-      ['可能', 'potential', `${word}できる`],
-      ['ば形', 'conditional', `${word}すれば`],
-      ['意向形', 'volitional', `${word}しよう`],
-      ['受身', 'passive', `${word}される`],
-    ];
-  }
-  if (/i-adjective/.test(pos) && word.endsWith('い') && !word.endsWith('いい')) {
-    const stem = word.slice(0, -1);
-    return [
-      ['く形', 'adverbial', `${stem}く`],
-      ['て形', 'te-form', `${stem}くて`],
-      ['た形', 'past', `${stem}かった`],
-      ['ない形', 'negative', `${stem}くない`],
-      ['ば形', 'conditional', `${stem}ければ`],
-    ];
-  }
-  return null;
-}
 
-function renderConjugation(sheet, word, pos) {
-  const rows = conjugations(word, pos);
-  if (!rows) return;
-  sheet.append(withEn(el('p', 'eyebrow', '活用'), 'conjugation', 'en-inline'));
-  const table = el('div', 'conj-table');
-  for (const [ja, en, form] of rows) {
-    const row = el('div', 'conj-row');
-    const label = el('span', 'conj-label');
-    label.append(document.createTextNode(ja));
-    if (bi()) label.append(el('span', 'conj-en', en));
-    row.append(label);
-    row.append(el('span', 'conj-form', form));
-    table.append(row);
-  }
-  sheet.append(table);
-}
 
 /* ------------------------------- complete JMdict senses on the word sheet
  * The deep tier's shard holds the entry's full record: numbered senses with
@@ -38109,172 +29962,10 @@ function renderConjugation(sheet, word, pos) {
  * JMdict's own cross-references and antonyms. Those relations are the
  * dictionary's voice, kept apart from the hand-written 類語 clusters — a
  * JMdict xref is never dressed up as an authored synonym note. */
-function relationTarget(tuple) {
-  return Array.isArray(tuple) ? String(tuple[0] || '').replace(/・\d+$/, '') : '';
-}
 
-function relationReadingQualifier(value) {
-  return typeof value === 'string' ? value.replace(/・\d+$/, '') : '';
-}
 
-function dictionaryRelationRoute(tuple, from) {
-  const target = relationTarget(tuple);
-  if (!target) return null;
-  const rows = dictionaryRowsForForm(target);
-  for (const qualifier of tuple.slice(1)) {
-    const readingQualifier = relationReadingQualifier(qualifier);
-    if (!readingQualifier) continue;
-    for (const row of rows) {
-      const summary = dictionaryReadingSummaries(row).find(
-        (candidate) =>
-          kataToHira(candidate[0]) === kataToHira(readingQualifier) &&
-          dictionaryReadingSupportsForm(row, candidate[0], target),
-      );
-      if (summary) {
-        return { t: 'word', id: target, seq: String(row[0]), reading: summary[0], from };
-      }
-    }
-  }
-  if (
-    D.dictionaryMode === 'worker' &&
-    D.dictionaryState === 'ready' &&
-    !D.dictionaryCompleteForms?.has(target)
-  ) {
-    const reading = tuple.slice(1).map(relationReadingQualifier).find(Boolean) || '';
-    return { t: 'word', id: target, from, dictionaryPendingLookup: true, ...(reading ? { reading } : {}) };
-  }
-  if (rows.length || lookup(target)) return { t: 'word', id: target, from };
-  return null;
-}
 
-function renderDictionaryRelations(container, titleJa, titleEn, tuples, node) {
-  if (!tuples?.length) return;
-  const block = el('div', 'dictionary-relations');
-  block.append(withEn(el('p', 'dictionary-rel-title', titleJa), titleEn, 'en-inline'));
-  for (const tuple of tuples) {
-    const target = relationTarget(tuple);
-    if (!target) continue;
-    const route = dictionaryRelationRoute(tuple, node.from);
-    const routable = !!route;
-    const row = el(routable ? 'button' : 'div', routable ? 'dictionary-rel' : 'dictionary-rel muted');
-    if (routable) {
-      row.type = 'button';
-      row.addEventListener('click', async () => {
-        let destination = route;
-        if (route.dictionaryPendingLookup) {
-          try {
-            await ensureDictionaryRowsForForm(target);
-            destination = dictionaryRelationRoute(tuple, node.from);
-          } catch {
-            return;
-          }
-        }
-        if (!destination) return;
-        const resolved = { ...destination };
-        delete resolved.dictionaryPendingLookup;
-        go(resolved);
-      });
-    }
-    row.append(el('span', 'dictionary-rel-word', target));
-    // The compact detail tuple may end with an internal source/sense integer.
-    // Only JMdict's textual qualifiers belong in the visible relation note.
-    const qualifier = tuple.slice(1).filter((value) => typeof value === 'string').join(' · ');
-    if (qualifier) row.append(el('span', 'dictionary-rel-note', qualifier));
-    if (routable) row.append(el('span', 'row-go', '›'));
-    block.append(row);
-  }
-  container.append(block);
-}
 
-function renderDictionaryDetails(container, details, node) {
-  details.forEach((entry, entryIndex) => {
-    const [, kanjiForms, kanaForms, senses] = entry;
-    const block = el('section', 'dictionary-entry');
-    if (details.length > 1 || kanjiForms.length > 1 || kanaForms.length > 1) {
-      const forms = el('div', 'dictionary-forms');
-      const spellings = kanjiForms.map((form) => form[0]);
-      if (spellings.length) forms.append(el('span', 'dictionary-spellings', spellings.join('・')));
-      forms.append(el('span', 'dictionary-readings', kanaForms.map((form) => form[0]).join('・')));
-      block.append(forms);
-    }
-    // a usage tag every sense of this entry carries (うかな書き on ため, 丁寧語 on よろしくお願いします): once, at the entry
-    const usageOf = (sense) => [...(sense[5] || []), ...(sense[6] || []), ...(sense[7] || [])];
-    const entryWideTags = senses.length
-      ? [...new Set(usageOf(senses[0]).filter((tag) => senses.every((sense) => usageOf(sense).includes(tag))))]
-      : [];
-    if (entryWideTags.length) block.append(el('p', 'sense-usage dictionary-usage', quietUsageTags(entryWideTags)));
-    let previousPos = '';
-    senses.forEach((sense, senseIndex) => {
-      const [
-        partOfSpeech,
-        appliesToKanji,
-        appliesToKana,
-        related,
-        antonym,
-        field,
-        dialect,
-        misc,
-        info,
-        languageSources,
-        glosses,
-      ] = sense;
-      const section = el('div', 'dictionary-sense');
-      section.append(el('span', 'dictionary-sense-number', String(senseIndex + 1)));
-      const body = el('div', 'dictionary-sense-body');
-      const pos = posLine(partOfSpeech);
-      // Hfix-2d r2 · the part-of-speech line holds parts of speech only, printed when it changes (and always
-      // on the sense this text uses); field, dialect and usage tags sit beside their own sense as quiet
-      // bracketed tags, and a tag every sense carries shows once, at the entry
-      const usageTags = [...new Set([...field, ...dialect, ...misc])].filter((tag) => !entryWideTags.includes(tag));
-      const inText = node?.sense || SENSE_BY_ANCHOR.get(heroSource.get(node));
-      const isTextSense = inText && String(inText.seq) === String(entry[0]) && Number(inText.k) === senseIndex;
-      if (pos && (pos !== previousPos || isTextSense)) body.append(el('p', 'sense-pos', pos));
-      if (pos) previousPos = pos;
-      if (usageTags.length) body.append(el('p', 'sense-usage', quietUsageTags(usageTags)));
-      const restrictions = [];
-      if (appliesToKanji?.length && appliesToKanji[0] !== '*') {
-        restrictions.push(tx(`${appliesToKanji.join('・')} の語義`, `for ${appliesToKanji.join('・')}`));
-      }
-      if (appliesToKana?.length && appliesToKana[0] !== '*') {
-        restrictions.push(tx(`${appliesToKana.join('・')} の読み`, `with reading ${appliesToKana.join('・')}`));
-      }
-      if (restrictions.length) body.append(el('p', 'dictionary-restriction', restrictions.join(' · ')));
-      const meanings = glosses.map((gloss) => {
-        const [text, gender, type] = gloss;
-        const marks = [type, gender].filter(Boolean);
-        return marks.length ? `${text} (${marks.join(', ')})` : text;
-      });
-      if (meanings.length === 1) body.append(el('p', 'gloss', meanings[0]));
-      else {
-        const list = el('ul', 'dictionary-glosses');
-        for (const meaning of meanings) list.append(el('li', null, meaning));
-        body.append(list);
-      }
-      for (const note of info || []) body.append(el('p', 'dictionary-info', note));
-      if (languageSources?.length) {
-        const sources = languageSources
-          .map(([lang, full, wasei, text]) =>
-            [lang, text, full ? 'full form' : null, wasei ? 'wasei' : null].filter(Boolean).join(' · '),
-          )
-          .join('; ');
-        body.append(el('p', 'dictionary-info', tx(`語源 ${sources}`, `source ${sources}`)));
-      }
-      renderDictionaryRelations(body, '関連する語', 'related words', related, node);
-      renderDictionaryRelations(body, '対義語', 'opposites', antonym, node);
-      // R3 · the sense the word's text uses, marked among them all (senseDoor): the node's, else the one the slip of the
-      // word it was opened from showed
-      if (isTextSense) {
-        section.classList.add('dictionary-sense-in-text');
-        section.setAttribute('aria-current', 'true');
-        body.prepend(el('p', 'dictionary-info', tx('この文での意味', 'the meaning in this text')));
-      }
-      section.append(body);
-      block.append(section);
-    });
-    if (entryIndex < details.length - 1) block.append(el('div', 'dictionary-entry-rule'));
-    container.append(block);
-  });
-}
 
 /** The entries a word sheet offers as doors for one written form: every entry and reading
  * whose own restriction permits the form, in the form's row order. The sheet
@@ -38283,136 +29974,16 @@ function renderDictionaryDetails(container, details, node) {
  * `enabledOnCore`: a seq-less sheet for a core spelling stands for the core record, not for
  * any entry (wordNodeIdentity), so it renders this choice as an enabled door that pushes its
  * own entry and exact reading, a lone choice included (「辞書の項目」). */
-function dictionaryHomographChoices(form) {
-  const choices = [];
-  const seen = new Set();
-  for (const row of dictionaryRowsForForm(form)) {
-    for (const summary of dictionaryReadingSummaries(row)) {
-      if (!dictionaryReadingSupportsForm(row, summary[0], form)) continue;
-      const key = `${row[0]}\u0000${summary[0]}\u0000${summary[1]}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      choices.push({ row, summary: [summary[0], form, summary[2]] });
-    }
-  }
-  const enabledOnCore = !!D.dict?.[form];
-  return choices.map((choice) => ({ ...choice, enabledOnCore }));
-}
 
 /** G1 · one line per gloss (Grok e-111: 海 listed うみ, み, わた and わだ, each "sea" — four readings of one entry).
  * The readings of one entry whose first gloss is the same collapse into one line: its reading first (the open one when
  * it is among them, else the most common, first in row order), the others after "also". Two entries never fold into one
  * line, even with the same gloss (年 とし and 年 ねん stay two doors); a reading with no gloss of its own stands alone. */
-function homographLines(choices, isActive) {
-  const lines = [];
-  const byGloss = new Map();
-  for (const choice of choices) {
-    const gloss = String(choice.summary[2] || '').trim().toLowerCase();
-    const key = gloss ? `${choice.row[0]}\u0000${gloss}` : null;
-    const line = key ? byGloss.get(key) : null;
-    if (line) { line.members.push(choice); continue; }
-    const fresh = { members: [choice] };
-    if (key) byGloss.set(key, fresh);
-    lines.push(fresh);
-  }
-  return lines.map(({ members }) => {
-    const active = members.find(isActive) || null;
-    const head = active || members[0];
-    return { head, also: members.filter((member) => member !== head), active: !!active };
-  });
-}
 
 /** Hfix-1A · the entry's spellings line goes into its head: the head's word becomes every spelling (総理・綜理), and the
  * readings the door does not open follow it quietly (ほかに じょうて); the line itself is not drawn twice. */
-function foldEntryForms(box) {
-  const head = box.querySelector(':scope > .is-entry-head .dictionary-homograph');
-  const forms = box.querySelector(':scope > .dictionary-entry > .dictionary-forms');
-  if (!head || !forms) return;
-  const word = head.querySelector('.row-word');
-  const spellings = forms.querySelector('.dictionary-spellings')?.textContent || '';
-  if (word?.firstChild?.nodeType === 3 && spellings) word.firstChild.textContent = spellings;
-  const reading = head.querySelector('.row-reading')?.textContent || '';
-  const others = (forms.querySelector('.dictionary-readings')?.textContent || '').split('・').filter((r) => r && kataToHira(r) !== kataToHira(reading));
-  if (others.length && word && !word.querySelector('.row-also')) {
-    const more = el('span', 'row-also', tx('ほかに ', 'also '));
-    const kana = el('span', null, others.join(tx('、', ', ')));
-    kana.lang = 'ja';
-    more.append(kana);
-    word.append(more);
-  }
-  forms.remove();
-}
 /** Hfix-1A · whether a seq-less core page's entries are one lone door (D23 B2): the door is then the head of that entry's
  * own block (renderWordNode), never a second copy of it. */
-function dictionaryLoneDoor(node) {
-  if (node.seq != null && node.seq !== '') return false;
-  const choices = dictionaryHomographChoices(node.id);
-  return choices.length === 1 && choices[0].enabledOnCore;
-}
-function renderDictionaryHomographs(container, node, { head = false } = {}) {
-  const choices = dictionaryHomographChoices(node.id);
-  const seqless = node.seq == null || node.seq === '';
-  // a seq-less core sheet shows even a lone entry, as a door (D23 B2)
-  const coreDoors = seqless && choices.some((choice) => choice.enabledOnCore);
-  if (choices.length <= 1 && !coreDoors) return;
-  // Hfix-1A · the lone door as the head of its entry's block: its spellings and reading, the senses under it say the rest
-  head = head && choices.length === 1;
-  const currentSeq = String(node.seq || node.dictionaryResolvedSeq || '');
-  const currentReading = kataToHira(node.reading || lookup(node.id, node.seq)?.r || '');
-  const block = el('div', head ? 'dictionary-homographs is-entry-head' : 'dictionary-homographs');
-  block.append(
-    choices.length === 1
-      ? withEn(el('p', 'dictionary-rel-title', '辞書の項目'), 'Dictionary entry', 'en-inline')
-      : withEn(
-        el('p', 'dictionary-rel-title', `同じ形の ${choices.length} 項目`),
-        `${choices.length} readings or entries share this form`,
-        'en-inline',
-      ),
-  );
-  // only an explicit sheet's own entry is no door to itself; on a seq-less core sheet the
-  // resolved entry the senses below come from is still a door (D23, Codex 16:20:08Z)
-  const isActive = ({ row, summary, enabledOnCore }) => !(seqless && enabledOnCore) && String(row[0]) === currentSeq &&
-    (!currentReading || kataToHira(summary[0]) === currentReading);
-  for (const { head, also, active } of homographLines(choices, isActive)) {
-    const [seq] = head.row;
-    const [reading, headForm, primaryGloss] = head.summary;
-    const choice = el('button', active ? 'dictionary-homograph active' : 'dictionary-homograph');
-    choice.type = 'button';
-    choice.dataset.dictionaryEntry = String(seq);
-    if (also.length) choice.dataset.alsoEntries = also.map((member) => String(member.row[0])).join(' ');
-    choice.setAttribute('aria-pressed', String(active));
-    const stack = el('span', 'row-stack');
-    const top = el('span', 'row-word');
-    top.append(document.createTextNode(headForm));
-    if (reading) top.append(el('span', 'row-reading', reading));
-    if (also.length) {
-      const readings = also.map((member) => member.summary[0]).filter(Boolean);
-      const more = el('span', 'row-also', tx('ほかに ', 'also '));
-      const kana = el('span', null, readings.join(tx('、', ', ')));
-      kana.lang = 'ja';
-      more.append(kana);
-      top.append(more);
-    }
-    stack.append(top);
-    if (primaryGloss && !head) stack.append(el('span', 'row-gloss', primaryGloss));
-    if (head) choice.setAttribute('aria-label', tx(`辞書の項目「${headForm}」${reading}をひらく`, `Open the dictionary entry ${headForm} ${reading}`));
-    choice.append(stack, el('span', 'row-go', active ? '·' : '›'));
-    choice.addEventListener('click', () => {
-      // guard by CONTENT, not object identity — async dictionary resolution
-      // can replace the stack-top object after this row rendered, and the
-      // identity check made the tap a silent no-op
-      const top = S.stack[S.stack.length - 1];
-      if (active || !top || top.t !== 'word' || top.id !== node.id) return;
-      // a homograph is a DOOR, not a correction: it PUSHES, so ← 戻る
-      // returns to the entry the learner was reading (replacing the stack
-      // top made back close the whole sheet — P1, full-instrument review). G1: it opens as every page does (go)
-      go({ t: 'word', id: headForm, seq: String(seq), reading, from: node.from || null },
-        { invoker: choice, from: choice.querySelector('.row-word') });
-    });
-    block.append(choice);
-  }
-  container.append(block);
-}
 
 // Background word data must not replace a pressed control between pointerdown
 // and click. User actions still render immediately; only these async refreshes
@@ -38470,22 +30041,6 @@ function refreshWordSheet(node) {
   else render();
 }
 
-function requestDictionaryDetails(node) {
-  if (node.dictionaryPending || node.dictionaryReady) return;
-  node.dictionaryPending = true;
-  node.dictionaryError = null;
-  ensureDictionaryDetails(node)
-    .then(() => {
-      node.dictionaryPending = false;
-      node.dictionaryReady = true;
-      refreshWordSheet(node);
-    })
-    .catch((err) => {
-      node.dictionaryPending = false;
-      node.dictionaryError = err;
-      refreshWordSheet(node);
-    });
-}
 
 /* ------------------------------------ D11 · a reader token's full-entry door
  * The long hold (and the mini's 全項目 and the focus pill, which share it)
@@ -38533,41 +30088,6 @@ const READER_KANA = /^[\p{Script=Hiragana}\p{Script=Katakana}ー]+$/u;
  *       too; ゆく → 行く, whose secondary reading it is);
  *   (c) with no base form, or one in neither script (JR, No), the token's own
  *       reading stands in for it. */
-function readerChoiceMatch(choice, rows) {
-  // R2 · an inflected token is matched as its dictionary form read the text's way (choice.form, choice.reading)
-  const base = choice.form || choice.b || '';
-  const spelled = READER_KANJI.test(base);
-  const key = (spelled || READER_KANA.test(base) ? base : choice.r) || '';
-  const reading = spelled ? '' : kataToHira(key);
-  const by = spelled ? 'spelling' : 'reading';
-  if (!key || (!spelled && !reading)) return { by, key, rows: [] };
-  const collect = (fits) => {
-    const found = [];
-    for (const row of rows) {
-      const k = row[5].findIndex((kana, index) => fits(row, kana, index));
-      if (k < 0) continue;
-      // a kana match is shown under a spelling its own reading permits (垂れ for だれ,
-      // not the entry's kana head たれ), or as itself when it is kana only (ダレ)
-      const head = spelled ? base : row[4].find((form) => readerReadingFits(row, k, form)) || row[5][k];
-      found.push({ seq: String(row[0]), head, reading: row[5][k], gloss: readerSummaryFor(row, k)[2] });
-    }
-    return found;
-  };
-  if (!spelled) return { by, key, rows: collect((row, kana) => kataToHira(kana) === reading) };
-  const written = (row, kana, index) => readerReadingFits(row, index, base);
-  // an uninflected token's own reading is evidence: 産 read さん in 産巣日 is not ウブ.
-  // An inflected one (分かっ for 分かる) says nothing about the dictionary form's reading by itself; R2: the reading
-  // derived from it (choice.reading) is the dictionary form's
-  const surface = choice.form ? kataToHira(choice.reading || '') : choice.s === base ? kataToHira(choice.r || '') : '';
-  if (!surface) return { by, key, rows: collect(written) };
-  const matching = collect((row, kana, index) => written(row, kana, index) && kataToHira(kana) === surface);
-  if (matching.length) return { by, key, rows: matching };
-  // no entry of this spelling carries the text's reading (the tokenizer may be wrong, or the word a
-  // fragment): its entries are offered as explicit candidates under their own readings — never opened
-  // for the learner, never called absent (産 is listed, as うぶ). With no entry at all, it is absent.
-  const offered = collect(written);
-  return offered.length ? { by, key, rows: offered, mismatch: (choice.form ? choice.reading : choice.r) || surface } : { by, key, rows: [] };
-}
 
 /** Whether the listed reading at kanaIndex may be printed with this spelling, by that
  * reading's OWN restriction (cell 11: 0 every written form, 1 none, an array the
@@ -38592,33 +30112,8 @@ function readerSummaryFor(row, kanaIndex) {
   return summary ? [kana, summary[1] || row[1] || '', summary[2] || ''] : [kana, row[1] || '', row[3] || ''];
 }
 
-function readerEntryNode(token, index, p) {
-  // R · the entry the token's own reading names, as its slip showed it (readingToken): 年 read ねん opens ねん's
-  // entry; before the full dictionary answers, a core spelling carries the reading and its sheet resolves it.
-  // R2 · the page is the door's: an inflected word's dictionary form read the text's way (its entry, or its D11 choice
-  // matched by that reading), a sound change's entry by the entry's own reading, a lone kanji's page
-  const door = readingToken(token);
-  if (door.kanjiOnly) return { t: 'kanji', id: door.b, from: { passage: p.id, index } };
-  // R3 · the page marks the sense its text uses (senseDoor)
-  const node = { t: 'word', id: door.b, from: { passage: p.id, index }, ctxScope: 'sent',
-    ...(door.sense?.seq ? { sense: { seq: door.sense.seq, k: door.sense.k } } : {}) };
-  const own = tokenReading(door);
-  if (door.seq) return { ...node, seq: door.seq, reading: door.r || own };
-  // R2 · an unfit door (a verb read like the quick dictionary's noun) never opens that noun's page: it is matched like a
-  // word the quick dictionary lacks (D11), by its reading
-  if (D.dict[door.b] && readingAsksIndex(door.b, own) && !door.unfit) return { ...node, reading: own };
-  if (D.dict[door.b] && !door.unfit) return node;
-  node.readerChoice = { passage: p.id, index, s: token.s, b: token.b, r: token.r || '', state: 'pending',
-    ...(door !== token ? { form: door.b, reading: own } : {}) };
-  return node;
-}
 
 /** The token a choice was opened from still stands where it stood. */
-function readerChoiceTokenHolds(choice) {
-  if (S.view !== 'reader' || S.passageId !== choice.passage) return false;
-  const token = D.passages?.find((p) => p.id === choice.passage)?.tokens?.[choice.index];
-  return !!token && token.s === choice.s && token.b === choice.b && (token.r || '') === choice.r;
-}
 
 function resolveReaderChoice(node) {
   const choice = node.readerChoice;
@@ -38663,170 +30158,18 @@ function resolveReaderChoice(node) {
 /** Why 覚 is off for a reader token the core dictionary lacks: one reason,
  * said wherever the reader could otherwise capture it (this path's sheets,
  * the mini, the chrome seal). A core hit captures exactly as before. */
-function readerCaptureReasonText(spelling) {
-  return tx(
-    `「${spelling}」は簡易辞書にないため、ここでは保存できません。全項目で全辞書を引けます。`,
-    `${spelling} isn't in the quick dictionary, so it can't be saved here. Full entry looks it up in the whole dictionary.`,
-  );
-}
 
-function readerCaptureReason(node) {
-  const reason = el('p', 'reader-choice-capture', readerCaptureReasonText(node.id));
-  reason.id = 'reader-choice-capture';
-  return reason;
-}
 
-function holdReaderCapture(button) {
-  button.disabled = true;
-  button.classList.add('reader-capture-held');
-  button.setAttribute('aria-describedby', 'reader-choice-capture');
-}
 
 /** The sheet of a reader token before any entry is open: matching, the
  * candidates, or an honest reason there is nothing to open. */
-function renderReaderChoice(sheet, node) {
-  const choice = node.readerChoice;
-  const head = el('h2', 'headword');
-  head.append(document.createTextNode(node.id));
-  sheet.append(head);
-  // R2 · an inflected word's page reads as its dictionary form is read in the text (おい → おく), never the surface's ruby
-  const shownReading = choice.form ? choice.reading : choice.r;
-  if (shownReading) sheet.append(el('p', 'reading', shownReading));
-  const box = el('div', 'reader-choice');
-  box.id = 'reader-choice';
-  box.dataset.state = choice.state;
-  if (choice.by) box.dataset.by = choice.by;
-  if (choice.state === 'pending') {
-    // the existing opening line: the index opens off the main thread
-    box.append(el('p', 'dictionary-opening', tx('語義と用法をひらいています…', 'Opening complete senses and usage…')));
-    queueMicrotask(() => resolveReaderChoice(node));
-  } else if (choice.state === 'unavailable') {
-    const warning = el('p', 'dictionary-warning', tx(
-      '全辞書をひらけないため、この語に合う項目を選べない。読み物と簡易辞書はそのまま使える。',
-      'The full dictionary could not be opened, so no entry can be matched to this word. The reader and its quick dictionary still work.',
-    ));
-    warning.id = 'reader-choice-unavailable';
-    const retry = biLabel('button', 'dictionary-retry', 'もう一度ひらく', 'try the full dictionary again');
-    retry.type = 'button';
-    retry.id = 'reader-choice-retry';
-    retry.addEventListener('click', () => {
-      if (S.stack.at(-1) !== node || choice.state !== 'unavailable') return;
-      choice.state = 'pending';
-      render();
-    });
-    box.append(warning, retry);
-  } else if (choice.state === 'moved') {
-    const moved = el('p', 'dictionary-warning', tx(
-      '辞書をひらく間に本文が変わったため、この語は照合していない。本文からもう一度ひらいてください。',
-      'The text changed while the dictionary opened, so this word was not matched. Open it again from the text.',
-    ));
-    moved.id = 'reader-choice-moved';
-    box.append(moved);
-  } else if (choice.state === 'none') {
-    // name what was actually missing: no entry for the form at all; a listed spelling no reading is
-    // permitted for (田ぼ, Codex D11 r4 review); or no entry read the way a kana base is
-    const none = el('p', 'gloss absent', !choice.formRows
-      ? tx('この語は辞書にない。', 'This word is not in the dictionary.')
-      : choice.by === 'spelling'
-        ? tx('辞書にこの書き方は載っているが、この書き方で読める項目はない。', 'The dictionary lists this spelling, but no entry permits a reading for it.')
-      : choice.key
-        ? tx(`辞書に、読み「${choice.key}」の項目はない。`, `No dictionary entry is read ${choice.key}.`)
-        : tx('この語には読みがないため、辞書の項目と照合できない。', 'This word carries no reading, so it cannot be matched to a dictionary entry.'));
-    none.id = 'reader-choice-none';
-    box.append(none);
-  } else if (choice.state === 'choose') {
-    const title = withEn(
-      el('p', 'reader-choice-title', '候補から選ぶ（この文での意味は確かめてください）'),
-      'Choose the word — check it fits this sentence',
-      'en-inline',
-    );
-    title.id = 'reader-choice-title';
-    box.setAttribute('role', 'group');
-    box.setAttribute('aria-labelledby', title.id);
-    box.append(title);
-    if (choice.mismatch) {
-      const mismatch = el('p', 'dictionary-warning', tx(
-        `辞書に、この書き方で読み「${choice.mismatch}」の項目はない。別の読みの項目：`,
-        `No entry with this spelling is read ${choice.mismatch}. Entries with other readings:`,
-      ));
-      mismatch.id = 'reader-choice-mismatch';
-      box.append(mismatch);
-    }
-    for (const candidate of choice.candidates) {
-      const button = el('button', 'reader-choice-row');
-      button.type = 'button';
-      button.id = `reader-choice-${candidate.seq}`;
-      button.dataset.readerChoice = candidate.seq;
-      button.setAttribute('aria-label', [candidate.head, candidate.reading, candidate.gloss].filter(Boolean).join(' · '));
-      const stack = el('span', 'row-stack');
-      const word = el('span', 'row-word');
-      word.append(document.createTextNode(candidate.head), el('span', 'row-reading', candidate.reading));
-      stack.append(word);
-      if (candidate.gloss) stack.append(el('span', 'row-gloss', candidate.gloss));
-      const arrow = el('span', 'row-go', '›');
-      arrow.setAttribute('aria-hidden', 'true');
-      button.append(stack, arrow);
-      button.addEventListener('click', () => {
-        if (S.stack.at(-1) !== node) return;
-        // the article token keeps its identity (id, from); the chosen entry
-        // rides only as seq/reading, exactly as a homograph door opens one
-        go({
-          t: 'word', id: node.id, seq: candidate.seq, reading: candidate.reading, matchedHead: candidate.head,
-          matchedGloss: candidate.gloss || null,
-          from: node.from, ctxScope: 'sent',
-          readerChoice: {
-            passage: choice.passage, index: choice.index, s: choice.s, b: choice.b, r: choice.r,
-            by: choice.by, key: choice.key, state: 'chosen',
-          },
-        }, { invoker: button });
-      });
-      box.append(button);
-    }
-    if (choice.total > choice.candidates.length) {
-      box.append(el('p', 'reader-choice-more', tx(
-        `候補 ${choice.total} 件のうち ${choice.candidates.length} 件を表示`,
-        `Showing ${choice.candidates.length} of ${choice.total} candidates`,
-      )));
-    }
-  }
-  box.append(readerCaptureReason(node));
-  sheet.append(box);
-}
 
 /** An entry opened from a reader token says how it was matched. */
-function renderReaderChoiceNote(sheet, node) {
-  const choice = node.readerChoice;
-  const note = el('div', 'reader-choice-note');
-  note.id = 'reader-choice-note';
-  note.dataset.seq = String(node.seq);
-  note.dataset.state = choice.state;
-  if (choice.by) note.dataset.by = choice.by;
-  const single = choice.by === 'spelling'
-    ? tx(`表記「${choice.key}」の項目はこれ一つ（この文での意味は確かめてください）`, `The one entry written ${choice.key} — check it fits this sentence`)
-    : tx(`読み「${choice.key}」の項目はこれ一つ（この文での意味は確かめてください）`, `The one entry read ${choice.key} — check it fits this sentence`);
-  note.append(el('p', null, choice.state === 'single'
-    ? single
-    : tx('候補から選んだ項目（この文での意味は確かめてください）', 'Chosen from the candidates — check it fits this sentence')));
-  note.append(readerCaptureReason(node));
-  sheet.append(note);
-}
 
 /** G1 · the page's examples, the tapped word's own first (Codex gap 17): the article's sentence it was tapped in, then
  * one short example with its English (the bank's sentences are human-translated); everything else — other articles' long
  * source sentences, tables, vote counts — folds under "More examples". With neither, the shortest example leads. */
 const SHORT_EXAMPLE_CHARS = 40;
-function exampleOrder(node, examples) {
-  const own = ownSentenceExample(node);
-  const text = (ex) => ex.tokens.map((token) => token.s).join('');
-  // the shelf's copy of the same sentence (its bounds may differ by a bracket) is the word's own one, not another example
-  const index = node.from?.index;
-  const rest = examples.filter((ex) => !own || !(ex.passage === own.passage && Number.isInteger(ex.start) &&
-    ex.start <= index && index < ex.start + ex.tokens.length));
-  const short = rest.find((ex) => ex.en && [...text(ex)].length <= SHORT_EXAMPLE_CHARS) || null;
-  let first = [own, short].filter(Boolean);
-  if (!first.length && rest.length) first = [[...rest].sort((a, b) => [...text(a)].length - [...text(b)].length)[0]];
-  return { first, more: rest.filter((ex) => !first.includes(ex)) };
-}
 /** The sentence of its article a word was tapped in, as an example (null when it was not opened from an article). */
 function ownSentenceExample(node) {
   const passageId = node.from?.passage;
@@ -39108,49 +30451,6 @@ const RADICAL_VARIANT = {
 };
 const GLUE_STROKE = new Set(['丶', '丿', '乀', '乁', '乛', '乚']);
 const _compsCache = new Map();
-function _strokeOf(x) {
-  const k = D.kanji[x];
-  if (k && k.st) return k.st;
-  const r = D.radicals[x];
-  if (r && r.st) return r.st;
-  return null;
-}
-function _componentsOf(q) {
-  if (_compsCache.has(q)) return _compsCache.get(q);
-  const out = new Set();
-  const kv = D.kanji[q];
-  if (kv && kv.parts) for (const p of kv.parts) if (p !== q) out.add(p);
-  const r = D.radicals[q];
-  if (r && r.kanji && r.kanji.length >= 2 && r.kanji.length <= 12) {
-    const lists = r.kanji.filter((x) => D.kanji[x]).map((x) => new Set(D.kanji[x].parts));
-    if (lists.length >= 2) {
-      const [first, ...rest] = lists;
-      const qInK = !!D.kanji[q];
-      const sq = _strokeOf(q);
-      for (const p of first) {
-        if (p === q || !rest.every((s) => s.has(p))) continue;
-        const sp = _strokeOf(p);
-        if (qInK && D.kanji[p] && sp != null && sq != null && sp > sq) continue;
-        out.add(p);
-      }
-    }
-  }
-  out.delete(q);
-  _compsCache.set(q, out);
-  return out;
-}
-function _allSub(q) {
-  const seen = new Set();
-  const stack = [..._componentsOf(q)];
-  while (stack.length) {
-    const x = stack.pop();
-    if (x !== q && !seen.has(x)) {
-      seen.add(x);
-      for (const y of _componentsOf(x)) stack.push(y);
-    }
-  }
-  return seen;
-}
 /* Q · each part once, at its own level (Q/DESIGN.md §6; Grok's walk: 総 read 糸 + 忩 + 公, and 公 is 忩's own part; the
  * inventory found 364 kanji showing a part beside its own part or twice in two forms, 月 + 肉 in 42 of them):
  *  - a part the list names twice, as it is written and as its standalone form, is shown once, as written: the written
@@ -39164,57 +30464,10 @@ const PART_WRITTEN = Object.fromEntries([...Object.entries(RADICAL_VARIANT).map(
   ['刂', ['刀']], ['攵', ['攴']], ['罒', ['网']], ['灬', ['火']], ['氺', ['水']], ['冫', ['氷', '水']], ['月', ['肉']]]);
 /** a part's strokes as it is written in a Japanese kanji, where the data has none or counts the older form (辶: 4 → 3) */
 const PART_STROKES = { 辶: 3, 亻: 2, 彳: 3, 氵: 3, 冫: 2, 扌: 3, 忄: 3, 犭: 3, 阝: 3, 艹: 3, 礻: 4, 衤: 5, 刂: 2, 灬: 4, 罒: 5, 攵: 4, '⺍': 3 };
-function mainParts(c) {
-  const k = D.kanji[c];
-  if (!k || !k.parts || !k.parts.length) return [];
-  const listed = [...new Set(k.parts)];
-  // a part named twice, as written and as its standalone form, is the written one (first, so neither is taken for a
-  // piece of the other)
-  const P = listed.filter((p) => p !== c && !listed.some((v) => v !== p && (PART_WRITTEN[v] || []).includes(p)));
-  const subs = new Map(P.map((q) => [q, _allSub(q)]));
-  const st = P.map((p) => PART_STROKES[p] ?? _strokeOf(p));
-  // the parts that make the kanji exactly, stroke for stroke, none inside another: the fewest (its own level: 総 = 糸 +
-  // 忩, not 糸 + 公 + 心; 党 = 尚 + 儿), and of those the ones the list names first
-  if (k.st && P.length > 1 && P.length <= 12) {
-    let best = null;
-    for (let mask = 1; mask < 1 << P.length; mask += 1) {
-      const order = P.map((_, i) => i).filter((i) => mask & (1 << i));
-      if (order.length < 2 || (best && order.length > best.length)) continue;
-      if (order.some((i) => !st[i]) || order.reduce((sum, i) => sum + st[i], 0) !== k.st) continue;
-      if (order.some((i) => order.some((j) => j !== i && subs.get(P[j]).has(P[i])))) continue;
-      if (!best || order.length < best.length || order.join() < best.join()) best = order;
-    }
-    if (best) return best.map((i) => P[i]).slice(0, 3);
-  }
-  // no exact cover in the data: the top level by the lists alone, and the stroke budget (a part before its own parts:
-  // one that would take the parts shown past the kanji's strokes is a piece of one already shown)
-  let keep = P.filter((p) => !P.some((q) => q !== p && subs.get(q).has(p)));
-  if (keep.length > 1) keep = keep.filter((p) => !GLUE_STROKE.has(p));
-  if (k.st) {
-    let strokes = 0;
-    keep = keep.filter((p) => {
-      if (strokes >= k.st) return false;
-      const n = PART_STROKES[p] ?? _strokeOf(p);
-      if (!n) return true;
-      if (strokes + n > k.st) return false;
-      strokes += n;
-      return true;
-    });
-  }
-  return keep.slice(0, 3);
-}
 /** Q · a part's name in English: its plain meaning (月 standing for the 肉 the list also names, in 胃 and 腕, is meat),
  * without the catalogue's words: the name before "Radical" ("Net Radical Variant (no. 122)" → net), before a note in
  * brackets (the kanji table stops its meanings at 36 letters, mid-note: "Bud (plants, Mushrooms Not Yet Opene" → bud),
  * the first sense. The word web names its kanji and parts by the same rule. */
-function partGloss(c, part) {
-  const flesh = part === '月' && (D.kanji?.[c]?.parts || []).includes('肉');
-  // a written form with no meaning of its own takes its standalone form's (亻 is person)
-  return partMeaning(D.kanji?.[flesh ? '肉' : part]?.m) || partMeaning(D.kanji?.[(PART_WRITTEN[part] || [])[0]]?.m);
-}
-function partMeaning(text) {
-  return String(text || '').split('(')[0].replace(/\s*\bradical\b.*$/iu, '').split(/[;,]/u)[0].replace(/\s{2,}/gu, ' ').trim().toLowerCase();
-}
 
 /** The label on a 部品 row. 729 of the 926 components in the KANJIDIC/漢検
  * layer carry an empty `name` — they are shape components, not Kangxi radicals,
@@ -39222,13 +30475,6 @@ function partMeaning(text) {
  * nothing, and made a live door look like a dead one. The honest line says what
  * IS known and what the door actually opens: the family of kanji built from
  * this shape, which is exactly what renderRadicalNode() shows on the far side. */
-function componentLabel(c) {
-  const r = D.radicals[c];
-  if (r?.name) return r.name;
-  const n = r?.kanjiCount;
-  if (n) return tx(`部品 — ${n} 字に使われる`, `component — used in ${n} kanji`);
-  return tx('部品 — 漢検の部首表に名前がない', 'component — no name in the Kanji Kentei radical table');
-}
 
 /* まぎらわしい字 — the margin note every paper kanji dictionary keeps:
  * characters that look alike enough to be misread. Hand-authored sets of
@@ -39271,33 +30517,6 @@ function writtenFormNote(tags = []) {
 
 /** Dictionary classification is not visible-part membership or etymology.
  * Preserve both source schemes; never relabel the legacy lesson `rad`. */
-function renderKanjiClassifications(sheet, id, node = {}) {
-  const facts = kanjiFacts(id);
-  if (!facts) return;
-  const number = facts.radicalSchemes.classical;
-  const rad = D.radInfo?.[number];
-  const heading = el('h3', 'list-head', tx('辞書の部首分類', 'Dictionary classification'));
-  sheet.append(heading);
-  const door = el('button', 'rad-door');
-  door.type = 'button';
-  door.dataset.classicalRadical = String(number);
-  door.append(el('span', 'rad-glyph', rad?.c || String(number)));
-  const text = el('span', 'rad-text');
-  text.append(el('span', 'rad-name', tx(`伝統部首 ${number}`, `Classical radical ${number}`)));
-  text.append(el('span', 'rad-sub', `KANJIDIC2${rad?.name ? ` · ${rad.name}` : ''}`));
-  door.append(text, el('span', 'row-go', '›'));
-  door.addEventListener('click', () => go({
-    t: 'catalog', id: `classical-radical:${number}`, by: 'classical-radical', value: number, from: node.from,
-  }, { invoker: door }));
-  sheet.append(door);
-  const nelson = facts.radicalSchemes.nelson;
-  if (nelson != null) {
-    const label = D.radInfo?.[nelson]?.c || '';
-    const line = el('p', 'fine', tx(`Nelson 部首 ${nelson} ${label} — KANJIDIC2`, `Nelson radical ${nelson} ${label} — KANJIDIC2`));
-    line.dataset.nelsonRadical = String(nelson);
-    sheet.append(line);
-  }
-}
 
 /** M2 family navigation is an ephemeral capability, never learner/source-practice identity. */
 let kanjiFamilyTask = null;
@@ -39307,10 +30526,6 @@ const kanjiFamilyMounts = new WeakMap();
 const kanjiFamilyExposures = new WeakMap();
 const kanjiFamilyExamples = new WeakMap();
 const kanjiFamilyViews = new WeakMap();
-function kanjiFamilyLiveVisit() {
-  const visit = S.kanjiCourse;
-  return visit?.unitId === 'shiki-shoku' && recordReady(visit.epoch) ? visit : null;
-}
 function kanjiFamilyTicket(invoker) {
   const visit = S.kanjiCourse;
   return { epoch: recordEpoch, view: S.view, stack: S.stack, top: S.stack.at(-1), visit,
@@ -39332,23 +30547,6 @@ function kanjiFamilyStamp() {
 function kanjiFamilyStampCurrent(stamp) {
   return !!stamp && stamp.runtime === kanjiFamilyRuntime && stamp.epoch === recordEpoch &&
     stamp.visit === kanjiFamilyLiveVisit();
-}
-function kanjiFamilyHelpRow(row, at) {
-  const about = row.about.type === 'word'
-    ? { kind: 'word', term: row.about.id, reading: row.about.reading }
-    : { kind: 'kanji', literal: row.about.id };
-  return { what: row.what, about, reveals: [...row.reveals], at };
-}
-async function kanjiFamilyAuthorize(exposures, ticket) {
-  if (!kanjiFamilyTicketCurrent(ticket)) return false;
-  const visit = kanjiFamilyLiveVisit();
-  if (!visit) return true;
-  const at = Date.now();
-  const outcome = await kanjiCourseRememberHelp(visit, exposures.map((row) => kanjiFamilyHelpRow(row, at)));
-  if (!kanjiFamilyTicketCurrent(ticket) || !['kept', 'held'].includes(outcome?.status)) return false;
-  kanjiCourseApplyHelp(visit);
-  ticket.run = visit.run; // only this accepted projection may advance the captured run
-  return true;
 }
 function loadKanjiFamily() {
   if (kanjiFamilyRuntime) return Promise.resolve(kanjiFamilyRuntime);
@@ -39385,9 +30583,6 @@ function loadKanjiFamily() {
   }).finally(() => { active = false; clearTimeout(timeout); kanjiFamilyTask = null; });
   return kanjiFamilyTask;
 }
-function kanjiFamilyHasExampleOrigin() {
-  return S.stack.some((node) => !!kanjiFamilyResolveExample(node));
-}
 function sanitizeKanjiFamilyExposure(sheet) {
   // Before attachment, remove revoked facts: author display rules can override hidden.
   for (const section of sheet.querySelectorAll('[data-kanji-family-surface]')) {
@@ -39398,34 +30593,6 @@ function sanitizeKanjiFamilyExposure(sheet) {
     exposure.panel.hidden = true;
     exposure.panel.replaceChildren();
   }
-}
-function activateKanjiFamily(sheet) {
-  for (const section of sheet.querySelectorAll('[data-kanji-family-surface]')) kanjiFamilyMounts.get(section)?.();
-}
-function kanjiFamilyControlId(reference, suffix) {
-  return `family-${encodeURIComponent(JSON.stringify(reference))}-${suffix}`;
-}
-function kanjiFamilyStatus(invoker, ja, en) {
-  if (!invoker?.isConnected) return;
-  let status = invoker.parentElement.querySelector('[data-family-status]');
-  if (!status) {
-    status = el('p', 'fine'); status.dataset.familyStatus = ''; status.setAttribute('role', 'status');
-    invoker.after(status);
-  }
-  status.textContent = tx(ja, en);
-}
-function kanjiFamilyRefusal(invoker) {
-  kanjiFamilyStatus(invoker, 'ヘルプの記録を確認できなかったため、内容はまだ表示していません。',
-    'The help record could not be confirmed, so this content has not been shown.');
-}
-function kanjiFamilyCourseExpectation(reference) {
-  const targets = window.BunkiKanjiCourse?.getUnit('shiki-shoku').targets || [];
-  const target = targets.find((value) => value.teachingSentence?.reference?.id === reference.id && value.readings.length === 1);
-  if (!target) return undefined;
-  const sentence = target.teachingSentence;
-  return { word: { type: 'word', id: target.wordKey, reading: target.readings[0] },
-    sentence: sentence.text, english: sentence.english, sourceAttribution: sentence.sourceAttribution,
-    ...(sentence.register ? { register: sentence.register } : {}) };
 }
 async function openKanjiFamilyExample(reference, invoker, expected = undefined) {
   const ticket = kanjiFamilyTicket(invoker);
@@ -39459,55 +30626,6 @@ async function openKanjiFamilyExample(reference, invoker, expected = undefined) 
 }
 
 /** An actual disclosure captures once; repainting an acknowledged panel does not. */
-function renderKanjiFamilyDisclosure(section, node, exposures, renderFacts) {
-  let state = kanjiFamilyViews.get(node);
-  if (!state) { state = { stamp: null, busy: false }; kanjiFamilyViews.set(node, state); }
-  const live = kanjiFamilyLiveVisit();
-  if (!live) state.stamp = kanjiFamilyStamp();
-  const panel = el('div', 'entry-rows');
-  panel.id = kanjiFamilyControlId({ type: node.t, id: node.id }, 'facts');
-  panel.hidden = !kanjiFamilyStampCurrent(state.stamp);
-  kanjiFamilyExposures.set(section, { state, panel });
-  if (!panel.hidden) renderFacts(panel);
-  if (live) {
-    const reveal = biLabel('button', 'chip', '出典と説明', 'Source and account');
-    reveal.type = 'button'; reveal.id = kanjiFamilyControlId({ type: node.t, id: node.id }, 'disclose');
-    reveal.setAttribute('aria-controls', panel.id); reveal.setAttribute('aria-expanded', String(!panel.hidden));
-    state.control = reveal;
-    reveal.disabled = !!state.busy;
-    const explanation = el('p', 'fine', tx('開くと、ここにある読みや意味を、このコースで使ったヘルプとして扱います。',
-      'Opening this counts the readings and meanings shown here as help for this course.'));
-    reveal.addEventListener('click', async () => {
-      if (state.busy) return;
-      if (!panel.hidden) {
-        state.stamp = null; panel.hidden = true; panel.replaceChildren(); reveal.setAttribute('aria-expanded', 'false');
-        return;
-      }
-      const ticket = kanjiFamilyTicket(reveal);
-      state.busy = ticket; reveal.disabled = true;
-      try {
-        const allowed = await kanjiFamilyAuthorize(exposures, ticket);
-        if (!kanjiFamilyTicketCurrent(ticket)) return;
-        if (!allowed) { kanjiFamilyRefusal(reveal); return; }
-        state.stamp = kanjiFamilyStamp();
-        panel.replaceChildren(); renderFacts(panel); panel.hidden = false; reveal.setAttribute('aria-expanded', 'true');
-      } finally {
-        if (state.busy === ticket) { state.busy = false; if (state.control?.isConnected) state.control.disabled = false; }
-      }
-    });
-    section.append(reveal, explanation);
-  }
-  section.append(panel);
-}
-function kanjiFamilyCitations(parent, citations) {
-  for (const citation of citations) {
-    const source = citation.source;
-    const label = `${source.title || source.id} · ${citation.locator}`;
-    const line = el(/^https:\/\//u.test(source.url || '') ? 'a' : 'p', 'fine', label);
-    if (line.tagName === 'A') { line.href = source.url; line.target = '_blank'; line.rel = 'noopener noreferrer'; }
-    parent.append(line);
-  }
-}
 function renderKanjiFamily(sheet, node) {
   const section = el('section'); section.dataset.kanjiFamilySurface = 'relationships';
   const heading = () => el('h3', 'list-head', tx('資料でたどる字のつながり', 'Source-backed character relationships'));
@@ -39660,9 +30778,6 @@ let kanjiStructureTask = null;
 let kanjiStructureModel = null;
 let kanjiStructureError = null;
 const kanjiStructureMounts = new WeakMap();
-function activateKanjiStructure(sheet) {
-  for (const section of sheet.querySelectorAll('[data-kanji-structure]')) kanjiStructureMounts.get(section)?.();
-}
 function loadKanjiStructure() {
   if (kanjiStructureModel) return Promise.resolve(kanjiStructureModel);
   if (kanjiStructureTask) return kanjiStructureTask;
@@ -39859,297 +30974,6 @@ function openKanjiWorldEncounter(invoker, node) {
   });
 }
 
-function renderKanjiNode(sheet, node) {
-  const retained = retainedKanjiRecord(node.id);
-  const k = retained || D.kanji[node.id] || window.BunkiSkipUI?.getKanji(S.skipUi, node.id);
-  if (!k) {
-    // A wider SKIP entry can survive in the learner's existing list across
-    // reloads. Reopen through this same sheet after lazy metadata resolves,
-    // not a dead-end just because the optional index has not been used yet.
-    if (window.BunkiSkipUI && !skipState().data) {
-      const pending = el('div', 'skip-entry-pending');
-      sheet.append(pending);
-      const load = () => {
-        pending.replaceChildren(el('p', 'skip-status', tx('漢字の項目を読み込み中…', 'Loading this kanji entry…')));
-        window.BunkiSkipUI.ensureData(skipState()).then(() => {
-          if (!pending.isConnected) return;
-          pending.replaceChildren();
-          renderKanjiNode(pending, node);
-        }).catch(() => {
-          if (!pending.isConnected) return;
-          const retry = el('button', 'skip-retry', tx('漢字の項目を再読込', 'Retry this kanji entry'));
-          retry.type = 'button';
-          retry.addEventListener('click', load);
-          pending.replaceChildren(el('p', 'skip-error', tx('項目を読み込めませんでした。', 'This entry could not load.')), retry);
-        });
-      };
-      load();
-      return;
-    }
-    sheet.append(el('div', 'sem-empty', tx('この字はこの層にない。', 'This kanji is not in this layer.')));
-    return;
-  }
-  const hero = el('div', 'hero');
-  hero.append(el('div', 'hero-glyph', k.c));
-  const meta = el('div', 'hero-meta');
-  const display = kanjiEntryRecord(node.id, node.referenceEntry) || k;
-  const referenceView = kanjiReferenceView(node.id, display);
-  meta.append(el('div', 'hero-mean', referenceView.meanings.join('; ') || tx('語義は未収録です。', 'Meaning not supplied.')));
-  const chips = el('div', 'shelf-meta');
-  if (Number.isInteger(k.st)) chips.append(catalogChip(`${k.st} 画`, `${k.st} strokes`, 'strokes', k.st, node.from));
-  if (D.kanken[k.c]?.kk)
-    chips.append(catalogChip(`漢検 ${D.kanken[k.c].kk}`, `Kanji Kentei ${kankenGradeLabel(D.kanken[k.c].kk)}`, 'kanken', D.kanken[k.c].kk, node.from));
-  if (D.kmeta?.[k.c]?.jlpt)
-    chips.append(catalogChip(`JLPT ${D.kmeta[k.c].jlpt}`, `JLPT ${D.kmeta[k.c].jlpt}`, 'jlpt', D.kmeta[k.c].jlpt, node.from));
-  // the entry number in the operator's paper dictionary (Kodansha KKLD),
-  // named by edition — the book on the desk and the sheet on the screen agree
-  if (kkldOf(k.c)) {
-    const kchip = el('span', 'pool-tag kkld-chip', `Kodansha ${kkldLine(k.c)}`);
-    kchip.id = 'kanji-kkld';
-    kchip.title = tx('講談社 漢字学習字典の番号（版ごと）', "Kodansha Kanji Learner's Dictionary entry number, by edition");
-    chips.append(kchip);
-  }
-  if (window.BunkiSkipUI) {
-    const shapeDoor = el('button', 'chip', tx('形と画数で引く', 'look up by shape and strokes'));
-    shapeDoor.id = 'kanji-shape-lookup'; shapeDoor.type = 'button';
-    shapeDoor.addEventListener('click', () => go({ t: 'skip', id: 'skip:*', from: node.from }, { invoker: shapeDoor }));
-    chips.append(shapeDoor);
-  }
-  meta.append(chips);
-  hero.append(meta);
-  sheet.append(hero);
-  if (node.id === '門' && kanjiWorldEligible()) {
-    const worldDoor = el('button', 'chip kanji-world-door', tx('羅城門へ · 試作', 'Visit Rajōmon · preview'));
-    worldDoor.id = 'kanji-world-door'; worldDoor.type = 'button';
-    worldDoor.addEventListener('click', () => openKanjiWorldEncounter(worldDoor, node));
-    sheet.append(worldDoor);
-  }
-  if (referenceView.state === 'complete') {
-    const source = el('p', 'fine', tx(
-      `辞書の全語義 — KANJIDIC2 ${referenceView.referenceSource.dictionaryDate}`,
-      `Complete dictionary meanings — KANJIDIC2 ${referenceView.referenceSource.dictionaryDate}`,
-    ));
-    source.dataset.kanjiMeaningsSource = referenceView.referenceSource.release;
-    sheet.append(source);
-  } else {
-    sheet.append(el('p', 'fine', tx('上の語義は保存済み・レッスン用の語義です。', 'The meanings above are the saved or lesson keywords.')));
-    if (referenceView.state === 'absent') sheet.append(el('p', 'fine', tx('この字の辞書語義・部首分類は資料にありません。', 'This source does not supply dictionary meanings or classification for this form.')));
-    kanjiFactsStatus(sheet, referenceView.state, 'kanji-facts-retry', () => { if (sheet.isConnected) render(); });
-  }
-  if (retained) {
-    sheet.append(el('p', 'fine', tx(
-      `保存した回答・以下の読みは KANJIDIC2 ${retained.sourceVersion.dictionaryDate} のままです。辞書を開いても書き換わりません。`,
-      `Your saved answer and the readings below remain from KANJIDIC2 ${retained.sourceVersion.dictionaryDate}. Opening this dictionary does not rewrite them.`,
-    )));
-  }
-  // K01 · an official Jōyō form kanji.json lacks (剝, 𠮟) says what it is; any other wider entry keeps its SKIP note
-  const joyoForm = !D.kanji[k.c] && !!kanjiReferenceRows()?.records.has(k.c);
-  if (k.skipFallback) sheet.append(el('p', 'skip-fallback-note', joyoForm
-    ? tx('常用漢字表（2010年）の字形。読みと意味は KANJIDIC2 から。このアプリにはこの字の部品のデータがまだない。',
-      'An official Jōyō form (2010). Its readings and meanings come from KANJIDIC2; this app has no component data for it yet.')
-    : tx(
-      'SKIP 索引の KANJIDIC2 項目。このアプリの部品・用例・筆順が未収録のことがあります。',
-      'KANJIDIC2 entry from the SKIP index. This app may not yet have its components, example words or stroke diagram.',
-    )));
-
-  // K01 · every reading of the kanji (kanjiReference): the lessons' selection first, then the rest. A reading
-  // only the official 2010 table gives is starred and named under the list. Until every reading has arrived the
-  // list is the lessons' selection and says so; a failed load offers its retry.
-  const kv = el('dl', 'kv');
-  const readingsState = display.readingsState || (retained ? 'saved' : 'complete');
-  kv.dataset.kanjiReadings = readingsState;
-  if (retained) kv.dataset.currentJoyoKunState = kanjiReadingsState();
-  const officialOnly = new Set(display.officialReadings || []);
-  const readingLine = (list) => {
-    const span = el('span', 'on');
-    if (!list?.length) span.textContent = '—';
-    // each reading stays whole on its line, its ・ kept with it, so a long list breaks only after a ・ (never
-    // inside い.ける, never before a ・)
-    (list || []).forEach((reading, i) => {
-      const item = el('span', 'reading-item', reading);
-      if (officialOnly.has(reading)) item.append(el('sup', 'reading-official-mark', '*'));
-      if (i < list.length - 1) item.append(document.createTextNode('・'));
-      span.append(item);
-    });
-    return span;
-  };
-  const on = el('dd');
-  on.append(readingLine(display.on));
-  kv.append(withEn(el('dt', null, '音'), 'on'), on);
-  const kun = el('dd');
-  kun.append(readingLine(display.kun));
-  kv.append(withEn(el('dt', null, '訓'), 'kun'), kun);
-  sheet.append(kv);
-  const currentKun = currentJoyoKunNote(node.id);
-  if (currentKun) sheet.append(currentKun);
-  const tableStatus = joyoOnNote(node.id, display.on);
-  if (tableStatus) sheet.append(tableStatus);
-  if (officialOnly.size) {
-    const official = el('p', 'fine reading-source-note', tx('* 常用漢字表（2010年）にある読み', '* a reading from the official Jōyō kanji table (2010)'));
-    official.id = 'kanji-reading-official';
-    sheet.append(official);
-  }
-  if (readingsState === 'pending' || readingsState === 'failed') {
-    const line = el('p', 'fine reading-source-note', readingsState === 'failed'
-      ? tx('すべての読みを読み込めなかった。いま見えているのはレッスン用に選んだ読みだけ。', 'Every reading could not be loaded — these are only the readings chosen for lessons.')
-      : tx('いま見えているのはレッスン用に選んだ読み。すべての読みを読み込み中…', 'These are the readings chosen for lessons — loading every reading…'));
-    line.id = 'kanji-readings-status';
-    line.setAttribute('role', 'status');
-    sheet.append(line);
-    if (readingsState === 'failed') {
-      const retry = biLabel('button', 'chip', '再試行', 'Try again');
-      retry.type = 'button';
-      retry.id = 'kanji-readings-retry';
-      retry.addEventListener('click', () => {
-        void loadReferenceExtra();
-        render();
-      });
-      sheet.append(retry);
-    }
-  }
-  renderSourceKanjiDoor(sheet, node);
-  renderKanjiCourseDoor(sheet, node);
-
-  renderKanjiClassifications(sheet, node.id, node);
-
-  // まぎらわしい字 — the look-alikes, laid side by side to break the spell
-  const twins = confusablesFor(k.c);
-  if (twins.length) {
-    sheet.append(withEn(el('p', 'eyebrow', 'まぎらわしい字'), 'easily confused with', 'en-inline'));
-    const rows = el('div', 'entry-rows');
-    for (const c of twins) {
-      const row = el('button', 'entry-row');
-      row.type = 'button';
-      row.dataset.confusable = c;
-      row.append(el('span', 'row-glyph', c));
-      row.append(el('span', 'row-main', D.kanji[c].m));
-      row.append(el('span', 'row-go', '›'));
-      row.addEventListener('click', () => go({ t: 'kanji', id: c, from: node.from }, { invoker: row }));
-      rows.append(row);
-    }
-    sheet.append(rows);
-  }
-
-  // STROKE ORDER — the diagram is a door, not a picture. It opens the
-  // dedicated full-screen page where the strokes actually draw themselves.
-  sheet.append(withEn(el('p', 'eyebrow', '筆順'), 'stroke order', 'en-inline'));
-  sheet.append(strokeDoor(k));
-  renderKanjiStructure(sheet, node);
-  renderKanjiFamily(sheet, node);
-
-  const parts = mainParts(k.c);
-  if (parts.length) {
-    sheet.append(withEn(el('p', 'eyebrow', '部品一覧'), 'listed components', 'en-inline'));
-    const rows = el('div', 'entry-rows');
-    for (const c of parts) {
-      const row = el('button', 'entry-row');
-      row.type = 'button';
-      row.append(el('span', 'row-glyph', c));
-      row.dataset.component = c;
-      row.append(el('span', 'row-main', componentLabel(c)));
-      row.append(el('span', 'row-go', '›'));
-      row.addEventListener('click', () => go({ t: 'radical', id: c, from: node.from }, { invoker: row }));
-      rows.append(row);
-    }
-    sheet.append(rows);
-  }
-
-  // COMMON COMPOUNDS — reading + first gloss per row, every row a door.
-  // No silent cap: an initial page, then "show all" reveals the whole list
-  // (Renzo shows "6 of 96" the same way). The count in the heading is the true
-  // total, so the depth of the dictionary is visible at a glance.
-  // K07 · then the words reached through a written alternative (しいたけ／椎茸, あい／藍), shown by the spelling
-  // that holds this kanji and opening that very entry; a Jōyō kanji no shipped word list names carries up to ten
-  // JMdict words chosen at build time (the reference sidecar), each opening its own entry by sequence and reading.
-  const words = D.kanjiWords[k.c] || [];
-  const listed = new Set(words);
-  const alternates = (D.kanjiAltWords?.get(k.c) || []).filter(([id]) => !listed.has(id));
-  const filled = !words.length && !alternates.length ? kanjiReferenceRows()?.words.get(k.c) || [] : [];
-  const items = [
-    ...words.map((id) => ({ id })),
-    ...alternates.map(([id, form]) => ({ id, form })),
-    ...filled.map(([seq, form, reading, gloss, tags]) => ({ id: form, form, seq: String(seq), reading, gloss, tags })),
-  ];
-  if (items.length) {
-    sheet.append(filled.length
-      ? withEn(el('p', 'eyebrow', `この字を含む語 — ${items.length} 語`), 'words that contain it', 'en-inline')
-      : withEn(el('p', 'eyebrow', `よく使う語 — ${items.length} 語`), 'common compounds', 'en-inline'));
-    const rows = el('div', 'entry-rows');
-    const makeRow = (item) => {
-      const g = item.seq ? { r: item.reading, m: [item.gloss] } : lookup(item.id);
-      const row = el('button', 'entry-row compound');
-      row.type = 'button';
-      if (item.form) row.dataset.wordSpelling = item.form;
-      if (item.seq) row.dataset.jmdictSeq = item.seq;
-      const main = el('span', 'row-stack');
-      const top = el('span', 'row-word');
-      top.append(document.createTextNode(item.form || item.id));
-      if (g?.r) top.append(el('span', 'row-reading', g.r));
-      main.append(top);
-      const gloss = [g?.m?.[0], writtenFormNote(item.tags)].filter(Boolean).join(' — ');
-      if (gloss) main.append(el('span', 'row-gloss', gloss));
-      row.append(main);
-      row.append(el('span', 'row-go', '›'));
-      row.addEventListener('click', () => go(item.seq
-        ? { t: 'word', id: item.form, seq: item.seq, reading: item.reading, from: node.from }
-        : { t: 'word', id: item.id, from: node.from }, { invoker: row }));
-      return row;
-    };
-    const FIRST = 24;
-    for (const item of (node.compoundsExpanded ? items : items.slice(0, FIRST))) rows.append(makeRow(item));
-    sheet.append(rows);
-    if (items.length > FIRST && !node.compoundsExpanded) {
-      const more = el('button', 'more-row');
-      more.type = 'button';
-      const remain = items.length - FIRST;
-      more.textContent = tx(`のこり ${remain} 語をすべて見る`, `show all ${items.length} — ${remain} more`);
-      more.addEventListener('click', () => {
-        node.compoundsExpanded = true;
-        for (const item of items.slice(FIRST)) rows.append(makeRow(item));
-        more.remove();
-      });
-      sheet.append(more);
-    }
-  } else {
-    sheet.append(withEn(el('p', 'eyebrow', 'この字を含む語'), 'words that contain it', 'en-inline'));
-    // K07 · a Jōyō kanji the build found in no shipped dictionary says so plainly
-    const none = kanjiReferenceRows()?.wordless.has(k.c);
-    const empty = el('div', 'sem-empty', none
-      ? tx('この字を含む語は、このアプリの辞書にはない。', 'No word in this app’s dictionaries contains this kanji.')
-      : tx('この字を含む語は辞書側にまだない。部品からは続けられる。', 'No listed word contains this kanji yet — the walk continues through its parts.'));
-    if (none) empty.dataset.wordless = 'checked';
-    sheet.append(empty);
-  }
-
-  // K05 · as many idioms as the heading counts are one tap away
-  const idioms = D.idiomsByKanji[k.c] || [];
-  if (idioms.length) {
-    const heading = el('p', 'eyebrow');
-    heading.textContent = tx(`熟語・慣用句 — ${idioms.length}`, `${idioms.length} idioms and set phrases`);
-    sheet.append(heading);
-    const FIRST_IDIOMS = 24;
-    const chipOf = (w) => ({ label: w, sub: D.idioms[w]?.r || '' });
-    const openIdiom = (item, invoker) => go({ t: 'idiom', id: item.label, from: node.from }, { invoker });
-    const chips = chipsFor((node.idiomsExpanded ? idioms : idioms.slice(0, FIRST_IDIOMS)).map(chipOf), openIdiom, null, 'idiom');
-    sheet.append(chips);
-    if (idioms.length > FIRST_IDIOMS && !node.idiomsExpanded) {
-      const more = el('button', 'more-row');
-      more.type = 'button';
-      more.id = 'kanji-idioms-more';
-      const remain = idioms.length - FIRST_IDIOMS;
-      more.textContent = tx(`のこり ${remain} 語をすべて見る`, `show all ${idioms.length} — ${remain} more`);
-      more.addEventListener('click', () => {
-        node.idiomsExpanded = true;
-        chips.append(...chipsFor(idioms.slice(FIRST_IDIOMS).map(chipOf), openIdiom, null, 'idiom').children);
-        more.remove();
-      });
-      sheet.append(more);
-    }
-  }
-
-
-  renderStudyFold(sheet, node, null);
-}
 
 /* ==================================================== 筆順 · stroke order ===
  * A kanji is written, not drawn — so the stroke diagram gets a page of its
@@ -40187,65 +31011,11 @@ function cancelStrokeAnimation() {
 }
 
 /** KanjiVG stores each stroke's start as its path's first moveto. */
-function strokeStart(d) {
-  const m = /M\s*(-?[\d.]+)[\s,]+(-?[\d.]+)/.exec(d);
-  return m ? { x: Number(m[1]), y: Number(m[2]) } : null;
-}
 
 /** The sheet's small diagram — unchanged geometry, now wrapped in a door. */
-function strokeThumb(paths) {
-  const svg = document.createElementNS(SVG_NS, 'svg');
-  svg.setAttribute('viewBox', STROKE_VIEWBOX);
-  svg.setAttribute('class', 'strokes');
-  svg.setAttribute('aria-hidden', 'true');
-  svg.id = 'strokes';
-  // just the painted character — no stroke-numbers on the preview (operator
-  // 2026-08-10: "no writing next to the stroke-order kanji; tap to open"). The
-  // numbers still guide inside the full-screen 筆順 page.
-  for (const d of paths) {
-    const path = document.createElementNS(SVG_NS, 'path');
-    path.setAttribute('d', d);
-    svg.append(path);
-  }
-  return svg;
-}
 
 /** The door on the kanji sheet. It exists for every kanji, with data or
  * without — the corridor has no dead ends, only honest rooms. */
-function strokeDoor(k) {
-  const paths = strokePathsFor(k.c);
-  const door = el('button', paths.length ? 'stroke-door' : 'stroke-door bare');
-  door.type = 'button';
-  door.id = 'strokes-door';
-  door.dataset.action = 'entry.open';
-  door.dataset.strokes = String(paths.length);
-  door.setAttribute(
-    'aria-label',
-    paths.length
-      ? tx(
-          `${k.c} の筆順をひらく — ${paths.length} 画`,
-          `open the stroke order for ${k.c} — ${paths.length} strokes`,
-        )
-      : tx(
-          `${k.c} の筆順 — 筆順のデータはまだない`,
-          `${k.c} stroke order — stroke data not yet available`,
-        ),
-  );
-  // just the stroke-order glyph — tap the box and it opens (operator 2026-08-10:
-  // "no writing next to the stroke-order kanji"). No side label, no chevron.
-  if (paths.length) door.append(strokeThumb(paths));
-  else door.append(el('span', 'stroke-door-glyph', k.c));
-
-  door.addEventListener('click', (event) => {
-    interaction(
-      { kind: 'entry.open', target: { kind: 'kanji', id: k.c } },
-      event.detail === 0 ? 'keyboard' : 'pointer',
-      'strokes-door',
-    );
-    openStrokePage(k.c, { invoker: door });
-  });
-  return door;
-}
 
 /** One clock for the numbered overlay. The page remembers how many strokes
  * have actually begun even while numbers are switched off, so waking the
@@ -40279,38 +31049,6 @@ function syncStrokeGhost(page, written) {
 /** Put the page into a definite state: `shown` strokes complete, the last of
  * them `progress` of the way drawn. Called by the animation every frame and
  * by the step-through control once per press. */
-function paintStrokes(page, shown, progress = 1) {
-  const paths = [...page.querySelectorAll('.stroke-ink path')];
-  const bleeds = [...page.querySelectorAll('.stroke-bleed path')];
-  const total = paths.length;
-  paths.forEach((path, i) => {
-    const len = Number(path.dataset.len) || 0;
-    let offset = len;
-    if (i < shown - 1) offset = 0;
-    else if (i === shown - 1) offset = len * (1 - progress);
-    path.style.strokeDashoffset = String(offset);
-    if (bleeds[i]) bleeds[i].style.strokeDashoffset = String(offset);
-  });
-  // Once living ink owns the stage, its first-splat callback owns the number
-  // clock too. The hidden SVG rAF must never race ahead of the real brush.
-  if (page.dataset.living !== 'on') {
-    // At progress zero the pending SVG stroke is still fully dash-hidden.
-    // Keep its number hidden for that frame too; both become visible on the
-    // first positive drawing sample, matching the living-ink first-splat law.
-    syncStrokeNumbers(page, progress > 0 ? shown : shown - 1);
-  }
-  const counter = page.querySelector('#stroke-count');
-  if (counter) {
-    const current = Math.max(0, Math.min(total, shown));
-    counter.dataset.current = String(current);
-    counter.dataset.total = String(total);
-    counter.textContent = `${current} / ${total}`;
-  }
-  const prev = page.querySelector('#stroke-prev');
-  const next = page.querySelector('#stroke-next');
-  if (prev) prev.disabled = shown <= 1;
-  if (next) next.disabled = shown >= total;
-}
 
 /** Draw the strokes in order. Each path's duration follows its own measured
  * length, so a long sweep takes longer than a tick — handwriting, not a
@@ -40390,42 +31128,10 @@ function startStrokeAnimation(page) {
   strokeFrame = requestAnimationFrame(frame);
 }
 
-function strokeControl(id, ja, en) {
-  const btn = el('button', 'stroke-btn');
-  btn.type = 'button';
-  btn.id = id;
-  btn.append(el('span', 'l-ja', tx(ja, en)));
-  if (!bi()) btn.setAttribute('aria-label', ja);
-  return btn;
-}
 
 /** KANJIDIC writes okurigana after a dot (なが.い). Keep that boundary
  * visible without making a screen reader pronounce the punctuation. */
-function displayKunReading(reading) {
-  const value = String(reading || '');
-  const dot = value.indexOf('.');
-  return dot < 0 ? value : `${value.slice(0, dot)}（${value.slice(dot + 1)}）`;
-}
 
-function strokeReadingRow(ja, en, values, kind = 'on', official = []) {
-  const row = el('div', 'stroke-reading-row');
-  const label = el('span', 'stroke-reading-label', tx(ja, en));
-  const raw = values?.length ? values : [];
-  // K01 · a reading only the official 2010 table gives carries the same star as on the kanji page; each reading
-  // stays whole on its line, so a complete list breaks only between readings
-  const value = el('span', 'stroke-reading-value');
-  if (!raw.length) value.textContent = '—';
-  raw.forEach((item, i) => {
-    value.append(el('span', 'stroke-reading-item',
-      (kind === 'kun' ? displayKunReading(item) : item) + (official.includes(item) ? '*' : '') + (i < raw.length - 1 ? '・' : '')));
-  });
-  value.lang = 'ja';
-  if (kind === 'kun' && raw.length) {
-    value.setAttribute('aria-label', raw.map((item) => item.replaceAll('.', '')).join('、'));
-  }
-  row.append(label, value);
-  return row;
-}
 
 /** The quiet room has one learning option. Enabling it starts a fresh write,
  * guaranteeing that marker n rises with stroke n rather than appearing over
@@ -40461,133 +31167,11 @@ function strokeNumbersControl(page, reduced) {
 }
 
 /** Minimal mode is an allowlist, not legacy chrome made transparent. */
-function strokeAwakeField(page, k) {
-  // 四隅の間 (operator spec, 2026-08-15): the corners carry the controls —
-  // worlds top-right on the seal, numbers bottom-right, speed bottom-left,
-  // back top-left. The wake mark opens ONLY the readings, underneath the
-  // glyph, so nothing crowds the sheet.
-  const field = el('section', 'stroke-awake-field');
-  field.id = 'stroke-awake-field';
-  field.dataset.strokeChrome = '';
-  field.setAttribute('aria-label', tx('読み', 'readings'));
-  field.append(strokeReadingField(k));
-  return field;
-}
 
-function strokeReadingField(k) {
-  const readings = el('div', 'stroke-reading-field');
-  readings.setAttribute('role', 'group');
-  readings.setAttribute('aria-label', tx('読み', 'readings'));
-  // what the lists are (unfinished, or carrying a starred reading) is said above them: below, the writing-speed
-  // corner covers the field's left edge
-  readings.append(...strokeReadingsStatus(k));
-  if (k?.sourceVersion) {
-    const saved = !!retainedKanjiRecord(k.c);
-    readings.append(el('p', 'stroke-reading-note', saved ? tx(
-      `保存した読み — KANJIDIC2 ${k.sourceVersion.dictionaryDate}`,
-      `Saved readings — KANJIDIC2 ${k.sourceVersion.dictionaryDate}`,
-    ) : tx(
-      `辞書の読み — KANJIDIC2 ${k.sourceVersion.dictionaryDate}`,
-      `Dictionary readings — KANJIDIC2 ${k.sourceVersion.dictionaryDate}`,
-    )));
-  }
-  if (k?.officialReadings?.length) {
-    readings.append(el('p', 'stroke-reading-note', tx('* 常用漢字表（2010年）にある読み', '* a reading from the official Jōyō kanji table (2010)')));
-  }
-  readings.append(
-    strokeReadingRow('音読み', 'on', k?.on, 'on', k?.officialReadings),
-    strokeReadingRow('訓読み', 'kun', k?.kun, 'kun', k?.officialReadings),
-  );
-  const tableStatus = joyoOnNote(k?.c, k?.on, 'p', 'stroke-reading-note');
-  if (tableStatus) readings.append(tableStatus);
-  const currentKun = currentJoyoKunNote(k?.c, 'p', 'stroke-reading-note');
-  if (currentKun) readings.append(currentKun);
-  return readings;
-}
 
-function strokeClassificationLine(id, k) {
-  const radical = kanjiFacts(id)?.radicalSchemes.classical;
-  const glyph = D.radInfo?.[radical]?.c;
-  return `${k?.st ?? strokePathsFor(id).length}画${glyph
-    ? tx(` · 伝統部首 ${glyph}（KANJIDIC2）`, ` · classical radical ${glyph} (KANJIDIC2)`) : ''}`;
-}
-function strokeReferenceStatus(id, k) {
-  const note = el('div', 'stroke-reference-status');
-  const view = kanjiReferenceView(id, k);
-  if (view.state === 'complete') note.append(el('p', 'stroke-read-note', tx(
-    `意味・部首分類 — KANJIDIC2 ${view.referenceSource.dictionaryDate}`,
-    `Meanings and classification — KANJIDIC2 ${view.referenceSource.dictionaryDate}`,
-  )));
-  else {
-    note.append(el('p', 'stroke-read-note', tx('語義は保存済み・レッスン用のものです。', 'Meanings shown are saved or lesson keywords.')));
-    if (view.state === 'absent') note.append(el('p', 'stroke-read-note', tx('この資料には辞書語義・部首分類がありません。', 'This source supplies no dictionary meanings or classification for this form.')));
-    kanjiFactsStatus(note, view.state, 'stroke-facts-retry', refreshStrokeReadings);
-  }
-  if (k?.sourceVersion) {
-    const saved = !!retainedKanjiRecord(id);
-    note.append(el('p', 'stroke-read-note', saved ? tx(
-      `読み・保存した回答 — KANJIDIC2 ${k.sourceVersion.dictionaryDate}`,
-      `Readings and saved answer — KANJIDIC2 ${k.sourceVersion.dictionaryDate}`,
-    ) : tx(
-      `辞書の読み — KANJIDIC2 ${k.sourceVersion.dictionaryDate}`,
-      `Dictionary readings — KANJIDIC2 ${k.sourceVersion.dictionaryDate}`,
-    )));
-  }
-  return note;
-}
-function strokeClassicReadings(k) {
-  const readings = el('span', 'stroke-readings');
-  const officialOnly = new Set(k?.officialReadings || []);
-  const star = (reading) => (officialOnly.has(reading) ? '*' : '');
-  if (k?.on?.length) {
-    const row = el('span', 'stroke-read-row');
-    row.append(el('span', 'stroke-read-label', '音'), el('span', 'stroke-on', k.on.map((reading) => reading + star(reading)).join('・')));
-    readings.append(row);
-  }
-  if (k?.kun?.length) {
-    const row = el('span', 'stroke-read-row');
-    row.append(el('span', 'stroke-read-label', '訓'));
-    k.kun.forEach((kn, i) => {
-      const [stem, oku] = kn.split('.');
-      if (i) row.append(document.createTextNode('・'));
-      const reading = el('span', 'stroke-kun');
-      reading.append(el('span', 'stroke-kun-stem', stem));
-      if (oku) reading.append(document.createTextNode(oku));
-      if (star(kn)) reading.append(document.createTextNode(star(kn)));
-      row.append(reading);
-    });
-    readings.append(row);
-  }
-  if (officialOnly.size) readings.append(el('span', 'stroke-read-note', tx('* 常用漢字表（2010年）にある読み', '* a reading from the official Jōyō kanji table (2010)')));
-  readings.append(...strokeReadingsStatus(k, 'span', 'stroke-read-note'));
-  const tableStatus = joyoOnNote(k?.c, k?.on, 'span', 'stroke-read-note');
-  if (tableStatus) readings.append(tableStatus);
-  const currentKun = currentJoyoKunNote(k?.c, 'span', 'stroke-read-note');
-  if (currentKun) readings.append(currentKun);
-  return readings;
-}
 
 /** K01 · the writing room says what its readings are, as the entry does: until every reading has arrived they are the
  * lessons' selection, and a failed load offers its retry. Nothing when the lists are whole. */
-function strokeReadingsStatus(k, tag = 'p', className = 'stroke-reading-note') {
-  const state = k?.readingsState;
-  if (state !== 'pending' && state !== 'failed') return [];
-  const line = el(tag, className, state === 'failed'
-    ? tx('すべての読みを読み込めなかった。いま見えているのはレッスン用に選んだ読みだけ。', 'Every reading could not be loaded — these are only the readings chosen for lessons.')
-    : tx('いま見えているのはレッスン用に選んだ読み。すべての読みを読み込み中…', 'These are the readings chosen for lessons — loading every reading…'));
-  line.id = 'stroke-readings-status';
-  line.dataset.strokeReadings = state;
-  line.setAttribute('role', 'status');
-  if (state !== 'failed') return [line];
-  const retry = biLabel('button', 'chip stroke-readings-retry', '再試行', 'Try again');
-  retry.type = 'button';
-  retry.id = 'stroke-readings-retry';
-  retry.addEventListener('click', () => {
-    void loadReferenceExtra();
-    refreshStrokeReadings();
-  });
-  return [line, retry];
-}
 
 /** Reference data arrived, failed, or is being retried: patch the visible labels
  * in either writing-room layout while the existing ink engine keeps running. */
@@ -40661,28 +31245,6 @@ function strokeSpeedControl(page) {
 }
 
 /** The honest room: a character we can show but whose order we do not know. */
-function strokeMissing(page, id, k) {
-  const box = el('div', 'stroke-missing');
-  box.append(el('div', 'stroke-missing-glyph', id));
-  const line = el('p', 'stroke-missing-line');
-  line.id = 'stroke-missing';
-  line.textContent = tx('筆順のデータはまだない。', 'Stroke data not yet available.');
-  box.append(line);
-  const note = el('p', 'stroke-missing-note');
-  note.textContent = k?.st
-    ? tx(
-        `画数 — ${k.st} 画。このアプリにはこの字の筆順データが未収録です。`,
-        `Stroke count — ${k.st}. This app does not bundle stroke paths for this character.`,
-      )
-    : tx(
-        'このアプリにはこの字の筆順データが未収録です。',
-        'This app does not bundle stroke paths for this character.',
-      );
-  box.append(note);
-  box.append(el('p', 'stroke-meta-mean', kanjiReferenceView(id, k).meanings.join('; ')));
-  box.append(strokeClassicReadings(k), strokeReferenceStatus(id, k));
-  page.append(box);
-}
 
 /* ------------------------------------------------- 書の間 · the living ink
  * The stroke page's hero: the kanji WRITTEN in real fluid ink by the same
@@ -40828,23 +31390,6 @@ function animcjkApproved() {
     .catch(() => new Set());
   return animcjkApprovedPromise;
 }
-async function animcjkGlyphFor(ch) {
-  try {
-    const approved = await animcjkApproved();
-    if (!approved.has(ch)) return null;
-    const sid = (ch.codePointAt(0) % 16).toString(16).padStart(2, '0');
-    if (!animcjkShards.has(sid)) {
-      animcjkShards.set(
-        sid,
-        fetch(`data/share_alike/animcjk/${sid}.json`).then((r) => (r.ok ? r.json() : null)),
-      );
-    }
-    const shard = await animcjkShards.get(sid);
-    return (shard && shard.entries && shard.entries[ch]) || null;
-  } catch {
-    return null;
-  }
-}
 /** Uniformly scale absolute SVG path data about the lattice centre. Both
  * outline sources emit only absolute M/L/C/Q/Z (verified corpus-wide), whose
  * every numeric parameter is an absolute coordinate — x and y scale about
@@ -40852,13 +31397,6 @@ async function animcjkGlyphFor(ch) {
  * path carrying any other command (relative, H/V, arcs) returns null and
  * the caller keeps the WHOLE glyph unscaled — a half-scaled glyph would
  * put the sprite clip out of register with its own medians. */
-function scalePathData(d, frac, centre = 512) {
-  if (/[^MLCQZmlcqz0-9.,\s-]/.test(d) || /[mlcqz]/.test(d)) return null;
-  return d.replace(
-    /-?\d*\.?\d+/g,
-    (tok) => String(Math.round((centre + (Number(tok) - centre) * frac) * 10) / 10),
-  );
-}
 let inkRoom = null; // { handle, canvas, page, stage, lift, syncLift, unsync } — one sheet
 /* Three deliberate speeds. Legacy continuous preferences settle at their nearest
  * mark; a new device starts at Normal, the middle of the slider. */
@@ -41090,19 +31628,6 @@ function inkGroundFor(world, size) {
   return c;
 }
 
-function inkSpecFor(INK, strokes) {
-  const world = THEME_UI[themeIx()];
-  const iw = INK_WORLDS[world.id] || INK_WORLDS.sumi;
-  return {
-    pal: iw.pal,
-    wetScale: iw.wetScale,
-    strokes,
-    still: iw.still || world.ink,
-    ground: (r, size) => inkGroundFor(world, size),
-    gpuN: 1024,
-    gl2Sim: 800,
-  };
-}
 async function mountInkRoom(room2, ch, paths, reduced) {
   stopInkRoom();
   const { page, stage, pips } = room2;
@@ -41848,10 +32373,6 @@ const wordVoice = () => wordPref(WORD_VOICE_KEY, 'wordVoice', WORD_VOICE);
 /** One stroke's time: min(110 ms, 1400 ms ÷ strokes), never under 45 ms, at the middle 書く速さ — a word of up to 31
  * strokes writes in 1.4 s, 32 take 1.44 s — scaled by the one slider (slow 0.7 → longer, fast 1.6 → shorter). */
 const INK_TEMPO = Object.freeze({ budget: 1400, ceiling: 110, floor: 45 });
-function inkStrokeMs(strokes, speed = strokeSpeed()) {
-  if (!(strokes > 0)) return 0;
-  return Math.max(INK_TEMPO.floor, Math.min(INK_TEMPO.ceiling, INK_TEMPO.budget / strokes)) * (STROKE_SPEED_DEFAULT / speed);
-}
 
 /** How well he knows what the stage stands for: 'unmet' · 'met' · 'again' · 'recalled' · 'owned'. A word's depth is G2's
  * (wordDepth: its encounter ledger beside the card). A kanji, which wordDepth does not rank, keeps the card's answer
@@ -41862,23 +32383,6 @@ function inkStrokeMs(strokes, speed = strokeSpeed()) {
 const INK_DEPTH = Object.freeze({ recall: 0.9, recalled: 7, owned: 30 });
 function stageDepth(node, now = Date.now()) {
   return wordDepth(node, S, now)?.depth || cardDepth(node, now);
-}
-function cardDepth(node, now = Date.now()) {
-  if (!node?.id || (node.t !== 'word' && node.t !== 'kanji')) return 'unmet';
-  const key = srsKey(node.t, node.id);
-  const card = plainRecord(S.srs) && owns(S.srs, key) && plainRecord(S.srs[key]) ? S.srs[key] : null;
-  const kept = (Array.isArray(S.taken) ? S.taken : []).find((row) => row?.t === node.t && row.id === node.id) || null;
-  if (!card) return kept ? 'met' : 'unmet';
-  const shown = nonEmptyString(node.reading) ? kataToHira(node.reading) : '';
-  if ((shown && nonEmptyString(kept?.cueReading) && kataToHira(kept.cueReading) !== shown) ||
-    (node.seq != null && node.seq !== '' && nonEmptyString(kept?.entrySeq) && kept.entrySeq !== String(node.seq))) return 'met';
-  const state = Number.isInteger(card.state) ? card.state : 0;
-  if (state === 0) return 'met';
-  if (state !== 2) return 'again';
-  const recall = cardRecall(card, now);
-  const stability = Number.isFinite(card.stability) ? card.stability : 0;
-  if (recall === null || recall < INK_DEPTH.recall) return 'again';
-  return stability >= INK_DEPTH.owned ? 'owned' : stability >= INK_DEPTH.recalled ? 'recalled' : 'again';
 }
 /** The pinned scheduler's present recall of a stored card, at its clamped instant; null when it cannot say. */
 function cardRecall(card, now) {
@@ -41891,12 +32395,6 @@ function cardRecall(card, now) {
   } catch { return null; }
 }
 /** The ceremony for a depth: whether the ink writes, and whether the word stands bare (読 · 意 on request). */
-function inkCeremony(depth, deliberate, brush = wordBrush()) {
-  const bare = depth === 'recalled' || depth === 'owned';
-  const write = !!deliberate && !strokeReduced() &&
-    (brush === 'always' || (brush === 'first' && (depth === 'unmet' || depth === 'met')));
-  return { depth, bare, write };
-}
 
 /** The writing on the stage now — one at a time. The stage that replaces it, a page, Back and pagehide end it, so a
  * late callback never paints a successor or reopens a closed stage. */
@@ -42144,150 +32642,8 @@ function dressStage(visit, stage, { word, label, token, kind, nodeFor, reading, 
 /** A bare word's two asks (recalled, owned): 読 heads the reading's own line, 意 the meaning's — one tap each shows it in
  * place, kept for the visit, so a redraw or a return from the page shows what he asked for. A held line keeps its whole
  * size while unseen, so asking changes nothing's size: the card is not re-seated and nothing moves under the finger. */
-function askOnRequest(stage, plan, readingLine) {
-  const said = stage.querySelector('.mini-head-text');
-  const meaning = [...stage.querySelectorAll('.mini-gloss, .mini-word-note')];
-  const asks = [];
-  if (readingLine) asks.push(['reading', '読', tx('読みを見る', 'Show the reading'), [readingLine]]);
-  if (meaning.length) asks.push(['meaning', '意', tx('意味を見る', 'Show the meaning'), meaning]);
-  if (!said || !asks.length) return;
-  for (const [what, glyph, name, held] of asks) {
-    const line = el('div', 'mini-asked');
-    line.dataset.ask = what;
-    const ask = el('button', 'mini-ask-seal', glyph);
-    ask.type = 'button';
-    ask.lang = 'ja';
-    ask.dataset.ask = what;
-    ask.title = name;
-    ask.setAttribute('aria-label', name);
-    const answer = el('div', 'mini-asked-answer');
-    held[0].before(line);
-    answer.append(...held);
-    line.append(ask, answer);
-    const paint = () => {
-      const open = !!plan.asked[what];
-      ask.setAttribute('aria-expanded', String(open));
-      answer.toggleAttribute('data-ask-held', !open);
-    };
-    ask.addEventListener('click', (event) => {
-      event.stopPropagation();
-      plan.asked[what] = !plan.asked[what];
-      paint();
-    });
-    paint();
-  }
-}
-
-function renderRadicalNode(sheet, node) {
-  const r = D.radicals[node.id];
-  if (!r) {
-    sheet.append(el('div', 'sem-empty', tx('この部品はこの層にない。', 'This part is not in this layer.')));
-    return;
-  }
-  // Is this component itself one of the 214 official radicals? If so, name it
-  // as one — the operator's point: the radical system is real, not "up for
-  // debate". If not, it is a shape-component and says so plainly.
-  const official = D.radByGlyph?.[node.id];
-  const posText =
-    official && (official.pos === '独立' ? tx('独立', 'stands alone') : tx(official.pos, `${official.pos} · ${official.posEn}`));
-
-  const hero = el('div', 'hero');
-  hero.append(el('div', 'hero-glyph', r.c));
-  const meta = el('div', 'hero-meta');
-  meta.append(
-    el(
-      'div',
-      'hero-mean',
-      (official && official.name) || r.name || tx('（名称は漢検の部首表にない部品）', '(a part with no name in the Kanji Kentei radical table)'),
-    ),
-  );
-  const chips = el('div', 'shelf-meta');
-  if (official) {
-    chips.append(el('span', 'pool-tag', tx(`部首 ${official.n}`, `radical ${official.n}`)));
-    chips.append(el('span', 'pool-tag', posText));
-  }
-  if (r.st) chips.append(el('span', 'pool-tag', tx(`${r.st} 画`, `${r.st} strokes`)));
-  chips.append(el('span', 'pool-tag', tx(`${r.kanjiCount} 字`, `${r.kanjiCount} kanji`)));
-  meta.append(chips);
-  hero.append(meta);
-  sheet.append(hero);
-
-  // RADK/KRAD membership is a shape grouping. A radical's canonical position
-  // does not describe every member (火 also groups bottom 灬 and other forms).
-  // Count this collection, not every kanji; the heading below reports the cap.
-  const note = el('div', 'note');
-  const count = r.kanjiCount || 0;
-  note.textContent = tx(
-    `この資料では、この形を部品に持つ字は全${count}字。`,
-    `In this collection, this shape appears as a component in ${count} kanji.`,
-  );
-  sheet.append(note);
-
-  if (r.isKanji && D.kanji[r.c]) {
-    sheet.append(
-      chipsFor(
-        [{ label: r.c, sub: tx('字としても見る', 'view as a kanji') }],
-        (item, invoker) => go({ t: 'kanji', id: item.label, from: node.from }, { invoker }),
-        null,
-        'kanji',
-      ),
-    );
-  }
-
-  sheet.append(
-    withEn(
-      el(
-        'p',
-        'eyebrow',
-        r.kanjiCount > r.kanji.length
-          ? `この部品を含む字 — ${r.kanjiCount} 字のうち ${r.kanji.length} 字`
-          : `この部品を含む字 — ${r.kanjiCount} 字`,
-      ),
-      r.kanjiCount > r.kanji.length
-        ? `kanji that contain this part — showing ${r.kanji.length} of ${r.kanjiCount}`
-        : `kanji that contain this part — ${r.kanjiCount}`,
-      'en-inline',
-    ),
-  );
-  sheet.append(
-    chipsFor(
-      r.kanji.map((c) => ({ label: c, sub: D.kanken[c]?.kk ? tx(D.kanken[c].kk, kankenGradeLabel(D.kanken[c].kk)) : '' })),
-      (item, invoker) => go({ t: 'kanji', id: item.label, from: node.from }, { invoker }),
-      null,
-      'kanji',
-    ),
-  );
 
 
-  renderStudyFold(sheet, node, null);
-}
-
-function renderIdiomNode(sheet, node) {
-  const idiom = D.idioms[node.id];
-  if (!idiom) {
-    sheet.append(el('div', 'sem-empty', tx('この句はこの層にない。', 'This phrase is not in this layer.')));
-    return;
-  }
-  const head = el('h2', 'headword', idiom.w);
-  sheet.append(head);
-  sheet.append(el('p', 'reading', idiom.r));
-  const meta = el('div', 'shelf-meta');
-  if (idiom.yoji) meta.append(withEn(el('span', 'pool-tag', '四字熟語'), 'four-character idiom'));
-  sheet.append(meta);
-  for (const g of idiom.g) sheet.append(el('p', 'gloss', g));
-
-  sheet.append(withEn(el('p', 'eyebrow', '字へ'), 'into the kanji', 'en-inline'));
-  sheet.append(
-    chipsFor(
-      idiom.k.map((c) => ({ label: c, sub: D.kanken[c]?.kk ? tx(D.kanken[c].kk, kankenGradeLabel(D.kanken[c].kk)) : '' })),
-      (item, invoker) => go({ t: 'kanji', id: item.label, from: node.from }, { invoker }),
-      null,
-      'kanji',
-    ),
-  );
-
-  renderStudyFold(sheet, node, null);
-}
 
 /** 出会い — the observation ledger, read back at last (P2-19).
  *
@@ -42302,68 +32658,7 @@ function renderIdiomNode(sheet, node) {
  * colours the item, and never touches FSRS state. When an item has no
  * history the section is absent rather than showing a hopeful zero. */
 const TRAIL_KINDS = new Set(['tap', 'probe', 'dojo', 'lesson', 'reveal', 'drift']);
-function encounterTrail(key) {
-  const rows = (S.obslog || []).filter((row) => TRAIL_KINDS.has(row[1]) && row[2] === key);
-  if (!rows.length) return null;
-  const last = rows[rows.length - 1];
-  const counts = {};
-  for (const row of rows) counts[row[1]] = (counts[row[1]] || 0) + 1;
-  return { rows, first: rows[0][0], last, counts };
-}
 /** The last row, said in the learner's own terms — never a verdict. */
-function trailLastPhrase(row) {
-  const kind = row[1];
-  const g = row[3];
-  if (kind === 'tap') {
-    if (g === 3) return tx('全項目をひらいた', 'opened the full entry');
-    if (g === 2) return tx('語釈を見た', 'looked at the meaning');
-    return tx('ふりがなを出した', 'revealed the reading');
-  }
-  if (kind === 'drift') return g === 3 ? tx('水で「わかる」', 'flicked as known in the water') : tx('水で「まだ」', 'flicked as not yet in the water');
-  if (kind === 'probe') return g === 3 ? tx('読めた（読みの確認）', 'read it right in a reading check') : tx('読めなかった（読みの確認）', 'missed it in a reading check');
-  if (kind === 'lesson') return g === 3 ? tx('レッスンで正解', 'answered right in a lesson') : tx('レッスンで不正解', 'answered wrong in a lesson');
-  if (kind === 'reveal') return g === 1 ? tx('復習で「思い出した」', 'declared recall in review') : tx('復習で「まだ」', 'declared not-yet in review');
-  if (kind === 'dojo') {
-    const seal = { 1: '再', 2: '難', 3: '良', 4: '易' }[g];
-    return seal ? tx(`道場の稽古 — ${seal}`, `practised in the dojo — ${['', 'again', 'hard', 'good', 'easy'][g]}`) : tx('道場の稽古', 'practised in the dojo');
-  }
-  return tx('出会った', 'met it');
-}
-function renderEncounterTrail(sheet, node) {
-  if (!['word', 'kanji', 'radical', 'idiom'].includes(node.t)) return;
-  const trail = encounterTrail(srsKey(node.t, node.id));
-  if (!trail) return;
-  const box = el('div', 'encounter-trail');
-  box.append(withEn(el('p', 'eyebrow', '出会い'), 'your encounters', 'en-inline'));
-  const day = (t) => new Date(t).toLocaleDateString();
-  const n = trail.rows.length;
-  box.append(
-    el(
-      'p',
-      'trail-line',
-      tx(
-        `初めて ${day(trail.first)} ・ これまで ${n}回`,
-        `first met ${day(trail.first)} · ${n} ${n === 1 ? 'encounter' : 'encounters'} so far`,
-      ),
-    ),
-  );
-  box.append(
-    el('p', 'trail-line', tx(`直近 ${day(trail.last[0])} — ${trailLastPhrase(trail.last)}`, `last ${day(trail.last[0])} — ${trailLastPhrase(trail.last)}`)),
-  );
-  // the third line only when practice actually happened — a reading tapped
-  // in the reader is assistance, not practice, and must not be dressed as it
-  const practice = (trail.counts.dojo || 0) + (trail.counts.probe || 0) + (trail.counts.lesson || 0);
-  if (practice) {
-    box.append(
-      el(
-        'p',
-        'trail-line trail-quiet',
-        tx(`稽古 ${practice}回（記録であって、習熟ではない）`, `${practice} practice ${practice === 1 ? 'record' : 'records'} — evidence, not mastery`),
-      ),
-    );
-  }
-  sheet.append(box);
-}
 
 /** One page, detached: its bar, its body and its report line, its prose made doors. `path` is the stack the page will
  * stand on (its own node last). While it is built the page stands on that stack, so everything a builder reads from it
@@ -42757,9 +33052,6 @@ function pageCutAllowed() {
     !(typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 }
 /** The page's headword: a word's h2, a kanji's glyph, else the page's first heading. */
-function heroOf(page) {
-  return page?.querySelector('.headword, .hero-glyph, h2') || null;
-}
 /** End a word still travelling: it lands at once. */
 function finishPageTransition() {
   const running = pageTransition;
@@ -43079,19 +33371,7 @@ function readFrameRows() {
     return Array.isArray(rows) ? rows.filter(validFrameRow) : [];
   } catch { return []; }
 }
-function recordFrameRow(row) {
-  try {
-    const rows = readFrameRows();
-    rows.push(row);
-    localStorage.setItem(FRAMES_STORE, JSON.stringify(rows.slice(-FRAMES_CAP)));
-  } catch { /* a device's own measure: a full or blocked storage keeps none */ }
-}
 /** The week's roughest moves, worst first. */
-function roughestThisWeek(n = 5) {
-  const since = Date.now() - 7 * 24 * 60 * 60 * 1000;
-  return readFrameRows().filter((row) => row[0] >= since).sort((a, b) => b[3] - a[3]).slice(0, n)
-    .map(([t, name, where, worst]) => ({ name, where, worst_ms: worst, at: new Date(t).toISOString().slice(0, 10) }));
-}
 function licencePanel() {
   const box = el('div', 'note');
   box.append(
@@ -43192,20 +33472,6 @@ function renderVariants(root) {
   root.append(bar);
 }
 
-function updateMeasurements() {
-  const out = $('#measure');
-  if (!out) return;
-  const probe = $('.shelf-snippet') || $('.sig-name') || $('.crumb');
-  const reader = $('#reader') || $('.reader') || $('.shelf-title');
-  const faint = probe ? contrastOf(probe) : null;
-  const ink = $('.view-title') ? contrastOf($('.view-title')) : null;
-  const readerPx = reader ? Math.round(parseFloat(getComputedStyle(reader).fontSize)) : null;
-  const chromePx = Math.round(parseFloat(getComputedStyle(document.querySelector('.crumb')).fontSize));
-  out.textContent = tx(
-    `測定：淡色 ${faint ?? '—'}:1 · 本文墨 ${ink ?? '—'}:1 · 焦点 ${readerPx ?? '—'}px / 周辺 ${chromePx}px`,
-    `measured: faint text ${faint ?? '—'}:1 · body ink ${ink ?? '—'}:1 · focus ${readerPx ?? '—'}px vs chrome ${chromePx}px`,
-  );
-}
 
 /* --------------------------------------------------------------- render */
 /** The view rendered by the previous render() pass — lets a re-render of
@@ -43268,11 +33534,6 @@ function roomDirection(from, to) {
 let storyHeroIntent = null; // the tapped shelf card's picture, for the room change it starts
 let storyHeroFrom = null; // { passageId, rank }: the shelf card a story was opened from, where Back takes its picture
 let storyHeroSerial = 0;
-function storyHeroOnScreen(img) {
-  if (!img?.isConnected || !img.complete || !img.naturalWidth) return false;
-  const r = img.getBoundingClientRect();
-  return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
-}
 function storyHeroDeparting() {
   const intent = storyHeroIntent;
   storyHeroIntent = null;
@@ -43289,31 +33550,6 @@ function storyHeroDeparting() {
   return null;
 }
 /** The same picture where the room change arrives: the reader's picture, or the shelf card it was opened from. */
-function storyHeroArriving(hero) {
-  if (S.view !== hero.to || S.passageId !== hero.passageId) return null;
-  const src = hero.img.getAttribute('src');
-  const candidates = hero.to === 'reader'
-    ? [document.querySelector('#app > main .reader-picture-img')]
-    : [...document.querySelectorAll('#shelf-body .shelf-item[data-passage] .story-img')]
-      .filter((img) => img.closest('.shelf-item')?.dataset.passage === hero.passageId)
-      .sort((a, b) => Number(!(hero.rank && a.closest(`.${hero.rank}`))) - Number(!(hero.rank && b.closest(`.${hero.rank}`))));
-  const img = candidates.find((node) => node && node.getAttribute('src') === src && node.getBoundingClientRect().height > 0);
-  if (!img) return null;
-  const r = img.getBoundingClientRect();
-  return r.bottom > 0 && r.top < innerHeight ? img : null;
-}
-function nameStoryHero(img, id) {
-  img.style.viewTransitionName = 'hero';
-  img.dataset.storyHero = String(id);
-}
-function clearStoryHero(hero) {
-  for (const img of [hero?.img, hero?.arrived]) {
-    if (img?.dataset.storyHero === String(hero.id)) {
-      img.style.removeProperty('view-transition-name');
-      delete img.dataset.storyHero;
-    }
-  }
-}
 function withoutRoomTransition(change) {
   roomTransitionUpdating = true;
   try { return change(); } finally { roomTransitionUpdating = false; }
@@ -43521,24 +33757,6 @@ const PUBLIC_THEME_IDS = [
   'hakuu',
 ];
 const THEME_STORE = 'kairo-theme';
-function themeId() {
-  let stored = '';
-  try {
-    stored = localStorage.getItem(THEME_STORE) || '';
-  } catch {
-    stored = '';
-  }
-  if (THEME_UI.some((t) => t.id === stored)) return stored;
-  try {
-    if (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) return 'yoru';
-  } catch {
-    /* no matchMedia */
-  }
-  return 'hokusai';
-}
-function themeIx() {
-  return Math.max(0, THEME_UI.findIndex((t) => t.id === themeId()));
-}
 function setKairoTheme(id) {
   const t = THEME_UI.find((x) => x.id === id) || THEME_UI[0];
   // 北斎 is the bare :root default — no attribute, so nothing overrides it
@@ -43572,15 +33790,6 @@ const DRIFT_THEME_BY_WORLD = {
   hakuu: 4,
   kaku: 4,
 };
-function syncDriftTheme() {
-  try {
-    if (window.__DRIFT__ && window.__DRIFT__.setTheme) {
-      window.__DRIFT__.setTheme(DRIFT_THEME_BY_WORLD[themeId()] ?? 0);
-    }
-  } catch {
-    /* drift not mounted yet — render() re-syncs when it first shows */
-  }
-}
 /** A world change recolours through what setKairoTheme has already moved —
  * the data-theme tokens, the grown paper, the drift sync. The ONLY rendered
  * DOM that bakes the world in is the seal glyphs, so swap those in place
@@ -43974,9 +34183,6 @@ window.addEventListener('resize', () => {
  * the picker is armed only while the pointer is down on the seal. */
 let worldPickerEls = null;
 let worldPickerOpener = null;
-function worldPickerEsc(e) {
-  if (e.key === 'Escape') closeWorldPicker();
-}
 function closeWorldPicker() {
   if (!worldPickerEls) return;
   for (const n of worldPickerEls) n.remove();
@@ -43985,14 +34191,6 @@ function closeWorldPicker() {
   // hand focus back to the seal that opened the stones (keyboard walkers)
   if (worldPickerOpener && document.contains(worldPickerOpener)) worldPickerOpener.focus();
   worldPickerOpener = null;
-}
-function worldName(t) {
-  return tx(t.name, {
-    sumi: 'Ink on kozo paper', shu: 'Vermilion on shell white', iwa: 'Umber on persimmon paper',
-    rokusho: 'Shell white on black lacquer', yoru: 'Gold on indigo', hokusai: 'Hokusai Prussian blue',
-    akafuji: 'Red Fuji', nami: 'The Great Wave', keyblock: 'Woodblock ink',
-    hakuu: 'Lightning below the summit', kaku: 'Electric phosphor',
-  }[t.id]);
 }
 function openWorldPicker(anchor) {
   readerTicketIntent = null;
@@ -44735,15 +34933,6 @@ function buildPlacesMenu(root, bar) {
 /** The narrow reader's top line scrolls inside itself, and neither engine finishes revealing a
  * door that keyboard focus finds half outside it, so its ring is cut at the toolbar's edge. Only
  * keyboard focus moves only this toolbar's own horizontal offset; the page never moves. */
-function revealFocusedChromeDoor(event) {
-  const bar = event.currentTarget, door = event.target;
-  if (!(door instanceof Element) || !door.matches(':focus-visible') || bar.scrollWidth <= bar.clientWidth) return;
-  const rect = bar.getBoundingClientRect(), box = door.getBoundingClientRect();
-  const left = rect.left + bar.clientLeft, right = left + bar.clientWidth;
-  if (!box.width || box.width > right - left) return;
-  const delta = box.right > right ? Math.ceil(box.right - right) : box.left < left ? Math.floor(box.left - left) : 0;
-  if (delta) bar.scrollLeft += delta;
-}
 
 /** iOS Safari applies :active only where a touch listener exists. One passive listener on the
  * document lets every control show its press at touch-down, as native controls do (T2: "native
@@ -44871,9 +35060,6 @@ const PLACES_TABS = [
   { id: 'progress', ...tabWords(ROOM_NAMES.places.me), view: 'me', views: ['me', 'kagami', 'srs-stats', 'settings'] },
 ];
 /** The tab table of the layout in use. */
-function primaryTabs() {
-  return placesLayout() ? PLACES_TABS : PRIMARY_TABS;
-}
 let primaryDockObserver;
 /** Keep the report rail above live room controls, including wrapped labels. */
 function observePrimaryDocks() {
@@ -45085,277 +35271,25 @@ const ME_FIELDS = [
     noteJa: 'ホフスタッター・再帰・計算機科学・テクノロジー', noteEn: 'Hofstadter, recursion, computer science and tech' },
 ];
 /** The July sitting: the first Sunday of July in the goal year, local midnight. */
-function meN1Sitting() {
-  const first = new Date(ME_N1_SITTING.year, ME_N1_SITTING.month, 1);
-  return new Date(ME_N1_SITTING.year, ME_N1_SITTING.month, 1 + ((7 - first.getDay()) % 7));
-}
 /** Whole days from today to the sitting: 0 on the day, negative once it has passed. */
-function meDaysToSitting(now = new Date()) {
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  return Math.round((meN1Sitting() - today) / 86400000);
-}
 const ME_MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 /** session only: how many months back the seal calendar is turned */
 let meMonthBack = 0;
 /** deck id → { cards: Map(card id → {word, term, reading}), total } | null (could not load) | a promise */
 const meDeckIndex = new Map();
-function meDeckLedger(id) {
-  try {
-    const raw = JSON.parse(localStorage.getItem(`bunki-cloze:${id}`) || 'null');
-    // only a ledger the deck player itself would read (its format, version and deck)
-    return raw && raw.format === 'bunki-cloze-state' && raw.version === 1 && raw.deckId === id &&
-      raw.cards && typeof raw.cards === 'object' && !Array.isArray(raw.cards) && Object.keys(raw.cards).length ? raw : null;
-  } catch {
-    return null;
-  }
-}
 /** the deck's words, fetched once and only for a deck the learner has opened */
-function meDeckWords(id, onReady) {
-  const have = meDeckIndex.get(id);
-  if (have === null || (have && !(have instanceof Promise))) return have;
-  if (!have) {
-    const packed = window.__CORRIDOR_BUNDLE__?.[`decks/${id}`] || window.__KP_DECKS__?.[id];
-    const got = packed ? Promise.resolve(packed)
-      : fetch(new URL(`decks/${id}/deck.json`, document.baseURI)).then((r) => (r.ok ? r.json() : Promise.reject(new Error(`deck ${id} ${r.status}`))));
-    meDeckIndex.set(id, got.then((deck) => {
-      const cards = new Map();
-      const groups = {};
-      for (const w of deck.words || []) {
-        if (w.group) groups[w.group] = (groups[w.group] || 0) + 1;
-        for (const c of w.cards || []) cards.set(c.id, { word: w.id, term: w.term, reading: w.reading || '', group: w.group || '' });
-      }
-      const index = { cards, total: (deck.words || []).length, groups };
-      meDeckIndex.set(id, index);
-      return index;
-    }, () => {
-      meDeckIndex.set(id, null);
-      return null;
-    }));
-  }
-  meDeckIndex.get(id).then(onReady);
-  return undefined;
-}
 const meNum = (n) => Number(n).toLocaleString('en-US');
-function meDate(t, year = false) {
-  const d = new Date(t);
-  return tx(`${year ? `${d.getFullYear()}年` : ''}${d.getMonth() + 1}月${d.getDate()}日`,
-    `${d.getDate()} ${ME_MONTHS_EN[d.getMonth()].slice(0, 3)}${year ? ` ${d.getFullYear()}` : ''}`);
-}
-function meRevoked() {
-  const out = new Set();
-  for (const row of S.revlog || []) if (Array.isArray(row) && row[2] === 0) out.add(row[3]);
-  return out;
-}
 /** every day with real practice: cards (reviews, drills, lessons, papers, deck answers, written
  * sentences) or reading (a finished article, a tap in the reader) */
-function meDays(decks) {
-  const days = new Map();
-  let first = Infinity;
-  const mark = (t, kind) => {
-    if (!finiteNumber(t) || t <= 0) return;
-    const key = dayKey(new Date(t));
-    const day = days.get(key) || { cards: false, read: false };
-    day[kind] = true;
-    days.set(key, day);
-    if (t < first) first = t;
-  };
-  for (const [key, day] of Object.entries(S.stats || {})) {
-    const [y, m, d] = key.split('-').map(Number);
-    if (day && day.n > 0 && y && m && d) mark(new Date(y, m - 1, d, 12).getTime(), 'cards');
-  }
-  const revoked = meRevoked();
-  (S.revlog || []).forEach((row, i) => { if (Array.isArray(row) && row[2] !== 0 && !revoked.has(i)) mark(row[0], 'cards'); });
-  for (const row of S.obslog || []) {
-    if (!Array.isArray(row)) continue;
-    if (row[1] === 'tap') mark(row[0], 'read');
-    else if (['probe', 'dojo', 'lesson', 'mock'].includes(row[1])) mark(row[0], 'cards');
-  }
-  for (const t of Object.values(S.readDone || {})) mark(t, 'read');
-  for (const r of S.sentencePractice?.responses || []) mark(Date.parse(r.at), 'cards');
-  for (const d of decks) for (const row of d.ledger?.log || []) if (Array.isArray(row)) mark(Date.parse(row[2]), 'cards');
-  return { days, first: Number.isFinite(first) ? new Date(first) : null };
-}
 /** graft D's lead figure: characters of the articles you finished, less the words you tapped for help. The characters
  * are counted as the help line counts them (articleReadChars, Hfix-1B L-1), so unaided never exceeds read */
-function meReadUnaided() {
-  const passages = D.passages || [];
-  const counted = new Map();
-  for (const p of passages) {
-    if (!owns(S.readDone || {}, p.id)) continue;
-    const chars = articleReadChars(p.id, S, p);
-    if (finiteNumber(chars)) counted.set(p.id, chars);
-  }
-  const finished = passages.filter((p) => counted.has(p.id));
-  if (!finished.length) return null;
-  const ids = new Set(finished.map((p) => p.id));
-  const looked = new Set();
-  let helped = 0;
-  for (const row of S.obslog || []) {
-    if (!Array.isArray(row) || row[1] !== 'tap' || !ids.has(row[4]) || typeof row[2] !== 'string') continue;
-    const once = `${row[4]}\u0000${row[2]}`;
-    if (looked.has(once)) continue;
-    looked.add(once);
-    helped += [...row[2].replace(/^word:/, '')].length;
-  }
-  const read = finished.reduce((sum, p) => sum + counted.get(p.id), 0);
-  return { n: Math.max(0, read - helped), read, articles: finished.length, looked: looked.size };
-}
-function meHorizons(decks) {
-  const rows = [];
-  // words held by recall in a deck's ledger, optionally only the cards a test keeps
-  const heldIn = (d, keep) => {
-    const held = new Set();
-    for (const [cardId, rec] of Object.entries(d?.ledger?.cards || {})) {
-      const card = d.index?.cards.get(cardId);
-      if (keep && !(card && keep(card))) continue;
-      const word = card?.word || cardId.slice(0, cardId.lastIndexOf('-'));
-      if (rec && rec.state === 2 && !owns(d.ledger.suspended || {}, cardId)) held.add(word);
-    }
-    return held.size;
-  };
-  const [n1Deck, fieldsDeck] = ME_DECKS.map((h) => decks.find((x) => x.id === h.id));
-  rows.push({ id: 'n1', ja: ME_DECKS[0].ja, en: ME_DECKS[0].en, n: heldIn(n1Deck), of: n1Deck?.index?.total ?? null,
-    begun: !!n1Deck?.ledger, measure: tx(ME_DECKS[0].measureJa, ME_DECKS[0].measureEn) });
-  for (const f of ME_FIELDS) {
-    // a begun deck is split by field only once its words have arrived: until then it says so
-    const counting = !!fieldsDeck?.ledger && !fieldsDeck.index;
-    rows.push({ id: `field-${f.id}`, field: f, ja: f.ja, en: f.en, counting,
-      n: counting ? 0 : heldIn(fieldsDeck, (card) => card.group === f.id),
-      of: fieldsDeck?.index?.groups?.[f.id] ?? null, begun: !!fieldsDeck?.ledger,
-      measure: tx(ME_DECKS[1].measureJa, ME_DECKS[1].measureEn) });
-  }
-  const kk = D.kanken || {};
-  const met = new Set();
-  const heldK = new Set();
-  const add = (text, held) => {
-    for (const c of String(text || '')) if (owns(kk, c)) { met.add(c); if (held) heldK.add(c); }
-  };
-  let saved = 0;
-  let savedHeld = 0;
-  for (const item of S.taken || []) {
-    const key = srsKey(item.t, item.id);
-    const held = S.srs[key]?.state === 2 && !S.suspended?.[key];
-    saved += 1;
-    if (held) savedHeld += 1;
-    if (['word', 'kanji', 'idiom'].includes(item.t)) add(item.t === 'kanji' ? item.id : item.label || item.id, held);
-  }
-  for (const d of decks) {
-    if (!d.index || !d.ledger) continue;
-    for (const [cardId, rec] of Object.entries(d.ledger.cards)) {
-      const w = d.index.cards.get(cardId);
-      if (w) add(w.term, rec?.state === 2 && !owns(d.ledger.suspended || {}, cardId));
-    }
-  }
-  rows.push({ id: 'kanken', ja: '漢検の漢字', en: 'Kanken kanji', n: heldK.size, of: Object.keys(kk).length, met: met.size, begun: met.size > 0,
-    measure: tx(`想起で保持 · 出会った ${meNum(met.size)} 字`, `held by recall · ${meNum(met.size)} met`) });
-  rows.push({ id: 'saved', ja: '集めた言葉', en: 'Words you saved', n: savedHeld, of: saved, begun: saved > 0,
-    measure: tx('想起で保持 · 自分で集めた札', 'held by recall · cards you saved yourself') });
-  return rows;
-}
 /** 継いだ言葉: a word that lapsed in review and was later recalled again. The corridor's review log
  * names the state before each grade; a deck's log does not, so a deck card counts only when it
  * has lapsed (its own lapse count), stands in review again, and was recalled on a later day. */
-function meCameHome(decks) {
-  const rows = [];
-  const revoked = meRevoked();
-  const pending = new Map();
-  const homes = new Map();
-  (S.revlog || []).forEach((row, i) => {
-    if (!Array.isArray(row) || row[2] === 0 || revoked.has(i)) return;
-    if (row[3] === 2 && row[2] === 1) pending.set(row[1], row[0]);
-    else if (row[3] === 2 && row[2] >= 2 && pending.has(row[1])) {
-      homes.set(row[1], { lapsed: pending.get(row[1]), home: row[0] });
-      pending.delete(row[1]);
-    }
-  });
-  const byKey = new Map((S.taken || []).map((item) => [srsKey(item.t, item.id), item]));
-  for (const [key, h] of homes) {
-    const item = byKey.get(key);
-    if (!item || !['word', 'kanji', 'idiom'].includes(item.t)) continue;
-    const answer = item.t === 'word' ? savedAnswerFor(item) : null;
-    rows.push({ surface: item.t === 'kanji' ? item.id : item.label || item.id, reading: answer?.status === 'available' ? answer.reading : '', ...h });
-  }
-  for (const d of decks) {
-    if (!d.index || !d.ledger) continue;
-    const log = new Map();
-    for (const row of d.ledger.log || []) {
-      const t = Array.isArray(row) ? Date.parse(row[2]) : NaN;
-      if (!Number.isFinite(t)) continue;
-      if (!log.has(row[0])) log.set(row[0], []);
-      log.get(row[0]).push([t, row[1]]);
-    }
-    for (const [cardId, rec] of Object.entries(d.ledger.cards)) {
-      if (!rec || !(rec.lapses > 0) || rec.state !== 2) continue;
-      const answers = log.get(cardId) || [];
-      let lapsed = null;
-      for (const [t, g] of answers) if (g === 1) lapsed = t;
-      const home = lapsed == null ? null : answers.find(([t, g]) => g >= 2 && t > lapsed && dayKey(new Date(t)) !== dayKey(new Date(lapsed)));
-      const w = d.index.cards.get(cardId);
-      if (home && w) rows.push({ surface: w.term, reading: w.reading, lapsed, home: home[0] });
-    }
-  }
-  const seen = new Set();
-  return rows.sort((a, b) => b.home - a.home).filter((r) => !seen.has(r.surface) && seen.add(r.surface)).slice(0, 4);
-}
 /** the newest line the learner wrote by hand in sentence practice, else the newest line they kept */
-function meCopiedLine() {
-  const sp = S.sentencePractice;
-  if (!sp) return null;
-  const entries = new Map((sp.entries || []).map((e) => [e.plan?.id, e]));
-  const wrote = (sp.responses || []).filter((r) => r.mode === 'production' && typeof r.text === 'string' && r.text.trim())
-    .sort((a, b) => Date.parse(b.at) - Date.parse(a.at))[0];
-  if (wrote) return { text: wrote.text.trim(), title: entries.get(wrote.entryId)?.context?.title || '', at: Date.parse(wrote.at), hand: true };
-  const kept = (sp.entries || []).at(-1);
-  if (kept?.context?.quote) return { text: kept.context.quote, title: kept.context.title || '', at: Date.parse(kept.plan?.capture?.occurredAt), hand: false };
-  return null;
-}
 /** a gold seam along the word's own crack: the same word always breaks the same way */
-function meSeam(surface) {
-  let h = 2166136261;
-  for (const c of String(surface)) h = Math.imul(h ^ c.codePointAt(0), 16777619) >>> 0;
-  const next = () => {
-    h = Math.imul(h ^ (h >>> 13), 2246822507) >>> 0;
-    return (h % 1000) / 1000;
-  };
-  // a crack, not a wave: uneven runs, sharp turns, one short branch
-  const pts = [[0, 9 + (next() - 0.5) * 4]];
-  for (let x = 0, up = next() < 0.5; x < 100; up = !up) {
-    x = Math.min(100, x + 7 + next() * 11);
-    pts.push([x, 9 + (up ? -1 : 1) * (1.5 + next() * 5.5)]);
-  }
-  const at = pts[1 + Math.floor(next() * (pts.length - 2))];
-  const branch = [at, [at[0] + 5 + next() * 6, at[1] < 9 ? 1 + next() * 2 : 15 + next() * 2]];
-  const line = (list) => list.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`).join(' ');
-  const svg = document.createElementNS(SVG_NS, 'svg');
-  svg.setAttribute('class', 'me-seam');
-  svg.setAttribute('viewBox', '0 0 100 18');
-  svg.setAttribute('preserveAspectRatio', 'none');
-  svg.setAttribute('aria-hidden', 'true');
-  for (const [d, cls] of [[line(pts), 'me-seam-main'], [line(branch), 'me-seam-branch']]) {
-    const path = document.createElementNS(SVG_NS, 'path');
-    path.setAttribute('d', d);
-    path.setAttribute('class', cls);
-    path.setAttribute('vector-effect', 'non-scaling-stroke');
-    svg.append(path);
-  }
-  return svg;
-}
-function meSection(part, ja, en, aside) {
-  const sec = el('section', `me-part me-${part}`);
-  sec.dataset.mePart = part;
-  const head = el('div', 'me-part-head');
-  head.append(el('h2', 'eyebrow', tx(ja, en)));
-  if (aside) head.append(el('span', 'me-part-aside', aside));
-  sec.append(head);
-  return sec;
-}
 /** A Japanese name breaks only after its 中黒 (・) and 、, never inside a word (ヒン|ドゥー) and never
  * before its 中黒 (|・テクノロジー): each phrase, with the mark that ends it, is one unbreakable piece. */
-function meBreakable(tag, cls, text) {
-  const node = el(tag, cls);
-  for (const part of String(text).split(/(?<=[・、])/u)) node.append(el('span', 'me-nb', part));
-  return node;
-}
 /** Where an unbegun goal's deck lives: Learn in the current layout, Review in the layout under test. Q · in the house voice
  * (G-14; Grok's walk: "THE FIELDS DECK IS IN LEARN"): a plain sentence, never set in capitals (.is-sentence). */
 function fieldsDeckHome() {
@@ -45363,124 +35297,7 @@ function fieldsDeckHome() {
     : tx('まだ始めていない。専門デッキは「学ぶ」にある。', 'Not started yet. The fields deck is in Learn.');
 }
 /** One horizon: its name (a field also carries his own gloss), the figure held, the ruled scale. */
-function meHorizonRow(h, { quiet = false } = {}) {
-  const row = el('div', 'me-hz');
-  row.dataset.horizon = h.id;
-  if (!h.begun) row.classList.add('not-begun');
-  const shown = h.begun && !h.counting;
-  const top = el('div', 'me-hz-top');
-  top.append(meBreakable('span', 'me-hz-name', tx(h.ja, h.en)));
-  const figure = el('span', 'me-hz-n');
-  figure.append(el('b', '', shown ? meNum(h.n) : '—'));
-  if (h.of && shown) figure.append(el('span', 'me-hz-of', ` / ${meNum(h.of)}`));
-  top.append(figure);
-  row.append(top);
-  if (h.field) row.append(meBreakable('p', 'me-hz-note', tx(h.field.noteJa, h.field.noteEn)));
-  const rule = el('div', 'me-hz-rule');
-  rule.setAttribute('aria-hidden', 'true');
-  if (h.of && h.met) {
-    const met = el('i', 'me-hz-met');
-    met.style.setProperty('--f', Math.min(1, h.met / h.of).toFixed(4));
-    rule.append(met);
-  }
-  const fill = el('i', 'me-hz-fill');
-  fill.style.setProperty('--f', h.of && shown ? Math.min(1, h.n / h.of).toFixed(4) : '0');
-  rule.append(fill);
-  const sub = el('p', `me-hz-sub${h.begun ? '' : ' is-sentence'}`);
-  if (!h.begun) flowText(sub, {
-    saved: tx('まだ札がない。読みながら言葉を保存する。', 'No cards yet. Save words as you read.'),
-    kanken: tx('保存した言葉の漢字から数える。', 'Counted from the kanji in your saved words.'),
-    n1: placesLayout() ? tx('まだ始めていない。N1デッキは「復習」にある。', 'Not started yet. The N1 deck is in Review.')
-      : tx('まだ始めていない。N1デッキは「学ぶ」にある。', 'Not started yet. The N1 deck is in Learn.'),
-  }[h.id] || fieldsDeckHome());
-  else if (h.counting) sub.textContent = tx('専門デッキの札を数えている…', 'counting your fields deck…');
-  else {
-    sub.append(el('span', '', h.measure));
-    if (h.of) sub.append(el('b', '', ` · ${((h.n / h.of) * 100).toFixed(1)}%`));
-  }
-  row.append(rule);
-  if (!quiet) row.append(sub);
-  return row;
-}
 /** The lead horizon: N1 in July 2027, the days to the July sitting from today, then N1 vocabulary. */
-function meN1Plate(h) {
-  const plate = el('div', 'me-n1');
-  const head = el('div', 'me-n1-head');
-  head.append(el('span', 'me-n1-seal', 'N1'),
-    el('span', 'me-n1-when', tx(`${ME_N1_SITTING.year}年${ME_N1_SITTING.month + 1}月`, `${ME_MONTHS_EN[ME_N1_SITTING.month]} ${ME_N1_SITTING.year}`)));
-  plate.append(head);
-  const days = meDaysToSitting();
-  const sitting = meN1Sitting();
-  const count = el('p', 'me-n1-count');
-  if (days > 0) {
-    const n = el('b', 'me-n1-days', meNum(days));
-    if (bi()) count.append(n, el('span', 'me-n1-unit', days === 1 ? 'day to the test' : 'days to the test'));
-    else count.append(el('span', 'me-n1-unit', 'あと'), n, el('span', 'me-n1-unit', '日'));
-  } else {
-    count.classList.add('is-done');
-    count.append(el('span', 'me-n1-unit', days === 0
-      ? tx('今日が試験の日', 'The test is today')
-      : tx(`${ME_N1_SITTING.year}年7月の試験は過ぎた`, `The July ${ME_N1_SITTING.year} test has passed`)));
-  }
-  plate.append(count);
-  if (days >= 0) {
-    plate.append(el('p', 'me-n1-date', tx(
-      `試験日 ${sitting.getFullYear()}年${sitting.getMonth() + 1}月${sitting.getDate()}日（日）の見込み`,
-      `Test expected Sun ${sitting.getDate()} ${ME_MONTHS_EN[sitting.getMonth()].slice(0, 3)} ${sitting.getFullYear()}`)));
-  }
-  plate.append(meHorizonRow(h));
-  return plate;
-}
-function meHorizonsPart(decks) {
-  const sec = meSection('horizons', '目標', 'Your goals');
-  const rows = meHorizons(decks);
-  sec.append(meN1Plate(rows.find((h) => h.id === 'n1')));
-  sec.append(el('h3', 'me-hz-group', tx('あなたの三つの分野', 'Your three fields')));
-  const fields = rows.filter((h) => h.field);
-  // until the fields deck is opened, the three fields say so once, not three times
-  const unbegun = fields.length > 0 && fields.every((h) => !h.begun);
-  if (unbegun) sec.append(el('p', 'me-hz-sub me-hz-group-note is-sentence', fieldsDeckHome()));
-  for (const h of fields) sec.append(meHorizonRow(h, { quiet: unbegun }));
-  sec.append(el('h3', 'me-hz-group', tx('あなたの言葉', 'Your words')));
-  for (const h of rows) if (h.id === 'kanken' || h.id === 'saved') sec.append(meHorizonRow(h));
-  return sec;
-}
-function meCameHomePart(decks, active) {
-  const home = meCameHome(decks);
-  if (!home.length && !active) return null;
-  const sec = meSection('mended', '取り戻した語', 'Words you won back');
-  if (!home.length) {
-    sec.append(el('p', 'me-quiet', tx('忘れた言葉をもう一度思い出すと、ここに金で継がれる。',
-      'When a word slips and you win it back, it is mended here in gold.')));
-    return sec;
-  }
-  const list = el('ol', 'me-home-list');
-  home.forEach((h, i) => {
-    const li = el('li', 'me-home');
-    li.style.setProperty('--i', String(i));
-    const word = el('span', 'me-home-w');
-    const surface = el('span', 'me-home-surface', h.surface);
-    surface.lang = 'ja';
-    surface.dataset.uiContent = 'learning';
-    word.append(surface);
-    if (h.reading && h.reading !== h.surface) {
-      const reading = el('span', 'me-home-r', h.reading);
-      reading.lang = 'ja';
-      reading.dataset.uiContent = 'learning';
-      word.append(reading);
-    }
-    const seam = el('span', 'me-home-seam');
-    seam.setAttribute('aria-hidden', 'true');
-    seam.append(meSeam(h.surface), el('i', 'me-gleam'));
-    const when = el('span', 'me-home-when');
-    when.append(el('span', '', tx(`${meDate(h.lapsed)} 失念`, `lapsed ${meDate(h.lapsed)}`)),
-      el('b', '', tx(`${meDate(h.home)} 回復`, `held ${meDate(h.home)}`)));
-    li.append(word, seam, when);
-    list.append(li);
-  });
-  sec.append(list);
-  return sec;
-}
 function meSealsPart(days, first) {
   const now = new Date();
   const maxBack = first ? (now.getFullYear() - first.getFullYear()) * 12 + now.getMonth() - first.getMonth() : 0;
@@ -45545,24 +35362,6 @@ function meSealsPart(days, first) {
   sec.append(head, dow, grid, foot);
   return sec;
 }
-function meLinePart() {
-  const line = meCopiedLine();
-  if (!line) return null;
-  const sec = meSection('line', line.hand ? '書き写した一文' : '書き留めた一文', line.hand ? 'A line you wrote by hand' : 'A line you kept');
-  const text = el('p', 'me-hand', line.text);
-  text.lang = 'ja';
-  text.dataset.uiContent = 'learning';
-  const src = el('p', 'me-line-src');
-  if (line.title) {
-    const t = el('span', 'me-line-title', line.title);
-    t.lang = 'ja';
-    t.dataset.uiContent = 'learning';
-    src.append(el('span', '', tx('出典 ', 'from ')), t);
-  }
-  if (Number.isFinite(line.at)) src.append(el('b', '', `${line.title ? ' · ' : ''}${meDate(line.at)}`));
-  sec.append(text, src);
-  return sec;
-}
 /** 奥付: the back of the book — the two everyday switches, then every setting */
 function meBackPart() {
   const sec = meSection('back', '設定', 'Settings');
@@ -45618,167 +35417,12 @@ function meBackPart() {
   sec.append(row('表示言語', 'Interface language', language), row('明かり', 'Light', light), doors);
   return sec;
 }
-function renderMe(main) {
-  const decks = ME_DECKS.map((d) => ({ id: d.id, ledger: meDeckLedger(d.id), index: undefined }));
-  for (const d of decks) {
-    const known = meDeckIndex.get(d.id);
-    if (d.ledger && known && !(known instanceof Promise)) d.index = known;
-  }
-  const book = el('div', 'me-book');
-  const spine = el('div', 'me-spine');
-  spine.setAttribute('aria-hidden', 'true');
-  const edges = el('div', 'me-edges');
-  edges.setAttribute('aria-hidden', 'true');
-  book.append(spine, edges);
-  const { days, first } = meDays(decks);
-  const now = new Date();
-  const head = el('header', 'me-head');
-  head.append(el('p', 'eyebrow me-kicker', tx('一年の帳', 'The book of your year')));
-  head.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.me)));
-  const dateline = el('p', 'me-dateline');
-  if (first) {
-    const dayN = Math.round((new Date(now.getFullYear(), now.getMonth(), now.getDate()) - new Date(first.getFullYear(), first.getMonth(), first.getDate())) / 86400000) + 1;
-    // each clause holds together; the line breaks only at its dots
-    const clause = (...parts) => {
-      const span = el('span', 'me-clause');
-      span.append(...parts.map((p, i) => (i % 2 ? el('b', '', p) : p)));
-      return span;
-    };
-    const clauses = bi()
-      ? [clause('since ', meDate(first, true)), clause('day ', meNum(dayN)), clause('', meNum(days.size), ` day${days.size === 1 ? '' : 's'} practised`)]
-      : [clause('', meDate(first, true), 'から'), clause('', meNum(dayN), ' 日目'), clause('稽古 ', meNum(days.size), ' 日')];
-    clauses.forEach((c, i) => dateline.append(...(i ? [' · ', c] : [c])));
-  } else {
-    dateline.classList.add('is-blank');
-    flowText(dateline, tx('最初の札か記事から、この帳が始まる。', 'Your book begins with your first card or article.'));
-  }
-  head.append(dateline);
-  const reading = meReadUnaided();
-  if (reading) {
-    const lead = el('p', 'me-lead');
-    lead.append(el('b', 'me-lead-n', meNum(reading.n)), el('span', 'me-lead-l', tx('字を自力で読んだ', 'characters read unaided')),
-      el('span', 'me-lead-m', tx(`読み終えた ${reading.articles} 編から、調べた ${reading.looked} 語を除く`,
-        `in ${reading.articles} finished article${reading.articles === 1 ? '' : 's'}, less the ${reading.looked} word${reading.looked === 1 ? '' : 's'} you looked up`)));
-    head.append(lead);
-  }
-  // G2 · beside it, the help signal: help per 1,000 characters of the month's first readings (meHelpLine, read-only)
-  head.append(meHelpLine());
-  book.append(head);
-  let horizons = meHorizonsPart(decks);
-  let home = meCameHomePart(decks, !!first);
-  book.append(horizons);
-  if (home) book.append(home);
-  book.append(meSealsPart(days, first));
-  const line = meLinePart();
-  if (line) book.append(line);
-  const contents = meSection('contents', 'もっと見る', 'More');
-  const doors = el('div', 'foundation-doors me-doors');
-  doors.append(
-    foundationDoor('me-progress', '学びの足跡', 'Your progress', 'kagami'),
-    foundationDoor('me-statistics', '復習の統計', 'Review statistics', 'srs-stats'),
-    placesLayout() ? foundationDoor('me-collections', '保存した語とリスト', 'Saved words & lists', 'saved') : foundationDoor('me-collections', '集めた言葉', 'Saved words & lists', 'tray'),
-  );
-  if (window.__CORRIDOR_STANDALONE__ !== true) {
-    const personal = biLabel('button', 'grammar-link foundation-door', '自分の文章', 'Your own texts');
-    personal.type = 'button'; personal.id = 'me-personal';
-    personal.addEventListener('click', openPersonalCollection); doors.append(personal);
-  }
-  contents.append(doors);
-  book.append(contents, meBackPart());
-  main.append(book);
-  // a deck the learner has opened brings its words: the horizon's whole, its kanji, its mended words
-  for (const d of decks) {
-    if (!d.ledger || d.index) continue;
-    meDeckWords(d.id, (index) => {
-      if (!index || !book.isConnected || d.index) return;
-      d.index = index;
-      const nextHorizons = meHorizonsPart(decks);
-      nextHorizons.classList.add('me-settle');
-      horizons.replaceWith(nextHorizons);
-      horizons = nextHorizons;
-      const nextHome = meCameHomePart(decks, !!first);
-      if (home && nextHome) home.replaceWith(nextHome);
-      else if (nextHome) horizons.after(nextHome);
-      if (nextHome) home = nextHome;
-    });
-  }
-}
 /** Opening Settings at the record: the backup row in view and Export ready for a key press. */
-function showRecordBackup() {
-  requestAnimationFrame(() => {
-    document.getElementById('record-backup')?.scrollIntoView({ block: 'center' });
-    document.getElementById('export-store')?.focus({ preventScroll: true });
-  });
-}
 /** Settings → Layout: the current layout, or the one under test. Two visible states, the active one
  * lit, and one plain line of what changes and what does not. The choice re-renders where it stands. */
-function renderLayoutChoice() {
-  const section = el('section', 'foundation-section settings-layout');
-  section.id = 'settings-layout';
-  section.append(el('h2', 'eyebrow', tx('レイアウト', 'Layout')));
-  const choices = el('div', 'lang-seg settings-layout-choice');
-  choices.setAttribute('role', 'group');
-  choices.setAttribute('aria-label', tx('レイアウト', 'Layout'));
-  for (const [id, ja, en] of [['current', 'いまの並び', 'Current'], ['places', '新しい並び', 'New layout']]) {
-    const button = el('button', '', tx(ja, en));
-    button.type = 'button';
-    button.dataset.layout = id;
-    button.setAttribute('aria-pressed', String((placesLayout() ? 'places' : 'current') === id));
-    button.addEventListener('click', () => {
-      if ((placesLayout() ? 'places' : 'current') === id) return;
-      roomTransition(() => {
-        setLayout(id);
-        render();
-        window.scrollTo(0, 0);
-      });
-    });
-    choices.append(button);
-  }
-  section.append(choices, el('p', 'settings-layout-note', tx(
-    '新しい並び：復習・本棚・辞書・試験・記録の五つ。カードはどちらも同じ。いつでも戻せる。',
-    'New layout: five places — Review, Bookshelf, Dictionary, Tests, Progress. Your cards are the same in both; switch back any time.')));
-  return section;
-}
 /** Settings → 筆 and 声 (G4): when a word he brings closer writes itself (first meeting · always · never) and whether it is
  * said in the recorded voice (on · off). Device choices, never the learner record. The writing's speed is not here: it
  * is his one 書く速さ slider, in one place — the writing room — and this note says where. */
-function renderWritingChoice() {
-  const section = el('section', 'foundation-section settings-writing');
-  section.id = 'settings-writing';
-  section.append(el('h2', 'eyebrow', tx('筆と声', 'Writing and voice')));
-  const row = (id, ja, en, options, current, choose) => {
-    const line = el('div', 'settings-writing-row');
-    const name = el('p', 'settings-writing-name', tx(ja, en));
-    name.id = `${id}-name`;
-    const choices = el('div', 'lang-seg settings-layout-choice settings-writing-choice');
-    choices.id = id;
-    choices.setAttribute('role', 'group');
-    choices.setAttribute('aria-labelledby', name.id);
-    for (const [value, optionJa, optionEn] of options) {
-      const button = el('button', '', tx(optionJa, optionEn));
-      button.type = 'button';
-      button.dataset.value = value;
-      button.setAttribute('aria-pressed', String(current === value));
-      button.addEventListener('click', () => {
-        const chosen = choose(value);
-        for (const other of choices.querySelectorAll('button')) other.setAttribute('aria-pressed', String(other.dataset.value === chosen));
-      });
-      choices.append(button);
-    }
-    line.append(name, choices);
-    return line;
-  };
-  section.append(
-    row('settings-brush', '筆 — 語が自分で書かれる', '筆 — a word writes itself',
-      [['first', '初めての語', 'First meeting'], ['always', 'いつも', 'Always'], ['never', '書かない', 'Never']],
-      wordBrush(), (value) => setWordPref(WORD_BRUSH_KEY, 'wordBrush', WORD_BRUSH, value)),
-    row('settings-voice', '声 — 収録音声で読み上げる', '声 — say it in the recorded voice',
-      [['on', 'オン', 'On'], ['off', 'オフ', 'Off']],
-      wordVoice(), (value) => setWordPref(WORD_VOICE_KEY, 'wordVoice', WORD_VOICE, value)),
-    el('p', 'settings-layout-note', tx('書く速さは、書の間のスライダー一つで決まります。',
-      'The writing speed is set in one place: the writing room’s slider.')));
-  return section;
-}
 function renderSettings(main) {
   const places = placesLayout();
   main.append(el('p', 'eyebrow me-kicker', places ? tx('記録', 'Progress') : tx('私', 'Me')));
@@ -45900,38 +35544,6 @@ const ROOM_IDS = {
 };
 const REGISTER_ROOM_DOORS = [['いまの日本を読む', 'news & magazines'], ['日本語を持ち込む', 'bring your own text'], ['参考書庫', 'Reference library'], ['レッスン', 'Lessons'], ['JLPT の練習', 'JLPT practice']];
 const REGISTER_LINE_DOORS = [['読み物の好み', 'Reading preferences']];
-function stampRegister() {
-  const html = document.documentElement;
-  const main = document.querySelector('#app > main');
-  const room = ROOM_IDS[S.view] || S.view || 'door';
-  const material = S.view === 'personaldeck' ? 'hall'
-    : document.body.classList.contains('ginga') || !main ? 'door'
-    : main.querySelector('.mock-opts, .mock-q, .guided-room[data-stage="question"]') ? 'attempt'
-      : main.querySelector('.exam-confirm') ? 'threshold'
-        : main.querySelector('.exam-score') ? 'results'
-          : main.querySelector('.exam-levels') ? 'jlpt'
-            : main.querySelector('.chat-log') ? 'tutor'
-              : main.querySelector('#shelf-body') ? 'shelf'
-                : main.querySelector('.mock-review') ? 'review' : 'hall';
-  if (html.dataset.room !== room || html.dataset.register !== material) {
-    html.dataset.room = room;
-    html.dataset.register = material;
-  }
-  // the older sets have no .exam-progress: their counter is the card-kind after the policy line
-  const progress = document.querySelector('.exam-progress') ||
-    document.querySelector('#app > main[data-mock-set] > .card-kind:not(.mock-attempt-policy)');
-  const counted = ((progress?.firstElementChild || progress)?.textContent || '').match(/(\d+)\s*(?:of|\/)\s*(\d+)/);
-  if (counted) html.style.setProperty('--stage', String(Number(counted[1]) / Number(counted[2])));
-  else html.style.removeProperty('--stage');
-  const opts = document.querySelector('.mock-opts, .mock-q + .lesson-options');
-  if (opts?.querySelector('[aria-pressed="true"], [aria-checked="true"], .chosen, .selected, .is-selected')) html.dataset.answered = '1';
-  else delete html.dataset.answered;
-  for (const door of document.querySelectorAll('#shelf-body button.grammar-link:not([data-grade])')) {
-    const label = (door.textContent || '').replace(/\s+/g, ' ').trim();
-    door.dataset.grade = REGISTER_ROOM_DOORS.some((names) => label.toLowerCase().startsWith(tx(...names).toLowerCase())) ? 'room'
-      : REGISTER_LINE_DOORS.some((names) => label.toLowerCase().startsWith(tx(...names).toLowerCase())) ? 'line' : 'tool';
-  }
-}
 
 /** The visible state of a room that failed to draw. Keeps drafts; logs the fault. */
 function renderRoomError(main, view, error) {
@@ -46508,15 +36120,6 @@ function ensureSkyMargin() {
 }
 /** Q · the screen a report is about, in the learner's words: the room's own name, the story he is reading, the word or
  * kanji whose page is open (never an internal id; the ids stay in the report's Details). */
-function maintenanceScreenName() {
-  try {
-    const story = S.view === 'reader' ? passage() : null;
-    const name = story ? null : ROOM_NAMES.rooms[S.view];
-    const detail = S.stack.at(-1);
-    return [story ? tx(`読み物「${story.title}」`, `the story ${story.title}`) : name ? tx(...name) : '',
-      detail?.id ? tx(`「${detail.id}」のページ`, `the page for ${detail.id}`) : ''].filter(Boolean).join(' · ');
-  } catch { return ''; }
-}
 let maintenanceReports = null;
 let deckPresentation = null;
 let olderStartToken = 0;
@@ -46549,19 +36152,6 @@ function relayServiceUrl(address, key) {
       return `${url.origin}${url.pathname.replace(/\/+$/, '')}/k/${key}`;
   } catch { /* An unusable link names no service. */ }
   return '';
-}
-function saveReportRelay(address, key) {
-  try {
-    if (address === 'off') { localStorage.removeItem(REPORT_RELAY_STORE); return 'off'; }
-    const url = relayServiceUrl(address, key);
-    if (url) { localStorage.setItem(REPORT_RELAY_STORE, JSON.stringify({ url })); return 'saved'; }
-  } catch { /* An unusable link changes nothing. */ }
-  return '';
-}
-function saveReportRelayLink(text) {
-  let params;
-  try { params = new URL(String(text).trim()).searchParams; } catch { return ''; }
-  return params.has('report-relay') ? saveReportRelay(params.get('report-relay') || '', params.get('report-key') || '') : '';
 }
 // a setup link opened in the browser, waiting in Settings for the learner's Set up
 let reportRelayOffer = null;
@@ -46730,3 +36320,5 @@ function deckHost() {
   }
   return deckHostAdapter;
 }
+
+export { $, AI_DEFAULT_BASE_URL, AI_DEFAULT_MODEL, AI_DEVICE_STORE, AI_EVIDENCE_ROLES, AI_KEY_STORE, AI_MINE_MAX_ROWS, AI_READING_TIMEOUT_CAP_MS, AI_READING_TOKENS_PER_SECOND, AI_TIMEOUT_MS, ANNOTATION_DIGITS, BEYOND_JOYO, D, DEPTH_NAMES, DEPTH_OWNED_S, DEPTH_RECALLED_S, DEPTH_RECALL_R, DICTIONARY_INDEX_PATH, DICTIONARY_SHARD_PATH, DOJO_DECKS, DRAFT_KEY, DRIFT_THEME_BY_WORLD, EXAMPLE_DIR, FRAMES_CAP, FRAMES_STORE, GESTURE, GLOSS_LEAD, GLOSS_MESSY, GLUE_STROKE, GODAN_ROW, GODAN_TE, GRAMMAR, INK_DEPTH, INK_TEMPO, INK_WORLDS, ISO_DAY, JOYO_JUDGEABLE, JOYO_MARKS, KAGAMI_BAND_NAMES, KAGAMI_CLEAR, KAGAMI_CODE_BAND, KAGAMI_LEVELS, KAGAMI_MIN_SEEN, KAGAMI_MODEL_VERSION, KAGAMI_OOV, KANJI_QUEST_FAILED, KANJI_QUEST_STRUCTURAL, KATA_TO_HIRA_OFFSET, LEADING_DROP_DAYS, LEARN_STAGE_DECKS, LEMMA_NIDAN, LEMMA_ONBIN, LESSON_SIZE, LOOKUP_HELPER_POS, M4_COPY, ME_DECKS, ME_FIELDS, ME_MONTHS_EN, ME_N1_SITTING, MINI_INK, MONTHS_EN, NARRATION_VOICES, NEW_PER_DAY_DEFAULT, NODE_KIND, NOTE_TEXT, PARTICLES, PARTICLE_BY_SURFACE, PART_STROKES, PART_WRITTEN, PLACES_TABS, POS_FAMILY, POS_PLAIN, POS_SEGMENT_CODE, PRIMARY_TABS, READER_KANA, READER_KANJI, REGISTER_LINE_DOORS, REGISTER_ROOM_DOORS, REL, REPORT_RELAY_STORE, REVIEWS_PER_DAY_DEFAULT, ROMAJI, ROOM_IDS, ROOM_NAMES, S, SAVE_PRESS_MS, SENSEI_OBS_CODES, SENSE_BY_ANCHOR, SENSE_CLASS, SENSE_GAVE_UP, SENSE_LATE, SENSE_MUST_END, SENSE_MUST_NOT, SENSE_NUMBER, SENSE_NUMBER_WORD, SENSE_TAG_EN, SENSE_TAG_JA, SENSE_WAIT_MS, SENSE_WEEKDAY, SHORT_EXAMPLE_CHARS, SLIP_NODE, SLIP_OWN_MEANING, SOUND_PLAIN, SOUND_VOICED, SPEAK_JA, SRS_KINDS, SRS_PREF_LADDERS, SRS_PRESETS, STROKE_SPEED_DEFAULT, STROKE_VIEWBOX, SVG_NS, TE_FORM_AUXILIARY, TE_FORM_NOTE, THEME_STORE, THEME_UI, THES_RELS, TODAY_JA_WORD, TODAY_SKY_CAP, TODAY_SKY_MISS_DAYS, TODAY_SKY_WORD, TOKEN_CONTEXT, TOPIC_BLOCKS, TOPIC_KICKERS, TOPIC_ORDER, TOUCH_READING_FADES, TOUCH_READING_GAP, TOUCH_READING_MOTION, TOUCH_READING_ROWS, TOUCH_ROW_PINS, TRAIL_KINDS, VOICE_LOCK, WORD_BRUSH, WORD_BRUSH_KEY, WORD_VOICE, WORD_VOICE_KEY, WW_CX, WW_CY, WW_KANJI_ANGLES, WW_REL, WW_RING2_ORDER, WW_RING2_SLOTS, WW_TRAIL_MAX, WW_WALK_KEY, YOMI_DAKUTEN, YOMI_HANDAKU, _KDX_NPTS, _compsCache, _kdxDist, _kdxNorm, _kdxResample, _kdxTemplates, activateWordLadder, afterPressLands, aiChatLog, aiConverse, aiLogAll, aiSheetNotes, aiSheetTurns, allAssessmentEvidence, anchorBox, animcjkApproved, animcjkShards, annotationKana, applyAssessmentV2, assertLearningSource, assessmentClockSession, back, bi, biLabel, boxLeadGloss, buildListenRow, buildTeacherChatLog, cacheDictionaryFormRows, cacheDictionaryRow, cancelExcerptPlayback, canonicalRecordJson, capturePending, captureScaleVisit, cardRecall, chipsFor, clearReaderReadings, clearReaderSummons, clearWordLadder, closeSealStrip, closeWorldPicker, commitCapture, commitStorePatch, confusablesFor, contrastOf, controlsUnder, copyRecordWith, currentAssessmentV2, currentJoyoKunNote, currentRecordNoteView, currentSentenceListeningCue, deckSummaries, deeperDepth, depthIndexMemo, depthNodeCache, depthRank, depthRetrievability, dictionaryQueryOpening, dictionaryReadingSummaries, dictionaryRowBySeq, dictionaryWorkerRequest, diveFromMini, diveFromSlip, el, encounterKey, enhanceJapaneseProse, ensureArchiveIndex, ensureArticle, ensureDictionaryIndex, ensureDictionaryShard, ensureReadingPositionModule, ensureSenseSidecar, ensureSentenceListeningCatalog, entryKanaIndex, explicitWordSnapshot, fetchData, fieldsDeckHome, findLookupOccurrence, finishPageTransition, finiteNumber, fitChromeKeep, flowText, focusKanjiItem, foundationDoor, frameFoot, glyphBox, go, guidedTaken, heldWordCardNode, heroSource, hideReaderToast, holdPageUnderDrawer, inkGroundFor, installProseWordRoving, installScaleBridge, interaction, invalidateRecordNoteViews, isLeech, jaGroupSegments, jlptRank, kagamiBandFor, kagamiLevel, kagamiLevelOf, kagamiMockBand, kanaReadingKey, kanjiAnswerAvailable, kanjiCourseApplyHelp, kanjiCourseRememberHelp, kanjiDisplayRecord, kanjiFamilyExposures, kanjiFamilyMounts, kanjiFamilyResolveExample, kanjiFamilyStamp, kanjiFamilyStampCurrent, kanjiFamilyTicket, kanjiFamilyTicketCurrent, kanjiFamilyViews, kanjiQuestFor, kanjiQuestLoading, kanjiQuestOwner, kanjiReadingsState, kanjiReferenceRows, kanjiStructureMounts, kanjiWorldEligible, kankenGradeLabel, kataToHira, keepNavigationReturn, laneMembers, layersMarkTop, learnDeckSummary, learnStageFace, loadReferenceExtra, logicalArchiveRows, lookupWordKey, meBackPart, meDeckIndex, meNum, meSealsPart, metReadable, mockFailed, motionEase, motionMs, narrationVoiceName, nonEmptyString, notYetReleased, noteEncounter, openAssessmentQuestionReview, openDeck, openGuidedRoom, openJapaneseLookup, openKanjiCourseUnit, openKanjiWorldEncounter, openPassage, openPersonalCollection, openPlainSaveMenu, openReferenceCollection, openSealStrip, openSentencePractice, openSpeakRoom, openStrokePage, openVocabularyListPopover, openWordWeb, optional, ownSentenceExample, owns, pageCutAllowed, paintMiniPath, passage, performAssessmentReconciliation, placeFloating, placeKinsoku, placesLayout, plainRecord, proseWordRovers, protectStore, queueAssessmentWork, quietUsageTags, readAloud, readFrameRows, readHelpPatch, readHelpReadable, readerReadingFits, readerSummaryFor, readerTokenLead, recordReady, recordWritable, refreshStrokeReadings, refreshWordSheet, relayServiceUrl, removeMini, render, renderFamilyExampleNode, renderKanjiCourseDoor, renderKanjiFamily, renderKanjiStructure, renderKdxGrid, renderReferenceConnections, renderReviewHall, renderSentenceTokens, renderSourceInboxEntries, renderSourceKanjiDoor, renderStudyFold, renderStudyHall, renderTeacherDoor, renderTextSourceContextSelection, renderWordWeb, resolveReaderChoice, resolveTeacherSource, retainedKanjiRecord, retireScaleReturn, returnToScaleBead, revalidateTutorRequests, revealFloatingFocus, roomName, roomTransition, rubyNode, safeJsonValue, sameItem, sameWordIdentity, saveWord, savedAnswerFor, scaleIn, scaleNavigationAllowed, scaleOut, scalePassage, scaleThreadPath, scaleTokenFingerprint, sealListRecency, senseGlosses, senseLed, senseNumberBefore, sensePatch, senseWeekdayBracket, sentenceDraftBindings, sentenceDraftInputErrors, sentenceDraftWindowEdits, setGlossLine, setJaWords, setLayout, setLookupStop, setOwnRecordValue, setWordPref, shallowerDepth, sheetActionLine, sheetActionLineKeys, shelfDay, showMini, skipState, sourceInboxShelf, speakAvailable, srsDueItems, srsKey, srsParamsProblem, srsRoomBack, srsSchedulePolicy, stopPassageRead, stopSentenceListening, strokePathsFor, strokeReduced, strokeSpeed, studyHallDoors, suppressAssessmentCards, syncChromeKeep, syncStrokeNumbers, teacherDraftInputErrors, teacherDraftWindowEdits, teacherSourceProcessingUnavailable, teacherWindowDraftPrefix, todayQueue, todaySky, transcriptTime, trayItemPending, tx, uiIcon, updateReaderPlaceSave, updateReadingPlaces, validInstant, validNewPerDay, validPauseEvery, validPreset, validRetention, validReviewsPerDay, validStoreEnvelope, waitForLookupNameReadings, wireReaderWordMenu, withEn, wordBrush, wordCardIdentity, wordNodeIdentity, wordStudied, wordVoice, wordWeb, writtenFormNote, wwP, wwPartMembers, wwReduced, wwShort, wwSpread, wwTokenIndex, wwTrail, yomiVariantCache };

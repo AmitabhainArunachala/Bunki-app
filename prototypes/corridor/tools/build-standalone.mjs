@@ -162,6 +162,24 @@ for (const [hook, [specifier, name]] of controllerImports) {
 }
 assert.equal(appScript.split("import('./corridor-ink.js')").length - 1, 1, 'Standalone writing import changed');
 appScript = appScript.replace("import('./corridor-ink.js')", 'import(window.__KAIRO_INK_URL__)');
+
+// G3: corridor.js imports its eleven seams as sibling modules. A single file cannot
+// fetch siblings (a file:// document blocks cross-origin module fetches), so fold each
+// static seam import back into one module scope. The moved declarations are unchanged;
+// only the module boundary the split added is removed for the standalone document.
+const seamImports = [...appScript.matchAll(/^import\s*\{[^}]*\}\s*from\s*'\.\/modules\/([^']+)\.mjs';$/gmu)]
+  .map((match) => match[1]);
+assert.equal(seamImports.length, 11, 'Standalone must fold exactly the eleven corridor seams');
+let seamScript = '';
+for (const seam of seamImports) {
+  const seamSource = read(`modules/${seam}.mjs`)
+    .replace(/^import\b[^\n]*?from\s*'[^\n']*';\n/gmu, '')
+    .replace(/^export\s*\{[^\n]*\};\n?/gmu, '');
+  assert(!/^import\b/mu.test(seamSource) && !/^export\b/mu.test(seamSource), `Standalone seam ${seam} still carries module syntax`);
+  seamScript += seamSource.trim() + '\n\n';
+}
+appScript = appScript.replace(/^import\s*\{[^}]*\}\s*from\s*'\.\/modules\/[^']+\.mjs';\n/gmu, '');
+appScript = seamScript + appScript;
 let driftScript = read('drift-layer.js');
 assert.equal(driftScript.split('import("./record-controller.mjs")').length - 1, 1, 'Standalone Drift record import changed');
 driftScript = driftScript.replace('import("./record-controller.mjs")',

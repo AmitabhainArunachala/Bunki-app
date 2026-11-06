@@ -79,6 +79,17 @@ try {
   execFileSync(process.execPath, [join(repo, 'scripts/verify-shared-study.mjs')], {stdio:'pipe'});
   for (const path of [
     'corridor.js',
+    'modules/dictionary.mjs',
+    'modules/word-entry.mjs',
+    'modules/capture.mjs',
+    'modules/study-host.mjs',
+    'modules/return.mjs',
+    'modules/worlds.mjs',
+    'modules/voice.mjs',
+    'modules/learner.mjs',
+    'modules/drift.mjs',
+    'modules/library.mjs',
+    'modules/teacher.mjs',
     'reading-controller.mjs',
     'teacher-context.mjs',
     'teacher-drafts.mjs',
