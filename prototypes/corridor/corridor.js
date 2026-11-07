@@ -6179,7 +6179,7 @@ let beginnerGuideOpen = false;
 function renderBeginnerGuide() {
   const section = el('section', 'shelf-beginner');
   section.dataset.japaneseLookup = 'off';
-  const start = biLabel('button', 'shelf-beginner-start', '日本語ではじめる', 'Start with Japanese');
+  const start = biLabel('button', 'shelf-beginner-start', '日本語をはじめる', 'Start with Japanese');
   start.type = 'button';
   start.id = 'beginner-start';
   start.setAttribute('aria-controls', 'beginner-guide');
