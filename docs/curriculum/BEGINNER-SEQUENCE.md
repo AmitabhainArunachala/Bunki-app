@@ -33,15 +33,19 @@ a fixed pedagogy.
 The phases are strictly ordered in the manifest (the judge test enforces it). Interleaving readings earlier than the last word unit is a
 version-2 question (S3-R3).
 
+**G9 kana-id extension (draft decision).** `identity.mjs` currently has no kana-item id, so this draft uses the local, stable form
+`kana:<sign>` (for example `kana:あ`) and proposes that form as a G9 extension. It does not pretend that the current identity module
+already accepts kana ids; the extension must be accepted or replaced before MF2 freezes the manifest, without changing word entry ids.
+
 ## Unit order (read from units.json)
 
 | # | Phase | Unit id | Title | Items | Prerequisites |
 |---|---|---|---|---|---|
-| 1 | Kana and sound | `unit:beginner:kana:01-hiragana-basic` | Hiragana: the 46 basic signs and the five vowels | 46 | — |
-| 2 | Kana and sound | `unit:beginner:kana:02-hiragana-marks-and-combinations` | Hiragana: voiced marks, combinations, small っ and long vowels | 59 | `unit:beginner:kana:01-hiragana-basic` |
-| 3 | Kana and sound | `unit:beginner:kana:03-katakana-basic` | Katakana: the 46 basic signs | 46 | `unit:beginner:kana:02-hiragana-marks-and-combinations` |
-| 4 | Kana and sound | `unit:beginner:kana:04-katakana-marks-and-loanword-sounds` | Katakana: marks, combinations, ー and loanword sounds | 77 | `unit:beginner:kana:03-katakana-basic` |
-| 5 | Kana and sound | `unit:beginner:kana:05-sound-and-script-in-first-words` | Sound and script in your first words: numbers, yes and no, length and pitch | 37 | `unit:beginner:kana:02-hiragana-marks-and-combinations`, `unit:beginner:kana:04-katakana-marks-and-loanword-sounds` |
+| 1 | Kana and sound | `unit:beginner:kana:01-hiragana-basic` | Hiragana: 46 basic signs, including the five vowels | 46 | — |
+| 2 | Kana and sound | `unit:beginner:kana:02-hiragana-marks-and-combinations` | Hiragana: 25 marked signs, 33 combinations and small っ | 59 | `unit:beginner:kana:01-hiragana-basic` |
+| 3 | Kana and sound | `unit:beginner:kana:03-katakana-basic` | Katakana: 46 basic signs | 46 | `unit:beginner:kana:02-hiragana-marks-and-combinations` |
+| 4 | Kana and sound | `unit:beginner:kana:04-katakana-marks-and-loanword-sounds` | Katakana: 25 marked signs, 33 combinations, small ッ, ー and 17 loanword sounds | 77 | `unit:beginner:kana:03-katakana-basic` |
+| 5 | Kana and sound | `unit:beginner:kana:05-sound-and-script-in-first-words` | Sound and script in 37 first words: 13 numbers, はい・いいえ, and 22 length-and-pitch words | 37 | `unit:beginner:kana:02-hiragana-marks-and-combinations`, `unit:beginner:kana:04-katakana-marks-and-loanword-sounds` |
 | 6 | Survival phrases | `unit:beginner:phrases:01-greetings` | Greetings and politeness | 12 | `unit:beginner:kana:05-sound-and-script-in-first-words` |
 | 7 | Survival phrases | `unit:beginner:phrases:02-introductions` | Meeting people and introducing yourself | 10 | `unit:beginner:phrases:01-greetings` |
 | 8 | Survival phrases | `unit:beginner:phrases:03-train-and-directions` | Station, train and directions | 10 | `unit:beginner:phrases:02-introductions` |
@@ -98,7 +102,9 @@ version-2 question (S3-R3).
 | 59 | Guided reading | `unit:beginner:reading:03-market-and-bicycle` | The market and the bicycle: two N4 readings | 2 | `unit:beginner:reading:02-station-and-neighbour` |
 | 60 | Guided reading | `unit:beginner:reading:04-bookshop-and-letter` | The bookshop and the letter: two N4 readings | 2 | `unit:beginner:reading:03-market-and-bicycle` |
 
-Prerequisites always point at earlier units; the first unit has none.
+Prerequisites always point at earlier units; the first unit has none. Unit-level situation labels are phase-aware and are enforced by
+`unit.schema.json`: kana units use `sound-and-script`; survival units use their six named phrase situations; situation-word units use the
+10 theme ids below (while each word retains one of the 27 word-level situation ids); guided-reading units use `guided-reading`.
 
 ## Frequency source
 
@@ -132,6 +138,14 @@ draft therefore derives its rank from bytes already pinned in this repo:
 - **Bias, stated:** The bank is a coverage-greedy selection of sentences (build_examples.py, 4-6 per dictionary target), so counts are frequencies within the shipped bank, not in the raw corpora; the raw corpora are not in the repo.
 - **Derived list:** `frequency-source.json` (sha256 `d3997e786aec599c879acb550b730b0a591c870d04078087a30dca8fcfe025c6`), produced by `derive-frequency.py` in the same directory.
 - **Review item:** The spec names no frequency list (contract unknown 1). This source is pinned, rights-cleared and in the repo, but it is a coverage-greedy bank, not a balanced corpus; the reviewer decides whether it stands or a licensed list replaces it in version 2.
+
+### Slot filling and entries missing from dict-v2
+
+Slots are considered in frequency-rank order. Entries in `excluded_as_artifacts` are skipped. An ent_seq with no dict-v2 row is never
+silently dropped: when the pinned full JMdict resolves it, it keeps its rank slot with `missing_at_base: true` and an explicit
+`resolved_via` naming that pinned source; otherwise it is skipped here and deferred to `words_next_500` with a recorded reason. In this
+draft 御座る (rank 441, ent_seq 1270350) in the first 500 and お陰 (rank 598, ent_seq 1001640) in the next 500 use the pinned-full-JMdict
+resolution path. No unresolved entry is silently skipped.
 
 ### Words skipped as artifacts
 
@@ -176,13 +190,16 @@ Tolerance band: the 500 slots are cut into five bands of 100 slots in rank order
 
 Grouping rule: each word carries one situation id from the taxonomy of 27 situations; situations roll up into 10 themes; inside a band the words of one theme form one unit; a theme with fewer than 5 words in a band joins its first listed neighbour theme present in that band (the unit names every situation it includes and each word keeps its own situation id); units inside a band are ordered by their mean rank, and words inside a unit are ordered by rank.
 
-| Band | Slots | Ranks | Units (words) |
+The rank windows below are the actual minimum and maximum member ranks after exclusions. Counting every integer position in each
+window except `excluded_as_artifacts` gives exactly 100 available positions per band.
+
+| Band | Slots | Member ranks (actual min–max) | Units (words) |
 |---|---|---|---|
-| 1 | 1–100 | 2–101 | People: pronouns, family and meeting (12); Being, doing, having and giving (21); Pointing, asking, how much and how often (17); Time, days, positions and directions (8); Thinking, saying and feeling (9); Describing things (5); Actions and movement (13); Daily life: food, money, body and leisure (9); Work, school, society and media (6) |
-| 2 | 101–200 | 110–205 | Actions and movement (5); Time, days, positions and directions (8); Home, town, travel, nature and the world (13); Describing things (7); Thinking, saying and feeling (7); Pointing, asking, how much and how often (20); People: pronouns, family and meeting (7); Daily life: food, money, body and leisure (6); Work, school, society and media (17); Being, doing, having and giving (10) |
-| 3 | 201–300 | 208–307 | Daily life: food, money, body and leisure (15); Describing things (9); Being, doing, having and giving (12); Work, school, society and media (15); Actions and movement (10); Home, town, travel, nature and the world (12); Thinking, saying and feeling (15); Pointing, asking, how much and how often (12) |
+| 1 | 1–100 | 1–101 | People: pronouns, family and meeting (12); Being, doing, having and giving (21); Pointing, asking, how much and how often (17); Time, days, positions and directions (8); Thinking, saying and feeling (9); Describing things (5); Actions and movement (13); Daily life: food, money, body and leisure (9); Work, school, society and media (6) |
+| 2 | 101–200 | 102–205 | Actions and movement (5); Time, days, positions and directions (8); Home, town, travel, nature and the world (13); Describing things (7); Thinking, saying and feeling (7); Pointing, asking, how much and how often (20); People: pronouns, family and meeting (7); Daily life: food, money, body and leisure (6); Work, school, society and media (17); Being, doing, having and giving (10) |
+| 3 | 201–300 | 206–307 | Daily life: food, money, body and leisure (15); Describing things (9); Being, doing, having and giving (12); Work, school, society and media (15); Actions and movement (10); Home, town, travel, nature and the world (12); Thinking, saying and feeling (15); Pointing, asking, how much and how often (12) |
 | 4 | 301–400 | 308–410 | Daily life: food, money, body and leisure (15); Actions and movement (8); Pointing, asking, how much and how often (16); Describing things (8); People: pronouns, family and meeting (13); Home, town, travel, nature and the world (13); Work, school, society and media (17); Being, doing, having and giving (10) |
-| 5 | 401–500 | 413–514 | Work, school, society and media (11); Thinking, saying and feeling (14); Actions and movement (9); Daily life: food, money, body and leisure (12); Pointing, asking, how much and how often (7); Home, town, travel, nature and the world (11); Describing things (13); People: pronouns, family and meeting (9); Time, days, positions and directions (7); Being, doing, having and giving (7) |
+| 5 | 401–500 | 411–514 | Work, school, society and media (11); Thinking, saying and feeling (14); Actions and movement (9); Daily life: food, money, body and leisure (12); Pointing, asking, how much and how often (7); Home, town, travel, nature and the world (11); Describing things (13); People: pronouns, family and meeting (9); Time, days, positions and directions (7); Being, doing, having and giving (7) |
 
 ### Themes (the level units are cut on inside a band)
 

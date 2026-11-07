@@ -39,9 +39,10 @@
     },
     "word_selection": {
       "type": "object",
-      "required": ["rule", "band_slots", "tolerance", "grouping", "situations", "excluded_as_artifacts"],
+      "required": ["rule", "band_slots", "rank_windows", "tolerance", "grouping", "situations", "excluded_as_artifacts"],
       "properties": {
         "band_slots": { "type": "integer", "minimum": 1 },
+        "rank_windows": { "type": "array", "minItems": 5, "maxItems": 5, "items": { "type": "object", "required": ["band", "min_rank", "max_rank"], "additionalProperties": false, "properties": { "band": { "type": "integer", "minimum": 1, "maximum": 5 }, "min_rank": { "type": "integer", "minimum": 1 }, "max_rank": { "type": "integer", "minimum": 1 } } } },
         "tolerance": { "type": "object", "required": ["ranks", "statement"], "properties": { "ranks": { "type": "integer", "minimum": 1 }, "statement": { "type": "string", "minLength": 1 } } },
         "grouping": { "type": "object", "required": ["statement"], "properties": { "statement": { "type": "string", "minLength": 1 } } },
         "excluded_as_artifacts": { "type": "array", "items": { "type": "object", "required": ["seq", "word", "reason"], "properties": { "seq": { "$ref": "#/$defs/seq" }, "reason": { "type": "string", "minLength": 1 } } } }
@@ -99,7 +100,8 @@
         "situation": { "type": "string", "minLength": 1 },
         "in_dict_v2": { "type": "boolean" },
         "missing_at_base": { "type": "boolean" },
-        "audio_slot": { "$ref": "#/$defs/audioSlot" }
+        "audio_slot": { "$ref": "#/$defs/audioSlot" },
+        "resolved_via": { "type": "string", "minLength": 1 }
       }
     },
     "phraseItem": {
@@ -169,7 +171,13 @@
         "items": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/item" } },
         "review_obligations": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/reviewObligation" } },
         "assessments": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/assessment" } }
-      }
+      },
+      "oneOf": [
+        { "properties": { "phase": { "const": "kana-and-sound" }, "situation": { "const": "sound-and-script" } } },
+        { "properties": { "phase": { "const": "survival-phrases" }, "situation": { "enum": ["greetings", "introductions", "train-and-directions", "convenience-store-and-shopping", "restaurant", "help-and-health"] } } },
+        { "properties": { "phase": { "const": "situation-words" }, "situation": { "enum": ["people", "being-doing-and-having", "pointing-asking-and-amounts", "time-and-place", "mind-and-words", "describing", "actions-and-movement", "daily-life-and-body", "work-society-and-media", "town-travel-and-nature"] } } },
+        { "properties": { "phase": { "const": "guided-reading" }, "situation": { "const": "guided-reading" } } }
+      ]
     },
     "nextWord": {
       "type": "object",
@@ -181,7 +189,8 @@
         "rank": { "type": "integer", "minimum": 1 },
         "status": { "enum": ["planned", "built"] },
         "materials": { "type": "object", "required": ["dict_v2_entry", "example_sentences_in_bank", "lesson", "audio_clip"] },
-        "missing_at_base": { "type": "boolean" }
+        "missing_at_base": { "type": "boolean" },
+        "resolved_via": { "type": "string", "minLength": 1 }
       }
     }
   }

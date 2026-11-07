@@ -44,7 +44,7 @@ articles shipped at base. The sequence, the frequency source, the tolerance band
     "path": "prototypes/corridor/contracts/identity/identity.mjs",
     "typed": "packages/domain/src/identity/index.ts",
     "word_item_id": "entryId({ seq, spelling: dict-v2 head, reading: dict-v2 primary reading }) → entry:<seq>:<spelling>|<reading>",
-    "kana_item_id": "kana:<sign> — local form; identity.mjs has no kana id (proposed G9 extension, recorded in DECISIONS.md)",
+    "kana_item_id": "kana:<sign> — local form; identity.mjs has no kana id (proposed G9 extension, recorded in docs/curriculum/BEGINNER-SEQUENCE.md)",
     "phrase_item_id": "phrase:beginner:<slug> — local form; entry_id carries the JMdict entry when the phrase is itself an entry",
     "article_item_id": "article:<article id> — local form over prototypes/corridor/data/articles/<id>.json, pinned by sha256",
     "assessment_check_vocabulary": [
@@ -245,8 +245,35 @@ articles shipped at base. The sequence, the frequency source, the tolerance band
     "review_item": "The spec names no frequency list (contract unknown 1). This source is pinned, rights-cleared and in the repo, but it is a coverage-greedy bank, not a balanced corpus; the reviewer decides whether it stands or a licensed list replaces it in version 2."
   },
   "word_selection": {
-    "rule": "slots 1–500 are filled in frequency-rank order from frequency-source.json, skipping excluded_as_artifacts; words_next_500 are the following 500 by the same rule",
+    "rule": "slots 1–500 are filled in frequency-rank order from frequency-source.json, skipping excluded_as_artifacts; an ent_seq with no dict-v2 row is never silently skipped: it keeps its slot only with an explicit resolved_via naming the pinned full JMdict and missing_at_base:true, otherwise it is deferred to words_next_500 with a recorded reason; words_next_500 are the following 500 by the same rule",
     "band_slots": 100,
+    "rank_windows": [
+      {
+        "band": 1,
+        "min_rank": 1,
+        "max_rank": 101
+      },
+      {
+        "band": 2,
+        "min_rank": 102,
+        "max_rank": 205
+      },
+      {
+        "band": 3,
+        "min_rank": 206,
+        "max_rank": 307
+      },
+      {
+        "band": 4,
+        "min_rank": 308,
+        "max_rank": 410
+      },
+      {
+        "band": 5,
+        "min_rank": 411,
+        "max_rank": 514
+      }
+    ],
     "tolerance": {
       "ranks": 125,
       "observed_max_dip": 102,
@@ -708,7 +735,7 @@ articles shipped at base. The sequence, the frequency source, the tolerance band
       "phase": "kana-and-sound",
       "order": 1,
       "title": {
-        "en": "Hiragana: the 46 basic signs and the five vowels",
+        "en": "Hiragana: 46 basic signs, including the five vowels",
         "ja": "ひらがな ― 五十音"
       },
       "situation": "sound-and-script",
@@ -1599,8 +1626,8 @@ articles shipped at base. The sequence, the frequency source, the tolerance band
       "phase": "kana-and-sound",
       "order": 2,
       "title": {
-        "en": "Hiragana: voiced marks, combinations, small っ and long vowels",
-        "ja": "ひらがな ― 濁音・半濁音・拗音・促音・長音"
+        "en": "Hiragana: 25 marked signs, 33 combinations and small っ",
+        "ja": "ひらがな ― 濁音・半濁音・拗音・促音"
       },
       "situation": "sound-and-script",
       "outcomes": [
@@ -2750,7 +2777,7 @@ articles shipped at base. The sequence, the frequency source, the tolerance band
       "phase": "kana-and-sound",
       "order": 3,
       "title": {
-        "en": "Katakana: the 46 basic signs",
+        "en": "Katakana: 46 basic signs",
         "ja": "カタカナ ― 五十音"
       },
       "situation": "sound-and-script",
@@ -3627,7 +3654,7 @@ articles shipped at base. The sequence, the frequency source, the tolerance band
       "phase": "kana-and-sound",
       "order": 4,
       "title": {
-        "en": "Katakana: marks, combinations, ー and loanword sounds",
+        "en": "Katakana: 25 marked signs, 33 combinations, small ッ, ー and 17 loanword sounds",
         "ja": "カタカナ ― 濁音・拗音・長音・外来語の音"
       },
       "situation": "sound-and-script",
@@ -4987,14 +5014,14 @@ articles shipped at base. The sequence, the frequency source, the tolerance band
       "phase": "kana-and-sound",
       "order": 5,
       "title": {
-        "en": "Sound and script in your first words: numbers, yes and no, length and pitch",
+        "en": "Sound and script in 37 first words: 13 numbers, はい・いいえ, and 22 length-and-pitch words",
         "ja": "はじめての ことば ― かず・はい/いいえ・長さと高さ"
       },
       "situation": "sound-and-script",
       "outcomes": [
         "I can count from one to ten and say 100, 1,000 and 10,000.",
         "I can answer はい or いいえ.",
-        "I can read 25 real words written in kana and say them with the right length (おばあさん, ビール, きっぷ).",
+        "I can read 22 real words written in kana and say them with the right length (おばあさん, ビール, きっぷ).",
         "I can hear that あめ (rain) and あめ (candy) differ in pitch, even if I cannot yet produce it."
       ],
       "prerequisites": [
@@ -28260,7 +28287,8 @@ articles shipped at base. The sequence, the frequency source, the tolerance band
             "role": "dictionary word audio",
             "filled": false,
             "clip": null
-          }
+          },
+          "resolved_via": "pinned full JMdict: jmdict-simplified 3.6.2+20260803141815; zip sha256 1806d2817215ebe7ded997c8dac4831a3335d83ed12f321ac869a97e745d3a5c"
         },
         {
           "kind": "word",
@@ -30458,7 +30486,8 @@ articles shipped at base. The sequence, the frequency source, the tolerance band
         "lesson": false,
         "audio_clip": false
       },
-      "missing_at_base": true
+      "missing_at_base": true,
+      "resolved_via": "pinned full JMdict: jmdict-simplified 3.6.2+20260803141815; zip sha256 1806d2817215ebe7ded997c8dac4831a3335d83ed12f321ac869a97e745d3a5c"
     },
     {
       "position": 585,
