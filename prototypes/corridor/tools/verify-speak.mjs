@@ -322,11 +322,21 @@ const BRIDGE = `
     gateAgree: async (fixture) => {
       const xid = 'xgate-1';
       const speak = speakGateEvidence(fixture, xid).map((row) => row.slice(1));
-      const realAsk = aiAsk, realKey = aiKey;
-      aiAsk = async () => JSON.stringify(fixture);
-      aiKey = () => 'gate-agreement';
+      const priorConfig = localStorage.getItem(AI_DEVICE_STORE);
+      const config = { v: 1, baseUrl: 'https://speak-gate.invalid', model: 'claude-opus-5',
+        configId: '2f6e1c2a-3b4d-4e5f-8a7b-9c0d1e2f3a4b',
+        credential: { origin: 'https://speak-gate.invalid', key: 'synthetic-gate-agreement-key' } };
       const before = S.obslog.length;
-      try { await aiMineObservations('chat', 'learner ink', 'reply', xid); } finally { aiAsk = realAsk; aiKey = realKey; }
+      try {
+        localStorage.setItem(AI_DEVICE_STORE, JSON.stringify(config));
+        window.__SPEAK_GATE_FIXTURE__ = fixture;
+        const continuation = createTutorRequestContinuation(null, aiTransport());
+        await aiMineObservations('chat', 'learner ink', 'reply', xid, continuation);
+      } finally {
+        delete window.__SPEAK_GATE_FIXTURE__;
+        if (priorConfig === null) localStorage.removeItem(AI_DEVICE_STORE);
+        else localStorage.setItem(AI_DEVICE_STORE, priorConfig);
+      }
       const mine = S.obslog.slice(before).map((row) => row.slice(1));
       return { speak, mine };
     },
@@ -363,6 +373,28 @@ async function newRoom(browser, { key = true, cap = 10, usd = 0, reducedMotion =
     const request = route.request();
     engines.offOrigin.push({ case: current, method: request.method(), url: request.url().slice(0, 300), body: (request.postData() || '').slice(0, 4000) });
     return route.abort();
+  });
+  // the gate's own synthetic provider: an exact reserved endpoint, registered after the deny-all route so it handles that
+  // request first; every other off-origin request still reaches the deny-all route unchanged.
+  const gateEndpoint = 'https://speak-gate.invalid/v1/messages';
+  const gateConfig = { v: 1, baseUrl: 'https://speak-gate.invalid', model: 'claude-opus-5',
+    configId: '2f6e1c2a-3b4d-4e5f-8a7b-9c0d1e2f3a4b',
+    credential: { origin: 'https://speak-gate.invalid', key: 'synthetic-gate-agreement-key' } };
+  await context.route((url) => url.href === gateEndpoint, async (route) => {
+    const request = route.request();
+    assert.equal(request.method(), 'POST', 'synthetic tutor request is a POST');
+    assert.equal(request.url(), gateEndpoint, 'synthetic tutor request uses the reserved endpoint');
+    assert.equal(request.headers()['x-api-key'], gateConfig.credential.key, 'synthetic tutor request carries its bound credential');
+    assert.equal(request.headers()['anthropic-version'], '2023-06-01', 'synthetic tutor request is Anthropic-shaped');
+    const body = JSON.parse(request.postData() || '{}');
+    assert.equal(body.model, gateConfig.model, 'synthetic tutor request names its configured model');
+    assert.ok(Array.isArray(body.messages) && body.messages.length > 0, 'synthetic tutor request carries messages');
+    const fixture = await request.frame().evaluate(() => window.__SPEAK_GATE_FIXTURE__);
+    assert.ok(Array.isArray(fixture), 'the fixture is in the bridge\'s temporary window field');
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
+      id: 'msg_speak_gate', type: 'message', role: 'assistant', model: gateConfig.model,
+      content: [{ type: 'text', text: JSON.stringify(fixture) }],
+      stop_reason: 'end_turn', stop_sequence: null, usage: { input_tokens: 1, output_tokens: 1 } }) });
   });
   await context.route((url) => url.origin === base && /\/(corridor\.js|speak\.js|speak-core\.mjs|rooms\/speak\.css)$/u.test(url.pathname), async (route) => {
     const path = new URL(route.request().url()).pathname.replace(/^\//u, '');
