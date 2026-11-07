@@ -13,7 +13,7 @@
  */
 
 // BEGIN GENERATED RELEASE IDENTITY — npm run release:sync
-const APP_RELEASE = Object.freeze({"version":"1.2.1","channel":"stable","releasedOn":"2026-11-08","learnerDataEpoch":1});
+const APP_RELEASE = Object.freeze({"version":"1.2.2","channel":"stable","releasedOn":"2026-11-08","learnerDataEpoch":1});
 // END GENERATED RELEASE IDENTITY
 
 const DATA = {
