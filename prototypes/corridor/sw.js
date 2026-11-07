@@ -206,6 +206,8 @@ const BOOT_DATA = [
   'modules/assessment-core.mjs',
   'modules/learning-core.mjs',
   'modules/record-core.mjs',
+  // corridor.js imports device-voice.mjs at boot; first offline launch needs it.
+  'device-voice.mjs',
 ];
 // The guided session (S.view 'guided') is imported only when its door is pressed, so an install
 // that stopped at the boot core left the room unable to open offline unless it had been opened
