@@ -1,10 +1,12 @@
 # Shared study consumer
 
-Bunki's N2, N1, senmon and kotoba-master deck doors, plus `?deck=shared-grammar`,
-host the canonical Nihongo Study UI and v4 engine only in explicit shared mode
-(`?sharedStudy=preview` or a bound host). `decks/player/mount.js` routes those IDs
-before it reads a legacy ledger in that mode. Ordinary routes retain their
-existing player, counts and history until an explicit migration/cutover occurs.
+Bunki hosts the canonical Nihongo Study UI and v4 engine only through
+`?deck=n2|n1|senmon|kotoba-master|shared-grammar&sharedStudy=preview` (choose one
+deck ID) or a real bound host. `decks/player/mount.js` routes those IDs before it
+reads a legacy ledger in shared mode. Ordinary legacy decks, saved-word/kanji/
+question review routes and the outer Bunki Record remain unchanged and
+disconnected from this distribution, retaining their existing player, counts
+and history until an explicit migration/cutover occurs.
 
 The same-origin frame imports the byte-identical `mountStudyApp` and grammar
 renderer from `vendor/shared-study-engine`. This adopts subsequent canonical UI
@@ -105,13 +107,14 @@ unchanged. Canonical learner-created cards retain their own content.
 ## Isolated local preview
 
 Use `?deck=n2&sharedStudy=preview`.
-The ordinary Bunki deck route mounts the real canonical UI, backend and store.
+This explicit preview route mounts the canonical UI, backend and store.
 The preview uses `test-bunki-shared-preview`, its own IndexedDB database and
 appearance keys, and a Web Lock around installation creation. It preserves one
 installation across reloads and deck changes. Its explicit synthetic initial
 grant is limited to twenty introductions on the creation learner day. It has
-no live server or production permit authority; further/day-rollover grants need
-an explicit test transport. The shell does not claim this preview is paired.
+no real sync transport, live server or production permit authority;
+further/day-rollover grants need an explicit test transport. The shell does not
+claim this preview is paired.
 
 In shared mode, mapped legacy pack writes are disabled. Old kotoba-mine/MCD,
 context-dense, personal collections, saved-word/kanji/sentence/question reviews
@@ -124,6 +127,9 @@ event, and no missing permit, parent, mode or hesitation evidence is invented.
 Older already-open application versions are not fenced by these new source
 files. Real rollout therefore still requires an explicit migration/cutover and
 old-client fencing plan.
+
+This integration is a development candidate, not a deployment or a physical-device
+pass. It makes no version or release changes.
 
 ## Content and provenance
 
@@ -139,11 +145,38 @@ grammar module and reviewed translations, with QA bypass disabled. The compact
 engine registry produces a byte-identical initial projection to the full frozen
 registry. The source hashes bind every adopted pack and grammar asset.
 
-The canonical UI's off-card dictionary port is not yet bound to Bunki's dictionary
-host. Full packaged card details, target lookup and related catalog cards work;
-arbitrary off-catalog token dictionary lookup is unavailable in this preview.
-No duplicate large dictionary is packaged. Native dictionary, card factory,
-live sync and device rollout are separate host work.
+The existing shared frame loads the pinned offline JMdict/KANJIDIC2 dictionary
+through `loadOfflineDictionary` and `prepareOfflineDictionary`, including
+off-catalog lookup for entries present in that artifact. Character lookup uses
+exact `resolveKanji`; ordinary dictionary lookup priority is unchanged. Related
+vocabulary comes only from the loaded catalog, not arbitrary dictionary entries.
+Native dictionary, card factory, live sync and device rollout remain separate
+host work.
+
+## Optional kanji exploration and canonical Record
+
+The committed distribution comes from canonical Nihongo commit
+`1392485ec1bd686313e8f1e1e8b01a42c98c11bd`. It adds optional answer-side kanji
+exploration and a read-only report inside the canonical Record. The simple
+prompt → Reveal → four grades loop remains unchanged; exploration is optional
+and does not grade a character or create another review task. Authored enrichment
+covers two selected sound families and seven contrasts, not comprehensive kanji
+coverage. Related vocabulary uses the loaded catalog, and newer passage-reading
+rules are preserved.
+
+The canonical Record report reads the existing canonical projection. Exposure
+and vocabulary self-ratings are not separate proof of kanji or handwriting
+mastery. Delayed first outcomes, missing checks and coverage remain distinct;
+later success does not replace a first outcome, and a missing check is neither
+a demonstrated failure nor success. The 20 → 30 → 40 ladder is a proposed
+experiment and never raises workload automatically. The report does not
+establish total study time, backlog trend or an unfamiliar-word baseline needed
+to recommend an increase.
+
+All nine behavior-critical modules and the reducer remain byte-identical to the
+previous distribution. This refresh adds no scheduler, task identity, ledger or
+transport, and does not connect the canonical report to the outer Bunki Record
+or migrate existing learner history.
 
 ## Regeneration and checks
 
@@ -165,7 +198,7 @@ Generate content with
 `--check` verifies reproducibility against the same reviewed inputs.
 
 Run `node scripts/verify-shared-study.mjs`,
-`./node_modules/.bin/vitest run tools/shared-study.test.mjs`, and
+`./node_modules/.bin/vitest run tools/shared-study.test.mjs tools/shared-study-backlog.test.mjs tools/shared-study-dictionary.test.mjs tools/shared-study-fixtures.test.mjs`, and
 `npm run release:verify`. The web builder runs the distribution/content hash gate
 and refuses local builds below 8 GiB free space. `npm test` also runs the pinned
 distribution/content verifier before Vitest. A compact reviewed source excerpt

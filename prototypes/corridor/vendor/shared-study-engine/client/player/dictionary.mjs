@@ -43,6 +43,11 @@ export async function prepareOfflineDictionary(input,catalog){
   const entry=choose(forms.get(surface)?.filter(entry=>entry.source!=='deck'),reading);
   return entry?Object.freeze({...entry,kind:'dictionary'}):null;
  }
+ // Character facts are an exact lookup, independent of JMdict word-sense priority.
+ function resolveKanji(glyph){
+  if(typeof glyph!=='string'||[...glyph].length!==1||!/^\p{Script=Han}$/u.test(glyph)||['々','〻'].includes(glyph))return null;
+  const value=kanji.get(glyph);return value?Object.freeze({...value,kind:'kanji',lemma:glyph}):null;
+ }
  function resolve(info){
   const context=byText.get(info.source?.context),tokens=context?.tokens,validSpan=info.source?.context?.slice(info.span?.start,info.span?.end)===info.surface,token=validSpan?tokens?.find(t=>t.start<=info.span.start&&t.end>=info.span.end):null;
   const chunk=validSpan?context?.chunks.find(c=>c.start<=info.span.start&&c.end>=info.span.end):null;
@@ -55,5 +60,5 @@ export async function prepareOfflineDictionary(input,catalog){
   if(entry&&entry.source!=='deck')return Object.freeze({kind:'dictionary',...entry});
   return Object.freeze({kind:'pending',lemma,reading:reading||null});
  }
- return Object.freeze({resolve,resolveExact,segments:(e,text,field)=>{const record=passages.get(`${e.taskKey}|${field}`);return record?.text===text?record.tokens:byText.get(text)?.tokens||null;},attribution:Object.freeze(structuredClone(input.attribution)),entryCount:entries.size});
+ return Object.freeze({resolve,resolveKanji,resolveExact,segments:(e,text,field)=>{const record=passages.get(`${e.taskKey}|${field}`);return record?.text===text?record.tokens:byText.get(text)?.tokens||null;},attribution:Object.freeze(structuredClone(input.attribution)),entryCount:entries.size});
 }

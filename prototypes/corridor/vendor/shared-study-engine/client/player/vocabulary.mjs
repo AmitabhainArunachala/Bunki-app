@@ -1,3 +1,5 @@
+import {buildKanjiModel} from '../kanji/model.mjs';
+import {renderKanjiPanel} from '../kanji/panel.mjs';
 import {createNode,wordSegments} from './presentation.mjs';
 import {applyKinsoku} from './kinsoku.mjs';
 import {splitSourceRuby} from './ruby-segments.mjs';
@@ -86,17 +88,13 @@ export function renderVocabularyPassage(document,entry,text,{front=false,field='
  node.append(...renderRange(cursor,text.length));return applyKinsoku(node);
 }
 /** Compact source-backed relationships; no inferred kanji facts or readings. */
-export function renderVocabularyRelated(document,entry,{onWord=()=>{},relatedWords=[],onRelated=()=>{},dictionary=null}={}){
- const h=(tag,attrs,...children)=>createNode(document,tag,attrs,...children),panel=h('div',{class:'kanji-panel'});
- if(entry.collocations?.length){const chips=h('div',{class:'collocation-chips'});for(const text of entry.collocations){const value=typeof text==='string'?text:JSON.stringify(text),passage=renderVocabularyPassage(document,entry,value,{field:'sheet',onWord,dictionary});chips.append(h('span',{class:'collocation-chip','data-collocation':value},...passage.childNodes));}panel.append(h('h3',{'data-interface-copy':''},'よく使う組み合わせ'),chips);}
- const glyphs=[...new Set([...entry.term].filter(c=>/\p{Script=Han}/u.test(c)))];
- for(const glyph of glyphs){const data=entry.kanji?.find(k=>k.c===glyph),words=relatedWords.filter(e=>e.taskKey!==entry.taskKey&&e.term.includes(glyph)).slice(0,6),info=h('div',{class:'kanji-info'});
-  if(data)info.append(h('div',{class:'kanji-heading'},data.r?h('p',{class:'reading'},data.r):null,data.m?h('p',{lang:'en'},data.m):null),data.parts?.length?h('p',{class:'secondary'},h('span',{'data-interface-copy':''},'部品'),'：',h('span',{'data-vocabulary-source':''},data.parts.join('・')),data.st?[' · ',h('span',{'data-interface-copy':''},`${data.st}画`)]:null):null,h('p',{class:'source-label','data-interface-copy':''},'配布デッキの漢字データ'));
-  else info.append(h('p',{class:'secondary','data-interface-copy':''},'この漢字の詳しい情報はまだありません'));
-  if(words.length)info.append(h('div',{class:'related-words'},...words.map(e=>h('button',{type:'button',class:'text-link',onclick:()=>onRelated(e)},e.term))));
-  panel.append(h('div',{class:'kanji-row'},h('strong',{class:'kanji'},glyph),info));
- }
- if(!glyphs.length)panel.append(h('p',{class:'secondary','data-interface-copy':''},'この言葉には漢字がありません。'));return panel;
+export function renderVocabularyRelated(document,entry,{onWord=()=>{},relatedWords=[],onRelated=()=>{},dictionary=null,locale=document.documentElement?.dataset?.interfaceLanguage||(document.documentElement?.lang==='en'?'en':'ja'),learningReport=null}={}){
+ return renderKanjiPanel(document,buildKanjiModel(entry,{relatedWords,dictionary,learningReport}),{
+  locale,onRelated,renderCollocation:text=>{
+   const passage=renderVocabularyPassage(document,entry,text,{field:'sheet',onWord,dictionary});
+   passage.setAttribute('data-collocation',text);return passage;
+  }
+ });
 }
 /** One entry layout serves the card back, deck lookup, dictionary and phrase lookup. */
 export function renderVocabularyEntry(document,entry,{onWord=()=>{},kanjiPanel=null,relatedWords=[],dictionary=null,hideUnavailable=false}={}){
