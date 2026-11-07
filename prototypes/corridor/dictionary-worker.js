@@ -339,6 +339,13 @@ function scoreDictionary(context, matchingCoreIds) {
   const coreIds = new Set(matchingCoreIds || []);
   const compatibleCoreIds = new Set();
   const scored = [];
+  const inflections = new Set(
+    (Array.isArray(context.inflections) ? context.inflections : [])
+      .map((form) => String(form || ''))
+      .filter(Boolean),
+  );
+  const inflected = [];
+  let exact = false;
   for (const row of dictionaryEntries) {
     const [seq, head, reading, firstGloss, written, kana, glosses, normalGlosses, common] = row;
     const summaries = dictionaryReadingSummaries(row);
@@ -421,7 +428,41 @@ function scoreDictionary(context, matchingCoreIds) {
         }
       }
     }
-    if (score < 0) continue;
+    if (score < 0) {
+      // The same finite candidate spellings the main thread sends for the
+      // inline/core path; a candidate is kept only when this row actually has
+      // that spelling or reading. No row, no result.
+      if (inflections.size) {
+        const matchedForm =
+          (inflections.has(head) || inflections.has(kataToHira(head)) ? head : '') ||
+          written.find((form) => inflections.has(form) || inflections.has(kataToHira(form))) ||
+          kana.find((form) => inflections.has(kataToHira(form)) || inflections.has(form));
+        if (matchedForm) {
+          const [matchedReading, displayHead, matchedGloss] =
+            summaries.find(([, summaryHead]) =>
+              summaryHead === matchedForm || kataToHira(summaryHead) === matchedForm) ||
+            summaries.find(([summaryReading]) => kataToHira(summaryReading) === matchedForm) ||
+            defaultSummary;
+          inflected.push({
+            result: {
+              t: 'word',
+              id: displayHead || head,
+              seq,
+              reading: matchedReading || reading || '',
+              w: displayHead || head,
+              r: matchedReading || reading || '',
+              g: matchedGloss || firstGloss || '',
+              matchedGloss: matchedGloss || firstGloss || '',
+              inflection: true,
+            },
+            score: 34,
+            tie: common ? 0 : 6,
+          });
+        }
+      }
+      continue;
+    }
+    if (score >= 90) exact = true;
 
     if (coreIds.size) {
       const forms = new Set([head, ...written, ...kana]);
@@ -447,6 +488,7 @@ function scoreDictionary(context, matchingCoreIds) {
       tie,
     });
   }
+  if (!exact) scored.push(...inflected);
   scored.sort(
     (left, right) =>
       right.score - left.score ||

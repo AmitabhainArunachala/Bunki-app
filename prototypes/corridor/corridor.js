@@ -22638,6 +22638,9 @@ function searchResults(query) {
   const { q, hasKanji, hasKana, qh, qk, ql, qn } = context;
   if (!q) return [];
   const scored = [];
+  const inflectionSet = new Set(context.inflections || []);
+  const coreInflections = [];
+  const inlineInflections = [];
   for (const e of searchIndex) {
     let score = -1;
     // Only the English exact-gloss tiers set this; every other lane leaves it
@@ -22678,6 +22681,18 @@ function searchResults(query) {
       }
     }
     if (score >= 0) scored.push({ e, score, tie });
+    else if (
+      inflectionSet.size &&
+      e.t === 'word' &&
+      (inflectionSet.has(e.w) ||
+        inflectionSet.has(e.rh) ||
+        inflectionSet.has(kataToHira(e.w)) ||
+        inflectionSet.has(kataToHira(e.r)))
+    ) {
+      // Below every ordinary written/kana/romaji/English tier: a dictionary
+      // spelling the query's ending can stand for, never a rewrite of the query.
+      coreInflections.push({ e: { ...e, inflection: true }, score: 34, tie: e.j });
+    }
   }
   const matchingCoreIds = new Set(scored.filter(({ e }) => e.core).map(({ e }) => e.id));
   const workerSearch = D.dictionarySearchCache?.get(q) || null;
@@ -22785,7 +22800,47 @@ function searchResults(query) {
         score,
         tie,
       });
+    } else if (inflectionSet.size) {
+      const matchedForm =
+        (inflectionSet.has(head) || inflectionSet.has(kataToHira(head)) ? head : '') ||
+        written.find((form) => inflectionSet.has(form) || inflectionSet.has(kataToHira(form))) ||
+        kana.find((form) => inflectionSet.has(kataToHira(form)) || inflectionSet.has(form));
+      if (matchedForm) {
+        const [matchedReading, displayHead, matchedGloss] =
+          summaries.find(([, summaryHead]) =>
+            summaryHead === matchedForm || kataToHira(summaryHead) === matchedForm) ||
+          summaries.find(([summaryReading]) => kataToHira(summaryReading) === matchedForm) ||
+          defaultSummary;
+        inlineInflections.push({
+          e: {
+            t: 'word',
+            id: displayHead || head,
+            seq,
+            reading: matchedReading || reading || '',
+            w: displayHead || head,
+            r: matchedReading || reading || '',
+            g: matchedGloss || firstGloss || '',
+            matchedGloss: matchedGloss || firstGloss || '',
+            dictionaryRow: row,
+            inflection: true,
+          },
+          score: 34,
+          tie: common ? 0 : 6,
+        });
+      }
     }
+  }
+  const exactMatch = scored.some(({ score }) => score >= 90);
+  if (exactMatch) {
+    // An exact entry outranks every fallback, including one a worker returned
+    // before this query's core lane knew the exact spelling.
+    for (let at = scored.length - 1; at >= 0; at -= 1) {
+      if (scored[at].e.inflection) scored.splice(at, 1);
+    }
+  } else if (!workerSearch?.scored?.some(({ e }) => e.inflection)) {
+    // Worker replies own the fallback once they arrive; before then (and with
+    // no optional index) the core/inline rows answer immediately.
+    scored.push(...coreInflections, ...inlineInflections);
   }
   scored.sort(
     (a, b) =>

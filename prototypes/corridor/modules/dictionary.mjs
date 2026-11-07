@@ -1759,6 +1759,115 @@ function normalizeGloss(s) {
   return bare;
 }
 
+/* A small, finite inflected-form fallback. It is not a tokenizer: for a
+ * Japanese query it reads one known ending (polite, past, negative, te) and
+ * proposes the dictionary spellings that ending can come from. Every proposed
+ * spelling is then checked against the real dictionary rows; nothing here
+ * creates an entry or claims which homograph the user meant. */
+let INFLECTION_ROWS = null;
+const INFLECTION_RULES = [
+  ['くありませんでした', 'adjective'],
+  ['くありません', 'adjective'],
+  ['くなかった', 'adjective'],
+  ['ませんでした', 'polite'],
+  ['ていました', 'te'],
+  ['ていません', 'te'],
+  ['ています', 'te'],
+  ['ていない', 'te'],
+  ['ている', 'te'],
+  ['てください', 'te'],
+  ['ません', 'polite'],
+  ['ました', 'polite'],
+  ['ましょう', 'polite'],
+  ['ます', 'polite'],
+  ['たかった', 'polite'],
+  ['たくない', 'polite'],
+  ['くない', 'adjective'],
+  ['たい', 'polite'],
+  ['なかった', 'negative'],
+  ['ない', 'negative'],
+  ['かったです', 'adjective'],
+  ['いです', 'adjective'],
+  ['かった', 'adjective'],
+  ['くて', 'adjective'],
+  ['ければ', 'adjective'],
+  ['かろう', 'adjective'],
+  ['く', 'adjective'],
+  ['て', 'te'],
+  ['で', 'te'],
+  ['た', 'past'],
+  ['だ', 'past'],
+];
+
+function dictionaryInflectionCandidates(query) {
+  const q = String(query || '').trim();
+  if (!q || q.length > 24 || !/[一-鿌぀-ゖァ-ヺ]/.test(q)) return [];
+  const hira = kataToHira(q);
+  const rows = INFLECTION_ROWS || (INFLECTION_ROWS = {
+    a: new Map(Object.entries(GODAN_ROW).map(([dictionary, row]) => [row[0], dictionary])),
+    i: new Map(Object.entries(GODAN_ROW).map(([dictionary, row]) => [row[1], dictionary])),
+  });
+  const out = new Set();
+  const add = (value) => {
+    const form = String(value || '');
+    if (form.length >= 2 && form.length <= 24) out.add(form);
+  };
+  const addKuru = (stem) => {
+    if (stem === 'き' || stem === 'こ') add('くる');
+    else if (stem.endsWith('来')) add(`${stem}る`);
+  };
+  const addFromPolite = (stem) => {
+    const last = stem.slice(-1);
+    const dictionary = rows.i.get(last);
+    if (dictionary) add(stem.slice(0, -1) + dictionary);
+    add(stem + 'る');
+    if (last === 'し') add(stem.slice(0, -1) + 'する');
+    addKuru(stem);
+  };
+  const addFromNegative = (stem) => {
+    const last = stem.slice(-1);
+    const dictionary = rows.a.get(last);
+    if (dictionary) add(stem.slice(0, -1) + dictionary);
+    add(stem + 'る');
+    if (last === 'し') add(stem.slice(0, -1) + 'する');
+    addKuru(stem);
+  };
+  const addFromTe = (stem) => {
+    const last = stem.slice(-1);
+    if (last === 'っ') {
+      for (const ending of ['う', 'つ', 'る', 'く']) add(stem.slice(0, -1) + ending);
+    } else if (last === 'ん') {
+      for (const ending of ['ぬ', 'ぶ', 'む']) add(stem.slice(0, -1) + ending);
+    } else if (last === 'い') {
+      add(stem.slice(0, -1) + 'く');
+      add(stem.slice(0, -1) + 'ぐ');
+      add(stem + 'る');
+    } else if (last === 'し') {
+      add(stem.slice(0, -1) + 'す');
+      add(stem.slice(0, -1) + 'する');
+      add(stem + 'る');
+    } else {
+      add(stem + 'る');
+    }
+    addKuru(stem);
+  };
+  for (const [ending, kind] of INFLECTION_RULES) {
+    if (!hira.endsWith(ending)) continue;
+    const stem = hira.slice(0, -ending.length);
+    if (!stem) continue;
+    if (kind === 'adjective') {
+      add(stem + 'い');
+      // 分かった / わかった / かかった are godan-る pasts that wear the same
+      // かった ending as an i-adjective; 分かる comes from 分 + かる.
+      if (ending === 'かった') add(stem + 'かる');
+    } else if (kind === 'polite') addFromPolite(stem);
+    else if (kind === 'negative') addFromNegative(stem);
+    else addFromTe(stem);
+    break;
+  }
+  return [...out];
+}
+
 function dictionarySearchContext(query) {
   const q = String(query || '').trim();
   const hasKanji = /[一-鿌]/.test(q);
@@ -1772,6 +1881,7 @@ function dictionarySearchContext(query) {
     qk: qh ? hiraToKata(qh) : null,
     ql: q.toLowerCase(),
     qn: hasKanji || hasKana ? '' : normalizeGloss(q),
+    inflections: dictionaryInflectionCandidates(q),
   };
 }
 
