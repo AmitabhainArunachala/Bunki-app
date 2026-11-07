@@ -687,7 +687,7 @@ function renderWritingChoice() {
     row('settings-brush', '筆 — 語が自分で書かれる', '筆 — a word writes itself',
       [['first', '初めての語', 'First meeting'], ['always', 'いつも', 'Always'], ['never', '書かない', 'Never']],
       wordBrush(), (value) => setWordPref(WORD_BRUSH_KEY, 'wordBrush', WORD_BRUSH, value)),
-    row('settings-voice', '声 — 収録音声で読み上げる', '声 — say it in the recorded voice',
+    row('settings-voice', '声 — 収録音声を優先、なければ端末の声', '声 — recorded audio first, device voice for gaps',
       [['on', 'オン', 'On'], ['off', 'オフ', 'Off']],
       wordVoice(), (value) => setWordPref(WORD_VOICE_KEY, 'wordVoice', WORD_VOICE, value)),
     el('p', 'settings-layout-note', tx('書く速さは、書の間のスライダー一つで決まります。',

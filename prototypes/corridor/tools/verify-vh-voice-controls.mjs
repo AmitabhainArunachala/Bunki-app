@@ -13,19 +13,20 @@ const digest = (s) => createHash('sha256').update(s).digest('hex');
 const runId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
 const out = resolveCorridorEvidence();
 assert(!process.env.KAIRO_CORRIDOR_SOURCE, 'voice mutation parent must start with the real source');
-const copy = 'VH COPY-VOICE · unavailable copy and title follow manifest admission in both languages';
+const copy = 'VH COPY-VOICE · no Japanese device voice stays silent with a named reason in both languages';
 const retry = 'MECHANICS · retrying an available clip clears the old error; a new failure stays visible';
+// Keep report IDs stable; word gaps now explain device-voice availability, independent of manifest admission.
 const controls = [
   { id: 'no-manifest-copy-empty', test: copy, witness: 'unavailable visible copy: null/en',
-    from: "say(tx('この版には収録音声がありません', 'This build has no recorded voices'), 'no-recordings');", to: "say('', 'no-recordings');" },
-  { id: 'missing-word-copy-loses-locked-voice', test: copy, witness: 'unavailable visible copy: empty-v2/en',
-    from: '`No ${voice} recording yet — on its way`', to: '`No recording yet — on its way`' },
+    from: "'No Japanese device voice. Add a Japanese voice, then tap audio.'", to: "''" },
+  { id: 'missing-word-copy-loses-locked-voice', test: copy, witness: 'unavailable visible copy: null/en',
+    from: "'No Japanese device voice. Add a Japanese voice, then tap audio.'", to: "'No device voice. Add a voice, then tap audio.'" },
   { id: 'card-unavailable-title-omitted', test: copy, witness: 'unavailable title: null/en',
-    from: '    btn.title = reason;', to: '    void reason;' },
+    from: '  btn.title = reason;', to: '  void reason;' },
   { id: 'card-retry-retains-error-title', test: retry, witness: 'retry title clears the old failure',
-    from: "        btn.title = '';\n        delete btn.dataset.voiceUnavailable;", to: '        delete btn.dataset.voiceUnavailable;' },
+    from: '  btn.title = reason;', to: '  if (flag) btn.title = reason;' },
   { id: 'card-subsequent-error-title-stale', test: retry, witness: 'subsequent failure updates its title',
-    from: '    btn.title = reason;', to: "    if (btn.title !== 'stale failure sentinel') btn.title = reason;" },
+    from: '  btn.title = reason;', to: "  if (btn.title !== 'stale failure sentinel') btn.title = reason;" },
   { id: 'pending-quote-creates-listen-control', test: 'VH COPY-VOICE · absent narration adds no dead excerpt Listen control', witness: 'pending quote must not create a Listen control',
     from: "for (const quote of articleNarration ? root.querySelectorAll('blockquote.sentence-original') : [])", to: "for (const quote of root.querySelectorAll('blockquote.sentence-original'))" },
 ];

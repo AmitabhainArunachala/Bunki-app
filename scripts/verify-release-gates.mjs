@@ -448,7 +448,7 @@ export function batteryGates(out, env = process.env) {
     {
       name: 'approved-voice-contract',
       command: process.execPath,
-      args: ['--test', tool('test-approved-voice')],
+      args: ['--test', tool('test-approved-voice'), tool('test-dynamic-tts-contract')],
       requiredPath: tool('test-approved-voice'),
     },
     {

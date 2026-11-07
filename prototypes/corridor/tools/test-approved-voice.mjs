@@ -21,25 +21,33 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { test } from 'node:test';
 import vm from 'node:vm';
 import { runtimeLock } from './voice-lock.mjs';
+import { createDeviceVoice, REASONS as DEVICE_VOICE_REASONS } from '../device-voice.mjs';
 
 /** The source under test. KAIRO_CORRIDOR_SOURCE lets the mutant adjudicator point this
  * suite at a one-line mutation of corridor.js and prove each control actually goes red;
  * unset — which is every real run — it is the shipped file. */
 const source = readFileSync(process.env.KAIRO_CORRIDOR_SOURCE
   || new URL('../corridor.js', import.meta.url), 'utf8');
-function between(start, end) {
-  const from = source.indexOf(start), to = source.indexOf(end, from);
+const voiceSource = readFileSync(new URL('../modules/voice.mjs', import.meta.url), 'utf8');
+const wordSource = readFileSync(new URL('../modules/word-entry.mjs', import.meta.url), 'utf8');
+function between(start, end, input = source) {
+  const from = input.indexOf(start), to = input.indexOf(end, from);
   assert(from >= 0 && to > from, `Missing source boundary: ${start}`);
-  return source.slice(from, to);
+  return input.slice(from, to);
 }
 const narrationSource = between('const readAloud =', '/* ------------------------------------------------ 収録の声');
 // anchored on the manifest state, not on the deleted chooser: V removed REC_VOICE_KEY,
 // REC_ROSTER, sessionVoicePref and recVoicePref outright
-const recordedSource = between('let recManifest;', 'function refreshListenRow(');
-const barSource = between('function voicePendingNote(', 'function renderReader(');
+const recordedSource = between('let recManifest;', '/** F · the listen door');
+const barSource = between('function buildListenRow(', '/* G5 · LAYERS');
+// G3 moved these declarations into modules; keep exercising their actual bodies.
+const voiceHelpersSource = between('function voiceForRole(', 'function refreshListenRow(', voiceSource);
+const wordHelpersSource = between('function wordClipKey(', 'function openSlip(', wordSource);
 const controlSource = between('function enhanceJapaneseProse(', '/* Save is one tap');
 const settle = () => new Promise(resolve => setImmediate(resolve));
 const passage = { id: 'fixture' };
+const JA_LOCAL = { name: 'Kyoko', voiceURI: 'kyoko', lang: 'ja-JP', localService: true, default: true };
+const EN_LOCAL = { name: 'Samantha', voiceURI: 'samantha', lang: 'en-US', localService: true };
 const LOCK = runtimeLock();
 const MAIN = LOCK.main, SECOND = LOCK.second;
 const lockBlock = { model: LOCK.model, main: MAIN, second: SECOND };
@@ -60,6 +68,13 @@ const approvedWords = ({ voice = MAIN, role = 'word', model = LOCK.model,
 /** The files this build actually ships. */
 const shipped = (name) => { try { return JSON.parse(readFileSync(new URL(`../audio/${name}`, import.meta.url), 'utf8')); } catch { return null; } };
 const clipsOnDisk = (dir) => { try { return readdirSync(new URL(`../audio/${dir}/`, import.meta.url)).filter((f) => f.endsWith('.m4a')); } catch { return []; } };
+
+function eventTarget() {
+  const listeners = new Map();
+  return { addEventListener(type, handler) {
+    if (!listeners.has(type)) listeners.set(type, []); listeners.get(type).push(handler);
+  }, dispatchEvent(event) { for (const handler of listeners.get(event.type) || []) handler(event); } };
+}
 
 function domFixture() {
   const ids = new Map();
@@ -87,10 +102,7 @@ function domFixture() {
     };
     return node;
   }
-  const listeners = new Map();
-  return { el, document: { getElementById: id => ids.get(id) || null, addEventListener(type, handler) {
-    if (!listeners.has(type)) listeners.set(type, []); listeners.get(type).push(handler);
-  }, dispatchEvent(event) { for (const handler of listeners.get(event.type) || []) handler(event); } } };
+  return { el, document: { ...eventTarget(), hidden: false, getElementById: id => ids.get(id) || null } };
 }
 
 function mediaFixture() {
@@ -114,19 +126,25 @@ function mediaFixture() {
 
 async function fixture({ narration = null, words = { v: 1, words: {} },
   flags = { __KAIRO_NARRATION__: 1, __KAIRO_AUDIO__: 1 }, preference = null, passageId = passage.id,
-  sessionPreference = null, storageThrows = false, fetchError = false, language = 'en' } = {}) {
+  sessionPreference = null, storageThrows = false, fetchError = false, language = 'en',
+  voices = [EN_LOCAL, JA_LOCAL], voiceSetting = 'on' } = {}) {
   const dom = domFixture(), media = mediaFixture();
   const preferences = new Map(preference ? [['kairo-rec-voice-v1', preference]] : []);
   const fetches = [], writes = [], deviceVoiceCalls = [];
-  let refreshes = 0;
+  let refreshes = 0, cancellations = 0;
   const context = {
-    window: { ...flags }, S: { view: 'reader', stack: [], review: { ix: 0, revealed: true, history: [] } },
+    window: { ...eventTarget(), ...flags },
+    S: { view: 'reader', stack: [], review: { ix: 0, revealed: true, history: [], queue: [{ t: 'word', id: '電車' }] } },
     ...dom, Audio: media.Audio, clearTimeout,
     tx: (ja, en) => language === 'ja' ? ja : en, bi: () => language !== 'ja',
     uiIcon: () => dom.el('svg'),
     refreshListenRow: () => { refreshes += 1; },
-    speechSynthesis: { speak: value => deviceVoiceCalls.push(value), cancel() {} },
-    SpeechSynthesisUtterance: class { constructor(value) { deviceVoiceCalls.push(value); } },
+    stopSentenceListening() {}, wordVoice: () => voiceSetting,
+    createDeviceVoice: () => createDeviceVoice(context), DEVICE_VOICE_REASONS,
+    speechSynthesis: { ...eventTarget(), getVoices: () => voices,
+      speak(utterance) { deviceVoiceCalls.push(utterance); utterance.onstart?.(); },
+      cancel() { cancellations += 1; } },
+    SpeechSynthesisUtterance: class { constructor(text) { this.text = text; } },
     localStorage: {
       getItem: key => { if (storageThrows) throw new Error('storage denied'); return preferences.get(key) ?? null; },
       setItem: (key, value) => { writes.push([key, value]); preferences.set(key, value); },
@@ -139,15 +157,16 @@ async function fixture({ narration = null, words = { v: 1, words: {} },
       const value = url === 'audio/article-narration.json' ? narration : words;
       return { ok: value !== null, json: async () => value };
     },
-    fixtureSessionPreference: sessionPreference,
+    sessionVoicePref: sessionPreference,
   };
   context.window.speechSynthesis = context.speechSynthesis;
   vm.createContext(context);
-  vm.runInContext(`${narrationSource}\n${recordedSource}\n${barSource}\n${controlSource}\nsessionVoicePref = fixtureSessionPreference;`, context);
+  vm.runInContext(`${voiceHelpersSource}\n${wordHelpersSource}\n${narrationSource}\n${recordedSource}\n${barSource}\n${controlSource}`, context);
   await context.ensureArticleNarration(); await context.ensureRecManifest();
   return {
     context, ...media, ...dom, fetches, writes, preferences, deviceVoiceCalls,
     get refreshes() { return refreshes; },
+    get cancellations() { return cancellations; },
     state: vm.runInContext('readAloud', context),
     loadedNarration: () => vm.runInContext('articleNarration', context),
     bar: () => context.buildListenRow({ id: passageId }),
@@ -157,6 +176,13 @@ async function fixture({ narration = null, words = { v: 1, words: {} },
       const wrapper = dom.el('div'), button = dom.el('button'), note = dom.el('span', 'say-note');
       wrapper.append(button, note); return { button, note };
     },
+    reviewCard() {
+      context.S.view = 'review';
+      const row = dom.el('div');
+      context.appendReviewVoice(row, { text: 'でんしゃ', word: '電車' });
+      context.retireCardAudioOnFaceChange();
+      return { button: row.querySelector('#card-say'), note: row.querySelector('.say-note') };
+    },
   };
 }
 
@@ -164,7 +190,7 @@ async function fixture({ narration = null, words = { v: 1, words: {} },
  * These read the files this build ships. They are the cases that can go red when the audio is
  * missing — which is the only reason this suite exists. */
 
-test('REAL · the shipped build is pending and silent, and no stale interim choice can speak', async () => {
+test('REAL · a missing shipped word uses Japanese device speech, and stale choices stay inert', async () => {
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const boot = vm.createContext({ window: {}, navigator: {}, location: { protocol: 'http:' } });
   for (const [, attributes, code] of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)) {
@@ -172,7 +198,6 @@ test('REAL · the shipped build is pending and silent, and no stale interim choi
   }
   const words = shipped('manifest.json');
   const approved = words?.v === 2 ? Object.keys(words.words || {}).length : 0;
-  const admitted = words?.v === 2 && words.lock?.model === LOCK.model && !!words.words && typeof words.words === 'object';
   // TRIPWIRE. The pending state is honest only while the locked voice has recorded nothing. The
   // day a clip lands this fails, and the positive case below must carry the proof instead.
   const onDisk = clipsOnDisk(`w/${MAIN}`);
@@ -188,15 +213,16 @@ test('REAL · the shipped build is pending and silent, and no stale interim choi
     f.context.speakCardReading(probe[1], button, probe[0]);
     await settle();
     assert.equal(f.created.length, 0, `a saved ${preference} choice cannot play an interim word clip`);
-    assert.equal(f.deviceVoiceCalls.length, 0, 'never the device voice');
+    assert.equal(f.deviceVoiceCalls.length, 1, 'the missing exact clip uses device speech');
+    assert.equal(f.deviceVoiceCalls[0].text, probe[1], 'speak the reading the learner was shown');
+    assert.equal(f.deviceVoiceCalls[0].lang, 'ja-JP');
+    assert.equal(f.deviceVoiceCalls[0].voice, JA_LOCAL, 'a saved choice cannot select the device voice');
     assert.deepEqual(f.writes, [], 'nothing is written to storage');
     assert.equal(f.preferences.get('kairo-rec-voice-v1') ?? null, preference, 'the old value is left untouched');
-    assert.equal(button.dataset.voiceUnavailable, admitted ? 'not-recorded' : 'no-recordings');
-    const expected = admitted
-      ? language === 'ja' ? `${LOCK.voices[MAIN]} の収録音声はありません（準備中）` : `No ${LOCK.voices[MAIN]} recording yet — on its way`
-      : language === 'ja' ? 'この版には収録音声がありません' : 'This build has no recorded voices';
-    assert.equal(note.textContent, expected, 'REAL unavailable copy is exact and visible');
-    assert.equal(button.title, expected, 'REAL unavailable title equals the visible reason');
+    assert.equal(button.dataset.voiceUnavailable, undefined);
+    const expected = language === 'ja' ? '端末の声 · Kyoko' : 'Device voice · Kyoko';
+    assert.equal(note.textContent, expected, 'REAL playback source is exact and visible');
+    assert.equal(button.title, expected, 'REAL title equals the visible source');
   }
 });
 
@@ -236,12 +262,13 @@ test('REAL · a word with a shipped clip plays it, keyed by the reading the card
     return;
   }
   const [key, entry] = entries[0];
+  assert(existsSync(new URL(`../${entry.src}`, import.meta.url)), 'the shipped word clip is on disk');
   const [surface, reading] = key.split('|');
   const f = await fixture({ words });
   const { button, note } = f.card();
   f.context.speakCardReading(reading, button, surface); await settle();
   assert.equal(f.created[0]?.src, entry.src, 'the first shipped word plays its own clip');
-  assert.equal(note.textContent, '');
+  assert.equal(note.textContent, `Recorded audio · ${LOCK.voices[MAIN]}`);
   assert.equal(f.deviceVoiceCalls.length, 0);
 });
 
@@ -254,8 +281,9 @@ test('CONTROL · the second voice is never a fallback for a missing main-voice c
   const { button, note } = f.card();
   f.context.speakCardReading('でんしゃ', button, '電車'); await settle();
   assert.equal(f.created.length, 0, 'the second speaker does not read a word');
-  assert.equal(f.deviceVoiceCalls.length, 0);
-  assert.equal(button.dataset.voiceUnavailable, 'not-recorded');
+  assert.equal(f.deviceVoiceCalls.length, 1, 'a gap uses Japanese device speech, never the second recording');
+  assert.equal(f.deviceVoiceCalls[0].voice, JA_LOCAL);
+  assert.equal(button.dataset.voiceUnavailable, undefined);
   assert.equal(f.wordClip('電車', 'でんしゃ', 'word'), null, 'the resolver itself refuses it');
 
   // the same clip, lawfully marked as the dialogue's second speaker, IS admissible
@@ -289,20 +317,37 @@ test('CONTROL · a spelling alone is never a key, and a reading picks its own cl
   const c = spelling.card(); spelling.context.speakCardReading('ねん', c.button, '年'); await settle();
   assert.equal(spelling.created.length, 0, 'a spelling-keyed entry is not playable');
   assert.equal(spelling.wordClip('年', 'ねん', 'word'), null);
-  assert.equal(spelling.deviceVoiceCalls.length, 0);
+  assert.equal(spelling.deviceVoiceCalls.length, 1);
+  assert.equal(spelling.deviceVoiceCalls[0].text, 'ねん', 'device speech keeps the requested reading');
 });
 
-test('CONTROL · the device voice is never reached by any absence path', async () => {
+test('CONTROL · absent or rejected word clips use Japanese device speech, never unapproved Audio', async () => {
   for (const options of [{ words: null }, { words: { v: 1, words: { 電車: { id: 'x', voices: ['ami'] } } } },
     { words: approvedWords({ model: 'some-other-model' }) }, { fetchError: true },
     { words: approvedWords({ key: '電車' }) }]) {
     const f = await fixture(options);
     const { button } = f.card();
     f.context.speakCardReading('でんしゃ', button, '電車'); await settle();
-    assert.equal(f.deviceVoiceCalls.length, 0, `device speech reached through ${JSON.stringify(options).slice(0, 60)}`);
+    assert.equal(f.deviceVoiceCalls.length, 1, `missing exact clip: ${JSON.stringify(options).slice(0, 60)}`);
+    assert.equal(f.deviceVoiceCalls[0].text, 'でんしゃ');
+    assert.equal(f.deviceVoiceCalls[0].voice, JA_LOCAL);
     assert.equal(f.created.length, 0);
-    assert(button.dataset.voiceUnavailable, 'the absence is said where it can be seen');
+    assert.equal(button.dataset.voiceUnavailable, undefined);
+    assert.equal(button.title, 'Device voice · Kyoko');
   }
+});
+
+test('CONTROL · an exact approved word clip takes priority over available Japanese device speech', async () => {
+  const f = await fixture({ words: approvedWords() }), { button, note } = f.card();
+  f.context.speakCardReading('でんしゃ', button, '電車'); await settle();
+  assert.equal(f.created.length, 1);
+  assert.equal(f.created[0].src, `audio/w/${MAIN}/densha.m4a`);
+  assert.equal(f.deviceVoiceCalls.length, 0, 'approved recording priority');
+  assert.equal(note.textContent, `Recorded audio · ${LOCK.voices[MAIN]}`);
+  f.created[0].fail(); await settle();
+  assert.equal(f.deviceVoiceCalls.length, 0, 'a playback failure does not switch voices');
+  assert.equal(button.dataset.voiceUnavailable, 'play-failed');
+  assert.equal(note.textContent, 'This recording could not play here');
 });
 
 test('CONTROL · identity is stated, never defaulted', async () => {
@@ -359,7 +404,9 @@ test('CONTROL · a v1 manifest is legacy: readable, and carrying no approved cli
   const { button } = f.card();
   f.context.speakCardReading('でんしゃ', button, '電車'); await settle();
   assert.equal(f.created.length, 0);
-  assert.equal(button.dataset.voiceUnavailable, 'no-recordings');
+  assert.equal(f.deviceVoiceCalls.length, 1, 'legacy recordings stay inert while device speech is available');
+  assert.equal(f.deviceVoiceCalls[0].voice, JA_LOCAL);
+  assert.equal(button.dataset.voiceUnavailable, undefined);
 });
 
 test('CONTROL · a stored voice preference decides nothing at all', async () => {
@@ -385,19 +432,19 @@ test('CONTROL · a stored voice preference decides nothing at all', async () => 
  * Synthetic manifests, because a failure, a cancellation and a late completion cannot be staged
  * with real media. These never stand in for a real-manifest positive. */
 
-test('VH COPY-VOICE · unavailable copy and title follow manifest admission in both languages', async () => {
-  for (const language of ['en', 'ja']) for (const [kind, words, admitted] of [
-    ['null', null, false], ['legacy', { v: 1, words: {} }, false],
-    ['empty-v2', { v: 2, lock: lockBlock, words: {} }, true], ['missing-word-v2', approvedWords(), true],
+test('VH COPY-VOICE · no Japanese device voice stays silent with a named reason in both languages', async () => {
+  for (const language of ['en', 'ja']) for (const [kind, words] of [
+    ['null', null], ['legacy', { v: 1, words: {} }],
+    ['empty-v2', { v: 2, lock: lockBlock, words: {} }], ['missing-word-v2', approvedWords()],
   ]) {
-    const f = await fixture({ words, language }), { button, note } = f.card();
+    const f = await fixture({ words, language, voices: [EN_LOCAL] }), { button, note } = f.card();
     f.context.speakCardReading('みしゅうろく', button, '未収録'); await settle();
-    const expected = admitted
-      ? language === 'ja' ? `${LOCK.voices[MAIN]} の収録音声はありません（準備中）` : `No ${LOCK.voices[MAIN]} recording yet — on its way`
-      : language === 'ja' ? 'この版には収録音声がありません' : 'This build has no recorded voices';
+    const expected = language === 'ja'
+      ? '端末に日本語の声がありません。日本語の声を追加して、音を押してください。'
+      : 'No Japanese device voice. Add a Japanese voice, then tap audio.';
     assert.equal(note.textContent, expected, `unavailable visible copy: ${kind}/${language}`);
     assert.equal(button.title, expected, `unavailable title: ${kind}/${language}`);
-    assert.equal(button.dataset.voiceUnavailable, admitted ? 'not-recorded' : 'no-recordings');
+    assert.equal(button.dataset.voiceUnavailable, 'no-ja-voice');
     assert.equal(f.created.length, 0); assert.equal(f.deviceVoiceCalls.length, 0);
   }
 });
@@ -521,7 +568,7 @@ test('MECHANICS · card replay ignores a stale failure while a current one is re
   f.context.speakCardReading('でんしゃ', button, '電車');
   f.created[0].fail(); await settle();
   assert.equal(f.created.length, 2);
-  assert.equal(note.textContent, '');
+  assert.equal(note.textContent, `Recorded audio · ${LOCK.voices[MAIN]}`);
   f.created[1].fail(); await settle();
   assert.equal(note.textContent, 'This recording could not play here');
 });
@@ -533,11 +580,12 @@ test('MECHANICS · retrying an available clip clears the old error; a new failur
   assert.equal(note.textContent, 'This recording could not play here');
   assert.equal(button.title, 'This recording could not play here', 'first failure title is exact');
   f.context.speakCardReading('でんしゃ', button, '電車'); await settle();
-  assert.equal(note.textContent, '', 'a currently playing retry must not retain the old failure');
-  assert.equal(button.title, '', 'retry title clears the old failure');
+  assert.equal(note.textContent, `Recorded audio · ${LOCK.voices[MAIN]}`, 'a currently playing retry must not retain the old failure');
+  assert.equal(button.title, `Recorded audio · ${LOCK.voices[MAIN]}`, 'retry title clears the old failure');
+  assert.equal(button.dataset.voiceUnavailable, undefined);
   f.created[1].end(); await settle();
-  assert.equal(note.textContent, '');
-  assert.equal(button.title, '', 'successful completion has no error title');
+  assert.equal(note.textContent, `Recorded audio · ${LOCK.voices[MAIN]}`);
+  assert.equal(button.title, `Recorded audio · ${LOCK.voices[MAIN]}`, 'successful completion has no error title');
   f.context.speakCardReading('でんしゃ', button, '電車'); await settle();
   button.title = 'stale failure sentinel';
   f.created[2].fail(); await settle();
@@ -557,20 +605,109 @@ test('MECHANICS · leaving a card face retires its pending manifest request and 
   f.context.S.view = 'review'; f.context.speakCardReading('でんしゃ', button, '電車'); await settle();
   assert.equal(f.created.length, 1);
   f.context.S.review.ix += 1; f.context.retireCardAudioOnFaceChange(); await settle();
-  assert.equal(f.created[0].paused, true); assert.equal(note.textContent, '');
+  assert.equal(f.created[0].paused, true);
+  assert.equal(note.textContent, `Recorded audio · ${LOCK.voices[MAIN]}`);
 });
 
-test('CONTROL · the card\u2019s voice door exists only on a revealed face', () => {
-  // 声=on must never speak before the learner has revealed the answer. There is no auto-speak
-  // anywhere in this build — the door is a tap — so the law is structural, and this pins it:
-  // the one place that builds `#card-say` sits inside the revealed branch, and nowhere else.
-  const door = source.indexOf("say.id = 'card-say'");
-  assert(door > 0, 'the card voice door moved; this control no longer knows where to look');
-  assert.equal(source.indexOf("say.id = 'card-say'", door + 1), -1, 'there is exactly one voice door');
-  const revealed = source.lastIndexOf("if (rv.revealed && !['sentence', 'question'].includes(item.t)) {", door);
-  assert(revealed > 0 && revealed < door, 'the voice door is built inside the revealed branch');
-  const speak = source.indexOf('speakCardReading(spoken', door);
-  assert(speak > door, 'and the tap, not a timer, is what speaks');
-  // nothing in the file speaks a card without a tap
-  assert.equal(/setTimeout\([^)]*speakCardReading/u.test(source), false, 'no scheduled card speech');
+test('CONTROL · automatic review speech waits for reveal and runs once per face', async () => {
+  assert.match(source, /retireCardAudioOnFaceChange\(\);\s*autoSpeakReviewFace\(\);/u,
+    'render invokes automatic speech after retiring the previous face');
+  for (const words of [null, approvedWords()]) {
+    const f = await fixture({ words });
+    f.context.S.review.revealed = false;
+    const { button } = f.reviewCard();
+    const plays = () => f.created.length + f.deviceVoiceCalls.length;
+    f.context.autoSpeakReviewFace(); button.handlers.click(); await settle();
+    assert.equal(plays(), 0, 'neither automatic speech nor a stale door may reveal the answer');
+
+    f.context.S.review.revealed = true;
+    f.context.retireCardAudioOnFaceChange();
+    f.context.autoSpeakReviewFace(); await settle();
+    assert.equal(plays(), 1, 'revealing the answer automatically speaks');
+    assert.equal(f.created.length, words ? 1 : 0);
+    assert.equal(f.deviceVoiceCalls.length, words ? 0 : 1);
+    // A rerender replaces the button, not the face. Completion and voiceschanged cannot replay it.
+    f.created[0]?.end(); f.deviceVoiceCalls[0]?.onend?.(); await settle();
+    f.reviewCard(); f.context.autoSpeakReviewFace();
+    f.context.speechSynthesis.dispatchEvent({ type: 'voiceschanged' }); await settle();
+    assert.equal(plays(), 1, 'a revealed face is attempted only once');
+
+    f.context.S.review.ix += 1;
+    f.context.S.review.queue.push({ t: 'word', id: '電車' });
+    f.context.S.review.revealed = false;
+    f.reviewCard(); f.context.autoSpeakReviewFace(); await settle();
+    assert.equal(plays(), 1, 'the next front remains silent');
+    f.context.S.review.revealed = true;
+    f.reviewCard(); f.context.autoSpeakReviewFace(); await settle();
+    assert.equal(plays(), 2, 'a new revealed face gets its own attempt');
+  }
+});
+
+test('CONTROL · automatic speech respects the Voice setting and inactive review surfaces', async () => {
+  const off = await fixture({ voiceSetting: 'off' }), { button, note } = off.reviewCard();
+  off.context.autoSpeakReviewFace(); await settle();
+  assert.equal(off.deviceVoiceCalls.length, 0);
+  assert.equal(button.dataset.voiceUnavailable, 'disabled');
+  assert.equal(note.textContent, 'Voice is off · tap audio to play');
+  button.handlers.click(); await settle();
+  assert.equal(off.deviceVoiceCalls.length, 1, 'manual replay remains available');
+  for (const block of [f => { f.context.S.view = 'shelf'; },
+    f => { f.context.S.review.pending = true; }, f => { f.context.S.review.admitting = true; },
+    f => { f.context.S.stack.push({ t: 'word', id: '電車' }); },
+    f => { f.context.S.strokes = true; }, f => { f.document.hidden = true; }]) {
+    const f = await fixture(), { button } = f.reviewCard();
+    block(f); f.context.retireCardAudioOnFaceChange();
+    f.context.autoSpeakReviewFace(); button.handlers.click(); await settle();
+    assert.equal(f.created.length + f.deviceVoiceCalls.length, 0, 'inactive surfaces cannot speak');
+  }
+});
+
+test('MECHANICS · device cancellation ignores stale callbacks and a current failure stays visible', async () => {
+  const f = await fixture(), { button, note } = f.reviewCard();
+  f.context.autoSpeakReviewFace(); await settle();
+  const first = f.deviceVoiceCalls[0], staleEnd = first.onend, staleError = first.onerror;
+  button.handlers.click(); await settle();
+  assert.equal(f.deviceVoiceCalls.length, 2);
+  assert.equal(first.onend, null, 'cancelled callbacks are detached');
+  staleEnd(); staleError();
+  assert.equal(button.classList.contains('is-speaking'), true, 'stale completion cannot clear current playback');
+  assert.equal(note.textContent, 'Device voice · Kyoko');
+  f.deviceVoiceCalls[1].onerror();
+  assert.equal(button.classList.contains('is-speaking'), false);
+  assert.equal(button.dataset.voiceUnavailable, 'speech-failed');
+  assert.equal(note.textContent, 'Device voice could not play. Tap audio to retry.');
+  assert.equal(button.title, note.textContent);
+  f.reviewCard(); f.context.autoSpeakReviewFace(); await settle();
+  assert.equal(f.deviceVoiceCalls.length, 2, 'failure does not automatically retry the face');
+
+  const currentButton = f.document.getElementById('card-say');
+  currentButton.handlers.click(); await settle();
+  const last = f.deviceVoiceCalls[2], cancellations = f.cancellations;
+  f.context.S.view = 'shelf'; f.context.retireCardAudioOnFaceChange();
+  assert(f.cancellations > cancellations, 'leaving cancels device speech');
+  assert.equal(last.onend, null); assert.equal(last.onerror, null);
+});
+
+test('MECHANICS · a pending automatic request cannot speak after leaving its face', async () => {
+  const f = await fixture(); f.reviewCard();
+  let release;
+  f.context.ensureRecManifest = () => new Promise(resolve => { release = resolve; });
+  f.context.autoSpeakReviewFace();
+  f.context.S.view = 'shelf'; f.context.retireCardAudioOnFaceChange();
+  release(null); await settle();
+  assert.equal(f.deviceVoiceCalls.length + f.created.length, 0);
+});
+
+test('MECHANICS · late Japanese voice availability updates the reason without replaying the face', async () => {
+  const voices = [EN_LOCAL], f = await fixture({ voices }), { button, note } = f.reviewCard();
+  f.context.autoSpeakReviewFace(); await settle();
+  assert.equal(button.dataset.voiceUnavailable, 'no-ja-voice');
+  assert.equal(f.deviceVoiceCalls.length, 0);
+  voices.push(JA_LOCAL);
+  f.context.speechSynthesis.dispatchEvent({ type: 'voiceschanged' });
+  f.context.autoSpeakReviewFace(); await settle();
+  assert.equal(f.deviceVoiceCalls.length, 0, 'voice discovery is not another automatic attempt');
+  assert.equal(note.textContent, 'Device voice · Kyoko · tap audio to play');
+  button.handlers.click(); await settle();
+  assert.equal(f.deviceVoiceCalls.length, 1);
 });

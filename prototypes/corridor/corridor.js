@@ -1,3 +1,4 @@
+import { createDeviceVoice, REASONS as DEVICE_VOICE_REASONS } from './device-voice.mjs';
 import { activeDictionaryQuery, alternateLemmaDoor, annotationPieceReadings, annotationReadsAs, appendJapaneseLookup, bankExamplesFor, conjugations, dictionaryAnsweredForm, dictionaryCoreMatch, dictionaryDetailRowsFor, dictionaryDetailsFor, dictionaryEpoch, dictionaryGlossSummary, dictionaryHomographChoices, dictionaryLoneDoor, dictionaryQueryError, dictionaryQueryKey, dictionaryQueryToken, dictionaryReadingSupportsForm, dictionaryRelationRoute, dictionaryRowsFor, dictionaryRowsForForm, dictionaryRowsReadAs, dictionarySearchContext, dictionaryShardId, dictionaryShardNumber, dictionarySummaryFor, dictionaryTag, displayKunReading, displayPairs, embeddedDictionaryJson, ensureDictionaryDetails, ensureDictionaryRowBySeq, ensureDictionaryRowsForForm, ensureDictionaryRowsForNode, ensureSense, ensureTeFormAnswer, exampleFnv, exampleHoldsWord, exampleIdentity, exampleKanji, exampleOrder, exampleOwnRows, exampleSenseKey, exampleTokenIsWord, fetchExampleJson, findExamples, glossaryCrossRefPlan, hasEmbeddedDictionaryIndex, hiraToKata, homographLines, inlineGloss, inlineGlossLine, inlineTokenGloss, inlineWordGloss, inlineWordReading, japaneseLookupEntryRecord, japaneseLookupHelpId, japaneseLookupRecord, kanaIru, kanjiReadingsInWord, kanjiReadingsOf, lemmaReading, lemmaTakesForm, loadDictionaryJson, lookup, lookupBlockWords, lookupItemBlocks, lookupOccurrence, nameReaderToken, narrowLemmaEntries, normalizeGloss, partGloss, partMeaning, phoneticAnnotationCandidates, phoneticAnnotationIndices, phoneticAnnotationRanges, posCode, posLine, readerDoorGloss, readerDoorLead, readerGlossLine, readerGlossMissText, readerHelp, readerLayerParagraph, readerLayerReading, readerLookupAnswer, readerRenderedTokens, readerTokenAt, readerTokenAtIndex, readerTokenNode, readerTokenState, readerWordHint, readerWordNote, readingAsksIndex, readingExpected, readingForm, readingLine, readingPlaceFailure, readingTargets, readingToken, readingTokenEntry, readyTokenReading, relationReadingQualifier, relationTarget, renderConjugation, renderDictionaryDetails, renderDictionaryHomographs, renderDictionaryRelations, renderThesaurus, requestDictionaryDetails, senseChoice, senseDoor, senseExpression, senseFillInPlace, senseIsQuick, senseMoreElement, senseMoreLine, senseMustRun, senseNameHeldText, senseNegation, senseNeighbours, senseRecord, senseRefine, senseSpelledReading, senseWithin, sidecarSense, soundChangeDoor, soundChangeReadings, tapLadderHint, teFormAnswer, teFormRecord, teFormSenseGlosses, thesClusters, tokenGlossLine, tokenReading, validDictionaryRow, yomiReadingType, yomiVariantsOf } from './modules/dictionary.mjs';
 import { blankSlip, drawSheetActionLine, entryCueReading, findSheetDoor, flySeal, foldEntryForms, holdRing, keepFloatingBeside, keepMenuInCard, keptItemNode, keptStarWhy, keptState, keptWordProjection, listGloss, listReading, listToMarkdown, listeningField, listsWithout, markStripMore, miniKanjiWeb, note, noteSealListUse, noteSlipDepth, noteText, openSlip, openWordWebLadder, paintWordSave, placeSaveMenu, rememberSheet, renderWordCaptureNote, reopenSaveMenu, replaceWordCard, saveAiDeviceConfig, saveDrawerScroller, saveOne, saveReaderPosition, saveReportRelay, saveReportRelayLink, savedNodeRecord, savedRecordNoteDraft, sealHostedWord, sealListOrder, sealTarget, setSaveDrawerPush, sheetActionVisitHolds, sheetDoorKey, sheetTakeLabel, slipAllowed, slipHeadword, slipScroller, standingSlip, takenContext, toggleTaken, travelSlip, unsaveEverywhere, wordArchiveRef, wordCaptureBasis, wordCaptureHeldText, wordCaptureNoteText, wordCaptureOpenLabel, wordCaptureReadingMismatch, wordCaptureState, wordClipFor, wordClipKey, wordDepth, wordIdentityRelation, wordPresentationKey, wordRow, wordSaveFacts } from './modules/word-entry.mjs';
 import { clearTouchReadingSeat, encounterIdentity, encounterPatch, encounterTrail, fileIntakeFailure, filePageLabel, finishTouchReadingFade, holdReaderCapture, pinTouchRows, readerCaptureReason, readerCaptureReasonText, readerQuickRecord, readerQuickRecordAsRead, readerTakeCurrent, readerTakeNode, reconcileSourceInboxEntries, rememberFileDraft, renderEncounterTrail, seatGlossRow, seatInlineGloss, seatTouchReading, setTouchReadingShown, sourceInboxEntries, sourceLadderAction, sourceProcessingScope, stopTouchReadingFade, syncReaderTakeSeal, touchReading, touchReadingFading, touchRows, unpinTouchRows } from './modules/capture.mjs';
@@ -12366,6 +12367,7 @@ function cancelExcerptPlayback() {
 }
 
 async function playNarratedExcerpt(text, button, sourceId = null) {
+  retireCardSpeech();
   const original = excerptListenLabel();
   if (button.classList.contains('is-speaking')) { cancelExcerptPlayback(); button.classList.remove('is-speaking'); button.textContent = original; return; }
   // the handoff first, then this run's claim: taking the generation before cancelling would
@@ -12453,6 +12455,7 @@ function stopPassageRead() {
 /** Speak the passage sentence by sentence — short utterances keep 止める
  * responsive and survive the platform's long-utterance truncation. */
 function speakPassage(p, onDone) {
+  retireCardSpeech();
   const generation = ++readAloud.generation;
   const current = () => readAloud.on && readAloud.generation === generation;
   // Only the locked narration voice plays; there is no device fallback and no picker.
@@ -12484,8 +12487,8 @@ function speakPassage(p, onDone) {
  * Word clips follow the same approved roster as narration: Kore is the main
  * voice and Charon the second. A stale interim preference cannot authorize it
  * to play. The old device preference is left intact; the learner record never
- * changes here. Without an approved clip the answer card explains its absence
- * and stays silent. Licences ride audio/LICENCES.md. */
+ * changes here. A missing exact clip may use the device's Japanese voice for a
+ * revealed answer. Licences ride audio/LICENCES.md. */
 /* V (2026-10-17): the voice a surface plays is decided by its CONTENT ROLE. The chooser is gone,
  * roster, preference reader and all — a half-removed chooser is how a stale `kairo-rec-voice-v1`
  * of 'charon', or of a withdrawn interim voice, could make the second speaker read every word.
@@ -12540,6 +12543,7 @@ if (typeof window !== 'undefined') ensureRecManifest();
 /** Play one recorded clip. Resolves true when it played to the end, false when it
  * could not play, and null when it was stopped (a replay, another clip, or 止める). */
 function playRecClip(src, btn, { rate = 1, onTime = null } = {}) {
+  deviceVoice.cancel();
   return new Promise((done) => {
     // ONE PLAYBACK OWNER (V): the sentence-listening lane plays through its own element, so a word,
     // a read or a quote taking the room must end it too. (typeof: the voice suites run this file
@@ -12586,53 +12590,169 @@ function approvedWordManifest(m) {
 /** The one admissible clip for a (surface, reading) on a single-speaker surface. Returns null
  * rather than guessing: no spelling-only match, no other reading, no other voice, no other
  * model. `entrySeq`, when the card knows which dictionary entry it is showing, must agree too. */
-/** 音 — the answer card's voice door. The recorded clip in the approved voice, when
- * the word has one; otherwise a visible reason and silence. One tap speaks; a retap restarts. */
-let cardAudioSerial = 0, cardFaceKey = '';
+/** 音 — exact approved recordings first, ephemeral Japanese device speech for gaps. */
+const deviceVoice = createDeviceVoice();
+let cardAudioSerial = 0, cardFaceKey = '', cardFaceReview = null, cardFaceItem = null;
+let reviewVoiceFace = null;
+function retireCardSpeech() {
+  cardAudioSerial += 1;
+  deviceVoice.cancel();
+  document.getElementById('card-say')?.classList.remove('is-speaking');
+}
+window.addEventListener('pagehide', retireCardSpeech);
+document.addEventListener('visibilitychange', () => { if (document.hidden) retireCardSpeech(); });
+// Also cover media owned by a mounted room (e.g. assessment audio).
+document.addEventListener('play', event => {
+  if (event.target === recAudioEl) deviceVoice.cancel();
+  else retireCardSpeech();
+}, true);
+
 /** Called from render(): any change of card face (grade, undo, reveal, leave) retires card audio. */
 function retireCardAudioOnFaceChange() {
   const rv = S.review;
-  const key = `${S.view}|${rv ? rv.ix : ''}|${rv ? rv.revealed : ''}|${rv?.history?.length ?? ''}|${S.stack.length}`;
-  if (key === cardFaceKey) return;
+  const item = rv?.queue?.[rv.ix];
+  const face = JSON.stringify([rv?.ix, !!rv?.revealed, rv?.history?.length, rv?.presented?.key]);
+  if (!reviewVoiceFace || reviewVoiceFace.rv !== rv || reviewVoiceFace.item !== item || reviewVoiceFace.key !== face)
+    reviewVoiceFace = { rv, item, key: face, attempted: false, status: null };
+  const key = JSON.stringify([S.view, face, S.stack.map(node => [node.t, node.id]), !!S.strokes]);
+  if (key === cardFaceKey && cardFaceReview === rv && cardFaceItem === item) return;
   cardFaceKey = key;
+  cardFaceReview = rv; cardFaceItem = item;
   cardAudioSerial += 1;
+  deviceVoice.cancel();
   if (!readAloud.on) stopRecAudio();
 }
-function speakCardReading(text, btn, word) {
+
+function cardVoiceStatus(btn, reason, flag) {
+  if (!btn) return;
+  btn.title = reason;
+  if (flag) btn.dataset.voiceUnavailable = flag;
+  else delete btn.dataset.voiceUnavailable;
+  const note = btn.parentElement?.querySelector('.say-note');
+  if (note) note.textContent = reason;
+  if (btn.id === 'card-say' && reviewVoiceFace) reviewVoiceFace.status = { reason, flag };
+}
+function deviceVoiceMessage(result) {
+  if (result.spoken || result.ok) return tx(`端末の声 · ${result.voice.name}`, `Device voice · ${result.voice.name}`);
+  if (result.reason === DEVICE_VOICE_REASONS.NO_JA_VOICE)
+    return tx('端末に日本語の声がありません。日本語の声を追加して、音を押してください。',
+      'No Japanese device voice. Add a Japanese voice, then tap audio.');
+  if (result.reason === DEVICE_VOICE_REASONS.INVALID_TEXT)
+    return tx('この答えは読み上げられません', 'This answer cannot be spoken');
+  if (result.reason === DEVICE_VOICE_REASONS.FAILED)
+    return tx('端末の声を再生できませんでした。音を押して再試行。', 'Device voice could not play. Tap audio to retry.');
+  return tx('この環境では端末の声を利用できません', 'Device voice is unavailable in this browser');
+}
+
+function speakCardReading(text, btn, word, { automatic = false, entrySeq = null } = {}) {
+  if (document.hidden || (btn?.id === 'card-say' &&
+      (S.view !== 'review' || !S.review?.revealed || S.review.pending || S.review.admitting || S.stack.length || S.strokes))) return;
+  retireCardSpeech();
+  stopReadAloud(); stopRecAudio(); stopSentenceListening();
   // the clip belongs to the card face that asked: a grade, undo, reveal change or leave before
   // the manifest answers retires it, and a playing clip stops when the face changes
-  const serial = ++cardAudioSerial;
-  const say = (reason, flag) => {
-    if (!btn) return;
-    btn.dataset.voiceUnavailable = flag;
-    btn.title = reason;
-    const note = btn.parentElement?.querySelector('.say-note');
-    if (note) note.textContent = reason;
-  };
+  const serial = cardAudioSerial, face = btn?.id === 'card-say' ? reviewVoiceFace : null;
+  const button = () => face ? document.getElementById('card-say') : btn;
+  const current = () => serial === cardAudioSerial && !document.hidden &&
+    (!face || (face === reviewVoiceFace && S.view === 'review' && S.review === face.rv &&
+      S.review?.queue?.[S.review.ix] === face.item && S.review.revealed && !S.review.pending && !S.review.admitting &&
+      !S.stack.length && !S.strokes && button()?.dataset.voiceText === text && button()?.dataset.voiceWord === word)) &&
+    (!btn || !!button()?.isConnected);
+  const say = (reason, flag) => { if (current()) cardVoiceStatus(button(), reason, flag); };
   ensureRecManifest().then((m) => {
-    if (serial !== cardAudioSerial) return;
+    if (!current() || (automatic && wordVoice() !== 'on')) return;
     // `text` is the reading the card is showing. It is the key, not decoration.
-    const entry = wordClipFor(m, word, text, 'word');
+    const entry = wordClipFor(m, word, text, 'word', entrySeq);
     if (entry) {
-      if (btn) {
-        btn.title = '';
-        delete btn.dataset.voiceUnavailable;
-        const note = btn.parentElement?.querySelector('.say-note');
-        if (note) note.textContent = '';
-      }
-      playRecClip(entry.src, btn).then((played) => {
-        if (serial !== cardAudioSerial || played !== false || !btn) return;
+      say(tx(`収録音声 · ${NARRATION_VOICES[entry.voice]}`, `Recorded audio · ${NARRATION_VOICES[entry.voice]}`), null);
+      playRecClip(entry.src, button()).then((played) => {
+        if (!current() || played !== false) return;
         say(tx('この環境では再生できませんでした', 'This recording could not play here'), 'play-failed');
       });
       return;
     }
-    // Nothing admissible: say so where it can be seen. Never the device voice, never the second
-    // speaker, never this word's other reading.
-    const voice = NARRATION_VOICES[voiceForRole('word')];
-    if (!m || m.legacy) say(tx('この版には収録音声がありません', 'This build has no recorded voices'), 'no-recordings');
-    else say(tx(`${voice} の収録音声はありません（準備中）`, `No ${voice} recording yet — on its way`), 'not-recorded');
+    stopReadAloud(); stopRecAudio(); stopSentenceListening();
+    const result = deviceVoice.speak(text, {
+      onStart: () => { if (current()) button()?.classList.add('is-speaking'); },
+      onEnd: () => { if (current()) button()?.classList.remove('is-speaking'); },
+      onError: reason => {
+        if (current()) button()?.classList.remove('is-speaking');
+        say(deviceVoiceMessage({ reason }), reason);
+      },
+    });
+    say(deviceVoiceMessage(result), result.spoken ? null : result.reason);
   });
 }
+
+/** Use only the answer on this face; never infer one of a kanji's several readings. */
+function reviewVoiceTarget(item, back = null) {
+  if (item.t === 'sentence') {
+    const plan = sentencePracticeModule?.selectSentencePractice(S.sentencePractice, item.id)?.plan;
+    if (!plan) return null;
+    if (plan.kind === 'kanji-reading') return { text: plan.readingCue.token.r, word: plan.readingCue.token.s };
+    return { text: plan.origin.text, word: plan.origin.text };
+  }
+  if (item.t === 'kanji') {
+    const display = kanjiDisplayRecord(item.id) || retainedKanjiRecord(item.id);
+    const readings = [...new Set([...(display?.on || []), ...(display?.kun || [])])];
+    if (display?.readingsState !== 'complete' || readings.length !== 1 || !/^[\p{Script=Hiragana}\p{Script=Katakana}ー]+$/u.test(readings[0])) return null;
+    return { text: readings[0], word: item.label };
+  }
+  return { text: back?.reading || item.label, word: item.label, entrySeq: item.entrySeq || null };
+}
+
+function appendReviewVoice(row, target) {
+  const note = el('span', 'say-note');
+  note.id = 'card-say-note'; note.setAttribute('role', 'status'); note.setAttribute('aria-live', 'polite');
+  if (!target?.text) {
+    note.textContent = tx('読みを一つに決められないため、読み上げません', 'Audio unavailable: no single reading for this answer');
+    row.append(note); return;
+  }
+  const say = el('button', 'say');
+  say.type = 'button'; say.id = 'card-say';
+  say.innerHTML =
+    '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.25"/><text x="12" y="12.8" text-anchor="middle" dominant-baseline="central" font-size="11" fill="currentColor" font-family="Noto Serif JP, serif">音</text></svg>';
+  say.setAttribute('aria-label', tx('答えを読み上げる', 'Speak the answer'));
+  say.setAttribute('aria-describedby', note.id);
+  say.dataset.voiceText = target.text; say.dataset.voiceWord = target.word;
+  if (target.entrySeq) say.dataset.voiceEntrySeq = target.entrySeq;
+  say.addEventListener('click', () => speakCardReading(target.text, say, target.word, { entrySeq: target.entrySeq }));
+  row.append(say, note);
+}
+
+function autoSpeakReviewFace() {
+  if (S.view !== 'review' || !S.review?.revealed || S.review.pending || S.review.admitting ||
+      S.stack.length || S.strokes || document.hidden) return;
+  const button = document.getElementById('card-say');
+  if (!button) { retireCardSpeech(); return; }
+  if (!reviewVoiceFace) return;
+  const target = JSON.stringify([button.dataset.voiceText, button.dataset.voiceWord, button.dataset.voiceEntrySeq]);
+  if (reviewVoiceFace.target && reviewVoiceFace.target !== target) {
+    retireCardSpeech(); reviewVoiceFace.status = null;
+    if (reviewVoiceFace.attempted)
+      cardVoiceStatus(button, tx('答えが更新されました · 音で再生', 'Answer updated · tap audio to play'), null);
+  }
+  reviewVoiceFace.target = target;
+  const status = reviewVoiceFace.status;
+  if (status) cardVoiceStatus(button, status.reason, status.flag);
+  if (reviewVoiceFace.attempted) return;
+  reviewVoiceFace.attempted = true;
+  if (wordVoice() !== 'on') {
+    cardVoiceStatus(button, tx('声はオフ · 音で再生', 'Voice is off · tap audio to play'), DEVICE_VOICE_REASONS.DISABLED);
+    return;
+  }
+  speakCardReading(button.dataset.voiceText, button, button.dataset.voiceWord,
+    { automatic: true, entrySeq: button.dataset.voiceEntrySeq });
+}
+// Some browsers populate voices after the first render. Refresh availability only;
+// a delayed event must never replay a face or speak after navigation.
+globalThis.speechSynthesis?.addEventListener?.('voiceschanged', () => {
+  if (S.view !== 'review' || !S.review?.revealed || S.stack.length || document.hidden ||
+      reviewVoiceFace?.status?.flag !== DEVICE_VOICE_REASONS.NO_JA_VOICE) return;
+  const support = deviceVoice.support();
+  const reason = deviceVoiceMessage(support) + (support.ok ? tx(' · 音で再生', ' · tap audio to play') : '');
+  cardVoiceStatus(document.getElementById('card-say'), reason, support.ok ? null : support.reason);
+});
 
 
 /** F · the listen door's two places (the lead's ruling on Grok f-86, 2026-10-18): folded, its one glyph stands at the
@@ -24364,6 +24484,7 @@ function renderSentenceListening(main, entry, state) {
     if (sentenceListeningOwner) { stopSentenceListening(); return; }
     // ONE PLAYBACK OWNER (V): the quote above this transcript, a passage read and a card clip all
     // yield before the sentence speaks, so two voices never share the room
+    retireCardSpeech();
     stopReadAloud(); stopRecAudio();
     const owner = { controller: new AbortController(), audio: null, url: null, completed: false, failed: false };
     sentenceListeningOwner = owner;
@@ -25637,6 +25758,7 @@ async function commitReviewAction(rv, item, produce, advance, report = null) {
   const pending = {};
   try { if (!reviewExitAdmissions.get(rv)?.entered) reviewExitActivity(rv); }
   catch { reviewExitIntent = null; }
+  retireCardSpeech();
   rv.pending = pending;
   let failure = null;
   try {
@@ -26642,6 +26764,11 @@ function renderReview(main) {
     renderAssessmentQuestionRecall(face, rv, item);
   } else if (item.t === 'sentence') {
     renderSentenceRecallFace(face, rv, item);
+    if (rv.revealed) {
+      const row = el('div', 'review-reading-row');
+      appendReviewVoice(row, reviewVoiceTarget(item));
+      face.append(row);
+    }
   } else if (cloze) {
     const line = el('p', 'review-cloze' + (rv.revealed ? ' reveal r-0' : ''));
     // the card's sentence carries the reader's full gesture grammar — every
@@ -26678,9 +26805,6 @@ function renderReview(main) {
       if (assessment.assisted) context.append(assessmentAssistedMark(assessment));
       face.append(context);
     }
-    // The reading's audio door follows the locked approved voices. A missing
-    // recording is explained on activation; it never borrows an interim voice.
-    const spoken = backc.reading || (item.t === 'kanji' ? '' : item.label);
     const row = el('div', 'review-reading-row reveal r-1');
     if (item.t === 'kanji') {
       // Kanji-trust owns the complete display record; lessons keep their own short selection.
@@ -26715,22 +26839,7 @@ function renderReview(main) {
         : tx('全ての読みは現在表示できません。確認できる読みを表示しています。', 'The complete reading set is unavailable. Showing the available readings.')));
       row.append(readings);
     } else if (backc.reading) row.append(el('div', 'review-reading', backc.reading));
-    if (spoken && recManifest !== null) {
-      const say = el('button', 'say');
-      say.type = 'button';
-      say.id = 'card-say';
-      // the card's voice door names the locked voice, from the lock: a swap renames it everywhere
-      const sayVoice = NARRATION_VOICES[voiceForRole('word')];
-      say.setAttribute('aria-label', tx(`読み上げ — ${sayVoice} の収録音声`, `speak the reading (${sayVoice} recording)`));
-      say.innerHTML =
-        '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.25"/><text x="12" y="12.8" text-anchor="middle" dominant-baseline="central" font-size="11" fill="currentColor" font-family="Noto Serif JP, serif">音</text></svg>';
-      say.addEventListener('click', () => speakCardReading(spoken, say, item.label));
-      row.append(say);
-      // a tap that cannot play says why, visibly and to assistive tech — never a silent no-op
-      const sayNote = el('span', 'say-note');
-      sayNote.id = 'card-say-note'; sayNote.setAttribute('role', 'status'); sayNote.setAttribute('aria-live', 'polite');
-      row.append(sayNote);
-    }
+    appendReviewVoice(row, reviewVoiceTarget(item, backc));
     if (row.childNodes.length) face.append(row);
     // 語義 — one sense decides the grade; the next two whisper on one line
     // (SuperMemo's minimum-information rule; the crowding was four italic
@@ -26925,6 +27034,7 @@ function renderReview(main) {
     b.append(el('span', 'g-sub', b.dataset.gradeKey));
     b.addEventListener('click', async () => {
       if (rv.pending || S.review !== rv || rv.queue[rv.ix] !== item || !rv.revealed) return;
+      retireCardSpeech();
       const pressedNow = new Date();
       const skey = srsKey(item.t, item.id);
       // T-06 forcing at the commit: after a check that must repeat, the
@@ -27673,6 +27783,7 @@ function speakHost() {
     },
     // one sound at a time: Kore's element becomes the app's one playback owner while she speaks
     ownAudio: (audioEl) => {
+      retireCardSpeech();
       if (recAudioEl !== audioEl) stopRecAudio();
       recAudioEl = audioEl;
       if (speakOwnedAudio.has(audioEl)) return;
@@ -32362,12 +32473,13 @@ function wordPref(key, field, allowed) {
 function setWordPref(key, field, allowed, value) {
   if (!allowed.includes(value)) return wordPref(key, field, allowed);
   S[field] = value;
+  if (key === WORD_VOICE_KEY && value === 'off') { retireCardSpeech(); stopRecAudio(); }
   try { localStorage.setItem(key, value); } catch { /* kept for this session */ }
   return value;
 }
 /** 筆 — when a word writes itself: 'first' (a first meeting: new or met), 'always', 'never'. */
 const wordBrush = () => wordPref(WORD_BRUSH_KEY, 'wordBrush', WORD_BRUSH);
-/** 声 — whether a word he brings closer is said in the locked recorded voice: 'on' or 'off'. */
+/** 声 — automatic speech: recorded audio first, device voice for gaps; 'on' or 'off'. */
 const wordVoice = () => wordPref(WORD_VOICE_KEY, 'wordVoice', WORD_VOICE);
 
 /** One stroke's time: min(110 ms, 1400 ms ÷ strokes), never under 45 ms, at the middle 書く速さ — a word of up to 31
@@ -32528,18 +32640,18 @@ function retireStage({ refreshing = false } = {}) {
   stageInk?.end('replaced');
   if (refreshing || !stageVoiceSpoke) return;
   stageVoiceSpoke = false;
-  cardAudioSerial += 1;
+  retireCardSpeech();
   if (!readAloud.on) stopRecAudio();
 }
 if (typeof window !== 'undefined') window.addEventListener('pagehide', () => retireStage());
 
 /** 音 / 声 — the word in the locked recorded voice, through the card's own voice door: keyed by the surface and the
- * reading the stage shows (V's resolver under audio/voice-lock.json, Kore for a word), never the device's voice and
- * never another speaker. Only ever after his own gesture, on an unsealed stage. A missing recording marks the 音 quietly
+ * reading the stage shows (V's resolver under audio/voice-lock.json, Kore for a word), with a Japanese device voice
+ * for gaps. Only ever after his own gesture, on an unsealed stage. An unavailable voice marks the 音 quietly
  * (its name says so); asked for with a tap, its note also says why. */
-function sayStageWord(button, { surface, reading, manual = false }) {
+function sayStageWord(button, { surface, reading }) {
   if (!button?.isConnected || !nonEmptyString(reading)) return;
-  if (manual && !button.parentElement.querySelector('.say-note')) {
+  if (!button.parentElement.querySelector('.say-note')) {
     const note = el('span', 'say-note mini-say-note');
     note.setAttribute('role', 'status');
     note.setAttribute('aria-live', 'polite');
@@ -32604,7 +32716,7 @@ function dressStage(visit, stage, { word, label, token, kind, nodeFor, reading, 
     voice.type = 'button';
     voice.id = 'mini-voice';
     voice.lang = 'ja';
-    voice.title = tx('読み上げる — 収録音声', 'Hear it — the recorded voice');
+    voice.title = tx('読み上げる — 収録音声を優先、なければ端末の声', 'Hear it — recorded audio first, device voice for gaps');
     voice.setAttribute('aria-label', voice.title);
     // what the voice door said in this visit stays said: the stage drawn again (a return from the page, a redraw) shows it
     if (plan.voiceSaid) {
@@ -32616,7 +32728,7 @@ function dressStage(visit, stage, { word, label, token, kind, nodeFor, reading, 
     }).observe(voice, { attributes: true, attributeFilter: ['data-voice-unavailable', 'title'] });
     voice.addEventListener('click', (event) => {
       event.stopPropagation();
-      sayStageWord(voice, { surface: label, reading, manual: true });
+      sayStageWord(voice, { surface: label, reading });
     });
     marks.append(voice);
   }
@@ -33555,6 +33667,7 @@ function withoutRoomTransition(change) {
   try { return change(); } finally { roomTransitionUpdating = false; }
 }
 function roomTransition(change) {
+  retireCardSpeech();
   if (roomTransitionUpdating) return change();
   if (!S.ready || document.hidden) return withoutRoomTransition(change);
   // G1 · a room change is a move the frame sampler names, from the room left to the room reached
@@ -35421,7 +35534,7 @@ function meBackPart() {
 /** Settings → Layout: the current layout, or the one under test. Two visible states, the active one
  * lit, and one plain line of what changes and what does not. The choice re-renders where it stands. */
 /** Settings → 筆 and 声 (G4): when a word he brings closer writes itself (first meeting · always · never) and whether it is
- * said in the recorded voice (on · off). Device choices, never the learner record. The writing's speed is not here: it
+ * said in recorded audio or the device voice (on · off). Device choices, never the learner record. The writing's speed is not here: it
  * is his one 書く速さ slider, in one place — the writing room — and this note says where. */
 function renderSettings(main) {
   const places = placesLayout();
@@ -35618,6 +35731,7 @@ function paintCrumb(crumb) {
  * found again by the very press that moved the keyboard */
 const FOCUS_STATE_CLASSES = new Set(['on', 'on-list', 'dead', 'active', 'lit', 'primary', 'quiet']);
 function render() {
+  retireCardAudioOnFaceChange();
   kanjiWorldVisit?.close(false);
   // Today folds into Review in the layout under test; anything that still names it opens
   // Review, its successor. The current layout is asked only when the view is Today.
@@ -36041,6 +36155,7 @@ function render() {
   // Sample the resolved ground after both the view classes and room stamp settle.
   syncPaper();
   retireCardAudioOnFaceChange();
+  autoSpeakReviewFace();
   // every navigation passes through here — keep the Back sentinel honest
   syncWalkSentinel();
 }

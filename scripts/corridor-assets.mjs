@@ -20,6 +20,7 @@ export const CORRIDOR_REQUIRED_ROOTS = [
   'rooms/me.css',
   'rooms/cards.css',
   'corridor.js',
+  'device-voice.mjs',
   'modules',
   'maintenance/report-client.js',
   'maintenance/report-client.css',
