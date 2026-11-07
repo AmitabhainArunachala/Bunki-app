@@ -1,0 +1,75 @@
+{
+  "schema": "bunki.kanji-unit-manifest.draft/1",
+  "manifest": "kanji-unit-manifest",
+  "manifest_path": "prototypes/corridor/data/kanji-units/manifest-draft/MANIFEST-DRAFT.md",
+  "block_info_string": "json kanji-unit-manifest",
+  "extractor": "prototypes/corridor/data/kanji-units/manifest-draft/extract-manifest.mjs",
+  "version": 1,
+  "draft_date": "2026-11-07",
+  "frozen": false,
+  "freeze_date": null,
+  "author_family": "anthropic",
+  "unit_count": 152,
+  "kanji_count": 2136,
+  "distinct_kanji": 2136,
+  "kanken_units": 0,
+  "frequency_source": null,
+  "kanken_first_units_status": "blocked",
+  "canonical_json": {
+    "rule": "object keys sorted recursively, arrays in order, no whitespace, UTF-8",
+    "sha256": "d753b20f7856be2f92885f2dacefddd439c37cb2db0e364363d6a9bffad55da5",
+    "bytes": 1596311
+  },
+  "source_pins": {
+    "kanken_jsonl": {
+      "path": "corpus/datasets/kanji/kanken.jsonl",
+      "sha256": "f8f8a98ee064aadbf98b559c3743d7ace18fe62a6801c6365f9a77860a7cafd7",
+      "bytes": 2252069
+    },
+    "kanken_json": {
+      "path": "prototypes/corridor/data/proprietary_safe/kanken.json",
+      "sha256": "6efa199b7caec160c95e87c260b4184694fb8e4778a4563327bf1d79741ff444",
+      "bytes": 68631
+    },
+    "kanji_json": {
+      "path": "prototypes/corridor/data/share_alike/kanji.json",
+      "sha256": "8ce7ad0151a2bf487bda72c384460eca908fc1bdc2a4073042b9e3db7342d2ce",
+      "bytes": 514757
+    },
+    "reference_extra": {
+      "path": "prototypes/corridor/data/share_alike/reference-extra.json",
+      "sha256": "fdeb4a2c9d04248e7b6c6147b272555386a6e2e850ae4448f59b93c7797eedf8",
+      "bytes": 3760427
+    },
+    "strokes_json": {
+      "path": "prototypes/corridor/data/share_alike/strokes.json",
+      "sha256": "435c37c0063fba4180d3cb444ef54cfa2430e71a650a4032cc481ada29627f2b",
+      "bytes": 1970447
+    },
+    "parts_graph": {
+      "path": "prototypes/corridor/data/parts-graph/graph.json",
+      "sha256": "4777d9f26da7b7212e287dd565075b7055b960fe5dd31a5a6e5f6f794610e9f1",
+      "bytes": 12285899
+    },
+    "animcjk_equivalence": {
+      "path": "prototypes/corridor/data/share_alike/animcjk/equivalence.json",
+      "sha256": "6d44d6f30d91ebd0f611191f44619c5fc3d19ddd987816de93757748d3d8466d",
+      "bytes": 21319
+    },
+    "kanji_course": {
+      "path": "prototypes/corridor/kanji-course.js",
+      "sha256": "90e2696fb4dccf8f157d3dbc59bbc7571cfded9b338dbb9b2187dad0ab89efb8",
+      "bytes": 65541
+    },
+    "words_json": {
+      "path": "prototypes/corridor/data/share_alike/words.json",
+      "sha256": "d21ff76508a3ed88cec9c096510feac9b5ff2df639061a3be46cb85c6fdf985b",
+      "bytes": 808645
+    },
+    "radicals214": {
+      "path": "prototypes/corridor/data/share_alike/radicals214.json",
+      "sha256": "b5c0df196761eb1979a8d61b2d54176b8b0c62dc990d5d08837b10a075d2eb86",
+      "bytes": 21271
+    }
+  }
+}

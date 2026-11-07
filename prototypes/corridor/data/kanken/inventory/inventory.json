@@ -1,0 +1,1318 @@
+{
+  "schema": "bunki.kanken.inventory/1",
+  "spec_refs": [
+    "S6-R4",
+    "S6-R10",
+    "S6-AC3",
+    "S6-DD3",
+    "S2-R2",
+    "S2-R20",
+    "S2-DD7"
+  ],
+  "sources": {
+    "kanken_jsonl": {
+      "path": "corpus/datasets/kanji/kanken.jsonl",
+      "sha256": "f8f8a98ee064aadbf98b559c3743d7ace18fe62a6801c6365f9a77860a7cafd7",
+      "bytes": 2252069
+    },
+    "kanken_json": {
+      "path": "prototypes/corridor/data/proprietary_safe/kanken.json",
+      "sha256": "6efa199b7caec160c95e87c260b4184694fb8e4778a4563327bf1d79741ff444",
+      "bytes": 68631
+    },
+    "kanji_json": {
+      "path": "prototypes/corridor/data/share_alike/kanji.json",
+      "sha256": "8ce7ad0151a2bf487bda72c384460eca908fc1bdc2a4073042b9e3db7342d2ce",
+      "bytes": 514757
+    },
+    "reference_extra": {
+      "path": "prototypes/corridor/data/share_alike/reference-extra.json",
+      "sha256": "fdeb4a2c9d04248e7b6c6147b272555386a6e2e850ae4448f59b93c7797eedf8",
+      "bytes": 3760427
+    },
+    "strokes_json": {
+      "path": "prototypes/corridor/data/share_alike/strokes.json",
+      "sha256": "435c37c0063fba4180d3cb444ef54cfa2430e71a650a4032cc481ada29627f2b",
+      "bytes": 1970447
+    },
+    "parts_graph": {
+      "path": "prototypes/corridor/data/parts-graph/graph.json",
+      "sha256": "4777d9f26da7b7212e287dd565075b7055b960fe5dd31a5a6e5f6f794610e9f1",
+      "bytes": 12285899
+    },
+    "animcjk_equivalence": {
+      "path": "prototypes/corridor/data/share_alike/animcjk/equivalence.json",
+      "sha256": "6d44d6f30d91ebd0f611191f44619c5fc3d19ddd987816de93757748d3d8466d",
+      "bytes": 21319
+    },
+    "kanji_course": {
+      "path": "prototypes/corridor/kanji-course.js",
+      "sha256": "90e2696fb4dccf8f157d3dbc59bbc7571cfded9b338dbb9b2187dad0ab89efb8",
+      "bytes": 65541
+    }
+  },
+  "counting_rule": "rows are counted by each row's own kanken_level and form fields; distinct glyph sets exclude the empty glyph string unless stated",
+  "total_rows": 6787,
+  "distinct_glyphs_including_empty": 6245,
+  "distinct_glyphs": 6244,
+  "glyphless_rows": 537,
+  "glyphless_rows_with_image": 398,
+  "levels": [
+    {
+      "level": "10級",
+      "rows": 80,
+      "forms": {
+        "親字": 80
+      },
+      "oyaji_rows": 80,
+      "distinct_glyphs": 80,
+      "distinct_oyaji_glyphs": 80,
+      "glyphless_rows": 0,
+      "lookup_covered": 80,
+      "teaching_covered": 31,
+      "teaching_coverage_pct": 38.8,
+      "template_covered": 80
+    },
+    {
+      "level": "9級",
+      "rows": 160,
+      "forms": {
+        "親字": 160
+      },
+      "oyaji_rows": 160,
+      "distinct_glyphs": 160,
+      "distinct_oyaji_glyphs": 160,
+      "glyphless_rows": 0,
+      "lookup_covered": 160,
+      "teaching_covered": 12,
+      "teaching_coverage_pct": 7.5,
+      "template_covered": 160
+    },
+    {
+      "level": "8級",
+      "rows": 200,
+      "forms": {
+        "親字": 200
+      },
+      "oyaji_rows": 200,
+      "distinct_glyphs": 200,
+      "distinct_oyaji_glyphs": 200,
+      "glyphless_rows": 0,
+      "lookup_covered": 200,
+      "teaching_covered": 1,
+      "teaching_coverage_pct": 0.5,
+      "template_covered": 200
+    },
+    {
+      "level": "7級",
+      "rows": 202,
+      "forms": {
+        "親字": 202
+      },
+      "oyaji_rows": 202,
+      "distinct_glyphs": 202,
+      "distinct_oyaji_glyphs": 202,
+      "glyphless_rows": 0,
+      "lookup_covered": 202,
+      "teaching_covered": 3,
+      "teaching_coverage_pct": 1.5,
+      "template_covered": 202
+    },
+    {
+      "level": "6級",
+      "rows": 193,
+      "forms": {
+        "親字": 193
+      },
+      "oyaji_rows": 193,
+      "distinct_glyphs": 193,
+      "distinct_oyaji_glyphs": 193,
+      "glyphless_rows": 0,
+      "lookup_covered": 193,
+      "teaching_covered": 4,
+      "teaching_coverage_pct": 2.1,
+      "template_covered": 193
+    },
+    {
+      "level": "5級",
+      "rows": 191,
+      "forms": {
+        "親字": 191
+      },
+      "oyaji_rows": 191,
+      "distinct_glyphs": 191,
+      "distinct_oyaji_glyphs": 191,
+      "glyphless_rows": 0,
+      "lookup_covered": 191,
+      "teaching_covered": 0,
+      "teaching_coverage_pct": 0,
+      "template_covered": 191
+    },
+    {
+      "level": "4級",
+      "rows": 313,
+      "forms": {
+        "親字": 313
+      },
+      "oyaji_rows": 313,
+      "distinct_glyphs": 313,
+      "distinct_oyaji_glyphs": 313,
+      "glyphless_rows": 0,
+      "lookup_covered": 313,
+      "teaching_covered": 0,
+      "teaching_coverage_pct": 0,
+      "template_covered": 313
+    },
+    {
+      "level": "3級",
+      "rows": 284,
+      "forms": {
+        "親字": 284
+      },
+      "oyaji_rows": 284,
+      "distinct_glyphs": 284,
+      "distinct_oyaji_glyphs": 284,
+      "glyphless_rows": 0,
+      "lookup_covered": 284,
+      "teaching_covered": 0,
+      "teaching_coverage_pct": 0,
+      "template_covered": 284
+    },
+    {
+      "level": "準2級",
+      "rows": 328,
+      "forms": {
+        "親字": 328
+      },
+      "oyaji_rows": 328,
+      "distinct_glyphs": 328,
+      "distinct_oyaji_glyphs": 328,
+      "glyphless_rows": 0,
+      "lookup_covered": 328,
+      "teaching_covered": 0,
+      "teaching_coverage_pct": 0,
+      "template_covered": 328
+    },
+    {
+      "level": "2級",
+      "rows": 185,
+      "forms": {
+        "親字": 185
+      },
+      "oyaji_rows": 185,
+      "distinct_glyphs": 185,
+      "distinct_oyaji_glyphs": 185,
+      "glyphless_rows": 0,
+      "lookup_covered": 183,
+      "teaching_covered": 0,
+      "teaching_coverage_pct": 0,
+      "template_covered": 185
+    },
+    {
+      "level": "準1級",
+      "rows": 858,
+      "forms": {
+        "親字": 849,
+        "旧字でない異体字": 9
+      },
+      "oyaji_rows": 849,
+      "distinct_glyphs": 851,
+      "distinct_oyaji_glyphs": 844,
+      "glyphless_rows": 7,
+      "lookup_covered": 164,
+      "teaching_covered": 0,
+      "teaching_coverage_pct": 0,
+      "template_covered": 851
+    },
+    {
+      "level": "1級",
+      "rows": 2675,
+      "forms": {
+        "親字": 2652,
+        "旧字でない異体字": 18,
+        "元字": 5
+      },
+      "oyaji_rows": 2652,
+      "distinct_glyphs": 2558,
+      "distinct_oyaji_glyphs": 2535,
+      "glyphless_rows": 117,
+      "lookup_covered": 129,
+      "teaching_covered": 0,
+      "teaching_coverage_pct": 0,
+      "template_covered": 2557
+    },
+    {
+      "level": "1/準1級",
+      "rows": 644,
+      "forms": {
+        "旧字": 644
+      },
+      "oyaji_rows": 0,
+      "distinct_glyphs": 397,
+      "distinct_oyaji_glyphs": 0,
+      "glyphless_rows": 247,
+      "lookup_covered": 9,
+      "teaching_covered": 0,
+      "teaching_coverage_pct": 0,
+      "template_covered": 397
+    },
+    {
+      "level": "配当外",
+      "rows": 474,
+      "forms": {
+        "旧字でない異体字": 474
+      },
+      "oyaji_rows": 0,
+      "distinct_glyphs": 308,
+      "distinct_oyaji_glyphs": 0,
+      "glyphless_rows": 166,
+      "lookup_covered": 23,
+      "teaching_covered": 0,
+      "teaching_coverage_pct": 0,
+      "template_covered": 1
+    }
+  ],
+  "levels_sum": 6787,
+  "forms": {
+    "親字": 5637,
+    "旧字": 644,
+    "旧字でない異体字": 501,
+    "元字": 5
+  },
+  "jouyou_rows_in_kanken": 2136,
+  "jouyou_membership": {
+    "source": {
+      "name": "常用漢字表（内閣告示第2号、2010年11月30日）",
+      "url": "https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/kanji/joyokanjisakuin/index.html",
+      "pageSha256": "33cb7b99d88d069a5e6e228a71f587285c9fa3cc6937e74022928524569f26f3",
+      "fetchedAt": "2026-10-19T08:09:17Z"
+    },
+    "size": 2136,
+    "symmetric_difference": {
+      "jsonl_only": [],
+      "joyo_only": []
+    },
+    "listed_in_gaps": true
+  },
+  "duplicate_glyphs": [
+    {
+      "glyph": "芸",
+      "rows": [
+        {
+          "entry_id": "CE-000230",
+          "species_id": "CT-000196",
+          "form": "親字",
+          "kanken_level": "1級"
+        },
+        {
+          "entry_id": "CE-001637",
+          "species_id": "CT-001346",
+          "form": "親字",
+          "kanken_level": "7級"
+        }
+      ]
+    },
+    {
+      "glyph": "缶",
+      "rows": [
+        {
+          "entry_id": "CE-000838",
+          "species_id": "CT-000697",
+          "form": "親字",
+          "kanken_level": "準2級"
+        },
+        {
+          "entry_id": "CE-000842",
+          "species_id": "CT-000697",
+          "form": "元字",
+          "kanken_level": "1級"
+        }
+      ]
+    },
+    {
+      "glyph": "欠",
+      "rows": [
+        {
+          "entry_id": "CE-001672",
+          "species_id": "CT-001374",
+          "form": "親字",
+          "kanken_level": "7級"
+        },
+        {
+          "entry_id": "CE-001674",
+          "species_id": "CT-001374",
+          "form": "元字",
+          "kanken_level": "1級"
+        }
+      ]
+    },
+    {
+      "glyph": "弁",
+      "rows": [
+        {
+          "entry_id": "CE-005702",
+          "species_id": "CT-004733",
+          "form": "親字",
+          "kanken_level": "6級"
+        },
+        {
+          "entry_id": "CE-005706",
+          "species_id": "CT-004733",
+          "form": "元字",
+          "kanken_level": "1級"
+        }
+      ]
+    },
+    {
+      "glyph": "予",
+      "rows": [
+        {
+          "entry_id": "CE-006209",
+          "species_id": "CT-005156",
+          "form": "親字",
+          "kanken_level": "8級"
+        },
+        {
+          "entry_id": "CE-006211",
+          "species_id": "CT-005156",
+          "form": "元字",
+          "kanken_level": "1級"
+        }
+      ]
+    },
+    {
+      "glyph": "余",
+      "rows": [
+        {
+          "entry_id": "CE-006212",
+          "species_id": "CT-005157",
+          "form": "親字",
+          "kanken_level": "6級"
+        },
+        {
+          "entry_id": "CE-006214",
+          "species_id": "CT-005157",
+          "form": "元字",
+          "kanken_level": "1級"
+        }
+      ]
+    }
+  ],
+  "coverage": {
+    "rule": "teaching_covered = the glyph is a target of an authored unit in kanji-course.js; lookup_covered = the glyph has an entry in share_alike/kanji.json. Lookup is never counted as taught.",
+    "teaching_source": {
+      "path": "prototypes/corridor/kanji-course.js",
+      "sha256": "90e2696fb4dccf8f157d3dbc59bbc7571cfded9b338dbb9b2187dad0ab89efb8",
+      "course_id": "kanji-foundations-24",
+      "revision": 4,
+      "units": 13,
+      "distinct_kanji": 51,
+      "counts": {
+        "units": 13,
+        "characters": 51,
+        "wordExamples": 103
+      }
+    },
+    "through_2kyu": {
+      "kanji": 2136,
+      "teaching_covered": 51,
+      "teaching_coverage_pct": 2.4,
+      "lookup_covered": 2134,
+      "lookup_coverage_pct": 99.9
+    },
+    "upper": {
+      "準1級": {
+        "oyaji_rows": 849,
+        "oyaji_glyphs": 844,
+        "glyphless_oyaji_rows": 5,
+        "teaching_covered": 0,
+        "teaching_coverage_pct": 0,
+        "lookup_covered": 164,
+        "uncovered_glyphs": "丑丞乃之乍乎也云亘亙些亥亦亨亮什仇仔伊伍伶伽佃佑佼侃俄俠俣俱倖倦倭偓偲傭僑僻儘儲允兇兎兜其冴凌凧凪凰凱函剃劃劉劫勺勿匁匙匝匡匪卜卦卯卿厨厩厭叉叛叡叢叩只叶吃吊吋吞吠吻吾呆咳哉哨哩啄啐啞喋喧喬喰嘉嘗嘩噂噌噓噸噺嚙囊圃圭坐坤坦垢埠埴堰堵堺塙塵壕壬壺夙夷奄套妓妾姐姑姥姦姪姶娃娩娼婁嬉嬬嬰孜孟宋宍宏宕宥寅寓寵尖尤尭屍屑屢岨岱峨峯峻嵩嵯嶋嶺巌巳巴巷巽帖幌幡庄庇庖庚庵廓廟廠廻廿弗弘弛弼彊彦彪彬徽忽怜怯恕恢恰悉悌悶惇惚惟惣惹愈慧慾憐戊戎或戟托扮按挺挽捌捧捲捷捺掠掩掬揃揖搔摑摸摺撒撚撞撫播撰擢擾攪敦斌斐斡斧斯於旭昂昌昏晃晋晒晦智暢曙曝曳朋朔李杏杓杖杜杢杭杵杷枇柁柊柏柑柘柚柴柾栂栖栗栴桂桐桓桔桶梁梓梢梧梯梱梶棉棲椀椋椙椛椴椿楊楓楕楚楠楢楯楳榊榎榛槌槍槙槻樋樗樟樫樵樺樽橘橡橿檀檎檜檮櫓櫛欣欽歎此歪殆毅毘汀汐汝汲沌沓沫洛洩洲浩浬涌淀淋淘淳淵渚渠渥湊湘湛溜溢漉漑漕漣潑澗澱濠濡濤瀆瀕瀞瀦灌灘灸灼烏烹焚焰煉煤煽熔燐燕燦燭爺爾牌牒牝牟牡牢牽犀狐狗狛狸狼狽猪猷獅玖玲珂珊珪琉琢琳琵琶瑚瑛瑞瑳瓜瓢甑甜甥甫畠畢畦畷疋疏疹痔癌皐盃盈瞥矧矩砥砦砧硯硲碇碍碓碗碧碩磐磯礦礪祁祇祐禄禎禦禰禱禽禾禿秤秦稀稔稗稜穆穎穣穿窄窪窺竈竣竪竺竿笈笠笥笹筈筏筑箔箕箭篇篠篦簞簸簾籾粁粂粍粕粟粥糊糎糞糟糠紐紗紘紬絃絢綜綬綴綾緋緬縞繡繫纂纏罫翠翫翰耀而耶耽聡聯聾肇肋肱肴胡胤脆脹腔腿膏膿臥舘舛舜舵艮芙芥芭芹苅苑苓苔苧苫茄茅茜茸荊荏荻莞莫菅菖菩菰菱萄萊萌萩萱葎葡董葦葱葵葺蒐蒔蒙蒜蒲蒼蓉蓑蓬蓮蔀蔓蔚蔣蔦蔭蕃蕉蕊蕎蕗蕨蕩蕪薗薙薩薯藁藪藷蘇蘭虻蚤蛋蛙蛛蛤蛭蛸蛾蜎蜘蝕蝦蝶螺蟬蟹蟻蠅蠟蠣衿袈袴袷裟裡裳襖覗訊訣註詑詫誹誼諏諒諜諫諺謂謬讃豹貰賑賤贋赫趨跨蹄蹟軀輔輯輿轍轟轡辰辻辿迂迄迦迺逗這逢逼遁遥遼邑郁鄭酉酋醇醍醐醬醱釘釦釧鈷鉤鉦鉾銑銚鋒鋤鋪鋲鋸錆錐錘錨錫鍍鍔鍬鍾鎗鎚鎧鏑鐙鐸鑓閃閏閤阿陀隈隼雀雁雛雫霞靖靱鞄鞍鞘鞠鞭韃韮頁頗頸顚飴餐饗馨馳馴駁駈駕駿驒髭魁魯鮎鮒鮪鮫鮭鯉鯖鯛鰍鰐鰭鰯鰹鰺鰻鱒鱗鳩鳳鳶鴇鴛鴦鴨鴫鴻鵜鵠鵡鵬鶯鷗鷲鷹鷺鸚鹼麒麟麴麿黍黛鼎鼠龝"
+      },
+      "1級": {
+        "oyaji_rows": 2652,
+        "oyaji_glyphs": 2535,
+        "glyphless_oyaji_rows": 117,
+        "teaching_covered": 0,
+        "teaching_coverage_pct": 0,
+        "lookup_covered": 124,
+        "uncovered_glyphs": "丐丕丫丱乂乖于亟亢亶仂仄仆仍仗仞仟价伉估佇佗佚佝佞佩佯佰佶佻侈侏侑侖侘俎俐俑俔俘俚俛俟俤俥俯俶俾倅倆倏們倔倚倡倥倨倩倪倬偃偈偐偕偖做偬偸傀傅傚傴僂僉僖僥僭僮僵儁儂儔儕儚儡儳儷儺儻儼兀兌兢兪冀冏冑冕冢冤冪冱冽凅凊凜几凩凭刋刎刔刪刮刳剄剋剌剔剞剪剳剴剽剿劈劬劭劼勁勍勒勖勠勣勦匆匈匍匏匐匕匚匣匯匱匳卅卉卍卮厖厥厲叟叨叭叮叺吁吝吩听吭吮吶吼吽呎呏呟呰呵呶呷呻咀咄咆咎咏咐咢咤咥咨咫咬咸哂哄哇哈哢哥哦哭哮哳哽唏唔售唸啀啅啖啜啣啻啼啾喀喃喇喊喑喘喙喞喟喨嗄嗇嗔嗚嗜嗟嗤嗷嗽嗾嘔嘖嘛嘯嘴嘶嘸噁噎噤噦噪噫噬噯嚀嚆嚊嚔嚠嚥嚬嚮嚶嚼囀囁囂囃囈囹囿圄圉圜圦圻址坎坏坡坩坿垓垠垤埃埆埒堊堝堡塋塒塹塿墅墟壅壎壑壙壜壟壼夥夬夭夲夸夾奎奐奕奘奚奠奢奸妝妣妲姆姙姚姜姨姮姸娉娑娟娥娵娶婀婉婢婪婬媚媼媽嫋嫖嫗嫣嫩嫺嫻嬋嬌嬖嬪嬲嬶嬾孀孅孑孒孕孚孛孥孩孰孱孵孺孼宦宸寇寐寔寞寤寥寨寰尠尨尸尹屁屎屛屠屭屶屹岌岑岔岫峙峪峭崑崔崙崚崛崟崢嵋嵌嵎嵒嵬嶂嶄嶇嶝嶢嶬嶮嶷嶼巉巍巒巓巫已帑帙帚帛帷幀幃幄幎幔幗幟幢幫幵幷幺庠廁廂廈廖廛廝廡廨廩廬廱弋弌弍弑弖弩弭彎彗彝彭彷彽彿徂徇很徊徘徙徨徭徼忖忝忤忱忸忻忿怎怏怕怙怛怡怦怩怫怱怺恁恂恃恊恍恙恚恟恤恪恫恬悁悃悄悋悍悒悖悚悛悧悴悵悸悽悾惆惓惘惴惶惷惺惻愀愃愆愍愎愒愕愧愨愬愴愾愿慂慇慊慍慓慙慝慟慠慥慫慳慴慵慷憊憑憔憖憚憫憮憺懃懆懈懊懋懌懍懣懦懶懺懼懽懾懿戈戉戌戍戔戛戡截戮戳扁扎扛扞扠扣扨扼找抃抉抒抓抔抖抻拆拇拈拊拌拑拗拮拯拱拵拿挂挈挌挘捍捏捐捫捶掀掉掎掏掖掟掣掫掾揀揄揆揉揣揩揶搏搓搗搤搦搨搴搶摎摏摧摶撈撓撕撥撩撻撼擂擅擒擘擠擡擣擯擱擲擺擽攀攘攢攣攤攫攬敖敝敞敲斂斃斛斟斫旁旃旄旆旌旛旰旱旻昃昊昜昴昵昶晁晏晞晟晢晤晧晨晰暄暈暉暘暝暹暾曚曠曦曩曬曰曷曼朏朞朦朧朮朶朸朿杆杙杞杠杣杪杲杳杼枉枋枌枡枳枴枷枸枹柎柝柞柢柤柩柬柮柯栞栩栫栲桄框桎桙桛桴桷梃梏梔梟梠梭梲梵梺梻棍棕棗棘棠棣棹椁椄椈椏椒椚椰椹椽楔楝楡楫楮楸楹楾榀榁榑榔榕榜榧榱榴榻榾槁槃槊槎槐槓槧槨槭槲槿樅樊樒樔樛樸橄橇橈橙橦檄檋檐檔檗檠檣檬檳檸檻櫂櫃櫚櫟櫨櫪櫱櫺欅欒欖欷欸欹歃歇歉歔歙歛歟歠歿殀殃殄殍殞殤殪殫殯殲殷毋毟毫毬毯毳氈氓氛汕汞汨汪沁沂沍沐沚沛沮沱沽沾泄泅泓泗泛泝泪泯洌洒洟洫洵洶洸洽浙浚浣浹涅涎涓涕涵涸淅淆淌淒淙淪淬淹渙渝渟渣渫渭游渺渾湃湍湎湫湲溂溏溘溟溥溲溷溽滂滄滉滌滓滔滲滷滸滾漓漱漲漾漿潘潦潯潸潺澆澎澡澣澪澳澹濔濘濛濬濺濾瀁瀉瀋瀏瀑瀚瀝瀟瀰瀲瀾灑炒炙炬炮炯炷炸烋烙烝烽焉焙焜焠煌煖煥煦煬熄熕熙熨熬熹熾燉燎燔燗燠燧燬燮燵燹燻燼燿爍爛爨爬爰牀牆牋牖牘牴牾犂犇犒犖犢犲狃狄狆狎狒狠狡狢狷猊猋猖猗猜猝猥猩猯猴猾獏獗獪獮獰獺玫玻珀珈珞珥珮琅琥琲琺瑁瑇瑕瑙瑜瑟瑣瑩瑪瑰瑶瑾璇璋璞瓏瓔瓧瓩瓮瓰瓱瓲瓷瓸甃甅甌甍甎甓甕甦甸畋畚畛畤畬畸疆疇疔疚疝疣疥疱疳疵疸疼疽痂痃痊痍痒痙痞痣痰痲痳痹痺痼痾痿瘁瘉瘋瘟瘠瘡瘢瘤瘧瘰瘴瘻癆癇癈癘癜癢癧癨癩癪癬癭癰癲癴癸皁皎皓皖皙皚皰皴皹皺盂盍盒盞盥盧盪盻眄眇眈眛眥眩眷眸睇睚睛睥睨睫睹睾瞋瞎瞑瞞瞠瞰瞻瞼瞽瞿矇矍矚矜矣矮矻矼砌砒砠硅碌碚碣碪碼碾磅磊磋磑磚磧磬磴磽礑礒礙礫礬祀祓祗祚祟祠祺禊禝禧禳禹禺秉秕秣秧秬稈稍稟稠稷穡穢穹穽窈窕窖窘窩窶窿竄竅竇竍竏竓竕站竚竟竡竢竦竭竰竽笆笊笏笘笙笞笨笳笵筅筌筍筐筥筧筮筰筱筲筴筵箍箏箒箘箚箜箝箴篁篆篋篌篝篥篩篪篷簀簇簍簑簓簗簣簧簫簷簽籃籌籒籔籙籟籡籤籥籬籵粏粢粤粨粱粲粳粽糀糂糅糒糜糝糯糲糴糶糺紂紆紉紊紕紜紮紲紵紿絅絆絎絏絖絛絣絨絮絳絽綉綏綢綣綦綫綯綰綵綸綺綽緇緘緝緞緡緤緲縅縉縊縋縒縕縟縡縲縵縷縹縺縻繆繖繙繚繝繞繧繳繹繻繽纃纈纊纐纓纔纘纛纜缸罅罌罍罎罔罕罘罟罠罧罨罩罹羂羃羆羇羈羌羔羚羝羯羲羶羸羹翅翊翔翕翡翦翳翹耄耆耋耘耙耡耦耨耿聆聊聒聘聚聢聳聶聿肄肆肚肛肬肭胄胖胙胚胛胝胥胯胱脛脣脩脯脾腆腋腑腓腠腥腮腱腴膀膂膃膈膊膠膣膩膰膵膺膾臀臂臉臍臑臘臙臚臠臧臻臾舂舅舐舒舫舳舸艀艘艙艚艝艟艢艤艨艪艫艱艸艾芒芟芫芬芸芻苆苙苜苞苟苡苳苴苹苺苻范茆茉茗茘茣茫茯茱茲茴茵茹荀荅荐荳荼莅莉莎莚莟莠莢莨莪菁菎菘菠菫菲菴菽萁萃萍萵萸萼葆葩葭葷蒟蒡蒹蒻蒿蓁蓆蓍蓐蓖蓙蓼蓿蔔蔕蔗蔘蔟蔡蕀蕁蕕蕘蕣蕭蕷蕾薀薇薈薊薏薐薑薔薛薜薤薨薹薺藉藐藕藜藹藺藾蘆蘊蘋蘚蘢蘿虒虔虧蚌蚓蚣蚩蚪蚫蚯蚰蚶蛄蛆蛉蛔蛞蛟蛬蛯蛹蛻蜀蜃蜆蜈蜉蜊蜍蜑蜒蜓蜚蜥蜩蜴蜷蜹蜻蜿蝌蝎蝓蝗蝘蝟蝠蝣蝨蝮蝲蝴蝸螂螈螗螟螫螯螳螻螾蟀蟄蟇蟋蟎蟠蟪蟯蟶蟷蟾蠆蠊蠍蠑蠕蠖蠡蠢蠱蠹衄衍衒衙衢衫衲衵衾袂袍袒袗袙袢袤袰袱袵袿裃裄裎裔裘裙裨裲裴裹裼褂褄褌褓褞褥褪褫褶褸褻襁襄襌襞襠襤襦襭襯襴襷覃覈覓覘覡覦覩覬覲覿觜觝觥觴訌訐訖訛訝訥訶詁詆詈詒詛詢詬詭詼誂誄誅誑誚誡誣誥誦誨諂諄諍諚諠諡諢諤諱諳諷謇謐謔謖謗謦謨謫謳謾譌譎譏譖譚譟譫譬譴讌讐讒讖讙谿豈豌豕豢豺貂貉貊貎貘貲貶貽賈賚賺賻賽贄贅贇贍贐贓贔贖赧赬赭赳趁趙趺趾跂跋跌跎跏跖跚跛跟跣跪跼跿踉踑踝踞踟踰踴踵蹂蹇蹈蹉蹊蹌蹐蹙蹠蹣蹤蹲蹶蹻蹼躁躄躅躇躊躋躑躓躔躡躪躬躮躱躾軈軋軛軫軻軼軾輀輅輊輒輓輛輜輟輦輳輹輻輾轂轅轆轌轎轗轢轤辜辟辮辷迚迢迥迪迴迹逅逋逍逑逕逖逞逡逧逵逾遉遏遐遑遒遖遨遯遶遽邀邁邂邇邏邨邯邱邵郛郢郤鄂鄒鄙鄲酊酖酣酥酩酲酳醂醋醢醪醴醵醺釉釐釵釿鈑鈔鈕鈞鈿鉅鉈鉉鉋鉗鉞銓銕銖銛銜銷銹鋏鋺錏錙錚錣錵錺錻鍠鍮鍼鎬鎰鎹鎺鏃鏈鏐鏖鏗鏘鏝鏤鏨鐃鐐鐓鐚鐫鐶鐺鑞鑠鑢鑪鑰鑷鑼鑽鑾鑿钁閂閊閔閘閧閨閭閹閻閾闃闊闌闍闔闕闖闡闢闥阡阨阮阯陂陌陜陝陞陟陬陲隋隍隕隗隘隧隰隴雉雋雍雎雕雖雹霄霆霈霍霎霏霑霓霖霙霤霪霰霹霽霾靂靄靆靉靠靡靤靦靨靫靺靼鞁鞅鞋鞐鞜鞣鞦鞨鞫鞳鞴韋韶頌頏頡頤頷頽顆顋顫顬顰顱顳顴颪颯颱颶飄飆飩飫飭餃餉餒餔餞餡餤餬餮餽餾饂饅饉饋饌饐饑饒饕馗馘馥馭馮駑駘駛駝駟駭駮駱駸駻騁騅騏騙騫騭騾驀驂驃驍驎驕驟驢驤驥驩驪骭骰骼髀髏髑髢髣髥髦髫髱髴髷髻鬆鬘鬚鬟鬢鬣鬧鬨鬩鬮鬯鬻魃魄魍魎魏魑魘魞魬魳魴魸鮃鮇鮑鮓鮖鮟鮠鮨鮱鮲鮴鮸鮹鯀鯊鯎鯏鯐鯑鯒鯔鯡鯢鯣鯤鯰鯱鰄鰆鰈鰉鰊鰌鰒鰓鰔鰕鰘鰙鰚鰤鰥鰧鰮鰰鰾鱆鱇鱏鱓鱚鱛鱟鱠鱧鱩鱲鱶鱸鳧鳰鴃鴆鴉鴒鴕鴟鴣鴾鴿鵁鵄鵆鵇鵑鵝鵤鵥鵯鵲鵺鶄鶇鶉鶍鶎鶚鶤鶩鶪鶫鶲鶸鶺鶻鷁鷂鷆鷓鷙鷦鷭鷯鷸鷽鸛鸞鹵鹹麈麋麌麑麕麝麤麩麭麼麾黌黎黐黔黜黝黠黥黯黴黶黷黹黻黼黽鼇鼈鼕鼬鼯鼴鼾齎齏齟齠齣齦齧齪齬齲齶齷龐龕龠﨟屮"
+      }
+    }
+  },
+  "report_lines": {
+    "S6-AC3": "teaching coverage through 2級: 51/2136 (2.4%); 準1級: 0/844 (0%); 1級: 0/2535 (0%). Lookup coverage through 2級 is 2134/2136 and is not teaching coverage."
+  },
+  "completeness": [
+    {
+      "class": "10級·親字",
+      "level": "10級",
+      "form": "親字",
+      "role": "teaching path through 2級 (reading, meaning and a drawable template required)",
+      "entries": 80,
+      "glyph_entries": 80,
+      "glyphless_entries": 0,
+      "reading": 80,
+      "meaning": 80,
+      "stroke_count": 80,
+      "template": 80,
+      "brush_outline_approved": 76,
+      "required": [
+        "reading",
+        "meaning",
+        "template"
+      ],
+      "complete": 80,
+      "incomplete": 0,
+      "missing": [],
+      "glyphless_entry_ids": [],
+      "note": "complete counts glyphs with every required field present in pinned content; a glyphless row has no literal identity and can satisfy none"
+    },
+    {
+      "class": "9級·親字",
+      "level": "9級",
+      "form": "親字",
+      "role": "teaching path through 2級 (reading, meaning and a drawable template required)",
+      "entries": 160,
+      "glyph_entries": 160,
+      "glyphless_entries": 0,
+      "reading": 160,
+      "meaning": 160,
+      "stroke_count": 160,
+      "template": 160,
+      "brush_outline_approved": 150,
+      "required": [
+        "reading",
+        "meaning",
+        "template"
+      ],
+      "complete": 160,
+      "incomplete": 0,
+      "missing": [],
+      "glyphless_entry_ids": [],
+      "note": "complete counts glyphs with every required field present in pinned content; a glyphless row has no literal identity and can satisfy none"
+    },
+    {
+      "class": "8級·親字",
+      "level": "8級",
+      "form": "親字",
+      "role": "teaching path through 2級 (reading, meaning and a drawable template required)",
+      "entries": 200,
+      "glyph_entries": 200,
+      "glyphless_entries": 0,
+      "reading": 200,
+      "meaning": 200,
+      "stroke_count": 200,
+      "template": 200,
+      "brush_outline_approved": 187,
+      "required": [
+        "reading",
+        "meaning",
+        "template"
+      ],
+      "complete": 200,
+      "incomplete": 0,
+      "missing": [],
+      "glyphless_entry_ids": [],
+      "note": "complete counts glyphs with every required field present in pinned content; a glyphless row has no literal identity and can satisfy none"
+    },
+    {
+      "class": "7級·親字",
+      "level": "7級",
+      "form": "親字",
+      "role": "teaching path through 2級 (reading, meaning and a drawable template required)",
+      "entries": 202,
+      "glyph_entries": 202,
+      "glyphless_entries": 0,
+      "reading": 202,
+      "meaning": 202,
+      "stroke_count": 202,
+      "template": 202,
+      "brush_outline_approved": 188,
+      "required": [
+        "reading",
+        "meaning",
+        "template"
+      ],
+      "complete": 202,
+      "incomplete": 0,
+      "missing": [],
+      "glyphless_entry_ids": [],
+      "note": "complete counts glyphs with every required field present in pinned content; a glyphless row has no literal identity and can satisfy none"
+    },
+    {
+      "class": "6級·親字",
+      "level": "6級",
+      "form": "親字",
+      "role": "teaching path through 2級 (reading, meaning and a drawable template required)",
+      "entries": 193,
+      "glyph_entries": 193,
+      "glyphless_entries": 0,
+      "reading": 193,
+      "meaning": 193,
+      "stroke_count": 193,
+      "template": 193,
+      "brush_outline_approved": 172,
+      "required": [
+        "reading",
+        "meaning",
+        "template"
+      ],
+      "complete": 193,
+      "incomplete": 0,
+      "missing": [],
+      "glyphless_entry_ids": [],
+      "note": "complete counts glyphs with every required field present in pinned content; a glyphless row has no literal identity and can satisfy none"
+    },
+    {
+      "class": "5級·親字",
+      "level": "5級",
+      "form": "親字",
+      "role": "teaching path through 2級 (reading, meaning and a drawable template required)",
+      "entries": 191,
+      "glyph_entries": 191,
+      "glyphless_entries": 0,
+      "reading": 191,
+      "meaning": 191,
+      "stroke_count": 191,
+      "template": 191,
+      "brush_outline_approved": 168,
+      "required": [
+        "reading",
+        "meaning",
+        "template"
+      ],
+      "complete": 191,
+      "incomplete": 0,
+      "missing": [],
+      "glyphless_entry_ids": [],
+      "note": "complete counts glyphs with every required field present in pinned content; a glyphless row has no literal identity and can satisfy none"
+    },
+    {
+      "class": "4級·親字",
+      "level": "4級",
+      "form": "親字",
+      "role": "teaching path through 2級 (reading, meaning and a drawable template required)",
+      "entries": 313,
+      "glyph_entries": 313,
+      "glyphless_entries": 0,
+      "reading": 313,
+      "meaning": 313,
+      "stroke_count": 313,
+      "template": 313,
+      "brush_outline_approved": 285,
+      "required": [
+        "reading",
+        "meaning",
+        "template"
+      ],
+      "complete": 313,
+      "incomplete": 0,
+      "missing": [],
+      "glyphless_entry_ids": [],
+      "note": "complete counts glyphs with every required field present in pinned content; a glyphless row has no literal identity and can satisfy none"
+    },
+    {
+      "class": "3級·親字",
+      "level": "3級",
+      "form": "親字",
+      "role": "teaching path through 2級 (reading, meaning and a drawable template required)",
+      "entries": 284,
+      "glyph_entries": 284,
+      "glyphless_entries": 0,
+      "reading": 284,
+      "meaning": 284,
+      "stroke_count": 284,
+      "template": 284,
+      "brush_outline_approved": 256,
+      "required": [
+        "reading",
+        "meaning",
+        "template"
+      ],
+      "complete": 284,
+      "incomplete": 0,
+      "missing": [],
+      "glyphless_entry_ids": [],
+      "note": "complete counts glyphs with every required field present in pinned content; a glyphless row has no literal identity and can satisfy none"
+    },
+    {
+      "class": "準2級·親字",
+      "level": "準2級",
+      "form": "親字",
+      "role": "teaching path through 2級 (reading, meaning and a drawable template required)",
+      "entries": 328,
+      "glyph_entries": 328,
+      "glyphless_entries": 0,
+      "reading": 328,
+      "meaning": 328,
+      "stroke_count": 328,
+      "template": 328,
+      "brush_outline_approved": 299,
+      "required": [
+        "reading",
+        "meaning",
+        "template"
+      ],
+      "complete": 328,
+      "incomplete": 0,
+      "missing": [],
+      "glyphless_entry_ids": [],
+      "note": "complete counts glyphs with every required field present in pinned content; a glyphless row has no literal identity and can satisfy none"
+    },
+    {
+      "class": "2級·親字",
+      "level": "2級",
+      "form": "親字",
+      "role": "teaching path through 2級 (reading, meaning and a drawable template required)",
+      "entries": 185,
+      "glyph_entries": 185,
+      "glyphless_entries": 0,
+      "reading": 185,
+      "meaning": 185,
+      "stroke_count": 185,
+      "template": 185,
+      "brush_outline_approved": 166,
+      "required": [
+        "reading",
+        "meaning",
+        "template"
+      ],
+      "complete": 185,
+      "incomplete": 0,
+      "missing": [],
+      "glyphless_entry_ids": [],
+      "note": "complete counts glyphs with every required field present in pinned content; a glyphless row has no literal identity and can satisfy none"
+    },
+    {
+      "class": "準1級·親字",
+      "level": "準1級",
+      "form": "親字",
+      "role": "upper-grade headword (reading and meaning required; template reported for the S6-DD3 gap report)",
+      "entries": 849,
+      "glyph_entries": 844,
+      "glyphless_entries": 5,
+      "reading": 844,
+      "meaning": 844,
+      "stroke_count": 844,
+      "template": 844,
+      "brush_outline_approved": 0,
+      "required": [
+        "reading",
+        "meaning"
+      ],
+      "complete": 844,
+      "incomplete": 5,
+      "missing": [],
+      "glyphless_entry_ids": [
+        "CE-003670",
+        "CE-003805",
+        "CE-004428",
+        "CE-004722",
+        "CE-004813"
+      ],
+      "note": "complete counts glyphs with every required field present in pinned content; a glyphless row has no literal identity and can satisfy none"
+    },
+    {
+      "class": "準1級·旧字でない異体字",
+      "level": "準1級",
+      "form": "旧字でない異体字",
+      "role": "旧字でない異体字 (reference-only form; presence reported, nothing required)",
+      "entries": 9,
+      "glyph_entries": 7,
+      "glyphless_entries": 2,
+      "reading": 7,
+      "meaning": 7,
+      "stroke_count": 7,
+      "template": 7,
+      "brush_outline_approved": 0,
+      "required": [],
+      "complete": 7,
+      "incomplete": 0,
+      "missing": [],
+      "glyphless_entry_ids": [],
+      "note": "reference-only class: presence reported, nothing required"
+    },
+    {
+      "class": "1級·親字",
+      "level": "1級",
+      "form": "親字",
+      "role": "upper-grade headword (reading and meaning required; template reported for the S6-DD3 gap report)",
+      "entries": 2652,
+      "glyph_entries": 2535,
+      "glyphless_entries": 117,
+      "reading": 2497,
+      "meaning": 2498,
+      "stroke_count": 2534,
+      "template": 2534,
+      "brush_outline_approved": 1,
+      "required": [
+        "reading",
+        "meaning"
+      ],
+      "complete": 2497,
+      "incomplete": 155,
+      "missing": [
+        {
+          "glyph": "哳",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "屛",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "慠",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "榀",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "檋",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "檔",
+          "missing": [
+            "reading"
+          ]
+        },
+        {
+          "glyph": "癴",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "籒",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "籡",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "粏",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "苆",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "蝲",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "螈",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "蟎",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "蠊",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "踑",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "躮",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "鎺",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "驎",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "魸",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "鮇",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "鮱",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "鮲",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "鮸",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "鯐",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "鰘",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "鰙",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "鰚",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "鰧",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "鱩",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "鱲",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "鵇",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "鵥",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "鶄",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "鶎",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "鶪",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "﨟",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        },
+        {
+          "glyph": "屮",
+          "missing": [
+            "reading",
+            "meaning"
+          ]
+        }
+      ],
+      "glyphless_entry_ids": [
+        "CE-000031",
+        "CE-000044",
+        "CE-000144",
+        "CE-000157",
+        "CE-000186",
+        "CE-000188",
+        "CE-000243",
+        "CE-000277",
+        "CE-000280",
+        "CE-000389",
+        "CE-000391",
+        "CE-000482",
+        "CE-000514",
+        "CE-000556",
+        "CE-000783",
+        "CE-000813",
+        "CE-001093",
+        "CE-001253",
+        "CE-001339",
+        "CE-001343",
+        "CE-001354",
+        "CE-001364",
+        "CE-001456",
+        "CE-001591",
+        "CE-001597",
+        "CE-001603",
+        "CE-001606",
+        "CE-001624",
+        "CE-001628",
+        "CE-001682",
+        "CE-001710",
+        "CE-001738",
+        "CE-001782",
+        "CE-001855",
+        "CE-001877",
+        "CE-001880",
+        "CE-001890",
+        "CE-001903",
+        "CE-001983",
+        "CE-002029",
+        "CE-002089",
+        "CE-002092",
+        "CE-002116",
+        "CE-002125",
+        "CE-002149",
+        "CE-002237",
+        "CE-002258",
+        "CE-002387",
+        "CE-002467",
+        "CE-002577",
+        "CE-002661",
+        "CE-002752",
+        "CE-002754",
+        "CE-002881",
+        "CE-002993",
+        "CE-003108",
+        "CE-003377",
+        "CE-003386",
+        "CE-003389",
+        "CE-003467",
+        "CE-003559",
+        "CE-003723",
+        "CE-003799",
+        "CE-003801",
+        "CE-003834",
+        "CE-003852",
+        "CE-003880",
+        "CE-003936",
+        "CE-004094",
+        "CE-004099",
+        "CE-004195",
+        "CE-004266",
+        "CE-004285",
+        "CE-004687",
+        "CE-004832",
+        "CE-004841",
+        "CE-004871",
+        "CE-004878",
+        "CE-004936",
+        "CE-004950",
+        "CE-005014",
+        "CE-005317",
+        "CE-005372",
+        "CE-005375",
+        "CE-005544",
+        "CE-005588",
+        "CE-005608",
+        "CE-005663",
+        "CE-005665",
+        "CE-005667",
+        "CE-005682",
+        "CE-005686",
+        "CE-005692",
+        "CE-005694",
+        "CE-005696",
+        "CE-005698",
+        "CE-005720",
+        "CE-005775",
+        "CE-005800",
+        "CE-005804",
+        "CE-005819",
+        "CE-005822",
+        "CE-005854",
+        "CE-005903",
+        "CE-005910",
+        "CE-006067",
+        "CE-006117",
+        "CE-006127",
+        "CE-006154",
+        "CE-006215",
+        "CE-006277",
+        "CE-006436",
+        "CE-006477",
+        "CE-006577",
+        "CE-006579",
+        "CE-006587",
+        "CE-006702"
+      ],
+      "note": "complete counts glyphs with every required field present in pinned content; a glyphless row has no literal identity and can satisfy none"
+    },
+    {
+      "class": "1級·旧字でない異体字",
+      "level": "1級",
+      "form": "旧字でない異体字",
+      "role": "旧字でない異体字 (reference-only form; presence reported, nothing required)",
+      "entries": 18,
+      "glyph_entries": 18,
+      "glyphless_entries": 0,
+      "reading": 18,
+      "meaning": 18,
+      "stroke_count": 18,
+      "template": 18,
+      "brush_outline_approved": 0,
+      "required": [],
+      "complete": 18,
+      "incomplete": 0,
+      "missing": [],
+      "glyphless_entry_ids": [],
+      "note": "reference-only class: presence reported, nothing required"
+    },
+    {
+      "class": "1級·元字",
+      "level": "1級",
+      "form": "元字",
+      "role": "元字 (reference-only form; presence reported, nothing required)",
+      "entries": 5,
+      "glyph_entries": 5,
+      "glyphless_entries": 0,
+      "reading": 5,
+      "meaning": 5,
+      "stroke_count": 5,
+      "template": 5,
+      "brush_outline_approved": 5,
+      "required": [],
+      "complete": 5,
+      "incomplete": 0,
+      "missing": [],
+      "glyphless_entry_ids": [],
+      "note": "reference-only class: presence reported, nothing required"
+    },
+    {
+      "class": "1/準1級·旧字",
+      "level": "1/準1級",
+      "form": "旧字",
+      "role": "旧字 (reference-only form; presence reported, nothing required)",
+      "entries": 644,
+      "glyph_entries": 397,
+      "glyphless_entries": 247,
+      "reading": 347,
+      "meaning": 353,
+      "stroke_count": 397,
+      "template": 397,
+      "brush_outline_approved": 0,
+      "required": [],
+      "complete": 397,
+      "incomplete": 0,
+      "missing": [],
+      "glyphless_entry_ids": [],
+      "note": "reference-only class: presence reported, nothing required"
+    },
+    {
+      "class": "配当外·旧字でない異体字",
+      "level": "配当外",
+      "form": "旧字でない異体字",
+      "role": "旧字でない異体字 (reference-only form; presence reported, nothing required)",
+      "entries": 474,
+      "glyph_entries": 308,
+      "glyphless_entries": 166,
+      "reading": 303,
+      "meaning": 305,
+      "stroke_count": 305,
+      "template": 1,
+      "brush_outline_approved": 0,
+      "required": [],
+      "complete": 308,
+      "incomplete": 0,
+      "missing": [],
+      "glyphless_entry_ids": [],
+      "note": "reference-only class: presence reported, nothing required"
+    }
+  ],
+  "template_gaps_S6_DD3": {
+    "10級": {
+      "glyphs": 80,
+      "with_template": 80,
+      "without_template": 0,
+      "missing": ""
+    },
+    "9級": {
+      "glyphs": 160,
+      "with_template": 160,
+      "without_template": 0,
+      "missing": ""
+    },
+    "8級": {
+      "glyphs": 200,
+      "with_template": 200,
+      "without_template": 0,
+      "missing": ""
+    },
+    "7級": {
+      "glyphs": 202,
+      "with_template": 202,
+      "without_template": 0,
+      "missing": ""
+    },
+    "6級": {
+      "glyphs": 193,
+      "with_template": 193,
+      "without_template": 0,
+      "missing": ""
+    },
+    "5級": {
+      "glyphs": 191,
+      "with_template": 191,
+      "without_template": 0,
+      "missing": ""
+    },
+    "4級": {
+      "glyphs": 313,
+      "with_template": 313,
+      "without_template": 0,
+      "missing": ""
+    },
+    "3級": {
+      "glyphs": 284,
+      "with_template": 284,
+      "without_template": 0,
+      "missing": ""
+    },
+    "準2級": {
+      "glyphs": 328,
+      "with_template": 328,
+      "without_template": 0,
+      "missing": ""
+    },
+    "2級": {
+      "glyphs": 185,
+      "with_template": 185,
+      "without_template": 0,
+      "missing": ""
+    },
+    "準1級": {
+      "glyphs": 851,
+      "with_template": 851,
+      "without_template": 0,
+      "missing": ""
+    },
+    "1級": {
+      "glyphs": 2558,
+      "with_template": 2557,
+      "without_template": 1,
+      "missing": "屮"
+    },
+    "1/準1級": {
+      "glyphs": 397,
+      "with_template": 397,
+      "without_template": 0,
+      "missing": ""
+    },
+    "配当外": {
+      "glyphs": 308,
+      "with_template": 1,
+      "without_template": 307,
+      "missing": "㵎丗仭伜侠倶僊僣兔冉冦凋凛凾剏剥劄勗厠厦厮厰叱呑呱唖唳唹啗嘘噛嚏嚢囓囮堋堙塘填墻壥壷夐妁妍娜媾嫂嫦孳孽寃屏屓屡峩崘嵳巵帀幇并廏廐廚廸廼弉弯弸彜忰慚懴戞扈抛抬拏捩掴掻搆撹攅旒昿晣晳曁曄枅桀桝桧桿梛梳梼椶楞槹橢檪櫁殱毗沪涛涜淤渕湮溌滕滬潅潭潴濆濶瀛炳烱焔煕煢熈熏犁玳瑯瓊瓠瓣甄畭畴皋皸盌眦砺砿硼磔祢祷禀穐竃笄筝筬筺箆箙箪篳簒簔簟簪籀籐籖粃綛綟綮縢繃繋繍繦纉纒翆翩耜聨肓胼腟臈舁芍芦苒苣荵莓莱莵莽菟萠萢葯蒂蒋蒭蓴蔬蕈蕋薮蘂蘖蘗蘯虱蚋蛎蛩蜋蝉蝋蝙蝱蝿螽蟆蠎蠏蠧衊衽袞褊褝襪覯觚諌諛諞謚譁譛讎讚谺豁豎賁賎贏跫蹕躙躯輌輙轜迸逎遘邃醗醤醯釁鈎鋩鎔鐔鑚閙閼陋靭鞆鞏韆韈韜韞韭韲頚頬頴顛駢騨髯鮗鯲鯵鰛鱈鳬鴂鴈鴎鴪鴬鵙鵞鹸麁麸麹鼹齔𥡴"
+    }
+  },
+  "frequency_source": {
+    "status": "absent",
+    "node": "X17",
+    "looked_up": "/root/bunki-campaign/inputs/ on agni, read-only, 2026-11-07",
+    "finding": "no pinned kanji frequency file and no sha256 recorded (no *freq* file; SELECTION.md and MANIFEST.json do not mention a frequency source)",
+    "consequence": "the first 準1級 and 1級 units (S6-R15) are a stated blocker; no other count is substituted"
+  }
+}

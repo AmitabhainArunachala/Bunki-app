@@ -1,0 +1,559 @@
+{
+  "schema": "bunki.kanken.reconcile/1",
+  "spec_refs": [
+    "S6-R4",
+    "S6-OI1"
+  ],
+  "kanken_jsonl": {
+    "path": "corpus/datasets/kanji/kanken.jsonl",
+    "sha256": "f8f8a98ee064aadbf98b559c3743d7ace18fe62a6801c6365f9a77860a7cafd7",
+    "bytes": 2252069,
+    "rows": 6787
+  },
+  "kanken_json": {
+    "path": "prototypes/corridor/data/proprietary_safe/kanken.json",
+    "sha256": "6efa199b7caec160c95e87c260b4184694fb8e4778a4563327bf1d79741ff444",
+    "bytes": 68631,
+    "glyphs": 2453,
+    "per_level": {
+      "10級": 80,
+      "8級": 200,
+      "9級": 160,
+      "4級": 313,
+      "7級": 201,
+      "準1級": 164,
+      "準2級": 328,
+      "1級": 124,
+      "配当外": 23,
+      "5級": 191,
+      "2級": 183,
+      "6級": 193,
+      "3級": 284,
+      "1/準1級": 9
+    },
+    "sources": [
+      {
+        "name": "kanken kanji fact table",
+        "licence": "CC0",
+        "attribution": "日本漢字能力検定 配当漢字 (CC0 fact table)",
+        "url": ""
+      }
+    ]
+  },
+  "jsonl_oyaji_through_2kyu_missing_in_kanken_json": {
+    "count": 2,
+    "glyphs": [
+      "剝",
+      "𠮟"
+    ],
+    "detail": [
+      {
+        "glyph": "剝",
+        "level": "2級",
+        "entry_id": "CE-005137",
+        "species_id": "CT-004259",
+        "kanken_json_carries_same_species_variant": [
+          {
+            "glyph": "剥",
+            "form": "旧字でない異体字",
+            "kanken_level": "配当外",
+            "kanken_json_level": "配当外"
+          }
+        ]
+      },
+      {
+        "glyph": "𠮟",
+        "level": "2級",
+        "entry_id": "CE-002687",
+        "species_id": "CT-002254",
+        "kanken_json_carries_same_species_variant": [
+          {
+            "glyph": "叱",
+            "form": "旧字でない異体字",
+            "kanken_level": "配当外",
+            "kanken_json_level": "配当外"
+          }
+        ]
+      }
+    ]
+  },
+  "kanken_json_absent_from_jsonl": {
+    "reading": "two readings of \"absent\": (any_form) no row of any form carries the glyph; (as_oyaji) no 親字 row carries it, although a 旧字 or 旧字でない異体字 row may",
+    "any_form": {
+      "count": 0,
+      "glyphs": []
+    },
+    "as_oyaji": {
+      "count": 32,
+      "glyphs": [
+        {
+          "glyph": "丗",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-003863",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "伜",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-002334",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "兒",
+          "kanken_json_level": "1/準1級",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-002649",
+              "form": "旧字",
+              "kanken_level": "1/準1級"
+            }
+          ]
+        },
+        {
+          "glyph": "冉",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-003802",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "冓",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-002030",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "剥",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-005138",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "參",
+          "kanken_json_level": "1/準1級",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-002443",
+              "form": "旧字",
+              "kanken_level": "1/準1級"
+            }
+          ]
+        },
+        {
+          "glyph": "叱",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-002688",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "呑",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-004966",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "嘘",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-001271",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "噛",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-002200",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "壷",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-001885",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "屏",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-005613",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "并",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-005604",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "弯",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-006787",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "從",
+          "kanken_json_level": "1/準1級",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-002909",
+              "form": "旧字",
+              "kanken_level": "1/準1級"
+            }
+          ]
+        },
+        {
+          "glyph": "捩",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-006580",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "掴",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-000736",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "掻",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-003941",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "敕",
+          "kanken_json_level": "1/準1級",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-004488",
+              "form": "旧字",
+              "kanken_level": "1/準1級"
+            }
+          ]
+        },
+        {
+          "glyph": "桀",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-001683",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "縣",
+          "kanken_json_level": "1/準1級",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-001724",
+              "form": "旧字",
+              "kanken_level": "1/準1級"
+            }
+          ]
+        },
+        {
+          "glyph": "繋",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-001631",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "繍",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-002886",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "賁",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-005318",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "醤",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-003209",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "頬",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-005917",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "鹸",
+          "kanken_json_level": "配当外",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-001816",
+              "form": "旧字でない異体字",
+              "kanken_level": "配当外"
+            }
+          ]
+        },
+        {
+          "glyph": "黑",
+          "kanken_json_level": "1/準1級",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-002219",
+              "form": "旧字",
+              "kanken_level": "1/準1級"
+            }
+          ]
+        },
+        {
+          "glyph": "齊",
+          "kanken_json_level": "1/準1級",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-003520",
+              "form": "旧字",
+              "kanken_level": "1/準1級"
+            }
+          ]
+        },
+        {
+          "glyph": "齒",
+          "kanken_json_level": "1/準1級",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-002597",
+              "form": "旧字",
+              "kanken_level": "1/準1級"
+            }
+          ]
+        },
+        {
+          "glyph": "龍",
+          "kanken_json_level": "1/準1級",
+          "jsonl_rows": [
+            {
+              "entry_id": "CE-006429",
+              "form": "旧字",
+              "kanken_level": "1/準1級"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "level_disagreements": {
+    "compared_glyphs": 2453,
+    "count": 0,
+    "glyphs": [],
+    "oyaji_rows_only": {
+      "compared_glyphs": 2421,
+      "count": 0,
+      "glyphs": []
+    }
+  },
+  "rank_disagreements": 0,
+  "duplicate_glyphs_in_jsonl": [
+    {
+      "glyph": "芸",
+      "rows": [
+        {
+          "entry_id": "CE-000230",
+          "species_id": "CT-000196",
+          "form": "親字",
+          "kanken_level": "1級"
+        },
+        {
+          "entry_id": "CE-001637",
+          "species_id": "CT-001346",
+          "form": "親字",
+          "kanken_level": "7級"
+        }
+      ]
+    },
+    {
+      "glyph": "缶",
+      "rows": [
+        {
+          "entry_id": "CE-000838",
+          "species_id": "CT-000697",
+          "form": "親字",
+          "kanken_level": "準2級"
+        },
+        {
+          "entry_id": "CE-000842",
+          "species_id": "CT-000697",
+          "form": "元字",
+          "kanken_level": "1級"
+        }
+      ]
+    },
+    {
+      "glyph": "欠",
+      "rows": [
+        {
+          "entry_id": "CE-001672",
+          "species_id": "CT-001374",
+          "form": "親字",
+          "kanken_level": "7級"
+        },
+        {
+          "entry_id": "CE-001674",
+          "species_id": "CT-001374",
+          "form": "元字",
+          "kanken_level": "1級"
+        }
+      ]
+    },
+    {
+      "glyph": "弁",
+      "rows": [
+        {
+          "entry_id": "CE-005702",
+          "species_id": "CT-004733",
+          "form": "親字",
+          "kanken_level": "6級"
+        },
+        {
+          "entry_id": "CE-005706",
+          "species_id": "CT-004733",
+          "form": "元字",
+          "kanken_level": "1級"
+        }
+      ]
+    },
+    {
+      "glyph": "予",
+      "rows": [
+        {
+          "entry_id": "CE-006209",
+          "species_id": "CT-005156",
+          "form": "親字",
+          "kanken_level": "8級"
+        },
+        {
+          "entry_id": "CE-006211",
+          "species_id": "CT-005156",
+          "form": "元字",
+          "kanken_level": "1級"
+        }
+      ]
+    },
+    {
+      "glyph": "余",
+      "rows": [
+        {
+          "entry_id": "CE-006212",
+          "species_id": "CT-005157",
+          "form": "親字",
+          "kanken_level": "6級"
+        },
+        {
+          "entry_id": "CE-006214",
+          "species_id": "CT-005157",
+          "form": "元字",
+          "kanken_level": "1級"
+        }
+      ]
+    }
+  ]
+}
