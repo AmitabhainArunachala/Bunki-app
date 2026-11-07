@@ -88,15 +88,23 @@ test('a missing packaged dictionary can be retried after reconnecting',async () 
 
 function hostWriteFixture({paused = false} = {}) {
   const source = readFileSync(new URL('../../../corridor.js',import.meta.url),'utf8');
-  const start = source.indexOf('async function commitStorePatch(');
-  assert.notEqual(start,-1,'The shared host must use the current asynchronous record writer');
-  const end = source.indexOf('\n}\n',start) + 2;
+  // Execute the actual writer and its boolean wrapper together: omitting the
+  // outcome helper or its refusal constant would bypass the boundary under test.
+  const definitions = ['commitStorePatch','commitStorePatchOutcome'].map(name => {
+    const matches = [...source.matchAll(new RegExp(`^async function ${name}\\(`,'gm'))];
+    assert.equal(matches.length,1,`The shared host must define ${name} exactly once`);
+    const start = matches[0].index, end = source.indexOf('\n}\n',start);
+    assert.notEqual(end,-1,`Missing end of host function ${name}`);
+    return source.slice(start,end + 2);
+  });
+  const declined = [...source.matchAll(/^const PRODUCER_DECLINED = [^\n]+;$/gm)];
+  assert.equal(declined.length,1,'The shared host must define PRODUCER_DECLINED exactly once');
   const clone = value => JSON.parse(JSON.stringify(value));
   const state = {taken:[],lists:{},deepWords:{},srs:{original:true},revlog:[['original']],obslog:[]};
   let record = clone(state), allowed = true, visit = 1, writes = 0, queued = 0, release;
   const failures = [];
   const barrier = paused ? new Promise(resolve => {release = resolve;}) : null;
-  const commit = vm.runInNewContext(source.slice(start,end) + ';commitStorePatch', {
+  const commit = vm.runInNewContext([declined[0][0],...definitions,'commitStorePatch'].join('\n'), {
     S:state, personalHost:{allowed:() => allowed,captureAccess() {const own = visit; return () => own === visit && allowed;}}, recordEpoch:1,
     recordWritable:() => true, publishedRecord:clone(state), DEFAULT_LEARNER_RECORD:{},
     canonicalRecordJson:JSON.stringify, safelySyncStoreAlert() {}, recordFailure(reason) {failures.push(reason);},
@@ -331,7 +339,7 @@ test('stamped service worker returns an uncached 503 for missing offline content
   // Derive a valid small installed generation from the actual worker's boot
   // contract. Its identity and stamped worker are validated unchanged at fetch.
   vm.runInContext(source,context);
-  const required = vm.runInContext('[...new Set([...SHELL,...BOOT_DATA,...GUIDED_ROOM].filter(path => path !== "."))]',context);
+  const required = vm.runInContext('[...new Set([...SHELL,...BOOT_DATA,...GUIDED_ROOM,...SPEAK_ROOM].filter(path => path !== "."))]',context);
   const files = new Map(required.map(path => [path,Buffer.from('fixture')]));
   const core = 'data/share_alike/dict.json', shard = 'data/share_alike/dict-v2/index.json';
   files.set(core,Buffer.from(JSON.stringify({words:{'本':{r:'ほん',m:['book']}}})));

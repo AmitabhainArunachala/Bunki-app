@@ -80,6 +80,8 @@ function expectedRoots(record, roots) {
 }
 function reducePatch({ record, revision }, input) {
   keys(input, ['patch', 'expected'], ['appendArchive', 'expectedRevision']);
+  // HOOKS r8 rev 3.2 §7.2: the journey root is written only by its typed command (record-host commitJourney)
+  insist(!own(input.patch, 'm4Journey'), 'journey-root-reserved');
   if (own(input.patch, 'assessmentQuestionPractice'))
     insist(Number.isSafeInteger(input.expectedRevision) && input.expectedRevision === revision, 'stale-question-snapshot');
   else if (own(input, 'expectedRevision'))
@@ -454,6 +456,7 @@ class RecordApp {
   #tail = Promise.resolve();
   #pending = 0;
   #closed = false;
+  #journeyCommits = new WeakMap();
   constructor({ host, writer, binding, onPublish, restoreGate, noteGate, practiceGate, assessmentGate, assessmentResolvers, sourceReferenceGate }) {
     this.#host = host;
     this.#writer = writer;
@@ -485,7 +488,7 @@ class RecordApp {
         : {}),
     });
   }
-  #enqueue(action, command = false) {
+  #enqueue(action, command = false, retainCapture = null) {
     let captured;
     let meta;
     try {
@@ -496,6 +499,7 @@ class RecordApp {
           changeId: crypto.randomUUID(),
           occurredAt: new Date().toISOString(),
         });
+      if (retainCapture) retainCapture(captured, meta);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -549,6 +553,40 @@ class RecordApp {
   }
   snapshot() {
     return this.#enqueue(async (captured) => this.#finish(captured, await this.#host.snapshot()));
+  }
+  /** HOOKS r8 rev 3.2 §7: the journey's confirmed authority, and its one write path, queued with every other write */
+  journeyAuthority() {
+    return this.#host.journeyAuthority();
+  }
+  beginJourneyCommit(input, gate) {
+    // Copy now, before queueing, so later caller edits cannot change the command
+    // bound to this handle. #enqueue allocates its private changeId synchronously.
+    const proposed = copy(input), handle = Object.freeze(Object.create(null));
+    const custody = { captured: null, hostHandle: null, finished: false };
+    this.#journeyCommits.set(handle, custody);
+    const run = this.#enqueue(async (captured, meta) => {
+      const begun = this.#host.beginJourneyCommit(meta, proposed, gate);
+      custody.hostHandle = begun.handle;
+      return this.#finish(captured, await begun.completion);
+    }, true, (captured) => { custody.captured = captured; });
+    const completion = run.then((outcome) => { custody.finished = true; return outcome; },
+      (error) => { custody.finished = true; throw error; });
+    return Object.freeze({ handle, completion });
+  }
+  commitJourney(input, gate) {
+    try { return this.beginJourneyCommit(input, gate).completion; }
+    catch (error) { return Promise.reject(error); }
+  }
+  async settleJourneyCommit(handle) {
+    const custody = this.#journeyCommits.get(handle);
+    const unresolved = () => Object.freeze({ state: 'unresolved' });
+    if (!custody?.finished || !custody.captured || !custody.hostHandle) return unresolved();
+    try {
+      this.#guard(custody.captured);
+      const result = await this.#host.settleJourneyCommit(custody.hostHandle);
+      this.#guard(custody.captured);
+      return result;
+    } catch { return unresolved(); }
   }
   /** A programming/producer error rejects before a target write. Operational
    * failures return recovery-required and preserve any durable target receipt. */

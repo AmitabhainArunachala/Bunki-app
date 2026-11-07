@@ -42,10 +42,13 @@
          and the figures no longer depend on the device's own fonts. -->
     <link rel="stylesheet" href="fonts.css" />
     <!-- the recorded roster is aboard: the app may fetch audio/manifest.json.
-         No article narration ships until the locked Kore voice is rendered. -->
+         The locked Kore voice has begun shipping (one-article probe, 2026-10-15), so the reader
+         may fetch audio/article-narration.json; articles without clips keep the pending line. -->
     <script>
       window.__KAIRO_AUDIO__ = 1;
+      window.__KAIRO_NARRATION__ = 1;
     </script>
+    <link rel="stylesheet" href="kanji-world-encounter.css" />
     <link rel="stylesheet" href="corridor.css" />
     <link rel="stylesheet" href="reference-ui.css" />
     <link rel="stylesheet" href="drift-layer.css" />
@@ -65,6 +68,9 @@
     <div id="app"></div>
     <script defer src="reference-core.js"></script>
     <script defer src="reference-ui.js"></script>
+    <script defer src="kanji-structure.js"></script>
+    <script defer src="kanji-family.js"></script>
+    <script defer src="kanji-course.js"></script>
     <!-- the Drift universe (Phase 2): self-mounts #drift-layer, sleeps until
          the corridor's drift entry view wakes it via window.__DRIFT__ -->
     <script defer src="drift-layer.js"></script>

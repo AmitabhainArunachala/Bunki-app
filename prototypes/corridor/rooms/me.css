@@ -5,18 +5,20 @@
 /* ---- Skin frame (Skin lane): Me is a stab-bound book (和綴じ): its binding holes and a
    gold thread run down the left margin, in late gold light; at night a lamp. Values only. ---- */
 html:is([data-room='me'], [data-room='progress'], [data-room='settings'], [data-room='saved']) body:not([data-view='drift']) {
-  --color-page: color-mix(in srgb, var(--color-ground) 62%, #f7efdc);
+  /* drawn: the stab binding's holes and its gold thread down the left margin — dots and a hairline, hard-edged, the world's ink and the house gold */
   --skin-ground:
     radial-gradient(circle at 9px 50%, color-mix(in srgb, var(--color-ink) 30%, transparent) 2px, transparent 2.6px) 0 0 / 18px 64px repeat-y,
-    linear-gradient(90deg, transparent 8.5px, color-mix(in srgb, var(--color-gold) 55%, transparent) 8.5px, color-mix(in srgb, var(--color-gold) 55%, transparent) 9.5px, transparent 9.5px) 0 0 / 18px 100% no-repeat;
-  --skin-light: radial-gradient(90% 50% at 100% 0%, rgb(232 196 120 / 18%), transparent 70%);
+    linear-gradient(90deg, transparent 8.5px, color-mix(in srgb, var(--tone-gold) 55%, transparent) 8.5px, color-mix(in srgb, var(--tone-gold) 55%, transparent) 9.5px, transparent 9.5px) 0 0 / 18px 100% no-repeat;
+  /* bokashi: atenashi — the Me room's late light — light: the house gold, lowered by the world's ink, wiped in from the upper right */
+  --skin-light: radial-gradient(90% 50% at 100% 0%, color-mix(in srgb, var(--tone-gold) 14%, transparent), transparent 70%);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='me'], [data-room='progress'], [data-room='settings'], [data-room='saved']) body:not([data-view='drift']) {
-  --color-page: var(--color-ground);
+  /* drawn: the binding's holes, pierced to the world's deepest coat, and its gold thread — hard-edged */
   --skin-ground:
-    radial-gradient(circle at 9px 50%, rgb(0 0 0 / 55%) 2px, transparent 2.6px) 0 0 / 18px 64px repeat-y,
-    linear-gradient(90deg, transparent 8.5px, color-mix(in srgb, var(--color-gold) 50%, transparent) 8.5px, color-mix(in srgb, var(--color-gold) 50%, transparent) 9.5px, transparent 9.5px) 0 0 / 18px 100% no-repeat;
-  --skin-light: radial-gradient(70% 40% at 92% 2%, color-mix(in srgb, var(--color-gold) 16%, transparent), transparent 70%);
+    radial-gradient(circle at 9px 50%, color-mix(in srgb, var(--tone-shade) 70%, transparent) 2px, transparent 2.6px) 0 0 / 18px 64px repeat-y,
+    linear-gradient(90deg, transparent 8.5px, color-mix(in srgb, var(--tone-gold) 50%, transparent) 8.5px, color-mix(in srgb, var(--tone-gold) 50%, transparent) 9.5px, transparent 9.5px) 0 0 / 18px 100% no-repeat;
+  /* bokashi: urushi — the Me room's lamp — light: lantern gold held in the lacquer at the upper right */
+  --skin-light: radial-gradient(70% 40% at 92% 2%, color-mix(in srgb, var(--tone-gold) 14%, transparent), transparent 70%);
 }
 
 /* ==========================================================================================
@@ -29,32 +31,34 @@ html:is([data-room='me'], [data-room='progress'], [data-room='settings'], [data-
 html[data-room='me'] body:not([data-view='drift']) { --skin-ground: none; }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='me'] body:not([data-view='drift']) {
   --skin-ground: none;
+  /* bokashi: urushi — the Me room's lamp at night — light: lantern gold over the book's right shoulder, a low warmth at the left foot */
   --skin-light:
-    radial-gradient(60% 34% at 96% 0%, color-mix(in srgb, var(--color-gold) 20%, transparent), transparent 72%),
-    radial-gradient(80% 40% at 0% 100%, color-mix(in srgb, var(--color-gold) 7%, transparent), transparent 70%);
+    radial-gradient(80% 44% at 96% 0%, color-mix(in srgb, var(--tone-gold) 15%, transparent), transparent 72%),
+    radial-gradient(80% 40% at 0% 100%, color-mix(in srgb, var(--tone-gold) 7%, transparent), transparent 70%);
 }
 html[data-room='me'] .me-book {
   position: relative;
   margin: 2px 4px 8px 0;
   padding: 22px 18px 24px 30px;
-  background: var(--color-surface);
-  border-radius: 2px 6px 6px 2px;
+  /* bokashi: atenashi — the Me book — light: the world's raised paper, a breath of its key pigment settling toward the binding, edgeless */
+  background: radial-gradient(130% 90% at 100% 0%, var(--tone-raised), color-mix(in srgb, var(--tone-key) 3%, var(--tone-raised))) var(--tone-raised);
+  border-radius: var(--radius-seal) var(--radius-control) var(--radius-control) var(--radius-seal);
   box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-line), var(--elevation-card);
   transform-origin: 0 50%;
-  animation: me-book-open 420ms var(--ease-enter) backwards;
 }
-@keyframes me-book-open { from { opacity: 0.01; transform: perspective(1200px) rotateY(-8deg); } }
 html[data-room='me'] .me-spine {
   position: absolute; left: 0; top: 0; bottom: 0; width: 16px;
   border-right: var(--stroke-hairline) solid var(--color-line);
+  /* bokashi: atenashi — the book's spine — depth: the fold's shade, the world's ink at a breath (gentle across its 16 px); the stab holes are drawn over it */
   background:
     radial-gradient(circle at 8px 50%, color-mix(in srgb, var(--color-ink) 34%, transparent) 1.6px, transparent 2.2px) 0 26px / 16px 76px repeat-y,
-    linear-gradient(90deg, color-mix(in srgb, var(--color-ink) 11%, transparent), transparent 80%);
+    linear-gradient(90deg, color-mix(in srgb, var(--color-ink) 5%, transparent), transparent 80%);
 }
 html[data-room='me'] .me-edges {
   position: absolute; right: -5px; top: 5px; bottom: 5px; width: 5px;
-  border-radius: 0 3px 3px 0;
-  background: repeating-linear-gradient(90deg, var(--color-surface) 0 1px, var(--color-line) 1px 1.5px);
+  border-radius: 0 var(--radius-seal) var(--radius-seal) 0;
+  /* drawn: the book's page edges — hairlines of raised paper and ink line, hard-edged */
+  background: repeating-linear-gradient(90deg, var(--tone-raised) 0 1px, var(--color-line) 1px 1.5px);
   box-shadow: 2px 2px 4px -2px rgb(0 0 0 / 20%);
 }
 
@@ -62,26 +66,36 @@ html[data-room='me'] .me-edges {
 html[data-room='me'] .me-head .me-kicker { margin: 0 0 var(--space-2); }
 html[data-room='me'] .me-head .view-title {
   margin: 0 0 var(--space-2);
-  font: 800 clamp(30px, 9vw, 38px)/1.08 var(--font-headword);
+  font: 800 var(--type-hero)/1.08 var(--font-headword);
   letter-spacing: -0.01em;
   text-wrap: balance;
 }
 html[data-room='me'] body:not(.ui-bi) .me-head .view-title { letter-spacing: 0.04em; word-break: keep-all; line-break: strict; }
-html[data-room='me'] :is(.me-dateline, .me-hz-sub, .me-cal-foot, .me-home-when, .me-line-src, .me-part-aside, .me-hz-n, .me-lead-m) {
-  font-family: var(--font-data);
+/* the book's faces (F, L-5: one ladder, no monospace in the book): its labels and figures-in-a-line are the interface's
+   face (--font-ui) with tabular numerals, its prose the reading face, its titles and its big numerals the headword
+   face — three faces, each with one job */
+html[data-room='me'] :is(.me-dateline, .me-hz-sub, .me-cal-foot, .me-home-when, .me-line-src, .me-part-aside, .me-hz-n) {
+  font-family: var(--font-ui);
   font-variant-numeric: tabular-nums;
 }
-html[data-room='me'] .me-dateline { margin: 0; font-size: 12px; line-height: 1.7; letter-spacing: 0.06em; color: var(--color-muted); }
+html[data-room='me'] .me-lead-m { font-family: var(--font-reading); font-variant-numeric: tabular-nums; }
+html[data-room='me'] .me-dateline { margin: 0; font-size: var(--type-caption); line-height: 1.7; letter-spacing: 0.06em; color: var(--color-muted); }
 html[data-room='me'] body.ui-bi .me-dateline { text-transform: uppercase; }
 html[data-room='me'] body:not(.ui-bi) .me-dateline { font-family: var(--font-reading); letter-spacing: 0.04em; }
-html[data-room='me'] body:not(.ui-bi) .me-dateline b { font-family: var(--font-data); }
 html[data-room='me'] .me-clause { white-space: nowrap; }
-html[data-room='me'] body .me-dateline.is-blank { font: 400 15px/1.65 var(--font-reading); letter-spacing: 0.02em; text-transform: none; color: var(--color-ink-2); }
+html[data-room='me'] body .me-dateline.is-blank { font: 400 var(--type-control)/1.65 var(--font-reading); letter-spacing: 0.02em; text-transform: none; color: var(--color-ink-2); }
 html[data-room='me'] :is(.me-dateline, .me-hz-sub, .me-line-src) b { color: var(--color-ink); font-weight: 700; }
 html[data-room='me'] .me-lead { display: grid; gap: 3px; margin: var(--space-4) 0 0; }
-html[data-room='me'] .me-lead-n { font: 700 40px/1 var(--font-data); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; color: var(--color-ink); }
-html[data-room='me'] .me-lead-l { font: 800 17px/1.3 var(--font-headword); }
-html[data-room='me'] .me-lead-m { font-size: 11px; line-height: 1.5; color: var(--color-muted); }
+html[data-room='me'] .me-lead-n { font: 800 var(--type-headword)/1 var(--font-headword); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; color: var(--color-ink); }
+html[data-room='me'] .me-lead-l { font: 800 var(--type-lead)/1.3 var(--font-headword); }
+html[data-room='me'] .me-lead-m { font-size: var(--type-label); line-height: 1.5; color: var(--color-muted); }
+/* G2's help line (on integration 7f1912be; its own rules there, editorial.css:5405–5409, set 24 / 15 / 13 px and the
+   mono face, and give way to these on the merge): set as the lead above it — the figure in the headword face, its
+   label as the lead's, its note as prose */
+html[data-room='me'] .me-help-n { font: 800 var(--type-section)/1 var(--font-headword); font-variant-numeric: tabular-nums; color: var(--color-ink); }
+html[data-room='me'] .me-help-l { font: 800 var(--type-lead)/1.3 var(--font-headword); }
+html[data-room='me'] .me-help-m { font: 400 var(--type-label)/1.5 var(--font-reading); font-variant-numeric: tabular-nums; color: var(--color-muted); }
+html[data-room='me'] .me-help:not(:has(.me-help-n)) { font: 400 var(--type-label)/1.55 var(--font-reading); color: var(--color-muted); }
 
 /* ruled sections */
 html[data-room='me'] .me-part {
@@ -91,17 +105,18 @@ html[data-room='me'] .me-part {
 }
 html[data-room='me'] .me-part-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); }
 html[data-room='me'] .me-part-head h2.eyebrow { margin: 0 0 var(--space-2); }
-html[data-room='me'] .me-part-aside { font-size: 11px; letter-spacing: 0.06em; color: var(--color-gold); }
-html[data-room='me'] .me-quiet { margin: var(--space-1) 0 0; font: 400 14px/1.65 var(--font-reading); color: var(--color-ink-2); }
+html[data-room='me'] .me-part-aside { font-size: var(--type-caption); letter-spacing: 0.06em; color: var(--color-gold); }
+html[data-room='me'] .me-quiet { margin: var(--space-1) 0 0; font: 400 var(--type-chrome)/1.65 var(--font-reading); color: var(--color-ink-2); }
 
 /* four horizons: thin gold hairlines, mono numbers */
 html[data-room='me'] .me-hz { margin: var(--space-3) 0 var(--space-4); }
 html[data-room='me'] .me-hz-top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); }
-html[data-room='me'] .me-hz-name { font: 800 17px/1.25 var(--font-headword); }
-html[data-room='me'] .me-hz-n { font-size: 13px; white-space: nowrap; color: var(--color-muted); }
+html[data-room='me'] .me-hz-name { font: 800 var(--type-lead)/1.25 var(--font-headword); }
+html[data-room='me'] .me-hz-n { font-size: var(--type-label); white-space: nowrap; color: var(--color-muted); }
 html[data-room='me'] .me-hz-n b { color: var(--color-ink); font-weight: 700; }
 html[data-room='me'] .me-hz-rule {
   position: relative; height: 9px; margin: 6px 0 4px;
+  /* drawn: a horizon's rule and its ten ticks, hairlines of the edge ink */
   background:
     linear-gradient(var(--color-edge-strong), var(--color-edge-strong)) 0 4.25px / 100% 0.5px no-repeat,
     repeating-linear-gradient(90deg, transparent 0 calc(10% - 0.5px), var(--color-edge-strong) calc(10% - 0.5px) 10%) 0 1.5px / 100% 6px no-repeat;
@@ -109,12 +124,15 @@ html[data-room='me'] .me-hz-rule {
 html[data-room='me'] .me-hz-rule i {
   position: absolute; left: 0; right: 0; top: 3px; height: 3px;
   transform: scaleX(var(--f, 0)); transform-origin: 0 50%;
-  animation: me-fill 600ms var(--ease-ink) 160ms backwards;
+  animation: me-fill var(--motion-long) var(--ease-ink) 160ms backwards;
 }
-html[data-room='me'] .me-hz-rule .me-hz-fill { background: linear-gradient(90deg, color-mix(in srgb, var(--color-gold) 78%, var(--color-ink)), var(--color-gold)); }
+html[data-room='me'] .me-hz-rule .me-hz-fill {
+  /* bokashi: atenashi — a horizon's earned fill — brush: the house gold drawn along the rule, deepest where it began */
+  background: linear-gradient(90deg, color-mix(in srgb, var(--gold) 70%, var(--color-ink)), var(--tone-gold));
+}
 html[data-room='me'] .me-hz-rule .me-hz-met { top: 3.5px; height: 2px; background: color-mix(in srgb, var(--color-gold) 28%, transparent); }
 @keyframes me-fill { from { transform: scaleX(0); } }
-html[data-room='me'] .me-hz-sub { margin: 0; font-size: 11px; line-height: 1.5; letter-spacing: 0.05em; color: var(--color-muted); }
+html[data-room='me'] .me-hz-sub { margin: 0; font-size: var(--type-caption); line-height: 1.5; letter-spacing: 0.05em; color: var(--color-muted); }
 html[data-room='me'] body.ui-bi .me-hz-sub { text-transform: uppercase; }
 html[data-room='me'] .me-hz.not-begun .me-hz-name { color: var(--color-ink-2); }
 html[data-room='me'] .me-settle .me-hz-rule i { animation-delay: 0ms; }
@@ -124,7 +142,7 @@ html[data-room='me'] .me-settle .me-hz-rule i { animation-delay: 0ms; }
 html[data-room='me'] .me-n1 {
   margin: var(--space-3) 0 var(--space-5);
   padding: 14px 14px 2px;
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   background: color-mix(in srgb, var(--color-ink) 3.5%, var(--color-surface));
   box-shadow:
     inset 0 0 0 var(--stroke-hairline) var(--color-edge-strong),
@@ -135,14 +153,15 @@ html[data-room='me'] .me-n1-head { display: flex; align-items: center; gap: 10px
 html[data-room='me'] .me-n1-seal {
   display: inline-grid; place-items: center;
   min-width: 34px; height: 26px; padding: 0 6px;
-  border-radius: 2px;
+  border-radius: var(--radius-seal);
   background: var(--color-ink);
   color: var(--color-surface);
-  font: 800 15px/1 var(--font-headword);
+  font: 800 var(--type-control)/1 var(--font-headword);
   letter-spacing: 0.04em;
 }
 html[data-room='me'] .me-n1-when {
-  font: 600 12px/1 var(--font-data);
+  font: 600 var(--type-caption)/1 var(--font-ui);
+  font-variant-numeric: tabular-nums;
   letter-spacing: 0.12em;
   color: var(--color-ink);
 }
@@ -153,16 +172,17 @@ html[data-room='me'] .me-n1-count {
   color: var(--color-ink);
 }
 html[data-room='me'] .me-n1-days {
-  font: 800 48px/0.95 var(--font-headword);
+  font: 800 calc(var(--type-headword) * 1.25)/0.95 var(--font-headword);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
 }
-html[data-room='me'] .me-n1-unit { font: 600 15px/1.2 var(--font-ui); color: var(--color-ink-2); }
-html[data-room='me'] body:not(.ui-bi) .me-n1-unit { font: 800 17px/1.2 var(--font-headword); }
-html[data-room='me'] .me-n1-count.is-done .me-n1-unit { font: 800 20px/1.25 var(--font-headword); color: var(--color-ink); }
+html[data-room='me'] .me-n1-unit { font: 600 var(--type-control)/1.2 var(--font-ui); color: var(--color-ink-2); }
+html[data-room='me'] body:not(.ui-bi) .me-n1-unit { font: 800 var(--type-lead)/1.2 var(--font-headword); }
+html[data-room='me'] .me-n1-count.is-done .me-n1-unit { font: 800 var(--type-reading)/1.25 var(--font-headword); color: var(--color-ink); }
 html[data-room='me'] .me-n1-date {
   margin: 8px 0 0;
-  font: 400 11px/1.5 var(--font-data);
+  font: 400 var(--type-caption)/1.5 var(--font-ui);
+  font-variant-numeric: tabular-nums;
   letter-spacing: 0.05em;
   color: var(--color-muted);
 }
@@ -174,15 +194,15 @@ html[data-room='me'] .me-n1 .me-hz {
 }
 html[data-room='me'] .me-hz-group {
   margin: var(--space-4) 0 0;
-  font: 600 11px/1.2 var(--font-ui);
+  font: 600 var(--type-caption)/1.2 var(--font-ui);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--color-muted);
 }
-html[data-room='me'] body:not(.ui-bi) .me-hz-group { letter-spacing: 0.24em; font-size: 12px; text-transform: none; }
+html[data-room='me'] body:not(.ui-bi) .me-hz-group { letter-spacing: 0.24em; font-size: var(--type-caption); text-transform: none; }
 html[data-room='me'] .me-hz-note {
   margin: 3px 0 0;
-  font: 400 13px/1.45 var(--font-reading);
+  font: 400 var(--type-label)/1.45 var(--font-reading);
   color: var(--color-ink-2);
   text-wrap: pretty;
 }
@@ -209,13 +229,13 @@ html[data-room='me'] .me-home {
   display: grid; grid-template-columns: auto minmax(40px, 1fr) auto; align-items: center; gap: var(--space-3);
   padding: var(--space-3) 0;
   border-bottom: var(--stroke-hairline) solid var(--color-line);
-  animation: me-rise 360ms var(--ease-enter) backwards;
+  animation: me-rise var(--motion-sheet) var(--ease-enter) backwards;
   animation-delay: min(240ms, calc(80ms + var(--i, 0) * 40ms));
 }
 html[data-room='me'] .me-home:last-child { border-bottom: 0; }
 html[data-room='me'] .me-home-w { display: grid; gap: 1px; }
-html[data-room='me'] .me-home-surface { font: 800 26px/1.15 var(--font-headword); letter-spacing: 0.04em; }
-html[data-room='me'] .me-home-r { font: 400 11.5px/1.3 var(--font-reading); letter-spacing: 0.1em; color: var(--color-muted); }
+html[data-room='me'] .me-home-surface { font: 800 var(--type-section)/1.15 var(--font-headword); letter-spacing: 0.04em; }
+html[data-room='me'] .me-home-r { font: 400 var(--type-caption)/1.3 var(--font-reading); letter-spacing: 0.1em; color: var(--color-muted); }
 html[data-room='me'] .me-home-seam { position: relative; display: block; height: 18px; overflow: hidden; }
 html[data-room='me'] .me-seam { display: block; width: 100%; height: 100%; overflow: visible; }
 html[data-room='me'] .me-seam path {
@@ -226,22 +246,23 @@ html[data-room='me'] .me-seam .me-seam-branch { stroke-width: 1.1; }
 /* the seam catches the light once: a glint travels its length */
 html[data-room='me'] .me-gleam {
   position: absolute; top: 0; bottom: 0; left: 0; width: 28%;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, #fff 70%, var(--color-gold)) 50%, transparent);
+  /* bokashi: emitted — the seam's glint — light: the world's raised paper lit with the house gold, travelling once */
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--tone-raised) 70%, var(--gold)) 50%, transparent);
   opacity: 0; pointer-events: none;
-  animation: me-gleam 340ms var(--ease-ink) backwards;
+  animation: me-gleam var(--motion-sheet) var(--ease-ink) backwards;
   animation-delay: min(240ms, calc(120ms + var(--i, 0) * 40ms));
 }
 @keyframes me-gleam { 0% { opacity: 0; transform: translateX(-100%); } 30% { opacity: 0.9; } 100% { opacity: 0; transform: translateX(380%); } }
 html[data-room='me'] .me-home .me-gleam { animation-delay: min(240ms, calc(160ms + var(--i, 0) * 40ms)); }
-html[data-room='me'] .me-home-when { display: grid; justify-items: end; gap: 2px; font-size: 11px; line-height: 1.35; letter-spacing: 0.04em; color: var(--color-muted); white-space: nowrap; }
+html[data-room='me'] .me-home-when { display: grid; justify-items: end; gap: 2px; font-size: var(--type-caption); line-height: 1.35; letter-spacing: 0.04em; color: var(--color-muted); white-space: nowrap; }
 html[data-room='me'] .me-home-when b { color: var(--color-gold); font-weight: 700; }
 @keyframes me-rise { from { opacity: 0.01; transform: translateY(6px); } }
 
 /* the seal calendar: a 朱 seal carrying 習 or 読 on every day practised */
 html[data-room='me'] .me-month { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; }
 html[data-room='me'] .me-month-title { margin: 0; display: flex; justify-content: center; align-items: baseline; gap: 8px; }
-html[data-room='me'] .me-month-name { font: 800 24px/1.1 var(--font-headword); }
-html[data-room='me'] .me-month-year { font: 500 12px/1 var(--font-data); color: var(--color-muted); letter-spacing: 0.08em; }
+html[data-room='me'] .me-month-name { font: 800 var(--type-section)/1.1 var(--font-headword); }
+html[data-room='me'] .me-month-year { font: 500 var(--type-caption)/1 var(--font-ui); font-variant-numeric: tabular-nums; color: var(--color-muted); letter-spacing: 0.08em; }
 html[data-room='me'] .me-turn {
   width: 44px; height: 44px; display: grid; place-items: center; padding: 0;
   border: 0; background: transparent; color: var(--color-ink-2); border-radius: var(--radius-control); cursor: pointer;
@@ -254,24 +275,24 @@ html[data-room='me'] .me-turn-on::before { transform: translateX(-2px) rotate(-1
 html[data-room='me'] .me-turn:disabled { opacity: 0.25; cursor: default; }
 html[data-room='me'] .me-turn:not(:disabled):hover { background: var(--color-fill); }
 html[data-room='me'] :is(.me-dow, .me-cal) { display: grid; grid-template-columns: repeat(7, 1fr); }
-html[data-room='me'] .me-dow { margin: var(--space-2) 0 4px; text-align: center; font: 500 10px/1 var(--font-data); letter-spacing: 0.08em; color: var(--color-muted); }
+html[data-room='me'] .me-dow { margin: var(--space-2) 0 4px; text-align: center; font: 500 var(--type-caption)/1 var(--font-ui); letter-spacing: 0.08em; color: var(--color-muted); }
 html[data-room='me'] .me-cal { gap: 4px; }
 html[data-room='me'] .me-day {
   position: relative; display: block; aspect-ratio: 1; font-style: normal;
   box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-line);
 }
 html[data-room='me'] .me-day.blank { box-shadow: none; }
-html[data-room='me'] .me-day-n { position: absolute; left: 3px; top: 2px; z-index: 2; font: 400 8.5px/1 var(--font-data); color: var(--color-muted); }
+html[data-room='me'] .me-day-n { position: absolute; left: 3px; top: 2px; z-index: 2; font: 400 var(--type-caption)/1 var(--font-ui); font-variant-numeric: tabular-nums; color: var(--color-muted); }
 html[data-room='me'] .me-seal {
   position: absolute; inset: 24% 16% 14% 20%; display: grid; place-items: center;
-  border-radius: 3px;
+  border-radius: var(--radius-seal);
   background: var(--color-seal);
   color: var(--color-surface);
-  font: 800 clamp(13px, 4.2vw, 17px)/1 var(--font-headword);
+  font: 800 var(--type-body)/1 var(--font-headword);
   box-shadow: inset 0 0 0 1.25px var(--color-surface), inset 0 0 0 2.5px var(--color-seal);
   opacity: 0.92;
   transform: rotate(-4deg);
-  animation: me-stamp 200ms cubic-bezier(0.3, 1.4, 0.5, 1) backwards;
+  animation: me-stamp var(--motion-standard) var(--ease-enter) backwards;
   animation-delay: min(240ms, calc(80ms + var(--i, 0) * 14ms));
 }
 html[data-room='me'] .me-day.seal:nth-child(3n) .me-seal { transform: rotate(3deg); }
@@ -280,13 +301,13 @@ html[data-room='me'] .me-day.seal-read .me-seal { background: transparent; color
 @keyframes me-stamp { from { opacity: 0; transform: scale(1.3) rotate(-4deg); } }
 html[data-room='me'] .me-day.is-today { box-shadow: inset 0 0 0 1.5px var(--color-live); }
 html[data-room='me'] .me-day.is-today .me-day-n { color: var(--color-live); font-weight: 700; }
-html[data-room='me'] .me-cal-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin: var(--space-3) 0 0; font-size: 11px; letter-spacing: 0.05em; color: var(--color-muted); }
+html[data-room='me'] .me-cal-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin: var(--space-3) 0 0; font-size: var(--type-caption); letter-spacing: 0.05em; color: var(--color-muted); }
 html[data-room='me'] .me-key { display: inline-flex; align-items: center; gap: 6px; }
-html[data-room='me'] .me-key-seal { width: 16px; height: 16px; display: grid; place-items: center; border-radius: 2px; background: var(--color-seal); color: var(--color-surface); font: 800 10px/1 var(--font-headword); }
+html[data-room='me'] .me-key-seal { width: 16px; height: 16px; display: grid; place-items: center; border-radius: var(--radius-seal); background: var(--color-seal); color: var(--color-surface); font: 800 var(--type-caption)/1 var(--font-headword); }
 html[data-room='me'] .me-key-seal.read { background: transparent; color: var(--color-seal); box-shadow: inset 0 0 0 1px var(--color-seal); }
 html[data-room='me'] .me-cal-count { margin-left: auto; color: var(--color-ink-2); }
-html[data-room='me'] .me-seals.turned-back .me-cal { animation: me-turn-back 300ms var(--ease-enter) backwards; transform-origin: 100% 50%; }
-html[data-room='me'] .me-seals.turned-on .me-cal { animation: me-turn-on 300ms var(--ease-enter) backwards; transform-origin: 0 50%; }
+html[data-room='me'] .me-seals.turned-back .me-cal { animation: me-turn-back var(--motion-sheet) var(--ease-enter) backwards; transform-origin: 100% 50%; }
+html[data-room='me'] .me-seals.turned-on .me-cal { animation: me-turn-on var(--motion-sheet) var(--ease-enter) backwards; transform-origin: 0 50%; }
 @keyframes me-turn-back { from { opacity: 0.01; transform: perspective(900px) rotateY(50deg); } }
 @keyframes me-turn-on { from { opacity: 0.01; transform: perspective(900px) rotateY(-50deg); } }
 html[data-room='me'] .me-seals:is(.turned-back, .turned-on) .me-seal { animation-delay: min(240ms, calc(80ms + var(--i, 0) * 14ms)); }
@@ -294,11 +315,11 @@ html[data-room='me'] .me-seals:is(.turned-back, .turned-on) .me-seal { animation
 /* a line you wrote by hand */
 html[data-room='me'] .me-hand {
   margin: var(--space-1) 0 var(--space-2);
-  font: 400 22px/1.8 var(--font-brush);
+  font: 400 var(--type-reading)/1.8 var(--font-brush);
   color: var(--color-ink);
   line-break: strict; overflow-wrap: anywhere;
 }
-html[data-room='me'] .me-line-src { margin: 0; font-size: 11px; letter-spacing: 0.05em; color: var(--color-muted); }
+html[data-room='me'] .me-line-src { margin: 0; font-size: var(--type-caption); letter-spacing: 0.05em; color: var(--color-muted); }
 html[data-room='me'] .me-line-title { font-family: var(--font-reading); letter-spacing: 0.04em; color: var(--color-ink-2); }
 
 /* contents and the back of the book: ruled rows, not cards */
@@ -307,40 +328,43 @@ html[data-room='me'] body.v-depth-layered #app .me-book .foundation-door {
   min-height: 50px; padding: 0 2px; margin: 0;
   background: transparent; border: 0; border-radius: 0; box-shadow: none;
   border-bottom: var(--stroke-hairline) solid var(--color-line);
-  font: 500 15px/1.3 var(--font-ui);
+  font: 500 var(--type-control)/1.3 var(--font-ui);
 }
-html[data-room='me'] body:not(.ui-bi) .me-book .foundation-door { font: 800 15px/1.3 var(--font-headword); letter-spacing: 0.06em; }
+html[data-room='me'] body:not(.ui-bi) .me-book .foundation-door { font: 800 var(--type-control)/1.3 var(--font-headword); letter-spacing: 0.06em; }
 html[data-room='me'] body.v-depth-layered #app .me-book .foundation-door:hover { background: var(--color-fill); }
 html[data-room='me'] .me-set {
   display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
   min-height: 60px; border-bottom: var(--stroke-hairline) solid var(--color-line);
 }
-html[data-room='me'] .me-set-l { font: 500 15px/1.3 var(--font-ui); }
-html[data-room='me'] body:not(.ui-bi) .me-set-l { font: 800 15px/1.3 var(--font-headword); letter-spacing: 0.06em; }
-html[data-room='me'] .me-seg { display: inline-flex; flex: none; padding: 2px; border-radius: 8px; box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-edge-strong); }
+html[data-room='me'] .me-set-l { font: 500 var(--type-control)/1.3 var(--font-ui); }
+html[data-room='me'] body:not(.ui-bi) .me-set-l { font: 800 var(--type-control)/1.3 var(--font-headword); letter-spacing: 0.06em; }
+html[data-room='me'] .me-seg { display: inline-flex; flex: none; padding: 2px; border-radius: var(--radius-control); box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-edge-strong); }
 html[data-room='me'] .me-seg button {
-  min-width: 60px; min-height: 44px; padding: 0 12px; border: 0; border-radius: 6px;
-  background: transparent; color: var(--color-ink-2); font: 500 14px/1 var(--font-ui); cursor: pointer;
+  min-width: 60px; min-height: 44px; padding: 0 12px; border: 0; border-radius: var(--radius-control);
+  background: transparent; color: var(--color-ink-2); font: 500 var(--type-chrome)/1 var(--font-ui); cursor: pointer;
 }
 html[data-room='me'] .me-seg button[lang='ja'] { font-family: var(--font-headword); font-weight: 800; }
 html[data-room='me'] .me-seg button[aria-pressed='true'] { background: var(--color-ink); color: var(--color-surface); font-weight: 700; }
 
 /* night: a lamp-lit book on 藍 — the page glows warm at the top right, the gold is lit */
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='me'] .me-book {
+  /* bokashi: urushi — the Me book at night — light: the lamp's gold on the page's shoulder, its foot sinking toward the world's deepest coat */
   background:
-    radial-gradient(110% 40% at 96% 0%, color-mix(in srgb, var(--color-gold) 15%, transparent), transparent 72%),
-    radial-gradient(90% 50% at 0% 100%, rgb(0 0 0 / 22%), transparent 70%),
-    var(--color-surface);
+    radial-gradient(110% 40% at 96% 0%, color-mix(in srgb, var(--tone-gold) 15%, transparent), transparent 72%),
+    radial-gradient(90% 50% at 0% 100%, color-mix(in srgb, var(--tone-shade) 30%, transparent), transparent 70%),
+    var(--tone-sheen);
   box-shadow: inset 0 0 0 var(--stroke-hairline) color-mix(in srgb, var(--color-gold) 24%, transparent), inset 0 1px 0 rgb(255 255 255 / 5%), 0 24px 60px -18px rgb(0 0 0 / 70%);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='me'] .me-spine {
+  /* bokashi: urushi — the book's spine at night — depth: the fold sinking a breath toward the world's deepest coat; the stab holes drawn into it */
   background:
-    radial-gradient(circle at 8px 50%, rgb(0 0 0 / 60%) 1.6px, transparent 2.2px) 0 26px / 16px 76px repeat-y,
-    linear-gradient(90deg, rgb(0 0 0 / 30%), transparent 80%);
+    radial-gradient(circle at 8px 50%, color-mix(in srgb, var(--tone-shade) 80%, transparent) 1.6px, transparent 2.2px) 0 26px / 16px 76px repeat-y,
+    linear-gradient(90deg, color-mix(in srgb, var(--tone-shade) 22%, transparent), transparent 80%);
   border-right-color: color-mix(in srgb, var(--color-gold) 32%, transparent);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='me'] .me-edges {
-  background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--color-gold) 30%, var(--color-surface)) 0 1px, rgb(0 0 0 / 40%) 1px 1.5px);
+  /* drawn: the page edges at night — gilt hairlines on the sheen, the deepest coat between them */
+  background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--tone-gold) 30%, var(--tone-sheen)) 0 1px, color-mix(in srgb, var(--tone-shade) 60%, transparent) 1px 1.5px);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='me'] .me-hz-rule .me-hz-fill {
   background: var(--color-gold);
@@ -366,26 +390,30 @@ html[data-room='me'] .me-seg button[aria-pressed='true'] { background: var(--col
 
 /* settings: the back pages of the same book */
 html[data-room='settings'] main .me-kicker { margin: 0 0 var(--space-2); }
-html[data-room='settings'] main > .view-title { font: 800 clamp(28px, 8vw, 36px)/1.1 var(--font-headword); }
+html[data-room='settings'] main > .view-title { font: 800 var(--type-display)/1.1 var(--font-headword); }
 html[data-room='settings'] main .foundation-section { padding-top: var(--space-3); }
 
 html[data-room='settings'] main :is(.settings-language, .settings-layout-choice) {
-  display: inline-flex; padding: 2px; border: 0; border-radius: 8px; background: transparent;
+  display: inline-flex; padding: 2px; border: 0; border-radius: var(--radius-control); background: transparent;
   box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-edge-strong);
 }
 html[data-room='settings'] main :is(.settings-language, .settings-layout-choice) button {
-  min-width: 72px; min-height: 44px; padding: 0 14px; border: 0; border-radius: 6px;
-  background: transparent; color: var(--color-ink-2); font: 500 14px/1 var(--font-ui);
+  min-width: 72px; min-height: 44px; padding: 0 14px; border: 0; border-radius: var(--radius-control);
+  background: transparent; color: var(--color-ink-2); font: 500 var(--type-chrome)/1 var(--font-ui);
 }
 html[data-room='settings'] main :is(.settings-language, .settings-layout-choice) button[aria-pressed='true'] { background: var(--color-ink); color: var(--color-surface); font-weight: 700; }
+/* G4 · 筆 and 声: two named rows of the same segmented choice as the language and the layout */
+html[data-room='settings'] main .settings-writing-row { display: grid; justify-items: start; gap: var(--space-2); margin: var(--space-3) 0 0; }
+html[data-room='settings'] main .settings-writing-name { margin: 0; font: 600 var(--type-control)/1.4 var(--font-ui); color: var(--color-ink); }
+html[data-room='settings'] main .settings-writing-choice { flex-wrap: wrap; }
 html[data-room='settings'] main > .foundation-doors { margin-top: var(--space-4); gap: 0; border-top: var(--stroke-hairline) solid var(--color-edge-strong); }
 html[data-room='settings'] body.v-depth-layered #app main > .foundation-doors .foundation-door {
   min-height: 54px; padding: 0 2px; margin: 0;
   background: transparent; border: 0; border-radius: 0; box-shadow: none;
   border-bottom: var(--stroke-hairline) solid var(--color-line);
-  font: 500 16px/1.3 var(--font-ui);
+  font: 500 var(--type-body)/1.3 var(--font-ui);
 }
-html[data-room='settings'] body:not(.ui-bi) #app main > .foundation-doors .foundation-door { font: 800 16px/1.3 var(--font-headword); letter-spacing: 0.06em; }
+html[data-room='settings'] body:not(.ui-bi) #app main > .foundation-doors .foundation-door { font: 800 var(--type-body)/1.3 var(--font-headword); letter-spacing: 0.06em; }
 html[data-room='settings'] body.v-depth-layered #app main > .foundation-doors .foundation-door:hover { background: var(--color-fill); }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='settings'] main :is(.settings-language, .settings-layout-choice) button[aria-pressed='true'] {
   background: transparent; color: var(--color-ink);
@@ -401,25 +429,21 @@ html[data-room='progress'] main .stats-cell {
   border-bottom: var(--stroke-hairline) solid var(--color-line);
 }
 html[data-room='progress'] main .stats-cell:not(:nth-child(3n + 1)) { border-left: var(--stroke-hairline) solid var(--color-line); }
-html[data-room='progress'] main .stats-n { font: 700 26px/1.1 var(--font-data); color: var(--color-ink); }
+html[data-room='progress'] main .stats-n { font: 700 var(--type-section)/1.1 var(--font-data); color: var(--color-ink); }
 html[data-room='progress'] main .s-learn .stats-n { color: var(--color-seal); }
 html[data-room='progress'] main .s-mature .stats-n { color: var(--color-gold); }
-html[data-room='progress'] main .stats-l { margin-top: 2px; font-size: 11.5px; letter-spacing: 0.04em; color: var(--color-muted); }
+html[data-room='progress'] main .stats-l { margin-top: 2px; font-size: var(--type-caption); letter-spacing: 0.04em; color: var(--color-muted); }
 html[data-room='progress'] main .stats-bars { gap: 3px; border-bottom-color: var(--color-edge-strong); }
-html[data-room='progress'] main .stats-col i { border-radius: 1px 1px 0 0; background: color-mix(in srgb, var(--color-gold) 85%, var(--color-ink)); }
+html[data-room='progress'] main .stats-col i { border-radius: var(--radius-seal) var(--radius-seal) 0 0; background: color-mix(in srgb, var(--color-gold) 85%, var(--color-ink)); }
 html[data-room='progress'] main .stats-bars.ahead .stats-col i { background: color-mix(in srgb, var(--color-accent) 12%, transparent); box-shadow: inset 0 0 0 1px var(--color-accent); }
 html[data-room='progress'] main :is(.stats-axis, .stats-today, .stats-retention) { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
-html[data-room='progress'] main .stats-axis { font-size: 11px; letter-spacing: 0.05em; color: var(--color-muted); }
-html[data-room='progress'] main :is(.stats-today, .stats-retention) { font-size: 14px; line-height: 1.6; color: var(--color-ink-2); }
-html[data-room='progress'] main .kagami-cell { border-radius: 2px; border-color: var(--color-edge-strong); }
+html[data-room='progress'] main .stats-axis { font-size: var(--type-caption); letter-spacing: 0.05em; color: var(--color-muted); }
+html[data-room='progress'] main :is(.stats-today, .stats-retention) { font-size: var(--type-chrome); line-height: 1.6; color: var(--color-ink-2); }
+html[data-room='progress'] main .kagami-cell { border-radius: var(--radius-seal); border-color: var(--color-edge-strong); }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='progress'] main .stats-col i { background: var(--color-gold); box-shadow: 0 0 6px -2px var(--color-gold); }
 
-@media (prefers-reduced-motion: reduce) {
-  html[data-room='me'] :is(.me-hz-rule i, .me-gleam) { animation: none !important; }
-  html[data-room='me'] #app :is(.me-book, .me-home, .me-seal, .me-cal) { animation: me-fade 80ms linear backwards !important; }
-}
-
-@keyframes me-fade { from { opacity: 0; } to { opacity: 1; } }
 
 /* round 4 review (D5): the fields deck's "not begun" is said once, under the group's name */
 html[data-room='me'] .me-hz-group-note { margin: 4px 0 2px; }
+/* Q · a goal not begun says so in a plain sentence, in the house voice: never set in capitals and tracked like a figure */
+html[data-room='me'] body .me-hz-sub.is-sentence { font: 400 var(--type-chrome)/1.5 var(--font-ui); letter-spacing: 0.01em; text-transform: none; color: var(--color-ink-2); }

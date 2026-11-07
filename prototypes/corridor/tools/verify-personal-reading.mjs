@@ -13,6 +13,7 @@ import { readAppRecord } from './record-test-support.mjs';
 // An explicit external driver allows a browser-engine regression to be checked
 // without silently changing the application or the workspace dependency graph.
 const driverModule = process.env.KAIRO_PLAYWRIGHT_MODULE || 'playwright-core';
+const driverUrl = import.meta.resolve(driverModule);
 const { chromium, webkit } = await import(driverModule);
 
 const out = resolve(process.env.KAIRO_EVIDENCE_DIR || resolve(homedir(), '.dharma/bunki_audit/personal-reading'));
@@ -224,7 +225,7 @@ try {
 const failures = results.filter((result) => !result.pass).length;
 writeFileSync(resolve(out, 'receipt.json'), `${JSON.stringify({
   site: CORRIDOR_DIR,
-  browser: { name: browserName, version: browserVersion, driverModule },
+  browser: { name: browserName, version: browserVersion, driverModule, driverUrl },
   corridorSha256: createHash('sha256').update(runtimeBytes).digest('hex'),
   counterfactualSource: process.env.KAIRO_PERSONAL_READING_SOURCE || null,
   controllerSha256: createHash('sha256').update(readFileSync(resolve(CORRIDOR_DIR, 'reading-controller.mjs'))).digest('hex'),

@@ -91,3 +91,7 @@ reports/
 # picks, cuts, picture briefs and a hand-tick page reviewed as committed.
 # Reformatting would churn a review artefact other agents are still reading.
 docs/content/library-candidates-2026-10-03/
+
+# Governed source documents retain their reviewed text (FULL preflight ruling).
+docs/design/CONTINUITY_CONTRACT_2026-10-15.md
+docs/operator/VOICE_LOCK.md

@@ -189,6 +189,11 @@ for (const change of ['unchanged', 'pending', 'published-same-text-revision']) t
       const plainRecord = value => value !== null && typeof value === 'object' && !Array.isArray(value);
       const boundedImportValue = () => true, flushRecordDrafts = () => sentenceDraftController.flush();
       const recordApp = { exportBackup: ports.exportBackup };
+      // K (15817946): an export is a read that this window may make while it owns the recovered record and no import is
+      // crossing (recordExportable, asked before and after the snapshot): the staged functions, on this fixture's state
+      const recordOwner = true, recordRecovered = true, recordDeparted = false, staleTab = false, storeSealed = false;
+      ${extract('function recordReady(', 'function recordWritable(')}
+      ${extract('function recordExportable(', '/** Why a record room cannot write')}
       ${extract('function canonicalRecordJson(', 'function validArchiveTurn(')}
       ${extract('function recordDraftsSettled(', 'function preserveVisibleDrafts(')}
       ${extract('async function buildExportRecord(', 'const AI_EVIDENCE_ROLES')}

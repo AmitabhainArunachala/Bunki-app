@@ -1,0 +1,729 @@
+{
+  "provenance": {
+    "meaning": "teacher-drafts rows modelled on a real full producer receipt. Every row keeps that run's real keys and values except observations of non-delayed cases (reduced to their real names) and transport calls (reduced to identity/status/reply). The real receipt recorded observations: [] for both delayed cases (the false reject). Their two observations each are written in the current producer shape from the real snapshot files listed; values named under modelled were not separately recorded by that run.",
+    "receipt": {
+      "file": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/G6/codex-build/release-battery-17/teacher-drafts-integration/receipt.json",
+      "sha256": "c320aada1ff9b1ac24b55c1de9d0da8b123b11221e939ee95244817d568c6a16",
+      "suite": "teacher-drafts",
+      "mode": "full",
+      "engines": ["chromium"],
+      "browserVersions": {
+        "chromium": "153.0.8010.12"
+      },
+      "artifactSha256": "a57ba3f5744c11987c5bfa2a1518499dc5ab65539e20411c855a6c8e71c3803b",
+      "verifierSha256": "3a5efa56ab4930eb23a6249e006d2551800e69a56001123fa7dab376ce0feb93",
+      "startedAt": "2026-10-18T11:50:56.351Z"
+    },
+    "realEmptyObservationRows": [
+      "chromium/synthetic-delayed-success-preserves-newer-text-and-deliberate-empty",
+      "chromium/synthetic-delayed-error-preserves-newer-text-and-deliberate-empty"
+    ],
+    "alsoConfirmedEmpty": [
+      {
+        "file": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/HFIX1/B/runs/site-1/teacher-drafts-chromium/receipt.json",
+        "sha256": "07f8758330b35c9f76b62209351d45ab401ad967eff7f58a9a58446a68defdcd",
+        "engines": ["chromium"],
+        "verifierSha256": "319aecb2428b8db664ac17ad30a36a2d59acdf76b90fa18a36118e7d9e4a2619",
+        "emptyObservationRows": [
+          "chromium/synthetic-delayed-success-preserves-newer-text-and-deliberate-empty",
+          "chromium/synthetic-delayed-error-preserves-newer-text-and-deliberate-empty"
+        ]
+      },
+      {
+        "file": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/HFIX1/B/runs/site-1/teacher-drafts-webkit/receipt.json",
+        "sha256": "e73676d52e195cf96a881c078db2d9635b540c116dca0bd96474e34ebdcb3bd8",
+        "engines": ["webkit"],
+        "verifierSha256": "319aecb2428b8db664ac17ad30a36a2d59acdf76b90fa18a36118e7d9e4a2619",
+        "emptyObservationRows": [
+          "webkit/synthetic-delayed-success-preserves-newer-text-and-deliberate-empty",
+          "webkit/synthetic-delayed-error-preserves-newer-text-and-deliberate-empty"
+        ]
+      }
+    ],
+    "snapshots": [
+      {
+        "case": "synthetic-delayed-success-preserves-newer-text-and-deliberate-empty",
+        "label": "outbound-1",
+        "file": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/G6/codex-build/release-battery-17/teacher-drafts-integration/chromium/synthetic-delayed-success-preserves-newer-text-and-deliberate-empty/outbound-1.json",
+        "sha256": "b4bc0b800cb1428398525f1cc87dc946b077b5902df1bd590abd5cb41f6ecaf3"
+      },
+      {
+        "case": "synthetic-delayed-success-preserves-newer-text-and-deliberate-empty",
+        "label": "newer-edited-while-reply-pending",
+        "file": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/G6/codex-build/release-battery-17/teacher-drafts-integration/chromium/synthetic-delayed-success-preserves-newer-text-and-deliberate-empty/newer-edited-while-reply-pending.json",
+        "sha256": "61be7e2ff1ec012afea835370c7661a882880088abb7526c699d735afc559ee5"
+      },
+      {
+        "case": "synthetic-delayed-success-preserves-newer-text-and-deliberate-empty",
+        "label": "newer-after-delayed-success",
+        "file": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/G6/codex-build/release-battery-17/teacher-drafts-integration/chromium/synthetic-delayed-success-preserves-newer-text-and-deliberate-empty/newer-after-delayed-success.json",
+        "sha256": "93dce535086d86d24af415b01004063282d472e6904f3eecfac20a3c0cba7bac"
+      },
+      {
+        "case": "synthetic-delayed-success-preserves-newer-text-and-deliberate-empty",
+        "label": "newer-after-clean-restart",
+        "file": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/G6/codex-build/release-battery-17/teacher-drafts-integration/chromium/synthetic-delayed-success-preserves-newer-text-and-deliberate-empty/newer-after-clean-restart.json",
+        "sha256": "8edcf989195e3a8de8e588412661937d063965bf45289c10f4cf0c8f33f0d6b6"
+      },
+      {
+        "case": "synthetic-delayed-success-preserves-newer-text-and-deliberate-empty",
+        "label": "outbound-2",
+        "file": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/G6/codex-build/release-battery-17/teacher-drafts-integration/chromium/synthetic-delayed-success-preserves-newer-text-and-deliberate-empty/outbound-2.json",
+        "sha256": "882d880f0b2c163e0d8cf43b080b4449359e8d42b55a286c5f91e701c6368c6d"
+      },
+      {
+        "case": "synthetic-delayed-success-preserves-newer-text-and-deliberate-empty",
+        "label": "empty-edited-while-reply-pending",
+        "file": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/G6/codex-build/release-battery-17/teacher-drafts-integration/chromium/synthetic-delayed-success-preserves-newer-text-and-deliberate-empty/empty-edited-while-reply-pending.json",
+        "sha256": "220fee176b409c6b144c9a387676b86480d3878b967ecb29acc28b57a75083d3"
+      },
+      {
+        "case": "synthetic-delayed-success-preserves-newer-text-and-deliberate-empty",
+        "label": "empty-after-delayed-success",
+        "file": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/G6/codex-build/release-battery-17/teacher-drafts-integration/chromium/synthetic-delayed-success-preserves-newer-text-and-deliberate-empty/empty-after-delayed-success.json",
+        "sha256": "9a17defc001b84a11ce8468478ead2daf30d43aec31febb344dd12166aebbedd"
+      },
+      {
+        "case": "synthetic-delayed-success-preserves-newer-text-and-deliberate-empty",
+        "label": "empty-after-clean-restart",
+        "file": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/G6/codex-build/release-battery-17/teacher-drafts-integration/chromium/synthetic-delayed-success-preserves-newer-text-and-deliberate-empty/empty-after-clean-restart.json",
+        "sha256": "9a17defc001b84a11ce8468478ead2daf30d43aec31febb344dd12166aebbedd"
+      },
+      {
+        "case": "synthetic-delayed-error-preserves-newer-text-and-deliberate-empty",
+        "label": "outbound-1",
+        "file": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/G6/codex-build/release-battery-17/teacher-drafts-integration/chromium/synthetic-delayed-error-preserves-newer-text-and-deliberate-empty/outbound-1.json",
+        "sha256": "bccc7f26a55d54b28e18efd563377d5e4a08afa06689cb66bfbf4354ba149290"
+      },
+      {
+        "case": "synthetic-delayed-error-preserves-newer-text-and-deliberate-empty",
+        "label": "newer-after-delayed-provider-error",
+        "file": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/G6/codex-build/release-battery-17/teacher-drafts-integration/chromium/synthetic-delayed-error-preserves-newer-text-and-deliberate-empty/newer-after-delayed-provider-error.json",
+        "sha256": "9b1b12b5faf591fcd4d0a9b03252c618c84a5b116931aed9ce1b7ee70bd34026"
+      },
+      {
+        "case": "synthetic-delayed-error-preserves-newer-text-and-deliberate-empty",
+        "label": "outbound-2",
+        "file": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/G6/codex-build/release-battery-17/teacher-drafts-integration/chromium/synthetic-delayed-error-preserves-newer-text-and-deliberate-empty/outbound-2.json",
+        "sha256": "43953a13255377b9c2ffa7e6ef3c3f353dc287b68ed75dcf8455e4b44eb67727"
+      },
+      {
+        "case": "synthetic-delayed-error-preserves-newer-text-and-deliberate-empty",
+        "label": "empty-after-delayed-provider-error",
+        "file": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/G6/codex-build/release-battery-17/teacher-drafts-integration/chromium/synthetic-delayed-error-preserves-newer-text-and-deliberate-empty/empty-after-delayed-provider-error.json",
+        "sha256": "af2ff5fb580702889642526b19fb4f17dd77e0d233cef095ae8b1abc9153cf38"
+      }
+    ],
+    "modelled": [
+      "synthetic-delayed-error-preserves-newer-text-and-deliberate-empty/newer: current = the after-error durable draft (the producer asserted its revision equals the newer draft); editorAfterRestart/draftAfterRestart = that current draft (the retained run asserted the restarted editor but took no post-restart snapshot)",
+      "synthetic-delayed-error-preserves-newer-text-and-deliberate-empty/empty: current = the after-error durable draft (the producer asserted its revision equals the newer draft); editorAfterRestart/draftAfterRestart = that current draft (the retained run asserted the restarted editor but took no post-restart snapshot)"
+    ]
+  },
+  "report": {
+    "suite": "teacher-drafts",
+    "version": 1,
+    "pass": true,
+    "mode": "full",
+    "engines": ["chromium"],
+    "browserVersions": {
+      "chromium": "153.0.8010.12"
+    },
+    "artifactSha256": "a57ba3f5744c11987c5bfa2a1518499dc5ab65539e20411c855a6c8e71c3803b",
+    "verifierSha256": "3a5efa56ab4930eb23a6249e006d2551800e69a56001123fa7dab376ce0feb93"
+  },
+  "results": [
+    {
+      "name": "clean-close-before-debounce-general",
+      "engine": "chromium",
+      "pass": true,
+      "elapsedMs": 1673,
+      "phase": "general-recovery-durable",
+      "syntheticProvider": false,
+      "faultCase": false,
+      "browserLaunches": 2,
+      "observations": [
+        {
+          "name": "general-real-browser-close"
+        }
+      ],
+      "errors": [],
+      "transport": {
+        "primary": [],
+        "mining": [],
+        "blocked": [],
+        "preflights": [],
+        "externalRequestsSent": 0
+      }
+    },
+    {
+      "name": "clean-close-before-debounce-selected-context",
+      "engine": "chromium",
+      "pass": true,
+      "elapsedMs": 2424,
+      "phase": "selected-context-recovery-durable",
+      "syntheticProvider": false,
+      "faultCase": false,
+      "browserLaunches": 2,
+      "observations": [
+        {
+          "name": "normal-ui-source-topic"
+        },
+        {
+          "name": "selected-context-real-browser-close"
+        }
+      ],
+      "errors": [],
+      "transport": {
+        "primary": [],
+        "mining": [],
+        "blocked": [],
+        "preflights": [],
+        "externalRequestsSent": 0
+      }
+    },
+    {
+      "name": "committed-topic-drafts-and-deliberate-clear-survive-browser-restart",
+      "engine": "chromium",
+      "pass": true,
+      "elapsedMs": 6921,
+      "phase": "topic-switches-retain-authored-revisions",
+      "syntheticProvider": false,
+      "faultCase": false,
+      "browserLaunches": 2,
+      "observations": [
+        {
+          "name": "normal-ui-source-topic"
+        },
+        {
+          "name": "normal-ui-source-topic"
+        }
+      ],
+      "errors": [],
+      "transport": {
+        "primary": [],
+        "mining": [],
+        "blocked": [],
+        "preflights": [],
+        "externalRequestsSent": 0
+      }
+    },
+    {
+      "name": "synthetic-delayed-success-preserves-newer-text-and-deliberate-empty",
+      "engine": "chromium",
+      "pass": true,
+      "elapsedMs": 6290,
+      "phase": "empty-after-clean-restart",
+      "syntheticProvider": true,
+      "faultCase": false,
+      "browserLaunches": 3,
+      "observations": [
+        {
+          "name": "delayed-success-keeps-current-draft",
+          "label": "newer",
+          "providerStatus": 200,
+          "submitted": {
+            "consumed": false,
+            "contextRef": null,
+            "revision": "854b0847-a6b2-41d5-90be-520492a11ff7",
+            "text": "  Submitted newer question with preserved raw spacing  "
+          },
+          "current": {
+            "consumed": false,
+            "contextRef": null,
+            "revision": "1bab6b32-9a02-4ea8-80f9-db41b594311a",
+            "text": "  Newer same-topic question <猫> é  "
+          },
+          "outboundXid": "xmvdrldci-1",
+          "reply": "Synthetic delayed newer answer.",
+          "outboundReplies": ["Synthetic delayed newer answer."],
+          "editorAfterOutcome": "  Newer same-topic question <猫> é  ",
+          "draftAfterOutcome": {
+            "consumed": false,
+            "contextRef": null,
+            "revision": "1bab6b32-9a02-4ea8-80f9-db41b594311a",
+            "text": "  Newer same-topic question <猫> é  "
+          },
+          "editorAfterRestart": "  Newer same-topic question <猫> é  ",
+          "draftAfterRestart": {
+            "consumed": false,
+            "contextRef": null,
+            "revision": "1bab6b32-9a02-4ea8-80f9-db41b594311a",
+            "text": "  Newer same-topic question <猫> é  "
+          }
+        },
+        {
+          "name": "delayed-success-keeps-current-draft",
+          "label": "empty",
+          "providerStatus": 200,
+          "submitted": {
+            "consumed": false,
+            "contextRef": null,
+            "revision": "bdbc1ba7-3bac-4595-a35e-66a870e500e5",
+            "text": "  Submitted empty question with preserved raw spacing  "
+          },
+          "current": {
+            "consumed": false,
+            "contextRef": null,
+            "revision": "7edb575a-7e28-4900-880d-154ad0b99f5c",
+            "text": ""
+          },
+          "outboundXid": "xmvdrlf90-1",
+          "reply": "Synthetic delayed empty answer.",
+          "outboundReplies": ["Synthetic delayed empty answer."],
+          "editorAfterOutcome": "",
+          "draftAfterOutcome": {
+            "consumed": false,
+            "contextRef": null,
+            "revision": "7edb575a-7e28-4900-880d-154ad0b99f5c",
+            "text": ""
+          },
+          "editorAfterRestart": "",
+          "draftAfterRestart": {
+            "consumed": false,
+            "contextRef": null,
+            "revision": "7edb575a-7e28-4900-880d-154ad0b99f5c",
+            "text": ""
+          }
+        }
+      ],
+      "errors": [],
+      "transport": {
+        "primary": [
+          {
+            "origin": "https://teacher-drafts.synthetic.invalid",
+            "pathname": "/v1/messages",
+            "credential": "synthetic-matched",
+            "contextRef": null,
+            "reply": "Synthetic delayed newer answer.",
+            "status": 200
+          },
+          {
+            "origin": "https://teacher-drafts.synthetic.invalid",
+            "pathname": "/v1/messages",
+            "credential": "synthetic-matched",
+            "contextRef": null,
+            "reply": "Synthetic delayed empty answer.",
+            "status": 200
+          }
+        ],
+        "mining": [
+          {
+            "origin": "https://teacher-drafts.synthetic.invalid",
+            "pathname": "/v1/messages",
+            "credential": "synthetic-matched"
+          },
+          {
+            "origin": "https://teacher-drafts.synthetic.invalid",
+            "pathname": "/v1/messages",
+            "credential": "synthetic-matched"
+          }
+        ],
+        "blocked": [],
+        "preflights": [],
+        "externalRequestsSent": 0
+      }
+    },
+    {
+      "name": "synthetic-delayed-error-preserves-newer-text-and-deliberate-empty",
+      "engine": "chromium",
+      "pass": true,
+      "elapsedMs": 6276,
+      "phase": "empty-after-delayed-provider-error",
+      "syntheticProvider": true,
+      "faultCase": false,
+      "browserLaunches": 3,
+      "observations": [
+        {
+          "name": "delayed-error-keeps-current-draft",
+          "label": "newer",
+          "providerStatus": 503,
+          "submitted": {
+            "consumed": false,
+            "contextRef": null,
+            "revision": "e35580f6-c8e7-4655-8a9e-79c0628f4df3",
+            "text": "  Failing newer request  "
+          },
+          "current": {
+            "consumed": false,
+            "contextRef": null,
+            "revision": "d7406608-f111-4d06-8d81-4737978d5bdf",
+            "text": "  The learner changed this question during the failed request  "
+          },
+          "outboundXid": "xmvdrli8f-1",
+          "outboundReplies": [],
+          "failureLines": 1,
+          "editorAfterOutcome": "  The learner changed this question during the failed request  ",
+          "draftAfterOutcome": {
+            "consumed": false,
+            "contextRef": null,
+            "revision": "d7406608-f111-4d06-8d81-4737978d5bdf",
+            "text": "  The learner changed this question during the failed request  "
+          },
+          "editorAfterRestart": "  The learner changed this question during the failed request  ",
+          "draftAfterRestart": {
+            "consumed": false,
+            "contextRef": null,
+            "revision": "d7406608-f111-4d06-8d81-4737978d5bdf",
+            "text": "  The learner changed this question during the failed request  "
+          }
+        },
+        {
+          "name": "delayed-error-keeps-current-draft",
+          "label": "empty",
+          "providerStatus": 503,
+          "submitted": {
+            "consumed": false,
+            "contextRef": null,
+            "revision": "cf87b03e-69ca-463d-84c2-1f63aa6d25e3",
+            "text": "  Failing empty request  "
+          },
+          "current": {
+            "consumed": false,
+            "contextRef": null,
+            "revision": "db922b0c-9f68-4796-9212-358b157ff955",
+            "text": ""
+          },
+          "outboundXid": "xmvdrlk3x-1",
+          "outboundReplies": [],
+          "failureLines": 2,
+          "editorAfterOutcome": "",
+          "draftAfterOutcome": {
+            "consumed": false,
+            "contextRef": null,
+            "revision": "db922b0c-9f68-4796-9212-358b157ff955",
+            "text": ""
+          },
+          "editorAfterRestart": "",
+          "draftAfterRestart": {
+            "consumed": false,
+            "contextRef": null,
+            "revision": "db922b0c-9f68-4796-9212-358b157ff955",
+            "text": ""
+          }
+        }
+      ],
+      "errors": [],
+      "transport": {
+        "primary": [
+          {
+            "origin": "https://teacher-drafts.synthetic.invalid",
+            "pathname": "/v1/messages",
+            "credential": "synthetic-matched",
+            "contextRef": null,
+            "reply": "",
+            "status": 503
+          },
+          {
+            "origin": "https://teacher-drafts.synthetic.invalid",
+            "pathname": "/v1/messages",
+            "credential": "synthetic-matched",
+            "contextRef": null,
+            "reply": "",
+            "status": 503
+          }
+        ],
+        "mining": [],
+        "blocked": [],
+        "preflights": [],
+        "externalRequestsSent": 0
+      }
+    },
+    {
+      "name": "synthetic-pending-topic-a-reply-cannot-change-topic-b-draft",
+      "engine": "chromium",
+      "pass": true,
+      "elapsedMs": 6072,
+      "phase": "topic-b-remains-visible-after-topic-a-reply",
+      "syntheticProvider": true,
+      "faultCase": false,
+      "browserLaunches": 2,
+      "observations": [
+        {
+          "name": "normal-ui-source-topic"
+        },
+        {
+          "name": "normal-ui-source-topic"
+        }
+      ],
+      "errors": [],
+      "transport": {
+        "primary": [
+          {
+            "origin": "https://teacher-drafts.synthetic.invalid",
+            "pathname": "/v1/messages",
+            "credential": "synthetic-matched",
+            "contextRef": "teacher-context:af1d013698153e907546583b5ff2582f6238294851691f1720e32a5e974a4fc7",
+            "reply": "Synthetic answer belongs to topic A only.",
+            "status": 200
+          }
+        ],
+        "mining": [
+          {
+            "origin": "https://teacher-drafts.synthetic.invalid",
+            "pathname": "/v1/messages",
+            "credential": "synthetic-matched"
+          }
+        ],
+        "blocked": [],
+        "preflights": [],
+        "externalRequestsSent": 0
+      }
+    },
+    {
+      "name": "synthetic-reply-consumption-and-archive-commit-atomically-old-backup-cannot-resurrect",
+      "engine": "chromium",
+      "pass": true,
+      "elapsedMs": 5570,
+      "phase": "consumed-raw-text-retained-after-browser-restart",
+      "syntheticProvider": true,
+      "faultCase": true,
+      "browserLaunches": 2,
+      "observations": [
+        {
+          "name": "normal-ui-backup-download"
+        },
+        {
+          "name": "genuine-native-reply-atomicity"
+        }
+      ],
+      "errors": [],
+      "transport": {
+        "primary": [
+          {
+            "origin": "https://teacher-drafts.synthetic.invalid",
+            "pathname": "/v1/messages",
+            "credential": "synthetic-matched",
+            "contextRef": null,
+            "reply": "Synthetic atomic teacher answer.",
+            "status": 200
+          }
+        ],
+        "mining": [],
+        "blocked": [],
+        "preflights": [],
+        "externalRequestsSent": 0
+      }
+    },
+    {
+      "name": "synthetic-native-quota-reply-keeps-unconsumed-draft-and-archive-atomic",
+      "engine": "chromium",
+      "pass": true,
+      "elapsedMs": 3065,
+      "phase": "quota-draft-reopened",
+      "syntheticProvider": true,
+      "faultCase": true,
+      "browserLaunches": 2,
+      "observations": [
+        {
+          "name": "explicit-native-reply-fault"
+        }
+      ],
+      "errors": [],
+      "transport": {
+        "primary": [
+          {
+            "origin": "https://teacher-drafts.synthetic.invalid",
+            "pathname": "/v1/messages",
+            "credential": "synthetic-matched",
+            "contextRef": null,
+            "reply": "Synthetic quota reply that must never become durable.",
+            "status": 200
+          }
+        ],
+        "mining": [],
+        "blocked": [],
+        "preflights": [],
+        "externalRequestsSent": 0
+      }
+    },
+    {
+      "name": "synthetic-native-abort-reply-keeps-unconsumed-draft-and-archive-atomic",
+      "engine": "chromium",
+      "pass": true,
+      "elapsedMs": 2996,
+      "phase": "abort-draft-reopened",
+      "syntheticProvider": true,
+      "faultCase": true,
+      "browserLaunches": 2,
+      "observations": [
+        {
+          "name": "explicit-native-reply-fault"
+        }
+      ],
+      "errors": [],
+      "transport": {
+        "primary": [
+          {
+            "origin": "https://teacher-drafts.synthetic.invalid",
+            "pathname": "/v1/messages",
+            "credential": "synthetic-matched",
+            "contextRef": null,
+            "reply": "Synthetic abort reply that must never become durable.",
+            "status": 200
+          }
+        ],
+        "mining": [],
+        "blocked": [],
+        "preflights": [],
+        "externalRequestsSent": 0
+      }
+    },
+    {
+      "name": "synthetic-owner-revoked-at-durable-reply-cannot-publish-or-resurrect",
+      "engine": "chromium",
+      "pass": true,
+      "elapsedMs": 2988,
+      "phase": "new-owner-confirms-consumed-durable-reply",
+      "syntheticProvider": true,
+      "faultCase": true,
+      "browserLaunches": 2,
+      "observations": [
+        {
+          "name": "synthetic-pagehide-at-real-native-completion"
+        }
+      ],
+      "errors": [],
+      "transport": {
+        "primary": [
+          {
+            "origin": "https://teacher-drafts.synthetic.invalid",
+            "pathname": "/v1/messages",
+            "credential": "synthetic-matched",
+            "contextRef": null,
+            "reply": "Synthetic durable reply whose old owner loses publication authority.",
+            "status": 200
+          }
+        ],
+        "mining": [],
+        "blocked": [],
+        "preflights": [],
+        "externalRequestsSent": 0
+      }
+    },
+    {
+      "name": "non-original-source-refusal-keeps-draft-and-never-sends",
+      "engine": "chromium",
+      "pass": true,
+      "elapsedMs": 3959,
+      "phase": "source-refusal-after-send",
+      "syntheticProvider": true,
+      "faultCase": false,
+      "browserLaunches": 2,
+      "observations": [
+        {
+          "name": "normal-ui-source-topic"
+        }
+      ],
+      "errors": [],
+      "transport": {
+        "primary": [],
+        "mining": [],
+        "blocked": [],
+        "preflights": [],
+        "externalRequestsSent": 0
+      }
+    },
+    {
+      "name": "portable-backup-preserves-current-topic-text-empty-and-new-imported-topic",
+      "engine": "chromium",
+      "pass": true,
+      "elapsedMs": 16685,
+      "phase": "current-and-imported-topic-drafts-after-real-import",
+      "syntheticProvider": false,
+      "faultCase": false,
+      "browserLaunches": 2,
+      "observations": [
+        {
+          "name": "normal-ui-source-topic"
+        },
+        {
+          "name": "normal-ui-source-topic"
+        },
+        {
+          "name": "independent-normal-ui-donor-profile"
+        },
+        {
+          "name": "normal-ui-portable-donor-backup"
+        },
+        {
+          "name": "normal-ui-backup-download"
+        }
+      ],
+      "errors": [],
+      "transport": {
+        "primary": [],
+        "mining": [],
+        "blocked": [],
+        "preflights": [],
+        "externalRequestsSent": 0
+      }
+    },
+    {
+      "name": "synthetic-backup-missing-context-draft-preserved-as-unavailable",
+      "engine": "chromium",
+      "pass": true,
+      "elapsedMs": 4912,
+      "phase": "unavailable-source-question-after-browser-restart",
+      "syntheticProvider": false,
+      "faultCase": true,
+      "browserLaunches": 2,
+      "observations": [
+        {
+          "name": "normal-ui-source-topic"
+        },
+        {
+          "name": "normal-ui-backup-download"
+        },
+        {
+          "name": "explicit-synthetic-portable-backup-missing-context"
+        },
+        {
+          "name": "normal-ui-backup-download"
+        }
+      ],
+      "errors": [],
+      "transport": {
+        "primary": [],
+        "mining": [],
+        "blocked": [],
+        "preflights": [],
+        "externalRequestsSent": 0
+      }
+    },
+    {
+      "name": "synthetic-recovery-conflict-foreign-and-malformed-slots-stay-visible-and-retained",
+      "engine": "chromium",
+      "pass": true,
+      "elapsedMs": 7805,
+      "phase": "malformed-slot-retained-after-browser-close",
+      "syntheticProvider": false,
+      "faultCase": true,
+      "browserLaunches": 3,
+      "observations": [
+        {
+          "name": "explicit-synthetic-localStorage-recovery-fault"
+        },
+        {
+          "name": "explicit-synthetic-localStorage-recovery-fault"
+        },
+        {
+          "name": "separate-foreign-installation-output"
+        },
+        {
+          "name": "explicit-synthetic-localStorage-recovery-fault"
+        },
+        {
+          "name": "explicit-synthetic-localStorage-recovery-fault"
+        }
+      ],
+      "errors": [],
+      "transport": {
+        "primary": [],
+        "mining": [],
+        "blocked": [],
+        "preflights": [],
+        "externalRequestsSent": 0
+      }
+    }
+  ]
+}

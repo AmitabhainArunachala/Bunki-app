@@ -1,0 +1,27 @@
+{
+  "v": 1,
+  "provider": "Google Generative Language API",
+  "endpoint": "https://generativelanguage.googleapis.com/v1beta",
+  "render": {
+    "model": "gemini-3.8-flash-tts",
+    "note": "The lead's 10-17 decision on John's 'for now just anything decent and we can swap later'. Swap = change this one value and re-render; nothing else in the tree names a model."
+  },
+  "live": {
+    "model": "gemini-3.8-live",
+    "approved": false,
+    "note": "The planned speaking room runs a DIFFERENT model from the renderer, and 'Kore' on it is a third voice John has never heard. The slot exists so the room cannot silently inherit the offline approval — the same-name trap that produced seventeen days of silence. Nothing may call this until he hears it and approved becomes true."
+  },
+  "voices": {
+    "main": { "id": "kore", "prebuilt": "Kore", "roles": ["narrator", "word", "example"] },
+    "second": { "id": "charon", "prebuilt": "Charon", "roles": ["speaker-b"] }
+  },
+  "roleLaw": "A single-speaker surface (article prose, word, card back, example sentence) plays the main voice only. The second voice is admissible solely for speakerRole 'speaker-b' inside a dialogue. The second voice is never a fallback for a missing main-voice clip.",
+  "approvedReference": {
+    "model": "gemini-3.1-flash-tts-preview",
+    "heardOn": "2026-09-29",
+    "words": "ok, let:s lock these in for now.  let:s keep cooking in the meantime",
+    "evidence": "~/.dharma/bunki_review/2026-09-29/voice-audition/key.json round2.labels F=g31-Kore E=g31-Charon",
+    "note": "Immutable evidence of what he heard. Shut down 2026-11-17; not a render target."
+  },
+  "rejected": ["f1", "ami", "metan", "zundamon", "takehiro", "deviceTTS"]
+}

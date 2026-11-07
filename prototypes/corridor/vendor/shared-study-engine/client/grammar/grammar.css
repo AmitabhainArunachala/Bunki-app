@@ -1,0 +1,11 @@
+.grammar-front,.grammar-back { overflow-wrap:anywhere; }
+.grammar-front .passage,.grammar-back .passage { font-family:var(--font-passage,"Hiragino Mincho ProN",serif); line-height:2.25; font-size:var(--passage-size,24px); }
+.grammar-pattern { font-size:1.35em; }
+.grammar-target { background:transparent; color:var(--target,var(--accent,#a3322a)); font-weight:700; }
+.grammar-back ruby { ruby-align:center; }
+.grammar-back rt { font-size:.5em; color:var(--ruby,var(--ink-muted,inherit)); }
+.grammar-lookup { font:inherit; color:inherit; border:0; background:transparent; padding:0; line-height:inherit; cursor:pointer; }
+.grammar-lookup:focus-visible { outline:2px solid var(--focus,currentColor); outline-offset:2px; }
+.grammar-source,.grammar-reading-source,.grammar-audit,.grammar-qa-warning { font-size:.75em; }
+.grammar-related { padding-inline-start:1.25em; }
+.grammar-translation { margin-block:.5em 1em; }

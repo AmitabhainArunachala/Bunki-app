@@ -1,3 +1,4 @@
+import { selectBackupFile } from './record-fixture-support.mjs';
 /**
  * Repeatable SKIP browser regression. No learner-store fixtures or runtime
  * state injection: controls are driven through clicks, keys and mouse wheel.
@@ -64,6 +65,11 @@ async function query(raw) {
   await page.locator('#nav-search-input').fill(raw);
   await page.waitForTimeout(120);
 }
+/** G1: a page arrives (and leaves) by its match cut, its state changed in the cut's update a frame after the click; the
+ * checks read the page once no cut runs (none runs under reduced motion: the page then changes at once). */
+async function pageSettled() {
+  await page.waitForFunction(() => !document.documentElement.matches(':active-view-transition'), null, { timeout: 5000 });
+}
 async function count() {
   return Number((await page.locator('.skip-result-count').innerText()).split(' kanji')[0].replaceAll(',', ''));
 }
@@ -81,7 +87,7 @@ try {
   await openShelfDoor(page, '#kanjidex-link');
   await page.locator('.kdx-lens').filter({ hasText: 'by its shape' }).click();
   await page.locator('.skip-hit').first().waitFor();
-  check('lens preserves heading and all dictionary lenses', await page.locator('h1').innerText() === 'Kanji finder' &&
+  check('lens preserves heading and all dictionary lenses', await page.locator('h1').innerText() === 'Kanji by shape' &&
     JSON.stringify(await page.locator('.kdx-lens .l-ja').allTextContents()) ===
       JSON.stringify(['by its parts', 'by its shape', 'draw it', 'by reading', 'by meaning', 'by strokes', 'by radical', 'by frequency', 'by level', 'Kodansha number']));
   await page.locator('.skip-hit').first().click();
@@ -162,17 +168,22 @@ try {
   await query('1-3-8');
   const hit = page.locator('.skip-hit').first(), hitId = await hit.getAttribute('id');
   await hit.click();
+  await pageSettled();
   await page.locator('#sheet-back').click();
+  await pageSettled();
   await page.waitForTimeout(100);
   check('Back preserves query and focus', await page.locator('#nav-search-input').inputValue() === '1-3-8' &&
     await page.evaluate((id) => document.activeElement.id === id, hitId));
   await query('4-6-4');
   await page.locator('[data-skip-hit="㐆"]').click();
+  await pageSettled();
   check('fallback opens ordinary kanji sheet', await page.locator('.skip-fallback-note').count() === 1);
   check('ordinary kanji sheet has no visible SKIP code', await page.locator('.sheet .skip-code-door-wrap').count() === 0);
   await page.locator('#kanji-shape-lookup').click();
+  await pageSettled();
   check('code-free shape door opens nested lookup', await page.locator('.sheet .skip-ui').count() === 1);
   await page.locator('#sheet-back').click();
+  await pageSettled();
   check('nested Back returns to same fallback entry', await page.locator('.sheet .hero-glyph').innerText() === '㐆');
   await page.locator(await entryCloseSelector(page)).click();
   await page.locator('.theme-seal').first().click();
@@ -248,10 +259,13 @@ try {
   const afterInvalid = await readAppRecord(page);
   check('wrong-literal imported snapshot leaves the accepted record unchanged', JSON.stringify(afterInvalid) === JSON.stringify(beforeInvalid));
   await page.locator('.tray-line').filter({ hasText: '㐆' }).click();
+  // S · on Saved ✓ the page's one Save opens its menu (a drawer under the bar), whose Review row takes the card out — this
+  // pinned a second press on the page's seal as the removal
   await page.locator('#sheet-take').click();
+  await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
   await waitForAppRecord(page, record => !record.taken.some(item => item.id === '㐆'));
   await page.locator(await entryCloseSelector(page)).click();
-  await Promise.all([page.waitForEvent('load'), page.setInputFiles('#import-file', backupPath)]);
+  await Promise.all([page.waitForEvent('load'), selectBackupFile(page, backupPath)]);
   await page.waitForFunction(() => document.body.dataset.ready === '1');
   const restored = await readAppRecord(page);
   check('ordinary backup import restores the exact captured answer and schedule',

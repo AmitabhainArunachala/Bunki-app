@@ -494,6 +494,11 @@ def main() -> int:
             derived_readings += 1
     print(f"    readings derived from UniDic for {derived_readings} words")
 
+    # Shelf/semantic entries such as 拍子 are added after the dictionary pass.
+    # Apply only the reviewed exact word/reading repairs here, not a new broad heal.
+    reviewed_glosses = gloss_heal.apply_reviewed_glosses(words)
+    print(f"    reviewed word glosses completed: {reviewed_glosses}")
+
     # kanji -> words containing it is derived in the browser from words.json's
     # `k` arrays (same data, ~400 KB smaller over the wire); the cap the UI
     # applies is declared in the manifest, not hidden.

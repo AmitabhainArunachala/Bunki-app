@@ -12,6 +12,7 @@ import {
   renameSync,
   rmSync,
   writeFileSync,
+  statfsSync,
 } from 'node:fs';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { homedir } from 'node:os';
@@ -60,6 +61,8 @@ const sourceInputs = (files, modules) =>
 
 let staging;
 try {
+  const space = statfsSync(repo);
+  if (!process.env.CI && space.bavail * space.bsize < 8 * 1024 ** 3) throw new Error('Disk guard: local builds require at least 8 GiB available.');
   const destination = canonicalDestination(output);
   if (inside(realpathSync(repo), destination)) {
     throw new Error(
@@ -73,8 +76,20 @@ try {
   }
   if (existsSync(output))
     throw new Error('Output already exists; choose a new directory. No files were replaced.');
+  execFileSync(process.execPath, [join(repo, 'scripts/verify-shared-study.mjs')], {stdio:'pipe'});
   for (const path of [
     'corridor.js',
+    'modules/dictionary.mjs',
+    'modules/word-entry.mjs',
+    'modules/capture.mjs',
+    'modules/study-host.mjs',
+    'modules/return.mjs',
+    'modules/worlds.mjs',
+    'modules/voice.mjs',
+    'modules/learner.mjs',
+    'modules/drift.mjs',
+    'modules/library.mjs',
+    'modules/teacher.mjs',
     'reading-controller.mjs',
     'teacher-context.mjs',
     'teacher-drafts.mjs',
@@ -105,12 +120,20 @@ try {
     'guided-session-engine.mjs',
     'guided-session-content.mjs',
     'guided-moments.mjs',
+    'speak.js',
+    'speak-core.mjs',
     'corridor-ink.js',
     'dictionary-worker.js',
     'skip-core.js',
     'skip-ui.js',
     'reference-core.js',
     'reference-ui.js',
+    'kanji-structure.js',
+    'kanji-family.js',
+    'kanji-course.js',
+    'review-caller.mjs',
+    'help-relevance.mjs',
+    'journey-lifecycle.mjs',
     'decks/context-dense/engine.js',
     'decks/context-dense/mount.js',
     'decks/player/engine.js',

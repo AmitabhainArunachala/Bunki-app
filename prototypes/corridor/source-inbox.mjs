@@ -107,12 +107,13 @@ export function parseSourceInbox(raw) {
   if (raw == null) raw = { version: 1, entries: [] };
   if (owned.has(raw)) return raw;
   bounded(raw);
-  fields(raw, raw.version === 4 ? ['version', 'entries', 'listening', 'excerpts', 'transcripts', 'files']
+  fields(raw, raw.version === 5 ? ['version', 'entries', 'listening', 'excerpts', 'transcripts', 'files', 'intake', 'anchors']
+    : raw.version === 4 ? ['version', 'entries', 'listening', 'excerpts', 'transcripts', 'files']
     : raw.version === 3 ? ['version', 'entries', 'listening', 'excerpts', 'transcripts']
     : raw.version === 2 ? ['version', 'entries', 'listening', 'excerpts'] : ['version', 'entries']);
-  if (![1, 2, 3, 4].includes(raw.version) || !Array.isArray(raw.entries)) fail('invalid-source-inbox');
+  if (![1, 2, 3, 4, 5].includes(raw.version) || !Array.isArray(raw.entries)) fail('invalid-source-inbox');
   if (raw.entries.length > SOURCE_INBOX_LIMITS.entries) fail('inbox-capacity');
-  const files = raw.version === 4 ? parseFileEntries(raw.files) : [];
+  const files = raw.version >= 4 ? parseFileEntries(raw.files) : [];
   const fileById = new Map(files.map((entry) => [entry.captureId, entry]));
   const entries = raw.entries.map((entry) => parseCapture(entry, fileById.get(entry.id)));
   if (new Set(entries.map((entry) => entry.id)).size !== entries.length) fail('duplicate-capture');
@@ -164,7 +165,7 @@ export function parseSourceInbox(raw) {
       if (new Set(transcripts.map((entry) => entry.captureId)).size !== transcripts.length) fail('duplicate-transcript');
       result.transcripts = transcripts;
     }
-    if (raw.version === 4) {
+    if (raw.version >= 4) {
       const linked = new Set([...listening.map(e => e.sourceId), ...excerpts.map(e => e.captureId), ...result.transcripts.map(e => e.captureId)]);
       for (const entry of files) {
         const child = byId.get(entry.captureId), parent = fileById.get(entry.sourceId);
@@ -173,6 +174,10 @@ export function parseSourceInbox(raw) {
               entry.sourceId === entry.captureId || !sameFileBytes(parent.file, entry.file)))) fail('invalid-file-source');
       }
       result.files = files;
+    }
+    if (raw.version === 5) {
+      result.intake = parseIntakeRows(raw.intake, byId);
+      result.anchors = parseAnchorRows(raw.anchors, byId);
     }
   }
   freeze(result); owned.add(result); return result;
@@ -411,7 +416,7 @@ function createFileCapture({ id, capturedAt, title, file, document }) {
 }
 export function addFileCapture(raw, input) {
   bounded(input); fields(input, ['id', 'capturedAt', 'title', 'sourceId', 'file', 'document']);
-  const current = parseSourceInbox(raw), inbox = current.version === 4 ? current
+  const current = parseSourceInbox(raw), inbox = current.version >= 4 ? current
     : { ...current, version: 4, listening: current.listening || [], excerpts: current.excerpts || [], transcripts: current.transcripts || [], files: [] };
   const [link] = parseFileEntries([{ captureId: input.id, sourceId: input.sourceId, file: input.file, document: input.document,
     provenance: { kind: 'learner-file', suppliedAt: input.capturedAt } }]);
@@ -480,4 +485,122 @@ function createInputRecovery({ storage, installationText, assertCurrent, key, pa
       current(); storage.removeItem(key); return true;
     },
   });
+}
+
+// ---- The one intake contract (S3-R13, S3-R14, S4-R24; campaign G11) ---------------------------------------------
+// Every source carries provenance and a capability that is true to its bytes: retained-body when the capture holds
+// text, pointer when it holds only a link. Licence or permission claims are kept as the learner's words and grant
+// nothing: the capture's policy stays what createSourceCapture derives from the learner's own action. An exact anchor
+// is {source id, text sha256, token}; when the text behind it is not the text it was written against, the anchor is
+// invalid, never moved. Inbox version 5 adds the two arrays; versions 1-4 still parse and upgrade only when written to.
+export const SOURCE_INTAKE_ORIGINS = Object.freeze(['library', 'intake', 'clipboard', 'share']);
+export const SOURCE_INTAKE_CAPABILITIES = Object.freeze(['retained-body', 'pointer']);
+export const SOURCE_ANCHOR_LIMIT = 4000;
+const SHA256 = /^[0-9a-f]{64}$/u;
+const captureCapability = (capture) => (capture.candidate.article.body ? 'retained-body' : 'pointer');
+const captureTextSha256 = (capture) => capture.candidate.article.body?.contentSha256 ?? null;
+function parseClaims(raw) {
+  if (raw === null) return null;
+  fields(raw, ['licence', 'permission']);
+  return { licence: raw.licence === null ? null : text(raw.licence, 1000), permission: raw.permission === null ? null : text(raw.permission, 1000) };
+}
+function parseIntakeRows(rows, byId) {
+  if (!Array.isArray(rows) || rows.length > byId.size) fail('invalid-intake-library');
+  const intake = rows.map((row) => {
+    fields(row, ['captureId', 'origin', 'capability', 'claims', 'textSha256']);
+    const captureId = uuid(row.captureId), capture = byId.get(captureId);
+    if (!capture || !SOURCE_INTAKE_ORIGINS.includes(row.origin) || row.capability !== captureCapability(capture) ||
+        row.textSha256 !== captureTextSha256(capture)) fail('invalid-intake');
+    return { captureId, origin: row.origin, capability: row.capability, claims: parseClaims(row.claims), textSha256: row.textSha256 };
+  });
+  if (new Set(intake.map((row) => row.captureId)).size !== intake.length) fail('duplicate-intake');
+  return intake;
+}
+function parseToken(raw) {
+  fields(raw, ['index', 'length']);
+  if (!Number.isSafeInteger(raw.index) || raw.index < 0 || Object.is(raw.index, -0) ||
+      !Number.isSafeInteger(raw.length) || raw.length < 1) fail('invalid-anchor-token');
+  return { index: raw.index, length: raw.length };
+}
+function parseAnchorRows(rows, byId) {
+  if (!Array.isArray(rows) || rows.length > SOURCE_ANCHOR_LIMIT) fail('invalid-anchor-library');
+  const anchors = rows.map((row) => {
+    fields(row, ['id', 'sourceId', 'textSha256', 'token']);
+    const id = uuid(row.id), sourceId = uuid(row.sourceId);
+    // The source must exist. The text behind the anchor is compared at resolution, where a change invalidates it.
+    if (!byId.has(sourceId) || typeof row.textSha256 !== 'string' || !SHA256.test(row.textSha256)) fail('invalid-source-anchor');
+    return { id, sourceId, textSha256: row.textSha256, token: parseToken(row.token) };
+  });
+  if (new Set(anchors.map((row) => row.id)).size !== anchors.length) fail('duplicate-anchor');
+  return anchors;
+}
+function intakeInbox(raw) {
+  const current = parseSourceInbox(raw);
+  return current.version === 5 ? current : { ...current, version: 5, listening: current.listening || [], excerpts: current.excerpts || [],
+    transcripts: current.transcripts || [], files: current.files || [], intake: [], anchors: [] };
+}
+/** A capture through the contract: provenance {sourceId, title, origin, url}, a capability true to the bytes, claims
+ * kept as words. The capture itself is createSourceCapture's, so its policy is the learner's own action and nothing else. */
+export function createSourceIntake(raw) {
+  bounded(raw); fields(raw, ['id', 'capturedAt', 'provenance', 'capability', 'text', 'claims']);
+  fields(raw.provenance, ['sourceId', 'title', 'origin', 'url']);
+  const id = uuid(raw.id);
+  if (raw.provenance.sourceId !== id) fail('intake-source-mismatch');
+  if (!SOURCE_INTAKE_ORIGINS.includes(raw.provenance.origin)) fail('invalid-intake-origin');
+  if (!SOURCE_INTAKE_CAPABILITIES.includes(raw.capability)) fail('invalid-intake-capability');
+  if (typeof raw.text !== 'string' || (raw.capability === 'retained-body') !== (raw.text.trim() !== '')) fail('intake-capability-mismatch');
+  const claims = parseClaims(raw.claims);
+  const capture = createSourceCapture({ id, capturedAt: raw.capturedAt, title: raw.provenance.title,
+    url: raw.provenance.url === null ? '' : raw.provenance.url, text: raw.text });
+  return freeze({ capture, intake: { captureId: id, origin: raw.provenance.origin, capability: captureCapability(capture),
+    claims, textSha256: captureTextSha256(capture) } });
+}
+/** Into the one inbox: the capture through acceptSourceCapture, its intake row beside it. Retries are idempotent;
+ * a different row for the same capture is refused. */
+export function acceptSourceIntake(raw, value) {
+  bounded(value); fields(value, ['capture', 'intake']);
+  const accepted = acceptSourceCapture(intakeInbox(raw), value.capture);
+  const [row] = parseIntakeRows([value.intake], new Map(accepted.entries.map((entry) => [entry.id, entry])));
+  const previous = accepted.intake.find((entry) => entry.captureId === row.captureId);
+  if (previous) {
+    if (JSON.stringify(previous) !== JSON.stringify(row)) fail('intake-conflict');
+    return accepted;
+  }
+  return parseSourceInbox({ ...accepted, intake: [...accepted.intake, row] });
+}
+/** The contract's view of any capture in the inbox, including one from before the contract (origin unknown). */
+export function selectSourceIntake(raw, id) {
+  const inbox = parseSourceInbox(raw), captureId = uuid(id), capture = inbox.entries.find((entry) => entry.id === captureId);
+  if (!capture) return null;
+  const row = (inbox.intake || []).find((entry) => entry.captureId === captureId) || null, [observation] = capture.candidate.provenance;
+  return freeze({ sourceId: captureId, capability: captureCapability(capture), textSha256: captureTextSha256(capture),
+    provenance: { sourceId: captureId, title: capture.candidate.article.title, origin: row?.origin ?? null, url: capture.encounterUrl,
+      attribution: observation.attribution, licence: observation.license, claims: row?.claims ?? null },
+    body: capture.candidate.article.body?.text ?? null, capturedAt: capture.capturedAt });
+}
+/** An exact reading position {source id, text sha256, token}, written only against the text that is there. */
+export function addSourceAnchor(raw, input) {
+  bounded(input); fields(input, ['id', 'sourceId', 'textSha256', 'token']);
+  const inbox = intakeInbox(raw), byId = new Map(inbox.entries.map((entry) => [entry.id, entry]));
+  const [row] = parseAnchorRows([input], byId);
+  if (row.textSha256 !== captureTextSha256(byId.get(row.sourceId))) fail('anchor-text-mismatch');
+  const previous = inbox.anchors.find((entry) => entry.id === row.id);
+  if (previous) {
+    if (JSON.stringify(previous) !== JSON.stringify(row)) fail('anchor-conflict');
+    return parseSourceInbox(inbox);
+  }
+  return parseSourceInbox({ ...inbox, anchors: [...inbox.anchors, row] });
+}
+export function selectSourceAnchor(raw, id) {
+  const anchorId = uuid(id);
+  return (parseSourceInbox(raw).anchors || []).find((entry) => entry.id === anchorId) || null;
+}
+/** Exact, or invalid when the text behind it changed: the anchor is never moved to a guessed position. */
+export function resolveSourceAnchor(raw, id) {
+  const inbox = parseSourceInbox(raw), anchor = selectSourceAnchor(inbox, id);
+  if (!anchor) return null;
+  const capture = inbox.entries.find((entry) => entry.id === anchor.sourceId);
+  if ((capture ? captureTextSha256(capture) : null) !== anchor.textSha256)
+    return freeze({ status: 'invalid', reason: 'text-changed', sourceId: anchor.sourceId, textSha256: anchor.textSha256, token: null });
+  return freeze({ status: 'exact', sourceId: anchor.sourceId, textSha256: anchor.textSha256, token: anchor.token });
 }

@@ -83,6 +83,9 @@ const boot = async (p, url = `${base}/index.html?entry=shelf`) => {
   await openShelfDoor(p, '#levels-link');
 };
 const overview = async () => {
+  // G1: Close moves the page inside its match cut (the page leaves in the cut's update, a frame after the click): a page
+  // already leaving is not open, so the layer is read once no cut runs
+  await page.waitForFunction(() => !document.documentElement.matches(':active-view-transition'), null, { timeout: 5000 });
   if (await page.locator('.sheet').count()) {
     await page.waitForTimeout(800);
     await page.click(await entryCloseSelector(page));
@@ -212,8 +215,10 @@ try {
       await page.locator(`[data-entry-id="${entry.id}"]`).click();
       await page.waitForSelector('.sheet');
       const text = await page.locator('.sheet').innerText();
-      assert.ok(text.includes(entry.reading || 'Reading not supplied') || text.includes('読み未収録'));
-      assert.equal(await page.locator('.sheet .take').count(), 0);
+      assert.ok(text.includes(entry.reading || 'No reading') || text.includes('読みなし'));
+      // S · the page's keep is its one Save (.save-one) — it pinned the foot's .take, which no page carries now: a reference
+      // entry with no learning target offers no Save of any kind
+      assert.equal(await page.locator('.sheet .save-one, .sheet .take').count(), 0);
       await page.waitForTimeout(850);
       await page.click(await entryCloseSelector(page));
     }
@@ -233,7 +238,7 @@ try {
       assert.ok((await page.locator('.sheet').innerText()).includes(reading));
       const entry = catalog.collections.find(collection => collection.id === `jlpt:${level}`).entries.find(entry => entry.key === key);
       assert.equal(await page.locator('.sheet').getAttribute('data-node'), entry.canonicalTarget ? 'word:～月' : `reference:${key}`);
-      if (!entry.canonicalTarget) assert.equal(await page.locator('.sheet .take').count(), 0);
+      if (!entry.canonicalTarget) assert.equal(await page.locator('.sheet .save-one, .sheet .take').count(), 0);
       await page.click(await entryCloseSelector(page));
       await page.waitForFunction(id => document.activeElement?.id === id, rowId);
       assert.equal(await page.locator('#reference-search').inputValue(), '～月');
@@ -432,7 +437,7 @@ try {
   await new Promise((done) => server.close(done));
   rmSync(temp, { recursive: true, force: true });
   if (shots) writeFileSync(resolve(shots, 'results.json'), `${JSON.stringify(checks, null, 2)}\n`);
-  if (shots) writeFileSync(resolve(shots, 'execution.json'), `${JSON.stringify({ selectedCase, excludedChecks, externalRequests,
+  if (shots) writeFileSync(resolve(shots, 'execution.json'), `${JSON.stringify({ selectedCase, excludedChecks, externalRequests, site: root, runId: process.env.KAIRO_GATE_RUN_ID ?? null,
     browser: { engine: 'Chromium', version: browser.version(), headless: true, maximumContexts: 1 } }, null, 2)}\n`);
 }
 const failed = checks.filter((item) => !item.pass);

@@ -5,6 +5,7 @@
 /* ---- Skin frame (Skin lane): the deck players share Learn's lacquer stage. Players inject
    their own sheets later, so tokens only, on body. ---- */
 html:is([data-room='deckplay'], [data-room='contextdeck']) body:not([data-view='drift']) {
+  /* bokashi: ichimonji — the deck room's sky — depth: the stage's lacquer (the world's own ink) laid across the top of the page, gone by 180 px */
   --skin-ground: linear-gradient(180deg, color-mix(in srgb, var(--color-lacquer) 8%, transparent), transparent 180px);
 }
 

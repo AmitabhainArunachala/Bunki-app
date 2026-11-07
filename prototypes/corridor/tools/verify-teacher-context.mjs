@@ -14,12 +14,14 @@ import { homedir } from 'node:os';
 import { extname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
+import { contextBrowserVersion } from './browser-version-support.mjs';
 import {
   resolveCorridorEvidence,
   resolveCorridorSite,
 } from '../../../scripts/resolve-corridor-site.mjs';
 import { verifyBundledArtifact } from '../../bunki-desktop/lib/artifact.cjs';
 import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+import { setUpDeviceTutorForContext } from './tutor-fixture-support.mjs';
 
 assert(
   process.env.KAIRO_SITE_DIR && isAbsolute(process.env.KAIRO_SITE_DIR),
@@ -255,9 +257,8 @@ async function holdEntry(page, index, word) {
   await token.scrollIntoViewIfNeeded();
   const box = await token.boundingBox();
   assert(box && box.width > 0 && box.height > 0, 'Word has a real pointer target');
-  // reader lane 2026-10-02: one tap opens the word's popup, whose "Full entry ›" opens the entry
-  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
-  await page.locator('#mini .mini-entry').click();
+  await openReaderWordStage(page, token);
+  await page.locator('#mini button.mini-word').click();
   await page
     .locator(`#sheet[data-node="word:${word}"]`)
     .waitFor({ state: 'visible', timeout: 10_000 });
@@ -274,7 +275,7 @@ async function holdEntry(page, index, word) {
   );
   await settled(page, '#sheet');
   await page.locator('#sheet .teacher-save').waitFor({ state: 'visible' });
-  assert.equal(await page.locator('#sheet #take').getAttribute('aria-pressed'), 'false');
+  assert.equal(await page.locator('#sheet #sheet-take').getAttribute('aria-pressed'), 'false');
 }
 
 function coherent(context, source, index, word) {
@@ -342,7 +343,7 @@ async function saveDiscuss(fixture, source, index, word, neutral = false) {
       frozenLearning(before.record),
       'Neutral save does not enroll, schedule, or grade',
     );
-    assert.equal(await page.locator('#sheet #take').getAttribute('aria-pressed'), 'false');
+    assert.equal(await page.locator('#sheet #sheet-take').getAttribute('aria-pressed'), 'false');
     await page.waitForFunction(() => !!document.querySelector('#sheet .teacher-note')?.textContent);
     await screenshot(fixture, 'neutral-save', '#sheet');
   }
@@ -397,6 +398,7 @@ async function chooseContext(page, context) {
 }
 
 async function configureProvider(page) {
+  await page.evaluate(() => { const d = document.getElementById('ai-connection'); if (d) d.open = true; }); // Q · the address and model fold under the tutor's Details
   await page.locator('#ai-base-url').fill(FAKE_ORIGIN);
   await page.locator('#ai-model-input').fill(FAKE_MODEL);
   await page.locator('#ai-key-input').fill(FAKE_KEY);
@@ -636,6 +638,10 @@ async function runCase(name, synthetic, body) {
     serviceWorkers: 'block',
     recordVideo: { dir: join(out, 'recordings'), size: { width: 1120, height: 940 } },
   });
+  await context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1')); // Returning device; demonstration has its own gate.
+  // precondition now (Hfix-1B, item 11): a tutor set up, since every "Ask the tutor" door needs one; a case's own synthetic
+  // provider (configureProvider) replaces it and is never written over
+  await setUpDeviceTutorForContext(context);
   const transport = captureTransport(context, synthetic);
   await transport.install();
   await context.tracing.start({ screenshots: true, snapshots: true, sources: false });
@@ -660,7 +666,7 @@ async function runCase(name, synthetic, body) {
     status: 'running',
     startedAt: new Date().toISOString(),
     syntheticProvider: synthetic,
-    browser: context.browser()?.version(),
+    browser: await contextBrowserVersion(context, chromium, { executablePath: process.env.CHROMIUM_PATH }),
   };
   const video = page.video();
   try {
@@ -721,10 +727,11 @@ try {
       'Discuss deduplicates the prior neutral save',
     );
     assert.deepEqual(frozenLearning(saved.record), frozenLearning(initial.record));
-    assert.equal(
-      await page.locator('#chat-send').isDisabled(),
-      true,
-      'Saved context is available before provider setup',
+    // Hfix-1B: the door needs a tutor set up, so the saved context now waits with one; nothing was sent
+    assert.deepEqual(
+      { blocked: fixture.transport.blocked.length, primary: fixture.transport.primary.length },
+      { blocked: 0, primary: 0 },
+      'Saved context waits on the tutor page and nothing was sent',
     );
     await screenshot(fixture, 'saved-context');
     await reopenTutor(page);
@@ -738,10 +745,11 @@ try {
     await openShelfDoor(page, '#ai-link');
     await selected(page, context);
     await page.locator('#teacher-target-open').click();
-    await page.locator('#sheet[data-node="word:窓"] #take').waitFor();
+    // S · the page's one Save is its bar's (#sheet-take); this pinned the foot's #take
+    await page.locator('#sheet[data-node="word:窓"] #sheet-take').waitFor();
     await settled(page, '#sheet');
-    assert.equal(await page.locator('#sheet #take').getAttribute('aria-pressed'), 'false');
-    await page.locator('#sheet #take').click();
+    assert.equal(await page.locator('#sheet #sheet-take').getAttribute('aria-pressed'), 'false');
+    await page.locator('#sheet #sheet-take').click();
     await waitForAppRecord(
       page,
       (record) => record.taken.some((item) => item.t === 'word' && item.id === '窓'),
@@ -1270,3 +1278,33 @@ writeFileSync(join(OUT, 'receipt.json'), `${JSON.stringify(receipt, null, 2)}\n`
 writeFileSync(join(EVIDENCE, 'latest.json'), `${JSON.stringify(receipt, null, 2)}\n`);
 console.log(JSON.stringify(receipt, null, 2));
 process.exitCode = receipt.failures ? 1 : 0;
+
+// These source-context checks enter through the G3 ladder; the grammar itself is
+// checked separately. A second activation is allowed only after a real reading rung.
+async function openReaderWordStage(page, word) {
+  await word.click();
+  await page.waitForFunction(node => ['reading', 'gloss', 'stage'].includes(node?.dataset.ladderRung), await word.elementHandle());
+  if (await word.getAttribute('data-ladder-rung') === 'reading') {
+    assert.equal(await page.locator('#mini').count(), 0, 'First activation reveals reading without meaning');
+    // On-touch reader ruby paints through ::before; the native rt stays hidden
+    // to preserve the word's width. Require actual paint from either renderer.
+    await page.waitForFunction(node => [...node.querySelectorAll('ruby')].some(ruby => {
+      const rt = ruby.querySelector('rt');
+      if (!rt?.textContent.trim() || rt.classList.contains('hidden-rt')) return false;
+      const native = getComputedStyle(rt), floating = getComputedStyle(ruby, '::before');
+      return (rt.getClientRects().length > 0 && native.visibility !== 'hidden' && native.display !== 'none' && Number(native.opacity) > 0) ||
+        (ruby.getClientRects().length > 0 && ruby.dataset.r === rt.textContent && floating.content === JSON.stringify(rt.textContent) &&
+          floating.visibility !== 'hidden' && floating.display !== 'none' && Number(floating.opacity) > 0);
+    }), await word.elementHandle(), { timeout: 5000 });
+    await word.click();
+  }
+  // Ladder (John, 10-19): the English under the word comes before the stage; one more activation, only once it is seen
+  await page.waitForFunction(node => node?.dataset.ladderRung === 'gloss' || !!document.getElementById('mini'), await word.elementHandle());
+  if (await word.getAttribute('data-ladder-rung') === 'gloss') {
+    assert.equal(await page.locator('#mini').count(), 0, 'The English rung shows the meaning under the word, before the stage');
+    assert(await word.evaluate(node => !!node.querySelector(':scope > .tok-en .tok-en-text')), 'The English rung draws the English under the word');
+    await word.click();
+  }
+  await page.locator('#mini').waitFor();
+  assert.equal(await word.getAttribute('data-ladder-rung'), 'stage', 'The exact source word reaches its stage');
+}

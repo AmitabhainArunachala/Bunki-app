@@ -50,6 +50,9 @@ function listPaths(text, name) {
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const FONT_A = 'fonts/a.woff2';
 const FONT_B = 'fonts/b.woff2';
+const SHARED_FONT = 'vendor/shared-study-engine/client/app/fonts/test.woff2';
+const SHARED_DATA = 'data/shared-study/grammar.json';
+const SHARED_MODULE = 'vendor/shared-study-engine/client/app/app.mjs';
 
 /** a stamped release sw.js accepts: its boot core plus two fonts, with synthetic bodies */
 function buildRelease() {
@@ -57,8 +60,12 @@ function buildRelease() {
     ...shellPaths(SW).filter((path) => path !== '.'),
     ...listPaths(SW, 'BOOT_DATA'),
     ...listPaths(SW, 'GUIDED_ROOM'),
+    ...listPaths(SW, 'SPEAK_ROOM'),
     FONT_A,
     FONT_B,
+    SHARED_FONT,
+    SHARED_DATA,
+    SHARED_MODULE,
   ]);
   const bodies = new Map([...paths].map((path) => [path, Buffer.from(`body of ${path}`)]));
   const inputs = [...paths, 'sw.js']
@@ -205,6 +212,7 @@ describe('sw.js shell', () => {
       'decks/player/mount.js',
       'decks/player/engine.js',
       'vendor/ts-fsrs.mjs',
+      'srs-core.mjs',
       'data/fsrs-pin.json',
     ]) {
       expect(shell, path).toContain(path);
@@ -268,10 +276,10 @@ describe('sw.js shell', () => {
     expect(record.deleted).toEqual([older]);
   });
 
-  it('installs the N2, N1 and specialist decks, leaving tokens for first use (A52)', async () => {
+  it('installs the N2, N1, specialist and own-words decks, leaving tokens for first use (A52)', async () => {
     const { run, record } = loadWorker([]);
     await run('install');
-    for (const id of ['n2', 'n1', 'senmon']) {
+    for (const id of ['n2', 'n1', 'senmon', 'kotoba-master']) {
       expect(record.added).toContain(new URL(`decks/${id}/deck.json`, SCOPE).href);
       expect(record.added).not.toContain(new URL(`decks/${id}/tokens.json`, SCOPE).href);
     }
@@ -290,6 +298,19 @@ describe('sw.js bundled fonts (R5-19)', () => {
     };
   const isFont = (path) => path.startsWith('fonts/');
 
+  it('shared study content and fonts are lazy verified assets, never an install or background prerequisite', async () => {
+    const shared = [SHARED_FONT,SHARED_DATA,SHARED_MODULE];let unavailable=true;
+    const {run,request,stored,record}=loadWorker([],{source,network:serve(path=>unavailable&&shared.includes(path))});
+    await run('install');await run('activate');
+    await until(()=>[FONT_A,FONT_B].every(path=>record.fetched.includes(path)));
+    expect(record.fetched.filter(path=>shared.includes(path))).toEqual([]);
+    for(const path of shared)expect(await stored(cacheName,path)).toBeUndefined();
+    unavailable=false;
+    for(const path of shared){expect((await request(path)).status).toBe(200);expect(await stored(cacheName,path)).toBe(bodies.get(path).toString());}
+    unavailable=true;
+    for(const path of shared)expect((await request(path)).status).toBe(200);
+  });
+
   it('stamped install succeeds and caches the boot core when every font request fails', async () => {
     const { run, stored, record, stores } = loadWorker([], { source, network: serve(isFont) });
     await run('install');
@@ -297,6 +318,7 @@ describe('sw.js bundled fonts (R5-19)', () => {
       ...shellPaths(SW).filter((path) => path !== '.'),
       ...listPaths(SW, 'BOOT_DATA'),
       ...listPaths(SW, 'GUIDED_ROOM'),
+      ...listPaths(SW, 'SPEAK_ROOM'),
       'build-identity.json',
       'sw.js',
     ];

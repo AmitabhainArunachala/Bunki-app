@@ -3,8 +3,11 @@
  *   R1 flush tokens     — adjacent reader tokens on one line leave no gap between their glyphs
  *                         (base text only, readings excluded), before and after a reading shows;
  *                         and no whitespace text node stands between token elements.
- *   R2 readability      — Japanese body 21–22 px at 1368 / 18–19 px at 390; a shown reading is
- *                         ≥ 0.55 × the body; the tap's English (in the word popup, reader lane
+ *   R2 readability      — (F, 2026-10-18: one ladder, one ruby; was 21–22 / 18–19 px and a reading
+ *                         ≥ 0.55 × the body, drawn as ruby::before) the Japanese body is the ladder's
+ *                         reading step, exactly 23 px at 1368 and 21 px at 390; a shown reading is a
+ *                         native <rt> at exactly half the body and 10 px or more (MASTER_SPEC D5), at
+ *                         ≥ 4.5:1 on its paper; the tap's English (in the word popup, reader lane
  *                         2026-10-02) is ≥ 15 px at ≥ 4.5:1; the body text itself is ≥ 4.5:1.
  *   R3 first sentence   — every token of the first sentence is inside the first viewport, and
  *                         nothing fixed (tip, bar, bug) covers it, at 390×844 and 1368×900.
@@ -14,13 +17,16 @@
  *   S3 one count        — every number the unfiltered shelf states about its size is the same
  *                         number, and it equals the stories on the shelf (grid + today's band).
  *   S4 picture cards    — (FEEL pass 2026-10-02, John: "there are now NO pictures at all… we want
- *                         this to be like a magazine") every article card on the shelf carries ONE
- *                         picture slot, a fixed 3:2 box: the record's own picture (index.json
- *                         "picture".src, loaded, decorative inside the card) where it has one, else a
- *                         calm block whose only words are its topic in small type (never a kanji, no
- *                         larger than 16 px). Every card has a kicker, the headline, a level chip and
- *                         in English its English line; the lead adds its first sentence. The short
- *                         word definitions carry no picture and stand in their own band. The 永 seal
+ *                         this to be like a magazine") every article card whose row has a picture or a
+ *                         key kanji carries ONE picture slot, a fixed 3:2 box: the record's own picture
+ *                         (index.json "picture".src, loaded, decorative inside the card) where it has
+ *                         one, else its key kanji (index.json "heroKanji") alone, set at a third of the
+ *                         box's height or more on the world's paper. A row with neither has no band at
+ *                         all, and no card shows a category placeholder block (N, 2026-10-17, rewrites
+ *                         the pin "else a calm block whose only words are its topic in small type, never
+ *                         a kanji, no larger than 16 px"). Every card has a kicker, the headline, a level chip and
+ *                         in English its English line; the lead adds its first sentence. No short word
+ *                         definition stands on the shelf (N, 2026-10-17: culled as not articles). The 永 seal
  *                         sits inside the 本棚 title, ≤ 48 px. Control: 2ae957bb, whose cards had no
  *                         picture slot at all.
  *   T1 tools (glance)   — (glance pass 2026-10-01) the shelf's study tools sit behind ONE visible
@@ -32,9 +38,8 @@
  *                         gloss (the accessible name says both); a door in it still opens its room.
  *                         Control: 7ef0e985, whose thirteen text doors stood in a row under the filters.
  *   M1 title block      — (glance pass) at 1368 and 390 the date and the article count stand on one
- *                         line; the 未確認 note is one short line that still counts the pending stories
- *                         against the total, and its ⓘ opens the longer explanation; the 永 seal stays
- *                         ≤ 48 px inside the title. Control: 7ef0e985, whose phone dateline broke the
+ *                         line; (S, 2026-10-16) no provenance note — no AI作成 / Made by AI, no ⓘ — on the
+ *                         shelf in either language; the 永 seal stays ≤ 48 px inside the title. Control: 7ef0e985, whose phone dateline broke the
  *                         count onto a second line and whose note ran to three lines.
  *   O1 no clipped row   — (glance pass) at 320, 390 and 1368 the shelf as served, and with its tools
  *                         panel open, never runs past the screen's side: no element of the shelf
@@ -42,14 +47,10 @@
  *                         itself does not, and the look-up field's hint fits inside the field.
  *                         Control: 7ef0e985, whose phone chip bar and today's six scrolled sideways
  *                         with a chip and a card cut mid-word at the edge.
- *   P1 tip in the page  — (glance pass; reader lane 2026-10-02) at 1368 and 390, on a first visit, the
- *                         one-time hint says, in one plain line, "Tap any word for its meaning." (round 4,
- *                         John T4: the explanation was "too verbose"). It is a note in the page's flow
- *                         (never fixed, sticky or absolute) that ends above the article's first word,
- *                         and at four scroll depths no on-screen word is covered by it. The first word
- *                         that opens its popup makes it disappear without moving the text, and it is
- *                         remembered, so the next visit opens without it; its × removes it at once and
- *                         for good. Control: 3166ded3, whose tip taught the three-tap ladder and stayed.
+ *   P1 word demonstration — G3 replaces the permanent tip with one silent, text-free word stage on
+ *                         a genuinely fresh record. It creates no lookup/review work, does not replay
+ *                         after navigation/reload, and a saved-history record suppresses it even without
+ *                         the device-only seen key. Both 390 and 1368 are exercised.
  *   W1 ダマスカス saves  — (glance pass; reader lane 2026-10-02) at 1368 and 390, the word popup for
  *                         ダマスカス (Damascus, the fixture article's first word, read だますかす by the
  *                         article and ダマスカス by the dictionary: one reading in two scripts) offers a live
@@ -63,43 +64,46 @@
  *                         offer; saved in 全項目 first, the popup's Save is live and pressed ("Saved ✓")
  *                         with no held reason and no "open that card". Control: 8dea3c2e, where the quick
  *                         look kept だますかす as the card's reading and 全項目 called it "another reading".
- *   G1 one tap, the meaning — (reader lane 2026-10-02, John #8/#11) at 1368 and 390, ONE tap on 郊外 opens
- *                         the popup with the word, its reading こうがい, its meaning "suburb", a filled
- *                         Save and "Full entry ›", inside the screen; nothing is written under the word.
- *                         A tap on another word moves the popup; Escape puts it away and gives focus back
- *                         to the word. Control: 3166ded3, whose first tap showed only the reading.
- *   G2 menu → one card  — (John #11 "right click and choose save") a right-click on 郊外 opens the word menu
- *                         at the pointer: Save word · Save the sentence · Full entry · Ask the tutor about
- *                         this sentence · Copy. Save word makes exactly one 郊外 card carrying its sentence
- *                         (the capture path's ctx), the menu closes, a polite toast says so, and the menu
- *                         then shows "Saved ✓" unavailable. A right-click off the words keeps the browser's
- *                         own menu. Control: 3166ded3, which had no word menu.
- *   G3 Save + Undo      — (John #17) at 1368 and 390, the popup's Save makes one card in one press, no list
- *                         window opens, the button reads "Saved ✓" and a role=status toast reads "Saved to
- *                         review · Undo"; Undo takes the card back out and the button reads "Save" again.
+ *   G1 stage meaning   — G3's known on-touch word reveals its reading, then opens the stage with
+ *                         its meaning, Save and full-entry band. Switching words yields exactly one stage;
+ *                         Escape closes it and restores focus. verify-word-grammar pins every rung.
+ *   G2 hold → one card  — (John #11 "right click and choose save"; G5 hold = seal, 2026-10-18) a right-click on
+ *                         郊外 seals it: exactly one 郊外 card carrying its sentence (the capture path's ctx),
+ *                         and the strip opens beside the word (never over it) with a polite status that says
+ *                         Saved and the word's acts in plain full verbs: 全項目 · Full entry · Save the
+ *                         sentence · Copy · Remove (Ask the tutor about the word only with a tutor set up:
+ *                         Hfix-1B). A second right-click is the
+ *                         same strip and still one card. A right-click off the words keeps the browser's own
+ *                         menu. Control: 3166ded3, which had no word menu; 92e5492f, whose menu saved nothing
+ *                         until its Save was chosen.
+ *   G3 Save + Review off — (John #17; 1.3.0 Save ▾) at 1368 and 390, the popup's Save makes one card in one
+ *                         press, no list window opens, the button reads "Saved ✓" and its menu unfolds inside
+ *                         the card with Review checked; Review off takes the card back out and the button
+ *                         reads "Save" again.
  *                         Control: 3166ded3, whose Save opened dialog#vocabulary-list-dialog.
- *   G4 keyboard menu    — the focused word's Shift+F10 (and the ContextMenu key) opens the menu with the
- *                         first item focused; ↓ moves; Escape closes it and focus returns to the word.
+ *   G4 keyboard strip   — the focused word's Shift+F10 (and the ContextMenu key) seals it and opens the strip
+ *                         with its first control focused (New list… on a record with no lists); ↓ moves to
+ *                         全項目 · Full entry; Escape closes it and focus returns to the word.
  *                         Enter on the word opens the popup with focus on Save; Escape returns to the word.
  *                         Control: 3166ded3 (no menu).
  *   G5 lists popover    — (John #17; round 4 T5, "click save and then add to list from there") the popup
- *                         offers no list until the word is saved; after Save, at 1368 "Add to a list" opens
- *                         a compact non-modal popover beside the link (no dialog#vocabulary-list-dialog),
- *                         whose inline "New list" field makes a list holding the word and whose checkbox
- *                         takes it off again while the card stays; at 390 the popover is a short sheet
- *                         on the screen's foot. Control: 3166ded3.
+ *                         has no list button; Save ▾ saves the word and unfolds its menu inside the card
+ *                         under the button, at 1368 and 390 (no dialog#vocabulary-list-dialog, never over the
+ *                         kanji or sentence bands), whose "+ New list" row becomes a name field that makes a
+ *                         list holding the word and whose checkbox takes it off again while the card stays.
+ *                         Control: 3166ded3.
  *                         In the galaxy, where a word's entry opens over the sky and a word of its example
- *                         sentences opens the same popup, the path is the same: no list before Save, the
- *                         list beside "Saved ✓", and none again after Undo. Control: 890cd522, which
+ *                         sentences opens the same popup, the path is the same: no menu before Save, the
+ *                         menu under "Saved ✓", and none again after Review off. Control: 890cd522, which
  *                         showed "Add to a list" beside an unsaved Save there.
  *                         That popup's word band is laid out there too: the word, its reading and its meaning
- *                         each stand on a row of their own, and "Full entry" sits beside the word in the band's
- *                         corner, at least 44px each way, inside the card and the screen, and not covered.
+ *                         each stand on a row of their own, and the band itself is the door into the full entry
+ *                         (a chevron at its end), at least 44px tall, inside the card and the screen, not covered.
  *                         Control: 76c40528, whose galaxy popup ran the three together on one line.
  *   G6 sentence door    — (John #18; round 4 T5) no sentence bar shows when a word is chosen (no sentence
  *                         action shows outside the popup); the popup's last band is one named door,
  *                         "Study this sentence", showing the sentence's start; it opens the sentence in
- *                         the card, the word marked, with "Ask the tutor" and "Practice it" and a quiet
+ *                         the card, the word marked, with "Ask the tutor" (a tutor set up) and "Practice it" and a quiet
  *                         "Save the sentence", which keeps that sentence on the tutor page without making
  *                         it the active one; and Ask the tutor opens the tutor with that sentence as its
  *                         active context. Control: 3166ded3, whose bar floated in on the first tap.
@@ -134,7 +138,7 @@
  *                         brackets share a painted line with the following glyph, closing punctuation
  *                         shares one with the preceding glyph, and title lookup words do not split.
  *   J1 JLPT room        — the room and a question show no "awaiting John" / "machine-checked"
- *                         text; unreviewed tests wear the 未確認 chip; each level card carries its
+ *                         text and (S) no provenance chip or line at all; each level card carries its
  *                         level colour hook and a count of its tests (steps 3–4).
  *   K1 keyboard (R4)    — from the end of the title block to the article's close (読み終えた), a 3-paragraph
  *                         article costs at most paragraphs + 3 Tab presses: one stop per paragraph;
@@ -153,7 +157,8 @@
 import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
+import { designSelection, readingContrastHolds, rubyHalfOfBody, rubyLegible, scopeResult } from './vh-visual-contracts.mjs';
 import { createRequire } from 'node:module';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -161,6 +166,7 @@ import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
+import { setUpDeviceTutor } from './tutor-fixture-support.mjs';
 
 const require = createRequire(import.meta.url);
 const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
@@ -169,6 +175,19 @@ const site = resolveCorridorSite(), evidence = resolveCorridorEvidence();
 const manifest = JSON.parse(readFileSync(resolve(site, 'build-identity.json'), 'utf8'));
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['chromium', 'webkit'];
 assert(engines.every((engine) => ['chromium', 'webkit'].includes(engine)));
+const browserVersions = {};
+const g6SentenceDoorControl = process.argv.includes('--g6-sentence-door-control');
+if (g6SentenceDoorControl) assert.deepEqual(process.argv.slice(2), ['--g6-sentence-door-control'], 'The G6 control must be the only argument');
+const selectedDesign = g6SentenceDoorControl
+  ? { scope: 'g6-sentence-door-control', diagnostic: true, cases: ['G6-sentence-return-motion-320'] }
+  : designSelection(process.argv.slice(2));
+const runId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
+const g3Only = process.argv.includes('--g3-only');
+const spacingOnly = process.argv.includes('--spacing-only');
+const fixesOnly = process.argv.includes('--design-fixes-only');
+assert([g3Only, spacingOnly, fixesOnly].filter(Boolean).length <= 1, 'Choose one explicit narrow design schedule');
+const verifierSha256 = createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex');
+const DEMO_KEY = 'kairo-word-ladder-demo-v1';
 const withControl = process.argv.includes('--control');
 
 const ARTICLE = 'global-voices:2026-09-28-65726'; // 「ダマスカス 郊外 ジャラマナ」, 「正 反対」, 「「 連帯 の 畑 」」
@@ -183,15 +202,727 @@ const DIAGNOSTIC = /signals disagree|不一致|awaiting John/iu;
 const host = await startStaticHost({ site, port: 0 });
 const results = [];
 
+// Exact40 asset admission5e340029; independent of the index being checked.
+const SHELF40 = Object.freeze([
+  {
+    "id": "bunki-read-n2-shosoin-names",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-shosoin-names.webp",
+      "alt": "A long raised log storehouse on tall pillars among autumn maples, with deer resting in the sunlit grass.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-shosoin-names-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "bc26bb1e2cccfe5c81450bfb3249d89a5f9d8dc139bb0d3728e12ecfa1102518",
+      "768a1a4554e84f5133c0f5d0d64c0aaf36732b90cefd34850559dd09c4f5bdad"
+    ]
+  },
+  {
+    "id": "aozora:000772-1",
+    "picture": {
+      "src": "articles/pictures/aozora-000772-1.webp",
+      "alt": "A man in a long coat and hat walks a foggy brick-lined street at dawn, carrying a glowing lantern.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/aozora-000772-1-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "f27c9bdf83d997ef0a824b25833f724c055648de50fff37b28be1823b37b3892",
+      "c60d760e17071700e4c9c57eea54994138ae73be2b2262575b64dc100eaedfdb"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-shima-4004",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-shima-4004.webp",
+      "alt": "An open calculator showing its circuit board on a workbench beside a lamp and soldering iron, rain outside.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-shima-4004-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "c4240a196ca77adc52adbde8d9e42d6882a8b27252df5aceb10165f63fae675b",
+      "a8022462c0523868d52ce5fb7292dcab7b5d50004b7572ea01aab3018354f826"
+    ]
+  },
+  {
+    "id": "bunki-read-n1-optogenetics-nobel",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n1-optogenetics-nobel.webp",
+      "alt": "A glowing blue fibre over a microscope stage beside a flask of green algae, a researcher at the window behind.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n1-optogenetics-nobel-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "7139ffed48b76b4ab529fe04f3131c7ce85144ae06c2d3420440057c88b31984",
+      "eb975e25d7125c25c0c616442960e900c0c1dc262e1ca84eb9fe3b29f5efe714"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-kobe-jain",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-kobe-jain.webp",
+      "alt": "A small white Jain temple with a dome and short spire beside clapboard houses on a sloping lane above the bay.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-kobe-jain-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "abd9f04678084c37b95de3a055b8ce85ae41b7bacc2df0ba3eb6ed73b7cc5d40",
+      "5be0a482d4f9199a5e018d154589dc345ed27df2b46222f2a24bedbfe7bfb8ee"
+    ]
+  },
+  {
+    "id": "bunki-read-n3-honda-quarter",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n3-honda-quarter.webp",
+      "alt": "An abacus, a tied ledger and stacks of coins on a low desk, one stack on a blue cloth, young trees outside.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n3-honda-quarter-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "872acac9833776c443f4d3a87366ae4837bf70d79c28f8c904bbc9364297628f",
+      "a575615b689223b88fe5999be245c3df319b3158e7758d79b9916393007db0e7"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-bodhisena",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-bodhisena.webp",
+      "alt": "A monk on a scaffold paints the eye of the great bronze Buddha, blue cords running down to the crowd below.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-bodhisena-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "a0522f83fdfd1736dffed908920ef355a75e221e85af2168941a525b118b0b9e",
+      "cf5c38561b47734ebf3bba1cba5e5ebd10621134f62dc33640eb4798a8e058af"
+    ]
+  },
+  {
+    "id": "aozora:049966-1",
+    "picture": {
+      "src": "articles/pictures/aozora-049966-1.webp",
+      "alt": "A lamplit study with tied scrolls, a travel bundle, straw hat and staff, and snow falling in the garden.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/aozora-049966-1-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "87a7b253f1e06ea158b2778a091b9e0dc1486ca41708da4e0569088b1b0e1332",
+      "928a9c13f1093a1751aabc9b055c1078e337d7ec893a4742c0859714c563db52"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-forgetting-curve",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-forgetting-curve.webp",
+      "alt": "A dusk study desk with an hourglass, metronome, pocket watch, oil lamp and a row of blank cards.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-forgetting-curve-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "0bb02da6155dc86c3767e7cedf0a5bc99af51b9fc3a2976d6481ff50a8463331",
+      "8ffa52dcb18216a226c367626c60b56e295e2f74334ff9c2b6641d600fcda848"
+    ]
+  },
+  {
+    "id": "bunki-read-n1-neocognitron",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n1-neocognitron.webp",
+      "alt": "A researcher works under a desk lamp beside mainframe cabinets with tape reels, a circuit diagram on the wall.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n1-neocognitron-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "cb3910d3cfa11f829f5a691701ae8d58897ebc06fc1bee6b902423e973c253b0",
+      "e8b268e236e70ea0fefb00be5dfa75b020b356af79cbb6c8594ff14e99823f33"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-kokugo-survey",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-kokugo-survey.webp",
+      "alt": "Hands untie the cord of a closed string-bound book on a low table, with a stack of books and a tea bowl.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-kokugo-survey-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "0c120aaaed4b58dccb047d3423997af49b75e7195f0d78f73a570e85581e5743",
+      "31d4cc568108addbf4cf8d2b31e71453d114e730e3d10452d960bee08c917b20"
+    ]
+  },
+  {
+    "id": "bunki-read-n1-strange-loop",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n1-strange-loop.webp",
+      "alt": "A stone staircase winds around a mossy hill past a lit lantern, mirrored in a still pond at dusk.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n1-strange-loop-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "e31eaf041b1d0d99e6dae61cdd862f6431135946c29e89e2e22183a1477d8a8a",
+      "33c45999a2b0b20cf053809810b6d3861593454c1fecb7b1485b01e5a6b547cf"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-benzaiten",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-benzaiten.webp",
+      "alt": "A figure rinses coins in a bamboo basket at a spring in a candlelit grotto, red shrine gates beyond.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-benzaiten-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "66402cdc128d4d621f1368b3624a2e15caf6149f41c1453beebdcb9f8221da1a",
+      "01dbaa327886de1f40a097dac46dd18d4dddfcbfdbbeaca17bf68c3f641b01c4"
+    ]
+  },
+  {
+    "id": "bunki-read-n1-soai-nobel",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n1-soai-nobel.webp",
+      "alt": "Round glass flasks on a lab bench, crystals growing in the nearest, and a quartz crystal on the windowsill.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n1-soai-nobel-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "0eec5a93508352f13f748735d8853243508730ad6e6cc76c38080cb66dc0a024",
+      "2ed48566c821025b2558ca17d5ba7fca29f347502979d3a73cfa541223011bd8"
+    ]
+  },
+  {
+    "id": "bunki-read-n3-gojuon-sanskrit",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n3-gojuon-sanskrit.webp",
+      "alt": "A low writing desk with brush, inkstone, blank paper and a brass bell, open to a garden of white plum blossom.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n3-gojuon-sanskrit-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "30510206a848445fe0fee7beaca0faacac267848ff024f38bddf554d267ef667",
+      "15240d4380cfc36036d2a52e15f37b0c0db3500629dcea77497788308840d5ca"
+    ]
+  },
+  {
+    "id": "aozora:002359-1",
+    "picture": {
+      "src": "articles/pictures/aozora-002359-1.webp",
+      "alt": "A traveller in a straw hat stops on a mountain path to look at a wildflower, Mount Fuji above the mist.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/aozora-002359-1-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "4b2d8f4886dd0e3f3c0975f02235a41ee87f1f51a1927503d3f5d163b6ee53af",
+      "d6b1415da72af524b5111866a4b71d65d6047b8e397d20f7c524be4a297c5728"
+    ]
+  },
+  {
+    "id": "bunki-read-n1-nobel-economics",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n1-nobel-economics.webp",
+      "alt": "A grey stone bank with a green copper dome above a wet street, cars and people in winter coats with umbrellas.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n1-nobel-economics-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "a2c63f4c0334d41b08bd57f9062813bd7e1bbec306744023b05da5f2ca03ccf8",
+      "1534d521784ad3cf5db11c8c34d444f539a68d9d3ba742b34a1601f4c010b286"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-sleep-memory",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-sleep-memory.webp",
+      "alt": "A person asleep in a small room beside a desk with a lit lamp and an open book, snow outside the window.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-sleep-memory-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "e139ed969bbb725a73e3c43f24436cbddb500b92fc88e3b003c2abe65ba7dd7a",
+      "9cbb67dac78ad0dd27fe84f4850ada6ebe507c97170586e5953803098b861418"
+    ]
+  },
+  {
+    "id": "bunki-read-n3-transistor-class",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n3-transistor-class.webp",
+      "alt": "An open red transistor radio, a ring magnifier lamp, soldering iron and tweezers, an old tube radio behind.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n3-transistor-class-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "ae632f66823b7011137292d83c322d2a7275b44386d3f971f03afa16c1680749",
+      "f5fdeb0c35ec3e2f82490850299a6ce40f6b0f7a808a167a906c799157d911f2"
+    ]
+  },
+  {
+    "id": "bunki-read-n1-zazen-brainwaves",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n1-zazen-brainwaves.webp",
+      "alt": "A row of monks sit in meditation in a dim wooden hall, one lamp lit, the doors open to a night garden.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n1-zazen-brainwaves-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "5fae50ebc2eff53353c80e64dedf3f74056087095e337538187578186581cd9b",
+      "41f687f7a38753cf5a25b652a1544119c726c6210274469c9ae5a7094a337a5c"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-japan-us-chip-fab",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-japan-us-chip-fab.webp",
+      "alt": "A large white factory under construction on farmland, with tall cranes, trucks and red maples in front.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-japan-us-chip-fab-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "f7abd227d47efa33ac584fbf827aea3dff72b4c82a12c7282697d7ea1fb0cd3a",
+      "7c8170c572cd873ef2fef9d177dad6bb51af0633b34f1edb9d9b457c5c5ac1b6"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-shoten-ganesha",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-shoten-ganesha.webp",
+      "alt": "A red cable car climbs a forested slope toward a temple and pagoda, with white radishes on a stand in front.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-shoten-ganesha-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "2396bae24c5154b46e80199c963c80cebd4f65698feca172701855e817855d4c",
+      "29b0dbd3c1e0b71b5a8c01b660f60ecc20299c421b8f8ec7291d7da41240ffc3"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-icecube-nobel",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-icecube-nobel.webp",
+      "alt": "A two-storey lab on stilts on a white ice plain under a green aurora, with a few small figures nearby.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-icecube-nobel-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "e2ce0e87784ab2eb4862961b616dc0ec4248f9d8ea45860a6fb4548eecf22e69",
+      "5d822f0f0a4d3b3685fb0b20876f315194731dee2e310e5a7636ba8c05f4f9bc"
+    ]
+  },
+  {
+    "id": "aozora:058059-1",
+    "picture": {
+      "src": "articles/pictures/aozora-058059-1.webp",
+      "alt": "A monk crouches at a mossy stone basin to wash his face with a dipper, a frosty garden beside the veranda.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/aozora-058059-1-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "ce5f5974eb417b947c88e3d2df02b9d654f622f14b636f43d8ada409992eeba3",
+      "f26553c4c09a571bfa75fc09c107c73fcd28b591c33b580ff99c2637f12b64da"
+    ]
+  },
+  {
+    "id": "bunki-read-n3-rule-of-72",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n3-rule-of-72.webp",
+      "alt": "Two coin stacks, the right one twice as tall, beside an abacus and a passbook, city lights in the window.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n3-rule-of-72-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "95a6d4c5b6e34e706c7f319a849c00ad093e39852e0d2bc0153b027676a7fe2d",
+      "255e53b61cb0406ff04023632ac0182256bdbd7af95ef0a7056b966bc4d6bc98"
+    ]
+  },
+  {
+    "id": "global-voices:2026-08-03-65560",
+    "picture": {
+      "src": "articles/pictures/global-voices-2026-08-03-65560.webp",
+      "alt": "Two women forest guards in green uniforms walk a path through tall grass at dawn, a rhinoceros far ahead.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/global-voices-2026-08-03-65560-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "077660ae797e7e577f105123cc7f62406298bfd7b0236c309715159ec455115e",
+      "4cc6c8d0b709c723fef9b0dc9f5f77fc74d217a816b3e6245958e32c5bc14241"
+    ]
+  },
+  {
+    "id": "bunki-read-n1-kukai-sanskrit",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n1-kukai-sanskrit.webp",
+      "alt": "A young monk carrying scrolls crosses a moonlit temple courtyard, with a great pagoda and willows behind.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n1-kukai-sanskrit-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "8935c15d36c0b8f84d6d09a8a01a0695db92528c27e960d7081509292fd9546b",
+      "f2bdf99ca948ddc6888c47db3ea70905233ee01b9c9c1d5359d8e0c3b7f17211"
+    ]
+  },
+  {
+    "id": "global-voices:2026-07-28-65374",
+    "picture": {
+      "src": "articles/pictures/global-voices-2026-07-28-65374.webp",
+      "alt": "A hillside village of flat-roofed stone houses at dusk, one window glowing blue, a phone mast on the ridge.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/global-voices-2026-07-28-65374-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "17f1b0ee11a480e259cfb775da3cd9a8d861d7da080a9c881f626db7712ee91d",
+      "4800ac20f03d8a9627e39116b255f4a3aaa4f2bf604031c998971e583e07c3cf"
+    ]
+  },
+  {
+    "id": "govonline:202403-entry-5920-column",
+    "picture": {
+      "src": "articles/pictures/govonline-202403-entry-5920-column.webp",
+      "alt": "A woman holds a glowing phone in a lantern-lit hall of mirrors, her reflection repeating down the hall.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/govonline-202403-entry-5920-column-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "7a70def8e88709d76cdd04b60838884cff8f5d7f07687657acde00cdb246eee3",
+      "66a9fc9a9856187b7620403fa662ddeeb4c4024286bee351d7ec7cde113f840f"
+    ]
+  },
+  {
+    "id": "mext:b_menu-hakusho-html-hpaa202601-1421221_00020-column2-3",
+    "picture": {
+      "src": "articles/pictures/mext-b-menu-hakusho-html-hpaa202601-1421221-00020-column2-3.webp",
+      "alt": "A white robot arm and a server rack in a lab at dusk, the National Diet Building seen through the window.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/mext-b-menu-hakusho-html-hpaa202601-1421221-00020-column2-3-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "5431f44df83943ec9686033d3b7ba2f5c83832d53c27591382ac9f736208c734",
+      "278bd28cbd2e21b3ef5bc7ea1d85cd59bb957e0ecf0983f2ed3c6e1c4f6793b0"
+    ]
+  },
+  {
+    "id": "aozora:004668-1",
+    "picture": {
+      "src": "articles/pictures/aozora-004668-1.webp",
+      "alt": "A fishing village below a steep green hill on a calm morning, boats on the beach, a stone marker on the slope.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/aozora-004668-1-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "9393749d019846e0df6744c9092920e6bc9e5b4dd3b96e3a30c6346960b90cd1",
+      "464d0c71b89f07b76bf7b713c096bb01c44b3c008823f34469f1e26b008686d9"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-carson-nobel",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-carson-nobel.webp",
+      "alt": "A figure with red wings stands on black rocks by a dark sea at dusk, facing an island with faint lights.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-carson-nobel-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "dfeacd61020febcdac1498f397cf4108a5c477214ddcdc38743915eeb9855a26",
+      "2e5e986e3d89244826601b531345ff37603883fb07f8c3cd9ab1e838ce196d66"
+    ]
+  },
+  {
+    "id": "aozora:053224-1",
+    "picture": {
+      "src": "articles/pictures/aozora-053224-1.webp",
+      "alt": "A steam train with lit windows crosses a snowy field at night, its lights reflected in the flooded rice paddy.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/aozora-053224-1-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "b946dfb655067cd2b1638d6f211aed6cb524b02ce47b3d44263fae7a1cb410a1",
+      "b27795a5b9ac49ae506aa411a976dc42860a5486eb17c3b0cdc432498ebc791c"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-imf-outlook",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-imf-outlook.webp",
+      "alt": "Container ships at a misty quay under tall gantry cranes, stacked containers and a faint city skyline.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-imf-outlook-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "c87483d2e6a87f8129d9b43965d243a7043e70c8804c9ba486f11de057d66052",
+      "222b80a8029f01493dea52449ef6278c56b0685dd9bc7d3e3b28a9794b9ecb16"
+    ]
+  },
+  {
+    "id": "aozora:049966-2",
+    "picture": {
+      "src": "articles/pictures/aozora-049966-2.webp",
+      "alt": "A lone monk walks a ridge path between tea terraces toward a hilltop monastery under a wall of snow peaks.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/aozora-049966-2-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "360886ce46850dbecf4166d23676f5fe204009077fa71696e9f316e7d5ec5916",
+      "af7be2952576ce7e15b71d22e17ddd35f6cec5cc38e7244d5552fee4260dbb06"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-pillay-peace-nobel",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-pillay-peace-nobel.webp",
+      "alt": "A red-brick palace with a tall clock tower behind a gate, autumn trees and umbrellas on a wet forecourt.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-pillay-peace-nobel-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "2a9b3f5ae50546ef3449761d871f9f3c31475756b9ef88ae883f6a151e70cb79",
+      "8a69ee49db910ea78516ae5f66a87b61c6349573e78d9550105b8acdc30d8ba6"
+    ]
+  },
+  {
+    "id": "bunki-read-n1-suzuki-zen",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n1-suzuki-zen.webp",
+      "alt": "A figure in dark kimono climbs stone steps to a two-storey temple gate among tall cedars, a jet trail above.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n1-suzuki-zen-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "154965f5a72c7962e5f0bc03d0bec26b4748cd2d6d7304fca51465871104cafd",
+      "0101616992b0bde1cf7a1698ff6d8a2c8433b9432653c8c9587898d70acf2935"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-grit-checked",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-grit-checked.webp",
+      "alt": "A long file of cadets jogs along a rainy river road below stone buildings, one runner trailing the rest.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-grit-checked-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "c4599caecb936dce11b75b22fcbcf84dd574995275f31ec65cd4fcdb9e7d84c3",
+      "a65b0ea016711af3a1e09495cf54f9af8891d19a66d029e59b34a564db91d761"
+    ]
+  },
+  {
+    "id": "bunki-read-n3-felt-prices",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n3-felt-prices.webp",
+      "alt": "Shoppers with baskets in a small lit supermarket seen from the rainy street, crates of cabbages and apples.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n3-felt-prices-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "fe31e1a25563cbddd1519693059e8e47197df429b9ffcc13d9e778caf0dc22c6",
+      "fc8c90b67940a056f9c031684c11598bd22bccc51743594eefe47e4b1e5c4b4b"
+    ]
+  },
+  {
+    "id": "bunki-read-n2-hofstadter-law",
+    "picture": {
+      "src": "articles/pictures/bunki-read-n2-hofstadter-law.webp",
+      "alt": "A chessboard mid-game beside an old computer terminal and a coffee cup, grey dawn light in the window.",
+      "w": 1200,
+      "h": 800,
+      "srcSmall": "articles/pictures/bunki-read-n2-hofstadter-law-600.webp",
+      "wSmall": 600
+    },
+    "hashes": [
+      "0e15519fe761c6192c4d6b1ef96c376c8c919542c217a80cb4d503aafc831898",
+      "13b2d62268e2d45dcc960bc297085480b016a412bc8de87de86618e42c7f7f35"
+    ]
+  }
+]);
+function shelf40SourceProof() {
+  const index = JSON.parse(readFileSync(resolve(site, 'data/articles/index.json'), 'utf8'));
+  assert.equal(index.articles.length, 156, 'The complete curated index remains156 rows');
+  assert.equal(index.articles.filter((row) => row.picture?.src).length, 156, 'All156 rows carry real picture metadata');
+  assert.equal(new Set(SHELF40.map((row) => row.id)).size, 40);
+  for (const expected of SHELF40) {
+    const found = index.articles.filter((row) => row.id === expected.id);
+    assert.equal(found.length, 1, `Admitted article missing/duplicated: ${expected.id}`);
+    assert.deepEqual(found[0].picture, expected.picture, `Admitted picture metadata drift: ${expected.id}`);
+    for (const [i, key] of ['src', 'srcSmall'].entries()) {
+      const bytes = readFileSync(resolve(site, 'data', expected.picture[key]));
+      assert.equal(createHash('sha256').update(bytes).digest('hex'), expected.hashes[i], `Admitted bytes drift: ${expected.id}/${key}`);
+    }
+  }
+  return { ids: SHELF40.map((row) => row.id), images: SHELF40.length * 2 };
+}
+// Shelf40: fault data belongs only to an isolated verifier response, never the artifact.
+const SHELF_FALLBACK_ID = 'bunki-read-n2-shima-4004';
+function shelfFallbackIndex(index, mode) {
+  assert(['missing', 'failed', 'no-band'].includes(mode), 'Unknown shelf fallback fixture');
+  const copy = structuredClone(index);
+  const rows = copy.articles.filter((row) => row.id === SHELF_FALLBACK_ID);
+  assert.equal(rows.length, 1, 'The exact fallback article must exist once');
+  const row = rows[0];
+  assert.equal(row.heroKanji, '算', 'The fallback has a real attested key kanji');
+  assert(row.picture?.src && row.picture?.srcSmall, 'Both real responsive resources must exist');
+  if (mode !== 'failed') delete row.picture;
+  if (mode === 'no-band') delete row.heroKanji;
+  return copy;
+}
+async function installShelfFallback(page, mode) {
+  const original = JSON.parse(readFileSync(resolve(site, 'data/articles/index.json'), 'utf8'));
+  const picture = original.articles.find((row) => row.id === SHELF_FALLBACK_ID)?.picture;
+  const data = shelfFallbackIndex(original, mode);
+  const urls = ['src', 'srcSmall'].map((key) => `/data/${picture[key]}`);
+  const aborted = [], failed = [];
+  const indexRoute = (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) });
+  const imageRoute = (route) => {
+    const path = new URL(route.request().url()).pathname;
+    if (urls.includes(path)) { aborted.push(path); return route.abort('failed'); }
+    return route.fallback();
+  };
+  const recordFailure = (request) => {
+    const path = new URL(request.url()).pathname;
+    if (urls.includes(path)) failed.push({ path, error: request.failure()?.errorText || null });
+  };
+  const dispose = async () => {
+    const failures = [];
+    const cleanup = [() => page.unroute('**/data/articles/index.json', indexRoute)];
+    if (mode === 'failed') cleanup.push(
+      () => page.unroute('**/data/articles/pictures/*', imageRoute),
+      () => page.off('requestfailed', recordFailure));
+    for (const retire of cleanup) {
+      try { await retire(); } catch (error) { failures.push(error); }
+    }
+    if (failures.length) throw new AggregateError(failures, 'Shelf fixture cleanup did not complete');
+  };
+  try {
+    await page.route('**/data/articles/index.json', indexRoute);
+    if (mode === 'failed') {
+      page.on('requestfailed', recordFailure);
+      await page.route('**/data/articles/pictures/*', imageRoute);
+    }
+  } catch (error) {
+    try { await dispose(); }
+    catch (cleanupError) { throw new AggregateError([error, cleanupError], 'Shelf fixture setup and cleanup failed'); }
+    throw error;
+  }
+  return { id: SHELF_FALLBACK_ID, mode, urls, aborted, failed,
+    responseSHA256: createHash('sha256').update(JSON.stringify(data)).digest('hex'), dispose };
+}
+async function shelfFallbackObservation(page, fixture, expectedFailedPath, originalBox) {
+  const card = page.locator(`#shelf-body [data-passage="${fixture.id}"].story-card`).first();
+  await card.scrollIntoViewIfNeeded();
+  await card.locator('img.story-img').evaluateAll((images) => { for (const img of images) img.loading = 'eager'; });
+  await page.waitForFunction(({ id, mode }) => {
+    const card = document.querySelector(`#shelf-body [data-passage="${id}"].story-card`);
+    return !!card && (mode === 'no-band' ? !card.querySelector('.story-picture')
+      : !card.querySelector('.story-img') && !!card.querySelector('.story-picture.is-kanji .story-hero-kanji'));
+  }, { id: fixture.id, mode: fixture.mode });
+  const observed = await card.evaluate((node) => {
+    const bands = node.querySelectorAll('.story-picture'), band = bands[0], glyph = band?.querySelector('.story-hero-kanji');
+    const box = band?.getBoundingClientRect();
+    return { bands: bands.length, images: node.querySelectorAll('.story-img').length,
+      glyph: glyph?.textContent || '', text: band?.textContent.trim() || '',
+      size: glyph ? parseFloat(getComputedStyle(glyph).fontSize) : 0,
+      width: box?.width || 0, height: box?.height || 0,
+      placeholder: !!node.querySelector('.is-placeholder, .story-picture-word') };
+  });
+  assert.equal(observed.images, 0, 'No failed or absent image may stand over the fallback');
+  assert.equal(observed.placeholder, false, 'No category placeholder');
+  if (fixture.mode === 'no-band') assert.equal(observed.bands, 0, 'No picture and no kanji means no band');
+  else {
+    assert.equal(observed.bands, 1, 'Exactly one genuine fallback band');
+    assert.equal(observed.glyph, '算'); assert.equal(observed.text, '算');
+    assert(observed.size >= observed.height / 3, 'Key kanji occupies at least a third of the band');
+    assert(Math.abs(observed.width / observed.height - 1.5) <= .02, 'Fallback preserves the3:2 slot');
+    if (originalBox) assert(Math.abs(observed.width - originalBox.width) <= 1 && Math.abs(observed.height - originalBox.height) <= 1, 'Fallback preserves the loaded-picture box');
+  }
+  if (fixture.mode === 'failed') {
+    assert(expectedFailedPath && fixture.urls.includes(expectedFailedPath), 'Expected resource must be one of the original src/srcSmall');
+    assert(fixture.aborted.includes(expectedFailedPath), `Responsive request not aborted: ${expectedFailedPath}`);
+    assert(fixture.failed.some((row) => row.path === expectedFailedPath && row.error), `No actual transport failure: ${expectedFailedPath}`);
+  }
+  return { mode: fixture.mode, id: fixture.id, responseSHA256: fixture.responseSHA256,
+    expectedFailedPath, armedFailures: fixture.mode === 'failed' ? fixture.urls : [],
+    aborted: [...fixture.aborted], failed: [...fixture.failed], ...observed };
+}
+
 async function open(page, search = '') {
   await page.goto(`${host.origin}/?entry=shelf&ui=bi${search}`);
-  await page.waitForFunction(() => document.body.dataset.ready === '1');
+  await g6Wait(page, 'app-ready', () => document.body.dataset.ready === '1');
   await page.waitForTimeout(400);
 }
 async function openArticle(page, id, search = '') {
   await open(page, search);
   await page.evaluate((pid) => document.querySelector(`#shelf-body [data-passage="${pid}"] .shelf-open`).click(), id);
-  await page.waitForFunction(() => document.body.dataset.view === 'reader' && document.querySelector('#reader .tok'));
+  await g6Wait(page, 'article-reader-ready', () => document.body.dataset.view === 'reader' && document.querySelector('#reader .tok'));
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(500);
 }
@@ -226,7 +957,9 @@ const measureGaps = (count) => {
     }
     if (!rects.length) continue;
     probe.textContent = base;
-    const excess = word.getBoundingClientRect().width - probe.getBoundingClientRect().width;
+    // Native prose may wrap within one token. Its union spans the empty
+    // distance between line ends; only the actual fragment widths carry ink.
+    const excess = [...word.getClientRects()].reduce((sum, rect) => sum + rect.width, 0) - probe.getBoundingClientRect().width;
     boxes.push({ text: base, index: Number(tok.dataset.index), first: rects[0], last: rects.at(-1), excess });
   }
   probe.remove();
@@ -292,10 +1025,10 @@ const measureReaderMotion = () => {
   const seconds = (value) => parseFloat(value) * (value.trim().endsWith('ms') ? 0.001 : 1);
   const violations = [];
   let transitions = 0, animations = 0;
-  const nodes = [...document.querySelectorAll('#app, #app *, #mini, #mini *, #reader-word-menu, #reader-word-menu *, #reader-toast, #reader-toast *, #vocabulary-list-popover, #vocabulary-list-popover *')];
+  const nodes = [...document.querySelectorAll('#app, #app *, #mini, #mini *, #seal-strip, #seal-strip *, #reader-toast, #reader-toast *, #vocabulary-list-popover, #vocabulary-list-popover *')];
   const groups = { topBar: '#app > .chrome button', tabBar: '#primary-tabs .primary-tab', titleCard: '.reader-card button, .reader-card summary',
-    bookmark: '#reader-place-save', playBar: '.listen-row', words: '#reader button', finished: '#read-fin', settings: '.dials .seg button',
-    menu: '#reader-word-menu', popup: '#mini button', toast: '#reader-toast', listAdd: '#vocabulary-list-create' };
+    bookmark: '#reader-place-save', playBar: '.listen-row', words: '#reader .tok[data-prose-label]', finished: '#read-fin', settings: '.dials .seg button',
+    menu: '#seal-strip', popup: '#mini button', toast: '#reader-toast', listAdd: '#vocabulary-list-create' };
   const covered = Object.fromEntries(Object.entries(groups).map(([group, selector]) => [group, nodes.filter((node) => node.matches(selector)).length]));
   for (const node of nodes) for (const pseudo of [null, '::before', '::after']) {
     const style = getComputedStyle(node, pseudo);
@@ -347,12 +1080,166 @@ const contrastOf = (selector) => {
   return Math.round(((Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05)) * 100) / 100;
 };
 
-async function tapToken(page, index) {
+async function focusToken(page, index) {
   const tok = page.locator(`#reader .tok[data-index="${index}"]`);
-  await tok.evaluate((node) => node.scrollIntoView({ block: 'center' }));
+  const at = await tok.evaluate((node) => [...node.closest('[data-prose-roving]').querySelectorAll('.tok[data-para]')].indexOf(node));
+  assert(at >= 0, `token ${index} has no paragraph rover`);
+  await tok.locator('xpath=ancestor::*[@data-prose-roving][1]').focus();
+  await page.keyboard.press('Home');
+  for (let i = 0; i < at; i++) await page.keyboard.press('ArrowRight');
+  assert.equal(await page.evaluate(() => document.activeElement?.dataset.index), String(index), 'paragraph rover selected the wrong word');
+}
+
+/** Ladder (John, 10-19, a spec change): a word's box by its own ladder — its reading where that is not up, then its English
+ * under it, then the box — each press only once the rung before it is seen, never a blind extra. Whether the box came. */
+async function climbToBox(page, locator, press = () => locator.click()) {
+  const node = await locator.elementHandle();
+  try {
+    let last = await locator.getAttribute('data-ladder-rung');
+    for (let step = 0; step < 3 && !(await page.locator('#mini').count()); step += 1) {
+      await press();
+      last = await page.waitForFunction(([n, was]) => (document.getElementById('mini') ? 'stage'
+        : ['reading', 'gloss'].includes(n?.dataset.ladderRung) && n.dataset.ladderRung !== was ? n.dataset.ladderRung : null),
+      [node, last], { timeout: 10000 }).then((handle) => handle.jsonValue(), () => null);
+      if (!last) break;
+    }
+  } finally { await node?.dispose(); }
+  return (await page.locator('#mini').count()) > 0;
+}
+/** G6 records dispatches and predicates without introducing a wait or retry. Event capture runs
+ * synchronously at the physical tap, so a rising target is observed where it was actually hit. */
+const g6Phase = (page, phase, predicate = null) => {
+  if (page.__g6) Object.assign(page.__g6, { phase, predicate });
+};
+const g6Wait = (page, phase, predicate, arg, options) => {
+  g6Phase(page, phase, predicate.toString());
+  return page.waitForFunction(predicate, arg, options);
+};
+const g6Tap = async (page, selector, point, invoke) => {
+  if (!page.__g6) return invoke();
+  const tap = { sequence: page.__g6.taps.length + 1, phase: page.__g6.phase, token: page.__g6.token,
+    selector, intendedCoordinates: point, coordinateSource: point ? 'explicit physical point' : 'locator resolves physical point',
+    startedAt: Date.now() };
+  page.__g6.taps.push(tap);
+  try { return await invoke(); } finally { tap.finishedAt = Date.now(); }
+};
+async function installG6Observability(page) {
+  page.__g6 = { phase: 'open-article', predicate: null, token: null, taps: [] };
+  await page.addInitScript(({ control }) => {
+    const describe = (node) => node instanceof Element ? { tag: node.tagName, id: node.id || null,
+      classes: node.getAttribute('class'), tokenIndex: node.closest('.tok[data-index]')?.dataset.index ?? null } : null;
+    const evidence = { taps: [], sentenceDoorClicks: 0, controlApplications: 0, blocked: [] };
+    window.__readerShelfG6Evidence = evidence;
+    for (const type of ['pointerdown', 'pointerup', 'click']) window.addEventListener(type, (event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      const door = target?.closest('#mini #mini-sentence-open');
+      if (type === 'click' && door) evidence.sentenceDoorClicks += 1;
+      const blocked = Boolean(control && type === 'click' && door && evidence.sentenceDoorClicks === 4);
+      const token = target?.closest('.tok[data-index]');
+      const mini = document.getElementById('mini');
+      const row = { type, at: Date.now(), coordinates: { x: event.clientX, y: event.clientY },
+        actualTarget: describe(target), sentenceDoor: describe(door), hitTarget: describe(document.elementFromPoint(event.clientX, event.clientY)),
+        token: token ? { index: token.dataset.index, rung: token.dataset.ladderRung ?? null } : null,
+        view: document.body?.dataset.view ?? null, focus: describe(document.activeElement),
+        scroll: { x: scrollX, y: scrollY }, viewport: { width: innerWidth, height: innerHeight },
+        popup: mini ? { word: mini.querySelector('.mini-word')?.textContent ?? null,
+          sentence: mini.querySelector('.mini-sentence-pane')?.hidden === false } : null,
+        isTrusted: event.isTrusted, blocked };
+      evidence.taps.push(row);
+      if (blocked) {
+        evidence.controlApplications += 1;
+        evidence.blocked.push(row);
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+    }, true);
+  }, { control: g6SentenceDoorControl });
+}
+function g6ControlOutcome(error, diagnostics) {
+  const events = diagnostics?.observed.events;
+  return { applications: events?.controlApplications ?? 0,
+    killed: diagnostics?.phase === 'rising-sentence-pane' &&
+      diagnostics?.predicate === String(() => document.querySelector('#mini .mini-sentence-pane')?.hidden === false) &&
+      /Timeout/u.test(String(error.message || error)) && events?.controlApplications === 1 &&
+      diagnostics?.observed.popup?.sentence === false && events?.blocked.length === 1 &&
+      events?.blocked[0].sentenceDoor?.id === 'mini-sentence-open' };
+}
+async function g6Diagnostics(page) {
+  const state = page.__g6;
+  if (!state) return undefined;
+  const observed = await page.evaluate((index) => {
+    const describe = (node) => node instanceof Element ? { tag: node.tagName, id: node.id || null,
+      classes: node.getAttribute('class'), tokenIndex: node.closest('.tok[data-index]')?.dataset.index ?? null } : null;
+    const token = index === null ? null : document.querySelector(`#reader .tok[data-index="${index}"]`);
+    const mini = document.getElementById('mini'), box = mini?.getBoundingClientRect();
+    return { token: token ? { index: token.dataset.index, rung: token.dataset.ladderRung ?? null,
+      text: token.textContent } : null, view: document.body?.dataset.view ?? null,
+      focus: describe(document.activeElement), scroll: { x: scrollX, y: scrollY },
+      viewport: { width: innerWidth, height: innerHeight }, popup: mini ? {
+        word: mini.querySelector('.mini-word')?.textContent ?? null,
+        sentence: mini.querySelector('.mini-sentence-pane')?.hidden === false,
+        rect: { x: box.x, y: box.y, width: box.width, height: box.height } } : null,
+      events: window.__readerShelfG6Evidence ?? null };
+  }, state.token).catch(error => ({ collectionError: String(error.message || error) }));
+  const taps = state.taps.map(tap => {
+    const events = observed.events?.taps.filter(event => event.at >= tap.startedAt && event.at <= (tap.finishedAt ?? Infinity)) ?? [];
+    const down = events.find(event => event.type === 'pointerdown');
+    return { ...tap, intendedCoordinates: tap.intendedCoordinates ?? down?.coordinates ?? null, events };
+  });
+  return { phase: state.phase, predicate: state.predicate, selectedToken: state.token, taps, observed };
+}
+
+async function tapToken(page, index, { scroll = true } = {}) {
+  if (page.__g6) page.__g6.token = index;
+  g6Phase(page, `token-${index}-first-tap`);
+  const tok = page.locator(`#reader .tok[data-index="${index}"]`);
+  if (scroll) await tok.evaluate((node) => node.scrollIntoView({ block: 'center' }));
   const box = await tok.evaluate((node) => { const r = node.getClientRects()[0]; return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
-  await page.mouse.click(box.x, box.y);
-  await page.waitForTimeout(250);
+  await g6Tap(page, `#reader .tok[data-index="${index}"]`, box, () => page.mouse.click(box.x, box.y));
+  // Lookup-only words may still be resolving their dictionary index after
+  // 250 ms. Observe this activation on the exact node; never add a retry tap.
+  const activated = await tok.elementHandle();
+  try {
+    await g6Wait(page, `token-${index}-activated`, (node) => node?.isConnected &&
+      (node.dataset.ladderRung === 'reading' || node.dataset.ladderRung === 'gloss' ||
+        (node.dataset.ladderRung === 'stage' && !!document.querySelector('#mini'))), activated, { timeout: 5000 });
+  } finally { await activated?.dispose(); }
+  if (!await page.locator('#mini').count()) {
+    const revealed = await tok.evaluate((node) => node.dataset.ladderRung === 'reading' || node.dataset.ladderRung === 'gloss');
+    assert(revealed, `token ${index}: first activation produced neither the reading rung, the English rung nor a stage`);
+    // Ladder (John, 10-19): after the reading comes the English under the word, then the stage — each click only once the
+    // rung before it is seen, never a blind retry
+    if (await tok.evaluate((node) => node.dataset.ladderRung === 'reading')) {
+      g6Phase(page, `token-${index}-reading-to-gloss-tap`);
+      await g6Tap(page, `#reader .tok[data-index="${index}"]`, null, () => tok.click());
+      await g6Wait(page, `token-${index}-gloss-or-popup`, (node) => node?.isConnected && (node.dataset.ladderRung === 'gloss' || !!document.querySelector('#mini')),
+        await tok.elementHandle(), { timeout: 5000 });
+    }
+    if (!await page.locator('#mini').count()) {
+      assert(await tok.evaluate((node) => node.dataset.ladderRung === 'gloss'), `token ${index}: the English rung did not follow the reading`);
+      g6Phase(page, `token-${index}-gloss-to-popup-tap`);
+      await g6Tap(page, `#reader .tok[data-index="${index}"]`, null, () => tok.click());
+    }
+    g6Phase(page, `token-${index}-popup-visible`, 'waitForSelector("#mini")');
+    await page.waitForSelector('#mini');
+    await page.waitForTimeout(250);
+  }
+}
+
+/** Ladder · a tap where the control stands on the glass, once it holds still (two frames alike): a finger's tap, which never
+ * scrolls the page to its target first. */
+async function tapWhereItStands(page, selector) {
+  g6Phase(page, `tap-target-visible:${selector}`, `locator(${JSON.stringify(selector)}).waitFor()`);
+  await page.locator(selector).waitFor();
+  g6Phase(page, `tap-target-still:${selector}`, 'two consecutive animation-frame bounding rects are identical');
+  const at = await page.locator(selector).evaluate((node) => new Promise((done) => {
+    let last = null;
+    const tick = () => { const r = node.getBoundingClientRect(), now = `${r.x}|${r.y}|${r.width}|${r.height}`;
+      if (now === last) done({ x: r.x + r.width / 2, y: r.y + r.height / 2 }); else { last = now; requestAnimationFrame(tick); } };
+    requestAnimationFrame(tick);
+  }));
+  g6Phase(page, `physical-tap:${selector}`);
+  await g6Tap(page, selector, at, () => page.mouse.click(at.x, at.y));
 }
 
 /** The popup's painted box and which of its views is open. */
@@ -374,25 +1261,43 @@ const popupFocus = (page) => page.evaluate(() => {
 try {
   for (const engine of engines) {
     const browser = await { chromium, webkit }[engine].launch({ headless: true });
-    const context = async (viewport, init) => {
+    browserVersions[engine] = browser.version();
+    console.log(`${engine} ${browserVersions[engine]}`);
+    const context = async (viewport, init, { demo = false } = {}) => {
       const ctx = await browser.newContext({ viewport, reducedMotion: 'reduce', serviceWorkers: 'block' });
       await silenceBrowserAudio(ctx);
+      if (!demo) await ctx.addInitScript((key) => localStorage.setItem(key, '1'), DEMO_KEY);
       if (init) await ctx.addInitScript(init);
       await ctx.route('**/*', (route) => (new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort()));
       const page = await ctx.newPage();
       page.setDefaultTimeout(15000);
       return { ctx, page };
     };
-    const run = async (name, viewport, body, init) => {
-      const { ctx, page } = await context(viewport, init);
+    const run = async (name, viewport, body, init, options) => {
+      assert(selectedDesign.cases.includes(name) || selectedDesign.diagnostic, `Undeclared design case ${name}`);
+      if (!selectedDesign.cases.includes(name)) return;
+      const { ctx, page } = await context(viewport, init, options);
+      const pageErrors = [], pageErrorDetails = [], networkEvents = [];
+      const traceRequest = (event, request) => {
+        if (/\/dict-v2\//u.test(request.url())) networkEvents.push({ event, phase: page.__verifierPhase || 'walk', url: request.url(), failure: request.failure()?.errorText || null });
+      };
+      page.on('request', (request) => traceRequest('request', request));
+      page.on('requestfinished', (request) => traceRequest('finished', request));
+      page.on('requestfailed', (request) => traceRequest('failed', request));
+      page.on('pageerror', (error) => { pageErrors.push(error.message); pageErrorDetails.push({ phase: page.__verifierPhase || 'walk', message: error.message }); });
       try {
         const observations = await body(page);
+        assert.deepEqual(pageErrors, [], 'unfiltered browser page errors');
         results.push({ engine, name, passed: true, observations });
         console.log(`PASS ${engine}/${name} ${JSON.stringify(observations)}`);
       } catch (error) {
+        // Collect before a screenshot disables animations or changes the state being diagnosed.
+        const diagnostics = await g6Diagnostics(page);
+        const controlOutcome = g6SentenceDoorControl ? g6ControlOutcome(error, diagnostics) : undefined;
         const screenshot = resolve(evidence, `${engine}-${name}.png`);
         await page.screenshot({ path: screenshot, animations: 'disabled' }).catch(() => {});
-        results.push({ engine, name, passed: false, error: String(error.message || error), screenshot });
+        results.push({ engine, name, passed: false, error: String(error.message || error), pageErrorDetails, networkEvents,
+          ...(diagnostics ? { diagnostics, stack: error.stack ?? null } : {}), ...(controlOutcome ? { controlOutcome } : {}), screenshot });
         console.log(`FAIL ${engine}/${name}: ${String(error.message || error).split('\n')[0]}`);
       } finally { await ctx.close(); }
     };
@@ -400,6 +1305,7 @@ try {
     for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
       await run(`R1-flush-tokens-${label}`, viewport, async (page) => {
         await openArticle(page, ARTICLE);
+        if (withControl) await page.addStyleTag({ content: '#reader .tok[data-index="1"] .tok-word { padding-inline-end: 8px !important; }' });
         const resting = await page.evaluate(measureGaps, 220);
         assert(resting.tokens > 100, `measured only ${resting.tokens} tokens`);
         assert.equal(resting.strayWhitespace, 0, 'whitespace text nodes stand between reader tokens');
@@ -412,25 +1318,28 @@ try {
 
       await run(`R2-readability-${label}`, viewport, async (page) => {
         await openArticle(page, ARTICLE);
-        if (withControl) await page.addStyleTag({ content: '#reader rt, #reader ruby::before { font-size: 0.46em !important; }' });
+        if (withControl) await page.addStyleTag({ content: '#reader rt { font-size: 0.46em !important; }' });
         const body = await page.evaluate(() => parseFloat(getComputedStyle(document.querySelector('#reader')).fontSize));
-        const [lo, hi] = label === '1368' ? [21, 22] : [18, 19];
-        assert(body >= lo && body <= hi, `Japanese body ${body}px, wanted ${lo}–${hi}px`);
+        const want = label === '1368' ? 23 : 21; // the ladder's reading step (21 on a phone)
+        assert.equal(body, want, `Japanese body ${body}px, wanted the reading step ${want}px`);
         const bodyContrast = await page.evaluate(contrastOf, '#reader .tok.content');
         assert(bodyContrast >= 4.5, `reading text contrast ${bodyContrast}:1`);
         await tapToken(page, 1);
-        // measure what is painted: the <rt> itself, or the ruby's ::before when the reader draws
-        // the reading there (the <rt> then stays in the DOM, undisplayed, as the reading's record)
+        // what is painted is the <rt> itself (one ruby, native): no pseudo-element draws a reading
         const rt = await page.evaluate(() => {
           const node = [...document.querySelectorAll('#reader .tok[data-index="1"] rt')].find((n) => !n.classList.contains('hidden-rt'));
           if (!node) return null;
-          const drawn = getComputedStyle(node).display === 'none' ? getComputedStyle(node.parentElement, '::before') : getComputedStyle(node);
-          const text = drawn === getComputedStyle(node) ? node.textContent : drawn.content.replace(/^"|"$/gu, '');
-          return { size: parseFloat(drawn.fontSize), opacity: Number(drawn.opacity), text, expected: node.textContent,
-            carrier: getComputedStyle(node).display === 'none' ? 'ruby::before' : 'rt' };
+          const cs = getComputedStyle(node), ruby = node.parentElement;
+          const pseudo = ['::before', '::after'].map((p) => getComputedStyle(ruby, p).content).filter((c) => c && c !== 'none' && c !== 'normal');
+          return { size: parseFloat(cs.fontSize), opacity: Number(cs.opacity), shown: cs.display !== 'none' && cs.visibility !== 'hidden',
+            text: node.textContent, carrier: 'rt', pseudo };
         });
-        assert(rt && rt.opacity > 0.9 && rt.text === rt.expected, `the first tap shows no reading: ${JSON.stringify(rt)}`);
-        assert(rt.size / body >= 0.55, `furigana ${rt.size}px is ${(rt.size / body).toFixed(2)}× the body`);
+        assert(rt && rt.shown && rt.opacity > 0.9 && rt.text, `the first tap shows no reading: ${JSON.stringify(rt)}`);
+        assert.deepEqual(rt.pseudo, [], `a pseudo-element draws a reading: ${JSON.stringify(rt.pseudo)}`);
+        assert(rubyHalfOfBody(rt.size, body), `furigana ${rt.size}px is ${(rt.size / body).toFixed(2)}× the body, not half`);
+        assert(rubyLegible(rt.size), `furigana ${rt.size}px is under 10px`);
+        const readingContrast = await page.evaluate(contrastOf, '#reader .tok[data-index="1"] rt:not(.hidden-rt)');
+        assert(readingContrastHolds(readingContrast), `the reading's contrast ${readingContrast}:1`);
         // one tap is the meaning (reader lane 2026-10-02): the English stands in the word's popup
         const gloss = await page.evaluate(() => {
           const node = document.querySelector('#mini .mini-gloss');
@@ -440,7 +1349,7 @@ try {
         const glossContrast = await page.evaluate(contrastOf, '#mini .mini-gloss');
         assert(gloss.size >= 15, `English gloss ${gloss.size}px`);
         assert(glossContrast >= 4.5, `English gloss contrast ${glossContrast}:1`);
-        return { body, bodyContrast, furigana: rt.size, carrier: rt.carrier, ratio: Math.round((rt.size / body) * 100) / 100, gloss: gloss.size, glossContrast };
+        return { body, bodyContrast, furigana: rt.size, carrier: rt.carrier, ratio: Math.round((rt.size / body) * 100) / 100, readingContrast, gloss: gloss.size, glossContrast };
       });
 
       await run(`R3-first-sentence-${label}`, viewport, async (page) => {
@@ -517,13 +1426,14 @@ try {
 
     for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
       await run(`S4-picture-cards-${label}`, viewport, async (page) => {
+        const admission = shelf40SourceProof();
         await open(page);
         // let every picture the index names arrive (they are lazy below the fold)
         await page.evaluate(async () => {
           for (const img of document.querySelectorAll('#shelf-body img.story-img')) img.loading = 'eager';
           await Promise.all([...document.querySelectorAll('#shelf-body img.story-img')].map((img) => img.decode().catch(() => {})));
         });
-        const probe = await page.evaluate(async () => {
+        const probe = await page.evaluate(async ({ admittedIds, fallbackId }) => {
           const index = await (await fetch('data/articles/index.json')).json();
           const byId = new Map(index.articles.map((row) => [row.id, row]));
           const cards = [...document.querySelectorAll('#shelf-body .story-card')];
@@ -531,10 +1441,19 @@ try {
           const articles = cards.filter((card) => !glossary(card)), definitions = cards.filter(glossary);
           const bad = [];
           let pictured = 0;
+          let kanjiSheets = 0;
           for (const card of articles) {
             const slots = card.querySelectorAll('.story-picture');
             const slot = slots[0];
             const row = byId.get(card.dataset.passage) || {};
+            // N (2026-10-17) rewrites the pin "a row with no picture shows the calm block with its topic word": a row with
+            // no picture shows its key kanji (heroKanji) on the world's paper, and a row with neither has no band at all
+            const heroKanji = typeof row.heroKanji === 'string' && /^[\p{Script=Han}々]{1,2}$/u.test(row.heroKanji) ? row.heroKanji : '';
+            if (card.querySelector('.is-placeholder, .story-picture-word')) bad.push(`${card.dataset.passage}: a category placeholder block`);
+            if (!row.picture?.src && !heroKanji) {
+              if (slots.length) bad.push(`${card.dataset.passage}: a row with neither picture nor key kanji wears ${slots.length} band(s)`);
+              continue;
+            }
             if (slots.length !== 1) { bad.push(`${card.dataset.passage}: ${slots.length} picture slots`); continue; }
             const box = slot.getBoundingClientRect();
             const ratio = box.width / box.height;
@@ -550,10 +1469,13 @@ try {
               else if (img.alt !== '') bad.push(`${card.dataset.passage}: picture inside the card is not decorative`);
               else pictured += 1;
             } else {
+              const glyph = slot.querySelector('.story-hero-kanji');
               const words = slot.textContent.trim();
-              const size = parseFloat(getComputedStyle(slot.querySelector('.story-picture-word') || slot).fontSize);
-              if (img || !slot.classList.contains('is-placeholder')) bad.push(`${card.dataset.passage}: a picture slot with no picture is not the calm block`);
-              else if (/[\p{Script=Han}]/u.test(words) || size > 16 || !words) bad.push(`${card.dataset.passage}: the calm block reads "${words}" at ${size}px`);
+              const size = glyph ? parseFloat(getComputedStyle(glyph).fontSize) : 0;
+              // the key kanji alone, large (a third of the box's height or more), and nothing else in the band
+              if (img || !slot.classList.contains('is-kanji') || !glyph) bad.push(`${card.dataset.passage}: a picture-less row does not show its key kanji`);
+              else if (words !== heroKanji || size < box.height / 3) bad.push(`${card.dataset.passage}: the key kanji band reads "${words}" at ${size}px in a ${Math.round(box.height)}px box`);
+              else kanjiSheets += 1;
             }
           }
           for (const card of definitions) {
@@ -566,18 +1488,38 @@ try {
           const seal = document.querySelector('.shelf-masthead .shelf-art');
           const sealBox = seal?.getBoundingClientRect();
           const named = index.articles.filter((row) => row.picture?.src && cards.some((card) => card.dataset.passage === row.id)).length;
-          return { cards: cards.length, articles: articles.length, definitions: definitions.length, pictured, named, bad: bad.slice(0, 4), badCount: bad.length,
+          const keyed = index.articles.filter((row) => !row.picture?.src && row.heroKanji && cards.some((card) => card.dataset.passage === row.id)).length;
+          const fallbackBox = document.querySelector(`#shelf-body [data-passage="${fallbackId}"] .story-picture`)?.getBoundingClientRect();
+          const missingAdmitted = admittedIds.filter((id) => !cards.some((card) => card.dataset.passage === id));
+          return { missingAdmitted, fallbackBox: fallbackBox ? { width: fallbackBox.width, height: fallbackBox.height } : null, cards: cards.length, articles: articles.length, definitions: definitions.length, pictured, named, kanjiSheets, keyed, bad: bad.slice(0, 4), badCount: bad.length,
             incomplete: incomplete.slice(0, 4), incompleteCount: incomplete.length,
             lede: lead?.querySelector('.story-lede')?.textContent ?? '', sealInTitle: !!seal?.closest('.shelf-mast-title'),
             seal: sealBox ? Math.round(Math.max(sealBox.width, sealBox.height)) : 0 };
-        });
-        assert(probe.cards > 20 && probe.articles > 20 && probe.definitions > 0, `only ${probe.cards} cards, ${probe.definitions} word definitions`);
+        }, { admittedIds: admission.ids, fallbackId: SHELF_FALLBACK_ID });
+        // N (2026-10-17) rewrites the pin "word definitions stand on the shelf, in their own band": the ten left through
+        // the cull queue as not articles — none stands, and every card is an article wearing its picture slot
+        assert(probe.cards > 20 && probe.articles === probe.cards && probe.definitions === 0, `${probe.cards} cards, ${probe.articles} articles, ${probe.definitions} word definitions`);
         assert.equal(probe.badCount, 0, `picture slots wrong: ${probe.bad.join(' | ')}`);
         assert(probe.named > 0 && probe.pictured === probe.named, `${probe.pictured} of the ${probe.named} pictures the index names stand on their cards`);
+        assert.equal(probe.keyed, 0, 'Shipped data now has no organically pictureless row');
+        assert.equal(probe.kanjiSheets, 0);
+        assert.deepEqual(probe.missingAdmitted, [], 'Every admitted article has its own rendered card');
+        assert(probe.fallbackBox, 'Exact fallback target is present in the real baseline');
         assert.equal(probe.incompleteCount, 0, `cards missing kicker, headline, English line or level: ${probe.incomplete.join(', ')}`);
         assert(/[。！？…]$/u.test(probe.lede), `the lead has no first-sentence teaser: "${probe.lede}"`);
         assert(probe.sealInTitle && probe.seal > 0 && probe.seal <= 48, `the 永 seal is not a small mark inside the title: ${JSON.stringify(probe)}`);
-        return { cards: probe.cards, pictured: probe.pictured, definitions: probe.definitions, lede: probe.lede.slice(0, 24), seal: probe.seal };
+        const fallback = [];
+        for (const mode of ['missing', 'failed', 'no-band']) {
+          const fixture = await installShelfFallback(page, mode);
+          try {
+            await open(page);
+            // Original srcset is retained:1368/DPR1 chooses1200,390/DPR1 chooses600.
+            const expected = mode === 'failed' ? fixture.urls[label === '390' ? 1 : 0] : null;
+            fallback.push(await shelfFallbackObservation(page, fixture, expected, probe.fallbackBox));
+          } finally { await fixture.dispose(); }
+        }
+        return { cards: probe.cards, pictured: probe.pictured, definitions: probe.definitions, lede: probe.lede.slice(0, 24), seal: probe.seal,
+          admittedIds: admission.ids, admittedImageBytesChecked: admission.images, fallback };
       });
     }
 
@@ -669,18 +1611,15 @@ try {
             why: !!why?.querySelector('summary'), seal: seal ? Math.round(Math.max(seal.width, seal.height)) : 0 };
         });
         assert(Math.abs(probe.dateTop - probe.tallyTop) <= 2 && probe.datelineLines === 1, `date and count are not one line: ${JSON.stringify(probe)}`);
-        assert(/Unreviewed/u.test(probe.note) && /\d+.*\d+/u.test(probe.note), `the 未確認 note does not count the pending stories against the total: "${probe.note}"`);
-        assert.equal(probe.noteLines, 1, `the 未確認 note runs to ${probe.noteLines} lines: "${probe.note}"`);
-        assert(probe.why, 'the 未確認 note has no ⓘ for its longer explanation');
-        await page.locator('.shelf-review-note summary').click();
-        const explained = await page.evaluate(() => {
-          const p = document.querySelector('.shelf-review-note details[open] > p');
-          const r = p?.getBoundingClientRect();
-          return p ? { text: p.innerText.trim(), inView: r.left >= 0 && r.right <= innerWidth + 0.5 && r.bottom <= innerHeight } : null;
-        });
-        assert(explained && explained.text.length > 40 && explained.inView, `the ⓘ opens no readable explanation: ${JSON.stringify(explained)}`);
+        // S · no provenance on the shelf (John, 2026-10-16: "and made by AI!! do not write that!!!!"). This pinned the AI作成
+        // note — its count against the total, its one line, its ⓘ and the explanation behind it. The new truth: the
+        // masthead carries no such note in any form, in either language; how a story was made stays in its record.
+        assert.equal(probe.note, '', `the shelf still carries a provenance note: "${probe.note}"`);
+        assert(!probe.why, 'a provenance ⓘ is still on the shelf');
+        const masthead = await page.evaluate(() => [...document.querySelectorAll('.shelf-masthead, #shelf-reading-results')].map((n) => n.innerText).join(' \n '));
+        assert(!/Made by AI|AI作成|not yet checked|人の確認|未確認|unreviewed/iu.test(masthead), `the shelf names provenance: "${masthead.match(/.{0,30}(Made by AI|AI作成|not yet checked|人の確認|未確認|unreviewed).{0,30}/iu)?.[0]}"`);
         assert(probe.seal > 0 && probe.seal <= 48, `the 永 seal is ${probe.seal}px`);
-        return { note: probe.note, explanation: explained.text.slice(0, 40), seal: probe.seal };
+        return { note: null, seal: probe.seal };
       });
     }
 
@@ -726,63 +1665,107 @@ try {
     }
 
     for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
-      await run(`P1-tip-in-the-page-${label}`, viewport, async (page) => {
+      await run(`P1-fresh-word-demo-${label}`, viewport, async (page) => {
+        page.__verifierPhase = 'fresh shelf';
+        await open(page);
+        const learning = (record) => Object.fromEntries(['taken', 'srs', 'obslog', 'revlog', 'lists', 'teacherContexts']
+          .map((key) => [key, record[key] ?? null]));
+        const before = learning(await readAppRecord(page));
+        page.__verifierPhase = 'open article';
         await openArticle(page, ARTICLE);
-        const tip = await page.evaluate(() => {
-          const node = document.getElementById('reader-tip');
-          if (!node) return null;
-          const first = document.querySelector('#reader .tok').getBoundingClientRect();
-          return { position: getComputedStyle(node).position, bottom: Math.round(node.getBoundingClientRect().bottom), firstTop: Math.round(first.top),
-            text: node.innerText.trim() };
-        });
-        assert(tip, 'no first-visit tip on a first visit');
-        assert.equal(tip.text, 'Tap any word for its meaning.', 'the hint is not the plain wording');
-        assert(['static', 'relative'].includes(tip.position), `the tip is ${tip.position}, not part of the page`);
-        assert(tip.bottom <= tip.firstTop, `the tip ends at ${tip.bottom}px, below the first word's top ${tip.firstTop}px`);
-        const covered = [];
-        for (const depth of [0, 300, 700, 1200]) {
-          await page.evaluate((y) => window.scrollTo(0, y), depth);
-          await page.waitForTimeout(120);
-          covered.push(...await page.evaluate((y) => [...document.querySelectorAll('#reader .tok')].flatMap((t) => {
-            const r = t.getClientRects()[0];
-            if (!r || r.bottom <= 0 || r.top >= innerHeight) return [];
-            const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
-            return hit?.closest('#reader-tip') ? [`${t.textContent}@${y}`] : [];
-          }), depth));
-        }
-        assert.equal(covered.length, 0, `words covered by the tip: ${covered.slice(0, 5).join(', ')}`);
-        await page.evaluate(() => window.scrollTo(0, 0));
-        // the word's distance below the tip: the header may change height when a word is chosen
-        // (that is the header's business); the tip must neither leave nor move the text
-        const gap = () => {
-          const t = document.getElementById('reader-tip');
-          const w = document.querySelector('#reader .tok[data-index="1"]').getBoundingClientRect();
-          return t ? Math.round(w.top - t.getBoundingClientRect().bottom) : null;
-        };
-        const before = await page.evaluate(gap);
+        await page.locator('#mini[data-demo="true"] .mini-word').waitFor();
+        const demonstration = await page.evaluate(() => ({
+          word: document.querySelector('#mini[data-demo="true"] .mini-word')?.textContent.trim(),
+          stages: document.querySelectorAll('#mini').length,
+          tip: document.querySelectorAll('#reader-tip').length,
+          instructions: /Tap any word for its meaning\./u.test(document.body.innerText),
+          seen: localStorage.getItem('kairo-word-ladder-demo-v1'),
+          audio: window.__g3DemoAudio,
+        }));
+        assert(demonstration.word && demonstration.stages === 1, `fresh demo did not choose one real word: ${JSON.stringify(demonstration)}`);
+        assert(!demonstration.tip && !demonstration.instructions, 'the permanent reader tip remains');
+        assert.equal(demonstration.seen, '1', 'demonstration did not remember its device-only seen mark');
+        assert.equal(demonstration.audio, 0, 'the demonstration played audio');
+        await page.waitForTimeout(800);
+        assert.deepEqual(learning(await readAppRecord(page)), before, 'the demonstration created learner history or review work');
+        await page.keyboard.press('Escape');
+        page.__verifierPhase = 'navigation after demo';
+        await openArticle(page, ARTICLE);
+        await page.waitForTimeout(1000);
+        assert.equal(await page.locator('#mini[data-demo="true"], #reader-tip').count(), 0, 'demonstration/tip replayed after navigation');
+        page.__verifierPhase = 'reload after demo';
+        await page.reload();
+        await page.waitForFunction(() => document.body.dataset.ready === '1');
+        await page.waitForTimeout(1000);
+        assert.equal(await page.locator('#mini[data-demo="true"], #reader-tip').count(), 0, 'demonstration/tip replayed after reload');
+        page.__verifierPhase = 'lookup-only setup';
+        // A lookup alone is history too: no saved card is needed to suppress the demo.
+        await openArticle(page, ARTICLE);
+        const beforeLookup = await readAppRecord(page);
+        page.__verifierPhase = 'deliberate lookup';
         await tapToken(page, 1);
-        const after = { gap: await page.evaluate(gap), remembered: await page.evaluate(() => localStorage.getItem('kairo-tip-reader-v1')),
-          popup: await page.locator('#mini').count(),
-          visible: await page.evaluate(() => { const t = document.getElementById('reader-tip'); return !!t && getComputedStyle(t).visibility !== 'hidden' && Number(getComputedStyle(t).opacity) > 0.01; }) };
-        assert.equal(after.popup, 1, 'the first tap opened no popup');
-        assert(after.gap !== null && Math.abs(after.gap - before) <= 1, `the first tap moved the text under the tip: ${JSON.stringify({ before, ...after })}`);
-        assert(!after.visible, 'the hint still shows after the first successful tap');
-        assert.equal(after.remembered, '1', 'choosing a word did not remember the tip as seen');
+        const looked = await waitForAppRecord(page, (r) => r.obslog.length > beforeLookup.obslog.length, { description: 'lookup-only history' });
+        assert.equal(looked.taken.length, 0, 'lookup-only fixture accidentally saved a card');
+        page.__verifierPhase = 'navigate after lookup';
+        await page.evaluate((key) => localStorage.removeItem(key), DEMO_KEY);
         await openArticle(page, ARTICLE);
-        assert.equal(await page.locator('#reader-tip').count(), 0, 'the tip came back on the next visit');
-        await page.evaluate(() => localStorage.removeItem('kairo-tip-reader-v1'));
-        await openArticle(page, THREE_PARAS);
-        await page.locator('#reader-tip .reader-tip-close').click();
-        const dismissed = await page.evaluate((key) => ({ tip: !!document.getElementById('reader-tip'), remembered: localStorage.getItem(key) }), 'kairo-tip-reader-v1');
-        assert(!dismissed.tip && dismissed.remembered === '1', `the × did not dismiss and remember the tip: ${JSON.stringify(dismissed)}`);
-        return { position: tip.position, gapAboveText: tip.firstTop - tip.bottom, text: tip.text };
-      });
+        await page.waitForTimeout(1000);
+        assert.equal(await page.locator('#mini[data-demo="true"]').count(), 0, 'lookup-only history received a demonstration');
+        assert.deepEqual(learning(await readAppRecord(page)), learning(looked), 'suppressed lookup-history demo changed learning roots');
+        page.__verifierPhase = 'saved-history setup';
+        // Establish real saved history through its UI, then remove only the device mark. The
+        // durable record, not this mark, must prevent teaching an existing learner again.
+        await openArticle(page, ARTICLE);
+        await tapToken(page, 1);
+        await page.locator('#mini #mini-take:not([disabled])').click();
+        page.__verifierPhase = 'save history';
+        const saved = await waitForAppRecord(page, (r) => r.taken.some((item) => item.t === 'word' && item.id === '郊外'),
+          { description: 'history fixture saved through the real stage' });
+        page.__verifierPhase = 'navigate after Save';
+        await page.evaluate((key) => localStorage.removeItem(key), DEMO_KEY);
+        await openArticle(page, ARTICLE);
+        await page.waitForTimeout(1000);
+        assert.equal(await page.locator('#mini[data-demo="true"], #reader-tip').count(), 0, 'a learner with saved history received the demonstration');
+        assert.deepEqual(learning(await readAppRecord(page)), learning(saved), 'suppressed demonstration changed learner history');
+        return { demonstration, navigationReplay: false, reloadReplay: false, historyReplay: false, lookupHistoryReplay: false };
+      }, () => {
+        window.__g3DemoAudio = 0;
+        const play = window.HTMLMediaElement.prototype.play;
+        window.HTMLMediaElement.prototype.play = function (...args) { window.__g3DemoAudio++; return play.apply(this, args); };
+        if (window.speechSynthesis) {
+          const speak = window.speechSynthesis.speak.bind(window.speechSynthesis);
+          window.speechSynthesis.speak = (...args) => { window.__g3DemoAudio++; return speak(...args); };
+        }
+      }, { demo: true });
     }
+
+    await run('P1-history-only-no-demo', PHONE, async (page) => {
+      await open(page);
+      const before = await readAppRecord(page);
+      assert.equal(before.readerPos?.['aozora:049966-1'], 120, 'real migration must retain the history-only position fixture');
+      assert.equal(before.taken.length, 0, 'history-only fixture has no saved card');
+      assert.equal((before.obslog || []).length, 0, 'history-only fixture has no lookup');
+      assert.equal(await page.evaluate(key => localStorage.getItem(key), DEMO_KEY), null, 'no device seen key may suppress this fixture');
+      await openArticle(page, ARTICLE); await page.waitForTimeout(1200);
+      assert.equal(await page.locator('#mini[data-demo="true"], #reader-tip').count(), 0, 'existing reader-position history must suppress the demonstration');
+      const after = await readAppRecord(page);
+      for (const key of ['taken', 'srs', 'obslog', 'revlog', 'lists', 'teacherContexts']) assert.deepEqual(after[key], before[key], `suppressed demonstration changed ${key}`);
+      assert.equal(after.readerPos?.['aozora:049966-1'], 120, 'opening another article lost existing reading position');
+      return { savedCards: 0, lookups: 0, priorArticlePosition: 120, demonstration: false };
+    }, () => {
+      // Migration input only. The app installs and reads its normal native record;
+      // the verifier never writes the active database or replaces a state reducer.
+      if (!localStorage.getItem('g3-history-fixture-installed')) {
+        localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1, taken: [], srs: {}, readerPos: { 'aozora:049966-1': 120 } }));
+        localStorage.setItem('g3-history-fixture-installed', '1');
+      }
+    }, { demo: true });
 
     for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
       await run(`W1-damascus-can-be-saved-${label}`, viewport, async (page) => {
         await openArticle(page, ARTICLE);
-        await page.locator('#reader .tok[data-index="0"]').click();
+        // Ladder (John, 10-19, a spec change): a kana word's first tap sets its English under it, the next opens its box
+        await climbToBox(page, page.locator('#reader .tok[data-index="0"]'));
         await page.waitForSelector('#mini #mini-take');
         const probe = await page.evaluate(() => {
           const seal = document.querySelector('#mini #mini-take');
@@ -798,7 +1781,8 @@ try {
         // the durable write lands a beat before the app repaints its button: wait for the page, then read it
         await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 }).catch(() => {});
         const saved = await page.evaluate(() => ({ label: document.querySelector('#mini #mini-take')?.textContent, pressed: document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed'),
-          window: [...document.querySelectorAll('dialog[open], [role="dialog"]:not(#mini)')].some((n) => n.getClientRects().length > 0) }));
+          // Save ▾'s own menu unfolds inside the card (1.3.0): a dialog, but no window
+          window: [...document.querySelectorAll('dialog[open], [role="dialog"]:not(#mini):not(#mini *)')].some((n) => n.getClientRects().length > 0) }));
         const cards = record.taken.filter((t) => t.t === 'word' && t.id === 'ダマスカス').length;
         assert(saved.label === 'Saved ✓' && saved.pressed === 'true' && !saved.window && cards === 1, `one press did not save ダマスカス once: ${JSON.stringify({ ...saved, cards })}`);
         return { reading: probe.reading, saved: saved.label, cards };
@@ -807,13 +1791,15 @@ try {
 
     // the popup's one-tap Save; then 全項目 from the same popup
     const saveFromQuickLook = async (page) => {
-      await page.locator('#reader .tok[data-index="0"]').click();
+      // Ladder (John, 10-19, a spec change): the kana word's English first, then its box
+      await climbToBox(page, page.locator('#reader .tok[data-index="0"]'));
       await page.waitForSelector('#mini #mini-take:not([disabled])');
       await page.locator('#mini #mini-take').click();
       await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
     };
+    // S · the page's one Save is its bar's (#sheet-take); the foot's 覚える (#take) these pinned is gone
     const fullEntryState = (page) => page.evaluate(() => {
-      const take = document.querySelector('#sheet #take');
+      const take = document.querySelector('#sheet #sheet-take');
       return { take: take && { pressed: take.getAttribute('aria-pressed'), disabled: take.disabled, held: take.classList.contains('word-capture-held') },
         note: document.querySelector('#word-capture-note')?.textContent.trim() ?? null, replace: !!document.querySelector('#word-capture-replace') };
     });
@@ -821,8 +1807,8 @@ try {
       // quick look first, then 全項目
       await openArticle(page, ARTICLE);
       await saveFromQuickLook(page);
-      await page.locator('#mini .mini-entry').click();
-      await page.waitForSelector('#sheet #take');
+      await page.locator('#mini button.mini-word').click(); // the band is the door
+      await page.waitForSelector('#sheet #sheet-take');
       const full = await fullEntryState(page);
       assert(full.take?.pressed === 'true' && !full.take.disabled && !full.take.held && full.note === null && !full.replace,
         `saved from the quick look, 全項目 does not show it saved: ${JSON.stringify(full)}`);
@@ -831,16 +1817,16 @@ try {
     // 全項目 first, then the quick look (a fresh context: a fresh record)
     await run('W2-one-word-one-card-reverse', DESK, async (page) => {
       await openArticle(page, ARTICLE);
-      await page.locator('#reader .tok[data-index="0"]').click();
-      await page.waitForSelector('#mini .mini-entry');
-      await page.locator('#mini .mini-entry').click();
-      await page.waitForSelector('#sheet #take:not([disabled])');
-      await page.locator('#sheet #take').click();
-      await page.waitForFunction(() => document.querySelector('#sheet #take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
+      // Ladder (John, 10-19, a spec change): the kana word's English first, then its box
+      await climbToBox(page, page.locator('#reader .tok[data-index="0"]'));
+      await page.waitForSelector('#mini button.mini-word');
+      await page.locator('#mini button.mini-word').click();
+      await page.waitForSelector('#sheet #sheet-take:not([disabled])');
+      await page.locator('#sheet #sheet-take').click();
+      await page.waitForFunction(() => document.querySelector('#sheet #sheet-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
       await page.locator(await entryCloseSelector(page)).click();
       await page.waitForFunction(() => !document.querySelector('#sheet'), null, { timeout: 5_000 });
-      await page.locator('#reader .tok[data-index="0"]').click();
-      await page.waitForSelector('#mini #mini-take');
+      await page.locator('#mini .mini-word').waitFor(); // G3: Back from a stage-origin page restores that stage.
       const quick = await page.evaluate(() => {
         const seal = document.querySelector('#mini #mini-take');
         return { pressed: seal.getAttribute('aria-pressed'), disabled: seal.disabled, held: seal.classList.contains('reader-capture-held'),
@@ -856,30 +1842,38 @@ try {
     const popupState = (page) => page.evaluate(() => {
       const mini = document.getElementById('mini');
       if (!mini) return null;
-      const box = mini.getBoundingClientRect(), take = mini.querySelector('#mini-take'), entry = mini.querySelector('.mini-entry');
+      const box = mini.getBoundingClientRect(), take = mini.querySelector('#mini-take'), door = mini.querySelector('button.mini-word[data-action="entry.open"]'), head = mini.querySelector('.mini-head');
       return { word: mini.querySelector('.mini-word')?.textContent, reading: mini.querySelector('.mini-reading')?.textContent,
         gloss: mini.querySelector('.mini-gloss')?.textContent, save: take && { label: take.textContent, disabled: take.disabled,
           filled: getComputedStyle(take).backgroundColor !== 'rgba(0, 0, 0, 0)' && getComputedStyle(take).backgroundColor !== 'transparent' },
-        entry: entry && { label: entry.textContent, disabled: entry.disabled },
+        door: door && { name: door.getAttribute('aria-label'), chevron: getComputedStyle(head, '::after').content !== 'none', entryButton: !!mini.querySelector('.mini-entry') },
         inside: box.left >= 0 && box.top >= 0 && box.right <= innerWidth && box.bottom <= innerHeight,
-        underWord: document.querySelectorAll('#reader .tok-en').length };
+        underWord: document.querySelectorAll('#reader .tok-en').length,
+        underAt: [...document.querySelectorAll('#reader .tok-en')].map((row) => row.closest('.tok')?.dataset.index ?? null) };
     });
     const cardsFor = (record, id) => record.taken.filter((t) => t.t === 'word' && t.id === id);
     for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
-      await run(`G1-one-tap-meaning-${label}`, viewport, async (page) => {
+      await run(`G1-stage-meaning-${label}`, viewport, async (page) => {
         await openArticle(page, ARTICLE);
         await tapToken(page, SUBURB);
+        // R3 (Grok 2029) · a slip drawn before its word's sense is at hand shows a quiet "…" (aria-busy, R2's contract) until
+        // it is: the card is read once answered, up to 5 s, then asserted exactly as before
+        await page.waitForFunction(() => !!document.getElementById('mini') && document.getElementById('mini').getAttribute('aria-busy') !== 'true',
+          null, { timeout: 5_000 }).catch(() => {});
         const one = await popupState(page);
-        assert(one, 'one tap opened no popup');
-        assert.deepEqual([one.word, one.reading, one.gloss], ['郊外', 'こうがい', 'suburb'], `one tap does not show the word, reading and meaning: ${JSON.stringify(one)}`);
+        assert(one, 'reading → stage opened no popup');
+        assert.deepEqual([one.word, one.reading, one.gloss], ['郊外', 'こうがい', 'suburb'], `the stage does not show the word, reading and meaning: ${JSON.stringify(one)}`);
         assert(one.save?.label === 'Save' && !one.save.disabled && one.save.filled, `no filled Save: ${JSON.stringify(one.save)}`);
-        assert(/^Full entry\s*›$/u.test(one.entry?.label ?? '') && !one.entry.disabled, `no Full entry › link: ${JSON.stringify(one.entry)}`);
-        assert(one.inside && one.underWord === 0, `the popup is off screen, or English was written under the word: ${JSON.stringify(one)}`);
+        assert(one.door?.name === 'Open the full entry' && one.door.chevron && !one.door.entryButton, `the band is not the door into the full entry: ${JSON.stringify(one.door)}`);
+        // Ladder (John, 10-19, a spec change): "nothing written under the word" becomes: the word's own English, which its
+        // second tap set, stays under it while its box stands, and no other word has one
+        assert(one.inside && one.underWord === 1 && one.underAt[0] === String(SUBURB),
+          `the popup is off screen, or English other than the word's own was written under a word: ${JSON.stringify(one)}`);
         await tapToken(page, 2);
         const moved = await page.evaluate(() => ({ count: document.querySelectorAll('#mini').length, word: document.querySelector('#mini .mini-word')?.textContent }));
         const third = await page.evaluate(() => document.querySelector('#reader .tok[data-index="2"] .tok-word')?.textContent.replace(/\s/gu, ''));
         assert(moved.count === 1 && moved.word && moved.word !== '郊外' && third.includes(moved.word.slice(0, 1)), `another word did not move the popup: ${JSON.stringify({ moved, third })}`);
-        await page.locator('#reader .tok[data-index="2"]').focus();
+        await focusToken(page, 2);
         await page.keyboard.press('Escape');
         const closed = await page.evaluate(() => ({ mini: !!document.getElementById('mini'), focus: document.activeElement?.dataset.index }));
         assert(!closed.mini && closed.focus === '2', `Escape did not put the popup away and keep the word: ${JSON.stringify(closed)}`);
@@ -892,29 +1886,37 @@ try {
       const tok = page.locator(`#reader .tok[data-index="${SUBURB}"]`);
       await tok.evaluate((node) => node.scrollIntoView({ block: 'center' }));
       const at = await tok.evaluate((node) => { const r = node.getClientRects()[0]; return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
+      const wordBox = await tok.evaluate((node) => { const r = node.getBoundingClientRect(); return { left: r.left, right: r.right, top: r.top, bottom: r.bottom }; });
       await page.mouse.click(at.x, at.y, { button: 'right' });
-      await page.waitForSelector('#reader-word-menu');
-      const menu = await page.evaluate(() => {
-        const node = document.getElementById('reader-word-menu'), box = node.getBoundingClientRect();
-        return { role: node.getAttribute('role'), items: [...node.querySelectorAll('[role="menuitem"]')].map((item) => item.textContent), left: box.left, top: box.top };
-      });
-      assert.deepEqual(menu.items, ['Save word', 'Save the sentence', 'Full entry', 'Ask the tutor about this sentence', 'Copy'], `the word menu: ${JSON.stringify(menu.items)}`);
-      assert(menu.role === 'menu' && Math.abs(menu.left - at.x) <= 2 && Math.abs(menu.top - at.y) <= 2, `the menu is not at the pointer: ${JSON.stringify({ menu, at })}`);
-      await page.locator('#reader-word-menu [data-menu-action="save-word"]').click();
-      const record = await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length > 0, { description: '郊外 saved from the menu' });
-      await page.waitForFunction(() => !!document.querySelector('#reader-toast:not([hidden])'), null, { timeout: 5_000 }).catch(() => {});
+      await page.waitForSelector('#seal-strip');
+      const record = await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length > 0, { description: '郊外 sealed by the right-click' });
       await page.waitForTimeout(300);
+      const strip = await page.evaluate(() => {
+        const node = document.getElementById('seal-strip'), box = node.getBoundingClientRect(), status = document.getElementById('seal-strip-status');
+        return { role: node.getAttribute('role'), items: [...node.querySelectorAll('[data-strip-action]')].filter((item) => !item.hidden).map((item) => item.textContent.trim()),
+          status: status && { text: status.textContent.trim(), role: status.getAttribute('role') }, top: box.top, bottom: box.bottom, left: box.left, right: box.right };
+      });
+      // the word's one way out stands beside Saved ✓ in the first row (lead's ruling, 2026-10-18); the acts follow under the hairline
+      // Hfix-1B (item 11): no tutor is set up here, so the strip has no "Ask the tutor about the word"
+      assert.deepEqual(strip.items, ['Remove', '全項目 · Full entry', 'Save the sentence', 'Copy'], `the strip: ${JSON.stringify(strip.items)}`);
+      assert.equal(await page.locator('#seal-strip .seal-strip-lists > #seal-strip-status + [data-strip-action="remove"]').count(), 1, 'Remove does not stand beside Saved ✓');
+      const overWord = !(strip.right <= wordBox.left || strip.left >= wordBox.right || strip.bottom <= wordBox.top || strip.top >= wordBox.bottom);
+      assert(strip.role === 'dialog' && !overWord, `the strip is not beside its word: ${JSON.stringify({ strip, wordBox })}`);
       const after = await readAppRecord(page);
       const cards = cardsFor(after, '郊外');
-      assert.equal(cards.length, 1, `the menu made ${cards.length} 郊外 cards`);
+      assert.equal(cards.length, 1, `the right-click made ${cards.length} 郊外 cards`);
       assert(cards[0].ctx?.scope === 'sent' && cards[0].ctx.p === ARTICLE && cards[0].ctx.i === SUBURB, `the card lost its sentence: ${JSON.stringify(cards[0])}`);
-      const toast = await page.evaluate(() => { const t = document.querySelector('#reader-toast:not([hidden])'); return t && { text: t.innerText.replace(/\s+/gu, ' ').trim(), role: t.getAttribute('role'), live: t.getAttribute('aria-live') }; });
-      assert(toast && /^Saved to review\b/u.test(toast.text) && toast.role === 'status' && toast.live === 'polite', `no polite toast: ${JSON.stringify(toast)}`);
-      assert.equal(await page.locator('#reader-word-menu').count(), 0, 'the menu stayed open after Save word');
+      // S · what the keep says, it says once and politely (Saved), and nothing about review
+      assert(strip.status && /^Saved\b/u.test(strip.status.text) && !/review/iu.test(strip.status.text) && strip.status.role === 'status', `no polite status: ${JSON.stringify(strip.status)}`);
+      await page.keyboard.press('Escape');
+      assert.equal(await page.locator('#seal-strip').count(), 0, 'Escape left the strip open');
       await page.mouse.click(at.x, at.y, { button: 'right' });
-      await page.waitForSelector('#reader-word-menu');
-      const again = await page.evaluate(() => { const item = document.querySelector('#reader-word-menu [data-menu-action="save-word"]'); return { label: item.textContent, disabled: item.getAttribute('aria-disabled') }; });
-      assert.deepEqual(again, { label: 'Saved ✓', disabled: 'true' }, `the menu does not show the word saved: ${JSON.stringify(again)}`);
+      await page.waitForSelector('#seal-strip');
+      await page.waitForTimeout(300);
+      const again = await page.evaluate(() => ({ status: document.getElementById('seal-strip-status')?.textContent.trim(),
+        remove: !document.querySelector('#seal-strip [data-strip-action="remove"]')?.hidden }));
+      assert.deepEqual(again, { status: 'Saved ✓', remove: true }, `the second right-click does not show the word kept: ${JSON.stringify(again)}`);
+      assert.equal(cardsFor(await readAppRecord(page), '郊外').length, 1, 'a second right-click duplicated or removed the card');
       await page.keyboard.press('Escape');
       // the browser keeps its own menu off the words
       const offWord = await page.evaluate(() => {
@@ -923,7 +1925,7 @@ try {
         return title.dispatchEvent(event);
       });
       assert.equal(offWord, true, 'a right-click off the words lost the browser menu');
-      return { items: menu.items.length, cards: cards.length, ctx: cards[0].ctx, srs: !!record.srs, toast: toast.text };
+      return { items: strip.items.length, cards: cards.length, ctx: cards[0].ctx, srs: !!record.srs, status: strip.status.text };
     });
 
     for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
@@ -934,18 +1936,22 @@ try {
         await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length === 1, { description: 'one press saves 郊外' });
         // the durable write lands a beat before the app repaints its button and raises the toast: wait for the page
         await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true'
-          && !!document.querySelector('#reader-toast:not([hidden])'), null, { timeout: 5_000 }).catch(() => {});
+          && !!document.querySelector('#mini #vocabulary-list-popover.is-inline'), null, { timeout: 5_000 }).catch(() => {});
         const saved = await page.evaluate(() => ({ label: document.querySelector('#mini #mini-take')?.textContent, pressed: document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed'),
           window: !!document.querySelector('#vocabulary-list-dialog, dialog[open]'),
           toast: document.querySelector('#reader-toast:not([hidden])')?.innerText.replace(/\s+/gu, ' ').trim() ?? null,
           role: document.querySelector('#reader-toast')?.getAttribute('role') }));
         assert(saved.label === 'Saved ✓' && saved.pressed === 'true' && !saved.window, `one press did not save in place: ${JSON.stringify(saved)}`);
-        assert(saved.toast === 'Saved to review Undo' && saved.role === 'status', `the toast: ${JSON.stringify(saved)}`);
-        await page.locator('#reader-toast-action').click();
-        const undone = await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length === 0, { description: 'Undo takes the card out' });
+        // Save ▾ (1.3.0): the press that saves unfolds the word's menu inside the card, its Review row checked —
+        // that row is the way back out (the menu's opening puts the Save toast away)
+        const menu = await page.evaluate(() => { const pop = document.querySelector('#mini #vocabulary-list-popover.is-inline'), review = pop?.querySelector('#mini-review');
+          return { inline: !!pop, review: review ? review.checked : null }; });
+        assert(menu.inline && menu.review === true, `Save ▾ did not unfold its menu with Review checked: ${JSON.stringify(menu)}`);
+        await page.locator('#mini #mini-review').uncheck();
+        const undone = await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length === 0, { description: 'Review off takes the card out' });
         await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'false', null, { timeout: 5_000 }).catch(() => {});
         const label2 = await page.locator('#mini #mini-take').textContent();
-        assert.equal(label2, 'Save', 'after Undo the button does not read Save');
+        assert.equal(label2, 'Save', 'after Review off the button does not read Save');
         return { saved: saved.label, toast: saved.toast, afterUndo: cardsFor(undone, '郊外').length };
       });
     }
@@ -953,19 +1959,28 @@ try {
     await run('G4-keyboard-menu', DESK, async (page) => {
       await openArticle(page, ARTICLE);
       const word = page.locator(`#reader .tok[data-index="${SUBURB}"]`);
-      await word.focus();
+      await focusToken(page, SUBURB);
       await page.keyboard.press('Shift+F10');
-      await page.waitForSelector('#reader-word-menu');
-      const first = await page.evaluate(() => document.activeElement?.dataset.menuAction);
+      await page.waitForSelector('#seal-strip');
+      const control = () => page.evaluate(() => document.activeElement?.closest('#seal-strip') ? document.activeElement.dataset.stripAction || document.activeElement.id : null);
+      const first = await control();
       await page.keyboard.press('ArrowDown');
-      const second = await page.evaluate(() => document.activeElement?.dataset.menuAction);
+      const second = await control();
       await page.keyboard.press('Escape');
-      const back = await page.evaluate(() => ({ menu: !!document.getElementById('reader-word-menu'), focus: document.activeElement?.dataset.index }));
-      assert.deepEqual([first, second, back.menu, back.focus], ['save-word', 'save-sentence', false, String(1)], `Shift+F10, ↓, Escape: ${JSON.stringify({ first, second, back })}`);
+      const back = await page.evaluate(() => ({ menu: !!document.getElementById('seal-strip'), focus: document.activeElement?.dataset.index }));
+      assert.deepEqual([first, second, back.menu, back.focus], ['seal-strip-new', 'entry', false, String(1)], `Shift+F10, ↓, Escape: ${JSON.stringify({ first, second, back })}`);
       await page.keyboard.press('ContextMenu');
-      const byKey = await page.evaluate(() => document.activeElement?.closest('#reader-word-menu') ? document.activeElement.dataset.menuAction : null);
-      assert.equal(byKey, 'save-word', 'the ContextMenu key did not open the menu');
+      await page.waitForSelector('#seal-strip');
+      const byKey = await control();
+      assert.equal(byKey, 'seal-strip-new', 'the ContextMenu key did not open the strip with the keyboard inside it');
       await page.keyboard.press('Escape');
+      await page.keyboard.press('Enter');
+      const reveal = await word.evaluate((node) => node.dataset.ladderRung === 'reading');
+      assert(reveal && await page.locator('#mini').count() === 0, 'first Enter did not stop at the reading rung');
+      // Ladder (John, 10-19): the second Enter sets the English under the word; the third opens the popup
+      await page.keyboard.press('Enter');
+      const english = await word.evaluate((node) => node.dataset.ladderRung === 'gloss' && !!node.querySelector(':scope > .tok-en'));
+      assert(english && await page.locator('#mini').count() === 0, 'second Enter did not stop at the English rung');
       await page.keyboard.press('Enter');
       await page.waitForSelector('#mini');
       const popup = await page.evaluate(() => document.activeElement?.id);
@@ -979,22 +1994,24 @@ try {
       await run(`G5-lists-popover-${label}`, viewport, async (page) => {
         await openArticle(page, ARTICLE);
         await tapToken(page, SUBURB);
-        // one path (round 4, T5): the popup offers no list before Save; after it, Add to a list stands beside Saved ✓
-        assert.equal(await page.locator('#mini #mini-lists').isVisible(), false, 'the popup offers a list before the word is saved');
+        // one path (round 4, T5; 1.3.0 Save ▾): the popup has no list button; Save saves the word and unfolds its
+        // menu inside the card, under the button — never a window, never over another band
+        assert.equal(await page.locator('#mini #mini-lists, #mini .mini-entry').count(), 0, 'the popup carries a list or entry button');
+        assert.equal(await page.locator('#vocabulary-list-popover').count(), 0, 'a menu is open before Save');
         await page.locator('#mini #mini-take').click();
         await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
-        await page.locator('#mini #mini-lists').click();
-        await page.waitForSelector('#vocabulary-list-popover');
+        await page.waitForSelector('#mini #vocabulary-list-popover.is-inline');
         const shape = await page.evaluate(() => {
-          const pop = document.getElementById('vocabulary-list-popover'), box = pop.getBoundingClientRect(), link = document.getElementById('mini-lists').getBoundingClientRect();
-          return { modal: !!document.querySelector('dialog[open], #vocabulary-list-dialog'), width: Math.round(box.width), height: Math.round(box.height),
-            bottom: Math.round(box.bottom), left: Math.round(box.left), right: Math.round(box.right), top: Math.round(box.top), linkBottom: Math.round(link.bottom),
-            viewport: [innerWidth, innerHeight], fixed: getComputedStyle(pop).position };
+          const mini = document.getElementById('mini'), pop = document.getElementById('vocabulary-list-popover'), box = pop.getBoundingClientRect(), card = mini.getBoundingClientRect(), take = document.getElementById('mini-take').getBoundingClientRect();
+          const bands = [...mini.querySelectorAll('.mini-web, .mini-sentence-wrap')].map((n) => n.getBoundingClientRect()).filter((r) => r.height);
+          return { modal: !!document.querySelector('dialog[open], #vocabulary-list-dialog'), inCard: pop.closest('#mini') === mini, position: getComputedStyle(pop).position,
+            inside: box.left >= card.left - 0.5 && box.right <= card.right + 0.5 && box.top >= card.top - 0.5 && box.bottom <= card.bottom + 0.5,
+            underSave: box.top >= take.bottom - 1, aboveBands: bands.every((r) => r.top >= box.bottom - 0.5), expanded: document.getElementById('mini-take').getAttribute('aria-expanded'),
+            newList: !!pop.querySelector('#vocabulary-list-new'), width: Math.round(box.width), height: Math.round(box.height), viewport: [innerWidth, innerHeight] };
         });
-        assert(!shape.modal && shape.fixed === 'fixed', `the lists open as a window: ${JSON.stringify(shape)}`);
-        if (label === '1368') assert(shape.width <= 340 && Math.abs(shape.top - shape.linkBottom) <= 12, `not a compact popover beside its link: ${JSON.stringify(shape)}`);
-        else assert(shape.left === 0 && shape.right === shape.viewport[0] && Math.abs(shape.bottom - shape.viewport[1]) <= 1 && shape.height <= shape.viewport[1] * 0.62 + 1,
-          `not a short sheet at the foot: ${JSON.stringify(shape)}`);
+        assert(!shape.modal && shape.inCard && shape.position === 'static' && shape.inside && shape.underSave && shape.aboveBands && shape.expanded === 'true' && shape.newList,
+          `Save ▾'s menu is not inside the card under its button: ${JSON.stringify(shape)}`);
+        await page.locator('#vocabulary-list-new').click();
         await page.locator('#vocabulary-list-name').fill('Syria');
         await page.locator('#vocabulary-list-create').click();
         await waitForAppRecord(page, (r) => r.lists?.Syria?.some((m) => m.t === 'word' && m.id === '郊外') && cardsFor(r, '郊外').length === 1,
@@ -1040,58 +2057,67 @@ try {
       await page.waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 8_000 }).catch(() => {});
       await page.waitForTimeout(400);
       const path = () => page.evaluate(() => {
-        const mini = document.getElementById('mini'), take = mini?.querySelector('#mini-take'), lists = mini?.querySelector('#mini-lists');
+        const mini = document.getElementById('mini'), take = mini?.querySelector('#mini-take'), menu = mini?.querySelector('#vocabulary-list-popover.is-inline');
         const shown = (node) => !!node && node.getClientRects().length > 0 && getComputedStyle(node).visibility !== 'hidden';
         return { view: document.body.dataset.view, word: mini?.querySelector('.mini-word')?.textContent ?? null, save: take?.textContent ?? null,
-          pressed: take?.getAttribute('aria-pressed') ?? null, held: take?.disabled ?? null, hasList: !!lists, list: shown(lists), note: shown(mini?.querySelector('.mini-take-note')) };
+          pressed: take?.getAttribute('aria-pressed') ?? null, held: take?.disabled ?? null, hasMenu: !!take?.dataset.saveMenu, list: shown(menu), note: shown(mini?.querySelector('.mini-take-note')) };
       });
       // a word of an example sentence whose Save is live and not yet pressed
       let before = null;
       const tokens = page.locator('#sheet .example .sentence-tok');
       for (let i = 0, n = Math.min(await tokens.count(), 30); i < n && !before; i += 1) {
         await tokens.nth(i).scrollIntoViewIfNeeded();
-        await tokens.nth(i).click();
+        // Ladder (John, 10-19, a spec change): a sentence word's box is its third rung (its reading, its English, the box)
+        await climbToBox(page, tokens.nth(i));
         await page.waitForTimeout(250);
         const seen = await path();
-        if (seen.hasList && seen.held === false && seen.pressed === 'false') before = seen;
+        if (seen.hasMenu && seen.held === false && seen.pressed === 'false') before = seen;
         else await page.keyboard.press('Escape');
       }
       assert(before, 'no example word in the galaxy entry offers a live, unpressed Save');
-      assert(before.view === 'drift' && before.save === 'Save' && !before.list && before.note, `the galaxy popup offers a list before the word is saved: ${JSON.stringify(before)}`);
+      // S · no caption beside Save (John, 2026-10-16: ":goes into review is excessive and 無駄"): this pinned the
+      // "goes into review" note under an unpressed Save; the new truth is the Save alone, no note at any moment
+      assert(before.view === 'drift' && before.save === 'Save' && !before.list && !before.note, `the galaxy popup opens its menu before the word is saved, or a caption stands beside Save: ${JSON.stringify(before)}`);
       const band = await page.evaluate(() => {
-        const mini = document.getElementById('mini'), entry = mini.querySelector('.mini-entry');
+        const mini = document.getElementById('mini'), head = mini.querySelector('.mini-head'), door = mini.querySelector('button.mini-word[data-action="entry.open"]');
         const box = (node) => { const r = node.getBoundingClientRect(); return { top: r.top, right: r.right, bottom: r.bottom, left: r.left, width: r.width, height: r.height }; };
-        const e = box(entry), hit = document.elementFromPoint(e.left + e.width / 2, e.top + e.height / 2);
-        return { card: box(mini), screen: { width: innerWidth, height: innerHeight }, entry: e, entryName: entry.innerText.trim(), entryOnTop: !!hit && entry.contains(hit),
+        const h = box(head), e = box(door), end = document.elementFromPoint(h.right - 20, h.top + h.height / 2), mid = document.elementFromPoint(e.left + e.width / 2, e.top + e.height / 2);
+        return { card: box(mini), screen: { width: innerWidth, height: innerHeight }, band: h, entry: e, entryName: door.getAttribute('aria-label'),
+          chevron: getComputedStyle(head, '::after').content !== 'none', entryOnTop: !!mid && door.contains(mid), bandIsDoor: !!end && (end === door || door.contains(end)),
+          entryButton: !!mini.querySelector('.mini-entry'),
+          // the word is a button whose padding reaches 5px past its glyph line (its 44px hit): a row is the content box
           rows: ['.mini-word', '.mini-reading', '.mini-gloss'].map((selector) => mini.querySelector(selector)).filter(Boolean)
-            .map((node) => ({ part: node.classList[0], text: node.textContent, ...box(node) })) };
+            .map((node) => { const r = node.getBoundingClientRect(), s = getComputedStyle(node), pt = parseFloat(s.paddingTop) || 0, pb = parseFloat(s.paddingBottom) || 0;
+              return { part: node.classList[0], text: node.textContent, top: r.top + pt, right: r.right, bottom: r.bottom - pb, left: r.left, width: r.width, height: r.height - pt - pb }; }) };
       });
       assert(band.rows.length >= 2 && band.rows.every((row) => row.width > 0 && row.height > 0), `the galaxy popup's word band is missing a line: ${JSON.stringify(band.rows)}`);
       const runOn = band.rows.slice(1).map((row, i) => [band.rows[i], row]).filter(([above, below]) => below.top < above.bottom - 1).map(([above, below]) => `${above.part} and ${below.part}`);
       assert.equal(runOn.length, 0, `the galaxy popup runs its word, reading and meaning together on one line (${runOn.join('; ')}): ${JSON.stringify(band.rows)}`);
-      const word = band.rows[0];
-      assert(band.entry.width >= 44 && band.entry.height >= 44, `the galaxy popup's Full entry is under 44px: ${JSON.stringify(band.entry)}`);
-      assert(/^Full entry/u.test(band.entryName) && band.entryOnTop, `the galaxy popup's Full entry is covered or unnamed: ${JSON.stringify({ name: band.entryName, onTop: band.entryOnTop })}`);
-      assert(band.entry.left >= band.card.left - 1 && band.entry.right <= band.card.right + 1 && band.entry.top >= band.card.top - 1 && band.entry.bottom <= band.card.bottom + 1
-        && band.entry.left >= 0 && band.entry.right <= band.screen.width && band.entry.top >= 0 && band.entry.bottom <= band.screen.height,
-        `the galaxy popup's Full entry leaves its card or the screen: ${JSON.stringify(band)}`);
-      assert(band.entry.left >= word.right - 1 && band.entry.top < word.bottom && band.card.right - band.entry.right < band.entry.left - band.card.left,
-        `the galaxy popup's Full entry is not beside the word in the band's corner: ${JSON.stringify({ entry: band.entry, word, card: band.card })}`);
+      assert(band.entry.width >= 44 && band.entry.height >= 44 && band.band.height >= 44, `the galaxy popup's door into the full entry is under 44px: ${JSON.stringify({ entry: band.entry, band: band.band })}`);
+      assert(band.entryName === 'Open the full entry' && band.entryOnTop && band.bandIsDoor && band.chevron && !band.entryButton,
+        `the galaxy popup's band is not the door into the full entry: ${JSON.stringify({ name: band.entryName, onTop: band.entryOnTop, bandIsDoor: band.bandIsDoor, chevron: band.chevron, entryButton: band.entryButton })}`);
+      assert(band.band.left >= band.card.left - 1 && band.band.right <= band.card.right + 1 && band.band.top >= band.card.top - 1 && band.band.bottom <= band.card.bottom + 1
+        && band.band.left >= 0 && band.band.right <= band.screen.width && band.band.top >= 0 && band.band.bottom <= band.screen.height,
+        `the galaxy popup's band leaves its card or the screen: ${JSON.stringify(band)}`);
       await page.locator('#mini #mini-take').click();
       await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
       await waitForAppRecord(page, (r) => cardsFor(r, before.word).length === 1, { description: 'the galaxy popup saved one card' });
       const saved = await path();
-      assert(saved.save === 'Saved ✓' && saved.list && !saved.note, `after Save the galaxy popup does not offer the list: ${JSON.stringify(saved)}`);
-      await page.locator('#reader-toast-action').click();
-      await waitForAppRecord(page, (r) => cardsFor(r, before.word).length === 0, { description: 'Undo takes the card out' });
+      assert(saved.save === 'Saved ✓' && saved.list && !saved.note, `after Save the galaxy popup does not unfold its menu: ${JSON.stringify(saved)}`);
+      // the menu's Review row is the way back out; Escape folds the menu away and the card is as before
+      await page.locator('#mini #mini-review').uncheck();
+      await waitForAppRecord(page, (r) => cardsFor(r, before.word).length === 0, { description: 'Review off takes the card out' });
       await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'false', null, { timeout: 5_000 });
+      await page.keyboard.press('Escape');
+      await page.waitForFunction(() => !document.getElementById('vocabulary-list-popover'), null, { timeout: 5_000 });
       const undone = await path();
-      assert(undone.save === 'Save' && !undone.list && undone.note, `after Undo the galaxy popup still offers a list: ${JSON.stringify(undone)}`);
+      assert(undone.save === 'Save' && !undone.list && !undone.note, `after Review off the galaxy popup still shows its menu, or a caption beside Save: ${JSON.stringify(undone)}`);
       return { taps, entry: entry.node, word: before.word, before, saved, undone, band: { rows: band.rows.map((row) => `${row.part}@${Math.round(row.top)}`), entry: [Math.round(band.entry.width), Math.round(band.entry.height)] } };
     });
 
     await run('G6-sentence-row', DESK, async (page) => {
       await openArticle(page, ARTICLE);
+      await setUpDeviceTutor(page); // precondition now (Hfix-1B, item 11): a tutor set up, so the pane offers Ask the tutor
       await tapToken(page, SUBURB);
       const row = await page.evaluate(() => ({
         bar: [...document.querySelectorAll('.teacher-door, #reader-context-save, #reader-teacher, #reader-sentence-practice')]
@@ -1107,9 +2133,10 @@ try {
       const pane = await page.evaluate(() => ({
         marked: document.querySelector('#mini .mini-sentence-pane:not([hidden]) .mini-sentence-full mark')?.textContent ?? null,
         choices: [...document.querySelectorAll('#mini .mini-sentence-pane .mini-sentence-action-name')].map((n) => n.textContent),
-        keep: document.querySelector('#mini .mini-sentence-pane #reader-context-save .mini-sentence-keep-name')?.textContent ?? null,
+        // S · the sentence's keep is the one Save (button.save-one, Save · Saved ✓); it pinned "Save the sentence" with a hint line
+        keep: (() => { const k = document.querySelector('#mini .mini-sentence-pane #reader-context-save'); return k && { one: k.matches('button.save-one[data-save-one]'), text: k.textContent }; })(),
       }));
-      assert.deepEqual([pane.marked, pane.choices, pane.keep], ['郊外', ['Ask the tutor', 'Practice it'], 'Save the sentence'], `the sentence pane: ${JSON.stringify(pane)}`);
+      assert.deepEqual([pane.marked, pane.choices, pane.keep], ['郊外', ['Ask the tutor', 'Practice it'], { one: true, text: 'Save' }], `the sentence pane: ${JSON.stringify(pane)}`);
       // the sentence's own Save keeps it on the tutor page, in the reader, without making it the active sentence
       const unkept = await readAppRecord(page);
       await page.locator('#mini #reader-context-save').click();
@@ -1127,16 +2154,30 @@ try {
     });
 
     await run('G6-sentence-below-seat-390', PHONE, async (page) => {
-      const pageErrors = [];
-      page.on('pageerror', (error) => pageErrors.push(error.message));
+      const pageErrors = [], pageErrorDetails = [], networkEvents = [];
+      const traceRequest = (event, request) => {
+        if (/\/dict-v2\//u.test(request.url())) networkEvents.push({ event, phase: page.__verifierPhase || 'walk', url: request.url(), failure: request.failure()?.errorText || null });
+      };
+      page.on('request', (request) => traceRequest('request', request));
+      page.on('requestfinished', (request) => traceRequest('finished', request));
+      page.on('requestfailed', (request) => traceRequest('failed', request));
+      page.on('pageerror', (error) => { pageErrors.push(error.message); pageErrorDetails.push({ phase: page.__verifierPhase || 'walk', message: error.message }); });
       await open(page);
       await page.locator('#shelf-body [data-passage="aozora:046605"] .shelf-open').first().click();
       const token = page.locator('#reader .tok[data-index="816"]');
       await token.waitFor();
       await page.evaluate(() => document.fonts.ready);
       await page.waitForTimeout(500);
-      await page.evaluate(() => window.scrollTo(0, 4716));
-      await token.click();
+      // the public fixture seats token 816 at the viewport top it had at article scroll 4716 before the ladder
+      // (332 px down a 390×844 screen, its card below it); the page has grown, so the scroll is derived from the token
+      const fixture = await page.evaluate(() => {
+        const t = document.querySelector('#reader .tok[data-index="816"]').getBoundingClientRect();
+        const y = Math.round(t.top + scrollY - 332);
+        window.scrollTo(0, y);
+        return { y, top: document.querySelector('#reader .tok[data-index="816"]').getBoundingClientRect().top };
+      });
+      assert(Math.abs(fixture.top - 332) <= 1.5 && fixture.y > 0, `the fixture seats the word at 332 px: ${JSON.stringify(fixture)}`);
+      await tapToken(page, 816, { scroll: false }); // G3 · a tap on the word the fixture seats, where it stands
       await page.waitForSelector('#mini #mini-sentence-open');
       await page.waitForTimeout(400);
       const seat = () => page.evaluate(() => {
@@ -1154,7 +2195,7 @@ try {
       });
       const word = await seat();
       assert.equal(word.word, '大丈夫', 'token 816 of やまなし opens its own word');
-      assert.equal(word.scrollY, 4716, 'The public below-word fixture uses article scroll 4716');
+      assert.equal(word.scrollY, fixture.y, `The public below-word fixture keeps its article scroll (${fixture.y})`);
       assert.equal(word.card.side, 'below', `the public fixture must start with the word card below its anchor: ${JSON.stringify(word)}`);
       assert.equal(word.sentence, false, 'The public fixture starts on the word view');
       await page.locator('#mini #mini-sentence-open').click();
@@ -1174,11 +2215,16 @@ try {
     for (const [label, viewport] of [['390', PHONE], ['320', NARROW]]) {
       await run(`G6-sentence-pane-seat-${label}`, viewport, async (page) => {
         await openArticle(page, ARTICLE);
+        await setUpDeviceTutor(page); // precondition now (Hfix-1B, item 11): a tutor set up, so Tab meets Ask the tutor first
         await tapToken(page, SUBURB);
         const box = () => page.locator('#mini').evaluate((node) => {
           const r = node.getBoundingClientRect(); return { top: r.top, bottom: r.bottom, height: r.height,
             clipped: !!node.style.maxHeight, side: node.dataset.side,
-            chromeBottom: document.querySelector('#app > .chrome')?.getBoundingClientRect().bottom };
+            // G6 · the chrome's edge is the frame's foot: the scale thread stands under the bar as its second row
+            chromeBottom: Math.max(...['#app > .chrome', '#app > .scale-thread'].map((sel) => {
+              const edge = document.querySelector(sel);
+              return edge && ['fixed', 'sticky'].includes(getComputedStyle(edge).position) ? edge.getBoundingClientRect().bottom : 0;
+            })) };
         });
         const focused = () => page.evaluate(() => {
           const mini = document.querySelector('#mini'), active = document.activeElement;
@@ -1199,6 +2245,13 @@ try {
         const word = await box();
         if (word.clipped && word.side === 'above') assert(Math.abs(word.top - word.chromeBottom) <= 1,
           'A clipped word card must meet the chrome edge, leaving no strip of cut title glyphs');
+        // Ladder · D7 (the lead's ruling, 10-19): on a short glass the word's box may glide the text to make room for its kanji
+        // rows as it opens (smoothly, unless motion is reduced); that is the box's own seat, so the article's place is read
+        // once the text stands still, and opening the sentence must not move it from there
+        await page.evaluate(() => new Promise((done) => { let last = scrollY, still = 0, frames = 0;
+          const tick = () => { frames += 1; if (scrollY === last) still += 1; else { still = 0; last = scrollY; }
+            if (still >= 6 || frames > 300) done(); else requestAnimationFrame(tick); };
+          requestAnimationFrame(tick); }));
         const beforeScroll = await page.evaluate(() => scrollY);
         await page.locator('#mini #mini-sentence-open').click();
         await page.waitForTimeout(200); // ResizeObserver has placed the settled sentence view.
@@ -1225,6 +2278,11 @@ try {
         assert.equal(await page.locator('#mini #mini-take').isVisible(), true, 'Back to the word restores its Save');
         assert.equal(await page.locator('#mini .mini-sentence-pane').isVisible(), false, 'Back to the word hides the sentence view');
         // その has no kanji band: its shorter word card exposes the sentence view's clipped-focus regression.
+        // 郊外's card still floats over the text (its band is a door into the entry): put it away first, as a finger
+        // would have to, then tap the next word where it stands
+        await page.locator('#mini').focus();
+        await page.keyboard.press('Escape');
+        await page.locator('#mini').waitFor({ state: 'detached' });
         await tapToken(page, 12); // tapToken centers the real article token before opening its word popup.
         const shortWord = await box();
         const shortScroll = await page.evaluate(() => scrollY);
@@ -1253,6 +2311,7 @@ try {
       });
 
       await run(`G6-sentence-return-motion-${label}`, viewport, async (page) => {
+        await installG6Observability(page);
         await page.emulateMedia({ reducedMotion: 'no-preference' });
         await openArticle(page, ARTICLE);
         const putAway = async () => {
@@ -1265,16 +2324,21 @@ try {
         const problems = [], returns = {};
         for (const [index, text] of [[4, 'の'], [0, 'ダマスカス'], [12, 'その']]) {
           await tapToken(page, index);
+          g6Phase(page, `token-${index}-sentence-door-visible`, 'waitForSelector("#mini #mini-sentence-open")');
           await page.waitForSelector('#mini #mini-sentence-open');
           await page.waitForTimeout(400); // the card has finished rising
           const left = await popupSeat(page);
           assert.equal(left.word, text, `token ${index} of the fixture article`);
-          await page.locator('#mini #mini-sentence-open').click();
-          await page.locator('#mini #reader-sentence-practice').click();
-          await page.waitForFunction(() => document.body.dataset.view === 'sentence-practice');
-          await page.locator('#sentence-practice-back').click();
-          await page.waitForFunction(() => document.body.dataset.view === 'reader');
-          await page.waitForFunction(() => document.activeElement?.id === 'reader-sentence-practice', null, { timeout: 5_000 })
+          // Ladder (the lead's ruling (c), 10-19: the box rides in the text's layer): the doors are tapped where they stand,
+          // as a finger does. Playwright's click first scrolls its target into view; with the box in the text layer that
+          // scroll moves the article (to 413 px here, then the practice view starts at 0), which no finger's tap does
+          await tapWhereItStands(page, '#mini #mini-sentence-open');
+          await tapWhereItStands(page, '#mini #reader-sentence-practice');
+          await g6Wait(page, `token-${index}-practice-view`, () => document.body.dataset.view === 'sentence-practice');
+          g6Phase(page, `token-${index}-practice-back-tap`);
+          await g6Tap(page, '#sentence-practice-back', null, () => page.locator('#sentence-practice-back').click());
+          await g6Wait(page, `token-${index}-returned-reader`, () => document.body.dataset.view === 'reader');
+          await g6Wait(page, `token-${index}-returned-practice-focus`, () => document.activeElement?.id === 'reader-sentence-practice', null, { timeout: 5_000 })
             .catch(() => {});
           await page.waitForTimeout(400);
           const focus = await popupFocus(page);
@@ -1284,7 +2348,8 @@ try {
           if (focus.scrollY !== left.scrollY) problems.push(`${text}: the article moved from ${left.scrollY} to ${focus.scrollY}`);
           if (!returned?.sentence || returned.word !== text) problems.push(`${text}: its sentence pane did not reopen: ${JSON.stringify(returned)}`);
           else {
-            await page.locator('#mini #mini-sentence-back').click();
+            g6Phase(page, `token-${index}-sentence-back-tap`);
+            await g6Tap(page, '#mini #mini-sentence-back', null, () => page.locator('#mini #mini-sentence-back').click());
             await page.waitForTimeout(200);
             const word = await popupSeat(page);
             returns[text].word = word;
@@ -1294,23 +2359,34 @@ try {
         }
         // その once more: its sentence is opened by a second tap while the card is still rising
         await tapToken(page, 12);
+        g6Phase(page, 'rising-setup-sentence-door-visible', 'waitForSelector("#mini #mini-sentence-open")');
         await page.waitForSelector('#mini #mini-sentence-open');
         await page.waitForTimeout(400);
         const settled = await popupSeat(page);
         await putAway();
         const point = (selector) => page.locator(selector).evaluate((node) => { const r = node.getClientRects()[0]; return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
         const tok = await point('#reader .tok[data-index="12"]');
-        await page.mouse.click(tok.x, tok.y);
+        g6Phase(page, 'rising-token-first-tap');
+        await g6Tap(page, '#reader .tok[data-index="12"]', tok, () => page.mouse.click(tok.x, tok.y));
+        // Ladder (John, 10-19, a spec change): その (kana) shows its English under it first; the next tap, taken only once that
+        // rung is seen, opens its box, and its sentence is opened while the card still rises
+        await g6Wait(page, 'rising-token-gloss-or-popup', () => document.querySelector('#reader .tok[data-index="12"]')?.dataset.ladderRung === 'gloss' || !!document.getElementById('mini'));
+        if (!(await page.locator('#mini').count())) {
+          const again = await point('#reader .tok[data-index="12"] .tok-word');
+          g6Phase(page, 'rising-token-popup-tap');
+          await g6Tap(page, '#reader .tok[data-index="12"] .tok-word', again, () => page.mouse.click(again.x, again.y));
+        }
         const door = await point('#mini #mini-sentence-open');
-        await page.mouse.click(door.x, door.y);
-        await page.waitForFunction(() => document.querySelector('#mini .mini-sentence-pane')?.hidden === false);
+        g6Phase(page, 'rising-sentence-door-tap');
+        await g6Tap(page, '#mini #mini-sentence-open', door, () => page.mouse.click(door.x, door.y));
+        await g6Wait(page, 'rising-sentence-pane', () => document.querySelector('#mini .mini-sentence-pane')?.hidden === false);
         await page.waitForTimeout(500);
         const rising = await popupSeat(page);
         if (rising.scrollY !== settled.scrollY || !rising.sentence || Math.abs(rising.top - settled.top) > 1) {
           problems.push(`その: a sentence opened while the card rises is off the word card's seat: ${JSON.stringify({ settled, rising })}`);
         }
         assert.deepEqual(problems, [], 'Returning from Practice, and opening a sentence while the card rises, must land on the sentence pane at the word card\'s seat');
-        return { returns, settled, rising };
+        return { returns, settled, rising, diagnostics: await g6Diagnostics(page) };
       });
     }
 
@@ -1361,15 +2437,16 @@ try {
         await page.locator('#mini #mini-sentence-back').click();
         await page.locator('#mini #mini-take').click();
         await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
-        await page.waitForSelector('#reader-toast:not([hidden])');
+        // Save ▾ (1.3.0): the save unfolds the menu inside the card (its opening puts the Save toast away)
+        await page.waitForSelector('#mini #vocabulary-list-popover.is-inline #vocabulary-list-new');
         const saved = await page.evaluate(measureReaderMotion);
-        assert(saved.covered.toast === 1 && saved.animations > word.animations - 1, `motion check did not observe the Save toast: ${JSON.stringify(saved.covered)}`);
-        assert.deepEqual(saved.violations, [], 'The saved popup and its toast may animate only transform and opacity');
-        await page.locator('#mini #mini-lists').click();
+        assert(saved.animations > word.animations - 1, `motion check did not observe the saved popup and its menu: ${JSON.stringify(saved.covered)}`);
+        assert.deepEqual(saved.violations, [], 'The saved popup and its menu may animate only transform and opacity');
+        await page.locator('#vocabulary-list-new').click();
         await page.waitForSelector('#vocabulary-list-popover #vocabulary-list-create');
         const lists = await page.evaluate(measureReaderMotion);
-        assert.equal(lists.covered.listAdd, 1, `motion check did not observe the list sheet's Add: ${JSON.stringify(lists.covered)}`);
-        assert.deepEqual(lists.violations, [], 'The list sheet may animate only transform and opacity');
+        assert.equal(lists.covered.listAdd, 1, `motion check did not observe the menu's Add: ${JSON.stringify(lists.covered)}`);
+        assert.deepEqual(lists.violations, [], 'The menu may animate only transform and opacity');
         await page.keyboard.press('Escape');
         await page.keyboard.press('Escape');
         await page.locator('#dials-toggle').click();
@@ -1378,12 +2455,12 @@ try {
         assert(settings.covered.settings > 0, `motion check did not observe the text settings: ${JSON.stringify(settings.covered)}`);
         assert.deepEqual(settings.violations, [], 'The text settings may animate only transform and opacity');
         await page.locator('#dials-toggle').click();
-        await page.locator(`#reader .tok[data-index="${SUBURB}"]`).focus();
+        await focusToken(page, SUBURB);
         await page.keyboard.press('Shift+F10');
-        await page.waitForSelector('#reader-word-menu');
+        await page.waitForSelector('#seal-strip');
         const menu = await page.evaluate(measureReaderMotion);
-        assert.equal(menu.covered.menu, 1, `motion check did not observe the word menu: ${JSON.stringify(menu.covered)}`);
-        assert.deepEqual(menu.violations, [], 'The word menu may animate only transform and opacity');
+        assert.equal(menu.covered.menu, 1, `motion check did not observe the strip: ${JSON.stringify(menu.covered)}`);
+        assert.deepEqual(menu.violations, [], 'The strip may animate only transform and opacity');
         return { word, sentence, saved, lists, settings, menu };
       });
 
@@ -1417,9 +2494,11 @@ try {
       await page.locator('.exam-confirm button', { hasText: /study/i }).first().click();
       await page.waitForSelector('.exam-paper');
       const question = await page.evaluate(() => document.querySelector('#app main').innerText);
-      const leaks = [room.text, question].flatMap((t) => t.match(/.{0,20}(awaiting John|machine-checked).{0,20}/giu) || []);
-      assert.equal(leaks.length, 0, `diagnostic wording: ${leaks.join(' | ')}`);
-      assert(room.chips > 0, 'no 未確認 chip on unreviewed tests');
+      // S · no provenance in the learner's app (John, 2026-10-16): this pinned "a 未確認 chip on unreviewed tests"; the new
+      // truth is no provenance chip or line in the room or a question — the review state stays in the form's record
+      const leaks = [room.text, question].flatMap((t) => t.match(/.{0,20}(awaiting John|machine-checked|Made by AI|AI作成|Written by AI|AIが書きました|not yet checked|未確認|人の確認).{0,20}/giu) || []);
+      assert.equal(leaks.length, 0, `diagnostic or provenance wording: ${leaks.join(' | ')}`);
+      assert.equal(room.chips, 0, `${room.chips} provenance chips on the tests`);
       assert(room.levels.length === 5 && room.levels.every((l) => l.level && /\d/u.test(l.tests)), `level cards: ${JSON.stringify(room.levels)}`);
       return { chips: room.chips, levels: room.levels };
     });
@@ -1441,8 +2520,12 @@ try {
         await page.keyboard.press('Tab');
       }
       assert(presses <= paragraphs + 3, `${presses} Tab presses from the title to 読み終えた for ${paragraphs} paragraphs`);
-      const first = page.locator('#reader button.tok[tabindex="0"]').first();
+      const first = page.locator('#reader [data-reader-prose][tabindex="0"]').first();
+      const idle = await page.evaluate(() => ({ paragraphs: document.querySelectorAll('#reader [data-reader-prose][tabindex="0"]').length,
+        buttons: document.querySelectorAll('#reader button.tok, #reader .tok[role="button"]').length }));
+      assert.deepEqual(idle, { paragraphs, buttons: 0 }, 'idle prose must have one paragraph stop and no word buttons');
       await first.focus();
+      await page.keyboard.press('Home');
       const walk = await page.evaluate(() => {
         const a = document.activeElement;
         return { index: a.dataset.index, name: a.getAttribute('aria-label'), word: a.querySelector('.tok-word')?.textContent.replace(/\s/gu, '') ?? '' };
@@ -1469,7 +2552,12 @@ try {
       for (const id of [NARRATED, ARTICLE]) {
         await openArticle(page, id);
         const listen = page.locator('#listen-toggle');
-        if (await listen.count() && await listen.isEnabled()) { await listen.click(); await page.waitForTimeout(1500); }
+        // the bar stands folded to its mark (one-hand 5a-ii): the mark opens it before its play control is pressed
+        if (await listen.count()) {
+          await page.locator('#listen-open').click();
+          await page.waitForSelector('.listen-row.play-bar[data-open="true"]', { timeout: 5000 });
+          if (await listen.isEnabled()) { await listen.click(); await page.waitForTimeout(1500); }
+        }
       }
       const listenText = await page.evaluate(() => document.querySelector('.listen-row')?.innerText ?? '');
       const f1 = requests.filter((u) => /\/audio\/(narration|w)\/f1\//u.test(u));
@@ -1483,15 +2571,20 @@ try {
   }
 } finally {
   await host.close();
+  const acceptance = scopeResult({ expected: engines.flatMap(engine => selectedDesign.cases.map(id => `${engine}/${id}`)),
+    observed: results.map(row => `${row.engine}/${row.name}`), passed: results.every(row => row.passed), diagnostic: selectedDesign.diagnostic });
   const receipt = {
+    schemaVersion: 2, runId, requestedScope: selectedDesign.scope, engines, ...acceptance,
     artifactSha256: manifest.artifactSha256, gitSha: manifest.gitSha, sourceDirty: manifest.sourceDirty,
-    verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
-    control: withControl ? 'rt and ruby::before forced to 0.46em' : null,
-    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368, the first-visit tip in the page, ダマスカス savable, one word one card; reader lane: one tap shows the meaning, the word menu saves one card, Save is one tap with Undo, the menu by keyboard, the lists popover, the sentence row and phone seating, sentence Save without activation, the version switch with 44px hit boxes, transform/opacity-only motion across the reader room and the popup Save and list path, the same one path in the galaxy, return from Practice on lookup and content words with motion enabled, a public below-word sentence seat with unchanged anchor and article scroll, and Japanese punctuation line breaks with source text preserved',
+    verifierSha256,
+    control: g6SentenceDoorControl ? 'block exactly the fourth sentence-door click (the rising-card path); no extra tap or wait' : withControl ? (spacingOnly ? '8px padding after the actual 郊外 token' : '8px token padding; rt and ruby::before forced to 0.46em') : null,
+    scope: fixesOnly ? 'R1 fragment spacing, W2 saved page return, G6 pinned below seat, and G8 motion coverage only; other design gates not run' : spacingOnly ? 'R1 actual inline-fragment widths and same-line printed-token gaps at 1368/390 only; no other design gates' : 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368, the silent fresh-record word demonstration with no permanent tip, ダマスカス savable, one word one card; reader lane: reading then stage shows the meaning, the word menu saves one card, Save is one tap with Undo, the menu by keyboard, the lists popover, the sentence row and phone seating, sentence Save without activation, the version switch with 44px hit boxes, transform/opacity-only motion across the reader room and the popup Save and list path, the same one path in the galaxy, return from Practice on lookup and content words with motion enabled, a public below-word sentence seat with unchanged anchor and article scroll, and Japanese punctuation line breaks with source text preserved',
+    browserVersions,
+    selectedScope: g6SentenceDoorControl ? 'G6/320 single sentence-door negative control only; diagnostic, never full acceptance' : fixesOnly ? 'Six exact changed or diagnosed design cases per engine' : spacingOnly ? 'R1 spacing only, both viewport sizes' : g3Only ? 'G3 demonstration, stage, keyboard and prose; older design gates not run' : 'all design gates',
     results,
-    passed: results.length === engines.length * 49 && results.every((row) => row.passed),
+    passed: acceptance.fullAcceptance,
   };
   writeFileSync(resolve(evidence, 'design-reader-shelf.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(`${results.filter((r) => r.passed).length}/${results.length} passed · evidence ${evidence}`);
-  if (!receipt.passed) process.exitCode = 1;
+  process.exitCode = acceptance.exitCode;
 }

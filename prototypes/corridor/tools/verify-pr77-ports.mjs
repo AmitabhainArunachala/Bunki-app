@@ -191,7 +191,7 @@ PROBES['crumb-origin'] = async () => {
   await settle(page);
   const trayBack = await page.evaluate(() => document.body.dataset.view);
   check('d9f0b984 · the tray opened from the galaxy names the galaxy, where its 戻る goes',
-    /^(銀河|galaxy)/.test(trayCrumb) && trayBack === 'drift', JSON.stringify({ trayCrumb, trayBack }));
+    /^(銀河|Galaxy) › (今日|Today)$/.test(trayCrumb) && trayBack === 'drift', JSON.stringify({ trayCrumb, trayBack }));
 
   await open(page);
   await page.click('#tray');
@@ -209,7 +209,7 @@ PROBES['crumb-origin'] = async () => {
   await settle(page);
   const reviewBack = await page.evaluate(() => document.body.dataset.view);
   check('d9f0b984 · a plain review names Today, the tray its 戻る reopens',
-    /(今日|Today).*(復習|review)/.test(reviewCrumb) && reviewBack === 'tray', JSON.stringify({ reviewCrumb, reviewBack }));
+    /(今日|Today) › (復習|Review)$/.test(reviewCrumb) && reviewBack === 'tray', JSON.stringify({ reviewCrumb, reviewBack }));
   await context.close();
 };
 
@@ -229,27 +229,37 @@ async function openRow(page, id) {
   }));
 }
 
-/* d9f0b984 — rows wearing 検収前 offered no reason: the reason block was gated
- * on pendingVerification, which few of them carry. Since the design pass of 2026-09-30 the
- * learner-facing mark is the 未確認 chip (its reason in the tooltip and the article's footer). */
+/* d9f0b984 — rows wearing 検収前 offered no reason: the reason block was gated on pendingVerification, which few of them
+ * carry, and the rights-held rows told the Wikinews archive-freeze story. Since 2026-09-30 the mark was the 未確認 chip
+ * (then Made by AI) with a reason in the footer; this probe pinned that mark and its per-row reasons.
+ * S (John, 2026-10-16: "no one wants to see a made by ai in red!!!"): the new truth is that no row says how it was made
+ * or whether it is being checked — not the human-review row, not the rights-held row, not the approved control — and none
+ * tells another source's story; the review state stays in each row's record (review, pendingVerification). */
 PROBES['review-reason'] = async () => {
   const { context, page } = await learner();
   await open(page, '?entry=shelf&ui=bi');
-  const freeze = /archive froze/;
+  const freeze = /archive froze|Wikinews closed/i;
+  const marked = (row) => /Made by AI|AI作成|unreviewed|未確認|not yet checked/iu.test(row.eyebrow)
+    || row.notes.some((n) => /review|pending|not yet verified|checked by a person|人による確認|確認され|未確認/iu.test(n) || freeze.test(n));
   const human = await openRow(page, 'env:press-press_05591');
-  check('d9f0b984 · a row marked 未確認 for human review says so, and not with another source\'s story',
-    /Unreviewed/.test(human.eyebrow) && human.notes.some((n) => /review/i.test(n) && !freeze.test(n)) && !human.notes.some((n) => freeze.test(n)),
-    JSON.stringify(human).slice(0, 400));
+  check('d9f0b984 (S) · a row awaiting human review opens with no provenance mark or review note',
+    human.eyebrow.length > 0 && !marked(human), JSON.stringify(human).slice(0, 400));
   await page.click('#back');
-  const rights = await openRow(page, 'yasashii:1');
-  check('d9f0b984 · a row held for its rights names that reason, not the Wikinews archive freeze',
-    /Unreviewed/.test(rights.eyebrow) && rights.notes.some((n) => /terms|rights|licen/i.test(n)) && !rights.notes.some((n) => freeze.test(n)),
-    JSON.stringify(rights).slice(0, 400));
+  // N (2026-10-17) rewrites the pin "yasashii:1, a row held for its rights, opens with no pending note": the ten
+  // rights-held glossary rows left the shelf through the cull queue, so no shelf row is held for its rights any longer;
+  // the new kind of row — an original whose review state (two model families, John's own read) lives only in its
+  // authoring record — is opened in its place and must read the same
+  const shelfIndex = JSON.parse(readFileSync(resolve(CORRIDOR_DIR, 'data/articles/index.json'), 'utf8'));
+  const rightsHeld = shelfIndex.articles.filter((row) => row.review === 'rights-review-pending').map((row) => row.id);
+  check('d9f0b984 (N) · no shelf row is held for its rights any longer (the ten held glossary rows were culled)',
+    rightsHeld.length === 0, rightsHeld.join(', '));
+  const original = await openRow(page, 'aozora:049966-1');
+  check('d9f0b984 (N) · an original still awaiting John\'s own read opens with no provenance mark or review note',
+    original.eyebrow.length > 0 && !marked(original), JSON.stringify(original).slice(0, 400));
   await page.click('#back');
   const approved = await openRow(page, 'bunki-graded-n3-zoka-sanjin-morning');
-  check('d9f0b984 · an approved row carries no pending note (negative control)',
-    !/Unreviewed/.test(approved.eyebrow) && !approved.notes.some((n) => /pending/i.test(n)),
-    JSON.stringify(approved).slice(0, 300));
+  check('d9f0b984 (S) · an approved row reads the same (control: the probe opened a real row each time)',
+    approved.eyebrow.length > 0 && !marked(approved), JSON.stringify(approved).slice(0, 300));
   await context.close();
 };
 

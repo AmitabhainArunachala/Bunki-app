@@ -24,13 +24,13 @@ import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, extname, join, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
-import { chromium } from 'playwright-core';
+import { chromium, webkit } from 'playwright-core';
 import { silenceBrowserAudio, TEST_AUDIO_OUTPUT } from './browser-audio-silence.mjs';
 import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecord, readAppRecordSnapshot, waitForAppRecord, armRecordWriteFailure, clearRecordWriteFailure } from './record-test-support.mjs';
@@ -109,21 +109,37 @@ async function openFooterSignals(page) {
   await page.waitForTimeout(150);
 }
 
-async function touchAt(page, selector, index, holdMs) {
+async function touchAt(page, selector, index, holdMs, scroll = true) {
   const target = page.locator(selector).nth(index);
   // centre, don't nudge: scrollIntoViewIfNeeded moves the minimum, which
   // can park the target at the viewport's top edge UNDER the fixed chrome
   // — the touch then lands on 戻る and navigates away instead of holding
   // the word. (Surfaced when per-article bookmarks began reopening texts
   // mid-scroll; a centred target is always clear of both chrome bands.)
-  await target.evaluate((n) => n.scrollIntoView({ block: 'center' }));
-  await page.waitForTimeout(60);
-  // aim at the element's first line fragment, the way a finger aims at the
-  // glyphs — a union box can drift into the line gap once a gloss hangs below
-  const box = await target.evaluate((node) => {
-    const r = node.getClientRects()[0] ?? node.getBoundingClientRect();
-    return { x: r.x, y: r.y, width: r.width, height: r.height };
-  });
+  // A caller that has just centred the target and measures it on screen passes scroll = false (openWordStage
+  // already hands its flag on).
+  // A locator finds its element in one round trip and evaluates on it in the next. A surface drawn again in place
+  // between the two (the word's stage, redrawn as its meaning arrives) hands the evaluation a node it has already
+  // detached: its box is zero though its successor stands where it stood (INTFIX-C, the rehearsal's "touch: no box for
+  // #mini button.mini-word", 2026-10-20). Each step says whether it met a live node; on a detached one the selector
+  // is found again and the step done again, as Playwright's own actions retry a detached element, so the finger aims
+  // at the element the selector names now. No wait is added or widened, and a live node without a box still fails.
+  let box = null;
+  for (let attempt = 0; attempt < 3 && !box; attempt += 1) {
+    if (scroll && !await target.evaluate((n) => {
+      if (!n.isConnected) return false;
+      n.scrollIntoView({ block: 'center' });
+      return true;
+    })) continue;
+    await page.waitForTimeout(60);
+    // aim at the element's first line fragment, the way a finger aims at the
+    // glyphs — a union box can drift into the line gap once a gloss hangs below
+    box = await target.evaluate((node) => {
+      if (!node.isConnected) return null;
+      const r = node.getClientRects()[0] ?? node.getBoundingClientRect();
+      return { x: r.x, y: r.y, width: r.width, height: r.height };
+    });
+  }
   if (!box || !box.width) throw new Error(`touch: no box for ${selector}`);
   const x = box.x + box.width / 2;
   const y = box.y + box.height / 2;
@@ -158,15 +174,50 @@ async function chooseDial(page, key, value) {
   { key, value });
 }
 
-/** The reader's click grammar (reader lane 2026-10-02): a full dictionary entry opens from the word's
- * popup — one tap, then "Full entry ›" (the hold that used to open it now opens the word menu). */
+/** Reach the exact prose occurrence through its paragraph's real keyboard controller. */
+async function focusProseOccurrence(page, target) {
+  const offset = await target.evaluate(word => {
+    const block = word.closest('[data-prose-roving]');
+    if (!block) return -1;
+    return [...block.querySelectorAll('.tok[data-para],.sentence-tok,.japanese-lookup-word,.gs-word,.kp-tok')]
+      .filter(node => node.closest('[data-prose-roving]') === block).indexOf(word);
+  });
+  assert(offset >= 0, 'The intended occurrence belongs to a prose keyboard controller');
+  await target.locator('xpath=ancestor::*[@data-prose-roving][1]').focus();
+  await page.keyboard.press('Home');
+  for (let step = 0; step < offset; step++) await page.keyboard.press('ArrowRight');
+  assert(await target.evaluate(word => document.activeElement === word), 'Home/Arrows select the exact intended occurrence');
+}
+
+/** Setup for checks whose subject is the stage: only an observed reading rung permits the second activation, and (Ladder)
+ * only an observed English rung the third. */
+async function openWordStage(page, selector, index = 0, scroll = true) {
+  const target = page.locator(selector).nth(index);
+  assert.notEqual(await target.getAttribute('data-ladder-rung'), 'stage', 'Stage setup begins on a word without its stage');
+  await touchAt(page, selector, index, 0, scroll);
+  await page.waitForFunction(node => ['reading', 'gloss', 'stage'].includes(node?.dataset.ladderRung), await target.elementHandle());
+  if (await target.getAttribute('data-ladder-rung') === 'reading') {
+    assert.equal(await page.locator('#mini').count(), 0, 'Reading rung has no meaning stage');
+    assert(await target.evaluate(node => [...node.querySelectorAll('rt')].some(rt => !rt.classList.contains('hidden-rt') && getComputedStyle(rt).visibility !== 'hidden')), 'Reading rung reveals the pronunciation');
+    await touchAt(page, selector, index, 0, scroll);
+  }
+  // Ladder (John, 10-19): the English under the word comes before the stage; one more touch, only once it is seen
+  await page.waitForFunction(node => node?.dataset.ladderRung === 'gloss' || !!document.getElementById('mini'), await target.elementHandle());
+  if (await target.getAttribute('data-ladder-rung') === 'gloss') {
+    assert.equal(await page.locator('#mini').count(), 0, 'English rung has no meaning stage yet');
+    assert(await target.evaluate(node => !!node.querySelector(':scope > .tok-en .tok-en-text')), 'English rung draws the English under the word');
+    await touchAt(page, selector, index, 0, scroll);
+  }
+  await page.locator('#mini .mini-word').waitFor();
+  assert.equal(await target.getAttribute('data-ladder-rung'), 'stage', 'The exact occurrence reached its stage');
+}
+
+/** Open the page through its stage, after observing any required reading rung. */
 async function holdWord(page, selector, index = 0) {
-  await touchAt(page, selector, index, 0);
-  await page.waitForSelector('#mini .mini-entry', { timeout: 8000 });
+  await openWordStage(page, selector, index);
   await page.waitForTimeout(120);
-  // a press where the link is painted: the popup floats, so nothing may scroll the page to reach it
-  const box = await page.locator('#mini .mini-entry').boundingBox();
-  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await touchAt(page, selector, index, 0);
+  await page.waitForSelector('#sheet');
   await page.waitForTimeout(200);
 }
 
@@ -270,10 +321,16 @@ async function sheetViewportGeometry(page) {
   return page.evaluate((closeSelector) => {
     const sheet = document.querySelector('#sheet').getBoundingClientRect();
     const close = document.querySelector(closeSelector).getBoundingClientRect();
-    return { innerWidth, clientWidth: document.documentElement.clientWidth,
+    // The page's measure belongs to its content; the bar and scale thread are chrome.
+    const contentNode = document.querySelector('#sheet > :not(.sheet-bar):not(.scale-thread)');
+    const content = contentNode?.getBoundingClientRect();
+    const rails = [...document.querySelectorAll('#sheet > .scale-thread')];
+    return { innerWidth, innerHeight, clientWidth: document.documentElement.clientWidth,
       scrollWidth: document.documentElement.scrollWidth,
       visualWidth: window.visualViewport?.width ?? innerWidth,
-      sheet: sheet.toJSON(), close: close.toJSON() };
+      sheet: sheet.toJSON(), close: close.toJSON(), content: content ? content.toJSON() : null,
+      contentTag: contentNode?.tagName ?? null, contentClass: contentNode?.className ?? null,
+      rails: rails.map((rail) => rail.getBoundingClientRect().toJSON()) };
   }, await entryCloseSelector(page));
 }
 
@@ -313,9 +370,11 @@ async function walkToSemPanel(page, tapFn) {
   return page.locator('#sheet .sem-row').count();
 }
 
+// F (one ladder, 2026-10-18): the reader's body on a phone is the ladder's reading step, 21 px (was the approved 19 px
+// fixture); a reading over it is half its size, 10.5 px, the floor D5 sets. Navigation labels stay at or under 17 px.
 function hasApprovedPhoneHierarchy(probe) {
   const reader = probe.text.find(t => t.label === 'reading body (focused)');
-  return reader?.fontSize === 19 && probe.navigationLabelSize > 0 && probe.navigationLabelSize <= 17;
+  return reader?.fontSize === 21 && probe.navigationLabelSize > 0 && probe.navigationLabelSize <= 17;
 }
 
 function articleSummaries(probe) {
@@ -328,20 +387,36 @@ function summariesMeetAA(rows) {
 
 async function measureChromeTargets(page) {
   return page.evaluate(() => {
-    const headerSave = document.querySelector('#reader-take');
+    // one Save: no #reader-take, and (S, John 2026-10-16: "how do we know where to add something") at most one keep in the
+    // bar — the one Save component (#chrome-keep) on the slip's own path — it pinned "no Save in the bar" (10-15 17:20);
+    // while the slip is open its Save is measured beside the bar's doors
+    const barSaves = [...document.querySelectorAll('.chrome button')].filter((n) => n.id === 'reader-take'
+      || /^(保存|Save)/u.test((n.textContent || '').trim()) || /^(保存|Save)\b/u.test(n.getAttribute('aria-label') || ''));
     const popupSave = document.querySelector('#mini #mini-take');
     const popupOpen = !!document.querySelector('#mini');
-    const relocatedSave = popupOpen && !!popupSave && !!headerSave && getComputedStyle(headerSave).visibility === 'hidden';
     const targets = [...document.querySelectorAll('.chrome button')];
-    if (relocatedSave) targets.push(popupSave);
+    if (popupOpen && popupSave) targets.push(popupSave);
+    const bar = document.querySelector('#app > .chrome');
+    const barBox = bar?.getBoundingClientRect();
+    const port = bar ? { left: barBox.left + bar.clientLeft, right: barBox.left + bar.clientLeft + bar.clientWidth,
+      scrollLeft: bar.scrollLeft, scrollMax: bar.scrollWidth - bar.clientWidth } : null;
+    const vv = window.visualViewport;
+    const reader = document.querySelector('#reader');
+    const pageState = { view: document.body.dataset.view, innerWidth, innerHeight, scrollX, scrollY,
+      documentWidth: document.documentElement.scrollWidth, bodyWidth: document.body.scrollWidth,
+      readerWidth: reader ? reader.scrollWidth : null,
+      visual: vv ? Object.fromEntries(['offsetLeft', 'offsetTop', 'pageLeft', 'pageTop', 'scale', 'width', 'height'].map(k => [k, vv[k]])) : null };
     const rows = targets.filter(n => {
       const r = n.getBoundingClientRect();
       return r.width > 1 && r.height > 1 && getComputedStyle(n).visibility !== 'hidden' && n.checkVisibility();
     }).map(n => {
       const r = n.getBoundingClientRect();
       const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+      const inBar = !!bar && bar.contains(n);
       return { id: n.id || n.textContent.trim(), x: r.x, y: r.y, width: r.width, height: r.height,
-        reachable: !!hit && (hit === n || n.contains(hit)), right: r.right, bottom: r.bottom };
+        reachable: !!hit && (hit === n || n.contains(hit)), right: r.right, bottom: r.bottom, bar: inBar,
+        whole: r.x >= 0 && r.right <= innerWidth && r.y >= 0 && r.bottom <= innerHeight
+          && (!inBar || (!!port && r.x >= port.left && r.right <= port.right)) };
     });
     const overlaps = [];
     for (let i = 0; i < rows.length; i++) for (let j = i + 1; j < rows.length; j++) {
@@ -349,11 +424,175 @@ async function measureChromeTargets(page) {
       if (Math.min(a.right, b.right) - Math.max(a.x, b.x) > 1 &&
           Math.min(a.bottom, b.bottom) - Math.max(a.y, b.y) > 1) overlaps.push([a.id, b.id]);
     }
-    const saveOwnership = !popupOpen || (!!headerSave && getComputedStyle(headerSave).visibility === 'hidden' && !!popupSave && popupSave.checkVisibility({ visibilityProperty: true })
-      && rows.some(row => row.id === 'mini-take' && row.reachable && row.width >= 44 && row.height >= 44));
-    return { width: innerWidth, rows, overlaps, relocatedSave, saveOwnership, valid: saveOwnership && rows.length >= 7 && !overlaps.length &&
+    const saveOwnership = barSaves.length <= 1 && barSaves.every((n) => n.id === 'chrome-keep' && n.matches('button.save-one[data-save-one]'))
+      && (!popupOpen || (!!popupSave && popupSave.checkVisibility({ visibilityProperty: true })
+      && rows.some(row => row.id === 'mini-take' && row.reachable && row.width >= 44 && row.height >= 44)));
+    return { width: innerWidth, rows, overlaps, barSaves: barSaves.length, popupOpen, saveOwnership, port, page: pageState,
+      valid: saveOwnership && rows.length >= 7 && !overlaps.length &&
       rows.every(r => r.width >= 44 && r.height >= 44 && r.x >= 0 && r.right <= innerWidth && r.y >= 0 && r.bottom <= innerHeight && r.reachable) };
   });
+}
+
+/** One native touch stroke across the reader's toolbar. It counts only when every protocol command is
+ * acknowledged and the document observes, at dispatch, a complete trusted stream on connected toolbar targets
+ * that scrolls without activating anything. */
+async function strokeChrome(page, from, to) {
+  await page.evaluate(() => {
+    const events = [];
+    const types = ['pointerdown', 'pointermove', 'pointerup', 'pointercancel', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'click'];
+    const observe = (e) => events.push({ type: e.type, trusted: e.isTrusted, target: e.target?.id || e.target?.tagName || null,
+      connected: !!e.target?.isConnected, inBar: !!e.target?.closest?.('#app > .chrome'), touches: e.touches ? e.touches.length : null });
+    for (const type of types) document.addEventListener(type, observe, { capture: true, passive: true });
+    window.__chromeStroke = () => { for (const type of types) document.removeEventListener(type, observe, true); return events; };
+  });
+  const vv = await page.evaluate(() => ({ x: window.visualViewport?.offsetLeft || 0, y: window.visualViewport?.offsetTop || 0 }));
+  const cdp = await page.context().newCDPSession(page);
+  let acknowledged = 0;
+  let inputError = null;
+  try {
+    for (let i = 0; i <= 6; i++) {
+      const point = { id: 1, x: from.x + (to.x - from.x) * i / 6 - vv.x, y: from.y + (to.y - from.y) * i / 6 - vv.y, radiusX: 1, radiusY: 1, force: 1 };
+      await cdp.send('Input.dispatchTouchEvent', { type: i ? 'touchMove' : 'touchStart', touchPoints: [point] });
+      acknowledged += 1;
+    }
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    acknowledged += 1;
+  } catch (error) {
+    inputError = String(error?.message || error);
+  }
+  await cdp.detach();
+  const settled = await page.evaluate(() => new Promise((done) => {
+    const began = performance.now();
+    let still = 0;
+    let last = '';
+    const frame = () => {
+      const bar = document.querySelector('#app > .chrome');
+      const vv = window.visualViewport;
+      const now = JSON.stringify([bar?.scrollLeft, scrollX, scrollY, vv?.offsetLeft, vv?.offsetTop]);
+      still = now === last ? still + 1 : 0;
+      last = now;
+      if (still >= 8) return done(true);
+      if (performance.now() - began > 3000) return done(false);
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  }));
+  const events = await page.evaluate(() => window.__chromeStroke());
+  const start = events.find(e => e.type === 'touchstart');
+  const end = events.filter(e => e.type === 'touchend' || e.type === 'touchcancel').at(-1);
+  const complete = !inputError && acknowledged === 8 && settled && events.every(e => e.trusted && e.connected)
+    && !!start && start.inBar && events.some(e => e.type === 'touchmove') && end?.type === 'touchend' && end.touches === 0
+    && !events.some(e => e.type === 'click');
+  return { from, to, acknowledged, inputError, settled, events, complete };
+}
+
+/** The reader saves its place 900ms after the page last scrolled, so the setup's own scroll can still be writing.
+ * A record is a baseline only once two reads further apart than that agree; one still changing is none. */
+async function settledAppRecord(page, timeout = 10000) {
+  const deadline = Date.now() + timeout;
+  let text = JSON.stringify(await readAppRecord(page));
+  while (Date.now() < deadline) {
+    await page.waitForTimeout(1500);
+    const next = JSON.stringify(await readAppRecord(page));
+    if (next === text) return { text, settled: true };
+    text = next;
+  }
+  return { text, settled: false };
+}
+
+/** Where the toolbar holds more doors than the phone is wide, a thumb reaches them by scrolling the toolbar.
+ * Native strokes alone move it; every door must then be seen whole inside the toolbar's port and the viewport,
+ * owning its own centre at 44px, while the page, its width, the visual viewport and the settled record stay exactly
+ * put. A stroke begins on a whole door other than the keep: the outside press that puts a slip away renews the keep
+ * in place, and a stroke whose own target leaves the document is no evidence. */
+async function reachChromeNatively(page, width) {
+  const baseline = await settledAppRecord(page);
+  const recordBefore = baseline.text;
+  const positions = [await measureChromeTargets(page)];
+  const strokes = [];
+  const last = () => positions.at(-1);
+  const stroke = async (forward) => {
+    const at = last();
+    const doors = at.rows.filter(r => r.bar && r.whole && r.reachable && r.id !== 'chrome-keep');
+    const origin = forward ? doors.at(-1) : doors[0];
+    if (!origin || !at.port) return false;
+    const y = origin.y + origin.height / 2;
+    const done = await strokeChrome(page, { x: origin.x + origin.width / 2, y },
+      { x: forward ? at.port.left + 8 : at.port.right - 8, y });
+    strokes.push({ forward, origin: origin.id, ...done });
+    positions.push(await measureChromeTargets(page));
+    const moved = forward ? last().port.scrollLeft > at.port.scrollLeft : last().port.scrollLeft < at.port.scrollLeft;
+    return done.complete && moved;
+  };
+  for (let i = 0; i < 3 && last().port && last().port.scrollLeft < last().port.scrollMax; i++) if (!await stroke(true)) break;
+  for (let i = 0; i < 3 && last().port && last().port.scrollLeft > 0; i++) if (!await stroke(false)) break;
+  const recordAfter = JSON.stringify(await readAppRecord(page));
+  const [first] = positions;
+  const keys = (at) => at.rows.filter(r => r.bar).map(r => r.id);
+  const doors = keys(first);
+  const seen = new Set(positions.flatMap(at => at.rows
+    .filter(r => r.bar && r.whole && r.reachable && r.width >= 44 && r.height >= 44).map(r => r.id)));
+  const verdict = {
+    eightDistinctDoors: doors.length === 8 && new Set(doors).size === 8 && positions.every(at => JSON.stringify(keys(at)) === JSON.stringify(doors)),
+    everyDoorReached: doors.every(id => seen.has(id)),
+    targetsAtLeast44: positions.every(at => at.rows.every(r => r.width >= 44 && r.height >= 44)),
+    noOverlap: positions.every(at => !at.overlaps.length),
+    saveOwnership: positions.every(at => at.saveOwnership),
+    strokesComplete: strokes.every(s => s.complete) && (first.port?.scrollMax > 0 ? strokes.length > 0 : true),
+    restored: !!first.port && last().port?.scrollLeft === first.port.scrollLeft,
+    pageSteady: positions.every(at => JSON.stringify(at.page) === JSON.stringify(first.page)),
+    viewportWidth: first.page.view === 'reader' && first.page.innerWidth === width && first.page.documentWidth <= width
+      && first.page.bodyWidth <= width && (first.page.readerWidth ?? 0) <= width
+      && first.page.visual?.width === width && first.page.visual?.scale === 1,
+    recordSettled: baseline.settled,
+    recordUnchanged: recordBefore === recordAfter,
+  };
+  return { valid: Object.values(verdict).every(Boolean), verdict, doors, seen: [...seen], positions,
+    strokes: strokes.map(({ events, ...s }) => ({ ...s, events: events.map(e => `${e.type}:${e.target}${e.connected ? '' : '(detached)'}`) })) };
+}
+
+/** Under 360 px the reader's bar yields its Learn door to the tab bar, as every room's does (the lead's ruling, 2026-10-19:
+ * Q's G-12 over G6's scrolling eight; Grok's H0-3), so its seven doors fit the phone. Each visible door stands whole on
+ * screen and inside the bar (nothing clipped by the toolbar's own scroller, which G6 keeps only as a safety net), is at
+ * least 44 px and its own hit target; nothing overlaps; Learn stays one tap away in the tab bar; the page stays the
+ * phone's width. */
+async function standChrome(page, width, { selected = false } = {}) {
+  const at = await measureChromeTargets(page);
+  const learn = await page.evaluate(() => {
+    const door = document.querySelector('#app > .chrome > #chrome-dojo');
+    const tab = document.querySelector('#tab-learn');
+    const shown = (n) => !!n && n.checkVisibility() && n.getBoundingClientRect().width > 1;
+    return { door: shown(door), tab: shown(tab) };
+  });
+  // Hfix-1A (item 4, the lead's ruling: one Save on screen) · while a word's stage stands, the bar's Save steps aside: it
+  // keeps its slot (no door moves) but is neither seen nor reached, and the stage's Save is the one. So a selected bar
+  // stands six doors around that kept slot; an unselected bar, seven
+  const keep = await page.evaluate(() => {
+    const k = document.querySelector('#app > .chrome #chrome-keep');
+    if (!k) return null;
+    const r = k.getBoundingClientRect();
+    return { aside: k.hasAttribute('data-aside'), inert: !!k.inert, hidden: getComputedStyle(k).visibility === 'hidden', x: r.x, right: r.right };
+  });
+  const doors = at.rows.filter(r => r.bar).map(r => r.id);
+  const count = selected ? 6 : 7;
+  const search = at.rows.find(r => r.id === 'chrome-search'), tray = at.rows.find(r => r.id === 'tray');
+  const keepAside = !selected || (!!keep && keep.aside && keep.inert && keep.hidden && !doors.includes('chrome-keep')
+    && keep.right - keep.x >= 44 && !!search && !!tray && keep.x >= search.right - 1 && keep.right <= tray.x + 1);
+  const verdict = {
+    sevenDistinctDoors: doors.length === count && new Set(doors).size === count && keepAside,
+    learnInTabBar: !learn.door && learn.tab,
+    everyDoorWhole: at.rows.every(r => r.whole),
+    toolbarFits: !!at.port && at.port.scrollMax <= 0,
+    targetsAtLeast44: at.rows.every(r => r.width >= 44 && r.height >= 44),
+    everyDoorReachable: at.rows.every(r => r.reachable),
+    noOverlap: !at.overlaps.length,
+    saveOwnership: at.saveOwnership,
+    viewportWidth: at.page.view === 'reader' && at.page.innerWidth === width && at.page.documentWidth <= width
+      && at.page.bodyWidth <= width && (at.page.readerWidth ?? 0) <= width
+      && at.page.visual?.width === width && at.page.visual?.scale === 1,
+  };
+  return { valid: Object.values(verdict).every(Boolean), verdict, doors, keep, learn, port: at.port, page: at.page,
+    rows: at.rows.map(r => ({ id: r.id, x: Math.round(r.x), right: Math.round(r.right), width: Math.round(r.width), whole: r.whole, reachable: r.reachable })) };
 }
 
 /* measurement helpers evaluated in the page */
@@ -416,9 +655,14 @@ export const MEASURE_FN = `(() => {
       !(n.matches('.article-about a.inline-link[href]') && getComputedStyle(n).display === 'inline'))
     .map((n) => {
       const r = n.getBoundingClientRect();
-      const expanded = n.matches('button.tok, button.sent-door, button.rest-toggle') ? getComputedStyle(n, '::before') : null;
-      const expandedW = expanded ? parseFloat(expanded.width) : 0;
-      const expandedH = expanded ? parseFloat(expanded.height) : 0;
+      // a control whose press region is its ::before is measured by that region (the reader's words, the sentence and rest
+      // doors; G5 · L-2: a Save in a bar, its 28 px face inside the bar and its ::before the bar's full 44, as Close)
+      const expanded = n.matches('.tok, button.sent-door, button.rest-toggle, [data-bar] button.save-one:not(.chrome-keep), button.ww-reading-door') ? getComputedStyle(n, '::before') : null;
+      // A reading door's transparent reach must actually exist and receive input.
+      const usableExpanded = !n.matches('button.ww-reading-door') || (expanded &&
+        !['none', 'normal'].includes(expanded.content) && expanded.display !== 'none' && expanded.pointerEvents !== 'none');
+      const expandedW = expanded && usableExpanded ? parseFloat(expanded.width) : 0;
+      const expandedH = expanded && usableExpanded ? parseFloat(expanded.height) : 0;
       return {
         text: (n.textContent||'').trim().slice(0, 14),
         w: Math.round(r.width), h: Math.round(r.height),
@@ -466,6 +710,159 @@ export const MEASURE_FN = `(() => {
   };
 })()`;
 
+/* ---------------------------------------- Hfix-1A · item 18 · Save pressed while the meaning is "…" */
+// The lead's item 18 (10-19, found by the merge builder on 09c9239d): on a cold page, Saved ✓ (the stage's Save ▾) pressed
+// while the stage's meaning is still "…" closed the card and opened no menu 3–4 times in 5, and D23 aborted about one run
+// in three. The meaning landed between the finger's aim and its touch, the word band grew, and the touch met the band,
+// which dove into the page. Two strict rows, each run five times in every engine KAIRO_BROWSER names (both when unset), on
+// a cold page (a fresh load) with the dictionary's detail shards held, so the "…" stands for as long as the row needs:
+//   pending-save.during    the press lands while "…" shows: the menu opens; the meaning then arrives in place (the same
+//                          card, its menu still open, a meaning where the "…" stood, nothing busy);
+//   pending-save.inflight  the finger aims at Saved ✓ while "…" shows, the meaning arrives, the touch lands where it aimed:
+//                          the menu opens and the card stays (the word where D23 taps it, mid-glass);
+//   pending-save.inflight-below  the same with the word near the top of the glass, so the card stands below it and a
+//                          growing meaning would push Save down.
+// Controls (KAIRO_CORRIDOR_NEGATIVE, armed once the word is kept): pending-dismiss — a press inside the card dismisses it
+// (every row red); pending-shift — the band keeps no room for the meaning to come (inflight-below red).
+const PENDING_NEGATIVE = process.env.KAIRO_CORRIDOR_NEGATIVE || '';
+const PENDING_CONTROLS = {
+  'pending-dismiss': ["    if (mini && !mini.contains(target) && !target.closest?.('#vocabulary-list-popover, #reader-toast')) {",
+    "    if (mini && !target.closest?.('#vocabulary-list-popover, #reader-toast')) {"],
+  'pending-shift': ['  if (senseWaiting) { SLIP_OWN_MEANING.set(mini, String(g.m[0])); reserveSenseRoom(said, g); }',
+    '  if (senseWaiting) { SLIP_OWN_MEANING.set(mini, String(g.m[0])); }'],
+};
+const PENDING_SHARD = /^\/data\/share_alike\/dict-v2\/[0-9a-f]{2}\.json$/u;
+const PENDING_LETTER = '[data-passage="bunki-graded-n4-letter"]:not([data-recommendation]) .shelf-open';
+const PENDING_WORD = '#reader .tok[data-index="189"]';
+export async function pendingSaveRows(base) {
+  if (PENDING_NEGATIVE && !PENDING_CONTROLS[PENDING_NEGATIVE]) throw new Error(`unknown control ${PENDING_NEGATIVE}`);
+  const engines = process.env.KAIRO_BROWSER === 'chromium' ? { chromium }
+    : process.env.KAIRO_BROWSER === 'webkit' ? { webkit } : { chromium, webkit };
+  for (const [engine, type] of Object.entries(engines)) {
+    const browser = await type.launch();
+    console.log(`\n— Hfix-1A · item 18 · Save pressed while the meaning is "…" · ${engine} ${browser.version()}${PENDING_NEGATIVE ? ` · control ${PENDING_NEGATIVE}` : ''}`);
+    try { await pendingSaveEngine(browser, engine, base); }
+    catch (error) { check(`Hfix-1A · 18 · ${engine} · pending-save rows ran`, false, String(error?.message || error).split('\n')[0]); }
+    finally { await browser.close(); }
+  }
+}
+async function pendingSaveEngine(browser, engine, base) {
+  const context = await browser.newContext({ viewport: VIEWPORT, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+  await context.addInitScript(() => { localStorage.setItem('kairo-word-ladder-demo-v1', '1'); });
+  await silenceBrowserAudio(context);
+  let hold = false, release = () => {}, gate = Promise.resolve(), asked = 0, armed = false;
+  await context.route((url) => PENDING_SHARD.test(url.pathname), async (route) => {
+    if (hold) { asked += 1; await gate; }
+    try { await route.continue(); } catch { /* the page went first */ }
+  });
+  if (PENDING_NEGATIVE) await context.route(/\/corridor\.js(\?.*)?$/u, async (route) => {
+    if (!armed) { await route.continue(); return; }
+    const reply = await route.fetch();
+    const [from, to] = PENDING_CONTROLS[PENDING_NEGATIVE];
+    const body = await reply.text();
+    assert.equal(body.split(from).length, 2, `control ${PENDING_NEGATIVE}: its line must be in corridor.js exactly once`);
+    await route.fulfill({ response: reply, body: body.replace(from, to) });
+  });
+  const page = await context.newPage();
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  page.setDefaultTimeout(20000);
+  const coldLetter = async () => {
+    await page.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
+    await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+    await page.locator(PENDING_LETTER).first().click();
+    await settleReader(page);
+  };
+  const stage = async (seat = 'center') => {
+    const word = page.locator(PENDING_WORD).first();
+    await word.evaluate((n) => n.scrollIntoView({ block: 'center' }));
+    if (seat === 'top') await word.evaluate((n) => window.scrollBy(0, n.getBoundingClientRect().top - 150));
+    await page.waitForTimeout(120);
+    // Ladder (John, 10-19): one observed rung a tap: the reading (where it is not up), then the English under the word, then
+    // the stage; each tap waits for the rung it climbs to, and the next is taken only once that rung is seen
+    for (let after = ['reading', 'gloss']; after && !await page.locator('#mini').count();) {
+      const box = await word.boundingBox();
+      await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
+      const rung = await page.waitForFunction(([n, after]) => (document.getElementById('mini') ? 'stage'
+        : after.includes(n.dataset.ladderRung) ? n.dataset.ladderRung : null), [await word.elementHandle(), after], { timeout: 10000 })
+        .then((h) => h.jsonValue());
+      after = { reading: ['gloss'], gloss: [] }[rung] ?? null;
+    }
+    await page.locator('#mini #mini-take').waitFor({ timeout: 10000 });
+    await page.waitForTimeout(250);
+  };
+  const card = () => page.evaluate(() => {
+    const mini = document.getElementById('mini');
+    const take = document.getElementById('mini-take');
+    const menu = document.querySelector('#mini #vocabulary-list-popover.is-inline');
+    return { mini: !!mini, same: !!mini && mini === window.__pendingCard, menu: !!menu && menu.getClientRects().length > 0,
+      line: mini?.querySelector('.mini-gloss')?.textContent ?? null, wait: !!mini?.querySelector('[data-sense-wait]'),
+      busy: mini?.getAttribute('aria-busy') ?? null, saved: take?.textContent.trim() ?? null };
+  });
+  // the word is kept once, so every cold stage shows Saved ✓ (the record survives the reloads); a control is armed only
+  // after it, on the measured pages
+  await coldLetter();
+  await stage();
+  await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true', null, { timeout: 15000 }).catch(() => {});
+  if (!(await page.locator('#mini-take.taken').count())) {
+    const box = await page.locator('#mini-take').boundingBox();
+    await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
+    await waitForAppRecord(page, (record) => (record.taken || []).some((entry) => entry.t === 'word' && entry.id === '上手'), { description: 'the kept 上手' });
+  }
+  armed = true;
+  for (const kind of ['during', 'inflight', 'inflight-below']) {
+    let passes = 0;
+    const seen = [];
+    for (let run = 1; run <= 5; run += 1) {
+      hold = true; asked = 0; gate = new Promise((done) => { release = done; });
+      const before = errors.length;
+      let row = null;
+      try {
+        await coldLetter();
+        await stage(kind === 'inflight-below' ? 'top' : 'center');
+        const pending = await page.evaluate(() => { window.__pendingCard = document.getElementById('mini'); return { wait: !!document.querySelector('#mini [data-sense-wait]'),
+          saved: document.getElementById('mini-take')?.textContent.trim(), side: document.getElementById('mini')?.dataset.side ?? null }; });
+        const aim = await page.locator('#mini-take').boundingBox();
+        const at = { x: aim.x + aim.width / 2, y: aim.y + aim.height / 2 };
+        if (kind === 'during') {
+          await page.touchscreen.tap(at.x, at.y);
+          const opened = await page.waitForSelector('#mini #vocabulary-list-popover.is-inline', { timeout: 3000 }).then(() => true, () => false);
+          const atPress = await card();
+          hold = false; release();
+          await page.waitForFunction(() => !document.querySelector('#mini [data-sense-wait]'), null, { timeout: 15000 }).catch(() => {});
+          await page.waitForTimeout(600);
+          const settled = await card();
+          row = { pending, opened, atPress, settled, asked };
+          row.pass = pending.wait && /✓/u.test(pending.saved || '') && opened && atPress.same && atPress.wait &&
+            settled.same && settled.menu && !settled.wait && settled.busy !== 'true' && !!settled.line && settled.line !== '…';
+        } else {
+          hold = false; release();
+          await page.waitForFunction(() => !document.querySelector('#mini [data-sense-wait]'), null, { timeout: 15000 }).catch(() => {});
+          await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+          const landed = await page.evaluate(({ x, y }) => { const n = document.elementFromPoint(x, y); return n ? (n.id || n.className || n.tagName).toString().slice(0, 40) : null; }, at);
+          await page.touchscreen.tap(at.x, at.y);
+          const opened = await page.waitForSelector('#mini #vocabulary-list-popover.is-inline', { timeout: 3000 }).then(() => true, () => false);
+          const after = await card();
+          row = { pending, aim: { x: Math.round(at.x), y: Math.round(at.y) }, landed, opened, after, asked };
+          row.pass = pending.wait && /✓/u.test(pending.saved || '') && asked > 0 && opened && after.same && after.menu && !after.wait &&
+            (kind !== 'inflight-below' || pending.side === 'below');
+        }
+        row.errors = errors.slice(before);
+        if (row.errors.length) row.pass = false;
+      } catch (error) {
+        row = { pass: false, error: String(error?.message || error).split('\n')[0] };
+      } finally { hold = false; release(); }
+      if (row.pass) passes += 1;
+      seen.push(row);
+    }
+    check(`Hfix-1A · 18 · ${engine} · pending-save.${kind} · ${kind === 'during'
+      ? 'Saved ✓ pressed while the meaning is "…" opens its menu; the meaning then arrives in place, the card and menu kept'
+      : `Saved ✓ aimed during "…", touched after the meaning arrived: its menu opens, the card stays${kind === 'inflight-below' ? ' (the card below its word)' : ''}`} (5 of 5 on cold pages)`,
+    passes === 5, JSON.stringify({ passes, runs: seen }).slice(0, 2400));
+  }
+  await context.close();
+}
+
 /* ------------------------------------------------------------------ main */
 async function main() {
   const argv = process.argv.slice(2);
@@ -478,7 +875,22 @@ async function main() {
     reportArg >= 0 ? resolve(argv[reportArg + 1]) : resolve(EVIDENCE_DIR, 'verification-report.json');
   activeReportPath = reportPath;
 
+  // INT-VH (VH-1's law): a declared control is a diagnostic run, never an acceptance. Item 18's mutation runs with its own
+  // rows alone; a whole walk under it would write a receipt that does not say a control ran
+  if (PENDING_NEGATIVE && !(argv.includes('--only') && argv[argv.indexOf('--only') + 1] === 'pending-save'))
+    throw new Error('KAIRO_CORRIDOR_NEGATIVE runs only with --only pending-save');
   const { server, base } = await startCorridorServer();
+  // Hfix-1A · `--only pending-save` runs item 18's rows alone (its five-run rows in each engine), for a targeted check
+  const only = argv.includes('--only') ? argv[argv.indexOf('--only') + 1] : '';
+  if (only) {
+    if (only !== 'pending-save') throw new Error(`unknown --only ${only}`);
+    try { await pendingSaveRows(base); } finally { server.close(); }
+    const report = { only, negative: PENDING_NEGATIVE || null, summary: { total: results.length, failed: failures }, results };
+    mkdirSync(dirname(reportPath), { recursive: true });
+    writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
+    console.log(`\n${results.length - failures}/${results.length} checks passed`);
+    return failures === 0 && results.length ? 0 : 1;
+  }
   const browser = await chromium.launch({
     executablePath: process.env.CHROMIUM_PATH || undefined,
   });
@@ -491,6 +903,8 @@ async function main() {
       'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
   };
   const context = await browser.newContext(contextOptions);
+  // This is an existing-device journey; G3's fresh-device demonstration has its own verifier.
+  await context.addInitScript(() => { localStorage.setItem('kairo-word-ladder-demo-v1', '1'); });
   await silenceBrowserAudio(context);
   const page = await context.newPage();
   const consoleErrors = [];
@@ -501,6 +915,7 @@ async function main() {
 
   const hashFile = (file) => createHash('sha256').update(readFileSync(file)).digest('hex');
   const report = {
+    schemaVersion: 1, runId: process.env.KAIRO_GATE_RUN_ID || randomUUID(), fullAcceptance: false,
     artifact: { path: CORRIDOR_DIR, sha256: JSON.parse(readFileSync(resolve(CORRIDOR_DIR, 'build-identity.json'), 'utf8')).artifactSha256 },
     sources: {
       verifier: hashFile(fileURLToPath(import.meta.url)),
@@ -691,8 +1106,9 @@ async function main() {
       sectionProbe.ids.length === shelfData.length + sectionProbe.today,
     `${sectionProbe.unique}/${sectionProbe.ids.length} unique stories · ${shelfData.length} grid cards + ${sectionProbe.today} of today’s six`);
 
-  // the glossary is billed as itself: one-line definitions wear the 用語集 kicker, and the shelf's
-  // one tally counts every story and says how many of them are glossary entries
+  // N (2026-10-17) rewrites the pin "glossary rows wear Glossary, and the tally names its glossary entries": the ten
+  // one-line definitions left the shelf through the cull queue (not articles) — none wears the kicker, and the one tally
+  // counts every story and names no glossary entry
   const glossaryProbe = await page.evaluate(`(() => {
     const cards = [...document.querySelectorAll('#shelf-reading-results .shelf-item')];
     const glossary = cards.filter((n) => n.querySelector('.story-kicker .l-ja')?.textContent === 'Glossary');
@@ -706,9 +1122,9 @@ async function main() {
     return m ? { total: Number(m[1] ?? m[3]), glossary: Number(m[2] ?? m[4] ?? 0) } : null;
   };
   const billed = readTally(glossaryProbe.intro), resulted = readTally(glossaryProbe.results);
-  check('glossary rows wear Glossary, and the one tally counts every story and names its glossary entries',
-    glossaryProbe.glossary > 0 && billed?.total === glossaryProbe.cards && billed?.glossary === glossaryProbe.glossary &&
-      JSON.stringify(resulted) === JSON.stringify(billed),
+  check('no glossary definition stands on the shelf, and the one tally counts every story and names no glossary entry',
+    glossaryProbe.cards > 0 && glossaryProbe.glossary === 0 && billed?.total === glossaryProbe.cards && billed?.glossary === 0 &&
+      !/用語集|word definitions|glossary/iu.test(`${glossaryProbe.intro} ${glossaryProbe.results}`) && JSON.stringify(resulted) === JSON.stringify(billed),
     `${glossaryProbe.glossary} glossary of ${glossaryProbe.cards} stories · masthead "${glossaryProbe.intro}" · results "${glossaryProbe.results}"`);
   await openShelfTools(page);
   await page.locator('#shelf-reading-search').fill('no-matching-reading-fixture-zz987');
@@ -738,40 +1154,19 @@ async function main() {
     ordinalCapable >= 2 ? flagged >= 0 : flagged === 0,
     `${flagged} flagged; ${ordinalCapable} articles with >=2 ordinal signals`);
 
-  // glossary cross-references resolve or fall silent: a citation whose
-  // target stands on this shelf becomes a live door; one into the missing
-  // rest of the glossary drops its number — no dead "(No.NN)" survives
-  const inkanIndex = shelfData.findIndex((s) => s.title === '印鑑登録証');
-  check('the cross-referencing glossary entry stands on the shelf', inkanIndex >= 0,
-    `shelf index ${inkanIndex}`);
-  await tap(page, '.shelf-item:not([data-recommendation])', inkanIndex);
-  await settleReader(page);
-  const refProbe = await page.evaluate(`(() => {
-    const reader = document.getElementById('reader');
-    const doors = [...reader.querySelectorAll('.glossary-ref')];
-    return {
-      text: reader.textContent,
-      doors: doors.length,
-      targets: doors.map((d) => d.dataset.glossaryRef),
-    };
-  })()`);
-  check('no dead (No.NN) citation survives into the read',
-    refProbe.text.length > 0 && !/No\s*\.\s*[0-9]/.test(refProbe.text),
-    `${refProbe.text.replace(/\s+/g, '').slice(0, 48)}…`);
-  check('the in-shelf citation is a live door to its glossary entry',
-    refProbe.doors === 1 && refProbe.targets[0] === 'yasashii:6',
-    `doors → ${refProbe.targets.join(', ') || 'none'}`);
-  await page.evaluate(`document.querySelector('#reader .glossary-ref')?.click()`);
-  await page
-    .waitForFunction(
-      `document.querySelector('h1.view-title')?.textContent === '印鑑登録証明書'`,
-      null,
-      { timeout: 8000 },
-    )
-    .catch(() => {});
-  const refLanded = await page.evaluate(`document.querySelector('h1.view-title')?.textContent ?? ''`);
-  check('the glossary door opens the entry it names', refLanded === '印鑑登録証明書',
-    `landed on "${refLanded}"`);
+  // N (2026-10-17) rewrites the pins of the glossary's cross-references ("the cross-referencing entry 印鑑登録証 stands
+  // on the shelf", "its (No.6) citation is a live door to yasashii:6", "the door opens 印鑑登録証明書", "no dead (No.NN)
+  // survives into its read"): the cited glossary left the shelf with every entry that cited it. The new truth, as
+  // strictly: neither entry stands on the shelf or in its index, and no text the shelf can open carries a (No.NN)
+  // citation at all — so no door, live or dead, is left to draw.
+  const glossaryGone = SHELF_INDEX.articles.filter((row) => row.source === 'isa-yasashii-glossary' || /^yasashii:/u.test(row.id)).map((row) => row.id);
+  const inkanIndex = shelfData.findIndex((s) => s.title === '印鑑登録証' || s.title === '印鑑登録証明書');
+  check('the cross-referencing glossary entries stand nowhere on the shelf or in its index',
+    inkanIndex === -1 && glossaryGone.length === 0, `shelf index ${inkanIndex} · index rows ${glossaryGone.join(', ') || 'none'}`);
+  const citing = SHELF_INDEX.articles.filter((row) => !String(row.file || '').startsWith('archive/')).filter((row) =>
+    /No\s*\.\s*[0-9]/.test(JSON.parse(readFileSync(resolve(CORRIDOR_DIR, 'data/articles', row.file), 'utf8')).text));
+  check('no text on the shelf carries a (No.NN) glossary citation',
+    citing.length === 0, citing.map((row) => row.id).slice(0, 4).join(', ') || `${SHELF_INDEX.articles.length} texts clean`);
   await open('?entry=shelf');
 
   // the raw instrument is one 詳細 tap away, not gone — and it must include
@@ -947,21 +1342,51 @@ async function main() {
   const tapIdx = await page.evaluate(`(() => {
     const toks = [...document.querySelectorAll('#reader .tok.content')];
     for (let i = 1; i < toks.length; i++) {
-      if (toks[i].getClientRects().length === 1 && toks[i].textContent.length >= 2) return i;
+      if (toks[i].getClientRects().length === 1 && toks[i].querySelector('rt.hidden-rt') && toks[i].textContent.length >= 2) return i;
     }
     return 2;
   })()`);
 
-  // reader lane 2026-10-02 (John #8): ONE tap is the meaning. The popup shows the word, its reading and
-  // its meaning at once; the word does not move, nothing is written under it, and no sheet opens.
+  // G3: the first activation reveals the reading; Ladder (John, 10-19, a spec change): the second writes the word's English
+  // under it, the third exposes the stage, and none of them moves the print.
   const glyphBox = `(el) => (el.querySelector('ruby') ?? el).getBoundingClientRect().bottom`;
   await page.locator('#reader .tok.content').nth(tapIdx).evaluate((n) => n.scrollIntoView({ block: 'center' }));
   await page.waitForTimeout(80);
   const wordTopBefore = await page.evaluate(
     `(${glyphBox})(document.querySelectorAll('#reader .tok.content')[${tapIdx}])`,
   );
-  await tap(page, '#reader .tok.content', tapIdx);
+  // F · the reading a first press shows is a native <rt> inside the word's own box, so centring the word again before
+  // each press would scroll the page by half the reading's height (5 px at 390): the word is centred once, above, and
+  // every press (three, Ladder) lands where it stands, so a move measured here is the app's
+  const tapWord = () => page.locator('#reader .tok.content').nth(tapIdx).elementHandle(); // found afresh at each wait
+  await touchAt(page, '#reader .tok.content', tapIdx, 0, false);
   await page.waitForTimeout(120);
+  await page.waitForFunction((n) => !!n.dataset.ladderRung || !!document.getElementById('mini'), await tapWord(), { timeout: 8000 });
+  const readingOnly = await page.locator('#reader .tok.content').nth(tapIdx).evaluate(node => ({
+    rung: node.dataset.ladderRung, readings: node.querySelectorAll('rt:not(.hidden-rt)').length,
+    stage: !!document.getElementById('mini'), page: !!document.getElementById('sheet'), english: !!node.querySelector('.tok-en'),
+  }));
+  check('grammar · first activation reveals only the reading', readingOnly.rung === 'reading' && readingOnly.readings > 0 && !readingOnly.stage && !readingOnly.page && !readingOnly.english, JSON.stringify(readingOnly));
+  // Ladder (John, 10-19, a spec change): the second activation, taken only once the reading rung is seen, writes the word's
+  // English under it and opens nothing; the third, taken only once that English is seen, opens the stage
+  await page.waitForFunction((n) => n.dataset.ladderRung === 'reading', await tapWord(), { timeout: 8000 });
+  await touchAt(page, '#reader .tok.content', tapIdx, 0, false);
+  // the English rung seats its row at once and writes the English when the word's reading and sense settle (tok-en-wait):
+  // wait for that English within the same 8 s, then the check judges what landed
+  await page.waitForFunction((n) => (n.dataset.ladderRung !== 'reading' && !!n.querySelector(':scope > .tok-en .tok-en-text')?.textContent.trim()) ||
+    !!document.getElementById('mini'), await tapWord(), { timeout: 8000 }).catch(() => {});
+  const englishOnly = await page.locator('#reader .tok.content').nth(tapIdx).evaluate((node) => ({
+    rung: node.dataset.ladderRung, readings: node.querySelectorAll('rt:not(.hidden-rt)').length,
+    english: node.querySelector(':scope > .tok-en .tok-en-text')?.textContent.trim() ?? '', rows: document.querySelectorAll('#reader .tok-en').length,
+    marked: node.classList.contains('has-en') && node.dataset.depthAside === 'meaning',
+    stage: !!document.getElementById('mini'), page: !!document.getElementById('sheet'),
+  }));
+  check('grammar · second activation writes the word\'s English under it, keeps its reading, and opens nothing',
+    englishOnly.rung === 'gloss' && englishOnly.readings > 0 && !!englishOnly.english && englishOnly.rows === 1 && englishOnly.marked &&
+      !englishOnly.stage && !englishOnly.page, JSON.stringify(englishOnly));
+  await page.waitForFunction((n) => n.dataset.ladderRung === 'gloss', await tapWord(), { timeout: 8000 });
+  await touchAt(page, '#reader .tok.content', tapIdx, 0, false);
+  await page.waitForSelector('#mini .mini-word');
   const afterTap = await page.evaluate(`(() => {
     const tok = document.querySelectorAll('#reader .tok.content')[${tapIdx}];
     const mini = document.querySelector('#mini');
@@ -969,22 +1394,27 @@ async function main() {
     return {
       lit: tok.classList.contains('lit'),
       en: document.querySelectorAll('#reader .tok-en').length,
+      ownEn: tok.querySelectorAll(':scope > .tok-en').length,
+      rung: tok.dataset.ladderRung ?? null,
       sheet: !!document.querySelector('#sheet'),
       popup: mini ? { word: mini.querySelector('.mini-word')?.textContent, reading: mini.querySelector('.mini-reading')?.textContent ?? '',
         gloss: mini.querySelector('.mini-gloss')?.textContent ?? '', save: mini.querySelector('#mini-take')?.textContent ?? null,
-        entry: !!mini.querySelector('.mini-entry') } : null,
+        door: !!mini.querySelector('button.mini-word[data-action="entry.open"]'), entryButton: !!mini.querySelector('.mini-entry') } : null,
       covers: !!box && box.left < word.right && box.right > word.left && box.top < word.bottom && box.bottom > word.top,
       top: (tok.querySelector('ruby') ?? tok).getBoundingClientRect().bottom,
       dataWord: tok.dataset.word,
     };
   })()`);
-  check('grammar · one tap opens the popup — the word, its reading and its meaning at once, no sheet',
-    !!afterTap.popup && afterTap.popup.word === afterTap.dataWord && afterTap.popup.gloss.length > 0 &&
-      ['Save', '保存', 'Saved ✓', '保存済み ✓'].includes(afterTap.popup.save) && afterTap.popup.entry && !afterTap.sheet,
-    JSON.stringify(afterTap.popup));
-  check('grammar · the tapped word does not move, nothing is written under it, and its popup leaves it uncovered',
-    afterTap.en === 0 && !afterTap.covers && Math.abs(afterTap.top - wordTopBefore) < 2,
-    `glyph bottom ${wordTopBefore.toFixed(1)} → ${afterTap.top.toFixed(1)}px · covered=${afterTap.covers} · reading shown=${afterTap.lit}`);
+  // Ladder (John, 10-19, a spec change): the stage is the third activation (it was the second)
+  check('grammar · third activation opens the stage — exact word, reading, meaning and Save, the band its door, no separate Full entry button',
+    !!afterTap.popup && afterTap.rung === 'stage' && afterTap.popup.word === afterTap.dataWord && afterTap.popup.gloss.length > 0 &&
+      ['Save', '保存', 'Saved ✓', '保存済み ✓'].includes(afterTap.popup.save) && afterTap.popup.door && !afterTap.popup.entryButton && !afterTap.sheet,
+    JSON.stringify({ rung: afterTap.rung, ...afterTap.popup }));
+  // Ladder (John, 10-19, a spec change): "nothing is written under it" becomes: its own English, and nothing else, is
+  // written under it (one English row in the whole text, the tapped word's)
+  check('grammar · the tapped word does not move, only its own English is written under it, and its popup leaves it uncovered',
+    afterTap.en === 1 && afterTap.ownEn === 1 && !afterTap.covers && Math.abs(afterTap.top - wordTopBefore) < 2,
+    `glyph bottom ${wordTopBefore.toFixed(1)} → ${afterTap.top.toFixed(1)}px · covered=${afterTap.covers} · reading shown=${afterTap.lit} · English rows ${afterTap.en} (own ${afterTap.ownEn})`);
 
   // the worst long-gloss word on the shelf must render its meaning WHOLE in the popup
   await open('?entry=shelf');
@@ -994,7 +1424,7 @@ async function main() {
     `[...document.querySelectorAll('#reader .tok.content')].findIndex((t) => t.dataset.word === '沿線')`,
   );
   if (enIdx >= 0) {
-    await tap(page, '#reader .tok.content', enIdx);
+    await openWordStage(page, '#reader .tok.content', enIdx);
     await page.waitForTimeout(150);
     const glossFit = await page.evaluate(`(() => {
       const en = document.querySelector('#mini .mini-gloss');
@@ -1015,46 +1445,79 @@ async function main() {
   await page.waitForTimeout(150);
   await page.locator('[data-dial="furigana:1"]').dispatchEvent('click');
   await page.waitForTimeout(150);
-  await tap(page, '#reader .tok.content', tapIdx);
-  await page.waitForTimeout(120);
+  await openWordStage(page, '#reader .tok.content', tapIdx);
   const popupUp = (await page.locator('#mini').count()) === 1;
 
-  // a second tap on the same word puts the popup away: no ladder, no sheet, nothing under the word
+  // The next activation from the observed stage opens its full entry.
   await tap(page, '#reader .tok.content', tapIdx);
+  await page.waitForSelector('#sheet', { timeout: 8000 });
   await page.waitForTimeout(120);
   const afterSecond = await page.evaluate(`(() => {
     const t = document.querySelectorAll('#reader .tok.content')[${tapIdx}];
     return { sheet: document.querySelector('#sheet')?.dataset.node ?? '', popup: !!document.querySelector('#mini'),
-      gloss: !!t.querySelector('.tok-en'), current: t.classList.contains('tok-current') };
+      gloss: t.querySelectorAll(':scope > .tok-en').length, glossAll: document.querySelectorAll('#reader .tok-en').length,
+      rung: t.dataset.ladderRung ?? null, current: t.classList.contains('tok-current') };
   })()`);
-  check('grammar · a second tap on the same word puts its popup away — no sheet, nothing under the word',
-    popupUp && afterSecond.sheet === '' && !afterSecond.popup && !afterSecond.gloss && afterSecond.current,
+  // Ladder (John, 10-19, a spec change): "nothing under the word" becomes: the word keeps its own English under it while its
+  // page stands (the visit holds it for the way back to its stage), and no other word has one
+  check('grammar · activation from the stage opens its full entry — the popup gone, the word\'s own English held under it, the word still the chosen one',
+    popupUp && afterSecond.sheet.startsWith('word:') && afterSecond.rung === 'page' && !afterSecond.popup && afterSecond.gloss === 1 &&
+      afterSecond.glossAll === 1 && afterSecond.current,
     JSON.stringify({ popupUp, ...afterSecond }));
+  // Back unwinds page to the same stage; folding that stage returns to bare prose.
+  await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
+  await page.waitForFunction(() => !document.getElementById('sheet'));
+  await page.waitForSelector('#mini');
+  const afterClose = await page.evaluate(`(() => {
+    const t = document.querySelectorAll('#reader .tok.content')[${tapIdx}];
+    return { sheet: !!document.querySelector('#sheet'), popup: !!document.querySelector('#mini'), lit: t.classList.contains('lit'), current: t.classList.contains('tok-current'),
+      english: t.querySelectorAll(':scope > .tok-en').length };
+  })()`);
+  // Ladder (John, 10-19): the restored stage has its English under the word again, as the stage had it
+  check('grammar · closing the page restores its stage, summoned reading and English on the chosen word',
+    !afterClose.sheet && afterClose.popup && afterClose.lit && afterClose.current && afterClose.english === 1, JSON.stringify(afterClose));
+  await page.keyboard.press('Escape');
+  const folded = await page.locator('#reader .tok.content').nth(tapIdx).evaluate(node => ({
+    stage: !!document.getElementById('mini'), page: !!document.getElementById('sheet'), lit: node.classList.contains('lit'), rung: node.dataset.ladderRung,
+    english: node.querySelectorAll('.tok-en').length,
+  }));
+  // Ladder (John, 10-19): bare is without the English too
+  check('grammar · folding the restored stage leaves the original word bare', !folded.stage && !folded.page && !folded.lit && !folded.rung && !folded.english, JSON.stringify(folded));
 
-  // press and hold → the word menu (John #11: "right click and choose save"); a tap anywhere else puts it away
+  // press and hold → the seal and its strip (John #11: "right click and choose save"; G5 hold = seal): the word is kept,
+  // the strip opens beside it with the word's acts; a tap anywhere else puts it away
+  const keptBefore = await page.evaluate(`Number(document.getElementById('tray')?.dataset.count ?? NaN)`);
   await touchAt(page, '#reader .tok.content', 6, 700);
+  await page.waitForSelector('#seal-strip', { timeout: 6000 }).catch(() => {});
   await page.waitForTimeout(200);
   const menu = await page.evaluate(`(() => {
-    const m = document.querySelector('#reader-word-menu');
-    return m ? { role: m.getAttribute('role'), items: [...m.querySelectorAll('[role="menuitem"]')].map((n) => n.dataset.menuAction) } : null;
+    const m = document.querySelector('#seal-strip');
+    return m ? { role: m.getAttribute('role'), status: document.getElementById('seal-strip-status')?.textContent.trim() ?? '',
+      items: [...m.querySelectorAll('[data-strip-action]')].filter((n) => !n.hidden).map((n) => n.dataset.stripAction),
+      // Remove stands beside Saved ✓ in the first row (lead's ruling, 2026-10-18)
+      removeBesideSaved: !!m.querySelector('.seal-strip-lists > #seal-strip-status + [data-strip-action="remove"]'),
+      kept: Number(document.getElementById('tray')?.dataset.count ?? NaN) } : null;
   })()`);
-  check('grammar · a press and hold opens the word menu', !!menu && menu.role === 'menu' &&
-    menu.items.join(',') === 'save-word,save-sentence,entry,ask-tutor,copy', JSON.stringify(menu));
+  check('grammar · a press and hold seals the word and opens its strip', !!menu && menu.role === 'dialog' && /^Saved/u.test(menu.status) &&
+    // Hfix-1B (item 11): no tutor is set up on this device, so the strip carries no "Ask the tutor" (verify-hfix-rooms holds
+    // the strip with a tutor set up, where it returns)
+    menu.kept === keptBefore + 1 && menu.items.join(',') === 'remove,entry,sentence,copy' && menu.removeBesideSaved, JSON.stringify({ keptBefore, ...menu }));
   // "anywhere else": a point on the page's own margin, beside the text, that carries no control
   const elsewhere = await page.evaluate(`(() => {
     for (const x of [innerWidth - 3, 3]) for (const y of [0.35, 0.5, 0.65].map((f) => Math.round(innerHeight * f))) {
       const hit = document.elementFromPoint(x, y);
-      if (hit && !hit.closest('button, a, input, [role="menu"], #mini, .tok')) return { x, y };
+      if (hit && !hit.closest('button, a, input, [role="menu"], [role="dialog"], #mini, #seal-strip, .tok')) return { x, y };
     }
     return null;
   })()`);
   if (elsewhere) await page.mouse.click(elsewhere.x, elsewhere.y);
   await page.waitForTimeout(120);
-  check('grammar · one tap anywhere else puts the menu away',
-    !!elsewhere && (await page.locator('#reader-word-menu').count()) === 0, elsewhere ? 'menu dismissed' : 'no empty margin found');
+  check('grammar · one tap anywhere else puts the strip away',
+    !!elsewhere && (await page.locator('#seal-strip').count()) === 0, elsewhere ? 'strip dismissed' : 'no empty margin found');
 
-  // the popup's Full entry → the full entry (from a clean slate: whatever the menu
-  // interlude did, close it and re-aim)
+  // Always-on ruby skips the reading rung. Ladder (John, 10-19, a spec change): the English under the word, then the stage,
+  // then the full entry from the clean word: three activations (it was two: the stage, then the page), each taken only once
+  // the rung before it is seen
   if (await page.locator('#sheet').count()) {
     await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
     await page.waitForTimeout(150);
@@ -1062,8 +1525,25 @@ async function main() {
   await page.evaluate('window.scrollTo(0, 0)');
   await page.locator('[data-dial="furigana:2"]').dispatchEvent('click');
   await page.waitForTimeout(150);
-  await holdWord(page, '#reader .tok.content');
+  const alwaysWord = page.locator('#reader .tok.content').first();
+  const alwaysRung = () => alwaysWord.evaluate((n) => ({ rung: n.dataset.ladderRung ?? null, stage: !!document.getElementById('mini'),
+    english: !!n.querySelector(':scope > .tok-en .tok-en-text'), readings: n.querySelectorAll('rt:not(.hidden-rt)').length }));
+  await tap(page, '#reader .tok.content', 0);
+  await page.waitForFunction((n) => !!n.dataset.ladderRung || !!document.getElementById('mini'), await alwaysWord.elementHandle(), { timeout: 8000 });
+  const alwaysFirst = await alwaysRung();
+  if (alwaysFirst.rung === 'gloss') {
+    await tap(page, '#reader .tok.content', 0);
+    await page.waitForSelector('#mini .mini-word');
+  }
+  const alwaysSecond = await alwaysRung();
+  if (alwaysSecond.rung === 'stage') {
+    await page.waitForTimeout(120);
+    await tap(page, '#reader .tok.content', 0);
+  }
   await page.waitForSelector('#sheet[data-node^="word:"]');
+  // G1 (2026-10-16): the page arrives by a 320 ms match cut and takes data that lands meanwhile once the cut ends, so
+  // its complete senses are read when its "Opening complete senses…" line has gone, not at a fixed 200 ms
+  await page.waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 8000 }).catch(() => {});
   const panel = await page.evaluate(`(() => {
     const s = document.querySelector('#sheet');
     return {
@@ -1080,9 +1560,13 @@ async function main() {
       hasClose: !!s.querySelector('#sheet-close'),
     };
   })()`);
-  check('grammar · the popup\'s Full entry opens the full entry',
-    panel.headword.length > 0 && (panel.reading.length > 0 || panel.gloss.length > 0),
-    `${panel.headword}（${panel.reading}）`);
+  // Ladder (John, 10-19, a spec change): it named two activations (the stage, then the page); now the English, the stage,
+  // then the page, each rung observed
+  check('grammar · with always-on readings, the English, the stage, then the page take three activations',
+    alwaysFirst.rung === 'gloss' && alwaysFirst.english && !alwaysFirst.stage &&
+      alwaysSecond.rung === 'stage' && alwaysSecond.stage && alwaysSecond.english &&
+      panel.headword.length > 0 && (panel.reading.length > 0 || panel.gloss.length > 0),
+    `${panel.headword}（${panel.reading}） · first ${JSON.stringify(alwaysFirst)} · second ${JSON.stringify(alwaysSecond)}`);
   check('the sheet carries its own back and close', panel.hasBack && panel.hasClose,
     `back=${panel.hasBack} close=${panel.hasClose}`);
   check('the entry offers a hop into each kanji', panel.kanjiRows.length > 0,
@@ -1152,6 +1636,11 @@ async function main() {
   await waitForFiniteMotion(page, '#sheet');
   const phoneSheet = await sheetViewportGeometry(page);
   report.measurements.kanjiPhoneViewport = phoneSheet;
+  check('phone kanji: the scale thread is one full-width 44px rail above real content',
+    !!phoneSheet.content && phoneSheet.rails.length === 1 &&
+    phoneSheet.rails[0].left === 0 && phoneSheet.rails[0].width === VIEWPORT.width &&
+    phoneSheet.rails[0].height === 44 && phoneSheet.content.top >= phoneSheet.rails[0].bottom,
+    JSON.stringify(phoneSheet));
   check('phone thesaurus → kanji keeps the close control on the 390px viewport',
     phoneSheet.innerWidth === VIEWPORT.width && phoneSheet.clientWidth === VIEWPORT.width &&
     phoneSheet.scrollWidth <= VIEWPORT.width && phoneSheet.visualWidth === VIEWPORT.width &&
@@ -1171,9 +1660,13 @@ async function main() {
   await page.waitForSelector('#sheet', { state: 'detached' });
   check('phone kanji close dismisses the full entry', await page.locator('#sheet').count() === 0);
 
-  // Desktop control: retain the design pass's centred 900px measure and working
-  // close path. This is another page in the same already-headless browser.
+  // Desktop control: retain the design pass's centred measure and working close path. G1 (2026-10-16, John: "this
+  // should come to the WHOLE SCREEN"): the entry is a whole-screen page, so the page covers the window and the measure
+  // is its content's — a centred column no wider than the old 900 px sheet. This is another page in the same
+  // already-headless browser.
   const desktopSheetContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  // This is an existing-device journey; G3's fresh-device demonstration has its own verifier.
+  await desktopSheetContext.addInitScript(() => { localStorage.setItem('kairo-word-ladder-demo-v1', '1'); });
   try {
     const desktopPage = await desktopSheetContext.newPage();
     await desktopPage.goto(`${base}/index.html?entry=shelf&ui=bi`, { waitUntil: 'load' });
@@ -1183,9 +1676,17 @@ async function main() {
     await waitForFiniteMotion(desktopPage, '#sheet');
     const desktopSheet = await sheetViewportGeometry(desktopPage);
     report.measurements.kanjiDesktopViewport = desktopSheet;
-    check('desktop kanji keeps its centred measure and reachable close',
-      desktopSheet.scrollWidth <= 1280 && desktopSheet.sheet.width === 900 &&
-      desktopSheet.sheet.left === 190 && desktopSheet.close.right <= 1280,
+    const column = desktopSheet.content;
+    check('desktop kanji: the scale thread is one full-width 44px rail above real content',
+      !!column && desktopSheet.rails.length === 1 &&
+      desktopSheet.rails[0].left === 0 && desktopSheet.rails[0].width === 1280 &&
+      desktopSheet.rails[0].height === 44 && column.top >= desktopSheet.rails[0].bottom,
+      JSON.stringify(desktopSheet));
+    check('desktop kanji: the page covers the window, its content keeps a centred measure, its close is reachable',
+      desktopSheet.scrollWidth <= 1280 && desktopSheet.sheet.left === 0 && desktopSheet.sheet.top === 0 &&
+      desktopSheet.sheet.width === 1280 && desktopSheet.sheet.height === desktopSheet.innerHeight &&
+      !!column && column.width <= 900 && column.width >= 760 && Math.abs(column.left - (1280 - column.right)) <= 2 &&
+      desktopSheet.close.right <= 1280,
       JSON.stringify(desktopSheet));
     await shoot(desktopPage, shotsDir, '04b-kanji-desktop-settled');
     await desktopPage.locator('#sheet-back').focus();
@@ -1232,10 +1733,7 @@ async function main() {
 
   // kanji → radical
   const markPartChip = async () => page.evaluate(`(() => {
-    const heads = [...document.querySelectorAll('#sheet .eyebrow')];
-    const h = heads.find((x) => x.textContent === 'main components');
-    if (!h) return 0;
-    const first = h.nextElementSibling?.querySelector('.entry-row');
+    const first = document.querySelector('#sheet .entry-row[data-component]');
     if (!first) return 0;
     first.dataset.probe = 'partchip';
     return 1;
@@ -1264,7 +1762,7 @@ async function main() {
   // radical → back out to another kanji that uses it
   const markFamilyChip = async () => page.evaluate(`(() => {
     const heads = [...document.querySelectorAll('#sheet .eyebrow')];
-    const h = heads.find((x) => x.textContent === 'kanji that contain this part');
+    const h = heads.find((x) => x.textContent.startsWith('kanji that contain this part'));
     if (!h) return 0;
     const chips = [...(h.nextElementSibling?.querySelectorAll('.chip') ?? [])];
     const pick = chips[chips.length > 1 ? 1 : 0];
@@ -1282,16 +1780,24 @@ async function main() {
   report.hops = hops;
 
   // ------------------------------------------------------------ step 5 take
-  console.log('\n— step 5 · 覚える');
-  await tap(page, '#take');
+  console.log('\n— step 5 · 覚える (S: the page\'s one Save)');
+  // S · the page keeps through its one Save in the bar (#sheet-take); the foot's 覚える (#take) and its "saved to" drawer
+  // (.list-picker .fold-sub), which this pinned, are gone: the Save's own menu says where the word went
+  await tap(page, '#sheet-take');
+  await page.waitForSelector('#vocabulary-list-popover.is-drawer', { timeout: 5000 }).catch(() => {});
   const taken = await page.locator('#tray').textContent();
   check('any node can be taken into study', /^Today\s+[1-9][0-9]*$/u.test(taken.trim()), `chrome reads "${taken.trim()}"`);
   const bucket = await page.evaluate(`(() => {
-    const p = document.querySelector('.list-picker .fold-sub');
-    return p ? p.textContent : null;
+    const pop = document.querySelector('#vocabulary-list-popover.is-drawer');
+    const review = pop?.querySelector('#mini-review');
+    const save = document.querySelector('#sheet-take');
+    return pop ? { review: review ? review.checked : null, row: review?.closest('label')?.textContent.trim() ?? null,
+      pressed: save?.getAttribute('aria-pressed'), one: !!save?.matches('button.save-one[data-save-one]'), under: Math.round(pop.getBoundingClientRect().top) } : null;
   })()`);
-  check('after saving, the sheet says plainly where the word went',
-    !!bucket && /保存先|saved to/.test(bucket), String(bucket).slice(0, 44));
+  check('after saving, the page\'s one Save opens its menu under the bar: the word is in review (Review ticked), its lists one tap away',
+    !!bucket && bucket.review === true && /^(復習|Review)$/u.test(bucket.row) && bucket.pressed === 'true' && bucket.one, JSON.stringify(bucket));
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(160);
   // the schedule preview lives one named fold deep since 2026-08-27 —
   // open 学習の記録 the way a finger does before reading it (aim at the
   // study fold's own head: the list drawer shares the .fold-head class)
@@ -1322,13 +1828,14 @@ async function main() {
   await page.waitForTimeout(150);
   // choose the word first (its popup): a phone's sticky header grows by the chrome's 覚える door when a word is
   // chosen, and the browser's scroll anchoring moves scrollY to keep the text still. The place the reader leaves
-  // from is the place once the word is chosen; then the popup's Full entry opens the entry.
-  await tap(page, '#reader .tok.content', 23);
-  await page.waitForSelector('#mini .mini-entry', { timeout: 8000 });
+  // from is the place once the word is chosen; then the same word again opens the entry (1.3.0).
+  await openWordStage(page, '#reader .tok.content', 23);
+  await page.waitForSelector('#mini .mini-word', { timeout: 8000 });
   await page.waitForTimeout(150);
   const scrollBefore = await page.evaluate('window.scrollY');
-  const entryBox = await page.locator('#mini .mini-entry').boundingBox();
-  await page.mouse.click(entryBox.x + entryBox.width / 2, entryBox.y + entryBox.height / 2);
+  // a press where the word is painted: nothing may scroll the page to reach it
+  const wordBox = await page.locator('#reader .tok.content').nth(23).boundingBox();
+  await page.mouse.click(wordBox.x + wordBox.width / 2, wordBox.y + wordBox.height / 2);
   await page.waitForSelector('#sheet');
   // the deep tier's one-time re-render replaces the sheet body moments after
   // it opens — tapping a kanji row mid-swap dies with it (same settle as
@@ -1516,44 +2023,133 @@ async function main() {
   check('no console errors during the walk', consoleErrors.length === 0,
     consoleErrors.slice(0, 3).join(' | ') || 'clean');
 
-  // Phone navigation must remain usable before and after selection adds the
-  // capture door. Check actual hit testing as well as document overflow.
+  // Phone navigation must remain usable before and after a word is touched (its slip opens with the one
+  // Save; the bar gains nothing). Check actual hit testing as well as document overflow.
   await open('?entry=shelf');
   await tap(page, FIRST_TEXT);
   await settleReader(page);
+  // At 320 the bar's seven doors fit the phone whole (Learn waits in the tab bar under 360 px); at 390 its eight do.
   const chromeGeometry = [];
   for (const selected of [false, true]) {
     if (selected) {
-      await tap(page, '#reader .tok.content', 1);
-      await page.waitForFunction(() => !document.querySelector('#reader-take').disabled);
+      await openWordStage(page, '#reader .tok.content', 1);
+      await page.waitForSelector('#mini #mini-take');
     }
-    for (const width of [320, 390]) {
+    for (const width of selected ? [390, 320] : [320, 390]) {
       await page.setViewportSize({ width, height: VIEWPORT.height });
       await page.evaluate(() => { window.scrollTo(0, 0); });
       await waitForFiniteMotion(page, '.chrome');
+      await shoot(page, shotsDir, `07-reader-chrome-${width}-${selected ? 'selected' : 'unselected'}`);
+      if (width === 320) {
+        const stand = await standChrome(page, width, { selected });
+        chromeGeometry.push({ selected, width, ...stand });
+        check(`reader navigation · ${width}px ${selected ? 'selected' : 'unselected'}: ${selected ? 'six doors stand whole around the bar\'s Save, which steps aside in its own slot while the stage\'s Save is the one' : 'seven doors stand whole'}, each 44 px and its own target, Learn in the tab bar, the page ${width} wide`,
+          stand.valid, JSON.stringify(stand));
+        continue;
+      }
       const geometry = await measureChromeTargets(page);
       chromeGeometry.push({ selected, ...geometry });
       check(`reader navigation · ${width}px ${selected ? 'selected' : 'unselected'} controls remain reachable`,
         geometry.valid, JSON.stringify(geometry));
-      await shoot(page, shotsDir, `07-reader-chrome-${width}-${selected ? 'selected' : 'unselected'}`);
+      if (!selected) {
+        const learnDoor = await page.evaluate(() => !!document.querySelector('#app > .chrome > #chrome-dojo')?.checkVisibility());
+        check(`reader navigation · ${width}px the Learn door stands in the bar: it yields to the tab bar only under 360 px`, learnDoor, String(learnDoor));
+      }
     }
   }
   report.measurements.readerChrome = chromeGeometry;
+  // the negative control: the Learn door given back at 320 px crowds the bar past the phone. Its last door no longer
+  // stands whole, while the toolbar's own scroller (G6's safety net) still keeps the page 320 wide.
+  const learnBack = await page.addStyleTag({ content: 'body.has-primary-tabs:not(.zen) #app > .chrome > #chrome-dojo { display: inline-flex !important; }' });
+  // (the walk left the word's stage standing: the bar is measured as a selected one)
+  const crowded = await standChrome(page, 320, { selected: true });
+  check('reader navigation · a 320px bar given its Learn door back no longer stands whole, and the page stays 320 wide',
+    !crowded.valid && !crowded.verdict.learnInTabBar && !crowded.verdict.toolbarFits && !crowded.verdict.everyDoorWhole
+      && crowded.verdict.viewportWidth, JSON.stringify(crowded));
+  await learnBack.evaluate(n => n.remove());
+  await page.setViewportSize(VIEWPORT);
+  await page.evaluate(() => { window.scrollTo(0, 0); });
+  await waitForFiniteMotion(page, '.chrome');
   const narrowControl = await page.addStyleTag({ content: '#chrome-search { min-width: 20px !important; width: 20px !important; max-width: 20px !important; clip-path: inset(0); }' });
   const narrowProbe = await measureChromeTargets(page);
   const narrowSweep = await page.evaluate(MEASURE_FN);
   check('reader navigation · an undersized clipped control fails both geometry and the 44px sweep',
     !narrowProbe.valid && narrowSweep.targets.some(t => t.id === 'chrome-search' && t.hitW < MIN_TAP));
   await narrowControl.evaluate(n => n.remove());
-  const smallReading = await page.addStyleTag({ content: '#reader.reader { font-size: 18px !important; }' });
+  const smallReading = await page.addStyleTag({ content: '#reader.reader { font-size: 19px !important; }' });
   const smallProbe = await page.evaluate(MEASURE_FN);
-  check('reader hierarchy · a smaller reading body fails the approved 19px fixture',
+  check('reader hierarchy · a smaller reading body (the old 19px) fails the ladder\'s 21px reading step',
     !hasApprovedPhoneHierarchy(smallProbe));
   await smallReading.evaluate(n => n.remove());
   const largeNavigation = await page.addStyleTag({ content: '.chrome .l-ja { font-size: 19px !important; }' });
   const largeProbe = await page.evaluate(MEASURE_FN);
   check('reader hierarchy · enlarged navigation fails the approved 17px fixture', !hasApprovedPhoneHierarchy(largeProbe));
   await largeNavigation.evaluate(n => n.remove());
+
+  // ---------------- ONE TOP BAR (the one-hand pass, slice E; contract §2). Every bar in the house is one frame:
+  // 44 high (no safe area in this headless walk), on one hairline, in the frame's material, with ONE back glyph
+  // (‹, drawn once on [data-bar-back] at 44×44) — the room's chrome in the reader and the guided room, the entry
+  // sheet's bar, the writing room's bar (the full room: the quiet room is four corners by design), the deck's
+  // study bar. The guided room's own bar is an instance too: 44, its title in the middle, no back of its own
+  // (the room's bar above carries the one back). A 52px bar fails the same check.
+  console.log('\n— one top bar · 44, one hairline, one back glyph, five instances');
+  const BAR_FN = `((sel) => {
+    const bar = document.querySelector(sel);
+    if (!bar) return { missing: sel };
+    const r = bar.getBoundingClientRect(), cs = getComputedStyle(bar);
+    const shown = (n) => n.checkVisibility() && getComputedStyle(n).visibility !== 'hidden';
+    const backs = [...bar.querySelectorAll('[data-bar-back]')].filter(shown);
+    const back = backs[0] ? backs[0].getBoundingClientRect() : null;
+    const glyph = backs[0] ? getComputedStyle(backs[0], '::after') : null;
+    return { sel, height: Math.round(r.height * 100) / 100, border: parseFloat(cs.borderBottomWidth), backs: backs.length,
+      back: back && { w: Math.round(back.width), h: Math.round(back.height), chevron: /url\\(/.test((glyph.maskImage || glyph.webkitMaskImage || '') + '') },
+      line: parseFloat(cs.borderBottomWidth) > 0, bg: cs.backgroundColor, wrap: cs.flexWrap };
+  })`;
+  // 44 of doors plus the one hairline under them (outside the 44, so every door sits at y = 0): the bar's box is
+  // more than 44 and at most 45 (Chromium reports a 0.5px border as "1px" in computed style, so the rect is the law)
+  const barOk = (b, backs = 1) => !!b && !b.missing && b.height > 44 && b.height <= 45 && b.backs === backs && b.line && b.wrap === 'nowrap'
+    && b.bg !== 'rgba(0, 0, 0, 0)' && (backs === 0 || (b.back && b.back.w >= 44 && b.back.h >= 44 && b.back.chevron));
+  const bars = {};
+  const barCheck = async (name, sel, backs = 1) => {
+    const b = await page.evaluate(`(${BAR_FN})(${JSON.stringify(sel)})`);
+    bars[name] = b;
+    check(`one top bar · ${name}: ${sel} is 44 high on one hairline, nowrap, ${backs} back glyph${backs === 1 ? '' : 's'} (‹, 44×44)`, barOk(b, backs), JSON.stringify(b));
+  };
+  await open('?entry=shelf');
+  await tap(page, FIRST_TEXT);
+  await settleReader(page);
+  await barCheck('reader', '#app > .chrome');
+  await openWordStage(page, '#reader .tok.content', 1);
+  await page.waitForSelector('#mini button.mini-word');
+  await tap(page, '#mini button.mini-word');
+  await page.waitForSelector('#sheet .sheet-bar');
+  await barCheck('sheet', '#sheet .sheet-bar');
+  await open('?entry=shelf&minimal=0');
+  await openShelfTools(page);
+  await page.fill('#search', '永');
+  await page.waitForSelector('[data-result="kanji:永"]', { timeout: 15000 });
+  await tap(page, '[data-result="kanji:永"]');
+  await page.waitForSelector('#strokes-door');
+  await tap(page, '#strokes-door');
+  await page.waitForSelector('#stroke-page:not([data-minimal="on"]) .stroke-bar');
+  await barCheck('writing room', '#stroke-page .stroke-bar');
+  await open('?entry=shelf');
+  await tap(page, '#chrome-dojo');
+  await page.waitForSelector('[data-study-door="guided"]');
+  await tap(page, '[data-study-door="guided"]');
+  await page.waitForSelector('.guided-room .gs-bar');
+  await barCheck('guided room', '#app > .chrome');
+  await barCheck('guided room bar', '.guided-room .gs-bar', 0);
+  await open('?deck=n2');
+  await page.waitForSelector('#kp-start', { timeout: 30000 });
+  await tap(page, '#kp-start');
+  await page.waitForSelector('#kp-card', { timeout: 15000 });
+  await barCheck('deck', '.kp-top-study');
+  const tallBar = await page.addStyleTag({ content: '.kp-top-study { height: 52px !important; }' });
+  check('one top bar · a 52px deck bar fails the same check', !barOk(await page.evaluate(`(${BAR_FN})('.kp-top-study')`)));
+  await tallBar.evaluate(n => n.remove());
+  report.measurements.bars = bars;
+  await shoot(page, shotsDir, '07-one-top-bar-deck');
 
   // the radical picker is the densest tap grid in the app, and the shelf/panel
   // sweep above never enters the kanjidex — its chips are measured by name
@@ -1624,6 +2220,7 @@ async function main() {
   await page.fill('#note-input', '読み物のふりがなが小さい');
   await tap(page, '#note-send');
   await page.waitForTimeout(300);
+  await waitForAppRecord(page, (r) => (r.obslog || []).some((x) => x[1] === 'note' && x[3] === '読み物のふりがなが小さい'), { timeout: 8000 }).catch(() => {});
   const noteRow = await evaluateAppRecord(page, `(() => {
     const s = record;
     const rows = (s.obslog || []).filter((r) => r[1] === 'note');
@@ -1648,22 +2245,24 @@ async function main() {
   // path — the sound itself is judged by ears, not by this suite.
   await open('?entry=shelf');
   await tap(page, FIRST_TEXT);
-  // 2026-09-30: the voice is locked (Kore; Charon second). With no Kore clip for this article
-  // the play bar explains the absence; its accessible description names the locked voices.
-  await page.waitForSelector('#listen-note', { timeout: 15000 });
+  // 2026-09-30: the voice is locked (Kore; Charon second). F (the lead's ruling, 2026-10-18; was: the bar folds to its
+  // one mark, dimmed, its note — out of sight — the description naming the locked voices): with no Kore clip for this
+  // article the reader draws no listen mark at all — no dead control, nothing to press, nothing to focus, no device
+  // voice offered. The row stays only as an empty hidden place (a late manifest can arm it in place)
+  await page.waitForSelector('.listen-row.is-pending', { state: 'attached', timeout: 15000 });
   const listenBefore = await page.evaluate(`({
-    toggles: document.querySelectorAll('#listen-toggle, #listen-voice').length,
-    note: document.querySelector('#listen-note')?.textContent ?? '',
-    description: document.querySelector('#listen-note')?.getAttribute('aria-description') ?? '',
+    controls: document.querySelectorAll('#listen-open, #listen-toggle, #listen-voice, #listen-note').length,
+    hidden: !!document.querySelector('.listen-row.is-pending')?.hidden,
+    drawn: [...document.querySelectorAll('.listen-row')].some((row) => row.checkVisibility()),
+    stops: document.querySelectorAll('.listen-row button, .listen-row [tabindex]').length,
+    // the voice's own places: the listen row and the instrument line it would end (the article's text is not a voice)
+    text: [...document.querySelectorAll('.listen-row, .reader-head')].map((node) => node.textContent).join(' '),
   })`);
-  // D13b (2026-09-25): no device voice and no automatic voice. With no voice chosen the door
-  // is shut and the note says why honestly (no recording, or recorded only in the interim
-  // アミ voice, or recordings still being checked); it never offers a device voice.
-  check('reader · with no approved recording the listen row says so and offers nothing to play',
-    listenBefore.toggles === 0 && /^No recording for this article$/u.test(listenBefore.note) &&
-      listenBefore.description === 'Approved voices: Kore (main), Charon (second).' &&
-      !/device voice|端末の声|F1/u.test(`${listenBefore.note} ${listenBefore.description}`),
-    JSON.stringify(listenBefore));
+  // D13b (2026-09-25): no device voice and no automatic voice — and now nothing to press where there is nothing to hear
+  check('reader · with no approved recording no listen mark is drawn and nothing offers to play',
+    listenBefore.controls === 0 && listenBefore.hidden && !listenBefore.drawn && listenBefore.stops === 0 &&
+      !/device voice|端末の声|F1/u.test(listenBefore.text),
+    JSON.stringify({ ...listenBefore, text: listenBefore.text.slice(0, 80) }));
 
   // the strip is summoned explicitly now — ?entry=shelf is a front door and
   // no longer raises the operator instrument (full-instrument review P1)
@@ -1943,8 +2542,8 @@ async function main() {
     await open('?entry=shelf');
     await page.locator(d23Letter).first().click();
     await settleReader(page);
-    // one tap is the popup (reader lane 2026-10-02); a hold opens the word menu instead
-    await touchAt(page, d23Token, 0, 0);
+    // Stage setup observes any reading rung; a hold remains the separate word menu.
+    await openWordStage(page, d23Token);
     await page.waitForSelector('#mini #mini-take');
   };
   const d23Start = d23Cards(await readAppRecord(page));
@@ -1997,8 +2596,10 @@ async function main() {
   check('D23 · the reader’s 上手 door is taken: the mini seal is inked and live, nothing held',
     d23Taken.word === '上手' && d23Taken.taken && d23Taken.pressed === 'true' && !d23Taken.disabled && d23Taken.reason === null && !d23Taken.open,
     JSON.stringify(d23Taken));
-  // the core card leaves through its own door: a press on the popup's "Saved ✓"
+  // the core card leaves through its own door: Saved ✓ ▾ opens the word's menu, whose Review row takes it out
   await tap(page, '#mini-take');
+  await page.waitForSelector('#mini #vocabulary-list-popover.is-inline #mini-review');
+  await tap(page, '#mini-review');
   await waitForAppRecord(page, (record) => d23Cards(record).length === 0, { description: 'the core 上手 card removed' });
 
   // (3) 1353320 through the core sheet's own live door → 覚 → an explicit card
@@ -2092,9 +2693,17 @@ async function main() {
     !d23ActionError && d23Opened?.node === 'word:上手' && d23Opened.reading === 'じょうず' && !d23Opened.mini &&
       d23Opened.take?.taken === true && d23Opened.take.pressed === 'true' && d23Opened.take.disabled === false,
     JSON.stringify({ opened: d23Opened, ...(d23ActionError ? { actionError: d23ActionError } : {}) }));
-  // through that route the card leaves by its own door, and the record is as it began
+  // through that route the card leaves by its own door, and the record is as it began. S · the page's one Save behaves as
+  // every Save: on Saved ✓ a press opens its menu (a drawer under the bar), whose Review row takes the card out — this
+  // pinned a second press on the page's seal as the removal
   await tap(page, '#sheet-take');
+  await page.waitForSelector('#vocabulary-list-popover.is-drawer #mini-review');
+  await tap(page, '#vocabulary-list-popover.is-drawer #mini-review');
   await waitForAppRecord(page, (record) => d23Cards(record).length === 0, { description: 'the 1353320 card removed through its own door' });
+  // the page drawn again under the open menu keeps the keyboard in the menu, on its Review row: Escape there closes it
+  await page.waitForFunction(() => document.activeElement?.id === 'mini-review' && !!document.activeElement.closest('#vocabulary-list-popover.is-drawer'));
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('#vocabulary-list-popover', { state: 'detached' });
   check('D23 · through the opened route the 1353320 card is removed by its own door', true, 'no 上手 card remains');
   await shoot(page, shotsDir, '12b-d23-core-row');
 
@@ -2130,31 +2739,59 @@ async function main() {
 
   // ------------------------------ Phase A · the observation log (taps)
   console.log('\n— Phase A · reader taps land in the observation log');
-  await open('?entry=shelf&dials=0,0,0'); // furigana hidden → the full ladder
+  await open('?entry=shelf&dials=0,1,0'); // on-demand furigana → reading, English, stage, page
   await tap(page, FIRST_TEXT);
   await settleReader(page);
   const obsBefore = await evaluateAppRecord(page,
     `(record.obslog || []).length`,
   );
-  await tap(page, '#reader .tok.content', 3); // the popup: the meaning shown
+  // Ladder (John, 10-19, a spec change): the meaning's depth 2 is logged where the meaning first shows, the English under
+  // the word (once a visit), and the stage after it logs nothing; the reading logs 1 and the page 3 as before. The first
+  // visit climbs one observed rung at a time and reads the durable log at each rung (each row lands with its own write)
+  const tapDepths = async () => ((await readAppRecord(page)).obslog || []).slice(obsBefore).filter((r) => r[1] === 'tap').map((r) => r[3]).join(',');
+  const depthsBecome = async (want, ms = 4000) => {
+    let seen = await tapDepths();
+    for (const until = Date.now() + ms; seen !== want && Date.now() < until; seen = await tapDepths()) await page.waitForTimeout(50);
+    return seen;
+  };
+  const obsWord = () => page.locator('#reader .tok.content').nth(3).elementHandle(); // found afresh at each wait
+  await tap(page, '#reader .tok.content', 3); // reading (1)
+  await page.waitForFunction((n) => n.dataset.ladderRung === 'reading', await obsWord(), { timeout: 8000 });
+  const obsAtReading = await depthsBecome('1');
+  await tap(page, '#reader .tok.content', 3); // English (2)
+  await page.waitForFunction((n) => n.dataset.ladderRung === 'gloss', await obsWord(), { timeout: 8000 });
+  const obsAtEnglish = await depthsBecome('1,2');
+  const obsEnglishStageless = (await page.locator('#mini').count()) === 0;
+  await tap(page, '#reader .tok.content', 3); // the stage: no row
+  await page.waitForSelector('#mini .mini-word');
+  await page.waitForTimeout(600); // a row the stage wrote would have landed by now
+  const obsAtStage = await tapDepths();
+  await tap(page, '#reader .tok.content', 3); // stage → full entry (3)
+  await page.waitForSelector('#sheet');
   await page.waitForTimeout(250);
-  await tap(page, '#reader .tok.content', 3); // the same word again puts it away: no look, no row
+  await page.locator(await entryCloseSelector(page)).dispatchEvent('click'); // closing it returns the original word: no row
+  await page.waitForFunction(() => !document.getElementById('sheet'));
   await page.waitForTimeout(250);
-  await holdWord(page, '#reader .tok.content', 3); // the popup again, then its Full entry
+  await page.waitForSelector('#mini'); // Back restores the stage without another observation
+  await page.keyboard.press('Escape'); // folding returns to bare without another observation
+  await holdWord(page, '#reader .tok.content', 3); // reading (1), English (2), stage (no row), entry (3) again
   await page.waitForSelector('#sheet');
   await page.waitForTimeout(1600); // the trailing debounce persists the rows
+  await waitForAppRecord(page, (r) => (r.obslog || []).slice(obsBefore).filter((x) => x[1] === 'tap').length >= 6, { timeout: 8000 }).catch(() => {});
   const obs = await evaluateAppRecord(page, `(() => {
     const env = record;
     const rows = (env.obslog || []).slice(${obsBefore});
     return { rows, srsHasKey: rows.length ? Object.prototype.hasOwnProperty.call(env.srs || {}, rows[0][2]) : null };
   })()`);
   const ladder = obs.rows.filter((r) => r[1] === 'tap');
-  const sameWord = ladder.length === 3 && ladder.every((r) => r[2] === ladder[0][2] && r[4] === ladder[0][4]);
-  // reader lane 2026-10-02: one tap shows the meaning (an honest 2), a tap that puts the popup away logs
-  // nothing, and the Full entry is the 3
-  check('a tap, a closing tap, then the popup and its Full entry — meaning, meaning, entry — every look logged',
-    sameWord && ladder.map((r) => r[3]).join(',') === '2,2,3',
-    ladder.map((r) => `depth ${r[3]}`).join(' → ') + ` (${ladder[0]?.[2]}@${ladder[0]?.[4]})` || 'no rows');
+  const sameWord = ladder.length === 6 && ladder.every((r) => r[2] === ladder[0][2] && r[4] === ladder[0][4]);
+  // Ladder (John, 10-19, a spec change): it pinned the stage's depth 2; the English rung logs it now (seen before any stage
+  // stands), and the stage logs nothing
+  check('reading, English and page each log their depth (the meaning\'s 2 at the English, before any stage); the stage, Back and fold log nothing; the next visit repeats the same exact word/source',
+    sameWord && ladder.map((r) => r[3]).join(',') === '1,2,3,1,2,3' &&
+      obsAtReading === '1' && obsAtEnglish === '1,2' && obsEnglishStageless && obsAtStage === '1,2',
+    (ladder.map((r) => `depth ${r[3]}`).join(' → ') + ` (${ladder[0]?.[2]}@${ladder[0]?.[4]})` || 'no rows') +
+      ` · logged at the reading ${obsAtReading || '—'}, at the English ${obsAtEnglish || '—'} (no stage ${obsEnglishStageless}), at the stage ${obsAtStage || '—'}`);
   check('rows persist inside the exported envelope with ms timestamps',
     ladder.every((r) => Number.isInteger(r[0]) && r[0] > 1.7e12 && typeof r[2] === 'string' && typeof r[4] === 'string'),
     `${obs.rows.length} rows appended after ${obsBefore} existing`);
@@ -2201,6 +2838,7 @@ async function main() {
   );
   await page.locator('[data-probe="wrong"]').click();
   await page.waitForTimeout(300);
+  await waitForAppRecord(page, (r) => (r.taken || []).length === probeEnvBefore.taken + 1, { timeout: 8000 }).catch(() => {});
   const probeAfter = await evaluateAppRecord(page, `(() => {
     const e = record;
     const rows = (e.obslog || []).filter((r) => r[1] === 'probe');
@@ -2256,6 +2894,7 @@ async function main() {
   await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
   await page.waitForTimeout(400);
   const dojoDay = `(() => { const d = new Date(); const p = (n) => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); })()`;
+  await waitForAppRecord(page, (r) => (r.revlog || []).length === 1, { timeout: 8000 }).catch(() => {});
   const dojoTakenAfter = await evaluateAppRecord(page, `(() => {
     const e = record;
     const day = ${dojoDay};
@@ -2287,6 +2926,7 @@ async function main() {
   // new-card budget unburned, one obslog row naming the drill room
   await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
   await page.waitForTimeout(400);
+  await waitForAppRecord(page, (r) => (r.obslog || []).some((x) => x[1] === 'dojo'), { timeout: 8000 }).catch(() => {});
   const dojoDrillAfter = await evaluateAppRecord(page, `(() => {
     const e = record;
     const day = ${dojoDay};
@@ -2343,7 +2983,7 @@ async function main() {
     `document.querySelector('.view-title')?.textContent ?? ''`,
   );
   check('the archive read\'s crumb names its true origin — the archive, not the bare shelf',
-    /bookshelf › archive › /.test(archiveCrumb) && archiveCrumb.includes(archiveReaderTitle),
+    /Bookshelf › Archive › /.test(archiveCrumb) && archiveCrumb.includes(archiveReaderTitle),
     `crumb "${archiveCrumb.slice(0, 60)}"`);
   await tap(page, '#back');
   await page.waitForSelector('.archive-year');
@@ -2373,23 +3013,33 @@ async function main() {
   check('a common word carries at least 4 example sentences',
     bankSheet.n >= 4 && bankSheet.en >= 1,
     `${bankSheet.n} examples · ${bankSheet.en} with English`);
-  // the eyebrow teaches the gesture: one tap gives the meaning (reader lane 2026-10-02)
+  // G3 teaches the ladder once, through motion; examples retain their heading without a permanent gesture hint.
   const exampleEyebrow = await page.evaluate(
-    `[...document.querySelectorAll('#sheet .eyebrow')].map((n) => n.textContent).find((t) => t === 'examples — tap a word for its meaning') ?? ''`,
+    `[...document.querySelectorAll('#sheet .eyebrow')].map((n) => n.textContent).find((t) => /examples|用例/.test(t)) ?? ''`,
   );
-  check('the 用例 eyebrow says that a tap on a word gives its meaning',
-    /触れると意味/.test(exampleEyebrow) || /tap a word for its meaning/.test(exampleEyebrow),
+  const obsoleteExampleHint = await page.locator('#sheet').innerText();
+  check('the example heading remains, without the obsolete permanent one-tap hint',
+    /examples|用例/.test(exampleEyebrow) && !/触れると意味|tap (?:a|any) word for its meaning/i.test(obsoleteExampleHint),
     `eyebrow: "${exampleEyebrow}"`);
+  // R (2026-10-16): a word read otherwise than the quick dictionary (明日 あした) waits up to READING_WAIT_MS for its
+  // entry, so its popup is read once it has come — the same popup, the reading and the meaning at once (seen red on the
+  // base build too, L/site-3, before G1)
+  await openWordStage(page, '#sheet .example .sentence-tok');
   const ladderProof = await page.evaluate(`(() => {
     const tok = document.querySelector('#sheet .example .sentence-tok');
     if (!tok) return null;
-    tok.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     const mini = document.querySelector('#mini');
-    return { word: tok.textContent, popup: mini?.querySelector('.mini-word')?.textContent ?? null,
-      gloss: mini?.querySelector('.mini-gloss')?.textContent ?? null, under: !!tok.querySelector('.tok-en') };
+    const own = tok.cloneNode(true);
+    own.querySelectorAll('.tok-en').forEach((row) => row.remove());
+    return { word: own.textContent, popup: mini?.querySelector('.mini-word')?.textContent ?? null,
+      gloss: mini?.querySelector('.mini-gloss')?.textContent ?? null, under: tok.querySelectorAll(':scope > .tok-en .tok-en-text').length,
+      underAll: document.querySelectorAll('#sheet .tok-en').length };
   })()`);
-  check('example tokens open the word popup — the reading and the meaning at once, nothing under the word',
-    !!ladderProof && !!ladderProof.popup && ladderProof.word.includes(ladderProof.popup.slice(0, 1)) && !!ladderProof.gloss && !ladderProof.under,
+  // Ladder (John, 10-19, a spec change): "with nothing under the word" becomes: with its own English under the word, the
+  // one English row on the page (the stage keeps the English rung's row; the word's own text is read without it)
+  check('example tokens reach their stage through the observed reading and English rungs, their own English kept under the word',
+    !!ladderProof && !!ladderProof.popup && ladderProof.word.includes(ladderProof.popup.slice(0, 1)) && !!ladderProof.gloss &&
+      ladderProof.under === 1 && ladderProof.underAll === 1,
     JSON.stringify(ladderProof));
   // the keyboard-shaped click put focus in the popup; Escape there puts away the popup only
   await page.keyboard.press('Escape');
@@ -2423,7 +3073,7 @@ async function main() {
   await page.waitForTimeout(400);
   await page.evaluate(`document.querySelector('#sheet .example .sent-door')?.click()`);
   await page.waitForSelector('#sheet .sent-reader .sentence-tok.example-hit', { timeout: 8000 });
-  await tap(page, '#sheet .sent-reader .sentence-tok.example-hit');
+  await openWordStage(page, '#sheet .sent-reader .sentence-tok.example-hit');
   await page.waitForTimeout(300);
   const hantoGloss = await page.evaluate(
     `document.querySelector('#mini .mini-gloss')?.textContent ?? null`,
@@ -2437,14 +3087,18 @@ async function main() {
   await tap(page, FIRST_TEXT);
   await settleReader(page);
   await holdWord(page, '#reader .tok.content', 6);
-  await page.waitForSelector('#sheet #take');
+  // S · the page keeps through its one Save in the bar (#sheet-take); the foot's #take this pinned is gone. Its menu opens
+  // as a drawer under the bar; Escape puts it away before the scopes further down are touched
+  await page.waitForSelector('#sheet #sheet-take');
   await page
     .waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 8000 })
     .catch(() => {});
-  await tap(page, '#sheet #take');
+  await tap(page, '#sheet #sheet-take');
   await page.waitForSelector('[data-ctx-scope]', { timeout: 8000 });
+  if (await page.locator('#vocabulary-list-popover').count()) { await page.keyboard.press('Escape'); await page.waitForTimeout(200); }
   await tap(page, '[data-ctx-scope="sent"]');
   await page.waitForTimeout(300);
+  await waitForAppRecord(page, (r) => (r.taken || []).some((t) => t.ctx?.scope === 'sent'), { timeout: 8000 }).catch(() => {});
   const ctxStored = await evaluateAppRecord(page, `(() => {
     const e = record;
     const it = (e.taken || []).find((t) => t.ctx);
@@ -2481,44 +3135,65 @@ async function main() {
   check('the reader boots bare — ふりがな waits for the tap',
     bareBoot.visible === 0 && bareBoot.hidden > 10,
     `${bareBoot.visible} shown · ${bareBoot.hidden} waiting`);
-  const cycleTap = () => page.evaluate(`(() => {
-    const t = [...document.querySelectorAll('#reader .tok.content')].find((x) => x.querySelector('rt'));
-    t.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: 10, clientY: 10 }));
-    t.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, clientX: 10, clientY: 10 }));
-    // activation rides the click a real browser sends after the tap
-    t.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
-  })()`);
-  const cycleState = () => page.evaluate(`(() => {
-    const t = [...document.querySelectorAll('#reader .tok.content')].find((x) => x.querySelector('rt')) ||
-      [...document.querySelectorAll('#reader .tok.content')][0];
-    return { rt: [...t.querySelectorAll('rt')].filter((r) => !r.classList.contains('hidden-rt')).length, gloss: !!t.querySelector('.tok-en'),
-      popup: document.querySelector('#mini .mini-gloss')?.textContent ?? null };
-  })()`);
-  // reader lane 2026-10-02: one tap is the meaning — the popup, with the touched word's reading on the text
-  // (ふりがな 触れて); the same word again puts it away; nothing is ever written under the word
+  const cycleIndex = await page.locator('#reader .tok.content').evaluateAll(words => words.findIndex(word => word.querySelector('rt.hidden-rt')));
+  assert(cycleIndex >= 0, 'The bare-cycle fixture has an actual hidden reading');
+  const cycleTap = () => tap(page, '#reader .tok.content', cycleIndex);
+  const cycleState = () => page.locator('#reader .tok.content').nth(cycleIndex).evaluate(t => ({
+    rt: t.querySelectorAll('rt:not(.hidden-rt)').length, gloss: !!t.querySelector('.tok-en'),
+    popup: document.querySelector('#mini .mini-gloss')?.textContent ?? null,
+    page: document.querySelector('#sheet')?.dataset.node ?? '', rung: t.dataset.ladderRung ?? null,
+  }));
+  const cycleWord = () => page.locator('#reader .tok.content').nth(cycleIndex).elementHandle(); // found afresh at each wait
   await cycleTap();
-  await page.waitForTimeout(150);
+  await page.waitForFunction((n) => !!n.dataset.ladderRung || !!document.getElementById('mini'), await cycleWord(), { timeout: 8000 });
   const cyc1 = await cycleState();
+  check('bare cycle · first activation is reading only', cyc1.rung === 'reading' && cyc1.rt > 0 && !cyc1.popup && !cyc1.page && !cyc1.gloss, JSON.stringify(cyc1));
+  // Ladder (John, 10-19, a spec change): the second activation, taken only once the reading is seen, writes the English under
+  // the word and opens nothing; the third, taken only once the English is seen, is the meaning stage (it was the second),
+  // and the English stays under the word through the stage, its page and the way back; the fourth opens the full entry
+  await page.waitForFunction((n) => n.dataset.ladderRung === 'reading', await cycleWord(), { timeout: 8000 });
   await cycleTap();
-  await page.waitForTimeout(150);
+  await page.waitForFunction((n) => n.dataset.ladderRung !== 'reading' || !!document.getElementById('mini'), await cycleWord(), { timeout: 8000 });
+  const cycEnglish = await cycleState();
+  check('bare cycle · second activation writes the English under the word, its reading kept, and opens no stage',
+    cycEnglish.rung === 'gloss' && cycEnglish.rt > 0 && cycEnglish.gloss && !cycEnglish.popup && !cycEnglish.page, JSON.stringify(cycEnglish));
+  await page.waitForFunction((n) => n.dataset.ladderRung === 'gloss', await cycleWord(), { timeout: 8000 });
+  await cycleTap(); await page.waitForSelector('#mini .mini-word');
+  await page.waitForFunction(() => {
+    const gloss = document.querySelector('#mini .mini-gloss')?.textContent?.trim();
+    return !!gloss && gloss !== '…';
+  });
   const cyc2 = await cycleState();
-  await cycleTap();
-  await page.waitForTimeout(200);
+  check('bare cycle · third activation is the meaning stage, the English kept under the word',
+    cyc2.rung === 'stage' && cyc2.rt > 0 && !!cyc2.popup && !cyc2.page && cyc2.gloss, JSON.stringify(cyc2));
+  await cycleTap(); await page.waitForSelector('#sheet', { timeout: 8000 });
   const cyc3 = await cycleState();
-  check('one tap shows the meaning and the reading at once; the same word again puts the popup away',
-    cyc1.rt >= 1 && !!cyc1.popup && !cyc1.gloss && cyc2.popup === null && !cyc2.gloss && !!cyc3.popup && !cyc3.gloss,
-    `tap 1: rt=${cyc1.rt} popup="${cyc1.popup}" → tap 2: popup=${cyc2.popup} → tap 3: popup="${cyc3.popup}"`);
-  // the full entry is one choice in the word menu a press and hold opens — and 戻る works IMMEDIATELY.
-  // The third tap above left the popup open, and a finger can't hold a word the popup covers, so
-  // put it away first, the way a reader would: the same word once more (checked just above).
+  check('bare cycle · fourth activation opens the full entry, the English held under the word for the way back',
+    cyc3.page.startsWith('word:') && cyc3.rung === 'page' && !cyc3.popup && cyc3.gloss, JSON.stringify(cyc3));
+  await page.locator(await entryCloseSelector(page)).click();
+  await page.waitForFunction(() => !document.getElementById('sheet'));
+  await page.waitForSelector('#mini');
+  const returned = await cycleState();
+  check('bare cycle · Back restores the same meaning stage, its English under the word',
+    returned.rung === 'stage' && returned.popup === cyc2.popup && returned.rt > 0 && !returned.page && returned.gloss, JSON.stringify(returned));
+  await page.keyboard.press('Escape');
+  const cycleFolded = await cycleState();
+  check('bare cycle · folding the stage returns to bare text', !cycleFolded.rung && cycleFolded.rt === 0 && !cycleFolded.popup && !cycleFolded.page && !cycleFolded.gloss, JSON.stringify(cycleFolded));
   await cycleTap();
-  await page.waitForSelector('#mini', { state: 'hidden', timeout: 4000 });
+  await page.waitForFunction((n) => !!n.dataset.ladderRung || !!document.getElementById('mini'), await cycleWord(), { timeout: 8000 });
+  const reopened = await cycleState();
+  check('bare cycle · a new visit starts with reading again', reopened.rung === 'reading' && reopened.rt > 0 && !reopened.popup && !reopened.page && !reopened.gloss, JSON.stringify(reopened));
+  await focusProseOccurrence(page, page.locator('#reader .tok.content').nth(cycleIndex));
+  await page.keyboard.press('Escape');
+  const bareAgain = await cycleState();
+  check('bare cycle · Escape also folds reading directly to bare', !bareAgain.rung && bareAgain.rt === 0 && !bareAgain.popup && !bareAgain.page, JSON.stringify(bareAgain));
+  // The full entry is also one choice in the strip; Back answers immediately.
   await touchAt(page, '#reader .tok.content', 4, 700); // past GESTURE.MENU_MS
-  await page.waitForSelector('#reader-word-menu', { timeout: 6000 });
-  const menuUp = await page.evaluate(`[...document.querySelectorAll('#reader-word-menu [role="menuitem"]')].map((n) => n.dataset.menuAction)`);
-  check('a press and hold opens the word menu, the full entry in it', menuUp.includes('entry') && menuUp.includes('save-word'),
-    `menu: ${menuUp.join(' · ')}`);
-  await page.evaluate(`document.querySelector('#reader-word-menu [data-menu-action="entry"]')?.click()`);
+  await page.waitForSelector('#seal-strip', { timeout: 6000 });
+  const menuUp = await page.evaluate(`[...document.querySelectorAll('#seal-strip [data-strip-action]')].filter((n) => !n.hidden).map((n) => n.dataset.stripAction)`);
+  check('a press and hold opens the strip, the full entry in it and the word kept (Remove offered)', menuUp.includes('entry') && menuUp.includes('remove'),
+    `strip: ${menuUp.join(' · ')}`);
+  await page.evaluate(`document.querySelector('#seal-strip [data-strip-action="entry"]')?.click()`);
   await page.waitForSelector('#sheet', { timeout: 8000 });
   await page.evaluate(`document.querySelector('#sheet-back')?.click()`); // immediately — no dead window
   await page.waitForTimeout(300);
@@ -2528,6 +3203,7 @@ async function main() {
   await page.waitForSelector('[data-dial="furigana:2"]', { state: 'attached', timeout: 8000 });
   await page.locator('[data-dial="furigana:2"]').dispatchEvent('click');
   await page.waitForTimeout(300);
+  await waitForAppRecord(page, (r) => r.dials?.furigana === 2, { timeout: 8000 }).catch(() => {});
   const dialPersist = await evaluateAppRecord(page,
     `record.dials?.furigana`,
   );
@@ -2624,8 +3300,18 @@ async function main() {
   })()`);
   check('R2-B · the sheet seal wears taken-state where 覚える was taken',
     sealBefore.taken && sealBefore.pressed === 'true', JSON.stringify(sealBefore));
+  // S · on Saved ✓ the page's one Save opens its menu (a drawer under the bar); its Review row is the way back out — this
+  // pinned a second press on the seal as the un-memorize
   await tap(page, '#sheet-take');
+  await page.waitForSelector('#vocabulary-list-popover.is-drawer #mini-review');
+  await tap(page, '#vocabulary-list-popover.is-drawer #mini-review');
+  await waitForAppRecord(page, (record) => !(record.taken || []).length, { description: 'the 学校 card un-memorized through the Review row' });
+  // the page drawn again under the open menu keeps the keyboard in the menu, on its Review row: Escape there closes it
+  await page.waitForFunction(() => document.activeElement?.id === 'mini-review' && !!document.activeElement.closest('#vocabulary-list-popover.is-drawer'));
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('#vocabulary-list-popover', { state: 'detached' });
   await page.waitForTimeout(300);
+  await waitForAppRecord(page, (r) => (r.taken || []).length === 0, { timeout: 8000 }).catch(() => {});
   const afterUntake = await evaluateAppRecord(page, `(() => {
     const e = record;
     return { taken: (e.taken || []).length, revlog: (e.revlog || []).length,
@@ -2650,6 +3336,7 @@ async function main() {
   await page.waitForSelector('#sheet #sheet-take');
   await tap(page, '#sheet-take');
   await page.waitForTimeout(300);
+  await waitForAppRecord(page, (r) => (r.taken || []).length === 1, { timeout: 8000 }).catch(() => {});
   const reTaken = await evaluateAppRecord(page, `(() => {
     const e = record;
     const rec = e.srs?.['word:学校'];
@@ -2676,6 +3363,7 @@ async function main() {
   await page.fill('#list-maker-field', '読書');
   await page.locator('#list-maker-make').click();
   await page.waitForTimeout(150);
+  await waitForAppRecord(page, (r) => Object.hasOwn(r.lists || {}, '読書'), { timeout: 8000 }).catch(() => {});
   const dupeState = await evaluateAppRecord(page, `(() => {
     const e = record;
     const f = document.querySelector('#list-maker-field');
@@ -2699,6 +3387,7 @@ async function main() {
   await page.fill('.list-rename .list-maker-field', '精読');
   await page.locator('.list-rename .list-maker-make').click();
   await page.waitForTimeout(250);
+  await waitForAppRecord(page, (r) => Object.hasOwn(r.lists || {}, '精読'), { timeout: 8000 }).catch(() => {});
   const renamed = await evaluateAppRecord(page, `(() => {
     const e = record;
     return Object.keys(e.lists || {});
@@ -2713,6 +3402,7 @@ async function main() {
   })()`);
   await page.locator('.list-op.armed').click();
   await page.waitForTimeout(250);
+  await waitForAppRecord(page, (r) => Object.keys(r.lists || {}).length === 0, { timeout: 8000 }).catch(() => {});
   const deleted = await evaluateAppRecord(page, `(() => {
     const e = record;
     return { lists: Object.keys(e.lists || {}).length, taken: (e.taken || []).length,
@@ -2722,62 +3412,62 @@ async function main() {
     armed.armedBtn && armed.still === 1 && deleted.lists === 0 && deleted.taken === 1 && deleted.revlog === 1 && deleted.srsKept,
     `armed=${JSON.stringify(armed)} → ${JSON.stringify(deleted)}`);
 
-  // The reader's capture doors save in one tap and keep their source context; lists are a popover away.
+  // One Save (John, 2026-10-15 17:20: the bar's own '+' is gone): the reader's Save lives in the slip, saves in
+  // one tap and keeps its sentence context; lists are a menu away, inside the slip. S (John, 2026-10-16: "why is the plus
+  // bar gone???? what replaced it??"): the bar carries one keep again — the one Save component, naming the word last
+  // touched; this pinned "the bar carries no Save of its own" before and after a touch.
   const captureSheetLoads = observeWordSheetLoads(page);
   await open('?entry=shelf');
   await tap(page, FIRST_TEXT);
   await settleReader(page);
-  const idleSeal = await page.evaluate(`(() => {
-    const b = document.querySelector('#reader-take');
-    return b ? { disabled: b.disabled, pressed: b.getAttribute('aria-pressed') } : null;
-  })()`);
-  check('R2-B · 覚える waits top-right of the reader, quiet until a word is touched',
-    !!idleSeal && idleSeal.disabled === true && idleSeal.pressed === 'false',
-    JSON.stringify(idleSeal));
-  await tap(page, '#reader .tok.content', 9);
-  await page.waitForTimeout(200);
+  const barSaves = () => page.evaluate(`[...document.querySelectorAll('#app > .chrome button')].filter((n) => n.id === 'reader-take'
+    || /^(保存|Save)/u.test((n.textContent || '').trim()) || /^(保存|Save)\\b/u.test(n.getAttribute('aria-label') || ''))
+    .map((n) => ({ id: n.id, one: n.matches('button.save-one[data-save-one]'), rest: n.dataset.saveRest != null, word: n.querySelector('.save-bar-word')?.textContent ?? '' }))`);
+  const idleBar = await barSaves();
+  check('R2-B · before a word is touched the bar carries one keep, the one Save, at rest (it says what it does; it names no word)',
+    idleBar.length === 1 && idleBar[0].id === 'chrome-keep' && idleBar[0].one && idleBar[0].rest, JSON.stringify(idleBar));
+  await openWordStage(page, '#reader .tok.content', 9);
+  await page.waitForSelector('#mini #mini-take');
   const touched = await page.evaluate(`(() => {
     const t = document.querySelectorAll('#reader .tok.content')[9];
-    const b = document.querySelector('#reader-take');
-    return { word: t.dataset.word, index: Number(t.dataset.index), sealReady: !b.disabled, label: b.getAttribute('aria-label') };
+    const b = document.querySelector('#mini #mini-take');
+    return { word: t.dataset.word, index: Number(t.dataset.index), marked: t.classList.contains('tok-current'),
+      slipWord: document.querySelector('#mini .mini-word')?.textContent ?? '', saveReady: !!b && !b.disabled && b.getAttribute('aria-pressed') === 'false' };
   })()`);
-  check('R2-B · touching a word arms the door with that word, in place',
-    touched.sealReady && touched.label.includes(touched.word),
-    `${touched.word} — "${touched.label}"`);
+  const touchedBar = await barSaves();
+  check('R2-B · touching a word marks it and opens its slip, whose Save is the one Save — and the bar\'s one keep names that word',
+    touched.marked && touched.slipWord === touched.word && touched.saveReady && touchedBar.length === 1 && touchedBar[0].one && !touchedBar[0].rest && touchedBar[0].word === touched.word,
+    `${touched.word} — slip "${touched.slipWord}", bar saves ${JSON.stringify(touchedBar)}`);
   const envBefore = await evaluateAppRecord(page, `(() => {
     const e = record;
     return { taken: (e.taken || []).length, revlog: (e.revlog || []).length };
   })()`);
-  // reader lane 2026-10-02 (John #17), round 4 (T5, "click save and then add to list from there"): Save — here the
-  // chrome's 覚える, the popup's Save or the menu's Save word — is one tap, and the popup offers a list only once the
-  // word is saved; its "Add to a list" opens a small popover that enrolls nothing more.
-  await page.waitForSelector('#mini #mini-take');
-  const listsBeforeSave = await page.evaluate(`!!document.querySelector('#mini #mini-lists')?.getClientRects().length`);
-  await page.keyboard.press('Escape');
-  await page.waitForSelector('#mini', { state: 'detached' });
-  await tap(page, '#reader-take');
+  // reader lane 2026-10-02 (John #17), round 4 (T5, "click save and then add to list from there"), 1.3.0 Save ▾:
+  // Save is one tap; the slip has no list button, and Save ▾ unfolds its menu inside the card only once the word is
+  // saved; the menu enrolls nothing more.
+  const listsBeforeSave = await page.evaluate(`!!document.querySelector('#mini #mini-lists, #mini .mini-entry, #vocabulary-list-popover')`);
+  await tap(page, '#mini-take');
   await waitForAppRecord(page, record => record.taken.some(row => row.t === 'word' && row.id === touched.word),
-    { description: 'explicit reader save' });
+    { description: 'the slip\'s save' });
   const captured = await evaluateAppRecord(page, `(() => {
     const e = record;
     const it = (e.taken || [])[(e.taken || []).length - 1];
     return { taken: (e.taken || []).length, t: it?.t, id: it?.id, ctx: it?.ctx ?? null };
   })()`);
-  check('R2-B · capture from the reader top-right lands in S.taken with its sentence ctx',
+  check('R2-B · the slip\'s Save lands in S.taken with its sentence ctx',
     captured.taken === envBefore.taken + 1 && captured.t === 'word' && captured.id === touched.word &&
       captured.ctx?.scope === 'sent' && captured.ctx?.i === touched.index && typeof captured.ctx?.p === 'string',
     JSON.stringify(captured.ctx));
-  if (!await page.locator('#mini').count()) await tap(page, '#reader .tok.content', 9);
-  await page.waitForSelector('#mini #mini-lists:not([hidden])');
-  await tap(page, '#mini-lists');
-  await page.waitForSelector('#vocabulary-list-popover');
+  await page.waitForSelector('#mini #mini-take[aria-pressed="true"]'); // Saved ✓ ▾: its menu unfolds by itself
+  await page.waitForSelector('#mini #vocabulary-list-popover.is-inline');
   const popoverBits = await page.evaluate(`(() => ({
     modal: !!document.querySelector('dialog[open], #vocabulary-list-dialog'),
     role: document.querySelector('#vocabulary-list-popover')?.getAttribute('role'),
-    newList: !!document.querySelector('#vocabulary-list-popover #vocabulary-list-name'),
+    inCard: !!document.querySelector('#mini #vocabulary-list-popover.is-inline'),
+    newList: !!document.querySelector('#vocabulary-list-popover #vocabulary-list-new'),
   }))()`);
-  check('R2-B · the popup offers lists only after Save; they open as a small popover, not a window, and enroll nothing more',
-    !listsBeforeSave && (await readAppRecord(page)).taken.length === captured.taken && !popoverBits.modal && popoverBits.role === 'dialog' && popoverBits.newList,
+  check('R2-B · Save ▾ opens its menu only once the word is saved; it unfolds inside the card, not a window, and enrolls nothing more',
+    !listsBeforeSave && (await readAppRecord(page)).taken.length === captured.taken && !popoverBits.modal && popoverBits.role === 'dialog' && popoverBits.inCard && popoverBits.newList,
     JSON.stringify({ listsBeforeSave, ...popoverBits }));
   await page.keyboard.press('Escape');
   await page.waitForSelector('#vocabulary-list-popover', { state: 'detached' });
@@ -2788,16 +3478,25 @@ async function main() {
     await page.waitForSelector('#mini', { state: 'detached' });
   }
   // the deeper choices stay one door away: the word's Full entry carries the context scopes and the named lists
+  const captureOrigin = await page.locator('#reader .tok.content').nth(9).elementHandle();
+  const captureOriginIndex = await captureOrigin.getAttribute('data-index');
   await holdWord(page, '#reader .tok.content', 9);
   await page.waitForSelector('#sheet [data-ctx-scope]');
   await waitForWordSheetBody(page, captureSheetLoads);
+  // S · the way back out and the named lists live in the page's one Save (it pinned the foot's #take and its .list-picker)
   const panelBits = await page.evaluate(`(() => ({
-    take: document.querySelector('#sheet #take')?.getAttribute('aria-pressed') === 'true',
+    take: document.querySelector('#sheet #sheet-take')?.getAttribute('aria-pressed') === 'true',
+    one: !!document.querySelector('#sheet #sheet-take')?.matches('button.save-one[data-save-one]'),
     scopes: document.querySelectorAll('#sheet [data-ctx-scope]').length,
-    lists: !!document.querySelector('#sheet .list-picker'),
+    // the foot's keep and its "saved to" picker; the card's context picker (.list-picker.context-picker) stays
+    foot: document.querySelectorAll('#sheet #take, #sheet .list-picker:not(.context-picker)').length,
   }))()`);
-  check('R2-B · the full entry keeps the way back out, the context scopes, and named lists',
-    panelBits.take && panelBits.scopes === 3 && panelBits.lists,
+  await tap(page, '#sheet #sheet-take');
+  await page.waitForSelector('#vocabulary-list-popover.is-drawer', { timeout: 5000 }).catch(() => {});
+  panelBits.lists = await page.evaluate(`!!document.querySelector('#vocabulary-list-popover.is-drawer #vocabulary-list-new') && !!document.querySelector('#vocabulary-list-popover.is-drawer #mini-review')`);
+  if (await page.locator('#vocabulary-list-popover').count()) { await page.keyboard.press('Escape'); await page.waitForTimeout(200); }
+  check('R2-B · the full entry keeps the way back out, the context scopes, and named lists — in its one Save',
+    panelBits.take && panelBits.one && panelBits.scopes === 3 && panelBits.lists && panelBits.foot === 0,
     JSON.stringify(panelBits));
   for (const scope of ['word', 'para', 'sent']) {
     // Saving replaces the sheet; a durable record can arrive before its new
@@ -2816,15 +3515,21 @@ async function main() {
     }, scope);
     check(`R2-B · the full entry durably saves ${scope} context without another enrollment or review`,
       record.taken.length === captured.taken && record.revlog.length === envBefore.revlog);
+    check(`G3 · saving ${scope} context preserves the exact originating occurrence`,
+      await captureOrigin.evaluate((word, index) => word.isConnected && word === document.querySelector(`#reader .tok[data-index="${index}"]`), captureOriginIndex));
   }
   captureSheetLoads.dispose();
   await shoot(page, shotsDir, '19-capture-sovereignty');
   await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
   await page.waitForSelector('#sheet', { state: 'detached' });
-  // the popup's "Saved ✓" takes the card back out
-  await tap(page, '#reader .tok.content', 9);
+  // Back has restored this word's stage; Save opens its menu without another word activation.
+  await page.waitForSelector('#mini');
+  assert.equal(await page.locator('#reader .tok.content').nth(9).getAttribute('data-ladder-rung'), 'stage');
+  assert(await captureOrigin.evaluate(word => word.isConnected && word.dataset.ladderRung === 'stage'), 'Context saves return to the original occurrence stage');
   await page.waitForSelector('#mini #mini-take[aria-pressed="true"]');
   await tap(page, '#mini-take');
+  await page.waitForSelector('#mini #vocabulary-list-popover.is-inline #mini-review');
+  await tap(page, '#mini-review');
   await waitForAppRecord(page, record => !record.taken.some(row => row.t === 'word' && row.id === touched.word),
     { description: 'explicit stop memorizing' });
   const undone = await evaluateAppRecord(page, `(() => {
@@ -2834,19 +3539,26 @@ async function main() {
   check('R2-B · explicit stop restores the deck size without changing the revlog',
     undone.taken === envBefore.taken && undone.revlog === envBefore.revlog,
     JSON.stringify(undone));
-  await tap(page, '#reader .tok.content', 9); // the same word again puts its popup away
+  // put the word's menu and popup away one layer at a time, as a finger's Escape would (the same word again would dive)
+  await focusProseOccurrence(page, page.locator('#reader .tok.content').nth(9));
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => !document.getElementById('vocabulary-list-popover'));
+  await focusProseOccurrence(page, page.locator('#reader .tok.content').nth(9));
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('#mini', { state: 'detached' });
 
   // the popup's Save repaints in place — the popup never blinks.
   // D11 (8d0fbccf) holds the popup's Save for a reader token the core dictionary lacks, and D23 for a
   // spelling another entry's card holds: the save runs on the first token from 12 on whose popup offers
-  // an enabled, not-yet-saved Save; each other popup is put away with a second tap on its word, as a finger would
+  // an enabled, not-yet-saved Save; each other popup is put away with Escape on its word (1.3.0: the same
+  // word again would open its entry)
   const miniCandidates = await page.evaluate(
     `[...document.querySelectorAll('#reader .tok.content')].flatMap((t, i) => (i >= 12 && t.dataset.word !== '学校' ? [i] : []))`,
   );
   let miniIx = -1;
   const miniSkipped = [];
   for (const ix of miniCandidates.slice(0, 16)) {
-    await tap(page, '#reader .tok.content', ix);
+    await openWordStage(page, '#reader .tok.content', ix);
     await page.waitForSelector('#mini #mini-take');
     const seal = await page.evaluate(`(() => {
       const s = document.querySelector('#mini-take');
@@ -2855,7 +3567,9 @@ async function main() {
     })()`);
     if (!seal.disabled && !seal.taken) { miniIx = ix; break; }
     miniSkipped.push(`${seal.word}:${seal.disabled ? 'held' : 'taken'}`);
-    await tap(page, '#reader .tok.content', ix);
+    await focusProseOccurrence(page, page.locator('#reader .tok.content').nth(ix));
+    await page.keyboard.press('Escape');
+    await page.waitForSelector('#mini', { state: 'detached' });
     await page.waitForTimeout(120);
   }
   const miniWordText = await page.evaluate(`document.querySelector('#mini .mini-word')?.childNodes[0]?.textContent ?? ''`);
@@ -2873,9 +3587,10 @@ async function main() {
     miniIx >= 0 && miniCap.miniUp && miniCap.sealTaken === true && miniCap.id === miniWordText && miniCap.scope === 'sent' && !miniCap.window,
     JSON.stringify({ ...miniCap, word: miniWordText, skipped: miniSkipped }));
   if (miniIx >= 0) {
-    // a deliberate second press, not the second half of a double-tap (which the Save ignores, so it cannot undo itself)
-    await page.waitForTimeout(700);
-    await tap(page, '#mini-take');
+    // the save unfolded Save ▾'s menu; its Review row takes the card back out (a second press on Save ▾ within a
+    // breath is the same press, and past it only opens the menu again: Save cannot undo itself)
+    await page.waitForSelector('#mini #vocabulary-list-popover.is-inline #mini-review');
+    await tap(page, '#mini-review');
     await waitForAppRecord(page, record => !record.taken.some(row => row.t === 'word' && row.id === miniWordText),
       { description: 'popup stop memorizing' });
   }
@@ -2905,6 +3620,7 @@ async function main() {
     sentSeal.present && sentSeal.label.includes('半島'), JSON.stringify(sentSeal));
   await tap(page, '#sheet-take');
   await page.waitForTimeout(300);
+  await waitForAppRecord(page, (r) => (r.taken || []).at(-1)?.id === '半島', { timeout: 8000 }).catch(() => {});
   const sentCap = await evaluateAppRecord(page, `(() => {
     const e = record;
     const it = (e.taken || [])[(e.taken || []).length - 1];
@@ -2984,6 +3700,7 @@ async function main() {
     `"${trayBefore.button.trim()}" · forecast "${trayBefore.forecast}"`);
   await page.locator('[data-srs-start="word:人々"]').click();
   await page.waitForTimeout(300);
+  await waitForAppRecord(page, (r) => typeof (r.taken || []).find((t) => t.id === '人々')?.started === 'number', { timeout: 8000 }).catch(() => {});
   const trayAfter = await evaluateAppRecord(page, `(() => {
     const e = record;
     const row = e.taken.find((t) => t.id === '人々');
@@ -3025,6 +3742,7 @@ async function main() {
   await page.waitForSelector('.grade.g-good');
   await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
   await page.waitForTimeout(400);
+  await waitForAppRecord(page, (r) => (r.revlog || []).length > 0, { timeout: 8000 }).catch(() => {});
   const backProbe = await evaluateAppRecord(page, `(() => {
     const e = record;
     const rec = e.srs['word:学校'];
@@ -3323,6 +4041,7 @@ async function main() {
   await page.waitForSelector('.anki-undo-slot .review-undo', { timeout: 8000 });
   await page.evaluate(`document.querySelector('.review-undo')?.click()`);
   await page.waitForTimeout(300);
+  await waitForAppRecord(page, (r) => (r.revlog || []).at(-1)?.[1] === 'word:先生' && r.revlog.at(-1)[2] === 0, { timeout: 8000 }).catch(() => {});
   const undoneR3C = await evaluateAppRecord(page, `(() => {
     const e = record;
     const last = e.revlog[e.revlog.length - 1];
@@ -3401,7 +4120,8 @@ async function main() {
     view: document.body.dataset.view,
   })`);
   check('R3-E · the dojo entered from the galaxy wears a galaxy crumb',
-    dojoProbe.view === 'dojo' && dojoProbe.crumb.trim() === 'galaxy › focus' && dojoProbe.room === 'focus',
+    // one room-name table (one hand, slice E): the crumb names the dojo by its title's word, ROOM_NAMES' 次の稽古 · Up next
+    dojoProbe.view === 'dojo' && dojoProbe.crumb.trim() === 'Galaxy › Up next' && dojoProbe.room === 'Up next',
     `crumb "${dojoProbe.crumb}" · room "${dojoProbe.room}"`);
   await page.tap('#back');
   await page.waitForTimeout(600);
@@ -3539,55 +4259,178 @@ async function main() {
       readerYKept > 200 && Math.abs(backFromSheet.y - readerYKept) <= 20,
     `${JSON.stringify(backFromSheet)} (kept ${readerYKept})`);
 
-  // (b) from a drift dive: one press surfaces ONE level of the water
-  await open('');
-  await page.waitForTimeout(2200);
-  const divePickText = await page.evaluate(`(() => {
-    const K = /[\\u4e00-\\u9fff]/;
-    for (const w of document.querySelectorAll('#drift-layer .word')) {
-      const r = w.getBoundingClientRect();
-      if (!r.width || r.left < 60 || r.right > 320 || r.top < 260 || r.bottom > 640) continue;
-      if (!K.test(w.textContent)) continue;
-      w.dataset.r3b = '1';
-      return w.textContent;
+  // (b) Hosted taps use the shared reading/stage/page visit. Device Back
+  // must fold every rung on the SAME occurrence without leaving this document.
+  const r3bState = () => page.evaluate(() => ({
+    stamp: window.__r3bDocument, view: document.body.dataset.view, history: history.state,
+    active: document.getElementById('drift-layer')?.classList.contains('active'),
+    mini: document.querySelector('#mini .mini-word')?.textContent ?? null,
+    sheet: document.querySelector('#sheet')?.dataset.node ?? null,
+    dived: document.body.classList.contains('drift-dived'), depth: document.getElementById('depth')?.textContent,
+  }));
+  const r3bTouch = async (point) => {
+    const offset = await page.evaluate(() => ({ x: visualViewport?.offsetLeft || 0, y: visualViewport?.offsetTop || 0 }));
+    const cdp = await context.newCDPSession(page);
+    try {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [
+        { x: point.x - offset.x, y: point.y - offset.y, radiusX: 6, radiusY: 6, force: 1 },
+      ] });
+      await page.waitForTimeout(60);
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    } finally { await cdp.detach(); }
+  };
+  const r3bWordTap = async (target) => {
+    let point = null;
+    // Wait before input for this exact printed occurrence, never replay a delivered tap.
+    for (let i = 0; i < 50 && !point; i++) {
+      point = await target.evaluate(owner => {
+        const r = owner.querySelector('.base')?.getBoundingClientRect();
+        if (!owner.isConnected || !r?.width) return null;
+        const x = r.x + r.width / 2, y = r.y + r.height / 2;
+        if (document.elementFromPoint(x, y)?.closest('.word') !== owner) return null;
+        window.__r3bPointer = null;
+        addEventListener('pointerdown', event => { window.__r3bPointer = {
+          same: event.target.closest('.word') === owner, trusted: event.isTrusted, type: event.pointerType,
+        }; }, { capture: true, once: true });
+        return { x, y };
+      });
+      if (!point) await page.waitForTimeout(100);
     }
-    return null;
-  })()`);
-  check('R3-B · a kanji word stands in the field to dive into', !!divePickText, divePickText ?? 'none');
-  const diveCdp = await page.context().newCDPSession(page);
-  let dived = false;
-  for (let i = 0; i < 5 && !dived && divePickText; i++) {
-    const at = await page.evaluate(`(() => {
-      const w = document.querySelector('#drift-layer .word[data-r3b]');
-      if (!w) return null;
-      const r = w.getBoundingClientRect();
-      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-    })()`);
-    if (!at) break;
-    await diveCdp.send('Input.dispatchTouchEvent', {
-      type: 'touchStart',
-      touchPoints: [{ x: at.x, y: at.y }],
-    });
-    await page.waitForTimeout(70);
-    await diveCdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-    await page.waitForTimeout(650);
-    dived = await page.evaluate(`document.body.classList.contains('drift-dived')`);
+    assert(point, 'R3-B: original word has an eligible printed hit target');
+    await r3bTouch(point);
+    const actual = await page.evaluate(() => window.__r3bPointer);
+    assert(actual?.same && actual.trusted && actual.type === 'touch', `R3-B native target: ${JSON.stringify(actual)}`);
+    await page.waitForTimeout(500);
+  };
+  for (const rung of ['reading', 'stage', 'page']) {
+    try {
+      await open('?entry=drift');
+      await page.waitForSelector('#drift-layer[data-record-state="active"]');
+      await page.waitForTimeout(2200);
+      assert.equal(await page.getAttribute('body', 'data-furigana'), '1', 'R3-B uses the restored on-touch dial');
+      const target = await page.evaluateHandle(() => [...document.querySelectorAll('#drift-layer .word')].find(n => {
+        const base = n.querySelector('.base'), reading = n.querySelector('.yomi'), r = base?.getBoundingClientRect();
+        return /[\u4e00-\u9fff]/.test(base?.textContent || '') && reading?.textContent &&
+          Number(getComputedStyle(reading).opacity) === 0 && r?.left > 60 && r.right < 330 && r.top > 230 && r.bottom < 620 &&
+          document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)?.closest('.word') === n;
+      }));
+      assert(await target.evaluate(n => !!n), 'R3-B: a visible known word supplies the reading rung');
+      const label = await target.evaluate(n => n.querySelector('.base').textContent);
+      await page.evaluate(rung => { window.__r3bDocument = `hosted-${rung}`; }, rung);
+      await r3bWordTap(target);
+      await page.waitForFunction(n => n.isConnected && n.dataset.ladderRung === 'reading', target);
+      if (rung !== 'reading') {
+        await r3bWordTap(target);
+        await page.waitForSelector('#mini');
+        assert.equal(await target.evaluate(n => n.dataset.ladderRung), 'stage');
+        assert.equal(await page.locator('#mini .mini-word').textContent(), label);
+      }
+      if (rung === 'page') {
+        await r3bWordTap(target);
+        await page.waitForSelector('#sheet');
+        assert.equal(await page.getAttribute('#sheet', 'data-node'), `word:${label}`);
+        assert(await target.evaluate(n => n.isConnected), 'Original occurrence survives page entry');
+      }
+      const before = await r3bState();
+      await page.goBack(); await page.waitForTimeout(800);
+      const after = await r3bState();
+      const origin = after.stamp === before.stamp ? await target.evaluate(n => ({
+        connected: n.isConnected, label: n.querySelector('.base')?.textContent, rung: n.dataset.ladderRung ?? null,
+        readingOpacity: getComputedStyle(n.querySelector('.yomi')).opacity,
+      })) : null;
+      const returned = after.stamp === before.stamp && after.view === 'drift' && after.active && !after.sheet &&
+        origin?.connected && origin.label === label && (rung === 'page'
+          ? origin.rung === 'stage' && after.mini === label
+          : !origin.rung && !after.mini && Number(origin.readingOpacity) === 0);
+      check(`R3-B · device Back from hosted ${rung} returns the exact occurrence`, returned,
+        JSON.stringify({ label, before, after, origin }));
+      if (rung === 'page') {
+        // Do not count a return after failed staging as evidence of a deeper Back.
+        let folded = null;
+        if (returned) { await page.goBack(); await page.waitForTimeout(800); folded = await r3bState(); }
+        const bareOrigin = folded?.stamp === before.stamp ? await target.evaluate(n => ({
+          connected: n.isConnected, rung: n.dataset.ladderRung ?? null, opacity: getComputedStyle(n.querySelector('.yomi')).opacity,
+        })) : null;
+        check('R3-B · another device Back folds the restored hosted stage in place',
+          !!returned && folded?.stamp === before.stamp && folded.view === 'drift' && folded.active &&
+          !folded.mini && !folded.sheet && bareOrigin?.connected && !bareOrigin.rung && Number(bareOrigin.opacity) === 0,
+          JSON.stringify({ folded, bareOrigin }));
+      }
+    } catch (error) {
+      check(`R3-B · hosted ${rung} native setup and return complete`, false, error.stack || String(error));
+    }
   }
-  await diveCdp.detach();
-  check('R3-B · the tap ladder carries into the dive', dived, `drift-dived after ladder taps`);
-  await page.evaluate('window.__r3bDive = 1');
-  await page.goBack();
-  await page.waitForTimeout(800);
-  const backFromDive = await page.evaluate(`({
-    sameDocument: window.__r3bDive === 1,
-    view: document.body.dataset.view,
-    dived: document.body.classList.contains('drift-dived'),
-    layerActive: document.getElementById('drift-layer')?.classList.contains('active'),
-  })`);
-  check('R3-B · device Back from a dive surfaces one level, never leaves the water',
-    backFromDive.sameDocument && backFromDive.view === 'drift' && !backFromDive.dived &&
-      backFromDive.layerActive,
-    JSON.stringify(backFromDive));
+
+  // (b2) The retained PRIVATE sky dive is still a separate Back obligation.
+  // Observe real hub-sprite paint calls (as verify-drift-hunt does), then one
+  // native touch enters the rendered hub. No app-state/API dive or tap loop.
+  await context.addInitScript(() => {
+    window.__r3bHubs = [];
+    const symbols = new WeakMap(), proto = window.CanvasRenderingContext2D.prototype;
+    const fillText = proto.fillText, drawImage = proto.drawImage;
+    proto.fillText = function (text, ...args) {
+      if (this.canvas.width === 96 && this.canvas.height === 96) symbols.set(this.canvas, String(text));
+      return fillText.call(this, text, ...args);
+    };
+    proto.drawImage = function (...args) {
+      if (this.canvas.id === 'fx' && args.length === 5 && args[0] instanceof window.HTMLCanvasElement &&
+          args[0].width === 96 && args[0].height === 96) {
+        window.__r3bHubs.push({ label: symbols.get(args[0]), x: args[1] + args[3] / 2, y: args[2] + args[4] / 2, at: performance.now() });
+        if (window.__r3bHubs.length > 1200) window.__r3bHubs.splice(0, 600);
+      }
+      return drawImage.apply(this, args);
+    };
+  });
+  try {
+    await open('?entry=drift');
+    await page.waitForSelector('#drift-layer[data-record-state="active"]');
+    await page.waitForTimeout(2200);
+    await page.evaluate(() => { window.__r3bDocument = 'private-dive'; });
+    const before = await r3bState();
+    assert(!before.dived && before.depth === '' && !before.mini && !before.sheet, 'Private dive starts at bare depth zero');
+    const hub = await page.waitForFunction(() => {
+      const now = performance.now(), seen = new Set(), options = [];
+      const rects = [...document.querySelectorAll('#drift-layer .word,#drift-layer .glyph,#drift-layer .part')]
+        .map(n => n.getBoundingClientRect());
+      for (const h of window.__r3bHubs.slice().reverse()) {
+        if (now - h.at >= 220 || !h.label || seen.has(h.label)) continue;
+        seen.add(h.label);
+        // Same visible hub-body samples as verify-drift-hunt, all within its
+        // existing 34px door. Clearance prevents native touch target adjustment
+        // from choosing a nearby word; the delivered target is asserted below.
+        for (const [dx, dy] of [[0,0],[24,0],[-24,0],[0,-24],[0,24],[17,-17],[-17,-17],[17,17],[-17,17]]) {
+          const x = h.x + dx, y = h.y + dy, hit = document.elementFromPoint(x, y);
+          if (x < 52 || x > 338 || y < 170 || y > 690 ||
+              hit?.closest('.word,.glyph,.part,#lvl,#theme,.drift-door,#ginga-symbol,#ginga-theme-seal,#chrome,.nav-bar')) continue;
+          const clearance = Math.min(...rects.map(r => Math.hypot(Math.max(r.left-x, 0, x-r.right), Math.max(r.top-y, 0, y-r.bottom))));
+          options.push({ ...h, canvas: { x: h.x, y: h.y }, x, y, dx, dy, clearance });
+        }
+      }
+      return options.sort((a, b) => b.clearance - a.clearance).find(h => h.clearance >= 12) || null;
+    }, null, { timeout: 6000 });
+    const point = await hub.jsonValue();
+    await page.evaluate(() => {
+      window.__r3bPointer = null;
+      addEventListener('pointerdown', event => { window.__r3bPointer = {
+        trusted: event.isTrusted, type: event.pointerType, node: event.target.closest('.word,.glyph,.part')?.className ?? null,
+      }; }, { capture: true, once: true });
+    });
+    await r3bTouch(point);
+    const actual = await page.evaluate(() => window.__r3bPointer);
+    assert(actual?.trusted && actual.type === 'touch' && !actual.node, `Native canvas hub target: ${JSON.stringify(actual)}`);
+    await page.waitForFunction(label => document.body.classList.contains('drift-dived') &&
+      document.getElementById('depth')?.textContent === label, point.label, { timeout: 5000 });
+    const dived = await r3bState();
+    const entered = dived.stamp === before.stamp && dived.dived && dived.depth === point.label && dived.history?.bunkiWalk?.v === 1;
+    check('R3-B · native canvas hub enters exactly one private sky level', entered, JSON.stringify({ point, actual, dived }));
+    await page.goBack(); await page.waitForTimeout(800);
+    const returned = await r3bState();
+    check('R3-B · device Back from a private dive surfaces one level, never leaves the water',
+      entered && returned.stamp === before.stamp && returned.view === 'drift' && returned.active &&
+      !returned.dived && returned.depth === '' && !returned.mini && !returned.sheet, JSON.stringify(returned));
+  } catch (error) {
+    check('R3-B · private dive native setup and return complete', false, error.stack || String(error));
+  }
 
   // (c) the archive keeps BOTH scroll contexts across Back — the year list
   // where a row was opened, and the shelf where its door stands ~20,000px deep
@@ -3789,6 +4632,7 @@ async function main() {
   await page.waitForSelector('.grade-row .grade.g-good');
   await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
   await page.waitForTimeout(400);
+  await waitForAppRecord(page, (r) => (r.revlog || []).length > 0, { timeout: 8000 }).catch(() => {});
   const gradedR3D = await evaluateAppRecord(page, `(() => {
     const e = record;
     return { rec: e.srs['word:学校'], row: e.revlog[e.revlog.length - 1] };
@@ -3829,6 +4673,8 @@ async function main() {
     w: invalidParamsRecord.srsPrefs.fsrs.w.map((x, i) => (i === 20 ? 5 : x)),
   };
   const invalidParamsContext = await browser.newContext(contextOptions);
+  // This is an existing-device journey; G3's fresh-device demonstration has its own verifier.
+  await invalidParamsContext.addInitScript(() => { localStorage.setItem('kairo-word-ladder-demo-v1', '1'); });
   await invalidParamsContext.addInitScript((recordText) => {
     if (!location.href.startsWith('http://127.0.0.1:') || sessionStorage.getItem('params-fixture-seeded')) return;
     localStorage.setItem('kairo-corridor-v1', recordText);
@@ -3957,6 +4803,7 @@ async function main() {
   }, { x: restBox.cx, y: edgeY }), 'rest edge must hit the intended rest button');
   await page.mouse.click(restBox.cx, edgeY);
   await page.waitForTimeout(300);
+  await waitForAppRecord(page, (r) => Object.keys(r.suspended || {}).length === 1, { timeout: 8000 }).catch(() => {});
   const afterEdge = await evaluateAppRecord(page, `(() => ({
     suspended: Object.keys(record.suspended || {}),
     sheet: !!document.querySelector('#sheet'),
@@ -3970,45 +4817,46 @@ async function main() {
   // ------------- C1's own finding: the sentence page walks on to its article
   // (rubric §9.5 — a review answer returns to the source sentence AND its
   // article). The demonstration found the sentence half present, this half
-  // missing. A bank example must still show no door: honest absence.
+  // missing. (A bank example's sentence page draws no such door: honest absence, product-side.)
+  // INTFIX-C (2026-10-20): the walk looked for the sentence door (▷) on the word's STAGE, which draws none: the product
+  // draws ▷ on the example lines of a word page (and on glossary refs). So it never reached a sentence page, and wrote
+  // an "honest absence" row that passed on nothing, in every run since at least 2026-10-04: the row VH-1's retained
+  // contract rightly refuses. The walk now takes the product's own path: the first text's word page, the ▷ of the
+  // word's own sentence (the example line drawn from the article the word was tapped in), that sentence's page, and
+  // its door home. The door must be there, and must land in the same article.
   console.log('\n— C1 finding · the sentence page reaches its article');
   await open('?entry=shelf');
   await page.waitForSelector('.shelf-item:not([data-recommendation])');
   await tap(page, FIRST_TEXT);
-  await page.waitForSelector('#reader .tok.content');
-  const sentHome = await page.evaluate(`(() => {
-    const tok = document.querySelector('#reader .tok.content');
-    return tok ? tok.textContent.trim() : '';
-  })()`);
-  await tap(page, '#reader .tok.content');
-  await page.waitForTimeout(400);
-  const sentDoorSeen = await page.evaluate(`(() => {
-    const d = document.querySelector('.sent-door');
-    if (d) { d.click(); return true; }
-    return false;
-  })()`);
-  if (sentDoorSeen) {
-    await page.waitForSelector('#sheet');
-    await page.waitForTimeout(300);
-  }
+  await settleReader(page);
+  const sentFrom = await page.evaluate(`(() => ({
+    word: document.querySelector('#reader .tok.content')?.textContent.trim() || '',
+    title: document.querySelector('#reader h1.view-title, h1.view-title')?.textContent.trim() || '',
+  }))()`);
+  await holdWord(page, '#reader .tok.content');
+  const ownDoor = '#sheet .example[data-own] .sent-door';
+  await page.waitForSelector(ownDoor);
+  const ownSentence = await page.evaluate(`document.querySelector('#sheet .example[data-own] .example-ja')?.textContent || ''`);
+  await page.evaluate(`document.querySelector(${JSON.stringify(ownDoor)}).click()`);
+  await page.waitForSelector('#sheet .sent-reader');
   const homeDoor = await page.evaluate(`(() => {
     const b = document.querySelector('#sent-home');
     return { present: !!b, label: b ? b.textContent : '' };
   })()`);
+  let landed = { view: '', reader: false, sheet: true, title: '' };
   if (homeDoor.present) {
     await page.evaluate(`document.querySelector('#sent-home')?.click()`);
     await page.waitForTimeout(600);
-    const landed = await page.evaluate(`(() => ({
+    landed = await page.evaluate(`(() => ({
       view: document.body.dataset.view || '',
       reader: !!document.querySelector('#reader'),
       sheet: !!document.querySelector('#sheet'),
+      title: document.querySelector('#reader h1.view-title, h1.view-title')?.textContent.trim() || '',
     }))()`);
-    check('C1 · the sentence page walks on to the whole article it came from',
-      landed.reader && !landed.sheet, JSON.stringify({ ...homeDoor, ...landed, from: sentHome }));
-  } else {
-    check('C1 · a sentence with no shelf article shows no door onto nothing',
-      true, 'no article-backed sentence page reached in this walk — honest absence path');
   }
+  check('C1 · the sentence page walks on to the whole article it came from',
+    homeDoor.present && landed.reader && !landed.sheet && !!sentFrom.title && landed.title === sentFrom.title,
+    JSON.stringify({ ...homeDoor, ...landed, from: sentFrom.word, article: sentFrom.title, sentence: ownSentence }));
   // ------------- E3 round-A findings (the closing double-dry earned these)
   // (1) a captured-but-never-STARTED row drilled in the 漢字だけ block must
   // stay practice: the no-debt law says only 始める enrols, and srsDueItems
@@ -4040,6 +4888,7 @@ async function main() {
     );
     await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
     await page.waitForTimeout(400);
+    await waitForAppRecord(page, (r) => (r.obslog || []).some((x) => x[1] === 'dojo'), { timeout: 8000 }).catch(() => {});
     const afterUnstarted = await evaluateAppRecord(page, `(() => {
       const e = record;
       const day = Object.values(e.stats || {}).reduce((a, s) => a + (s.nnew || 0), 0);
@@ -4123,6 +4972,7 @@ async function main() {
   const chosenWord = await page.evaluate(`document.querySelector('[data-enroll]')?.dataset.enroll ?? null`);
   await page.evaluate(`document.querySelector('[data-enroll]').click()`);
   await page.waitForTimeout(250);
+  await waitForAppRecord(page, (r) => (r.taken || []).length === 1 && Number.isFinite(r.taken[0].started), { timeout: 8000 }).catch(() => {});
   const afterOne = await evaluateAppRecord(page, `(() => {
     const e = record;
     return {
@@ -4137,6 +4987,7 @@ async function main() {
   await shoot(page, shotsDir, '23-r4b-lesson-enroll-choice');
   await page.evaluate(`document.querySelector('#lesson-enroll-all').click()`);
   await page.waitForTimeout(250);
+  await waitForAppRecord(page, (r) => (r.taken || []).length === 10 && r.taken.every((t) => Number.isFinite(t.started)), { timeout: 8000 }).catch(() => {});
   const afterAll = await evaluateAppRecord(page, `(() => {
     const e = record;
     const ids = (e.taken || []).map((t) => t.id);
@@ -4205,6 +5056,7 @@ async function main() {
     await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
     await page.waitForTimeout(300);
   }
+  await waitForAppRecord(page, (r) => (r.revlog || []).length === 2, { timeout: 8000 }).catch(() => {});
   const lap1After = await evaluateAppRecord(page, `(() => {
     const e = record;
     return {
@@ -4232,6 +5084,7 @@ async function main() {
   await shoot(page, shotsDir, '24-r4b-dojo-second-lap');
   await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
   await page.waitForTimeout(300);
+  await waitForAppRecord(page, (r) => (r.obslog || []).some((x) => x[1] === 'dojo'), { timeout: 8000 }).catch(() => {});
   const lap2After = await evaluateAppRecord(page, `(() => {
     const e = record;
     const rows = (e.obslog || []).filter((r) => r[1] === 'dojo');
@@ -4345,9 +5198,13 @@ async function main() {
   report.loadMs = loadMs;
 
   await browser.close();
+  // Hfix-1A · item 18's rows, in every engine KAIRO_BROWSER names (the journey above is Chromium's)
+  try { await pendingSaveRows(base); }
+  catch (error) { check('Hfix-1A · 18 · pending-save rows ran', false, String(error?.message || error).split('\n')[0]); }
   server.close();
 
   report.summary = { total: results.length, failed: failures };
+  report.fullAcceptance = failures === 0;
   report.results = results;
   mkdirSync(dirname(reportPath), { recursive: true });
   writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
