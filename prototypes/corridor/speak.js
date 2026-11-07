@@ -213,15 +213,33 @@ export function createSpeakRoom(host) {
     if (!tp.key) throw failure(0, null, 'no-key');
     const s = st.session;
     const system = core.buildSystemInstruction({ scene: st.scene, plants: s.plants, notes: s.notes, avoidOpenings: s.avoid, level: s.level });
-    const history = s.lines.filter((line) => line.text).map((line) => ({ who: line.who === 'me' ? 'me' : 'kore', text: line.text }));
+    // An inquiry carries the bounded text-tutor transcript in front of the room's own spoken lines. It is context,
+    // never archived again as if it had been said here.
+    const inquiry = st.scene?.kind === 'inquiry' ? st.scene : null;
+    const history = [...(inquiry?.history || []), ...s.lines.filter((line) => line.text)
+      .map((line) => ({ who: line.who === 'me' ? 'me' : 'kore', text: line.text }))];
     const wavBase64 = wav ? core.bytesToBase64(wav) : null;
     const ask = async (nudge) => {
+      // Every outbound inquiry request re-resolves the exact current source and needs the app's aiAllowed===true.
+      // A digest is not permission; the text-tutor's personal-source consent is not a voice-provider consent.
+      if (inquiry) {
+        if (live && !live()) throw failure(0, null, 'aborted');
+        let allowed = false;
+        try {
+          const verdict = typeof host.validateInquirySource === 'function'
+            ? await host.validateInquirySource(inquiry.source) : false;
+          allowed = verdict === true || verdict?.aiAllowed === true;
+        } catch { allowed = false; }
+        if (!allowed) throw failure(0, null, 'source-unavailable');
+        if (live && !live()) throw failure(0, null, 'aborted');
+      }
       const started = performance.now();
       const json = await post(tp, `/models/${tp.ears}:generateContent`, core.buildTurnRequest({ system, history, mode, wavBase64, typed, target, nudge }), TURN_BUDGET_MS);
       const usd = addCost(tp.ears, json.usageMetadata);
       const text = (json.candidates?.[0]?.content?.parts || []).map((part) => part.text || '').join('');
       return { turn: core.parseTurn(text, { mode }), usage: json.usageMetadata || null, ms: Math.round(performance.now() - started), usd };
     };
+
     let answer = await ask(null);
     if (!answer.turn) throw failure(0, null, 'unclear');
     let englishNote = false;
@@ -519,9 +537,12 @@ export function createSpeakRoom(host) {
       const line = addLine({ who: answer.turn.reply.speaker === 'second' ? 'second' : 'kore', kind: 'opening', text: answer.turn.reply.text,
         tokens: answer.turn.reply.tokens, speaker: answer.turn.reply.speaker, englishNote: answer.englishNote });
       const xid = nextXid();
+      const inquiryRef = st.scene?.kind === 'inquiry' ? st.scene.contextRef : null;
       await host.commitTurn([
         row('assistant', line.text, answer.model, xid),
-        row('app', JSON.stringify({ kind: 'opening', text: line.text, scene: st.scene.id, ms: answer.ms, usage: answer.usage }), answer.model, xid),
+        row('app', JSON.stringify({ kind: 'opening', text: line.text, scene: st.scene.id,
+          ...(inquiryRef ? { contextRef: inquiryRef, sourceContextRef: inquiryRef, sourceContext: st.scene.source } : {}),
+          ms: answer.ms, usage: answer.usage }), answer.model, xid),
       ], [], xid);
       // the record answered: if the room was left, the talk ended or the scene changed meanwhile, her voice is not asked
       if (epoch !== st.epoch || s !== st.session || s.ended) return;
@@ -642,7 +663,9 @@ export function createSpeakRoom(host) {
     for (const r of tr.reached) found.push({ kind: 'sensei', subject: r.word, subjectType: 'word', polarity: 1, code: 'prod-gap' });
     for (const w of usedNow) found.push({ kind: 'sensei', subject: w, subjectType: 'word', polarity: 3, code: 'prod-gap' });
     const xid = nextXid();
-    const analysis = { kind: 'turn', mode, scene: st.scene.id, heardKana: tr.heardKana, corrections: tr.corrections, reached: tr.reached, used: usedNow,
+    const inquiryRef = st.scene?.kind === 'inquiry' ? st.scene.contextRef : null;
+    const analysis = { kind: 'turn', mode, scene: st.scene.id, ...(inquiryRef ? { contextRef: inquiryRef, sourceContextRef: inquiryRef } : {}),
+      heardKana: tr.heardKana, corrections: tr.corrections, reached: tr.reached, used: usedNow,
       remember: tr.remember, bridge: tr.bridge ? { text: tr.bridge.text, kana: tr.bridge.kana } : null, ms: answer.ms, usage: answer.usage,
       take: st.wavInfo && wav ? { seconds: st.wavInfo.seconds, sampleRate: 16000 } : null, voice: { model: transport().lock.model } };
     const saved = await host.commitTurn([
@@ -665,7 +688,8 @@ export function createSpeakRoom(host) {
     if (kind === 'aborted') return;
     if (kind === 'network') { st.offline = !navigator.onLine; setStatus(st.offline ? 'offline' : 'error'); return; }
     if (kind === 'busy') { setStatus('busy', { seconds: error.retryDelay || 0 }); return; }
-    setStatus({ 'no-key': 'no-key', key: 'key', unclear: 'unclear', timeout: 'timeout', 'not-found': 'ears-gone', server: 'error', malformed: 'unclear' }[kind] || 'error');
+    setStatus({ 'no-key': 'no-key', key: 'key', unclear: 'unclear', timeout: 'timeout', 'not-found': 'ears-gone', server: 'error', malformed: 'unclear',
+      'source-unavailable': 'source-unavailable' }[kind] || 'error');
   }
 
   /* ---------------------------------------------------------------- the ring */
@@ -900,6 +924,22 @@ export function createSpeakRoom(host) {
     const role = el('p', 'speak-role');
     if (sc) role.textContent = t(`相手：${sc.role.ja}${sc.second ? `・${sc.second.ja}` : ''}`, `Kore plays ${sc.role.en}${sc.second ? `, with ${sc.second.en}` : ''}`);
     header.append(kind, title, role);
+    if (sc?.kind === 'inquiry') {
+      const tutor = el('button', 'btn-tertiary speak-quiet speak-inquiry-tutor', t('先生の文へ戻る', 'Back to the tutor'));
+      tutor.type = 'button';
+      tutor.id = 'speak-inquiry-tutor';
+      tutor.addEventListener('click', async () => {
+        tutor.disabled = true;
+        // The room may be left, re-entered or re-scened while the tutor activation is being saved.
+        const epoch = st.epoch;
+        const live = () => epoch === st.epoch && st.scene === sc && host.isCurrent();
+        try {
+          const kept = await host.openTutor(sc.contextRef, live);
+          if (kept === false && tutor.isConnected) tutor.disabled = false;
+        } catch { if (tutor.isConnected) tutor.disabled = false; }
+      });
+      header.append(tutor);
+    }
     return header;
   }
   function dock() {
@@ -962,7 +1002,25 @@ export function createSpeakRoom(host) {
     els.body.replaceChildren();
     if (st.layer && st.layer !== 'shadow') { paintLayer(); return; }
     paintScript();
+    if (!st.layer) paintInquiry();
     if (st.layer === 'shadow') paintLayer();
+  }
+  /** The exact sentence and question this voice conversation continues, in the room's own quiet text. */
+  function paintInquiry() {
+    if (st.scene?.kind !== 'inquiry' || !els.body) return;
+    const box = el('section', 'speak-inquiry');
+    box.setAttribute('aria-label', t('先生から続けている文と質問', 'The sentence and question carried from the tutor'));
+    box.append(el('p', 'speak-quiet-line', t('選んだ文', 'Selected sentence')));
+    const quote = el('p', 'speak-quiet-line speak-inquiry-quote', st.scene.source.quote);
+    quote.lang = 'ja';
+    box.append(quote);
+    if (st.scene.question) {
+      box.append(el('p', 'speak-quiet-line', t('先生への質問', 'Your question for the tutor')));
+      const question = el('p', 'speak-quiet-line speak-inquiry-question', st.scene.question);
+      question.lang = 'ja';
+      box.append(question);
+    }
+    els.body.prepend(box);
   }
   function paintScript() {
     if (!els.body || (st.layer && st.layer !== 'shadow')) return;
@@ -1189,6 +1247,8 @@ export function createSpeakRoom(host) {
     'ears-gone': ['Kore の耳のモデルが見つかりません。', 'Kore’s listening model isn’t available.'],
     error: ['Kore と話せませんでした。言ったことは残っています。', 'Kore couldn’t answer. Nothing you said is lost.'],
     'voice-replaced': ['Kore の声は入れ替えの途中です。文字はそのまま続きます。', 'Kore’s voice is being replaced. The words go on.'],
+    'source-unavailable': ['この出典は声の会話にはまだ利用できません。共有が許可されていないか、出典が変わりました。文章と質問は残っています。',
+      'This source is not available for the spoken conversation yet — sharing is not allowed for it, or the source changed. Your text and question are still here.'],
     'not-saved': ['この一往復は記録に残せませんでした。', 'This turn wasn’t saved to your record.'],
     accounting: ['この端末に費用を記録できませんでした。記録できるまで、次の一往復は始めません。', 'This device couldn’t record what the last turn cost. The next turn waits until it can.'],
     'still-answering': ['Kore がまだ答えています。書いたことはそのまま残っています。', 'Kore is still answering. What you wrote is still here.'],
@@ -1808,6 +1868,15 @@ export function createSpeakRoom(host) {
     st.offline = navigator.onLine === false;
     st.sceneAsked = scene;
     st.scene = null;
+    // An inquiry is already an exact, immutable scene: never replace it with a generic article/free scene.
+    if (scene?.kind === 'inquiry') {
+      st.scene = scene;
+      paintHead();
+      paintAll();
+      if (st.offline) { setStatus('offline'); return; }
+      void startSession();
+      return;
+    }
     const id = scene?.kind === 'article' && scene.id ? `article:${scene.id}` : scene?.id || 'free';
     const epoch = st.epoch;
     void resolveScene(id).then((sc) => sc || resolveScene('free')).then((sc) => {
@@ -1835,7 +1904,8 @@ export function createSpeakRoom(host) {
     const s = st.session;
     return JSON.parse(JSON.stringify({
       phase: st.phase, mode: st.mode, layer: st.layer, status: st.status?.kind || null, scene: st.scene?.id || null,
-      session: s ? { id: s.id, lines: s.lines.map((l) => ({ who: l.who, kind: l.kind, text: l.text, silent: !!l.silent, corrections: l.corrections?.length || 0 })),
+      inquiry: st.scene?.kind === 'inquiry' ? { contextRef: st.scene.contextRef, quote: st.scene.source.quote, question: st.scene.question } : null,
+      session: s ? { id: s.id, contextRef: s.contextRef, lines: s.lines.map((l) => ({ who: l.who, kind: l.kind, text: l.text, silent: !!l.silent, corrections: l.corrections?.length || 0 })),
         plants: s.plants.map((p) => p.word), reached: s.reached.map((r) => r.word), ended: s.ended, bridgeTries: s.bridgeTries || 0, notes: s.savedNotes } : null,
       wav: st.wavInfo, gum: st.gum, take: !!st.take, voiceRetired: st.voiceRetired, offline: st.offline, micDenied: st.micDenied, micError: st.micError || null,
       playing: st.playing ? { kind: st.playing.kind, rate: st.playing.rate || 1 } : null, audioPaused: audio ? audio.paused || audio.ended : true,

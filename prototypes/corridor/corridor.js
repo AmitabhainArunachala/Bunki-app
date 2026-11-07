@@ -20050,6 +20050,50 @@ function renderTeacherContexts(main) {
     });
     actions.append(open);
   }
+  if (speakAvailable()) {
+    // One quiet door beside return/practice: carry this exact sentence and the learner's current draft into Speak.
+    const continueSpeak = biLabel('button', 'chip', '声で続きを話す', 'Continue in Speak');
+    continueSpeak.type = 'button'; continueSpeak.id = 'teacher-speak-inquiry';
+    continueSpeak.disabled = !recordWritable();
+    continueSpeak.addEventListener('click', async () => {
+      if (!preserveVisibleDrafts()) {
+        note.textContent = tx('下書きを保存できなかった。質問はそのまま残っている。もう一度。',
+          'The draft could not be saved. Your question is still here; try again.');
+        return;
+      }
+      const epoch = recordEpoch, expected = context.id, serial = teacherContextSelectionSerial;
+      continueSpeak.disabled = true;
+      try {
+        if (!recordWritable(epoch) || activeTeacherContext()?.id !== expected) return;
+        const draft = teacherDraftController?.view(expected);
+        const input = document.getElementById('chat-input');
+        const matchingInput = input && (input.dataset.teacherContextRef || '') === expected ? input : null;
+        if (draft?.state === 'conflict') {
+          note.textContent = tx('この質問は保存済みの文と食い違っている。先生の画面で選んでから、もう一度。',
+            'This question conflicts with the saved one. Resolve it in the tutor view, then try again.');
+          return;
+        }
+        const question = typeof draft?.text === 'string' ? draft.text : matchingInput?.value || '';
+        const history = aiChatTurns().filter((turn) => (turn.contextRef || null) === expected);
+        const { inquiryScene } = await import('./speak-core.mjs');
+        let scene = null;
+        try { scene = inquiryScene(context, { question, history }); } catch (error) {
+          note.textContent = error?.message === 'inquiry-question-too-long'
+            ? tx('質問が長すぎる（4000文字まで）。質問はそのまま残っている。短くしてから、もう一度。',
+              'Your question is too long (up to 4,000 characters). It is still here; shorten it and try again.')
+            : tx('この文を声の会話に渡せなかった。文章と質問はそのまま残っている。',
+              'This sentence could not be carried into the spoken conversation. Your text and question are still here.');
+          return;
+        }
+        if (!recordWritable(epoch) || activeTeacherContext()?.id !== expected ||
+            serial !== teacherContextSelectionSerial || !continueSpeak.isConnected) return;
+        openSpeakRoom('ai', scene, continueSpeak);
+      } finally {
+        if (continueSpeak.isConnected) continueSpeak.disabled = !recordWritable(epoch);
+      }
+    });
+    actions.append(continueSpeak);
+  }
   if (context.sourceKind === 'bundled-passage' && sentencePracticeModule) {
     const practice = biLabel('button', 'chip', 'この文を練習する', 'practice this sentence');
     practice.type = 'button'; practice.id = 'teacher-sentence-practice'; practice.disabled = !recordWritable();
@@ -27802,7 +27846,46 @@ function speakHost() {
     },
     recordWritable: () => recordWritable(),
     archive: (surface) => aiLogAll(surface),
-    openTutor: () => { keepNavigationReturn('ai', document.activeElement); S.view = 'ai'; render(); window.scrollTo(0, 0); },
+    // The exact source context an inquiry came from, re-resolved immediately before any outbound voice-brain request.
+    // A stored digest is never permission: only the app's current source policy and aiAllowed===true admit it.
+    validateInquirySource: async (context) => {
+      const epoch = recordEpoch;
+      if (!recordWritable(epoch)) throw new Error('record-owner-changed');
+      const resolved = await resolveTeacherSource(context);
+      if (!recordWritable(epoch)) throw new Error('record-owner-changed');
+      if (resolved.context.id !== context.id) throw new Error('source-changed');
+      return resolved.aiAllowed === true;
+    },
+    // From Speak back to the tutor of the same sentence: re-select that exact context with acknowledged persistence,
+    // then leave through the frame that opened Speak (its draft, scroll and focus live there), never a new loop.
+    // `live` is the room's own guard: a learner who left, changed scene or lost the record keeps the generic path out.
+    openTutor: async (contextRef = null, live = null) => {
+      const ref = typeof contextRef === 'string' ? contextRef : null;
+      const invoker = document.activeElement;
+      const alive = () => S.view === 'speak' && (typeof live !== 'function' || live() === true);
+      if (!alive()) return false;
+      if (ref) {
+        const epoch = recordEpoch;
+        const module = await ensureTeacherContextModule();
+        if (!alive() || !recordWritable(epoch)) return false;
+        if (activeTeacherContext()?.id !== ref) {
+          const saved = await commitStorePatch((latest) => ({
+            teacherContexts: module.activateTeacherContext(latest.teacherContexts, ref),
+          }));
+          if (!saved || !alive() || !recordWritable(epoch)) return false;
+        }
+      }
+      if (!alive()) return false;
+      const home = S.navigationReturns.at(-1);
+      if (home?.destination === 'speak' && home.view === 'ai') {
+        speakRoom?.leave();
+        if (returnFromNavigation()) return true;
+        return false;
+      }
+      keepNavigationReturn('ai', invoker);
+      S.view = 'ai'; render(); window.scrollTo(0, 0);
+      return true;
+    },
     // V's lock as the app carries it: the VOICE_LOCK mirror that tools/sync-voice-lock.mjs generates from
     // audio/voice-lock.json (no fetch, no race). Where this build has no mirror yet, the room keeps speak-core's
     // checked fallback (VOICE_LOCK_FILE, equal to V's file whenever the file is in the tree).
