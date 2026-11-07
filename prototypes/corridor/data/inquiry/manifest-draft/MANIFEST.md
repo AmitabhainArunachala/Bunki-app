@@ -1,0 +1,276 @@
+# Inquiry-thread manifest draft
+
+This draft declares **one thread with three units**, following the 「敬語」 inquiry from noticing expressions to comparing sources and transferring the explanation. S3 does not specify a thread count, so MF5R must judge whether this count and coverage are adequate. Unit and item IDs are deterministic strings under the G9 identity convention. Every unit is outside the vocabulary schedule (`schedule_key: null`) and carries the S3-R16 compounding obligations.
+
+This is not frozen: MF5 alone performs the S13.8 freeze and any later hash. The draft's write set is only `prototypes/corridor/data/inquiry/manifest-draft/`; the schema and twin below are the files MF5 reads. J11 journey acceptance belongs to L3B.2, not this node.
+
+The author family is `moonshot`. Structural, prerequisite, and coverage review requires a verdict with `reviewer_family` and `model_id` from `zhipu`, `deepseek`, or `openai`; a verdict from the author family is invalid. Neither that review nor this draft certifies Japanese readings, meanings, or naturalness. Those judgments remain with native reviewers X4 through the obligations carried by each unit.
+
+```json manifest
+{
+  "manifest": "inquiry",
+  "version": 1,
+  "draft_date": "2026-11-07",
+  "frozen": false,
+  "freeze_date": null,
+  "author_family": "moonshot",
+  "unit_count": 3,
+  "thread_count": 1,
+  "j11_example_thread_id": "inquiry:thread:keigo-in-context",
+  "write_set": [
+    "prototypes/corridor/data/inquiry/manifest-draft/"
+  ],
+  "units": [
+    {
+      "id": "inquiry:unit:keigo-in-context:01-notice",
+      "thread_id": "inquiry:thread:keigo-in-context",
+      "title": "掲示と記事の「お」「ご」に気づく",
+      "outcomes": [
+        {
+          "kind": "can-do",
+          "text": "Can locate お知らせ, ご案内, and お願い in a selected passage and quote the whole sentence in which each expression occurs."
+        },
+        {
+          "kind": "inquiry",
+          "text": "What does the surrounding sentence suggest about why the writer chose お or ご, and which parts of that interpretation still need evidence?"
+        }
+      ],
+      "prerequisites": [],
+      "review_obligations": [
+        {
+          "actor_class": "native_reviewer_X4",
+          "check": "Verify that each quoted expression occurs in the cited passage and that its reading and naturalness are not inferred from the draft's English gloss."
+        },
+        {
+          "actor_class": "family_reviewer_MF5R",
+          "check": "Check that the inquiry question is answerable from linked evidence rather than from a vocabulary-schedule completion rule."
+        }
+      ],
+      "assessments": [
+        {
+          "check_type": "source-grounded-excerpt-markup",
+          "item_ids": [
+            "inquiry:item:keigo-in-context:01-notice:whole-sentence",
+            "inquiry:item:keigo-in-context:01-notice:expression-boundary"
+          ]
+        },
+        {
+          "check_type": "open-inquiry-record",
+          "item_ids": [
+            "inquiry:item:keigo-in-context:01-notice:initial-hypothesis"
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "id": "source:nhk-news-web-easy",
+          "kind": "news-reading",
+          "title": "NHK NEWS WEB EASY — やさしい日本語のニュース",
+          "route": "S3-R8: web capture → source inbox → reader"
+        },
+        {
+          "id": "source:bunka-cho-keigo-guideline",
+          "kind": "government-guideline",
+          "title": "文化庁『敬語の指針』（2007年）",
+          "route": "S3-R8: library reference → excerpt intake → reader"
+        }
+      ],
+      "compounding_obligations": [
+        {
+          "step": "earlier_reading_record",
+          "check": "Store the selected NHK NEWS WEB EASY passage, its whole-sentence quotations, and the learner's initial hypothesis before consulting the guideline.",
+          "source_id": "source:nhk-news-web-easy",
+          "evidence_store": "earlier_reading_record"
+        },
+        {
+          "step": "later_linked_evidence",
+          "check": "Link the relevant 敬語の指針 excerpt to each earlier quotation instead of replacing the earlier record.",
+          "source_id": "source:bunka-cho-keigo-guideline",
+          "evidence_store": "linked_evidence"
+        },
+        {
+          "step": "change_with_reason",
+          "check": "Record whether the initial interpretation of お or ご changed, unchanged, or remains unresolved, with a reason tied to the linked excerpt.",
+          "source_id": null,
+          "evidence_store": "interpretation_revision_log"
+        },
+        {
+          "step": "transfer_evidence",
+          "check": "Store a new whole-sentence example selected by the learner and its explanation in the evidence ledger, not in review grades.",
+          "source_id": null,
+          "evidence_store": "transfer_evidence_apart_from_review_grades"
+        }
+      ],
+      "schedule_key": null
+    },
+    {
+      "id": "inquiry:unit:keigo-in-context:02-compare",
+      "thread_id": "inquiry:thread:keigo-in-context",
+      "title": "資料を比べて敬語の分類を確かめる",
+      "outcomes": [
+        {
+          "kind": "can-do",
+          "text": "Can compare two cited accounts of 尊敬語, 謙譲語, and 丁寧語 and annotate where a sentence such as ご案内します makes the speaker's role relevant to the analysis."
+        },
+        {
+          "kind": "inquiry",
+          "text": "Does the second source support, complicate, or leave unresolved the first unit's interpretation of ご案内, and what is the exact textual reason?"
+        }
+      ],
+      "prerequisites": [
+        "inquiry:unit:keigo-in-context:01-notice"
+      ],
+      "review_obligations": [
+        {
+          "actor_class": "native_reviewer_X4",
+          "check": "Review the Japanese analysis of ご案内します, including its reading, speaker-role interpretation, and naturalness; the drafting family does not certify these as native-true."
+        },
+        {
+          "actor_class": "family_reviewer_MF5R",
+          "check": "Check that both sources are independently linked and that any disagreement or unresolved point remains visible in the learner record."
+        }
+      ],
+      "assessments": [
+        {
+          "check_type": "two-source-comparison",
+          "item_ids": [
+            "inquiry:item:keigo-in-context:02-compare:source-agreement",
+            "inquiry:item:keigo-in-context:02-compare:source-tension"
+          ]
+        },
+        {
+          "check_type": "reasoned-revision",
+          "item_ids": [
+            "inquiry:item:keigo-in-context:02-compare:revision-with-reason"
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "id": "source:bunka-cho-keigo-guideline",
+          "kind": "government-guideline",
+          "title": "文化庁『敬語の指針』（2007年）",
+          "route": "S3-R8: library reference → excerpt intake → reader"
+        },
+        {
+          "id": "source:nhk-language-handbook",
+          "kind": "broadcaster-language-reference",
+          "title": "NHK放送文化研究所『NHK ことばのハンドブック』",
+          "route": "S3-R8: reference lookup → excerpt intake → reader"
+        }
+      ],
+      "compounding_obligations": [
+        {
+          "step": "earlier_reading_record",
+          "check": "Load unit 01's unchanged 敬語の指針 excerpt, initial hypothesis, and linked news quotation as the earlier-reading record.",
+          "source_id": "source:bunka-cho-keigo-guideline",
+          "evidence_store": "earlier_reading_record"
+        },
+        {
+          "step": "later_linked_evidence",
+          "check": "Add a separately sourced NHK ことばのハンドブック excerpt and link it to the same interpretation, preserving support, tension, and uncertainty labels.",
+          "source_id": "source:nhk-language-handbook",
+          "evidence_store": "linked_evidence"
+        },
+        {
+          "step": "change_with_reason",
+          "check": "Write a new revision only when the comparison motivates it; name the source sentence and reason for every changed, retained, or unresolved judgment.",
+          "source_id": null,
+          "evidence_store": "interpretation_revision_log"
+        },
+        {
+          "step": "transfer_evidence",
+          "check": "Apply the comparison to a learner-selected request outside the two cited excerpts and save that work as transfer evidence separate from review grades.",
+          "source_id": null,
+          "evidence_store": "transfer_evidence_apart_from_review_grades"
+        }
+      ],
+      "schedule_key": null
+    },
+    {
+      "id": "inquiry:unit:keigo-in-context:03-transfer",
+      "thread_id": "inquiry:thread:keigo-in-context",
+      "title": "別の文脈へ移し、自分の説明を修正する",
+      "outcomes": [
+        {
+          "kind": "can-do",
+          "text": "Can examine お願い or ご案内 in a new literary or corpus context, explain the choice using linked evidence, and distinguish the quoted Japanese from the learner's interpretation."
+        },
+        {
+          "kind": "inquiry",
+          "text": "What survives when the explanation is transferred from a news or reference passage to a different register, and what must now be revised or asked of a native reviewer?"
+        }
+      ],
+      "prerequisites": [
+        "inquiry:unit:keigo-in-context:02-compare"
+      ],
+      "review_obligations": [
+        {
+          "actor_class": "native_reviewer_X4",
+          "check": "Judge the readings, meanings, register, and naturalness of the transferred Japanese examples and identify any learner-produced wording that should not be presented as native-true."
+        },
+        {
+          "actor_class": "family_reviewer_MF5R",
+          "check": "Check that the transfer artifact and review grades occupy separate records and that the final revision retains links to both its earlier reading and later evidence."
+        }
+      ],
+      "assessments": [
+        {
+          "check_type": "cross-register-transfer",
+          "item_ids": [
+            "inquiry:item:keigo-in-context:03-transfer:new-context",
+            "inquiry:item:keigo-in-context:03-transfer:evidence-linked-explanation"
+          ]
+        },
+        {
+          "check_type": "native-review-handoff",
+          "item_ids": [
+            "inquiry:item:keigo-in-context:03-transfer:uncertainty-questions"
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "id": "source:bccwj",
+          "kind": "balanced-corpus",
+          "title": "国立国語研究所『現代日本語書き言葉均衡コーパス』",
+          "route": "S3-R8: corpus query → excerpt intake → reader"
+        },
+        {
+          "id": "source:aozora-kokoro",
+          "kind": "literary-text",
+          "title": "青空文庫 — 夏目漱石『こころ』",
+          "route": "S3-R8: web capture → source inbox → reader"
+        }
+      ],
+      "compounding_obligations": [
+        {
+          "step": "earlier_reading_record",
+          "check": "Carry forward unit 02's corpus-query plan or selected excerpt together with the unchanged revision log and its source links.",
+          "source_id": "source:bccwj",
+          "evidence_store": "earlier_reading_record"
+        },
+        {
+          "step": "later_linked_evidence",
+          "check": "Link a whole-sentence こころ excerpt from 青空文庫 as independent later evidence; do not substitute it for the earlier corpus record.",
+          "source_id": "source:aozora-kokoro",
+          "evidence_store": "linked_evidence"
+        },
+        {
+          "step": "change_with_reason",
+          "check": "Revise the earlier cross-source explanation with an explicit reason that identifies the new register, the supporting quotation, and any remaining uncertainty.",
+          "source_id": null,
+          "evidence_store": "interpretation_revision_log"
+        },
+        {
+          "step": "transfer_evidence",
+          "check": "Save the final new-context analysis, native-review questions, and revision links in the transfer-evidence ledger apart from all review grades.",
+          "source_id": null,
+          "evidence_store": "transfer_evidence_apart_from_review_grades"
+        }
+      ],
+      "schedule_key": null
+    }
+  ]
+}
+```
