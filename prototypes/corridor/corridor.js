@@ -6173,6 +6173,76 @@ function renderContextDeck(main) {
   });
 }
 
+/** One optional starting path, kept as a quiet line on the shelf: no onboarding, no grade,
+ * no record. The state is this visit's only — a fresh visit starts folded. */
+let beginnerGuideOpen = false;
+function renderBeginnerGuide() {
+  const section = el('section', 'shelf-beginner');
+  section.dataset.japaneseLookup = 'off';
+  const start = biLabel('button', 'shelf-beginner-start', '日本語ではじめる', 'Start with Japanese');
+  start.type = 'button';
+  start.id = 'beginner-start';
+  start.setAttribute('aria-controls', 'beginner-guide');
+  start.setAttribute('aria-expanded', String(beginnerGuideOpen));
+
+  const guide = el('div', 'shelf-beginner-guide');
+  guide.id = 'beginner-guide';
+  guide.hidden = !beginnerGuideOpen;
+  guide.dataset.japaneseLookup = 'off';
+  const title = el('h2', 'shelf-beginner-title', tx('はじめての日本語', 'New to Japanese'));
+  title.id = 'beginner-guide-title';
+  const copy = el('p', 'shelf-beginner-copy', tx(
+    '短い読み物から始めます。語をタップすると読みと意味が出ます。語によっては、意味が出るまで何度かタップが必要です。残したい語は「保存」を押すと札になります。保存した札は、いつもの復習で見直せます。',
+    'Start with one short reading. Tap a word to see its reading and meaning — some words need a few taps before the meaning appears. Press Save to keep a word, and come back to study your saved words in the usual review.',
+  ));
+  const actions = el('div', 'shelf-beginner-actions');
+  const read = biLabel('button', 'shelf-beginner-go', '短い読み物をひらく', 'Start a short reading');
+  read.type = 'button';
+  read.id = 'beginner-read';
+  read.addEventListener('click', () => openPassage('bunki-graded-n5-morning'));
+  const study = biLabel('button', 'shelf-beginner-go shelf-beginner-go-quiet', '保存した札を復習する', 'Study saved words');
+  study.type = 'button';
+  study.id = 'beginner-study';
+  study.addEventListener('click', openBeginnerStudy);
+  actions.append(read, study);
+  guide.append(title, copy, actions);
+  guide.setAttribute('role', 'region');
+  guide.setAttribute('aria-labelledby', title.id);
+
+  start.addEventListener('click', () => {
+    beginnerGuideOpen = !beginnerGuideOpen;
+    guide.hidden = !beginnerGuideOpen;
+    start.setAttribute('aria-expanded', String(beginnerGuideOpen));
+  });
+  guide.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || !beginnerGuideOpen) return;
+    event.preventDefault();
+    beginnerGuideOpen = false;
+    guide.hidden = true;
+    start.setAttribute('aria-expanded', 'false');
+    start.focus();
+  });
+  section.append(start, guide);
+  return section;
+}
+
+/** The real queue, reached the same way the app's own Review door reaches it: Today in the
+ * current layout, Review itself in the layout under test. */
+function openBeginnerStudy() {
+  const places = placesLayout();
+  readerTicketDeparture(places ? 'dojo' : 'tray');
+  keepScroll();
+  S.stack = [];
+  if (places) {
+    S.view = 'dojo';
+  } else {
+    S.trayFrom = { view: 'shelf', scroll: Math.round(window.scrollY) };
+    S.view = 'tray';
+  }
+  render();
+  window.scrollTo(0, 0);
+}
+
 function renderShelf(main) {
   main.append(withEn(el('p', 'eyebrow', '回廊 · 図書館'), 'KAIRO · the library', 'en-inline'));
   renderScaleArticleReturn(main);
@@ -6525,7 +6595,8 @@ function renderShelfBody(search = null) {
   });
   // The title and lead story open the room; lookup and filters wait inside Tools.
   name.append(toolsToggle);
-  masthead.after(toolsBox);
+  const beginner = renderBeginnerGuide();
+  masthead.after(beginner, toolsBox);
   body.append(main);
   let matches = stories.filter(p => {
     const f=p.readingFacets || {};

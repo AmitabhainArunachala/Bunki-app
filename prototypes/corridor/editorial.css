@@ -990,6 +990,98 @@ html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srg
   box-shadow: 0 0 0 0.5px rgb(0 0 0 / 12%), 0 1px 3px rgb(0 0 0 / 12%);
 }
 
+/* the optional beginner path: one quiet line under the masthead, then a compact inline guide.
+   It never stands as a card over the shelf; its actions are the only filled controls. */
+.shelf-beginner {
+  display: grid;
+  justify-items: start;
+  gap: 2px;
+  min-width: 0;
+  margin: 0 0 var(--s3);
+}
+.shelf-beginner-start {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--tint);
+  font: 600 var(--type-control)/1.35 var(--sans);
+  text-align: start;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.24em;
+  cursor: pointer;
+}
+.shelf-beginner-start:hover { color: color-mix(in srgb, var(--tint) 78%, var(--label)); }
+.shelf-beginner-start[aria-expanded='true'] { color: var(--label); }
+.shelf-beginner-guide {
+  width: 100%;
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  max-width: 720px;
+  margin: 2px 0 0;
+  padding: 12px 16px 14px;
+  border-left: 2px solid var(--tint);
+  border-radius: 0 var(--radius-card) var(--radius-card) 0;
+  background: var(--surface-sunk);
+}
+.shelf-beginner-guide[hidden] { display: none; }
+.shelf-beginner-title {
+  margin: 0;
+  font: 700 var(--type-label)/1.35 var(--sans);
+  letter-spacing: 0.01em;
+  color: var(--label);
+}
+.shelf-beginner-copy {
+  max-width: 66ch;
+  margin: 0;
+  font: 400 var(--type-body)/1.6 var(--sans);
+  color: var(--label-2);
+  overflow-wrap: anywhere;
+}
+.shelf-beginner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+  margin-top: 4px;
+}
+.shelf-beginner-go {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--tint-wash);
+  color: var(--color-accent-label, var(--tint));
+  font: 600 var(--type-control)/1.35 var(--sans);
+  text-align: start;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+.shelf-beginner-go:hover { background: color-mix(in srgb, var(--tint) 18%, transparent); }
+.shelf-beginner-go-quiet {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--separator);
+  color: var(--label);
+}
+.shelf-beginner-go-quiet:hover { background: var(--fill); }
+@media (max-width: 520px) {
+  .shelf-beginner { gap: 2px 10px; }
+  .shelf-beginner-guide { padding: 10px 12px 12px; }
+  .shelf-beginner-actions { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .shelf-beginner-go { width: 100%; }
+}
+
 /* the filters: grey capsules with no outline; the native select lies over each, reaching 44px */
 .shelf-controls.shelf-chipbar {
   display: flex;
