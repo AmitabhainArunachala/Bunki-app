@@ -4,7 +4,7 @@
 import { openShelfDoor } from '../prototypes/corridor/tools/shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { spawn, spawnSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import {
   existsSync,
   mkdirSync,
@@ -37,6 +37,7 @@ const results = [];
 let server;
 let serverExit;
 let browser;
+let browserVersion = null;
 let site;
 let originalModule;
 
@@ -173,6 +174,7 @@ try {
     'real browser boots and executes the compiled core plus authored controller',
     async () => {
       browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
+      browserVersion = browser.version();
       const context = await browser.newContext();
       await silenceBrowserAudio(context);
       const errors = [];
@@ -254,6 +256,7 @@ try {
       assert.equal(child.status, 0, child.stderr || String(child.error));
       const bundleReceipt = JSON.parse(readFileSync(output + '.build.json'));
       browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
+      browserVersion = browser.version();
       const context = await browser.newContext();
       await silenceBrowserAudio(context);
       await context.setOffline(true);
@@ -436,6 +439,12 @@ try {
     JSON.stringify(
       {
         schemaVersion: 1,
+        runId: process.env.KAIRO_GATE_RUN_ID || randomUUID(),
+        verifierSha256: createHash('sha256')
+          .update(readFileSync(fileURLToPath(import.meta.url)))
+          .digest('hex'),
+        runtime: { engine: 'chromium', version: browserVersion },
+        sourceOnly: true,
         site,
         testAudioOutput: TEST_AUDIO_OUTPUT,
         audioSilenceHelperSha256: createHash('sha256')

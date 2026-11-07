@@ -1,0 +1,4834 @@
+{
+ "generator": "nihongo-srs tools/export_bunki_cards.py v1 (ruling 1250)",
+ "vocabSha256": "86814c0801e3c77bc34c4be47e4a1c5f6da926b6bc3df90692f77e258136e021",
+ "deck": "kotoba-master",
+ "count": 301,
+ "sources": [
+  "kotoba-mcd@08540b58"
+ ],
+ "cards": [
+  {
+   "term": "なぞかけ",
+   "reading": "なぞかけ",
+   "pos": "noun",
+   "meaning": "riddle-pun in a fixed format",
+   "defJa": "AとBの共通点を、しゃれで答える言葉遊び。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "寄席の大喜利で、司会者が客席からお題を募った。「ネクタイ」と声がかかると、落語家は少し考えてから「ネクタイとかけまして、宴会の幹事と解きます。その心は、どちらも最後の『しめ』が肝心」と見事ななぞかけを返した。",
+    "form": "なぞかけ",
+    "en": "During an improvisational comedy segment at a traditional variety theater, the host asked the audience to suggest a topic. When someone called out \"A necktie,\" the comic storyteller thought for a moment and came back with a clever riddle: \"How is a necktie like the organizer of a banquet? For both, the finishing touch is crucial: tying things up properly.\"",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "かつお節",
+   "reading": "かつおぶし",
+   "pos": "noun",
+   "meaning": "dried bonito flakes",
+   "defJa": "カツオを煮て干し、固くしたもの。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "祖母の台所では、朝いちばんに削り器でかつお節を削る音がしていた。削りたてを鍋に入れてひと煮立ちさせ、こせば、香りのいいだしが取れる。その日の味噌汁は、いつもこのだしから始まった。",
+    "form": "かつお節",
+    "en": "In my grandmother's kitchen, the first sound of the morning was dried bonito being shaved on a special grater. Putting the freshly shaved flakes in a pot, bringing it briefly to a boil, and straining it produced a fragrant stock. The day's miso soup always began with this stock.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "語呂合わせ",
+   "reading": "ごろあわせ",
+   "pos": "noun",
+   "meaning": "number-word pun",
+   "defJa": "数字などの音を、別の言葉に当てること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "年号や数字を覚えるとき、昔から頼りにされてきたのが語呂合わせだ。七九四年の平安京遷都は「鳴くよウグイス平安京」、ルート２は「一夜一夜に人見ごろ」。数字の羅列も、言葉に置き換えると不思議と忘れない。",
+    "form": "語呂合わせ",
+    "en": "People have long relied on sound-based wordplay to remember dates and numbers. The move of the capital to Heian-kyo in 794 is remembered with \"The bush warbler sings in Heian-kyo,\" and the square root of two with \"Night after night, people are a sight to behold.\" Strangely enough, even a string of numbers becomes hard to forget when it is turned into words.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "なんくるない",
+   "reading": "なんくるない",
+   "pos": "other",
+   "meaning": "it&#x27;ll all work out",
+   "defJa": "沖縄の言葉で、なんとかなるという意味。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "那覇の祖母は、私が受験に失敗して泣いていたとき、背中をさすりながら笑った。「なんくるないさ。まじめにやっていれば、道はちゃんと開けるよ」。あの一言に、何度救われたかわからない。",
+    "form": "なんくるない",
+    "en": "When I was crying after failing an entrance exam, my grandmother in Naha smiled as she rubbed my back. \"Things will work out. If you keep at it earnestly, a path will open up for you.\" I cannot count how many times those words have saved me.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "反射的に",
+   "reading": "はんしゃてきに",
+   "pos": "other",
+   "meaning": "by reflex, without thinking",
+   "defJa": "考えるより先に、体が自然に動いて。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "熱いフライパンの取っ手にうっかり触れた瞬間、反射的に手を引っ込めた。指先は少し赤くなったが、すぐに流水で冷やしたおかげで、水ぶくれにはならずに済んだ。",
+    "form": "反射的に",
+    "en": "The instant I accidentally touched the hot handle of a frying pan, I reflexively pulled my hand away. My fingertips turned a little red, but cooling them immediately under running water kept them from blistering.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "相乗",
+   "reading": "そうじょう",
+   "pos": "noun",
+   "meaning": "synergy",
+   "defJa": "重なって効果を強め合うこと。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "駅ビルの開業に合わせて、駅前の商店街も夜の営業時間を延ばした。ビルに来た客が商店街にも流れ、商店街の客もビルに立ち寄る。双方の売り上げがそろって伸びたのは、まさに相乗効果と言えるだろう。",
+    "form": "相乗",
+    "en": "To coincide with the opening of the station's shopping complex, the shopping street in front of the station extended its evening hours. Customers visiting the complex also came to the shopping street, and customers from the shopping street stopped by the complex as well. The resulting increase in sales on both sides could certainly be called a synergistic effect.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "箇所",
+   "reading": "かしょ",
+   "pos": "noun",
+   "meaning": "spot, part",
+   "defJa": "全体の中の、ある決まった部分や場所。",
+   "level": "N2",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "古い木造の実家は、雨が降るたびにあちこちで雨漏りがする。父と天井裏にのぼって調べると、傷んだ箇所が三つ見つかった。とりあえずそこだけ板を張り替え、本格的な修理は秋に業者に頼むことにした。",
+    "form": "箇所",
+    "en": "My family's old wooden house leaks in various places whenever it rains. When my father and I climbed into the attic to investigate, we found three damaged spots. For the time being, we replaced the boards only in those places and decided to have a contractor carry out proper repairs in the fall.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "落脱",
+   "reading": "らくだつ",
+   "pos": "noun",
+   "meaning": "omission in a text",
+   "defJa": "文章から文字や言葉がぬけ落ちること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "この写本は江戸時代に書き写されたもので、ところどころに文字の落脱がある。研究者は別系統の写本と一字ずつ突き合わせ、抜け落ちた語句を補いながら本文を復元していった。",
+    "form": "落脱",
+    "en": "This manuscript was copied during the Edo period, and characters are missing here and there. Researchers reconstructed the text by comparing it character by character with a manuscript from a different line of transmission and supplying the missing words and phrases.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "いざという時",
+   "reading": "いざというとき",
+   "pos": "other",
+   "meaning": "when it really counts",
+   "defJa": "大事なことや危ないことが起きたとき。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "祖母の家の押し入れには、水や乾パン、懐中電灯を詰めたリュックが今も置いてある。「いざという時に慌てても遅いからね」というのが口癖で、年に一度は中身を入れ替えている。",
+    "form": "いざという時",
+    "en": "Even now, a backpack packed with water, hardtack, and a flashlight sits in the closet at my grandmother's house. She often says, \"It'll be too late to panic when an emergency comes,\" and replaces its contents at least once a year.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "見分ける",
+   "reading": "みわける",
+   "pos": "verb",
+   "meaning": "to tell apart",
+   "defJa": "見て、ちがいや良い悪いを区別する。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "双子の姉妹は顔も声もそっくりで、担任の先生でさえなかなか見分けられない。ところが母親だけは、笑ったときにできるえくぼの位置で、一瞬でどちらかわかるそうだ。",
+    "form": "見分けられない",
+    "en": "The twin sisters look and sound so much alike that even their homeroom teacher has trouble telling them apart. Their mother alone, however, can apparently tell which is which in an instant by the positions of the dimples that appear when they smile.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "突入",
+   "reading": "とつにゅう",
+   "pos": "noun",
+   "meaning": "entering a new phase; storming",
+   "defJa": "勢いよく中へ入ること。新しい段階に入ること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "人質をとって立てこもっていた男に対し、警察は夜通し説得を続けたが、男は応じなかった。午前五時、機動隊が建物に突入し、男の身柄を確保した。人質は全員無事だった。",
+    "form": "突入",
+    "en": "The police spent the whole night trying to persuade a man who had barricaded himself inside with hostages, but he refused to cooperate. At five in the morning, riot police stormed the building and took him into custody. All the hostages were unharmed.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "勝ち残る",
+   "reading": "かちのこる",
+   "pos": "verb",
+   "meaning": "to win and advance",
+   "defJa": "勝って次の試合に進む。最後まで残る。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "全国から百二十八校が出場した夏の大会も、いよいよ大詰めを迎えた。強豪校が次々と姿を消す中、初出場の公立校が最後の四校まで勝ち残り、地元は大きな盛り上がりを見せている。",
+    "form": "勝ち残り",
+    "en": "The summer tournament, which began with 128 schools from across the country, has finally reached its closing stages. As powerhouse schools have been knocked out one after another, a public school making its first appearance has won its way into the final four, stirring great excitement in its hometown.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "ひらめく",
+   "reading": "ひらめく",
+   "pos": "verb",
+   "meaning": "to come to mind suddenly",
+   "defJa": "考えが急に頭にうかぶ。光が一瞬光る。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "新商品の名前がなかなか決まらず、企画会議は三時間も続いた。行き詰まって窓の外を眺めていたとき、ふと名案がひらめいた。急いでメモを取ってみんなに見せると、全員が「それだ！」と声をそろえた。",
+    "form": "ひらめいた",
+    "en": "The planning meeting dragged on for three hours because we could not settle on a name for the new product. Stuck for ideas, I was gazing out the window when a brilliant idea suddenly came to me. I hurriedly wrote it down and showed everyone, and they all exclaimed in unison, \"That's it!\"",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "最善",
+   "reading": "さいぜん",
+   "pos": "noun",
+   "meaning": "the very best",
+   "defJa": "いちばんよいこと。できるかぎりのこと。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "手術を前に、主治医は家族を集めてこう言った。「成功する確率は五分五分ですが、私たちは最善を尽くします」。母は黙ってうなずき、父の手をそっと握った。",
+    "form": "最善",
+    "en": "Before the operation, the attending doctor gathered the family and said, \"The chances of success are fifty-fifty, but we will do our very best.\" My mother nodded silently and gently took my father's hand.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "新体制",
+   "reading": "しんたいせい",
+   "pos": "noun",
+   "meaning": "new setup; new leadership",
+   "defJa": "組織などの、新しくなった仕組みや顔ぶれ。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "長年チームを率いた監督が退任し、今季は新しい監督とコーチ陣による新体制で開幕を迎える。主将も若手に代わり、顔ぶれは大きく様変わりし、ファンの間では期待と不安が入り交じっている。",
+    "form": "新体制",
+    "en": "The manager who led the team for many years has stepped down, and the team will begin this season under a new manager and coaching staff. A younger player has also taken over as captain, and with so many changes to the personnel, fans are feeling a mixture of anticipation and anxiety.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "霊魂不滅",
+   "reading": "れいこんふめつ",
+   "pos": "noun",
+   "meaning": "immortality of the soul",
+   "defJa": "死んだ後も、たましいは消えずに残るという考え。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "古代エジプトの人々は、死後も魂は生き続けると考えていた。遺体をミイラにして丁寧に保存したのも、この霊魂不滅の信仰があったからだ。魂が戻ってくるための体を、残しておく必要があったのである。",
+    "form": "霊魂不滅",
+    "en": "The ancient Egyptians believed that the soul continued to live after death. It was this belief in the immortality of the soul that led them to mummify bodies and preserve them carefully. They needed to leave a body for the soul to return to.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "見地",
+   "reading": "けんち",
+   "pos": "noun",
+   "meaning": "standpoint",
+   "defJa": "物事を判断するときの立場。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "新しい薬が承認されるまでには長い年月がかかる。病気によく効くというだけでは足りず、安全性の見地からも厳しい審査を受けなければならないからだ。",
+    "form": "見地",
+    "en": "It takes many years for a new medicine to be approved. Being effective against a disease is not enough; it must also undergo rigorous scrutiny from the standpoint of safety.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "各部",
+   "reading": "かくぶ",
+   "pos": "noun",
+   "meaning": "each part",
+   "defJa": "全体をつくっている、それぞれの部分。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "車検では、ブレーキやライト、タイヤなど、車の各部を一つずつ点検していく。不具合が見つかれば部品を交換し、すべての検査に合格して初めて、再び公道を走れるようになる。",
+    "form": "各部",
+    "en": "During a vehicle inspection, each part of the car, including the brakes, lights, and tires, is checked individually. If a problem is found, the relevant parts are replaced, and only after the car passes every inspection can it be driven on public roads again.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "攪拌",
+   "reading": "かくはん",
+   "pos": "noun",
+   "meaning": "stirring",
+   "defJa": "液体などをかき回して混ぜること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "工場のタンクでは、原料の液体が沈殿しないよう、底に取り付けた羽根で絶えず攪拌している。かき混ぜる速度が遅すぎると成分が分離し、製品の品質にむらが出てしまうからだ。",
+    "form": "攪拌",
+    "en": "In the factory's tank, blades fitted at the bottom constantly stir the liquid raw materials to keep them from settling. If the stirring is too slow, the components separate, causing inconsistencies in product quality.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "床の間",
+   "reading": "とこのま",
+   "pos": "noun",
+   "meaning": "alcove in a tatami room",
+   "defJa": "和室の奥の、掛け軸や花を飾る所。",
+   "level": "N2",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "和室の床の間には、季節ごとに掛け軸を掛け替えるのが祖父の楽しみだった。正月には松の絵、夏には滝の絵。その下に一輪挿しを置くと、六畳の部屋がきりっと引き締まった。",
+    "form": "床の間",
+    "en": "My grandfather enjoyed changing the hanging scroll in the alcove of the Japanese-style room with each season. At New Year's, it was a painting of a pine tree; in summer, a waterfall. Placing a single-flower vase beneath it gave the six-mat room a crisp, composed look.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "分留",
+   "reading": "ぶんりゅう",
+   "pos": "noun",
+   "meaning": "fractional distillation",
+   "defJa": "沸く温度の差で液体の混ざり物を分けること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "原油は、そのままではほとんど使い道がない。製油所では原油を加熱し、沸点の違いを利用して分留することで、ガソリンや灯油、軽油などに分けていく。",
+    "form": "分留",
+    "en": "Crude oil has very few uses in its unprocessed state. At a refinery, it is heated and separated into gasoline, kerosene, diesel fuel, and other products through fractional distillation, which takes advantage of their different boiling points.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "自ずと",
+   "reading": "おのずと",
+   "pos": "other",
+   "meaning": "naturally, of itself",
+   "defJa": "何もしなくても、自然にそうなる様子。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "毎日少しずつでも書き続けていると、文章のリズムは自ずと身についてくる。最初から上手に書こうと気負う必要はない。量をこなすうちに、自分らしい言い回しも見えてくるはずだ。",
+    "form": "自ずと",
+    "en": "If you keep writing every day, even a little at a time, you will naturally develop a feel for the rhythm of prose. There is no need to put pressure on yourself to write well from the start. As you write more, you should also begin to discover turns of phrase that feel like your own.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "正直",
+   "reading": "しょうじき",
+   "pos": "other",
+   "meaning": "honest; honestly",
+   "defJa": "うそやごまかしがないこと。",
+   "level": "N3",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "「この服、似合ってる？」と妻に聞かれ、夫は少し迷ってから正直に答えた。「色はいいけど、サイズが大きすぎると思う」。妻は不満そうな顔をしたが、翌日その服を返品しに行った。",
+    "form": "正直",
+    "en": "\"Does this look good on me?\" his wife asked, and after hesitating a little, her husband answered honestly. \"The color is nice, but I think it's too big.\" His wife looked displeased, but the next day she went to return it.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "率直に言って",
+   "reading": "そっちょくにいって",
+   "pos": "other",
+   "meaning": "frankly speaking",
+   "defJa": "遠慮せずに、思ったとおりに言えば。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "新しいデザイン案を見せられた部長は、しばらく黙り込んでいた。「率直に言って、これでは前の案と大して変わらないね。もっと思い切った提案がほしい」。チームの全員が肩を落とした。",
+    "form": "率直に言って",
+    "en": "After being shown the new design proposal, the department head remained silent for a while. \"Frankly, this isn't much different from the previous proposal. I want something bolder.\" Everyone on the team slumped in disappointment.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "迷信",
+   "reading": "めいしん",
+   "pos": "noun",
+   "meaning": "superstition",
+   "defJa": "根拠がないのに昔から信じられていること。",
+   "level": "N2",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "祖母は、夜に爪を切ると親の死に目に会えないと信じていた。根拠のない迷信だと笑っても、本人は真顔で首を振る。おかげで私は今でも、夜になると爪切りに手が伸びない。",
+    "form": "迷信",
+    "en": "My grandmother believed that if you cut your nails at night, you would not be there when your parents died. Even when I laughed it off as a baseless superstition, she shook her head with a serious expression. As a result, even now I cannot bring myself to reach for the nail clippers at night.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "背く",
+   "reading": "そむく",
+   "pos": "verb",
+   "meaning": "disobey, go against",
+   "defJa": "決まりや言いつけ、期待に逆らう。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "医師からは酒を控えるよう強く言われていたのに、父はその言いつけに背いて晩酌を続けた。案の定、次の検査では数値がさらに悪くなっていて、医師にこっぴどく叱られた。",
+    "form": "背いて",
+    "en": "Although his doctor had firmly told him to cut back on alcohol, my father went against those instructions and continued his evening drinks. Sure enough, his readings were even worse at his next checkup, and the doctor gave him a severe scolding.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "定量的",
+   "reading": "ていりょうてき",
+   "pos": "other",
+   "meaning": "quantitative",
+   "defJa": "数や量で表して調べる様子。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "「なんとなく売れていない」では会議は進まない。どの商品が、いつ、何個売れたのかを数字で示し、定量的に分析して初めて、具体的な対策が見えてくる。",
+    "form": "定量的",
+    "en": "Saying \"It just feels like things aren't selling\" will not move a meeting forward. Only by presenting figures showing which products sold, when, and in what quantities, and analyzing them quantitatively, can concrete measures begin to emerge.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "断続的",
+   "reading": "だんぞくてき",
+   "pos": "other",
+   "meaning": "intermittent, on and off",
+   "defJa": "切れたり続いたりをくり返す様子。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "台風の影響で、昨夜から雨が断続的に降り続いている。気象庁は、土砂災害への警戒を呼びかけている。",
+    "form": "断続的",
+    "en": "Because of the typhoon, rain has been falling on and off since last night. The Japan Meteorological Agency is urging people to stay alert for landslides.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "下敷き",
+   "reading": "したじき",
+   "pos": "noun",
+   "meaning": "plastic writing pad; basis",
+   "defJa": "字を書くとき紙の下に敷く板。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "小学生の娘が、新しい下敷きを嬉しそうに見せてくれた。好きなキャラクターの絵が描いてある。これをノートのページの間に挟んでおくと、鉛筆の字がきれいに書けるし、下のページに跡も残らないのだという。",
+    "form": "下敷き",
+    "en": "My daughter, who is in elementary school, happily showed me her new writing board. It has a picture of her favorite character on it. She says that slipping it between the pages of her notebook lets her write neatly in pencil without leaving indentations on the page underneath.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "下敷きになる",
+   "reading": "したじきになる",
+   "pos": "other",
+   "meaning": "be pinned underneath",
+   "defJa": "重い物の下に押さえつけられる。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "昨夜の地震で、市内では古い木造住宅の屋根が崩れ落ちた。一人暮らしの高齢の男性が崩れた家の下敷きになったが、駆けつけた近所の人たちに助け出され、命に別状はないという。",
+    "form": "下敷きになった",
+    "en": "During last night's earthquake, the roof of an old wooden house in the city collapsed. An elderly man living alone was trapped beneath the collapsed house, but neighbors who rushed to the scene rescued him, and his life is reportedly not in danger.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "帰納的関数",
+   "reading": "きのうてきかんすう",
+   "pos": "noun",
+   "meaning": "recursive function (logic)",
+   "defJa": "決まった操作のくり返しで作られる、計算できる関数。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "足し算は「1を足す」操作の繰り返しで、掛け算は足し算の繰り返しで定義できる。このように、ごく簡単な関数から決まった規則で次々に組み立てられる関数を帰納的関数という。どんな関数なら計算できるのかを考える際の、出発点となる概念だ。",
+    "form": "帰納的関数",
+    "en": "Addition can be defined as repeating the operation \"add one,\" and multiplication as repeating addition. Functions built up step by step from very simple functions according to fixed rules in this way are called recursive functions. This concept is a starting point for considering what kinds of functions can be computed.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "帰納的",
+   "reading": "きのうてき",
+   "pos": "other",
+   "meaning": "inductive",
+   "defJa": "いくつもの例から、一般的な結論を出すようす。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "白鳥を何千羽見ても、すべて白かったからといって「白鳥はみな白い」とは言い切れない。実際、オーストラリアでは黒い白鳥が見つかっている。個々の事例から一般的な法則を導く帰納的な推論には、こうした落とし穴がつきものだ。",
+    "form": "帰納的",
+    "en": "Even if you see thousands of swans and every one is white, you cannot say with certainty that \"all swans are white.\" In fact, black swans have been found in Australia. Such pitfalls are inherent in inductive reasoning, which derives general laws from individual cases.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "機能的",
+   "reading": "きのうてき",
+   "pos": "other",
+   "meaning": "functional, practical",
+   "defJa": "むだがなく、使う目的によく合っているようす。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "狭い台所でも、よく使う鍋や調味料をコンロの近くにまとめるだけで、ずっと機能的になる。見た目のおしゃれさより、まず動きやすさを考えるのが片づけのコツだ。",
+    "form": "機能的",
+    "en": "Even a cramped kitchen becomes much more functional just by keeping frequently used pots and seasonings together near the stove. The trick to organizing it is to think first about ease of movement rather than stylish looks.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "磁気共鳴",
+   "reading": "じききょうめい",
+   "pos": "noun",
+   "meaning": "magnetic resonance",
+   "defJa": "強い磁場の中で原子核が電波に反応する現象。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "MRIは、磁気共鳴という現象を利用して体の内部を画像にする検査だ。強い磁石と電波を使うため、X線検査のように被ばくする心配はないが、検査中はかなり大きな音がする。",
+    "form": "磁気共鳴",
+    "en": "MRI is an examination that uses a phenomenon called magnetic resonance to produce images of the inside of the body. Because it uses strong magnets and radio waves, there is no need to worry about radiation exposure as with an X-ray examination, but it makes quite a lot of noise during the scan.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "磁気共鳴断層撮影",
+   "reading": "じききょうめいだんそうさつえい",
+   "pos": "noun",
+   "meaning": "MRI scan",
+   "defJa": "磁石と電波で体の断面を画像にする検査。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "頭痛が続くため、父は病院で磁気共鳴断層撮影、いわゆるMRI検査を受けた。大きな磁石の筒の中に二十分ほど横になっていたが、工事のような音が響いて落ち着かなかったという。結果は異常なしだった。",
+    "form": "磁気共鳴断層撮影",
+    "en": "Because his headaches persisted, my father went to the hospital for magnetic resonance imaging, commonly known as an MRI scan. He lay inside a tube containing a large magnet for about twenty minutes, but he said that the construction-like noises echoing around him made it hard to relax. The results showed no abnormalities.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "石版",
+   "reading": "せきばん",
+   "pos": "noun",
+   "meaning": "lithographic stone",
+   "defJa": "絵を描いて印刷に使う平らな石の板。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "石版印刷では、平らな石の表面に油性のクレヨンで直接絵を描く。水と油がはじき合う性質を利用して、描いた部分にだけインクをのせ、それを紙に刷り取るのだ。",
+    "form": "石版",
+    "en": "In stone lithography, a picture is drawn directly onto the surface of a flat stone with an oil-based crayon. Taking advantage of the fact that water and oil repel each other, ink is applied only to the drawn areas, and the image is then printed onto paper.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "刈り込む",
+   "reading": "かりこむ",
+   "pos": "verb",
+   "meaning": "trim, prune",
+   "defJa": "枝や草、髪を切って形を整える。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "梅雨入りの前に、伸び放題だった庭の生け垣を刈り込むことにした。祖父が使っていた大きな植木ばさみを持ち出し、上から少しずつ形を整えていく。一時間ほどで、見違えるほどすっきりした。",
+    "form": "刈り込む",
+    "en": "Before the rainy season began, I decided to trim the garden hedge, which had been left to grow unchecked. I brought out the large hedge shears my grandfather used to use and gradually shaped it from the top down. After about an hour, it looked so neat that it was hardly recognizable.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "滑稽",
+   "reading": "こっけい",
+   "pos": "other",
+   "meaning": "comical; ridiculous",
+   "defJa": "思わず笑いたくなるようなおかしさ。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "大真面目な顔で傘を差したまま、男は噴水の縁を綱渡りのようにそろそろと歩いていく。本人が真剣であればあるほど、その姿は滑稽で、見ていた子どもたちは腹を抱えて笑った。",
+    "form": "滑稽",
+    "en": "With a completely serious expression and an open umbrella held over him, the man inched along the rim of the fountain as though walking a tightrope. The more earnest he was, the more comical he looked, and the children watching clutched their stomachs with laughter.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "失読症",
+   "reading": "しつどくしょう",
+   "pos": "noun",
+   "meaning": "dyslexia",
+   "defJa": "知能に問題がないのに、字を読むのが難しい状態。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "息子は話すのが得意で、算数もよくできた。ところが教科書を音読させると、一行進むのにひどく時間がかかる。専門の医師に診てもらい、失読症だとわかったのは小学三年生のときだった。",
+    "form": "失読症",
+    "en": "My son was good at speaking and did well in arithmetic too. Yet when asked to read his textbook aloud, he took an awfully long time to get through a single line. He was in the third grade of elementary school when a specialist examined him and we learned that he had dyslexia.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "難読",
+   "reading": "なんどく",
+   "pos": "noun",
+   "meaning": "hard to read (of kanji)",
+   "defJa": "読み方がむずかしく、正しく読める人が少ないこと。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "「百足」や「海月」は、難読漢字としてよく知られている。答えはムカデとクラゲだ。普段はカタカナで書かれることが多いので、漢字で見せられると読めない人がほとんどだろう。",
+    "form": "難読",
+    "en": "The character combinations \"hundred feet\" and \"sea moon\" are well-known examples of difficult-to-read kanji. The answers are \"centipede\" and \"jellyfish.\" Since these words are usually written in katakana, most people probably cannot read them when shown the kanji spellings.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "格闘",
+   "reading": "かくとう",
+   "pos": "noun",
+   "meaning": "grappling; wrestling with",
+   "defJa": "組み合って戦うこと。難しいことに取り組むこと。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "閉店後の店内に忍び込んだ男は、見回りに来た警備員ともみ合いになった。数分間の格闘の末に男は取り押さえられ、通報で駆けつけた警察官に引き渡された。警備員は腕に軽いけがをしたという。",
+    "form": "格闘",
+    "en": "A man who had sneaked into a store after closing got into a scuffle with a security guard making the rounds. After several minutes of struggling, the man was subdued and handed over to police officers who arrived in response to the call. The guard reportedly suffered a minor injury to his arm.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "格闘家",
+   "reading": "かくとうか",
+   "pos": "noun",
+   "meaning": "martial artist, fighter",
+   "defJa": "戦う競技を仕事にしている人。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "総合格闘技のリングに上がる格闘家は、試合の一か月前から厳しい減量に入る。計量で一グラムでも超えれば、試合そのものが成立しなくなるからだ。食事を細かく管理しながら、毎日のスパーリングで体を追い込んでいく。",
+    "form": "格闘家",
+    "en": "Fighters who enter the mixed martial arts ring begin a strict weight-cutting regimen a month before a match. This is because if they are even one gram over the limit at the weigh-in, the match itself cannot go ahead. While carefully controlling their diets, they push their bodies hard in daily sparring sessions.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "演習",
+   "reading": "えんしゅう",
+   "pos": "noun",
+   "meaning": "exercises; drills; seminar",
+   "defJa": "本番のように行う練習。大学の少人数授業。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "大地震を想定し、市役所では毎年秋に防災演習を行っている。職員はヘルメットをかぶって庁舎の外へ避難し、負傷者の搬送や安否確認の手順を本番さながらに確かめる。",
+    "form": "演習",
+    "en": "Every fall, city hall conducts a disaster preparedness drill based on the scenario of a major earthquake. Staff put on helmets and evacuate the building, practicing the procedures for transporting the injured and checking everyone's safety as though it were a real emergency.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "模索",
+   "reading": "もさく",
+   "pos": "noun",
+   "meaning": "searching for a way",
+   "defJa": "手がかりが少ない中で、方法を探すこと。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "人口が減り続ける山あいの町では、空き家を若い移住者に格安で貸し出すなど、生き残りの道を模索している。まだ手探りの段階だが、昨年は三世帯が新たに移り住んだ。",
+    "form": "模索",
+    "en": "A mountain town whose population continues to shrink is exploring ways to survive, including renting vacant homes to young newcomers at very low prices. It is still feeling its way, but three new households moved there last year.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "まな板",
+   "reading": "まないた",
+   "pos": "noun",
+   "meaning": "cutting board",
+   "defJa": "包丁で食材を切るときに下に置く板。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "生の肉を切ったあとは、まな板を熱湯でよく洗ってから野菜を切ること。料理教室の先生は、包丁の使い方よりも先に、まずこれを徹底して教えてくれた。",
+    "form": "まな板",
+    "en": "After cutting raw meat, wash the cutting board thoroughly with boiling water before cutting vegetables. My cooking teacher made sure we learned this before even teaching us how to use a knife.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "たくらむ",
+   "reading": "たくらむ",
+   "pos": "verb",
+   "meaning": "scheme, be up to something",
+   "defJa": "よくないことを、こっそり計画する。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "弟がにやにやしながら、台所の様子をうかがっている。また何かたくらんでいるに違いない。案の定、夕食のあと、冷蔵庫のプリンが一つ消えていた。口のまわりにはカラメルがついていた。",
+    "form": "たくらんで",
+    "en": "My younger brother is grinning as he peeks into the kitchen to see what is going on. He must be plotting something again. Sure enough, after dinner, one of the custard puddings in the refrigerator was gone. There was caramel around his mouth.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "途切れ途切れ",
+   "reading": "とぎれとぎれ",
+   "pos": "other",
+   "meaning": "in broken bits, on and off",
+   "defJa": "続かずに、何度も切れるようす。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "山奥の旅館に着くと、スマートフォンの電波は一本しか立たなかった。東京の母に電話をかけてみたが、声は途切れ途切れにしか聞こえず、結局「また明日かけるね」とだけ言って切った。",
+    "form": "途切れ途切れ",
+    "en": "When I arrived at the inn deep in the mountains, my smartphone had only one bar of reception. I tried calling my mother in Tokyo, but her voice kept cutting in and out, so in the end I just said, \"I'll call again tomorrow,\" and hung up.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "俯瞰",
+   "reading": "ふかん",
+   "pos": "noun",
+   "meaning": "looking down from above",
+   "defJa": "高い所から見下ろすこと。全体を広く見ること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "展望台に上ると、街全体を俯瞰することができた。地上を歩いているときはごちゃごちゃして見えた路地も、上から眺めると碁盤の目のように整然と並んでいる。",
+    "form": "俯瞰",
+    "en": "When I climbed up to the observation deck, I could see the entire city from above. Even the alleys that had seemed jumbled while I was walking through them at ground level were arranged as neatly as a grid when viewed from above.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "照準",
+   "reading": "しょうじゅん",
+   "pos": "noun",
+   "meaning": "aim; target",
+   "defJa": "ねらいを合わせること。その目標。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "狙撃手はスコープをのぞき込み、十字線の中心に遠くの標的をとらえた。風の向きと強さを読みながら、慎重に照準を合わせる。息を止めて引き金に指をかけると、あたりの物音がすっと遠のいた。",
+    "form": "照準",
+    "en": "The sniper peered through the scope and centered the distant target in the crosshairs. Reading the wind's direction and strength, he carefully adjusted his aim. As he held his breath and placed his finger on the trigger, the sounds around him seemed to fade into the distance.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "浮き立つ",
+   "reading": "うきたつ",
+   "pos": "verb",
+   "meaning": "feel cheerful and excited",
+   "defJa": "楽しいことを思って、心がうきうきする。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "明日から待ちに待った夏休みだ。終業式の帰り道、子どもたちは気持ちが浮き立つのを抑えきれず、ランドセルを鳴らしながら駆けていった。海へ行く子、祖父母の家に泊まる子、それぞれの夏が始まる。",
+    "form": "浮き立つ",
+    "en": "The long-awaited summer vacation starts tomorrow. On their way home from the end-of-term ceremony, the children could not contain their excitement and ran off with their school backpacks rattling. Some would go to the beach and others would stay with their grandparents; each child's summer was beginning.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "灼熱",
+   "reading": "しゃくねつ",
+   "pos": "noun",
+   "meaning": "scorching heat",
+   "defJa": "焼けるように熱いこと。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "八月の甲子園は、まさに灼熱の戦いだ。気温は三十五度を超え、グラウンドの照り返しで体感温度はさらに上がる。それでも球児たちは、最後まで全力で白球を追い続けた。",
+    "form": "灼熱",
+    "en": "The August tournament at Koshien is truly a battle in scorching heat. Temperatures exceed 35 degrees Celsius, and heat reflected off the field makes it feel even hotter. Even so, the young baseball players kept chasing the white ball with all their might right to the end.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "反抗的",
+   "reading": "はんこうてき",
+   "pos": "other",
+   "meaning": "rebellious, defiant",
+   "defJa": "目上の人に逆らおうとするようす。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "中学二年になった息子は、最近すっかり反抗的になった。何か言えば「うるさい」と返し、部屋にこもったまま出てこない。夫は「自分もあの頃はそうだった」と笑っている。",
+    "form": "反抗的",
+    "en": "My son, now in his second year of junior high school, has become thoroughly rebellious lately. Whenever I say anything, he snaps, \"Shut up,\" and stays shut away in his room. My husband laughs and says, \"I was like that at his age too.\"",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "一層",
+   "reading": "いっそう",
+   "pos": "other",
+   "meaning": "even more",
+   "defJa": "前よりもさらに。もっと。",
+   "level": "N3",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "夕方から降り出した雨は、夜になって一層激しさを増した。川の水位が急に上がり始めたため、市は川沿いの低い土地に住む人たちに、早めの避難を呼びかけている。",
+    "form": "一層",
+    "en": "The rain that began falling in the evening grew even heavier as night fell. Because the river's water level has begun rising rapidly, the city is urging people living in low-lying areas along the river to evacuate early.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "起点",
+   "reading": "きてん",
+   "pos": "noun",
+   "meaning": "starting point",
+   "defJa": "物事や道が始まるところ。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "東海道は、江戸の日本橋を起点として京都の三条大橋まで続く街道だ。日本橋には今も「日本国道路元標」が埋め込まれており、全国の国道の距離はここから測られている。",
+    "form": "起点",
+    "en": "The Tokaido is a highway that begins at Nihonbashi in Edo and runs to the Sanjo Bridge in Kyoto. The \"Origin Marker of Japan's Roads\" is still embedded at Nihonbashi, and distances along national highways throughout the country are measured from this point.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "分業",
+   "reading": "ぶんぎょう",
+   "pos": "noun",
+   "meaning": "division of labor",
+   "defJa": "仕事を分けて、それぞれが受け持つこと。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "町の小さなパン屋では、夫が生地をこね、妻が焼き上げと接客を受け持つ。夫婦で分業するようになってから、一日に焼ける数が倍近くに増え、今では行列のできる店になったという。",
+    "form": "分業",
+    "en": "At a small bakery in town, the husband kneads the dough while the wife handles the baking and serves customers. Since the couple began dividing the work, the number of items they can bake in a day has reportedly almost doubled, and customers now line up outside the shop.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "共謀",
+   "reading": "きょうぼう",
+   "pos": "noun",
+   "meaning": "conspiring to commit a crime",
+   "defJa": "二人以上で悪いことをひそかに相談すること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "元社長と経理部長が共謀し、会社の資金およそ三億円を私的に流用していた疑いが強まった。二人は架空の取引先への支払いを装い、数年にわたって金を引き出していたという。",
+    "form": "共謀",
+    "en": "Suspicions have grown that the former company president and the head of accounting conspired to divert about 300 million yen in company funds for personal use. The two reportedly withdrew money over several years by disguising it as payments to fictitious business partners.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "かなめ",
+   "reading": "かなめ",
+   "pos": "noun",
+   "meaning": "the key point, linchpin",
+   "defJa": "物事のいちばん大事なところ。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "このチームの守備のかなめは、キャプテンの佐藤選手だ。最後尾から声を出し続ける彼がいるからこそ、若い選手たちも落ち着いて動ける。けがで欠場した試合では、守りが崩れて大量失点した。",
+    "form": "かなめ",
+    "en": "The linchpin of this team's defense is its captain, Sato. It is precisely because he keeps calling out instructions from the back that the younger players can stay calm as they move. In a match he missed through injury, the defense fell apart and the team conceded heavily.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "命運",
+   "reading": "めいうん",
+   "pos": "noun",
+   "meaning": "fate, make-or-break fortune",
+   "defJa": "生き残るか滅びるかを決めるめぐり合わせ。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "業績の悪化が続く老舗の家電メーカーにとって、来月発売する新型の冷蔵庫は、まさに会社の命運を握る商品だ。社長自ら開発の現場に足を運び、細かい部分まで指示を出している。",
+    "form": "命運",
+    "en": "For a long-established home appliance manufacturer whose business performance continues to deteriorate, the new refrigerator due to go on sale next month is truly a product on which the company's fate depends. The president personally visits the development team and gives instructions down to the smallest details.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "理学",
+   "reading": "りがく",
+   "pos": "noun",
+   "meaning": "natural science (as a field)",
+   "defJa": "物理や化学など、自然のしくみを研究する学問。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "理学と工学は似ているようで、目指すものが違う。前者は自然の仕組みそのものを解き明かそうとし、後者はその知識を使って、人の役に立つものを作ろうとする。",
+    "form": "理学",
+    "en": "The natural sciences and engineering may seem similar, but they have different aims. The former seek to understand how nature itself works, while the latter seek to use that knowledge to make things that benefit people.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "財政",
+   "reading": "ざいせい",
+   "pos": "noun",
+   "meaning": "public finances",
+   "defJa": "国や自治体のお金のやりくり。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "人口が減り、税収も年々落ち込んでいる。市の財政はすでに限界に近く、来年度は図書館の開館日を減らすことになった。",
+    "form": "財政",
+    "en": "The population is shrinking, and tax revenues are falling year after year. The city's finances are already stretched close to the limit, and it has been decided that the library will open on fewer days next fiscal year.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "資金",
+   "reading": "しきん",
+   "pos": "noun",
+   "meaning": "funds",
+   "defJa": "ある目的のために用意するお金。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "商店街の空き店舗でカフェを開こうと、元会社員の女性は五年かけて開業資金を貯めた。足りない分は市の融資制度で補い、この春ようやく念願の店を開いた。",
+    "form": "資金",
+    "en": "Hoping to open a cafe in a vacant shop on the shopping street, a woman who used to work for a company spent five years saving the money to start her business. She made up the shortfall through the city's loan program and finally opened her long-dreamed-of cafe this spring.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "利回り",
+   "reading": "りまわり",
+   "pos": "noun",
+   "meaning": "investment yield",
+   "defJa": "投資したお金に対するもうけの割合。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "銀行の定期預金に預けても、利回りは年0.1%にも満たない。そこで最近は、少額から始められる投資信託や個人向け国債に目を向ける人が増えている。",
+    "form": "利回り",
+    "en": "Even putting money in a bank time deposit yields less than 0.1% a year. As a result, more people have recently been turning to investment trusts and government bonds for individuals, which allow them to start with small amounts.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "妨害",
+   "reading": "ぼうがい",
+   "pos": "noun",
+   "meaning": "obstruction; interference",
+   "defJa": "人の行動や物事の進行をわざとじゃますること。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "近年、紛争地域の周辺を中心に、衛星測位の電波を狙った妨害が相次いで報告されている。位置情報が狂うと、航空機や船舶が正しい航路を見失う恐れがある。ある航空会社では、飛行中の機体の位置が実際より数十キロもずれて表示される事例が何度も起きた。専門家は、衛星だけに頼らない航法の仕組みを早急に整えるべきだと訴えている。",
+    "form": "妨害",
+    "en": "In recent years, repeated incidents of interference targeting satellite positioning signals have been reported, mainly around conflict zones. If location data becomes inaccurate, aircraft and ships risk losing their correct course. One airline has repeatedly experienced cases in which a plane's position during flight was displayed tens of kilometers from its actual location. Experts are calling for navigation systems that do not rely solely on satellites to be put in place urgently.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "立ち位置",
+   "reading": "たちいち",
+   "pos": "noun",
+   "meaning": "position; role among others",
+   "defJa": "周りとの関係の中でしめる場所や役割。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "五人組アイドルグループの最年少メンバーは、デビュー当時、自分の立ち位置がわからずに悩んでいたという。歌もダンスも得意な先輩に囲まれ、何をすればいいのか見えなかったのだ。今ではトークの面白さを買われ、バラエティー番組に引っ張りだこだ。",
+    "form": "立ち位置",
+    "en": "The youngest member of a five-person idol group reportedly struggled to find their place in the group when they debuted. Surrounded by more experienced members who excelled at both singing and dancing, they could not see what they should do. Now, their entertaining conversation is highly valued, and they are in constant demand on variety shows.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "悲観",
+   "reading": "ひかん",
+   "pos": "noun",
+   "meaning": "pessimism, despair",
+   "defJa": "うまくいかないと考えて望みを失うこと。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "第一志望の大学に落ちた弟は、すっかり悲観して部屋に閉じこもってしまった。見かねた母は「人生はこれで終わりじゃないよ」と声をかけ、弟の好物のカレーを作った。",
+    "form": "悲観",
+    "en": "After failing to get into his first-choice university, my younger brother lost all hope and shut himself in his room. Unable to bear seeing him like that, my mother told him, \"Your life isn't over because of this,\" and made his favorite curry.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "冷戦",
+   "reading": "れいせん",
+   "pos": "noun",
+   "meaning": "cold war",
+   "defJa": "直接は戦わずに、陣営どうしがにらみ合う対立。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "第二次世界大戦の後、アメリカとソ連は全面戦争に至ることはなかったものの、半世紀近くにわたって激しく対立した。これが冷戦と呼ばれる時代である。両国は核兵器の開発を競い合い、世界は東西二つの陣営に分断された。一九八九年にベルリンの壁が崩壊し、その二年後にソ連が解体したことで、冷戦はようやく終わりを迎えた。",
+    "form": "冷戦",
+    "en": "After World War II, the United States and the Soviet Union never went to full-scale war with each other, but they were locked in fierce confrontation for nearly half a century. This is the era known as the Cold War. The two countries competed to develop nuclear weapons, and the world was divided into two camps, East and West. With the fall of the Berlin Wall in 1989 and the dissolution of the Soviet Union two years later, the Cold War finally came to an end.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "覇権",
+   "reading": "はけん",
+   "pos": "noun",
+   "meaning": "dominance, hegemony",
+   "defJa": "圧倒的な力で地域や分野を支配すること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "スマートフォンの登場から十年あまりで、携帯電話市場の覇権は日本のメーカーから海外の巨大企業へと移った。かつて国内の売り場を埋め尽くした国産機は、今ではほとんど見かけない。",
+    "form": "覇権",
+    "en": "In little more than a decade after the arrival of smartphones, dominance of the mobile phone market shifted from Japanese manufacturers to giant overseas companies. Japanese-made phones, which once filled retail displays across the country, are now rarely seen.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "覇権安定論",
+   "reading": "はけんあんていろん",
+   "pos": "noun",
+   "meaning": "hegemonic stability theory",
+   "defJa": "強い一国が秩序を支えると世界経済が安定するという説。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "十九世紀のイギリスや二十世紀後半のアメリカのように、圧倒的な力を持つ国が自由貿易のルールを守らせているとき、世界経済は安定しやすい。こうした考え方を覇権安定論という。",
+    "form": "覇権安定論",
+    "en": "The world economy tends to be stable when an overwhelmingly powerful country, such as Britain in the nineteenth century or the United States in the latter half of the twentieth century, enforces the rules of free trade. This idea is called hegemonic stability theory.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "当然ながら",
+   "reading": "とうぜんながら",
+   "pos": "other",
+   "meaning": "naturally; as expected",
+   "defJa": "言うまでもなく、当たり前のことだが。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "台風で新幹線が半日止まった。当然ながら、駅の窓口には払い戻しを求める人の長い列ができた。私も一時間近く並んで、ようやく手続きを終えた。旅行の予定は、すべて組み直しになった。",
+    "form": "当然ながら",
+    "en": "A typhoon brought bullet train services to a halt for half a day. Naturally, a long line of people seeking refunds formed at the station ticket counter. I too waited in line for nearly an hour before finally completing the process. All my travel plans had to be rearranged.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "還元",
+   "reading": "かんげん",
+   "pos": "noun",
+   "meaning": "giving back; chemical reduction",
+   "defJa": "得た利益を人々に返すこと。また、もとに戻すこと。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "創業の地への恩返しとして、その菓子メーカーは利益の一部を地元に還元している。毎年、町の小学校に本を寄贈し、夏祭りの費用の一部も負担してきた。",
+    "form": "還元",
+    "en": "As a way of giving back to the place where it was founded, the confectionery manufacturer returns part of its profits to the local community. Every year, it has donated books to the town's elementary school and covered part of the cost of the summer festival.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "財物",
+   "reading": "ざいぶつ",
+   "pos": "noun",
+   "meaning": "property (legal term)",
+   "defJa": "お金や品物など、値打ちのある物。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "刑法でいう「財物」とは、現金や宝石のように形があり、持ち主にとって価値のある物を指す。電気のように形のないものは原則として含まれないが、法律の中に特別な規定が置かれている。",
+    "form": "財物",
+    "en": "In the Penal Code, \"property\" refers to tangible things that have value to their owner, such as cash or jewels. Intangible things such as electricity are generally not included, but the law contains a special provision for them.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "罰則",
+   "reading": "ばっそく",
+   "pos": "noun",
+   "meaning": "penalty (in a law or rule)",
+   "defJa": "決まりを破った人への罰を定めた規則。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "改正条例の施行により、路上での喫煙が禁止される区域が広がった。違反した場合は二千円の過料が科される。市は「罰則を設けなければ実効性がない」として、巡回員による指導を強化する方針だ。",
+    "form": "罰則",
+    "en": "With the amended ordinance coming into effect, the areas where smoking on the street is prohibited have expanded. Violators face an administrative fine of 2,000 yen. The city says, \"The rules will not be effective without penalties,\" and plans to step up guidance from patrol officers.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "自意識過剰",
+   "reading": "じいしきかじょう",
+   "pos": "noun",
+   "meaning": "overly self-conscious",
+   "defJa": "人からどう見られるかを気にしすぎること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "新しい髪型で出社した朝、みんなに見られている気がして一日じゅう落ち着かなかった。でも同僚に聞いたら、誰も気づいていなかったらしい。我ながら自意識過剰だったと苦笑した。",
+    "form": "自意識過剰",
+    "en": "The morning I went to work with a new hairstyle, I felt as though everyone was looking at me and was uneasy all day. But when I asked a colleague, it seemed that no one had noticed. I gave a wry laugh at how overly self-conscious I had been.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "集積",
+   "reading": "しゅうせき",
+   "pos": "noun",
+   "meaning": "concentration in one place",
+   "defJa": "多くのものを一か所に集めること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "豊田市の周辺には、自動車の組み立て工場だけでなく、部品を手がける中小企業が数多く集積している。必要な部品をすぐに調達できることが、この地域の大きな強みになっている。",
+    "form": "集積",
+    "en": "Around Toyota City, there is a concentration not only of automobile assembly plants but also of many small and medium-sized companies that make parts. Being able to procure the necessary parts quickly is a major strength of this region.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "係助",
+   "reading": "かかりじょ",
+   "pos": "noun",
+   "meaning": "binding particle (dictionary label)",
+   "defJa": "辞書の品詞表示で、係り助詞を表す略語。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "古語辞典で「ぞ」を引くと、品詞の欄に「係助」と書かれている。係り助詞の略で、「ぞ」が文中にあると、文末の動詞が連体形に変わる。いわゆる係り結びである。",
+    "form": "係助",
+    "en": "If you look up the emphatic particle meaning \"indeed\" in a classical Japanese dictionary, the part-of-speech column reads \"bind. part.\" This is short for \"binding particle,\" and when this particle appears in a sentence, the verb at the end changes to its attributive form. This is what is known as particle–predicate concord.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "上下",
+   "reading": "じょうげ",
+   "pos": "noun",
+   "meaning": "up and down; both directions",
+   "defJa": "上と下。上がったり下がったりすること。",
+   "level": "N2",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "春先は一日のうちでも気温が大きく上下する。朝晩は冬のように冷え込むのに、昼間は汗ばむほど暖かくなることも珍しくない。脱ぎ着しやすい服で出かけるのが無難だ。",
+    "form": "上下",
+    "en": "In early spring, temperatures rise and fall sharply even within a single day. Although mornings and evenings can be as cold as winter, it is not unusual for the daytime to become warm enough to make you sweat. It is safest to go out in clothes that are easy to put on and take off.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "覆う",
+   "reading": "おおう",
+   "pos": "verb",
+   "meaning": "to cover",
+   "defJa": "上からかぶせて、見えないようにする。",
+   "level": "N3",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "朝起きると、窓の外は一面の霧だった。町全体を白く覆うその霧は、昼近くになってようやく晴れた。",
+    "form": "覆う",
+    "en": "When I woke up in the morning, everything outside the window was shrouded in fog. The fog that blanketed the whole town in white finally lifted close to noon.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "編入",
+   "reading": "へんにゅう",
+   "pos": "noun",
+   "meaning": "incorporation; transfer (into)",
+   "defJa": "あとから組織などに組み入れること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "地元の短大を卒業したあと、姉は東京の大学の三年次に編入した。単位の一部は認められたものの、必修科目の多さに最初の半年は苦労したらしい。それでも最後は、同級生と肩を並べて卒業した。",
+    "form": "編入",
+    "en": "After graduating from a local junior college, my older sister transferred into the third year at a university in Tokyo. Although some of her credits were recognized, she apparently struggled during the first six months because of the large number of required courses. Even so, she eventually graduated alongside her classmates.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "威張り散らす",
+   "reading": "いばりちらす",
+   "pos": "verb",
+   "meaning": "boss everyone around",
+   "defJa": "周りの人に、えらそうな態度をとる。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "新しく来た部長は、部下には威張り散らすくせに、社長の前ではまるで別人のように腰が低い。そんな姿を毎日見せられて、若手社員はすっかりやる気をなくしてしまった。",
+    "form": "威張り散らす",
+    "en": "The new department head bosses his subordinates around, yet in front of the company president he is so deferential that he seems like a different person. Having to watch this every day has completely drained the younger employees' motivation.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "威張りくさる",
+   "reading": "いばりくさる",
+   "pos": "verb",
+   "meaning": "act high and mighty",
+   "defJa": "ひどくえらそうにする。悪く言う言い方。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "新しく来た課長は、部下の前ではいつも威張りくさっているくせに、社長の前に出ると急に腰が低くなる。そんな姿を見て、若手社員たちは陰であきれている。",
+    "form": "威張りくさって",
+    "en": "The new section chief is always lording it over his subordinates, yet the moment he appears before the company president, he suddenly becomes deferential. Seeing this behavior, the younger employees are privately exasperated.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "歩留まり",
+   "reading": "ぶどまり",
+   "pos": "noun",
+   "meaning": "yield (share of good products)",
+   "defJa": "作った物のうち、良品として使える割合。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "半導体工場では、一枚のウエハーから取れるチップのうち、実際に使える良品の割合を歩留まりと呼ぶ。ほこり一つで不良品が出るため、工場の中は手術室よりも清潔に保たれている。",
+    "form": "歩留まり",
+    "en": "In a semiconductor factory, the proportion of usable, defect-free chips obtained from a single wafer is called the yield. Because even a single speck of dust can cause a defective chip, the inside of the factory is kept cleaner than an operating room.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "軽減",
+   "reading": "けいげん",
+   "pos": "noun",
+   "meaning": "reduction (of a burden)",
+   "defJa": "負担や痛みなどを減らして軽くすること。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "市は来年度から、子育て世帯の経済的な負担を軽減するため、保育料を一律に半額にすると発表した。若い世代が市外へ流出するのに歯止めをかけるねらいもある。",
+    "form": "軽減",
+    "en": "The city has announced that, starting next fiscal year, it will halve childcare fees across the board to ease the financial burden on families raising children. The measure also aims to stem the outflow of younger people from the city.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "屈強",
+   "reading": "くっきょう",
+   "pos": "other",
+   "meaning": "brawny, powerfully built",
+   "defJa": "体が大きく、力が強そうなようす。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "店の入り口には、黒いスーツを着た屈強な男が二人、腕を組んで立っていた。肩幅は扉の半分ほどもあり、酔っ払いが騒ぎを起こすと、軽々と持ち上げて外へつまみ出してしまう。",
+    "form": "屈強",
+    "en": "Two brawny men in black suits stood with their arms folded at the entrance to the establishment. Their shoulders were about half as wide as the doorway, and whenever a drunk caused trouble, they would effortlessly lift the person up and throw them out.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "ビンビン",
+   "reading": "びんびん",
+   "pos": "other",
+   "meaning": "intensely felt",
+   "defJa": "刺激などが強く伝わってくるようす。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "小さなライブハウスの最前列に陣取ると、スピーカーから低音がビンビン響いてきて、胸の奥まで震えるようだった。終演後もしばらく耳鳴りが止まらなかった。",
+    "form": "ビンビン",
+    "en": "When I took up a spot in the front row of a small live music venue, the bass throbbed from the speakers so powerfully that I felt vibrations deep in my chest. My ears kept ringing for a while even after the show ended.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "ギンギン",
+   "reading": "ぎんぎん",
+   "pos": "other",
+   "meaning": "to the max",
+   "defJa": "冷たさや興奮などがとても強いようす。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "夜中にエナジードリンクを二本も飲んだせいで、目がギンギンに冴えて全然眠れない。明日は朝一で大事な試験なのに、時計の針はもう三時を回っている。",
+    "form": "ギンギン",
+    "en": "Because I drank two whole energy drinks in the middle of the night, I am completely wired and cannot sleep at all. I have an important exam first thing tomorrow morning, but the clock has already passed three.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "殴り書き",
+   "reading": "なぐりがき",
+   "pos": "noun",
+   "meaning": "scribble",
+   "defJa": "字を急いで乱暴に書くこと。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "電話を切ると、母は手近にあったレシートの裏に、聞いたばかりの住所を殴り書きした。急いでいたせいで、あとから見ると自分でも読めない字がいくつかあったという。",
+    "form": "殴り書き",
+    "en": "After hanging up the phone, my mother scrawled the address she had just been given on the back of a receipt lying nearby. She said that, because she had been in such a hurry, when she looked at it later there were some characters even she could not read.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "節制",
+   "reading": "せっせい",
+   "pos": "noun",
+   "meaning": "moderation in eating and drinking",
+   "defJa": "飲み食いなどをほどほどにおさえること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "若いころは毎晩のように飲み歩いていた父も、健康診断で血糖値の高さを指摘されてからは節制に努めている。晩酌は週末だけにし、ご飯の量も半分に減らした。",
+    "form": "節制",
+    "en": "My father used to go out drinking almost every night when he was young, but ever since a health checkup revealed his high blood sugar, he has been trying to practice moderation. He now has his evening drinks only on weekends and has cut his portions of rice in half.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "せせら笑い",
+   "reading": "せせらわらい",
+   "pos": "noun",
+   "meaning": "sneer",
+   "defJa": "相手をばかにして、鼻で笑うこと。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "「どうせ口だけだろう」。会議で新しい計画を説明すると、先輩は口元にせせら笑いを浮かべた。悔しさをこらえながら、私は必ず結果を出してみせると心に決めた。",
+    "form": "せせら笑い",
+    "en": "\"You're probably all talk anyway.\" When I explained my new plan at the meeting, a senior colleague's mouth curled into a sneer. Swallowing my frustration, I resolved that I would show them by delivering results without fail.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "言語道断",
+   "reading": "ごんごどうだん",
+   "pos": "other",
+   "meaning": "outrageous; inexcusable",
+   "defJa": "あまりにひどくて、言葉にならないこと。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "市の職員が、災害支援のために集められた寄付金を私的に流用していたことが分かった。市長は記者会見で「被災者を思う市民の善意を踏みにじる行為で、言語道断だ」と厳しく非難した。",
+    "form": "言語道断",
+    "en": "It was discovered that a city employee had diverted donations collected for disaster relief to personal use. At a press conference, the mayor strongly condemned the act, saying, \"This tramples on the goodwill of residents who care about disaster victims. It is utterly inexcusable.\"",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "値札",
+   "reading": "ねふだ",
+   "pos": "noun",
+   "meaning": "price tag",
+   "defJa": "商品につけて、値段を示す小さな札。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "気に入ったコートを手に取り、何気なく値札を裏返して思わず息をのんだ。給料のほぼ半分だ。そっとハンガーに戻し、店員さんと目を合わせないように店を出た。",
+    "form": "値札",
+    "en": "I picked up a coat I liked, casually turned over the price tag, and gasped. It cost almost half my salary. I gently put it back on the hanger and left the store, avoiding eye contact with the sales assistant.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "耐える",
+   "reading": "たえる",
+   "pos": "verb",
+   "meaning": "endure; withstand",
+   "defJa": "苦しさやつらさを、じっとがまんする。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "陸上部のエースだった美咲にとって、骨折した足のリハビリは想像以上につらかった。それでも、もう一度グラウンドを走る日を思い描き、毎日の痛みにじっと耐えた。",
+    "form": "耐えた",
+    "en": "For Misaki, who had been the star of the track and field team, rehabilitation for her broken leg was harder than she had imagined. Even so, she pictured the day she would run on the track again and patiently endured the pain each day.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "忍び",
+   "reading": "しのび",
+   "pos": "noun",
+   "meaning": "secrecy; going incognito",
+   "defJa": "人に知られないように、こっそり動くこと。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "伊賀や甲賀の忍びは、敵の城に入り込んで情報を集めるのが主な仕事だった。黒い装束で闇にまぎれ、足音を立てずに歩く訓練を積んでいたという。正体を知られることは、そのまま死を意味した。",
+    "form": "忍び",
+    "en": "The main job of the ninjas of Iga and Koga was to infiltrate enemy castles and gather information. They are said to have trained to blend into the darkness in black clothing and walk without making a sound. Having their identities discovered meant certain death.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "眼前",
+   "reading": "がんぜん",
+   "pos": "noun",
+   "meaning": "right before one&#x27;s eyes",
+   "defJa": "目のすぐ前。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "長いトンネルを抜けると、眼前に真っ青な海が広がった。窓際の席に座っていた子どもたちは一斉に歓声を上げ、冷たいガラスに顔を押しつけて、いつまでも外を眺めていた。",
+    "form": "眼前",
+    "en": "When we emerged from the long tunnel, a brilliant blue sea stretched out before our eyes. The children sitting by the windows all cheered at once, pressed their faces against the cold glass, and kept gazing outside for ages.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "鼓膜",
+   "reading": "こまく",
+   "pos": "noun",
+   "meaning": "eardrum",
+   "defJa": "耳の奥にあって、音で震えるうすい膜。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "耳の奥には、鼓膜と呼ばれる薄い膜が張られている。空気の振動が伝わるとこの膜が震え、その動きが奥にある小さな骨を通じて神経へと送られる。こうして私たちは音を聞いている。",
+    "form": "鼓膜",
+    "en": "Deep inside the ear stretches a thin membrane called the eardrum. When vibrations in the air reach it, this membrane vibrates, and its movement is transmitted to the nerves through tiny bones farther inside. This is how we hear sounds.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "秒速",
+   "reading": "びょうそく",
+   "pos": "noun",
+   "meaning": "speed per second",
+   "defJa": "一秒間に進む距離で表した速さ。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "台風の接近に伴い、沖縄では最大瞬間風速が秒速五十メートルを超えた。気象台は、看板が飛ばされたり車が横転したりするおそれがあるとして、外出を控えるよう呼びかけている。",
+    "form": "秒速",
+    "en": "As the typhoon approached, peak wind gusts in Okinawa exceeded fifty meters per second. The local meteorological office is urging people to avoid going out, warning that signs could be blown away and cars could overturn.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "ぞっと",
+   "reading": "ぞっと",
+   "pos": "other",
+   "meaning": "shiver with fear",
+   "defJa": "怖さで、体が冷たくなるように感じるようす。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "夜道を一人で歩いていると、背後からずっと同じ足音がついてくる。思い切って振り返ると、そこには誰もいなかった。その瞬間、背筋がぞっとして、家まで一度も振り返らずに走った。",
+    "form": "ぞっと",
+    "en": "As I walked alone along the road at night, the same footsteps kept following me from behind. I finally worked up the courage to turn around, but there was no one there. At that moment, a chill ran down my spine, and I ran all the way home without looking back once.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "ぞっとしない",
+   "reading": "ぞっとしない",
+   "pos": "other",
+   "meaning": "not very appealing",
+   "defJa": "あまり感心しない。気が進まない。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "友人に、休日の朝五時に起きて行列に並ぼうと誘われた。人気のパン屋の限定品が目当てらしいが、真冬の寒空の下で二時間待つというのは、あまりぞっとしない。結局、丁重に断った。",
+    "form": "ぞっとしない",
+    "en": "A friend invited me to get up at five in the morning on a day off and join a queue. Apparently, they wanted a limited-edition item from a popular bakery, but the idea of waiting outdoors for two hours in the bitter midwinter cold did not appeal to me much. In the end, I politely declined.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "等比",
+   "reading": "とうひ",
+   "pos": "noun",
+   "meaning": "geometric (equal ratio)",
+   "defJa": "となり合う数の比がいつも同じこと。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "2、4、8、16のように、となり合う数の比がいつも同じになる数の並びを等比数列という。どの数も一つ前の数の二倍になっているので、次に来るのが32だとすぐにわかる。",
+    "form": "等比",
+    "en": "A sequence of numbers such as 2, 4, 8, 16, in which the ratio between adjacent numbers is always the same, is called a geometric sequence. Since each number is twice the one before it, we can immediately see that the next number is 32.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "数列",
+   "reading": "すうれつ",
+   "pos": "noun",
+   "meaning": "sequence of numbers",
+   "defJa": "決まった順に数を並べたもの。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "1、3、5、7、9……のように、決まった規則で数を並べたものを数列という。この例では、どの数も前の数に2を足して作られている。高校の数学では、こうした規則を見抜き、何番目の数でもすぐに求められる式を立てる練習をする。",
+    "form": "数列",
+    "en": "Numbers arranged according to a fixed rule, such as 1, 3, 5, 7, 9, and so on, form what is called a sequence. In this example, each number is obtained by adding 2 to the previous one. In high school mathematics, students practice identifying these rules and constructing formulas that let them quickly find the number at any position in the sequence.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "返済",
+   "reading": "へんさい",
+   "pos": "noun",
+   "meaning": "repayment",
+   "defJa": "借りたお金を返すこと。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "住宅ローンを組んで十年、毎月の返済は家計に重くのしかかってきた。それでも夫婦で節約を重ね、ボーナスが出るたびに少しずつ繰り上げて返し、完済の予定を五年早めることができた。",
+    "form": "返済",
+    "en": "In the ten years since we took out our mortgage, the monthly repayments had weighed heavily on our household budget. Even so, the two of us kept economizing and made small extra repayments whenever we received a bonus, allowing us to bring our scheduled payoff date forward by five years.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "預金",
+   "reading": "よきん",
+   "pos": "noun",
+   "meaning": "bank deposit",
+   "defJa": "銀行などに預けたお金。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "給料が入るとすぐに、決まった額を別の口座へ移して預金に回すようにしている。手元にあると、ついつい使ってしまうからだ。おかげで三年で旅行一回分ほどの蓄えができた。",
+    "form": "預金",
+    "en": "As soon as my pay comes in, I make a point of transferring a fixed amount to a separate account for savings. That is because if I have the money on hand, I tend to spend it without meaning to. Thanks to this habit, I saved about enough for one trip in three years.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "金利",
+   "reading": "きんり",
+   "pos": "noun",
+   "meaning": "interest rate",
+   "defJa": "お金を貸し借りするときの利息の割合。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "中央銀行が金利を引き上げると、住宅ローンの返済額も増える。家を買う予定のある人にとって、決して他人事ではない。",
+    "form": "金利",
+    "en": "When the central bank raises interest rates, mortgage repayments also increase. For anyone planning to buy a home, this is certainly not just someone else's concern.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "利率",
+   "reading": "りりつ",
+   "pos": "noun",
+   "meaning": "interest rate (formal)",
+   "defJa": "元金に対する利息の割合。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "住宅ローンを組むときは、利率のわずかな差も軽く見てはいけない。三千万円を三十五年で借りる場合、年0.5%違うだけで、総返済額は三百万円ほど変わってくる。",
+    "form": "利率",
+    "en": "When taking out a mortgage, you should not dismiss even a small difference in interest rates. If you borrow thirty million yen over thirty-five years, a difference of just 0.5 percentage points in the annual interest rate changes the total repayment amount by about three million yen.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "初項",
+   "reading": "しょこう",
+   "pos": "noun",
+   "meaning": "first term of a sequence",
+   "defJa": "数列のいちばん最初の数。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "1、4、7、10と続く数列は、初項が1で、3ずつ増えていく等差数列だ。公差が3なので、第10項は1に3を9回足して28になる。最初の数と増え方さえわかれば、何番目の数でもすぐに求められる。",
+    "form": "初項",
+    "en": "The sequence 1, 4, 7, 10, and so on is an arithmetic sequence with a first term of 1 that increases by 3 each time. Since the common difference is 3, the tenth term is found by adding 3 to 1 nine times, giving 28. As long as you know the first number and how much the sequence increases each time, you can quickly find the number at any position.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "運用",
+   "reading": "うんよう",
+   "pos": "noun",
+   "meaning": "managing, putting to use",
+   "defJa": "お金や制度をうまく使って動かすこと。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "退職金をそのまま銀行に預けておくのはもったいないと、父は資産の運用を始めた。もっとも、損をするのは怖いらしく、選ぶのは値動きの小さい投資信託ばかりだ。",
+    "form": "運用",
+    "en": "Thinking it would be a waste to leave his retirement payout sitting in the bank, my father began investing his money. Still, he seems afraid of losing money, so he chooses only investment funds whose prices fluctuate very little.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "利息",
+   "reading": "りそく",
+   "pos": "noun",
+   "meaning": "interest (money)",
+   "defJa": "貸し借りしたお金に上乗せされるお金。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "銀行に百万円を預けても、一年でつく利息はわずか数百円にすぎない。それならいっそ投資に回したほうがいいのではないかと、若い世代を中心に資産運用への関心が高まっている。",
+    "form": "利息",
+    "en": "Even if you deposit one million yen in a bank, the interest earned in a year amounts to only a few hundred yen. Wondering whether they might be better off investing the money instead, more and more people, particularly younger generations, are becoming interested in managing their assets through investment.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "元金",
+   "reading": "がんきん",
+   "pos": "noun",
+   "meaning": "principal",
+   "defJa": "利息がつく前の、もとのお金。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "住宅ローンの毎月の返済額には、借りたお金そのものと、それにかかる利息とが含まれている。返し始めの数年は支払いの大半が利息に消え、なかなか元金が減らないことに驚く人も多い。",
+    "form": "元金",
+    "en": "Monthly mortgage repayments include both the money borrowed and the interest charged on it. During the first few years of repayment, most of each payment goes toward interest, and many people are surprised by how slowly the principal decreases.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "単利",
+   "reading": "たんり",
+   "pos": "noun",
+   "meaning": "simple interest",
+   "defJa": "最初のお金だけに利息をつける計算。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "単利では、最初に預けた元本にだけ利息がつく。一方の複利は、ついた利息にもさらに利息がつく仕組みだ。期間が短いうちは差は小さいが、十年、二十年と続けば受け取る額は大きく変わってくる。",
+    "form": "単利",
+    "en": "With simple interest, interest accrues only on the principal originally deposited. Compound interest, on the other hand, is a system in which the interest earned also earns further interest. The difference is small over a short period, but after ten or twenty years, the amounts received differ greatly.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "歴然",
+   "reading": "れきぜん",
+   "pos": "other",
+   "meaning": "clear, obvious",
+   "defJa": "だれが見てもはっきりしているようす。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "プロと素人の差は歴然としていた。同じカメラで同じ花を撮ったはずなのに、写真家の一枚だけが柔らかな光をまとい、まるで別の花のように見える。腕の違いとは、こういうことなのだろう。",
+    "form": "歴然",
+    "en": "The difference between the professional and the amateur was unmistakable. Although they had supposedly photographed the same flower with the same camera, only the photographer's image was bathed in soft light, making it look like an entirely different flower. This must be what a difference in skill means.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "ごとく",
+   "reading": "ごとく",
+   "pos": "other",
+   "meaning": "like, as (literary)",
+   "defJa": "〜のように、という意味の書き言葉。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "部長は例のごとく、会議の終わり間際になって新しい仕事を押しつけてきた。「来週までによろしく」とだけ言い残し、さっさと部屋を出ていく。残された私たちは、顔を見合わせてため息をついた。",
+    "form": "ごとく",
+    "en": "As usual, the department head dumped new work on us just as the meeting was about to end. Saying only, 'Please have this done by next week,' the department head promptly left the room. Those of us left behind looked at one another and sighed.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "なお",
+   "reading": "なお",
+   "pos": "other",
+   "meaning": "note that; still",
+   "defJa": "あとから言い足すときの書き言葉。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "秋の文化祭は十月二十日の土曜日に開かれます。一般の方もどなたでも自由に見学できます。なお、校内には駐車場がありませんので、お越しの際は電車やバスをご利用ください。",
+    "form": "なお",
+    "en": "The autumn cultural festival will be held on Saturday, October 20. All members of the public are welcome to visit freely. Please note that there is no parking on the school grounds, so please come by train or bus.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "なおかつ",
+   "reading": "なおかつ",
+   "pos": "other",
+   "meaning": "and also; and yet",
+   "defJa": "その上さらに。それでもまだ。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "駅から徒歩三分で、なおかつ家賃が月五万円以下。そんな物件はめったにないと、不動産屋に笑われた。それでも諦めきれず、私は週末のたびに街を歩き回った。",
+    "form": "なおかつ",
+    "en": "A three-minute walk from the station, and on top of that, rent of no more than fifty thousand yen a month. The real estate agent laughed at me, saying properties like that were few and far between. Even so, I could not bring myself to give up, and I walked all around town every weekend.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "足し算",
+   "reading": "たしざん",
+   "pos": "noun",
+   "meaning": "addition",
+   "defJa": "数を合わせて合計を出す計算。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "小学一年生の娘は、算数の宿題になると両手の指を総動員する。三たす五なら、片手を広げ、もう片方の指を三本立てて数える。足し算はすっかり得意になったが、繰り上がりが出てくると、まだ指が足りない。",
+    "form": "足し算",
+    "en": "My daughter, who is in her first year of elementary school, puts every finger on both hands to work when she does her math homework. For three plus five, she spreads out one hand, holds up three fingers on the other, and counts them. She has become quite good at addition, but when it involves carrying, she still runs out of fingers.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "万有引力",
+   "reading": "ばんゆういんりょく",
+   "pos": "noun",
+   "meaning": "universal gravitation",
+   "defJa": "重さのある物どうしが、互いに引き合う力。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "木から落ちるリンゴも、地球のまわりを回る月も、同じ力に引かれている。ニュートンが見抜いたこの万有引力の考え方によって、地上と天上の動きは初めて一つの法則で説明できるようになった。",
+    "form": "万有引力",
+    "en": "An apple falling from a tree and the moon orbiting the Earth are both pulled by the same force. Newton's insight into this concept of universal gravitation made it possible, for the first time, to explain motion on Earth and in the heavens with a single law.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "自転軸",
+   "reading": "じてんじく",
+   "pos": "noun",
+   "meaning": "axis of rotation",
+   "defJa": "星などが回るときの、中心になる線。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "地球の自転軸は、公転面に垂直な方向からおよそ23.4度傾いている。この傾きのおかげで、太陽の光が当たる角度が一年を通して変わり、日本には春夏秋冬の季節が生まれる。",
+    "form": "自転軸",
+    "en": "The Earth's axis of rotation is tilted about 23.4 degrees away from the direction perpendicular to its orbital plane. Because of this tilt, the angle at which sunlight strikes the Earth changes throughout the year, giving Japan its four seasons of spring, summer, autumn, and winter.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "遠心力",
+   "reading": "えんしんりょく",
+   "pos": "noun",
+   "meaning": "centrifugal force",
+   "defJa": "回る物が、外へ押し出されるように感じる力。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "洗濯機の脱水は、遠心力を利用している。洗濯槽が高速で回ると、衣類に含まれた水が外側へと押し出され、槽の壁にある小さな穴から抜けていくのだ。回転が速いほど、衣類はよく乾く。",
+    "form": "遠心力",
+    "en": "A washing machine's spin cycle uses centrifugal force. As the drum spins at high speed, the water in the clothes is forced outward and escapes through small holes in the drum's walls. The faster it spins, the drier the clothes become.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "分布",
+   "reading": "ぶんぷ",
+   "pos": "noun",
+   "meaning": "distribution",
+   "defJa": "物がどこにどれだけあるかという広がり方。",
+   "level": "N2",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "日本列島では、桜の開花は南から北へと進んでいく。毎年発表される開花日の分布図を見ると、春が少しずつ北上していく様子が手に取るようにわかる。北海道で桜が咲くのは、たいてい五月に入ってからだ。",
+    "form": "分布",
+    "en": "Across the Japanese archipelago, cherry blossoms open progressively from south to north. The map showing the distribution of flowering dates published each year makes it easy to see spring gradually moving northward. In Hokkaido, the cherry blossoms usually do not open until May.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "棚卸",
+   "reading": "たなおろし",
+   "pos": "noun",
+   "meaning": "stocktaking",
+   "defJa": "店の商品の数をすべて数えて調べること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "年度末の三月三十一日、そのスーパーでは閉店後に従業員総出で棚卸を行う。棚に並んだ缶詰や調味料を一つずつ数え、帳簿上の在庫数と合っているかを確かめていくのだ。作業が終わったのは、日付が変わる直前だった。",
+    "form": "棚卸",
+    "en": "On March 31, the last day of the fiscal year, every employee at that supermarket takes part in a stocktake after closing. They count the cans and seasonings on the shelves one by one, checking that the totals match the inventory recorded in the books. The work was not finished until just before midnight.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "棚卸資産",
+   "reading": "たなおろししさん",
+   "pos": "noun",
+   "meaning": "inventory (in accounts)",
+   "defJa": "売るために持っている商品や材料。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "決算期末になると、倉庫の商品や原材料を一つずつ数え、帳簿の数字と照らし合わせる。こうして確定した在庫の金額は、貸借対照表に棚卸資産として計上される。",
+    "form": "棚卸資産",
+    "en": "At the end of the accounting period, the goods and raw materials in the warehouse are counted one by one and checked against the figures in the books. The value of the stock established in this way is recorded on the balance sheet as inventory.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "自由自在",
+   "reading": "じゆうじざい",
+   "pos": "other",
+   "meaning": "freely, at will",
+   "defJa": "思いどおりに、どのようにでもできるようす。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "熟練の飴細工職人は、熱い飴をはさみ一本で自由自在に操り、ほんの数分でうさぎや金魚を形づくってみせる。見物していた子どもたちから、そのたびに歓声が上がった。",
+    "form": "自由自在",
+    "en": "The skilled candy sculptor deftly manipulated the hot candy with just a pair of scissors, shaping it into rabbits and goldfish in only a few minutes. Each time, the children watching burst into cheers.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "座標",
+   "reading": "ざひょう",
+   "pos": "noun",
+   "meaning": "coordinates",
+   "defJa": "点の位置を、数の組で表したもの。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "グラフ用紙の上の点Aは、原点から右に3、上に2進んだところにある。これを座標で表すと（3，2）になる。数学の授業では、こうして点の位置を数の組で表す方法を最初に学ぶ。",
+    "form": "座標",
+    "en": "Point A on the graph paper is located 3 units to the right and 2 units above the origin. Expressed as coordinates, its position is (3, 2). In math class, students first learn this method of representing a point's position with a pair of numbers.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "座標幾何学",
+   "reading": "ざひょうきかがく",
+   "pos": "noun",
+   "meaning": "coordinate geometry",
+   "defJa": "図形を式で表し、計算で調べる数学の分野。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "座標幾何学では、点を（2，3）のような数の組で表す。こうすると、二点間の距離や直線の傾きを、図を描かずに計算で求めることができる。この方法を考え出したのは、フランスの哲学者デカルトだと言われている。",
+    "form": "座標幾何学",
+    "en": "In coordinate geometry, a point is represented by a pair of numbers such as (2, 3). This makes it possible to calculate the distance between two points or the slope of a straight line without drawing a diagram. The French philosopher Descartes is said to have devised this method.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "電卓",
+   "reading": "でんたく",
+   "pos": "noun",
+   "meaning": "pocket calculator",
+   "defJa": "数字を打ちこんで計算する小さな機械。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "経理部のベテラン社員は、パソコンがあっても、請求書の金額は必ず手元の電卓でたたいて確かめる。キーを打つ指は驚くほど速くて正確で、新人たちはいつも感心して見ている。",
+    "form": "電卓",
+    "en": "Even with a computer available, the veteran employee in the accounting department always checks invoice amounts by punching them into the calculator at hand. Their fingers move over the keys with astonishing speed and accuracy, and the new employees always watch in admiration.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "電卓を叩く",
+   "reading": "でんたくをたたく",
+   "pos": "other",
+   "meaning": "to crunch the numbers",
+   "defJa": "損か得かを細かく計算してみる。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "マイホームを買うか、このまま賃貸に住み続けるか。夫は夜な夜な電卓を叩き、ローンの総額と家賃の合計を比べてみた。三十年で見ると、差は思ったほど大きくなかった。",
+    "form": "電卓を叩き",
+    "en": "Should we buy a home of our own or continue renting? Night after night, my husband punched numbers into a calculator, comparing the total mortgage cost with the total rent. Over thirty years, the difference was not as great as we had expected.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "卓越",
+   "reading": "たくえつ",
+   "pos": "noun",
+   "meaning": "excellence, outstanding",
+   "defJa": "ほかよりずっとすぐれていること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "この老舗旅館が長く愛されてきたのは、料理長の卓越した腕によるところが大きい。地元の旬の素材を生かした献立を目当てに、毎年同じ季節に訪れる客も少なくない。",
+    "form": "卓越",
+    "en": "This long-established inn owes much of its enduring popularity to the head chef's exceptional skill. Many guests return at the same time every year for the menu that makes the most of local, seasonal ingredients.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "計算機",
+   "reading": "けいさんき",
+   "pos": "noun",
+   "meaning": "calculating machine",
+   "defJa": "計算をするための機械。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "家計簿をつけるとき、母は今でもスマートフォンではなく、ボタンの大きな計算機を使う。レシートを一枚ずつ見ながら数字を打ち込み、合計が合うと満足そうにうなずく。",
+    "form": "計算機",
+    "en": "When keeping the household accounts, my mother still uses a calculator with large buttons instead of a smartphone. She enters the numbers while looking at each receipt in turn, and nods with satisfaction when the totals match.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "垂直",
+   "reading": "すいちょく",
+   "pos": "other",
+   "meaning": "vertical; perpendicular",
+   "defJa": "まっすぐ立っていること。直角に交わること。",
+   "level": "N2",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "岩壁はほぼ垂直に切り立っていて、手をかける場所もほとんど見当たらない。それでも登山家は、一歩ずつ慎重に足場を探しながら、頂上を目指して登っていった。",
+    "form": "垂直",
+    "en": "The rock face rose almost vertically, with hardly a handhold to be found. Even so, the mountaineer climbed toward the summit, carefully searching for a foothold with each step.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "索引",
+   "reading": "さくいん",
+   "pos": "noun",
+   "meaning": "index",
+   "defJa": "本の言葉がどのページにあるかを並べた一覧。",
+   "level": "N2",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "分厚い料理の本で「かぼちゃ」のレシピを探すなら、巻末の索引を開くのがいちばん早い。材料の名前が五十音順に並んでいて、載っているページがすぐにわかる。",
+    "form": "索引",
+    "en": "If you are looking for pumpkin recipes in a thick cookbook, the quickest way is to open the index at the back. The ingredient names are arranged in Japanese syllabary order, so you can immediately find the pages where they appear.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "被告人",
+   "reading": "ひこくにん",
+   "pos": "noun",
+   "meaning": "defendant in a criminal trial",
+   "defJa": "刑事裁判で罪を問われている人。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "判決を言い渡したあと、裁判長は証言台の前に立つ被告人に「二度と同じ過ちを繰り返さないでください」と語りかけた。男は深く頭を下げ、刑務官に付き添われて法廷をあとにした。",
+    "form": "被告人",
+    "en": "After delivering the sentence, the presiding judge addressed the defendant standing in front of the witness stand: 'Please never make the same mistake again.' The man bowed deeply and left the courtroom escorted by a prison officer.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "万引き",
+   "reading": "まんびき",
+   "pos": "noun",
+   "meaning": "shoplifting",
+   "defJa": "客のふりをして店の品物を盗むこと。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "近所のコンビニでは、万引きの被害が後を絶たない。店長は防犯カメラを増やし、出入り口には「店内の様子は録画しています」という張り紙を出した。それでも、菓子や雑誌がなくなる日は減らないという。",
+    "form": "万引き",
+    "en": "The convenience store in my neighborhood suffers from constant shoplifting. The manager installed more security cameras and put up a notice at the entrance saying, 'Activity inside the store is being recorded.' Even so, the number of days when sweets and magazines go missing reportedly has not decreased.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "返却",
+   "reading": "へんきゃく",
+   "pos": "noun",
+   "meaning": "returning a borrowed item",
+   "defJa": "借りた物や預かった物を返すこと。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "図書館で借りた本の返却期限を、すっかり忘れていた。慌てて閉館間際に駆け込むと、カウンターの職員さんが「次から気をつけてくださいね」と笑って受け取ってくれた。",
+    "form": "返却",
+    "en": "I had completely forgotten the due date for the books I had borrowed from the library. When I rushed in just before closing, the staff member at the counter smiled and took them, saying, 'Please be more careful next time.'",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "立件",
+   "reading": "りっけん",
+   "pos": "noun",
+   "meaning": "building a criminal case",
+   "defJa": "証拠を集めて刑事事件として扱うこと。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "県警は、高齢者から現金をだまし取ったとして逮捕した男について、余罪の十数件もあわせて立件する方針を固めた。男の自宅から押収した名簿には、県内の高齢者約二千人の名前が並んでいたという。",
+    "form": "立件",
+    "en": "The prefectural police have decided to build cases for a dozen or so additional offenses against a man arrested on suspicion of swindling elderly people out of cash. A list seized from his home reportedly contained the names of about two thousand elderly residents of the prefecture.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "既存",
+   "reading": "きそん",
+   "pos": "noun",
+   "meaning": "existing",
+   "defJa": "前からすでにあること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "新しい路線バスが走り始めたのは、市の東側の住宅地だ。既存の路線では駅まで一時間近くかかっていたが、新しいルートなら二十分ほどで着く。お年寄りの多い地区だけに、住民からは喜びの声が上がっている。",
+    "form": "既存",
+    "en": "A new bus service has begun operating in a residential area on the east side of the city. The existing routes took nearly an hour to reach the station, but the new route takes about twenty minutes. Residents have welcomed the service, particularly because so many people in the area are elderly.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "既存装置",
+   "reading": "きそんそうち",
+   "pos": "noun",
+   "meaning": "existing equipment",
+   "defJa": "前から使っている機械や設備。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "工場の生産ラインを一から作り直すには、莫大な費用がかかる。そこで会社は、既存装置に新しいセンサーを取り付けることで、少しずつ自動化を進めることにした。",
+    "form": "既存装置",
+    "en": "Rebuilding the factory's production line from scratch would cost an enormous amount of money. The company therefore decided to automate it gradually by installing new sensors on its existing equipment.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "見出し",
+   "reading": "みだし",
+   "pos": "noun",
+   "meaning": "headline",
+   "defJa": "記事の内容がひと目でわかる短い言葉。",
+   "level": "N2",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "朝刊を広げると、一面に「首相、辞任を表明」という大きな見出しが躍っていた。昨夜まではそんな気配はまったくなかっただけに、父はコーヒーカップを手にしたまま、しばらく記事を読みふけっていた。",
+    "form": "見出し",
+    "en": "When we opened the morning paper, a large headline leapt out from the front page: 'Prime Minister Announces Resignation.' There had been no sign of anything like this as of the previous night, so my father spent quite a while engrossed in the article, still holding his coffee cup.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "異例",
+   "reading": "いれい",
+   "pos": "noun",
+   "meaning": "unusual; exceptional",
+   "defJa": "いつもと違っていて、めったにないこと。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "今年は桜の開花が異例の早さとなり、三月の半ばには都心で満開を迎えた。観測が始まって以来もっとも早い記録で、花見の計画を前倒しにする人が相次いだ。",
+    "form": "異例",
+    "en": "This year, the cherry blossoms opened exceptionally early, reaching full bloom in central Tokyo by mid-March. It was the earliest date since records began, and one person after another moved their cherry-blossom-viewing plans forward.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "抹殺",
+   "reading": "まっさつ",
+   "pos": "noun",
+   "meaning": "wiping out; erasing",
+   "defJa": "存在をすっかり消し去ること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "独裁政権は、都合の悪い記録を次々と抹殺した。数十年後に見つかった一冊の日記が、消された歴史を語り始めている。",
+    "form": "抹殺",
+    "en": "The dictatorship systematically erased records it found inconvenient. A diary discovered several decades later is beginning to tell the history that was wiped away.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "夕べ",
+   "reading": "ゆうべ",
+   "pos": "noun",
+   "meaning": "last night",
+   "defJa": "きのうの夜。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "夕べは遅くまで友達と電話していたせいで、今朝はなかなか起きられなかった。一時間目の授業中も、あくびをかみ殺すのに必死で、先生の話はほとんど頭に入らなかった。",
+    "form": "夕べ",
+    "en": "Because I stayed up late talking to a friend on the phone last night, I had a hard time getting up this morning. Even during the first class of the day, I was so busy trying to stifle my yawns that I barely took in anything the teacher said.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "脱出",
+   "reading": "だっしゅつ",
+   "pos": "noun",
+   "meaning": "escape; getting out",
+   "defJa": "危ない所や閉じこめられた所からぬけ出すこと。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "エレベーターに閉じ込められて三十分。非常ボタンで呼んだ管理会社の人がようやく到着し、扉をこじ開けてくれた。狭い箱から脱出したとき、外の空気がこんなにおいしいとは思わなかった。",
+    "form": "脱出",
+    "en": "I had been trapped in the elevator for thirty minutes. Someone from the management company, whom I had called using the emergency button, finally arrived and pried the doors open. When I escaped from that cramped box, I had never imagined that the air outside could feel so wonderful.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "捜索",
+   "reading": "そうさく",
+   "pos": "noun",
+   "meaning": "search (for a missing person)",
+   "defJa": "いなくなった人や物を探すこと。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "大きな地震で倒壊した建物の現場では、救助犬が重要な役割を果たしている。鋭い嗅覚を持つ犬は、がれきの下に閉じ込められた人のにおいを、人間よりはるかに早く見つけ出すことができる。発生から七十二時間を過ぎると生存率が急激に下がるとされるため、捜索は時間との闘いだ。国内では、民間の団体を中心にこうした犬の育成と訓練が進められている。",
+    "form": "捜索",
+    "en": "Rescue dogs play an important role at the sites of buildings that have collapsed in major earthquakes. With their keen sense of smell, dogs can detect the scent of people trapped beneath rubble far faster than humans can. Survival rates are said to drop sharply once seventy-two hours have passed since the earthquake, so the search is a race against time. In Japan, efforts to raise and train these dogs are led mainly by private organizations.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "神奈川県",
+   "reading": "かながわけん",
+   "pos": "noun",
+   "meaning": "Kanagawa Prefecture",
+   "defJa": "東京都の南にあり、横浜市に県庁がある県。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "横浜や鎌倉、箱根など、神奈川県には人気の観光地が多い。東京から電車で一時間ほどで行けるため、週末になると日帰りの観光客で大いににぎわう。海と山の両方を一日で楽しめるのも魅力だ。",
+    "form": "神奈川県",
+    "en": "Kanagawa Prefecture has many popular tourist destinations, including Yokohama, Kamakura, and Hakone. Since they can be reached in about an hour by train from Tokyo, they bustle with day-trippers on weekends. Being able to enjoy both the sea and the mountains in a single day is another attraction.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "行方不明",
+   "reading": "ゆくえふめい",
+   "pos": "noun",
+   "meaning": "missing",
+   "defJa": "どこにいるのかわからないこと。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "近所の小学生が、学校から帰ってこないまま行方不明になった。町内会の人たちは懐中電灯を手に、夜遅くまで川沿いや公園を捜し回った。翌朝、男の子は友達の家の物置で眠っているところを見つかった。",
+    "form": "行方不明",
+    "en": "An elementary school child in the neighborhood went missing after failing to come home from school. Members of the neighborhood association searched along the river and through parks with flashlights until late at night. The next morning, the boy was found sleeping in a storage shed at a friend's house.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "海上",
+   "reading": "かいじょう",
+   "pos": "noun",
+   "meaning": "at sea",
+   "defJa": "海の上。海の水面のあたり。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "漁船から「乗組員が海に落ちた」と通報を受け、巡視船とヘリコプターが現場へ急行した。波は高かったが、男性は救命胴衣を着けていたため、約二時間後に海上を漂っているところを無事救助された。",
+    "form": "海上",
+    "en": "After a fishing boat reported that a crew member had fallen into the sea, a patrol vessel and a helicopter rushed to the scene. Although the waves were high, the man was wearing a life jacket and was safely rescued about two hours later while floating at sea.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "気象庁",
+   "reading": "きしょうちょう",
+   "pos": "noun",
+   "meaning": "Japan Meteorological Agency",
+   "defJa": "天気や地震の情報を出す国の役所。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "気象庁は今日、九州北部が梅雨明けしたとみられると発表した。平年より五日早く、これから本格的な暑さが続く見込みだ。熱中症への十分な注意が呼びかけられている。",
+    "form": "気象庁",
+    "en": "The Japan Meteorological Agency announced today that the rainy season appears to have ended in northern Kyushu. This is five days earlier than usual, and sustained summer heat is now expected. People are being urged to take thorough precautions against heatstroke.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "出勤",
+   "reading": "しゅっきん",
+   "pos": "noun",
+   "meaning": "going to work",
+   "defJa": "仕事のために勤め先へ行くこと。",
+   "level": "N2",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "台風が近づいているため、会社は社員に自宅待機を指示した。それでも電車が動いているのを見て、律儀に出勤してきた新人が一人だけいて、部長は思わず苦笑いした。",
+    "form": "出勤",
+    "en": "Because a typhoon was approaching, the company instructed its employees to stay home on standby. Even so, one conscientious new employee saw that the trains were still running and came to work, prompting the department head to give a wry smile.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "収納家具",
+   "reading": "しゅうのうかぐ",
+   "pos": "noun",
+   "meaning": "storage furniture",
+   "defJa": "物をしまっておくための棚やたんす。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "引っ越し先の部屋には、作り付けのクローゼットがなかった。そこで、服や小物をしまうための収納家具を買いそろえることにした。部屋の寸法を測ってから選んだので、すき間なくぴったり収まった。",
+    "form": "収納家具",
+    "en": "The room I moved into did not have a built-in closet. So I decided to buy the storage furniture I needed for my clothes and small belongings. Since I measured the room before choosing the furniture, everything fit perfectly without any gaps.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "鑑定",
+   "reading": "かんてい",
+   "pos": "noun",
+   "meaning": "expert appraisal; forensic test",
+   "defJa": "専門家が物を調べ、本物かどうかや価値を決めること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "祖父の家の蔵から、古い掛け軸が見つかった。専門家に鑑定を頼んだところ、江戸時代の有名な絵師が描いた本物だとわかり、家族一同驚いている。ずっと物置の隅に放っておかれていたものだ。",
+    "form": "鑑定",
+    "en": "An old hanging scroll was found in the storehouse at my grandfather's home. We asked an expert to appraise it, and the whole family was astonished to learn that it was an authentic work by a famous painter from the Edo period. It had been left neglected in a corner of the storeroom all that time.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "目撃証言",
+   "reading": "もくげきしょうげん",
+   "pos": "noun",
+   "meaning": "eyewitness testimony",
+   "defJa": "事件や事故を見た人が、その様子を話すこと。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "事故当時、交差点の信号が何色だったのかをめぐって、双方の言い分は真っ向から食い違った。警察は防犯カメラの映像を確認するとともに、現場に居合わせた通行人の目撃証言を集めている。",
+    "form": "目撃証言",
+    "en": "The two sides gave completely conflicting accounts of what color the traffic light at the intersection had been at the time of the accident. The police are reviewing security camera footage and collecting eyewitness testimony from passersby who were at the scene.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "画像",
+   "reading": "がぞう",
+   "pos": "noun",
+   "meaning": "image (digital picture)",
+   "defJa": "写真や画面に写し出された絵や姿。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "旅行先で撮った写真をSNSに投稿する前に、画像を少し加工した。明るさを上げて色味を整えると、曇り空の下で撮った海も、見違えるほど鮮やかになった。",
+    "form": "画像",
+    "en": "Before posting the photos I had taken on my trip on social media, I edited the images a little. Increasing the brightness and adjusting the colors made even the sea, photographed under an overcast sky, look astonishingly vivid.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "死刑囚",
+   "reading": "しけいしゅう",
+   "pos": "noun",
+   "meaning": "death-row inmate",
+   "defJa": "死刑の判決が決まり、刑を待っている人。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "判決が確定してから三十年近く、その死刑囚は拘置所の独房で再審を求め続けてきた。支援者たちは、当時の捜査に重大な誤りがあったと訴え、裁判のやり直しを求める署名を集めている。",
+    "form": "死刑囚",
+    "en": "For nearly thirty years since the sentence became final, the death-row prisoner has continued to seek a retrial from a solitary cell in a detention center. Supporters contend that there were serious errors in the original investigation and are collecting signatures calling for a new trial.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "決定的",
+   "reading": "けっていてき",
+   "pos": "other",
+   "meaning": "decisive; conclusive",
+   "defJa": "結果をはっきり決めるほど重要なさま。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "試合は1対1のまま後半のロスタイムに入った。ゴール前でフリーになった相手フォワードのシュートを、キーパーが体を投げ出して止めた。あのセーブこそが、勝敗を分ける決定的な場面だった。",
+    "form": "決定的",
+    "en": "The match entered second-half stoppage time with the score still 1-1. An opposing forward found space in front of goal and took a shot, but the goalkeeper flung their body at it and made the save. That save was the decisive moment that made the difference between winning and losing.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "決定的文脈自由文法",
+   "reading": "けっていてきぶんみゃくじゆうぶんぽう",
+   "pos": "noun",
+   "meaning": "deterministic context-free grammar",
+   "defJa": "後戻りせずに構文を解析できる種類の文法。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "決定的文脈自由文法で書かれた言語なら、構文解析器は入力を左から一度読むだけで、後戻りせずに解析を進められる。そのため、多くのプログラミング言語は、この性質を満たすように文法が設計されている。",
+    "form": "決定的文脈自由文法",
+    "en": "For a language described by a deterministic context-free grammar, a parser can analyze the input in a single pass from left to right without backtracking. For this reason, the grammars of many programming languages are designed to have this property.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "開業",
+   "reading": "かいぎょう",
+   "pos": "noun",
+   "meaning": "opening a business",
+   "defJa": "新しく店や事業を始めること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "大学病院で十年勤めた内科医が、ふるさとの町で診療所を開業した。お年寄りの多い地域だけに、往診にも力を入れるという。初日から、待合室は近所の人たちでいっぱいになった。",
+    "form": "開業",
+    "en": "An internist who had worked at a university hospital for ten years opened a clinic in their hometown. Since the area has many elderly residents, the doctor says they will also focus on making house calls. From the very first day, the waiting room was full of people from the neighborhood.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "創開",
+   "reading": "そうかい",
+   "pos": "noun",
+   "meaning": "founding of a shop",
+   "defJa": "店などを新しく開くこと。珍しい言葉。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "この和菓子屋は、明治の初めに創開した老舗だ。初代が考案した栗まんじゅうは、百五十年たった今も店の看板商品で、のれんには初代のころからの屋号が染め抜かれている。",
+    "form": "創開",
+    "en": "This traditional Japanese confectionery shop is a long-established business founded in the early Meiji period. The chestnut buns devised by its founder remain the shop's signature product even after a hundred and fifty years, and its doorway curtain bears the shop name, dyed into the fabric, that has been used since the founder's day.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "迅速",
+   "reading": "じんそく",
+   "pos": "other",
+   "meaning": "swift; prompt",
+   "defJa": "物事をとてもすばやく行うさま。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "大雨で川の水位が急に上がり始めると、市はすぐに避難指示を出し、職員が一軒ずつ高齢者の家を回った。こうした迅速な対応のおかげで、けが人は一人も出なかった。",
+    "form": "迅速",
+    "en": "When heavy rain caused the river's water level to begin rising rapidly, the city immediately issued an evacuation order, and municipal staff went from house to house visiting elderly residents. Thanks to this swift response, not a single person was injured.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "警視庁",
+   "reading": "けいしちょう",
+   "pos": "noun",
+   "meaning": "Tokyo Metropolitan Police",
+   "defJa": "東京都を受け持つ警察の本部。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "東京・渋谷のスクランブル交差点には、ハロウィーンの夜になると大勢の若者が集まる。警視庁は今年も数百人規模の警察官を動員し、事故やトラブルを防ぐための警備にあたる方針だ。",
+    "form": "警視庁",
+    "en": "Large crowds of young people gather at the scramble crossing in Tokyo's Shibuya district on Halloween night. This year, the Tokyo Metropolitan Police again plan to mobilize several hundred officers to provide security and prevent accidents and trouble.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "仕分け",
+   "reading": "しわけ",
+   "pos": "noun",
+   "meaning": "sorting",
+   "defJa": "物を種類や行き先ごとに分けること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "年末の宅配便センターでは、全国から届く荷物の仕分けが夜通し続く。ベルトコンベヤーで流れてくる箱を、送り先の地域ごとに素早く分けていく。一つでも間違えると、荷物は遠く離れた町へ運ばれてしまう。",
+    "form": "仕分け",
+    "en": "At the parcel delivery center at the end of the year, the sorting of packages arriving from all over the country continues through the night. Boxes coming down the conveyor belt are quickly sorted by destination area. Even a single mistake can send a package to a town far away from where it belongs.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "切り札",
+   "reading": "きりふだ",
+   "pos": "noun",
+   "meaning": "trump card",
+   "defJa": "いざという時に使う、いちばん効く手段。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "一点を追う九回裏、二死満塁。監督は最後までベンチに温存していた切り札を代打に送った。今季打率四割を超える男は、初球を迷わず振り抜いた。打球は高々と舞い上がり、そのまま右中間のスタンドに吸い込まれた。",
+    "form": "切り札",
+    "en": "It was the bottom of the ninth inning, with the team trailing by one run, two outs, and the bases loaded. The manager sent in as a pinch hitter the trump card he had been saving on the bench until the very end. The man, who was batting over .400 that season, swung at the first pitch without hesitation. The ball soared high into the air and sailed straight into the stands in right-center field.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "銅線",
+   "reading": "どうせん",
+   "pos": "noun",
+   "meaning": "copper wire",
+   "defJa": "銅で作った細い線。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "工事現場から、ケーブルの中の銅線ばかりを狙った盗難が相次いでいる。銅の価格が上がったことで、盗んだ電線を業者に持ち込めば高値で売れるためだ。",
+    "form": "銅線",
+    "en": "There has been a series of thefts from construction sites specifically targeting the copper wire inside cables. This is because rising copper prices mean that stolen electrical wire can be sold to dealers for a high price.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "動線計画",
+   "reading": "どうせんけいかく",
+   "pos": "noun",
+   "meaning": "flow planning (of movement)",
+   "defJa": "建物の中で人がどう動くかを考えて通り道を決めること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "家を建てるとき、間取りの見た目ばかりに気を取られがちだが、大切なのは動線計画だ。台所から洗面所、物干し場までが一直線につながっていれば、毎日の家事はぐっと楽になる。",
+    "form": "動線計画",
+    "en": "When building a house, it is easy to focus entirely on how the floor plan looks, but what matters is planning how people move through it. If the kitchen, washroom, and clothes-drying area are connected in a straight line, everyday housework becomes much easier.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "記号",
+   "reading": "きごう",
+   "pos": "noun",
+   "meaning": "symbol, sign",
+   "defJa": "意味を表すために使う、しるしや文字。",
+   "level": "N2",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "洗濯表示の記号は、数年前に国際規格に合わせて新しくなった。たらいの絵は洗濯、三角は漂白、四角は乾燥を表す。初めて見たときは、まるで暗号のようだと思った。",
+    "form": "記号",
+    "en": "The symbols on laundry care labels were updated a few years ago to conform to international standards. A picture of a wash tub means washing, a triangle means bleaching, and a square means drying. When I first saw them, I thought they looked like a secret code.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "侮る",
+   "reading": "あなどる",
+   "pos": "verb",
+   "meaning": "underestimate",
+   "defJa": "相手の力を低く見て、軽く扱う。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "相手は県大会で一度も勝ったことのない無名校だった。格下だと侮って控え選手中心で臨んだ結果、前回王者はまさかの初戦敗退を喫した。試合後、監督は「油断があった」と頭を下げた。",
+    "form": "侮って",
+    "en": "Their opponents were an unknown school that had never won a match in the prefectural tournament. Underestimating them as an inferior side, the defending champions fielded mostly reserves and suffered a shocking defeat in their opening match. Afterward, the coach bowed and admitted, 'We let our guard down.'",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "礎を築く",
+   "reading": "いしずえをきずく",
+   "pos": "other",
+   "meaning": "to lay the foundations",
+   "defJa": "のちの発展を支える土台をつくる。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "明治の初め、政府は海外から多くの技術者を招き、鉄道を敷き、製糸工場を建てさせた。そこで技術を学んだ日本人がやがて各地で後進を育て、日本が工業国として発展する礎を築いた。",
+    "form": "礎を築いた",
+    "en": "In the early Meiji period, the government invited many engineers from overseas to lay railways and build silk-reeling mills. The Japanese people who learned these techniques there later trained the next generation in regions across the country, laying the foundations for Japan's development as an industrial nation.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "膨大",
+   "reading": "ぼうだい",
+   "pos": "other",
+   "meaning": "enormous, vast",
+   "defJa": "数や量がとても多いようす。",
+   "level": "N2",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "辞書づくりは気の遠くなる作業だ。新聞や雑誌から集めた膨大な用例を一つずつ読み、言葉の意味や使われ方を確かめていく。一冊が完成するまでに十年以上かかることも珍しくない。",
+    "form": "膨大",
+    "en": "Compiling a dictionary is a dauntingly long task. An enormous number of examples collected from newspapers and magazines must be read one by one to check the meanings of words and how they are used. It is not unusual for a single dictionary to take more than ten years to complete.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "製法",
+   "reading": "せいほう",
+   "pos": "noun",
+   "meaning": "method of making",
+   "defJa": "物を作るやり方や手順。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "創業三百年のしょうゆ蔵では、杉の大桶で一年以上かけて熟成させる昔ながらの製法を今も守っている。手間もコストもかかるが、この味を求めて全国から注文が届く。",
+    "form": "製法",
+    "en": "A soy sauce brewery founded three hundred years ago still follows the traditional method of aging its sauce for more than a year in large cedar vats. It takes both labor and money, but orders come in from across the country from people seeking this flavor.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "高度",
+   "reading": "こうど",
+   "pos": "noun",
+   "meaning": "advanced; altitude",
+   "defJa": "程度が高いこと。また、地上からの高さ。",
+   "level": "N2",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "飛行機が高度一万メートルに達すると、シートベルト着用のサインが消えた。窓の外には、どこまでも雲の海が広がっている。富士山の頂だけが、その上にぽっかりと顔を出していた。",
+    "form": "高度",
+    "en": "When the plane reached an altitude of ten thousand meters, the fasten-seatbelt sign went off. Outside the window, a sea of clouds stretched as far as the eye could see. Only the summit of Mount Fuji poked up above it.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "登載",
+   "reading": "とうさい",
+   "pos": "noun",
+   "meaning": "entry (in a register)",
+   "defJa": "名簿や台帳に、名前などを書き入れること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "選挙で投票するには、住んでいる市区町村の選挙人名簿に登載されていなければならない。引っ越したばかりの人は、転入届を出してから三か月たつまで、新しい住所では投票できない。",
+    "form": "登載",
+    "en": "To vote in an election, you must be listed on the electoral register of the city, ward, town, or village where you live. People who have just moved cannot vote at their new address until three months have passed since they filed their notification of moving in.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "縮小",
+   "reading": "しゅくしょう",
+   "pos": "noun",
+   "meaning": "reduction, scaling down",
+   "defJa": "規模や大きさを小さくすること。",
+   "level": "N2",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "業績の悪化を受けて、その家電メーカーは国内の工場を二つ閉鎖し、事業を大幅に縮小すると発表した。従業員のおよそ一割にあたる千人が、配置転換や早期退職の対象になるという。",
+    "form": "縮小",
+    "en": "Following a decline in its business performance, the home appliance manufacturer announced that it would close two factories in Japan and substantially scale back its operations. About one thousand employees, roughly ten percent of its workforce, will reportedly be subject to reassignment or early retirement.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "真空管",
+   "reading": "しんくうかん",
+   "pos": "noun",
+   "meaning": "vacuum tube",
+   "defJa": "空気を抜いたガラス管で電気の流れを操る部品。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "祖父の書斎には、古い真空管アンプが今も現役で置かれている。電源を入れると、ガラスの管の中がほんのりと橙色に灯り、しばらくして温まってから、柔らかな音が流れ出す。",
+    "form": "真空管",
+    "en": "An old vacuum-tube amplifier is still in active use in my grandfather's study. When it is switched on, the insides of the glass tubes glow a faint orange, and after a little while, once they have warmed up, a soft sound begins to flow out.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "貿易摩擦",
+   "reading": "ぼうえきまさつ",
+   "pos": "noun",
+   "meaning": "trade friction",
+   "defJa": "輸出入をめぐって国の間に起きる対立。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "アメリカが中国からの輸入品に高い関税をかけると、中国もすぐに報復関税で応じた。両国の貿易摩擦は激しさを増し、世界経済の先行きにも暗い影を落としている。",
+    "form": "貿易摩擦",
+    "en": "When the United States imposed high tariffs on imports from China, China immediately responded with retaliatory tariffs. Trade friction between the two countries has intensified, casting a dark shadow over the outlook for the global economy as well.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "由々しき",
+   "reading": "ゆゆしき",
+   "pos": "other",
+   "meaning": "grave, serious",
+   "defJa": "放っておけないほど重大な。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "地方の病院では医師不足が深刻で、夜間に救急患者を受け入れられない日も出てきた。救急車が隣の市まで走ることも珍しくない。住民の命に直結する、由々しき事態だ。",
+    "form": "由々しき",
+    "en": "Hospitals in rural areas face such a serious shortage of doctors that there are now some nights when they cannot accept emergency patients. It is not uncommon for ambulances to have to travel to the neighboring city. This is a grave situation that directly affects residents' lives.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "指数関数",
+   "reading": "しすうかんすう",
+   "pos": "noun",
+   "meaning": "exponential function",
+   "defJa": "同じ数を何回も掛け合わせる形の関数。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "感染症の流行が始まったばかりの頃は、患者の数が指数関数的に増えていく。一人が二人に、二人が四人にうつしていけば、わずか十回で千人を超えてしまう。最初の対策が肝心だと言われるのはそのためだ。",
+    "form": "指数関数",
+    "en": "In the early stages of an infectious disease outbreak, the number of patients grows exponentially. If one person infects two, those two infect four, and so on, the number will exceed a thousand in just ten rounds. This is why measures taken at the outset are said to be crucial.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "凄まじい",
+   "reading": "すさまじい",
+   "pos": "other",
+   "meaning": "tremendous, fierce",
+   "defJa": "驚くほど勢いや程度が激しい。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "台風が上陸した夜、窓の外では凄まじい風が吹き荒れていた。庭の木が大きくしなり、どこからか飛んできたトタン板が塀にぶつかる音が響いた。家族は一睡もできないまま朝を迎えた。",
+    "form": "凄まじい",
+    "en": "On the night the typhoon made landfall, a ferocious wind raged outside the window. The trees in the garden bent sharply, and the sound of a sheet of corrugated metal blown in from somewhere crashing into the wall around the property rang out. The family reached morning without getting a wink of sleep.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "協定",
+   "reading": "きょうてい",
+   "pos": "noun",
+   "meaning": "agreement, pact",
+   "defJa": "国や団体が話し合って決めた約束。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "隣り合う二つの町が、大きな災害に備えて相互応援協定を結んだ。どちらかが被災した場合、もう一方が給水車や職員を派遣し、避難してきた住民の受け入れも行う。",
+    "form": "協定",
+    "en": "Two neighboring towns have signed a mutual aid agreement in preparation for major disasters. If either town is struck by a disaster, the other will dispatch water trucks and staff, and also take in residents who have evacuated.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "性能",
+   "reading": "せいのう",
+   "pos": "noun",
+   "meaning": "performance of a machine",
+   "defJa": "機械などがどれだけよく働くかの程度。",
+   "level": "N2",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "新しいスマートフォンは、カメラの性能が大きく向上した。暗い室内でもノイズの少ない写真が撮れ、遠くの看板の文字までくっきり写る。その分、価格も前のモデルより一万円ほど高くなった。",
+    "form": "性能",
+    "en": "The new smartphone's camera performance has improved greatly. It can take photos with little noise even in dark rooms, and it captures even the lettering on distant signs clearly. The price is also about ten thousand yen higher than the previous model's as a result.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "財閥",
+   "reading": "ざいばつ",
+   "pos": "noun",
+   "meaning": "family-run conglomerate",
+   "defJa": "一族が多くの会社を支配する企業グループ。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "戦前の日本経済は、三井や三菱、住友といった財閥が握っていた。一族が持ち株会社を通じて銀行や商社、鉱山など多くの企業を支配していたのだ。戦後、これらは占領軍の命令で解体された。",
+    "form": "財閥",
+    "en": "Before the war, Japan's economy was controlled by family-owned conglomerates such as Mitsui, Mitsubishi, and Sumitomo. Through holding companies, these families controlled numerous businesses, including banks, trading companies, and mines. After the war, these conglomerates were dismantled on the orders of the occupying forces.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "制圧",
+   "reading": "せいあつ",
+   "pos": "noun",
+   "meaning": "bringing under control",
+   "defJa": "力で相手をおさえて支配すること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "コンビニで刃物を振り回していた男は、通報を受けて駆けつけた警察官二人によって、間もなく制圧された。客や店員にけがはなく、男はその場で現行犯逮捕されたという。",
+    "form": "制圧",
+    "en": "A man brandishing a knife in a convenience store was soon subdued by two police officers who rushed to the scene after receiving a report. No customers or staff were injured, and the man was reportedly arrested on the spot after being caught in the act.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "決裂",
+   "reading": "けつれつ",
+   "pos": "noun",
+   "meaning": "breakdown of talks",
+   "defJa": "話し合いがまとまらずに終わること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "賃上げをめぐる労使の交渉は、深夜まで続いたものの決裂した。組合側は翌朝から二十四時間のストライキに入ると発表し、通勤客への影響が心配されている。",
+    "form": "決裂",
+    "en": "Negotiations between labor and management over a pay increase continued late into the night but broke down. The union announced that it would begin a twenty-four-hour strike the following morning, raising concerns about the impact on commuters.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "中枢",
+   "reading": "ちゅうすう",
+   "pos": "noun",
+   "meaning": "center, core",
+   "defJa": "全体を動かす、いちばん大事な中心部分。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "霞が関には、財務省や外務省など、国の行政の中枢を担う官庁が集まっている。国会議事堂や首相官邸もすぐ近くにあり、昼休みになると、官庁街の食堂はスーツ姿の職員でいっぱいになる。",
+    "form": "中枢",
+    "en": "Kasumigaseki is home to a concentration of ministries, including the Ministry of Finance and the Ministry of Foreign Affairs, that form the core of the national administration. The National Diet Building and the prime minister's office are also close by, and at lunchtime the eateries in the government district fill with officials in suits.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "製造工程",
+   "reading": "せいぞうこうてい",
+   "pos": "noun",
+   "meaning": "manufacturing process",
+   "defJa": "物を作るときの、材料から完成までの段階。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "工場見学では、ガラス越しにチョコレートの製造工程を見ることができる。カカオ豆を炒って細かくすりつぶし、型に流して冷やし固めるまで、すべて機械が自動で進めていく。最後に試食をもらって、子どもたちは大喜びだった。",
+    "form": "製造工程",
+    "en": "On the factory tour, visitors can watch the chocolate manufacturing process through glass. Machines handle every step automatically, from roasting the cocoa beans and grinding them finely to pouring the chocolate into molds and cooling it until it sets. The children were delighted to receive samples to taste at the end.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "現像",
+   "reading": "げんぞう",
+   "pos": "noun",
+   "meaning": "developing (film)",
+   "defJa": "撮ったフィルムを薬で処理して像を出すこと。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "デジタルカメラが普及する前は、撮り終えたフィルムを写真店に持っていき、現像を頼むのが当たり前だった。仕上がりは数日後で、どんな写真が撮れているか、受け取るまで分からないのも楽しみのひとつだった。",
+    "form": "現像",
+    "en": "Before digital cameras became widespread, it was normal to take a finished roll of film to a photo shop and ask to have it developed. The photos would be ready a few days later, and not knowing how they had turned out until picking them up was part of the fun.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "削り",
+   "reading": "けずり",
+   "pos": "noun",
+   "meaning": "shaving; cutting away",
+   "defJa": "表面を少しずつそぎ取ること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "大工の祖父がかんなを引くと、紙のように薄い木くずがくるくると丸まって床に落ちた。向こうが透けて見えるほどの削りこそ、腕の確かさの証しだという。",
+    "form": "削り",
+    "en": "When my grandfather, a carpenter, pulled his plane along the wood, paper-thin shavings curled up and fell to the floor. He says that shavings so fine you can see through them are the true proof of a skilled hand.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "共学",
+   "reading": "きょうがく",
+   "pos": "noun",
+   "meaning": "coeducation",
+   "defJa": "男子と女子が同じ学校で学ぶこと。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "娘が通う高校は、昨年まで女子校だったが、今年から共学になった。廊下に男子生徒の姿があるのは、まだ少し不思議な感じがするという。制服も新しくなり、学校の雰囲気はずいぶん変わった。",
+    "form": "共学",
+    "en": "The high school my daughter attends was a girls' school until last year, but it became coeducational this year. She says it still feels a little strange to see male students in the hallways. The uniforms have also changed, and the atmosphere of the school is quite different now.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "驚愕",
+   "reading": "きょうがく",
+   "pos": "noun",
+   "meaning": "astonishment, shock",
+   "defJa": "ひどくおどろくこと。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "一枚の絵画が、オークションで予想の十倍を超える値段で落札された。会場には驚愕の声が広がり、記者たちは落札者が誰なのかを確かめようと一斉に走り出した。",
+    "form": "驚愕",
+    "en": "A painting sold at auction for more than ten times its expected price. Cries of astonishment spread through the room, and the reporters all rushed off at once to find out who the winning bidder was.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "湧出",
+   "reading": "ゆうしゅつ",
+   "pos": "noun",
+   "meaning": "welling up from the ground",
+   "defJa": "地中から湯や水がわき出ること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "この温泉では、地下千メートルから毎分五百リットルもの湯が湧出している。源泉の温度は六十度を超えるため、水で薄めることはせず、時間をかけて冷ましてから湯船に注いでいる。",
+    "form": "湧出",
+    "en": "At this hot spring, as much as five hundred liters of hot water wells up every minute from a thousand meters underground. Since the water is over sixty degrees Celsius at its source, it is allowed to cool gradually before being poured into the baths, without being diluted with water.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "放逸",
+   "reading": "ほういつ",
+   "pos": "other",
+   "meaning": "self-indulgent living",
+   "defJa": "したい放題で、だらしなく暮らすこと。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "名家の跡取りとして育った若旦那は、父親が亡くなると家業を番頭に任せきりにし、毎晩のように茶屋で遊び暮らした。その放逸な暮らしぶりがたたって、三代続いた店はわずか数年で人手に渡った。",
+    "form": "放逸",
+    "en": "The young master, raised as the heir to a distinguished family, left the family business entirely in the hands of its head clerk after his father died and spent nearly every night enjoying himself at teahouses. His dissolute lifestyle took its toll, and within just a few years the shop, which had lasted three generations, passed into other hands.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "追い上げる",
+   "reading": "おいあげる",
+   "pos": "verb",
+   "meaning": "to close in on",
+   "defJa": "前を行く相手との差を縮めて迫る。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "前半で三点差をつけられたチームは、後半に入ると猛然と追い上げ、残り五分でついに同点に追いついた。スタンドは総立ちとなり、地鳴りのような歓声が響いた。",
+    "form": "追い上げ",
+    "en": "After falling three goals behind in the first half, the team mounted a fierce comeback in the second half and finally drew level with five minutes remaining. Everyone in the stands rose to their feet, and cheers rumbled like an earthquake.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "劣勢",
+   "reading": "れっせい",
+   "pos": "noun",
+   "meaning": "losing position",
+   "defJa": "相手より力が弱く、不利な立場。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "前半を終えて0対2。劣勢に立たされたチームは、ハーフタイムに監督から檄を飛ばされ、後半は見違えるような動きを見せた。終了間際の同点ゴールに、スタンドは総立ちになった。",
+    "form": "劣勢",
+    "en": "At the end of the first half, the score was 0-2. The team, struggling from behind, received a rousing talk from the coach at halftime and played like a completely different side in the second half. An equalizing goal just before the end brought everyone in the stands to their feet.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "速やか",
+   "reading": "すみやか",
+   "pos": "other",
+   "meaning": "prompt; without delay",
+   "defJa": "時間をおかずに、すぐ行うさま。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "地震で大きな揺れを感じたら、まず身の安全を確保しよう。揺れが収まったら火の元を確認し、速やかに避難できるよう出口を確保しておくことが大切だ。",
+    "form": "速やか",
+    "en": "If you feel strong shaking during an earthquake, first make sure you are safe. Once the shaking stops, it is important to check potential sources of fire and keep an exit clear so that you can evacuate promptly.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "要石",
+   "reading": "かなめいし",
+   "pos": "noun",
+   "meaning": "keystone, linchpin",
+   "defJa": "全体を支え、ないと成り立たない大事なもの。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "石造りのアーチは、てっぺんに据えた要石が左右の石をしっかりと押さえることで形を保っている。この一つを抜き取れば、アーチはたちまち崩れ落ちてしまう。",
+    "form": "要石",
+    "en": "A stone arch holds its shape because the keystone at the top firmly holds the stones on either side in place. If that one stone is removed, the arch will immediately collapse.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "牛耳る",
+   "reading": "ぎゅうじる",
+   "pos": "verb",
+   "meaning": "to control, to dominate",
+   "defJa": "組織の中心に立ち、思いどおりに動かす。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "その町内会は、二十年以上も会長を務める元町議が牛耳っている。祭りの日取りから予算の使い道まで、会長の一声ですべてが決まってしまう。最近は、若い住民から不満の声も上がり始めた。",
+    "form": "牛耳っている",
+    "en": "That neighborhood association is dominated by a former town council member who has served as its chair for more than twenty years. Everything, from the dates of festivals to how the budget is spent, is decided by a single word from the chair. Recently, younger residents have begun voicing dissatisfaction as well.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "讃岐うどん",
+   "reading": "さぬきうどん",
+   "pos": "noun",
+   "meaning": "Sanuki udon",
+   "defJa": "香川県の名物で、こしが強いうどん。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "香川県は「うどん県」を名乗るほどのうどん好きの土地だ。こしの強い讃岐うどんを目当てに、朝から何軒もの店をはしごする観光客も珍しくない。一杯数百円という手ごろな値段も魅力だ。",
+    "form": "讃岐うどん",
+    "en": "People in Kagawa Prefecture love udon noodles so much that the prefecture calls itself 'Udon Prefecture.' It is not unusual for tourists to start in the morning and visit several shops in succession in search of the firm, chewy Sanuki udon noodles. The affordable price of just a few hundred yen per bowl is another attraction.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "寄付",
+   "reading": "きふ",
+   "pos": "noun",
+   "meaning": "donation",
+   "defJa": "お金や物を、見返りなしに差し出すこと。",
+   "level": "N3",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "卒業記念に、六年生が育てた野菜を地域のバザーで売り、売り上げをすべて近くの児童養護施設に寄付した。施設からは、お礼の手紙と子どもたちの絵が届いた。",
+    "form": "寄付",
+    "en": "To mark their graduation, the sixth graders sold vegetables they had grown at a local bazaar and donated all the proceeds to a nearby children's home. The home sent them a thank-you letter and drawings by the children.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "宛先",
+   "reading": "あてさき",
+   "pos": "noun",
+   "meaning": "address of the recipient",
+   "defJa": "手紙やメールを届ける相手や住所。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "急いでいたせいで、取引先に送るはずの見積書を、宛先をよく確かめないまま別の会社に送ってしまった。気づいたのは送信ボタンを押した直後で、血の気が引いた。",
+    "form": "宛先",
+    "en": "Because I was in a hurry, I sent a quotation intended for a client to a different company without checking the recipient's address carefully. I realized my mistake just after pressing the send button, and the blood drained from my face.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "あて先変更",
+   "reading": "あてさきへんこう",
+   "pos": "noun",
+   "meaning": "change of delivery address",
+   "defJa": "郵便物を届ける住所を新しくすること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "通販で注文した荷物を、自宅ではなく職場で受け取りたくなった。配送業者のサイトから手続きをすれば、発送後でもあて先変更ができる。ただし、配達がすでに始まっている場合は受け付けてもらえないこともある。",
+    "form": "あて先変更",
+    "en": "I decided I wanted to receive a package I had ordered online at work rather than at home. By completing the procedure on the delivery company's website, you can change the delivery address even after the package has shipped. However, the request may not be accepted if the package is already out for delivery.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "芸術家",
+   "reading": "げいじゅつか",
+   "pos": "noun",
+   "meaning": "artist",
+   "defJa": "絵や音楽などの作品を作る人。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "パリのモンマルトルの丘には、かつて貧しい画家や詩人が大勢暮らしていた。若き日のピカソもその一人で、芸術家たちは安いアトリエで互いに刺激を与え合いながら、新しい表現を生み出していった。",
+    "form": "芸術家",
+    "en": "The hill of Montmartre in Paris was once home to many poor painters and poets. The young Picasso was one of them, and in inexpensive studios, these artists inspired one another as they developed new forms of expression.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "顔つき",
+   "reading": "かおつき",
+   "pos": "noun",
+   "meaning": "facial expression, look",
+   "defJa": "顔の形やようす。そのときの表情。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "面接の順番を待つ学生たちは、みな緊張した顔つきで手元のメモを見つめていた。名前を呼ばれた青年は、一度大きく息を吸ってから、背筋を伸ばして部屋に入っていった。",
+    "form": "顔つき",
+    "en": "The students waiting their turn for interviews were all staring at the notes in their hands with tense expressions. When his name was called, one young man took a deep breath, straightened his back, and went into the room.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "争う",
+   "reading": "あらそう",
+   "pos": "verb",
+   "meaning": "to compete for; to quarrel",
+   "defJa": "相手に勝とうとして張り合う。けんかする。",
+   "level": "N3",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "父が亡くなったあと、残された土地をめぐって兄弟が争うことになった。幼いころはあれほど仲がよかったのに、今では顔を合わせても口もきかない。母はそれが何よりもつらいと言う。",
+    "form": "争う",
+    "en": "After my father died, my brothers ended up fighting over the land he left behind. They had been so close as children, but now they will not even speak when they see each other. My mother says that hurts her more than anything.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "競う",
+   "reading": "きそう",
+   "pos": "verb",
+   "meaning": "to compete, vie",
+   "defJa": "相手より上になろうと、力や技を比べ合う。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "秋の運動会のクライマックスは、紅白に分かれて速さを競うリレーだ。最後の走者がゴールテープを切った瞬間、校庭じゅうに歓声と拍手が沸き起こった。",
+    "form": "競う",
+    "en": "The highlight of the autumn sports day is the relay, in which the students split into red and white teams and compete to see who is fastest. The moment the final runner broke the finish-line tape, cheers and applause erupted throughout the schoolyard.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "素肌",
+   "reading": "すはだ",
+   "pos": "noun",
+   "meaning": "bare skin",
+   "defJa": "化粧や服でおおわれていない肌。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "真夏の海辺では、素肌に強い日差しを浴びる時間がどうしても長くなる。日焼け止めはこまめに塗り直し、肩や首の後ろなど、塗り忘れやすいところにも気を配りたい。",
+    "form": "素肌",
+    "en": "At the beach in midsummer, your bare skin inevitably ends up exposed to strong sunlight for long periods. Be sure to reapply sunscreen frequently and pay attention to places that are easy to forget, such as your shoulders and the back of your neck.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "素泊り",
+   "reading": "すどまり",
+   "pos": "noun",
+   "meaning": "room-only stay",
+   "defJa": "宿で、食事をつけずに泊まること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "温泉街の旅館は一泊二食付きが基本だが、最近は素泊まりのプランを用意する宿も増えた。夕食は近くの居酒屋で地元の料理を楽しみ、宿には寝に帰るだけという旅も気軽でいい。",
+    "form": "素泊まり",
+    "en": "Inns in hot-spring towns typically offer an overnight stay with dinner and breakfast, but recently more have begun offering room-only plans. A trip where you enjoy local food for dinner at a nearby pub and return to the inn just to sleep can be pleasantly relaxed, too.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "首相",
+   "reading": "しゅしょう",
+   "pos": "noun",
+   "meaning": "prime minister",
+   "defJa": "内閣の一番上に立ち、国の政治を率いる人。",
+   "level": "N3",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "首相は記者会見で、来年度から子育て世帯への給付を拡充する方針を明らかにした。財源については、年末までに具体案をまとめるとしているが、野党からは増税につながるのではないかと懸念する声も出ている。",
+    "form": "首相",
+    "en": "At a press conference, the prime minister announced plans to expand benefits for households raising children beginning next fiscal year. The prime minister said a concrete funding proposal would be drawn up by the end of the year, but some in the opposition have expressed concern that it could lead to tax increases.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "国会",
+   "reading": "こっかい",
+   "pos": "noun",
+   "meaning": "the Diet (parliament)",
+   "defJa": "選ばれた議員が法律や予算を決める国の機関。",
+   "level": "N3",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "来年度の予算案が、きょうの午後の本会議で可決され、成立した。野党は審議の時間が足りないと強く反発したが、与党が賛成多数で押し切った。予算をめぐる攻防が終わり、国会の焦点は今後、年金制度の改革に移る。",
+    "form": "国会",
+    "en": "The budget for next fiscal year was passed and formally approved at this afternoon's plenary session. The opposition strongly objected that there had not been enough time for deliberation, but the ruling party pushed it through with a majority vote. With the battle over the budget over, the Diet's focus will now shift to reforming the pension system.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "診る",
+   "reading": "みる",
+   "pos": "verb",
+   "meaning": "to examine a patient",
+   "defJa": "医者が患者の体の具合を調べる。",
+   "level": "N3",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "夜中に娘が高い熱を出したので、急いで救急外来に連れていった。当直の医師は喉の奥をのぞき、胸に聴診器を当てて丁寧に診ると、「インフルエンザでしょう」と言って薬を出してくれた。",
+    "form": "診る",
+    "en": "My daughter developed a high fever in the middle of the night, so I hurried her to the emergency department. The doctor on duty looked into the back of her throat, placed a stethoscope against her chest, and examined her carefully, then said, \"It's probably the flu,\" and prescribed some medicine.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "回復",
+   "reading": "かいふく",
+   "pos": "noun",
+   "meaning": "recovery",
+   "defJa": "悪くなったものが、もとの状態にもどること。",
+   "level": "N3",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "手術から一か月、父の体力はゆっくりと回復してきた。最初は病室の中を歩くのがやっとだったが、今では毎朝、病院の中庭を一周できるまでになった。来月には退院できそうだという。",
+    "form": "回復",
+    "en": "In the month since his operation, my father's strength has gradually been returning. At first, he could barely walk around his hospital room, but now he can make a circuit of the hospital courtyard every morning. They say he will probably be able to leave the hospital next month.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "景気",
+   "reading": "けいき",
+   "pos": "noun",
+   "meaning": "the economy, business conditions",
+   "defJa": "物の売り買いなど、経済全体の調子。",
+   "level": "N3",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "景気が良くなると企業の業績が上がり、給料やボーナスも増える。人々の財布のひもがゆるめば物がよく売れ、それがまた企業を潤すという好循環が生まれる。",
+    "form": "景気",
+    "en": "When the economy improves, companies perform better, and salaries and bonuses rise as well. When people loosen their purse strings, goods sell well, which in turn helps companies prosper, creating a virtuous cycle.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "健全",
+   "reading": "けんぜん",
+   "pos": "other",
+   "meaning": "healthy, sound",
+   "defJa": "無理やかたよりがなく、しっかりしたようす。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "市の財政は、ここ数年で大きく改善した。借金を減らし、無駄な事業を見直した結果、ようやく健全な状態を取り戻しつつある。十年前には、財政破綻の一歩手前とまで言われていた。",
+    "form": "健全",
+    "en": "The city's finances have improved considerably over the past few years. By reducing its debt and reviewing wasteful projects, it is finally returning to a sound financial footing. Ten years ago, it was even said to be on the brink of financial collapse.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "双方",
+   "reading": "そうほう",
+   "pos": "noun",
+   "meaning": "both sides",
+   "defJa": "向かい合う二つの側の、どちらも。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "賃上げをめぐる労使の交渉は、深夜にまで及んだ。会社側が当初の提示額を引き上げたことで、ようやく双方が歩み寄り、合意にこぎつけた。予定されていたストライキは回避される見通しだ。",
+    "form": "双方",
+    "en": "Negotiations between labor and management over a pay raise continued late into the night. When the company increased its initial offer, the two sides finally moved toward a compromise and managed to reach an agreement. The planned strike is now expected to be averted.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "非常識",
+   "reading": "ひじょうしき",
+   "pos": "other",
+   "meaning": "inconsiderate, out of line",
+   "defJa": "世の中の当たり前のマナーから外れていること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "深夜二時に、上の階の住人が掃除機をかけ始めた。翌朝、管理会社に相談すると、担当者も「さすがにその時間は非常識ですね」と苦笑いし、全戸に注意の張り紙を出してくれた。",
+    "form": "非常識",
+    "en": "At two in the morning, the resident upstairs started vacuuming. When I raised the issue with the management company the next morning, the person in charge gave a wry smile and agreed, \"That really is an inconsiderate time to do it,\" then put up a notice reminding all residents to be considerate.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "潔い",
+   "reading": "いさぎよい",
+   "pos": "other",
+   "meaning": "gracious; without excuses",
+   "defJa": "未練を残さず、思い切りがよい。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "試合に敗れた監督は、言い訳を一切しなかった。「すべて私の采配ミスです」と頭を下げ、その場で辞任を表明した。その潔い態度に、相手チームのファンからも拍手が送られた。",
+    "form": "潔い",
+    "en": "After losing the game, the coach made no excuses whatsoever. He bowed his head and said, \"It was all down to my tactical mistakes,\" and announced his resignation on the spot. His forthright acceptance of responsibility drew applause even from the opposing team's fans.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "報告",
+   "reading": "ほうこく",
+   "pos": "noun",
+   "meaning": "report; informing",
+   "defJa": "起きたことや調べたことを人に知らせること。",
+   "level": "N3",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "出張から戻った課長は、さっそく部長に商談の結果を報告した。先方が新しい契約に前向きだと聞き、部長は満足そうにうなずいた。「詳しいことは明日までに書面で頼む」とだけ言って、席を立った。",
+    "form": "報告",
+    "en": "On returning from his business trip, the section chief promptly reported the outcome of the business negotiations to the department head. Hearing that the other party was receptive to a new contract, the department head nodded with satisfaction. He simply said, \"Please put the details in writing by tomorrow,\" and got up from his seat.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "盛大",
+   "reading": "せいだい",
+   "pos": "other",
+   "meaning": "grand, lavish",
+   "defJa": "人が多く集まり、にぎやかで立派なようす。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "祖父の米寿を祝って、親戚一同が集まり、盛大なパーティーを開いた。ひ孫たちから花束を受け取ると、祖父は照れくさそうに笑い、最後には少し涙ぐんでいた。",
+    "form": "盛大",
+    "en": "To celebrate my grandfather's eighty-eighth birthday, all the relatives gathered and threw a grand party. When he received a bouquet from his great-grandchildren, he smiled bashfully, and by the end he was a little teary-eyed.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "医療",
+   "reading": "いりょう",
+   "pos": "noun",
+   "meaning": "medical care",
+   "defJa": "病気やけがを治すこと。また、そのしくみ。",
+   "level": "N3",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "山あいのこの村には診療所が一つしかなく、医師は週に二日しか来ない。急病のときは、車で一時間かけて町の病院まで行くしかない。過疎地の医療をどう守るかは、多くの自治体が抱える課題だ。",
+    "form": "医療",
+    "en": "This village nestled in the mountains has only one clinic, and a doctor comes just two days a week. In the event of a sudden illness, the only option is to drive an hour to the hospital in town. How to preserve access to medical care in areas with shrinking populations is a challenge facing many local governments.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "幸運",
+   "reading": "こううん",
+   "pos": "noun",
+   "meaning": "good luck",
+   "defJa": "運がよいこと。よいめぐり合わせ。",
+   "level": "N3",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "大雪で飛行機が欠航し、空港で途方に暮れていたところ、最後の一席だけ空いていた夜行バスに乗ることができた。あの幸運がなければ、翌日の面接には間に合わなかっただろう。",
+    "form": "幸運",
+    "en": "My flight was canceled because of heavy snow, and I was at a loss at the airport when I managed to get the very last available seat on an overnight bus. Without that stroke of luck, I probably would not have made it to my interview the next day.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "具体性",
+   "reading": "ぐたいせい",
+   "pos": "noun",
+   "meaning": "concreteness, specificity",
+   "defJa": "話や計画の中身がはっきりしていること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "「売り上げを伸ばすために頑張ります」という目標では、具体性に欠ける。誰に、何を、いつまでに、どれだけ売るのか。そこまで決めて初めて、計画は動き出す。",
+    "form": "具体性",
+    "en": "A goal such as \"I'll work hard to increase sales\" is not specific enough. What will you sell, to whom, in what quantity, and by when? Only after you have decided that much can the plan get moving.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "具体的",
+   "reading": "ぐたいてき",
+   "pos": "other",
+   "meaning": "concrete, specific",
+   "defJa": "中身がはっきりしていて、よくわかる様子。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "「売上を伸ばしたい」だけでは、目標として弱い。いつまでに、何をどれだけ増やすのか、具体的な数字に落とし込んでこそ、日々の行動が決まってくる。",
+    "form": "具体的",
+    "en": "Simply saying \"I want to increase sales\" is weak as a goal. Only when you express it in concrete numbers—what you will increase, by how much, and by when—does it become clear what you need to do each day.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "反面",
+   "reading": "はんめん",
+   "pos": "noun",
+   "meaning": "on the other hand",
+   "defJa": "ある面とは逆の、もう一方の面。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "都会の暮らしは便利な反面、家賃が高く、どこへ行っても人が多くて落ち着かない。週末になると山あいの実家に帰りたくなるのは、きっとそのせいだろう。",
+    "form": "反面",
+    "en": "City life is convenient, but rents are high, and everywhere you go is so crowded that it is hard to relax. That is probably why, whenever the weekend comes, I feel like going back to my family home in the mountains.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "つべこべ",
+   "reading": "つべこべ",
+   "pos": "other",
+   "meaning": "complaining on and on",
+   "defJa": "あれこれと文句や理屈を言うようす。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "「宿題が多すぎるよ」「先生がずるいんだ」と言い訳を並べる息子に、母はぴしゃりと言った。「つべこべ言わないで、さっさと始めなさい。終わったらおやつにしようね」。",
+    "form": "つべこべ",
+    "en": "As her son piled on excuses such as \"There's too much homework\" and \"The teacher's being unfair,\" his mother spoke sharply to him. \"Stop arguing and get started right away. When you're finished, let's have a snack.\"",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "一握り",
+   "reading": "ひとにぎり",
+   "pos": "noun",
+   "meaning": "a handful; a tiny few",
+   "defJa": "片手でつかめるほどの量。ごくわずか。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "プロのサッカー選手になる夢を抱く子どもは数えきれないほどいるが、実際にプロとして生活していけるのは、ほんの一握りにすぎない。それでも少年は、毎朝誰よりも早くグラウンドに来てボールを蹴っている。",
+    "form": "一握り",
+    "en": "Countless children dream of becoming professional soccer players, but only a tiny handful can actually make a living as professionals. Even so, the boy arrives at the field earlier than anyone else every morning to kick a ball around.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "言及",
+   "reading": "げんきゅう",
+   "pos": "noun",
+   "meaning": "mention; reference",
+   "defJa": "話や文章の中で、あることに触れること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "首相は記者会見で景気対策について長く語ったが、消費税の引き上げには最後まで言及しなかった。記者から重ねて問われても、「まだ何も決まっていない」と繰り返すばかりだった。",
+    "form": "言及",
+    "en": "At the press conference, the prime minister spoke at length about measures to boost the economy but never mentioned raising the consumption tax. Even when reporters asked repeatedly, the prime minister would only repeat, \"Nothing has been decided yet.\"",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "仮に",
+   "reading": "かりに",
+   "pos": "other",
+   "meaning": "supposing, if",
+   "defJa": "本当かどうかは別にして、そうだとすると。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "仮に今夜、大きな地震が起きたとしたら、家族とどこで落ち合うか決めてあるだろうか。電話がつながらないことも考えて、避難場所と連絡方法を一度話し合っておきたい。",
+    "form": "仮に",
+    "en": "Suppose a major earthquake struck tonight: have you decided where to meet up with your family? With the possibility that phone calls may not get through in mind, it would be wise to discuss where to evacuate and how to contact one another beforehand.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "話者",
+   "reading": "わしゃ",
+   "pos": "noun",
+   "meaning": "speaker of a language",
+   "defJa": "ある言葉を使って話す人。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "世界でもっとも話者の多い言語は、英語と中国語だと言われる。ただし、母語として話す人だけを数えると、中国語が英語を大きく上回る。英語は、母語ではなく第二言語として使う人が多いからだ。",
+    "form": "話者",
+    "en": "English and Chinese are said to be the languages with the most speakers in the world. However, if only native speakers are counted, Chinese far outnumbers English. This is because many people use English as a second language rather than as their mother tongue.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "対価",
+   "reading": "たいか",
+   "pos": "noun",
+   "meaning": "payment in return",
+   "defJa": "仕事や品物に見合って受け取るお金。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "労働基準法は、残業した時間に対してもきちんと対価を支払うよう会社に義務づけている。サービス残業が問題になるのは、働いた分の賃金が支払われていないからだ。",
+    "form": "対価",
+    "en": "The Labor Standards Act requires companies to provide proper compensation for overtime hours as well. Unpaid overtime is a problem because workers are not being paid for the work they have done.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "習得",
+   "reading": "しゅうとく",
+   "pos": "noun",
+   "meaning": "acquisition of a skill",
+   "defJa": "学んだり練習したりして、身につけること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "来年からタイの支店に赴任することになった兄は、毎晩仕事から帰ると、タイ語の教科書を開いている。半年でひととおりの日常会話を習得するのが目標だそうだ。",
+    "form": "習得",
+    "en": "My older brother, who is due to take up a post at the branch in Thailand next year, opens his Thai textbook every evening when he gets home from work. He says his goal is to acquire a basic command of everyday conversation in six months.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "銀髪",
+   "reading": "ぎんぱつ",
+   "pos": "noun",
+   "meaning": "silver hair",
+   "defJa": "銀色に光って見える、白い髪。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "オーケストラの指揮台に立ったのは、八十歳を超えた長身の老マエストロだった。豊かな銀髪が照明を受けてきらめき、タクトが振り下ろされるたびに、ふわりと揺れる。",
+    "form": "銀髪",
+    "en": "The person who stepped onto the orchestra's podium was a tall, elderly maestro over eighty years old. His thick silver hair gleamed under the lights and swayed gently each time he brought his baton down.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "視覚系",
+   "reading": "しかくけい",
+   "pos": "noun",
+   "meaning": "visual system",
+   "defJa": "目と脳で、見たものを処理するしくみ。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "目に入った光の情報は、網膜から視神経を通って脳の後ろのほうへ送られる。視覚系はそこで色や形、動きを別々に処理し、最後に一つの像としてまとめ上げている。",
+    "form": "視覚系",
+    "en": "Information from the light entering the eyes is sent from the retina through the optic nerve to the back of the brain. There, the visual system processes color, shape, and movement separately before finally combining them into a single image.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "ぎいぎい",
+   "reading": "ぎいぎい",
+   "pos": "other",
+   "meaning": "creak",
+   "defJa": "古い木や金属がこすれて出る音。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "祖父の家の古い廊下は、歩くたびにぎいぎいと音を立てる。夜中にトイレに起きると、その音がやけに大きく響いて、子どもの頃はそれが怖くてたまらなかった。",
+    "form": "ぎいぎい",
+    "en": "The old hallway in my grandfather's house creaks with every step. Whenever I got up to use the bathroom in the middle of the night, the sound would echo unusually loudly, and as a child I found it unbearably frightening.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "さりげない",
+   "reading": "さりげない",
+   "pos": "other",
+   "meaning": "casual, unforced",
+   "defJa": "わざとらしくなく、自然なようす。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "同僚の誕生日に、机の上に小さなお菓子とメモをさりげなく置いておいた。大げさに祝うより、そのくらいの方がかえって気持ちが伝わるものだ。翌朝、彼女からうれしそうなお礼のメッセージが届いた。",
+    "form": "さりげなく",
+    "en": "On a coworker's birthday, I discreetly left a small treat and a note on her desk. A gesture like that can actually convey your feelings better than making a big fuss. The next morning, I received a cheerful message from her thanking me.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "しおり",
+   "reading": "しおり",
+   "pos": "noun",
+   "meaning": "bookmark; trip booklet",
+   "defJa": "読みかけの本にはさむ目印。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "読みかけの文庫本に、旅先で買った押し花のしおりをはさんだ。続きはあしたの通勤電車で読もう。そう思って明かりを消したのに、結末が気になってなかなか寝つけなかった。",
+    "form": "しおり",
+    "en": "I slipped a pressed-flower bookmark I had bought on a trip into the paperback I was partway through. I would carry on reading on the train to work tomorrow. Although I turned off the light with that thought, I was so curious about the ending that I had trouble falling asleep.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "がち",
+   "reading": "がち",
+   "pos": "other",
+   "meaning": "for real (slang)",
+   "defJa": "本気であること。若者の言葉。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "「え、あの店のラーメン、そんなにうまいの？」「いや、ガチでうまいって。俺、先週だけで三回行ったもん。」半信半疑でついて行った友人は、スープを一口飲んだとたん黙り込み、気づけば替え玉まで頼んでいた。",
+    "form": "ガチ",
+    "en": "\"Wait, is the ramen at that place really that good?\" \"Seriously, it's really good. I went three times just last week.\" My friend came along, half convinced and half doubtful, but fell silent the moment he took a sip of the broth, and before I knew it, he had even ordered another serving of noodles.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "可決",
+   "reading": "かけつ",
+   "pos": "noun",
+   "meaning": "passage (of a bill)",
+   "defJa": "会議で、出された案をよいと認めて決めること。",
+   "level": "N2",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "市議会は二十日の本会議で、市内の小中学校の給食費を無償にする条例案を賛成多数で可決した。来年四月から実施され、子育て世帯の負担軽減が期待されている。",
+    "form": "可決",
+    "en": "At its plenary session on the twentieth, the city council passed by majority vote a proposed ordinance making school lunches free at the city's elementary and junior high schools. It will take effect next April and is expected to ease the financial burden on households raising children.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "残留",
+   "reading": "ざんりゅう",
+   "pos": "noun",
+   "meaning": "staying on; remaining",
+   "defJa": "ほかが去ったあとも、その場にとどまること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "最終節を前に、チームは降格圏とわずか勝ち点1差。勝てば自力でJ1残留が決まる大一番に、ホームのスタジアムには一万人を超えるサポーターが詰めかけた。",
+    "form": "残留",
+    "en": "With the final round of matches approaching, the team was just one point clear of the relegation zone. More than ten thousand supporters packed the home stadium for the crucial match, in which a win would secure the team's place in J1 regardless of other results.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "皇族",
+   "reading": "こうぞく",
+   "pos": "noun",
+   "meaning": "member of the imperial family",
+   "defJa": "天皇の一族として、皇室に属する人。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "女性の皇族は、一般の男性と結婚すると皇室を離れることになる。結婚後は夫の名字を名乗り、一般の国民として暮らしていく。皇室を離れることは、皇室典範という法律で定められているからだ。",
+    "form": "皇族",
+    "en": "When a female member of the imperial family marries a man outside the imperial family, she leaves the imperial household. After marriage, she takes her husband's surname and lives as an ordinary citizen. This is because her departure from the imperial household is stipulated by a law called the Imperial House Law.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "離脱",
+   "reading": "りだつ",
+   "pos": "noun",
+   "meaning": "withdrawal; leaving a group",
+   "defJa": "入っていた組織や集まりから抜けること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "二〇一六年の国民投票で僅差の結果が出たのち、イギリスは二〇二〇年一月に欧州連合から正式に離脱した。国内では今も、その判断の是非をめぐって議論が続いている。",
+    "form": "離脱",
+    "en": "After the narrow result of the 2016 referendum, Britain formally withdrew from the European Union in January 2020. Debate continues within the country even now over whether that decision was right.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "皇室",
+   "reading": "こうしつ",
+   "pos": "noun",
+   "meaning": "the imperial family (institution)",
+   "defJa": "天皇とその一族をまとめていう言葉。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "皇室の方々が被災地を訪れ、避難所で暮らす人々一人ひとりに膝をついて声をかけられた。テレビでその様子を見た祖母は、「ありがたいねえ」と目を細めた。",
+    "form": "皇室",
+    "en": "Members of the imperial family visited the disaster-stricken area and knelt down to speak to each person living in the evacuation shelters. Watching the scene on television, my grandmother's eyes softened as she said, \"How kind of them.\"",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "危ぶむ",
+   "reading": "あやぶむ",
+   "pos": "verb",
+   "meaning": "to fear for; to doubt",
+   "defJa": "うまくいかないのではないかと心配する。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "主力選手が相次いでけがで離脱し、開幕前から一部では優勝どころか上位進出さえ危ぶむ声が上がっていた。ところが若手が次々と台頭し、チームは前半戦を首位で折り返した。",
+    "form": "危ぶむ",
+    "en": "With key players sidelined by injuries one after another, some were already expressing doubts before the season began about whether the team could even finish near the top, let alone win the championship. Yet young players stepped up one after another, and the team reached the halfway point of the season in first place.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "男系",
+   "reading": "だんけい",
+   "pos": "noun",
+   "meaning": "male line (of descent)",
+   "defJa": "父から子へ、父方の血筋で続く家系。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "明治以降の皇室典範では、皇位を継ぐのは男系の男子に限られている。父方をたどって歴代天皇につながる男性だけが、皇位継承の資格を持つということだ。",
+    "form": "男系",
+    "en": "Under the Imperial House Law since the Meiji era, succession to the imperial throne has been restricted to males in the male line. This means that only men descended from past emperors through an unbroken male line are eligible to inherit the throne.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "相続",
+   "reading": "そうぞく",
+   "pos": "noun",
+   "meaning": "inheritance",
+   "defJa": "亡くなった人の財産を家族などが受け継ぐこと。",
+   "level": "N3",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "父が亡くなって、実家の土地と家を兄と私で相続することになった。誰も住む予定のない家をどうするのか、話し合いは半年たった今もまとまっていない。",
+    "form": "相続",
+    "en": "After our father died, my older brother and I were to inherit the family home and its land. Even now, six months later, our discussions have yet to produce an agreement on what to do with the house, which no one plans to live in.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "規定",
+   "reading": "きてい",
+   "pos": "noun",
+   "meaning": "provision; rule",
+   "defJa": "決まりとしてはっきり定めたこと。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "この大会では、選手が使うラケットの大きさや重さに細かい規定がある。試合前に審判が一本ずつ確かめ、少しでも基準を外れていれば使用は認められない。",
+    "form": "規定",
+    "en": "This tournament has detailed rules governing the size and weight of the rackets players use. Before each match, the referee checks them one by one, and any racket that falls even slightly outside the standards cannot be used.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "羽目になる",
+   "reading": "はめになる",
+   "pos": "other",
+   "meaning": "end up having to",
+   "defJa": "思ってもいなかった、困ったことになる。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "財布を家に忘れたことに気づいたのは、レジで会計をする直前だった。結局、一緒にいた後輩にお金を借りる羽目になり、先輩としての面目は丸つぶれだ。",
+    "form": "羽目になり",
+    "en": "I realized I had left my wallet at home just before paying at the register. In the end, I had to borrow money from the junior colleague who was with me, completely losing face as the senior colleague.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "費え",
+   "reading": "ついえ",
+   "pos": "noun",
+   "meaning": "wasteful expense",
+   "defJa": "むだに出ていくお金や手間。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "見栄のために建てられた豪華な庁舎は、町にとって大きな費えでしかなかった。維持費ばかりがかさみ、肝心の道路や学校の修繕は後回しにされ続けた。住民の不満が噴き出したのは、次の選挙のときだった。",
+    "form": "費え",
+    "en": "The lavish town hall, built for the sake of appearances, was nothing but a huge waste of money for the town. Maintenance costs kept piling up, while essential repairs to roads and schools were continually put off. The residents' discontent boiled over at the next election.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "吟味",
+   "reading": "ぎんみ",
+   "pos": "noun",
+   "meaning": "careful selection",
+   "defJa": "よく調べて、よいものを選ぶこと。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "翻訳の仕事で最も時間がかかるのは、一つ一つの言葉の吟味だ。辞書に載っている訳語をそのまま当てはめても、原文の持つ温度までは伝わらない。ある翻訳家は、たった一行のせりふに数日悩むことも珍しくないと話す。読者が何気なく読み流す文章の裏には、そうした地道な作業が隠れている。",
+    "form": "吟味",
+    "en": "The most time-consuming part of translation is carefully weighing each and every word. Simply plugging in the equivalents listed in a dictionary does not convey the emotional tone of the original. One translator says it is not unusual to agonize for several days over a single line of dialogue. Behind prose that readers skim through without a second thought lies this kind of painstaking work.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "逸失利益",
+   "reading": "いっしつりえき",
+   "pos": "noun",
+   "meaning": "lost earnings",
+   "defJa": "事故などがなければ得られたはずの収入。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "交通事故でけがをし、半年間働けなくなった場合、その間に得られたはずの給料は損害として請求できる。さらに後遺症で収入が減れば、将来の逸失利益も賠償の対象になる。",
+    "form": "逸失利益",
+    "en": "If you are injured in a traffic accident and unable to work for six months, you can claim the salary you would have earned during that period as damages. If lasting effects of the injury also reduce your income, future lost earnings are eligible for compensation as well.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "採点",
+   "reading": "さいてん",
+   "pos": "noun",
+   "meaning": "grading, scoring",
+   "defJa": "答案や演技を見て、点数をつけること。",
+   "level": "N2",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "期末試験が終わると、国語の先生は職員室で三百枚もの答案の採点に追われる。記述問題が多いため一枚ずつ丁寧に読まなければならず、毎晩遅くまで赤ペンを握っている。",
+    "form": "採点",
+    "en": "Once the end-of-term exams are over, the Japanese-language teacher is swamped with grading as many as three hundred exam papers in the staff room. Because there are many written-response questions, each paper has to be read carefully, and the teacher works with a red pen until late every night.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "肌寒い",
+   "reading": "はださむい",
+   "pos": "other",
+   "meaning": "chilly",
+   "defJa": "体に少しひんやりと寒さを感じる。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "九月も半ばを過ぎると、朝晩は急に肌寒くなる。半袖のまま家を出たら、駅のホームで思わず身震いした。あしたからは、薄手のカーディガンを一枚持っていこう。",
+    "form": "肌寒く",
+    "en": "Once the middle of September has passed, mornings and evenings suddenly become chilly. I left home in short sleeves and found myself shivering on the station platform. Starting tomorrow, I will bring a lightweight cardigan.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "鋭敏",
+   "reading": "えいびん",
+   "pos": "other",
+   "meaning": "sharp, keen",
+   "defJa": "感覚や頭の働きがとてもするどいようす。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "犬の嗅覚は人間の数千倍から一万倍も鋭敏だといわれる。空港では、その鼻を生かした探知犬が、旅行客の荷物の中に隠された麻薬や果物をかぎ分けている。",
+    "form": "鋭敏",
+    "en": "A dog's sense of smell is said to be several thousand to ten thousand times keener than a human's. At airports, detection dogs put their noses to use sniffing out drugs and fruit hidden in travelers' luggage.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "集結",
+   "reading": "しゅうけつ",
+   "pos": "noun",
+   "meaning": "massing; gathering in one place",
+   "defJa": "人や船などが一か所に大勢集まること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "国境付近に数万人規模の兵力が集結しているとの情報を受け、周辺国は警戒を強めている。偵察衛星の画像には、戦車や装甲車がずらりと並ぶ様子が写っていた。",
+    "form": "集結",
+    "en": "Following reports that tens of thousands of troops are massing near the border, neighboring countries are stepping up their vigilance. Images from reconnaissance satellites showed rows of tanks and armored vehicles.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "盤上",
+   "reading": "ばんじょう",
+   "pos": "noun",
+   "meaning": "on the board (shogi, go)",
+   "defJa": "将棋や碁の盤の上。そこでの勝負。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "対局はいよいよ終盤に入った。持ち時間を使い切った若手棋士は、盤上をじっと見つめたまま、一分ごとに迫る秒読みの中で、勝ちにつながる次の一手を探し続けた。",
+    "form": "盤上",
+    "en": "The game had finally entered its closing stages. Having used up the allotted thinking time, the young professional player kept staring intently at the board, searching for the next move that could lead to victory as the countdown for each one-minute move limit pressed on.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "秒針",
+   "reading": "びょうしん",
+   "pos": "noun",
+   "meaning": "second hand",
+   "defJa": "時計で、秒を示す細い針。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "試験の残り時間が一分を切った。静まり返った教室に、壁の時計の秒針が進む音だけがやけに大きく響く。最後の問題の答えを、私は急いで書き込んだ。ペンを置いたのは、終了のチャイムが鳴るのとほぼ同時だった。",
+    "form": "秒針",
+    "en": "There was less than a minute left in the exam. In the completely silent classroom, only the ticking of the second hand on the wall clock sounded unusually loud. I hurriedly wrote in the answer to the final question. I put down my pen almost at the same moment that the bell rang to end the exam.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "制覇",
+   "reading": "せいは",
+   "pos": "noun",
+   "meaning": "winning the championship",
+   "defJa": "大会などで勝って、一番になること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "全国大会の決勝で、地元の高校が悲願の全国制覇を成し遂げた。優勝の知らせが届くと、町の商店街には祝いの垂れ幕がいくつも掲げられ、どの店も記念の割引セールを始めた。",
+    "form": "制覇",
+    "en": "In the final of the national tournament, the local high school achieved its long-cherished dream of winning the national championship. When news of the victory arrived, numerous celebratory banners went up along the town's shopping street, and every shop began offering special discounts to mark the occasion.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "盤面",
+   "reading": "ばんめん",
+   "pos": "noun",
+   "meaning": "board position",
+   "defJa": "将棋や碁で、盤の上の駒や石の並び方。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "名人は扇子を手にしたまま、じっと盤面を見つめて動かなかった。持ち時間は残りわずか。ようやく駒をつまむと、ぱちりと高い音を立てて、誰も予想しなかった一手を指した。",
+    "form": "盤面",
+    "en": "The master sat motionless, a folding fan in hand, staring intently at the board. There was very little thinking time left. Finally, he picked up a piece and, with a sharp, loud click, made a move that no one had anticipated.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "神童",
+   "reading": "しんどう",
+   "pos": "noun",
+   "meaning": "child prodigy",
+   "defJa": "小さいころから、すごい才能を見せる子。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "三歳で鍵盤に触れ、五歳で最初の曲を作ったモーツァルトは、幼いころから神童として知られていた。父親は息子を連れてヨーロッパ各地の宮廷を回り、その才能を王侯貴族に披露した。",
+    "form": "神童",
+    "en": "Mozart, who first touched a keyboard at three and composed his first piece at five, was known as a child prodigy from an early age. His father took him to royal courts throughout Europe, showcasing his talent to royalty and the nobility.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "揺さぶる",
+   "reading": "ゆさぶる",
+   "pos": "verb",
+   "meaning": "to shake; to unsettle",
+   "defJa": "強くゆらす。人の心を大きく動かす。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "何度呼んでも返事がないので、母は眠っている弟の肩をつかんで強く揺さぶった。それでも弟は寝返りを打つだけで、目を覚ます気配はまったくなかった。",
+    "form": "揺さぶった",
+    "en": "After getting no response no matter how many times she called, my mother grabbed my sleeping younger brother by the shoulder and shook him hard. Even then, he merely rolled over and showed no sign at all of waking up.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "たぐいまれ",
+   "reading": "たぐいまれ",
+   "pos": "other",
+   "meaning": "exceptional, rare",
+   "defJa": "ほかにないほど、とてもすぐれているようす。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "わずか十五歳で国際ピアノコンクールを制した少女は、たぐいまれな才能の持ち主として一躍注目を集めた。それでも本人は「毎日八時間練習しているだけです」と、照れくさそうに笑った。",
+    "form": "たぐいまれ",
+    "en": "The girl who won an international piano competition at just fifteen suddenly attracted widespread attention as someone with exceptionally rare talent. Even so, she smiled bashfully and said, \"I just practice eight hours every day.\"",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "特訓",
+   "reading": "とっくん",
+   "pos": "noun",
+   "meaning": "intensive training",
+   "defJa": "短い間に、特に力を入れてする練習。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "運動会のリレーでアンカーに選ばれた息子は、毎朝父親と公園で特訓を続けている。バトンの受け取り方からスタートの構えまで、二人とも真剣そのものだ。",
+    "form": "特訓",
+    "en": "My son, who was chosen to run the anchor leg in the sports-day relay, has been training intensively with his father in the park every morning. From how to receive the baton to the starting stance, both of them take every detail completely seriously.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "持て余す",
+   "reading": "もてあます",
+   "pos": "verb",
+   "meaning": "to not know what to do with",
+   "defJa": "多すぎたり難しすぎたりして、扱いに困る。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "定年退職した父は、最初のひと月こそのんびり過ごしていたが、すぐに暇を持て余すようになった。今では週に三日、近所の公民館で子どもたちに将棋を教えている。",
+    "form": "持て余す",
+    "en": "After reaching retirement age and leaving work, my father spent the first month relaxing, but he soon found he did not know what to do with all his free time. Now he teaches children Japanese chess at the local community center three days a week.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "検討",
+   "reading": "けんとう",
+   "pos": "noun",
+   "meaning": "consideration; analysis",
+   "defJa": "よいかどうか、よく調べて考えること。",
+   "level": "N3",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "市は、老朽化した市民プールを取り壊し、跡地に公園を整備する案を検討している。ただ、夏場に子どもたちが遊べる場所がなくなるとして、住民の間では反対の声も根強い。",
+    "form": "検討",
+    "en": "The city is considering a plan to demolish the aging municipal swimming pool and turn the site into a park. However, opposition remains strong among residents, who say this would leave children without a place to play in summer.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "健闘",
+   "reading": "けんとう",
+   "pos": "noun",
+   "meaning": "putting up a good fight",
+   "defJa": "強い相手にも負けずに、よくがんばること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "県大会の決勝で、初出場の公立高校は強豪の私立校に一点差で敗れた。それでも試合後、スタンドからは選手たちの健闘をたたえる大きな拍手がいつまでも鳴りやまなかった。",
+    "form": "健闘",
+    "en": "In the final of the prefectural tournament, a public high school competing for the first time lost to a formidable private school by a single point. Even so, after the game, loud applause from the stands praising the players' valiant effort seemed to go on forever.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "互角",
+   "reading": "ごかく",
+   "pos": "other",
+   "meaning": "evenly matched",
+   "defJa": "両方の力が同じくらいであること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "決勝に勝ち上がった二校は、春の大会でも延長戦までもつれ込んだ因縁の相手だ。投手力も打撃力もほぼ互角で、どちらが勝ってもおかしくないと評判になっている。",
+    "form": "互角",
+    "en": "The two schools that advanced to the final are familiar rivals whose match in the spring tournament also went into extra innings. They are almost evenly matched in both pitching and batting, and people are saying that either could win.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "快挙",
+   "reading": "かいきょ",
+   "pos": "noun",
+   "meaning": "remarkable achievement",
+   "defJa": "みんなが喜ぶような、すばらしい成果。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "県立の無名校が、甲子園で強豪校を次々と破り、初出場で初優勝という快挙を成し遂げた。地元の商店街では号外が配られ、町じゅうがお祭り騒ぎとなった。",
+    "form": "快挙",
+    "en": "A little-known prefectural high school defeated powerhouse schools one after another at Koshien, achieving the remarkable feat of winning its first championship on its very first appearance. Special newspaper editions were handed out in the local shopping district, and the entire town erupted in celebration.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "そうそう",
+   "reading": "そうそう",
+   "pos": "other",
+   "meaning": "eminent, distinguished",
+   "defJa": "名の知れた、すぐれた人ばかりであるようす。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "新しい美術館の開館記念展には、国内外のそうそうたる画家の作品が並んだ。ピカソやモネの名画を一度に見られるとあって、初日から長い行列ができた。",
+    "form": "そうそう",
+    "en": "The new art museum's inaugural exhibition featured works by an illustrious lineup of painters from Japan and abroad. With masterpieces by Picasso and Monet on view together, long lines formed from the very first day.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "千差万別",
+   "reading": "せんさばんべつ",
+   "pos": "other",
+   "meaning": "endless variety",
+   "defJa": "一つ一つがみなちがっていること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "同じ「頭痛」といっても、その原因は千差万別だ。寝不足や肩こりから来るものもあれば、思わぬ重い病気が隠れている場合もある。痛みがいつもと違うと感じたら、早めに医師に相談したい。",
+    "form": "千差万別",
+    "en": "Even when they are all called \"headaches,\" their causes vary enormously. Some arise from lack of sleep or stiff shoulders, while others may conceal an unexpectedly serious illness. If the pain feels different from usual, it is best to consult a doctor promptly.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "生得的",
+   "reading": "せいとくてき",
+   "pos": "other",
+   "meaning": "innate",
+   "defJa": "学ばなくても、生まれつき持っている様子。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "赤ちゃんは、教えられなくても生まれてすぐに母親の乳を吸う。こうした生得的な行動は、経験を通して身につける学習とは区別され、本能と呼ばれることもある。",
+    "form": "生得的",
+    "en": "Babies suckle at their mothers' breasts soon after birth without being taught. Innate behavior like this is distinguished from learning acquired through experience and is sometimes called instinct.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "先天的",
+   "reading": "せんてんてき",
+   "pos": "other",
+   "meaning": "congenital, from birth",
+   "defJa": "生まれる前から体に備わっている様子。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "その少年は先天的な心臓の病気を抱えて生まれ、幼いころに三度の手術を受けた。今では医師も驚くほど元気になり、サッカー部で毎日ボールを追いかけている。",
+    "form": "先天的",
+    "en": "The boy was born with a congenital heart condition and underwent three operations when he was little. He is now so healthy that even his doctors are surprised, and he chases after the ball every day in the school soccer club.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "従来",
+   "reading": "じゅうらい",
+   "pos": "noun",
+   "meaning": "conventional, until now",
+   "defJa": "これまでずっとそうであったこと。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "新しい電気自動車は、従来のモデルに比べて、一回の充電で走れる距離がおよそ一・五倍に伸びた。東京から名古屋の近くまで、途中で充電せずに行けるという。",
+    "form": "従来",
+    "en": "The new electric car's range on a single charge is about one and a half times that of the previous model. It is said to be able to travel from Tokyo to near Nagoya without recharging along the way.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "手法",
+   "reading": "しゅほう",
+   "pos": "noun",
+   "meaning": "technique, method",
+   "defJa": "物事をするときのやり方や技術。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "この画家は、絵の具を何度も薄く塗り重ねる手法で知られている。そうすることで、光が奥から透けて見えるような、深い色合いが生まれるのだ。一枚を仕上げるのに、一年以上かかることも珍しくない。",
+    "form": "手法",
+    "en": "This painter is known for a technique of repeatedly applying thin layers of paint. This produces deep tones that seem to let light shine through from within. It is not unusual for a single painting to take more than a year to complete.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "検証試験",
+   "reading": "けんしょうしけん",
+   "pos": "noun",
+   "meaning": "verification test",
+   "defJa": "性能や安全性を、実際に試して確かめること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "自動運転バスの検証試験が、今月から市内の路線で始まった。運転席には安全のため係員が座り、歩行者の急な飛び出しや路上駐車にも正しく対応できるかを確かめる。結果がよければ、二年後の本格運行を目指す。",
+    "form": "検証試験",
+    "en": "Verification trials of a self-driving bus began this month on a route in the city. A staff member sits in the driver's seat for safety while checks are made to see whether the bus can respond properly to pedestrians suddenly stepping into the road and to vehicles parked along it. If the results are good, the aim is to begin full-scale service in two years.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "丹念",
+   "reading": "たんねん",
+   "pos": "other",
+   "meaning": "painstaking, meticulous",
+   "defJa": "時間をかけて、細かいところまでていねいな様子。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "その刑事は、事件当夜に現場付近を通った人を一人ずつ訪ね、話を丹念に聞いて回った。三か月で会った人は二百人を超えた。そして、ある主婦の何気ない一言から、ついに犯人へとつながる手がかりが見つかった。",
+    "form": "丹念",
+    "en": "The detective visited, one by one, the people who had passed near the scene on the night of the crime and painstakingly listened to their accounts. In three months, the detective met with more than two hundred people. Then, a casual remark from a housewife finally yielded a clue leading to the culprit.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "加勢",
+   "reading": "かせい",
+   "pos": "noun",
+   "meaning": "backing one side",
+   "defJa": "争いで、一方の味方をして助けること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "兄弟げんかが始まると、末っ子の妹はいつも次男の側に加勢した。二人がかりで言い返されると、長男は口をとがらせて自分の部屋にこもってしまうのだった。",
+    "form": "加勢",
+    "en": "Whenever the brothers started fighting, their little sister, the youngest child, always sided with the second son. When both of them argued back at him, the eldest son would pout and shut himself away in his room.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "巧む",
+   "reading": "たくむ",
+   "pos": "verb",
+   "meaning": "contrive artfully",
+   "defJa": "工夫をこらして、うまく作りあげる。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "この随筆家の文章には、巧まざるユーモアがある。笑わせようと狙った箇所はひとつもないのに、日々の失敗を淡々とつづる筆致に、読者は思わず吹き出してしまう。",
+    "form": "巧まざる",
+    "en": "This essayist's writing has an uncontrived humor. Although not a single passage is deliberately aimed at making people laugh, the matter-of-fact way the writer recounts everyday mishaps makes readers burst out laughing despite themselves.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "率先",
+   "reading": "そっせん",
+   "pos": "noun",
+   "meaning": "taking the lead",
+   "defJa": "人より先に、自分から進んで行うこと。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "地震のあと、避難所の掃除や配膳を率先して引き受けたのは、近所に住む高校生たちだった。その姿に励まされ、大人たちも次々と手を貸し始めた。重苦しかった避難所の空気が、少しずつ明るくなっていった。",
+    "form": "率先",
+    "en": "After the earthquake, it was high school students from the neighborhood who took the initiative in cleaning the evacuation shelter and serving meals. Encouraged by their example, the adults began lending a hand one after another. The shelter's oppressive atmosphere gradually began to brighten.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "舵を取る",
+   "reading": "かじをとる",
+   "pos": "other",
+   "meaning": "to take the helm",
+   "defJa": "船の向きを決める。組織を導く。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "嵐の夜、ベテランの船長は自ら舵を取り、波の高い湾の入り口を慎重に抜けていった。若い船員たちは、息をのんでその背中を見守っていた。船が無事に港へ入ったのは、夜明け近くのことだった。",
+    "form": "舵を取り",
+    "en": "On a stormy night, the veteran captain took the helm himself and carefully navigated the entrance to the bay, where the waves were high. The young crew members watched his back with bated breath. It was nearly dawn when the ship entered the harbor safely.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "凋落",
+   "reading": "ちょうらく",
+   "pos": "noun",
+   "meaning": "decline, fall",
+   "defJa": "勢いのあったものが、おとろえること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "かつて世界の市場を席巻した日本の家電メーカーも、今では見る影もない。海外勢との価格競争に敗れ、凋落の一途をたどった。栄華を誇った工場の跡地には、今は大型の物流倉庫が建っている。",
+    "form": "凋落",
+    "en": "The Japanese home-appliance manufacturers that once dominated global markets are now mere shadows of their former selves. Losing the price competition with overseas rivals, they went into steady decline. Large logistics warehouses now stand on the sites of factories that once flourished.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "折半",
+   "reading": "せっぱん",
+   "pos": "noun",
+   "meaning": "splitting fifty-fifty",
+   "defJa": "お金などを二人で半分ずつ分けること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "友人と二人で旅行に行ったときは、宿代もガソリン代も折半にしている。どちらがいくら出したかをスマホのアプリに記録しておき、帰ってから差額を精算するのが、長く仲よく旅を続けるこつだ。",
+    "form": "折半",
+    "en": "When a friend and I travel together, we split both lodging and gasoline costs equally. Keeping track of who has paid how much in a smartphone app and settling the difference when we get home is the key to continuing to enjoy traveling together for years to come.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "甚だしい",
+   "reading": "はなはだしい",
+   "pos": "other",
+   "meaning": "extreme, gross",
+   "defJa": "よくないことの程度が、とても大きい。",
+   "level": "N2",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "今年の夏は記録的な日照りが続き、県内の農作物の被害は甚だしい。とくに米と野菜の打撃が大きく、出荷量は例年の半分にも届かない見込みで、農家からは悲鳴が上がっている。",
+    "form": "甚だしい",
+    "en": "A record-breaking drought has persisted this summer, causing severe damage to crops throughout the prefecture. Rice and vegetables have been hit especially hard, with shipments expected to fall short of even half the usual annual amount, and farmers are crying out in distress.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "不況",
+   "reading": "ふきょう",
+   "pos": "noun",
+   "meaning": "recession",
+   "defJa": "物が売れず、経済が落ちこんでいる状態。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "長引く不況の影響で、駅前の商店街ではシャッターを下ろしたままの店が目立つようになった。創業五十年の和菓子屋も、ついに今月いっぱいで店を閉めるという。",
+    "form": "不況",
+    "en": "As a result of the prolonged recession, shops that remain shuttered have become a conspicuous sight in the shopping district in front of the station. Even the Japanese confectionery shop that has been in business for fifty years is reportedly closing for good at the end of this month.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "ザーサイ",
+   "reading": "ザーサイ",
+   "pos": "noun",
+   "meaning": "Sichuan pickled mustard stem",
+   "defJa": "からし菜の太い茎で作る中国の漬物。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "中華料理店で、ラーメンの横に小皿のザーサイが添えられてきた。コリコリとした歯ごたえとほどよい塩気が、あとを引くおいしさだ。もともとは中国・四川の漬物だという。",
+    "form": "ザーサイ",
+    "en": "At a Chinese restaurant, my ramen came with a small side dish of pickled mustard stems. Their crunchy texture and just the right amount of saltiness make you want to keep eating them. I am told these pickles originally come from Sichuan, China.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "万が一",
+   "reading": "まんがいち",
+   "pos": "other",
+   "meaning": "in the unlikely event",
+   "defJa": "めったにないが、もしかしたら起こる場合。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "地震や台風に備えて、玄関の近くに非常用の持ち出し袋を置いている。水や懐中電灯、常備薬のほかに、万が一スマートフォンが使えなくなったときのため、家族の電話番号を書いたメモも入れてある。",
+    "form": "万が一",
+    "en": "I keep an emergency grab bag near the front door in preparation for earthquakes and typhoons. Besides water, a flashlight, and my usual medicines, it also contains a note with my family's phone numbers, just in case my smartphone becomes unusable.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "北上",
+   "reading": "ほくじょう",
+   "pos": "noun",
+   "meaning": "moving north",
+   "defJa": "北の方へ向かって進むこと。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "台風十号は、一時間におよそ二十キロの速さで北上を続けている。あすの夜には九州南部に接近する見込みで、気象庁は暴風や高波への厳重な警戒を呼びかけている。",
+    "form": "北上",
+    "en": "Typhoon No. 10 continues to move north at about twenty kilometers per hour. It is expected to approach southern Kyushu by tomorrow night, and the Japan Meteorological Agency is urging extreme caution against violent winds and high waves.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "自民党",
+   "reading": "じみんとう",
+   "pos": "noun",
+   "meaning": "Liberal Democratic Party (LDP)",
+   "defJa": "日本の政党、自由民主党の短い呼び名。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "戦後の日本政治は、長く自民党を中心に動いてきた。一九五五年の結党以来、野党に転じた時期はわずかで、ほとんどの期間を政権与党として過ごしている。",
+    "form": "自民党",
+    "en": "Postwar Japanese politics has long revolved around the Liberal Democratic Party. Since its founding in 1955, it has spent only brief periods in opposition and has been a governing party for most of that time.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "並立",
+   "reading": "へいりつ",
+   "pos": "noun",
+   "meaning": "standing side by side; coexisting",
+   "defJa": "二つ以上のものが同じ立場で並んであること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "中国の三国時代には、魏・呉・蜀の三つの国が並立し、互いに天下を争った。どの国も統一を果たせないまま、およそ半世紀にわたって激しい戦いが続いた。",
+    "form": "並立",
+    "en": "During China's Three Kingdoms period, the three states of Wei, Wu, and Shu coexisted, competing with one another for control of the realm. Fierce fighting continued for about half a century without any of the three achieving unification.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "立体的",
+   "reading": "りったいてき",
+   "pos": "other",
+   "meaning": "three-dimensional; many-sided",
+   "defJa": "高さや奥行きがあるようす。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "鉛筆でりんごを描くとき、輪郭だけでは平らな円にしか見えない。光の当たる側を明るく残し、反対側に影をつけていくと、絵はぐっと立体的になる。美術の先生は「影を怖がらないこと」と何度も言っていた。",
+    "form": "立体的",
+    "en": "When you draw an apple in pencil, an outline alone looks like nothing more than a flat circle. Leaving the side facing the light bright and adding shading to the opposite side makes the drawing look much more three-dimensional. The art teacher repeatedly said, \"Don't be afraid of shadows.\"",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "訂正",
+   "reading": "ていせい",
+   "pos": "noun",
+   "meaning": "correction",
+   "defJa": "言葉や数字などの間違いを正しく直すこと。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "昨日の記事で、市長の年齢を「五十八歳」としたのは「六十八歳」の誤りでした。おわびして訂正します。読者の方からのご指摘で判明しました。今後は、確認をいっそう徹底してまいります。",
+    "form": "訂正",
+    "en": "In yesterday's article, the mayor's age was incorrectly given as fifty-eight instead of sixty-eight. We apologize and hereby correct the error. It came to light after a reader pointed it out. We will check our facts more thoroughly in the future.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "審議",
+   "reading": "しんぎ",
+   "pos": "noun",
+   "meaning": "deliberation (of a bill)",
+   "defJa": "会議で案の中身をくわしく話し合うこと。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "政府が提出した年金制度の改正案は、きょうから衆議院の委員会で審議が始まった。野党は国民の負担が増えるとして、時間をかけた慎重な議論を求めている。",
+    "form": "審議",
+    "en": "A House of Representatives committee began deliberations today on the government's proposed pension-system reform bill. The opposition argues that it will increase the public's financial burden and is urging that ample time be allowed for careful deliberation.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "事前に必要",
+   "reading": "じぜんにひつよう",
+   "pos": "other",
+   "meaning": "required in advance",
+   "defJa": "何かをする前に済ませておかなければならないこと。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "行き先の国によっては、ビザの取得が事前に必要になる。申請から発給まで数週間かかることもあるので、航空券を買う前に大使館のホームページで確認しておこう。",
+    "form": "事前に必要",
+    "en": "Depending on the country you are traveling to, you may need to obtain a visa in advance. It can take several weeks from application to issuance, so check the embassy's website before buying your plane ticket.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "施工",
+   "reading": "せこう",
+   "pos": "noun",
+   "meaning": "construction work",
+   "defJa": "建物や道路などの工事を実際に行うこと。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "新しい市民会館の建設工事は、地元の建設会社が施工を請け負った。設計どおりに工事が進んでいるかを確かめるため、市の担当者が月に一度、現場を見て回っている。",
+    "form": "施工",
+    "en": "A local construction company was contracted to build the new civic hall. To check that construction is proceeding according to the plans, a city official tours the site once a month.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "会見",
+   "reading": "かいけん",
+   "pos": "noun",
+   "meaning": "press conference",
+   "defJa": "記者に向けて、決まった場で話すこと。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "不祥事の発覚から三日後、社長はようやく会見を開き、深々と頭を下げた。だが、記者からの質問には「調査中」と繰り返すばかりで、会場には重苦しい空気が漂った。",
+    "form": "会見",
+    "en": "Three days after the scandal came to light, the company president finally held a press conference and bowed deeply. However, in response to reporters' questions, the president merely kept repeating, \"It's under investigation,\" and a heavy atmosphere hung over the room.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "設計",
+   "reading": "せっけい",
+   "pos": "noun",
+   "meaning": "design; planning",
+   "defJa": "作る前に形やしくみを考えて図にすること。",
+   "level": "N3",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "新しい市立図書館は、地元出身の建築家が設計した。大きな窓から自然光がたっぷり入るように工夫されていて、昼間は照明をつけなくても本が読めるほど明るい。",
+    "form": "設計",
+    "en": "The new city library was designed by an architect from the area. It was carefully designed to let in plenty of natural light through its large windows, making it bright enough to read during the day without turning on the lights.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "崩落",
+   "reading": "ほうらく",
+   "pos": "noun",
+   "meaning": "collapse; cave-in",
+   "defJa": "崖や建物の一部などが、くずれて落ちること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "大雨の影響で、山あいの県道沿いの斜面が崩落した。土砂は道路をふさぎ、奥の集落は一時孤立した。けが人はいなかったという。県は重機を入れて土砂の撤去を急いでいるが、全面復旧には一か月ほどかかる見通しだ。",
+    "form": "崩落",
+    "en": "Heavy rain caused a slope beside a prefectural road in the mountains to collapse. Earth and debris blocked the road, temporarily isolating a settlement farther along it. No injuries were reported. The prefectural government has brought in heavy machinery and is rushing to remove the debris, but full restoration is expected to take about a month.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "修繕費",
+   "reading": "しゅうぜんひ",
+   "pos": "noun",
+   "meaning": "repair costs",
+   "defJa": "建物や設備の傷んだところを直すお金。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "築四十年のマンションでは、外壁や水道管の傷みが目立ち始めた。管理組合は修繕費が足りなくなることを心配し、来年から毎月の積立金を引き上げると決めた。",
+    "form": "修繕費",
+    "en": "In the forty-year-old condominium building, deterioration of the exterior walls and water pipes has begun to stand out. Concerned that funds for repairs would run short, the owners' association decided to raise the monthly reserve contributions starting next year.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "精査",
+   "reading": "せいさ",
+   "pos": "noun",
+   "meaning": "close examination",
+   "defJa": "細かいところまで、くわしく調べること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "新しい薬が承認されるまでには、長い道のりがある。製薬会社が提出した膨大な試験データを国の審査機関が一つひとつ精査し、効き目と安全性が確かめられて初めて、販売が認められるのだ。",
+    "form": "精査",
+    "en": "There is a long road to approval for a new drug. The national regulatory agency carefully scrutinizes the vast amount of trial data submitted by the pharmaceutical company, item by item, and only after the drug's effectiveness and safety have been confirmed is it allowed to go on sale.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "県議会",
+   "reading": "けんぎかい",
+   "pos": "noun",
+   "meaning": "prefectural assembly",
+   "defJa": "県の予算や条例を決める議員の集まり。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "来年度の予算案が、二月の県議会に提出された。子育て支援の拡充などで総額は過去最大となり、議員からは財源の裏付けを問う質問が相次いだ。予算案は来月末に採決される見通しだ。",
+    "form": "県議会",
+    "en": "The budget proposal for next fiscal year was submitted to the February session of the prefectural assembly. Expanded support for child-rearing and other measures pushed the total to a record high, prompting a succession of questions from assembly members about how the funding would be secured. A vote on the proposal is expected at the end of next month.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "訴額",
+   "reading": "そがく",
+   "pos": "noun",
+   "meaning": "amount claimed in a lawsuit",
+   "defJa": "裁判で相手に求める金額などの価値。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "訴額が百四十万円以下の民事裁判は簡易裁判所、それを超えるものは地方裁判所が扱う。裁判所に納める手数料も、この金額に応じて段階的に決まる仕組みになっている。",
+    "form": "訴額",
+    "en": "Civil cases involving claims of 1.4 million yen or less are handled by summary courts, while those involving larger amounts are handled by district courts. The fees payable to the court are also set on a sliding scale according to the amount of the claim.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "妥当性",
+   "reading": "だとうせい",
+   "pos": "noun",
+   "meaning": "validity; reasonableness",
+   "defJa": "考えや数字が、その場に合っていて正しいこと。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "会社が示した値上げ幅について、消費者団体はその妥当性に疑問を投げかけた。原材料費の上昇分を考えても、二割もの値上げは高すぎるというのだ。会社側は近く、詳しい説明の場を設けるとしている。",
+    "form": "妥当性",
+    "en": "A consumer group questioned whether the size of the company's announced price increase was justified. The group says that even allowing for the rise in raw-material costs, an increase of as much as twenty percent is too high. The company says it will soon arrange an opportunity to explain the details.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "経費",
+   "reading": "けいひ",
+   "pos": "noun",
+   "meaning": "business expenses",
+   "defJa": "仕事や活動を続けるのにかかるお金。",
+   "level": "N1",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "出張で使ったタクシー代は、領収書を出せば経費として精算できる。ただし、私用で乗った分まで混ぜてしまうと、あとで大きな問題になる。会社のお金を使う以上、一円単位で正直に申告するのが基本だ。",
+    "form": "経費",
+    "en": "Taxi fares incurred on a business trip can be reimbursed as expenses if you submit the receipts. However, including fares for personal trips can cause serious problems later. When using company money, the basic rule is to report your expenses honestly down to the last yen.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "定例",
+   "reading": "ていれい",
+   "pos": "noun",
+   "meaning": "regular (scheduled)",
+   "defJa": "いつも決まった時期に行うもの。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "毎週月曜日の朝には、部署の定例会議が開かれる。先週の売り上げや今週の予定を共有するだけの短い会議だが、全員が顔を合わせる貴重な機会になっている。",
+    "form": "定例",
+    "en": "The department holds its regular meeting every Monday morning. Although it is a short meeting simply to share last week's sales figures and this week's plans, it provides a valuable opportunity for everyone to meet face to face.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "原子力発電所",
+   "reading": "げんしりょくはつでんしょ",
+   "pos": "noun",
+   "meaning": "nuclear power plant",
+   "defJa": "核の力で電気を作る施設。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "海岸沿いに建つその原子力発電所では、大地震に備えて、高さ二十メートルを超える防潮堤の工事が進められている。再稼働に向けた審査は長引き、地元では賛否の声が分かれたままだ。",
+    "form": "原子力発電所",
+    "en": "At the nuclear power plant on the coast, construction is under way on a seawall more than twenty meters high in preparation for a major earthquake. The review process for restarting the plant has dragged on, and local opinion remains divided between support and opposition.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "交わす",
+   "reading": "かわす",
+   "pos": "verb",
+   "meaning": "exchange (words, contracts)",
+   "defJa": "おたがいにやりとりする。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "朝、マンションのエレベーターで隣の部屋の老夫婦と乗り合わせた。「おはようございます」とあいさつを交わすだけの間柄だが、その短いやりとりがあるだけで、なんとなく一日が気持ちよく始まる。",
+    "form": "交わす",
+    "en": "One morning, I happened to share the elevator in my apartment building with the elderly couple from next door. Our acquaintance goes no further than exchanging a \"Good morning,\" but that brief exchange alone somehow gets the day off to a pleasant start.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "顕著",
+   "reading": "けんちょ",
+   "pos": "other",
+   "meaning": "striking, marked",
+   "defJa": "はっきりと目立っていて、よく分かるようす。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "この十年で、町の高齢化は顕著に進んだ。商店街ではシャッターを下ろしたままの店が目立ち、町に一つしかない小学校の児童数は、当時の半分にまで減っている。",
+    "form": "顕著",
+    "en": "The town's population has aged markedly over the past ten years. Shops that remain shuttered are a conspicuous sight in the shopping district, and the number of pupils at the town's only elementary school has fallen to half what it was ten years ago.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "空爆",
+   "reading": "くうばく",
+   "pos": "noun",
+   "meaning": "airstrike",
+   "defJa": "飛行機などから爆弾を落として攻撃すること。",
+   "level": "",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "夜明け前、国境近くの軍事拠点に対して大規模な空爆が行われた。戦闘機の爆音で目を覚ました住民の多くは、着の身着のままで近くの地下壕へ避難したという。",
+    "form": "空爆",
+    "en": "Before dawn, a large-scale airstrike was carried out on a military base near the border. Many residents awakened by the roar of fighter jets reportedly fled to nearby underground shelters with nothing but the clothes they were wearing.",
+    "register": "報",
+    "topic": "other"
+   }
+  },
+  {
+   "term": "濁る",
+   "reading": "にごる",
+   "pos": "verb",
+   "meaning": "become cloudy or muddy",
+   "defJa": "水などが透き通らなくなる。",
+   "level": "N2",
+   "deck": "kotoba-master",
+   "passage": {
+    "ja": "上流で大雨が降ったせいで、いつもは底まで透き通っている川がすっかり濁っていた。釣りを楽しみにしていた兄は、竿を手にしたまま恨めしそうに水面を眺めていた。",
+    "form": "濁って",
+    "en": "Because of heavy rain upstream, the river, normally clear all the way to the bottom, had turned completely muddy. My older brother, who had been looking forward to fishing, stood with his rod still in his hand, gazing resentfully at the water's surface.",
+    "register": "報",
+    "topic": "other"
+   }
+  }
+ ],
+ "decks": {
+  "kotoba-master": [
+   "わたしの言葉",
+   "My own words",
+   "sumi"
+  ]
+ }
+}

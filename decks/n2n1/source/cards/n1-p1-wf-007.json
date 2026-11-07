@@ -9,7 +9,7 @@
    "passage": {
     "ja": "新聞の見出しは、「壊滅」のような短くて強い語を好む。ところが現場の描写に悲惨という語を重ねすぎると、読者の感覚はかえって麻痺し、出来事の具体が見えなくなる。報道の現場では、形容詞に頼ることなく事実の細部で伝えよ、とよく言われる。たとえば「家が流された」と書くより、「玄関の表札だけが残った」と書くほうが、被害の大きさは胸に迫る。言葉の強さに頼らない書き方は、読み手への信頼の表れでもある。",
     "form": "悲惨",
-    "en": "Newspaper headlines favor short, strong words like \"devastated.\" But if the word miserable is piled onto a description of the scene, readers' senses instead go numb and the concrete details of the event become invisible. In newsrooms it is often said that one should convey things through factual detail without relying on adjectives. Writing \"only the nameplate by the front door remained\" brings home the scale of the damage more than writing \"the house was swept away.\" Writing that does not rely on the strength of words is also an expression of trust in the reader.",
+    "en": "Newspaper headlines favor short, forceful words such as \"devastation.\" But using words like \"tragic\" too often to describe a scene can actually numb readers' senses and obscure the concrete details of what happened. In journalism, people often say that a story should be conveyed through factual details rather than relying on adjectives. For example, writing \"Only the nameplate at the front door remained\" brings home the scale of the damage more powerfully than writing \"The house was swept away.\" Writing without relying on the force of words is also an expression of trust in the reader.",
     "register": "報",
     "topic": "language",
     "tipJa": "「悲惨な事故」のように、痛ましさを強く言う語。使いすぎると軽くなる。",
@@ -23,15 +23,16 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
+   "cardId": "nn-fff745308a-7953e7a7",
    "term": "採択",
    "reading": "さいたく",
    "pos": "noun",
    "meaning": "adoption (of a resolution)",
    "defJa": "提案や決議を正式に選んで決めること",
    "passage": {
-    "ja": "国連総会は二〇一九年、二〇二二年から二〇三二年までを「国際先住民言語の十年」とする決議を採択した。世界で話される七千ほどの言語の多くが、消滅の危機にあると指摘されている。言語が失われれば、その言語でしか語れない自然の見方や歴史の記憶も同時に失われる。各国は教育や放送を通じて、話者を支える具体的な措置を求められている。言葉を守ることは、その言葉を話す人々の尊厳を守ることにほかならない。",
+    "ja": "国連総会は二〇一九年、二〇二二年から二〇三二年までを「国際先住民言語の十年」とする決議を採択した。世界で話される七千ほどの言語の多くが、消滅の危機にあると指摘されている。言語が失われれば、その言語でしか語れない自然の見方や歴史の記憶も同時に失われる。各国は教育や放送を通じて、話者を支える具体的な措置を求められている。言葉を守ることは、その言葉を話す人々の尊厳を守ることでもある。",
     "form": "採択",
-    "en": "In 2019 the UN General Assembly adopted a resolution designating 2022 to 2032 the International Decade of Indigenous Languages. Many of the roughly seven thousand languages spoken in the world are said to be in danger of disappearing. When a language is lost, the views of nature and memories of history that can be spoken only in that language are lost with it. Countries are being asked to take concrete measures supporting speakers, through education and broadcasting. Protecting a language is nothing other than protecting the dignity of the people who speak it.",
+    "en": "In 2019 the UN General Assembly adopted a resolution designating 2022 to 2032 the International Decade of Indigenous Languages. Many of the roughly seven thousand languages spoken in the world are said to be in danger of disappearing. When a language is lost, the views of nature and memories of history that can be spoken only in that language are lost with it. Countries are being asked to take concrete measures supporting speakers, through education and broadcasting. Protecting a language also means protecting the dignity of the people who speak it.",
     "register": "報",
     "topic": "language",
     "tipJa": "「決議を採択する」のように、会議などで正式に決める意味。",
@@ -97,7 +98,7 @@
    "passage": {
     "ja": "試験の手紙文では、頭語と結語の組み合わせが場面に応じて問われる。拝啓で始めたら敬具で結ぶ、前略で始めたら草々で結ぶ、という対応を押さえておけば得点源になる。頭語を見れば結語を推測できるので、丁寧な形と略した形の二系統に分けて覚えるのがよい。これは暗記に頼る分野だが、混乱しにくい整理のしかたはある。季節の挨拶を続ける形式が問われる年もあるので、時候の言葉も一緒に押さえておきたい。",
     "form": "拝啓",
-    "en": "In exam letter-writing questions, the pairing of opening and closing phrases is tested depending on the occasion. If you secure the correspondences, begin with the formal opening and end with the formal closing, begin with the abbreviated opening and end with its matching close, it becomes a source of points. Since you can guess the closing from the opening, it is best to remember them in two groups, the polite forms and the abbreviated forms. This is a field that relies on memorization, but there is a way of organizing it that makes confusion less likely. Some years the form that continues with a seasonal greeting is tested, so it is worth securing the seasonal phrases together with these.",
+    "en": "In exam letter-writing questions, the pairing of opening and closing phrases is tested depending on the occasion. If you secure the correspondences—begin with haikei and end with keigu, begin with zenryaku and end with sōsō—it becomes a source of points. Since you can guess the closing from the opening, it is best to remember them in two groups, the polite forms and the abbreviated forms. This is a field that relies on memorization, but there is a way of organizing it that makes confusion less likely. Some years the form that continues with a seasonal greeting is tested, so it is worth securing the seasonal phrases together with these.",
     "register": "学",
     "topic": "language",
     "tipJa": "拝啓は頭語、結びは敬具。前略には草々が対になる。",
@@ -317,7 +318,7 @@
    "passage": {
     "ja": "二〇一六年、囲碁の人工知能が世界のトップ棋士イ・セドル九段に四勝一敗で勝ち越した。各国の報道を驚かせたのは、第二局の三十七手目である。人間の常識では考えにくく、しかも後の展開を見れば筋の通った、不思議な一手だったからだ。その後、棋士たちはこうした手を研究に取り入れ、長く受け継がれてきた定石や技を見直すようになり、機械の発想を借りて棋風を磨く者も珍しくなくなった。",
     "form": "技",
-    "en": "In 2016, a Go-playing AI beat the world's top player, Lee Sedol, four games to one. What astonished the media worldwide was move 37 of the second game. It was a strange move, hard to imagine by human common sense yet, in light of how the game developed, entirely sound. Afterward, professionals took such moves into their research and began to reexamine the long-inherited standard patterns and techniques, and it became common for players to borrow the machine's ideas to sharpen their style.",
+    "en": "In 2016, a Go-playing AI beat the world's top player, ninth-dan professional Lee Sedol, four games to one. What astonished the media worldwide was move 37 of the second game. It was a strange move, hard to imagine by human common sense yet, in light of how the game developed, entirely sound. Afterward, professionals took such moves into their research and began to reexamine the long-inherited standard patterns and techniques, and it became common for players to borrow the machine's ideas to sharpen their style.",
     "register": "報",
     "topic": "ai",
     "tipJa": "「技を磨く」「技を見直す」のように、鍛えた腕前や型を表す。",

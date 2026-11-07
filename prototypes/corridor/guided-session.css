@@ -8,7 +8,6 @@
    ========================================================================== */
 
 .guided-room {
-  --gs-radius: 6px;
   --gs-sheet-shadow: var(
     --paper-shadow,
     0 1px 0 rgba(28, 47, 66, 0.06),
@@ -17,7 +16,7 @@
   --gs-edge: var(--paper-edge, 1px solid color-mix(in srgb, var(--ink) 30%, transparent));
   color: var(--ink);
   font-family: var(--sans);
-  font-size: 15.5px;
+  font-size: var(--type-body);
   line-height: 1.6;
 }
 .guided-room h1,
@@ -31,10 +30,10 @@
   color: var(--ink);
 }
 .guided-room h2 {
-  font-size: 20px;
+  font-size: var(--type-lead);
 }
 .guided-room h3 {
-  font-size: 16px;
+  font-size: var(--type-body);
 }
 .guided-room p {
   margin: 0 0 0.8em;
@@ -78,7 +77,7 @@
 /* ---------- bilingual labels: Japanese first, a small English gloss beside it ---------- */
 .gs-gloss {
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: var(--type-caption);
   letter-spacing: 0.06em;
   color: var(--ink-2);
   margin-left: 7px;
@@ -89,13 +88,13 @@
 .gs-title .gs-gloss {
   display: block;
   margin: 6px 0 0;
-  font-size: 12px;
+  font-size: var(--type-caption);
   letter-spacing: 0.12em;
 }
 .gs-eyebrow {
   display: block;
   font-family: var(--serif);
-  font-size: 12.5px;
+  font-size: var(--type-label);
   letter-spacing: 0.12em;
   color: var(--ink-2);
   margin: 0 0 8px;
@@ -108,66 +107,24 @@
   margin: 0 4px;
 }
 
-/* ---------- the room bar: the room's own doors under the app's mast ---------- */
-.gs-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding: 2px 0 10px;
-  margin-bottom: 4px;
-  border-bottom: 1px solid var(--line);
-}
-.gs-bar-name {
-  font-family: var(--serif);
-  font-size: 13px;
-  letter-spacing: 0.08em;
-  color: var(--ink-2);
-}
-.gs-bar-doors {
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-}
+/* ---------- the room bar: an instance of the house's one bar (editorial.css ONE TOP BAR); its middle is the
+   session's title, its doors at the right ---------- */
 .gs-nav {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   gap: 5px;
-  min-height: 36px;
-  padding: 6px 12px !important;
-  border: 1px solid transparent !important;
-  border-radius: 20px;
-  font-family: var(--serif);
-  font-size: 14px;
-}
-.gs-nav:hover {
-  border-color: var(--line) !important;
-}
-.gs-nav[aria-current='page'] {
-  border-color: var(--ink) !important;
-  background: color-mix(in srgb, var(--ground-0) 60%, transparent) !important;
 }
 .gs-nav .gs-gloss {
   margin-left: 0;
 }
 /* during an attempt the room's own doors recede too (T8) */
-.guided-room[data-stage='question'] .gs-bar {
-  border-bottom-color: var(--line-soft);
-  padding-bottom: 6px;
-}
-.guided-room[data-stage='question'] .gs-nav {
-  font-size: 12px;
-  min-height: 32px;
-  padding: 4px 7px;
-  color: var(--ink-2);
-}
 .guided-room[data-stage='question'] .gs-nav .gs-gloss,
 .guided-room[data-stage='question'] .gs-bar-name .gs-gloss {
   display: none;
 }
 
-/* ---------- one grammar of buttons: ink fill commits; outlined is secondary; text is quiet ---------- */
+/* ---------- the buttons are the house's families (editorial.css): primary commits, a slip is secondary,
+   a quiet word is text; only their places are kept here ---------- */
 .gs-actions {
   display: flex;
   gap: 10px;
@@ -176,50 +133,13 @@
   margin-top: 22px;
 }
 .gs-button {
-  display: inline-flex !important;
-  align-items: baseline;
+  display: inline-flex;
+  /* Hfix-2d (X-3b): one label on a 48 px button is centred, not packed to the top by baseline */
+  align-items: center;
   gap: 8px;
-  min-height: 44px;
-  padding: 11px 18px !important;
-  border: 1px solid var(--ink) !important;
-  border-radius: 4px;
-  font-family: var(--serif) !important;
-  font-size: 16px;
-  line-height: 1.2;
-  color: var(--ink);
-  background: transparent;
-}
-.gs-button.primary {
-  background: var(--ink) !important;
-  color: var(--ground-0) !important;
 }
 .gs-button.primary .gs-gloss {
-  color: color-mix(in srgb, var(--ground-0) 88%, transparent);
-}
-.gs-button.primary:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--ink) 88%, black) !important;
-}
-.gs-button.quiet {
-  border-color: var(--line) !important;
-}
-.gs-button:disabled,
-.gs-button.primary:disabled {
-  background: transparent !important;
-  color: var(--ink-2) !important;
-  border-color: var(--line) !important;
-}
-.gs-button.primary:disabled .gs-gloss {
-  color: var(--faint);
-}
-.gs-text {
-  color: var(--ink);
-  min-height: 32px;
-  padding: 2px 0 !important;
-  font-size: 14.5px;
-  border-bottom: 1px solid var(--line) !important;
-}
-.gs-text:hover {
-  border-bottom-color: var(--ink) !important;
+  color: color-mix(in srgb, #f7f2e8 88%, transparent);
 }
 .gs-text:disabled {
   color: var(--faint);
@@ -233,16 +153,16 @@
   padding-top: 22px;
 }
 .gs-hero {
-  font-size: clamp(32px, 7vw, 48px) !important;
+  font-size: clamp(var(--type-display), 7vw, calc(var(--type-headword) * 1.25)) !important;
   line-height: 1.15;
 }
 .gs-title {
-  font-size: clamp(24px, 4.2vw, 32px);
+  font-size: clamp(var(--type-section), 4.2vw, var(--type-display));
   line-height: 1.25;
   margin-bottom: 4px !important;
 }
 .gs-lede {
-  font-size: 17px;
+  font-size: var(--type-lead);
   line-height: 1.65;
   color: var(--ink-2);
   max-width: 48ch;
@@ -250,7 +170,7 @@
 }
 .gs-meta {
   font-family: var(--serif);
-  font-size: 13px;
+  font-size: var(--type-label);
   letter-spacing: 0.06em;
   color: var(--faint);
   margin-top: 14px !important;
@@ -261,14 +181,14 @@
   background: var(--ground-0);
   border: 1px solid var(--line);
   border-left: 3px solid var(--ink);
-  font-size: 17px;
+  font-size: var(--type-lead);
   overflow-wrap: anywhere;
 }
 .gs-field-caption {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--faint);
   margin-top: 8px;
   font-family: var(--serif);
@@ -291,7 +211,7 @@
 }
 .gs-step {
   font-family: var(--serif);
-  font-size: 12px;
+  font-size: var(--type-caption);
   letter-spacing: 0.14em;
   color: var(--ink-2);
   display: block;
@@ -300,11 +220,11 @@
 .gs-journey-strip strong {
   font-family: var(--serif);
   font-weight: 500;
-  font-size: 17px;
+  font-size: var(--type-lead);
   display: block;
 }
 .gs-journey-strip p {
-  font-size: 13.5px;
+  font-size: var(--type-chrome);
   color: var(--ink-2);
   margin: 4px 0 0 !important;
 }
@@ -321,7 +241,7 @@
   background: var(--card-ground, #f5efe0) !important;
   color: var(--card-ink, #211e17) !important;
   border: 1px solid var(--card-line, rgba(33, 30, 23, 0.16)) !important;
-  border-radius: var(--gs-radius);
+  border-radius: var(--radius-control);
   padding: 14px 16px !important;
   box-shadow: 0 10px 28px -14px rgba(28, 47, 66, 0.35);
 }
@@ -329,12 +249,12 @@
   display: block;
   font-family: var(--serif);
   font-weight: 400;
-  font-size: 19px;
+  font-size: var(--type-reading);
 }
 .gs-duecard button small {
   display: block;
   color: var(--card-faint, rgba(33, 30, 23, 0.6));
-  font-size: 12.5px;
+  font-size: var(--type-label);
   margin-top: 3px;
 }
 .gs-duecard .gs-go {
@@ -342,7 +262,7 @@
   margin-top: 10px;
   font-family: var(--serif);
   color: var(--card-ai, #2e4d6e);
-  font-size: 15px;
+  font-size: var(--type-control);
 }
 .gs-duecard button.gs-light {
   background: transparent !important;
@@ -354,7 +274,7 @@
   color: var(--ink-2);
 }
 .gs-duecard button.gs-light b {
-  font-size: 15px;
+  font-size: var(--type-control);
 }
 /* the glosses ride inline beside their Japanese, even inside the card's block-level small */
 .gs-duecard button .gs-gloss {
@@ -390,15 +310,15 @@
   gap: 2px;
   padding: 4px 8px !important;
   font-family: var(--serif) !important;
-  font-size: 16px;
+  font-size: var(--type-body);
   color: var(--ink);
   background: none !important;
-  border-radius: 2px;
+  border-radius: var(--radius-seal);
   text-align: center !important;
 }
 .gs-node small {
   font-family: var(--sans);
-  font-size: 10.5px;
+  font-size: var(--type-caption);
   letter-spacing: 0.06em;
   color: var(--ink-2);
 }
@@ -414,9 +334,11 @@
   background: var(--ground-0);
   margin-bottom: 2px;
 }
+/* a point still ahead recedes by its ink alone (Hfix-1B; H-akafuji-08, H-hokusai-06, H-nami-05, H-rokusho-10): the world's
+   second ink at full strength, never faded further, so its name and kind read at 4.5:1 or more on the field and on the
+   map's own threads that run under them (an opacity of .75 left them 3.3–4.5:1) */
 .gs-node:disabled {
   color: var(--ink-2);
-  opacity: 0.75;
 }
 .gs-node.encountered::before {
   background: var(--ink);
@@ -427,7 +349,7 @@
   border-color: var(--red);
 }
 .gs-node.due {
-  font-size: 19px;
+  font-size: var(--type-lead);
 }
 .gs-node.due::before {
   width: 10px;
@@ -448,7 +370,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px 16px;
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--ink-2);
   margin: 14px 0;
 }
@@ -494,11 +416,11 @@
 .gs-facts strong {
   font-family: var(--serif);
   font-weight: 500;
-  font-size: 18px;
+  font-size: var(--type-lead);
   display: block;
 }
 .gs-facts span {
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--faint);
 }
 .gs-details {
@@ -511,7 +433,7 @@
   min-height: 32px;
 }
 .gs-details p {
-  font-size: 14px;
+  font-size: var(--type-chrome);
   color: var(--ink-2);
   margin-top: 8px;
 }
@@ -519,7 +441,7 @@
   margin-top: 26px !important;
 }
 .gs-side-note {
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--faint);
   line-height: 1.55;
 }
@@ -527,7 +449,7 @@
   color: var(--faint);
 }
 .gs-notice {
-  font-size: 13.5px;
+  font-size: var(--type-chrome);
   color: var(--ink);
   border-left: 3px solid var(--ai);
   padding: 6px 10px;
@@ -547,7 +469,7 @@
 }
 .gs-session-top .gs-eyebrow {
   margin: 0;
-  font-size: 12px;
+  font-size: var(--type-caption);
 }
 .gs-count {
   position: absolute;
@@ -568,7 +490,7 @@
   display: grid !important;
   place-items: center;
   font-family: var(--serif) !important;
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--faint);
   border-bottom: 3px solid var(--line) !important;
   text-align: center !important;
@@ -598,14 +520,14 @@
   margin-left: -1px;
   border-left: 2px solid transparent;
   font-family: var(--serif);
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--faint);
   letter-spacing: 0.04em;
 }
 .gs-rail-item small {
   display: block;
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: var(--type-caption);
   color: var(--faint-2, var(--faint));
 }
 .gs-rail-item.current {
@@ -616,15 +538,15 @@
 /* the attempt: a sheet of washi on the ground */
 .gs-sheet {
   background-color: var(--ground-0);
+  /* drawn: the attempt sheet's laid lines — hairlines of the world's ink at a breath, hard-edged (its white sheen of its own is gone: no pigment is lighter than the paper) */
   background-image:
     repeating-linear-gradient(
       0deg,
       color-mix(in srgb, var(--ink) 2.5%, transparent) 0 1px,
       transparent 1px 3px
-    ),
-    radial-gradient(ellipse at 20% 0%, color-mix(in srgb, #fff 45%, transparent), transparent 60%);
+    );
   border: 1px solid color-mix(in srgb, var(--ink) 32%, transparent);
-  border-radius: var(--gs-radius);
+  border-radius: var(--radius-card);
   box-shadow: var(--gs-sheet-shadow);
   padding: 20px 18px 18px;
 }
@@ -637,6 +559,7 @@
   )
   .gs-sheet:not(.gs-lacquer) {
   /* night paper keeps its grain but no sheen: on a dark ground a light sheen reads as glow */
+  /* drawn: the night sheet's laid lines, hairlines of its ink */
   background-image: repeating-linear-gradient(
     0deg,
     color-mix(in srgb, var(--ink) 2.5%, transparent) 0 1px,
@@ -644,11 +567,11 @@
   );
 }
 .gs-sheet .gs-title {
-  font-size: clamp(21px, 3vw, 26px);
+  font-size: clamp(var(--type-reading), 3vw, var(--type-section));
   margin-bottom: 14px !important;
 }
 .gs-passage {
-  font-size: 16.5px;
+  font-size: var(--type-body);
   line-height: 1.95;
   padding: 14px 16px;
   background: var(--ground-2);
@@ -657,12 +580,12 @@
   white-space: pre-line;
 }
 .gs-instruction {
-  font-size: 14px;
+  font-size: var(--type-chrome);
   color: var(--ink-2);
   margin-bottom: 6px !important;
 }
 .gs-question {
-  font-size: 19px;
+  font-size: var(--type-lead);
   line-height: 1.85;
   margin: 0 0 18px !important;
 }
@@ -691,18 +614,11 @@ legend.gs-instruction {
   gap: 12px;
   min-height: 48px;
   padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  background: color-mix(in srgb, var(--ground-0) 70%, transparent);
-  font-size: 17px;
-  cursor: pointer;
+  font-size: var(--type-lead);
   text-wrap: pretty;
   word-break: keep-all;
   line-break: strict;
   overflow-wrap: anywhere;
-}
-.gs-choice:hover {
-  border-color: var(--ink-2);
 }
 .gs-choice input {
   margin: 0;
@@ -714,7 +630,7 @@ legend.gs-instruction {
 }
 .gs-choice-num {
   font-family: var(--serif);
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--faint);
   width: 12px;
   flex: none;
@@ -746,7 +662,7 @@ legend.gs-instruction {
 .gs-outcome {
   display: block;
   font-family: var(--sans);
-  font-size: 11.5px;
+  font-size: var(--type-caption);
   letter-spacing: 0.06em;
   margin-top: 4px;
   color: var(--ink-2);
@@ -780,26 +696,15 @@ legend.gs-instruction {
   display: inline-block;
   transform-origin: 50% 0;
 }
-@media (prefers-reduced-motion: no-preference) {
-  .gs-slash path {
-    animation: gs-slash 0.34s cubic-bezier(0.15, 0.9, 0.2, 1) 0.06s forwards;
-  }
-  .gs-choice.is-wrong.cut .gs-choice-num {
-    animation: gs-numfall 0.5s cubic-bezier(0.35, 0.6, 0.3, 1) 0.3s forwards;
-  }
-  .gs-choice {
-    transition:
-      none;
-  }
+.gs-slash path {
+  animation: gs-slash var(--motion-sheet) var(--ease-enter) 60ms forwards;
 }
-@media (prefers-reduced-motion: reduce) {
-  .gs-slash path {
-    transform: none;
-  }
-  .gs-choice.is-wrong.cut .gs-choice-num {
-    transform: translate(2px, 10px) rotate(60deg);
-    opacity: 0.6;
-  }
+.gs-choice.is-wrong.cut .gs-choice-num {
+  animation: gs-numfall 0.5s var(--ease-standard) 0.3s forwards;
+}
+.gs-choice {
+  transition:
+    none;
 }
 @keyframes gs-slash {
   to {
@@ -830,7 +735,7 @@ legend.gs-instruction {
   gap: 8px;
   font-family: var(--serif);
   font-weight: 500;
-  font-size: 24px;
+  font-size: var(--type-section);
 }
 .gs-incorrect .gs-verdict {
   color: var(--red);
@@ -842,7 +747,7 @@ legend.gs-instruction {
 .gs-verdict-ja {
   display: block;
   font-family: var(--serif);
-  font-size: 15px;
+  font-size: var(--type-control);
   letter-spacing: 0.1em;
   margin: -2px 0 0 28px;
   color: var(--ink-2);
@@ -851,17 +756,17 @@ legend.gs-instruction {
   color: var(--red);
 }
 .gs-comparison {
-  font-size: 14px;
+  font-size: var(--type-chrome);
   color: var(--ink-2);
   margin: 6px 0 0 !important;
 }
 .gs-feedback p {
   margin: 6px 0 0;
-  font-size: 14px;
+  font-size: var(--type-chrome);
 }
 .gs-feedback .gs-text {
   margin-top: 8px;
-  font-size: 13px;
+  font-size: var(--type-label);
 }
 .gs-return-link {
   margin-top: 16px;
@@ -876,16 +781,16 @@ legend.gs-instruction {
 }
 .gs-aside h3,
 .gs-aside .gs-aside-title {
-  font-size: 16px;
+  font-size: var(--type-body);
 }
 .gs-aside p {
-  font-size: 13.5px;
+  font-size: var(--type-chrome);
   color: var(--ink-2);
 }
 .gs-aside .gs-text {
   display: block;
   margin-top: 8px;
-  font-size: 13.5px;
+  font-size: var(--type-chrome);
   border-bottom: 0 !important;
 }
 .gs-aside .gs-text [lang='ja'] {
@@ -896,12 +801,12 @@ legend.gs-instruction {
   padding-top: 14px;
 }
 .gs-aside .gs-rule p {
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--faint);
 }
 .gs-source-id {
   font-family: 'Roboto Mono', 'Noto Sans JP', ui-monospace, Menlo, monospace;
-  font-size: 11px;
+  font-size: var(--type-caption);
   color: var(--ink-2);
   word-break: break-all;
 }
@@ -925,7 +830,7 @@ legend.gs-instruction {
   color: var(--sheet-ink);
 }
 .gs-anchor {
-  font-size: 12.5px;
+  font-size: var(--type-label);
   letter-spacing: 0.06em;
   color: var(--sheet-faint);
   margin-bottom: 14px;
@@ -944,16 +849,16 @@ legend.gs-instruction {
 }
 .gs-target > span:first-child {
   font-family: var(--serif);
-  font-size: 26px;
+  font-size: var(--type-section);
   color: var(--sheet-ink);
 }
 .gs-target > span:last-child {
   color: var(--sheet-ink-2);
-  font-size: 14px;
+  font-size: var(--type-chrome);
 }
 .gs-reading {
   font-family: var(--sans);
-  font-size: 0.62em;
+  font-size: var(--type-label);
   font-weight: 400;
   margin-inline-start: 0.16em;
   color: var(--red);
@@ -967,7 +872,7 @@ legend.gs-instruction {
   align-items: center;
   gap: 8px 18px;
   margin: 12px 0 18px;
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--sheet-faint);
 }
 .gs-lacquer .gs-text {
@@ -979,8 +884,8 @@ legend.gs-instruction {
   background: var(--card-ground, var(--ground-0));
   color: var(--card-ink, var(--ink));
   padding: 16px 18px;
-  border-radius: 4px;
-  font-size: 19px;
+  border-radius: var(--radius-card);
+  font-size: var(--type-lead);
   line-height: 1.9;
   margin: 6px 0 14px !important;
   box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25);
@@ -998,12 +903,12 @@ legend.gs-instruction {
 }
 .gs-meaning {
   font-family: var(--sans);
-  font-size: 14px;
+  font-size: var(--type-chrome);
   color: var(--sheet-ink-2);
   margin: 0 0 14px !important;
 }
 .gs-teaching {
-  font-size: 14.5px;
+  font-size: var(--type-control);
   line-height: 1.7;
   color: var(--sheet-ink-2);
   border-top: 1px solid var(--sheet-line);
@@ -1016,16 +921,16 @@ legend.gs-instruction {
   margin-top: 16px;
   padding: 12px 14px;
   border: 1px solid var(--sheet-line);
-  border-radius: 4px;
+  border-radius: var(--radius-card);
 }
 .gs-example p {
-  font-size: 17px;
+  font-size: var(--type-lead);
   margin: 0 0 4px !important;
   color: var(--sheet-ink);
 }
 .gs-example small {
   color: var(--sheet-faint);
-  font-size: 12.5px;
+  font-size: var(--type-label);
 }
 .gs-lacquer > .gs-eyebrow:not(:first-of-type) {
   margin-top: 18px;
@@ -1040,10 +945,10 @@ legend.gs-instruction {
   min-height: 40px;
   padding: 8px 12px !important;
   border: 1px solid var(--gold) !important;
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   color: var(--gold);
   font-family: var(--serif) !important;
-  font-size: 15px;
+  font-size: var(--type-control);
 }
 .gs-branch-links button span {
   opacity: 0.7;
@@ -1062,15 +967,14 @@ legend.gs-instruction {
 .gs-branch-back {
   margin-bottom: 12px;
 }
-.gs-branch .gs-title,
-.gs-word-room .gs-title {
+.gs-branch .gs-title {
   display: flex;
   align-items: baseline;
   gap: 10px;
   flex-wrap: wrap;
 }
 .gs-branch-reading {
-  font-size: 14px;
+  font-size: var(--type-chrome);
   color: var(--sheet-red);
   letter-spacing: 0.06em;
   font-weight: 400;
@@ -1081,30 +985,9 @@ legend.gs-instruction {
 .gs-word {
   display: inline !important;
   padding: 0 1px !important;
-  border-bottom: 1px dotted currentColor !important;
-  border-radius: 0;
   font: inherit !important;
   color: inherit;
   line-height: inherit;
-}
-.gs-word:hover {
-  background: var(--ai-wash) !important;
-}
-.gs-lacquer .gs-word:hover {
-  background: var(--sheet-ai-wash, rgba(217, 178, 95, 0.14)) !important;
-}
-/* the word room sits on the ground: its reading keeps the paper's red */
-.gs-word-room .gs-branch-reading {
-  display: block;
-  margin-top: 10px;
-  font-size: 0.5em;
-  line-height: 1.6;
-  color: var(--red);
-}
-.gs-word-room .gs-meaning {
-  margin-top: 20px !important;
-  color: var(--ink-2);
-  font-size: 15px;
 }
 
 /* ---------- summary · results · learn ---------- */
@@ -1118,7 +1001,7 @@ legend.gs-instruction {
   background: var(--ground-0);
   border: 1px solid var(--line);
   border-left: 3px solid var(--line);
-  border-radius: 4px;
+  border-radius: var(--radius-card);
 }
 .gs-row.missed {
   border-left-color: var(--red);
@@ -1134,25 +1017,25 @@ legend.gs-instruction {
 }
 .gs-row-number {
   font-family: var(--serif);
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--faint);
   padding-top: 3px;
 }
 .gs-row h3,
 .gs-row .gs-row-title {
-  font-size: 18px;
+  font-size: var(--type-lead);
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 4px 10px;
 }
 .gs-row p {
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--ink-2);
   margin: 2px 0 6px !important;
 }
 .gs-row .gs-text {
-  font-size: 13px;
+  font-size: var(--type-label);
   border-bottom-color: transparent !important;
 }
 .gs-row .gs-text [lang='ja'] {
@@ -1168,7 +1051,7 @@ legend.gs-instruction {
   display: inline-flex;
   align-items: baseline;
   gap: 6px;
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--ink-2);
   white-space: nowrap;
 }
@@ -1177,7 +1060,7 @@ legend.gs-instruction {
   font-family: var(--serif);
   border: 1px solid var(--line);
   padding: 0 6px;
-  border-radius: 2px;
+  border-radius: var(--radius-seal);
 }
 .gs-gap-tag .gs-gloss {
   margin-left: 0;
@@ -1193,7 +1076,7 @@ legend.gs-instruction {
   gap: 4px 12px;
 }
 .gs-card {
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--ink-2);
 }
 .gs-card b {
@@ -1225,7 +1108,7 @@ legend.gs-instruction {
 }
 .gs-deck-summary p {
   font-family: var(--serif);
-  font-size: 15px;
+  font-size: var(--type-control);
 }
 .gs-results {
   display: grid;
@@ -1234,17 +1117,17 @@ legend.gs-instruction {
   padding-top: 20px;
 }
 .gs-score {
-  font-size: clamp(40px, 9vw, 56px) !important;
+  font-size: clamp(var(--type-headword), 9vw, calc(var(--type-headword) * 1.25)) !important;
   line-height: 1.05;
 }
 .gs-of {
-  font-size: 0.42em;
+  font-size: var(--type-lead);
   color: var(--ink-2);
 }
 .gs-h-sub {
   display: block;
   font-family: var(--sans);
-  font-size: 13px;
+  font-size: var(--type-label);
   letter-spacing: 0.04em;
   color: var(--ink-2);
   margin-top: 14px;
@@ -1266,12 +1149,12 @@ legend.gs-instruction {
 .gs-results-facts strong {
   font-family: var(--serif);
   font-weight: 500;
-  font-size: 24px;
+  font-size: var(--type-section);
   display: block;
   font-variant-numeric: tabular-nums;
 }
 .gs-results-facts span {
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--ink-2);
   display: block;
 }
@@ -1286,7 +1169,7 @@ legend.gs-instruction {
   gap: 6px 10px;
   margin: 4px 0 12px !important;
   font-family: var(--serif);
-  font-size: 16px;
+  font-size: var(--type-body);
 }
 .gs-gap-line b {
   font-weight: 500;
@@ -1302,17 +1185,17 @@ legend.gs-instruction {
 .gs-focus {
   background: var(--ground-0);
   border: 1px solid var(--line);
-  border-radius: var(--gs-radius);
+  border-radius: var(--radius-card);
   box-shadow: var(--gs-sheet-shadow);
   padding: 18px 18px 16px;
 }
 .gs-focus-target {
   font-family: var(--serif);
-  font-size: 30px;
+  font-size: var(--type-title);
   margin: 6px 0 8px;
 }
 .gs-focus p {
-  font-size: 14px;
+  font-size: var(--type-chrome);
   color: var(--ink-2);
 }
 
@@ -1326,7 +1209,7 @@ legend.gs-instruction {
 .gs-draft-label {
   display: block;
   font-family: var(--serif);
-  font-size: 13px;
+  font-size: var(--type-label);
   letter-spacing: 0.06em;
   color: var(--ink-2);
   margin: 16px 0 6px;
@@ -1336,10 +1219,10 @@ legend.gs-instruction {
   min-height: 140px;
   padding: 14px;
   border: 1px solid var(--line);
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   background: var(--ground-0);
   color: var(--ink);
-  font-size: 17px;
+  font-size: var(--type-lead);
   line-height: 1.8;
   resize: vertical;
   box-sizing: border-box;
@@ -1350,7 +1233,7 @@ legend.gs-instruction {
 .gs-sensei-context {
   background: var(--ground-0);
   border: 1px solid var(--line);
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   padding: 16px 18px;
   margin: 16px 0;
 }
@@ -1359,7 +1242,7 @@ legend.gs-instruction {
   grid-template-columns: auto 1fr;
   gap: 6px 14px;
   margin: 10px 0 0;
-  font-size: 13.5px;
+  font-size: var(--type-chrome);
 }
 .gs-sensei-context dt {
   color: var(--faint);
@@ -1368,7 +1251,7 @@ legend.gs-instruction {
   margin: 0;
 }
 .gs-copy-message {
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--ai);
   min-height: 1em;
 }
@@ -1380,7 +1263,7 @@ legend.gs-instruction {
   margin-top: 40px;
   padding-top: 18px;
   border-top: 1px solid var(--line-soft);
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--ink-2);
 }
 .gs-moments,
@@ -1395,7 +1278,7 @@ legend.gs-instruction {
   letter-spacing: 0.08em;
 }
 .gs-footer .gs-text {
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--ink-2);
   min-height: 34px;
 }
@@ -1412,11 +1295,11 @@ legend.gs-instruction {
 }
 .gs-effect select {
   font: inherit;
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--ink);
   background: var(--ground-0);
   border: 1px solid var(--line);
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   padding: 5px 6px;
   min-height: 34px;
 }
@@ -1426,7 +1309,7 @@ legend.gs-instruction {
   height: 16px;
 }
 .gs-footer-note {
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--faint);
 }
 .gs-save-status {
@@ -1499,17 +1382,17 @@ legend.gs-instruction {
 }
 @media (max-width: 380px) {
   .gs-hero {
-    font-size: 30px !important;
+    font-size: var(--type-title) !important;
   }
   .gs-choice {
-    font-size: 16px;
+    font-size: var(--type-body);
   }
   .gs-node {
-    font-size: 14px;
+    font-size: var(--type-chrome);
     padding: 4px 6px !important;
   }
   .gs-node small {
-    font-size: 9px;
+    font-size: var(--type-caption);
   }
 }
 @media (max-width: 760px) {
@@ -1522,24 +1405,10 @@ legend.gs-instruction {
     display: none;
   }
   .gs-node {
-    font-size: 14px;
+    font-size: var(--type-chrome);
     padding: 4px 6px !important;
   }
   .gs-node small {
-    font-size: 9.5px;
+    font-size: var(--type-caption);
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .guided-room *,
-  .guided-room *::before,
-  .guided-room *::after {
-    animation: none !important;
-    transition: none !important;
-    scroll-behavior: auto !important;
-  }
-  #app .guided-room .gs-feedback,
-  #app .guided-room .gs-slash path {
-    animation: gs-quiet-verdict 80ms linear both !important;
-  }
-}
-@keyframes gs-quiet-verdict { from { opacity: 0; } }

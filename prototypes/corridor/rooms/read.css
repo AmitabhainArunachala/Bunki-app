@@ -5,14 +5,14 @@
 /* ---- Skin frame (Skin lane): Read is warm, thick kōzo print paper in a morning window;
    at night the same paper under lantern light. Values only; build on them. ---- */
 html:is([data-room='shelf'], [data-room='archive'], [data-room='feed'], [data-room='publisher'], [data-room='source-inbox'], [data-room='source-reader'], [data-room='personal-reading']) body:not([data-view='drift']) {
-  --color-page: color-mix(in srgb, var(--color-ground) 48%, #fbf6ea);
-  --skin-light: radial-gradient(110% 55% at 100% 0%, rgb(255 246 226 / 44%), transparent 65%);
+  /* bokashi: atenashi — the reading room's morning window — light: the world's raised paper wiped in from the upper right, edgeless */
+  --skin-light: radial-gradient(110% 55% at 100% 0%, color-mix(in srgb, var(--tone-raised) 80%, transparent), transparent 65%);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='shelf'], [data-room='archive'], [data-room='feed'], [data-room='publisher'], [data-room='source-inbox'], [data-room='source-reader'], [data-room='personal-reading']) body:not([data-view='drift']) {
-  --color-page: var(--color-ground);
+  /* bokashi: urushi — the reading room under lantern light — light: the house gold held in the lacquer at the upper right and low across the foot */
   --skin-light:
-    radial-gradient(70% 34% at 88% 6%, color-mix(in srgb, var(--color-gold) 13%, transparent), transparent 70%),
-    radial-gradient(120% 40% at 50% 110%, color-mix(in srgb, var(--color-gold) 9%, transparent), transparent 70%);
+    radial-gradient(70% 34% at 88% 6%, color-mix(in srgb, var(--tone-gold) 13%, transparent), transparent 70%),
+    radial-gradient(120% 40% at 50% 110%, color-mix(in srgb, var(--tone-gold) 9%, transparent), transparent 70%);
 }
 
 /* =====================================================================================
@@ -29,13 +29,12 @@ html[data-room='shelf'] #shelf-body .shelf-masthead h1.view-title {
   color: var(--color-ink);
 }
 html[data-room='shelf'] body #shelf-body .shelf-dateline {
-  font-size: 13px;
+  font-size: var(--type-label);
   font-family: var(--font-data);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
   color: var(--color-ink-2);
 }
-html[data-room='shelf'] #shelf-body .shelf-review-note { color: var(--color-muted); }
 /* Japanese datelines keep the reading face: a monospace Latin beside kanji reads as a form field */
 html[data-room='shelf'] body:not(.ui-bi) #shelf-body .shelf-dateline { font-family: var(--font-ui); letter-spacing: 0.01em; }
 /* the shelf's own search: a hairline field like the chips beside it, not a grey capsule */
@@ -54,7 +53,9 @@ html[data-room='shelf'] #shelf-body .story-card .shelf-title {
   font-family: var(--font-headword);
   font-weight: 800;
   color: var(--color-ink);
-  word-break: auto-phrase;
+  /* Q · breaks only between its words (setJaWords); auto-phrase was Chromium's alone, WebKit broke anywhere */
+  word-break: keep-all;
+  overflow-wrap: break-word;
   line-break: strict;
   text-wrap: pretty;
 }
@@ -66,7 +67,7 @@ html[data-room='shelf'] #shelf-body .story-card .shelf-title-en {
 }
 html[data-room='shelf'] #shelf-body .story-date {
   font-family: var(--font-data);
-  font-size: 12px;
+  font-size: var(--type-caption);
   letter-spacing: 0.02em;
   color: var(--color-muted);
 }
@@ -78,7 +79,7 @@ html[data-room='shelf'] #shelf-body .story-instrument {
   align-items: center;
   gap: 4px 0;
   margin: 0;
-  font: 500 12.5px/1.4 var(--font-data);
+  font: 500 var(--type-label)/1.4 var(--font-data);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
   color: var(--color-muted);
@@ -89,7 +90,7 @@ html[data-room='shelf'] #shelf-body .story-instrument > .story-fact::before {
   color: var(--color-muted);
 }
 html[data-room='shelf'] #shelf-body .story-instrument .story-kicker {
-  font: 600 12px/1.3 var(--font-ui);
+  font: 600 var(--type-caption)/1.3 var(--font-ui);
   letter-spacing: 0.06em;
 }
 html[data-room='shelf'] #shelf-body .story-instrument .story-mine { color: var(--color-live); font-weight: 600; }
@@ -105,27 +106,17 @@ html[data-room='shelf'] #shelf-body .story-instrument .story-mine { color: var(-
   background: transparent;
   box-shadow: none;
   color: var(--color-signal);
-  font: 800 13px/1 var(--font-headword);
+  font: 800 var(--type-label)/1 var(--font-headword);
   letter-spacing: 0.02em;
 }
 
-/* ---------- the lead: a woodblock at its own 3:2 crop, registration marks at its corners ---------- */
-html[data-room='shelf'] #shelf-body .story-lead .story-picture::after {
-  content: '';
-  position: absolute;
-  inset: 12px;
-  pointer-events: none;
-  opacity: 0.8;
-  background:
-    linear-gradient(#fff, #fff) 0 7px / 15px 1px no-repeat,
-    linear-gradient(#fff, #fff) 7px 0 / 1px 15px no-repeat,
-    linear-gradient(#fff, #fff) 100% 7px / 15px 1px no-repeat,
-    linear-gradient(#fff, #fff) calc(100% - 7px) 0 / 1px 15px no-repeat,
-    linear-gradient(#fff, #fff) 0 calc(100% - 7px) / 15px 1px no-repeat,
-    linear-gradient(#fff, #fff) 7px 100% / 1px 15px no-repeat,
-    linear-gradient(#fff, #fff) 100% calc(100% - 7px) / 15px 1px no-repeat,
-    linear-gradient(#fff, #fff) calc(100% - 7px) 100% / 1px 15px no-repeat;
+/* at night the seal's red is lifted by the world's light ink so its level reads at 4.5:1 on the raised lacquer (it read
+   3.8:1 in 浪 and 雷) */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(html[data-room='shelf'] #shelf-body .story-instrument, html[data-room='reader'] .reader-meta) .level-chip {
+  color: color-mix(in srgb, var(--color-signal) 70%, var(--color-ink));
 }
+
+/* ---------- the lead: a woodblock at its own 3:2 crop, clean to its edges (no registration marks) ---------- */
 html[data-room='shelf'] #shelf-body .story-lead .story-lede {
   font-family: var(--font-reading);
   color: var(--color-ink-2);
@@ -133,12 +124,12 @@ html[data-room='shelf'] #shelf-body .story-lead .story-lede {
 
 /* ---------- 今日の６本: living spines. Each stands on the shelf, its whole title set vertically ---------- */
 html[data-room='shelf'] #shelf-body .shelf-daily-selection > .shelf-band-head {
-  font: 600 12px/1.3 var(--font-ui);
+  font: 600 var(--type-caption)/1.3 var(--font-ui);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--color-ink-2);
 }
-html[data-room='shelf'] body:not(.ui-bi) #shelf-body .shelf-daily-selection > .shelf-band-head { font-size: 13px; letter-spacing: 0.2em; }
+html[data-room='shelf'] body:not(.ui-bi) #shelf-body .shelf-daily-selection > .shelf-band-head { font-size: var(--type-label); letter-spacing: 0.2em; }
 html[data-room='shelf'] #shelf-today.shelf-today-strip {
   align-items: stretch;
   gap: 18px 12px;
@@ -148,7 +139,7 @@ html[data-room='shelf'] #shelf-today.shelf-today-strip {
 }
 html[data-room='shelf'] #shelf-body .story-teaser {
   border: 1px solid var(--color-line);
-  border-radius: var(--radius-small) var(--radius-small) 0 0;
+  border-radius: var(--radius-seal) var(--radius-seal) 0 0;
   background: var(--color-surface);
   box-shadow: var(--elevation-paper);
 }
@@ -170,23 +161,23 @@ html[data-room='shelf'] #shelf-body .story-teaser > .shelf-open > .shelf-title-e
   border-top: 1px solid var(--color-line-soft);
 }
 html[data-room='shelf'] #shelf-body .story-teaser .shelf-title {
-  font-size: 17px;
+  font-size: var(--type-lead);
   line-height: 1.45;
   letter-spacing: 0.06em;
 }
-html[data-room='shelf'] #shelf-body .story-teaser .shelf-title-en { font-size: 12px; line-height: 1.35; letter-spacing: 0.01em; }
-html[data-room='shelf'] #shelf-body .story-teaser .story-kicker { font-size: 11px; letter-spacing: 0.08em; }
+html[data-room='shelf'] #shelf-body .story-teaser .shelf-title-en { font-size: var(--type-caption); line-height: 1.35; letter-spacing: 0.01em; }
+html[data-room='shelf'] #shelf-body .story-teaser .story-kicker { font-size: var(--type-caption); letter-spacing: 0.08em; }
 html[data-room='shelf'] #shelf-body .story-teaser > .shelf-open > .story-foot { margin: 0 10px; padding: 0 0 10px; }
 html[data-room='shelf'] #shelf-body .story-teaser > .shelf-open > .shelf-title-en + .story-foot { margin-top: -4px; }
 html[data-room='shelf'] #shelf-body .story-teaser > .shelf-open > .shelf-head + .story-foot { padding-top: 8px; border-top: 1px solid var(--color-line-soft); }
-html[data-room='shelf'] #shelf-body .story-teaser .story-date { font-size: 11px; }
+html[data-room='shelf'] #shelf-body .story-teaser .story-date { font-size: var(--type-caption); }
 html[data-room='shelf'] #shelf-body .story-teaser .level-badge {
   top: 6px;
   right: 6px;
   min-height: 20px;
   padding: 0 6px;
   border-radius: var(--radius-seal);
-  font: 800 11px/1 var(--font-headword);
+  font: 800 var(--type-caption)/1 var(--font-headword);
 }
 @media (hover: hover) {
   html[data-room='shelf'] #shelf-body .story-teaser:hover { transform: translateY(-6px); }
@@ -207,9 +198,9 @@ html[data-room='shelf'] #shelf-body .story-teaser .level-badge {
   html[data-room='shelf'] #shelf-reading-results > .story-lead:hover { transform: none; box-shadow: none; }
   html[data-room='shelf'] #shelf-body .story-lead .story-picture { border-radius: 0; }
   html[data-room='shelf'] #shelf-body .story-lead .shelf-head { gap: 8px; padding: 14px 16px 6px; }
-  html[data-room='shelf'] #shelf-body .story-lead .shelf-title { font-size: 26px; line-height: 1.38; letter-spacing: 0.01em; }
-  html[data-room='shelf'] #shelf-body .story-lead .shelf-title-en { font-size: 15px; line-height: 1.45; }
-  html[data-room='shelf'] #shelf-body .story-lead .story-lede { font-size: 15px; line-height: 1.8; }
+  html[data-room='shelf'] #shelf-body .story-lead .shelf-title { font-size: var(--type-section); line-height: 1.38; letter-spacing: 0.01em; }
+  html[data-room='shelf'] #shelf-body .story-lead .shelf-title-en { font-size: var(--type-control); line-height: 1.45; }
+  html[data-room='shelf'] #shelf-body .story-lead .story-lede { font-size: var(--type-control); line-height: 1.8; }
 
   /* the seconds and the rest: an index of rows, the picture first, the title whole beside it */
   html[data-room='shelf'] #shelf-reading-results > :is(.story-second, .story-grid) {
@@ -235,7 +226,7 @@ html[data-room='shelf'] #shelf-body .story-teaser .level-badge {
     grid-row: 1;
     width: 100%;
     margin: 0;
-    border-radius: var(--radius-small);
+    border-radius: var(--radius-seal);
     box-shadow: 0 0 0 0.5px var(--color-line);
   }
   html[data-room='shelf'] #shelf-reading-results > :is(.story-second, .story-grid) .shelf-head {
@@ -244,11 +235,11 @@ html[data-room='shelf'] #shelf-body .story-teaser .level-badge {
     gap: 4px;
     padding: 0;
   }
-  html[data-room='shelf'] #shelf-reading-results > :is(.story-second, .story-grid) .shelf-title { font-size: 17px; line-height: 1.5; }
-  html[data-room='shelf'] #shelf-reading-results > .story-second .shelf-title { font-size: 19px; line-height: 1.45; }
-  html[data-room='shelf'] #shelf-reading-results > :is(.story-second, .story-grid) .shelf-title-en { font-size: 13.5px; line-height: 1.4; }
-  html[data-room='shelf'] #shelf-reading-results > :is(.story-second, .story-grid) .story-instrument { font-size: 11.5px; }
-  html[data-room='shelf'] #shelf-reading-results > :is(.story-second, .story-grid) .story-instrument .level-chip { min-height: 20px; font-size: 12px; }
+  html[data-room='shelf'] #shelf-reading-results > :is(.story-second, .story-grid) .shelf-title { font-size: var(--type-lead); line-height: 1.5; }
+  html[data-room='shelf'] #shelf-reading-results > .story-second .shelf-title { font-size: var(--type-reading); line-height: 1.45; }
+  html[data-room='shelf'] #shelf-reading-results > :is(.story-second, .story-grid) .shelf-title-en { font-size: var(--type-chrome); line-height: 1.4; }
+  html[data-room='shelf'] #shelf-reading-results > :is(.story-second, .story-grid) .story-instrument { font-size: var(--type-caption); }
+  html[data-room='shelf'] #shelf-reading-results > :is(.story-second, .story-grid) .story-instrument .level-chip { min-height: 20px; font-size: var(--type-caption); }
   html[data-room='shelf'] #shelf-reading-results > :is(.story-second, .story-grid) .story-foot { padding-top: 2px; }
   html[data-room='shelf'] #shelf-reading-results > .shelf-band { margin: 28px 0 18px; }
   /* the spines stand two to a shelf on a phone (three would set the English sideways in too thin a column) */
@@ -264,7 +255,7 @@ html[data-room='shelf'] #shelf-body .story-teaser .level-badge {
   filter: brightness(0.8) saturate(0.85);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='shelf'] #shelf-body .story-kicker {
-  color: color-mix(in srgb, var(--topic, var(--color-accent)) 30%, var(--color-ink-2));
+  color: var(--kicker, color-mix(in srgb, var(--topic, var(--color-accent)) 30%, var(--color-ink-2)));
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='shelf'] #shelf-today.shelf-today-strip {
   border-bottom-color: color-mix(in srgb, var(--color-gold) 70%, transparent);
@@ -293,9 +284,9 @@ html[data-room='reader'] body main > .reader-hero .reader-picture-img {
 html[data-room='reader'] main > .reader-hero .reader-picture-caption {
   inset: 10px 12px auto auto;
   padding: 3px 7px;
-  border-radius: var(--radius-small);
+  border-radius: var(--radius-seal);
   background: rgb(10 12 16 / 55%);
-  font: 500 9.5px/1.2 var(--font-data);
+  font: 500 var(--type-caption)/1.2 var(--font-data);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   text-shadow: none;
@@ -309,13 +300,15 @@ html[data-room='reader'] .reader-meta {
   letter-spacing: 0.03em;
   color: var(--color-ink-2);
 }
-html[data-room='reader'] .reader-meta .reader-fact { flex: 0 0 auto; white-space: nowrap; font-size: 12.5px; text-transform: none; }
+html[data-room='reader'] .reader-meta .reader-fact { flex: 0 0 auto; white-space: nowrap; font-size: var(--type-label); text-transform: none; }
 html[data-room='reader'] .reader-meta .reader-mine { color: var(--color-live); font-weight: 600; }
 html[data-room='reader'] main > h1.view-title {
   font-family: var(--font-headword);
   font-weight: 800;
   letter-spacing: 0.01em;
-  word-break: auto-phrase;
+  /* Q · its words are lookup doors kept whole in .ja-unit; the same break in both engines */
+  word-break: keep-all;
+  overflow-wrap: break-word;
   line-break: strict;
   text-wrap: pretty;
 }
@@ -339,7 +332,7 @@ html[data-room='reader'] .version-toggle .version-choice {
   background: transparent;
   box-shadow: none;
   color: var(--color-muted);
-  font: 600 14px/1.2 var(--font-ui);
+  font: 600 var(--type-chrome)/1.2 var(--font-ui);
 }
 html[data-room='reader'] .version-toggle .version-choice + .version-choice { padding-left: 14px; }
 html[data-room='reader'] .version-toggle .version-choice[aria-pressed='true'] {
@@ -347,7 +340,7 @@ html[data-room='reader'] .version-toggle .version-choice[aria-pressed='true'] {
   box-shadow: inset 0 -2px 0 var(--color-ink);
   color: var(--color-ink);
 }
-html[data-room='reader'] .version-block .version-caption { margin: 2px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--color-muted); }
+html[data-room='reader'] .version-block .version-caption { margin: 2px 0 0; font-size: var(--type-label); line-height: 1.45; color: var(--color-muted); }
 /* the set page: a fine double rule over the text (A's typesetting); the words stand on the paper */
 html[data-room='reader'] body.v-depth-layered:not([data-view='drift']) main #reader.reader,
 html[data-room='reader'] body:not([data-view='drift']) main #reader.reader {
@@ -358,8 +351,6 @@ html[data-room='reader'] body:not([data-view='drift']) main #reader.reader {
   background: transparent;
   box-shadow: inset 0 3px 0 -2px var(--color-line);
 }
-html[data-room='reader'] #reader rt,
-html[data-room='reader'] #reader:not(.fg-always) ruby::before { color: var(--color-accent); letter-spacing: 0.04em; }
 
 /* ---------- the voiced line (B): the play bar is one scan-line; unrecorded, the line waits unlit ---------- */
 html[data-room='reader'] body.v-depth-layered:not([data-view='drift']) .listen-row.play-bar,
@@ -389,13 +380,15 @@ html[data-room='reader'] .listen-row .play-track::before {
   box-shadow: 0 0 8px var(--color-live-glow, transparent);
 }
 html[data-room='reader'] .listen-row .play-voice { font-family: var(--font-data); color: var(--color-ink-2); }
-html[data-room='reader'] body .listen-row.play-bar.is-pending { padding: 0 14px; }
-html[data-room='reader'] .listen-row .play-pending {
-  flex: 1 1 auto;
-  gap: 8px;
-  font: 500 12.5px/1.3 var(--font-data);
-  letter-spacing: 0.03em;
-  color: var(--color-ink-2);
+html[data-room='reader'] .listen-row .play-mark { color: var(--color-ink-2); }
+/* folded: no scan-line bed, no edge — the mark alone */
+/* folded: the mark alone, quiet — no edge, no shadow, no bed; a disc of the reader's own surface so the glyph never
+   sits on bare text where it floats over the column. #app outweighs the relief rules' :is(…, #reader, …) */
+html[data-room='reader'] body:not([data-view='drift']) #app .listen-row.play-bar[data-open='false'] {
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-surface);
+  box-shadow: none;
 }
 html[data-room='reader'] .listen-row .play-pending::after {
   content: '';
@@ -416,10 +409,11 @@ html[data-room='reader'] .listen-row .play-pending::after {
   z-index: 1;
   pointer-events: none;
   mix-blend-mode: screen;
+  /* bokashi: emitted — the night print's lamplight — light: two lanterns and the street's glow in the house gold, soft enough that no ring shows */
   background:
-    radial-gradient(14% 18% at 30% 70%, rgb(255 196 120 / 42%), transparent 70%),
-    radial-gradient(10% 13% at 66% 64%, rgb(255 206 140 / 34%), transparent 70%),
-    radial-gradient(60% 40% at 50% 100%, rgb(226 189 108 / 16%), transparent 75%);
+    radial-gradient(40% 72% at 30% 70%, color-mix(in srgb, var(--tone-gold) 8%, transparent), transparent 72%),
+    radial-gradient(30% 60% at 66% 64%, color-mix(in srgb, var(--tone-gold) 6%, transparent), transparent 72%),
+    radial-gradient(70% 70% at 50% 100%, color-mix(in srgb, var(--tone-gold) 6.5%, transparent), transparent 75%);
   animation: read-lamp 6.8s ease-in-out infinite alternate;
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] main > .reader-hero::after {
@@ -428,7 +422,8 @@ html[data-room='reader'] .listen-row .play-pending::after {
   inset: -60% -10% 0;
   z-index: 1;
   pointer-events: none;
-  background: repeating-linear-gradient(104deg, transparent 0 11px, rgb(214 226 255 / 16%) 11px 12px, transparent 12px 29px);
+  /* drawn: the night print's rain — hairline streaks of the world's own light ink, hard-edged */
+  background: repeating-linear-gradient(104deg, transparent 0 11px, color-mix(in srgb, var(--color-ink) 16%, transparent) 11px 12px, transparent 12px 29px);
   animation: read-rain 8s linear infinite;
 }
 @keyframes read-rain { from { transform: translate3d(0, -12%, 0); } to { transform: translate3d(-4%, 0, 0); } }
@@ -445,18 +440,13 @@ html[data-room='reader'] .listen-row .play-pending::after {
   html[data-room='reader'] body[data-view='reader'] #app > main > h1.view-title.on-hero { margin-top: -16px; }
   /* the instrument line may take two short lines; it never runs off the page */
   html[data-room='reader'] body[data-view='reader'] #app > main .reader-meta { flex-wrap: wrap; row-gap: 2px; }
-  html[data-room='reader'] body[data-view='reader'] #app > main > h1.view-title { font-size: 23px; line-height: 1.38; }
-  html[data-room='reader'] body[data-view='reader'] #app > main > .view-title-en { font-size: 14px; line-height: 1.4; }
+  html[data-room='reader'] body[data-view='reader'] #app > main > h1.view-title { font-size: var(--type-reading); line-height: 1.38; }
+  html[data-room='reader'] body[data-view='reader'] #app > main > .view-title-en { font-size: var(--type-chrome); line-height: 1.4; }
   html[data-room='reader'] body #reader-tip.reader-tip { padding-block: 2px; }
-  html[data-room='reader'] body #reader-tip .reader-tip-text { font-size: 13.5px; line-height: 1.4; }
+  html[data-room='reader'] body #reader-tip .reader-tip-text { font-size: var(--type-chrome); line-height: 1.4; }
   html[data-room='reader'] body #reader.reader { padding-top: 8px; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html[data-room='reader'] main > .reader-hero::before,
-  html[data-room='reader'] main > .reader-hero::after,
-  html[data-room='reader'] body #mini { animation: none; }
-}
 
 /* ---- polish lane (2026-10-08): the shelf's head, tightened so the lead woodblock rises on a
    phone. Spacing only: every line, field and pinned note keeps its place and its one line. ---- */
@@ -478,23 +468,18 @@ html[data-room='shelf'] #shelf-body .shelf-tools-count {
   min-width: 18px;
   height: 18px;
   padding: 0 5px;
-  border-radius: 9px;
+  border-radius: var(--radius-seal);
   background: var(--color-accent);
   color: #f7f2e8;
-  font: 600 11px/1 var(--font-data);
+  font: 600 var(--type-caption)/1 var(--font-data);
   font-variant-numeric: tabular-nums;
 }
-html[data-room='shelf'] #shelf-body .shelf-review-note { font-size: 12px; line-height: 1.4; }
-html[data-room='shelf'] #shelf-body .shelf-review-note summary.icon-button { color: var(--color-muted); }
 
 /* ---- fix lane rooms (2026-10-08, review #7): the reader reads as a set page, not a ruled book.
    A word's 44px touch floor is its ::before (corridor.css button.tok), never its box: a 44px box
-   in a 41px line pushed every line to ~54px at 19px. Off or on-touch readings float in the
-   leading (ruby::before), so the line keeps print leading; always-on ruby still earns its space. ---- */
+   in a 41px line pushed every line to ~54px at 19px. Every reading is native ruby (F): the reader's
+   one leading houses it, on touch and always alike (editorial.css #reader). ---- */
 html[data-room='reader'] #reader button.tok { min-height: 0; }
-@media (max-width: 520px) {
-  html[data-room='reader'] body #reader.reader:not(.fg-always) { line-height: 2; }
-}
 /* the first-visit tip: one quiet line with its ×, not a boxed callout above the text */
 html[data-room='reader'] body #reader-tip.reader-tip {
   gap: 2px;
@@ -504,36 +489,13 @@ html[data-room='reader'] body #reader-tip.reader-tip {
   border-radius: 0;
   background: none;
 }
-html[data-room='reader'] body #reader-tip .reader-tip-text { font: 400 12.5px/1.4 var(--font-ui); color: var(--color-muted); }
+html[data-room='reader'] body #reader-tip .reader-tip-text { font: 400 var(--type-label)/1.4 var(--font-ui); color: var(--color-muted); }
 html[data-room='reader'] body #reader-tip .reader-tip-close { color: var(--color-muted); }
 html[data-room='reader'] body #reader-tip .reader-tip-close .ui-icon { width: 14px; height: 14px; }
 /* no recording yet (phone): a slim quiet caption line at the foot, not a bordered floating pill with a
    dashed track. It stays at the foot because suites close the word popup by pressing this row
    (verify-reader-lookup), and only a foot row is never under the popup; a desk keeps the
    relief-edged row in the page, pinned by verify-relief. */
-@media (max-width: 520px) {
-  /* (#app: the relief rule's :is(…, #reader, …) carries an id's weight) */
-  html[data-room='reader'] body:not([data-view='drift']) #app .listen-row.play-bar.is-pending {
-    left: 0;
-    right: 0;
-    height: 30px;
-    min-height: 0;
-    margin: 0;
-    padding: 0 var(--s2, 16px);
-    border: 0;
-    border-top: 0.5px solid var(--color-rule);
-    border-radius: 0;
-    background: var(--color-page, var(--color-paper));
-    box-shadow: none;
-  }
-  html[data-room='reader'] .listen-row.is-pending .play-pending { flex: 0 1 auto; font: 400 11.5px/1.2 var(--font-data); color: var(--color-muted); }
-  html[data-room='reader'] .listen-row.is-pending .play-pending .ui-icon { width: 13px; height: 13px; }
-  html[data-room='reader'] .listen-row.is-pending .play-pending::after { content: none; }
-}
-/* the quiet line is its own ground: the taller paper strip of the play bar's bed is not drawn over the text */
-@media (max-width: 520px) {
-  html[data-room='reader'] body[data-view='reader']:not(.zen):has(.listen-row.is-pending):not(:has(.reader-actions:not([hidden]))) #app::after { display: none; }
-}
 /* in the Tools sheet every filter keeps a full 44px touch target, even through the sheet's
    opening pop (it rises from 0.96 scale): 46px boxes */
 html[data-room='shelf'] #shelf-body .shelf-tools-filters :is(.filter-chip, .filter-search) { min-height: 46px; }
@@ -562,7 +524,7 @@ html[data-room='reader'] body[data-view='reader'] #app > main .reader-head > .re
   display: block;
   padding-top: 12px;
   /* one face and one size, in English and in 日本語 (round 4 T4: the line mixed mono and sans) */
-  font: 400 12px/1.7 var(--font-ui);
+  font: 400 var(--type-caption)/1.7 var(--font-ui);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0;
   text-transform: none;
@@ -581,26 +543,11 @@ html[data-room='reader'] body[data-view='reader'] #app > main .reader-head > .re
   box-shadow: none;
 }
 html[data-room='reader'] .reader-head > .reader-meta > * { display: inline-block; margin: 0 8px 0 0; vertical-align: middle; white-space: nowrap; text-transform: none; letter-spacing: 0; }
-html[data-room='reader'] .reader-head > .reader-meta > .listen-row { display: flex; white-space: normal; }
 html[data-room='reader'] .reader-head > .reader-meta .reader-source { font: inherit; color: var(--color-ink-2); }
 html[data-room='reader'] body:not(.ui-bi) .reader-head > .reader-meta .reader-source { font-family: var(--font-ui); }
 html[data-room='reader'] .reader-head > .reader-meta :is(.reader-fact, .grade-tag, .shelf-date) { font: inherit; letter-spacing: inherit; color: inherit; text-transform: none; }
 html[data-room='reader'] .reader-head > .reader-meta .reader-mine { color: var(--color-live); font-weight: 600; }
 html[data-room='reader'] #app > main .reader-head > .reader-meta .level-chip { display: inline-block; min-height: 0; margin-right: 8px; padding: 1px 4px; font: inherit; line-height: 1.2; }
-/* 未確認 is an honest small mark in the line, not a grey pill */
-html[data-room='reader'] .reader-head > .reader-meta .status-chip {
-  min-height: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: none;
-  box-shadow: none;
-  font: inherit;
-  letter-spacing: inherit;
-  text-transform: lowercase;
-  color: var(--color-signal);
-}
-html[data-room='reader'] body:not(.ui-bi) .reader-head > .reader-meta .status-chip { text-transform: none; }
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-head > .dials-toggle {
   position: absolute;
   top: 0;
@@ -613,34 +560,7 @@ html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hea
   box-shadow: none;
   color: var(--color-muted);
 }
-/* the voice's state: on a phone one muted mark at the line's end (no strip, no fixed foot); on a desk
-   the relief-edged row keeps a line of its own under the figures (verify-relief) */
-html[data-room='reader'] body:not([data-view='drift']) #app main .reader-meta > .listen-row.play-bar.is-pending {
-  display: inline-flex;
-  min-height: 0;
-  margin: 0;
-  padding: 1px 10px;
-  vertical-align: middle;
-}
-html[data-room='reader'] .reader-meta > .listen-row.is-pending .play-pending { gap: 6px; font: inherit; letter-spacing: inherit; text-transform: none; }
-html[data-room='reader'] .reader-meta > .listen-row.is-pending .play-pending::after { content: none; }
 @media (max-width: 520px) {
-  html[data-room='reader'] body:not([data-view='drift']) #app main .reader-meta > .listen-row.play-bar.is-pending {
-    position: static;
-    display: inline-flex;
-    width: auto;
-    height: auto;
-    min-height: 0;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    background: none;
-    box-shadow: none;
-  }
-  html[data-room='reader'] .reader-meta > .listen-row.is-pending .play-pending { gap: 4px; font: inherit; letter-spacing: inherit; text-transform: none; color: var(--color-muted); }
-  html[data-room='reader'] .reader-meta > .listen-row.is-pending .play-pending .ui-icon { width: 12px; height: 12px; }
-  html[data-room='reader'] .reader-meta > .listen-row.is-pending .play-pending::after { content: none; }
   html[data-room='reader'] body[data-view='reader'] #app > main > h1.view-title { margin-bottom: 2px; }
   /* the kanji grade is the Tools filter's measure; on a phone the line keeps to provenance, level,
      the record's own figures and the two honest marks, so it stays two short lines */
@@ -683,15 +603,15 @@ html[data-room='reader'] .version-block .version-help > .version-caption {
   border-radius: var(--radius-control);
   background: var(--color-paper);
   box-shadow: var(--elevation-float);
-  font: 400 13px/1.5 var(--font-ui);
+  font: 400 var(--type-label)/1.5 var(--font-ui);
   color: var(--color-ink-2);
 }
 
 /* ---------- the first-visit tip: a quiet caption over the text that fades after the first tap ---------- */
 html[data-room='reader'] body #reader-tip.reader-tip { margin: 0; padding: 0; }
-html[data-room='reader'] body #reader-tip .reader-tip-text { font: 400 12px/1.4 var(--font-ui); color: var(--color-muted); }
+html[data-room='reader'] body #reader-tip .reader-tip-text { font: 400 var(--type-caption)/1.4 var(--font-ui); color: var(--color-muted); }
 @media (max-width: 520px) {
-  html[data-room='reader'] body #reader-tip .reader-tip-text { font-size: 12px; line-height: 1.4; }
+  html[data-room='reader'] body #reader-tip .reader-tip-text { font-size: var(--type-caption); line-height: 1.4; }
 }
 
 /* ---------- the shelf's head: the look-up line is the masthead's top rule, not a second search box ---------- */
@@ -705,58 +625,52 @@ html[data-room='shelf'] body:not(.zen):not([data-view='drift']) #app > main > #s
   background-position: 2px 50%;
   background-size: 16px 16px;
   box-shadow: inset 0 -1px 0 var(--color-line);
-  font: 400 15px/1.4 var(--font-ui);
+  font: 400 var(--type-control)/1.4 var(--font-ui);
 }
 html[data-room='shelf'] body:not(.zen):not([data-view='drift']) #app > main > #search.search-field:focus {
   background-color: transparent;
   box-shadow: inset 0 -2px 0 var(--color-accent);
 }
 html[data-room='shelf'] body:not(.zen):not([data-view='drift']) #app > main > #search.search-field::placeholder { color: var(--color-muted); }
-/* the 未確認 note: one quiet line under the lead story, across the grid */
-html[data-room='shelf'] #shelf-reading-results > .shelf-review-note {
-  grid-column: 1 / -1;
-  margin: -4px 0 6px;
-  padding: 0;
-}
-@media (max-width: 520px) {
-  html[data-room='shelf'] #shelf-reading-results > .shelf-review-note { margin: -6px 0 10px; }
-}
-/* the shelf arrives as a held frame that rises: its masthead and lead woodblock are drawn on the first
-   painted frame (the old room hands over to a whole shelf, never to bare paper), and only move */
-@keyframes read-shelf-hold { from { transform: translate3d(0, var(--rise, 12px), 0); } to { transform: none; } }
-html[data-room='shelf'][data-room-entering] #app > main > * { animation-name: read-shelf-hold; }
 html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-color: color-mix(in srgb, var(--color-ink) 9%, var(--color-page, var(--color-paper))); }
-
-/* the reader's entrance: the picture and title rise; the instrument line and the text only fade in, so
-   the words are where they will stay from the first frame (a reader's place never drifts) */
-@keyframes read-text-settle { from { opacity: 0.01; } to { opacity: 1; } }
-html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .version-block, .dials, .listen-row, #reader-tip, #reader, .article-footer) {
-  animation-name: read-text-settle;
-}
 
 
 /* =====================================================================================
    ROUND 4, T5 (John: "it all bledns together! It lacks modularity, it lacks contrast, texture, depth,
    separtion, user ease, emotional depth, sharp contrast, and stand out clarity"). The word popup is a
-   raised card of separate bands, in every room it opens in:
+   raised card of separate bands — the one slip, skinned once here with no room prefix, so the reader,
+   the exam paper, the guided session and the sky all open the same card (one-hand pass, 2026-10-15):
      1. the word band: a lacquer cartouche, the word in light ink, its reading in lantern gold, faint
-        青海波 waves for texture, "Full entry ›" in its corner;
-     2. one path: Save (a note says where it goes), then "Add to a list" beside "Saved ✓";
+        青海波 waves for texture; the band itself is the door into the full entry (a chevron at its end);
+     2. one path: Save ▾ (a note says where it goes); once the word is saved, its menu unfolds inside
+        the card under the button;
      3. the kanji band: a sunk band, labelled, its tiles raised on it;
      4. the sentence band: one named door, "Study this sentence ›", which opens the sentence in the card.
    Colours are the skin's roles (--color-*) mixed per band; nothing here persists anything.
    ===================================================================================== */
-:root body:not([data-view='drift']) #mini {
-  --mini-paper: color-mix(in srgb, var(--color-surface) 55%, #fffefb);
+#mini {
+  /* The slip wears the world (John, 2026-10-15, 墨: "a random blue color with no sense of contrast or connection to
+     the background"; his bar: contrast deeply considered, rooted in the world's pigments, gradation where it brings
+     depth — CONTINUITY_CONTRACT §6 holds the table). Its paper is the world's raised paper, plain. By day the head
+     band is the world's ink as a brushed stroke (濃淡): full ink where the word and its reading stand, washing to
+     ink 90% + paper at its foot where the brush lifts into the slip's paper; the word is the paper showing through
+     the ink (白抜き); the reading is the world's red lit by its paper (red 40%: ≥ 5.0:1 on the ink in every world —
+     the pure red reads 1.7–2.7:1 on ink); Save is the A family, the world's 藍. At night the band is the world's
+     lacquer (below) and the ramp inverts. No fixed navy: every value is the world's own. */
+  --mini-paper: var(--color-paper, #f5efe0);
   --mini-band: color-mix(in srgb, var(--color-ground) 36%, var(--mini-paper));
-  --mini-head: var(--color-lacquer, #141a28);
-  --mini-head-2: var(--color-lacquer-2, #1d2638);
-  --mini-head-ink: #f3ecdd;
-  --mini-head-ink-2: color-mix(in srgb, #f3ecdd 78%, var(--mini-head));
-  --mini-gold: #e5c27a;
+  --mini-head: var(--color-ink);
+  /* Material II: the brush lifts to ink 93 % + paper (90 % read as more than one tonal step in 24 px) */
+  --mini-head-2: color-mix(in srgb, var(--color-ink) 93%, var(--color-paper));
+  --mini-head-ink: var(--color-paper, #f5efe0);
+  --mini-head-ink-2: color-mix(in srgb, var(--color-paper) 78%, var(--color-ink));
+  --mini-reading: color-mix(in srgb, var(--color-reading, var(--color-signal)) 40%, var(--color-paper));
+  --mini-gold: color-mix(in srgb, var(--color-paper) 70%, var(--color-ink));
   --mini-edge: color-mix(in srgb, var(--color-ink) 26%, transparent);
   --mini-rule: color-mix(in srgb, var(--color-ink) 12%, transparent);
-  --mini-press: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* the slip floats beside its word (placeFloating seats it); it was corridor.css's base rule that said so */
+  position: fixed;
+  z-index: 70;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -767,7 +681,9 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
   padding: 0;
   overflow: hidden;
   border: 1px solid var(--mini-edge);
-  border-radius: 16px;
+  border-radius: var(--radius-overlay);
+  /* opaque paper, from a plain value first (a phone that cannot resolve a colour chain still gets paper) */
+  background: var(--color-paper, #f5efe0);
   background: var(--mini-paper);
   /* a tight contact shadow, and a deep shade that falls away from the word the card describes (the card
      sits 10px from its word; a long drop shadow across it would dim the word and its reading) */
@@ -775,50 +691,104 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
     0 14px 40px -12px rgb(20 24 34 / 32%);
   color: var(--color-ink);
   cursor: auto;
-  /* the card rises and settles: translate and opacity only (placeFloating measures it as it opens) */
-  animation: read-mini-rise 260ms cubic-bezier(0.18, 0.9, 0.24, 1) backwards;
+  /* Ladder · a scroll inside the card never scrolls the text beneath it */
+  overscroll-behavior: contain;
+  /* the card rises and settles: translate and opacity only (placeFloating measures it as it opens). Ladder · above its word
+     it settles downward from above (--mini-rise), so its rise never brushes the word's reading */
+  animation: read-mini-rise var(--motion-room) var(--ease-enter) backwards;
 }
-@keyframes read-mini-rise { from { opacity: 0.01; transform: translate3d(0, 10px, 0); } }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) #mini {
-  --mini-paper: color-mix(in srgb, var(--color-paper) 93%, #ffffff);
+@keyframes read-mini-rise { from { opacity: 0.01; transform: translate3d(0, var(--mini-rise, 10px), 0); } }
+#mini[data-side='above'] { --mini-rise: -10px; }
+/* Ladder · a word set in the page's own text carries its card: the card stands in the text's scroll layer (placeFloating:
+   data-flow="text", its top in the document), travels with the word and goes under the bars and the tabs as the text does */
+#mini[data-flow='text'] {
+  position: absolute;
+  z-index: 18;
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #mini {
+  /* night: the band is the world's lacquer — its depth (ground 48% + black) under the word, its sheen (ground 72% +
+     black) at the foot where it meets the raised lacquer paper; the word is the world's shell-white or sutra-cream
+     ink; the reading the world's own lit red (≥ 6.2:1 on the lacquer); Save the lit A (an emitted accent edge, never
+     a solid phosphor fill). A lit accent hairline on the band's top edge keeps it figure on the dark ground. */
   --mini-band: color-mix(in srgb, var(--color-ground) 64%, var(--mini-paper));
-  --mini-head: color-mix(in srgb, var(--color-ground) 48%, #000000);
-  --mini-head-2: color-mix(in srgb, var(--color-ground) 72%, #000000);
-  --mini-edge: color-mix(in srgb, var(--color-gold, #e2bd6c) 34%, transparent);
+  /* Material II: the lacquer is the world's own — its ground in its deepest coat (zen-stage-deep), not a neutral black, so
+     夜's band stays indigo, 浪's the deep sea, 雷's the storm */
+  --mini-head: color-mix(in srgb, var(--color-ground) 30%, var(--tone-shade));
+  --mini-head-2: color-mix(in srgb, var(--color-ground) 62%, var(--tone-shade));
+  --mini-head-ink: var(--color-ink);
+  --mini-head-ink-2: color-mix(in srgb, var(--color-ink) 78%, var(--mini-head));
+  --mini-reading: var(--color-reading, var(--color-signal));
+  --mini-gold: var(--tone-gold);
+  --mini-edge: color-mix(in srgb, var(--tone-gold) 34%, transparent);
   --mini-rule: color-mix(in srgb, var(--color-ink) 14%, transparent);
+  /* Q · the slip's own outer edge is its lit hairline, so it stands as a figure wherever placeFloating seats it (C2). At
+     64 % the house gold, laid over the slip's raised paper, reads at least 3:1 against every ground a night world
+     paints, from its deepest coat to that raised paper (浪 is the closest, 3.49:1). At 34 % it read 2.82–2.9:1 in
+     夜, 浪 and 白雨. The slip's inner rules keep --mini-edge. */
+  --mini-lit-edge: color-mix(in srgb, var(--tone-gold) 64%, transparent);
+  border-color: var(--mini-lit-edge);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%), 0 0 0 1px rgb(0 0 0 / 30%), 0 3px 8px -3px rgb(0 0 0 / 55%),
     0 16px 48px -14px rgb(0 0 0 / 62%);
 }
 /* above its word, the deep shade lifts upward, off the word and its reading */
-:root body:not([data-view='drift']) #mini[data-side='above'] {
+#mini[data-side='above'] {
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 60%), 0 0 0 0.5px rgb(20 24 34 / 6%), 0 3px 8px -3px rgb(20 24 34 / 26%),
     0 -14px 40px -12px rgb(20 24 34 / 32%);
 }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) #mini[data-side='above'] {
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #mini[data-side='above'] {
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%), 0 0 0 1px rgb(0 0 0 / 30%), 0 3px 8px -3px rgb(0 0 0 / 55%),
     0 -16px 48px -14px rgb(0 0 0 / 62%);
 }
 
+/* Hfix-1A (L-4) · a run of full-width Latin letters or digits in a word (Ｍｕｊｉｎ, ２０２６) takes the face's
+   proportional widths, never letter-spaced, and never breaks inside (corridor.js appendTextRuns) */
+.tok-word .fw-run { font-feature-settings: 'palt' 1; white-space: nowrap; }
+
+/* Hfix-1A · a stage cut short of its rows (no seat on the glass holds it whole) ends between two rows and says it scrolls:
+   its foot fades into the band the cut falls in (corridor.js markCardMore), the hold strip's own sign
+   (editorial.css .seal-strip[data-more]), and the fade leaves once the last row is in view */
+/* Hfix-1A · the room a meaning still to come keeps in the word band (reserveSenseRoom) is the word view's; the sentence view
+   sets its head otherwise, and keeps none */
+#mini.is-sentence .mini-head-text { min-height: 0 !important; }
+#mini[data-more='true']::after {
+  content: '';
+  position: sticky;
+  bottom: 0;
+  flex: none;
+  display: block;
+  height: 32px;
+  margin-top: -32px;
+  /* bokashi: atenashi — the stage's foot — focus: the band's own ground rising over its last 32 px, where there is more
+     (32, not 22: C4's one step per 24 px; over 22 px hokusai's band rose 4.9 ΔE, two steps, in WebKit) */
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--mini-more-ground, var(--mini-paper)) 0%, transparent),
+    var(--mini-more-ground, var(--mini-paper)));
+  pointer-events: none;
+}
+
 /* 1. the word band */
-:root body[data-view] #mini .mini-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; column-gap: 6px; }
-:root body[data-view] #mini .mini-head-text { display: grid; gap: 2px; min-width: 0; }
-:root body[data-view] #mini .mini-head .mini-entry .mini-entry-label { display: inline-flex; align-items: center; gap: 5px; }
-:root body:not([data-view='drift']) #mini .mini-head {
+#mini .mini-head { display: grid; align-items: start; }
+#mini .mini-head-text { display: grid; gap: 2px; min-width: 0; }
+#mini .mini-head {
   position: relative;
   padding: 10px 8px 11px 18px;
   background-color: var(--mini-head);
-  background-image: linear-gradient(180deg, var(--mini-head-2), var(--mini-head) 72%);
+  /* bokashi: ichimonji — the slip's head band — brush: the world's ink as one straight stroke across the top, full over the word and its reading, lifting at its foot (at night the band is the world's lacquer, its depth to its sheen) */
+  background-image: linear-gradient(180deg, var(--mini-head) 0 56%, var(--mini-head-2) 100%);
   color: var(--mini-head-ink);
   isolation: isolate;
 }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #mini .mini-head {
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
 /* 青海波: Hokusai's waves, faint, behind the band's right; the word stands clear of them */
-:root body:not([data-view='drift']) #mini .mini-head::before {
+#mini .mini-head::before {
   content: '';
   position: absolute;
   inset: 0;
   z-index: -1;
   opacity: 0.1;
   pointer-events: none;
+  /* drawn: 青海波, Hokusai's waves — hard-edged rings of the band's gold on its ink, faint (opacity .1) */
   background-image:
     radial-gradient(circle at 100% 150%, transparent 24%, var(--mini-gold) 24% 26%, transparent 26% 36%, var(--mini-gold) 36% 38%, transparent 38%),
     radial-gradient(circle at 0 150%, transparent 24%, var(--mini-gold) 24% 26%, transparent 26% 36%, var(--mini-gold) 36% 38%, transparent 38%),
@@ -828,53 +798,114 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
   -webkit-mask-image: linear-gradient(100deg, transparent 40%, #000 94%);
   mask-image: linear-gradient(100deg, transparent 40%, #000 94%);
 }
-:root body:not([data-view='drift']) #mini .mini-word {
+#mini .mini-word {
   padding: 0;
   overflow-wrap: anywhere;
-  font: 800 30px/1.15 var(--font-headword, var(--display));
+  font: 800 var(--type-title)/1.15 var(--font-headword, var(--display));
   letter-spacing: 0.02em;
   color: var(--mini-head-ink);
 }
-:root body:not([data-view='drift']) #mini .mini-reading {
-  font: 500 17px/1.3 var(--font-reading, var(--serif));
-  letter-spacing: 0.06em;
-  color: var(--mini-gold);
-}
-:root body:not([data-view='drift']) #mini .mini-gloss {
-  margin: 2px 0 0;
-  font: 500 17px/1.35 var(--font-ui, var(--sans));
-  color: var(--mini-head-ink);
-}
-:root body:not([data-view='drift']) #mini .mini-gloss.mini-miss { font-weight: 400; color: var(--mini-head-ink-2); }
-:root body:not([data-view='drift']) #mini .mini-head .mini-entry {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  margin: -6px 0 0;
-  padding: 0 10px;
+/* 1.3.0 (John, 2026-10-14: "The big ugly button titled 'full entry' is unnecessary bloat"): the word
+   itself is the door to its full entry, as a second tap on it in the text is. It keeps the band's look;
+   only the hand and the keyboard find a button, with a 44px reach that moves nothing */
+#mini button.mini-word {
+  justify-self: start;
+  /* G1 · a one-glyph word (手, the page's short example leads now) keeps the door's own 44 across, as it keeps its 44
+     down; the glyph stays where it stands (design-reader-shelf G5-galaxy) */
+  min-inline-size: 44px;
+  /* its 44 down whatever the step its word is set at (the ladder's title, 29, left 43.4 with a fixed 5): the reach is
+     what the line leaves to 44, rounded up to a whole pixel (layout's 1/64 px would leave 43.97), given back in
+     margin, so it moves nothing */
+  margin-block: calc(-1 * max(5px, round(up, (44px - 1.15em) / 2, 1px)));
+  padding-block: max(5px, round(up, (44px - 1.15em) / 2, 1px));
+  padding-inline: 0;
   border: 0;
-  border-radius: 12px;
-  background: transparent;
-  color: var(--mini-head-ink);
-  font: 600 14px/1 var(--font-ui, var(--sans));
-  white-space: nowrap;
-  text-decoration: none;
+  background: none;
+  text-align: start;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
-:root body:not([data-view='drift']) #mini .mini-head .mini-entry .mini-entry-label {
-  padding: 7px 10px 7px 12px;
-  border: 1px solid color-mix(in srgb, var(--mini-head-ink) 36%, transparent);
-  border-radius: 999px;
+#mini button.mini-word:focus-visible { outline: 2px solid var(--mini-gold, currentColor); outline-offset: 2px; border-radius: var(--radius-seal); }
+/* over the sky the house's --color-* tokens are not set (editorial.css scopes them to body:not([data-view='drift'])):
+   there the slip reads the galaxy's own depth tokens, so it wears the same card and not a see-through one */
+body[data-view='drift'] #mini {
+  --color-surface: var(--surface, #fbf8f1);
+  --color-paper: var(--raised, #fbf8f1);
+  --color-ground: var(--ground, #ece6d8);
+  --color-ink: var(--text, #1c1a16);
+  --color-ink-2: var(--text-2, #4a4a44);
+  --color-muted: var(--faint, #6b6b66);
+  --color-accent: var(--ai, var(--text, #1c1a16));
+  --color-accent-wash: var(--ai-wash, rgb(28 26 22 / 8%));
+  --color-signal: var(--red, #b3261e);
+  --color-gold: var(--gold, #94702a);
 }
-:root body:not([data-view='drift']) #mini .mini-head .mini-entry .mini-entry-chevron { font-weight: 700; }
-:root body:not([data-view='drift']) #mini .mini-head .mini-entry:disabled { color: var(--mini-head-ink-2); cursor: default; }
+/* the band is the door: a chevron at its end says there is more, and the word's button reaches across the band */
+#mini .mini-head:has(button.mini-word) { padding-right: 40px; }
+#mini .mini-head:has(button.mini-word)::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  width: 9px;
+  height: 9px;
+  border-top: 1.75px solid var(--mini-head-ink-2);
+  border-right: 1.75px solid var(--mini-head-ink-2);
+  transform: translateY(-50%) rotate(45deg);
+  pointer-events: none;
+}
+#mini button.mini-word::before { content: ''; position: absolute; inset: 0; }
+/* Save ▾: one button; once the word is saved it opens the word's menu (lists, copy, remove) */
+#mini .mini-take[data-save-menu]::after { content: '▾'; margin-inline-start: 6px; font-size: var(--type-caption); opacity: 0.8; }
+#mini .mini-reading {
+  font: 500 var(--type-lead)/1.3 var(--font-reading, var(--serif));
+  letter-spacing: 0.06em;
+  color: var(--mini-reading);
+}
+#mini .mini-gloss {
+  margin: 2px 0 0;
+  font: 500 var(--type-lead)/1.35 var(--font-ui, var(--sans));
+  color: var(--mini-head-ink);
+}
+#mini .mini-gloss.mini-miss { font-weight: 400; color: var(--mini-head-ink-2); }
+/* N · the article's own note on this word (wordNotes): one quiet line under the gloss, in the band's second ink */
+#mini .mini-word-note {
+  margin: 8px 0 0;
+  font: 400 var(--type-chrome)/1.45 var(--font-ui, var(--sans));
+  color: var(--mini-head-ink-2);
+  /* a Japanese word in the note keeps together (never シ / ナ, 中 / 国 at a line's end) */
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
 
 /* why a word can't be saved here, and the door to the card that holds its spelling: plain lines on paper */
-:root body:not([data-view='drift']) #mini .mini-take-reason { display: block; margin: 0; padding: 12px 18px 0; font: 400 13.5px/1.45 var(--font-ui); color: var(--color-ink-2); }
-:root body:not([data-view='drift']) #mini .mini-take-open { align-self: flex-start; min-height: 44px; margin: 6px 14px 0; }
+#mini .mini-take-reason { display: block; margin: 0; padding: 12px 18px 0; font: 400 var(--type-chrome)/1.45 var(--font-ui); color: var(--color-ink-2); }
+#mini .mini-take-open {
+  align-self: flex-start;
+  min-height: 44px;
+  margin: 6px 14px 0;
+  padding: 0 14px;
+  border: 1px solid var(--mini-edge);
+  border-radius: var(--radius-control);
+  background: var(--mini-paper);
+  color: var(--color-accent);
+  font: 600 var(--type-control)/1 var(--font-ui);
+  cursor: pointer;
+}
 
-/* 2. one path: Save, then Add to a list */
-:root body:not([data-view='drift']) #mini .mini-actions {
+/* S · why a star of Today's sky stands there: one plain line under the band, in the slip's quiet ink */
+#mini .mini-why {
+  margin: 0;
+  padding: 10px 14px 0;
+  background: var(--mini-paper);
+  font: 500 var(--type-chrome)/1.35 var(--font-ui);
+  letter-spacing: 0.01em;
+  color: var(--color-ink-2);
+}
+#mini .mini-why::first-letter { text-transform: uppercase; }
+
+/* 2. one path: Save ▾ */
+#mini .mini-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -883,7 +914,9 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
   padding: 8px 14px;
   background: var(--mini-paper);
 }
-:root body:not([data-view='drift']) #mini .mini-take {
+#mini .mini-take {
+  /* the slip's one key is the A family (editorial.css): the world's 藍 by day, lit at night. Only its measure is kept
+     here: 44 high (the slip's Save is measured at 44 beside the bar's doors), one step wider than its word */
   position: static;
   display: inline-flex;
   flex: 0 0 auto;
@@ -892,55 +925,255 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
   min-width: 112px;
   min-height: 44px;
   padding: 0 18px;
-  border: 1px solid color-mix(in srgb, var(--color-accent) 70%, #000000);
-  border-radius: 12px;
-  background: var(--color-accent);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 18%), 0 1px 2px rgb(20 24 34 / 18%);
-  color: #fbf8f1;
-  font: 650 16px/1 var(--font-ui);
   letter-spacing: 0.01em;
   cursor: pointer;
 }
-:root body:not([data-view='drift']) #mini .mini-take.taken {
+/* over the sky the families are not in force (they are scoped to the rooms): the slip paints its key from the sky's
+   own tokens, the same 藍 */
+body[data-view='drift'] #mini .mini-take:not(.taken):not(.reader-capture-held) {
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--color-accent);
+  color: var(--color-paper, #f5efe0);
+  font: 600 var(--type-body)/1.25 var(--font-ui);
+}
+#mini .mini-take.taken {
   border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
   background: color-mix(in srgb, var(--color-accent) 10%, var(--mini-paper));
   box-shadow: none;
   color: var(--color-accent);
 }
-:root body:not([data-view='drift']) #mini .mini-take.reader-capture-held {
+#mini .mini-take.reader-capture-held {
   border: 1px dashed var(--mini-edge);
   background: transparent;
   box-shadow: none;
   color: var(--color-ink-2);
   cursor: help;
 }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) #mini .mini-take:not(.taken):not(.reader-capture-held) {
-  border-color: color-mix(in srgb, var(--color-accent) 60%, #ffffff);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 35%), 0 1px 2px rgb(0 0 0 / 40%);
-  color: #0b1220;
-}
-:root body:not([data-view='drift']) #mini .mini-take-note { flex: 1 1 auto; min-width: 0; font: 400 13.5px/1.3 var(--font-ui); color: var(--color-muted); }
-:root body:not([data-view='drift']) #mini .mini-lists {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  margin: 0;
-  padding: 0 16px;
-  border: 1px solid var(--mini-edge);
-  border-radius: 12px;
-  background: var(--mini-paper);
-  box-shadow: 0 1px 0 var(--mini-rule);
-  color: var(--color-ink);
-  font: 600 15px/1 var(--font-ui);
-  text-decoration: none;
-  cursor: pointer;
-  animation: read-mini-path 220ms cubic-bezier(0.18, 0.9, 0.24, 1) backwards;
-}
 @keyframes read-mini-path { from { opacity: 0.01; transform: translate3d(-6px, 0, 0); } }
-:root body[data-view] #mini :is(.mini-lists, .mini-take-note, .mini-sentence-open, .mini-sentence-pane)[hidden] { display: none; }
+#mini :is(.mini-sentence-open, .mini-sentence-pane)[hidden] { display: none; }
+
+/* G4 · 墨 — the word writes itself (corridor.js writeWord). The ink is the band's own white-out ink (--mini-head-ink: the
+   paper by day, the world's ink at night) and its お手本 the same ink at a breath (24 %): one pigment at two strengths, no
+   new colour (contract §6). Each character keeps its place and its text; while the ink stands in for a written character
+   its type is held clear, and at the end the ink dries into the type in one short crossfade. Nothing here takes a
+   pointer: the word is still the door to its page, mid-stroke included. */
+#mini .mini-word :is(.ink-word, .ink-char) { pointer-events: none; }
+#mini .mini-word .ink-char { position: relative; }
+#mini .mini-word .ink-glyph {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1em;
+  height: 1em;
+  overflow: visible;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+#mini .mini-word .ink-glyph path { fill: none; stroke-width: 7.5; stroke-linecap: round; stroke-linejoin: round; }
+/* the お手本 is one layer at a breath: its opacity is the group's, so crossing strokes never darken where they meet */
+#mini .mini-word .ink-ghost { opacity: 0.24; }
+#mini .mini-word .ink-ghost path { stroke: var(--mini-head-ink); }
+#mini .mini-word .ink-wet path { stroke: var(--mini-head-ink); stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+/* the word travels to the stage as its own お手本, and the ink writes over it where it lands */
+#mini .mini-word[data-ink='arriving'] { color: color-mix(in srgb, var(--mini-head-ink) 24%, transparent); }
+#mini .mini-word:is([data-ink='arriving'], [data-ink='writing'], [data-ink='finished']) .ink-char[data-strokes] { color: transparent; }
+/* finished by a press: every stroke drawn at once, until the press is released and the plain word stands */
+#mini .mini-word[data-ink='finished'] .ink-wet path { stroke-dashoffset: 0; opacity: 1; }
+#mini .mini-word[data-ink='writing'] .ink-char:not([data-strokes]) { transition: color 160ms ease-out; }
+#mini .mini-word[data-ink='settling'] .ink-char[data-strokes] { color: var(--mini-head-ink); transition: color 180ms ease-out; }
+#mini .mini-word[data-ink='settling'] .ink-glyph { opacity: 0; transition: opacity 180ms ease-in; }
+/* the reading keeps its place from the first frame and flows in over the writing's last 40 % */
+#mini .mini-reading[data-ink-held] { opacity: 0; }
+
+/* a bare word (recalled, owned): 読 and 意 on request — a quiet seal heads the reading's line and the meaning's; a tap
+   shows the line in place. A held line keeps its size unseen, so asking re-seats nothing and moves nothing */
+#mini .mini-asked { display: flex; align-items: flex-start; gap: 4px; margin: 0 0 0 -8px; min-height: 44px; }
+#mini .mini-asked-answer { display: grid; gap: 2px; min-width: 0; padding-top: 11px; }
+#mini .mini-asked-answer[data-ask-held] { visibility: hidden; }
+#mini .mini-asked .mini-gloss { margin: 0; }
+#mini .mini-ask-seal {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--mini-head-ink-2);
+  font: 600 var(--type-body)/1 var(--font-headword, var(--serif));
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#mini .mini-ask-seal::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mini-head-ink) 52%, transparent);
+  pointer-events: none;
+}
+#mini .mini-ask-seal[aria-expanded='true'] { color: var(--mini-head-ink); }
+#mini .mini-ask-seal[aria-expanded='true']::before { box-shadow: inset 0 0 0 1px var(--mini-reading); }
+#mini .mini-ask-seal:focus-visible { outline: 2px solid var(--mini-gold, currentColor); outline-offset: -2px; border-radius: 50%; }
+#mini .mini-ask-seal { flex: none; }
+
+/* the stage's own marks, quiet at the end of its row: 筆 writes the word again, 音 says it in the recorded voice. A
+   word with no recording: the 音 is struck through, its name says so, and a tap says why in a line beneath */
+#mini .mini-marks {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  margin-inline-start: auto;
+}
+#mini .mini-mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink-2);
+  font: 600 var(--type-lead)/1 var(--font-headword, var(--serif));
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#mini .mini-mark::before {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--mini-edge);
+  pointer-events: none;
+}
+#mini .mini-mark:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -3px; border-radius: 50%; }
+#mini .mini-voice[data-voice-unavailable] { color: var(--color-muted); }
+#mini .mini-voice[data-voice-unavailable]::after {
+  content: '';
+  position: absolute;
+  left: 13px;
+  right: 13px;
+  top: 50%;
+  border-top: 1px solid currentColor;
+  transform: rotate(-32deg);
+  pointer-events: none;
+}
+#mini .mini-say-note {
+  flex: 1 0 100%;
+  max-width: 230px;
+  margin: 0 6px 4px;
+  font: 400 var(--type-label)/1.4 var(--font-ui, var(--sans));
+  color: var(--color-ink-2);
+  text-align: end;
+}
+#mini .mini-say-note:empty { display: none; }
+
+/* Save ▾'s menu unfolds inside the card, under its own button (John, 2026-10-14: "a drop down menu … with
+   options inside the menu"): it never lies over another control; the card grows, and keepFloatingBeside
+   seats the taller card beside its word again. One menu in every room, with no switch — S: the same rules dress it
+   wherever the one Save stands (the slip, a row, a bar's drawer), the slip's tokens with the page's as their fallback. */
+:is(#mini, body) .vocabulary-list-popover.is-inline {
+  position: static;
+  z-index: auto;
+  width: auto;
+  max-height: none;
+  margin: -4px 10px 10px;
+  padding: 4px 0 0;
+  border: 0;
+  border-top: 1px solid var(--mini-rule, var(--color-rule));
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--color-ink);
+  overflow: visible;
+  animation: read-mini-unfold var(--motion-room) var(--ease-enter) both;
+}
+@keyframes read-mini-unfold { from { opacity: 0; transform: translateY(-6px); } }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-choice {
+  gap: 12px;
+  min-height: 46px;
+  padding: 0 8px;
+  border-radius: var(--radius-control);
+  font: 500 var(--type-body)/1.3 var(--font-ui);
+  color: var(--color-ink);
+}
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-choice:hover { background: var(--color-accent-wash); }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-choice input {
+  appearance: none;
+  -webkit-appearance: none;
+  display: grid;
+  place-content: center;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  border: 1.5px solid var(--mini-edge, var(--color-edge-strong));
+  border-radius: var(--radius-control);
+  background: none;
+}
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-choice input::before {
+  content: '';
+  width: 10px;
+  height: 5px;
+  border-left: 2px solid var(--color-paper, #f5efe0);
+  border-bottom: 2px solid var(--color-paper, #f5efe0);
+  transform: translateY(-1px) rotate(-45deg) scale(0.4);
+  opacity: 0;
+  transition: transform var(--motion-quick) var(--ease-enter), opacity var(--motion-ma) var(--ease-standard);
+}
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-choice input:checked { border-color: var(--color-accent); background: var(--color-accent); }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-choice input:checked::before { opacity: 1; transform: translateY(-1px) rotate(-45deg) scale(1); }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-review .vocabulary-list-name { font-weight: 650; }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-count { font: 400 var(--type-label)/1.2 var(--font-ui); color: var(--color-muted); }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-title {
+  margin: 10px 8px 2px;
+  font: 600 var(--type-caption)/1.2 var(--font-ui);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-choices { max-height: 30vh; margin: 0; }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-choices:has(> .vocabulary-list-empty),
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-title:has(+ .vocabulary-list-choices > .vocabulary-list-empty) { display: none; }
+:is(#mini, body) .vocabulary-list-popover.is-inline :is(.vocabulary-list-form, .vocabulary-list-new)[hidden] { display: none; }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-new { display: block; width: 100%; color: var(--color-accent); font-weight: 600; }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-form { gap: 8px; margin: 4px 0 0; padding: 0 0 2px; }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-field {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--mini-rule, var(--color-rule));
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--mini-band, var(--color-surface-sunk)) 70%, transparent);
+  color: var(--color-ink);
+  font: 400 var(--type-body)/1.2 var(--font-ui);
+}
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-field::placeholder { color: var(--color-muted); }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-create {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-radius: var(--radius-control);
+  background: none;
+  color: var(--color-accent);
+  font: 650 var(--type-control)/1 var(--font-ui);
+  box-shadow: none;
+}
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-status { margin: 6px 8px 0; font: 400 var(--type-label)/1.4 var(--font-ui); color: var(--color-accent); }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-more { margin: 8px 0 0; padding-top: 4px; border-top: 1px solid var(--mini-rule, var(--color-rule)); }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-action {
+  min-height: 46px;
+  padding: 0 8px;
+  border-radius: var(--radius-control);
+  color: var(--color-ink);
+  font: 500 var(--type-body)/1.3 var(--font-ui);
+}
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-action:hover { background: var(--color-accent-wash); }
 
 /* 3. the kanji band */
-:root body:not([data-view='drift']) #mini .mini-web {
+#mini .mini-web {
   display: grid;
   gap: 0;
   margin: 0;
@@ -949,17 +1182,17 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
   border-bottom: 1px solid var(--mini-rule);
   background: var(--mini-band);
 }
-:root body:not([data-view='drift']) #mini .mini-band-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 36px; }
-:root body:not([data-view='drift']) #mini .mini-band-label {
+#mini .mini-band-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 36px; }
+#mini .mini-band-label {
   margin: 0;
-  font: 600 11px/1.3 var(--font-ui);
+  font: 600 var(--type-caption)/1.3 var(--font-ui);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-muted);
 }
-:root body:not([data-view='drift']):not(.ui-bi) #mini .mini-band-label { letter-spacing: 0.08em; }
-:root body:not([data-view='drift']) #mini .mini-kanji { display: grid; }
-:root body:not([data-view='drift']) #mini .mini-kanji-row {
+body:not(.ui-bi) #mini .mini-band-label { letter-spacing: 0.08em; }
+#mini .mini-kanji { display: grid; }
+#mini .mini-kanji-row {
   display: grid;
   grid-template-columns: 40px minmax(0, 1fr);
   align-items: center;
@@ -973,41 +1206,41 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
   text-align: start;
   cursor: pointer;
 }
-:root body:not([data-view='drift']) #mini .mini-kanji-row:last-child { border-bottom: 0; }
-:root body:not([data-view='drift']) #mini .mini-kanji-glyph {
+#mini .mini-kanji-row:last-child { border-bottom: 0; }
+#mini .mini-kanji-glyph {
   display: grid;
   place-items: center;
   width: 40px;
   height: 40px;
   border: 1px solid color-mix(in srgb, var(--color-ink) 30%, transparent);
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   background: var(--mini-paper);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%), 0 2px 5px -1px rgb(20 24 34 / 22%);
   color: var(--color-ink);
-  font: 800 24px/1 var(--font-headword);
+  font: 800 var(--type-section)/1 var(--font-headword);
 }
-:root body:not([data-view='drift']) #mini .mini-kanji-what { display: grid; gap: 2px; min-width: 0; }
-:root body:not([data-view='drift']) #mini .mini-kanji-meaning { font: 600 14px/1.3 var(--font-ui); }
-:root body:not([data-view='drift']) #mini .mini-kanji-parts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; }
-:root body:not([data-view='drift']) #mini .mini-kanji-part { font: 500 17px/1.3 var(--font-reading); color: var(--color-accent); }
-:root body:not([data-view='drift']) #mini .mini-kanji-part-name { font: 12.5px/1.3 var(--font-reading); color: var(--color-ink-2); }
-:root body:not([data-view='drift']) #mini .mini-kanji-part-name.mini-kanji-part-meaning { font: 500 12.5px/1.3 var(--font-ui); letter-spacing: 0; }
-:root body:not([data-view='drift']) #mini .mini-kanji-plus { font: 12px/1 var(--font-data); color: var(--color-muted); }
-:root body:not([data-view='drift']) #mini .mini-cards { display: flex; flex-wrap: wrap; align-items: center; gap: 0 4px; margin: 6px 0 0; }
-:root body:not([data-view='drift']) #mini .mini-cards-label { margin-right: 4px; font: 600 11px/1.3 var(--font-ui); letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-muted); }
-:root body:not([data-view='drift']) #mini .mini-card-word {
+#mini .mini-kanji-what { display: grid; gap: 2px; min-width: 0; }
+#mini .mini-kanji-meaning { font: 600 var(--type-chrome)/1.3 var(--font-ui); }
+#mini .mini-kanji-parts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; }
+#mini .mini-kanji-part { font: 500 var(--type-lead)/1.3 var(--font-reading); color: var(--color-accent); }
+#mini .mini-kanji-part-name { font: var(--type-label)/1.3 var(--font-reading); color: var(--color-ink-2); }
+#mini .mini-kanji-part-name.mini-kanji-part-meaning { font: 500 var(--type-label)/1.3 var(--font-ui); letter-spacing: 0; }
+#mini .mini-kanji-plus { font: var(--type-caption)/1 var(--font-data); color: var(--color-muted); }
+#mini .mini-cards { display: flex; flex-wrap: wrap; align-items: center; gap: 0 4px; margin: 6px 0 0; }
+#mini .mini-cards-label { margin-right: 4px; font: 600 var(--type-caption)/1.3 var(--font-ui); letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-muted); }
+#mini .mini-card-word {
   min-height: 44px;
   padding: 0 6px;
   border: 0;
   background: transparent;
   color: var(--color-ink);
-  font: 600 17px/1 var(--font-reading);
+  font: 600 var(--type-lead)/1 var(--font-reading);
   text-decoration: underline;
   text-decoration-color: var(--color-gold);
   text-underline-offset: 0.3em;
   cursor: pointer;
 }
-:root body:not([data-view='drift']) #mini .mini-web-open {
+#mini .mini-web-open {
   justify-self: start;
   display: inline-flex;
   align-items: center;
@@ -1016,17 +1249,17 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
   margin-right: -6px;
   padding: 0 6px;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--radius-control);
   background: transparent;
   color: var(--color-accent);
-  font: 600 14.5px/1.2 var(--font-ui);
+  font: 600 var(--type-control)/1.2 var(--font-ui);
   cursor: pointer;
 }
-:root body:not([data-view='drift']) #mini .mini-web-open .mini-entry-chevron { font-weight: 700; }
+#mini .mini-web-open .mini-entry-chevron { font-weight: 700; }
 
 /* 4. the sentence band: one named door; its pane holds the sentence and two plain choices */
-:root body:not([data-view='drift']) #mini .mini-sentence-wrap { margin: 0; padding: 0; border: 0; background: var(--mini-paper); }
-:root body:not([data-view='drift']) #mini .mini-sentence-open {
+#mini .mini-sentence-wrap { margin: 0; padding: 0; border: 0; background: var(--mini-paper); }
+#mini .mini-sentence-open {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
@@ -1043,25 +1276,25 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
   text-align: start;
   cursor: pointer;
 }
-:root body:not([data-view='drift']) #mini .mini-sentence-open-text { display: grid; gap: 3px; min-width: 0; }
-:root body:not([data-view='drift']) #mini .mini-sentence-label { margin: 0; font: 650 15.5px/1.25 var(--font-ui); color: var(--color-ink); }
-:root body:not([data-view='drift']) #mini .mini-sentence-quote {
+#mini .mini-sentence-open-text { display: grid; gap: 3px; min-width: 0; }
+#mini .mini-sentence-label { margin: 0; font: 650 var(--type-body)/1.25 var(--font-ui); color: var(--color-ink); }
+#mini .mini-sentence-quote {
   overflow: hidden;
-  font: 400 14px/1.45 var(--font-reading);
+  font: 400 var(--type-chrome)/1.45 var(--font-reading);
   color: var(--color-muted);
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-:root body:not([data-view='drift']) #mini :is(.mini-sentence-chevron, .mini-sentence-action-chevron) { font: 700 20px/1 var(--font-ui); color: var(--color-muted); }
-:root body:not([data-view='drift']) #mini .mini-sentence-pane { padding: 2px 14px 14px 16px; animation: read-mini-path 220ms cubic-bezier(0.18, 0.9, 0.24, 1) backwards; }
+#mini :is(.mini-sentence-chevron, .mini-sentence-action-chevron) { font: 700 var(--type-lead)/1 var(--font-ui); color: var(--color-muted); }
+#mini .mini-sentence-pane { padding: 2px 14px 14px 16px; animation: read-mini-path var(--motion-room) var(--ease-enter) backwards; }
 @media (max-width: 520px) {
-  :root body:not([data-view='drift']) #mini.is-sentence[data-flow='document'] {
+  #mini.is-sentence[data-flow='document'] {
     position: absolute;
     max-height: none;
     overflow: visible;
   }
 }
-:root body:not([data-view='drift']) #mini .mini-sentence-back {
+#mini .mini-sentence-back {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -1069,15 +1302,15 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
   margin: 0 0 0 -6px;
   padding: 0 8px;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--radius-control);
   background: transparent;
   color: var(--color-accent);
-  font: 600 15px/1 var(--font-ui);
+  font: 600 var(--type-control)/1 var(--font-ui);
   cursor: pointer;
 }
-:root body:not([data-view='drift']) #mini .mini-sentence-back-chevron { font: 700 20px/1 var(--font-ui); }
+#mini .mini-sentence-back-chevron { font: 700 var(--type-lead)/1 var(--font-ui); }
 /* the pane's name is for a screen reader; the quoted sentence shows what it is */
-:root body:not([data-view='drift']) #mini .mini-sentence-title {
+#mini .mini-sentence-title {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -1086,24 +1319,24 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
-:root body:not([data-view='drift']) #mini .mini-sentence-full {
+#mini .mini-sentence-full {
   margin: 0 0 10px;
   padding: 8px 12px;
   border-left: 3px solid var(--color-accent);
-  border-radius: 0 10px 10px 0;
+  border-radius: 0 var(--radius-control) var(--radius-control) 0;
   background: var(--mini-band);
-  font: 400 16px/1.7 var(--font-reading);
+  font: 400 var(--type-body)/1.7 var(--font-reading);
   color: var(--color-ink);
 }
-:root body:not([data-view='drift']) #mini .mini-sentence-word {
+#mini .mini-sentence-word {
   padding: 0 1px;
-  border-radius: 3px;
+  border-radius: var(--radius-seal);
   background: color-mix(in srgb, var(--color-gold, #94702a) 26%, transparent);
   box-shadow: inset 0 -2px 0 var(--color-signal);
   color: inherit;
 }
-:root body:not([data-view='drift']) #mini .mini-sentence-choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 8px; }
-:root body:not([data-view='drift']) #mini .mini-sentence-action {
+#mini .mini-sentence-choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 8px; }
+#mini .mini-sentence-action {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas: 'name chevron' 'hint chevron';
@@ -1115,19 +1348,19 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
   margin: 0;
   padding: 8px 10px 8px 12px;
   border: 1px solid var(--mini-edge);
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   background: var(--mini-paper);
   box-shadow: 0 1px 0 var(--mini-rule), 0 4px 10px -8px rgb(20 24 34 / 40%);
   color: var(--color-ink);
   text-align: start;
   cursor: pointer;
 }
-:root body:not([data-view='drift']) #mini .mini-sentence-action-name { grid-area: name; font: 650 15.5px/1.2 var(--font-ui); color: var(--color-accent); }
-:root body:not([data-view='drift']) #mini .mini-sentence-action-hint { grid-area: hint; font: 400 13px/1.3 var(--font-ui); color: var(--color-ink-2); text-wrap: balance; }
-:root body:not([data-view='drift']) #mini .mini-sentence-action-chevron { grid-area: chevron; }
-:root body:not([data-view='drift']) #mini .mini-sentence-action:disabled { opacity: 0.55; cursor: default; }
+#mini .mini-sentence-action-name { grid-area: name; font: 650 var(--type-body)/1.2 var(--font-ui); color: var(--color-accent); }
+#mini .mini-sentence-action-hint { grid-area: hint; font: 400 var(--type-label)/1.3 var(--font-ui); color: var(--color-ink-2); text-wrap: balance; }
+#mini .mini-sentence-action-chevron { grid-area: chevron; }
+#mini .mini-sentence-action:disabled { opacity: 0.55; cursor: default; }
 /* the sentence's own Save: a quiet row under the two choices, one hairline above it */
-:root body:not([data-view='drift']) #mini .mini-sentence-keep {
+#mini .mini-sentence-keep {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
@@ -1144,55 +1377,96 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
   text-align: start;
   cursor: pointer;
 }
-:root body:not([data-view='drift']) #mini .mini-sentence-keep-name { font: 600 15px/1.25 var(--font-ui); color: var(--color-accent); }
-:root body:not([data-view='drift']) #mini .mini-sentence-keep-hint { font: 400 13px/1.3 var(--font-ui); color: var(--color-ink-2); }
-:root body:not([data-view='drift']) #mini .mini-sentence-keep:disabled { opacity: 0.55; cursor: default; }
-:root body:not([data-view='drift']) #mini .mini-status { margin: 0; padding: 0 18px; font: 13px/1.5 var(--font-ui); color: var(--color-ink); }
-:root body:not([data-view='drift']) #mini .mini-status:empty { display: none; }
+#mini .mini-sentence-keep-name { font: 600 var(--type-control)/1.25 var(--font-ui); color: var(--color-accent); }
+#mini .mini-sentence-keep-hint { font: 400 var(--type-label)/1.3 var(--font-ui); color: var(--color-ink-2); }
+#mini .mini-sentence-keep:disabled { opacity: 0.55; cursor: default; }
+#mini .mini-status { margin: 0; padding: 0 18px; font: var(--type-label)/1.5 var(--font-ui); color: var(--color-ink); }
+#mini .mini-status:empty { display: none; }
 /* the sentence's own view: the word band stays as context; the word's controls step aside */
-:root body:not([data-view='drift']) #mini.is-sentence :is(.mini-actions, .mini-web, .mini-take-reason, .mini-take-open) { display: none; }
-:root body:not([data-view='drift']) #mini.is-sentence .mini-head { padding-block: 8px; align-items: center; }
-:root body:not([data-view='drift']) #mini.is-sentence .mini-head-text { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; }
-:root body:not([data-view='drift']) #mini.is-sentence .mini-word { font-size: 24px; }
-:root body:not([data-view='drift']) #mini.is-sentence :is(.mini-reading, .mini-gloss) { margin: 0; font-size: 15px; }
+#mini.is-sentence :is(.mini-actions, .mini-web, .mini-take-reason, .mini-take-open) { display: none; }
+#mini.is-sentence .mini-head { padding-block: 8px; align-items: center; }
+#mini.is-sentence .mini-head-text { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; }
+#mini.is-sentence .mini-word { font-size: var(--type-section); }
+#mini.is-sentence :is(.mini-reading, .mini-gloss) { margin: 0; font-size: var(--type-control); }
 
 /* a narrow phone (320–360): the same bands, set tighter, so the card still fits above its word; every
    target keeps its 44px */
 @media (max-width: 360px) {
-  :root body:not([data-view='drift']) #mini .mini-head { padding: 8px 6px 9px 14px; }
-  :root body:not([data-view='drift']) #mini .mini-word { font-size: 26px; }
-  :root body:not([data-view='drift']) #mini :is(.mini-reading, .mini-gloss) { font-size: 15px; }
-  :root body:not([data-view='drift']) #mini .mini-actions { padding: 6px 12px; gap: 6px 10px; }
-  :root body:not([data-view='drift']) #mini .mini-take { min-width: 96px; padding: 0 14px; }
-  :root body:not([data-view='drift']) #mini .mini-take-note { font-size: 12.5px; }
-  :root body:not([data-view='drift']) #mini .mini-web { padding: 0 10px 2px 14px; }
-  :root body:not([data-view='drift']) #mini .mini-band-head { height: 32px; }
-  :root body:not([data-view='drift']) #mini .mini-kanji-row { min-height: 44px; padding: 2px 0; }
-  :root body:not([data-view='drift']) #mini .mini-kanji-glyph { width: 36px; height: 36px; font-size: 21px; }
-  :root body:not([data-view='drift']) #mini .mini-sentence-open { min-height: 46px; padding: 5px 12px 6px 14px; }
-  :root body:not([data-view='drift']) #mini .mini-sentence-quote { font-size: 13px; }
+  #mini .mini-head { padding: 8px 6px 9px 14px; }
+  #mini .mini-word { font-size: var(--type-section); }
+  #mini :is(.mini-reading, .mini-gloss) { font-size: var(--type-control); }
+  #mini .mini-actions { padding: 6px 12px; gap: 6px 10px; }
+  #mini .mini-take { min-width: 96px; padding: 0 14px; }
+  #mini .mini-web { padding: 0 10px 2px 14px; }
+  #mini .mini-band-head { height: 32px; }
+  #mini .mini-kanji-row { min-height: 44px; padding: 2px 0; }
+  #mini .mini-kanji-glyph { width: 36px; height: 36px; font-size: var(--type-reading); }
+  #mini .mini-sentence-open { min-height: 46px; padding: 5px 12px 6px 14px; }
+  #mini .mini-sentence-quote { font-size: var(--type-label); }
 }
 
-/* press: every control answers the finger at once; focus is a clear ring */
-:root body:not([data-view='drift']) #mini :is(.mini-take, .mini-lists, .mini-entry, .mini-web-open, .mini-sentence-open, .mini-sentence-back, .mini-sentence-action, .mini-sentence-keep, .mini-kanji-row, .mini-card-word) {
-  transition: transform 90ms var(--mini-press);
+/* Ladder · D7 · the compact card (the lead's ruling, 10-19; John, 10-15: the word card "too bulky"). When the whole card has
+   no seat beside its word it sets tighter instead of moving the print: the word and its reading on one line with the meaning
+   under them, Save, and every kanji on one line of its own: its glyph, its keyword, its readings. Its parts wait on the
+   kanji's own page; the sentence's band folds under the cut, which says it scrolls. The same bands and inks, set closer;
+   every target keeps its 44 px. */
+#mini .mini-kanji-readings { display: none; }
+#mini.is-compact .mini-head { padding: 6px 8px 7px 16px; }
+#mini.is-compact .mini-head {
+  /* bokashi: ichimonji — the compact card's head band — brush: the same stroke on a shorter band, its lift starting higher so it is drawn over as many px as the full band's (contrast-sweep C4: ≤ 1 visible tonal step per 24 px; from 56 % of a 79 px band it was 2) */
+  background-image: linear-gradient(180deg, var(--mini-head) 0 25%, var(--mini-head-2) 100%);
 }
-:root body:not([data-view='drift']) #mini :is(button):active:not(:disabled) { transform: scale(0.97); }
-:root body:not([data-view='drift']) #mini :is(.mini-sentence-open, .mini-kanji-row, .mini-sentence-keep):active:not(:disabled) { transform: none; background-color: var(--mini-rule); }
-:root body:not([data-view='drift']) #mini :is(button, [tabindex]):focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
-:root body:not([data-view='drift']) #mini .mini-head :is(button):focus-visible { outline-color: var(--mini-gold); }
+#mini.is-compact .mini-head-text { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; }
+/* the room a meaning still to come keeps (reserveSenseRoom) is measured in the full card's lines: the compact card keeps none,
+   as the sentence view keeps none; a meaning that lands later seats the card again */
+#mini.is-compact .mini-head-text { min-height: 0 !important; }
+#mini.is-compact .mini-word { font-size: var(--type-section); }
+#mini.is-compact .mini-reading { font-size: var(--type-control); }
+/* the word's depth dot hangs 9–15 px past it (editorial.css): on the compact line its reading starts clear of the dot */
+#mini.is-compact:is([data-depth], [data-kept]) .mini-reading { margin-inline-start: 10px; }
+#mini.is-compact .mini-gloss { flex: 1 0 100%; margin: 0; font-size: var(--type-control); line-height: 1.28; }
+/* the quiet second line of a sense waits on the word's page, as a kanji's parts wait on the kanji's (the compact card shows the
+   meaning, Save and every kanji row; at 320×568 that line alone stood the last kanji row under the fade). Its element stays,
+   so a sense arriving later still finds it; its own style says display: block, hence !important */
+#mini.is-compact .mini-gloss-more { display: none !important; }
+#mini.is-compact .mini-actions { padding-block: 4px; }
+#mini.is-compact .mini-band-head { height: 28px; }
+#mini.is-compact .mini-kanji-row { grid-template-columns: 30px minmax(0, 1fr); column-gap: 10px; min-height: 44px; padding: 0; }
+#mini.is-compact .mini-kanji-glyph {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-control);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%), 0 1px 3px -1px rgb(20 24 34 / 22%);
+  font-size: var(--type-lead);
+}
+#mini.is-compact .mini-kanji-what { display: flex; align-items: baseline; gap: 12px; min-width: 0; }
+#mini.is-compact .mini-kanji-meaning { flex: 0 1 auto; white-space: nowrap; }
+#mini.is-compact .mini-kanji-parts { display: none; }
+/* cut below its kanji rows, the compact card keeps a fade's depth (32 px) of its kanji band under them: the fade covers that */
+#mini.is-compact.is-cut .mini-web { padding-bottom: 32px; }
+#mini.is-compact .mini-kanji-readings {
+  display: inline;
+  margin-inline-start: auto;
+  font: 500 var(--type-label)/1.3 var(--font-reading);
+  letter-spacing: 0.04em;
+  color: var(--color-ink-2);
+  white-space: nowrap;
+}
+
+/* press: the house's one press rule (editorial.css) answers the finger; focus is a clear ring */
+#mini :is(button, [tabindex]):focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+#mini .mini-head :is(button):focus-visible { outline-color: var(--mini-gold); }
 @media (hover: hover) {
-  :root body:not([data-view='drift']) #mini .mini-kanji-row:hover .mini-kanji-glyph { border-color: var(--color-accent); }
-  :root body:not([data-view='drift']) #mini :is(.mini-web-open, .mini-sentence-back):hover,
-  :root body:not([data-view='drift']) #mini .mini-sentence-keep:hover .mini-sentence-keep-name { text-decoration: underline; text-underline-offset: 0.2em; }
-  :root body:not([data-view='drift']) #mini .mini-head .mini-entry:hover .mini-entry-label { border-color: var(--mini-gold); }
-  :root body:not([data-view='drift']) #mini :is(.mini-sentence-open, .mini-sentence-action):hover { background-color: color-mix(in srgb, var(--color-accent) 6%, var(--mini-paper)); }
+  #mini .mini-kanji-row:hover .mini-kanji-glyph { border-color: var(--color-accent); }
+  #mini :is(.mini-web-open, .mini-sentence-back):hover,
+  #mini .mini-sentence-keep:hover .mini-sentence-keep-name { text-decoration: underline; text-underline-offset: 0.2em; }
+  #mini :is(.mini-sentence-open, .mini-sentence-action):hover { background-color: color-mix(in srgb, var(--color-accent) 6%, var(--mini-paper)); }
 }
 
 /* the toast is its own lacquer slip: what just happened, and the way back, never melted into the page */
 :root body:not([data-view='drift']) .reader-toast {
   border: 1px solid color-mix(in srgb, #f3ecdd 16%, transparent);
-  border-radius: 14px;
+  border-radius: var(--radius-overlay);
   background: var(--color-lacquer, #141a28);
   box-shadow: 0 2px 4px rgb(0 0 0 / 18%), 0 16px 34px -10px rgb(0 0 0 / 50%);
   color: #f3ecdd;
@@ -1203,11 +1477,6 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
   background: color-mix(in srgb, var(--color-ground) 45%, #000000);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  :root body:not([data-view='drift']) #mini,
-  :root body:not([data-view='drift']) #mini :is(.mini-lists, .mini-sentence-pane) { animation: read-text-settle 100ms linear both !important; }
-  :root body:not([data-view='drift']) #mini :is(button):active:not(:disabled) { transform: none; }
-}
 
 /* =====================================================================================
    ROUND 4, T4 (John: "the top header, the background of the picture, th etitle, the subtitle, the
@@ -1253,7 +1522,7 @@ html[data-room='reader'] body:not([data-view='drift']) {
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero {
   margin: 0 0 4px;
   padding: 10px 10px 34px;
-  border-radius: var(--radius-card, 8px);
+  border-radius: var(--radius-card);
   background: var(--reader-mat);
   -webkit-mask-image: none;
   mask-image: none;
@@ -1262,7 +1531,7 @@ html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-her
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero .reader-picture-img {
   /* a phone shows the print as a band, never a sliver; the first sentence still opens on the first screen (R3) */
   height: clamp(136px, calc(100svh - 700px - var(--nav-clearance, 0px)), 280px);
-  border-radius: 3px;
+  border-radius: var(--radius-seal);
   box-shadow: 0 0 0 1px var(--reader-mat-edge), 0 8px 18px -8px rgb(0 0 0 / 70%);
 }
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero .reader-picture-caption {
@@ -1301,7 +1570,7 @@ html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-car
   margin: 0 0 12px;
   padding: 14px 16px 4px;
   border: 1px solid var(--reader-card-edge);
-  border-radius: 14px;
+  border-radius: var(--radius-card);
   background: var(--reader-card-grain), var(--reader-card);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%), 0 2px 3px rgb(20 24 34 / 8%), 0 16px 32px -14px rgb(20 24 34 / 34%);
   color: var(--reader-ink);
@@ -1313,10 +1582,12 @@ html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-her
 html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title {
   position: static;
   margin: 0 0 4px;
-  font: 800 clamp(26px, 3vw, 34px)/1.4 var(--font-headword);
+  font: 800 var(--type-display)/1.4 var(--font-headword);
   letter-spacing: 0.01em;
   color: var(--reader-ink);
-  word-break: auto-phrase;
+  /* Q · its words are lookup doors kept whole in .ja-unit; the same break in both engines */
+  word-break: keep-all;
+  overflow-wrap: break-word;
   line-break: strict;
   text-wrap: pretty;
 }
@@ -1324,10 +1595,26 @@ html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .
   margin: 0 0 2px;
   padding: 1px 0 1px 10px;
   border-left: 2px solid color-mix(in srgb, var(--color-accent) 70%, transparent);
-  font: 500 15px/1.45 var(--font-ui);
+  font: 500 var(--type-control)/1.45 var(--font-ui);
   letter-spacing: 0;
   text-transform: none;
   color: var(--color-accent);
+}
+/* N · a real text's context line under its title, set like a dateline: the card's own ink thinned toward its own paper,
+   no box, no rule, no label */
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .reader-context {
+  margin: 2px 0 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: 400 var(--type-label)/1.55 var(--font-ui);
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--reader-ink) 76%, var(--reader-card));
+}
+/* a sentence keeps together; one longer than the line still wraps within itself */
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .reader-context > .reader-context-part {
+  display: inline-block;
+  max-width: 100%;
 }
 /* the instrument line sits under a hairline in the card; the settings icon keeps its corner */
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-card > .reader-head {
@@ -1339,6 +1626,25 @@ html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-car
   border-top: 1px solid color-mix(in srgb, var(--color-ink) 9%, transparent);
 }
 html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .reader-head > .reader-meta { padding-top: 8px; }
+/* F · the folded listen mark (the lead's ruling on Grok f-86, 2026-10-18): one glyph at the right end of the instrument
+   line, in the head's flow — a float the line's text steps around, beside the settings icon (whose 34 px in the head its
+   right margin keeps) — so it never sits over the reading column at any scroll. Open, the bar stands where it always has
+   (editorial.css: the phone's foot, a desk's own line). With no recording the head holds no mark. */
+html[data-room='reader'] body:not([data-view='drift']) #app .reader-head > .listen-row.play-bar[data-open='false'] {
+  position: static;
+  float: right;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  max-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  margin: 0 34px 0 8px;
+  padding: 0;
+}
+html[data-room='reader'] body[data-view='reader'] #app > main .reader-head:has(> .listen-row:not([hidden])) > .reader-meta::before { width: 0; }
+/* the head holds its float: what follows starts under the mark, never beside it */
+html[data-room='reader'] body:not([data-view='drift']) #app > main .reader-head:has(> .listen-row:not([hidden])) { display: flow-root; }
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-card > .reader-head > .dials-toggle {
   position: absolute;
   top: 0;
@@ -1360,7 +1666,7 @@ html[data-room='reader'] #app > main > .reader-card .version-toggle {
   margin: 0;
   padding: 2px;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--radius-control);
   background: var(--reader-track);
   box-shadow: inset 0 1px 2px rgb(0 0 0 / 12%);
 }
@@ -1372,11 +1678,11 @@ html[data-room='reader'] #app > main > .reader-card .version-toggle .version-cho
   /* the brief's 44px floor: each side is a 44px box, so the sunk track stands 48px */
   min-height: 44px;
   padding: 0 8px;
-  border-radius: 8px;
+  border-radius: var(--radius-control);
   background: transparent;
   box-shadow: none;
   color: var(--color-ink-2);
-  font: 600 14px/1.2 var(--font-ui);
+  font: 600 var(--type-chrome)/1.2 var(--font-ui);
 }
 html[data-room='reader'] #app > main > .reader-card .version-toggle .version-choice + .version-choice { padding-left: 8px; }
 html[data-room='reader'] #app > main > .reader-card .version-toggle .version-choice[aria-pressed='true'] {
@@ -1388,7 +1694,7 @@ html[data-room='reader'] #app > main > .reader-card .version-toggle .version-hel
 /* a narrow phone (320): each side sets its level under its name, so "Simplified · N3" never breaks at its dot */
 @media (max-width: 340px) {
   html[data-room='reader'] #app > main > .reader-card .version-toggle .version-choice { flex-direction: column; flex-wrap: nowrap; gap: 1px; padding: 3px 4px; line-height: 1.15; }
-  html[data-room='reader'] #app > main > .reader-card .version-toggle .version-choice .version-level { font-size: 11.5px; line-height: 1.1; }
+  html[data-room='reader'] #app > main > .reader-card .version-toggle .version-choice .version-level { font-size: var(--type-caption); line-height: 1.1; }
   html[data-room='reader'] #app > main > .reader-card .version-toggle .version-choice .version-dot { display: none; }
 }
 html[data-room='reader'] #app > main > .reader-card .version-toggle .version-help > summary { width: 44px; height: 44px; min-height: 44px; }
@@ -1398,22 +1704,11 @@ html[data-room='reader'] body #app > main > .reader-card > #reader-tip.reader-ti
   padding: 2px 6px 0 16px;
   border-top: 1px solid color-mix(in srgb, var(--color-ink) 9%, transparent);
 }
-html[data-room='reader'] body #app > main > .reader-card > #reader-tip .reader-tip-text { font: 400 13px/1.4 var(--font-ui); color: var(--color-ink-2); }
-/* The shared control styles transition colour; reader highlights change instantly, like the word card. */
-html[data-room='reader'] body #app > main > .reader-card .icon-button {
-  transition: transform 90ms ease-out;
-}
-html[data-room='reader'] body #app > main > .reader-card .icon-button:active { transform: scale(0.97); }
-html[data-room='reader'] body #app > main .chip { transition: transform 140ms var(--ease); }
+html[data-room='reader'] body #app > main > .reader-card > #reader-tip .reader-tip-text { font: 400 var(--type-label)/1.4 var(--font-ui); color: var(--color-ink-2); }
 html[data-room='reader'] body:not(.zen) #app > .chrome > button,
 html[data-room='reader'] body:not(.zen) #app > .chrome .lang-seg button::before,
 html[data-room='reader'] body #app > .primary-tabs .primary-tab,
 html[data-room='reader'] body #app > main .seg button { transition: none; }
-@media (prefers-reduced-motion: reduce) {
-  html[data-room='reader'] body #app > main > .reader-card .icon-button,
-  html[data-room='reader'] body #app > main .chip { transition: none; }
-  html[data-room='reader'] body #app > main > .reader-card .icon-button:active { transform: none; }
-}
 
 /* the room is the page itself (washi): the mat, the card and the paper lie on it as separate things */
 :root[data-room='reader'] body[data-view='reader']:not(.zen):not([data-view='entry']) #app > main {
@@ -1433,8 +1728,8 @@ html[data-room='reader'] body:not([data-view='drift']) main #reader.reader {
 @media (max-width: 520px) {
   html[data-room='reader'] body.v-depth-layered:not([data-view='drift']) main #reader.reader,
   html[data-room='reader'] body:not([data-view='drift']) main #reader.reader { margin-inline: calc(50% - 50vw); padding-inline: var(--s2, 16px); }
-  html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title { font-size: 23px; line-height: 1.38; }
-  html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .view-title-en { font-size: 14px; line-height: 1.4; }
+  html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title { font-size: var(--type-reading); line-height: 1.38; }
+  html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .view-title-en { font-size: var(--type-chrome); line-height: 1.4; }
 }
 
 /* =====================================================================================
@@ -1457,16 +1752,13 @@ html[data-room='shelf'] body:not([data-view='drift']) {
     margin: -30px 12px 0;
     padding: 14px 16px 10px;
     border: 1px solid var(--shelf-card-edge);
-    border-radius: 14px;
+    border-radius: var(--radius-card);
     background: var(--shelf-card);
     box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%), 0 2px 3px rgb(20 24 34 / 8%), 0 16px 32px -14px rgb(20 24 34 / 34%);
   }
   :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='shelf'] #shelf-reading-results > .story-lead .shelf-head {
     box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%), 0 0 0 1px rgb(0 0 0 / 28%), 0 20px 44px -14px rgb(0 0 0 / 75%);
   }
-  /* the print's lower registration marks rise clear of the card that overlaps its foot */
-  html[data-room='shelf'] #shelf-body .story-lead .story-picture::after { inset: 12px 12px 42px; }
-  html[data-room='shelf'] #shelf-reading-results > .story-lead + .shelf-review-note { margin-top: 10px; }
 }
 /* the 読 seal: a crisp tile with a keyline; at night a lantern-gold one, so it never melts into the 藍 */
 html[data-room='shelf'] #shelf-body .shelf-masthead .shelf-art { box-shadow: 0 0 0 1px rgb(20 24 34 / 16%), 0 2px 6px -1px rgb(20 24 34 / 28%); }
@@ -1481,52 +1773,45 @@ html[data-room='shelf'] #shelf-body .shelf-masthead .shelf-art { box-shadow: 0 0
    unchanged (G5 pins them).
    ===================================================================================== */
 :root body:not([data-view='drift']) .vocabulary-list-popover {
-  --list-paper: color-mix(in srgb, var(--color-surface) 55%, #fffefb);
+  --list-paper: var(--color-paper, #f5efe0);
   border: 1px solid color-mix(in srgb, var(--color-ink) 26%, transparent);
+  background: var(--color-paper, #f5efe0);
   background: var(--list-paper);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 60%), 0 2px 4px rgb(20 24 34 / 10%), 0 22px 48px -10px rgb(20 24 34 / 42%);
   color: var(--color-ink);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) .vocabulary-list-popover {
-  --list-paper: color-mix(in srgb, var(--color-paper) 93%, #ffffff);
   border-color: color-mix(in srgb, var(--color-gold, #e2bd6c) 34%, transparent);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%), 0 0 0 1px rgb(0 0 0 / 30%), 0 -18px 56px -8px rgb(0 0 0 / 75%);
 }
 :root body:not([data-view='drift']) .vocabulary-list-popover .vocabulary-list-title {
   margin: 0 0 8px;
-  font: 650 17px/1.35 var(--font-ui);
+  font: 650 var(--type-lead)/1.35 var(--font-ui);
   color: var(--color-ink);
 }
 :root body:not([data-view='drift']) .vocabulary-list-popover .vocabulary-list-empty { color: var(--color-muted); }
 :root body:not([data-view='drift']) .vocabulary-list-popover .vocabulary-list-field {
   border: 1px solid color-mix(in srgb, var(--color-ink) 30%, transparent);
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   background: color-mix(in srgb, var(--color-ground) 30%, var(--list-paper));
   box-shadow: inset 0 1px 2px rgb(20 24 34 / 10%);
   color: var(--color-ink);
 }
 :root body:not([data-view='drift']) .vocabulary-list-popover #vocabulary-list-create {
+  /* the menu's Add is the same key as Save: the world's 藍, the world's paper for its word (dark at night) */
   min-width: 72px;
-  border: 1px solid color-mix(in srgb, var(--color-accent) 70%, #000000);
-  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 70%, var(--color-ink));
+  border-radius: var(--radius-control);
   background: var(--color-accent);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 18%), 0 1px 2px rgb(20 24 34 / 18%);
-  color: #fbf8f1;
-  transition: transform 140ms var(--ease);
-}
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) .vocabulary-list-popover #vocabulary-list-create {
-  border-color: color-mix(in srgb, var(--color-accent) 60%, #ffffff);
-  color: #0b1220;
+  box-shadow: 0 1px 2px rgb(20 24 34 / 18%);
+  color: var(--color-paper, #f5efe0);
 }
 :root body:not([data-view='drift']) .vocabulary-list-popover #vocabulary-list-create:disabled { opacity: 0.55; }
-:root body:not([data-view='drift']) .vocabulary-list-popover #vocabulary-list-create:active:not(:disabled) { transform: scale(0.97); }
-@media (prefers-reduced-motion: reduce) {
-  :root body:not([data-view='drift']) .vocabulary-list-popover #vocabulary-list-create { transition: none; }
-}
 :root body:not([data-view='drift']) .vocabulary-list-popover .vocabulary-list-choice { min-height: 48px; border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent); border-radius: 0; }
 @media (max-width: 560px) {
   /* the sheet's grabber: it reads as a sheet that came up from the foot (decoration only) */
-  :root body:not([data-view='drift']) .vocabulary-list-popover { padding-top: 20px; }
+  :root body:not([data-view='drift']) .vocabulary-list-popover:not(.is-save-menu) { padding-top: 20px; }
+  :root body:not([data-view='drift']) .vocabulary-list-popover.is-save-menu::before { content: none; }
   :root body:not([data-view='drift']) .vocabulary-list-popover::before {
     content: '';
     position: absolute;
@@ -1535,7 +1820,7 @@ html[data-room='shelf'] #shelf-body .shelf-masthead .shelf-art { box-shadow: 0 0
     width: 36px;
     height: 4px;
     margin-left: -18px;
-    border-radius: 2px;
+    border-radius: var(--radius-seal);
     background: color-mix(in srgb, var(--color-ink) 22%, transparent);
     pointer-events: none;
   }
@@ -1558,20 +1843,18 @@ html[data-room='shelf'] body:not(.zen) #app .shelf-today-read {
   color: var(--color-ink);
   text-align: left;
   cursor: pointer;
-  transition: transform var(--motion-press) var(--ease-standard);
 }
-html[data-room='shelf'] body:not(.zen) #app .shelf-today-read:active { transform: scale(0.99); }
 html[data-room='shelf'] .shelf-today-read-l {
   grid-column: 1;
-  font: 600 11px/1.2 var(--font-ui);
+  font: 600 var(--type-caption)/1.2 var(--font-ui);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-muted);
 }
-html[data-room='shelf'] body:not(.ui-bi) .shelf-today-read-l { letter-spacing: 0.2em; text-transform: none; font-size: 12px; }
+html[data-room='shelf'] body:not(.ui-bi) .shelf-today-read-l { letter-spacing: 0.2em; text-transform: none; font-size: var(--type-caption); }
 html[data-room='shelf'] .shelf-today-read-t {
   grid-column: 1;
-  font: 600 17px/1.45 var(--font-reading);
+  font: 600 var(--type-lead)/1.45 var(--font-reading);
   word-break: keep-all;
   line-break: strict;
   overflow-wrap: anywhere;
@@ -1597,10 +1880,15 @@ html[data-room='shelf'] .shelf-today-read-arrow::after {
   transform: translateY(-50%) rotate(45deg);
 }
 html[data-room='shelf'] .shelf-today-read:hover .shelf-today-read-arrow { transform: translateX(3px); }
-@media (prefers-reduced-motion: reduce) {
-  html[data-room='shelf'] :is(.shelf-today-read, .shelf-today-read-arrow) { transition: none; }
-}
 /* on a phone the slip keeps clear of the room's vertical sign, as the masthead's words do */
 @media (max-width: 520px) {
   html[data-room='shelf'] body:not(.zen) #app .shelf-today-read { width: calc(100% - 34px); }
+}
+
+/* Q · the reader never scrolls sideways on a phone: a reading drawn over the last word of a line (ruby::before) may
+   overhang the glass by a pixel or two at 320; the overhang is clipped, nothing scrolls (overflow-x: clip makes no scroll
+   box). Phones only. On a wider glass the column never reaches the glass, and in WebKit the clipped main made the room's
+   view-transition snapshot take 20–35 s: 戻る from the reader at 600 to 1280 px (INTG3/probe/backvariant.mjs) */
+@media (max-width: 520px) {
+  html[data-room='reader'] #app > main { overflow-x: clip; }
 }

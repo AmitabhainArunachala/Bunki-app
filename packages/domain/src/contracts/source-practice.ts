@@ -105,19 +105,36 @@ const originSchema = z
 
 export type SourcePracticeOrigin = z.infer<typeof originSchema>;
 export type SourcePracticeMode = 'cloze' | 'production' | 'listening';
-const listeningCueSchema = z.strictObject({
+const listeningCueFields = {
   version: z.literal(1),
   path: z.string().min(1).max(700),
   sha256: z.string().regex(/^[0-9a-f]{64}$/u),
   bytes: z.number().int().min(1).max(10_000_000),
   sentenceIndex: z.number().int().min(0).max(100_000),
-  voice: z.literal('ami'),
   alignment: z.literal('sentence-order'),
   transcriptStatus: z.literal('unreviewed'),
+};
+// Plans saved before the voice lock carry this shape; it stays parseable so a stored record
+// survives, and the app never plays it.
+const legacyListeningCueSchema = z.strictObject({
+  ...listeningCueFields,
+  voice: z.literal('ami'),
 });
+// Since the voice lock (slice V, 2026-10-17) a cue names its own voice, speaker role and model.
+// Which ones may play is the app's lock, enforced where the clip is played; this contract only
+// keeps the descriptor coherent. Before this, the contract accepted 'ami' alone, so every cue in
+// the locked voice was refused here even after its clip existed.
+const lockedListeningCueSchema = z.strictObject({
+  ...listeningCueFields,
+  voice: z.string().regex(/^[a-z][a-z0-9-]{0,31}$/u),
+  speakerRole: z.string().regex(/^[a-z][a-z-]{0,31}$/u),
+  model: z.string().regex(/^[a-z0-9][a-z0-9.-]{0,79}$/u),
+});
+const listeningCueSchema = z.union([legacyListeningCueSchema, lockedListeningCueSchema]);
 export type SourceListeningCue = z.infer<typeof listeningCueSchema>;
 /** A coherent descriptor is not editorial review or permission to fetch a URL.
- * The caller must resolve the installed source/catalog and verify actual bytes. */
+ * The caller must resolve the installed source/catalog and verify actual bytes.
+ * The path is the cue's own voice's folder: a clip cannot claim one voice and live in another's. */
 export function parseSourceListeningCue(
   raw: unknown,
   origin: SourcePracticeOrigin,
@@ -127,7 +144,7 @@ export function parseSourceListeningCue(
     !('tokenSpan' in origin) ||
     !/^[A-Za-z0-9][A-Za-z0-9:_-]*$/u.test(origin.sourceId) ||
     cue.path !==
-      `audio/s/ami/${origin.sourceId.replaceAll(':', '_')}-${String(cue.sentenceIndex).padStart(3, '0')}.m4a`
+      `audio/s/${cue.voice}/${origin.sourceId.replaceAll(':', '_')}-${String(cue.sentenceIndex).padStart(3, '0')}.m4a`
   )
     throw new TypeError('invalid-listening-cue');
   return cue;

@@ -31,7 +31,7 @@
    "passage": {
     "ja": "「全部の答えを同時に試して一瞬で正解を出す」と書けば、量子コンピュータの説明は魅力的になりますが、大切な条件が抜け落ちます。量子的な状態の性質を利用するにしても、測定で得られる情報には制約があり、役立つ結果が得られるように計算の手順を組む工夫が要ります。普通の計算機より有利とされる問題があることと、あらゆる仕事が速くなることとは別です。記事を直すなら、同時に試すという比喩を強めるより、どんな問題でどの手順を使う話なのかを示し、適用範囲を狭めて正確さを取り戻します。",
     "form": "量子コンピュータ",
-    "en": "Describing a quantum computer as trying every answer simultaneously and instantly producing the correct one sounds appealing but omits crucial conditions. Even when exploiting quantum states, measurement constrains the information obtained, and the procedure must be designed to yield useful results. Advantages on certain problems do not mean that every task becomes faster. Editing the article should recover precision by identifying the problem and method rather than strengthening the metaphor of simultaneous trials.",
+    "en": "Describing a quantum computer as trying every answer simultaneously and instantly producing the correct one sounds appealing but omits crucial conditions. Even when exploiting quantum states, measurement constrains the information obtained, and the procedure must be designed to yield useful results. Advantages on certain problems do not mean that every task becomes faster. Editing the article should narrow its scope of application and recover precision by identifying the problem and method rather than strengthening the metaphor of simultaneous trials.",
     "register": "語",
     "topic": "ai",
     "tipJa": "あらゆる計算を速める万能機という表現は避ける。",

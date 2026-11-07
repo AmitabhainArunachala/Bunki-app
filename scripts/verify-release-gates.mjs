@@ -1,7 +1,7 @@
 /** Truthful battery execution and behavioral regression checks for release gates. */
 import assert from 'node:assert/strict';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import {
   closeSync,
   existsSync,
@@ -16,6 +16,7 @@ import {
   symlinkSync,
   unlinkSync,
   writeFileSync,
+  writeSync,
 } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
@@ -27,6 +28,33 @@ import { isDeepStrictEqual } from 'node:util';
 import { buildCorridorModules } from './build-reading-module.mjs';
 import { corridorAssetFiles } from './corridor-assets.mjs';
 import { verifyRelease } from './release/version.mjs';
+import { acceptanceEnvironment, digest, sourceSnapshot } from './ci/verification-admission.mjs';
+import {
+  gateEvidenceDeclaration,
+  evidenceInvocation,
+  requireApprovedInvocation,
+  validateGateEvidence,
+  RELEASE_GROUPS,
+} from './ci/gate-evidence.mjs';
+import { commandCheckEvidence } from './ci/command-check-contracts.mjs';
+import { validateReaderEnglishEvidence } from './ci/vh-media-report-contracts.mjs';
+import {
+  englishSourcePins,
+  englishExpectations,
+} from '../prototypes/corridor/tools/reader-english-rung.mjs';
+import { syntheticEnglishReceipt } from '../prototypes/corridor/tools/reader-english-rung-controls.mjs';
+import {
+  loadHfix2cPins,
+  validateHfix2cFocused,
+  validateHfix2cLaneAdmission,
+} from './ci/vh-hfix2c-report-contracts.mjs';
+import { loadHfix2dPins, validateHfix2dReport } from './ci/vh-hfix2d-report-contracts.mjs';
+import {
+  BATCH3_SUITES,
+  BATCH3_REPORT_TYPES,
+  loadBatch3Pins,
+  validateBatch3Admission,
+} from './ci/vh-batch3-report-contracts.mjs';
 
 const SELF = fileURLToPath(import.meta.url);
 const ROOT = resolve(dirname(SELF), '..');
@@ -203,6 +231,9 @@ function timeoutMs(value = DEFAULT_TIMEOUT_MS) {
   return parsed;
 }
 
+// The CI planner uses exactly the same default and validation as the child runner.
+export { timeoutMs as gateTimeoutMs };
+
 // Every entry is required. Deleting a verifier or corpus must fail, not skip.
 export function batteryGates(out, env = process.env) {
   const node = (name, file, args = [], report) => ({
@@ -243,10 +274,84 @@ export function batteryGates(out, env = process.env) {
       join(out, 'reference-core'),
     ]),
     node('reference-data', 'tools/build-reference-data.mjs', ['--check']),
+    node('gloss-text', tool('test-gloss-text')),
     node('reference-ui-contracts', tool('test-reference-ui')),
     node('skip-core', tool('test-skip-core')),
     node('skip-ui-contracts', tool('test-skip-ui')),
     node('kanji-capture', tool('test-kanji-capture')),
+    ...['chromium', 'webkit'].map((engine) => {
+      const name = engine === 'chromium' ? 'kanji-trust' : 'kanji-trust-webkit';
+      return {
+        ...node(name, tool('verify-kanji-trust'), [], {
+          ...report(name, 'kanji-trust', 'verify-kanji-trust.json'),
+          engine,
+        }),
+        env: { KAIRO_BROWSER: engine },
+      };
+    }),
+    ...['hfix2a', 'hfix2a-item-a'].flatMap((type) =>
+      ['chromium', 'webkit'].map((engine) => {
+        const name = engine === 'chromium' ? type : `${type}-webkit`;
+        return {
+          ...node(name, tool(`verify-${type}`), [], {
+            ...report(name, type, 'result.json'),
+            engine,
+          }),
+          // Both producers can succeed in diagnostic mode; only the complete
+          // branch schedule is acceptance, regardless of the caller's shell.
+          env: { KAIRO_BROWSER: engine, HFIX2A_MODE: 'branch', HFIX2A_CASE: '' },
+        };
+      }),
+    ),
+    ...['hfix2c', 'hfix2c-contrast'].flatMap((suite) =>
+      ['chromium', 'webkit'].map((engine) => {
+        const name = engine === 'chromium' ? suite : `${suite}-webkit`;
+        const focused = suite === 'hfix2c';
+        return {
+          ...node(
+            name,
+            focused ? tool('verify-hfix2c') : 'scripts/ci/run-hfix2c-contrast-gate.mjs',
+            [],
+            {
+              ...report(
+                name,
+                focused ? 'hfix2c' : 'hfix2c-three-state-contrast',
+                focused ? 'result.json' : 'lane-admission.json',
+              ),
+              engine,
+            },
+          ),
+          env: {
+            KAIRO_BROWSER: engine,
+            ...(focused ? { HFIX2C_MODE: 'branch', HFIX2C_CASE: '', HFIX2C_BASE: '' } : {}),
+          },
+        };
+      }),
+    ),
+    ...['chromium', 'webkit'].map((engine) => {
+      const name = engine === 'chromium' ? 'hfix2d' : 'hfix2d-webkit';
+      return {
+        ...node(name, tool('verify-hfix2d'), [], { ...report(name, 'hfix2d'), engine }),
+        env: {
+          KAIRO_BROWSER: engine,
+          KAIRO_EXPECT_GITSHA: env.KAIRO_SITE_DIR
+            ? json(join(env.KAIRO_SITE_DIR, 'build-identity.json')).gitSha
+            : '',
+        },
+      };
+    }),
+    ...BATCH3_SUITES.flatMap((suite) =>
+      ['chromium', 'webkit'].map((engine) => {
+        const name = engine === 'chromium' ? suite : `${suite}-webkit`;
+        return {
+          ...node(name, `scripts/ci/run-${suite}-gate.mjs`, [], {
+            ...report(name, `batch3-${suite}`, 'lane-admission.json'),
+            engine,
+          }),
+          env: { KAIRO_BROWSER: engine },
+        };
+      }),
+    ),
     node(
       'word-saved-answer',
       tool('test-word-saved-answer'),
@@ -259,6 +364,12 @@ export function batteryGates(out, env = process.env) {
       [],
       report('word-saved-answer-controls', 'checks'),
     ),
+    {
+      ...node('word-saved-answer-mutation-controls', tool('test-word-saved-answer'), [
+        '--controls',
+      ]),
+      timeoutMs: 40 * 60 * 1000,
+    },
     node('navigation-returns', tool('test-navigation-returns')),
     node('reference-packaging', tool('test-reference-packaging')),
     node('skip-packaging', tool('test-skip-packaging')),
@@ -329,8 +440,31 @@ export function batteryGates(out, env = process.env) {
     },
     node('sentence-drafts-integration', tool('verify-sentence-drafts')),
     node('browser-audio-silence-contract', tool('browser-audio-silence.test')),
+    // V (2026-10-17). Both suites existed and neither was gated: test-approved-voice was a
+    // named by-design red, and test-excerpt-narration threw at import, so the quote audio John
+    // asked for on 09-29 had no executing test at all. voice-lock is the comparison that was
+    // missing between the renderer, the manifests and the runtime.
+    node('voice-lock', tool('verify-voice-lock'), ['--require-complete']),
+    {
+      name: 'approved-voice-contract',
+      command: process.execPath,
+      args: ['--test', tool('test-approved-voice')],
+      requiredPath: tool('test-approved-voice'),
+    },
+    {
+      name: 'excerpt-narration-contract',
+      command: process.execPath,
+      args: ['--test', tool('test-excerpt-narration')],
+      requiredPath: tool('test-excerpt-narration'),
+    },
     node('source-kanji-practice-contract', tool('source-kanji-practice.test')),
     node('source-kanji-practice-integration', tool('verify-source-kanji-practice')),
+    node(
+      'kanji-world-encounter',
+      tool('verify-kanji-world-encounter'),
+      [],
+      report('kanji-world-encounter', 'checks'),
+    ),
     {
       name: 'source-inbox-contract',
       command: process.execPath,
@@ -578,6 +712,65 @@ export function batteryGates(out, env = process.env) {
     ),
     node('import-provider', tool('verify-import-provider')),
     node('playback', tool('verify-playback')),
+    // V finisher (2026-10-17): the shipped narration through real media elements — every other
+    // playback gate replaces Audio with a double, so none had ever played a real clip. Both engines:
+    // the CI default is one, so the gate asks for all, as guided-session does
+    { ...node('narration-media', tool('verify-narration-media')), env: { KAIRO_BROWSER: 'all' } },
+    // F (2026-10-18): one type ladder and one ruby — a reading 10 px or more at half its word, never touching, a gloss
+    // 13 px or more, at 200 % text too — and the two continuity moves (the shelf picture becomes the reader's picture;
+    // the deck's next card arrives the way the last one left). Both engines: WebKit is the referee
+    { ...node('type-ruby', tool('verify-type-ruby')), env: { KAIRO_BROWSER: 'all' } },
+    { ...node('continuity', tool('verify-continuity')), env: { KAIRO_BROWSER: 'all' } },
+    // R3 (2026-10-18): the sense a word's text uses, for every one of the reviewed taps, the flash while a sense is still to
+    // come, and the class sweeps. One gate per engine: each runs 15–25 minutes, past the battery's default, so each
+    // carries its own floor, twice its longest healthy run (battery.test: a measured run stays under half its timeout)
+    {
+      ...node('sense-truth', tool('verify-sense-truth')),
+      env: { KAIRO_BROWSER: 'chromium' },
+      timeoutMs: 60 * 60 * 1000,
+    },
+    {
+      ...node('sense-truth-webkit', tool('verify-sense-truth')),
+      env: { KAIRO_BROWSER: 'webkit' },
+      timeoutMs: 60 * 60 * 1000,
+    },
+    // VH-1: one gate per engine. Three run past the battery's default, so each carries its own floor, at least twice its
+    // longest healthy run: reader-doors with its controls (831 s WebKit), the Speak negatives one mutant at a time
+    // (1,104 s WebKit, 22 controls) and reading-truth's full sweep (2,149–2,388 s; 4,801 s under fleet load)
+    ...['chromium', 'webkit'].flatMap((engine) => {
+      const suffix = engine === 'webkit' ? '-webkit' : '';
+      return [
+        ['record-depth', 'verify-record-depth', ['--controls']],
+        ['speak', 'verify-speak', []],
+        ['speak-negatives', 'verify-speak', ['--negatives'], 60 * 60 * 1000],
+        ['vh-sense-controls', 'verify-vh-sense-controls', []],
+        ['reader-doors', 'verify-reader-doors', [], 40 * 60 * 1000],
+        ['reading-truth', 'verify-reading-truth', [], 3 * 60 * 60 * 1000],
+        ['comb-0', 'verify-comb-0', []],
+        ['sweep', 'verify-sweep', []],
+        ['contrast-sweep', 'verify-contrast-sweep', []],
+        ['design-reader-shelf', 'verify-design-reader-shelf', []],
+      ].map(([name, file, args, floor]) => ({
+        ...node(name + suffix, tool(file), args),
+        env: { KAIRO_BROWSER: engine },
+        ...(floor ? { timeoutMs: floor } : {}),
+      }));
+    }),
+    node('vh-voice-controls', tool('verify-vh-voice-controls')),
+    // G1–G6 (one-hand): the word's grammar — the page and its cut (G1), depth and the help ledger (G2), the tap ladder
+    // (G3), ink (G4), hold = seal (G5) and the scale thread (G6) — with every slice's negative controls. One gate per
+    // engine: each runs 22–25 minutes with controls (site-5: 1,309 s Chromium, 1,521 s WebKit), so each carries its own
+    // floor, twice its longest healthy run
+    {
+      ...node('word-grammar', tool('verify-word-grammar'), ['--controls']),
+      env: { KAIRO_BROWSER: 'chromium' },
+      timeoutMs: 60 * 60 * 1000,
+    },
+    {
+      ...node('word-grammar-webkit', tool('verify-word-grammar'), ['--controls']),
+      env: { KAIRO_BROWSER: 'webkit' },
+      timeoutMs: 60 * 60 * 1000,
+    },
     // the living-thread guided session (operator-approved 2026-09-23): journey, real deck, moments
     { ...node('guided-session', tool('verify-guided-session')), env: { KAIRO_BROWSER: 'all' } },
     // …its engine rules and set-versus-bank checks, and its offline and single-file claims
@@ -687,6 +880,25 @@ export function batteryGates(out, env = process.env) {
     node('kagami', tool('verify-kagami')),
     // card-system slice 1: the button, the counts and the session are one queue; three presets
     node('srs-today', tool('verify-srs-today')),
+    // SRS FULLPROOF: does a card come back when it promised, on every surface (the deck player, the saved-word review,
+    // the context deck, your own texts), with its negative controls; one gate per engine, each with its own floor,
+    // over twice its longest healthy run (36 min Chromium, 37 min WebKit, both with controls, 10-19)
+    {
+      ...node('srs-conformance', tool('verify-srs-conformance'), [], {
+        ...report('srs-conformance', 'srs-conformance', 'srs-conformance.json'),
+        engine: 'chromium',
+      }),
+      env: { KAIRO_BROWSER: 'chromium' },
+      timeoutMs: 80 * 60 * 1000,
+    },
+    {
+      ...node('srs-conformance-webkit', tool('verify-srs-conformance'), [], {
+        ...report('srs-conformance-webkit', 'srs-conformance', 'srs-conformance.json'),
+        engine: 'webkit',
+      }),
+      env: { KAIRO_BROWSER: 'webkit' },
+      timeoutMs: 80 * 60 * 1000,
+    },
     node(
       'native-readings',
       tool('verify-native-readings'),
@@ -749,11 +961,44 @@ export function batteryGates(out, env = process.env) {
       'search-fallback-core',
       'search-fallback-ui',
       'standalone-journey',
+      'kanji-trust',
+      'hfix2a',
+      'hfix2a-item-a',
+      'srs-conformance',
+      'hfix2c',
+      'hfix2c-three-state-contrast',
+      'hfix2d',
+      ...BATCH3_REPORT_TYPES,
     ].includes(gate.report?.type)
       ? {
           report: {
             ...gate.report,
             artifactSha256: env.KAIRO_VERIFIED_ARTIFACT_SHA256,
+            ...([
+              'hfix2a',
+              'hfix2a-item-a',
+              'hfix2c',
+              'hfix2c-three-state-contrast',
+              'hfix2d',
+              ...BATCH3_REPORT_TYPES,
+            ].includes(gate.report.type)
+              ? {
+                  siteIdentity: env.KAIRO_SITE_DIR
+                    ? json(join(env.KAIRO_SITE_DIR, 'build-identity.json'))
+                    : null,
+                }
+              : {}),
+            ...([
+              'hfix2c',
+              'hfix2c-three-state-contrast',
+              'hfix2d',
+              ...BATCH3_REPORT_TYPES,
+            ].includes(gate.report.type)
+              ? { siteDir: env.KAIRO_SITE_DIR ? resolve(env.KAIRO_SITE_DIR) : null }
+              : {}),
+            ...(gate.report.type === 'kanji-trust'
+              ? { siteDir: env.KAIRO_SITE_DIR ? resolve(env.KAIRO_SITE_DIR) : null }
+              : {}),
             ...(gate.report.type === 'standalone-journey'
               ? {
                   siteDir: env.KAIRO_SITE_DIR ? resolve(env.KAIRO_SITE_DIR) : null,
@@ -775,6 +1020,9 @@ export function batteryGates(out, env = process.env) {
                     : null,
                 }
               : {}),
+            ...(gate.report.type === 'native'
+              ? { readerEnglishRungSources: englishSourcePins(ROOT) }
+              : {}),
             ...(['drift-hunt', 'native'].includes(gate.report.type) ? { engine: 'chromium' } : {}),
             ...([
               'drift-hunt',
@@ -792,6 +1040,13 @@ export function batteryGates(out, env = process.env) {
               'search-fallback-core',
               'search-fallback-ui',
               'standalone-journey',
+              'hfix2a',
+              'hfix2a-item-a',
+              'srs-conformance',
+              'hfix2c',
+              'hfix2c-three-state-contrast',
+              'hfix2d',
+              ...BATCH3_REPORT_TYPES,
             ].includes(gate.report.type)
               ? {
                   sourceSha256: existsSync(resolve(ROOT, gate.requiredPath))
@@ -804,7 +1059,9 @@ export function batteryGates(out, env = process.env) {
           },
         }
       : {}),
-    timeoutMs: timeoutMs(env.KAIRO_BATTERY_TIMEOUT_MS),
+    // a gate that runs longer than the battery's default carries its own floor; the battery's own timeout still rules the
+    // rest, and a longer one raises every gate
+    timeoutMs: Math.max(timeoutMs(env.KAIRO_BATTERY_TIMEOUT_MS), gate.timeoutMs || 0),
     env: {
       ...(env.KAIRO_SITE_DIR
         ? { KAIRO_SITE_DIR: env.KAIRO_SITE_DIR, KAIRO_ASSESSMENT_SITE_DIR: env.KAIRO_SITE_DIR }
@@ -867,6 +1124,22 @@ const RECORD_GATE_CASES = {
     'word-review-shows-and-binds-its-saved-answer',
     'word-review-unavailable-face-refuses-grades-and-writes-nothing',
     'word-review-changed-answer-refuses-both-producers-and-asks-for-a-fresh-look',
+    // INT-VH (2026-10-19): G2's twelve rows (7523134f, on VH-1's base 384d4a70) run in every mode, --browser included,
+    // but were missing here, so no receipt of the current producer could be admitted. Added with the producer's names.
+    'g2-definitions-lifted-from-the-authored-source',
+    'g2-identity-is-the-word-as-it-reads-never-the-spelling-alone',
+    'g2-depth-boundaries-need-stability-and-present-recall',
+    'g2-a-different-reading-or-entry-is-at-most-met-and-never-rings',
+    'g2-golden-訳-read-やく-never-inherits-わけ',
+    'g2-not-yet-outranks-until-an-unrevoked-good-review-after-it',
+    'g2-kept-is-review-or-a-list-for-the-same-word-only',
+    'g2-a-look-up-writes-the-encounter-ledger-only-once-a-day',
+    'g2-his-correction-writes-met-only-and-toggles',
+    'g2-the-roots-validate-strictly-and-keep-later-versions',
+    'g2-help-per-1000-characters-counts-first-readings-once',
+    'g2-a-kept-word-answers-cold-from-its-own-card',
+    // INT-VH: Hfix-1B (L-1) — Me reads one count, so unaided never exceeds read
+    'hfix1b-me-reads-one-count-so-unaided-never-exceeds-read',
   ],
   learningBrowser: [
     'quiz-answer-rejection-and-reload-preserve-the-unanswered-question',
@@ -1023,9 +1296,10 @@ const OFFLINE_GATE_CASES = [
 
 const HUNT_GATE_CASES = [
   'hunt · a lifting pinch finger never grades the word beneath a third finger',
-  'hunt · explainer taps do not dismantle the world beneath it',
-  'hunt · the explainer close button is reachable by a finger',
-  'hunt · the explainer closes without navigating the app away',
+  'hunt · shared entry explanation taps do not dismantle the canvas dive',
+  'hunt · the shared entry Back control is reachable by a finger',
+  'hunt · shared entry Back restores the exact stage and canvas dive',
+  'hunt · the dive’s centre follows reading, stage and page; Back restores stage and folding keeps the dive',
   'hunt · a slow drag on water inside a dive does not surface a level',
   'hunt · a long press on water inside a dive does not surface a level',
   'hunt · pointercancel leaves no ghost drag offset',
@@ -1036,13 +1310,15 @@ const HUNT_GATE_CASES = [
   'hunt · tapping a constellation label answers instead of razing it',
   'hunt · a 44px near-miss under a lock forgives instead of razing',
   'hunt · a release on a hub sun releases the constellation instead of diving',
-  'hunt · a finger the gesture never owned cannot carry a held word',
+  'hunt · a foreign finger cannot carry the owned word after its shared stage folds',
   'hunt · a held finger keeps a constellation alive past the 10s fade',
-  'hunt · a corpus-backed semantic member is staged, hit-testable DOM interaction',
+  'hunt · a corpus-backed semantic member is staged, hit-testable DOM interaction (reading then shared stage, same lock identity)',
   'hunt · a kana-only word focuses cleanly and its bloom admits no strangers',
   'hunt · a foreign pointermove cannot drag a touch-held word',
-  'hunt · a replacement pinch pair rebases before its first translated move',
-  'hunt · a rebased replacement pair remains a live pinch',
+  'hunt · a canceled three-pointer hand does not jump when a remainder moves',
+  'hunt · a canceled three-pointer hand cannot revive before all physical pointers end',
+  'hunt · a fully released canceled hand admits exactly one fresh native scale crossing',
+  'hunt · the fresh-hand visible inverse restores the retained sky place without record changes',
   'hunt · a stationary active pointer prevents bloom lifecycle expiry beneath it',
   'hunt · foreign cancel cannot erase a tracked hand or its bloom lifecycle',
   'hunt · node-down/far-up without a delivered move is not a tap, drag, or grade',
@@ -1489,12 +1765,13 @@ const NATIVE_GATE_CASES = [
     'no request, console, or page errors across the run',
     'all completion and bookmark state persists in the native learner record',
     'the 日本語のみ chrome renders no English titles',
-    // 未確認 once per section (operator's review, 2026-10-01): each masthead counts the pending stories
-    'the 日本語のみ masthead says 未確認 once, counting every human-review-pending story',
-    'every human-review-pending story wears 未確認 in its reader meta line',
+    // S (John, 2026-10-16: "no one wants to see a made by ai in red"): no provenance on the shelf or in any reader meta —
+    // these mirror verify-native-readings' rewritten cases; they pinned 未確認 said once per masthead and worn per story
+    'the 日本語のみ shelf says nothing of how its stories were made (no note, no AI作成 / 未確認), pending stories or not',
+    'no human-review-pending story wears a provenance mark in its reader meta or facts',
     'all 30 native completions and exact bookmarks survive a real page reload',
     'the bilingual shelf renders every English title from the records themselves, today’s six included',
-    'the bilingual masthead says 未確認 once, counting every human-review-pending story of the shelf',
+    'the bilingual shelf says nothing of how its stories were made (no note, no Made by AI), pending stories or not',
     'the bilingual shelf pass added no request, console, or page errors',
   ].map((name) => ({ name, articleId: null })),
   {
@@ -1580,6 +1857,10 @@ const STANDALONE_RECORD_MODULES = [
   './record-app.mjs',
   './record-sync.mjs',
   './modules/record-core.mjs',
+  './srs-core.mjs',
+  './review-caller.mjs',
+  './help-relevance.mjs',
+  './journey-lifecycle.mjs',
 ];
 const PRACTICE_HISTORY_CASES = [
   'two-completed-attempts-and-failed-save-actions',
@@ -1607,7 +1888,159 @@ function requireNamedCases(rows, names, field = 'pass', accepted = true) {
   );
 }
 
+export function validateKanjiTrustReport(value, { engine, artifactSha256, siteDir }) {
+  const expectedRows = [
+    'K01-sei',
+    'K01-kai',
+    'K01-o',
+    'K01-official',
+    'K01-joyo-forms',
+    'K01-stroke-extended',
+    'K01-stroke-official',
+    'K01-stroke-failed',
+    'K03-lookup',
+    'K04-kodansha',
+    'K05-frequency',
+    'K05-reading-all',
+    'K05-nested-return',
+    'K05-nested-search-page',
+    'K05-idioms',
+    'K05-parts',
+    'K07-words',
+    'K06-load',
+    'K08-lessons',
+  ];
+  assert.equal(value.schemaVersion, 1, 'Unknown Kanji-trust receipt version');
+  assert.equal(value.control, null, 'A mutant Kanji-trust run is not an acceptance');
+  assert.equal(value.failures, 0, 'Kanji-trust reports failures');
+  assert(['chromium', 'webkit'].includes(engine), 'Kanji-trust engine must be pinned');
+  assert(Array.isArray(value.results), 'Kanji-trust has no engine results');
+  assert.deepEqual(
+    value.results.map((result) => result.engine),
+    [engine],
+    'Foreign or extra engine',
+  );
+  const rows = value.results[0].rows;
+  assert(Array.isArray(rows), 'Kanji-trust has no completed rows');
+  assert.deepEqual(
+    rows.map((row) => row.row),
+    expectedRows,
+    'Incomplete or reordered Kanji-trust run',
+  );
+  assert(
+    rows.every((row) => row.pass === true),
+    'Kanji-trust contains a failed row',
+  );
+  assert.match(artifactSha256 || '', /^[a-f0-9]{64}$/u, 'Kanji-trust artifact must be pinned');
+  assert.equal(value.artifactSha256, artifactSha256, 'Foreign Kanji-trust artifact');
+  assert.equal(typeof siteDir, 'string', 'Kanji-trust site must be pinned');
+  assert(isAbsolute(siteDir), 'Kanji-trust site must be absolute');
+  assert.equal(value.site, siteDir, 'Foreign Kanji-trust site');
+  return true;
+}
+
+export function validateHfix2aReport(
+  value,
+  { type, engine, artifactSha256, sourceSha256, siteIdentity },
+) {
+  assert(['hfix2a', 'hfix2a-item-a'].includes(type), 'Unknown Hfix-2a report type');
+  assert(['chromium', 'webkit'].includes(engine), 'Hfix-2a engine must be pinned');
+  assert.equal(value.engine, engine, 'Foreign Hfix-2a engine');
+  assert.equal(value.mode, 'branch', 'A diagnostic Hfix-2a run is not acceptance');
+  assert.match(artifactSha256 || '', /^[a-f0-9]{64}$/u, 'Hfix-2a artifact must be pinned');
+  assert.match(sourceSha256 || '', /^[a-f0-9]{64}$/u, 'Hfix-2a verifier must be pinned');
+  assert.equal(siteIdentity?.schemaVersion, 1, 'Hfix-2a build identity must be pinned');
+  assert.equal(siteIdentity.product, 'KAIRO');
+  assert.equal(siteIdentity.artifactSha256, artifactSha256, 'Hfix-2a build pin disagrees');
+  assert.deepEqual(value.identity, siteIdentity, 'Foreign Hfix-2a build identity');
+  assert.equal(value.verifierSha256, sourceSha256, 'Foreign Hfix-2a verifier');
+  const rows = type === 'hfix2a' ? value.results : value.rows;
+  const names =
+    type === 'hfix2a'
+      ? ['X11', 'X16', 'KT2', 'M1']
+      : ['context', 'guided', 'personal', 'fresh', 'empty-personal', 'cancel'];
+  assert(Array.isArray(rows), 'Hfix-2a has no completed rows');
+  assert.deepEqual(
+    rows.map((row) => row.name),
+    names,
+    'Incomplete or reordered Hfix-2a run',
+  );
+  assert(
+    rows.every((row) => row.pass === true),
+    'Hfix-2a contains a failed row',
+  );
+  if (type === 'hfix2a-item-a') {
+    assert.equal(value.pass, true, 'Hfix-2a item A did not pass');
+    assert.deepEqual(value.errors, [], 'Hfix-2a item A reported errors');
+    assert.deepEqual(value.mutations, [], 'Hfix-2a item A ran a mutant');
+  } else {
+    assert(
+      rows.every((row) => row.error === null),
+      'Hfix-2a reported a row error',
+    );
+    assert(
+      typeof value.version === 'string' && value.version.length > 0,
+      'Hfix-2a browser version missing',
+    );
+    assert.deepEqual(
+      value.viewport,
+      engine === 'webkit' ? { width: 390, height: 844 } : { width: 1440, height: 900 },
+      'Foreign Hfix-2a viewport',
+    );
+    assert.deepEqual(
+      rows[3].detail?.safety,
+      [
+        'cancel-preserves-record-and-binding',
+        'source-draft',
+        'deck-ledger',
+        'malformed-backup',
+        'interruption-prefix-0',
+        'interruption-prefix-1',
+        'interruption-prefix-2',
+        'interruption-prefix-3',
+      ],
+      'Incomplete Hfix-2a adoption safety coverage',
+    );
+    assert(Array.isArray(value.mutations), 'Hfix-2a recovery controls missing');
+    assert.deepEqual(
+      value.mutations.map((row) => row.row),
+      ['M1-interrupt--1', 'M1-interrupt-0', 'M1-interrupt-1', 'M1-interrupt-2'],
+      'Incomplete Hfix-2a recovery controls',
+    );
+    const bindingSha = siteIdentity.files?.find(
+      (file) => file.path === 'record-binding.mjs',
+    )?.sha256;
+    assert.match(bindingSha || '', /^[a-f0-9]{64}$/u, 'Hfix-2a recovery source must be pinned');
+    for (const mutation of value.mutations) {
+      assert.equal(mutation.original, bindingSha, 'Hfix-2a recovery control used another source');
+      assert.match(mutation.served || '', /^[a-f0-9]{64}$/u, 'Hfix-2a recovery mutation missing');
+      assert.notEqual(
+        mutation.served,
+        mutation.original,
+        'Hfix-2a recovery control did not mutate',
+      );
+    }
+  }
+  return true;
+}
+
+/** English-only supplement; the native branch retains every pre-existing assertion. */
+export function validateNativeReaderEnglishRung(
+  value,
+  { readerEnglishRungSources, artifactSha256, engine },
+) {
+  return validateReaderEnglishEvidence(value.readerEnglishRung, {
+    root: ROOT,
+    sources: readerEnglishRungSources,
+    usage: 'native',
+    artifactSha256,
+    engine,
+    articleIds: NATIVE_ARTICLE_IDS,
+  });
+}
+
 function requireCompleteReport({
+  runId,
   path,
   type,
   engine,
@@ -1618,7 +2051,9 @@ function requireCompleteReport({
   sourceAssetSha256,
   builderSha256,
   siteDir,
+  siteIdentity,
   practiceSource,
+  readerEnglishRungSources,
   mode,
 }) {
   let receiptPath = path;
@@ -1652,6 +2087,83 @@ function requireCompleteReport({
       'Check count disagrees with the receipt',
     );
     assert.equal(value.summary?.failed, 0, 'Receipt reports failures');
+  } else if (type === 'kanji-trust') {
+    validateKanjiTrustReport(value, { engine, artifactSha256, siteDir });
+  } else if (type === 'hfix2a' || type === 'hfix2a-item-a') {
+    validateHfix2aReport(value, { type, engine, artifactSha256, sourceSha256, siteIdentity });
+  } else if (type === 'srs-conformance') {
+    // SRS FULLPROOF: every row green and every negative control caught, for this gate's engine, on the pinned artifact
+    // by the pinned verifier; a targeted (--only) run is never an acceptance
+    assert.equal(value.format, 'bunki-srs-conformance', 'Not an SRS conformance receipt');
+    assert.equal(value.version, 1, 'Unknown SRS conformance receipt version');
+    assert.equal(value.only, null, 'A targeted SRS run is never an acceptance');
+    assert.deepEqual(value.engines, [engine], 'The SRS receipt is for another engine');
+    assert(
+      Array.isArray(value.results) && value.results.length >= 30,
+      'The SRS receipt has too few checks',
+    );
+    assert.equal(
+      new Set(value.results.map((row) => row.name)).size,
+      value.results.length,
+      'Duplicate SRS checks',
+    );
+    assert(
+      value.results.every((row) => row.pass === true),
+      'The SRS receipt contains a failed check',
+    );
+    assert(
+      Array.isArray(value.controls) && value.controls.length >= 10,
+      'The SRS receipt has too few controls',
+    );
+    assert(
+      value.controls.every((control) => control.caught === true),
+      'An SRS negative control was not caught',
+    );
+    assert.equal(value.pass, true, 'The SRS receipt does not pass');
+    assert(
+      artifactSha256 && value.artifactSha256 === artifactSha256,
+      'The SRS receipt is for another artifact',
+    );
+    assert(
+      sourceSha256 && value.verifierSha256 === sourceSha256,
+      'The SRS receipt is from another verifier',
+    );
+  } else if (type === 'hfix2c' || type === 'hfix2c-three-state-contrast') {
+    const pins = loadHfix2cPins({ root: ROOT, siteDir, engine, runId });
+    assert.equal(pins.artifactSha256, artifactSha256, 'Hfix-2c descriptor artifact differs');
+    assert.deepEqual(pins.identity, siteIdentity, 'Hfix-2c descriptor identity differs');
+    assert.equal(
+      sourceSha256,
+      type === 'hfix2c' ? pins.sources.focused : pins.sources.wrapper,
+      'Hfix-2c descriptor source differs',
+    );
+    if (type === 'hfix2c') validateHfix2cFocused(value, pins);
+    else validateHfix2cLaneAdmission(value, dirname(path), pins);
+  } else if (BATCH3_REPORT_TYPES.includes(type)) {
+    const suite = type.slice('batch3-'.length);
+    const pins = loadBatch3Pins({ root: ROOT, siteDir, suite, engine, runId });
+    assert.equal(
+      pins.identity.artifactSha256,
+      artifactSha256,
+      'Batch 3 descriptor artifact differs',
+    );
+    assert.deepEqual(pins.identity, siteIdentity, 'Batch 3 descriptor identity differs');
+    assert.equal(
+      sourceSha256,
+      pins.sources[`scripts/ci/run-${suite}-gate.mjs`],
+      'Batch 3 descriptor source differs',
+    );
+    validateBatch3Admission(value, dirname(path), pins);
+  } else if (type === 'hfix2d') {
+    const pins = loadHfix2dPins({ root: ROOT, siteDir, engine, runId });
+    assert.equal(pins.artifactSha256, artifactSha256, 'Hfix-2d descriptor artifact differs');
+    assert.equal(
+      digest(JSON.stringify(pins.identity)),
+      digest(JSON.stringify(siteIdentity)),
+      'Hfix-2d descriptor identity differs',
+    );
+    assert.equal(sourceSha256, pins.verifierSha256, 'Hfix-2d descriptor source differs');
+    validateHfix2dReport(value, pins);
   } else if (type === 'teaching-context' || type === 'ai-adaptation') {
     assert.equal(
       value.suite,
@@ -1882,6 +2394,7 @@ function requireCompleteReport({
       );
     assert.deepEqual(value.failures, [], 'Native reading receipt reports failures');
     assert.deepEqual(value.noise, [], 'Native reading receipt reports browser errors');
+    validateNativeReaderEnglishRung(value, { readerEnglishRungSources, artifactSha256, engine });
   } else if (
     [
       'shelf-search',
@@ -2159,27 +2672,108 @@ function requireCompleteReport({
   }
 }
 
-async function runGate(gate, root, out, signal) {
+async function runGate(gate, root, out, signal, boundary = {}) {
   const log = join(out, `${gate.name}.log`);
   const startedAt = now();
-  writeFileSync(log, `${gate.command} ${gate.args.join(' ')}\n`);
-  const finish = (status, exitCode, detail = '', processExitCode = null) => ({
-    name: gate.name,
-    status,
-    exitCode,
-    processExitCode,
-    detail,
-    log,
-    startedAt,
-    completedAt: now(),
-  });
+  const runId = randomUUID();
+  const attemptPath = join(out, `${gate.name}.attempt.json`);
+  const stdoutPath = join(out, `${gate.name}.stdout.json`);
+  let proof = null;
+  let declaration, invocation, instrumentation, commandBefore, sourceBefore, fd, stdoutFd;
+  writeFileSync(log, '');
+  const finish = (status, exitCode, detail = '', processExitCode = null) => {
+    const result = {
+      name: gate.name,
+      runId,
+      attemptReceipt: attemptPath,
+      status,
+      exitCode,
+      processExitCode,
+      detail,
+      log,
+      startedAt,
+      completedAt: now(),
+      proof,
+    };
+    if (status === 'passed') {
+      result.evidenceReceipt = {
+        schemaVersion: 1,
+        kind: 'bunki-gate-evidence',
+        name: gate.name,
+        runId,
+        gitSha: boundary.gitSha || null,
+        artifactSha256: boundary.artifactSha256 || null,
+        fullAcceptance: true,
+        proof,
+      };
+      result.evidenceReceiptSha256 = digest(JSON.stringify(result.evidenceReceipt));
+    }
+    writeJson(attemptPath, {
+      schemaVersion: 1,
+      kind: 'bunki-gate-attempt',
+      ...result,
+      declaredInvocation: {
+        command: gate.command,
+        args: gate.args,
+        cwd: gate.cwd || '.',
+        env: { ...gate.env },
+      },
+      invocation: instrumentation
+        ? {
+            command: invocation.command,
+            args: invocation.args,
+            cwd: resolve(root, gate.cwd || '.'),
+            env: { KAIRO_BROWSER: 'chromium', ...invocation.env, KAIRO_GATE_RUN_ID: runId },
+            instrumentation,
+          }
+        : null,
+      candidate: boundary.source || null,
+    });
+    return result;
+  };
   if (gate.requiredPath && !existsSync(resolve(root, gate.requiredPath))) {
     return finish('missing', 127, `Required path is missing: ${gate.requiredPath}`);
   }
-  const fd = openSync(log, 'a');
+  const producer =
+    gate.requiredPath &&
+    existsSync(resolve(root, gate.requiredPath)) &&
+    lstatSync(resolve(root, gate.requiredPath)).isFile()
+      ? resolve(root, gate.requiredPath)
+      : null;
+  const verifierSha256 = producer ? digest(readFileSync(producer)) : null;
+  try {
+    declaration = gateEvidenceDeclaration(gate, root, out);
+    sourceBefore = sourceSnapshot(root);
+    assert.deepEqual(
+      sourceBefore,
+      boundary.sourceSnapshot,
+      'Source/input tree differs from the initial battery snapshot',
+    );
+    if (declaration.path)
+      assert(!existsSync(declaration.path), 'Preexisting receipt rejected before launch');
+    const evidenceDirectory = join(out, gate.name);
+    assert(
+      !existsSync(evidenceDirectory) || readdirSync(evidenceDirectory).length === 0,
+      'Gate evidence directory must be fresh',
+    );
+    invocation = evidenceInvocation(gate, declaration, root);
+    instrumentation = requireApprovedInvocation(gate, declaration, invocation, root);
+    writeFileSync(log, `${invocation.command} ${invocation.args.join(' ')}\n`);
+    if (declaration.kind === 'command-check') commandBefore = commandCheckEvidence(gate, root);
+    fd = openSync(log, 'a');
+    stdoutFd = openSync(stdoutPath, 'wx');
+  } catch (error) {
+    if (fd !== undefined) closeSync(fd);
+    return finish('incomplete', 78, error.message);
+  }
+  const tee = (chunk) => {
+    for (const target of [stdoutFd, fd])
+      for (let at = 0; at < chunk.length;) at += writeSync(target, chunk, at);
+  };
   let child;
   let timer;
   let killTimer;
+  let drainTimer;
   let killed = null;
   let stopPromise = Promise.resolve();
   const killGroup = (kind) => {
@@ -2199,6 +2793,7 @@ async function runGate(gate, root, out, signal) {
     stopPromise = new Promise((accept) => {
       killTimer = setTimeout(() => {
         killGroup('SIGKILL');
+        child?.stdout?.destroy();
         accept();
       }, 250);
     });
@@ -2207,11 +2802,15 @@ async function runGate(gate, root, out, signal) {
   let result;
   try {
     result = await new Promise((accept) => {
-      child = spawn(gate.command, gate.args, {
+      child = spawn(invocation.command, invocation.args, {
         cwd: resolve(root, gate.cwd || '.'),
-        env: { ...process.env, ...gate.env },
-        stdio: ['ignore', fd, fd],
+        env: { ...acceptanceEnvironment(process.env, invocation.env), KAIRO_GATE_RUN_ID: runId },
+        stdio: ['ignore', 'pipe', fd],
         detached: process.platform !== 'win32',
+      });
+      child.stdout?.on('data', tee);
+      child.once('exit', () => {
+        drainTimer = setTimeout(() => child.stdout?.destroy(), 2000);
       });
       child.once('error', (error) => accept({ error }));
       child.once('close', (code, processSignal) => accept({ code, processSignal }));
@@ -2224,20 +2823,51 @@ async function runGate(gate, root, out, signal) {
   } finally {
     clearTimeout(timer);
     clearTimeout(killTimer);
+    clearTimeout(drainTimer);
     signal?.removeEventListener('abort', abort);
+    child?.stdout?.destroy();
     closeSync(fd);
+    closeSync(stdoutFd);
   }
   if (killed)
     return finish(killed, killed === 'timed-out' ? 124 : 130, `Gate ${killed}`, result.code);
   if (result.error) return finish('missing', 127, result.error.message);
   if (result.code !== 0)
     return finish('failed', result.code || 1, result.processSignal || '', result.code);
-  if (gate.report) {
-    try {
-      requireCompleteReport(gate.report);
-    } catch (error) {
-      return finish('incomplete', 78, error.message, 0);
-    }
+  try {
+    if (producer)
+      assert.equal(
+        digest(readFileSync(producer)),
+        verifierSha256,
+        'Verifier source changed during execution',
+      );
+    const sourceAfter = sourceSnapshot(root);
+    assert.deepEqual(sourceAfter, sourceBefore, 'Source/input tree changed during gate execution');
+    proof = validateGateEvidence(
+      gate,
+      declaration,
+      {
+        ...boundary,
+        root,
+        out,
+        startedAt,
+        runId,
+        stdoutPath,
+        commandBefore,
+        processExitCode: result.code,
+        engine: gate.env?.PERSONAL_HOST_BROWSER || gate.env?.KAIRO_BROWSER || 'chromium',
+        verifierSha256,
+        gitSha: boundary.gitSha,
+        sourceVerifiedBeforeAndAfter: sourceBefore !== null,
+        sourceBefore,
+        sourceAfter,
+        env: invocation.env,
+        environment: invocation.env,
+      },
+      (report) => requireCompleteReport({ ...report, runId }),
+    );
+  } catch (error) {
+    return finish('incomplete', 78, error.message, 0);
   }
   return finish('passed', 0, '', 0);
 }
@@ -2287,16 +2917,95 @@ export async function runGates({ gates, root, out, source = null, signal }) {
       ].join('\n'),
     );
   };
+  const boundary = { source };
+  boundary.sourceSnapshot = sourceSnapshot(root);
+  boundary.gitSha = boundary.sourceSnapshot?.head || null;
+  if (source?.sha) {
+    assert(boundary.gitSha, 'Declared source requires an actual checkout rooted at the gate root');
+    assert.equal(source.sha, boundary.gitSha, 'Declared source SHA differs from actual HEAD');
+  }
+  receipt.sourceBefore = boundary.sourceSnapshot;
+  boundary.producerHashes = Object.fromEntries(
+    [
+      'prototypes/corridor/tools/verify-sense-truth.mjs',
+      'prototypes/corridor/tools/verify-speak.mjs',
+    ]
+      .filter((p) => existsSync(resolve(root, p)))
+      .map((p) => [p, digest(readFileSync(resolve(root, p)))]),
+  );
+  if (existsSync(resolve(root, 'prototypes/corridor/corridor.js')))
+    boundary.sourceSha256 = digest(readFileSync(resolve(root, 'prototypes/corridor/corridor.js')));
+  boundary.sourceHashes = Object.fromEntries(
+    [
+      'prototypes/corridor/tools/verify-record-binding.mjs',
+      'prototypes/corridor/record-binding.mjs',
+    ]
+      .filter((p) => existsSync(resolve(root, p)))
+      .map((p) => [resolve(root, p), digest(readFileSync(resolve(root, p)))]),
+  );
+
+  if (source?.site) {
+    const verified = verifyArtifact(source.site);
+    assert.equal(verified.artifactSha256, source.artifactSha256, 'Requested artifact differs');
+    const manifest = json(join(source.site, 'build-identity.json'));
+    assert.equal(manifest.gitSha, boundary.gitSha, 'Artifact and source HEAD differ');
+    Object.assign(boundary, {
+      site: source.site,
+      artifactSha256: verified.artifactSha256,
+      runtimeFiles: manifest.files,
+      artifactVerifiedBeforeAndAfter: true,
+      readArtifactJson: (path) => json(join(source.site, path)),
+    });
+    receipt.artifactBefore = verified;
+  }
   persist();
   for (const [index, gate] of gates.entries()) {
     if (signal?.aborted) break;
     receipt.gates[index] = { name: gate.name, status: 'running' };
     persist();
-    receipt.gates[index] = await runGate(gate, root, out, signal);
+    receipt.gates[index] = await runGate(gate, root, out, signal, boundary);
     persist();
     console.log(
       `[battery] ${gate.name} -> ${receipt.gates[index].status} (${receipt.gates[index].exitCode})`,
     );
+  }
+  const invalidatePassed = (detail) => {
+    for (const gate of receipt.gates)
+      if (gate.status === 'passed') {
+        gate.status = 'incomplete';
+        gate.exitCode = 78;
+        gate.detail = detail;
+        gate.proof = null;
+        delete gate.evidenceReceipt;
+        delete gate.evidenceReceiptSha256;
+        if (gate.attemptReceipt)
+          writeJson(gate.attemptReceipt, {
+            ...json(gate.attemptReceipt),
+            ...gate,
+            evidenceReceipt: null,
+            evidenceReceiptSha256: null,
+          });
+      }
+  };
+  try {
+    receipt.sourceAfter = sourceSnapshot(root);
+    assert.deepEqual(
+      receipt.sourceAfter,
+      receipt.sourceBefore,
+      'Source/input tree changed across the battery',
+    );
+  } catch (error) {
+    receipt.sourceBoundaryError = String(error.message);
+    invalidatePassed('Source boundary failed: ' + error.message);
+  }
+  if (source?.site) {
+    try {
+      receipt.artifactAfter = verifyArtifact(source.site);
+      assert.equal(receipt.artifactAfter.artifactSha256, receipt.artifactBefore.artifactSha256);
+    } catch (error) {
+      receipt.artifactBoundaryError = String(error.message);
+      invalidatePassed('Artifact boundary failed: ' + error.message);
+    }
   }
   receipt.status = signal?.aborted
     ? 'interrupted'
@@ -2320,10 +3029,48 @@ async function verifyRunner(out) {
   const invoke = (name, gates, interruptAfterMs) => {
     const evidence = join(out, name);
     const config = join(fixtures, `${name}.json`);
+    // Synthetic reports must be emitted by this fixture child inside this run,
+    // just as real producer reports must; parent-staged siblings are not fresh evidence.
+    gates = gates.map((item) => {
+      if (!item.report) return item;
+      const old = item.report.path,
+        target = join(evidence, `${item.name}-report.json`);
+      const args = item.args.map((arg) => arg.replaceAll(old, target));
+      if (existsSync(old)) {
+        const at = args.indexOf('-e');
+        assert(at >= 0, 'Report fixture must be an explicit child program');
+        let payload = lstatSync(old).isFile() ? readFileSync(old, 'utf8') : null;
+        let sidecars = '';
+        if (item.report.type === 'record-practice-finalize' && payload !== null) {
+          // Relocate the complete synthetic report bundle, preserving missing,
+          // malformed and symlinked sidecars for the existing rejection controls.
+          payload = payload.replaceAll(fixtures + '/', evidence + '/');
+          for (const engine of ['chromium', 'webkit']) {
+            const source = join(fixtures, engine),
+              destination = join(evidence, engine);
+            if (existsSync(source))
+              sidecars += `require('node:fs').cpSync(${JSON.stringify(source)},${JSON.stringify(destination)},{recursive:true,verbatimSymlinks:true});\n`;
+          }
+        }
+        args[at + 1] =
+          sidecars +
+          (!lstatSync(old).isFile()
+            ? `require('node:fs').cpSync(${JSON.stringify(old)},${JSON.stringify(target)},{recursive:true});\n`
+            : `require('node:fs').writeFileSync(${JSON.stringify(target)},${JSON.stringify(payload)});\n`) +
+          args[at + 1];
+      }
+      return { ...item, args, report: { ...item.report, path: target } };
+    });
     writeJson(config, { root: fixtures, out: evidence, gates, interruptAfterMs });
     const child = spawnSync(process.execPath, [driver, config], {
       encoding: 'utf8',
       timeout: 15_000,
+      env: {
+        ...process.env,
+        GIT_CEILING_DIRECTORIES: [out, process.env.GIT_CEILING_DIRECTORIES]
+          .filter(Boolean)
+          .join(':'),
+      },
     });
     assert.ifError(child.error);
     return { child, receipt: json(join(evidence, 'battery.json')) };
@@ -2333,6 +3080,7 @@ async function verifyRunner(out) {
     command: process.execPath,
     args: ['-e', source],
     timeoutMs: 3000,
+    fixtureReceipt: 'process-probe',
     ...extra,
   });
   const marker = join(fixtures, 'continued.txt');
@@ -2353,6 +3101,7 @@ async function verifyRunner(out) {
     gate('missing-file', 'process.exit(0)', { requiredPath: 'missing-verifier.mjs' }),
     {
       name: 'missing-executable',
+      fixtureReceipt: 'process-probe',
       command: join(fixtures, 'not-installed'),
       args: [],
       timeoutMs: 3000,
@@ -2368,12 +3117,38 @@ async function verifyRunner(out) {
   const requiredNames = [
     'reference-core',
     'reference-data',
+    'gloss-text',
     'reference-ui-contracts',
     'skip-core',
     'skip-ui-contracts',
     'kanji-capture',
+    'kanji-trust',
+    'kanji-trust-webkit',
+    'hfix2a',
+    'hfix2a-webkit',
+    'hfix2a-item-a',
+    'hfix2a-item-a-webkit',
+    'hfix2c',
+    'hfix2c-webkit',
+    'hfix2c-contrast',
+    'hfix2c-contrast-webkit',
+    'hfix2d',
+    'hfix2d-webkit',
+    'hfix2e-contrast',
+    'hfix2e-contrast-webkit',
+    'hfix2e-examples',
+    'hfix2e-examples-webkit',
+    'hfix2e-hold',
+    'hfix2e-hold-webkit',
+    'hfix2e-x10-kt3',
+    'hfix2e-x10-kt3-webkit',
+    'hfix2b',
+    'hfix2b-webkit',
+    'hfix2e2',
+    'hfix2e2-webkit',
     'word-saved-answer',
     'word-saved-answer-controls',
+    'word-saved-answer-mutation-controls',
     'navigation-returns',
     'reference-packaging',
     'skip-packaging',
@@ -2430,8 +3205,12 @@ async function verifyRunner(out) {
     'sentence-drafts-contract',
     'sentence-drafts-integration',
     'browser-audio-silence-contract',
+    'voice-lock',
+    'approved-voice-contract',
+    'excerpt-narration-contract',
     'source-kanji-practice-contract',
     'source-kanji-practice-integration',
+    'kanji-world-encounter',
     'source-inbox-contract',
     'source-learning-integration',
     'sentence-practice-integration',
@@ -2457,8 +3236,11 @@ async function verifyRunner(out) {
     'practice-history-webkit',
     'kagami',
     'srs-today',
+    'srs-conformance',
+    'srs-conformance-webkit',
     'import-provider',
     'playback',
+    'narration-media',
     'guided-session-contract',
     'guided-offline',
     'annotation-lookup',
@@ -2549,6 +3331,7 @@ async function verifyRunner(out) {
     );
     if (type === 'native') {
       assert.equal(selected.report.engine, 'chromium');
+      assert.deepEqual(selected.report.readerEnglishRungSources, englishSourcePins(ROOT));
       assert.equal(selected.env.KAIRO_BROWSER, 'chromium');
     } else {
       assert.deepEqual(selected.report.engines, ['chromium', 'webkit']);
@@ -2981,6 +3764,7 @@ async function verifyRunner(out) {
   // zero exit cannot promote omitted journeys, stale identity, or browser errors.
   const scopedArtifact = 'a'.repeat(64);
   const scopedVerifier = 'b'.repeat(64);
+  const nativeEnglishSources = englishSourcePins(ROOT);
   const bothEngines = ['chromium', 'webkit'];
   const nativeDial = {
     key: 'furigana',
@@ -3205,6 +3989,13 @@ async function verifyRunner(out) {
     native: {
       schemaVersion: 1,
       kind: 'native-bunki-readings-browser-verification',
+      readerEnglishRung: syntheticEnglishReceipt(
+        englishExpectations(ROOT),
+        'native',
+        nativeEnglishSources,
+        scopedArtifact,
+        'chromium',
+      ),
       completed: true,
       pass: true,
       touchEmulation: true,
@@ -3228,7 +4019,9 @@ async function verifyRunner(out) {
           type,
           artifactSha256: scopedArtifact,
           sourceSha256: scopedVerifier,
-          ...(type === 'native' ? { engine: 'chromium' } : { engines: bothEngines }),
+          ...(type === 'native'
+            ? { engine: 'chromium', readerEnglishRungSources: nativeEnglishSources }
+            : { engines: bothEngines }),
           ...(type === 'record-practice-finalize' ? { practiceSource: practiceSources } : {}),
           ...expected,
         },
@@ -3323,6 +4116,12 @@ async function verifyRunner(out) {
       );
     }
     if (type === 'native') {
+      mutations.push(['missing-English-evidence', { readerEnglishRung: undefined }]);
+      for (const key of ['helper', 'expectations', 'controls']) {
+        const wrong = JSON.parse(JSON.stringify(fixture.readerEnglishRung));
+        wrong.sources[key] = '0'.repeat(64);
+        mutations.push([`stale-English-${key}`, { readerEnglishRung: wrong }]);
+      }
       mutations.push(
         ['schema', { schemaVersion: 2 }],
         ['kind', { kind: 'other-reading-suite' }],
@@ -3587,6 +4386,15 @@ async function verifyRunner(out) {
     for (const [name, expected] of [
       ['missing-expected-artifact', { artifactSha256: null }],
       ['missing-expected-verifier', { sourceSha256: null }],
+      ...(type === 'native'
+        ? [
+            ['missing-expected-English-pins', { readerEnglishRungSources: null }],
+            ...Object.keys(nativeEnglishSources).map((key) => [
+              `stale-expected-English-${key}`,
+              { readerEnglishRungSources: { ...nativeEnglishSources, [key]: '0'.repeat(64) } },
+            ]),
+          ]
+        : []),
       [
         'wrong-expected-engine',
         type === 'native' ? { engine: 'webkit' } : { engines: ['chromium'] },
@@ -5525,7 +6333,7 @@ function verifySearchReports(out) {
   ];
 }
 
-function verifyStandaloneJourneyReports(out) {
+export function verifyStandaloneJourneyReports(out) {
   const directory = join(out, 'standalone-journey-report-controls');
   mkdirSync(directory);
   const path = join(directory, 'results.json'),
@@ -5830,6 +6638,24 @@ window.__KAIRO_INK_URL__ = standaloneModuleUrl("${inkBytes.toString('base64')}")
       },
     ],
     [
+      'old-six-record-modules',
+      (v) => {
+        v.standalone.inlinedRecordModules = v.standalone.inlinedRecordModules.slice(0, 6);
+      },
+    ],
+    [
+      'reordered-record-modules',
+      (v) => {
+        v.standalone.inlinedRecordModules.reverse();
+      },
+    ],
+    [
+      'unknown-extra-record-module',
+      (v) => {
+        v.standalone.inlinedRecordModules.push('./unknown-record-module.mjs');
+      },
+    ],
+    [
       'missing-record-module',
       (v) => {
         v.standalone.inlinedRecordModules.pop();
@@ -6084,19 +6910,23 @@ async function main() {
     const base = join(homedir(), '.dharma/bunki/release-gates');
     if (!args.length) mkdirSync(base, { recursive: true });
     const out = freshOutput(args[1] || mkdtempSync(join(base, 'verify-')));
-    const checks = [
-      ...(await verifyRunner(out)),
-      ...verifyTeachingReports(out),
-      ...verifySearchReports(out),
-      ...verifyStandaloneJourneyReports(out),
-      ...verifyArtifactFailures(out),
-      ...(await verifyWorkflows()),
-      ...(await verifyWorkflowFailures(out)),
+    const groupChecks = [
+      await verifyRunner(out),
+      verifyTeachingReports(out),
+      verifySearchReports(out),
+      verifyStandaloneJourneyReports(out),
+      verifyArtifactFailures(out),
+      await verifyWorkflows(),
+      await verifyWorkflowFailures(out),
     ];
+    const groups = RELEASE_GROUPS.map((id, index) => ({ id, checks: groupChecks[index] }));
+    const checks = groupChecks.flat();
     writeJson(join(out, 'verification-report.json'), {
       schemaVersion: 1,
       completedAt: now(),
       checks,
+      groups,
+      runId: process.env.KAIRO_GATE_RUN_ID,
       passed: checks.length,
       scope:
         'executed runner failure paths and parsed workflow contracts; GitHub-hosted deployment is not executed',

@@ -2,11 +2,18 @@
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
 import {readFile} from 'node:fs/promises';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {createHash,randomUUID} from 'node:crypto';
+import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {chromium,webkit} from 'playwright-core';
 import {fixture,enrichmentFixture} from './personal-fixture.mjs';
-import {resolveCorridorSite} from '../../../scripts/resolve-corridor-site.mjs';
+import {resolveCorridorEvidence,resolveCorridorSite} from '../../../scripts/resolve-corridor-site.mjs';
 const root=resolveCorridorSite();
+const evidence=resolveCorridorEvidence(),runId=process.env.KAIRO_GATE_RUN_ID||randomUUID();
+const identity=JSON.parse(readFileSync(path.join(root,'build-identity.json')));
+let receiptResult=null,receiptError=null,browser;
+const browserName=process.env.PERSONAL_HOST_BROWSER||'chromium';
 let releaseDictionary;
 let dictionaryPending=false;
 const dictionaryWait=new Promise(resolve=>{releaseDictionary=resolve;});
@@ -19,11 +26,11 @@ const server=createServer(async(req,res)=>{try{
  res.setHeader('Content-Type',({'.mjs':'text/javascript','.js':'text/javascript','.json':'application/json','.html':'text/html','.css':'text/css','.woff2':'font/woff2'})[path.extname(f)]||'application/octet-stream');
  res.end(data);
 }catch{res.writeHead(404);res.end('missing');}});
+try {
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const origin=`http://127.0.0.1:${server.address().port}`;
-const browserName=process.env.PERSONAL_HOST_BROWSER || 'chromium';
 assert(['chromium','webkit'].includes(browserName),'Unknown host browser');
-const browser=await (browserName==='webkit'?webkit:chromium).launch({headless:true,...(browserName==='chromium'&&process.env.PERSONAL_CHROMIUM?{executablePath:process.env.PERSONAL_CHROMIUM}:{})});
+browser=await (browserName==='webkit'?webkit:chromium).launch({headless:true,...(browserName==='chromium'&&process.env.PERSONAL_CHROMIUM?{executablePath:process.env.PERSONAL_CHROMIUM}:{})});
 // Read committed rows independently of the host's in-memory publication. The
 // legacy localStorage record is no longer the shared learner write target.
 async function sharedRecord(page) {
@@ -48,7 +55,6 @@ async function sharedRecord(page) {
   } finally {db.close();}
  }));
 }
-try {
  const page=await browser.newPage({viewport:{width:390,height:844}}), errors=[],reqs=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>reqs.push({url:r.url(),method:r.method()}));
  await page.goto(origin+'/?deck=personal');
@@ -64,15 +70,21 @@ try {
  assert.equal(await page.locator('#sheet .gloss').first().isVisible(),false);
  await page.locator('.personal-dictionary-meaning > summary').click();assert((await page.locator('#sheet .senses').innerText()).includes('library'));
  assert.equal((await sharedRecord(page)).taken.length,0,'dictionary lookup does not enroll a card');
- await page.locator('#take').click();
- await page.locator('#take[aria-pressed="true"]').waitFor();
- assert.equal(await page.locator('#take-chooser, #take-save').count(),0,'Save commits in one tap without a destination chooser');
- assert.equal(await page.locator('#vocabulary-list-popover').count(),0,'the optional list popover opens only on request');
+ // S · the page keeps through its one Save in the bar (#sheet-take): one press keeps and opens its own menu (review, lists, Copy)
+ // as a drawer under the bar; it pinned the foot's #take and a list popover that opened only on request
+ await page.locator('#sheet-take').click();
+ await page.locator('#sheet-take[aria-pressed="true"]').waitFor();
+ assert.equal(await page.locator('#take-chooser, #take-save, #take').count(),0,'Save commits in one tap without a destination chooser, and the page has one Save');
+ await page.locator('#vocabulary-list-popover.is-drawer').waitFor();
+ await page.keyboard.press('Escape');
  const savedWord=(await sharedRecord(page)).taken.find(t=>t.t==='word'&&t.id==='図書館');
  assert(savedWord,'one tap saves the canonical word to the shared learner record');
  assert(Number.isFinite(savedWord.started),'one-tap 覚える keeps the host explicit-review enrollment contract');
  assert.equal(savedWord.from,null);assert.equal(savedWord.ctx,undefined);assert.equal(savedWord.sourceContextRef,undefined);
- await page.locator('#personal-add-list').click();
+ // S · the lists live in the one Save's menu (it pinned the foot's "Add to list…", #personal-add-list): Saved ✓ opens it,
+ // and its New list… asks the name once
+ await page.locator('#sheet-take').click();
+ await page.locator('#vocabulary-list-popover.is-drawer #vocabulary-list-new').click();
  await page.locator('#vocabulary-list-name').fill('Synthetic host list');
  await page.locator('#sheet .dictionary-opening').waitFor();
  assert(dictionaryPending,'the full dictionary is still loading when the list draft is entered');
@@ -85,7 +97,10 @@ try {
  assert.equal(canonical.taken.filter(t=>t.t==='word'&&t.id==='図書館').length,1,'adding a list does not duplicate the saved card');
  assert.deepEqual(canonical.taken.find(t=>t.t==='word'&&t.id==='図書館'),savedWord,'list membership preserves the enrolled card');
  assert.deepEqual(canonical.srs,{});assert.deepEqual(canonical.revlog,[]);
- await page.locator('#vocabulary-list-name').press('Escape');await page.locator('#vocabulary-list-popover').waitFor({state:'detached'});
+ // S · in the Save's menu the name field folds back into its row once the list is made, and the keyboard stays in the menu
+ // on the new list's box, where Escape closes it (this pressed Escape in the old popover's always-open name field)
+ await page.waitForFunction(()=>document.activeElement?.matches?.('#vocabulary-list-popover input[data-list="Synthetic host list"]'));
+ await page.keyboard.press('Escape');await page.locator('#vocabulary-list-popover').waitFor({state:'detached'});
  await page.locator('[data-kanjirow="図"]').click();await page.locator('#sheet[data-node="kanji:図"]').waitFor();await page.locator('#sheet-back').click();await page.locator('#sheet[data-node="word:図書館"]').waitFor();
  await page.goBack();await page.locator('#sheet').waitFor({state:'detached'});
  assert.equal(new URL(page.url()).searchParams.get('deck'),'personal');
@@ -93,26 +108,39 @@ try {
  assert(after.sameRoot);assert.equal(after.id,before.id);assert.equal(after.progress,before.progress);assert.equal(after.inert,false);
  await page.locator('.pc-answer-tools [data-lookup]').filter({hasText:'にあたって'}).first().click();await page.locator('#sheet[data-node^=\"grammar:\"]').waitFor();
  const grammarId=(await page.locator('#sheet').getAttribute('data-node')).slice('grammar:'.length);
- await page.locator('#take').click();
- await page.locator('#take[aria-pressed="true"]').waitFor();
- await page.locator('#personal-add-list').click();await page.locator('[data-list="Synthetic host list"]').check();
+ await page.locator('#sheet-take').click();
+ await page.locator('#sheet-take[aria-pressed="true"]').waitFor();
+ // S · the lists live in the one Save's menu (it pinned #personal-add-list): the press that kept the point opened it
+ await page.locator('#vocabulary-list-popover.is-drawer').waitFor();await page.locator('[data-list="Synthetic host list"]').click();
+ await page.locator('[data-list="Synthetic host list"]:checked').waitFor();
  await page.waitForFunction(()=>document.querySelector('.vocabulary-list-status')?.textContent.includes('Synthetic host list'));
  const grammarSaved=await sharedRecord(page);
  const grammarCard=grammarSaved.taken.find(t=>t.t==='grammar'&&t.id===grammarId);
  assert(grammarCard);assert(Number.isFinite(grammarCard.started));assert.equal(grammarCard.from,null);
  assert(grammarSaved.lists['Synthetic host list'].some(t=>t.t==='grammar'&&t.id===grammarId));
  assert.deepEqual(grammarSaved.srs,{});assert.deepEqual(grammarSaved.revlog,[]);
- await page.locator('#vocabulary-list-name').press('Escape');await page.locator('#vocabulary-list-popover').waitFor({state:'detached'});
+ // S · the keyboard is on the list's box it just ticked, in the menu; Escape closes it (the name field was never opened)
+ await page.waitForFunction(()=>document.activeElement?.matches?.('#vocabulary-list-popover input[data-list="Synthetic host list"]'));
+ await page.keyboard.press('Escape');await page.locator('#vocabulary-list-popover').waitFor({state:'detached'});
  await page.setViewportSize({width:1440,height:900});
- await page.locator('#personal-add-list').click();await page.locator('#vocabulary-list-popover').waitFor();
- await page.locator('#personal-add-list').click();
- assert.equal(await page.locator('#vocabulary-list-popover').count(),0,'pressing Add to list again dismisses its own popover');
- assert.equal(await page.locator('#personal-add-list').getAttribute('aria-expanded'),'false');
+ // S · the one Save toggles its own menu (it pinned #personal-add-list's popover): a press on Saved ✓ opens it, the next press
+ // folds it — after the Save's breath (SAVE_PRESS_MS: a second press within it is the same press)
+ await page.locator('#sheet-take').click();await page.locator('#vocabulary-list-popover').waitFor();
+ await page.waitForTimeout(650);
+ await page.locator('#sheet-take').click();
+ assert.equal(await page.locator('#vocabulary-list-popover').count(),0,'pressing Save again folds its own menu');
+ assert.equal(await page.locator('#sheet-take').getAttribute('aria-expanded'),'false');
  await page.setViewportSize({width:390,height:844});
  await page.locator('#sheet').press('Escape');await page.locator('#sheet').waitFor({state:'detached'});
  const finalProgress=await page.evaluate(async id=>{const {openStore}=await import('./decks/personal/store.mjs');const store=await openStore();try{return JSON.stringify((await store.get(id)).progress);}finally{store.close();}},data.id);
  assert.equal(finalProgress,before.progress,'word, grammar and list capture leave personal assessment history unchanged');
  assert.equal(reqs.filter(r=>/\/data\/articles\/index\.json$/u.test(new URL(r.url).pathname)).length,0,'the private deck loads no article index');
  assert(reqs.every(r=>r.method==='GET'));assert(reqs.every(r=>r.url.startsWith(origin)||r.url.startsWith('data:')));assert.deepEqual(errors,[]);
- console.log(JSON.stringify({status:'PASS',realCoreDictionary:true,sharedRememberAndNamedList:true,oneTapSave:true,optionalListPopover:true,addToListPointerToggle:true,dictionaryRefreshPreservesListDraft:true,explicitReviewEnrollment:true,recursiveKanjiBack:true,privateRootAndAssessmentPreserved:true,englishDeliberateReveal:true,frontLoadsNoDictionary:true,requestsAllSameOriginGet:true,deviceBackClosesHost:true,sharedGrammarCapture:true,errors},null,2));
-}finally{releaseDictionary();await browser.close();await new Promise(r=>server.close(r));}
+ receiptResult={status:'PASS',realCoreDictionary:true,sharedRememberAndNamedList:true,oneTapSave:true,optionalListPopover:true,addToListPointerToggle:true,dictionaryRefreshPreservesListDraft:true,explicitReviewEnrollment:true,recursiveKanjiBack:true,privateRootAndAssessmentPreserved:true,englishDeliberateReveal:true,frontLoadsNoDictionary:true,requestsAllSameOriginGet:true,deviceBackClosesHost:true,sharedGrammarCapture:true,errors};
+}catch(error){receiptError=String(error.stack||error);process.exitCode=1;}finally{
+ const receipt={...receiptResult,schemaVersion:2,runId,status:receiptError?'FAIL':receiptResult?.status||'FAIL',error:receiptError,completed:!!receiptResult&&!receiptError,
+  engine:browserName,browserVersion:browser?.version()||null,artifactSha256:identity.artifactSha256,gitSha:identity.gitSha,
+  verifierSha256:createHash('sha256').update(readFileSync(fileURLToPath(import.meta.url))).digest('hex')};
+ writeFileSync(path.join(evidence,'personal-host.json'),JSON.stringify(receipt,null,2)+'\n');console.log(JSON.stringify(receipt,null,2));
+ releaseDictionary();await browser?.close();if(server.listening)await new Promise(r=>server.close(r));
+}

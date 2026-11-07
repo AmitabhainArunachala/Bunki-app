@@ -1,3 +1,4 @@
+import { REVIEW_EXIT_NAMES, readerTicketFixture, liftCorridor } from './srs-hooks-corridor-layer.mjs';
 /** Controlled acknowledgment tests of the actual authored learning handlers.
  * Frozen synthetic roots detect premature mutation. This verifies the UI save
  * contract; RecordApp/Host suites separately exercise real browser storage. */
@@ -14,6 +15,7 @@ import { chromium, webkit } from 'playwright-core';
 import { verifyBundledArtifact } from '../../bunki-desktop/lib/artifact.cjs';
 import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 import * as fsrsApi from '../vendor/ts-fsrs.mjs';
+import * as srsCore from '../srs-core.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const browserMode = process.argv.includes('--browser');
@@ -41,12 +43,41 @@ if (controlName) {
   source = controls.applyControl(source, controls.LEARNING_RECORD_CONTROLS, controlName);
   console.log(`CONTROL-APPLIED ${controlName} ${createHash('sha256').update(source).digest('hex')}`);
 }
+// G2 controls: `--g2-control <name>` applies one literal edit (it must match exactly once) to the authored depth code; the
+// named rows must then fail on their behaviour, never on a harness error
+const G2_CONTROLS = {
+  // the shown reading ignored: 年 read ねん becomes the core とし and borrows its card's depth
+  'reading-check-dropped': { from: '  const reading = shown ? kanaReadingKey(shown) || null : null;\n  const make =', to: '  const reading = null;\n  const make =',
+    kills: ['g2-a-different-reading-or-entry-is-at-most-met-and-never-rings'] },
+  // a look-up that writes review scheduling (the card's due moved to the look-up)
+  'tap-schedules': { from: '  const help = article ? readHelpPatch(latest, article, key, now) : null;',
+    to: "  const help = article ? readHelpPatch(latest, article, key, now) : null;\n  if (plainRecord(latest.srs) && owns(latest.srs, srsKey('word', identity.id))) patch.srs = { ...latest.srs, [srsKey('word', identity.id)]: { ...latest.srs[srsKey('word', identity.id)], due: new Date(now).toISOString() } };",
+    kills: ['g2-a-look-up-writes-the-encounter-ledger-only-once-a-day'] },
+  // "Not yet" ignored once any card stands
+  'not-yet-ignored': { from: "  if (said?.value === 'not-yet' && !(match === 'same' && notYetReleased(record, skey, said.cursor))) {",
+    to: "  if (said?.value === 'not-yet' && !stored && !(match === 'same' && notYetReleased(record, skey, said.cursor))) {",
+    kills: ['g2-not-yet-outranks-until-an-unrevoked-good-review-after-it'] },
+  // Hfix-1B · L-1 back: Me's lead figure counts the index's figure again while the help line counts the sealed reading
+  'two-counts': { from: '    const chars = articleReadChars(p.id, S, p);', to: '    const chars = finiteNumber(p.chars) ? p.chars : null;',
+    kills: ['hfix1b-me-reads-one-count-so-unaided-never-exceeds-read'] },
+};
+const g2ControlAt = process.argv.indexOf('--g2-control');
+const g2Control = g2ControlAt >= 0 ? G2_CONTROLS[process.argv[g2ControlAt + 1]] : null;
+assert(g2ControlAt < 0 || (g2Control && !browserMode), 'A G2 control is one of G2_CONTROLS, on the authored source');
+if (g2Control) {
+  assert.equal(source.split(g2Control.from).length, 2, 'the control\'s edit matches exactly once');
+  source = source.replace(g2Control.from, g2Control.to);
+  console.log(`G2-CONTROL-APPLIED ${process.argv[g2ControlAt + 1]} ${createHash('sha256').update(source).digest('hex')} kills ${g2Control.kills.join(', ')}`);
+}
 const ast = ts.createSourceFile('corridor.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
 const names = new Set([
+  ...REVIEW_EXIT_NAMES,
   'srsKey', 'srsCardOf', 'srsStoredRecord', 'srsSchedulerInstant', 'srsReviewLogRow',
   'focusKanjiReadingReview', 'kanjiAnswerAvailable', 'retainedKanjiRecord', 'validKanjiRecord', 'nonEmptyString', 'safeJsonValue',
   'advanceReviewSession', 'resetAssessmentQuestionReview', 'commitReviewAction', 'commitDrillGrade', 'commitStandardGrade',
   'renderReview', 'renderReviewUndo', 'renderProbe', 'renderLessons', 'renderSrsPrefs',
+  // the review's next card by the app's one schedule owner (srs-core.mjs, given to the sandbox below)
+  'reviewNextStep', 'reviewPauseTimer', 'srsWordAnswerIdentity',
   'reviewCounts', 'srsCardKind', 'SRS_KINDS',
   'aiQuizPending', 'aiQuizStarting', 'aiQuizParse', 'aiQuizCommit', 'aiQuizStart', 'renderAiQuiz',
   'learningEnrollmentPending', 'commitLearningEnrollment', 'captureStorePatch', 'commitCapture',
@@ -91,6 +122,8 @@ class Element {
   }
   append(...children) { this.children.push(...children); }
   setAttribute() {}
+  getAttribute() { return null; }
+  removeAttribute() {}
   addEventListener(kind, run) { this.events[kind] = run; }
   remove() { this.removed = true; }
   fire() { return this.events.click?.(); }
@@ -105,7 +138,7 @@ const questions = Array.from({ length: 3 }, (_, i) => ({ q: 'Synthetic question 
 const quiz = () => ({ qs: questions, ix: 0, picked: null, correct: 0, ts: 100 });
 function fixture(overrides = {}, options = {}) {
   const durableNames = ['taken', 'srs', 'revlog', 'obslog', 'stats', 'suspended', 'lessonsDone', 'deepWords', 'srsPrefs', 'aiQuiz'];
-  const S = { view: 'review', focus: null, review: run(), reviewMore: false, probe: null,
+  const S = { stack: [], view: 'review', focus: null, review: run(), reviewMore: false, probe: null,
     taken: [clone(item)], srs: {}, revlog: [], obslog: [], stats: {}, suspended: {}, lessonsDone: {}, deepWords: {},
     srsPrefs: { newPerDay: 20, reviewLimit: 20 }, aiQuiz: null, ...overrides };
   let durable = Object.fromEntries(durableNames.map((key) => [key, freeze(clone(S[key]))]));
@@ -114,8 +147,9 @@ function fixture(overrides = {}, options = {}) {
   let paints = 0;
   let scrolls = 0;
   const sandbox = {
-    S, Date: options.Date || Date, Math, JSON, Set, Map, console, fsrsApi, scheduler: fsrsApi.fsrs({ enable_fuzz: false }), recordEpoch: 1,
-    assessmentQuestionReviewOwner: null,
+    S, Date: options.Date || Date, Math, JSON, Set, Map, console, fsrsApi, srsCore, scheduler: fsrsApi.fsrs({ enable_fuzz: false }), recordEpoch: 1,
+    assessmentQuestionReviewOwner: null, queueMicrotask, recordApp: null, recordInstallation: null,
+    recordDeparted: false, staleTab: false, storeSealed: false,
     recordReady: (epoch = 1) => epoch === sandbox.recordEpoch,
     recordWritable: (epoch = 1) => epoch === sandbox.recordEpoch,
     render: () => { paints += 1; },
@@ -448,7 +482,9 @@ async function propertyChecks() {
   const items = [clone(item), { t: 'kanji', id: '学', label: '学', ts: 100, started: 100 }];
   const keyOf = (value) => value.t + ':' + value.id;
   const fixedStart = Date.parse('2026-09-10T10:00:00Z');
-  const mature = () => ({ due: '2026-09-13T10:00:00.000Z', last_review: '2026-09-01T10:00:00.000Z',
+  // a mature review card that is DUE at the fixed start (due the day before, after a 12-day interval): since 10-19 the
+  // producer refuses an early review (srs-core's gate), and the model below says so independently
+  const mature = () => ({ due: '2026-09-09T10:00:00.000Z', last_review: '2026-08-28T10:00:00.000Z',
     state: 2, stability: 12, difficulty: 5, elapsed_days: 2, scheduled_days: 12, learning_steps: 0, reps: 4, lapses: 1 });
   const scope = 'Generated word and dictionary-backed kanji grade/dojo/undo handler contracts with frozen synthetic roots, default unfitted FSRS weights, fixed clock and controlled save acknowledgments. Resume serializes these modeled roots into a fresh fixture. No browser/native durability, native lost-ack recovery, fitted-weight initialization, retained dictionary provenance, sentence/question source contract, or undo initiated after reload claim.';
   const counters = {};
@@ -469,6 +505,18 @@ async function propertyChecks() {
   };
   const pendingCount = (f) => assert.equal(f.queue.length, 1, 'One pending intention must queue exactly one save');
   const advancedOnce = (rv, previousIx) => assert.equal(rv.ix, previousIx + 1, 'One acknowledged grade advances the cursor exactly once');
+  // An actual handler settles at once when it refuses and on its acknowledgment when it saves. One still open after that
+  // is a contract failure, named with its command (the history's trace), never a run left waiting on it: before this
+  // bound, a save the model wrongly refused was awaited unacknowledged and node exited on the unsettled await (13)
+  // without a receipt.
+  const HANDLER_SETTLE_MS = 10000;
+  const settled = async (promise, label) => {
+    let timer;
+    const bound = new Promise((_, fail) => {
+      timer = setTimeout(() => fail(new assert.AssertionError({ message: label + ': the actual handler did not settle within ' + HANDLER_SETTLE_MS + ' ms' })), HANDLER_SETTLE_MS);
+    });
+    try { return await Promise.race([promise, bound]); } finally { clearTimeout(timer); }
+  };
   const revokeTarget = (row, key, index) => same(row.slice(1), [key, 0, index], 'Undo targets its original grade row');
   // Deliberately corrupt only oracle inputs, never authored code or live data.
   // Each control must fail at the same assertion used by generated histories.
@@ -501,7 +549,7 @@ async function propertyChecks() {
   };
   const scenarioNames = ['grade', 'reject-retry', 'undo-reject-retry', 'undo-conflict', 'replace-before-stage',
     'replace-after-stage', 'epoch-loss', 'stale-enrollment', 'disclosure-guard', 'concurrent-merge',
-    'dojo-existing', 'kanji-unavailable', 'committed-lost-ack', 'ownership-after-publication', 'two-grade-two-undo'];
+    'dojo-existing', 'kanji-unavailable', 'committed-lost-ack', 'ownership-after-publication', 'two-grade-two-undo', 'backward-step'];
   const commandsFor = (historyIndex, historySeed) => {
     const random = rngFor(historySeed);
     const commands = [];
@@ -509,8 +557,13 @@ async function propertyChecks() {
     for (let episode = 0; episode < episodes; episode += 1) {
       const kind = episode === 0 ? historyIndex % scenarioNames.length : episode === 1 ? 0 : random(scenarioNames.length);
       const rating = 1 + random(4);
+      // srs-core refuses a grade before its due: the episode every history grades in (the second) and the cases built on a
+      // saved grade (an undo, a lost acknowledgment, ownership after publication, two grades, the backward step) walk the
+      // clock on, forward only, to their card's due; the others keep the refusals earlier backward moves bring
+      const toDue = episode === 1 || ['undo-reject-retry', 'undo-conflict', 'committed-lost-ack', 'ownership-after-publication',
+        'two-grade-two-undo', 'backward-step'].includes(scenarioNames[kind]);
       const start = { op: 'start', type: kind === 11 ? 1 : random(2), dojo: kind === 10,
-        declared: random(4) === 0 ? 0 : 1, shift: [-172800000, 0, 60000, 86400000][random(4)] };
+        declared: random(4) === 0 ? 0 : 1, shift: [-172800000, 0, 60000, 86400000][random(4)], toDue };
       const gradeCommand = { op: 'grade', rating };
       const ok = { op: 'ack', save: true };
       const stage = { op: 'stage' };
@@ -527,8 +580,10 @@ async function propertyChecks() {
           const enrollment = random(2) ? 'suspend' : 'remove';
           part = [start, gradeCommand, { op: 'external', kind: enrollment }, stage, ok, { op: 'external', kind: 'enroll' }]; break;
         }
+        // the answer's face is the guard (35f8b940, 2026-09-28: Show answer replaced the 思い出した/まだ declaration): a
+        // face-down card refuses a grade whether a declaration stands or not, and a shown card is graded with none
         case 'disclosure-guard': part = [start, { op: 'disclosure', revealed: false, declared: 1 }, gradeCommand,
-          { op: 'disclosure', revealed: true, declared: null }, gradeCommand, { op: 'disclosure', revealed: true, declared: 1 }, gradeCommand, stage, ok]; break;
+          { op: 'disclosure', revealed: false, declared: null }, gradeCommand, { op: 'disclosure', revealed: true, declared: null }, gradeCommand, stage, ok]; break;
         case 'concurrent-merge': part = [start, gradeCommand, { op: 'external', kind: 'unrelated' }, { op: 'external', kind: 'target' }, stage, ok]; break;
         case 'dojo-existing': part = [start, { op: 'external', kind: 'mature' }, gradeCommand, { op: 'duplicate' }, stage, ok, { op: 'undo' }, stage, ok]; break;
         case 'kanji-unavailable': part = [start, { op: 'dictionary', available: false }, gradeCommand, stage, ok,
@@ -536,8 +591,11 @@ async function propertyChecks() {
         case 'committed-lost-ack': part = [start, gradeCommand, { op: 'duplicate' }, stage, { op: 'ack', save: true, lostAck: true }]; break;
         case 'ownership-after-publication': part = [start, gradeCommand, { op: 'duplicate' }, stage, { op: 'ack', save: true, loseOwnershipAfterPublish: true }]; break;
         case 'two-grade-two-undo': part = [start, { op: 'grade', rating: 1 }, stage, ok,
-          { op: 'clock', shift: 86400000 }, { op: 'disclosure', revealed: true, declared: 1 }, gradeCommand, stage, ok,
+          { op: 'clock', shift: 86400000, toDue: true }, { op: 'disclosure', revealed: true, declared: 1 }, gradeCommand, stage, ok,
           { op: 'undo' }, stage, ok, { op: 'undo' }, stage, ok]; break;
+        // the device clock set back a few minutes: Again puts the card in a short step, which the due gate serves within the
+        // 20-minute learn-ahead limit, and the grade is anchored at the last review (the clamp), never before it
+        case 'backward-step': part = [start, { op: 'grade', rating: 1 }, stage, ok, { ...start, shift: -300000, toDue: false }, gradeCommand, stage, ok]; break;
         default: part = [start, gradeCommand, { op: 'duplicate' }, stage, ok];
       }
       part.push({ op: 'resume' });
@@ -548,6 +606,15 @@ async function propertyChecks() {
     }
     assert(commands.length >= 12 && commands.length <= 64);
     return commands;
+  };
+  // the due rule, modeled on its own (not by calling srs-core): a card never answered may be graded; a learning or
+  // relearning step when due within the 20-minute learn-ahead limit; a review card when it falls due by the end of today
+  const gradeableNow = (rec, nowMs) => {
+    if (!rec || rec.state === 0) return true;
+    const due = Date.parse(rec.due);
+    if (rec.state === 1 || rec.state === 3) return due <= nowMs + 20 * 60000;
+    const end = new Date(nowMs); end.setHours(23, 59, 59, 999);
+    return due <= end.getTime();
   };
   const runHistory = async (historyIndex, historySeed, commands) => {
     let now = fixedStart;
@@ -568,6 +635,12 @@ async function propertyChecks() {
       f.c.presentReviewAnswer(rv);
       return rv;
     };
+    // srs-core refuses a grade before its due (the model says so at stage): a case that needs its grade saved walks the clock
+    // on, forward only, to its card's due
+    const walkToDue = (item) => {
+      const rec = f.durable().srs[keyOf(item)];
+      if (!gradeableNow(rec, now)) { now = Date.parse(rec.due); count('clockMovesToDue'); }
+    };
     const attemptGrade = (rating) => {
       const rv = f.S.review, current = rv.queue[rv.ix];
       const key = ['again', 'hard', 'good', 'easy'][rating - 1];
@@ -584,7 +657,8 @@ async function propertyChecks() {
         let valid = ownsSession;
         if (pending.kind === 'grade') valid = valid && (pending.item.t !== 'kanji' || !!f.c.D.kanji[pending.item.id]?.m?.trim()) &&
           (pending.item.t !== 'word' || !!f.c.D.dict[pending.item.id]?.m?.length) &&
-          (pending.dojo || (!!entry && (before.srs[pending.key] !== undefined || Number.isFinite(entry.started)) && !before.suspended[pending.key]));
+          (pending.dojo || (!!entry && (before.srs[pending.key] !== undefined || Number.isFinite(entry.started)) && !before.suspended[pending.key] &&
+            gradeableNow(before.srs[pending.key], now)));
         if (pending.kind === 'undo' && !pending.entry.dojo) valid = valid &&
           JSON.stringify(ordered(before.srs[pending.entry.key] ?? null)) === JSON.stringify(ordered(pending.entry.after ?? null));
         pending.valid = !!valid; pending.staged = true;
@@ -653,9 +727,12 @@ async function propertyChecks() {
           case 'start': {
             assert.equal(pending, null); rejectedGrade = false; target = items[command.type]; now += command.shift;
             if (command.shift < 0) count('backwardClockMoves'); else if (command.shift === 0) count('equalClockMoves');
+            if (command.toDue) walkToDue(target);
             const rv = newSession(command.dojo); rv.declared = command.declared; break;
           }
-          case 'clock': assert.equal(pending, null); now += command.shift; count('explicitClockMoves'); break;
+          case 'clock': assert.equal(pending, null); now += command.shift; count('explicitClockMoves');
+            if (command.toDue) walkToDue(f.S.review.queue[f.S.review.ix]);
+            break;
           case 'disclosure': assert.equal(pending, null); Object.assign(f.S.review, { revealed: command.revealed, declared: command.declared });
             // the rendered face: a revealed card presents (binds) its answer, a face-down one has none
             if (command.revealed) f.c.presentReviewAnswer(f.S.review); else f.S.review.presented = null;
@@ -663,10 +740,15 @@ async function propertyChecks() {
           case 'dictionary': if (command.available) f.c.D.kanji.学 = { m: 'synthetic learning' }; else delete f.c.D.kanji.学; break;
           case 'grade': {
             assert.equal(pending, null); const rv = f.S.review, before = f.durable(), session = sessionValue(rv);
-            const allowed = !!f.S.focus || (rv.revealed && rv.declared !== null);
+            // a drill grades as it is asked; a review card once its answer is shown (35f8b940: no declaration is needed;
+            // a declared まだ, declared 0, still makes the grade Again)
+            const allowed = !!f.S.focus || rv.revealed;
             const promise = attemptGrade(command.rating);
             unchanged(f, before, rv, session, 'grade activation before acknowledgment');
-            if (!allowed) { assert.equal(await promise, false); assert.equal(f.queue.length, 0); count('disclosureRejections'); break; }
+            if (!allowed) {
+              assert.equal(f.queue.length, 0, 'A refused grade queues no save');
+              assert.equal(await settled(promise, 'refused grade'), false); count('disclosureRejections'); break;
+            }
             pendingCount(f);
             const current = rv.queue[rv.ix], dojo = !!f.S.focus;
             const effectiveRating = !dojo && rv.declared === 0 ? 1 : command.rating;
@@ -685,7 +767,8 @@ async function propertyChecks() {
           }
           case 'duplicate': {
             assert(pending); const before = f.durable(), session = sessionValue(pending.rv);
-            const value = pending.kind === 'grade' ? await attemptGrade(pending.rating) : await byClass(f.render('renderReviewUndo', pending.rv), 'review-undo').fire();
+            const value = await settled(pending.kind === 'grade' ? attemptGrade(pending.rating) : byClass(f.render('renderReviewUndo', pending.rv), 'review-undo').fire(),
+              'duplicate ' + pending.kind);
             assert.equal(value, false); pendingCount(f); unchanged(f, before, pending.rv, session, 'duplicate pending activation'); count('pendingDuplicates'); break;
           }
           case 'stage': stagePending(); break;
@@ -723,7 +806,7 @@ async function propertyChecks() {
               f.c.recordEpoch += 1;
               trace.at(-1).publicationBoundary = { savedBeforeOwnershipLoss: true, oldEpoch: p.epoch, newEpoch: f.c.recordEpoch };
             } : undefined });
-            const returned = await p.promise;
+            const returned = await settled(p.promise, 'acknowledged ' + p.kind);
             if (command.loseOwnershipAfterPublish) {
               assert(publishedBeforeOwnershipLoss, 'Ownership-loss callback ran only after saved publication');
               same(f.durable(), publishedBeforeOwnershipLoss, 'Ownership loss retains the complete published roots');
@@ -883,11 +966,15 @@ async function referenceChecks() {
     const vectors = [
       ...[R.Again, R.Hard, R.Good, R.Easy].map((rating) => ({ id: `V1-new-${rating}`, history: [], now: '2026-09-25T00:00:00Z', rating, state: S.New })),
       ...[R.Again, R.Hard, R.Good, R.Easy].map((rating) => ({ id: `V2-learning-${rating}`, history: [[R.Good, '2026-09-25T00:00:00Z']], now: '2026-09-25T00:10:00Z', rating, state: S.Learning })),
-      ...[R.Again, R.Hard, R.Good, R.Easy].map((rating) => ({ id: `V3-review-${rating}`, history: V3, now: '2026-09-25T00:00:00Z', rating, state: S.Review })),
+      // V3/V7b grade the review card on its due date (2026-10-31 on the pin, V5 pins it). Before 10-19 they graded
+      // it on 09-25, 36 days early; the app now refuses that (srs-core's gate), and V3-early below proves the refusal.
+      ...[R.Again, R.Hard, R.Good, R.Easy].map((rating) => ({ id: `V3-review-${rating}`, history: V3, now: '2026-10-31T00:00:00Z', rating, state: S.Review })),
       ...[R.Again, R.Good].map((rating) => ({ id: `V4-relearning-${rating}`, history: [...V3, [R.Again, '2026-09-25T00:00:00Z']], now: '2026-09-25T00:10:00Z', rating, state: S.Relearning })),
       { id: 'V5-overdue-good', history: V3, now: '2026-11-30T00:00:00Z', rating: R.Good, state: S.Review },
       { id: 'V7a-fitted-new-good', history: [], now: '2026-09-25T00:00:00Z', rating: R.Good, state: S.New, fitted: true },
-      { id: 'V7b-fitted-mature-good', history: V3, now: '2026-09-25T00:00:00Z', rating: R.Good, state: S.Review, fitted: true },
+      // the fitted weights date V3's card 2026-11-17 (the history replayed on them), so V7b grades it then
+      { id: 'V7b-fitted-mature-good', history: V3, now: '2026-11-17T00:00:00Z', rating: R.Good, state: S.Review, fitted: true },
+      { id: 'V3-early-good', history: V3, now: '2026-09-25T00:00:00Z', rating: R.Good, state: S.Review, refused: true },
     ];
     const stored = (card) => ({ ...card, due: card.due.toISOString(), ...(card.last_review ? { last_review: card.last_review.toISOString() } : {}) });
     for (const vector of vectors) {
@@ -921,6 +1008,13 @@ async function referenceChecks() {
       const key = { [R.Again]: 'again', [R.Hard]: 'hard', [R.Good]: 'good', [R.Easy]: 'easy' }[vector.rating];
       const pending = grade(f, { rating: vector.rating, key, now: at(vector.now), day: vector.now.slice(0, 10) });
       f.ack(true);
+      if (vector.refused) {
+        // a review card 36 days before its due: the app writes no grade and the card keeps its schedule
+        assert.equal(await pending, false, `${vector.id}: the app refused an early review`);
+        assert.deepEqual(f.durable().srs['word:学校'], row.before, `${vector.id}: the card keeps its schedule`);
+        row.refused = true; row.pass = true;
+        continue;
+      }
       assert.equal(await pending, true, `${vector.id}: the app committed its grade`);
       const actual = f.durable().srs['word:学校'];
       row.expected = stored(expected); row.actual = actual;
@@ -1169,6 +1263,389 @@ async function browserChecks() {
     }
   } finally { await new Promise((done) => server.close(done)); }
 }
+
+/* G2 · depth (slice G2, 2026-10-17): the encounter ledger, the dot's depth and the help signal, as the ACTUAL authored
+ * definitions lifted by name and run over synthetic records (no browser). What these rows hold, each one a named claim:
+ *   identity   a word met as it reads where it was met — never its spelling alone (年 read ねん is not the core とし; 訳 read
+ *              やく beside わけ's #1538330 is unresolved and carries no foreign entry)
+ *   depth      every boundary: stability 6.99 / 7 / 29.99 / 30 against present recall .8999 / .9; New, Learning,
+ *              Relearning; no scheduler; a future last review (clamped, srsSchedulerInstant)
+ *   capping    a different reading or entry is at most "met" and never rings; "Not yet" outranks any card state until an
+ *              unrevoked Good or Easy review after it; "I know this" is at most "again"
+ *   writes     a look-up or a correction writes met (and the help signal) only — taken, lists, srs, revlog, stats and
+ *              suspended are never in its patch; a day already counted writes nothing; a clock moved back counts nothing
+ *   schema     the validators refuse malformed roots, keep a later version as it is, and refuse a "Not yet" cursor past the log
+ *   metric     help per 1,000 characters of first readings by sealed month; repeats and rereads add nothing */
+const G2_NAMES = new Set([
+  'DEPTH_ORDER', 'DEPTH_RECALL_R', 'DEPTH_RECALLED_S', 'DEPTH_OWNED_S', 'depthRank', 'deeperDepth', 'shallowerDepth',
+  'localDayOrdinal', 'localMonthKey', 'encounterIdentity', 'encounterKey', 'depthIdentityMatch', 'depthIndexMemo', 'depthIndex',
+  'depthRetrievability', 'notYetReleased', 'wordDepth', 'copyRecordWith', 'articleFingerprint', 'readHelpPatch', 'readHelpFinishPatch',
+  'encounterPatch', 'correctionPatch', 'helpByMonth', 'articleReadChars', 'meReadUnaided', 'savedNodeRecord', 'wordArchiveRef',
+  'MET_KEY_MAX', 'MET_KINDS', 'validMetKey', 'validMetEntry', 'validMetRoot', 'validReadHelpArticle', 'validReadHelp', 'metReadable',
+  'readHelpReadable', 'metCursorsFit', 'KANA_VOWEL_ROWS', 'kanaReadingKey', 'KATA_TO_HIRA_OFFSET', 'kataToHira', 'entryKanaIndex',
+  'wordCardIdentity', 'wordAnswerIdentity', 'savedAnswerFor', 'wordSelection', 'nonBlankMeanings', 'srsKey', 'srsSchedulerInstant',
+  'owns', 'plainRecord', 'nonEmptyString', 'finiteNumber', 'setOwnRecordValue', 'safeJsonValue', 'storyLevel',
+]);
+const g2Selected = ast.statements.filter((statement) => {
+  const declared = ts.isFunctionDeclaration(statement) ? [statement.name?.text] :
+    ts.isVariableStatement(statement) ? statement.declarationList.declarations.map((node) => node.name.getText(ast)) : [];
+  return declared.some((name) => G2_NAMES.has(name));
+});
+const g2Program = g2Selected.map((statement) => statement.getText(ast)).join('\n');
+// the index rows the fixtures name: [seq, head, reading, gloss, written, kana, glosses]
+const G2_ROWS = new Map([
+  ['2084840', [2084840, '年', 'ねん', 'year', ['年'], ['ねん'], ['year', 'counter for years']]],
+  ['1468060', [1468060, '年', 'とし', 'year', ['年'], ['とし'], ['year', 'age']]],
+  ['1538330', [1538330, '訳', 'わけ', 'reason', ['訳'], ['わけ'], ['reason', 'meaning']]],
+  ['1126030', [1126030, 'ポンド', 'ポンド', 'pound (weight)', [], ['ポンド'], ['pound (weight)']]],
+  ['2855351', [2855351, 'ポンド', 'ポンド', 'pound (currency)', [], ['ポンド'], ['pound (currency)']]],
+]);
+function g2Context({ retrievability = 0.95, scheduler = true, answered = [], passages = [] } = {}) {
+  const calls = [];
+  const sandbox = {
+    S: null, Date, Math, JSON, Set, Map, console,
+    D: { dict: { 年: { r: 'とし', m: ['year'] }, 訳: { r: 'わけ', m: ['reason'] }, 総理: { r: 'そうり', m: ['prime minister'] } },
+      words: {}, kanji: {}, passages },
+    scheduler: scheduler ? { get_retrievability: (card, at) => { calls.push({ card, at }); return typeof retrievability === 'function' ? retrievability(card, at) : retrievability; } } : null,
+    dictionaryRowBySeq: (seq) => G2_ROWS.get(String(seq)) || null,
+    dictionaryAnsweredForm: (form) => answered.includes(form),
+    dictionaryRowsReadAs: (form, reading) => [...G2_ROWS.values()].filter((row) => (row[1] === form || row[4].includes(form)) && row[5].includes(reading)),
+  };
+  const context = vm.createContext(sandbox);
+  // a const is a binding of the script, not a property of its global: the one the rows call is handed out by name
+  vm.runInContext(g2Program + '\n;globalThis.encounterKey = encounterKey;', context, { filename: 'authored-depth.js' });
+  context.calls = calls;
+  return context;
+}
+const DAY = 86400000;
+const T0 = new Date(2026, 9, 17, 9, 0, 0).getTime();
+const card = (overrides = {}) => ({ due: new Date(T0 + 20 * DAY).toISOString(), last_review: new Date(T0 - 5 * DAY).toISOString(),
+  stability: 40, difficulty: 5, elapsed_days: 5, scheduled_days: 25, reps: 6, lapses: 0, learning_steps: 0, state: 2, ...overrides });
+const g2Record = (overrides = {}) => freeze(clone({ taken: [], lists: {}, srs: {}, revlog: [], obslog: [], stats: {}, suspended: {}, deepWords: {},
+  readDone: {}, met: null, readHelp: null, ...overrides }));
+const keyOf = (c, node) => c.encounterKey(c.encounterIdentity(node));
+const SCHEDULING = ['taken', 'lists', 'srs', 'revlog', 'stats', 'suspended', 'deepWords', 'obslog', 'readDone'];
+
+await check('g2-definitions-lifted-from-the-authored-source', async () => {
+  assert.equal(g2Selected.length, G2_NAMES.size, 'every G2 definition comes from the current authored source');
+});
+await check('g2-identity-is-the-word-as-it-reads-never-the-spelling-alone', async () => {
+  const c = g2Context();
+  assert.deepEqual(clone(c.encounterIdentity({ id: '年', reading: 'とし' })), { t: 'word', id: '年', kind: 'core', seq: null, reading: 'とし' });
+  assert.deepEqual(clone(c.encounterIdentity({ id: '年' })), { t: 'word', id: '年', kind: 'core', seq: null, reading: 'とし' });
+  // the text reads ねん: before the full dictionary names its entry it is unresolved, never the core's とし
+  assert.deepEqual(clone(c.encounterIdentity({ id: '年', reading: 'ねん' })), { t: 'word', id: '年', kind: 'unresolved', seq: null, reading: 'ねん' });
+  assert.deepEqual(clone(c.encounterIdentity({ id: '年', seq: '2084840', reading: 'ねん' })), { t: 'word', id: '年', kind: 'seq', seq: '2084840', reading: 'ねん' });
+  // a fallback entry read otherwise lends nothing: 訳 read やく beside わけ's #1538330 is unresolved, with no entry number
+  assert.deepEqual(clone(c.encounterIdentity({ id: '訳', seq: '1538330', reading: 'やく' })), { t: 'word', id: '訳', kind: 'unresolved', seq: null, reading: 'やく' });
+  // katakana and hiragana read alike are one reading; no reading at all is unresolved, never a guess
+  assert.equal(c.encounterIdentity({ id: 'ポンド', seq: '1126030', reading: 'ぽんど' }).kind, 'seq');
+  assert.equal(c.encounterIdentity({ id: '未知語', reading: '' }).kind, 'unresolved');
+  assert.equal(c.encounterIdentity({ id: '未知語', reading: 'みちご' }).kind, 'text');
+  assert.equal(c.encounterIdentity({ t: 'kanji', id: '年' }), null);
+  const key = keyOf(c, { id: '年', seq: '2084840', reading: 'ねん' });
+  assert.equal(key, JSON.stringify([1, 'word', '年', 'seq', '2084840', 'ねん']));
+  assert.notEqual(key, keyOf(c, { id: '年', reading: 'とし' }));
+  assert.equal(c.validMetKey(key), true);
+  for (const bad of ['word:年:ねん', JSON.stringify([1, 'word', '年', 'seq', null, 'ねん']), JSON.stringify([1, 'word', '年', 'core', '2084840', 'ねん']),
+    JSON.stringify([2, 'word', '年', 'core', null, 'とし']), JSON.stringify([1, 'word', '年', 'core', null]), '[1, "word", "年", "core", null, "とし"]'])
+    assert.equal(c.validMetKey(bad), false, bad);
+});
+await check('g2-depth-boundaries-need-stability-and-present-recall', async () => {
+  const node = { id: '年', reading: 'とし' };
+  const cases = [[6.99, 0.95, 'again'], [7, 0.9, 'recalled'], [7, 0.8999, 'again'], [29.99, 0.95, 'recalled'], [30, 0.9, 'owned'], [30, 0.8999, 'again']];
+  for (const [stability, r, want] of cases) {
+    const c = g2Context({ retrievability: r });
+    const record = g2Record({ taken: [{ t: 'word', id: '年', label: '年', ts: 1 }], srs: { 'word:年': card({ stability }) } });
+    assert.equal(c.wordDepth(node, record, T0).depth, want, `S ${stability}, R ${r}`);
+  }
+  const states = [[0, 'met'], [1, 'again'], [3, 'again']];
+  for (const [state, want] of states) {
+    const c = g2Context({ retrievability: 0.99 });
+    const record = g2Record({ taken: [{ t: 'word', id: '年', label: '年', ts: 1 }], srs: { 'word:年': card({ state }) } });
+    assert.equal(c.wordDepth(node, record, T0).depth, want, `state ${state}`);
+  }
+  // no scheduler, no last review: the card lends no recall rank
+  const none = g2Context({ scheduler: false });
+  const reviewed = g2Record({ taken: [{ t: 'word', id: '年', label: '年', ts: 1 }], srs: { 'word:年': card() } });
+  assert.equal(none.wordDepth(node, reviewed, T0).depth, 'again');
+  const fresh = g2Context({ retrievability: 0.99 });
+  const unreviewed = g2Record({ taken: [{ t: 'word', id: '年', label: '年', ts: 1 }], srs: { 'word:年': (({ last_review, ...rest }) => rest)(card()) } });
+  assert.equal(fresh.wordDepth(node, unreviewed, T0).depth, 'again');
+  // a clock behind the card's last review reads at the review itself (srsSchedulerInstant), never a negative interval
+  const future = g2Context({ retrievability: 0.97 });
+  const ahead = g2Record({ taken: [{ t: 'word', id: '年', label: '年', ts: 1 }], srs: { 'word:年': card({ last_review: new Date(T0 + 3 * DAY).toISOString() }) } });
+  assert.equal(future.wordDepth(node, ahead, T0).depth, 'owned');
+  assert.equal(future.calls.at(-1).at.getTime(), T0 + 3 * DAY);
+  // encounters alone: one day met, two days again, nothing unmet
+  const c = g2Context();
+  const key = keyOf(c, node);
+  assert.equal(c.wordDepth(node, g2Record(), T0).depth, 'unmet');
+  assert.equal(c.wordDepth(node, g2Record({ met: { version: 1, entries: { [key]: { first: 1, last: 1, days: 1 } } } }), T0).depth, 'met');
+  assert.equal(c.wordDepth(node, g2Record({ met: { version: 1, entries: { [key]: { first: 1, last: 4, days: 2 } } } }), T0).depth, 'again');
+});
+await check('g2-a-different-reading-or-entry-is-at-most-met-and-never-rings', async () => {
+  const c = g2Context({ retrievability: 0.97, answered: ['年'] });
+  // his card is the core 年 read とし, owned; the text's 年 read ねん borrows none of it
+  const owned = g2Record({ taken: [{ t: 'word', id: '年', label: '年', ts: 1 }], srs: { 'word:年': card() } });
+  assert.equal(c.wordDepth({ id: '年', reading: 'とし' }, owned, T0).depth, 'owned');
+  assert.equal(c.wordDepth({ id: '年', reading: 'とし' }, owned, T0).kept, true);
+  for (const node of [{ id: '年', reading: 'ねん' }, { id: '年', seq: '2084840', reading: 'ねん' }]) {
+    const key = keyOf(c, node);
+    const seen = g2Record({ ...owned, met: { version: 1, entries: { [key]: { first: 1, last: 9, days: 5 } } } });
+    const result = c.wordDepth(node, seen, T0);
+    assert.equal(result.depth, 'met', JSON.stringify(node));
+    assert.equal(result.kept, false);
+    assert.equal(result.otherKept, true);
+    assert.equal(result.cap, 'identity');
+  }
+  // ポンド #1126030 is not #2855351, though both read ポンド
+  const pound = g2Record({ taken: [{ t: 'word', id: 'ポンド', label: 'ポンド', ts: 1, entrySeq: '1126030', cueReading: 'ポンド' }],
+    deepWords: { ポンド: { r: 'ポンド', m: ['pound (weight)'], seq: '1126030' } }, srs: { 'word:ポンド': card() } });
+  assert.equal(c.wordDepth({ id: 'ポンド', seq: '1126030', reading: 'ポンド' }, pound, T0).depth, 'owned');
+  assert.equal(c.wordDepth({ id: 'ポンド', seq: '2855351', reading: 'ポンド' }, pound, T0).depth, 'unmet');
+  assert.equal(c.wordDepth({ id: 'ポンド', seq: '2855351', reading: 'ポンド' }, pound, T0).kept, false);
+  // the core record beside its entry read alike: one word only where the dictionary, asked, has exactly that one entry
+  const nen = g2Record({ taken: [{ t: 'word', id: '年', label: '年', ts: 1, entrySeq: '1468060', cueReading: 'とし' }],
+    deepWords: { 年: { r: 'とし', m: ['year'], seq: '1468060' } }, srs: { 'word:年': card() } });
+  assert.equal(c.wordDepth({ id: '年', reading: 'とし' }, nen, T0).match, 'same');
+  const unasked = g2Context({ retrievability: 0.97 });
+  assert.equal(unasked.wordDepth({ id: '年', reading: 'とし' }, nen, T0).match, 'compatible');
+  assert.equal(unasked.wordDepth({ id: '年', reading: 'とし' }, nen, T0).depth, 'unmet');
+  assert.equal(unasked.wordDepth({ id: '年', reading: 'とし' }, nen, T0).kept, true);
+});
+await check('g2-golden-訳-read-やく-never-inherits-わけ', async () => {
+  const c = g2Context({ retrievability: 0.98, answered: ['訳'] });
+  const owned = g2Record({ taken: [{ t: 'word', id: '訳', label: '訳', ts: 1 }], srs: { 'word:訳': card({ stability: 60 }) } });
+  assert.equal(c.wordDepth({ id: '訳', reading: 'わけ' }, owned, T0).depth, 'owned');
+  const kawaguchi = { id: '訳', seq: '1538330', reading: 'やく' };
+  const result = c.wordDepth(kawaguchi, owned, T0);
+  assert.equal(result.identity.kind, 'unresolved');
+  assert.equal(result.identity.seq, null, 'no foreign entry in the identity');
+  assert(['unmet', 'met'].includes(result.depth));
+  assert.equal(result.kept, false);
+  const patch = c.encounterPatch(owned, kawaguchi, T0);
+  assert.deepEqual(Object.keys(patch), ['met']);
+  const [key] = Object.keys(patch.met.entries);
+  assert.deepEqual(JSON.parse(key), [1, 'word', '訳', 'unresolved', null, 'やく']);
+  const after = g2Record({ ...owned, ...clone(patch) });
+  assert.equal(c.wordDepth(kawaguchi, after, T0).depth, 'met');
+  assert.equal(c.wordDepth({ id: '訳', reading: 'わけ' }, after, T0).depth, 'owned', 'わけ is untouched');
+  // the tutor's and the examples' archive: やく never reads わけ's spelling-keyed rows
+  assert.equal(c.wordArchiveRef({ id: '訳' }, { r: 'わけ', m: ['reason'] }), 'word:訳');
+  assert.notEqual(c.wordArchiveRef({ id: '訳', reading: 'やく' }, { r: 'やく', m: [] }), 'word:訳');
+  assert.notEqual(c.wordArchiveRef({ id: '年', seq: '2084840' }, { seq: 2084840, r: 'ねん', m: ['year'] }), 'word:年');
+});
+await check('g2-not-yet-outranks-until-an-unrevoked-good-review-after-it', async () => {
+  const c = g2Context({ retrievability: 0.97 });
+  const node = { id: '年', reading: 'とし' };
+  const key = keyOf(c, node);
+  const said = (cursor) => ({ version: 1, entries: { [key]: { first: 1, last: 1, days: 1, said: { value: 'not-yet', at: T0, cursor } } } });
+  const base = { taken: [{ t: 'word', id: '年', label: '年', ts: 1 }], srs: { 'word:年': card() } };
+  const row = (g) => [T0 + 1000, 'word:年', g, 2, 1, 0.9, 40, 5, 41, 5, 30, T0 + 30 * DAY];
+  const before = [row(3)];
+  assert.equal(c.wordDepth(node, g2Record({ ...base, revlog: before, met: said(1) }), T0).depth, 'again');
+  assert.equal(c.wordDepth(node, g2Record({ ...base, revlog: before, met: said(1) }), T0).cap, 'not-yet');
+  assert.equal(c.wordDepth(node, g2Record({ ...base, revlog: [...before, row(2), row(1)], met: said(1) }), T0).depth, 'again', 'Hard and Again release nothing');
+  assert.equal(c.wordDepth(node, g2Record({ ...base, revlog: [...before, row(3)], met: said(1) }), T0).depth, 'owned', 'a Good review after it releases');
+  assert.equal(c.wordDepth(node, g2Record({ ...base, revlog: [...before, row(4)], met: said(1) }), T0).depth, 'owned', 'so does Easy');
+  assert.equal(c.wordDepth(node, g2Record({ ...base, revlog: [...before, row(3), [T0 + 2000, 'word:年', 0, 1]], met: said(1) }), T0).depth, 'again',
+    'an undone Good restores the cap');
+  assert.equal(c.wordDepth(node, g2Record({ ...base, revlog: [...before, [T0, 'word:学校', 3, 2, 1, 0.9, 1, 5, 2, 5, 3, T0]], met: said(1) }), T0).depth, 'again',
+    'another word\'s review releases nothing');
+  // "I know this" is his statement: at most "again", never a review's rank; and capped by identity
+  const known = { version: 1, entries: { [key]: { first: 1, last: 1, days: 1, said: { value: 'known', at: T0, cursor: 0 } } } };
+  assert.equal(c.wordDepth(node, g2Record({ met: known }), T0).depth, 'again');
+  assert.equal(c.wordDepth(node, g2Record({ met: known }), T0).kept, false);
+});
+await check('g2-kept-is-review-or-a-list-for-the-same-word-only', async () => {
+  const c = g2Context({ retrievability: 0.97 });
+  const node = { id: '総理', reading: 'そうり' };
+  assert.equal(c.wordDepth(node, g2Record({ taken: [{ t: 'word', id: '総理', label: '総理', ts: 1 }] }), T0).kept, true);
+  assert.equal(c.wordDepth(node, g2Record({ taken: [{ t: 'word', id: '総理', label: '総理', ts: 1 }] }), T0).depth, 'met');
+  assert.equal(c.wordDepth(node, g2Record({ lists: { 政治: [{ t: 'word', id: '総理', label: '総理', ts: 1 }] } }), T0).kept, true);
+  // a card's history outlives its removal, but history alone is not kept
+  const removed = c.wordDepth(node, g2Record({ srs: { 'word:総理': card() } }), T0);
+  assert.equal(removed.kept, false);
+  assert.equal(removed.depth, 'owned');
+  assert.equal(c.wordDepth(node, g2Record(), T0).kept, false);
+});
+await check('g2-a-look-up-writes-the-encounter-ledger-only-once-a-day', async () => {
+  const c = g2Context();
+  const node = { id: '総理', reading: 'そうり' };
+  const record = g2Record({ taken: [{ t: 'word', id: '総理', label: '総理', ts: 1 }], srs: { 'word:総理': card() }, revlog: [[1, 'word:総理', 3]],
+    met: { version: 1, entries: {}, future: { kept: 'as is' } } });
+  const first = c.encounterPatch(record, node, T0);
+  assert.deepEqual(Object.keys(first), ['met'], 'no scheduling root in a look-up');
+  for (const root of SCHEDULING) assert.equal(Object.hasOwn(first, root), false, root);
+  assert.equal(first.met.future.kept, 'as is', 'an unknown field of the root is kept');
+  const day = c.localDayOrdinal(T0);
+  assert.deepEqual(clone(first.met.entries[keyOf(c, node)]), { first: day, last: day, days: 1 });
+  const once = g2Record({ ...record, met: clone(first.met) });
+  assert.deepEqual(clone(c.encounterPatch(once, node, T0 + 3600000)), {}, 'the same day writes nothing');
+  assert.deepEqual(clone(c.encounterPatch(once, node, T0 - 2 * DAY)), {}, 'a clock moved back counts nothing');
+  const next = c.encounterPatch(once, node, T0 + DAY);
+  assert.deepEqual(clone(next.met.entries[keyOf(c, node)]), { first: day, last: day + 1, days: 2 });
+  // a later version of the root is someone else's: read-only here, never written, never reset
+  const later = g2Record({ met: { version: 2, opaque: ['kept'] } });
+  assert.deepEqual(clone(c.encounterPatch(later, node, T0)), {});
+  assert.equal(c.wordDepth(node, later, T0).depth, 'unmet');
+  // an extension field on an entry survives the next day's count
+  const extended = g2Record({ met: { version: 1, entries: { [keyOf(c, node)]: { first: day, last: day, days: 1, note: 'kept' } } } });
+  assert.equal(c.encounterPatch(extended, node, T0 + DAY).met.entries[keyOf(c, node)].note, 'kept');
+});
+await check('g2-his-correction-writes-met-only-and-toggles', async () => {
+  const c = g2Context();
+  const node = { id: '総理', reading: 'そうり' };
+  const record = g2Record({ taken: [{ t: 'word', id: '総理', label: '総理', ts: 1 }], srs: { 'word:総理': card() }, revlog: [[1, 'word:総理', 3], [2, 'word:総理', 4]] });
+  const notYet = c.correctionPatch(record, node, 'not-yet', T0);
+  assert.deepEqual(Object.keys(notYet), ['met']);
+  const entry = notYet.met.entries[keyOf(c, node)];
+  assert.deepEqual(clone(entry.said), { value: 'not-yet', at: T0, cursor: 2 });
+  const withSaid = g2Record({ ...record, met: clone(notYet.met) });
+  const undone = c.correctionPatch(withSaid, node, 'not-yet', T0 + 1);
+  assert.equal(Object.hasOwn(undone.met.entries[keyOf(c, node)], 'said'), false, 'pressing it again takes it back');
+  const known = c.correctionPatch(withSaid, node, 'known', T0 + 2);
+  assert.equal(known.met.entries[keyOf(c, node)].said.value, 'known');
+  assert.deepEqual(clone(c.correctionPatch(record, node, 'mastered', T0)), {});
+});
+await check('g2-the-roots-validate-strictly-and-keep-later-versions', async () => {
+  const c = g2Context();
+  const key = JSON.stringify([1, 'word', '年', 'core', null, 'とし']);
+  assert.equal(c.validMetRoot(null), true);
+  assert.equal(c.validMetRoot({ version: 1, entries: { [key]: { first: 3, last: 9, days: 4 } } }), true);
+  assert.equal(c.validMetRoot({ version: 3, anything: { at: 'all' } }), true, 'a later version is kept as it is');
+  for (const bad of [{ version: 1 }, { version: 1, entries: { [key]: { first: 9, last: 3, days: 1 } } }, { version: 1, entries: { [key]: { first: 3, last: 4, days: 3 } } },
+    { version: 1, entries: { [key]: { first: 3, last: 3, days: 0 } } }, { version: 1, entries: { 'word:年': { first: 3, last: 3, days: 1 } } },
+    { version: 1, entries: { [key]: { first: 3, last: 3, days: 1, said: { value: 'mastered', at: 1, cursor: 0 } } } }, [], 'met', { version: 0, entries: {} }])
+    assert.equal(c.validMetRoot(bad), false, JSON.stringify(bad));
+  const said = { version: 1, entries: { [key]: { first: 3, last: 3, days: 1, said: { value: 'not-yet', at: 1, cursor: 2 } } } };
+  assert.equal(c.metCursorsFit({ met: said, revlog: [[1], [2]] }), true);
+  assert.equal(c.metCursorsFit({ met: said, revlog: [[1]] }), false, 'a cursor past the log it travels with is refused');
+  const article = { src: '0000abcd', chars: 10, level: 'N3', helped: [key], done: 5, month: '2026-10' };
+  assert.equal(c.validReadHelp({ version: 1, since: 1, articles: { a: article } }), true);
+  assert.equal(c.validReadHelp({ version: 1, since: 1, articles: { a: { ...article, helped: [key, key] } } }), false, 'a word asked twice is one row');
+  assert.equal(c.validReadHelp({ version: 1, since: 1, articles: { a: { ...article, month: undefined } } }), false);
+  assert.equal(c.validReadHelp({ version: 1, since: 1, articles: { a: { ...article, src: 'nope' } } }), false);
+});
+await check('g2-help-per-1000-characters-counts-first-readings-once', async () => {
+  const tokens = (text) => [...text].map((s) => ({ s, b: s, r: '', c: true }));
+  const A = { id: 'a', tokens: tokens('あ'.repeat(1000)), authorLevel: 'N3' };
+  const B = { id: 'b', tokens: tokens('い'.repeat(500)), readingFacets: { jlpt: 'N5' } };
+  const C = { id: 'c', tokens: tokens('う'.repeat(300)) };
+  const c = g2Context({ passages: [A, B, C] });
+  const k1 = keyOf(c, { id: '総理', reading: 'そうり' });
+  const k2 = keyOf(c, { id: '年', reading: 'とし' });
+  let record = g2Record();
+  const apply = (patch) => { record = g2Record({ ...record, ...clone(patch) }); };
+  apply({ readHelp: c.readHelpPatch(record, 'a', k1, T0) });
+  assert.equal(c.readHelpPatch(record, 'a', k1, T0 + 1), null, 'the same word asked again in the same reading counts once');
+  apply({ readHelp: c.readHelpPatch(record, 'a', k2, T0 + 2) });
+  apply(c.readHelpFinishPatch(record, 'a', new Date(2026, 9, 31, 23, 59).getTime()));
+  apply(c.readHelpFinishPatch(record, 'b', T0 + 5));
+  assert.equal(c.readHelpPatch(record, 'a', keyOf(c, { id: '訳', reading: 'わけ' }), T0 + 6), null, 'nothing counts after the first finish');
+  assert.deepEqual(clone(c.readHelpFinishPatch(record, 'a', T0 + 7)), {}, 'finishing again never moves the first reading');
+  const signal = c.helpByMonth(record);
+  assert.equal(signal.months.length, 1);
+  const [october] = signal.months;
+  assert.equal(october.month, '2026-10');
+  assert.equal(october.chars, 1500);
+  assert.equal(october.help, 2);
+  assert.equal(Math.round(october.per1000 * 1000) / 1000, 1.333);
+  assert.equal(october.level, 'N4', 'the month\'s average level (N3 and N5)');
+  // a reading finished before counting began is not a first reading; a text changed under its id is not sealed
+  const before = g2Record({ readDone: { c: 1 } });
+  assert.equal(c.readHelpPatch(before, 'c', k1, T0), null);
+  const changed = g2Context({ passages: [A, B, { ...C, tokens: tokens('え'.repeat(300)) }] });
+  const begun = g2Record({ readHelp: c.readHelpPatch(g2Record(), 'c', k1, T0) });
+  assert.deepEqual(clone(changed.readHelpFinishPatch(begun, 'c', T0 + 1)), {});
+  assert.equal(changed.readHelpPatch(begun, 'c', k2, T0 + 1), null);
+  // no level, no help, no exposure: said as such, never estimated
+  const quiet = g2Record({ readHelp: c.readHelpFinishPatch(g2Record(), 'c', T0).readHelp });
+  assert.equal(c.helpByMonth(quiet).months[0].level, null);
+  assert.equal(c.helpByMonth(quiet).months[0].unlevelled, 1);
+  assert.equal(c.helpByMonth(quiet).months[0].per1000, 0);
+  assert.equal(c.helpByMonth(g2Record()), null);
+  assert.deepEqual(clone(c.helpByMonth(g2Record({ readHelp: { version: 1, since: T0, articles: {} } })).months), []);
+});
+/* Hfix-1B (L-1, the lead's Dogen look at G2): Me said "730 characters read unaided … less the 3 words you looked up" above
+ * "725 characters, 3 words asked" — unaided over read on one card. The lead figure counted the index's figure (whitespace
+ * in) and the help line the sealed first reading (whitespace aside): two rules. Both now read ONE count (articleReadChars). */
+await check('hfix1b-me-reads-one-count-so-unaided-never-exceeds-read', async () => {
+  const tokens = (text) => [...text].map((s) => ({ s, b: s, r: '', c: true }));
+  // 725 characters of text, two paragraph breaks besides; the index says 735 (its figure counts more than the text's own)
+  const A = { id: 'a', chars: 735, tokens: tokens(`${'あ'.repeat(700)}\n\n${'い'.repeat(25)}`) };
+  const c = g2Context({ passages: [A] });
+  let record = g2Record();
+  const apply = (patch) => { record = g2Record({ ...record, ...clone(patch) }); };
+  for (const [i, node] of [{ id: '総理', reading: 'そうり' }, { id: '日本', reading: 'にほん' }, { id: '年', reading: 'とし' }].entries())
+    apply({ readHelp: c.readHelpPatch(record, 'a', keyOf(c, node), T0 + i) });
+  apply(c.readHelpFinishPatch(record, 'a', T0 + 9));
+  apply({ readDone: { a: T0 + 9 }, obslog: [[T0, 'tap', 'word:総理', 1, 'a'], [T0 + 1, 'tap', 'word:日本', 2, 'a'], [T0 + 2, 'tap', 'word:年', 1, 'a']] });
+  c.S = record;
+  const help = c.helpByMonth(record).months[0];
+  const lead = clone(c.meReadUnaided());
+  assert.equal(help.chars, 725, 'the help line counts the sealed first reading');
+  assert.equal(help.help, 3);
+  assert.deepEqual(lead, { n: 720, read: 725, articles: 1, looked: 3 }, 'the lead counts the same 725, less the 5 characters of the 3 words');
+  assert(lead.n <= help.chars, 'unaided never exceeds what was read');
+  // Me opened cold (the article's text not loaded): the sealed first reading still counts it, never the index's figure
+  const cold = g2Context({ passages: [{ id: 'a', chars: 735 }] });
+  cold.S = record;
+  assert.equal(cold.meReadUnaided().read, 725);
+  assert.equal(cold.helpByMonth(record).months[0].chars, 725);
+  // an article finished before the help signal began and not loaded: its index figure, and still unaided ≤ read
+  const old = g2Context({ passages: [{ id: 'b', chars: 300 }] });
+  old.S = g2Record({ readDone: { b: 1 }, obslog: [[1, 'tap', 'word:総理', 1, 'b']] });
+  assert.deepEqual(clone(old.meReadUnaided()), { n: 298, read: 300, articles: 1, looked: 1 });
+});
+await check('g2-a-kept-word-answers-cold-from-its-own-card', async () => {
+  const c = g2Context();
+  const saved = g2Record({ taken: [{ t: 'word', id: '年', label: '年', ts: 1, entrySeq: '2084840', cueReading: 'ねん' }],
+    deepWords: { 年: { r: 'ねん', m: ['year', 'counter for years'], seq: '2084840' } } });
+  const rec = c.savedNodeRecord({ t: 'word', id: '年', seq: '2084840', reading: 'ねん' }, saved);
+  assert.equal(rec.r, 'ねん');
+  assert.equal(rec.seq, '2084840');
+  assert.deepEqual(clone(rec.m), ['year', 'counter for years']);
+  assert.equal(c.savedNodeRecord({ t: 'word', id: '年', seq: '1468060', reading: 'とし' }, saved), null, 'another entry is not this card');
+  assert.equal(c.savedNodeRecord({ t: 'word', id: '年', seq: '2084840', reading: 'とし' }, saved), null);
+  assert.equal(c.savedNodeRecord({ t: 'word', id: '年' }, saved), null, 'a door that names no entry is the dictionary\'s');
+});
+
+
+// The ticket writes no learner evidence. The accepted grade/undo and the separate
+// reader-position preference writer retain their own publication boundaries.
+if (!browserMode) {
+  const ticketPin = JSON.parse(readFileSync(resolve(root, 'data/fsrs-pin.json'), 'utf8'));
+  for (const acknowledged of [true, false]) await check(`ticket-return-retains-published-grade-${acknowledged ? 'acknowledged' : 'unacknowledged'}-without-an-extra-write`, async () => {
+    const f = readerTicketFixture(source, { core: srsCore, fsrsApi, pin: ticketPin });
+    const rv = f.start(); rv.revealed = true; rv.declared = 1;
+    const grade = f.grade(rv);
+    for (let i = 0; i < 12 && !f.queued.length; i++) await Promise.resolve();
+    assert(f.queued.length, 'actual shared grade reached its save');
+    f.ack({ acknowledged }); await grade; f.flushMicrotasks();
+    const roots = f.roots(), count = f.box.writes;
+    const reservation = f.storage.getItem('bunki-srs:answered-today');
+    f.door().fire(); f.flushTransition(); f.flushFrames();
+    assert.deepEqual(f.roots(), roots); assert.equal(f.box.writes, count);
+    assert.equal(f.storage.getItem('bunki-srs:answered-today'), reservation);
+    assert.equal(f.S.review, null); assert.equal(f.S.view, 'reader');
+    assert.equal(f.queued.length, 0);
+  });
+  await check('ticket-continuation-and-independent-reader-position-write-do-not-replay-grades', async () => {
+    const f = readerTicketFixture(source, { core: srsCore, fsrsApi, pin: ticketPin });
+    const old = f.start(); const ticket = f.ticket(); const roots = f.roots();
+    f.c.startReview(old.scope, { continueFrom: old });
+    assert.equal(f.ticket(), ticket); assert.notEqual(f.S.review, old); assert.equal(f.box.writes, 0);
+    f.door().fire(); f.flushTransition(); f.flushFrames();
+    vm.runInContext(liftCorridor(source, ['saveReaderPosition']), f.c);
+    const saved = f.c.saveReaderPosition(f.p.id, 321);
+    assert.equal(f.queued.length, 1); f.ack(); assert.equal(await saved, true);
+    const next = f.roots(); assert.equal(next.readerPos[f.p.id], 321); delete next.readerPos;
+    assert.deepEqual(next, roots); assert.equal(f.box.writes, 1, 'only independently invoked UI preference publication');
+  });
+}
+
 if (browserMode) await browserChecks();
 
 const receipt = { format: 'kairo-learning-acknowledgment-tests', version: 1,
@@ -1177,7 +1654,7 @@ const receipt = { format: 'kairo-learning-acknowledgment-tests', version: 1,
   artifactSha256: artifact?.artifactSha256,
   ...(propertyMode ? { properties: properties || { pass: false, receipt: 'learning-properties.json' } } : {}),
   ...(referenceMode ? { reference: reference ? { pass: reference.pass, receipt: 'learning-reference.json' } : { pass: false, receipt: 'learning-reference.json' } } : {}),
-  testedDefinitions: [...names], scope: browserMode ? 'Actual immutable staged browser UI and independently read native IndexedDB, plus controlled frozen-root acknowledgment tests' : 'Actual authored handlers with frozen synthetic roots and controlled save acknowledgments; no browser-storage claim',
+  testedDefinitions: [...names, ...G2_NAMES], scope: browserMode ? 'Actual immutable staged browser UI and independently read native IndexedDB, plus controlled frozen-root acknowledgment tests' : 'Actual authored handlers with frozen synthetic roots and controlled save acknowledgments; no browser-storage claim',
   results, pass: results.every((result) => result.pass) };
 writeFileSync(resolve(out, 'learning-record.json'), JSON.stringify(receipt, null, 2) + '\n');
 if (!receipt.pass) process.exitCode = 1;

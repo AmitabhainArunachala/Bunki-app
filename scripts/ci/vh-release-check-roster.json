@@ -1,0 +1,67 @@
+[
+  {
+    "id": "runner",
+    "checks": [
+      "successful children",
+      "failure aggregation and continuation",
+      "missing required paths and executables",
+      "missing actual runtime verifiers fail without skipping",
+      "timeout and grandchild cleanup",
+      "cancellation preserves interrupted and unrun outcomes",
+      "missing and incomplete receipts",
+      "completed receipt acceptance",
+      "practice engine, offline fault, artifact identity and complete journeys",
+      "record, learning and Drift receipts require exact cases, browser and artifact",
+      "offline gate requires one real run receipt, full lifecycle, exact cases, artifact and no failures",
+      "Hunt gate retains Drift matrix coverage and requires exact cases, schema, Chromium, artifact and verifier source",
+      "shelf-search requires both engines, all exact cases, strict latency, artifact and verifier identity",
+      "record note views require full mode, both engines, all exact cases and clean browser receipts",
+      "record note creation requires full mode,18 exact cases across both engines, artifact and verifier identity and no browser noise",
+      "native readings require completed pass,55 article-aware checks,30 acknowledged articles and exact identity",
+      "practice finalization requires68 ordered cases, pinned runtime and verifier identities, six synthetic controls and intact local evidence in both engines",
+      "real shell rejects tracked output"
+    ]
+  },
+  {
+    "id": "teaching-reports",
+    "checks": [
+      "teaching receipts require pinned artifacts and verifiers, complete named coverage and closed browser resources"
+    ]
+  },
+  {
+    "id": "search-reports",
+    "checks": [
+      "search receipts require current artifact/verifier pins, complete named coverage, scoped faults and closed resources"
+    ]
+  },
+  {
+    "id": "standalone-reports",
+    "checks": [
+      "standalone journey requires all twelve stations, pinned build/verifier identities, exact local output and closed silent browser handles"
+    ]
+  },
+  {
+    "id": "artifact-failures",
+    "checks": [
+      "executed artifact verification accepts a complete canonical app and rejects dirty, mutated, rehashed, unstamped, incomplete, missing-module and stale-module candidates"
+    ]
+  },
+  {
+    "id": "workflows",
+    "checks": [
+      "YAML parsed without duplicate keys",
+      "parallel native SDK and RPC execution retain exact commands and evidence",
+      "complete non-fail-fast plan and fresh-runner retry feed always-required admission",
+      "one packaged build and immutable artifact identity on every shard",
+      "full-only proof with exact-tree producer transfer or full verification fallback",
+      "main-only deployment of admitted unchanged bytes",
+      "legacy jobs remain read-only"
+    ]
+  },
+  {
+    "id": "workflow-failures",
+    "checks": [
+      "workflow admission preserves all native controls and rejects incomplete DAGs, partial matrices, skipped assertions, unverified artifact transfer and weakened promotion"
+    ]
+  }
+]
