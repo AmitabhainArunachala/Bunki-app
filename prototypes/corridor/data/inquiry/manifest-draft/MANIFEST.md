@@ -6,6 +6,8 @@ This is not frozen: MF5 alone performs the S13.8 freeze and any later hash. The 
 
 The author family is `moonshot`. Structural, prerequisite, and coverage review requires a verdict with `reviewer_family` and `model_id` from `zhipu`, `deepseek`, or `openai`; a verdict from the author family is invalid. Neither that review nor this draft certifies Japanese readings, meanings, or naturalness. Those judgments remain with native reviewers X4 through the obligations carried by each unit.
 
+This node's class is `experience`; it receives a schema-and-review check and no device walk. A different MF5 read path is fixed on MF5's contract, while this node exposes exactly one ```json block equal to `units.json`.
+
 ```json manifest
 {
   "manifest": "inquiry",
@@ -231,6 +233,12 @@ The author family is `moonshot`. Structural, prerequisite, and coverage review r
       ],
       "sources": [
         {
+          "id": "source:bunka-cho-keigo-guideline",
+          "kind": "government-guideline",
+          "title": "文化庁『敬語の指針』（2007年）",
+          "route": "S3-R8: library reference → excerpt intake → reader"
+        },
+        {
           "id": "source:bccwj",
           "kind": "balanced-corpus",
           "title": "国立国語研究所『現代日本語書き言葉均衡コーパス』",
@@ -246,13 +254,13 @@ The author family is `moonshot`. Structural, prerequisite, and coverage review r
       "compounding_obligations": [
         {
           "step": "earlier_reading_record",
-          "check": "Carry forward unit 02's corpus-query plan or selected excerpt together with the unchanged revision log and its source links.",
-          "source_id": "source:bccwj",
+          "check": "Carry forward unit 02's selected 敬語の指針 excerpt together with the unchanged revision log and its source links.",
+          "source_id": "source:bunka-cho-keigo-guideline",
           "evidence_store": "earlier_reading_record"
         },
         {
           "step": "later_linked_evidence",
-          "check": "Link a whole-sentence こころ excerpt from 青空文庫 as independent later evidence; do not substitute it for the earlier corpus record.",
+          "check": "Link a whole-sentence こころ excerpt from 青空文庫 as independent later evidence; do not substitute it for the earlier guideline record.",
           "source_id": "source:aozora-kokoro",
           "evidence_store": "linked_evidence"
         },
