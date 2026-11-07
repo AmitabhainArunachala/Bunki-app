@@ -1,0 +1,188 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "bunki:beginner-unit-manifest/1",
+  "title": "Beginner on-ramp unit manifest (draft shape, version 1)",
+  "description": "Checked by prototypes/corridor/tools/beginner-manifest.test.mjs with a small built-in validator (type, const, enum, pattern, min/max, required, properties, additionalProperties, items, $ref, oneOf, not). Word items are G9 identity entry ids; assessments name a check from the identity contract's modalities and the item ids they cover.",
+  "type": "object",
+  "required": ["manifest", "version", "drafted_at", "frozen", "freeze_date", "phase_order", "unit_count", "identity_contract", "frequency_source", "word_selection", "audio", "review_rules", "units", "words_next_500", "missing_at_base", "attribution"],
+  "not": { "required": ["hash"] },
+  "properties": {
+    "manifest": { "const": "beginner" },
+    "version": { "type": "integer", "minimum": 1 },
+    "drafted_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "frozen": { "const": false },
+    "freeze_date": { "type": "null" },
+    "phase_order": { "const": ["kana-and-sound", "survival-phrases", "situation-words", "guided-reading"] },
+    "unit_count": { "type": "integer", "minimum": 1 },
+    "identity_contract": {
+      "type": "object",
+      "required": ["version", "path", "word_item_id", "assessment_check_vocabulary"],
+      "properties": { "version": { "const": 2 }, "path": { "type": "string", "minLength": 1 } }
+    },
+    "frequency_source": {
+      "type": "object",
+      "required": ["id", "name", "version", "pinned_inputs", "tokenizer", "rules", "bias", "review_item"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "pinned_inputs": {
+          "type": "object",
+          "required": ["rule", "combined_sha256", "files"],
+          "properties": {
+            "combined_sha256": { "$ref": "#/$defs/sha256" },
+            "files": { "type": "array", "minItems": 1, "items": { "type": "object", "required": ["path", "sha256"], "properties": { "path": { "type": "string", "minLength": 1 }, "sha256": { "$ref": "#/$defs/sha256" } } } }
+          }
+        },
+        "rules": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "word_selection": {
+      "type": "object",
+      "required": ["rule", "band_slots", "tolerance", "grouping", "situations", "excluded_as_artifacts"],
+      "properties": {
+        "band_slots": { "type": "integer", "minimum": 1 },
+        "tolerance": { "type": "object", "required": ["ranks", "statement"], "properties": { "ranks": { "type": "integer", "minimum": 1 }, "statement": { "type": "string", "minLength": 1 } } },
+        "grouping": { "type": "object", "required": ["statement"], "properties": { "statement": { "type": "string", "minLength": 1 } } },
+        "excluded_as_artifacts": { "type": "array", "items": { "type": "object", "required": ["seq", "word", "reason"], "properties": { "seq": { "$ref": "#/$defs/seq" }, "reason": { "type": "string", "minLength": 1 } } } }
+      }
+    },
+    "audio": { "type": "object", "required": ["policy", "slot_id_rule", "roles_used"] },
+    "review_rules": { "type": "object", "required": ["japanese_truth"] },
+    "units": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/unit" } },
+    "words_next_500": { "type": "array", "minItems": 500, "maxItems": 500, "items": { "$ref": "#/$defs/nextWord" } },
+    "missing_at_base": { "type": "array", "items": { "type": "object", "required": ["id", "seq", "rank", "for"], "properties": { "seq": { "$ref": "#/$defs/seq" }, "for": { "const": "L2.1" } } } },
+    "attribution": { "type": "object", "required": ["jmdict", "snow", "tanaka"] }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "seq": { "type": "string", "pattern": "^[0-9]+$" },
+    "unitId": { "type": "string", "pattern": "^unit:beginner:(kana|phrases|words|reading):[a-z0-9-]+$" },
+    "canDo": { "type": "string", "pattern": "^I can .+\\.$" },
+    "idList": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+    "audioSlot": {
+      "type": "object",
+      "required": ["id", "role", "filled", "clip"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^slot:audio:unit:beginner:[a-z0-9-]+:[a-z0-9-]+:.+$" },
+        "role": { "enum": ["judged reference", "dictionary word audio", "narration"] },
+        "filled": { "const": false },
+        "clip": { "type": "null" }
+      }
+    },
+    "kanaItem": {
+      "type": "object",
+      "required": ["kind", "id", "kana", "romaji", "script", "type", "audio_slot"],
+      "properties": {
+        "kind": { "const": "kana" },
+        "id": { "type": "string", "pattern": "^kana:[\\u3041-\\u3096\\u30a1-\\u30fa\\u30fc]{1,2}$" },
+        "kana": { "type": "string", "minLength": 1 },
+        "romaji": { "type": "string", "minLength": 1 },
+        "script": { "enum": ["hiragana", "katakana"] },
+        "type": { "enum": ["basic", "dakuten", "handakuten", "yoon", "sokuon", "special", "loanword"] },
+        "audio_slot": { "$ref": "#/$defs/audioSlot" }
+      }
+    },
+    "wordItem": {
+      "type": "object",
+      "required": ["kind", "id", "seq", "spelling", "reading", "display", "gloss", "in_dict_v2", "missing_at_base", "audio_slot"],
+      "properties": {
+        "kind": { "const": "word" },
+        "id": { "type": "string", "pattern": "^entry:[0-9]+:.+\\|.+$" },
+        "seq": { "$ref": "#/$defs/seq" },
+        "spelling": { "type": "string", "minLength": 1 },
+        "reading": { "type": "string", "minLength": 1 },
+        "display": { "type": "string", "minLength": 1 },
+        "gloss": { "type": "string" },
+        "rank": { "type": ["integer", "null"], "minimum": 1 },
+        "situation": { "type": "string", "minLength": 1 },
+        "in_dict_v2": { "type": "boolean" },
+        "missing_at_base": { "type": "boolean" },
+        "audio_slot": { "$ref": "#/$defs/audioSlot" }
+      }
+    },
+    "phraseItem": {
+      "type": "object",
+      "required": ["kind", "id", "ja", "kana", "romaji", "en", "situation", "jmdict_seq", "entry_id", "key_words", "audio_slot", "native_review"],
+      "properties": {
+        "kind": { "const": "phrase" },
+        "id": { "type": "string", "pattern": "^phrase:beginner:[a-z0-9-]+$" },
+        "ja": { "type": "string", "minLength": 1 },
+        "kana": { "type": "string", "minLength": 1 },
+        "romaji": { "type": "string", "minLength": 1 },
+        "en": { "type": "string", "minLength": 1 },
+        "situation": { "type": "string", "minLength": 1 },
+        "jmdict_seq": { "type": ["string", "null"], "pattern": "^[0-9]+$" },
+        "entry_id": { "type": ["string", "null"], "pattern": "^entry:[0-9]+:.+\\|.+$" },
+        "key_words": { "type": "array", "items": { "type": "string", "pattern": "^entry:[0-9]+:.+\\|.+$" } },
+        "audio_slot": { "$ref": "#/$defs/audioSlot" },
+        "native_review": { "type": "object", "required": ["status"], "properties": { "status": { "enum": ["pending", "done"] } } }
+      }
+    },
+    "articleItem": {
+      "type": "object",
+      "required": ["kind", "id", "article_id", "path", "sha256", "title", "level", "audio_slot"],
+      "properties": {
+        "kind": { "const": "article" },
+        "id": { "type": "string", "pattern": "^article:[a-z0-9-]+$" },
+        "article_id": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "pattern": "^prototypes/corridor/data/articles/[a-z0-9-]+\\.json$" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "title": { "type": "string", "minLength": 1 },
+        "level": { "enum": ["N5", "N4"] },
+        "audio_slot": { "$ref": "#/$defs/audioSlot" }
+      }
+    },
+    "item": { "oneOf": [{ "$ref": "#/$defs/kanaItem" }, { "$ref": "#/$defs/wordItem" }, { "$ref": "#/$defs/phraseItem" }, { "$ref": "#/$defs/articleItem" }] },
+    "reviewObligation": {
+      "type": "object",
+      "required": ["type", "covers", "status"],
+      "properties": {
+        "type": { "enum": ["native-read", "phonetics-review", "other-family-review"] },
+        "covers": { "$ref": "#/$defs/idList" },
+        "status": { "enum": ["pending", "done"] },
+        "rule": { "type": "string" }
+      }
+    },
+    "assessment": {
+      "type": "object",
+      "required": ["check", "covers", "method"],
+      "properties": {
+        "check": { "enum": ["recognition", "recall", "production", "listening", "reading", "writing", "speaking"] },
+        "covers": { "$ref": "#/$defs/idList" },
+        "method": { "type": "string", "minLength": 1 }
+      }
+    },
+    "unit": {
+      "type": "object",
+      "required": ["id", "phase", "order", "title", "situation", "outcomes", "prerequisites", "items", "review_obligations", "assessments"],
+      "properties": {
+        "id": { "$ref": "#/$defs/unitId" },
+        "phase": { "enum": ["kana-and-sound", "survival-phrases", "situation-words", "guided-reading"] },
+        "order": { "type": "integer", "minimum": 1 },
+        "title": { "type": "object", "required": ["en", "ja"], "properties": { "en": { "type": "string", "minLength": 1 }, "ja": { "type": "string", "minLength": 1 } } },
+        "situation": { "type": "string", "minLength": 1 },
+        "band": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "outcomes": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/canDo" } },
+        "prerequisites": { "type": "array", "items": { "$ref": "#/$defs/unitId" } },
+        "items": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/item" } },
+        "review_obligations": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/reviewObligation" } },
+        "assessments": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/assessment" } }
+      }
+    },
+    "nextWord": {
+      "type": "object",
+      "required": ["position", "id", "seq", "spelling", "reading", "rank", "status", "materials", "missing_at_base"],
+      "properties": {
+        "position": { "type": "integer", "minimum": 501, "maximum": 1000 },
+        "id": { "type": "string", "pattern": "^entry:[0-9]+:.+\\|.+$" },
+        "seq": { "$ref": "#/$defs/seq" },
+        "rank": { "type": "integer", "minimum": 1 },
+        "status": { "enum": ["planned", "built"] },
+        "materials": { "type": "object", "required": ["dict_v2_entry", "example_sentences_in_bank", "lesson", "audio_clip"] },
+        "missing_at_base": { "type": "boolean" }
+      }
+    }
+  }
+}
