@@ -5,12 +5,14 @@ import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
-import { cpSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, extname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium, webkit } from 'playwright-core';
+import { contextBrowserVersion } from './browser-version-support.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+import { setUpDeviceTutorIfNone } from './tutor-fixture-support.mjs';
 
 assert(process.env.KAIRO_SITE_DIR && isAbsolute(process.env.KAIRO_SITE_DIR), 'Supply one immutable staged runtime explicitly');
 const OUT = resolveCorridorEvidence(), SITE = resolveCorridorSite();
@@ -23,8 +25,9 @@ const normalize = (value) => Array.isArray(value) ? value.map(normalize) : value
   ? Object.fromEntries(Object.keys(value).sort().map((key) => [key, normalize(value[key])])) : value;
 const digest = (value) => sha(JSON.stringify(normalize(value)));
 const manifest = JSON.parse(readFileSync(join(SITE, 'build-identity.json'), 'utf8'));
-const retainedSite = join(OUT, 'tested-site');
-cpSync(SITE, retainedSite, { recursive: true, errorOnExist: true, force: false });
+// resolveCorridorSite verifies every supplied artifact byte before this process uses it.
+// Share that preserved immutable artifact; source copies and gate evidence remain separate.
+const retainedSite = SITE;
 for (const file of manifest.files) assert.equal(sha(readFileSync(join(retainedSite, file.path))), file.sha256);
 const sourceCopies = [];
 for (const path of ['prototypes/corridor/tools/verify-teacher-drafts.mjs', 'prototypes/corridor/tools/record-test-support.mjs',
@@ -108,7 +111,8 @@ async function launch(fixture) {
   fixture.context = await ({ chromium, webkit }[fixture.engine]).launchPersistentContext(fixture.profile, {
     headless: true, viewport: { width: 1120, height: 1100 }, locale: 'en-US', serviceWorkers: 'block', acceptDownloads: true,
   });
-  browserVersions[fixture.engine] = fixture.context.browser()?.version();
+  await fixture.context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1')); // Returning device fixture.
+  browserVersions[fixture.engine] = await contextBrowserVersion(fixture.context, { chromium, webkit }[fixture.engine]);
   await fixture.transport.install(fixture.context);
   fixture.page = fixture.context.pages()[0] || await fixture.context.newPage(); fixture.page.setDefaultTimeout(15000);
   fixture.page.on('pageerror', (error) => fixture.errors.push({ phase: fixture.phase, message: error.message, stack: error.stack }));
@@ -139,12 +143,15 @@ async function selectTopic(fixture, contextRef) {
 }
 async function createTopic(fixture, { articleId = 'bunki-graded-n3-river', index = 0 } = {}) {
   await shelf(fixture);
+  // precondition now (Hfix-1B, item 11): a tutor set up, since the sentence's "Ask the tutor" needs one (a provider the case
+  // already configured stays as it is)
+  await setUpDeviceTutorIfNone(fixture.page);
   const source = fixture.page.locator(`.shelf-item[data-passage="${articleId}"]:not([data-recommendation]) .shelf-open`);
   assert.equal(await source.count(), 1, 'Source has one canonical bookshelf entry');
   await source.click();
   const token = fixture.page.locator(`#reader .tok[data-index="${index}"]`); await token.waitFor();
   const word = await token.getAttribute('data-word'); assert(word, 'Fixture chooses a real content word');
-  await token.click(); await fixture.page.locator('#mini-sentence-open').click(); await fixture.page.locator('#reader-teacher').click();
+  await openReaderWordStage(fixture.page, token); await fixture.page.locator('#mini-sentence-open').click(); await fixture.page.locator('#reader-teacher').click();
   await fixture.page.locator('#teacher-context-select').waitFor();
   await waitForAppRecord(fixture.page, (record) => record.teacherContexts?.entries.some((entry) => entry.sourceId === articleId && entry.index === index), { description: 'normal source-context save' });
   const native = await readAppRecordSnapshot(fixture.page);
@@ -155,6 +162,7 @@ async function createTopic(fixture, { articleId = 'bunki-graded-n3-river', index
 }
 async function configure(fixture) {
   const page = fixture.page;
+  await page.evaluate(() => { const d = document.getElementById('ai-connection'); if (d) d.open = true; }); // Q · the address and model fold under the tutor's Details
   await page.locator('#ai-base-url').fill(FAKE_ORIGIN); await page.locator('#ai-model-input').fill(FAKE_MODEL);
   await page.locator('#ai-key-input').fill(FAKE_KEY); await page.locator('#ai-key-save').click();
   await tutor(fixture); await page.waitForFunction(() => document.querySelector('#chat-send')?.disabled === false);
@@ -234,7 +242,8 @@ define('clean-close-before-debounce-general', async (fixture) => {
 });
 define('clean-close-before-debounce-selected-context', async (fixture) => {
   const topic = await createTopic(fixture);
-  assert.equal(await fixture.page.locator('#chat-send').isDisabled(), true);
+  // Hfix-1B: the door needs a tutor set up, so the question waits as a draft with one, and nothing was sent
+  assert.deepEqual({ blocked: fixture.transport.blocked.length, primary: fixture.transport.primary.length }, { blocked: 0, primary: 0 });
   await beforeDebounce(fixture, topic.id, '  A question about this sentence,\nstill unsent 猫 e\u0301  ', 'selected-context');
 });
 define('committed-topic-drafts-and-deliberate-clear-survive-browser-restart', async (fixture) => {
@@ -271,8 +280,23 @@ async function exportUi(fixture, label) {
 async function importUi(fixture, file) {
   if (!await fixture.page.locator('#import-file').count()) { await shelf(fixture); await fixture.page.locator('#tray').click(); }
   const timeOrigin = await fixture.page.evaluate(() => performance.timeOrigin);
-  await fixture.page.locator('#import-file').setInputFiles(file);
-  await fixture.page.waitForFunction((prior) => performance.timeOrigin !== prior && document.body.dataset.ready === '1', timeOrigin, { timeout: 20000 });
+  // Every restore now asks the learner to confirm first (Hfix-2a, 71907eb2). Accept exactly that confirmation, as
+  // record-fixture-support's selectBackupFile does; any other dialog fails the row. The one 20 s wait is unchanged.
+  let problem;
+  const confirm = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  fixture.page.on('dialog', confirm);
+  try {
+    await fixture.page.locator('#import-file').setInputFiles(file);
+    await fixture.page.waitForFunction((prior) => performance.timeOrigin !== prior && document.body.dataset.ready === '1', timeOrigin, { timeout: 20000 });
+    if (problem) throw problem;
+  } finally { fixture.page.off('dialog', confirm); }
   await tutor(fixture);
 }
 async function pendingQuestion(fixture, contextRef, question, reply, fail = false) {
@@ -316,13 +340,17 @@ define('synthetic-delayed-success-preserves-newer-text-and-deliberate-empty', as
     assert.notEqual(newer.revision, pending.submitted.revision);
     const edited = await snapshot(fixture, `${label}-edited-while-reply-pending`); await screenshot(fixture, `${label}-visible-while-pending`);
     pending.planned.release(); await successfulReply(fixture, reply);
-    assert.equal(await fixture.page.locator('#chat-input').inputValue(), nextText);
+    const editorAfterOutcome = await fixture.page.locator('#chat-input').inputValue(); assert.equal(editorAfterOutcome, nextText);
     const after = await snapshot(fixture, `${label}-after-delayed-success`); checkDraft(after, null, nextText, false, newer.revision);
     assert.deepEqual(after.record.teacherDrafts, edited.record.teacherDrafts, 'A late response cannot consume a different edit identity');
     assert(after.archive.turns.some((row) => row.role === 'assistant' && row.content === reply && row.xid === pending.outbound.xid));
     unchangedExcept(edited, after, ['aiChat']);
-    await restart(fixture); assert.equal(await fixture.page.locator('#chat-input').inputValue(), nextText);
-    checkDraft(await snapshot(fixture, `${label}-after-clean-restart`), null, nextText, false, newer.revision);
+    await restart(fixture); const editorAfterRestart = await fixture.page.locator('#chat-input').inputValue(); assert.equal(editorAfterRestart, nextText);
+    const reopened = await snapshot(fixture, `${label}-after-clean-restart`); checkDraft(reopened, null, nextText, false, newer.revision);
+    fixture.observations.push({ name: 'delayed-success-keeps-current-draft', label, providerStatus: pending.call.status,
+      submitted: pending.submitted, current: newer, outboundXid: pending.outbound.xid, reply,
+      outboundReplies: after.archive.turns.filter((row) => row.role === 'assistant' && row.xid === pending.outbound.xid).map((row) => row.content),
+      editorAfterOutcome, draftAfterOutcome: entry(after, null), editorAfterRestart, draftAfterRestart: entry(reopened, null) });
   }
 }, { synthetic: true });
 
@@ -334,12 +362,19 @@ define('synthetic-delayed-error-preserves-newer-text-and-deliberate-empty', asyn
     pending.planned.release();
     await waitForAppRecord(fixture.page, (record) => record.aiChat.some((row) => row.systemMessage === true), { description: 'durable synthetic provider failure line' });
     await finished(fixture);
-    assert.equal(await fixture.page.locator('#chat-input').inputValue(), nextText, 'Failure cannot restore old submitted text into a deliberate empty/new draft');
+    const editorAfterOutcome = await fixture.page.locator('#chat-input').inputValue();
+    assert.equal(editorAfterOutcome, nextText, 'Failure cannot restore old submitted text into a deliberate empty/new draft');
     const after = await snapshot(fixture, `${label}-after-delayed-provider-error`); checkDraft(after, null, nextText, false, newer.revision);
     assert.equal(after.archive.turns.filter((row) => row.xid === pending.outbound.xid && row.role === 'assistant').length, 0);
     unchangedExcept(pending.beforeReply, after, ['aiChat', 'teacherDrafts']);
     await screenshot(fixture, `${label}-failed-request-keeps-current-draft`);
-    await restart(fixture); assert.equal(await fixture.page.locator('#chat-input').inputValue(), nextText);
+    await restart(fixture); const editorAfterRestart = await fixture.page.locator('#chat-input').inputValue(); assert.equal(editorAfterRestart, nextText);
+    const reopened = await snapshot(fixture, `${label}-after-clean-restart`); checkDraft(reopened, null, nextText, false, newer.revision);
+    fixture.observations.push({ name: 'delayed-error-keeps-current-draft', label, providerStatus: pending.call.status,
+      submitted: pending.submitted, current: newer, outboundXid: pending.outbound.xid,
+      outboundReplies: after.archive.turns.filter((row) => row.role === 'assistant' && row.xid === pending.outbound.xid).map((row) => row.content),
+      failureLines: after.record.aiChat.filter((row) => row.systemMessage === true).length,
+      editorAfterOutcome, draftAfterOutcome: entry(after, null), editorAfterRestart, draftAfterRestart: entry(reopened, null) });
   }
 }, { synthetic: true });
 
@@ -713,3 +748,33 @@ try {
 }
 assert.equal(results.length, ENGINES.length * (FILTERS.size || definitions.length));
 assert(results.every((row) => row.pass), 'Teacher-draft persistent-browser journeys failed');
+
+// These source-context checks enter through the G3 ladder; the grammar itself is
+// checked separately. A second activation is allowed only after a real reading rung.
+async function openReaderWordStage(page, word) {
+  await word.click();
+  await page.waitForFunction(node => ['reading', 'gloss', 'stage'].includes(node?.dataset.ladderRung), await word.elementHandle());
+  if (await word.getAttribute('data-ladder-rung') === 'reading') {
+    assert.equal(await page.locator('#mini').count(), 0, 'First activation reveals reading without meaning');
+    // On-touch reader ruby paints through ::before; the native rt stays hidden
+    // to preserve the word's width. Require actual paint from either renderer.
+    await page.waitForFunction(node => [...node.querySelectorAll('ruby')].some(ruby => {
+      const rt = ruby.querySelector('rt');
+      if (!rt?.textContent.trim() || rt.classList.contains('hidden-rt')) return false;
+      const native = getComputedStyle(rt), floating = getComputedStyle(ruby, '::before');
+      return (rt.getClientRects().length > 0 && native.visibility !== 'hidden' && native.display !== 'none' && Number(native.opacity) > 0) ||
+        (ruby.getClientRects().length > 0 && ruby.dataset.r === rt.textContent && floating.content === JSON.stringify(rt.textContent) &&
+          floating.visibility !== 'hidden' && floating.display !== 'none' && Number(floating.opacity) > 0);
+    }), await word.elementHandle(), { timeout: 5000 });
+    await word.click();
+  }
+  // Ladder (John, 10-19): the English under the word comes before the stage; one more activation, only once it is seen
+  await page.waitForFunction(node => node?.dataset.ladderRung === 'gloss' || !!document.getElementById('mini'), await word.elementHandle());
+  if (await word.getAttribute('data-ladder-rung') === 'gloss') {
+    assert.equal(await page.locator('#mini').count(), 0, 'The English rung shows the meaning under the word, before the stage');
+    assert(await word.evaluate(node => !!node.querySelector(':scope > .tok-en .tok-en-text')), 'The English rung draws the English under the word');
+    await word.click();
+  }
+  await page.locator('#mini').waitFor();
+  assert.equal(await word.getAttribute('data-ladder-rung'), 'stage', 'The exact source word reaches its stage');
+}

@@ -515,6 +515,48 @@ async function tabToFirstAnswer(page, limit) {
   }
   return presses;
 }
+async function assertReadingRung(page, word) {
+  await page.waitForFunction(() => !!document.querySelector('.exam-paper [data-ladder-rung="reading"]'));
+  assert.equal(await word.getAttribute('data-ladder-rung'), 'reading', 'The same occurrence owns the reading rung');
+  assert.equal(await page.locator('#mini').count(), 0, 'The first activation does not expose the stage');
+  // Ladder (John, 10-19: "one tap should just be the furigana"): no English under the word yet
+  assert.equal(await word.locator('.tok-en').count(), 0, 'The first activation does not expose the English');
+  assert(await word.locator('rt').evaluateAll(nodes => nodes.some(node => {
+    const style = getComputedStyle(node);
+    return node.textContent.trim() && style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0;
+  })), 'The first reading is visible');
+}
+/** Ladder · the English rung as drawn on one occurrence: its rows of English under the word (.tok-en > .tok-en-text), that
+ * text and whether it paints, whether the reading still paints over the word, and the has-en / DOTS-hook marks. */
+const englishFacts = (node) => {
+  const rows = node.querySelectorAll(':scope > .tok-en');
+  const ink = rows[0]?.querySelector(':scope > .tok-en-text');
+  const style = ink ? getComputedStyle(ink) : null;
+  return { rows: rows.length, text: ink?.textContent.trim() || null,
+    painted: !!style && style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0 && ink.getClientRects().length > 0,
+    reading: [...node.querySelectorAll('rt')].some((rt) => {
+      const shown = getComputedStyle(rt);
+      return rt.textContent.trim() && shown.display !== 'none' && shown.visibility !== 'hidden' && Number(shown.opacity) > 0;
+    }),
+    hasEn: node.classList.contains('has-en'), aside: node.dataset.depthAside ?? null };
+};
+/** Ladder (John, 10-19: "two taps should be the furigana plus the english word underneath"): the activation after the
+ * reading keeps the reading and sets the word's English under it, and opens no stage. Returns the English it shows. */
+async function assertEnglishRung(page, word) {
+  await page.waitForFunction(() => !!document.querySelector('.exam-paper [data-ladder-rung="gloss"]'));
+  assert.equal(await word.getAttribute('data-ladder-rung'), 'gloss', 'The same occurrence owns the English rung');
+  assert.equal(await page.locator('#mini').count(), 0, 'The English rung does not expose the stage');
+  const { text, ...drawn } = await word.evaluate(englishFacts);
+  assert.deepEqual(drawn, { rows: 1, painted: true, reading: true, hasEn: true, aside: 'meaning' },
+    'The English rung paints one row of English under the word, its reading kept, the DOTS hook on this occurrence');
+  assert(text, 'The English row says the entry\'s English, or the dash where the entry has none');
+  return text;
+}
+/** The stage keeps the English its climb set under the word (Ladder: the reading and the English stay under the box). */
+async function assertStageKeepsEnglish(word, english) {
+  assert.equal(await word.evaluate((node) => node.querySelector(':scope > .tok-en > .tok-en-text')?.textContent.trim() ?? null), english,
+    'The stage keeps the same English under the word');
+}
 // A machine-checked N3 test sits the real paper on the one question sheet: two 試験科目 with their official minutes, 問題
 // headers in the official wording, numbers that restart with the second booklet, underlined
 // targets, and results by the official 得点区分 beside the published marks.
@@ -589,13 +631,14 @@ async function officialPaperStudyHeading(page) {
   await page.locator('.exam-paper-question').waitFor();
   const heading = await page.locator('.exam-task-heading').evaluate((node) => {
     const words = [...node.querySelectorAll('.japanese-lookup-word')];
-    return { text: node.textContent, words: words.length, stops: words.filter((word) => word.tabIndex === 0).length,
+    return { text: node.textContent, words: words.length, stops: words.filter((word) => word.tabIndex === 0).length, paragraphStop: node.tabIndex,
       numberWords: node.querySelectorAll('.exam-mondai-no .japanese-lookup-word').length,
       nameWords: node.querySelectorAll('.exam-daimon .japanese-lookup-word').length };
   });
   assert.equal(heading.text, 'Question 1問題１\u3000Kanji reading漢字読み');
   assert(heading.numberWords >= 1 && heading.nameWords >= 1, 'The 問題 number and the 大問 name are lookup words in study mode');
-  assert.equal(heading.stops, 1, 'The 問題 heading is one Tab stop');
+  assert.equal(heading.stops, 0, 'The heading words are not sequential Tab stops');
+  assert.equal(heading.paragraphStop, 0, 'The 問題 heading itself is one Tab stop');
   return heading;
 }
 // Every case this invocation could run, and whether the filter selected it: the receipt
@@ -619,6 +662,8 @@ async function run(engine, name, action) {
       : {}),
     viewport: { width: 320, height: 844 },
   });
+  const browserVersion = context.browser().version();
+  console.log(`BROWSER ${engine} ${browserVersion}`);
   const page = context.pages()[0] || (await context.newPage());
   fitContext.set(page, { engine, name });
   page.setDefaultTimeout(20000);
@@ -638,6 +683,7 @@ async function run(engine, name, action) {
     assert.deepEqual(external, [], 'No external service was contacted');
     results.push({
       engine,
+      browserVersion,
       name,
       passed: true,
       startedAt,
@@ -679,6 +725,7 @@ async function run(engine, name, action) {
     };
     results.push({
       engine,
+      browserVersion,
       name,
       passed: false,
       startedAt,
@@ -990,7 +1037,7 @@ async function assistedWhyCase(page, section, log) {
     await stage(`door-${row.q}`, 'setup', async (o) => {
       // before the tap: the door states its cost; no rule, no sheet, no durable mark
       o.cost = await page.locator('#exam-why-cost').innerText();
-      assert.match(o.cost, /locks this answer and marks it assisted/u);
+      assert.equal(o.cost, 'Opening it locks this answer and records it as answered with help');
       assert.equal(await page.locator('#exam-why-sheet').count(), 0);
       assert(!(await bodyText()).includes(byQ[row.q].rationale), `${row.q}: rule hidden before the durable mark`);
     });
@@ -1229,8 +1276,8 @@ async function assistedWhyCase(page, section, log) {
     o.score = await page.locator('.exam-score').textContent();
     o.partition = await page.locator('.exam-independence').textContent();
     o.markedRows = await page.locator('[data-exam-assisted="true"]').evaluateAll((nodes) => nodes.map((node) => node.dataset.examItem));
-    assert.equal(o.score, `8 of ${items.length} correct, including 2 assisted`);
-    assert.equal(o.partition, 'Independent 7 · Assisted 3 · Unanswered 2');
+    assert.equal(o.score, `8 of ${items.length} correct, including 2 with help`);
+    assert.equal(o.partition, 'Independent 7 · With help 3 · Unanswered 2');
     assert.deepEqual(o.markedRows, G1.assisted.map((q) => byQ[q].id));
   });
   await stage('F3-post-terminal-reload', 'behavior', async (o) => {
@@ -1273,7 +1320,7 @@ async function assistedWhyCase(page, section, log) {
     await page.locator('#assessment-question-feedback').waitFor();
     o.marks = await page.locator('.review-face .assessment-review-assisted').allInnerTexts();
     assert.equal(o.before, 0, 'No mark before the answer is checked');
-    assert.deepEqual(o.marks, ['Assisted · you opened the explanation after answering']);
+    assert.deepEqual(o.marks, ['With help · you opened the explanation after answering']);
   });
   return { attemptId, kept, counts: { correct: 8, incorrect: 2, independent: 7, assisted: 3, unanswered: 2 } };
 }
@@ -1376,10 +1423,11 @@ async function existingCardCase(page, section, log) {
   return { first: first.attemptId, second: second.attemptId, mark: second.mark };
 }
 
-// Machine-checked written tests name that a person has not yet checked them.
+// S (John, 2026-10-16: no provenance in the learner's app): written tests are counted, no more — it pinned "· not yet checked
+// by a person" after the count; the review state stays in each entry's record
 const machineWritten = catalog.entries.filter((row) => row.availability.ready && row.mode === 'written').length;
 const dojoPracticeLabel = machineWritten
-  ? `${machineWritten} written tests · not yet checked by a person`
+  ? `${machineWritten} written test${machineWritten === 1 ? '' : 's'}`
   : `${sections.length} practice set${sections.length === 1 ? '' : 's'} · practice sets available`;
 try {
   for (const engine of engines) {
@@ -1505,19 +1553,37 @@ try {
       assert.equal(initial.attempt.answers[0].response.kind, 'unanswered');
       assert.equal(assessmentItemAssistanceV2(initial.attempt, item.id), null);
       assert.equal(await page.locator('.exam-paper button button').count(), 0);
-      const lookupWord = page.locator('.exam-prompt .japanese-lookup-word').first();
+      const lookupWord = page.locator('.exam-prompt .japanese-lookup-word').filter({ hasText: /\p{Script=Han}/u }).first();
       assert(await lookupWord.count(), 'A real study question has lookup controls');
       const lookupText = await lookupWord.textContent();
       await lookupWord.click();
-      await page.locator('#mini').waitFor();
+      await assertReadingRung(page, lookupWord);
       const assistedRecord = await disk(page);
       const assisted = selectAssessmentV2(assistedRecord.assessmentLibraryV2);
       const mark = assessmentItemAssistanceV2(assisted.attempt, item.id);
-      assert.equal(mark?.kind, 'dictionary', 'Native assistance must be committed before the reading popup');
+      assert.equal(mark?.kind, 'dictionary', 'Native assistance must be committed before the first reading');
       assert.equal(assisted.attempt.answers[0].response.kind, 'unanswered');
       assert.equal(await page.locator('#exam-why-sheet').count(), 0);
       assert.equal(await page.locator('[data-exam-option]').first().isEnabled(), true);
+      // Ladder (John, 10-19, a spec change): the second activation no longer opens the stage. It sets the word's English
+      // under it (the second rung), and only once that rung is seen does the third open the stage; neither rewrites the
+      // recorded help.
+      await lookupWord.click();
+      const english = await assertEnglishRung(page, lookupWord);
+      assert.deepEqual(assessmentItemAssistanceV2(selectAssessmentV2((await disk(page)).assessmentLibraryV2).attempt, item.id), mark,
+        'The second rung does not rewrite the recorded help');
+      await lookupWord.click();
+      await page.locator('#mini').waitFor();
+      assert.equal(await lookupWord.getAttribute('data-ladder-rung'), 'stage');
+      await assertStageKeepsEnglish(lookupWord, english);
+      assert.deepEqual(assessmentItemAssistanceV2(selectAssessmentV2((await disk(page)).assessmentLibraryV2).attempt, item.id), mark,
+        'The third rung (the stage) does not rewrite the recorded help');
       await page.locator('.exam-heading').click();
+      assert.equal(await lookupWord.getAttribute('data-ladder-rung'), null);
+      assert.equal(await lookupWord.locator('rt').count(), 0, 'Dismissal restores bare prose');
+      // Ladder (John, 10-19): bare is also without the English the climb set under the word, and without its DOTS-hook marks
+      assert.deepEqual(await lookupWord.evaluate(englishFacts), { rows: 0, text: null, painted: false, reading: false, hasEn: false, aside: null },
+        'Dismissal clears the English under the word');
       await wrongAnswer(page, item);
       const chosen = selectAssessmentV2((await disk(page)).assessmentLibraryV2);
       assert.equal(chosen.attempt.answers[0].flagged, false, 'No bookmark was needed');
@@ -1549,11 +1615,121 @@ try {
       assert.deepEqual(completed.revlog, baseline.revlog);
       assert.match(await page.locator('.exam-bookmark-note').innerText(), /1 wrong answers saved, with or without bookmarks/u);
       await page.screenshot({ path: resolve(evidence, `${engine}${suffix}-study-missed-without-bookmark.png`), fullPage: true });
-      return { lookupText, mark, mistake: mistake.id, prioritySubjects: priorities.targets.map(row => row.subject),
+      return { lookupText, english, mark, mistake: mistake.id, prioritySubjects: priorities.targets.map(row => row.subject),
         unanswered: followup.evidence.filter(row => row.outcome === 'unanswered' || row.outcome === 'not-reached').length };
     });
-    // R4 · a long 読解 question: each prose block is ONE Tab stop, reached word by word with
-    // ←/→ and Home/End; the word is its own name; Esc returns to the same occurrence. The Tab
+    // G3 · the word's menu reveals nothing, so opening and dismissing it records no help; Full entry reveals the entry and
+    // records the dictionary help once, before the page opens. G5 · the menu is the hold's strip: a right-click (a hold,
+    // Shift+F10) keeps the word once and opens the strip, and a second one opens the same strip and writes nothing.
+    await run(engine, `study-word-menu-records-help-only-on-reveal${suffix}`, async (page, context, log) => {
+      await start(page, section, 'practice');
+      const item = items[0];
+      const attempt = async () => selectAssessmentV2((await disk(page)).assessmentLibraryV2).attempt;
+      const word = '橋';
+      const lookupWord = page.locator(`.exam-prompt .japanese-lookup-word[data-lookup-text="${word}"]`);
+      assert.equal(await lookupWord.count(), 1, 'The real first study question has the selected dictionary occurrence');
+      const lookupText = await lookupWord.textContent();
+      const menu = page.locator('#seal-strip');
+      const before = await attempt();
+      const recordBefore = await disk(page);
+      assert.equal(assessmentItemAssistanceV2(before, item.id), null);
+      const bare = async (label) => {
+        assert.equal(await page.locator('#mini, #sheet, .exam-prompt [data-ladder-rung]').count(), 0, `${label} reveals no hint or page`);
+        assert.equal(await lookupWord.locator('rt').count(), 0, `${label} leaves the occurrence bare`);
+      };
+      const stripActions = () => menu.evaluate((node) => ({
+        actions: [...node.querySelectorAll('[data-strip-action]')].filter((button) => !button.hidden).map((button) => button.dataset.stripAction),
+        status: node.querySelector('.seal-strip-status')?.textContent || '' }));
+
+      // the deliberate keep: the first right-click seals the word once, invents no grade and records no assistance
+      assert.equal(recordBefore.taken.some(row => row.t === 'word' && row.id === word), false, 'The fixture starts with this word unsaved');
+      await lookupWord.click({ button: 'right' });
+      await menu.waitFor();
+      const savedRecord = await pollRecord(page, row => row.taken.some(saved => saved.t === 'word' && saved.id === word));
+      const sealed = await stripActions();
+      const savedRows = savedRecord.taken.filter(row => row.t === 'word' && row.id === word);
+      assert.equal(savedRows.length, 1, 'The keep durably adds the selected word once');
+      assert.deepEqual(savedRecord.taken.filter(row => !(row.t === 'word' && row.id === word)), recordBefore.taken, 'The keep preserves existing cards');
+      assert.deepEqual(savedRecord.srs, recordBefore.srs, 'The keep does not invent a review grade');
+      assert.deepEqual(savedRecord.revlog, recordBefore.revlog);
+      assert.deepEqual(selectAssessmentV2(savedRecord.assessmentLibraryV2).attempt, before, 'The keep records no assistance or answer');
+      assert(/Saved ✓/u.test(sealed.status) && sealed.actions.includes('remove'), `The strip says the word is kept: ${JSON.stringify(sealed)}`);
+      await page.keyboard.press('Escape');
+      await menu.waitFor({ state: 'detached' });
+      await bare('The kept word');
+      log.stages.push({ name: 'word-strip-keep', savedRows, strip: sealed, actualAttempt: await attempt(), expectedAttempt: before });
+
+      const dismissals = {};
+      for (const [how, dismiss] of [['escape', () => page.keyboard.press('Escape')], ['outside', () => page.locator('.exam-heading').click()]]) {
+        await lookupWord.click({ button: 'right' });
+        await menu.waitFor();
+        const openAttempt = await attempt();
+        dismissals[how] = (await stripActions()).actions;
+        await dismiss();
+        await menu.waitFor({ state: 'detached' });
+        await page.waitForTimeout(300);
+        const actualAttempt = await attempt();
+        log.stages.push({ name: `word-strip-dismiss-${how}`, modality: 'right-click', dismissal: how,
+          openAttempt, expectedAttempt: before, actualAttempt });
+        assert.deepEqual(actualAttempt, before, `Opening and dismissing the word's strip (${how}) records nothing`);
+        assert.deepEqual(openAttempt, before, `The open strip (${how}) records nothing`);
+        assert.deepEqual(await disk(page), savedRecord, `Opening and dismissing the strip again (${how}) leaves the learner record as the keep left it`);
+        await bare(`The dismissed strip (${how})`);
+      }
+      assert(['entry', 'copy', 'remove'].every(action => dismissals.escape.includes(action)), 'The kept word\'s strip offers Full entry, Copy and Remove');
+      await lookupWord.click({ button: 'right' });
+      await menu.locator('[data-strip-action="copy"]').click();
+      await menu.waitFor({ state: 'detached' });
+      const copyToast = page.locator('#reader-toast .reader-toast-text');
+      await copyToast.waitFor();
+      const copyOutcome = await copyToast.innerText();
+      // Native clipboard permissions differ by engine; this proves help attribution for the
+      // actual Copy action and its terminal UI, without claiming to inspect OS clipboard data.
+      assert([`Copied ${word}`, 'Could not copy'].includes(copyOutcome), 'The actual Copy action reports its outcome');
+      assert.deepEqual(await attempt(), before, 'Copy records no assistance');
+      assert.deepEqual(await disk(page), savedRecord, 'Copy leaves the learner record unchanged');
+      await bare('Copy');
+      log.stages.push({ name: 'word-strip-copy', copyOutcome, actualAttempt: await attempt(), expectedAttempt: before });
+
+      await lookupWord.click({ button: 'right' });
+      const entry = menu.locator('[data-strip-action="entry"]');
+      await entry.waitFor();
+      assert.equal(await entry.isDisabled(), false, `${lookupText} has a full entry to open`);
+      await entry.click();
+      await page.locator('#sheet').waitFor();
+      const after = await attempt();
+      const mark = assessmentItemAssistanceV2(after, item.id);
+      assert.equal(mark?.kind, 'dictionary', 'Full entry records the dictionary help');
+      assert.equal(after.events.length, before.events.length + 1, 'Full entry records exactly one assistance event');
+      assert.deepEqual(after.events.slice(0, -1), before.events, 'Full entry preserves the earlier attempt events');
+      const helpEvent = after.events.at(-1);
+      assert.equal(helpEvent.kind, 'assistance');
+      assert.equal(helpEvent.detail, `dictionary:${item.sha256}`, 'The one help event belongs to this exact question');
+      // An admitted assistance command also accounts for time on the current question.
+      // Retain exact answer equality after accounting for that measured delta only.
+      assert.equal(before.clock.interrupted, false, 'This live question has uninterrupted elapsed accounting');
+      assert.deepEqual(after.cursor, before.cursor, 'Full entry keeps the same question and block');
+      assert.equal(after.clock.sessionId, before.clock.sessionId);
+      assert(Number.isFinite(before.clock.lastMonotonicMs) && Number.isFinite(after.clock.lastMonotonicMs));
+      const elapsedDelta = after.clock.elapsedMs - before.clock.elapsedMs;
+      assert(Number.isFinite(elapsedDelta) && elapsedDelta >= 0);
+      assert.equal(elapsedDelta, Math.max(0, after.clock.lastWallMs - before.clock.lastWallMs,
+        after.clock.lastMonotonicMs - before.clock.lastMonotonicMs), 'The retained clock advances by its observed wall/monotonic delta');
+      const beforeBlock = before.blocks.find(block => block.blockId === before.cursor.blockId);
+      const afterBlock = after.blocks.find(block => block.blockId === after.cursor.blockId);
+      assert.equal(beforeBlock.status, 'open');
+      assert.equal(afterBlock.status, 'open');
+      assert.equal(afterBlock.elapsedMs - beforeBlock.elapsedMs, elapsedDelta, 'The open block retains exactly the same elapsed delta');
+      const expectedAnswers = before.answers.map(answer => answer.item.id === before.cursor.itemId
+        ? { ...answer, elapsedMs: answer.elapsedMs + elapsedDelta } : answer);
+      assert.deepEqual(after.answers, expectedAnswers, 'Full entry preserves every answer field apart from the exact current-question elapsed delta');
+      const recordAfter = await disk(page);
+      for (const field of ['taken', 'srs', 'revlog']) assert.deepEqual(recordAfter[field], savedRecord[field], `Full entry leaves ${field} unchanged`);
+      log.stages.push({ name: 'word-strip-entry', actualAttempt: after, helpEvent, mark });
+      return { lookupText, menu: dismissals.escape, copyOutcome, savedRows, mark, helpEvent };
+    });
+    // G3 · a long 読解 question: each prose paragraph is ONE Tab stop, reached word by word with
+    // ←/→ and Home/End; only the selected word is named; Esc returns to the same occurrence. The Tab
     // budget runs first and reads only markup that predates this change, so the prior per-word
     // build fails it for the right reason.
     const longReading = [...items].filter((item) => item.passages.length).sort((a, b) =>
@@ -1568,29 +1744,39 @@ try {
 
       const blocks = await page.evaluate(() => [...document.querySelectorAll('.exam-paper [data-lookup-block]')].map((block) => {
         const words = [...block.querySelectorAll('.japanese-lookup-word')].filter((word) => word.closest('[data-lookup-block]') === block);
-        return { words: words.map((word) => word.textContent), stops: words.filter((word) => word.tabIndex === 0).length,
+        return { text: block.textContent, words: words.map((word) => word.textContent), stops: words.filter((word) => word.tabIndex >= 0).length,
           labels: words.filter((word) => word.hasAttribute('aria-label')).length,
-          described: [...new Set(words.map((word) => word.getAttribute('aria-describedby')))] };
+          nonPresentationRoles: words.filter((word) => word.getAttribute('role') !== 'presentation').length, tabAttributes: words.filter((word) => word.hasAttribute('tabindex')).length, nativeButtons: words.filter((word) => word.tagName === 'BUTTON').length,
+          paragraphStop: block.tabIndex, prose: block.dataset.proseRoving, described: block.getAttribute('aria-describedby')?.split(/\s+/u) || [] };
       }).filter((block) => block.words.length));
       assert(blocks.length >= budget.prose, 'Every prose block is a lookup block');
       const help = await page.evaluate(() => {
         const node = document.getElementById('japanese-lookup-help');
         return node && { text: node.textContent, hidden: node.hidden, inPaper: !!node.closest('.exam-paper') };
       });
-      assert.deepEqual(help, { text: 'Enter: reading and meaning · ←/→: next word', hidden: true, inPaper: false });
+      assert.deepEqual(help, { text: '←/→: choose a word · Enter: open · Shift+F10: save and more', hidden: true, inPaper: false });
       for (const block of blocks) {
-        assert.equal(block.stops, 1, `One Tab stop per block: ${block.words.join('')}`);
+        assert.equal(block.stops, 0, `No word enters the sequential Tab order: ${block.words.join('')}`);
+        assert.equal(block.paragraphStop, 0, 'The paragraph itself is the stop');
+        assert.equal(block.prose, 'true');
+        assert.equal(block.nativeButtons, 0, 'Inline prose is not a native button-per-word stream');
         assert.equal(block.labels, 0);
+        assert.equal(block.nonPresentationRoles, 0);
+        assert.equal(block.tabAttributes, 0);
         assert.deepEqual(block.described, ['japanese-lookup-help']);
       }
-      const names = [];
+      const proseSnapshots = [];
       for (const block of await page.locator('.exam-paper [data-lookup-block]').all()) {
-        for (const line of (await block.ariaSnapshot()).split('\n')) {
-          const match = /^\s*- button "(.*)"/u.exec(line);
-          if (match) names.push(JSON.parse(`"${match[1]}"`));
-        }
+        if (!await block.locator('.japanese-lookup-word').count()) continue;
+        const snapshot = await block.ariaSnapshot();
+        assert.doesNotMatch(snapshot, /^\s*- (?:button|group)(?:\s|:)/mu, 'Idle prose has no word control stream in the accessibility tree');
+        const text = (await block.textContent()).replace(/\s+/gu, '');
+        // AX serializers insert boundary spaces between inline text runs; preserve text order, not those serialization spaces.
+        const prose = snapshot.replace(/\s+/gu, '');
+        assert(prose.includes(text) || prose.includes(JSON.stringify(text).slice(1, -1)), `The accessibility paragraph retains its continuous visible text: ${JSON.stringify({text,snapshot})}`);
+        proseSnapshots.push(snapshot);
       }
-      assert.deepEqual(names, blocks.flatMap((block) => block.words), 'Each word is named by exactly its visible text');
+      assert.equal(proseSnapshots.length, blocks.length);
       assert.equal(await page.locator('.exam-prompt').evaluate(readQuestionText), expectedQuestionText(longReading));
 
       const passage = page.locator('.exam-passage p');
@@ -1601,7 +1787,9 @@ try {
         const block = document.querySelector('.exam-passage p');
         return [...block.querySelectorAll('.japanese-lookup-word')].indexOf(document.activeElement);
       });
-      await passage.locator('.japanese-lookup-word[tabindex="0"]').focus();
+      await passage.focus();
+      await page.keyboard.press('ArrowRight');
+      assert.equal(await activeIndex(), 0, 'ArrowRight enters the paragraph at its first word');
       await page.keyboard.press('End');
       assert.equal(await activeIndex(), passageCount - 1);
       await page.keyboard.press('ArrowRight');
@@ -1624,7 +1812,14 @@ try {
       await page.keyboard.press('Tab');
       assert.equal(await page.evaluate(() => !!document.activeElement.closest('.exam-prompt')), true);
       await page.keyboard.press('Shift+Tab');
-      assert.equal(await activeIndex(), 3, 'The block remembers the last-visited word');
+      assert.equal(await passage.evaluate(node => document.activeElement === node), true, 'Shift+Tab returns to the paragraph stop');
+      await page.keyboard.press('ArrowRight');
+      assert.equal(await activeIndex(), 4, 'The paragraph remembers the last-visited word');
+      await page.keyboard.press('ArrowLeft');
+      assert.equal(await activeIndex(), 3);
+      assert.deepEqual(await page.evaluate(() => ({ role: document.activeElement.getAttribute('role'),
+        name: document.activeElement.getAttribute('aria-label'), text: document.activeElement.dataset.lookupText })),
+        { role: 'group', name: await passageWords.nth(3).getAttribute('data-lookup-text'), text: await passageWords.nth(3).getAttribute('data-lookup-text') });
       assert.equal(await page.locator('#mini').count(), 0, 'Moving between words never opens or records help');
       assert.equal(assessmentItemAssistanceV2(selectAssessmentV2((await disk(page)).assessmentLibraryV2).attempt, longReading.id), null);
 
@@ -1633,52 +1828,81 @@ try {
       const repeat = await page.evaluate(() => {
         const words = [...document.querySelectorAll('.exam-paper .japanese-lookup-word')];
         const counts = new Map();
-        for (const word of words) counts.set(word.textContent, (counts.get(word.textContent) || 0) + 1);
+        for (const word of words) counts.set(word.dataset.lookupText, (counts.get(word.dataset.lookupText) || 0) + 1);
         const text = [...counts].filter(([value, count]) => count > 1 && /\p{Script=Han}/u.test(value))
           .sort((a, b) => b[1] - a[1])[0]?.[0];
-        const same = words.filter((word) => word.textContent === text);
+        const same = words.filter((word) => word.dataset.lookupText === text);
         window.__proseOld = same.at(-1);
-        return { text, occurrence: same.length - 1, count: same.length };
+        const target = same.at(-1), block = target?.closest('[data-lookup-block]');
+        return { text, occurrence: same.length - 1, count: same.length,
+          block: [...document.querySelectorAll('.exam-paper [data-lookup-block]')].indexOf(block),
+          word: block ? [...block.querySelectorAll('.japanese-lookup-word')].indexOf(target) : -1 };
       });
       assert(repeat.text, 'The long question repeats a word');
       const atOccurrence = () => page.evaluate(({ text, occurrence }) => {
-        const same = [...document.querySelectorAll('.exam-paper .japanese-lookup-word')].filter((word) => word.textContent === text);
+        const same = [...document.querySelectorAll('.exam-paper .japanese-lookup-word')].filter((word) => word.dataset.lookupText === text);
         const active = document.activeElement;
-        return { focused: same.indexOf(active) === occurrence, stop: same[occurrence]?.tabIndex === 0,
+        return { focused: same.indexOf(active) === occurrence, stop: same[occurrence]?.tabIndex === -1 && same[occurrence]?.closest('[data-lookup-block]')?.tabIndex === 0,
           replaced: !!window.__proseOld && !window.__proseOld.isConnected && active !== window.__proseOld };
       }, repeat);
-      await page.evaluate(() => window.__proseOld.focus());
+      await page.locator('.exam-paper [data-lookup-block]').nth(repeat.block).focus();
+      await page.keyboard.press('Home');
+      for (let index = 0; index < repeat.word; index++) await page.keyboard.press('ArrowRight');
       await page.keyboard.press('Enter');
-      await page.locator('#mini').waitFor();
+      const repeatWord = page.locator(`.exam-paper .japanese-lookup-word[data-lookup-text=${JSON.stringify(repeat.text)}]`).nth(repeat.occurrence);
+      await assertReadingRung(page, repeatWord);
       const assisted = selectAssessmentV2((await disk(page)).assessmentLibraryV2);
       assert.equal(assessmentItemAssistanceV2(assisted.attempt, longReading.id)?.kind, 'dictionary',
         'Enter passes through the same save-before-reveal guard as a tap');
       assert.deepEqual(await atOccurrence(), { focused: true, stop: true, replaced: true });
+      // Ladder (John, 10-19, a spec change): the second Enter no longer opens the stage. It sets the word's English under
+      // the same occurrence, the keyboard staying on it; only once that rung is seen does the third Enter open the stage.
+      await page.keyboard.press('Enter');
+      const english = await assertEnglishRung(page, repeatWord);
+      assert.deepEqual(await atOccurrence(), { focused: true, stop: true, replaced: true }, 'The English rung keeps the keyboard on the same occurrence');
+      await page.keyboard.press('Enter');
+      await page.locator('#mini').waitFor();
+      assert.equal(await repeatWord.getAttribute('data-ladder-rung'), 'stage');
+      await assertStageKeepsEnglish(repeatWord, english);
       assert.equal(await page.locator('#mini .mini-word').textContent(), repeat.text);
       await page.keyboard.press('Escape');
       assert.equal(await page.locator('#mini').count(), 0, 'Esc on the word closes its popup');
+      assert.equal(await repeatWord.getAttribute('data-ladder-rung'), null);
+      assert.equal(await repeatWord.locator('rt').count(), 0, 'Escape clears the revealed reading');
+      // Ladder (John, 10-19): bare is also without the English the climb set under the word, and without its DOTS-hook marks
+      assert.deepEqual(await repeatWord.evaluate(englishFacts), { rows: 0, text: null, painted: false, reading: false, hasEn: false, aside: null },
+        'Escape clears the English under the word');
       assert.equal((await atOccurrence()).focused, true);
       assert.equal(await page.locator('.exam-paper').count(), 1, 'Esc closed only the popup');
 
+      // Ladder (John, 10-19, a spec change): reading, then English, then the stage — each Enter only once the rung before
+      // it is seen
+      await page.keyboard.press('Enter');
+      await assertReadingRung(page, repeatWord);
+      await page.keyboard.press('Enter');
+      await assertEnglishRung(page, repeatWord);
       await page.keyboard.press('Enter');
       await page.locator('#mini').waitFor();
-      await page.locator('#mini .mini-entry').focus();
+      await page.locator('#mini').focus();
       await page.keyboard.press('Escape');
       assert.equal(await page.locator('#mini').count(), 0);
       assert.equal((await atOccurrence()).focused, true, 'Esc inside the popup returns to the same occurrence');
 
+      // Ladder (John, 10-19, a spec change): Space climbs the same three rungs, each press only once the rung before it is seen
+      await page.keyboard.press('Space');
+      await assertReadingRung(page, repeatWord);
+      await page.keyboard.press('Space');
+      await assertEnglishRung(page, repeatWord);
       await page.keyboard.press('Space');
       await page.locator('#mini').waitFor();
-      // lists open in a small popover from the popup's "Add to a list" (reader lane 2026-10-02), never a window;
-      // one path (round 4, T5): the popup offers a list once the word is saved
+      // Save ▾ (1.3.0): the press saves the word and unfolds its menu inside the card, never a window
       await page.locator('#mini-take').click();
       await page.waitForFunction(() => document.querySelector('#mini-take')?.getAttribute('aria-pressed') === 'true');
-      await page.locator('#mini-lists').click();
-      await page.locator('#vocabulary-list-popover').waitFor();
+      await page.locator('#mini #vocabulary-list-popover.is-inline').waitFor();
       await page.keyboard.press('Escape');
       await page.waitForFunction(() => !document.getElementById('vocabulary-list-popover'));
-      assert.equal(await page.locator('#mini').count(), 1, 'Esc in the list popover closes only the popover');
-      assert.equal(await page.evaluate(() => document.activeElement?.id), 'mini-lists', 'Esc hands focus back to Add to list…');
+      assert.equal(await page.locator('#mini').count(), 1, 'Esc in the menu closes only the menu');
+      assert.equal(await page.evaluate(() => document.activeElement?.id), 'mini-take', 'Esc hands focus back to Save ▾');
       await page.keyboard.press('Escape');
       assert.equal(await page.locator('#mini').count(), 0);
       assert.equal((await atOccurrence()).focused, true, 'Esc in the popup returns to the same occurrence');
@@ -1686,14 +1910,14 @@ try {
         const style = getComputedStyle(document.activeElement);
         return { outline: style.outlineColor, shadow: style.boxShadow, wash: style.backgroundColor };
       });
-      // the app's one focus token (--focus-ring over --focus-wash), the same look as a reader word
+      // The final H inline-word policy uses a reading-color hairline without a box or fill.
       assert.equal(focusStyle.outline, 'rgba(0, 0, 0, 0)', 'Never the browser ring on a prose word');
       assert.match(focusStyle.shadow, /inset/u, 'The focus token draws its ink underline');
-      assert.notEqual(focusStyle.wash, 'rgba(0, 0, 0, 0)', 'The focus token lays its vermilion wash');
+      assert.equal(focusStyle.wash, 'rgba(0, 0, 0, 0)', 'The selected inline word keeps the H no-fill policy');
       await page.screenshot({ path: resolve(evidence, `${engine}${suffix}-prose-roving-focus.png`) });
       const final = selectAssessmentV2((await disk(page)).assessmentLibraryV2);
       assert.equal(final.attempt.answers.find((row) => row.item.id === longReading.id).response.kind, 'unanswered');
-      return { question: longReading.id, presses, proseBlocks: budget.prose, words: budget.words, repeat, focusStyle };
+      return { question: longReading.id, presses, proseBlocks: budget.prose, words: budget.words, repeat, english, focusStyle };
     });
     if (longReading) await run(engine, `prose-timed-plain-text${suffix}`, async (page) => {
       await start(page, section, 'timed');

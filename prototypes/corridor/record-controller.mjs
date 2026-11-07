@@ -183,24 +183,24 @@ async function readArchive() {
     });
   } finally { db.close(); }
 }
-async function scanLegacy(writer, captured, includeDrift = false) {
+async function scanLegacy(writer, captured, includeDrift = false, legacyStorage = localStorage) {
   assertWriter(writer, captured);
-  const recordText = localStorage.getItem(LEGACY_KEY);
-  const legacyDriftText = includeDrift ? localStorage.getItem(DRIFT_KEY) : undefined;
+  const recordText = legacyStorage.getItem(LEGACY_KEY);
+  const legacyDriftText = includeDrift ? legacyStorage.getItem(DRIFT_KEY) : undefined;
   const archive = await readArchive();
   assertWriter(writer, captured);
-  insist(localStorage.getItem(LEGACY_KEY) === recordText, 'source-changed');
-  insist(!includeDrift || localStorage.getItem(DRIFT_KEY) === legacyDriftText, 'source-changed');
+  insist(legacyStorage.getItem(LEGACY_KEY) === recordText, 'source-changed');
+  insist(!includeDrift || legacyStorage.getItem(DRIFT_KEY) === legacyDriftText, 'source-changed');
   return { recordText, archive: { database: ARCHIVE_DB, version: 3, rows: archive.rows, imports: archive.imports },
     ...(includeDrift ? { legacyDriftText } : {}) };
 }
 
 /** Caller still validates learner-domain fields before passing this snapshot
  * to prepare(). The exact physical archive keys and original text are retained. */
-export async function captureLegacySource(writer, { includeDrift = false } = {}) {
+export async function captureLegacySource(writer, { includeDrift = false, legacyStorage = localStorage } = {}) {
   insist(typeof includeDrift === 'boolean', 'invalid-source-options');
   const captured = captureWriter(writer);
-  const current = await scanLegacy(writer, captured, includeDrift);
+  const current = await scanLegacy(writer, captured, includeDrift, legacyStorage);
   assertWriter(writer, captured);
   return legacySourceSnapshot({ recordText: current.recordText, archiveRows: current.archive.rows, importJournals: current.archive.imports,
     ...(includeDrift ? { legacyDriftText: current.legacyDriftText } : {}) });
@@ -222,8 +222,8 @@ function publicSnapshot(snapshot) {
 const limitNotice = 'already-open-legacy-writers-must-honor-lock-or-be-closed';
 
 class RecordController {
-  #store; #writer; #policy; #databaseName; #requireDrift; #closed = false; #tail = Promise.resolve();
-  constructor(store, options) { this.#store = store; this.#writer = options.writer; this.#policy = options.policy; this.#databaseName = options.databaseName; this.#requireDrift = options.requireDrift === true; }
+  #legacyStorage; #store; #writer; #policy; #databaseName; #requireDrift; #closed = false; #tail = Promise.resolve();
+  constructor(store, options) { this.#legacyStorage = options.legacyStorage || localStorage; this.#store = store; this.#writer = options.writer; this.#policy = options.policy; this.#databaseName = options.databaseName; this.#requireDrift = options.requireDrift === true; }
   #guard(captured) { insist(!this.#closed, 'closed'); assertWriter(this.#writer, captured); insist(captured.sessionId === this.#policy.binding.sessionId, 'session-changed'); }
   #run(action) {
     const run = this.#tail.then(async () => {
@@ -281,7 +281,7 @@ class RecordController {
     return receipt;
   }
   async #observe(captured, state) {
-    const actual = await scanLegacy(this.#writer, captured, state.source.version === 2); this.#guard(captured);
+    const actual = await scanLegacy(this.#writer, captured, state.source.version === 2, this.#legacyStorage); this.#guard(captured);
     if (!equal(actual.archive, state.source.archive)) return { kind: 'diverged', reason: 'legacy-archive-diverged' };
     const record = actual.recordText === state.source.recordText ? 'original' : actual.recordText === state.manifest.fenceText ? 'fenced' : 'diverged';
     if (record === 'diverged') return { kind: 'diverged', reason: 'legacy-record-diverged' };
@@ -308,12 +308,12 @@ class RecordController {
     const state = await this.#read(captured);
     if (!state.manifest) {
       let legacy;
-      try { const text = localStorage.getItem(LEGACY_KEY); legacy = text === null ? null : JSON.parse(text); }
+      try { const text = this.#legacyStorage.getItem(LEGACY_KEY); legacy = text === null ? null : JSON.parse(text); }
       catch { return { ...state, outcome: this.#outcome('quarantined', null, { reason: 'legacy-record-unreadable', quarantinePersisted: false }) }; }
       if ((legacy !== null && (!plain(legacy) || legacy.v !== 1)) || state.snapshot.documents.length || state.snapshot.replica.operations.length)
         return { ...state, outcome: this.#outcome('quarantined', null, { reason: 'custody-unavailable', quarantinePersisted: false }) };
       if (this.#requireDrift) {
-        try { parseLegacyDriftText(localStorage.getItem(DRIFT_KEY)); }
+        try { parseLegacyDriftText(this.#legacyStorage.getItem(DRIFT_KEY)); }
         catch { return { ...state, outcome: this.#outcome('quarantined', null, { reason: 'legacy-drift-unreadable', quarantinePersisted: false }) }; }
       }
       return { ...state, outcome: this.#outcome('legacy', null) };
@@ -343,7 +343,7 @@ class RecordController {
       }
       insist(state.snapshot.documents.length === 0 && state.snapshot.replica.operations.length === 0 && state.snapshot.outbox.length === 0 &&
         state.snapshot.inbox.length === 0 && state.snapshot.checkpoints.length === 0, 'target-occupied');
-      const actual = await scanLegacy(this.#writer, captured, source.version === 2); this.#guard(captured);
+      const actual = await scanLegacy(this.#writer, captured, source.version === 2, this.#legacyStorage); this.#guard(captured);
       if (actual.recordText !== source.recordText || !equal(actual.archive, source.archive) ||
         (source.version === 2 && actual.legacyDriftText !== source.legacyDriftText))
         return this.#outcome('source-changed', null, { reason: 'source-changed-before-prepare', sourcePreserved: true });
@@ -389,9 +389,9 @@ class RecordController {
         if (observed.record === 'original') {
           // There is no localStorage CAS. The held legacy Web Lock is the
           // cooperative exclusion primitive; original custody already exists.
-          if (localStorage.getItem(LEGACY_KEY) !== state.source.recordText) return this.#quarantine(captured, state, 'legacy-record-diverged');
+          if (this.#legacyStorage.getItem(LEGACY_KEY) !== state.source.recordText) return this.#quarantine(captured, state, 'legacy-record-diverged');
           this.#guard(captured);
-          localStorage.setItem(LEGACY_KEY, state.manifest.fenceText);
+          this.#legacyStorage.setItem(LEGACY_KEY, state.manifest.fenceText);
         }
         boundary = 'record-fenced';
         if (state.source.version === 2) {
@@ -402,10 +402,10 @@ class RecordController {
           if (partial.drift === 'original') {
             // A second separately fallible LS write. Durable intent recognizes
             // either partial state on recovery; no cross-store atomicity claim.
-            if (localStorage.getItem(LEGACY_KEY) !== state.manifest.fenceText) return this.#quarantine(captured, state, 'legacy-record-diverged');
-            if (localStorage.getItem(DRIFT_KEY) !== state.source.legacyDriftText) return this.#quarantine(captured, state, 'legacy-drift-diverged');
+            if (this.#legacyStorage.getItem(LEGACY_KEY) !== state.manifest.fenceText) return this.#quarantine(captured, state, 'legacy-record-diverged');
+            if (this.#legacyStorage.getItem(DRIFT_KEY) !== state.source.legacyDriftText) return this.#quarantine(captured, state, 'legacy-drift-diverged');
             this.#guard(captured);
-            localStorage.setItem(DRIFT_KEY, state.manifest.driftFenceText);
+            this.#legacyStorage.setItem(DRIFT_KEY, state.manifest.driftFenceText);
           }
         }
         boundary = 'fenced';
@@ -472,6 +472,7 @@ class RecordController {
 
 export async function createRecordController(options) {
   insist(plain(options) && plain(options.writer) && typeof options.writer.capture === 'function' && typeof options.writer.assert === 'function', 'writer-required');
+  insist(options.legacyStorage === undefined || (typeof options.legacyStorage?.getItem === 'function' && typeof options.legacyStorage?.setItem === 'function'), 'invalid-source-options');
   const captured = captureWriter(options.writer, options.policy?.binding?.sessionId);
   const databaseName = options.databaseName;
   insist(options.requireDrift === undefined || typeof options.requireDrift === 'boolean', 'invalid-source-options');

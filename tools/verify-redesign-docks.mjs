@@ -128,7 +128,14 @@ async function controls(
   caseInfo,
   stage,
   selector,
-  { count, liveStatus = false, textInside = false, scroll = false, reportAtBottom = false } = {},
+  {
+    count,
+    liveStatus = false,
+    textInside = false,
+    scroll = false,
+    reportAtBottom = false,
+    reportHidden = false,
+  } = {},
 ) {
   if (!liveStatus) {
     // Ordinary room stages include a finite entrance and a ResizeObserver
@@ -184,7 +191,14 @@ async function controls(
       sample.points.every((point) => point.owned),
       `${stage}: all five hit points belong to control: ${detail}`,
     );
-    assert(sample.report?.visible, `${stage}: report button remains visible: ${detail}`);
+    // A deck card in the app's focus room has no report button (John, 2026-10-13: "No need for 'bug'
+    // button in SRS screen"); every other room keeps it visible and clear of its controls.
+    if (reportHidden)
+      assert(
+        sample.report && !sample.report.visible,
+        `${stage}: the focus room hides the report button while a card is up: ${detail}`,
+      );
+    else assert(sample.report?.visible, `${stage}: report button remains visible: ${detail}`);
     assert.equal(sample.reportOverlap, 0, `${stage}: zero report overlap: ${detail}`);
     if (liveStatus) {
       assert(
@@ -387,7 +401,10 @@ async function journey(page, info) {
     await page.locator('#kp-rule').waitFor({ state: 'hidden' });
     assert.equal(await page.locator('#kp-rule').count(), 0, 'Real dismiss removes the rule');
     // four pads since the learner's D1 (Again · Hard · Good · Easy; CARD_CONTRACT_V2 §4 as amended 2026-10-09)
-    await controls(page, info, 'grades-after-rule', '.kp-grades .kp-grade', { count: 4 });
+    await controls(page, info, 'grades-after-rule', '.kp-grades .kp-grade', {
+      count: 4,
+      reportHidden: true,
+    });
   } else {
     await page.locator('#kp-start').click();
     await page.locator('#kp-reveal').click();
@@ -401,7 +418,7 @@ async function journey(page, info) {
     );
     await controls(page, info, 'dictionary-close', '#kp-sheet-close', {
       count: 1,
-      reportAtBottom: true,
+      reportHidden: true,
     });
     await page.locator('#kp-sheet-close').click();
     await page.locator('#kp-sheet').waitFor({ state: 'hidden' });

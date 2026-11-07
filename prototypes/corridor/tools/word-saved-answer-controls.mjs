@@ -60,13 +60,15 @@ export const WORD_CONTROLS = Object.freeze({
     ["  if (item.t !== 'word') return reviewBack(item);\n", '  return reviewBack(item);\n']] },
   C2: { note: 'capture guard reverted: an explicit selection on a core spelling saves nothing', witnesses: ['T2'],
     // the search stand-in rows built on a 1353320 or うわて capture on the core spelling 上手 then hold a core card,
-    // and the history fixtures then keep no うわて snapshot
+    // and the history fixtures then keep no うわて snapshot; K1 (b) captures 生 read せい, an explicit selection on the
+    // core spelling 生 whose entry 1378450 reads only なま: with the guard reverted it no longer throws (L, 2026-10-16)
     collateral: ['T7r.setup', 'T7r', 'T7s.setup', 'T7s', 'T11.setup', 'T11', 'T13.setup', 'T13', 'T15',
-      'X1', 'X2', 'X3.setup', 'X3', 'X4.setup', 'X4', 'X5.setup', 'X5', 'V1', 'V2', 'V3', 'V4', 'V5', 'P3', 'P3b', 'P3r'], edits: [
+      'X1', 'X2', 'X3.setup', 'X3', 'X4.setup', 'X4', 'X5.setup', 'X5', 'V1', 'V2', 'V3', 'V4', 'V5', 'P3', 'P3b', 'P3r', 'K1'], edits: [
       ["  if (node.seq != null && node.seq !== '') {\n    snapshot = explicitWordSnapshot(node, latest);",
         "  if (node.seq != null && node.seq !== '' && !D.dict[id]) {\n    snapshot = explicitWordSnapshot(node, latest);"]] },
   C3: { note: 'fail-closed removed: an explicit selection with no validated answer captures a row without identity', witnesses: ['T3'],
-    collateral: ['T4'], edits: [
+    // K1 (b): 生 read せい (entry 1378450 reads only なま) is such a selection; its capture no longer throws (L, 2026-10-16)
+    collateral: ['T4', 'K1'], edits: [
       ["    if (!snapshot) throw Object.assign(new Error('word-answer-unavailable'), { code: 'word-answer-unavailable' });\n    identity = { kind: 'seq', seq: snapshot.seq, reading: snapshot.r };",
         "    identity = snapshot ? { kind: 'seq', seq: snapshot.seq, reading: snapshot.r } : { kind: 'unknown' };"]] },
   C4: { note: 'identity by reading only: a shared reading passes for a shared entry', witnesses: ['T5'],
@@ -88,11 +90,13 @@ export const WORD_CONTROLS = Object.freeze({
   C9r: { note: 'removal guard removed from the ordinary remove producer', witnesses: ['T7r'],
     // a core door (V3), the 1353320 door on a core card (V4) and every other-identity door (V5) then remove the card
     collateral: ['V3', 'V4', 'V5'], edits: [
-    ['      holds(latest);\n', '']] },
+    ['      holds(latest);\n      return { taken: latest.taken.filter((entry) => entry.t !== node.t || entry.id !== node.id) };',
+      '      return { taken: latest.taken.filter((entry) => entry.t !== node.t || entry.id !== node.id) };']] },
   C9s: { note: 'suppression guard removed from the assessment suppression producer', witnesses: ['T7s'],
     // the core door then suppresses the route-captured 1353320 card
     collateral: ['V3'], edits: [
-    ["suppressAssessmentCards({ kind: 'remove', key }, expected ? holds : null)", "suppressAssessmentCards({ kind: 'remove', key }, null)"]] },
+    ["      return await suppressAssessmentCards({ kind: 'remove', key }, expected ? holds : null);",
+      "      return await suppressAssessmentCards({ kind: 'remove', key }, null);"]] },
   C10: { note: 'shown-answer binding removed: availability alone authorizes a grade', witnesses: ['T8'], collateral: [], edits: [
     ['  if (!bound || bound.item !== item || bound.ix !== rv.ix || bound.key !== wordPresentationKey(item, answer)) {', '  if (false) {']] },
   // the reading match is kana-insensitive since the glance pass (entryKanaIndex); this mutant passes over an exact form
@@ -143,7 +147,8 @@ export const WORD_CONTROLS = Object.freeze({
       ['  const enabledOnCore = !!D.dict?.[form];', '  const enabledOnCore = false;']] },
   KS4b: { note: 'the resolved-seq active rule restored on the core sheet only (B2 and the dedup kept): the resolved entry’s door is inert, a failed click',
     witnesses: ['N1'], collateral: ['S8'], edits: [
-      ['    const active = !(seqless && enabledOnCore) && String(seq) === currentSeq &&', '    const active = String(seq) === currentSeq &&']] },
+      ['  const isActive = ({ row, summary, enabledOnCore }) => !(seqless && enabledOnCore) && String(row[0]) === currentSeq &&',
+        '  const isActive = ({ row, summary, enabledOnCore }) => String(row[0]) === currentSeq &&']] },
   KS5: { note: 'fold by skipping: the numbered row is dropped and the core row keeps its own later rank, so words fall out of the first 40',
     witnesses: ['S1', 'S8', 'S11'], collateral: [], edits: [
       ['    const row = e.seq && searchRowShownByCore(e, coreRows.get(e.id)) ? coreRows.get(e.id) : e;',

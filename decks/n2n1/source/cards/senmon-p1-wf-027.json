@@ -273,7 +273,7 @@
    "passage": {
     "ja": "先進国と呼ばれる国だって、昔からずっと豊かだったわけじゃないんですよね。たとえば明治の日本は、不平等な条約に苦しみながら、列強に追いつこうと、それはもう必死でした。教育にも、工場にも、鉄道にも、ありったけの力を注ぎ込んだじゃないですか。今の豊かさは、当たり前どころか、そうした長い積み重ねの結果なんです。そう思うと、いまは貧しい後発の国にだって、伸びしろは十分すぎるほどあるはずですよ。",
     "form": "先進国",
-    "en": "Even countries called developed nations haven't always been wealthy. For example, Meiji Japan, suffering under unequal treaties, was desperate to catch up with the great powers. They poured every bit of strength into education and factories, didn't they? Today's affluence is far from a given; it's the result of that long accumulation. Thinking about it that way, even latecomer countries that are poor now should have plenty of room to grow.",
+    "en": "Even countries called developed nations haven't always been wealthy. For example, Meiji Japan, suffering under unequal treaties, was desperate to catch up with the great powers. They poured every bit of strength into education, factories, and railways, didn't they? Today's affluence is far from a given; it's the result of that long accumulation. Thinking about it that way, even latecomer countries that are poor now should have plenty of room to grow.",
     "register": "話",
     "topic": "history",
     "tipJa": "「発展途上国」「後発国」と対比される。「先進国首脳会議」のような複合語でも使う。",
@@ -317,7 +317,7 @@
    "passage": {
     "ja": "切磋琢磨とは、骨や玉を磨くように、互いに励まし合いながら、己を高めていくことをいう。競い合う相手がいればこそ、人は自分でも気づかなかった伸びしろに出会える。同じ志をもつ仲間の成長を、自分のことのように喜べるとき、人は嫉妬ではなく刺激を受け取れるようになる。ただし、それは他力本願とは、まったく別のものだ。自分の足で立とうとする者同士の間でしか、この関係は成り立たないからである。",
     "form": "切磋琢磨",
-    "en": "Sessa-takuma means improving oneself by encouraging one another, as one polishes bone or jade. Precisely because there is a rival to compete with, a person meets room for growth they had not noticed themselves. When one can rejoice in a companion's growth as if it were one's own, one comes to receive stimulation rather than jealousy. However, that is different from relying on others. This relationship holds only between people who try to stand on their own feet.",
+    "en": "Sessa-takuma means improving oneself by encouraging one another, as one polishes bone or jade. Precisely because there is a rival to compete with, a person meets room for growth they had not noticed themselves. When one can rejoice in the growth of a companion who shares one's aspirations as if it were one's own, one comes to receive stimulation rather than jealousy. However, that is different from relying on others. This relationship holds only between people who try to stand on their own feet.",
     "register": "論",
     "topic": "mind",
     "tipJa": "四字熟語。「切磋琢磨し合う」「切磋琢磨する仲間」。骨角と玉石を磨く意から。",
@@ -867,7 +867,7 @@
    "passage": {
     "ja": "あの会社、生成AIがここまで騒がれる前から、自前のチップの設計を、こっそり始めてたんですよ。要するに、先手を打つのが抜群にうまいんです。需要が目に見えてから動いたのでは遅いんだって、ちゃんと分かってたんでしょうね、きっと。外から買うだけだと、供給が止まったが最後、工場も売り場も全部ストップじゃないですか。代替の利かない部品ほど、危なくなったときのために、自分で握っておくべきだってことです。",
     "form": "先手を打つ",
-    "en": "That company had started designing its own chips before generative AI got this much buzz. In short, it is outstandingly good at making the first move. They must have understood that moving only after demand is visible is too late. If you only buy from outside, once supply stops, the factories and the shops all stop, right? The less replaceable a part is, the more you should hold it yourself.",
+    "en": "That company had secretly started designing its own chips before generative AI got this much buzz. In short, it is outstandingly good at making the first move. They must have understood that moving only after demand is visible is too late. If you only buy from outside, once supply stops, the factories and the shops all stop, right? The less replaceable a part is, the more you should hold it yourself in case things go wrong.",
     "register": "話",
     "topic": "ai",
     "tipJa": "「先手を打って〜する」の形が多い。後手に回る、の反対。碁・将棋が語源。",
@@ -911,7 +911,7 @@
    "passage": {
     "ja": "文章が冗長になる原因の多くは、同じ内容を言い換えて繰り返すことにある。「まず最初に」「必ず必要」のような重複表現は、その典型だ。会議の議事録でも報告書でも、書き終えたあとで声に出して読むと、無駄な語がどこにあるのか耳が教えてくれる。余談を削るのは惜しいが、読み手の時間を奪ってまで残すに足るものではない。思い切って体言止めを使えば、リズムが生まれ、文は驚くほど引き締まる。",
     "form": "冗長",
-    "en": "The cause of wordy prose is, in most cases, restating the same content in other words. Redundant phrases like 'first of all, at the start' are typical. Whether it is meeting minutes or a report, reading it aloud after finishing lets your ears tell you where the wasted words are. Cutting an aside is painful, but it is not worth keeping at the cost of the reader's time. If you boldly use noun-ending sentences, rhythm arises and the prose tightens remarkably.",
+    "en": "The cause of wordy prose is, in most cases, restating the same content in other words. Redundant phrases like 'first of all, at the start' and 'absolutely necessary' are typical. Whether it is meeting minutes or a report, reading it aloud after finishing lets your ears tell you where the wasted words are. Cutting an aside is painful, but it is not worth keeping at the cost of the reader's time. If you boldly use noun-ending sentences, rhythm arises and the prose tightens remarkably.",
     "register": "語",
     "topic": "language",
     "tipJa": "「冗長な説明」「冗長になる」。短く削れる無駄を指すマイナス評価の語。",

@@ -79,6 +79,9 @@ decks/n2n1/source/batches/
 decks/n2n1/BATON_CODEX_2026-10-07.md
 decks/n2n1/prompts/judge.md
 decks/n2n1/source/rewrite-queue.json
+# Imported from nihongo-srs's exported cards (153a81794) and rebuilt by the same
+# build.py; the import's bytes are the source of record, like mined.json above.
+decks/n2n1/source/imported/
 
 # Research evidence written by parallel research agents (the 鏡 10000x
 # campaign, 2026-09-28): the same append-only, multi-agent situation as
@@ -91,3 +94,7 @@ reports/
 # picks, cuts, picture briefs and a hand-tick page reviewed as committed.
 # Reformatting would churn a review artefact other agents are still reading.
 docs/content/library-candidates-2026-10-03/
+
+# Governed source documents retain their reviewed text (FULL preflight ruling).
+docs/design/CONTINUITY_CONTRACT_2026-10-15.md
+docs/operator/VOICE_LOCK.md

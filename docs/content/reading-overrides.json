@@ -14,6 +14,30 @@
   },
   "entries": [
     {
+      "word": "何を",
+      "reading": "なにを",
+      "surfaces": ["何", "を"],
+      "readings": ["なに", null],
+      "kind": "term",
+      "note": "E2 reviewed reading: 何 directly before the case particle を reads なに. The particle is a context guard and stays unchanged."
+    },
+    {
+      "word": "何が",
+      "reading": "なにが",
+      "surfaces": ["何", "が"],
+      "readings": ["なに", null],
+      "kind": "term",
+      "note": "E2 reviewed reading: 何 directly before the case particle が reads なに. The particle is a context guard and stays unchanged."
+    },
+    {
+      "word": "一晩中",
+      "reading": "ひとばんじゅう",
+      "surfaces": ["一晩", "中"],
+      "readings": [null, "じゅう"],
+      "kind": "term",
+      "note": "Throughout the night: 中 reads じゅう (Hfix-2c; both Words you looked up decks)."
+    },
+    {
       "word": "天之御中主神",
       "reading": "あめのみなかぬしのかみ",
       "surfaces": ["天之御中主", "神"],
@@ -316,6 +340,886 @@
       "readings": ["りん", "たい", "きょう"],
       "kind": "term",
       "note": "Abbreviation of 林業退職金共済制度, in mhlw:stf-newpage_76152. UniDic read 林 as the surname はやし; the abbreviation is りんたいきょう (fresh shelf, 2026-09-28)."
+    },
+    {
+      "word": "硤合",
+      "reading": "そあい",
+      "surfaces": ["硤合"],
+      "readings": ["そあい"],
+      "kind": "person",
+      "note": "surname of the 2026 chemistry laureate; UniDic leaves it without a reading (Bunki batch-1r, bunki-read-n1-soai-nobel)"
+    },
+    {
+      "word": "府中町",
+      "reading": "ふちゅうちょう",
+      "surfaces": ["府中", "町"],
+      "readings": [null, "ちょう"],
+      "kind": "place",
+      "note": "Fuchū in Aki District, Hiroshima, is 府中町 ふちゅうちょう; UniDic gives まち (Bunki batch-1r, bunki-read-n1-soai-nobel)"
+    },
+    {
+      "word": "博士研究員",
+      "reading": "はくしけんきゅういん",
+      "surfaces": ["博士", "研究", "員"],
+      "readings": ["はくし", null, null],
+      "kind": "term",
+      "note": "postdoctoral researcher: はくしけんきゅういん (Bunki batch-1r, bunki-read-n1-soai-nobel)"
+    },
+    {
+      "word": "サクレー",
+      "reading": "さくれー",
+      "surfaces": ["サクレー"],
+      "readings": ["さくれー"],
+      "kind": "place",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-1r, bunki-read-n1-soai-nobel)"
+    },
+    {
+      "word": "ホモキラリティー",
+      "reading": "ほもきらりてぃー",
+      "surfaces": ["ホモキラリティー"],
+      "readings": ["ほもきらりてぃー"],
+      "kind": "term",
+      "note": "katakana term with no reading in UniDic; fills the lookup reading (Bunki batch-1r, bunki-read-n1-soai-nobel)"
+    },
+    {
+      "word": "東大寺",
+      "reading": "とうだいじ",
+      "surfaces": ["東", "大寺"],
+      "readings": ["とう", "だいじ"],
+      "kind": "place",
+      "note": "UniDic splits 東大寺 into 東(ひがし) + 大寺; the temple is とうだいじ (Bunki batch-1r, bunki-read-n2-bodhisena)"
+    },
+    {
+      "word": "大安寺",
+      "reading": "だいあんじ",
+      "surfaces": ["大安", "寺"],
+      "readings": ["だいあん", null],
+      "kind": "place",
+      "note": "Nara temple 大安寺 is だいあんじ (Kotobank); UniDic gives たいあん (Bunki batch-1r, bunki-read-n2-bodhisena)"
+    },
+    {
+      "word": "霊鷲山",
+      "reading": "りょうじゅせん",
+      "surfaces": ["霊鷲", "山"],
+      "readings": ["りょうじゅ", "せん"],
+      "kind": "place",
+      "note": "Vulture Peak is りょうじゅせん (霊山寺's site); UniDic gives れいしゅうさん (Bunki batch-1r, bunki-read-n2-bodhisena)"
+    },
+    {
+      "word": "縷",
+      "reading": "る",
+      "surfaces": ["縷"],
+      "readings": ["る"],
+      "kind": "term",
+      "note": "開眼縷 かいげんる (Kotobank); UniDic has no reading for 縷 (Bunki batch-1r, bunki-read-n2-bodhisena)"
+    },
+    {
+      "word": "続日本紀",
+      "reading": "しょくにほんぎ",
+      "surfaces": ["続", "日本", "紀"],
+      "readings": ["しょく", "にほん", "ぎ"],
+      "kind": "title",
+      "note": "the chronicle is しょくにほんぎ; UniDic gives ぞく・にっぽん・き (Bunki batch-1r, bunki-read-n2-bodhisena)"
+    },
+    {
+      "word": "此の如く",
+      "reading": "かくのごとく",
+      "surfaces": ["此", "の", "如く"],
+      "readings": ["かく", null, null],
+      "kind": "term",
+      "note": "classical 此の如く reads かくのごとく (Bunki batch-1r, bunki-read-n2-bodhisena)"
+    },
+    {
+      "word": "盛りなる",
+      "reading": "さかりなる",
+      "surfaces": ["盛り", "なる"],
+      "readings": ["さかり", null],
+      "kind": "term",
+      "note": "盛り in the sense of height/prosperity is さかり; UniDic gives もり (Bunki batch-1r, bunki-read-n2-bodhisena)"
+    },
+    {
+      "word": "仏哲",
+      "reading": "ぶってつ",
+      "surfaces": ["仏哲"],
+      "readings": ["ぶってつ"],
+      "kind": "person",
+      "note": "the monk from Champa is ぶってつ (Kotobank); UniDic gives ふつてつ (Bunki batch-1r, bunki-read-n2-bodhisena)"
+    },
+    {
+      "word": "多治比広成",
+      "reading": "たじひのひろなり",
+      "surfaces": ["多治比", "広成"],
+      "readings": ["たじひの", "ひろなり"],
+      "kind": "person",
+      "note": "the clan name takes の (たじひのひろなり; 奈良県 万葉百科); UniDic gives たじひ + ひろなり (Bunki batch-1r, bunki-read-n2-bodhisena)"
+    },
+    {
+      "word": "1日後",
+      "reading": "いちにちご",
+      "surfaces": ["1", "日", "後"],
+      "readings": [null, "にち", null],
+      "kind": "term",
+      "note": "after the numeral 1, 日 reads にち (いちにちご); UniDic gives か (Bunki batch-1r, bunki-read-n2-forgetting-curve)"
+    },
+    {
+      "word": "31日後",
+      "reading": "さんじゅういちにちご",
+      "surfaces": ["31", "日", "後"],
+      "readings": [null, "にち", null],
+      "kind": "term",
+      "note": "after 31, 日 reads にち; UniDic gives か (Bunki batch-1r, bunki-read-n2-forgetting-curve)"
+    },
+    {
+      "word": "1日で",
+      "reading": "いちにちで",
+      "surfaces": ["1", "日", "で"],
+      "readings": [null, "にち", null],
+      "kind": "term",
+      "note": "after the numeral 1, 日 reads にち; UniDic gives か (Bunki batch-1r, bunki-read-n2-forgetting-curve)"
+    },
+    {
+      "word": "カーピキ",
+      "reading": "かーぴき",
+      "surfaces": ["カーピキ"],
+      "readings": ["かーぴき"],
+      "kind": "person",
+      "note": "surname Karpicke; UniDic leaves the reading empty (Bunki batch-1r, bunki-read-n2-forgetting-curve)"
+    },
+    {
+      "word": "大金持ち",
+      "reading": "おおがねもち",
+      "surfaces": ["大", "金持ち"],
+      "readings": [null, "がねもち"],
+      "kind": "term",
+      "note": "rendaku: おおがねもち; UniDic splits 大 + 金持ち(かねもち) (Bunki batch-1r, bunki-read-n3-honda-quarter)"
+    },
+    {
+      "word": "仕様書",
+      "reading": "しようしょ",
+      "surfaces": ["仕様", "書"],
+      "readings": [null, "しょ"],
+      "kind": "term",
+      "note": "specification document: しようしょ; UniDic gives かき (Bunki batch-1r, bunki-read-n2-shima-4004)"
+    },
+    {
+      "word": "ファジン",
+      "reading": "ふぁじん",
+      "surfaces": ["ファジン"],
+      "readings": ["ふぁじん"],
+      "kind": "person",
+      "note": "surname Faggin; UniDic leaves the reading empty (Bunki batch-1r, bunki-read-n2-shima-4004)"
+    },
+    {
+      "word": "クレタ人",
+      "reading": "くれたじん",
+      "surfaces": ["クレタ", "人"],
+      "readings": [null, "じん"],
+      "kind": "term",
+      "note": "nationality suffix 人 reads じん; UniDic gives にん (Bunki batch-1r, bunki-read-n1-strange-loop)"
+    },
+    {
+      "word": "不思議の環",
+      "reading": "ふしぎのわ",
+      "surfaces": ["不思議", "の", "環"],
+      "readings": [null, null, "わ"],
+      "kind": "title",
+      "note": "the Japanese title term for strange loop reads ふしぎのわ; UniDic gives かん (Bunki batch-1r, bunki-read-n1-strange-loop)"
+    },
+    {
+      "word": "北野町",
+      "reading": "きたのちょう",
+      "surfaces": ["北野", "町"],
+      "readings": [null, "ちょう"],
+      "kind": "place",
+      "note": "Kobe's 北野町 is きたのちょう; UniDic gives まち (Bunki batch-1r, bunki-read-n2-kobe-jain)"
+    },
+    {
+      "word": "インド人",
+      "reading": "いんどじん",
+      "surfaces": ["インド", "人"],
+      "readings": [null, "じん"],
+      "kind": "term",
+      "note": "nationality suffix 人 reads じん; UniDic gives にん (Bunki batch-1r, bunki-read-n2-kobe-jain)"
+    },
+    {
+      "word": "紀元前",
+      "reading": "きげんぜん",
+      "surfaces": ["紀元", "前"],
+      "readings": [null, "ぜん"],
+      "kind": "term",
+      "note": "前 in 紀元前 reads ぜん; UniDic gives まえ (Bunki batch-1r, bunki-read-n2-kobe-jain)"
+    },
+    {
+      "word": "ジナ",
+      "reading": "じな",
+      "surfaces": ["ジナ"],
+      "readings": ["じな"],
+      "kind": "person",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-1r, bunki-read-n2-kobe-jain)"
+    },
+    {
+      "word": "マハービーラ",
+      "reading": "まはーびーら",
+      "surfaces": ["マハービーラ"],
+      "readings": ["まはーびーら"],
+      "kind": "person",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-1r, bunki-read-n2-kobe-jain)"
+    },
+    {
+      "word": "バルダマーナ",
+      "reading": "ばるだまーな",
+      "surfaces": ["バルダマーナ"],
+      "readings": ["ばるだまーな"],
+      "kind": "person",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-1r, bunki-read-n2-kobe-jain)"
+    },
+    {
+      "word": "バグワン・マハビールスワミ・ジェイン",
+      "reading": "ばぐわん・まはびーるすわみ・じぇいん",
+      "surfaces": ["バグワン・マハビールスワミ・ジェイン"],
+      "readings": ["ばぐわん・まはびーるすわみ・じぇいん"],
+      "kind": "place",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-1r, bunki-read-n2-kobe-jain)"
+    },
+    {
+      "word": "卵細胞",
+      "reading": "らん",
+      "surfaces": ["卵", "細胞"],
+      "readings": ["らん", null],
+      "kind": "term",
+      "note": "卵細胞 (an egg cell) reads らんさいぼう (kotobank: 卵細胞（読み）ランサイボウ); UniDic gives たまご (Bunki batch-2r, bunki-read-n1-optogenetics-nobel)"
+    },
+    {
+      "word": "ソグド人",
+      "reading": "じん",
+      "surfaces": ["ソグド", "人"],
+      "readings": [null, "じん"],
+      "kind": "term",
+      "note": "ソグド人 reads ソグドじん; UniDic gives 人 にん (Bunki batch-2r, bunki-read-n2-shosoin-names)"
+    },
+    {
+      "word": "何かしら",
+      "reading": "なにかしら",
+      "surfaces": ["何", "かしら"],
+      "readings": ["なに", null],
+      "kind": "term",
+      "note": "何かしら reads なにかしら; UniDic gives なん (Bunki batch-2r, aozora:002359-1)"
+    },
+    {
+      "word": "弁財天",
+      "reading": "べんざい",
+      "surfaces": ["弁財", "天"],
+      "readings": ["べんざい", null],
+      "kind": "term",
+      "note": "弁財天 reads べんざいてん (ブリタニカ via kotobank); UniDic gives the old variant べざい (Bunki batch-2r, bunki-read-n2-benzaiten)"
+    },
+    {
+      "word": "弁才天",
+      "reading": "べんざい",
+      "surfaces": ["弁才", "天"],
+      "readings": ["べんざい", null],
+      "kind": "term",
+      "note": "弁才天 reads べんざいてん (デジタル大辞泉); UniDic gives べんさい (Bunki batch-2r, bunki-read-n2-benzaiten)"
+    },
+    {
+      "word": "八本",
+      "reading": "はっ",
+      "surfaces": ["八", "本"],
+      "readings": ["はっ", null],
+      "kind": "term",
+      "note": "八本 reads はっぽん; UniDic gives 八 はち (Bunki batch-2r, bunki-read-n2-benzaiten)"
+    },
+    {
+      "word": "萍",
+      "reading": "うきぐさ",
+      "surfaces": ["萍"],
+      "readings": ["うきぐさ"],
+      "kind": "term",
+      "note": "the source's own ruby reads 萍《うきぐさ》 (duckweed); UniDic gives no reading (Bunki batch-2r, aozora:000772-1)"
+    },
+    {
+      "word": "一カ所",
+      "reading": "いっ",
+      "surfaces": ["一", "カ所"],
+      "readings": ["いっ", null],
+      "kind": "term",
+      "note": "一カ所 reads いっかしょ; UniDic gives 一 いち (Bunki batch-2r, aozora:000772-1)"
+    },
+    {
+      "word": "一個",
+      "reading": "いっ",
+      "surfaces": ["一", "個"],
+      "readings": ["いっ", null],
+      "kind": "term",
+      "note": "一個 reads いっこ; UniDic gives 一 いち (Bunki batch-2r, aozora:000772-1)"
+    },
+    {
+      "word": "英国人",
+      "reading": "じん",
+      "surfaces": ["英国", "人"],
+      "readings": [null, "じん"],
+      "kind": "term",
+      "note": "英国人 reads えいこくじん; UniDic gives 人 にん (Bunki batch-2r, aozora:000772-1)"
+    },
+    {
+      "word": "西洋人",
+      "reading": "じん",
+      "surfaces": ["西洋", "人"],
+      "readings": [null, "じん"],
+      "kind": "term",
+      "note": "西洋人 reads せいようじん; UniDic gives 人 にん (Bunki batch-2r, aozora:000772-1, aozora:049966-1)"
+    },
+    {
+      "word": "気に入る",
+      "reading": "いる",
+      "surfaces": ["気", "に", "入る"],
+      "readings": [null, null, "いる"],
+      "kind": "term",
+      "note": "気に入る reads きにいる; UniDic gives はいる (Bunki batch-2r, aozora:000772-1)"
+    },
+    {
+      "word": "四字",
+      "reading": "よ",
+      "surfaces": ["四", "字"],
+      "readings": ["よ", null],
+      "kind": "term",
+      "note": "四字 reads よじ; UniDic gives よん (Bunki batch-2r, aozora:000772-1)"
+    },
+    {
+      "word": "シナ訳",
+      "reading": "やく",
+      "surfaces": ["シナ", "訳"],
+      "readings": [null, "やく"],
+      "kind": "term",
+      "note": "訳 after a language or country name is a translation (やく), as in 漢訳 かんやく; UniDic gives わけ (reason) (Bunki batch-2r, aozora:049966-1)"
+    },
+    {
+      "word": "天上天下唯我独尊",
+      "reading": "てんげ",
+      "surfaces": ["天上", "天下", "唯我", "独尊"],
+      "readings": [null, "てんげ", null, null],
+      "kind": "term",
+      "note": "the set phrase reads てんじょうてんげゆいがどくそん (デジタル大辞泉 via kotobank); UniDic gives 天下 てんか. Bound to the whole phrase, so 天下の富貴 later in the text keeps てんか (Bunki batch-2r, aozora:049966-1)"
+    },
+    {
+      "word": "ベル研究所",
+      "reading": "じょ",
+      "surfaces": ["ベル", "研究", "所"],
+      "readings": [null, null, "じょ"],
+      "kind": "place",
+      "note": "ベル研究所 reads ベルけんきゅうじょ (ブリタニカ via kotobank: ベルけんきゅうじょ【ベル研究所】); UniDic gives 所 しょ (Bunki batch-2r, bunki-read-n3-transistor-class)"
+    },
+    {
+      "word": "放送科学基礎研究所",
+      "reading": "じょ",
+      "surfaces": ["放送", "科学", "基礎", "研究", "所"],
+      "readings": [null, null, null, null, "じょ"],
+      "kind": "place",
+      "note": "放送科学基礎研究所 (NHK's basic-research laboratory) reads ほうそうかがくきそけんきゅうじょ: NDL Authorities 00293698 (NHK ホウソウ カガク キソ ケンキュウジョ) and CiNii DA03565060 (ホウソウ カガク キソ ケンキュウジョ); UniDic gives 所 しょ. Name-only, like ベル研究所: there is no global 研究所 rule (RIKEN reads しょ) (Bunki batch-2r, bunki-read-n1-neocognitron)"
+    },
+    {
+      "word": "461巻",
+      "reading": "かん",
+      "surfaces": ["461", "巻"],
+      "readings": [null, "かん"],
+      "kind": "term",
+      "note": "461巻 (volumes) reads …かん; UniDic gives 巻 まき here (Bunki batch-3r, bunki-read-n1-kukai-sanskrit)"
+    },
+    {
+      "word": "44巻",
+      "reading": "かん",
+      "surfaces": ["44", "巻"],
+      "readings": [null, "かん"],
+      "kind": "term",
+      "note": "44巻 (volumes) reads …かん; UniDic gives 巻 まき here (Bunki batch-3r, bunki-read-n1-kukai-sanskrit)"
+    },
+    {
+      "word": "22日付",
+      "reading": "にちづけ",
+      "surfaces": ["22", "日", "付"],
+      "readings": [null, "にち", "づけ"],
+      "kind": "term",
+      "note": "22日付 (dated the 22nd) reads にじゅうににちづけ; UniDic gives 日 か and 付 つけ here (Bunki batch-3r, bunki-read-n1-kukai-sanskrit)"
+    },
+    {
+      "word": "カジランガ",
+      "reading": "かじらんが",
+      "surfaces": ["カジランガ"],
+      "readings": ["かじらんが"],
+      "kind": "name",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-3r, global-voices:2026-08-03-65560)"
+    },
+    {
+      "word": "コホラ",
+      "reading": "こほら",
+      "surfaces": ["コホラ"],
+      "readings": ["こほら"],
+      "kind": "name",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-3r, global-voices:2026-08-03-65560)"
+    },
+    {
+      "word": "ゴラガード",
+      "reading": "ごらがーど",
+      "surfaces": ["ゴラガード"],
+      "readings": ["ごらがーど"],
+      "kind": "name",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-3r, global-voices:2026-08-03-65560)"
+    },
+    {
+      "word": "ジブサガル",
+      "reading": "じぶさがる",
+      "surfaces": ["ジブサガル"],
+      "readings": ["じぶさがる"],
+      "kind": "name",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-3r, global-voices:2026-08-03-65560)"
+    },
+    {
+      "word": "スワナプール",
+      "reading": "すわなぷーる",
+      "surfaces": ["スワナプール"],
+      "readings": ["すわなぷーる"],
+      "kind": "name",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-3r, global-voices:2026-08-03-65560)"
+    },
+    {
+      "word": "ソニトプル",
+      "reading": "そにとぷる",
+      "surfaces": ["ソニトプル"],
+      "readings": ["そにとぷる"],
+      "kind": "name",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-3r, global-voices:2026-08-03-65560)"
+    },
+    {
+      "word": "ディパンジャリ",
+      "reading": "でぃぱんじゃり",
+      "surfaces": ["ディパンジャリ"],
+      "readings": ["でぃぱんじゃり"],
+      "kind": "name",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-3r, global-voices:2026-08-03-65560)"
+    },
+    {
+      "word": "ドゥルガス",
+      "reading": "どぅるがす",
+      "surfaces": ["ドゥルガス"],
+      "readings": ["どぅるがす"],
+      "kind": "name",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-3r, global-voices:2026-08-03-65560)"
+    },
+    {
+      "word": "バゴリ",
+      "reading": "ばごり",
+      "surfaces": ["バゴリ"],
+      "readings": ["ばごり"],
+      "kind": "name",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-3r, global-voices:2026-08-03-65560)"
+    },
+    {
+      "word": "ビスワナート",
+      "reading": "びすわなーと",
+      "surfaces": ["ビスワナート"],
+      "readings": ["びすわなーと"],
+      "kind": "name",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-3r, global-voices:2026-08-03-65560)"
+    },
+    {
+      "word": "ブラマプトラ",
+      "reading": "ぶらまぷとら",
+      "surfaces": ["ブラマプトラ"],
+      "readings": ["ぶらまぷとら"],
+      "kind": "name",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-3r, global-voices:2026-08-03-65560)"
+    },
+    {
+      "word": "ブルハパハール",
+      "reading": "ぶるはぱはーる",
+      "surfaces": ["ブルハパハール"],
+      "readings": ["ぶるはぱはーる"],
+      "kind": "name",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-3r, global-voices:2026-08-03-65560)"
+    },
+    {
+      "word": "プリヤンカ",
+      "reading": "ぷりやんか",
+      "surfaces": ["プリヤンカ"],
+      "readings": ["ぷりやんか"],
+      "kind": "name",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-3r, global-voices:2026-08-03-65560)"
+    },
+    {
+      "word": "ラキンプル",
+      "reading": "らきんぷる",
+      "surfaces": ["ラキンプル"],
+      "readings": ["らきんぷる"],
+      "kind": "name",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-3r, global-voices:2026-08-03-65560)"
+    },
+    {
+      "word": "ラシュミ",
+      "reading": "らしゅみ",
+      "surfaces": ["ラシュミ"],
+      "readings": ["らしゅみ"],
+      "kind": "name",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-3r, global-voices:2026-08-03-65560)"
+    },
+    {
+      "word": "フェンス沿い",
+      "reading": "ぞい",
+      "surfaces": ["フェンス", "沿い"],
+      "readings": [null, "ぞい"],
+      "kind": "term",
+      "note": "沿い after a noun is voiced: フェンス沿い reads フェンスぞい (as 川沿い reads かわぞい); UniDic gives そい (Bunki batch-3r, global-voices:2026-08-03-65560)"
+    },
+    {
+      "word": "アカイェス",
+      "reading": "あかいぇす",
+      "surfaces": ["アカイェス"],
+      "readings": ["あかいぇす"],
+      "kind": "name",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-3r, bunki-read-n2-pillay-peace-nobel)"
+    },
+    {
+      "word": "ナバネセム",
+      "reading": "なばねせむ",
+      "surfaces": ["ナバネセム"],
+      "readings": ["なばねせむ"],
+      "kind": "name",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (Bunki batch-3r, bunki-read-n2-pillay-peace-nobel)"
+    },
+    {
+      "word": "ピレイ",
+      "reading": "ぴれい",
+      "surfaces": ["ピレイ"],
+      "readings": ["ぴれい"],
+      "kind": "name",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (Bunki batch-3r, bunki-read-n2-pillay-peace-nobel)"
+    },
+    {
+      "word": "一言半句",
+      "reading": "いちごん",
+      "surfaces": ["一言", "半句"],
+      "readings": ["いちごん", null],
+      "kind": "term",
+      "note": "the set phrase 一言半句 reads いちごんはんく; UniDic gives 一言 ひとこと (Bunki batch-3r, aozora:053224-1)"
+    },
+    {
+      "word": "ボツリボツリ",
+      "reading": "ぼつりぼつり",
+      "surfaces": ["ボツリボツリ"],
+      "readings": ["ぼつりぼつり"],
+      "kind": "term",
+      "note": "katakana adverb (ぼつりぼつり, little by little) with no reading in UniDic; fills the lookup reading (Bunki batch-3r, aozora:053224-1)"
+    },
+    {
+      "word": "年2回",
+      "reading": "ねん",
+      "surfaces": ["年", "2", "回"],
+      "readings": ["ねん", null, null],
+      "kind": "term",
+      "note": "年2回 (twice a year) reads ねんにかい; UniDic gives 年 とし here (Bunki batch-3r, bunki-read-n2-imf-outlook)"
+    },
+    {
+      "word": "何より",
+      "reading": "なに",
+      "surfaces": ["何", "より"],
+      "readings": ["なに", null],
+      "kind": "term",
+      "note": "何よりも (above all) reads なによりも; UniDic gives なん here (Bunki batch-3r, bunki-read-n1-suzuki-zen)"
+    },
+    {
+      "word": "哩",
+      "reading": "まいる",
+      "surfaces": ["哩"],
+      "readings": ["まいる"],
+      "kind": "term",
+      "note": "哩 is the mile, read マイル (デジタル大辞泉: マイル【哩】, KB02); UniDic leaves it without a reading (Bunki batch-4r, aozora:049966-2)"
+    },
+    {
+      "word": "一ヵ年",
+      "reading": "いっ",
+      "surfaces": ["一", "ヵ年"],
+      "readings": ["いっ", null],
+      "kind": "term",
+      "note": "一ヵ年 reads いっかねん; UniDic gives いち (Bunki batch-4r, aozora:049966-2)"
+    },
+    {
+      "word": "八歳",
+      "reading": "はっ",
+      "surfaces": ["八", "歳"],
+      "readings": ["はっ", null],
+      "kind": "term",
+      "note": "七十八歳 reads ななじゅうはっさい; UniDic gives 八 はち before 歳 (Bunki batch-4r, aozora:049966-2)"
+    },
+    {
+      "word": "一遍",
+      "reading": "いっ",
+      "surfaces": ["一", "遍"],
+      "readings": ["いっ", null],
+      "kind": "term",
+      "note": "もう一遍 (once more) reads いっぺん; UniDic gives 一 いち (Bunki batch-4r, aozora:049966-2, aozora:004668-1)"
+    },
+    {
+      "word": "トヴェルスキー",
+      "reading": "とゔぇるすきー",
+      "surfaces": ["トヴェルスキー"],
+      "readings": ["とゔぇるすきー"],
+      "kind": "name",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-4r, bunki-read-n2-hofstadter-law)"
+    },
+    {
+      "word": "世界中",
+      "reading": "じゅう",
+      "surfaces": ["世界", "中"],
+      "readings": [null, "じゅう"],
+      "kind": "term",
+      "note": "世界中 (all over the world) reads せかいじゅう; UniDic gives 中 ちゅう (Bunki batch-4r, global-voices:2026-07-28-65374)"
+    },
+    {
+      "word": "妻沼聖天山",
+      "reading": "ざん",
+      "surfaces": ["妻沼", "聖天", "山"],
+      "readings": [null, "しょうでん", "ざん"],
+      "kind": "place",
+      "note": "妻沼聖天山 reads めぬましょうでんざん (Saitama Prefecture's own furigana, HJ49); UniDic gives せいてん and さん (Bunki batch-4r, bunki-read-n2-shoten-ganesha)"
+    },
+    {
+      "word": "歓喜天",
+      "reading": "かんぎ",
+      "surfaces": ["歓喜", "天"],
+      "readings": ["かんぎ", null],
+      "kind": "term",
+      "note": "歓喜天 reads かんぎてん (デジタル大辞泉: かんぎ‐てん【歓喜天】, HJ01); UniDic gives 歓喜 かんき (Bunki batch-4r, bunki-read-n2-shoten-ganesha)"
+    },
+    {
+      "word": "宝山寺",
+      "reading": "じ",
+      "surfaces": ["宝山", "寺"],
+      "readings": [null, "じ"],
+      "kind": "place",
+      "note": "宝山寺 reads ほうざんじ (精選版 日本国語大辞典: ほうざん‐じ【宝山寺】, HJ08); UniDic gives 寺 てら before へ (Bunki batch-4r, bunki-read-n2-shoten-ganesha)"
+    },
+    {
+      "word": "七日間",
+      "reading": "なの",
+      "surfaces": ["七", "日間"],
+      "readings": ["なの", null],
+      "kind": "term",
+      "note": "七日間 reads なのかかん; UniDic gives 七 なな (Bunki batch-4r, bunki-read-n2-shoten-ganesha)"
+    },
+    {
+      "word": "中腹",
+      "reading": "ちゅうふく",
+      "surfaces": ["中腹"],
+      "readings": ["ちゅうふく"],
+      "kind": "term",
+      "note": "中腹 (halfway up a mountain) reads ちゅうふく; UniDic gives なかはら (Bunki batch-4r, bunki-read-n2-shoten-ganesha)"
+    },
+    {
+      "word": "二十四時間",
+      "reading": "よ",
+      "surfaces": ["二十", "四", "時間"],
+      "readings": [null, "よ", null],
+      "kind": "term",
+      "note": "二十四時間 reads にじゅうよじかん; UniDic gives 四 よん (Bunki batch-4r, aozora:004668-1)"
+    },
+    {
+      "word": "せち辛い",
+      "reading": "がらい",
+      "surfaces": ["せち", "辛い"],
+      "readings": [null, "がらい"],
+      "kind": "term",
+      "note": "せち辛い reads せちがらい; UniDic gives 辛い つらい (Bunki batch-4r, aozora:004668-1)"
+    },
+    {
+      "word": "ゲリュオン",
+      "reading": "げりゅおん",
+      "surfaces": ["ゲリュオン"],
+      "readings": ["げりゅおん"],
+      "kind": "name",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-4r, bunki-read-n2-carson-nobel)"
+    },
+    {
+      "word": "ステシコロス",
+      "reading": "すてしころす",
+      "surfaces": ["ステシコロス"],
+      "readings": ["すてしころす"],
+      "kind": "name",
+      "note": "katakana name with no reading in UniDic; fills the lookup reading (no ruby is drawn on katakana) (Bunki batch-4r, bunki-read-n2-carson-nobel)"
+    },
+    {
+      "word": "博士論文",
+      "reading": "はくし",
+      "surfaces": ["博士", "論文"],
+      "readings": ["はくし", null],
+      "kind": "term",
+      "note": "博士論文 (doctoral thesis) reads はくしろんぶん; UniDic gives 博士 はかせ here (Bunki batch-4r, bunki-read-n2-carson-nobel)"
+    },
+    {
+      "word": "如何にも",
+      "reading": "いか",
+      "surfaces": ["如何", "に", "も"],
+      "readings": ["いか", null, null],
+      "kind": "term",
+      "note": "如何にも reads いかにも; UniDic gives いかん here (Bunki batch-4r, aozora:058059-1)"
+    },
+    {
+      "word": "一向宗",
+      "reading": "しゅう",
+      "surfaces": ["一向", "宗"],
+      "readings": [null, "しゅう"],
+      "kind": "term",
+      "note": "一向宗 (the True Pure Land school) reads いっこうしゅう; UniDic gives 宗 むね (Bunki batch-4r, aozora:058059-1)"
+    },
+    {
+      "word": "忠孝",
+      "reading": "ちゅうこう",
+      "surfaces": ["忠孝"],
+      "readings": ["ちゅうこう"],
+      "kind": "term",
+      "note": "忠孝 (loyalty and filial piety) reads ちゅうこう; UniDic gives a personal-name reading (Bunki batch-4r, aozora:058059-1)"
+    },
+    {
+      "word": "両個",
+      "reading": "りょうこ",
+      "surfaces": ["両個"],
+      "readings": ["りょうこ"],
+      "kind": "term",
+      "note": "両個 (both) reads りょうこ; UniDic gives the mahjong word りゃんこ (Bunki batch-4r, aozora:058059-1)"
+    },
+    {
+      "word": "9月",
+      "reading": "くがつ",
+      "surfaces": ["9", "月"],
+      "readings": [null, "がつ"],
+      "kind": "date",
+      "note": "9月 is the month, read がつ after its number; UniDic read 月 つき (Moon) here (Grok 0315, R3)"
+    },
+    {
+      "word": "7月",
+      "reading": "しちがつ",
+      "surfaces": ["7", "月"],
+      "readings": [null, "がつ"],
+      "kind": "date",
+      "note": "7月 is the month, read がつ after its number; UniDic read 月 つき (Moon) here (Grok 0315, R3)"
+    },
+    {
+      "word": "７月",
+      "reading": "しちがつ",
+      "surfaces": ["７", "月"],
+      "readings": [null, "がつ"],
+      "kind": "date",
+      "note": "７月 is the month, read がつ after its number; UniDic read 月 つき (Moon) here (Grok 0315, R3)"
+    },
+    {
+      "word": "3月",
+      "reading": "さんがつ",
+      "surfaces": ["3", "月"],
+      "readings": [null, "がつ"],
+      "kind": "date",
+      "note": "3月 is the month, read がつ after its number; UniDic read 月 つき (Moon) here (Grok 0315, R3)"
+    },
+    {
+      "word": "10月",
+      "reading": "じゅうがつ",
+      "surfaces": ["10", "月"],
+      "readings": [null, "がつ"],
+      "kind": "date",
+      "note": "10月 is the month, read がつ after its number; UniDic read 月 つき (Moon) here (Grok 0315, R3)"
+    },
+    {
+      "word": "四月",
+      "reading": "しがつ",
+      "surfaces": ["四", "月"],
+      "readings": ["し", "がつ"],
+      "kind": "date",
+      "note": "四月 (April) reads しがつ; UniDic read it よん つき (ごん狐: 四月のいい晩) (Grok 0315, R3)"
+    },
+    {
+      "word": "60分",
+      "reading": "ろくじゅっぷん",
+      "surfaces": ["時間", "60", "分"],
+      "readings": [null, null, "ぷん"],
+      "kind": "time",
+      "note": "制作時間60分 (sixty minutes) reads ぷん; UniDic read 分 ぶん (part, share). Bound to 時間 so 60分の1 (a fraction, ぶん) stays UniDic's (R3, mext:b_menu-houdou-mext_01683)"
+    },
+    {
+      "word": "59分",
+      "reading": "ごじゅうきゅうふん",
+      "surfaces": ["59", "分", "、"],
+      "readings": [null, "ふん", null],
+      "kind": "time",
+      "note": "迎えた59分、 (the 59th minute of the match) reads ふん; UniDic read 分 ぶん (part, share). Bound to the comma so 59分の1 (a fraction, ぶん) stays UniDic's (R3, wikinews:44384)"
+    },
+    {
+      "word": "発見された方",
+      "reading": "はっけんされたかた",
+      "surfaces": ["発見", "さ", "れ", "た", "方"],
+      "readings": [null, null, null, null, "かた"],
+      "kind": "term",
+      "note": "発見された方 (those who found one, polite) reads かた; UniDic read 方 ほう (direction) (Grok 0315, R3, env:press-press_05643)"
+    },
+    {
+      "word": "家族の方",
+      "reading": "かぞくのかた",
+      "surfaces": ["家族", "の", "方", "が"],
+      "readings": [null, null, "かた", null],
+      "kind": "term",
+      "note": "その家族の方が (their family members, polite) reads かた; UniDic read 方 ほう (R3, mhlw:stf-newpage_76340)"
+    },
+    {
+      "word": "多くの方",
+      "reading": "おおくのかた",
+      "surfaces": ["多く", "の", "方", "に"],
+      "readings": [null, null, "かた", null],
+      "kind": "term",
+      "note": "多くの方に (to many people, polite) reads かた; UniDic read 方 ほう (R3, mhlw:stf-newpage_76340)"
+    },
+    {
+      "word": "希望の方",
+      "reading": "きぼうのかた",
+      "surfaces": ["希望", "の", "方", "は"],
+      "readings": [null, null, "かた", null],
+      "kind": "term",
+      "note": "取材希望の方は (those who wish to cover it, polite) reads かた; UniDic read 方 ほう (R3, env:press-press_05591)"
+    },
+    {
+      "word": "たくさんの方",
+      "reading": "たくさんのかた",
+      "surfaces": ["たくさん", "の", "方", "に"],
+      "readings": [null, null, "かた", null],
+      "kind": "term",
+      "note": "たくさんの方に (to many people, polite) reads かた; UniDic read 方 ほう (R3, wikinews:45095)"
+    },
+    {
+      "word": "先輩方",
+      "reading": "せんぱいがた",
+      "surfaces": ["先輩", "方"],
+      "readings": [null, "がた"],
+      "kind": "term",
+      "note": "先輩方 (one’s seniors, the honorific plural) reads がた; UniDic read 方 ほう (Grok 0315, R3, wikinews:45095)"
+    },
+    {
+      "word": "僕の方",
+      "reading": "ぼくのほう",
+      "surfaces": ["僕", "の", "方", "大きい"],
+      "readings": [null, null, "ほう", null],
+      "kind": "term",
+      "note": "僕の方大きいよ (mine is bigger) reads ほう, the side of a comparison; UniDic read 方 かた (Grok 0315, R3, aozora:046605)"
+    },
+    {
+      "word": "そこら中",
+      "reading": "そこらじゅう",
+      "surfaces": ["そこ", "ら", "中"],
+      "readings": [null, null, "じゅう"],
+      "kind": "term",
+      "note": "そこら中 (all over the place) reads じゅう; UniDic read 中 ちゅう (Grok 0315, R3, aozora:046605)"
+    },
+    {
+      "word": "床につく",
+      "reading": "とこにつく",
+      "surfaces": ["床", "に", "つい"],
+      "readings": ["とこ", null, null],
+      "kind": "term",
+      "note": "床についていて (ごん狐: 兵十のおっ母は、床についていて, taken to her bed) reads とこ, the bed; UniDic read 床 ゆか (the floor) (Grok 0315 row つく, R3, aozora:000628)"
     }
   ],
   "accepts": [

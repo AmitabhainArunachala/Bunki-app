@@ -89,6 +89,16 @@ const SHELL = [
   'corridor-ink.js',
   'fonts.css',
   'vendor/ts-fsrs.mjs',
+  // the one schedule owner every deck, review and practice asks
+  'srs-core.mjs',
+  // HOOKS r8: the one review caller, W3's help-relevance rule and its catalog, installed beside it
+  'review-caller.mjs',
+  'help-relevance.mjs',
+  'data/help-relevance-catalog.json',
+  // HOOKS r8 rev 3.2 §7: the journey's lifecycle, switched by JOURNEY_WRITES
+  'journey-lifecycle.mjs',
+  // M4 v0: the quest adapter, imported beside the lifecycle when the switch is ON
+  'm4-quest.mjs',
   'dictionary-worker.js',
   'skip-core.js',
   'skip-ui.js',
@@ -102,6 +112,17 @@ const SHELL = [
   'icon-512.png',
   'reference-core.js',
   'reference-ui.js',
+  'kanji-structure.js',
+  'kanji-family.js',
+  'kanji-course.js',
+  'kanji-world-encounter.mjs',
+  'kanji-world-encounter.css',
+  'kanji-world/rajomon-content.json',
+  // The scene itself (kanji-world/rajomon-r1.png, 5 MB) is NOT precached, for the
+  // tokens' reason (A52): it ships as a required release asset the fetch handler
+  // verifies and caches on first use, and the encounter names an unavailable scene.
+  'data/share_alike/kanji-structure.json',
+  'data/share_alike/kanji-family.json',
   'reference-ui.css',
   'data/share_alike/reference-extra.json',
   'data/share_alike/kkld.json',
@@ -109,6 +130,7 @@ const SHELL = [
   // 集中道場 › デッキ opens offline from install
   'decks/player/engine.js',
   'decks/player/mount.js',
+  'shared-study-content.mjs',
   'decks/player/player.css',
   'decks/player/host.js',
   // …with what mount.js fetches at load, so a first visit then offline still opens a deck
@@ -137,6 +159,7 @@ const SHELL = [
   'decks/n2/deck.json',
   'decks/n1/deck.json',
   'decks/senmon/deck.json',
+  'decks/kotoba-master/deck.json',
   // Their tokens side files (deck.tokens) are NOT precached: the fetch handler verifies
   // and caches them on first use, so the back's tap targets work offline after one sitting while
   // the install stays light (A52).
@@ -186,11 +209,23 @@ const GUIDED_ROOM = [
   'guided-moments.css',
   'guided/sets/index.json',
 ];
+// 話す · Speak is imported only when its door is pressed too, "loaded like the guided session" (corridor.js, track C):
+// its module, its core and its styles travel with the install, so the room opens offline, where it plays and shadows
+// kept lines (676a4754), without having been opened online first.
+const SPEAK_ROOM = [
+  'speak.js',
+  'speak-core.mjs',
+  'rooms/speak.css',
+];
 const guidedAsset = (path) => path.startsWith('guided/') && !path.endsWith('.md');
-const fontAsset = (path) => /^fonts\/[^/]+\.woff2$/.test(path);
+// Shared study modules/content are verified and cached on first bound use.
+// Shared fonts use the same verified reuse path, but are fetched lazily rather
+// than joining every ordinary Bunki installation's background download.
+const backgroundFontAsset = (path) => /^fonts\/[^/]+\.woff2$/.test(path);
+const fontAsset = (path) => backgroundFontAsset(path) || /^vendor\/shared-study-engine\/client\/app\/fonts\/[^/]+\.woff2$/.test(path);
 const fontUrl = (url) => url.startsWith(SCOPE) && fontAsset(url.slice(SCOPE.length));
 const PRECACHE_URLS = new Set(
-  [...SHELL, ...BOOT_DATA, ...GUIDED_ROOM].map((path) => new URL(path, SCOPE).href),
+  [...SHELL, ...BOOT_DATA, ...GUIDED_ROOM, ...SPEAK_ROOM].map((path) => new URL(path, SCOPE).href),
 );
 
 const assetUrl = (path) => new URL(path.split('/').map(encodeURIComponent).join('/'), SCOPE).href;
@@ -327,7 +362,7 @@ async function validateRelease(identityResponse, workerResponse) {
   if ((await digest(new TextEncoder().encode(JSON.stringify(inputs)))) !== assetVersion) {
     throw new Error('release source digest mismatch');
   }
-  for (const path of [...SHELL.filter((path) => path !== '.'), ...BOOT_DATA, ...GUIDED_ROOM]) {
+  for (const path of [...SHELL.filter((path) => path !== '.'), ...BOOT_DATA, ...GUIDED_ROOM, ...SPEAK_ROOM]) {
     if (!entries.has(assetUrl(path))) throw new Error(`release boot entry missing: ${path}`);
   }
   return {
@@ -367,7 +402,7 @@ self.addEventListener('install', (event) => {
       const guided = [...release.entries.values()].map((entry) => entry.path).filter(guidedAsset);
       const urls = [
         ...new Set(
-          [...SHELL.filter((path) => path !== '.'), ...BOOT_DATA, ...GUIDED_ROOM, ...guided].map(
+          [...SHELL.filter((path) => path !== '.'), ...BOOT_DATA, ...GUIDED_ROOM, ...SPEAK_ROOM, ...guided].map(
             assetUrl,
           ),
         ),
@@ -463,7 +498,7 @@ async function fillFonts() {
     await drainGeneration(name, cache, release, held).catch(() => {});
   }
   const missing = [...release.entries].filter(
-    ([url, entry]) => fontAsset(entry.path) && !held.has(url),
+    ([url, entry]) => backgroundFontAsset(entry.path) && !held.has(url),
   );
   const lane = async () => {
     for (let next = missing.shift(); next; next = missing.shift()) {
@@ -538,6 +573,9 @@ self.addEventListener('fetch', (event) => {
   if (/^api\//.test(relativePath)) return;
   const isContent = /^(data|vendor|design|modules|fonts)\//.test(relativePath);
   const navigation = request.mode === 'navigate';
+  // The canonical study UI is an actual document inside Bunki, not an app route.
+  // Preserve its own document under control; other navigations keep the shell.
+  const sharedFrame = url.pathname === new URL('decks/player/shared-frame.html', SCOPE).pathname;
   const cacheFirst = navigation || PRECACHE_URLS.has(url.href) || isContent;
   const task = (async () => {
     const cache = await caches.open(CACHE_NAME).catch(() => null);
@@ -545,7 +583,7 @@ self.addEventListener('fetch', (event) => {
       if (!cache) return { response: updateNeeded() };
       try {
         const release = await readInstalledRelease(cache);
-        const canonical = navigation ? assetUrl('index.html') : `${url.origin}${url.pathname}`;
+        const canonical = navigation ? assetUrl(sharedFrame ? 'decks/player/shared-frame.html' : 'index.html') : `${url.origin}${url.pathname}`;
         if (canonical === IDENTITY_URL) return { response: release.identity.clone() };
         const entry = release.entries.get(canonical);
         if (!entry) return { response: updateNeeded() };
@@ -558,7 +596,7 @@ self.addEventListener('fetch', (event) => {
         return { response: updateNeeded() };
       }
     }
-    const cachedRequest = navigation ? new URL('index.html', SCOPE).href : request;
+    const cachedRequest = navigation ? new URL(sharedFrame ? 'decks/player/shared-frame.html' : 'index.html', SCOPE).href : request;
     const hit = cache ? await cache.match(cachedRequest).catch(() => undefined) : undefined;
     if (cacheFirst && hit) return { response: hit };
     try {

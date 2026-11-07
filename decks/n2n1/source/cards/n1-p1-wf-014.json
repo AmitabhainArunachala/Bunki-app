@@ -1,15 +1,16 @@
 {
  "cards": [
   {
+   "cardId": "nn-5f9baf2494-fb542abf",
    "term": "仕組み",
    "reading": "しくみ",
    "pos": "noun",
    "meaning": "structure; mechanism",
    "defJa": "ものごとが成り立つ構造や仕掛け",
    "passage": {
-    "ja": "言葉は、意味を運ぶ容器にすぎないのだろうか。私にはそうは思えない。助詞ひとつが文の重心を動かす仕組みを知れば、母語と外国語の垣根さえ低く見えてくる。たとえば「は」と「が」の違いは、辞書の訳語を並べても決して説明しきれず、話し手が何を既知とし、何を新しい情報として差し出すかという構造に根ざしている。外国語を学ぶとは、他人の言葉を覚えることである以前に、自分の言葉の骨組みを発見することにほかならない。",
+    "ja": "言葉は、意味を運ぶ容器にすぎないのだろうか。私にはそうは思えない。助詞ひとつが文の重心を動かす仕組みを知れば、母語と外国語の垣根さえ低く見えてくる。たとえば「は」と「が」の違いは、辞書の訳語を並べても決して説明しきれず、話し手が何を既知とし、何を新しい情報として差し出すかという構造に根ざしている。外国語を学ぶとは、他人の言葉を覚えることである以前に、自分の言葉の骨組みを発見することでもある。",
     "form": "仕組み",
-    "en": "Is language nothing more than a container that carries meaning? I cannot think so. Once you know the mechanism by which a single particle shifts the center of gravity of a sentence, even the hedge between your mother tongue and a foreign language begins to look low. The difference between wa and ga, for example, can never be fully explained by lining up dictionary translations; it is rooted in a structure of what the speaker treats as already known and what is offered as new information. To learn a foreign language is, before it is memorizing someone else's words, nothing other than discovering the framework of your own.",
+    "en": "Is language nothing more than a container that carries meaning? I cannot think so. Once you know the mechanism by which a single particle shifts the center of gravity of a sentence, even the hedge between your mother tongue and a foreign language begins to look low. The difference between wa and ga, for example, can never be fully explained by lining up dictionary translations; it is rooted in a structure of what the speaker treats as already known and what is offered as new information. Learning a foreign language also means discovering the framework of your own language, before memorizing someone else's words.",
     "register": "論",
     "topic": "language",
     "tipJa": "「〜の仕組みを知る・解き明かす」と使い、物事が動く内部の構造を指す。",
@@ -45,15 +46,16 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
+   "cardId": "nn-c6cdafb772-c4f1f822",
    "term": "固い",
    "reading": "かたい",
    "pos": "i-adj",
    "meaning": "firm; hard; rigid",
    "defJa": "形や意志が簡単に変わらないさま",
    "passage": {
-    "ja": "固い決意は、しばしば人を支えるが、同時に人を縛りもする。「三日坊主を二度としない」と誓った人ほど、一日でも休もうものなら、そこで全てが終わったと感じ、すべてを投げ出したくなる。その意味で、決意は岩のようにではなく、結んだ紐のように、ほどけても結び直せるしなやかさがあるほうが長持ちする。習慣を育てるとは、強さを競うことではなく、折れても何度でも戻ってくる力を養うことにほかならない。",
+    "ja": "固い決意は、しばしば人を支えるが、同時に人を縛りもする。「三日坊主を二度としない」と誓った人ほど、一日でも休もうものなら、そこで全てが終わったと感じ、すべてを投げ出したくなる。その意味で、決意は岩のようにではなく、結んだ紐のように、ほどけても結び直せるしなやかさがあるほうが長持ちする。習慣を育てるとは、強さを競うことではなく、折れても何度でも戻ってくる力を養うことだ。",
     "form": "固い",
-    "en": "A firm resolve often supports a person, but at the same time it also binds them. The more a person has vowed 'never to be a three-day quitter again,' the more, if they so much as rest for a day, they feel that everything is over and want to throw it all away. In that sense, a resolution lasts longer if it is not like a rock but like a tied cord, supple enough to be retied even when it comes undone. Cultivating a habit is nothing other than nurturing the power to come back time and again even when broken, not competing in strength.",
+    "en": "A firm resolve often supports a person, but at the same time it also binds them. The more a person has vowed 'never to be a three-day quitter again,' the more, if they so much as rest for a day, they feel that everything is over and want to throw it all away. In that sense, a resolution lasts longer if it is not like a rock but like a tied cord, supple enough to be retied even when it comes undone. Cultivating a habit means nurturing the power to come back time and again even when broken, not competing in strength.",
     "register": "論",
     "topic": "mind",
     "tipJa": "「固い決意・約束・絆」。簡単には変わらず揺るがないさま。",

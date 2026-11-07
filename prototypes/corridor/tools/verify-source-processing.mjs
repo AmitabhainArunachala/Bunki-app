@@ -11,8 +11,28 @@ import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } 
 import { extname, isAbsolute, join, resolve } from 'node:path';
 import process from 'node:process';
 import { chromium, webkit } from 'playwright-core';
+import { contextBrowserVersion } from './browser-version-support.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+import { setUpDeviceTutor } from './tutor-fixture-support.mjs';
+
+/** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
+ * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
+async function answeringRestore(page, run) {
+  let problem;
+  const answer = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', answer);
+  try { const value = await run(); if (problem) throw problem; return value; }
+  catch (error) { throw problem || error; }
+  finally { page.off('dialog', answer); }
+}
 
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable staged KAIRO_SITE_DIR');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
@@ -173,6 +193,7 @@ async function tutor(page) {
   await openShelfDoor(page, '#ai-link'); await page.locator('#chat-input').waitFor();
 }
 async function configure(page, model = FAKE_MODEL) {
+  await page.evaluate(() => { const d = document.getElementById('ai-connection'); if (d) d.open = true; }); // Q · the address and model fold under the tutor's Details
   await page.locator('#ai-base-url').fill(FAKE_ORIGIN); await page.locator('#ai-model-input').fill(model);
   await page.locator('#ai-key-input').fill(FAKE_KEY); await page.locator('#ai-key-save').click();
   await page.locator('#chat-input').waitFor();
@@ -251,7 +272,7 @@ for (const engine of engines) for (const width of sizes) {
       acceptDownloads: true, ignoreHTTPSErrors: true, ...(engine === 'chromium' ? { args: ['--ignore-certificate-errors'] } : {}),
       recordVideo: { dir: videos, size: { width, height: width === 390 ? 844 : 1050 } },
     });
-    result.browserVersion = context.browser()?.version();
+    result.browserVersion = await contextBrowserVersion(context, { chromium, webkit }[engine]);
     // A separate loopback HTTPS server exercises real CORS/abort behavior,
     // including WebKit requests controlled by the installed service worker.
     syntheticResponder = async (request, response) => {
@@ -318,6 +339,9 @@ for (const engine of engines) for (const width of sizes) {
     await page.locator('#source-capture-url').fill(ENCOUNTER_URL); await page.locator('#source-capture-text').fill(TEXT);
     await page.locator('#source-capture-save').click(); await page.locator('#source-reader-body').waitFor();
     await selectWord(page); await page.locator('#source-selection-lookup').click();
+    // precondition now (Hfix-1B, item 11): a tutor set up, so the word's page offers Ask the tutor (the case's own synthetic
+    // provider replaces it below)
+    await setUpDeviceTutor(page);
     await page.locator('.nav-search-row').first().click(); await page.locator('#sheet .teacher-discuss').click();
     await settledQuestion(page, QUESTION); await configure(page);
     const neutral = await readAppRecordSnapshot(page), topic = neutral.record.teacherContexts.entries.find((t) => t.id === neutral.record.teacherContexts.activeRef);
@@ -385,8 +409,8 @@ for (const engine of engines) for (const width of sizes) {
       // Import through the normal controls into another fresh installation.
       await close(); profileName = 'restored-profile'; await open(); await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page);
       await openLists(page); const oldTime = await page.evaluate(() => performance.timeOrigin);
-      await page.locator('#import-file').setInputFiles(backupFile);
-      await page.waitForFunction((old) => performance.timeOrigin !== old && document.body.dataset.ready === '1', oldTime, { timeout: 30000 });
+      await answeringRestore(page, async () => { await page.locator('#import-file').setInputFiles(backupFile);
+        await page.waitForFunction((old) => performance.timeOrigin !== old && document.body.dataset.ready === '1', oldTime, { timeout: 30000 }); });
       await tutor(page); await configure(page, `${FAKE_MODEL}-changed`);
       assert.deepEqual(await deviceApprovals(page), {}); assert.equal(await page.locator('#chat-send').isDisabled(), true);
       assert.equal(await page.locator('#chat-input').inputValue(), laterQuestion);

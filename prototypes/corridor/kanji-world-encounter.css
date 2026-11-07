@@ -1,0 +1,110 @@
+/* Scoped room: the host keeps its own theme, navigation and learner state. */
+.kw-encounter {
+  --kw-ink: #f3ead9;
+  --kw-muted: #b9c6d2;
+  --kw-accent: #c7dfdc;
+  color: var(--kw-ink);
+  background: radial-gradient(ellipse at 50% 0, #25334b, #111c2e 65%);
+  border-radius: 3px;
+  min-height: min(780px, 88svh);
+  overflow: hidden;
+  font-family: var(--sans, system-ui, sans-serif);
+  isolation: isolate;
+}
+.kw-encounter * { box-sizing: border-box; }
+.kw-encounter .kw-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px clamp(12px, 3vw, 28px);
+}
+.kw-encounter .kw-progress { font-size: 12px; letter-spacing: 0.08em; color: var(--kw-muted); }
+.kw-encounter .kw-body {
+  max-width: 760px;
+  min-height: 540px;
+  margin: 0 auto;
+  padding: clamp(24px, 5vw, 60px) clamp(20px, 5vw, 52px) 36px;
+  text-align: center;
+}
+.kw-encounter .kw-body--place { max-width: 1200px; padding: 0 0 36px; }
+.kw-encounter .kw-title {
+  color: var(--kw-ink);
+  font: 400 clamp(20px, 3vw, 27px)/1.5 var(--serif, Georgia, serif);
+  letter-spacing: 0.01em;
+  margin: 0 0 20px;
+}
+.kw-encounter .kw-title:focus { outline: none; }
+.kw-encounter .kw-place { margin: 0 0 28px; position: relative; background: #101a29; }
+.kw-encounter .kw-image { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: contain; }
+.kw-encounter .kw-candidate {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  background: #101a29e8;
+  color: #dae2e7;
+  padding: 3px 8px;
+  border-radius: 2px;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.kw-encounter .kw-image-fallback { min-height: 240px; margin: 0; padding: 80px 30px; color: var(--kw-muted); }
+.kw-encounter .kw-hook { margin: 0 20px 8px; font-size: 17px; line-height: 1.7; }
+.kw-encounter .kw-note { max-width: 440px; margin: 12px auto 24px; color: var(--kw-muted); font-size: 13px; line-height: 1.7; padding: 0 12px; }
+.kw-encounter .kw-glyph { font: 400 clamp(112px, 23vw, 176px)/1.35 var(--serif, 'Yu Mincho', serif); margin: 24px 0 12px; }
+.kw-encounter .kw-word { font: 400 clamp(64px, 15vw, 104px)/1.5 var(--serif, 'Yu Mincho', serif); margin: 28px 0 0; letter-spacing: 0.06em; }
+.kw-encounter .kw-reading { color: var(--kw-accent); font: 400 24px/1.7 var(--serif, serif); margin: 2px 0 14px; letter-spacing: 0.08em; }
+.kw-encounter .kw-meaning { margin: 4px 0 20px; font-size: 22px; line-height: 1.5; }
+.kw-encounter .kw-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 48px;
+  max-width: calc(100% - 24px);
+  padding: 12px 22px;
+  border: 1px solid #9caeb9;
+  border-radius: 3px;
+  background: var(--kw-accent);
+  color: #142336;
+  font: 500 15px/1.5 var(--sans, system-ui, sans-serif);
+  text-decoration: none;
+  cursor: pointer;
+}
+.kw-encounter .kw-button--quiet { color: var(--kw-ink); background: transparent; border-color: #66768c; }
+.kw-encounter .kw-top .kw-button { border-color: transparent; padding: 8px 4px; }
+.kw-encounter :is(.kw-button, .kw-answer):focus-visible { outline: 3px solid #f1c77e; outline-offset: 4px; }
+.kw-encounter .kw-button:hover { filter: brightness(1.1); }
+.kw-encounter .kw-answer-form { max-width: 360px; margin: 24px auto 0; }
+.kw-encounter .kw-answer-label { display: block; color: var(--kw-muted); font-size: 13px; text-align: left; }
+.kw-encounter .kw-answer {
+  display: block;
+  width: 100%;
+  min-height: 52px;
+  margin: 8px 0 20px;
+  padding: 10px 14px;
+  border: 1px solid #8b9bab;
+  border-radius: 3px;
+  color: var(--kw-ink);
+  background: #0b1525;
+  font: 400 20px/1.5 var(--sans, system-ui, sans-serif);
+}
+.kw-encounter .kw-feedback { min-height: 24px; margin: 20px 0 12px; color: #eadbbd; font-size: 14px; line-height: 1.6; }
+.kw-encounter .kw-feedback--answer { font-size: 22px; margin: 28px 0 20px; }
+.kw-encounter .kw-response { margin: 24px 0 0; color: var(--kw-muted); font-size: 20px; }
+.kw-encounter .kw-complete-copy { max-width: 380px; margin: 36px auto 24px; font-size: 18px; line-height: 1.9; }
+@media (max-width: 480px) {
+  .kw-encounter { min-height: calc(100svh - 120px); border-radius: 0; }
+  .kw-encounter .kw-body { min-height: 460px; padding-top: 20px; }
+  .kw-encounter .kw-body--place { padding-top: 0; }
+  .kw-encounter .kw-body--place .kw-title { padding: 0 20px; }
+  .kw-encounter .kw-candidate { position: static; text-align: right; padding: 5px 12px; font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kw-encounter *, .kw-encounter *::before, .kw-encounter *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+.kw-dialog { width: min(1100px, 100vw); max-width: 100vw; max-height: 100svh; padding: 0; border: 1px solid #68798a; background: #111c2e; color: #f3ead9; overscroll-behavior: contain; }
+.kw-dialog::backdrop { background: #050c18dd; }
+.kw-dialog .kw-loading { padding: 32px; }
+.kw-dialog > div > .kw-button { min-height: 48px; margin: 0 32px 32px; }
+@media(max-width:480px) { .kw-dialog { width:100vw; height:100svh; margin:0; border:0; } }

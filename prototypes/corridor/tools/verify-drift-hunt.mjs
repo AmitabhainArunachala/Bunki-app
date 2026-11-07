@@ -18,6 +18,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { extname, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
+import { isDeepStrictEqual } from 'node:util';
+import { readAppRecordSnapshot } from './record-test-support.mjs';
 import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 import { chromium } from 'playwright-core';
 
@@ -77,7 +79,7 @@ await ctx.addInitScript(() => {
       // it aimed at (a moving-target miss), which is the only ground on
       // which re-staging is honest
       word: event.target?.closest?.('.word')?.querySelector?.('.base')?.textContent ?? null,
-      card: !!event.target?.closest?.('#card.open'),
+      card: !!event.target?.closest?.('#card.open,#mini'),
     });
   }, true);
   const cap = (items, item) => {
@@ -129,11 +131,9 @@ const M = (type, x, y) => cdp.send('Input.dispatchMouseEvent', {
   clickCount: 1,
 });
 const runtimePointer = async (type, x, y, pointerId, isPrimary = false) => {
-  // CDP Input cannot encode a partial touch lift: touchEnd/touchCancel require
-  // an empty point list. Preserve the browser-generated active identities,
-  // then deliver the one changed PointerEvent through CDP Runtime so the app
-  // receives the exact A-up / B+C-move sequence without an invalid protocol
-  // payload or a guessed pointer id.
+  // Historical synthetic control: preserve its exact browser-generated IDs.
+  // This is not a physical partial-lift witness; the G6 canceled-hand cases
+  // below use native CDP TouchLists and separately prove input completion.
   const terminal = type === 'pointerup' || type === 'pointercancel';
   const expression = `(() => {
     const target = document.elementFromPoint(${JSON.stringify(x)}, ${JSON.stringify(y)}) || document.body;
@@ -201,7 +201,8 @@ const world = `(() => ({
   sats: document.querySelectorAll('#drift-layer .word.bsat').length,
   tray: document.getElementById('drift-tray')?.textContent ?? '',
   depth: document.getElementById('depth')?.textContent ?? '',
-  card: document.getElementById('card')?.classList.contains('open') ?? false,
+  card: !!document.getElementById('mini') || (document.getElementById('card')?.classList.contains('open') ?? false),
+  sheet: document.getElementById('sheet')?.dataset.node ?? null,
   radoc: document.getElementById('radoc')?.classList.contains('open') ?? false,
   members: [...document.querySelectorAll('#drift-layer .word.bsat')]
     .map((el) => el.querySelector('.base')?.textContent ?? '').filter(Boolean).sort(),
@@ -264,7 +265,8 @@ const check = (name, pass, detail = '') => {
 };
 
 const targetPoint = (selector, label) => page.evaluate(({ selector, label }) => {
-  const candidates = [...document.querySelectorAll(selector)].filter((el) => el.querySelector('.base,.g,.pch')?.textContent === label);
+  const text = (el) => { const copy = el.querySelector('.base,.g,.pch')?.cloneNode(true); copy?.querySelectorAll('rt').forEach((rt) => rt.remove()); return copy?.textContent; };
+  const candidates = [...document.querySelectorAll(selector)].filter((el) => text(el) === label);
   const point = candidates.map((el) => {
     const r = el.getBoundingClientRect(), x = r.x + r.width / 2, y = r.y + r.height / 2;
     return { el, label, x, y, hit: el.contains(document.elementFromPoint(x, y)), classes: el.className };
@@ -275,7 +277,7 @@ const targetPoint = (selector, label) => page.evaluate(({ selector, label }) => 
     const actual = event.target?.closest?.(selector);
     window.__driftHuntMemberHit = {
       sameNode: actual === point.el,
-      label: actual?.querySelector('.base,.g,.pch')?.textContent ?? null,
+      label: actual ? text(actual) : null,
       trusted: event.isTrusted, type: event.pointerType,
     };
   }, { capture: true, once: true });
@@ -303,63 +305,53 @@ async function tapMember(selector, label, trace) {
   }
   await page.waitForTimeout(1100);
 }
-async function stageMessage(trace) {
-  await boot(1729);
-  const water = await page.evaluate(() => {
-    for (let y = 200; y < 520; y += 20) for (let x = 220; x < 330; x += 20) {
-      if (!document.elementFromPoint(x, y)?.closest('.word,.glyph,.part,#lvl,#theme,#ginga-symbol,#ginga-theme-seal')) return { x, y };
-    }
-    return null;
-  });
-  assert(water, 'The staged subject needs a real open-water camera pan');
-  let x = water.x, y = water.y;
-  const points = [];
-  await T('touchStart', [[x, y]]);
-  for (let step = 0; step < 40; step++) {
-    const subject = await page.evaluate(wordAt('伝言'));
-    assert(subject.exists, 'The rendered message subject must survive the camera pan');
-    const dx = 195 - subject.x, dy = 420 - subject.y;
-    if (Math.hypot(dx, dy) < 4) break;
-    x += Math.max(-12, Math.min(12, dx * 0.35)); y += Math.max(-12, Math.min(12, dy * 0.35));
-    points.push([x, y]);
-    await T('touchMove', [[x, y]]); await page.waitForTimeout(20);
-    await T('touchMove', [[x, y]]); await page.waitForTimeout(90);
-  }
-  await T('touchEnd', []); await page.waitForTimeout(700);
-  trace.actions.push({ kind: 'camera-pan', subject: '伝言', from: water, points });
-  for (let rung = 0; rung < 3; rung++) await tapMember('#drift-layer .word', '伝言', trace);
-  assert.equal((await page.evaluate(world)).depth, '伝言');
+async function stageHubDive(name) {
+  const hub = await stageHubBloom(name);
+  const trace = stagings[stagings.length - 1];
+  await tap(hub.x, hub.y); await page.waitForTimeout(700);
+  const released = await page.evaluate(world);
+  assert.equal(released.ctr, null, 'The first hub touch releases the held family');
+  assert.equal(released.depth, '', 'Release must not also dive');
+  await tap(hub.x, hub.y); await page.waitForTimeout(1200);
+  const dived = await page.evaluate(world);
+  assert.equal(dived.depth, hub.label, 'The next actual canvas-hub touch enters its own kanji');
+  trace.actions.push({ kind: 'canvas-hub-release-then-dive', hub, released, dived });
+  trace.subject = hub.label;
+  return trace;
 }
 async function stageCard(kind) {
-  const trace = { name: `${kind}-card`, seed: 1729, actions: [] };
-  stagings.push(trace);
-  for (let attempt = 1; attempt <= 3; attempt++) {
   try {
-    await stageMessage(trace);
-    if (kind === 'radical') {
-      await tapMember('#drift-layer .glyph', '伝', trace);
-      await tapMember('#drift-layer .glyph.comp', '亻', trace);
-      await tapMember('#drift-layer .glyph.center', '亻', trace);
-    } else {
-      await tapMember('#drift-layer .glyph', '言', trace);
-      for (let rung = 0; rung < 3; rung++) await tapMember('#drift-layer .word', '言葉', trace);
-      await tapMember('#drift-layer .part', 'を', trace);
-      await tapMember('#drift-layer .part.center', 'を', trace);
+    const trace = await stageHubDive(`hosted-${kind}`);
+    const selector = '#drift-layer .glyph.center';
+    await tapMember(selector, trace.subject, trace);
+    const first = await page.locator(selector).getAttribute('data-ladder-rung');
+    assert(['reading', 'stage'].includes(first), 'A supported hosted kanji answers on the shared ladder');
+    if (first === 'reading') {
+      assert.equal(await page.locator('#mini,#sheet').count(), 0);
+      await tapMember(selector, trace.subject, trace);
+    }
+    await page.locator('#mini').waitFor();
+    assert.equal(await page.locator('#mini .mini-word').textContent(), trace.subject);
+    assert.equal(await page.locator(selector).getAttribute('data-ladder-rung'), 'stage');
+    trace.meaning = await page.locator('#mini .mini-gloss').textContent();
+    const kanji = JSON.parse(readFileSync(resolve(CORRIDOR, 'data/share_alike/kanji.json'), 'utf8')).kanji[trace.subject];
+    trace.expectedMeaning = String(kanji?.m || '').toLowerCase();
+    assert(trace.expectedMeaning, 'The pinned kanji source supplies this meaning');
+    assert.equal(trace.meaning?.trim().toLowerCase(), trace.expectedMeaning, 'The shared kanji stage names its own canonical meaning, never a missing word entry');
+    if (kind === 'page') {
+      await tapMember(selector, trace.subject, trace);
+      await page.locator(`#sheet[data-node="kanji:${trace.subject}"]`).waitFor();
+      assert.equal(await page.locator('#mini').count(), 0);
     }
     trace.state = await page.evaluate(world);
-    assert(trace.state.card && trace.state.depth, 'The real dive must retain an open Drift card');
-    await shot(`staging-${kind}-card.png`);
+    await shot(`staging-hosted-${kind}.png`);
     return true;
   } catch (error) {
-    trace.error = error.message;
-    trace.attempt = attempt;
-    console.log(JSON.stringify({ staging: trace }));
-    // Only a recorded native touch of the wrong moving body can restart setup.
-    // A correctly delivered interaction that fails its contract remains a failure.
-    if (error.code !== 'OBSERVED_TARGET_MISS' || attempt === 3) return false;
+    const trace = stagings[stagings.length - 1];
+    if (trace) trace.error = error.message;
+    console.log(JSON.stringify({ staging: trace, error: error.message }));
+    return false;
   }
-  }
-  return false;
 }
 async function stageHubBloom(name) {
   await boot(1729);
@@ -400,69 +392,60 @@ check('hunt · a lifting pinch finger never grades the word beneath a third fing
   `A id=${liftAId}; tray "${before.tray}" → "${after.tray}", word present=${word.exists}`);
 await T('touchCancel', []);
 
-/* 2 · the radical explainer is a modal, not a hole (P0) — its taps must not
- * dismantle the dive stack, and its close button must be reachable. */
-await stageCard('radical');
+/* 2 · the hosted entry explanation replaces the private radical card.
+ * Its content and Back control preserve the exact underlying canvas dive.
+ * The shared entry page retains the modal-isolation obligation. */
+const pageReady = await stageCard('page');
+const modalTrace = stagings[stagings.length - 1];
 const depthBefore = (await page.evaluate(world)).depth;
-const radQ = await page.evaluate(`(() => {
-  const c = document.getElementById('card');
-  if (!c || !c.classList.contains('open')) {
-    const ctr = document.querySelector('#drift-layer .word.center, #drift-layer .glyph.center');
-    if (ctr) { const r = ctr.getBoundingClientRect(); return { openFirst: { x: r.x + r.width / 2, y: r.y + r.height / 2 } }; }
-  }
-  const b = document.querySelector('#drift-layer .radq');
-  if (!b) return null;
-  const r = b.getBoundingClientRect();
-  return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
-})()`);
-if (radQ?.openFirst) {
-  await tap(radQ.openFirst.x, radQ.openFirst.y);
-  await page.waitForTimeout(900);
-}
-const radQ2 = await page.evaluate(`(() => {
-  const b = document.querySelector('#drift-layer .radq');
-  if (!b) return null;
-  const r = b.getBoundingClientRect();
-  return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
-})()`);
-if (radQ2) {
-  await tap(radQ2.x, radQ2.y);
-  await page.waitForTimeout(700);
-  const openState = await page.evaluate(world);
-  await tap(195, 400); // a paragraph of the explainer
-  await page.waitForTimeout(500);
-  const afterP = await page.evaluate(world);
-  check('hunt · explainer taps do not dismantle the world beneath it',
-    openState.radoc && afterP.depth === openState.depth && afterP.radoc,
-    `depth "${openState.depth}" → "${afterP.depth}", still open=${afterP.radoc}`);
-  const xBtn = await page.evaluate(`(() => {
-    const b = document.getElementById('radocX');
-    const r = b.getBoundingClientRect();
-    const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
-    return { x: r.x + r.width / 2, y: r.y + r.height / 2, hitsSelf: b.contains(hit) || hit === b };
-  })()`);
-  check('hunt · the explainer close button is reachable by a finger', xBtn.hitsSelf,
-    `hit-test at (${xBtn.x.toFixed(0)},${xBtn.y.toFixed(0)}) reaches the X: ${xBtn.hitsSelf}`);
-  await tap(xBtn.x, xBtn.y);
-  await page.waitForTimeout(600);
+if (pageReady) {
+  const heading = page.locator('#sheet .hero-mean').first();
+  const r = await heading.boundingBox();
+  assert(r, 'The actual hosted entry heading is visible');
+  await tap(r.x + r.width / 2, r.y + r.height / 2);
+  const contentAfter = await page.evaluate(world);
+  check('hunt · shared entry explanation taps do not dismantle the canvas dive',
+    contentAfter.sheet === `kanji:${modalTrace.subject}` && contentAfter.depth === depthBefore,
+    `canonical entry ${contentAfter.sheet}; canvas depth ${depthBefore} → ${contentAfter.depth}`);
+  const back = await page.locator('#sheet-back').evaluate((node) => {
+    const r = node.getBoundingClientRect(), x = r.x + r.width / 2, y = r.y + r.height / 2;
+    return { x, y, hitsSelf: node.contains(document.elementFromPoint(x, y)) };
+  });
+  check('hunt · the shared entry Back control is reachable by a finger', back.hitsSelf, JSON.stringify(back));
+  await tap(back.x, back.y); await page.locator('#mini').waitFor();
   const closed = await page.evaluate(world);
-  check('hunt · the explainer closes without navigating the app away',
-    !closed.radoc && closed.depth === depthBefore,
-    `radoc open=${closed.radoc}, depth "${depthBefore}" → "${closed.depth}"`);
+  check('hunt · shared entry Back restores the exact stage and canvas dive',
+    !closed.sheet && closed.depth === depthBefore &&
+      await page.locator('#mini .mini-word').textContent() === modalTrace.subject &&
+      await page.locator('#mini .mini-gloss').textContent() === modalTrace.meaning,
+    `Back restores exact ${modalTrace.subject} stage; canvas depth ${closed.depth}`);
+  await page.keyboard.press('Escape');
+  assert.equal(await page.locator('#mini,#sheet').count(), 0);
 } else {
-  check('hunt · explainer reachable in a dive', false, 'no 部首とは？ button found');
+  check('hunt · shared entry explanation taps do not dismantle the canvas dive', false, 'Actual canvas hub → canonical entry staging failed');
+  check('hunt · the shared entry Back control is reachable by a finger', false, 'Canonical entry staging failed');
+  check('hunt · shared entry Back restores the exact stage and canvas dive', false, 'Canonical entry staging failed');
 }
 
-/* 3 · inside a dive, only a deliberate tap surfaces (P1) */
-await boot();
-w = await page.evaluate(anyWord);
-for (let i = 0; i < 3; i++) {
-  const at = await page.evaluate(wordAt(w.w));
-  if (!at.exists) break;
-  await tap(at.x, at.y);
-  await page.waitForTimeout(i === 2 ? 1500 : 450);
-}
+/* 3 · a real canvas-hub dive retains its level through the shared ladder,
+ * then slow/held open-water gestures remain navigation-neutral. */
+const stageReady = await stageCard('stage');
+const visitTrace = stagings[stagings.length - 1];
 const inDive = await page.evaluate(world);
+let visitOk = false;
+if (stageReady) {
+  await tapMember('#drift-layer .glyph.center', visitTrace.subject, visitTrace);
+  await page.locator(`#sheet[data-node="kanji:${visitTrace.subject}"]`).waitFor();
+  await page.locator('#sheet-back').click(); await page.locator('#mini').waitFor();
+  const sameStage = await page.locator('#mini .mini-word').textContent() === visitTrace.subject &&
+    await page.locator('#mini .mini-gloss').textContent() === visitTrace.meaning;
+  await page.keyboard.press('Escape');
+  visitOk = sameStage && await page.locator('#mini,#sheet').count() === 0 &&
+    await page.locator('#drift-layer .glyph.center').getAttribute('data-ladder-rung') === null &&
+    (await page.evaluate(world)).depth === inDive.depth;
+}
+check('hunt · the dive’s centre follows reading, stage and page; Back restores stage and folding keeps the dive',
+  visitOk, JSON.stringify({ subject: visitTrace?.subject, depth: inDive.depth, sameMeaning: visitOk }));
 await drag(300, 620, 210, 620, 560); // slow drag on water
 await page.waitForTimeout(700);
 const afterDrag = await page.evaluate(world);
@@ -531,13 +514,14 @@ for (let hop = 0; hop < 2; hop++) {
     return null;
   })()`);
   if (!sat) break;
-  await tap(sat.x, sat.y);
-  await page.waitForTimeout(600);
-  const fresh = await page.evaluate(wordAt(sat.w));
-  if (fresh.exists) {
-    await tap(fresh.x, fresh.y);
-    await page.waitForTimeout(1600);
-  }
+  const trace = { name: `walk-hop-${hop + 1}`, actions: [] }; stagings.push(trace);
+  await tapMember('#drift-layer .word.bsat', sat.w, trace);
+  assert.equal((await page.evaluate(world)).ctr, sat.w, 'The actual satellite becomes the next family centre');
+  const rung = await page.locator('#drift-layer .word.bctr').getAttribute('data-ladder-rung');
+  assert(['reading', 'stage'].includes(rung));
+  if (rung === 'stage') assert.equal(await page.locator('#mini .mini-word').textContent(), sat.w);
+  await page.keyboard.press('Escape');
+  assert.equal((await page.evaluate(world)).ctr, sat.w, 'Folding lookup retains the walked family');
 }
 await page.waitForTimeout(2000); // two recycler passes
 const origin = await page.evaluate(wordAt(w.w));
@@ -621,11 +605,10 @@ if (sat9) {
   await page.waitForTimeout(500);
   const st = await page.evaluate(lockState);
   const answered = await page.evaluate(
-    `document.querySelectorAll('#drift-layer .word.unfolded, #drift-layer .word.glossed').length`);
+    `document.querySelectorAll('#drift-layer .word[data-ladder-rung]').length`);
   // a label we hold no reading for must reach its gloss on the FIRST tap:
   // its furigana stage would answer with nothing visible
-  const muteOk = !sat9.mute || st.glossed > 0 || (await page.evaluate(
-    `document.querySelectorAll('#drift-layer .word.glossed').length`)) > 0;
+  const muteOk = !sat9.mute || await page.locator('#mini .mini-word').textContent().catch(() => '') === sat9.w;
   check('hunt · tapping a constellation label answers instead of razing it',
     st.ctr !== null && answered > 0 && muteOk,
     `"${sat9.w}" mute=${sat9.mute} · centre survived=${st.ctr !== null}, answered=${answered}, glossed=${st.glossed}`);
@@ -686,7 +669,8 @@ check('hunt · a release on a hub sun releases the constellation instead of divi
  * ownership check; #card swallows pointerdown and has no pointermove
  * listener at all, so a thumb resting on the open card was invisible to the
  * touch set while its every move still reached the drag branch, P1).
- * Run inside a dive with the card open: no camera pan, no tide rail, so a
+ * The exact outside owner touch folds the shared stage before a foreign finger arrives.
+ * Run inside a real hub dive: no camera pan, no tide rail, so a
  * raw pixel delta is honest here. */
 // Orbiters keep circling on their own inside a dive. Keep the same field
 // displacement baseline and compare the held word with its moving peers.
@@ -700,7 +684,7 @@ let p0 = null;
 let confirmedOwner = null;
 let ownerStagingFailure = 'no owner touch attempted';
 for (let attempt = 1; attempt <= 3; attempt++) {
-  const cardReady = await stageCard('particle');
+  const cardReady = await stageCard('stage');
   const trace = stagings[stagings.length - 1];
   const staging = trace.ownerStaging = { attempt, status: 'preparing' };
   if (!cardReady) {
@@ -710,21 +694,64 @@ for (let attempt = 1; attempt <= 3; attempt++) {
   // Reset observations, take p0 and aim in one synchronous evaluation. No
   // page read, screenshot or wait belongs between this snapshot and native
   // touchStart: the selected body continues orbiting after we return.
-  const snapshot = await page.evaluate(`(() => {
+  //
+  // INTFIX · the aim is taken repeatedly until one lands. Whether an orbiter owns its own centre
+  // is a property of THIS FRAME of a field that never stops drifting, and after the dive has
+  // receded the field only a handful of orbiters are touchable at all, so a single look decided
+  // the whole row on a coin-flip. Each look is a complete, self-contained snapshot; the one that
+  // finds an owner is the one that arms the listener and whose coordinates are touched, with no
+  // read or wait between it and touchStart. A wait only ever happens BEFORE a fresh look.
+  const takeAim = () => page.evaluate(`(() => {
     window.__driftHuntPointerDowns.length = 0;
     window.__driftHuntOwnerHit = null;
     const p0 = ${fieldPos};
-    const card = document.getElementById('card');
-    const cr = card && card.classList.contains('open') ? card.getBoundingClientRect() : null;
+    const card = document.getElementById('mini');
+    const cr = card ? card.getBoundingClientRect() : null;
     const words = [...document.querySelectorAll('#drift-layer .word')];
-    // Keep the original highest/leftmost clear orbiter and far card corner.
-    const orb = words.map((el) => {
+    // Keep the highest/leftmost hit-owned orbiter at least 20px clear of the shared stage, on any side.
+    //
+    // INTFIX · a finger aims at a word, not at its mathematical centre. The shared stage opens
+    // over a dive that has receded the field, so only a handful of orbiters are still touchable,
+    // and those few drift: measured on 2a1e6aef at 390x844, two of four cleared the card and the
+    // centre point of one of them was covered by a NEIGHBOUR's always-on reading <rt>, which is
+    // ordinary overlap in a drifting field. Testing the centre alone therefore found an owner
+    // only sometimes, and when it found none this staging broke out with no retry — the gate's
+    // "card=true orbiter=false". Each candidate is now probed where a finger would land: its own
+    // .base glyph first, then the element centre, then two points inside that glyph. The first
+    // candidate that owns one of its own points is taken.
+    //
+    // Nothing is widened. The geometric filters (opacity, the 110..560 band, 20px clear of the
+    // stage on some side) are unchanged, every probe point lies inside the word's own box, and
+    // delivery is still proved against the exact node by hit.sameNode below. If no candidate
+    // owns any of its own points the staging still fails, so a product regression that makes
+    // orbiters untouchable stays red.
+    const owns = (el, x, y) => x >= 0 && y >= 0 && x <= innerWidth && y <= innerHeight &&
+      el.contains(document.elementFromPoint(x, y));
+    // Points inside the word's own glyph, used only as a fallback. A single owned sliver is not
+    // enough: the field drifts between this snapshot and the native touch, so a word whose
+    // centre belongs to a neighbour is a word the finger will miss. A fallback candidate must
+    // own its glyph centre AND both flanks before it is trusted.
+    const glyphHold = (el) => {
+      const glyph = el.querySelector('.base');
+      const g = glyph ? glyph.getBoundingClientRect() : null;
+      if (!g || !g.width || !g.height) return null;
+      const y = g.top + g.height / 2;
+      const mid = g.left + g.width / 2;
+      if (!owns(el, mid, y) || !owns(el, g.left + g.width * 0.3, y) || !owns(el, g.left + g.width * 0.7, y)) return null;
+      return { x: mid, y };
+    };
+    const candidates = words.map((el) => {
       const r = el.getBoundingClientRect();
       return { el, r, x: r.left + r.width / 2, y: r.top + r.height / 2 };
     }).filter((o) => o.r.width && !o.el.classList.contains('center') &&
       parseFloat(o.el.style.opacity || '1') > 0.4 && o.r.top > 110 && o.r.bottom < 560 &&
-      (!cr || o.r.bottom < cr.top - 20) && o.el.contains(document.elementFromPoint(o.x, o.y)))
-      .sort((a, b) => (a.y + a.x) - (b.y + b.x))[0];
+      (!cr || o.r.bottom < cr.top - 20 || o.r.top > cr.bottom + 20 || o.r.right < cr.left - 20 || o.r.left > cr.right + 20))
+      .sort((a, b) => (a.y + a.x) - (b.y + b.x));
+    // Unchanged first choice: the highest/leftmost orbiter that owns its own centre. Only when
+    // no orbiter owns its centre — the state that broke this staging — does the glyph fallback
+    // run, so a run that used to stage still stages exactly the same word.
+    const orb = candidates.find((o) => owns(o.el, o.x, o.y))
+      || candidates.reduce((found, o) => found || (() => { const h = glyphHold(o.el); return h ? { ...o, x: h.x, y: h.y } : null; })(), null);
     const corner = cr ? { x: cr.right - 26, y: cr.top + 20 } : null;
     const stage = {
       card: corner ? { ...corner, hit: card.contains(document.elementFromPoint(corner.x, corner.y)) } : null,
@@ -743,13 +770,19 @@ for (let attempt = 1; attempt <= 3; attempt++) {
           id: event.pointerId, type: event.pointerType, isPrimary: event.isPrimary,
           isTrusted: event.isTrusted, x: event.clientX, y: event.clientY,
           word: word?.querySelector('.base')?.textContent ?? null,
-          card: !!event.target?.closest?.('#card.open'),
+          card: !!event.target?.closest?.('#card.open,#mini'),
           sameNode: word === orb.el, at: performance.now(),
         };
       }, { capture: true, once: true });
     }
     return { stage, p0, aimedAt: performance.now() };
   })()`);
+  let snapshot = null;
+  for (let look = 1; look <= 10; look += 1) {
+    snapshot = await takeAim();
+    if (snapshot.stage.card?.hit && snapshot.stage.orb) break;
+    if (look < 10) await page.waitForTimeout(320);
+  }
   stage = snapshot.stage;
   p0 = snapshot.p0;
   staging.snapshot = snapshot;
@@ -762,6 +795,8 @@ for (let attempt = 1; attempt <= 3; attempt++) {
     hit: window.__driftHuntOwnerHit,
     downs: window.__driftHuntPointerDowns.slice(),
     observedAt: performance.now(),
+    stagePresent: !!document.getElementById('mini'),
+    depth: document.getElementById('depth')?.textContent ?? '',
   }));
   staging.confirmation = confirmation;
   const first = confirmation.downs.length === 1 ? confirmation.downs[0] : null;
@@ -804,15 +839,19 @@ if (confirmedOwner) {
   const target = p0[stage.orb.w] && p1[stage.orb.w]
     ? Math.hypot(p1[stage.orb.w][0] - p0[stage.orb.w][0], p1[stage.orb.w][1] - p0[stage.orb.w][1]) : -1;
   const ownerFinger = observedFingers.find((finger) => finger.word === stage.orb.w);
-  const cardFinger = observedFingers.find((finger) => finger.card);
+  const foreignFinger = observedFingers.find((finger) => finger.id !== ownerFinger?.id &&
+    Math.hypot(finger.x - stage.card.x, finger.y - stage.card.y) < 1);
+  const ownerConfirmation = stagings[stagings.length - 1].ownerStaging.confirmation;
   stagings[stagings.length - 1].fingers = { stage, observedFingers, target, median, confirmedOwner, p0, p1 };
-  check('hunt · a finger the gesture never owned cannot carry a held word',
-    ownerFinger && cardFinger && ownerFinger.id !== cardFinger.id && target >= 0 && target - median < 30,
+  check('hunt · a foreign finger cannot carry the owned word after its shared stage folds',
+    ownerFinger && foreignFinger && ownerFinger.id !== foreignFinger.id &&
+      ownerConfirmation.stagePresent === false && ownerConfirmation.depth !== '' && foreignFinger.card === false &&
+      target >= 0 && target - median < 30,
     `held ${target.toFixed(1)}px vs orbiter median ${median.toFixed(1)}px of ${live.length} moving ` +
     `(all-words median ${(deltas[Math.floor(deltas.length / 2)] ?? 0).toFixed(1)}px, max ${(deltas[deltas.length - 1] ?? 0).toFixed(1)}px); ` +
-    `owner id=${ownerFinger?.id ?? null}, card id=${cardFinger?.id ?? null}`);
+    `owner id=${ownerFinger?.id ?? null}, foreign id=${foreignFinger?.id ?? null}; stage folded=${ownerConfirmation.stagePresent === false}`);
 } else {
-  check('hunt · a finger the gesture never owned cannot carry a held word', false,
+  check('hunt · a foreign finger cannot carry the owned word after its shared stage folds', false,
     `staging failed: ${ownerStagingFailure}; card=${!!stage?.card} orbiter=${!!stage?.orb}`);
 }
 
@@ -869,6 +908,7 @@ const semanticMember = (label) => page.evaluate((target) => {
         reading: el.querySelector('.yomi')?.textContent ?? '',
         unfolded: el.classList.contains('unfolded'),
         glossed: el.classList.contains('glossed'),
+        rung: el.dataset.ladderRung || null,
       };
       if (state.hitSelf) return state;
       fallback ??= state;
@@ -942,6 +982,8 @@ for (let staging = 1; staging <= 3; staging++) {
   }
   const semanticRevealOne = await semanticMember('残酷');
   const semanticAfterOne = await page.evaluate(world);
+  // the app's slip belongs to a dive's centre (the one-hand pass), never to a lock member's reveal
+  const slipOne = await page.evaluate(`document.getElementById('mini')?.querySelector('.mini-word')?.textContent ?? null`);
   const semanticSecondAim = await aimSemantic('残酷');
   let tapTwo = { attempted: false, delivered: false, reason: 'not attempted' };
   if (semanticSecondAim?.hitSelf) {
@@ -949,26 +991,44 @@ for (let staging = 1; staging <= 3; staging++) {
     await page.waitForTimeout(500);
   }
   const semanticRevealTwo = await semanticMember('残酷');
+  const semanticStage = await page.locator('#mini').evaluate(n => ({word:n.querySelector('.mini-word')?.textContent,gloss:n.querySelector('.mini-gloss')?.textContent})).catch(() => null);
   const semanticAfterTwo = await page.evaluate(world);
   const ok =
     lockStarted && semanticTarget?.dom === true && semanticTarget.hitSelf === true &&
     semanticTarget.reading !== '' &&
     semanticBefore.ctr === '過酷' && semanticAfterOne.ctr === '過酷' && semanticAfterTwo.ctr === '過酷' &&
-    semanticRevealOne?.unfolded === true && semanticRevealOne.glossed === false &&
-    semanticRevealTwo?.unfolded === true && semanticRevealTwo.glossed === true;
+    semanticRevealOne?.rung === 'reading' && semanticRevealOne.unfolded === true && semanticRevealOne.glossed === false && slipOne === null &&
+    semanticRevealTwo?.rung === 'stage' && semanticRevealTwo.unfolded === true && semanticStage?.word === '残酷' && !!semanticStage.gloss?.trim();
   semanticFinal = {
     ok,
     detail:
       `DOM=${semanticTarget?.dom ?? false}, hitSelf=${semanticTarget?.hitSelf ?? false}; ` +
-      `stage1=${semanticRevealOne?.unfolded ?? false}/${semanticRevealOne?.glossed ?? false}, ` +
+      `stage1=${semanticRevealOne?.unfolded ?? false}/${semanticRevealOne?.glossed ?? false} slip=${JSON.stringify(slipOne)}, ` +
       `stage2=${semanticRevealTwo?.unfolded ?? false}/${semanticRevealTwo?.glossed ?? false}; ` +
       `centre "${semanticBefore.ctr}" → "${semanticAfterOne.ctr}" → "${semanticAfterTwo.ctr}"` +
       `; staging ${staging}/3 (tap1 ${tapOne.reason}; tap2 ${tapTwo.reason})`,
   };
   if (ok || !(missed(tapOne) || missed(tapTwo))) break;
 }
-check('hunt · a corpus-backed semantic member is staged, hit-testable DOM interaction',
+check('hunt · a corpus-backed semantic member is staged, hit-testable DOM interaction (reading then shared stage, same lock identity)',
   semanticFinal.ok, semanticFinal.detail);
+
+const closeSemanticStage = async (expectedWord) => {
+  const before = await page.evaluate(world);
+  const actualWord = await page.locator('#mini .mini-word').textContent().catch(() => null);
+  if (actualWord !== expectedWord) return {ok:false,expectedWord,actualWord,reason:'expected stage was not mounted'};
+  await page.keyboard.press('Escape');
+  let closed = true;
+  try {
+    await page.waitForFunction(() => !document.getElementById('mini') && !document.getElementById('sheet') && window.__DRIFT__.canNavigate(),null,{timeout:5000});
+  } catch { closed = false; }
+  const after = await page.evaluate(world);
+  return {ok:closed && before.ctr === after.ctr,expectedWord,actualWord,before,after,closed};
+};
+// Native dismissal is a fixture precondition: the G6 stage intentionally
+// rejects a hold behind it. Preserve the already-observed stage facts.
+const semanticClosure = await closeSemanticStage('残酷');
+stagings.push({case:'semantic-stage-native-closure',...semanticClosure});
 
 // Start the lock afresh so the old canvas failure cannot mask the kana-only
 // fallback half of the hunt.
@@ -984,9 +1044,12 @@ for (let staging = 1; staging <= 3; staging++) {
   }
   const kanaAnswered = await semanticMember('きつい');
   const kanaCentreAfterAnswer = await page.evaluate(world);
+  const kanaStage = await page.locator('#mini').evaluate(n => ({word:n.querySelector('.mini-word')?.textContent,gloss:n.querySelector('.mini-gloss')?.textContent})).catch(() => null);
+  const kanaClosure = await closeSemanticStage('きつい');
+  stagings.push({case:'kana-stage-native-closure',staging,...kanaClosure});
   const kanaForLock = await aimSemantic('きつい');
   let kanaPress = { attempted: false, delivered: false, reason: 'not attempted' };
-  if (kanaForLock?.hitSelf) {
+  if (semanticClosure.ok && kanaClosure.ok && kanaForLock?.hitSelf) {
     kanaPress = await touchMember('きつい', 620);
     await page.waitForTimeout(900);
   }
@@ -999,8 +1062,9 @@ for (let staging = 1; staging <= 3; staging++) {
   // cleanly and its bloom admits ONLY meaning-related members, which may be
   // none at all. No strangers, honest emptiness.
   const ok =
+    semanticClosure.ok && kanaClosure.ok &&
     kanaTarget?.dom === true && kanaTarget.hitSelf === true && kanaTarget.reading === '' &&
-    kanaAnswered?.unfolded === true && kanaAnswered.glossed === true &&
+    kanaAnswered?.rung === 'stage' && kanaStage?.word === 'きつい' && !!kanaStage.gloss?.trim() &&
     kanaCentreAfterAnswer.ctr === '厳しい' && kanaFallback.ctr === 'きつい' &&
     kanaFallback.members.length === kanaFallback.sats;
   kanaFinal = {
@@ -1010,7 +1074,7 @@ for (let staging = 1; staging <= 3; staging++) {
       `reading=${JSON.stringify(kanaTarget?.reading ?? null)}, first=${kanaAnswered?.unfolded ?? false}/${kanaAnswered?.glossed ?? false}; ` +
       `centre="${kanaCentreAfterAnswer.ctr}"→"${kanaFallback.ctr}", DOM sats=${kanaFallback.sats}, ` +
       `members=${kanaFallback.members.join('・')}` +
-      `; staging ${staging}/3 (tap ${kanaTap.reason}; press ${kanaPress.reason})`,
+      `; native closures=${semanticClosure.ok}/${kanaClosure.ok}; staging ${staging}/3 (tap ${kanaTap.reason}; press ${kanaPress.reason})`,
   };
   if (ok || !(missed(kanaTap) || missed(kanaPress))) break;
 }
@@ -1018,8 +1082,8 @@ check('hunt · a kana-only word focuses cleanly and its bloom admits no stranger
   kanaFinal.ok, kanaFinal.detail);
 
 /* 15 · pointer identity is part of gesture authority. A mouse/foreign pointer
- * may not move a touch-held word, and changing the active pair after a third
- * finger joins must rebase the pinch before its next 1px translation. */
+ * may not move a touch-held word. A third sky finger cancels the entire
+ * physical hand until all its fingers (including later joiners) end. */
 await boot();
 w = await page.evaluate(anyWord);
 await page.mouse.move(w.x, w.y);
@@ -1034,61 +1098,246 @@ const foreignDisplacement = identityAfter.exists
   : Infinity;
 await T('touchCancel', []);
 
-await boot();
-w = await page.evaluate(anyWord);
-await page.evaluate(`window.__driftHuntPointerDowns.length = 0`);
-const a0 = [45, 190, 31];
-const b0 = [145, 190, 32];
-const a1 = [35, 190, 31];
-const b1 = [155, 190, 32];
-await T('touchStart', [a0]);
-await T('touchStart', [a0, b0]);
-await T('touchMove', [a1, b1]);
-await page.waitForTimeout(180);
-const held = await page.evaluate(wordAt(w.w));
-const c0 = [held.x, held.y, 33];
-await T('touchStart', [a1, b1, c0]);
-await page.waitForTimeout(70);
-const aPointer = await pointerIdAt(a0[0], a0[1]);
-const bPointer = await pointerIdAt(b0[0], b0[1]);
-const cPointer = await pointerIdAt(c0[0], c0[1]);
-if (aPointer != null) await runtimePointer('pointerup', a1[0], a1[1], aPointer, true);
-await page.waitForTimeout(100);
-const pinchBefore = await page.evaluate(wordAt(w.w));
-if (bPointer != null) await runtimePointer('pointermove', b1[0] + 1, b1[1] + 1, bPointer);
-if (cPointer != null) await runtimePointer('pointermove', held.x + 1, held.y + 1, cPointer);
-await page.waitForTimeout(260);
-const pinchAfter = await page.evaluate(wordAt(w.w));
-const pinchScale = pinchBefore.exists && pinchAfter.exists && pinchBefore.width
-  ? pinchAfter.width / pinchBefore.width
-  : Infinity;
-let deliberateSpreadScale = Infinity;
-if (bPointer != null && cPointer != null && pinchAfter.exists) {
-  const bx = b1[0] + 1, by = b1[1] + 1;
-  const cx = held.x + 1, cy = held.y + 1;
-  const vx = cx - bx, vy = cy - by;
-  const length = Math.hypot(vx, vy) || 1;
-  const ux = vx / length, uy = vy / length;
-  await runtimePointer('pointermove', bx - ux * 24, by - uy * 24, bPointer);
-  await runtimePointer('pointermove', cx + ux * 24, cy + uy * 24, cPointer);
-  await page.waitForTimeout(260);
-  const pinchSpread = await page.evaluate(wordAt(w.w));
-  deliberateSpreadScale = pinchSpread.exists && pinchAfter.width
-    ? pinchSpread.width / pinchAfter.width
-    : Infinity;
-}
-await shot('08-pointer-identity-pinch-rebase.png');
-await T('touchCancel', []);
 check('hunt · a foreign pointermove cannot drag a touch-held word',
   foreignDisplacement < 8,
   `foreign-pointer displacement=${Number.isFinite(foreignDisplacement) ? foreignDisplacement.toFixed(1) : '∞'}px`);
-check('hunt · a replacement pinch pair rebases before its first translated move',
-  aPointer != null && bPointer != null && cPointer != null && pinchScale > 0.92 && pinchScale < 1.08,
-  `browser ids A/B/C=${aPointer}/${bPointer}/${cPointer}; ` +
-    `1px replacement-pair scale=${Number.isFinite(pinchScale) ? pinchScale.toFixed(3) : '∞'}×`);
-check('hunt · a rebased replacement pair remains a live pinch',
-  Number.isFinite(deliberateSpreadScale) && deliberateSpreadScale > 1.08 && deliberateSpreadScale < 1.8,
-  `deliberate replacement-pair spread scale=${Number.isFinite(deliberateSpreadScale) ? deliberateSpreadScale.toFixed(3) : '∞'}×`);
+
+// G6's surface scale hand is canceled by a third pointer. These mandatory
+// native streams keep the physical CDP TouchList honest across partial lifts;
+// historical synthetic pointer controls elsewhere remain separate evidence.
+const huntScaleFacts = async () => ({
+  ...await page.evaluate(() => ({
+    view: document.body.dataset.view,
+    active: document.getElementById('drift-layer')?.classList.contains('active'),
+    inert: document.getElementById('drift-layer')?.inert,
+    ready: window.__DRIFT__.canNavigate(), place: window.__DRIFT__.capturePlace(),
+    mini: !!document.getElementById('mini'), sheet: !!document.getElementById('sheet'),
+    viewportScale: visualViewport?.scale ?? 1,
+  })),
+  world: await page.evaluate(world),
+});
+const settleHuntScale = async (trace) => {
+  let facts = await huntScaleFacts(), equal = 0;
+  const started = Date.now();
+  trace.settling = [];
+  for (let n = 0; n < 40 && equal < 2; n++) {
+    await page.waitForTimeout(100);
+    const next = await huntScaleFacts();
+    trace.settling.push(next.place);
+    equal = isDeepStrictEqual(facts.place, next.place) ? equal + 1 : 0;
+    facts = next;
+  }
+  trace.settlingMs = Date.now() - started;
+  assert(equal >= 2, 'the actual camera settles within four seconds without a setter');
+  assert(facts.view === 'drift' && facts.active && !facts.inert && facts.ready && !facts.mini && !facts.sheet,
+    'the native hand starts in admitted visible sky');
+  assert.equal(facts.place?.path, '[]', 'surface scale fixture starts outside a private dive');
+  return facts;
+};
+const nativeSkyPoints = () => page.evaluate(() => {
+  const ink = [...document.querySelectorAll('#drift-layer .word, #drift-layer .glyph, #drift-layer .part')]
+    .map(n => n.getBoundingClientRect()).filter(r => r.width && r.height);
+  const safe = [];
+  for (let y = 230; y <= 614; y += 24) for (let x = 78; x <= 318; x += 24) {
+    if (ink.some(r => Math.hypot(x-r.x-r.width/2, y-r.y-r.height/2) < 44)) continue;
+    const disk = [[x,y], ...Array.from({length:16}, (_,i) => [x+30*Math.cos(i*Math.PI/8),y+30*Math.sin(i*Math.PI/8)])];
+    if (disk.every(([px,py]) => document.elementFromPoint(px,py)?.id === 'sky')) safe.push([x,y]);
+  }
+  // Bounded scan, native footprint ownership (including stars/chrome), and
+  // enough margin for the deliberately large canceled/fresh spread.
+  const compatible = (a,b) => Math.hypot(a[0]-b[0],a[1]-b[1]) >= 54 && [a,b].every((p,i) => {
+    const q = i ? a : b, x = (p[0]+q[0])/2+(p[0]-q[0])*0.8, y = (p[1]+q[1])/2+(p[1]-q[1])*0.8;
+    return x >= 35 && x <= 355 && y >= 100 && y <= 744;
+  });
+  for (const first of safe) {
+    const selected = [first];
+    for (const point of safe) {
+      if (selected.every(other => compatible(point,other))) selected.push(point);
+      if (selected.length === 4) return {points:selected,ownershipRadius:30,footprintSamples:17,wordForgiveness:44,candidates:safe.length};
+    }
+  }
+  return null;
+});
+const beginNativeHandWitness = async () => page.evaluate(() => {
+  const stamp = `${location.href}:${performance.timeOrigin}`;
+  const witness = { stamp, events:[], live:new Set(), routes:[document.body.dataset.view], listeners:[] };
+  for (const type of ['pointerdown','pointermove','pointerup','pointercancel','touchstart','touchmove','touchend','touchcancel']) {
+    const listener = event => {
+      if (event.pointerType && event.pointerType !== 'touch') return;
+      if (type === 'pointerdown') witness.live.add(event.pointerId);
+      if (type === 'pointerup' || type === 'pointercancel') witness.live.delete(event.pointerId);
+      witness.events.push({event, captured:{type,id:event.pointerId ?? null,count:event.touches?.length ?? null,
+        target:event.target?.id || null,word:event.target?.closest?.('.word')?.querySelector('.base')?.textContent || null,
+        x:event.clientX ?? null,y:event.clientY ?? null,trusted:event.isTrusted,cancelable:event.cancelable,
+        connected:event.target?.isConnected === true,stamp}});
+    };
+    addEventListener(type,listener,{capture:true,passive:true}); witness.listeners.push([type,listener]);
+  }
+  witness.observer = new MutationObserver(() => {
+    const view = document.body.dataset.view;
+    if (witness.routes.at(-1) !== view) witness.routes.push(view);
+  });
+  witness.observer.observe(document.body,{attributes:true,attributeFilter:['data-view']});
+  window.__huntNativeHandWitness = witness;
+});
+const readNativeHandWitness = (stop = false) => page.evaluate(stop => {
+  const w = window.__huntNativeHandWitness;
+  if (!w) return null;
+  const receipt = {stamp:w.stamp,live:[...w.live],routes:w.routes.slice(),events:w.events.map(({event,captured}) => ({...captured,
+    defaultPrevented:event.defaultPrevented,postDispatch:event.eventPhase === Event.NONE,
+    stillConnected:event.target?.isConnected === true,sameDocument:event.target?.ownerDocument === document}))};
+  if (stop) {
+    w.observer.disconnect(); for (const [type,listener] of w.listeners) removeEventListener(type,listener,true);
+    delete window.__huntNativeHandWitness;
+  }
+  return receipt;
+}, stop);
+const spreadHuntPair = (points, factor) => {
+  const [a,b,...rest] = points, mx = (a[0]+b[0])/2, my = (a[1]+b[1])/2;
+  return [[mx+(a[0]-mx)*factor,my+(a[1]-my)*factor,a[2]],
+    [mx+(b[0]-mx)*factor,my+(b[1]-my)*factor,b[2]],...rest];
+};
+const sameHuntSky = (actual,before) => actual.view === 'drift' && actual.active && !actual.inert &&
+  actual.ready && !actual.mini && !actual.sheet && actual.viewportScale === before.viewportScale &&
+  isDeepStrictEqual(actual.place,before.place) && isDeepStrictEqual(actual.world,before.world);
+const sameHuntRecord = (actual,before) => actual.revision === before.revision && isDeepStrictEqual(actual.record,before.record);
+const runCanceledHuntHand = async (schedule) => {
+  const trace = {case:'native-canceled-hand',schedule,inputError:null,commands:[],states:[],complete:false};
+  let active = [], witnessStarted = false;
+  const send = async (label,type,points) => {
+    // CDP partial touchEnd names the contacts being released. Keep the
+    // caller's desired remaining list separate and prove it from native events.
+    const protocolPoints = type === 'touchEnd' && points.length
+      ? active.filter(p=>!points.some(next=>next[2]===p[2])) : points;
+    const command = {label,type,points:points.map(p=>p.slice()),protocolPoints:protocolPoints.map(p=>p.slice()),acknowledged:false};
+    trace.commands.push(command);
+    try { await T(type,protocolPoints); command.acknowledged = true; active = points; }
+    catch (error) { trace.inputError = String(error); throw error; }
+    await page.waitForTimeout(35);
+    command.observed = await readNativeHandWitness();
+    const touch = command.observed.events.findLast(e=>e.type.startsWith('touch'));
+    command.physicalListMatches = command.observed.live.length === points.length && touch?.count === points.length;
+  };
+  const state = async label => {
+    const facts = await huntScaleFacts(); trace.states.push({label,facts}); return facts;
+  };
+  try {
+    await boot();
+    trace.before = await settleHuntScale(trace);
+    trace.recordBefore = await readAppRecordSnapshot(page);
+    trace.aim = await nativeSkyPoints();
+    assert(trace.aim, 'four native sky-owned footprints exist; never substitute words, stars or chrome');
+    const [a,b,c,d] = trace.aim.points.map(([x,y],i)=>[x,y,301+i]);
+    await beginNativeHandWitness(); witnessStarted = true;
+    await send('A down','touchStart',[a]);
+    await send('B down','touchStart',[a,b]);
+    await send('C cancels hand','touchStart',[a,b,c]);
+    const checks = [];
+    checks.push(await state('third pointer cancels'));
+    let remainder;
+    if (schedule === 'originals-first') {
+      await send('A up; B/C remain','touchEnd',[b,c]); checks.push(await state('A up'));
+      await send('B up; C remains','touchEnd',[c]); checks.push(await state('only third remains'));
+      await send('D down while C remains','touchStart',[c,d]); remainder = [c,d];
+    } else if (schedule === 'third-first') {
+      await send('C up; A/B remain','touchEnd',[a,b]); checks.push(await state('third up'));
+      remainder = [a,b];
+    } else remainder = [a,b,c];
+    remainder = remainder.map(([x,y,id])=>[x+1,y+1,id]);
+    await send('canceled remainder translates one pixel','touchMove',remainder);
+    trace.noJump = await state('one-pixel remainder');
+    trace.noJumpOk = checks.every(f=>sameHuntSky(f,trace.before)) && sameHuntSky(trace.noJump,trace.before);
+    remainder = spreadHuntPair(remainder,1.6);
+    await send('canceled remainder deliberately spreads 1.6x','touchMove',remainder);
+    checks.push(await state('deliberate canceled spread'));
+    if (schedule === 'third-first') {
+      await send('D joins canceled A/B remainder','touchStart',[...remainder,d]);
+      await send('A up; B/D remain','touchEnd',[remainder[1],d]);
+      await send('B/D still quarantined','touchMove',[[remainder[1][0]+1,remainder[1][1]+1,remainder[1][2]],[d[0]+1,d[1]+1,d[2]]]);
+      checks.push(await state('replacement after third-first lift'));
+      await send('B up; D remains','touchEnd',[[d[0]+1,d[1]+1,d[2]]]);
+    } else if (schedule === 'originals-first') {
+      await send('C up; D remains','touchEnd',[remainder[1]]);
+    }
+    if (schedule !== 'touchcancel') {
+      await send('last canceled finger moves','touchMove',active.map(([x,y,id])=>[x+1,y+1,id]));
+      checks.push(await state('last canceled finger'));
+    }
+    const recordCanceled = await readAppRecordSnapshot(page);
+    trace.canceledRecord = recordCanceled;
+    trace.noRevivalOk = checks.every(f=>sameHuntSky(f,trace.before)) && sameHuntRecord(recordCanceled,trace.recordBefore);
+    await send('physical all up',schedule === 'touchcancel' ? 'touchCancel' : 'touchEnd',[]);
+    trace.allUp = await readNativeHandWitness();
+    assert(trace.allUp.live.length === 0 && trace.allUp.events.at(-1)?.count === 0,
+      'native terminals and an empty physical TouchList precede the next hand');
+    trace.freshAim = await nativeSkyPoints();
+    assert(trace.freshAim, 'a fresh native pair has real sky-owned footprints');
+    const fresh = trace.freshAim.points.slice(0,2).map(([x,y],i)=>[x,y,401+i]);
+    await send('fresh A down','touchStart',[fresh[0]]);
+    await send('fresh B down','touchStart',fresh);
+    await send('fresh spread crosses once','touchMove',spreadHuntPair(fresh,1.6));
+    await page.waitForFunction(() => document.body.dataset.view === 'shelf',null,{timeout:5000});
+    trace.shelf = await state('fresh shelf crossing');
+    await send('crossed hand continues moving','touchMove',spreadHuntPair(fresh,1.8));
+    trace.afterExtraMove = await state('no second crossing');
+    await send('fresh physical all up','touchEnd',[]);
+    trace.input = await readNativeHandWitness(true); witnessStarted = false;
+    const events = trace.input.events, downs = events.filter(e=>e.type==='pointerdown');
+    const ids = [...new Set(downs.map(e=>e.id))];
+    const expectedDowns = schedule === 'touchcancel' ? 5 : 6;
+    const expectedCommands = {'originals-first':16,'third-first':17,touchcancel:11}[schedule];
+    const allUpCommand = trace.commands.findIndex(c=>c.label === 'physical all up');
+    trace.inputIntegrity = trace.inputError === null && trace.commands.length === expectedCommands &&
+      trace.commands.every(c=>c.acknowledged) && allUpCommand >= 0 &&
+      trace.commands.slice(0,allUpCommand+1).every(c=>c.physicalListMatches) &&
+      downs.length === expectedDowns && ids.length === expectedDowns && downs.every(e=>e.target==='sky' && !e.word) &&
+      ids.every(id=>events.some(e=>e.id===id && ['pointerup','pointercancel'].includes(e.type))) &&
+      events.some(e=>e.type==='pointermove') && events.some(e=>e.type==='touchmove') &&
+      events.every(e=>e.trusted && e.connected && e.stillConnected && e.sameDocument && e.postDispatch && e.stamp===trace.input.stamp) &&
+      trace.input.live.length === 0 && events.at(-1)?.count === 0 &&
+      (schedule !== 'touchcancel' || events.some(e=>e.type==='pointercancel') && events.some(e=>e.type==='touchcancel' && e.count===0));
+    trace.freshOk = trace.shelf.view === 'shelf' && !trace.shelf.active && trace.shelf.inert &&
+      !trace.shelf.mini && !trace.shelf.sheet && isDeepStrictEqual(trace.shelf.place,trace.before.place) &&
+      isDeepStrictEqual(trace.shelf.world,trace.before.world) && isDeepStrictEqual(trace.afterExtraMove,trace.shelf) &&
+      isDeepStrictEqual(trace.input.routes,['drift','shelf']);
+    const inverse = page.locator('.scale-thread[data-scale="shelf"] [data-scale-out]');
+    assert.equal(await inverse.count(),1,'one real shelf-to-sky inverse');
+    assert(await inverse.isVisible() && await inverse.isEnabled(),'the inverse is visibly enabled');
+    trace.inverseHit = await inverse.evaluate(n => {
+      const r=n.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);
+      return {owned:hit===n||n.contains(hit),label:n.textContent,rect:{x:r.x,y:r.y,width:r.width,height:r.height}};
+    });
+    assert(trace.inverseHit.owned,'the visible inverse owns the native tap');
+    await inverse.tap();
+    await page.waitForFunction(() => document.body.dataset.view === 'drift' && document.getElementById('drift-layer')?.classList.contains('active') && !document.getElementById('drift-layer')?.inert,null,{timeout:5000});
+    trace.returned = await state('visible inverse returned');
+    trace.recordAfter = await readAppRecordSnapshot(page);
+    trace.returnOk = sameHuntSky(trace.returned,trace.before) && sameHuntRecord(trace.recordAfter,trace.recordBefore);
+    trace.complete = true;
+  } catch (error) {
+    trace.error = {message:error.message,stack:error.stack};
+  } finally {
+    // Cleanup is recorded and can never turn an incomplete stream into a pass.
+    if (active.length) {
+      try { await T('touchCancel',[]); trace.cleanupCanceled = true; }
+      catch (error) { trace.cleanupError = String(error); }
+    }
+    if (witnessStarted) trace.input = await readNativeHandWitness(true);
+    await shot(`08-native-canceled-${schedule}.png`);
+    stagings.push(trace);
+    writeFileSync(resolve(EVIDENCE,`${EVIDENCE_PHASE}-native-canceled-${schedule}.json`),JSON.stringify(trace,null,2)+'\n');
+  }
+  return trace;
+};
+
+const canceledHands = [];
+for (const schedule of ['originals-first','third-first','touchcancel']) canceledHands.push(await runCanceledHuntHand(schedule));
+const handPassed = (key) => canceledHands.length === 3 && canceledHands.every(t=>t.complete && t.inputIntegrity && t[key]);
+const handDetail = (key) => canceledHands.map(t=>`${t.schedule}: complete=${t.complete}, native=${t.inputIntegrity ?? false}, ${key}=${t[key] ?? false}${t.error ? `, error=${t.error.message}` : ''}`).join(' | ');
+check('hunt · a canceled three-pointer hand does not jump when a remainder moves',handPassed('noJumpOk'),handDetail('noJumpOk'));
+check('hunt · a canceled three-pointer hand cannot revive before all physical pointers end',handPassed('noRevivalOk'),handDetail('noRevivalOk'));
+check('hunt · a fully released canceled hand admits exactly one fresh native scale crossing',handPassed('freshOk'),handDetail('freshOk'));
+check('hunt · the fresh-hand visible inverse restores the retained sky place without record changes',handPassed('returnOk'),handDetail('returnOk'));
 
 /* 16 · lifecycle clocks yield to an active finger even when it is perfectly
  * still. This deliberately crosses the ten-second idle expiry boundary. */
