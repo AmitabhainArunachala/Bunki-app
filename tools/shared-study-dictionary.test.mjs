@@ -1,8 +1,11 @@
+/* global Response, structuredClone */
 import { describe, it, expect } from 'vitest';
 import { createHash } from 'node:crypto';
+import { Buffer } from 'node:buffer';
+import process from 'node:process';
 import { gzipSync } from 'node:zlib';
 import { readFileSync } from 'node:fs';
-import { pathToFileURL } from 'node:url';
+import { URL, pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
 import {
   buildSharedStudyBinding,

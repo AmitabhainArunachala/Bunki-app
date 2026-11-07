@@ -1,4 +1,5 @@
 /** Called only by the existing verified-artifact browser harness. */
+/* global window, document, localStorage, structuredClone, frameElement, bunkiSharedStudy, __backlogFixture */
 import assert from 'node:assert/strict';
 import { seedBunkiBacklog } from './shared-study-backlog-fixture.mjs';
 import { silenceBrowserAudio } from '../prototypes/corridor/tools/browser-audio-silence.mjs';

@@ -3,6 +3,7 @@
  * learn-ahead only by the learner's choice with nothing else left), the due gate every surface asks
  * before it writes a grade, the scheduler built from the pin, and the close counted from the answers.
  */
+/* global structuredClone */
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';

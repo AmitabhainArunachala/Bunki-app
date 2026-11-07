@@ -1,9 +1,13 @@
+/* global structuredClone */
 import { describe, it, expect } from 'vitest';
 import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { Buffer } from 'node:buffer';
+import process from 'node:process';
+import { URL, URLSearchParams } from 'node:url';
 import vm from 'node:vm';
 import ts from 'typescript';
 import {

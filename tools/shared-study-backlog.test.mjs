@@ -1,5 +1,7 @@
+/* global structuredClone */
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
+import { URL } from 'node:url';
 import { createBunkiStudyAdapter } from '../prototypes/corridor/study-engine-adapter.mjs';
 import { decodeSharedContent, SHARED_DECKS } from '../prototypes/corridor/shared-study-content.mjs';
 import { bindStudyPresentation } from '../prototypes/corridor/shared-study-presentation.mjs';
