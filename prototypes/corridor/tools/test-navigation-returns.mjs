@@ -27,7 +27,7 @@ function app() {
     learningSourceVisit: null, pendingReferenceCollection: null, retainedRetryView: null,
     activeTokenAlternatives: null, readerPosTimer: null, sheetActionVisit: null, sealStrip: null, sealSerial: 0, sealPending: null, readerLayers: null, personalHost: null,
     roomTransitionUpdating: false, activeRoomTransition: null, pageEpoch: 0, recordEpoch: 4,
-    recordApp: null, recordInstallation: null, readerTicket: null,
+    recordApp: null, recordInstallation: null, readerTicket: null, kanjiWorldVisit: null,
     reviewExitUi() {}, // This fixture stops before DOM drawing; exit suite below uses real helpers.
     syncReviewExitNotice() {},
     keepScroll() {}, rememberSheet() {}, invokerKey: value => value,
