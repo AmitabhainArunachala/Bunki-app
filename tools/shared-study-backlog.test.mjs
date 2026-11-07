@@ -1,3 +1,5 @@
+/* global structuredClone */
+import {URL} from 'node:url';
 import {describe,it,expect} from 'vitest';
 import {readFileSync} from 'node:fs';
 import {createBunkiStudyAdapter} from '../prototypes/corridor/study-engine-adapter.mjs';

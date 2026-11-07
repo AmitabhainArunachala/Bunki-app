@@ -1,5 +1,6 @@
 /** Pure frozen-content binding builder. Production inventory counts stay pinned;
  * small reviewed source excerpts can exercise this same builder in CI. */
+/* global structuredClone, TextDecoder */
 import {createHash} from 'node:crypto';
 import {createGunzip} from 'node:zlib';
 import {Readable} from 'node:stream';

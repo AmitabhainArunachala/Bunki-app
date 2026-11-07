@@ -1,3 +1,7 @@
+/* global structuredClone */
+import {Buffer} from 'node:buffer';
+import process from 'node:process';
+import {URL,URLSearchParams} from 'node:url';
 import {describe,it,expect} from 'vitest';
 import {readFileSync,writeFileSync,mkdirSync,mkdtempSync,rmSync,readdirSync} from 'node:fs';
 import {createHash} from 'node:crypto';

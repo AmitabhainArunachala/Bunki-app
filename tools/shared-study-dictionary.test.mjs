@@ -1,3 +1,7 @@
+/* global Response, structuredClone */
+import {Buffer} from 'node:buffer';
+import process from 'node:process';
+import {URL} from 'node:url';
 import {describe,it,expect} from 'vitest';
 import {createHash} from 'node:crypto';
 import {gzipSync} from 'node:zlib';

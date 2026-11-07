@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 /** Headless, fresh browser profile only. No native app, screenshots or live data. */
+/* global window, document, localStorage, structuredClone, frameElement, parent, navigator, fetch, caches, dispatchEvent, Event, IDBObjectStore, URL */
+/* global bunkiSharedStudy, __boundStudyFixture */
 import assert from 'node:assert/strict';
 import {resolve} from 'node:path';
 import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
