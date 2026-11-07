@@ -18,7 +18,7 @@
   },
   "source": {
     "repository": "nihongo-srs",
-    "commit": "1392485ec1bd686313e8f1e1e8b01a42c98c11bd",
+    "commit": "423b9e5d970be74db94f8c7f2be89a8e73c46fd6",
     "mode": "committed",
     "changedFiles": []
   },
@@ -43,13 +43,13 @@
   "files": [
     {
       "path": "client/app/app.css",
-      "bytes": 57498,
-      "sha256": "e1fbfa37d1e9f2b1c3f76418de880c3db57b4ab70dfbeb25a34ff28dd4b97c41"
+      "bytes": 57802,
+      "sha256": "d0f153ea313a1258dcd5ed72b46e1b093515713c8a5881c7e920058cb4df6b86"
     },
     {
       "path": "client/app/app.mjs",
-      "bytes": 169020,
-      "sha256": "761529d286ded08b2b116a69044f610a640daf6ca649a3225e3093c91789ea1a"
+      "bytes": 169025,
+      "sha256": "1b69470ebd6bf78b3fbbac3bae18788c41d23b1525ed688298d2827cf956e361"
     },
     {
       "path": "client/app/backup-status.mjs",
@@ -1513,8 +1513,8 @@
     },
     {
       "path": "client/player/vocabulary.mjs",
-      "bytes": 10060,
-      "sha256": "795c71f9f020c50d7e6540a25f6e293fb6a3bcb0038127ea8babdbc4050ba7fa"
+      "bytes": 10065,
+      "sha256": "b785c0841f744c28f45083da119f30491a9bda2aa9fcf1fd281190a98d83aac4"
     },
     {
       "path": "client/replay.mjs",
@@ -1592,5 +1592,5 @@
       "sha256": "adab18734248871867be9cf62fa25b58cce3f3f37a34a81e714b0b1b26e10dba"
     }
   ],
-  "closureSha256": "43ece321b3dedb31617a88725f2e45ecf6d6d354b7089b9b9055a9451ffaba2f"
+  "closureSha256": "7afc56713838f7d5bea74f5e9d9b49dc0c8dbda9d8118460744e23a7ede98099"
 }

@@ -1,7 +1,7 @@
 {
   "format": "bunki-shared-study-pin/v1",
-  "sourceCommit": "1392485ec1bd686313e8f1e1e8b01a42c98c11bd",
-  "closureSha256": "43ece321b3dedb31617a88725f2e45ecf6d6d354b7089b9b9055a9451ffaba2f",
+  "sourceCommit": "423b9e5d970be74db94f8c7f2be89a8e73c46fd6",
+  "closureSha256": "7afc56713838f7d5bea74f5e9d9b49dc0c8dbda9d8118460744e23a7ede98099",
   "contentBindingSha256": "a577552090841813ac80ab4cc31024bad745bce318678618b67849ddc7060add",
   "verifierSha256": "adab18734248871867be9cf62fa25b58cce3f3f37a34a81e714b0b1b26e10dba"
 }

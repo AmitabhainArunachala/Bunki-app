@@ -128,8 +128,8 @@ Older already-open application versions are not fenced by these new source
 files. Real rollout therefore still requires an explicit migration/cutover and
 old-client fencing plan.
 
-This integration is a development candidate, not a deployment or a physical-device
-pass. It makes no version or release changes.
+This integration is development candidate `1.2.2-rc.1`, not a deployment or a
+physical-device pass. It is prepared locally for a draft stacked PR only.
 
 ## Content and provenance
 
@@ -156,7 +156,7 @@ host work.
 ## Optional kanji exploration and canonical Record
 
 The committed distribution comes from canonical Nihongo commit
-`1392485ec1bd686313e8f1e1e8b01a42c98c11bd`. It adds optional answer-side kanji
+`423b9e5d970be74db94f8c7f2be89a8e73c46fd6`. It adds optional answer-side kanji
 exploration and a read-only report inside the canonical Record. The simple
 prompt → Reveal → four grades loop remains unchanged; exploration is optional
 and does not grade a character or create another review task. Authored enrichment

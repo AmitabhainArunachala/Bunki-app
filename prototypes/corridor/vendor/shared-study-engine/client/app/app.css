@@ -85,6 +85,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .kicker{margin:0;font-size:var(--t-xs);font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .sheet-desc{margin:0;font-size:var(--t-sm);line-height:1.7;color:var(--secondary);max-width:72ch}
 .sheet-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:12px}
+/* The bilingual Record export label may exceed a 320px action row; wrap it
+   within the row instead of widening the page, while keeping all text and the
+   existing 44px minimum touch height. */
+.record .sheet-actions>[data-export]{max-width:100%;min-width:0;white-space:normal;overflow-wrap:anywhere}
 .sheet-note{margin-top:14px;font-size:13px;color:var(--secondary)}
 .sheet .empty{padding:6px 0 0;font-size:14px}
 .sheet .forecast li,[data-legacy-history] .forecast li{padding:12px 0;border-bottom:1px solid var(--line-soft)}

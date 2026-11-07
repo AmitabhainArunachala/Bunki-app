@@ -88,7 +88,7 @@ export function renderVocabularyPassage(document,entry,text,{front=false,field='
  node.append(...renderRange(cursor,text.length));return applyKinsoku(node);
 }
 /** Compact source-backed relationships; no inferred kanji facts or readings. */
-export function renderVocabularyRelated(document,entry,{onWord=()=>{},relatedWords=[],onRelated=()=>{},dictionary=null,locale=document.documentElement?.dataset?.interfaceLanguage||(document.documentElement?.lang==='en'?'en':'ja'),learningReport=null}={}){
+export function renderVocabularyRelated(document,entry,{onWord=()=>{},relatedWords=[],onRelated=()=>{},dictionary=null,locale=document.documentElement?.dataset?.kanjiInterfaceLanguage||(document.documentElement?.lang==='en'?'en':'ja'),learningReport=null}={}){
  return renderKanjiPanel(document,buildKanjiModel(entry,{relatedWords,dictionary,learningReport}),{
   locale,onRelated,renderCollocation:text=>{
    const passage=renderVocabularyPassage(document,entry,text,{field:'sheet',onWord,dictionary});

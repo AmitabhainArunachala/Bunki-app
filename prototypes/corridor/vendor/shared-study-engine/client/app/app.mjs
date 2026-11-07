@@ -197,7 +197,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       originalAttributes.set(element,after);
     }
     document.documentElement.lang=interfaceLanguage==='en'?'en':'ja';
-    document.documentElement.dataset.interfaceLanguage=interfaceLanguage;
+    document.documentElement.dataset.kanjiInterfaceLanguage=interfaceLanguage;
   }
   function languagePicker(compact=false){const select=h('select',{'aria-label':'表示言語','data-interface-language':'',onchange:async e=>{if(updateBoundary?.held)return;interfaceLanguage=e.target.value;for(const picker of root.querySelectorAll('[data-interface-language]'))picker.value=interfaceLanguage;const end=beginFlight('preference');try{await preferences.setItem('nihongo.interface-language.v1',interfaceLanguage);}catch{message('表示言語を保存できません。');}finally{end();render();}}},h('option',{value:'ja'},'日本語'),h('option',{value:'en'},'English'),h('option',{value:'both'},'両方'));select.value=interfaceLanguage;return h('label',{class:`language-picker${compact?' compact':''}`},h('span',{},'表示言語'),select);}
   let refreshFactoryRows=()=>{};
