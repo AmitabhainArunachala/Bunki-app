@@ -18,7 +18,7 @@ concurrency:
 jobs:
   plan:
     name: plan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     outputs:
       scope: ${{ steps.plan.outputs.scope }}
@@ -71,7 +71,7 @@ jobs:
           retention-days: 14
   build:
     name: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     outputs:
       site-id: ${{ steps.site.outputs.artifact-id }}
@@ -183,7 +183,7 @@ jobs:
   fast:
     name: battery / ${{ matrix.shard }}
     needs: [plan, build]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: ${{ matrix.jobTimeoutMinutes }}
     strategy:
       fail-fast: false
@@ -264,7 +264,7 @@ jobs:
     name: fast-retry-plan
     if: always() && needs.plan.result == 'success' && needs.build.result == 'success'
     needs: [plan, build, fast]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
       GH_TOKEN: ${{ github.token }}
@@ -310,7 +310,7 @@ jobs:
     name: retry / ${{ matrix.shard }}
     if: always() && needs.fast-retry-plan.result == 'success' && needs.fast-retry-plan.outputs.has-retries == 'true'
     needs: [plan, build, fast-retry-plan]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: ${{ matrix.jobTimeoutMinutes }}
     strategy:
       fail-fast: false
@@ -395,7 +395,7 @@ jobs:
     name: bunki / fast
     if: always()
     needs: [plan, build, fast, fast-retry-plan, fast-retry]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
       GH_TOKEN: ${{ github.token }}
@@ -481,7 +481,7 @@ jobs:
     name: battery / ${{ matrix.shard }}
     if: needs.plan.outputs.has-battery == 'true'
     needs: [plan, build]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: ${{ matrix.jobTimeoutMinutes }}
     strategy:
       fail-fast: false
@@ -572,7 +572,7 @@ jobs:
     name: retry-plan
     if: always() && needs.plan.result == 'success' && needs.build.result == 'success' && needs.plan.outputs.has-battery == 'true'
     needs: [plan, build, battery]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
       GH_TOKEN: ${{ github.token }}
@@ -618,7 +618,7 @@ jobs:
     name: retry / ${{ matrix.shard }}
     if: always() && needs.retry-plan.result == 'success' && needs.retry-plan.outputs.has-retries == 'true'
     needs: [plan, build, retry-plan]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: ${{ matrix.jobTimeoutMinutes }}
     strategy:
       fail-fast: false
@@ -733,7 +733,7 @@ jobs:
         retry-plan,
         retry,
       ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
       GH_TOKEN: ${{ github.token }}
