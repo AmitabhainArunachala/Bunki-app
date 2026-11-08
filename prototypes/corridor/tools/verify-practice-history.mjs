@@ -28,6 +28,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 import { chromium, webkit } from 'playwright-core';
 import { readAppRecordSnapshot, readAppRecord, waitForAppRecord, armRecordWriteFailure, clearRecordWriteFailure } from './record-test-support.mjs';
 import { silenceBrowserAudio, TEST_AUDIO_OUTPUT } from './browser-audio-silence.mjs';
+import { collectBootScripts, eagerBootClosure } from './offline-boot-closure.mjs';
 
 /** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
  * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
@@ -122,7 +123,7 @@ assert.deepEqual(files, manifest.files, 'Every served byte belongs to the suppli
 const { selectPractice } = await import(pathToFileURL(resolve(ROOT, 'assessment-controller.mjs')).href);
 const sourcePath = fileURLToPath(import.meta.url);
 const sourceSha256 = hash(readFileSync(sourcePath));
-const helperPaths = ['record-test-support.mjs', 'browser-audio-silence.mjs'];
+const helperPaths = ['record-test-support.mjs', 'browser-audio-silence.mjs', 'offline-boot-closure.mjs'];
 const helperSha256 = Object.fromEntries(helperPaths.map(name => [name, hash(readFileSync(new URL(name, import.meta.url)))]));
 function bookends() {
   assert.equal(hash(readFileSync(sourcePath)), sourceSha256, 'Verifier source stayed fixed');
@@ -269,6 +270,8 @@ async function fresh(record = seed, options = {}) {
   const errors = [];
   const diagnostics = [];
   const setRequests = [];
+  const observedScriptRoots = new Set();
+  const siteURL = new URL(`${base}/`);
   context.on('page', (page) => {
     page.on('pageerror', (error) => {
       errors.push(error.message);
@@ -287,6 +290,12 @@ async function fresh(record = seed, options = {}) {
     );
     page.on('request', (request) => {
       if (/\/data\/mock\/sets\//u.test(request.url())) setRequests.push(request.url());
+      if (request.resourceType() === 'script') {
+        const url = new URL(request.url());
+        assert(url.origin === siteURL.origin && !url.username && !url.password &&
+          url.pathname.startsWith(siteURL.pathname), `Loaded script escapes the site: ${url.href}`);
+        observedScriptRoots.add(decodeURIComponent(url.pathname.slice(siteURL.pathname.length)));
+      }
     });
   });
   const page = await context.newPage();
@@ -300,7 +309,7 @@ async function fresh(record = seed, options = {}) {
     localStorage.setItem('kairo-corridor-v1', JSON.stringify(record));
   }, { record, installation });
   await boot(page);
-  return { context, page, errors, setRequests, diagnostics };
+  return { context, page, errors, setRequests, diagnostics, observedScriptRoots };
 }
 async function record(page) {
   return readAppRecord(page);
@@ -1183,7 +1192,7 @@ try {
 
   await check(
     'real-offline-reload-retains-answers-without-set-fetch',
-    async ({ context, page, setRequests }) => {
+    async ({ context, page, setRequests, observedScriptRoots }) => {
       // The unchanged release installs its worker automatically over HTTPS.
       await pollNativeState(
         () => page.evaluate(async () =>
@@ -1203,13 +1212,16 @@ try {
       await advance(page);
       await choose(page, 0);
       const before = await selected(page);
+      const scriptRoots = await page.evaluate(collectBootScripts, readFileSync(resolve(ROOT, 'index.html'), 'utf8'));
+      // Dynamic imports actually used by this journey (including record boot)
+      // also need their static closure; unrequested optional imports stay lazy.
+      const loadedScriptRoots = [...observedScriptRoots].sort();
+      const bootClosure = await eagerBootClosure(ROOT, [...scriptRoots, ...loadedScriptRoots]);
       const cachePaths = [
         'index.html',
         'corridor.js',
-        // Boot now loads the assessment, source-cloze and shared record graph.
-        // Require its complete staged module inventory, including transitive
-        // dependencies, rather than letting an online first visit hide a gap.
-        ...files.filter((file) => file.path.endsWith('.mjs')).map((file) => file.path),
+        // Certify the staged HTML's eager graph, including static dependencies.
+        ...bootClosure,
         'data/manifest.json',
       ];
       const cacheHashes = await page.evaluate(async (paths) => {
@@ -1273,6 +1285,7 @@ try {
           navigatorOnline,
           receivedServerResponses: servedResponses - responseCount,
           workerInstallation: 'Automatic HTTPS registration by the unchanged release',
+          eagerBoot: { scriptRoots, loadedScriptRoots, files: bootClosure },
           cachedReleaseEntries: cacheHashes,
           cachedShell: true,
           upstreamSetRequests: 0,

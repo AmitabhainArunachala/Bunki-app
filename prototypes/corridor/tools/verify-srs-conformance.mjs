@@ -57,6 +57,7 @@ import * as fsrsApi from '../vendor/ts-fsrs.mjs';
 import * as player from '../decks/player/engine.js';
 import * as contextEngine from '../decks/context-dense/engine.js';
 import { createEngine as personalEngine } from '../decks/personal/engine.mjs';
+import { readAuthoredCorridor } from './authored-corridor-source.mjs';
 
 const TOOL_DIR = fileURLToPath(new URL('.', import.meta.url));
 const SOURCE = resolve(TOOL_DIR, '..');
@@ -138,8 +139,11 @@ function nodePart() {
   }
 
   // the corridor's construction, lifted from the authored source, against srs-core's for every preset and fitted weights
-  const corridorSource = readFileSync(join(SOURCE, 'corridor.js'), 'utf8');
-  const ast = ts.createSourceFile('corridor.js', corridorSource, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+  const authored = readAuthoredCorridor(SOURCE);
+  const corridorSource = authored.source;
+  receipt.sourceSha256 = createHash('sha256').update(readFileSync(join(SOURCE, 'corridor.js'))).digest('hex');
+  receipt.sourceFiles = authored.files;
+  const ast = ts.createSourceFile('authored-corridor.js', corridorSource, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
   const fittedW = pin.w.map((v, i) => (i < 4 ? Number((v * 1.5).toFixed(4)) : i === 8 ? Number((v + 0.3).toFixed(4)) : v));
   const cases = [
     ['no choice', {}], ['standard', { preset: 'standard' }], ['gentle', { preset: 'gentle', retention: 0.85 }], ['hardcore', { preset: 'hardcore' }],
