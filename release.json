@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "product": "KAIRO",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "channel": "stable",
-  "releasedOn": "2026-11-08",
+  "releasedOn": "2026-11-09",
   "learnerDataEpoch": 1,
   "migration": "none",
   "rollbackCompatible": true,
-  "notes": "releases/1.2.2.md"
+  "notes": "releases/1.2.3.md"
 }

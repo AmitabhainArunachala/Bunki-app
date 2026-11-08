@@ -507,6 +507,18 @@ const FOCUS_CONTRAST = `(sentences) => {
       const ratio = (light + 0.05) / (dark + 0.05); const kind = element.closest('rt') ? 'ruby' : 'text';
       result[kind].count += 1; result[kind].min = Math.min(result[kind].min ?? Infinity, ratio);
     }
+    // in the app a reading is drawn above its kanji as ruby[data-rt]::after, in the line's own leading
+    // (the rt keeps no box, so the line never moves); it is measured as a reading, by the same rule
+    for (const ruby of sentence.querySelectorAll('ruby[data-rt]')) {
+      const after = getComputedStyle(ruby, '::after');
+      if (after.content === 'none' || after.content === 'normal' || getComputedStyle(ruby).visibility !== 'visible') continue;
+      let opacity = 1; for (let n = ruby; n; n = n.parentElement) { const computed = getComputedStyle(n); if (computed.display === 'none') { opacity = 0; break; } opacity *= Number(computed.opacity); if (computed.maskImage !== 'none') result.masks.push(computed.maskImage); }
+      if (!opacity) continue;
+      const colour = rgba(after.color); const ink = mix(colour, background, opacity * colour[3] / 255);
+      const [light, dark] = [lum(ink), lum(background)].sort((a, b) => b - a);
+      const ratio = (light + 0.05) / (dark + 0.05);
+      result.ruby.count += 1; result.ruby.min = Math.min(result.ruby.min ?? Infinity, ratio);
+    }
   }
   return result;
 }`;
@@ -1010,7 +1022,9 @@ async function verifyPilot(browser, base, cardId = PILOT_CARD, label = 'pilot') 
     await page.click('#kp-start');
     await page.waitForSelector('#kp-card');
     const front = await page.evaluate(`(() => { const f = document.getElementById('kp-card'); return { id: f.dataset.card, sentences: f.querySelectorAll('.kp-sentence .kp-s').length, target: [...f.querySelectorAll('.kp-sentence .kp-target')].map((n) => n.textContent), rt: f.querySelectorAll('rt').length, blank: f.querySelectorAll('.kp-blank').length, text: f.querySelector('.kp-sentence').textContent,
-      chips: [...f.querySelectorAll('.kp-chips .kp-chip')].map((n) => n.textContent), reg: f.querySelector('.kp-chips .kp-regchip')?.getAttribute('aria-label') || '', rows: (() => { const tops = new Set([...f.querySelectorAll('.kp-chips .kp-chip')].map((n) => Math.round(n.getBoundingClientRect().top))); return tops.size; })() }; })()`);
+      chips: [...f.querySelectorAll('.kp-chips .kp-chip')].map((n) => n.textContent), reg: f.querySelector('.kp-chips .kp-regchip')?.getAttribute('aria-label') || '',
+      drawn: [...f.querySelectorAll('.kp-chips .kp-chip')].filter((n) => n.getClientRects().length).map((n) => n.textContent),
+      rows: (() => { const tops = new Set([...f.querySelectorAll('.kp-chips .kp-chip')].filter((n) => n.getClientRects().length).map((n) => Math.round(n.getBoundingClientRect().top))); return tops.size; })() }; })()`);
     check(
       `${label}: ${card.id} (${card.word.term}, ${card.register}/${card.topic}) shows its ${sentenceEnds(card.ja).length} sentences with the target marked once, no readings, no gap`,
       front.id === card.id && front.sentences === sentenceEnds(card.ja).length && front.sentences >= 4 && front.target.length === 1 && front.target[0] === card.form && front.rt === 0 && front.blank === 0 && front.text === card.ja,
@@ -1019,10 +1033,14 @@ async function verifyPilot(browser, base, cardId = PILOT_CARD, label = 'pilot') 
     // one line at 390px, even with the longest topic chip (インド・仏教) beside a level chip
     // (km-064-m08). Round 4 (T8, T2): the front is the sentence, so the register and the source are no
     // longer bare chips there ("Lecture", "Examples"); the back's 出典 fold names the style in full
+    // In the app's focus room (John, 2026-10-13: "SRS section very clear and smooth with NO CLUTTER at
+    // all") the head draws only the level, as one small figure: the topic chip is built in its row in
+    // place of the word's group, but not drawn (the standalone pages draw it)
     check(
-      `${label}: the topic sits as a small text chip in the card’s chip row in place of the word’s group; no register chip and no source chip on the front; one row on a phone`,
-      front.chips.includes(UI_TOPICS[card.topic]) && !front.chips.includes(UI_REGISTERS[card.register]) && !front.chips.includes(deck.groups.find((g) => g.id === card.word.group)?.titleEn) && !front.chips.includes('Original composition') && front.reg === '' && front.rows === 1,
-      JSON.stringify({ chips: front.chips, reg: front.reg, rows: front.rows }),
+      `${label}: the topic sits as a small text chip in the card’s chip row in place of the word’s group; no register chip and no source chip on the front; in the app the level is the one chip drawn, on one row on a phone`,
+      front.chips.includes(UI_TOPICS[card.topic]) && !front.chips.includes(UI_REGISTERS[card.register]) && !front.chips.includes(deck.groups.find((g) => g.id === card.word.group)?.titleEn) && !front.chips.includes('Original composition') && front.reg === '' &&
+        front.drawn.join() === (card.word.level ?? '') && front.rows === (card.word.level ? 1 : 0),
+      JSON.stringify({ chips: front.chips, drawn: front.drawn, reg: front.reg, rows: front.rows }),
     );
     await page.click('#kp-reveal');
     await page.waitForSelector('.kp-grade');
@@ -1030,8 +1048,8 @@ async function verifyPilot(browser, base, cardId = PILOT_CARD, label = 'pilot') 
     const style = await page.evaluate(`document.querySelector('#kp-card .kp-f-src .kp-src-style')?.textContent ?? null`);
     check(`${label}: the back’s 出典 fold names the passage’s style in full (${UI_REGISTER_NAMES[card.register]})`, style === `Style ${UI_REGISTER_NAMES[card.register]}`, JSON.stringify({ style }));
     // on the back the 全文／焦点 toggle may take a line of its own; the chips keep theirs
-    const backRows = await page.evaluate(`new Set([...document.querySelectorAll('#kp-card .kp-chips > .kp-chip')].map((n) => Math.round(n.getBoundingClientRect().top))).size`);
-    check(`${label}: on the back the chips still sit on one row`, backRows === 1, JSON.stringify({ backRows }));
+    const backRows = await page.evaluate(`new Set([...document.querySelectorAll('#kp-card .kp-chips > .kp-chip')].filter((n) => n.getClientRects().length).map((n) => Math.round(n.getBoundingClientRect().top))).size`);
+    check(`${label}: on the back the drawn chips still sit on one row`, backRows === (card.word.level ? 1 : 0), JSON.stringify({ backRows }));
     const back = await page.evaluate(`(() => { const a = document.querySelector('#kp-card .kp-answer'); const kids = [...a.children].map((n) => n.className.split(' ')[0]); const note = a.querySelector(':scope > .kp-note'); return { kids, note: note?.textContent || '', lang: note?.closest('[lang]')?.lang, beforeFolds: kids.indexOf('kp-note') >= 0 && kids.indexOf('kp-note') < kids.indexOf('kp-folds'), afterDef: kids.indexOf('kp-note') === kids.indexOf('kp-def') + 1, grammar: [...document.querySelectorAll('#kp-see [data-grammar]')].map((n) => n.dataset.grammar) }; })()`);
     check(
       `${label}: the back puts the passage’s own usage note (tipJa) in tier one, right after the definition and before the folds, in Japanese`,
@@ -1356,7 +1374,9 @@ async function verifyBack(browser, base) {
     const card = document.getElementById('kp-card');
     const rest = card.cloneNode(true);
     rest.querySelectorAll('.kp-chips, .kp-sentence').forEach((n) => n.remove());
-    rest.querySelectorAll('.kp-taphint').forEach((n) => { if (['Recall the meaning, then tap', 'Tap to reveal the answer'].includes(n.textContent)) n.textContent = ''; });
+    // the tap hint is interface chrome; in the app it names the right half, which turns the card
+    // (John, 2026-10-13: "Simply tapping the right of the screen should show back of card")
+    rest.querySelectorAll('.kp-taphint').forEach((n) => { if (['Recall the meaning, then tap', 'Tap to reveal the answer', 'Recall the meaning, then tap the right side', 'Tap the right side to reveal the answer'].includes(n.textContent)) n.textContent = ''; });
     rest.querySelectorAll('.kp-rhint-label').forEach((n) => { if (n.textContent === 'Hint') n.textContent = ''; });
     return { rt: card.querySelectorAll('rt, ruby').length, taps: card.querySelectorAll('.kp-sentence :is(button, a, [role="button"], [tabindex], .kp-tapword)').length, tapwords: document.querySelectorAll('.kp-tapword').length,
       rhint: card.querySelectorAll('.kp-rhint').length, repaired: card.dataset.repaired ?? null,
@@ -1692,7 +1712,9 @@ async function verifyBack(browser, base) {
     await close(o);
   }
 
-  // 6) 「タップして答えを見る」 (and 「意味を思い出してからタップ」) and the swipe hint: the first three sittings of a deck, then gone
+  // 6) 「タップして答えを見る」 (and 「意味を思い出してからタップ」) and the swipe hint: the first three sittings of a deck, then gone.
+  // In the app the hint names where the tap goes, since the right half of the screen turns the card and
+  // there is no button (John, 2026-10-13: "No need for 'reveal answer' button")
   {
     const seen = [];
     for (const [q, deck, sittings] of [
@@ -1713,7 +1735,7 @@ async function verifyBack(browser, base) {
     const [first, third, fourth, mcdFourth] = seen;
     check(
       '6) each sitting counts (prefs.sittings); the tap hint shows in the first three sittings of a deck and is gone from the fourth, on both decks; the swipe hint shows on the first back of the first sitting only',
-      first.stored === 1 && first.front === 'Recall the meaning, then tap' && first.swipe && third.stored === 3 && !!third.front && !third.swipe && fourth.stored === 4 && fourth.front === null && !fourth.swipe && mcdFourth.stored === 4 && mcdFourth.front === null && !mcdFourth.swipe,
+      first.stored === 1 && first.front === 'Recall the meaning, then tap the right side' && first.swipe && third.stored === 3 && !!third.front && !third.swipe && fourth.stored === 4 && fourth.front === null && !fourth.swipe && mcdFourth.stored === 4 && mcdFourth.front === null && !mcdFourth.swipe,
       JSON.stringify(seen),
     );
   }
@@ -2222,9 +2244,10 @@ const PAINT = `(() => {
   const out = {
     look: kp.dataset.look, kind: card.dataset.kind, classes: card.className, topicVar: card.style.getPropertyValue('--kp-topic'),
     edge: getComputedStyle(card).borderLeftColor, kindChip: chips[0]?.textContent, kindChipColor: chips[0] ? getComputedStyle(chips[0]).color : null,
+    edgeTop: getComputedStyle(card).borderTopColor, edgeWidth: getComputedStyle(card).borderLeftWidth, drawn: chips.filter((c) => c.getClientRects().length).map((c) => c.textContent),
     chips: chips.map((c) => c.textContent), level: card.querySelector('.kp-levelchip')?.textContent ?? null, levelLabel: card.querySelector('.kp-levelchip')?.getAttribute('aria-label') ?? null,
     levelColor: color('.kp-levelchip'), levelBg: card.querySelector('.kp-levelchip') ? getComputedStyle(card.querySelector('.kp-levelchip')).backgroundColor : null,
-    state: color('.kp-st-new, .kp-st-learn'), target: color('.kp-target'), targetLine: card.querySelector('.kp-target') ? getComputedStyle(card.querySelector('.kp-target')).textDecorationLine : null,
+    state: color('.kp-st-new, .kp-st-learn'), target: color('.kp-target'), targetLine: card.querySelector('.kp-target') ? getComputedStyle(card.querySelector('.kp-target')).textDecorationLine : null, targetWeight: card.querySelector('.kp-target') ? getComputedStyle(card.querySelector('.kp-target')).fontWeight : null,
     term: color('.kp-term'), gloss: color('.kp-gloss'), en: color('.kp-en'), tip: color('.kp-tip'),
     tipBar: card.querySelector('.kp-tip') ? getComputedStyle(card.querySelector('.kp-tip')).borderLeftWidth : null,
     again: color('#kp-grade-again b'), hard: color('#kp-grade-hard b'), good: color('#kp-grade-good b'), easy: color('#kp-grade-easy b'),
@@ -2443,16 +2466,26 @@ async function verifyVisual(browser, base) {
     const back = await o.page.evaluate(PAINT);
     const t = back.tok;
     const w = mcd.words.find((x) => x.id === 'km-064');
+    // The app opens its decks in the focus room (John, 2026-10-13: "SRS section very clear and smooth with
+    // NO CLUTTER at all"; "more subtle awareness, more precision"): one sheet with one hairline edge (no
+    // kind stripe), the marked word in bold ink rather than a colour code, and the level as the one small
+    // figure drawn in the head. The 語 colour, the kind chip and 初めて stay on the standalone pages; in
+    // the app the kind and state chips are built but not drawn.
     check(
-      `a, b) ${look}: the 語 card's edge and first chip are the 語 colour (no level 1–3 edge, no topic hue), the target and term its noun colour and underlined, 初めて in ink-2, the level chip N1 monochrome with its 目安 label`,
-      front.kind === 'go' && !/kp-lv\d|kp-topic/.test(front.classes) && !front.topicVar && front.edge === t['kind-go'] && front.kindChip === 'Word' && front.kindChipColor === t['kind-go'] &&
-        back.target === t.noun && back.targetLine.includes('underline') && back.term === t.noun && front.state === t['ink-2'] &&
-        w.level === 'N1' && front.level === 'N1' && front.levelLabel === 'N1 equivalent (estimated from public lists)' && front.levelColor === t['ink-2'] && front.levelBg === t['panel-2'],
-      JSON.stringify({ kind: front.kind, edge: front.edge, chip: front.kindChipColor, target: back.target, state: front.state, level: front.level, chips: front.chips }),
+      `a, b) ${look}: the 語 card has one hairline edge, the same colour all round (no kind stripe, no level 1–3 edge, no topic hue); its kind chip (Word) and 初めて are built but not drawn; the target and term are bold ink with no underline; the level N1 is the one chip drawn, in ink-2 with no fill, with its 目安 label`,
+      front.kind === 'go' && !/kp-lv\d|kp-topic/.test(front.classes) && !front.topicVar && front.edgeWidth === '1px' && front.edge === front.edgeTop && front.edge !== t['kind-go'] && front.kindChip === 'Word' && front.drawn.join() === 'N1' &&
+        back.target === t.ink && back.targetWeight === '700' && back.targetLine === 'none' && back.term === t.ink && front.state !== null &&
+        w.level === 'N1' && front.level === 'N1' && front.levelLabel === 'N1 equivalent (estimated from public lists)' && front.levelColor === t['ink-2'] && front.levelBg === 'rgba(0, 0, 0, 0)',
+      JSON.stringify({ kind: front.kind, edge: front.edge, edgeTop: front.edgeTop, edgeWidth: front.edgeWidth, target: back.target, line: back.targetLine, level: front.level, levelColor: front.levelColor, chips: front.chips, drawn: front.drawn }),
     );
+    // the focus room's pads sit on the stage, so each grade word takes its hue (D1, 2026-10-08: "color
+    // coded") at a lightness drawn from the dock's own ink: OKLCH hue 28 red, 75 amber, 150 green, 255
+    // blue, chroma 0.14 (places-layout measures each at 4.5:1 or more on its pad, by day and night)
+    const hue = (c) => /^oklch\(([\d.]+) 0\.14 (\d+)\)$/.exec(c || '');
+    const hues = [back.again, back.hard, back.good, back.easy].map((c) => +hue(c)?.[2]);
     check(
       `b) ${look}: English is never coloured (gloss, 英訳 and the note in ink-2, no amber bar on the note); the four grades are red, amber, green and blue`,
-      back.gloss === t['ink-2'] && back.en === t['ink-2'] && back.tip === t['ink-2'] && back.tipBar === '0px' && back.again === t.red && back.hard === t.amber && back.good === t.green && back.easy === t.blue && new Set([t.red, t.amber, t.green, t.blue]).size === 4,
+      back.gloss === t['ink-2'] && back.en === t['ink-2'] && back.tip === t['ink-2'] && back.tipBar === '0px' && hues.join() === '28,75,150,255' && new Set([back.again, back.hard, back.good, back.easy].map((c) => hue(c)?.[1])).size === 1,
       JSON.stringify({ gloss: back.gloss, en: back.en, tip: back.tip, tipBar: back.tipBar, again: back.again, hard: back.hard, good: back.good, easy: back.easy }),
     );
     await close(o);
@@ -2469,11 +2502,13 @@ async function verifyVisual(browser, base) {
     const q = await open('?deck=kotoba', 'kotoba-mine');
     const s = await q.page.evaluate(PAINT);
     await close(q);
+    // in the app's focus room a 字 card is the same sheet as a 語 card (one hairline, no kind stripe); its
+    // kind is still marked on the card (data-kind) and in its built chip
     check(
-      'b) 字 card: edge and chip in the 字 colour; a word with no level (利回り) has no level chip; the sentence deck says 語 and its source, never a "3/1" count',
-      ji.kind === 'ji' && ji.kindChip === 'Kanji' && ji.edge === ji.tok['kind-ji'] && ji.kindChipColor === ji.tok['kind-ji'] && ji.edge !== ji.tok['kind-go'] && ji.state === ji.tok.amber &&
-        none.level === null && !none.chips.some((c) => /^N\d$/.test(c)) && s.kindChip === 'Word' && s.edge === s.tok['kind-go'] && !s.chips.some((c) => /\d+\/\d+/.test(c)) && s.level === 'N1',
-      JSON.stringify({ ji: [ji.kind, ji.kindChip, ji.edge], none: none.chips, sentence: s.chips }),
+      'b) 字 card: marked 字 with its Kanji chip built, one hairline edge (no kind stripe) and nothing but the level drawn in the head; a word with no level (利回り) has no level chip and draws none; the sentence deck says 語 and its source, never a "3/1" count',
+      ji.kind === 'ji' && ji.kindChip === 'Kanji' && ji.edgeWidth === '1px' && ji.edge === ji.edgeTop && ji.edge !== ji.tok['kind-ji'] && ji.drawn.every((c) => /^N\d$/.test(c)) &&
+        none.level === null && !none.chips.some((c) => /^N\d$/.test(c)) && none.drawn.length === 0 && s.kindChip === 'Word' && s.edgeWidth === '1px' && !s.chips.some((c) => /\d+\/\d+/.test(c)) && s.level === 'N1' && s.drawn.join() === 'N1',
+      JSON.stringify({ ji: [ji.kind, ji.kindChip, ji.edge, ji.edgeWidth, ji.drawn], none: [none.chips, none.drawn], sentence: [s.chips, s.drawn] }),
     );
   }
 
@@ -2483,16 +2518,19 @@ async function verifyVisual(browser, base) {
     for (const look of ['dark', 'washi']) {
       const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0, look }, state: due('kotoba-mcd', 'km-200-m01') });
       await reveal(o.page);
-      const v = await o.page.evaluate(`(() => { const card = document.getElementById('kp-card'); const t = card.querySelector('.kp-target'); const rts = t ? [...t.querySelectorAll('rt')] : [];
+      // in the app the reading over a kanji is drawn as its ruby's ::after (the rt keeps no box)
+      const v = await o.page.evaluate(`(() => { const card = document.getElementById('kp-card'); const t = card.querySelector('.kp-target'); const drawn = t ? [...t.querySelectorAll('ruby[data-rt]')].map((r) => getComputedStyle(r, '::after')).filter((a) => a.content !== 'none' && a.content !== 'normal') : [];
         const kp = document.querySelector('.kp'); const probe = document.createElement('i'); kp.append(probe); const tok = (k) => { probe.style.color = 'var(--kp-' + k + ')'; return getComputedStyle(probe).color; };
-        const out = { id: card.dataset.card, pos: card.className, target: t ? getComputedStyle(t).color : null, rt: rts.map((r) => getComputedStyle(r).color), verb: tok('verb'), accent: tok('cyan') }; probe.remove(); return out; })()`);
+        const out = { id: card.dataset.card, pos: card.className, target: t ? getComputedStyle(t).color : null, rt: drawn.map((a) => a.color), verb: tok('verb'), ink: tok('ink'), accent: tok('cyan') }; probe.remove(); return out; })()`);
       seen.push({ look, ...v });
       await close(o);
     }
+    // one hue on the asked word: in the app's focus room the target is bold ink (no part-of-speech colour),
+    // and the reading drawn over it is the target's own ink, never the accent
     check(
-      'b) 墨 and 和紙, verb card km-200-m01 (追い上げる): the reading over the target is the target\'s own verb colour, never the accent',
-      seen.every((v) => v.id === 'km-200-m01' && /kp-pos-verb/.test(v.pos) && v.target === v.verb && v.rt.length > 0 && v.rt.every((c) => c === v.target) && v.target !== v.accent),
-      JSON.stringify(seen.map(({ look, target, rt, accent }) => ({ look, target, rt: [...new Set(rt)], accent }))),
+      'b) 墨 and 和紙, verb card km-200-m01 (追い上げる): the reading over the target is the target\'s own colour (in the app, its ink), never the accent',
+      seen.every((v) => v.id === 'km-200-m01' && /kp-pos-verb/.test(v.pos) && v.target === v.ink && v.rt.length > 0 && v.rt.every((c) => c === v.target) && v.target !== v.accent),
+      JSON.stringify(seen.map(({ look, target, rt, ink, accent }) => ({ look, target, rt: [...new Set(rt)], ink, accent }))),
     );
   }
 

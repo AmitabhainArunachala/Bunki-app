@@ -17,6 +17,8 @@
  *    turns it; every reading on the back, with the passage's lines unmoved; the Readings switch
  *    returns the clean text and moves nothing.
  * 4. Switched back through Settings: the current layout returns, unmarked.
+ * 5. Since 1.2.1 the focus room is the app's deck screen in the current layout too: a fresh device
+ *    opens a deck from Learn into the same clean room, the four grades colour coded.
  *
  * Claim boundary: Chromium only, synthetic records; no physical-device or learner acceptance claim.
  * Usage: KAIRO_SITE_DIR=<staged site> node verify-places-layout.mjs
@@ -394,6 +396,37 @@ try {
     await leave.waitFor({ timeout: 20_000 });
     const marked = await page.evaluate(() => document.documentElement.dataset.layout || 'none');
     check('collection · a private collection page names its way back Review', (await leave.textContent()).trim() === '← Review' && marked === 'places', `${(await leave.textContent()).trim()} · ${marked}`);
+    await context.close();
+  }
+
+  // ---- 5. since 1.2.1 the focus room is the app's deck screen in the current layout too: a fresh
+  //         device, no switch turned, opens a deck from Learn into the same clean room
+  {
+    const { context, page, errors } = await newPage();
+    await page.goto(`${host.origin}/index.html?entry=shelf&ui=bi`);
+    await ready(page);
+    check('current · a fresh device opens the current layout', (await layout(page)) === 'current');
+    await page.locator('#tab-learn').click();
+    await page.waitForTimeout(1200);
+    await page.locator('.learn-go-deck[data-stage-deck="n2"]').click();
+    await page.locator('#kp-card').waitFor();
+    await page.waitForTimeout(800);
+    const bare = () => page.evaluate(() => {
+      const shown = (s) => { const n = document.querySelector(s); return !!n && getComputedStyle(n).display !== 'none'; };
+      return { revealed: !!document.querySelector('#kp-grade-good'), chrome: shown('#app > .chrome'), tabs: shown('#primary-tabs'), rail: shown('#bunki-reports-root .br-rail') };
+    });
+    const up = await bare();
+    check('current · while a card is up: no top bar, no tab bar, no report button', !up.chrome && !up.tabs && !up.rail, JSON.stringify(up));
+    const width = await page.evaluate(() => innerWidth);
+    await page.touchscreen.tap(Math.round(width * 0.22), 420);
+    await page.waitForTimeout(500);
+    check('current · a tap on the left half leaves the front', !(await bare()).revealed);
+    await page.touchscreen.tap(Math.round(width * 0.8), 420);
+    await page.waitForTimeout(800);
+    check('current · a tap on the right half turns the card', (await bare()).revealed);
+    check('current · the Readings switch is on the back', await page.locator('#kp-readings').isVisible());
+    await gradesColourCoded(page, 'current layout');
+    check('current · no page errors', !errors.length, errors.slice(0, 2).join(' | '));
     await context.close();
   }
 } catch (error) {

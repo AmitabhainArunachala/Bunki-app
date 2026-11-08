@@ -51,6 +51,8 @@ try {
       const page = await context.newPage(), cdp = await context.newCDPSession(page);
       await cdp.send('DOM.enable'); await cdp.send('Accessibility.enable');
       await page.goto(host.origin + '/index.html?deck=n1&ui=bi');
+      // the report entry's accessible names, in both languages, on the deck home (the card screen has none)
+      for (const lang of ['ja', 'bi']) { await page.locator(`#lang [data-lang=${lang}]`).click(); await labels(page, cdp, lang); }
       await page.locator('#kp-start').click();
       check(`${width}/${zoom} bare original front`, await page.locator('#kp-card rt, #kp-card .kp-tok, #kp-card .kp-zoom').count() === 0 && await page.locator('#kp-card').getAttribute('data-card') === card.id, await page.locator('#kp-card').textContent());
       await page.locator('#kp-reveal').click(); await resting(page);
@@ -77,22 +79,30 @@ try {
         check(`${width}/${zoom} folded context before the passage offers its opener before the compared actions`, offered, { offered, context: (await page.evaluate(census)).context });
         if (offered) { await more.click(); await resting(page); await page.mouse.move(width - 4, 200); await page.mouse.wheel(0, initial.page - await page.evaluate(() => scrollY)); await page.waitForTimeout(100); }
       }
-      // Added distinct deliberately off-window cases: trusted inner wheel chooses an earlier paragraph; passive locale/world changes must preserve the exact reading pose.
+      // The app opens its decks in the focus room (John, 2026-10-13: "SRS section very clear and smooth with
+      // NO CLUTTER at all"): while a card is up there is no top bar, so the language and world switches
+      // and the report entry are not on the card screen; the card's own Readings switch is. It is the
+      // comparison here: switching readings must keep the exact reading pose (nothing moves), off-window
+      // and fitted. The report entry's names are checked on the deck home, where the rail stands.
+      const chrome = await page.evaluate(() => ({ lang: !!document.querySelector('#lang')?.getClientRects().length, world: !!document.querySelector('#theme-seal')?.getClientRects().length, report: !!document.querySelector('#bunki-report-bug')?.getClientRects().length, readings: document.getElementById('kp-readings')?.getAttribute('aria-pressed') }));
+      check(`${width}/${zoom} the card screen has no top bar or report entry (no language or world switch, no report rail) and offers its Readings switch, on`, !chrome.lang && !chrome.world && !chrome.report && chrome.readings === 'true', chrome);
+      const same = (a, b) => a.card === b.card && a.zoom === b.zoom && a.windowed === b.windowed && a.inner === b.inner && a.anchor.top === b.anchor.top && a.height === b.height && a.page === b.page && a.ledger === b.ledger && JSON.stringify(a.context) === JSON.stringify(b.context) && JSON.stringify(a.folds) === JSON.stringify(b.folds) && JSON.stringify(a.target) === JSON.stringify(b.target);
+      // Deliberately off-window: trusted inner wheel chooses an earlier paragraph; where the window is tall
+      // enough to keep the marked word inside, a trusted outer scroll then carries it above the screen.
       const beforeOff = await page.evaluate(census);
       await page.locator('.kp-sentence').hover(); await page.mouse.wheel(0, -beforeOff.inner); await page.waitForTimeout(100);
       await page.mouse.wheel(0, 20); await page.waitForTimeout(100);
       let offSeat = await page.evaluate(census);
+      if (fits(offSeat)) { await page.mouse.move(width - 4, 200); await page.mouse.wheel(0, offSeat.target.bottom - offSeat.header.bottom + 20); await page.waitForTimeout(100); offSeat = await page.evaluate(census); }
       check(`${width}/${zoom} deliberate off-window comparison has open/nonzero/windowed pose and target outside`, seated(offSeat, zoom === 'focus') && !fits(offSeat), offSeat);
-      for (const lang of ['ja', 'bi']) {
-        await page.locator(`#lang [data-lang=${lang}]`).click(); await resting(page);
-        const afterOff = await page.evaluate(census);
-        check(`${width}/${zoom} deliberately off-window language ${lang} retains exact reading pose`, afterOff.card === offSeat.card && afterOff.zoom === offSeat.zoom && afterOff.windowed === offSeat.windowed && afterOff.inner === offSeat.inner && afterOff.anchor.top === offSeat.anchor.top && afterOff.height === offSeat.height && afterOff.page === offSeat.page && afterOff.ledger === offSeat.ledger && JSON.stringify(afterOff.context) === JSON.stringify(offSeat.context) && JSON.stringify(afterOff.folds) === JSON.stringify(offSeat.folds), { before: offSeat, after: afterOff }); offSeat = afterOff;
+      // off-window the switch may sit under the session bar, where a pointer would first scroll the page:
+      // it is pressed from the keyboard (a trusted Enter on the focused switch, the page left where it is)
+      for (const state of ['false', 'true']) {
+        await page.locator('#kp-readings').evaluate(n => n.focus({ preventScroll: true })); await page.keyboard.press('Enter'); await resting(page);
+        const afterOff = await page.evaluate(census), pressed = await page.locator('#kp-readings').getAttribute('aria-pressed');
+        check(`${width}/${zoom} deliberately off-window Readings ${state === 'true' ? 'on' : 'off'} retains exact reading pose`, pressed === state && same(afterOff, offSeat), { before: offSeat, after: afterOff, pressed }); offSeat = afterOff;
       }
-      for (const seal of ['金', '墨']) {
-        await page.locator('#theme-seal').click(); await page.locator('.world-stone', { hasText: seal }).click(); await resting(page);
-        const afterOff = await page.evaluate(census);
-        check(`${width}/${zoom} deliberately off-window world ${seal} retains exact reading pose`, afterOff.card === offSeat.card && afterOff.zoom === offSeat.zoom && afterOff.windowed === offSeat.windowed && afterOff.inner === offSeat.inner && afterOff.anchor.top === offSeat.anchor.top && afterOff.height === offSeat.height && afterOff.page === offSeat.page && afterOff.ledger === offSeat.ledger && JSON.stringify(afterOff.context) === JSON.stringify(offSeat.context) && JSON.stringify(afterOff.folds) === JSON.stringify(offSeat.folds), { before: offSeat, after: afterOff }); offSeat = afterOff;
-      }
+      await page.mouse.move(width - 4, 200); await page.mouse.wheel(0, offSeat.anchor.top - initial.anchor.top); await page.waitForTimeout(100);
       // Use trusted inner scrolling to fit the target before the preserved +20px reading adjustment.
       const beforeAim = await page.evaluate(census);
       await page.locator('.kp-sentence').hover();
@@ -101,22 +111,13 @@ try {
       await page.locator('.kp-sentence').hover(); await page.mouse.wheel(0, 20); await page.waitForTimeout(100);
       let before = await page.evaluate(census);
       const ledger = before.ledger;
-      check(`${width}/${zoom} compared state is non-default before language switches: windowed, inner seat moved by the wheel${zoom === 'focus' ? ', a context group opened' : ''}`, seated(before, zoom === 'focus'), { windowed: before.windowed, inner: before.inner, context: before.context });
-      check(`${width}/${zoom} compared pose actually fits before language switches`, fits(before), before);
+      check(`${width}/${zoom} compared state is non-default before the Readings switch: windowed, inner seat moved by the wheel${zoom === 'focus' ? ', a context group opened' : ''}`, seated(before, zoom === 'focus'), { windowed: before.windowed, inner: before.inner, context: before.context });
+      check(`${width}/${zoom} compared pose actually fits before the Readings switch`, fits(before), before);
       check(`${width}/${zoom} actual reveal surname`, JSON.stringify(before.ruby) === JSON.stringify(['こむら', 'こむら']), before.ruby);
-      for (const lang of ['ja', 'bi']) {
-        await page.locator(`#lang [data-lang=${lang}]`).click(); await resting(page);
-        const after = await page.evaluate(census);
-        const same = after.card === before.card && after.zoom === before.zoom && after.windowed === before.windowed && JSON.stringify(after.folds) === JSON.stringify(before.folds) && JSON.stringify(after.context) === JSON.stringify(before.context) && after.ledger === ledger;
-        check(`${width}/${zoom} native language ${lang} preserves face/window/folds/context/ledger and reading controls`, same && fits(after), { before, after });
-        await labels(page, cdp, lang); before = after;
-      }
-      check(`${width}/${zoom} compared state is non-default before world switches: windowed, inner seat moved${zoom === 'focus' ? ', a context group opened' : ''}`, seated(before, zoom === 'focus'), { windowed: before.windowed, inner: before.inner, context: before.context });
-      check(`${width}/${zoom} world comparisons start with fitted reading controls`, fits(before), before);
-      for (const seal of ['金', '墨']) {
-        await page.locator('#theme-seal').click(); await page.locator('.world-stone', { hasText: seal }).click(); await resting(page);
-        const after = await page.evaluate(census);
-        check(`${width}/${zoom} native world ${seal} retains presentation and fits`, after.card === before.card && after.zoom === zoom && after.ledger === ledger && JSON.stringify(after.folds) === JSON.stringify(before.folds) && JSON.stringify(after.context) === JSON.stringify(before.context) && Math.abs(after.inner - before.inner) < 1 && after.height === before.height && Math.abs(after.anchor.top - before.anchor.top) < 1 && fits(after), { before, after }); before = after;
+      for (const state of ['false', 'true']) {
+        await page.locator('#kp-readings').click(); await resting(page);
+        const after = await page.evaluate(census), pressed = await page.locator('#kp-readings').getAttribute('aria-pressed');
+        check(`${width}/${zoom} native Readings ${state === 'true' ? 'on' : 'off'} preserves face/window/folds/context/ledger and fits`, pressed === state && same(after, before) && after.ledger === ledger && JSON.stringify(after.ruby) === JSON.stringify(before.ruby) && fits(after), { before, after, pressed }); before = after;
       }
       // The existing word sheet's real kanji door goes through corridor go()/Back().
       await page.locator('#kp-card .kp-target').click();
@@ -186,9 +187,13 @@ try {
     await repeat.click();
     const frame = await page.locator('#kp-sheet').evaluate(n => ({ text: n.textContent, reading: n.querySelector('.kp-sheet-reading')?.textContent, key: n.dataset.key, saves: n.querySelectorAll('#kp-take,#kp-take-list,#kp-sheet-full,.kp-sheet-en,.kp-sheet-def').length }));
     check('actual repeated person lookup is missing-entry with correct reading and no generic sense/save identity', frame.reading === 'こむら' && frame.key === '' && frame.saves === 0 && /This word is not in the dictionary/.test(frame.text) && !/small village|小さい村|しょうそん/.test(frame.text), frame);
-    await page.locator('#kp-sheet-close').click(); await page.locator('#lang [data-lang=ja]').click(); await resting(page);
+    // the card screen has no language switch in the focus room; the card is rebuilt on the way back from
+    // the corridor's kanji page instead (corridor go()/Back())
+    await page.locator('#kp-sheet-close').click();
+    await page.locator('#kp-card .kp-target').click(); await page.locator('.kp-sheet-kanji-door[data-kanji="交"]').click(); await page.locator('#sheet').waitFor();
+    await page.locator('#sheet-back').click(); await page.locator('#sheet').waitFor({ state: 'detached' }); await resting(page);
     const rebuilt = await page.evaluate(census);
-    check('actual language rebuild keeps both contextual surname ruby', JSON.stringify(rebuilt.ruby) === JSON.stringify(['こむら', 'こむら']), rebuilt.ruby);
+    check('actual rebuild (back from the kanji page) keeps both contextual surname ruby', JSON.stringify(rebuilt.ruby) === JSON.stringify(['こむら', 'こむら']), rebuilt.ruby);
     const projections = await page.evaluate(async card => {
       const { sentenceNodes } = await import('./decks/player/mount.js');
       const freeze = value => { if (value && typeof value === 'object') { Object.values(value).forEach(freeze); Object.freeze(value); } return value; };

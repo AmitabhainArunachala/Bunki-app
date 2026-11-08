@@ -330,6 +330,8 @@
  * at least 44px in both dimensions (the line keeps its own typography). */
 .kp-tok { position: relative; cursor: pointer; border-radius: 3px; -webkit-tap-highlight-color: transparent; }
 .kp-tok::before { content: ''; position: absolute; left: 50%; top: 50%; width: max(100%, 44px); height: 44px; transform: translate(-50%, -50%); }
+/* a word split across two lines keeps only its printed boxes: its reach would span both lines (mount.js splitReach) */
+.kp-tok.kp-split::before { content: none; }
 .kp-tok:focus { outline: none; }
 .kp-tok:hover, .kp-tok:focus-visible { text-decoration: underline dotted; text-decoration-thickness: 1.5px; text-underline-offset: 0.3em; }
 .kp-target.kp-tok:hover, .kp-target.kp-tok:focus-visible { text-decoration: underline dotted 2px; }

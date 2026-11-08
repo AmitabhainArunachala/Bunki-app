@@ -3450,195 +3450,211 @@ body.has-primary-tabs .pc-status { bottom: calc(var(--nav-clearance) + 125px); }
   .pc-preview > button { display: flex; width: fit-content; max-width: calc(100vw - 120px); margin-block: 0 var(--space-2); }
 }
 body.has-primary-tabs:has(#sheet, #stroke-page, #vocabulary-list-popover, .kp-sheet-wrap, [role='dialog'][aria-modal='true']:not([hidden]), .world-picker) .primary-tabs { display: none; }
-/* The focus room (John, 2026-10-13: "SRS section very clear and smooth with NO CLUTTER at all").
+/* The focus room (John, 2026-10-13: "SRS section very clear and smooth with NO CLUTTER at all"), in
+   every layout since 1.2.1: the app's decks open here.
    While a deck card is up the world recedes, as 復習's zen already does: no top bar, no tabs.
-   The session's own bar (×, progress, count) stays at the top, and the report button sits in it. */
-html[data-layout='places'] body:has(#app :is(.kp-study, .kp-done)) #app > .chrome,
-html[data-layout='places'] body:has(#app :is(.kp-study, .kp-done)) .primary-tabs { display: none; }
-html[data-layout='places'] body.has-primary-tabs:has(#app :is(.kp-study, .kp-done)) { --nav-clearance: env(safe-area-inset-bottom, 0px); }
-html[data-layout='places'] body:has(#app .kp-study) #app .kp-top-study { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3; background: var(--kp-stage); padding-block: 8px; margin-block: -8px; }
+   The session's own bar (×, progress, count, Remove) stays at the top. */
+body:has(#app :is(.kp-study, .kp-done)) #app > .chrome,
+body:has(#app :is(.kp-study, .kp-done)) .primary-tabs { display: none; }
+body.has-primary-tabs:has(#app :is(.kp-study, .kp-done)) { --nav-clearance: env(safe-area-inset-bottom, 0px); }
+body:has(#app .kp-study) #app .kp-top-study { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3; background: var(--kp-stage); padding-block: 8px; margin-block: -8px; }
 /* no report button while a card is up (John, 2026-10-13) */
-html[data-layout='places'] body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: none; }
+body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: none; }
 /* The back reads clean, like the reader: a reading shows on the answer, and on a word you tap
    while its meaning is open. Hidden readings keep their line, so nothing moves. */
-html[data-layout='places'] #app .kp-sentence rt { display: none; }
-html[data-layout='places'] #app .kp-sentence ruby { position: relative; }
+#app .kp-sentence rt { display: none; }
+#app .kp-sentence ruby { position: relative; }
 /* Readings are drawn above their kanji in the line's own leading, not laid out as ruby, so the line is
    the same before the reveal, after it, with readings on or off, and while a word is open. After the
    reveal every kanji carries its reading (learner brief 2026-10-04); 読み off returns the clean
    original (2026-10-13), keeping only the answer's reading and the one on a word you tap. */
-html[data-layout='places'] #app .kp-sentence ruby[data-rt]::after {
-  content: none; position: absolute; left: 50%; bottom: calc(100% + 1px); transform: translateX(-50%);
+/* a word that carries a reading stays on one line (its reading is drawn over the whole word), on the
+   front too (kp-nb), so the lines break the same before and after the reveal */
+#app .kp-sentence :is(ruby, .kp-nb) { white-space: nowrap; }
+/* the player seats each line's readings so none runs into the next or past the line's edge:
+   --kp-rt-dx moves a reading off its word's centre, --kp-rt-fit narrows one that cannot fit */
+#app .kp-sentence ruby[data-rt]::after {
+  content: none; position: absolute; left: 50%; bottom: calc(100% + 1px); transform: translateX(calc(-50% + var(--kp-rt-dx, 0px))) scaleX(var(--kp-rt-fit, 1));
   font: 400 max(11px, 0.5em)/1 var(--kp-jp, var(--sans, system-ui)); letter-spacing: -0.04em; white-space: nowrap;
   color: color-mix(in srgb, var(--kp-ink-2) 88%, transparent); pointer-events: none;
 }
-html[data-layout='places'] #app .kp[data-readings='on'] .kp-sentence ruby[data-rt]::after,
-html[data-layout='places'] #app .kp-sentence :is(.kp-target, .kp-tok.kp-lit) ruby[data-rt]::after { content: attr(data-rt); }
-html[data-layout='places'] #app .kp-sentence .kp-target ruby[data-rt]::after { color: inherit; }
-html[data-layout='places'] #app .kp-sentence.kp-enter ruby[data-rt]::after { animation: kp-fade 0.16s cubic-bezier(0.2, 0, 0, 1) 0.06s both; }
-html[data-layout='places'] #app .kp-sentence .kp-tok.kp-lit ruby[data-rt]::after { animation: kp-fade 0.12s cubic-bezier(0.2, 0, 0, 1) both; }
-html[data-layout='places'] #app .kp-study .kp-readings { margin-left: 14px; }
+#app .kp[data-readings='on'] .kp-sentence ruby[data-rt]::after,
+#app .kp-sentence :is(.kp-target, .kp-tok.kp-lit) ruby[data-rt]::after { content: attr(data-rt); }
+#app .kp-sentence .kp-target ruby[data-rt]::after { color: inherit; }
+#app .kp-sentence.kp-enter ruby[data-rt]::after { animation: kp-fade 0.16s cubic-bezier(0.2, 0, 0, 1) 0.06s both; }
+#app .kp-sentence .kp-tok.kp-lit ruby[data-rt]::after { animation: kp-fade 0.12s cubic-bezier(0.2, 0, 0, 1) both; }
+#app .kp-study .kp-readings { margin-left: 14px; }
 /* ── The focus room, refined (John, 2026-10-13: "more detail, more sensibility, more subtle awareness,
    more precision, more depth"). One sheet of washi under a lamp on the 藍 stage; the passage is the
    only bold thing; every other mark is quiet, and nothing moves that does not have to.
    ─ the stage: a faint lamp above the card gives it depth (a light, not a gradient wash) */
-html[data-layout='places'] #app .kp:has(> .kp-study) {
+#app .kp:has(> .kp-study) {
   background:
     radial-gradient(120% 55% at 50% 22%, color-mix(in srgb, var(--kp-stage) 86%, #9db0d4) 0%, transparent 72%),
     var(--kp-study-ground);
 }
 /* ─ the bar: ×, one hairline of progress, the count in plain figures, Remove as a quiet word */
-html[data-layout='places'] #app .kp-top-study { gap: 14px; }
-html[data-layout='places'] #app .kp-top-study .kp-icon { width: 40px; color: color-mix(in srgb, var(--kp-stage-ink) 78%, transparent); font-size: 22px; }
-html[data-layout='places'] #app .kp-top-study .kp-progress { height: 2px; border-radius: 1px; background: color-mix(in srgb, var(--kp-stage-ink) 14%, transparent); -webkit-mask-image: none; mask-image: none; }
-html[data-layout='places'] #app .kp-top-study .kp-progress i { background: color-mix(in srgb, var(--kp-stage-ink) 80%, transparent); border-radius: 1px; }
-html[data-layout='places'] #app .kp-top-study .kp-count { min-width: 0; font: 500 13px/1 var(--sans, system-ui); letter-spacing: 0.02em; font-variant-numeric: tabular-nums; color: var(--kp-stage-mute); }
-html[data-layout='places'] #app .kp-top-study .kp-delete { height: 40px; padding: 0 4px; border: 0; background: transparent; font: 500 13px/1 var(--sans, system-ui); letter-spacing: 0.01em; color: color-mix(in srgb, var(--kp-stage-ink) 52%, transparent); }
+#app .kp-top-study { gap: 14px; }
+#app .kp-top-study .kp-icon { width: 40px; color: color-mix(in srgb, var(--kp-stage-ink) 78%, transparent); font-size: 22px; }
+#app .kp-top-study .kp-progress { height: 2px; border-radius: 1px; background: color-mix(in srgb, var(--kp-stage-ink) 14%, transparent); -webkit-mask-image: none; mask-image: none; }
+#app .kp-top-study .kp-progress i { background: color-mix(in srgb, var(--kp-stage-ink) 80%, transparent); border-radius: 1px; }
+#app .kp-top-study .kp-count { min-width: 0; font: 500 13px/1 var(--sans, system-ui); letter-spacing: 0.02em; font-variant-numeric: tabular-nums; color: var(--kp-stage-mute); }
+#app .kp-top-study .kp-delete { height: 44px; padding: 0 4px; border: 0; background: transparent; font: 500 13px/1 var(--sans, system-ui); letter-spacing: 0.01em; color: var(--kp-stage-mute); }
 /* ─ the sheet: one paper, one hairline edge (no kind stripe), a little fibre, lifted by two shadows:
    a close one that says it rests, a long one that says it is lit from above */
-html[data-layout='places'] #app .kp-study .kp-card {
+#app .kp-study .kp-card {
   gap: 14px; padding: 20px 22px 24px; border-radius: 3px;
   border: 1px solid color-mix(in srgb, var(--kp-ink) 9%, transparent);
-  background: var(--washi, none) 0 0 / 300px 300px, var(--kp-panel);
+  /* plain paper: a texture never sits under the readings (the deck's own rule, 和紙・黒板・桜) */
+  background: var(--kp-panel);
   box-shadow: 0 1px 0 rgb(255 255 255 / 55%) inset, 0 1px 2px rgb(0 0 0 / 22%), 0 22px 44px -22px rgb(0 0 0 / 60%);
 }
 /* ─ the head: after a deck's first sittings the task goes unsaid (the marked word says it); the
    level stays as one small figure in the corner, not a chip */
-html[data-layout='places'] #app .kp-study .kp-chips > .kp-chip:not(.kp-levelchip) { display: none; }
-html[data-layout='places'] #app .kp-study .kp-chips { flex-wrap: nowrap; min-height: 16px; }
-html[data-layout='places'] #app .kp-study .kp-eyebrow { flex: 1 1 auto; min-width: 0; font: 600 12px/1.2 var(--sans, system-ui); letter-spacing: 0.02em; text-transform: none; color: var(--kp-mute); }
-html[data-layout='places'] #app .kp[data-hints='0'] .kp-study .kp-eyebrow-t,
-html[data-layout='places'] #app .kp[data-hints='0'] .kp-study .kp-eyebrow::before { display: none; }
-html[data-layout='places'] #app .kp-study .kp-levelchip { margin-left: auto; padding: 0; border: 0; background: none; font: 600 11px/1 var(--sans, system-ui); letter-spacing: 0.06em; color: color-mix(in srgb, var(--kp-ink) 46%, transparent); }
-/* ─ the passage: a book page. Reading size, justified to a clean block, kinsoku and hanging
-   punctuation, and ONE line height before and after the reveal (readings sit in the leading),
-   so the text never reflows when the answer opens */
-html[data-layout='places'] #app .kp-study .kp-sentence,
-html[data-layout='places'] #app .kp-study .kp-sentence:has(.kp-tok) {
+#app .kp-study .kp-chips > .kp-chip:not(.kp-levelchip) { display: none; }
+#app .kp-study .kp-chips { flex-wrap: nowrap; min-height: 16px; }
+#app .kp-study .kp-eyebrow { flex: 1 1 auto; min-width: 0; font: 600 12px/1.2 var(--sans, system-ui); letter-spacing: 0.02em; text-transform: none; color: var(--kp-mute); }
+#app .kp[data-hints='0'] .kp-study .kp-eyebrow-t,
+#app .kp[data-hints='0'] .kp-study .kp-eyebrow::before { display: none; }
+#app .kp-study .kp-levelchip { margin-left: auto; padding: 0; border: 0; background: none; font: 600 11px/1 var(--sans, system-ui); letter-spacing: 0.06em; color: var(--kp-ink-2); }
+/* ─ the passage: a book page. Reading size, kinsoku and hanging punctuation, and ONE line height
+   before and after the reveal (readings sit in the leading), so the text never reflows when the
+   answer opens */
+#app .kp-study .kp-sentence,
+#app .kp-study .kp-sentence:has(.kp-tok) {
   font-size: clamp(19px, 5.3vw, 23px); line-height: 2.3; letter-spacing: 0.05em; font-weight: 500;
-  text-align: justify; text-justify: inter-character; line-break: strict; hanging-punctuation: allow-end;
+  text-align: start; line-break: strict; hanging-punctuation: allow-end;
   overflow-wrap: break-word;
   /* a Japanese page sits on a character grid: the block is a whole number of characters wide, so a
-     full line needs no stretching and justification only absorbs kinsoku */
+     full line ends flush; a line that ends before a word kept whole for its reading stays a little
+     short rather than stretched */
   width: round(down, 100%, 1.05em); margin-inline: auto;
 }
+/* 焦点 folds the sentences around the target to exactly two of these lines (2 × 2.3), never a sliver of a third */
+#app .kp .kp-study .kp-card[data-zoom='focus'] .kp-sentence .kp-ctx:not([data-open='1']) .kp-ctx-in { max-height: 4.6em; }
 /* ─ the marked word: ink, not a colour code; held by two 朱 corner ticks over a breath of wash.
    One mark, not three (the underline goes) */
-html[data-layout='places'] #app .kp-study .kp-target { color: var(--kp-ink); font-weight: 700; text-decoration: none; padding: 0 0.1em; margin: 0 -0.1em; }
-html[data-layout='places'] #app .kp-study .kp-target.kp-tok:hover, html[data-layout='places'] #app .kp-study .kp-target.kp-tok:focus-visible { text-decoration: none; }
+#app .kp-study .kp-target { color: var(--kp-ink); font-weight: 700; text-decoration: none; padding: 0 0.1em; margin: 0 -0.1em; }
+#app .kp-study .kp-target.kp-tok:hover, #app .kp-study .kp-target.kp-tok:focus-visible { text-decoration: none; }
 /* ─ a tapped word: its reading shows (above) and a faint ink wash ties it to its open meaning */
-html[data-layout='places'] #app .kp-study .kp-tok.kp-lit { background: color-mix(in srgb, var(--kp-ink) 7%, transparent); border-radius: 2px; box-shadow: 0 0 0 2px color-mix(in srgb, var(--kp-ink) 7%, transparent); }
+#app .kp-study .kp-tok.kp-lit { background: color-mix(in srgb, var(--kp-ink) 7%, transparent); border-radius: 2px; box-shadow: 0 0 0 2px color-mix(in srgb, var(--kp-ink) 7%, transparent); }
 /* ─ reveal: the right half of the screen turns the card (John, 2026-10-13: "Simply tapping the right
    of the screen should show back of card. No need for 'reveal answer' button"). The button stays a
    real, labelled control for keyboard and VoiceOver; it just has no look. Its keyboard focus shows as
    a hairline at the zone's edge. */
-html[data-layout='places'] #app .kp-study > #kp-reveal {
+#app .kp-study > #kp-reveal {
   position: fixed; z-index: 2; top: calc(env(safe-area-inset-top, 0px) + 60px); right: 0; bottom: 0; width: 50%;
   min-height: 0; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none;
   color: transparent; font-size: 0; -webkit-tap-highlight-color: transparent; cursor: pointer;
 }
-html[data-layout='places'] #app .kp-study > #kp-reveal:active { transform: none; }
-html[data-layout='places'] #app .kp-study > #kp-reveal:focus-visible { outline: none; box-shadow: inset 2px 0 0 color-mix(in srgb, var(--kp-stage-ink) 55%, transparent); }
+#app .kp-study > #kp-reveal:active { transform: none; }
+#app .kp-study > #kp-reveal:focus-visible { outline: none; box-shadow: inset 2px 0 0 color-mix(in srgb, var(--kp-stage-ink) 55%, transparent); }
 /* with no slab at the foot, the page runs to the bottom of the screen and can scroll clear of it */
-html[data-layout='places'] #app .kp-study:has(> #kp-reveal) { padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
-html[data-layout='places'] #app .kp .kp-study:has(> #kp-reveal) > .kp-undo { bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 3; background: transparent; }
-html[data-layout='places'] #app .kp-study .kp-taphint { border-top: 0; padding-top: 4px; font: 500 12px/1.4 var(--sans, system-ui); letter-spacing: 0.02em; text-transform: none; color: var(--kp-mute); }
-html[data-layout='places'] #app .kp-study .kp-undo { font: 500 13px/1 var(--sans, system-ui); letter-spacing: 0.01em; }
+#app .kp-study:has(> #kp-reveal) { padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
+/* Undo on the next front stands 10px off the foot (the safe area counted once), on its opaque
+   full-width dock band, so no passage ink shows through it */
+#app .kp .kp-study:has(> #kp-reveal) > .kp-undo { bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 3; }
+#app .kp-study .kp-taphint { border-top: 0; padding-top: 4px; font: 500 12px/1.4 var(--sans, system-ui); letter-spacing: 0.02em; text-transform: none; color: var(--kp-mute); }
+#app .kp-study .kp-undo { font: 500 13px/1 var(--sans, system-ui); letter-spacing: 0.01em; }
 /* ─ the answer: headword in ink, its reading and part of speech as quiet text, no badges */
-html[data-layout='places'] #app .kp-study .kp-word .kp-term { color: var(--kp-ink); }
-html[data-layout='places'] #app .kp-study .kp-word .kp-reading { letter-spacing: 0.08em; }
-html[data-layout='places'] #app .kp-study .kp-posbadge { padding: 0; border: 0; background: none; font: 500 12px/1 var(--sans, system-ui); letter-spacing: 0.02em; color: var(--kp-mute); }
-html[data-layout='places'] #app .kp-study .kp-f-gloss { border: 0; padding: 0; margin: 0; }
-html[data-layout='places'] #app .kp-study .kp-f-gloss > summary { min-height: 40px; font: 500 14px/1 var(--sans, system-ui); color: var(--kp-mute); }
-html[data-layout='places'] #app .kp-study .kp-f-gloss > summary::before { content: none; }
+#app .kp-study .kp-word .kp-term { color: var(--kp-ink); }
+#app .kp-study .kp-word .kp-reading { letter-spacing: 0.08em; }
+#app .kp-study .kp-posbadge { padding: 0; border: 0; background: none; font: 500 12px/1 var(--sans, system-ui); letter-spacing: 0.02em; color: var(--kp-mute); }
+#app .kp-study .kp-f-gloss { border: 0; padding: 0; margin: 0; }
+#app .kp-study .kp-f-gloss > summary { min-height: 40px; font: 500 14px/1 var(--sans, system-ui); color: var(--kp-mute); }
+#app .kp-study .kp-f-gloss > summary::before { content: none; }
 /* Full passage / Focus: two quiet words, the current one in ink, no pill */
-html[data-layout='places'] #app .kp-study .kp-zoom { gap: 14px; padding: 0; border: 0; background: none; box-shadow: none; }
-html[data-layout='places'] #app .kp .kp-study .kp-eyebrow > .kp-zoom { margin-left: 0; }
-html[data-layout='places'] #app .kp-study .kp-zoom-btn { min-height: 32px; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; font: 500 12px/1 var(--sans, system-ui); letter-spacing: 0.01em; color: var(--kp-mute); }
-html[data-layout='places'] #app .kp-study .kp-zoom-btn[aria-pressed='true'] { color: var(--kp-ink); box-shadow: inset 0 -1px 0 currentColor; }
-html[data-layout='places'] #app .kp-study .kp-swipehint { font: 400 11px/1.4 var(--sans, system-ui); letter-spacing: 0.04em; }
-html[data-layout='places'] #app .kp-study .kp-rule { font-family: var(--sans, system-ui); }
+#app .kp-study .kp-zoom { gap: 14px; padding: 0; border: 0; background: none; box-shadow: none; }
+#app .kp .kp-study .kp-eyebrow > .kp-zoom { margin-left: 0; }
+#app .kp-study .kp-zoom-btn { min-height: 32px; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; font: 500 12px/1 var(--sans, system-ui); letter-spacing: 0.01em; color: var(--kp-mute); }
+#app .kp-study .kp-zoom-btn[aria-pressed='true'] { color: var(--kp-ink); box-shadow: inset 0 -1px 0 currentColor; }
+#app .kp-study .kp-swipehint { font: 400 11px/1.4 var(--sans, system-ui); letter-spacing: 0.04em; }
+#app .kp-study .kp-rule { font-family: var(--sans, system-ui); }
 /* ─ the word sheet: the same paper as the card, a small lift, the word first; level as a figure,
    no kind chip; Save is one plain button, the English and the full entry are quiet rows */
-html[data-layout='places'] #app .kp-sheet-wrap { background: rgb(6 10 20 / 46%); }
-html[data-layout='places'] #app .kp-sheet {
+#app .kp-sheet-wrap { background: rgb(6 10 20 / 46%); }
+#app .kp-sheet {
   gap: 12px; padding: 18px 22px calc(20px + env(safe-area-inset-bottom)); border-radius: 10px 10px 0 0;
   border-color: color-mix(in srgb, var(--kp-ink) 10%, transparent);
   background: var(--washi, none) 0 0 / 300px 300px, var(--kp-panel);
   box-shadow: 0 -1px 0 rgb(255 255 255 / 50%) inset, 0 -18px 40px -20px rgb(0 0 0 / 55%);
 }
-html[data-layout='places'] #app .kp-sheet-term { font-family: var(--kp-head, serif); font-weight: 800; font-size: 30px; letter-spacing: 0.04em; }
-html[data-layout='places'] #app .kp-sheet-reading { font-size: 15px; letter-spacing: 0.08em; color: var(--kp-ink-2); }
-html[data-layout='places'] #app .kp-sheet-chips { padding-top: 14px; }
-html[data-layout='places'] #app .kp-sheet-chips > .kp-chip:not(.kp-levelchip) { display: none; }
-html[data-layout='places'] #app .kp-sheet-chips .kp-levelchip { padding: 0; border: 0; background: none; font: 600 11px/1 var(--sans, system-ui); letter-spacing: 0.06em; color: color-mix(in srgb, var(--kp-ink) 46%, transparent); }
-html[data-layout='places'] #app .kp-sheet-x { border-color: transparent; background: none; color: var(--kp-mute); font-size: 22px; font-weight: 300; }
-html[data-layout='places'] #app .kp-sheet-def { font-family: var(--kp-serif, serif); font-size: 17px; line-height: 1.75; }
-html[data-layout='places'] #app .kp-sheet .kp-f-gloss { border: 0; border-top: 1px solid color-mix(in srgb, var(--kp-ink) 9%, transparent); border-radius: 0; padding: 0; margin: 0; }
-html[data-layout='places'] #app .kp-sheet .kp-f-gloss > summary { min-height: 44px; font: 500 14px/1 var(--sans, system-ui); color: var(--kp-ink-2); }
-html[data-layout='places'] #app .kp-sheet .kp-f-gloss > summary::before { content: none; }
-html[data-layout='places'] #app .kp-sheet-kanji-door { border-radius: 3px; border-color: color-mix(in srgb, var(--kp-ink) 12%, transparent); background: color-mix(in srgb, var(--kp-ink) 3%, transparent); }
-html[data-layout='places'] #app .kp-sheet .kp-take {
+#app .kp-sheet-term { font-family: var(--kp-head, serif); font-weight: 800; font-size: 30px; letter-spacing: 0.04em; }
+#app .kp-sheet-reading { font-size: 15px; letter-spacing: 0.08em; color: var(--kp-ink-2); }
+#app .kp-sheet-chips { padding-top: 14px; }
+#app .kp-sheet-chips > .kp-chip:not(.kp-levelchip) { display: none; }
+#app .kp-sheet-chips .kp-levelchip { padding: 0; border: 0; background: none; font: 600 11px/1 var(--sans, system-ui); letter-spacing: 0.06em; color: var(--kp-ink-2); }
+#app .kp-sheet-x { border-color: transparent; background: none; color: var(--kp-mute); font-size: 22px; font-weight: 300; }
+#app .kp-sheet-def { font-family: var(--kp-serif, serif); font-size: 17px; line-height: 1.75; }
+#app .kp-sheet .kp-f-gloss { border: 0; border-top: 1px solid color-mix(in srgb, var(--kp-ink) 9%, transparent); border-radius: 0; padding: 0; margin: 0; }
+#app .kp-sheet .kp-f-gloss > summary { min-height: 44px; font: 500 14px/1 var(--sans, system-ui); color: var(--kp-ink-2); }
+#app .kp-sheet .kp-f-gloss > summary::before { content: none; }
+#app .kp-sheet-kanji-door { border-radius: 3px; border-color: color-mix(in srgb, var(--kp-ink) 12%, transparent); background: color-mix(in srgb, var(--kp-ink) 3%, transparent); }
+#app .kp-sheet .kp-take {
   width: auto; justify-self: start; min-height: 44px; padding: 0 20px; border-radius: 3px;
   border: 1px solid color-mix(in srgb, var(--kp-ink) 22%, transparent); background: none;
   color: var(--kp-ink); font: 600 15px/1 var(--sans, system-ui); letter-spacing: 0.01em;
 }
-html[data-layout='places'] #app .kp-sheet .kp-take-note { font: 400 12px/1.5 var(--sans, system-ui); color: var(--kp-mute); }
-html[data-layout='places'] #app .kp-sheet .kp-sheet-full {
+#app .kp-sheet .kp-take-note { font: 400 12px/1.5 var(--sans, system-ui); color: var(--kp-mute); }
+#app .kp-sheet .kp-sheet-full {
   justify-self: stretch; text-align: left; min-height: 44px; padding: 0; border: 0; border-top: 1px solid color-mix(in srgb, var(--kp-ink) 9%, transparent);
   border-radius: 0; background: none; text-decoration: none; font: 500 14px/1 var(--sans, system-ui); color: var(--kp-ink-2);
 }
-html[data-layout='places'] #app .kp-sheet .kp-sheet-indeck, html[data-layout='places'] #app .kp-sheet .kp-sheet-taken { border: 0; background: none; padding: 0; font: 400 13px/1.5 var(--sans, system-ui); color: var(--kp-mute); }
+#app .kp-sheet .kp-sheet-indeck, #app .kp-sheet .kp-sheet-taken { border: 0; background: none; padding: 0; font: 400 13px/1.5 var(--sans, system-ui); color: var(--kp-mute); }
 /* ─ the close: the sitting ends where it happened, on the stage. One line of what happened, the
    words you met (a 朱 dot under the ones that come back soon), and one door forward: today's
    reading. The tally boxes and the rate stay on the standalone pages. */
-html[data-layout='places'] #app .kp:has(> .kp-done) { background: var(--kp-study-ground); min-height: 100dvh; }
-html[data-layout='places'] #app .kp-done { gap: 20px; padding: calc(env(safe-area-inset-top, 0px) + 44px) 4px calc(32px + env(safe-area-inset-bottom, 0px)); color: var(--kp-stage-ink); }
-html[data-layout='places'] #app .kp-done > .kp-top { display: none; }
-html[data-layout='places'] #app .kp-done .kp-done-title { color: var(--kp-stage-ink); font-size: clamp(30px, 8.6vw, 40px); font-weight: 700; letter-spacing: 0.02em; }
-html[data-layout='places'] #app .kp-done .kp-rise { gap: 14px 20px; padding: 6px 0 2px; }
-html[data-layout='places'] #app .kp-done .kp-rise-w { display: inline-flex; flex-direction: column; align-items: center; gap: 5px; font-family: var(--kp-serif); font-weight: 600; font-size: 19px; color: color-mix(in srgb, var(--kp-stage-ink) 86%, transparent); }
-html[data-layout='places'] #app .kp-done .kp-rise-w.is-again { color: var(--kp-stage-ink); }
-html[data-layout='places'] #app .kp-done .kp-rise-w::after { content: ''; width: 4px; height: 4px; border-radius: 50%; background: transparent; }
-html[data-layout='places'] #app .kp-done .kp-rise-w.is-again::after { background: var(--kp-shu); }
-html[data-layout='places'] #app .kp-done .kp-tally, html[data-layout='places'] #app .kp-done .kp-done-rate { display: none; }
-html[data-layout='places'] #app .kp-done .kp-done-line { margin: 4px 0 0; font: 400 17px/1.55 var(--sans, system-ui); color: var(--kp-stage-ink); }
-html[data-layout='places'] #app .kp-done .kp-sub { margin: -8px 0 0; font: 400 14px/1.5 var(--sans, system-ui); color: var(--kp-stage-mute); }
-html[data-layout='places'] #app .kp-done .kp-door {
+#app .kp:has(> .kp-done) { background: var(--kp-study-ground); min-height: 100dvh; }
+#app .kp-done { gap: 20px; padding: calc(env(safe-area-inset-top, 0px) + 44px) 4px calc(32px + env(safe-area-inset-bottom, 0px)); color: var(--kp-stage-ink); }
+#app .kp-done > .kp-top { display: none; }
+#app .kp-done .kp-done-title { color: var(--kp-stage-ink); font-size: clamp(30px, 8.6vw, 40px); font-weight: 700; letter-spacing: 0.02em; }
+#app .kp-done .kp-rise { gap: 14px 20px; padding: 6px 0 2px; }
+#app .kp-done .kp-rise-w { display: inline-flex; flex-direction: column; align-items: center; gap: 5px; font-family: var(--kp-serif); font-weight: 600; font-size: 19px; color: color-mix(in srgb, var(--kp-stage-ink) 86%, transparent); }
+#app .kp-done .kp-rise-w.is-again { color: var(--kp-stage-ink); }
+#app .kp-done .kp-rise-w::after { content: ''; width: 4px; height: 4px; border-radius: 50%; background: transparent; }
+#app .kp-done .kp-rise-w.is-again::after { background: var(--kp-shu); }
+#app .kp-done .kp-tally { display: none; }
+#app .kp-done .kp-done-rate { margin: -12px 0 0; gap: 8px; font: 400 14px/1.5 var(--sans, system-ui); color: var(--kp-stage-mute); }
+#app .kp-done .kp-done-rate b { font: 600 14px/1.5 var(--sans, system-ui); font-variant-numeric: tabular-nums; color: var(--kp-stage-ink); }
+#app .kp-done .kp-done-rate span + b + span { margin-left: 0; font: inherit; color: inherit; }
+#app .kp-done .kp-done-rate span + b + span::before { content: '· '; }
+#app .kp-done .kp-done-line { margin: 4px 0 0; font: 400 17px/1.55 var(--sans, system-ui); color: var(--kp-stage-ink); }
+#app .kp-done .kp-sub { margin: -8px 0 0; font: 400 14px/1.5 var(--sans, system-ui); color: var(--kp-stage-mute); }
+#app .kp-done .kp-door {
   display: grid; justify-items: start; gap: 8px; margin-top: 12px; min-height: 0; padding: 16px 18px 18px; text-align: left;
   border: 0; border-radius: 3px; background: var(--washi, none) 0 0 / 300px 300px, var(--kp-panel); color: var(--kp-ink);
   box-shadow: 0 1px 0 rgb(255 255 255 / 55%) inset, 0 18px 36px -18px rgb(0 0 0 / 60%);
 }
-html[data-layout='places'] #app .kp-done .kp-door-l { font: 500 12px/1 var(--sans, system-ui); letter-spacing: 0.02em; color: var(--kp-mute); }
-html[data-layout='places'] #app .kp-done .kp-door-t { font-family: var(--kp-serif); font-weight: 600; font-size: 19px; line-height: 1.5; letter-spacing: 0.03em; }
-html[data-layout='places'] #app .kp-done .kp-home-quiet, html[data-layout='places'] #app .kp-done > .kp-start:not(.kp-door) { justify-self: start; min-height: 44px; padding: 0; border: 0; background: none; box-shadow: none; font: 500 15px/1 var(--sans, system-ui); color: var(--kp-stage-ink); text-decoration: none; }
-html[data-layout='places'] #app .kp-done .kp-undo { justify-self: start; padding: 0; font: 500 13px/1 var(--sans, system-ui); color: var(--kp-stage-mute); }
+#app .kp-done .kp-door-l { font: 500 12px/1 var(--sans, system-ui); letter-spacing: 0.02em; color: var(--kp-mute); }
+#app .kp-done .kp-door-t { font-family: var(--kp-serif); font-weight: 600; font-size: 19px; line-height: 1.5; letter-spacing: 0.03em; }
+#app .kp-done .kp-home-quiet, #app .kp-done > .kp-start:not(.kp-door) { justify-self: start; min-height: 44px; padding: 0; border: 0; background: none; box-shadow: none; font: 500 15px/1 var(--sans, system-ui); color: var(--kp-stage-ink); text-decoration: none; }
+#app .kp-done .kp-undo { justify-self: start; padding: 0; font: 500 13px/1 var(--sans, system-ui); color: var(--kp-stage-mute); }
 /* ─ grading: four pads on the stage, colour coded as chosen on 10-08 (D1: "Four (Again · Hard · Good ·
    Easy) — and color coded"), red · amber · green · blue as in the decks. Each word takes its hue at a
    lightness drawn from the dock's own ink, so it reads on every stage, dark or light (measured ≥ 5.9:1);
    Good, the usual answer, is tinted. Words in the interface face, intervals as tabular figures */
-html[data-layout='places'] #app .kp-study .kp-grades { column-gap: 8px; border-top: 0; background: linear-gradient(transparent, var(--kp-dock) 14px); padding-top: 16px; }
-html[data-layout='places'] #app .kp-study .kp-grade {
+#app .kp-study .kp-grades { column-gap: 8px; border-top: 0; background: linear-gradient(transparent, var(--kp-dock) 14px); padding-top: 16px; }
+#app .kp-study .kp-grade {
   --kp-grade-ink: var(--kp-dock-ink);
   min-height: 60px; gap: 4px; border-radius: 3px; box-shadow: none;
   border: 1px solid color-mix(in srgb, var(--kp-dock-ink) 18%, transparent); border-top: 2px solid var(--kp-grade-ink);
   background: color-mix(in srgb, var(--kp-dock-ink) 6%, transparent); color: var(--kp-dock-ink);
 }
-html[data-layout='places'] #app .kp-study .kp-grade b { color: var(--kp-grade-ink); font: 600 16px/1.1 var(--sans, system-ui); letter-spacing: 0.01em; }
-html[data-layout='places'] #app .kp-study .kp-grade small { color: var(--kp-dock-mute); font: 400 12px/1 var(--sans, system-ui); letter-spacing: 0; font-variant-numeric: tabular-nums; }
-html[data-layout='places'] #app .kp-study .kp-grade-seal { color: var(--kp-grade-ink); font-size: 22px; }
+#app .kp-study .kp-grade b { color: var(--kp-grade-ink); font: 600 16px/1.1 var(--sans, system-ui); letter-spacing: 0.01em; }
+#app .kp-study .kp-grade small { color: var(--kp-dock-mute); font: 400 12px/1 var(--sans, system-ui); letter-spacing: 0; font-variant-numeric: tabular-nums; }
+#app .kp-study .kp-grade-seal { color: var(--kp-grade-ink); font-size: 22px; }
 @supports (color: oklch(from red l c h)) {
-  html[data-layout='places'] #app .kp-study .kp-again { --kp-grade-ink: oklch(from var(--kp-dock-ink) calc(l * 0.8 + 0.1) 0.14 28); }
-  html[data-layout='places'] #app .kp-study .kp-hard { --kp-grade-ink: oklch(from var(--kp-dock-ink) calc(l * 0.8 + 0.1) 0.14 75); }
-  html[data-layout='places'] #app .kp-study .kp-good {
+  #app .kp-study .kp-again { --kp-grade-ink: oklch(from var(--kp-dock-ink) calc(l * 0.8 + 0.1) 0.14 28); }
+  #app .kp-study .kp-hard { --kp-grade-ink: oklch(from var(--kp-dock-ink) calc(l * 0.8 + 0.1) 0.14 75); }
+  #app .kp-study .kp-good {
     --kp-grade-ink: oklch(from var(--kp-dock-ink) calc(l * 0.8 + 0.1) 0.14 150);
     border-color: color-mix(in srgb, var(--kp-grade-ink) 45%, transparent); border-top-color: var(--kp-grade-ink);
     background: color-mix(in srgb, var(--kp-grade-ink) 16%, transparent);
   }
-  html[data-layout='places'] #app .kp-study .kp-easy { --kp-grade-ink: oklch(from var(--kp-dock-ink) calc(l * 0.8 + 0.1) 0.14 255); }
+  #app .kp-study .kp-easy { --kp-grade-ink: oklch(from var(--kp-dock-ink) calc(l * 0.8 + 0.1) 0.14 255); }
 }
 /* in 日本語 the seal is the pad's face and the word a quiet caption under it (as the r4 skin meant) */
-html[data-layout='places'] #app .kp-study .kp-grade:has(.kp-grade-seal) b { font: 500 11px/1 var(--sans, system-ui); letter-spacing: 0.06em; }
+#app .kp-study .kp-grade:has(.kp-grade-seal) b { font: 500 11px/1 var(--sans, system-ui); letter-spacing: 0.06em; }
 .learn-section + .learn-section,
 .foundation-section { margin-top: var(--space-8); }
 .learn-section { padding-top: var(--space-2); }

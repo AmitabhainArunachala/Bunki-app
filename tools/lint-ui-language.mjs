@@ -380,10 +380,13 @@ async function record(page, room, language) {
         getComputedStyle(el).visibility !== 'hidden' &&
         !el.closest('[inert], [aria-hidden="true"]'),
     ).length,
+    // a deck card or its close is the focus room: no top bar and no tabs while it is up (John,
+    // 2026-10-13: "SRS section very clear and smooth with NO CLUTTER at all")
     quiet:
       ['drift', 'entry'].includes(document.body.dataset.view) ||
       document.body.classList.contains('zen') ||
-      !!document.querySelector('#sheet, #stroke-page'),
+      !!document.querySelector('#sheet, #stroke-page') ||
+      !!document.querySelector('#app :is(.kp-study, .kp-done)'),
   }));
   const contractIssues = [];
   if (!ROOM_STAMPS[shell.view] || shell.stamp !== ROOM_STAMPS[shell.view])
