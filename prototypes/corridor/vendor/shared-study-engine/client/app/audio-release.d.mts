@@ -1,0 +1,41 @@
+import type {AudioCapability,AudioRef,PackState} from './audio-resources.mjs';
+export interface AudioProfile { readonly providerRoute: string; readonly model: string; readonly voice: string; readonly settings: Readonly<Record<string,unknown>> }
+export interface AudioSourceField { readonly fieldId: string; readonly text: string; readonly language: 'ja'|'en'|null; readonly pronunciationDirectives: readonly Readonly<{start:number;end:number;reading:string}>[]; readonly pendingReasons:readonly string[] }
+export interface AudioSelection {
+ readonly taskKey: string; readonly contentRevision: string; readonly audioContentRevision: string;
+ readonly contentRelease: string; readonly fields: readonly string[]; readonly profileId: string|null;
+ readonly supportedReadingId: null; readonly face: 'front'|'answer'; readonly sourceFields: readonly AudioSourceField[];
+}
+export interface AudioRootSummary {
+ readonly contentRelease: string; readonly projectionId: string;
+ readonly identities: Readonly<{catalog:string;registry:string;grammar:string;dictionary:string}>;
+ readonly correctionLedgerRevision: string; readonly defaultProfileId: string|null;
+ readonly profiles: readonly Readonly<{id:string;profile:AudioProfile}>[];
+}
+declare const verifiedSelection: unique symbol;
+/** Logical opaque type. Per-player instance branding is enforced by runtime WeakMaps. */
+export interface ReadyAudioSelection {
+ readonly [verifiedSelection]: true; readonly status:'ready'; readonly releaseId:string; readonly projectionId:string;
+ readonly contentRelease:string; readonly taskKey:string; readonly contentRevision:string; readonly audioContentRevision:string;
+ readonly profileId:string; readonly identities:AudioRootSummary['identities']; readonly localState:PackState;
+ readonly segments:readonly Readonly<{fieldId:string;start:number;end:number;inputKey:string;profileId:string;ref:AudioRef}>[];
+}
+export type AudioUnavailableStatus = 'pending'|'preparation-failed'|'profile-unassigned'|'profile-unavailable'|'source-stale'|'content-release-mismatch'|'integrity-invalid'|'unsupported-capability'|'cancelled'|'face-hidden'|'offline-missing';
+export type AudioResolution = ReadyAudioSelection|Readonly<{status:AudioUnavailableStatus}>;
+export interface AudioPackInspection {
+ readonly root:AudioRootSummary; readonly pack:Readonly<{id:string;totalBytes:number}>;
+ readonly refs:readonly AudioRef[];
+ /** Verified demo-pack rows still require mounted source/directive revalidation with resolve. */
+ readonly placements:readonly Readonly<{taskKey:string;contentRevision:string;audioContentRevision:string;fieldId:string;supportedReadingId:null;profileId:string;language:'ja'|'en';state:'verified';packId:string;sourceSha256:string;sourceBytes:number;segments:readonly unknown[]}>[];
+}
+export interface AudioReleaseReader {
+ load(options?:{signal?:AbortSignal}):Promise<AudioRootSummary>;
+ resolve(selection:AudioSelection,options?:{signal?:AbortSignal}):Promise<AudioResolution>;
+ inspectPack(packId:string,options?:{signal?:AbortSignal}):Promise<AudioPackInspection>;
+ readClip(ref:AudioRef,options?:{signal?:AbortSignal}):Promise<Uint8Array>;
+ dispose():Promise<void>;
+}
+export function createAudioReleaseReader(options:{capability:AudioCapability}):Readonly<AudioReleaseReader>;
+export function audioBucket(taskKey:string):number;
+export function hashAudioBytes(bytes:Uint8Array):Promise<string>;
+export function isAudioReadyResult(value:unknown):value is ReadyAudioSelection;
