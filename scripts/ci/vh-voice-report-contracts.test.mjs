@@ -303,7 +303,8 @@ test('Sense rejects the actual pre-Shelf40 index pin while accepting current con
   const current = sense();
   assert.equal(validateVoiceReport('sense-truth', current.report, current.context).passed, true);
   const old = sense();
-  old.context.runtimeFiles['data/articles/index.json'] = '131991cc0ab9d56986bf5e1d270f14a5f5143ecb02c020a76566284ba49e5b8e';
+  old.context.runtimeFiles['data/articles/index.json'] =
+    '131991cc0ab9d56986bf5e1d270f14a5f5143ecb02c020a76566284ba49e5b8e';
   assert.equal(validateVoiceReport('sense-truth', old.report, old.context).passed, false);
 });
 test('Sense source changes require independent roster review, and semantic retry never launders a red', () => {

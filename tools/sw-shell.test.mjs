@@ -299,16 +299,24 @@ describe('sw.js bundled fonts (R5-19)', () => {
   const isFont = (path) => path.startsWith('fonts/');
 
   it('shared study content and fonts are lazy verified assets, never an install or background prerequisite', async () => {
-    const shared = [SHARED_FONT,SHARED_DATA,SHARED_MODULE];let unavailable=true;
-    const {run,request,stored,record}=loadWorker([],{source,network:serve(path=>unavailable&&shared.includes(path))});
-    await run('install');await run('activate');
-    await until(()=>[FONT_A,FONT_B].every(path=>record.fetched.includes(path)));
-    expect(record.fetched.filter(path=>shared.includes(path))).toEqual([]);
-    for(const path of shared)expect(await stored(cacheName,path)).toBeUndefined();
-    unavailable=false;
-    for(const path of shared){expect((await request(path)).status).toBe(200);expect(await stored(cacheName,path)).toBe(bodies.get(path).toString());}
-    unavailable=true;
-    for(const path of shared)expect((await request(path)).status).toBe(200);
+    const shared = [SHARED_FONT, SHARED_DATA, SHARED_MODULE];
+    let unavailable = true;
+    const { run, request, stored, record } = loadWorker([], {
+      source,
+      network: serve((path) => unavailable && shared.includes(path)),
+    });
+    await run('install');
+    await run('activate');
+    await until(() => [FONT_A, FONT_B].every((path) => record.fetched.includes(path)));
+    expect(record.fetched.filter((path) => shared.includes(path))).toEqual([]);
+    for (const path of shared) expect(await stored(cacheName, path)).toBeUndefined();
+    unavailable = false;
+    for (const path of shared) {
+      expect((await request(path)).status).toBe(200);
+      expect(await stored(cacheName, path)).toBe(bodies.get(path).toString());
+    }
+    unavailable = true;
+    for (const path of shared) expect((await request(path)).status).toBe(200);
   });
 
   it('stamped install succeeds and caches the boot core when every font request fails', async () => {

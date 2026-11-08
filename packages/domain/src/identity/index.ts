@@ -34,8 +34,17 @@ export type TaskId = `task:${string}`;
 /** `comp:<kanji id>:<position>` (SPEC-v1 §S6, "Component occurrence") */
 export type ComponentOccurrenceId = `comp:${KanjiId}:${number}`;
 
-export type Modality = 'recognition' | 'recall' | 'production' | 'listening' | 'reading' | 'writing' | 'speaking';
-export const MODALITIES: readonly Modality[] = ['recognition', 'recall', 'production', 'listening', 'reading', 'writing', 'speaking'];
+export type Modality =
+  'recognition' | 'recall' | 'production' | 'listening' | 'reading' | 'writing' | 'speaking';
+export const MODALITIES: readonly Modality[] = [
+  'recognition',
+  'recall',
+  'production',
+  'listening',
+  'reading',
+  'writing',
+  'speaking',
+];
 
 /** full provenance on every relation: the dataset, its pinned version and its licence */
 export interface Provenance {
@@ -71,9 +80,28 @@ export interface MigrationStep {
 }
 
 export type MigrationResult =
-  | { readonly version: 2; readonly from: string; readonly id: EntryId; readonly migration: readonly MigrationStep[] }
-  | { readonly version: 2; readonly from: string; readonly id: null; readonly ambiguous: 'needs seq'; readonly candidates: readonly EntryId[]; readonly migration: readonly MigrationStep[] }
-  | { readonly version: 2; readonly from: string; readonly id: null; readonly ambiguous: 'no candidate'; readonly candidates: readonly []; readonly migration: readonly MigrationStep[] };
+  | {
+      readonly version: 2;
+      readonly from: string;
+      readonly id: EntryId;
+      readonly migration: readonly MigrationStep[];
+    }
+  | {
+      readonly version: 2;
+      readonly from: string;
+      readonly id: null;
+      readonly ambiguous: 'needs seq';
+      readonly candidates: readonly EntryId[];
+      readonly migration: readonly MigrationStep[];
+    }
+  | {
+      readonly version: 2;
+      readonly from: string;
+      readonly id: null;
+      readonly ambiguous: 'no candidate';
+      readonly candidates: readonly [];
+      readonly migration: readonly MigrationStep[];
+    };
 
 export interface EntryCandidate {
   readonly seq: string | number;
@@ -117,7 +145,8 @@ export class IdentityError extends TypeError {
 
 const toHiragana = (text: string): string =>
   text.replace(/[ァ-ヶ]/gu, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
-const filled = (value: unknown): value is string => typeof value === 'string' && value.trim() !== '';
+const filled = (value: unknown): value is string =>
+  typeof value === 'string' && value.trim() !== '';
 const plainObject = (value: unknown): value is Record<string, unknown> =>
   !!value && typeof value === 'object' && !Array.isArray(value);
 function need(ok: unknown, message: string): asserts ok {
@@ -141,7 +170,11 @@ export function readingId(input: { readonly kanji: string; readonly reading: str
   return `reading:${input.kanji}|${toHiragana(input.reading)}`;
 }
 
-export function entryId(input: { readonly seq: string | number; readonly spelling: string; readonly reading: string }): EntryId {
+export function entryId(input: {
+  readonly seq: string | number;
+  readonly spelling: string;
+  readonly reading: string;
+}): EntryId {
   need(input.seq != null && filled(String(input.seq)), 'entryId: an entry id needs its seq');
   need(filled(input.spelling), 'entryId: a spelling is required');
   need(filled(input.reading), 'entryId: a reading is required');
@@ -150,73 +183,182 @@ export function entryId(input: { readonly seq: string | number; readonly spellin
 
 export function senseId(input: { readonly entry: EntryId; readonly index: number }): SenseId {
   need(filled(input.entry) && input.entry.startsWith('entry:'), 'senseId: an entry id is required');
-  need(Number.isInteger(input.index) && input.index >= 1, 'senseId: a 1-based sense index is required');
+  need(
+    Number.isInteger(input.index) && input.index >= 1,
+    'senseId: a 1-based sense index is required',
+  );
   return `${input.entry}#s${input.index}`;
 }
 
-export function taskId(input: { readonly entry: EntryId; readonly reading: ReadingId; readonly sense: SenseId; readonly modality: Modality }): TaskId {
+export function taskId(input: {
+  readonly entry: EntryId;
+  readonly reading: ReadingId;
+  readonly sense: SenseId;
+  readonly modality: Modality;
+}): TaskId {
   need(filled(input.entry) && input.entry.startsWith('entry:'), 'taskId: an entry id is required');
-  need(filled(input.reading) && input.reading.startsWith('reading:'), 'taskId: a reading id is required');
-  need(filled(input.sense) && input.sense.startsWith(`${input.entry}#s`), 'taskId: a sense id of this entry is required');
-  need(filled(input.modality) && (MODALITIES as readonly string[]).includes(input.modality), `taskId: a modality is required (${MODALITIES.join(', ')})`);
+  need(
+    filled(input.reading) && input.reading.startsWith('reading:'),
+    'taskId: a reading id is required',
+  );
+  need(
+    filled(input.sense) && input.sense.startsWith(`${input.entry}#s`),
+    'taskId: a sense id of this entry is required',
+  );
+  need(
+    filled(input.modality) && (MODALITIES as readonly string[]).includes(input.modality),
+    `taskId: a modality is required (${MODALITIES.join(', ')})`,
+  );
   return `task:${input.entry}|${input.reading}|${input.sense}|${input.modality}`;
 }
 
 export function validProvenance(provenance: unknown): provenance is Provenance {
-  return plainObject(provenance) && (['dataset', 'version', 'licence'] as const).every((k) => filled(provenance[k]));
+  return (
+    plainObject(provenance) &&
+    (['dataset', 'version', 'licence'] as const).every((k) => filled(provenance[k]))
+  );
 }
 
-export function relate(input: { readonly reading: ReadingId; readonly kanji: KanjiId; readonly entry: string; readonly provenance: Provenance }): Relation {
-  need(filled(input.reading) && input.reading.startsWith('reading:'), 'relate: a reading id is required');
+export function relate(input: {
+  readonly reading: ReadingId;
+  readonly kanji: KanjiId;
+  readonly entry: string;
+  readonly provenance: Provenance;
+}): Relation {
+  need(
+    filled(input.reading) && input.reading.startsWith('reading:'),
+    'relate: a reading id is required',
+  );
   need(filled(input.kanji) && input.kanji.startsWith('kanji:'), 'relate: a kanji id is required');
   need(filled(input.entry), 'relate: an entry id is required');
-  need(validProvenance(input.provenance), 'relate: provenance.dataset, provenance.version and provenance.licence are required');
+  need(
+    validProvenance(input.provenance),
+    'relate: provenance.dataset, provenance.version and provenance.licence are required',
+  );
   const { dataset, version, licence } = input.provenance;
-  return { kanji: input.kanji, reading: input.reading, entry: input.entry, provenance: { dataset, version, licence } };
+  return {
+    kanji: input.kanji,
+    reading: input.reading,
+    entry: input.entry,
+    provenance: { dataset, version, licence },
+  };
 }
 
-export function componentOccurrenceId(input: { readonly kanji: string; readonly position: number; readonly part: string }): ComponentOccurrence {
+export function componentOccurrenceId(input: {
+  readonly kanji: string;
+  readonly position: number;
+  readonly part: string;
+}): ComponentOccurrence {
   const kanji = kanjiId(input.kanji);
-  need(Number.isInteger(input.position) && input.position >= 1, 'componentOccurrenceId: a 1-based position is required');
-  return { id: `comp:${kanji}:${input.position}`, kanji, position: input.position, part: partId(input.part) };
+  need(
+    Number.isInteger(input.position) && input.position >= 1,
+    'componentOccurrenceId: a 1-based position is required',
+  );
+  return {
+    id: `comp:${kanji}:${input.position}`,
+    kanji,
+    position: input.position,
+    part: partId(input.part),
+  };
 }
 
-export function migrateIdentity(record: IdentityRecordV1, context: { readonly candidates?: readonly EntryCandidate[] }): MigrationResult {
+export function migrateIdentity(
+  record: IdentityRecordV1,
+  context: { readonly candidates?: readonly EntryCandidate[] },
+): MigrationResult {
   need(plainObject(record), 'migrateIdentity: an identity record is required');
   const version: unknown = (record as { version?: unknown }).version;
-  need(version === 1, `migrateIdentity: unknown identity version ${version === undefined ? '(missing)' : JSON.stringify(version)}; only version 1 migrates to ${IDENTITY_VERSION}`);
-  need(filled(record.key) && record.key.includes('|'), 'migrateIdentity: a version-1 key has the form spelling|reading');
+  need(
+    version === 1,
+    `migrateIdentity: unknown identity version ${version === undefined ? '(missing)' : JSON.stringify(version)}; only version 1 migrates to ${IDENTITY_VERSION}`,
+  );
+  need(
+    filled(record.key) && record.key.includes('|'),
+    'migrateIdentity: a version-1 key has the form spelling|reading',
+  );
   const bar = record.key.indexOf('|');
   const spelling = record.key.slice(0, bar);
   const reading = toHiragana(record.key.slice(bar + 1));
-  const ids = [...new Set((context.candidates ?? [])
-    .filter((c) => c.spelling === spelling && toHiragana(c.reading) === reading && c.seq != null)
-    .map((c) => entryId(c)))].sort();
-  const migration: readonly MigrationStep[] = [{ from: 1, to: IDENTITY_VERSION, rule: 'spelling|reading → entry:<seq>:spelling|reading; the seq comes from the candidate set' }];
+  const ids = [
+    ...new Set(
+      (context.candidates ?? [])
+        .filter(
+          (c) => c.spelling === spelling && toHiragana(c.reading) === reading && c.seq != null,
+        )
+        .map((c) => entryId(c)),
+    ),
+  ].sort();
+  const migration: readonly MigrationStep[] = [
+    {
+      from: 1,
+      to: IDENTITY_VERSION,
+      rule: 'spelling|reading → entry:<seq>:spelling|reading; the seq comes from the candidate set',
+    },
+  ];
   const first = ids[0];
-  if (ids.length === 1 && first !== undefined) return { version: 2, from: record.key, id: first, migration };
-  if (ids.length === 0) return { version: 2, from: record.key, id: null, ambiguous: 'no candidate', candidates: [], migration };
-  return { version: 2, from: record.key, id: null, ambiguous: 'needs seq', candidates: ids, migration };
+  if (ids.length === 1 && first !== undefined)
+    return { version: 2, from: record.key, id: first, migration };
+  if (ids.length === 0)
+    return {
+      version: 2,
+      from: record.key,
+      id: null,
+      ambiguous: 'no candidate',
+      candidates: [],
+      migration,
+    };
+  return {
+    version: 2,
+    from: record.key,
+    id: null,
+    ambiguous: 'needs seq',
+    candidates: ids,
+    migration,
+  };
 }
 
 /** true, or throws IdentityError naming the first rule the target breaks */
 export function validateEvidenceTarget(event: EvidenceEventShape): true {
   need(plainObject(event) && filled(event['kind']), 'evidence: an event with a kind is required');
   const target: unknown = event['target'];
-  need(plainObject(target) && filled(target['kind']), 'evidence: untyped target; a target carries kind "lexical" or "section"');
+  need(
+    plainObject(target) && filled(target['kind']),
+    'evidence: untyped target; a target carries kind "lexical" or "section"',
+  );
   if (target['kind'] === 'lexical') {
     const entry = target['entry'];
-    need(filled(entry) && entry.startsWith('entry:'), 'evidence: a lexical target needs its entry id');
+    need(
+      filled(entry) && entry.startsWith('entry:'),
+      'evidence: a lexical target needs its entry id',
+    );
     return true;
   }
   if (target['kind'] === 'section') {
-    need(filled(target['sourceOccurrence']), 'evidence: a section target needs its source occurrence');
+    need(
+      filled(target['sourceOccurrence']),
+      'evidence: a section target needs its source occurrence',
+    );
     const digest = target['transcriptDigest'];
-    need(filled(digest) && SHA256.test(digest), 'evidence: a section target needs a sha256 transcript digest');
+    need(
+      filled(digest) && SHA256.test(digest),
+      'evidence: a section target needs a sha256 transcript digest',
+    );
     const range: unknown = target['range'];
-    need(plainObject(range) && Number.isInteger(range['start']) && Number.isInteger(range['end']) && (range['end'] as number) > (range['start'] as number), 'evidence: a section target needs a range');
-    need(range['wholeSentence'] === true && range['validated'] === true && !range['forcedFirstWord'], 'evidence: a section must be a validated whole sentence, never forced to its first word');
-    need(!(target['retypedFrom'] === 'lexical' && target['lexicalConfidence'] !== 'confident'), 'evidence: an uncertain lexical capture retyped as a section is refused');
+    need(
+      plainObject(range) &&
+        Number.isInteger(range['start']) &&
+        Number.isInteger(range['end']) &&
+        (range['end'] as number) > (range['start'] as number),
+      'evidence: a section target needs a range',
+    );
+    need(
+      range['wholeSentence'] === true && range['validated'] === true && !range['forcedFirstWord'],
+      'evidence: a section must be a validated whole sentence, never forced to its first word',
+    );
+    need(
+      !(target['retypedFrom'] === 'lexical' && target['lexicalConfidence'] !== 'confident'),
+      'evidence: an uncertain lexical capture retyped as a section is refused',
+    );
     return true;
   }
   throw new IdentityError(`evidence: untyped target kind ${JSON.stringify(target['kind'])}`);
