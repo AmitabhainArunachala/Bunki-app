@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync } from 'node:fs';
-import { join } from 'node:path';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { basename, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'vitest';
 import { resolveCorridorEvidence } from '../scripts/resolve-corridor-site.mjs';
+import { retainedReportContracts } from '../scripts/ci/vh-retained-report-contracts.mjs';
 import { readAuthoredCorridor } from '../prototypes/corridor/tools/authored-corridor-source.mjs';
 import { INVENTORY, WORD_CONTROLS, LEARNING_RECORD_CONTROLS, admitControl, applyControl, runControls, sha256 } from '../prototypes/corridor/tools/word-saved-answer-controls.mjs';
 
@@ -45,6 +46,19 @@ test('the actual saved-answer controls run and every declared child is killed', 
     assert.equal(Object.keys(report.pins.before).length, 19);
     assert.equal(report.pins.stable, true);
     assert.equal(report.pass, true);
+    const admission = retainedReportContracts['word-saved-answer-mutation-controls'].validate(report, {
+      root: ROOT,
+      out: dirname(evidence),
+      gateId: basename(evidence),
+      startedAt: report.phase.startedAt,
+      args: ['prototypes/corridor/tools/test-word-saved-answer.mjs', '--controls'],
+      verifierSha256: sha256(readFileSync(TEST_FILE)),
+      sourceVerifiedBeforeAndAfter: report.pins.stable,
+      readReport: path => JSON.parse(readFileSync(join(evidence, path), 'utf8')),
+    });
+    assert.deepEqual(admission.errors, []);
+    assert.equal(admission.passed, true);
+    assert.deepEqual(admission.observedCases, expectedChildren);
 
     const baseline = { complete: true, problems: [], results: new Map(INVENTORY.map(id => [id, true])) };
     const control = WORD_CONTROLS.C10;

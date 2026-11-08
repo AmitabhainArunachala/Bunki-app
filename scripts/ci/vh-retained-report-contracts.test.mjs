@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { retainedReportContracts, driftFastSchedule } from './vh-retained-report-contracts.mjs';
 import { accessibilitySourceInventory, compareInventory } from './vh-inventory-source-parity.mjs';
+import { readAuthoredCorridor } from '../../prototypes/corridor/tools/authored-corridor-source.mjs';
 import {
   INVENTORY as PRODUCER_WORD_INVENTORY,
   LEARNING_RECORD_CONTROLS,
@@ -361,6 +362,7 @@ const pinnedPaths = {
   'corridor.js': 'prototypes/corridor/corridor.js',
   'test-word-saved-answer.mjs': MUTATION_PRODUCER,
   'word-saved-answer-controls.mjs': 'prototypes/corridor/tools/word-saved-answer-controls.mjs',
+  'authored-corridor-source.mjs': 'prototypes/corridor/tools/authored-corridor-source.mjs',
   'verify-learning-record.mjs': 'prototypes/corridor/tools/verify-learning-record.mjs',
   'dict-v2/index.json': 'prototypes/corridor/data/share_alike/dict-v2/index.json',
   'dict.json': 'prototypes/corridor/data/share_alike/dict.json',
@@ -401,6 +403,9 @@ const learningInventory = [
   'g2-help-per-1000-characters-counts-first-readings-once',
   'g2-a-kept-word-answers-cold-from-its-own-card',
   'hfix1b-me-reads-one-count-so-unaided-never-exceeds-read',
+  'ticket-return-retains-published-grade-acknowledged-without-an-extra-write',
+  'ticket-return-retains-published-grade-unacknowledged-without-an-extra-write',
+  'ticket-continuation-and-independent-reader-position-write-do-not-replay-grades',
 ];
 const tapOutput = (marker, rows) => {
   const ids = Object.keys(rows),
@@ -426,19 +431,25 @@ function syntheticMutationControls({
   word = WORD_CONTROLS,
   learning = LEARNING_RECORD_CONTROLS,
 } = {}) {
+  const authored = readAuthoredCorridor(join(ROOT, 'prototypes/corridor'));
   const pins = Object.fromEntries(
-    Object.entries(pinnedPaths).map(([key, path]) => [
+    Object.entries({
+      ...pinnedPaths,
+      ...Object.fromEntries(
+        authored.files.map((file) => [file.path, `prototypes/corridor/${file.path}`]),
+      ),
+    }).map(([key, path]) => [
       key,
       { path, sha256: digestOf(readFileSync(join(ROOT, path))) },
     ]),
   );
-  const authored = pins['corridor.js'].sha256,
+  const authoredSha256 = digestOf(authored.source),
     model = { records: {}, stdout: {}, stderr: {}, receipts: {} };
   const verdicts = [],
     childIds = [];
   const add = (id, kind, name, table, rows) => {
     const control = name ? table[name] : null,
-      source = name ? digestOf(`synthetic ${id} ${authored}`) : authored;
+      source = name ? digestOf(`synthetic ${id} ${authoredSha256}`) : authoredSha256;
     const failed = Object.keys(rows).filter((key) => !rows[key]);
     const verdict = name
       ? {
@@ -461,7 +472,7 @@ function syntheticMutationControls({
       mutation: {
         table: name ? (kind === 'tap' ? 'WORD_CONTROLS' : 'LEARNING_RECORD_CONTROLS') : null,
         edits: name ? control.edits : null,
-        authoredSha256: authored,
+        authoredSha256,
         sourceSha256: source,
       },
       marker:
@@ -582,7 +593,7 @@ function materialize(model) {
     gateId: MUTATION,
     startedAt,
     args: [MUTATION_PRODUCER, '--controls'],
-    verifierSha256: model.report.pins.before['test-word-saved-answer.mjs'].sha256,
+    verifierSha256: digestOf(readFileSync(join(ROOT, MUTATION_PRODUCER))),
     sourceVerifiedBeforeAndAfter: true,
     readReport: (path) => JSON.parse(readFileSync(join(gate, path), 'utf8')),
   };
@@ -647,6 +658,25 @@ test('word-saved-answer mutation controls: survived, missing, tampered, unstable
   m = fresh();
   for (const side of ['before', 'after']) m.report.pins[side]['corridor.js'].sha256 = A;
   fail('stable pins of another corridor.js', m);
+  for (const key of Object.keys(fresh().report.pins.before)) {
+    m = fresh();
+    for (const side of ['before', 'after']) delete m.report.pins[side][key];
+    fail(`missing source pin ${key}`, m);
+    m = fresh();
+    for (const side of ['before', 'after']) m.report.pins[side][key].sha256 = A;
+    fail(`wrong source hash ${key}`, m);
+    m = fresh();
+    for (const side of ['before', 'after']) m.report.pins[side][key].path = 'another-source.mjs';
+    fail(`wrong source path ${key}`, m);
+  }
+  m = fresh();
+  for (const side of ['before', 'after'])
+    m.report.pins[side]['extra.mjs'] = { path: 'extra.mjs', sha256: A };
+  fail('extra source pin', m);
+  m = fresh();
+  for (const record of Object.values(m.records))
+    record.mutation.authoredSha256 = m.report.pins.before['corridor.js'].sha256;
+  fail('raw corridor hash substituted for aggregate declaration identity', m);
   const reduced = { ...WORD_CONTROLS };
   delete reduced.KX5;
   fail('reduced self-consistent roster', syntheticMutationControls({ word: reduced }));
