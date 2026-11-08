@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 import test from 'node:test';
 import ts from 'typescript';
+import { supplementalGates } from '../../../scripts/ci/supplemental.mjs';
 
 // Actual shipped renderer/handlers, deterministic DOM + async/storage seams.
 // This proves status/ownership only; it cannot prove native press geometry.
@@ -114,7 +115,7 @@ function harness({ personal = false, code = renderer, language = 'en', text = '�
       publisherLibrary: { get entry() { return clone(live); } }, sourceInbox: { get entry() { return clone(live); } },
       teacherContexts: { entries: [], activeRef: 'previous' }, stack: [] },
     AI_CHAT_PAGE: 'chat', tx: (ja, en) => language === 'ja' ? ja : en,
-    el: (tag, cls, text) => new Node(tag, cls, text), biLabel: (tag, cls, _ja, en) => new Node(tag, cls, en),
+    el: (tag, cls, text) => new Node(tag, cls, text), biLabel: (tag, cls, ja, en) => new Node(tag, cls, language === 'ja' ? ja : en),
     saveOne(options) { const button = new Node('button'); button.id = options.id; button.options = options; return button; },
     paintWordSave() {}, copyReaderText() {}, appendTranscriptTime() {}, appendFileSourceRange() {},
     sentencePracticeModule: {}, teacherContextModule: module,
@@ -521,9 +522,17 @@ test('unchanged deferred fold: real Open handler only after click; cancel/detach
 });
 
 test('new suite is registered exactly once without replacing a required suite', () => {
-  const supplemental = readFileSync(new URL('../../../scripts/ci/supplemental.mjs', import.meta.url), 'utf8');
-  assert.equal(supplemental.split("'prototypes/corridor/tools/publisher-context-open.test.mjs'").length - 1, 1);
-  assert(supplemental.includes("'prototypes/corridor/tools/reader-english-rung.test.mjs'"));
+  const gates = supplementalGates('/unit-fixture');
+  const contracts = gates.filter(gate => gate.name === 'ci-contracts');
+  assert.equal(contracts.length, 1);
+  assert.equal(contracts[0].command, process.execPath);
+  assert.equal(contracts[0].args[0], '--test');
+  const executable = gates.flatMap(gate => gate.args);
+  for (const suite of ['prototypes/corridor/tools/publisher-context-open.test.mjs',
+    'prototypes/corridor/tools/reader-english-rung.test.mjs']) {
+    assert.equal(contracts[0].args.filter(arg => arg === suite).length, 1, suite);
+    assert.equal(executable.filter(arg => arg === suite).length, 1, suite);
+  }
 });
 
 // MOVER: actual declarations and DOM descendants, not a guessed body.textContent getter.
@@ -536,7 +545,8 @@ async function moverKilled(label, run, pattern) {
 }
 const moverAst = ts.createSourceFile('corridor.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
 const moverNames = ['ladderVisit', 'ladderCleanupGeneration', 'inlineWordReading', 'inlineGlossLine', 'setGlossLine',
-  'inlineWordGloss', 'seatGlossRow', 'activateWordLadder', 'ladderGlossRung', 'clearWordLadder', 'foldWordLadder', 'syncChromeKeep', 'back', 'installProseWordRoving', 'proseWordRovers'];
+  'inlineWordGloss', 'seatGlossRow', 'activateWordLadder', 'ladderGlossRung', 'clearWordLadder', 'foldWordLadder', 'syncChromeKeep', 'back', 'installProseWordRoving', 'proseWordRovers',
+  'enterWord', 'recede', 'slipDive', 'ladderOpening', 'ladderReturning', 'ladderPages', 'miniDiving', 'heroSource', 'keptPages'];
 const moverModule = path => ts.createSourceFile(path, readFileSync(new URL('../' + path, import.meta.url), 'utf8'),
   ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
 const moverAsts = [moverAst, moverModule('modules/dictionary.mjs'), moverModule('modules/capture.mjs')];
@@ -572,7 +582,7 @@ function actualListener(needle) {
 const ghostListener = actualListener('Date.now() < swallowClickUntil');
 const escapeListener = actualListener("if (event.key !== 'Escape') return;");
 
-function moverHarness({ personal = false, gloss = true, code = fold } = {}) {
+function moverHarness({ personal = false, gloss = true, code = fold, program = moverProgram } = {}) {
   const h = harness({ personal }), { context: c, Node } = h;
   h.body.replaceChildren(new Node('#text', '', '町で'));
   const anchor = new Node('span', 'japanese-lookup-word'); anchor.append(new Node('#text', '', '雨'));
@@ -597,16 +607,20 @@ function moverHarness({ personal = false, gloss = true, code = fold } = {}) {
     removeMini: () => { mini = null; }, clearReaderReadings: () => assert.fail('Source is not #reader'),
     kataToHira: x => x, dressStage() {}, setTouchReadingShown(rt, shown) { rt.classList.toggle('hidden-rt', !shown); },
     queueMicrotask() {}, syncWalkSentinel() {}, refreshLadderRoom() {},
+    finishPageTransition() {}, renderLayer() {}, sampleTransition() {}, readerTicketCommitSheet() {},
+    returnScroll() {}, restoreDialogInvoker() {}, readerTicketReturned() {}, readerTicket: null,
+    layerPathFor: () => true, takePrebuiltPage: () => null, scaleNodeBelongs: () => false,
+    kanjiCourseReferenceHelp: () => null, sampleWhere: () => null,
     worldPickerEls: null, roomTransitionUpdating: true, returnFromNavigation: () => { c.returned = (c.returned || 0) + 1; return true; },
     japaneseLookupHelpId: () => 'lookup-help',
     setTimeout: fn => timers.push(fn), focusProseWord: node => { focus = node; },
     chromeKeep: () => { const button = new Node('button'); button.id = 'chrome-keep'; button.dataset.saveKey = 'new'; return button; },
     paintKeepAside() {}, fitChromeKeep: () => { fitted++; } });
   c.S.dials = { furigana: 1 }; c.S.navigationDepartures = 0; c.S.wordEntrySerial = 0;
-  runInNewContext(moverProgram + '\n' + ghostListener + '\n' + escapeListener + '\n' + code + `
+  runInNewContext(program + '\n' + ghostListener + '\n' + escapeListener + '\n' + code + `
     this.mover = { get visit() { return ladderVisit; }, get generation() { return ladderCleanupGeneration; },
       get pending() { return sourceLadderPress; }, activate: activateWordLadder, gloss: ladderGlossRung,
-      clear: clearWordLadder, fold: foldWordLadder, paint: setGlossLine,
+      clear: clearWordLadder, fold: foldWordLadder, paint: setGlossLine, enter: enterWord, recede, dive: slipDive,
       owner: sourceLadderOwner, current: sourceLadderOwnerCurrent, back, roving: installProseWordRoving };
   `, c, { timeout: 1000 });
   const m = c.mover;
@@ -809,11 +823,48 @@ test('mover exclusions and one-level Escape/Back remain the actual ladder gramma
   assert.equal(escape.m.visit, null); assert.equal(escape.focus, escape.anchor); assert(event.defaultPrevented);
 });
 
-test('mover copy and existing source guard are unchanged; private generation owns page/restore seams', () => {
-  assert(renderer.includes('body.textContent === source.text'));
-  assert(renderer.includes("'選んだ文章をひらく', 'open selected text'"));
-  assert(source.includes("ladderCleanupGeneration++;\n      ladderOpening.rung = 'page';"));
-  assert(source.includes('ladderCleanupGeneration++;\n      ladderVisit = origin;'));
+function pageRestore(program, label) {
+  const h = moverHarness({ program });
+  const visit = h.m.visit;
+  assert.equal(visit.rung, 'gloss');
+  assert.equal(h.m.activate(h.anchor, h.options), 'stage');
+  assert.equal(visit.rung, 'stage');
+  for (let round = 0; round < 2; round++) {
+    const opened = h.m.generation;
+    h.m.dive(() => h.m.enter({ t: 'word', id: 'rain' }, { instant: true }), 'pointer');
+    assert.equal(h.m.visit, null);
+    assert.equal(visit.rung, 'page');
+    assert.equal(h.c.S.stack.length, 1);
+    assert(h.m.generation > opened, `${label} enter generation`);
+    const returned = h.m.generation;
+    h.m.recede({ instant: true });
+    assert.equal(h.m.visit, visit);
+    assert.equal(visit.rung, 'stage');
+    assert.equal(h.c.S.stack.length, 0);
+    assert.equal(h.focus, h.anchor);
+    assert(h.m.generation > returned, `${label} restore generation`);
+  }
+}
+test('mover copy, source guard, and page/restore generation execute actual visible seams', async () => {
+  for (const [language, text] of [['en', 'open selected text'], ['ja', '選んだ文章をひらく']])
+    assert.equal(harness({ language }).find('context-open').textContent, text);
+  const contaminated = harness(); contaminated.select();
+  contaminated.body.append(new contaminated.Node('#text', '', '汚染'));
+  contaminated.open(); await drain();
+  assert.equal(contaminated.surface.state.lastOutcome.code, 'O7');
+  assert.equal(contaminated.surface.state.pending, null);
+  assert.equal(contaminated.counts().commits, 0);
+  assert.equal(contaminated.counts().writes, 0);
+  assert.equal(contaminated.counts().navigation, 0);
+  pageRestore(moverProgram, 'actual');
+  const page = moverProgram.replace("      ladderCleanupGeneration++;\n      ladderOpening.rung = 'page';",
+    "      void 0;\n      ladderOpening.rung = 'page';");
+  assert.notEqual(page, moverProgram);
+  await moverKilled('page-generation', () => pageRestore(page, 'page mutant'), /enter generation/);
+  const restore = moverProgram.replace('      ladderCleanupGeneration++;\n      ladderVisit = origin;',
+    '      void 0;\n      ladderVisit = origin;');
+  assert.notEqual(restore, moverProgram);
+  await moverKilled('restore-generation', () => pageRestore(restore, 'restore mutant'), /restore generation/);
 });
 
 test('mover genuine roving Enter/Space calls word.click without outside cleanup or trust gate', () => {
