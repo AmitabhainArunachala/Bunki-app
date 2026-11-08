@@ -17,7 +17,10 @@ Each has its own progress and its own colour theme.
 
 The player follows [card contract v2](../../docs/srs/CARD_CONTRACT_V2.md) and the
 amendments A26–A45 in [STANDARD.md](../../docs/srs/STANDARD.md). The standalone study pages
-bundle the same player, and the Anki templates match it where Anki can.
+bundle the same legacy player for ordinary offline use, and the Anki templates match it
+where Anki can. Opening a standalone page with `sharedStudy=preview` or a bound shared
+host displays an unavailable message without mounting study or writing learner state.
+Shared study uses the [supported Bunki routes](../../docs/srs/SHARED_STUDY_ENGINE.md) instead.
 
 - **Front:** the passage and nothing else to lean on: no readings, no English, no words to
   tap. Both decks open in 読んで思い出す: the word is marked and you recall its sense and
@@ -206,6 +209,12 @@ source, and `tools/rights.py` applies it to every card when the deck is built:
 
 `tools/build.py` has two profiles. Both give every card the same id, so progress carries
 over between them.
+
+The standalone HTML exporter also needs the root npm dependencies installed with `npm ci`.
+It bundles the shared-mode selectors with esbuild and checks the finished module with
+Acorn to reject remaining runtime imports. Regenerate the pages with the builder;
+never edit the generated HTML. The executable export and mount-parity regressions are
+`scripts/ci/kotoba-standalone.test.mjs` and `scripts/ci/kotoba-standalone-parity.test.mjs`.
 
 | Profile                 | What it is for                                                               | What it leaves out                                                                                                                                                                                                                                                                                                                         | Writes                                                                                                              |
 | ----------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |

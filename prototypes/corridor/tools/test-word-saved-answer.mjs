@@ -1,8 +1,8 @@
 /**
  * D23 · the saved word answer: extracted-function tests over the real committed data.
  *
- * The ACTUAL corridor.js definitions are lifted by name (the TS-AST seam of
- * verify-corridor-storage-integrity.mjs). They run over the served dict-v2/index.json, dict.json
+ * The actual authored definitions collected by readAuthoredCorridor are lifted by name through
+ * the TS-AST seam of verify-corridor-storage-integrity.mjs. They run over the served dict-v2/index.json, dict.json
  * and words.json. Fixture values follow the independent D23 acceptance ledger (F01–F07, H01–H10,
  * the F04 content addendum), copied here literally.
  *

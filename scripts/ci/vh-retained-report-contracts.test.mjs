@@ -438,10 +438,7 @@ function syntheticMutationControls({
       ...Object.fromEntries(
         authored.files.map((file) => [file.path, `prototypes/corridor/${file.path}`]),
       ),
-    }).map(([key, path]) => [
-      key,
-      { path, sha256: digestOf(readFileSync(join(ROOT, path))) },
-    ]),
+    }).map(([key, path]) => [key, { path, sha256: digestOf(readFileSync(join(ROOT, path))) }]),
   );
   const authoredSha256 = digestOf(authored.source),
     model = { records: {}, stdout: {}, stderr: {}, receipts: {} };
