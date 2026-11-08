@@ -1,6 +1,8 @@
 /** Full authored entries run with controlled module dependencies, never lifted listeners. */
 import assert from 'node:assert/strict';
-import {test} from 'node:test';
+const {test}=await import(
+  process.env.VITEST==='true'&&!process.env.NODE_TEST_CONTEXT?'vitest':'node:test'
+);
 import vm from 'node:vm';
 import {readFileSync,existsSync} from 'node:fs';
 import {createRequire} from 'node:module';

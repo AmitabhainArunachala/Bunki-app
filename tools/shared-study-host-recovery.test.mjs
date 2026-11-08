@@ -1,6 +1,8 @@
 /** Allocation-before-create and failclosed reopen are host identity obligations. */
 import assert from 'node:assert/strict';
-import {test} from 'node:test';
+const {test}=await import(
+  process.env.VITEST==='true'&&!process.env.NODE_TEST_CONTEXT?'vitest':'node:test'
+);
 import {readFileSync} from 'node:fs';
 import {createSharedStudyTestHost,QA_HOST_MARKER} from '../prototypes/corridor/shared-study-test-host.mjs';
 import {createBunkiStudyAdapter} from '../prototypes/corridor/study-engine-adapter.mjs';

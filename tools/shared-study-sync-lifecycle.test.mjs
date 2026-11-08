@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
-import {test} from 'node:test';
+const {test}=await import(
+  process.env.VITEST==='true'&&!process.env.NODE_TEST_CONTEXT?'vitest':'node:test'
+);
 import {readFileSync} from 'node:fs';
 import {setTimeout as delay} from 'node:timers/promises';
 import {createBunkiStudyAdapter} from '../prototypes/corridor/study-engine-adapter.mjs';

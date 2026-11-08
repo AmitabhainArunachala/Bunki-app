@@ -1,4 +1,6 @@
-import test from 'node:test';
+const {test}=await import(
+  process.env.VITEST==='true'&&!process.env.NODE_TEST_CONTEXT?'vitest':'node:test'
+);
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';

@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
-import {test} from 'node:test';
+const {test}=await import(
+  process.env.VITEST==='true'&&!process.env.NODE_TEST_CONTEXT?'vitest':'node:test'
+);
 import vm from 'node:vm';
 import {attachSharedStudyAudioPreparation,disposeSharedStudyAudioPreparation} from '../prototypes/corridor/shared-study-audio-preparation.mjs';
 

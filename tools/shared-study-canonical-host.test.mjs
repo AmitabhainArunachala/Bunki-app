@@ -1,7 +1,9 @@
 /** Direct canonical browser-style installation against the Bunki shell port.
  * Synthetic authority and memory CAS only; physical Mac evidence is separate. */
 import assert from 'node:assert/strict';
-import {test} from 'node:test';
+const {test}=await import(
+  process.env.VITEST==='true'&&!process.env.NODE_TEST_CONTEXT?'vitest':'node:test'
+);
 import {readFileSync} from 'node:fs';
 import {createBunkiStudyAdapter,createBunkiAttempt} from '../prototypes/corridor/study-engine-adapter.mjs';
 import {createSharedStudySync} from '../prototypes/corridor/shared-study-sync.mjs';
