@@ -604,5 +604,13 @@
     "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
     "startedAt": "2026-11-08T00:49:56Z",
     "reason": "Producer verification policy differs from trusted default branch"
+  },
+  "42431546894/2": {
+    "result": "retry",
+    "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
+    "startedAt": "2026-11-08T08:49:58Z",
+    "failures": 1,
+    "attemptedAt": "2026-11-08T08:58:17.241Z",
+    "reason": "Observation artifact not yet available: bunki-plan-42431546894-2"
   }
 }
