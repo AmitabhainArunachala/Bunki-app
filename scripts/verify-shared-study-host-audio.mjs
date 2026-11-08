@@ -124,7 +124,7 @@ try{
   window.AudioContext=SilentContext;window.webkitAudioContext=SilentContext;
   const set=Storage.prototype.setItem;
   Storage.prototype.setItem=function(key,value){if(key.startsWith('bunki-cloze:')||key==='kairo-corridor-v1')__bunkiAudioProbe.legacy.push({type:'localStorage',key});return set.call(this,key,value);};
-  for(const method of ['put','add','delete','clear']){const original=IDBObjectStore.prototype[method];IDBObjectStore.prototype[method]=function(...args){if(!this.transaction.db.name.startsWith('bunki-shared-study-qa-'))__bunkiAudioProbe.legacy.push({type:'indexedDB',database:this.transaction.db.name,method});return original.apply(this,args);};}
+  for(const method of ['put','add','delete','clear']){const original=IDBObjectStore.prototype[method];IDBObjectStore.prototype[method]=function(...args){if(!this.transaction.db.name.startsWith('bunki-shared-study-qa-')&&this.transaction.db.name!=='nsrs-private-audio-demand-v1')__bunkiAudioProbe.legacy.push({type:'indexedDB',database:this.transaction.db.name,method});return original.apply(this,args);};}
  });
  page=await context.newPage();page.on('pageerror',e=>receipt.errors.push(e.message));
  async function mount(){

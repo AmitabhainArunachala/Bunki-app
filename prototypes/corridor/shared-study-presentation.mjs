@@ -7,7 +7,7 @@ export function bindStudyPresentation(backend,catalog) {
   const resolve=entry=>{
     if(!entry)return entry;
     const presentation=entries.get(entry.taskKey);
-    if(!presentation)return entry; // Canonical learner-created cards carry their own content.
+    if(!presentation)return structuredClone(entry); // Canonical learner-created cards carry their own content.
     for(const field of['noteGuid','contractId','passageId','contentRevision'])if(presentation[field]!==entry[field])throw Error('presentation-identity-mismatch');
     return presentation;
   };
