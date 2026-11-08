@@ -32,7 +32,18 @@ export async function render(main,{deckId,english=true,onLeave,autoStart}={}) {
   const url=new URL('./shared-frame.html',import.meta.url);url.searchParams.set('deck',deckId);url.searchParams.set('ui',english?'en':'ja');if(autoStart)url.searchParams.set('start','1');
   // The child receives the already bound backend, never credentials or a new
   // independent learner identity. This port is same-origin and frame-specific.
-  frame.bunkiStudyPort=Object.freeze({adapter});frame.src=url.href;root.append(frame);
+  // The same-origin child has a distinct JS realm. Preserve the host resource
+  // authority, but clone data descriptors in the realm that validates them.
+  // Callbacks and AbortSignal retain their original identity across this port.
+  const capability=adapter.platform.audio;
+  const audio=capability?Object.freeze({protocol:capability.protocol,release:structuredClone(capability.release),
+    async read(ref,{signal}={}) {
+      if(signal?.aborted)throw new DOMException('Audio read aborted','AbortError');
+      const bytes=await capability.resources.read(structuredClone(ref),{signal});
+      if(signal?.aborted)throw new DOMException('Audio read aborted','AbortError');
+      return bytes;
+    },packState:packId=>capability.resources.packState(packId)}):null;
+  frame.bunkiStudyPort=Object.freeze({adapter,...(audio?{audio}:{})});frame.src=url.href;root.append(frame);
 }
 
 export async function summary(deckId) {
