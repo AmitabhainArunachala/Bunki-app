@@ -156,7 +156,7 @@ host work.
 ## Optional kanji exploration and canonical Record
 
 The committed distribution comes from canonical Nihongo commit
-`423b9e5d970be74db94f8c7f2be89a8e73c46fd6`. It adds optional answer-side kanji
+`d31317b809606e0889dba5f85b87c24bdf46fa30`. It adds optional answer-side kanji
 exploration and a read-only report inside the canonical Record. The simple
 prompt → Reveal → four grades loop remains unchanged; exploration is optional
 and does not grade a character or create another review task. Authored enrichment
@@ -177,6 +177,11 @@ All nine behavior-critical modules and the reducer remain byte-identical to the
 previous distribution. This refresh adds no scheduler, task identity, ledger or
 transport, and does not connect the canonical report to the outer Bunki Record
 or migrate existing learner history.
+
+The canonical phone Extra-practice Finish action wraps its full bilingual label
+within the study column while retaining a touch target of at least 44px. It does
+not shrink fonts, clip text or write study state. Host gutters and the existing
+practice-answer resume behavior are unchanged.
 
 ## Regeneration and checks
 

@@ -89,6 +89,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
    within the row instead of widening the page, while keeping all text and the
    existing 44px minimum touch height. */
 .record .sheet-actions>[data-export]{max-width:100%;min-width:0;white-space:normal;overflow-wrap:anywhere}
+/* The complete bilingual extra-practice Finish label may exceed a 304px
+   viewport; wrap it inside the study column instead of widening the page,
+   keeping all text and the existing 44px minimum touch height. */
+.study>[data-finish-practice]{max-width:100%;min-width:0;white-space:normal;overflow-wrap:anywhere}
 .sheet-note{margin-top:14px;font-size:13px;color:var(--secondary)}
 .sheet .empty{padding:6px 0 0;font-size:14px}
 .sheet .forecast li,[data-legacy-history] .forecast li{padding:12px 0;border-bottom:1px solid var(--line-soft)}

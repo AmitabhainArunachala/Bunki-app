@@ -168,10 +168,12 @@ try {
         waitUntil: 'domcontentloaded',
       });
       await narrowPage.locator('[data-shared-study-frame]').waitFor({ timeout: 60000 });
-      const narrowFrame = await (
+      let narrowFrame = await (
         await narrowPage.locator('[data-shared-study-frame]').elementHandle()
       ).contentFrame();
-      await narrowFrame.waitForFunction(() => !!window.bunkiSharedStudy, null, { timeout: 60000 });
+      await narrowFrame.waitForFunction(() => !!window.bunkiSharedStudy, null, {
+        timeout: 60000,
+      });
       await narrowPage.waitForFunction(
         () => window.__KAIRO_RECORD_SAFETY__?.state().writable,
         null,
@@ -200,6 +202,106 @@ try {
         );
       };
       await assertWidth();
+      // Use the shipped Words -> Extra practice -> Reveal flow in all labels.
+      for (const language of ['ja', 'en', 'both']) {
+        await narrowFrame.locator('select[data-interface-language]').first().selectOption(language);
+        const practiceState = () =>
+          narrowFrame.evaluate(async () => ({
+            projection: bunkiSharedStudy.backend.readProjection(),
+            stored: await bunkiSharedStudy.store.readState(),
+          }));
+        const beforePractice = await practiceState();
+        await narrowFrame.locator('[data-nav=words]').click();
+        await narrowFrame
+          .locator('.word-row')
+          .first()
+          .getByRole('button', { name: /追加練習|Extra practice/ })
+          .click();
+        // A new touch reveal respects the previous card's 400ms click-through guard.
+        await narrowPage.waitForTimeout(450);
+        await narrowFrame.locator('[data-card][data-reveal]').tap();
+        const finish = narrowFrame.locator('[data-finish-practice]');
+        await finish.waitFor({ state: 'visible' });
+        await narrowFrame.evaluate(() => document.fonts.ready);
+        const labels = {
+          ja: '追加練習を終える',
+          en: 'Finish extra practice',
+          both: '追加練習を終える / Finish extra practice',
+        };
+        assert.equal((await finish.textContent()).replace(/\s+/g, ' ').trim(), labels[language]);
+        assert.equal(await narrowFrame.locator('[data-grade]').count(), 0);
+        await finish.scrollIntoViewIfNeeded();
+        const box = await finish.evaluate((node) => {
+          const r = node.getBoundingClientRect(),
+            style = window.getComputedStyle(node);
+          const range = document.createRange();
+          range.selectNodeContents(node);
+          return {
+            left: r.left,
+            right: r.right,
+            top: r.top,
+            bottom: r.bottom,
+            width: r.width,
+            height: r.height,
+            clientWidth: node.clientWidth,
+            scrollWidth: node.scrollWidth,
+            clientHeight: node.clientHeight,
+            scrollHeight: node.scrollHeight,
+            frameWidth: document.documentElement.clientWidth,
+            fontSize: parseFloat(style.fontSize),
+            textRects: Array.from(range.getClientRects(), (text) => ({
+              left: text.left,
+              right: text.right,
+              top: text.top,
+              bottom: text.bottom,
+            })),
+          };
+        });
+        assert(
+          box.width >= 44 && box.height >= 44 && box.fontSize >= 14,
+          'Practice exit keeps its readable 44px touch target',
+        );
+        assert(box.left >= 0 && box.right <= box.frameWidth + 1);
+        assert(
+          box.scrollWidth <= box.clientWidth + 1 && box.scrollHeight <= box.clientHeight + 1,
+          'Complete practice exit label fits internally',
+        );
+        assert(
+          box.textRects.every(
+            (text) =>
+              text.left >= box.left - 1 &&
+              text.right <= box.right + 1 &&
+              text.top >= box.top - 1 &&
+              text.bottom <= box.bottom + 1,
+          ),
+          'All practice exit text stays inside its action',
+        );
+        await assertWidth();
+        await finish.tap();
+        await narrowFrame.locator('[data-start]').waitFor();
+        assert.equal(await narrowFrame.evaluate(() => bunkiSharedStudy.app.read().current), null);
+        assert.deepEqual(
+          await practiceState(),
+          beforePractice,
+          'Extra practice and Finish preserve durable observations, grades, permits and scheduling',
+        );
+        (receipt.narrowPractice ||= []).push({
+          outerWidth: width,
+          language,
+          ...box,
+        });
+      }
+      // Finish returns to Today and retains its resumable practice card in memory.
+      // Reload to start the independent fresh normal-review phase, preserving durable state.
+      await narrowPage.reload({ waitUntil: 'domcontentloaded' });
+      await narrowPage.locator('[data-shared-study-frame]').waitFor({ timeout: 60000 });
+      narrowFrame = await (
+        await narrowPage.locator('[data-shared-study-frame]').elementHandle()
+      ).contentFrame();
+      await narrowFrame.waitForFunction(() => !!window.bunkiSharedStudy, null, {
+        timeout: 60000,
+      });
+      await narrowFrame.locator('select[data-interface-language]').first().selectOption('en');
       await narrowFrame.locator('[data-start]').tap();
       await narrowFrame.locator('[data-reveal]').tap();
       await narrowFrame.locator('[data-study=back]').waitFor();
@@ -209,7 +311,9 @@ try {
         await narrowPage.evaluate(() => window.__KAIRO_RECORD_SAFETY__.state().notSaving),
         false,
       );
-      await narrowPage.goto(`${host.origin}/?deck=n2&ui=en`, { waitUntil: 'domcontentloaded' });
+      await narrowPage.goto(`${host.origin}/?deck=n2&ui=en`, {
+        waitUntil: 'domcontentloaded',
+      });
       await narrowPage.locator('#kp-start').waitFor({ timeout: 60000 });
       assert.equal(await narrowPage.locator('[data-shared-study-frame]').count(), 0);
       assert.equal(
@@ -231,6 +335,7 @@ try {
     }
     receipt.checks.push(
       'shared-320px-and-375px-layout-keeps-full-canonical-width-and-four-touch-grades',
+      'shared-phone-extra-practice-ja-en-both-full-label-touch-exit-and-readonly-state',
       'normal-and-shared-routes-have-writable-record-without-protection-banner',
     );
   } finally {
@@ -266,7 +371,9 @@ try {
       1,
   );
   const normalLedger = await normal.evaluate(() => localStorage.getItem('bunki-cloze:n2'));
-  await normal.goto(`${host.origin}/?deck=n2&ui=en`, { waitUntil: 'domcontentloaded' });
+  await normal.goto(`${host.origin}/?deck=n2&ui=en`, {
+    waitUntil: 'domcontentloaded',
+  });
   await normal.locator('#kp-start').waitFor({ timeout: 60000 });
   assert.equal(await normal.evaluate(() => localStorage.getItem('bunki-cloze:n2')), normalLedger);
   const legacyCounts = await normal.evaluate(async () => {
@@ -282,7 +389,9 @@ try {
   );
   assert.equal(legacyCounts.misses[0].deck, 'n2');
   assert(legacyCounts.misses[0].term);
-  await normal.goto(`${host.origin}/?dojo=1&ui=en`, { waitUntil: 'domcontentloaded' });
+  await normal.goto(`${host.origin}/?dojo=1&ui=en`, {
+    waitUntil: 'domcontentloaded',
+  });
   await normal.locator('[data-deck="n2"] .dojo-deck-bar').waitFor({ timeout: 60000 });
   const row = normal.locator('[data-deck="n2"]');
   assert.equal(
@@ -306,7 +415,9 @@ try {
     false,
   );
   await normal.setViewportSize({ width: 393, height: 852 });
-  await normal.goto(`${host.origin}/?deck=n2&ui=en`, { waitUntil: 'domcontentloaded' });
+  await normal.goto(`${host.origin}/?deck=n2&ui=en`, {
+    waitUntil: 'domcontentloaded',
+  });
   await normal.locator('#kp-start').waitFor({ timeout: 60000 });
   assert.equal(await normal.locator('[data-shared-study-frame]').count(), 0);
   assert.equal(await normal.evaluate(() => localStorage.getItem('bunki-cloze:n2')), normalLedger);
@@ -390,7 +501,10 @@ try {
         await frame.locator('body').innerText(),
       );
     } catch (error) {
-      receipt.frameFailure = { url: frame.url(), text: await frame.locator('body').innerText() };
+      receipt.frameFailure = {
+        url: frame.url(),
+        text: await frame.locator('body').innerText(),
+      };
       throw error;
     }
     return frame;
@@ -564,7 +678,15 @@ try {
             },
           };
           await store.reconcile({
-            events: [{ seq: 1, rt: ts, authority: 'server', event, bodyHash: payloadHash(event) }],
+            events: [
+              {
+                seq: 1,
+                rt: ts,
+                authority: 'server',
+                event,
+                bodyHash: payloadHash(event),
+              },
+            ],
             head: 1,
           });
           return { kind: 'reserved' };
@@ -572,12 +694,16 @@ try {
       },
     };
   });
-  await boundPage.goto(`${host.origin}/?deck=senmon&ui=en`, { waitUntil: 'domcontentloaded' });
+  await boundPage.goto(`${host.origin}/?deck=senmon&ui=en`, {
+    waitUntil: 'domcontentloaded',
+  });
   await boundPage.locator('[data-shared-study-frame]').waitFor({ timeout: 60000 });
   const boundFrame = await (
     await boundPage.locator('[data-shared-study-frame]').elementHandle()
   ).contentFrame();
-  await boundFrame.waitForFunction(() => !!window.bunkiSharedStudy, null, { timeout: 60000 });
+  await boundFrame.waitForFunction(() => !!window.bunkiSharedStudy, null, {
+    timeout: 60000,
+  });
   assert.equal(await boundFrame.evaluate(() => bunkiSharedStudy.app.read().module), 'senmon');
   assert.equal(
     await boundFrame.evaluate(() => frameElement.bunkiStudyPort.adapter.platform.presentation),
@@ -671,10 +797,14 @@ try {
   const other = await fetch(`${host.origin}/index.html`);
   assert.equal(other.headers.get('content-security-policy'), "frame-ancestors 'none'");
   receipt.checks.push('only-shared-frame-allows-same-origin-embedding');
-  const offlineContext = await browser.newContext({ viewport: { width: 393, height: 852 } });
+  const offlineContext = await browser.newContext({
+    viewport: { width: 393, height: 852 },
+  });
   await silenceBrowserAudio(offlineContext);
   const offlinePage = await offlineContext.newPage();
-  await offlinePage.goto(`${host.origin}/?deck=n2`, { waitUntil: 'domcontentloaded' });
+  await offlinePage.goto(`${host.origin}/?deck=n2`, {
+    waitUntil: 'domcontentloaded',
+  });
   // The product auto-registers only on HTTPS; this isolated loopback fixture
   // explicitly exercises the exact stamped service worker from the built site.
   await offlinePage.evaluate(() => navigator.serviceWorker.register('/sw.js'));
@@ -705,7 +835,9 @@ try {
     await offlinePage.locator('[data-shared-study-frame]').elementHandle()
   ).contentFrame();
   await onlineFrame.waitForURL(/shared-frame\.html/);
-  await onlineFrame.waitForFunction(() => !!window.bunkiSharedStudy, null, { timeout: 60000 });
+  await onlineFrame.waitForFunction(() => !!window.bunkiSharedStudy, null, {
+    timeout: 60000,
+  });
   assert.deepEqual(
     await onlineFrame.evaluate(() => {
       const p = frameElement.bunkiStudyPort.adapter.platform;

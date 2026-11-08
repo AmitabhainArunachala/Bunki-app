@@ -18,7 +18,7 @@
   },
   "source": {
     "repository": "nihongo-srs",
-    "commit": "423b9e5d970be74db94f8c7f2be89a8e73c46fd6",
+    "commit": "d31317b809606e0889dba5f85b87c24bdf46fa30",
     "mode": "committed",
     "changedFiles": []
   },
@@ -43,8 +43,8 @@
   "files": [
     {
       "path": "client/app/app.css",
-      "bytes": 57802,
-      "sha256": "d0f153ea313a1258dcd5ed72b46e1b093515713c8a5881c7e920058cb4df6b86"
+      "bytes": 58117,
+      "sha256": "af7aa8515e26b1562fbb0b12b5df9024c693dc74e47645a03a96a32cd97de1f1"
     },
     {
       "path": "client/app/app.mjs",
@@ -1592,5 +1592,5 @@
       "sha256": "adab18734248871867be9cf62fa25b58cce3f3f37a34a81e714b0b1b26e10dba"
     }
   ],
-  "closureSha256": "7afc56713838f7d5bea74f5e9d9b49dc0c8dbda9d8118460744e23a7ede98099"
+  "closureSha256": "f7600a7fb831b7d7f9ac065d98f2aee7fe1bda93c1662b32557d3cc943ce8492"
 }
