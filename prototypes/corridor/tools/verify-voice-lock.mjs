@@ -33,6 +33,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
+import {fixtureSource,fixtureDefinitions} from './corridor-fixture-source.mjs';
 import { readVoiceLock, runtimeLock, voiceForRole } from './voice-lock.mjs';
 import { currentBlock, lockBlock } from './sync-voice-lock.mjs';
 import { buildListeningCues, listeningSentences } from './build-listening-cues.mjs';
@@ -62,7 +63,8 @@ export function runtimeCueRule(source = read('corridor.js')) {
     if (from < 0 || to < 0) throw new Error(`corridor.js boundary moved: ${start}`);
     return source.slice(from, to);
   };
-  return vm.runInNewContext(`${slice('/* === VOICE_LOCK', 'const LISTEN_RATES =')}
+  const role=fixtureDefinitions(fixtureSource(corridor,{rootSource:source}),['voiceForRole']);
+  return vm.runInNewContext(`${role}\n${slice('/* === VOICE_LOCK', 'const LISTEN_RATES =')}
 ${slice('const approvedSentenceCue', 'function currentSentenceListeningCue(')}
 approvedSentenceCue;`, {});
 }

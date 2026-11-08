@@ -4,11 +4,14 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import vm from 'node:vm';
+import {fileURLToPath} from 'node:url';
+import {createDeviceVoice} from '../device-voice.mjs';
+import {fixtureSource} from './corridor-fixture-source.mjs';
 import * as exitCore from '../srs-core.mjs';
 import * as exitFsrs from '../vendor/ts-fsrs.mjs';
 import { reviewExitFixture, readerTicketFixture, liftCorridor, READER_TICKET_NAMES } from './srs-hooks-corridor-layer.mjs';
 
-const source = readFileSync(new URL('../corridor.js', import.meta.url), 'utf8');
+const source = fixtureSource(fileURLToPath(new URL('../',import.meta.url)));
 const exitPin = JSON.parse(readFileSync(new URL('../data/fsrs-pin.json', import.meta.url), 'utf8'));
 function actualFunction(name) {
   const match = source.match(new RegExp(`^(?:async )?function ${name}\\([^]*?^\\}`, 'm'));
@@ -25,7 +28,7 @@ function app() {
     window: { scrollY: 180, scrollTo(_x, y) { this.scrollY = y; } },
     document: { activeElement: null, getElementById: () => null }, referenceLibrary: null,
     learningSourceVisit: null, pendingReferenceCollection: null, retainedRetryView: null,
-    activeTokenAlternatives: null, readerPosTimer: null, sheetActionVisit: null, sealStrip: null, sealSerial: 0, sealPending: null, readerLayers: null, personalHost: null,
+    activeTokenAlternatives: null, readerPosTimer: null, sheetActionVisit: null, sealStrip: null, sealSerial: 0, sealPending: null, readerLayers: null, personalHost: null, kanjiWorldVisit: null,
     roomTransitionUpdating: false, activeRoomTransition: null, pageEpoch: 0, recordEpoch: 4,
     recordApp: null, recordInstallation: null, readerTicket: null,
     reviewExitUi() {}, // This fixture stops before DOM drawing; exit suite below uses real helpers.
@@ -40,6 +43,9 @@ function app() {
   });
   context.scaleSource = visit => visit?.recordEpoch === context.recordEpoch ? { token: {} } : null;
   vm.runInContext(liftCorridor(source, READER_TICKET_NAMES), context);
+  context.deviceVoice=createDeviceVoice({});
+  context.readAloud={on:false};context.stopRecAudio=()=>{};
+  vm.runInContext(['cardAudioSerial','reviewVoiceFace'].map(name=>source.match(new RegExp(`^(?:let|const) ${name}[^]*?;`, 'm'))[0]).join('\n')+'\n'+['retireCardSpeech','retireCardAudioOnFaceChange'].map(actualFunction).join('\n'),context);
   vm.runInContext(actualFunction('syncSheetActionVisit'), context);
   // G5 (2026-10-18): a render puts away the hold's strip and the 層 layers, where it once closed the word menu
   vm.runInContext(['closeSealStrip', 'foldReaderLayers'].map(actualFunction).join('\n'), context);
@@ -260,7 +266,7 @@ function readerBack({ joined = false } = {}) {
   c = vm.createContext({
     S: { view: 'reader', passageId: p.id, stack: [word], scaleVisit: null, wordEntrySerial: 0,
       taken: [], srs: {}, revlog: [] }, D: { passages: [p] }, recordEpoch: 4, pageEpoch: 7,
-    learningSourceVisit: { view: 'review' }, personalHost: null, referenceLibrary: null, worldPickerEls: null,
+    learningSourceVisit: { view: 'review' }, personalHost: null, kanjiWorldVisit: null, referenceLibrary: null, worldPickerEls: null,
     innerWidth: 390, innerHeight: 844,
     window: { scrollY: 0 },
     document: {
