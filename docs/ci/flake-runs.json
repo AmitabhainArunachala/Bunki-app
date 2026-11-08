@@ -533,7 +533,7 @@
   },
   "42407808769/1": {
     "result": "rejected",
-    "policy": "377430e200daf7ac88ef87bf35e8ec1fa150e042aa6170ef278e82ecf42ce03f",
+    "policy": "002dc875d95d7d62d63eaed04ff00e3c74fed894c7b0b9d4615572cf2957a401",
     "startedAt": "2026-11-07T19:46:14Z",
     "reason": "Producer verification policy differs from trusted default branch"
   },
@@ -543,8 +543,8 @@
   },
   "42407075841/1": {
     "result": "rejected",
-    "policy": "377430e200daf7ac88ef87bf35e8ec1fa150e042aa6170ef278e82ecf42ce03f",
-    "startedAt": "2026-11-08T08:55:07Z",
+    "policy": "002dc875d95d7d62d63eaed04ff00e3c74fed894c7b0b9d4615572cf2957a401",
+    "startedAt": "2026-11-08T16:58:02Z",
     "reason": "Producer verification policy differs from trusted default branch"
   },
   "42407075841/2": {
@@ -561,8 +561,8 @@
   },
   "42400327580/1": {
     "result": "rejected",
-    "policy": "377430e200daf7ac88ef87bf35e8ec1fa150e042aa6170ef278e82ecf42ce03f",
-    "startedAt": "2026-11-08T08:55:12Z",
+    "policy": "002dc875d95d7d62d63eaed04ff00e3c74fed894c7b0b9d4615572cf2957a401",
+    "startedAt": "2026-11-08T16:58:09Z",
     "reason": "Producer verification policy differs from trusted default branch"
   },
   "42418249759/1": {
@@ -571,16 +571,16 @@
   },
   "42431546894/1": {
     "result": "rejected",
-    "policy": "377430e200daf7ac88ef87bf35e8ec1fa150e042aa6170ef278e82ecf42ce03f",
-    "startedAt": "2026-11-08T08:49:58Z",
+    "policy": "002dc875d95d7d62d63eaed04ff00e3c74fed894c7b0b9d4615572cf2957a401",
+    "startedAt": "2026-11-08T16:57:48Z",
     "reason": "Producer verification policy differs from trusted default branch"
   },
   "42431546894/2": {
     "result": "retry",
-    "policy": "377430e200daf7ac88ef87bf35e8ec1fa150e042aa6170ef278e82ecf42ce03f",
-    "startedAt": "2026-11-08T08:49:58Z",
-    "failures": 4,
-    "attemptedAt": "2026-11-08T16:43:39.988Z",
+    "policy": "002dc875d95d7d62d63eaed04ff00e3c74fed894c7b0b9d4615572cf2957a401",
+    "startedAt": "2026-11-08T16:57:48Z",
+    "failures": 5,
+    "attemptedAt": "2026-11-08T18:06:23.548Z",
     "reason": "Observation artifact not yet available: bunki-plan-42431546894-2"
   },
   "42407075841/3": {
@@ -637,7 +637,7 @@
   },
   "42489884950/1": {
     "result": "rejected",
-    "policy": "377430e200daf7ac88ef87bf35e8ec1fa150e042aa6170ef278e82ecf42ce03f",
+    "policy": "002dc875d95d7d62d63eaed04ff00e3c74fed894c7b0b9d4615572cf2957a401",
     "startedAt": "2026-11-08T14:27:19Z",
     "reason": "Producer verification policy differs from trusted default branch"
   },
@@ -672,5 +672,9 @@
   "42502862651/2": {
     "result": "observed",
     "startedAt": "2026-11-08T17:24:16Z"
+  },
+  "42507705587/1": {
+    "result": "observed",
+    "startedAt": "2026-11-08T17:59:49Z"
   }
 }
