@@ -6,12 +6,12 @@ import { expect, test } from 'vitest';
 
 // Execute the actual Node contract suites through npm test's existing browser-capable
 // Vitest shard. TAP is the child test runner's explicit result protocol.
-function requireContracts(file, cases) {
+function requireContracts(file, cases, timeout = 90000) {
   const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
   const result = spawnSync(process.execPath, ['--test', '--test-reporter=tap', file], {
     cwd: root,
     encoding: 'utf8',
-    timeout: 90000,
+    timeout,
     maxBuffer: 4 * 1024 * 1024,
   });
   expect(result.error).toBeUndefined();
@@ -29,3 +29,6 @@ test('offline boot dependency contracts execute every case without skips', () =>
 test('source kanji transition contracts execute every case without skips', () => {
   requireContracts('prototypes/corridor/tools/source-kanji-baseline.test.mjs', 4);
 }, 120000);
+test('pending save held-request contract executes without skips', () => {
+  requireContracts('prototypes/corridor/tools/pending-save-held-request.test.mjs', 1, 240000);
+}, 270000);

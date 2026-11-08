@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import {
   cpSync,
@@ -221,15 +221,19 @@ test('all four real offline pages reveal, grade, undo, reload and refuse shared 
         if (await page.locator('#kp-reveal').count()) await page.locator('#kp-reveal').click();
         await page.locator(`#kp-grade-${grade}`).click();
         await page.waitForFunction(
-          (key) => JSON.parse(localStorage.getItem(key) || '{"log":[]}').log.length === 1,
+          (key) =>
+            JSON.parse(globalThis.localStorage.getItem(key) || '{"log":[]}').log.length === 1,
           key,
         );
-        const saved = await page.evaluate((key) => JSON.parse(localStorage.getItem(key)), key);
+        const saved = await page.evaluate(
+          (key) => JSON.parse(globalThis.localStorage.getItem(key)),
+          key,
+        );
         assert.equal(saved.log[0][0], card);
         assert.equal(saved.log[0][1], rating);
         await page.locator('#kp-undo').click();
         await page.waitForFunction(
-          (key) => JSON.parse(localStorage.getItem(key)).log.length === 0,
+          (key) => JSON.parse(globalThis.localStorage.getItem(key)).log.length === 0,
           key,
         );
         assert.equal(await page.locator('[data-card]').first().getAttribute('data-card'), card);
@@ -237,15 +241,18 @@ test('all four real offline pages reveal, grade, undo, reload and refuse shared 
       if (await page.locator('#kp-reveal').count()) await page.locator('#kp-reveal').click();
       await page.locator('#kp-grade-good').click();
       await page.waitForFunction(
-        (key) => JSON.parse(localStorage.getItem(key)).log.length === 1,
+        (key) => JSON.parse(globalThis.localStorage.getItem(key)).log.length === 1,
         key,
       );
-      const persisted = await page.evaluate((key) => localStorage.getItem(key), key);
+      const persisted = await page.evaluate((key) => globalThis.localStorage.getItem(key), key);
       await page.reload();
       await page.locator('#kp-start').waitFor();
-      assert.equal(await page.evaluate((key) => localStorage.getItem(key), key), persisted);
+      assert.equal(
+        await page.evaluate((key) => globalThis.localStorage.getItem(key), key),
+        persisted,
+      );
       assert(
-        (await page.evaluate(() => Object.keys(localStorage))).every(
+        (await page.evaluate(() => Object.keys(globalThis.localStorage))).every(
           (key) => key.startsWith('bunki-cloze:') || key === 'bunki-srs:answered-today',
         ),
       );
@@ -264,11 +271,11 @@ test('all four real offline pages reveal, grade, undo, reload and refuse shared 
         await tab.goto(url + (mode === 'query' ? '?sharedStudy=preview' : ''));
         await tab.waitForFunction(
           () =>
-            document.body.innerText.includes('standalone') ||
-            document.body.innerText.includes('Standalone'),
+            globalThis.document.body.innerText.includes('standalone') ||
+            globalThis.document.body.innerText.includes('Standalone'),
         );
         assert.equal(await tab.locator('#kp-start,#kp-reveal,[id^="kp-grade-"]').count(), 0);
-        assert.equal(await tab.evaluate(() => localStorage.length), 0);
+        assert.equal(await tab.evaluate(() => globalThis.localStorage.length), 0);
         assert.deepEqual(failures, []);
         await blocked.close();
       }
