@@ -128,8 +128,9 @@ Older already-open application versions are not fenced by these new source
 files. Real rollout therefore still requires an explicit migration/cutover and
 old-client fencing plan.
 
-This integration is development candidate `1.2.2-rc.1`, not a deployment or a
-physical-device pass. It is prepared locally for a draft stacked PR only.
+The [release manifest](../../release.json) owns the candidate version and links
+its delivery notes. A local preview does not establish deployment or a
+physical-device pass.
 
 ## Content and provenance
 
@@ -155,17 +156,23 @@ host work.
 
 ## Optional kanji exploration and canonical Record
 
-The committed distribution comes from canonical Nihongo commit
-`d31317b809606e0889dba5f85b87c24bdf46fa30`. It adds optional answer-side kanji
-exploration and a read-only report inside the canonical Record. The simple
-prompt → Reveal → four grades loop remains unchanged; exploration is optional
-and does not grade a character or create another review task. Authored enrichment
-covers two selected sound families and seven contrasts, not comprehensive kanji
-coverage. Related vocabulary uses the loaded catalog, and newer passage-reading
-rules are preserved.
+The committed distribution is identified by the
+[independent consumer pin](../../scripts/shared-study-pin.json). After Reveal,
+open **Kanji and related words** (漢字と、つながる言葉) and select a character to
+inspect its available facts, attributed sound family, visual comparisons and
+clearly labeled invented memory cues. The panel follows the canonical UI's
+Japanese, English or bilingual language selection. Authored enrichment is limited
+to the [selected families and contrasts](../../prototypes/corridor/vendor/shared-study-engine/client/kanji/families.mjs),
+not comprehensive kanji coverage; unavailable character facts remain explicit.
+Complete readings, definitions, sentences, collocations, furigana and dictionary
+actions remain available. Exploration is optional and does not grade a character
+or create another review task: prompt → Reveal → Again / Hard / Good / Easy
+remains the study loop.
 
-The canonical Record report reads the existing canonical projection. Exposure
-and vocabulary self-ratings are not separate proof of kanji or handwriting
+In the canonical **Record**, expand **What your record shows**
+(学習記録から分かること) for the optional read-only report. It reads the existing
+canonical projection. Exposure and vocabulary self-ratings are not separate proof
+of kanji or handwriting
 mastery. Delayed first outcomes, missing checks and coverage remain distinct;
 later success does not replace a first outcome, and a missing check is neither
 a demonstrated failure nor success. The 20 → 30 → 40 ladder is a proposed
@@ -180,8 +187,11 @@ or migrate existing learner history.
 
 The canonical phone Extra-practice Finish action wraps its full bilingual label
 within the study column while retaining a touch target of at least 44px. It does
-not shrink fonts, clip text or write study state. Host gutters and the existing
-practice-answer resume behavior are unchanged.
+not shrink fonts, clip text or write study state. The existing practice-answer
+resume behavior is unchanged. At outer widths up to 360px, the ordinary main
+element directly hosting shared study uses 8px horizontal gutters, giving the
+frame 304px at a 320px viewport and preserving the canonical 300px minimum.
+Ordinary legacy routes retain their 18px gutters.
 
 ## Regeneration and checks
 
@@ -223,9 +233,14 @@ the same browser guard once in the existing CI Vitest lane, which supplies the
 immutable artifact and installed browser. Missing CI inputs fail.
 The gate mapper supplies the per-gate evidence directory; `gateForShard` adds
 the artifact path and hashes without replacing it. The Vitest shard requests
-Chromium in the first-attempt and retry matrices. A Node CI regression executes
-that composed npm child and checks the actual browser preflight, including
-missing-input and tampered-artifact failures, without launching a browser.
+Chromium in the first-attempt and retry matrices. The Node CI regression in
+[`scripts/ci/battery.test.mjs`](../../scripts/ci/battery.test.mjs) executes that
+composed npm child and checks the actual browser preflight, including missing-input
+and tampered-artifact failures, without launching a browser. The package-script
+regression in [`tools/shared-study.test.mjs`](../../tools/shared-study.test.mjs)
+also executes npm with command spies to require invocation order and failure
+propagation for both package scripts; echo-only and comment-only browser
+invocations must fail those checks.
 Local `npm test` explicitly skips the browser guard only when no site is supplied.
 The existing site resolver verifies all stamped bytes before browser launch;
 `KAIRO_ARTIFACT_SHA256` can pin a previously built artifact while source is edited.

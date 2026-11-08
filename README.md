@@ -53,6 +53,10 @@ Its browser verifiers live in `prototypes/corridor/tools/`; the required checks
 are registered in [the release gate runner](scripts/verify-release-gates.mjs).
 Build artifacts and executed evidence belong outside the checkout.
 
+For the optional shared-study kanji exploration and canonical Record report,
+use the [isolated preview guide](docs/srs/SHARED_STUDY_ENGINE.md#isolated-local-preview).
+It owns the entry points and their separation from ordinary learner history.
+
 ### Private paragraph collections
 
 Open **集中道場 → 私の文脈**, or use `?deck=personal`, to import a private

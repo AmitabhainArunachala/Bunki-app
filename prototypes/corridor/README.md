@@ -1,11 +1,9 @@
 # 回廊 KAIRO — the corridor prototype
 
-**An instrument for making decisions, not a product.** One continuous corridor
-you walk on a phone (390×844), built so the open Wayfinder tickets can be
-settled by looking rather than by argument. Deliberately disposable: nothing in
-`apps/app` or `packages/*` was refactored to accommodate it.
-
-Live at `/corridor/` on the Pages site.
+These notes retain the corridor's early prototype experiments. For the current
+phone product, deployed address and common usage, see the
+[product README](../../README.md). The historical variants below do not define
+the current release contract.
 
 ## The walk
 
