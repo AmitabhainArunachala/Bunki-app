@@ -676,5 +676,11 @@
   "42507705587/1": {
     "result": "observed",
     "startedAt": "2026-11-08T17:59:49Z"
+  },
+  "42505535024/1": {
+    "result": "rejected",
+    "policy": "002dc875d95d7d62d63eaed04ff00e3c74fed894c7b0b9d4615572cf2957a401",
+    "startedAt": "2026-11-08T17:33:14Z",
+    "reason": "Producer verification policy differs from trusted default branch"
   }
 }
