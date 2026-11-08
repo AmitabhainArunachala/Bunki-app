@@ -7,10 +7,17 @@ import test from 'node:test';
 // These tests prove ownership and cleanup, not native CSS interpolation or layout.
 // G61 and touch-ruby browser witnesses remain required for those properties.
 const source = readFileSync(new URL('../corridor.js', import.meta.url), 'utf8');
-const start = source.indexOf('const TOUCH_READING_GAP = 2;');
-const end = source.indexOf('function clearWordLadder(', start);
-assert(start >= 0 && end > start, 'executable lifecycle boundary exists');
-const executable = source.slice(start, end);
+const moduleSource = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
+function slice(text, start, end, label) {
+  const a = text.indexOf(start), b = text.indexOf(end, a);
+  assert(a >= 0 && b > a && text.indexOf(start, a + 1) < 0 && text.indexOf(end, b + 1) < 0, `unique ${label} boundary`);
+  return text.slice(a, b);
+}
+const executable = [
+  slice(source, 'const TOUCH_READING_GAP = 2;', 'function clearWordLadder(', 'corridor touch state'),
+  slice(moduleSource('modules/capture.mjs'), 'function touchReading(', 'function sourceLadderAction(', 'capture lifecycle'),
+  slice(moduleSource('modules/dictionary.mjs'), 'function readingLine(', 'function japaneseLookupRecord(', 'readingLine'),
+].join('\n');
 
 function harness() {
   let now = 1000, nextTimer = 1, observe;

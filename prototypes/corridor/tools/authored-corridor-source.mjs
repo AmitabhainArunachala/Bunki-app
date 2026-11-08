@@ -39,6 +39,7 @@ const sources = (statement) => {
   if (statement.type === 'ExportNamedDeclaration' && statement.source) return [statement.source.value];
   return [];
 };
+const moduleName = (node) => (node?.type === 'Literal' ? node.value : node?.name);
 
 export function readAuthoredCorridor(directory) {
   const root = resolve(directory);
@@ -68,8 +69,17 @@ export function readAuthoredCorridor(directory) {
   const sourceOf = (text, ast, path) => {
     const pieces = [];
     for (const statement of ast.body) {
-      if (statement.type === 'ImportDeclaration' || statement.type === 'ExportAllDeclaration') continue;
+      if (statement.type === 'ImportDeclaration') continue;
+      if (statement.type === 'ExportAllDeclaration') {
+        if (statement.exported)
+          throw new Error(`Unsupported export alias ${moduleName(statement.exported)} in authored corridor source ${label(path)}: only same-name named exports are lifted`);
+        continue;
+      }
       if (statement.type === 'ExportNamedDeclaration') {
+        for (const specifier of statement.specifiers) {
+          if (specifier.type !== 'ExportSpecifier' || moduleName(specifier.local) !== moduleName(specifier.exported))
+            throw new Error(`Unsupported export alias ${moduleName(specifier.exported)} in authored corridor source ${label(path)}: only same-name named exports are lifted`);
+        }
         if (statement.declaration) pieces.push(text.slice(statement.declaration.start, statement.declaration.end));
         continue;
       }

@@ -1,4 +1,5 @@
 import { REVIEW_EXIT_NAMES, readerTicketFixture, liftCorridor } from './srs-hooks-corridor-layer.mjs';
+import { readAuthoredCorridor } from './authored-corridor-source.mjs';
 /** Controlled acknowledgment tests of the actual authored learning handlers.
  * Frozen synthetic roots detect premature mutation. This verifies the UI save
  * contract; RecordApp/Host suites separately exercise real browser storage. */
@@ -37,7 +38,7 @@ if (browserMode) {
 const controlAt = process.argv.indexOf('--control');
 const controlName = controlAt >= 0 ? process.argv[controlAt + 1] : null;
 assert(!controlName || !browserMode, 'A control edits the authored source, never a staged artifact');
-let source = readFileSync(resolve(site || root, 'corridor.js'), 'utf8');
+let source = readAuthoredCorridor(site || root).source;
 if (controlName) {
   const controls = await import('./word-saved-answer-controls.mjs');
   source = controls.applyControl(source, controls.LEARNING_RECORD_CONTROLS, controlName);
@@ -76,6 +77,8 @@ const names = new Set([
   'focusKanjiReadingReview', 'kanjiAnswerAvailable', 'retainedKanjiRecord', 'validKanjiRecord', 'nonEmptyString', 'safeJsonValue',
   'advanceReviewSession', 'resetAssessmentQuestionReview', 'commitReviewAction', 'commitDrillGrade', 'commitStandardGrade',
   'renderReview', 'renderReviewUndo', 'renderProbe', 'renderLessons', 'renderSrsPrefs',
+  // the review face's audio row: appended by the actual renderReview, a no-op audio boundary here
+  'appendReviewVoice', 'reviewVoiceTarget',
   // the review's next card by the app's one schedule owner (srs-core.mjs, given to the sandbox below)
   'reviewNextStep', 'reviewPauseTimer', 'srsWordAnswerIdentity',
   'reviewCounts', 'srsCardKind', 'SRS_KINDS',
@@ -118,7 +121,9 @@ const freeze = (value) => {
 class Element {
   constructor(tag = 'div', className = '', text = '') {
     Object.assign(this, { tag, className, textContent: text, children: [], style: {}, dataset: {}, events: {}, disabled: false });
-    this.classList = { add: (name) => { this.className += ' ' + name; } };
+    this.classList = { add: (name) => { this.className += ' ' + name; }, remove: (name) => {
+      this.className = this.className.split(' ').filter((value) => value !== name).join(' ');
+    } };
   }
   append(...children) { this.children.push(...children); }
   setAttribute() {}
@@ -152,6 +157,7 @@ function fixture(overrides = {}, options = {}) {
     recordDeparted: false, staleTab: false, storeSealed: false,
     recordReady: (epoch = 1) => epoch === sandbox.recordEpoch,
     recordWritable: (epoch = 1) => epoch === sandbox.recordEpoch,
+    sharedStudyActive: () => false,
     render: () => { paints += 1; },
     window: { scrollY: 0, scrollTo: () => { scrolls += 1; }, __CORRIDOR_STANDALONE__: true },
     document: { createTextNode: (text) => new Element('text', '', text) },
@@ -169,6 +175,7 @@ function fixture(overrides = {}, options = {}) {
     // D23: the revealed answer face is now rendered here; it reads no assessment context or source note
     assessmentReviewContext: () => null, renderLearningSource: () => {},
     recManifest: null, // Explicit audio-unavailable fixture; this suite does not exercise audio.
+    retireCardSpeech: () => {},
     // a DOM focus helper startReview calls after rendering; no scheduling effect
     focusKanjiReadingReview: () => {},
     endLessonRun: () => {}, srsCustom: null, srsNewPerDay: () => S.srsPrefs.newPerDay, srsReviewLimit: () => S.srsPrefs.reviewLimit,

@@ -537,11 +537,31 @@ async function moverKilled(label, run, pattern) {
 const moverAst = ts.createSourceFile('corridor.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
 const moverNames = ['ladderVisit', 'ladderCleanupGeneration', 'inlineWordReading', 'inlineGlossLine', 'setGlossLine',
   'inlineWordGloss', 'seatGlossRow', 'activateWordLadder', 'ladderGlossRung', 'clearWordLadder', 'foldWordLadder', 'syncChromeKeep', 'back', 'installProseWordRoving', 'proseWordRovers'];
-const moverDeclarations = new Map();
-for (const statement of moverAst.statements) {
-  const names = ts.isFunctionDeclaration(statement) ? [statement.name?.text]
-    : ts.isVariableStatement(statement) ? statement.declarationList.declarations.map(n => n.name.getText(moverAst)) : [];
-  for (const name of names) if (moverNames.includes(name)) moverDeclarations.set(name, statement.getText(moverAst));
+const moverModule = path => ts.createSourceFile(path, readFileSync(new URL('../' + path, import.meta.url), 'utf8'),
+  ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+const moverAsts = [moverAst, moverModule('modules/dictionary.mjs'), moverModule('modules/capture.mjs')];
+const moverSupportNames = ['sourceLadderAction']; // the fold's exact-source guard calls capture's action matcher
+const moverDeclarations = new Map(), moverOwner = new Map(), moverSupport = new Map();
+for (const ast of moverAsts) {
+  for (const statement of ast.statements) {
+    const names = ts.isFunctionDeclaration(statement) ? [statement.name?.text]
+      : ts.isVariableStatement(statement) ? statement.declarationList.declarations.map(n => n.name.getText(ast)) : [];
+    for (const name of names) {
+      if (moverNames.includes(name)) {
+        assert(!moverDeclarations.has(name), `Unique declaration ${name} in ${ast.fileName}`);
+        moverDeclarations.set(name, statement.getText(ast));
+        if (!moverOwner.has(ast)) moverOwner.set(ast, name);
+      } else if (moverSupportNames.includes(name)) {
+        assert(!moverSupport.has(name), `Unique support declaration ${name} in ${ast.fileName}`);
+        moverSupport.set(name, { ast, text: statement.getText(ast) });
+      }
+    }
+  }
+}
+for (const { ast, text } of moverSupport.values()) {
+  const owner = moverOwner.get(ast);
+  assert(owner, `A mover declaration shares ${ast.fileName} with its support`);
+  moverDeclarations.set(owner, moverDeclarations.get(owner) + '\n' + text);
 }
 assert.equal(moverDeclarations.size, moverNames.length, 'Mover uses every actual ladder declaration');
 const moverProgram = [...new Set(moverDeclarations.values())].join('\n');

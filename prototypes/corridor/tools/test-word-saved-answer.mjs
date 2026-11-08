@@ -58,6 +58,7 @@ import vm from 'node:vm';
 import ts from 'typescript';
 import * as fsrsApi from '../vendor/ts-fsrs.mjs';
 import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
+import { readAuthoredCorridor } from './authored-corridor-source.mjs';
 import { INVENTORY, WORD_CONTROLS, applyControl, inventoryReport, runControls, sha256, sourceMarker, stageAssessmentAuthority } from './word-saved-answer-controls.mjs';
 
 const here = (path) => new URL(path, import.meta.url);
@@ -75,7 +76,7 @@ if (process.argv.includes('--controls')) {
 }
 
 function defineRows() {
-  let source = readFileSync(here('../corridor.js'), 'utf8');
+  let source = readAuthoredCorridor(fileURLToPath(here('../'))).source;
   const controlName = argValue('--control');
   if (controlName) source = applyControl(source, WORD_CONTROLS, controlName);
   console.log(sourceMarker(controlName, WORD_CONTROLS, sha256(source)));
@@ -91,6 +92,8 @@ function defineRows() {
     'lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'dictionaryGlossSummary', 'dictionaryReadingSupportsForm',
     'dictionarySummaryFor', 'validDictionaryRow', 'cacheDictionaryRow', 'cacheDictionaryFormRows', 'dictionaryRowBySeq',
     'dictionaryRowsForForm', 'readerReadingFits', 'readerSummaryFor', 'readerQuickRecord', 'readerGlossMissText', 'readerCaptureReasonText',
+    // the inflection search seam (modules/dictionary.mjs): its candidates and the rows/rules/godan table it reads
+    'dictionaryInflectionCandidates', 'INFLECTION_ROWS', 'INFLECTION_RULES', 'GODAN_ROW',
     'nonBlankMeanings', 'wordSelection', 'savedAnswerFor', 'wordAnswerIdentity', 'sameWordIdentity', 'wordStudied',
     'wordCardIdentity', 'wordNodeIdentity', 'explicitWordSnapshot', 'wordCapturePlan', 'captureStorePatch', 'commitCapture',
     'capturePending', 'toggleTaken', 'replaceWordCard', 'wordCaptureState', 'wordCaptureReadingMismatch', 'wordCaptureHeldText', 'showMini',

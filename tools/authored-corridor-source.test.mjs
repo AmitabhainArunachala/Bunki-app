@@ -99,3 +99,24 @@ it('unsupported anonymous or expression defaults cannot silently lose authored s
     );
   }
 });
+
+it('named export aliases cannot make a lift execute a different function than ESM', async () => {
+  const source = 'function reading() { return 42; } function other() { return 0; } export { other as reading };';
+  const actual = await import('data:text/javascript,' + encodeURIComponent(source));
+  expect(actual.reading()).toBe(0);
+  fixture({ ...base, 'modules/seat.mjs': source }, (root) => {
+    expect(() => readAuthoredCorridor(root)).toThrow(/Unsupported.*export/i);
+  });
+});
+it('rejects local and forwarded export aliases while retaining same-name exports', () => {
+  for (const source of [
+    'function value() { return 38; } export { value as renamed };',
+    "export { value as reading } from './value.mjs';",
+    "export { value as 'reading' } from './value.mjs';",
+  ]) fixture({ ...base, 'modules/seat.mjs': source }, (root) => {
+    expect(() => readAuthoredCorridor(root)).toThrow(/Unsupported.*export/i);
+  });
+  fixture(base, (root) => {
+    expect(vm.runInNewContext(readAuthoredCorridor(root).source + '\nanswer()')).toBe(42);
+  });
+});

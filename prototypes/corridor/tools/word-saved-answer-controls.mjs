@@ -40,6 +40,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, statSync
 import { isAbsolute, join, relative } from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { fileURLToPath } from 'node:url';
+import { readAuthoredCorridor } from './authored-corridor-source.mjs';
 
 export const CHILD_TIMEOUT_MS = 300_000;
 export const CHILD_MAX_BUFFER = 16 * 1024 * 1024;
@@ -402,18 +403,23 @@ export async function runControls({ root, testFile, learningRecordFile, evidence
   const stage = await stageAssessmentAuthority(root, join(evidence, 'assessment-stage'));
   const childrenDir = join(evidence, 'children');
   mkdirSync(childrenDir, { recursive: true });
-  const corridorFile = join(root, 'prototypes/corridor/corridor.js');
-  const pinned = { 'corridor.js': corridorFile, 'test-word-saved-answer.mjs': testFile,
-    'word-saved-answer-controls.mjs': fileURLToPath(import.meta.url), 'verify-learning-record.mjs': learningRecordFile,
+  const corridorRoot = join(root, 'prototypes/corridor');
+  const pinned = { 'test-word-saved-answer.mjs': testFile,
+    'word-saved-answer-controls.mjs': fileURLToPath(import.meta.url),
+    'authored-corridor-source.mjs': fileURLToPath(new URL('./authored-corridor-source.mjs', import.meta.url)),
+    'verify-learning-record.mjs': learningRecordFile,
     'dict-v2/index.json': join(root, 'prototypes/corridor/data/share_alike/dict-v2/index.json'),
     'dict.json': join(root, 'prototypes/corridor/data/share_alike/dict.json'),
     'words.json': join(root, 'prototypes/corridor/data/share_alike/words.json') };
-  const pinsNow = () => Object.fromEntries(Object.entries(pinned).map(([name, file]) =>
-    [name, { path: relative(root, file), sha256: sha256(readFileSync(file)) }]));
+  // the closure is recomputed on every read, so an added or removed contributor changes the pin set
+  const pinsNow = () => Object.fromEntries([
+    ...Object.entries(pinned).map(([name, file]) => [name, { path: relative(root, file), sha256: sha256(readFileSync(file)) }]),
+    ...readAuthoredCorridor(corridorRoot).files.map((file) => [file.path,
+      { path: relative(root, join(corridorRoot, file.path)), sha256: file.sha256 }])]);
   const pins = pinsNow();
   const stagePins = Object.fromEntries(readdirSync(stage, { recursive: true }).map(String).sort()
     .filter((name) => statSync(join(stage, name)).isFile()).map((name) => [name, sha256(readFileSync(join(stage, name)))]));
-  const authored = readFileSync(corridorFile, 'utf8');
+  const authored = readAuthoredCorridor(corridorRoot).source;
   const authoredSha256 = sha256(authored);
   const bounds = { timeoutMs, killSignal: 'SIGKILL', maxBufferBytesPerStream: CHILD_MAX_BUFFER };
   // a control child writes no gate report: it runs without the gate's evidence directory

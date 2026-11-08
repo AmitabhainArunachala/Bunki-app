@@ -22,8 +22,8 @@
  *   C1  timed Kanji-only practice of a card not due records practice only, never a review;
  *   B   burying across surfaces (lead's ruling 10-19): 検証 answered in 専門 → its cards in 言葉の鉱脈, MCD, the context
  *       deck and its saved word: card rest today and are served tomorrow; kanji:検 and the MCD 字 card are not buried;
- *   one owner: no production file builds a scheduler except srs-core.mjs and the corridor's own construction, which is
- *       proved equal to srs-core's.
+ *   one owner: on the production surfaces and paths exercised here, schedulers are built by srs-core.mjs or the
+ *       corridor's own construction, which is proved equal to srs-core's.
  * Negative controls (in-memory edits of the served files, no disk copies): the old pos+4 rule, a label that lies, a
  * surface with its own queue rule (the context deck freezing its queue; the corridor learning ahead silently), a
  * stale whole-ledger write, a second scheduler construction, burying switched off. Each must turn its named check red,
