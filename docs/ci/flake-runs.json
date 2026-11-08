@@ -612,5 +612,13 @@
     "failures": 1,
     "attemptedAt": "2026-11-08T08:58:17.241Z",
     "reason": "Observation artifact not yet available: bunki-plan-42431546894-2"
+  },
+  "42407075841/3": {
+    "result": "observed",
+    "startedAt": "2026-11-08T08:55:07Z"
+  },
+  "42418249759/2": {
+    "result": "observed",
+    "startedAt": "2026-11-08T08:55:00Z"
   }
 }
