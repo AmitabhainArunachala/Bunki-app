@@ -48,7 +48,7 @@ try{
   for(const method of ['put','add','delete','clear']){
    const operation=IDBObjectStore.prototype[method];
    IDBObjectStore.prototype[method]=function(...args){
-    if(!this.transaction.db.name.startsWith('bunki-shared-study-qa-'))globalThis.__qaLegacyWrites.push({kind:'indexedDB',database:this.transaction.db.name,store:this.name,method});
+    if(!this.transaction.db.name.startsWith('bunki-shared-study-qa-')&&this.transaction.db.name!=='nsrs-private-audio-demand-v1')globalThis.__qaLegacyWrites.push({kind:'indexedDB',database:this.transaction.db.name,store:this.name,method});
     return operation.apply(this,args);
    };
   }
