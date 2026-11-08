@@ -821,6 +821,24 @@ function verifyBackData(decks) {
   check("K029", 'c) a passage card carries the English of its target sentence only — part of the passage translation, never all of it when the passage has more than one sentence', bad.length === 0 && withEn / cards.length > 0.9 && sameEnPerPassage, bad.slice(0, 4).join(' | ') || `${withEn}/${cards.length} cards (the rest cannot be matched and show no 英訳)`);
 }
 
+/** The standalone exporter represents these three imports explicitly for offline legacy study. */
+function standaloneMountForParity(source) {
+  const substitutions = [
+    ["import {isSharedDeck,isSharedStudyMode} from '../../shared-study-content.mjs';", 'const {isSharedDeck,isSharedStudyMode} = __KP_SHARED_CONTENT__;'],
+    ["const sharedPlayer = () => import('./shared-mount.mjs');", "const sharedPlayer = () => { throw new Error('Standalone study: shared study is unavailable in this offline page.'); };"],
+    ["const fsrsApi = window.__TSFSRS__ || (await import('../../vendor/ts-fsrs.mjs'));", 'const fsrsApi = window.__TSFSRS__;'],
+  ];
+  let mount = source;
+  for (const [pattern, replacement] of substitutions) {
+    const count = source.split(pattern).length - 1;
+    if (count !== 1) throw new Error(`Standalone mount parity: expected pattern exactly once, found ${count}: ${pattern}`);
+    mount = mount.replace(pattern, replacement);
+  }
+  return mount
+    .replace(/import\s*\{([^}]*)\}\s*from\s*'\.\/engine\.js';/u, 'const {$1} = __KP_ENGINE__;')
+    .replace(/^export /gmu, '').replaceAll('import.meta.url', 'location.href').replaceAll('</script', '<\\/script');
+}
+
 /** the standalone study pages and the Anki templates keep parity with the player's front and back */
 function verifyBackParity() {
   const tools = resolve(REPO_DIR, 'decks/kotoba-mine/tools');
@@ -860,9 +878,7 @@ function verifyBackParity() {
   // release outputs must actually contain the player from the built site under test.
   const playerCss = readFileSync(resolve(CORRIDOR_DIR, 'decks/player/player.css'), 'utf8');
   const roomMotion = readFileSync(resolve(CORRIDOR_DIR, 'rooms/motion.css'), 'utf8');
-  const mount = readFileSync(resolve(CORRIDOR_DIR, 'decks/player/mount.js'), 'utf8')
-    .replace(/import\s*\{([^}]*)\}\s*from\s*'\.\/engine\.js';/u, 'const {$1} = __KP_ENGINE__;')
-    .replace(/^export /gmu, '').replaceAll('import.meta.url', 'location.href').replaceAll('</script', '<\\/script');
+  const mount = standaloneMountForParity(readFileSync(resolve(CORRIDOR_DIR, 'decks/player/mount.js'), 'utf8'));
   const releaseParity = [];
   for (const page of ['study.html', 'study-mcd.html']) {
     const html = readFileSync(resolve(release, page), 'utf8');

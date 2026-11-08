@@ -7686,6 +7686,7 @@ function dueCount(deck, state, now, opts) {
 
 return { DECK_FORMAT, STATE_FORMAT, VERSION, LEECH_LAPSES, RATINGS, nextStep, servable, sittingTally, closeLines, pauseWords, LEARN_AHEAD_MS, buriedWords, buriedToday, refusalWords, admitDeckGrade, dayKey, validateDeck, indexDeck, TOKENS_FORMAT, TOKEN_KINDS, cardTokens, defTokens, createScheduler, emptyState, LOOKUP_KEEP, logLookup, REPAIR_ACTIONS, inspectState, normalizeState, isSuspended, suspendCard, restoreSuspended, isLeech, swapTarget, swapCard, repairCard, skipFor, introducedToday, buildQueue, learningSoon, effectiveReviewTime, grade, changeOf, undoChange, preview, wordStatus, dueCount };
 })();
+var __KP_SHARED_CONTENT__=(()=>{var o=Object.defineProperty;var i=Object.getOwnPropertyDescriptor;var d=Object.getOwnPropertyNames;var h=Object.prototype.hasOwnProperty;var f=(r,e)=>{for(var a in e)o(r,a,{get:e[a],enumerable:!0})},y=(r,e,a,s)=>{if(e&&typeof e=="object"||typeof e=="function")for(let t of d(e))!h.call(r,t)&&t!==a&&o(r,t,{get:()=>e[t],enumerable:!(s=i(e,t))||s.enumerable});return r};var m=r=>y(o({},"__esModule",{value:!0}),r);var p={};f(p,{isSharedDeck:()=>n,isSharedStudyMode:()=>c});var u=Object.freeze(["n2","n1","senmon","kotoba-master"]),n=r=>u.includes(r);var c=()=>!!globalThis.bunkiSharedStudyHost||new URLSearchParams(globalThis.location?.search||"").get("sharedStudy")==="preview";return m(p);})();
 /**
  * 集中道場 deck player. One screen at a time: deck → study → done, plus the
  * word list and settings. The schedule is this deck's own ledger in
@@ -7738,8 +7739,10 @@ const {
   validateDeck,
   wordStatus,
 } = __KP_ENGINE__;
+const {isSharedDeck,isSharedStudyMode} = __KP_SHARED_CONTENT__;
+const sharedPlayer = () => { throw new Error('Standalone study: shared study is unavailable in this offline page.'); };
 
-const fsrsApi = window.__TSFSRS__ || (await import('../../vendor/ts-fsrs.mjs'));
+const fsrsApi = window.__TSFSRS__;
 const pin = window.__CORRIDOR_BUNDLE__?.['fsrs-pin'] || (await fetchJson(new URL('../../data/fsrs-pin.json', location.href)));
 const scheduler = createScheduler(fsrsApi, pin);
 
@@ -8007,6 +8010,7 @@ function loadState(storage, deck) {
 /** write a candidate ledger; the caller adopts it only when this returns true. The text written becomes this
  * window's revision of the ledger (writeLedger). */
 function save(state) {
+  if (!ctx || isSharedStudyMode()) return false;
   const text = JSON.stringify(state);
   if (!writeRaw(ctx.storage, stateKey(ctx.deck.id), text)) return false;
   ctx.ledgerText = text;
@@ -11197,6 +11201,14 @@ function ensureCss() {
 }
 
 async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true, autoStart, presentation = null, next = null, focusRoom = false, words = null, learner = null } = {}) {
+  if (isSharedStudyMode() && (isSharedDeck(deckId) || deckId === 'shared-grammar')) {
+    ++mountRequest; ctx = null; pendingStart = null;
+    return (await sharedPlayer()).render(main, {deckId,onLeave,english,autoStart});
+  }
+  if (isSharedStudyMode()) {
+    ++mountRequest; ctx = null; pendingStart = null;
+    return (await sharedPlayer()).renderSharedFence(main,{english,onLeave});
+  }
   const request = ++mountRequest;
   if (autoStart !== undefined) pendingStart = { deckId, autoStart };
   ensureCss();
@@ -11280,6 +11292,8 @@ async function render(main, { deckId, storage = window.localStorage, onLeave, op
  * name its cards and writes nothing.
  */
 async function missedTerms(deckId, storage = window.localStorage, since = 0) {
+  if (isSharedStudyMode() && (isSharedDeck(deckId) || deckId === 'shared-grammar')) return (await sharedPlayer()).missedTerms(deckId,since);
+  if (isSharedStudyMode()) return [];
   const { deck, index } = await loadDeck(deckId);
   const { state } = loadState(storage, deck);
   const latest = new Map();
@@ -11294,6 +11308,8 @@ async function missedTerms(deckId, storage = window.localStorage, since = 0) {
 }
 
 async function summary(deckId, storage = window.localStorage) {
+  if (isSharedStudyMode() && (isSharedDeck(deckId) || deckId === 'shared-grammar')) return (await sharedPlayer()).summary(deckId);
+  if (isSharedStudyMode()) return {due:0,fresh:0,total:0,words:0,authority:'unmapped'};
   const { deck } = await loadDeck(deckId);
   const { state } = loadState(storage, deck);
   const prefs = prefsFor(storage, deck);
@@ -11301,7 +11317,13 @@ async function summary(deckId, storage = window.localStorage) {
   return { due: q.due.length, fresh: q.fresh.length, total: q.queue.length, words: deck.words.length, titleJa: deck.titleJa, titleEn: deck.titleEn };
 }
 
-render(document.getElementById('app'), { deckId: 'kotoba-mine' });
+if (isSharedStudyMode()) {
+  const note = document.createElement('p');
+  note.textContent = 'Standalone study: shared study is unavailable in this offline page.';
+  document.getElementById('app').append(note);
+} else {
+  render(document.getElementById('app'), { deckId: 'kotoba-mine' });
+}
 </script>
 </body>
 </html>

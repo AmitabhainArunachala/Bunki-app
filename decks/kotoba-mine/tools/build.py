@@ -22,7 +22,8 @@ gets the next free number for its word and is appended; an id whose key is no
 longer produced moves to "reserved" and is never handed out again.
 
 Run from the repo root:  python3 decks/kotoba-mine/tools/build.py
-Needs: pip install fugashi unidic-lite==1.0.8 genanki
+Needs: pip install fugashi unidic-lite==1.0.8 genanki; npm install (the existing
+       npm dependencies esbuild and acorn close the standalone study page)
 
 Flags
   --study-only    rebuild only the two private release HTML pages from their existing
@@ -52,7 +53,9 @@ import hashlib
 import html
 import json
 import re
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -1368,9 +1371,102 @@ def build_tsv(deck: dict, spec: dict, out_dir: Path = RELEASE) -> None:
 
 
 # ------------------------------------------------------------------ study.html
+# Standalone boundary: these four files are the ordinary self-contained legacy
+# player (bunki-cloze:<deck>, the authored pinned scheduler, four grades, undo
+# and reload). They inline the authored TS-FSRS, srs-core and engine code. From
+# shared-study-content.mjs they include only the selector pair mount.js imports:
+# esbuild (existing npm dependency) bundles that pair, and acorn (existing npm
+# dependency, also used by the standalone judge) parse-checks the final
+# module. Shared-engine preview is not supported here: the lazy shared-mount
+# import is a fail-closed boundary, and isSharedStudyMode() shows a plain message
+# instead of mounting the player or touching storage.
+SHARED_SELECTORS = ("isSharedDeck", "isSharedStudyMode")
+SUBPROCESS_TIMEOUT = 60
+CLOSED_MODULE_CHECK = r"""
+import {createRequire} from 'node:module';
+import {readFileSync} from 'node:fs';
+const [repo, file] = process.argv.slice(2);
+const {parse} = createRequire(repo + '/package.json')('acorn');
+const ast = parse(readFileSync(file, 'utf8'), {ecmaVersion: 'latest', sourceType: 'module'});
+const bad = [];
+function visit(node) {
+  if (!node || typeof node !== 'object') return;
+  if (['ImportDeclaration', 'ImportExpression', 'ExportAllDeclaration'].includes(node.type)) bad.push(node.type);
+  if (node.type === 'ExportNamedDeclaration' && node.source) bad.push('ExportNamedDeclaration with source');
+  for (const value of Object.values(node)) {
+    if (Array.isArray(value)) value.forEach(visit);
+    else visit(value);
+  }
+}
+visit(ast);
+if (bad.length) {
+  console.error(`unclosed runtime imports: ${[...new Set(bad)].join(', ')}`);
+  process.exit(1);
+}
+"""
+
+
+def _npm_binary(name: str, package: str) -> Path:
+    """An installed npm dependency's executable, found under the normal REPO root (not CORRIDOR)."""
+    for path in (REPO / "node_modules" / ".bin" / name, REPO / "node_modules" / package / "bin" / name):
+        if path.is_file():
+            return path
+    raise SystemExit(f"study export: npm dependency {package!r} is not installed under {REPO / 'node_modules'}")
+
+
+def _run_bounded(command: list[str], *, what: str) -> subprocess.CompletedProcess[str]:
+    try:
+        return subprocess.run(command, cwd=REPO, capture_output=True, text=True, timeout=SUBPROCESS_TIMEOUT)
+    except FileNotFoundError as exc:
+        raise SystemExit(f"study export: {what}: {exc}") from exc
+    except subprocess.TimeoutExpired as exc:
+        raise SystemExit(f"study export: {what} timed out after {SUBPROCESS_TIMEOUT}s") from exc
+
+
+def _shared_selectors_js(corridor: Path) -> str:
+    """Bundle only the selectors mount.js imports; any other bundled input fails the allowlist."""
+    source = corridor / "shared-study-content.mjs"
+    if not source.is_file():
+        raise SystemExit(f"study export: missing shared selector source {source}")
+    esbuild = _npm_binary("esbuild", "esbuild")
+    with tempfile.TemporaryDirectory(prefix="kotoba-shared-") as tmp:
+        entry = Path(tmp) / "selectors.mjs"
+        entry.write_text("export {" + ",".join(SHARED_SELECTORS) + "} from " + json.dumps(str(source.resolve())) + ";\n", "utf-8")
+        out, metafile = Path(tmp) / "selectors.js", Path(tmp) / "selectors.meta.json"
+        result = _run_bounded([str(esbuild), str(entry), "--bundle", "--format=iife", "--global-name=__KP_SHARED_CONTENT__",
+                               "--platform=neutral", "--tree-shaking=true", "--minify", "--log-level=error",
+                               f"--outfile={out}", f"--metafile={metafile}"], what="esbuild shared selectors")
+        if result.returncode:
+            raise SystemExit("study export: esbuild shared selectors failed: " + (result.stderr or result.stdout).strip())
+        meta = json.loads(metafile.read_text("utf-8"))
+        allowed = {entry.resolve(), source.resolve()}
+        for key in meta.get("inputs", {}):
+            path = Path(key)
+            if not path.is_absolute():
+                path = REPO / path
+            if path.resolve() not in allowed:
+                raise SystemExit(f"study export: shared selector bundle pulled in unexpected module {key}")
+        if any(output.get("imports") for output in meta.get("outputs", {}).values()):
+            raise SystemExit("study export: shared selector bundle kept a runtime import")
+        return out.read_text("utf-8").strip()
+
+
+def _assert_closed_module(script: str) -> None:
+    """Parse the finished script (acorn) and fail unless it has no runtime imports."""
+    with tempfile.TemporaryDirectory(prefix="kotoba-module-") as tmp:
+        module, check = Path(tmp) / "study.mjs", Path(tmp) / "closed.mjs"
+        module.write_text(script, "utf-8")
+        check.write_text(CLOSED_MODULE_CHECK, "utf-8")
+        result = _run_bounded(["node", str(check), str(REPO), str(module)], what="standalone module import check")
+        if result.returncode:
+            raise SystemExit("study export: generated module is not closed: " + (result.stderr or result.stdout).strip())
+
+
 def build_study(deck: dict, out: Path | None = None, gloss: dict | None = None) -> None:
-    """One offline file: the player's three modules inlined as plain code
-    (no runtime eval, so it also runs under a strict content policy)."""
+    """One offline file: the player's authored modules inlined as plain code
+    (no runtime eval, so it also runs under a strict content policy). The
+    standalone boundary is documented above; ordinary mode calls the exact
+    authored render, and shared mode shows a message without writing state."""
     player = CORRIDOR / "decks" / "player"
     tsfsrs = re.sub(r"//# sourceMappingURL=.*$", "", (CORRIDOR / "vendor" / "ts-fsrs.mjs").read_text("utf-8"), flags=re.M)
     m = re.search(r"export\s*\{([^}]*)\};?\s*$", tsfsrs)
@@ -1391,10 +1487,31 @@ def build_study(deck: dict, out: Path | None = None, gloss: dict | None = None) 
     engine_names = re.findall(r"^export (?:async )?(?:function|const|let) (\w+)", engine, flags=re.M)
     engine_js = "const __KP_ENGINE__ = (() => {\n" + re.sub(r"^export ", "", engine, flags=re.M) + "\nreturn { " + ", ".join(engine_names) + " };\n})();"
     mount = (player / "mount.js").read_text("utf-8")
-    mount = re.sub(r"import\s*\{([^}]*)\}\s*from\s*'\./engine\.js';", r"const {\1} = __KP_ENGINE__;", mount)
-    mount = re.sub(r"^export ", "", mount, flags=re.M).replace("import.meta.url", "location.href")
-    code = "\n".join([fsrs_js, core_js, engine_js, mount])
+
+    def replace_once(old: str, new: str, what: str) -> None:
+        nonlocal mount
+        count = mount.count(old)
+        assert count == 1, f"study export: expected one {what}, found {count}"
+        mount = mount.replace(old, new, 1)
+
+    mount, n = re.subn(r"import\s*\{([^}]*)\}\s*from\s*'\./engine\.js';", r"const {\1} = __KP_ENGINE__;", mount)
+    assert n == 1, "the player mount imports engine once"
+    replace_once("import {isSharedDeck,isSharedStudyMode} from '../../shared-study-content.mjs';",
+                 "const {isSharedDeck,isSharedStudyMode} = __KP_SHARED_CONTENT__;", "shared-study-content import")
+    replace_once("const sharedPlayer = () => import('./shared-mount.mjs');",
+                 "const sharedPlayer = () => { throw new Error('Standalone study: shared study is unavailable in this offline page.'); };",
+                 "lazy shared-mount import")
+    replace_once("const fsrsApi = window.__TSFSRS__ || (await import('../../vendor/ts-fsrs.mjs'));",
+                 "const fsrsApi = window.__TSFSRS__;", "bundled TS-FSRS fallback")
+    assert mount.count("import.meta.url") == 4, "the player mount resolves four module URLs"
+    mount = mount.replace("import.meta.url", "location.href")
+    mount = re.sub(r"^export ", "", mount, flags=re.M)
+    assert not re.search(r"^export\b", mount, flags=re.M), "the player mount exports nothing after inlining"
+    code = "\n".join([fsrs_js, core_js, engine_js, _shared_selectors_js(CORRIDOR), mount])
     page = (HERE / "study-shell.html").read_text("utf-8")
+    render_call = "render(document.getElementById('app'), { deckId: 'kotoba-mine' });"
+    assert page.count(render_call) == 1, "the study shell renders one standalone player"
+    page = page.replace(render_call, "__KP_STANDALONE_ENTRY__")
     deck_json = json.dumps(deck, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     pin = (CORRIDOR / "data" / "fsrs-pin.json").read_text("utf-8").strip()
     fonts = (CORRIDOR / "fonts.css").read_text("utf-8")
@@ -1410,7 +1527,19 @@ def build_study(deck: dict, out: Path | None = None, gloss: dict | None = None) 
     gloss_json = json.dumps(gloss, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     page = page.replace("__CSS__", css).replace("__PIN__", pin).replace("__GLOSS__", gloss_json).replace("__DECK__", deck_json)
     page = page.replace("__CODE__", code.replace("</script", "<\\/script"))
+    entry = ("if (isSharedStudyMode()) {\n"
+             "  const note = document.createElement('p');\n"
+             "  note.textContent = 'Standalone study: shared study is unavailable in this offline page.';\n"
+             "  document.getElementById('app').append(note);\n"
+             "} else {\n"
+             f"  {render_call}\n"
+             "}")
+    assert page.count("__KP_STANDALONE_ENTRY__") == 1
+    page = page.replace("__KP_STANDALONE_ENTRY__", entry)
     page = page.replace("__TITLE__", html.escape(deck["titleEn"]))
+    scripts = re.findall(r"<script\b[^>]*>([\s\S]*?)</script>", page)
+    assert len(scripts) == 1, "the standalone page has one module"
+    _assert_closed_module(scripts[0])
     (out or RELEASE / "study.html").write_text(page, "utf-8")
 
 
