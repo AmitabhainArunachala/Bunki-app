@@ -1,3 +1,4 @@
+/* global process */
 import { describe, it, expect } from 'vitest';
 import { spawnSync } from 'node:child_process';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync, symlinkSync, unlinkSync } from 'node:fs';
@@ -102,7 +103,8 @@ it('unsupported anonymous or expression defaults cannot silently lose authored s
 });
 
 it('named export aliases cannot make a lift execute a different function than ESM', async () => {
-  const source = 'function reading() { return 42; } function other() { return 0; } export { other as reading };';
+  const source =
+    'function reading() { return 42; } function other() { return 0; } export { other as reading };';
   const actual = await import('data:text/javascript,' + encodeURIComponent(source));
   expect(actual.reading()).toBe(0);
   fixture({ ...base, 'modules/seat.mjs': source }, (root) => {
@@ -114,71 +116,112 @@ it('rejects local and forwarded export aliases while retaining same-name exports
     'function value() { return 38; } export { value as renamed };',
     "export { value as reading } from './value.mjs';",
     "export { value as 'reading' } from './value.mjs';",
-  ]) fixture({ ...base, 'modules/seat.mjs': source }, (root) => {
-    expect(() => readAuthoredCorridor(root)).toThrow(/Unsupported.*export/i);
-  });
+  ])
+    fixture({ ...base, 'modules/seat.mjs': source }, (root) => {
+      expect(() => readAuthoredCorridor(root)).toThrow(/Unsupported.*export/i);
+    });
   fixture(base, (root) => {
     expect(vm.runInNewContext(readAuthoredCorridor(root).source + '\nanswer()')).toBe(42);
   });
 });
 
 const executable = (files, run) => fixture({ ...files, 'package.json': '{"type":"module"}' }, run);
-const esmAnswer = (root) => spawnSync(process.execPath, ['--input-type=module', '-e',
-  `import { answer } from ${JSON.stringify('file://' + join(root, 'corridor.js'))}; console.log(answer());`], { encoding: 'utf8' });
+const esmAnswer = (root) =>
+  spawnSync(
+    process.execPath,
+    [
+      '--input-type=module',
+      '-e',
+      `import { answer } from ${JSON.stringify('file://' + join(root, 'corridor.js'))}; console.log(answer());`,
+    ],
+    { encoding: 'utf8' },
+  );
 const answerCall = 'export function answer() { return reading(); }';
 
 it('default, namespace and renamed imports cannot silently bind another authored declaration', () => {
   const cases = [
-    { corridor: `import reading from './modules/a.mjs';\n${answerCall}\n`,
-      module: 'function reading() { return 42; }\nexport default function actual() { return 0; }\n', answer: '0' },
-    { corridor: `import { actual as reading } from './modules/a.mjs';\n${answerCall}\n`,
-      module: 'function reading() { return 42; }\nexport function actual() { return 0; }\n', answer: '0' },
-    { corridor: "import * as ns from './modules/a.mjs';\nexport function answer() { return ns.actual(); }\n",
-      module: 'export function actual() { return 0; }\n', answer: '0' },
+    {
+      corridor: `import reading from './modules/a.mjs';\n${answerCall}\n`,
+      module: 'function reading() { return 42; }\nexport default function actual() { return 0; }\n',
+      answer: '0',
+    },
+    {
+      corridor: `import { actual as reading } from './modules/a.mjs';\n${answerCall}\n`,
+      module: 'function reading() { return 42; }\nexport function actual() { return 0; }\n',
+      answer: '0',
+    },
+    {
+      corridor:
+        "import * as ns from './modules/a.mjs';\nexport function answer() { return ns.actual(); }\n",
+      module: 'export function actual() { return 0; }\n',
+      answer: '0',
+    },
   ];
-  for (const { corridor, module, answer } of cases) executable({ 'corridor.js': corridor, 'modules/a.mjs': module }, (root) => {
-    const real = esmAnswer(root);
-    expect(real.status).toBe(0);
-    expect(real.stdout.trim()).toBe(answer);
-    expect(() => readAuthoredCorridor(root)).toThrow();
-  });
+  for (const { corridor, module, answer } of cases)
+    executable({ 'corridor.js': corridor, 'modules/a.mjs': module }, (root) => {
+      const real = esmAnswer(root);
+      expect(real.status).toBe(0);
+      expect(real.stdout.trim()).toBe(answer);
+      expect(() => readAuthoredCorridor(root)).toThrow();
+    });
 });
 
 it('missing and private bindings cannot be admitted by their declaration alone', () => {
   for (const files of [
     { 'modules/b.mjs': 'function reading() { return 42; }\nexport const actual = 0;\n' },
-    { 'modules/b.mjs': "export { reading } from './c.mjs';\n", 'modules/c.mjs': 'function reading() { return 42; }\n' },
+    {
+      'modules/b.mjs': "export { reading } from './c.mjs';\n",
+      'modules/c.mjs': 'function reading() { return 42; }\n',
+    },
     { 'modules/b.mjs': 'const reading = () => 42;\nexport const actual = 0;\n' },
-  ]) executable({ 'corridor.js': `import { reading } from './modules/b.mjs';\n${answerCall}\n`, ...files }, (root) => {
-    expect(esmAnswer(root).status).not.toBe(0);
-    expect(() => readAuthoredCorridor(root)).toThrow();
-  });
+  ])
+    executable(
+      { 'corridor.js': `import { reading } from './modules/b.mjs';\n${answerCall}\n`, ...files },
+      (root) => {
+        expect(esmAnswer(root).status).not.toBe(0);
+        expect(() => readAuthoredCorridor(root)).toThrow();
+      },
+    );
 });
 
-it('same-name forwarded exports and corridor cycles are validated end to end', () => executable({
-  'corridor.js': `import { reading } from './modules/a.mjs';\nconst offset = 2;\nexport { offset };\n${answerCall}\n`,
-  'modules/a.mjs': "export { reading } from './b.mjs';\n",
-  'modules/b.mjs': "import { offset } from '../corridor.js';\nexport function reading() { return 40 + offset; }\n",
-}, (root) => {
-  const real = esmAnswer(root);
-  expect(real.status).toBe(0);
-  expect(real.stdout.trim()).toBe('42');
-  const result = readAuthoredCorridor(root);
-  expect(vm.runInNewContext(result.source + '\nanswer()')).toBe(42);
-  expect(result.files.map((row) => row.path).sort()).toEqual(['corridor.js', 'modules/a.mjs', 'modules/b.mjs']);
-}));
+it('same-name forwarded exports and corridor cycles are validated end to end', () =>
+  executable(
+    {
+      'corridor.js': `import { reading } from './modules/a.mjs';\nconst offset = 2;\nexport { offset };\n${answerCall}\n`,
+      'modules/a.mjs': "export { reading } from './b.mjs';\n",
+      'modules/b.mjs':
+        "import { offset } from '../corridor.js';\nexport function reading() { return 40 + offset; }\n",
+    },
+    (root) => {
+      const real = esmAnswer(root);
+      expect(real.status).toBe(0);
+      expect(real.stdout.trim()).toBe('42');
+      const result = readAuthoredCorridor(root);
+      expect(vm.runInNewContext(result.source + '\nanswer()')).toBe(42);
+      expect(result.files.map((row) => row.path).sort()).toEqual([
+        'corridor.js',
+        'modules/a.mjs',
+        'modules/b.mjs',
+      ]);
+    },
+  ));
 
-it('intentionally external corridor imports stay external and are not validated as authored seams', () => executable({
-  'corridor.js': `import mocked from './external.mjs';\nimport { reading } from './modules/a.mjs';\n${answerCall}\n`,
-  'modules/a.mjs': 'export function reading() { return mocked(); }\n',
-}, (root) => {
-  const result = readAuthoredCorridor(root);
-  expect(vm.runInNewContext(result.source + '\nanswer()', { mocked: () => 42 })).toBe(42);
-}));
+it('intentionally external corridor imports stay external and are not validated as authored seams', () =>
+  executable(
+    {
+      'corridor.js': `import mocked from './external.mjs';\nimport { reading } from './modules/a.mjs';\n${answerCall}\n`,
+      'modules/a.mjs': 'export function reading() { return mocked(); }\n',
+    },
+    (root) => {
+      const result = readAuthoredCorridor(root);
+      expect(vm.runInNewContext(result.source + '\nanswer()', { mocked: () => 42 })).toBe(42);
+    },
+  ));
 
 it('star exports are refused, including an ambiguous pair of names', () => {
   const single = {
-    'corridor.js': "import { value } from './modules/a.mjs';\nexport function answer() { return value(); }\n",
+    'corridor.js':
+      "import { value } from './modules/a.mjs';\nexport function answer() { return value(); }\n",
     'modules/a.mjs': "export * from './b.mjs';\n",
     'modules/b.mjs': 'export function value() { return 7; }\n',
   };

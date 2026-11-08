@@ -1,8 +1,9 @@
 /**
  * D23 · bounded control admission for the saved-word-answer tests.
  *
- * A control is a set of literal edits to corridor.js. Each edit must match exactly once; the
- * edited source is then lifted by the test it is run against. This module declares:
+ * A control applies literal edits to the declaration source returned by readAuthoredCorridor.
+ * Each edit must match exactly once before the test lifts it. Raw contributing files are pinned
+ * separately. This module declares:
  *   - the exact test inventory;
  *   - every control, with its witnesses and the collateral it may cause: 34 WORD_CONTROLS and 2
  *     LEARNING_RECORD_CONTROLS, 36 controls, run as 38 children with the two baselines;
@@ -54,7 +55,7 @@ export const WORD_CASES = Object.freeze(['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7
 /** The exact rows test-word-saved-answer.mjs must report: F0, then a setup row and a behaviour row per case. */
 export const INVENTORY = Object.freeze(['F0', ...WORD_CASES.flatMap((id) => [`${id}.setup`, id])]);
 
-/* Controls on test-word-saved-answer.mjs. `edits` are [from, to] literal pairs on corridor.js;
+/* Controls on test-word-saved-answer.mjs. `edits` are [from, to] pairs in that declaration source;
  * `witnesses` must fail; `collateral` may fail (declared by reading the code, never inferred). */
 export const WORD_CONTROLS = Object.freeze({
   C1: { note: 'resolver bypassed: the review back is lookup()’s (reviewCardBack → reviewBack)', witnesses: ['T1'], collateral: [], edits: [
