@@ -6,6 +6,7 @@
  * a finite local fixture grant. Production boot never imports this module. */
 import {dayBounds, payloadHash} from './vendor/shared-study-engine/client/engine.mjs';
 import {createSharedStudyStorage} from './shared-study-storage.mjs';
+import {disposeSharedStudyAudioPreparation} from './shared-study-audio-preparation.mjs';
 import {createSharedStudySync} from './shared-study-sync.mjs';
 
 export const QA_HOST_MARKER = 'bunki-isolated-shared-study-qa/v1';
@@ -143,6 +144,7 @@ export async function createSharedStudyTestHost(options = {}) {
         active = adapter;activeStorage=storage;
         return adapter;
       } catch(error) {
+        disposeSharedStudyAudioPreparation(adapter);
         adapter?.backend?.dispose();
         await storage.close?.();
         throw error;
@@ -153,6 +155,7 @@ export async function createSharedStudyTestHost(options = {}) {
   async function dispose() {
     if (disposed) return;
     disposed = true;
+    disposeSharedStudyAudioPreparation(active);
     // Fence new requests first; the canonical in-flight turn can still settle
     // its acknowledgement/reconciliation before handles and storage close.
     sync?.dispose();

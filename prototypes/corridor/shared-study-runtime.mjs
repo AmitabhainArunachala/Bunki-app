@@ -1,4 +1,5 @@
 import {createBunkiStudyAdapter} from './study-engine-adapter.mjs';
+import {attachSharedStudyAudioPreparation} from './shared-study-audio-preparation.mjs';
 import {loadSharedContent} from './shared-study-content.mjs';
 import {createSharedStudyStorage} from './shared-study-storage.mjs';
 import {dayBounds,payloadHash} from './vendor/shared-study-engine/client/engine.mjs';
@@ -12,17 +13,18 @@ export function sharedStudyRuntime() {
   const preview=new URLSearchParams(globalThis.location?.search||'').get('sharedStudy')==='preview';
   if (!host && !preview) return Promise.reject(Error('shared-profile-not-bound'));
   runtime=(async()=>{
-    const {content}=await loadSharedContent();
+    const {content,binding}=await loadSharedContent();
+    const prepare=adapter=>attachSharedStudyAudioPreparation({adapter,binding});
     if (host) {
       // Isolated QA hosts own profile create/open serialization and bind the
       // exact created adapter (including any sync lifecycle). Never create a
       // second adapter behind their back.
       if (typeof host.withAdapter==='function') {
-        const adapter=await host.withAdapter(binding=>createBunkiStudyAdapter({...binding,content}));
+        const adapter=await host.withAdapter(async hostBinding=>prepare(await createBunkiStudyAdapter({...hostBinding,content})));
         if (typeof host.onReady==='function') await host.onReady(adapter);
         return adapter;
       }
-      return createBunkiStudyAdapter({...host,content});
+      return prepare(await createBunkiStudyAdapter({...host,content}));
     }
     // Deliberately isolated preview, never a migration or a production authority.
     if(!globalThis.navigator?.locks)throw Error('shared-preview-profile-lock-required');
@@ -42,7 +44,7 @@ export function sharedStudyRuntime() {
       await store.reconcile({events:[{seq:1,rt:ts,authority:'server',event,bodyHash:payloadHash(event)}],head:1});
     }});
     if (!existing) localStorage.setItem(key,installation);
-    return adapter;
+    return prepare(adapter);
     });
   })().catch(error=>{runtime=null;throw error;});
   return runtime;

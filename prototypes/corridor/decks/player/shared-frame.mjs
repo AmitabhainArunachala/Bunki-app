@@ -25,6 +25,10 @@ try {
   // The canonical preparer validates every frozen example, cloze target, reading
   // span and translation binding. No Bunki reimplementation of grammar faces.
   const prepared=await grammar.prepareGrammarModule(module,{identityRegistry:registry,reviewIndex:reviews,qaMode:false});
+  // Hand the authenticated BUILD and canonical grammar records to the parent
+  // observer without waiting for startup or a scan. Setup failure must leave
+  // mount and grades usable; this frame never owns another observer.
+  try { adapter.ensureAudioPreparation?.({build,grammarRecords:prepared.records})?.catch?.(()=>{}); } catch {}
   const records=new Map(prepared.records.map(r=>[r.guid,r])),tasks=new Map(prepared.tasks.map(t=>[t.taskKey,t]));
   // Canonical source planning validates plain records/arrays in this realm.
   // Keep exact frozen source bytes, then attach grammar's local WeakMap records.
