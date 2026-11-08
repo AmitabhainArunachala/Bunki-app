@@ -172,6 +172,32 @@ Hosts supply admitted release resources; canonical code checks source identity,
 content revision, bytes and face safety. Neither this host nor Bunki generates
 speech or substitutes device speech for ElevenLabs/Kore recordings.
 
+`shared-study-audio-preparation.mjs` starts the exported canonical accepted-source
+observer once per parent store, after checking the exact BUILD and grammar
+bindings. The same observer survives changes between mapped study frames.
+Cross-frame arguments are copied into the parent's realm before canonical
+validation. Creation failure and page disposal release subscriptions; failed
+startup can be retried. Grading does not await the background scan.
+
+Pending demand descriptors live in a separate canonical private IndexedDB store,
+partitioned by the explicit learner and installation namespace. They never enter
+the review journal. Current catalog references and accepted manual-card owners
+are checked against current source before a production batch can be prepared.
+Profiles, permissions and reading review remain explicit; a saved demand does
+not mean that speech was generated, downloaded or listening-approved. The same
+canonical resolver and offline production tools serve Nihongo and this host.
+Unmapped legacy cards are not silently converted or counted as complete audio.
+
+The bound adapter exposes `exportCurrentAudioSource(options)` for an explicit
+local production handoff after preparation has started. It delegates to the
+existing canonical host's `exportCurrentSource`, preserving ordered demand IDs,
+revision-bound cursors and finite selection limits. Arguments and results are
+copied into the parent realm; final disposal rejects a late result. The method
+does not start another observer, download a file, enqueue jobs or submit speech.
+The caller must keep the resulting selected source export private and use the
+canonical offline consumer; a stored observation still needs fresh source
+validation before provider execution or recording attachment.
+
 `node --test tools/shared-study-canonical-host.test.mjs
  tools/shared-study-host-recovery.test.mjs tools/shared-study-sync-lifecycle.test.mjs`
 checks the host and transport composition. For actual ordinary-route browser

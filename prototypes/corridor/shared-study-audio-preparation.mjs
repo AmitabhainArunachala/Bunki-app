@@ -115,6 +115,44 @@ function ensurePreparation(entry, options) {
   return opening;
 }
 
+function exportCurrentSource(entry, options) {
+  if (entry.disposed) return Promise.reject(disposedError());
+  // Close over a parent-realm copy synchronously: a cross-frame caller may
+  // keep mutating its own selection while the canonical export is pending.
+  let request;
+  try {
+    request = structuredClone(options ?? {});
+  } catch (error) {
+    return Promise.reject(error);
+  }
+  return (async () => {
+    // Never start a host here. Join an already-started or in-flight one and
+    // surface its failure unchanged; disposal always wins at every fence.
+    if (entry.inflight) {
+      try {
+        await entry.inflight;
+      } catch (error) {
+        if (entry.disposed) throw disposedError();
+        throw error;
+      }
+    }
+    if (entry.disposed) throw disposedError();
+    const helper = entry.helper;
+    if (!helper) throw Error('shared-audio-export-not-ready');
+    if (typeof helper.exportCurrentSource !== 'function') throw Error('shared-audio-export-unavailable');
+    let result;
+    try {
+      result = await helper.exportCurrentSource(request);
+    } catch (error) {
+      if (entry.disposed) throw disposedError();
+      throw error;
+    }
+    if (entry.disposed) throw disposedError();
+    // Parent-owned copy, so canonical/caller mutation cannot alias each other.
+    return structuredClone(result);
+  })();
+}
+
 function wrap(entry) {
   const adapter = entry.adapter;
   const platform = Object.freeze({
@@ -125,6 +163,7 @@ function wrap(entry) {
     ...adapter,
     platform,
     ensureAudioPreparation: options => ensurePreparation(entry, options),
+    exportCurrentAudioSource: (options = {}) => exportCurrentSource(entry, options),
   });
 }
 
