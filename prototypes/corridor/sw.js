@@ -102,6 +102,12 @@ const SHELL = [
   'icon-512.png',
   'reference-core.js',
   'reference-ui.js',
+  'kanji-world-encounter.mjs',
+  'kanji-world-encounter.css',
+  'kanji-world/rajomon-content.json',
+  // The scene itself (kanji-world/rajomon-r1.png, 5 MB) is NOT precached: it ships as a
+  // required release asset the fetch handler verifies and caches on first use, and the
+  // encounter names an unavailable scene.
   'reference-ui.css',
   'data/share_alike/reference-extra.json',
   'data/share_alike/kkld.json',
