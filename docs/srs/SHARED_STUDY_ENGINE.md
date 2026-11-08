@@ -132,6 +132,61 @@ The [release manifest](../../release.json) owns the candidate version and links
 its delivery notes. A local preview does not establish deployment or a
 physical-device pass.
 
+## Bound development host and ordinary routes
+
+`scripts/build-shared-study-qa.mjs` derives an explicitly isolated development
+site from an already verified built Corridor artifact. It authenticates the
+source artifact and actual route inputs, retains the original build identity,
+and writes a separate `qa-host-receipt.json` describing the entry/module overlay.
+It does not claim the derived site is an independently admitted production build.
+Outputs must be fresh directories under `~/.dharma`, outside the checkout.
+
+```sh
+node scripts/build-shared-study-qa.mjs \
+  --site /absolute/path/to/verified-built-site \
+  --out /absolute/path/under/.dharma/fresh-shared-study-site \
+  --run shared-study-dev
+```
+
+Its bootstrap binds `createSharedStudyTestHost` before the ordinary Corridor
+entry initializes. The five ordinary routes `?deck=n2`, `n1`, `senmon`,
+`kotoba-master` and `shared-grammar` then consume the canonical UI without the
+`sharedStudy=preview` switch. The host uses a separate run-scoped IndexedDB
+store and synthetic learner `test-shared-audio`. A Web Lock serializes profile
+creation; an installation marker is persisted before store creation. A missing
+or malformed reopened store blocks rather than silently recreating a learner.
+The default local fixture grants only twenty initial introductions and supplies
+no authenticated network authority. Production boot does not import this host.
+
+The optional sync binding delegates request format, replay, retry and
+reconciliation to the canonical transport. Bunki supplies connectivity,
+visibility, holds, credential access and explicit pairing/permit callbacks.
+It attaches to the same canonical store used by grading; it does not write a
+second schedule. Synthetic protocol tests cover bidirectional reconciliation,
+a lost acknowledgement retried with identical command bytes, concurrent offline
+attempts, Undo, empty sync and reopen. These tests do not establish actual paired
+Mac-to-Bunki synchronization or migration of existing learner history.
+
+The optional `audio` capability passes unchanged to the canonical player.
+Hosts supply admitted release resources; canonical code checks source identity,
+content revision, bytes and face safety. Neither this host nor Bunki generates
+speech or substitutes device speech for ElevenLabs/Kore recordings.
+
+`node --test tools/shared-study-canonical-host.test.mjs
+ tools/shared-study-host-recovery.test.mjs tools/shared-study-sync-lifecycle.test.mjs`
+checks the host and transport composition. For actual ordinary-route browser
+qualification, set `BUNKI_QA_SITE`, `BUNKI_QA_EVIDENCE` and the independently
+selected `BUNKI_QA_ENGINE_CLOSURE`, then run
+`node scripts/verify-shared-study-host-browser.mjs`. The verifier uses a fresh
+test profile, grades once through each of the five real routes and reopens the
+same journal after a browser-process restart. It distinguishes first-boot shell
+record initialization from forbidden legacy grade writes.
+
+Outer Record, saved-word/kanji/question review, personal collections, context/MCD,
+assessment and other unsupported routes retain their existing contracts. The
+ordinary QA binding neither maps their identities by displayed text nor
+performs a production cutover.
+
 ## Content and provenance
 
 `data/shared-study-content.json` binds all 8,508 frozen task identities, including
