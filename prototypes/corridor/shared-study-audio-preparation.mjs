@@ -151,8 +151,14 @@ export function attachSharedStudyAudioPreparation({adapter, binding, eventTarget
     // Own the lifetime before importing: pagehide must also fence a helper
     // whose module has not resolved yet.
     if (typeof eventTarget?.addEventListener === 'function') {
-      entry.pagehide = () => disposeLifecycle(entry);
-      eventTarget.addEventListener('pagehide', entry.pagehide, {once: true});
+      function onPagehide(event) {
+        if (event?.persisted === true) return;
+        eventTarget.removeEventListener?.('pagehide', onPagehide, {capture: false});
+        entry.pagehide = null;
+        disposeLifecycle(entry);
+      }
+      entry.pagehide = onPagehide;
+      eventTarget.addEventListener('pagehide', onPagehide, {capture: false});
     }
   }
   return wrap(entry);

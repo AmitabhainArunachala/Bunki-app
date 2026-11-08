@@ -55,5 +55,10 @@ try {
   const app=mountStudyApp(root,{backend,catalog,themes,grammar,dictionary,preferences,platform,now:adapter.now,initialModule,corpus});
   if(params.get('start')==='1')root.querySelector('[data-start]')?.click();
   window.bunkiSharedStudy=Object.freeze({app,backend:adapter.backend,store:adapter.store,catalog,dictionary});
-  window.addEventListener('pagehide',()=>app.dispose(),{once:true});
+  function onPagehide(event) {
+    if (event?.persisted === true) return;
+    window.removeEventListener('pagehide', onPagehide);
+    app.dispose();
+  }
+  window.addEventListener('pagehide', onPagehide);
 } catch(error) {root.replaceChildren();const p=document.createElement('p');p.setAttribute('role','alert');p.textContent=`Shared study could not open: ${error.message}`;root.append(p);}

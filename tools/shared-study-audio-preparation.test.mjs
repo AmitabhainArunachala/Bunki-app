@@ -42,3 +42,16 @@ test('one parent pagehide listener is removed by explicit disposal before naviga
  await f.attached.ensureAudioPreparation({build,grammarRecords:[]});assert.equal(events.listeners.size,1);
  disposeSharedStudyAudioPreparation(f.adapter);assert.equal(events.listeners.size,0);assert.equal(f.stopped,1);
 });
+
+function transition(type,persisted){const e=new Event(type);Object.defineProperty(e,'persisted',{value:persisted});return e;}
+test('persisted pagehide/pageshow keeps one live observer and final pagehide disposes',async()=>{
+ const f=fixture();await f.attached.ensureAudioPreparation({build,grammarRecords:[]});
+ for(let i=0;i<2;i++){f.events.dispatchEvent(transition('pagehide',true));f.events.dispatchEvent(transition('pageshow',true));await f.attached.ensureAudioPreparation({build,grammarRecords:[]});assert.equal(f.started,1);assert.equal(f.stopped,0);assert.equal(f.listeners.size,1);}
+ f.events.dispatchEvent(transition('pagehide',false));assert.equal(f.stopped,1);assert.equal(f.listeners.size,0);assert.equal(f.attached.platform.getAudioPreparationState().state,'disposed');
+ f.events.dispatchEvent(transition('pageshow',false));await assert.rejects(()=>f.attached.ensureAudioPreparation({build,grammarRecords:[]}),/disposed/);assert.equal(f.started,1);
+});
+test('persisted navigation during lazy import does not retire or duplicate continuation',async()=>{
+ let release;const pending=new Promise(r=>release=r);const f=fixture({loadCanonical:()=>pending});const opening=f.attached.ensureAudioPreparation({build,grammarRecords:[]});
+ f.events.dispatchEvent(transition('pagehide',true));f.events.dispatchEvent(transition('pageshow',true));release(f.canonical);await opening;await f.attached.ensureAudioPreparation({build,grammarRecords:[]});
+ assert.equal(f.started,1);assert.equal(f.stopped,0);assert.equal(f.listeners.size,1);f.events.dispatchEvent(transition('pagehide',false));assert.equal(f.stopped,1);assert.equal(f.listeners.size,0);
+});

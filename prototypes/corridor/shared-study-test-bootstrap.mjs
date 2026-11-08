@@ -12,5 +12,10 @@ if (typeof runId !== 'string' || !runId) throw Error('shared-study-qa-explicit-r
 const host = await createSharedStudyTestHost({marker, runId});
 // The actual Corridor router/templates read this exact global during boot.
 globalThis.bunkiSharedStudyHost = host;
-globalThis.addEventListener?.('pagehide', () => host.dispose(), {once: true});
+function onPagehide(event) {
+  if (event?.persisted === true) return;
+  globalThis.removeEventListener('pagehide', onPagehide);
+  host.dispose();
+}
+globalThis.addEventListener('pagehide', onPagehide);
 await import('./corridor.js');
