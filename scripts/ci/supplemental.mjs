@@ -115,7 +115,7 @@ export function supplementalGates(out) {
   ].map((gate) => ({ ...gate, env: { KAIRO_EVIDENCE_DIR: join(out, gate.name), ...gate.env } }));
 }
 const DECK_PATHS = ['prototypes/corridor/decks', 'decks/kotoba-mine'];
-export function frozenDeck(root = process.cwd()) {
+export function frozenDeck(root = process.cwd(), canonicalBuilder = buildCanonicalFrozenDecks) {
   const generated = execFileSync('git', ['ls-files', '-z', '--', ...DECK_PATHS], {
     cwd: root,
     encoding: 'utf8',
@@ -130,7 +130,7 @@ export function frozenDeck(root = process.cwd()) {
         stdio: 'inherit',
       });
     // N2 packs compare fresh external output; the following git check still guards Kotoba output.
-    buildCanonicalFrozenDecks(root);
+    canonicalBuilder(root);
     execFileSync(
       'git',
       ['diff', '--stat', '--exit-code', '--', ...DECK_PATHS, ':(exclude)*.apkg'],
