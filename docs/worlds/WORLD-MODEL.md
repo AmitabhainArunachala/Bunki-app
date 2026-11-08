@@ -12,13 +12,13 @@ A **world is a view over the shared graph**, plus **one state layer**.
 
 ## The models it replaces
 
-| Model | Where it lived | Disposition |
-|---|---|---|
-| M3 world engine (T29) | design only | its design becomes an instance of this model; nothing is ported, there is no m3 module |
-| Worldcraft (M4) | `prototypes/corridor/m4-worldcraft.mjs`, `worldcraft-view.mjs` (rescued, S7-R4) | projects and help state move into the state layer; the build host becomes a view |
-| Passage (M4) | `prototypes/corridor/m4-passage.mjs` (rescued) | its interruptible continuation becomes `continuation` |
-| Quests | `prototypes/corridor/m4-quest.mjs` | the quest and journey lifecycle becomes `journeys` |
-| Kanji worlds (W12) | `prototypes/corridor/kanji-world-encounter.mjs` | an instance opened on a kanji's entries; content from the graph, never a lesson packet typed into the world |
+| Model                 | Where it lived                                                                  | Disposition                                                                                                 |
+| --------------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| M3 world engine (T29) | design only                                                                     | its design becomes an instance of this model; nothing is ported, there is no m3 module                      |
+| Worldcraft (M4)       | `prototypes/corridor/m4-worldcraft.mjs`, `worldcraft-view.mjs` (rescued, S7-R4) | projects and help state move into the state layer; the build host becomes a view                            |
+| Passage (M4)          | `prototypes/corridor/m4-passage.mjs` (rescued)                                  | its interruptible continuation becomes `continuation`                                                       |
+| Quests                | `prototypes/corridor/m4-quest.mjs`                                              | the quest and journey lifecycle becomes `journeys`                                                          |
+| Kanji worlds (W12)    | `prototypes/corridor/kanji-world-encounter.mjs`                                 | an instance opened on a kanji's entries; content from the graph, never a lesson packet typed into the world |
 
 On the integration base these models keep different state (`createQuestState`, `createWorldcraftState`, `createPassage` each return their own shape); the contract's stub tests fail against them on shape, which is the point.
 

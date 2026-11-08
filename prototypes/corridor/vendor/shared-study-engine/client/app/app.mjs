@@ -1,3 +1,5 @@
+import {buildKanjiCapacityReport} from '../kanji/capacity.mjs';
+import {renderKanjiCapacity} from '../kanji/panel.mjs';
 import {createBackupStatusObserver} from './backup-status.mjs';
 import {createFactoryStatusReader,factoryRequest} from './factory-status.mjs';
 import {applyKinsoku} from '../player/kinsoku.mjs';
@@ -195,6 +197,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       originalAttributes.set(element,after);
     }
     document.documentElement.lang=interfaceLanguage==='en'?'en':'ja';
+    document.documentElement.dataset.kanjiInterfaceLanguage=interfaceLanguage;
   }
   function languagePicker(compact=false){const select=h('select',{'aria-label':'表示言語','data-interface-language':'',onchange:async e=>{if(updateBoundary?.held)return;interfaceLanguage=e.target.value;for(const picker of root.querySelectorAll('[data-interface-language]'))picker.value=interfaceLanguage;const end=beginFlight('preference');try{await preferences.setItem('nihongo.interface-language.v1',interfaceLanguage);}catch{message('表示言語を保存できません。');}finally{end();render();}}},h('option',{value:'ja'},'日本語'),h('option',{value:'en'},'English'),h('option',{value:'both'},'両方'));select.value=interfaceLanguage;return h('label',{class:`language-picker${compact?' compact':''}`},h('span',{},'表示言語'),select);}
   let refreshFactoryRows=()=>{};
@@ -1093,7 +1096,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   }
 
   function kanjiPanel(entry) {
-    const div=renderVocabularyRelated(document,entry,{onWord:openWord,relatedWords:catalog,dictionary,onRelated:e=>{query=e.term;navigate('words');}});
+    const div=renderVocabularyRelated(document,entry,{onWord:openWord,relatedWords:catalog,dictionary,locale:interfaceLanguage,onRelated:e=>{query=e.term;navigate('words');}});
     div.append(button('Macの辞書で調べる',()=>platform.openDictionary?.(entry.term),{disabled:!platform.openDictionary,class:'quiet','data-interface-copy':''}),!platform.openDictionary?h('p',{class:'secondary','data-interface-copy':''},'Macのシステム辞書は未通信です。'):null);return div;
   }
   function repair(task,data,onSuccess){return run(backend.command('repair',{taskKey:task.taskKey,parent:task.head,...data}),onSuccess);}
@@ -1176,6 +1179,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     scheduledPage=Math.min(scheduledPage,Math.max(0,Math.ceil(nextDue.length/50)-1));
     return h('section',{class:'record'},h('header',{class:'screen-head'},h('h1',{},'学習の記録')),
       h('div',{class:'sheet stat-sheet'},h('div',{class:'record-summary'},h('div',{},h('strong',{},String(today.length)),h('span',{},'今日の回答')),h('div',{},h('strong',{},today.length?`${Math.round(recall/today.length*100)}%`:'—'),h('span',{},'今日思い出せた割合')),h('div',{},h('strong',{},String(p.captures.length)),h('span',{},'言葉の記録')))),
+      h('section',{class:'sheet','data-kanji-record':''},renderKanjiCapacity(document,buildKanjiCapacityReport(p,catalog,{now:now()}),{locale:interfaceLanguage})),
       h('section',{class:'sheet'},h('h2',{},'これからの復習'),nextDue.length?h('ul',{class:'forecast','data-scheduled-list':''},...nextDue.slice(scheduledPage*50,(scheduledPage+1)*50).map(t=>h('li',{},h('span',{'data-vocabulary-entry':''},catalog.find(e=>e.taskKey===t.taskKey)?.term||'カード'),h('span',{},displayDate(t.card.due,{dateStyle:'short',timeStyle:'short'}))))):h('p',{class:'empty'},'学習を始めると、復習の予定がここに現れます。')),
       nextDue.length>50?h('div',{class:'row-actions','data-scheduled-pages':''},button('前の50枚',()=>{scheduledPage--;render();},{disabled:scheduledPage===0}),button('次の50枚',()=>{scheduledPage++;render();},{disabled:(scheduledPage+1)*50>=nextDue.length})):null,
       ...(legacyHistory?[legacyArchive()]:[]),

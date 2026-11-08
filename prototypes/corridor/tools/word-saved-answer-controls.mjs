@@ -1,8 +1,9 @@
 /**
  * D23 · bounded control admission for the saved-word-answer tests.
  *
- * A control is a set of literal edits to corridor.js. Each edit must match exactly once; the
- * edited source is then lifted by the test it is run against. This module declares:
+ * A control applies literal edits to the declaration source returned by readAuthoredCorridor.
+ * Each edit must match exactly once before the test lifts it. Raw contributing files are pinned
+ * separately. This module declares:
  *   - the exact test inventory;
  *   - every control, with its witnesses and the collateral it may cause: 34 WORD_CONTROLS and 2
  *     LEARNING_RECORD_CONTROLS, 36 controls, run as 38 children with the two baselines;
@@ -40,6 +41,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, statSync
 import { isAbsolute, join, relative } from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { fileURLToPath } from 'node:url';
+import { readAuthoredCorridor } from './authored-corridor-source.mjs';
 
 export const CHILD_TIMEOUT_MS = 300_000;
 export const CHILD_MAX_BUFFER = 16 * 1024 * 1024;
@@ -53,7 +55,7 @@ export const WORD_CASES = Object.freeze(['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7
 /** The exact rows test-word-saved-answer.mjs must report: F0, then a setup row and a behaviour row per case. */
 export const INVENTORY = Object.freeze(['F0', ...WORD_CASES.flatMap((id) => [`${id}.setup`, id])]);
 
-/* Controls on test-word-saved-answer.mjs. `edits` are [from, to] literal pairs on corridor.js;
+/* Controls on test-word-saved-answer.mjs. `edits` are [from, to] pairs in that declaration source;
  * `witnesses` must fail; `collateral` may fail (declared by reading the code, never inferred). */
 export const WORD_CONTROLS = Object.freeze({
   C1: { note: 'resolver bypassed: the review back is lookup()’s (reviewCardBack → reviewBack)', witnesses: ['T1'], collateral: [], edits: [
@@ -402,18 +404,23 @@ export async function runControls({ root, testFile, learningRecordFile, evidence
   const stage = await stageAssessmentAuthority(root, join(evidence, 'assessment-stage'));
   const childrenDir = join(evidence, 'children');
   mkdirSync(childrenDir, { recursive: true });
-  const corridorFile = join(root, 'prototypes/corridor/corridor.js');
-  const pinned = { 'corridor.js': corridorFile, 'test-word-saved-answer.mjs': testFile,
-    'word-saved-answer-controls.mjs': fileURLToPath(import.meta.url), 'verify-learning-record.mjs': learningRecordFile,
+  const corridorRoot = join(root, 'prototypes/corridor');
+  const pinned = { 'test-word-saved-answer.mjs': testFile,
+    'word-saved-answer-controls.mjs': fileURLToPath(import.meta.url),
+    'authored-corridor-source.mjs': fileURLToPath(new URL('./authored-corridor-source.mjs', import.meta.url)),
+    'verify-learning-record.mjs': learningRecordFile,
     'dict-v2/index.json': join(root, 'prototypes/corridor/data/share_alike/dict-v2/index.json'),
     'dict.json': join(root, 'prototypes/corridor/data/share_alike/dict.json'),
     'words.json': join(root, 'prototypes/corridor/data/share_alike/words.json') };
-  const pinsNow = () => Object.fromEntries(Object.entries(pinned).map(([name, file]) =>
-    [name, { path: relative(root, file), sha256: sha256(readFileSync(file)) }]));
+  // the closure is recomputed on every read, so an added or removed contributor changes the pin set
+  const pinsNow = () => Object.fromEntries([
+    ...Object.entries(pinned).map(([name, file]) => [name, { path: relative(root, file), sha256: sha256(readFileSync(file)) }]),
+    ...readAuthoredCorridor(corridorRoot).files.map((file) => [file.path,
+      { path: relative(root, join(corridorRoot, file.path)), sha256: file.sha256 }])]);
   const pins = pinsNow();
   const stagePins = Object.fromEntries(readdirSync(stage, { recursive: true }).map(String).sort()
     .filter((name) => statSync(join(stage, name)).isFile()).map((name) => [name, sha256(readFileSync(join(stage, name)))]));
-  const authored = readFileSync(corridorFile, 'utf8');
+  const authored = readAuthoredCorridor(corridorRoot).source;
   const authoredSha256 = sha256(authored);
   const bounds = { timeoutMs, killSignal: 'SIGKILL', maxBufferBytesPerStream: CHILD_MAX_BUFFER };
   // a control child writes no gate report: it runs without the gate's evidence directory

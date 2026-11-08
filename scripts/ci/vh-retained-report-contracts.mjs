@@ -380,6 +380,7 @@ export const RETAINED_CASES = Object.freeze({
 import { createHash } from 'node:crypto';
 import { lstatSync, readFileSync, realpathSync, statSync } from 'node:fs';
 import { isAbsolute, join, relative, resolve } from 'node:path';
+import { readAuthoredCorridor } from '../../prototypes/corridor/tools/authored-corridor-source.mjs';
 const WORD_IDS = [
   'T1',
   'T2',
@@ -825,6 +826,9 @@ const LEARNING_RECORD_INVENTORY = Object.freeze([
   // FULL-prep (2026-10-20): Hfix-1B (L-1), which every learning-record run carries since INT-VH merge 1; INT-VH added it
   // to RECORD_GATE_CASES.learningControlled but not to this copy, so no mutation-control report could be admitted
   'hfix1b-me-reads-one-count-so-unaided-never-exceeds-read',
+  'ticket-return-retains-published-grade-acknowledged-without-an-extra-write',
+  'ticket-return-retains-published-grade-unacknowledged-without-an-extra-write',
+  'ticket-continuation-and-independent-reader-position-write-do-not-replay-grades',
 ]);
 const WORD_SAVED_ANSWER_INVENTORY = Object.freeze(
   wordCases.filter((id) => id !== 'inventory-exact'),
@@ -833,6 +837,7 @@ const MUTATION_CONTROL_PINS = Object.freeze({
   'corridor.js': 'prototypes/corridor/corridor.js',
   'test-word-saved-answer.mjs': 'prototypes/corridor/tools/test-word-saved-answer.mjs',
   'word-saved-answer-controls.mjs': 'prototypes/corridor/tools/word-saved-answer-controls.mjs',
+  'authored-corridor-source.mjs': 'prototypes/corridor/tools/authored-corridor-source.mjs',
   'verify-learning-record.mjs': 'prototypes/corridor/tools/verify-learning-record.mjs',
   'dict-v2/index.json': 'prototypes/corridor/data/share_alike/dict-v2/index.json',
   'dict.json': 'prototypes/corridor/data/share_alike/dict.json',
@@ -1079,17 +1084,24 @@ function mutationControls(producer) {
       require(r?.format === 'd23-control-admission' &&
         r.version === 2, 'Wrong control report format');
       require(sameSite(r.root, c.root), 'Controls ran against another checkout');
+      const authored = readAuthoredCorridor(join(c.root, 'prototypes/corridor'));
+      const pinnedPaths = {
+        ...MUTATION_CONTROL_PINS,
+        ...Object.fromEntries(
+          authored.files.map((file) => [file.path, `prototypes/corridor/${file.path}`]),
+        ),
+      };
       const pinned = Object.fromEntries(
-        Object.entries(MUTATION_CONTROL_PINS).map(([key, path]) => [
+        Object.entries(pinnedPaths).map(([key, path]) => [
           key,
           sha256(readFileSync(resolve(c.root, path))),
         ]),
       );
       const pins = r.pins;
       require(pins?.stable === true &&
-        exact(Object.keys(MUTATION_CONTROL_PINS), Object.keys(pins.before || {})) &&
+        exact(Object.keys(pinnedPaths), Object.keys(pins.before || {})) &&
         JSON.stringify(pins.before) === JSON.stringify(pins.after) &&
-        Object.entries(MUTATION_CONTROL_PINS).every(
+        Object.entries(pinnedPaths).every(
           ([key, path]) =>
             pins.before[key]?.path === path && pins.before[key].sha256 === pinned[key],
         ), 'Pinned sources unstable or differ from the current checkout');
@@ -1112,7 +1124,7 @@ function mutationControls(producer) {
       ), 'Missing, duplicate or extra control child');
       for (const row of children)
         if (MUTATION_CONTROL_CHILDREN.includes(row?.child))
-          mutationChild(c, row, row.child, pinned['corridor.js'], s);
+          mutationChild(c, row, row.child, sha256(authored.source), s);
       const verdicts = Array.isArray(r.verdicts) ? r.verdicts : [];
       require(exact(
         MUTATION_CONTROL_CHILDREN.filter((id) => !id.endsWith('-baseline')),

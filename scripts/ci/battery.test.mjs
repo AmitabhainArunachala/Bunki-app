@@ -6,7 +6,8 @@ import { homedir, tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import test from 'node:test';
 import { batteryGates, gateTimeoutMs, runGates } from '../verify-release-gates.mjs';
-import { frozenDeck, supplementalGates } from './supplemental.mjs';
+import { supplementalGates } from './supplemental.mjs';
+import { CANONICAL_FIXTURE_FILES, frozenFixtureDeck } from './frozen-deck-fixture.mjs';
 import { EventEmitter } from 'node:events';
 import { parse as parseYaml } from 'yaml';
 import { scheduledBudget, SCHEDULING_POLICY } from './scheduling-budgets.mjs';
@@ -920,7 +921,7 @@ const DECK_APKGS = [
   'decks/kotoba-mine/release/public/kotoba-mine.apkg',
   'decks/kotoba-mine/release/public/kotoba-mcd.apkg',
 ];
-function deckRepo(extra = '', n2n1Extra = '') {
+function deckRepo(extra = '', canonicalExtra = '') {
   const repo = fresh();
   const files = {
     'decks/kotoba-mine/tools/build.py': [
@@ -932,17 +933,25 @@ function deckRepo(extra = '', n2n1Extra = '') {
       extra,
       '',
     ].join('\n'),
-    // the N2/N1 pack build the gate also runs (ruling 1250): it rewrites its committed pack with the same bytes
-    'decks/n2n1/tools/build_n2n1.py': [
-      'import pathlib',
-      "pack = pathlib.Path(__file__).resolve().parents[3] / 'prototypes/corridor/decks/n2/deck.json'",
-      'pack.write_text(pack.read_text())',
-      n2n1Extra,
+    'tools/build_bunki.py': [
+      'import json, pathlib, sys',
+      'root, output = map(pathlib.Path, sys.argv[1:])',
+      `files = json.loads(${JSON.stringify(JSON.stringify(CANONICAL_FIXTURE_FILES))})`,
+      'for name, text in files.items():',
+      '    target = output / name',
+      '    target.parent.mkdir(parents=True, exist_ok=True)',
+      '    target.write_text(text)',
+      canonicalExtra,
       '',
     ].join('\n'),
     'decks/kotoba-mine/release/kotoba-mine.tsv': 'card\n',
     'prototypes/corridor/decks/index.json': '{}\n',
-    'prototypes/corridor/decks/n2/deck.json': '{"id":"n2"}\n',
+    ...Object.fromEntries(
+      Object.entries(CANONICAL_FIXTURE_FILES).map(([file, text]) => [
+        `prototypes/corridor/decks/${file}`,
+        text,
+      ]),
+    ),
     ...Object.fromEntries(DECK_APKGS.map((file) => [file, `original ${file}`])),
   };
   for (const [file, text] of Object.entries(files)) {
@@ -972,7 +981,7 @@ const dirty = (repo) =>
 test('frozen deck build restores its timestamped APKGs and still rejects any other deck mutation', () => {
   const clean = deckRepo();
   const original = apkgBytes(clean);
-  frozenDeck(clean);
+  frozenFixtureDeck(clean);
   assert.deepEqual(apkgBytes(clean), original);
   assert.equal(dirty(clean), '');
   for (const [extra, pattern, left] of [
@@ -990,19 +999,53 @@ test('frozen deck build restores its timestamped APKGs and still rejects any oth
   ]) {
     const repo = deckRepo(extra);
     const before = apkgBytes(repo);
-    assert.throws(() => frozenDeck(repo), pattern);
+    assert.throws(() => frozenFixtureDeck(repo), pattern);
     assert.deepEqual(apkgBytes(repo), before, extra);
     assert.equal(dirty(repo), left, extra);
   }
-  // the N2/N1 packs are under the same parity: a rebuild that changes a committed pack is refused
-  const drifted = deckRepo('', 'pack.write_text(\'{"id":"n2","words":[]}\\n\')');
+  const drifted = deckRepo(
+    '',
+    "(root / 'prototypes/corridor/decks/n2/deck.json').write_text('changed\\n')\n" +
+      "(output / 'n2/deck.json').write_text('changed\\n')",
+  );
   const before = apkgBytes(drifted);
-  assert.throws(() => frozenDeck(drifted), /Command failed: git diff/u);
+  assert.throws(() => frozenFixtureDeck(drifted), /Command failed: git diff/u);
   assert.deepEqual(apkgBytes(drifted), before);
   assert.equal(dirty(drifted), ' M prototypes/corridor/decks/n2/deck.json');
 });
+test('frozen deck build requires all eight external canonical outputs and restores APKGs on producer failure', () => {
+  for (const file of Object.keys(CANONICAL_FIXTURE_FILES)) {
+    const repo = deckRepo(
+      '',
+      `target = output / ${JSON.stringify(file)}\ntarget.write_text(target.read_text() + ' ')`,
+    );
+    const before = apkgBytes(repo);
+    assert.throws(
+      () => frozenFixtureDeck(repo),
+      (error) => error.message === `Canonical deck byte parity mismatch: ${file}`,
+      file,
+    );
+    assert.deepEqual(apkgBytes(repo), before, file);
+    assert.equal(dirty(repo), '', file);
+  }
+  for (const [extra, pattern, left] of [
+    ["(output / 'n1/tokens.json').unlink()", /ENOENT/u, ''],
+    ['sys.exit(3)', /Command failed: python3/u, ''],
+    [
+      "(root / 'prototypes/corridor/decks/extra.json').write_text('{}\\n')",
+      /Deck build wrote uncommitted outputs/u,
+      '?? prototypes/corridor/decks/extra.json',
+    ],
+  ]) {
+    const repo = deckRepo('', extra);
+    const before = apkgBytes(repo);
+    assert.throws(() => frozenFixtureDeck(repo), pattern);
+    assert.deepEqual(apkgBytes(repo), before, extra);
+    assert.equal(dirty(repo), left, extra);
+  }
+});
 test('the per-gate source boundary admits the restoring frozen build and rejects an unrestored APKG rewrite', async () => {
-  const supplemental = new globalThis.URL('./supplemental.mjs', import.meta.url).href;
+  const fixtureModule = new globalThis.URL('./frozen-deck-fixture.mjs', import.meta.url).href;
   const probe = (name, args) => ({
     name,
     command: process.execPath,
@@ -1017,7 +1060,7 @@ test('the per-gate source boundary admits the restoring frozen build and rejects
       probe('deck-frozen-fixture', [
         '--input-type=module',
         '-e',
-        `import { frozenDeck, supplementalGates } from ${JSON.stringify(supplemental)}; frozenDeck(process.cwd());`,
+        `import { frozenFixtureDeck } from ${JSON.stringify(fixtureModule)}; frozenFixtureDeck(process.cwd());`,
       ]),
     ],
     root: restoring,

@@ -79,6 +79,9 @@ const ROOMS_JA = ['tray', 'saved', 'list', 'dojo', 'probe', 'lessons', 'feed', '
 
 // the doors this check walks through, appended to the module's own source (changes nothing it does not name)
 const BRIDGE = `
+import { mainParts } from './modules/worlds.mjs';
+import { partGloss } from './modules/dictionary.mjs';
+import { todayHook } from './modules/drift.mjs';
 window.__COMB__ = {
   open: async (id) => { try { removeMini(); } catch {} S.stack = []; const p = D.passages.find((x) => x.id === id); if (!p) return false; await ensureArticle(p); openPassage(p.id); window.scrollTo(0, 0); return true; },
   visit: (v) => { try { removeMini(); } catch {} S.stack = []; S.strokes = null; S.view = v; render(); window.scrollTo(0, 0); return S.view; },
@@ -97,9 +100,9 @@ const NEG_CSS = {
 };
 const NEG_SOURCE = {
   card: [['corridor.js', 'function anchorBox(anchor) {', 'function anchorBox(anchor) { return anchor.getBoundingClientRect();']],
-  parts: [['corridor.js', 'function mainParts(c) {\n  const k = D.kanji[c];', "function mainParts(c) {\n  if (c === '総') return ['糸', '忩', '公'];\n  const k = D.kanji[c];"]],
-  hook: [['corridor.js', 'function todayIsRadical(part, c) {', 'function todayIsRadical(part, c) { return true;']],
-  count: [['corridor.js', 'function shelfTallyText(list) {', 'function shelfTallyText(list) { list = [...list, list[0]];']],
+  parts: [['modules/worlds.mjs', 'function mainParts(c) {\n  const k = D.kanji[c];', "function mainParts(c) {\n  if (c === '総') return ['糸', '忩', '公'];\n  const k = D.kanji[c];"]],
+  hook: [['modules/drift.mjs', 'function todayIsRadical(part, c) {', 'function todayIsRadical(part, c) { return true;']],
+  count: [['modules/library.mjs', 'function shelfTallyText(list) {', 'function shelfTallyText(list) { list = [...list, list[0]];']],
   focus: [['corridor.js', "box.addEventListener('change', () => { focusList = listName; void setMembership(listName, box.checked); });", "box.addEventListener('change', () => void setMembership(listName, box.checked));"]],
   // the base's seating: only the definition is budgeted above the pads (the note and the rest may sit under them), and
   // only the folds' summaries are rows the pads may not cut
@@ -107,8 +110,8 @@ const NEG_SOURCE = {
     ['decks/player/mount.js', "const FOLD_ROWS = '.kp-folds > details > summary, .kp-folds > :not(details)';", "const FOLD_ROWS = '.kp-folds > details > summary';"]],
   offline: [['maintenance/report-client.js', 'mime_type: file.type, bytes: bytes[i] })', 'mime_type: file.type, blob: file })']],
   // the web's kanji and parts named by the table's whole meaning again ("dotted cliff radical (no. 53)")
-  plain: [['corridor.js', '  return { en: partMeaning(k.m), ja:', "  return { en: String(k.m || '').toLowerCase(), ja:"],
-    ['corridor.js', '    en: partGloss(null, p) || `${count} kanji`,', '    en: D.kanji[p]?.m ? String(D.kanji[p].m).toLowerCase() : `${count} kanji`,']],
+  plain: [['modules/worlds.mjs', "  return { en: partMeaning(kanjiReferenceView(c, k).meanings.join('; ')), ja:", "  return { en: String(k.m || '').toLowerCase(), ja:"],
+    ['modules/worlds.mjs', '    en: partGloss(null, p) || `${count} kanji`,', '    en: D.kanji[p]?.m ? String(D.kanji[p].m).toLowerCase() : `${count} kanji`,']],
   guided: [['corridor.js', 'function openGuidedRoom(from) {', 'function openGuidedRoom(from) { const until = performance.now() + 1500; while (performance.now() < until) { /* the negative control: a slow open */ }']],
 };
 

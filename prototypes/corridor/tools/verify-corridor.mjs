@@ -751,8 +751,9 @@ async function pendingSaveEngine(browser, engine, base) {
   await context.addInitScript(() => { localStorage.setItem('kairo-word-ladder-demo-v1', '1'); });
   await silenceBrowserAudio(context);
   let hold = false, release = () => {}, gate = Promise.resolve(), asked = 0, armed = false;
+  let heldRequest = null;
   await context.route((url) => PENDING_SHARD.test(url.pathname), async (route) => {
-    if (hold) { asked += 1; await gate; }
+    if (hold) { asked += 1; heldRequest?.(); await gate; }
     try { await route.continue(); } catch { /* the page went first */ }
   });
   if (PENDING_NEGATIVE) await context.route(/\/corridor\.js(\?.*)?$/u, async (route) => {
@@ -820,6 +821,15 @@ async function pendingSaveEngine(browser, engine, base) {
       try {
         await coldLetter();
         await stage(kind === 'inflight-below' ? 'top' : 'center');
+        // The pending card can precede the shard's entry into the held route.
+        await new Promise((done, reject) => {
+          if (asked > 0) { done(); return; }
+          const timer = setTimeout(() => {
+            heldRequest = null;
+            reject(new Error('the dictionary shard did not enter the held route'));
+          }, 15000);
+          heldRequest = () => { clearTimeout(timer); heldRequest = null; done(); };
+        });
         const pending = await page.evaluate(() => { window.__pendingCard = document.getElementById('mini'); return { wait: !!document.querySelector('#mini [data-sense-wait]'),
           saved: document.getElementById('mini-take')?.textContent.trim(), side: document.getElementById('mini')?.dataset.side ?? null }; });
         const aim = await page.locator('#mini-take').boundingBox();

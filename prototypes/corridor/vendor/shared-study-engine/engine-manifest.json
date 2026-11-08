@@ -18,7 +18,7 @@
   },
   "source": {
     "repository": "nihongo-srs",
-    "commit": "2602ec65f79154616abb2f3666f3928929a93413",
+    "commit": "d31317b809606e0889dba5f85b87c24bdf46fa30",
     "mode": "committed",
     "changedFiles": []
   },
@@ -43,13 +43,13 @@
   "files": [
     {
       "path": "client/app/app.css",
-      "bytes": 57468,
-      "sha256": "eb5f2610a19f417d3fef4f2a9735f33977492740641fafe9c62e07de2f67d989"
+      "bytes": 58117,
+      "sha256": "af7aa8515e26b1562fbb0b12b5df9024c693dc74e47645a03a96a32cd97de1f1"
     },
     {
       "path": "client/app/app.mjs",
-      "bytes": 168637,
-      "sha256": "38b7d90fcb7ff6ff1fcd6a6d7444db576a58019c10e902b9601080b24cee94df"
+      "bytes": 169025,
+      "sha256": "1b69470ebd6bf78b3fbbac3bae18788c41d23b1525ed688298d2827cf956e361"
     },
     {
       "path": "client/app/backup-status.mjs",
@@ -1402,6 +1402,31 @@
       "sha256": "8043c0e7e4d06188e63b8b3e149c6e3188c5aa698c9f1f860c6b9dcdebebd613"
     },
     {
+      "path": "client/kanji/capacity.mjs",
+      "bytes": 23695,
+      "sha256": "205eb6b9c71624dbe2485b04118ff33d3b2e0fe46ad1ca62f8fc0601ae6d200a"
+    },
+    {
+      "path": "client/kanji/families.mjs",
+      "bytes": 6007,
+      "sha256": "b21c261b62fab8934465c1c3840dcf53fec03e04875db3cd30f9f5d13cb29947"
+    },
+    {
+      "path": "client/kanji/kanji.css",
+      "bytes": 11141,
+      "sha256": "582856d1c102087d34e930354acf4cc97ba0a721039aa634805ba118bc2a2e74"
+    },
+    {
+      "path": "client/kanji/model.mjs",
+      "bytes": 4461,
+      "sha256": "83c1dce60c170f90db06c8c9ce21ee6508c45bacd7046bbb7837638f62869f17"
+    },
+    {
+      "path": "client/kanji/panel.mjs",
+      "bytes": 30842,
+      "sha256": "30741f1cb9969bb06d5fb16217f35295f83507abfdf54b1795dde821814faee2"
+    },
+    {
       "path": "client/materializer.mjs",
       "bytes": 12296,
       "sha256": "9ca3d1f59737c1b327acd47e01ceb34ebab6e961fc24e5fc813d06ed02aa74e7"
@@ -1423,8 +1448,8 @@
     },
     {
       "path": "client/player/dictionary.mjs",
-      "bytes": 7023,
-      "sha256": "660b37858b1bd0e5af3f47ba7fc0e4ef6faa4d6539258e1cdf032fe90a128b37"
+      "bytes": 7385,
+      "sha256": "669a59e34789d5a6d85adda65ec583e8211e3a33f4c9fd2757f02e07d248e101"
     },
     {
       "path": "client/player/kinsoku.mjs",
@@ -1448,8 +1473,8 @@
     },
     {
       "path": "client/player/passage-reading-rules.mjs",
-      "bytes": 719172,
-      "sha256": "3a5d5d4ccd5619aa5da48368e3392abc2312e8f63db8752e9dfb79e4f1255732"
+      "bytes": 753368,
+      "sha256": "7301637fd15a3b7752f873be5954ccea4d7748fca01723524f04062fa04eb98f"
     },
     {
       "path": "client/player/presentation.mjs",
@@ -1488,8 +1513,8 @@
     },
     {
       "path": "client/player/vocabulary.mjs",
-      "bytes": 11355,
-      "sha256": "5967deebbc06762465653b0c7382d538dc5ef011f6a86f2d8c970bc82219ee9b"
+      "bytes": 10065,
+      "sha256": "b785c0841f744c28f45083da119f30491a9bda2aa9fcf1fd281190a98d83aac4"
     },
     {
       "path": "client/replay.mjs",
@@ -1567,5 +1592,5 @@
       "sha256": "adab18734248871867be9cf62fa25b58cce3f3f37a34a81e714b0b1b26e10dba"
     }
   ],
-  "closureSha256": "f3626961823781b8e2e3ae044973b70ba9b6446c6d34e009231f1dbe2e5cedf7"
+  "closureSha256": "f7600a7fb831b7d7f9ac065d98f2aee7fe1bda93c1662b32557d3cc943ce8492"
 }

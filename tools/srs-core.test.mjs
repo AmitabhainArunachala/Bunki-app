@@ -1,3 +1,4 @@
+/* global structuredClone */
 /**
  * The app's one schedule owner (prototypes/corridor/srs-core.mjs): the sitting rule (Anki's order,
  * learn-ahead only by the learner's choice with nothing else left), the due gate every surface asks

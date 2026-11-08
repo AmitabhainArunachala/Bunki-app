@@ -62,7 +62,8 @@ const sourceInputs = (files, modules) =>
 let staging;
 try {
   const space = statfsSync(repo);
-  if (!process.env.CI && space.bavail * space.bsize < 8 * 1024 ** 3) throw new Error('Disk guard: local builds require at least 8 GiB available.');
+  if (!process.env.CI && space.bavail * space.bsize < 8 * 1024 ** 3)
+    throw new Error('Disk guard: local builds require at least 8 GiB available.');
   const destination = canonicalDestination(output);
   if (inside(realpathSync(repo), destination)) {
     throw new Error(
@@ -76,7 +77,9 @@ try {
   }
   if (existsSync(output))
     throw new Error('Output already exists; choose a new directory. No files were replaced.');
-  execFileSync(process.execPath, [join(repo, 'scripts/verify-shared-study.mjs')], {stdio:'pipe'});
+  execFileSync(process.execPath, [join(repo, 'scripts/verify-shared-study.mjs')], {
+    stdio: 'pipe',
+  });
   for (const path of [
     'corridor.js',
     'device-voice.mjs',

@@ -22,8 +22,8 @@
  *   C1  timed Kanji-only practice of a card not due records practice only, never a review;
  *   B   burying across surfaces (lead's ruling 10-19): 検証 answered in 専門 → its cards in 言葉の鉱脈, MCD, the context
  *       deck and its saved word: card rest today and are served tomorrow; kanji:検 and the MCD 字 card are not buried;
- *   one owner: no production file builds a scheduler except srs-core.mjs and the corridor's own construction, which is
- *       proved equal to srs-core's.
+ *   one owner: on the production surfaces and paths exercised here, schedulers are built by srs-core.mjs or the
+ *       corridor's own construction, which is proved equal to srs-core's.
  * Negative controls (in-memory edits of the served files, no disk copies): the old pos+4 rule, a label that lies, a
  * surface with its own queue rule (the context deck freezing its queue; the corridor learning ahead silently), a
  * stale whole-ledger write, a second scheduler construction, burying switched off. Each must turn its named check red,
@@ -40,8 +40,8 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
-import { mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
-import { join, relative, resolve } from 'node:path';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
@@ -57,6 +57,8 @@ import * as fsrsApi from '../vendor/ts-fsrs.mjs';
 import * as player from '../decks/player/engine.js';
 import * as contextEngine from '../decks/context-dense/engine.js';
 import { createEngine as personalEngine } from '../decks/personal/engine.mjs';
+import { readAuthoredCorridor } from './authored-corridor-source.mjs';
+import { instrumentSchedulerOwnership, readSchedulerOwnership, judgeSchedulerOwnership, probeSchedulerEngine } from './srs-ownership-probe.mjs';
 
 const TOOL_DIR = fileURLToPath(new URL('.', import.meta.url));
 const SOURCE = resolve(TOOL_DIR, '..');
@@ -79,6 +81,7 @@ const check = (name, pass, detail = '') => {
   return !!pass;
 };
 const receipt = { format: 'bunki-srs-conformance', version: 1, startedAt: new Date().toISOString(), uptimeStart: uptime(), site: SITE, engines: ENGINES, controls: [] };
+receipt.ownershipProbeSha256 = createHash('sha256').update(readFileSync(new URL('./srs-ownership-probe.mjs', import.meta.url))).digest('hex');
 try {
   const identity = JSON.parse(readFileSync(join(SITE, 'build-identity.json'), 'utf8'));
   Object.assign(receipt, { gitSha: identity.gitSha, sourceDirty: identity.sourceDirty, artifactSha256: identity.artifactSha256 });
@@ -112,34 +115,12 @@ function nodePart() {
   ];
   check('rule · learning waits while cards remain, comes first once due, early only by choice and only within 20 min', rule.every(Boolean), rule.join(' '));
 
-  // one owner: who builds an FSRS scheduler
-  const files = [];
-  const walk = (dir) => {
-    for (const name of readdirSync(dir)) {
-      const path = join(dir, name);
-      const rel = relative(SOURCE, path);
-      if (/^(vendor|tools|node_modules|evidence|maintenance|design|audio|fonts|data)(\/|$)/u.test(rel) || /\/tests?\//u.test(rel) || /\.test\.(m?js)$/u.test(name)) continue;
-      if (statSync(path).isDirectory()) walk(path);
-      else if (/\.(m?js)$/u.test(name)) files.push(rel);
-    }
-  };
-  walk(SOURCE);
-  const builders = (text) => text.split('\n').filter((line) => !/^\s*(\/\/|\*|\/\*)/u.test(line) && /\b(generatorParameters|fsrs)\s*\(/u.test(line)).length;
-  const scan = (read) => Object.fromEntries(files.map((rel) => [rel, builders(read(rel))]).filter(([, n]) => n));
-  const found = scan((rel) => readFileSync(join(SOURCE, rel), 'utf8'));
-  const owners = JSON.stringify(found) === JSON.stringify({ 'corridor.js': 2, 'srs-core.mjs': 1 }) || JSON.stringify(found) === JSON.stringify({ 'srs-core.mjs': 1, 'corridor.js': 2 });
-  check('one owner · only srs-core.mjs (and the corridor\'s own construction, proved equal below) builds a scheduler', owners, found);
-  const importers = ['decks/player/engine.js', 'decks/context-dense/engine.js', 'decks/personal/engine.mjs', 'decks/personal/mount.mjs', 'corridor.js']
-    .filter((rel) => !readFileSync(join(SOURCE, rel), 'utf8').includes('srs-core.mjs'));
-  check('one owner · every surface asks srs-core.mjs', importers.length === 0, importers.join(', ') || 'player, context, personal, corridor');
-  if (CONTROLS) {
-    const mutated = scan((rel) => readFileSync(join(SOURCE, rel), 'utf8') + (rel === 'decks/context-dense/engine.js' ? '\nconst own = fsrsApi.fsrs(fsrsApi.generatorParameters({}));\n' : ''));
-    control('a second scheduler construction (context engine)', 'one owner', JSON.stringify(mutated) !== JSON.stringify(found));
-  }
-
   // the corridor's construction, lifted from the authored source, against srs-core's for every preset and fitted weights
-  const corridorSource = readFileSync(join(SOURCE, 'corridor.js'), 'utf8');
-  const ast = ts.createSourceFile('corridor.js', corridorSource, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+  const authored = readAuthoredCorridor(SOURCE);
+  const corridorSource = authored.source;
+  receipt.sourceSha256 = createHash('sha256').update(readFileSync(join(SOURCE, 'corridor.js'))).digest('hex');
+  receipt.sourceFiles = authored.files;
+  const ast = ts.createSourceFile('authored-corridor.js', corridorSource, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
   const fittedW = pin.w.map((v, i) => (i < 4 ? Number((v * 1.5).toFixed(4)) : i === 8 ? Number((v + 0.3).toFixed(4)) : v));
   const cases = [
     ['no choice', {}], ['standard', { preset: 'standard' }], ['gentle', { preset: 'gentle', retention: 0.85 }], ['hardcore', { preset: 'hardcore' }],
@@ -284,6 +265,7 @@ const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
 const host = await startStaticHost({ site: SITE, port: 0 });
 const BASE = host.origin;
 let overrides = {};
+let ownershipCalls = [];
 async function applyOverrides(context) {
   for (const [file, body] of Object.entries(overrides)) {
     await context.route((url) => url.origin === BASE && url.pathname === `/${file}`, (route) => route.fulfill({ status: 200, body, headers: { 'content-type': 'text/javascript; charset=utf-8', 'cache-control': 'no-store' } }));
@@ -323,6 +305,16 @@ async function newPage(browser, { seedLocal = null } = {}) {
   // the machine's own time zone: the app's importer and the learner's day both read it
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, serviceWorkers: 'block' });
   await applyOverrides(context);
+  await instrumentSchedulerOwnership(context, BASE);
+  const observeOwnership = Object.keys(overrides).length === 0;
+  const close = context.close.bind(context);
+  context.close = async (...args) => {
+    try {
+      if (observeOwnership) ownershipCalls.push(...await readSchedulerOwnership(context, BASE));
+    } finally {
+      await close(...args);
+    }
+  };
   await silenceBrowserAudio(context);
   const page = await context.newPage();
   await page.clock.install({ time: T_LOCAL });
@@ -964,6 +956,7 @@ for (const engine of ENGINES) {
   try {
     receipt[`${engine}Version`] = browser.version();
     overrides = {};
+    ownershipCalls = [];
     early = {};
     if (runs('john')) await scenario(`[${engine}] John's route`, () => playerJohnRoute(browser, engine));
     if (runs('steps')) await scenario(`[${engine}] deck player steps`, () => playerSteps(browser, engine));
@@ -977,6 +970,27 @@ for (const engine of ENGINES) {
     if (runs('john') && runs('corridor') && runs('early')) {
       check(`[${engine}] (c) one early wording: the deck player, context cards, saved words and your own texts each say "${EARLY_WORDS[0]}"`,
         ['deck', 'context', 'corridor', 'personal'].every((k) => EARLY_WORDS.includes(early[k])), early);
+    }
+    if (runs('ownership') || !ONLY) {
+      const observed = judgeSchedulerOwnership(ownershipCalls, [
+        '/decks/player/engine.js', '/decks/context-dense/engine.js', '/decks/personal/engine.mjs', '/decks/personal/mount.mjs', '/corridor.js',
+      ]);
+      const positive = await scenario(`[${engine}] scheduler ownership probe`, () => probeSchedulerEngine(browser, BASE, pin));
+      check(`[${engine}] one owner · only srs-core.mjs and corridor.js construct the exercised schedulers`, observed.owners && positive?.owners, observed);
+      check(`[${engine}] one owner · every surface executes srs-core.mjs`, observed.delegated && positive?.delegated, observed.missing);
+      if (CONTROLS) {
+        const aliased = mutant('decks/context-dense/engine.js', '  return srsCore.createScheduler(fsrsApi, pin, learner);',
+          '  const { fsrs: construct, generatorParameters: parameters } = fsrsApi;\n  construct(parameters({}));\n  return srsCore.createScheduler(fsrsApi, pin, learner);');
+        const second = await scenario(`[${engine}] aliased scheduler ownership control`, () => probeSchedulerEngine(browser, BASE, pin, aliased['decks/context-dense/engine.js']));
+        control(`[${engine}] a second aliased scheduler construction (context engine)`, 'one owner', second?.owners === false && second.delegated && second.constructors > positive?.constructors, second);
+        const commentOnly = `// import * as srsCore from '../../srs-core.mjs';
+          export function createScheduler(api) {
+            const { fsrs: construct, generatorParameters: parameters } = api;
+            return construct(parameters(${JSON.stringify(srsCore.schedulerInput(pin))}));
+          }`;
+        const bypass = await scenario(`[${engine}] comment-only core ownership control`, () => probeSchedulerEngine(browser, BASE, pin, commentOnly));
+        control(`[${engine}] comment-only srs-core import with a working private scheduler`, 'one owner', bypass?.owners === false && bypass.delegated === false && bypass.missing.includes('/decks/context-dense/engine.js'), bypass);
+      }
     }
     if (CONTROLS) {
       if (runs('john')) {

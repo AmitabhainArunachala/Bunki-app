@@ -54,7 +54,10 @@ export const commandChecks = Object.freeze({
     inputs: [
       'scripts/ci/supplemental.mjs',
       'decks/kotoba-mine/tools/build.py',
+      // canonical2602 imports this former standalone builder as a library.
       'decks/n2n1/tools/build_n2n1.py',
+      'scripts/ci/canonical-decks.mjs',
+      'scripts/ci/canonical-decks-source.json',
     ],
   },
   'runtime-syntax': {

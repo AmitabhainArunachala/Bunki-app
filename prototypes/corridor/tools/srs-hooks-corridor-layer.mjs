@@ -124,6 +124,8 @@ export function corridorSandbox(program, { core, fsrsApi, pin, record, dict = {}
     kanjiAnswerAvailable: () => true,
     assertWordAnswerPresented: () => {},
     resetAssessmentQuestionReview: () => {},
+    // Presentation boundary; speech retirement is covered by the voice suite.
+    retireCardSpeech: () => {},
     finiteNumber: (v) => Number.isFinite(v),
     nonEmptyString: (v) => typeof v === 'string' && v.trim() !== '',
     plainRecord: (v) => v !== null && typeof v === 'object' && !Array.isArray(v),

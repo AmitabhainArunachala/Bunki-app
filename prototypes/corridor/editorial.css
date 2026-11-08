@@ -775,6 +775,7 @@ html[data-register='tutor'] main button.japanese-lookup-word { border: 0; backgr
   .exam-option-text { font-size: var(--type-reading); }
 }
 @media (max-width: 360px) {
+  body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main:has(> [data-shared-study]) { padding-inline: 8px; }
   .reference-other-rooms { width: 100%; justify-content: space-between; }
   .sheet-bar .sheet-depth { min-width: 18px; }
 }

@@ -334,12 +334,16 @@ async function readerSettled(page) {
   return settled;
 }
 async function openWord(fixture) {
-  // Wait in real time before the native baseline so that the preceding reader
-  // bookmark debounce can settle.
-  await delay(950);
-  const { page, source } = fixture, before = await readAppRecordSnapshot(page), earliest = Date.now();
+  const { page, source } = fixture;
+  // The reader saves its place 900 ms after scrolling. Capture the settled state before the entry's own focus
+  // navigation, let that navigation's legitimate bookmark settle, and only then take the entry baseline, so that
+  // pre-entry navigation cannot be attributed to opening the word drawer.
+  const preFocus = await readerSettled(page);
   // the full entry's keyboard door on the word itself (Ctrl+Enter; reader lane 2026-10-02 retired the focus pill)
   const token = page.locator(`#reader .tok[data-index="${source.index}"]`); await focusSourceWord(page, token);
+  const preEntry = await readerSettled(page);
+  unchangedExcept(preFocus, preEntry, ['readerPos']);
+  const before = await readAppRecordSnapshot(page), earliest = Date.now();
   await page.keyboard.press('Control+Enter');
   await page.locator(`#sheet[data-node="word:${source.token.b}"]`).waitFor();
   await waitForAppRecord(page, record => record.obslog.length === before.record.obslog.length + 1);
