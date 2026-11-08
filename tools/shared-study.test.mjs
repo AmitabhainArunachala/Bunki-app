@@ -1,9 +1,18 @@
 /* global structuredClone */
 import { Buffer } from 'node:buffer';
+import assert from 'node:assert/strict';
 import process from 'node:process';
 import { URL, URLSearchParams } from 'node:url';
 import { describe, it, expect } from 'vitest';
-import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync, readdirSync } from 'node:fs';
+import {
+  existsSync,
+  readFileSync,
+  writeFileSync,
+  mkdirSync,
+  mkdtempSync,
+  rmSync,
+  readdirSync,
+} from 'node:fs';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
@@ -51,6 +60,72 @@ const small = {
     passages: content.registry.passages.filter((e) => passages.has(e.passageId)),
   },
 };
+function assertBrowserScriptWiring(scripts, name) {
+  const temporary = mkdtempSync(join(tmpdir(), 'bunki-browser-wiring-')),
+    bin = join(temporary, 'node_modules', '.bin'),
+    trace = join(temporary, 'commands.jsonl'),
+    browser = 'scripts/verify-shared-study-browser.mjs',
+    verifier = 'scripts/verify-shared-study.mjs',
+    expected =
+      name === 'test'
+        ? [
+            ['node', verifier],
+            ['node', browser, '--if-ci'],
+            ['vitest', 'run'],
+          ]
+        : [['node', browser]];
+  try {
+    mkdirSync(bin, { recursive: true });
+    writeFileSync(join(temporary, 'package.json'), JSON.stringify({ private: true, scripts }));
+    for (const command of ['node', 'vitest']) {
+      writeFileSync(
+        join(bin, command),
+        `#!${process.execPath}
+const { appendFileSync } = require('node:fs');
+const args = process.argv.slice(2);
+appendFileSync(process.env.BUNKI_WIRING_TRACE, JSON.stringify([${JSON.stringify(command)}, ...args]) + '\\n');
+process.exit(args[0] === process.env.BUNKI_WIRING_FAIL ? 23 : 0);
+`,
+        { mode: 0o755 },
+      );
+    }
+    for (const failure of ['', browser, ...(name === 'test' ? [verifier] : [])]) {
+      rmSync(trace, { force: true });
+      const result = spawnSync('npm', ['run', '--silent', name], {
+        cwd: temporary,
+        encoding: 'utf8',
+        timeout: 10000,
+        env: {
+          ...process.env,
+          npm_config_cache: join(temporary, 'npm-cache'),
+          npm_config_update_notifier: 'false',
+          npm_config_ignore_scripts: 'false',
+          npm_config_script_shell: '/bin/sh',
+          BUNKI_WIRING_TRACE: trace,
+          BUNKI_WIRING_FAIL: failure,
+        },
+      });
+      assert.ifError(result.error);
+      assert.equal(result.signal, null);
+      assert.equal(result.status, failure ? 23 : 0, result.stderr);
+      const calls = existsSync(trace)
+        ? readFileSync(trace, 'utf8')
+            .trim()
+            .split('\n')
+            .map((line) => JSON.parse(line))
+        : [];
+      assert.deepEqual(
+        calls,
+        failure
+          ? expected.slice(0, expected.findIndex((call) => call[1] === failure) + 1)
+          : expected,
+        'npm browser wiring must execute the required commands in order',
+      );
+    }
+  } finally {
+    rmSync(temporary, { recursive: true, force: true });
+  }
+}
 function memory() {
   let writes = 0,
     failAfter = false;
@@ -485,10 +560,39 @@ describe('Bunki canonical shared study consumer', () => {
     } finally {
       rmSync(temporary, { recursive: true, force: true });
     }
+  });
+  it.each(['test', 'verify:shared-study:browser'])(
+    'executes the browser gate through npm run %s and propagates failures',
+    (name) => {
+      const scripts = JSON.parse(readFileSync(new URL('../package.json', import.meta.url))).scripts;
+      assertBrowserScriptWiring(scripts, name);
+    },
+  );
+  it.each([
+    [
+      'test',
+      'echo-only',
+      "node scripts/verify-shared-study.mjs && echo 'node scripts/verify-shared-study-browser.mjs --if-ci' && vitest run",
+    ],
+    [
+      'test',
+      'comment-only',
+      'node scripts/verify-shared-study.mjs && vitest run # node scripts/verify-shared-study-browser.mjs --if-ci',
+    ],
+    [
+      'verify:shared-study:browser',
+      'echo-only',
+      "echo 'node scripts/verify-shared-study-browser.mjs'",
+    ],
+    [
+      'verify:shared-study:browser',
+      'comment-only',
+      '# node scripts/verify-shared-study-browser.mjs',
+    ],
+  ])('rejects npm run %s with an %s browser invocation', (name, _kind, command) => {
     const scripts = JSON.parse(readFileSync(new URL('../package.json', import.meta.url))).scripts;
-    expect(scripts.test).toContain('node scripts/verify-shared-study-browser.mjs --if-ci');
-    expect(scripts['verify:shared-study:browser']).toBe(
-      'node scripts/verify-shared-study-browser.mjs',
+    expect(() => assertBrowserScriptWiring({ ...scripts, [name]: command }, name)).toThrow(
+      'npm browser wiring must execute the required commands in order',
     );
   });
   it('ignores the grammar-only query unless preview or a bound host owns study, and recovers after a failed deck', () => {
