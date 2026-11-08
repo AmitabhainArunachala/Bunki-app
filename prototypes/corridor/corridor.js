@@ -36579,7 +36579,7 @@ function mountMaintenanceReports() {
   });
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+function bootCorridor() {
   mountMaintenanceReports();
   boot().catch((err) => {
     document.body.dataset.error = String(err);
@@ -36589,7 +36589,11 @@ window.addEventListener('DOMContentLoaded', () => {
     // a learner whose app will not start is exactly who needs to say so
     if (maintenanceReports) root.append(reportEntries('report-line-page'));
   });
-});
+}
+// An explicitly composed host may import the same application after DOM ready.
+// Keep the normal deferred-module entry and that late entry on one boot path.
+if (document.readyState === 'loading') window.addEventListener('DOMContentLoaded', bootCorridor, { once: true });
+else queueMicrotask(bootCorridor);
 
 /* ---- 集中道場 › デッキ: the host lexicon adapter the deck player receives
  * (decks/player/host.js; learning-design §3). Kept below the storage-ledger

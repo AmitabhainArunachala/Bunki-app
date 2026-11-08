@@ -5,7 +5,7 @@ import {isSharedDeck,moduleForSharedDeck} from './shared-study-content.mjs';
 
 export {isSharedStudyMode} from './shared-study-content.mjs';
 
-export async function createBunkiStudyAdapter({content, storage, identity, transport=null, canRequestNewCards=false, isOnline=()=>globalThis.navigator?.onLine!==false, presentation, isPaired=false, startedOffline=null, activitySince=null, getSyncState=null, getSyncError=null, subscribeSyncState=null, labelForInstallation=null, now=Date.now, uuid, initialize=null, readPreviousRegistry=null}) {
+export async function createBunkiStudyAdapter({content, storage, identity, transport=null, canRequestNewCards=false, isOnline=()=>globalThis.navigator?.onLine!==false, presentation, audio=null, isPaired=false, startedOffline=null, activitySince=null, getSyncState=null, getSyncError=null, subscribeSyncState=null, labelForInstallation=null, now=Date.now, uuid, initialize=null, readPreviousRegistry=null}) {
   if (!storage || !identity || !['open','fresh'].includes(identity.mode)) throw Error('shared-host-binding-required');
   const {learner,environment,installation,epoch=0,timezone='Asia/Tokyo',mode} = identity;
   if (![learner,environment,installation].every(v=>typeof v==='string'&&v)) throw Error('shared-host-identity-required');
@@ -13,6 +13,16 @@ export async function createBunkiStudyAdapter({content, storage, identity, trans
   if (readPreviousRegistry !== null && typeof readPreviousRegistry !== 'function') throw Error('shared-content-history-adapter');
   if (!['boolean','function'].includes(typeof canRequestNewCards) || typeof isOnline !== 'function') throw Error('shared-permit-capability-adapter');
   if (transport !== null && typeof transport.reserveNewPermits !== 'function') throw Error('shared-permit-transport-adapter');
+  // The canonical audio-resources contract is forwarded byte-capably. Deep
+  // release/root authentication belongs to the UI that exports the root; this
+  // host rejects only a capability that claims the wrong protocol or cannot
+  // expose the two required resource operations.
+  if (audio !== null && audio !== undefined && (typeof audio !== 'object' || Array.isArray(audio) ||
+      Object.keys(audio).sort().join('|')!=='protocol|release|resources' ||
+      audio.protocol !== 'nsrs-audio-resources/v1' || !audio.release || !audio.resources ||
+      Object.keys(audio.resources).sort().join('|')!=='packState|read' ||
+      typeof audio.resources.read !== 'function' || typeof audio.resources.packState !== 'function'))
+    throw Error('shared-audio-capability-adapter');
   if (presentation!==undefined&&!['phone','desktop'].includes(presentation) ||
       !['boolean','function'].includes(typeof isPaired) || startedOffline!==null&&typeof startedOffline!=='boolean' ||
       activitySince!==null&&(!Number.isSafeInteger(activitySince)||activitySince<0) ||
@@ -41,6 +51,7 @@ export async function createBunkiStudyAdapter({content, storage, identity, trans
   const activityStart=activitySince??backend.readProjection().appliedSeq;
   if(activityStart>backend.readProjection().appliedSeq){backend.dispose();throw Error('shared-activity-prefix');}
   const platform=Object.freeze({storageKind:'bunki-shared',isOnline:online,startedOffline:offlineAtOpen,activitySince:activityStart,
+    ...(audio!==null&&audio!==undefined?{audio}:{}),
     ...(presentation===undefined?{}:{presentation}),
     isPaired:()=>typeof isPaired==='function'?isPaired()===true:isPaired===true,canRequestNewCards:canRequest,
     ...(getSyncState?{getSyncState}:{}),...(getSyncError?{getSyncError}:{}),

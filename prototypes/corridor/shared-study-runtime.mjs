@@ -13,7 +13,17 @@ export function sharedStudyRuntime() {
   if (!host && !preview) return Promise.reject(Error('shared-profile-not-bound'));
   runtime=(async()=>{
     const {content}=await loadSharedContent();
-    if (host) return createBunkiStudyAdapter({...host,content});
+    if (host) {
+      // Isolated QA hosts own profile create/open serialization and bind the
+      // exact created adapter (including any sync lifecycle). Never create a
+      // second adapter behind their back.
+      if (typeof host.withAdapter==='function') {
+        const adapter=await host.withAdapter(binding=>createBunkiStudyAdapter({...binding,content}));
+        if (typeof host.onReady==='function') await host.onReady(adapter);
+        return adapter;
+      }
+      return createBunkiStudyAdapter({...host,content});
+    }
     // Deliberately isolated preview, never a migration or a production authority.
     if(!globalThis.navigator?.locks)throw Error('shared-preview-profile-lock-required');
     return navigator.locks.request('bunki-shared-study-preview-profile-v1',async()=>{
