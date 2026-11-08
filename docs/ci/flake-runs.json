@@ -1,28 +1,4 @@
 {
-  "37728173857/31": {
-    "result": "observed",
-    "startedAt": "2026-10-24T14:48:48Z"
-  },
-  "37980085769/26": {
-    "result": "observed",
-    "startedAt": "2026-10-24T14:48:55Z"
-  },
-  "38950321223/18": {
-    "result": "observed",
-    "startedAt": "2026-10-24T14:48:32Z"
-  },
-  "38919512644/18": {
-    "result": "observed",
-    "startedAt": "2026-10-24T14:48:36Z"
-  },
-  "37714882624/31": {
-    "result": "observed",
-    "startedAt": "2026-10-24T14:48:48Z"
-  },
-  "37925123360/27": {
-    "result": "observed",
-    "startedAt": "2026-10-24T14:48:57Z"
-  },
   "40116714309/1": {
     "result": "observed",
     "startedAt": "2026-10-24T17:34:08Z"
@@ -561,20 +537,18 @@
   },
   "42407808769/1": {
     "result": "rejected",
-    "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
+    "policy": "377430e200daf7ac88ef87bf35e8ec1fa150e042aa6170ef278e82ecf42ce03f",
     "startedAt": "2026-11-07T19:46:14Z",
     "reason": "Producer verification policy differs from trusted default branch"
   },
   "42412794552/1": {
-    "result": "rejected",
-    "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
-    "startedAt": "2026-11-07T20:48:14Z",
-    "reason": "Producer verification policy differs from trusted default branch"
+    "result": "observed",
+    "startedAt": "2026-11-07T20:48:14Z"
   },
   "42407075841/1": {
     "result": "rejected",
-    "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
-    "startedAt": "2026-11-07T19:36:55Z",
+    "policy": "377430e200daf7ac88ef87bf35e8ec1fa150e042aa6170ef278e82ecf42ce03f",
+    "startedAt": "2026-11-08T08:55:07Z",
     "reason": "Producer verification policy differs from trusted default branch"
   },
   "42407075841/2": {
@@ -591,8 +565,8 @@
   },
   "42400327580/1": {
     "result": "rejected",
-    "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
-    "startedAt": "2026-11-07T18:15:02Z",
+    "policy": "377430e200daf7ac88ef87bf35e8ec1fa150e042aa6170ef278e82ecf42ce03f",
+    "startedAt": "2026-11-08T08:55:12Z",
     "reason": "Producer verification policy differs from trusted default branch"
   },
   "42418249759/1": {
@@ -601,16 +575,16 @@
   },
   "42431546894/1": {
     "result": "rejected",
-    "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
-    "startedAt": "2026-11-08T00:49:56Z",
+    "policy": "377430e200daf7ac88ef87bf35e8ec1fa150e042aa6170ef278e82ecf42ce03f",
+    "startedAt": "2026-11-08T08:49:58Z",
     "reason": "Producer verification policy differs from trusted default branch"
   },
   "42431546894/2": {
     "result": "retry",
-    "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
+    "policy": "377430e200daf7ac88ef87bf35e8ec1fa150e042aa6170ef278e82ecf42ce03f",
     "startedAt": "2026-11-08T08:49:58Z",
-    "failures": 3,
-    "attemptedAt": "2026-11-08T12:25:52.340Z",
+    "failures": 4,
+    "attemptedAt": "2026-11-08T16:43:39.988Z",
     "reason": "Observation artifact not yet available: bunki-plan-42431546894-2"
   },
   "42407075841/3": {
@@ -628,5 +602,9 @@
   "42406261624/3": {
     "result": "observed",
     "startedAt": "2026-11-08T08:55:07Z"
+  },
+  "42500806447/1": {
+    "result": "observed",
+    "startedAt": "2026-11-08T16:37:05Z"
   }
 }
