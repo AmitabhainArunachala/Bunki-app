@@ -1,3 +1,4 @@
+/* global process, URL, Buffer */
 /** Asset admission and authenticated QA derivation, using tiny synthetic sites. */
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -189,8 +190,11 @@ test('real QA builder copies and authenticates helper bytes while preserving sou
     assert.equal(receipt.productionBuild, false);
     const packBytes = readFileSync(join(source, packHelper));
     assert.deepEqual(readFileSync(join(output, packHelper)), packBytes);
-    assert.deepEqual(receipt.modules.find(row => row.path === packHelper), {path: packHelper, bytes: packBytes.length, sha256: sha(packBytes)});
-    const packRoute = receipt.actualCorridorRouteInputs.find(row => row.path === packHelper);
+    assert.deepEqual(
+      receipt.modules.find((row) => row.path === packHelper),
+      { path: packHelper, bytes: packBytes.length, sha256: sha(packBytes) },
+    );
+    const packRoute = receipt.actualCorridorRouteInputs.find((row) => row.path === packHelper);
     assert(packRoute);
     assert.equal(packRoute.sourceArtifactSha256, sha(packBytes));
     assert.equal(packRoute.currentSourceSha256, sha(packBytes));
@@ -284,6 +288,38 @@ test('QA keeps the portable artifact symlink guard for the helper', () => {
   }
 });
 
-test('real QA builder rejects a sealed stale presentation resolver before derivation',()=>{
- const root=scope();try{const site=siteFixture(root);const resolver=join(site,'shared-study-presentation.mjs');put(resolver,Buffer.concat([readFileSync(resolver),Buffer.from('\n// independently admitted stale presentation bytes\n')]));seal(site);verifyBundledArtifact(site);const before=inventory(site).map(path=>[path,sha(readFileSync(join(site,path)))]);const {result,output}=derive(root,site,'stale-presentation-qa');assert.equal(result.status,1,'A valid old artifact must not be admitted with a stale resolver');assert.match(result.stderr,/QA source route differs from current source: shared-study-presentation\.mjs/);assert.equal(existsSync(output),false,'reject before any output directory/copy');assert.deepEqual(inventory(site).map(path=>[path,sha(readFileSync(join(site,path)))]),before,'stale source artifact remains unchanged');}finally{rmSync(root,{recursive:true,force:true});}
+test('real QA builder rejects a sealed stale presentation resolver before derivation', () => {
+  const root = scope();
+  try {
+    const site = siteFixture(root);
+    const resolver = join(site, 'shared-study-presentation.mjs');
+    put(
+      resolver,
+      Buffer.concat([
+        readFileSync(resolver),
+        Buffer.from('\n// independently admitted stale presentation bytes\n'),
+      ]),
+    );
+    seal(site);
+    verifyBundledArtifact(site);
+    const before = inventory(site).map((path) => [path, sha(readFileSync(join(site, path)))]);
+    const { result, output } = derive(root, site, 'stale-presentation-qa');
+    assert.equal(
+      result.status,
+      1,
+      'A valid old artifact must not be admitted with a stale resolver',
+    );
+    assert.match(
+      result.stderr,
+      /QA source route differs from current source: shared-study-presentation\.mjs/,
+    );
+    assert.equal(existsSync(output), false, 'reject before any output directory/copy');
+    assert.deepEqual(
+      inventory(site).map((path) => [path, sha(readFileSync(join(site, path)))]),
+      before,
+      'stale source artifact remains unchanged',
+    );
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });
