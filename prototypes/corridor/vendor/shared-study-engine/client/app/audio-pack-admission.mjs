@@ -4,6 +4,7 @@ import {studyAudioSourcePlan,studyAudioProfileAssignments} from './study-audio.m
 import {planCardSpeech} from '../audio/card-speech-plan.mjs';
 import {createJapaneseOnlySelection} from '../audio/japanese-only-selection.mjs';
 import {assertJapaneseOnlyRuntimeField} from '../audio/japanese-only-runtime-guard.mjs';
+import {verifyAudioPlacement} from './audio-release.mjs';
 import {passageReadingRules, passageReadingLedgerSha256} from '../player/passage-reading-rules.mjs';
 import {validateAudioCapability} from './audio-resources.mjs';
 
@@ -382,40 +383,25 @@ export function createAudioPackAdmission({
             row.sourceSha256 !== field.sourceHash || row.sourceBytes !== new TextEncoder().encode(field.sourceText).length) {
           throw invalid('japanese-field-binding');
         }
-        let whole = '', offset = 0;
-        const directives = [];
-        for (const piece of row.segments) {
-          if (row.version === 2 && (piece.language !== 'ja' || piece.profileId !== row.profileAssignments.ja)) {
-            throw invalid('japanese-segment-profile');
-          }
-          if (!same(piece.speechInput.profile, assignments.profiles.ja)) throw invalid('japanese-speech-profile');
-          for (const segment of piece.speechInput.segments) {
-            if (segment.language !== 'ja') throw invalid('japanese-segment-language');
-            for (const directive of segment.pronunciationDirectives) directives.push({
-              start: directive.start + offset, end: directive.end + offset, reading: directive.reading});
-            whole += segment.text; offset += Array.from(segment.text).length;
-          }
-        }
-        if (whole !== field.sourceText || !same(directives, field.readingEvidence.map(({start,end,reading}) => ({start,end,reading})))) {
-          throw invalid('japanese-whole-field');
-        }
       } catch (error) {
         if (error?.audioCode === 'integrity') throw error;
         throw invalid('japanese-selection');
       }
       japaneseSelectionDigests.set(taskKey, japaneseSelection.digest);
-      if (metadataOnly) continue;
-      const result = await call(() => reader.resolve({
+      const selection = {
         taskKey,
         contentRevision: selected.contentRevision,
         audioContentRevision: plan.audioContentRevision,
         contentRelease: binding.contentRelease,
         fields: [row.fieldId],
-        ...(root.version === 2 ? {version: 2, profileAssignments: studyAudioProfileAssignments(root, source.selectedAssignments ?? source.accepted?.inputs?.assignments ?? {}, plan.sourceFields, [row.fieldId])} : {profileId: row.profileId}),
+        ...(root.version === 2 ? {version: 2, profileAssignments: studyAudioProfileAssignments(root, assignments, plan.sourceFields, [row.fieldId])} : {profileId: row.profileId}),
         supportedReadingId: row.supportedReadingId,
         face: 'answer',
         sourceFields: plan.sourceFields,
-      }, {signal}), signal);
+      };
+      verifyAudioPlacement({root, placement: row, selection, packId});
+      if (metadataOnly) continue;
+      const result = await call(() => reader.resolve(selection, {signal}), signal);
       alive(signal);
       if (result?.status === 'cancelled') throw cancelled();
       if (result?.status === 'offline-missing') {

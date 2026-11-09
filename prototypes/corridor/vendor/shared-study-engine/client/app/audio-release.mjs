@@ -757,6 +757,163 @@ function selectionValue(raw) {
   });
 }
 
+function boundaryAt(bytes, offset) {
+  if (offset === 0 || offset === bytes.byteLength) return true;
+  return (bytes[offset] & 0xc0) !== 0x80;
+}
+
+function verifySegments(row, source, rootProfile) {
+  const sourceBytes = ENC.encode(source.text);
+  if (sourceBytes.byteLength !== row.sourceBytes) bad('source-length');
+  if (sha256(source.text) !== row.sourceSha256) bad('source-digest');
+  let cursor = 0;
+  const output = [];
+  const actualDirectives = [];
+  let codepointCursor = 0;
+  for (const segment of row.segments) {
+    if (segment.start !== cursor) bad('segment-gap');
+    if (segment.end > sourceBytes.byteLength) bad('segment-end');
+    if (!boundaryAt(sourceBytes, segment.start) || !boundaryAt(sourceBytes, segment.end)) {
+      bad('segment-boundary');
+    }
+    let computed;
+    try {
+      computed = createSpeechInput({
+        segments: segment.speechInput.segments,
+        profile: rootProfile,
+      });
+    } catch {
+      bad('speech-input-invalid');
+    }
+    let canonical;
+    try {
+      canonical = canonicalStringify(computed);
+    } catch {
+      bad('speech-input-canonical');
+    }
+    let supplied;
+    try {
+      supplied = canonicalStringify(segment.speechInput);
+    } catch {
+      bad('speech-input-supplied');
+    }
+    if (canonical !== supplied) bad('speech-input-mismatch');
+    if (computed.inputKey !== segment.inputKey) bad('speech-input-key');
+    if (computed.segments.some(part => part.language !== row.language)) {
+      bad('speech-input-language');
+    }
+    let slice;
+    try {
+      slice = DEC.decode(sourceBytes.subarray(segment.start, segment.end));
+    } catch {
+      bad('segment-utf8');
+    }
+    if (computed.segments.map(part => part.text).join('') !== slice) {
+      bad('segment-source-text');
+    }
+    for (const part of computed.segments) {
+      for (const directive of part.pronunciationDirectives) actualDirectives.push({start:codepointCursor+directive.start,end:codepointCursor+directive.end,reading:directive.reading});
+      codepointCursor += Array.from(part.text).length;
+    }
+    output.push(Object.freeze({
+      fieldId: row.fieldId,
+      packId: row.packId,
+      supportedReadingId: row.supportedReadingId,
+      start: segment.start,
+      end: segment.end,
+      inputKey: segment.inputKey,
+      speechInput: computed,
+    }));
+    cursor = segment.end;
+  }
+  if (cursor !== sourceBytes.byteLength) bad('segment-coverage');
+  if (canonicalStringify(actualDirectives) !== canonicalStringify(source.pronunciationDirectives)) bad('source-pronunciation-mismatch');
+  return Object.freeze(output);
+}
+
+function verifySegmentsV2(row, source, selected, root) {
+  if (canonicalStringify(row.language) !== canonicalStringify(source.language)) bad('source-partition-mismatch');
+  const points = Array.from(source.text), bytes = ENC.encode(source.text), parts = sourceParts(source);
+  if (bytes.length !== row.sourceBytes || sha256(source.text) !== row.sourceSha256 || parts.length !== row.segments.length) bad('source-v2-coverage');
+  const used = [...new Set(parts.map(part => part.language))].sort();
+  if (canonicalStringify(Object.keys(row.profileAssignments).sort()) !== canonicalStringify(used)) bad('source-v2-profiles');
+  const output = [];
+  for (const [index, segment] of row.segments.entries()) {
+    const part = parts[index];
+    if (segment.start !== part.start || segment.end !== part.end || segment.language !== part.language ||
+        row.profileAssignments[part.language] !== selected.profileAssignments[part.language]) bad('source-v2-segment');
+    const start = ENC.encode(points.slice(0, part.start).join('')).length;
+    const end = start + ENC.encode(points.slice(part.start, part.end).join('')).length;
+    if (segment.byteStart !== start || segment.byteEnd !== end) bad('source-v2-byte-span');
+    const directives = [];
+    for (const directive of source.pronunciationDirectives) {
+      if (directive.start < part.end && directive.end > part.start) {
+        if (directive.start < part.start || directive.end > part.end) bad('source-v2-directive-crossing');
+        directives.push({start: directive.start - part.start, end: directive.end - part.start, reading: directive.reading});
+      }
+    }
+    let computed;
+    try { computed = createSpeechInput({segments: [{language: part.language,
+      text: points.slice(part.start, part.end).join(''), pronunciationDirectives: directives}],
+      profile: root.profileById.get(segment.profileId)}); } catch { bad('source-v2-input'); }
+    if (computed.inputKey !== segment.inputKey || canonicalStringify(computed) !== canonicalStringify(segment.speechInput)) bad('source-v2-speech');
+    output.push(Object.freeze({...segment, fieldId: row.fieldId, supportedReadingId: row.supportedReadingId}));
+  }
+  return output;
+}
+
+function matchesPlacementProfiles(row, selected, source) {
+  if (selected.version !== 2) return row.version !== 2 && row.profileId === selected.profileId;
+  if (row.version !== 2) return false;
+  const languages = [...new Set(sourceParts(source).map(part => part.language))].sort();
+  return canonicalStringify(Object.keys(row.profileAssignments).sort()) === canonicalStringify(languages) &&
+    languages.every(language => row.profileAssignments[language] === selected.profileAssignments[language]);
+}
+
+function placementSource(row, selected, root) {
+  const source = selected.sourceFields.get(row.fieldId);
+  if (!source || !selected.fields.includes(row.fieldId) || row.taskKey !== selected.taskKey ||
+      row.contentRevision !== selected.contentRevision || row.audioContentRevision !== selected.audioContentRevision ||
+      row.supportedReadingId !== selected.supportedReadingId) return {status: 'source-stale'};
+  if (source.pendingReasons.length || source.language === null) return {status: 'pending'};
+  if (!matchesPlacementProfiles(row, selected, source)) return {status: 'source-stale'};
+  if (row.state === 'pending' || row.state === 'running') return {status: 'pending'};
+  if (row.state === 'failed') return {status: 'preparation-failed'};
+  if (row.state === 'stale') return {status: 'source-stale'};
+  if (canonicalStringify(row.language) !== canonicalStringify(source.language) ||
+      row.sourceBytes !== ENC.encode(source.text).byteLength || row.sourceSha256 !== sha256(source.text)) {
+    return {status: 'source-stale'};
+  }
+  return {status: 'metadata-verified', segments: selected.version === 2 ?
+    verifySegmentsV2(row, source, selected, root) : verifySegments(row, source, root.profileById.get(selected.profileId))};
+}
+
+export function verifyAudioPlacement({root, placement, selection, packId}) {
+  const selected = selectionValue(selection);
+  const version = root.version === undefined ? 1 : root.version;
+  if (![1, 2].includes(version) || (selected.version === 2 ? 2 : 1) !== version) bad('placement-version');
+  if (selected.face !== 'answer' || selected.contentRelease !== root.contentRelease) bad('placement-selection');
+  if (selected.fields.length !== 1 || selected.fields[0] !== placement.fieldId ||
+      placement.packId !== text(packId, 'placement-pack')) bad('placement-selection-scope');
+  const profileById = new Map();
+  for (const raw of exactArray(root.profiles, 'root.profiles', MAX_PROFILES)) {
+    const entry = exactRecord(raw, ['id', 'profile'], 'profile-entry');
+    const id = text(entry.id, 'profile-id');
+    if (profileById.has(id)) bad('profile-duplicate');
+    profileById.set(id, profileValue(entry.profile));
+  }
+  const context = {version, profileById, packsById: new Map([[packId, true]])};
+  let raw = placement;
+  if (version === 2) {
+    if (placement.version !== 2) bad('placement-version');
+    const {version: ignored, ...fields} = placement;
+    raw = fields;
+  }
+  const row = placementRow(raw, context);
+  const result = placementSource(row, selected, context);
+  if (result.status !== 'metadata-verified') bad(`placement-${result.status}`);
+}
+
 /* ---------- Public helpers ---------- */
 
 function toHex(bytes) {
@@ -1038,111 +1195,6 @@ export function createAudioReleaseReader({capability} = {}) {
     return shard;
   }
 
-  function boundaryAt(bytes, offset) {
-    if (offset === 0 || offset === bytes.byteLength) return true;
-    return (bytes[offset] & 0xc0) !== 0x80;
-  }
-
-  function verifySegments(row, source, rootProfile) {
-    const sourceBytes = ENC.encode(source.text);
-    if (sourceBytes.byteLength !== row.sourceBytes) bad('source-length');
-    if (sha256(source.text) !== row.sourceSha256) bad('source-digest');
-    let cursor = 0;
-    const output = [];
-    const actualDirectives = [];
-    let codepointCursor = 0;
-    for (const segment of row.segments) {
-      if (segment.start !== cursor) bad('segment-gap');
-      if (segment.end > sourceBytes.byteLength) bad('segment-end');
-      if (!boundaryAt(sourceBytes, segment.start) || !boundaryAt(sourceBytes, segment.end)) {
-        bad('segment-boundary');
-      }
-      let computed;
-      try {
-        computed = createSpeechInput({
-          segments: segment.speechInput.segments,
-          profile: rootProfile,
-        });
-      } catch {
-        bad('speech-input-invalid');
-      }
-      let canonical;
-      try {
-        canonical = canonicalStringify(computed);
-      } catch {
-        bad('speech-input-canonical');
-      }
-      let supplied;
-      try {
-        supplied = canonicalStringify(segment.speechInput);
-      } catch {
-        bad('speech-input-supplied');
-      }
-      if (canonical !== supplied) bad('speech-input-mismatch');
-      if (computed.inputKey !== segment.inputKey) bad('speech-input-key');
-      if (computed.segments.some(part => part.language !== row.language)) {
-        bad('speech-input-language');
-      }
-      let slice;
-      try {
-        slice = DEC.decode(sourceBytes.subarray(segment.start, segment.end));
-      } catch {
-        bad('segment-utf8');
-      }
-      if (computed.segments.map(part => part.text).join('') !== slice) {
-        bad('segment-source-text');
-      }
-      for (const part of computed.segments) {
-        for (const directive of part.pronunciationDirectives) actualDirectives.push({start:codepointCursor+directive.start,end:codepointCursor+directive.end,reading:directive.reading});
-        codepointCursor += Array.from(part.text).length;
-      }
-      output.push(Object.freeze({
-        fieldId: row.fieldId,
-        packId: row.packId,
-        supportedReadingId: row.supportedReadingId,
-        start: segment.start,
-        end: segment.end,
-        inputKey: segment.inputKey,
-        speechInput: computed,
-      }));
-      cursor = segment.end;
-    }
-    if (cursor !== sourceBytes.byteLength) bad('segment-coverage');
-    if (canonicalStringify(actualDirectives) !== canonicalStringify(source.pronunciationDirectives)) bad('source-pronunciation-mismatch');
-    return Object.freeze(output);
-  }
-
-  function verifySegmentsV2(row, source, selected) {
-    if (canonicalStringify(row.language) !== canonicalStringify(source.language)) bad('source-partition-mismatch');
-    const points = Array.from(source.text), bytes = ENC.encode(source.text), parts = sourceParts(source);
-    if (bytes.length !== row.sourceBytes || sha256(source.text) !== row.sourceSha256 || parts.length !== row.segments.length) bad('source-v2-coverage');
-    const used = [...new Set(parts.map(part => part.language))].sort();
-    if (canonicalStringify(Object.keys(row.profileAssignments).sort()) !== canonicalStringify(used)) bad('source-v2-profiles');
-    const output = [];
-    for (const [index, segment] of row.segments.entries()) {
-      const part = parts[index];
-      if (segment.start !== part.start || segment.end !== part.end || segment.language !== part.language ||
-          row.profileAssignments[part.language] !== selected.profileAssignments[part.language]) bad('source-v2-segment');
-      const start = ENC.encode(points.slice(0, part.start).join('')).length;
-      const end = start + ENC.encode(points.slice(part.start, part.end).join('')).length;
-      if (segment.byteStart !== start || segment.byteEnd !== end) bad('source-v2-byte-span');
-      const directives = [];
-      for (const directive of source.pronunciationDirectives) {
-        if (directive.start < part.end && directive.end > part.start) {
-          if (directive.start < part.start || directive.end > part.end) bad('source-v2-directive-crossing');
-          directives.push({start: directive.start - part.start, end: directive.end - part.start, reading: directive.reading});
-        }
-      }
-      let computed;
-      try { computed = createSpeechInput({segments: [{language: part.language,
-        text: points.slice(part.start, part.end).join(''), pronunciationDirectives: directives}],
-        profile: root.profileById.get(segment.profileId)}); } catch { bad('source-v2-input'); }
-      if (computed.inputKey !== segment.inputKey || canonicalStringify(computed) !== canonicalStringify(segment.speechInput)) bad('source-v2-speech');
-      output.push(Object.freeze({...segment, fieldId: row.fieldId, supportedReadingId: row.supportedReadingId}));
-    }
-    return output;
-  }
-
   async function resolveSelection(selection, signal) {
     if (disposed) return {status: 'cancelled'};
     if (signal?.aborted) return {status: 'cancelled'};
@@ -1211,30 +1263,20 @@ export function createAudioReleaseReader({capability} = {}) {
         if (candidate.taskKey === selected.taskKey &&
             candidate.contentRevision === selected.contentRevision &&
             candidate.fieldId === fieldId &&
-            (selected.version === 2 ? candidate.version === 2 &&
-              Object.entries(candidate.profileAssignments).every(([lang, id]) => selected.profileAssignments[lang] === id) : candidate.profileId === selected.profileId)) {
+            matchesPlacementProfiles(candidate, selected, source)) {
           row = candidate;
           break;
         }
       }
       if (!row) return {status: 'source-stale'};
-      if (row.audioContentRevision !== selected.audioContentRevision) {
-        return {status: 'source-stale'};
-      }
-      if (row.state === 'pending' || row.state === 'running') return {status: 'pending'};
-      if (row.state === 'failed') return {status: 'preparation-failed'};
-      if (row.state === 'stale') return {status: 'source-stale'};
-      if(row.packId===null)allFieldsPacked=false;else selectedPacks.add(row.packId);
-      if (canonicalStringify(row.language) !== canonicalStringify(source.language)) return {status: 'source-stale'};
-      if (row.sourceBytes !== ENC.encode(source.text).byteLength ||
-          row.sourceSha256 !== sha256(source.text)) {
-        return {status: 'source-stale'};
-      }
       try {
-        pieces.push(...(selected.version === 2 ? verifySegmentsV2(row, source, selected) : verifySegments(row, source, profile)));
+        const verified = placementSource(row, selected, loaded);
+        if (verified.status !== 'metadata-verified') return {status: verified.status};
+        pieces.push(...verified.segments);
       } catch (error) {
         return statusFor(error);
       }
+      if(row.packId===null)allFieldsPacked=false;else selectedPacks.add(row.packId);
     }
 
     const segments = [];

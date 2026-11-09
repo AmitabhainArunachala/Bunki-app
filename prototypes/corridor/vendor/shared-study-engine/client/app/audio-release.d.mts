@@ -62,3 +62,5 @@ export function createAudioReleaseReader(options:{capability:AudioCapability}):R
 export function audioBucket(taskKey:string):number;
 export function hashAudioBytes(bytes:Uint8Array):Promise<string>;
 export function isAudioReadyResult(value:unknown):value is ReadyAudioSelection;
+
+export function verifyAudioPlacement(options:{root:AudioRootSummary;placement:AudioPackInspection['placements'][number];selection:AudioSelection|AudioSelectionV2;packId:string}):void;

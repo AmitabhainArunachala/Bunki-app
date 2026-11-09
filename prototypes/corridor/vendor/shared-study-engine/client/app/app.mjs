@@ -773,7 +773,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const e=c?.entry;if(!e)return [];
     const available=new Set(studyAudioSourceFields(e).map(field=>field.fieldId));
     const grammar=!!e.grammarRecord&&typeof e.contractId==='string'&&e.contractId.startsWith('grammar.');
-    const ids=grammar?['pattern']:['term','ja'];
+    const ids=grammar?[]:['term','ja'];
     if(grammar){
       const examples=Array.isArray(e.grammarRecord.examples)?e.grammarRecord.examples:[];
       const passageId=e.passageId??e.grammarTask?.passageId??null;

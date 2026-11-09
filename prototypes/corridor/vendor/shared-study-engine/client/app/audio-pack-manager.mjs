@@ -287,6 +287,7 @@ export function createAudioPackManager({release, namespace, transport, store, ad
       if (cached) {
         if (!same(marker, cached.marker)) throw failure('marker-changed');
         if (verifyResources) {
+          await validateAdmission(cached.inspection, {reader: cachedReader(cached), signal, metadataOnly: true});
           for (const ref of cached.inspection.refs) await requiredDurable(ref, signal);
           alive(signal);
         }
