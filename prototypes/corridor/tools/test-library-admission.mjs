@@ -4,8 +4,10 @@ import { createHash } from 'node:crypto';
 import { isDeepStrictEqual } from 'node:util';
 import { test } from 'node:test';
 import vm from 'node:vm';
+import ts from 'typescript';
+import { resolve } from 'node:path';
 
-const code = readFileSync(new URL('./verify-feed.mjs', import.meta.url), 'utf8');
+const code = readFileSync(process.env.KAIRO_FEED_VERIFIER_SOURCE || new URL('./verify-feed.mjs', import.meta.url), 'utf8');
 const declaration = code.match(/^function libraryCandidateProblems\([^]*?^\}/m)?.[0];
 assert(declaration);
 const context = vm.createContext({ createHash, isDeepStrictEqual });
@@ -43,8 +45,45 @@ for(const [name,mutate,witness] of [
   ['invented content eyes',f=>f.source.admission.contentReviews.push({family:'one'},{family:'two'}),'unkeyed-admission'],
   ['installable candidate',f=>f.row.libraryCandidate.installable=true,'candidate-scope'],
 ]) test('reject '+name,()=>{const f=fixture();mutate(f);assert(validate(f.row,f.body,f.source).includes(witness));});
-test('legacy deletion-cull contract remains separate and unchanged by library validation',()=>{
-  assert.match(code,/const shelfCulls = cullRows\.filter\(\(row\) => row\.decision === 'approved' && row\.where === 'shelf'\)/);
-  assert.match(code,/if \(row\.chars !== body\.text\.length\)/);
-  assert.match(code,/const shareAlikeReading = \(row\) =>\s*row\.pool === 'share_alike' && freshIds\.has\(row\.id\)/);
+// AST locates executable verifier statements; no classification/result is inferred from source.
+const feedTree = ts.createSourceFile('verify-feed.mjs', code, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+function variable(name) {
+  const statement = feedTree.statements.find(node => ts.isVariableStatement(node) && node.declarationList.declarations.some(d => d.name.getText(feedTree) === name));
+  assert(statement, name); return statement.getText(feedTree);
+}
+const cullLoop = feedTree.statements.find(node => ts.isForOfStatement(node) && node.expression.getText(feedTree) === 'shelfCulls');
+assert(cullLoop);
+const pendingCheck = feedTree.statements.find(node => ts.isExpressionStatement(node) && ts.isCallExpression(node.expression) && node.expression.arguments[0]?.text?.startsWith('nothing proposed for culling'));
+let legacyCount;
+function visit(node) {
+  if (ts.isIfStatement(node) && ts.isExpressionStatement(node.thenStatement) && ts.isCallExpression(node.thenStatement.expression) && node.thenStatement.expression.arguments[0]?.text === 'index-chars') legacyCount ??= node;
+  ts.forEachChild(node, visit);
+}
+visit(feedTree); assert(legacyCount);
+function legacyFeed({ decision = 'approved', where = 'shelf', present = false, chars = text.length, share = {} } = {}) {
+  const results = [];
+  const ctx = vm.createContext({ queue: [{kind:'cull', id:'fixture', decision, where, reason:'fixture', decidedBy:'fixture'}],
+    curatedById: new Map(present ? [['fixture', {}]] : []), archiveIds: new Set(), ARTICLES:'/fixture', resolve,
+    existsSync: () => false, check: (name, passed) => results.push({ name, passed }),
+    row: { chars }, body: {text}, problems: [], freshRows: [{id:'fresh'}],
+  });
+  vm.runInContext([variable('cullRows'), variable('shelfCulls'), cullLoop.getText(feedTree), variable('prematureCulls'), pendingCheck.getText(feedTree),
+    legacyCount.getText(feedTree), variable('freshIds'), variable('shareAlikeReading'),
+    'globalThis.observed = {culls:shelfCulls.length, problems:[...problems], share:shareAlikeReading(globalThis.shareRow)};'].join('\n'),
+    Object.assign(ctx, {shareRow:{id:'fresh',pool:'share_alike',licence:'CC BY-SA 4.0',attribution:'fixture',url:'https://example.invalid',...share}}));
+  return { results, ...JSON.parse(JSON.stringify(ctx.observed)) };
+}
+test('actual feed verifier: approved shelf culls act; pending shelf and approved other-domain culls do not', () => {
+  const approved = legacyFeed(); assert.equal(approved.culls,1); assert(approved.results.every(r=>r.passed));
+  assert(legacyFeed({present:true}).results.some(r=>!r.passed), 'approved shelf cull still present fails');
+  const pending = legacyFeed({decision:'pending',present:true}); assert.equal(pending.culls,0); assert(pending.results.every(r=>r.passed));
+  assert(legacyFeed({decision:'pending'}).results.some(r=>!r.passed), 'pending removal fails');
+  const elsewhere = legacyFeed({where:'archive',present:true}); assert.equal(elsewhere.culls,0); assert(elsewhere.results.every(r=>r.passed));
+});
+test('same actual verifier invocation preserves legacy UTF16 count and attributed fresh share-alike exception', () => {
+  assert.notEqual(text.length,[...text].length,'astral fixture distinguishes count domains');
+  assert.deepEqual(legacyFeed().problems,[]);
+  assert.deepEqual(legacyFeed({chars:[...text].length}).problems,['index-chars']);
+  assert.equal(legacyFeed().share,true);
+  for (const share of [{id:'not-fresh'},{pool:'original'},{licence:'CC BY 4.0'},{attribution:''},{url:''}]) assert.equal(legacyFeed({share}).share,false);
 });

@@ -33,7 +33,7 @@ function scanLegacy() {
       if (ts.isFunctionDeclaration(st) && st.name && LEGACY_FUNCTIONS.includes(st.name.text)) {
         const text = st.getText(sf);
         found.functions.set(st.name.text, { file: relative(CORRIDOR, file), line: sf.getLineAndCharacterOfPosition(st.getStart(sf)).line + 1,
-          mentionsFocus: /\bfocus/u.test(text), mentionsSelection: /\b(selection|Range|setStart|setEnd)\b/u.test(text), mentionsScroll: /scrollTo\(/u.test(text) });
+          declaration: true });
       }
     }
     source.split('\n').forEach((line, i) => { if (/\bhistory\.back\(\)/u.test(line)) found.historyBack.push(`${relative(CORRIDOR, file)}:${i + 1}`); });
@@ -169,9 +169,9 @@ test('return contract · G4', async (t) => {
       assert.equal(entry.returnKind, 'to adopt', `${name} is 'to adopt'`);
       assert.ok(typeof entry.currentBehaviour === 'string' && entry.currentBehaviour.length > 10, `${name} records its current behaviour`);
       assert.ok(Array.isArray(entry.restores), `${name} lists what it restores`);
-      if (!info.mentionsFocus) assert.ok(!entry.restores.includes('focus'), `${name} does not restore focus and may not claim it`);
-      if (!info.mentionsSelection) assert.ok(!entry.restores.includes('selection'), `${name} does not restore the selection and may not claim it`);
+      assert.ok(!entry.restores.includes('selection'), `${name}: registry makes no selection restoration guarantee`);
     }
+    execFileSync(process.execPath, ['--test', '--test-name-pattern=registry restoration claims', join(CORRIDOR, 'tools/test-navigation-returns.mjs')], { stdio: 'pipe' });
     for (const site of found.historyBack) {
       assert.ok(reg.legacy.some((l) => l.name === 'history.back' && Array.isArray(l.sites) && l.sites.includes(site)), `history.back at ${site} is listed`);
     }

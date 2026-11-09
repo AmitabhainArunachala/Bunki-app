@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import vm from 'node:vm';
+import { doorRegistry } from '../contracts/return/door-registry.mjs';
 import {fileURLToPath} from 'node:url';
 import {createDeviceVoice} from '../device-voice.mjs';
 import {fixtureSource} from './corridor-fixture-source.mjs';
@@ -11,7 +12,7 @@ import * as exitCore from '../srs-core.mjs';
 import * as exitFsrs from '../vendor/ts-fsrs.mjs';
 import { reviewExitFixture, readerTicketFixture, liftCorridor, READER_TICKET_NAMES } from './srs-hooks-corridor-layer.mjs';
 
-const source = fixtureSource(fileURLToPath(new URL('../',import.meta.url)));
+const source = fixtureSource(fileURLToPath(new URL('../',import.meta.url)), { rootSource: process.env.KAIRO_CORRIDOR_SOURCE ? readFileSync(process.env.KAIRO_CORRIDOR_SOURCE, 'utf8') : null });
 const exitPin = JSON.parse(readFileSync(new URL('../data/fsrs-pin.json', import.meta.url), 'utf8'));
 function actualFunction(name) {
   const match = source.match(new RegExp(`^(?:async )?function ${name}\\([^]*?^\\}`, 'm'));
@@ -1382,3 +1383,50 @@ test('RTM omitted revoke-marker retirement blocks the next article/sentence retu
 test('RTM obsolete completion without the active-job fence detaches a newer ticket', () => mutationKilled('old-completion-unfenced',
   bytes => replaceOne(bytes, '  if (readerTicketPlacement !== job) return;\n', ''), async bytes =>
     placementCallbackOracle(bytes, { stage: 'correction', next: 'ticket', order: 'during' })));
+
+test('registry restoration claims execute actual legacy returns after focus and selection change', () => {
+  const { context: c } = app();
+  const originalSelection = { start: 40, end: 42 };
+  const selection = { ...originalSelection };
+  // The learner selected elsewhere while away; none of these legacy paths claims a range guarantee.
+  selection.start = 0; selection.end = 0;
+  const target = { isConnected:true, closest:()=>null, matches:()=>false,
+    getClientRects:()=>[{}], getBoundingClientRect:()=>({width:40,height:20,left:1,top:1,right:41,bottom:21}),
+    focus() { c.document.activeElement=this; } };
+  Object.assign(c, { proseWordRovers:new WeakMap(), worldPickerEls:null, ladderPages:new Map(), keptPages:new Map(),
+    retireScaleTransients() {}, retireScaleDestination() {}, clearWordLadder() {}, layerPathFor:()=>false,
+    getComputedStyle:()=>({visibility:'visible',opacity:'1'}), innerWidth:390,innerHeight:844,
+    render() {}, requestAnimationFrame:callback=>callback(),
+  });
+  c.document.querySelectorAll=()=>[target]; c.document.getElementById=()=>target;
+  vm.runInContext(['returnScroll','scaleNavigationAllowed','replaceScalePages','focusScaleControl','returnToScaleBead','focusProseWord'].map(actualFunction).join('\n'),c);
+  c.document.getSelection=()=>selection;
+  const stranger={};
+  // All remembered per-view offsets are exercised; these paths do not promise focus/selection restoration.
+  for (const [view,key] of [['reader','readerScroll'],['shelf','shelfScroll'],['archive','archiveScroll'],['publisher','publisherScroll'],['source-reader','sourceScroll'],['feed','feedScroll'],['yoji','yojiScroll']]) {
+    c.S.view=view;c.S[key]=321;c.window.scrollY=0;c.document.activeElement=stranger;
+    c.returnScroll();assert.equal(c.window.scrollY,321,view);assert.equal(c.document.activeElement,stranger);assert.deepEqual(selection,{start:0,end:0});
+  }
+  c.S.view='levels';c.referenceLibrary={returnScroll(){c.window.scrollY=654;}};c.returnScroll();assert.equal(c.window.scrollY,654);
+  // Actual navigation restores its frame's view/stack/scroll. A nonempty stack avoids its optional root focus branch.
+  const stack=[{t:'word',id:'本'}];c.S.view='search';c.S.stack=[];c.window.scrollY=0;
+  c.S.navigationReturns=[{destination:'search',view:'shelf',stack,scroll:456,passageId:null,readerScroll:0}];
+  c.document.activeElement=stranger;assert.equal(c.returnFromNavigation(),true);
+  assert.equal(c.S.view,'shelf');assert.equal(c.S.stack,stack);assert.equal(c.window.scrollY,456);assert.equal(c.document.activeElement,stranger);assert.deepEqual(selection,{start:0,end:0});
+  // Shelf bead executes actual stack replacement and visible-target focus helper.
+  c.S.view='reader';c.S.stack=[{t:'word',id:'本'}];c.S.shelfScroll=789;c.S.passageId=null;c.document.activeElement=stranger;
+  assert.equal(c.returnToScaleBead({scale:'shelf',view:'shelf'}),true);
+  assert.equal(c.S.stack.length,0);assert.equal(c.S.view,'shelf');assert.equal(c.window.scrollY,789);assert.equal(c.document.activeElement,target);assert.deepEqual(selection,{start:0,end:0});
+  // Both pending and mounted strip paths return focus through actual focusProseWord.
+  c.document.activeElement=stranger;c.sealPending={anchor:target};c.closeSealStrip({restoreFocus:true});assert.equal(c.document.activeElement,target);
+  let removed=false;c.document.activeElement=stranger;c.sealStrip={anchor:target,strip:{querySelector:()=>null,remove(){removed=true;}}};
+  c.closeSealStrip({restoreFocus:true});assert(removed);assert.equal(c.document.activeElement,target);assert.deepEqual(selection,{start:0,end:0});
+  const observed = new Map([
+    ['returnScroll',['scroll']], ['returnFromNavigation',['view','stack','scroll']],
+    ['returnToScaleBead',['stack','scroll','focus']], ['closeSealStrip',['focus']],
+  ]);
+  for (const entry of doorRegistry().legacy.filter(row=>observed.has(row.name))) {
+    assert.deepEqual([...entry.restores].sort(),observed.get(entry.name).sort(),`${entry.name}: registry agrees with executed restoration paths`);
+  }
+
+});
