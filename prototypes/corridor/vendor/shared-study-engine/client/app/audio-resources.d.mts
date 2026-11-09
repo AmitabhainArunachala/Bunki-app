@@ -6,7 +6,7 @@ export interface AudioReleaseSelection {
 export type PackState = 'verified-local'|'missing'|'incomplete'|'nonpersistent';
 export interface AudioResources {
  read(ref: AudioRef, options?: {signal?: AbortSignal}): Promise<Uint8Array>;
- packState(packId: string): PackState|Promise<PackState>;
+ packState(packId: string, options?: {signal?: AbortSignal}): PackState|Promise<PackState>;
 }
 export interface AudioCapability { readonly protocol: 'nsrs-audio-resources/v1'; readonly release: AudioReleaseSelection; readonly resources: AudioResources }
 export function validateAudioCapability(value: unknown): Readonly<AudioCapability>;

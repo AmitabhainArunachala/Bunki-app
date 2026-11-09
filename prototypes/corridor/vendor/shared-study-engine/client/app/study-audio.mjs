@@ -71,8 +71,12 @@ export function studyAudioSourceFields(entry) {
 
 /** One mounted accepted entry, exact current correction overlay, no provider/profile work.
  * The mount caches by exact source snapshot, so mutable QA inputs cannot retain stale directives. */
-export function studyAudioSourcePlan(entry) {
-  const task=planCardSpeech({catalog:[entry],grammarRecords:entry.grammarRecord?[entry.grammarRecord]:[],readingRules:passageReadingRules,sourceRevision:'runtime-projection',correctionLedgerRevision:passageReadingLedgerSha256,profiles:{},scope:{accessScope:'runtime-projection',licenseScope:'runtime-projection'}}).tasks[0];
+export function studyAudioSourcePlan(entry, assignments = {}) {
+  const selected = (rows = {}) => {
+    if (rows === null || typeof rows !== 'object' || Array.isArray(rows)) throw new TypeError('study-audio-assignments');
+    return Object.hasOwn(rows, entry.taskKey) ? {[entry.taskKey]: rows[entry.taskKey]} : {};
+  };
+  const task=planCardSpeech({catalog:[entry],grammarRecords:entry.grammarRecord?[entry.grammarRecord]:[],readingRules:passageReadingRules,sourceRevision:'runtime-projection',correctionLedgerRevision:passageReadingLedgerSha256,profiles:{},languageAssignments:selected(assignments.languageAssignments),readingAssignments:selected(assignments.readingAssignments),scope:{accessScope:'runtime-projection',licenseScope:'runtime-projection'}}).tasks[0];
   const sourceFields=Object.freeze(task.fields.map(field=>Object.freeze({fieldId:field.sourcePath,text:field.sourceText,language:typeof field.language==='string'?field.language:null,pronunciationDirectives:Object.freeze(field.readingEvidence.map(({start,end,reading})=>Object.freeze({start,end,reading}))),pendingReasons:Object.freeze(field.pendingReasons.filter(reason=>!['profile-unassigned','profile-conflict','reading-review-pending'].includes(reason)))})));
   const plan=Object.freeze({audioContentRevision:task.audioContentRevision,sourceFields});
   return plan;
@@ -112,6 +116,8 @@ function copyRef(ref) {
 function snapshotReady(result) {
   const segments = result.segments.map(segment => Object.freeze({
     fieldId: segment.fieldId,
+    packId: segment.packId,
+    supportedReadingId: segment.supportedReadingId,
     start: segment.start,
     end: segment.end,
     inputKey: segment.inputKey,
@@ -127,6 +133,7 @@ function snapshotReady(result) {
     contentRevision: result.contentRevision,
     audioContentRevision: result.audioContentRevision,
     profileId: result.profileId,
+    supportedReadingId: result.supportedReadingId,
     localState: result.localState,
     segments: Object.freeze(segments),
   });
@@ -135,8 +142,9 @@ function snapshotReady(result) {
 /** Create a study-audio player over a declared capability.
  *
  * `authorize` is consulted before and after every await and immediately before
- * each source start; returning false cancels playback quietly. `audioSession`
- * is claimed for the duration of actual playback and restored on stop, end,
+ * each source start; returning false cancels playback quietly. Optional
+ * `preflight` gates each decoded segment with the immutable snapshot and ref.
+ * `audioSession` is claimed for actual playback and restored on stop, end,
  * failure or disposal. Without a capability the player stays explicitly
  * unavailable; it never constructs the legacy trial player.
  */
@@ -145,6 +153,7 @@ export function createStudyAudio({
   createContext = browserContext,
   audioSession = globalThis.navigator?.audioSession,
   authorize,
+  preflight,
 } = {}) {
   let reader = null;
   let readerError = null;
@@ -280,6 +289,19 @@ export function createStudyAudio({
       }
       if (!decoded || cancelled(token)) return;
       if (!authorized()) { cancelToken(token); return; }
+      if (typeof preflight === 'function') {
+        try {
+          await Promise.race([
+            preflight(snapshot, {signal: token.controller?.signal, ref: segment.ref, segment}),
+            token.done,
+          ]);
+        } catch (error) {
+          if (cancelled(token)) return;
+          throw error;
+        }
+        if (cancelled(token)) return;
+        if (!authorized()) { cancelToken(token); return; }
+      }
       const source = target.createBufferSource();
       token.source = source;
       source.buffer = decoded;
@@ -374,14 +396,14 @@ export function createStudyAudio({
     releaseSession();
   }
 
-  function load() {
+  function load(options) {
     if (disposed) return Promise.reject(audioError('cancelled', 'study-audio-disposed'));
     if (readerError) {
       return Promise.reject(readerError.audioCode === 'unsupported'
         ? audioError('unsupported', 'study-audio-unsupported')
         : audioError('integrity', 'study-audio-integrity'));
     }
-    return reader.load();
+    return reader.load(options);
   }
 
   async function dispose() {

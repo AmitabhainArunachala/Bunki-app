@@ -999,6 +999,8 @@ export function createAudioReleaseReader({capability} = {}) {
       }
       output.push(Object.freeze({
         fieldId: row.fieldId,
+        packId: row.packId,
+        supportedReadingId: row.supportedReadingId,
         start: segment.start,
         end: segment.end,
         inputKey: segment.inputKey,
@@ -1108,6 +1110,8 @@ export function createAudioReleaseReader({capability} = {}) {
         if (clip.verification !== 'verified') bad('clip-unverified');
         segments.push(Object.freeze({
           fieldId: piece.fieldId,
+          packId: piece.packId,
+          supportedReadingId: piece.supportedReadingId,
           start: piece.start,
           end: piece.end,
           inputKey: piece.inputKey,
@@ -1124,7 +1128,7 @@ export function createAudioReleaseReader({capability} = {}) {
     if(allFieldsPacked&&selectedPacks.size){
       try{
         const states=[];
-        for(const packId of selectedPacks){states.push(await withSignal(Promise.resolve(resources.packState(packId)),signal));if(disposed||signal?.aborted)return {status:'cancelled'};}
+        for(const packId of selectedPacks){states.push(await withSignal(Promise.resolve(resources.packState(packId,{signal})),signal));if(disposed||signal?.aborted)return {status:'cancelled'};}
         if(states.every(state=>state==='verified-local')){
           // Host locality is a presence assertion; only exact selected bytes can establish readiness.
           for(const segment of segments){const bytes=await readClip(segment.ref,{signal});if(await hashAudioBytes(bytes)!==segment.ref.sha256)bad('local-clip-digest');if(disposed||signal?.aborted)return {status:'cancelled'};}
@@ -1143,6 +1147,7 @@ export function createAudioReleaseReader({capability} = {}) {
       contentRevision: selected.contentRevision,
       audioContentRevision: selected.audioContentRevision,
       profileId: selected.profileId,
+      supportedReadingId: selected.supportedReadingId,
       identities: loaded.identities,
       localState,
       segments: Object.freeze(segments),

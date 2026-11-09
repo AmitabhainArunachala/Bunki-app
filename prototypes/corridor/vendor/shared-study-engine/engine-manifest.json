@@ -18,7 +18,7 @@
   },
   "source": {
     "repository": "nihongo-srs",
-    "commit": "503688879ea5e4820773721a449dc3ede8f79065",
+    "commit": "8b9c80a7338009f16fe44068080446bbce51f7ea",
     "mode": "committed",
     "changedFiles": []
   },
@@ -29,7 +29,7 @@
   "behavior": {
     "client/engine.mjs": "5253648cf520052ffd76feacdcf6e9d3ee60d34914a003e167362d6fe5d025fc",
     "client/replay.mjs": "642ca6b6759de4cb137b3041670dab5457ad7d600603c58136bd923d14008686",
-    "client/player/replica-backend.mjs": "dbf7b4dcf3fa720d2d007b29786c6ab0594a6218a1284e2955a34531e3ee4876",
+    "client/player/replica-backend.mjs": "557ef048e5c7a9951a793863b3a364c335c66e88e165f067388bd78d4030a402",
     "client/store.mjs": "f166afe36c091fe336b2056f0c3013c45d2aeba47fe90aa2c459de026cae23b1",
     "client/player/study-sessions.mjs": "e6067b6172fcad7c0d4ec789c9d1284f01be633cdb2f4737a280bd03aadaf91c",
     "client/app/local-budget.mjs": "f561b0f793d160cd5de57f52fca5a52025ae2973de7e8b7333af77c1012d6fbd",
@@ -68,23 +68,53 @@
     },
     {
       "path": "client/app/app.mjs",
-      "bytes": 188776,
-      "sha256": "d53cccbe995566bf6f577d3e72bf8133274e66b7ba53c90496a7c4f206399073"
+      "bytes": 197241,
+      "sha256": "85d55b6c4e77dbb7329d6a78e4fc39d03d94d9a603998bd380e397e9ccaae9d8"
+    },
+    {
+      "path": "client/app/audio-pack-admission.d.mts",
+      "bytes": 4855,
+      "sha256": "354d2266b1e7133c8ccac4082271a07359bfcad262bc185ef8b60706f7c1ef25"
+    },
+    {
+      "path": "client/app/audio-pack-admission.mjs",
+      "bytes": 16929,
+      "sha256": "01bc02b65e5d90aca96e74f717205d3d78d4dc7cc0a792be7de0de46ffd5adaf"
+    },
+    {
+      "path": "client/app/audio-pack-manager.d.mts",
+      "bytes": 1915,
+      "sha256": "920fcf75c8b13c6936597f584ee0594c0cd0692cc1023ebbfa00d116cad23f6b"
+    },
+    {
+      "path": "client/app/audio-pack-manager.mjs",
+      "bytes": 24772,
+      "sha256": "8de7ae68ba187c8d337136bb22d1d8081784ef75fe4e3ff0baec0435af248f74"
+    },
+    {
+      "path": "client/app/audio-pack-source.d.mts",
+      "bytes": 1422,
+      "sha256": "9636bb1c82278a288b1abfba2a930f499551c853278dcf5ba8e80c630de84a44"
+    },
+    {
+      "path": "client/app/audio-pack-source.mjs",
+      "bytes": 26335,
+      "sha256": "26cbec1485e78873aee762636595ca5a264e2fba7e89e09d40a5491e9cb56de7"
     },
     {
       "path": "client/app/audio-release.d.mts",
-      "bytes": 3471,
-      "sha256": "a933b46a64bc104c9edcac98fb6b29e160b52a00bab044db939ea47ae04722aa"
+      "bytes": 3548,
+      "sha256": "0c4e6c846e26fae4182083eb4671fba39a93308f5b3a3aa1e41925151e8fa12b"
     },
     {
       "path": "client/app/audio-release.mjs",
-      "bytes": 48527,
-      "sha256": "79d6a1f282e99986b318a578d54f3a2b7de175455116072cead54510996e3480"
+      "bytes": 48759,
+      "sha256": "42683e73f7d6d6dc17e816a2464556721e795d62039164ae37d11c13d0a6ef76"
     },
     {
       "path": "client/app/audio-resources.d.mts",
-      "bytes": 1406,
-      "sha256": "416fa9e19772f9a9b9c586cb9b5e91090321a32b4384221b67f0214410aba916"
+      "bytes": 1440,
+      "sha256": "131557653f3f6f960a4892617fb39eb9cf52d49b206a72d85c6a7e219012cfcb"
     },
     {
       "path": "client/app/audio-resources.mjs",
@@ -95,6 +125,16 @@
       "path": "client/app/backup-status.mjs",
       "bytes": 4935,
       "sha256": "88167572be902c77c13fd231f522bb0ef32d19e64e5d70d047e88f9018bac87d"
+    },
+    {
+      "path": "client/app/browser-audio-pack-host.d.mts",
+      "bytes": 2461,
+      "sha256": "120bb289b62f148334c9cf701d56a314f1ed30807b8998d26f8b00126b013320"
+    },
+    {
+      "path": "client/app/browser-audio-pack-host.mjs",
+      "bytes": 10045,
+      "sha256": "61bad5c15fabc218f140dab9ca26e64851df61cdfeea822b7ef4a3260190452c"
     },
     {
       "path": "client/app/corpus-inventory.mjs",
@@ -1413,13 +1453,13 @@
     },
     {
       "path": "client/app/study-audio.d.mts",
-      "bytes": 920,
-      "sha256": "b0bb5998dcdd8a97fee473d277e5ca2b34381c0661bb75244442c8f7d305786d"
+      "bytes": 1564,
+      "sha256": "6793ca5e6ae3a892c6a3825484759fd646cbdb9a53c876544ff715f2880531ea"
     },
     {
       "path": "client/app/study-audio.mjs",
-      "bytes": 15460,
-      "sha256": "f5cd1b3eb7a8ffc6b96a386d798a5f9051bdc51e05c2099288d109d0caa424fa"
+      "bytes": 16514,
+      "sha256": "bbe4cebeea058196784de81e97abf2210665b95d40945983c942825dc98369b4"
     },
     {
       "path": "client/app/study-loop.mjs",
@@ -1568,8 +1608,8 @@
     },
     {
       "path": "client/player/replica-backend.mjs",
-      "bytes": 38474,
-      "sha256": "dbf7b4dcf3fa720d2d007b29786c6ab0594a6218a1284e2955a34531e3ee4876"
+      "bytes": 38323,
+      "sha256": "557ef048e5c7a9951a793863b3a364c335c66e88e165f067388bd78d4030a402"
     },
     {
       "path": "client/player/rest-day-evidence.mjs",
@@ -1605,6 +1645,16 @@
       "path": "client/schema/event.mjs",
       "bytes": 14944,
       "sha256": "cc0204a7f93ae29312b77e13bab68719b14f489f5d4c2e78f84162659ec4928e"
+    },
+    {
+      "path": "client/storage/audio-pack-indexeddb.d.mts",
+      "bytes": 1256,
+      "sha256": "40a10bc9b6d68f86a124284fa98baa5d66971c08ec4e8f75a687fbb6044a40d3"
+    },
+    {
+      "path": "client/storage/audio-pack-indexeddb.mjs",
+      "bytes": 7752,
+      "sha256": "499a2ff6566350e3242fad2e8380db0b2673f77c59ff5ad23d3b107a3a7fc9c3"
     },
     {
       "path": "client/storage/indexeddb.mjs",
@@ -1672,5 +1722,5 @@
       "sha256": "adab18734248871867be9cf62fa25b58cce3f3f37a34a81e714b0b1b26e10dba"
     }
   ],
-  "closureSha256": "8e0dc34d8e48bd1f7dd8bf0088e69f2483969e77e7f715f70652646c99e31036"
+  "closureSha256": "ca0832fd8916f6df169cbf609956abef3d8fd3c87657939a8c25b260fd57f714"
 }

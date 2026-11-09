@@ -1,6 +1,7 @@
 import {buildKanjiCapacityReport} from '../kanji/capacity.mjs';
 import {renderKanjiCapacity} from '../kanji/panel.mjs';
 export {startAcceptedAudioHost,acceptedAudioSourceRevision} from './accepted-audio-host.mjs';
+export {createBrowserAudioPackHost} from './browser-audio-pack-host.mjs';
 import {createBackupStatusObserver} from './backup-status.mjs';
 import {createFactoryStatusReader,factoryRequest} from './factory-status.mjs';
 import {applyKinsoku} from '../player/kinsoku.mjs';
@@ -62,11 +63,12 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   const pairedPhone = ['paired-dev','paired-prod'].includes(platform.storageKind);
   if(platform.presentation!==undefined&&!['phone','desktop'].includes(platform.presentation))throw Error('invalid-study-presentation');
   const phonePresentation=platform.presentation===undefined?pairedPhone:platform.presentation==='phone';
-  const sharedAudioDeclared=platform.audio!==undefined&&platform.audio!==null;
+  const sharedAudioDeclared=platform.audioDownloadFailure===true||platform.audio!==undefined&&platform.audio!==null;
+  let audioDownloadsSuspended=false,audioDownloadActionFailed=false,audioDownloadsSnapshot=null;
   const trialAudio=sharedAudioDeclared?null:createTrialAudio({origin:platform.audioOrigin??win.nihongoNativeSync?.origin??win.location?.origin});
   let trialAudioPlaybackGeneration=0;
-  let sharedAudioOwner=null,sharedAudioRoot=null,sharedAudioRootState=sharedAudioDeclared?'idle':'absent',sharedAudioRootPromise=null;
-  const studyAudio=sharedAudioDeclared?createStudyAudio({capability:platform.audio,authorize:()=>sharedAudioAuthorized()}):null;
+  let sharedAudioOwner=null,sharedAudioRoot=null,sharedAudioRootState=sharedAudioDeclared?'idle':'absent',sharedAudioRootPromise=null,sharedAudioRootController=null;
+  const studyAudio=sharedAudioDeclared?createStudyAudio({capability:platform.audio,authorize:()=>sharedAudioAuthorized(),preflight:platform.audioDownloads?.authorizePlayback}):null;
   const h = (tag, attrs, ...children) => createNode(document, tag, attrs, ...children);
   const button = (text, fn, attrs = {}) => h('button', { type:'button', onclick: fn, ...attrs }, text);
   let screen = 'today', module = initialModule, current = null, busy = false, notice = '', pendingIntent = null, pendingAction = null, factoryRetry = null, disposed = false, pop = null, lastReview = null;
@@ -101,7 +103,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   const defaultLanguage=defaultInterfaceLanguage(win.navigator);
   let interfaceLanguage=defaultLanguage;try{const stored=preferences.getItem('nihongo.interface-language.v1');if(['ja','en','both'].includes(stored))interfaceLanguage=stored;}catch{}
   const originalLabels=new WeakMap(),originalAttributes=new WeakMap(),cardViews=new WeakMap();
-  const copy=(tag,ja,en,attrs={})=>renderInterfacePair(h(tag,attrs),ja,en,interfaceLanguage,{inline:tag==='button'});
+  const copy=(tag,ja,en,attrs={})=>renderInterfacePair(h(tag,attrs),ja,en,interfaceLanguage,{inline:tag==='button'||attrs['data-interface-layout']==='inline'});
   const copyButton=(ja,en,action,attrs={})=>copy('button',ja,en,{type:'button',onclick:action,...attrs});
   const online=()=>typeof platform.isOnline==='function'?platform.isOnline():win.navigator.onLine!==false;
   let startedOffline=platform.startedOffline===true&&!online();
@@ -178,7 +180,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function displayDate(value,options={}){const date=new Date(value),zone=options.timeZone?{timeZone:options.timeZone}:{},jp=`${date.toLocaleDateString('ja-JP',{month:'long',day:'numeric',...zone})}（${date.toLocaleDateString('ja-JP',{weekday:'short',...zone})}）${options.timeStyle?date.toLocaleTimeString('ja-JP',{timeStyle:'short',...zone}):''}`,en=new Intl.DateTimeFormat('en-US',options).format(date);return renderInterfacePair(h('span'),jp,en,interfaceLanguage);}
   function localize(){
     for(const element of document.querySelectorAll('[data-interface-ja][data-interface-en]')){
-      if(!isSourceCopy(element))renderInterfacePair(element,element.dataset.interfaceJa,element.dataset.interfaceEn,interfaceLanguage,{inline:!!element.closest('button,option')&&element.dataset.interfaceLayout!=='grade'});
+      if(!isSourceCopy(element))renderInterfacePair(element,element.dataset.interfaceJa,element.dataset.interfaceEn,interfaceLanguage,{inline:element.dataset.interfaceLayout==='inline'||!!element.closest('button,option')&&element.dataset.interfaceLayout!=='grade'});
     }
     const walker=document.createTreeWalker(document.body,win.NodeFilter.SHOW_TEXT),nodes=[];let node;
     while(node=walker.nextNode()){
@@ -732,7 +734,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function focusStudyCard(){main.querySelector('[data-card]')?.focus({preventScroll:true});}
   function clearCardSelection(){const selection=win.getSelection(),card=main.querySelector('[data-card]');if(selection&&card&&(card.contains(selection.anchorNode)||card.contains(selection.focusNode)))selection.removeAllRanges();}
   function sharedAudioAuthorized(){
-    if(disposed||!sharedAudioDeclared||sharedAudioOwner!==current||screen!=='study'||!current?.revealed)return false;
+    if(disposed||!sharedAudioDeclared||audioDownloadsBlocked()||sharedAudioOwner!==current||screen!=='study'||!current?.revealed)return false;
     const c=current;
     try{
       return sharedAudioOwner===c&&c.revealed&&screen==='study'&&
@@ -746,9 +748,9 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function sharedAudioSource(c=current){
     const e=c?.entry;if(!e)return null;
     try{
-      const snapshot=JSON.stringify(e);
+      const assignments=c.audioSelectedAssignments??{},snapshot=JSON.stringify([e,assignments]);
       if(c.audioSourceSnapshot!==snapshot||!c.audioSourcePlan){
-        c.audioSourcePlan=studyAudioSourcePlan(e);c.audioSourceSnapshot=snapshot;
+        c.audioSourcePlan=studyAudioSourcePlan(e,assignments);c.audioSourceSnapshot=snapshot;
       }
       return c.audioSourcePlan;
     }catch{return null;}
@@ -825,12 +827,13 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const [ja,en]=sharedAudioStatusCopy(code);node.hidden=false;renderInterfacePair(node,ja,en,interfaceLanguage);
   }
   function sharedAudioDefaultLabel(c=current){
-    const fields=sharedAudioDefaultFields(c).map(sharedAudioFieldLabels);
+    const fields=sharedAudioDefaultFields(c).map(fieldId=>sharedAudioFieldLabels(fieldId,c));
     const ja=fields.length?fields.map(labels=>labels[0]).join(' · '):'—';
     const en=fields.length?fields.map(labels=>labels[1]).join(' · '):'—';
     return sharedAudioText(`既定（${ja}）`,`Default (${en})`);
   }
-  function sharedAudioFieldLabels(fieldId){
+  function sharedAudioFieldLabels(fieldId,c=current){
+    if(fieldId==='meaning'&&c?.entry?.manual===true)return ['意味','Meaning'];
     const labels={term:['単語','Word'],reading:['読み','Reading'],ja:['例文（日本語）','Example (Japanese)'],
       defJa:['定義（日本語）','Definition (Japanese)'],meaning:['意味（英語）','Meaning (English)'],
       note:['補足','Notes'],en:['例文（英語）','Example (English)'],pattern:['文型','Pattern'],
@@ -865,7 +868,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const fieldSelect=h('select',{'aria-label':sharedAudioText('音声の項目','Audio field'),'data-study-audio-field':'',
       onchange:event=>changeSharedAudioChoice(c,{fieldId:event.currentTarget.value})});
     fieldSelect.append(h('option',{value:'default'},sharedAudioDefaultLabel(c)));
-    for(const field of fields)fieldSelect.append(h('option',{value:field.fieldId},sharedAudioText(...sharedAudioFieldLabels(field.fieldId))));
+    for(const field of fields)fieldSelect.append(h('option',{value:field.fieldId},sharedAudioText(...sharedAudioFieldLabels(field.fieldId,c))));
     const choice=sharedAudioFieldChoice(c);
     fieldSelect.value=choice==='default'||fields.some(field=>field.fieldId===choice)?choice:'default';
     const profileSelect=h('select',{'aria-label':sharedAudioText('音声プロファイル','Audio profile'),'data-study-audio-profile':'',
@@ -890,23 +893,52 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const status=panel.querySelector('[data-study-audio-status]');if(status)sharedAudioStatusInto(status,c);
   }
   function stopTrialAudio(){
+    stopSharedAudioRoot();
     trialAudioPlaybackGeneration++;
     trialAudio?.stop();
     studyAudio?.stop();
     sharedAudioOwner=null;
     const c=current;
     if(c){
+      c.audioSourceController?.abort();c.audioSourceController=null;c.audioSourcePromise=null;
       c.audioPlaying=false;
       c.audioPlayGeneration=(c.audioPlayGeneration??0)+1;
       c.audioGeneration=(c.audioGeneration??0)+1;
       c.audioPromise=null;
     }
   }
+  function audioDownloadsBlocked(){
+    return ['paused','disposed'].includes(platform.audioDownloads?.read().state);
+  }
+  function invalidateDownloadedAudio(){
+    stopTrialAudio();
+    for(const c of [current,parkedStudy?.current]){
+      if(!c)continue;
+      c.audioGeneration=(c.audioGeneration??0)+1;
+      c.audioResult=null;c.audioResolverKey=null;c.audioPromise=null;c.audioStatus='preparation-failed';
+    }
+    syncSharedAudioDom();
+  }
+  function retryDownloadedAudio(){
+    if(!sharedAudioDeclared)return;
+    stopSharedAudioRoot();
+    if(['offline','integrity'].includes(sharedAudioRootState))sharedAudioRootState='idle';
+    for(const c of [current,parkedStudy?.current]){
+      if(!c)continue;
+      const failed=['offline-missing','integrity-invalid','preparation-failed','cancelled'].includes(c.audioStatus);
+      const resolving=c.audioResult?.status!=='ready'&&(c.audioPromise||c.audioSourcePromise);
+      if(!failed&&!resolving)continue;
+      if(c===current&&sharedAudioOwner===c){studyAudio?.stop();sharedAudioOwner=null;}
+      c.audioSourceController?.abort();c.audioSourceController=null;c.audioSourcePromise=null;
+      c.audioGeneration=(c.audioGeneration??0)+1;
+      c.audioResult=null;c.audioResolverKey=null;c.audioPromise=null;c.audioStatus='preparing';
+    }
+  }
   function trialAudioMember(c=current){return !!trialAudio&&!!c?.entry?.noteGuid&&trialAudio.has(c.entry.noteGuid);}
   function trialAudioReady(c=current){return !!trialAudio&&!!c?.revealed&&trialAudioMember(c);}
   function trialAudioLabel(active=false,c=current){
     if(sharedAudioDeclared&&!active&&sharedAudioFieldChoice(c)!=='default'){
-      const [ja,en]=sharedAudioFieldLabels(sharedAudioFieldChoice(c));
+      const [ja,en]=sharedAudioFieldLabels(sharedAudioFieldChoice(c),c);
       return sharedAudioText(`${ja}を再生（P）`,`Play ${en} (P)`);
     }
     const [ja,en]=sharedAudioDeclared
@@ -949,32 +981,63 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     trialAudio.play(c.entry.noteGuid).catch(()=>{if(generation===trialAudioPlaybackGeneration&&!disposed&&screen==='study'&&c===current&&trialAudioReady(c))trialAudioFailure();})
       .finally(()=>{if(generation===trialAudioPlaybackGeneration&&!disposed&&screen==='study'&&c===current&&c.revealed&&control?.isConnected&&control===main.querySelector('[data-trial-audio]'))control.setAttribute('aria-busy','false');});
   }
+  function stopSharedAudioRoot(){
+    sharedAudioRootController?.abort();sharedAudioRootController=null;
+    if(sharedAudioRootState==='loading'){sharedAudioRootPromise=null;sharedAudioRootState='idle';}
+  }
   function loadSharedAudioRoot(){
     if(!sharedAudioDeclared||!studyAudio)return Promise.resolve(null);
     if(sharedAudioRootState==='ready')return Promise.resolve(sharedAudioRoot);
     if(sharedAudioRootPromise)return sharedAudioRootPromise;
     sharedAudioRootState='loading';
-    const promise=studyAudio.load().then(root=>{
-      if(disposed)return root;
+    const controller=new AbortController();sharedAudioRootController=controller;
+    const promise=studyAudio.load({signal:controller.signal}).then(root=>{
+      if(disposed||controller.signal.aborted)return null;
       sharedAudioRoot=root;sharedAudioRootState='ready';
       if(screen==='study'&&current?.revealed)syncSharedAudioCurrent();
       return root;
     },error=>{
-      if(!disposed){
+      if(!disposed&&!controller.signal.aborted){
         sharedAudioRoot=null;sharedAudioRootState=error?.audioCode==='unsupported'?'unsupported':error?.audioCode==='offline'?'offline':'integrity';
         if(screen==='study'&&current?.revealed)syncSharedAudioCurrent();
       }
       return null;
-    }).finally(()=>{if(sharedAudioRootPromise===promise)sharedAudioRootPromise=null;});
+    }).finally(()=>{if(sharedAudioRootPromise===promise){sharedAudioRootPromise=null;sharedAudioRootController=null;}});
     sharedAudioRootPromise=promise;return promise;
   }
-  function syncSharedAudioCurrent(){
+  function syncSharedAudioCurrent(sourceChecked=false){
     if(disposed||!sharedAudioDeclared||screen!=='study'||!current||!current.revealed)return;
+    if(audioDownloadsBlocked()){invalidateDownloadedAudio();return;}
     const c=current;
     if(c.audioFieldId===undefined)c.audioFieldId='default';
     if(sharedAudioRootState==='idle'){c.audioStatus='preparing';syncSharedAudioDom(c);loadSharedAudioRoot();return;}
     if(sharedAudioRootState==='loading'){c.audioStatus='preparing';syncSharedAudioDom(c);return;}
     if(sharedAudioRootState!=='ready'){c.audioStatus=sharedAudioRootState==='unsupported'?'unsupported-capability':sharedAudioRootState==='offline'?'offline-missing':'integrity-invalid';sharedAudioOwner=null;syncSharedAudioDom(c);return;}
+    if(!sourceChecked&&typeof platform.audioDownloads?.readSource==='function'){
+      if(c.audioSourcePromise)return;
+      const controller=new AbortController(),generation=c.audioGeneration??0,taskKey=c.entry.taskKey;
+      c.audioSourceController=controller;
+      const active=()=>!disposed&&!controller.signal.aborted&&c===current&&screen==='study'&&c.revealed&&(c.audioGeneration??0)===generation&&c.entry.taskKey===taskKey;
+      const promise=Promise.resolve().then(()=>platform.audioDownloads.readSource({taskKeys:[taskKey],signal:controller.signal})).then(source=>{
+        if(!active())return;
+        if(!source?.selectedAssignments)throw Error('study-audio-source-assignments');
+        const snapshot=JSON.stringify(source.selectedAssignments);
+        if(c.audioAssignmentSnapshot!==undefined&&c.audioAssignmentSnapshot!==snapshot)stopTrialAudio();
+        c.audioSelectedAssignments=JSON.parse(snapshot);c.audioAssignmentSnapshot=snapshot;
+        c.audioSourcePromise=null;c.audioSourceController=null;
+        syncSharedAudioCurrent(true);
+      }).catch(error=>{
+        if(!active())return;
+        stopTrialAudio();
+        c.audioResult=null;c.audioResolverKey=null;c.audioStatus=error?.audioCode==='cancelled'||error?.name==='AbortError'?'cancelled':'integrity-invalid';
+        sharedAudioOwner=null;syncSharedAudioDom(c);
+      }).finally(()=>{
+        if(c.audioSourcePromise===promise){c.audioSourcePromise=null;c.audioSourceController=null;}
+      });
+      c.audioSourcePromise=promise;
+      if(!c.audioResult){c.audioStatus='preparing';syncSharedAudioDom(c);}
+      return;
+    }
     const fields=sharedAudioSelectedFields(c),profileId=sharedAudioProfileChoice(c),revision=sharedAudioRevision(c);
     if(!fields.length||revision===null){
       c.audioStatus=revision===null?'integrity-invalid':'source-stale';c.audioResult=null;c.audioResolverKey=null;c.audioPromise=null;sharedAudioOwner=null;syncSharedAudioDom(c);return;
@@ -1039,7 +1102,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     syncSharedAudioCurrent();
   }
   function playSharedAudio(c=current){
-    if(disposed||screen!=='study'||!c||c!==current||!c.revealed||c.audioResult?.status!=='ready')return;
+    if(disposed||audioDownloadsBlocked()||screen!=='study'||!c||c!==current||!c.revealed||c.audioResult?.status!=='ready')return;
     sharedAudioOwner=c;
     const generation=(c.audioPlayGeneration??0)+1;c.audioPlayGeneration=generation;
     c.audioPlaying=true;
@@ -1556,6 +1619,42 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const reason=backend.readReplayDiagnostics?.()?.reason;
     return ['row-budget','input-budget','config-budget','retained-budget'].includes(reason)?h('p',{'data-cache-limit':reason,role:'status'},'履歴が高速処理の上限に達しています。学習は続けられますが、表示が遅くなることがあります。'):null;
   }
+  function syncAudioDownloads(node=main.querySelector('[data-audio-downloads]')){
+    if(disposed||!node||!platform.audioDownloads)return;
+    const status=platform.audioDownloads.read(),state=audioDownloadActionFailed?'error':status.state;
+    const [ja,en]=({
+      idle:['音声はまだ保存されていません。','Audio is not yet saved.'],
+      checking:['保存済みの音声を確認しています…','Checking saved audio…'],
+      downloading:['音声を保存しています…','Saving audio…'],
+      saved:['選択した音声をこの端末に保存しました。','Selected audio is saved on this device.'],
+      cancelled:['保存をキャンセルしました。保存済みの音声は残っています。','Saving was cancelled. Previously saved audio remains.'],
+      error:['音声を確認または保存できませんでした。もう一度お試しください。','Audio could not be checked or saved. Try again.'],
+      paused:['音声の保存を一時停止しています。','Audio saving is paused.'],
+      disposed:['音声のダウンロードは終了しました。','Audio downloads are closed.'],
+    })[state]??['音声を確認できませんでした。','Audio could not be checked.'];
+    renderInterfacePair(node.querySelector('[data-audio-download-status]'),ja,en,interfaceLanguage,{inline:true});
+    const locked=['checking','downloading','paused','disposed'].includes(status.state);
+    node.querySelector('[data-audio-download-start]').disabled=locked;
+    node.querySelector('[data-audio-download-cancel]').disabled=!['checking','downloading'].includes(status.state);
+    node.querySelector('[data-audio-download-refresh]').disabled=locked;
+  }
+  async function audioDownloadAction(action){
+    audioDownloadActionFailed=false;
+    try{await platform.audioDownloads[action]();}
+    catch{audioDownloadActionFailed=!['cancelled','paused','disposed'].includes(platform.audioDownloads.read().state);}
+    syncAudioDownloads();
+  }
+  function audioDownloadsDetail(){
+    if(!platform.audioDownloads)return h('details',{class:'sheet','data-audio-downloads':''},copy('summary','音声のダウンロード','Audio downloads',{'data-interface-layout':'inline'}),copy('p','この内容の音声ダウンロードは利用できません。学習は続けられます。','Audio downloads are unavailable for this content. You can continue studying.',{role:'status'}));
+    const node=h('details',{class:'sheet','data-audio-downloads':''},
+      copy('summary','音声のダウンロード','Audio downloads',{'data-interface-layout':'inline'}),
+      h('p',{role:'status','data-audio-download-status':'','data-interface-layout':'inline'}),
+      h('div',{class:'sheet-actions'},
+        copyButton('音声を保存','Save audio',()=>audioDownloadAction('acquire'),{'data-audio-download-start':''}),
+        copyButton('キャンセル','Cancel',()=>platform.audioDownloads.cancel(),{'data-audio-download-cancel':''}),
+        copyButton('確認','Check',()=>audioDownloadAction('refresh'),{'data-audio-download-refresh':''})));
+    syncAudioDownloads(node);return node;
+  }
   function settingsScreen(){
     const p=backend.readProjection(),planned=plannedSettings(p),weekdayPolicy=!!planned.studyPolicy;
     const paceInput=(key,attrs)=>h('input',{...attrs,id:'study-pace-'+key,value:paceDraft[key]??planned[key],oninput:event=>{paceDraft[key]=event.currentTarget.value;}});
@@ -1578,6 +1677,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const file=h('input',{type:'file',accept:'.json,application/json','aria-label':'バックアップを選ぶ',onchange:async e=>{if(updateBoundary?.held)return;const end=beginFlight('import');try{const backup=JSON.parse(await e.target.files[0].text());await backend.importBackup(backup);message('互換のある保存済み記録を追加しました。');render();}catch(error){message(error.message==='backup-has-pending-events-recovery-required'?'未送信の記録を含むため自動復元できません。元の端末とバックアップを保管してください。':'学習者・内容の整合性を確認できませんでした。記録は置き換えていません。');}finally{end();}}});
     const sheet=(id,kicker,title,description,...body)=>h('section',{class:'sheet','data-settings-section':id},h('div',{class:'sheet-head'},h('p',{class:'kicker'},kicker),h('h2',{},title),description?h('p',{class:'sheet-desc'},description):null),...body);
     return h('section',{class:'settings'},h('header',{class:'screen-head stacked'},h('h1',{},'設定'),h('p',{class:'secondary'},'この端末の表示と、すべてのデッキ共通の学習設定。')),...(platform.nativeSync?[nativeSyncSettings()]:[]),...(typeof platform.backupStatus==='function'?[backupDetail()]:[]),platform.onScreenChange?h('section',{class:'sheet host-settings','data-host-settings':''}):null,
+      ...((platform.audioDownloads||platform.audioDownloadFailure)?[audioDownloadsDetail()]:[]),
       sheet('appearance','表示','この端末の見え方','色はこの端末だけに保存します。学習履歴や他の端末の色は変わりません。',h('div',{class:'control-grid'},themePicker(),languagePicker()),h('label',{class:'swipe-grading-setting'},swipe,h('span',{},'スワイプで採点（この端末のみ）')),h('p',{id:'swipe-grading-help',class:'secondary'},'初期設定はオフです。左で「もう一度」、右で「正解」。'),h('label',{class:'swipe-grading-setting'},h('input',{type:'checkbox',checked:intervalHints,'data-interval-hints':'',onchange:async event=>{if(updateBoundary?.held)return;intervalHints=event.target.checked;const end=beginFlight('preference');try{await preferences.setItem('nihongo.interval-hints.v1',String(intervalHints));}catch{message('この端末に表示設定を保存できません。');}finally{end();}}}),h('span',{},'次の復習までの間隔を表示（この端末のみ）'))),
       ...(legacyHistory?[sheet('legacy-display','引き継ぎ','引き継いだ表示設定',null,...legacyHistory.decks.map(d=>h('p',{class:'secondary','data-legacy-settings':''},`${d.deckId} · 一日の新規 ${d.preferences.newPerDay} · 読み方 ${d.preferences.mode} · 全文英訳 ${d.preferences.gloss} · 文脈 ${d.preferences.zoom}`)),h('p',{class:'secondary'},themePreferenceSet?'色はこの端末の指定を使っています。':'以前の色指定は未設定です。自動表示のまま、設定値は書き込んでいません。'))]:[]),
       sheet('pace','学習','共通の学習ペース','1日の新規カード上限と学習日の区切りは、すべてのデッキ共通です。変更は翌日の学習日から有効です。',h('div',{class:'setting-row'},h('label',{},'1日の新規カード上限',newCount),button('翌日から変更',()=>{const value=newCount.valueAsNumber;if(!Number.isSafeInteger(value)||value<1||value>200)return message('1日の新規カード上限は1〜200の整数を入力してください。');savePace('newPerDayTotal',newCount,value);},{disabled:weekdayPolicy})),weekdayPolicy?h('p',{class:'secondary','data-weekday-policy-active':''},'曜日ごとの新規カード上限を使っています。今日のカスタム学習パネルで変更できます。'):null,
@@ -1691,10 +1791,32 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     }
     trialAudio.load().then(()=>{if(!disposed)syncTrialAudioControl();},()=>{if(!disposed)syncTrialAudioControl();});
   };
+  const audioDownloadsChanged=()=>{
+    if(disposed)return;
+    const snapshot=platform.audioDownloads.read(),previous=audioDownloadsSnapshot,{state}=snapshot;
+    audioDownloadsSnapshot=snapshot;
+    const suspended=['paused','disposed'].includes(state),resumed=audioDownloadsSuspended&&!suspended;
+    audioDownloadsSuspended=suspended;
+    const completed=previous?.state==='downloading'&&['saved','error','cancelled'].includes(state);
+    const installed=previous&&snapshot.installedPacks!==previous.installedPacks;
+    const retry=resumed||completed||installed||state==='saved'&&previous?.state!=='saved';
+    if(suspended){
+      if(sharedAudioDeclared)invalidateDownloadedAudio();
+    }else{
+      if(resumed||['saved','idle','cancelled'].includes(state))audioDownloadActionFailed=false;
+      if(retry){
+        retryDownloadedAudio();
+        loadTrialAudio();
+      }
+    }
+    syncAudioDownloads();
+  };
+  const unsubscribeAudioDownloads=platform.audioDownloads?.subscribe(audioDownloadsChanged);
+  if(platform.audioDownloads)audioDownloadsChanged();
   win.addEventListener('online',loadTrialAudio);win.addEventListener('focus',loadTrialAudio);document.addEventListener('visibilitychange',loadTrialAudio);
   loadTrialAudio();
   backupObserver.start();
   reconcileUnknownFactoryRows();
   if(platform.storageKind==='native-worker-prod'&&platform.nativeSync)updateStatus().catch(()=>{});
-  return Object.freeze({requestUpdateBoundary:token=>updateBoundary.request(token),readUpdateState:()=>updateBoundary.read(),releaseUpdateBoundary:token=>updateBoundary.release(token),subscribeUpdateState:listener=>updateBoundary.subscribe(listener),showTask:(...args)=>{if(updateBoundary.held)return;sessionShown=0;return start(...args);},refreshStatus:updateStatus,read:()=>({screen,module,current,busy:busy||typedBusy||customBusy,pendingIntent,theme,themePreferenceSet,interfaceLanguage}),dispose(){stopTrialAudio();studyAudio?.dispose?.();disposed=true;updateBoundary.dispose();root.removeEventListener('input',updateDraftWake);root.removeEventListener('change',updateDraftWake);backupObserver.dispose();win.removeEventListener('focus',backupWake);document.removeEventListener('visibilitychange',backupWake);nativeStatusGeneration++;clearSyncRetry();win.clearTimeout(outboxSyncTimer);win.clearTimeout(saveBacklogTimer);win.clearTimeout(toastTimer);win.clearTimeout(finishGuardTimer);panelObserver?.disconnect();budgetWatcher?.dispose();win.removeEventListener('online',availabilityWake);win.removeEventListener('online',reconnectSync);win.removeEventListener('offline',availabilityWake);win.removeEventListener('focus',budgetWake);document.removeEventListener('visibilitychange',budgetWake);win.removeEventListener('focus',autoSync);document.removeEventListener('visibilitychange',autoSync);platform.nativeSync?.dispose?.();factoryStatuses.dispose();rubyLayout.dispose();current?.timer.dispose();parkedStudy?.current.timer.dispose();closePopover();unsubscribe();unsubscribeSyncState?.();dark.removeEventListener('change',darkChanged);document.removeEventListener('keydown',onKey);document.removeEventListener('keydown',escape);document.removeEventListener('pointerdown',outsidePopover,true);win.removeEventListener('online',loadTrialAudio);win.removeEventListener('focus',loadTrialAudio);document.removeEventListener('visibilitychange',loadTrialAudio);trialAudioPlaybackGeneration++;trialAudio?.dispose();root.replaceChildren();}});
+  return Object.freeze({requestUpdateBoundary:token=>updateBoundary.request(token),readUpdateState:()=>updateBoundary.read(),releaseUpdateBoundary:token=>updateBoundary.release(token),subscribeUpdateState:listener=>updateBoundary.subscribe(listener),showTask:(...args)=>{if(updateBoundary.held)return;sessionShown=0;return start(...args);},refreshStatus:updateStatus,read:()=>({screen,module,current,busy:busy||typedBusy||customBusy,pendingIntent,theme,themePreferenceSet,interfaceLanguage}),dispose(){unsubscribeAudioDownloads?.();stopTrialAudio();studyAudio?.dispose?.();disposed=true;updateBoundary.dispose();root.removeEventListener('input',updateDraftWake);root.removeEventListener('change',updateDraftWake);backupObserver.dispose();win.removeEventListener('focus',backupWake);document.removeEventListener('visibilitychange',backupWake);nativeStatusGeneration++;clearSyncRetry();win.clearTimeout(outboxSyncTimer);win.clearTimeout(saveBacklogTimer);win.clearTimeout(toastTimer);win.clearTimeout(finishGuardTimer);panelObserver?.disconnect();budgetWatcher?.dispose();win.removeEventListener('online',availabilityWake);win.removeEventListener('online',reconnectSync);win.removeEventListener('offline',availabilityWake);win.removeEventListener('focus',budgetWake);document.removeEventListener('visibilitychange',budgetWake);win.removeEventListener('focus',autoSync);document.removeEventListener('visibilitychange',autoSync);platform.nativeSync?.dispose?.();factoryStatuses.dispose();rubyLayout.dispose();current?.timer.dispose();parkedStudy?.current.timer.dispose();closePopover();unsubscribe();unsubscribeSyncState?.();dark.removeEventListener('change',darkChanged);document.removeEventListener('keydown',onKey);document.removeEventListener('keydown',escape);document.removeEventListener('pointerdown',outsidePopover,true);win.removeEventListener('online',loadTrialAudio);win.removeEventListener('focus',loadTrialAudio);document.removeEventListener('visibilitychange',loadTrialAudio);trialAudioPlaybackGeneration++;trialAudio?.dispose();root.replaceChildren();}});
 }

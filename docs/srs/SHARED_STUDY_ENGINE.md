@@ -280,10 +280,15 @@ experiment and never raises workload automatically. The report does not
 establish total study time, backlog trend or an unfamiliar-word baseline needed
 to recommend an increase.
 
-All nine behavior-critical modules and the reducer remain byte-identical to the
-previous distribution. This refresh adds no scheduler, task identity, ledger or
-transport, and does not connect the canonical report to the outer Bunki Record
-or migrate existing learner history.
+Eight of nine behavior-critical modules, the reducer and its replay dependencies
+remain byte-identical to the previous distribution. The canonical replica backend
+now uses the existing effective learner-day calculation for queues, custom
+sessions and permit selection, including a pending timezone change that becomes
+effective while the app is idle. Sibling filtering uses review timestamps within
+that same interval, matching the unchanged reducer admission rules. Boundary,
+permit, Undo and next-day regression checks cover this correction; no stored
+history, task identity, event schema or scheduler formula changes. The canonical
+report remains separate from the outer Bunki Record, with no history migration.
 
 The canonical phone Extra-practice Finish action wraps its full bilingual label
 within the study column while retaining a touch target of at least 44px. It does

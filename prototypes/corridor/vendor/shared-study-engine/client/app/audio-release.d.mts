@@ -17,8 +17,8 @@ declare const verifiedSelection: unique symbol;
 export interface ReadyAudioSelection {
  readonly [verifiedSelection]: true; readonly status:'ready'; readonly releaseId:string; readonly projectionId:string;
  readonly contentRelease:string; readonly taskKey:string; readonly contentRevision:string; readonly audioContentRevision:string;
- readonly profileId:string; readonly identities:AudioRootSummary['identities']; readonly localState:PackState;
- readonly segments:readonly Readonly<{fieldId:string;start:number;end:number;inputKey:string;profileId:string;ref:AudioRef}>[];
+ readonly profileId:string; readonly supportedReadingId:null; readonly identities:AudioRootSummary['identities']; readonly localState:PackState;
+ readonly segments:readonly Readonly<{fieldId:string;packId:string|null;supportedReadingId:null;start:number;end:number;inputKey:string;profileId:string;ref:AudioRef}>[];
 }
 export type AudioUnavailableStatus = 'pending'|'preparation-failed'|'profile-unassigned'|'profile-unavailable'|'source-stale'|'content-release-mismatch'|'integrity-invalid'|'unsupported-capability'|'cancelled'|'face-hidden'|'offline-missing';
 export type AudioResolution = ReadyAudioSelection|Readonly<{status:AudioUnavailableStatus}>;
