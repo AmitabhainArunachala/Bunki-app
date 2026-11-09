@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import process from 'node:process';
 import { test } from 'node:test';
 import { pathToFileURL } from 'node:url';
+import {fixtureSource,fixtureDefinitions} from './corridor-fixture-source.mjs';
 assert(process.env.KAIRO_SITE_DIR, 'Supply a staged KAIRO_SITE_DIR');
 const site = resolve(process.env.KAIRO_SITE_DIR), manifest = JSON.parse(readFileSync(resolve(site, 'build-identity.json')));
 for (const path of ['corridor.js', 'sentence-practice.mjs', 'sentence-drafts.mjs', 'sentence-draft-controller.mjs', 'teacher-context.mjs', 'teacher-drafts.mjs', 'modules/learning-core.mjs'])
@@ -37,6 +38,10 @@ function sentenceDraftTextareaFixture(mode, rawText) {
   // injected; the textarea port models CRLF/CR -> LF presentation. This is not
   // a browser test, and dispatchInput below is a synthetic input event.
   const code = readFileSync(resolve(site, 'corridor.js'), 'utf8');
+  const authored=fixtureSource(site);
+  const identities=JSON.parse(readFileSync(resolve(site,'build-identity.json')));
+  for(const file of ['modules/worlds.mjs']) assert.equal(createHash('sha256').update(readFileSync(resolve(site,file))).digest('hex'),identities.files.find(row=>row.path===file)?.sha256);
+  const moved=fixtureDefinitions(authored,['sentenceDraftInputMatches','sentenceDraftStatus','sentenceDraftCopyButton']);
   const extract = (start, end) => {
     const begin = code.indexOf(start), finish = code.indexOf(end, begin + start.length);
     assert(begin >= 0 && finish > begin, `Missing staged function ${start}`);
@@ -73,6 +78,7 @@ function sentenceDraftTextareaFixture(mode, rawText) {
   const createUi = new Function('ports', `
     const {sentenceDraftController,sentenceDraftModule,recordWritable,recordInstallation,document,storeSealed,
       el,biLabel,tx,readRecordDrafts,rememberRecordDraft,rememberCaptureDraft} = ports;
+    ${moved}
     ${extract('const sentenceDraftBindings =', '\nfunction renderUnavailableSentenceDrafts(')}
     ${extract('function submittedSentenceDraft(', '\nasync function flushSentenceDrafts()')}
     ${extract('function preserveVisibleDrafts()', '\nfunction releaseRecordOwnership()')}
@@ -167,6 +173,7 @@ for (const change of ['unchanged', 'pending', 'published-same-text-revision']) t
     // Exact staged application functions and controller; storage/export/DOM
     // ports below are explicitly injected. This is not a native/browser test.
     const code = readFileSync(resolve(site, 'corridor.js'), 'utf8');
+    const authored=fixtureSource(site);
     const extract = (start, end) => {
       const begin = code.indexOf(start), finish = code.indexOf(end, begin + start.length);
       assert(begin >= 0 && finish > begin, `Missing staged function ${start}`);
@@ -194,7 +201,7 @@ for (const change of ['unchanged', 'pending', 'published-same-text-revision']) t
       const recordOwner = true, recordRecovered = true, recordDeparted = false, staleTab = false, storeSealed = false;
       ${extract('function recordReady(', 'function recordWritable(')}
       ${extract('function recordExportable(', '/** Why a record room cannot write')}
-      ${extract('function canonicalRecordJson(', 'function validArchiveTurn(')}
+      ${fixtureDefinitions(authored,['canonicalRecordJson','logicalArchiveRows','physicalArchiveRows'])}
       ${extract('function recordDraftsSettled(', 'function preserveVisibleDrafts(')}
       ${extract('async function buildExportRecord(', 'const AI_EVIDENCE_ROLES')}
       return { exportRecord: buildExportRecord, publish: value => { publishedRecord = value; } };

@@ -10,6 +10,8 @@ Superseded in part (2026-10-07): the collection shipped as three decks, `n2`, `n
 `DOJO_DECKS` rather than through `registry.json`. The identity in §5 does not describe them;
 see `decks/n2n1/BATON_CODEX_2026-10-07.md`. A fourth deck, `kotoba-master` (わたしの言葉 / My own
 words, the learner's own 301 words), was wired the same way on 2026-10-31.
+These are the legacy ledger bindings; explicitly bound canonical routes follow the
+[shared-study integration contract](../SHARED_STUDY_ENGINE.md).
 
 The learner's direction (PR #117): a combined N2/N1 collection covering vocabulary, grammar,
 expressions and contextual kanji knowledge; every released card carries at least one

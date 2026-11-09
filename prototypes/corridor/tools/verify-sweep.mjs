@@ -391,6 +391,27 @@ function scanPage() {
   return out;
 }
 
+// Exercise the same scanner sent to real surfaces, including each attribute channel.
+async function verifyProvenanceScanner(page) {
+  const labels = ["made by ai", "ai made", "ai-made", "aimade", "ai generated", "ai-generated", "aigenerated", "ai written", "ai-written", "aiwritten", "written by ai", "questions made by ai", "unreviewed", "un-reviewed", "not yet checked", "checked by a person", "awaiting review", "awaiting johns review", "awaiting john's review", "machine checked", "machine-checked", "human review", "human-review", "provisional", "AI作成", "AIが書", "AIが作", "未確認", "検収", "人の目", "人の確認", "人による確認", "2 of 3 not yet"];
+  for (const label of labels) {
+    await page.setContent('<p id="probe"></p>');
+    await page.locator('#probe').evaluate((node, text) => { node.textContent = text; }, label);
+    const found = (await page.evaluate(scanPage)).provenance;
+    assert.deepEqual(found.map(row => row.text), [label], `visible label: ${label}`);
+    assert.equal(PROV_N.test(label), true, 'shelf classifier accepts scanner fixture');
+  }
+  for (const attr of ['aria-label', 'title', 'placeholder', 'alt']) {
+    await page.setContent('<input id="probe">');
+    await page.locator('#probe').evaluate((node, name) => node.setAttribute(name, 'unreviewed'), attr);
+    const found = (await page.evaluate(scanPage)).provenance;
+    assert.equal(found.length, 1, attr);
+    assert.equal(found[0].attr, attr);
+  }
+  await page.setContent('<p>Library reading 日本語</p><p hidden>unreviewed</p><input aria-label="Search dictionary" title="Reading">');
+  assert.deepEqual((await page.evaluate(scanPage)).provenance, [], 'ordinary and hidden labels are not provenance');
+}
+
 /** WCAG contrast of two colours as the engine reports them — rgb()/rgba(), or WebKit's color(srgb r g b) for a mixed
  * value — the second assumed opaque. */
 function contrast(a, b) {
@@ -407,12 +428,12 @@ function contrast(a, b) {
 const inventory = [];
 const summary = { P: 0, C: 0, K: 0, Kone: 0, M: 0, rooms: 0 };
 
-/* N · the shelf's rows and cards. The provenance words are scanPage's own (checked identical below); the originals are
+/* N · the shelf's rows and cards. Provenance classification is exercised against scanPage with visible fixtures; the originals are
  * the review queue's rows of kind "original" (docs/content/feed-review-queue.json), the twenty that joined in slice N.
  * N2 (2026-10-17) · the hand-chosen articles are the queue's rows of kind "original" and of the real texts' own kinds
  * (aozora, gv, mext, govonline), in drops by their addedAt day, newest first: batches 3r and 4r, then N's twenty. */
 const PROV_N = /made by ai|ai[- ]?(made|generated|written)|written by ai|questions made by ai|unreviewed|un-reviewed|not yet checked|checked by a person|awaiting (john'?s )?review|machine[- ]checked|human[- ]review|provisional|AI作成|AIが(書|作)|未確認|検収|人の(目|確認)|人による確認|\b\d+ of \d+ not yet/iu;
-assert(scanPage.toString().includes(PROV_N.source), "N's provenance words are scanPage's own");
+
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const HAND_KINDS = new Set(['original', 'aozora', 'gv', 'mext', 'govonline']);
 const QUEUE_ORIGINALS = JSON.parse(readFileSync(resolve(REPO, 'docs/content/feed-review-queue.json'), 'utf8'))
@@ -665,6 +686,7 @@ try {
         await silenceBrowserAudio(context);
         const page = await context.newPage();
         page.setDefaultTimeout(25_000);
+        await verifyProvenanceScanner(page);
         const errors = [];
         page.on('pageerror', (error) => errors.push(error.message));
         await page.route('**/corridor.js', async (route) => {

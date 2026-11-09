@@ -124,6 +124,7 @@ import { openShelfTools } from './shelf-tools-support.mjs';
  * Usage: node verify-kotoba-mine.mjs   (rebuild the deck: python3 decks/kotoba-mine/tools/build.py)
  */
 
+import assert from 'node:assert/strict';
 import { createHash, randomUUID } from 'node:crypto';
 import { createServer } from 'node:http';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
@@ -142,7 +143,7 @@ const requestedEngine = process.env.KAIRO_BROWSER || 'chromium';
 if (!['chromium', 'webkit', 'all'].includes(requestedEngine)) throw new Error('KAIRO_BROWSER must be chromium, webkit or all');
 const engines = requestedEngine === 'all' ? ['chromium', 'webkit'] : [requestedEngine];
 const only = process.argv.find(arg => arg.startsWith('--case='))?.slice(7) || null;
-if (only && !['tap', 'host'].includes(only)) throw new Error('--case supports tap or host; omit it for the complete verifier');
+if (only && !['tap', 'host', 'review-contracts'].includes(only)) throw new Error('--case supports tap, host or review-contracts; omit it for the complete verifier');
 const evidence = resolveCorridorEvidence();
 let actualEngine = null, actualFixture = null;
 const gateRunId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
@@ -883,10 +884,7 @@ function verifyBackParity() {
   for (const page of ['study.html', 'study-mcd.html']) {
     const html = readFileSync(resolve(release, page), 'utf8');
     releaseParity.push({ page, css: html.includes(playerCss), mount: html.includes(mount), roomMotion: html.includes(roomMotion), fonts: (html.match(/@font-face\s*\{/gu) || []).length });
-    if (!['function leechLadder', 'function deleteCard', 'function suspendedField', 'function kanjiFamily', 'function seeAlsoLine', 'function swapCard', 'restoreSuspended', 'LEECH_LAPSES = 5', 'kp-kfam', 'kp-rhint'].every((k) => html.includes(k))) bad.push(`${page}: no delete, ladder or kanji family`);
     // Hfix-1B: the rule and the eyebrow say it unmistakably (Kimi KH1-1, KH1-2); the old wording is gone
-    if (!['function sentenceEnds', 'kp-folds', 'kp-zoom', 'againCoachSeen', 'savePrefQuiet', 'kp-en-none', RULE_TEXT, UI_RULE_TEXT, '印のついた語を思い出す', 'function revealInPlace', 'kp-kindchip', 'kp-levelchip', 'prefers-reduced-motion'].every((k) => html.includes(k)) || /kp-tapword|is-four|VISUAL_TIPS|topicColour|kp-lvchip|答えを見て理解が深まった|improved your understanding|'印の語を思い出す'/.test(html)) bad.push(`${page}: not the current player`);
-    if (!['function settleBack', 'function clampContext', 'function fitClamps', 'function sourceFold', 'kp-f-src', 'HINT_SITTINGS = 3', 'function skipFor', 'この語の他の文'].every((k) => html.includes(k)) || /記録を消す|kp-danger|'kp-hint'/.test(html)) bad.push(`${page}: not the Phase 1 follow-ups player`);
   }
   check("K030", 'parity: both separately served Kotoba release HTML outputs embed the exact built-site player CSS and mount code, room motion, and all 451 bundled faces',
     releaseParity.length === 2 && releaseParity.every((x) => x.css && x.mount && x.roomMotion && x.fonts === 451), JSON.stringify(releaseParity));
@@ -1539,7 +1537,17 @@ async function verifyTap(browser, base) {
       await page.click('#kp-card .kp-sentence .kp-target.kp-tok');
       const self = await page.evaluate(`document.getElementById('kp-pop')?.dataset.key`);
       const fonts = await studyFontEvidence(page);
-      seen.push({ file, shown, front, toks, pop, self, lookups: lookups.length, same, closed, fonts });
+      const inspectBundle = deckId => {
+        const all=window.__CORRIDOR_BUNDLE__ || {}, gloss=all['decks/kotoba-mine/gloss'];
+        return {deckId,format:gloss?.format,version:gloss?.version,deck:gloss?.deck,cards:Object.keys(gloss?.cards||{}).length,defs:Object.keys(gloss?.defs||{}).length,tokens:Object.entries(all).filter(([key,value])=>key.endsWith('/tokens')||value?.format==='bunki-cloze-tokens').map(([key])=>key)};
+      };
+      const bundle = await page.evaluate(inspectBundle,deckId);
+      // A differently named token payload must not escape the inventory check.
+      await page.evaluate(()=>{window.__CORRIDOR_BUNDLE__.__qa_inventory_control={format:'bunki-cloze-tokens'};});
+      try { const mutant=await page.evaluate(inspectBundle,deckId);assert(mutant.tokens.includes('__qa_inventory_control'),'runtime inventory must observe misnamed token payload'); }
+      finally { await page.evaluate(()=>{delete window.__CORRIDOR_BUNDLE__.__qa_inventory_control;}); }
+
+      seen.push({ file, shown, front, toks, pop, self, lookups: lookups.length, same, closed, fonts, bundle });
       if (errors.length) check(`K075/${file}`, `no page errors on ${file}`, false, errors.slice(0, 2).join(' | '));
       await context.close();
     }
@@ -1550,11 +1558,11 @@ async function verifyTap(browser, base) {
     );
     check("K077", 'tap, standalone: both release backs and popovers pass bundled-font evidence (Chromium glyph attribution; WebKit embedded-face raster match and fallback rejection)',
       seen.length === 2 && seen.every((x) => studyFontsPass(x.fonts)), JSON.stringify(seen.map(({ file, fonts }) => ({ file, fonts }))));
+    check('K078','standalone executed bundle inventory: exact own-deck gloss data, no token side bundle; popover/no-sheet behavior is K076',
+      seen.length===2&&seen.every(({bundle:b})=>b.format==='bunki-cloze-gloss'&&b.version===1&&b.deck===b.deckId&&b.cards>0&&b.defs>0&&b.tokens.length===0),JSON.stringify(seen.map(({file,bundle})=>({file,bundle}))));
   } finally {
     release.server.close();
   }
-  const html = ['study.html', 'study-mcd.html'].map((f) => readFileSync(resolve(REPO_DIR, 'decks/kotoba-mine/release', f), 'utf8'));
-  check("K078", 'tap: the study pages carry the gloss map of their own deck (bunki-cloze-gloss), still no tokens, their popover and no entry-sheet builder', html.every((t) => t.includes('"format":"bunki-cloze-gloss"') && !t.includes('bunki-cloze-tokens","version') && t.includes('function drawPop') && !t.includes('function drawSheet') && !t.includes('kp-sheet')), '');
   // 3. Anki: no tap-to-define, nothing added
   const anki = ['anki/front.html', 'anki/back.html', 'anki-sentence/front.html', 'anki-sentence/back.html'].map((f) => resolve(REPO_DIR, 'decks/kotoba-mine/tools', f)).filter(existsSync).map((f) => readFileSync(f, 'utf8'));
   check("K079", 'tap: the Anki templates add nothing for it (no tap-to-define in Anki: furigana only, STANDARD A44)', anki.length >= 2 && anki.every((t) => !/kp-tok|kp-sheet|kp-pop|tap-to-define|onclick/.test(t)), `${anki.length} templates`);
@@ -2948,6 +2956,29 @@ async function verifyVisual(browser, base) {
 }
 
 /* --------------------------------------------------- half two: the app */
+
+const RUNTIME_FEATURE_CASES=Object.freeze({
+  deleteRestore:['K111/kotoba-mcd','K111/kotoba-mine','K112/kotoba-mcd','K112/kotoba-mine'],
+  leechHintSwapHold:['K113','K115','K116','K117','K118','K119'],
+  kanjiFamilyAndReferences:['K120','K121','K122','K123'],
+  revealFoldsZoomAndRule:['K081','K083','K084','K085','K088','K089','K090','K091','K092','K103'],
+  clampsAndModeSkip:['K094','K095','K096','K097','K098','K099','K100','K101'],
+  kindLevelAndMotion:['K131','K132/hokusai','K132/yoru','K134','K138','K139','K140'],
+  standaloneGlossAndPopover:['K076','K078'],
+});
+function runtimeFeatureCoverage(rows,engine){
+ return Object.entries(RUNTIME_FEATURE_CASES).map(([feature,ids])=>({feature,cases:ids,pass:ids.every(id=>{const observed=rows.filter(row=>row.engine===engine&&(row.caseId===id||row.caseId.startsWith(id+'/')));return observed.length>0&&observed.every(row=>row.pass);})}));
+}
+function verifyRuntimeFeatureCoverage(){
+ const rows=results.filter(row=>row.engine===actualEngine),coverage=runtimeFeatureCoverage(rows,actualEngine);
+ assert(coverage.every(row=>row.pass),'Missing/failed executed feature cases: '+JSON.stringify(coverage));
+ console.log('R18_RUNTIME_FEATURE_COVERAGE '+JSON.stringify(coverage));
+ // Counterexamples exercise the consumer, not filename or source-text presence.
+ const complete=Object.values(RUNTIME_FEATURE_CASES).flat().map(caseId=>({engine:actualEngine,caseId,pass:true}));
+ const missing=complete.slice(1),failed=complete.map((row,i)=>i===0?{...row,pass:false}:row);
+ assert(runtimeFeatureCoverage(complete,actualEngine).every(row=>row.pass)&&!runtimeFeatureCoverage(missing,actualEngine).every(row=>row.pass)&&!runtimeFeatureCoverage(failed,actualEngine).every(row=>row.pass),'Feature admission counterexamples must fail');
+}
+
 async function main() {
   console.log('— 言葉の鉱脈: the deck as data');
   const deck = verifyDeck();
@@ -2972,7 +3003,11 @@ async function main() {
   browserVersions[engine] = browser.version();
   console.log(`BROWSER ${engine} ${browserVersions[engine]}`);
   if (only) {
-    try { await (only === 'tap' ? verifyTap : verifyHost)(browser, base); }
+    try {
+      if(only==='review-contracts'){
+        await verifyTap(browser,base);await verifyBack(browser,base);await verifyReviewData([deck,sentences]);await verifyReview(browser,base);await verifyVisual(browser,base);verifyRuntimeFeatureCoverage();
+      }else await (only==='tap'?verifyTap:verifyHost)(browser,base);
+    }
     catch (error) { check("K144", `${only} terminal`, false, error.stack || String(error)); }
     finally { await browser.close(); await new Promise(done => server.close(done)); }
     continue;
@@ -3146,6 +3181,7 @@ async function main() {
     console.log('\n— the review loop (CARD_CONTRACT_V2 §3.7, §4): delete, leech ladder, kanji family, see-also');
     await verifyReviewData([deck, sentences]);
     await verifyReview(browser, base);
+    verifyRuntimeFeatureCoverage();
   } catch (error) {
     check("K161", 'browser journey terminal', false, error.stack || String(error));
   } finally {

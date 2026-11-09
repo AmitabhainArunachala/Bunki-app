@@ -1,0 +1,425 @@
+/** Allocation-before-create and failclosed reopen are host identity obligations. */
+/* global process, URL, EventTarget, Response */
+import assert from 'node:assert/strict';
+const { test } = await import(
+  process.env.VITEST === 'true' && !process.env.NODE_TEST_CONTEXT ? 'vitest' : 'node:test'
+);
+import { readFileSync } from 'node:fs';
+import {
+  createSharedStudyTestHost,
+  QA_HOST_MARKER,
+} from '../prototypes/corridor/shared-study-test-host.mjs';
+import { createBunkiStudyAdapter } from '../prototypes/corridor/study-engine-adapter.mjs';
+import { createSharedStudySync } from '../prototypes/corridor/shared-study-sync.mjs';
+import { createMemoryAdapter } from '../prototypes/corridor/vendor/shared-study-engine/client/engine.mjs';
+const root = new URL('../prototypes/corridor/', import.meta.url),
+  fixture = JSON.parse(readFileSync(new URL('tools/fixtures/shared-srs-contracts.json', root)));
+const catalog = fixture.cards,
+  pin = JSON.parse(
+    readFileSync(new URL('vendor/shared-study-engine/client/vendor/fsrs-pin.json', root)),
+  );
+const content = {
+  pin,
+  catalog,
+  registry: {
+    tasks: catalog.map(({ taskKey, noteGuid, contractId, passageId, lexemeId }) => ({
+      taskKey,
+      noteGuid,
+      contractId,
+      passageId,
+      lexemeId,
+    })),
+    notes: catalog.map(({ noteGuid, module }) => ({ noteGuid, module })),
+    passages: [],
+    examples: [],
+  },
+};
+const locks = { request: async (_name, callback) => callback() };
+const options = (metadata, storage, uuid) => ({
+  marker: QA_HOST_MARKER,
+  runId: 'recovery-judge',
+  metadata,
+  locks,
+  storageFactory: () => storage,
+  uuid,
+  now: () => Date.parse('2026-11-08T10:00:00Z'),
+});
+
+test('public QA marker cannot activate real learner identity or legacy storage', async () => {
+  const values = new Map(),
+    metadata = {
+      getItem: (key) => values.get(key) ?? null,
+      setItem: (key, value) => values.set(key, value),
+    };
+  const config = options(metadata, createMemoryAdapter(), () => 'qa-scope');
+  await assert.rejects(
+    () => createSharedStudyTestHost({ ...config, marker: 'query-string' }),
+    /qa/,
+  );
+  await assert.rejects(
+    () => createSharedStudyTestHost({ ...config, learner: 'real-learner' }),
+    /qa/,
+  );
+  await assert.rejects(() => createSharedStudyTestHost({ ...config, environment: 'prod' }), /qa/);
+  await assert.rejects(
+    () => createSharedStudyTestHost({ ...config, identity: { learner: 'real-learner' } }),
+    /qa/,
+  );
+  const host = await createSharedStudyTestHost(config),
+    adapter = await host.withAdapter((binding) => createBunkiStudyAdapter({ ...binding, content }));
+  assert.equal(adapter.identity.learner, 'test-shared-audio');
+  assert.equal(adapter.identity.environment, 'test-shared-audio');
+  assert.equal(adapter.platform.isPaired(), false);
+  assert.equal(adapter.platform.canRequestNewCards(), false);
+  assert.ok([...values.keys()].every((key) => key.startsWith('bunki-shared-study:qa:')));
+  const reopened = await createSharedStudyTestHost(config);
+  assert.equal(reopened.identity.installation, host.identity.installation);
+  assert.equal(reopened.identity.mode, 'open');
+  await host.dispose();
+  await reopened.dispose();
+});
+
+test('metadata finalization failure retains allocated installation, never creates another learner', async () => {
+  const values = new Map();
+  let writes = 0,
+    fail = true,
+    counter = 0;
+  const metadata = {
+    getItem: (key) => values.get(key) ?? null,
+    setItem(key, value) {
+      writes++;
+      if (fail && writes === 2) throw Error('synthetic-metadata-finalize-failure');
+      values.set(key, value);
+    },
+  };
+  const storage = createMemoryAdapter(),
+    config = options(metadata, storage, () => `recovery-${++counter}`);
+  const first = await createSharedStudyTestHost(config),
+    installation = first.identity.installation;
+  await assert.rejects(
+    () => first.withAdapter((binding) => createBunkiStudyAdapter({ ...binding, content })),
+    /metadata|finalize/,
+  );
+  fail = false;
+  const restarted = await createSharedStudyTestHost(config);
+  assert.equal(restarted.identity.installation, installation);
+  assert.equal(restarted.identity.mode, 'open');
+  const adapter = await restarted.withAdapter((binding) =>
+    createBunkiStudyAdapter({ ...binding, content }),
+  );
+  assert.equal(adapter.identity.installation, installation);
+  assert.ok((await adapter.store.status()).applied > 0);
+  adapter.backend.dispose();
+  restarted.dispose?.();
+  first.dispose?.();
+});
+
+test('interrupted allocation with no canonical store is a blocked open, never a fresh fallback', async () => {
+  const values = new Map(),
+    metadata = {
+      getItem: (key) => values.get(key) ?? null,
+      setItem: (key, value) => values.set(key, value),
+    };
+  const config = options(metadata, createMemoryAdapter(), () => 'interrupted');
+  const host = await createSharedStudyTestHost(config);
+  await assert.rejects(
+    () =>
+      host.withAdapter(async () => {
+        throw Error('synthetic-crash-before-store');
+      }),
+    /synthetic-crash/,
+  );
+  const restarted = await createSharedStudyTestHost(config);
+  assert.equal(restarted.identity.installation, host.identity.installation);
+  assert.equal(restarted.identity.mode, 'open');
+  await assert.rejects(
+    () => restarted.withAdapter((binding) => createBunkiStudyAdapter({ ...binding, content })),
+    /missing-store/,
+  );
+  assert.equal(
+    (await createSharedStudyTestHost(config)).identity.installation,
+    host.identity.installation,
+  );
+});
+
+test('failed ready marker leaves sync unattached and same-host retry preserves durable history', async () => {
+  const values = new Map(),
+    failure = Error('synthetic-ready-marker-failure');
+  let fail = true,
+    allocations = 0;
+  const metadata = {
+    getItem: (key) => values.get(key) ?? null,
+    setItem(key, value) {
+      if (fail && JSON.parse(value).phase === 'ready') throw failure;
+      values.set(key, value);
+    },
+  };
+  const memory = createMemoryAdapter(),
+    handles = [],
+    adapters = [],
+    subscriptions = new Set();
+  const sync = createSharedStudySync({
+    origin: 'https://synthetic.invalid',
+    getCredential: () => 'synthetic-only',
+    online: () => false,
+    visible: () => true,
+    eventTarget: new EventTarget(),
+    automatic: false,
+    fetch: async () => {
+      throw Error('offline fixture must not fetch');
+    },
+    permits: {
+      isPaired: () => false,
+      reserve: async () => {
+        throw Error('unpaired fixture must not reserve');
+      },
+    },
+  });
+  const host = await createSharedStudyTestHost({
+    ...options(metadata, memory, () => `sync-recovery-${++allocations}`),
+    sync,
+    storageFactory() {
+      const handle = { closed: 0 };
+      handles.push(handle);
+      return {
+        async read(...args) {
+          assert.equal(handle.closed, 0);
+          return memory.read(...args);
+        },
+        async compareAndSwap(...args) {
+          assert.equal(handle.closed, 0);
+          return memory.compareAndSwap(...args);
+        },
+        close() {
+          handle.closed++;
+        },
+      };
+    },
+  });
+  let history, journal;
+  const open = async (binding) => {
+    const adapter = await createBunkiStudyAdapter({ ...binding, content });
+    const row = { adapter, disposed: 0 };
+    adapters.push(row);
+    if (adapters.length === 1) {
+      const command = adapter.backend.command('settings', { key: 'newPerDayTotal', value: 15 });
+      assert.equal((await adapter.backend.submitCommand(command)).kind, 'durable');
+      history = adapter.backend.readProjection();
+      journal = await adapter.store.outbox();
+      assert.equal(journal.length, 1);
+    }
+    return {
+      ...adapter,
+      store: {
+        ...adapter.store,
+        subscribe(listener) {
+          subscriptions.add(listener);
+          const stop = adapter.store.subscribe(listener);
+          return () => {
+            subscriptions.delete(listener);
+            stop();
+          };
+        },
+      },
+      backend: {
+        ...adapter.backend,
+        dispose() {
+          row.disposed++;
+          return adapter.backend.dispose();
+        },
+      },
+    };
+  };
+  try {
+    await assert.rejects(host.withAdapter(open), (error) => error === failure);
+    assert.equal(handles[0].closed, 1);
+    assert.equal(adapters[0].disposed, 1);
+    assert.equal(
+      subscriptions.size,
+      0,
+      'failed initialization must not retain a sync subscription',
+    );
+    assert.deepEqual(await host.synchronize(), {
+      state: 'idle',
+      error: 'shared-sync-not-attached',
+      retryAt: null,
+    });
+    assert.equal(JSON.parse([...values.values()][0]).phase, 'allocated');
+    fail = false;
+    const retried = await host.withAdapter(open);
+    assert.notEqual(retried.store, adapters[0].adapter.store);
+    assert.equal(retried.identity.installation, host.identity.installation);
+    assert.equal(retried.identity.mode, 'open');
+    assert.equal(allocations, 1);
+    assert.deepEqual(retried.backend.readProjection(), history);
+    assert.deepEqual(await retried.store.outbox(), journal);
+    assert.equal(JSON.parse([...values.values()][0]).phase, 'ready');
+    assert.equal(subscriptions.size, 1);
+    assert.equal((await host.synchronize()).state, 'offline');
+    await host.dispose();
+    await host.dispose();
+    assert.equal(subscriptions.size, 0);
+    assert.deepEqual(
+      handles.map((row) => row.closed),
+      [1, 1],
+    );
+    assert.deepEqual(
+      adapters.map((row) => row.disposed),
+      [1, 1],
+    );
+  } finally {
+    await host.dispose();
+  }
+});
+
+test('failed allocation metadata write prevents canonical store construction', async () => {
+  const metadata = {
+      getItem: () => null,
+      setItem() {
+        throw Error('synthetic-metadata-unavailable');
+      },
+    },
+    config = options(metadata, createMemoryAdapter(), () => 'allocation-failed');
+  let constructed = false;
+  const host = await createSharedStudyTestHost(config);
+  await assert.rejects(
+    () =>
+      host.withAdapter(async () => {
+        constructed = true;
+        throw Error('must-not-create');
+      }),
+    /metadata/,
+  );
+  assert.equal(constructed, false);
+});
+
+test('dispose during asynchronous adapter creation fences publication and closes its storage', async () => {
+  const values = new Map(),
+    metadata = {
+      getItem: (key) => values.get(key) ?? null,
+      setItem: (key, value) => values.set(key, value),
+    };
+  let closed = 0,
+    release,
+    created;
+  const memory = createMemoryAdapter(),
+    storage = {
+      ...memory,
+      async close() {
+        closed++;
+      },
+    };
+  const gate = new Promise((resolve) => {
+      release = resolve;
+    }),
+    ready = new Promise((resolve) => {
+      created = resolve;
+    });
+  const host = await createSharedStudyTestHost(
+    options(metadata, storage, () => 'dispose-creation'),
+  );
+  const opening = host.withAdapter(async (binding) => {
+    const adapter = await createBunkiStudyAdapter({ ...binding, content });
+    created();
+    await gate;
+    return adapter;
+  });
+  await ready;
+  await host.dispose();
+  release();
+  await assert.rejects(() => opening, /disposed/);
+  assert.equal(closed, 1);
+});
+
+for (const cleanupFailure of [null, 'backend', 'storage']) {
+  test(`failed in-flight permit request still disposes the host (${cleanupFailure ?? 'normal cleanup'})`, async () => {
+    const values = new Map(),
+      metadata = {
+        getItem: (key) => values.get(key) ?? null,
+        setItem: (key, value) => values.set(key, value),
+      };
+    const events = [],
+      failure = Error('synthetic-permit-request-failure');
+    let rejectPermit,
+      enteredPermit,
+      closed = false;
+    const pending = new Promise((_, reject) => {
+        rejectPermit = reject;
+      }),
+      entered = new Promise((resolve) => {
+        enteredPermit = resolve;
+      });
+    const memory = createMemoryAdapter(),
+      storage = {
+        ...memory,
+        async close() {
+          events.push('storage');
+          closed = true;
+          if (cleanupFailure === 'storage') throw Error('synthetic-storage-close-failure');
+        },
+      };
+    const host = await createSharedStudyTestHost({
+      ...options(metadata, storage, () => 'dispose-permits'),
+      sync: {
+        origin: 'https://synthetic.invalid',
+        getCredential: () => 'synthetic-only',
+        automatic: false,
+        online: () => true,
+        visible: () => true,
+        eventTarget: new EventTarget(),
+        transportOptions: { maxRetries: 0 },
+        fetch: async (url, init) => {
+          assert.equal(init.method, 'GET');
+          const { learner, environment, installation } = host.identity;
+          const response = new Response(
+            JSON.stringify({ scope: { learner, environment, installation }, head: 0, events: [] }),
+          );
+          Object.defineProperty(response, 'url', { value: url });
+          return response;
+        },
+        permits: {
+          isPaired: () => true,
+          reserve: () => {
+            enteredPermit();
+            return pending;
+          },
+        },
+      },
+    });
+    await host.withAdapter(async (binding) => {
+      const adapter = await createBunkiStudyAdapter({ ...binding, content });
+      return {
+        ...adapter,
+        backend: {
+          ...adapter.backend,
+          dispose() {
+            assert.equal(closed, false);
+            events.push('backend');
+            adapter.backend.dispose();
+            if (cleanupFailure === 'backend') throw Error('synthetic-backend-dispose-failure');
+          },
+        },
+      };
+    });
+    const reservation = assert.rejects(host.sync.reserveNewPermits(), (error) => error === failure);
+    await entered;
+    const disposal = assert.rejects(host.dispose(), (error) => error === failure);
+    assert.equal(host.getSyncState(), 'disposed');
+    assert.deepEqual(events, []);
+    rejectPermit(failure);
+    await Promise.all([reservation, disposal]);
+    assert.deepEqual(events, ['backend', 'storage']);
+    assert.equal(closed, true);
+    await host.dispose();
+    await host.dispose();
+    assert.deepEqual(events, ['backend', 'storage']);
+    let opened = false;
+    await assert.rejects(
+      host.withAdapter(() => {
+        opened = true;
+      }),
+      /shared-study-qa-disposed/,
+    );
+    assert.equal(opened, false);
+  });
+}

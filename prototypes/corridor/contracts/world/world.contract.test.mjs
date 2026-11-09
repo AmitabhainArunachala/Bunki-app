@@ -1,3 +1,4 @@
+import {assertPureModules} from '../../../../scripts/ci/pure-module-runtime-probe.mjs';
 /** G7 judge: one model doc and stubs — a world is a view over the shared graph with one state layer for projects,
  * continuation and journeys (campaign/contracts/G7.json; SPEC S6-R8, S7-R2, S7-R3, S7-R15). Pinned by the contract; the
  * worker writes docs/worlds/WORLD-MODEL.md, world.mjs and stubs/{worldcraft,passage,quest}.mjs and may not edit this
@@ -70,18 +71,7 @@ function suite(model, graph) {
   assert.ok(Object.isFrozen(world) && Object.isFrozen(s));
   return { world, state: s };
 }
-const scanBanned = (file, allowed) => {
-  const sf = ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
-  for (const stmt of sf.statements) {
-    if (ts.isImportDeclaration(stmt)) { assert.ok(allowed.has(stmt.moduleSpecifier.text), `${file}: import ${stmt.moduleSpecifier.text} is allowed`); continue; }
-    if (ts.isExportDeclaration(stmt) && stmt.moduleSpecifier) assert.ok(allowed.has(stmt.moduleSpecifier.text));
-    assert.ok(ts.isExportDeclaration(stmt) || ts.isFunctionDeclaration(stmt) || ts.isClassDeclaration(stmt) || (ts.isVariableStatement(stmt) && (stmt.declarationList.flags & ts.NodeFlags.Const)), `${file}: declaration, not action: ${stmt.getText(sf).slice(0, 50)}`);
-  }
-  const seen = new Set();
-  const bare = (node) => !((ts.isPropertyAccessExpression(node.parent) && node.parent.name === node) || (ts.isPropertyAssignment(node.parent) && node.parent.name === node));
-  const visit = (node) => { if (ts.isIdentifier(node) && BANNED.includes(node.text) && bare(node)) seen.add(node.text); if (ts.isCallExpression(node) && node.expression.kind === ts.SyntaxKind.ImportKeyword) seen.add('import()'); ts.forEachChild(node, visit); };
-  visit(sf); assert.deepEqual([...seen], [], `${file}: no store, network, clock, timer or random`);
-};
+
 
 test('world contract · G7', async (t) => {
   let m, graph, stubs;
@@ -163,10 +153,14 @@ test('world contract · G7', async (t) => {
     assert.ok(shown.length >= 1 && shown.every((w) => dictionaryWords.has(w) || [...w].every((ch) => partByLiteral.has(ch))), 'every character the world shows is in the data');
   });
 
-  await t.test('nothing activates: world.mjs imports only the G13, G5, G4 and G9 contracts, the stubs only world.mjs; no store, network, clock, timer or random; spies at zero', () => {
-    scanBanned(MODULE, ALLOWED_IMPORTS);
-    for (const [, f] of STUBS) scanBanned(f, STUB_IMPORTS);
-    suite(stubs.quest, graph); m.enterWorld(stubs.quest.open(graph, W), { from: 'direct' });
-    assert.deepEqual(calls, { store: 0, fetch: 0 });
+  await t.test('no observed activation on isolated world/dependency/stub import and fixture operations',()=>{
+    for(const [file,allowed] of [[MODULE,ALLOWED_IMPORTS],...STUBS.map(([,file])=>[file,STUB_IMPORTS])]){
+      const sf=ts.createSourceFile(file,readFileSync(file,'utf8'),ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
+      for(const stmt of sf.statements)if(ts.isImportDeclaration(stmt)||(ts.isExportDeclaration(stmt)&&stmt.moduleSpecifier))assert.ok(allowed.has(stmt.moduleSpecifier.text),'declared dependency remains within contract');
+    }
+    assert.deepEqual(assertPureModules({files:[MODULE,...STUBS.map(([,f])=>f)],data:{dictionary,parts,W,at},exercise:([m,...stubs],d)=>{
+      const graph=m.createSharedGraph({dictionary:d.dictionary,parts:d.parts});
+      for(const stub of stubs){const world=stub.open(graph,d.W);let state=stub.state();state=stub.save(state,world,{projectId:'p',placed:world.view.family.slice(0,2),at:d.at});state=stub.pause(state,world,{position:{stop:2},at:d.at+1});state=stub.journey(state,world,{journeyId:'j',at:d.at+2});m.advanceJourney(state,{journeyId:'j',at:d.at+3});m.enterWorld(world,{from:'direct'});}
+    }}).calls,[]);
   });
 });

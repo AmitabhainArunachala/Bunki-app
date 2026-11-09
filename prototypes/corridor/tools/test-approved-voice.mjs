@@ -20,6 +20,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { test } from 'node:test';
 import vm from 'node:vm';
+import ts from 'typescript';
 import { runtimeLock } from './voice-lock.mjs';
 import { createDeviceVoice, REASONS as DEVICE_VOICE_REASONS } from '../device-voice.mjs';
 
@@ -610,8 +611,6 @@ test('MECHANICS · leaving a card face retires its pending manifest request and 
 });
 
 test('CONTROL · automatic review speech waits for reveal and runs once per face', async () => {
-  assert.match(source, /retireCardAudioOnFaceChange\(\);\s*autoSpeakReviewFace\(\);/u,
-    'render invokes automatic speech after retiring the previous face');
   for (const words of [null, approvedWords()]) {
     const f = await fixture({ words });
     f.context.S.review.revealed = false;
@@ -710,4 +709,47 @@ test('MECHANICS · late Japanese voice availability updates the reason without r
   assert.equal(note.textContent, 'Device voice · Kyoko · tap audio to play');
   button.handlers.click(); await settle();
   assert.equal(f.deviceVoiceCalls.length, 1);
+});
+
+// Execute the complete actual render declaration. Drawing/store/room collaborators are
+// inert; audio retirement and auto-speech retain their actual fixture implementations.
+function installActualRender(f) {
+  const sf=ts.createSourceFile('corridor.js',source,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
+  const render=sf.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='render');
+  assert(render);
+  const c=f.context, calls=new Set();
+  function visit(node) { if(ts.isCallExpression(node)&&ts.isIdentifier(node.expression)) calls.add(node.expression.text); ts.forEachChild(node,visit); }
+  visit(render);
+  for(const name of calls) if(!['retireCardAudioOnFaceChange','autoSpeakReviewFace','el','tx','String','Number','bi'].includes(name)&&!(name in c)) c[name]=()=>{};
+  const decorate=node=>{node.classList.toggle=()=>{};node.replaceChildren=(...children)=>{node.children=[];node.append(...children);};node.contains=()=>false;return node;};
+  const el=(tag,cls,text)=>decorate(f.el(tag,cls??'',text??''));
+  const root=el('div'),body=el('body');
+  Object.assign(c,{el, $:()=>root, biLabel:(...args)=>{const node=el(args[0],args[1]);node.append(el('span','l-ja'));return node;},
+    kanjiWorldVisit:null,readerTicket:null,pageEpoch:0,recordEpoch:1,personalHost:null,retainedRetryView:null,pendingReferenceCollection:null,
+    lastRenderedView:'review',publisherOpenRequest:0,olderStartToken:0,guidedRoom:null,deckPlayer:null,deckPresentation:null,
+    maintenanceReports:null,roomTransitionUpdating:false,scheduler:{},fsrsApi:{},SEARCH_SVG:'',
+    renderRoomError:(_main,_view,error)=>{throw error;}, placesLayout:()=>true, buildRoomSign:()=>null, syncReviewExitNotice:()=>{}, readerTicketSync:()=>{}, back:()=>{}, revealFocusedChromeDoor:()=>{},
+    renderReview:main=>{const row=el('div');c.appendReviewVoice(row,{text:'でんしゃ',word:'電車'});main.append(row);},
+  });
+  Object.assign(c.S,{ready:true,variants:{nav:'tabs'},taken:[],dials:{furigana:0},lang:'en'});
+  Object.assign(c.document,{body,activeElement:body,documentElement:el('html'),createTextNode:text=>el('span',null,text)});
+  vm.runInContext(render.getText(sf),c);
+  return c;
+}
+test('render boundary retires pending old face before automatic playback and never replays a rerender',async()=>{
+  const f=await fixture({words:approvedWords()}),c=installActualRender(f),events=[];c.S.view='review';
+  const retire=c.retireCardAudioOnFaceChange,auto=c.autoSpeakReviewFace;
+  c.retireCardAudioOnFaceChange=()=>{events.push('retire');return retire();};
+  c.autoSpeakReviewFace=()=>{events.push('auto');return auto();};
+  let release;c.ensureRecManifest=()=>new Promise(done=>{release=done;});
+  const old=f.card();c.speakCardReading('でんしゃ',old.button,'電車');
+  c.S.review.ix=1;c.S.review.queue.push({t:'word',id:'電車'});c.S.review.revealed=false;
+  c.render();release(approvedWords());await settle();assert.equal(f.created.length,0,'render retires the old pending request');
+  c.ensureRecManifest=async()=>approvedWords();c.S.review.revealed=true;events.length=0;
+  c.render();await settle();assert.equal(f.created.length,1,JSON.stringify({events,view:c.S.view,face:vm.runInContext('reviewVoiceFace',c),button:c.document.getElementById('card-say')?.dataset,voice:c.wordVoice()}));
+  assert(events.indexOf('retire')<events.indexOf('auto'),'retirement observed before actual auto speech');
+  assert.equal(events.at(-1),'auto');
+  c.render();await settle();assert.equal(f.created.length,1,'actual rerender does not replay the same face');
+  c.S.review.ix=2;c.S.review.queue.push({t:'word',id:'電車'});c.S.review.revealed=true;
+  c.render();await settle();assert.equal(f.created[0].paused,true,'old live clip retired');assert.equal(f.created.length,2);
 });

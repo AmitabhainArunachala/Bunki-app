@@ -25,7 +25,7 @@ import { activeTeacherContext, aiAsk, aiChatTurns, aiCreateCards, aiKey, aiProvi
  * FSRS-6 (ts-fsrs 5.4.1) under packages/domain's pinned parameters.
  */
 // BEGIN GENERATED RELEASE IDENTITY — npm run release:sync
-const APP_RELEASE = Object.freeze({"version":"1.2.2-rc.1","channel":"rc","releasedOn":"2026-11-08","learnerDataEpoch":1});
+const APP_RELEASE = Object.freeze({"version":"1.3.0-rc.1","channel":"rc","releasedOn":"2026-11-09","learnerDataEpoch":1});
 // END GENERATED RELEASE IDENTITY
 const DATA = {
   safe: ['kanken', 'sem'],
@@ -36579,7 +36579,7 @@ function mountMaintenanceReports() {
   });
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+function bootCorridor() {
   mountMaintenanceReports();
   boot().catch((err) => {
     document.body.dataset.error = String(err);
@@ -36589,7 +36589,11 @@ window.addEventListener('DOMContentLoaded', () => {
     // a learner whose app will not start is exactly who needs to say so
     if (maintenanceReports) root.append(reportEntries('report-line-page'));
   });
-});
+}
+// An explicitly composed host may import the same application after DOM ready.
+// Keep the normal deferred-module entry and that late entry on one boot path.
+if (document.readyState === 'loading') window.addEventListener('DOMContentLoaded', bootCorridor, { once: true });
+else queueMicrotask(bootCorridor);
 
 /* ---- 集中道場 › デッキ: the host lexicon adapter the deck player receives
  * (decks/player/host.js; learning-design §3). Kept below the storage-ledger

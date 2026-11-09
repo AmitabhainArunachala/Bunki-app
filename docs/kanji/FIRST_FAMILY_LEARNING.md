@@ -81,7 +81,7 @@ The UI must retain reference exposure while the visit is live and apply it to ea
 
 `summary(run).results` for schema 2 includes `attemptId`, `item`, `tests`, `help`, `exposure`, `actedAt`, `answeredAt`, `feedbackAt`, `selfCheck`, `checkedAt` and `assisted`, alongside the existing result fields. Existing schema-1 result objects are unchanged.
 
-## One unavailable-until-integrated review seam
+## One guarded review seam
 
 `hookCandidate(run, attemptId)` returns `null` until there is an actual response, shown feedback and explicit self-check. It never emits a rating, schedules anything, binds a saved card, samples a clock or calls a hook. When ready it returns:
 
@@ -98,7 +98,9 @@ The UI must retain reference exposure while the visit is live and apply it to ea
 }
 ```
 
-The UI supplies `at: new Date(...)` at the single W4 seam. The `r1` surface version identifies this first hook surface; it is separate from catalog/unit revision 4. Never use slash-containing prompt IDs as surfaces. A candidate is eligibility information, not proof that a grade was admitted. W4 must still enforce trusted surface registration, exact current saved identity, ownership, enrollment/due state, duplicate/day restrictions, assistance and atomic publication. While that implementation is unavailable, practice continues and the UI reports the unavailable seam. No fallback schedule write is allowed.
+The legacy Corridor host prepares the candidate from its retained pre-answer snapshot and sends it through `review-caller.mjs` to the installed `__KAIRO_HOOKS__.report` seam. The `r1` surface version identifies this first hook surface; it is separate from catalog/unit revision 4. Never use slash-containing prompt IDs as surfaces. A candidate is eligibility information, not proof that a grade was admitted. The caller and hook check the trusted surface, retained attempt, exact current saved identity, ownership, enrollment/due state, duplicate/day restrictions and assistance before atomic publication. The admission boundary supplies the review time. A missing hook/caller or refused admission leaves practice available and reports the refusal; no fallback schedule write is allowed.
+
+The current host uses a page-session review ledger with `JOURNEY_WRITES = false`; the durable journey path is not enabled. Shared-study mode fences this legacy hook under the [shared-study integration boundary](../srs/SHARED_STUDY_ENGINE.md). The focused source integration regression is `tools/test-kanji-course-hooks.mjs`, which executes the authored course, caller, installed hook and pinned FSRS through controlled DOM, record, storage and lock adapters. It does not establish native rendering or storage durability.
 
 Leaving has no transition or penalty. Duplicate-response protection here is session-local; durable duplicate grading remains W4's responsibility. Incorrect responses cannot be laundered into `knew`; reveal/skip and merely opening a reference never become grade candidates.
 

@@ -1,5 +1,7 @@
 import {buildKanjiCapacityReport} from '../kanji/capacity.mjs';
 import {renderKanjiCapacity} from '../kanji/panel.mjs';
+export {startAcceptedAudioHost,acceptedAudioSourceRevision} from './accepted-audio-host.mjs';
+export {createBrowserAudioPackHost} from './browser-audio-pack-host.mjs';
 import {createBackupStatusObserver} from './backup-status.mjs';
 import {createFactoryStatusReader,factoryRequest} from './factory-status.mjs';
 import {applyKinsoku} from '../player/kinsoku.mjs';
@@ -20,6 +22,7 @@ import {createUpdateBoundary} from './update-boundary.mjs';
 import {isRetryableProdSyncError} from './prod-native-sync.mjs';
 import {watchLocalDayBudget} from './local-budget.mjs';
 import {createTrialAudio} from './trial-audio.mjs';
+import {createStudyAudio,studyAudioSourceFields,studyAudioSourcePlan} from './study-audio.mjs';
 const MODULES = [['all','すべて','すべてのデッキ'],['n2','N2','日本語能力試験'],['n1','N1','日本語能力試験'],['senmon','専門','考えを深める言葉'],['kotoba','わたしの言葉','拾い集めた言葉'],['grammar','文法','意味・思い出す']];
 const GRADES = [[1,'もう一度','Again','再'],[2,'難しい','Hard','難'],[3,'正解','Good','良'],[4,'簡単','Easy','易']];
 const interval = ms => ms < 60000 ? '1分未満' : ms < 3600000 ? `${Math.ceil(ms/60000)}分` : ms < 86400000 ? `${Math.ceil(ms/3600000)}時間` : `${Math.round(ms/86400000)}日`;
@@ -60,7 +63,12 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   const pairedPhone = ['paired-dev','paired-prod'].includes(platform.storageKind);
   if(platform.presentation!==undefined&&!['phone','desktop'].includes(platform.presentation))throw Error('invalid-study-presentation');
   const phonePresentation=platform.presentation===undefined?pairedPhone:platform.presentation==='phone';
-  const trialAudio=createTrialAudio({origin:platform.audioOrigin??win.nihongoNativeSync?.origin??win.location?.origin});
+  const sharedAudioDeclared=platform.audioDownloadFailure===true||platform.audio!==undefined&&platform.audio!==null;
+  let audioDownloadsSuspended=false,audioDownloadActionFailed=false,audioDownloadsSnapshot=null;
+  const trialAudio=sharedAudioDeclared?null:createTrialAudio({origin:platform.audioOrigin??win.nihongoNativeSync?.origin??win.location?.origin});
+  let trialAudioPlaybackGeneration=0;
+  let sharedAudioOwner=null,sharedAudioRoot=null,sharedAudioRootState=sharedAudioDeclared?'idle':'absent',sharedAudioRootPromise=null,sharedAudioRootController=null;
+  const studyAudio=sharedAudioDeclared?createStudyAudio({capability:platform.audio,authorize:()=>sharedAudioAuthorized(),preflight:platform.audioDownloads?.authorizePlayback}):null;
   const h = (tag, attrs, ...children) => createNode(document, tag, attrs, ...children);
   const button = (text, fn, attrs = {}) => h('button', { type:'button', onclick: fn, ...attrs }, text);
   let screen = 'today', module = initialModule, current = null, busy = false, notice = '', pendingIntent = null, pendingAction = null, factoryRetry = null, disposed = false, pop = null, lastReview = null;
@@ -95,7 +103,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   const defaultLanguage=defaultInterfaceLanguage(win.navigator);
   let interfaceLanguage=defaultLanguage;try{const stored=preferences.getItem('nihongo.interface-language.v1');if(['ja','en','both'].includes(stored))interfaceLanguage=stored;}catch{}
   const originalLabels=new WeakMap(),originalAttributes=new WeakMap(),cardViews=new WeakMap();
-  const copy=(tag,ja,en,attrs={})=>renderInterfacePair(h(tag,attrs),ja,en,interfaceLanguage,{inline:tag==='button'});
+  const copy=(tag,ja,en,attrs={})=>renderInterfacePair(h(tag,attrs),ja,en,interfaceLanguage,{inline:tag==='button'||attrs['data-interface-layout']==='inline'});
   const copyButton=(ja,en,action,attrs={})=>copy('button',ja,en,{type:'button',onclick:action,...attrs});
   const online=()=>typeof platform.isOnline==='function'?platform.isOnline():win.navigator.onLine!==false;
   let startedOffline=platform.startedOffline===true&&!online();
@@ -161,7 +169,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   updateBoundary=createUpdateBoundary({
     readBlockers:readUpdateBlockers,
     readFlights:()=>actionFlights.size,
-    onHold:()=>{root.setAttribute('inert','');trialAudio.stop();},
+    onHold:()=>{root.setAttribute('inert','');stopTrialAudio();},
     onRelease:()=>{root.removeAttribute('inert');},
   });
   const dayView=({restEvidence=screen!=='study'}={})=>studyDayView(backend.readProjection(),catalog,{at:now(),installation:backend.installation,queue:backend.queue(),offline:!online(),canRequestPermits:canRequestNewCards(),verifiedRestDays:restEvidence?(backend.readVerifiedRestDays?.().days??[]):[],sessionTimings:sessionEvidence.read(backend.readProjection()).entries});
@@ -172,7 +180,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function displayDate(value,options={}){const date=new Date(value),zone=options.timeZone?{timeZone:options.timeZone}:{},jp=`${date.toLocaleDateString('ja-JP',{month:'long',day:'numeric',...zone})}（${date.toLocaleDateString('ja-JP',{weekday:'short',...zone})}）${options.timeStyle?date.toLocaleTimeString('ja-JP',{timeStyle:'short',...zone}):''}`,en=new Intl.DateTimeFormat('en-US',options).format(date);return renderInterfacePair(h('span'),jp,en,interfaceLanguage);}
   function localize(){
     for(const element of document.querySelectorAll('[data-interface-ja][data-interface-en]')){
-      if(!isSourceCopy(element))renderInterfacePair(element,element.dataset.interfaceJa,element.dataset.interfaceEn,interfaceLanguage,{inline:!!element.closest('button,option')&&element.dataset.interfaceLayout!=='grade'});
+      if(!isSourceCopy(element))renderInterfacePair(element,element.dataset.interfaceJa,element.dataset.interfaceEn,interfaceLanguage,{inline:element.dataset.interfaceLayout==='inline'||!!element.closest('button,option')&&element.dataset.interfaceLayout!=='grade'});
     }
     const walker=document.createTreeWalker(document.body,win.NodeFilter.SHOW_TEXT),nodes=[];let node;
     while(node=walker.nextNode()){
@@ -354,7 +362,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function pauseStudy(next){
     if(updateBoundary?.held)return;
     if(!current||current.committed||boundaryPreparation)return message('保存を確認してから移動してください。失敗した場合は再試行できます。');
-    trialAudio.stop();setStudyMenu(false);closePopover();current.timer.pause();
+    stopTrialAudio();setStudyMenu(false);closePopover();current.timer.pause();
     parkedStudy={current,customRun,activeSession,boundaryQueue,boundaryNotice,sessionShown,module,scroll:main.querySelector('[data-card]')?.scrollTop??0};
     current=null;customRun=null;activeSession=null;screen=next;render();main.focus({preventScroll:true});
   }
@@ -443,6 +451,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     budgetWatcher?.schedule();
     if(parkedStudy&&!busy&&!pendingIntent&&parkedDayEnded()){const saved=parkedStudy;queueMicrotask(()=>{if(!disposed&&parkedStudy===saved&&parkedDayEnded())retireParkedStudy(()=>render());});}
     updateBoundary?.sync();
+    if(sharedAudioDeclared)syncSharedAudioCurrent();
   }
   function todayScreen() {
     const p=backend.readProjection(),view=dayView(),today=view.today,queue=backend.queue({module});
@@ -577,7 +586,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     try{const stored=preferences.getItem(key);if(stored!==null)return false;const result=preferences.setItem(key,'1');if(result&&typeof result.then==='function'){trackPreferencePromise(result);return false;}return true;}catch{return false;}
   }
   function completeSitting(){
-    trialAudio.stop();const p=backend.readProjection(),at=now(),session=activeSession,view=dayView({restEvidence:true}),practice=!!session?.practice;
+    stopTrialAudio();const p=backend.readProjection(),at=now(),session=activeSession,view=dayView({restEvidence:true}),practice=!!session?.practice;
     const summary=studyReviewSummary(p,{at,eventIds:session?.eventIds??[],startedAt:session?.startedAt,installation:backend.installation});
     const offers=view.offers;
     finishState={at,summary,view,offers,projection:p,online:online(),practice,practised:practice?customRun?.completed??0:0,ack:!practice&&summary.reviewed>0&&view.finished&&acknowledgeDay(view.today),until:win.performance.now()+400,showAll:false,source:current?.gradeSource||session?.source||lastInputSource};
@@ -697,7 +706,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   }
   function start(entry, practice = false,learnAhead=false,session=null,{source=lastInputSource,remaining=null,restore=null,preserveRun=false,readyTaskKeys=null,backlog=false}={}) {
     if (updateBoundary?.held || !entry) return;
-    trialAudio.stop();
+    stopTrialAudio();
     if(parkedStudy)return retireParkedStudy(()=>start(entry,practice,learnAhead,session,{source,remaining,restore,preserveRun,readyTaskKeys,backlog}));
     try {
       boundaryPreparation=null;
@@ -717,43 +726,403 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function keySheet(){
     const rows=[['Space・Return','Space / Return','解答を表示','Show answer'],['Space・Return（解答後）','Space / Return (back)','正解','Good'],['1〜4','1–4','採点：もう一度・難しい・正解・簡単','Grade: Again · Hard · Good · Easy'],['U・⌘Z','U / ⌘Z','最後の採点を元に戻す','Undo last rating'],['E','E','英訳の表示を切り替える','Show or hide the English'],['Esc','Esc','学習を終える','End session'],['?','?','この一覧','This list']];
     const node=h('dialog',{class:'key-sheet','data-key-sheet':''},h('h2',{},copy('span','キー操作','Keys')),h('dl',{},...rows.flatMap(([keyJa,keyEn,ja,en])=>[h('dt',{},copy('kbd',keyJa,keyEn)),h('dd',{},copy('span',ja,en))])),
-      trialAudioMember()?h('p',{class:'grade-rule','data-trial-audio-help':''},copy('span',`P：単語と文を再生`,'P: Play word and sentence')):null,
+      trialAudioReady()||(sharedAudioDeclared&&screen==='study'&&current?.revealed)?h('p',{class:'grade-rule','data-trial-audio-help':''},sharedAudioDeclared?copy('span','P：学習対象と全文を再生／停止','P: Play or stop audio'):copy('span',`P：単語と文を再生`,'P: Play word and sentence')):null,
       h('div',{class:'dialog-actions'},button('閉じる',()=>{node.close();node.remove();focusStudyCard();},{class:'primary'})));
     node.addEventListener('close',()=>{node.remove();focusStudyCard();updateBoundary?.sync();});
     root.append(node);node.showModal();localize();updateBoundary?.sync();
   }
   function focusStudyCard(){main.querySelector('[data-card]')?.focus({preventScroll:true});}
   function clearCardSelection(){const selection=win.getSelection(),card=main.querySelector('[data-card]');if(selection&&card&&(card.contains(selection.anchorNode)||card.contains(selection.focusNode)))selection.removeAllRanges();}
-  function trialAudioMember(c=current){return !!c?.entry?.noteGuid&&trialAudio.has(c.entry.noteGuid);}
-  function trialAudioLabel(){
-    const ja=`単語と文を再生（P）`,en='Play word and sentence (P)';
-    return interfaceLanguage==='en'?en:interfaceLanguage==='both'?`${ja} / ${en}`:ja;
+  function sharedAudioAuthorized(){
+    if(disposed||!sharedAudioDeclared||audioDownloadsBlocked()||sharedAudioOwner!==current||screen!=='study'||!current?.revealed)return false;
+    const c=current;
+    try{
+      return sharedAudioOwner===c&&c.revealed&&screen==='study'&&
+        c.entry.taskKey===c.audioSelectionTaskKey&&
+        c.attempt.contentRevision===c.audioSelectionContentRevision&&
+        sharedAudioRevision(c)===c.audioSelectionAudioRevision&&
+        sharedAudioFieldChoice(c)===c.audioSelectionField&&
+        sharedAudioProfileChoice(c)===c.audioSelectionProfile;
+    }catch{return false;}
   }
-  function trialAudioButton(){
-    const label=trialAudioLabel();
-    return button('🔊',event=>{event.preventDefault();event.stopPropagation();playTrialAudio();focusStudyCard();},
-      {class:'quiet study-icon','aria-label':label,title:label,'data-trial-audio':'','aria-busy':'false'});
+  function sharedAudioSource(c=current){
+    const e=c?.entry;if(!e)return null;
+    try{
+      const assignments=c.audioSelectedAssignments??{},snapshot=JSON.stringify([e,assignments]);
+      if(c.audioSourceSnapshot!==snapshot||!c.audioSourcePlan){
+        c.audioSourcePlan=studyAudioSourcePlan(e,assignments);c.audioSourceSnapshot=snapshot;
+      }
+      return c.audioSourcePlan;
+    }catch{return null;}
+  }
+  function sharedAudioRevision(c=current){return sharedAudioSource(c)?.audioContentRevision??null;}
+  function sharedAudioFieldChoice(c=current){
+    const id=c?.audioFieldId;
+    return typeof id==='string'&&id!=='default'?id:'default';
+  }
+  function sharedAudioProfileChoice(c=current){
+    if(c&&c.audioProfileId!==undefined)return c.audioProfileId;
+    return sharedAudioRoot?.defaultProfileId??null;
+  }
+  function sharedAudioDefaultFields(c=current){
+    const e=c?.entry;if(!e)return [];
+    const available=new Set(studyAudioSourceFields(e).map(field=>field.fieldId));
+    const grammar=!!e.grammarRecord&&typeof e.contractId==='string'&&e.contractId.startsWith('grammar.');
+    const ids=grammar?['pattern']:['term','ja'];
+    if(grammar){
+      const examples=Array.isArray(e.grammarRecord.examples)?e.grammarRecord.examples:[];
+      const passageId=e.passageId??e.grammarTask?.passageId??null;
+      const index=passageId==null?-1:examples.findIndex(example=>example&&example.exampleId===passageId);
+      if(index<0)return [];
+      ids.push(`examples[${index}].ja`);
+    }
+    if(ids.some(id=>!available.has(id)))return [];
+    const seen=new Set();
+    return ids.filter(id=>available.has(id)&&!seen.has(id)&&seen.add(id));
+  }
+  function sharedAudioSelectedFields(c=current){
+    if(!c?.entry)return [];
+    const choice=sharedAudioFieldChoice(c);
+    if(choice==='default')return sharedAudioDefaultFields(c);
+    return studyAudioSourceFields(c.entry).some(field=>field.fieldId===choice)?[choice]:[];
+  }
+  function sharedAudioSelectionKey(c=current){
+    if(!c)return null;
+    return JSON.stringify([c.entry.taskKey,c.attempt.contentRevision,sharedAudioRevision(c),
+      platform.audio?.release?.contentRelease??null,sharedAudioSelectedFields(c),sharedAudioProfileChoice(c),c.revealed?'answer':'front']);
+  }
+  function sharedAudioSelection(c=current){
+    return {
+      taskKey:c.entry.taskKey,
+      contentRevision:c.attempt.contentRevision,
+      audioContentRevision:sharedAudioRevision(c),
+      contentRelease:platform.audio?.release?.contentRelease??null,
+      fields:sharedAudioSelectedFields(c),
+      profileId:sharedAudioProfileChoice(c),
+      supportedReadingId:null,
+      face:c.revealed?'answer':'front',
+      sourceFields:sharedAudioSource(c)?.sourceFields??[],
+    };
+  }
+  const sharedAudioText=(ja,en)=>interfaceLanguage==='en'?en:interfaceLanguage==='both'?`${ja} / ${en}`:ja;
+  function sharedAudioStatusCopy(code){
+    switch(code){
+      case 'pending':return ['選択した項目の音声は準備中です。','Audio for the selected field is still pending preparation.'];
+      case 'profile-unassigned':return ['音声プロファイルが割り当てられていません。','No audio profile is assigned.'];
+      case 'profile-unavailable':return ['選択した音声プロファイルは利用できません。','The selected audio profile is unavailable.'];
+      case 'source-stale':return ['音声がこのカードの内容と一致しません。項目またはプロファイルを選び直してください。','Audio no longer matches this card. Choose another field or profile.'];
+      case 'content-release-mismatch':return ['音声のリリースがこのカードと一致しません。','The audio release does not match this card.'];
+      case 'integrity-invalid':return ['音声の完全性を確認できませんでした。','Audio integrity is invalid.'];
+      case 'unsupported-capability':return ['この端末では共有音声を利用できません。','Shared audio is unsupported on this device.'];
+      case 'preparation-failed':return ['音声の準備に失敗しました。','Audio preparation failed.'];
+      case 'offline-missing':return ['オフラインのため音声を利用できません。','Audio is not available offline.'];
+      case 'decode':return ['音声を再生できませんでした。もう一度タップしてください。','Audio could not play. Tap to try again.'];
+      case 'invalid':return ['音声の指定が正しくありません。','The audio selection is invalid.'];
+      default:return ['音声を準備しています…','Preparing audio…'];
+    }
+  }
+  function sharedAudioStatusInto(node,c=current){
+    const code=c?.audioStatus??'preparing';
+    if(code==='ready'||code==='cancelled'||code==='face-hidden'){node.hidden=true;renderInterfacePair(node,'','',interfaceLanguage);return;}
+    const [ja,en]=sharedAudioStatusCopy(code);node.hidden=false;renderInterfacePair(node,ja,en,interfaceLanguage);
+  }
+  function sharedAudioDefaultLabel(c=current){
+    const fields=sharedAudioDefaultFields(c).map(fieldId=>sharedAudioFieldLabels(fieldId,c));
+    const ja=fields.length?fields.map(labels=>labels[0]).join(' · '):'—';
+    const en=fields.length?fields.map(labels=>labels[1]).join(' · '):'—';
+    return sharedAudioText(`既定（${ja}）`,`Default (${en})`);
+  }
+  function sharedAudioFieldLabels(fieldId,c=current){
+    if(fieldId==='meaning'&&c?.entry?.manual===true)return ['意味','Meaning'];
+    const labels={term:['単語','Word'],reading:['読み','Reading'],ja:['例文（日本語）','Example (Japanese)'],
+      defJa:['定義（日本語）','Definition (Japanese)'],meaning:['意味（英語）','Meaning (English)'],
+      note:['補足','Notes'],en:['例文（英語）','Example (English)'],pattern:['文型','Pattern'],
+      formation:['接続','Formation'],nuance:['ニュアンス','Nuance']};
+    if(Object.hasOwn(labels,fieldId))return labels[fieldId];
+    const example=/^examples\[(\d+)\]\.(ja|en)$/.exec(fieldId);
+    if(example){
+      const number=Number(example[1])+1,japanese=example[2]==='ja';
+      return [`例文${number}（${japanese?'日本語':'英語'}）`,`Example ${number} (${japanese?'Japanese':'English'})`];
+    }
+    const collocation=/^collocations\[(\d+)\]$/.exec(fieldId);
+    if(collocation)return [`連語${Number(collocation[1])+1}`,`Collocation ${Number(collocation[1])+1}`];
+    const reference=/^relatedReferences\[(\d+)\]\.text$/.exec(fieldId);
+    if(reference)return [`関連項目${Number(reference[1])+1}`,`Related reference ${Number(reference[1])+1}`];
+    return ['項目','Field'];
+  }
+  function fillSharedAudioProfiles(select,c=current){
+    select.replaceChildren();
+    if(!sharedAudioRoot){
+      select.append(h('option',{value:''},sharedAudioText('読み込み中…','Loading…')));
+      select.disabled=true;return;
+    }
+    const profiles=sharedAudioRoot.profiles??[],defaultId=sharedAudioRoot.defaultProfileId??null;
+    if(defaultId===null||profiles.length===0)select.append(h('option',{value:''},sharedAudioText('未割り当て','Unassigned')));
+    for(const profile of profiles)select.append(h('option',{value:profile.id},profile.id));
+    const selected=sharedAudioProfileChoice(c);
+    select.value=selected??'';
+    select.disabled=false;
+  }
+  function sharedAudioPanel(c=current){
+    const fields=studyAudioSourceFields(c.entry);
+    const fieldSelect=h('select',{'aria-label':sharedAudioText('音声の項目','Audio field'),'data-study-audio-field':'',
+      onchange:event=>changeSharedAudioChoice(c,{fieldId:event.currentTarget.value})});
+    fieldSelect.append(h('option',{value:'default'},sharedAudioDefaultLabel(c)));
+    for(const field of fields)fieldSelect.append(h('option',{value:field.fieldId},sharedAudioText(...sharedAudioFieldLabels(field.fieldId,c))));
+    const choice=sharedAudioFieldChoice(c);
+    fieldSelect.value=choice==='default'||fields.some(field=>field.fieldId===choice)?choice:'default';
+    const profileSelect=h('select',{'aria-label':sharedAudioText('音声プロファイル','Audio profile'),'data-study-audio-profile':'',
+      onchange:event=>changeSharedAudioChoice(c,{profileId:event.currentTarget.value===''?null:event.currentTarget.value})});
+    fillSharedAudioProfiles(profileSelect,c);
+    const status=h('p',{class:'secondary','data-study-audio-status':'',role:'status'});
+    sharedAudioStatusInto(status,c);
+    return h('div',{class:'study-audio-panel','data-study-audio-panel':''},
+      h('details',{class:'fold','data-study-audio-options':''},
+        copy('summary','音声オプション','Audio options'),
+        h('div',{class:'study-audio-fields'},h('label',{},copy('span','項目','Field'),fieldSelect),h('label',{},copy('span','プロファイル','Profile'),profileSelect))),
+      status);
+  }
+  function syncSharedAudioPanel(c=current,panel=null){
+    panel??=main.querySelector('[data-study-audio-panel]');if(!panel)return;
+    const fieldSelect=panel.querySelector('[data-study-audio-field]');
+    if(fieldSelect){
+      const fields=studyAudioSourceFields(c.entry),choice=sharedAudioFieldChoice(c);
+      fieldSelect.value=choice==='default'||fields.some(field=>field.fieldId===choice)?choice:'default';
+    }
+    const profileSelect=panel.querySelector('[data-study-audio-profile]');if(profileSelect)fillSharedAudioProfiles(profileSelect,c);
+    const status=panel.querySelector('[data-study-audio-status]');if(status)sharedAudioStatusInto(status,c);
+  }
+  function stopTrialAudio(){
+    stopSharedAudioRoot();
+    trialAudioPlaybackGeneration++;
+    trialAudio?.stop();
+    studyAudio?.stop();
+    sharedAudioOwner=null;
+    const c=current;
+    if(c){
+      c.audioSourceController?.abort();c.audioSourceController=null;c.audioSourcePromise=null;
+      c.audioPlaying=false;
+      c.audioPlayGeneration=(c.audioPlayGeneration??0)+1;
+      c.audioGeneration=(c.audioGeneration??0)+1;
+      c.audioPromise=null;
+    }
+  }
+  function audioDownloadsBlocked(){
+    return ['paused','disposed'].includes(platform.audioDownloads?.read().state);
+  }
+  function invalidateDownloadedAudio(){
+    stopTrialAudio();
+    for(const c of [current,parkedStudy?.current]){
+      if(!c)continue;
+      c.audioGeneration=(c.audioGeneration??0)+1;
+      c.audioResult=null;c.audioResolverKey=null;c.audioPromise=null;c.audioStatus='preparation-failed';
+    }
+    syncSharedAudioDom();
+  }
+  function retryDownloadedAudio(){
+    if(!sharedAudioDeclared)return;
+    stopSharedAudioRoot();
+    if(['offline','integrity'].includes(sharedAudioRootState))sharedAudioRootState='idle';
+    for(const c of [current,parkedStudy?.current]){
+      if(!c)continue;
+      const failed=['offline-missing','integrity-invalid','preparation-failed','cancelled'].includes(c.audioStatus);
+      const resolving=c.audioResult?.status!=='ready'&&(c.audioPromise||c.audioSourcePromise);
+      if(!failed&&!resolving)continue;
+      if(c===current&&sharedAudioOwner===c){studyAudio?.stop();sharedAudioOwner=null;}
+      c.audioSourceController?.abort();c.audioSourceController=null;c.audioSourcePromise=null;
+      c.audioGeneration=(c.audioGeneration??0)+1;
+      c.audioResult=null;c.audioResolverKey=null;c.audioPromise=null;c.audioStatus='preparing';
+    }
+  }
+  function trialAudioMember(c=current){return !!trialAudio&&!!c?.entry?.noteGuid&&trialAudio.has(c.entry.noteGuid);}
+  function trialAudioReady(c=current){return !!trialAudio&&!!c?.revealed&&trialAudioMember(c);}
+  function trialAudioLabel(active=false,c=current){
+    if(sharedAudioDeclared&&!active&&sharedAudioFieldChoice(c)!=='default'){
+      const [ja,en]=sharedAudioFieldLabels(sharedAudioFieldChoice(c),c);
+      return sharedAudioText(`${ja}を再生（P）`,`Play ${en} (P)`);
+    }
+    const [ja,en]=sharedAudioDeclared
+      ?active?['音声を停止（P）','Stop audio (P)']:['学習対象と全文を再生（P）','Play target and entire passage (P)']
+      :active?['Kore 試聴：再生を停止（P）','Kore trial: Stop audio (P)']:['Kore 試聴：単語と文を再生（P）','Kore trial: Play word and sentence (P)'];
+    return sharedAudioText(ja,en);
+  }
+  function trialAudioButton(card=current){
+    const c=card,shared=sharedAudioDeclared,playing=shared&&!!c?.audioPlaying,ready=shared&&c?.audioResult?.status==='ready';
+    const label=trialAudioLabel(playing,c);
+    return button('🔊',event=>{
+      event.preventDefault();event.stopPropagation();
+      if(shared)toggleSharedAudio(c,event.currentTarget);else playTrialAudio(c,event.currentTarget);
+      focusStudyCard();
+    },{class:'quiet study-icon','aria-label':label,title:label,'data-trial-audio':'','aria-busy':'false',...(shared?{'data-study-audio':'',disabled:!(ready||playing)}:{})});
   }
   function syncTrialAudioControl(){
-    if(disposed||screen!=='study'||!current)return;
+    if(disposed)return;
+    if(sharedAudioDeclared){syncSharedAudioCurrent();return;}
+    if(screen!=='study'||!current)return;
     const actions=main.querySelector('.study-actions');if(!actions)return;
     const existing=actions.querySelector('[data-trial-audio]');
-    if(!trialAudioMember(current)){existing?.remove();return;}
+    if(!trialAudioReady(current)){existing?.remove();return;}
     if(existing)return;
-    const node=trialAudioButton(),remaining=actions.querySelector('[data-study-remaining]');
+    const node=trialAudioButton(current),remaining=actions.querySelector('[data-study-remaining]');
     if(remaining)actions.insertBefore(node,remaining);else actions.prepend(node);
   }
   function trialAudioFailure(){
     const ja=`音声を再生できません。もう一度タップしてください。`,en='Audio could not play. Tap to try again.';
     message(interfaceLanguage==='en'?en:interfaceLanguage==='both'?`${ja} / ${en}`:ja);
   }
-  function playTrialAudio(){
-    const c=current;
-    if(disposed||screen!=='study'||!c||!trialAudioMember(c))return;
-    const control=main.querySelector('[data-trial-audio]');
+  function playTrialAudio(card=current,control=null){
+    const c=card;
+    if(disposed||screen!=='study'||!c||c!==current||!c.revealed||!trialAudioMember(c))return;
+    const live=main.querySelector('[data-trial-audio]');
+    if(control&&control!==live)return;
+    control=live;
+    const generation=++trialAudioPlaybackGeneration;
     control?.setAttribute('aria-busy','true');
-    trialAudio.play(c.entry.noteGuid).catch(()=>{if(!disposed)trialAudioFailure();})
-      .finally(()=>{if(control?.isConnected)control.setAttribute('aria-busy','false');});
+    trialAudio.play(c.entry.noteGuid).catch(()=>{if(generation===trialAudioPlaybackGeneration&&!disposed&&screen==='study'&&c===current&&trialAudioReady(c))trialAudioFailure();})
+      .finally(()=>{if(generation===trialAudioPlaybackGeneration&&!disposed&&screen==='study'&&c===current&&c.revealed&&control?.isConnected&&control===main.querySelector('[data-trial-audio]'))control.setAttribute('aria-busy','false');});
+  }
+  function stopSharedAudioRoot(){
+    sharedAudioRootController?.abort();sharedAudioRootController=null;
+    if(sharedAudioRootState==='loading'){sharedAudioRootPromise=null;sharedAudioRootState='idle';}
+  }
+  function loadSharedAudioRoot(){
+    if(!sharedAudioDeclared||!studyAudio)return Promise.resolve(null);
+    if(sharedAudioRootState==='ready')return Promise.resolve(sharedAudioRoot);
+    if(sharedAudioRootPromise)return sharedAudioRootPromise;
+    sharedAudioRootState='loading';
+    const controller=new AbortController();sharedAudioRootController=controller;
+    const promise=studyAudio.load({signal:controller.signal}).then(root=>{
+      if(disposed||controller.signal.aborted)return null;
+      sharedAudioRoot=root;sharedAudioRootState='ready';
+      if(screen==='study'&&current?.revealed)syncSharedAudioCurrent();
+      return root;
+    },error=>{
+      if(!disposed&&!controller.signal.aborted){
+        sharedAudioRoot=null;sharedAudioRootState=error?.audioCode==='unsupported'?'unsupported':error?.audioCode==='offline'?'offline':'integrity';
+        if(screen==='study'&&current?.revealed)syncSharedAudioCurrent();
+      }
+      return null;
+    }).finally(()=>{if(sharedAudioRootPromise===promise){sharedAudioRootPromise=null;sharedAudioRootController=null;}});
+    sharedAudioRootPromise=promise;return promise;
+  }
+  function syncSharedAudioCurrent(sourceChecked=false){
+    if(disposed||!sharedAudioDeclared||screen!=='study'||!current||!current.revealed)return;
+    if(audioDownloadsBlocked()){invalidateDownloadedAudio();return;}
+    const c=current;
+    if(c.audioFieldId===undefined)c.audioFieldId='default';
+    if(sharedAudioRootState==='idle'){c.audioStatus='preparing';syncSharedAudioDom(c);loadSharedAudioRoot();return;}
+    if(sharedAudioRootState==='loading'){c.audioStatus='preparing';syncSharedAudioDom(c);return;}
+    if(sharedAudioRootState!=='ready'){c.audioStatus=sharedAudioRootState==='unsupported'?'unsupported-capability':sharedAudioRootState==='offline'?'offline-missing':'integrity-invalid';sharedAudioOwner=null;syncSharedAudioDom(c);return;}
+    if(!sourceChecked&&typeof platform.audioDownloads?.readSource==='function'){
+      if(c.audioSourcePromise)return;
+      const controller=new AbortController(),generation=c.audioGeneration??0,taskKey=c.entry.taskKey;
+      c.audioSourceController=controller;
+      const active=()=>!disposed&&!controller.signal.aborted&&c===current&&screen==='study'&&c.revealed&&(c.audioGeneration??0)===generation&&c.entry.taskKey===taskKey;
+      const promise=Promise.resolve().then(()=>platform.audioDownloads.readSource({taskKeys:[taskKey],signal:controller.signal})).then(source=>{
+        if(!active())return;
+        if(!source?.selectedAssignments)throw Error('study-audio-source-assignments');
+        const snapshot=JSON.stringify(source.selectedAssignments);
+        if(c.audioAssignmentSnapshot!==undefined&&c.audioAssignmentSnapshot!==snapshot)stopTrialAudio();
+        c.audioSelectedAssignments=JSON.parse(snapshot);c.audioAssignmentSnapshot=snapshot;
+        c.audioSourcePromise=null;c.audioSourceController=null;
+        syncSharedAudioCurrent(true);
+      }).catch(error=>{
+        if(!active())return;
+        stopTrialAudio();
+        c.audioResult=null;c.audioResolverKey=null;c.audioStatus=error?.audioCode==='cancelled'||error?.name==='AbortError'?'cancelled':'integrity-invalid';
+        sharedAudioOwner=null;syncSharedAudioDom(c);
+      }).finally(()=>{
+        if(c.audioSourcePromise===promise){c.audioSourcePromise=null;c.audioSourceController=null;}
+      });
+      c.audioSourcePromise=promise;
+      if(!c.audioResult){c.audioStatus='preparing';syncSharedAudioDom(c);}
+      return;
+    }
+    const fields=sharedAudioSelectedFields(c),profileId=sharedAudioProfileChoice(c),revision=sharedAudioRevision(c);
+    if(!fields.length||revision===null){
+      c.audioStatus=revision===null?'integrity-invalid':'source-stale';c.audioResult=null;c.audioResolverKey=null;c.audioPromise=null;sharedAudioOwner=null;syncSharedAudioDom(c);return;
+    }
+    if(profileId===null){
+      c.audioStatus='profile-unassigned';c.audioResult=null;c.audioResolverKey=null;c.audioPromise=null;sharedAudioOwner=null;syncSharedAudioDom(c);return;
+    }
+    const key=sharedAudioSelectionKey(c);
+    if(c.audioResult&&c.audioResolverKey===key){
+      c.audioStatus=c.audioResult.status==='ready'?'ready':c.audioResult.status;
+      if(c.audioStatus!=='ready')sharedAudioOwner=null;
+      syncSharedAudioDom(c);return;
+    }
+    if(c.audioResolverKey===key&&c.audioPromise){c.audioStatus='preparing';syncSharedAudioDom(c);return;}
+    const generation=(c.audioGeneration??0)+1;c.audioGeneration=generation;
+    c.audioResolverKey=key;c.audioResult=null;c.audioStatus='preparing';sharedAudioOwner=c;
+    c.audioSelectionTaskKey=c.entry.taskKey;
+    c.audioSelectionContentRevision=c.attempt.contentRevision;
+    c.audioSelectionAudioRevision=revision;
+    c.audioSelectionField=sharedAudioFieldChoice(c);
+    c.audioSelectionProfile=profileId;
+    const selection=sharedAudioSelection(c);
+    const promise=studyAudio.resolve(selection).then(result=>{
+      if(disposed||c!==current||screen!=='study'||!c.revealed||c.audioGeneration!==generation||c.audioResolverKey!==key)return;
+      c.audioPromise=null;c.audioResult=result??null;c.audioStatus=result?.status??'integrity-invalid';
+      if(c.audioStatus!=='ready')sharedAudioOwner=null;
+      syncSharedAudioDom(c);
+    },error=>{
+      if(disposed||c!==current||screen!=='study'||!c.revealed||c.audioGeneration!==generation||c.audioResolverKey!==key)return;
+      c.audioPromise=null;c.audioResult=null;
+      c.audioStatus=error?.audioCode==='unsupported'?'unsupported-capability':error?.audioCode==='cancelled'?'cancelled':'integrity-invalid';
+      sharedAudioOwner=null;syncSharedAudioDom(c);
+    }).finally(()=>{if(c.audioPromise===promise)c.audioPromise=null;});
+    c.audioPromise=promise;
+    syncSharedAudioDom(c);
+  }
+  function syncSharedAudioDom(c=current){
+    if(disposed||!sharedAudioDeclared||c!==current||screen!=='study'||!c?.revealed)return;
+    const actions=main.querySelector('.study-actions');
+    let control=actions?.querySelector('[data-trial-audio]');
+    if(actions&&!control){
+      control=trialAudioButton(c);const remaining=actions.querySelector('[data-study-remaining]');
+      if(remaining)actions.insertBefore(control,remaining);else actions.prepend(control);
+    }
+    if(control){
+      const playing=!!c.audioPlaying,ready=c.audioResult?.status==='ready',label=trialAudioLabel(playing,c);
+      control.setAttribute('aria-label',label);control.title=label;
+      control.disabled=!(ready||playing);
+      control.setAttribute('aria-busy',String(playing));
+      control.setAttribute('data-study-audio','');
+    }
+    let panel=main.querySelector('[data-study-audio-panel]');
+    if(!panel){const heading=main.querySelector('.study-heading');if(heading){panel=sharedAudioPanel(c);heading.after(panel);}}
+    if(panel)syncSharedAudioPanel(c,panel);
+  }
+  function changeSharedAudioChoice(c,{fieldId,profileId}={}){
+    if(disposed||c!==current||screen!=='study')return;
+    stopTrialAudio();
+    if(fieldId!==undefined)c.audioFieldId=fieldId;
+    if(profileId!==undefined)c.audioProfileId=profileId;
+    c.audioResolverKey=null;c.audioResult=null;c.audioPromise=null;c.audioStatus='preparing';
+    syncSharedAudioCurrent();
+  }
+  function playSharedAudio(c=current){
+    if(disposed||audioDownloadsBlocked()||screen!=='study'||!c||c!==current||!c.revealed||c.audioResult?.status!=='ready')return;
+    sharedAudioOwner=c;
+    const generation=(c.audioPlayGeneration??0)+1;c.audioPlayGeneration=generation;
+    c.audioPlaying=true;
+    const live=main.querySelector('[data-study-audio]');
+    live?.setAttribute('aria-busy','true');
+    syncSharedAudioDom(c);
+    studyAudio.play(c.audioResult).catch(()=>{
+      if(c.audioPlayGeneration!==generation||disposed||screen!=='study'||c!==current||!c.revealed)return;
+      c.audioStatus='decode';trialAudioFailure();syncSharedAudioDom(c);
+    }).finally(()=>{
+      if(c.audioPlayGeneration!==generation||disposed||screen!=='study'||c!==current||!c.revealed)return;
+      c.audioPlaying=false;live?.setAttribute('aria-busy','false');syncSharedAudioDom(c);
+    });
+  }
+  function toggleSharedAudio(c=current,control=null){
+    if(disposed||screen!=='study'||!c||c!==current||!c.revealed)return;
+    if(control&&control!==main.querySelector('[data-study-audio]'))return;
+    if(c.audioPlaying){stopTrialAudio();syncSharedAudioDom(c);return;}
+    if(c.audioResult?.status!=='ready')return;
+    playSharedAudio(c);
   }
   let lastCardActionAt=-Infinity;
   function revealCard(c=current,source=lastInputSource){
@@ -773,10 +1142,11 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       copy('span',`残り${c.remaining}枚`,`${c.remaining} left`,{class:'study-remaining','data-study-remaining':''}),lastReview?studyAction('元に戻す','↶',undoLast,{'data-undo':''}):null);
     actions.append(studyAction('メニュー','⋯',()=>{if(!current.sessionInfoOpen){const undo=main.querySelector('[data-menu-undo]');if(undo&&!availableUndo())undo.remove();}setStudyMenu(!c.sessionInfoOpen);},
       {'data-session-info':'','aria-haspopup':'menu','aria-expanded':String(!!c.sessionInfoOpen),'aria-controls':'study-help'}));
-    const trialAudioControl=trialAudioMember(c)?trialAudioButton():null;
-    if(trialAudioControl)actions.insertBefore(trialAudioControl,actions.querySelector('[data-study-remaining]'));
+    const audioControl=sharedAudioDeclared?(c.revealed?trialAudioButton(c):null):(trialAudioReady(c)?trialAudioButton(c):null);
+    if(audioControl)actions.insertBefore(audioControl,actions.querySelector('[data-study-remaining]'));
     const context=h('span',{id:'study-context'},`${MODULES.find(m=>m[0]===e.module)?.[1]||'文法'} · ${c.attempt.learnAhead?'学習ステップ（少し早め） · ':''}${c.attempt.mode==='practice'?'追加練習（採点なし）':e.contractId==='grammar.cloze.v1'?'思い出す':e.contractId==='grammar.meaning.v1'?'意味':'読んで思い出す'}`);
     const heading=h('div',{class:'study-heading'},actions,context);if(boundaryNotice)heading.append(copy('p',boundaryNotice.ja,boundaryNotice.en,{class:'boundary-notice',role:'status','data-boundary-update':''}));section.append(heading);
+    if(sharedAudioDeclared&&c.revealed)section.append(sharedAudioPanel(c));
     const card=h('article',{class:'study-card','data-card':'',tabindex:'0',
       ...(c.revealed?{role:'region','aria-labelledby':'study-card-term'}:{role:'button','aria-label':'解答を表示',
         'aria-describedby':'study-card-content','aria-keyshortcuts':'Space Enter','data-reveal':''})});
@@ -1011,6 +1381,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function grade(rating,source) {
     const c=current;
     if(updateBoundary?.held||busy||pendingIntent||pop||document.querySelector('dialog[open]')||c?.sessionInfoOpen||!c?.revealed||c.committed||c.ratingsUnavailable||c.stale||c.attempt.mode!=='scored'&&!customRun)return;
+    stopTrialAudio();
     let intent;
     try{intent=gradeIntent(c,rating);}
     catch{
@@ -1121,7 +1492,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const p=backend.readProjection(),review=p.reviews.find(row=>row.id===lastReview.eventId),at=now(),today=backend.todayAllowance?.()??dayBounds(at,p.settings.learnerTimezone);
     if(!review||!Number.isSafeInteger(review.at)||review.at<today.startsAt||review.at>=today.endsAt)lastReview=null;
   }
-  function undoLast(){if(parkedStudy)return message('中断中の学習に戻ってから、別のカードを開いてください。');expireLastReview();const previous=lastReview;if(!previous)return;const p=backend.readProjection(),task=p.tasks[previous.entry.taskKey],effect=task&&p.effects[task.head];if(!effect||effect.root!==previous.eventId)return message('このカードは現在の状態から戻せません。');run(backend.command('undo',{taskKey:task.taskKey,parent:task.head,target:effect.root}),()=>{lastReview=null;customRun=previous.run?{...previous.run,remaining:[...previous.run.remaining]}:null;const review=p.reviews.find(row=>row.id===previous.eventId),labels=GRADES.find(([value])=>value===review?.effectiveRating),pressed=GRADES.find(([value])=>value===review?.rawRating),capped=review?.rawRating!==review?.effectiveRating;start(previous.entry,false,previous.learnAhead,previous.session,{source:'key',restore:{thinkMs:previous.thinkMs},preserveRun:!!previous.run});showToast(`[${capped?pressed?.[1]+' → ':''}${labels?.[1]||'評価'}]を元に戻しました`,`Undid [${capped?pressed?.[2]+' → ':''}${labels?.[2]||'rating'}]`);});}
+  function undoLast(){stopTrialAudio();if(parkedStudy)return message('中断中の学習に戻ってから、別のカードを開いてください。');expireLastReview();const previous=lastReview;if(!previous)return;const p=backend.readProjection(),task=p.tasks[previous.entry.taskKey],effect=task&&p.effects[task.head];if(!effect||effect.root!==previous.eventId)return message('このカードは現在の状態から戻せません。');run(backend.command('undo',{taskKey:task.taskKey,parent:task.head,target:effect.root}),()=>{lastReview=null;customRun=previous.run?{...previous.run,remaining:[...previous.run.remaining]}:null;const review=p.reviews.find(row=>row.id===previous.eventId),labels=GRADES.find(([value])=>value===review?.effectiveRating),pressed=GRADES.find(([value])=>value===review?.rawRating),capped=review?.rawRating!==review?.effectiveRating;start(previous.entry,false,previous.learnAhead,previous.session,{source:'key',restore:{thinkMs:previous.thinkMs},preserveRun:!!previous.run});showToast(`[${capped?pressed?.[1]+' → ':''}${labels?.[1]||'評価'}]を元に戻しました`,`Undid [${capped?pressed?.[2]+' → ':''}${labels?.[2]||'rating'}]`);});}
   function wordsScreen(){
     reconcileUnknownFactoryRows();
     const section=h('section',{},h('h1',{},'単語とカード'),h('p',{class:'secondary'},'文法の意味と想起は、別々のカードとして記録します。'));
@@ -1243,10 +1614,46 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function plannedSettings(projection){
     return {...projection.settings,...Object.fromEntries(projection.pendingSettings.map(({key,value})=>[key,value]))};
   }
-  function diagnosticValues(){return JSON.stringify({learner:backend.learner,installation:backend.installation,storage:platform.storageKind,replica:lastSaveStatus,sync:nativeSyncState,replayCache:backend.readReplayDiagnostics?.()??null},null,2);}
+  function diagnosticValues(){return JSON.stringify({learner:backend.learner,installation:backend.installation,storage:platform.storageKind,replica:lastSaveStatus,sync:nativeSyncState,replayCache:backend.readReplayDiagnostics?.()??null,...(typeof platform.getAudioPreparationState==='function'?{audioPreparation:platform.getAudioPreparationState()}: {})},null,2);}
   function cacheLimitNotice(){
     const reason=backend.readReplayDiagnostics?.()?.reason;
     return ['row-budget','input-budget','config-budget','retained-budget'].includes(reason)?h('p',{'data-cache-limit':reason,role:'status'},'履歴が高速処理の上限に達しています。学習は続けられますが、表示が遅くなることがあります。'):null;
+  }
+  function syncAudioDownloads(node=main.querySelector('[data-audio-downloads]')){
+    if(disposed||!node||!platform.audioDownloads)return;
+    const status=platform.audioDownloads.read(),state=audioDownloadActionFailed?'error':status.state;
+    const [ja,en]=({
+      idle:['音声はまだ保存されていません。','Audio is not yet saved.'],
+      checking:['保存済みの音声を確認しています…','Checking saved audio…'],
+      downloading:['音声を保存しています…','Saving audio…'],
+      saved:['選択した音声をこの端末に保存しました。','Selected audio is saved on this device.'],
+      cancelled:['保存をキャンセルしました。保存済みの音声は残っています。','Saving was cancelled. Previously saved audio remains.'],
+      error:['音声を確認または保存できませんでした。もう一度お試しください。','Audio could not be checked or saved. Try again.'],
+      paused:['音声の保存を一時停止しています。','Audio saving is paused.'],
+      disposed:['音声のダウンロードは終了しました。','Audio downloads are closed.'],
+    })[state]??['音声を確認できませんでした。','Audio could not be checked.'];
+    renderInterfacePair(node.querySelector('[data-audio-download-status]'),ja,en,interfaceLanguage,{inline:true});
+    const locked=['checking','downloading','paused','disposed'].includes(status.state);
+    node.querySelector('[data-audio-download-start]').disabled=locked;
+    node.querySelector('[data-audio-download-cancel]').disabled=!['checking','downloading'].includes(status.state);
+    node.querySelector('[data-audio-download-refresh]').disabled=locked;
+  }
+  async function audioDownloadAction(action){
+    audioDownloadActionFailed=false;
+    try{await platform.audioDownloads[action]();}
+    catch{audioDownloadActionFailed=!['cancelled','paused','disposed'].includes(platform.audioDownloads.read().state);}
+    syncAudioDownloads();
+  }
+  function audioDownloadsDetail(){
+    if(!platform.audioDownloads)return h('details',{class:'sheet','data-audio-downloads':''},copy('summary','音声のダウンロード','Audio downloads',{'data-interface-layout':'inline'}),copy('p','この内容の音声ダウンロードは利用できません。学習は続けられます。','Audio downloads are unavailable for this content. You can continue studying.',{role:'status'}));
+    const node=h('details',{class:'sheet','data-audio-downloads':''},
+      copy('summary','音声のダウンロード','Audio downloads',{'data-interface-layout':'inline'}),
+      h('p',{role:'status','data-audio-download-status':'','data-interface-layout':'inline'}),
+      h('div',{class:'sheet-actions'},
+        copyButton('音声を保存','Save audio',()=>audioDownloadAction('acquire'),{'data-audio-download-start':''}),
+        copyButton('キャンセル','Cancel',()=>platform.audioDownloads.cancel(),{'data-audio-download-cancel':''}),
+        copyButton('確認','Check',()=>audioDownloadAction('refresh'),{'data-audio-download-refresh':''})));
+    syncAudioDownloads(node);return node;
   }
   function settingsScreen(){
     const p=backend.readProjection(),planned=plannedSettings(p),weekdayPolicy=!!planned.studyPolicy;
@@ -1270,6 +1677,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const file=h('input',{type:'file',accept:'.json,application/json','aria-label':'バックアップを選ぶ',onchange:async e=>{if(updateBoundary?.held)return;const end=beginFlight('import');try{const backup=JSON.parse(await e.target.files[0].text());await backend.importBackup(backup);message('互換のある保存済み記録を追加しました。');render();}catch(error){message(error.message==='backup-has-pending-events-recovery-required'?'未送信の記録を含むため自動復元できません。元の端末とバックアップを保管してください。':'学習者・内容の整合性を確認できませんでした。記録は置き換えていません。');}finally{end();}}});
     const sheet=(id,kicker,title,description,...body)=>h('section',{class:'sheet','data-settings-section':id},h('div',{class:'sheet-head'},h('p',{class:'kicker'},kicker),h('h2',{},title),description?h('p',{class:'sheet-desc'},description):null),...body);
     return h('section',{class:'settings'},h('header',{class:'screen-head stacked'},h('h1',{},'設定'),h('p',{class:'secondary'},'この端末の表示と、すべてのデッキ共通の学習設定。')),...(platform.nativeSync?[nativeSyncSettings()]:[]),...(typeof platform.backupStatus==='function'?[backupDetail()]:[]),platform.onScreenChange?h('section',{class:'sheet host-settings','data-host-settings':''}):null,
+      ...((platform.audioDownloads||platform.audioDownloadFailure)?[audioDownloadsDetail()]:[]),
       sheet('appearance','表示','この端末の見え方','色はこの端末だけに保存します。学習履歴や他の端末の色は変わりません。',h('div',{class:'control-grid'},themePicker(),languagePicker()),h('label',{class:'swipe-grading-setting'},swipe,h('span',{},'スワイプで採点（この端末のみ）')),h('p',{id:'swipe-grading-help',class:'secondary'},'初期設定はオフです。左で「もう一度」、右で「正解」。'),h('label',{class:'swipe-grading-setting'},h('input',{type:'checkbox',checked:intervalHints,'data-interval-hints':'',onchange:async event=>{if(updateBoundary?.held)return;intervalHints=event.target.checked;const end=beginFlight('preference');try{await preferences.setItem('nihongo.interval-hints.v1',String(intervalHints));}catch{message('この端末に表示設定を保存できません。');}finally{end();}}}),h('span',{},'次の復習までの間隔を表示（この端末のみ）'))),
       ...(legacyHistory?[sheet('legacy-display','引き継ぎ','引き継いだ表示設定',null,...legacyHistory.decks.map(d=>h('p',{class:'secondary','data-legacy-settings':''},`${d.deckId} · 一日の新規 ${d.preferences.newPerDay} · 読み方 ${d.preferences.mode} · 全文英訳 ${d.preferences.gloss} · 文脈 ${d.preferences.zoom}`)),h('p',{class:'secondary'},themePreferenceSet?'色はこの端末の指定を使っています。':'以前の色指定は未設定です。自動表示のまま、設定値は書き込んでいません。'))]:[]),
       sheet('pace','学習','共通の学習ペース','1日の新規カード上限と学習日の区切りは、すべてのデッキ共通です。変更は翌日の学習日から有効です。',h('div',{class:'setting-row'},h('label',{},'1日の新規カード上限',newCount),button('翌日から変更',()=>{const value=newCount.valueAsNumber;if(!Number.isSafeInteger(value)||value<1||value>200)return message('1日の新規カード上限は1〜200の整数を入力してください。');savePace('newPerDayTotal',newCount,value);},{disabled:weekdayPolicy})),weekdayPolicy?h('p',{class:'secondary','data-weekday-policy-active':''},'曜日ごとの新規カード上限を使っています。今日のカスタム学習パネルで変更できます。'):null,
@@ -1294,7 +1702,8 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     if(pop&&rating&&!editing&&current?.revealed){event.preventDefault();closePopover();grade(Number(rating),'key');return;}
     if(pop||document.querySelector('dialog[open]')||event.target.closest?.('button,input,select,textarea,summary,a,audio,video,[contenteditable]'))return;
     if(screen==='study'&&current&&event.key.toLowerCase()==='p'){
-      if(trialAudioMember(current)){event.preventDefault();playTrialAudio();}
+      if(sharedAudioDeclared){if(current.revealed&&(current.audioPlaying||current.audioResult?.status==='ready')){event.preventDefault();toggleSharedAudio(current);}return;}
+      if(trialAudioReady(current)){event.preventDefault();playTrialAudio(current);}
       return;
     }
     if(event.key.toLowerCase()==='u'&&lastReview){event.preventDefault();undoLast();return;}
@@ -1372,12 +1781,42 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   observeSharedActivity();render();
   const loadTrialAudio=()=>{
     if(disposed||updateBoundary?.held||document.visibilityState==='hidden')return;
+    if(sharedAudioDeclared){
+      if(sharedAudioRootState==='idle'||sharedAudioRootState==='offline')loadSharedAudioRoot();
+      if(current?.audioResult?.status==='offline-missing'){
+        current.audioResult=null;current.audioResolverKey=null;
+      }
+      syncSharedAudioCurrent();
+      return;
+    }
     trialAudio.load().then(()=>{if(!disposed)syncTrialAudioControl();},()=>{if(!disposed)syncTrialAudioControl();});
   };
+  const audioDownloadsChanged=()=>{
+    if(disposed)return;
+    const snapshot=platform.audioDownloads.read(),previous=audioDownloadsSnapshot,{state}=snapshot;
+    audioDownloadsSnapshot=snapshot;
+    const suspended=['paused','disposed'].includes(state),resumed=audioDownloadsSuspended&&!suspended;
+    audioDownloadsSuspended=suspended;
+    const completed=previous?.state==='downloading'&&['saved','error','cancelled'].includes(state);
+    const installed=previous&&snapshot.installedPacks!==previous.installedPacks;
+    const retry=resumed||completed||installed||state==='saved'&&previous?.state!=='saved';
+    if(suspended){
+      if(sharedAudioDeclared)invalidateDownloadedAudio();
+    }else{
+      if(resumed||['saved','idle','cancelled'].includes(state))audioDownloadActionFailed=false;
+      if(retry){
+        retryDownloadedAudio();
+        loadTrialAudio();
+      }
+    }
+    syncAudioDownloads();
+  };
+  const unsubscribeAudioDownloads=platform.audioDownloads?.subscribe(audioDownloadsChanged);
+  if(platform.audioDownloads)audioDownloadsChanged();
   win.addEventListener('online',loadTrialAudio);win.addEventListener('focus',loadTrialAudio);document.addEventListener('visibilitychange',loadTrialAudio);
   loadTrialAudio();
   backupObserver.start();
   reconcileUnknownFactoryRows();
   if(platform.storageKind==='native-worker-prod'&&platform.nativeSync)updateStatus().catch(()=>{});
-  return Object.freeze({requestUpdateBoundary:token=>updateBoundary.request(token),readUpdateState:()=>updateBoundary.read(),releaseUpdateBoundary:token=>updateBoundary.release(token),subscribeUpdateState:listener=>updateBoundary.subscribe(listener),showTask:(...args)=>{if(updateBoundary.held)return;sessionShown=0;return start(...args);},refreshStatus:updateStatus,read:()=>({screen,module,current,busy:busy||typedBusy||customBusy,pendingIntent,theme,themePreferenceSet,interfaceLanguage}),dispose(){disposed=true;updateBoundary.dispose();root.removeEventListener('input',updateDraftWake);root.removeEventListener('change',updateDraftWake);backupObserver.dispose();win.removeEventListener('focus',backupWake);document.removeEventListener('visibilitychange',backupWake);nativeStatusGeneration++;clearSyncRetry();win.clearTimeout(outboxSyncTimer);win.clearTimeout(saveBacklogTimer);win.clearTimeout(toastTimer);win.clearTimeout(finishGuardTimer);panelObserver?.disconnect();budgetWatcher?.dispose();win.removeEventListener('online',availabilityWake);win.removeEventListener('online',reconnectSync);win.removeEventListener('offline',availabilityWake);win.removeEventListener('focus',budgetWake);document.removeEventListener('visibilitychange',budgetWake);win.removeEventListener('focus',autoSync);document.removeEventListener('visibilitychange',autoSync);platform.nativeSync?.dispose?.();factoryStatuses.dispose();rubyLayout.dispose();current?.timer.dispose();parkedStudy?.current.timer.dispose();closePopover();unsubscribe();unsubscribeSyncState?.();dark.removeEventListener('change',darkChanged);document.removeEventListener('keydown',onKey);document.removeEventListener('keydown',escape);document.removeEventListener('pointerdown',outsidePopover,true);win.removeEventListener('online',loadTrialAudio);win.removeEventListener('focus',loadTrialAudio);document.removeEventListener('visibilitychange',loadTrialAudio);trialAudio.dispose();root.replaceChildren();}});
+  return Object.freeze({requestUpdateBoundary:token=>updateBoundary.request(token),readUpdateState:()=>updateBoundary.read(),releaseUpdateBoundary:token=>updateBoundary.release(token),subscribeUpdateState:listener=>updateBoundary.subscribe(listener),showTask:(...args)=>{if(updateBoundary.held)return;sessionShown=0;return start(...args);},refreshStatus:updateStatus,read:()=>({screen,module,current,busy:busy||typedBusy||customBusy,pendingIntent,theme,themePreferenceSet,interfaceLanguage}),dispose(){unsubscribeAudioDownloads?.();stopTrialAudio();studyAudio?.dispose?.();disposed=true;updateBoundary.dispose();root.removeEventListener('input',updateDraftWake);root.removeEventListener('change',updateDraftWake);backupObserver.dispose();win.removeEventListener('focus',backupWake);document.removeEventListener('visibilitychange',backupWake);nativeStatusGeneration++;clearSyncRetry();win.clearTimeout(outboxSyncTimer);win.clearTimeout(saveBacklogTimer);win.clearTimeout(toastTimer);win.clearTimeout(finishGuardTimer);panelObserver?.disconnect();budgetWatcher?.dispose();win.removeEventListener('online',availabilityWake);win.removeEventListener('online',reconnectSync);win.removeEventListener('offline',availabilityWake);win.removeEventListener('focus',budgetWake);document.removeEventListener('visibilitychange',budgetWake);win.removeEventListener('focus',autoSync);document.removeEventListener('visibilitychange',autoSync);platform.nativeSync?.dispose?.();factoryStatuses.dispose();rubyLayout.dispose();current?.timer.dispose();parkedStudy?.current.timer.dispose();closePopover();unsubscribe();unsubscribeSyncState?.();dark.removeEventListener('change',darkChanged);document.removeEventListener('keydown',onKey);document.removeEventListener('keydown',escape);document.removeEventListener('pointerdown',outsidePopover,true);win.removeEventListener('online',loadTrialAudio);win.removeEventListener('focus',loadTrialAudio);document.removeEventListener('visibilitychange',loadTrialAudio);trialAudioPlaybackGeneration++;trialAudio?.dispose();root.replaceChildren();}});
 }

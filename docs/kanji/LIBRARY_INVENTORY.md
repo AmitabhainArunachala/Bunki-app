@@ -17,7 +17,7 @@ The report is external runtime evidence, not a repository asset. `--out` is requ
 
 Every consumed file has a path, SHA-256 and byte count. Repeated reads and the final boundary reject changed bytes; optional family presence must also remain stable. The report contains no clock, random identifier or absolute checkout path. Its Git HEAD is contextual: the input hashes identify the actual working-tree snapshot, including uncommitted inputs. Freeze those inputs before treating a report as the accepted slice inventory.
 
-## Current measured denominators
+## Frozen slice-4 denominators
 
 The slice-4 snapshot uses the tables at base `0186490e1c356c9b295c252747dd3184a3d7efb9` plus the new working-tree family asset described below. These counts are produced from the actual catalog, tables, dictionary shards and article files, not copied from the stale 70-passage `data/manifest.json`. Later runs must use their own input hashes.
 

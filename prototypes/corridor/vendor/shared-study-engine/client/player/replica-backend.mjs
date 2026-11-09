@@ -10,7 +10,7 @@ import {createRestDayEvidenceReader} from './rest-day-evidence.mjs';
 import {createProjectionView} from './projection-view.mjs';
 import {StoreError} from '../store.mjs';
 import { canonicalStringify, payloadHash } from '../schema/event.mjs';
-import { dayBounds, studyDayAllowance } from '../replay.mjs';
+import { studyDayAllowance } from '../replay.mjs';
 import { servable,nextStep,createScheduler } from '../vendor/engine.js';
 import * as fsrsApi from '../vendor/ts-fsrs.mjs';
 import {orderBacklogReviews} from './backlog-order.mjs';
@@ -247,7 +247,7 @@ export async function createReplicaBackend({ store, engine, catalog, pin = null,
     const data = { ...(attempt.mode==='scored'?{ratingPolicy:'chosen-v1'}:{}),...(attempt.session?{session:clone(attempt.session)}:{}),taskKey: attempt.taskKey, parent: attempt.parent, contentRevision: attempt.contentRevision, rawRating,
       attempt: { id: attempt.id, mode: attempt.mode, revealed: true, foregroundValid: true, thinkMs, helpBeforeAnswer: false },
       hesitation: { ...evidence, signalIds: signals.map(c => c.id) }, learnAhead: attempt.learnAhead===true };
-    const bounds = dayBounds(reviewedAt, projection.settings.learnerTimezone);
+    const bounds = studyDayAllowance(projection, reviewedAt);
     const permit = attempt.mode==='practice'?null:Object.values(projection.permits).find(p => p.install === store.scope.installation && !p.usedBy && p.startsAt === bounds.startsAt && p.endsAt > reviewedAt);
     if (permit) data.permitId = permit.id;
     return data;
@@ -291,17 +291,16 @@ export async function createReplicaBackend({ store, engine, catalog, pin = null,
     return reviewAlternative(attempt,rating,thinkMs,previewEntry(attempt,thinkMs)).intent;
   }
   function queue({ module = 'all',learningOnly=false,backlog=false } = {}) {
-    const bounds = dayBounds(now(), projection.settings.learnerTimezone);
-    const hasPermit = Object.values(projection.permits).some(p => p.install === store.scope.installation && !p.usedBy && p.startsAt <= now() && p.endsAt > now());
+    const at=now(),bounds = studyDayAllowance(projection, at);
+    const hasPermit = Object.values(projection.permits).some(p => p.install === store.scope.installation && !p.usedBy && p.startsAt <= at && p.endsAt > at);
     // Build once only if this call reaches a sibling-sensitive candidate. The
     // private index is read-only after construction and never survives a call.
-    // Queue uses recorded dayStart, unlike custom sessions' inclusive at range.
     let reviewedByLexicalKey=null;
     const hasReviewedSibling=task=>{
       if(reviewedByLexicalKey===null){
         reviewedByLexicalKey=new Map();
         for(const review of projection.reviews){
-          if(review.undoneAt||review.dayStart!==bounds.startsAt)continue;
+          if(review.undoneAt||!(review.at>=bounds.startsAt&&review.at<bounds.endsAt))continue;
           const lexicalKey=projection.tasks[review.taskKey].lexicalKey;
           let tasks=reviewedByLexicalKey.get(lexicalKey);
           if(!tasks){tasks=new Set();reviewedByLexicalKey.set(lexicalKey,tasks);}
@@ -317,7 +316,7 @@ export async function createReplicaBackend({ store, engine, catalog, pin = null,
       if ((projection.settings.topicsOff[t.module] ?? []).includes(t.group)) return false;
       if (!projection.introductions[t.taskKey] && !hasPermit) return false;
       if(learningOnly){if(!t.card||![1,3].includes(t.card.state)||!Number.isFinite(Date.parse(t.card.due)))return false;}
-      else if (!servable(t.card, new Date(now()), {dayEnd:bounds.endsAt-1})) return false;
+      else if (!servable(t.card, new Date(at), {dayEnd:bounds.endsAt-1})) return false;
       if ((!t.card || t.card.state === 0 || t.card.state === 2) && hasReviewedSibling(t)) return false;
       return true;
     }).sort((a, b) => {
@@ -325,7 +324,7 @@ export async function createReplicaBackend({ store, engine, catalog, pin = null,
       return Number(!x.card) - Number(!y.card) || Number(y.priority) - Number(x.priority) ||
         (Date.parse(x.card?.due ?? '') || 0) - (Date.parse(y.card?.due ?? '') || 0);
     });
-    return backlog&&!learningOnly?rankedBacklog(ready,now()):ready;
+    return backlog&&!learningOnly?rankedBacklog(ready,at):ready;
   }
   function sitting({module='all',ahead=false}={}){
     const ready=queue({module}),learning=queue({module,learningOnly:true}).map(e=>({id:e.taskKey,due:Date.parse(projection.tasks[e.taskKey].card.due)}));
@@ -376,7 +375,7 @@ export async function createReplicaBackend({ store, engine, catalog, pin = null,
     })();
     try{return await record.pending;}finally{record.pending=null;}
   }
-  function customSession(input={}){return selectCustomSession(projection,catalogEntries(),input,{now:now(),dayStart:dayBounds(now(),projection.settings.learnerTimezone).startsAt,dayEnd:dayBounds(now(),projection.settings.learnerTimezone).endsAt-1,installation:store.scope.installation});}
+  function customSession(input={}){const at=now(),bounds=studyDayAllowance(projection,at);return selectCustomSession(projection,catalogEntries(),input,{now:at,dayStart:bounds.startsAt,dayEnd:bounds.endsAt-1,installation:store.scope.installation});}
   let newOverride=null;
   const todayAllowance=()=>studyDayAllowance(projection,now());
   const addNewToday=increment=>changeTodayAllowance('newTodayOverride',increment);

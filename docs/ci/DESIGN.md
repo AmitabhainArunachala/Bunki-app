@@ -12,7 +12,11 @@ contracts, timeout cleanup, and assertions stay intact. `runGates()` continues t
 execute gates and validate their reports. New orchestration selects subsets; it
 cannot redefine what passing means. A parity command prints and compares the base
 revision's names with the candidate's names. Missing names fail. Supplemental
-checks preserve stronger assertions found outside the current 135-gate battery.
+checks preserve stronger assertions found outside the canonical battery. Current
+membership comes from `batteryGates()` in
+[`scripts/verify-release-gates.mjs`](../../scripts/verify-release-gates.mjs) and
+`supplementalGates()` in [`scripts/ci/supplemental.mjs`](../../scripts/ci/supplemental.mjs),
+not the historical gate counts below.
 
 The workflow starts planning, the fast lane, build, and the single macOS native
 job without the old native-before-Linux dependency. Independent matrix jobs use
@@ -44,16 +48,18 @@ contract verifiers, and the frozen deck no-diff checks. These gates are removed
 from the slower matrix, not repeated. The deck check retains private and public
 profiles, frozen IDs, tracked-output and untracked-output checks, the existing
 `.apkg` exception, Python assertions, and deck/player tests with their pinned
-Python dependencies installed.
+Python dependencies installed. Canonical N2/N1/senmon/kotoba-master reproduction
+has a separate frozen content producer and external source requirement; see
+[Frozen canonical deck reproduction](../../scripts/ci/CANONICAL_DECKS.md).
 
-| Linux work                     |                                           Initial prediction | Scheduling                                          |
-| ------------------------------ | -----------------------------------------------------------: | --------------------------------------------------- |
-| Fast checks                    |                                          Under 10 min target | Parallel early lanes if measured sum exceeds budget |
-| Practice history / WebKit      |                                                    15.98 min | Dedicated shard                                     |
-| Practice history / Chromium    |                                                    12.10 min | Dedicated shard                                     |
-| Remaining gates                | Approximately 14 min per shard before extracting fast checks | Ten duration-balanced shards                        |
-| Build and packaged-asset smoke |                                            Measure on branch | Once, before artifact-dependent gates               |
-| Native Swift and RPC           |                                            Measure on branch | One macOS job, parallel to Linux                    |
+| Linux work                     |                                           Initial prediction | Scheduling                                                             |
+| ------------------------------ | -----------------------------------------------------------: | ---------------------------------------------------------------------- |
+| Fast checks                    |                                          Under 10 min target | Parallel early lanes if measured sum exceeds budget                    |
+| Practice history / WebKit      |                                                    15.98 min | Dedicated shard                                                        |
+| Practice history / Chromium    |                                                    12.10 min | Dedicated shard                                                        |
+| Remaining gates                | Approximately 14 min per shard before extracting fast checks | At least ten duration-balanced shards; split to fit execution ceilings |
+| Build and packaged-asset smoke |                                            Measure on branch | Once, before artifact-dependent gates                                  |
+| Native Swift and RPC           |                                            Measure on branch | One macOS job, parallel to Linux                                       |
 
 The initial 12-bin estimate uses the complete f938 log: 135 gates and 166.76
 minutes between battery start and final gate completion. Longest-processing-time
@@ -66,10 +72,14 @@ explicit plan metadata. Unknown or new gates receive conservative weights, never
 disappear. Timings change allocation only, never required membership.
 
 Cold setup, artifact transfer, and supplemental gates need headroom under the
-40-minute target. Step timeouts must exceed twice their measured healthy duration;
-the existing 20-minute gate default needs a scoped increase for 16-minute history
-verification. Gate timeouts and job timeouts are distinct. A retry may exceed the
-ordinary 40-minute target and is reported honestly.
+40-minute target. Execution ceilings are separate from measured or predicted
+durations: [`scheduling-budgets.mjs`](../../scripts/ci/scheduling-budgets.mjs)
+derives each shard's gate-step and job limits from its actual gate timeouts plus
+explicit wrapper, receipt, setup and retention reservations. The planner splits
+work that cannot fit the hosted limit, and the workflow consumes those limits
+from the matrix. Retry budgets cover only the failed gates in their original
+dependency order. A retry may exceed the ordinary 40-minute target and is reported
+honestly; a larger execution ceiling is not a new timing measurement.
 
 ## Artifact and proof
 
@@ -89,6 +99,26 @@ native/build/supplemental outcomes, gate attempts, and completion status. A
 docs-only receipt explicitly has `scope: docs`; it is never full-battery proof.
 The policy digest covers the workflow and verification implementation, not just
 the list of gate names. Receipt filenames keyed by tree are indexes, not proof.
+
+Every accepted gate attempt also carries a fresh, nonce-bound evidence receipt
+for its declared proof contract. The runner checks source/input identity before
+and after execution, as well as the verified site when supplied. Missing producer
+evidence or changed source/artifact bytes invalidates a zero-exit result. Cached
+full-proof admission checks the accepted attempt and its planned proof contract
+again. [`gate-evidence.mjs`](../../scripts/ci/gate-evidence.mjs) owns those
+contracts; [`verification-admission.mjs`](../../scripts/ci/verification-admission.mjs)
+owns the common admission checks and acceptance-environment filtering.
+
+Framework file obligations and discovery universes are reviewed independently in
+[`framework-rosters.json`](../../scripts/ci/framework-rosters.json). Adding or
+removing a discovered test file requires updating the applicable universe and
+gate roster. Framework receipts must match that roster and account for every
+collected test with a passing completion; filtered, skipped, retried and
+expected-failure cases do not satisfy acceptance. Supply each conditional test's
+browser, artifact and evidence prerequisites through the supported gate inputs.
+The executable checks live in
+[`framework-rosters.mjs`](../../scripts/ci/framework-rosters.mjs) and
+[`framework-receipt.mjs`](../../scripts/ci/framework-receipt.mjs).
 
 The only promotion is:
 

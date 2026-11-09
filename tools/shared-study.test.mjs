@@ -3,7 +3,7 @@ import { Buffer } from 'node:buffer';
 import assert from 'node:assert/strict';
 import process from 'node:process';
 import { URL, URLSearchParams } from 'node:url';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   existsSync,
   readFileSync,
@@ -21,6 +21,7 @@ import vm from 'node:vm';
 import ts from 'typescript';
 import {
   decodeSharedContent,
+  loadSharedContent,
   SHARED_DECKS,
   moduleForSharedDeck,
 } from '../prototypes/corridor/shared-study-content.mjs';
@@ -28,6 +29,8 @@ import {
   createBunkiStudyAdapter,
   createBunkiAttempt,
 } from '../prototypes/corridor/study-engine-adapter.mjs';
+import { attachSharedStudyAudioPreparation } from '../prototypes/corridor/shared-study-audio-preparation.mjs';
+import { createSharedStudyStorage } from '../prototypes/corridor/shared-study-storage.mjs';
 import {
   createStudyEngine,
   createMemoryAdapter,
@@ -220,6 +223,24 @@ function productContext(path, names, dependencies) {
   vm.runInContext(names.map((name) => productFunction(path, name)).join('\n'), context);
   return context;
 }
+// Keep module initialization and the singleton in the actual runtime's own scope.
+function productModule(path, imports, dependencies) {
+  const compiled = ts.transpileModule(readFileSync(new URL(path, root), 'utf8'), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+  });
+  const exports = {};
+  new vm.Script(compiled.outputText, { filename: path }).runInNewContext({
+    ...dependencies,
+    URLSearchParams,
+    exports,
+    require: (specifier) => {
+      if (!Object.hasOwn(imports, specifier))
+        throw Error(`Unexpected product import: ${specifier}`);
+      return imports[specifier];
+    },
+  });
+  return exports;
+}
 
 describe('Bunki canonical shared study consumer', () => {
   it('maps each shared host door to the canonical initial-module API', () => {
@@ -275,8 +296,52 @@ describe('Bunki canonical shared study consumer', () => {
     async function mount({ host, phone = false }) {
       const queries = [],
         created = [],
-        values = new Map();
-      const context = productContext('shared-study-runtime.mjs', ['sharedStudyRuntime'], {
+        values = new Map(),
+        store = Object.freeze({}),
+        backend = Object.freeze({});
+      const loadCanonical = vi.fn(() => {
+        throw Error('unexpected-canonical-audio-start');
+      });
+      const openDatabase = vi.fn(() => {
+        throw Error('unexpected-profile-storage-open');
+      });
+      const attach = vi.fn((options) =>
+        attachSharedStudyAudioPreparation({ ...options, eventTarget: {}, loadCanonical }),
+      );
+      let loaded;
+      const imports = {
+        './shared-study-content.mjs': {
+          loadSharedContent: async () => {
+            loaded = await loadSharedContent({
+              fetcher: async (url) => ({
+                ok: true,
+                arrayBuffer: async () => Uint8Array.from(readFileSync(url)).buffer,
+              }),
+            });
+            return loaded;
+          },
+        },
+        './shared-study-storage.mjs': {
+          createSharedStudyStorage: (options) =>
+            createSharedStudyStorage({ ...options, indexedDB: { open: openDatabase } }),
+        },
+        './study-engine-adapter.mjs': {
+          createBunkiStudyAdapter: async (options) => {
+            const adapter = {
+              ...options,
+              store,
+              backend,
+              catalog: options.content.catalog,
+              platform: {},
+            };
+            created.push(adapter);
+            return adapter;
+          },
+        },
+        './shared-study-audio-preparation.mjs': { attachSharedStudyAudioPreparation: attach },
+        './vendor/shared-study-engine/client/engine.mjs': { dayBounds, payloadHash },
+      };
+      const context = productModule('shared-study-runtime.mjs', imports, {
         bunkiSharedStudyHost: host,
         location: { search: '?sharedStudy=preview' },
         matchMedia: (query) => {
@@ -289,17 +354,25 @@ describe('Bunki canonical shared study consumer', () => {
           getItem: (key) => values.get(key) || null,
           setItem: (key, value) => values.set(key, value),
         },
-        loadSharedContent: async () => ({ content: small }),
-        createSharedStudyStorage: () => ({ isolated: true }),
-        createBunkiStudyAdapter: async (options) => {
-          created.push(options);
-          return options;
-        },
       });
-      vm.runInContext('let runtime=null;', context);
       const result = await context.sharedStudyRuntime();
       expect(await context.sharedStudyRuntime()).toBe(result);
       expect(created).toHaveLength(1);
+      expect(attach).toHaveBeenCalledTimes(1);
+      expect(attach.mock.calls[0][0].adapter).toBe(created[0]);
+      expect(attach.mock.calls[0][0].binding).toBe(loaded.binding);
+      expect(result).not.toBe(created[0]);
+      expect(result.store).toBe(store);
+      expect(result.backend).toBe(backend);
+      expect(result.catalog).toBe(loaded.content.catalog);
+      expect(result.platform.getAudioPreparationState()).toEqual({ state: 'pending' });
+      expect(result.ensureAudioPreparation).toBeTypeOf('function');
+      await expect(result.exportCurrentAudioSource()).rejects.toThrow(
+        'shared-audio-export-not-ready',
+      );
+      expect(result.platform.getAudioPreparationState()).toEqual({ state: 'pending' });
+      expect(loadCanonical).not.toHaveBeenCalled();
+      expect(openDatabase).not.toHaveBeenCalled();
       return { result, queries };
     }
     for (const phone of [false, true]) {

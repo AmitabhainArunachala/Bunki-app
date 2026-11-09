@@ -18,7 +18,7 @@
   },
   "source": {
     "repository": "nihongo-srs",
-    "commit": "d31317b809606e0889dba5f85b87c24bdf46fa30",
+    "commit": "8b9c80a7338009f16fe44068080446bbce51f7ea",
     "mode": "committed",
     "changedFiles": []
   },
@@ -29,7 +29,7 @@
   "behavior": {
     "client/engine.mjs": "5253648cf520052ffd76feacdcf6e9d3ee60d34914a003e167362d6fe5d025fc",
     "client/replay.mjs": "642ca6b6759de4cb137b3041670dab5457ad7d600603c58136bd923d14008686",
-    "client/player/replica-backend.mjs": "dbf7b4dcf3fa720d2d007b29786c6ab0594a6218a1284e2955a34531e3ee4876",
+    "client/player/replica-backend.mjs": "557ef048e5c7a9951a793863b3a364c335c66e88e165f067388bd78d4030a402",
     "client/store.mjs": "f166afe36c091fe336b2056f0c3013c45d2aeba47fe90aa2c459de026cae23b1",
     "client/player/study-sessions.mjs": "e6067b6172fcad7c0d4ec789c9d1284f01be633cdb2f4737a280bd03aadaf91c",
     "client/app/local-budget.mjs": "f561b0f793d160cd5de57f52fca5a52025ae2973de7e8b7333af77c1012d6fbd",
@@ -42,19 +42,99 @@
   "closureFormat": "nihongo-study-engine-manifest/v2",
   "files": [
     {
+      "path": "client/app/accepted-audio-export.d.mts",
+      "bytes": 3466,
+      "sha256": "e50aebfd07c4f8e27e63f2839334cc859eedd4bc3e77c7dbb3b8b0a418320bd5"
+    },
+    {
+      "path": "client/app/accepted-audio-export.mjs",
+      "bytes": 19081,
+      "sha256": "a987d9fb3dcd9a253765245a154814163d6206105f1f189f985dfad9c162062c"
+    },
+    {
+      "path": "client/app/accepted-audio-host.d.mts",
+      "bytes": 1068,
+      "sha256": "519d9b14dcb798a28f1250798cb4da0543ab89bf2e2589b6b37d1d2174d2447a"
+    },
+    {
+      "path": "client/app/accepted-audio-host.mjs",
+      "bytes": 4043,
+      "sha256": "6d833557dc1a67d0514c179de57f7765db954b04192904a09edbb0daf6d3f070"
+    },
+    {
       "path": "client/app/app.css",
       "bytes": 58117,
       "sha256": "af7aa8515e26b1562fbb0b12b5df9024c693dc74e47645a03a96a32cd97de1f1"
     },
     {
       "path": "client/app/app.mjs",
-      "bytes": 169025,
-      "sha256": "1b69470ebd6bf78b3fbbac3bae18788c41d23b1525ed688298d2827cf956e361"
+      "bytes": 197241,
+      "sha256": "85d55b6c4e77dbb7329d6a78e4fc39d03d94d9a603998bd380e397e9ccaae9d8"
+    },
+    {
+      "path": "client/app/audio-pack-admission.d.mts",
+      "bytes": 4855,
+      "sha256": "354d2266b1e7133c8ccac4082271a07359bfcad262bc185ef8b60706f7c1ef25"
+    },
+    {
+      "path": "client/app/audio-pack-admission.mjs",
+      "bytes": 16929,
+      "sha256": "01bc02b65e5d90aca96e74f717205d3d78d4dc7cc0a792be7de0de46ffd5adaf"
+    },
+    {
+      "path": "client/app/audio-pack-manager.d.mts",
+      "bytes": 1915,
+      "sha256": "920fcf75c8b13c6936597f584ee0594c0cd0692cc1023ebbfa00d116cad23f6b"
+    },
+    {
+      "path": "client/app/audio-pack-manager.mjs",
+      "bytes": 24772,
+      "sha256": "8de7ae68ba187c8d337136bb22d1d8081784ef75fe4e3ff0baec0435af248f74"
+    },
+    {
+      "path": "client/app/audio-pack-source.d.mts",
+      "bytes": 1422,
+      "sha256": "9636bb1c82278a288b1abfba2a930f499551c853278dcf5ba8e80c630de84a44"
+    },
+    {
+      "path": "client/app/audio-pack-source.mjs",
+      "bytes": 26335,
+      "sha256": "26cbec1485e78873aee762636595ca5a264e2fba7e89e09d40a5491e9cb56de7"
+    },
+    {
+      "path": "client/app/audio-release.d.mts",
+      "bytes": 3548,
+      "sha256": "0c4e6c846e26fae4182083eb4671fba39a93308f5b3a3aa1e41925151e8fa12b"
+    },
+    {
+      "path": "client/app/audio-release.mjs",
+      "bytes": 48759,
+      "sha256": "42683e73f7d6d6dc17e816a2464556721e795d62039164ae37d11c13d0a6ef76"
+    },
+    {
+      "path": "client/app/audio-resources.d.mts",
+      "bytes": 1440,
+      "sha256": "131557653f3f6f960a4892617fb39eb9cf52d49b206a72d85c6a7e219012cfcb"
+    },
+    {
+      "path": "client/app/audio-resources.mjs",
+      "bytes": 11728,
+      "sha256": "d362f62b7f7610f09cf5be8f7ce46e445877800cddb7cf22e3e151b969586d6c"
     },
     {
       "path": "client/app/backup-status.mjs",
       "bytes": 4935,
       "sha256": "88167572be902c77c13fd231f522bb0ef32d19e64e5d70d047e88f9018bac87d"
+    },
+    {
+      "path": "client/app/browser-audio-pack-host.d.mts",
+      "bytes": 2461,
+      "sha256": "120bb289b62f148334c9cf701d56a314f1ed30807b8998d26f8b00126b013320"
+    },
+    {
+      "path": "client/app/browser-audio-pack-host.mjs",
+      "bytes": 10045,
+      "sha256": "61bad5c15fabc218f140dab9ca26e64851df61cdfeea822b7ef4a3260190452c"
     },
     {
       "path": "client/app/corpus-inventory.mjs",
@@ -1338,8 +1418,8 @@
     },
     {
       "path": "client/app/interface-language.mjs",
-      "bytes": 58266,
-      "sha256": "1c8c23d350b5614e4552d59ad8e8b429f15c91ab4e54178ef391c06034860b9b"
+      "bytes": 60552,
+      "sha256": "9c0c9893e45d957627c4a59af3c8d13fbbd353fe011ad7e7baf2b5c10b61a4bf"
     },
     {
       "path": "client/app/local-budget.mjs",
@@ -1352,6 +1432,16 @@
       "sha256": "0ca8b7879a5f06afacf85dfc9005c378699eecc26cbb7fbf64ccce7cef292756"
     },
     {
+      "path": "client/app/private-audio-demand.d.mts",
+      "bytes": 532,
+      "sha256": "ddcef92f296d24151e1e39b0b86c07012d96fa2224965304f16ccf33785618bb"
+    },
+    {
+      "path": "client/app/private-audio-demand.mjs",
+      "bytes": 8133,
+      "sha256": "67c3d8ba723053eb6d7c45452ed488e66775004254c346f1c327f90f0e710ef4"
+    },
+    {
       "path": "client/app/prod-native-sync.mjs",
       "bytes": 11599,
       "sha256": "12c97e5245dd2c5af5606bbe04786002b6b2a1ec1312a8cffff8ef3a07c2d341"
@@ -1360,6 +1450,16 @@
       "path": "client/app/session-timings.mjs",
       "bytes": 9542,
       "sha256": "bda13527e48b5ae2694fa3a5a281cd7696f6600c1b852b6d39283ae2e6395a93"
+    },
+    {
+      "path": "client/app/study-audio.d.mts",
+      "bytes": 1564,
+      "sha256": "6793ca5e6ae3a892c6a3825484759fd646cbdb9a53c876544ff715f2880531ea"
+    },
+    {
+      "path": "client/app/study-audio.mjs",
+      "bytes": 16514,
+      "sha256": "bbe4cebeea058196784de81e97abf2210665b95d40945983c942825dc98369b4"
     },
     {
       "path": "client/app/study-loop.mjs",
@@ -1380,6 +1480,26 @@
       "path": "client/app/update-boundary.mjs",
       "bytes": 3562,
       "sha256": "4e12a612b5aa43e65ed26ebc22667714ba62db44e92d67a28484eeef82669a9e"
+    },
+    {
+      "path": "client/audio/accepted-demand.d.mts",
+      "bytes": 3842,
+      "sha256": "7a987cc14d83a8f37476bffdf502c8b3c64e41ebf0c33591bd6277a5ea2c7726"
+    },
+    {
+      "path": "client/audio/accepted-demand.mjs",
+      "bytes": 22851,
+      "sha256": "2cdc6d347adeb8c00a82dfcd12666695960e813634f016a9949b8f0aac22ee7d"
+    },
+    {
+      "path": "client/audio/card-speech-plan.mjs",
+      "bytes": 24104,
+      "sha256": "9a9b4ab046b60fe053584508474e609a01dba7e2c6d5cab43e1b1f7275f5b4ef"
+    },
+    {
+      "path": "client/audio/speech-input.mjs",
+      "bytes": 16128,
+      "sha256": "640a36affd598d8161a631d0e5cb274963afbde26f1eca4a9af905ffd6624e92"
     },
     {
       "path": "client/content/translation-coverage.mjs",
@@ -1488,8 +1608,8 @@
     },
     {
       "path": "client/player/replica-backend.mjs",
-      "bytes": 38474,
-      "sha256": "dbf7b4dcf3fa720d2d007b29786c6ab0594a6218a1284e2955a34531e3ee4876"
+      "bytes": 38323,
+      "sha256": "557ef048e5c7a9951a793863b3a364c335c66e88e165f067388bd78d4030a402"
     },
     {
       "path": "client/player/rest-day-evidence.mjs",
@@ -1525,6 +1645,16 @@
       "path": "client/schema/event.mjs",
       "bytes": 14944,
       "sha256": "cc0204a7f93ae29312b77e13bab68719b14f489f5d4c2e78f84162659ec4928e"
+    },
+    {
+      "path": "client/storage/audio-pack-indexeddb.d.mts",
+      "bytes": 1256,
+      "sha256": "40a10bc9b6d68f86a124284fa98baa5d66971c08ec4e8f75a687fbb6044a40d3"
+    },
+    {
+      "path": "client/storage/audio-pack-indexeddb.mjs",
+      "bytes": 7752,
+      "sha256": "499a2ff6566350e3242fad2e8380db0b2673f77c59ff5ad23d3b107a3a7fc9c3"
     },
     {
       "path": "client/storage/indexeddb.mjs",
@@ -1592,5 +1722,5 @@
       "sha256": "adab18734248871867be9cf62fa25b58cce3f3f37a34a81e714b0b1b26e10dba"
     }
   ],
-  "closureSha256": "f7600a7fb831b7d7f9ac065d98f2aee7fe1bda93c1662b32557d3cc943ce8492"
+  "closureSha256": "ca0832fd8916f6df169cbf609956abef3d8fd3c87657939a8c25b260fd57f714"
 }

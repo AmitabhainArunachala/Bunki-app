@@ -14,7 +14,7 @@ export const LEGACY = Object.freeze([
   { name: 'closeSealStrip', file: 'corridor.js', returnKind: 'to adopt', restores: ['focus'],
     currentBehaviour: 'closes the seal strip and, when restoreFocus is set, gives focus back to the prose word anchor; nothing else returns' },
   { name: 'history.back', file: 'corridor.js', returnKind: 'to adopt', restores: ['view'],
-    sites: ['corridor.js:5691', 'corridor.js:5749'],
+    sites: ['corridor.js:5692', 'corridor.js:5750'],
     currentBehaviour: 'browser history navigation out of a sheet or route; the previous view re-renders from state; no anchor, selection, focus or scroll guarantee' },
 ]);
 

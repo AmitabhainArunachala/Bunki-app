@@ -1,11 +1,17 @@
 /** Actual renderer/loader probes with the real pure model and six production
- * projections. No browser, layout, rasterization, network, build or learner host.
+ * projections. No browser, layout, rasterization, network or learner host.
+ * Executes the actual standalone builder once to verify its emitted data bundle.
  * Fake DOM covers only tree membership, SVG attributes, events and focus.
  * queueMicrotask, fetch and timeout callbacks are explicitly controlled.
  */
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 import { createRequire } from 'node:module';
 import { test } from 'node:test';
 import vm from 'node:vm';
@@ -28,6 +34,8 @@ const runtime = {
 const modelSource = read('../kanji-structure.js');
 const corridorSource = read('../corridor.js');
 const ast = ts.createSourceFile('corridor.js', corridorSource, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+const worldsSource = read('../modules/worlds.mjs');
+const worldsAst = ts.createSourceFile('worlds.mjs', worldsSource, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
 const functionNames = ['loadKanjiStructure', 'renderKanjiStructure', 'activateKanjiStructure', 'mountPageEffects'];
 const stateNames = ['kanjiStructureTask', 'kanjiStructureModel', 'kanjiStructureError', 'kanjiStructureMounts'];
 const declarations = stateNames.map(name => {
@@ -37,13 +45,15 @@ const declarations = stateNames.map(name => {
   return statement.getText(ast);
 });
 const lifted = [...declarations, ...functionNames.map(name => {
-  const node = ast.statements.find(statement => ts.isFunctionDeclaration(statement) && statement.name?.text === name);
-  assert.ok(node, name);
-  return node.getText(ast);
+  const matches = [ast, worldsAst].flatMap(sourceFile => sourceFile.statements
+    .filter(statement => ts.isFunctionDeclaration(statement) && statement.name?.text === name)
+    .map(node => ({ node, sourceFile })));
+  assert.equal(matches.length, 1, `exactly one actual declaration for ${name}`);
+  return matches[0].node.getText(matches[0].sourceFile);
 })].join('\n');
 console.log(JSON.stringify({
   scope: 'source-only structure SVG attributes and controlled loader',
-  corridorSha256: sha(corridorSource), modelSha256: sha(modelSource),
+  corridorSha256: sha(corridorSource), worldsSha256: sha(worldsSource), modelSha256: sha(modelSource),
   productionGroupingSha256: sha(groupingText), liftedFunctionsSha256: sha(lifted),
   functions: functionNames, glyphs,
 }));
@@ -103,6 +113,7 @@ function harness({ bundle = true, model = true } = {}) {
       getElementById: () => null, activeElement: null },
     scaleThread: () => null,
     activatePendingLookupReadings: () => {},
+    activateKanjiFamily: () => {}, // unrelated family activation, outside this structure-only fixture
     adoptSaveMenuOwner: () => {},
     reconcileSheetActionLines: (...args) => sheetActionReconciliations.push(args),
     findSheetDoor: () => null,
@@ -195,15 +206,23 @@ function reach(h, model, node, occurrence) {
 
 test('real six-glyph projection, UMD export and actual standalone bundle mapping agree', async () => {
   assert.deepEqual(Object.keys(grouping.characters), glyphs);
-  const standalone = read('./build-standalone.mjs');
-  const parsed = ts.createSourceFile('build-standalone.mjs', standalone, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
-  const bundles = parsed.statements.flatMap(statement => ts.isVariableStatement(statement)
-    ? [...statement.declarationList.declarations] : []).find(declaration => declaration.name.getText(parsed) === 'BUNDLES');
-  assert.ok(bundles && ts.isObjectLiteralExpression(bundles.initializer));
-  const item = bundles.initializer.properties.find(property => property.name.text === 'share_alike/kanji-structure');
-  assert.equal(item.initializer.text, 'data/share_alike/kanji-structure.json');
-  assert.equal(sha(read(`../${item.initializer.text}`)), sha(groupingText));
-  const h = harness();
+  const out = join(resolveCorridorEvidence(), `kanji-structure-${randomUUID()}.html`);
+  execFileSync(process.execPath, [fileURLToPath(new URL('./build-standalone.mjs', import.meta.url)), out], {
+    encoding: 'utf8', timeout: 120_000, maxBuffer: 4 * 1024 * 1024,
+  });
+  const emitted = readFileSync(out, 'utf8');
+  const receipt = JSON.parse(readFileSync(out + '.build.json', 'utf8'));
+  assert.equal(receipt.status, 'passed');
+  assert.equal(receipt.standaloneSha256, sha(emitted), 'receipt binds exact emitted standalone bytes');
+  const marker = '<script type="application/json" id="corridor-bundle">';
+  const start = emitted.indexOf(marker);
+  assert.ok(start >= 0, 'actual standalone output exposes the serialized data bundle');
+  assert.equal(emitted.lastIndexOf(marker), start, 'exactly one emitted data bundle');
+  const end = emitted.indexOf('</script>', start + marker.length);
+  assert.ok(end > start, 'emitted data bundle is closed');
+  const packed = JSON.parse(emitted.slice(start + marker.length, end));
+  assert.deepEqual(packed['share_alike/kanji-structure'], grouping, 'actual builder emits exact production grouping');
+  const h = harness({ bundle: packed });
   assert.equal(typeof h.window.BunkiKanjiStructure.createModel, 'function');
   const model = await h.preload();
   assert.equal(h.requests.length, 0);

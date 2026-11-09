@@ -2,11 +2,12 @@
 
 Bunki hosts the canonical Nihongo Study UI and v4 engine only through
 `?deck=n2|n1|senmon|kotoba-master|shared-grammar&sharedStudy=preview` (choose one
-deck ID) or a real bound host. `decks/player/mount.js` routes those IDs before it
-reads a legacy ledger in shared mode. Ordinary legacy decks, saved-word/kanji/
-question review routes and the outer Bunki Record remain unchanged and
-disconnected from this distribution, retaining their existing player, counts
-and history until an explicit migration/cutover occurs.
+deck ID) or an explicitly bound host. `decks/player/mount.js` routes those IDs
+before it reads a legacy ledger in shared mode. Without a bound host or the
+preview switch, ordinary startup retains the legacy routes and history. The
+[bound development host](#bound-development-host-and-ordinary-routes) enables
+the mapped ordinary routes with an isolated learner; unsupported routes and the
+outer Bunki Record remain disconnected.
 
 The same-origin frame imports the byte-identical `mountStudyApp` and grammar
 renderer from `vendor/shared-study-engine`. This adopts subsequent canonical UI
@@ -99,10 +100,14 @@ changed frozen rows and other additions fail closed. The isolated preview has no
 content-history adapter and remains fixed to its installed 8,508-task inventory;
 it refuses future growth instead of deriving historical rows from learner state.
 
-`shared-study-presentation.mjs` only resolves selected task keys to prepared
-grammar objects. Grammar's canonical renderer validates object identity. This
-adapter preserves selection order and delegates all commands and policy decisions
-unchanged. Canonical learner-created cards retain their own content.
+`bindStudyPresentation` in `shared-study-presentation.mjs` resolves selected task
+keys to prepared grammar objects. Grammar's canonical renderer validates object
+identity. This adapter preserves selection order and delegates all commands and
+policy decisions unchanged. Canonical learner-created cards retain their own
+content. The module also supplies `bindSharedStudyViewport`: when the canonical
+current card changes and settles, including after Undo, the parent aligns the
+frame below its sticky chrome. Reveal, failed or same-card actions, and ordinary
+reading, disclosure or dictionary scrolling do not trigger that realignment.
 
 ## Isolated local preview
 
@@ -131,6 +136,116 @@ old-client fencing plan.
 The [release manifest](../../release.json) owns the candidate version and links
 its delivery notes. A local preview does not establish deployment or a
 physical-device pass.
+
+## Bound development host and ordinary routes
+
+`scripts/build-shared-study-qa.mjs` derives an explicitly isolated development
+site from an already verified built Corridor artifact. It authenticates the
+source artifact and actual route inputs, retains the original build identity,
+and writes a separate `qa-host-receipt.json` describing the entry/module overlay.
+It does not claim the derived site is an independently admitted production build.
+Outputs must be fresh directories under `~/.dharma`, outside the checkout.
+
+```sh
+node scripts/build-shared-study-qa.mjs \
+  --site /absolute/path/to/verified-built-site \
+  --out /absolute/path/under/.dharma/fresh-shared-study-site \
+  --run shared-study-dev
+```
+
+Its bootstrap binds `createSharedStudyTestHost` before the ordinary Corridor
+entry initializes. The five ordinary routes `?deck=n2`, `n1`, `senmon`,
+`kotoba-master` and `shared-grammar` then consume the canonical UI without the
+`sharedStudy=preview` switch. The host uses a separate run-scoped IndexedDB
+store and synthetic learner `test-shared-audio`. A Web Lock serializes profile
+creation; an installation marker is persisted before store creation. A missing
+or malformed reopened store blocks rather than silently recreating a learner.
+The ready marker is persisted before sync attaches to the store, so a metadata
+write failure can retry without retaining a subscription to the failed adapter.
+The default local fixture grants only twenty initial introductions and supplies
+no authenticated network authority. Production boot does not import this host.
+
+The optional sync binding delegates request format, replay, retry and
+reconciliation to the canonical transport. Bunki supplies connectivity,
+visibility, holds, credential access and explicit pairing/permit callbacks.
+It attaches to the same canonical store used by grading; it does not write a
+second schedule. Synthetic protocol tests cover bidirectional reconciliation,
+a lost acknowledgement retried with identical command bytes, concurrent offline
+attempts, Undo, empty sync and reopen. These tests do not establish actual paired
+Mac-to-Bunki synchronization or migration of existing learner history.
+
+The optional `audio` capability passes unchanged to the canonical player.
+Hosts supply admitted release resources; canonical code checks source identity,
+content revision, bytes and face safety. Neither this host nor Bunki generates
+speech or substitutes device speech for ElevenLabs/Kore recordings.
+
+A bound host may instead provide `audioPackConfiguration` for the canonical
+download manager: the admitted release, source authority, scope, selected pack
+IDs, byte transport, authorization callback and optional current assignments
+callback. `shared-study-audio-packs.mjs` keeps one canonical browser pack host
+per parent replica store, verifies the BUILD and content-binding pins, and copies
+frame arguments into the parent's realm before validation. The shared frame
+receives its verified resource capability and optional Audio downloads controls;
+it does not implement another admission policy or audio cache. Pack cleanup
+finishes before the parent replica is closed. A configuration failure remains
+visible in the optional disclosure while ordinary study stays available.
+
+Downloaded bytes are separate from the review journal and partitioned by learner,
+installation, epoch and release binding. Local verification establishes byte and
+source integrity, not pronunciation quality or listening acceptance. This code
+does not configure a production grant, create provider recordings, or establish
+complete recorded coverage. Both the standalone app and these mapped Bunki
+routes consume the same canonical implementation when its distribution is
+refreshed and independently admitted below.
+
+`shared-study-audio-preparation.mjs` starts the exported canonical accepted-source
+observer once per parent store, after checking the exact BUILD and grammar
+bindings. The same observer survives changes between mapped study frames.
+Cross-frame arguments are copied into the parent's realm before canonical
+validation. Creation failure and final page disposal release subscriptions;
+failed startup can be retried. Persisted `pagehide` keeps the parent host, frame
+and observer alive; canonical `pageshow` handling flushes the observer on return.
+Lifecycle-event regressions do not establish that a browser actually entered
+the back/forward cache. Final host disposal still closes packs, backend and
+storage if sync draining fails, preserving the original error. Grading does not
+await the background scan.
+
+Pending demand descriptors live in a separate canonical private IndexedDB store,
+partitioned by the explicit learner and installation namespace. They never enter
+the review journal. Current catalog references and accepted manual-card owners
+are checked against current source before a production batch can be prepared.
+Profiles, permissions and reading review remain explicit; a saved demand does
+not mean that speech was generated, downloaded or listening-approved. The same
+canonical resolver and offline production tools serve Nihongo and this host.
+Unmapped legacy cards are not silently converted or counted as complete audio.
+
+The bound adapter exposes `exportCurrentAudioSource(options)` for an explicit
+local production handoff after preparation has started. It delegates to the
+existing canonical host's `exportCurrentSource`, preserving ordered demand IDs,
+revision-bound cursors and finite selection limits. Arguments and results are
+copied into the parent realm; final disposal rejects a late result. The method
+does not start another observer, download a file, enqueue jobs or submit speech.
+The caller must keep the resulting selected source export private and use the
+canonical offline consumer; a stored observation still needs fresh source
+validation before provider execution or recording attachment.
+
+`node --test tools/shared-study-canonical-host.test.mjs
+ tools/shared-study-host-recovery.test.mjs tools/shared-study-sync-lifecycle.test.mjs`
+checks the host and transport composition. For actual ordinary-route browser
+qualification, set `BUNKI_QA_SITE`, `BUNKI_QA_EVIDENCE` and the independently
+selected `BUNKI_QA_ENGINE_CLOSURE`, then run
+`node scripts/verify-shared-study-host-browser.mjs`. The verifier uses a fresh
+test profile, grades once through each of the five real routes and reopens the
+same journal after a browser-process restart. The preview and ordinary-host
+verifiers distinguish first-boot shell record initialization from forbidden
+legacy grade writes. They exclude the exact private demand database
+`nsrs-private-audio-demand-v1` as well as their canonical study-store namespace;
+near-match names and other legacy writes remain subject to the mutation checks.
+
+Outer Record, saved-word/kanji/question review, personal collections, context/MCD,
+assessment and other unsupported routes retain their existing contracts. The
+ordinary QA binding neither maps their identities by displayed text nor
+performs a production cutover.
 
 ## Content and provenance
 
@@ -180,10 +295,15 @@ experiment and never raises workload automatically. The report does not
 establish total study time, backlog trend or an unfamiliar-word baseline needed
 to recommend an increase.
 
-All nine behavior-critical modules and the reducer remain byte-identical to the
-previous distribution. This refresh adds no scheduler, task identity, ledger or
-transport, and does not connect the canonical report to the outer Bunki Record
-or migrate existing learner history.
+Eight of nine behavior-critical modules, the reducer and its replay dependencies
+remain byte-identical to the previous distribution. The canonical replica backend
+now uses the existing effective learner-day calculation for queues, custom
+sessions and permit selection, including a pending timezone change that becomes
+effective while the app is idle. Sibling filtering uses review timestamps within
+that same interval, matching the unchanged reducer admission rules. Boundary,
+permit, Undo and next-day regression checks cover this correction; no stored
+history, task identity, event schema or scheduler formula changes. The canonical
+report remains separate from the outer Bunki Record, with no history migration.
 
 The canonical phone Extra-practice Finish action wraps its full bilingual label
 within the study column while retaining a touch target of at least 44px. It does

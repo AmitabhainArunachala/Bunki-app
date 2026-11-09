@@ -15,6 +15,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import vm from 'node:vm';
+import {fileURLToPath} from 'node:url';
+import {createDeviceVoice,REASONS as DEVICE_VOICE_REASONS} from '../device-voice.mjs';
+import {fixtureSource,fixtureDefinitions} from './corridor-fixture-source.mjs';
 import { runtimeLock } from './voice-lock.mjs';
 
 /** The source under test. KAIRO_CORRIDOR_SOURCE lets the mutant adjudicator point this
@@ -28,14 +31,16 @@ function between(start, end) {
   return source.slice(from, to);
 }
 const controlSource = between('function enhanceJapaneseProse(', '/* Save is one tap');
-const playbackSource = between('function excerptListenLabel(', 'function stopReadAloud(');
-const voiceHelpersSource = between('const narrationVoiceName =', 'function excerptListenLabel(');
+const authored=fixtureSource(fileURLToPath(new URL('../',import.meta.url)),{rootSource:source});
+const definitions=names=>fixtureDefinitions(authored,names);
+const playbackSource = definitions(['excerptListenLabel','retireExcerptControl','cancelExcerptPlayback','playNarratedExcerpt']);
+const voiceHelpersSource = definitions(['narrationVoiceName','narrationClips']);
 const preferenceSource = between('let recManifest;', 'function ensureRecManifest(');
 // the slice must start at the generated lock, because the roster and the role law are read
 // from it: starting at NARRATION_VOICES would leave VOICE_LOCK undefined
-const voiceNamesSource = between('/* === VOICE_LOCK', 'const LISTEN_RATES =');
-const clipSource = between('function stopRecAudio(', '/** 音 — the answer card');
-const cardSource = between('let cardAudioSerial = 0', 'function refreshListenRow(');
+const voiceNamesSource = definitions(['VOICE_LOCK','NARRATION_VOICES','voiceForRole','approvedNarrationClip','approvedNarrationManifest']);
+const clipSource = definitions(['stopRecAudio','playRecClip','approvedWordManifest','wordClipKey','wordClipFor']);
+const cardSource = definitions(['deviceVoice','cardAudioSerial','reviewVoiceFace','retireCardSpeech','retireCardAudioOnFaceChange','cardVoiceStatus','deviceVoiceMessage','speakCardReading','reviewVoiceTarget','appendReviewVoice','autoSpeakReviewFace','readAloud','buildListenRow','excerptPlayback','retireExcerptControl','cancelExcerptPlayback','excerptListenLabel','stopReadAloud','stopPassageRead','sentenceListeningCatalog','stopSentenceListening']);
 const quoteText = '「引用の始まり。続きです。引用の終わり。」';
 const LOCK = runtimeLock();
 const MAIN = LOCK.main, VOICE = LOCK.voices[LOCK.main];
@@ -110,8 +115,12 @@ function fixture({ language = 'en', preference = null, results = [], quotes = 1,
     Object.assign(context, { Audio: media.Audio, setImmediate });
     delete context.playRecClip; delete context.stopRecAudio;
   }
+  Object.assign(context,{createDeviceVoice,DEVICE_VOICE_REASONS});
+  context.deviceVoice=createDeviceVoice({});
+  context.document??={hidden:false,getElementById:()=>null};
+  const retireSource=definitions(['cardAudioSerial','retireCardSpeech']);
   vm.createContext(context);
-  vm.runInContext(`let excerptPlayback = 0, excerptControl = null, recAudioEl = null;\n${voiceNamesSource}\n${voiceHelpersSource}\n${controlSource}\n${playbackSource}${media ? `\n${clipSource}` : ''}`, context);
+  vm.runInContext(`${retireSource}\nlet excerptPlayback = 0, excerptControl = null, recAudioEl = null;\n${voiceNamesSource}\n${voiceHelpersSource}\n${controlSource}\n${playbackSource}${media ? `\n${clipSource}` : ''}`, context);
   context.enhanceJapaneseProse({ querySelectorAll: selector => selector === 'blockquote.sentence-original' ? quoteList : [] });
   const buttons = quoteList.map(quote => quote.nextElementSibling);
   return { context, button: buttons[0], buttons, requests, writes, stops, preferences };
@@ -230,13 +239,14 @@ test('The clip player resolves a stopped clip as a cancellation, distinct from a
 test('Replaying a card word leaves no false failure; a real failure still says so', async () => {
   const media = mediaFixture();
   const note = { textContent: '' };
-  const btn = { title: '', dataset: {}, parentElement: { querySelector: selector => selector === '.say-note' ? note : null },
+  const btn = { isConnected:true, title: '', dataset: {}, parentElement: { querySelector: selector => selector === '.say-note' ? note : null },
     classList: { add() {}, remove() {} } };
   const context = { S: { view: 'review' }, readAloud: { on: false }, Audio: media.Audio, setImmediate,
     tx: (ja, en) => en, localStorage: { getItem: () => MAIN },
     ensureRecManifest: async () => ({ v: 2, lock: lockBlock, words: { '電車|でんしゃ': {
       surface: '電車', reading: 'でんしゃ', voice: MAIN, speakerRole: 'word', model: LOCK.model,
       src: `audio/w/${MAIN}/densha.m4a` } } }) };
+  Object.assign(context,{createDeviceVoice,DEVICE_VOICE_REASONS,document:{hidden:false,getElementById:()=>null}});
   vm.createContext(context);
   vm.runInContext(`${voiceNamesSource}\n${preferenceSource}\n${clipSource}\n${cardSource}`, context);
   context.speakCardReading('でんしゃ', btn, '電車');
@@ -245,8 +255,8 @@ test('Replaying a card word leaves no false failure; a real failure still says s
   await settle(); await settle();
   assert.equal(media.created.length, 2);
   assert.equal(media.created[0].paused, true);
-  assert.equal(note.textContent, '', 'The retap restarts playback without a failure note');
-  assert.equal(btn.title, '');
+  assert.equal(note.textContent, `Recorded audio · ${VOICE}`, 'The retap restarts playback with its recorded voice provenance, without a failure note');
+  assert.equal(btn.title, `Recorded audio · ${VOICE}`);
   media.created[1].fail();
   await settle();
   assert.equal(note.textContent, 'This recording could not play here');
