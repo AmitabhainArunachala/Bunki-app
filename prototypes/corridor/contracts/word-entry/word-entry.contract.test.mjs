@@ -3,7 +3,7 @@
  * fixture passes and may not edit this file. The fixtures come from the shipped dictionary data itself
  * (data/share_alike/dict.json core + dict-v2/index.json and shards): the word 食べる, a homograph the index holds under two
  * seqs, and the index's own provenance block. The base's two producers (reference-core.js searchEntries and corridor.js
- * wordCardIdentity) are read with the TypeScript parser and shown to carry no entry/reading/sense ids (negative control).
+ * wordCardIdentity) are executed on the same dictionary fixture and shown to carry no contract entry/reading/sense ids.
  * Authored by the Bunki lead 2026-11-06; TESTS_SOUND by a second family before pinning. */
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
@@ -11,6 +11,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import ts from 'typescript';
+import vm from 'node:vm';
 import { entryId, readingId, senseId } from '../identity/identity.mjs';
 import { createReturnRecord, validateReturnRecord } from '../return/return.mjs';
 
@@ -56,22 +57,26 @@ function expectedIds(row) {
   return { entry, reading, senses };
 }
 
-// ---- the base's producers, read statically (they run only in a browser): what shape do they return? ------------------
-function returnedObjectKeys(file, fnName) {
+// Parse only to locate the actual legacy declaration; returned values come from execution.
+function legacyCardProducer() {
+  const file = join(CORRIDOR, 'corridor.js');
   const source = readFileSync(file, 'utf8');
   const sf = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
-  const keys = new Set(); let found = false;
-  const visit = (node) => {
-    if ((ts.isFunctionDeclaration(node) || ts.isFunctionExpression(node)) && node.name?.text === fnName) {
-      found = true;
-      const walk = (n) => { if (ts.isReturnStatement(n) && n.expression && ts.isObjectLiteralExpression(n.expression)) for (const p of n.expression.properties) if (p.name && ts.isIdentifier(p.name)) keys.add(p.name.text); ts.forEachChild(n, walk); };
-      walk(node);
-    }
-    ts.forEachChild(node, visit);
-  };
-  visit(sf);
-  assert.ok(found, `${fnName} is declared in ${file}`);
-  return keys;
+  const declaration = sf.statements.find(node => ts.isFunctionDeclaration(node) && node.name?.text === 'wordCardIdentity');
+  assert.ok(declaration);
+  const context = vm.createContext({
+    plainRecord: value => value != null && typeof value === 'object' && !Array.isArray(value),
+    owns: (value, key) => Object.hasOwn(value, key),
+    nonEmptyString: value => typeof value === 'string' && value.length > 0,
+    D: { dict: data().core },
+  });
+  vm.runInContext(declaration.getText(sf), context);
+  return context.wordCardIdentity;
+}
+function legacySearchProducer() {
+  const context = vm.createContext({ module: { exports: {} } });
+  vm.runInContext(readFileSync(join(CORRIDOR, 'reference-core.js'), 'utf8'), context);
+  return context.module.exports.searchEntries;
 }
 
 test('word entry contract · G13', async (t) => {
@@ -162,16 +167,19 @@ test('word entry contract · G13', async (t) => {
   });
 
   await t.test('[4] negative control: the base\'s two producers return different shapes with no entry, reading or sense ids', () => {
-    const cardKeys = returnedObjectKeys(join(CORRIDOR, 'corridor.js'), 'wordCardIdentity');
-    const searchFile = join(CORRIDOR, 'reference-core.js');
-    const searchSource = readFileSync(searchFile, 'utf8');
-    assert.match(searchSource, /function searchEntries\(entries, query\)/u, 'reference-core.js searchEntries is the base search producer');
-    // searchEntries returns catalog rows: id/text/reading/meanings…, never entry/reading/sense ids of the contract
-    const searchFields = [...searchSource.matchAll(/entry\.(\w+)/gu)].map((m) => m[1]);
-    assert.ok(searchFields.includes('meanings') && searchFields.includes('id'), 'search rows are id/text/meanings shaped');
-    for (const k of ['entry', 'senses', 'firstAnswer']) { assert.ok(!cardKeys.has(k), `wordCardIdentity returns no ${k}`); assert.ok(!searchFields.includes(k), `searchEntries rows carry no ${k}`); }
-    assert.ok(cardKeys.has('kind') && cardKeys.has('seq'), 'the card producer returns {kind, seq, reading}');
-    assert.notDeepEqual([...cardKeys].sort(), searchFields.filter((f, i, a) => a.indexOf(f) === i).sort(), 'the two base producers disagree on shape');
+    const fixtureRow = indexRows(WORD)[0];
+    const legacyRow = { id: WORD, text: WORD, reading: fixtureRow[I.primaryReading], meanings: fixtureRow[I.glosses] };
+    const searchRows = legacySearchProducer()([legacyRow], WORD);
+    assert.equal(searchRows.length, 1);
+    assert.equal(searchRows[0], legacyRow, 'actual legacy search returns the matching input row');
+    const card = legacyCardProducer()({ taken: [{ t: 'word', id: WORD, entrySeq: fixtureRow[I.seq], cueReading: fixtureRow[I.primaryReading] }] }, WORD);
+    assert.deepEqual(JSON.parse(JSON.stringify(card)), { kind: 'seq', seq: fixtureRow[I.seq], reading: fixtureRow[I.primaryReading] });
+    const canonical = catalog.fromCard({ seq: fixtureRow[I.seq], spelling: WORD, reading: fixtureRow[I.primaryReading] });
+    assert.ok(canonical.entry && canonical.senses.length && canonical.firstAnswer);
+    for (const value of [searchRows[0], card]) {
+      for (const key of ['entry', 'senses', 'firstAnswer']) assert.equal(Object.hasOwn(value, key), false, `legacy result lacks ${key}`);
+    }
+    assert.notDeepEqual(Object.keys(card).sort(), Object.keys(searchRows[0]).sort());
     // a third fixture: a card with a different sense id for the same word must fail the equality assertion
     const row = indexRows(WORD)[0]; const want = expectedIds(row);
     const good = catalog.fromCard({ seq: row[I.seq], spelling: WORD, reading: row[I.primaryReading] });

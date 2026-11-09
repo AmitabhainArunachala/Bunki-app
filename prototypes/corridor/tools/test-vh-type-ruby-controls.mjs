@@ -1,3 +1,4 @@
+import { supplementalGates } from '../../../scripts/ci/supplemental.mjs';
 /** F approved-contract counterexamples run the predicates verify-design-reader-shelf and verify-places-layout call,
  * and the type-ruby adapter over the observed receipts of the approved 17-row producer (cda18876). */
 import test from 'node:test';
@@ -145,8 +146,11 @@ test('RT1 keeps the existing global ruby list, sole size rule and pseudo-reading
   assert.equal(l2(global).passed, true);
   assert.equal(l2([], { rubyRules: ['rooms/motion.css|rt|0.5em', 'editorial.css|rt|12px'] }).passed, false);
   assert.equal(l2([], { pseudoReadings: ['editorial.css rt::before'] }).passed, false);
-  const registration = readFileSync(new URL('../../../scripts/ci/supplemental.mjs', import.meta.url), 'utf8');
-  assert.equal(registration.split("'prototypes/corridor/tools/test-vh-type-ruby-controls.mjs'").length - 1, 1);
+  const gates = supplementalGates('/tmp/ruby-registry-probe');
+  const consumers = gates.filter(gate => gate.command === process.execPath && gate.args.includes('--test') && gate.args.includes('prototypes/corridor/tools/test-vh-type-ruby-controls.mjs'));
+  assert.equal(consumers.length, 1, 'one executable Node test gate consumes this file');
+  assert.equal(consumers[0].name, 'ci-contracts');
+  assert.equal(consumers[0].args.filter(arg => arg === 'prototypes/corridor/tools/test-vh-type-ruby-controls.mjs').length, 1);
 });
 for (const engine of ['chromium', 'webkit']) test(`RT1 ${engine}: L2 remains required by native receipt admission`, () => {
   const report = structuredClone(observed.receipts[engine]);

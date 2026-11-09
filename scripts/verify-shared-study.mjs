@@ -46,12 +46,10 @@ for (const [id, row] of Object.entries(binding.packs))
 for (const [name, hash] of Object.entries(binding.grammarAssets))
   if (digest(read(`data/shared-study/${name}`)) !== hash)
     throw Error(`Shared grammar drift: ${name}`);
-if (
-  !read('decks/player/shared-frame.mjs')
-    .toString()
-    .includes("import {mountStudyApp} from '../../vendor/shared-study-engine/client/app/app.mjs'")
-)
-  throw Error('Canonical UI entry is not mounted');
+// Matching an import line in source proves only that the string exists, not that the UI mounts.
+// Executable mount coverage lives in scripts/verify-shared-study-browser.mjs, which loads the
+// built shared-frame page in a browser and exercises the mounted app; this verifier makes no
+// claim about mounted UI and does not treat any earlier browser receipt as current.
 console.log(
   JSON.stringify({
     canonicalFiles: manifest.files.length,
