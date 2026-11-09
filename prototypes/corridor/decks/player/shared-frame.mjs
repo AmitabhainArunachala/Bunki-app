@@ -54,8 +54,12 @@ try {
     protocol:packHost.audio.protocol,release:packHost.audio.release,
     read:(...args)=>packHost.audio.resources.read(...args),
     packState:(...args)=>packHost.audio.resources.packState(...args)}:null):window.frameElement.bunkiStudyPort.audio;
+  const audioDownloads=packHost?.audioDownloads;
   const basePlatform=packsConfigured?{...adapter.platform,audio:null,
-    audioDownloads:packHost?.audioDownloads,audioDownloadFailure}:adapter.platform;
+    audioDownloads:audioDownloads?{...audioDownloads,async readSource({taskKeys,signal}={}) {
+      // Allocate only the returned source projection in this realm; keep the signal live.
+      return structuredClone(await audioDownloads.readSource({taskKeys,signal}));
+    }}:audioDownloads,audioDownloadFailure}:adapter.platform;
   const platform=audioPort?{...basePlatform,audio:{protocol:audioPort.protocol,release:structuredClone(audioPort.release),
     resources:{async read(ref,{signal}={}) {
       if(signal?.aborted)throw new DOMException('Audio read aborted','AbortError');

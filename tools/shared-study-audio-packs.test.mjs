@@ -88,3 +88,57 @@ test('failed setup cleanup does not retire the reusable sync port',async()=>{
  const host=await qaHost({order,sync});const adapter=()=>({store:{},catalog:[],backend:{dispose(){}},disposeAudioPacks:async()=>{}});
  await assert.rejects(()=>host.withAdapter(adapter),error=>error===failure);await host.withAdapter(adapter);assert.equal(attempts,2);assert.equal(retired,false);await host.dispose();assert.equal(retired,true);
 });
+
+test('selected preflight segment and live source options cross into parent realm without cloning AbortSignal',async()=>{
+ const ref={key:'media/shared.m4a',sha256:hash('a'),bytes:3},segment={fieldId:'ja',start:0,end:6,inputKey:hash('b'),profileId:'explicit-profile',ref};
+ const signalController=new AbortController(),signal=signalController.signal;let observedOptions,observedSegment,calls=0;
+ const source={revision:'current-v1',selectedAssignments:{profiles:{ja:{providerRoute:'local-fixture'}},languageAssignments:{task:{meaning:'ja'}},readingAssignments:{}}};
+ const f=fixture(),controls={...f.controls,
+  readSource:async options=>{calls++;canonicalStringify(options.taskKeys);assert.equal(Object.getPrototypeOf(options),Object.prototype);assert.equal(Object.getPrototypeOf(options.taskKeys),Array.prototype);observedOptions=options;if(signal.aborted)throw Object.assign(Error('source-aborted'),{name:'AbortError'});return source;},
+  authorizePlayback:async(value,options)=>{canonicalStringify(value);canonicalStringify(options.segment);assert.equal(Object.getPrototypeOf(options.segment),Object.prototype);assert.equal(Object.getPrototypeOf(options.segment.ref),Object.prototype);assert.equal(options.signal,signal);observedSegment=options.segment;},
+ };
+ const g=fixture({loadCanonical:async()=>({createBrowserAudioPackHost:async()=>({audio:f.audio,audioDownloads:controls,dispose:async()=>{}})})}),host=await g.attached.ensureAudioPacks(request());
+ const child=vm.runInNewContext('('+JSON.stringify({taskKeys:['task'],snapshot:{status:'ready',segments:[segment]},segment})+')');
+ const reading=host.audioDownloads.readSource({taskKeys:child.taskKeys,signal});child.taskKeys[0]='mutated-after-call';assert.equal(await reading,source);assert.deepEqual(observedOptions.taskKeys,['task']);assert.equal(observedOptions.signal,signal);assert.equal(signal.aborted,false);
+ await host.audioDownloads.authorizePlayback(child.snapshot,{ref:child.segment.ref,segment:child.segment,signal});child.segment.inputKey='changed';assert.deepEqual(observedSegment,segment);
+ signalController.abort();await assert.rejects(()=>host.audioDownloads.readSource({taskKeys:['task'],signal}),{name:'AbortError'});assert.equal(observedOptions.signal,signal);assert.equal(calls,2);
+ await g.attached.disposeAudioPacks();await f.attached.disposeAudioPacks();
+});
+
+test('complete frame returns child-realm source assignments and preserves exact source/preflight cancellation ports',async()=>{
+ const digest=hash('a'),release=configuration().release,frameURL=new URL('../prototypes/corridor/decks/player/shared-frame.mjs',import.meta.url),parentSource={revision:'live-selected',selectedAssignments:{profiles:{ja:{providerRoute:'synthetic',settings:{test:true}}},languageAssignments:{task:{meaning:'ja'}},readingAssignments:{task:{meaning:[]}}}};
+ const parentSourceBefore=JSON.stringify(parentSource),signal=new AbortController().signal,segment={fieldId:'ja',start:0,end:6,inputKey:hash('b'),profileId:'explicit',ref:{key:'media/shared.m4a',sha256:digest,bytes:3}};
+ let sourceOptions,preflightOptions,mounted,viewportCalls=0,sourceError=null;
+ const f=fixture(),controls={...f.controls,
+  readSource:async options=>{canonicalStringify(options.taskKeys);assert.equal(Object.getPrototypeOf(options.taskKeys),Array.prototype);sourceOptions=options;if(sourceError)throw sourceError;return parentSource;},
+  authorizePlayback:async(_snapshot,options)=>{canonicalStringify(options.segment);assert.equal(Object.getPrototypeOf(options.segment),Object.prototype);preflightOptions=options;},
+ };
+ const g=fixture({binding:{...binding,dictionary:{buildSha256:digest}},loadCanonical:async()=>({createBrowserAudioPackHost:async()=>({audio:f.audio,audioDownloads:controls,dispose:async()=>{}})})});
+ const data={'shared-study-content.json':{dictionary:{buildSha256:digest},grammarAssets:{'registry.json':digest,'grammar.json':digest,'grammar-reviews.json':digest},counts:{vocabulary:1,grammar:0}},'registry.json':{},'grammar.json':{},'grammar-reviews.json':{},'tokens.json':{},'BUILD.json':build};
+ const root={replaceChildren(){},append(value){throw Error('Frame failed to mount: '+value.textContent);},querySelector(){return null;}},ctx=vm.createContext({URL,URLSearchParams,TextDecoder,Uint8Array,ArrayBuffer,DOMException,AbortController,console,location:{search:'?deck=n2&ui=en'},localStorage:{getItem:()=>null,setItem(){}},document:{querySelector:()=>root,createElement:()=>({setAttribute(){}})},crypto:{subtle:{digest:async()=>new Uint8Array(32).fill(0xaa).buffer}},fetch:async url=>{const name=new URL(url).pathname.split('/').at(-1),value=data[name];assert.notEqual(value,undefined,name);return{ok:true,arrayBuffer:async()=>new TextEncoder().encode(JSON.stringify(value)).buffer};}});
+ // Local JSON fixtures model structuredClone's realm allocation for this
+ // plain-JSON source boundary; signal is deliberately outside that boundary.
+ vm.runInContext('globalThis.structuredClone=value=>JSON.parse(JSON.stringify(value));globalThis.window=globalThis;globalThis.addEventListener=()=>{};globalThis.removeEventListener=()=>{};',ctx);
+ ctx.frameElement={bunkiStudyPort:{adapter:g.attached}};
+ const imports={
+  '../../vendor/shared-study-engine/client/app/app.mjs':{mountStudyApp(_root,options){mounted=options;return{dispose(){}};}},
+  '../../vendor/shared-study-engine/client/grammar/renderer.mjs':{prepareGrammarModule:async()=>({records:[],tasks:[]})},
+  '../../vendor/shared-study-engine/client/app/dictionary-loader.mjs':{loadOfflineDictionary:async()=>({})},
+  '../../vendor/shared-study-engine/client/player/dictionary.mjs':{prepareOfflineDictionary:async d=>d},
+  '../../shared-study-presentation.mjs':{bindStudyPresentation:backend=>backend,bindSharedStudyViewport(){viewportCalls++;return()=>{};}},
+  '../../shared-study-content.mjs':{moduleForSharedDeck:id=>id,sharedDictionaryBuild:()=>({})},
+ };
+ const compiled=ts.transpileModule(readFileSync(frameURL,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022},transformers:{before:[context=>node=>ts.visitNode(node,function visit(value){if(ts.isMetaProperty(value)&&value.keywordToken===ts.SyntaxKind.ImportKeyword)return ts.factory.createIdentifier('__frameImportMeta');return ts.visitEachChild(value,visit,context);})]}}).outputText;
+ const execute=vm.runInContext('(async function(exports,require,__frameImportMeta){'+compiled+'\n})',ctx);
+ await execute({},key=>{assert(Object.hasOwn(imports,key),key);return imports[key];},{url:frameURL.href});assert(mounted,'Actual frame must mount');assert.equal(viewportCalls,1);assert.equal(mounted.platform.audioDownloadFailure,false);
+ ctx.platform=mounted.platform;ctx.signal=signal;
+ const local=await vm.runInContext('platform.audioDownloads.readSource({taskKeys:["task"],signal})',ctx);ctx.local=local;
+ assert.equal(vm.runInContext('Object.getPrototypeOf(local)===Object.prototype && Object.getPrototypeOf(local.selectedAssignments)===Object.prototype && Object.getPrototypeOf(local.selectedAssignments.readingAssignments.task.meaning)===Array.prototype',ctx),true);
+ assert.notEqual(local,parentSource);assert.equal(sourceOptions.signal,signal);assert.deepEqual(sourceOptions.taskKeys,['task']);
+ vm.runInContext('local.selectedAssignments.languageAssignments.task.meaning="changed-child"',ctx);assert.equal(JSON.stringify(parentSource),parentSourceBefore);
+ parentSource.selectedAssignments.profiles.ja.settings.test=false;assert.equal(local.selectedAssignments.profiles.ja.settings.test,true);
+ ctx.segment=vm.runInContext('('+JSON.stringify(segment)+')',ctx);
+ await vm.runInContext('platform.audioDownloads.authorizePlayback({status:"ready",segments:[segment]},{signal,ref:segment.ref,segment})',ctx);assert.deepEqual(preflightOptions.segment,segment);assert.equal(preflightOptions.signal,signal);
+ sourceError=Object.assign(Error('current-source-cancelled'),{name:'AbortError'});await assert.rejects(()=>vm.runInContext('platform.audioDownloads.readSource({taskKeys:["task"],signal})',ctx),error=>error===sourceError);
+ await g.attached.disposeAudioPacks();await f.attached.disposeAudioPacks();
+});

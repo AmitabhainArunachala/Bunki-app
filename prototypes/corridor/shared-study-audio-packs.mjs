@@ -38,11 +38,15 @@ function exposeHost(entry, host) {
     })}),
     audioDownloads: Object.freeze({
       read: () => controls.read(),
+      readSource: (options = {}) => controls.readSource({
+        taskKeys: structuredClone(options.taskKeys), signal: options.signal,
+      }),
       subscribe: listener => controls.subscribe(listener),
       acquire: () => controls.acquire(), cancel: () => controls.cancel(),
       refresh: () => controls.refresh(),
       authorizePlayback: (snapshot, options = {}) => controls.authorizePlayback(
-        structuredClone(snapshot), {signal: options.signal, ref: structuredClone(options.ref)}),
+        structuredClone(snapshot), {signal: options.signal, ref: structuredClone(options.ref),
+          segment: structuredClone(options.segment)}),
     }),
   });
 }
