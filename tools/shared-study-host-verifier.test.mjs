@@ -337,14 +337,17 @@ if (!vm.SourceTextModule) {
     );
   }
   function mutant(verifier, predicate) {
-    const hook =
-      verifier.kind === 'audio'
-        ? "__bunkiAudioProbe.legacy.push({type:'indexedDB'"
-        : "globalThis.__qaLegacyWrites.push({kind:'indexedDB'";
-    const marker =
-      "if(!this.transaction.db.name.startsWith('bunki-shared-study-qa-')&&this.transaction.db.name!=='nsrs-private-audio-demand-v1')" +
-      hook;
-    return verifier.source.replace(marker, `if(${predicate})${hook}`);
+    const target =
+      /\bif\s*\(\s*!\s*this\s*\.\s*transaction\s*\.\s*db\s*\.\s*name\s*\.\s*startsWith\s*\(\s*(['"])bunki-shared-study-qa-\1\s*\)\s*&&\s*this\s*\.\s*transaction\s*\.\s*db\s*\.\s*name\s*!==\s*(['"])nsrs-private-audio-demand-v1\2\s*\)/gu;
+    const matches = [...verifier.source.matchAll(target)];
+    if (matches.length !== 1)
+      throw new Error(`mutant: expected exactly one target predicate, found ${matches.length}`);
+    const [{ index, 0: match }] = matches;
+    return (
+      verifier.source.slice(0, index) +
+      `if(${predicate})` +
+      verifier.source.slice(index + match.length)
+    );
   }
   for (const verifier of verifiers) {
     test(`${verifier.kind} verifier excludes only canonical QA and private audio stores, preserving legacy operations`, async () => {
