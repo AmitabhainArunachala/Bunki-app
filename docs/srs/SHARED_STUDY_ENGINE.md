@@ -172,6 +172,25 @@ Hosts supply admitted release resources; canonical code checks source identity,
 content revision, bytes and face safety. Neither this host nor Bunki generates
 speech or substitutes device speech for ElevenLabs/Kore recordings.
 
+A bound host may instead provide `audioPackConfiguration` for the canonical
+download manager: the admitted release, source authority, scope, selected pack
+IDs, byte transport, authorization callback and optional current assignments
+callback. `shared-study-audio-packs.mjs` keeps one canonical browser pack host
+per parent replica store, verifies the BUILD and content-binding pins, and copies
+frame arguments into the parent's realm before validation. The shared frame
+receives its verified resource capability and optional Audio downloads controls;
+it does not implement another admission policy or audio cache. Pack cleanup
+finishes before the parent replica is closed. A configuration failure remains
+visible in the optional disclosure while ordinary study stays available.
+
+Downloaded bytes are separate from the review journal and partitioned by learner,
+installation, epoch and release binding. Local verification establishes byte and
+source integrity, not pronunciation quality or listening acceptance. This code
+does not configure a production grant, create provider recordings, or establish
+complete recorded coverage. Both the standalone app and these mapped Bunki
+routes consume the same canonical implementation when its distribution is
+refreshed and independently admitted below.
+
 `shared-study-audio-preparation.mjs` starts the exported canonical accepted-source
 observer once per parent store, after checking the exact BUILD and grammar
 bindings. The same observer survives changes between mapped study frames.
