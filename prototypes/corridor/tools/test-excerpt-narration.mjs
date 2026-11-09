@@ -332,14 +332,154 @@ test('ONE OWNER · a recorded clip ends the sentence-listening lane before it pl
   assert.equal(media.created.length, 0);
 });
 
-test('ONE OWNER · the sentence-listening lane silences every other voice before it speaks', () => {
-  // structural: the listening player is wired deep in its room, so the law is pinned where it
-  // lives — inside its play handler, before its own media element exists
-  const at = source.indexOf('function renderSentenceListening(');
-  assert(at > 0, 'renderSentenceListening moved; this control no longer knows where to look');
-  const handler = source.indexOf("play.addEventListener('click', async () => {", at);
-  const media = source.indexOf('new Audio(owner.url)', handler);
-  const yields = source.indexOf('stopReadAloud(); stopRecAudio();', handler);
-  assert(handler > at && media > handler, 'the listening play handler moved');
-  assert(yields > handler && yields < media, 'the quote, the read and the card clip yield before the sentence speaks');
+const listeningSource = definitions(['renderSentenceListening', 'retireCardSpeech',
+  'stopReadAloud', 'stopPassageRead', 'cancelExcerptPlayback', 'retireExcerptControl',
+  'stopRecAudio', 'stopSentenceListening', 'verifiedSentenceAudio']);
+
+function listeningFixture({ loadAudio = null, retainedOwner = false } = {}) {
+  const nodes = [], events = [], media = [], boundaries = [];
+  function el(tagName, className = '', textContent = '') {
+    const classes = new Set(className.split(' '));
+    const node = {
+      tagName, className, textContent, dataset: {}, childNodes: [], handlers: {},
+      isConnected: true, value: '',
+      classList: { remove: name => classes.delete(name), contains: name => classes.has(name) },
+      append(...children) { this.childNodes.push(...children); },
+      replaceChildren(...children) { this.childNodes = children; },
+      setAttribute(name, value) { this[name] = value; },
+      addEventListener(type, handler) { this.handlers[type] = handler; },
+    };
+    nodes.push(node);
+    return node;
+  }
+  const cue = { voice: MAIN, path: `audio/s/${MAIN}/retained.m4a` };
+  const entry = { plan: { id: 'listening-fixture', listeningCue: cue },
+    context: { title: 'Fixture', quote: quoteText, sourceId: 'fixture' } };
+  const state = { listeningRun: { completedPlays: 0, revealed: false, pending: false } };
+  const excerpt = el('button', 'is-speaking', 'Stop');
+  const snapshot = operation => {
+    events.push(operation);
+    boundaries.push({ operation, cardRetired: context.cardAudioSerial > 0,
+      deviceCancelled: events.includes('device:cancel'),
+      excerptRetired: context.excerptControl === null && !excerpt.classList.contains('is-speaking'),
+      passageStopped: !context.readAloud.on && context.readAloud.generation > 0,
+      recordingStopped: context.recAudioEl === null });
+  };
+  const context = {
+    AbortController, clearTimeout,
+    recordEpoch: 1, recordReady: epoch => epoch === 1, recordWritable: () => true,
+    S: { view: 'sentence-practice', sentencePracticeView: state },
+    NARRATION_VOICES: { [MAIN]: VOICE },
+    sentenceDraftController: null,
+    attachSentenceDraft: () => ({ binding: {} }),
+    sentencePracticeError: error => error.message,
+    el, biLabel: (tag, cls, ja, en) => el(tag, cls, en), tx: (ja, en) => en,
+    document: { getElementById: id => nodes.find(node => node.id === id) || null },
+    cardAudioSerial: 0,
+    deviceVoice: { cancel: () => events.push('device:cancel') },
+    readAloud: { on: true, generation: 0 }, excerptControl: excerpt, excerptPlayback: 0,
+    excerptListenLabel: () => 'Listen',
+    recAudioEl: { pause: () => events.push('recording:pause') },
+    sentenceListeningOwner: null,
+    resolveSentenceListeningCue: async () => { snapshot('cue:resolve'); return cue; },
+    fetch: async () => { snapshot('fetch'); throw new Error('unexpected media fetch'); },
+    Blob: class extends Blob {
+      constructor(...args) { snapshot('blob'); super(...args); }
+    },
+    URL: {
+      createObjectURL: () => { snapshot('url:create'); return 'blob:silent-fixture'; },
+      revokeObjectURL: url => events.push(`url:revoke:${url}`),
+    },
+    Audio: class {
+      constructor(url) { snapshot('audio:construct'); this.src = url; media.push(this); }
+      async play() { snapshot('audio:play'); }
+      pause() { events.push('audio:pause'); }
+    },
+  };
+  const retained = retainedOwner ? {
+    controller: new AbortController(), url: 'blob:retained',
+    audio: { pause: () => events.push('retained:pause'), onended: () => {}, onerror: () => {} },
+    stopped: () => events.push('retained:stopped'),
+  } : null;
+  retained?.controller.signal.addEventListener('abort', () => events.push('retained:abort'));
+  context.sentenceListeningOwner = retained;
+  vm.createContext(context);
+  vm.runInContext(listeningSource, context);
+  const verified = context.verifiedSentenceAudio;
+  context.verifiedSentenceAudio = (...args) => {
+    snapshot('audio:verify');
+    return loadAudio ? loadAudio(...args) : verified(...args);
+  };
+  context.renderSentenceListening(el('main'), entry, state);
+  const find = id => nodes.find(node => node.id === id);
+  return { context, state, retained, events, media, boundaries, find,
+    click: () => find('sentence-listening-play').handlers.click() };
+}
+
+function assertListeningHandoff(fixture) {
+  assert(fixture.boundaries.length > 0, 'the actual handler reached the audio boundary');
+  for (const { operation, ...retired } of fixture.boundaries) {
+    assert.deepEqual(retired, { cardRetired: true, deviceCancelled: true,
+      excerptRetired: true, passageStopped: true, recordingStopped: true },
+    `every previous voice yields before ${operation}`);
+  }
+}
+
+test('ONE OWNER · the sentence-listening lane silences every other voice before media access', async () => {
+  const f = listeningFixture({ loadAudio: async () => new Uint8Array(0) });
+  await f.click();
+  assertListeningHandoff(f);
+  assert.deepEqual(f.boundaries.map(row => row.operation),
+    ['cue:resolve', 'audio:verify', 'blob', 'url:create', 'audio:construct', 'audio:play']);
+  assert.equal(f.media.length, 1);
+  assert.equal(f.state.listeningRun.completedPlays, 0);
+});
+
+test('ONE OWNER · unbound retained listening recordings cancel other voices without media access', async () => {
+  const f = listeningFixture();
+  await f.click();
+  assertListeningHandoff(f);
+  assert.deepEqual(f.boundaries.map(row => row.operation), ['cue:resolve', 'audio:verify']);
+  assert.equal(f.find('sentence-listening-audio-status').textContent, 'current-source-required');
+  assert.equal(f.context.sentenceListeningOwner, null);
+  assert.equal(f.media.length, 0);
+  assert.equal(f.state.listeningRun.completedPlays, 0);
+});
+
+test('ONE OWNER · a retained listening owner is cancelled before a retry can access media', async () => {
+  const f = listeningFixture({ retainedOwner: true });
+  await f.click();
+  assert.deepEqual(f.events, ['retained:abort', 'retained:pause', 'url:revoke:blob:retained', 'retained:stopped']);
+  assert.equal(f.retained.controller.signal.aborted, true);
+  assert.equal(f.retained.audio.onended, null);
+  assert.equal(f.retained.audio.onerror, null);
+  assert.equal(f.context.sentenceListeningOwner, null);
+  assert.deepEqual(f.boundaries, []);
+  assert.equal(f.media.length, 0);
+  await f.click();
+  assertListeningHandoff(f);
+  assert.deepEqual(f.boundaries.map(row => row.operation), ['cue:resolve', 'audio:verify']);
+  assert.equal(f.media.length, 0);
+});
+
+test('ONE OWNER · cancelling a pending cached listening read makes its completion inert', async () => {
+  let release, signal;
+  const f = listeningFixture({ loadAudio: (cue, ownerSignal) => {
+    signal = ownerSignal;
+    return new Promise(resolve => { release = resolve; });
+  } });
+  const playing = f.click();
+  await settle();
+  assertListeningHandoff(f);
+  assert.equal(signal.aborted, false);
+  await f.click();
+  assert.equal(signal.aborted, true);
+  release(new Uint8Array(0));
+  await playing;
+  assert.deepEqual(f.boundaries.map(row => row.operation), ['cue:resolve', 'audio:verify']);
+  assert.equal(f.media.length, 0);
+  assert.equal(f.context.sentenceListeningOwner, null);
+  assert.equal(f.state.listeningRun.completedPlays, 0);
+  assert.equal(f.find('sentence-listening-audio-status').textContent,
+    'Playback stopped. You can listen again from the start.');
 });
