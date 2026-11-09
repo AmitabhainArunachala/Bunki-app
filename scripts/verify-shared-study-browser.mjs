@@ -10,6 +10,7 @@ import { startStaticHost } from '../prototypes/bunki-desktop/lib/static-host.cjs
 import { silenceBrowserAudio } from '../prototypes/corridor/tools/browser-audio-silence.mjs';
 import { resolveCorridorSite, resolveCorridorEvidence } from './resolve-corridor-site.mjs';
 import { checkSharedBacklog } from './shared-study-backlog-browser.mjs';
+import { observeSharedStudyLegacyWrites } from './shared-study-legacy-observer.mjs';
 if (process.argv.includes('--if-ci') && !process.env.CI && !process.env.KAIRO_SITE_DIR) {
   console.log(
     'Shared-study browser check not requested locally; use npm run verify:shared-study:browser with an explicit built artifact.',
@@ -451,26 +452,7 @@ try {
   await silenceBrowserAudio(context);
   const page = await context.newPage();
   page.on('pageerror', (e) => receipt.errors.push(e.message));
-  await page.addInitScript(() => {
-    window.__legacyWrites = [];
-    for (const method of ['put', 'add', 'delete', 'clear']) {
-      const original = IDBObjectStore.prototype[method];
-      IDBObjectStore.prototype[method] = function (...args) {
-        if (!this.transaction.db.name.startsWith('bunki-shared-study-'))
-          window.__legacyWrites.push({
-            database: this.transaction.db.name,
-            store: this.name,
-            method,
-          });
-        return original.apply(this, args);
-      };
-    }
-    if (window === window.top && !localStorage.getItem('bunki-cloze:n2'))
-      localStorage.setItem(
-        'bunki-cloze:n2',
-        '{"format":"synthetic-preserved-legacy","cards":{"not-a-frozen-task":{}}}',
-      );
-  });
+  await page.addInitScript(observeSharedStudyLegacyWrites);
   const legacy = () =>
     page.evaluate(() => ({
       keys: Object.fromEntries(

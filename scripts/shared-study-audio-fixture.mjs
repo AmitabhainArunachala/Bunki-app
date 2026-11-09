@@ -286,7 +286,13 @@ export async function createBunkiAudioFixture({
 
   // The export closure is independently pinned by the caller and checked by the
   // distribution verifier; the distribution manifest is never the authority.
-  const {verifyEngineDistribution} = await import(pathToFileURL(join(engineRoot, 'tools/verify_engine.mjs')));
+  const pinPath = findPin(repoRoot);
+  const pin = readJson(pinPath);
+  if (pin.format !== 'bunki-shared-study-pin/v1') fail('unexpected shared-study pin format');
+  const engineVerifierPath = join(engineRoot, 'tools/verify_engine.mjs');
+  if (hashFile(engineVerifierPath) !== pin.verifierSha256)
+    fail('Canonical verifier differs from reviewed Bunki pin');
+  const {verifyEngineDistribution} = await import(pathToFileURL(engineVerifierPath));
   const manifest = verifyEngineDistribution(engineRoot, {expectedClosureSha256: expectedClosure});
   if (manifest.closureSha256 !== expectedClosure) fail('engine closure differs from expectedClosure');
 
@@ -303,10 +309,7 @@ export async function createBunkiAudioFixture({
   );
   const sourceDir = join(repoRoot, 'prototypes/corridor');
   const bindingPath = join(sourceDir, 'data/shared-study-content.json');
-  const pinPath = findPin(repoRoot);
   const binding = readJson(bindingPath);
-  const pin = readJson(pinPath);
-  if (pin.format !== 'bunki-shared-study-pin/v1') fail('unexpected shared-study pin format');
   const bindingSha256 = hashFile(bindingPath);
   if (pin.contentBindingSha256 !== bindingSha256) fail('shared-study binding does not match the frozen pin');
   if (binding.format !== 'bunki-shared-content/v1' || !Array.isArray(binding.rows)) {
