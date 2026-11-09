@@ -726,5 +726,9 @@
     "failures": 2,
     "attemptedAt": "2026-11-09T17:36:25.907Z",
     "reason": "Command failed: gh api --paginate --slurp repos/AmitabhainArunachala/Bunki-app/actions/runs/42431546894/attempts/6/jobs?per_page=100"
+  },
+  "42406261624/7": {
+    "result": "observed",
+    "startedAt": "2026-11-09T17:06:32Z"
   }
 }
