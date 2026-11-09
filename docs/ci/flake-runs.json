@@ -554,9 +554,9 @@
   "42431546894/2": {
     "result": "retry",
     "policy": "002dc875d95d7d62d63eaed04ff00e3c74fed894c7b0b9d4615572cf2957a401",
-    "startedAt": "2026-11-08T16:57:48Z",
-    "failures": 5,
-    "attemptedAt": "2026-11-08T18:06:23.548Z",
+    "startedAt": "2026-11-09T09:03:28Z",
+    "failures": 6,
+    "attemptedAt": "2026-11-09T10:22:11.396Z",
     "reason": "Observation artifact not yet available: bunki-plan-42431546894-2"
   },
   "42407075841/3": {
@@ -710,5 +710,9 @@
   "42406261624/6": {
     "result": "observed",
     "startedAt": "2026-11-09T09:03:41Z"
+  },
+  "42593972611/1": {
+    "result": "observed",
+    "startedAt": "2026-11-09T09:30:38Z"
   }
 }
