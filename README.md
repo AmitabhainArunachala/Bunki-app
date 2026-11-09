@@ -93,10 +93,12 @@ preserved Sites v5 donor on `sites/v5-import`.
 
 ## Status
 
-The repository holds one product prototype and one semantic authority: the
-runnable corridor under `prototypes/corridor/`, and the deterministic Phase-0
-kernel under `apps/` and `packages/` (the corridor is held to the kernel's laws
-by contract parity — see ADR-004). Product features are real and interactive;
+The repository holds the runnable corridor under `prototypes/corridor/` and the
+deterministic Phase-0 kernel under `apps/` and `packages/` (legacy Corridor
+contracts are held to the kernel's laws by contract parity — see ADR-004).
+Explicitly bound study routes use the
+[canonical shared-study engine](docs/srs/SHARED_STUDY_ENGINE.md#host-contract).
+Product features are real and interactive;
 claims about efficacy, retention, or review burden remain outside the evidence
 currently collected (REQ-GATE-03).
 
@@ -165,7 +167,7 @@ npm ci
 npm run lint          # eslint, incl. the boundary rules above
 npm run format:check  # prettier
 npm run typecheck     # tsc --noEmit in every workspace
-npm run test          # vitest, all workspaces
+npm run test          # shared-study admission, then Vitest across workspaces
 
 npm run test:replay   # golden replay equality (packages/domain)
 npm run verify:export # export→replay equality (packages/export)

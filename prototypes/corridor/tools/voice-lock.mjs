@@ -1,6 +1,6 @@
-/** The one voice lock, read by the renderer, the validators, the runtime mirror and the tests.
- * Nothing else in the tree may name a model or a voice: `audio/voice-lock.json` is the value and
- * this module is its only reader. Swapping the voice is one edit there plus `sync-voice-lock.mjs
+/** The legacy Corridor voice lock, read by the renderer, validators, runtime mirror and tests.
+ * Legacy rendering and playback take their model and role assignments from `audio/voice-lock.json`
+ * through this reader. Swapping the voice is one edit there plus `sync-voice-lock.mjs
  * --write` (which carries it into corridor.js's mirror) plus a re-render. */
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';

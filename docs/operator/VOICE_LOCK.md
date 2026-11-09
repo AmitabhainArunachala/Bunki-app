@@ -1,6 +1,6 @@
 # The voice lock, and how audio is made under it
 
-Slice V, 2026-10-17. This page describes the lock. The lock itself is `prototypes/corridor/audio/voice-lock.json`.
+Slice V, 2026-10-17. This page describes the legacy Corridor narration lock. The lock itself is `prototypes/corridor/audio/voice-lock.json`. The explicitly bound canonical routes use the separate [shared-study audio contract](../srs/SHARED_STUDY_ENGINE.md); that integration does not authorize rendering or change this lock.
 
 ## The lock
 - **What it holds:** `audio/voice-lock.json` is the one value.
@@ -9,7 +9,7 @@ Slice V, 2026-10-17. This page describes the lock. The lock itself is `prototype
   - the voices: **Kore** is the main voice (narrator, word, example); **Charon** is the second voice, for `speaker-b` only;
   - the role law;
   - a separate, unapproved `live` slot for the speaking room.
-- **Who reads it:** `tools/voice-lock.mjs` is its only reader. `tools/sync-voice-lock.mjs --check|--write` carries it into the generated `VOICE_LOCK` block in corridor.js. Nothing else in the tree names a model or a voice.
+- **Who reads it:** `tools/voice-lock.mjs` is its shared reader. `tools/sync-voice-lock.mjs --check|--write` carries it into the generated `VOICE_LOCK` block in corridor.js. Legacy Corridor rendering and playback take their model and role assignments from this lock.
 - **Second voice:** Charon is never a fallback. A missing clip is visibly missing; it is never device speech and never another speaker.
 
 ## Temporary scope: dialogues are single-voice

@@ -2,11 +2,12 @@
 
 Bunki hosts the canonical Nihongo Study UI and v4 engine only through
 `?deck=n2|n1|senmon|kotoba-master|shared-grammar&sharedStudy=preview` (choose one
-deck ID) or a real bound host. `decks/player/mount.js` routes those IDs before it
-reads a legacy ledger in shared mode. Ordinary legacy decks, saved-word/kanji/
-question review routes and the outer Bunki Record remain unchanged and
-disconnected from this distribution, retaining their existing player, counts
-and history until an explicit migration/cutover occurs.
+deck ID) or an explicitly bound host. `decks/player/mount.js` routes those IDs
+before it reads a legacy ledger in shared mode. Without a bound host or the
+preview switch, ordinary startup retains the legacy routes and history. The
+[bound development host](#bound-development-host-and-ordinary-routes) enables
+the mapped ordinary routes with an isolated learner; unsupported routes and the
+outer Bunki Record remain disconnected.
 
 The same-origin frame imports the byte-identical `mountStudyApp` and grammar
 renderer from `vendor/shared-study-engine`. This adopts subsequent canonical UI
@@ -99,10 +100,14 @@ changed frozen rows and other additions fail closed. The isolated preview has no
 content-history adapter and remains fixed to its installed 8,508-task inventory;
 it refuses future growth instead of deriving historical rows from learner state.
 
-`shared-study-presentation.mjs` only resolves selected task keys to prepared
-grammar objects. Grammar's canonical renderer validates object identity. This
-adapter preserves selection order and delegates all commands and policy decisions
-unchanged. Canonical learner-created cards retain their own content.
+`bindStudyPresentation` in `shared-study-presentation.mjs` resolves selected task
+keys to prepared grammar objects. Grammar's canonical renderer validates object
+identity. This adapter preserves selection order and delegates all commands and
+policy decisions unchanged. Canonical learner-created cards retain their own
+content. The module also supplies `bindSharedStudyViewport`: when the canonical
+current card changes and settles, including after Undo, the parent aligns the
+frame below its sticky chrome. Reveal, failed or same-card actions, and ordinary
+reading, disclosure or dictionary scrolling do not trigger that realignment.
 
 ## Isolated local preview
 
@@ -155,6 +160,8 @@ entry initializes. The five ordinary routes `?deck=n2`, `n1`, `senmon`,
 store and synthetic learner `test-shared-audio`. A Web Lock serializes profile
 creation; an installation marker is persisted before store creation. A missing
 or malformed reopened store blocks rather than silently recreating a learner.
+The ready marker is persisted before sync attaches to the store, so a metadata
+write failure can retry without retaining a subscription to the failed adapter.
 The default local fixture grants only twenty initial introductions and supplies
 no authenticated network authority. Production boot does not import this host.
 
@@ -195,8 +202,13 @@ refreshed and independently admitted below.
 observer once per parent store, after checking the exact BUILD and grammar
 bindings. The same observer survives changes between mapped study frames.
 Cross-frame arguments are copied into the parent's realm before canonical
-validation. Creation failure and page disposal release subscriptions; failed
-startup can be retried. Grading does not await the background scan.
+validation. Creation failure and final page disposal release subscriptions;
+failed startup can be retried. Persisted `pagehide` keeps the parent host, frame
+and observer alive; canonical `pageshow` handling flushes the observer on return.
+Lifecycle-event regressions do not establish that a browser actually entered
+the back/forward cache. Final host disposal still closes packs, backend and
+storage if sync draining fails, preserving the original error. Grading does not
+await the background scan.
 
 Pending demand descriptors live in a separate canonical private IndexedDB store,
 partitioned by the explicit learner and installation namespace. They never enter
@@ -224,8 +236,11 @@ qualification, set `BUNKI_QA_SITE`, `BUNKI_QA_EVIDENCE` and the independently
 selected `BUNKI_QA_ENGINE_CLOSURE`, then run
 `node scripts/verify-shared-study-host-browser.mjs`. The verifier uses a fresh
 test profile, grades once through each of the five real routes and reopens the
-same journal after a browser-process restart. It distinguishes first-boot shell
-record initialization from forbidden legacy grade writes.
+same journal after a browser-process restart. The preview and ordinary-host
+verifiers distinguish first-boot shell record initialization from forbidden
+legacy grade writes. They exclude the exact private demand database
+`nsrs-private-audio-demand-v1` as well as their canonical study-store namespace;
+near-match names and other legacy writes remain subject to the mutation checks.
 
 Outer Record, saved-word/kanji/question review, personal collections, context/MCD,
 assessment and other unsupported routes retain their existing contracts. The

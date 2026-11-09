@@ -2,7 +2,7 @@
 /** Carry audio/voice-lock.json into corridor.js's runtime mirror, so the browser needs no fetch
  * and the two can never drift. `--check` is a gate (exit 1 on drift, naming the one command to
  * run); `--write` performs the swap. Swapping the voice is therefore: edit the JSON, run --write,
- * re-render. Nothing else in the tree names a model or a voice. */
+ * re-render. This mirror governs legacy Corridor playback; canonical shared-study audio has its own contract. */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';

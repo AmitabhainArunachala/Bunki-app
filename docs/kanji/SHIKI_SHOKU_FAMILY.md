@@ -96,9 +96,7 @@ The immutable handback's Git head plus the family and structure SHA-256 values i
 
 W5 owns mapping its proposed `GraphPort` to these exports, selecting each destination's own occurrence, return capabilities, rendering and depth semantics. The technical `$` wrapper remains retained evidence; `$/0` is the glyph root. W3 owns source truth and later reviewed relationship/task adapters.
 
-**Slice 5 adds separately authored course targets.** `BunkiKanjiCourse.taskTarget(reference)` now resolves exact canonical 職・識・織 references to their keyword tasks and the exact primary word/reading pairs 職業・しょくぎょう, 知識・ちしき and 組織・そしき to their whole-word reading tasks. It returns the stable course ID, `unitId: "shiki-shoku"`, unit revision 4, target ID and authored prompt IDs. Component occurrences, sentence occurrences, wrong readings and teaching-only alternate words still resolve to null. This supersedes slice 4's `taskTarget: null` boundary only for these new tasks; earlier frozen source remains unchanged.
-
-See [first-family learning contract](FIRST_FAMILY_LEARNING.md). The course is ordinary-text practice, not a source-transfer assessment, handwriting recognition or a delayed-retention claim. The retained sentences remain teaching examples; they never become confirmed source-practice plans or scheduler identities. Any future source-practice task still needs separate live source-context/reading-cue admission and plan confirmation under the actual host contract. Course result rows remain practice observations. Only an explicit eligible attempt may cross W4's one hook; its implementation is not included in this branch.
+The [first-family learning contract](FIRST_FAMILY_LEARNING.md) owns the separately authored course task identities and guarded legacy review seam added after slice 4. The retained sentences remain teaching examples; they never become confirmed source-practice plans or scheduler identities. Any future source-practice task still needs separate live source-context/reading-cue admission and plan confirmation under the actual host contract.
 
 The family asset deliberately retains only on-readings. Kun readings such as 織 お.る and 識 し.る remain available in `kanji.json` and the complete kanji reference supplied by the consumer; the 戠 phonetic-family association does not govern or predict them. Missing standalone geometry and historical/font bindings remain unchanged.
 
@@ -118,7 +116,7 @@ The focused executable probe is `tools/test-kanji-family-navigation.mjs`; its F1
 
 ## Why `learning-core.mjs` is absent from Git
 
-The module is generated output by design, not a missing handwritten file. `scripts/build-reading-module.mjs` exists in Git; this source-only worktree's sparse selection does not materialize it or all `packages/` inputs. Reading a file from another worktree is not a replacement for pinning its Git bytes.
+The module is generated output by design, not a missing handwritten file. `scripts/build-reading-module.mjs` and its `packages/` inputs are tracked sources; a sparse checkout must materialize them before building. Reading a file from another worktree is not a replacement for pinning its Git bytes.
 
 The exact generation path, inspected from the frozen source, is:
 

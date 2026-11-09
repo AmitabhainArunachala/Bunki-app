@@ -6,9 +6,9 @@ This branch extends the integrated `df617045` prototype. It is an experimental f
 
 - Full meanings and explicitly separated classical/Nelson dictionary classifications from the existing pinned KANJIDIC2 source. Ordinary entries, reference lists/search, radical lookup, exploration captions and writing-room labels share the facts. The source has 10,384 records; six legacy structural forms honestly have no reference facts.
 - Original-path group inspection for 森・品・晶・織・識・職. The source projection contains 61 groups and 88 strokes; repeated occurrences and unnamed groups remain separate. This is a stroke-group model, not an etymology or semantic/phonetic-role model.
-- An authored pilot of 48 kanji in 12 units, using 97 attested primary/alternate word records (including repeated words). Meaning recognition and whole-word reading are separate tasks. An introduction offers teaching or a check before answers appear; dictionary-origin visits offer supported practice instead. Reveal/skip receives no success credit. Missed-target repair preserves full-unit scores. The new selection requires linguistic/editorial and learner validation before acceptance.
+- An authored course pilot, including the [first family unit](FIRST_FAMILY_LEARNING.md). `BunkiKanjiCourse.counts()` reports its current coverage. Meaning recognition and whole-word reading are separate tasks. An introduction offers teaching or a check before answers appear; dictionary-origin visits offer supported practice instead. Reveal/skip receives no success credit. Missed-target repair preserves full-unit scores. The new selection requires linguistic/editorial and learner validation before acceptance.
 
-The dictionary fields do not rewrite old lesson keywords, captured answers or scheduler state. The course writes only existing lesson evidence, through the existing acknowledged transaction, when the learner chooses Keep. No new learner root, scheduler, mastery metric or automatic enrollment exists.
+The dictionary fields do not rewrite old lesson keywords, captured answers or scheduler state. Keep writes existing lesson evidence through the existing acknowledged transaction. The first family's separate [review seam](FIRST_FAMILY_LEARNING.md#one-guarded-review-seam) can admit an eligible self-checked attempt to an existing saved card. No new learner root, scheduler, mastery metric or automatic enrollment exists.
 
 ## Shared interfaces
 
@@ -29,7 +29,8 @@ their attested alternate words; preview checks still withhold teaching answers.
 The third source revision expands the catalog to revision 3, while the original
 six units retain their revision-2 lesson IDs, content and compatible live runs.
 Only the six new units use revision-3 result IDs. The legacy technical course ID
-remains stable; the visible title and coverage counts reflect 48 characters.
+remains stable. The later first-family addition is covered by its linked contract;
+the visible coverage comes from `counts()`.
 
 Reader slip and keyboard lookup shortcuts carry their original passage and
 token index into the kanji entry. Related-form navigation retains that origin
@@ -65,8 +66,9 @@ The fourth source slice adds a [frozen library inventory](LIBRARY_INVENTORY.md)
 and the first [attributed 戠 family](SHIKI_SHOKU_FAMILY.md). Identity coverage,
 word/readings, source occurrences, geometry, authored role edges and missing
 historical coverage are separate counts. `BunkiKanjiFamily` supplies typed,
-immutable joins with exact source evidence; its three family members are not
-additional authored course targets. Kimi's further teaching-gloss selections
+immutable joins with exact source evidence. Its separately authored course tasks
+are defined in the [first-family learning contract](FIRST_FAMILY_LEARNING.md).
+Kimi's further teaching-gloss selections
 preserve raw fields, lesson identities and all existing graded prompts.
 
 KANJIDIC2/scriptin release `3.6.2+20260803141815`; raw archive SHA-256 `5dfb850ee88c7bccecf4694cc4d7b1338e608440c5edcb8fefc93216b3471fe6`. Complete field projection and provenance are generated in `reference-extra.json`; the old tables are preserved.

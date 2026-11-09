@@ -1,5 +1,5 @@
 /**
- * The proposed M4 review caller, r3.1 (window 4 design for R2; not product code). One function turns a prepared M4/W3
+ * The legacy Corridor review caller, r3.1. One function turns a prepared M4/W3
  * attempt into the one hook call; every entrance reaches it only through a practice room's PREPARE_REVIEW.
  *   r2/r3: owner/epoch/journey/attempt binding, rechecked before the call; at most once per prepared identity; results
  *   owned per record epoch.

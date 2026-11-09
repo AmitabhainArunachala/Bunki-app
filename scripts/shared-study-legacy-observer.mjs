@@ -1,5 +1,5 @@
 export function observeSharedStudyLegacyWrites() {
-  const {window, IDBObjectStore, localStorage} = globalThis;
+  const { window, IDBObjectStore, localStorage } = globalThis;
   window.__legacyWrites = [];
   for (const method of ['put', 'add', 'delete', 'clear']) {
     const original = IDBObjectStore.prototype[method];

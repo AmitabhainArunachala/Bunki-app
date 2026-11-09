@@ -1,10 +1,11 @@
 # 収録の声 — voice licences
 
-Generated 2026-08-20 on the build machine (no cloud API). The roster is
+The retained legacy clips were generated 2026-08-20 on the build machine (no cloud API). That roster was
 interim and was NOT chosen by the operator: the planned 11-candidate shootout
 never ran (docs/build-evidence/tenohira/RUN_STATE.md), and on 2026-09-19 he
-said 小春音アミ is not the voice. A real audition decides the roster. All synthesis engines and voice
-models are free with attribution; this file is that attribution. The
+said 小春音アミ is not the voice. Those legacy synthesis engines and voice
+models are free with attribution; this file is that attribution. Current playback and rendering are governed by the
+[voice lock](../../../docs/operator/VOICE_LOCK.md). The
 audio pool is licence-separated from the content pools per the
 corridor's rights discipline.
 
@@ -32,9 +33,8 @@ AAC 64 kbps mono 24 kHz, one clip per sentence, listed in
 reader fetches that manifest. An article without clips still shows the pending
 line (この記事の収録音声はありません) and nothing plays for it.
 
-Word and sentence clips follow the same lock: only a Kore or Charon recording
-may play for a word or a shelf sentence. The interim clips credited above remain
-in the repository but no longer play. Until approved word clips exist, the
+Word and sentence playback follows the [voice lock's role assignments](../../../docs/operator/VOICE_LOCK.md#the-lock).
+The interim clips credited above remain in the repository but no longer play. Until approved word clips exist, the
 answer card stays silent and says the Kore voice is on its way; until approved
 sentence clips exist, sentence practice offers no listening mode and shows the
 same 音声準備中 · Kore state.

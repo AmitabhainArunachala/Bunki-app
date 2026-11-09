@@ -7,14 +7,23 @@
  * `.m4a` byte streams into a fresh QA-only release under the caller's output
  * directory. The release is a single-task fixture, not whole-catalog coverage.
  */
-import {createHash} from 'node:crypto';
+import { createHash } from 'node:crypto';
 import {
-  chmodSync, closeSync, existsSync, lstatSync, mkdirSync, openSync, readFileSync,
-  readdirSync, realpathSync, statSync, writeSync,
+  chmodSync,
+  closeSync,
+  existsSync,
+  lstatSync,
+  mkdirSync,
+  openSync,
+  readFileSync,
+  readdirSync,
+  realpathSync,
+  statSync,
+  writeSync,
 } from 'node:fs';
-import {isAbsolute, join, relative, resolve, dirname} from 'node:path';
-import {homedir} from 'node:os';
-import {pathToFileURL} from 'node:url';
+import { isAbsolute, join, relative, resolve, dirname } from 'node:path';
+import { homedir } from 'node:os';
+import { pathToFileURL } from 'node:url';
 
 const FIXTURE_FORMAT = 'bunki-source-bound-audio-fixture/v1';
 const PROTOCOL = 'nsrs-audio-resources/v1';
@@ -41,28 +50,36 @@ const MAX_CLIP_BYTES = 2 * 1024 * 1024;
 const MAX_ROWS = 4096;
 const CLIP_NAMES = Object.freeze(['term', 'first-sentence', 'remainder']);
 
-const fail = message => {
+const fail = (message) => {
   throw new Error(message);
 };
-const isPlain = value => value !== null && typeof value === 'object' && !Array.isArray(value) &&
+const isPlain = (value) =>
+  value !== null &&
+  typeof value === 'object' &&
+  !Array.isArray(value) &&
   (Object.getPrototypeOf(value) === Object.prototype || Object.getPrototypeOf(value) === null);
-const nonempty = value => typeof value === 'string' && /\S/u.test(value);
-const utf8 = value => Buffer.from(value, 'utf8');
-const sha256Hex = bytes => createHash('sha256').update(bytes).digest('hex');
-const readJson = path => JSON.parse(readFileSync(path, 'utf8'));
-const hashFile = path => sha256Hex(readFileSync(path));
-const jsonBytes = value => utf8(JSON.stringify(value));
-const refFor = (key, bytes) => Object.freeze({key, sha256: sha256Hex(bytes), bytes: bytes.byteLength});
+const nonempty = (value) => typeof value === 'string' && /\S/u.test(value);
+const utf8 = (value) => Buffer.from(value, 'utf8');
+const sha256Hex = (bytes) => createHash('sha256').update(bytes).digest('hex');
+const readJson = (path) => JSON.parse(readFileSync(path, 'utf8'));
+const hashFile = (path) => sha256Hex(readFileSync(path));
+const jsonBytes = (value) => utf8(JSON.stringify(value));
+const refFor = (key, bytes) =>
+  Object.freeze({ key, sha256: sha256Hex(bytes), bytes: bytes.byteLength });
 const assertHex = (value, label) => {
   if (typeof value !== 'string' || !HEX.test(value)) fail(`${label} must be a lower-case SHA-256`);
   return value;
 };
 const within = (base, target) => {
   const path = relative(base, target);
-  return path.length > 0 && !path.startsWith(`..${process.platform === 'win32' ? '\\' : '/'}`) &&
-    path !== '..' && !isAbsolute(path);
+  return (
+    path.length > 0 &&
+    !path.startsWith(`..${process.platform === 'win32' ? '\\' : '/'}`) &&
+    path !== '..' &&
+    !isAbsolute(path)
+  );
 };
-const pathExists = path => {
+const pathExists = (path) => {
   try {
     lstatSync(path);
     return true;
@@ -89,7 +106,7 @@ function findPin(repo) {
 /** Recursively enumerate regular `.m4a` files. Symlinks are never followed. */
 function findM4aFiles(directory) {
   const files = [];
-  const walk = current => {
+  const walk = (current) => {
     const stat = lstatSync(current);
     if (stat.isSymbolicLink()) return;
     if (stat.isDirectory()) {
@@ -99,7 +116,7 @@ function findM4aFiles(directory) {
     if (stat.isFile() && current.toLowerCase().endsWith('.m4a')) files.push(current);
   };
   walk(directory);
-  files.sort((a, b) => a < b ? -1 : a > b ? 1 : 0);
+  files.sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
   return files;
 }
 
@@ -130,15 +147,19 @@ function passageSplit(ja) {
 }
 
 const directiveFits = (directive, codepointLength) =>
-  Number.isSafeInteger(directive.start) && Number.isSafeInteger(directive.end) &&
-  directive.start >= 0 && directive.end > directive.start &&
-  directive.end <= codepointLength && nonempty(directive.reading);
+  Number.isSafeInteger(directive.start) &&
+  Number.isSafeInteger(directive.end) &&
+  directive.start >= 0 &&
+  directive.end > directive.start &&
+  directive.end <= codepointLength &&
+  nonempty(directive.reading);
 
-const relativeDirectives = (directives, offset) => directives.map(directive => ({
-  start: directive.start - offset,
-  end: directive.end - offset,
-  reading: directive.reading,
-}));
+const relativeDirectives = (directives, offset) =>
+  directives.map((directive) => ({
+    start: directive.start - offset,
+    end: directive.end - offset,
+    reading: directive.reading,
+  }));
 
 /** Select the first actual n2 vocabulary entry whose term and ja fields are
  * ready without pending reasons and whose reviewed reading spans fit the
@@ -161,9 +182,10 @@ function selectSource(catalog, studyAudioSourcePlan, createSpeechInput) {
     } catch {
       continue;
     }
-    if (!plan || !Array.isArray(plan.sourceFields) || !HEX.test(plan.audioContentRevision ?? '')) continue;
-    const termField = plan.sourceFields.find(field => field?.fieldId === 'term');
-    const jaField = plan.sourceFields.find(field => field?.fieldId === 'ja');
+    if (!plan || !Array.isArray(plan.sourceFields) || !HEX.test(plan.audioContentRevision ?? ''))
+      continue;
+    const termField = plan.sourceFields.find((field) => field?.fieldId === 'term');
+    const jaField = plan.sourceFields.find((field) => field?.fieldId === 'ja');
     if (!termField || !jaField) continue;
     if (termField.language !== 'ja' || jaField.language !== 'ja') continue;
     if (termField.text !== term || jaField.text !== ja) continue;
@@ -172,37 +194,48 @@ function selectSource(catalog, studyAudioSourcePlan, createSpeechInput) {
     const termDirectives = termField.pronunciationDirectives;
     const jaDirectives = jaField.pronunciationDirectives;
     if (!termDirectives.length || !jaDirectives.length) continue;
-    if (!termDirectives.every(directive => directiveFits(directive, termCodepoints))) continue;
-    if (!jaDirectives.every(directive => directiveFits(directive, split.totalCodepoints))) continue;
-    const firstDirectives = jaDirectives.filter(directive => directive.end <= split.firstCodepoints);
-    const remainderDirectives = jaDirectives.filter(directive => directive.start >= split.firstCodepoints);
+    if (!termDirectives.every((directive) => directiveFits(directive, termCodepoints))) continue;
+    if (!jaDirectives.every((directive) => directiveFits(directive, split.totalCodepoints)))
+      continue;
+    const firstDirectives = jaDirectives.filter(
+      (directive) => directive.end <= split.firstCodepoints,
+    );
+    const remainderDirectives = jaDirectives.filter(
+      (directive) => directive.start >= split.firstCodepoints,
+    );
     // A directive crossing the sentence boundary cannot be represented in
     // either per-segment relative coordinate space.
     if (firstDirectives.length + remainderDirectives.length !== jaDirectives.length) continue;
     // Exercise relative-coordinate movement in both passage clips.
     if (!firstDirectives.length || !remainderDirectives.length) continue;
     const termSpeech = createSpeechInput({
-      segments: [{
-        language: 'ja',
-        text: term,
-        pronunciationDirectives: relativeDirectives(termDirectives, 0),
-      }],
+      segments: [
+        {
+          language: 'ja',
+          text: term,
+          pronunciationDirectives: relativeDirectives(termDirectives, 0),
+        },
+      ],
       profile: PROFILE,
     });
     const firstSpeech = createSpeechInput({
-      segments: [{
-        language: 'ja',
-        text: split.firstSentence,
-        pronunciationDirectives: relativeDirectives(firstDirectives, 0),
-      }],
+      segments: [
+        {
+          language: 'ja',
+          text: split.firstSentence,
+          pronunciationDirectives: relativeDirectives(firstDirectives, 0),
+        },
+      ],
       profile: PROFILE,
     });
     const remainderSpeech = createSpeechInput({
-      segments: [{
-        language: 'ja',
-        text: split.remainder,
-        pronunciationDirectives: relativeDirectives(remainderDirectives, split.firstCodepoints),
-      }],
+      segments: [
+        {
+          language: 'ja',
+          text: split.remainder,
+          pronunciationDirectives: relativeDirectives(remainderDirectives, split.firstCodepoints),
+        },
+      ],
       profile: PROFILE,
     });
     return {
@@ -221,9 +254,17 @@ function selectSource(catalog, studyAudioSourcePlan, createSpeechInput) {
   fail('no usable n2 vocabulary.read.v1 entry with split-compatible reviewed readings');
 }
 
-function rowFor({taskKey, contentRevision, audioContentRevision, fieldId, text, sourceSha256,
-  sourceBytes, segments}) {
-  if (!Array.isArray(segments) || segments.length === 0) fail('verified placement requires segments');
+function rowFor({
+  taskKey,
+  contentRevision,
+  audioContentRevision,
+  fieldId,
+  sourceSha256,
+  sourceBytes,
+  segments,
+}) {
+  if (!Array.isArray(segments) || segments.length === 0)
+    fail('verified placement requires segments');
   return {
     taskKey,
     contentRevision,
@@ -263,7 +304,11 @@ export async function createBunkiAudioFixture({
   output,
   expectedClosure,
 } = {}) {
-  if (![repo, engineExport, mediaDirectory, output].every(value => typeof value === 'string' && value.length > 0)) {
+  if (
+    ![repo, engineExport, mediaDirectory, output].every(
+      (value) => typeof value === 'string' && value.length > 0,
+    )
+  ) {
     fail('repo, engineExport, mediaDirectory and output are required paths');
   }
   assertHex(expectedClosure, 'expectedClosure');
@@ -271,16 +316,20 @@ export async function createBunkiAudioFixture({
   const engineRoot = resolve(engineExport);
   const mediaRoot = resolve(mediaDirectory);
   const outputRoot = resolve(output);
-  const runtimeRoot=realpathSync(join(homedir(),'.dharma'));
-  if(!within(runtimeRoot,outputRoot))fail('output must be under ~/.dharma');
-  let ancestor=dirname(outputRoot);
-  while(!pathExists(ancestor))ancestor=dirname(ancestor);
-  if(realpathSync(ancestor)!==ancestor)fail('output ancestor must not be a symlink');
+  const runtimeRoot = realpathSync(join(homedir(), '.dharma'));
+  if (!within(runtimeRoot, outputRoot)) fail('output must be under ~/.dharma');
+  let ancestor = dirname(outputRoot);
+  while (!pathExists(ancestor)) ancestor = dirname(ancestor);
+  if (realpathSync(ancestor) !== ancestor) fail('output ancestor must not be a symlink');
   if (!statSync(repoRoot).isDirectory()) fail('repo must be a directory');
   if (!statSync(mediaRoot).isDirectory()) fail('mediaDirectory must be a directory');
 
   const judgeBase = process.env.BUNKI_AUDIO_JUDGE_OUT;
-  if (typeof judgeBase === 'string' && judgeBase.length > 0 && !within(resolve(judgeBase), outputRoot)) {
+  if (
+    typeof judgeBase === 'string' &&
+    judgeBase.length > 0 &&
+    !within(resolve(judgeBase), outputRoot)
+  ) {
     fail('output must be a new directory below BUNKI_AUDIO_JUDGE_OUT');
   }
 
@@ -292,26 +341,36 @@ export async function createBunkiAudioFixture({
   const engineVerifierPath = join(engineRoot, 'tools/verify_engine.mjs');
   if (hashFile(engineVerifierPath) !== pin.verifierSha256)
     fail('Canonical verifier differs from reviewed Bunki pin');
-  const {verifyEngineDistribution} = await import(pathToFileURL(engineVerifierPath));
-  const manifest = verifyEngineDistribution(engineRoot, {expectedClosureSha256: expectedClosure});
-  if (manifest.closureSha256 !== expectedClosure) fail('engine closure differs from expectedClosure');
+  const { verifyEngineDistribution } = await import(pathToFileURL(engineVerifierPath));
+  const manifest = verifyEngineDistribution(engineRoot, { expectedClosureSha256: expectedClosure });
+  if (manifest.closureSha256 !== expectedClosure)
+    fail('engine closure differs from expectedClosure');
 
-  const {studyAudioSourcePlan} = await import(pathToFileURL(join(engineRoot, 'client/app/study-audio.mjs')));
-  const {createSpeechInput} = await import(pathToFileURL(join(engineRoot, 'client/audio/speech-input.mjs')));
-  const {audioBucket} = await import(pathToFileURL(join(engineRoot, 'client/app/audio-release.mjs')));
-  const {sha256} = await import(pathToFileURL(join(engineRoot, 'client/schema/event.mjs')));
-  const {passageReadingLedgerSha256} = await import(pathToFileURL(join(engineRoot, 'client/player/passage-reading-rules.mjs')));
+  const { studyAudioSourcePlan } = await import(
+    pathToFileURL(join(engineRoot, 'client/app/study-audio.mjs'))
+  );
+  const { createSpeechInput } = await import(
+    pathToFileURL(join(engineRoot, 'client/audio/speech-input.mjs'))
+  );
+  const { audioBucket } = await import(
+    pathToFileURL(join(engineRoot, 'client/app/audio-release.mjs'))
+  );
+  const { sha256 } = await import(pathToFileURL(join(engineRoot, 'client/schema/event.mjs')));
+  const { passageReadingLedgerSha256 } = await import(
+    pathToFileURL(join(engineRoot, 'client/player/passage-reading-rules.mjs'))
+  );
 
   // Frozen Bunki content: four packs + binding + pin, decoded by the actual
   // source module rather than a copied or reimplemented reader.
-  const {decodeSharedContent, SHARED_DECKS} = await import(
+  const { decodeSharedContent, SHARED_DECKS } = await import(
     pathToFileURL(join(repoRoot, 'prototypes/corridor/shared-study-content.mjs'))
   );
   const sourceDir = join(repoRoot, 'prototypes/corridor');
   const bindingPath = join(sourceDir, 'data/shared-study-content.json');
   const binding = readJson(bindingPath);
   const bindingSha256 = hashFile(bindingPath);
-  if (pin.contentBindingSha256 !== bindingSha256) fail('shared-study binding does not match the frozen pin');
+  if (pin.contentBindingSha256 !== bindingSha256)
+    fail('shared-study binding does not match the frozen pin');
   if (binding.format !== 'bunki-shared-content/v1' || !Array.isArray(binding.rows)) {
     fail('unexpected shared-study binding format');
   }
@@ -323,7 +382,7 @@ export async function createBunkiAudioFixture({
     const declared = binding.packs?.[id]?.sha256;
     if (declared !== sha256Value) fail(`frozen ${id} pack does not match the binding`);
     decks[id] = readJson(path);
-    deckProvenance[id] = {path, sha256: sha256Value, cards: binding.packs[id].cards};
+    deckProvenance[id] = { path, sha256: sha256Value, cards: binding.packs[id].cards };
   }
   const fsrsPinPath = join(sourceDir, 'vendor/shared-study-engine/client/vendor/fsrs-pin.json');
   const fsrsPin = existsSync(fsrsPinPath) ? readJson(fsrsPinPath) : pin;
@@ -340,11 +399,16 @@ export async function createBunkiAudioFixture({
   const dictionarySha256 = hashFile(dictionaryPath);
   const buildSha256 = hashFile(buildPath);
   const catalogIdentity = assertHex(binding.source?.catalogSha256, 'binding.source.catalogSha256');
-  if (binding.source?.registrySha256 !== registrySha256) fail('registry source hash does not match the binding');
-  if (binding.grammarAssets?.['registry.json'] !== registrySha256) fail('grammar registry hash does not match');
-  if (binding.grammarAssets?.['grammar.json'] !== grammarSha256) fail('grammar source hash does not match the binding');
-  if (binding.dictionary?.sha256 !== dictionarySha256) fail('dictionary source hash does not match the binding');
-  if (binding.dictionary?.buildSha256 !== buildSha256) fail('dictionary build hash does not match the binding');
+  if (binding.source?.registrySha256 !== registrySha256)
+    fail('registry source hash does not match the binding');
+  if (binding.grammarAssets?.['registry.json'] !== registrySha256)
+    fail('grammar registry hash does not match');
+  if (binding.grammarAssets?.['grammar.json'] !== grammarSha256)
+    fail('grammar source hash does not match the binding');
+  if (binding.dictionary?.sha256 !== dictionarySha256)
+    fail('dictionary source hash does not match the binding');
+  if (binding.dictionary?.buildSha256 !== buildSha256)
+    fail('dictionary build hash does not match the binding');
   const identities = Object.freeze({
     catalog: catalogIdentity,
     registry: registrySha256,
@@ -353,7 +417,7 @@ export async function createBunkiAudioFixture({
   });
 
   const selected = selectSource(content.catalog, studyAudioSourcePlan, createSpeechInput);
-  const {entry, plan, split, termSpeech, firstSpeech, remainderSpeech} = selected;
+  const { entry, plan, split, termSpeech, firstSpeech, remainderSpeech } = selected;
   if (entry.taskKey === undefined) fail('selected entry has no taskKey');
   const taskKey = entry.taskKey;
   const contentRevision = entry.contentRevision;
@@ -367,7 +431,7 @@ export async function createBunkiAudioFixture({
     if (bytes.byteLength === 0) continue;
     if (bytes.byteLength > MAX_CLIP_BYTES) fail(`media file exceeds the clip limit: ${path}`);
     const digest = sha256Hex(bytes);
-    mediaCandidates.push({path, bytes, sha256: digest, relativePath: relative(mediaRoot, path)});
+    mediaCandidates.push({ path, bytes, sha256: digest, relativePath: relative(mediaRoot, path) });
   }
   const distinctMedia = [];
   const seenMedia = new Set();
@@ -376,20 +440,25 @@ export async function createBunkiAudioFixture({
     seenMedia.add(media.sha256);
     distinctMedia.push(media);
   }
-  if (distinctMedia.length < 3) fail('mediaDirectory must contain at least three distinct .m4a byte streams');
-  const selectedMedia = distinctMedia.slice(0, 3).map((media, index) => Object.freeze({
-    ...media,
-    clip: CLIP_NAMES[index],
-    ref: refFor(`media/${media.sha256}.m4a`, media.bytes),
-  }));
+  if (distinctMedia.length < 3)
+    fail('mediaDirectory must contain at least three distinct .m4a byte streams');
+  const selectedMedia = distinctMedia.slice(0, 3).map((media, index) =>
+    Object.freeze({
+      ...media,
+      clip: CLIP_NAMES[index],
+      ref: refFor(`media/${media.sha256}.m4a`, media.bytes),
+    }),
+  );
 
   const termBytes = utf8(entry.term);
   const jaBytes = split.sourceBytes;
-  if (termBytes.byteLength !== Buffer.byteLength(entry.term, 'utf8')) fail('term byte length mismatch');
+  if (termBytes.byteLength !== Buffer.byteLength(entry.term, 'utf8'))
+    fail('term byte length mismatch');
   if (jaBytes.byteLength !== Buffer.byteLength(entry.ja, 'utf8')) fail('ja byte length mismatch');
   const firstOffset = split.firstBytes.byteLength;
   const totalBytesLength = jaBytes.byteLength;
-  if (firstOffset + split.remainderBytes.byteLength !== totalBytesLength) fail('passage byte split mismatch');
+  if (firstOffset + split.remainderBytes.byteLength !== totalBytesLength)
+    fail('passage byte split mismatch');
 
   const packId = `bunki-audio-qa-${sha256(taskKey).slice(0, 12)}`;
 
@@ -401,12 +470,14 @@ export async function createBunkiAudioFixture({
     text: entry.term,
     sourceSha256: sha256(entry.term),
     sourceBytes: termBytes.byteLength,
-    segments: [{
-      start: 0,
-      end: termBytes.byteLength,
-      inputKey: termSpeech.inputKey,
-      speechInput: termSpeech,
-    }],
+    segments: [
+      {
+        start: 0,
+        end: termBytes.byteLength,
+        inputKey: termSpeech.inputKey,
+        speechInput: termSpeech,
+      },
+    ],
   });
   termRow.packId = packId;
   const jaRow = rowFor({
@@ -417,17 +488,20 @@ export async function createBunkiAudioFixture({
     text: entry.ja,
     sourceSha256: sha256(entry.ja),
     sourceBytes: totalBytesLength,
-    segments: [{
-      start: 0,
-      end: firstOffset,
-      inputKey: firstSpeech.inputKey,
-      speechInput: firstSpeech,
-    }, {
-      start: firstOffset,
-      end: totalBytesLength,
-      inputKey: remainderSpeech.inputKey,
-      speechInput: remainderSpeech,
-    }],
+    segments: [
+      {
+        start: 0,
+        end: firstOffset,
+        inputKey: firstSpeech.inputKey,
+        speechInput: firstSpeech,
+      },
+      {
+        start: firstOffset,
+        end: totalBytesLength,
+        inputKey: remainderSpeech.inputKey,
+        speechInput: remainderSpeech,
+      },
+    ],
   });
   jaRow.packId = packId;
 
@@ -441,7 +515,8 @@ export async function createBunkiAudioFixture({
     rows: [termRow, jaRow],
   };
   const placementBytes = jsonBytes(placementShard);
-  if (placementBytes.byteLength > MAX_SHARD_BYTES) fail('placement shard exceeds the contract bound');
+  if (placementBytes.byteLength > MAX_SHARD_BYTES)
+    fail('placement shard exceeds the contract bound');
   if (placementShard.rows.length > MAX_ROWS) fail('placement shard has too many rows');
   const placementRef = refFor('placements/task.json', placementBytes);
 
@@ -483,7 +558,9 @@ export async function createBunkiAudioFixture({
   const clipShards = [...clipRowsByBucket.entries()]
     .sort(([a], [b]) => a - b)
     .map(([bucket, rows]) => {
-      const ordered = rows.slice().sort((a, b) => a.inputKey < b.inputKey ? -1 : a.inputKey > b.inputKey ? 1 : 0);
+      const ordered = rows
+        .slice()
+        .sort((a, b) => (a.inputKey < b.inputKey ? -1 : a.inputKey > b.inputKey ? 1 : 0));
       const shard = {
         format: CLIP_FORMAT,
         version: 1,
@@ -495,17 +572,18 @@ export async function createBunkiAudioFixture({
       const bytes = jsonBytes(shard);
       if (bytes.byteLength > MAX_SHARD_BYTES) fail('clip shard exceeds the contract bound');
       if (shard.rows.length > MAX_ROWS) fail('clip shard has too many rows');
-      return {bucket, bytes, ref: refFor(`clips/${bucket}.json`, bytes)};
+      return { bucket, bytes, ref: refFor(`clips/${bucket}.json`, bytes) };
     });
 
   const packResourceRefs = [
     placementRef,
-    ...clipShards.map(shard => shard.ref),
-    ...selectedMedia.map(media => media.ref),
+    ...clipShards.map((shard) => shard.ref),
+    ...selectedMedia.map((media) => media.ref),
   ];
   const uniqueKeys = new Set();
   for (const ref of packResourceRefs) {
-    if (ref.key === 'root.json' || uniqueKeys.has(ref.key)) fail('pack index resource key is not unique');
+    if (ref.key === 'root.json' || uniqueKeys.has(ref.key))
+      fail('pack index resource key is not unique');
     uniqueKeys.add(ref.key);
   }
   const packTotalBytes = packResourceRefs.reduce((total, ref) => total + ref.bytes, 0);
@@ -532,10 +610,10 @@ export async function createBunkiAudioFixture({
     correctionLedgerRevision: passageReadingLedgerSha256,
     routing: ROUTING,
     defaultProfileId: PROFILE_ID,
-    profiles: [{id: PROFILE_ID, profile: PROFILE}],
-    placementShards: [{bucket: placementBucket, ref: placementRef}],
-    clipShards: clipShards.map(shard => ({bucket: shard.bucket, ref: shard.ref})),
-    packs: [{id: packId, ref: packIndexRef, totalBytes: packTotalBytes}],
+    profiles: [{ id: PROFILE_ID, profile: PROFILE }],
+    placementShards: [{ bucket: placementBucket, ref: placementRef }],
+    clipShards: clipShards.map((shard) => ({ bucket: shard.bucket, ref: shard.ref })),
+    packs: [{ id: packId, ref: packIndexRef, totalBytes: packTotalBytes }],
   };
   const rootBytes = jsonBytes(root);
   if (rootBytes.byteLength > MAX_ROOT_BYTES) fail('root exceeds the contract bound');
@@ -549,7 +627,7 @@ export async function createBunkiAudioFixture({
 
   // Compute every byte before creating the output directory, so failed
   // selection or verification never leaves a partial release behind.
-  const expectedClipSha256 = clipRows.map(row => row.ref.sha256);
+  const expectedClipSha256 = clipRows.map((row) => row.ref.sha256);
   const provenance = {
     source: {
       repo: repoRoot,
@@ -562,7 +640,7 @@ export async function createBunkiAudioFixture({
         contentBindingSha256: pin.contentBindingSha256,
         verifierSha256: pin.verifierSha256,
       },
-      binding: {path: bindingPath, sha256: bindingSha256},
+      binding: { path: bindingPath, sha256: bindingSha256 },
       fsrsPin: {
         path: fsrsPinPath,
         sha256: existsSync(fsrsPinPath) ? hashFile(fsrsPinPath) : hashFile(pinPath),
@@ -575,7 +653,8 @@ export async function createBunkiAudioFixture({
       decks: deckProvenance,
       identities,
       identitySources: {
-        catalog: 'binding.source.catalogSha256 (source catalog.json is not mounted in this worktree)',
+        catalog:
+          'binding.source.catalogSha256 (source catalog.json is not mounted in this worktree)',
         registry: 'prototypes/corridor/data/shared-study/registry.json',
         grammar: 'prototypes/corridor/data/shared-study/grammar.json',
         dictionary: 'prototypes/corridor/data/shared-study/dictionary.json.gz',
@@ -609,13 +688,14 @@ export async function createBunkiAudioFixture({
       termDirectives: termSpeech.segments[0].pronunciationDirectives.length,
       firstSentenceDirectives: selected.firstDirectiveCount,
       remainderDirectives: selected.remainderDirectiveCount,
-      selection: 'first decoded n2 vocabulary.read.v1 entry with ready term/ja fields, multi-sentence ja, and non-crossing reviewed reading spans',
+      selection:
+        'first decoded n2 vocabulary.read.v1 entry with ready term/ja fields, multi-sentence ja, and non-crossing reviewed reading spans',
     },
     media: {
       directory: mediaRoot,
       discoveredM4aFiles: mediaCandidates.length,
       distinctMediaHashes: distinctMedia.length,
-      selected: selectedMedia.map(media => ({
+      selected: selectedMedia.map((media) => ({
         clip: media.clip,
         path: media.path,
         relativePath: media.relativePath,
