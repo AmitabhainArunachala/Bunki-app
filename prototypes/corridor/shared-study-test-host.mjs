@@ -158,12 +158,28 @@ export async function createSharedStudyTestHost(options = {}) {
     disposeSharedStudyAudioPreparation(active);
     // Fence new requests first; the canonical in-flight turn can still settle
     // its acknowledgement/reconciliation before handles and storage close.
-    sync?.dispose();
-    await sync?.drain();
-    active?.backend?.dispose();
-    await activeStorage?.close?.();
-    activeStorage=null;
-    active = null;
+    let failure = null;
+    try {
+      sync?.dispose();
+      await sync?.drain();
+    } catch (error) {
+      failure = {error};
+    } finally {
+      try {
+        active?.backend?.dispose();
+      } catch (error) {
+        failure ??= {error};
+      }
+      try {
+        await activeStorage?.close?.();
+      } catch (error) {
+        failure ??= {error};
+      } finally {
+        activeStorage = null;
+        active = null;
+      }
+    }
+    if (failure) throw failure.error;
   }
 
   return Object.freeze({

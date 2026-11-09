@@ -73,3 +73,45 @@ test('dispose during asynchronous adapter creation fences publication and closes
  const opening=host.withAdapter(async binding=>{const adapter=await createBunkiStudyAdapter({...binding,content});created();await gate;return adapter;});
  await ready;await host.dispose();release();await assert.rejects(()=>opening,/disposed/);assert.equal(closed,1);
 });
+
+for (const cleanupFailure of [null, 'backend', 'storage']) {
+ test(`failed in-flight permit request still disposes the host (${cleanupFailure ?? 'normal cleanup'})`,async()=>{
+  const values=new Map(),metadata={getItem:key=>values.get(key)??null,setItem:(key,value)=>values.set(key,value)};
+  const events=[],failure=Error('synthetic-permit-request-failure');
+  let rejectPermit,enteredPermit,closed=false;
+  const pending=new Promise((_,reject)=>{rejectPermit=reject;}),entered=new Promise(resolve=>{enteredPermit=resolve;});
+  const memory=createMemoryAdapter(),storage={...memory,async close(){
+   events.push('storage');closed=true;
+   if(cleanupFailure==='storage')throw Error('synthetic-storage-close-failure');
+  }};
+  const host=await createSharedStudyTestHost({...options(metadata,storage,()=> 'dispose-permits'),sync:{
+   origin:'https://synthetic.invalid',getCredential:()=> 'synthetic-only',automatic:false,
+   online:()=>true,visible:()=>true,eventTarget:new EventTarget(),transportOptions:{maxRetries:0},
+   fetch:async(url,init)=>{
+    assert.equal(init.method,'GET');
+    const {learner,environment,installation}=host.identity;
+    const response=new Response(JSON.stringify({scope:{learner,environment,installation},head:0,events:[]}));
+    Object.defineProperty(response,'url',{value:url});return response;
+   },
+   permits:{isPaired:()=>true,reserve:()=>{enteredPermit();return pending;}},
+  }});
+  await host.withAdapter(async binding=>{
+   const adapter=await createBunkiStudyAdapter({...binding,content});
+   return {...adapter,backend:{...adapter.backend,dispose(){
+    assert.equal(closed,false);events.push('backend');adapter.backend.dispose();
+    if(cleanupFailure==='backend')throw Error('synthetic-backend-dispose-failure');
+   }}};
+  });
+  const reservation=assert.rejects(host.sync.reserveNewPermits(),error=>error===failure);
+  await entered;
+  const disposal=assert.rejects(host.dispose(),error=>error===failure);
+  assert.equal(host.getSyncState(),'disposed');assert.deepEqual(events,[]);
+  rejectPermit(failure);
+  await Promise.all([reservation,disposal]);
+  assert.deepEqual(events,['backend','storage']);assert.equal(closed,true);
+  await host.dispose();await host.dispose();assert.deepEqual(events,['backend','storage']);
+  let opened=false;
+  await assert.rejects(host.withAdapter(()=>{opened=true;}),/shared-study-qa-disposed/);
+  assert.equal(opened,false);
+ });
+}
