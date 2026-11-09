@@ -22,6 +22,7 @@ const QA_MODULES = [
   'corridor.js',
   'study-engine-adapter.mjs',
   'shared-study-runtime.mjs',
+  'shared-study-presentation.mjs',
   'shared-study-audio-preparation.mjs',
   'shared-study-test-host.mjs',
   'shared-study-test-bootstrap.mjs',
@@ -84,7 +85,7 @@ try {
   const admitted=verifyBundledArtifact(site);
   const routeInputs=['index.html','corridor.js','modules/study-host.mjs','decks/player/mount.js',
     'shared-study-audio-preparation.mjs',
-    'shared-study-content.mjs','shared-study-storage.mjs','decks/player/shared-frame.mjs','decks/player/shared-mount.mjs'].map(path=>{
+    'shared-study-content.mjs','shared-study-presentation.mjs','shared-study-storage.mjs','decks/player/shared-frame.mjs','decks/player/shared-mount.mjs'].map(path=>{
       const bytes=readFileSync(join(site,path));
       const current=digest(readFileSync(join(source,path)));
       if(path!=='corridor.js'&&digest(bytes)!==current)throw Error(`QA source route differs from current source: ${path}`);

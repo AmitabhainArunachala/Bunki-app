@@ -2,7 +2,7 @@ import {mountStudyApp} from '../../vendor/shared-study-engine/client/app/app.mjs
 import * as grammar from '../../vendor/shared-study-engine/client/grammar/renderer.mjs';
 import {loadOfflineDictionary} from '../../vendor/shared-study-engine/client/app/dictionary-loader.mjs';
 import {prepareOfflineDictionary} from '../../vendor/shared-study-engine/client/player/dictionary.mjs';
-import {bindStudyPresentation} from '../../shared-study-presentation.mjs';
+import {bindStudyPresentation,bindSharedStudyViewport} from '../../shared-study-presentation.mjs';
 import {moduleForSharedDeck,sharedDictionaryBuild} from '../../shared-study-content.mjs';
 
 const root=document.querySelector('#app');
@@ -53,11 +53,13 @@ try {
       return new Uint8Array(bytes);
     },packState:packId=>audioPort.packState(packId)}}}:adapter.platform;
   const app=mountStudyApp(root,{backend,catalog,themes,grammar,dictionary,preferences,platform,now:adapter.now,initialModule,corpus});
+  const disposeViewport=bindSharedStudyViewport({app,root,onCardStart:window.frameElement.bunkiStudyPort.onCardStart});
   if(params.get('start')==='1')root.querySelector('[data-start]')?.click();
   window.bunkiSharedStudy=Object.freeze({app,backend:adapter.backend,store:adapter.store,catalog,dictionary});
   function onPagehide(event) {
     if (event?.persisted === true) return;
     window.removeEventListener('pagehide', onPagehide);
+    disposeViewport();
     app.dispose();
   }
   window.addEventListener('pagehide', onPagehide);

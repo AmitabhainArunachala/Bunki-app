@@ -43,7 +43,13 @@ export async function render(main,{deckId,english=true,onLeave,autoStart}={}) {
       if(signal?.aborted)throw new DOMException('Audio read aborted','AbortError');
       return bytes;
     },packState:packId=>capability.resources.packState(packId)}):null;
-  frame.bunkiStudyPort=Object.freeze({adapter,...(audio?{audio}:{})});frame.src=url.href;root.append(frame);
+  const onCardStart=()=>{
+    if(request!==serial||!root.isConnected||!frame.isConnected||frame.parentNode!==root)return;
+    const chromeBottom=Math.max(0,document.querySelector('.chrome')?.getBoundingClientRect().bottom??0);
+    const target=window.scrollY+frame.getBoundingClientRect().top-chromeBottom;
+    window.scrollTo({top:Math.max(0,target),behavior:'instant'});
+  };
+  frame.bunkiStudyPort=Object.freeze({adapter,onCardStart,...(audio?{audio}:{})});frame.src=url.href;root.append(frame);
 }
 
 export async function summary(deckId) {

@@ -32,6 +32,7 @@ const routes = [
   'modules/study-host.mjs',
   'decks/player/mount.js',
   'shared-study-content.mjs',
+  'shared-study-presentation.mjs',
   'shared-study-storage.mjs',
   'decks/player/shared-frame.mjs',
   'decks/player/shared-mount.mjs',
@@ -189,6 +190,7 @@ test('real QA builder copies and authenticates helper bytes while preserving sou
         'corridor.js',
         'study-engine-adapter.mjs',
         'shared-study-runtime.mjs',
+        'shared-study-presentation.mjs',
         helper,
         'shared-study-test-host.mjs',
         'shared-study-test-bootstrap.mjs',
@@ -268,4 +270,8 @@ test('QA keeps the portable artifact symlink guard for the helper', () => {
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
+});
+
+test('real QA builder rejects a sealed stale presentation resolver before derivation',()=>{
+ const root=scope();try{const site=siteFixture(root);const resolver=join(site,'shared-study-presentation.mjs');put(resolver,Buffer.concat([readFileSync(resolver),Buffer.from('\n// independently admitted stale presentation bytes\n')]));seal(site);verifyBundledArtifact(site);const before=inventory(site).map(path=>[path,sha(readFileSync(join(site,path)))]);const {result,output}=derive(root,site,'stale-presentation-qa');assert.equal(result.status,1,'A valid old artifact must not be admitted with a stale resolver');assert.match(result.stderr,/QA source route differs from current source: shared-study-presentation\.mjs/);assert.equal(existsSync(output),false,'reject before any output directory/copy');assert.deepEqual(inventory(site).map(path=>[path,sha(readFileSync(join(site,path)))]),before,'stale source artifact remains unchanged');}finally{rmSync(root,{recursive:true,force:true});}
 });

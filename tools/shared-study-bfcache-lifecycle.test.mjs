@@ -78,30 +78,30 @@ if(!vm.SourceTextModule){
  }
  async function runFrame(text){
   const f=await adapterFixture(),events=new TrackedEvents(),appRoot={cleared:false,replaceChildren(){this.cleared=true;},append(){},querySelector(){return null;}};
-  let appClosed=0;const app={async exercise(){assert.equal(appClosed,0,'restored app is usable');return f.exercise();},dispose(){appClosed++;appRoot.replaceChildren();}};
+  let viewportClosed=0;let appClosed=0;const app={async exercise(){assert.equal(appClosed,0,'restored app is usable');return f.exercise();},dispose(){appClosed++;appRoot.replaceChildren();}};
   const encode=x=>new TextEncoder().encode(JSON.stringify(x));const registry={tasks:[]},grammar={records:[],tasks:[]},reviews={};
   const [registryHash,grammarHash,reviewsHash]=await Promise.all([registry,grammar,reviews].map(x=>digest(encode(x))));
   const build={files:{'catalog.json':'a'.repeat(64),'registry.json':registryHash,'grammar.json':grammarHash}},buildHash=await digest(encode(build));
   const binding={dictionary:{buildSha256:buildHash},grammarAssets:{'registry.json':registryHash,'grammar.json':grammarHash,'grammar-reviews.json':reviewsHash},counts:{vocabulary:1,grammar:0}};
   const assets={'shared-study-content.json':binding,'registry.json':registry,'grammar.json':grammar,'grammar-reviews.json':reviews,'BUILD.json':build,'tokens.json':{}};
-  const win={frameElement:{bunkiStudyPort:{adapter:f.adapter}},addEventListener:events.addEventListener.bind(events),removeEventListener:events.removeEventListener.bind(events)};
+  const win={frameElement:{bunkiStudyPort:{adapter:f.adapter,onCardStart:()=>{}}},addEventListener:events.addEventListener.bind(events),removeEventListener:events.removeEventListener.bind(events)};
   const context=vm.createContext({window:win,document:{querySelector:()=>appRoot,createElement:()=>({setAttribute(){}})},location:new URL('https://qa.invalid/decks/player/shared-frame.html?deck=n2'),localStorage:{getItem:()=>null,setItem(){}},URL,URLSearchParams,TextDecoder,TextEncoder,structuredClone,crypto:webcrypto,console,fetch:async url=>{const value=assets[new URL(url).pathname.split('/').at(-1)];assert.notEqual(value,undefined);return{ok:true,arrayBuffer:async()=>encode(value).buffer};}});
   const modules={
    'app.mjs':{mountStudyApp:()=>app},'renderer.mjs':{prepareGrammarModule:async()=>grammar},
    'dictionary-loader.mjs':{loadOfflineDictionary:async()=>({})},'dictionary.mjs':{prepareOfflineDictionary:async()=>({})},
-   'shared-study-presentation.mjs':{bindStudyPresentation:backend=>backend},'shared-study-content.mjs':{moduleForSharedDeck:()=> 'n2',sharedDictionaryBuild:(_binding,value)=>value},
+   'shared-study-presentation.mjs':{bindStudyPresentation:backend=>backend,bindSharedStudyViewport({app:mounted,root,onCardStart}){assert.equal(mounted,app);assert.equal(root,appRoot);assert.equal(typeof onCardStart,'function');return()=>{viewportClosed++;};}},'shared-study-content.mjs':{moduleForSharedDeck:()=> 'n2',sharedDictionaryBuild:(_binding,value)=>value},
   };
   const entry=new vm.SourceTextModule(text,{context,identifier:'https://qa.invalid/decks/player/shared-frame.mjs',initializeImportMeta:meta=>meta.url='https://qa.invalid/decks/player/shared-frame.mjs'});
   await entry.link(specifier=>moduleFor(context,modules[specifier.split('/').at(-1)]));await entry.evaluate();assert.equal(win.bunkiSharedStudy?.app,app,'actual full frame entry mounted');
-  return{...f,events,app,appRoot,get appClosed(){return appClosed;},close:()=>f.host.dispose()};
+  return{...f,events,app,appRoot,get appClosed(){return appClosed;},get viewportClosed(){return viewportClosed;},close:()=>f.host.dispose()};
  }
  async function frameOracle(text){
   const r=await runFrame(text);try{
    assert.equal(r.events.listeners.size,1);r.events.dispatchEvent(transition('pagehide',true));r.events.dispatchEvent(transition('pageshow',true));await tick();
-   assert.equal(r.appClosed,0,'persisted frame must retain usable app');assert.equal(r.appRoot.cleared,false);await r.app.exercise();
+   assert.equal(r.appClosed,0,'persisted frame must retain usable app');assert.equal(r.viewportClosed,0,'persisted frame retains its viewport observer');assert.equal(r.appRoot.cleared,false);await r.app.exercise();
    r.events.dispatchEvent(transition('pagehide',true));r.events.dispatchEvent(transition('pageshow',true));await tick();assert.equal(r.appClosed,0);
-   r.events.dispatchEvent(transition('pagehide',false));assert.equal(r.appClosed,1,'final frame unload disposes once');assert.equal(r.appRoot.cleared,true);assert.equal(r.events.listeners.size,0,'final frame unload removes authored listener');
-   r.events.dispatchEvent(transition('pagehide',false));assert.equal(r.appClosed,1);
+   r.events.dispatchEvent(transition('pagehide',false));assert.equal(r.appClosed,1,'final frame unload disposes once');assert.equal(r.viewportClosed,1,'final unload disposes viewport observer once');assert.equal(r.appRoot.cleared,true);assert.equal(r.events.listeners.size,0,'final frame unload removes authored listener');
+   r.events.dispatchEvent(transition('pagehide',false));assert.equal(r.appClosed,1);assert.equal(r.viewportClosed,1);
   }finally{await r.close();}
  }
  const bootstrap=source('prototypes/corridor/shared-study-test-bootstrap.mjs'),frame=source('prototypes/corridor/decks/player/shared-frame.mjs');

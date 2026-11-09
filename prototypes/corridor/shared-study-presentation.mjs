@@ -18,3 +18,38 @@ export function bindStudyPresentation(backend,catalog) {
     customSession:options=>{const session=backend.customSession(options);return {...session,entries:session.entries.map(resolve)};},
   });
 }
+
+/** Follow canonical current identity, including a revealed card restored by Undo. */
+export function bindSharedStudyViewport({app,root,onCardStart}) {
+  // Older/custom same-origin hosts may not expose the optional viewport port.
+  if(typeof onCardStart!=='function')return ()=>{};
+  const win=root.ownerDocument.defaultView;
+  let disposed=false,lastCurrent=null,pendingCurrent=null,frame=null;
+  const cancel=()=>{
+    if(frame!==null)win.cancelAnimationFrame(frame);
+    frame=null;pendingCurrent=null;
+  };
+  const schedule=()=>{
+    if(disposed)return;
+    const {screen,busy,current}=app.read();
+    if(!root.isConnected||screen!=='study'||busy||!current||current===lastCurrent){cancel();return;}
+    if(current===pendingCurrent)return;
+    cancel();pendingCurrent=current;
+    frame=win.requestAnimationFrame(()=>{
+      frame=win.requestAnimationFrame(()=>{
+        frame=null;pendingCurrent=null;
+        if(disposed||!root.isConnected)return;
+        const state=app.read();
+        if(state.screen!=='study'||state.busy||state.current!==current||current===lastCurrent)return;
+        onCardStart();lastCurrent=current;
+      });
+    });
+  };
+  const observer=new win.MutationObserver(schedule);
+  observer.observe(root,{childList:true,subtree:true,attributes:true,characterData:true});
+  schedule();
+  return ()=>{
+    if(disposed)return;
+    disposed=true;observer.disconnect();cancel();
+  };
+}
