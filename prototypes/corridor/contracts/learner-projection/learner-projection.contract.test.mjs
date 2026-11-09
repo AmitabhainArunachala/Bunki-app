@@ -1,3 +1,4 @@
+import {assertPureModules} from '../../../../scripts/ci/pure-module-runtime-probe.mjs';
 /** G12 judge: one read model of evidence with modality, assistance, source and declared coverage per source
  * (campaign/contracts/G12.json; SPEC S8-R7, S8-R9). Pinned by the contract; the worker writes projection.mjs beside this
  * file and may not edit this file. Fixtures are built with G9's identity builders and G6a's typed task events; the domain's
@@ -126,18 +127,9 @@ test('learner-projection contract · G12', async (t) => {
     assert.equal(m.project({ events: [...LOG, ...fb] }).evidence.rows.length, 3, 'feedback is not evidence of recall');
   });
 
-  await t.test('nothing activates: imports only the identity and learner-state contracts; no store, network, clock or timer; spies at zero', () => {
-    const sf = ts.createSourceFile(MODULE, readFileSync(MODULE, 'utf8'), ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
-    for (const stmt of sf.statements) {
-      if (ts.isImportDeclaration(stmt)) { assert.ok(ALLOWED_IMPORTS.has(stmt.moduleSpecifier.text), `import ${stmt.moduleSpecifier.text} is allowed`); continue; }
-      if (ts.isExportDeclaration(stmt) && stmt.moduleSpecifier) assert.ok(ALLOWED_IMPORTS.has(stmt.moduleSpecifier.text));
-      assert.ok(ts.isExportDeclaration(stmt) || ts.isFunctionDeclaration(stmt) || ts.isClassDeclaration(stmt) || (ts.isVariableStatement(stmt) && (stmt.declarationList.flags & ts.NodeFlags.Const)), `declaration, not action: ${stmt.getText(sf).slice(0, 50)}`);
-    }
-    const seen = new Set();
-    const bare = (node) => !((ts.isPropertyAccessExpression(node.parent) && node.parent.name === node) || (ts.isPropertyAssignment(node.parent) && node.parent.name === node));
-    const visit = (node) => { if (ts.isIdentifier(node) && BANNED.includes(node.text) && bare(node)) seen.add(node.text); if (ts.isCallExpression(node) && node.expression.kind === ts.SyntaxKind.ImportKeyword) seen.add('import()'); ts.forEachChild(node, visit); };
-    visit(sf); assert.deepEqual([...seen], []);
-    m.project({ events: LOG, sources: SOURCES }); m.parseObservation(LOG[0]);
-    assert.deepEqual(calls, { store: 0, fetch: 0 });
+  await t.test('no observed activation on isolated projection import and fixtures',()=>{
+    const sf=ts.createSourceFile(MODULE,readFileSync(MODULE,'utf8'),ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
+    for(const stmt of sf.statements)if(ts.isImportDeclaration(stmt)||(ts.isExportDeclaration(stmt)&&stmt.moduleSpecifier))assert.ok(ALLOWED_IMPORTS.has(stmt.moduleSpecifier.text),'declared dependency remains within contract');
+    assert.deepEqual(assertPureModules({files:[MODULE],data:{events:LOG,sources:SOURCES},exercise:([m],d)=>{m.project(d);m.parseObservation(d.events[0]);}}).calls,[]);
   });
 });

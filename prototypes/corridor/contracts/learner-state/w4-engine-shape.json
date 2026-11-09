@@ -1,15 +1,15 @@
 {
   "generatedBy": "prototypes/corridor/contracts/learner-state/build-engine-shape.mjs",
   "engine": {
-    "sourceCommit": "2602ec65f79154616abb2f3666f3928929a93413",
+    "sourceCommit": "503688879ea5e4820773721a449dc3ede8f79065",
     "sourceRepository": "nihongo-srs",
     "api": "nihongo-study-engine/v1",
     "eventVersion": 4,
     "policyId": "nsrs-policy-v1",
     "reducerPin": "642ca6b",
     "reducerSha256": "642ca6b6759de4cb137b3041670dab5457ad7d600603c58136bd923d14008686",
-    "closureSha256": "f3626961823781b8e2e3ae044973b70ba9b6446c6d34e009231f1dbe2e5cedf7",
-    "sharedFiles": 305
+    "closureSha256": "8e0dc34d8e48bd1f7dd8bf0088e69f2483969e77e7f715f70652646c99e31036",
+    "sharedFiles": 326
   },
   "scheduler": {
     "parameterSetId": "bunki-fsrs6-r090-defaults-v1",
@@ -230,7 +230,7 @@
     "client/schema/event.mjs": "cc0204a7f93ae29312b77e13bab68719b14f489f5d4c2e78f84162659ec4928e",
     "client/replay.mjs": "642ca6b6759de4cb137b3041670dab5457ad7d600603c58136bd923d14008686",
     "client/engine.mjs": "5253648cf520052ffd76feacdcf6e9d3ee60d34914a003e167362d6fe5d025fc",
-    "engine-manifest.json": "8d5ad50ca7a7c08720b42726dad8c166ef415c33290125dab11ad4ef82f36121",
+    "engine-manifest.json": "59fd72e5e3c84f84785c8d86c61328e04be41cc171d2ab4d6cdbbdf6060f924a",
     "data/fsrs-pin.json": "550f96c24b706b834938f772dc8ac28d93a4d8a578a8cd62f72cbf61c847bda0",
     "srs-core.mjs": "b4bb8f6080b209c1d8c8052a09ae00fd7e8a7f00f253d2a39da4b8b09040be45"
   }

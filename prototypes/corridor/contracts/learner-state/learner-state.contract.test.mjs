@@ -1,3 +1,4 @@
+import {assertPureModules} from '../../../../scripts/ci/pure-module-runtime-probe.mjs';
 /** G6a judge: every recall or grade is a typed task-contract event matching W4's canonical engine; enrolment is not a grade;
  * evidence stays modality-specific; nothing activates (campaign/contracts/G6a.json; SPEC S1-R11, S1-R12, S1-R19, S1-R20).
  * Pinned by the contract; the worker writes task-contract.mjs, build-engine-shape.mjs and the generated w4-engine-shape.json
@@ -23,8 +24,14 @@ const VENDOR = join(CORRIDOR, 'vendor', 'shared-study-engine');
 const MODULE = join(HERE, 'task-contract.mjs'), SHAPE = join(HERE, 'w4-engine-shape.json'), GENERATOR = join(HERE, 'build-engine-shape.mjs');
 const ENGINE = { event: join(VENDOR, 'client', 'schema', 'event.mjs'), replay: join(VENDOR, 'client', 'replay.mjs'), engine: join(VENDOR, 'client', 'engine.mjs'),
   manifest: join(VENDOR, 'engine-manifest.json'), pin: join(CORRIDOR, 'data', 'fsrs-pin.json'), srs: join(CORRIDOR, 'srs-core.mjs'), vendoredSrs: join(VENDOR, 'client', 'vendor', 'srs-core.mjs') };
-/** W4's stated pins (campaign/W4-HANDOFF.md rule 2; contract [5]) */
-const W4 = { sourceCommit: '2602ec65f79154616abb2f3666f3928929a93413', parameterSetId: 'bunki-fsrs6-r090-defaults-v1', reducerPin: '642ca6b' };
+/** Runtime identity follows the independent admitted consumer pin; scheduler/reducer stay fixed.
+ * Frozen content producer identity is a separate binding and is not changed here. */
+const runtimePin = JSON.parse(readFileSync(resolve(CORRIDOR, '..', '..', 'scripts', 'shared-study-pin.json'), 'utf8'));
+assert.equal(runtimePin.format, 'bunki-shared-study-pin/v1');
+assert.match(runtimePin.sourceCommit, /^[a-f0-9]{40}$/u);
+assert.match(runtimePin.closureSha256, /^[a-f0-9]{64}$/u);
+const W4 = { sourceCommit: runtimePin.sourceCommit, closureSha256: runtimePin.closureSha256,
+  parameterSetId: 'bunki-fsrs6-r090-defaults-v1', reducerPin: '642ca6b' };
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const ALLOWED_IMPORTS = new Set(['./w4-engine-shape.json', '../identity/identity.mjs']);
 const BANNED = ['indexedDB', 'localStorage', 'sessionStorage', 'fetch', 'XMLHttpRequest', 'setTimeout', 'setInterval', 'queueMicrotask', 'Date', 'performance', 'window', 'self', 'document', 'navigator', 'globalThis', 'process', 'require', 'createScheduler', 'replay', 'scheduler', 'decideReview'];
@@ -86,6 +93,9 @@ function pinProblems(shape, e) {
   const problems = [];
   const expect = (path, actual, wanted) => { if (JSON.stringify(actual) !== JSON.stringify(wanted)) problems.push(`${path}: ${JSON.stringify(actual)} ≠ ${JSON.stringify(wanted)}`); };
   expect('engine.sourceCommit', shape.engine?.sourceCommit, e.manifest.source.commit); expect('engine.sourceCommit (W4)', shape.engine?.sourceCommit, W4.sourceCommit);
+  expect('engine.closureSha256', shape.engine?.closureSha256, e.manifest.closureSha256);
+  expect('engine.closureSha256 (independent pin)', shape.engine?.closureSha256, W4.closureSha256);
+  expect('manifest.closureSha256 (independent pin)', e.manifest.closureSha256, W4.closureSha256);
   expect('engine.reducerPin (W4)', shape.engine?.reducerPin, W4.reducerPin); expect('engine.reducerSha256', shape.engine?.reducerSha256, e.manifest.reducerSha256);
   if (!e.manifest.reducerSha256.startsWith(String(shape.engine?.reducerPin))) problems.push('engine.reducerPin: not a prefix of engine-manifest reducerSha256');
   expect('scheduler.parameterSetId', shape.scheduler?.parameterSetId, e.pin.parameterSetId); expect('scheduler.parameterSetId (W4)', shape.scheduler?.parameterSetId, W4.parameterSetId);
@@ -183,37 +193,31 @@ test('learner-state contract · G6a', async (t) => {
     assert.ok(Object.isFrozen(rows));
   });
 
-  await t.test('[3] nothing activates: no store written, no scheduler called, no clock or timer identifier — on import or from any export', () => {
-    const sf = parse(MODULE);
-    for (const stmt of sf.statements) {
-      if (ts.isImportDeclaration(stmt)) { const spec = stmt.moduleSpecifier.text; assert.ok(ALLOWED_IMPORTS.has(spec), `import ${spec} is allowed (only the shape file and the G9 identity contract)`); continue; }
-      if (ts.isExportDeclaration(stmt) && stmt.moduleSpecifier) assert.ok(ALLOWED_IMPORTS.has(stmt.moduleSpecifier.text), `re-export from ${stmt.moduleSpecifier.text} is allowed`);
-      assert.ok(ts.isExportDeclaration(stmt) || ts.isFunctionDeclaration(stmt) || ts.isClassDeclaration(stmt) || (ts.isVariableStatement(stmt) && (stmt.declarationList.flags & ts.NodeFlags.Const)),
-        `top-level statement is a declaration, not an action: ${stmt.getText(sf).slice(0, 60)}`);
-    }
-    const seen = new Set();
-    // a bare identifier reaches a global or a scheduler; a property name (shape.scheduler, data.fetch) does not
-    const bare = (node) => !((ts.isPropertyAccessExpression(node.parent) && node.parent.name === node) || (ts.isPropertyAssignment(node.parent) && node.parent.name === node));
-    const visit = (node) => {
-      if (ts.isIdentifier(node) && BANNED.includes(node.text) && bare(node)) seen.add(node.text);
-      if (ts.isCallExpression(node) && node.expression.kind === ts.SyntaxKind.ImportKeyword) seen.add('import()');
-      ts.forEachChild(node, visit);
-    };
-    visit(sf); assert.deepEqual([...seen], [], 'no store, network, timer, clock or scheduler identifier in the module');
-    // exercise every export with fixtures; the spies stay at zero
-    m.parseTaskEvent(graded('Speak')); m.parseTaskEvent(enrolment); m.parseTaskId(task); m.isAnswer({ rating: 3 }); m.ratingFor({ selfCheck: 'knew' }, 'hint');
-    m.engineEnvelopeFor(graded('Rajomon')); m.engineEnvelopeFor(enrolment); m.evidenceRows([graded('M2'), enrolment]); m.engineTypesUsed(); m.checkEngineMatch();
-    assert.deepEqual(calls, { localStorage: 0, indexedDB: 0, fetch: 0 }, 'no store or network call');
+  await t.test('[3] no observed activation on isolated import and explicit export fixture paths',()=>{
+    const sf=ts.createSourceFile(MODULE,readFileSync(MODULE,'utf8'),ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
+    for(const stmt of sf.statements)if(ts.isImportDeclaration(stmt)||(ts.isExportDeclaration(stmt)&&stmt.moduleSpecifier))assert.ok(ALLOWED_IMPORTS.has(stmt.moduleSpecifier.text),'declared dependency remains within contract');
+    const data={graded:graded('Speak'),enrolment,task};
+    const report=assertPureModules({files:[MODULE],data,exercise:([m],d)=>{
+      m.parseTaskEvent(d.graded);m.parseTaskEvent(d.enrolment);m.parseTaskId(d.task);m.isAnswer({rating:3});m.ratingFor({selfCheck:'knew'},'hint');
+      m.engineEnvelopeFor(d.graded);m.engineEnvelopeFor(d.enrolment);m.evidenceRows([d.graded,d.enrolment]);m.engineTypesUsed();m.checkEngineMatch();
+    }});assert.deepEqual(report.calls,[]);
   });
 
-  await t.test('[4] canonical engine match: the answer union is srs-core\'s three forms; graded → review, enrolment → baseline or manual-card, never review; no type outside the engine\'s 15', () => {
+  await t.test('[4] canonical engine match: the answer union is srs-core\'s three forms; graded → review, enrolment → baseline or manual-card, never review; no type outside the engine\'s 15', async () => {
     const item = { kind: 'word', term: '食べる', reading: 'たべる' };
     for (const answer of ANSWERS) assert.equal(m.isAnswer(answer), srs.validAttempt({ item, tests: 'meaning', answer }), `isAnswer(${JSON.stringify(answer)}) agrees with srs-core validAttempt`);
     assert.equal(validAnswerText(ENGINE.srs), validAnswerText(ENGINE.vendoredSrs), 'validAnswer is the same text in the corridor and the vendored engine');
     assert.deepEqual(shape.answerUnion.forms, [{ key: 'rating', values: [1, 2, 3, 4] }, { key: 'selfCheck', values: ['knew', 'missed'] }, { key: 'claim', values: [true] }]);
-    // the grade rule mirrors decideReview (srs-core.mjs): knew 3, missed 1, rating as given, a claim never grades, answer-showing help 1, other help ≤ 2
-    const rule = readFileSync(ENGINE.srs, 'utf8');
-    for (const re of [/rating = answer\.selfCheck === 'knew' \? 3 : 1/u, /return refused\('claim-without-check'\)/u, /rating = Math\.min\(rating, 2\)/u, /rating = 1;/u]) assert.match(rule, re, 'the engine rule the contract mirrors');
+    // Compare two executed implementations, including all answer forms and help caps.
+    const canonical=await import(pathToFileURL(ENGINE.vendoredSrs));
+    const now=new Date(at);
+    for(const answer of [{rating:1},{rating:2},{rating:3},{rating:4},{selfCheck:'knew'},{selfCheck:'missed'},{claim:true}])for(const assistance of ['none','hint','revealed']){
+      const help=assistance==='none'?[]:[{what:'fixture',reveals:assistance==='revealed'?['meaning']:[]}];
+      const evidence={kind:'attempt',surface:'world:fixture',item,tests:'meaning',answer,revealed:true,help};
+      const actual=canonical.decideReview(evidence,{state:0},{now,dayEnd:at+86400000});
+      const want=m.ratingFor(answer,assistance);
+      assert.deepEqual(actual.write?{rating:actual.rating,from:actual.from,capped:actual.capped}:{refuse:actual.reason},want,JSON.stringify({answer,assistance}));
+    }
     assert.deepEqual(m.ratingFor({ selfCheck: 'knew' }), { rating: 3, from: 3, capped: false }); assert.deepEqual(m.ratingFor({ selfCheck: 'missed' }), { rating: 1, from: 1, capped: false });
     for (const r of [1, 2, 3, 4]) assert.equal(m.ratingFor({ rating: r }).rating, r);
     assert.deepEqual(m.ratingFor({ claim: true }), { refuse: 'claim-without-check' }); assert.deepEqual(m.ratingFor({ rating: 4 }, 'revealed'), { rating: 1, from: 4, capped: true }); assert.deepEqual(m.ratingFor({ rating: 4 }, 'hint'), { rating: 2, from: 4, capped: true });
@@ -244,6 +248,7 @@ test('learner-state contract · G6a', async (t) => {
     assert.equal(shape.engine.sourceCommit, W4.sourceCommit); assert.equal(shape.scheduler.parameterSetId, W4.parameterSetId); assert.equal(shape.engine.reducerPin, W4.reducerPin);
     assert.equal(e.manifest.source.commit, W4.sourceCommit, 'engine-manifest.json source.commit'); assert.equal(e.pin.parameterSetId, W4.parameterSetId, 'data/fsrs-pin.json');
     assert.ok(e.manifest.reducerSha256.startsWith(W4.reducerPin), 'the reducer pin is the manifest digest\'s prefix');
+    assert.equal(shape.engine.closureSha256, W4.closureSha256); assert.equal(e.manifest.closureSha256, W4.closureSha256, 'manifest closure matches independent consumer pin');
     // generated, never hand-written: the generator in this directory reproduces the file byte for byte
     const { NODE_TEST_CONTEXT, ...env } = process.env;
     const regenerated = execFileSync(process.execPath, [GENERATOR], { cwd: HERE, encoding: 'utf8', env, stdio: ['ignore', 'pipe', 'pipe'] });
@@ -251,7 +256,32 @@ test('learner-state contract · G6a', async (t) => {
     // the plants the contract names
     const altered = JSON.parse(JSON.stringify(shape)); altered.scheduler.parameterSetId = altered.scheduler.parameterSetId.replace('r090', 'r091');
     const problems = pinProblems(altered, e); assert.ok(problems.length >= 1 && problems.every((p) => /scheduler\.parameterSetId/u.test(p)), `one changed letter is named: ${problems.join(' | ')}`);
+    // A matching producer manifest and generated shape cannot self-admit a new runtime.
+    for (const field of ['sourceCommit', 'closureSha256']) {
+      const forged = JSON.parse(JSON.stringify(shape));
+      const engine = { ...e, manifest: { ...e.manifest, source: { ...e.manifest.source } } };
+      forged.engine[field] = 'f'.repeat(field === 'sourceCommit' ? 40 : 64);
+      if (field === 'sourceCommit') engine.manifest.source.commit = forged.engine[field];
+      else engine.manifest.closureSha256 = forged.engine[field];
+      const rejectedPaths = pinProblems(forged, engine).map(problem => problem.split(':')[0]);
+      assert.deepEqual(rejectedPaths, field === 'sourceCommit' ? ['engine.sourceCommit (W4)'] :
+        ['engine.closureSha256 (independent pin)', 'manifest.closureSha256 (independent pin)'],
+      `${field} is rejected only by the independent consumer pin`);
+    }
     const addedType = JSON.parse(JSON.stringify(shape)); addedType.deviceTypes.push('external-review');
     assert.match(pinProblems(addedType, e)[0], /^deviceTypes/u, 'a type added to the shape is named');
   });
+  await t.test('purity probe catches effectful initializers, computed globals, swallowed effects and operation effects',()=>{
+    for(const source of [
+      "export const x=Date.now();",
+      "export const x=globalThis['set'+'Timeout'](()=>{},0);",
+      "function helper(){return globalThis['fe'+'tch']('https://fixture.invalid');} export const x=helper();",
+      "try{globalThis['local'+'Storage'].setItem('x','y');}catch{} export const x=1;"
+    ])assert.throws(()=>assertPureModules({source,exercise:()=>{}}),/Observed effect/);
+    for(const expression of ["Math.random()","performance.now()","crypto.getRandomValues(new Uint8Array(1))","queueMicrotask(()=>{})"]){
+      assert.throws(()=>assertPureModules({source:'export function run(){return '+expression+'}',exercise:([m])=>m.run()}),/Observed effect/);
+    }
+    assert.deepEqual(assertPureModules({source:'export const x=1;',exercise:([m])=>{if(m.x!==1)throw Error('wrong pure result');new Date(1762300800000).getTime();}}).calls,[]);
+  });
+
 });

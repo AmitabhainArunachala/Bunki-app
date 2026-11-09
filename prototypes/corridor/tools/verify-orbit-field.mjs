@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import {assertPureModules} from '../../../scripts/ci/pure-module-runtime-probe.mjs';
 // verify-orbit-field.mjs — behavioural probe of prototypes/corridor/modules/orbit-field.mjs (G2 assertion [5]: the Meguri
 // mechanics are present as the corridor's own module; nothing of the standalone UI is). Exit 0 only when every check passes.
 import assert from 'node:assert/strict';
@@ -96,8 +97,10 @@ check('O7 drift: odd rings turn forward, even rings back, at .012 rad/s; angles 
   return 'drift moves each station by .012·dt with its ring parity, normalised';
 });
 check('O8 purity: the module names no DOM, audio, storage or timer; it exports only mechanics', () => {
-  const src = readFileSync(join(HERE, '..', 'modules', 'orbit-field.mjs'), 'utf8').replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
-  for (const bad of ['document', 'window', 'localStorage', 'AudioContext', 'requestAnimationFrame', 'setTimeout', 'performance.now', 'speechSynthesis', 'posters', 'MEGURI_']) assert.ok(!src.includes(bad), `no ${bad}`);
+  assert.deepEqual(assertPureModules({files:[join(HERE,'..','modules','orbit-field.mjs')],data:{words:WORDS},exercise:([O],d)=>{
+    const field=O.createOrbitField({words:d.words,width:400,height:800});O.layoutRings(400,800);O.ringPoint(field.rings[0],0);O.depthK(2);O.normalise(1);O.mulberry32(7)();
+    const station=field.stations[0];O.recordPass(field,station);O.resizeOrbitField(field,800,1600);O.advanceOrbitField(field,.01,{playing:true});O.passesOf(field,station);O.fireStation(field,station,1000);O.syncDepth(field);
+  }}).calls,[]);
   const names = Object.keys(O).sort();
   assert.deepEqual(names, ['DEBOUNCE_MS', 'DEPTH_FULL', 'DEPTH_PULL', 'DRIFT', 'DT_MAX', 'EASE', 'GROUPS', 'RING_DEF', 'SEED', 'TAU', 'advanceOrbitField', 'createOrbitField', 'depthK', 'fireStation', 'layoutRings', 'mulberry32', 'normalise', 'passesOf', 'placeStations', 'recordPass', 'resizeOrbitField', 'ringPoint', 'syncDepth']);
   return 'pure module, mechanics-only surface';

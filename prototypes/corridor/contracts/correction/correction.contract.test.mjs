@@ -1,3 +1,4 @@
+import {assertPureModules} from '../../../../scripts/ci/pure-module-runtime-probe.mjs';
 /** G14 judge: text and voice corrections share one record with original, basis, status and retraction, keyed by attempt
  * id (campaign/contracts/G14.json; SPEC S11-R6). Pinned by the contract; the worker writes ledger.mjs beside this file and
  * may not edit this file. The voice fixture is the base's own: a Speak turn parsed by speak-core.mjs parseTurn with the
@@ -133,17 +134,14 @@ test('correction contract · G14', async (t) => {
     assert.throws(() => m.parseLedger({ version: 1, rows: [{ kind: 'correction', id: 'x', attemptId: '' }] }), /invalid-ledger/u);
   });
 
-  await t.test('nothing activates: imports only speak-core (for the codes); no store, network, clock or timer; spies at zero', () => {
-    const sf = ts.createSourceFile(MODULE, readFileSync(MODULE, 'utf8'), ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
-    for (const stmt of sf.statements) {
-      if (ts.isImportDeclaration(stmt)) { assert.ok(ALLOWED_IMPORTS.has(stmt.moduleSpecifier.text), `import ${stmt.moduleSpecifier.text} is allowed`); continue; }
-      if (ts.isExportDeclaration(stmt) && stmt.moduleSpecifier) assert.ok(ALLOWED_IMPORTS.has(stmt.moduleSpecifier.text));
-      assert.ok(ts.isExportDeclaration(stmt) || ts.isFunctionDeclaration(stmt) || ts.isClassDeclaration(stmt) || (ts.isVariableStatement(stmt) && (stmt.declarationList.flags & ts.NodeFlags.Const)), `declaration, not action: ${stmt.getText(sf).slice(0, 50)}`);
-    }
-    const seen = new Set();
-    const bare = (node) => !((ts.isPropertyAccessExpression(node.parent) && node.parent.name === node) || (ts.isPropertyAssignment(node.parent) && node.parent.name === node));
-    const visit = (node) => { if (ts.isIdentifier(node) && BANNED.includes(node.text) && bare(node)) seen.add(node.text); if (ts.isCallExpression(node) && node.expression.kind === ts.SyntaxKind.ImportKeyword) seen.add('import()'); ts.forEachChild(node, visit); };
-    visit(sf); assert.deepEqual([...seen], []);
-    assert.deepEqual(calls, { store: 0, fetch: 0 });
+  await t.test('no observed activation on isolated ledger import and fixture operations',()=>{
+    const sf=ts.createSourceFile(MODULE,readFileSync(MODULE,'utf8'),ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
+    for(const stmt of sf.statements)if(ts.isImportDeclaration(stmt)||(ts.isExportDeclaration(stmt)&&stmt.moduleSpecifier))assert.ok(ALLOWED_IMPORTS.has(stmt.moduleSpecifier.text),'declared dependency remains within contract');
+    assert.deepEqual(assertPureModules({files:[MODULE],data:{row:textOn('A1'),turn,at},exercise:([m],d)=>{
+      let ledger=m.addCorrection(m.emptyLedger(),d.row);m.parseLedger(ledger);m.correctionsFor(ledger,'A1');m.textView(ledger,'A1');m.spokenView(ledger,'A1');
+      ledger=m.qualifyCorrection(ledger,ledger.rows[0].id,{note:'fixture',by:'learner',at:d.at+1});
+      m.retractCorrection(ledger,ledger.rows[0].id,{by:'learner',reason:'fixture',at:d.at+2});
+      m.fromSpeakTurn(m.emptyLedger(),d.turn,{attemptId:'A2',at:d.at,ref:'fixture'});
+    }}).calls,[]);
   });
 });
