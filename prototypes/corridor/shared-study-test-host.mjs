@@ -144,9 +144,11 @@ export async function createSharedStudyTestHost(options = {}) {
         active = adapter;activeStorage=storage;
         return adapter;
       } catch(error) {
-        disposeSharedStudyAudioPreparation(adapter);
-        adapter?.backend?.dispose();
-        await storage.close?.();
+        // Cleanup cannot replace the operation that failed.
+        try { disposeSharedStudyAudioPreparation(adapter); } catch {}
+        try { await adapter?.disposeAudioPacks?.(); } catch {}
+        try { await adapter?.backend?.dispose(); } catch {}
+        try { await storage.close?.(); } catch {}
         throw error;
       }
     });
@@ -166,7 +168,12 @@ export async function createSharedStudyTestHost(options = {}) {
       failure = {error};
     } finally {
       try {
-        active?.backend?.dispose();
+        await active?.disposeAudioPacks?.();
+      } catch (error) {
+        failure ??= {error};
+      }
+      try {
+        await active?.backend?.dispose();
       } catch (error) {
         failure ??= {error};
       }

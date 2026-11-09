@@ -23,6 +23,7 @@ const { test } = await import(
   process.env.VITEST === 'true' && !process.env.NODE_TEST_CONTEXT ? 'vitest' : 'node:test'
 );
 const helper = 'shared-study-audio-preparation.mjs';
+const packHelper = 'shared-study-audio-packs.mjs';
 const source = fileURLToPath(new URL('../prototypes/corridor/', import.meta.url));
 const builder = fileURLToPath(new URL('../scripts/build-shared-study-qa.mjs', import.meta.url));
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex');
@@ -37,6 +38,7 @@ const routes = [
   'decks/player/shared-frame.mjs',
   'decks/player/shared-mount.mjs',
   helper,
+  packHelper,
 ];
 function put(path, bytes) {
   mkdirSync(dirname(path), { recursive: true });
@@ -56,6 +58,7 @@ function assets(root) {
     } else put(join(root, path), 'public fixture');
   }
   put(join(root, helper), readFileSync(join(source, helper)));
+  put(join(root, packHelper), readFileSync(join(source, packHelper)));
   put(join(root, 'learner-private.mjs'), 'not a public runtime asset');
 }
 function inventory(root, directory = root) {
@@ -143,6 +146,7 @@ test('actual asset consumer admits the helper and excludes unrelated private fil
     assets(root);
     const paths = corridorAssetFiles(root).map((path) => relative(root, path));
     assert(paths.includes(helper));
+    assert(paths.includes(packHelper));
     assert(!paths.includes('learner-private.mjs'));
   } finally {
     rmSync(root, { recursive: true, force: true });
@@ -183,6 +187,13 @@ test('real QA builder copies and authenticates helper bytes while preserving sou
     const receipt = JSON.parse(readFileSync(join(output, 'qa-host-receipt.json'))),
       bytes = readFileSync(join(source, helper));
     assert.equal(receipt.productionBuild, false);
+    const packBytes = readFileSync(join(source, packHelper));
+    assert.deepEqual(readFileSync(join(output, packHelper)), packBytes);
+    assert.deepEqual(receipt.modules.find(row => row.path === packHelper), {path: packHelper, bytes: packBytes.length, sha256: sha(packBytes)});
+    const packRoute = receipt.actualCorridorRouteInputs.find(row => row.path === packHelper);
+    assert(packRoute);
+    assert.equal(packRoute.sourceArtifactSha256, sha(packBytes));
+    assert.equal(packRoute.currentSourceSha256, sha(packBytes));
     assert.deepEqual(readFileSync(join(output, helper)), bytes);
     assert.deepEqual(
       receipt.modules.map((row) => row.path).sort(),
@@ -192,6 +203,7 @@ test('real QA builder copies and authenticates helper bytes while preserving sou
         'shared-study-runtime.mjs',
         'shared-study-presentation.mjs',
         helper,
+        packHelper,
         'shared-study-test-host.mjs',
         'shared-study-test-bootstrap.mjs',
         'shared-study-sync.mjs',

@@ -86,6 +86,7 @@ export const CORRIDOR_REQUIRED_ROOTS = [
   'shared-study-storage.mjs',
   'shared-study-runtime.mjs',
   'shared-study-audio-preparation.mjs',
+  'shared-study-audio-packs.mjs',
   'shared-study-presentation.mjs',
   'review-caller.mjs',
   'help-relevance.mjs',

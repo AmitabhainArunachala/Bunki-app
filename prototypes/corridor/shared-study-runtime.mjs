@@ -14,7 +14,12 @@ export function sharedStudyRuntime() {
   if (!host && !preview) return Promise.reject(Error('shared-profile-not-bound'));
   runtime=(async()=>{
     const {content,binding}=await loadSharedContent();
-    const prepare=adapter=>attachSharedStudyAudioPreparation({adapter,binding});
+    const prepare=async adapter=>{
+      const prepared=attachSharedStudyAudioPreparation({adapter,binding});
+      if (!host?.audioPackConfiguration) return prepared;
+      const {attachSharedStudyAudioPacks}=await import('./shared-study-audio-packs.mjs');
+      return attachSharedStudyAudioPacks({adapter:prepared,binding,configuration:host.audioPackConfiguration});
+    };
     if (host) {
       // Isolated QA hosts own profile create/open serialization and bind the
       // exact created adapter (including any sync lifecycle). Never create a

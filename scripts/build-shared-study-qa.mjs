@@ -24,6 +24,7 @@ const QA_MODULES = [
   'shared-study-runtime.mjs',
   'shared-study-presentation.mjs',
   'shared-study-audio-preparation.mjs',
+  'shared-study-audio-packs.mjs',
   'shared-study-test-host.mjs',
   'shared-study-test-bootstrap.mjs',
   'shared-study-sync.mjs',
@@ -85,6 +86,7 @@ try {
   const admitted=verifyBundledArtifact(site);
   const routeInputs=['index.html','corridor.js','modules/study-host.mjs','decks/player/mount.js',
     'shared-study-audio-preparation.mjs',
+  'shared-study-audio-packs.mjs',
     'shared-study-content.mjs','shared-study-presentation.mjs','shared-study-storage.mjs','decks/player/shared-frame.mjs','decks/player/shared-mount.mjs'].map(path=>{
       const bytes=readFileSync(join(site,path));
       const current=digest(readFileSync(join(source,path)));
