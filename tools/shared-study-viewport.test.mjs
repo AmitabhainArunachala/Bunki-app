@@ -10,9 +10,10 @@ import {verifyBundledArtifact} from '../prototypes/bunki-desktop/lib/artifact.cj
 import {fileURLToPath} from 'node:url';
 import * as presentation from '../prototypes/corridor/shared-study-presentation.mjs';
 const {test}=await import(process.env.VITEST==='true'&&!process.env.NODE_TEST_CONTEXT?'vitest':'node:test');
-const repo=process.env.BUNKI_R4_SOURCE_REPO||resolve(fileURLToPath(new URL('..',import.meta.url)));
-const candidate=process.env.BUNKI_R4_CANDIDATE||repo;
-const output=process.env.BUNKI_R4_EVIDENCE||join(homedir(),'.dharma/bunki/r4-viewport');
+const acceptance=Boolean(process.env.CI||process.env.KAIRO_SITE_DIR);
+const repo=(!acceptance&&process.env.BUNKI_R4_SOURCE_REPO)||resolve(fileURLToPath(new URL('..',import.meta.url)));
+const candidate=(!acceptance&&process.env.BUNKI_R4_CANDIDATE)||repo;
+const output=process.env.KAIRO_EVIDENCE_DIR?join(process.env.KAIRO_EVIDENCE_DIR,'shared-study-viewport'):process.env.BUNKI_R4_EVIDENCE||join(homedir(),'.dharma/bunki/r4-viewport');
 const owned=new Set(['shared-study-presentation.mjs','decks/player/shared-frame.mjs','decks/player/shared-mount.mjs']);
 const qaOnly=new Set(['study-engine-adapter.mjs','shared-study-runtime.mjs','shared-study-audio-preparation.mjs','shared-study-test-host.mjs','shared-study-test-bootstrap.mjs','shared-study-sync.mjs']);
 
@@ -37,12 +38,14 @@ test('viewport observer follows a settled new card only and disposes pending cal
 test('older or custom frame port without optional scroll callback remains usable',()=>{for(const onCardStart of [undefined,null,{}]){const dispose=presentation.bindSharedStudyViewport({app:{read(){throw Error('unrequested observer read');}},root:null,onCardStart});assert.equal(typeof dispose,'function');dispose();dispose();}});
 
 test('actual ordinary n2 iframe keeps first prompt line visible after all four grades and Undo at1280/375/320',{
- skip:!process.env.BUNKI_R4_BROWSER,timeout:240000,
+ skip:!acceptance&&!process.env.BUNKI_R4_BROWSER,timeout:240000,
 },async()=>{
+ if(acceptance)assert(process.env.KAIRO_SITE_DIR&&process.env.KAIRO_EVIDENCE_DIR&&process.env.KAIRO_ARTIFACT_SHA256,'Explicit CI built site, evidence directory and artifact digest required');
  const {chromium}=createRequire(join(repo,'package.json'))('playwright-core');
- const site=process.env.BUNKI_R4_SITE;
- const root=site||process.env.BUNKI_R4_BASE_SITE;assert(root,'Explicit authenticated built base or fresh QA site required for browser proof');
+ const site=!acceptance&&process.env.BUNKI_R4_SITE;
+ const root=acceptance?process.env.KAIRO_SITE_DIR:site||process.env.BUNKI_R4_BASE_SITE;assert(root,'Explicit authenticated built base or fresh QA site required for browser proof');
  const baseIdentity=site?null:verifyBundledArtifact(root);
+ if(acceptance)assert.equal(baseIdentity.artifactSha256,process.env.KAIRO_ARTIFACT_SHA256,'Viewport artifact differs from CI input');
  if(!site)for(const path of ['index.html','corridor.js','modules/study-host.mjs','decks/player/mount.js','shared-study-content.mjs','shared-study-storage.mjs','shared-study-audio-preparation.mjs']){const hash=bytes=>createHash('sha256').update(bytes).digest('hex');assert.equal(hash(readFileSync(join(root,path))),hash(readFileSync(join(repo,'prototypes/corridor',path))),`Frozen non-overlay route input must match current source: ${path}`);}
  const mime={'.html':'text/html; charset=utf-8','.mjs':'text/javascript','.js':'text/javascript','.css':'text/css','.json':'application/json','.woff2':'font/woff2','.m4a':'audio/mp4'};
  const server=createServer((req,res)=>{
@@ -59,7 +62,7 @@ test('actual ordinary n2 iframe keeps first prompt line visible after all four g
  mkdirSync(output,{recursive:true});const receipt={kind:site?'fresh-built-ordinary-route-viewport':'authenticated-base-ordinary-router-overlay-fixture',sourceRepo:repo,candidate,site:site||null,baseArtifact:baseIdentity?{root,gitSha:baseIdentity.gitSha,artifactSha256:baseIdentity.artifactSha256}:null,viewports:[],errors:[]};let browser;
  try{
   await new Promise(r=>server.listen(0,'127.0.0.1',r));const origin=`http://127.0.0.1:${server.address().port}`;
-  browser=await chromium.launch({headless:true});receipt.browser=browser.version();
+  browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||undefined});receipt.browser=browser.version();
   for(const viewport of [{width:1280,height:820},{width:375,height:812},{width:320,height:568}]){
    const context=await browser.newContext({viewport,serviceWorkers:'block'}),page=await context.newPage(),row={viewport,actions:[],injectedFaults:[]};let failureArmed=false;receipt.viewports.push(row);
    page.on('pageerror',e=>{if(failureArmed&&e.message==='Synthetic viewport failed write')row.injectedFaults.push(e.message);else receipt.errors.push(e.message);});await context.route('**/*',r=>r.request().url().startsWith(origin+'/')?r.continue():r.abort());

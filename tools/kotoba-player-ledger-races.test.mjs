@@ -7,12 +7,14 @@ import {resolve,join,extname} from 'node:path';
 import {homedir} from 'node:os';
 import {fileURLToPath} from 'node:url';
 const {test}=await import(process.env.VITEST==='true'&&!process.env.NODE_TEST_CONTEXT?'vitest':'node:test');
-const source=process.env.BUNKI_LEDGER_SOURCE||resolve(fileURLToPath(new URL('..',import.meta.url)));
-const candidate=process.env.BUNKI_LEDGER_CANDIDATE||source;
-const runtime=process.env.BUNKI_LEDGER_EVIDENCE||join(homedir(),'.dharma/bunki/ledger-races');
-const options={skip:!process.env.BUNKI_LEDGER_BROWSER,timeout:45000};
+const acceptance=Boolean(process.env.CI||process.env.KAIRO_SITE_DIR);
+const source=(!acceptance&&process.env.BUNKI_LEDGER_SOURCE)||resolve(fileURLToPath(new URL('..',import.meta.url)));
+const candidate=(!acceptance&&process.env.BUNKI_LEDGER_CANDIDATE)||source;
+const runtime=process.env.KAIRO_EVIDENCE_DIR?join(process.env.KAIRO_EVIDENCE_DIR,'ledger-races'):process.env.BUNKI_LEDGER_EVIDENCE||join(homedir(),'.dharma/bunki/ledger-races');
+const options={skip:!acceptance&&!process.env.BUNKI_LEDGER_BROWSER,timeout:45000};
 
 async function fixture(name){
+ if(acceptance)assert(process.env.KAIRO_EVIDENCE_DIR,'Explicit CI evidence directory required');
  const {chromium}=createRequire(join(source,'package.json'))('playwright-core');
  const html=`<!doctype html><meta charset="utf-8"><main id="app"></main><script type="module">
  import * as engine from '/decks/player/engine.js';
@@ -32,7 +34,7 @@ async function fixture(name){
  const server=createServer((req,res)=>{try{const key=decodeURIComponent(new URL(req.url,'http://fixture.invalid').pathname).replace(/^\/+/, '');if(!key){res.setHeader('content-type','text/html');res.end(html);return;}const actual=key==='decks/player/mount.js'?join(candidate,'prototypes/corridor',key):join(root,key);assert(resolve(actual).startsWith(resolve(key==='decks/player/mount.js'?join(candidate,'prototypes/corridor'):root)+'/'));res.setHeader('content-type',/\.(mjs|js)$/.test(extname(actual))?'text/javascript':extname(actual)==='.css'?'text/css':'application/json');res.end(readFileSync(actual));}catch{res.writeHead(404);res.end('fixture resource missing');}});
  let browser,context;const receipt={name,source,candidate,checks:[],errors:[]};
  await new Promise(r=>server.listen(0,'127.0.0.1',r));const origin=`http://127.0.0.1:${server.address().port}`;
- try{browser=await chromium.launch({headless:true});context=await browser.newContext({serviceWorkers:'block',viewport:{width:1000,height:900}});await context.route('**/*',route=>route.request().url().startsWith(origin+'/')?route.continue():route.abort());const a=await context.newPage(),b=await context.newPage();for(const page of [a,b]){page.on('pageerror',error=>receipt.errors.push(error.message));await page.goto(origin);await page.waitForFunction(()=>!!window.fixture);}
+ try{browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||undefined});context=await browser.newContext({serviceWorkers:'block',viewport:{width:1000,height:900}});await context.route('**/*',route=>route.request().url().startsWith(origin+'/')?route.continue():route.abort());const a=await context.newPage(),b=await context.newPage();for(const page of [a,b]){page.on('pageerror',error=>receipt.errors.push(error.message));await page.goto(origin);await page.waitForFunction(()=>!!window.fixture);}
   return{a,b,receipt,async close(){mkdirSync(runtime,{recursive:true});writeFileSync(join(runtime,name+'.json'),JSON.stringify(receipt,null,2)+'\n');await context.close();await browser.close();await new Promise(r=>{server.close(r);server.closeAllConnections();});}};
  }catch(error){await context?.close();await browser?.close();await new Promise(r=>{server.close(r);server.closeAllConnections();});throw error;}
 }

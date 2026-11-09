@@ -4,6 +4,7 @@ import vm from 'node:vm';
 import {readFileSync, mkdtempSync, rmSync} from 'node:fs';
 import {createServer} from 'node:http';
 import {spawn} from 'node:child_process';
+import {createRequire} from 'node:module';
 import {once} from 'node:events';
 import {setTimeout,clearTimeout} from 'node:timers';
 import {tmpdir} from 'node:os';
@@ -16,6 +17,7 @@ import {studyAudioSourcePlan} from '../prototypes/corridor/vendor/shared-study-e
 import {prepareGrammarModule, assertGrammarFrontIntegrity} from '../prototypes/corridor/vendor/shared-study-engine/client/grammar/renderer.mjs';
 
 const {test}=await import(process.env.VITEST==='true'&&!process.env.NODE_TEST_CONTEXT?'vitest':'node:test');
+const acceptance=Boolean(process.env.CI||process.env.KAIRO_SITE_DIR);
 const root=new URL('../prototypes/corridor/',import.meta.url);
 const read=path=>JSON.parse(readFileSync(new URL(path,root)));
 const foreign=value=>vm.runInNewContext('JSON.parse(serialized)',{serialized:JSON.stringify(value)});
@@ -94,8 +96,10 @@ test('presentation binding retains empty selections and backend-owned session me
 });
 
 test('Today manual save and custom practice use child-realm entries in an actual iframe',{
-  skip:!process.env.BUNKI_TEST_CHROME,timeout:90000,
+  skip:!acceptance&&!process.env.BUNKI_TEST_CHROME,timeout:90000,
 },async()=>{
+  const {chromium}=createRequire(import.meta.url)('playwright-core');
+  const executable=process.env.CHROMIUM_PATH||(!acceptance&&process.env.BUNKI_TEST_CHROME)||chromium.executablePath();
   const child=`
     import {bindStudyPresentation} from '/prototypes/corridor/shared-study-presentation.mjs';
     import {mountStudyApp} from '/prototypes/corridor/vendor/shared-study-engine/client/app/app.mjs';
@@ -175,7 +179,7 @@ test('Today manual save and custom practice use child-realm entries in an actual
   let browser,socket;
   try{
     await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
-    browser=spawn(process.env.BUNKI_TEST_CHROME,[
+    browser=spawn(executable,[
       '--headless','--no-first-run','--disable-background-networking','--disable-extensions','--disable-sync',
       `--user-data-dir=${profile}`,'--remote-debugging-port=0','about:blank',
     ],{stdio:['ignore','ignore','pipe']});

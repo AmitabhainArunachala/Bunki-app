@@ -6,6 +6,7 @@ const {test}=await import(
 import {readFileSync} from 'node:fs';
 import {createSharedStudyTestHost,QA_HOST_MARKER} from '../prototypes/corridor/shared-study-test-host.mjs';
 import {createBunkiStudyAdapter} from '../prototypes/corridor/study-engine-adapter.mjs';
+import {createSharedStudySync} from '../prototypes/corridor/shared-study-sync.mjs';
 import {createMemoryAdapter} from '../prototypes/corridor/vendor/shared-study-engine/client/engine.mjs';
 const root=new URL('../prototypes/corridor/',import.meta.url),fixture=JSON.parse(readFileSync(new URL('tools/fixtures/shared-srs-contracts.json',root)));
 const catalog=fixture.cards,pin=JSON.parse(readFileSync(new URL('vendor/shared-study-engine/client/vendor/fsrs-pin.json',root)));
@@ -54,6 +55,63 @@ test('interrupted allocation with no canonical store is a blocked open, never a 
  assert.equal(restarted.identity.mode,'open');
  await assert.rejects(()=>restarted.withAdapter(binding=>createBunkiStudyAdapter({...binding,content})),/missing-store/);
  assert.equal((await createSharedStudyTestHost(config)).identity.installation,host.identity.installation);
+});
+
+test('failed ready marker leaves sync unattached and same-host retry preserves durable history',async()=>{
+ const values=new Map(),failure=Error('synthetic-ready-marker-failure');let fail=true,allocations=0;
+ const metadata={getItem:key=>values.get(key)??null,setItem(key,value){
+  if(fail&&JSON.parse(value).phase==='ready')throw failure;
+  values.set(key,value);
+ }};
+ const memory=createMemoryAdapter(),handles=[],adapters=[],subscriptions=new Set();
+ const sync=createSharedStudySync({origin:'https://synthetic.invalid',getCredential:()=> 'synthetic-only',
+  online:()=>false,visible:()=>true,eventTarget:new EventTarget(),automatic:false,
+  fetch:async()=>{throw Error('offline fixture must not fetch');},
+  permits:{isPaired:()=>false,reserve:async()=>{throw Error('unpaired fixture must not reserve');}},
+ });
+ const host=await createSharedStudyTestHost({...options(metadata,memory,()=>`sync-recovery-${++allocations}`),sync,
+  storageFactory(){
+   const handle={closed:0};handles.push(handle);
+   return {async read(...args){assert.equal(handle.closed,0);return memory.read(...args);},
+    async compareAndSwap(...args){assert.equal(handle.closed,0);return memory.compareAndSwap(...args);},
+    close(){handle.closed++;}};
+  },
+ });
+ let history,journal;
+ const open=async binding=>{
+  const adapter=await createBunkiStudyAdapter({...binding,content});
+  const row={adapter,disposed:0};adapters.push(row);
+  if(adapters.length===1){
+   const command=adapter.backend.command('settings',{key:'newPerDayTotal',value:15});
+   assert.equal((await adapter.backend.submitCommand(command)).kind,'durable');
+   history=adapter.backend.readProjection();journal=await adapter.store.outbox();
+   assert.equal(journal.length,1);
+  }
+  return {...adapter,store:{...adapter.store,subscribe(listener){
+   subscriptions.add(listener);const stop=adapter.store.subscribe(listener);
+   return()=>{subscriptions.delete(listener);stop();};
+  }},backend:{...adapter.backend,dispose(){row.disposed++;return adapter.backend.dispose();}}};
+ };
+ try{
+  await assert.rejects(host.withAdapter(open),error=>error===failure);
+  assert.equal(handles[0].closed,1);assert.equal(adapters[0].disposed,1);
+  assert.equal(subscriptions.size,0,'failed initialization must not retain a sync subscription');
+  assert.deepEqual(await host.synchronize(),{state:'idle',error:'shared-sync-not-attached',retryAt:null});
+  assert.equal(JSON.parse([...values.values()][0]).phase,'allocated');
+  fail=false;
+  const retried=await host.withAdapter(open);
+  assert.notEqual(retried.store,adapters[0].adapter.store);
+  assert.equal(retried.identity.installation,host.identity.installation);
+  assert.equal(retried.identity.mode,'open');assert.equal(allocations,1);
+  assert.deepEqual(retried.backend.readProjection(),history);
+  assert.deepEqual(await retried.store.outbox(),journal);
+  assert.equal(JSON.parse([...values.values()][0]).phase,'ready');
+  assert.equal(subscriptions.size,1);assert.equal((await host.synchronize()).state,'offline');
+  await host.dispose();await host.dispose();
+  assert.equal(subscriptions.size,0);
+  assert.deepEqual(handles.map(row=>row.closed),[1,1]);
+  assert.deepEqual(adapters.map(row=>row.disposed),[1,1]);
+ }finally{await host.dispose();}
 });
 
 test('failed allocation metadata write prevents canonical store construction',async()=>{

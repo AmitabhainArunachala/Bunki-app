@@ -137,10 +137,10 @@ export async function createSharedStudyTestHost(options = {}) {
         adapter = await callback(Object.freeze(binding));
         if (!adapter || typeof adapter !== 'object') throw Error('shared-study-qa-adapter-required');
         if(disposed)throw Error('shared-study-qa-disposed');
-        if (sync) await sync.attach(adapter);
-        if(disposed)throw Error('shared-study-qa-disposed');
         if (durable?.phase!=='ready') metadata.setItem(key,JSON.stringify({
           format:'bunki-shared-study-qa-allocation/v1',installation:chosen.installation,phase:'ready'}));
+        if (sync) await sync.attach(adapter);
+        if(disposed)throw Error('shared-study-qa-disposed');
         active = adapter;activeStorage=storage;
         return adapter;
       } catch(error) {
