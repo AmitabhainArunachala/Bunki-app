@@ -257,45 +257,10 @@ export function createSpeakRoom(host) {
   /** The voice of one line: one request per sentence, in the lock's model and the line's voice. Sentence two renders
    * while sentence one plays. A failure leaves that sentence silent; the model gone (Nov 17) stops the voice. */
   function voiceLine(line) {
-    const tp = transport();
-    const name = core.voiceFor(line.speaker || 'main', st.scene, tp.lock);
-    const sentences = splitLine(line);
-    const gen = st.voiceGen;
+    // Text/transcripts remain available; unbound lines cannot request provider audio.
     line.voice = [];
-    let previous = Promise.resolve();
-    for (const sentence of sentences) {
-      const job = previous.then(async () => {
-        // the room was left, the talk ended or the scene changed since this line was queued: nothing more is asked
-        if (gen !== st.voiceGen) { line.aborted = true; return null; }
-        if (!name || st.voiceRetired || !tp.key || st.offline) return null;
-        const text = core.voiceText(sentence.tokens, sentence.text, (token) => readingTrap(token));
-        try {
-          const json = await post(tp, `/models/${tp.lock.model}:generateContent`, core.buildVoiceRequest(text, name), VOICE_BUDGET_MS);
-          addCost(tp.lock.model, json.usageMetadata);
-          const part = (json.candidates?.[0]?.content?.parts || []).find((p) => p.inlineData?.data);
-          if (!part) return null;
-          const pcm = core.base64ToBytes(part.inlineData.data);
-          const wavBytes = /wav/iu.test(part.inlineData.mimeType || '') ? pcm : core.wavFromPcm16Bytes(pcm, core.pcmRate(part.inlineData.mimeType));
-          return { url: URL.createObjectURL(new Blob([wavBytes], { type: 'audio/wav' })), wav: wavBytes, text: sentence.text };
-        } catch (error) {
-          if (error.kind === 'aborted') { line.aborted = true; return null; }
-          if (error.kind === 'not-found') {
-            st.voiceRetired = true;
-            setStatus('voice-replaced');
-          }
-          return null;
-        }
-      });
-      line.voice.push(job);
-      previous = job;
-    }
-    Promise.all(line.voice).then((clips) => {
-      // silent means the voice was asked and failed; a request the room itself stopped says nothing about the voice
-      line.silent = clips.length > 0 && clips.every((clip) => !clip) && !line.aborted && !st.voiceRetired;
-      if (line.silent) paintLineState(line);
-    });
-    return line.voice;
-  }
+    return [];
+}
   function splitLine(line) {
     const tokens = Array.isArray(line.tokens) ? line.tokens : null;
     if (!tokens) return core.splitSentences(line.text).map((text) => ({ text, tokens: null }));
@@ -378,27 +343,10 @@ export function createSpeakRoom(host) {
     return played ? 'done' : 'silent';
   }
   function playClip(url, rate, token) {
-    return new Promise((done) => {
-      const a = ensureAudio();
-      const finish = (why) => {
-        a.removeEventListener('ended', onEnded); a.removeEventListener('pause', onPause); a.removeEventListener('error', onError);
-        done(why);
-      };
-      const onEnded = () => finish('ended');
-      const onPause = () => { if (!a.ended) finish('paused'); };
-      const onError = () => finish('error');
-      a.addEventListener('ended', onEnded);
-      a.addEventListener('pause', onPause);
-      a.addEventListener('error', onError);
-      a.src = url;
-      a.defaultPlaybackRate = rate;
-      a.playbackRate = rate;
-      st.playing = { kind: 'line', token, rate };
-      host.ownAudio(a);
-      const p = a.play();
-      p?.catch?.(() => finish('error'));
-    });
-  }
+    // Includes shadow replay of a previously cached unbound clip.
+    stopVoice();
+    return Promise.resolve('silent');
+}
   function stopVoice() {
     st.playToken += 1;
     st.playing = null;

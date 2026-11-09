@@ -355,7 +355,7 @@ function validateRoot(data, release) {
     'placementShards', 'clipShards', 'packs',
   ], 'root');
   if (fields.format !== ROOT_FORMAT) bad('root-format');
-  if (fields.version !== 1) bad('root-version');
+  if (fields.version !== 1 && fields.version !== 2) unsupported('root-version');
   if (fields.capability !== PROTOCOL) bad('root-capability');
   if (fields.routing !== ROUTING) unsupported('root-routing');
   if (text(fields.contentRelease, 'root.contentRelease') !== release.contentRelease) {
@@ -438,6 +438,7 @@ function validateRoot(data, release) {
   }
 
   return {
+    version: fields.version,
     contentRelease: fields.contentRelease,
     projectionId: fields.projectionId,
     identities: identitySnapshot,
@@ -487,7 +488,84 @@ function rowSegments(raw, label) {
   return Object.freeze(segments);
 }
 
+function profileAssignmentsValue(raw, root, pending = false) {
+  if (!isPlain(raw)) bad('profile-assignments-object');
+  const keys = Reflect.ownKeys(raw);
+  if (keys.length > 2 || keys.some(key => key !== 'ja' && key !== 'en')) bad('profile-assignments-keys');
+  const result = {};
+  for (const key of keys) {
+    const descriptor = Object.getOwnPropertyDescriptor(raw, key);
+    if (!descriptor || !Object.hasOwn(descriptor, 'value')) bad('profile-assignments-accessor');
+    const value = descriptor.value;
+    if (value === null && pending) result[key] = null;
+    else {
+      result[key] = text(value, 'profile-assignment');
+      if (root && !root.profileById.has(value)) bad('profile-assignment-unknown');
+    }
+  }
+  return Object.freeze(result);
+}
+
+function languageValue(raw, length, pending = false) {
+  if (raw === null && pending) return null;
+  if (raw === 'ja' || raw === 'en') return raw;
+  const values = exactArray(raw, 'source-partition', MAX_SEGMENTS);
+  if (!values.length) bad('source-partition-empty');
+  let cursor = 0;
+  const result = values.map(value => {
+    const part = exactRecord(value, ['start', 'end', 'language'], 'source-partition');
+    if (!Number.isSafeInteger(part.start) || Object.is(part.start, -0) || part.start !== cursor ||
+        !Number.isSafeInteger(part.end) || part.end <= part.start || part.end > length ||
+        (part.language !== 'ja' && part.language !== 'en')) bad('source-partition-span');
+    cursor = part.end;
+    return Object.freeze({start: part.start, end: part.end, language: part.language});
+  });
+  return Object.freeze(result);
+}
+
+function sourceParts(source) {
+  const length = Array.from(source.text).length;
+  if (Array.isArray(source.language)) {
+    if (source.language.at(-1).end !== length) bad('source-partition-coverage');
+    return source.language;
+  }
+  return [{start: 0, end: length, language: source.language}];
+}
+
+function placementRowV2(raw, root) {
+  const row = exactRecord(raw, ['taskKey', 'contentRevision', 'audioContentRevision', 'fieldId',
+    'supportedReadingId', 'profileAssignments', 'language', 'sourceSha256', 'sourceBytes', 'state', 'packId', 'segments'], 'placement-v2');
+  if (typeof row.taskKey !== 'string' || !isTaskKey(row.taskKey)) bad('placement-taskKey');
+  if (row.supportedReadingId !== null || !STATES.has(row.state)) bad('placement-state');
+  if (typeof row.sourceSha256 !== 'string' || !HEX.test(row.sourceSha256) ||
+      !Number.isSafeInteger(row.sourceBytes) || row.sourceBytes < 1 || Object.is(row.sourceBytes, -0)) bad('placement-source');
+  const profileAssignments = profileAssignmentsValue(row.profileAssignments, root, row.state !== 'verified');
+  const language = languageValue(row.language, row.sourceBytes, row.state !== 'verified');
+  if (row.packId !== null && !root.packsById.has(row.packId)) bad('placement-packId');
+  const values = exactArray(row.segments, 'placement-segments-v2', MAX_SEGMENTS);
+  if (row.state === 'verified' ? !values.length || row.packId === null || language === null : values.length !== 0) bad('placement-segments-state');
+  const segments = values.map((value, index) => {
+    const part = exactRecord(value, ['index', 'start', 'end', 'unit', 'byteStart', 'byteEnd',
+      'language', 'profileId', 'packId', 'inputKey', 'speechInput'], 'placement-segment-v2');
+    if (part.index !== index || part.unit !== 'codepoint' ||
+        !Number.isSafeInteger(part.start) || part.start < 0 || Object.is(part.start, -0) ||
+        !Number.isSafeInteger(part.end) || part.end <= part.start ||
+        !Number.isSafeInteger(part.byteStart) || part.byteStart < 0 || Object.is(part.byteStart, -0) ||
+        !Number.isSafeInteger(part.byteEnd) || part.byteEnd <= part.byteStart || part.byteEnd > row.sourceBytes ||
+        (part.language !== 'ja' && part.language !== 'en') || part.packId !== row.packId ||
+        !root.profileById.has(part.profileId) || profileAssignments[part.language] !== part.profileId ||
+        typeof part.inputKey !== 'string' || !HEX.test(part.inputKey)) bad('placement-segment-v2-identity');
+    speechInputValue(part.speechInput, part.inputKey);
+    return freeze({...part});
+  });
+  return freeze({...row, version: 2,
+    contentRevision: text(row.contentRevision, 'placement-contentRevision'),
+    audioContentRevision: text(row.audioContentRevision, 'placement-audioRevision'),
+    fieldId: text(row.fieldId, 'placement-fieldId'), profileAssignments, language, segments});
+}
+
 function placementRow(raw, root) {
+  if (root.version === 2) return placementRowV2(raw, root);
   const fields = exactRecord(raw, [
     'taskKey', 'contentRevision', 'audioContentRevision', 'fieldId', 'supportedReadingId',
     'profileId', 'language', 'sourceSha256', 'sourceBytes', 'state', 'packId', 'segments',
@@ -537,7 +615,7 @@ function placementRow(raw, root) {
 function validatePlacementShard(data, {bucket, contentRelease, projectionId}, root) {
   const fields = exactRecord(data,
     ['format', 'version', 'contentRelease', 'projectionId', 'bucket', 'rows'], 'placement-shard');
-  if (fields.format !== PLACEMENT_FORMAT || fields.version !== 1) bad('placement-format');
+  if (fields.format !== PLACEMENT_FORMAT || fields.version !== root.version) bad('placement-format');
   if (fields.contentRelease !== contentRelease || fields.projectionId !== projectionId) {
     bad('placement-scope');
   }
@@ -548,7 +626,7 @@ function validatePlacementShard(data, {bucket, contentRelease, projectionId}, ro
   for (const raw of values) {
     const row = placementRow(raw, root);
     const tuple = canonicalStringify([row.taskKey, row.contentRevision, row.fieldId, row.supportedReadingId,
-      row.profileId]);
+      row.version === 2 ? row.profileAssignments : row.profileId]);
     if (tuples.has(tuple)) bad('placement-row-duplicate');
     tuples.add(tuple);
     rows.push(row);
@@ -583,7 +661,7 @@ function clipRow(raw, root, bucket) {
 function validateClipShard(data, {bucket, contentRelease, projectionId}, root) {
   const fields = exactRecord(data,
     ['format', 'version', 'contentRelease', 'projectionId', 'bucket', 'rows'], 'clip-shard');
-  if (fields.format !== CLIP_FORMAT || fields.version !== 1) bad('clip-shard-format');
+  if (fields.format !== CLIP_FORMAT || fields.version !== root.version) bad('clip-shard-format');
   if (fields.contentRelease !== contentRelease || fields.projectionId !== projectionId) {
     bad('clip-shard-scope');
   }
@@ -602,7 +680,28 @@ function validateClipShard(data, {bucket, contentRelease, projectionId}, root) {
 
 /* ---------- Selection ---------- */
 
+function selectionValueV2(raw) {
+  const value = exactRecord(raw, ['version', 'taskKey', 'contentRevision', 'audioContentRevision',
+    'contentRelease', 'fields', 'profileAssignments', 'supportedReadingId', 'face', 'sourceFields'], 'selection-v2');
+  const profileAssignments = profileAssignmentsValue(value.profileAssignments, null, true);
+  // Reuse every legacy scalar selection/directive check with a detached scalar
+  // validation view; preserve original partitions only in this explicit version.
+  const languages = new Map();
+  const fields = exactArray(value.sourceFields, 'selection-sourceFields', MAX_SEGMENTS).map(source => {
+    exactRecord(source, ['fieldId', 'text', 'language', 'pronunciationDirectives', 'pendingReasons'], 'source-field');
+    const language = languageValue(source.language, Array.from(text(source.text, 'source-text')).length, true);
+    if (Array.isArray(language) && language.at(-1).end !== Array.from(source.text).length) bad('source-partition-coverage');
+    languages.set(source.fieldId, language);
+    return {...source, language: Array.isArray(language) ? 'ja' : language};
+  });
+  const {version, profileAssignments: ignored, ...base} = value;
+  const checked = selectionValue({...base, profileId: 'v2-validation', sourceFields: fields});
+  const sources = new Map([...checked.sourceFields].map(([id, source]) => [id, Object.freeze({...source, language: languages.get(id)})]));
+  return Object.freeze({...checked, version: 2, profileId: null, profileAssignments, sourceFields: sources});
+}
+
 function selectionValue(raw) {
+  if (isPlain(raw) && Object.getOwnPropertyDescriptor(raw, 'version')?.value === 2) return selectionValueV2(raw);
   const fields = exactRecord(raw, [
     'taskKey', 'contentRevision', 'audioContentRevision', 'contentRelease', 'fields',
     'profileId', 'supportedReadingId', 'face', 'sourceFields',
@@ -1013,6 +1112,37 @@ export function createAudioReleaseReader({capability} = {}) {
     return Object.freeze(output);
   }
 
+  function verifySegmentsV2(row, source, selected) {
+    if (canonicalStringify(row.language) !== canonicalStringify(source.language)) bad('source-partition-mismatch');
+    const points = Array.from(source.text), bytes = ENC.encode(source.text), parts = sourceParts(source);
+    if (bytes.length !== row.sourceBytes || sha256(source.text) !== row.sourceSha256 || parts.length !== row.segments.length) bad('source-v2-coverage');
+    const used = [...new Set(parts.map(part => part.language))].sort();
+    if (canonicalStringify(Object.keys(row.profileAssignments).sort()) !== canonicalStringify(used)) bad('source-v2-profiles');
+    const output = [];
+    for (const [index, segment] of row.segments.entries()) {
+      const part = parts[index];
+      if (segment.start !== part.start || segment.end !== part.end || segment.language !== part.language ||
+          row.profileAssignments[part.language] !== selected.profileAssignments[part.language]) bad('source-v2-segment');
+      const start = ENC.encode(points.slice(0, part.start).join('')).length;
+      const end = start + ENC.encode(points.slice(part.start, part.end).join('')).length;
+      if (segment.byteStart !== start || segment.byteEnd !== end) bad('source-v2-byte-span');
+      const directives = [];
+      for (const directive of source.pronunciationDirectives) {
+        if (directive.start < part.end && directive.end > part.start) {
+          if (directive.start < part.start || directive.end > part.end) bad('source-v2-directive-crossing');
+          directives.push({start: directive.start - part.start, end: directive.end - part.start, reading: directive.reading});
+        }
+      }
+      let computed;
+      try { computed = createSpeechInput({segments: [{language: part.language,
+        text: points.slice(part.start, part.end).join(''), pronunciationDirectives: directives}],
+        profile: root.profileById.get(segment.profileId)}); } catch { bad('source-v2-input'); }
+      if (computed.inputKey !== segment.inputKey || canonicalStringify(computed) !== canonicalStringify(segment.speechInput)) bad('source-v2-speech');
+      output.push(Object.freeze({...segment, fieldId: row.fieldId, supportedReadingId: row.supportedReadingId}));
+    }
+    return output;
+  }
+
   async function resolveSelection(selection, signal) {
     if (disposed) return {status: 'cancelled'};
     if (signal?.aborted) return {status: 'cancelled'};
@@ -1027,7 +1157,7 @@ export function createAudioReleaseReader({capability} = {}) {
     if (selected.contentRelease !== snapshot.release.contentRelease) {
       return {status: 'content-release-mismatch'};
     }
-    if (selected.profileId === null) return {status: 'profile-unassigned'};
+    if (selected.version !== 2 && selected.profileId === null) return {status: 'profile-unassigned'};
     let loaded;
     try {
       loaded = await loadInternal({signal});
@@ -1040,8 +1170,21 @@ export function createAudioReleaseReader({capability} = {}) {
         loaded.contentRelease !== snapshot.release.contentRelease) {
       return {status: 'integrity-invalid'};
     }
-    const profile = loaded.profileById.get(selected.profileId);
-    if (!profile) return {status: 'profile-unavailable'};
+    if ((selected.version === 2 ? 2 : 1) !== loaded.version) return {status: 'unsupported-capability'};
+    if (selected.version === 2) {
+      for (const fieldId of selected.fields) {
+        const source = selected.sourceFields.get(fieldId);
+        if (!source) return {status: 'source-stale'};
+        if (source.language === null) return {status: 'pending'};
+        for (const part of sourceParts(source)) {
+          const id = selected.profileAssignments[part.language];
+          if (!id) return {status: 'profile-unassigned'};
+          if (!loaded.profileById.has(id)) return {status: 'profile-unavailable'};
+        }
+      }
+    }
+    const profile = selected.version === 2 ? null : loaded.profileById.get(selected.profileId);
+    if (selected.version !== 2 && !profile) return {status: 'profile-unavailable'};
 
     let bucket;
     try {
@@ -1068,7 +1211,8 @@ export function createAudioReleaseReader({capability} = {}) {
         if (candidate.taskKey === selected.taskKey &&
             candidate.contentRevision === selected.contentRevision &&
             candidate.fieldId === fieldId &&
-            candidate.profileId === selected.profileId) {
+            (selected.version === 2 ? candidate.version === 2 &&
+              Object.entries(candidate.profileAssignments).every(([lang, id]) => selected.profileAssignments[lang] === id) : candidate.profileId === selected.profileId)) {
           row = candidate;
           break;
         }
@@ -1081,13 +1225,13 @@ export function createAudioReleaseReader({capability} = {}) {
       if (row.state === 'failed') return {status: 'preparation-failed'};
       if (row.state === 'stale') return {status: 'source-stale'};
       if(row.packId===null)allFieldsPacked=false;else selectedPacks.add(row.packId);
-      if (row.language !== source.language) return {status: 'source-stale'};
+      if (canonicalStringify(row.language) !== canonicalStringify(source.language)) return {status: 'source-stale'};
       if (row.sourceBytes !== ENC.encode(source.text).byteLength ||
           row.sourceSha256 !== sha256(source.text)) {
         return {status: 'source-stale'};
       }
       try {
-        pieces.push(...verifySegments(row, source, profile));
+        pieces.push(...(selected.version === 2 ? verifySegmentsV2(row, source, selected) : verifySegments(row, source, profile)));
       } catch (error) {
         return statusFor(error);
       }
@@ -1106,9 +1250,10 @@ export function createAudioReleaseReader({capability} = {}) {
         if (disposed || signal?.aborted) return {status: 'cancelled'};
         const clip = clipShardValue.rows.find(candidate => candidate.inputKey === piece.inputKey);
         if (!clip) bad('clip-missing');
-        if (clip.profileId !== selected.profileId) bad('clip-profile-mismatch');
+        if (clip.profileId !== (selected.version === 2 ? piece.profileId : selected.profileId)) bad('clip-profile-mismatch');
         if (clip.verification !== 'verified') bad('clip-unverified');
         segments.push(Object.freeze({
+          ...(selected.version === 2 ? {index: piece.index, unit: piece.unit, byteStart: piece.byteStart, byteEnd: piece.byteEnd, language: piece.language} : {}),
           fieldId: piece.fieldId,
           packId: piece.packId,
           supportedReadingId: piece.supportedReadingId,
@@ -1124,6 +1269,14 @@ export function createAudioReleaseReader({capability} = {}) {
     }
     if (disposed || signal?.aborted) return {status: 'cancelled'};
 
+    if (selected.version === 2) {
+      try {
+        for (const segment of segments) {
+          await readClip(segment.ref, {signal});
+          if (disposed || signal?.aborted) return {status: 'cancelled'};
+        }
+      } catch (error) { return statusFor(error); }
+    }
     let localState='nonpersistent';
     if(allFieldsPacked&&selectedPacks.size){
       try{
@@ -1140,6 +1293,7 @@ export function createAudioReleaseReader({capability} = {}) {
 
     const result = freeze({
       status: 'ready',
+      ...(selected.version === 2 ? {version: 2, profileAssignments: selected.profileAssignments} : {}),
       releaseId: snapshot.release.releaseId,
       projectionId: loaded.projectionId,
       contentRelease: loaded.contentRelease,
@@ -1196,13 +1350,13 @@ export function createAudioReleaseReader({capability} = {}) {
   /** Bounded local-demo pack inspection. All root shards are admitted for this
    * deliberately small projection; only rows explicitly assigned packId select media.
    * This does not define whole-catalog downloads or prove source/acoustic correctness. */
-  async function inspectPack(packId, {signal} = {}) {
+  async function inspectPack(packId, {signal, beforeMedia} = {}) {
     const loaded=await loadInternal({signal});
     const descriptor=loaded.packsById.get(packId);
     if(!descriptor)bad('pack-unknown');
     const index=parseJsonBytes(await readVerified(descriptor.ref, PACK_LIMIT, signal));
     const fields=exactRecord(index,['format','version','contentRelease','projectionId','id','resources','totalBytes'],'pack-index');
-    if(fields.format!=='nihongo-audio-pack'||fields.version!==1||fields.contentRelease!==loaded.contentRelease||fields.projectionId!==loaded.projectionId||fields.id!==packId)bad('pack-identity');
+    if(fields.format!=='nihongo-audio-pack'||fields.version!==loaded.version||fields.contentRelease!==loaded.contentRelease||fields.projectionId!==loaded.projectionId||fields.id!==packId)bad('pack-identity');
     const values=exactArray(fields.resources,'pack-resources',MAX_ROWS),listed=new Map();let total=0;
     for(const value of values){const ref=refValue(value,CLIP_LIMIT,'pack-resource');if(ref.key==='root.json'||ref.key===descriptor.ref.key||listed.has(ref.key))bad('pack-resource-duplicate');listed.set(ref.key,ref);total+=ref.bytes;if(total>PACK_BYTES_LIMIT)bad('pack-total');}
     if(total!==fields.totalBytes||total!==descriptor.totalBytes)bad('pack-total');
@@ -1212,15 +1366,24 @@ export function createAudioReleaseReader({capability} = {}) {
     const clips=new Map();
     for(const [bucket,ref] of loaded.clipByBucket){requireRef(ref);const shard=await clipShard(bucket,signal);for(const row of shard.rows)clips.set(row.inputKey,row);}
     if(!placements.length)bad('pack-empty');
-    for(const row of placements)for(const segment of row.segments){const clip=clips.get(segment.inputKey);if(!clip||clip.profileId!==row.profileId)bad('pack-clip-missing');requireRef(clip.ref);}
+    for(const row of placements)for(const segment of row.segments){const clip=clips.get(segment.inputKey);if(!clip||clip.profileId!==(row.version===2?segment.profileId:row.profileId))bad('pack-clip-missing');requireRef(clip.ref);}
     if(required.size!==listed.size)bad('pack-closure');
-    for(const [key,ref] of required){const supplied=listed.get(key);if(!supplied||supplied.sha256!==ref.sha256||supplied.bytes!==ref.bytes)bad('pack-closure');await readVerified(ref,admitted.get(ref.key)?.media?CLIP_LIMIT:SHARD_LIMIT,signal);}
-    return freeze({root:await load({signal}),pack:{id:packId,totalBytes:total},refs:[snapshot.release.root,descriptor.ref,...required.values()],placements});
+    for(const [key,ref] of required){const supplied=listed.get(key);if(!supplied||supplied.sha256!==ref.sha256||supplied.bytes!==ref.bytes)bad('pack-closure');}
+    const inspection=freeze({root:await load({signal}),pack:{id:packId,totalBytes:total},refs:[snapshot.release.root,descriptor.ref,...required.values()],placements});
+    if(beforeMedia!==undefined){
+      if(typeof beforeMedia!=='function')bad('pack-before-media');
+      if(disposed||signal?.aborted)throw new AudioCancelledError();
+      await withSignal(Promise.resolve().then(()=>beforeMedia(inspection)),signal);
+      if(disposed||signal?.aborted)throw new AudioCancelledError();
+    }
+    for(const ref of required.values())await readVerified(ref,admitted.get(ref.key)?.media?CLIP_LIMIT:SHARD_LIMIT,signal);
+    return inspection;
   }
 
   async function load(options) {
     const loaded = await loadInternal(options);
     return Object.freeze({
+      ...(loaded.version === 2 ? {version: 2} : {}),
       contentRelease: loaded.contentRelease,
       projectionId: loaded.projectionId,
       identities: loaded.identities,

@@ -57,23 +57,8 @@ export function createDeviceVoice(env = globalThis) {
   }
   function speak(text, { onStart, onEnd, onError } = {}) {
     cancel();
-    const decision = voiceDecision({ support: deviceVoiceSupport(env), text });
-    if (decision.source !== 'device') return { spoken: false, ...decision };
-    try {
-      const { synth, Utterance } = environment(env);
-      const utterance = new Utterance(decision.text);
-      utterance.lang = 'ja-JP';
-      utterance.voice = decision.voice.ref;
-      active = utterance;
-      utterance.onstart = () => { if (active === utterance) onStart?.(); };
-      utterance.onend = () => { if (active === utterance) { active = null; onEnd?.(); } };
-      utterance.onerror = () => { if (active === utterance) { active = null; onError?.(REASONS.FAILED); } };
-      synth.speak(utterance);
-      return { spoken: true, ...decision };
-    } catch {
-      cancel();
-      return { spoken: false, source: 'none', reason: REASONS.FAILED };
-    }
+    // UNBOUND legacy speech stays disabled: never infer a language or start a device utterance.
+    return { spoken: false, source: 'none', reason: REASONS.DISABLED };
   }
   return { support: () => deviceVoiceSupport(env), speak, cancel };
 }

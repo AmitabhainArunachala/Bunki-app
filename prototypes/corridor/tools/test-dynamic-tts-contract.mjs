@@ -40,15 +40,17 @@ test('the exact recorded clip has precedence; device TTS is only the missing-cli
 });
 
 test('speaking cancels the previous utterance, uses ja-JP and never writes a file or calls a network API', () => {
-  const env = fakeEnv();
-  const speaker = core.createDeviceVoice(env);
-  const result = speaker.speak('犬が走る。');
-  assert.equal(result.spoken, true);
-  assert.equal(env.calls.cancel, 1);
-  assert.equal(env.calls.speak.length, 1);
-  assert.equal(env.calls.speak[0].text, '犬が走る。');
-  assert.equal(env.calls.speak[0].lang, 'ja-JP');
-  assert.equal(env.calls.speak[0].voice, JA_LOCAL);
+  const env = fakeEnv(),
+    speaker = core.createDeviceVoice(env);
+  for (const text of ["犬が走る。", "English", "日本語 and English"]) {
+    const before = env.calls.cancel,
+      result = speaker.speak(text);
+    assert.equal(result.spoken, false);
+    assert.equal(result.source, "none");
+    assert.equal(result.reason, core.REASONS.DISABLED);
+    assert.equal(env.calls.cancel, before + 1);
+    assert.equal(env.calls.speak.length, 0);
+  }
 });
 
 test('unsupported or voice-less environments fail closed with a named reason', () => {

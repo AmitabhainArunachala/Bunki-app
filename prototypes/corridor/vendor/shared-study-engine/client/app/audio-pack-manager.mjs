@@ -314,7 +314,8 @@ export function createAudioPackManager({release, namespace, transport, store, ad
       });
       const reader = createAudioReleaseReader({capability});
       try {
-        const inspection = await call(() => reader.inspectPack(packId, {signal}), signal);
+        const inspection = await call(() => reader.inspectPack(packId, {signal, beforeMedia: inspection =>
+          validateAdmission(inspection, {reader, signal, metadataOnly: true})}), signal);
         alive(signal);
         if (refs.size !== inspection.refs.length || inspection.refs.some(ref => {
           const captured = refs.get(ref.key);
@@ -440,17 +441,32 @@ export function createAudioPackManager({release, namespace, transport, store, ad
       const packId = segment.packId;
       const cached = await installedClosure(packId, operation.signal);
       if (!cached) throw failure('playback-pack-missing');
+      const mixed = snapshot.version === 2;
+      if (mixed && (!snapshot.profileAssignments || snapshot.profileId !== null ||
+          snapshot.segments.some(row => !['ja', 'en'].includes(row.language) ||
+            snapshot.profileAssignments[row.language] !== row.profileId))) throw failure('playback-profiles');
       const matches = [...cached.resolutions.values()].filter(result =>
-        ['taskKey', 'contentRevision', 'audioContentRevision', 'profileId', 'supportedReadingId']
+        ['taskKey', 'contentRevision', 'audioContentRevision', 'supportedReadingId']
           .every(key => result[key] === snapshot[key]) &&
+        (mixed ? result.version === 2 && result.profileAssignments[segment.language] === segment.profileId :
+          result.version !== 2 && result.profileId === snapshot.profileId) &&
         result.segments.some(row => same(row, segment)));
       const placement = cached.inspection.placements.find(row =>
         row.packId === packId && row.taskKey === snapshot.taskKey &&
         row.contentRevision === snapshot.contentRevision && row.audioContentRevision === snapshot.audioContentRevision &&
-        row.profileId === snapshot.profileId && row.supportedReadingId === snapshot.supportedReadingId &&
-        row.fieldId === segment.fieldId);
+        (mixed ? row.version === 2 && row.profileAssignments[segment.language] === segment.profileId &&
+          row.segments.some(part => part.index === segment.index && part.start === segment.start &&
+            part.end === segment.end && part.byteStart === segment.byteStart && part.byteEnd === segment.byteEnd &&
+            part.language === segment.language && part.profileId === segment.profileId &&
+            part.packId === segment.packId && part.inputKey === segment.inputKey) :
+          row.version !== 2 && row.profileId === snapshot.profileId) &&
+        row.supportedReadingId === snapshot.supportedReadingId && row.fieldId === segment.fieldId);
       if (!matches.length || !placement) throw failure('playback-placement');
       try {
+        await validateAdmission(cached.inspection, {
+          reader: cachedReader(cached), placement, signal: operation.signal, metadataOnly: true,
+        });
+        alive(operation.signal);
         const bytes = await durable(refValue(ref), operation.signal);
         if (!bytes) throw failure('playback-resource-missing');
         await call(() => admission.validate(cached.inspection, {
@@ -528,7 +544,8 @@ export function createAudioPackManager({release, namespace, transport, store, ad
     let commitAttempted = false;
     try {
       let inspection;
-      try { inspection = await call(() => reader.inspectPack(packId, {signal}), signal); }
+      try { inspection = await call(() => reader.inspectPack(packId, {signal, beforeMedia: inspection =>
+          validateAdmission(inspection, {reader, signal, metadataOnly: true})}), signal); }
       catch (error) { throw stagingFailure ?? error; }
       alive(signal);
       if (captured.size !== inspection.refs.length || inspection.refs.some(ref => {

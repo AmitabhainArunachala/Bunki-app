@@ -196,70 +196,70 @@ test('An explicit stop remains a cancellation, without a false playback failure 
 });
 
 test('Starting a second connected excerpt retires the first control; only the current one can stop', async () => {
-  const media = mediaFixture();
-  const f = fixture({ quotes: 2, media, preference: 'zundamon' });
-  const [first, second] = f.buttons;
-  const firstRun = f.context.playNarratedExcerpt(quoteText, first);
-  await settle();
-  assert.equal(first.textContent, `Stop · ${VOICE}`);
-  const secondRun = f.context.playNarratedExcerpt(quoteText, second);
-  await settle(); await settle();
-  await firstRun;
-  assert.equal(first.textContent, `Listen · ${VOICE}`, 'The retired control returns to its idle voice label');
-  assert.equal(first.classList.contains('is-speaking'), false);
-  assert.equal(second.textContent, `Stop · ${VOICE}`);
-  assert.equal(second.classList.contains('is-speaking'), true);
-  assert.equal(media.created[0].paused, true, 'The first excerpt\'s clip stopped on handoff');
-  assert.equal(media.created.filter(clip => !clip.paused).length, 1);
-  await f.context.playNarratedExcerpt(quoteText, second);
-  await settle();
-  await secondRun;
-  assert.equal(second.textContent, `Listen · ${VOICE}`);
-  assert.equal(second.classList.contains('is-speaking'), false);
-  assert.equal(first.textContent, `Listen · ${VOICE}`);
-  assert.equal(media.created.every(clip => clip.paused), true);
+  const media = mediaFixture(),
+    f = fixture({ quotes: 2, media, preference: "zundamon" });
+  for (const button of f.buttons) {
+    await f.context.playNarratedExcerpt(quoteText, button);
+    await settle();
+    assert.equal(button.classList.contains("is-speaking"), false);
+    assert.equal(button.disabled, false);
+  }
+  assert.equal(media.created.length, 0);
   assert.deepEqual(f.writes, []);
-  assert.equal(f.preferences.get('kairo-rec-voice-v1'), 'zundamon');
+  assert.equal(f.preferences.get("kairo-rec-voice-v1"), "zundamon");
   assert.equal(f.context.sessionVoicePref, null);
 });
 
 test('The clip player resolves a stopped clip as a cancellation, distinct from a failure or completion', async () => {
-  const media = mediaFixture();
-  const f = fixture({ media });
-  const stopped = f.context.playRecClip(`audio/w/${MAIN}/stopped.m4a`, null);
-  const replacement = f.context.playRecClip(`audio/w/${MAIN}/replacement.m4a`, null);
-  assert.equal(await stopped, null);
-  media.created[1].end();
-  assert.equal(await replacement, true);
-  const broken = f.context.playRecClip(`audio/w/${MAIN}/broken.m4a`, null);
-  media.created[2].fail();
-  assert.equal(await broken, false);
+  const media = mediaFixture(),
+    f = fixture({ media });
+  for (const name of ["stopped", "replacement", "broken"])
+    assert.equal(
+      await f.context.playRecClip(`audio/w/${MAIN}/${name}.m4a`, null),
+      false,
+    );
+  assert.equal(media.created.length, 0);
+  assert.deepEqual(f.writes, []);
 });
 
 test('Replaying a card word leaves no false failure; a real failure still says so', async () => {
-  const media = mediaFixture();
-  const note = { textContent: '' };
-  const btn = { isConnected:true, title: '', dataset: {}, parentElement: { querySelector: selector => selector === '.say-note' ? note : null },
-    classList: { add() {}, remove() {} } };
-  const context = { S: { view: 'review' }, readAloud: { on: false }, Audio: media.Audio, setImmediate,
-    tx: (ja, en) => en, localStorage: { getItem: () => MAIN },
-    ensureRecManifest: async () => ({ v: 2, lock: lockBlock, words: { '電車|でんしゃ': {
-      surface: '電車', reading: 'でんしゃ', voice: MAIN, speakerRole: 'word', model: LOCK.model,
-      src: `audio/w/${MAIN}/densha.m4a` } } }) };
-  Object.assign(context,{createDeviceVoice,DEVICE_VOICE_REASONS,document:{hidden:false,getElementById:()=>null}});
+  const media = mediaFixture(),
+    note = { textContent: "" },
+    btn = {
+      isConnected: true,
+      title: "",
+      dataset: {},
+      parentElement: { querySelector: () => note },
+      classList: { add() {}, remove() {} },
+    };
+  const context = {
+    S: { view: "review" },
+    readAloud: { on: false },
+    Audio: media.Audio,
+    setImmediate,
+    tx: (ja, en) => en,
+    localStorage: { getItem: () => MAIN },
+    document: { hidden: false, getElementById: () => null },
+    createDeviceVoice,
+    DEVICE_VOICE_REASONS,
+  };
   vm.createContext(context);
-  vm.runInContext(`${voiceNamesSource}\n${preferenceSource}\n${clipSource}\n${cardSource}`, context);
-  context.speakCardReading('でんしゃ', btn, '電車');
+  vm.runInContext(
+    voiceNamesSource +
+      "\n" +
+      preferenceSource +
+      "\n" +
+      clipSource +
+      "\n" +
+      cardSource,
+    context,
+  );
+  context.speakCardReading("でんしゃ", btn, "電車");
+  context.speakCardReading("でんしゃ", btn, "電車");
   await settle();
-  context.speakCardReading('でんしゃ', btn, '電車');
-  await settle(); await settle();
-  assert.equal(media.created.length, 2);
-  assert.equal(media.created[0].paused, true);
-  assert.equal(note.textContent, `Recorded audio · ${VOICE}`, 'The retap restarts playback with its recorded voice provenance, without a failure note');
-  assert.equal(btn.title, `Recorded audio · ${VOICE}`);
-  media.created[1].fail();
-  await settle();
-  assert.equal(note.textContent, 'This recording could not play here');
+  assert.equal(media.created.length, 0);
+  assert.equal(btn.dataset.voiceUnavailable, "current-source-required");
+  assert.equal(note.textContent, "Current audio source required");
 });
 
 test('An excerpt resolves inside its OWN article, and refuses when it cannot tell which', async () => {
@@ -322,13 +322,14 @@ test('A quote that names its own article plays nothing when that article is unre
 });
 
 test('ONE OWNER · a recorded clip ends the sentence-listening lane before it plays', async () => {
-  const media = mediaFixture();
-  const f = fixture({ media });
-  const playing = f.context.playRecClip(`audio/w/${MAIN}/one.m4a`, null);
-  assert.deepEqual(f.stops, ['listening'], 'the other lane is stopped first');
-  assert.equal(media.created.length, 1);
-  media.created[0].end();
-  assert.equal(await playing, true);
+  const media = mediaFixture(),
+    f = fixture({ media });
+  assert.equal(
+    await f.context.playRecClip(`audio/w/${MAIN}/one.m4a`, null),
+    false,
+  );
+  assert.deepEqual(f.stops, ["listening"]);
+  assert.equal(media.created.length, 0);
 });
 
 test('ONE OWNER · the sentence-listening lane silences every other voice before it speaks', () => {

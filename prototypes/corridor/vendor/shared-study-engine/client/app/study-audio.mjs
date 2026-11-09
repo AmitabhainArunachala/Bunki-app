@@ -8,6 +8,7 @@
  * error. There is no trial/device/voice fallback and no synthesis.
  */
 import {createAudioReleaseReader, hashAudioBytes} from './audio-release.mjs';
+import {canonicalStringify} from '../schema/event.mjs';
 import {planCardSpeech} from '../audio/card-speech-plan.mjs';
 import {passageReadingRules,passageReadingLedgerSha256} from '../player/passage-reading-rules.mjs';
 
@@ -71,15 +72,37 @@ export function studyAudioSourceFields(entry) {
 
 /** One mounted accepted entry, exact current correction overlay, no provider/profile work.
  * The mount caches by exact source snapshot, so mutable QA inputs cannot retain stale directives. */
-export function studyAudioSourcePlan(entry, assignments = {}) {
+export function studyAudioSourcePlan(entry, assignments = {}, {version = 1} = {}) {
+  if (version !== 1 && version !== 2) throw new TypeError('study-audio-version');
   const selected = (rows = {}) => {
     if (rows === null || typeof rows !== 'object' || Array.isArray(rows)) throw new TypeError('study-audio-assignments');
     return Object.hasOwn(rows, entry.taskKey) ? {[entry.taskKey]: rows[entry.taskKey]} : {};
   };
   const task=planCardSpeech({catalog:[entry],grammarRecords:entry.grammarRecord?[entry.grammarRecord]:[],readingRules:passageReadingRules,sourceRevision:'runtime-projection',correctionLedgerRevision:passageReadingLedgerSha256,profiles:{},languageAssignments:selected(assignments.languageAssignments),readingAssignments:selected(assignments.readingAssignments),scope:{accessScope:'runtime-projection',licenseScope:'runtime-projection'}}).tasks[0];
-  const sourceFields=Object.freeze(task.fields.map(field=>Object.freeze({fieldId:field.sourcePath,text:field.sourceText,language:typeof field.language==='string'?field.language:null,pronunciationDirectives:Object.freeze(field.readingEvidence.map(({start,end,reading})=>Object.freeze({start,end,reading}))),pendingReasons:Object.freeze(field.pendingReasons.filter(reason=>!['profile-unassigned','profile-conflict','reading-review-pending'].includes(reason)))})));
+  const sourceFields=Object.freeze(task.fields.map(field=>Object.freeze({fieldId:field.sourcePath,text:field.sourceText,language:version===2?field.language:typeof field.language==='string'?field.language:null,pronunciationDirectives:Object.freeze(field.readingEvidence.map(({start,end,reading})=>Object.freeze({start,end,reading}))),pendingReasons:Object.freeze(field.pendingReasons.filter(reason=>!['profile-unassigned','profile-conflict','reading-review-pending'].includes(reason)))})));
   const plan=Object.freeze({audioContentRevision:task.audioContentRevision,sourceFields});
   return plan;
+}
+
+/** Resolve IDs from current explicit profile definitions, never from a default. */
+export function studyAudioProfileAssignments(root, assignments, sourceFields, selectedFields) {
+  const result = {};
+  const selected = new Set(selectedFields);
+  for (const source of sourceFields) {
+    if (!selected.has(source.fieldId) || source.language === null) continue;
+    const languages = Array.isArray(source.language) ? source.language.map(part => part.language) : [source.language];
+    for (const language of languages) {
+      if (Object.hasOwn(result, language)) continue;
+      const supplied = assignments?.profiles?.[language];
+      let matches = [];
+      try {
+        if (supplied && typeof supplied === 'object') matches = (root?.profiles ?? []).filter(entry =>
+          canonicalStringify(entry.profile) === canonicalStringify(supplied));
+      } catch { /* Invalid current profile remains explicitly unassigned. */ }
+      result[language] = matches.length === 1 ? matches[0].id : null;
+    }
+  }
+  return Object.freeze(result);
 }
 
 function browserContext() {
@@ -115,6 +138,7 @@ function copyRef(ref) {
 
 function snapshotReady(result) {
   const segments = result.segments.map(segment => Object.freeze({
+    ...(result.version === 2 ? {index: segment.index, unit: segment.unit, byteStart: segment.byteStart, byteEnd: segment.byteEnd, language: segment.language} : {}),
     fieldId: segment.fieldId,
     packId: segment.packId,
     supportedReadingId: segment.supportedReadingId,
@@ -126,6 +150,7 @@ function snapshotReady(result) {
   }));
   return Object.freeze({
     status: 'ready',
+    ...(result.version === 2 ? {version: 2, profileAssignments: result.profileAssignments} : {}),
     releaseId: result.releaseId,
     projectionId: result.projectionId,
     contentRelease: result.contentRelease,

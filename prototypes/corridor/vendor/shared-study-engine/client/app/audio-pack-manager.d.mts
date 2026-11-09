@@ -1,3 +1,4 @@
+/** Shared v1/v2 release semantics; persisted resource/store bindings remain unchanged. */
 import type {AudioCapability,AudioRef,AudioReleaseSelection,PackState} from './audio-resources.mjs';
 import type {AudioPackAdmission,AudioPackBinding,AudioPackNamespace} from './audio-pack-admission.mjs';
 import type {StudyAudioPreflightSnapshot,StudyAudioPreflightOptions} from './study-audio.mjs';

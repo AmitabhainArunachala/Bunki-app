@@ -18,7 +18,7 @@
   },
   "source": {
     "repository": "nihongo-srs",
-    "commit": "8b9c80a7338009f16fe44068080446bbce51f7ea",
+    "commit": "c3cf69766b41b4d45271890a945ab0442bec473d",
     "mode": "committed",
     "changedFiles": []
   },
@@ -68,28 +68,28 @@
     },
     {
       "path": "client/app/app.mjs",
-      "bytes": 197241,
-      "sha256": "85d55b6c4e77dbb7329d6a78e4fc39d03d94d9a603998bd380e397e9ccaae9d8"
+      "bytes": 198373,
+      "sha256": "8992e4b925848c4d01e649675388ae10ee761ae30fa0d6822f328ff6932b2c98"
     },
     {
       "path": "client/app/audio-pack-admission.d.mts",
-      "bytes": 4855,
-      "sha256": "354d2266b1e7133c8ccac4082271a07359bfcad262bc185ef8b60706f7c1ef25"
+      "bytes": 4968,
+      "sha256": "368819c7f6e255c1895d507890974ee5a257262899e7629dac5dcd4f90a5d46e"
     },
     {
       "path": "client/app/audio-pack-admission.mjs",
-      "bytes": 16929,
-      "sha256": "01bc02b65e5d90aca96e74f717205d3d78d4dc7cc0a792be7de0de46ffd5adaf"
+      "bytes": 21081,
+      "sha256": "86623243f16642190321af0354258208dd32a3a712ab419b39de44a4e929bc9a"
     },
     {
       "path": "client/app/audio-pack-manager.d.mts",
-      "bytes": 1915,
-      "sha256": "920fcf75c8b13c6936597f584ee0594c0cd0692cc1023ebbfa00d116cad23f6b"
+      "bytes": 2006,
+      "sha256": "f0de9b6de6375f7d92f29724e2e2a01559ae5732a189b015b3cca2357a3b0aed"
     },
     {
       "path": "client/app/audio-pack-manager.mjs",
-      "bytes": 24772,
-      "sha256": "8de7ae68ba187c8d337136bb22d1d8081784ef75fe4e3ff0baec0435af248f74"
+      "bytes": 26189,
+      "sha256": "2961e7b63f19824fe1e94b500a53006e2593d848f29c321e06259c67d46bfdcc"
     },
     {
       "path": "client/app/audio-pack-source.d.mts",
@@ -103,13 +103,13 @@
     },
     {
       "path": "client/app/audio-release.d.mts",
-      "bytes": 3548,
-      "sha256": "0c4e6c846e26fae4182083eb4671fba39a93308f5b3a3aa1e41925151e8fa12b"
+      "bytes": 5401,
+      "sha256": "db09ab4eaa340ae203779ea0cdbee0034f6894498128cc27a8149f60cd821dd9"
     },
     {
       "path": "client/app/audio-release.mjs",
-      "bytes": 48759,
-      "sha256": "42683e73f7d6d6dc17e816a2464556721e795d62039164ae37d11c13d0a6ef76"
+      "bytes": 59409,
+      "sha256": "47e6971f65dbf023f0167eba376b7c00a1bcc8c7a7f76cad3935575c7a5b31a0"
     },
     {
       "path": "client/app/audio-resources.d.mts",
@@ -1453,13 +1453,13 @@
     },
     {
       "path": "client/app/study-audio.d.mts",
-      "bytes": 1564,
-      "sha256": "6793ca5e6ae3a892c6a3825484759fd646cbdb9a53c876544ff715f2880531ea"
+      "bytes": 2753,
+      "sha256": "f9ba57f54f9c6d08d8b0a18fb3e5e289542e17d961b463aae8d6a821941362ee"
     },
     {
       "path": "client/app/study-audio.mjs",
-      "bytes": 16514,
-      "sha256": "bbe4cebeea058196784de81e97abf2210665b95d40945983c942825dc98369b4"
+      "bytes": 18005,
+      "sha256": "f4f82f3f9a88475ede517f9da236143bb12c29b5a771475979ec717500d5a103"
     },
     {
       "path": "client/app/study-loop.mjs",
@@ -1470,11 +1470,6 @@
       "path": "client/app/sync-evidence.mjs",
       "bytes": 4739,
       "sha256": "85a2661be1b198bd5180a107ea7366f270ce29e2b891e98335d6e0985a2d2279"
-    },
-    {
-      "path": "client/app/trial-audio.mjs",
-      "bytes": 13283,
-      "sha256": "09794b3a80688b9942767651ecda3101f53478b2cb3ef62ac13e69c6ca0e4e36"
     },
     {
       "path": "client/app/update-boundary.mjs",
@@ -1495,6 +1490,26 @@
       "path": "client/audio/card-speech-plan.mjs",
       "bytes": 24104,
       "sha256": "9a9b4ab046b60fe053584508474e609a01dba7e2c6d5cab43e1b1f7275f5b4ef"
+    },
+    {
+      "path": "client/audio/japanese-only-runtime-guard.d.mts",
+      "bytes": 447,
+      "sha256": "6c981f6a92114f877790c56b4bd8e28598055d46172e02e32dc6fc4f989d7104"
+    },
+    {
+      "path": "client/audio/japanese-only-runtime-guard.mjs",
+      "bytes": 1948,
+      "sha256": "b08ad1659bc7e343f1a92e8d181681ea2347d92082341ba39306fc129bef0b38"
+    },
+    {
+      "path": "client/audio/japanese-only-selection.d.mts",
+      "bytes": 1744,
+      "sha256": "849cde1962db5bd811fdc5d2e34f7c74824de970cc3172d700921fcb3c02efd6"
+    },
+    {
+      "path": "client/audio/japanese-only-selection.mjs",
+      "bytes": 6682,
+      "sha256": "7e77c7099384f409299eb47ddac0e61617cc63014695d003dd1ab3a68b39e438"
     },
     {
       "path": "client/audio/speech-input.mjs",
@@ -1722,5 +1737,5 @@
       "sha256": "adab18734248871867be9cf62fa25b58cce3f3f37a34a81e714b0b1b26e10dba"
     }
   ],
-  "closureSha256": "ca0832fd8916f6df169cbf609956abef3d8fd3c87657939a8c25b260fd57f714"
+  "closureSha256": "186bae3d894beaf61a16e0f36f77839bfd4080371dc420a71a70bd6571f9b638"
 }

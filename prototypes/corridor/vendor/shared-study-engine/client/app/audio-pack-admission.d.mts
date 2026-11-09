@@ -1,3 +1,4 @@
+/** Shared v1/v2 release semantics; persisted resource/store bindings remain unchanged. */
 import type {AudioReleaseSelection} from './audio-resources.mjs';
 import type {AudioPackInspection,AudioProfile,AudioReleaseReader,AudioRootSummary} from './audio-release.mjs';
 
@@ -107,7 +108,7 @@ export interface AudioSourceAssignments {
 export interface AudioPackAdmission {
  readonly binding:AudioPackBinding;
  authorize(packId:string,options?:{signal?:AbortSignal}):Promise<AudioPackGrant>;
- validate(inspection:AudioPackInspection,options:{reader:Pick<AudioReleaseReader,'resolve'>;signal?:AbortSignal;placement?:AudioPackInspection['placements'][number]}):Promise<AudioPackValidationStamp>;
+ validate(inspection:AudioPackInspection,options:{reader:Pick<AudioReleaseReader,'resolve'>;signal?:AbortSignal;placement?:AudioPackInspection['placements'][number];metadataOnly?:boolean}):Promise<AudioPackValidationStamp>;
 }
 export function createAudioPackAdmission(options:{
  release:AudioReleaseSelection;

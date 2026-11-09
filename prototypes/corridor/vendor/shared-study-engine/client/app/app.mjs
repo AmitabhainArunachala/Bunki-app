@@ -21,8 +21,7 @@ import {createSharedActivityTracker} from './sync-evidence.mjs';
 import {createUpdateBoundary} from './update-boundary.mjs';
 import {isRetryableProdSyncError} from './prod-native-sync.mjs';
 import {watchLocalDayBudget} from './local-budget.mjs';
-import {createTrialAudio} from './trial-audio.mjs';
-import {createStudyAudio,studyAudioSourceFields,studyAudioSourcePlan} from './study-audio.mjs';
+import {createStudyAudio,studyAudioSourceFields,studyAudioSourcePlan,studyAudioProfileAssignments} from './study-audio.mjs';
 const MODULES = [['all','すべて','すべてのデッキ'],['n2','N2','日本語能力試験'],['n1','N1','日本語能力試験'],['senmon','専門','考えを深める言葉'],['kotoba','わたしの言葉','拾い集めた言葉'],['grammar','文法','意味・思い出す']];
 const GRADES = [[1,'もう一度','Again','再'],[2,'難しい','Hard','難'],[3,'正解','Good','良'],[4,'簡単','Easy','易']];
 const interval = ms => ms < 60000 ? '1分未満' : ms < 3600000 ? `${Math.ceil(ms/60000)}分` : ms < 86400000 ? `${Math.ceil(ms/3600000)}時間` : `${Math.round(ms/86400000)}日`;
@@ -64,11 +63,13 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   if(platform.presentation!==undefined&&!['phone','desktop'].includes(platform.presentation))throw Error('invalid-study-presentation');
   const phonePresentation=platform.presentation===undefined?pairedPhone:platform.presentation==='phone';
   const sharedAudioDeclared=platform.audioDownloadFailure===true||platform.audio!==undefined&&platform.audio!==null;
+  const sharedAudioGuarded=sharedAudioDeclared&&typeof platform.audioDownloads?.authorizePlayback==='function';
   let audioDownloadsSuspended=false,audioDownloadActionFailed=false,audioDownloadsSnapshot=null;
-  const trialAudio=sharedAudioDeclared?null:createTrialAudio({origin:platform.audioOrigin??win.nihongoNativeSync?.origin??win.location?.origin});
+  // Audio requires the current Japanese-only shared authority.
+  const trialAudio=null;
   let trialAudioPlaybackGeneration=0;
-  let sharedAudioOwner=null,sharedAudioRoot=null,sharedAudioRootState=sharedAudioDeclared?'idle':'absent',sharedAudioRootPromise=null,sharedAudioRootController=null;
-  const studyAudio=sharedAudioDeclared?createStudyAudio({capability:platform.audio,authorize:()=>sharedAudioAuthorized(),preflight:platform.audioDownloads?.authorizePlayback}):null;
+  let sharedAudioOwner=null,sharedAudioRoot=null,sharedAudioRootState=sharedAudioGuarded?'idle':sharedAudioDeclared?'unsupported':'absent',sharedAudioRootPromise=null,sharedAudioRootController=null;
+  const studyAudio=sharedAudioGuarded?createStudyAudio({capability:platform.audio,authorize:()=>sharedAudioAuthorized(),preflight:platform.audioDownloads?.authorizePlayback}):null;
   const h = (tag, attrs, ...children) => createNode(document, tag, attrs, ...children);
   const button = (text, fn, attrs = {}) => h('button', { type:'button', onclick: fn, ...attrs }, text);
   let screen = 'today', module = initialModule, current = null, busy = false, notice = '', pendingIntent = null, pendingAction = null, factoryRetry = null, disposed = false, pop = null, lastReview = null;
@@ -748,9 +749,9 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function sharedAudioSource(c=current){
     const e=c?.entry;if(!e)return null;
     try{
-      const assignments=c.audioSelectedAssignments??{},snapshot=JSON.stringify([e,assignments]);
+      const assignments=c.audioSelectedAssignments??{},version=sharedAudioRoot?.version===2?2:1,snapshot=JSON.stringify([e,assignments,version]);
       if(c.audioSourceSnapshot!==snapshot||!c.audioSourcePlan){
-        c.audioSourcePlan=studyAudioSourcePlan(e,assignments);c.audioSourceSnapshot=snapshot;
+        c.audioSourcePlan=studyAudioSourcePlan(e,assignments,{version});c.audioSourceSnapshot=snapshot;
       }
       return c.audioSourcePlan;
     }catch{return null;}
@@ -760,7 +761,11 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const id=c?.audioFieldId;
     return typeof id==='string'&&id!=='default'?id:'default';
   }
+  function sharedAudioV2Profiles(c=current){
+    return studyAudioProfileAssignments(sharedAudioRoot,c?.audioSelectedAssignments??{},sharedAudioSource(c)?.sourceFields??[],sharedAudioSelectedFields(c));
+  }
   function sharedAudioProfileChoice(c=current){
+    if(sharedAudioRoot?.version===2){const profiles=sharedAudioV2Profiles(c);return Object.values(profiles).some(id=>id===null)?null:JSON.stringify(profiles);}
     if(c&&c.audioProfileId!==undefined)return c.audioProfileId;
     return sharedAudioRoot?.defaultProfileId??null;
   }
@@ -789,10 +794,10 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function sharedAudioSelectionKey(c=current){
     if(!c)return null;
     return JSON.stringify([c.entry.taskKey,c.attempt.contentRevision,sharedAudioRevision(c),
-      platform.audio?.release?.contentRelease??null,sharedAudioSelectedFields(c),sharedAudioProfileChoice(c),c.revealed?'answer':'front']);
+      platform.audio?.release?.contentRelease??null,sharedAudioSelectedFields(c),sharedAudioProfileChoice(c),c.revealed?'answer':'front',...(sharedAudioRoot?.version===2?[2]:[])]);
   }
   function sharedAudioSelection(c=current){
-    return {
+    const selection={
       taskKey:c.entry.taskKey,
       contentRevision:c.attempt.contentRevision,
       audioContentRevision:sharedAudioRevision(c),
@@ -803,6 +808,8 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       face:c.revealed?'answer':'front',
       sourceFields:sharedAudioSource(c)?.sourceFields??[],
     };
+    if(sharedAudioRoot?.version===2){const {profileId,...source}=selection;return {...source,version:2,profileAssignments:sharedAudioV2Profiles(c)};}
+    return selection;
   }
   const sharedAudioText=(ja,en)=>interfaceLanguage==='en'?en:interfaceLanguage==='both'?`${ja} / ${en}`:ja;
   function sharedAudioStatusCopy(code){
@@ -855,6 +862,11 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     if(!sharedAudioRoot){
       select.append(h('option',{value:''},sharedAudioText('読み込み中…','Loading…')));
       select.disabled=true;return;
+    }
+    if(sharedAudioRoot.version===2){
+      const ids=Object.values(sharedAudioV2Profiles(c)),assigned=ids.length>0&&ids.every(id=>typeof id==='string');
+      select.append(h('option',{value:'configured'},assigned?sharedAudioText('指定済みの音声','Configured voices'):sharedAudioText('未割り当て','Unassigned')));
+      select.value='configured';select.disabled=true;return;
     }
     const profiles=sharedAudioRoot.profiles??[],defaultId=sharedAudioRoot.defaultProfileId??null;
     if(defaultId===null||profiles.length===0)select.append(h('option',{value:''},sharedAudioText('未割り当て','Unassigned')));
@@ -1789,6 +1801,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       syncSharedAudioCurrent();
       return;
     }
+    if(!trialAudio)return;
     trialAudio.load().then(()=>{if(!disposed)syncTrialAudioControl();},()=>{if(!disposed)syncTrialAudioControl();});
   };
   const audioDownloadsChanged=()=>{

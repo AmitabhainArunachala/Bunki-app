@@ -25,7 +25,7 @@ import { activeTeacherContext, aiAsk, aiChatTurns, aiCreateCards, aiKey, aiProvi
  * FSRS-6 (ts-fsrs 5.4.1) under packages/domain's pinned parameters.
  */
 // BEGIN GENERATED RELEASE IDENTITY — npm run release:sync
-const APP_RELEASE = Object.freeze({"version":"1.3.0-rc.1","channel":"rc","releasedOn":"2026-11-09","learnerDataEpoch":1});
+const APP_RELEASE = Object.freeze({"version":"1.3.0-rc.2","channel":"rc","releasedOn":"2026-11-09","learnerDataEpoch":1});
 // END GENERATED RELEASE IDENTITY
 const DATA = {
   safe: ['kanken', 'sem'],
@@ -12571,32 +12571,10 @@ let recManifestWait = null;
 let recAudioEl = null;
 
 function ensureRecManifest() {
-  // the flag is stamped into index.html by the audio ship itself: a build
-  // without audio never fetches, so no probe ever sees a 404 in the console
-  // (typeof-guarded: the integrity suite runs this file in a windowless VM)
-  if (typeof window === 'undefined' || !window.__KAIRO_AUDIO__) {
-    recManifest = null;
-    return Promise.resolve(null);
-  }
-  if (recManifest !== undefined) return Promise.resolve(recManifest);
-  if (!recManifestWait) {
-    recManifestWait = fetch('audio/manifest.json')
-      .then((r) => (r.ok ? r.json() : null))
-      .catch(() => null)
-      .then((m) => {
-        // Manifest v2 or nothing. A v1 manifest is READABLE but carries no approved clips: its
-        // words are keyed by spelling alone and its clips predate the lock, so admitting one
-        // would speak a homograph's wrong reading (年 とし over a sentence that reads ねん).
-        recManifest = approvedWordManifest(m);
-        // the reader may have drawn while this was loading ('Checking…'): repaint its listen row
-        // once, never mid-read and never under an open sheet
-        // …by swapping only that row: focused tokens and glossary entries elsewhere are never
-        // replaced; focus inside the row itself returns to the same control
-        if (typeof S !== 'undefined' && S.view === 'reader' && !readAloud.on) refreshListenRow();
-        return recManifest;
-      });
-  }
-  return recManifestWait;
+  // UNBOUND legacy recordings are disabled: without a current bound source there is no manifest
+  // to probe, so this never fetches (the integrity suite also runs this file in a windowless VM).
+  recManifest = null;
+  return Promise.resolve(null);
 }
 
 function stopRecAudio() {
@@ -12615,35 +12593,10 @@ if (typeof window !== 'undefined') ensureRecManifest();
  * could not play, and null when it was stopped (a replay, another clip, or 止める). */
 function playRecClip(src, btn, { rate = 1, onTime = null } = {}) {
   deviceVoice.cancel();
-  return new Promise((done) => {
-    // ONE PLAYBACK OWNER (V): the sentence-listening lane plays through its own element, so a word,
-    // a read or a quote taking the room must end it too. (typeof: the voice suites run this file
-    // in slices, where that lane is not loaded.)
-    if (typeof stopSentenceListening === 'function') stopSentenceListening();
-    stopRecAudio();
-    const a = new Audio(src);
-    recAudioEl = a;
-    a.playbackRate = rate;
-    if (onTime) a.ontimeupdate = () => onTime(a.duration ? a.currentTime / a.duration : 0);
-    const off = () => {
-      if (btn) btn.classList.remove('is-speaking');
-      if (recAudioEl === a) recAudioEl = null;
-    };
-    a.onplay = () => btn && btn.classList.add('is-speaking');
-    a.onended = () => {
-      off();
-      done(true);
-    };
-    a.onpause = () => { off(); done(a.ended ? true : null); };
-    a.onerror = () => {
-      off();
-      done(false);
-    };
-    a.play().catch(() => {
-      off();
-      done(false);
-    });
-  });
+  // ONE PLAYBACK OWNER (V): stop every legacy lane before refusing, but construct no Audio.
+  if (typeof stopSentenceListening === 'function') stopSentenceListening();
+  stopRecAudio();
+  return Promise.resolve(false);
 }
 
 /** Manifest v2 only: { v:2, lock:{model}, words:{ "<surface>|<reading>": {...} } }. A v1 manifest
@@ -12720,39 +12673,8 @@ function speakCardReading(text, btn, word, { automatic = false, entrySeq = null 
       (S.view !== 'review' || !S.review?.revealed || S.review.pending || S.review.admitting || S.stack.length || S.strokes))) return;
   retireCardSpeech();
   stopReadAloud(); stopRecAudio(); stopSentenceListening();
-  // the clip belongs to the card face that asked: a grade, undo, reveal change or leave before
-  // the manifest answers retires it, and a playing clip stops when the face changes
-  const serial = cardAudioSerial, face = btn?.id === 'card-say' ? reviewVoiceFace : null;
-  const button = () => face ? document.getElementById('card-say') : btn;
-  const current = () => serial === cardAudioSerial && !document.hidden &&
-    (!face || (face === reviewVoiceFace && S.view === 'review' && S.review === face.rv &&
-      S.review?.queue?.[S.review.ix] === face.item && S.review.revealed && !S.review.pending && !S.review.admitting &&
-      !S.stack.length && !S.strokes && button()?.dataset.voiceText === text && button()?.dataset.voiceWord === word)) &&
-    (!btn || !!button()?.isConnected);
-  const say = (reason, flag) => { if (current()) cardVoiceStatus(button(), reason, flag); };
-  ensureRecManifest().then((m) => {
-    if (!current() || (automatic && wordVoice() !== 'on')) return;
-    // `text` is the reading the card is showing. It is the key, not decoration.
-    const entry = wordClipFor(m, word, text, 'word', entrySeq);
-    if (entry) {
-      say(tx(`収録音声 · ${NARRATION_VOICES[entry.voice]}`, `Recorded audio · ${NARRATION_VOICES[entry.voice]}`), null);
-      playRecClip(entry.src, button()).then((played) => {
-        if (!current() || played !== false) return;
-        say(tx('この環境では再生できませんでした', 'This recording could not play here'), 'play-failed');
-      });
-      return;
-    }
-    stopReadAloud(); stopRecAudio(); stopSentenceListening();
-    const result = deviceVoice.speak(text, {
-      onStart: () => { if (current()) button()?.classList.add('is-speaking'); },
-      onEnd: () => { if (current()) button()?.classList.remove('is-speaking'); },
-      onError: reason => {
-        if (current()) button()?.classList.remove('is-speaking');
-        say(deviceVoiceMessage({ reason }), reason);
-      },
-    });
-    say(deviceVoiceMessage(result), result.spoken ? null : result.reason);
-  });
+  // UNBOUND legacy readings are retired before any manifest, fetch, or playback can start.
+  cardVoiceStatus(btn, tx('現在の音源が必要です', 'Current audio source required'), 'current-source-required');
 }
 
 /** Use only the answer on this face; never infer one of a kanji's several readings. */
@@ -23963,14 +23885,8 @@ function currentSentenceListeningCue(context) {
   return cue;
 }
 async function verifiedSentenceAudio(cue, signal) {
-  const response = await fetch(cue.path, { signal });
-  if (!response.ok) throw new Error('listening-audio-unavailable');
-  const bytes = await response.arrayBuffer();
-  if (bytes.byteLength !== cue.bytes) throw new Error('listening-audio-changed');
-  const digest = [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))]
-    .map(byte => byte.toString(16).padStart(2, '0')).join('');
-  if (digest !== cue.sha256) throw new Error('listening-audio-changed');
-  return bytes;
+  // Unbound cached/listening recordings have no current Japanese field admission.
+  throw new Error('current-source-required');
 }
 function stopSentenceListening() {
   const owner = sentenceListeningOwner; sentenceListeningOwner = null;
