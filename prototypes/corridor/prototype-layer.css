@@ -285,10 +285,11 @@
 #bunki-prototype-root .pl-switch[aria-checked='true'] .pl-switch-dot { transform: translateX(20px); background: var(--pl-paper); }
 
 /* the cord carries the trail, so the app's breadcrumb row leaves the glass; its controls stay in the page and are the
- * ones a bead presses. In a page the row keeps its place as a box of no height, so the breath its own margin gives the
- * page's first line stays as the app has it in every state (the save drawer opens between the bar and this row). */
-:root[data-pl-ito='on'] .scale-thread:not(#sheet > .scale-thread) { display: none !important; }
-:root[data-pl-ito='on'] #sheet > .scale-thread { visibility: hidden !important; height: 0 !important; min-height: 0 !important; padding-block: 0 !important; overflow: hidden !important; box-shadow: none !important; }
+ * ones a bead presses. The row keeps its place as a box of no height and is never set to display: none here: in a page
+ * the breath its own margin gives the first line stays as the app has it in every state (the save drawer opens between
+ * the bar and this row), and display: none stays the app's own word for "no trail on this screen", which the cord
+ * follows (trailRow in prototype-layer.mjs). */
+:root[data-pl-ito='on'] .scale-thread { visibility: hidden !important; height: 0 !important; min-height: 0 !important; padding-block: 0 !important; overflow: hidden !important; border: 0 !important; box-shadow: none !important; }
 :root[data-pl-ito='on'] body:not([data-view='drift']) #app:has(> .scale-thread) > main > .room-sign { top: calc(53px + env(safe-area-inset-top, 0px)); }
 
 /* the light. One cross-fade of the whole glass for a change of look (document.startViewTransition): 450 ms, eased, the

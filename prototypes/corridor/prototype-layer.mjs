@@ -503,11 +503,15 @@ const ito = {
 };
 const still = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { return false; } };
 
-/** the app's trail row for the screen on the glass; none in a room with its own light (a world's dialog, the writing room) */
+/** The app's trail row for the screen on the glass; none in a room with its own light (a world's dialog, the writing
+ * room). The cord shows where the app would show that row and nowhere else: a row the app, or a stylesheet over it,
+ * takes off the glass (display: none) carries no cord. This trial hides the row another way (prototype-layer.css), so
+ * that test stays true while the trial is on. */
 function trailRow() {
   if (hostDialogs().length || document.querySelector('#stroke-page')) return null;
   const rows = [...document.querySelectorAll('#sheet > .scale-thread, #app > .scale-thread')].filter((row) => !row.closest('[inert]'));
-  return rows.find((row) => row.parentElement.id === 'sheet') || rows[0] || null;
+  const row = rows.find((item) => item.parentElement.id === 'sheet') || rows[0] || null;
+  return row && getComputedStyle(row).display !== 'none' ? row : null;
 }
 function readTrail(row) {
   return [...row.children].map((node, index) => {
@@ -573,7 +577,15 @@ function writeLook(look) {
  * flies it home for a third of a second, `.cut-word`) and its late lines are in; anything still moving would stand
  * double in the fade. With no such transition in the browser, or where the system asks for less motion, the look
  * changes at once, with the page. */
-function setLook(look) {
+function setLook(look, atOnce = false) {
+  if (atOnce) {
+    // a room with its own light takes its colours as it is built (the writing room reads its ink for the guide glyph):
+    // the learner's look is on the root before that, with no fade to wait for
+    ito.wanted = look;
+    ito.fade?.skipTransition();
+    writeLook(look);
+    return;
+  }
   if (look === ito.wanted) return;
   ito.wanted = look;
   if (ito.asked) return; // the fade already asked for puts the newest look on the root
@@ -798,7 +810,9 @@ function syncIto(redraw = false, records = null) {
   if (level !== ito.level) { ito.level = level; ito.held = false; }
   if (redraw || sig !== ito.sig) { ito.sig = sig; drawCord(trail); }
   placeCord(trail.length ? row : null);
-  setLook(lookFor(scale));
+  // a world's dialog or the writing room is on the glass: the learner's look, at once
+  if (!row && (hostDialogs().length || document.querySelector('#stroke-page'))) setLook(null, true);
+  else setLook(lookFor(scale));
 }
 function setIto(on) {
   const top = document.documentElement;
