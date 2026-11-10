@@ -403,7 +403,12 @@ describe('b. the unit that speaks', () => {
       h('span', { class: 'tok plain' }, '、'),
       h('span', { class: 'tok content' }, h('ruby', {}, '産業', h('rt', {}, 'さんぎょう'))),
       h('span', { class: 'tok plain' }, 'が'),
-      h('span', { class: 'tok content' }, '伸びる'),
+      // the reader's word spans are inline-flex boxes (seen in the built app): still words of one sentence
+      h(
+        'span',
+        { class: 'token-door' },
+        h('span', { class: 'tok content', role: 'presentation', display: 'inline-flex' }, '伸びる'),
+      ),
       h('span', { class: 'tok plain' }, '。'),
       h('span', { class: 'tok annotation', 'data-reader-annotation': 'true' }, '（のびる）'),
       h('span', { class: 'tok content' }, '次'),

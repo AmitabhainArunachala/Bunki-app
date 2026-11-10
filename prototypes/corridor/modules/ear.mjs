@@ -184,7 +184,8 @@ const parentOf = (node) => node?.parentNode && node.parentNode.nodeType === 1 ? 
 const inside = (outer, node) => { for (let at = node; at; at = at.parentNode) if (at === outer) return true; return false; };
 const hasJapanese = (text) => JAPANESE_LETTER.test(String(text || ''));
 const defaultDisplay = (node) => node?.style?.display || (INLINE_TAGS.has(tagOf(node)) ? 'inline' : 'block');
-const isInlineDisplay = (value) => /^(inline|contents|ruby|ruby-base|ruby-text)$/.test(String(value || ''));
+/** Inline in the flow of a line: the reader's word spans are inline-flex boxes, and still words of one sentence. */
+const isInlineDisplay = (value) => /^(inline(-block|-flex|-grid|-table)?|contents|ruby|ruby-base|ruby-text)$/.test(String(value || ''));
 const isControl = (node) => CONTROL_TAGS.has(tagOf(node)) || CONTROL_ROLES.has(String(attr(node, 'role') || '').toLowerCase());
 const isOwn = (node) => attr(node, 'data-ear-own') !== null;
 const isEditable = (node) => FIELD_TAGS.has(tagOf(node)) || ['', 'true', 'plaintext-only'].includes(attr(node, 'contenteditable') ?? 'no');
