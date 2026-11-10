@@ -225,7 +225,6 @@ body.v-depth-layered main > .eyebrow { padding-top: 0; }
 body .sheet button.pool-tag.cat-chip { min-width: 44px; min-height: 44px; }
 .level-chip { font-size: var(--type-caption); letter-spacing: 0.025em; border-radius: var(--radius-seal); padding: 4px 9px; }
 .level-note { font-size: var(--type-label); line-height: 1.6; }
-.details-toggle { font-size: var(--type-label); letter-spacing: 0.015em; }
 
 /* Room doors read as a directory. Controls keep their familiar locations. FEEL (2026-10-02): no
  * outlined boxes or cream fills — a room's groups sit in the page, its working areas in a soft
@@ -263,30 +262,12 @@ body .kdx-lens {
   display: inline-flex;
   align-items: baseline;
   gap: 5px;
-  min-height: 44px;
   margin: 0;
-  padding: 0 15px;
-  border: 0;
-  border-radius: var(--radius-control);
-  background: var(--fill);
-  box-shadow: none;
   transition: none;
 }
-body .kdx-lens:hover { background: var(--fill-strong); }
 body .kdx-lens .l-ja { display: inline; font: 600 var(--type-control)/44px var(--sans); color: var(--label); }
 body .kdx-lens .en-sub { display: inline; font: 500 var(--type-caption)/44px var(--sans); letter-spacing: 0.01em; color: var(--label-2); }
-body .kdx-lens.on { background: var(--tint); border: 0; }
 body .kdx-lens.on .l-ja, body .kdx-lens.on .en-sub { color: #fff; }
-body .skip-search-opener {
-  min-height: 44px;
-  padding: 0 16px;
-  border: 0;
-  border-radius: var(--radius-control);
-  background: var(--tint-wash);
-  color: var(--tint);
-  font: 600 var(--type-control)/1.2 var(--sans);
-}
-body .skip-search-opener[aria-expanded='true'] { background: var(--tint); color: #fff; }
 body .search-page-hint { color: var(--label-2); }
 body .search-page-results {
   margin-top: 14px;
@@ -321,15 +302,9 @@ body.v-depth-layered .study-door {
 }
 /* the dojo's choices: grey capsule tiles, the chosen one filled in the accent */
 body .focus-chip, body.v-depth-layered .focus-mode {
-  border: 0;
-  border-radius: var(--radius-control);
-  background: var(--fill);
-  box-shadow: none;
   color: var(--label);
   transition: transform 140ms var(--ease-standard);
 }
-body .focus-chip:hover, body.v-depth-layered .focus-mode:hover { background: var(--fill-strong); }
-body .focus-chip.on { background: var(--tint); box-shadow: none; color: #fff; }
 body .focus-chip.on :is(.focus-chip-n, .focus-chip-u) { color: inherit; }
 body .focus-chip-n { font-family: var(--sans); font-weight: 600; }
 body .focus-chip-u { color: inherit; opacity: 0.75; }
@@ -493,7 +468,6 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
 .reference-library { padding-top: 0; }
 .reference-navigation { gap: 4px 20px; padding-bottom: 10px; margin-bottom: 28px; border-bottom: 2px solid var(--ed-ink); }
 .reference-other-rooms { flex-wrap: wrap; gap: 4px 20px; }
-.reference-library .reference-text-button { color: var(--ai); font-size: var(--type-chrome); }
 .reference-heading { margin: 0 0 28px; }
 .reference-title { font-family: var(--display); font-weight: 800; letter-spacing: -0.02em; }
 .reference-intro { max-width: 68ch; font-size: var(--type-lead); line-height: 1.8; color: var(--ed-muted); }
@@ -752,7 +726,6 @@ html[data-register='tutor'] main button.japanese-lookup-word { border: 0; backgr
   body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main { width: 100%; margin: 0 auto 44px; padding: 24px 18px 72px; box-shadow: none; }
   main h1.view-title { font-size: var(--type-title); }
   .sheet-bar .sheet-depth { font-size: var(--type-label); }
-  .sheet-bar .sheet-back { padding-inline: 10px; }
   .sheet .headword { font-size: var(--type-hero); }
   .sheet .kv { grid-template-columns: 70px minmax(0, 1fr); gap: 8px 12px; }
   .sheet .kv dd { font-size: var(--type-lead); }
@@ -1003,21 +976,11 @@ html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srg
 .shelf-beginner-start {
   display: inline-flex;
   align-items: center;
-  min-height: 44px;
   max-width: 100%;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--tint);
-  font: 600 var(--type-control)/1.35 var(--sans);
   text-align: start;
-  text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.24em;
-  cursor: pointer;
 }
-.shelf-beginner-start:hover { color: color-mix(in srgb, var(--tint) 78%, var(--label)); }
-.shelf-beginner-start[aria-expanded='true'] { color: var(--label); }
 .shelf-beginner-guide {
   width: 100%;
   display: grid;
@@ -1210,20 +1173,9 @@ html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srg
   flex: 0 0 auto;
   align-items: center;
   gap: 7px;
-  min-height: 44px;
-  padding: 0 12px 0 13px;
-  border: 0;
-  border-radius: var(--radius-control);
-  color: var(--tint);
-  background: var(--tint-wash);
-  box-shadow: none;
-  font: 600 var(--type-control)/1 var(--sans);
   white-space: nowrap;
-  cursor: pointer;
   transition: none;
 }
-.shelf-tools-toggle:hover { background: color-mix(in srgb, var(--tint) 18%, transparent); }
-.shelf-tools-toggle[aria-expanded='true'] { color: #fff; background: var(--tint); }
 .shelf-tools-toggle .ui-icon { width: 18px; height: 18px; }
 .shelf-tools-toggle-label { display: inline-flex; align-items: baseline; gap: 5px; color: inherit; }
 .shelf-tools-toggle-label .en-sub { font: 500 var(--type-caption)/1 var(--sans); letter-spacing: 0.01em; text-transform: none; color: inherit; opacity: 0.8; }
@@ -1672,7 +1624,6 @@ body.v-depth-layered .dials { margin: 0 0 var(--s3); border: 0; border-radius: v
 /* every segmented choice is an iOS segmented control: a grey track, the chosen segment a white knob
    inset 2px inside its own 44px door (the track adds no height to the row) */
 body .seg { gap: 0; padding: 0; overflow: visible; }
-body .seg button { padding: 0 4px; }
 body .seg button :is(.l-ja, .en-sub) { color: inherit; }
 body .seg button .en-sub { font: 500 var(--type-caption)/1.2 var(--sans); letter-spacing: 0.01em; text-transform: none; color: var(--label-2); }
 body .dial-label { font-family: var(--sans); color: var(--label-2); letter-spacing: 0; }
@@ -1894,17 +1845,8 @@ body[data-view='reader'] main > blockquote {
 .article-footer .read-fin.chip {
   flex-direction: row;
   gap: var(--s1);
-  min-height: 44px;
-  padding: 0 var(--s3);
-  border: 0;
-  border-radius: var(--radius-control);
-  color: var(--tint);
-  background: var(--tint-wash);
-  box-shadow: none;
-  font: 600 var(--type-control)/1.2 var(--sans);
 }
 .article-footer .read-fin .en-sub { display: inline; font-size: var(--type-caption); text-transform: none; letter-spacing: 0.01em; }
-.article-footer .read-fin.finished { color: var(--raised); background: var(--ai); border-color: var(--ai); }
 .article-about {
   padding: var(--s3);
   border: 1px solid var(--hairline);
@@ -1928,7 +1870,7 @@ body .article-about .note { margin: var(--s1) 0 0; padding: 0; border: 0; border
 .article-about .inline-link { display: inline; min-width: 0; min-height: 0; padding: 0; line-height: inherit; text-align: start; color: var(--ai); }
 body .article-about .note .inline-link { color: var(--text-2); text-decoration-color: var(--hairline); overflow-wrap: anywhere; }
 body .article-about .note .inline-link:hover { color: var(--ai); text-decoration-color: currentColor; }
-.article-about .details-toggle { min-height: 44px; margin: var(--s1) 0 0; padding: 0; font: 600 var(--type-label)/1.4 var(--sans); letter-spacing: 0.02em; color: var(--ai); }
+.article-about .details-toggle { margin: var(--s1) 0 0; }
 
 /* a fixed bar never hides the page's last lines */
 /* the room the sentence bar needs at the page's foot is reserved from the first visit's tip on, so
@@ -2004,7 +1946,7 @@ body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip) #app { 
   .shelf-filter-help[open] > p { position: fixed; top: auto; bottom: var(--s2); left: var(--s2); right: var(--s2); width: auto; transform: none; }
   /* the tools button keeps its words and drops its icon on the narrowest phones */
   .shelf-mast-name { gap: 10px; }
-  .shelf-tools-toggle { gap: 6px; padding: 0 8px 0 10px; }
+  .shelf-tools-toggle { gap: 6px; }
   /* the tools panel on a phone: the groups stack, two tiles to a row */
   #shelf-body .shelf-study-tools { grid-template-columns: minmax(0, 1fr); gap: var(--s2); margin-bottom: var(--s2); padding: var(--s2); }
   #shelf-body .shelf-study-tools .shelf-tools-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -2283,8 +2225,7 @@ body .sheet .hero #kanji-shape-lookup, body .sheet .teacher-door .chip {
 body .sheet .teacher-door .chip { flex-direction: column; }
 body .sheet .teacher-door .chip .en-sub { font-size: var(--type-caption); letter-spacing: 0.01em; text-transform: none; color: inherit; opacity: 0.9; }
 /* S · beside the sentence's one Save, asking the tutor and practising are quiet words in the accent, no box (the C family) */
-body .sheet .teacher-door .chip.btn-tertiary { flex-direction: row; padding: 0 10px; border: 0; background: transparent; color: var(--color-accent-label, var(--color-accent, var(--ai))); font: 600 var(--type-control)/1.3 var(--font-ui, var(--sans)); }
-body .sheet .teacher-door .chip.btn-tertiary:hover:where(:not(:disabled)) { background: var(--color-fill, var(--ai-wash)); }
+body .sheet .teacher-door .chip.btn-tertiary { flex-direction: row; }
 body .sheet .kv { margin: var(--s2) 0; padding: var(--s2) 0; border-block: 1px solid var(--hairline); }
 body .sheet .kv dt { font: 700 var(--type-chrome)/1.8 var(--sans); color: var(--text); }
 body .sheet .kv dd { font: var(--type-reading)/1.7 var(--serif); letter-spacing: 0.04em; color: var(--accent); }
@@ -2293,23 +2234,15 @@ body .sheet .rad-door {
   min-height: 72px;
   margin: 0 0 var(--s2);
   padding: 12px var(--s2);
-  border: 1px solid var(--raised-edge);
-  border-radius: var(--radius-card);
-  background: var(--raised);
-  box-shadow: var(--raised-shadow);
 }
-@media (hover: hover) { body .sheet .rad-door:hover { box-shadow: var(--raised-shadow-hover); } }
+@media (hover: hover) { }
 body .sheet .rad-glyph { font-size: var(--type-hero); color: var(--text); }
 body .sheet .rad-name { font: 600 var(--type-lead)/1.4 var(--sans); color: var(--text); }
 body .sheet .rad-sub { font: var(--type-label)/1.5 var(--sans); color: var(--text-2); }
 body .sheet .stroke-door {
   padding: 10px;
-  border: 1px solid var(--raised-edge);
-  border-radius: var(--radius-card);
-  background: var(--washi) 0 0 / 300px 300px, color-mix(in srgb, var(--ink) 3%, var(--raised));
-  box-shadow: var(--raised-shadow);
 }
-@media (hover: hover) { body .sheet .stroke-door:hover { box-shadow: var(--raised-shadow-hover); } }
+@media (hover: hover) { }
 
 /* the writing room */
 #stroke-page .ink-sheet {
@@ -2632,17 +2565,8 @@ html[data-register='jlpt'] .exam-form-meta { margin: 0; font: 600 var(--type-con
 html[data-register='jlpt'] .exam-form .exam-skills, html[data-register='jlpt'] .exam-form .exam-status { margin: 0; font: var(--type-chrome)/1.6 var(--sans); color: var(--text-2); }
 html[data-register='jlpt'] .exam-form button.take {
   justify-self: start;
-  min-height: 44px;
   margin-top: var(--s1);
-  padding: 0 var(--s3);
-  border: 1px solid var(--ai);
-  border-radius: var(--radius-control);
-  background: var(--ai);
-  color: var(--raised);
-  box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 30%, transparent), inset 0 1px 0 rgb(255 255 255 / 14%);
-  font: 700 var(--type-control)/1 var(--sans);
 }
-html[data-register='jlpt'] .exam-written .exam-form:not(:first-of-type) button.take { background: transparent; color: var(--ai); box-shadow: none; }
 html[data-register='jlpt'] .exam-form .exam-sources { margin: var(--s1) 0 0; border: 0; }
 html[data-register='jlpt'] .exam-form .exam-sources > summary { min-height: 44px; padding: 6px 0; font: 600 var(--type-label)/1.4 var(--sans); color: var(--ai); cursor: pointer; }
 html[data-register='jlpt'] .exam-form .exam-sources p { font: var(--type-chrome)/1.7 var(--sans); color: var(--text-2); }
@@ -2690,7 +2614,6 @@ html[data-register='jlpt'] .exam-official .exam-official-import,
   html[data-register='jlpt'] .exam-official .exam-official-import:hover,
   .assessment-room .exam-confirm > button:not(.take):hover { background: color-mix(in srgb, var(--tint) 18%, transparent); }
 }
-.assessment-room .exam-confirm > button.take { min-height: 48px; }
 /* the real-paper section is ruled by its heading like every other section, not boxed in hairlines too */
 html[data-register='jlpt'] .assessment-room .exam-official { border: 0; padding: 0; }
 html[data-register='jlpt'] .assessment-room .exam-official > h2.exam-section-heading { margin-top: var(--s3); }
@@ -3206,7 +3129,6 @@ body .token-actions button:hover { background: var(--ai-wash); }
   font: var(--type-control)/1.2 var(--sans);
 }
 .vocabulary-list-field:focus-visible { outline: 2px solid var(--ai); outline-offset: 1px; }
-.vocabulary-list-popover .vocabulary-list-create { min-height: 44px; padding: 0 14px; border-radius: var(--radius-control); font: 600 var(--type-control)/1 var(--sans); }
 .vocabulary-list-popover .vocabulary-list-status { min-height: 0; margin: 6px 0 0; font: var(--type-label)/1.5 var(--sans); color: var(--ai); }
 .vocabulary-list-popover .vocabulary-list-status:empty { display: none; }
 .vocabulary-list-popover :is(.vocabulary-list-form, .vocabulary-list-new)[hidden] { display: none; }
@@ -3692,10 +3614,8 @@ body:has(#app .kp-study > .kp-reveal) #app { padding-bottom: 0; }
 .foundation-doors { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: var(--space-3); }
 .foundation-doors .foundation-door { min-height: var(--hit); margin: 0; }
 .settings-language { display: inline-flex; min-height: var(--hit); }
-.settings-language button { min-height: var(--hit); padding-inline: var(--space-4); }
 /* Settings → Layout (1.2.0): the same segmented pair as the language, and one plain line under it */
 .settings-layout-choice { display: inline-flex; min-height: var(--hit); }
-.settings-layout-choice button { min-height: var(--hit); padding-inline: var(--space-4); }
 .settings-layout-note { max-width: 34em; margin: var(--space-3) 0 0; font: 400 var(--type-label)/1.55 var(--font-ui); letter-spacing: 0; color: var(--color-muted); }
 @media (max-width: 520px) {
   body.has-primary-tabs[data-view='reader']:not(.zen) #app::after {
@@ -4122,8 +4042,8 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
 
 /* ==========================================================================
    BEGIN BUNKI BUTTON FAMILIES · written once (one hand, slice D, 2026-10-15)
-   Eight families serve the whole house. Every legacy class is mapped to its family in the :is()
-   lists below, and the faces it used to wear per module (corridor.css, register.css,
+   Eight families serve the whole house; A, B, C and F now live in tighten.css (2026-11-10) and their lists here keep
+   only what it does not cover. The faces a class used to wear per module (corridor.css, register.css,
    guided-session.css, player.css, context-deck.css, personal.css, report-client.css, skip-ui.css,
    reference-ui.css) are deleted; those files keep only a control's place and measure. The contract:
    radius control 6 · card 4 · overlay 18 · seal 3 (the four tokens, on :root); 48 tall for the
@@ -4152,10 +4072,7 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
 
 /* ---- A · Primary ---- */
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
-  .take:where(:not(.taken, .quiet)), .btn-primary, .chip:where(.btn-primary), .sheet-take:where(:not([aria-pressed='true'])),
-  .kp-start, .kp-reveal, .kp-next, .kp-take,
-  .gs-button:where(.primary), .cd-btn:where(.cd-primary), .cd-choice:where(.cd-primary), :where(.pc) .pc-primary, :where(#bunki-reports-root) .br-primary,
-  .chat-send, :where(.exam-confirm) > .take
+  .kp-start, .kp-reveal, .kp-next, .kp-take, .btn-primary:where(.save-one), .sheet-take:where(:not([aria-pressed='true']))
 ) {
   min-height: 48px;
   padding: 0 20px;
@@ -4169,46 +4086,28 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   cursor: pointer;
 }
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
-  .take:where(:not(.taken, .quiet)), .btn-primary, .chip:where(.btn-primary), .sheet-take:where(:not([aria-pressed='true'])),
-  .kp-start, .kp-reveal, .kp-next, .kp-take,
-  .gs-button:where(.primary), .cd-btn:where(.cd-primary), .cd-choice:where(.cd-primary), :where(.pc) .pc-primary, :where(#bunki-reports-root) .br-primary,
-  .chat-send, :where(.exam-confirm) > .take
+  .kp-start, .kp-reveal, .kp-next, .kp-take, .btn-primary:where(.save-one), .sheet-take:where(:not([aria-pressed='true']))
 ):hover:where(:not(:disabled)) { background: color-mix(in srgb, var(--color-accent) 88%, #000); }
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
-  .take:where(:not(.taken, .quiet)), .btn-primary, .chip:where(.btn-primary), .sheet-take:where(:not([aria-pressed='true'])),
-  .kp-start, .kp-reveal, .kp-next, .kp-take,
-  .gs-button:where(.primary), .cd-btn:where(.cd-primary), .cd-choice:where(.cd-primary), :where(.pc) .pc-primary, :where(#bunki-reports-root) .br-primary,
-  .chat-send, :where(.exam-confirm) > .take
+  .kp-start, .kp-reveal, .kp-next, .kp-take, .btn-primary:where(.save-one), .sheet-take:where(:not([aria-pressed='true']))
 ):where(:disabled) { background: var(--color-fill-strong); color: var(--color-muted); box-shadow: none; cursor: default; }
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.take, .btn-primary, .chip:where(.btn-primary)) :where(.en-sub) { color: inherit; opacity: 0.82; }
 /* at night the key is lit, never a solid fill: the accent as an emitted edge and a glow */
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
-  .take:where(:not(.taken, .quiet)), .btn-primary, .chip:where(.btn-primary), .sheet-take:where(:not([aria-pressed='true'])),
-  .kp-start, .kp-reveal, .kp-next, .kp-take,
-  .gs-button:where(.primary), .cd-btn:where(.cd-primary), .cd-choice:where(.cd-primary), :where(.pc) .pc-primary, :where(#bunki-reports-root) .br-primary,
-  .chat-send, :where(.exam-confirm) > .take
+  .kp-start, .kp-reveal, .kp-next, .kp-take, .btn-primary:where(.save-one), .sheet-take:where(:not([aria-pressed='true']))
 ):where(:not(:disabled)) {
   background: color-mix(in srgb, var(--color-accent) 9%, var(--color-ground));
   color: var(--color-accent);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 72%, transparent), 0 0 0 0.5px var(--color-glow), 0 0 18px -2px var(--color-glow), 0 10px 24px -10px rgb(0 0 0 / 70%);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
-  .take:where(:not(.taken, .quiet)), .btn-primary, .chip:where(.btn-primary), .sheet-take:where(:not([aria-pressed='true'])),
-  .kp-start, .kp-reveal, .kp-next, .kp-take,
-  .gs-button:where(.primary), .cd-btn:where(.cd-primary), .cd-choice:where(.cd-primary), :where(.pc) .pc-primary, :where(#bunki-reports-root) .br-primary,
-  .chat-send, :where(.exam-confirm) > .take
+  .kp-start, .kp-reveal, .kp-next, .kp-take, .btn-primary:where(.save-one), .sheet-take:where(:not([aria-pressed='true']))
 ):hover:where(:not(:disabled)) { background: color-mix(in srgb, var(--color-accent) 15%, var(--color-ground)); }
 
 /* ---- B · Secondary: a hairline slip ---- */
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
-  .chip:where(:not(.btn-primary, .btn-tertiary, .t-kanji, .t-word, .t-radical, .t-idiom)), .btn-secondary, .chip:where(.btn-secondary),
-  .take:where(.taken), .take:where(.quiet), .sheet-take:where([aria-pressed='true']),
-  .gs-button:where(:not(.primary)), .cd-btn:where(:not(.cd-primary)), .stroke-btn, :where(.stroke-controls) button,
-  :where(#bunki-reports-root .br-actions) button, :where(#bunki-reports-root .br-context-summary) button,
-  .skip-more, .skip-retry, .skip-search-opener, .skip-code-door, .reference-button,
-  :where(.pc) button:where(:not(.pc nav *, .pc-top *, .pc-card-foot *, .pc-grades *, .pc-token)),
-  .vocabulary-list-create, :where(.vocabulary-list-form) .chip, :where(.vocabulary-list-dialog) > .chip,
-  .kdx-lens, .focus-chip
+  .chip:where(.pool-tag, .cat-chip, .exam-level-card):where(:not(.btn-primary, .btn-tertiary, .t-kanji, .t-word, .t-radical, .t-idiom)),
+  :where(.pc) button:where(:not(.pc nav *, .pc-top *, .pc-card-foot *, .pc-grades *, .pc-token)), .sheet-take:where([aria-pressed='true'])
 ) {
   min-height: 44px;
   padding: 0 14px;
@@ -4222,31 +4121,14 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   cursor: pointer;
 }
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
-  .chip:where(:not(.btn-primary, .btn-tertiary, .t-kanji, .t-word, .t-radical, .t-idiom)), .btn-secondary,
-  .take:where(.taken), .take:where(.quiet), .sheet-take:where([aria-pressed='true']),
-  .gs-button:where(:not(.primary)), .cd-btn:where(:not(.cd-primary)), .stroke-btn, :where(.stroke-controls) button,
-  :where(#bunki-reports-root .br-actions) button, :where(#bunki-reports-root .br-context-summary) button,
-  .skip-more, .skip-retry, .skip-search-opener, .skip-code-door, .reference-button,
-  :where(.pc) button:where(:not(.pc nav *, .pc-top *, .pc-card-foot *, .pc-grades *, .pc-token)),
-  .vocabulary-list-create, :where(.vocabulary-list-form) .chip, :where(.vocabulary-list-dialog) > .chip,
-  .kdx-lens, .focus-chip
+  .chip:where(.pool-tag, .cat-chip, .exam-level-card):where(:not(.btn-primary, .btn-tertiary, .t-kanji, .t-word, .t-radical, .t-idiom)),
+  :where(.pc) button:where(:not(.pc nav *, .pc-top *, .pc-card-foot *, .pc-grades *, .pc-token)), .sheet-take:where([aria-pressed='true'])
 ):hover:where(:not(:disabled, [aria-disabled='true'])) { background: var(--color-fill); }
-:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.chip, .gs-button, .cd-btn, .stroke-btn, .skip-more, .skip-retry, .reference-button):where(:disabled, [aria-disabled='true']) {
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) .chip:where(:disabled, [aria-disabled='true']) {
   background: transparent;
   color: color-mix(in srgb, var(--color-ink) 42%, transparent);
   border-color: var(--color-line);
   cursor: default;
-}
-/* one A per screen: the sheet bar's Save is the A; the sheet's bottom Save is a slip */
-:is(body:not([data-view='drift']), body[data-view='drift']) #sheet > button.take {
-  min-height: 48px;
-  padding: 0 20px;
-  border: var(--stroke-hairline) solid var(--color-edge-strong);
-  border-radius: var(--radius-control);
-  background: transparent;
-  color: var(--color-ink);
-  box-shadow: none;
-  font: 500 var(--type-body)/1.25 var(--font-ui);
 }
 /* the list variant: an option in a list of options, read in the reading face; the attempt
    register keeps its own ruled paper for options (register.css) */
@@ -4263,7 +4145,7 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
 }
 html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.lesson-option, .mock-opt, .gs-choice, .cd-choice:where(:not(.cd-primary))):hover:where(:not(:disabled)) { background: var(--color-fill); }
 /* a toggle keeps its slip and takes the chosen mark (F's underline) when on */
-:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.chip:where(.on), .kdx-lens:where(.on), .focus-chip:where(.on), .stroke-btn:where([aria-pressed='true']), :where(.stroke-controls) button:where([aria-pressed='true']), .chip:where([aria-pressed='true']):where(:not(.btn-primary))) {
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) .chip:where(.pool-tag, .cat-chip, .exam-level-card, .t-kanji, .t-word, .t-radical, .t-idiom):where(.on, [aria-pressed='true']):where(:not(.btn-primary)) {
   color: var(--color-ink);
   background: transparent;
   border-color: var(--color-ink);
@@ -4278,8 +4160,7 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
 
 /* ---- C · Quiet: a word, no box ---- */
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
-  .btn-tertiary, .chip:where(.btn-tertiary), .kp-link, .kp-delete, .gs-text, .nav-arrow, .sheet-back,
-  :where(#bunki-reports-root) .br-close, .reference-text-button
+  .kp-link, .kp-delete, .nav-arrow
 ) {
   min-height: 44px;
   padding: 0 8px;
@@ -4294,10 +4175,9 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
   cursor: pointer;
 }
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
-  .btn-tertiary, .chip:where(.btn-tertiary), .kp-link, .kp-delete, .gs-text, .nav-arrow, .sheet-back,
-  :where(#bunki-reports-root) .br-close, .reference-text-button
+  .kp-link, .kp-delete, .nav-arrow
 ):hover:where(:not(:disabled)) { background: var(--color-fill); }
-:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.btn-tertiary, .gs-text, .kp-link):where(:disabled) { color: var(--color-muted); cursor: default; }
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) .kp-link:where(:disabled) { color: var(--color-muted); cursor: default; }
 
 /* ---- D · Glyph: a 44 square, no box ---- */
 /* (the rule's × and the standalone popover's × are drawn at 32px and own a 44px reach of their own in
@@ -4348,9 +4228,7 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
 
 /* ---- F · Segment / tab: words in a row, the chosen one inked and underlined ---- */
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
-  :where(.seg) button, :where(.lang-seg) button, :where(.kp-seg) button, .gs-nav, :where(#bunki-reports-root .br-nav) button, :where(.pc nav) button,
-  :where(.settings-language) button, :where(.settings-layout-choice) button, :where(.version-toggle) .version-choice, :where(.me-seg) button,
-  :where(#variants .vseg) button
+  :where(.lang-seg) button, :where(.kp-seg) button, .gs-nav
 ) {
   min-height: 44px;
   padding: 0 10px;
@@ -4364,9 +4242,7 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
   cursor: pointer;
 }
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
-  :where(.seg) button, :where(.lang-seg) button, :where(.kp-seg) button, .gs-nav, :where(#bunki-reports-root .br-nav) button, :where(.pc nav) button,
-  :where(.settings-language) button, :where(.settings-layout-choice) button, :where(.version-toggle) .version-choice, :where(.me-seg) button,
-  :where(#variants .vseg) button
+  :where(.lang-seg) button, :where(.kp-seg) button, .gs-nav
 ):where([aria-pressed='true'], [aria-current='page'], [aria-checked='true'], .is-on, .on) {
   color: var(--color-ink);
   font-weight: 700;
@@ -4401,11 +4277,6 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
   box-shadow: inset 0 calc(0px - var(--stroke-hairline)) 0 var(--color-reading);
   text-decoration: none;
 }
-/* ---- on the guided session's lacquer sheet (.gs-lacquer, the understanding) a quiet word and a slip take
-   the sheet's own ink and line, so they read on lacquer (axe: colour contrast); the sheet's gold primary is
-   its own (guided-session.css) ---- */
-:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) .gs-lacquer :is(.gs-text, .gs-button:where(:not(.primary))) { color: var(--color-sheet-ink); border-color: var(--color-sheet-line); }
-:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) .gs-lacquer :is(.gs-text, .gs-button:where(:not(.primary))):hover:where(:not(:disabled)) { background: var(--color-sheet-accent-wash); }
 /* END BUNKI BUTTON FAMILIES ================================================= */
 
 /* ==========================================================================
@@ -5320,8 +5191,7 @@ body:not(.zen) #app > .chrome {
   [data-bar='guided'] { justify-content: flex-end; }
 }
 [data-bar='guided'] .gs-bar-doors { flex: 0 0 auto; display: flex; flex-wrap: nowrap; gap: 0; }
-[data-bar='guided'] .gs-nav { min-height: 44px; padding: 0 10px; border: 0; background: transparent; color: var(--color-bar-quiet); font: 500 var(--type-chrome)/44px var(--font-ui); letter-spacing: 0; white-space: nowrap; }
-[data-bar='guided'] .gs-nav[aria-current='page'] { color: var(--color-bar-ink); font-weight: 700; }
+[data-bar='guided'] .gs-nav { white-space: nowrap; }
 /* the sheet's bar bleeds to the sheet's edges (its own .sheet-bar margins), its doors on the content's gutter */
 [data-bar='sheet'] { gap: 4px; padding-inline: 12px; }
 /* the deck's and the guided room's bars run to their host's edges as the sheet's does (E's leftover, F), its doors
@@ -5673,7 +5543,6 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture.is-kanji {
 /* the picture slot's backing (seen only while a picture loads) is the world's sunk paper, not a topic's ink */
 .story-picture { background-color: var(--tone-sunk); }
 /* the shelf's Tools door: a 藍 wash dimmed up into the raised paper (it sat 13 % under the page: muddy) */
-.shelf-tools-toggle { background: color-mix(in srgb, var(--tint) 6%, var(--tone-raised)); }
 /* the search field: the ramp's sunk paper (its fill sat 10 % under the page) */
 body .search-page .nav-search-input { background: var(--tone-sunk); }
 /* END BUNKI MATERIAL II ==================================================== */

@@ -1151,16 +1151,6 @@ body[data-view='drift'] #mini .mini-take:not(.taken):not(.reader-capture-held) {
   font: 400 var(--type-body)/1.2 var(--font-ui);
 }
 :is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-field::placeholder { color: var(--color-muted); }
-:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-create {
-  min-height: 44px;
-  padding: 0 16px;
-  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
-  border-radius: var(--radius-control);
-  background: none;
-  color: var(--color-accent);
-  font: 650 var(--type-control)/1 var(--font-ui);
-  box-shadow: none;
-}
 :is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-status { margin: 6px 8px 0; font: 400 var(--type-label)/1.4 var(--font-ui); color: var(--color-accent); }
 :is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-more { margin: 8px 0 0; padding-top: 4px; border-top: 1px solid var(--mini-rule, var(--color-rule)); }
 :is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-action {
@@ -1245,15 +1235,7 @@ body:not(.ui-bi) #mini .mini-band-label { letter-spacing: 0.08em; }
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  min-height: 44px;
   margin-right: -6px;
-  padding: 0 6px;
-  border: 0;
-  border-radius: var(--radius-control);
-  background: transparent;
-  color: var(--color-accent);
-  font: 600 var(--type-control)/1.2 var(--font-ui);
-  cursor: pointer;
 }
 #mini .mini-web-open .mini-entry-chevron { font-weight: 700; }
 

@@ -308,7 +308,7 @@ html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-fam.ww-cho
     mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent);
   }
   html[data-room='search'] .search-page .kdx-lenses.search-lenses::-webkit-scrollbar { display: none; }
-  html[data-room='search'] .search-page .kdx-lenses.search-lenses > .kdx-lens { flex: none; padding-inline: 13px; }
+  html[data-room='search'] .search-page .kdx-lenses.search-lenses > .kdx-lens { flex: none; }
   html[data-room='search'] .search-page .search-page-hint { margin: 4px 0 8px; font-size: var(--type-label); line-height: 1.45; }
 }
 
@@ -382,7 +382,7 @@ html:is([data-room='search'], [data-room='word-web']) :is(.ww-c-r, .ww-c-m) { po
     -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 64px), rgb(0 0 0 / 0.06) calc(100% - 6px), transparent);
     mask-image: linear-gradient(90deg, #000 calc(100% - 64px), rgb(0 0 0 / 0.06) calc(100% - 6px), transparent);
   }
-  html[data-room='search'] .search-page .kdx-lenses.search-lenses > .kdx-lens { scroll-snap-align: start; padding-inline: 12px; }
+  html[data-room='search'] .search-page .kdx-lenses.search-lenses > .kdx-lens { scroll-snap-align: start; }
   html[data-room='search'] .search-page .kdx-lenses.search-lenses > .kdx-lens:last-child { margin-right: 52px; }
   /* Q · a lens is whole or it is not shown (corridor.js wireLensStrip): the fade that left "radica" cut at the strip's
      edge gives way to lenses that fade out whole, and a quiet ‹ · › where more wait */
@@ -404,21 +404,10 @@ html[data-room='search'] body .search-page .skip-search-opener:not([aria-expande
   display: flex;
   align-items: center;
   width: auto;
-  min-height: 44px;
   margin: 0 0 -6px auto;
-  padding: 0 2px;
-  border: 0;
-  border-radius: 0;
-  background: none;
-  box-shadow: none;
-  color: var(--color-accent);
-  font: 500 var(--type-label)/1.3 var(--font-ui);
-  letter-spacing: 0.01em;
-  text-decoration: underline;
   text-decoration-thickness: 0.5px;
   text-underline-offset: 4px;
 }
-html[data-room='search'] body .search-page .skip-search-opener:not([aria-expanded='true']):hover { color: var(--color-ink); }
 /* on a phone the link rides the search eyebrow's line, so the field and its strip are the card */
 @media (min-width: 360px) and (max-width: 520px) {
   html[data-room='search'] body #app > main > .search-page { position: relative; }
@@ -450,10 +439,6 @@ html:is([data-room='search'], [data-room='word-web']) .ww-legend .ww-lg-key { ga
   background: transparent; box-shadow: inset 0 0 0 1px var(--color-live);
 }
 /* Search mode is an ink label. The shared part carries the web's one live light. */
-html[data-room='search'] body .search-page .kdx-lens.on {
-  background: var(--color-surface);
-  box-shadow: inset 0 -2px 0 var(--color-ink);
-}
 html[data-room='search'] body .search-page .kdx-lens.on :is(.l-ja, .en-sub) { color: var(--color-ink); }
 html[data-room='search'] .words-index > summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; }
 /* The shape-code lens above is the one door to this wheel. */
