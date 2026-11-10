@@ -3,6 +3,8 @@ import { join } from 'node:path';
 
 export const CORRIDOR_REQUIRED_ROOTS = [
   'index.html',
+  // everything-on prototype (integrate/everything-on-20261110): the doors page, plain HTML beside index.html
+  'prototype.html',
   'apple-touch-icon.png',
   'manifest.webmanifest',
   'sw.js',

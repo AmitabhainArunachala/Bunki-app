@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#f1e9d3" />
+    <title>Prototype doors · 回廊 KAIRO</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%231c2f42'/%3E%3Ctext x='8' y='12' font-size='11' text-anchor='middle' fill='%23f1e9d3'%3E%E6%89%89%3C/text%3E%3C/svg%3E"
+    />
+    <!-- EVERYTHING-ON PROTOTYPE (integrate/everything-on-20261110). A plain page: the site's own bundled fonts and the
+         default world's colours, no script, nothing imported from the app. Every link is relative, so the page works at
+         whatever address serves the build. One row per hidden feature; scripts/corridor-assets.mjs ships it. -->
+    <link rel="stylesheet" href="fonts.css" />
+    <style>
+      :root {
+        --ground: #f1e9d3;
+        --ground-2: #e9dfc2;
+        --card: #fcfbf8;
+        --ink: #1c2f42;
+        --ink-2: #4a5d70;
+        --red: #b03a2e;
+        --red-wash: rgba(176, 58, 46, 0.08);
+        --line: rgba(28, 47, 66, 0.16);
+        --line-soft: rgba(28, 47, 66, 0.08);
+        --display: 'Shippori Mincho B1', 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+        --serif: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif CJK JP', serif;
+        --sans: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif;
+        --mono: 'Roboto Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+        --tap: 44px;
+      }
+      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        margin: 0;
+        background: var(--ground);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 16px;
+        line-height: 1.6;
+      }
+      main {
+        max-width: 46rem;
+        margin: 0 auto;
+        padding: max(28px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) 72px
+          max(18px, env(safe-area-inset-left));
+      }
+      a { color: var(--ink); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+      a:hover { color: var(--red); }
+      a:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; border-radius: 2px; }
+
+      .masthead { display: flex; align-items: center; gap: 14px; margin: 0 0 6px; }
+      .seal {
+        flex: none;
+        width: 46px;
+        height: 46px;
+        display: grid;
+        place-items: center;
+        background: var(--ink);
+        color: var(--ground);
+        border-radius: 5px;
+        box-shadow: inset 0 0 0 2px var(--ink), inset 0 0 0 3px rgba(241, 233, 211, 0.55);
+        font-family: var(--display);
+        font-weight: 800;
+        font-size: 26px;
+        line-height: 1;
+      }
+      h1 { margin: 0; font-family: var(--display); font-weight: 800; font-size: 34px; line-height: 1.15; letter-spacing: 0.01em; }
+      .dateline { margin: 2px 0 20px; font-family: var(--mono); font-size: 13px; letter-spacing: 0.04em; color: var(--ink-2); }
+      .lede { margin: 0 0 10px; font-family: var(--serif); font-size: 18px; line-height: 1.7; }
+      .home { margin: 0 0 8px; font-size: 15px; }
+
+      h2.section {
+        margin: 44px 0 4px;
+        padding-top: 14px;
+        border-top: 1px solid var(--line);
+        font-family: var(--mono);
+        font-weight: 400;
+        font-size: 13px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--ink-2);
+      }
+      .section-note { margin: 0 0 16px; font-size: 14px; color: var(--ink-2); }
+
+      .door {
+        margin: 14px 0 0;
+        padding: 18px 18px 16px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 3px;
+      }
+      .door-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; margin: 0 0 6px; }
+      .door h3 { margin: 0; font-family: var(--display); font-weight: 800; font-size: 23px; line-height: 1.3; }
+      .tag {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        padding: 1px 7px 2px;
+        border: 1px solid var(--red);
+        border-radius: 2px;
+        color: var(--red);
+        white-space: nowrap;
+      }
+      .tag.quiet { border-color: var(--line); color: var(--ink-2); }
+      .what { margin: 0 0 10px; }
+      .go { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 10px; padding: 0; list-style: none; }
+      .go a {
+        display: inline-flex;
+        align-items: center;
+        min-height: var(--tap);
+        padding: 6px 14px;
+        border: 1px solid var(--ink);
+        border-radius: 2px;
+        background: var(--ground);
+        font-size: 15px;
+        line-height: 1.3;
+        text-decoration: none;
+      }
+      .go a::after { content: '›'; margin-left: 8px; font-family: var(--serif); }
+      .go a:hover { background: var(--ink); color: var(--ground); }
+      .go a.plain { border-color: var(--line); background: transparent; color: var(--ink-2); }
+      .go a.plain:hover { background: var(--ground-2); color: var(--ink); }
+      .then { margin: 0 0 10px; padding-left: 12px; border-left: 2px solid var(--line); font-size: 15px; }
+      .then b, .rough b { font-weight: 700; }
+      .rough { margin: 0; padding: 9px 12px; background: var(--red-wash); border-radius: 2px; font-size: 14px; color: var(--ink); }
+      .rough::before { content: '■'; margin-right: 7px; color: var(--red); font-size: 10px; vertical-align: 2px; }
+      .fine { margin: 8px 0 0; font-size: 14px; color: var(--ink-2); }
+      [lang='ja'] { font-family: var(--serif); }
+
+      .ledger { margin: 0; padding: 0; list-style: none; }
+      .ledger li { padding: 13px 2px 14px; border-top: 1px solid var(--line-soft); }
+      .ledger li:first-child { border-top: 0; }
+      .ledger b { display: block; font-family: var(--serif); font-weight: 700; font-size: 17px; }
+      .ledger span { display: block; font-size: 15px; color: var(--ink-2); }
+      .ledger .state { margin-top: 3px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; color: var(--red); }
+
+      footer { margin: 48px 0 0; padding-top: 14px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-2); }
+      footer code { font-family: var(--mono); font-size: 12px; }
+
+      @media (max-width: 480px) {
+        h1 { font-size: 29px; }
+        .door { padding: 16px 14px 14px; }
+        .door h3 { font-size: 21px; }
+        .go a { flex: 1 1 100%; justify-content: space-between; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="masthead">
+        <span class="seal" lang="ja" aria-hidden="true">扉</span>
+        <h1>Prototype doors</h1>
+      </div>
+      <p class="dateline">everything-on prototype · 2026-11-10 · not the stable preview</p>
+      <p class="lede">
+        Everything on this page is switched off or tucked away in the stable preview. Here each one has a door. Where a
+        door is rough, the note under it says how.
+      </p>
+      <p class="home"><a href="./" data-door="app">Open the app as it starts</a></p>
+
+      <h2 class="section" id="doors">Doors</h2>
+      <p class="section-note">Each link opens the app in this same build with the feature showing.</p>
+
+      <article class="door" id="door-quests">
+        <div class="door-head">
+          <h3>Quests</h3>
+          <span class="tag">preview</span>
+          <span class="tag quiet">on in this build only</span>
+        </div>
+        <p class="what">
+          From the word <span lang="ja">職業</span> in something you are reading, make a quest: answer the readings of
+          <span lang="ja">職業</span>, <span lang="ja">知識</span> and <span lang="ja">組織</span>, check each one, and
+          say whether you knew it. A quest in progress shows in Lessons. You can hold up to 8.
+        </p>
+        <ul class="go">
+          <li><a href="./?entry=shelf" data-door="quests">Open the bookshelf · preview</a></li>
+        </ul>
+        <p class="then">
+          <b>Then:</b> open <span lang="ja">都市の匿名性と言語</span> (Urban Anonymity and Language, N1 Literature, near
+          the end of the shelf). Tap <span lang="ja">職業</span> in the first paragraph until its box opens, tap the word
+          at the top of the box, and press “Make a quest from this word · preview”.
+        </p>
+        <p class="rough">
+          <b>Rough.</b> On the first day, and again after each rebuild of this prototype, the practice says “This answer
+          couldn’t be recorded for review.” The quest still counts each word. A press on “Start quest” in the first
+          instant after the card opens can be missed; press again.
+        </p>
+        <p class="fine">
+          From search (Words, then <span lang="ja">職業</span>) the word’s page offers the practice and its two rooms,
+          with no quest: a quest needs the sentence it came from.
+        </p>
+      </article>
+
+      <article class="door" id="door-shared-study">
+        <div class="door-head">
+          <h3>New study screen</h3>
+          <span class="tag">preview</span>
+        </div>
+        <p class="what">
+          The study screen and scheduler of the Nihongo Study app, inside Bunki, for four decks: N2 words, N1 words, Your
+          fields, My own words.
+        </p>
+        <ul class="go">
+          <li><a href="./?deck=n2&amp;sharedStudy=preview" data-door="shared-n2">N2 words · preview</a></li>
+          <li><a href="./?deck=n1&amp;sharedStudy=preview" data-door="shared-n1">N1 words · preview</a></li>
+          <li><a href="./?deck=senmon&amp;sharedStudy=preview" data-door="shared-senmon">Your fields · preview</a></li>
+          <li><a href="./?deck=kotoba-master&amp;sharedStudy=preview" data-door="shared-kotoba-master">My own words · preview</a></li>
+          <li><a class="plain" href="./?dojo=1&amp;sharedStudy=preview" data-door="shared-decks">The deck list · preview</a></li>
+        </ul>
+        <p class="rough">
+          <b>Rough.</b> It is a separate learner: your study history does not appear here, and nothing you do here reaches
+          your record. It gives 20 new cards once, on the first day, so on the second day it has none. No sound. While
+          its address is open, Bunki’s other graded practice answers “not mapped to shared study”. It sits in a frame
+          with its own themes and tabs.
+        </p>
+      </article>
+
+      <article class="door" id="door-grammar">
+        <div class="door-head">
+          <h3>Grammar deck</h3>
+          <span class="tag">preview</span>
+        </div>
+        <p class="what">Grammar points, by meaning and by recall. This deck exists only inside the new study screen.</p>
+        <ul class="go">
+          <li><a href="./?deck=shared-grammar&amp;sharedStudy=preview" data-door="shared-grammar">Grammar · preview</a></li>
+        </ul>
+        <p class="rough"><b>Rough.</b> The same limits as the new study screen above.</p>
+      </article>
+
+      <article class="door" id="door-places">
+        <div class="door-head">
+          <h3>Five places</h3>
+          <span class="tag">preview</span>
+        </div>
+        <p class="what">
+          Another arrangement of the whole app. The bar reads Review, Bookshelf, Dictionary, Tests, Progress in place of
+          Today, Read, Learn, Words, Me.
+        </p>
+        <ul class="go">
+          <li><a href="./?layout=places&amp;entry=shelf" data-door="places">Switch to five places · preview</a></li>
+          <li><a class="plain" href="./?layout=current&amp;entry=shelf" data-door="places-back">Back to the usual layout</a></li>
+        </ul>
+        <p class="rough">
+          <b>Rough.</b> The choice stays on this device until you switch back, so the app keeps opening this way.
+        </p>
+      </article>
+
+      <article class="door" id="door-variants">
+        <div class="door-head">
+          <h3>Design comparison strip</h3>
+          <span class="tag">preview</span>
+        </div>
+        <p class="what">
+          A black strip that switches eight open design questions on the spot: navigation, card format, difficulty
+          display, legibility, front door, depth, and two settings of the galaxy’s tap ladder.
+        </p>
+        <ul class="go">
+          <li><a href="./?variants=1&amp;entry=shelf" data-door="variants">Show the strip · preview</a></li>
+        </ul>
+        <p class="rough">
+          <b>Rough.</b> It is the makers’ wording, laid across every screen, and it takes taps. Its choices last until
+          the page reloads.
+        </p>
+      </article>
+
+      <article class="door" id="door-writing-room">
+        <div class="door-head">
+          <h3>Full writing-room controls</h3>
+          <span class="tag">preview</span>
+        </div>
+        <p class="what">
+          The older writing room: the kanji’s header, stroke dots, a stroke counter and its controls in view. The stable
+          preview shows a bare sheet of paper with the controls behind “⋯”.
+        </p>
+        <ul class="go">
+          <li><a href="./?minimal=0&amp;room=search" data-door="writing-room">Open search with the full controls · preview</a></li>
+        </ul>
+        <p class="then">
+          <b>Then:</b> type <span lang="ja">門</span>, open the kanji, and tap its stroke-order box.
+        </p>
+        <p class="rough"><b>Rough.</b> It is the older look. Nothing is saved differently.</p>
+      </article>
+
+      <article class="door" id="door-rajomon">
+        <div class="door-head">
+          <h3>Rajōmon</h3>
+          <span class="tag">preview</span>
+          <span class="tag quiet">also in the stable preview</span>
+        </div>
+        <p class="what">
+          One picture scene for learning one kanji: a gate in the rain for <span lang="ja">門</span>, in five steps.
+        </p>
+        <ul class="go">
+          <li><a href="./?room=search" data-door="rajomon">Open search · preview</a></li>
+        </ul>
+        <p class="then">
+          <b>Then:</b> type <span lang="ja">門</span>, open the kanji row, and press “Visit Rajōmon · preview”.
+        </p>
+        <p class="rough">
+          <b>Rough.</b> It records nothing and forgets its place when closed. The picture is a candidate that still waits
+          for your verdict.
+        </p>
+      </article>
+
+      <article class="door" id="door-moments">
+        <div class="door-head">
+          <h3>Guided practice: moments, style and sound</h3>
+          <span class="tag">preview</span>
+          <span class="tag quiet">also in the stable preview</span>
+        </div>
+        <p class="what">
+          The guided N2 session plays short moments. They start as “playful” with sound off; “dramatic” and sound are
+          your choice.
+        </p>
+        <ul class="go">
+          <li><a href="./?room=dojo" data-door="moments">Open Learn · preview</a></li>
+        </ul>
+        <p class="then">
+          <b>Then:</b> press “Guided test practice”. The choices are at the foot of the room: moments, style (quiet,
+          playful, dramatic) and sound.
+        </p>
+      </article>
+
+      <h2 class="section" id="hands">Needs your hands</h2>
+      <p class="section-note">Built and reachable. Each waits for something only you can give.</p>
+      <ul class="ledger">
+        <li>
+          <b>Tutor, quiz, AI reading and Speak</b>
+          <span>Each works once your own key is entered on this device (Settings, then Tutor connection; the Speak room has its own setup). They spend money.</span>
+        </li>
+        <li>
+          <b>One-tap problem reports</b>
+          <span>“Report a problem” would send the report straight to the makers. As built, it opens a GitHub page where you finish sending by hand. It needs a running relay and its key. Reports and screenshots sent that way become public GitHub issues.</span>
+        </li>
+        <li>
+          <b>News headlines, file intake, device sync and native save</b>
+          <span>These work only inside the Mac desktop app.</span>
+        </li>
+        <li>
+          <b>Offline use and home-screen install</b>
+          <span>These need an https address.</span>
+        </li>
+      </ul>
+
+      <h2 class="section" id="not-connected">Built but not connected yet</h2>
+      <p class="section-note">The code exists. Nothing in this build opens it.</p>
+      <ul class="ledger">
+        <li id="pending-worldcraft">
+          <b>Build a character</b>
+          <span>On <span lang="ja">職</span>, <span lang="ja">識</span> or <span lang="ja">織</span>, build the character from its two parts and keep up to 16 builds.</span>
+          <span class="state">being wired on 2026-11-10; its door moves up when it lands</span>
+        </li>
+        <li id="pending-passage">
+          <b>Passage</b>
+          <span>A fixed walk through seven stops, <span lang="ja">職 → 戠 → 識 → 戠 → 織 → 糸 → 織</span>, that can be interrupted and resumed. It has no screen yet.</span>
+          <span class="state">being wired on 2026-11-10; its door moves up when it lands</span>
+        </li>
+        <li id="pending-orbit">
+          <b>Orbit word field</b>
+          <span>Words circling on five rings; each pass pulls a word toward the centre.</span>
+          <span class="state">being wired on 2026-11-10; its door moves up when it lands</span>
+        </li>
+        <li id="pending-library110">
+          <b>The 110-piece library</b>
+          <span>110 more things to read: 57 Aozora, 30 Bunki originals, 15 Global Voices, 8 Wikipedia. Held for your selection; 9 texts have known typos and 5 have paragraphs marked for rewriting.</span>
+          <span class="state">being wired on 2026-11-10; its door moves up when it lands</span>
+        </li>
+        <li id="pending-rajomon-more">
+          <b>Rajōmon for other kanji</b>
+          <span>Only <span lang="ja">門</span> has a scene and a picture.</span>
+        </li>
+        <li>
+          <b>Eight contract modules</b>
+          <span>One parts graph for every kanji; coming back to the exact word, scroll and draft; one dictionary entry shared by search and the word card; Speak corrections you can inspect and take back; one view of evidence by skill; one model for worlds; same-spelling words kept apart; every answer as one typed event. Each has tests and no connection to the app, and each would replace something that works today.</span>
+        </li>
+        <li>
+          <b>Library cuts</b>
+          <span>A prepared decision to show 57 of the 156 shelf articles. It needs your recorded decision.</span>
+        </li>
+        <li>
+          <b>The old voice</b>
+          <span>Retired by ruling on 2026-11-10. Three controls still promise sound and give none: the voice row in Settings, the <span lang="ja">音</span> button on a review answer, and Listen on one article.</span>
+        </li>
+        <li>
+          <b>Card audio and two-device sync for the new study screen</b>
+          <span>The audio release and the sync server are not in this build.</span>
+        </li>
+        <li>
+          <b>N2 full, medium and short tests with listening</b>
+          <span>The questions and recordings are not in this build.</span>
+        </li>
+      </ul>
+
+      <footer>
+        Built from <code>integrate/everything-on-20261110</code>. The stable preview is another address and nothing here
+        changes it.
+      </footer>
+    </main>
+  </body>
+</html>
