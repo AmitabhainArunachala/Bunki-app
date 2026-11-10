@@ -161,7 +161,7 @@ export function noVoiceLine(reason, tx) {
 }
 
 /* ------------------------------------------------------------------ the unit that speaks */
-const SKIP_TAGS = new Set(['RT', 'RP', 'SCRIPT', 'STYLE', 'TEMPLATE', 'NOSCRIPT', 'INPUT', 'TEXTAREA', 'SELECT', 'CANVAS', 'IFRAME', 'SVG', 'MATH', 'OBJECT', 'VIDEO', 'AUDIO']);
+const SKIP_TAGS = new Set(['RT', 'RP', 'SCRIPT', 'STYLE', 'TEMPLATE', 'NOSCRIPT', 'INPUT', 'TEXTAREA', 'SELECT', 'CANVAS', 'IFRAME', 'TITLE', 'DESC', 'MATH', 'OBJECT', 'VIDEO', 'AUDIO']);
 const FIELD_TAGS = new Set(['INPUT', 'TEXTAREA', 'SELECT', 'OPTION']);
 const CONTROL_TAGS = new Set(['BUTTON', 'A', 'SUMMARY', 'LABEL']);
 const CONTROL_ROLES = new Set(['button', 'link', 'option', 'menuitem', 'menuitemradio', 'menuitemcheckbox', 'tab', 'treeitem', 'switch', 'checkbox', 'radio']);
@@ -465,10 +465,16 @@ export const EAR_CSS = `
   font: 12px/1.2 "Hiragino Sans", "Noto Sans JP", var(--sans, sans-serif); color: color-mix(in oklab, var(--ear-ink, var(--ink)) 82%, transparent);
   background: color-mix(in oklab, var(--print-white, var(--ground-0, var(--color-paper, var(--ground)))) 94%, transparent); pointer-events: none; }
 .ear-spot { position: absolute; width: 44px; height: 44px; }
-/* where the mark stands: beside the floating gate of the first screen, and beside the gate of every bar */
+/* where the mark stands: beside the floating gate of the first screen, and beside the gate of every bar; on a narrow
+   screen on the gate's other side, where the bar's own doors (search, the language, Save) never reach */
 #ginga-symbol + .ear-spot { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); left: calc(50% + 24px); z-index: 30; }
 :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate + .ear-spot { top: env(safe-area-inset-top, 0px); left: calc(50% + 22px); z-index: 1; }
 :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate + .ear-spot + * { margin-left: auto; }
+@media (max-width: 640px) {
+  #ginga-symbol + .ear-spot { left: calc(50% - 68px); }
+  :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate + .ear-spot { left: calc(50% - 66px); }
+  .ear-why { left: 4px; top: calc(100% + 2px); transform: none; }
+}
 /* armed: 朱文, a red character on paper */
 html[data-ear='armed'] .ear-mark::before { border-color: var(--ear-red); background: var(--ear-white); box-shadow: 0 1px 0 color-mix(in oklab, var(--ink) 18%, transparent); }
 html[data-ear='armed'] .ear-mark .ear-glyph { color: var(--ear-red); }

@@ -554,6 +554,27 @@ describe('b. the unit that speaks', () => {
     expect(said(u)).toEqual(['方法']);
   });
 
+  it('a button that draws its Japanese as SVG text is that button; SVG text loose on the page is no unit', () => {
+    const button = h(
+      'button',
+      { id: 'card-say' },
+      h(
+        'svg',
+        { display: 'inline' },
+        h('title', {}, 'speaker'),
+        h('text', { display: 'inline' }, '音'),
+      ),
+    );
+    const loose = h('svg', { display: 'inline' }, h('text', { display: 'inline' }, '絵の中の言葉'));
+    const body = page(button);
+    loose.parentNode = body;
+    body.childNodes.push(loose);
+    const u = findUnit(textIn(button, '音'), { context });
+    expect(u.element).toBe(button);
+    expect(said(u)).toEqual(['音']);
+    expect(findUnit(textIn(loose, '絵'), { context })).toBe(null);
+  });
+
   it('a row that mixes English and one kanji says the kanji', () => {
     const row = h(
       'button',
