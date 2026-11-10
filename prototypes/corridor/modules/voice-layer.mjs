@@ -156,10 +156,22 @@ export function installVoiceLayer(host) {
     for (const node of doc.querySelectorAll('#reader [data-speaking]')) node.removeAttribute('data-speaking');
     washes?.delete('bunki-speaking');
   };
+  /** The app draws the article again (a word looked up, a dial moved): the sentences keep their text and take the new
+   * page's words. False when the text itself is no longer the one being read (the other version of the story). */
+  function remapReader() {
+    const p = host.passage();
+    if (!p || p.id !== reader.pid) return false;
+    const fresh = articleSentences(p);
+    if (fresh.length !== reader.sentences.length || fresh.some((sentence, i) => sentence.text !== reader.sentences[i].text)) return false;
+    fresh.forEach((sentence, i) => { reader.sentences[i].els = sentence.els; });
+    return true;
+  }
+  const stale = (sentence) => sentence.els.length > 0 && !sentence.els.some((node) => node.isConnected);
   function showSentence(index) {
     clearSpeaking();
     const sentence = reader.sentences[index];
     if (!sentence) return;
+    if (stale(sentence)) remapReader();
     const shown = sentence.els.filter((node) => node.isConnected);
     for (const node of shown) node.setAttribute('data-speaking', '');
     const first = shown[0];
@@ -274,7 +286,10 @@ export function installVoiceLayer(host) {
     toggle(p) {
       if (reader.pid === p.id && readerActive()) {
         const state = reader.session.state;
-        if (state === 'paused') { prime(); reader.session.resume(); } else reader.session.pause();
+        if (state !== 'paused') reader.session.pause();
+        // the page may have been drawn again while paused; if it now shows another text, the read starts over on it
+        else if (reader.sentences.some(stale) && !remapReader()) { startReader(p, 0); return; }
+        else { prime(); reader.session.resume(); showSentence(reader.session.index); }
         host.refreshListenRow?.();
         return;
       }
@@ -301,7 +316,8 @@ export function installVoiceLayer(host) {
     if (!readerActive() || !['loading', 'playing'].includes(reader.session.state)) return;
     const word = event.target?.closest?.('#reader .tok[data-index]');
     if (!word) return;
-    const index = reader.sentences.findIndex((sentence) => sentence.els.includes(word));
+    let index = reader.sentences.findIndex((sentence) => sentence.els.includes(word));
+    if (index < 0 && reader.sentences.some(stale) && remapReader()) index = reader.sentences.findIndex((sentence) => sentence.els.includes(word));
     if (index < 0) return;
     event.preventDefault();
     event.stopImmediatePropagation();

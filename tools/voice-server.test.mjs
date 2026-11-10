@@ -31,6 +31,7 @@ import {
   parsePairing,
   isVoiceServer,
 } from '../prototypes/corridor/modules/voice-client.mjs';
+import { japaneseSentences } from '../prototypes/corridor/modules/voice-layer.mjs';
 import { createVoiceSeam, voiceKeyOf } from '../prototypes/corridor/modules/voice-seam.mjs';
 import { startFakeVoiceServer } from '../prototypes/corridor/tools/fake-voice-server.mjs';
 
@@ -860,6 +861,33 @@ describe('the seam: one sound at a time, and the controls', () => {
     await run(r.seam, { voiceKey: 'word:猫', sentences: [{ text: 'ねこ' }] });
     expect(r.calls.speak).toHaveLength(1);
     expect(r.calls.played).toHaveLength(2);
+  });
+});
+
+describe('only the Japanese is read', () => {
+  const texts = (text) => japaneseSentences(text).map((sentence) => sentence.text);
+  it('Japanese text is read as it stands, sentence by sentence', () => {
+    expect(texts('雨の日は本を読む。猫が窓の外を見ている。')).toEqual([
+      '雨の日は本を読む。',
+      '猫が窓の外を見ている。',
+    ]);
+    expect(texts('きかい')).toEqual(['きかい']);
+  });
+  it('from a tutor’s mixed reply only the Japanese is read; the English never reaches the server', () => {
+    expect(
+      texts(
+        'Use it like this: 雨が降っているのに、出かけました。 The clause before のに is the surprise.',
+      ),
+    ).toEqual(['雨が降っているのに、出かけました。', 'のに']);
+    expect(texts('Good session. 「機械」は「きかい」と読みます。 Review it tomorrow.')).toEqual([
+      '「機械」は「きかい」と読みます。',
+    ]);
+  });
+  it('English alone, a lone character and nothing at all give nothing to read', () => {
+    expect(texts('Good session. Review it tomorrow.')).toEqual([]);
+    expect(texts('The particle は marks the topic.')).toEqual([]);
+    expect(texts('')).toEqual([]);
+    expect(texts(null)).toEqual([]);
   });
 });
 
