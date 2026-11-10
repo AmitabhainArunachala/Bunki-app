@@ -1,0 +1,281 @@
+/* EVERYTHING-ON PROTOTYPE (integrate/everything-on-20261110): the prototype layer's own stylesheet, loaded by
+ * prototype-layer.mjs. Nothing here is a new look: the mark is the app's red tag (.pool-tag.sa), the button is its ink
+ * seal, and the sheet repeats the report sheet's rules (maintenance/report-client.css) under its own root. */
+
+/* ------------------------------------------------------------------------------------------------ the 新 / new mark
+ * One mark for everything built or connected today, drawn by the stylesheet so that no door's own text changes.
+ * The word follows the interface language (prototype-layer.mjs sets data-pl-lang on the root element). */
+:root { --pl-new: 'new'; }
+:root[data-pl-lang='ja'] { --pl-new: '新'; }
+
+#kanji-quest-door::after,                                   /* quests: the door on the 職業 word page */
+[id^='kanji-quest-lessons-'] .row-main::after,              /* quests: the row in Lessons */
+.kanji-quest-head::after,                                   /* quests: the top of the quest screens */
+#worldcraft-door::after,                                    /* Build a character: the door on 職 識 織 */
+#worldcraft-dialog h1.view-title::after,                    /* Build a character: the top of its screen */
+#passage-door::after,                                       /* Passage: the door on 職 識 織 */
+#passage-dialog .passage-bar .pool-tag::after,              /* Passage: beside "preview" at the top of its screen */
+#orbit-preview-door::after,                                 /* Orbit: the bubble in the galaxy menu */
+.orbit-preview-bar .orbit-preview-tag::after,               /* Orbit: beside "preview" at the top of its screen */
+.library-candidate-tag::after,                              /* candidate readings: each card, and the reader's head */
+.listen-row[data-passage='jawiki:5294446']::after,          /* the Sakura article's speaker bar */
+[data-shared-study='ready'] > p::after,                     /* the new study screen and the grammar deck: the top line */
+.dojo-deck[data-deck='shared-grammar'] .dojo-deck-t::after, /* the grammar deck's row in the deck list */
+.kanji-world-door-held::after,                              /* Rajōmon from 間 聞 問 開 閉 */
+#bunki-prototype-root .pl-new {
+  content: var(--pl-new);
+  display: inline-block;
+  flex: none;
+  margin-left: 8px;
+  padding: 1px 5px;
+  border: 1px solid var(--red, #b03a2e);
+  border-radius: var(--radius-seal, 3px);
+  background: transparent;
+  color: var(--red, #b03a2e);
+  font: 500 var(--type-caption, 12px) / 1.5 var(--sans, 'Noto Sans JP', system-ui, sans-serif);
+  letter-spacing: 0.08em;
+  text-transform: none;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+/* a chip stacks its children; these doors hold one line, so the mark stands beside it */
+#kanji-quest-door, #worldcraft-door, #passage-door, .kanji-world-door-held { flex-direction: row; align-items: center; }
+/* on the orbit screen's dark bar the mark takes that bar's own tag colours */
+.orbit-preview-bar .orbit-preview-tag::after { border-color: #de5b43; color: #f1b3a5; }
+/* five places: the whole arrangement is the new thing, so its bar carries the mark */
+:root[data-layout='places'] #primary-tabs::before {
+  content: var(--pl-new);
+  position: absolute;
+  top: -11px;
+  left: 12px;
+  padding: 1px 5px;
+  border: 1px solid var(--red, #b03a2e);
+  border-radius: var(--radius-seal, 3px);
+  background: var(--ground, #f1e9d3);
+  color: var(--red, #b03a2e);
+  font: 500 var(--type-caption, 12px) / 1.5 var(--sans, 'Noto Sans JP', system-ui, sans-serif);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------------------------------------- the root */
+#bunki-prototype-root {
+  --pl-paper: var(--ground, #f1e9d3);
+  --pl-ink: var(--ink, #1c2f42);
+  --pl-muted: var(--ink-2, #4a5d70);
+  --pl-line: color-mix(in srgb, var(--pl-ink) 24%, transparent);
+  color: var(--pl-ink);
+  font: var(--type-control, 15px) / 1.6 var(--sans, 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif);
+}
+#bunki-prototype-root *, #bunki-prototype-root *::before, #bunki-prototype-root *::after { box-sizing: border-box; }
+#bunki-prototype-root button, #bunki-prototype-root textarea { font: inherit; color: inherit; }
+#bunki-prototype-root button { cursor: pointer; }
+#bunki-prototype-root button:disabled { cursor: default; opacity: 0.58; }
+#bunki-prototype-root :focus-visible { outline: 2px solid var(--pl-ink); outline-offset: 3px; }
+#bunki-prototype-root p { margin: 0 0 12px; overflow-wrap: anywhere; }
+
+/* ----------------------------------------------------------------------------- the button, above the report entry */
+#bunki-prototype-root .pl-rail {
+  position: fixed;
+  z-index: 2147482990;
+  inset: auto var(--pl-right, 14px) var(--pl-bottom, 64px) auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100vw - 16px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: visible;
+  background: transparent;
+  color: var(--pl-ink);
+  pointer-events: none;
+}
+#bunki-prototype-root .pl-rail[popover]:not(:popover-open) { display: none; }
+#bunki-prototype-root .pl-rail::backdrop { background: transparent; pointer-events: none; }
+#bunki-prototype-root .pl-open {
+  position: relative;
+  isolation: isolate;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--pl-paper);
+  font: 800 16px / 1 'Shippori Mincho B1', var(--serif, 'Hiragino Mincho ProN', serif);
+  pointer-events: auto;
+}
+/* the ink seal the shelf's own masthead wears, small */
+#bunki-prototype-root .pl-open::before {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  z-index: -1;
+  border-radius: 4px;
+  background: var(--pl-ink);
+  box-shadow: inset 0 0 0 2px var(--pl-ink), inset 0 0 0 3px color-mix(in srgb, var(--pl-paper) 55%, transparent), 0 1px 4px rgb(0 0 0 / 18%);
+}
+#bunki-prototype-root .pl-open:is(:hover, :focus-visible)::before { inset: 5px; }
+/* the one line of the first open: it sits beside the button and lets taps through, except its own OK */
+#bunki-prototype-root .pl-intro {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(360px, calc(100vw - 72px));
+  padding: 10px 10px 10px 14px;
+  border: 1px solid var(--pl-line);
+  border-left: 3px solid var(--pl-ink);
+  border-radius: var(--radius-card, 4px);
+  background: color-mix(in srgb, var(--pl-paper) 94%, white);
+  box-shadow: 0 2px 6px rgb(0 0 0 / 6%), 0 12px 32px rgb(20 26 34 / 14%);
+  font-size: var(--type-label, 13px);
+  line-height: 1.55;
+  pointer-events: none;
+}
+#bunki-prototype-root .pl-intro[hidden] { display: none; }
+#bunki-prototype-root .pl-intro-text { margin: 0; }
+#bunki-prototype-root .pl-intro-ok {
+  flex: none;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 4px 10px;
+  border: 1px solid var(--pl-ink);
+  border-radius: var(--radius-seal, 3px);
+  background: transparent;
+  pointer-events: auto;
+}
+
+/* ------------------------------------------------------------------------------- the sheet (the report sheet's rules) */
+#bunki-prototype-root .pl-sheet {
+  width: min(600px, 100%);
+  height: min(850px, 100dvh);
+  max-width: 100%;
+  max-height: 100dvh;
+  margin: auto 0 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
+  background: var(--pl-paper);
+  color: var(--pl-ink);
+  box-shadow: -12px 8px 60px rgba(20, 30, 40, 0.2);
+}
+#bunki-prototype-root .pl-sheet[open] { display: flex; flex-direction: column; animation: pl-sheet-enter var(--motion-fast, 180ms) var(--ease-enter, ease-out); }
+#bunki-prototype-root .pl-sheet::backdrop { background: rgba(20, 30, 40, 0.38); }
+@keyframes pl-sheet-enter { from { transform: translateY(14px); } to { transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { #bunki-prototype-root .pl-sheet[open] { animation: none; } }
+#bunki-prototype-root .pl-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding: 24px 28px 14px; }
+#bunki-prototype-root h2 { margin: 4px 0 0; font-family: var(--serif, 'Hiragino Mincho ProN', 'Yu Mincho', serif); font-size: var(--type-title, 29px); font-weight: 500; line-height: 1.3; }
+#bunki-prototype-root .pl-close { flex: 0 0 auto; min-height: 44px; padding: 8px 12px; border: 0; background: transparent; font-size: var(--type-label, 13px); }
+#bunki-prototype-root .pl-nav { display: flex; gap: 20px; padding: 0 28px; border-bottom: 1px solid var(--pl-line); }
+#bunki-prototype-root .pl-nav button { min-height: 44px; padding: 10px 0; border: 0; border-radius: 0; background: transparent; color: var(--pl-muted); font-size: var(--type-label, 13px); }
+#bunki-prototype-root .pl-nav button[aria-current='page'] { color: var(--pl-ink); box-shadow: inset 0 -2px var(--pl-ink); }
+#bunki-prototype-root .pl-body { --pl-pad-x: 28px; min-height: 0; padding: 22px var(--pl-pad-x) 32px; overflow-y: auto; overscroll-behavior: contain; scrollbar-color: var(--pl-muted) var(--pl-paper); scrollbar-width: thin; }
+#bunki-prototype-root .pl-note { color: var(--pl-muted); font-size: var(--type-label, 13px); line-height: 1.6; }
+#bunki-prototype-root .pl-rule { margin: 28px 0 10px; padding-top: 14px; border-top: 1px solid var(--pl-line); font-size: var(--type-chrome, 14px); font-weight: 600; line-height: 1.4; }
+
+/* New in this build */
+#bunki-prototype-root .pl-list, #bunki-prototype-root .pl-rest, #bunki-prototype-root .pl-note-list { margin: 0; padding: 0; list-style: none; }
+#bunki-prototype-root .pl-item { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-top: 1px solid var(--pl-line); }
+#bunki-prototype-root .pl-item:first-child { border-top: 0; }
+#bunki-prototype-root .pl-item-text { flex: 1 1 auto; min-width: 0; }
+#bunki-prototype-root .pl-item-name { margin: 0 0 2px; font-family: var(--serif, serif); font-size: var(--type-lead, 18px); line-height: 1.4; }
+#bunki-prototype-root .pl-item-line { margin: 0; color: var(--pl-muted); font-size: var(--type-chrome, 14px); line-height: 1.55; }
+#bunki-prototype-root .pl-item-go { flex: none; display: flex; flex-direction: column; gap: 6px; }
+#bunki-prototype-root .pl-go, #bunki-prototype-root .pl-primary, #bunki-prototype-root .pl-quiet {
+  min-width: 56px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid var(--pl-ink);
+  border-radius: var(--radius-card, 4px);
+  background: transparent;
+  font-size: var(--type-chrome, 14px);
+}
+#bunki-prototype-root .pl-go:is(:hover, :focus-visible), #bunki-prototype-root .pl-primary { background: var(--pl-ink); color: var(--pl-paper); }
+#bunki-prototype-root .pl-go-quiet, #bunki-prototype-root .pl-quiet { border-color: var(--pl-line); color: var(--pl-muted); }
+#bunki-prototype-root .pl-rest li { padding: 7px 0; border-top: 1px solid color-mix(in srgb, var(--pl-ink) 10%, transparent); color: var(--pl-muted); font-size: var(--type-label, 13px); line-height: 1.6; }
+#bunki-prototype-root .pl-rest li:first-child { border-top: 0; }
+
+/* Tell me what's off */
+#bunki-prototype-root .pl-field { display: block; margin: 0 0 10px; }
+#bunki-prototype-root .pl-field > span { display: block; margin-bottom: 6px; font-size: var(--type-chrome, 14px); font-weight: 600; }
+#bunki-prototype-root textarea {
+  display: block;
+  width: 100%;
+  min-height: 110px;
+  padding: 10px 12px;
+  border: 1px solid var(--pl-line);
+  border-radius: var(--radius-seal, 3px);
+  background: color-mix(in srgb, var(--pl-paper) 94%, var(--pl-ink));
+  caret-color: var(--pl-ink);
+  font-size: 16px; /* a smaller face makes iOS zoom the page on focus */
+  line-height: 1.6;
+  resize: vertical;
+}
+#bunki-prototype-root textarea::placeholder { color: var(--pl-muted); opacity: 1; }
+#bunki-prototype-root .pl-context { margin: 0 0 8px; }
+#bunki-prototype-root .pl-target { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; padding: 8px 12px; border: 1px solid var(--pl-line); border-left: 3px solid var(--red, #b03a2e); font-size: var(--type-label, 13px); }
+#bunki-prototype-root .pl-target span { flex: 1 1 auto; min-width: 0; }
+#bunki-prototype-root .pl-link { flex: none; min-height: 44px; padding: 4px 8px; border: 0; background: transparent; color: var(--pl-muted); font-size: var(--type-label, 13px); text-decoration: underline; text-underline-offset: 3px; }
+#bunki-prototype-root .pl-notice { margin: 0 0 8px; padding: 10px 0; border-block: 1px solid var(--pl-line); font-size: var(--type-chrome, 14px); }
+#bunki-prototype-root .pl-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; margin: 12px 0 0; }
+#bunki-prototype-root .pl-note-row { padding: 14px 0; border-top: 1px solid var(--pl-line); }
+#bunki-prototype-root .pl-note-row:first-child { border-top: 0; }
+#bunki-prototype-root .pl-note-head { margin: 0 0 4px; }
+#bunki-prototype-root .pl-status { display: inline-block; font-size: var(--type-caption, 12px); font-weight: 600; line-height: 1.5; }
+#bunki-prototype-root .pl-status[data-pl-status='done'] { color: var(--pl-muted); }
+#bunki-prototype-root .pl-date { display: inline-block; margin-left: 12px; color: var(--pl-muted); font-size: var(--type-caption, 12px); font-variant-numeric: tabular-nums; }
+#bunki-prototype-root .pl-note-text { margin: 0 0 4px; white-space: pre-wrap; }
+#bunki-prototype-root .pl-note-where { margin: 0 0 4px; }
+#bunki-prototype-root .pl-reply { margin: 8px 0 0; padding: 8px 12px; border-left: 3px solid var(--pl-ink); background: color-mix(in srgb, var(--pl-paper) 93%, var(--pl-ink)); }
+#bunki-prototype-root .pl-reply strong { margin-right: 4px; font-size: var(--type-caption, 12px); }
+
+/* the app's report entry follows any open dialog; inside this sheet it would sit on the list, so it waits outside */
+#prototype-sheet #bunki-reports-root { display: none; }
+
+/* point at it: a clear pane over the page that takes the next tap */
+#bunki-prototype-root .pl-point {
+  position: fixed;
+  inset: 0;
+  z-index: 2147482995;
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgba(20, 30, 40, 0.06);
+  cursor: crosshair;
+  outline: 0;
+}
+#bunki-prototype-root .pl-point[popover]:not(:popover-open):not([data-open]) { display: none; }
+#bunki-prototype-root .pl-point:not([popover]):not([data-open]) { display: none; }
+#bunki-prototype-root .pl-point-hint {
+  position: absolute;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100vw - 24px);
+  margin: 0;
+  padding: 8px 14px;
+  border-radius: var(--radius-card, 4px);
+  background: var(--pl-ink);
+  color: var(--pl-paper);
+  font-size: var(--type-label, 13px);
+  pointer-events: none;
+}
+
+@media (max-width: 480px) {
+  #bunki-prototype-root .pl-heading { padding: 18px 18px 10px; }
+  #bunki-prototype-root .pl-nav { gap: 18px; padding-inline: 18px; }
+  #bunki-prototype-root .pl-body { --pl-pad-x: 18px; padding: 18px var(--pl-pad-x) 28px; }
+  #bunki-prototype-root h2 { font-size: var(--type-section, 24px); }
+  #bunki-prototype-root .pl-sheet { height: 100dvh; }
+}

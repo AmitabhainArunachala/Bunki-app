@@ -4577,6 +4577,15 @@ async function boot() {
   const readDoor = retryRouteRendered ? null : params.get('read');
   const readRendered = !!readDoor && D.passages.some((row) => row.id === readDoor);
   if (readRendered) withoutRoomTransition(() => openPassage(readDoor));
+  // with &word=<dictionary form>: the page of that word at its first occurrence in the article, as a tap on it would open
+  const wordDoor = readRendered ? params.get('word') : null;
+  if (wordDoor) {
+    const p = D.passages.find((row) => row.id === readDoor);
+    void ensureArticle(p).then(() => {
+      const index = p.tokens ? p.tokens.findIndex((token) => token.b === wordDoor) : -1;
+      if (index >= 0 && S.view === 'reader' && S.passageId === p.id && !S.stack.length) go(readerEntryNode(p.tokens[index], index, p), { instant: true });
+    }, () => {});
+  }
   document.body.dataset.ready = '1';
   if (!retryRouteRendered && !readRendered) render();
   const kanjiDoor = retryRouteRendered || readRendered ? null : params.get('kanji');
@@ -31320,6 +31329,13 @@ function openKanjiWorldEncounter(invoker, node) {
 // globalThis.__KAIRO_PASSAGE__, which mountPageEffects asks for a door on the 職・識・織 pages.
 // The single-file build carries no such file and stays without the door.
 if (typeof window !== 'undefined' && !window.__CORRIDOR_BUNDLE__) void import('./passage-view.mjs').catch(() => {});
+
+// EVERYTHING-ON PROTOTYPE: the prototype layer (the first-open line, the 新 marks, the prototype button with its list of new
+// things and its notes) is its own module and stylesheet, loaded beside the app. The single-file build carries neither.
+if (typeof window !== 'undefined' && !window.__CORRIDOR_BUNDLE__) {
+  void import('./prototype-layer.mjs').then((layer) => layer.installPrototypeLayer({ state: S, tx, served: maintenanceServedBuild }))
+    .catch((err) => console.warn('prototype layer unavailable', err));
+}
 
 
 /* ==================================================== 筆順 · stroke order ===

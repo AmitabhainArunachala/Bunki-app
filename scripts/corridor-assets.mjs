@@ -5,6 +5,9 @@ export const CORRIDOR_REQUIRED_ROOTS = [
   'index.html',
   // everything-on prototype (integrate/everything-on-20261110): the doors page, plain HTML beside index.html
   'prototype.html',
+  // everything-on prototype: the layer inside the app (the first-open line, the 新 marks, the prototype button and its sheet)
+  'prototype-layer.mjs',
+  'prototype-layer.css',
   'apple-touch-icon.png',
   'manifest.webmanifest',
   'sw.js',

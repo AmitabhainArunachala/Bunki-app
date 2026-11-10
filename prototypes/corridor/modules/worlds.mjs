@@ -583,7 +583,7 @@ function kanjiQuestRender(main, visit, redraw, button) {
   if (journey.quest.restarted && quest.view === 'page') { journey.quest.restarted = false; lines(['Q-15r']); }
   lines(quest.lines);
   if (quest.view === 'room' || quest.view === 'ended') return false;
-  main.append(el('h2', 'list-head', kanjiQuestLine('Q-02')));
+  main.append(el('h2', 'list-head kanji-quest-head', kanjiQuestLine('Q-02'))); // everything-on prototype: the class carries the 新 mark
   if (kanjiQuestStructural(journey)) { lines(['Q-17']); return true; }
   const root = journey.lifecycle.inspect().root;
   if (quest.view === 'pool') { kanjiQuestPool(main, visit, journey, button, redraw); return true; }
@@ -1982,7 +1982,7 @@ function renderKanjiNode(sheet, node) {
   // everything-on prototype (inventory block 26): the door also stands on five kanji that hold 門, and says whose scene it is
   const world = kanjiWorldEligible(node.id);
   if (world) {
-    const worldDoor = el('button', 'chip kanji-world-door', world === node.id ? tx('羅城門へ · 試作', 'Visit Rajōmon · preview')
+    const worldDoor = el('button', world === node.id ? 'chip kanji-world-door' : 'chip kanji-world-door kanji-world-door-held', world === node.id ? tx('羅城門へ · 試作', 'Visit Rajōmon · preview')
       : tx(`羅城門へ · 「${node.id}」の中の「${world}」 · 試作`, `Visit Rajōmon, the ${world} inside ${node.id} · preview`));
     worldDoor.id = 'kanji-world-door'; worldDoor.type = 'button';
     worldDoor.addEventListener('click', () => openKanjiWorldEncounter(worldDoor, node));
