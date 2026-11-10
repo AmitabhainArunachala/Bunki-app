@@ -139,7 +139,8 @@ try {
     await page.route('**/kanji-world/rajomon-content.json', route => route.fulfill({ status: 503, body: '' }));
     await door.click();
     await page.getByText('This scene could not load.', { exact: false }).waitFor();
-    await page.getByRole('button', { name: 'Back', exact: true }).click();
+    // the sheet under the scene says Back too (one word for going back): the scene's own Back is the one pressed
+    await page.locator('#kanji-world-dialog').getByRole('button', { name: 'Back', exact: true }).click();
     assert.equal(await page.locator('#kanji-world-dialog').count(), 0);
     await page.unroute('**/kanji-world/rajomon-content.json');
     assert.deepEqual(await readAppRecord(page), recordBefore);
