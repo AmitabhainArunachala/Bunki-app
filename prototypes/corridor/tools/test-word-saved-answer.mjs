@@ -1,8 +1,8 @@
 /**
  * D23 · the saved word answer: extracted-function tests over the real committed data.
  *
- * The ACTUAL corridor.js definitions are lifted by name (the TS-AST seam of
- * verify-corridor-storage-integrity.mjs). They run over the served dict-v2/index.json, dict.json
+ * The actual authored definitions collected by readAuthoredCorridor are lifted by name through
+ * the TS-AST seam of verify-corridor-storage-integrity.mjs. They run over the served dict-v2/index.json, dict.json
  * and words.json. Fixture values follow the independent D23 acceptance ledger (F01–F07, H01–H10,
  * the F04 content addendum), copied here literally.
  *
@@ -49,6 +49,7 @@
  *     Japanese label rides along (labelJa) for the route-label rows.
  */
 import assert from 'node:assert/strict';
+import { randomUUID } from 'node:crypto';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { after, test } from 'node:test';
@@ -57,6 +58,7 @@ import vm from 'node:vm';
 import ts from 'typescript';
 import * as fsrsApi from '../vendor/ts-fsrs.mjs';
 import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
+import { readAuthoredCorridor } from './authored-corridor-source.mjs';
 import { INVENTORY, WORD_CONTROLS, applyControl, inventoryReport, runControls, sha256, sourceMarker, stageAssessmentAuthority } from './word-saved-answer-controls.mjs';
 
 const here = (path) => new URL(path, import.meta.url);
@@ -74,7 +76,7 @@ if (process.argv.includes('--controls')) {
 }
 
 function defineRows() {
-  let source = readFileSync(here('../corridor.js'), 'utf8');
+  let source = readAuthoredCorridor(fileURLToPath(here('../'))).source;
   const controlName = argValue('--control');
   if (controlName) source = applyControl(source, WORD_CONTROLS, controlName);
   console.log(sourceMarker(controlName, WORD_CONTROLS, sha256(source)));
@@ -90,16 +92,36 @@ function defineRows() {
     'lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'dictionaryGlossSummary', 'dictionaryReadingSupportsForm',
     'dictionarySummaryFor', 'validDictionaryRow', 'cacheDictionaryRow', 'cacheDictionaryFormRows', 'dictionaryRowBySeq',
     'dictionaryRowsForForm', 'readerReadingFits', 'readerSummaryFor', 'readerQuickRecord', 'readerGlossMissText', 'readerCaptureReasonText',
+    // the inflection search seam (modules/dictionary.mjs): its candidates and the rows/rules/godan table it reads
+    'dictionaryInflectionCandidates', 'INFLECTION_ROWS', 'INFLECTION_RULES', 'GODAN_ROW',
     'nonBlankMeanings', 'wordSelection', 'savedAnswerFor', 'wordAnswerIdentity', 'sameWordIdentity', 'wordStudied',
     'wordCardIdentity', 'wordNodeIdentity', 'explicitWordSnapshot', 'wordCapturePlan', 'captureStorePatch', 'commitCapture',
     'capturePending', 'toggleTaken', 'replaceWordCard', 'wordCaptureState', 'wordCaptureReadingMismatch', 'wordCaptureHeldText', 'showMini',
+    // G1 (2026-10-16): a slip stands only beside a word on the top layer, and a slip leaving into its page is not standing
+    'slipAllowed', 'standingSlip',
+    // G3 (2026-10-17): the slip is one rung of an occurrence's ladder; the actual mini reads the visit it stands for,
+    // and the bar's Save follows the slip that now stands
+    'ladderVisit', 'ladderRefreshing', 'syncChromeKeep',
     // glance pass 2026-10-01: the reading names an entry's kana form across scripts
     'KANA_VOWEL_ROWS', 'kanaReadingKey', 'entryKanaIndex', 'entryCueReading',
     // Save is one tap (reader lane, 2026-10-02): the seal itself saves, and a press on "Saved ✓" is the mini's
     // remove route, with a toast that can undo it; the list chooser left the seal for a popover beside it
     'wordSaveFacts', 'paintWordSave', 'paintMiniPath', 'refreshWordSaveControls', 'toggleWordSave', 'READER_TOAST_MS', 'readerToastTimer',
     'hideReaderToast', 'showReaderToast', 'miniAnchor', 'SAVE_PRESS_MS', 'placeFloating', 'keepFloatingBeside',
+    // Ladder R2/R4 (e4b3c1c5): placeFloating rides the word's own scroller and closes a cut's fold ([data-fold])
+    'slipScroller',
     'miniKanjiWeb', 'revealFloatingFocus',
+    // Q (2026-10-17): the slip stands clear of its word with the word's reading (anchorBox); a kanji's part is named by
+    // its plain meaning (partGloss); the bar's Save fits its bar (fitChromeKeep)
+    'anchorBox', 'partGloss', 'partMeaning', 'PART_WRITTEN', 'RADICAL_VARIANT', 'fitChromeKeep', 'chromeKeepFitting',
+    // Save ▾ (bea9517f, 2026-10-14): a press on Saved ✓ unfolds the word's menu inside the actual mini, and its Review
+    // row is the remove route (one statement declares vocabularyListInvoker and vocabularyListNode)
+    'openVocabularyListPopover', 'closeVocabularyListPopover', 'vocabularyListInvoker',
+    // S (2026-10-16): every keep is the one Save — the mini's, a lesson's and an older set's rows — built by one component
+    // whose menu stands in its card or row (or a bar's drawer)
+    'saveOne', 'reopenSaveMenu', 'openPlainSaveMenu', 'placeSaveMenu',
+    // the tray count repaints in place after a save or a removal (0b413f3f, 2026-10-15)
+    'syncTrayCount',
     'assessmentSuppressionRetries', 'suppressAssessmentCards', 'performAssessmentSuppression',
     'listReading', 'listGloss', 'listToMarkdown', 'resolveAssessmentSubject', 'learningEnrollmentPending', 'commitLearningEnrollment',
     'reviewAnswerAvailable', 'reviewCardBack', 'reviewBack', 'kanjiAnswerAvailable', 'retainedKanjiRecord', 'validKanjiRecord',
@@ -114,7 +136,20 @@ function defineRows() {
     'searchRowShownByCore', 'renderSearchResults', 'dictionaryQueryKey', 'activeDictionaryQuery', 'clearDictionarySearchTimer',
     'requestDictionarySearch', 'dispatchQueuedDictionarySearch', 'DICTIONARY_SEARCH_SETTLE_MS', 'dictionarySearchGeneration',
     'dictionarySearchInFlight', 'dictionarySearchQueued', 'dictionarySearchTimer',
-    'dictionaryHomographChoices', 'renderDictionaryHomographs', 'dictionaryRowsFor', 'dictionaryDetailRowsFor'];
+    'dictionaryHomographChoices', 'renderDictionaryHomographs', 'dictionaryRowsFor', 'dictionaryDetailRowsFor',
+    // G1 (2026-10-16): one line per gloss — the homograph doors are drawn from homographLines
+    'homographLines',
+    // G5 (2026-10-18): the slip's floor stops above the 層 mark where the two would share a column (placeFloating)
+    'layersMarkTop',
+    // G6 (2026-10-19, merge): the slip's ceiling is the frame's foot, the scale thread under the bar (placeFloating); a
+    // card at its full room scrolls itself until Save's unfolded menu stands whole in it (placeSaveMenu)
+    'frameFoot', 'keepMenuInCard',
+    // R3 (2026-10-18): the record a word's sense shapes, the slip's second line, and the marks the slip leaves (for the
+    // page, and for a sense still to come)
+    'senseRecord', 'senseNameHeldText', 'senseMoreLine', 'SENSE_BY_ANCHOR', 'SENSE_LATER', 'senseLaterDraw', 'sensePatch', 'SLIP_NODE', 'senseMoreElement',
+    // Hfix-1A (2026-10-19): a slip too tall for its room is cut between two rows (rowCut), and a card with more below its
+    // cut says so (markCardMore); placeFloating calls both, so both are the actual functions here
+    'rowCut', 'markCardMore'];
   /** The authored top-level statements declaring `names`, each exactly once. */
   const liftFrom = (tree, names) => {
     const found = tree.statements.filter((statement) => {
@@ -174,11 +209,27 @@ function defineRows() {
     return target[key];
   } });
 
-  /** The disclosed DOM boundary for the actual mini. */
+  /** The selectors the fake DOM answers: one id, one class or one tag, the fold row's attribute-presence query
+   * placeFloating makes (Ladder R2/R4, e4b3c1c5), and the one compound query Save ▾'s menu makes for its
+   * checkboxes. Anything else is a disclosed-boundary failure. */
+  const matcher = (selector) => {
+    const box = /^input\[type="checkbox"\](:not\(:disabled\))?$/u.exec(selector);
+    if (box) return (node) => node.tag === 'input' && node.type === 'checkbox' && (!box[1] || !node.disabled);
+    if (selector === '[data-fold]') return (node) => Object.hasOwn(node.dataset ?? {}, 'fold') || Object.hasOwn(node.attributes ?? {}, 'data-fold');
+    assert.match(selector, /^[#.]?[a-z-]+$/u, 'the fake DOM answers one id, one class or one tag selector, [data-fold], or the menu’s checkbox query, only');
+    const name = selector.replace(/^[#.]/u, '');
+    return (node) => selector[0] === '#' ? node.id === name : selector[0] === '.' ? !!node.classList?.contains(name) : node.tag === name;
+  };
+  /** The disclosed DOM boundary for the actual mini (and, since Save ▾, the menu that unfolds inside it: parents,
+   * closest, after, contains and the menu's custom-property writes). */
   class FakeElement {
     constructor(tag = 'div', className = '', text = '') {
       Object.assign(this, { tag, className: className || '', textContent: text || '', children: [], attributes: {}, dataset: {},
-        style: {}, listeners: {}, disabled: false, isConnected: true, hidden: false, id: '' });
+        style: {}, listeners: {}, disabled: false, isConnected: true, hidden: false, id: '', parentNode: null });
+      Object.defineProperties(this.style, {
+        setProperty: { value: (name, value) => { this.style[name] = String(value); } },
+        removeProperty: { value: (name) => { delete this.style[name]; } },
+      });
       const names = () => this.className.split(' ').filter(Boolean);
       this.classList = {
         add: (name) => { if (!names().includes(name)) this.className = [...names(), name].join(' '); },
@@ -188,18 +239,24 @@ function defineRows() {
         contains: (name) => names().includes(name),
       };
     }
-    append(...nodes) { this.children.push(...nodes); }
-    replaceChildren(...nodes) { this.children = [...nodes]; }
+    append(...nodes) { for (const node of nodes) if (node instanceof FakeElement) node.parentNode = this; this.children.push(...nodes); }
+    replaceChildren(...nodes) { for (const node of nodes) if (node instanceof FakeElement) node.parentNode = this; this.children = [...nodes]; }
+    after(...nodes) {
+      const parent = this.parentNode;
+      assert(parent, 'after() needs a parent');
+      for (const node of nodes) if (node instanceof FakeElement) node.parentNode = parent;
+      parent.children.splice(parent.children.indexOf(this) + 1, 0, ...nodes);
+    }
+    contains(node) { for (let at = node; at; at = at.parentNode) if (at === this) return true; return false; }
+    closest(selector) { const hit = matcher(selector); for (let at = this; at; at = at.parentNode) if (hit(at)) return at; return null; }
     querySelectorAll(selector) {
-      assert.match(selector, /^[a-z]+$/u, 'the fake DOM answers tag selectors only');
-      const found = [], walk = (node) => { for (const child of node.children || []) { if (child.tag === selector) found.push(child); walk(child); } };
+      assert.match(selector, /^([a-z]+|input\[type="checkbox"\]|\[data-fold\])$/u, 'the fake DOM answers tag selectors, [data-fold], or the menu’s checkbox query, only');
+      const hit = matcher(selector);
+      const found = [], walk = (node) => { for (const child of node.children || []) { if (hit(child)) found.push(child); walk(child); } };
       walk(this); return found;
     }
     querySelector(selector) {
-      assert.match(selector, /^[#.]?[a-z-]+$/u, 'the fake DOM answers one id, one class or one tag selector only');
-      const name = selector.replace(/^[#.]/u, '');
-      const hit = (node) => selector[0] === '#' ? node.id === name
-        : selector[0] === '.' ? !!node.classList?.contains(name) : node.tag === name;
+      const hit = matcher(selector);
       const walk = (node) => { for (const child of node.children || []) { const found = hit(child) ? child : walk(child); if (found) return found; } return null; };
       return walk(this);
     }
@@ -253,6 +310,8 @@ function defineRows() {
       document: { querySelectorAll: () => [], body: { append: (node) => { context.dialogs.push(node); } }, getElementById: () => null,
         createTextNode: (text) => new FakeElement('#text', '', text) },
       window: { innerWidth: 400 }, removeMini: () => {}, activeTokenAlternatives: null,
+      // G1's frame sampler and the page built at idle are the browser's (frames, idle callbacks), not the slip's logic
+      sampleTransition: () => {}, sampleWhere: () => '', schedulePagePrebuild: () => {},
       sealSyncs: 0, syncReaderTakeSeal: () => { context.sealSyncs += 1; },
       commitStorePatch: async (producer) => {
         try {
@@ -308,6 +367,26 @@ function defineRows() {
    * which the mini removes it (reader lane, 2026-10-02). */
   const clickSeal = async (seal) => {
     await seal.listeners.click({ stopPropagation() {}, detail: 1 });
+  };
+  /** Save ▾'s menu as it unfolded inside the actual mini, or undefined. */
+  const menuOf = (mini) => find(mini.mini, (node) => node.id === 'vocabulary-list-popover');
+  /** Save ▾ (bea9517f, 2026-10-14): a press on Saved ✓ unfolds the word's menu inside the actual mini, and its first row,
+   * Review (checked while the word is saved), is the mini's remove route: unchecked, it runs toggleWordSave on the same
+   * node the seal stands for. Returns once that row has settled (its handler ran to its end). */
+  const reviewOff = async (mini) => {
+    await clickSeal(mini.seal);
+    const menu = menuOf(mini);
+    assert(menu, 'a press on Saved ✓ unfolds Save ▾’s menu');
+    assert(menu.classList.contains('is-save-menu') && menu.classList.contains('is-inline') && menu.parentNode === mini.mini,
+      'the menu is Save ▾’s own, unfolded inside the card');
+    const review = find(menu, (node) => node.id === 'mini-review');
+    assert.equal(review?.checked, true, 'its Review row is checked while the word is saved');
+    review.checked = false;
+    review.listeners.change();
+    assert.equal(review.disabled, true, 'the Review row holds while its route runs');
+    for (let tick = 0; tick < 50 && review.disabled; tick += 1) await new Promise((resolve) => setImmediate(resolve));
+    assert.equal(review.disabled, false, 'the Review row settles');
+    return review;
   };
 
   const NODES = {
@@ -397,11 +476,16 @@ function defineRows() {
       title: title ? [title.textContent, ...title.children.map((child) => child.textContent)] : null };
   };
   /** Click one door on the core sheet: a live door pushes its entry; returns the new stack top, or null if nothing
-   * was pushed (an inert door). */
+   * was pushed (an inert door). G1: the door opens its entry as every page opens — go, whose enterWord pushes exactly
+   * the node it is given inside the match cut — so a door's one navigation through the stand-in go is applied here as
+   * that push; a door that both navigated and pushed, or did either twice, is no door. */
   const clickDoor = (ctx, door) => {
-    const depth = ctx.S.stack.length;
+    const depth = ctx.S.stack.length, navigations = ctx.opened.length;
     door.door.listeners.click();
-    return ctx.S.stack.length === depth + 1 ? roundTrip(ctx.S.stack.at(-1)) : null;
+    const pushed = ctx.S.stack.length - depth, opened = ctx.opened.length - navigations;
+    if (opened === 1 && pushed === 0) ctx.S.stack.push(roundTrip(ctx.opened.at(-1)));
+    else if (!(pushed === 1 && opened === 0)) return null;
+    return roundTrip(ctx.S.stack.at(-1));
   };
   /** The explicit entry reached the way a learner reaches it after the dedup: search → the core row → the core sheet's
    * own door for that entry and exact reading. */
@@ -548,6 +632,8 @@ function defineRows() {
   }
   after(() => {
     const { exact, report } = inventoryReport('word-saved-answer', INVENTORY, observed);
+    Object.assign(report, { schemaVersion: 1, runId: process.env.KAIRO_GATE_RUN_ID || randomUUID(),
+      verifierSha256: sha256(readFileSync(fileURLToPath(import.meta.url))), sourceSha256: sha256(source), sourceOnly: true });
     // the release gate's 'checks' report; a control run writes none
     if (process.env.KAIRO_EVIDENCE_DIR && !controlName) {
       writeFileSync(join(resolveCorridorEvidence(), 'verification-report.json'), JSON.stringify(report, null, 2) + '\n');
@@ -743,11 +829,12 @@ function defineRows() {
     await clickSeal(mini.seal);
     assert.equal(bytes(ctx.latest), before);
     assert.equal(ctx.sealSyncs, 0);
-    // the same mini on a plain core card removes that card, and its handler runs to its end
+    assert.equal(menuOf(mini), undefined, 'a held seal unfolds no menu');
+    // the same mini on a plain core card removes that card through Save ▾'s Review row, and its handler runs to its end
     ctx = app({ mode: 'none', record: core });
     mini = openMini(ctx, '上手');
     assert.equal(mini.seal.disabled, false);
-    await clickSeal(mini.seal);
+    await reviewOff(mini);
     assert.deepEqual(roundTrip(ctx.latest.taken), []);
     assert.equal(ctx.sealSyncs, 1);
     // painted for the core card, the latest record holds うわて: the producer refuses, every byte kept
@@ -755,9 +842,10 @@ function defineRows() {
     mini = openMini(ctx, '上手');
     assert.equal(mini.seal.disabled, false);
     before = bytes(ctx.latest);
-    await clickSeal(mini.seal);
+    const refused = await reviewOff(mini);
     assert.equal(bytes(ctx.latest), before, 'a latest-state change after render refuses in the producer');
     assert.equal(ctx.sealSyncs, 0);
+    assert.equal(refused.checked, true, 'a refused route leaves Review checked');
     // H01's shape (no row cue; the snapshot reads うわて): the かみて door never removes the card; the うわて door does
     ctx = app({ mode: 'none', record: h01 });
     before = bytes(ctx.latest);
@@ -801,14 +889,15 @@ function defineRows() {
     assert.equal(await ctx.toggleTaken(NODES.mini, '上手'), false);
     assert.equal(bytes(ctx.latest), before);
     assert.deepEqual(roundTrip(ctx.suppressions), []);
-    // the actual mini painted for a core card while the latest record holds うわて: refused
+    // the actual mini painted for a core card while the latest record holds うわて: refused (Save ▾'s Review row)
     ctx = app({ mode: 'none', record: uwate, view: core, authority });
     let mini = openMini(ctx, '上手');
     assert.equal(mini.seal.disabled, false);
     before = bytes(ctx.latest);
-    await clickSeal(mini.seal);
+    const refused = await reviewOff(mini);
     assert.equal(bytes(ctx.latest), before);
     assert.deepEqual([roundTrip(ctx.suppressions), ctx.sealSyncs], [[], 0]);
+    assert.equal(refused.checked, true, 'a refused route leaves Review checked');
     // H01's shape: the かみて door suppresses nothing; the うわて door suppresses that card for real
     ctx = app({ mode: 'none', record: h01, authority });
     before = bytes(ctx.latest);
@@ -817,11 +906,11 @@ function defineRows() {
     assert.equal(await ctx.toggleTaken(NODES.uwateDoor, '上手'), true);
     assert.deepEqual(roundTrip(learning(ctx)), ['word:earlier', 'word:上手']);
     assert.deepEqual(roundTrip(ctx.latest.taken), []);
-    // the actual mini on a plain core card: the real suppression transition
+    // the actual mini on a plain core card: the real suppression transition, through Save ▾'s Review row
     ctx = app({ mode: 'none', record: core, authority });
     mini = openMini(ctx, '上手');
     const prior = roundTrip(ctx.latest);
-    await clickSeal(mini.seal);
+    await reviewOff(mini);
     assert.equal(ctx.sealSyncs, 1);
     assert.deepEqual(roundTrip(ctx.latest.taken), []);
     assert.deepEqual(roundTrip(learning(ctx)), ['word:earlier', 'word:上手']);
@@ -1511,10 +1600,11 @@ function defineRows() {
     for (const [record, line] of lines) {
       const main = lessonEnd(record);
       const held = enrollOf(main, '上手');
-      assert.deepEqual([held.disabled, held.textContent, held.classList.contains('word-capture-held')], [true, 'memorize', true]);
+      // S · each word's keep is the one Save (保存 · Save); it pinned the old 覚える · memorize label
+      assert.deepEqual([held.disabled, held.textContent, held.classList.contains('word-capture-held')], [true, 'Save', true]);
       assert.equal(byId(main, held.getAttribute('aria-describedby'))?.textContent, line);
-      assert.deepEqual([enrollOf(main, '海').disabled, enrollOf(main, '海').textContent], [false, 'memorize']);
-      assert.equal(byId(main, 'lesson-enroll-all')?.textContent, 'memorize all 1', 'the batch holds only 海');
+      assert.deepEqual([enrollOf(main, '海').disabled, enrollOf(main, '海').textContent], [false, 'Save']);
+      assert.equal(byId(main, 'lesson-enroll-all')?.textContent, 'Save all 1', 'the batch holds only 海');
     }
     // the older set, over the enrolled card and over the history with no card (Codex 17:33:57Z)
     for (const [record, line] of lines) {
@@ -1524,7 +1614,7 @@ function defineRows() {
       assert.deepEqual([held.disabled, held.classList.contains('word-capture-held')], [true, true]);
       assert.equal(byId(main, held.getAttribute('aria-describedby'))?.textContent, line);
       assert.equal(enrollOf(main, '海').disabled, false);
-      assert.equal(byId(main, 'mock-enroll-all')?.textContent, 'memorize all 1 missed');
+      assert.equal(byId(main, 'mock-enroll-all')?.textContent, 'Save all 1');
     }
   });
 
@@ -1538,11 +1628,11 @@ function defineRows() {
     assert(held, 'the 1353320 card holds the spelling: the core subject 上手 still shows its 覚える, held');
     assert.deepEqual([held.disabled, held.classList.contains('word-capture-held')], [true, true]);
     assert.equal(byId(main, held.getAttribute('aria-describedby'))?.textContent, COPY.held.unestablished('上手')[1]);
-    assert.equal(byId(main, 'mock-enroll-all')?.textContent, 'memorize all 1 missed', 'the batch still holds only 海');
+    assert.equal(byId(main, 'mock-enroll-all')?.textContent, 'Save all 1', 'the batch still holds only 海');
     main = olderSetResult(core);
     assert.equal(enrollOf(main, '上手'), undefined, 'a spelling enrolled as itself shows no 覚える, as before');
     assert.equal(all(main, (node) => node.className === 'enroll-held').length, 0, 'and no held line');
-    assert.equal(byId(main, 'mock-enroll-all')?.textContent, 'memorize all 1 missed');
+    assert.equal(byId(main, 'mock-enroll-all')?.textContent, 'Save all 1');
   });
 
   row('X5.setup', 'the route-captured 1353320 card and the card-less studied うわて history, each holding the core spelling 上手', () => {

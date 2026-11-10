@@ -17,6 +17,7 @@ import console from 'node:console';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
@@ -24,6 +25,12 @@ import { fileURLToPath } from 'node:url';
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const OUTPUT = resolve(ROOT, 'prototypes/corridor/data/share_alike/reference-extra.json');
 export const ARCHIVE_SHA = '5dfb850ee88c7bccecf4694cc4d7b1338e608440c5edcb8fefc93216b3471fe6';
+const FACTS_SOURCE = Object.freeze({
+  release: '3.6.2+20260803141815',
+  archiveSha256: ARCHIVE_SHA,
+  dictionaryDate: '2026-08-03',
+  databaseVersion: '2026-215',
+});
 export const sourcePaths = {
   dict: 'prototypes/corridor/data/share_alike/dict.json',
   words: 'prototypes/corridor/data/share_alike/words.json',
@@ -37,7 +44,12 @@ export const sourcePaths = {
   driftKanji: 'apps/app/src/data/generated/drift-kanji.json',
   kanjidicSample: 'corpus/samples/jmdict/kanjidic_sample.jsonl',
   dictionaryIndex: 'prototypes/corridor/data/share_alike/dict-v2/index.json',
+  // Kanji-trust: the complete KANJIDIC2 readings already ship in the SKIP sidecar (same pinned archive);
+  // E3 also projects the complete official on/kun lists for display; raw lesson fields stay untouched.
+  skip: 'prototypes/corridor/data/share_alike/skip.json',
+  joyo: 'tools/fixtures/reference/joyo-2010.json',
 };
+const core = createRequire(import.meta.url)('../prototypes/corridor/reference-core.js');
 const read = (path) => readFileSync(resolve(ROOT, path), 'utf8');
 const json = (path) => JSON.parse(read(path));
 const jsonl = (path) =>
@@ -87,6 +99,207 @@ export function dictionaryCandidates(entries) {
     });
   }
   return (head, reading) => [...(pairs.get(JSON.stringify([head, reading])) || [])];
+}
+
+const byCodePoint = (a, b) => a.codePointAt(0) - b.codePointAt(0);
+const appliesTo = (list, value) =>
+  Array.isArray(list) && (list.includes('*') || list.includes(value));
+export const WORDS_PER_EMPTY_KANJI = 10;
+
+/** K02 reference facts, not lesson answers. All source glosses survive verbatim and radical schemes stay separate. */
+export function kanjiFactsProjection(characters) {
+  const facts = characters
+    .map((row) => {
+      const radicals = row.radicals || [];
+      assert(
+        radicals.every((radical) => ['classical', 'nelson_c'].includes(radical.type)),
+        `Unrecognized radical scheme: ${row.literal}`,
+      );
+      const classical = radicals.filter((radical) => radical.type === 'classical');
+      const nelson = radicals.filter((radical) => radical.type === 'nelson_c');
+      assert(
+        classical.length === 1 && nelson.length <= 1,
+        `Ambiguous radical scheme: ${row.literal}`,
+      );
+      return [
+        row.literal,
+        (row.readingMeaning?.groups || [])
+          .flatMap((group) => group.meanings || [])
+          .filter((meaning) => meaning.lang === 'en')
+          .map((meaning) => meaning.value),
+        classical[0].value,
+        nelson[0]?.value ?? null,
+      ];
+    })
+    .sort((a, b) => byCodePoint(a[0], b[0]));
+  const projectedSha256 = hash(serialize(facts));
+  assert(
+    core.validateKanjiFacts({
+      schemaVersion: 4,
+      kanjiFactsVersion: 1,
+      kanjiFacts: facts,
+      audit: {
+        kanjiFacts: {
+          schemaVersion: 1,
+          ...FACTS_SOURCE,
+          projectedRows: facts.length,
+          projectedSha256,
+        },
+      },
+    }),
+    'Invalid or incomplete KANJIDIC2 reference facts',
+  );
+  return facts;
+}
+
+/**
+ * Kanji-trust projection (K01, K07). Copies facts only; nothing is merged, normalized into a new form or generated.
+ * - kanjiReadings [glyph, on, kun]: every KANJIDIC2 reading of each kanji.json or Jōyō glyph, source order.
+ * - kanjiRecords [glyph, meanings, strokeCount, classicalRadical]: the Jōyō forms kanji.json lacks (剝, 𠮟).
+ * - officialReadings [glyph, reading]: each 常用漢字表 reading that neither kanji.json nor KANJIDIC2 has.
+ * - jmdictWords [glyph, [[seq, writtenForm, reading, firstGloss, formTags]]]: for a Jōyō kanji no shipped word list
+ *   names (headwords, `k` lists or alternate spellings — the app's own rule), up to 10 JMdict entries from the
+ *   shipped dict-v2 data written with it: never a search-only spelling (sK); the reading is one JMdict allows for
+ *   that spelling and the gloss the first of the first sense allowed for both; common spellings first.
+ * - kanjiWithoutWords: the Jōyō kanji no shipped dictionary writes any word with.
+ */
+export function kanjiTrustProjection({
+  kanji,
+  kmeta,
+  dict,
+  words,
+  skip,
+  joyo,
+  index,
+  detail,
+  archiveCharacters,
+}) {
+  const skipBy = new Map(skip.entries.map((entry) => [entry.literal, entry]));
+  const joyoGlyphs = joyo.rows.map((row) => row[0]);
+  assert.deepEqual(
+    [...joyoGlyphs].sort(byCodePoint),
+    Object.keys(kmeta).sort(byCodePoint),
+    'The official table and the shipped stroke data name the same 2,136 characters',
+  );
+  const glyphs = [...new Set([...Object.keys(kanji), ...joyoGlyphs])].sort(byCodePoint);
+  const kanjiReadings = [];
+  for (const glyph of glyphs) {
+    const entry = skipBy.get(glyph);
+    if (!entry || (!entry.readings.on.length && !entry.readings.kun.length)) {
+      assert(!kmeta[glyph], `Jōyō ${glyph} has KANJIDIC2 readings`);
+      continue;
+    }
+    kanjiReadings.push([glyph, [...entry.readings.on], [...entry.readings.kun]]);
+  }
+  const kanjiRecords = joyoGlyphs
+    .filter((glyph) => !kanji[glyph])
+    .sort(byCodePoint)
+    .map((glyph) => {
+      const entry = skipBy.get(glyph);
+      return [glyph, [...entry.meanings], entry.strokeCounts?.[0] ?? null, entry.radical ?? null];
+    });
+  if (archiveCharacters) {
+    const unique = (values) => [...new Set(values)];
+    for (const [glyph, on, kun] of kanjiReadings) {
+      const groups = archiveCharacters.get(glyph)?.readingMeaning?.groups || [];
+      const raw = groups.flatMap((group) => group.readings || []);
+      assert.deepEqual(
+        [on, kun],
+        [
+          unique(raw.filter((reading) => reading.type === 'ja_on').map((reading) => reading.value)),
+          unique(
+            raw.filter((reading) => reading.type === 'ja_kun').map((reading) => reading.value),
+          ),
+        ],
+        `KANJIDIC2 reading parity: ${glyph}`,
+      );
+    }
+  }
+  const projected = new Map(kanjiReadings.map(([glyph, on, kun]) => [glyph, [...on, ...kun]]));
+  const officialReadings = [];
+  for (const [glyph, readings] of joyo.rows) {
+    const present = new Set(
+      [
+        ...(kanji[glyph]?.on || []),
+        ...(kanji[glyph]?.kun || []),
+        ...(projected.get(glyph) || []),
+      ].map(core.readingKey),
+    );
+    for (const reading of readings)
+      if (!present.has(core.readingKey(reading))) officialReadings.push([glyph, reading]);
+  }
+  // The app's own word lists: headwords and `k` lists (D.kanjiWords), then alternate spellings.
+  const buckets = core.kanjiWordBuckets(dict, words);
+  const alternates = core.kanjiAltWords(dict);
+  const empty = new Set(
+    joyoGlyphs.filter((glyph) => !buckets.get(glyph)?.size && !alternates.get(glyph)?.length),
+  );
+  const candidates = new Map([...empty].map((glyph) => [glyph, []]));
+  for (const row of index.entries) {
+    const forms = new Set(row[4].flatMap((form) => [...form]));
+    for (const glyph of forms) if (candidates.has(glyph)) candidates.get(glyph).push(row);
+  }
+  const shardsUsed = new Set();
+  const jmdictWords = [];
+  const searchOnly = [];
+  for (const glyph of [...empty].sort(byCodePoint)) {
+    const picked = [];
+    for (const row of candidates.get(glyph)) {
+      const [seq, , , , , , , , entryCommon] = row;
+      const found = detail(seq);
+      shardsUsed.add(found.shard);
+      const [, kanjiForms, kanaForms, senses] = found.entry;
+      const form = kanjiForms.find(
+        ([text, , tags]) => text.includes(glyph) && !tags.includes('sK'),
+      );
+      if (!form) continue;
+      const kana = kanaForms.find(
+        ([, , tags, applies]) => !tags.includes('sk') && appliesTo(applies, form[0]),
+      );
+      if (!kana) continue;
+      const sense = senses.find(
+        (item) => appliesTo(item[1], form[0]) && appliesTo(item[2], kana[0]) && item[10]?.length,
+      );
+      if (!sense) continue;
+      picked.push({
+        row: [seq, form[0], kana[0], sense[10][0][0], [...form[2]]],
+        formCommon: form[1],
+        entryCommon,
+        rare: form[2].includes('rK'),
+      });
+    }
+    picked.sort(
+      (a, b) =>
+        b.formCommon - a.formCommon ||
+        b.entryCommon - a.entryCommon ||
+        Number(a.rare) - Number(b.rare) ||
+        [...a.row[1]].length - [...b.row[1]].length ||
+        Number(a.row[0]) - Number(b.row[0]),
+    );
+    if (picked.length)
+      jmdictWords.push([glyph, picked.slice(0, WORDS_PER_EMPTY_KANJI).map((item) => item.row)]);
+    else if (candidates.get(glyph).length) searchOnly.push(glyph);
+  }
+  const filled = new Set(jmdictWords.map(([glyph]) => glyph));
+  const kanjiWithoutWords = [...empty].filter((glyph) => !filled.has(glyph)).sort(byCodePoint);
+  return {
+    kanjiReadings,
+    joyoOn: joyo.rows.map(([glyph, readings]) => [
+      glyph,
+      readings.filter((reading) => /[ァ-ヺ]/u.test(reading)),
+    ]),
+    joyoKun: joyo.rows.map(([glyph, readings]) => [
+      glyph,
+      readings.filter((reading) => !/[ァ-ヺ]/u.test(reading)),
+    ]),
+    kanjiRecords,
+    officialReadings,
+    jmdictWords,
+    kanjiWithoutWords,
+    emptyBeforeJmdict: [...empty].sort(byCodePoint),
+    searchOnly,
+    shardsUsed: [...shardsUsed].sort(),
+  };
 }
 
 export function buildReferenceData({ archive, prior } = {}) {
@@ -179,7 +392,8 @@ export function buildReferenceData({ archive, prior } = {}) {
     if (classifiedIds.has(id) && reading)
       wordPairs.set(JSON.stringify([id, reading]), [id, reading]);
   }
-  const candidates = dictionaryCandidates(json(sourcePaths.dictionaryIndex).entries);
+  const dictionaryIndex = json(sourcePaths.dictionaryIndex);
+  const candidates = dictionaryCandidates(dictionaryIndex.entries);
   const wordLinks = [...wordPairs.values()].map(([id, reading]) => [
     id,
     reading,
@@ -209,6 +423,8 @@ export function buildReferenceData({ archive, prior } = {}) {
       ]),
   ].filter(usefulMetadata);
   let pinnedRows;
+  let kanjiFacts;
+  let archiveCharacters = null;
   if (archive) {
     assert.equal(hash(readFileSync(archive)), ARCHIVE_SHA, 'KANJIDIC archive pin mismatch');
     // Python's standard-library ZIP reader avoids dependencies or platform unzip.
@@ -222,6 +438,14 @@ export function buildReferenceData({ archive, prior } = {}) {
       { maxBuffer: 64 * 1024 * 1024 },
     );
     const data = JSON.parse(raw);
+    assert.equal(data.dictDate, FACTS_SOURCE.dictionaryDate, 'KANJIDIC2 dictionary date changed');
+    assert.equal(
+      data.databaseVersion,
+      FACTS_SOURCE.databaseVersion,
+      'KANJIDIC2 database version changed',
+    );
+    kanjiFacts = kanjiFactsProjection(data.characters);
+    archiveCharacters = new Map(data.characters.map((row) => [row.literal, row]));
     assert.equal(data.characters.length, 10384);
     pinnedRows = data.characters
       .filter((row) => indexedGlyphs.has(row.literal) && missing(row.literal))
@@ -247,6 +471,16 @@ export function buildReferenceData({ archive, prior } = {}) {
       'First build needs the pinned --archive; offline checks can reuse an existing sidecar',
     );
     assert.equal(prior.audit?.kanjidicArchive?.sha256, ARCHIVE_SHA);
+    assert(
+      core.validateKanjiFacts(prior),
+      'Complete reference facts require the pinned --archive for their first build',
+    );
+    kanjiFacts = prior.kanjiFacts;
+    assert.equal(
+      prior.audit.kanjiFacts.projectedSha256,
+      hash(serialize(kanjiFacts)),
+      'Reference facts projection integrity mismatch; use the pinned archive to rebuild',
+    );
     pinnedRows = prior.kanjiMetadata.filter((row) => row[5] === 'kanjidic-pinned');
     assert.equal(
       prior.audit.kanjidicArchive.projectedSha256,
@@ -263,8 +497,44 @@ export function buildReferenceData({ archive, prior } = {}) {
     }
   }
   kanjiMetadata.push(...pinnedRows);
+  // dict-v2 detail shards, located exactly as the app locates them (FNV-1a over the ASCII seq, masked).
+  const { sharding } = dictionaryIndex;
+  assert.equal(sharding.id, 'fnv1a32-ascii-seq-mask15');
+  const shardDocs = new Map();
+  const shardPath = (shard) => `prototypes/corridor/data/share_alike/dict-v2/${shard}.json`;
+  const detail = (seq) => {
+    let value = sharding.offsetBasis >>> 0;
+    for (const ch of String(seq)) value = Math.imul(value ^ ch.charCodeAt(0), sharding.prime) >>> 0;
+    const shard = (value & (sharding.shardCount - 1)).toString(16).padStart(2, '0');
+    if (!shardDocs.has(shard)) {
+      const doc = json(shardPath(shard));
+      assert.equal(doc.sourcePin, dictionaryIndex.source.pin, 'detail shard pin');
+      shardDocs.set(shard, new Map(doc.entries.map((entry) => [entry[0], entry])));
+    }
+    const entry = shardDocs.get(shard).get(String(seq));
+    assert(entry, `JMdict detail for ${seq}`);
+    return { shard, entry };
+  };
+  const skip = json(sourcePaths.skip);
+  const joyo = json(sourcePaths.joyo);
+  assert.equal(
+    skip.sources.find((source) => source.release)?.sha256,
+    ARCHIVE_SHA,
+    'skip.json carries the pinned KANJIDIC2',
+  );
+  const trust = kanjiTrustProjection({
+    kanji,
+    kmeta,
+    dict,
+    words,
+    skip,
+    joyo,
+    index: dictionaryIndex,
+    detail,
+    archiveCharacters,
+  });
   return {
-    schemaVersion: 2,
+    schemaVersion: 4,
     pool: 'share_alike',
     sources: [
       {
@@ -291,6 +561,15 @@ export function buildReferenceData({ archive, prior } = {}) {
         attribution: 'KANJIDIC2 — EDRDG; JSON conversion by scriptin/jmdict-simplified.',
         archiveSha256: ARCHIVE_SHA,
       },
+      {
+        name: '常用漢字表（内閣告示第2号、2010年11月30日）',
+        url: joyo.url,
+        fetchedAt: joyo.fetchedAt,
+        pageSha256: joyo.sha256,
+        licence: 'Outside copyright (Japan Copyright Act, art. 13)',
+        attribution:
+          '文化庁「常用漢字表の音訓索引」. Supplies complete official on/kun lists (joyoOn/joyoKun) for display and outside-table on-reading labels and readings KANJIDIC2 lacks (officialReadings). No okurigana is inferred from this table.',
+      },
     ],
     layout: {
       kanken: ['sourceId', 'glyph', 'level', 'form', 'url', 'imageUrl', 'speciesId'],
@@ -306,6 +585,14 @@ export function buildReferenceData({ archive, prior } = {}) {
       kanjiMetadata: ['glyph', 'on', 'kun', 'meanings', 'strokeCount', 'source', 'sourceId?'],
       kanjiLevels: ['glyph', 'family', 'level', 'source', 'sourceId'],
       wordLinks: ['id', 'exactReading', 'candidateJmdictSequences'],
+      kanjiReadings: ['glyph', 'kanjidic2On', 'kanjidic2Kun'],
+      joyoKun: ['glyph', 'officialKunWithoutOkuriganaMarks'],
+      joyoOn: ['glyph', 'officialOn'],
+      kanjiRecords: ['glyph', 'meanings', 'strokeCount', 'classicalRadical'],
+      kanjiFacts: ['glyph', 'englishMeanings', 'classicalRadical', 'nelsonRadicalOrNull'],
+      officialReadings: ['glyph', 'reading'],
+      jmdictWords: ['glyph', 'words[jmdictSeq, writtenForm, reading, firstGloss, writtenFormTags]'],
+      kanjiWithoutWords: ['glyph'],
     },
     kanken: corpus.map((row) => [
       row.entry_id,
@@ -322,8 +609,30 @@ export function buildReferenceData({ archive, prior } = {}) {
       .filter((row) => row.jlpt)
       .map((row) => [row.char, 'jlpt-kanji', row.jlpt, 'kotobako', row.id]),
     wordLinks,
+    kanjiReadings: trust.kanjiReadings,
+    joyoKun: trust.joyoKun,
+    joyoOn: trust.joyoOn,
+    kanjiRecords: trust.kanjiRecords,
+    kanjiFactsVersion: 1,
+    kanjiFacts,
+    officialReadings: trust.officialReadings,
+    jmdictWords: trust.jmdictWords,
+    kanjiWithoutWords: trust.kanjiWithoutWords,
     audit: {
       schemaVersion: 1,
+      kanjiFacts: {
+        schemaVersion: 1,
+        ...FACTS_SOURCE,
+        projectedRows: kanjiFacts.length,
+        projectedSha256: hash(serialize(kanjiFacts)),
+        fields: [
+          'literal',
+          'readingMeaning.groups[].meanings[lang=en].value',
+          'radicals[type=classical].value',
+          'radicals[type=nelson_c].value',
+        ],
+        rule: 'All 10,384 pinned literals, sorted by Unicode scalar. Every English gloss verbatim in source order; no truncation, synonym generation, or deduplication. Classical and Nelson fields are copied separately; absent Nelson is null. No query codes or inferred classifications.',
+      },
       sourceHashes: Object.fromEntries(
         Object.entries(sourcePaths).map(([key, path]) => [key, { path, sha256: hash(read(path)) }]),
       ),
@@ -384,6 +693,48 @@ export function buildReferenceData({ archive, prior } = {}) {
         ],
         ['corpus/datasets/jmdict_idioms/idioms.jsonl', 'No JLPT/Kentei classifications.'],
       ],
+      kanjiTrust: {
+        readingSource: {
+          path: sourcePaths.skip,
+          release: skip.sources.find((source) => source.release).release,
+          archiveSha256: ARCHIVE_SHA,
+          dictionaryDate: skip.provenance.dictionaryDate,
+          databaseVersion: skip.provenance.databaseVersion,
+        },
+        readingScope:
+          'Every kanji.json glyph and the 2,136 characters of the 2010 常用漢字表 (= strokes.json meta).',
+        readingRule:
+          'Exact KANJIDIC2 on/kun source inventories are retained. Display keeps the raw lesson selection first, completes kun from joyoKun, then retains other dictionary readings. KANJIDIC2-attested okurigana are preserved; four ambiguous positions use the reviewed 本則 forms only when dictionary-attested. Any unresolved official reading makes its whole displayed kun list undotted. Affix hyphens stay distinct. Official on readings complete the display; additional dictionary on readings are labelled outside the Jōyō table.',
+        kanjiReadingRows: trust.kanjiReadings.length,
+        joyoOnRows: trust.joyoOn.length,
+        joyoOnReadings: trust.joyoOn.reduce((sum, [, readings]) => sum + readings.length, 0),
+        joyoKunRows: trust.joyoKun.length,
+        joyoKunReadings: trust.joyoKun.reduce((sum, [, readings]) => sum + readings.length, 0),
+        kanjiRecords: trust.kanjiRecords.map(([glyph]) => glyph),
+        officialTable: {
+          path: sourcePaths.joyo,
+          url: joyo.url,
+          fetchedAt: joyo.fetchedAt,
+          pageSha256: joyo.sha256,
+          characters: joyo.counts.characters,
+          readings: joyo.counts.readings,
+        },
+        officialReadingsAdded: trust.officialReadings.map(
+          ([glyph, reading]) => `${glyph}:${reading}`,
+        ),
+        wordFill: {
+          source: `prototypes/corridor/data/share_alike/dict-v2 (JMdict ${dictionaryIndex.source.pin})`,
+          perKanji: WORDS_PER_EMPTY_KANJI,
+          rule: 'Only for a Jōyō kanji no shipped word list names (headwords, k lists, alternate spellings). JMdict entries written with it, never a search-only spelling (sK); reading allowed for that spelling; first gloss of the first sense allowed for both; common spellings first, rare (rK) last, then shorter, then sequence.',
+          emptyBefore: trust.emptyBeforeJmdict.join(''),
+          filled: trust.jmdictWords.map(([glyph]) => glyph).join(''),
+          searchOnlySpellingsOnly: trust.searchOnly.join(''),
+          withoutWords: trust.kanjiWithoutWords.join(''),
+          shardSha256: Object.fromEntries(
+            trust.shardsUsed.map((shard) => [shardPath(shard), hash(read(shardPath(shard)))]),
+          ),
+        },
+      },
       rebuild:
         'node tools/build-reference-data.mjs --archive /path/to/kanjidic2-en-3.6.2+20260803141815.json.zip',
       offlineCheck: 'node tools/build-reference-data.mjs --check',

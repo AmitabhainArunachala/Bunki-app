@@ -1,0 +1,1467 @@
+{
+  "schemaVersion": 1,
+  "acceptedHead": "9aa2c6cf65f06d9c6150c0217434c8d8e926465c",
+  "behaviorBodySha256": "3c57ad6858821e4ed4a5b3f22ea8c25e993d21be3ee1ddd9321f419168f6cc15",
+  "occurrenceIdentity": "zero-based array index and exact name; repeated names are intentional",
+  "groups": {
+    "P": 222,
+    "K": 117,
+    "U": 8,
+    "C": 11,
+    "G": 9,
+    "identity": 1
+  },
+  "rows": [
+    {
+      "name": "P · ENGINE · 書く · ja · parts of speech in the plain school terms",
+      "detail": "[\"動詞（五段・他動詞）\"]"
+    },
+    {
+      "name": "P · ENGINE · 書く · ja · a sense's line prints only when it changes (1)",
+      "detail": "[\"動詞（五段・他動詞）\"]"
+    },
+    {
+      "name": "P · ENGINE · 書く · ja · the pos line holds parts of speech only (\"動詞（五段・他動詞）\")",
+      "detail": "動詞（五段・他動詞）"
+    },
+    {
+      "name": "P · ENGINE · 書く · ja · no Latin in \"動詞（五段・他動詞）\"",
+      "detail": "動詞（五段・他動詞）"
+    },
+    {
+      "name": "K · ENGINE · 書く · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"書\",\"main\":\"か（く）\"}]"
+    },
+    {
+      "name": "K · ENGINE · 書く · ja · no Latin beside 書",
+      "detail": "か（く）"
+    },
+    {
+      "name": "K · ENGINE · 書く · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 書く · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 書く · en · parts of speech in the plain one-line English",
+      "detail": "[\"godan verb, transitive\"]"
+    },
+    {
+      "name": "P · ENGINE · 書く · en · a sense's line prints only when it changes (1)",
+      "detail": "[\"godan verb, transitive\"]"
+    },
+    {
+      "name": "P · ENGINE · 書く · en · the pos line holds parts of speech only (\"godan verb, transitive\")",
+      "detail": "godan verb, transitive"
+    },
+    {
+      "name": "P · ENGINE · 書く · en · plain, no romaji in \"godan verb, transitive\"",
+      "detail": "godan verb, transitive"
+    },
+    {
+      "name": "K · ENGINE · 書く · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"書\",\"main\":\"Write\"}]"
+    },
+    {
+      "name": "P · ENGINE · 書く · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 食べる · ja · parts of speech in the plain school terms",
+      "detail": "[\"動詞（一段・他動詞）\"]"
+    },
+    {
+      "name": "P · ENGINE · 食べる · ja · a sense's line prints only when it changes (1)",
+      "detail": "[\"動詞（一段・他動詞）\"]"
+    },
+    {
+      "name": "P · ENGINE · 食べる · ja · the pos line holds parts of speech only (\"動詞（一段・他動詞）\")",
+      "detail": "動詞（一段・他動詞）"
+    },
+    {
+      "name": "P · ENGINE · 食べる · ja · no Latin in \"動詞（一段・他動詞）\"",
+      "detail": "動詞（一段・他動詞）"
+    },
+    {
+      "name": "K · ENGINE · 食べる · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"食\",\"main\":\"た（べる）\"}]"
+    },
+    {
+      "name": "K · ENGINE · 食べる · ja · no Latin beside 食",
+      "detail": "た（べる）"
+    },
+    {
+      "name": "K · ENGINE · 食べる · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 食べる · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 食べる · en · parts of speech in the plain one-line English",
+      "detail": "[\"ichidan verb, transitive\"]"
+    },
+    {
+      "name": "P · ENGINE · 食べる · en · a sense's line prints only when it changes (1)",
+      "detail": "[\"ichidan verb, transitive\"]"
+    },
+    {
+      "name": "P · ENGINE · 食べる · en · the pos line holds parts of speech only (\"ichidan verb, transitive\")",
+      "detail": "ichidan verb, transitive"
+    },
+    {
+      "name": "P · ENGINE · 食べる · en · plain, no romaji in \"ichidan verb, transitive\"",
+      "detail": "ichidan verb, transitive"
+    },
+    {
+      "name": "K · ENGINE · 食べる · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"食\",\"main\":\"Eat\"}]"
+    },
+    {
+      "name": "P · ENGINE · 食べる · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 勉強 · ja · parts of speech in the plain school terms",
+      "detail": "[\"名詞 · する動詞（他動詞）\",\"名詞 · する動詞（自動詞）\",\"名詞\",\"名詞 · する動詞（自動詞・他動詞）\"]"
+    },
+    {
+      "name": "P · ENGINE · 勉強 · ja · a sense's line prints only when it changes (4)",
+      "detail": "[\"名詞 · する動詞（他動詞）\",\"名詞 · する動詞（自動詞）\",\"名詞\",\"名詞 · する動詞（自動詞・他動詞）\"]"
+    },
+    {
+      "name": "P · ENGINE · 勉強 · ja · the pos line holds parts of speech only (\"名詞 · する動詞（他動詞）\")",
+      "detail": "名詞 · する動詞（他動詞）"
+    },
+    {
+      "name": "P · ENGINE · 勉強 · ja · the pos line holds parts of speech only (\"名詞 · する動詞（自動詞）\")",
+      "detail": "名詞 · する動詞（自動詞）"
+    },
+    {
+      "name": "P · ENGINE · 勉強 · ja · the pos line holds parts of speech only (\"名詞\")",
+      "detail": "名詞"
+    },
+    {
+      "name": "P · ENGINE · 勉強 · ja · the pos line holds parts of speech only (\"名詞 · する動詞（自動詞・他動詞）\")",
+      "detail": "名詞 · する動詞（自動詞・他動詞）"
+    },
+    {
+      "name": "P · ENGINE · 勉強 · ja · no Latin in \"名詞 · する動詞（他動詞）\"",
+      "detail": "名詞 · する動詞（他動詞）"
+    },
+    {
+      "name": "P · ENGINE · 勉強 · ja · no Latin in \"名詞 · する動詞（自動詞）\"",
+      "detail": "名詞 · する動詞（自動詞）"
+    },
+    {
+      "name": "P · ENGINE · 勉強 · ja · no Latin in \"名詞\"",
+      "detail": "名詞"
+    },
+    {
+      "name": "P · ENGINE · 勉強 · ja · no Latin in \"名詞 · する動詞（自動詞・他動詞）\"",
+      "detail": "名詞 · する動詞（自動詞・他動詞）"
+    },
+    {
+      "name": "K · ENGINE · 勉強 · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"勉\",\"main\":\"ベン\"},{\"glyph\":\"強\",\"main\":\"キョウ\"}]"
+    },
+    {
+      "name": "K · ENGINE · 勉強 · ja · no Latin beside 勉",
+      "detail": "ベン"
+    },
+    {
+      "name": "K · ENGINE · 勉強 · ja · no Latin beside 強",
+      "detail": "キョウ"
+    },
+    {
+      "name": "K · ENGINE · 勉強 · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 勉強 · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 勉強 · en · parts of speech in the plain one-line English",
+      "detail": "[\"noun · suru verb, transitive\",\"noun · suru verb, intransitive\",\"noun\",\"noun · suru verb, intransitive and transitive\"]"
+    },
+    {
+      "name": "P · ENGINE · 勉強 · en · a sense's line prints only when it changes (4)",
+      "detail": "[\"noun · suru verb, transitive\",\"noun · suru verb, intransitive\",\"noun\",\"noun · suru verb, intransitive and transitive\"]"
+    },
+    {
+      "name": "P · ENGINE · 勉強 · en · the pos line holds parts of speech only (\"noun · suru verb, transitive\")",
+      "detail": "noun · suru verb, transitive"
+    },
+    {
+      "name": "P · ENGINE · 勉強 · en · the pos line holds parts of speech only (\"noun · suru verb, intransitive\")",
+      "detail": "noun · suru verb, intransitive"
+    },
+    {
+      "name": "P · ENGINE · 勉強 · en · the pos line holds parts of speech only (\"noun\")",
+      "detail": "noun"
+    },
+    {
+      "name": "P · ENGINE · 勉強 · en · the pos line holds parts of speech only (\"noun · suru verb, intransitive\")",
+      "detail": "noun · suru verb, intransitive and transitive"
+    },
+    {
+      "name": "P · ENGINE · 勉強 · en · plain, no romaji in \"noun · suru verb, transitive\"",
+      "detail": "noun · suru verb, transitive"
+    },
+    {
+      "name": "P · ENGINE · 勉強 · en · plain, no romaji in \"noun · suru verb, intransiti\"",
+      "detail": "noun · suru verb, intransitive"
+    },
+    {
+      "name": "P · ENGINE · 勉強 · en · plain, no romaji in \"noun\"",
+      "detail": "noun"
+    },
+    {
+      "name": "P · ENGINE · 勉強 · en · plain, no romaji in \"noun · suru verb, intransiti\"",
+      "detail": "noun · suru verb, intransitive and transitive"
+    },
+    {
+      "name": "K · ENGINE · 勉強 · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"勉\",\"main\":\"Exertion\"},{\"glyph\":\"強\",\"main\":\"Strong\"}]"
+    },
+    {
+      "name": "P · ENGINE · 勉強 · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 高い · ja · parts of speech in the plain school terms",
+      "detail": "[\"い形容詞\"]"
+    },
+    {
+      "name": "P · ENGINE · 高い · ja · a sense's line prints only when it changes (1)",
+      "detail": "[\"い形容詞\"]"
+    },
+    {
+      "name": "P · ENGINE · 高い · ja · the pos line holds parts of speech only (\"い形容詞\")",
+      "detail": "い形容詞"
+    },
+    {
+      "name": "P · ENGINE · 高い · ja · no Latin in \"い形容詞\"",
+      "detail": "い形容詞"
+    },
+    {
+      "name": "K · ENGINE · 高い · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"高\",\"main\":\"たか（い）\"}]"
+    },
+    {
+      "name": "K · ENGINE · 高い · ja · no Latin beside 高",
+      "detail": "たか（い）"
+    },
+    {
+      "name": "K · ENGINE · 高い · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 高い · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 高い · en · parts of speech in the plain one-line English",
+      "detail": "[\"i-adjective\"]"
+    },
+    {
+      "name": "P · ENGINE · 高い · en · a sense's line prints only when it changes (1)",
+      "detail": "[\"i-adjective\"]"
+    },
+    {
+      "name": "P · ENGINE · 高い · en · the pos line holds parts of speech only (\"i-adjective\")",
+      "detail": "i-adjective"
+    },
+    {
+      "name": "P · ENGINE · 高い · en · plain, no romaji in \"i-adjective\"",
+      "detail": "i-adjective"
+    },
+    {
+      "name": "K · ENGINE · 高い · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"高\",\"main\":\"Tall\"}]"
+    },
+    {
+      "name": "P · ENGINE · 高い · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 静か · ja · parts of speech in the plain school terms",
+      "detail": "[\"な形容詞\"]"
+    },
+    {
+      "name": "P · ENGINE · 静か · ja · a sense's line prints only when it changes (1)",
+      "detail": "[\"な形容詞\"]"
+    },
+    {
+      "name": "P · ENGINE · 静か · ja · the pos line holds parts of speech only (\"な形容詞\")",
+      "detail": "な形容詞"
+    },
+    {
+      "name": "P · ENGINE · 静か · ja · no Latin in \"な形容詞\"",
+      "detail": "な形容詞"
+    },
+    {
+      "name": "K · ENGINE · 静か · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"静\",\"main\":\"しず（か）\"}]"
+    },
+    {
+      "name": "K · ENGINE · 静か · ja · no Latin beside 静",
+      "detail": "しず（か）"
+    },
+    {
+      "name": "K · ENGINE · 静か · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 静か · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 静か · en · parts of speech in the plain one-line English",
+      "detail": "[\"na-adjective\"]"
+    },
+    {
+      "name": "P · ENGINE · 静か · en · a sense's line prints only when it changes (1)",
+      "detail": "[\"na-adjective\"]"
+    },
+    {
+      "name": "P · ENGINE · 静か · en · the pos line holds parts of speech only (\"na-adjective\")",
+      "detail": "na-adjective"
+    },
+    {
+      "name": "P · ENGINE · 静か · en · plain, no romaji in \"na-adjective\"",
+      "detail": "na-adjective"
+    },
+    {
+      "name": "K · ENGINE · 静か · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"静\",\"main\":\"Quiet\"}]"
+    },
+    {
+      "name": "P · ENGINE · 静か · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 本 · ja · parts of speech in the plain school terms",
+      "detail": "[\"名詞\",\"接頭辞\",\"助数詞\"]"
+    },
+    {
+      "name": "P · ENGINE · 本 · ja · a sense's line prints only when it changes (3)",
+      "detail": "[\"名詞\",\"接頭辞\",\"助数詞\"]"
+    },
+    {
+      "name": "P · ENGINE · 本 · ja · the pos line holds parts of speech only (\"名詞\")",
+      "detail": "名詞"
+    },
+    {
+      "name": "P · ENGINE · 本 · ja · the pos line holds parts of speech only (\"接頭辞\")",
+      "detail": "接頭辞"
+    },
+    {
+      "name": "P · ENGINE · 本 · ja · the pos line holds parts of speech only (\"助数詞\")",
+      "detail": "助数詞"
+    },
+    {
+      "name": "U · ENGINE · 本 · ja · the usage tags sit beside their sense as quiet tags",
+      "detail": "[\"〔スポーツ〕\",\"〔武道〕\"]"
+    },
+    {
+      "name": "P · ENGINE · 本 · ja · no Latin in \"名詞\"",
+      "detail": "名詞"
+    },
+    {
+      "name": "P · ENGINE · 本 · ja · no Latin in \"接頭辞\"",
+      "detail": "接頭辞"
+    },
+    {
+      "name": "P · ENGINE · 本 · ja · no Latin in \"助数詞\"",
+      "detail": "助数詞"
+    },
+    {
+      "name": "K · ENGINE · 本 · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"本\",\"main\":\"ホン\"}]"
+    },
+    {
+      "name": "K · ENGINE · 本 · ja · no Latin beside 本",
+      "detail": "ホン"
+    },
+    {
+      "name": "K · ENGINE · 本 · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 本 · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 本 · en · parts of speech in the plain one-line English",
+      "detail": "[\"noun\",\"prefix\",\"counter\"]"
+    },
+    {
+      "name": "P · ENGINE · 本 · en · a sense's line prints only when it changes (3)",
+      "detail": "[\"noun\",\"prefix\",\"counter\"]"
+    },
+    {
+      "name": "P · ENGINE · 本 · en · the pos line holds parts of speech only (\"noun\")",
+      "detail": "noun"
+    },
+    {
+      "name": "P · ENGINE · 本 · en · the pos line holds parts of speech only (\"prefix\")",
+      "detail": "prefix"
+    },
+    {
+      "name": "P · ENGINE · 本 · en · the pos line holds parts of speech only (\"counter\")",
+      "detail": "counter"
+    },
+    {
+      "name": "U · ENGINE · 本 · en · the usage tags sit beside their sense as quiet tags",
+      "detail": "[\"sports\",\"martial arts\"]"
+    },
+    {
+      "name": "P · ENGINE · 本 · en · plain, no romaji in \"noun\"",
+      "detail": "noun"
+    },
+    {
+      "name": "P · ENGINE · 本 · en · plain, no romaji in \"prefix\"",
+      "detail": "prefix"
+    },
+    {
+      "name": "P · ENGINE · 本 · en · plain, no romaji in \"counter\"",
+      "detail": "counter"
+    },
+    {
+      "name": "K · ENGINE · 本 · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"本\",\"main\":\"Book\"}]"
+    },
+    {
+      "name": "P · ENGINE · 本 · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · ため · ja · parts of speech in the plain school terms",
+      "detail": "[\"名詞 · 副詞\"]"
+    },
+    {
+      "name": "P · ENGINE · ため · ja · a sense's line prints only when it changes (1)",
+      "detail": "[\"名詞 · 副詞\"]"
+    },
+    {
+      "name": "P · ENGINE · ため · ja · the pos line holds parts of speech only (\"名詞 · 副詞\")",
+      "detail": "名詞 · 副詞"
+    },
+    {
+      "name": "U · ENGINE · ため · ja · the usage tags sit beside their sense as quiet tags, once at the entry",
+      "detail": "[\"〔ふつうかなで書く〕\"]"
+    },
+    {
+      "name": "U · ENGINE · ため · ja · the entry-wide tag shows exactly once",
+      "detail": "[\"〔ふつうかなで書く〕\"]"
+    },
+    {
+      "name": "P · ENGINE · ため · ja · no Latin in \"名詞 · 副詞\"",
+      "detail": "名詞 · 副詞"
+    },
+    {
+      "name": "K · ENGINE · ため · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"為\",\"main\":\"ため\"}]"
+    },
+    {
+      "name": "K · ENGINE · ため · ja · no Latin beside 為",
+      "detail": "ため"
+    },
+    {
+      "name": "K · ENGINE · ため · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · ため · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · ため · en · parts of speech in the plain one-line English",
+      "detail": "[\"noun · adverb\"]"
+    },
+    {
+      "name": "P · ENGINE · ため · en · a sense's line prints only when it changes (1)",
+      "detail": "[\"noun · adverb\"]"
+    },
+    {
+      "name": "P · ENGINE · ため · en · the pos line holds parts of speech only (\"noun · adverb\")",
+      "detail": "noun · adverb"
+    },
+    {
+      "name": "U · ENGINE · ため · en · the usage tags sit beside their sense as quiet tags, once at the entry",
+      "detail": "[\"usually written in kana\"]"
+    },
+    {
+      "name": "U · ENGINE · ため · en · the entry-wide tag shows exactly once",
+      "detail": "[\"usually written in kana\"]"
+    },
+    {
+      "name": "P · ENGINE · ため · en · plain, no romaji in \"noun · adverb\"",
+      "detail": "noun · adverb"
+    },
+    {
+      "name": "K · ENGINE · ため · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"為\",\"main\":\"Do\"}]"
+    },
+    {
+      "name": "P · ENGINE · ため · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 来る · ja · parts of speech in the plain school terms",
+      "detail": "[\"動詞（カ変・自動詞）\",\"補助動詞（カ変）\",\"動詞（カ変・自動詞）\"]"
+    },
+    {
+      "name": "P · ENGINE · 来る · ja · the pos line holds parts of speech only (\"動詞（カ変・自動詞）\")",
+      "detail": "動詞（カ変・自動詞）"
+    },
+    {
+      "name": "P · ENGINE · 来る · ja · the pos line holds parts of speech only (\"補助動詞（カ変）\")",
+      "detail": "補助動詞（カ変）"
+    },
+    {
+      "name": "P · ENGINE · 来る · ja · the pos line holds parts of speech only (\"動詞（カ変・自動詞）\")",
+      "detail": "動詞（カ変・自動詞）"
+    },
+    {
+      "name": "P · ENGINE · 来る · ja · no Latin in \"動詞（カ変・自動詞）\"",
+      "detail": "動詞（カ変・自動詞）"
+    },
+    {
+      "name": "P · ENGINE · 来る · ja · no Latin in \"補助動詞（カ変）\"",
+      "detail": "補助動詞（カ変）"
+    },
+    {
+      "name": "P · ENGINE · 来る · ja · no Latin in \"動詞（カ変・自動詞）\"",
+      "detail": "動詞（カ変・自動詞）"
+    },
+    {
+      "name": "K · ENGINE · 来る · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"来\",\"main\":\"く（る）\"}]"
+    },
+    {
+      "name": "K · ENGINE · 来る · ja · no Latin beside 来",
+      "detail": "く（る）"
+    },
+    {
+      "name": "K · ENGINE · 来る · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 来る · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 来る · en · parts of speech in the plain one-line English",
+      "detail": "[\"kuru verb, intransitive\",\"kuru subsidiary verb\",\"kuru verb, intransitive\"]"
+    },
+    {
+      "name": "P · ENGINE · 来る · en · the pos line holds parts of speech only (\"kuru verb, intransitive\")",
+      "detail": "kuru verb, intransitive"
+    },
+    {
+      "name": "P · ENGINE · 来る · en · the pos line holds parts of speech only (\"kuru subsidiary verb\")",
+      "detail": "kuru subsidiary verb"
+    },
+    {
+      "name": "P · ENGINE · 来る · en · the pos line holds parts of speech only (\"kuru verb, intransitive\")",
+      "detail": "kuru verb, intransitive"
+    },
+    {
+      "name": "P · ENGINE · 来る · en · plain, no romaji in \"kuru verb, intransitive\"",
+      "detail": "kuru verb, intransitive"
+    },
+    {
+      "name": "P · ENGINE · 来る · en · plain, no romaji in \"kuru subsidiary verb\"",
+      "detail": "kuru subsidiary verb"
+    },
+    {
+      "name": "P · ENGINE · 来る · en · plain, no romaji in \"kuru verb, intransitive\"",
+      "detail": "kuru verb, intransitive"
+    },
+    {
+      "name": "K · ENGINE · 来る · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"来\",\"main\":\"Come\"}]"
+    },
+    {
+      "name": "P · ENGINE · 来る · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 見る · ja · parts of speech in the plain school terms",
+      "detail": "[\"動詞（一段・他動詞）\",\"補助動詞（一段）\"]"
+    },
+    {
+      "name": "P · ENGINE · 見る · ja · the pos line holds parts of speech only (\"動詞（一段・他動詞）\")",
+      "detail": "動詞（一段・他動詞）"
+    },
+    {
+      "name": "P · ENGINE · 見る · ja · the pos line holds parts of speech only (\"補助動詞（一段）\")",
+      "detail": "補助動詞（一段）"
+    },
+    {
+      "name": "P · ENGINE · 見る · ja · no Latin in \"動詞（一段・他動詞）\"",
+      "detail": "動詞（一段・他動詞）"
+    },
+    {
+      "name": "P · ENGINE · 見る · ja · no Latin in \"補助動詞（一段）\"",
+      "detail": "補助動詞（一段）"
+    },
+    {
+      "name": "K · ENGINE · 見る · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"見\",\"main\":\"み（る）\"}]"
+    },
+    {
+      "name": "K · ENGINE · 見る · ja · no Latin beside 見",
+      "detail": "み（る）"
+    },
+    {
+      "name": "K · ENGINE · 見る · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 見る · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 見る · en · parts of speech in the plain one-line English",
+      "detail": "[\"ichidan verb, transitive\",\"ichidan subsidiary verb\"]"
+    },
+    {
+      "name": "P · ENGINE · 見る · en · the pos line holds parts of speech only (\"ichidan verb, transitive\")",
+      "detail": "ichidan verb, transitive"
+    },
+    {
+      "name": "P · ENGINE · 見る · en · the pos line holds parts of speech only (\"ichidan subsidiary verb\")",
+      "detail": "ichidan subsidiary verb"
+    },
+    {
+      "name": "P · ENGINE · 見る · en · plain, no romaji in \"ichidan verb, transitive\"",
+      "detail": "ichidan verb, transitive"
+    },
+    {
+      "name": "P · ENGINE · 見る · en · plain, no romaji in \"ichidan subsidiary verb\"",
+      "detail": "ichidan subsidiary verb"
+    },
+    {
+      "name": "K · ENGINE · 見る · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"見\",\"main\":\"See\"}]"
+    },
+    {
+      "name": "P · ENGINE · 見る · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · ゆっくり · ja · parts of speech in the plain school terms",
+      "detail": "[\"副詞（と） · する動詞\",\"副詞\",\"副詞 · する動詞\"]"
+    },
+    {
+      "name": "P · ENGINE · ゆっくり · ja · the pos line holds parts of speech only (\"副詞（と） · する動詞\")",
+      "detail": "副詞（と） · する動詞"
+    },
+    {
+      "name": "P · ENGINE · ゆっくり · ja · the pos line holds parts of speech only (\"副詞\")",
+      "detail": "副詞"
+    },
+    {
+      "name": "P · ENGINE · ゆっくり · ja · the pos line holds parts of speech only (\"副詞 · する動詞\")",
+      "detail": "副詞 · する動詞"
+    },
+    {
+      "name": "U · ENGINE · ゆっくり · ja · the usage tags sit beside their sense as quiet tags",
+      "detail": "[\"〔擬音語・擬態語〕\"]"
+    },
+    {
+      "name": "P · ENGINE · ゆっくり · ja · no Latin in \"副詞（と） · する動詞\"",
+      "detail": "副詞（と） · する動詞"
+    },
+    {
+      "name": "P · ENGINE · ゆっくり · ja · no Latin in \"副詞\"",
+      "detail": "副詞"
+    },
+    {
+      "name": "P · ENGINE · ゆっくり · ja · no Latin in \"副詞 · する動詞\"",
+      "detail": "副詞 · する動詞"
+    },
+    {
+      "name": "K · ENGINE · ゆっくり · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · ゆっくり · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · ゆっくり · en · parts of speech in the plain one-line English",
+      "detail": "[\"to-adverb · suru verb\",\"adverb\",\"adverb · suru verb\"]"
+    },
+    {
+      "name": "P · ENGINE · ゆっくり · en · the pos line holds parts of speech only (\"to-adverb · suru verb\")",
+      "detail": "to-adverb · suru verb"
+    },
+    {
+      "name": "P · ENGINE · ゆっくり · en · the pos line holds parts of speech only (\"adverb\")",
+      "detail": "adverb"
+    },
+    {
+      "name": "P · ENGINE · ゆっくり · en · the pos line holds parts of speech only (\"adverb · suru verb\")",
+      "detail": "adverb · suru verb"
+    },
+    {
+      "name": "U · ENGINE · ゆっくり · en · the usage tags sit beside their sense as quiet tags",
+      "detail": "[\"onomatopoeic or mimetic word\"]"
+    },
+    {
+      "name": "P · ENGINE · ゆっくり · en · plain, no romaji in \"to-adverb · suru verb\"",
+      "detail": "to-adverb · suru verb"
+    },
+    {
+      "name": "P · ENGINE · ゆっくり · en · plain, no romaji in \"adverb\"",
+      "detail": "adverb"
+    },
+    {
+      "name": "P · ENGINE · ゆっくり · en · plain, no romaji in \"adverb · suru verb\"",
+      "detail": "adverb · suru verb"
+    },
+    {
+      "name": "P · ENGINE · ゆっくり · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · です · ja · parts of speech in the plain school terms",
+      "detail": "[\"助動詞（断定）\"]"
+    },
+    {
+      "name": "P · ENGINE · です · ja · the pos line holds parts of speech only (\"助動詞（断定）\")",
+      "detail": "助動詞（断定）"
+    },
+    {
+      "name": "P · ENGINE · です · ja · no Latin in \"助動詞（断定）\"",
+      "detail": "助動詞（断定）"
+    },
+    {
+      "name": "K · ENGINE · です · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · です · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · です · en · parts of speech in the plain one-line English",
+      "detail": "[\"copula\"]"
+    },
+    {
+      "name": "P · ENGINE · です · en · the pos line holds parts of speech only (\"copula\")",
+      "detail": "copula"
+    },
+    {
+      "name": "P · ENGINE · です · en · plain, no romaji in \"copula\"",
+      "detail": "copula"
+    },
+    {
+      "name": "P · ENGINE · です · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 信ずる · ja · parts of speech in the plain school terms",
+      "detail": "[\"動詞（サ変・ずる・他動詞）\"]"
+    },
+    {
+      "name": "P · ENGINE · 信ずる · ja · the pos line holds parts of speech only (\"動詞（サ変・ずる・他動詞）\")",
+      "detail": "動詞（サ変・ずる・他動詞）"
+    },
+    {
+      "name": "P · ENGINE · 信ずる · ja · no Latin in \"動詞（サ変・ずる・他動詞）\"",
+      "detail": "動詞（サ変・ずる・他動詞）"
+    },
+    {
+      "name": "K · ENGINE · 信ずる · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"信\",\"main\":\"シン\"}]"
+    },
+    {
+      "name": "K · ENGINE · 信ずる · ja · no Latin beside 信",
+      "detail": "シン"
+    },
+    {
+      "name": "K · ENGINE · 信ずる · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 信ずる · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 信ずる · en · parts of speech in the plain one-line English",
+      "detail": "[\"zuru verb, transitive\"]"
+    },
+    {
+      "name": "P · ENGINE · 信ずる · en · the pos line holds parts of speech only (\"zuru verb, transitive\")",
+      "detail": "zuru verb, transitive"
+    },
+    {
+      "name": "P · ENGINE · 信ずる · en · plain, no romaji in \"zuru verb, transitive\"",
+      "detail": "zuru verb, transitive"
+    },
+    {
+      "name": "K · ENGINE · 信ずる · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"信\",\"main\":\"Faith\"}]"
+    },
+    {
+      "name": "P · ENGINE · 信ずる · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 時々 · ja · no Latin in \"副詞 · の形容詞\"",
+      "detail": "副詞 · の形容詞"
+    },
+    {
+      "name": "P · ENGINE · 時々 · ja · no Latin in \"の形容詞 · 名詞\"",
+      "detail": "の形容詞 · 名詞"
+    },
+    {
+      "name": "K · ENGINE · 時々 · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"時\",\"main\":\"とき\"}]"
+    },
+    {
+      "name": "K · ENGINE · 時々 · ja · no Latin beside 時",
+      "detail": "とき"
+    },
+    {
+      "name": "K · ENGINE · 時々 · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 時々 · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 時々 · en · plain, no romaji in \"adverb · no-adjective\"",
+      "detail": "adverb · no-adjective"
+    },
+    {
+      "name": "P · ENGINE · 時々 · en · plain, no romaji in \"no-adjective · noun\"",
+      "detail": "no-adjective · noun"
+    },
+    {
+      "name": "K · ENGINE · 時々 · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"時\",\"main\":\"Time\"}]"
+    },
+    {
+      "name": "P · ENGINE · 時々 · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 三つ · ja · no Latin in \"数詞\"",
+      "detail": "数詞"
+    },
+    {
+      "name": "P · ENGINE · 三つ · ja · no Latin in \"名詞\"",
+      "detail": "名詞"
+    },
+    {
+      "name": "K · ENGINE · 三つ · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"三\",\"main\":\"みっ（つ）\"}]"
+    },
+    {
+      "name": "K · ENGINE · 三つ · ja · no Latin beside 三",
+      "detail": "みっ（つ）"
+    },
+    {
+      "name": "K · ENGINE · 三つ · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 三つ · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 三つ · en · plain, no romaji in \"number\"",
+      "detail": "number"
+    },
+    {
+      "name": "P · ENGINE · 三つ · en · plain, no romaji in \"noun\"",
+      "detail": "noun"
+    },
+    {
+      "name": "K · ENGINE · 三つ · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"三\",\"main\":\"Three\"}]"
+    },
+    {
+      "name": "P · ENGINE · 三つ · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 四つ · ja · no Latin in \"数詞\"",
+      "detail": "数詞"
+    },
+    {
+      "name": "P · ENGINE · 四つ · ja · no Latin in \"名詞\"",
+      "detail": "名詞"
+    },
+    {
+      "name": "K · ENGINE · 四つ · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"四\",\"main\":\"よっ（つ）\"}]"
+    },
+    {
+      "name": "K · ENGINE · 四つ · ja · no Latin beside 四",
+      "detail": "よっ（つ）"
+    },
+    {
+      "name": "K · ENGINE · 四つ · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 四つ · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 四つ · en · plain, no romaji in \"number\"",
+      "detail": "number"
+    },
+    {
+      "name": "P · ENGINE · 四つ · en · plain, no romaji in \"noun\"",
+      "detail": "noun"
+    },
+    {
+      "name": "K · ENGINE · 四つ · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"四\",\"main\":\"Four\"}]"
+    },
+    {
+      "name": "P · ENGINE · 四つ · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 羽 · ja · no Latin in \"名詞\"",
+      "detail": "名詞"
+    },
+    {
+      "name": "K · ENGINE · 羽 · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"羽\",\"main\":\"はね\"}]"
+    },
+    {
+      "name": "K · ENGINE · 羽 · ja · no Latin beside 羽",
+      "detail": "はね"
+    },
+    {
+      "name": "K · ENGINE · 羽 · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 羽 · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 羽 · en · plain, no romaji in \"noun\"",
+      "detail": "noun"
+    },
+    {
+      "name": "K · ENGINE · 羽 · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"羽\",\"main\":\"Feathers\"}]"
+    },
+    {
+      "name": "P · ENGINE · 羽 · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 形 · ja · no Latin in \"名詞\"",
+      "detail": "名詞"
+    },
+    {
+      "name": "K · ENGINE · 形 · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"形\",\"main\":\"かたち\"}]"
+    },
+    {
+      "name": "K · ENGINE · 形 · ja · no Latin beside 形",
+      "detail": "かたち"
+    },
+    {
+      "name": "K · ENGINE · 形 · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 形 · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 形 · en · plain, no romaji in \"noun\"",
+      "detail": "noun"
+    },
+    {
+      "name": "K · ENGINE · 形 · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"形\",\"main\":\"Shape\"}]"
+    },
+    {
+      "name": "P · ENGINE · 形 · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 試合 · ja · no Latin in \"名詞 · する動詞（自動詞）\"",
+      "detail": "名詞 · する動詞（自動詞）"
+    },
+    {
+      "name": "K · ENGINE · 試合 · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"試\",\"main\":\"シ\"},{\"glyph\":\"合\",\"main\":\"あい\"}]"
+    },
+    {
+      "name": "K · ENGINE · 試合 · ja · no Latin beside 試",
+      "detail": "シ"
+    },
+    {
+      "name": "K · ENGINE · 試合 · ja · no Latin beside 合",
+      "detail": "あい"
+    },
+    {
+      "name": "K · ENGINE · 試合 · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 試合 · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 試合 · en · plain, no romaji in \"noun · suru verb, intransiti\"",
+      "detail": "noun · suru verb, intransitive"
+    },
+    {
+      "name": "K · ENGINE · 試合 · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"試\",\"main\":\"Test\"},{\"glyph\":\"合\",\"main\":\"Fit\"}]"
+    },
+    {
+      "name": "P · ENGINE · 試合 · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 場合 · ja · no Latin in \"名詞\"",
+      "detail": "名詞"
+    },
+    {
+      "name": "K · ENGINE · 場合 · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"場\",\"main\":\"ば\"},{\"glyph\":\"合\",\"main\":\"あい\"}]"
+    },
+    {
+      "name": "K · ENGINE · 場合 · ja · no Latin beside 場",
+      "detail": "ば"
+    },
+    {
+      "name": "K · ENGINE · 場合 · ja · no Latin beside 合",
+      "detail": "あい"
+    },
+    {
+      "name": "K · ENGINE · 場合 · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 場合 · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 場合 · en · plain, no romaji in \"noun\"",
+      "detail": "noun"
+    },
+    {
+      "name": "K · ENGINE · 場合 · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"場\",\"main\":\"Location\"},{\"glyph\":\"合\",\"main\":\"Fit\"}]"
+    },
+    {
+      "name": "P · ENGINE · 場合 · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 暖かい · ja · no Latin in \"い形容詞\"",
+      "detail": "い形容詞"
+    },
+    {
+      "name": "K · ENGINE · 暖かい · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"暖\",\"main\":\"あたた（かい）\"}]"
+    },
+    {
+      "name": "K · ENGINE · 暖かい · ja · no Latin beside 暖",
+      "detail": "あたた（かい）"
+    },
+    {
+      "name": "K · ENGINE · 暖かい · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 暖かい · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 暖かい · en · plain, no romaji in \"i-adjective\"",
+      "detail": "i-adjective"
+    },
+    {
+      "name": "K · ENGINE · 暖かい · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"暖\",\"main\":\"Warmth\"}]"
+    },
+    {
+      "name": "P · ENGINE · 暖かい · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 食べ物 · ja · no Latin in \"名詞\"",
+      "detail": "名詞"
+    },
+    {
+      "name": "K · ENGINE · 食べ物 · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"食\",\"main\":\"た（べ）\"},{\"glyph\":\"物\",\"main\":\"もの\"}]"
+    },
+    {
+      "name": "K · ENGINE · 食べ物 · ja · no Latin beside 食",
+      "detail": "た（べ）"
+    },
+    {
+      "name": "K · ENGINE · 食べ物 · ja · no Latin beside 物",
+      "detail": "もの"
+    },
+    {
+      "name": "K · ENGINE · 食べ物 · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 食べ物 · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 食べ物 · en · plain, no romaji in \"noun\"",
+      "detail": "noun"
+    },
+    {
+      "name": "K · ENGINE · 食べ物 · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"食\",\"main\":\"Eat\"},{\"glyph\":\"物\",\"main\":\"Thing\"}]"
+    },
+    {
+      "name": "P · ENGINE · 食べ物 · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 組合 · ja · no Latin in \"名詞\"",
+      "detail": "名詞"
+    },
+    {
+      "name": "K · ENGINE · 組合 · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"組\",\"main\":\"くみ\"},{\"glyph\":\"合\",\"main\":\"あい\"}]"
+    },
+    {
+      "name": "K · ENGINE · 組合 · ja · no Latin beside 組",
+      "detail": "くみ"
+    },
+    {
+      "name": "K · ENGINE · 組合 · ja · no Latin beside 合",
+      "detail": "あい"
+    },
+    {
+      "name": "K · ENGINE · 組合 · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 組合 · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 組合 · en · plain, no romaji in \"noun\"",
+      "detail": "noun"
+    },
+    {
+      "name": "K · ENGINE · 組合 · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"組\",\"main\":\"Association\"},{\"glyph\":\"合\",\"main\":\"Fit\"}]"
+    },
+    {
+      "name": "P · ENGINE · 組合 · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 一月 · ja · no Latin in \"名詞\"",
+      "detail": "名詞"
+    },
+    {
+      "name": "K · ENGINE · 一月 · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"一\",\"main\":\"ひと\"},{\"glyph\":\"月\",\"main\":\"つき\"}]"
+    },
+    {
+      "name": "K · ENGINE · 一月 · ja · no Latin beside 一",
+      "detail": "ひと"
+    },
+    {
+      "name": "K · ENGINE · 一月 · ja · no Latin beside 月",
+      "detail": "つき"
+    },
+    {
+      "name": "K · ENGINE · 一月 · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 一月 · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 一月 · en · plain, no romaji in \"noun\"",
+      "detail": "noun"
+    },
+    {
+      "name": "K · ENGINE · 一月 · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"一\",\"main\":\"One\"},{\"glyph\":\"月\",\"main\":\"Month\"}]"
+    },
+    {
+      "name": "P · ENGINE · 一月 · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 口調 · ja · no Latin in \"名詞\"",
+      "detail": "名詞"
+    },
+    {
+      "name": "K · ENGINE · 口調 · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"口\",\"main\":\"ク\"},{\"glyph\":\"調\",\"main\":\"チョウ\"}]"
+    },
+    {
+      "name": "K · ENGINE · 口調 · ja · no Latin beside 口",
+      "detail": "ク"
+    },
+    {
+      "name": "K · ENGINE · 口調 · ja · no Latin beside 調",
+      "detail": "チョウ"
+    },
+    {
+      "name": "K · ENGINE · 口調 · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 口調 · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 口調 · en · plain, no romaji in \"noun\"",
+      "detail": "noun"
+    },
+    {
+      "name": "K · ENGINE · 口調 · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"口\",\"main\":\"Mouth\"},{\"glyph\":\"調\",\"main\":\"Tune\"}]"
+    },
+    {
+      "name": "P · ENGINE · 口調 · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 黒色 · ja · no Latin in \"名詞 · の形容詞\"",
+      "detail": "名詞 · の形容詞"
+    },
+    {
+      "name": "K · ENGINE · 黒色 · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"黒\",\"main\":\"くろ\"},{\"glyph\":\"色\",\"main\":\"いろ\"}]"
+    },
+    {
+      "name": "K · ENGINE · 黒色 · ja · no Latin beside 黒",
+      "detail": "くろ"
+    },
+    {
+      "name": "K · ENGINE · 黒色 · ja · no Latin beside 色",
+      "detail": "いろ"
+    },
+    {
+      "name": "K · ENGINE · 黒色 · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 黒色 · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 黒色 · en · plain, no romaji in \"noun · no-adjective\"",
+      "detail": "noun · no-adjective"
+    },
+    {
+      "name": "K · ENGINE · 黒色 · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"黒\",\"main\":\"Black\"},{\"glyph\":\"色\",\"main\":\"Color\"}]"
+    },
+    {
+      "name": "P · ENGINE · 黒色 · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 男の人 · ja · no Latin in \"表現 · 名詞\"",
+      "detail": "表現 · 名詞"
+    },
+    {
+      "name": "K · ENGINE · 男の人 · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"男\",\"main\":\"おとこ\"},{\"glyph\":\"人\",\"main\":\"ひと\"}]"
+    },
+    {
+      "name": "K · ENGINE · 男の人 · ja · no Latin beside 男",
+      "detail": "おとこ"
+    },
+    {
+      "name": "K · ENGINE · 男の人 · ja · no Latin beside 人",
+      "detail": "ひと"
+    },
+    {
+      "name": "K · ENGINE · 男の人 · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 男の人 · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 男の人 · en · plain, no romaji in \"expression · noun\"",
+      "detail": "expression · noun"
+    },
+    {
+      "name": "K · ENGINE · 男の人 · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"男\",\"main\":\"Male\"},{\"glyph\":\"人\",\"main\":\"Person\"}]"
+    },
+    {
+      "name": "P · ENGINE · 男の人 · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 一生 · ja · no Latin in \"名詞 · の形容詞 · 副詞\"",
+      "detail": "名詞 · の形容詞 · 副詞"
+    },
+    {
+      "name": "P · ENGINE · 一生 · ja · no Latin in \"の形容詞\"",
+      "detail": "の形容詞"
+    },
+    {
+      "name": "K · ENGINE · 一生 · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"一\",\"main\":\"\"},{\"glyph\":\"生\",\"main\":\"\"}]"
+    },
+    {
+      "name": "K · ENGINE · 一生 · ja · no Latin beside 一",
+      "detail": ""
+    },
+    {
+      "name": "K · ENGINE · 一生 · ja · no Latin beside 生",
+      "detail": ""
+    },
+    {
+      "name": "K · ENGINE · 一生 · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 一生 · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 一生 · en · plain, no romaji in \"noun · no-adjective · adverb\"",
+      "detail": "noun · no-adjective · adverb"
+    },
+    {
+      "name": "P · ENGINE · 一生 · en · plain, no romaji in \"no-adjective\"",
+      "detail": "no-adjective"
+    },
+    {
+      "name": "K · ENGINE · 一生 · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"一\",\"main\":\"One\"},{\"glyph\":\"生\",\"main\":\"Life\"}]"
+    },
+    {
+      "name": "P · ENGINE · 一生 · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 狩人 · ja · no Latin in \"名詞\"",
+      "detail": "名詞"
+    },
+    {
+      "name": "K · ENGINE · 狩人 · ja · the kanji rows read the kanji’s own readings (or nothing)",
+      "detail": "[{\"glyph\":\"狩\",\"main\":\"かり\"},{\"glyph\":\"人\",\"main\":\"\"}]"
+    },
+    {
+      "name": "K · ENGINE · 狩人 · ja · no Latin beside 狩",
+      "detail": "かり"
+    },
+    {
+      "name": "K · ENGINE · 狩人 · ja · no Latin beside 人",
+      "detail": ""
+    },
+    {
+      "name": "K · ENGINE · 狩人 · ja · the label surfaces carry no English",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 狩人 · ja · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "P · ENGINE · 狩人 · en · plain, no romaji in \"noun\"",
+      "detail": "noun"
+    },
+    {
+      "name": "K · ENGINE · 狩人 · en · the kanji rows read the English keyword",
+      "detail": "[{\"glyph\":\"狩\",\"main\":\"Hunt\"},{\"glyph\":\"人\",\"main\":\"Person\"}]"
+    },
+    {
+      "name": "P · ENGINE · 狩人 · en · no page error",
+      "detail": "[]"
+    },
+    {
+      "name": "C · ENGINE · 藍 · the quiet usage tag keeps C1 (≥ 4.5:1)"
+    },
+    {
+      "name": "C · ENGINE · 墨 · the quiet usage tag keeps C1 (≥ 4.5:1)"
+    },
+    {
+      "name": "C · ENGINE · 朱 · the quiet usage tag keeps C1 (≥ 4.5:1)"
+    },
+    {
+      "name": "C · ENGINE · 赤 · the quiet usage tag keeps C1 (≥ 4.5:1)"
+    },
+    {
+      "name": "C · ENGINE · 柿 · the quiet usage tag keeps C1 (≥ 4.5:1)"
+    },
+    {
+      "name": "C · ENGINE · 浪 · the quiet usage tag keeps C1 (≥ 4.5:1)"
+    },
+    {
+      "name": "C · ENGINE · 板 · the quiet usage tag keeps C1 (≥ 4.5:1)"
+    },
+    {
+      "name": "C · ENGINE · 雷 · the quiet usage tag keeps C1 (≥ 4.5:1)"
+    },
+    {
+      "name": "C · ENGINE · 漆 · the quiet usage tag keeps C1 (≥ 4.5:1)"
+    },
+    {
+      "name": "C · ENGINE · 金 · the quiet usage tag keeps C1 (≥ 4.5:1)"
+    },
+    {
+      "name": "C · ENGINE · 殻 · the quiet usage tag keeps C1 (≥ 4.5:1)"
+    },
+    {
+      "name": "G · ENGINE · 390 · the begin control sits inside the first viewport"
+    },
+    {
+      "name": "G · ENGINE · 390 · the begin label is centred in its 48 px button (|above − below| ≤ 3 px)"
+    },
+    {
+      "name": "G · ENGINE · 390 · the box is filled, not a tall empty stretch (its own content past the intro)"
+    },
+    {
+      "name": "G · ENGINE · 390 · no page error"
+    },
+    {
+      "name": "G · ENGINE · 1440 · the begin control sits inside the first viewport"
+    },
+    {
+      "name": "G · ENGINE · 1440 · the begin label is centred in its 48 px button (|above − below| ≤ 3 px)"
+    },
+    {
+      "name": "G · ENGINE · 1440 · the box is filled, not a tall empty stretch (its own content past the intro)"
+    },
+    {
+      "name": "G · ENGINE · mac · the arrival keeps the phone's measure"
+    },
+    {
+      "name": "G · ENGINE · 1440 · no page error"
+    },
+    {
+      "name": "identity · the served site is the expected commit"
+    }
+  ]
+}

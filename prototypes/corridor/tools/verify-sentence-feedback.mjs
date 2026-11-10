@@ -10,8 +10,27 @@ import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } 
 import { extname, isAbsolute, join, resolve } from 'node:path';
 import process from 'node:process';
 import { chromium, webkit } from 'playwright-core';
+import { contextBrowserVersion } from './browser-version-support.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { armRecordWriteFailure, clearRecordWriteFailure, readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+
+/** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
+ * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
+async function answeringRestore(page, run) {
+  let problem;
+  const answer = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', answer);
+  try { const value = await run(); if (problem) throw problem; return value; }
+  catch (error) { throw problem || error; }
+  finally { page.off('dialog', answer); }
+}
 
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable staged KAIRO_SITE_DIR');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
@@ -140,7 +159,7 @@ for (const engine of engines) for (const width of sizes) {
       acceptDownloads: true, ignoreHTTPSErrors: true, ...(engine === 'chromium' ? { args: ['--ignore-certificate-errors'] } : {}),
       recordVideo: { dir: videos, size: { width, height: width === 390 ? 844 : 1050 } },
     });
-    result.browserVersion = context.browser()?.version();
+    result.browserVersion = await contextBrowserVersion(context, { chromium, webkit }[engine]);
     await context.route('**/*', (route) => {
       const url = new URL(route.request().url()); if (url.origin === ORIGIN) return route.continue();
       result.externalRequests.push({ origin: url.origin, pathname: url.pathname }); return route.abort();
@@ -335,8 +354,9 @@ for (const engine of engines) for (const width of sizes) {
     result.observations.push({ name: 'normal-ui-backup', path: backupPath, sha256: hash(readFileSync(backupPath)) });
     await close(); profile = 'profile-restored'; await open(); await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page);
     await lists(page);
-    const timeOrigin = await page.evaluate(() => performance.timeOrigin); await page.locator('#import-file').setInputFiles(backupPath);
-    await page.waitForFunction(old => performance.timeOrigin !== old && document.body?.dataset.ready === '1', timeOrigin, { timeout: 30000 });
+    const timeOrigin = await page.evaluate(() => performance.timeOrigin);
+    await answeringRestore(page, async () => { await page.locator('#import-file').setInputFiles(backupPath);
+      await page.waitForFunction(old => performance.timeOrigin !== old && document.body?.dataset.ready === '1', timeOrigin, { timeout: 30000 }); });
     await close(); await open(); await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page);
     await page.waitForFunction(() => !!navigator.serviceWorker.controller, null, { timeout: 30000 });
     if (engine === 'webkit') disconnected = true; else await context.setOffline(true);

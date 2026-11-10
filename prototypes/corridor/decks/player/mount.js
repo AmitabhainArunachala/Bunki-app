@@ -16,27 +16,44 @@
  */
 import {
   RATINGS,
+  STATE_FORMAT,
+  VERSION,
+  admitDeckGrade,
   buildQueue,
+  buriedToday,
+  buriedWords,
   cardTokens,
+  changeOf,
+  closeLines,
   createScheduler,
   defTokens,
   grade,
   indexDeck,
   inspectState,
   isLeech,
+  isSuspended,
+  LEARN_AHEAD_MS,
   learningSoon,
   logLookup,
+  nextStep,
   normalizeState,
+  pauseWords,
   preview,
+  refusalWords,
   repairCard,
   restoreSuspended,
+  servable,
+  sittingTally,
   skipFor,
   suspendCard,
   swapCard,
   swapTarget,
+  undoChange,
   validateDeck,
   wordStatus,
 } from './engine.js';
+import {isSharedDeck,isSharedStudyMode} from '../../shared-study-content.mjs';
+const sharedPlayer = () => import('./shared-mount.mjs');
 
 const fsrsApi = window.__TSFSRS__ || (await import('../../vendor/ts-fsrs.mjs'));
 const pin = window.__CORRIDOR_BUNDLE__?.['fsrs-pin'] || (await fetchJson(new URL('../../data/fsrs-pin.json', import.meta.url)));
@@ -106,21 +123,26 @@ export function hostAdapter() {
 /* mode: 'read' (読んで思い出す, the contract's default), 'self' (穴埋め, the MCD blank preset) or
  * 'choice' (4択); gloss: the English fold on the back starts closed ('tap') or open ('show', the
  * per-deck "always show" switch); zoom: 'auto' (焦点 once a card has been seen, 全文 on a new one)
- * or the learner's 'full' | 'focus'; ruleSeen: the 「もう一度」 rule under the grade bar was shown
+ * or the learner's 'full' | 'focus'; againCoachSeen: the current 「もう一度」 rule under the grade bar was shown
  * once; sittings: how many sittings this deck has started (the tap and swipe hints retire after
  * HINT_SITTINGS). A stored `hint` (the front hint, retired by STANDARD A37) is ignored. */
-const PREFS_DEFAULT = { newPerDay: 15, mode: 'read', look: 'dark', gloss: 'tap', zoom: 'auto', ruleSeen: false, sittings: 0 };
+const PREFS_DEFAULT = { newPerDay: 15, mode: 'read', gloss: 'tap', zoom: 'auto', againCoachSeen: false, sittings: 0 };
 /** 「タップして答えを見る」 and the swipe hint show for this many sittings per deck, then retire */
 const HINT_SITTINGS = 3;
-const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, log: [], started: 0, q: '', open: null, from: null, toast: '', rail: 0, sheet: null, pop: null };
-let ctx = null; // { root, deck, deckKey, index, storage, onLeave, openEntry, host, tokenFile, gloss, state, prefs, notice }
+// the sitting (srs-core's rule): ahead — the learner chose to review learning steps early; early — the card on screen
+// came by that choice; pause — nothing else is left but cards in a learning step ({ count, words, at, canEarly });
+// shown — the card's stored record when it was put on screen (a grade refuses if another window changed it since)
+const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, log: [], started: 0, q: '', open: null, from: null, toast: '', rail: 0, sheet: null, pop: null, ahead: false, passFrom: 0, early: false, pause: null, shown: 'null', buried: 0 };
+let ctx = null; // { root, deck, deckKey, index, storage, onLeave, openEntry, host, tokenFile, gloss, state, ledgerText, scheduler, prefs, notice }
 let mountRequest = 0;
 let pendingStart = null;
 
 /** Transient reading state belongs to one face, never to the learner ledger. */
 export function capturePresentation({ includeInert = false } = {}) {
   if (!includeInert && ctx?.root?.closest('[inert]')) return null;
-  const face = ctx?.root?.isConnected && ctx.root.querySelector('#kp-card');
+  // L · null, never false: a deck left behind keeps its ctx with a detached root, and `false?.querySelector()` throws
+  // (?. guards only null/undefined), which aborted every later render() — the room change to Guided never came
+  const face = ctx?.root?.isConnected ? ctx.root.querySelector('#kp-card') : null;
   const passage = face?.querySelector('.kp-sentence');
   if (!passage || ui.screen !== 'study') return null;
   return {
@@ -128,6 +150,7 @@ export function capturePresentation({ includeInert = false } = {}) {
     folds: [...face.querySelectorAll('.kp-fold')].map(n => ({ key: [...n.classList].find(c => c.startsWith('kp-f-')), open: n.open })),
     context: [...passage.querySelectorAll('.kp-ctx')].map(n => ({ side: n.dataset.side, open: n.dataset.open || '' })),
     windowed: passage.classList.contains('kp-window'), height: passage.style.getPropertyValue('--kp-window-h'),
+    foldSeatGap: face.querySelector('.kp-folds')?.style.marginTop || '',
     inner: passage.scrollTop, anchor: passage.getBoundingClientRect().top, page: window.scrollY,
     fitted: backFits(),
   };
@@ -144,6 +167,10 @@ function restorePresentation(saved, { seat = true } = {}) {
   const face = ctx.root.querySelector('#kp-card');
   const passage = face?.querySelector('.kp-sentence');
   if (!passage) return;
+  // This spacing belongs to the current reading pose, including a deliberately
+  // scrolled pose that must not be automatically fitted again on return.
+  const folds = face.querySelector('.kp-folds');
+  if (folds) folds.style.marginTop = saved.foldSeatGap || '';
   for (const fold of saved.folds) {
     const node = fold.key && face.querySelector(`.${fold.key}`);
     if (node) node.open = fold.open;
@@ -187,9 +214,10 @@ function backFits() {
   const windowed = passage.classList.contains('kp-window');
   const clearTarget = mark.top >= Math.max(top, windowed ? view.top : top) - 1 && mark.bottom <= Math.min(bottom, windowed ? view.bottom : bottom) + 1;
   const clearToggle = !toggle || (toggle.getBoundingClientRect().top >= top - 1 && toggle.getBoundingClientRect().bottom <= bottom + 1);
-  const clearFolds = [...face.querySelectorAll('.kp-folds > details > summary')].every(node => {
+  const dockTop = barTop + Math.max(0, (parseFloat(getComputedStyle(bar).paddingTop) || 0) - 1);
+  const clearFolds = [...face.querySelectorAll(FOLD_ROWS)].every(node => {
     const row = node.getBoundingClientRect();
-    return !(row.top - lift < barTop - 0.5 && row.bottom - lift > barTop + 0.5);
+    return row.bottom - lift <= bottom + 0.5 || row.top - lift >= dockTop - 0.5;
   });
   return clearToggle && clearTarget && def.getBoundingClientRect().bottom - lift <= bottom + 1 && clearFolds;
 }
@@ -204,7 +232,6 @@ function refitBack(saved, always = false) {
 }
 export async function refitPresentation(always = false) {
   const saved = capturePresentation(), owner = ctx, request = mountRequest;
-  syncDefaultLook();
   if (!saved || externalSheet()) return;
   let touched = false;
   const touch = () => { touched = true; };
@@ -226,25 +253,19 @@ const beforeRestoreKey = (id) => `bunki-cloze:${id}:before-restore`;
 /** a stored ledger this player could not read, set aside before anything is saved over it */
 const quarantineKey = (id) => `bunki-cloze:${id}:quarantine`;
 const prefsKey = (deckId) => `bunki-cloze:prefs:v3:${deckId}`; // one set per deck
-const NIGHT_WORLDS = ['rokusho', 'yoru', 'nami', 'hakuu', 'kaku'];
-const keepsDarkByDay = (deck) => deck.defaults?.look === 'dark' && !NIGHT_WORLDS.includes(document.documentElement.dataset.theme);
-function defaultLook(deck, followWorld) {
-  return followWorld ? (keepsDarkByDay(deck) ? 'dark' : 'world') : (deck.defaults?.look || PREFS_DEFAULT.look);
+/** the deck wears the world (one hand, slice D): a look a deck or a stored preference once named is
+ * ignored and never written back — there is one material */
+function prefsFor(storage, deck) {
+  const defaults = { ...(deck.defaults || {}) };
+  delete defaults.look;
+  const stored = { ...(readJson(storage, prefsKey(deck.id)) || {}) };
+  delete stored.look;
+  return { ...PREFS_DEFAULT, ...defaults, ...stored };
 }
-function prefsFor(storage, deck, followWorld = false) {
-  return { ...PREFS_DEFAULT, ...(deck.defaults || {}), look: defaultLook(deck, followWorld), ...(readJson(storage, prefsKey(deck.id)) || {}) };
-}
-/** Automatic settings saves retain an implicit look as a default, rather than freezing the
- * current day/night resolution. Existing stored choices remain explicit. */
-function storePrefs(prefs, explicitLook = ctx.lookExplicit) {
+function storePrefs(prefs) {
   const stored = { ...prefs };
-  if (!explicitLook) delete stored.look;
+  delete stored.look;
   return writeJson(ctx.storage, prefsKey(ctx.deck.id), stored);
-}
-function syncDefaultLook() {
-  if (!ctx || ctx.lookExplicit) return;
-  ctx.prefs.look = defaultLook(ctx.deck, !!ctx.host);
-  ctx.root.dataset.look = ctx.prefs.look;
 }
 function readJson(storage, key) {
   try {
@@ -295,18 +316,77 @@ function loadState(storage, deck) {
   const storedCards = raw && typeof raw === 'object' && raw.cards && typeof raw.cards === 'object' ? Object.keys(raw.cards).length : 0;
   if (text != null && !Object.keys(state.cards).length && (unreadable || storedCards)) {
     const kept = writeRaw(storage, quarantineKey(deck.id), text);
-    return { state, notice: kept ? QUARANTINED : '' };
+    return { state, notice: kept ? QUARANTINED : '', text };
   }
-  return { state, notice: '' };
+  return { state, notice: '', text };
 }
-/** write a candidate ledger; the caller adopts it only when this returns true */
+/** write a candidate ledger; the caller adopts it only when this returns true. The text written becomes this
+ * window's revision of the ledger (writeLedger). */
 function save(state) {
-  return writeJson(ctx.storage, stateKey(ctx.deck.id), state);
+  if (!ctx || isSharedStudyMode()) return false;
+  const text = JSON.stringify(state);
+  if (!writeRaw(ctx.storage, stateKey(ctx.deck.id), text)) return false;
+  ctx.ledgerText = text;
+  return true;
+}
+/**
+ * The one way a grade, an undo or a repair reaches the ledger: fresh-read-then-write with a revision check.
+ * The revision is the exact stored text this window last read or wrote. When another window (a second tab, an
+ * open standalone page) has written since, its ledger is read again and the change is made on it (merge);
+ * `change(fresh)` may refuse by returning null, as a grade does when its card was answered there. A whole
+ * ledger this window holds is never written over newer grades (sol, 10-19: four six-day dates were rolled back).
+ * A stored ledger that cannot be read is not adopted. Returns { state, before } | { refused: true } | { failed: true }.
+ */
+function readLedger(text, deck) {
+  let raw;
+  try {
+    raw = JSON.parse(text);
+  } catch {
+    return null;
+  }
+  if (!raw || raw.format !== STATE_FORMAT || raw.version !== VERSION || raw.deckId !== deck.id ||
+      !raw.cards || typeof raw.cards !== 'object' || Array.isArray(raw.cards)) return null;
+  const state = normalizeState(raw, deck);
+  return Object.keys(raw.cards).length && !Object.keys(state.cards).length ? null : state;
+}
+
+function writeLedger(change) {
+  let text;
+  try {
+    text = ctx.storage.getItem(stateKey(ctx.deck.id));
+  } catch {
+    text = ctx.ledgerText;
+  }
+  if (text !== ctx.ledgerText && text != null) {
+    const read = readLedger(text, ctx.deck);
+    if (read) {
+      ctx.state = read;
+      ctx.ledgerText = text;
+    }
+  }
+  const before = ctx.state;
+  const next = change(before);
+  if (!next) return { refused: true };
+  if (!save(next)) return { failed: true };
+  ctx.state = next;
+  return { state: next, before };
+}
+/** another window wrote this deck's ledger: read it now, so what this one shows and answers is current */
+function onStorage(e) {
+  if (!ctx?.root?.isConnected || e.storageArea !== ctx.storage || e.key !== stateKey(ctx.deck.id) || e.newValue == null || e.newValue === ctx.ledgerText) return;
+  const read = readLedger(e.newValue, ctx.deck);
+  if (!read) return;
+  ctx.state = read;
+  ctx.ledgerText = e.newValue;
+  // a close that is waiting on cards in a learning step counts them again; the card on screen is checked when answered
+  if (ui.screen === 'home' || (ui.screen === 'study' && !ui.queue[ui.pos])) {
+    if (ui.screen === 'study') refreshPause();
+    paint();
+  }
 }
 /** adopt new settings only once they are stored */
-function savePrefs(prefs, { explicitLook = ctx.lookExplicit } = {}) {
-  if (!storePrefs(prefs, explicitLook)) return saveFailed();
-  ctx.lookExplicit = explicitLook;
+function savePrefs(prefs) {
+  if (!storePrefs(prefs)) return saveFailed();
   ctx.prefs = prefs;
   ui.toast = '';
   paintResponse({ hold: false });
@@ -358,20 +438,10 @@ const UI_EN = {
   "類語": "Related words",
   "同じ字・同じ読みの、学習中の語": "Study words sharing a kanji or reading",
   "参照": "See also",
-  "前の語に戻る": "Back to the previous word",
   "閉じる": "Close",
-  "辞書の全項目を開く": "Open the full dictionary entry",
-  "✓ 覚えるの札にあります": "✓ Saved to your review cards",
-  "リストに追加…": "Add to a list…",
-  "覚える": "Save",
-  "保存できませんでした": "Could not save",
-  "このデッキにあります": "Already in this deck",
-  "ここで止めよう": "Pause here",
-  "この語の日本語の語釈は、まだ辞書にありません": "This word has no Japanese definition in the dictionary yet.",
-  "この語は辞書にありません": "This word is not in the dictionary.",
-  "ここでは覚えるに保存できません（回廊でできます）": "Save to your review cards in KAIRO.",
-  "覚えるの札に入ります — このデッキの予定は変わりません": "Added to your review cards; this deck’s schedule stays the same.",
+  "ここでは保存できません": "Can't save from here.",
   "削除": "Remove",
+  "このカードを削除": "Remove this card",
   "このカードを削除（保留にする・あとで戻せる）": "Remove this card from study (pause it; restore it later)",
   "別の文に替える": "Use another sentence",
   "替えられる文がありません": "No alternative sentence available",
@@ -386,6 +456,8 @@ const UI_EN = {
   "思い出せた": "Recalled",
   "← もう一度　　スワイプ　　正解 →": "← Again　　Swipe　　Good →",
   "このヒントを閉じる": "Dismiss this hint",
+  "この札は別のウィンドウで答えました。次の札へ進みます。": "This card was answered in another window. On to the next one.",
+  "別のウィンドウで答えが変わったので、戻せませんでした。": "The answer changed in another window, so it could not be undone.",
   "おつかれさま": "Session complete",
   "回答": "Answers",
   "思い出せた割合": "Recall rate",
@@ -424,7 +496,7 @@ const UI_EN = {
   "このカードを削除しました（設定 › 保留中のカード から戻せます）。": "Card removed. Restore it from Settings → Paused cards.",
   "別の文に替えました。前の文は保留にしました。": "Changed to another sentence. The previous sentence is paused.",
   "保留にしました（設定 › 保留中のカード から戻せます）。": "Card paused. Restore it from Settings → Paused cards.",
-  "答えを見て理解が深まったなら もう一度": "Choose Again if seeing the answer improved your understanding.",
+  "答えを見て初めて分かったなら「もう一度」": "If the answer was new to you, choose Again",
   "この文だけの英訳は未対応です（全文の英訳と文の区切りが合いません）": "A translation of this sentence is unavailable because the sentence boundaries do not match.",
   "未": "New",
   "学習中": "Learning",
@@ -500,13 +572,15 @@ const UI_EN = {
   "裏：ふりがな付きの全文、読み、品詞、日本語の説明と使い方。英語の意味とその文の英訳はタップで開く。": "The back shows the passage with readings, the target’s reading, part of speech, Japanese definition and usage. Open folds for English meaning and the target sentence’s translation.",
   "文章はすべて書き下ろし。自然さ・事実・レベルを、書き手とは別のモデルが一枚ずつ確かめています。級は公開リストによる目安です。": "Every passage is original. A model separate from its author checks naturalness, facts and level for each card. Level labels are estimates from public lists."
 };
+// a refused grade's one plain line (the shared answer admission, HOOKS-SPEC §3.6): the same wording on every surface
+for (const reason of ['no-shared-admission', 'mark-unavailable']) UI_EN[refusalWords(reason, 'ja')] = refusalWords(reason, 'en');
 const t = (ja, en = UI_EN[ja]) => ctx?.english !== false ? (en ?? ja) : ja;
 
 /* ------------------------------------------------------------- helpers */
 function el(tag, cls, ...kids) {
   const node = document.createElement(tag);
   if (cls) node.className = cls;
-  if (/(?:^| )(?:kp-word|kp-def|kp-note|kp-sheet-def|kp-pop-def)(?: |$)/.test(cls || '')) node.lang = 'ja';
+  if (/(?:^| )(?:kp-word|kp-def|kp-note|kp-pop-def)(?: |$)/.test(cls || '')) node.lang = 'ja';
   for (const kid of kids.flat()) {
     if (kid == null || kid === false) continue;
     node.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
@@ -605,12 +679,10 @@ function displayUnits(card, units) {
     ? { ...unit, word: null, tok: { ...unit.tok, r: 'こむら', personContext: 'komura-jutaro' } } : unit);
 }
 
-/** a reading over its kanji; data-rt lets a host draw the reading as a label above the word
- * instead of as ruby, so showing or hiding it never moves the line */
+/** a reading over its kanji: native ruby, set by the house's one ruby rule (rooms/motion.css); the deck
+ * hides a reading in place (player.css), so showing or hiding it never moves the line */
 function rubyNode(text, reading) {
-  const ruby = el('ruby', null, text, el('rt', null, reading));
-  ruby.dataset.rt = reading;
-  return ruby;
+  return el('ruby', null, text, el('rt', null, reading));
 }
 export function sentenceNodes(card, { front = false, blank = false, ruby = front ? 'none' : 'all', split = false, clamp = false, taps = null }) {
   if (front) {
@@ -619,18 +691,81 @@ export function sentenceNodes(card, { front = false, blank = false, ruby = front
     taps = null; // the front has nothing to tap, whatever is asked
   }
   const cover = taps ? coverOf(card.ja.length, displayUnits(card, taps.units)) : null;
+  // Q · the passage breaks only between its words, the same on both faces (the lead, inbox 1447; MASTER_SPEC §7: the
+  // front stays sealed). Its words are the back's own tap units where it has them (on the front, plain: never a door,
+  // nothing to tap) and, between them, the host's one rule (jaWords); each word of 12 characters or fewer is one
+  // no-break span (.kp-w). A word that is not whole on one face would break the lines apart at the reveal.
+  const frontUnits = front && ctx?.host && !blank ? passageUnits(card) : null;
+  const wordCover = frontUnits ? coverOf(card.ja.length, displayUnits(card, frontUnits)) : cover;
+  const wordEnd = new Array(card.ja.length).fill(0);
+  let wordStart = 0;
+  // the passage's own tokens are the truest words when they have arrived (the same tokens on both faces); the host's
+  // rule glues them as it glues any words, and cuts the text itself (Intl.Segmenter) until they arrive
+  const toks = ctx?.host && ctx.tokenFile ? cardTokens(card, ctx.tokenFile) : null;
+  let segments = null;
+  if (toks?.length) {
+    segments = [];
+    let cursor = 0;
+    for (const t of [...toks].sort((a, b) => a.at - b.at)) {
+      if (!(t.at >= cursor) || card.ja.slice(t.at, t.at + t.s.length) !== t.s) continue;
+      if (t.at > cursor) segments.push(card.ja.slice(cursor, t.at));
+      segments.push(t.s);
+      cursor = t.at + t.s.length;
+    }
+    if (cursor < card.ja.length) segments.push(card.ja.slice(cursor));
+  }
+  for (const group of (ctx?.words ? ctx.words(card.ja, segments) : [])) {
+    const len = group.join('').length;
+    for (let i = wordStart; i < wordStart + len && i < wordEnd.length; i++) wordEnd[i] = wordStart + len;
+    wordStart += len;
+  }
+  // a tap unit is one word too: the rule's word around it grows to hold it whole
+  for (const u of wordCover ? new Set(wordCover.filter(Boolean)) : []) {
+    const end = Math.max(...Array.from({ length: u.len }, (_, j) => wordEnd[u.at + j] || 0), u.at + u.len);
+    for (let i = u.at; i < end && i < wordEnd.length; i++) wordEnd[i] = Math.max(wordEnd[i], end);
+  }
   const out = el('p', 'kp-sentence');
   out.lang = 'ja';
+  if (segments) out.dataset.words = 'tokens';
   const ends = split ? sentenceEnds(card.ja) : [card.ja.length];
   let host = out;
   let at = 0; // offset in card.ja of the next character
   let k = 0; // the sentence being filled
+  let word = null, wordUntil = -1; // the no-break span of the word being filled, and where that word ends
+  // a line may end between two words: an explicit <wbr> stands between them, outside their no-break spans (WebKit
+  // offers no break between two no-break spans side by side: the back ran on one line, 4,000 px wide, at 320)
+  const breakBefore = (parent) => {
+    const last = parent.lastChild;
+    if (last && !(last.nodeType === 1 && last.tagName === 'WBR')) parent.append(document.createElement('wbr'));
+  };
   const open = () => {
+    word = null;
     if (!split) return;
     host = el('span', 'kp-s');
+    breakBefore(out);
     out.append(host);
   };
   open();
+  /** the box a piece at [at, at + len) goes into: the current word's span while the piece is inside that word */
+  const plain = () => {
+    if (host.lastChild?.nodeType === 1 && host.lastChild.classList.contains('kp-w')) breakBefore(host);
+    word = null;
+    return host;
+  };
+  const boxFor = (len) => {
+    if (!wordEnd[at]) return plain();
+    if (word && word.parentNode === host && at < wordUntil) {
+      wordUntil = Math.max(wordUntil, wordEnd[Math.min(at + len, wordEnd.length) - 1] || 0);
+      return word;
+    }
+    const end = Math.max(wordEnd[at], wordEnd[Math.min(at + len, wordEnd.length) - 1] || 0);
+    if (end - at > 12) return plain();
+    word = el('span', 'kp-w');
+    breakBefore(host);
+    host.append(word);
+    wordUntil = end;
+    return word;
+  };
   // A word kept on one line (ruby, kp-nb: a host may set white-space: nowrap on it) must still leave
   // a line break open before a kept word right after it (小村|寿太郎), or the pair would move to the
   // next line as one and leave a short line behind: a <wbr> goes between them, where the next one goes.
@@ -641,19 +776,23 @@ export function sentenceNodes(card, { front = false, blank = false, ruby = front
   // (one word, several ruby segments) until a sentence starts a new host
   const put = (node, isTarget, len, unit = null) => {
     if (split && isTarget === 1) host.dataset.focus = '1';
-    const gap = keptBefore && kept(edge(node, false)) ? document.createElement('wbr') : null;
+    let gap = keptBefore && kept(edge(node, false)) ? document.createElement('wbr') : null;
     keptBefore = kept(edge(node, true));
+    const box = boxFor(len);
+    // Q · the break between two kept words is a break between words: never inside one word's span or one tap unit
+    // (Chromium honours a <wbr> inside a no-break span: 先入｜観); a word's span already has its own break before it
+    if (box !== host) gap = null;
     if (unit) {
-      let tok = host.lastChild;
+      let tok = box.lastChild;
       if (!(tok && tok.kpUnit === unit)) {
         tok = tapNode(el('span', 'kp-tok'), unit, taps.onTap);
-        host.append(tok);
+        if (gap) box.append(gap);
+        box.append(tok);
       }
-      if (gap) tok.append(gap);
       tok.append(node);
     } else {
-      if (gap) host.append(gap);
-      host.append(node);
+      if (gap) box.append(gap);
+      box.append(node);
     }
     at += len;
     while (split && k < ends.length - 1 && at >= ends[k]) {
@@ -684,7 +823,7 @@ export function sentenceNodes(card, { front = false, blank = false, ruby = front
     if (hasRuby) return put(rubyNode(text, reading), 0, len, unitOver(at, len));
     if (keep && !cover) return put(el('span', 'kp-nb', text), 0, len);
     // plain text may hold a sentence end or a word edge: cut it there so each sentence keeps its
-    // own words and each word its own tap target
+    // own words and each word its own tap target (and, Q, its own no-break span)
     let rest = text;
     while (rest) {
       let cut = rest.length;
@@ -695,83 +834,29 @@ export function sentenceNodes(card, { front = false, blank = false, ruby = front
         while (j < cut && cover[at + j] === u) j++;
         cut = j;
       }
+      if (wordEnd[at] && wordEnd[at] - at < cut) cut = wordEnd[at] - at;
       put(document.createTextNode(rest.slice(0, cut)), 0, cut, cover ? cover[at] : null);
       rest = rest.slice(cut);
     }
   });
   if (clamp && split) clampContext(out);
-  if (taps || ruby === 'all') {
-    reflowWatch?.observe(out);
-    document.fonts?.ready.then(() => out.isConnected && seatReadings(out));
-  }
+  if (taps) ctx?.host?.installProseWords?.(out, '.kp-tok');
+  if (taps || ruby === 'all') reflowWatch?.observe(out);
   return out;
 }
 
 /** Whenever a passage reflows (width, zoom, an opened fold, fonts): a word that wraps onto a second
  * line would centre its 44px reach (.kp-tok::before) on the gap between the two lines and reach over
- * the words of both, so it keeps only its printed boxes (kp-split); and the readings are re-seated. */
+ * the words of both, so it keeps only its printed boxes (kp-split). Readings are native ruby: the
+ * line lays them out itself, so nothing is seated by hand. */
 const reflowWatch = typeof ResizeObserver === 'function'
   ? new ResizeObserver((entries) => {
     for (const { target } of entries) {
       if (!target.isConnected) { reflowWatch.unobserve(target); continue; }
       for (const tok of target.querySelectorAll('.kp-tok')) tok.classList.toggle('kp-split', tok.getClientRects().length > 1);
-      seatReadings(target);
     }
   })
   : null;
-let rtMeasure = null;
-/** A host may draw each reading above its word (ruby[data-rt]::after; the app does, so the line
- * never moves) instead of laying it out as ruby. A reading wider than its word would then run into
- * its neighbour's reading or past the edge of the line. Each line's readings are seated left to
- * right: centred on the word where there is room, nudged apart (and inside the line) where there is
- * not, and narrowed to the word plus one reading character at most (--kp-rt-dx, --kp-rt-fit). */
-function seatReadings(sentence) {
-  const rubies = [...sentence.querySelectorAll('ruby[data-rt]')];
-  if (!rubies.length) return;
-  const style = getComputedStyle(rubies[0], '::after');
-  const size = parseFloat(style.fontSize);
-  if (!size) return;
-  rtMeasure ||= document.createElement('canvas').getContext('2d');
-  if (rtMeasure) rtMeasure.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-  const spacing = parseFloat(style.letterSpacing) || 0;
-  const gap = size * 0.2;
-  const lines = new Map();
-  for (const ruby of rubies) {
-    ruby.style.removeProperty('--kp-rt-dx');
-    ruby.style.removeProperty('--kp-rt-fit');
-    const rects = ruby.getClientRects();
-    if (rects.length !== 1 || !rects[0].width) continue;
-    const r = rects[0];
-    let block = ruby.parentElement;
-    while (block !== sentence && !/^(block|flex|flow-root|list-item)$/.test(getComputedStyle(block).display)) block = block.parentElement;
-    const text = ruby.dataset.rt;
-    const natural = (rtMeasure ? rtMeasure.measureText(text).width : [...text].length * size) + spacing * [...text].length;
-    const width = Math.min(natural, r.width + size);
-    const key = `${Math.round(r.bottom / 4)}`; // one line of the block
-    if (!lines.has(block)) lines.set(block, new Map());
-    const row = lines.get(block);
-    if (!row.has(key)) row.set(key, []);
-    row.get(key).push({ ruby, centre: (r.left + r.right) / 2, natural, width, x: (r.left + r.right) / 2 - width / 2 });
-  }
-  for (const [block, rows] of lines) {
-    const b = block.getBoundingClientRect(), cs = getComputedStyle(block);
-    const lo = b.left + parseFloat(cs.paddingLeft), hi = b.right - parseFloat(cs.paddingRight);
-    for (const items of rows.values()) {
-      items.sort((p, q) => p.centre - q.centre);
-      items.forEach((it, i) => { it.x = Math.max(it.x, i ? items[i - 1].x + items[i - 1].width + gap : lo); });
-      for (let i = items.length - 1; i >= 0; i--) {
-        const it = items[i], limit = i < items.length - 1 ? items[i + 1].x - gap : hi;
-        if (it.x + it.width > limit) it.x = limit - it.width;
-      }
-      for (const it of items) {
-        const dx = it.x + it.width / 2 - it.centre;
-        if (Math.abs(dx) >= 0.5) it.ruby.style.setProperty('--kp-rt-dx', `${dx.toFixed(1)}px`);
-        if (it.width < it.natural - 0.5) it.ruby.style.setProperty('--kp-rt-fit', (it.width / it.natural).toFixed(3));
-      }
-    }
-  }
-}
-
 /** 焦点 on a long passage: the sentences before the target and those after it each become one
  * group. 全文 lays the groups out inline (nothing changes); 焦点 folds each to two dimmed lines
  * (the before group shows its last two, the after group its first two) and fitClamps adds a ⋯
@@ -829,8 +914,6 @@ function paint() {
   if (!ctx?.root?.isConnected) return;
   const root = ctx.root;
   root.replaceChildren();
-  syncDefaultLook();
-  root.dataset.look = ctx.prefs.look;
   // the first sittings of a deck name the task on each card; after them the marked word says it alone
   root.dataset.hints = hintsOn() ? '1' : '0';
   root.dataset.readings = ctx.prefs.readings === 'off' ? 'off' : 'on';
@@ -848,7 +931,6 @@ function paint() {
   fitBar();
   fitClamps(root);
   ui.pop = null; // its word was just redrawn
-  if (ui.sheet) drawSheet({ focus: false });
 }
 /** on a phone the grade bar is fixed to the bottom of the screen: keep room for it under the card */
 function fitBar() {
@@ -884,7 +966,7 @@ function titleParts(deck) {
 function homeScreen() {
   const { deck, state, prefs } = ctx;
   const now = new Date();
-  const q = buildQueue(deck, state, now, prefs.newPerDay, { skip: skipFor(prefs.mode) });
+  const q = buildQueue(deck, state, now, prefs.newPerDay, { skip: skipFor(prefs.mode), buried: buriedToday(ctx.storage, deck.id, now) });
   const statuses = deck.words.map((w) => wordStatus(w, state));
   const known = statuses.filter((s) => s.key === 'known').length;
   const hard = statuses.filter((s) => s.key === 'hard').length;
@@ -911,9 +993,19 @@ function homeScreen() {
   box.append(tiles);
 
   const total = q.queue.length;
-  const start = btn('kp-start', total ? t(`始める — ${fmtN(total)}枚`, `Begin — ${nounEn(total, 'card')}`) : t("今日はここまで"), () => startSession(), { id: 'kp-start' });
-  start.disabled = !total;
+  // nothing due, but cards still in a learning step: they wait for their time, and the sitting's close offers them early
+  const stepping = total ? [] : learningCards(now);
+  const nextStepAt = stepping.length ? Math.min(...stepping.map((l) => l.due)) : 0;
+  const label = total
+    ? t(`始める — ${fmtN(total)}枚`, `Begin — ${nounEn(total, 'card')}`)
+    : stepping.length
+      ? t(`学習中 ${fmtN(stepping.length)}枚 — 次は ${fmtWait(Math.max(0, nextStepAt - now.getTime()))}後`, `${nounEn(stepping.length, 'card')} in a learning step — next in ${fmtWait(Math.max(0, nextStepAt - now.getTime()))}`)
+      : t("今日はここまで");
+  const start = btn('kp-start', label, () => startSession(), { id: 'kp-start' });
+  start.disabled = !total && !stepping.length;
   box.append(start);
+  // cards whose word was answered on another surface today rest until tomorrow (burying across decks), said quietly
+  if (q.buried) box.append(el('p', 'kp-sub kp-buried', buriedWords(q.buried, ctx.english === false ? 'ja' : 'en')));
 
   const foot = el('div', 'kp-foot');
   foot.append(btn('kp-link', t("語の一覧"), () => go('list'), { id: 'kp-to-list' }), btn('kp-link', t("設定"), () => go('settings'), { id: 'kp-to-settings' }));
@@ -939,12 +1031,13 @@ function topicSettings() {
     box2.checked = !off.has(g.id);
     box2.dataset.group = g.id;
     box2.addEventListener('change', () => {
-      const set = new Set(ctx.state.groupsOff);
-      if (box2.checked) set.delete(g.id);
-      else set.add(g.id);
-      const nextState = { ...ctx.state, groupsOff: [...set] };
-      if (!save(nextState)) return saveFailed();
-      ctx.state = nextState;
+      const r = writeLedger((fresh) => {
+        const set = new Set(fresh.groupsOff);
+        if (box2.checked) set.delete(g.id);
+        else set.add(g.id);
+        return { ...fresh, groupsOff: [...set] };
+      });
+      if (r.failed) return saveFailed();
       ui.toast = '';
       paintResponse({ hold: false });
     });
@@ -965,7 +1058,6 @@ function topicSettings() {
 function go(screen) {
   ui.screen = screen;
   ui.toast = '';
-  ui.sheet = null;
   paintResponse({ resetScroll: true, front: true });
 }
 
@@ -982,16 +1074,17 @@ function frameFront() {
   window.scrollTo({ top: 0, behavior: 'instant' });
   // in the app the reveal is the screen's right half, not a docked button: the floor is the screen's
   // own foot, and a marked word below it opens in view, its sentence in the middle of the page
+  const undo = ctx.root.querySelector('.kp-study > .kp-undo');
   if (target && dock && getComputedStyle(dock).position === 'fixed') {
     const t = target.getBoundingClientRect();
     const ceil = topInset() + 16;
-    const floor = innerHeight - 56;
+    // a showing Undo stands over the page's foot (sticky above the tabs): the word stops 16 px above it too
+    const floor = Math.min(innerHeight - 56, undo && getComputedStyle(undo).position === 'sticky' ? undo.getBoundingClientRect().top - 16 : Infinity);
     if (t.bottom > floor) window.scrollTo({ top: Math.max(0, Math.round((t.top + t.bottom) / 2 - (ceil + floor) / 2)), behavior: 'instant' });
     return;
   }
   if (!target || !dock || getComputedStyle(dock).position !== 'sticky') return;
   const t = target.getBoundingClientRect();
-  const undo = ctx.root.querySelector('.kp-study > .kp-undo');
   const floor = Math.min(dock.getBoundingClientRect().top, undo && getComputedStyle(undo).position === 'sticky' ? undo.getBoundingClientRect().top : Infinity) - 16;
   const ceil = topInset() + 16;
   if (t.bottom <= floor) return;
@@ -999,7 +1092,7 @@ function frameFront() {
 }
 
 function startSession() {
-  const q = buildQueue(ctx.deck, ctx.state, new Date(), ctx.prefs.newPerDay, { skip: skipFor(ctx.prefs.mode) });
+  const q = buildQueue(ctx.deck, ctx.state, new Date(), ctx.prefs.newPerDay, { skip: skipFor(ctx.prefs.mode), buried: buriedToday(ctx.storage, ctx.deck.id, new Date()) });
   // one more sitting of this deck: the tap and swipe hints count these (HINT_SITTINGS). Not stored
   // (storage full) only means they show a little longer.
   const prefs = { ...ctx.prefs, sittings: (Number(ctx.prefs.sittings) || 0) + 1 };
@@ -1013,7 +1106,10 @@ function startSession() {
   ui.started = Date.now();
   ui.undo = null;
   ui.rail = 0;
-  refill();
+  ui.ahead = false;
+  ui.passFrom = 0;
+  ui.buried = q.buried;
+  settle();
   resetCard();
   wantTokens();
   go('study');
@@ -1023,18 +1119,71 @@ function resetCard() {
   ui.revealed = false;
   ui.seen = false;
   ui.picked = null;
-  ui.sheet = null;
   ui.pop = null;
 }
 
-/** pull learning steps that came due back into the sitting, right after the
- * card under the cursor (never in its place: the card on screen never changes) */
-function refill() {
+/** this sitting's learning and relearning cards (the deck's, in its topics and mode), each with its due */
+function learningCards(now) {
+  return learningSoon(ctx.deck, ctx.state, now, Infinity, { skip: skipFor(ctx.prefs.mode) }).map(({ id, t }) => ({ id, due: t }));
+}
+/**
+ * Put the sitting's next card at the cursor, by srs-core's rule (Anki's order): a learning step that is due now;
+ * else the next card still waiting (a due review or a new card) that may still be answered now; else, with nothing
+ * else left, the steps still to come: shown early only once the learner chose to (ui.ahead), otherwise the close
+ * pauses on them (ui.pause) and offers that choice. The card on screen is never replaced: this runs only between
+ * cards. A waiting card another window has since answered is dropped here.
+ */
+function settle() {
   const now = new Date();
-  const ahead = new Set(ui.queue.slice(ui.pos));
-  for (const { id, t } of learningSoon(ctx.deck, ctx.state, now, 0, { skip: skipFor(ctx.prefs.mode) })) {
-    if (!ahead.has(id) && t <= now.getTime()) ui.queue.splice(ui.pos + 1, 0, id);
+  const waiting = [];
+  // a word answered on another surface since the sitting began rests too (its 字 cards and learning steps stay)
+  const rests = buriedToday(ctx.storage, ctx.deck.id, now);
+  for (const id of ui.queue.slice(ui.pos)) {
+    if (waiting.includes(id) || isSuspended(ctx.state, id) || !ctx.index.cards.has(id)) continue;
+    const s = ctx.state.cards[id];
+    if (!servable(s, now) || (s && s.state !== 2 && s.state !== 0)) continue;
+    const { card, word } = ctx.index.cards.get(id);
+    if (card.type !== 'kanji' && rests(word)) {
+      ui.buried++;
+      continue;
+    }
+    waiting.push(id);
   }
+  const queued = new Set(waiting);
+  const learning = learningCards(now).filter((l) => !queued.has(l.id));
+  const step = nextStep({ now, queue: waiting, learning, ahead: ui.ahead });
+  ui.queue = [...ui.queue.slice(0, ui.pos), ...waiting];
+  ui.early = false;
+  ui.pause = null;
+  if (step.show) {
+    ui.queue = [...ui.queue.slice(0, ui.pos), step.show, ...waiting.filter((id) => id !== step.show)];
+    ui.early = step.early;
+    ui.shown = JSON.stringify(ctx.state.cards[step.show] ?? null);
+  } else if (step.pause) {
+    const words = new Set(learning.map((l) => ctx.index.cards.get(l.id)?.word.id));
+    ui.pause = { count: step.count, words: words.size, at: step.at, canEarly: step.canEarly };
+  }
+}
+/** the close's pause, read again when a step falls due or comes within the learn-ahead limit, or another window wrote:
+ * the close stays until the learner chooses ("they will wait for you"); a step that is due now reads "due now" */
+function refreshPause() {
+  const now = new Date();
+  const learning = learningCards(now);
+  if (!learning.length) {
+    ui.pause = null;
+    return;
+  }
+  const next = Math.min(...learning.map((l) => l.due));
+  const words = new Set(learning.map((l) => ctx.index.cards.get(l.id)?.word.id));
+  ui.pause = { count: learning.length, words: words.size, at: Math.max(next, now.getTime()), canEarly: next - now.getTime() <= LEARN_AHEAD_MS };
+}
+/** the close's choice: review the cards in a learning step now (early, when they are not due yet) */
+function reviewAhead() {
+  ui.ahead = true;
+  ui.passFrom = ui.pos;
+  settle();
+  resetCard();
+  paintResponse({ resetScroll: true, front: true });
 }
 
 /** the answer mode for the card on screen. 4択 offers whole words, and the rest
@@ -1070,14 +1219,23 @@ function studyScreen() {
   if (!id) return doneScreen();
   const { card, word } = ctx.index.cards.get(id);
   const mode = cardMode();
-  const total = ui.queue.length;
+  // the early pass chosen at the close counts its own cards: those answered in it, this one, and the steps still to come
+  const from = ui.ahead ? ui.passFrom : 0;
+  const total = ui.ahead ? ui.pos - from + new Set([id, ...learningCards(new Date()).map((l) => l.id), ...ui.queue.slice(ui.pos + 1)]).size : ui.queue.length;
   const top = el('header', 'kp-top kp-top-study');
-  top.append(btn('kp-icon', '×', () => go('home'), { 'aria-label': t("終わる"), id: 'kp-quit' }));
+  // the house's one top bar (one hand): this is its instance while a card is up — 44, one back glyph (drawn by the
+  // frame), its own middle (the rail and the count)
+  top.dataset.bar = 'deck';
+  const quit = btn('kp-icon', '', () => go('home'), { 'aria-label': t("終わる"), id: 'kp-quit' });
+  quit.dataset.barBack = '';
+  quit.append(el('span', 'kp-sr', t("終わる")));
+  top.append(quit);
   const prog = el('div', 'kp-progress');
   // a short sitting draws one segment per card (the rail itself still ticks by transform)
   if (total > 1 && total <= 30) prog.style.setProperty('--kp-n', String(total));
-  prog.append(rail(ui.pos / total));
-  top.append(prog, el('span', 'kp-count', `${ui.pos + 1}/${total}`), deleteButton());
+  prog.append(rail((ui.pos - from) / total));
+  // 削除 is not here (Hfix-1B, the lead's round-1 ruling): a card is taken out on its back, never from a front
+  top.append(prog, el('span', 'kp-count', `${ui.pos - from + 1}/${total}`));
   box.append(top);
 
   const stored = ctx.state.cards[id];
@@ -1098,7 +1256,11 @@ function studyScreen() {
     ...passageChips(card),
     TOPIC[card.topic] ? null : el('span', 'kp-chip', t(ctx.deck.groups.find((g) => g.id === word.group)?.titleJa || '', ctx.deck.groups.find((g) => g.id === word.group)?.titleEn || '')),
     word.level ? levelChip(word.level) : null,
-    el('span', `kp-chip ${stored ? 'kp-st-learn' : 'kp-st-new'}`, stored ? t("復習") : t("初めて")),
+    // where the card is in its schedule: never seen, still in a learning step, or a review
+    // (the focus room draws only the step one: kp-st-step)
+    // shown before its step is due, by the learner's choice at the close, it says so and why, in the words every
+    // surface uses (context cards, saved words, your own texts)
+    el('span', `kp-chip ${!stored ? 'kp-st-new' : stored.state === 1 || stored.state === 3 ? `kp-st-learn kp-st-step${ui.early ? ' kp-st-early' : ''}` : 'kp-st-learn'}`, !stored ? t("初めて") : stored.state === 1 || stored.state === 3 ? (ui.early ? t('学習中 · 少し早め（ほかに札がないため）', 'Learning · a few minutes early (nothing else left)') : t('学習中', 'Learning')) : t("復習")),
   );
   // the card's one instruction, as its eyebrow (chrome: it names the task, never the answer)
   chips.prepend(cardEyebrow(card, mode));
@@ -1158,6 +1320,11 @@ function studyScreen() {
     if (mode === 'choice') {
       const ok = ui.picked === word.id;
       box.append(el('p', `kp-verdict ${ok ? 'kp-c-known' : 'kp-c-hard'}`, ok ? t("正解") : t(`不正解 — 正しくは ${word.term}`, `Incorrect — the answer is ${word.term}`)));
+      const after = ctx.state.cards[id];
+      if (after && (after.state === 1 || after.state === 3)) {
+        const back = fmtWait(Math.max(0, new Date(after.due).getTime() - Date.now()));
+        box.append(el('p', 'kp-stepnote', t(`学習中：${back}後にもう一度出ます。`, `Learning: it comes back in ${back}.`)));
+      }
       box.append(btn('kp-next', t("次へ →"), () => next(), { id: 'kp-next' }));
     } else {
       box.append(gradeBar(id));
@@ -1172,18 +1339,32 @@ function studyScreen() {
         ui.revealed = true;
         commit(RATINGS.again, { stay: true });
       }, { id: 'kp-dunno' }),
+      footBand(),
     );
   } else {
-    box.append(btn('kp-reveal', t("答えを見る"), reveal, { id: 'kp-reveal' }));
+    // the foot's band turns the card where the stage beside it does: its right half in the focus room
+    box.append(btn('kp-reveal', t("答えを見る"), reveal, { id: 'kp-reveal' }), footBand((e) => {
+      if (!ctx.focusRoom || !Number.isFinite(e.clientX) || e.clientX >= innerWidth / 2) reveal();
+    }));
   }
   if (ui.undo) box.append(btn('kp-undo', t("ひとつ戻す"), undo, { id: 'kp-undo' }));
   return box;
 }
 
+/** Hfix-1B · the band under the front's foot (editorial.css draws it in the app; player.css keeps it out of the standalone
+ * pages). A real element, not the study's ::after: it covers the passage that scrolls under it, so a tap there lands on the
+ * band (onTap, if any) and a reading of the page, a contrast sweep's included, finds that text covered, not shown */
+function footBand(onTap) {
+  const band = el('i', 'kp-foot-band');
+  band.setAttribute('aria-hidden', 'true');
+  if (onTap) band.addEventListener('click', onTap);
+  return band;
+}
+
 /** what the front asks, in one line: the marked word (読んで思い出す) or the gap (穴埋め・4択) */
 function cardEyebrow(card, mode) {
   const ji = card.type === 'kanji';
-  const label = mode === 'read' && !ji ? t('印の語を思い出す', 'Recall the marked word') : ji ? t('空所の字を思い出す', 'Recall the missing kanji') : t('空所の語を思い出す', 'Recall the missing word');
+  const label = mode === 'read' && !ji ? t('印のついた語を思い出す', 'Recall the marked word') : ji ? t('空所の字を思い出す', 'Recall the missing kanji') : t('空所の語を思い出す', 'Recall the missing word');
   // a passage's back puts the 全文／焦点 toggle on this row in place of the instruction: the front keeps
   // the row at the toggle's height, so the reveal neither grows the card's head nor moves the passage
   const n = el('span', `kp-eyebrow${card.type ? ' kp-eyebrow-zoom' : ''}`, el('span', 'kp-eyebrow-t', label));
@@ -1191,17 +1372,6 @@ function cardEyebrow(card, mode) {
   return n;
 }
 
-const THEMES = [
-  ['world', '全体のテーマ', '#fbf8f1', '#1f3a5f'],
-  ['dark', '墨', '#0a0e13', '#3fd0ff'],
-  ['ai', '藍', '#141a28', '#e9e2d2'],
-  ['matcha', '抹茶', '#13261a', '#a6e06a'],
-  ['kokuban', '黒板', '#1f2f28', '#ffe066'],
-  ['washi', '和紙', '#fbf6ea', '#93301a'],
-  ['sakura', '桜', '#fde7ec', '#a1264a'],
-  ['light', '白', '#ffffff', '#005f98'],
-  ['contrast', '高', '#000000', '#ffff00'],
-];
 const POS = { noun: ['noun', '名詞'], verb: ['verb', '動詞'], 'い-adjective': ['adj', '形容詞'], 'な-adjective': ['adj', '形容動詞'], adverb: ['adv', '副詞'], expression: ['expr', '表現'], 'sound word': ['sound', '擬音語'], kanji: ['noun', '漢字'] };
 const posKey = (pos) => (POS[pos] || ['noun'])[0];
 /** the part of speech as the interface names it: 名詞 in 日本語, "noun" in EN (never Japanese chrome in EN) */
@@ -1371,7 +1541,7 @@ function answerBlock(card, word) {
   // has one, else the word's; the deck's English notes go behind 英語
   const jaNote = word.tip && !/[A-Za-z]/.test(word.tip);
   const note = (typeof card.tipJa === 'string' && card.tipJa) || (jaNote ? word.tip : '');
-  if (note) a.append(el('p', `kp-note${note === card.tipJa ? ' kp-note-passage' : ''}`, note));
+  if (note) a.append(answerWords(el('p', `kp-note${note === card.tipJa ? ' kp-note-passage' : ''}`), note));
   // a leech's repair ladder (§4) sits after tier one and before the folds, so the word, its
   // reading and the definition stay pinned under the passage on every card (learning-design L1)
   if (isLeech(ctx.state, card.id)) a.append(leechLadder(card, word));
@@ -1528,8 +1698,8 @@ function seeAlsoLine(card, word) {
 
 /* ------------------------------------------------ tap → define → 覚える (CARD_CONTRACT_V2 §3, STANDARD A44)
  * After the reveal only, every word of the passage and of the Japanese definition is a tap
- * target (a word, a kanji, a grammar cue as one, and any word of this deck; particles, endings
- * and punctuation are not words and stay plain). With a host lexicon (the corridor) a tap opens
+ * target (a word, a kanji, a grammar cue as one, particles and endings; punctuation and
+ * phonetic annotations stay plain). With a host lexicon (the corridor) taps use its shared ladder into
  * the entry sheet: the reading, the Japanese sense, English behind 英語, and the corridor's one-tap
  * 覚える (A51); a word of this deck says 「このデッキにあります」 and offers no 覚える (A17). A word in
  * the sheet's definition opens one more sheet, and that second one says 「ここで止めよう」 and offers
@@ -1537,13 +1707,7 @@ function seeAlsoLine(card, word) {
  * own words are tappable, from the page's built-in gloss map, and a tap shows a small popover with
  * no 覚える. A tap is capture, never evidence: it never grades, never changes a card's schedule and
  * never adds a card; it is written to the ledger's lookups[] for the sensei and nowhere else. */
-const SHEET_DEPTH = 2;
-const IN_DECK = 'このデッキにあります';
-const STOP_HERE = 'ここで止めよう';
-const NO_JA = 'この語の日本語の語釈は、まだ辞書にありません';
-const NOT_FOUND = 'この語は辞書にありません';
-const NO_TAKE_HERE = 'ここでは覚えるに保存できません（回廊でできます）';
-const TAKE_NOTE = '覚えるの札に入ります — このデッキの予定は変わりません';
+const NO_TAKE_HERE = 'ここでは保存できません';
 const SELF_UNIT = Object.freeze({ self: true });
 const GLOSS_FORMAT = 'bunki-cloze-gloss';
 const ENTRY_KIND = { word: '語', kanji: '字', grammar: '文法' };
@@ -1565,7 +1729,22 @@ function wantTokens() {
     if (ctx?.deck !== deck || ctx.tokenFile) return;
     ctx.tokenFile = file;
     if (ui.screen === 'study' && ui.revealed) upgradeTaps();
+    else if (ui.screen === 'study') upgradeFront();
   });
+}
+
+/** Q · the front's words from the passage's own tokens once they arrive (Intl.Segmenter cut 簡単なんだ｜ろうと where
+ * the tokens hold だろう): the same text, its words as the back's, still sealed: plain, no doors */
+function upgradeFront() {
+  const id = ui.queue[ui.pos];
+  const face = ctx.root.querySelector('#kp-card');
+  const old = face?.querySelector(':scope > .kp-sentence');
+  if (!id || !face || face.dataset.card !== id || !old || old.dataset.words === 'tokens') return;
+  const { card } = ctx.index.cards.get(id);
+  const sentence = sentenceNodes(card, { front: true, blank: cardMode() !== 'read', split: !!card.type });
+  if (sentence.dataset.words !== 'tokens') return;
+  if (old.classList.contains('kp-enter')) sentence.classList.add('kp-enter');
+  old.replaceWith(sentence);
 }
 
 /** character offset → the unit covering it, or null */
@@ -1588,13 +1767,41 @@ function deckWordOf(t) {
   return null;
 }
 
-/** tokens → tap units { at, len, tok, word }: a 語, a 字, a 文法 cue (its tokens joined), or any
- * token that is a word of this deck */
+/** Parenthetical kana matching the preceding written word are a reading annotation,
+ * not another occurrence. Keep the original token offsets and displayed text. */
+function phoneticAnnotationRanges(tokens) {
+  const text = tokens.map((token) => token.s).join('');
+  const kana = (value) => String(value || '').replace(/[ァ-ヶ]/gu, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0x60)).replace(/[\s・]/gu, '');
+  const ranges = [];
+  for (const match of text.matchAll(/[（(]([\p{Script=Hiragana}\p{Script=Katakana}ー・\s]+)[）)]/gu)) {
+    let reading = '', written = '', edge = match.index;
+    for (let i = tokens.length - 1; i >= 0; i -= 1) {
+      const token = tokens[i];
+      if (token.at + token.s.length > edge) continue;
+      if (token.at + token.s.length !== edge || !/^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}ー々]+$/u.test(token.s)) break;
+      const r = token.r || (/^[\p{Script=Hiragana}\p{Script=Katakana}ー]+$/u.test(token.s) ? token.s : '');
+      if (!r) break;
+      reading = kana(r) + reading;
+      written = token.s + written;
+      edge = token.at;
+      if (reading === kana(match[1]) && /\p{Script=Han}/u.test(written)) {
+        ranges.push([match.index, match.index + match[0].length]);
+        break;
+      }
+      if (reading.length >= kana(match[1]).length) break;
+    }
+  }
+  return ranges;
+}
+
+/** Tokens → tap units, preserving grammar cues and every other Japanese occurrence. */
 function unitsOfTokens(tokens) {
   const out = [];
+  const annotations = phoneticAnnotationRanges(tokens);
   for (const t of tokens) {
+    if (annotations.some(([start, end]) => t.at < end && t.at + t.s.length > start)) continue;
     const word = deckWordOf(t);
-    if (t.k === 'other' && !word) continue;
+    if (t.k === 'other' && !word && !/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(t.s)) continue;
     const last = out.at(-1);
     if (!word && t.k === '文法' && last && !last.word && last.tok.k === '文法' && last.tok.ref === t.ref && last.at + last.len === t.at) {
       last.len += t.s.length;
@@ -1644,23 +1851,33 @@ function onDown(e) {
   if (ui.pop && !e.target.closest?.('.kp-pop')) closePop();
 }
 
-/** make node one tap target: role button, in the tab order, no look of its own until hover or focus */
+/** Hosted prose uses the shared paragraph controller; standalone keeps its native keyboard fallback. */
 function tapNode(node, unit, onTap) {
   node.classList.add('kp-tok');
   node.kpUnit = unit;
-  node.setAttribute('role', 'button');
-  node.tabIndex = 0;
-  node.setAttribute('aria-haspopup', 'dialog');
+  node.dataset.japaneseLookup = 'deck-word';
+  if (unit.word?.term || unit.tok?.s) node.dataset.proseLabel = unit.tok?.s || unit.word.term;
+  const hostedProse = typeof ctx?.host?.installProseWords === 'function';
+  if (!hostedProse) {
+    node.setAttribute('role', 'button');
+    node.tabIndex = 0;
+    node.setAttribute('aria-haspopup', 'dialog');
+  }
   if (unit.word) node.dataset.deckWord = unit.word.id;
   node.kpTap = () => onTap(unit, node);
+  // G5 · the player root's one hold finds the word it is held on by this (wireDeckHold); the word keeps only its tap's
+  // own listeners
+  node.kpHoldUnit = unit;
   node.addEventListener('click', (e) => {
     e.stopPropagation();
     if (dragged(e)) return;
+    // the release of a hold is never a tap (G5)
+    if (e.detail !== 0 && node.kpHeldAt && Date.now() - node.kpHeldAt < 700) return;
     // Transparent 44px reaches can overlap in prose. A pointer still chooses the printed
     // word nearest its point, rather than whichever neighbouring reach paints last.
     let chosen = node;
     if (e.detail && Number.isFinite(e.clientX) && Number.isFinite(e.clientY)) {
-      const prose = node.closest('.kp-sentence, .kp-def, .kp-sheet-def');
+      const prose = node.closest('.kp-sentence, .kp-def');
       let best = Infinity;
       for (const candidate of prose?.querySelectorAll('.kp-tok') || []) {
         for (const box of candidate.getClientRects()) {
@@ -1675,12 +1892,88 @@ function tapNode(node, unit, onTap) {
     chosen.kpTap();
   });
   node.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
+    if (hostedProse || e.defaultPrevented || (e.key !== 'Enter' && e.key !== ' ')) return;
     e.preventDefault();
     e.stopPropagation();
     onTap(unit, node);
   });
   return node;
+}
+
+/* G5 · hold = seal on the card's back (MASTER_SPEC §4 G; the front stays sealed until the answer): a finger held still on a
+ * back word, a right-click or Shift+F10 keeps it through the corridor's one keep (host.take, add-only) and opens the strip
+ * beside it (host.addToList, seal). The ring under the finger is the corridor's own (its seam, when the page is hosted). A
+ * hold that moves is a scroll; a hold belongs to its pointer; its release is never a tap. One set of listeners on the
+ * player's root serves every back word (each carries its unit as kpHoldUnit), so a tap target keeps only its tap's own.
+ * Standalone pages have no host and no hold. */
+const HOLD_MS = 500, HOLD_RING_MS = 150, HOLD_MOVE = 9;
+function holdWord(root, target) {
+  for (let node = target; node && node !== root; node = node.parentNode) if (node.kpHoldUnit) return node;
+  return null;
+}
+function wireDeckHold(root) {
+  let hold = null;
+  const clear = () => {
+    const h = hold;
+    if (!h) return;
+    hold = null;
+    clearTimeout(h.timer);
+    clearTimeout(h.ringTimer);
+    if (!h.done) h.ring?.cancel();
+  };
+  const commit = (h) => {
+    if (hold !== h || h.done) return;
+    h.done = true;
+    clearTimeout(h.timer);
+    clearTimeout(h.ringTimer);
+    h.node.kpHeldAt = Date.now();
+    void held(h.node.kpHoldUnit, h.node, { ring: h.ring });
+  };
+  root.addEventListener('pointerdown', (e) => {
+    clear();
+    if (e.pointerType === 'mouse' || e.isPrimary === false || !ctx?.host?.take) return;
+    const node = holdWord(root, e.target);
+    if (!node) return;
+    const h = { node, x: e.clientX, y: e.clientY, id: e.pointerId, ring: null, done: false };
+    h.ringTimer = setTimeout(() => {
+      if (hold === h && !h.done) h.ring = safely(() => globalThis.__KAIRO_HOLD_RING__?.(h.x, h.y) || null, null);
+    }, HOLD_RING_MS);
+    h.timer = setTimeout(() => commit(h), HOLD_MS);
+    hold = h;
+  });
+  root.addEventListener('pointermove', (e) => {
+    if (hold && !hold.done && e.pointerId === hold.id && Math.hypot(e.clientX - hold.x, e.clientY - hold.y) > HOLD_MOVE) clear();
+  });
+  root.addEventListener('pointerup', (e) => {
+    if (!hold || e.pointerId !== hold.id) return;
+    if (hold.done) hold.node.kpHeldAt = Date.now();
+    clear();
+  });
+  root.addEventListener('pointercancel', (e) => { if (hold && e.pointerId === hold.id) clear(); });
+  root.addEventListener('contextmenu', (e) => {
+    const node = holdWord(root, e.target);
+    if (!node || !ctx?.host?.take) return;
+    e.preventDefault();
+    // a touch hold some engines also report as a contextmenu is the same hold: one seal, never two
+    if (hold && !hold.done && hold.node === node) { commit(hold); return; }
+    if (node.kpHeldAt && Date.now() - node.kpHeldAt < 1200) return;
+    void held(node.kpHoldUnit, node, { keyboard: !e.clientX && !e.clientY });
+  });
+}
+async function held(unit, node, { keyboard = false, ring = null } = {}) {
+  // a late or synthetic hold never turns a sealed front into a door
+  if (ui.screen === 'study' && !ui.revealed) { ring?.cancel(); return; }
+  const host = ctx?.host;
+  const frame = frameOf(unit);
+  const entry = frame.entry || (frame.word
+    ? safely(() => host?.lookup?.({ s: frame.word.term, ref: frame.word.term, r: frame.word.reading || '', k: '語' }) || null, null) : null);
+  if (!host?.take || !host?.addToList || !entry) { ring?.cancel(); return; }
+  const was = !!safely(() => host.isTaken?.(entry), false);
+  let kept = was;
+  if (!was) { try { kept = !!(await host.take(entry)); } catch { kept = false; } }
+  ring?.settle(kept);
+  if (!kept || !node.isConnected) return;
+  safely(() => host.addToList(entry, node, { seal: true, created: !was, keyboard }));
 }
 
 /** text with its units as tap targets (a definition) */
@@ -1698,10 +1991,38 @@ function tapText(text, units, onTap) {
   return out;
 }
 
+/** Q · the answer's Japanese breaks only between its words, as the passage does (the host's one rule, ctx.words; the
+ * lead, inbox 1447): a <wbr> at each word's edge, never inside a word or a tap unit, and keep-all inside the words
+ * (player.css .kp-words). 話し合いによって条件をまとめるこ｜と and 定｜番 broke at the line's end. Without a host
+ * the text stands as it did. */
+function answerWords(node, text, units = null, onTap = null) {
+  const pieces = units?.length ? tapText(text, units, onTap) : [text];
+  const groups = ctx?.words && text ? ctx.words(text) : null;
+  if (!groups || groups.length < 2) { node.append(...pieces); return node; }
+  const cuts = new Set();
+  let end = 0;
+  for (const g of groups) { end += g.join('').length; cuts.add(end); }
+  let at = 0;
+  for (const piece of pieces) {
+    const len = typeof piece === 'string' ? piece.length : piece.textContent.length;
+    if (at && cuts.has(at)) node.append(document.createElement('wbr'));
+    if (typeof piece === 'string') {
+      let from = 0;
+      for (let i = 1; i < piece.length; i += 1) if (cuts.has(at + i)) { node.append(piece.slice(from, i), document.createElement('wbr')); from = i; }
+      node.append(piece.slice(from));
+    } else node.append(piece);
+    at += len;
+  }
+  node.classList.add('kp-words');
+  return node;
+}
 /** tier one's Japanese definition, its words tappable on the back */
 function defLine(card, word) {
   const p = el('p', 'kp-def');
-  p.append(...tapText(word.defJa || '', defUnits(word), (u, node) => tapped(u, node, { card, where: 'd', depth: 1 })));
+  // Q · the definition's words by the word rule (answerWords: tapText's pieces, a <wbr> between words); G3 · its taps
+  // join the host's one roving prose stop
+  answerWords(p, word.defJa || '', defUnits(word), (u, node) => tapped(u, node, { card, where: 'd', depth: 1 }));
+  if (p.querySelector('.kp-tok')) ctx?.host?.installProseWords?.(p, '.kp-tok');
   reflowWatch?.observe(p);
   return p;
 }
@@ -1796,8 +2117,8 @@ function deckIds() {
  * (storage full) only means the row is missing: the tap still opens. */
 function logTap(card, where, frame, depth) {
   const cardId = card?.id || ui.queue[ui.pos] || '';
-  const next = logLookup(ctx.state, { cardId, where, surface: frame.surface, key: frame.key, depth }, new Date());
-  if (save(next)) ctx.state = next;
+  // a lookup is written like a grade: on the ledger as it is stored now, never a stale copy over another window's grades
+  writeLedger((fresh) => logLookup(fresh, { cardId, where, surface: frame.surface, key: frame.key, depth }, new Date()));
 }
 
 /** the word whose meaning is open shows its reading; closing the meaning returns the clean text */
@@ -1807,11 +2128,33 @@ function lightWord(node) {
   node?.classList.add('kp-lit');
 }
 function tapped(unit, node, { card, where, depth }) {
+  // A late or synthetic activation must not turn a sealed front into a lookup door.
+  if (ui.screen === 'study' && !ui.revealed) return;
   const frame = frameOf(unit);
-  logTap(card, where, frame, depth);
-  if (depth === 1) lightWord(node);
-  if (ctx.host) openSheet(frame, node, depth);
-  else openPop(frame, node);
+  if (!ctx.host) {
+    lightWord(node);
+    logTap(card, where, frame, depth);
+    openPop(frame, node);
+    return;
+  }
+  // The host owns the ladder. Existing ruby needs only presentation callbacks; plain
+  // definition text uses the host's inline reading. Nothing is revealed before activation.
+  // F · the passage's readings are native <rt>s the deck hides in place (player.css), never ruby[data-rt]
+  const hasRuby = !!node.querySelector('ruby > rt');
+  const opened = safely(() => ctx.host.openSlip?.(frame, node, {
+    english: ctx.prefs.gloss === 'show',
+    ...(hasRuby ? {
+      reveal: () => node.classList.add('kp-lit'),
+      clearReveal: () => node.classList.remove('kp-lit'),
+      readingVisible: () => ctx.prefs.readings !== 'off' || node.classList.contains('kp-lit') || node.classList.contains('kp-target'),
+    } : {}),
+    onClose: (reason) => { if (reason !== 'dive') node.classList.remove('kp-lit'); },
+  }), false);
+  // Keep the existing tuple: hosted reveal, stage and page are distinct observation depths.
+  // Putting a stage away opens nothing, so it is no observation.
+  if (opened === 'dismissed') return;
+  logTap(card, where, frame, opened === 'dived' ? depth + 2 : opened === 'opened' ? depth + 1 : depth);
+  if (!opened) node.classList.remove('kp-lit');
 }
 
 /** what the host answers, or fallback when it throws: a host fault never breaks the card */
@@ -1827,147 +2170,6 @@ function englishLine(cls, text) {
   const n = el('p', cls, text);
   n.lang = 'en';
   return n;
-}
-
-/* -------- the entry sheet (with a host) */
-function openSheet(frame, node, depth) {
-  const prior = ui.sheet;
-  const stack = depth > 1 && prior ? [...prior.stack.slice(0, depth - 1), frame] : [frame];
-  ui.sheet = { stack, note: '', returnTo: depth > 1 && prior ? prior.returnTo : node };
-  drawSheet();
-}
-function closeSheet() {
-  const back = ui.sheet?.returnTo;
-  ui.sheet = null;
-  lightWord(null);
-  ctx.root.querySelector('.kp-sheet-wrap')?.remove();
-  if (back?.isConnected) back.focus({ preventScroll: true });
-}
-/** (re)draw the sheet over the card; the card itself is not repainted, so its folds stay as they are */
-function drawSheet({ focus = true } = {}) {
-  const old = ctx.root.querySelector('.kp-sheet-wrap');
-  const scroll = old?.querySelector('.kp-sheet')?.scrollTop || 0;
-  old?.remove();
-  if (!ui.sheet || ui.screen !== 'study') return;
-  const wrap = sheetNode();
-  ctx.root.append(wrap);
-  const sheet = wrap.querySelector('.kp-sheet');
-  if (focus) sheet.querySelector('.kp-sheet-term')?.focus({ preventScroll: true });
-  else sheet.scrollTop = scroll;
-}
-function sheetNode() {
-  const { stack } = ui.sheet;
-  const depth = stack.length;
-  const f = stack[depth - 1];
-  const wrap = el('div', 'kp-sheet-wrap');
-  wrap.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (e.target === wrap) closeSheet();
-  });
-  const sheet = el('div', 'kp-sheet');
-  sheet.id = 'kp-sheet';
-  sheet.lang = ctx.english !== false ? 'en' : 'ja';
-  sheet.setAttribute('role', 'dialog');
-  sheet.setAttribute('aria-modal', 'true');
-  sheet.setAttribute('aria-labelledby', 'kp-sheet-term');
-  sheet.dataset.depth = String(depth);
-  sheet.dataset.key = f.key;
-  const top = el('div', 'kp-sheet-top');
-  if (depth > 1) {
-    top.append(btn('kp-icon kp-sheet-back', '←', () => {
-      ui.sheet = { ...ui.sheet, stack: stack.slice(0, -1), note: '' };
-      drawSheet();
-    }, { id: 'kp-sheet-back', 'aria-label': t("前の語に戻る") }));
-  }
-  const term = el('h2', 'kp-sheet-term', f.label);
-  term.lang = 'ja';
-  term.id = 'kp-sheet-term';
-  term.dataset.uiContent = 'learning';
-  term.tabIndex = -1;
-  const head = el('div', 'kp-sheet-head', term, f.reading && f.reading !== f.label ? el('span', 'kp-sheet-reading', f.reading) : null);
-  const chips = el('div', 'kp-sheet-chips', f.kind ? el('span', 'kp-chip', t(f.kind)) : null, f.level ? levelChip(f.level) : null);
-  top.append(head, chips, btn('kp-icon kp-sheet-x', '×', closeSheet, { id: 'kp-sheet-close', 'aria-label': t("閉じる") }));
-  sheet.append(top);
-  // the Japanese sense first; its words open one more sheet, down to SHEET_DEPTH
-  if (f.ja) {
-    const def = el('p', 'kp-sheet-def');
-    def.lang = 'ja';
-    const units = depth < SHEET_DEPTH && f.word ? defUnits(f.word) : null;
-    def.append(...tapText(f.ja, units, (u, node) => tapped(u, node, { card: currentCard(), where: 's', depth: depth + 1 })));
-    sheet.append(def);
-  } else sheet.append(el('p', 'kp-sheet-none', t(f.word || f.entry ? NO_JA : NOT_FOUND)));
-  if (f.en) sheet.append(fold('kp-f-gloss kp-sheet-en', t("英語"), ctx.prefs.gloss === 'show', englishLine('kp-gloss', f.en)));
-  // A word of this deck keeps its no-save/no-full-entry contract, but its kanji are
-  // still one tap away. These doors work at either word depth without extending
-  // the recursive word-definition chain beyond its existing two-sheet limit.
-  const kanji = [...new Set([...(f.label || '')].filter((glyph) => /\p{Script=Han}/u.test(glyph)))];
-  const entries = kanji.map((glyph) => safely(() => ctx.host?.lookup({ s: glyph, ref: glyph, k: '字' }), null)).filter((entry) => entry?.t === 'kanji');
-  if (entries.length) {
-    const band = el('nav', 'kp-sheet-kanji');
-    band.setAttribute('aria-label', t('この語の漢字', 'Kanji in this word'));
-    for (const entry of entries) {
-      const glyph = el('span', 'kp-sheet-kanji-glyph', entry.label || entry.id);
-      glyph.lang = 'ja';
-      glyph.dataset.uiContent = 'learning';
-      band.append(btn('kp-sheet-kanji-door', glyph, () => {
-        closeSheet();
-        ctx.host.open(entry);
-      }, { 'data-kanji': entry.id, 'aria-label': t(`${entry.id}の漢字の項目を開く`, `Open ${entry.id} kanji entry`) }));
-    }
-    sheet.append(band);
-  }
-  if (depth >= SHEET_DEPTH) sheet.append(el('p', 'kp-sheet-stop', t(STOP_HERE)));
-  if (f.word) sheet.append(el('p', 'kp-sheet-indeck', t(IN_DECK)));
-  else if (f.entry) {
-    sheet.append(takeBlock(f));
-    // the corridor's own entry: every sense, examples, its kanji (it leaves the card for a moment)
-    sheet.append(btn('kp-link kp-sheet-full', t("辞書の全項目を開く"), () => {
-      const entry = f.entry;
-      closeSheet();
-      ctx.host.open(entry);
-    }, { id: 'kp-sheet-full' }));
-  }
-  wrap.append(sheet);
-  return wrap;
-}
-
-/** 覚える is the corridor's one save path (STANDARD A51): one tap writes the word to 覚えるの札
- * through the host, the corridor shows its Saved toast with 元に戻す, and nothing is asked first.
- * Once saved, リストに追加… opens the corridor's own list popover; a list is optional. */
-function takeBlock(f) {
-  const box = el('div', 'kp-take-box');
-  if (ui.sheet.note) box.append(el('p', 'kp-sheet-note', ui.sheet.note));
-  if (safely(() => !!ctx.host.isTaken(f.entry), false)) {
-    box.append(el('p', 'kp-sheet-taken', t("✓ 覚えるの札にあります")));
-    if (typeof ctx.host.addToList === 'function') {
-      const add = btn('kp-link kp-take-list', t("リストに追加…"), () => {
-        safely(() => ctx.host.addToList(f.entry, add), null);
-      }, { id: 'kp-take-list', 'aria-haspopup': 'dialog' });
-      box.append(add);
-    }
-    return box;
-  }
-  const take = btn('kp-take', t('保存', 'Save'), async () => {
-    if (ui.sheet?.busy) return;
-    const sheetNow = ui.sheet;
-    sheetNow.busy = true;
-    take.disabled = true;
-    const ok = await takeEntry(f.entry);
-    sheetNow.busy = false;
-    if (ui.sheet !== sheetNow) return; // the sheet closed or moved on while the corridor saved
-    ui.sheet.note = ok ? '' : t("保存できませんでした");
-    drawSheet({ focus: false });
-  }, { id: 'kp-take' });
-  box.append(take, el('p', 'kp-take-note', t(TAKE_NOTE)));
-  return box;
-}
-/** 覚えるの札, through the host (the corridor's guarded one-tap save) */
-async function takeEntry(entry) {
-  try {
-    return !!(await ctx.host.take(entry));
-  } catch {
-    return false;
-  }
 }
 
 /* -------- the popover (no host: the standalone study pages) */
@@ -2024,20 +2226,27 @@ const DELETED = 'このカードを削除しました（設定 › 保留中の�
 const SWAPPED = '別の文に替えました。前の文は保留にしました。';
 const SUSPENDED = '保留にしました（設定 › 保留中のカード から戻せます）。';
 const UNDOABLE = [DELETED, SWAPPED, SUSPENDED];
+const ELSEWHERE = 'この札は別のウィンドウで答えました。次の札へ進みます。';
+const UNDO_STALE = '別のウィンドウで答えが変わったので、戻せませんでした。';
 
-/** the back's nodes in order: the answer (tier one, a leech's ladder, then the folds) */
+/** the back's nodes in order: the answer (tier one, a leech's ladder, then the folds), then its quiet row (削除) */
 function backParts(card, word) {
   const answer = answerBlock(card, word);
-  return { answer, nodes: [answer] };
+  return { answer, nodes: [answer, cardTools()] };
 }
 
-/** 削除 in the study top bar, front and back, never more than a glance away: one tap, undone
- * from the toast or Undo for the rest of the sitting */
+/** 削除 (Hfix-1B, the lead's round-1 ruling on HG-5): taking a card out of study is a deliberate act after its answer is
+ * seen, so it lives on the back alone, as the card's last quiet row under the folds: never in the top bar, never on a
+ * front, never beside the grades. One tap there, undone from the toast or Undo for the rest of the sitting. */
 function deleteButton() {
-  return btn('kp-delete', t("削除"), (e) => {
+  return btn('kp-delete', t("このカードを削除"), (e) => {
     e.stopPropagation();
     deleteCard();
   }, { id: 'kp-delete', 'aria-label': t("このカードを削除（保留にする・あとで戻せる）") });
+}
+/** the back's quiet row: the last thing on the card, after its answer and folds */
+function cardTools() {
+  return el('div', 'kp-card-tools', deleteButton());
 }
 
 /** a ladder hint: the first kana of the reading and one ○ per kana left; on a 字 card, the
@@ -2083,11 +2292,17 @@ function leechLadder(card, word) {
   return box;
 }
 
-/** adopt a ledger change made on the card on screen: stored first, then one undo step */
-function adoptRepair(nextState) {
-  if (!save(nextState)) return saveFailed();
-  ui.undo = { state: ctx.state, queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right, log: [...ui.log] };
-  ctx.state = nextState;
+/** this sitting's place, for one undo step */
+function sittingNow() {
+  return { queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right, log: [...ui.log], ahead: ui.ahead, passFrom: ui.passFrom, early: ui.early, shown: ui.shown };
+}
+/** adopt a ledger change made on the card on screen (change: fresh ledger → changed ledger, via writeLedger): stored
+ * first, then one undo step that takes back only what it touched */
+function adoptRepair(change) {
+  const sitting = sittingNow();
+  const r = writeLedger(change);
+  if (r.failed || r.refused) return saveFailed();
+  ui.undo = { change: changeOf(r.before, r.state), sitting };
   return true;
 }
 /** the card leaves the sitting: this and every later place it held in the queue */
@@ -2096,35 +2311,44 @@ function dropFromQueue(id) {
 }
 function deleteCard() {
   const id = ui.queue[ui.pos];
-  if (!id || !adoptRepair(suspendCard(ctx.state, id, 'delete', new Date()))) return;
+  if (!id || !adoptRepair((fresh) => suspendCard(fresh, id, 'delete', new Date()))) return;
   dropFromQueue(id);
+  settle();
   ui.toast = DELETED;
   resetCard();
   paintResponse({ front: true });
 }
 function ladderSwap(card, word) {
-  const done = swapCard(word, card, ctx.state, new Date());
-  if (!done || !adoptRepair(done.state)) return;
+  let to = null;
+  if (!swapCard(word, card, ctx.state, new Date())) return;
+  const swapped = adoptRepair((fresh) => {
+    const done = swapCard(word, card, fresh, new Date());
+    to = done?.to ?? null;
+    return done?.state ?? null;
+  });
+  if (!swapped) return;
   dropFromQueue(card.id);
-  ui.queue.splice(ui.pos, 0, done.to); // the new passage takes the card's place, front first
+  ui.queue.splice(ui.pos, 0, to); // the new passage takes the card's place, front first
+  ui.shown = 'null';
   ui.toast = SWAPPED;
   resetCard();
   paint();
 }
 function ladderHint(card, hint) {
-  if (!adoptRepair(repairCard(ctx.state, card.id, 'hint', new Date(), hint))) return;
+  if (!adoptRepair((fresh) => repairCard(fresh, card.id, 'hint', new Date(), hint))) return;
   ui.toast = '';
   paint();
 }
 function ladderSuspend(card) {
-  if (!adoptRepair(suspendCard(ctx.state, card.id, 'leech', new Date()))) return;
+  if (!adoptRepair((fresh) => suspendCard(fresh, card.id, 'leech', new Date()))) return;
   dropFromQueue(card.id);
+  settle();
   ui.toast = SUSPENDED;
   resetCard();
   paint();
 }
 function ladderKeep(card) {
-  if (!adoptRepair(repairCard(ctx.state, card.id, 'keep', new Date()))) return;
+  if (!adoptRepair((fresh) => repairCard(fresh, card.id, 'keep', new Date()))) return;
   ui.toast = '';
   paint();
 }
@@ -2176,11 +2400,12 @@ const GRADES = [
   ['good', '正解', 'Good', '良', '3'],
   ['easy', '簡単', 'Easy', '易', '4'],
 ];
-/** Under the bar, once per deck until dismissed or answered, the rule for choosing. */
-const RULE = '答えを見て理解が深まったなら もう一度';
+/** Under the bar, once per deck until dismissed or answered, the rule for choosing, said so it cannot be read backwards
+ * (Hfix-1B; Kimi KH1-2, HG-2): an answer that was new to him is もう一度. */
+const RULE = '答えを見て初めて分かったなら「もう一度」';
 function gradeBar(id) {
   // each pad shows the interval the pinned scheduler gives that answer, now (engine preview)
-  const pv = preview(fsrsApi, scheduler, ctx.state, id, new Date());
+  const pv = preview(fsrsApi, ctx.scheduler, ctx.state, id, new Date());
   const bar = el('div', 'kp-grades');
   // in 日本語 each pad carries its seal glyph (Kaisei Tokumin: 再 難 良 易); English shows the word only
   const seal = (glyph) => {
@@ -2197,14 +2422,18 @@ function gradeBar(id) {
       }),
     );
   }
+  // a card whose Good keeps it in its learning steps says so, quietly: it will be back (Kimi's note, lead's ruling 10-19)
+  const st = ctx.state.cards[id];
+  if ((!st || st.state !== 2) && pv.good < DAY) bar.append(el('p', 'kp-stepnote', t(`学習中：正解でも ${fmtWait(pv.good)}後にもう一度出ます。`, `Learning: Good brings it back in ${fmtWait(pv.good)}.`)));
   // the gesture is explained once: on the first back of the deck's first sitting (help never sits in the
   // pads' way after that)
   if (swipeHintOn()) bar.append(el('p', 'kp-swipehint', t("← もう一度　　スワイプ　　正解 →")));
-  if (!ctx.prefs.ruleSeen) {
+  // The old ruleSeen preference belonged to the previous hint; returning decks get this coach once too.
+  if (!ctx.prefs.againCoachSeen) {
     const rule = el('p', 'kp-rule', el('span', null, t(RULE)));
     rule.id = 'kp-rule';
     const dismiss = () => {
-      if (!savePrefQuiet({ ruleSeen: true })) return;
+      if (!savePrefQuiet({ againCoachSeen: true })) return;
       rule.remove();
       fitBar();
     };
@@ -2321,6 +2550,13 @@ function paintResponse({ resetScroll = false, front = false, hold = true } = {})
  */
 /** A fitted reading window sits directly under the fixed chrome, so the card's chip row
  * (level, kind and Full/Focus) moves below it; an unwindowed passage keeps the row above. */
+/** Q · the last part of the answer that says something (its word, definition, note): the parts before its folds, whose
+ * rows are doors. A leech's ladder is controls, not the answer: it may wait below the pads (the first screen keeps the
+ * word and its definition without a scroll, CARD_CONTRACT_V2 §4) */
+function answerSaid(def) {
+  const parts = [...(def.parentElement?.children || [])].filter((n) => !n.classList.contains('kp-folds') && !n.classList.contains('kp-ladder') && n.getClientRects().length);
+  return parts[parts.length - 1] || def;
+}
 function placeWindowControls(face, passage, windowed) {
   face.toggleAttribute('data-window-controls', !!windowed);
   const chips = face.querySelector('.kp-chips');
@@ -2331,6 +2567,9 @@ function placeWindowControls(face, passage, windowed) {
   held?.focus({ preventScroll: true });
 }
 const WINDOW_LINES = 3;
+/** Q · the rows of the answer's folds the pads may never cut: each fold's summary, and a row of the folds that is not a
+ * fold (the see-also line of grammar links, which the pads cut in the MCD deck) */
+const FOLD_ROWS = '.kp-folds > details > summary, .kp-folds > :not(details)';
 const WINDOW_REACH = 12;
 function windowPassage(from, page = from) {
   const face = ctx.root.querySelector('#kp-card');
@@ -2349,8 +2588,14 @@ function windowPassage(from, page = from) {
   const line = parseFloat(getComputedStyle(passage).lineHeight) || 48;
   // The window seats directly under the chrome; the chip row, word and definition are budgeted below it.
   const seat = box.top - WINDOW_REACH - topInset() - SETTLE_GAP;
-  let over = def.getBoundingClientRect().bottom - lift - seat - (barTop - SETTLE_GAP);
-  for (const s of face.querySelectorAll('.kp-folds > details > summary')) {
+  // Q · nothing he must read sits under the pads (Grok's walk: the answer's note went grey under them): the window makes
+  // room for the whole of what the answer says (its word, definition, note: every part before its folds), and only when
+  // that would leave the passage fewer than WINDOW_LINES lines, for the definition, as before
+  const overFor = (n) => n.getBoundingClientRect().bottom - lift - seat - (barTop - SETTLE_GAP);
+  let over = overFor(def);
+  const said = answerSaid(def);
+  if (said !== def && box.height - overFor(said) >= WINDOW_LINES * line) over = Math.max(over, overFor(said));
+  for (const s of face.querySelectorAll(FOLD_ROWS)) {
     const r = s.getBoundingClientRect();
     const [top, bottom] = [r.top - lift - over, r.bottom - lift - over];
     if (!(top < barTop && bottom > barTop)) continue;
@@ -2449,6 +2694,9 @@ function settleBack() {
   const answer = face?.querySelector('.kp-answer');
   const def = answer?.querySelector(':scope > .kp-def');
   if (!def || ui.screen !== 'study') return;
+  const folds = face.querySelector('.kp-folds');
+  // Recalculate the extra seating gap after a viewport, font or fold change.
+  folds?.style.removeProperty('margin-top');
   const bar = ctx.root.querySelector('.kp-grades');
   const barTop = bar ? Math.min(innerHeight, bar.getBoundingClientRect().top) : innerHeight;
   const bottomLimit = barTop - SETTLE_GAP;
@@ -2466,12 +2714,18 @@ function settleBack() {
   if (windowed && target.getBoundingClientRect().height > windowed.clientHeight) target = marked || windowed;
   const toggle = windowed && face.querySelector('.kp-zoom');
   const top = Math.min(target.getBoundingClientRect().top, toggle ? toggle.getBoundingClientRect().top : Infinity);
-  const bottom = def.getBoundingClientRect().bottom - lift;
+  // Q · the whole of what the answer says (its word, definition and note) stays above the pads. Hfix-1B (G-10, Grok's
+  // 320×568 walk: the note ran under the pads): when it does not fit beside the target, the answer comes first and the
+  // passage gives way above it (it scrolls up under the header, where it is read again by scrolling); only an answer taller
+  // than the whole room keeps its word in view and lets its end go
+  const said = answerSaid(def).getBoundingClientRect().bottom - lift;
+  const word = answer.getBoundingClientRect().top - lift;
+  const bottom = said;
   let dy = 0;
   if (bottom - top <= bottomLimit - topLimit) {
     if (top < topLimit) dy = top - topLimit;
     else if (bottom > bottomLimit) dy = bottom - bottomLimit;
-  } else dy = bottom - bottomLimit;
+  } else dy = Math.min(bottom - bottomLimit, word - topLimit);
   const room = { up: -window.scrollY, down: document.documentElement.scrollHeight - innerHeight - window.scrollY };
   dy = Math.max(room.up, Math.min(room.down, dy));
   // then no fold row cut by the bar (backFits: none crosses its top edge by more than half a pixel on
@@ -2479,11 +2733,14 @@ function settleBack() {
   // so the plan is made in whole-pixel moves: a row seated against the bar here is seated there
   const whole = (d) => Math.round(window.scrollY + d) - window.scrollY;
   dy = Math.abs(dy) < 1 ? 0 : whole(dy); // under a pixel off is at rest
-  const rows = [...face.querySelectorAll('.kp-folds > details > summary')].map((s) => {
+  const rows = [...face.querySelectorAll(FOLD_ROWS)].map((s) => {
     const r = s.getBoundingClientRect();
     return [r.top - lift, r.bottom - lift];
   });
-  const clear = (d) => rows.every(([rTop, rBottom]) => !(rTop - d < barTop - 0.5 && rBottom - d > barTop + 0.5));
+  // The grade bar's leading padding is clear glass: a hidden row starts at the opaque dock,
+  // not at the element's top. A visible row keeps the same reading clearance as the answer.
+  const dockTop = barTop + Math.max(0, (parseFloat(getComputedStyle(bar).paddingTop) || 0) - 1);
+  const clear = (d) => rows.every(([rTop, rBottom]) => rBottom - d <= bottomLimit + 0.5 || rTop - d >= dockTop - 0.5);
   if (!clear(dy)) {
     // the least further move (down first) that clears every row, keeping the target sentence below the
     // top when it scrolls down and the definition above the bar when it scrolls up; none in a row's
@@ -2498,8 +2755,102 @@ function settleBack() {
       break;
     }
   }
-  if (!dy) return;
-  window.scrollTo({ top: window.scrollY + dy, behavior: 'instant' });
+  // Fit the header and fold edges together. On a short screen the passage may be too
+  // short to become an inner window, so moving only an inner scroll cannot seat its line.
+  // Include text-node ink and ruby, rather than only token element boxes.
+  const passage = face.querySelector('.kp-sentence');
+  const ink = [];
+  const walker = document.createTreeWalker(passage, NodeFilter.SHOW_TEXT);
+  while (walker.nextNode()) {
+    const node = walker.currentNode;
+    if (!node.textContent.trim() || node.parentElement.closest('rp')) continue;
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    for (const rect of range.getClientRects()) if (rect.width && rect.height) ink.push([rect.top, rect.bottom]);
+  }
+  // A reading and its base are one piece of ink: the header cannot sit in the
+  // whitespace between them and make a visible word lose only its reading.
+  for (const ruby of passage.querySelectorAll('ruby')) {
+    const boxes = [...ruby.getClientRects(), ...[...ruby.querySelectorAll('rt')].flatMap(rt => [...rt.getClientRects()])].filter(r => r.width && r.height);
+    if (boxes.length) ink.push([Math.min(...boxes.map(r => r.top)), Math.max(...boxes.map(r => r.bottom))]);
+  }
+  const view = passage.getBoundingClientRect();
+  const clearHeader = (d) => ink.every(([a, b]) => b <= view.top || a >= view.bottom || !(a - d < inset - 0.5 && b - d > inset + 0.5));
+  const keepTarget = bottom - top <= bottomLimit - topLimit;
+  const fitsEdges = (d) => (!keepTarget || top - d >= topLimit - 0.5) && d >= room.up && d <= room.down && word - d >= topLimit - 0.5 && bottom - d <= bottomLimit + 0.5 && clear(d) && clearHeader(d);
+  if (!fitsEdges(dy)) {
+    // A whole line plus a whole fold can move past an edge; bound the search by the
+    // available reading area, and choose the least page movement that clears both.
+    const reach = Math.ceil(bottomLimit - topLimit);
+    const findSeat = () => {
+      for (let k = 0; k <= reach; k++) {
+        const d = [whole(dy + k), whole(dy - k)].find(fitsEdges);
+        if (d !== undefined) return d;
+      }
+    };
+    let seat = findSeat();
+    if (seat === undefined && folds && rows.length && bottom - word <= bottomLimit - topLimit + 1) {
+      // If every normal-gap seat would cut ink or a fold, make room below the
+      // answer for one whole line plus the dock's clear band. Short cards whose
+      // folds already fit keep their normal spacing (including unmatched MCD).
+      const line = Math.max(1, ...ink.map(([a, b]) => b - a));
+      const extra = Math.ceil(Math.max(0, dockTop - (rows[0][0] - dy)) + line + 1);
+      folds.style.marginTop = `${(parseFloat(getComputedStyle(folds).marginTop) || 0) + extra}px`;
+      rows.splice(0, rows.length, ...[...face.querySelectorAll(FOLD_ROWS)].map(node => {
+        const r = node.getBoundingClientRect(); return [r.top - lift, r.bottom - lift];
+      }));
+      room.down = document.documentElement.scrollHeight - innerHeight - window.scrollY;
+      seat = findSeat();
+      if (seat === undefined) folds.style.removeProperty('margin-top');
+    }
+    if (seat !== undefined) dy = seat;
+  }
+  if (dy) window.scrollTo({ top: window.scrollY + dy, behavior: 'instant' });
+  if (windowed) seatUnderHeader(windowed, marked);
+}
+
+/** A long answer can carry the page past the window's seat, so the window's first lines run under the pinned header
+ * (WebKit, whose answer sets taller, lands there). A line at the header's edge is then wholly under it or wholly
+ * below it, its readings included (F, one ruby: a reading is the line's own ink, never half of one left under the
+ * bar): the passage moves by the least whole pixels that does it, the marked word kept in view. */
+function seatUnderHeader(passage, mark) {
+  const view = passage.getBoundingClientRect();
+  const clip = topInset();
+  if (clip <= view.top + 0.5) return;
+  const lines = new Map();
+  for (const n of passage.querySelectorAll('.kp-tok, ruby')) {
+    if (n.matches('ruby') && n.closest('.kp-tok')) continue;
+    for (const r of n.getClientRects()) {
+      if (!r.width || !r.height) continue;
+      const key = Math.round(r.bottom);
+      const line = lines.get(key) || { top: r.top, bottom: r.bottom, base: r.top };
+      line.top = Math.min(line.top, r.top); line.base = Math.min(line.base, r.top); line.bottom = Math.max(line.bottom, r.bottom);
+      lines.set(key, line);
+    }
+  }
+  // a reading belongs to the line its word sits on (WebKit seats an rt's box a little into its word's own box)
+  for (const rt of passage.querySelectorAll('rt')) {
+    const word = [...rt.parentElement.childNodes].find((c) => c.nodeType === 3 && c.textContent.trim());
+    if (!word) continue;
+    const range = document.createRange();
+    range.selectNodeContents(word);
+    const b = [...range.getClientRects()].find((r) => r.width);
+    const line = b && [...lines.values()].find((l) => Math.abs(l.bottom - b.bottom) <= 2);
+    if (!line) continue;
+    for (const r of rt.getClientRects()) if (r.width && r.height) line.top = Math.min(line.top, r.top);
+  }
+  const cut = [...lines.values()].find((l) => l.top < clip - 0.5 && l.bottom > clip + 0.5);
+  if (!cut) return;
+  const target = mark?.getBoundingClientRect();
+  const max = passage.scrollHeight - passage.clientHeight;
+  const prior = passage.scrollTop;
+  const shifts = [Math.floor(cut.top - clip), Math.ceil(cut.bottom - clip)].sort((a, b) => Math.abs(a) - Math.abs(b));
+  for (const shift of shifts) {
+    if (prior + shift < 0 || prior + shift > max) continue;
+    if (target && (target.top - shift < clip || target.bottom - shift > view.bottom)) continue;
+    passage.scrollTo({ top: prior + shift, behavior: 'instant' });
+    break;
+  }
 }
 /** the height of a header the host pins over the top of the page (the corridor's chrome); with
  * none, the study top bar pins itself (player.css, data-host none): where it rests once stuck */
@@ -2583,16 +2934,65 @@ function polish(face, sentence) {
 /** the rule under the grade bar is shown once: answering the card it sat under retires it.
  * Not stored (storage full) only means it shows again. */
 function retireRule() {
-  if (ctx.prefs.ruleSeen) return;
-  const prefs = { ...ctx.prefs, ruleSeen: true };
+  if (ctx.prefs.againCoachSeen) return;
+  const prefs = { ...ctx.prefs, againCoachSeen: true };
   if (storePrefs(prefs)) ctx.prefs = prefs;
 }
 
-function commit(rating, { stay = false } = {}) {
+async function commit(rating, { stay = false } = {}) {
   const id = ui.queue[ui.pos];
-  if (!id) return;
-  const nextState = grade(fsrsApi, scheduler, ctx.state, id, rating, new Date());
-  if (!save(nextState)) {
+  if (!id || !ctx || !ctx.root?.isConnected || ui.committing === ctx) return;
+  const owner = ctx, request = mountRequest, queue = ui.queue, pos = ui.pos, shown = ui.shown;
+  const schedule = owner.scheduler;
+  const current = () => ctx === owner && mountRequest === request && owner.root.isConnected &&
+    ui.screen === 'study' && ui.queue === queue && ui.pos === pos && ui.queue[pos] === id && ui.shown === shown;
+  const sitting = sittingNow();
+  const indexed = owner.index.cards.get(id);
+  ui.committing = owner;
+  let graded;
+  try {
+    // graded on the ledger as it is now, and only if the card is still the one put on screen and may be answered now
+    // (srs-core's gate): a card another window has answered, or one a stale queue still held, is never graded early.
+    // A word card's grade runs under the shared answer admission (one Web Lock, a re-check of today's answered words,
+    // its mark reserved before the write); a 字 card's does not (it never rests)
+    graded = await admitDeckGrade({
+      locks: globalThis.navigator?.locks || null,
+      storage: owner.storage,
+      deckId: owner.deck.id,
+      id,
+      word: indexed?.word,
+      card: indexed?.card,
+      write: change => current() ? writeLedger(change) : { refused: true },
+      change: (fresh, now) => {
+        const stored = fresh.cards[id] ?? null;
+        if (isSuspended(fresh, id) || JSON.stringify(stored) !== shown || !servable(stored, now, { learnAhead: true })) return null;
+        return grade(fsrsApi, schedule, fresh, id, rating, now);
+      },
+    });
+  } finally {
+    if (ui.committing === owner) ui.committing = null;
+  }
+  if (!current()) return;
+  const { result, r } = graded;
+  if (result === 'refused' || result === 'answered-elsewhere') {
+    dropFromQueue(id);
+    settle();
+    resetCard();
+    ui.toast = ELSEWHERE;
+    paintResponse({ front: true });
+    return;
+  }
+  if (result === 'no-shared-admission' || result === 'mark-unavailable') {
+    // practice continues: the card stays, and one plain line says the answer did not change its schedule
+    if (cardMode() === 'choice') {
+      ui.revealed = false;
+      ui.picked = null;
+    }
+    ui.toast = refusalWords(result, 'ja');
+    paint();
+    return;
+  }
+  if (result === 'failed') {
     // not stored: the same card stays, ready to answer again
     if (cardMode() === 'choice') {
       ui.revealed = false;
@@ -2604,12 +3004,12 @@ function commit(rating, { stay = false } = {}) {
   askToKeepStorage();
   if (cardMode() !== 'choice') retireRule();
   ui.toast = '';
-  ui.undo = { state: ctx.state, queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right, log: [...ui.log] };
-  ctx.state = nextState;
+  ui.undo = { change: changeOf(r.before, r.state), sitting };
   ui.done++;
   if (rating >= RATINGS.hard) ui.right++;
-  const answered = ctx.index.cards.get(id)?.word;
-  if (answered) ui.log.push({ term: answered.term, ok: rating >= RATINGS.hard });
+  const answered = indexed?.word;
+  // the close counts these: the word, where the card was in its schedule before this answer, and whether it came early
+  if (answered) ui.log.push({ term: answered.term, ok: rating >= RATINGS.hard, word: answered.id, before: r.before.cards[id]?.state ?? null, rating, early: ui.early });
   if (stay) {
     paint();
     return;
@@ -2638,13 +3038,9 @@ function askToKeepStorage() {
 function next(dir) {
   const id = ui.queue[ui.pos];
   const held = !motionOk() ? holdStudy(ctx.root.querySelector('.kp-study')) : null;
-  refill();
   ui.pos++;
-  // a learning step due within the sitting comes back after a few cards
-  const s = ctx.state.cards[id];
-  if (s && s.state !== 2 && new Date(s.due).getTime() - Date.now() < 15 * MIN) {
-    ui.queue.splice(Math.min(ui.queue.length, ui.pos + 4), 0, id);
-  }
+  // the next card by srs-core's rule: a learning step comes back when it is due, never a few cards later
+  settle();
   resetCard();
   const ghost = dir && motionOk() ? ghostOf(ctx.root.querySelector('#kp-card'), dir) : null;
   paint();
@@ -2662,20 +3058,33 @@ function ghostOf(face, dir) {
   const rect = face.getBoundingClientRect();
   const node = face.cloneNode(true);
   stripCloneIdentity(node);
+  // a still copy: nothing inside it fades in again while it leaves
   node.classList.remove('kp-arrive');
+  for (const moving of node.querySelectorAll('.kp-enter, .kp-arrive')) moving.classList.remove('kp-enter', 'kp-arrive');
   node.classList.add('kp-ghost', `kp-out-${dir}`);
   node.style.transform = '';
   node.setAttribute('aria-hidden', 'true');
   node.inert = true;
   return { node, rect };
 }
+let arrivalSerial = 0;
 function arrive(ghost, dir) {
   const box = ctx.root.querySelector('.kp-study');
   if (!box) return; // the done screen
   if (dir) box.dataset.advance = dir;
   const card = box.querySelector('#kp-card');
-  card?.classList.add('kp-arrive');
-  setTimeout(() => card?.classList.remove('kp-arrive'), 200);
+  if (card) {
+    // the arrival's class leaves with its own animation (or, bounded, its computed length), never a later card's:
+    // each paint builds a new card, and a reveal that keeps this one cancels the wait
+    card.classList.add('kp-arrive');
+    const arrival = ++arrivalSerial;
+    const settle = () => { if (card.dataset.arrival === String(arrival)) { card.classList.remove('kp-arrive'); delete card.dataset.arrival; } };
+    card.dataset.arrival = String(arrival);
+    card.addEventListener('animationend', (e) => { if (e.target === card) settle(); });
+    const cs = getComputedStyle(card);
+    const ms = (v) => (String(v).trim().endsWith('ms') ? parseFloat(v) : parseFloat(v) * 1000) || 0;
+    setTimeout(settle, ms(cs.animationDuration) + ms(cs.animationDelay) + 60);
+  }
   if (!motionOk()) return;
   // もう一度: one brief 朱 slash across the screen as the answered card leaves (inert, removed after)
   if (dir === 'again') {
@@ -2691,23 +3100,34 @@ function arrive(ghost, dir) {
   Object.assign(ghost.node.style, { top: `${ghost.rect.top - at.top}px`, left: `${ghost.rect.left - at.left}px`, width: `${ghost.rect.width}px`, height: `${ghost.rect.height}px` });
   box.append(ghost.node);
   const drop = () => ghost.node.remove();
-  ghost.node.addEventListener('animationend', drop, { once: true });
+  // its own leave ends it (an animation that ends inside the copy does not), or, bounded, 400 ms
+  ghost.node.addEventListener('animationend', (e) => { if (e.target === ghost.node) drop(); });
   setTimeout(drop, 400);
 }
 
 function undo() {
   if (!ui.undo) return;
-  // the words looked up since stay looked up: undo takes back answers and repairs, not lookups
-  const restored = { ...ui.undo.state, lookups: ctx.state.lookups || [] };
-  if (!save(restored)) return saveFailed();
-  ui.toast = '';
-  ctx.state = restored;
-  ui.queue = ui.undo.queue;
-  ui.pos = ui.undo.pos;
-  ui.done = ui.undo.done;
-  ui.right = ui.undo.right;
-  ui.log = ui.undo.log || [];
+  // only what the answer or repair touched goes back: another window's grades and the words looked up since stay
+  const { change, sitting } = ui.undo;
+  const r = writeLedger((fresh) => undoChange(fresh, change));
+  if (r.failed) return saveFailed();
   ui.undo = null;
+  if (r.refused) {
+    ui.toast = UNDO_STALE;
+    paint();
+    return;
+  }
+  ui.toast = '';
+  ui.queue = sitting.queue;
+  ui.pos = sitting.pos;
+  ui.done = sitting.done;
+  ui.right = sitting.right;
+  ui.log = sitting.log || [];
+  ui.ahead = sitting.ahead;
+  ui.passFrom = sitting.passFrom ?? 0;
+  ui.early = sitting.early;
+  ui.pause = null;
+  ui.shown = JSON.stringify(ctx.state.cards[ui.queue[ui.pos]] ?? null);
   resetCard();
   ui.revealed = cardMode() !== 'choice';
   ui.seen = !!ctx.state.cards[ui.queue[ui.pos]];
@@ -2775,12 +3195,16 @@ function attachSwipe(face) {
 }
 
 /**
- * The session close: the surface is clear. The words of this sitting rise off the card table
- * (the ones answered もう一度 in 朱), then the tally from this sitting only: kept (難しい, 正解, 簡単),
- * again (もう一度) and the time since 始める, the recall rate, when the next review falls due,
- * and one door: back to the deck.
+ * The session close: the surface is clear. The words of this sitting rise off the card table (the ones answered
+ * もう一度 in 朱), then what the sitting did in one or two sentences counted from its own answers (srs-core
+ * closeLines: new words, reviews, answers, the learning-step returns and how many came early, the words that
+ * needed Again), the tally (recalled, again, time) and the recall rate. While cards are still in a learning step
+ * it offers the one honest choice (lead's ruling 10-19): review them now, early (within the learn-ahead limit), or
+ * they wait. Then one door forward and back to the deck.
  */
+let pauseTimer = null;
 function doneScreen() {
+  clearTimeout(pauseTimer);
   const box = el('section', 'kp-done');
   box.append(topBar(t("おつかれさま")));
   box.append(el('h2', 'kp-done-title', t("机の上は、空になった。", "The surface is clear.")));
@@ -2798,29 +3222,43 @@ function doneScreen() {
     });
     box.append(rise);
   }
+  const now = new Date();
+  const lang = ctx.english === false ? 'ja' : 'en';
+  const tally = sittingTally(ui.log.map((x) => ({ word: x.word ?? x.term, before: x.before ?? null, rating: x.rating ?? (x.ok ? RATINGS.good : RATINGS.again), early: !!x.early })), { startedAt: ui.started || null, now });
   const pct = ui.done ? Math.round((ui.right / ui.done) * 100) : 0;
-  const secs = ui.started ? Math.max(0, Math.round((Date.now() - ui.started) / 1000)) : 0;
+  const secs = tally.seconds;
   const clock = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
   const cell = (label, value, cls) => el('div', `kp-tally-c ${cls}`, el('span', null, label), el('b', null, value));
-  box.append(el('div', 'kp-tally', cell(t("覚えた", "Kept"), String(ui.right), 'kp-tally-kept'), cell(t("もう一度"), String(ui.done - ui.right), 'kp-tally-again'), cell(t("時間", "Time"), clock, 'kp-tally-time')));
-  const rate = el('p', 'kp-done-rate', el('span', null, t("思い出せた割合")), el('b', null, `${pct}%`), el('span', null, `${t("回答")} ${ui.done}`));
-  if (!ctx.focusRoom) box.append(rate);
-  const soon = learningSoon(ctx.deck, ctx.state, new Date(), DAY, { skip: skipFor(ctx.prefs.mode) })[0];
-  // in the app's focus room the close says it in one sentence, and the recall rate stays under it as
-  // one quiet line (the tally boxes above stay the standalone page's)
-  if (ctx.focusRoom) {
-    // what happened, in one sentence and only what is true: the words met, the minutes, and how many
-    // needed a second look (they were seen again in the sitting; when they return is the next line)
-    const met = new Set(ui.log.map((x) => x.term)).size;
-    const second = missed.size;
-    const mins = Math.max(1, Math.round(secs / 60));
-    const minEn = `${mins} ${mins === 1 ? 'minute' : 'minutes'}`;
-    box.append(el('p', 'kp-done-line', second
-      ? t(`${met} 語に出会った（${mins} 分）。${second} 語はもう一度見た。`, `You met ${met} ${met === 1 ? 'word' : 'words'} in ${minEn}. ${second} needed a second look.`)
-      : t(`${met} 語に出会った（${mins} 分）。`, `You met ${met} ${met === 1 ? 'word' : 'words'} in ${minEn}.`)));
-    box.append(rate);
+  // what happened, only what is true: every number is a count of this sitting's answers
+  if (ui.log.length) {
+    const said = el('div', 'kp-done-said');
+    for (const line of closeLines(tally, lang)) said.append(el('p', 'kp-done-line', line));
+    box.append(said);
   }
-  box.append(el('p', 'kp-sub', soon ? t(`次の復習は ${fmtWait(Math.max(0, soon.t - Date.now()))}後。`, `Next review in ${fmtWait(Math.max(0, soon.t - Date.now()))}.`) : t("今日の分は終わり。また明日。")));
+  if (!ctx.focusRoom) box.append(el('div', 'kp-tally', cell(t("思い出せた", "Recalled"), String(ui.right), 'kp-tally-kept'), cell(t("もう一度"), String(ui.done - ui.right), 'kp-tally-again'), cell(t("時間", "Time"), clock, 'kp-tally-time')));
+  box.append(el('p', 'kp-done-rate', el('span', null, t("思い出せた割合")), el('b', null, `${pct}%`), el('span', null, `${t("回答")} ${ui.done}`)));
+  if (ui.pause) {
+    // cards still in a learning step: they come back when due; the learner may review them now, early, within the limit
+    const said = pauseWords({ ...ui.pause, count: ui.pause.words }, lang, now);
+    const line = el('p', 'kp-sub kp-pause', said.line);
+    line.id = 'kp-pause';
+    box.append(line);
+    if (said.now) box.append(btn('kp-start kp-ahead', said.now, reviewAhead, { id: 'kp-ahead' }));
+    // the line and its choice change when the next step falls due, or comes within the learn-ahead limit
+    const turn = ui.pause.canEarly ? ui.pause.at : ui.pause.at - LEARN_AHEAD_MS;
+    if (turn > now.getTime()) {
+      pauseTimer = setTimeout(() => {
+        if (ui.screen === 'study' && !ui.queue[ui.pos] && ctx?.root?.isConnected) {
+          refreshPause();
+          paint();
+        }
+      }, Math.min(2 ** 31 - 1, turn - now.getTime() + 50));
+    }
+  } else {
+    const soon = learningSoon(ctx.deck, ctx.state, now, DAY, { skip: skipFor(ctx.prefs.mode) })[0];
+    box.append(el('p', 'kp-sub', soon ? t(`次の復習は ${fmtWait(Math.max(0, soon.t - Date.now()))}後。`, `Next review in ${fmtWait(Math.max(0, soon.t - Date.now()))}.`) : t("今日の分は終わり。また明日。")));
+  }
+  if (ui.buried) box.append(el('p', 'kp-sub kp-buried', buriedWords(ui.buried, lang)));
   // one door forward: the host's reading for today, the words just met waiting in it
   const door = ctx.focusRoom ? safely(() => ctx.next?.() || null, null) : null;
   if (door) {
@@ -2828,7 +3266,7 @@ function doneScreen() {
     doorButton.querySelector('.kp-door-t').lang = 'ja';
     box.append(doorButton);
   }
-  box.append(btn(door ? 'kp-link kp-home-quiet' : 'kp-start', t("デッキに戻る"), () => go('home'), { id: 'kp-home' }));
+  box.append(btn(door || ui.pause?.canEarly ? 'kp-link kp-home-quiet' : 'kp-start', t("デッキに戻る"), () => go('home'), { id: 'kp-home' }));
   if (ui.undo) box.append(btn('kp-undo', t("ひとつ戻す"), undo, { id: 'kp-undo' }));
   return box;
 }
@@ -2916,19 +3354,6 @@ function settingsScreen() {
   box.append(seg(t("一日の新しいカード"), 'newPerDay', [[5, '5'], [10, '10'], [15, '15'], [20, '20'], [30, '30']]));
   box.append(seg(t("答え方"), 'mode', [['read', t("読んで思い出す")], ['self', t("穴埋め")], ['choice', t("4択")]]));
   box.append(seg(t("英語の意味（答えの「英語」）"), 'gloss', [['tap', t("タップで開く")], ['show', t("いつも開いておく")]]));
-  const themes = el('div', 'kp-field', el('h2', 'kp-h2', t("色（テーマ）")));
-  const sw = el('div', 'kp-swatches');
-  sw.setAttribute('role', 'radiogroup');
-  sw.setAttribute('aria-label', t("色（テーマ）"));
-  for (const [value, label, bg, ink] of THEMES.filter(([value]) => ctx.host || value !== 'world')) {
-    const on = ctx.prefs.look === value;
-    const b = btn(`kp-swatch${on ? ' is-on' : ''}`, t(label), () => {
-      savePrefs({ ...ctx.prefs, look: value }, { explicitLook: true });
-    }, { 'data-pref': `look:${value}`, 'aria-label': t(label), role: 'radio', 'aria-checked': String(on), style: `background:${bg};color:${ink}` });
-    sw.append(b);
-  }
-  themes.append(sw);
-  box.append(themes);
   box.append(suspendedField());
 
   const ta = el('textarea', 'kp-backup');
@@ -2969,9 +3394,8 @@ function suspendedField() {
   const count = el('p', 'kp-sub', ids.length ? t(`${fmtN(ids.length)}枚（${Object.entries(why).map(([k, n]) => `${SUSPEND_WHY[k] || k} ${n}`).join('・')}）`, `${nounEn(ids.length, 'card')} (${Object.entries(why).map(([k, n]) => `${t(SUSPEND_WHY[k] || k)} ${n}`).join(' · ')})`) : t("ありません"));
   count.id = 'kp-suspended';
   const back = btn('', t("復元"), () => {
-    const nextState = restoreSuspended(ctx.state, new Date(), ids);
-    if (!save(nextState)) return saveFailed();
-    ctx.state = nextState;
+    const r = writeLedger((fresh) => restoreSuspended(fresh, new Date(), ids));
+    if (r.failed) return saveFailed();
     ui.undo = null;
     ui.toast = '';
     paint();
@@ -3055,12 +3479,17 @@ function restoreButton(ta, msg) {
 }
 
 function onKey(e) {
-  if (!ctx?.root?.isConnected || ui.screen !== 'study' || e.target.closest?.('input, textarea')) return;
-  // an open sheet or popover takes the keys: Escape closes it, and nothing grades behind it
-  if (ui.sheet || ui.pop) {
+  // A retained card still has this document listener while a full entry owns the keys.
+  if (e.defaultPrevented || !ctx?.root?.isConnected || ui.screen !== 'study'
+    || ctx.root.closest('[inert], [aria-hidden="true"], [hidden]')
+    || (ctx.host && document.querySelector('#sheet, #stroke-page'))
+    || e.target.closest?.('input, textarea')) return;
+  // an open slip (the host's) or popover takes the keys: Escape closes it, and nothing grades behind it
+  const slip = !!ctx.host && safely(() => !!ctx.host.slipOpen?.(), false);
+  if (slip || ui.pop) {
     if (e.key === 'Escape') {
       e.preventDefault();
-      if (ui.sheet) closeSheet();
+      if (slip) { ctx.host.closeSlip?.(); lightWord(null); }
       else closePop();
     }
     return;
@@ -3089,7 +3518,15 @@ function ensureCss() {
   document.head.append(link);
 }
 
-export async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true, autoStart, presentation = null, next = null, focusRoom = false } = {}) {
+export async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true, autoStart, presentation = null, next = null, focusRoom = false, words = null, learner = null } = {}) {
+  if (isSharedStudyMode() && (isSharedDeck(deckId) || deckId === 'shared-grammar')) {
+    ++mountRequest; ctx = null; pendingStart = null;
+    return (await sharedPlayer()).render(main, {deckId,onLeave,english,autoStart});
+  }
+  if (isSharedStudyMode()) {
+    ++mountRequest; ctx = null; pendingStart = null;
+    return (await sharedPlayer()).renderSharedFence(main,{english,onLeave});
+  }
   const request = ++mountRequest;
   if (autoStart !== undefined) pendingStart = { deckId, autoStart };
   ensureCss();
@@ -3127,19 +3564,25 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
     // one, the page's built-in gloss map of this deck's own words (STANDARD A44)
     tokenFile: lexicon ? tokensReady.get(deckId) || null : null,
     gloss: lexicon ? null : glossFor(deckId, deck),
-    prefs: prefsFor(storage, deck, !!lexicon),
-    lookExplicit: Object.hasOwn(readJson(storage, prefsKey(deck.id)) || {}, 'look'),
+    prefs: prefsFor(storage, deck),
+    // Q · the host's one rule for Japanese line breaks: text → its words, as groups of segments (the app's jaWordGroups);
+    // the standalone pages have none and keep the browser's breaks
+    words: typeof words === 'function' ? words : null,
+    // the learner's own schedule policy (retention, steps, fitted weights) when the host passes it: one policy on every
+    // surface (lead's ruling 10-19); the standalone pages have none and use the pin
+    scheduler: learner ? createScheduler(fsrsApi, pin, learner) : scheduler,
   };
   root.addEventListener('pointerdown', onDown, true);
-  ({ state: ctx.state, notice: ctx.notice } = loadState(storage, deck));
+  wireDeckHold(root);
+  ({ state: ctx.state, notice: ctx.notice, text: ctx.ledgerText } = loadState(storage, deck));
   if (!sameDeck || start === false) {
     ui.screen = 'home';
     ui.queue = [];
-    ui.sheet = null;
     ui.pop = null;
   }
   if (!keyBound) {
     document.addEventListener('keydown', onKey);
+    window.addEventListener('storage', onStorage);
     window.addEventListener('scroll', () => ui.pop && placePop(), { passive: true });
     keyBound = true;
   }
@@ -3161,10 +3604,33 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
 }
 
 /** due count for a deck chooser, without rendering anything */
+/**
+ * Read-only, for the corridor's Today (S): the words this deck's ledger answered Again since `since` (epoch ms) — a
+ * miss in reading or in the four choices (わからない) — each with its latest miss, most recent first. It loads the deck to
+ * name its cards and writes nothing.
+ */
+export async function missedTerms(deckId, storage = window.localStorage, since = 0) {
+  if (isSharedStudyMode() && (isSharedDeck(deckId) || deckId === 'shared-grammar')) return (await sharedPlayer()).missedTerms(deckId,since);
+  if (isSharedStudyMode()) return [];
+  const { deck, index } = await loadDeck(deckId);
+  const { state } = loadState(storage, deck);
+  const latest = new Map();
+  for (const row of Array.isArray(state.log) ? state.log : []) {
+    if (!Array.isArray(row) || row[1] !== RATINGS.again) continue;
+    const at = Date.parse(row[2]);
+    const word = index.cards.get(row[0])?.word;
+    if (!(at >= since) || !word?.term) continue;
+    if (!latest.has(word.term) || latest.get(word.term).at < at) latest.set(word.term, { term: word.term, reading: word.reading || '', at, deck: deckId });
+  }
+  return [...latest.values()].sort((a, b) => b.at - a.at);
+}
+
 export async function summary(deckId, storage = window.localStorage) {
+  if (isSharedStudyMode() && (isSharedDeck(deckId) || deckId === 'shared-grammar')) return (await sharedPlayer()).summary(deckId);
+  if (isSharedStudyMode()) return {due:0,fresh:0,total:0,words:0,authority:'unmapped'};
   const { deck } = await loadDeck(deckId);
   const { state } = loadState(storage, deck);
   const prefs = prefsFor(storage, deck);
-  const q = buildQueue(deck, state, new Date(), prefs.newPerDay, { skip: skipFor(prefs.mode) });
+  const q = buildQueue(deck, state, new Date(), prefs.newPerDay, { skip: skipFor(prefs.mode), buried: buriedToday(storage, deck.id, new Date()) });
   return { due: q.due.length, fresh: q.fresh.length, total: q.queue.length, words: deck.words.length, titleJa: deck.titleJa, titleEn: deck.titleEn };
 }

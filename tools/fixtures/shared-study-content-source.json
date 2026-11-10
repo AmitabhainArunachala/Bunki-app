@@ -1,0 +1,2106 @@
+{
+  "format": "bunki-shared-content-source-excerpt/v1",
+  "reviewedSourceDigests": {
+    "registrySha256": "5b0f4a7685cb5abc8f2c26a0fb0c672e38554a6f23a456798750fe1608129013",
+    "catalogSha256": "53939502da9f0bae2fb63f74553924b5d2d809705efc1e21e01e64e2b61f4697"
+  },
+  "input": {
+    "registry": {
+      "tasks": [
+        {
+          "anki": {
+            "guid": "nsrs-g-0065845cfaa8",
+            "modelId": 1761577200102,
+            "ord": 1
+          },
+          "bunki": null,
+          "contractId": "grammar.cloze.v1",
+          "lexemeId": null,
+          "noteGuid": "nsrs-g-0065845cfaa8",
+          "passageId": "nsrs-g-0065845cfaa8:example:2",
+          "player": null,
+          "taskKey": "[\"nsrs-g-0065845cfaa8\",\"grammar.cloze.v1\",\"nsrs-g-0065845cfaa8:example:2\"]"
+        },
+        {
+          "anki": {
+            "guid": "nsrs-g-0065845cfaa8",
+            "modelId": 1761577200102,
+            "ord": 0
+          },
+          "bunki": null,
+          "contractId": "grammar.meaning.v1",
+          "lexemeId": null,
+          "noteGuid": "nsrs-g-0065845cfaa8",
+          "passageId": "nsrs-g-0065845cfaa8:example:1",
+          "player": null,
+          "taskKey": "[\"nsrs-g-0065845cfaa8\",\"grammar.meaning.v1\",\"nsrs-g-0065845cfaa8:example:1\"]"
+        },
+        {
+          "anki": {
+            "guid": "nsrs-v-56081f59ac82",
+            "modelId": 1761577200101,
+            "ord": 0
+          },
+          "bunki": {
+            "cardId": "nn-56081f59ac-e3bb27f0",
+            "deckId": "senmon",
+            "wordId": "nn-56081f59ac"
+          },
+          "contractId": "vocabulary.read.v1",
+          "lexemeId": "lexeme:nsrs-v-56081f59ac82",
+          "noteGuid": "nsrs-v-56081f59ac82",
+          "optionalAnkiRecall": {
+            "contractId": "vocabulary.recall.v1",
+            "guid": "nsrs-v-56081f59ac82",
+            "modelId": 1761577200101,
+            "ord": 1,
+            "standaloneScheduled": false
+          },
+          "passageId": "nn-56081f59ac-e3bb27f0",
+          "player": {
+            "cardId": "nn-56081f59ac-e3bb27f0",
+            "deckId": "senmon",
+            "wordId": "nn-56081f59ac"
+          },
+          "taskKey": "[\"nsrs-v-56081f59ac82\",\"vocabulary.read.v1\",\"nn-56081f59ac-e3bb27f0\"]"
+        },
+        {
+          "anki": {
+            "guid": "nsrs-v-57f75cee82a5",
+            "modelId": 1761577200101,
+            "ord": 0
+          },
+          "bunki": null,
+          "contractId": "vocabulary.read.v1",
+          "lexemeId": "lexeme:nsrs-v-57f75cee82a5",
+          "noteGuid": "nsrs-v-57f75cee82a5",
+          "optionalAnkiRecall": {
+            "contractId": "vocabulary.recall.v1",
+            "guid": "nsrs-v-57f75cee82a5",
+            "modelId": 1761577200101,
+            "ord": 1,
+            "standaloneScheduled": false
+          },
+          "passageId": "nn-57f75cee82-5376be10",
+          "player": {
+            "cardId": "nn-57f75cee82-5376be10",
+            "deckId": "kotoba-master",
+            "wordId": "nn-57f75cee82"
+          },
+          "taskKey": "[\"nsrs-v-57f75cee82a5\",\"vocabulary.read.v1\",\"nn-57f75cee82-5376be10\"]"
+        },
+        {
+          "anki": {
+            "guid": "nsrs-v-6648fc81ce29",
+            "modelId": 1761577200101,
+            "ord": 0
+          },
+          "bunki": {
+            "cardId": "nn-6648fc81ce-91d058a8",
+            "deckId": "n2",
+            "wordId": "nn-6648fc81ce"
+          },
+          "contractId": "vocabulary.read.v1",
+          "lexemeId": "lexeme:nsrs-v-6648fc81ce29",
+          "noteGuid": "nsrs-v-6648fc81ce29",
+          "optionalAnkiRecall": {
+            "contractId": "vocabulary.recall.v1",
+            "guid": "nsrs-v-6648fc81ce29",
+            "modelId": 1761577200101,
+            "ord": 1,
+            "standaloneScheduled": false
+          },
+          "passageId": "nn-6648fc81ce-91d058a8",
+          "player": {
+            "cardId": "nn-6648fc81ce-91d058a8",
+            "deckId": "n2",
+            "wordId": "nn-6648fc81ce"
+          },
+          "taskKey": "[\"nsrs-v-6648fc81ce29\",\"vocabulary.read.v1\",\"nn-6648fc81ce-91d058a8\"]"
+        },
+        {
+          "anki": {
+            "guid": "nsrs-v-67f6fe4a2fb4",
+            "modelId": 1761577200101,
+            "ord": 0
+          },
+          "bunki": {
+            "cardId": "nn-67f6fe4a2f-ca1c2c4f",
+            "deckId": "n1",
+            "wordId": "nn-67f6fe4a2f"
+          },
+          "contractId": "vocabulary.read.v1",
+          "lexemeId": "lexeme:nsrs-v-67f6fe4a2fb4",
+          "noteGuid": "nsrs-v-67f6fe4a2fb4",
+          "optionalAnkiRecall": {
+            "contractId": "vocabulary.recall.v1",
+            "guid": "nsrs-v-67f6fe4a2fb4",
+            "modelId": 1761577200101,
+            "ord": 1,
+            "standaloneScheduled": false
+          },
+          "passageId": "nn-67f6fe4a2f-ca1c2c4f",
+          "player": {
+            "cardId": "nn-67f6fe4a2f-ca1c2c4f",
+            "deckId": "n1",
+            "wordId": "nn-67f6fe4a2f"
+          },
+          "taskKey": "[\"nsrs-v-67f6fe4a2fb4\",\"vocabulary.read.v1\",\"nn-67f6fe4a2f-ca1c2c4f\"]"
+        }
+      ],
+      "notes": [
+        {
+          "ankiModelId": 1761577200101,
+          "kind": "vocabulary",
+          "lexemeId": "lexeme:nsrs-v-56081f59ac82",
+          "module": "senmon",
+          "noteGuid": "nsrs-v-56081f59ac82",
+          "source": "bunki-n2n1@b66a0540"
+        },
+        {
+          "ankiModelId": 1761577200101,
+          "kind": "vocabulary",
+          "lexemeId": "lexeme:nsrs-v-57f75cee82a5",
+          "module": "kotoba",
+          "noteGuid": "nsrs-v-57f75cee82a5",
+          "source": "kotoba-mcd@08540b58"
+        },
+        {
+          "ankiModelId": 1761577200101,
+          "kind": "vocabulary",
+          "lexemeId": "lexeme:nsrs-v-6648fc81ce29",
+          "module": "n2",
+          "noteGuid": "nsrs-v-6648fc81ce29",
+          "source": "bunki-n2n1@b66a0540"
+        },
+        {
+          "ankiModelId": 1761577200101,
+          "kind": "vocabulary",
+          "lexemeId": "lexeme:nsrs-v-67f6fe4a2fb4",
+          "module": "n1",
+          "noteGuid": "nsrs-v-67f6fe4a2fb4",
+          "source": "bunki-n2n1@b66a0540"
+        },
+        {
+          "ankiModelId": 1761577200102,
+          "kind": "grammar",
+          "module": "grammar",
+          "noteGuid": "nsrs-g-0065845cfaa8",
+          "pattern": "〜に堪えない",
+          "source": "nsrs-gen-20261028/g016"
+        }
+      ],
+      "passages": [
+        {
+          "assignment": "existing-pack-card-id",
+          "kind": "vocabulary",
+          "noteGuid": "nsrs-v-56081f59ac82",
+          "passageId": "nn-56081f59ac-e3bb27f0",
+          "sourceFormSha256": "2588b5b9bacc1df62c25c12ed78ad4a1c67e7f1ae5a756f9ef9e8972548fd4ac",
+          "sourceJaSha256": "51ad6e451beab1492b3b1c11847a573830b96a658e327bc294fff2218b7d46b9",
+          "sourceTokenIndex": 0
+        },
+        {
+          "assignment": "existing-pack-card-id",
+          "kind": "vocabulary",
+          "noteGuid": "nsrs-v-57f75cee82a5",
+          "passageId": "nn-57f75cee82-5376be10",
+          "sourceFormSha256": "7606319cb818292b36ec9aed17224ddda73a633e92598f95d13b7d11086fe38d",
+          "sourceJaSha256": "1c0b3836875e1e8b05cfbeb56df78d128f901430bf1edc73655e10b9681134d4",
+          "sourceTokenIndex": 0
+        },
+        {
+          "assignment": "existing-pack-card-id",
+          "kind": "vocabulary",
+          "noteGuid": "nsrs-v-6648fc81ce29",
+          "passageId": "nn-6648fc81ce-91d058a8",
+          "sourceFormSha256": "e18d718d85a162a7fffc01ff9c8a009ad2da184397d5838c0975eeaeb54bb351",
+          "sourceJaSha256": "218798d2eb1f6741103564db27c1efc14fac1ff02464685defb58a10429a635b",
+          "sourceTokenIndex": 0
+        },
+        {
+          "assignment": "existing-pack-card-id",
+          "kind": "vocabulary",
+          "noteGuid": "nsrs-v-67f6fe4a2fb4",
+          "passageId": "nn-67f6fe4a2f-ca1c2c4f",
+          "sourceFormSha256": "75e743b5ef9b92a226eee6393899119d7884e35a540d8ac00c74f060f1baf018",
+          "sourceJaSha256": "1a4eaccb96f67ab914ab87a9219431f285e8dd9c71210209676a917b360beec5",
+          "sourceTokenIndex": 0
+        },
+        {
+          "assignment": "frozen-original-example-slot",
+          "kind": "grammar",
+          "noteGuid": "nsrs-g-0065845cfaa8",
+          "passageId": "nsrs-g-0065845cfaa8:example:1",
+          "sourceFormSha256": "f97b90e563dcb465acca2fbef7bffe6782077e90a969516ec34de82ec14c746d",
+          "sourceJaSha256": "0be08cb56f06f0c627b72e914383dbe409794e4c757d4135b010dff48be67bb3"
+        },
+        {
+          "assignment": "frozen-original-example-slot",
+          "kind": "grammar",
+          "noteGuid": "nsrs-g-0065845cfaa8",
+          "passageId": "nsrs-g-0065845cfaa8:example:2",
+          "sourceFormSha256": "d2ec919991df5175dc46fd0f986f7fd8ba590ca9123291305061d9637d71ea5f",
+          "sourceJaSha256": "a45976923df34ba1eacd990580d59913e8aab372b1e32e5fc5af803e00082f38"
+        }
+      ],
+      "examples": [
+        {
+          "clozeSpan": {
+            "end": 13,
+            "start": 6,
+            "unit": "unicode-codepoint"
+          },
+          "exampleId": "nsrs-g-0065845cfaa8:example:1",
+          "noteGuid": "nsrs-g-0065845cfaa8",
+          "sourceExampleSha256": "177ed4dd43b644c2c299710cfdc3d4331f4f02e362e5c1d768b52d2d8a321879",
+          "sourceIndex": 0,
+          "sourceJaSha256": "0be08cb56f06f0c627b72e914383dbe409794e4c757d4135b010dff48be67bb3"
+        },
+        {
+          "clozeSpan": {
+            "end": 28,
+            "start": 19,
+            "unit": "unicode-codepoint"
+          },
+          "exampleId": "nsrs-g-0065845cfaa8:example:2",
+          "noteGuid": "nsrs-g-0065845cfaa8",
+          "sourceExampleSha256": "8268032aee600ff80e71dcb3ee60ab16b133c1a7d6416b3a0cd95fbe279be780",
+          "sourceIndex": 1,
+          "sourceJaSha256": "a45976923df34ba1eacd990580d59913e8aab372b1e32e5fc5af803e00082f38"
+        }
+      ]
+    },
+    "catalog": [
+      {
+        "anki": {
+          "guid": "nsrs-v-6648fc81ce29",
+          "modelId": 1761577200101,
+          "ord": 0
+        },
+        "bunki": {
+          "cardId": "nn-6648fc81ce-91d058a8",
+          "deckId": "n2",
+          "wordId": "nn-6648fc81ce"
+        },
+        "contractId": "vocabulary.read.v1",
+        "lexemeId": "lexeme:nsrs-v-6648fc81ce29",
+        "noteGuid": "nsrs-v-6648fc81ce29",
+        "optionalAnkiRecall": {
+          "contractId": "vocabulary.recall.v1",
+          "guid": "nsrs-v-6648fc81ce29",
+          "modelId": 1761577200101,
+          "ord": 1,
+          "standaloneScheduled": false
+        },
+        "passageId": "nn-6648fc81ce-91d058a8",
+        "player": {
+          "cardId": "nn-6648fc81ce-91d058a8",
+          "deckId": "n2",
+          "wordId": "nn-6648fc81ce"
+        },
+        "taskKey": "[\"nsrs-v-6648fc81ce29\",\"vocabulary.read.v1\",\"nn-6648fc81ce-91d058a8\"]",
+        "module": "n2",
+        "term": "高学歴",
+        "form": "高学歴",
+        "reading": "こうがくれき",
+        "meaning": "advanced educational background",
+        "defJa": "大学院など、高い段階の教育を受けていること",
+        "pos": "noun",
+        "posClass": "noun",
+        "note": "受けた教育の段階を表す語で、専門外の知識や人格を直接示すものではありません。",
+        "source": "bunki-n2n1@b66a0540",
+        "collocations": [],
+        "theme": "mind",
+        "kanji": [
+          {
+            "c": "高",
+            "m": "tall",
+            "parts": ["亠", "口", "冋"],
+            "st": 10,
+            "r": "こう"
+          },
+          {
+            "c": "学",
+            "m": "study",
+            "parts": ["冖", "子"],
+            "st": 8,
+            "r": "がく"
+          },
+          {
+            "c": "歴",
+            "m": "curriculum",
+            "parts": ["厂", "林", "止"],
+            "st": 14,
+            "r": "れき"
+          }
+        ],
+        "ja": "読書会に博士号を持つ人が来ると聞いて、会う前から何を聞いても答えてくれそうだと期待したことがあるんだ。高学歴だからといって、専門外の本まで詳しく知っているとは限らないのに、経歴から勝手に人物像を作っていたんだね。逆に、相手が専門用語を使わずに話すだけで、内容も簡単なんだろうと思うのも先入観だと思う。どこで何を学んだかは会話のきっかけにできるけど、実際にどんな問いを持っているかは、その人の言葉を聞いてから知りたいよね。",
+        "en": "Once, on hearing that someone with a doctorate was coming to a reading group, I expected before meeting them that they could answer anything I asked. Although advanced education does not mean knowing all about books outside one's specialty, I had built an image of the person from their background. Conversely, assuming that content is simple just because someone speaks without technical terms also seems like a preconception. Where and what someone studied can start a conversation, but I want to learn what questions they actually have by listening to their own words.",
+        "contentRevision": "218798d2eb1f6741103564db27c1efc14fac1ff02464685defb58a10429a635b",
+        "englishBinding": {
+          "format": "nihongo-translation-binding",
+          "version": 1,
+          "guid": "nsrs-v-6648fc81ce29",
+          "source_sha256": "218798d2eb1f6741103564db27c1efc14fac1ff02464685defb58a10429a635b",
+          "english_sha256": "b247bf084b8af7f7afe20d9d57b9a34d4ebace6c8f2520b3912d91c85fcbb528",
+          "source_segments": [
+            {
+              "id": "s0",
+              "start": 0,
+              "end": 51,
+              "unit": "unicode-codepoint",
+              "sha256": "bddd6881642b7ea71b804d0b6c445a7634bbf8cc8d6cbdce26c1906077253e74"
+            },
+            {
+              "id": "s1",
+              "start": 51,
+              "end": 106,
+              "unit": "unicode-codepoint",
+              "sha256": "397637bbc03be441d405f83df41aea8f39b454924b15e04277f37690a4a8b0c7"
+            },
+            {
+              "id": "s2",
+              "start": 106,
+              "end": 150,
+              "unit": "unicode-codepoint",
+              "sha256": "8fe8b701f5877a2fb450c5bb411e3a1ede81acbc4a101c19dd9eed5748b4c725"
+            },
+            {
+              "id": "s3",
+              "start": 150,
+              "end": 210,
+              "unit": "unicode-codepoint",
+              "sha256": "87d279d439694e5072b437f9c9f0be8755e39c99fe9b1a1e0ab91b92cd836447"
+            }
+          ],
+          "alignment": [
+            {
+              "source_ids": ["s0", "s1", "s2", "s3"],
+              "english_span": {
+                "start": 0,
+                "end": 571,
+                "unit": "unicode-codepoint"
+              },
+              "review_id": "57a66dd46d4fd4e19b8f84b7f43b6fa2a9dd2374047c0c405916f0903e8b5f18"
+            }
+          ],
+          "status": "verified",
+          "review_ids": ["57a66dd46d4fd4e19b8f84b7f43b6fa2a9dd2374047c0c405916f0903e8b5f18"],
+          "pending_reasons": [],
+          "provenance": []
+        },
+        "contentReady": true,
+        "rubySegments": [
+          ["読書", "どくしょ"],
+          ["会", "かい"],
+          ["に", ""],
+          ["博士号", "はくしごう"],
+          ["を", ""],
+          ["持", "も"],
+          ["つ", ""],
+          ["人", "ひと"],
+          ["が", ""],
+          ["来", "く"],
+          ["ると", ""],
+          ["聞", "き"],
+          ["いて、", ""],
+          ["会", "あ"],
+          ["う", ""],
+          ["前", "まえ"],
+          ["から", ""],
+          ["何", "なに"],
+          ["を", ""],
+          ["聞", "き"],
+          ["いても", ""],
+          ["答", "こた"],
+          ["えてくれそうだと", ""],
+          ["期待", "きたい"],
+          ["したことがあるんだ。", ""],
+          ["高学歴", "こうがくれき", 1],
+          ["だからといって、", ""],
+          ["専門", "せんもん"],
+          ["外", "がい"],
+          ["の", ""],
+          ["本", "ほん"],
+          ["まで", ""],
+          ["詳", "くわ"],
+          ["しく", ""],
+          ["知", "し"],
+          ["っているとは", ""],
+          ["限", "かぎ"],
+          ["らないのに、", ""],
+          ["経歴", "けいれき"],
+          ["から", ""],
+          ["勝手", "かって"],
+          ["に", ""],
+          ["人物", "じんぶつ"],
+          ["像", "ぞう"],
+          ["を", ""],
+          ["作", "つく"],
+          ["っていたんだね。", ""],
+          ["逆", "ぎゃく"],
+          ["に、", ""],
+          ["相手", "あいて"],
+          ["が", ""],
+          ["専門", "せんもん"],
+          ["用語", "ようご"],
+          ["を", ""],
+          ["使", "つか"],
+          ["わずに", ""],
+          ["話", "はな"],
+          ["すだけで、", ""],
+          ["内容", "ないよう"],
+          ["も", ""],
+          ["簡単", "かんたん"],
+          ["なんだろうと", ""],
+          ["思", "おも"],
+          ["うのも", ""],
+          ["先入", "せんにゅう"],
+          ["観", "かん"],
+          ["だと", ""],
+          ["思", "おも"],
+          ["う。どこで", ""],
+          ["何", "なに"],
+          ["を", ""],
+          ["学", "まな"],
+          ["んだかは", ""],
+          ["会話", "かいわ"],
+          ["のきっかけにできるけど、", ""],
+          ["実際", "じっさい"],
+          ["にどんな", ""],
+          ["問", "と"],
+          ["いを", ""],
+          ["持", "も"],
+          ["っているかは、その", ""],
+          ["人", "ひと"],
+          ["の", ""],
+          ["言葉", "ことば"],
+          ["を", ""],
+          ["聞", "き"],
+          ["いてから", ""],
+          ["知", "し"],
+          ["りたいよね。", ""]
+        ],
+        "ruby": [
+          {
+            "surface": "読書",
+            "reading": "どくしょ"
+          },
+          {
+            "surface": "会",
+            "reading": "かい"
+          },
+          {
+            "surface": "博士",
+            "reading": "はかせ"
+          },
+          {
+            "surface": "号",
+            "reading": "ごう"
+          },
+          {
+            "surface": "持つ",
+            "reading": "もつ"
+          },
+          {
+            "surface": "人",
+            "reading": "ひと"
+          },
+          {
+            "surface": "来る",
+            "reading": "くる"
+          },
+          {
+            "surface": "聞い",
+            "reading": "きい"
+          },
+          {
+            "surface": "会う",
+            "reading": "あう"
+          },
+          {
+            "surface": "前",
+            "reading": "まえ"
+          },
+          {
+            "surface": "何",
+            "reading": "なん"
+          },
+          {
+            "surface": "聞い",
+            "reading": "きい"
+          },
+          {
+            "surface": "答え",
+            "reading": "こたえ"
+          },
+          {
+            "surface": "期待",
+            "reading": "きたい"
+          },
+          {
+            "surface": "高",
+            "reading": "こう"
+          },
+          {
+            "surface": "学歴",
+            "reading": "がくれき"
+          },
+          {
+            "surface": "専門",
+            "reading": "せんもん"
+          },
+          {
+            "surface": "外",
+            "reading": "がい"
+          },
+          {
+            "surface": "本",
+            "reading": "ほん"
+          },
+          {
+            "surface": "詳しく",
+            "reading": "くわしく"
+          },
+          {
+            "surface": "知っ",
+            "reading": "しっ"
+          },
+          {
+            "surface": "限ら",
+            "reading": "かぎら"
+          },
+          {
+            "surface": "経歴",
+            "reading": "けいれき"
+          },
+          {
+            "surface": "勝手",
+            "reading": "かって"
+          },
+          {
+            "surface": "人物",
+            "reading": "じんぶつ"
+          },
+          {
+            "surface": "像",
+            "reading": "ぞう"
+          },
+          {
+            "surface": "作っ",
+            "reading": "つくっ"
+          },
+          {
+            "surface": "逆",
+            "reading": "ぎゃく"
+          },
+          {
+            "surface": "相手",
+            "reading": "あいて"
+          },
+          {
+            "surface": "専門",
+            "reading": "せんもん"
+          },
+          {
+            "surface": "用語",
+            "reading": "ようご"
+          },
+          {
+            "surface": "使わ",
+            "reading": "つかわ"
+          },
+          {
+            "surface": "話す",
+            "reading": "はなす"
+          },
+          {
+            "surface": "内容",
+            "reading": "ないよう"
+          },
+          {
+            "surface": "簡単",
+            "reading": "かんたん"
+          },
+          {
+            "surface": "思う",
+            "reading": "おもう"
+          },
+          {
+            "surface": "先入観",
+            "reading": "せんにゅうかん"
+          },
+          {
+            "surface": "思う",
+            "reading": "おもう"
+          },
+          {
+            "surface": "何",
+            "reading": "なん"
+          },
+          {
+            "surface": "学ん",
+            "reading": "まなん"
+          },
+          {
+            "surface": "会話",
+            "reading": "かいわ"
+          },
+          {
+            "surface": "実際",
+            "reading": "じっさい"
+          },
+          {
+            "surface": "問い",
+            "reading": "とい"
+          },
+          {
+            "surface": "持っ",
+            "reading": "もっ"
+          },
+          {
+            "surface": "人",
+            "reading": "ひと"
+          },
+          {
+            "surface": "言葉",
+            "reading": "ことば"
+          },
+          {
+            "surface": "聞い",
+            "reading": "きい"
+          },
+          {
+            "surface": "知り",
+            "reading": "しり"
+          }
+        ]
+      },
+      {
+        "anki": {
+          "guid": "nsrs-v-67f6fe4a2fb4",
+          "modelId": 1761577200101,
+          "ord": 0
+        },
+        "bunki": {
+          "cardId": "nn-67f6fe4a2f-ca1c2c4f",
+          "deckId": "n1",
+          "wordId": "nn-67f6fe4a2f"
+        },
+        "contractId": "vocabulary.read.v1",
+        "lexemeId": "lexeme:nsrs-v-67f6fe4a2fb4",
+        "noteGuid": "nsrs-v-67f6fe4a2fb4",
+        "optionalAnkiRecall": {
+          "contractId": "vocabulary.recall.v1",
+          "guid": "nsrs-v-67f6fe4a2fb4",
+          "modelId": 1761577200101,
+          "ord": 1,
+          "standaloneScheduled": false
+        },
+        "passageId": "nn-67f6fe4a2f-ca1c2c4f",
+        "player": {
+          "cardId": "nn-67f6fe4a2f-ca1c2c4f",
+          "deckId": "n1",
+          "wordId": "nn-67f6fe4a2f"
+        },
+        "taskKey": "[\"nsrs-v-67f6fe4a2fb4\",\"vocabulary.read.v1\",\"nn-67f6fe4a2f-ca1c2c4f\"]",
+        "module": "n1",
+        "term": "交渉",
+        "form": "交渉",
+        "reading": "こうしょう",
+        "meaning": "negotiation",
+        "defJa": "話し合いによって条件をまとめること",
+        "pos": "noun",
+        "posClass": "noun",
+        "note": "「交渉が決裂する」「交渉を重ねる」が定番。外交やビジネスの話し合いを指す。",
+        "source": "bunki-n2n1@b66a0540",
+        "collocations": [],
+        "theme": "history",
+        "kanji": [
+          {
+            "c": "交",
+            "m": "mingle",
+            "parts": ["亠", "父"],
+            "st": 6,
+            "r": "こう"
+          },
+          {
+            "c": "渉",
+            "m": "ford",
+            "parts": ["氵", "歩"],
+            "st": 11,
+            "r": "しょう"
+          }
+        ],
+        "ja": "1905年、日露戦争の講和会議がアメリカのポーツマスで開かれました。日本は連戦連勝を重ねていたものの、国力は限界に達しており、早期の講和が急務だったのです。全権の小村寿太郎は賠償金を求めてロシア側と交渉を重ねましたが、相手は最後まで譲りませんでした。結局、賠償金を取れないまま条約は成立し、帰国した小村は国民の激しい非難にさらされます。しかし今振り返ると、疲弊した国家をこれ以上戦わせなかった判断は、正しかったのかもしれません。",
+        "en": "In 1905, the peace conference that ended the Russo-Japanese War was held in Portsmouth, in the United States. Japan had won battle after battle, but its national strength had reached its limit, and an early peace was an urgent necessity. The plenipotentiary Komura Jutarō negotiated again and again with the Russian side over an indemnity, but they never gave an inch. In the end, the treaty was concluded without any indemnity, and Komura, on returning home, was met with fierce public criticism. Yet looking back now, the decision not to force an exhausted nation to keep fighting may well have been the right one.",
+        "contentRevision": "1a4eaccb96f67ab914ab87a9219431f285e8dd9c71210209676a917b360beec5",
+        "englishBinding": {
+          "format": "nihongo-translation-binding",
+          "version": 1,
+          "guid": "nsrs-v-67f6fe4a2fb4",
+          "source_sha256": "1a4eaccb96f67ab914ab87a9219431f285e8dd9c71210209676a917b360beec5",
+          "english_sha256": "1d89fb8a833ae0a63cd7d1682c46d2ff017f5b85cf1c85d61a55208b031a09bf",
+          "source_segments": [
+            {
+              "id": "s0",
+              "start": 0,
+              "end": 34,
+              "unit": "unicode-codepoint",
+              "sha256": "208c3b9571dcbff98b7ed08c0cc86888f38dac74b6af1ca541f8586c00d13b30"
+            },
+            {
+              "id": "s1",
+              "start": 34,
+              "end": 78,
+              "unit": "unicode-codepoint",
+              "sha256": "93a442a2715cc55212913d5835f9de7ca802144364cba6ef42c33f4d7085decd"
+            },
+            {
+              "id": "s2",
+              "start": 78,
+              "end": 125,
+              "unit": "unicode-codepoint",
+              "sha256": "463dda635e5266174d8ef52b51846e499bd2f2bf8626484b8199f7fcd13028ea"
+            },
+            {
+              "id": "s3",
+              "start": 125,
+              "end": 168,
+              "unit": "unicode-codepoint",
+              "sha256": "4e0c561c2e6b1f7771c7e42b3cb54a2938e01026d43c6d127118279d49dab28c"
+            },
+            {
+              "id": "s4",
+              "start": 168,
+              "end": 214,
+              "unit": "unicode-codepoint",
+              "sha256": "6ca6710c14030a96636f72127d051ce0d0576202a1d13bfc23d161e8cee25b0e"
+            }
+          ],
+          "alignment": [
+            {
+              "source_ids": ["s0", "s1", "s2", "s3", "s4"],
+              "english_span": {
+                "start": 0,
+                "end": 616,
+                "unit": "unicode-codepoint"
+              },
+              "review_id": "876b76aa862da51f135987c63e5f264cafbdc5c47127c0ef0274117d1760b316"
+            }
+          ],
+          "status": "verified",
+          "review_ids": ["876b76aa862da51f135987c63e5f264cafbdc5c47127c0ef0274117d1760b316"],
+          "pending_reasons": [],
+          "provenance": []
+        },
+        "contentReady": true,
+        "rubySegments": [
+          ["1905", ""],
+          ["年", "ねん"],
+          ["、", ""],
+          ["日露", "にちろ"],
+          ["戦争", "せんそう"],
+          ["の", ""],
+          ["講和", "こうわ"],
+          ["会議", "かいぎ"],
+          ["がアメリカのポーツマスで", ""],
+          ["開", "ひら"],
+          ["かれました。", ""],
+          ["日本", "にっぽん"],
+          ["は", ""],
+          ["連戦", "れんせん"],
+          ["連勝", "れんしょう"],
+          ["を", ""],
+          ["重", "かさ"],
+          ["ねていたものの、", ""],
+          ["国力", "こくりょく"],
+          ["は", ""],
+          ["限界", "げんかい"],
+          ["に", ""],
+          ["達", "たっ"],
+          ["しており、", ""],
+          ["早期", "そうき"],
+          ["の", ""],
+          ["講和", "こうわ"],
+          ["が", ""],
+          ["急務", "きゅうむ"],
+          ["だったのです。", ""],
+          ["全権", "ぜんけん"],
+          ["の", ""],
+          ["小村", "こむら"],
+          ["寿太郎", "じゅたろう"],
+          ["は", ""],
+          ["賠償", "ばいしょう"],
+          ["金", "きん"],
+          ["を", ""],
+          ["求", "もと"],
+          ["めてロシア", ""],
+          ["側", "がわ"],
+          ["と", ""],
+          ["交渉", "こうしょう", 1],
+          ["を", ""],
+          ["重", "かさ"],
+          ["ねましたが、", ""],
+          ["相手", "あいて"],
+          ["は", ""],
+          ["最後", "さいご"],
+          ["まで", ""],
+          ["譲", "ゆず"],
+          ["りませんでした。", ""],
+          ["結局", "けっきょく"],
+          ["、", ""],
+          ["賠償", "ばいしょう"],
+          ["金", "きん"],
+          ["を", ""],
+          ["取", "と"],
+          ["れないまま", ""],
+          ["条約", "じょうやく"],
+          ["は", ""],
+          ["成立", "せいりつ"],
+          ["し、", ""],
+          ["帰国", "きこく"],
+          ["した", ""],
+          ["小村", "しょうそん"],
+          ["は", ""],
+          ["国民", "こくみん"],
+          ["の", ""],
+          ["激", "はげ"],
+          ["しい", ""],
+          ["非難", "ひなん"],
+          ["にさらされます。しかし", ""],
+          ["今", "いま"],
+          ["振", "ふ"],
+          ["り", ""],
+          ["返", "かえ"],
+          ["ると、", ""],
+          ["疲弊", "ひへい"],
+          ["した", ""],
+          ["国家", "こっか"],
+          ["をこれ", ""],
+          ["以上", "いじょう"],
+          ["戦", "たたか"],
+          ["わせなかった", ""],
+          ["判断", "はんだん"],
+          ["は、", ""],
+          ["正", "ただ"],
+          ["しかったのかもしれません。", ""]
+        ],
+        "ruby": [
+          {
+            "surface": "年",
+            "reading": "ねん"
+          },
+          {
+            "surface": "日露",
+            "reading": "にちろ"
+          },
+          {
+            "surface": "戦争",
+            "reading": "せんそう"
+          },
+          {
+            "surface": "講和",
+            "reading": "こうわ"
+          },
+          {
+            "surface": "会議",
+            "reading": "かいぎ"
+          },
+          {
+            "surface": "開か",
+            "reading": "ひらか"
+          },
+          {
+            "surface": "日本",
+            "reading": "にっぽん"
+          },
+          {
+            "surface": "連戦",
+            "reading": "れんせん"
+          },
+          {
+            "surface": "連勝",
+            "reading": "れんしょう"
+          },
+          {
+            "surface": "重ね",
+            "reading": "かさね"
+          },
+          {
+            "surface": "国力",
+            "reading": "こくりょく"
+          },
+          {
+            "surface": "限界",
+            "reading": "げんかい"
+          },
+          {
+            "surface": "達し",
+            "reading": "たっし"
+          },
+          {
+            "surface": "早期",
+            "reading": "そうき"
+          },
+          {
+            "surface": "講和",
+            "reading": "こうわ"
+          },
+          {
+            "surface": "急務",
+            "reading": "きゅうむ"
+          },
+          {
+            "surface": "全権",
+            "reading": "ぜんけん"
+          },
+          {
+            "surface": "小村",
+            "reading": "こむら"
+          },
+          {
+            "surface": "寿太郎",
+            "reading": "じゅたろう"
+          },
+          {
+            "surface": "賠償金",
+            "reading": "ばいしょうきん"
+          },
+          {
+            "surface": "求め",
+            "reading": "もとめ"
+          },
+          {
+            "surface": "側",
+            "reading": "がわ"
+          },
+          {
+            "surface": "交渉",
+            "reading": "こうしょう"
+          },
+          {
+            "surface": "重ね",
+            "reading": "かさね"
+          },
+          {
+            "surface": "相手",
+            "reading": "あいて"
+          },
+          {
+            "surface": "最後",
+            "reading": "さいご"
+          },
+          {
+            "surface": "譲り",
+            "reading": "ゆずり"
+          },
+          {
+            "surface": "結局",
+            "reading": "けっきょく"
+          },
+          {
+            "surface": "賠償金",
+            "reading": "ばいしょうきん"
+          },
+          {
+            "surface": "取れ",
+            "reading": "とれ"
+          },
+          {
+            "surface": "条約",
+            "reading": "じょうやく"
+          },
+          {
+            "surface": "成立",
+            "reading": "せいりつ"
+          },
+          {
+            "surface": "帰国",
+            "reading": "きこく"
+          },
+          {
+            "surface": "小村",
+            "reading": "しょうそん"
+          },
+          {
+            "surface": "国民",
+            "reading": "こくみん"
+          },
+          {
+            "surface": "激しい",
+            "reading": "はげしい"
+          },
+          {
+            "surface": "非難",
+            "reading": "ひなん"
+          },
+          {
+            "surface": "今",
+            "reading": "いま"
+          },
+          {
+            "surface": "振り返る",
+            "reading": "ふりかえる"
+          },
+          {
+            "surface": "疲弊",
+            "reading": "ひへい"
+          },
+          {
+            "surface": "国家",
+            "reading": "こっか"
+          },
+          {
+            "surface": "以上",
+            "reading": "いじょう"
+          },
+          {
+            "surface": "戦わ",
+            "reading": "たたかわ"
+          },
+          {
+            "surface": "判断",
+            "reading": "はんだん"
+          },
+          {
+            "surface": "正しかっ",
+            "reading": "ただしかっ"
+          }
+        ]
+      },
+      {
+        "anki": {
+          "guid": "nsrs-v-56081f59ac82",
+          "modelId": 1761577200101,
+          "ord": 0
+        },
+        "bunki": {
+          "cardId": "nn-56081f59ac-e3bb27f0",
+          "deckId": "senmon",
+          "wordId": "nn-56081f59ac"
+        },
+        "contractId": "vocabulary.read.v1",
+        "lexemeId": "lexeme:nsrs-v-56081f59ac82",
+        "noteGuid": "nsrs-v-56081f59ac82",
+        "optionalAnkiRecall": {
+          "contractId": "vocabulary.recall.v1",
+          "guid": "nsrs-v-56081f59ac82",
+          "modelId": 1761577200101,
+          "ord": 1,
+          "standaloneScheduled": false
+        },
+        "passageId": "nn-56081f59ac-e3bb27f0",
+        "player": {
+          "cardId": "nn-56081f59ac-e3bb27f0",
+          "deckId": "senmon",
+          "wordId": "nn-56081f59ac"
+        },
+        "taskKey": "[\"nsrs-v-56081f59ac82\",\"vocabulary.read.v1\",\"nn-56081f59ac-e3bb27f0\"]",
+        "module": "senmon",
+        "term": "均衡",
+        "form": "均衡",
+        "reading": "きんこう",
+        "meaning": "equilibrium, balance",
+        "defJa": "釣り合いがとれて安定している状態",
+        "pos": "noun",
+        "posClass": "noun",
+        "note": "「勢力の均衡」「均衡が崩れる」が定番。外交や経済の分析で、力の釣り合いを表す硬めの語。",
+        "source": "bunki-n2n1@b66a0540",
+        "collocations": [],
+        "theme": "history",
+        "kanji": [
+          {
+            "c": "均",
+            "m": "level",
+            "parts": ["土", "匀", "勹"],
+            "st": 7,
+            "r": "きん"
+          },
+          {
+            "c": "衡",
+            "m": "equilibrium",
+            "parts": ["行", "魚", "大"],
+            "st": 16,
+            "r": "こう"
+          }
+        ],
+        "ja": "19世紀のヨーロッパ外交は、ある発想の上に成り立っていました。ナポレオン戦争後のウィーン会議で列強は、特定の国が力を持ちすぎないよう、互いを牽制し合う仕組みを設けます。これが勢力の均衡という原理で、おかげで大陸はしばらく大規模な戦争を回避できました。ところがドイツの統一が力関係を一変させると、この仕組みは次第に崩れ、やがて第一次世界大戦へとつながっていくのです。",
+        "en": "European diplomacy in the nineteenth century rested on a single idea. After the Napoleonic Wars, the great powers gathered at the Congress of Vienna and built a system in which they checked one another, so that no single state would become too powerful. This was the principle of the balance of power, and thanks to it the continent avoided large-scale war for some time. Yet when German unification upended the balance of forces, the system gradually broke down, eventually leading into the First World War.",
+        "contentRevision": "51ad6e451beab1492b3b1c11847a573830b96a658e327bc294fff2218b7d46b9",
+        "englishBinding": {
+          "format": "nihongo-translation-binding",
+          "version": 1,
+          "guid": "nsrs-v-56081f59ac82",
+          "source_sha256": "51ad6e451beab1492b3b1c11847a573830b96a658e327bc294fff2218b7d46b9",
+          "english_sha256": "cf30fabf214d67744c574bc6c7ea97257a549f2891a1c56549fe535a8b7649c9",
+          "source_segments": [
+            {
+              "id": "s0",
+              "start": 0,
+              "end": 31,
+              "unit": "unicode-codepoint",
+              "sha256": "ff840c5a0c3d96717a3c42fa745bf00127b2385c1d37fe6d5b56bc65244d52e3"
+            },
+            {
+              "id": "s1",
+              "start": 31,
+              "end": 84,
+              "unit": "unicode-codepoint",
+              "sha256": "a14f0fca9c4b8c9559049ace53df4961aeb80ffcaea08f3b1e93c8f6d7436c4d"
+            },
+            {
+              "id": "s2",
+              "start": 84,
+              "end": 125,
+              "unit": "unicode-codepoint",
+              "sha256": "9c045432c87b50b6ca0dbf7c377be0972ada1791e32443d707ff34192a002891"
+            },
+            {
+              "id": "s3",
+              "start": 125,
+              "end": 182,
+              "unit": "unicode-codepoint",
+              "sha256": "57a2313920e958b626bae935d260b815f0839837eaecd2268505187b5f7b4e02"
+            }
+          ],
+          "alignment": [
+            {
+              "source_ids": ["s0", "s1", "s2", "s3"],
+              "english_span": {
+                "start": 0,
+                "end": 508,
+                "unit": "unicode-codepoint"
+              },
+              "review_id": "d094f1da4038e1608972592af98c2ec6adb8fb9bc6326c3af56750e6fb7cfd55"
+            }
+          ],
+          "status": "verified",
+          "review_ids": ["d094f1da4038e1608972592af98c2ec6adb8fb9bc6326c3af56750e6fb7cfd55"],
+          "pending_reasons": [],
+          "provenance": []
+        },
+        "contentReady": true,
+        "rubySegments": [
+          ["19", ""],
+          ["世紀", "せいき"],
+          ["のヨーロッパ", ""],
+          ["外交", "がいこう"],
+          ["は、ある", ""],
+          ["発想", "はっそう"],
+          ["の", ""],
+          ["上", "うえ"],
+          ["に", ""],
+          ["成", "な"],
+          ["り", ""],
+          ["立", "た"],
+          ["っていました。ナポレオン", ""],
+          ["戦争", "せんそう"],
+          ["後", "ご"],
+          ["のウィーン", ""],
+          ["会議", "かいぎ"],
+          ["で", ""],
+          ["列強", "れっきょう"],
+          ["は、", ""],
+          ["特定", "とくてい"],
+          ["の", ""],
+          ["国", "くに"],
+          ["が", ""],
+          ["力", "ちから"],
+          ["を", ""],
+          ["持", "も"],
+          ["ちすぎないよう、", ""],
+          ["互", "たが"],
+          ["いを", ""],
+          ["牽制", "けんせい"],
+          ["し", ""],
+          ["合", "あ"],
+          ["う", ""],
+          ["仕組", "しく"],
+          ["みを", ""],
+          ["設", "もう"],
+          ["けます。これが", ""],
+          ["勢力", "せいりょく"],
+          ["の", ""],
+          ["均衡", "きんこう", 1],
+          ["という", ""],
+          ["原理", "げんり"],
+          ["で、おかげで", ""],
+          ["大陸", "たいりく"],
+          ["はしばらく", ""],
+          ["大", "だい"],
+          ["規模", "きぼ"],
+          ["な", ""],
+          ["戦争", "せんそう"],
+          ["を", ""],
+          ["回避", "かいひ"],
+          ["できました。ところがドイツの", ""],
+          ["統一", "とういつ"],
+          ["が", ""],
+          ["力", "ちから"],
+          ["関係", "かんけい"],
+          ["を", ""],
+          ["一変", "いっぺん"],
+          ["させると、この", ""],
+          ["仕組", "しく"],
+          ["みは", ""],
+          ["次第", "しだい"],
+          ["に", ""],
+          ["崩", "くず"],
+          ["れ、やがて", ""],
+          ["第", "だい"],
+          ["一", "いち"],
+          ["次", "じ"],
+          ["世界", "せかい"],
+          ["大戦", "たいせん"],
+          ["へとつながっていくのです。", ""]
+        ],
+        "ruby": [
+          {
+            "surface": "世紀",
+            "reading": "せいき"
+          },
+          {
+            "surface": "外交",
+            "reading": "がいこう"
+          },
+          {
+            "surface": "発想",
+            "reading": "はっそう"
+          },
+          {
+            "surface": "上",
+            "reading": "うえ"
+          },
+          {
+            "surface": "成り立っ",
+            "reading": "なりたっ"
+          },
+          {
+            "surface": "戦争",
+            "reading": "せんそう"
+          },
+          {
+            "surface": "後",
+            "reading": "ご"
+          },
+          {
+            "surface": "会議",
+            "reading": "かいぎ"
+          },
+          {
+            "surface": "列強",
+            "reading": "れっきょう"
+          },
+          {
+            "surface": "特定",
+            "reading": "とくてい"
+          },
+          {
+            "surface": "国",
+            "reading": "くに"
+          },
+          {
+            "surface": "力",
+            "reading": "ちから"
+          },
+          {
+            "surface": "持ち",
+            "reading": "もち"
+          },
+          {
+            "surface": "互い",
+            "reading": "たがい"
+          },
+          {
+            "surface": "牽制",
+            "reading": "けんせい"
+          },
+          {
+            "surface": "合う",
+            "reading": "あう"
+          },
+          {
+            "surface": "仕組み",
+            "reading": "しくみ"
+          },
+          {
+            "surface": "設け",
+            "reading": "もうけ"
+          },
+          {
+            "surface": "勢力",
+            "reading": "せいりょく"
+          },
+          {
+            "surface": "均衡",
+            "reading": "きんこう"
+          },
+          {
+            "surface": "原理",
+            "reading": "げんり"
+          },
+          {
+            "surface": "大陸",
+            "reading": "たいりく"
+          },
+          {
+            "surface": "大規模",
+            "reading": "だいきぼ"
+          },
+          {
+            "surface": "戦争",
+            "reading": "せんそう"
+          },
+          {
+            "surface": "回避",
+            "reading": "かいひ"
+          },
+          {
+            "surface": "統一",
+            "reading": "とういつ"
+          },
+          {
+            "surface": "力",
+            "reading": "ちから"
+          },
+          {
+            "surface": "関係",
+            "reading": "かんけい"
+          },
+          {
+            "surface": "一変",
+            "reading": "いっぺん"
+          },
+          {
+            "surface": "仕組み",
+            "reading": "しくみ"
+          },
+          {
+            "surface": "次第",
+            "reading": "しだい"
+          },
+          {
+            "surface": "崩れ",
+            "reading": "くずれ"
+          },
+          {
+            "surface": "第一",
+            "reading": "だいいち"
+          },
+          {
+            "surface": "次",
+            "reading": "じ"
+          },
+          {
+            "surface": "世界大戦",
+            "reading": "せかいたいせん"
+          }
+        ]
+      },
+      {
+        "anki": {
+          "guid": "nsrs-v-57f75cee82a5",
+          "modelId": 1761577200101,
+          "ord": 0
+        },
+        "bunki": null,
+        "contractId": "vocabulary.read.v1",
+        "lexemeId": "lexeme:nsrs-v-57f75cee82a5",
+        "noteGuid": "nsrs-v-57f75cee82a5",
+        "optionalAnkiRecall": {
+          "contractId": "vocabulary.recall.v1",
+          "guid": "nsrs-v-57f75cee82a5",
+          "modelId": 1761577200101,
+          "ord": 1,
+          "standaloneScheduled": false
+        },
+        "passageId": "nn-57f75cee82-5376be10",
+        "player": {
+          "cardId": "nn-57f75cee82-5376be10",
+          "deckId": "kotoba-master",
+          "wordId": "nn-57f75cee82"
+        },
+        "taskKey": "[\"nsrs-v-57f75cee82a5\",\"vocabulary.read.v1\",\"nn-57f75cee82-5376be10\"]",
+        "module": "kotoba",
+        "term": "なぞかけ",
+        "form": "なぞかけ",
+        "reading": "なぞかけ",
+        "meaning": "riddle-pun in a fixed format",
+        "defJa": "AとBの共通点を、しゃれで答える言葉遊び。",
+        "pos": "noun",
+        "posClass": "noun",
+        "note": "The pattern is AとかけてBと解く、その心は, with one pun that fits both A and B.",
+        "source": "kotoba-mcd@08540b58",
+        "collocations": [],
+        "theme": "",
+        "kanji": [],
+        "ja": "寄席の大喜利で、司会者が客席からお題を募った。「ネクタイ」と声がかかると、落語家は少し考えてから「ネクタイとかけまして、宴会の幹事と解きます。その心は、どちらも最後の『しめ』が肝心」と見事ななぞかけを返した。",
+        "en": "During an improvisational comedy segment at a traditional variety theater, the host asked the audience to suggest a topic. When someone called out \"A necktie,\" the comic storyteller thought for a moment and came back with a clever riddle: \"How is a necktie like the organizer of a banquet? For both, the finishing touch is crucial: tying things up properly.\"",
+        "contentRevision": "1c0b3836875e1e8b05cfbeb56df78d128f901430bf1edc73655e10b9681134d4",
+        "englishBinding": {
+          "format": "nihongo-translation-binding",
+          "version": 1,
+          "guid": "nsrs-v-57f75cee82a5",
+          "source_sha256": "1c0b3836875e1e8b05cfbeb56df78d128f901430bf1edc73655e10b9681134d4",
+          "english_sha256": "c2ba66e757a54f1b49f85140c53366f37e8e93a3e0e925336c2b80a124004d92",
+          "source_segments": [
+            {
+              "id": "s0",
+              "start": 0,
+              "end": 23,
+              "unit": "unicode-codepoint",
+              "sha256": "00bbee5cf5ce297747c1f4113aea5e5c1e15fda1030b26e8934c94d96decaea9"
+            },
+            {
+              "id": "s1",
+              "start": 23,
+              "end": 71,
+              "unit": "unicode-codepoint",
+              "sha256": "3aed83e5910491c9a78e28b0caf213069286ffbc8c527577c066405d7f9c5d7b"
+            },
+            {
+              "id": "s2",
+              "start": 71,
+              "end": 104,
+              "unit": "unicode-codepoint",
+              "sha256": "abda866bd307e7e8467754aa23f4c303e9df39a134e5d1e493108a28c1dc3c6d"
+            }
+          ],
+          "alignment": [
+            {
+              "source_ids": ["s0", "s1", "s2"],
+              "english_span": {
+                "start": 0,
+                "end": 358,
+                "unit": "unicode-codepoint"
+              },
+              "review_id": "106b9dffa3d3aed3040749672c3b83db81d477b58519093adea994b97561814c"
+            }
+          ],
+          "status": "verified",
+          "review_ids": ["106b9dffa3d3aed3040749672c3b83db81d477b58519093adea994b97561814c"],
+          "pending_reasons": [],
+          "provenance": []
+        },
+        "contentReady": true,
+        "rubySegments": [
+          ["寄席", "よせ"],
+          ["の", ""],
+          ["大喜利", "おおぎり"],
+          ["で、", ""],
+          ["司会", "しかい"],
+          ["者", "しゃ"],
+          ["が", ""],
+          ["客席", "きゃくせき"],
+          ["からお", ""],
+          ["題", "だい"],
+          ["を", ""],
+          ["募", "つの"],
+          ["った。「ネクタイ」と", ""],
+          ["声", "こえ"],
+          ["がかかると、", ""],
+          ["落語", "らくご"],
+          ["家", "か"],
+          ["は", ""],
+          ["少", "すこ"],
+          ["し", ""],
+          ["考", "かんが"],
+          ["えてから「ネクタイとかけまして、", ""],
+          ["宴会", "えんかい"],
+          ["の", ""],
+          ["幹事", "かんじ"],
+          ["と", ""],
+          ["解", "と"],
+          ["きます。その", ""],
+          ["心", "こころ"],
+          ["は、どちらも", ""],
+          ["最後", "さいご"],
+          ["の『しめ』が", ""],
+          ["肝心", "かんじん"],
+          ["」と", ""],
+          ["見事", "みごと"],
+          ["な", ""],
+          ["なぞかけ", "なぞかけ", 1],
+          ["を", ""],
+          ["返", "かえ"],
+          ["した。", ""]
+        ],
+        "ruby": []
+      },
+      {
+        "anki": {
+          "guid": "nsrs-g-0065845cfaa8",
+          "modelId": 1761577200102,
+          "ord": 0
+        },
+        "bunki": null,
+        "contractId": "grammar.meaning.v1",
+        "lexemeId": null,
+        "noteGuid": "nsrs-g-0065845cfaa8",
+        "passageId": "nsrs-g-0065845cfaa8:example:1",
+        "player": null,
+        "taskKey": "[\"nsrs-g-0065845cfaa8\",\"grammar.meaning.v1\",\"nsrs-g-0065845cfaa8:example:1\"]",
+        "module": "grammar",
+        "term": "〜に堪えない",
+        "form": "見るに堪えない",
+        "reading": "",
+        "meaning": "too awful to …; cannot contain (one's gratitude, regret)",
+        "defJa": "",
+        "source": "nsrs-gen-20261028/g016",
+        "ja": "SNSには、見るに堪えない誹謗中傷のコメントがあふれている。",
+        "en": "Social media is flooded with abusive comments too vile to look at.",
+        "contentRevision": "0be08cb56f06f0c627b72e914383dbe409794e4c757d4135b010dff48be67bb3",
+        "grammarGuid": "nsrs-g-0065845cfaa8",
+        "contentReady": true
+      },
+      {
+        "anki": {
+          "guid": "nsrs-g-0065845cfaa8",
+          "modelId": 1761577200102,
+          "ord": 1
+        },
+        "bunki": null,
+        "contractId": "grammar.cloze.v1",
+        "lexemeId": null,
+        "noteGuid": "nsrs-g-0065845cfaa8",
+        "passageId": "nsrs-g-0065845cfaa8:example:2",
+        "player": null,
+        "taskKey": "[\"nsrs-g-0065845cfaa8\",\"grammar.cloze.v1\",\"nsrs-g-0065845cfaa8:example:2\"]",
+        "module": "grammar",
+        "term": "〜に堪えない",
+        "form": "感謝の念に堪えない",
+        "reading": "",
+        "meaning": "too awful to …; cannot contain (one's gratitude, regret)",
+        "defJa": "",
+        "source": "nsrs-gen-20261028/g016",
+        "ja": "多くの方々から温かいご支援をいただき、感謝の念に堪えない。",
+        "en": "Having received warm support from so many people, I cannot express how grateful I am.",
+        "contentRevision": "a45976923df34ba1eacd990580d59913e8aab372b1e32e5fc5af803e00082f38",
+        "grammarGuid": "nsrs-g-0065845cfaa8",
+        "contentReady": true
+      }
+    ],
+    "packs": {
+      "n2": {
+        "deck": {
+          "id": "n2",
+          "words": [
+            {
+              "id": "nn-6648fc81ce",
+              "group": "mind",
+              "term": "高学歴",
+              "reading": "こうがくれき",
+              "meaning": "advanced educational background",
+              "defJa": "大学院など、高い段階の教育を受けていること",
+              "pos": "noun",
+              "kanji": [
+                {
+                  "c": "高",
+                  "m": "tall",
+                  "parts": ["亠", "口", "冋"],
+                  "st": 10,
+                  "r": "こう"
+                },
+                {
+                  "c": "学",
+                  "m": "study",
+                  "parts": ["冖", "子"],
+                  "st": 8,
+                  "r": "がく"
+                },
+                {
+                  "c": "歴",
+                  "m": "curriculum",
+                  "parts": ["厂", "林", "止"],
+                  "st": 14,
+                  "r": "れき"
+                }
+              ],
+              "cards": [
+                {
+                  "id": "nn-6648fc81ce-91d058a8",
+                  "lv": 1,
+                  "type": "word",
+                  "ja": "読書会に博士号を持つ人が来ると聞いて、会う前から何を聞いても答えてくれそうだと期待したことがあるんだ。高学歴だからといって、専門外の本まで詳しく知っているとは限らないのに、経歴から勝手に人物像を作っていたんだね。逆に、相手が専門用語を使わずに話すだけで、内容も簡単なんだろうと思うのも先入観だと思う。どこで何を学んだかは会話のきっかけにできるけど、実際にどんな問いを持っているかは、その人の言葉を聞いてから知りたいよね。",
+                  "form": "高学歴",
+                  "en": "Once, on hearing that someone with a doctorate was coming to a reading group, I expected before meeting them that they could answer anything I asked. Although advanced education does not mean knowing all about books outside one's specialty, I had built an image of the person from their background. Conversely, assuming that content is simple just because someone speaks without technical terms also seems like a preconception. Where and what someone studied can start a conversation, but I want to learn what questions they actually have by listening to their own words.",
+                  "kind": "original",
+                  "src": {
+                    "site": "書き下ろし（このデッキ用）",
+                    "licence": "Bunki original"
+                  },
+                  "passage": 1,
+                  "register": "話",
+                  "topic": "mind",
+                  "ruby": [
+                    ["読書", "どくしょ"],
+                    ["会", "かい"],
+                    ["に", ""],
+                    ["博士号", "はくしごう"],
+                    ["を", ""],
+                    ["持", "も"],
+                    ["つ", ""],
+                    ["人", "ひと"],
+                    ["が", ""],
+                    ["来", "く"],
+                    ["ると", ""],
+                    ["聞", "き"],
+                    ["いて、", ""],
+                    ["会", "あ"],
+                    ["う", ""],
+                    ["前", "まえ"],
+                    ["から", ""],
+                    ["何", "なに"],
+                    ["を", ""],
+                    ["聞", "き"],
+                    ["いても", ""],
+                    ["答", "こた"],
+                    ["えてくれそうだと", ""],
+                    ["期待", "きたい"],
+                    ["したことがあるんだ。", ""],
+                    ["高学歴", "こうがくれき", 1],
+                    ["だからといって、", ""],
+                    ["専門", "せんもん"],
+                    ["外", "がい"],
+                    ["の", ""],
+                    ["本", "ほん"],
+                    ["まで", ""],
+                    ["詳", "くわ"],
+                    ["しく", ""],
+                    ["知", "し"],
+                    ["っているとは", ""],
+                    ["限", "かぎ"],
+                    ["らないのに、", ""],
+                    ["経歴", "けいれき"],
+                    ["から", ""],
+                    ["勝手", "かって"],
+                    ["に", ""],
+                    ["人物", "じんぶつ"],
+                    ["像", "ぞう"],
+                    ["を", ""],
+                    ["作", "つく"],
+                    ["っていたんだね。", ""],
+                    ["逆", "ぎゃく"],
+                    ["に、", ""],
+                    ["相手", "あいて"],
+                    ["が", ""],
+                    ["専門", "せんもん"],
+                    ["用語", "ようご"],
+                    ["を", ""],
+                    ["使", "つか"],
+                    ["わずに", ""],
+                    ["話", "はな"],
+                    ["すだけで、", ""],
+                    ["内容", "ないよう"],
+                    ["も", ""],
+                    ["簡単", "かんたん"],
+                    ["なんだろうと", ""],
+                    ["思", "おも"],
+                    ["うのも", ""],
+                    ["先入", "せんにゅう"],
+                    ["観", "かん"],
+                    ["だと", ""],
+                    ["思", "おも"],
+                    ["う。どこで", ""],
+                    ["何", "なに"],
+                    ["を", ""],
+                    ["学", "まな"],
+                    ["んだかは", ""],
+                    ["会話", "かいわ"],
+                    ["のきっかけにできるけど、", ""],
+                    ["実際", "じっさい"],
+                    ["にどんな", ""],
+                    ["問", "と"],
+                    ["いを", ""],
+                    ["持", "も"],
+                    ["っているかは、その", ""],
+                    ["人", "ひと"],
+                    ["の", ""],
+                    ["言葉", "ことば"],
+                    ["を", ""],
+                    ["聞", "き"],
+                    ["いてから", ""],
+                    ["知", "し"],
+                    ["りたいよね。", ""]
+                  ],
+                  "tipJa": "受けた教育の段階を表す語で、専門外の知識や人格を直接示すものではありません。",
+                  "sense": "高い段階の教育を受けていること",
+                  "enTarget": "Although advanced education does not mean knowing all about books outside one's specialty, I had built an image of the person from their background."
+                }
+              ],
+              "level": "N2"
+            }
+          ]
+        },
+        "sha256": "cf3c920308b8f20f0886460f32c2f5a1333eec2b01cfc83f4d4a8324e15a70c2"
+      },
+      "n1": {
+        "deck": {
+          "id": "n1",
+          "words": [
+            {
+              "id": "nn-67f6fe4a2f",
+              "group": "history",
+              "term": "交渉",
+              "reading": "こうしょう",
+              "meaning": "negotiation",
+              "defJa": "話し合いによって条件をまとめること",
+              "pos": "noun",
+              "kanji": [
+                {
+                  "c": "交",
+                  "m": "mingle",
+                  "parts": ["亠", "父"],
+                  "st": 6,
+                  "r": "こう"
+                },
+                {
+                  "c": "渉",
+                  "m": "ford",
+                  "parts": ["氵", "歩"],
+                  "st": 11,
+                  "r": "しょう"
+                }
+              ],
+              "cards": [
+                {
+                  "id": "nn-67f6fe4a2f-ca1c2c4f",
+                  "lv": 1,
+                  "type": "word",
+                  "ja": "1905年、日露戦争の講和会議がアメリカのポーツマスで開かれました。日本は連戦連勝を重ねていたものの、国力は限界に達しており、早期の講和が急務だったのです。全権の小村寿太郎は賠償金を求めてロシア側と交渉を重ねましたが、相手は最後まで譲りませんでした。結局、賠償金を取れないまま条約は成立し、帰国した小村は国民の激しい非難にさらされます。しかし今振り返ると、疲弊した国家をこれ以上戦わせなかった判断は、正しかったのかもしれません。",
+                  "form": "交渉",
+                  "en": "In 1905, the peace conference that ended the Russo-Japanese War was held in Portsmouth, in the United States. Japan had won battle after battle, but its national strength had reached its limit, and an early peace was an urgent necessity. The plenipotentiary Komura Jutarō negotiated again and again with the Russian side over an indemnity, but they never gave an inch. In the end, the treaty was concluded without any indemnity, and Komura, on returning home, was met with fierce public criticism. Yet looking back now, the decision not to force an exhausted nation to keep fighting may well have been the right one.",
+                  "kind": "original",
+                  "src": {
+                    "site": "書き下ろし（このデッキ用）",
+                    "licence": "Bunki original"
+                  },
+                  "passage": 1,
+                  "register": "講",
+                  "topic": "history",
+                  "ruby": [
+                    ["1905", ""],
+                    ["年", "ねん"],
+                    ["、", ""],
+                    ["日露", "にちろ"],
+                    ["戦争", "せんそう"],
+                    ["の", ""],
+                    ["講和", "こうわ"],
+                    ["会議", "かいぎ"],
+                    ["がアメリカのポーツマスで", ""],
+                    ["開", "ひら"],
+                    ["かれました。", ""],
+                    ["日本", "にっぽん"],
+                    ["は", ""],
+                    ["連戦", "れんせん"],
+                    ["連勝", "れんしょう"],
+                    ["を", ""],
+                    ["重", "かさ"],
+                    ["ねていたものの、", ""],
+                    ["国力", "こくりょく"],
+                    ["は", ""],
+                    ["限界", "げんかい"],
+                    ["に", ""],
+                    ["達", "たっ"],
+                    ["しており、", ""],
+                    ["早期", "そうき"],
+                    ["の", ""],
+                    ["講和", "こうわ"],
+                    ["が", ""],
+                    ["急務", "きゅうむ"],
+                    ["だったのです。", ""],
+                    ["全権", "ぜんけん"],
+                    ["の", ""],
+                    ["小村", "こむら"],
+                    ["寿太郎", "じゅたろう"],
+                    ["は", ""],
+                    ["賠償", "ばいしょう"],
+                    ["金", "きん"],
+                    ["を", ""],
+                    ["求", "もと"],
+                    ["めてロシア", ""],
+                    ["側", "がわ"],
+                    ["と", ""],
+                    ["交渉", "こうしょう", 1],
+                    ["を", ""],
+                    ["重", "かさ"],
+                    ["ねましたが、", ""],
+                    ["相手", "あいて"],
+                    ["は", ""],
+                    ["最後", "さいご"],
+                    ["まで", ""],
+                    ["譲", "ゆず"],
+                    ["りませんでした。", ""],
+                    ["結局", "けっきょく"],
+                    ["、", ""],
+                    ["賠償", "ばいしょう"],
+                    ["金", "きん"],
+                    ["を", ""],
+                    ["取", "と"],
+                    ["れないまま", ""],
+                    ["条約", "じょうやく"],
+                    ["は", ""],
+                    ["成立", "せいりつ"],
+                    ["し、", ""],
+                    ["帰国", "きこく"],
+                    ["した", ""],
+                    ["小村", "しょうそん"],
+                    ["は", ""],
+                    ["国民", "こくみん"],
+                    ["の", ""],
+                    ["激", "はげ"],
+                    ["しい", ""],
+                    ["非難", "ひなん"],
+                    ["にさらされます。しかし", ""],
+                    ["今", "いま"],
+                    ["振", "ふ"],
+                    ["り", ""],
+                    ["返", "かえ"],
+                    ["ると、", ""],
+                    ["疲弊", "ひへい"],
+                    ["した", ""],
+                    ["国家", "こっか"],
+                    ["をこれ", ""],
+                    ["以上", "いじょう"],
+                    ["戦", "たたか"],
+                    ["わせなかった", ""],
+                    ["判断", "はんだん"],
+                    ["は、", ""],
+                    ["正", "ただ"],
+                    ["しかったのかもしれません。", ""]
+                  ],
+                  "tipJa": "「交渉が決裂する」「交渉を重ねる」が定番。外交やビジネスの話し合いを指す。",
+                  "enTarget": "The plenipotentiary Komura Jutarō negotiated again and again with the Russian side over an indemnity, but they never gave an inch."
+                }
+              ],
+              "level": "N1"
+            }
+          ]
+        },
+        "sha256": "15872fef145b41626027897acba219bc2ec2006a71401e40505894aa4b2ea6bb"
+      },
+      "senmon": {
+        "deck": {
+          "id": "senmon",
+          "words": [
+            {
+              "id": "nn-56081f59ac",
+              "group": "history",
+              "term": "均衡",
+              "reading": "きんこう",
+              "meaning": "equilibrium, balance",
+              "defJa": "釣り合いがとれて安定している状態",
+              "pos": "noun",
+              "kanji": [
+                {
+                  "c": "均",
+                  "m": "level",
+                  "parts": ["土", "匀", "勹"],
+                  "st": 7,
+                  "r": "きん"
+                },
+                {
+                  "c": "衡",
+                  "m": "equilibrium",
+                  "parts": ["行", "魚", "大"],
+                  "st": 16,
+                  "r": "こう"
+                }
+              ],
+              "cards": [
+                {
+                  "id": "nn-56081f59ac-e3bb27f0",
+                  "lv": 1,
+                  "type": "word",
+                  "ja": "19世紀のヨーロッパ外交は、ある発想の上に成り立っていました。ナポレオン戦争後のウィーン会議で列強は、特定の国が力を持ちすぎないよう、互いを牽制し合う仕組みを設けます。これが勢力の均衡という原理で、おかげで大陸はしばらく大規模な戦争を回避できました。ところがドイツの統一が力関係を一変させると、この仕組みは次第に崩れ、やがて第一次世界大戦へとつながっていくのです。",
+                  "form": "均衡",
+                  "en": "European diplomacy in the nineteenth century rested on a single idea. After the Napoleonic Wars, the great powers gathered at the Congress of Vienna and built a system in which they checked one another, so that no single state would become too powerful. This was the principle of the balance of power, and thanks to it the continent avoided large-scale war for some time. Yet when German unification upended the balance of forces, the system gradually broke down, eventually leading into the First World War.",
+                  "kind": "original",
+                  "src": {
+                    "site": "書き下ろし（このデッキ用）",
+                    "licence": "Bunki original"
+                  },
+                  "passage": 1,
+                  "register": "講",
+                  "topic": "history",
+                  "ruby": [
+                    ["19", ""],
+                    ["世紀", "せいき"],
+                    ["のヨーロッパ", ""],
+                    ["外交", "がいこう"],
+                    ["は、ある", ""],
+                    ["発想", "はっそう"],
+                    ["の", ""],
+                    ["上", "うえ"],
+                    ["に", ""],
+                    ["成", "な"],
+                    ["り", ""],
+                    ["立", "た"],
+                    ["っていました。ナポレオン", ""],
+                    ["戦争", "せんそう"],
+                    ["後", "ご"],
+                    ["のウィーン", ""],
+                    ["会議", "かいぎ"],
+                    ["で", ""],
+                    ["列強", "れっきょう"],
+                    ["は、", ""],
+                    ["特定", "とくてい"],
+                    ["の", ""],
+                    ["国", "くに"],
+                    ["が", ""],
+                    ["力", "ちから"],
+                    ["を", ""],
+                    ["持", "も"],
+                    ["ちすぎないよう、", ""],
+                    ["互", "たが"],
+                    ["いを", ""],
+                    ["牽制", "けんせい"],
+                    ["し", ""],
+                    ["合", "あ"],
+                    ["う", ""],
+                    ["仕組", "しく"],
+                    ["みを", ""],
+                    ["設", "もう"],
+                    ["けます。これが", ""],
+                    ["勢力", "せいりょく"],
+                    ["の", ""],
+                    ["均衡", "きんこう", 1],
+                    ["という", ""],
+                    ["原理", "げんり"],
+                    ["で、おかげで", ""],
+                    ["大陸", "たいりく"],
+                    ["はしばらく", ""],
+                    ["大", "だい"],
+                    ["規模", "きぼ"],
+                    ["な", ""],
+                    ["戦争", "せんそう"],
+                    ["を", ""],
+                    ["回避", "かいひ"],
+                    ["できました。ところがドイツの", ""],
+                    ["統一", "とういつ"],
+                    ["が", ""],
+                    ["力", "ちから"],
+                    ["関係", "かんけい"],
+                    ["を", ""],
+                    ["一変", "いっぺん"],
+                    ["させると、この", ""],
+                    ["仕組", "しく"],
+                    ["みは", ""],
+                    ["次第", "しだい"],
+                    ["に", ""],
+                    ["崩", "くず"],
+                    ["れ、やがて", ""],
+                    ["第", "だい"],
+                    ["一", "いち"],
+                    ["次", "じ"],
+                    ["世界", "せかい"],
+                    ["大戦", "たいせん"],
+                    ["へとつながっていくのです。", ""]
+                  ],
+                  "tipJa": "「勢力の均衡」「均衡が崩れる」が定番。外交や経済の分析で、力の釣り合いを表す硬めの語。",
+                  "enTarget": "This was the principle of the balance of power, and thanks to it the continent avoided large-scale war for some time."
+                }
+              ],
+              "level": "N1"
+            }
+          ]
+        },
+        "sha256": "e2054c3179ac80e133db2649a5dc10c0ffdb84281a946ce8259f782eb5e64332"
+      },
+      "kotoba-master": {
+        "deck": {
+          "id": "kotoba-master",
+          "words": [
+            {
+              "id": "nn-57f75cee82",
+              "group": "other",
+              "term": "なぞかけ",
+              "reading": "なぞかけ",
+              "meaning": "riddle-pun in a fixed format",
+              "defJa": "AとBの共通点を、しゃれで答える言葉遊び。",
+              "pos": "noun",
+              "kanji": [],
+              "cards": [
+                {
+                  "id": "nn-57f75cee82-5376be10",
+                  "lv": 1,
+                  "type": "word",
+                  "ja": "寄席の大喜利で、司会者が客席からお題を募った。「ネクタイ」と声がかかると、落語家は少し考えてから「ネクタイとかけまして、宴会の幹事と解きます。その心は、どちらも最後の『しめ』が肝心」と見事ななぞかけを返した。",
+                  "form": "なぞかけ",
+                  "en": "During an improvisational comedy segment at a traditional variety theater, the host asked the audience to suggest a topic. When someone called out \"A necktie,\" the comic storyteller thought for a moment and came back with a clever riddle: \"How is a necktie like the organizer of a banquet? For both, the finishing touch is crucial: tying things up properly.\"",
+                  "kind": "original",
+                  "src": {
+                    "site": "書き下ろし（このデッキ用）",
+                    "licence": "Bunki original"
+                  },
+                  "passage": 1,
+                  "register": "報",
+                  "topic": "other",
+                  "ruby": [
+                    ["寄席", "よせ"],
+                    ["の", ""],
+                    ["大喜利", "おおぎり"],
+                    ["で、", ""],
+                    ["司会", "しかい"],
+                    ["者", "しゃ"],
+                    ["が", ""],
+                    ["客席", "きゃくせき"],
+                    ["からお", ""],
+                    ["題", "だい"],
+                    ["を", ""],
+                    ["募", "つの"],
+                    ["った。「ネクタイ」と", ""],
+                    ["声", "こえ"],
+                    ["がかかると、", ""],
+                    ["落語", "らくご"],
+                    ["家", "か"],
+                    ["は", ""],
+                    ["少", "すこ"],
+                    ["し", ""],
+                    ["考", "かんが"],
+                    ["えてから「ネクタイとかけまして、", ""],
+                    ["宴会", "えんかい"],
+                    ["の", ""],
+                    ["幹事", "かんじ"],
+                    ["と", ""],
+                    ["解", "と"],
+                    ["きます。その", ""],
+                    ["心", "こころ"],
+                    ["は、どちらも", ""],
+                    ["最後", "さいご"],
+                    ["の『しめ』が", ""],
+                    ["肝心", "かんじん"],
+                    ["」と", ""],
+                    ["見事", "みごと"],
+                    ["な", ""],
+                    ["なぞかけ", "なぞかけ", 1],
+                    ["を", ""],
+                    ["返", "かえ"],
+                    ["した。", ""]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "sha256": "d2c080fff7de06a98bb4e63e909ed8f57ba5e67054e165de9057179e9afa9ed2"
+      }
+    },
+    "source": {
+      "registrySha256": "b0c0f24b7cda1929ee214777a7623f0be187308bc28b8989d2b1b5177f553add",
+      "catalogSha256": "b37f0af5125e8d4c6fbc9a774078613c418e1cefed917d32d58a9a1985ca510b"
+    },
+    "grammarAssets": {
+      "registry.json": "5b0f4a7685cb5abc8f2c26a0fb0c672e38554a6f23a456798750fe1608129013",
+      "grammar.json": "a3b576d32bdc08f9424eb96cf40c352cc422a5ef22cfaf78a665bb488de1993f",
+      "grammar-reviews.json": "47f47e81e54bb5c348d7c0182803b01e7bbe4672a8014cd345661fdb1f17288a"
+    },
+    "expected": {
+      "tasks": 6,
+      "vocabulary": 4
+    }
+  },
+  "expectedBindingSha256": "d94f37a5cf9021e90be0830a005ba5dfe3339939434b06ff6eb72fe09c3c1b91"
+}

@@ -269,8 +269,8 @@ try {
       await page.waitForTimeout(400);
     }
     if (!stable) throw new Error('Reader tokens did not settle before the gesture');
-    // the click grammar (reader lane 2026-10-02): a press and hold on a word opens its menu, and
-    // "Save word" there makes its review card — the reader's own capture, no sheet in between
+    // the click grammar (reader lane 2026-10-02; G5 hold = seal, 2026-10-18): a press and hold on a word keeps it —
+    // its review card, the reader's own capture, no sheet in between — and opens its strip
     const tok = await page.$('.reader .tok.content');
     await tok.scrollIntoViewIfNeeded();
     await page.waitForTimeout(150);
@@ -281,12 +281,12 @@ try {
     await page.waitForTimeout(900);
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
     await cdp.detach();
-    await page.waitForSelector('#reader-word-menu [data-menu-action="save-word"]', { timeout: 8000 });
+    await page.waitForSelector('#seal-strip', { timeout: 8000 });
     await page.waitForTimeout(400);
-    if (await page.$('#sheet')) throw new Error('the hold opened a sheet, not the word menu');
-    await page.click('#reader-word-menu [data-menu-action="save-word"]');
+    if (await page.$('#sheet')) throw new Error('the hold opened a sheet, not the strip');
     const taken = (await waitForAppRecord(page, record => record.taken.length > 0)).taken.length;
-    if (taken !== 1) throw new Error(`the menu's Save word made ${taken} cards`);
+    if (taken !== 1) throw new Error(`the hold made ${taken} cards`);
+    await page.keyboard.press('Escape');
     await page.waitForTimeout(400);
     await page.waitForTimeout(500);
     await page.mouse.wheel(0, 900);

@@ -1,3 +1,4 @@
+import { exactReaderStage } from './reader-stage-support.mjs';
 /** Bundled reading, recursive exploration and explicit practice through normal
  * controls. Persistent profiles, real record output, no injected learner state
  * or provider responses. This is a scoped technical subjourney. */
@@ -11,8 +12,28 @@ import { extname, isAbsolute, join, resolve } from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { chromium, webkit } from 'playwright-core';
+import { contextBrowserVersion } from './browser-version-support.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+import { DEVICE_TUTOR, setUpDeviceTutor } from './tutor-fixture-support.mjs';
+
+/** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
+ * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
+async function answeringRestore(page, run) {
+  let problem;
+  const answer = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', answer);
+  try { const value = await run(); if (problem) throw problem; return value; }
+  catch (error) { throw problem || error; }
+  finally { page.off('dialog', answer); }
+}
 
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable staged KAIRO_SITE_DIR');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
@@ -100,7 +121,7 @@ for (const engine of engines) for (const width of sizes) {
       acceptDownloads: true, ignoreHTTPSErrors: true, ...(engine === 'chromium' ? { args: ['--ignore-certificate-errors'] } : {}),
       recordVideo: { dir: videos, size: { width, height: width === 390 ? 844 : 1050 } },
     });
-    result.browserVersion = context.browser()?.version();
+    result.browserVersion = await contextBrowserVersion(context, { chromium, webkit }[engine]);
     await context.route('**/*', route => {
       const url = new URL(route.request().url()); if (url.origin === ORIGIN) return route.continue();
       result.externalRequests.push({ origin: url.origin, pathname: url.pathname }); return route.abort();
@@ -130,13 +151,14 @@ for (const engine of engines) for (const width of sizes) {
     const initial = await snapshot('initial'); assert.deepEqual(initial.taken, []); assert.deepEqual(initial.srs, {});
     await openShelfDoor(page, '#airead-link'); await page.locator('#airead-startingLevel').selectOption('N5');
     await waitForAppRecord(page, record => record.readingSettings?.startingLevel === 'N5');
-    assert(await page.locator('#airead-make').isDisabled()); await screenshot('local-reading-preferences');
+    // Hfix-1B (item 11): with no tutor set up the room draws no "ask the tutor to write one", only the door to set one up
+    assert.equal(await page.locator('#airead-make').count(), 0); assert.equal(await page.locator('#airead-connect').count(), 1); await screenshot('local-reading-preferences');
     await page.locator('#back').click(); await page.locator('body[data-view="shelf"]').waitFor();
     const item = page.locator('.shelf-item:not([data-recommendation])').filter({ has: page.locator('.shelf-title', { hasText: /^静かな朝$/u }) });
     assert.equal(await item.count(), 1); result.passageId = await item.getAttribute('data-passage');
     await item.locator('.shelf-open').click(); await sourceToken(page).waitFor(); await settled(page);
     // reader lane 2026-10-02: no sentence bar waits on the page; the practice door is in the tapped word's popup
-    assert.equal(await page.locator('#reader-sentence-practice').count(), 0); await sourceToken(page).click();
+    assert.equal(await page.locator('#reader-sentence-practice').count(), 0); await exactReaderStage(page, sourceToken(page), { word: WORD, index: INDEX, reading: 'まど', evidenceDir: OUT });
     await page.locator('#mini-sentence-open').click(); await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
     unchanged(initial, await snapshot('reader-choice-neutral')); await page.locator('#sentence-practice-back').click();
     await page.waitForFunction(() => document.body.dataset.view === 'reader' && document.activeElement?.id === 'reader-sentence-practice');
@@ -144,15 +166,17 @@ for (const engine of engines) for (const width of sizes) {
       const copy = (node.querySelector('.tok-word') || node).cloneNode(true); copy.querySelectorAll('rt,rp,.tok-en').forEach(node => node.remove());
       return copy.textContent;
     }));
-    // back from practice, the word's popup is open again with Practice focused; its Full entry opens the word
+    // back from practice, the word's popup is open again with Practice focused; its band (the word) opens the entry
     assert.equal(await page.locator('#mini .mini-word').textContent(), WORD);
-    await page.locator('#mini .mini-entry').click(); await page.locator('#sheet[data-node="word:窓"] .dictionary-entry').waitFor();
+    await page.locator('#mini button.mini-word').click(); await page.locator('#sheet[data-node="word:窓"] .dictionary-entry').waitFor();
     await settled(page); await page.waitForTimeout(800); // The real sheet's same-gesture guard.
     await page.locator('#sheet [data-kanjirow="窓"]').click(); await page.locator('#sheet[data-node="kanji:窓"]').waitFor();
     await settled(page); await page.waitForTimeout(800); await page.locator('#entry-sentence-practice').click();
     await page.locator('#sentence-practice-confirm').waitFor(); unchanged(initial, await snapshot('recursive-choice-neutral'));
     await page.locator('#back').click(); await page.locator('#sheet[data-node="kanji:窓"]').waitFor();
     await page.waitForFunction(() => document.activeElement?.id === 'entry-sentence-practice');
+    // precondition now (Hfix-1B, item 11): a tutor set up, so the word's page offers Ask the tutor (the page draws it on Back)
+    await setUpDeviceTutor(page);
     await page.locator('#sheet-back').click(); await page.locator('#sheet[data-node="word:窓"]').waitFor();
     await page.waitForTimeout(800); await page.locator('#sheet .teacher-save').click();
     await waitForAppRecord(page, record => record.teacherContexts?.entries.length === 1);
@@ -200,7 +224,9 @@ for (const engine of engines) for (const width of sizes) {
     await openSaved();
     await page.locator('[data-sentence-teacher-response]').click(); await page.locator('#chat-input').waitFor();
     const prepared = await page.locator('#chat-input').inputValue(); assert(prepared.startsWith(`${QUESTION}\n\n`)); assert(prepared.includes(PRODUCTION));
-    await savedQuestion(page, ref, prepared); assert(await page.locator('#chat-send').isDisabled());
+    await savedQuestion(page, ref, prepared);
+    // with a tutor set up (Hfix-1B) the question waits as a draft and nothing was sent: no request left for the tutor's service
+    assert.equal(result.externalRequests.filter((request) => request.origin === DEVICE_TUTOR.credential.origin).length, 0, 'nothing was sent to the tutor');
     await page.locator('#teacher-source-return').click(); await returned(page);
     assert.match(await page.locator('#reader-source-back').textContent(), /Back to tutor/u);
     await page.locator('#reader-source-back').click(); await page.locator('#chat-input').waitFor(); assert.equal(await page.locator('#chat-input').inputValue(), prepared);
@@ -219,8 +245,8 @@ for (const engine of engines) for (const width of sizes) {
     assert.deepEqual(JSON.parse(readFileSync(backupPath)).record.sentencePractice, completed.sentencePractice);
     await close(); profile = 'profile-restored'; await open(); await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page);
     await shelf(page); await page.locator('#tray').click(); const timeOrigin = await page.evaluate(() => performance.timeOrigin);
-    await page.locator('#import-file').setInputFiles(backupPath);
-    await page.waitForFunction(old => performance.timeOrigin !== old && document.body?.dataset.ready === '1', timeOrigin, { timeout: 30000 });
+    await answeringRestore(page, async () => { await page.locator('#import-file').setInputFiles(backupPath);
+      await page.waitForFunction(old => performance.timeOrigin !== old && document.body?.dataset.ready === '1', timeOrigin, { timeout: 30000 }); });
     // Warm the original source through its actual action before disconnecting.
     await openSaved(); await page.locator('.learning-source summary').click(); await page.locator('#learning-source-return').click(); await returned(page);
     await page.locator('#reader-source-back').click(); await page.locator('#sentence-production-text').waitFor();

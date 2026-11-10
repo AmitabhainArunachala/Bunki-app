@@ -1,3 +1,5 @@
+import { requireGateAttemptEvidence } from './verification-admission.mjs';
+import { requirePlannedGateProof } from './battery.mjs';
 /** Admission and transport for reusable CI proof. Cached JSON is never authority. */
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
@@ -87,6 +89,17 @@ export function admitProof({
     receipt.gates.every((gate) => ['passed', 'flaky'].includes(gate.status)),
     'A gate did not pass',
   );
+  for (const gate of receipt.gates) {
+    assert(Array.isArray(gate.attempts) && gate.attempts.length > 0, 'Per-gate attempts missing');
+    const accepted = gate.attempts.at(-1);
+    assert.equal(accepted.status, 'passed');
+    requireGateAttemptEvidence(accepted, {
+      gitSha: identity.sha,
+      artifactSha256: receipt.artifact.artifactSha256,
+    });
+    assert.equal(accepted.name, gate.name, 'Accepted attempt belongs to another gate');
+    requirePlannedGateProof(gate.name, accepted.evidenceReceipt.proof);
+  }
   const topology = (shards) =>
     sorted(shards.map((shard) => `${shard.id}:${sorted(shard.gates).join(',')}`));
   assert.deepEqual(topology(receipt.shards), topology(plan.shards), 'Proof shard coverage differs');

@@ -9,7 +9,7 @@
    "passage": {
     "ja": "スタンフォード大学の心理学者キャロル・ドゥエックは、人の能力は努力で伸ばせると信じる態度を「成長マインドセット」と名づけました。反対に、才能は生まれつき決まっていると考える態度が「固定マインドセット」です。前者の子どもは、失敗を能力の証明ではなく学びの材料として受け止めるため、難しい課題にも挑戦しやすいと報告されています。ただし、褒め言葉を変えるだけで身につくものではなく、教える側の振り返りも欠かせません。",
     "form": "成長マインドセット",
-    "en": "The Stanford psychologist Carol Dweck named the attitude of believing that one's abilities can be developed through effort the \"growth mindset.\" In contrast, the attitude of thinking that talent is fixed from birth is the \"fixed mindset.\" Children with the former take failure not as proof of ability but as material for learning, and so are reported to take on difficult tasks more readily. However, it is not acquired just by changing how you praise, and reflection on the teacher's side is also indispensable.",
+    "en": "Stanford psychologist Carol Dweck called the belief that people's abilities can develop through effort a \"growth mindset.\" By contrast, the belief that talent is fixed from birth is a \"fixed mindset.\" Children with the former are reported to be more willing to tackle difficult tasks because they see failure as something to learn from rather than as proof of their ability. However, a growth mindset cannot be acquired simply by changing the words used to praise children; reflection on the part of those teaching them is also essential.",
     "register": "講",
     "topic": "mind",
     "tipJa": "キャロル・ドゥエックの用語。対は「固定マインドセット」。",
@@ -405,7 +405,7 @@
    "passage": {
     "ja": "議論の場で、相手の言い間違いや細かい言葉尻を捉えて、本題とは関係のないところで責め立てる。これを揚げ足を取るといいます。たとえば、「全員が賛成だ」と言った人に対して、「いや、一人欠席していたから全員ではない」と返すような場面です。こうした指摘は、一見すると厳密に見えて、実際には議論の抽象度を下げ、肝心の中身から目をそらせるだけです。建設的な対話をしたいなら、相手の意図を汲んで、まず中身を掘り下げることが大切です。",
     "form": "揚げ足を取る",
-    "en": "In a debate, you seize on the other person's slip of the tongue or small quibbles and attack them on something unrelated to the main issue. This is called \"ageashi o toru.\" An example is a scene in which, to someone who said \"everyone is in favor,\" you retort, \"No, one person was absent so it isn't everyone.\" Such remarks look rigorous at first glance but in fact only lower the level of abstraction of the discussion and divert attention from the essential content. If you want constructive dialogue, it is important to grasp the other's intention and dig into the substance first.",
+    "en": "In a discussion, someone seizes on another person's slip of the tongue or minor points of wording and attacks them over something unrelated to the main issue. This is called \"nitpicking.\" For example, someone says, \"Everyone is in favor,\" and another person replies, \"No, one person was absent, so it wasn't everyone.\" Such objections may seem precise at first glance, but in fact they merely lower the discussion's level of abstraction and distract from its substance. For a constructive dialogue, it is important to understand what the other person means and first explore the substance of what they are saying.",
     "register": "講",
     "topic": "language",
     "tipJa": "「揚げ足を取るな」。言葉尻をとらえて相手を責める、悪い印象の言い方。",
@@ -625,7 +625,7 @@
    "passage": {
     "ja": "教育現場で、「もっと具体的に書きなさい」と指導されて困った経験がある人は多いだろう。実は、文章の抽象度は上げ下げが自在にできてこそ、読み手に伝わる。「自然を大切にしよう」という標語は、あまりに漠然としていて行動に結びつかず、「ごみを持ち帰ろう」まで下げて初めて、実行可能な指針になる。反対に、細部ばかりを並べる文章は、全体の主張が見えにくい。要するに、伝えたい相手に合わせた高さに調整できるかが鍵となる。",
     "form": "抽象度",
-    "en": "Many people have probably been at a loss at school after being told \"write more concretely.\" In fact, a text gets through to its reader only when the level of abstraction can be freely raised and lowered. A slogan like \"let's cherish nature\" is too vague to connect to action and becomes an actionable guideline only once it is lowered to \"let's take our trash home.\" Conversely, writing that merely lines up details makes the overall claim hard to see. In short, the key is whether you can adjust it to a height suited to the person you want to reach.",
+    "en": "Many people have probably felt at a loss at school when told to \"write more concretely.\" In fact, getting your message across to readers requires being able to raise and lower the level of abstraction in your writing freely. A slogan such as \"Let's cherish nature\" is too vague to lead to action; only when it is brought down to \"Let's take our trash home\" does it become a practical guideline. Conversely, writing that simply piles up details makes the overall point hard to discern. In short, the key is whether you can adjust the level to suit the people you want to reach.",
     "register": "報",
     "topic": "language",
     "tipJa": "「抽象度が高い／低い」。具体と抽象の間の段階を言う。",
@@ -669,7 +669,7 @@
    "passage": {
     "ja": "「少子化対策は待ったなしだ」という主張を、換言すれば、「子どもを産み育てやすい環境をつくる政策を、いま実行しなければ手遅れになる」ということになります。このように、同じ内容を別の言葉で言い直すことは、論旨を整理するうえで効果的な手段で、推敲の段階でもよく役立ちます。論文では、「すなわち」と並べて、この表現がよく使われます。ただし、言い換えのつもりが新しい論点を持ち込んでしまうと、読み手を混乱させるので、注意が必要です。",
     "form": "換言すれば",
-    "en": "If we put the claim \"measures against the declining birthrate cannot wait\" in other words, it becomes \"we must now carry out policies that create an environment where it is easy to have and raise children, or it will be too late.\" Restating the same content in different words like this is an effective means of organizing an argument and is also often useful at the stage of polishing. In academic papers, this expression is often used alongside \"sunawachi.\" However, if what you meant as a rephrasing brings in a new point, it confuses the reader, so caution is needed.",
+    "en": "To put the claim \"Measures to address the declining birthrate cannot wait\" in other words, it means, \"Unless we act now to implement policies that make it easier to have and raise children, it will be too late.\" Restating the same content in different words like this is an effective way to organize an argument and often helps during revision as well. In academic papers, this expression is frequently used, as is \"that is to say.\" However, care is needed: if an intended rephrasing introduces a new point, it will confuse the reader.",
     "register": "講",
     "topic": "language",
     "tipJa": "論文・講演の言い換えの合図。「すなわち」より硬い書き言葉寄り。",

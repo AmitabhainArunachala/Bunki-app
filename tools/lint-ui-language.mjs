@@ -1,6 +1,6 @@
 /** Exercise real room renderers in a built artifact. The test route bridge
  * exposes existing navigation functions; it does not replace any UI markup. */
-/* global window, document, NodeFilter, getComputedStyle */
+/* global window, document, NodeFilter, getComputedStyle, localStorage */
 import process from 'node:process';
 import { Buffer } from 'node:buffer';
 import { URL } from 'node:url';
@@ -11,8 +11,13 @@ import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { chromium } from 'playwright-core';
 import { resolveCorridorSite, resolveCorridorEvidence } from '../scripts/resolve-corridor-site.mjs';
+import { uiLanguageReportPath } from './ui-language-report.mjs';
 import { fixture, enrichmentFixture } from '../prototypes/corridor/tools/personal-fixture.mjs';
 import { entryCloseSelector } from '../prototypes/corridor/tools/sheet-navigation-support.mjs';
+import {
+  DEVICE_TUTOR_STORE,
+  setUpDeviceTutor,
+} from '../prototypes/corridor/tools/tutor-fixture-support.mjs';
 
 export const ROOMS = [
   'drift',
@@ -86,7 +91,8 @@ const ROOM_STAMPS = {
   settings: 'settings',
 };
 const site = resolveCorridorSite(),
-  out = path.join(resolveCorridorEvidence(), 'ui-language');
+  reportPath = uiLanguageReportPath(resolveCorridorEvidence()),
+  out = path.dirname(reportPath);
 const screenshots = process.argv.includes('--screenshots');
 const japaneseTour = process.argv.includes('--both-languages');
 const coreOnly = process.argv.includes('--core-only');
@@ -273,10 +279,17 @@ export async function inspectChrome(page) {
             .slice(0, 3)
             .map((c) => '.' + c)
             .join('');
+    // the house voice (the one-hand pass, contract §5): no spec words on the chrome — a control, a heading, a label,
+    // a chip or an eyebrow that says one of these is a leak, in either script. The brief's list: unreviewed · corpus ·
+    // evidence · record · probe · draft · assisted · source inbox · test release · response record. (One backslash:
+    // this regex lives in the page function, not in a template string — `\\b` matched a literal backslash and let
+    // every English word through; the negative control caught it.)
+    const BANNED =
+      /\b(unreviewed|corpus|evidence|records?|probes?|drafts?|assisted|source inbox|test release|response record)\b|未確認|探査|助けありと記録/iu;
     const issues = [],
       inspected = [];
     const chromeText =
-      'button, [role=button], nav, h1, h2, h3, h4, h5, h6, label, legend, summary, select, .eyebrow, .card-kind, .chip, .level-chip, .gs-eyebrow, .gs-bar-name, .gs-gap-line, .gs-row-number, .gs-gap-tag, .pc-eyebrow, .pc-kicker, .kp-chip, .kp-kicker, .vlabel, #variants .measure, .kagami-level, .kagami-obs, .kagami-read, .kagami-prov, .kagami-thin, .exam-skill, .exam-official-label, .exam-daimon-name, .exam-score-note, .exam-bookmark-note';
+      'button, [role=button], nav, h1, h2, h3, h4, h5, h6, label, legend, summary, select, .eyebrow, .card-kind, .chip, .level-chip, .status-chip, .shelf-review-text, .exam-review-reason, .mini-take-note, .gs-eyebrow, .gs-bar-name, .gs-gap-line, .gs-row-number, .gs-gap-tag, .pc-eyebrow, .pc-kicker, .kp-chip, .kp-kicker, .vlabel, #variants .measure, .kagami-level, .kagami-obs, .kagami-read, .kagami-prov, .kagami-thin, .exam-skill, .exam-official-label, .exam-daimon-name, .exam-score-note, .exam-bookmark-note';
     const nodes = [
       ...document.querySelectorAll(
         chromeText +
@@ -330,10 +343,14 @@ export async function inspectChrome(page) {
           kind: 'text',
           text: text.trim().slice(0, 250),
         });
+      if (textElement && BANNED.test(text))
+        issues.push({ selector: selector(el), kind: 'spec-word', text: text.trim().slice(0, 250) });
       for (const attr of ['aria-label', 'title', 'placeholder']) {
         const value = el.getAttribute(attr);
         if (value && cjk.test(withoutContent(value)) && !el.matches(learning))
           issues.push({ selector: selector(el), kind: attr, text: value });
+        if (value && BANNED.test(value))
+          issues.push({ selector: selector(el), kind: `spec-word:${attr}`, text: value });
       }
     }
     return { issues, inspected: inspected.length };
@@ -405,7 +422,7 @@ async function record(page, room, language) {
     ...result,
   });
   await writeFile(
-    path.join(out, 'report.json'),
+    reportPath,
     JSON.stringify(
       {
         artifact: site,
@@ -472,9 +489,16 @@ try {
     await page.locator('.gs-branch-links [data-action=branch]').first().click();
     await record(page, 'guided-branch', language);
     await page.locator('.guided-room [data-action=close-branch]').click();
-    await page.locator('.gs-word').first().click();
+    // the one-hand pass: a word door opens the app's slip beside it (no word room); Escape puts it away
+    await page
+      .locator('.gs-word')
+      .first()
+      .evaluate((n) => n.click());
+    await page.locator('#mini[data-from="guided"]').waitFor();
     await record(page, 'guided-word', language);
-    await page.locator('.guided-room [data-action=close-word]').first().click();
+    await page.locator('#mini').focus();
+    await page.keyboard.press('Escape');
+    await page.locator('#mini').waitFor({ state: 'detached' });
     await page.locator('.gs-progress [data-index="5"]').click();
     await page.locator('.gs-choice input').first().check();
     await page.locator('.guided-room [data-action=check]').click();
@@ -483,10 +507,14 @@ try {
     await page.locator('.guided-room [data-action=finish]').click();
     await page.locator('.gs-results').waitFor();
     await record(page, 'guided-results', language);
+    // precondition now: a tutor set up (Hfix-1B, item 11: the guided room's tutor door shows only with one); it is taken
+    // away again right after the walk, so no other recorded screen changes
+    await setUpDeviceTutor(page);
     for (const view of ['learn', 'field', 'sensei', 'about']) {
       await page.locator(`.gs-bar [data-view=${view}]`).click();
       await record(page, `guided-${view}`, language);
     }
+    await page.evaluate((store) => localStorage.removeItem(store), DEVICE_TUTOR_STORE);
     await page.evaluate(() => window.__BUNKI_LANGUAGE_TOUR__.visit('mock'));
     await page.locator('[data-exam-start]').first().click();
     await record(page, 'mock-confirm', language);
@@ -518,13 +546,15 @@ try {
         if (await summary.isVisible()) await summary.click();
       await record(page, `sheet-${kind}-details`, language);
     }
+    // S · the page's one Save opens its menu as a drawer under the bar (review, the lists, a new list, Copy); it pinned the
+    // foot's "saved to" drawer (.list-picker, #new-list, .list-maker-field), which is gone. The same two states are read:
+    // where the word went, and a new list asking its name
     await page.evaluate(() => window.__BUNKI_LANGUAGE_TOUR__.sheet('word'));
     await page.locator('#sheet-take').click();
-    await page.locator('#new-list').waitFor();
-    await page.locator('#sheet .list-picker').scrollIntoViewIfNeeded();
+    await page.locator('#vocabulary-list-popover.is-drawer #vocabulary-list-new').waitFor();
     await record(page, 'word-save-destinations', language);
-    await page.locator('#new-list').click();
-    await page.locator('#sheet .list-maker-field').scrollIntoViewIfNeeded();
+    await page.locator('#vocabulary-list-popover #vocabulary-list-new').click();
+    await page.locator('#vocabulary-list-popover #vocabulary-list-name').waitFor();
     await record(page, 'word-new-list', language);
     await page.evaluate(() => window.__BUNKI_LANGUAGE_TOUR__.variants());
     await record(page, 'variants', language);
@@ -597,7 +627,7 @@ try {
   }
   const issues = results.flatMap((r) => r.issues.map((i) => ({ room: r.room, ...i })));
   await writeFile(
-    path.join(out, 'report.json'),
+    reportPath,
     JSON.stringify({ artifact: site, results, errors, issues }, null, 2) + '\n',
   );
   console.log(
@@ -619,7 +649,7 @@ try {
   assert.equal(
     issues.length,
     0,
-    `${issues.length} English chrome language leaks; see ${path.join(out, 'report.json')}`,
+    `${issues.length} English chrome language leaks; see ${reportPath}`,
   );
   assert.equal(
     results.filter((r) => r.error).length,

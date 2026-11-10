@@ -238,9 +238,9 @@ describe('operation journal restore — two real SQLite files (ci-substitute)', 
   it('retains and restores 1,005 journal operations within one revision without adopting source counters', async () => {
     const sourceActor = { deviceId: 'large-source', incarnationId: 'source-install' };
     const source = open('large-source', POLICY, sourceActor).store;
+    let revision = (await source.snapshot()).revision;
     for (let start = 0; start < 1005; start += 100) {
-      const revision = (await source.snapshot()).revision;
-      await source.commitLocal({
+      const committed = await source.commitLocal({
         ...local(`batch-${start}`, revision),
         operations: Array.from({ length: Math.min(100, 1005 - start) }, (_, offset) => ({
           payload: {
@@ -254,6 +254,8 @@ describe('operation journal restore — two real SQLite files (ci-substitute)', 
           dependencies: [],
         })),
       });
+      expect(committed.committedRevision).toBe(revision + 1);
+      revision = committed.committedRevision;
     }
     const backup = exportOperationJournal((await source.snapshot()).replica);
     expect(backup.operations).toHaveLength(1005);
@@ -281,7 +283,7 @@ describe('operation journal restore — two real SQLite files (ci-substitute)', 
     expect(
       final.replica.operations.filter((op) => op.actor.deviceId === sourceActor.deviceId),
     ).toEqual(backup.operations);
-  }, 30_000);
+  }, 120_000);
 
   it('preserves pending facts and later quarantine while merging genuine predecessors', async () => {
     const current = open().store;

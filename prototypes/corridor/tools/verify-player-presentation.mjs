@@ -9,13 +9,15 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
 mkdirSync(OUT, { recursive: true });
 const require = createRequire(ROOT + '/package.json');
-const { chromium } = require('playwright');
+const { chromium, webkit } = require('playwright');
+const engine = process.env.KAIRO_BROWSER || 'chromium';
+assert(['chromium', 'webkit'].includes(engine));
 const { startStaticHost } = require(ROOT + '/prototypes/bunki-desktop/lib/static-host.cjs');
 const identity = JSON.parse(readFileSync(SITE + '/build-identity.json'));
 const card = JSON.parse(readFileSync(SITE + '/decks/n1/deck.json')).words[0].cards[0];
 assert.equal(card.id, 'nn-67f6fe4a2f-ca1c2c4f');
-const host = await startStaticHost({ site: SITE, port: 0 }), browser = await chromium.launch();
-const proof = { identity, scope: 'Native public controls on unchanged N1 first card, disposable learner records. Display-only negative fixtures call the public sentenceNodes renderer on deeply frozen clones; they do not alter production data.', cases: [], failures: [] };
+const host = await startStaticHost({ site: SITE, port: 0 }), browser = await ({ chromium, webkit })[engine].launch();
+const proof = { identity, engine, browserVersion: browser.version(), scope: 'Native public controls on unchanged N1 first card, disposable learner records. Display-only negative fixtures call the public sentenceNodes renderer on deeply frozen clones; they do not alter production data.', cases: [], failures: [] };
 const check = (name, passed, observations) => { proof.cases.push({ name, passed, observations }); if (!passed) proof.failures.push(name); };
 async function resting(page) {
   await page.evaluate(async () => {
@@ -33,6 +35,14 @@ const census = () => {
 const seated = (s, context) => s.windowed === true && s.inner > 0 && (!context || s.context.some(([, open]) => open === '1'));
 const fits = s => s.toggle.top >= s.header.bottom && s.target.top >= Math.max(s.header.bottom, s.windowed ? s.anchor.top : s.header.bottom) && s.target.bottom <= Math.min(s.bar.top, s.windowed ? s.anchor.bottom : s.bar.top) && s.def.bottom <= s.bar.top && s.toggle.bottom <= s.bar.top && s.overflow === 0;
 async function labels(page, cdp, lang) {
+  const expected = lang === 'ja' ? ['この画面の不具合を知らせる', '不具合を知らせる'] : ['Report a problem on this screen', 'Report a problem'];
+  if (!cdp) {
+    const button = page.getByRole('button', { name: expected[0], exact: true });
+    const container = page.locator('.br-rail');
+    const observations = { button: await button.ariaSnapshot(), container: await container.ariaSnapshot(), title: await button.getAttribute('title') };
+    check('WebKit accessible report entry ' + lang, await button.count() === 1 && observations.container.includes(expected[1]) && observations.title === expected[0], observations);
+    return;
+  }
   const { root } = await cdp.send('DOM.getDocument', { depth: 0 });
   const get = async selector => {
     const { nodeId } = await cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector });
@@ -40,17 +50,22 @@ async function labels(page, cdp, lang) {
     return nodes.filter(n => !n.ignored).map(n => ({ role: n.role?.value, name: n.name?.value }));
   };
   const actual = { button: await get('#bunki-report-bug'), container: await get('.br-rail'), title: await page.locator('#bunki-report-bug').getAttribute('title') };
-  const expected = lang === 'ja' ? ['この画面の問題を報告', '問題の報告'] : ['Report a problem on this screen', 'Report support'];
+  // the house voice (one hand, slice E): 不具合を知らせる · Report a problem
   check('actual accessibility tree report entry ' + lang, actual.button.some(n => n.role === 'button' && n.name === expected[0]) && actual.container.some(n => n.name === expected[1]) && actual.title === expected[0], actual);
 }
 try {
   for (const width of [320, 390]) for (const zoom of ['full', 'focus']) {
     const context = await browser.newContext({ viewport: { width, height: 844 }, reducedMotion: 'reduce', serviceWorkers: 'block' });
     try {
-      await context.addInitScript(zoom => localStorage.setItem('bunki-cloze:prefs:v3:n1', JSON.stringify({ look: 'world', zoom, sittings: 3, ruleSeen: true })), zoom);
-      const page = await context.newPage(), cdp = await context.newCDPSession(page);
-      await cdp.send('DOM.enable'); await cdp.send('Accessibility.enable');
+      await context.addInitScript(zoom => localStorage.setItem('bunki-cloze:prefs:v3:n1', JSON.stringify({ look: 'world', zoom, sittings: 3, ruleSeen: true, againCoachSeen: true })), zoom);
+      const page = await context.newPage(), cdp = engine === 'chromium' ? await context.newCDPSession(page) : null;
+      if (cdp) { await cdp.send('DOM.enable'); await cdp.send('Accessibility.enable'); }
       await page.goto(host.origin + '/index.html?deck=n1&ui=bi');
+      // The language controls appear before catalog/record hydration finishes.
+      // Establish the loaded deck home before testing either accessible name.
+      await page.waitForFunction(() => document.body.dataset.ready === '1');
+      await page.locator('#kp-start').waitFor();
+      await page.locator('#bunki-report-bug').waitFor();
       // the report entry's accessible names, in both languages, on the deck home (the card screen has none)
       for (const lang of ['ja', 'bi']) { await page.locator(`#lang [data-lang=${lang}]`).click(); await labels(page, cdp, lang); }
       await page.locator('#kp-start').click();
@@ -68,7 +83,7 @@ try {
         const keyed = await page.evaluate(census), focus = await page.evaluate(() => ({ active: document.activeElement?.id || document.activeElement?.tagName, trusted: window.__zoomTrusted }));
         check(`${width}/${zoom} keyboard Enter on ${choice} keeps focus on that button, the marked word inside the window and the ledger unwritten`, keyed.zoom === choice && focus.active === `kp-zoom-${choice}` && focus.trusted === true && keyed.card === held.card && keyed.ledger === held.ledger && fits(keyed), { held, keyed, focus });
       }
-      await page.locator('#kp-card .kp-target').click(); await page.locator('#kp-sheet-close').click();
+      await page.locator('#kp-card .kp-target').click(); await page.locator('#mini[data-from="deck"]').waitFor(); await page.keyboard.press('Escape'); await page.locator('#mini').waitFor({ state: 'detached' });
       const initial = await page.evaluate(census);
       await page.locator('.kp-f-gloss>summary').click();
       await resting(page);
@@ -81,11 +96,18 @@ try {
       }
       // The app opens its decks in the focus room (John, 2026-10-13: "SRS section very clear and smooth with
       // NO CLUTTER at all"): while a card is up there is no top bar, so the language and world switches
-      // and the report entry are not on the card screen; the card's own Readings switch is. It is the
-      // comparison here: switching readings must keep the exact reading pose (nothing moves), off-window
-      // and fitted. The report entry's names are checked on the deck home, where the rail stands.
-      const chrome = await page.evaluate(() => ({ lang: !!document.querySelector('#lang')?.getClientRects().length, world: !!document.querySelector('#theme-seal')?.getClientRects().length, report: !!document.querySelector('#bunki-report-bug')?.getClientRects().length, readings: document.getElementById('kp-readings')?.getAttribute('aria-pressed') }));
-      check(`${width}/${zoom} the card screen has no top bar or report entry (no language or world switch, no report rail) and offers its Readings switch, on`, !chrome.lang && !chrome.world && !chrome.report && chrome.readings === 'true', chrome);
+      // are not on the card screen; the card's own Readings switch is. It is the comparison here: switching
+      // readings must keep the exact reading pose (nothing moves), off-window and fitted. Hfix-1B (§7 line 28,
+      // HG-1): the one quiet report door is on the card screen too, in the study bar's end slot, never over
+      // the card; its names are checked on the deck home above, and the same element serves both.
+      const chrome = await page.evaluate(() => {
+        const box = (sel) => { const r = document.querySelector(sel)?.getBoundingClientRect(); return r && r.width ? r : null; };
+        const glyph = box('#bunki-report-bug svg'), bar = box('.kp-top-study');
+        return { lang: !!document.querySelector('#lang')?.getClientRects().length, world: !!document.querySelector('#theme-seal')?.getClientRects().length,
+          report: !!glyph && !!bar && glyph.left >= bar.left && glyph.right <= bar.right && glyph.top >= bar.top && glyph.bottom <= bar.bottom,
+          readings: document.getElementById('kp-readings')?.getAttribute('aria-pressed') };
+      });
+      check(`${width}/${zoom} the card screen has no top bar (no language or world switch), keeps the one report door in its study bar's end slot, and offers its Readings switch, on`, !chrome.lang && !chrome.world && chrome.report && chrome.readings === 'true', chrome);
       const same = (a, b) => a.card === b.card && a.zoom === b.zoom && a.windowed === b.windowed && a.inner === b.inner && a.anchor.top === b.anchor.top && a.height === b.height && a.page === b.page && a.ledger === b.ledger && JSON.stringify(a.context) === JSON.stringify(b.context) && JSON.stringify(a.folds) === JSON.stringify(b.folds) && JSON.stringify(a.target) === JSON.stringify(b.target);
       // Deliberately off-window: trusted inner wheel chooses an earlier paragraph; where the window is tall
       // enough to keep the marked word inside, a trusted outer scroll then carries it above the screen.
@@ -119,13 +141,13 @@ try {
         const after = await page.evaluate(census), pressed = await page.locator('#kp-readings').getAttribute('aria-pressed');
         check(`${width}/${zoom} native Readings ${state === 'true' ? 'on' : 'off'} preserves face/window/folds/context/ledger and fits`, pressed === state && same(after, before) && after.ledger === ledger && JSON.stringify(after.ruby) === JSON.stringify(before.ruby) && fits(after), { before, after, pressed }); before = after;
       }
-      // The existing word sheet's real kanji door goes through corridor go()/Back().
+      // The word slip's real kanji door (its kanji band) goes through corridor go()/Back().
       await page.locator('#kp-card .kp-target').click();
       const lookupLedger = await page.evaluate(() => localStorage.getItem('bunki-cloze:n1'));
       const seat = await page.evaluate(census);
       check(`${width}/${zoom} compared state is non-default before 交 depth: windowed, inner seat moved${zoom === 'focus' ? ', a context group opened' : ''}`, seated(seat, zoom === 'focus'), { windowed: seat.windowed, inner: seat.inner, context: seat.context });
       check(`${width}/${zoom} depth Back comparison starts with fitted reading controls`, fits(seat), seat);
-      await page.locator('.kp-sheet-kanji-door[data-kanji="交"]').click();
+      await page.locator('#mini[data-from="deck"] .mini-kanji-row[data-kanji="交"]').click();
       await page.locator('#sheet').waitFor();
       const underSheet = await page.evaluate(() => ({ page: scrollY, inert: !!document.querySelector('.kp').closest('[inert]') }));
       await resting(page);
@@ -185,12 +207,14 @@ try {
     check('late-token actual consumer surname and manually chosen window/fold/inner/page seat', JSON.stringify(pre.ruby) === JSON.stringify(['こむら', 'こむら']) && JSON.stringify(late.ruby) === JSON.stringify(pre.ruby) && late.windowed === pre.windowed && late.height === pre.height && Math.abs(late.inner - pre.inner) < 1 && Math.abs(late.anchor.top - pre.anchor.top) < 1 && JSON.stringify(late.folds) === JSON.stringify(pre.folds) && JSON.stringify(late.context) === JSON.stringify(pre.context) && fits(late), { pre, late });
     const repeat = page.locator('.kp-sentence .kp-tok').filter({ has: page.locator('rt', { hasText: 'こむら' }) }).last();
     await repeat.click();
-    const frame = await page.locator('#kp-sheet').evaluate(n => ({ text: n.textContent, reading: n.querySelector('.kp-sheet-reading')?.textContent, key: n.dataset.key, saves: n.querySelectorAll('#kp-take,#kp-take-list,#kp-sheet-full,.kp-sheet-en,.kp-sheet-def').length }));
-    check('actual repeated person lookup is missing-entry with correct reading and no generic sense/save identity', frame.reading === 'こむら' && frame.key === '' && frame.saves === 0 && /This word is not in the dictionary/.test(frame.text) && !/small village|小さい村|しょうそん/.test(frame.text), frame);
+    // the slip (one slip everywhere): the missing entry keeps the passage reading, no key, no Save, no door, no
+    // generic sense — the slip's own miss line in its place
+    const frame = await page.locator('#mini[data-from="deck"]').evaluate(n => ({ text: n.textContent, reading: n.querySelector('.mini-reading')?.textContent, key: n.dataset.key, saves: n.querySelectorAll('#mini-take,.mini-word[data-action="entry.open"],.mini-note,.mini-gloss[lang="ja"]').length, miss: n.querySelector('.mini-gloss')?.textContent }));
+    check('actual repeated person lookup is missing-entry with correct reading and no generic sense/save identity', frame.reading === 'こむら' && frame.key === '' && frame.saves === 0 && /No dictionary entry for this spelling\./.test(frame.miss) && !/small village|小さい村|しょうそん/.test(frame.text), frame);
     // the card screen has no language switch in the focus room; the card is rebuilt on the way back from
     // the corridor's kanji page instead (corridor go()/Back())
-    await page.locator('#kp-sheet-close').click();
-    await page.locator('#kp-card .kp-target').click(); await page.locator('.kp-sheet-kanji-door[data-kanji="交"]').click(); await page.locator('#sheet').waitFor();
+    await page.keyboard.press('Escape'); await page.locator('#mini').waitFor({ state: 'detached' });
+    await page.locator('#kp-card .kp-target').click(); await page.locator('#mini[data-from="deck"] .mini-kanji-row[data-kanji="交"]').click(); await page.locator('#sheet').waitFor();
     await page.locator('#sheet-back').click(); await page.locator('#sheet').waitFor({ state: 'detached' }); await resting(page);
     const rebuilt = await page.evaluate(census);
     check('actual rebuild (back from the kanji page) keeps both contextual surname ruby', JSON.stringify(rebuilt.ruby) === JSON.stringify(['こむら', 'こむら']), rebuilt.ruby);

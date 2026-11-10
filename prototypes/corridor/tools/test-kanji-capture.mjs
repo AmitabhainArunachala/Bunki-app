@@ -3,11 +3,13 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import vm from 'node:vm';
+import {fileURLToPath} from 'node:url';
+import {fixtureSource} from './corridor-fixture-source.mjs';
 
 const skipContext = vm.createContext({});
 vm.runInContext(readFileSync(new URL('../skip-ui.js', import.meta.url), 'utf8'), skipContext);
 const skipUI = skipContext.BunkiSkipUI;
-const source = readFileSync(new URL('../corridor.js', import.meta.url), 'utf8');
+const source = fixtureSource(fileURLToPath(new URL('../',import.meta.url)));
 const data = JSON.parse(readFileSync(new URL('../data/share_alike/skip.json', import.meta.url), 'utf8'));
 const canonical = JSON.parse(readFileSync(new URL('../data/share_alike/kanji.json', import.meta.url), 'utf8')).kanji;
 const byChar = new Map(data.entries.map(entry => [entry.literal, entry]));

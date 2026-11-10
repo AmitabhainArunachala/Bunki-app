@@ -30,14 +30,20 @@ const fixture = Buffer.concat([original, Buffer.from(shim)]);
 const reenable = ['create.disabled = busy || !recordWritable();', 'create.disabled = busy;'];
 assert.equal(original.toString().split(reenable[0]).length, 2, 'The control mutation must target one exact line');
 const reenabled = Buffer.concat([Buffer.from(original.toString().replace(...reenable)), Buffer.from(shim)]);
+// Negative control: a build that declares every kana parenthetical after a kanji an annotation by its shape alone must
+// fail the plain-prose case at its first door.
+const byShape = ['.filter(([open, , inner]) => annotationReadsAs(source, open, annotationKana(inner), tokenReadings, wordStarts))', '.filter(() => true)'];
+assert.equal(original.toString().split(byShape[0]).length, 2, 'The control mutation must target one exact line');
+const shapeOnly = Buffer.concat([Buffer.from(original.toString().replace(...byShape)), Buffer.from(shim)]);
 const controls = [['failed-list-write-is-honest-and-recoverable', 'list-form-reenabled-before-reload', reenabled, /must stay disabled until reload/],
-  ['failed-capture-inside-a-list-is-honest-and-recoverable', 'list-form-reenabled-before-reload-after-capture', reenabled, /A failed native write protects the host until reload/]];
+  ['failed-capture-inside-a-list-is-honest-and-recoverable', 'list-form-reenabled-before-reload-after-capture', reenabled, /A failed native write protects the host until reload/],
+  ['plain-prose-parentheticals-are-annotations-only-when-they-read', 'annotation-by-kana-shape', shapeOnly, /keeps its door/]];
 const sourceFiles = new Map(identity.files.map(file => [file.path, file.sha256]));
 assert.equal(sha(original), sourceFiles.get('corridor.js'));
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['chromium', 'webkit'];
 assert(engines.every(engine => ['chromium', 'webkit'].includes(engine)));
 const host = await startStaticHost({ site, port: 0 });
-const results = [], failures = [];
+const results = [], failures = [], browserVersions = {};
 const state = page => readAppRecordSnapshot(page);
 const targetRows = record => ({ taken: record.taken, srs: record.srs, revlog: record.revlog, deepWords: record.deepWords });
 
@@ -50,16 +56,53 @@ async function openLookup(page, text = '電車') {
     document.body.append(anchor);
     await window.annotationFixture.openJapaneseLookup(anchor, text);
   }, text);
+  await page.locator('#annotation-anchor[data-ladder-rung="reading"] rt').waitFor();
+  assert.equal(await page.locator('#mini').count(), 0, 'The first activation exposes reading only');
+  // Ladder (John, 10-19: "one tap should just be the furigana"): no English under the word yet
+  assert.equal(await page.locator('#annotation-anchor .tok-en').count(), 0, 'The first activation exposes reading only, no English');
+  const shown = await page.locator('#annotation-anchor rt').evaluate(node => ({ text: node.textContent,
+    opacity: Number(getComputedStyle(node).opacity), visibility: getComputedStyle(node).visibility }));
+  assert(shown.text && shown.opacity > 0 && shown.visibility !== 'hidden', 'The first reading must actually paint');
+  // Ladder (John, 10-19, a spec change): the second activation no longer opens the stage. It sets the English of the entry
+  // the lookup names under the word, the reading kept and no stage; only once that rung is seen does the third activation
+  // open the stage, the reading and the English kept under the word.
+  const expected = await page.evaluate(text => window.annotationFixture.D.dict[text]?.m?.[0] ?? null, text);
+  assert(expected, `The fixture word ${text} has a core entry with English`);
+  await page.evaluate(text => window.annotationFixture.openJapaneseLookup(document.getElementById('annotation-anchor'), text), text);
+  await page.locator('#annotation-anchor[data-ladder-rung="gloss"] > .tok-en > .tok-en-text').waitFor();
+  assert.equal(await page.locator('#mini').count(), 0, 'The second activation sets the English under the word, not the stage');
+  const english = await page.locator('#annotation-anchor').evaluate(node => {
+    const rows = node.querySelectorAll(':scope > .tok-en');
+    const ink = rows[0]?.querySelector(':scope > .tok-en-text');
+    const style = ink ? getComputedStyle(ink) : null;
+    const rt = node.querySelector('rt'), reading = rt ? getComputedStyle(rt) : null;
+    return { rows: rows.length, text: ink?.textContent.trim() || null,
+      painted: !!style && style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0 && ink.getClientRects().length > 0,
+      reading: !!reading && !!rt.textContent.trim() && reading.display !== 'none' && reading.visibility !== 'hidden' && Number(reading.opacity) > 0,
+      hasEn: node.classList.contains('has-en'), aside: node.dataset.depthAside ?? null };
+  });
+  assert.deepEqual(english, { rows: 1, text: expected, painted: true, reading: true, hasEn: true, aside: 'meaning' },
+    'The second activation paints the entry\'s English in one row under the word, its reading kept, the DOTS hook on it');
+  await page.evaluate(text => window.annotationFixture.openJapaneseLookup(document.getElementById('annotation-anchor'), text), text);
   await page.locator('#mini').waitFor();
+  assert.equal(await page.locator('#annotation-anchor').getAttribute('data-ladder-rung'), 'stage');
+  assert.equal(await page.locator('#annotation-anchor').evaluate(node => node.querySelector(':scope > .tok-en > .tok-en-text')?.textContent.trim() ?? null),
+    expected, 'The stage keeps the English under the word');
 }
-// Lists open from the popup's "Add to a list" in a compact popover (reader lane 2026-10-02); Save is the popup's own
-// one-tap button. The big list window is gone. One path (round 4, T5): the popup offers a list only once the word
-// is saved, so a word not yet saved is saved first, by the same capture the list used to make.
+// Save ▾ (1.3.0; one-hand pass 2026-10-15): the popup has one Save and no list button. On a word not yet saved the
+// press saves it and unfolds its menu (Review · lists · + New list · Copy) inside the card, under the button; on a
+// saved word the same press opens the menu. The big list window is gone.
 async function chooser(page, text = '電車') {
   await openLookup(page, text);
+  assert.equal(await page.locator('#mini #mini-lists, #mini .mini-entry').count(), 0, 'The popup has one Save ▾ and no list or entry button');
   if (await page.locator('#mini #mini-take').getAttribute('aria-pressed') !== 'true') await saveInPopup(page);
-  await page.locator('#mini #mini-lists').click();
-  await page.locator('#vocabulary-list-popover').waitFor();
+  else await page.locator('#mini #mini-take').click();
+  await menuOpen(page);
+}
+/** Save ▾'s menu: inside the card under its own button, never a window. */
+async function menuOpen(page) {
+  await page.locator('#mini #vocabulary-list-popover.is-inline').waitFor();
+  assert.equal(await page.locator('#mini #mini-take').getAttribute('aria-expanded'), 'true', 'Save ▾ says its menu is open');
   assert.equal(await page.locator('#vocabulary-list-dialog, dialog[open]').count(), 0, 'Lists must not open a modal window');
 }
 async function saveInPopup(page) {
@@ -67,6 +110,9 @@ async function saveInPopup(page) {
   await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true');
 }
 async function createList(page, name) {
+  // in Save ▾'s menu a new list is one row until it is asked for; then the row becomes its name field
+  const row = page.locator('#vocabulary-list-popover #vocabulary-list-new');
+  if (await row.isVisible()) await row.click();
   await page.locator('#vocabulary-list-popover #vocabulary-list-name').fill(name);
   await page.locator('#vocabulary-list-popover [type="submit"]').click();
 }
@@ -106,7 +152,7 @@ const cases = [
   ['failed-list-write-is-honest-and-recoverable', async page => {
     await openLookup(page); await saveInPopup(page);
     await waitForAppRecord(page, record => record.taken.some(row => row.id === '電車'));
-    await page.locator('#mini #mini-lists').click(); await page.locator('#vocabulary-list-popover').waitFor();
+    await menuOpen(page); // the save unfolded Save ▾'s menu
     const before = await state(page);
     await armRecordWriteFailure(page, 'abort', { roots: ['lists'] });
     await createList(page, 'Retry this list');
@@ -126,6 +172,10 @@ const cases = [
     assert.deepEqual((await state(page)).record, before.record);
     await chooser(page);
     assert.equal(await page.locator('#vocabulary-list-name').inputValue(), 'Retry this list', 'The typed list name survives the reload as a session draft');
+    // in Save ▾'s fresh menu the draft waits behind "+ New list": the row becomes the field, the draft in it
+    await page.locator('#vocabulary-list-popover #vocabulary-list-new').click();
+    assert.equal(await page.locator('#vocabulary-list-name').isVisible(), true, 'The name field shows with the draft');
+    assert.equal(await page.locator('#vocabulary-list-name').inputValue(), 'Retry this list');
     await page.locator('#vocabulary-list-popover [type="submit"]').click();
     await waitForAppRecord(page, record => member(record, 'Retry this list', '電車'));
     await page.waitForFunction(() => document.getElementById('vocabulary-list-name')?.value === '');
@@ -182,15 +232,24 @@ const cases = [
     });
     assert.equal(await page.locator('#mini .mini-reading').textContent(), 'うわて', 'The explicit JMdict entry must survive the quick look');
     assert.match(await page.locator('#mini .mini-gloss').textContent(), /upper part/);
-    await saveInPopup(page); await page.locator('#mini #mini-lists').click(); await createList(page, 'Exact reading');
+    await saveInPopup(page); await menuOpen(page); await createList(page, 'Exact reading');
     const saved = await waitForAppRecord(page, record => member(record, 'Exact reading', '上手'));
     const card = saved.taken.find(row => row.id === '上手');
     assert.equal(card.entrySeq, '1580400'); assert.equal(card.cueReading, 'うわて');
     await closeChooser(page);
-    const before = await state(page);
+    const prior = await state(page);
     await openLookup(page, '上手');
     assert.equal(await page.locator('#mini .mini-reading').textContent(), 'じょうず');
     assert.equal(await page.locator('#mini-take').isDisabled(), true, 'The different core homograph cannot overwrite the existing card');
+    // G2 · the look-up is itself his encounter with the core 上手 read じょうず: it writes the encounter ledger (met) and
+    // nothing else — never the うわて card, a list or a schedule. The refusals below must then change nothing at all.
+    const core = JSON.stringify([1, 'word', '上手', 'core', null, 'じょうず']);
+    await waitForAppRecord(page, record => !!record.met?.entries?.[core], { description: 'the look-up\'s own encounter' });
+    const before = await state(page);
+    assert.deepEqual(Object.keys({ ...prior.record, ...before.record }).filter(key => JSON.stringify(prior.record[key]) !== JSON.stringify(before.record[key])), ['met'],
+      'A look-up writes the encounter ledger and no other root');
+    assert.deepEqual(Object.keys(before.record.met.entries).filter(key => !Object.hasOwn(prior.record.met?.entries || {}, key)), [core],
+      'It adds exactly its own identity: 上手 read じょうず, the core record');
     // Also exercise the list popover's own guard; a stale caller cannot bypass it.
     await page.evaluate(() => window.annotationFixture.openVocabularyListPopover({ t: 'word', id: '上手' }, '上手', document.getElementById('annotation-anchor')));
     await createList(page, 'Wrong homograph');
@@ -211,18 +270,27 @@ const cases = [
     });
     const word = page.locator('#assistance-fixture [data-lookup-text="電車"]');
     await word.click(); await page.waitForFunction(() => window.annotationGate.calls === 1);
-    assert.equal(await page.locator('#mini').count(), 0, 'No hint may appear while assistance persistence is pending');
+    assert.equal(await page.locator('#mini, #assistance-fixture rt').count(), 0, 'Neither reading nor stage may appear while assistance persistence is pending');
+    // Ladder (John, 10-19): the English under the word is a hint too; admission still precedes every reveal
+    assert.equal(await page.locator('#assistance-fixture .tok-en').count(), 0, 'No English may appear while assistance persistence is pending');
     await page.evaluate(() => window.annotationGate.resolve(false));
     await page.waitForTimeout(50);
-    assert.equal(await page.locator('#mini').count(), 0, 'Rejected assistance cannot reveal a hint');
+    assert.equal(await page.locator('#mini, #assistance-fixture rt').count(), 0, 'Rejected assistance cannot reveal a reading or stage');
+    assert.equal(await page.locator('#assistance-fixture .tok-en').count(), 0, 'Rejected assistance cannot reveal the English');
     await word.click(); await page.waitForFunction(() => window.annotationGate.calls === 2);
     await page.evaluate(() => {
       const old = document.querySelector('#assistance-fixture [data-lookup-text="電車"]');
       const replacement = old.cloneNode(true); old.replaceWith(replacement);
       window.annotationGate.resolve(true);
     });
-    await page.locator('#mini').waitFor();
-    assert.equal(await page.locator('#mini .mini-reading').textContent(), 'でんしゃ');
+    await page.locator('#assistance-fixture [data-ladder-rung="reading"] rt').waitFor();
+    assert.equal(await page.locator('#mini').count(), 0, 'Approved first help reveals only the reading on the replacement occurrence');
+    // Ladder (John, 10-19: "one tap should just be the furigana"): the English under the word is the next rung, not this one
+    assert.equal(await page.locator('#assistance-fixture .tok-en').count(), 0, 'Approved first help reveals only the reading, no English');
+    assert.equal(await page.locator('#assistance-fixture rt').textContent(), 'でんしゃ');
+    assert.equal(await page.locator('#assistance-fixture rt').evaluate(node => {
+      const style = getComputedStyle(node); return style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0;
+    }), true, 'The approved reading actually paints');
   }],
   ['skip-search-stroke-door', async page => {
     await page.locator('#chrome-search').click();
@@ -303,6 +371,52 @@ const cases = [
     assert.equal(observed.normal.nestedControls, 0);
     assert.equal(observed.protectedCount, 0, 'Global enhancement cannot silently add hints to a timed/mock assessment');
   }],
+  // G3 · plain prose has no tokens: a kana parenthetical is its word's reading only when the served dictionary or the kanji
+  // data reads that word so (子供（こども）, 拓 ひら of ひら.く); a katakana word or a grammar mark in parentheses is prose
+  ['plain-prose-parentheticals-are-annotations-only-when-they-read', async page => {
+    const fixture = await page.evaluateHandle(() => {
+      const f = window.annotationFixture;
+      const room = f.S.view; f.S.view = 'shelf';
+      const box = document.createElement('section');
+      box.innerHTML = '<p class="fixture-annotation">子供（こども）が下品(な)要因（ボトルネック）を切り拓（ひら）く。</p>';
+      document.body.append(box);
+      const before = box.textContent;
+      try {
+        f.enhanceJapaneseProse(box);
+        return { box, room, before, pending: [...box.querySelectorAll('[data-lookup-readings-pending]')] };
+      } catch (error) { f.S.view = room; box.remove(); throw error; }
+    });
+    try {
+      // Keep the exact mounted occurrence and room alive while queued lexical proof arrives.
+      await page.waitForFunction(({ box, pending }) => {
+        if (!box.isConnected || window.annotationFixture.S.view !== 'shelf' ||
+          pending.some(node => !node.isConnected || !box.contains(node))) {
+          throw new Error('The same annotation fixture must remain mounted in its room');
+        }
+        return !box.querySelector('[data-lookup-readings-pending]');
+      }, fixture, { timeout: 10000 });
+      const observed = await fixture.evaluate(({ box, before, pending }) => {
+        if (!box.isConnected || window.annotationFixture.S.view !== 'shelf' ||
+          pending.some(node => !node.isConnected || !box.contains(node))) {
+          throw new Error('The same annotation fixture must remain mounted through observation');
+        }
+        const words = [...box.querySelectorAll('.japanese-lookup-word')].map(node => node.dataset.lookupText);
+        const sameText = box.textContent === before;
+        return { sameText, words, pendingReadings: { initial: pending.length, remaining: box.querySelectorAll('[data-lookup-readings-pending]').length,
+          sameBoxConnected: box.isConnected, sameWrappersConnected: pending.every(node => node.isConnected && box.contains(node)) } };
+      });
+      assert(observed.sameText, 'Lookup wrapping preserves exact source text');
+      assert(['ボトル', 'ネック'].every(part => observed.words.some(word => word.includes(part))),
+        `A katakana word in parentheses that reads no word before it keeps its door: ${JSON.stringify(observed.words)}`);
+      assert(observed.words.includes('な'), `A grammar mark in parentheses keeps its door: ${JSON.stringify(observed.words)}`);
+      assert(['子供', '下品', '要因', '拓'].every(word => observed.words.includes(word)), `Each written word stays a door: ${JSON.stringify(observed.words)}`);
+      assert(!observed.words.some(word => /^(こども|ひ|ら|ひら)$/u.test(word)), `A reading that reads its word is text, not a door: ${JSON.stringify(observed.words)}`);
+      return observed;
+    } finally {
+      try { await fixture.evaluate(({ box, room }) => { window.annotationFixture.S.view = room; box.remove(); }); }
+      finally { await fixture.dispose(); }
+    }
+  }],
 ];
 const filter = new Set(process.argv.slice(2).map(arg => { assert(arg.startsWith('--case=')); return arg.slice(7); }));
 for (const name of filter) assert(cases.some(([candidate]) => candidate === name), `Unknown case: ${name}`);
@@ -314,6 +428,8 @@ let browser;
 try {
   for (const engine of engines) {
     browser = await ({ chromium, webkit })[engine].launch();
+    browserVersions[engine] = browser.version();
+    console.log(`BROWSER ${engine} ${browserVersions[engine]}`);
     for (const { name, run, body, expect } of jobs) {
       const context = await browser.newContext({ viewport: { width: 1200, height: 900 }, locale: 'en-US', serviceWorkers: 'block' });
       await silenceBrowserAudio(context);
@@ -350,7 +466,7 @@ try {
   }
 } finally {
   await browser?.close(); await host.close();
-  writeFileSync(resolve(evidence, 'annotation-lookup.json'), JSON.stringify({ passed: failures.length === 0, identity,
+  writeFileSync(resolve(evidence, 'annotation-lookup.json'), JSON.stringify({ passed: failures.length === 0, identity, browserVersions,
     sourceSha256: sha(original), fixtureSha256: sha(fixture), shimSha256: sha(shim), verifierSha256: sha(readFileSync(new URL(import.meta.url))),
     controls: controls.map(([target, name, body]) => ({ case: target, name, fixtureSha256: sha(body) })),
     results, failures, limits: ['Test-only export shim and synthetic anchors; no operator profile or external service.', 'Native database writes and reload durability are exercised; visual acceptance belongs to the uninstrumented app.'] }, null, 2) + '\n');

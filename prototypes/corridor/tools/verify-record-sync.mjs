@@ -4,15 +4,20 @@
 // bindings, which are declared in the generated document rather than Node.
 /* global recordEpoch: writable, recordSyncSlot, closeRecordSync */
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { build } from 'esbuild';
 import { chromium } from 'playwright-core';
+import { readAuthoredCorridor } from './authored-corridor-source.mjs';
 
 const repository = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
-const source = readFileSync(resolve(repository, 'prototypes/corridor/corridor.js'), 'utf8');
+const corridor = resolve(repository, 'prototypes/corridor');
+const sourceBytes = readFileSync(resolve(corridor, 'corridor.js'));
+const authored = readAuthoredCorridor(corridor);
+const source = authored.source;
 const bundled = await build({ absWorkingDir: repository,
   stdin: { contents: "export * from './prototypes/corridor/record-sync.mjs'; export { createSyncOperation, operationReference, encodeLocalJson } from './scripts/corridor-record-entry.ts';", resolveDir: repository }, bundle: true, write: false,
   platform: 'browser', format: 'esm', target: 'es2022', logLevel: 'silent',
@@ -234,9 +239,10 @@ const server = createServer((req, res) => {
   res.end(req.url === '/record-sync.mjs' ? moduleBytes : html);
 });
 await new Promise((done) => server.listen(0, '127.0.0.1', done));
-let browser;
+let browser, browserVersion = null;
 try {
   browser = await chromium.launch({ headless: true });
+  browserVersion = browser.version();
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   const errors = []; page.on('pageerror', (error) => errors.push(error.message));
   await page.goto(`http://127.0.0.1:${server.address().port}/`);
@@ -263,10 +269,17 @@ try {
     await page.evaluate(() => window.showUnavailable());
     assert.match(await page.locator('.record-sync-status').innerText(), /unavailable in this host|isn’t available here/u);
     assert.equal(await page.locator('#record-sync button:enabled').count(), 0);
+    // Hfix-1B (L-7): nor any dead button drawn, nor the line of what it would carry; the status line stays
+    assert.equal(await page.locator('#record-sync button:visible').count(), 0, 'no sync button is drawn where sync cannot run');
+    assert.equal(await page.locator('#record-sync .record-sync-scope').isVisible(), false);
+    assert.equal(await page.locator('#record-sync .record-sync-status').isVisible(), true);
   });
   await check('connect and sync require separate user actions; disconnect wins a late cycle', async () => {
     await page.evaluate(() => window.setupSync());
     assert.deepEqual(await page.evaluate(() => fixture.calls), []);
+    // Hfix-1B (L-7) · where sync can run, its three buttons and its line are drawn again
+    assert.equal(await page.locator('#record-sync button:visible').count(), 3);
+    assert.equal(await page.locator('#record-sync .record-sync-scope').isVisible(), true);
     await page.locator('#record-sync-connect').click();
     await page.waitForFunction(() => !document.getElementById('record-sync-now').disabled);
     assert.deepEqual(await page.evaluate(() => fixture.calls), ['connect']);
@@ -310,4 +323,6 @@ try {
   await browser?.close();
   await new Promise((done) => server.close(done));
 }
-console.log(JSON.stringify({ pass: true, count: checks.length, checks, scope: 'Synthetic adapter and Chromium DOM behavior; no authenticated native transport exercised.' }, null, 2));
+console.log(JSON.stringify({ pass: true, count: checks.length, checks, runId: process.env.KAIRO_GATE_RUN_ID ?? null,
+  sourceSha256: createHash('sha256').update(sourceBytes).digest('hex'), sourceFiles: authored.files,
+  browser: { engine: 'chromium', version: browserVersion }, scope: 'Synthetic adapter and Chromium DOM behavior; no authenticated native transport exercised.' }, null, 2));

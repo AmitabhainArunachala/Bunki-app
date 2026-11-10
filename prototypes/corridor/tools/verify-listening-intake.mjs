@@ -11,8 +11,11 @@ import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } 
 import { extname, isAbsolute, join, resolve } from 'node:path';
 import process from 'node:process';
 import { chromium, webkit } from 'playwright-core';
+import { contextBrowserVersion } from './browser-version-support.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { armRecordWriteFailure, clearRecordWriteFailure, readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+import { selectBackupFile } from './record-fixture-support.mjs';
+import { setUpDeviceTutor } from './tutor-fixture-support.mjs';
 
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable staged KAIRO_SITE_DIR');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
@@ -172,7 +175,7 @@ for (const engine of engines) for (const width of sizes) {
       serviceWorkers: 'allow', acceptDownloads: true, ignoreHTTPSErrors: true,
       ...(engine === 'chromium' ? { args: ['--ignore-certificate-errors'] } : {}), recordVideo: { dir: videos, size: { width, height: width === 390 ? 844 : 1050 } },
     });
-    result.browserVersion = context.browser()?.version();
+    result.browserVersion = await contextBrowserVersion(context, { chromium, webkit }[engine]);
     await context.route('**/*', (route) => {
       const request = route.request(), url = new URL(request.url());
       if (url.origin === ORIGIN) return route.continue();
@@ -252,6 +255,8 @@ for (const engine of engines) for (const width of sizes) {
     assert.equal(topic.sourceId, excerpt.captureId); assert.equal(topic.quote, '  町の図書館で本を読んだ。');
     await page.locator('#sheet .learning-source summary').click(); await page.locator('#learning-source-return').click();
     await page.locator('#source-context-return').waitFor(); assert.equal(await page.locator('#listening-excerpt-original').getAttribute('href'), 'https://www.youtube.com/watch?v=R23fixture1&t=12s');
+    // precondition now (Hfix-1B, item 11): a tutor set up, so the word's page offers Ask the tutor (drawn on Back)
+    await setUpDeviceTutor(page);
     await page.locator('#source-reader-back').click(); await page.locator('#sheet .teacher-discuss').click();
     await page.locator('#chat-input').fill(QUESTION); await waitForAppRecord(page, (record) => record.teacherDrafts?.entries.some((entry) => entry.text === QUESTION && !entry.consumed));
     assert.equal(await page.locator('#chat-send').isDisabled(), true);
@@ -264,7 +269,8 @@ for (const engine of engines) for (const width of sizes) {
     const backup = JSON.parse(readFileSync(backupFile)); assert.deepEqual(backup.record.sourceInbox, saved.record.sourceInbox);
     await close(); profile = 'restored-profile'; await open(); await frontDoor(page); await lists(page);
     const importNavigation = page.waitForEvent('framenavigated', { predicate: (frame) => frame === page.mainFrame(), timeout: 30000 });
-    await page.locator('#import-file').setInputFiles(backupFile); await importNavigation; await ready(page); await inbox(page);
+    // Every restore asks first (Hfix-2a): answer exactly that confirmation; any other dialog fails.
+    await selectBackupFile(page, backupFile); await importNavigation; await ready(page); await inbox(page);
     const restored = await readAppRecordSnapshot(page); assert.deepEqual(restored.record.sourceInbox, saved.record.sourceInbox);
     assert.equal(restored.record.taken[0].sourceContextRef, topic.id);
     assert(restored.record.teacherDrafts.entries.some((entry) => entry.text === QUESTION && !entry.consumed));

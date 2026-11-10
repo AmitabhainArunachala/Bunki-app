@@ -1,0 +1,8 @@
+/** Selection only; current source/profile/grant admission remains caller-owned. */
+export type JapaneseSelectionReason='selected-ja-whole-field'|'excluded-english'|'excluded-mixed'|'excluded-unassigned'|'excluded-notation'|'excluded-unsupported-prose-path';
+export interface JapaneseSelectionRow {readonly taskKey:string;readonly noteGuid:string;readonly contractId:string;readonly passageId:string;readonly schedulerContentRevision:string|null;readonly audioContentRevision:string;readonly sourcePath:string;readonly sourceRef:string;readonly sourceHash:string;readonly selected:boolean;readonly reason:JapaneseSelectionReason;}
+export interface JapaneseSelectionCoverage {readonly tasks:number;readonly fields:number;readonly selectedPlacements:number;readonly selectedSourceRefs:number;readonly excludedPlacements:number;readonly excludedByReason:Readonly<Partial<Record<JapaneseSelectionReason,number>>>;}
+export interface JapaneseOnlySelection {readonly format:'nihongo-japanese-only-selection';readonly version:1;readonly policyId:'ja-whole-field-v1';readonly sourceRevision:string;readonly correctionLedgerRevision:string;readonly rows:readonly JapaneseSelectionRow[];readonly coverage:JapaneseSelectionCoverage;readonly digest:string;}
+export interface JapaneseSelectionOptions {readonly plan:Readonly<Record<string,unknown>>;readonly sourceRevision:string;readonly correctionLedgerRevision:string;/** Explicit trusted request scope; never derive from untrusted pack rows. */readonly taskKeys?:readonly string[];}
+export function createJapaneseOnlySelection(options:JapaneseSelectionOptions):JapaneseOnlySelection;
+export function validateJapaneseOnlySelection(manifest:unknown,options:JapaneseSelectionOptions):JapaneseOnlySelection;

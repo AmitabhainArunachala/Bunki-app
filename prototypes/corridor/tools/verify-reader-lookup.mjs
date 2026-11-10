@@ -11,6 +11,7 @@ import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
+import { readAppRecord } from './record-test-support.mjs';
 const require = createRequire(import.meta.url);
 const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
 assert(process.env.KAIRO_SITE_DIR && process.env.KAIRO_ARTIFACT_SHA256, 'Choose an existing artifact and its exact digest');
@@ -36,14 +37,69 @@ for (const fixture of missing) {
     'Missing fixture must not have a full-dictionary row');
 }
 assert.equal(article.tokens[2].s,'の');
-const host=await startStaticHost({site,port:0}), results=[];
+const host=await startStaticHost({site,port:0}), results=[], browserVersions={}, pointerSamples=[];
 const token=(page,index)=>page.locator(`#reader .tok[data-index="${index}"]`);
 async function center(locator){
   await locator.scrollIntoViewIfNeeded();
-  return locator.evaluate(node=>{const box=node.getBoundingClientRect(),x=box.left+box.width/2,y=box.top+box.height/2;
-    if(!node.contains(document.elementFromPoint(x,y)))throw new Error('Token centre obscured');return{x,y};});
+  // Inline words may wrap. Their union box contains other words; use an actual
+  // printed glyph fragment while retaining exact occurrence hit ownership.
+  const point=await locator.evaluate(node=>{
+    const box=node.getBoundingClientRect(),cx=box.left+box.width/2,cy=box.top+box.height/2;
+    const union={x:cx,y:cy,width:box.width,height:box.height,hit:node.contains(document.elementFromPoint(cx,cy)),fragments:node.getClientRects().length};
+    const walker=document.createTreeWalker(node,NodeFilter.SHOW_TEXT);
+    while(walker.nextNode()){
+      const text=walker.currentNode;if(text.parentElement.closest('rt,.tok-en'))continue;
+      for(let i=0;i<text.length;i++){
+        if(!/[^\s]/u.test(text.data[i]))continue;
+        const range=document.createRange();range.setStart(text,i);range.setEnd(text,i+1);
+        const r=range.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
+        if(r.width>0&&r.height>0&&node.contains(document.elementFromPoint(x,y)))return{x,y,index:node.dataset.index,glyph:text.data[i],union};
+      }
+    }
+    throw new Error(`No printed glyph of this occurrence is hit-testable: ${JSON.stringify(union)}`);
+  });
+  pointerSamples.push(point);return point;
 }
 async function click(page,locator){const at=await center(locator);await page.mouse.click(at.x,at.y);}
+async function focusOccurrence(page,word){
+  const at=await word.evaluate(node=>{const block=node.closest('[data-reader-prose]');return [...block.querySelectorAll('.tok[data-para]')].indexOf(node);});
+  assert(at>=0);await word.locator('xpath=ancestor::*[@data-reader-prose][1]').focus();
+  await page.keyboard.press('Home');for(let i=0;i<at;i++)await page.keyboard.press('ArrowRight');
+  assert(await word.evaluate(node=>document.activeElement===node),'The exact occurrence is selected through its paragraph');
+}
+async function openStage(page,word,source,dials,modality='pointer'){
+  if(modality!=='pointer')await focusOccurrence(page,word);
+  const activate=()=>modality==='pointer'?click(page,word):page.keyboard.press(modality);
+  const surface=await word.evaluate(node=>{const clone=node.cloneNode(true);clone.querySelectorAll('rt,.tok-en').forEach(n=>n.remove());return clone.textContent;});
+  const kana=s=>String(s||'').replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60));
+  // Ladder (John, 10-19, a spec change): a word set in text raises its reading on every dial where the reading is not
+  // already up (なし too; つねに has it up, and a word that is its own kana has none to raise), then sets its English under
+  // it, and only then opens the stage. Each activation is taken once the rung before it is seen.
+  const reveal=Number(dials.split(',')[1])!==2&&!!source.r&&kana(source.r)!==kana(surface);
+  await activate();
+  await page.waitForFunction(node=>!!node?.dataset.ladderRung,await word.elementHandle());
+  assert.equal(await word.getAttribute('data-ladder-rung'),reveal?'reading':'gloss','The first activation follows this dial and exact displayed word: its reading where one shows on tap, else its English');
+  if(reveal){
+    assert.equal(await page.locator('#mini').count(),0,'The first rung has no meaning stage');
+    await page.waitForFunction(node=>[...node.querySelectorAll('ruby')].some(ruby=>{
+      const rt=ruby.querySelector('rt');if(!rt?.textContent||rt.classList.contains('hidden-rt'))return false;
+      const n=getComputedStyle(rt),p=getComputedStyle(ruby,'::before');
+      return rt.getClientRects().length>0&&n.display!=='none'&&n.visibility!=='hidden'&&Number(n.opacity)>0||
+        ruby.dataset.r===rt.textContent&&p.content===JSON.stringify(rt.textContent)&&p.visibility!=='hidden'&&Number(p.opacity)>0;
+    }),await word.elementHandle(),{timeout:5000});
+    assert.equal(await word.evaluate(node=>node.querySelectorAll('.tok-en').length),0,'The reading rung shows no English yet');
+    await activate();
+    await page.waitForFunction(node=>node?.dataset.ladderRung!=='reading',await word.elementHandle());
+    assert.equal(await word.getAttribute('data-ladder-rung'),'gloss','The second activation sets the English under the same occurrence');
+  }
+  assert.equal(await page.locator('#mini').count(),0,'The English rung has no meaning stage');
+  await page.waitForFunction(node=>!!node.querySelector(':scope > .tok-en .tok-en-text')?.textContent.trim(),await word.elementHandle(),{timeout:5000});
+  assert(await word.evaluate(node=>node.classList.contains('has-en')&&node.dataset.depthAside==='meaning'),'The English rung marks its own word');
+  await activate();
+  await page.locator('#mini').waitFor();
+  assert.equal(await word.getAttribute('data-ladder-rung'),'stage','The same occurrence reaches the meaning stage');
+  assert.equal(await word.evaluate(node=>node.querySelectorAll(':scope > .tok-en').length),1,'The English stays under its word at the stage');
+}
 async function open(page,dials){
   await page.goto(`${host.origin}/?entry=shelf&dials=${dials}&ui=bi`);
   await page.waitForFunction(()=>document.body.dataset.ready==='1');
@@ -67,8 +123,10 @@ try{
  for(const engine of engines){
   const browserType={chromium,webkit}[engine];
   const browser=await browserType.launch({headless:true});
+  browserVersions[engine]=browser.version(); console.log(`${engine} ${browserVersions[engine]}`);
   const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce',serviceWorkers:'block'});
   await silenceBrowserAudio(context);
+  await context.addInitScript(()=>localStorage.setItem('kairo-word-ladder-demo-v1','1')); // This is lookup coverage, not the fresh-record demonstration.
   const page=await context.newPage(),errors=[];
   page.setDefaultTimeout(12000);page.on('pageerror',e=>errors.push(e.message));
   await context.route('**/*',route=>new URL(route.request().url()).origin===host.origin?route.continue():route.abort());
@@ -81,55 +139,75 @@ try{
    for(const dials of ['0,1,0','0,0,0','0,2,0','2,1,0']){
     await run('named-known-'+dials.replaceAll(',','-'),async()=>{
      await open(page,dials);const named=token(page,1),neighbour=await token(page,2).textContent();
-     assert.equal(await named.evaluate(n=>n.tagName),'BUTTON');assert(await named.getAttribute('aria-label'));
-     await click(page,named);await page.locator('#mini .mini-reading').waitFor();
+     assert.equal(await named.evaluate(n=>n.tagName),'SPAN');assert.equal(await named.getAttribute('role'),'presentation');assert.equal(await named.getAttribute('tabindex'),null);
+     await openStage(page,named,article.tokens[1],dials);await page.locator('#mini .mini-reading').waitFor();
      const shown=await mini(page);assert.deepEqual(shown,{word:'谷川',reading:'たにがわ',gloss:'mountain stream',role:'dialog'});
      assert.equal(await token(page,2).textContent(),neighbour);assert.equal(await page.locator('#sheet').count(),0);
-     assert.equal(await named.locator('.tok-en').count(),0,'Lookup must not inject another word’s inline gloss');
+     // Ladder (John, 10-19, a spec change): the stage keeps the word's own English under it (one row, its own meaning, the
+     // one its stage shows); no other word in the text carries one, so lookup still never injects another word's gloss
+     const inline=await page.evaluate(word=>[...document.querySelectorAll('#reader .tok-en')].map(row=>({own:row.parentElement===word,text:row.textContent})),await named.elementHandle());
+     assert.deepEqual(inline,[{own:true,text:shown.gloss}],'Lookup sets only this word’s own English under it, never another word’s inline gloss');
      for(const key of ['Enter','Space']){
-      await tapOutside(page);await named.focus();await page.keyboard.press(key);
+      await tapOutside(page);await openStage(page,named,article.tokens[1],dials,key);
       await page.locator('#mini .mini-reading').waitFor();assert.deepEqual(await mini(page),shown);
      }
      return{dials,shown,labelAfter:await named.getAttribute('aria-label')};
     });
     for(const fixture of missing) await run(fixture.kind+'-absent-'+dials.replaceAll(',','-'),async()=>{
      await open(page,dials);const control=token(page,fixture.index);
-     assert.equal(await control.evaluate(node=>node.tagName),'BUTTON');
+     assert.equal(await control.evaluate(node=>node.tagName),'SPAN');assert.equal(await control.getAttribute('role'),'presentation');assert.equal(await control.getAttribute('tabindex'),null);
      assert(await control.evaluate((node,kind)=>node.classList.contains(kind),fixture.kind));
-     await click(page,control);await page.locator('#mini').waitFor();
+     await openStage(page,control,article.tokens[fixture.index],dials);await page.locator('#mini').waitFor();
      const shown=await mini(page);assert.equal(shown.word,fixture.surface);
      assert.equal(shown.reading,fixture.reading,'A retained token reading must survive lookup even when the dictionary has no entry');
      assert.equal(await page.locator('#mini-take').isDisabled(),true,'Absent meanings cannot create an empty review card');return shown;
     });
     await run('auxiliary-identity-'+dials.replaceAll(',','-'),async()=>{
      await open(page,dials);const ending=token(page,89);
-     await click(page,ending);await page.locator('#mini').waitFor();
+     await openStage(page,ending,article.tokens[89],dials);await page.locator('#mini').waitFor();
      const shown=await mini(page);
-     assert.equal(shown.word,'ます');assert.equal(shown.reading,'ます');
+     // L · a word written exactly as it is read does not say itself twice: ます has no reading line
+     assert.equal(shown.word,'ます');assert.equal(shown.reading,'');
+     assert.equal(await page.locator('#mini .mini-reading').count(),0,'ます, written as it is read, shows no reading line');
      assert.equal(shown.gloss,'No dictionary entry for this spelling.','A polite ending must not borrow 升 or 増す');
      assert.equal(await page.locator('#mini-take').isDisabled(),true);
-     assert.equal(await page.locator('#mini .mini-entry').isDisabled(),true,
-      'An unresolved full-entry door must not reopen the rejected dictionary row');
+     assert.equal(await page.locator('#mini button.mini-word, #mini [data-action="entry.open"]').count(),0,
+      'An unresolved spelling has no door into an entry: its word is plain text, never a button that reopens the rejected row');
      assert.equal(await page.locator('#sheet').count(),0);
-     return{dials,shown,saveHeld:true,unresolvedEntryHeld:true};
+     // the same run, a kanji word: its reading line is still there (谷川 read たにがわ), so hiding every reading cannot pass
+     await tapOutside(page);const kanji=token(page,1);
+     await openStage(page,kanji,article.tokens[1],dials);await page.locator('#mini .mini-reading').waitFor();
+     const kanjiShown=await mini(page);
+     assert.equal(kanjiShown.word,'谷川');assert.equal(kanjiShown.reading,'たにがわ','A kanji word keeps its reading line');
+     return{dials,shown,kanjiShown,saveHeld:true,unresolvedEntryHeld:true};
     });
    }
    await run('particle-tap-keyboard-and-menu',async()=>{
     await open(page,'0,1,0');const particle=token(page,2);const before=await particle.textContent();
     for(const modality of ['pointer','Enter','Space']){
-     if(modality==='pointer')await click(page,particle);else{await particle.focus();await page.keyboard.press(modality);}
+     await openStage(page,particle,article.tokens[2],'0,1,0',modality);
      await page.locator('#mini .mini-gloss').waitFor();const shown=await mini(page);
      assert.equal(shown.word,'の');assert.equal(shown.gloss,'of · belonging');assert.equal(shown.role,'dialog');
-     assert.equal(await page.locator('#sheet').count(),0);assert.equal(await particle.textContent(),before);
+     // Ladder (John, 10-19, a spec change): the particle's own text is as it was; the one thing under it is its English row,
+     // which reads its role
+     assert.equal(await page.locator('#sheet').count(),0);
+     assert.equal(await particle.evaluate(node=>{const clone=node.cloneNode(true);clone.querySelectorAll(':scope > .tok-en').forEach(n=>n.remove());return clone.textContent;}),before);
+     assert.deepEqual(await particle.evaluate(node=>[...node.querySelectorAll('.tok-en')].map(row=>row.parentElement===node?row.textContent:null)),['of · belonging'],
+      'The particle carries exactly its own English row, its role');
      await tapOutside(page);
     }
-    // the grammar entry is one choice in the word menu (reader lane 2026-10-02): a right-click, then Full entry
+    // the grammar entry is one choice in the strip (reader lane 2026-10-02; G5 hold = seal): a right-click, then Full entry;
+    // a particle is not a card, so its strip keeps nothing, says nothing about saving and offers no lists
+    const recordBefore=await readAppRecord(page);
     const at=await center(particle);await page.mouse.click(at.x,at.y,{button:'right'});
-    await page.locator('#reader-word-menu').waitFor();
-    const items=await page.locator('#reader-word-menu [role="menuitem"]').allTextContents();
-    assert.deepEqual(items,['Save the sentence','Full entry','Ask the tutor about this sentence','Copy'],'A particle offers its menu without a word save');
-    assert.equal(await page.locator('#mini').count(),0,'The menu replaces a quick look, never sits over one');
-    await page.locator('#reader-word-menu [data-menu-action="entry"]').click();
+    await page.locator('#seal-strip').waitFor();
+    const items=(await page.locator('#seal-strip [data-strip-action]:not([hidden])').allTextContents()).map(text=>text.trim());
+    assert.deepEqual(items,['全項目 · Full entry','Save the sentence','Copy','Ask the tutor about the word'],'A particle offers its strip without a word save');
+    assert.equal(await page.locator('#seal-strip .seal-strip-lists, #seal-strip-new').count(),0,'A particle offers no lists');
+    assert.equal((await page.locator('#seal-strip-status').textContent()).trim(),'','A particle\'s strip says nothing about saving');
+    assert.deepEqual((await readAppRecord(page)).taken,recordBefore.taken,'Holding a particle keeps nothing');
+    assert.equal(await page.locator('#mini').count(),0,'The strip replaces a quick look, never sits over one');
+    await page.locator('#seal-strip [data-strip-action="entry"]').click();
     await page.locator('#sheet[data-node="particle:no"]').waitFor();
     assert.equal(await page.locator('#mini').count(),0,'Opening grammar must not leave a quick look over it');
     assert.match(await page.locator('#sheet .headword').textContent(),/^の/u);
@@ -141,7 +219,7 @@ try{
  }
 }finally{
  await host.close();
- const receipt={artifactSha256:manifest.artifactSha256,gitSha:manifest.gitSha,sourceDirty:manifest.sourceDirty,
+ const receipt={browserVersions,pointerSamples,artifactSha256:manifest.artifactSha256,gitSha:manifest.gitSha,sourceDirty:manifest.sourceDirty,
   verifierSha256:createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
   scope:'Known named, dictionary-absent named/plain, and auxiliary identity lookup in four dial modes; particle short tap, keyboard and the word menu full entry. No broad lexical/capture regression claim',
   instrumentation:'Unmodified staged runtime, normal DOM controls, no export shim or model calls; native audio paths run silently',results,

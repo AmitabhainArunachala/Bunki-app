@@ -85,8 +85,9 @@ try {
   const promoted = await waitForAppRecord(page, (record) => record.taken?.length === 1);
   assert.deepEqual(promoted.taken.map((item) => item.id), ['犬']);
   assert.deepEqual(promoted.revlog || [], [], 'explicit learning does not invent recall');
-  // Native readback can precede the command's live UI publication.
-  await page.waitForFunction(() => !document.querySelector('[data-airead-take="犬"]'));
+  // Native readback can precede the command's live UI publication. S · the suggestion's keep is the one Save: it stays and
+  // reads Saved ✓ (pressed) once the word is kept — it pinned the button leaving the page
+  await page.waitForFunction(() => document.querySelector('[data-airead-take="犬"]')?.getAttribute('aria-pressed') === 'true');
   assert.deepEqual(await page.evaluate(() => window.__KAIRO_SRS__.dueKeys()), ['word:犬']);
   results.push({ name: 'one-explicit-suggestion-promotion-creates-only-that-review', pass: true });
   await page.locator('#back').click();

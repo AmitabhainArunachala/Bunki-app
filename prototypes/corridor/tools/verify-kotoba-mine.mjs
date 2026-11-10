@@ -8,7 +8,7 @@ import { openShelfTools } from './shelf-tools-support.mjs';
  * spells its passage with exactly one marked word, and the marked word carries
  * a kana reading.
  *
- * Half two drives the corridor in real Chromium:
+ * Half two drives the selected real browser (KAIRO_BROWSER=chromium|webkit|all):
  *   · 集中道場 › デッキ lists the deck; opening it shows the deck home;
  *   · a card shows the sentence with the word marked, reveals readings,
  *     meaning and source, and a grade lands in
@@ -57,8 +57,8 @@ import { openShelfTools } from './shelf-tools-support.mjs';
  *      焦点 dims the other sentences (never removes them); a new card opens 全文,
  *      a card seen before 焦点; sentence cards have no zoom;
  *   e) the grade bar is fixed to the bottom of a phone screen (a 195-character
- *      passage never hides it) and carries the rule 「答えを見て理解が深まったなら
- *      もう一度」 once, dismissible, remembered in prefs.
+ *      passage never hides it) and carries the rule 「答えを見て初めて分かったなら「もう一度」」
+ *      ("If the answer was new to you, choose Again", Hfix-1B) once, dismissible, remembered in prefs.
  *
  * Then the visual system (CARD_CONTRACT_V2 §9, brief-2026-10-04/aesthetics.md):
  *   a) no 見て覚えるコツ panel, no topic hue, no level 1–3 edge, no amber tip bar; the method
@@ -75,9 +75,9 @@ import { openShelfTools } from './shelf-tools-support.mjs';
  *      smooth autoscroll, transformed card or swipe drag.
  *
  * Then the review loop (CARD_CONTRACT_V2 §3.7, §4), both decks where it applies:
- *   a) 削除 in the study top bar is one tap: the card leaves the sitting and every later queue, its FSRS
- *      record and id untouched (ledger: suspended, repairLog); the toast's 元に戻す brings it
- *      back; 設定 › 保留中のカード counts it and 復元 returns it to the queue;
+ *   a) 削除 is never on a front (Hfix-1B); on the back it is the card's last quiet row, and one tap there: the card
+ *      leaves the sitting and every later queue, its FSRS record and id untouched (ledger: suspended, repairLog); the
+ *      toast's 元に戻す brings it back; 設定 › 保留中のカード counts it and 復元 returns it to the queue;
  *   b) a card that has lapsed LEECH_LAPSES (5) times shows the repair ladder on its back after tier one, in
  *      order 別の文に替える → ヒントを付ける → 保留, each one tap and logged: the swap suspends the
  *      card and puts the word's next unseen passage on screen (due at once, after a reload too);
@@ -124,20 +124,30 @@ import { openShelfTools } from './shelf-tools-support.mjs';
  * Usage: node verify-kotoba-mine.mjs   (rebuild the deck: python3 decks/kotoba-mine/tools/build.py)
  */
 
-import { createHash } from 'node:crypto';
+import assert from 'node:assert/strict';
+import { createHash, randomUUID } from 'node:crypto';
 import { createServer } from 'node:http';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, extname, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { AxeBuilder } from '@axe-core/playwright';
-import { chromium } from 'playwright-core';
-import { resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
+import { chromium, webkit } from 'playwright-core';
+import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
 
-import { contrastTable, KIND_JI_FLOOR, kindJiTable } from './contrast-kotoba.mjs';
+import { contrastByWorld, contrastTable, KIND_JI_FLOOR, kindJiTable } from './contrast-kotoba.mjs';
 
+const requestedEngine = process.env.KAIRO_BROWSER || 'chromium';
+if (!['chromium', 'webkit', 'all'].includes(requestedEngine)) throw new Error('KAIRO_BROWSER must be chromium, webkit or all');
+const engines = requestedEngine === 'all' ? ['chromium', 'webkit'] : [requestedEngine];
+const only = process.argv.find(arg => arg.startsWith('--case='))?.slice(7) || null;
+if (only && !['tap', 'host', 'review-contracts'].includes(only)) throw new Error('--case supports tap, host or review-contracts; omit it for the complete verifier');
+const evidence = resolveCorridorEvidence();
+let actualEngine = null, actualFixture = null;
+const gateRunId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
+const browserVersions = {}, results = [];
 const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
 // The battery's law: verify the built artifact, not the source tree. Deck sources, the release
 // folder and the build tools live in the repository, outside the built site.
@@ -182,11 +192,33 @@ function startServer(rootDir = CORRIDOR_DIR) {
 }
 
 let failures = 0;
-function check(name, pass, detail = '') {
+function check(caseId, name, pass, detail = '') {
   if (!pass) failures += 1;
+  results.push({ engine: actualEngine, caseId, fixture: actualFixture, name, pass: !!pass, detail });
   console.log(`${pass ? '  ok  ' : ' FAIL '} ${name}${detail ? `  — ${detail}` : ''}`);
 }
 const readJson = (path) => JSON.parse(readFileSync(path, 'utf8'));
+
+/** The player admits a grade asynchronously — mount.js commit() awaits srs-core's admitAnswer under one Web Lock — so the
+ * ledger and the screen change some tens of milliseconds after the tap (26–27 ms measured on 2026-10-31). Act, then wait,
+ * within a bound, for the outcome: the deck's log grew (the write landed), or the player painted a toast it had not shown
+ * before (a refused or failed write: 保存できませんでした with #kp-to-backup, or a refusal line). Never a fixed sleep, and
+ * never a read of the ledger right after the tap. */
+async function settledGrade(page, ledgerKey, act, { timeout = 5000 } = {}) {
+  const probe = `(() => { const s = JSON.parse(localStorage.getItem(${JSON.stringify(ledgerKey)}) || 'null'); const toast = document.querySelector('.kp-toast');
+    return { log: s?.log?.length ?? 0, fresh: !!toast && !toast.dataset.kpSeen }; })()`;
+  const before = await page.evaluate(`(() => { document.querySelector('.kp-toast')?.setAttribute('data-kp-seen', '1'); return ${probe}; })()`);
+  await act();
+  await page.waitForFunction(`(() => { const now = ${probe}; return now.log > ${before.log} || now.fresh; })()`, null, { timeout });
+  return before;
+}
+const gradeClick = (page, ledgerKey, selector = '#kp-grade-good', options) => settledGrade(page, ledgerKey, () => page.click(selector), options);
+/** a grade that moves on: settled, and the next card is on screen (the card id changed) */
+async function gradeToNext(page, ledgerKey, selector = '#kp-grade-good', { timeout = 5000 } = {}) {
+  const was = await page.evaluate(`document.getElementById('kp-card')?.dataset.card ?? null`);
+  await gradeClick(page, ledgerKey, selector, { timeout });
+  await page.waitForFunction(`(document.getElementById('kp-card')?.dataset.card ?? null) !== ${JSON.stringify(was)}`, null, { timeout });
+}
 
 /** Actual renderer fonts on visible study-page text, plus self-contained face declarations. */
 async function studyFontEvidence(page) {
@@ -211,6 +243,59 @@ async function studyFontEvidence(page) {
     nodes.forEach((node, i) => node.setAttribute('data-kp-font-probe', String(i)));
     return { faces: faces.length, embedded: faces.every((rule) => /^url\(["']?data:font\/woff2;base64,/.test(rule.style.getPropertyValue('src'))), registered: document.fonts.size, status: document.fonts.status, errorFaces: [...document.fonts].filter((face) => face.status === 'error').length, textNodes: nodes.length };
   });
+  if (actualEngine === 'webkit') {
+    // WebKit exposes no public CDP font-attribution API. Compare the renderer's
+    // actual text rasters with independently named copies of the embedded faces;
+    // a fallback-family mutation must fail that same comparison. This is raster
+    // evidence, not a fabricated native/custom glyph census.
+    try {
+      const raster = await page.evaluate(async () => {
+        const rules = [...document.styleSheets].flatMap(sheet => [...sheet.cssRules]).filter(rule => rule.type === 5);
+        const unquote = text => text.trim().replace(/^["']|["']$/gu, '');
+        const nodes = [...document.querySelectorAll('[data-kp-font-probe]')];
+        const cases = nodes.map(node => {
+          const cs = getComputedStyle(node);
+          return { node, family: unquote(cs.fontFamily.split(',')[0]), stack: cs.fontFamily, weight: cs.fontWeight, style: cs.fontStyle,
+            text: [...node.childNodes].filter(child => child.nodeType === Node.TEXT_NODE).map(child => child.textContent).join('') };
+        });
+        const families = [...new Set(cases.map(row => row.family))], aliases = new Map(families.map((family, i) => [family, `kp-probe-${i}`])), added = [];
+        const canvas = document.createElement('canvas'); canvas.width = 4096; canvas.height = 100;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const raster = (row, family) => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.font = `${row.style} ${row.weight} 32px ${family}`; ctx.fillStyle = '#000';
+          ctx.fillText(row.text, 2, 60);
+          return { width: ctx.measureText(row.text).width, data: ctx.getImageData(0, 0, canvas.width, canvas.height).data };
+        };
+        const same = (a, b) => a.width === b.width && a.data.every((v, i) => v === b.data[i]);
+        try {
+          for (const rule of rules) {
+            const family = unquote(rule.style.fontFamily), alias = aliases.get(family);
+            if (!alias) continue;
+            const face = new window.FontFace(alias, rule.style.getPropertyValue('src'), { weight: rule.style.fontWeight || 'normal', style: rule.style.fontStyle || 'normal', unicodeRange: rule.style.getPropertyValue('unicode-range') || 'U+0-10FFFF' });
+            document.fonts.add(face); added.push(face);
+          }
+          const missingFamilies = families.filter(family => !rules.some(rule => unquote(rule.style.fontFamily) === family));
+          for (const row of cases) await document.fonts.load(`${row.style} ${row.weight} 32px "${aliases.get(row.family)}"`, row.text);
+          const rows = cases.map(row => {
+            const expectedStack = row.stack.split(',').map(family => aliases.has(unquote(family)) ? `"${aliases.get(unquote(family))}"` : family).join(',');
+            const expected = raster(row, expectedStack), actual = raster(row, getComputedStyle(row.node).fontFamily);
+            const oldStyle = row.node.getAttribute('style');
+            row.node.style.setProperty('font-family', 'monospace', 'important');
+            const mutant = raster(row, getComputedStyle(row.node).fontFamily);
+            if (oldStyle === null) row.node.removeAttribute('style'); else row.node.setAttribute('style', oldStyle);
+            return { family: row.family, text: row.text, matchesEmbedded: same(actual, expected), fallbackRejected: !same(mutant, expected), unclipped: expected.width < canvas.width - 4 };
+          });
+          return { method: 'webkit-embedded-face-raster', families, cases: rows.length, missingFamilies,
+            matched: rows.filter(row => row.matchesEmbedded).length, unclipped: rows.every(row => row.unclipped),
+            fallbackRejected: rows.filter(row => row.fallbackRejected).length, failures: rows.filter(row => !row.matchesEmbedded || !row.unclipped) };
+        } finally { for (const face of added) document.fonts.delete(face); }
+      });
+      return { ...census, ...raster, statusAfterGlyphs: await page.evaluate(() => document.fonts.status) };
+    } finally {
+      await page.evaluate(() => { for (const node of document.querySelectorAll('[data-kp-font-probe]')) node.removeAttribute('data-kp-font-probe'); });
+    }
+  }
   const cdp = await page.context().newCDPSession(page);
   try {
     await cdp.send('DOM.enable');
@@ -220,25 +305,27 @@ async function studyFontEvidence(page) {
     const fonts = [];
     for (const nodeId of nodeIds) fonts.push(...(await cdp.send('CSS.getPlatformFontsForNode', { nodeId })).fonts);
     const statusAfterGlyphs = await page.evaluate(() => document.fonts.status);
-    return { ...census, statusAfterGlyphs, glyphs: fonts.reduce((n, f) => n + f.glyphCount, 0), nativeGlyphs: fonts.filter((f) => !f.isCustomFont).reduce((n, f) => n + f.glyphCount, 0), families: [...new Set(fonts.filter((f) => f.glyphCount).map((f) => f.familyName))] };
+    return { ...census, method: 'chromium-native-glyph-attribution', statusAfterGlyphs, glyphs: fonts.reduce((n, f) => n + f.glyphCount, 0), nativeGlyphs: fonts.filter((f) => !f.isCustomFont).reduce((n, f) => n + f.glyphCount, 0), families: [...new Set(fonts.filter((f) => f.glyphCount).map((f) => f.familyName))] };
   } finally {
     await page.evaluate(() => { for (const node of document.querySelectorAll('[data-kp-font-probe]')) node.removeAttribute('data-kp-font-probe'); });
     await cdp.detach();
   }
 }
-const studyFontsPass = (f) => f.faces === 451 && f.embedded && f.registered === 451 && f.status === 'loaded' && f.statusAfterGlyphs === 'loaded' && f.errorFaces === 0 && f.textNodes > 0 && f.glyphs > 0 && f.nativeGlyphs === 0;
+const studyFontsPass = (f) => f.faces === 451 && f.embedded && f.registered === 451 && f.status === 'loaded' && f.statusAfterGlyphs === 'loaded' && f.errorFaces === 0 && f.textNodes > 0 &&
+  (f.method === 'chromium-native-glyph-attribution' ? f.glyphs > 0 && f.nativeGlyphs === 0
+    : f.method === 'webkit-embedded-face-raster' && f.cases === f.textNodes && f.matched === f.cases && f.missingFamilies.length === 0 && f.unclipped && f.fallbackRejected > 0);
 
 /* ------------------------------------------------- half one: the deck */
 function verifyDeck() {
   const deck = readJson(DECK_PATH);
-  check('the deck is a bunki-cloze-deck v1 with 12 topics', deck.format === 'bunki-cloze-deck' && deck.version === 1 && deck.groups.length === 12);
+  check("K001", 'the deck is a bunki-cloze-deck v1 with 12 topics', deck.format === 'bunki-cloze-deck' && deck.version === 1 && deck.groups.length === 12);
   const cards = deck.words.flatMap((w) => w.cards.map((c) => ({ ...c, word: w })));
-  check('323 words, each with one or more sentences, best first', deck.words.length === 323 && deck.words.every((w) => w.cards.length && w.cards.map((c) => c.lv).join() === w.cards.map((_, i) => i + 1).join()), `${deck.words.length} words · ${cards.length} cards`);
+  check("K002", '323 words, each with one or more sentences, best first', deck.words.length === 323 && deck.words.every((w) => w.cards.length && w.cards.map((c) => c.lv).join() === w.cards.map((_, i) => i + 1).join()), `${deck.words.length} words · ${cards.length} cards`);
   const passages = new Map(cards.map((c) => [`${c.word.id}:${c.ja}`, c]));
   const real = [...passages.values()].filter((c) => c.kind !== 'original');
-  check('every passage names its source; real mined passages and passages written for the deck', cards.every((c) => c.kind && c.src && (c.src.url || c.src.site)) && real.length > 0 && real.length < passages.size, `${passages.size} passages · ${real.length} mined · ${passages.size - real.length} written`);
+  check("K003", 'every passage names its source; real mined passages and passages written for the deck', cards.every((c) => c.kind && c.src && (c.src.url || c.src.site)) && real.length > 0 && real.length < passages.size, `${passages.size} passages · ${real.length} mined · ${passages.size - real.length} written`);
   const mcd = cards.filter((c) => c.type);
-  check('MCD: one word asked per card — 語 cards blank the word (and any repeat of it), 字 cards one kanji with its reading as the hint', mcd.length === cards.length && mcd.every((c) => c.type === 'word' || (c.type === 'kanji' && c.hint)) && !!deck.method?.length, `${cards.filter((c) => c.type === 'word').length} 語 · ${cards.filter((c) => c.type === 'kanji').length} 字`);
+  check("K004", 'MCD: one word asked per card — 語 cards blank the word (and any repeat of it), 字 cards one kanji with its reading as the hint', mcd.length === cards.length && mcd.every((c) => c.type === 'word' || (c.type === 'kanji' && c.hint)) && !!deck.method?.length, `${cards.filter((c) => c.type === 'word').length} 語 · ${cards.filter((c) => c.type === 'kanji').length} 字`);
   const bad = [];
   for (const c of cards) {
     const target = c.ruby.filter((seg) => seg[2] === 1);
@@ -247,7 +334,7 @@ function verifyDeck() {
     else if (!/^[ぁ-ゖー]+$/.test(target[0][1])) bad.push(`${c.id}: reading ${target[0][1]}`);
     if (!c.en) bad.push(`${c.id}: no English`);
   }
-  check('every card spells its sentence, asks exactly one word, and gives it a kana reading', bad.length === 0, bad.slice(0, 4).join(' | ') || `${cards.length}/${cards.length}`);
+  check("K005", 'every card spells its sentence, asks exactly one word, and gives it a kana reading', bad.length === 0, bad.slice(0, 4).join(' | ') || `${cards.length}/${cards.length}`);
   return deck;
 }
 
@@ -266,7 +353,7 @@ function verifyIds(decks) {
     const ids = manifest[deck.id] ?? {};
     const bad = deck.words.flatMap((w) => w.cards.filter((c) => ids[cardKey(w.id, c)] !== c.id).map((c) => `${c.id} ${cardKey(w.id, c)}`));
     const n = deck.words.reduce((sum, w) => sum + w.cards.length, 0);
-    check(`${deck.id}: every card id is the one ids.json gives its key (word, passage, kind), not its position`, bad.length === 0 && Object.keys(ids).length === n, bad.slice(0, 3).join(' | ') || `${n}/${n} · ${(manifest.reserved?.[deck.id] ?? []).length} reserved`);
+    check(`K006/${deck.id}`, `${deck.id}: every card id is the one ids.json gives its key (word, passage, kind), not its position`, bad.length === 0 && Object.keys(ids).length === n, bad.slice(0, 3).join(' | ') || `${n}/${n} · ${(manifest.reserved?.[deck.id] ?? []).length} reserved`);
   }
 }
 
@@ -281,8 +368,8 @@ function verifyLeaks(decks) {
   const wordLeaks = cards.filter(({ c, w }) => c.type !== 'kanji' && (plain(c, 1, 3).includes(c.form) || plain(c, 1, 3).includes(w.term))).map(({ c }) => c.id);
   const kanjiLeaks = cards.filter(({ c }) => c.type === 'kanji' && plain(c, 1).includes(c.ruby.find((seg) => seg[2] === 1)[0])).map(({ c }) => c.id);
   const repeats = cards.filter(({ c }) => c.ruby.some((seg) => seg[2] === 3)).length;
-  check('no 語 or 文 card prints its word outside the blanks (a repeat of the word is blanked too)', wordLeaks.length === 0, wordLeaks.slice(0, 4).join(' | ') || `0 · ${repeats} cards blank a repeat`);
-  check('no 字 card prints its blanked kanji elsewhere in the passage', kanjiLeaks.length === 0, kanjiLeaks.slice(0, 4).join(' | ') || `0 of ${cards.filter(({ c }) => c.type === 'kanji').length}`);
+  check("K007", 'no 語 or 文 card prints its word outside the blanks (a repeat of the word is blanked too)', wordLeaks.length === 0, wordLeaks.slice(0, 4).join(' | ') || `0 · ${repeats} cards blank a repeat`);
+  check("K008", 'no 字 card prints its blanked kanji elsewhere in the passage', kanjiLeaks.length === 0, kanjiLeaks.slice(0, 4).join(' | ') || `0 of ${cards.filter(({ c }) => c.type === 'kanji').length}`);
 }
 
 /* ------------------------------------------- readings the tokeniser got wrong (F17) */
@@ -301,7 +388,7 @@ function verifyRuby(decks) {
     });
     if (!found.length || found.some((r) => r !== right)) bad.push(`${id}: ${after}${surface}=${found.join('/') || '(none)'}${found.includes(wrong) ? ` (${wrong})` : ''}`);
   }
-  check('corrected readings stay corrected: 日本人 じん, 他の ほか, 一日 いちにち, 一般の方 かた, 土曜日 び, 寛仁 ともひと …', bad.length === 0, bad.slice(0, 4).join(' | ') || `${pairs.length}/${pairs.length} pairs (tools/kotoba-deck-ruby.fixtures.json)`);
+  check("K009", 'corrected readings stay corrected: 日本人 じん, 他の ほか, 一日 いちにち, 一般の方 かた, 土曜日 び, 寛仁 ともひと …', bad.length === 0, bad.slice(0, 4).join(' | ') || `${pairs.length}/${pairs.length} pairs (tools/kotoba-deck-ruby.fixtures.json)`);
 }
 
 /* ------------------------------------- the grade path (F01, F07, N02) */
@@ -336,12 +423,17 @@ async function verifyGradePath(browser, base) {
       await page.waitForSelector('#kp-grade-good');
       const before = await page.evaluate(`({ ledger: localStorage.getItem(${JSON.stringify(LEDGER)}), count: document.querySelector('.kp-count').textContent })`);
       await page.evaluate(`Storage.prototype.setItem = () => { throw new DOMException('full', 'QuotaExceededError'); }`);
-      await page.click('#kp-grade-good');
+      await gradeClick(page, LEDGER);
       const after = await page.evaluate(`({ ledger: localStorage.getItem(${JSON.stringify(LEDGER)}), count: document.querySelector('.kp-count')?.textContent, card: !!document.querySelector('#kp-card'), grades: !!document.querySelector('#kp-grade-good'), backup: !!document.querySelector('#kp-to-backup'), text: document.querySelector('.kp').innerText })`);
+      // Under the admission order (HOOKS-SPEC §3.3) the word's mark is written before the ledger, so a storage that refuses
+      // every write stops the grade at the mark and the player shows the refusal line for 'mark-unavailable' (lead 0128;
+      // that line stands, lead/Kimi 1250) — never 保存できませんでした with バックアップへ, which is the line for a ledger
+      // write that fails after the mark landed.
+      const refusal = /couldn’t be saved safely, so it didn’t change the card’s schedule|安全に保存できなかったため、札の予定は変わっていません/.test(after.text);
       check(
-        'when storage refuses the write, the card stays (1/N), the ledger is unchanged and the page says 保存できませんでした',
-        /^1\//.test(after.count || '') && after.count === before.count && after.card && after.grades && after.backup && after.ledger === before.ledger && after.text.includes('Could not save.'),
-        JSON.stringify({ count: after.count, card: after.card, grades: after.grades, backup: after.backup, ledgerUnchanged: after.ledger === before.ledger }),
+        "K010", 'when storage refuses the write, the card stays (1/N), the ledger is unchanged and the page shows the admission’s refusal line (the mark could not be written, HOOKS-SPEC §3.3), with no backup prompt',
+        /^1\//.test(after.count || '') && after.count === before.count && after.card && after.grades && after.ledger === before.ledger && refusal && !after.backup,
+        JSON.stringify({ count: after.count, card: after.card, grades: after.grades, backup: after.backup, ledgerUnchanged: after.ledger === before.ledger, refusal }),
       );
     } finally {
       await context.close();
@@ -356,7 +448,7 @@ async function verifyGradePath(browser, base) {
       await page.waitForSelector('#kp-card');
       const a = await page.evaluate(SENTENCE);
       await page.click('#kp-reveal');
-      await page.click('#kp-grade-good'); // card A: next step in 10 minutes
+      await gradeClick(page, LEDGER); // card A: next step in 10 minutes
       const due = await page.evaluate(`(() => { const s = JSON.parse(localStorage.getItem(${JSON.stringify(LEDGER)})); const c = Object.values(s.cards)[0]; return (new Date(c.due) - Date.now()) / 60000; })()`);
       // a new sitting: A is not due yet, so it is not in the queue
       await page.click('#kp-quit');
@@ -369,14 +461,13 @@ async function verifyGradePath(browser, base) {
       await page.waitForSelector('#kp-grade-good');
       const stillB = await page.evaluate(SENTENCE);
       check(
-        'a learning card that comes due while another card is open does not replace it',
+        "K011", 'a learning card that comes due while another card is open does not replace it',
         a !== b && stillB === b && due > 9 && due <= 10.1,
         JSON.stringify({ dueInMinutes: Math.round(due * 10) / 10, same: stillB === b }),
       );
-      await page.click('#kp-grade-good');
-      await page.waitForSelector('#kp-card');
+      await gradeToNext(page, LEDGER);
       const shown = await page.evaluate(SENTENCE);
-      check('…and it is the very next card once that one is answered', shown === a, shown?.slice(0, 24) ?? 'no card');
+      check("K012", '…and it is the very next card once that one is answered', shown === a, shown?.slice(0, 24) ?? 'no card');
     } finally {
       await context.close();
     }
@@ -398,7 +489,7 @@ async function verifyRestore(browser, base) {
   const gradeOne = async () => {
     await page.click('#kp-start');
     await page.click('#kp-reveal');
-    await page.click('#kp-grade-good');
+    await gradeClick(page, LEDGER);
     await page.click('#kp-quit');
   };
   const restore = async (text) => {
@@ -416,7 +507,7 @@ async function verifyRestore(browser, base) {
 
     const empty = await restore('{}');
     check(
-      '復元 with {} leaves the ledger bytes as they were and says no card records are in it',
+      "K013", '復元 with {} leaves the ledger bytes as they were and says no card records are in it',
       (await raw(LEDGER)) === current && empty.msg.includes('This backup has no card records.') && !empty.msg.includes('Restored') && empty.button === 'Restore',
       empty.msg,
     );
@@ -427,7 +518,7 @@ async function verifyRestore(browser, base) {
     const done = await page.evaluate(`document.getElementById('kp-backup-msg').textContent`);
     const now = JSON.parse(await raw(LEDGER));
     check(
-      'an older backup with fewer cards: the first tap shows both counts and asks again (置き換える); the second replaces and keeps the old ledger aside',
+      "K014", 'an older backup with fewer cards: the first tap shows both counts and asks again (置き換える); the second replaces and keeps the old ledger aside',
       first.msg.includes('Backup: 1 card · 1 answer') && first.msg.includes('Current record: 2 cards · 2 answers') && first.msg.includes('fewer records') && first.button === 'Replace' && untouched && Object.keys(now.cards).length === 1 && now.log.length === 1 && (await raw(`${LEDGER}:before-restore`)) === current && done.includes('Restored'),
       JSON.stringify({ first: first.msg, button: first.button, untouched, done }),
     );
@@ -437,7 +528,7 @@ async function verifyRestore(browser, base) {
     await page.evaluate(`localStorage.setItem(${JSON.stringify(LEDGER)}, ${JSON.stringify(broken)})`);
     await bootMcd();
     const home = await page.evaluate(`document.querySelector('.kp-notice')?.textContent || ''`);
-    check('an unreadable stored ledger is copied to bunki-cloze:kotoba-mcd:quarantine and the deck home says so', (await raw(`${LEDGER}:quarantine`)) === broken && home.includes('kept separately'), home);
+    check("K015", 'an unreadable stored ledger is copied to bunki-cloze:kotoba-mcd:quarantine and the deck home says so', (await raw(`${LEDGER}:quarantine`)) === broken && home.includes('kept separately'), home);
   } finally {
     await context.close();
   }
@@ -456,29 +547,28 @@ const CONTRAST = `(() => {
   const root = document.querySelector('.kp');
   const probe = document.createElement('i');
   root.append(probe);
-  const rgba = (v) => { probe.style.color = ''; probe.style.color = v; return getComputedStyle(probe).color.match(/[\\d.]+/g).map(Number); };
+  // Chromium serialises a plain colour as rgb()/rgba() and a color-mix() role as color(srgb r g b / a)
+  const parse = (c) => { let m = c.match(/^rgba?\\(([^)]+)\\)$/); if (m) { const n = m[1].split(/[\\s,/]+/).filter(Boolean).map(Number); return [n[0], n[1], n[2], n[3] ?? 1]; }
+    m = c.match(/^color\\(srgb\\s+([\\d.]+)\\s+([\\d.]+)\\s+([\\d.]+)(?:\\s*\\/\\s*([\\d.]+))?\\)$/); return m ? [+m[1] * 255, +m[2] * 255, +m[3] * 255, m[4] !== undefined ? +m[4] : 1] : [0, 0, 0, 0]; };
+  const rgba = (v) => { probe.style.color = ''; probe.style.color = v; return parse(getComputedStyle(probe).color); };
   const rgb = (v) => rgba(v).slice(0, 3);
   const lum = (c) => { const [r, g, b] = c.map((x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
   const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
   const mix = (a, b, t) => a.map((v, i) => Math.round(v * t + b[i] * (1 - t)));
   const tokens = ['ink', 'ink-2', 'mute', 'cyan', 'red', 'amber', 'green', 'blue', 'violet', 'noun', 'verb', 'adj', 'adv', 'expr', 'sound', 'kind-go', 'kind-ji', 'kind-bun'];
   const out = {};
-  const before = root.dataset.look;
-  for (const look of ['light', 'sakura', 'washi']) {
-    root.dataset.look = look;
-    const t = Object.fromEntries([...tokens, 'bg', 'panel', 'panel-2'].map((k) => [k, rgb('var(--kp-' + k + ')')]));
-    const wash = rgba('var(--kp-cyan-wash)');
-    // the card panel, the second panel (tiles, kanji boxes; also the darkest texture tint), the page,
-    // the tinted 正解 (Good) pad (12% green over the panel) and the accent wash (答えを見る, chosen settings)
-    const surfaces = { panel: t.panel, 'panel-2': t['panel-2'], page: t.bg, 'good-button': mix(t.green, t.panel, 0.12), 'accent-wash': mix(wash.slice(0, 3), t.bg, wash[3] ?? 1) };
-    let min = { ratio: 99 };
-    for (const k of tokens) for (const [s, bg] of Object.entries(surfaces)) {
-      const r = ratio(t[k], bg);
-      if (r < min.ratio) min = { ratio: Math.round(r * 100) / 100, pair: k + ' on ' + s };
-    }
-    out[look] = min;
+  // one material (the one-hand pass): the deck wears the world it is opened in, so the sheet on
+  // screen is the one measured — the card panel, the second panel (tiles, kanji boxes), the page,
+  // the tinted 正解 (Good) pad (12% green over the panel) and the accent wash (答えを見る, chosen settings)
+  const t = Object.fromEntries([...tokens, 'bg', 'panel', 'panel-2'].map((k) => [k, rgb('var(--kp-' + k + ')')]));
+  const wash = rgba('var(--kp-cyan-wash)');
+  const surfaces = { panel: t.panel, 'panel-2': t['panel-2'], page: t.bg, 'good-button': mix(t.green, t.panel, 0.12), 'accent-wash': mix(wash.slice(0, 3), t.bg, wash[3] ?? 1) };
+  let min = { ratio: 99 };
+  for (const k of tokens) for (const [s, bg] of Object.entries(surfaces)) {
+    const r = ratio(t[k], bg);
+    if (r < min.ratio) min = { ratio: Math.round(r * 100) / 100, pair: k + ' on ' + s };
   }
-  root.dataset.look = before;
+  out[document.documentElement.dataset.theme || 'hokusai'] = min;
   probe.remove();
   return out;
 })()`;
@@ -507,17 +597,13 @@ const FOCUS_CONTRAST = `(sentences) => {
       const ratio = (light + 0.05) / (dark + 0.05); const kind = element.closest('rt') ? 'ruby' : 'text';
       result[kind].count += 1; result[kind].min = Math.min(result[kind].min ?? Infinity, ratio);
     }
-    // in the app a reading is drawn above its kanji as ruby[data-rt]::after, in the line's own leading
-    // (the rt keeps no box, so the line never moves); it is measured as a reading, by the same rule
-    for (const ruby of sentence.querySelectorAll('ruby[data-rt]')) {
-      const after = getComputedStyle(ruby, '::after');
-      if (after.content === 'none' || after.content === 'normal' || getComputedStyle(ruby).visibility !== 'visible') continue;
-      let opacity = 1; for (let n = ruby; n; n = n.parentElement) { const computed = getComputedStyle(n); if (computed.display === 'none') { opacity = 0; break; } opacity *= Number(computed.opacity); if (computed.maskImage !== 'none') result.masks.push(computed.maskImage); }
-      if (!opacity) continue;
-      const colour = rgba(after.color); const ink = mix(colour, background, opacity * colour[3] / 255);
-      const [light, dark] = [lum(ink), lum(background)].sort((a, b) => b - a);
-      const ratio = (light + 0.05) / (dark + 0.05);
-      result.ruby.count += 1; result.ruby.min = Math.min(result.ruby.min ?? Infinity, ratio);
+    // F (one ruby, 2026-10-18): every reading is a native <rt>, measured above as a text node inside rt; no reading is
+    // drawn as a pseudo-element any more (was ruby[data-rt]::after), and none may be: one found is a failure
+    for (const ruby of sentence.querySelectorAll('ruby')) {
+      for (const pseudo of ['::before', '::after']) {
+        const content = getComputedStyle(ruby, pseudo).content;
+        if (content && content !== 'none' && content !== 'normal') { result.ruby.count += 1; result.ruby.min = 0; }
+      }
     }
   }
   return result;
@@ -555,7 +641,7 @@ async function verifyDelivery(browser, base) {
     await page.waitForSelector('.kp-grade');
     const four = await page.evaluate(`({ n: document.querySelectorAll('.kp-grade').length, ids: [...document.querySelectorAll('.kp-grades .kp-grade')].map((b) => b.id).join(), labels: [...document.querySelectorAll('.kp-grade b')].map((b) => b.textContent).join('/'), keys: [...document.querySelectorAll('.kp-grade')].map((b) => b.getAttribute('aria-keyshortcuts')).join(), waits: [...document.querySelectorAll('.kp-grade small')].map((s) => s.textContent).join('/'), hint: document.querySelector('.kp-swipehint')?.textContent, position: getComputedStyle(document.querySelector('.kp-grades')).position })`);
     const untouched = (await count()) === '1/15' && (await logLength('kotoba-mine')) === 0;
-    check('the grade bar shows Again · Hard · Good · Easy in that order (ids again, hard, good, easy; keys 1–4), each with an interval, whatever button setting is stored, and stays on screen (fixed)', four.n === 4 && four.ids === 'kp-grade-again,kp-grade-hard,kp-grade-good,kp-grade-easy' && four.labels === 'Again/Hard/Good/Easy' && four.keys === '1,2,3,4' && four.waits.split('/').length === 4 && four.waits.split('/').every(waitOk) && four.hint.includes('Good') && four.position === 'fixed' && untouched, JSON.stringify({ ...four, untouched }));
+    check("K016", 'the grade bar shows Again · Hard · Good · Easy in that order (ids again, hard, good, easy; keys 1–4), each with an interval, whatever button setting is stored, and stays on screen (fixed)', four.n === 4 && four.ids === 'kp-grade-again,kp-grade-hard,kp-grade-good,kp-grade-easy' && four.labels === 'Again/Hard/Good/Easy' && four.keys === '1,2,3,4' && four.waits.split('/').length === 4 && four.waits.split('/').every(waitOk) && four.hint.includes('Good') && four.position === 'fixed' && untouched, JSON.stringify({ ...four, untouched }));
 
     // swipes: a cancelled gesture or a mostly vertical one never grades; a sideways one does (F34)
     const gesture = (moves, last) =>
@@ -571,10 +657,10 @@ async function verifyDelivery(browser, base) {
     const afterCancel = { count: await count(), log: await logLength('kotoba-mine') };
     const vertical = await gesture([[255, 400]], ['pointerup', 255, 400]);
     const afterVertical = { count: await count(), log: await logLength('kotoba-mine') };
-    await gesture([[200, 105], [260, 110]], ['pointerup', 260, 110]);
+    await settledGrade(page, 'bunki-cloze:kotoba-mine', () => gesture([[200, 105], [260, 110]], ['pointerup', 260, 110]));
     const afterSwipe = { count: await count(), log: await logLength('kotoba-mine'), rating: await page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mine') || 'null')?.log?.at(-1)?.[1] ?? null`) };
     check(
-      'a cancelled swipe and a mostly vertical one (dx 105, dy 300) never grade and put the card back; a sideways swipe grades 正解 (Good, rating 3)',
+      "K017", 'a cancelled swipe and a mostly vertical one (dx 105, dy 300) never grade and put the card back; a sideways swipe grades 正解 (Good, rating 3)',
       afterCancel.count === '1/15' && afterCancel.log === 0 && cancelled.transform === '' && cancelled.swipe === '' && afterVertical.count === '1/15' && afterVertical.log === 0 && vertical.transform === '' && afterSwipe.log === 1 && afterSwipe.rating === 3 && afterSwipe.count !== '1/15',
       JSON.stringify({ afterCancel, afterVertical, afterSwipe }),
     );
@@ -588,8 +674,8 @@ async function verifyDelivery(browser, base) {
       reset: [...document.querySelectorAll('.kp-settings button')].filter((b) => /記録を消す|消えます|erase.*record|delete.*record|reset.*record|clear.*record/i.test(b.textContent)).length + document.querySelectorAll('.kp-danger').length, backup: [...document.getElementById('kp-backup').closest('.kp-field').querySelectorAll('button')].map((b) => b.textContent) })`);
     const axe = await new AxeBuilder({ page }).include('.kp').analyze();
     const aria = axe.violations.filter((v) => v.id === 'label' || v.id.startsWith('aria-') || v.id === 'button-name').map((v) => v.id);
-    check('設定: the backup box has a label, each choice row is a radio group with one checked (no 判定のボタン, no front ふりがな, no ヒント row: the front has no hint), the storage line shows, and axe finds no label or aria problems', settings.label === 'Backup text' && settings.groups === 4 && settings.checked === 4 && settings.gone === 0 && /^Device storage: (persistent|not persistent|unknown)$/.test(settings.persist) && aria.length === 0, JSON.stringify({ ...settings, aria }));
-    check('3) 設定 › バックアップ offers コピー and 復元 and no 記録を消す: whole-deck reset is not offered (A34)', settings.reset === 0 && settings.backup.join() === 'Copy,Restore', JSON.stringify({ reset: settings.reset, backup: settings.backup }));
+    check("K018", '設定: the backup box has a label, each of the three choice rows (new per day, mode, English) is a radio group with one checked — no 色 picker (the deck wears the world), no 判定のボタン, no front ふりがな, no ヒント row — the storage line shows, and axe finds no label or aria problems', settings.label === 'Backup text' && settings.groups === 3 && settings.checked === 3 && settings.gone === 0 && /^Device storage: (persistent|not persistent|unknown)$/.test(settings.persist) && aria.length === 0, JSON.stringify({ ...settings, aria }));
+    check("K019", '3) 設定 › バックアップ offers コピー and 復元 and no 記録を消す: whole-deck reset is not offered (A34)', settings.reset === 0 && settings.backup.join() === 'Copy,Restore', JSON.stringify({ reset: settings.reset, backup: settings.backup }));
 
     // the done screen keeps ひとつ戻す (F37)
     await page.evaluate(`localStorage.setItem('bunki-cloze:prefs:v3:kotoba-mine', JSON.stringify({ ...JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mine')), newPerDay: 1 }))`);
@@ -598,11 +684,17 @@ async function verifyDelivery(browser, base) {
     await page.click('#kp-start');
     await page.click('#kp-reveal');
     await page.waitForSelector('.kp-grade');
-    // a new card answered 正解 (Good) comes back once in the sitting (its 10-minute step); the second answer ends it
+    // a new card answered 正解 (Good) is in its 10-minute step: with nothing else left the close says so and offers it
+    // now, early (Anki's learn-ahead, by the learner's choice: lead's ruling 10-19); taken, the second answer ends it
     await page.click('#kp-grade-good');
+    await page.waitForSelector('#kp-ahead');
+    const pause = await page.evaluate(`document.getElementById('kp-pause')?.innerText || ''`);
+    await page.click('#kp-ahead');
+    await page.waitForSelector('#kp-card .kp-st-early');
     await page.click('#kp-reveal');
     await page.click('#kp-grade-good');
     await page.waitForSelector('.kp-done');
+    check("K163", 'the one card in its step is not shown again until the learner chooses it at the close, then it says it is early', /1 word is in a learning step \(the next is due in 10 min\): review it now, early, or it will wait for you\./.test(pause), pause);
     const done = await page.evaluate(`({ undo: document.querySelectorAll('#kp-undo').length, text: document.querySelector('.kp-done').innerText.replace(/\\s+/g, ' ') })`);
     let back = null;
     if (done.undo) {
@@ -610,7 +702,8 @@ async function verifyDelivery(browser, base) {
       await page.waitForSelector('.kp-grade');
       back = { count: await count(), log: await logLength('kotoba-mine') };
     }
-    check('the done screen keeps ひとつ戻す and it brings the last card back', done.undo === 1 && done.text.includes('Recall rate') && back?.count === '2/2' && back.log === 1, JSON.stringify({ ...done, back }));
+    // the card comes back as the early pass's own one card: that pass counts within itself (lead's 0122, Grok §1)
+    check("K020", 'the done screen keeps ひとつ戻す and it brings the last card back', done.undo === 1 && done.text.includes('Recall rate') && back?.count === '1/1' && back.log === 1, JSON.stringify({ ...done, back }));
 
     // 4択 never asks a 字 card: it is answered as 穴埋め (F38)
     await page.evaluate(DUE_KANJI);
@@ -621,7 +714,7 @@ async function verifyDelivery(browser, base) {
     await page.click('#kp-reveal');
     await page.waitForSelector('.kp-grade');
     const grades = await page.locator('.kp-grade').count();
-    check('in 4択 a 字 card shows no choices: hint, 答えを見る and the four-pad grade bar instead', kanji.chip === 'Kanji' && kanji.choices === 0 && kanji.reveal && kanji.blank === '〔ざい〕' && grades === 4, JSON.stringify({ ...kanji, grades }));
+    check("K021", 'in 4択 a 字 card shows no choices: hint, 答えを見る and the four-pad grade bar instead', kanji.chip === 'Kanji' && kanji.choices === 0 && kanji.reveal && kanji.blank === '〔ざい〕' && grades === 4, JSON.stringify({ ...kanji, grades }));
 
     // each key grades its own FSRS rating (1 Again, 2 Hard, 3 Good, 4 Easy) on its own card, and the
     // interval it stores is the one its pad showed (a pad's text, read back as a range, holds the
@@ -650,7 +743,7 @@ async function verifyDelivery(browser, base) {
       const ms = Date.parse(stored.due) - Date.parse(stored.row[2]);
       graded.push({ key, name, card: shown.id, wait: shown.wait, row: stored.row.slice(0, 2), ms, holds: stored.row[0] === shown.id && stored.row[1] === Number(key) && holds(shown.wait, ms) });
     }
-    check('keys 1–4 each grade their own rating (Again 1, Hard 2, Good 3, Easy 4) on the card on screen, and each stored interval is the one its pad showed', graded.length === 4 && graded.every((g) => g.holds) && new Set(graded.map((g) => g.card)).size === 4, JSON.stringify(graded));
+    check("K022", 'keys 1–4 each grade their own rating (Again 1, Hard 2, Good 3, Easy 4) on the card on screen, and each stored interval is the one its pad showed', graded.length === 4 && graded.every((g) => g.holds) && new Set(graded.map((g) => g.card)).size === 4, JSON.stringify(graded));
 
     const OLD = JSON.stringify({ format: 'bunki-cloze-state', version: 1, deckId: 'kotoba-mine', groupsOff: [],
       cards: {
@@ -668,13 +761,13 @@ async function verifyDelivery(browser, base) {
     await page.waitForFunction(`JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mine')).log.length === 6`, null, { timeout: 5000 });
     const after = await page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mine'))`);
     const before = JSON.parse(OLD);
-    check('a ledger written by the two-button player (ratings 1 and 3 only) loads as it is: its due card is counted, nothing is set aside, and a Hard adds one [id, 2, time] row after the old rows, the other record untouched',
+    check("K023", 'a ledger written by the two-button player (ratings 1 and 3 only) loads as it is: its due card is counted, nothing is set aside, and a Hard adds one [id, 2, time] row after the old rows, the other record untouched',
       oldHome.due === '1' && oldHome.notice === 0 && oldHome.quarantine === null && JSON.stringify(after.log.slice(0, 5)) === JSON.stringify(before.log) && after.log[5][0] === 'km-064-1' && after.log[5][1] === 2 && JSON.stringify(after.cards['km-065-1']) === JSON.stringify(before.cards['km-065-1']) && after.cards['km-064-1'].reps === 4,
       JSON.stringify({ oldHome, last: after.log.at(-1), reps: after.cards['km-064-1']?.reps }));
 
-    // every colour token clears 4.5:1 on the surfaces it sits on, in the light themes (F35, A20)
+    // every colour token clears 4.5:1 on the surfaces it sits on, in the world the deck is opened in (F35, A20)
     const contrast = await page.evaluate(CONTRAST);
-    check('light themes: every text colour, the kind colours and the four grade hues included, is at least 4.5:1 on the card, the second panel, the page, the 正解 pad and the accent wash', Object.values(contrast).every((m) => m.ratio >= 4.5), Object.entries(contrast).map(([k, m]) => `${k} ${m.ratio} (${m.pair})`).join(' · '));
+    check("K024", "the deck's material (the world's own page): every text colour, the kind colours and the four grade hues included, is at least 4.5:1 on the card, the second panel, the page, the 正解 pad and the accent wash", Object.values(contrast).every((m) => m.ratio >= 4.5), Object.entries(contrast).map(([k, m]) => `${k} ${m.ratio} (${m.pair})`).join(' · '));
   } finally {
     await context.close();
   }
@@ -683,8 +776,8 @@ async function verifyDelivery(browser, base) {
 /* ------------------------- the back hierarchy (CARD_CONTRACT_V2 §2–§4) */
 const KANJI_RE = /[㐀-鿿々〆ヵヶ]/;
 const FOLD_ORDER = ['English', 'Translation', 'Kanji form and meaning', 'Related words', 'Other sentences for this word', 'Source'];
-const RULE_TEXT = '答えを見て理解が深まったなら もう一度';
-const UI_RULE_TEXT = 'Choose Again if seeing the answer improved your understanding.';
+const RULE_TEXT = '答えを見て初めて分かったなら「もう一度」';
+const UI_RULE_TEXT = 'If the answer was new to you, choose Again';
 /** where each sentence of a passage ends — the rule build.py and the player share */
 function sentenceEnds(ja) {
   const out = [];
@@ -713,11 +806,11 @@ function sentenceEnds(ja) {
 /** the back as data: readings everywhere, the gloss default, the target sentence's English */
 function verifyBackData(decks) {
   const unread = decks.flatMap((deck) => deck.words.flatMap((w) => w.cards.flatMap((c) => c.ruby.filter((seg) => KANJI_RE.test(seg[0]) && !seg[1]).map((seg) => `${c.id} ${seg[0]}`))));
-  check('b) every kanji in every passage has a reading for the back (none left bare)', unread.length === 0, unread.slice(0, 4).join(' | ') || `${decks.reduce((n, d) => n + d.words.reduce((m, w) => m + w.cards.length, 0), 0)} cards`);
-  check('b) no pitch is shown because the decks carry none (the back omits it)', decks.every((d) => d.words.every((w) => w.pitch == null)));
-  check('c) both decks default the English gloss to a tap (deck.defaults.gloss = tap, written by build.py)', decks.every((d) => d.defaults?.gloss === 'tap'), decks.map((d) => `${d.id} ${d.defaults?.gloss}`).join(' · '));
+  check("K025", 'b) every kanji in every passage has a reading for the back (none left bare)', unread.length === 0, unread.slice(0, 4).join(' | ') || `${decks.reduce((n, d) => n + d.words.reduce((m, w) => m + w.cards.length, 0), 0)} cards`);
+  check("K026", 'b) no pitch is shown because the decks carry none (the back omits it)', decks.every((d) => d.words.every((w) => w.pitch == null)));
+  check("K027", 'c) both decks default the English gloss to a tap (deck.defaults.gloss = tap, written by build.py)', decks.every((d) => d.defaults?.gloss === 'tap'), decks.map((d) => `${d.id} ${d.defaults?.gloss}`).join(' · '));
   check(
-    '2) both decks open in 読んで思い出す (deck.defaults.mode = read, no front hint setting); the MCD method says so and that 字 cards come with 穴埋め',
+    "K028", '2) both decks open in 読んで思い出す (deck.defaults.mode = read, no front hint setting); the MCD method says so and that 字 cards come with 穴埋め',
     decks.every((d) => d.defaults?.mode === 'read' && !('hint' in d.defaults)) && decks[0].method.some((l) => l.includes('読んで思い出す')) && decks[0].method.some((l) => l.includes('字') && l.includes('穴埋め') && l.includes('記録は消えない')),
     decks.map((d) => `${d.id} ${JSON.stringify(d.defaults)}`).join(' · '),
   );
@@ -726,7 +819,25 @@ function verifyBackData(decks) {
   const bad = cards.filter((c) => c.enTarget != null && (!c.en.includes(c.enTarget) || (sentenceEnds(c.ja).length > 1 && c.enTarget === c.en))).map((c) => c.id);
   const withEn = cards.filter((c) => c.enTarget).length;
   const sameEnPerPassage = mcd.words.every((w) => w.cards.every((c) => c.enTarget === w.cards.find((x) => x.passage === c.passage && x.type === 'word').enTarget));
-  check('c) a passage card carries the English of its target sentence only — part of the passage translation, never all of it when the passage has more than one sentence', bad.length === 0 && withEn / cards.length > 0.9 && sameEnPerPassage, bad.slice(0, 4).join(' | ') || `${withEn}/${cards.length} cards (the rest cannot be matched and show no 英訳)`);
+  check("K029", 'c) a passage card carries the English of its target sentence only — part of the passage translation, never all of it when the passage has more than one sentence', bad.length === 0 && withEn / cards.length > 0.9 && sameEnPerPassage, bad.slice(0, 4).join(' | ') || `${withEn}/${cards.length} cards (the rest cannot be matched and show no 英訳)`);
+}
+
+/** The standalone exporter represents these three imports explicitly for offline legacy study. */
+function standaloneMountForParity(source) {
+  const substitutions = [
+    ["import {isSharedDeck,isSharedStudyMode} from '../../shared-study-content.mjs';", 'const {isSharedDeck,isSharedStudyMode} = __KP_SHARED_CONTENT__;'],
+    ["const sharedPlayer = () => import('./shared-mount.mjs');", "const sharedPlayer = () => { throw new Error('Standalone study: shared study is unavailable in this offline page.'); };"],
+    ["const fsrsApi = window.__TSFSRS__ || (await import('../../vendor/ts-fsrs.mjs'));", 'const fsrsApi = window.__TSFSRS__;'],
+  ];
+  let mount = source;
+  for (const [pattern, replacement] of substitutions) {
+    const count = source.split(pattern).length - 1;
+    if (count !== 1) throw new Error(`Standalone mount parity: expected pattern exactly once, found ${count}: ${pattern}`);
+    mount = mount.replace(pattern, replacement);
+  }
+  return mount
+    .replace(/import\s*\{([^}]*)\}\s*from\s*'\.\/engine\.js';/u, 'const {$1} = __KP_ENGINE__;')
+    .replace(/^export /gmu, '').replaceAll('import.meta.url', 'location.href').replaceAll('</script', '<\\/script');
 }
 
 /** the standalone study pages and the Anki templates keep parity with the player's front and back */
@@ -768,20 +879,16 @@ function verifyBackParity() {
   // release outputs must actually contain the player from the built site under test.
   const playerCss = readFileSync(resolve(CORRIDOR_DIR, 'decks/player/player.css'), 'utf8');
   const roomMotion = readFileSync(resolve(CORRIDOR_DIR, 'rooms/motion.css'), 'utf8');
-  const mount = readFileSync(resolve(CORRIDOR_DIR, 'decks/player/mount.js'), 'utf8')
-    .replace(/import\s*\{([^}]*)\}\s*from\s*'\.\/engine\.js';/u, 'const {$1} = __KP_ENGINE__;')
-    .replace(/^export /gmu, '').replaceAll('import.meta.url', 'location.href').replaceAll('</script', '<\\/script');
+  const mount = standaloneMountForParity(readFileSync(resolve(CORRIDOR_DIR, 'decks/player/mount.js'), 'utf8'));
   const releaseParity = [];
   for (const page of ['study.html', 'study-mcd.html']) {
     const html = readFileSync(resolve(release, page), 'utf8');
     releaseParity.push({ page, css: html.includes(playerCss), mount: html.includes(mount), roomMotion: html.includes(roomMotion), fonts: (html.match(/@font-face\s*\{/gu) || []).length });
-    if (!['function leechLadder', 'function deleteCard', 'function suspendedField', 'function kanjiFamily', 'function seeAlsoLine', 'function swapCard', 'restoreSuspended', 'LEECH_LAPSES = 5', 'kp-kfam', 'kp-rhint'].every((k) => html.includes(k))) bad.push(`${page}: no delete, ladder or kanji family`);
-    if (!['function sentenceEnds', 'kp-folds', 'kp-zoom', 'ruleSeen', 'savePrefQuiet', 'kp-en-none', RULE_TEXT, 'function revealInPlace', 'kp-kindchip', 'kp-levelchip', 'prefers-reduced-motion'].every((k) => html.includes(k)) || /kp-tapword|is-four|VISUAL_TIPS|topicColour|kp-lvchip/.test(html)) bad.push(`${page}: not the current player`);
-    if (!['function settleBack', 'function clampContext', 'function fitClamps', 'function sourceFold', 'kp-f-src', 'HINT_SITTINGS = 3', 'function skipFor', 'この語の他の文'].every((k) => html.includes(k)) || /記録を消す|kp-danger|'kp-hint'/.test(html)) bad.push(`${page}: not the Phase 1 follow-ups player`);
+    // Hfix-1B: the rule and the eyebrow say it unmistakably (Kimi KH1-1, KH1-2); the old wording is gone
   }
-  check('parity: both separately served Kotoba release HTML outputs embed the exact built-site player CSS and mount code, room motion, and all 451 bundled faces',
+  check("K030", 'parity: both separately served Kotoba release HTML outputs embed the exact built-site player CSS and mount code, room motion, and all 451 bundled faces',
     releaseParity.length === 2 && releaseParity.every((x) => x.css && x.mount && x.roomMotion && x.fonts === 451), JSON.stringify(releaseParity));
-  check('parity: the study pages bundle this player; the Anki fronts show no readings, English or hint; the Anki backs keep the same order (英語 and 英訳 closed, 漢字 open on 字 cards, 出典 the last fold) and translate only the target sentence; Anki edges and first chips by item kind (the retuned 字 hue), 形容動詞 on な-adjectives', bad.length === 0, bad.slice(0, 3).join(' | ') || 'anki, anki-sentence, study.html, study-mcd.html, kotoba-mcd.tsv');
+  check("K031", 'parity: the study pages bundle this player; the Anki fronts show no readings, English or hint; the Anki backs keep the same order (英語 and 英訳 closed, 漢字 open on 字 cards, 出典 the last fold) and translate only the target sentence; Anki edges and first chips by item kind (the retuned 字 hue), 形容動詞 on な-adjectives', bad.length === 0, bad.slice(0, 3).join(' | ') || 'anki, anki-sentence, study.html, study-mcd.html, kotoba-mcd.tsv');
 }
 
 /* ------------------------------------- the host lexicon adapter (Phase 2 stage B) */
@@ -796,7 +903,7 @@ function hostProbe() {
 
 async function verifyHost(browser, base) {
   const { deck, side, id } = hostProbe();
-  check('tokens: both decks name a side file (deck.tokens) that build.py wrote beside them, and a card holds 語, 字 and 文法 tokens', deck.tokens === 'tokens.json' && readJson(SENTENCE_DECK_PATH).tokens === 'tokens.json' && side.format === 'bunki-cloze-tokens' && !!id, `${deck.tokens} · probe ${id}`);
+  check("K032", 'tokens: both decks name a side file (deck.tokens) that build.py wrote beside them, and a card holds 語, 字 and 文法 tokens', deck.tokens === 'tokens.json' && readJson(SENTENCE_DECK_PATH).tokens === 'tokens.json' && side.format === 'bunki-cloze-tokens' && !!id, `${deck.tokens} · probe ${id}`);
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await context.addInitScript(SEEDED);
   const page = await context.newPage();
@@ -817,21 +924,23 @@ async function verifyHost(browser, base) {
       const toks = await m.tokensFor('kotoba-mcd', ${JSON.stringify(id)});
       const pick = (k) => toks.find((t) => t.k === k && t.ref);
       const word = h.lookup(pick('語')), kanji = h.lookup(pick('字')), grammar = h.lookup(pick('文法'));
-      const other = h.lookup(toks.find((t) => t.k === 'other'));
+      const other = h.lookup({ s: '。', b: '。', k: 'other' });
+      const particle = h.lookup({ s: 'は', b: 'は', r: 'は', k: 'other' });
       const takenBefore = h.isTaken(word);
       const took = await h.take(word);
       const again = await h.take(word);
       const kanjiTook = await h.take(kanji);
       return {
         host: document.querySelector('.kp')?.dataset.host,
-        methods: ['lookup', 'open', 'isTaken', 'take', 'addToList'].filter((k) => typeof h?.[k] === 'function').length,
+        methods: ['lookup', 'open', 'isTaken', 'take', 'addToList', 'installProseWords'].filter((k) => typeof h?.[k] === 'function').length,
         lists: typeof h?.lists,
         tokens: toks.length, spells: toks.map((t) => t.s).join('').length,
         word, kanji: kanji && { t: kanji.t, id: kanji.id, gloss: kanji.gloss }, grammar: grammar && { t: grammar.t, id: grammar.id, label: grammar.label },
-        other,
+        other, particle,
         takenBefore, took, again, kanjiTook,
         takenAfter: h.isTaken(word), kanjiTaken: h.isTaken(kanji),
-        toast: document.getElementById('reader-toast')?.textContent || '',
+        // the toast's own words, without its Undo action's
+        toast: (document.getElementById('reader-toast')?.textContent || '').replace(document.getElementById('reader-toast-action')?.textContent || '', '').trim(),
         undo: !!document.getElementById('reader-toast-action'),
         chooser: document.querySelectorAll('#kp-chooser, .kp-chooser, #take-chooser, .take-chooser').length,
       };
@@ -844,18 +953,19 @@ async function verifyHost(browser, base) {
     const loaded = fetched.filter((p) => p.endsWith('/tokens.json')).length - before;
     const ledgerAfter = await page.evaluate(`localStorage.getItem('bunki-cloze:kotoba-mcd')`);
     check(
-      'host: the corridor mounts the deck with its lexicon adapter (lookup, open, isTaken, take, addToList; no lists() chooser feed); the tokens side file loads only when asked',
-      o.host === 'corridor' && o.methods === 5 && o.lists === 'undefined' && before === 0 && loaded === 1,
+      "K033", 'host: the corridor mounts the deck with its lexicon adapter (lookup, open, isTaken, take, addToList, installProseWords; no lists() chooser feed); the tokens side file loads only when asked',
+      o.host === 'corridor' && o.methods === 6 && o.lists === 'undefined' && before === 0 && loaded === 1,
       JSON.stringify({ host: o.host, methods: o.methods, tokensFetchedAtStart: before, onAsk: loaded }),
     );
     check(
-      `host: lookup of known tokens on ${id} returns entries — a 語 with its reading and gloss, a 字 from kanji.json, a 文法 point from the grammar table; a particle returns null`,
-      o.word?.t === 'word' && !!o.word.label && !!o.word.reading && !!o.word.gloss && o.kanji?.t === 'kanji' && !!o.kanji.gloss && o.grammar?.t === 'grammar' && !!o.grammar.label && o.other === null && o.spells > 0,
-      JSON.stringify({ word: o.word && { id: o.word.id, label: o.word.label, reading: o.word.reading, gloss: o.word.gloss }, kanji: o.kanji, grammar: o.grammar, other: o.other }),
+      "K034", `host: lookup of known tokens on ${id} returns entries — a 語 with its reading and gloss, a 字 from kanji.json, a 文法 point from the grammar table; punctuation stays plain while known Japanese は resolves`,
+      o.word?.t === 'word' && !!o.word.label && !!o.word.reading && !!o.word.gloss && o.kanji?.t === 'kanji' && !!o.kanji.gloss && o.grammar?.t === 'grammar' && !!o.grammar.label && o.other === null && o.particle?.t === 'word' && o.particle.id === 'は' && o.spells > 0,
+      JSON.stringify({ word: o.word && { id: o.word.id, label: o.word.label, reading: o.word.reading, gloss: o.word.gloss }, kanji: o.kanji, grammar: o.grammar, other: o.other, particle: o.particle }),
     );
     check(
-      'host: take() is the corridor’s one-tap save (A51) — the word and a 字 land in the shared review pool (覚えるの札) of the durable record at once, with the Saved toast and 元に戻す and no chooser; a second take writes nothing; isTaken() then says so; the deck ledger, the observation log and the schedule are untouched',
-      !o.takenBefore && o.took && o.again && o.kanjiTook && o.takenAfter && o.kanjiTaken && o.rows.length === 2 && /復習に保存しました|Saved to review/.test(o.toast) && o.undo && o.chooser === 0 && o.obs === 0 && o.srsSame && ledgerAfter === ledgerBefore,
+      "K035", 'host: take() is the corridor’s one-tap save (A51) — the word and a 字 land in the shared review pool (覚えるの札) of the durable record at once, with the Saved toast and 元に戻す and no chooser; a second take writes nothing; isTaken() then says so; the deck ledger, the observation log and the schedule are untouched',
+      // S · the toast says what Save says (保存しました · Saved), nothing about review (it pinned 復習に保存しました|Saved to review)
+      !o.takenBefore && o.took && o.again && o.kanjiTook && o.takenAfter && o.kanjiTaken && o.rows.length === 2 && /^(保存しました|Saved)$/u.test(o.toast) && o.undo && o.chooser === 0 && o.obs === 0 && o.srsSame && ledgerAfter === ledgerBefore,
       JSON.stringify({ rows: o.rows, toast: o.toast, undo: o.undo, chooser: o.chooser, obs: o.obs, srsSame: o.srsSame, ledgerSame: ledgerAfter === ledgerBefore }),
     );
     await page.evaluate(`(async () => {
@@ -865,9 +975,10 @@ async function verifyHost(browser, base) {
       h.open(h.lookup(toks.find((t) => t.k === '語' && t.ref)));
     })()`);
     await page.waitForSelector('#sheet', { timeout: 8000 });
-    const sheet = await page.evaluate(`({ node: document.querySelector('#sheet')?.dataset.node, take: document.querySelector('#sheet #take')?.getAttribute('aria-pressed'), deck: !!document.querySelector('.kp') })`);
-    check('host: open(entry) shows the corridor’s own entry sheet for the word (its 覚える already on), over the deck', /^word:/.test(sheet.node || '') && sheet.take === 'true' && sheet.deck, JSON.stringify(sheet));
-    if (errors.length) check('no page errors with the host adapter', false, errors.slice(0, 2).join(' | '));
+    // S · the page's one Save is its bar's (#sheet-take); it pinned the foot's #take
+    const sheet = await page.evaluate(`({ node: document.querySelector('#sheet')?.dataset.node, take: document.querySelector('#sheet #sheet-take')?.getAttribute('aria-pressed'), deck: !!document.querySelector('.kp') })`);
+    check("K036", 'host: open(entry) shows the corridor’s own entry sheet for the word (its one Save already on), over the deck', /^word:/.test(sheet.node || '') && sheet.take === 'true' && sheet.deck, JSON.stringify(sheet));
+    if (errors.length) check("K037", 'no page errors with the host adapter', false, errors.slice(0, 2).join(' | '));
   } finally {
     await context.close();
   }
@@ -891,11 +1002,11 @@ async function verifyHost(browser, base) {
   }
   const html = ['study.html', 'study-mcd.html'].map((f) => readFileSync(resolve(REPO_DIR, 'decks/kotoba-mine/release', f), 'utf8'));
   check(
-    'host: the standalone study pages mount with a null adapter (data-host none), bundle no host.js and no tokens, and fetch none',
+    "K038", 'host: the standalone study pages mount with a null adapter (data-host none), bundle no host.js and no tokens, and fetch none',
     seen.every((x) => x.host === 'none' && x.tokens === 0) && html.every((t) => !t.includes('createHost') && !t.includes('bunki-cloze-tokens","version') && !/"tokens":"tokens/.test(t) && t.includes('function hostAdapter')),
     JSON.stringify(seen),
   );
-  check('host: both actual release study pages embed all 451 font faces and paint visible home text entirely with bundled fonts',
+  check("K039", 'host: both actual release study pages embed 451 faces; Chromium attributes visible glyphs to bundled fonts, WebKit matches embedded-face rasters and rejects fallback',
     seen.length === 2 && seen.every((x) => studyFontsPass(x.fonts)), JSON.stringify(seen.map(({ page, fonts }) => ({ page, fonts }))));
 }
 
@@ -934,7 +1045,7 @@ function verifyPilotData(deck) {
   }
   const words = [...new Set(cards.map((c) => c.word.id))];
   check(
-    'pilot and full run: every contract-v2 card is 4–5 sentences of 180–300 characters, the target once, written for the deck, with a register, a topic, a Japanese usage note and a Japanese sense where it names them, and its target sentence’s English',
+    "K040", 'pilot and full run: every contract-v2 card is 4–5 sentences of 180–300 characters, the target once, written for the deck, with a register, a topic, a Japanese usage note and a Japanese sense where it names them, and its target sentence’s English',
     cards.length >= 54 && bad.length === 0,
     bad.slice(0, 4).join(' | ') || `${cards.length} cards · ${words.length} words · ${Object.keys(REGISTERS).map((r) => `${r}${cards.filter((c) => c.register === r).length}`).join(' ')} · tipJa ${cards.filter((c) => c.tipJa).length} · sense ${cards.filter((c) => c.sense).length}`,
   );
@@ -947,11 +1058,11 @@ function verifyPilotData(deck) {
     const v2 = w.cards.map((c, i) => (c.register ? i : -1)).filter((i) => i >= 0);
     return v2.length && v2.some((i, k) => i !== k);
   });
-  check('pilot and full run: a word’s v2 passages differ in register (§5) and come first, unbroken from its first card (A49)', same.length === 0 && after.length === 0, [...same, ...after.map((w) => w.id)].join(' ') || `${words.length} words`);
+  check("K041", 'pilot and full run: a word’s v2 passages differ in register (§5) and come first, unbroken from its first card (A49)', same.length === 0 && after.length === 0, [...same, ...after.map((w) => w.id)].join(' ') || `${words.length} words`);
   const side = readJson(resolve(dirname(DECK_PATH), deck.tokens));
   const ids = new Set(deck.words.map((w) => w.id));
   const lemmas = Object.keys(side.defs).filter((k) => !ids.has(k));
-  check('pilot: the MCD tokens file carries Japanese senses for words that are not the deck’s own (gloss_ja.json), beside one definition per deck word', lemmas.length > 500 && deck.words.every((w) => side.defs[w.id]), `${lemmas.length} lemma senses · ${ids.size} deck words`);
+  check("K042", 'pilot: the MCD tokens file carries Japanese senses for words that are not the deck’s own (gloss_ja.json), beside one definition per deck word', lemmas.length > 500 && deck.words.every((w) => side.defs[w.id]), `${lemmas.length} lemma senses · ${ids.size} deck words`);
 }
 
 /* ------------------------------------- the full passage run (STANDARD A49, A50) */
@@ -964,12 +1075,12 @@ function verifyFullRunData(deck) {
   const pilot = new Set(Object.keys(readJson(PILOT_PATH)).map((n) => `km-${n.padStart(3, '0')}`));
   const run = v2.filter((c) => !pilot.has(c.word.id));
   check(
-    'full run (A50): 323 words, 2435 cards — 1897 語 (one per passage) and 538 字 — over 1897 passages: 954 contract v2 (54 pilot, 900 full run over 303 words), 454 mined',
+    "K043", 'full run (A50): 323 words, 2435 cards — 1897 語 (one per passage) and 538 字 — over 1897 passages: 954 contract v2 (54 pilot, 900 full run over 303 words), 454 mined',
     deck.words.length === 323 && cards.length === 2435 && words.length === 1897 && kanji.length === 538 && new Set(words.map((c) => `${c.word.id}:${c.ja}`)).size === 1897 && v2.length === 954 && run.length === 900 && new Set(run.map((c) => c.word.id)).size === 303 && mined.length === 454,
     `${deck.words.length} words · ${cards.length} cards · ${words.length} 語 · ${kanji.length} 字 · ${v2.length} v2 (${v2.length - run.length} pilot, ${run.length} full run, ${new Set(run.map((c) => c.word.id)).size} words) · ${mined.length} mined`,
   );
   const late = deck.words.filter((w) => !(w.cards[0].type === 'word' && w.cards[0].register && w.cards[0].passage === 1 && w.cards[0].lv === 1));
-  check('full run (A49): every word’s first passage is contract v2 — its first card is a 語 card with a register, passage 1, lv 1', late.length === 0, late.map((w) => w.id).join(' ') || `${deck.words.length}/${deck.words.length} words`);
+  check("K044", 'full run (A49): every word’s first passage is contract v2 — its first card is a 語 card with a register, passage 1, lv 1', late.length === 0, late.map((w) => w.id).join(' ') || `${deck.words.length}/${deck.words.length} words`);
   // A49: the 字 cards stay on the passage they were made from (their ids were minted there): the
   // word's first passage without a register; a v2 passage never has one
   const strays = kanji.filter((c) => {
@@ -978,18 +1089,25 @@ function verifyFullRunData(deck) {
   });
   const onV2 = kanji.filter((c) => v2.some((x) => x.word === c.word && x.ja === c.ja));
   check(
-    'full run (A49): every 字 card points at its origin passage — the word’s first passage without a register, the one its id was minted on — and no contract-v2 passage has a 字 card',
+    "K045", 'full run (A49): every 字 card points at its origin passage — the word’s first passage without a register, the one its id was minted on — and no contract-v2 passage has a 字 card',
     strays.length === 0 && onV2.length === 0,
     [...strays, ...onV2].slice(0, 4).map((c) => `${c.id} (passage ${c.passage})`).join(' | ') || `${kanji.length} 字 cards on ${new Set(kanji.map((c) => `${c.word.id}:${c.passage}`)).size} origin passages`,
   );
 }
 
 async function verifyPilot(browser, base, cardId = PILOT_CARD, label = 'pilot') {
+  const deck = readJson(DECK_PATH), word = deck.words.find(w => w.cards.some(c => c.id === cardId));
+  const card = word?.cards.find(c => c.id === cardId);
+  const prior = actualFixture;
+  actualFixture = { deckId: 'kotoba-mcd', wordId: word?.id || null, cardId, cardSha256: card ? createHash('sha256').update(JSON.stringify(card)).digest('hex') : null };
+  try { return await verifyPilotBody(browser, base, cardId, label); } finally { actualFixture = prior; }
+}
+async function verifyPilotBody(browser, base, cardId, label) {
   const deck = readJson(DECK_PATH);
   const side = readJson(resolve(dirname(DECK_PATH), deck.tokens));
   const card = pilotCards(deck).find((c) => c.id === cardId);
   if (!card) {
-    check(`${label}: ${cardId} is in the deck`, false);
+    check("K046", `${label}: ${cardId} is in the deck`, false);
     return;
   }
   // a word of this passage that is not the deck's own and has a sense in the table: keyed as the
@@ -1010,7 +1128,7 @@ async function verifyPilot(browser, base, cardId = PILOT_CARD, label = 'pilot') 
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await context.addInitScript(SEEDED);
   await context.addInitScript(`try { if (!sessionStorage.getItem('__pilot_seeded')) { sessionStorage.setItem('__pilot_seeded', '1');
-    localStorage.setItem('bunki-cloze:prefs:v3:kotoba-mcd', ${JSON.stringify(JSON.stringify({ ruleSeen: true, newPerDay: 0 }))});
+    localStorage.setItem('bunki-cloze:prefs:v3:kotoba-mcd', ${JSON.stringify(JSON.stringify({ againCoachSeen: true, newPerDay: 0 }))});
     localStorage.setItem('bunki-cloze:kotoba-mcd', ${JSON.stringify(state)}); } } catch {}`);
   const page = await context.newPage();
   const errors = [];
@@ -1026,7 +1144,7 @@ async function verifyPilot(browser, base, cardId = PILOT_CARD, label = 'pilot') 
       drawn: [...f.querySelectorAll('.kp-chips .kp-chip')].filter((n) => n.getClientRects().length).map((n) => n.textContent),
       rows: (() => { const tops = new Set([...f.querySelectorAll('.kp-chips .kp-chip')].filter((n) => n.getClientRects().length).map((n) => Math.round(n.getBoundingClientRect().top))); return tops.size; })() }; })()`);
     check(
-      `${label}: ${card.id} (${card.word.term}, ${card.register}/${card.topic}) shows its ${sentenceEnds(card.ja).length} sentences with the target marked once, no readings, no gap`,
+      "K047", `${label}: ${card.id} (${card.word.term}, ${card.register}/${card.topic}) shows its ${sentenceEnds(card.ja).length} sentences with the target marked once, no readings, no gap`,
       front.id === card.id && front.sentences === sentenceEnds(card.ja).length && front.sentences >= 4 && front.target.length === 1 && front.target[0] === card.form && front.rt === 0 && front.blank === 0 && front.text === card.ja,
       JSON.stringify({ ...front, text: undefined }),
     );
@@ -1037,7 +1155,7 @@ async function verifyPilot(browser, base, cardId = PILOT_CARD, label = 'pilot') 
     // all") the head draws only the level, as one small figure: the topic chip is built in its row in
     // place of the word's group, but not drawn (the standalone pages draw it)
     check(
-      `${label}: the topic sits as a small text chip in the card’s chip row in place of the word’s group; no register chip and no source chip on the front; in the app the level is the one chip drawn, on one row on a phone`,
+      "K048", `${label}: the topic sits as a small text chip in the card’s chip row in place of the word’s group; no register chip and no source chip on the front; in the app the level is the one chip drawn, on one row on a phone`,
       front.chips.includes(UI_TOPICS[card.topic]) && !front.chips.includes(UI_REGISTERS[card.register]) && !front.chips.includes(deck.groups.find((g) => g.id === card.word.group)?.titleEn) && !front.chips.includes('Original composition') && front.reg === '' &&
         front.drawn.join() === (card.word.level ?? '') && front.rows === (card.word.level ? 1 : 0),
       JSON.stringify({ chips: front.chips, drawn: front.drawn, reg: front.reg, rows: front.rows }),
@@ -1046,17 +1164,17 @@ async function verifyPilot(browser, base, cardId = PILOT_CARD, label = 'pilot') 
     await page.waitForSelector('.kp-grade');
     await page.waitForSelector('#kp-card .kp-sentence .kp-tok', { timeout: 15000 });
     const style = await page.evaluate(`document.querySelector('#kp-card .kp-f-src .kp-src-style')?.textContent ?? null`);
-    check(`${label}: the back’s 出典 fold names the passage’s style in full (${UI_REGISTER_NAMES[card.register]})`, style === `Style ${UI_REGISTER_NAMES[card.register]}`, JSON.stringify({ style }));
+    check("K049", `${label}: the back’s 出典 fold names the passage’s style in full (${UI_REGISTER_NAMES[card.register]})`, style === `Style ${UI_REGISTER_NAMES[card.register]}`, JSON.stringify({ style }));
     // on the back the 全文／焦点 toggle may take a line of its own; the chips keep theirs
     const backRows = await page.evaluate(`new Set([...document.querySelectorAll('#kp-card .kp-chips > .kp-chip')].filter((n) => n.getClientRects().length).map((n) => Math.round(n.getBoundingClientRect().top))).size`);
-    check(`${label}: on the back the drawn chips still sit on one row`, backRows === (card.word.level ? 1 : 0), JSON.stringify({ backRows }));
+    check("K050", `${label}: on the back the drawn chips still sit on one row`, backRows === (card.word.level ? 1 : 0), JSON.stringify({ backRows }));
     const back = await page.evaluate(`(() => { const a = document.querySelector('#kp-card .kp-answer'); const kids = [...a.children].map((n) => n.className.split(' ')[0]); const note = a.querySelector(':scope > .kp-note'); return { kids, note: note?.textContent || '', lang: note?.closest('[lang]')?.lang, beforeFolds: kids.indexOf('kp-note') >= 0 && kids.indexOf('kp-note') < kids.indexOf('kp-folds'), afterDef: kids.indexOf('kp-note') === kids.indexOf('kp-def') + 1, grammar: [...document.querySelectorAll('#kp-see [data-grammar]')].map((n) => n.dataset.grammar) }; })()`);
     check(
-      `${label}: the back puts the passage’s own usage note (tipJa) in tier one, right after the definition and before the folds, in Japanese`,
+      "K051", `${label}: the back puts the passage’s own usage note (tipJa) in tier one, right after the definition and before the folds, in Japanese`,
       back.note === card.tipJa && back.afterDef && back.beforeFolds && back.lang === 'ja',
       JSON.stringify(back),
     );
-    check(`${label}: the passage’s grammar points appear in the back’s 文法 line`, (card.grammar || []).every((g) => back.grammar.includes(g.id)), JSON.stringify({ want: (card.grammar || []).map((g) => g.id), got: back.grammar }));
+    check("K052", `${label}: the passage’s grammar points appear in the back’s 文法 line`, (card.grammar || []).every((g) => back.grammar.includes(g.id)), JSON.stringify({ want: (card.grammar || []).map((g) => g.id), got: back.grammar }));
     let sheet = null;
     if (pick) {
       // the token whose text (its readings left out) is the picked surface: a ruby'd token's
@@ -1065,15 +1183,16 @@ async function verifyPilot(browser, base, cardId = PILOT_CARD, label = 'pilot') 
         const c = n.cloneNode(true); c.querySelectorAll('rt, rp').forEach((r) => r.remove());
         if (c.textContent === ${JSON.stringify(pick.s)}) { n.dataset.verifyPick = '1'; return; } } })()`);
       await page.locator('#kp-card [data-verify-pick]').first().click();
-      await page.waitForSelector('#kp-sheet');
-      sheet = await page.evaluate(`(() => { const s = document.getElementById('kp-sheet'); return { term: s.querySelector('.kp-sheet-term')?.textContent, def: s.querySelector('.kp-sheet-def')?.textContent || '', none: s.querySelector('.kp-sheet-none')?.textContent || '', take: !!s.querySelector('#kp-take'), inDeck: !!s.querySelector('.kp-sheet-indeck') }; })()`);
+      // one slip everywhere (the one-hand pass): the app's slip, from the deck, carries the deck's own Japanese sense
+      await page.waitForSelector('#mini[data-from="deck"]');
+      sheet = await page.evaluate(`(() => { const s = document.getElementById('mini'); const gloss = s.querySelector('.mini-gloss'); return { term: s.querySelector('.mini-word')?.textContent, def: gloss?.lang === 'ja' ? gloss.textContent : '', none: gloss?.lang === 'ja' ? '' : gloss?.textContent || '', take: !!s.querySelector('#mini-take'), inDeck: !!s.querySelector('.mini-note') }; })()`);
     }
     check(
-      `${label}: tapping a word that is not the deck’s own (${pick?.s ?? 'none found'}) shows its Japanese sense from gloss_ja.json in the entry sheet, not 「まだ辞書にありません」`,
+      "K053", `${label}: tapping a word that is not the deck’s own (${pick?.s ?? 'none found'}) shows its Japanese sense from gloss_ja.json in the slip, not the dictionary’s miss line`,
       !!pick && !!sense && sheet?.def === sense && !sheet.none && !sheet.inDeck,
       JSON.stringify({ pick, sense, sheet }),
     );
-    check(`${label}: no page errors`, errors.length === 0, errors.slice(0, 2).join(' | '));
+    check("K054", `${label}: no page errors`, errors.length === 0, errors.slice(0, 2).join(' | '));
   } finally {
     await context.close();
   }
@@ -1085,18 +1204,52 @@ async function verifyPilot(browser, base, cardId = PILOT_CARD, label = 'pilot') 
 const SCHEDULE_OF = (key) => `(() => { const s = JSON.parse(localStorage.getItem(${JSON.stringify(key)}) || '{}'); return JSON.stringify({ cards: s.cards || {}, log: s.log || [], groupsOff: s.groupsOff || [], suspended: s.suspended || {}, repairs: s.repairs || {}, repairLog: s.repairLog || [] }); })()`;
 const LOOKUPS_OF = (key) => `(JSON.parse(localStorage.getItem(${JSON.stringify(key)}) || '{}').lookups || [])`;
 const RESTING = `new Promise((ok, fail) => { let last = -1; let same = 0; const started = performance.now(); const tick = () => { if (performance.now() - started > 5000) return fail(new Error('The revealed card did not reach its resting scroll and ink within 5 seconds')); const moving = document.getElementById('kp-card').getAnimations({ subtree: true }).some((a) => a.playState === 'running' && a.effect?.getComputedTiming().endTime !== Infinity); if (scrollY === last) { if (++same >= 6 && !moving) return ok(Math.round(scrollY)); } else { same = 0; last = scrollY; } requestAnimationFrame(tick); }; tick(); })`;
-/** the tap targets' reach: elementFromPoint 21px above and below each sampled word's centre lands on that word */
-const REACH = `(() => {
-  const bar = document.querySelector('.kp-grades')?.getBoundingClientRect().top ?? innerHeight;
-  const toks = [...document.querySelectorAll('#kp-card .kp-sentence .kp-tok:not(.kp-target)')].filter((t) => { const r = t.getClientRects(); if (r.length !== 1) return false; const c = (r[0].top + r[0].bottom) / 2; return c > 80 && c < bar - 30; }).slice(0, 12);
-  const miss = [];
-  for (const t of toks) {
-    const r = t.getClientRects()[0];
-    const x = (r.left + r.right) / 2, y = (r.top + r.bottom) / 2;
-    for (const dy of [-21, 21]) { const hit = document.elementFromPoint(x, y + dy); if (!hit || !t.contains(hit)) miss.push(t.textContent + (dy < 0 ? '↑' : '↓')); }
+/** Overlapping transparent reaches route to the nearest printed word. Prove the actual
+ * activation, including occurrence identity; raw elementFromPoint ownership is only a witness.
+ * The caller supplies a fresh context with readings off, so every first activation is stage 2. */
+async function wordReach(page, key) {
+  const samples = await page.evaluate(async () => {
+    const host = (await import(new URL('decks/player/mount.js', location.href).href)).hostAdapter();
+    const all = [...document.querySelectorAll('#kp-card .kp-sentence .kp-tok')];
+    const bar = document.querySelector('.kp-grades')?.getBoundingClientRect().top ?? innerHeight;
+    return all.filter(n => {
+      const rects = n.getClientRects(), r = rects[0];
+      return !n.classList.contains('kp-target') && rects.length === 1 && r.width > 0
+        && (r.top + r.bottom) / 2 > 80 && (r.top + r.bottom) / 2 < bar - 30;
+    }).slice(0, 12).map(n => {
+      const unit = n.kpUnit, entry = unit.word ? null : host.lookup(unit.tok);
+      return { index: all.indexOf(n), surface: unit.tok?.s || unit.word.term,
+        key: unit.word ? `deck:${unit.word.id}` : entry ? `${entry.t}:${entry.id}` : '',
+        card: document.getElementById('kp-card').dataset.card, height: n.getClientRects()[0].height };
+    });
+  });
+  const baseline = await page.evaluate(SCHEDULE_OF(key));
+  const points = [];
+  for (const sample of samples) for (const dy of [-21, 21]) {
+    const target = page.locator('#kp-card .kp-sentence .kp-tok').nth(sample.index);
+    const point = await target.evaluate((n, offset) => {
+      const r = n.getClientRects()[0], x = (r.left + r.right) / 2, y = (r.top + r.bottom) / 2 + offset;
+      return { x, y, rawHit: document.elementFromPoint(x, y)?.closest('.kp-tok')?.dataset.proseLabel || '' };
+    }, dy);
+    const before = await page.evaluate(LOOKUPS_OF(key));
+    await page.mouse.click(point.x, point.y);
+    const actual = await target.evaluate(n => ({ occurrence: n.isConnected && n.dataset.ladderRung === 'stage'
+        && [...document.querySelectorAll('#kp-card [data-ladder-rung]')].length === 1,
+      rung: n.dataset.ladderRung || '', key: document.getElementById('mini')?.dataset.key,
+      from: document.getElementById('mini')?.dataset.from, sheet: !!document.getElementById('sheet') }));
+    const after = await page.evaluate(LOOKUPS_OF(key)), row = after.at(-1);
+    const oneRow = after.length === before.length + 1 && JSON.stringify(after.slice(0, -1)) === JSON.stringify(before)
+      && row[1] === sample.card && row[2] === 'p' && row[3] === sample.surface && row[4] === sample.key && row[5] === 2;
+    const scheduleSame = await page.evaluate(SCHEDULE_OF(key)) === baseline;
+    await page.keyboard.press('Escape');
+    const folded = await target.evaluate(n => !n.dataset.ladderRung && !document.getElementById('mini') && !document.getElementById('sheet'));
+    const foldQuiet = JSON.stringify(await page.evaluate(LOOKUPS_OF(key))) === JSON.stringify(after);
+    points.push({ ...sample, expectedKey: sample.key, dy, ...point, ...actual, oneRow, scheduleSame, folded, foldQuiet,
+      pass: actual.occurrence && actual.rung === 'stage' && actual.key === sample.key && actual.from === 'deck'
+        && !actual.sheet && oneRow && scheduleSame && folded && foldQuiet });
   }
-  return { sampled: toks.length, miss, height: toks[0] ? toks[0].getClientRects()[0].height : 0 };
-})()`;
+  return { sampled: samples.length, height: samples[0]?.height || 0, points, miss: points.filter(p => !p.pass) };
+}
 
 async function verifyTap(browser, base) {
   const mcd = readJson(DECK_PATH);
@@ -1106,7 +1259,7 @@ async function verifyTap(browser, base) {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await context.addInitScript(SEEDED);
     await context.addInitScript(`try { if (!sessionStorage.getItem('__tap_seeded')) { sessionStorage.setItem('__tap_seeded', '1');
-      localStorage.setItem('bunki-cloze:prefs:v3:${deck}', ${JSON.stringify(JSON.stringify({ ruleSeen: true, ...(prefs || {}) }))});
+      localStorage.setItem('bunki-cloze:prefs:v3:${deck}', ${JSON.stringify(JSON.stringify({ againCoachSeen: true, ...(prefs || {}) }))});
       ${state ? `localStorage.setItem('bunki-cloze:${deck}', ${JSON.stringify(state)});` : ''} } } catch {}`);
     const page = await context.newPage();
     const errors = [];
@@ -1124,13 +1277,24 @@ async function verifyTap(browser, base) {
   };
   const KEY = 'bunki-cloze:kotoba-mcd';
 
+  // Reach observations live in their own record; the ladder fixture below must still start at zero.
+  const reachRun = await open('?deck=mcd&dials=0,0,0', 'kotoba-mcd', { prefs: { readings: 'off' } });
+  let reach;
+  try {
+    await reachRun.page.click('#kp-reveal');
+    await reachRun.page.waitForSelector('#kp-card .kp-sentence .kp-tok');
+    await reachRun.page.evaluate(RESTING);
+    reach = await wordReach(reachRun.page, KEY);
+    check("K055", 'tap: reach fixture has no page errors', reachRun.errors.length === 0, reachRun.errors.join(' | '));
+  } finally { await reachRun.context.close(); }
+
   // 1. the corridor: a new card of 財政 (km-064-m01), then a due card of 金利 (km-109-m01), whose definition names 利息
-  let o = await open('?deck=mcd', 'kotoba-mcd');
+  let o = await open('?deck=mcd&dials=0,1,0', 'kotoba-mcd', { prefs: { readings: 'off' } });
   try {
     const { page } = o;
     await page.waitForLoadState('networkidle');
     const front = await page.evaluate(`({ toks: document.querySelectorAll('#kp-card .kp-tok').length, roles: document.querySelectorAll('#kp-card .kp-sentence [role="button"], #kp-card .kp-sentence [tabindex]').length, card: document.getElementById('kp-card').dataset.card })`);
-    check('tap: the front has no tap targets, even with the tokens loaded (front pin)', front.toks === 0 && front.roles === 0, JSON.stringify(front));
+    check("K056", 'tap: the front has no tap targets, even with the tokens loaded (front pin)', front.toks === 0 && front.roles === 0, JSON.stringify(front));
     await page.click('#kp-reveal');
     await page.waitForSelector('#kp-card .kp-sentence .kp-tok');
     const rows = side.passages[side.cards[front.card]];
@@ -1160,73 +1324,129 @@ async function verifyTap(browser, base) {
       const toks = [...document.querySelectorAll('#kp-card .kp-sentence .kp-tok:not(.kp-target)')].map(plain);
       const t = document.querySelector('#kp-card .kp-sentence .kp-tok:not(.kp-target)');
       const rest = getComputedStyle(t).textDecorationLine;
-      return { toks, def: [...document.querySelectorAll('#kp-card .kp-def .kp-tok')].map((n) => n.textContent), target: document.querySelectorAll('#kp-card .kp-sentence .kp-target.kp-tok').length, rest,
-        roles: [...document.querySelectorAll('#kp-card .kp-tok')].every((n) => n.getAttribute('role') === 'button' && n.tabIndex === 0) };
+      const restShadow = getComputedStyle(t).boxShadow;
+      return { toks, restShadow, def: [...document.querySelectorAll('#kp-card .kp-def .kp-tok')].map((n) => n.textContent), target: document.querySelectorAll('#kp-card .kp-sentence .kp-target.kp-tok').length, rest,
+        roles: [...document.querySelectorAll('#kp-card .kp-tok')].every(n => n.tagName === 'SPAN' && n.getAttribute('role') === 'presentation' && !n.hasAttribute('tabindex') && !n.hasAttribute('aria-label') && !n.hasAttribute('aria-haspopup')),
+        paragraphs: [...document.querySelectorAll('#kp-card .kp-sentence, #kp-card .kp-def')].filter(n => n.querySelector('.kp-tok')).every(n => n.dataset.proseRoving === 'true' && n.tabIndex === 0) };
     })()`);
     const missing = want.filter((w) => !back.toks.includes(w.s)).map((w) => w.s);
     check(
-      `tap: after the reveal every word of ${front.card}'s passage (語・字・文法, ${want.length}) and of its definition is a tap target, the target too; buttons by role, in the tab order`,
-      missing.length === 0 && back.toks.length >= want.length && back.def.length >= 2 && back.target >= 1 && back.roles,
-      JSON.stringify({ want: want.length, got: back.toks.length, missing: missing.slice(0, 5), def: back.def, target: back.target }),
+      "K057", `tap: after the reveal every word of ${front.card}'s passage (語・字・文法, ${want.length}) and of its definition is a tap target, the target too; native inline prose with one Tab stop per paragraph`,
+      missing.length === 0 && back.toks.length >= want.length && back.def.length >= 2 && back.target >= 1 && back.roles && back.paragraphs,
+      JSON.stringify({ want: want.length, got: back.toks.length, missing: missing.slice(0, 5), def: back.def, target: back.target, roles: back.roles, paragraphs: back.paragraphs }),
     );
     await page.evaluate(RESTING);
-    const reach = await page.evaluate(REACH);
     await page.hover('#kp-card .kp-sentence .kp-tok:not(.kp-target)');
-    const hover = await page.evaluate(`(() => { const t = document.querySelector('#kp-card .kp-sentence .kp-tok:not(.kp-target)'); const cs = getComputedStyle(t); return cs.textDecorationLine + ' ' + cs.textDecorationStyle; })()`);
+    const hover = await page.evaluate(`(() => { const t = document.querySelector('#kp-card .kp-sentence .kp-tok:not(.kp-target)'); const cs = getComputedStyle(t);
+      const p = document.createElement('i'); document.body.append(p); p.style.color = 'var(--color-reading)'; const reading = getComputedStyle(p).color; p.remove();
+      return { deco: cs.textDecorationLine, shadow: cs.boxShadow, reading }; })()`);
+    // the one-hand pass: the house's one word mark (family H) — a hairline underline in the reading's colour,
+    // drawn as an inset shadow, no text-decoration, nothing at rest
     check(
-      'tap: each word reaches 44px tall (a press 21px above or below its centre lands on it), and has no underline until hover or focus, then a dotted one',
-      reach.sampled >= 5 && reach.miss.length === 0 && back.rest === 'none' && hover === 'underline dotted',
-      JSON.stringify({ ...reach, rest: back.rest, hover }),
+      "K058", "tap: each word reaches 44px tall (real presses 21px above and below activate its exact occurrence, stage and key once without scheduling), wears no mark at rest, and under the pointer wears the house's one word mark: a hairline underline in the reading's colour (an inset shadow, no text-decoration)",
+      reach.sampled >= 5 && reach.points.length === reach.sampled * 2 && reach.miss.length === 0 && back.rest === 'none' && back.restShadow === 'none' && hover.deco === 'none' && hover.shadow.includes('inset') && hover.shadow.includes(hover.reading) && /-0\.5px/.test(hover.shadow),
+      JSON.stringify({ ...reach, rest: back.rest, restShadow: back.restShadow, hover }),
     );
 
     const before = { sched: await page.evaluate(SCHEDULE_OF(KEY)), env: await env(page) };
     // a word of the passage that is not this deck's: 人口
-    const tok = page.locator('#kp-card .kp-sentence .kp-tok:not(.kp-target):not([data-deck-word])').first();
+    const candidates = page.locator('#kp-card .kp-sentence .kp-tok:not(.kp-target):not([data-deck-word])');
+    // F · every reading is a native <rt>, and the deck hides one in place (player.css: visibility), so a hidden-reading word is
+    // one whose own <rt> is there and unseen (the drawn ruby[data-rt] reading is gone)
+    const candidateIndex = await candidates.evaluateAll(nodes => nodes.findIndex(node => node.kpUnit?.tok?.k === '語'
+      && [...node.querySelectorAll('ruby > rt')].some(rt => rt.textContent.trim() && getComputedStyle(rt).visibility === 'hidden')));
+    if (candidateIndex < 0) throw new Error('Fixture has no hidden-reading lexical word');
+    const tok = candidates.nth(candidateIndex);
     const tokText = await tok.evaluate((n) => { const c = n.cloneNode(true); c.querySelectorAll('rt').forEach((r) => r.remove()); return c.textContent; });
-    await tok.click();
-    await page.waitForSelector('#kp-sheet');
+    const wordIndex = await tok.evaluate(n => [...n.closest('.kp-sentence').querySelectorAll('.kp-tok')].indexOf(n));
+    await page.locator('#kp-card .kp-sentence').focus();
+    await page.keyboard.press('Home');
+    for (let index = 0; index < wordIndex; index++) await page.keyboard.press('ArrowRight');
+    check("K059", 'tap: paragraph arrows select the exact occurrence without opening or logging',
+      await tok.evaluate(n => document.activeElement === n && n.getAttribute('role') === 'group' && n.tabIndex === -1)
+        && await page.locator('#mini').count() === 0 && (await page.evaluate(LOOKUPS_OF(KEY))).length === 0);
+    await page.keyboard.press('Enter');
+    await page.waitForFunction(() => document.querySelector('#kp-card [data-ladder-rung="reading"]'));
+    await page.waitForFunction(() => [...document.querySelectorAll('#kp-card [data-ladder-rung="reading"] ruby > rt')].every(rt => getComputedStyle(rt).visibility !== 'hidden' && Number(getComputedStyle(rt).opacity) === 1));
+    const reading = await tok.evaluate(n => ({ expected: [...n.querySelectorAll('ruby > rt')].map(rt => rt.textContent).join(''),
+      shown: [...n.querySelectorAll('ruby > rt')].map(rt => { const style = getComputedStyle(rt);
+        return style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0 ? rt.textContent : ''; }).join(''),
+      rung:n.dataset.ladderRung, lit:n.classList.contains('kp-lit') }));
+    check("K060", 'tap: first Enter exposes the exact reading only, logs depth1 once and leaves the schedule unchanged',
+      reading.expected && reading.shown === reading.expected && reading.rung === 'reading' && reading.lit && await page.locator('#mini').count() === 0
+        && (await page.evaluate(LOOKUPS_OF(KEY))).map(row=>row[5]).join(',') === '1' && (await page.evaluate(SCHEDULE_OF(KEY))) === before.sched, JSON.stringify(reading));
+    await page.keyboard.press('Enter');
+    await page.waitForSelector('#mini[data-from="deck"]');
     await page.waitForTimeout(250);
-    const sheet = await page.evaluate(`(() => { const s = document.getElementById('kp-sheet'); const en = s.querySelector('.kp-sheet-en'); return { depth: s.dataset.depth, key: s.dataset.key, term: s.querySelector('.kp-sheet-term')?.textContent, reading: s.querySelector('.kp-sheet-reading')?.textContent || '', ja: (s.querySelector('.kp-sheet-def') || s.querySelector('.kp-sheet-none'))?.textContent, enOpen: en?.open, enText: en?.querySelector('[lang="en"]')?.textContent || '', take: !!s.querySelector('#kp-take'), inDeck: !!s.querySelector('.kp-sheet-indeck'), modal: s.getAttribute('aria-modal'), focus: document.activeElement?.id }; })()`);
+    const sheet = await page.evaluate(`(() => { const s = document.getElementById('mini'); const gloss = s.querySelector('.mini-gloss'); const word = s.querySelector('.mini-word'); return { key: s.dataset.key, term: word?.textContent, reading: s.querySelector('.mini-reading')?.textContent || '', ja: gloss?.textContent || '', jaLang: gloss?.lang || '', en2: !!s.querySelector('.mini-gloss-2'), door: word?.dataset.action === 'entry.open' && word.getAttribute('aria-label') === 'Open the full entry', take: !!s.querySelector('#mini-take'), inDeck: !!s.querySelector('.mini-note'), role: s.getAttribute('role'), modal: s.getAttribute('aria-modal'), focusLit: !!document.activeElement?.classList.contains('kp-lit'), kanji: s.querySelectorAll('.mini-kanji-row[data-kanji]').length }; })()`);
+    const stageRows = await page.evaluate(LOOKUPS_OF(KEY));
+    const occurrence = await tok.elementHandle();
+    await tok.click();
+    await page.waitForSelector('#sheet');
+    const pageNode = await page.locator('#sheet').getAttribute('data-node');
+    const pageRows = await page.evaluate(LOOKUPS_OF(KEY));
+    const covered = await occurrence.evaluate(n => n.isConnected && !!n.closest('[inert]') && !!n.closest('[aria-hidden="true"]'));
+    await page.locator('#sheet').focus();
+    for (const key of ['3', 'u', 'Enter', 'Space']) await page.keyboard.press(key);
+    check("K061", 'tap: the full page retains an inert, hidden deck occurrence; grade, undo and advance keys cannot change its schedule or observations',
+      covered && await page.locator('#sheet').count() === 1 && await page.evaluate(SCHEDULE_OF(KEY)) === before.sched
+        && JSON.stringify(await page.evaluate(LOOKUPS_OF(KEY))) === JSON.stringify(pageRows)
+        && await page.locator('#kp-card').getAttribute('data-card') === front.card, JSON.stringify({ covered, pageNode }));
+    await page.locator('#sheet-back').click();
+    await page.waitForSelector('#mini[data-from="deck"]');
     const ledger1 = await page.evaluate(LOOKUPS_OF(KEY));
+    const returnedOccurrence = await occurrence.evaluate(n => ({ connected: n.isConnected, focused: document.activeElement === n,
+      rung: n.dataset.ladderRung, active: document.activeElement?.outerHTML.slice(0, 400) }));
+    check("K062", 'tap: third activation opens the exact entry; Back restores its stage without another observation',
+      stageRows.map(row=>row[5]).join(',') === '1,2' && pageRows.map(row=>row[5]).join(',') === '1,2,3'
+        && pageNode === sheet.key && JSON.stringify(ledger1) === JSON.stringify(pageRows)
+        && returnedOccurrence.connected && returnedOccurrence.focused && returnedOccurrence.rung === 'stage'
+        && await page.locator('#mini').getAttribute('data-key') === sheet.key,
+      JSON.stringify({pageNode, key:sheet.key, depths:ledger1.map(row=>row[5]), returnedOccurrence}));
     check(
-      `tap: a word of the passage (${tokText}) opens the entry sheet through the host — its reading, the Japanese sense (or a line that says the dictionary has none), English behind 英語 (closed), 覚える`,
-      sheet.depth === '1' && /^(word|kanji|grammar):/.test(sheet.key) && !!sheet.term && !!sheet.ja && sheet.enOpen === false && !!sheet.enText && sheet.take && !sheet.inDeck && sheet.modal === 'true' && sheet.focus === 'kp-sheet-term',
+      "K063", `tap: a word of the passage (${tokText}) opens the slip through the host — its reading, the Japanese sense (or the slip's miss line), no English line under the deck's default (the band is the door into the full entry, where English lives), Save, its kanji band; a dialog that is not modal, the lit word keeping the keyboard`,
+      /^(word|kanji|grammar):/.test(sheet.key) && !!sheet.term && !!sheet.ja && sheet.jaLang === 'ja' && !sheet.en2 && sheet.door && sheet.take && !sheet.inDeck && sheet.role === 'dialog' && sheet.modal === null && sheet.focusLit && sheet.kanji >= 1,
       JSON.stringify(sheet),
     );
-    await page.click('#kp-take');
+    await page.click('#mini-take');
     const id = sheet.key.replace(/^\w+:/, '');
     await waitForAppRecord(page, (r) => r.taken.some((t) => `${t.t}:${t.id}` === sheet.key), { description: 'one-tap deck capture' });
-    await page.waitForSelector('#kp-sheet .kp-sheet-taken');
-    const saved = await page.evaluate(`({ chooser: document.querySelectorAll('#kp-chooser, .kp-chooser, #kp-take-save, #kp-new-list').length, toast: document.getElementById('reader-toast')?.textContent || '', undo: !!document.getElementById('reader-toast-action'), list: !!document.getElementById('kp-take-list'), sheet: document.getElementById('kp-sheet')?.dataset.key })`);
+    await page.waitForSelector('#mini #mini-take.taken[aria-pressed="true"]');
+    // Save ▾: the press that saves unfolds the word's menu inside the slip (review · lists · + New list · copy)
+    await page.waitForSelector('#mini #vocabulary-list-popover.is-save-menu.is-inline', { timeout: 5000 });
+    const saved = await page.evaluate(`({ chooser: document.querySelectorAll('#kp-chooser, .kp-chooser, #kp-take-save, #kp-new-list, #kp-take-list, #kp-take').length, label: document.getElementById('mini-take')?.textContent || '', expanded: document.getElementById('mini-take')?.getAttribute('aria-expanded'), menu: [...document.querySelectorAll('#vocabulary-list-popover .vocabulary-list-action')].map((n) => n.id), review: document.getElementById('mini-review')?.checked, sheet: document.getElementById('mini')?.dataset.key })`);
     const after = { sched: await page.evaluate(SCHEDULE_OF(KEY)), env: await env(page) };
     check(
-      'tap: 覚える is one tap through the corridor’s save path (A51) — no chooser appears; the word is in the shared review pool (覚えるの札) at once, still one row; the corridor shows 復習に保存しました with 元に戻す; the sheet says so and offers リストに追加…',
-      saved.chooser === 0 && after.env.taken.filter((k) => k === sheet.key).length === 1 && after.env.taken.length === before.env.taken.length + 1 && /復習に保存しました|Saved to review/.test(saved.toast) && saved.undo && saved.list && saved.sheet === sheet.key,
+      "K064", 'tap: Save is one tap through the corridor’s save path (A51) — no chooser appears; the word is in the shared review pool (覚えるの札) at once, still one row; the button reads 保存済み ✓ · Saved ✓ and its menu (review · + New list · copy) unfolds inside the slip, which stays on the same word',
+      saved.chooser === 0 && after.env.taken.filter((k) => k === sheet.key).length === 1 && after.env.taken.length === before.env.taken.length + 1 && /^(保存済み ✓|Saved ✓)$/.test(saved.label) && saved.expanded === 'true' && saved.menu.includes('vocabulary-list-new') && saved.menu.includes('mini-copy') && saved.review === true && saved.sheet === sheet.key,
       JSON.stringify({ ...saved, taken: after.env.taken }),
     );
-    // the optional list: the corridor's own popover, over the deck sheet, writes the same guarded commit
-    await page.click('#kp-take-list');
-    await page.waitForSelector('#vocabulary-list-popover', { timeout: 5000 });
-    const pop = await page.evaluate(`(() => { const p = document.getElementById('vocabulary-list-popover'); const r = p.getBoundingClientRect(); const x = r.left + r.width / 2, y = r.top + Math.min(20, r.height / 2); const top = document.elementFromPoint(x, y); return { title: p.querySelector('.vocabulary-list-title')?.textContent || '', onTop: !!top && p.contains(top), inside: r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight }; })()`);
+    // the menu is the corridor's own list popover, inside the slip under its button: a list written here is the same guarded commit
+    // Its 220ms unfold begins 6px above the resting box; measure the final layout,
+    // not an arbitrary frame during that documented entry animation.
+    await page.waitForFunction(() => document.getElementById('vocabulary-list-popover')?.getAnimations()
+      .every(animation => animation.playState === 'finished'), null, { timeout: 5000 });
+    const pop = await page.evaluate(`(() => { const p = document.getElementById('vocabulary-list-popover'); const m = document.getElementById('mini'); const r = p.getBoundingClientRect(); const mr = m.getBoundingClientRect(); const br = document.getElementById('mini-take').getBoundingClientRect(); const x = r.left + r.width / 2, y = r.top + Math.min(20, r.height / 2); const top = document.elementFromPoint(x, y); return { title: p.querySelector('.vocabulary-list-title')?.textContent || '', onTop: !!top && p.contains(top), inside: r.left >= mr.left - 0.5 && r.right <= mr.right + 0.5 && r.top >= mr.top - 0.5 && r.bottom <= mr.bottom + 0.5 && r.top >= br.bottom - 0.5, inSlip: m.contains(p), boxes: { menu: r.toJSON(), stage: mr.toJSON(), save: br.toJSON() } }; })()`);
     check(
-      'tap: リストに追加… opens the corridor’s list popover for the saved word, on top of the deck sheet and inside the screen',
-      pop.title.includes(sheet.term || id) && pop.onTop && pop.inside,
+      "K065", 'tap: after its entry animation Save ▾’s list popover rests inside the slip under Save, covering no other control',
+      ['リスト', 'Lists'].includes(pop.title) && pop.onTop && pop.inside && pop.inSlip,
       JSON.stringify(pop),
     );
     await page.keyboard.press('Escape');
     await page.waitForFunction(() => !document.getElementById('vocabulary-list-popover'), null, { timeout: 5000 }).catch(() => {});
     check(
-      'tap: a tap is capture, never evidence — the deck ledger’s cards, log, suspensions and repairs are byte-identical, no card was added, the observation log and the corridor schedule did not move; the tap is one lookups[] row',
-      before.sched === after.sched && after.env.obs === before.env.obs && after.env.srs === before.env.srs && ledger1.length === 1 && ledger1[0][1] === front.card && ledger1[0][2] === 'p' && ledger1[0][4] === sheet.key && ledger1[0][5] === 1,
+      "K066", 'tap: a tap is capture, never evidence — the deck ledger’s cards, log, suspensions and repairs are byte-identical, no card was added, the observation log and the corridor schedule did not move; the three activations are exactly depths1/2/3 in lookups[]',
+      before.sched === after.sched && after.env.obs === before.env.obs && after.env.srs === before.env.srs && ledger1.length === 3 && ledger1.every(row => row[1] === front.card && row[2] === 'p' && row[4] === sheet.key) && ledger1.map(row=>row[5]).join(',') === '1,2,3',
       JSON.stringify({ same: before.sched === after.sched, obs: [before.env.obs, after.env.obs], lookups: ledger1 }),
     );
-    // keys behind an open sheet do not grade; Escape closes it and gives focus back
+    // keys behind an open slip do not grade; Escape closes it on the same card, and the word is bare again
     await page.keyboard.press('3');
     const graded = (await page.evaluate(SCHEDULE_OF(KEY))) !== before.sched;
     await page.keyboard.press('Escape');
-    const closed = await page.evaluate(`({ sheet: !!document.getElementById('kp-sheet'), card: document.getElementById('kp-card')?.dataset.card })`);
-    check('tap: with the sheet open the grade keys do nothing; Escape closes it on the same card', !graded && !closed.sheet && closed.card === front.card, JSON.stringify({ graded, ...closed }));
-    if (o.errors.length) check('no page errors with the tap', false, o.errors.slice(0, 2).join(' | '));
+    await page.waitForFunction(() => !document.getElementById('mini'), null, { timeout: 5000 }).catch(() => {});
+    const closed = await page.evaluate(`({ sheet: !!document.getElementById('mini'), lit: !!document.querySelector('#kp-card .kp-lit'), card: document.getElementById('kp-card')?.dataset.card })`);
+    check("K067", 'tap: with the slip open the grade keys do nothing; Escape closes it on the same card and the word is bare', !graded && !closed.sheet && !closed.lit && closed.card === front.card, JSON.stringify({ graded, ...closed }));
+    if (o.errors.length) check("K068", 'no page errors with the tap', false, o.errors.slice(0, 2).join(' | '));
   } finally {
     await o.context.close();
   }
@@ -1238,40 +1458,47 @@ async function verifyTap(browser, base) {
     await page.waitForSelector('#kp-card .kp-sentence .kp-tok');
     const sched = await page.evaluate(SCHEDULE_OF(KEY));
     await page.click('#kp-card .kp-sentence .kp-target.kp-tok');
-    await page.waitForSelector('#kp-sheet');
-    const self = await page.evaluate(`(() => { const s = document.getElementById('kp-sheet'); return { key: s.dataset.key, term: s.querySelector('.kp-sheet-term')?.textContent, indeck: s.querySelector('.kp-sheet-indeck')?.textContent, take: s.querySelectorAll('#kp-take, #kp-chooser, .kp-take').length, full: !!s.querySelector('#kp-sheet-full'), defToks: [...s.querySelectorAll('.kp-sheet-def .kp-tok')].map((n) => n.textContent), stop: !!s.querySelector('.kp-sheet-stop') }; })()`);
+    await page.waitForSelector('#mini[data-from="deck"]');
+    const self = await page.evaluate(`(() => { const s = document.getElementById('mini'); const gloss = s.querySelector('.mini-gloss'); const word = s.querySelector('.mini-word'); return { key: s.dataset.key, term: word?.textContent, indeck: s.querySelector('.mini-note')?.textContent, take: s.querySelectorAll('#mini-take, #kp-take, #kp-chooser, .kp-take').length, door: word?.dataset.action === 'entry.open' && word.getAttribute('aria-label') === 'Open the full entry', ja: gloss?.lang === 'ja' ? gloss.textContent : '', toks: s.querySelectorAll('.kp-tok, [data-depth]').length }; })()`);
     check(
-      'tap: the card’s own word (a word enrolled in this deck) shows 「このデッキにあります」 and no 覚える',
-      self.key === 'deck:km-109' && self.term === '金利' && self.indeck === 'Already in this deck' && self.take === 0 && !self.full && !self.stop && self.defToks.includes('利息'),
+      "K069", 'tap: the card’s own word (a word enrolled in this deck) shows its Japanese sense, 「Already in this deck」 in Save’s place and no Save; its band is the door into the dictionary’s entry; the slip holds no deeper chain of taps',
+      self.key === 'deck:km-109' && self.term === '金利' && self.indeck === 'Already in this deck' && self.take === 0 && self.door && self.ja.includes('利息') && self.toks === 0,
       JSON.stringify(self),
     );
-    await page.click('#kp-sheet .kp-sheet-def .kp-tok[data-deck-word="km-113"]');
-    await page.waitForSelector('#kp-sheet[data-depth="2"]');
-    const deep = await page.evaluate(`(() => { const s = document.getElementById('kp-sheet'); return { key: s.dataset.key, term: s.querySelector('.kp-sheet-term')?.textContent, stop: s.querySelector('.kp-sheet-stop')?.textContent, toks: s.querySelectorAll('.kp-tok').length, def: s.querySelector('.kp-sheet-def')?.textContent, indeck: !!s.querySelector('.kp-sheet-indeck'), back: !!s.querySelector('#kp-sheet-back') }; })()`);
+    // The same word again opens the dictionary; Back restores this stage without a new tap.
+    await page.click('#kp-card .kp-sentence .kp-target.kp-tok');
+    await page.waitForSelector('#sheet');
+    const entry = await page.evaluate(`({ mini: !!document.getElementById('mini'), names: document.getElementById('sheet')?.innerText.includes('金利') })`);
+    await page.click('#sheet-back');
+    await page.waitForFunction(() => !document.getElementById('sheet'), null, { timeout: 5000 });
+    const bare = await page.evaluate(`({ mini: document.getElementById('mini')?.dataset.key, rung: document.querySelector('#kp-card .kp-target')?.dataset.ladderRung, card: document.getElementById('kp-card')?.dataset.card, depths: ${LOOKUPS_OF(KEY)}.map(row=>row[5]) })`);
     check(
-      'tap: a word in the sheet’s definition opens one more sheet (depth 2: 利息, also this deck’s), which says 「ここで止めよう」 and has nothing left to tap; ← goes back',
-      deep.term === '利息' && deep.stop === 'Pause here' && deep.toks === 0 && !!deep.def && deep.indeck && deep.back,
-      JSON.stringify(deep),
+      "K070", 'tap: the same word again opens its full dictionary entry (the slip goes with it); Back restores its stage on the same card with no new observation',
+      entry.names && !entry.mini && bare.mini === 'deck:km-109' && bare.rung === 'stage' && bare.depths.join(',') === '2,3' && bare.card === 'km-109-m01',
+      JSON.stringify({ entry, bare }),
     );
-    await page.click('#kp-sheet-back');
-    await page.waitForSelector('#kp-sheet[data-depth="1"]');
-    await page.click('#kp-sheet-close');
-    // a word of the card's definition (お金) opens its sheet too
-    await page.click('#kp-card .kp-def .kp-tok >> nth=0');
-    await page.waitForSelector('#kp-sheet');
-    const fromDef = await page.evaluate(`document.getElementById('kp-sheet').dataset.key`);
+    await page.keyboard.press('Escape');
+    await page.waitForSelector('#mini', { state: 'detached' });
+    // Definition prose carries no printed reading: one reveal, then its stage.
+    const definitionWord = page.locator('#kp-card .kp-def .kp-tok').filter({ hasText: /\p{Script=Han}/u }).first();
+    await definitionWord.click();
+    await page.waitForFunction(() => document.querySelector('#kp-card .kp-def [data-ladder-rung="reading"]'));
+    check("K071", 'tap: definition first activation reveals ruby without stage', await page.locator('#mini').count() === 0 && await definitionWord.locator('rt').count() > 0);
+    await definitionWord.click();
+    await page.waitForSelector('#mini[data-from="deck"]');
+    const fromDef = await page.evaluate(`document.getElementById('mini').dataset.key`);
     const lookups = await page.evaluate(LOOKUPS_OF(KEY));
     const same = (await page.evaluate(SCHEDULE_OF(KEY))) === sched;
     check(
-      'tap: lookups[] keeps where and how deep each tap was (passage target, sheet definition at depth 2, card definition) and the schedule is unchanged',
-      same && lookups.map((r) => `${r[2]}${r[5]}`).join(',') === 'p1,s2,d1' && lookups[0][4] === 'deck:km-109' && lookups[1][4] === 'deck:km-113' && lookups[2][4] === fromDef,
+      "K072", 'tap: lookups[] keeps where and how deep each tap was (already-visible passage target: stage2 then page3; definition: reveal1 then stage2) and the schedule is unchanged',
+      same && lookups.map((r) => `${r[2]}${r[5]}`).join(',') === 'p2,p3,d1,d2' && lookups[0][4] === 'deck:km-109' && lookups[1][4] === 'deck:km-109' && lookups[2][4] === fromDef && lookups[3][4] === fromDef,
       JSON.stringify({ same, lookups }),
     );
     await page.keyboard.press('Escape');
-    await page.click('#kp-grade-good');
+    await gradeClick(page, 'bunki-cloze:kotoba-mcd');
     const graded = await page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mcd'))`);
-    check('tap: the card still grades as before, and its lookups stay in the ledger beside the answer', graded.log.length === 1 && graded.lookups.length === 3, JSON.stringify({ log: graded.log.length, lookups: graded.lookups.length }));
-    if (o.errors.length) check('no page errors in the sheet recursion', false, o.errors.slice(0, 2).join(' | '));
+    check("K073", 'tap: the card still grades as before, and its lookups stay in the ledger beside the answer', graded.log.length === 1 && graded.lookups.length === 4, JSON.stringify({ log: graded.log.length, lookups: graded.lookups.length }));
+    if (o.errors.length) check("K074", 'no page errors in the slip and entry cycle', false, o.errors.slice(0, 2).join(' | '));
   } finally {
     await o.context.close();
   }
@@ -1284,7 +1511,7 @@ async function verifyTap(browser, base) {
     for (const [file, deckId, cardId] of [['study-mcd.html', 'kotoba-mcd', 'km-109-m01'], ['study.html', 'kotoba-mine', 'km-114-1']]) {
       const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
       await context.addInitScript(`try { if (!sessionStorage.getItem('__tap_seeded')) { sessionStorage.setItem('__tap_seeded', '1');
-        localStorage.setItem('bunki-cloze:prefs:v3:${deckId}', ${JSON.stringify(JSON.stringify({ newPerDay: 0, ruleSeen: true }))});
+        localStorage.setItem('bunki-cloze:prefs:v3:${deckId}', ${JSON.stringify(JSON.stringify({ newPerDay: 0, againCoachSeen: true }))});
         localStorage.setItem('bunki-cloze:${deckId}', ${JSON.stringify(due(deckId, cardId))}); } } catch {}`);
       const page = await context.newPage();
       const errors = [];
@@ -1310,25 +1537,35 @@ async function verifyTap(browser, base) {
       await page.click('#kp-card .kp-sentence .kp-target.kp-tok');
       const self = await page.evaluate(`document.getElementById('kp-pop')?.dataset.key`);
       const fonts = await studyFontEvidence(page);
-      seen.push({ file, shown, front, toks, pop, self, lookups: lookups.length, same, closed, fonts });
-      if (errors.length) check(`no page errors on ${file}`, false, errors.slice(0, 2).join(' | '));
+      const inspectBundle = deckId => {
+        const all=window.__CORRIDOR_BUNDLE__ || {}, gloss=all['decks/kotoba-mine/gloss'];
+        return {deckId,format:gloss?.format,version:gloss?.version,deck:gloss?.deck,cards:Object.keys(gloss?.cards||{}).length,defs:Object.keys(gloss?.defs||{}).length,tokens:Object.entries(all).filter(([key,value])=>key.endsWith('/tokens')||value?.format==='bunki-cloze-tokens').map(([key])=>key)};
+      };
+      const bundle = await page.evaluate(inspectBundle,deckId);
+      // A differently named token payload must not escape the inventory check.
+      await page.evaluate(()=>{window.__CORRIDOR_BUNDLE__.__qa_inventory_control={format:'bunki-cloze-tokens'};});
+      try { const mutant=await page.evaluate(inspectBundle,deckId);assert(mutant.tokens.includes('__qa_inventory_control'),'runtime inventory must observe misnamed token payload'); }
+      finally { await page.evaluate(()=>{delete window.__CORRIDOR_BUNDLE__.__qa_inventory_control;}); }
+
+      seen.push({ file, shown, front, toks, pop, self, lookups: lookups.length, same, closed, fonts, bundle });
+      if (errors.length) check(`K075/${file}`, `no page errors on ${file}`, false, errors.slice(0, 2).join(' | '));
       await context.close();
     }
     check(
-      'tap, standalone (study-mcd.html, study.html): no tap target on the front; after the reveal furigana and only this deck’s own words are tappable (the built-in gloss map); a tap shows a small popover — term, reading, definition, English behind 英語 — with no 覚える and a one-line note saying so; a press elsewhere closes it; one lookups[] row, the schedule unchanged',
-      seen.length === 2 && seen.every((x) => x.front === 0 && x.toks.rt > 0 && x.toks.other.length >= 1 && x.toks.other.every(Boolean) && x.pop.key === 'deck:km-107' && x.self === `deck:${x.shown.slice(0, 6)}` && !!x.pop.term && !!x.pop.reading && !!x.pop.def && x.pop.enOpen === false && !!x.pop.en && /^Save to your review cards in KAIRO\.$/u.test(x.pop.note) && x.pop.noteLines === 1 && x.pop.take === 0 && x.pop.inside && !x.pop.sheet && x.lookups === 1 && x.same && x.closed),
+      "K076", 'tap, standalone (study-mcd.html, study.html): no tap target on the front; after the reveal furigana and only this deck’s own words are tappable (the built-in gloss map); a tap shows a small popover — term, reading, definition, English behind 英語 — with no 覚える and a one-line note saying so; a press elsewhere closes it; one lookups[] row, the schedule unchanged',
+      seen.length === 2 && seen.every((x) => x.front === 0 && x.toks.rt > 0 && x.toks.other.length >= 1 && x.toks.other.every(Boolean) && x.pop.key === 'deck:km-107' && x.self === `deck:${x.shown.slice(0, 6)}` && !!x.pop.term && !!x.pop.reading && !!x.pop.def && x.pop.enOpen === false && !!x.pop.en && /^Can't save from here\.$/u.test(x.pop.note) && x.pop.noteLines === 1 && x.pop.take === 0 && x.pop.inside && !x.pop.sheet && x.lookups === 1 && x.same && x.closed),
       JSON.stringify(seen.map((x) => ({ file: x.file, card: x.shown, front: x.front, toks: x.toks.other, self: x.self, pop: { key: x.pop.key, term: x.pop.term, note: x.pop.note, noteLines: x.pop.noteLines, take: x.pop.take, inside: x.pop.inside }, lookups: x.lookups, same: x.same, closed: x.closed }))),
     );
-    check('tap, standalone: both actual release backs and their word popovers use bundled fonts for every visible text glyph',
+    check("K077", 'tap, standalone: both release backs and popovers pass bundled-font evidence (Chromium glyph attribution; WebKit embedded-face raster match and fallback rejection)',
       seen.length === 2 && seen.every((x) => studyFontsPass(x.fonts)), JSON.stringify(seen.map(({ file, fonts }) => ({ file, fonts }))));
+    check('K078','standalone executed bundle inventory: exact own-deck gloss data, no token side bundle; popover/no-sheet behavior is K076',
+      seen.length===2&&seen.every(({bundle:b})=>b.format==='bunki-cloze-gloss'&&b.version===1&&b.deck===b.deckId&&b.cards>0&&b.defs>0&&b.tokens.length===0),JSON.stringify(seen.map(({file,bundle})=>({file,bundle}))));
   } finally {
     release.server.close();
   }
-  const html = ['study.html', 'study-mcd.html'].map((f) => readFileSync(resolve(REPO_DIR, 'decks/kotoba-mine/release', f), 'utf8'));
-  check('tap: the study pages carry the gloss map of their own deck (bunki-cloze-gloss) and still no tokens', html.every((t) => t.includes('"format":"bunki-cloze-gloss"') && !t.includes('bunki-cloze-tokens","version') && t.includes('function drawPop') && t.includes('ここで止めよう')), '');
   // 3. Anki: no tap-to-define, nothing added
   const anki = ['anki/front.html', 'anki/back.html', 'anki-sentence/front.html', 'anki-sentence/back.html'].map((f) => resolve(REPO_DIR, 'decks/kotoba-mine/tools', f)).filter(existsSync).map((f) => readFileSync(f, 'utf8'));
-  check('tap: the Anki templates add nothing for it (no tap-to-define in Anki: furigana only, STANDARD A44)', anki.length >= 2 && anki.every((t) => !/kp-tok|kp-sheet|kp-pop|tap-to-define|onclick/.test(t)), `${anki.length} templates`);
+  check("K079", 'tap: the Anki templates add nothing for it (no tap-to-define in Anki: furigana only, STANDARD A44)', anki.length >= 2 && anki.every((t) => !/kp-tok|kp-sheet|kp-pop|tap-to-define|onclick/.test(t)), `${anki.length} templates`);
 }
 
 async function verifyBack(browser, base) {
@@ -1344,10 +1581,11 @@ async function verifyBack(browser, base) {
     return JSON.stringify(s);
   };
   /** a fresh page with this deck's prefs (and ledger) stored before the player boots */
-  const open = async (q, deck, { prefs = null, state = null, sem = false } = {}) => {
+  const open = async (q, deck, { prefs = null, state = null, sem = false, world = null } = {}) => {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await context.addInitScript(SEEDED);
     await context.addInitScript(`try { if (!sessionStorage.getItem('__back_seeded')) { sessionStorage.setItem('__back_seeded', '1');
+      ${world ? `localStorage.setItem('kairo-theme', ${JSON.stringify(world)});` : ''}
       ${prefs ? `localStorage.setItem('bunki-cloze:prefs:v3:${deck}', ${JSON.stringify(JSON.stringify(prefs))});` : ''}
       ${state ? `localStorage.setItem('bunki-cloze:${deck}', ${JSON.stringify(state)});` : ''} } } catch {}`);
     if (sem) {
@@ -1403,7 +1641,7 @@ async function verifyBack(browser, base) {
     return at.every((i) => i >= 0) && at.every((i, k) => k === 0 || i > at[k - 1]);
   };
   const close = async (o) => {
-    if (o.errors.length) check('no page errors on the back', false, o.errors.slice(0, 2).join(' | '));
+    if (o.errors.length) check("K080", 'no page errors on the back', false, o.errors.slice(0, 2).join(' | '));
     await o.context.close();
   };
 
@@ -1433,7 +1671,7 @@ async function verifyBack(browser, base) {
     await close(o);
   }
   const badFront = fronts.filter((f) => !f.ok);
-  check('a, 2) front pin, both decks: no furigana, no English, no tap targets in the passage, no folds, no hint under a blank — also with old tap-ふりがな / English-hint prefs stored; MCD opens in 読んで思い出す (target marked, nothing blanked), 穴埋め blanks it; only a card repaired with a ladder hint shows one, marked data-repaired', badFront.length === 0, badFront.length ? JSON.stringify(badFront[0]) : fronts.map((f) => `${f.label} ${f.card}`).join(' · '));
+  check("K081", 'a, 2) front pin, both decks: no furigana, no English, no tap targets in the passage, no folds, no hint under a blank — also with old tap-ふりがな / English-hint prefs stored; MCD opens in 読んで思い出す (target marked, nothing blanked), 穴埋め blanks it; only a card repaired with a ladder hint shows one, marked data-repaired', badFront.length === 0, badFront.length ? JSON.stringify(badFront[0]) : fronts.map((f) => `${f.label} ${f.card}`).join(' · '));
 
   // b, c) a new MCD 語 card: tier one, then the folds in order; d) zoom on a new card
   {
@@ -1444,27 +1682,28 @@ async function verifyBack(browser, base) {
     await o.page.waitForSelector('.kp-grade');
     const b = await o.page.evaluate(BACK);
     const tier1 = b.order.slice(0, b.order.indexOf('kp-folds'));
+    // Q (the comb): the definition may carry .kp-words, the app's word rule for its Japanese line breaks; nothing else
     check(
-      'b) tier one under the passage: the word (reading, part of speech, no pitch), a reading over every kanji, the Japanese definition, no English; the part-of-speech badge is chrome in the interface language (EN: noun)',
-      b.word.join() === 'kp-term,kp-reading,kp-posbadge' && !b.pitch && !b.bare && b.rt > 0 && tier1[0] === 'kp-word' && tier1[1] === 'kp-def' && tier1.every((k) => ['kp-word', 'kp-def', 'kp-note'].includes(k.split(' ')[0])) && b.def === w.defJa && !/[A-Za-z]/.test(b.tier1) && zf === null &&
+      "K082", 'b) tier one under the passage: the word (reading, part of speech, no pitch), a reading over every kanji, the Japanese definition, no English; the part-of-speech badge is chrome in the interface language (EN: noun)',
+      b.word.join() === 'kp-term,kp-reading,kp-posbadge' && !b.pitch && !b.bare && b.rt > 0 && tier1[0] === 'kp-word' && ['kp-def', 'kp-def kp-words'].includes(tier1[1]) && tier1.every((k) => ['kp-word', 'kp-def', 'kp-note'].includes(k.split(' ')[0])) && b.def === w.defJa && !/[A-Za-z]/.test(b.tier1) && zf === null &&
         // the badge follows the interface (this run is EN): the English name, marked lang=en, never 名詞 in EN chrome
         b.pos?.lang === 'en' && /^[a-z -]+$/.test(b.pos.text) && !/[\u3040-\u30ff\u3400-\u9fff]/u.test(b.pos.text),
       JSON.stringify({ card: c.id, order: b.order, word: b.word, rt: b.rt, bare: b.bare, pos: b.pos }),
     );
     const sibs = w.cards.filter((x) => x.type === 'word' && x.passage !== c.passage);
     check(
-      'c) tier two: native folds in order 英語 → 英訳 → 漢字の形と意味 → (類語) → other passages → 出典, the folds last in the answer; 英語 is closed by default and holds the gloss',
+      "K083", 'c) tier two: native folds in order 英語 → 英訳 → 漢字の形と意味 → (類語) → other passages → 出典, the folds last in the answer; 英語 is closed by default and holds the gloss',
       b.native && inOrder(b.summaries) && b.summaries[0] === 'English' && b.summaries.at(-1) === 'Source' && b.order.at(-1) === 'kp-folds' && b.gloss && !b.gloss.open && b.gloss.text.startsWith(w.meaning),
       JSON.stringify({ summaries: b.summaries, last: b.order.slice(-2), gloss: b.gloss?.open }),
     );
     const s = c.src;
     check(
-      '4) 出典 is the last fold, closed: the site (a link when the record has a URL), the licence from card.src.licence (lang="en"), the author when there is one, and which passage of the word this is',
+      "K084", '4) 出典 is the last fold, closed: the site (a link when the record has a URL), the licence from card.src.licence (lang="en"), the author when there is one, and which passage of the word this is',
       b.src && !b.src.open && b.src.text.includes(s.site) && b.src.text.includes(s.licence) && b.src.text.includes(`Passage ${c.passage}`) && (!s.author || b.src.text.includes(s.author)) && b.srcLink === (s.url ?? null) && b.licenceLang === 'en',
       JSON.stringify({ card: c.id, src: b.src?.text, link: b.srcLink }),
     );
     check(
-      'c) 英訳 is the target sentence only (not the passage); 漢字 closed on a 語 card; 類語 absent on a new card; other passages are titles only',
+      "K085", 'c) 英訳 is the target sentence only (not the passage); 漢字 closed on a 語 card; 類語 absent on a new card; other passages are titles only',
       b.en?.text === c.enTarget && c.enTarget !== c.en && b.kanji && !b.kanji.open && !b.sem && b.others?.summary === `Other passages for this word (${sibs.length})` && !b.others.open && sibs.every((x) => !b.others.text.includes(x.ja.slice(0, 10))),
       JSON.stringify({ en: b.en?.text?.slice(0, 50), kanji: b.kanji?.open, sem: !!b.sem, others: b.others?.summary }),
     );
@@ -1480,19 +1719,19 @@ async function verifyBack(browser, base) {
       const chrome = [...ans.querySelectorAll('.kp-folds summary, .kp-tip-label')].every((n) => n.closest('[lang]').lang === 'en');
       const en = [...ans.querySelectorAll('.kp-gloss, .kp-en')].every((n) => n.lang === 'en');
       return { chrome, en, details: [...ans.querySelectorAll('details')].every((d) => !d.hasAttribute('lang')) }; })()`);
-    check('c) screen readers: EN fold summaries and English content carry lang="en", while native details add no language override', lang.chrome && lang.en && lang.details, JSON.stringify(lang));
+    check("K086", 'c) screen readers: EN fold summaries and English content carry lang="en", while native details add no language override', lang.chrome && lang.en && lang.details, JSON.stringify(lang));
     // 44px touch targets on the zoom toggle and the rule's ×, though they are drawn smaller
     const hits = await o.page.evaluate(`['kp-zoom-focus', 'kp-zoom-full', 'kp-rule-dismiss'].map((id) => { const n = document.getElementById(id); if (id !== 'kp-rule-dismiss') n.scrollIntoView({ block: 'center' }); const r = n.getBoundingClientRect(); const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
       const at = (dy) => document.elementFromPoint(cx, cy + dy) === n; return { id, h: Math.round(r.height), reach: at(-21) && at(21) }; })`);
-    check('e) the zoom toggle and the rule\'s × each have a 44px hit area on a phone without growing on screen', hits.every((h) => h.reach && h.h < 44), JSON.stringify(hits));
+    check("K087", 'e) the zoom toggle and the rule\'s × each have a 44px hit area on a phone without growing on screen', hits.every((h) => h.reach && h.h < 44), JSON.stringify(hits));
     await o.page.click('#kp-zoom-focus');
     await o.page.waitForTimeout(400);
     const z2 = await zoom();
     const enOpen = await o.page.evaluate(`document.querySelector('#kp-card .kp-f-en').open`);
-    check('d) switching 全文／焦点 does not rebuild the screen: an open 英訳 stays open', enOpen === true, String(enOpen));
+    check("K088", 'd) switching 全文／焦点 does not rebuild the screen: an open 英訳 stays open', enOpen === true, String(enOpen));
     const stored = await o.page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mcd') || '{}').zoom`);
     check(
-      'd) a new passage card opens 全文 after the reveal (no zoom on the front); 焦点 in the card header dims the other sentences, keeps them, and is remembered for the deck',
+      "K089", 'd) a new passage card opens 全文 after the reveal (no zoom on the front); 焦点 in the card header dims the other sentences, keeps them, and is remembered for the deck',
       z1.zoom === 'full' && z1.inChips && z1.full === 'true' && z1.n >= 2 && z1.focus === 1 && z1.dim.every((x) => x === 1) && z1.passage.text.count > 0 && z1.passage.text.min >= 4.5 && (!z1.passage.ruby.count || z1.passage.ruby.min >= 4.5) && z1.text === c.ja && z2.zoom === 'focus' && z2.focusBtn === 'true' && z2.n === z1.n && z2.dim.every((x) => x < 0.5) && z2.contrast.masks.length === 0 && z2.contrast.text.count > 0 && z2.contrast.ruby.count > 0 && z2.focused.text.count > 0 && z2.focused.text.min >= 4.5 && (!z2.focused.ruby.count || z2.focused.ruby.min >= 4.5) && z2.bright.every((x) => x === 1) && z2.text === c.ja && stored === 'focus',
       JSON.stringify({ before: { zoom: z1.zoom, n: z1.n, dim: z1.dim, passage: z1.passage }, after: { zoom: z2.zoom, dim: z2.dim, contrast: z2.contrast, focused: z2.focused }, stored }),
     );
@@ -1502,9 +1741,9 @@ async function verifyBack(browser, base) {
       const hit = document.elementFromPoint(g.left + g.width / 2, g.top + g.height / 2); const t = document.getElementById('primary-tabs')?.getBoundingClientRect(); const tabs = t?.height > 0 ? t : null; return { position: getComputedStyle(document.querySelector('.kp-grades')).position, bottom: Math.round(b.bottom), top: Math.round(b.top), expectedBottom: Math.round(tabs?.top ?? innerHeight), tabsBottom: tabs ? Math.round(tabs.bottom) : null, viewport: innerHeight, noOverlap: b.bottom <= (tabs?.top ?? innerHeight), hit: !!hit?.closest('#kp-grade-good'), rule: document.getElementById('kp-rule')?.textContent ?? null }; })()`);
     await o.page.click('#kp-rule-dismiss');
     await o.page.waitForSelector('#kp-grade-good');
-    const dismissed = await o.page.evaluate(`({ rule: !!document.getElementById('kp-rule'), seen: JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mcd') || '{}').ruleSeen, zoom: document.getElementById('kp-card').dataset.zoom, enOpen: document.querySelector('#kp-card .kp-f-en').open })`);
+    const dismissed = await o.page.evaluate(`({ rule: !!document.getElementById('kp-rule'), seen: JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mcd') || '{}').againCoachSeen, zoom: document.getElementById('kp-card').dataset.zoom, enOpen: document.querySelector('#kp-card .kp-f-en').open })`);
     check(
-      'e) the grade bar is pinned to the bottom of the phone screen and shows 「答えを見て理解が深まったなら もう一度」 until dismissed; dismissing is remembered in prefs and keeps an open fold open',
+      "K090", 'e) the grade bar is pinned to the bottom of the phone screen and shows its rule (Hfix-1B: "If the answer was new to you, choose Again" · 「答えを見て初めて分かったなら「もう一度」」) until dismissed; dismissing is remembered in prefs and keeps an open fold open',
       bar.position === 'fixed' && bar.bottom === bar.expectedBottom && bar.viewport === 844 && (bar.tabsBottom === null || bar.tabsBottom === 844) && bar.noOverlap && bar.hit && bar.rule?.includes(UI_RULE_TEXT) && !dismissed.rule && dismissed.seen === true && dismissed.zoom === 'focus' && dismissed.enOpen === true,
       JSON.stringify({ ...bar, dismissed }),
     );
@@ -1518,7 +1757,7 @@ async function verifyBack(browser, base) {
     await o.page.click('#kp-reveal');
     await o.page.waitForSelector('.kp-grade');
     const b = await o.page.evaluate(BACK);
-    check('c) a passage with no matched sentence (km-109-m05) keeps the 英訳 fold in its place, saying 未対応, never the whole translation', c.id === 'km-109-m05' && c.enTarget == null && b.summaries[1] === 'Translation' && b.en?.text.includes('unavailable') && !b.en.text.includes(c.en.slice(0, 20)) && inOrder(b.summaries), JSON.stringify({ id: c.id, summaries: b.summaries, en: b.en?.text }));
+    check("K091", 'c) a passage with no matched sentence (km-109-m05) keeps the 英訳 fold in its place, saying 未対応, never the whole translation', c.id === 'km-109-m05' && c.enTarget == null && b.summaries[1] === 'Translation' && b.en?.text.includes('unavailable') && !b.en.text.includes(c.en.slice(0, 20)) && inOrder(b.summaries), JSON.stringify({ id: c.id, summaries: b.summaries, en: b.en?.text }));
     await close(o);
   }
 
@@ -1527,11 +1766,11 @@ async function verifyBack(browser, base) {
     const o = await open('?deck=kotoba', 'kotoba-mine');
     await o.page.click('#kp-reveal');
     await o.page.waitForSelector('#kp-rule');
-    await o.page.click('#kp-grade-good');
+    await gradeToNext(o.page, 'bunki-cloze:kotoba-mine');
     await o.page.click('#kp-reveal');
     await o.page.waitForSelector('.kp-grade');
-    const next = await o.page.evaluate(`({ rule: !!document.getElementById('kp-rule'), seen: JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mine') || '{}').ruleSeen })`);
-    check('e) the rule is shown once: after the card it sat under is answered, the next back has none (prefs ruleSeen)', !next.rule && next.seen === true, JSON.stringify(next));
+    const next = await o.page.evaluate(`({ rule: !!document.getElementById('kp-rule'), seen: JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mine') || '{}').againCoachSeen })`);
+    check("K092", 'e) the rule is shown once: after the card it sat under is answered, the next back has none (prefs againCoachSeen)', !next.rule && next.seen === true, JSON.stringify(next));
     await close(o);
   }
 
@@ -1554,16 +1793,19 @@ async function verifyBack(browser, base) {
     out.push({ side: g.dataset.side, glyphs, hits, at }); } return out; })()`;
   {
     const seen = [];
-    for (const [id, look] of [
-      ['km-109-m05', 'kokuban'],
-      ['km-109-m05', 'dark'],
-      ['km-298-m02', 'dark'],
+    for (const [id, world] of [
+      ['km-109-m05', 'hokusai'],
+      ['km-109-m05', 'yoru'],
+      ['km-298-m02', 'hokusai'],
     ]) {
-      const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0, zoom: 'auto', look }, state: ledger('kotoba-mcd', id) });
+      const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0, zoom: 'auto' }, world, state: ledger('kotoba-mcd', id) });
       const card = await cardId(o.page);
       await o.page.click('#kp-reveal');
       await o.page.waitForSelector('.kp-grade');
       await o.page.evaluate(RESTING);
+      const actualWorld = await o.page.evaluate(() => document.documentElement.dataset.theme || 'hokusai');
+      check(`K093/${id}/${world}`, `1) ellipsis fixture ${id} actually renders in ${world} before geometry is measured`, actualWorld === world,
+        JSON.stringify({ requested: world, actual: actualWorld }));
       // the ⋯ in mid-screen, so the lines beside it are measured
       const look1 = async (g) => { await o.page.locator('#kp-card .kp-ctx .kp-more').nth(g).evaluate((n) => n.scrollIntoView({ block: 'center' })); return o.page.evaluate(PILL_CLEAR); };
       const pills = await o.page.locator('#kp-card .kp-ctx .kp-more:visible').count();
@@ -1574,14 +1816,14 @@ async function verifyBack(browser, base) {
         await o.page.locator('#kp-card .kp-ctx .kp-more').nth(g).click();
         opened.push((await look1(g))[g]);
       }
-      seen.push({ id, look, card, rest, opened });
+      seen.push({ id, world, actualWorld, card, rest, opened });
       await close(o);
     }
     const all = seen.flatMap((x) => [...x.rest, ...x.opened]);
     check(
-      '1) in 焦点 the ⋯ never sits on the passage: no visible glyph of a folded group intersects its ⋯, at rest or opened (km-109-m05 in 黒板 and 墨, km-298-m02)',
-      seen.every((x) => x.card === x.id && x.rest.length >= 1 && x.opened.length === x.rest.length) && all.every((g) => g && g.glyphs > 0 && g.hits === 0),
-      JSON.stringify(seen.map(({ id, look, rest, opened }) => ({ id, look, rest, opened }))),
+      "K094", '1) in 焦点 the ⋯ never sits on the passage: no visible glyph of a folded group intersects its ⋯, at rest or opened (km-109-m05 by day and at night in 紺紙, km-298-m02)',
+      seen.every((x) => x.actualWorld === x.world && x.card === x.id && x.rest.length >= 1 && x.opened.length === x.rest.length) && all.every((g) => g && g.glyphs > 0 && g.hits === 0),
+      JSON.stringify(seen.map(({ id, world, actualWorld, rest, opened }) => ({ id, world, actualWorld, rest, opened }))),
     );
   }
 
@@ -1615,12 +1857,12 @@ async function verifyBack(browser, base) {
     const full = seen['全文'];
     const { c } = index.get('km-298-m02');
     check(
-      '1) the longest passage (km-298-m02) at its resting position after the reveal, 焦点 and 全文: .kp-term and the definition sit above the pinned bar, no fold row is cut by it; in 焦点 the target sentence is on screen too',
+      "K095", '1) the longest passage (km-298-m02) at its resting position after the reveal, 焦点 and 全文: .kp-term and the definition sit above the pinned bar, no fold row is cut by it; in 焦点 the target sentence is on screen too',
       f.id === 'km-298-m02' && full.id === 'km-298-m02' && [f, full].every((x) => x.rest.term <= x.rest.bar && x.rest.def <= x.rest.bar && x.rest.cut === 0) && f.rest.sentenceTop >= 0,
       JSON.stringify({ 焦点: f.rest, 全文: full.rest }),
     );
     check(
-      '1) 焦点 folds the sentences before and after the target to two dimmed lines each (never removed: the passage text is whole), with ⋯ (aria-expanded) on a group that runs longer, which opens it; 全文 lays the groups out inline with no ⋯',
+      "K096", '1) 焦点 folds the sentences before and after the target to two dimmed lines each (never removed: the passage text is whole), with ⋯ (aria-expanded) on a group that runs longer, which opens it; 全文 lays the groups out inline with no ⋯',
       f.groups.length >= 1 && f.groups.every((g) => g.display === 'block' && g.h <= Math.ceil(2 * g.line) + 1 && g.dim < 0.5 && g.contrast.masks.length === 0 && g.contrast.text.count > 0 && (g.clip === '1') === g.more) && f.groups.some((g) => g.contrast.ruby.count > 0) && f.groups.some((g) => g.more) && f.opened?.expanded === 'true' && f.opened.h > Math.ceil(2 * f.opened.line) + 1 &&
         f.ink.focused.text.count > 0 && f.ink.focused.text.min >= 4.5 && (!f.ink.focused.ruby.count || f.ink.focused.ruby.min >= 4.5) && full.ink.passage.text.count > 0 && full.ink.passage.text.min >= 4.5 && (!full.ink.passage.ruby.count || full.ink.passage.ruby.min >= 4.5) &&
         f.text === c.ja && full.text === c.ja && full.groups.every((g) => g.display === 'contents' && !g.more && g.dim === 1),
@@ -1650,13 +1892,13 @@ async function verifyBack(browser, base) {
       await close(o);
     }
     check(
-      '5) at the resting position after the reveal no fold row is cut by the pinned bar (each wholly above it or wholly below), the word and definition are above it, and the last fold (出典) scrolls clear of it',
+      "K097", '5) at the resting position after the reveal no fold row is cut by the pinned bar (each wholly above it or wholly below), the word and definition are above it, and the last fold (出典) scrolls clear of it',
       seen.every((x) => x.cut === 0 && x.term <= x.bar && x.def <= x.bar && x.end.src <= x.end.bar),
       JSON.stringify(seen.map(({ label, card, y, cut, term, def, bar: restBar, end }) => ({ label, card, y, cut, term, def, restBar, src: end.src, bar: end.bar }))),
     );
   }
 
-  // 5, A39) the standalone study pages have no host header, so the study top bar (× n/N 削除)
+  // 5, A39) the standalone study pages have no host header, so the study top bar (× n/N)
   // pins itself: after the reveal it stays on screen on a short passage (km-064-m01, due) and on a
   // word's long contract-v2 first passage (A49) alike, and tier one rests between it and the bar.
   {
@@ -1669,7 +1911,7 @@ async function verifyBack(browser, base) {
         ['study.html', 'kotoba-mine', null, true],
       ]) {
         const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
-        const prefs = JSON.stringify(state ? { look: 'ai', newPerDay: 0 } : { look: 'ai' });
+        const prefs = JSON.stringify(state ? { newPerDay: 0 } : {});
         await context.addInitScript(`try { localStorage.setItem('bunki-cloze:prefs:v3:${deck}', ${JSON.stringify(prefs)});
           ${state ? `localStorage.setItem('bunki-cloze:${deck}', ${JSON.stringify(state)});` : ''} } catch {}`);
         const p = await context.newPage();
@@ -1690,7 +1932,7 @@ async function verifyBack(browser, base) {
       release.server.close();
     }
     check(
-      '5, A39) standalone study pages (no host header): the study top bar pins itself, so at rest after the reveal it is on screen (its top ≥ 0) on a short passage and on a long contract-v2 first passage alike, and the word and definition sit between it and the pinned grade bar',
+      "K098", '5, A39) standalone study pages (no host header): the study top bar pins itself, so at rest after the reveal it is on screen (its top ≥ 0) on a short passage and on a long contract-v2 first passage alike, and the word and definition sit between it and the pinned grade bar',
       seen.length === 3 && seen.every((x) => x.head >= 0 && x.termTop >= x.headBottom && x.term <= x.bar && x.def <= x.bar) && seen[0].card === 'km-064-m01' && index.get(seen[1].card)?.c.register,
       JSON.stringify(seen),
     );
@@ -1708,7 +1950,7 @@ async function verifyBack(browser, base) {
     await o.page.evaluate('window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" })');
     const end = await o.page.evaluate(`(() => { const b = document.querySelector('.kp-grades').getBoundingClientRect(); const s = document.querySelector('#kp-card .kp-f-src > summary').getBoundingClientRect(); return { src: Math.round(s.bottom), bar: Math.round(b.top) }; })()`);
     const z = await o.page.evaluate(`document.getElementById('kp-card').dataset.zoom`);
-    check('e) the longest passage (195 characters): the grade bar is on screen at the top of the page and the 出典 fold scrolls clear of it; a card seen before opens in 焦点', id === 'km-298-m02' && top.bottom === top.expectedBottom && top.viewport === 844 && (top.tabsBottom === null || top.tabsBottom === 844) && top.noOverlap && top.inView && top.hit && end.src <= end.bar && z === 'focus', JSON.stringify({ id, top, end, zoom: z }));
+    check("K099", 'e) the longest passage (195 characters): the grade bar is on screen at the top of the page and the 出典 fold scrolls clear of it; a card seen before opens in 焦点', id === 'km-298-m02' && top.bottom === top.expectedBottom && top.viewport === 844 && (top.tabsBottom === null || top.tabsBottom === 844) && top.noOverlap && top.inView && top.hit && end.src <= end.bar && z === 'focus', JSON.stringify({ id, top, end, zoom: z }));
     await close(o);
   }
 
@@ -1734,7 +1976,7 @@ async function verifyBack(browser, base) {
     }
     const [first, third, fourth, mcdFourth] = seen;
     check(
-      '6) each sitting counts (prefs.sittings); the tap hint shows in the first three sittings of a deck and is gone from the fourth, on both decks; the swipe hint shows on the first back of the first sitting only',
+      "K100", '6) each sitting counts (prefs.sittings); the tap hint shows in the first three sittings of a deck and is gone from the fourth, on both decks; the swipe hint shows on the first back of the first sitting only',
       first.stored === 1 && first.front === 'Recall the meaning, then tap the right side' && first.swipe && third.stored === 3 && !!third.front && !third.swipe && fourth.stored === 4 && fourth.front === null && !fourth.swipe && mcdFourth.stored === 4 && mcdFourth.front === null && !mcdFourth.swipe,
       JSON.stringify(seen),
     );
@@ -1764,7 +2006,7 @@ async function verifyBack(browser, base) {
       const shown = await page.evaluate(`({ id: document.getElementById('kp-card').dataset.card, blank: document.querySelector('#kp-card .kp-blank')?.textContent ?? null })`);
       const l = await page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mcd'))`);
       check(
-        '2) 読んで思い出す (the MCD default) leaves a due 字 card out of the queue — nothing suspended, its record kept; choosing 穴埋め brings it back, blanked with its reading',
+        "K101", '2) 読んで思い出す (the MCD default) leaves a due 字 card out of the queue — nothing suspended, its record kept; choosing 穴埋め brings it back, blanked with its reading',
         read.disabled && read.start === 'Done for today' && modeRead === 'true' && self === 'Begin — 1 card' && shown.id === 'km-064-m02' && shown.blank === '〔ざい〕' && !Object.keys(l.suspended ?? {}).length && l.cards['km-064-m02']?.stability === 20,
         JSON.stringify({ read, modeRead, self, shown, suspended: l.suspended ?? {} }),
       );
@@ -1779,7 +2021,7 @@ async function verifyBack(browser, base) {
     await o.page.click('#kp-reveal');
     await o.page.waitForSelector('.kp-grade');
     const b = await o.page.evaluate(BACK);
-    check('c) on a 字 card 漢字の形と意味 is open by default', b.kanji?.open === true && inOrder(b.summaries), JSON.stringify({ summaries: b.summaries, kanji: b.kanji?.open }));
+    check("K102", 'c) on a 字 card 漢字の形と意味 is open by default', b.kanji?.open === true && inOrder(b.summaries), JSON.stringify({ summaries: b.summaries, kanji: b.kanji?.open }));
     await close(o);
   }
   {
@@ -1790,7 +2032,7 @@ async function verifyBack(browser, base) {
     const b = await o.page.evaluate(BACK);
     const z = await o.page.evaluate(`({ zoom: document.querySelectorAll('.kp-zoom, .kp-s').length, data: document.getElementById('kp-card').dataset.zoom ?? null })`);
     check(
-      'c, d, 4, 7) sentence deck: 英語 stays open with 設定 › いつも開いておく, 英訳 is the sentence, the same fold order with 「この語の他の文」 and 出典 (site, licence, no passage number) last, and no zoom',
+      "K103", 'c, d, 4, 7) sentence deck: 英語 stays open with 設定 › いつも開いておく, 英訳 is the sentence, the same fold order with 「この語の他の文」 and 出典 (site, licence, no passage number) last, and no zoom',
       b.gloss?.open === true && b.gloss.text.startsWith(w.meaning) && b.en?.text === c.en && inOrder(b.summaries) && b.order.at(-1) === 'kp-folds' && b.summaries.at(-1) === 'Source' &&
         (w.cards.length > 1 ? b.others?.summary === `Other sentences for this word (${w.cards.length - 1})` : !b.others) && b.src?.text.includes(c.src.site) && b.src.text.includes(c.src.licence) && !/(?:文章|Passage )\d/.test(b.src.text) && z.zoom === 0 && z.data === null && !b.bare,
       JSON.stringify({ card: c.id, summaries: b.summaries, gloss: b.gloss?.open, src: b.src?.text, zoom: z }),
@@ -1817,7 +2059,7 @@ async function verifyBack(browser, base) {
     }
     const [fresh, learning, review, none] = seen;
     check(
-      'c) 類語 appears only when the word has entries and the card is in review state (closed, after 漢字), never on a new or learning card; a card in review opens 焦点',
+      "K104", 'c) 類語 appears only when the word has entries and the card is in review state (closed, after 漢字), never on a new or learning card; a card in review opens 焦点',
       // the new card is the word's first passage (a contract-v2 one since A49), the others km-064-m01
       seen.every((x) => x.id === (x === fresh ? index.get(x.id)?.w.cards[0].id : 'km-064-m01') && x.order) && index.get(fresh.id)?.w.id === 'km-064' && !fresh.sem && !learning.sem && review.sem && review.closed && review.text.includes('家計') && !none.sem && fresh.zoom === 'full' && review.zoom === 'focus',
       JSON.stringify(seen.map(({ label, id, sem, zoom }) => ({ label, id, sem, zoom }))),
@@ -1856,7 +2098,7 @@ async function verifyReviewData(decks) {
       mine: freshOf(mine, 'km-064', ['km-064-1']),
     };
     check(
-      'a) 削除 on a card never shown does not hold the word: the next passage (not that passage\'s 字 cards) becomes its first; deleting a 字 card leaves its passage first',
+      "K105", 'a) 削除 on a card never shown does not hold the word: the next passage (not that passage\'s 字 cards) becomes its first; deleting a 字 card leaves its passage first',
       mcd.words.find((w) => w.id === 'km-064').cards.slice(0, 4).map((c) => c.id).join() === [...v2, 'km-064-m01'].join() &&
         got.mcd.join() === 'km-064-m07' && got.mcdOrigin.join() === 'km-064-m04' && got.mcdKanji.join() === 'km-064-m06' && got.mine.join() === 'km-064-2',
       JSON.stringify(got),
@@ -1876,14 +2118,14 @@ async function verifyReviewData(decks) {
     const self = buildQueue(mcd, state, now, 5000, { skip: skipFor('self') });
     const isJi = (id) => ji.includes(id);
     check(
-      `2) 読んで思い出す leaves all ${ji.length} 字 cards out of the queue (none due, none new) without suspending them; 穴埋め and 4択 keep them (skipFor)`,
+      "K106", `2) 読んで思い出す leaves all ${ji.length} 字 cards out of the queue (none due, none new) without suspending them; 穴埋め and 4択 keep them (skipFor)`,
       ji.length > 500 && !read.queue.some(isJi) && self.due.filter(isJi).length >= 1 && self.queue.some(isJi) && skipFor('choice') === null && JSON.stringify(state) === before && !state.suspended?.length,
       JSON.stringify({ read: { due: read.due.length, fresh: read.fresh.length, ji: read.queue.filter(isJi).length }, self: { due: self.due.length, ji: self.queue.filter(isJi).length } }),
     );
   }
   const constant = (name) => engine.match(new RegExp(`const ${name} = (\\d+);`))?.[1];
   check(
-    'b) the leech threshold is 5 lapses (LEECH_LAPSES, contract §4); the unlock constants are unchanged (14 days, 3 lapses)',
+    "K107", 'b) the leech threshold is 5 lapses (LEECH_LAPSES, contract §4); the unlock constants are unchanged (14 days, 3 lapses)',
     constant('LEECH_LAPSES') === '5' && constant('UNLOCK_STABILITY_DAYS') === '14' && constant('UNLOCK_AFTER_LAPSES') === '3',
     `LEECH_LAPSES ${constant('LEECH_LAPSES')} · UNLOCK_STABILITY_DAYS ${constant('UNLOCK_STABILITY_DAYS')} · UNLOCK_AFTER_LAPSES ${constant('UNLOCK_AFTER_LAPSES')}`,
   );
@@ -1904,7 +2146,7 @@ async function verifyReviewData(decks) {
       const glyphs = [...w.term];
       if (glyphs.every((ch) => KANJI_RE.test(ch) && ch !== '々') && new Set(glyphs).size === glyphs.length && w.kanji.length === glyphs.length && w.kanji.every((k) => k.r) && w.kanji.map((k) => k.r).join('') !== w.reading) bad.push(`${w.id} ${w.term}: ${w.kanji.map((k) => k.r).join('+')} ≠ ${w.reading}`);
     }
-  check('c) each kanji of a word carries its reading in that word (kanji[].r, from the kanji table, never guessed): kana only, and together they spell an all-kanji word', bad.length === 0 && n / all > 0.9, bad.slice(0, 3).join(' | ') || `${n / decks.length}/${all / decks.length} kanji per deck`);
+  check("K108", 'c) each kanji of a word carries its reading in that word (kanji[].r, from the kanji table, never guessed): kana only, and together they spell an all-kanji word', bad.length === 0 && n / all > 0.9, bad.slice(0, 3).join(' | ') || `${n / decks.length}/${all / decks.length} kanji per deck`);
   // the Anki back: the same family, over the words before this one in deck order (Anki's new-card order)
   const release = resolve(REPO_DIR, 'decks/kotoba-mine/release');
   const wrong = [];
@@ -1923,7 +2165,7 @@ async function verifyReviewData(decks) {
       if (JSON.stringify(got) !== JSON.stringify(want)) wrong.push(`${d.id} ${r[0]}`);
     }
   }
-  check('c) parity: the Anki 漢字 fold lists the kanji family (同 / 読) over the words before it in deck order, as the player derives it', wrong.length === 0 && rows > 0, wrong.slice(0, 3).join(' | ') || `${rows} notes with a family`);
+  check("K109", 'c) parity: the Anki 漢字 fold lists the kanji family (同 / 読) over the words before it in deck order, as the player derives it', wrong.length === 0 && rows > 0, wrong.slice(0, 3).join(' | ') || `${rows} notes with a family`);
 }
 
 async function verifyReview(browser, base) {
@@ -1942,7 +2184,7 @@ async function verifyReview(browser, base) {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await context.addInitScript(SEEDED);
     await context.addInitScript(`try { if (!sessionStorage.getItem('__review_seeded')) { sessionStorage.setItem('__review_seeded', '1');
-      localStorage.setItem('bunki-cloze:prefs:v3:${deck}', ${JSON.stringify(JSON.stringify({ newPerDay: 0, ruleSeen: true, ...prefs }))});
+      localStorage.setItem('bunki-cloze:prefs:v3:${deck}', ${JSON.stringify(JSON.stringify({ newPerDay: 0, againCoachSeen: true, ...prefs }))});
       localStorage.setItem('bunki-cloze:${deck}', ${JSON.stringify(state)}); } } catch {}`);
     if (inject) {
       await context.route(`**/decks/${deck}/deck.json`, async (route) => {
@@ -1964,7 +2206,7 @@ async function verifyReview(browser, base) {
     return { context, page, errors, boot };
   };
   const close = async (o) => {
-    if (o.errors.length) check('no page errors in the review loop', false, o.errors.slice(0, 2).join(' | '));
+    if (o.errors.length) check("K110", 'no page errors in the review loop', false, o.errors.slice(0, 2).join(' | '));
     await o.context.close();
   };
   const read = (page, deck) => page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:${deck}'))`);
@@ -1978,7 +2220,9 @@ async function verifyReview(browser, base) {
     await page.waitForSelector('.kp-grade');
   };
 
-  // a) 削除: one tap, out of the sitting and the queue, record untouched; 元に戻す; 設定 › 保留中のカード › 復元
+  // a) 削除: never on a front (Hfix-1B, the lead's round-1 ruling on HG-5: removing a card is an explicit act after the
+  //    answer is seen); on the back it is the card's last quiet row, after the answer and its folds, outside the top bar and
+  //    the grade bar. One tap there takes the card out of the sitting and the queue, record untouched; 元に戻す; 設定 › 保留中のカード › 復元
   for (const [q, deck, a, b] of [
     ['?deck=mcd', 'kotoba-mcd', 'km-064-m01', 'km-065-m01'],
     ['?deck=kotoba', 'kotoba-mine', 'km-064-1', 'km-065-1'],
@@ -1986,11 +2230,31 @@ async function verifyReview(browser, base) {
     const o = await open(q, deck, ledger(deck, [card(a, { due: '2020-01-01T00:00:00.000Z' }), card(b, { due: '2020-01-02T00:00:00.000Z' })]));
     try {
       await start(o.page);
+      const front = await o.page.evaluate(`(() => { const top = document.querySelector('.kp-top-study'); const words = (n) => (n?.innerText || '').replace(/\\s+/g, ' ');
+        return { del: document.querySelectorAll('#kp-delete, .kp-delete').length, topButtons: [...(top?.querySelectorAll('button') || [])].map((n) => n.id || n.className),
+          removeWords: /Remove|削除/.test(words(document.querySelector('.kp-study'))),
+          hang: getComputedStyle(document.querySelector('#kp-card .kp-sentence')).hangingPunctuation ?? null,
+          mark: (() => { const t = document.querySelector('#kp-card .kp-target'); const cs = t && getComputedStyle(t); return cs ? { image: cs.backgroundImage, wash: cs.backgroundColor } : null; })() }; })()`);
+      // Hfix-1B (H-yoru-01; §7 line 38): the marked word is marked by its wash alone, with no corner marks drawn on it.
+      // INT-VH: K161/K162 are this deck loop's own ids, declared in vh-deck-report-contracts KOTOBA_SITES (per deck, as K111/K112)
+      check(`K161/${deck}`, `a) ${deck}: the front's marked word carries no corner marks (no drawn layer on it), only its wash`,
+        !!front.mark && front.mark.image === 'none' && !/rgba\(0, 0, 0, 0\)|transparent/u.test(front.mark.wash), JSON.stringify(front.mark));
+      // Hfix-1B: WebKit (the iPhone's engine) painted a line's hung 「ど、」 a second time at the next line's start; the deck's
+      // passage hangs no punctuation (Chromium has no such property: null there, and nothing to paint twice)
+      check(`K162/${deck}`, `a) ${deck}: the front's passage hangs no punctuation (${actualEngine}: ${front.hang ?? 'no such property'})`,
+        actualEngine === 'webkit' ? front.hang === 'none' : front.hang === null || front.hang === 'none', JSON.stringify({ hang: front.hang }));
       await revealCard(o.page);
+      // the reveal's crossfade holds an inert copy of the front (its quit button without its id) over the screen, and a
+      // polish band crosses the card, for under 0.4 s: the back is read once both have gone
+      await o.page.waitForFunction(() => !document.querySelector('.kp-reveal-hold') && !document.querySelector('#kp-card > .kp-polish'), null, { timeout: 3000 });
       const first = await onScreen(o.page);
       const before = await read(o.page, deck);
       const tools = await o.page.evaluate(`(() => { const d = document.getElementById('kp-delete'); d.scrollIntoView({ block: 'center' }); const r = d.getBoundingClientRect(); const cx = r.left + r.width / 2, cy = r.top + r.height / 2; const at = (dy) => document.elementFromPoint(cx, cy + dy) === d;
-        return { inTop: !!d.closest('.kp-top-study') && !d.closest('#kp-card'), lastInTop: d.parentElement.lastElementChild === d, h: Math.round(r.height), reach: at(-21) && at(21), label: d.textContent }; })()`);
+        const row = d.parentElement, face = document.getElementById('kp-card');
+        return { inCard: !!face && face.contains(d), quietRow: row.classList.contains('kp-card-tools') && row.parentElement === face && face.lastElementChild === row && row.children.length === 1,
+          afterAnswer: !!face?.querySelector('.kp-answer') && !!(face.querySelector('.kp-answer').compareDocumentPosition(row) & Node.DOCUMENT_POSITION_FOLLOWING),
+          outsideBars: !d.closest('.kp-top-study, .kp-grades'), topButtons: [...document.querySelectorAll('.kp-top-study button')].map((n) => n.id || n.className),
+          h: Math.round(r.height), reach: at(-21) && at(21), label: d.textContent }; })()`);
       await o.page.click('#kp-delete');
       await o.page.waitForSelector('#kp-toast-undo');
       const gone = await onScreen(o.page);
@@ -2014,14 +2278,17 @@ async function verifyReview(browser, base) {
       const homeAfter = await o.page.evaluate(`document.getElementById('kp-start').textContent`);
       const lastRow = l1.repairLog?.at(-1) ?? [];
       check(
-        `a) ${deck}: 削除 at the right end of the study top bar (one tap, 44px reach) takes the card out of the sitting at once, keeps its FSRS record and id, and says how to undo; 元に戻す brings it back on screen`,
-        tools.inTop && tools.lastInTop && tools.h >= 44 && tools.reach && tools.label === 'Remove' && first.id === a && first.count === '1/2' && gone.id === b && gone.count === '1/1' && gone.undo && /Card removed/.test(gone.toast) &&
+        // Hfix-1B (the lead's ruling on HG-5) supersedes the old "削除 at the right end of the study top bar" row that held K111
+        `K111/${deck}`, `a) ${deck}: no 削除 on the front (nothing in its top bar but ×, no Remove word anywhere on it); on the back 削除 is the card's last quiet row, after the answer, outside the top bar and the grades (one tap, 44px reach), and takes the card out of the sitting at once, keeps its FSRS record and id, and says how to undo; 元に戻す brings it back on screen`,
+        front.del === 0 && JSON.stringify(front.topButtons) === '["kp-quit"]' && !front.removeWords &&
+          tools.inCard && tools.quietRow && tools.afterAnswer && tools.outsideBars && JSON.stringify(tools.topButtons) === '["kp-quit"]' &&
+          tools.h >= 44 && tools.reach && tools.label === 'Remove this card' && first.id === a && first.count === '1/2' && gone.id === b && gone.count === '1/1' && gone.undo && /Card removed/.test(gone.toast) &&
           l1.suspended?.[a]?.by === 'delete' && JSON.stringify(l1.cards[a]) === JSON.stringify(before.cards[a]) && lastRow[0] === a && lastRow[1] === 'delete' && !l1.suspended?.[b] &&
           back.id === a && back.revealed && back.count === '1/2' && !l2.suspended?.[a],
-        JSON.stringify({ tools, first: first.id, gone, back: back.id, suspended: l1.suspended, row: lastRow.slice(0, 2) }),
+        JSON.stringify({ front, tools, first: first.id, gone, back: back.id, suspended: l1.suspended, row: lastRow.slice(0, 2) }),
       );
       check(
-        `a) ${deck}: after a reload the deleted card is not in the queue; 設定 › 保留中のカード counts it and 復元 puts it back (logged), with the record as it was`,
+        `K112/${deck}`, `a) ${deck}: after a reload the deleted card is not in the queue; 設定 › 保留中のカード counts it and 復元 puts it back (logged), with the record as it was`,
         /^Begin — 1 card$/.test(home) && /^1 card \(Remove 1\)$/.test(counted) && after.text === 'None' && after.disabled && Object.keys(l3.suspended).length === 0 && l3.repairLog.at(-1)[1] === 'restore' && l3.repairLog.at(-1)[0] === a && JSON.stringify(l3.cards[a]) === JSON.stringify(before.cards[a]) && /2 cards/.test(homeAfter),
         JSON.stringify({ home, counted, after, homeAfter }),
       );
@@ -2045,24 +2312,23 @@ async function verifyReview(browser, base) {
       await o.page.click('#kp-ladder-hint');
       await o.page.waitForSelector('.kp-grade');
       const hinted = { ladder: await o.page.locator('#kp-ladder').count(), ledger: await read(o.page, 'kotoba-mcd') };
-      await o.page.click('#kp-grade-good');
-      await o.page.waitForSelector('#kp-card');
+      await gradeToNext(o.page, 'bunki-cloze:kotoba-mcd');
       const second = await onScreen(o.page);
       await revealCard(o.page);
       const noLadder = await o.page.locator('#kp-ladder').count();
       check(
-        'b) a card with 5 lapses shows the repair ladder after tier one (the definition or usage note) and before the folds, in order 別の文に替える → ヒントを付ける → 保留 (and このまま続ける); a card with 4 does not',
+        "K113", 'b) a card with 5 lapses shows the repair ladder after tier one (the definition or usage note) and before the folds, in order 別の文に替える → ヒントを付ける → 保留 (and このまま続ける); a card with 4 does not',
         ladder && ladder.head === 'Difficulty on this sentence: 5 times' && ladder.steps.join() === 'swap,hint,suspend' && ladder.labels.join('/') === 'Use another sentence/Add a hint/Pause' && ladder.enabled.every(Boolean) && ladder.swapTo.startsWith(`Passage ${swapOf('km-064-m01').passage} `) && ladder.afterTierOne && ladder.beforeFolds && ladder.inAnswer && ladder.keep && second.id === 'km-065-m01' && noLadder === 0,
         JSON.stringify({ ladder, second: second.id, noLadder }),
       );
       check(
-        'b) with the ladder shown on km-064-m01 at 390×844, the revealed word (.kp-term) and its definition sit inside the first screen, above the grade bar, with no scroll',
+        "K114", 'b) with the ladder shown on km-064-m01 at 390×844, the revealed word (.kp-term) and its definition sit inside the first screen, above the grade bar, with no scroll',
         firstScreen.scrollY === 0 && firstScreen.vh === 844 && firstScreen.term[0] >= 0 && firstScreen.term[1] <= firstScreen.bar && firstScreen.def[1] <= firstScreen.bar,
         JSON.stringify(firstScreen),
       );
       const r = hinted.ledger.repairs?.['km-064-m01'];
       check(
-        'b) ヒントを付ける: one tap stores the hint for this card in the ledger (repairs, logged), the ladder closes, and the card is still graded as usual',
+        "K115", 'b) ヒントを付ける: one tap stores the hint for this card in the ledger (repairs, logged), the ladder closes, and the card is still graded as usual',
         hinted.ladder === 0 && r?.hint === 'ざ○○○' && r.lapses === 5 && hinted.ledger.repairLog.at(-1).join('|').startsWith('km-064-m01|hint|') && hinted.ledger.log.length === 0 && second.id === 'km-065-m01',
         JSON.stringify({ repairs: hinted.ledger.repairs, row: hinted.ledger.repairLog.at(-1) }),
       );
@@ -2078,11 +2344,10 @@ async function verifyReview(browser, base) {
       const f1 = await o.page.evaluate(`({ id: document.getElementById('kp-card').dataset.card, repaired: document.getElementById('kp-card').dataset.repaired ?? null, hint: document.querySelector('#kp-card .kp-rhint')?.textContent ?? null })`);
       await revealCard(o.page);
       const b1 = await o.page.evaluate(`({ rhint: document.querySelectorAll('#kp-card .kp-rhint').length, ladder: !!document.getElementById('kp-ladder') })`);
-      await o.page.click('#kp-grade-good');
-      await o.page.waitForSelector('#kp-card');
+      await gradeToNext(o.page, 'bunki-cloze:kotoba-mcd');
       const f2 = await o.page.evaluate(`({ id: document.getElementById('kp-card').dataset.card, repaired: document.getElementById('kp-card').dataset.repaired ?? null, hint: document.querySelectorAll('#kp-card .kp-rhint').length })`);
       check(
-        'b) the hint shows on the front of the repaired card only (marked data-repaired, gone after the reveal); the next card has none; no ladder until it lapses again',
+        "K116", 'b) the hint shows on the front of the repaired card only (marked data-repaired, gone after the reveal); the next card has none; no ladder until it lapses again',
         f1.id === 'km-064-m01' && f1.repaired === 'hint' && f1.hint === 'Hintざ○○○' && b1.rhint === 0 && !b1.ladder && f2.id === 'km-065-m01' && f2.repaired === null && f2.hint === 0,
         JSON.stringify({ f1, b1, f2 }),
       );
@@ -2106,7 +2371,7 @@ async function verifyReview(browser, base) {
       const reloaded = await onScreen(o.page);
       const target = swapOf('km-064-m01');
       check(
-        'b) 別の文に替える: one tap suspends the leech (record and the word\'s other progress kept), logs the swap, and puts the word\'s next unseen passage on screen, due at once — still first after a reload',
+        "K117", 'b) 別の文に替える: one tap suspends the leech (record and the word\'s other progress kept), logs the swap, and puts the word\'s next unseen passage on screen, due at once — still first after a reload',
         now.id === target.id && !now.revealed && now.count === '1/1' && /Changed to another sentence/.test(now.toast) && now.undo && l.suspended['km-064-m01']?.by === 'swap' && l.repairs['km-064-m01']?.swap === target.id && JSON.stringify(l.cards['km-064-m01']) === JSON.stringify(before.cards['km-064-m01']) && !l.cards[target.id] && l.repairLog.at(-1).join('|').startsWith(`km-064-m01|swap|`) && l.repairLog.at(-1)[3] === target.id && reloaded.id === target.id && reloaded.count === '1/1',
         JSON.stringify({ now, reloaded: reloaded.id, target: target.id, suspended: l.suspended, repairs: l.repairs }),
       );
@@ -2126,7 +2391,7 @@ async function verifyReview(browser, base) {
       const now = await onScreen(o.page);
       const l = await read(o.page, 'kotoba-mine');
       check(
-        'b) 保留 (sentence deck): one tap suspends the leech (by leech, logged as suspend) and the next card comes up; on a sentence card the swap names 例文2',
+        "K118", 'b) 保留 (sentence deck): one tap suspends the leech (by leech, logged as suspend) and the next card comes up; on a sentence card the swap names 例文2',
         swapTo.startsWith('Example 2 ') && now.id === 'km-065-1' && /Card paused/.test(now.toast) && l.suspended['km-064-1']?.by === 'leech' && l.repairLog.at(-1)[1] === 'suspend' && l.repairs['km-064-1']?.lapses === 6,
         JSON.stringify({ swapTo, now, suspended: l.suspended, row: l.repairLog.at(-1) }),
       );
@@ -2144,7 +2409,7 @@ async function verifyReview(browser, base) {
       await o.page.waitForSelector('.kp-grade');
       const kept = { ladder: await o.page.locator('#kp-ladder').count(), r: (await read(o.page, 'kotoba-mcd')).repairs['km-064-m02'] };
       check(
-        'b) a 字 card has no passage to swap to (step disabled, said so) and its hint is the kanji\'s parts; このまま続ける closes the ladder until the next lapse (logged as keep)',
+        "K119", 'b) a 字 card has no passage to swap to (step disabled, said so) and its hint is the kanji\'s parts; このまま続ける closes the ladder until the next lapse (logged as keep)',
         ji.swap === true && ji.why === 'No alternative sentence available' && ji.hint === 'Show “貝＋才” on the front' && kept.ladder === 0 && kept.r?.keep === true && kept.r.lapses === 5,
         JSON.stringify({ ji, kept }),
       );
@@ -2174,11 +2439,11 @@ async function verifyReview(browser, base) {
       await o.page.waitForSelector('#kp-card');
       const back = await onScreen(o.page);
       check(
-        'c) 漢字の形と意味 lists the learner\'s own words sharing a kanji (同 財閥) or a kanji reading (読 制圧 for せい, 自由自在 for ざい), with the reading, each a 44px link; words not met yet (財物, 起爆剤…) are left out',
+        "K120", 'c) 漢字の形と意味 lists the learner\'s own words sharing a kanji (同 財閥) or a kanji reading (読 制圧 for せい, 自由自在 for ざい), with the reading, each a 44px link; words not met yet (財物, 起爆剤…) are left out',
         JSON.stringify(shape) === JSON.stringify(want) && JSON.stringify(shape) === JSON.stringify([{ c: '財', same: ['財閥'], read: ['自由自在'] }, { c: '政', same: [], read: ['制圧'] }]) && fam[0].r === 'ざい' && fam[1].r === 'せい' && famReach,
         JSON.stringify(fam),
       );
-      check('c) each family word opens its row in 語の一覧, and ← returns to the card, still revealed', list.title === 'Word list' && list.open === 'km-188' && list.detail && back.id === 'km-064-m01' && back.revealed, JSON.stringify({ list, back }));
+      check("K121", 'c) each family word opens its row in 語の一覧, and ← returns to the card, still revealed', list.title === 'Word list' && list.open === 'km-188' && list.detail && back.id === 'km-064-m01' && back.revealed, JSON.stringify({ list, back }));
     } finally {
       await close(o);
     }
@@ -2190,7 +2455,7 @@ async function verifyReview(browser, base) {
       await start(o.page);
       await revealCard(o.page);
       const none = await o.page.evaluate(`({ kfam: document.querySelectorAll('#kp-card .kp-kfam').length, tiles: document.querySelectorAll('#kp-card .kp-kj').length, see: !!document.getElementById('kp-see') })`);
-      check('c, d) with no other word met, the kanji fold holds the anatomy only; with no see-also or grammar in the deck there is no 参照 line', none.kfam === 0 && none.tiles === 2 && !none.see, JSON.stringify(none));
+      check("K122", 'c, d) with no other word met, the kanji fold holds the anatomy only; with no see-also or grammar in the deck there is no 参照 line', none.kfam === 0 && none.tiles === 2 && !none.see, JSON.stringify(none));
     } finally {
       await close(o);
     }
@@ -2220,7 +2485,7 @@ async function verifyReview(browser, base) {
       await o.page.waitForSelector('.kp-row.is-open');
       const opened = await o.page.evaluate(`document.querySelector('.kp-row.is-open')?.dataset.word`);
       check(
-        'd) a see-also and a grammar id in the deck show as one line right after the kanji fold: 参照 links to a deck word (語の一覧) and shows a word outside the deck as text; in the corridor the grammar point opens the corridor’s grammar sheet through the host adapter',
+        "K123", 'd) a see-also and a grammar id in the deck show as one line right after the kanji fold: 参照 links to a deck word (語の一覧) and shows a word outside the deck as text; in the corridor the grammar point opens the corridor’s grammar sheet through the host adapter',
         see && see.inFolds && see.prev === 'kp-fold kp-f-kanji' && see.labels.join() === 'See also,Grammar' && see.links.join() === 'km-188,grammar:n4-nagara' && see.items.join() === '国家予算' && /^grammar:/.test(sheet.node || '') && /ながら/.test(sheet.head || '') && opened === 'km-188',
         JSON.stringify({ see, sheet, opened }),
       );
@@ -2242,7 +2507,7 @@ const PAINT = `(() => {
   const color = (sel) => { const n = card.querySelector(sel) || document.querySelector(sel); return n ? getComputedStyle(n).color : null; };
   const chips = [...card.querySelectorAll('.kp-chips > .kp-chip')];
   const out = {
-    look: kp.dataset.look, kind: card.dataset.kind, classes: card.className, topicVar: card.style.getPropertyValue('--kp-topic'),
+    kind: card.dataset.kind, classes: card.className, topicVar: card.style.getPropertyValue('--kp-topic'),
     edge: getComputedStyle(card).borderLeftColor, kindChip: chips[0]?.textContent, kindChipColor: chips[0] ? getComputedStyle(chips[0]).color : null,
     edgeTop: getComputedStyle(card).borderTopColor, edgeWidth: getComputedStyle(card).borderLeftWidth, drawn: chips.filter((c) => c.getClientRects().length).map((c) => c.textContent),
     chips: chips.map((c) => c.textContent), level: card.querySelector('.kp-levelchip')?.textContent ?? null, levelLabel: card.querySelector('.kp-levelchip')?.getAttribute('aria-label') ?? null,
@@ -2391,7 +2656,7 @@ function verifyLevels(decks) {
       if (w.level) n++;
     }
   const named = decks.every((d) => (d.method ?? []).some((line) => line.includes('目安') && line.includes('open-anki-jlpt-decks')));
-  check('b) word.level comes from the public list (wbig.json, joined on headword and reading, one level only) and the method names the list as a 目安', bad.length === 0 && n > 0 && named, bad.slice(0, 3).join(' | ') || `${n / decks.length} of ${decks[0].words.length} words levelled per deck`);
+  check("K124", 'b) word.level comes from the public list (wbig.json, joined on headword and reading, one level only) and the method names the list as a 目安', bad.length === 0 && n > 0 && named, bad.slice(0, 3).join(' | ') || `${n / decks.length} of ${decks[0].words.length} words levelled per deck`);
 }
 
 async function verifyVisual(browser, base) {
@@ -2400,23 +2665,44 @@ async function verifyVisual(browser, base) {
   verifyLevels([mcd, sent]);
   const { rows, failures: low } = contrastTable();
   check(
-    'c) contrast (tools/contrast-kotoba.mjs, read from player.css): passage ≥ 7, body, gloss, muted text, every chip, state, accent and part-of-speech colour ≥ 4.5 in all eight themes',
+    "K125", 'c) contrast (tools/contrast-kotoba.mjs, read from player.css): the standalone sheet (the frozen study pages: the default world by day) — passage ≥ 7, body, gloss, muted text, every chip, state, accent and part-of-speech colour ≥ 4.5',
     low.length === 0,
     low.slice(0, 3).join(' | ') || rows.map((r) => `${r.look} ${Math.min(...Object.values(r).filter((v) => typeof v === 'number'))}`).join(' · '),
   );
 
   const ji = kindJiTable();
   check(
-    `7) the 字 hue (a 字 card's edge and chip) is at least ΔE_ok ${KIND_JI_FLOOR} from every other hue of its theme (washi and sakura no longer share the verb's blue; 墨, 白 and 抹茶 moved off the sound-word pink)`,
+    "K126", `7) the 字 hue (a 字 card's edge and chip) is at least ΔE_ok ${KIND_JI_FLOOR} from every other hue of the standalone sheet`,
     ji.failures.length === 0,
     ji.failures.slice(0, 3).join(' | ') || ji.rows.map((r) => `${r.look} ${r.value} ΔE${r.deltaE} (${r.nearest})`).join(' · '),
   );
 
+  // one material (the one-hand pass): the hosted deck in every world, measured in the browser as the
+  // page resolves the room's roles — the default and the ten public worlds, by day and at night, on the
+  // home and in a sitting (the stage and the dock)
+  const worlds = await contrastByWorld({ base, browser });
+  check(
+    "K127", 'c) the deck in all eleven worlds (hosted; home and sitting): passage ≥ 7, body, gloss, muted text, every chip, state, accent, part-of-speech, stage and dock colour ≥ 4.5',
+    worlds.failures.length === 0 && worlds.rows.length === 22,
+    worlds.failures.slice(0, 3).join(' | ') || worlds.rows.map((r) => `${r.look} ${Math.min(...Object.values(r).filter((v) => typeof v === 'number'))}`).join(' · '),
+  );
+  check(
+    "K128", `7) the 字 hue is at least ΔE_ok ${KIND_JI_FLOOR} from every other hue of its material, in every world, by day and at night`,
+    worlds.ji.failures.length === 0 && worlds.ji.rows.length === 22,
+    worlds.ji.failures.slice(0, 3).join(' | ') || worlds.ji.rows.map((r) => `${r.look} ΔE${r.deltaE} (${r.nearest})`).join(' · '),
+  );
+  check(
+    "K129", "one material: in every world the deck's ground is the world's own page and it carries no look of its own",
+    worlds.sheets.length === 22 && worlds.sheets.every((s) => s.look === null) && worlds.sheets.filter((s) => s.name.endsWith('·home')).every((s) => s.page && s.deck.join() === s.page.join()),
+    JSON.stringify(worlds.sheets.filter((s) => s.look !== null || (s.name.endsWith('·home') && (!s.page || s.deck.join() !== s.page.join()))).slice(0, 3)),
+  );
+
   const due = (deck, id) => JSON.stringify({ format: 'bunki-cloze-state', version: 1, deckId: deck, groupsOff: [], log: [], cards: { [id]: { due: '2020-01-01T00:00:00.000Z', stability: 20, difficulty: 5, state: 2, reps: 3, lapses: 0, elapsed_days: 20, scheduled_days: 20 } } });
-  const open = async (q, deck, { prefs = null, state = null, reduce = false, start = true } = {}) => {
+  const open = async (q, deck, { prefs = null, state = null, reduce = false, start = true, world = null } = {}) => {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await context.addInitScript(SEEDED);
     await context.addInitScript(`try { if (!sessionStorage.getItem('__vis_seeded')) { sessionStorage.setItem('__vis_seeded', '1');
+      ${world ? `localStorage.setItem('kairo-theme', ${JSON.stringify(world)});` : ''}
       ${prefs ? `localStorage.setItem('bunki-cloze:prefs:v3:${deck}', ${JSON.stringify(JSON.stringify(prefs))});` : ''}
       ${state ? `localStorage.setItem('bunki-cloze:${deck}', ${JSON.stringify(state)});` : ''} } } catch {}`);
     const page = await context.newPage();
@@ -2433,7 +2719,7 @@ async function verifyVisual(browser, base) {
     return { context, page, errors };
   };
   const close = async (o) => {
-    if (o.errors.length) check('no page errors in the visual checks', false, o.errors.slice(0, 2).join(' | '));
+    if (o.errors.length) check("K130", 'no page errors in the visual checks', false, o.errors.slice(0, 2).join(' | '));
     await o.context.close();
   };
   const reveal = async (page) => {
@@ -2450,16 +2736,17 @@ async function verifyVisual(browser, base) {
     await o.page.waitForSelector('#kp-backup');
     const set = await o.page.evaluate(`(() => { const m = document.querySelector('.kp-settings #kp-method'); return { method: !!m, summary: m?.querySelector('summary')?.textContent, lines: m ? m.querySelectorAll('p').length : 0, groups: document.querySelectorAll('.kp-settings [role="radiogroup"]').length }; })()`);
     check(
-      'a) the deck home has no 見て覚えるコツ panel, no method panel and no topic hue on its rows; このデッキのしくみ sits in 設定 with every line of the method',
-      home.tips === 0 && home.method === 0 && home.topic === 0 && set.method && set.summary === 'How this deck works' && set.lines === mcd.method.length && set.groups === 4,
+      "K131", 'a) the deck home has no 見て覚えるコツ panel, no method panel and no topic hue on its rows; このデッキのしくみ sits in 設定 with every line of the method, beside three choice rows (no 色 picker: the deck wears the world)',
+      home.tips === 0 && home.method === 0 && home.topic === 0 && set.method && set.summary === 'How this deck works' && set.lines === mcd.method.length && set.groups === 3,
       JSON.stringify({ home, set }),
     );
     await close(o);
   }
 
-  // b) a new MCD 語 card with a level (財政 N1), front and back, in 墨 and 白
-  for (const look of ['dark', 'light']) {
-    const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { look } });
+  // b) a new MCD 語 card with a level (財政 N1), front and back, by day (ベロ藍) and at night (紺紙)
+  for (const world of ['hokusai', 'yoru']) {
+    const look = world;
+    const o = await open('?deck=mcd', 'kotoba-mcd', { world });
     const front = await o.page.evaluate(PAINT);
     await reveal(o.page);
     await o.page.evaluate(`document.querySelectorAll('#kp-card details').forEach((d) => (d.open = true))`);
@@ -2472,7 +2759,7 @@ async function verifyVisual(browser, base) {
     // figure drawn in the head. The 語 colour, the kind chip and 初めて stay on the standalone pages; in
     // the app the kind and state chips are built but not drawn.
     check(
-      `a, b) ${look}: the 語 card has one hairline edge, the same colour all round (no kind stripe, no level 1–3 edge, no topic hue); its kind chip (Word) and 初めて are built but not drawn; the target and term are bold ink with no underline; the level N1 is the one chip drawn, in ink-2 with no fill, with its 目安 label`,
+      `K132/${world}`, `a, b) ${look}: the 語 card has one hairline edge, the same colour all round (no kind stripe, no level 1–3 edge, no topic hue); its kind chip (Word) and 初めて are built but not drawn; the target and term are bold ink with no underline; the level N1 is the one chip drawn, in ink-2 with no fill, with its 目安 label`,
       front.kind === 'go' && !/kp-lv\d|kp-topic/.test(front.classes) && !front.topicVar && front.edgeWidth === '1px' && front.edge === front.edgeTop && front.edge !== t['kind-go'] && front.kindChip === 'Word' && front.drawn.join() === 'N1' &&
         back.target === t.ink && back.targetWeight === '700' && back.targetLine === 'none' && back.term === t.ink && front.state !== null &&
         w.level === 'N1' && front.level === 'N1' && front.levelLabel === 'N1 equivalent (estimated from public lists)' && front.levelColor === t['ink-2'] && front.levelBg === 'rgba(0, 0, 0, 0)',
@@ -2484,7 +2771,7 @@ async function verifyVisual(browser, base) {
     const hue = (c) => /^oklch\(([\d.]+) 0\.14 (\d+)\)$/.exec(c || '');
     const hues = [back.again, back.hard, back.good, back.easy].map((c) => +hue(c)?.[2]);
     check(
-      `b) ${look}: English is never coloured (gloss, 英訳 and the note in ink-2, no amber bar on the note); the four grades are red, amber, green and blue`,
+      `K133/${world}`, `b) ${look}: English is never coloured (gloss, 英訳 and the note in ink-2, no amber bar on the note); the four grades are red, amber, green and blue`,
       back.gloss === t['ink-2'] && back.en === t['ink-2'] && back.tip === t['ink-2'] && back.tipBar === '0px' && hues.join() === '28,75,150,255' && new Set([back.again, back.hard, back.good, back.easy].map((c) => hue(c)?.[1])).size === 1,
       JSON.stringify({ gloss: back.gloss, en: back.en, tip: back.tip, tipBar: back.tipBar, again: back.again, hard: back.hard, good: back.good, easy: back.easy }),
     );
@@ -2493,7 +2780,7 @@ async function verifyVisual(browser, base) {
 
   // b) a 字 card: its own edge and chip colour; a word without a level: no level chip; the sentence deck: 語, no "3/1"
   {
-    const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0, look: 'washi', mode: 'self' }, state: due('kotoba-mcd', 'km-064-m02') });
+    const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0, mode: 'self' }, world: 'iwa', state: due('kotoba-mcd', 'km-064-m02') });
     const ji = await o.page.evaluate(PAINT);
     await close(o);
     const p = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0 }, state: due('kotoba-mcd', 'km-066-m01') });
@@ -2505,7 +2792,7 @@ async function verifyVisual(browser, base) {
     // in the app's focus room a 字 card is the same sheet as a 語 card (one hairline, no kind stripe); its
     // kind is still marked on the card (data-kind) and in its built chip
     check(
-      'b) 字 card: marked 字 with its Kanji chip built, one hairline edge (no kind stripe) and nothing but the level drawn in the head; a word with no level (利回り) has no level chip and draws none; the sentence deck says 語 and its source, never a "3/1" count',
+      "K134", 'b) 字 card: marked 字 with its Kanji chip built, one hairline edge (no kind stripe) and nothing but the level drawn in the head; a word with no level (利回り) has no level chip and draws none; the sentence deck says 語 and its source, never a "3/1" count',
       ji.kind === 'ji' && ji.kindChip === 'Kanji' && ji.edgeWidth === '1px' && ji.edge === ji.edgeTop && ji.edge !== ji.tok['kind-ji'] && ji.drawn.every((c) => /^N\d$/.test(c)) &&
         none.level === null && !none.chips.some((c) => /^N\d$/.test(c)) && none.drawn.length === 0 && s.kindChip === 'Word' && s.edgeWidth === '1px' && !s.chips.some((c) => /\d+\/\d+/.test(c)) && s.level === 'N1' && s.drawn.join() === 'N1',
       JSON.stringify({ ji: [ji.kind, ji.kindChip, ji.edge, ji.edgeWidth, ji.drawn], none: [none.chips, none.drawn], sentence: [s.chips, s.drawn] }),
@@ -2515,22 +2802,22 @@ async function verifyVisual(browser, base) {
   // b) one hue on the asked word: the reading over a verb target takes the target's part-of-speech colour, not the accent (Anki parity: .sentence rt sets only opacity)
   {
     const seen = [];
-    for (const look of ['dark', 'washi']) {
-      const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0, look }, state: due('kotoba-mcd', 'km-200-m01') });
+    for (const world of ['hokusai', 'iwa']) {
+      const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0 }, world, state: due('kotoba-mcd', 'km-200-m01') });
       await reveal(o.page);
-      // in the app the reading over a kanji is drawn as its ruby's ::after (the rt keeps no box)
-      const v = await o.page.evaluate(`(() => { const card = document.getElementById('kp-card'); const t = card.querySelector('.kp-target'); const drawn = t ? [...t.querySelectorAll('ruby[data-rt]')].map((r) => getComputedStyle(r, '::after')).filter((a) => a.content !== 'none' && a.content !== 'normal') : [];
+      // F (one ruby): the reading over a kanji is its native <rt>, shown (laid out and visible)
+      const v = await o.page.evaluate(`(() => { const card = document.getElementById('kp-card'); const t = card.querySelector('.kp-target'); const drawn = t ? [...t.querySelectorAll('ruby > rt')].map((r) => getComputedStyle(r)).filter((a) => a.display !== 'none' && a.visibility === 'visible') : [];
         const kp = document.querySelector('.kp'); const probe = document.createElement('i'); kp.append(probe); const tok = (k) => { probe.style.color = 'var(--kp-' + k + ')'; return getComputedStyle(probe).color; };
         const out = { id: card.dataset.card, pos: card.className, target: t ? getComputedStyle(t).color : null, rt: drawn.map((a) => a.color), verb: tok('verb'), ink: tok('ink'), accent: tok('cyan') }; probe.remove(); return out; })()`);
-      seen.push({ look, ...v });
+      seen.push({ world, ...v });
       await close(o);
     }
     // one hue on the asked word: in the app's focus room the target is bold ink (no part-of-speech colour),
     // and the reading drawn over it is the target's own ink, never the accent
     check(
-      'b) 墨 and 和紙, verb card km-200-m01 (追い上げる): the reading over the target is the target\'s own colour (in the app, its ink), never the accent',
+      "K135", 'b) ベロ藍 and 柿渋, verb card km-200-m01 (追い上げる): the reading over the target is the target\'s own colour (in the app, its ink), never the accent',
       seen.every((v) => v.id === 'km-200-m01' && /kp-pos-verb/.test(v.pos) && v.target === v.ink && v.rt.length > 0 && v.rt.every((c) => c === v.target) && v.target !== v.accent),
-      JSON.stringify(seen.map(({ look, target, rt, ink, accent }) => ({ look, target, rt: [...new Set(rt)], ink, accent }))),
+      JSON.stringify(seen.map(({ world, target, rt, ink, accent }) => ({ world, target, rt: [...new Set(rt)], ink, accent }))),
     );
   }
 
@@ -2550,23 +2837,24 @@ async function verifyVisual(browser, base) {
       await context.close();
     }
     check(
-      'b) Anki (both note types): a note tagged level::N1 shows an N1 chip in the chip row, a note without a level tag shows none; no new field',
+      "K136", 'b) Anki (both note types): a note tagged level::N1 shows an N1 chip in the chip row, a note without a level tag shows none; no new field',
       seen.every(({ chips }) => chips.length === 2 && chips[0].display !== 'none' && chips[0].label === '"N1"' && chips[1].display === 'none'),
       JSON.stringify(seen),
     );
   }
 
-  // d) textures: on the page, never on the card (和紙 paper, 黒板 chalk)
+  // d) one material: the world's paper is the page — the deck paints no texture of its own, and the card
+  // under the ruby is plain (ベロ藍, 柿渋 by day; 紺紙 at night)
   {
     const seen = [];
-    for (const look of ['washi', 'kokuban', 'sakura']) {
-      const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { look } });
+    for (const world of ['hokusai', 'iwa', 'yoru']) {
+      const o = await open('?deck=mcd', 'kotoba-mcd', { world });
       await reveal(o.page);
       const v = await o.page.evaluate(PAINT);
-      seen.push({ look, card: v.cardTex, page: v.pageTex !== 'none' });
+      seen.push({ world, card: v.cardTex, page: v.pageTex });
       await close(o);
     }
-    check('d) 和紙, 黒板 and 桜 paint their texture on the page; the card under the ruby is plain', seen.every((x) => x.card === 'none' && x.page), JSON.stringify(seen));
+    check("K137", "d) ベロ藍, 柿渋 and 紺紙: the card under the ruby is plain and the deck paints no texture of its own — no fibre (url) and no repeating pattern on the page; the stage's soft light is the stage's", seen.every((x) => x.card === 'none' && !/url\(|repeating-/.test(x.page)), JSON.stringify(seen));
   }
 
   // e) the reveal keeps the card; the answer fades in within 180 ms; a grade slides the card out its way
@@ -2580,7 +2868,7 @@ async function verifyVisual(browser, base) {
         answer: cs.animationName, answerMs: parseFloat(cs.animationDuration) * 1000, rt: rt ? getComputedStyle(rt).animationName : null, rtMs: rt ? (parseFloat(getComputedStyle(rt).animationDuration) + parseFloat(getComputedStyle(rt).animationDelay)) * 1000 : null }; })()`);
     const motion = await o.page.evaluate(MOTION);
     check(
-      'e) the reveal keeps the card node, its chips and the screen (no rebuild): the readings fade in (140 ms after a 40 ms delay, done by 180 ms) and the answer rises in 120–180 ms, opacity and transform only',
+      "K138", 'e) the reveal keeps the card node, its chips and the screen (no rebuild): the readings fade in (140 ms after a 40 ms delay, done by 180 ms) and the answer rises in 120–180 ms, opacity and transform only',
       kept.card && kept.study && kept.top && kept.chips && kept.cards === 1 && !kept.reveal && kept.grades === 4 && kept.answer === 'kp-rise' && kept.answerMs >= 120 && kept.answerMs <= 180 && kept.rt === 'kp-fade' && Math.round(kept.rtMs) <= 180 && motion.longest <= 180,
       JSON.stringify({ ...kept, longest: motion.longest }),
     );
@@ -2599,7 +2887,7 @@ async function verifyVisual(browser, base) {
     await o.page.waitForSelector('#kp-reveal');
     const again = await o.page.evaluate(`({ seen: window.__kpSeen, advance: document.querySelector('.kp-study').dataset.advance })`);
     check(
-      'e) a grade slides the answered card out its way (正解 right, もう一度 left; an inert copy without ids, gone after the slide) while the next card settles; the rail ticks by transform in 120 ms',
+      "K139", 'e) a grade slides the answered card out its way (正解 right, もう一度 left; an inert copy without ids, gone after the slide) while the next card settles; the rail ticks by transform in 120 ms',
       after.seen.length === 1 && after.seen[0].cls.includes('kp-out-good') && !after.seen[0].id && after.seen[0].ids === 0 && after.seen[0].hidden === 'true' && after.seen[0].inert && after.advance === 'good' && after.arrive && after.cards === 1 && gone === 0 &&
         again.seen.length === 1 && again.seen[0].cls.includes('kp-out-again') && again.advance === 'again' && rail0 === '0' && Math.abs(after.frac - after.want) < 1e-9 && after.prop === 'transform' && after.ms === 120,
       JSON.stringify({ good: after.seen[0]?.cls, again: again.seen[0]?.cls, gone, rail: [rail0, after.frac, after.prop, after.ms] }),
@@ -2629,7 +2917,7 @@ async function verifyVisual(browser, base) {
     await o.page.waitForTimeout(200);
     const settled = await o.page.evaluate(REDUCED_MOTION());
     check(
-      'e) prefers-reduced-motion (emulateMedia): no ambient motion or smooth autoscroll; every declared animation, idle transition and observed effect is opacity-only within 120 ms, including after settling; reveal keeps the card, swipe never drags or slides out, next card crossfades and rail uses plain width',
+      "K140", 'e) prefers-reduced-motion (emulateMedia): no ambient motion or smooth autoscroll; every declared animation, idle transition and observed effect is opacity-only within 120 ms, including after settling; reveal keeps the card, swipe never drags or slides out, next card crossfades and rail uses plain width',
       baseline.opacityOnly && baseline.running === 0 && baseline.moving.length === 0 && still && foldOpen && revealed.longest > 0 && revealed.longest <= 120 && revealed.opacityOnly && revealed.moving.length === 0 && drag.transform === '' && drag.swipe === 'good' && advanced.seen === 0 && advanced.arrive && advanced.log === 1 && advanced.count.startsWith('2/') &&
         advanced.rail === 'none' && Math.abs(advanced.width - advanced.track / advanced.total) < 1 && moved.longest > 0 && moved.longest <= 120 && moved.opacityOnly && moved.moving.length === 0 && settled.opacityOnly && settled.running === 0 && settled.moving.length === 0,
       JSON.stringify({ baseline, still, foldOpen, revealed, drag, advanced, moved, settled }),
@@ -2659,7 +2947,7 @@ async function verifyVisual(browser, base) {
     rejected.push({ name: 'finished Web Animations transform', rejected: !finishedEffect.opacityOnly, faults: finishedEffect.faults });
     await o.page.evaluate(REDUCED_MOTION('start'));
     const restored = await o.page.evaluate(REDUCED_MOTION());
-    check('e) reduced-motion probe rejects idle transform/color transitions, finished CSS and Web Animations transform/stroke effects, ambient fades and smooth autoscroll; removing the mutations restores a passing baseline',
+    check("K141", 'e) reduced-motion probe rejects idle transform/color transitions, finished CSS and Web Animations transform/stroke effects, ambient fades and smooth autoscroll; removing the mutations restores a passing baseline',
       rejected.length === 7 && rejected.every((x) => x.rejected) && restored.opacityOnly && restored.running === 0,
       JSON.stringify({ rejected, restored }));
     await o.page.evaluate(REDUCED_MOTION('stop'));
@@ -2668,12 +2956,35 @@ async function verifyVisual(browser, base) {
 }
 
 /* --------------------------------------------------- half two: the app */
+
+const RUNTIME_FEATURE_CASES=Object.freeze({
+  deleteRestore:['K111/kotoba-mcd','K111/kotoba-mine','K112/kotoba-mcd','K112/kotoba-mine'],
+  leechHintSwapHold:['K113','K115','K116','K117','K118','K119'],
+  kanjiFamilyAndReferences:['K120','K121','K122','K123'],
+  revealFoldsZoomAndRule:['K081','K083','K084','K085','K088','K089','K090','K091','K092','K103'],
+  clampsAndModeSkip:['K094','K095','K096','K097','K098','K099','K100','K101'],
+  kindLevelAndMotion:['K131','K132/hokusai','K132/yoru','K134','K138','K139','K140'],
+  standaloneGlossAndPopover:['K076','K078'],
+});
+function runtimeFeatureCoverage(rows,engine){
+ return Object.entries(RUNTIME_FEATURE_CASES).map(([feature,ids])=>({feature,cases:ids,pass:ids.every(id=>{const observed=rows.filter(row=>row.engine===engine&&(row.caseId===id||row.caseId.startsWith(id+'/')));return observed.length>0&&observed.every(row=>row.pass);})}));
+}
+function verifyRuntimeFeatureCoverage(){
+ const rows=results.filter(row=>row.engine===actualEngine),coverage=runtimeFeatureCoverage(rows,actualEngine);
+ assert(coverage.every(row=>row.pass),'Missing/failed executed feature cases: '+JSON.stringify(coverage));
+ console.log('R18_RUNTIME_FEATURE_COVERAGE '+JSON.stringify(coverage));
+ // Counterexamples exercise the consumer, not filename or source-text presence.
+ const complete=Object.values(RUNTIME_FEATURE_CASES).flat().map(caseId=>({engine:actualEngine,caseId,pass:true}));
+ const missing=complete.slice(1),failed=complete.map((row,i)=>i===0?{...row,pass:false}:row);
+ assert(runtimeFeatureCoverage(complete,actualEngine).every(row=>row.pass)&&!runtimeFeatureCoverage(missing,actualEngine).every(row=>row.pass)&&!runtimeFeatureCoverage(failed,actualEngine).every(row=>row.pass),'Feature admission counterexamples must fail');
+}
+
 async function main() {
   console.log('— 言葉の鉱脈: the deck as data');
   const deck = verifyDeck();
   const sentences = readJson(SENTENCE_DECK_PATH);
   const sc = sentences.words.flatMap((w) => w.cards);
-  check('言葉の鉱脈・文 sits beside it: 323 words of real single sentences, each with its source', sentences.id === 'kotoba-mine' && sentences.words.length === 323 && sc.every((c) => !c.type && c.src && c.ruby.filter((g) => g[2] === 1).length === 1), `${sc.length} sentence cards`);
+  check("K142", '言葉の鉱脈・文 sits beside it: 323 words of real single sentences, each with its source', sentences.id === 'kotoba-mine' && sentences.words.length === 323 && sc.every((c) => !c.type && c.src && c.ruby.filter((g) => g[2] === 1).length === 1), `${sc.length} sentence cards`);
   verifyIds([deck, sentences]);
   verifyLeaks([deck, sentences]);
   verifyRuby([deck, sentences]);
@@ -2682,12 +2993,25 @@ async function main() {
   verifyPilotData(deck);
   verifyFullRunData(deck);
   const said = (d) => (d.method ?? []).join('');
-  check('the method text names the same four grades the player shows (もう一度・難しい・正解・簡単), never the retired 思い出せた button or 覚えた', said(deck).includes('「もう一度・難しい・正解・簡単」') && ['「正解」', '「難しい」', '「簡単」', '「もう一度」'].every((g) => said(sentences).includes(g)) && !said(deck).includes('「思い出せた」') && !said(sentences).includes('「思い出せた」') && !said(deck).includes('覚えた') && !said(sentences).includes('覚えた'), deck.method?.at(-1) ?? '');
-  check('the two decks open in different colour themes', deck.defaults?.look && sentences.defaults?.look && deck.defaults.look !== sentences.defaults.look, `${deck.defaults?.look} · ${sentences.defaults?.look}`);
+  check("K143", 'the method text names the same four grades the player shows (もう一度・難しい・正解・簡単), never the retired 思い出せた button or 覚えた', said(deck).includes('「もう一度・難しい・正解・簡単」') && ['「正解」', '「難しい」', '「簡単」', '「もう一度」'].every((g) => said(sentences).includes(g)) && !said(deck).includes('「思い出せた」') && !said(sentences).includes('「思い出せた」') && !said(deck).includes('覚えた') && !said(sentences).includes('覚えた'), deck.method?.at(-1) ?? '');
 
-  console.log('\n— 集中道場 › デッキ, in a real browser');
+  for (const engine of engines) {
+  actualEngine = engine;
+  console.log(`\n— 集中道場 › デッキ, ${engine}${only ? ` (partial: ${only})` : ''}`);
   const { server, base } = await startServer();
-  const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
+  const browser = await ({ chromium, webkit })[engine].launch(engine === 'chromium' ? { executablePath: process.env.CHROMIUM_PATH || undefined } : {});
+  browserVersions[engine] = browser.version();
+  console.log(`BROWSER ${engine} ${browserVersions[engine]}`);
+  if (only) {
+    try {
+      if(only==='review-contracts'){
+        await verifyTap(browser,base);await verifyBack(browser,base);await verifyReviewData([deck,sentences]);await verifyReview(browser,base);await verifyVisual(browser,base);verifyRuntimeFeatureCoverage();
+      }else await (only==='tap'?verifyTap:verifyHost)(browser,base);
+    }
+    catch (error) { check("K144", `${only} terminal`, false, error.stack || String(error)); }
+    finally { await browser.close(); await new Promise(done => server.close(done)); }
+    continue;
+  }
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await context.addInitScript(`try {
     if (!localStorage.getItem('__deck_seeded')) {
@@ -2715,11 +3039,11 @@ async function main() {
     await page.click('.nav-dojo');
     await page.waitForSelector('[data-deck="kotoba-mine"]', { timeout: 8000 });
     const rows = await page.evaluate(`[...document.querySelectorAll('.dojo-deck')].map((b) => b.dataset.deck)`);
-    check('集中道場 lists 私の文脈, N2, N1, 専門, 言葉の鉱脈・MCD and ・文, 文脈札, and the saved-word queue', JSON.stringify(rows) === JSON.stringify(['personal', 'n2', 'n1', 'senmon', 'kotoba-mcd', 'kotoba-mine', 'context', 'mine']), rows.join(', '));
+    check("K145", '集中道場 lists 私の文脈, N2, N1, 専門, わたしの言葉, 言葉の鉱脈・MCD and ・文, 文脈札, and the saved-word queue', JSON.stringify(rows) === JSON.stringify(['personal', 'n2', 'n1', 'senmon', 'kotoba-master', 'kotoba-mcd', 'kotoba-mine', 'context', 'mine']), rows.join(', '));
 
     await page.click('[data-deck="kotoba-mcd"]');
     await page.waitForSelector('#kp-start', { timeout: 15000 });
-    check('the deck home leads with the count: no method panel there, no 見て覚えるコツ panel', (await page.locator('#kp-method, #kp-tips, .kp-tips').count()) === 0);
+    check("K146", 'the deck home leads with the count: no method panel there, no 見て覚えるコツ panel', (await page.locator('#kp-method, #kp-tips, .kp-tips').count()) === 0);
     const home = await page.evaluate(`({ start: document.getElementById('kp-start').textContent, groups: document.querySelectorAll('.kp-group').length })`);
     const beforeTopics = await page.evaluate(`({ ledger: localStorage.getItem('bunki-cloze:kotoba-mcd'), prefs: localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mcd') })`);
     await page.click('#kp-to-settings');
@@ -2729,7 +3053,7 @@ async function main() {
     await page.click('.kp-icon');
     await page.waitForSelector('#kp-start');
     const afterTopics = await page.evaluate(`({ ledger: localStorage.getItem('bunki-cloze:kotoba-mcd'), prefs: localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mcd') })`);
-    check('the deck home shows today’s count and its 12 exact topics remain in Settings, with their source counts and no preference or ledger change on return',
+    check("K147", 'the deck home shows today’s count and its 12 exact topics remain in Settings, with their source counts and no preference or ledger change on return',
       /15/.test(home.start) && home.groups === 0 && topics.length === 12 && JSON.stringify(topics) === JSON.stringify(expectedTopics) &&
         JSON.stringify(beforeTopics) === JSON.stringify(afterTopics) && await page.locator('#kp-start').textContent() === home.start,
       JSON.stringify({ home, topics, expectedTopics, beforeTopics, afterTopics }));
@@ -2742,28 +3066,28 @@ async function main() {
     // figures carry a thousands separator (2,435): read them back without it
     const num = (x) => Number(String(x).replace(/,/g, ''));
     const begin = num(/\d[\d,]*/.exec(home.start)?.[0]);
-    check('the deck home shows four small tiles in one row, Due · New · Known · Difficult, with the queue’s own counts (due + new is the start button’s number), in amber, ink, green and red (T2)',
+    check("K148", 'the deck home shows four small tiles in one row, Due · New · Known · Difficult, with the queue’s own counts (due + new is the start button’s number), in amber, ink, green and red (T2)',
       tiles.length === 4 && tiles.map((x) => x.label).join() === 'Due,New,Known,Difficult' && tiles.every((x) => /^\d{1,3}(,\d{3})*$/.test(x.n)) && num(tiles[0].n) + num(tiles[1].n) === begin &&
         new Set(tiles.map((x) => x.top)).size === 1 && tiles.every((x) => x.h <= 72) && tiles[0].color === hue.amber && tiles[1].color === hue.ink && tiles[2].color === hue.green && tiles[3].color === hue.red,
       JSON.stringify({ tiles, begin }));
 
     await page.click('#kp-start');
     await page.waitForSelector('#kp-card .kp-target');
-    check('a card is a passage with the word marked (読んで思い出す) — no gap, no hint, no readings, no English', (await page.locator('#kp-card .kp-blank, #kp-card .kp-hint').count()) === 0 && (await page.locator('#kp-card .kp-sentence .kp-target').count()) >= 1 && (await page.locator('#kp-card rt').count()) === 0 && (await page.locator('#kp-card details').count()) === 0);
+    check("K149", 'a card is a passage with the word marked (読んで思い出す) — no gap, no hint, no readings, no English', (await page.locator('#kp-card .kp-blank, #kp-card .kp-hint').count()) === 0 && (await page.locator('#kp-card .kp-sentence .kp-target').count()) >= 1 && (await page.locator('#kp-card rt').count()) === 0 && (await page.locator('#kp-card details').count()) === 0);
     await page.click('#kp-reveal');
     await page.waitForSelector('#kp-grade-good');
     const back = await page.evaluate(`({ rt: document.querySelectorAll('#kp-card rt').length, target: !!document.querySelector('#kp-card .kp-target'), term: document.querySelector('.kp-term')?.textContent, src: !!document.querySelector('#kp-card .kp-src') })`);
-    check('the answer puts readings over the kanji, gives the meaning, and names the source', back.rt > 0 && back.target && !!back.term && back.src, JSON.stringify(back));
+    check("K150", 'the answer puts readings over the kanji, gives the meaning, and names the source', back.rt > 0 && back.target && !!back.term && back.src, JSON.stringify(back));
     const takenBefore = (await readAppRecord(page)).taken.length;
-    await page.click('#kp-grade-good');
+    await gradeClick(page, 'bunki-cloze:kotoba-mcd');
     const ledger = await ls('bunki-cloze:kotoba-mcd');
     const after = await readAppRecord(page);
-    check('a grade lands in the deck’s own ledger and never in the word queue', Object.keys(ledger?.cards || {}).length === 1 && after.taken.length === takenBefore && (after.revlog || []).length === 0, `${Object.keys(ledger?.cards || {}).length} card · ${after.taken.length} taken`);
+    check("K151", 'a grade lands in the deck’s own ledger and never in the word queue', Object.keys(ledger?.cards || {}).length === 1 && after.taken.length === takenBefore && (after.revlog || []).length === 0, `${Object.keys(ledger?.cards || {}).length} card · ${after.taken.length} taken`);
 
     await boot('?deck=mcd');
     await page.waitForSelector('#kp-start', { timeout: 15000 });
     const kept = await ls('bunki-cloze:kotoba-mcd');
-    check('?deck=mcd opens the MCD deck directly and the ledger survived the reload', Object.keys(kept?.cards || {}).length === 1);
+    check("K152", '?deck=mcd opens the MCD deck directly and the ledger survived the reload', Object.keys(kept?.cards || {}).length === 1);
     await page.click('#kp-to-settings');
     await page.click('[data-pref="mode:choice"]');
     await page.click('.kp-icon');
@@ -2772,54 +3096,60 @@ async function main() {
     const choices = await page.locator('.kp-choice').count();
     await page.click('.kp-choice');
     await page.waitForSelector('.kp-verdict');
-    check('4-choice mode: four words, one tap answers and grades', choices === 4 && (await ls('bunki-cloze:kotoba-mcd')).log.length === 2);
+    check("K153", '4-choice mode: four words, one tap answers and grades', choices === 4 && (await ls('bunki-cloze:kotoba-mcd')).log.length === 2);
+    // one material (the one-hand pass): both decks stand on the world's own page, with no look of their own
+    const MATERIAL = `(() => { const kp = document.querySelector('.kp'); const p = document.createElement('i'); document.body.append(p); p.style.color = 'var(--color-page)';
+      const worldPage = getComputedStyle(p).color; p.remove(); return { deck: getComputedStyle(kp).backgroundColor, worldPage, look: kp.dataset.look ?? null, blank: document.querySelectorAll('#kp-card .kp-blank').length }; })()`;
     await boot('?deck=mcd');
     await page.waitForSelector('#kp-start', { timeout: 15000 });
+    const mcdMaterial = await page.evaluate(MATERIAL);
+    check("K154", "the two decks open in the same material: ?deck=mcd stands on the world's page and carries no look of its own", mcdMaterial.deck === mcdMaterial.worldPage && mcdMaterial.look === null, JSON.stringify(mcdMaterial));
     await page.click('#kp-to-settings');
     await page.click('[data-pref="mode:self"]');
     await page.click('.kp-icon');
     await page.click('#kp-start');
     await page.waitForSelector('#kp-card .kp-blank');
-    check('穴埋め (the MCD blank preset): one gap and nothing under it — no hint, no readings, no English', (await page.locator('#kp-card .kp-blank').count()) >= 1 && (await page.locator('#kp-card .kp-hint').count()) === 0 && (await page.locator('#kp-card rt').count()) === 0);
+    check("K155", '穴埋め (the MCD blank preset): one gap and nothing under it — no hint, no readings, no English', (await page.locator('#kp-card .kp-blank').count()) >= 1 && (await page.locator('#kp-card .kp-hint').count()) === 0 && (await page.locator('#kp-card rt').count()) === 0);
     await boot('?deck=kotoba');
     await page.waitForSelector('#kp-start', { timeout: 15000 });
+    const sentHome = await page.evaluate(MATERIAL);
     await page.click('#kp-start');
     await page.waitForSelector('#kp-card .kp-target');
-    const sent = await page.evaluate(`({ look: document.querySelector('.kp')?.dataset.look, blank: document.querySelectorAll('#kp-card .kp-blank').length })`);
-    check('?deck=kotoba opens the sentence deck: a real sentence with the word marked, in its own dark look by day', sent.blank === 0 && sent.look === 'dark', JSON.stringify(sent));
+    const sent = await page.evaluate(MATERIAL);
+    check("K156", "?deck=kotoba opens the sentence deck: a real sentence with the word marked, its home on the world's own page (one material: the deck's ground is the page's, no look of its own; a sitting stands on the room's lacquer stage)", sent.blank === 0 && sentHome.deck === sentHome.worldPage && sentHome.look === null && sent.look === null, JSON.stringify({ home: sentHome, sitting: sent }));
 
-    // 覚える is one tap (round-1 save path): the row is written through the
-    // guarded commit at once, and the list drawer opens under the finger so
-    // where the word went is right there.
+    // S · one tap on the page's one Save (#sheet-take, round-1 save path): the row is written through the guarded commit at
+    // once, and its menu opens as a drawer under the bar so where the word went is right there. This pinned the foot's
+    // 覚える (#take), its "saved to" drawer (.list-picker) and that drawer's own list maker; the lists now live in the Save's
+    // menu, one tap each, a new list asking its name once.
     await boot();
     await openShelfTools(page);
     await page.fill('#search', '金利');
     await page.waitForSelector('[data-result^="word:金利"]', { timeout: 15000 });
     await page.click('[data-result^="word:金利"]');
-    await page.waitForSelector('#sheet #take');
-    await page.click('#sheet #take');
+    await page.waitForSelector('#sheet #sheet-take');
+    await page.click('#sheet #sheet-take');
     await waitForAppRecord(page, (record) => record.taken.some((t) => t.id === '金利'),
       { description: 'one-tap sheet save' });
-    await page.waitForSelector('#sheet .list-picker .fold-head.open');
+    await page.waitForSelector('#vocabulary-list-popover.is-drawer #mini-review:checked', { timeout: 5000 });
     const saved = await waitForAppRecord(page, (record) => record.taken.some((t) => t.id === '金利'),
       { description: 'saved word record' });
-    check('one tap on 覚える saves the word and opens its lists, nothing more written yet',
+    check("K157", 'one tap on the page\'s one Save saves the word and opens its menu (review ticked, lists one tap away), nothing more written yet',
       saved.taken.length === 1 && Object.keys(saved.lists || {}).length === 0,
       `${saved.taken.length} rows · lists ${Object.keys(saved.lists || {}).length}`);
-    // a list named in the drawer receives the word through the same guarded commit
-    await page.click('#sheet #new-list');
-    await page.fill('#sheet [id^="list-picker-name:"]', '経済ニュース');
-    await page.click('#sheet .list-maker-make');
+    // a list named in the menu receives the word through the same guarded commit
+    await page.click('#vocabulary-list-popover #vocabulary-list-new');
+    await page.fill('#vocabulary-list-popover #vocabulary-list-name', '経済ニュース');
+    await page.click('#vocabulary-list-popover #vocabulary-list-create');
     const listed = await waitForAppRecord(page, (record) =>
       (record.lists?.['経済ニュース'] || []).some((x) => x.id === '金利'), { description: 'new list membership' });
-    check('the new list receives the word, still one card', listed.taken.length === 1 &&
+    check("K158", 'the new list receives the word, still one card', listed.taken.length === 1 &&
       listed.taken.filter((t) => t.id === '金利').length === 1, JSON.stringify(Object.keys(listed.lists || {})));
-    // the commit resolves before the sheet re-renders: wait (bounded) for the drawer to redraw, then read it
-    await page.waitForFunction(() => (document.querySelector('#sheet .list-picker .fold-sub')?.textContent || '').includes('経済ニュース'),
-      null, { timeout: 5000 }).catch(() => {});
-    const where = await page.evaluate(`document.querySelector('#sheet .list-picker .fold-sub')?.textContent || ''`);
-    check('the sheet then says where the word went', where.includes('経済ニュース'), where);
-    check('no console errors', consoleErrors.length === 0, consoleErrors.slice(0, 2).join(' | '));
+    // the menu then shows the list ticked: where the word went, in the Save's own menu
+    await page.waitForFunction(() => !!document.querySelector('#vocabulary-list-popover input[data-list="経済ニュース"]:checked'), null, { timeout: 5000 }).catch(() => {});
+    const where = await page.evaluate(`[...document.querySelectorAll('#vocabulary-list-popover .vocabulary-list-choice')].filter((row) => row.querySelector('input:checked')).map((row) => row.textContent.trim()).join(' · ')`);
+    check("K159", 'the Save\'s menu then says where the word went', where.includes('経済ニュース'), where);
+    check("K160", 'no console errors', consoleErrors.length === 0, consoleErrors.slice(0, 2).join(' | '));
 
     console.log('\n— a grade is saved before the card moves on');
     await verifyGradePath(browser, base);
@@ -2851,10 +3181,16 @@ async function main() {
     console.log('\n— the review loop (CARD_CONTRACT_V2 §3.7, §4): delete, leech ladder, kanji family, see-also');
     await verifyReviewData([deck, sentences]);
     await verifyReview(browser, base);
+    verifyRuntimeFeatureCoverage();
+  } catch (error) {
+    check("K161", 'browser journey terminal', false, error.stack || String(error));
   } finally {
     await browser.close();
-    server.close();
+    await new Promise(done => server.close(done));
   }
+  }
+  writeFileSync(resolve(evidence, 'kotoba-mine.json'), JSON.stringify({ schemaVersion: 2, runId: gateRunId, engines, browserVersions, scope: only ? `partial:${only}` : 'full',
+    artifactSha256: process.env.KAIRO_ARTIFACT_SHA256 || null, verifierSha256: createHash('sha256').update(readFileSync(fileURLToPath(import.meta.url))).digest('hex'), results, failures }, null, 2) + '\n');
   console.log(failures ? `\n${failures} check(s) failed` : '\nall checks green');
   process.exit(failures ? 1 : 0);
 }

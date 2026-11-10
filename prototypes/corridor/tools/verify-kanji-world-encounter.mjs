@@ -19,6 +19,7 @@ mkdirSync(evidence, { recursive: true });
 const host = await startStaticHost({ site, port: 0 });
 const browser = await chromium.launch({ headless: true });
 const observations = [];
+const READINGS = '**/data/share_alike/reference-extra.json';
 let activePage;
 async function openEntry(page) {
   await page.goto(`${host.origin}/?entry=shelf&ui=bi`);
@@ -51,8 +52,24 @@ try {
     let page = await context.newPage(); activePage = page;
     page.setDefaultTimeout(15000);
     const errors = []; page.on('pageerror', error => errors.push(error.message));
+    // Every reading arrives on its own clock, and a sheet drawn while they are still on their way is
+    // drawn again when they land. The door waits for that redraw instead of opening an encounter
+    // the redraw would close: a failed first load leaves the retry, whose actual response is held.
+    await page.route(READINGS, route => route.fulfill({ status: 503, body: '' }));
     await openEntry(page);
+    await page.unroute(READINGS);
+    let releaseReadings;
+    const held = new Promise(done => { releaseReadings = done; });
+    await page.route(READINGS, async route => { await held; await route.continue(); });
+    await page.locator('#kanji-readings-retry').click();
+    await page.locator('[data-kanji-readings="pending"]').waitFor();
+    assert.equal(await page.locator('#kanji-world-door').count(), 0, 'The door waits while every reading is still on its way');
+    releaseReadings();
+    await page.locator('[data-kanji-readings="complete"]').waitFor();
+    await page.unroute(READINGS);
     let door = page.locator('#kanji-world-door');
+    await door.waitFor();
+    assert.equal(await page.locator('[data-kanji-readings="pending"], [data-kanji-facts-state="pending"]').count(), 0);
     await door.scrollIntoViewIfNeeded();
     const origin = await page.evaluate(() => ({ node: document.querySelector('#sheet').dataset.node, y: window.scrollY, sheet: document.querySelector('#sheet').scrollTop }));
     const recordBefore = await readAppRecord(page);
@@ -144,7 +161,7 @@ try {
     await page.keyboard.press('Escape');
     assert.deepEqual(await readAppRecord(page), imageRecordBefore, 'All durable rows and revision remain unchanged');
     assert.deepEqual(errors, [], 'No page exceptions');
-    observations.push({ viewport, status: 'PASS', checks: ['actual-entry', 'actual-image', 'word-check', 'wrong-answer', 'reveal-retry', 'uncued-recall', 'exact-return', 'unchanged-record-rows-and-revision', 'repeat', 'escape', 'cancel-in-flight', 'content-failure-return', 'image-failure-practice'] });
+    observations.push({ viewport, status: 'PASS', checks: ['door-waits-for-readings', 'actual-entry', 'actual-image', 'word-check', 'wrong-answer', 'reveal-retry', 'uncued-recall', 'exact-return', 'unchanged-record-rows-and-revision', 'repeat', 'escape', 'cancel-in-flight', 'content-failure-return', 'image-failure-practice'] });
     await context.close(); activePage = null;
   }
   writeReports('PASS');

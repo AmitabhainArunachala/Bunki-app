@@ -6,6 +6,8 @@
  * room, the standalone page, a test) supplies time, storage, and FSRS.
  */
 
+import * as srsCore from '../../srs-core.mjs';
+
 export const DECK_FORMAT = 'bunki-srs-deck';
 export const STATE_FORMAT = 'bunki-srs-deck-state';
 export const DECK_VERSION = 1;
@@ -289,17 +291,64 @@ export function dayKey(date) {
   return `${y}-${m}-${d}`;
 }
 
-export function createScheduler(fsrsApi, pin) {
-  const parameters = fsrsApi.generatorParameters({
-    w: pin.w.slice(),
-    request_retention: pin.requestRetention,
-    maximum_interval: pin.maximumInterval,
-    enable_fuzz: pin.enableFuzz,
-    enable_short_term: pin.enableShortTerm,
-    learning_steps: pin.learningSteps,
-    relearning_steps: pin.relearningSteps,
+/** the scheduler, built by the app's one schedule owner (srs-core.mjs): the pin, with the learner's own policy when
+ * the host passes it */
+export function createScheduler(fsrsApi, pin, learner = null) {
+  return srsCore.createScheduler(fsrsApi, pin, learner);
+}
+/** the sitting rule, the due gate and the close, from the same owner */
+export const { nextStep, servable, sittingTally, closeLines, pauseWords, waitWords, LEARN_AHEAD_MS, buriedWords } = srsCore;
+/** burying across surfaces for today: (card) => true when its word (target and reading) was answered elsewhere today */
+export function buriedToday(storage, now) {
+  const answered = srsCore.answeredToday(storage, now);
+  return (card) => srsCore.buriedHere(answered, card.target, card.reading, 'context');
+}
+/** the one plain line a refused grade shows (practice continues); shared by every surface (srs-core) */
+export const refusalWords = srsCore.refusalWords;
+/**
+ * One grade under the shared answer admission (HOOKS-SPEC §3.6): admitted under the one Web Lock (none:
+ * 'no-shared-admission'); the ledger read fresh; change(fresh, now) is the host's own gate and grade (null refuses:
+ * 'refused'); a word answered on another surface since the card was shown rests unless the card is in its learning
+ * steps ('answered-elsewhere'); the word's mark is reserved before the ledger is saved ('mark-unavailable' when it
+ * cannot be written); a save that stores nothing ('failed') releases a reservation this grade inserted.
+ * Returns { result, fresh, next, now }.
+ */
+export async function admitContextGrade({ locks, storage, card, load, save, change, clock = () => new Date() }) {
+  let result = null;
+  let fresh = null;
+  let next = null;
+  const admitted = await srsCore.admitAnswer({
+    locks,
+    clock,
+    storage,
+    where: 'context',
+    commit: async ({ now, answered, reserve }) => {
+      fresh = load();
+      next = change(fresh, now);
+      if (!next) {
+        result = 'refused';
+        return { outcome: 'not-published' };
+      }
+      const stored = fresh.cards[card.id] ?? null;
+      const inSteps = !!stored && (stored.state === srsCore.LEARNING || stored.state === srsCore.RELEARNING);
+      if (!inSteps && srsCore.buriedHere(answered, card.target, card.reading, 'context')) {
+        result = 'answered-elsewhere';
+        return { outcome: 'not-published' };
+      }
+      if (!reserve(srsCore.wordIdentity(card.target, card.reading))) {
+        result = 'mark-unavailable';
+        return { outcome: 'not-published' };
+      }
+      // a save that stores nothing (a full or refused storage) is not published
+      if (!save(next)) {
+        result = 'failed';
+        return { outcome: 'not-published' };
+      }
+      result = 'graded';
+      return { outcome: 'published' };
+    },
   });
-  return fsrsApi.fsrs(parameters);
+  return admitted.admitted ? { result, fresh, next, now: admitted.now } : { result: 'no-shared-admission', fresh: null, next: null, now: null };
 }
 
 function reviveCard(stored, TypeConvert) {
@@ -406,11 +455,13 @@ export function counts(deck, state, now) {
  */
 export function grade(fsrsApi, scheduler, state, cardId, rating, now) {
   const stored = state.cards[cardId] ?? null;
+  // the review-time clamp the pin names: a clock behind the card's last review grades at that review
+  const at = srsCore.reviewInstant(stored?.last_review, now);
   const before = stored
     ? reviveCard(stored, fsrsApi.TypeConvert)
-    : fsrsApi.createEmptyCard(now);
-  const scheduled = scheduler.next(before, now, rating);
-  const introducedAt = stored?.introducedAt || now.toISOString();
+    : fsrsApi.createEmptyCard(at);
+  const scheduled = scheduler.next(before, at, rating);
+  const introducedAt = stored?.introducedAt || at.toISOString();
   return {
     ...state,
     cards: {
@@ -418,6 +469,17 @@ export function grade(fsrsApi, scheduler, state, cardId, rating, now) {
       [cardId]: freezeCard(scheduled.card, introducedAt),
     },
   };
+}
+
+/** what each answer would schedule, from now, for the seals' times (ms by rating 1–4) */
+export function preview(fsrsApi, scheduler, state, cardId, now) {
+  const stored = state.cards[cardId] ?? null;
+  const at = srsCore.reviewInstant(stored?.last_review, now);
+  const before = stored ? reviveCard(stored, fsrsApi.TypeConvert) : fsrsApi.createEmptyCard(at);
+  const all = scheduler.repeat(before, at);
+  const out = {};
+  for (const rating of [1, 2, 3, 4]) out[rating] = new Date(all[rating].card.due).getTime() - now.getTime();
+  return out;
 }
 
 export function basicTsv(deck) {
