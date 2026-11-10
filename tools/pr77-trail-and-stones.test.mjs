@@ -1,3 +1,4 @@
+/* global URL */
 /**
  * Two fixes from the never-merged PR #77 (origin/claude/renkan-round-b-2026-08-18, 3df6ed8f4), retyped into today's
  * files: (1) a drill undo (a bare [t,'dojo',key,0] row) is not an encounter and takes back the practice it revokes,
@@ -20,10 +21,24 @@ function slice(text, start, end, label) {
 
 function trail(obslog, lang = 'bi') {
   const source = [
-    slice(read('modules/capture.mjs'), 'function encounterTrail(', '\nexport {', 'encounterTrail … renderEncounterTrail'),
-    slice(read('modules/drift.mjs'), 'function trailLastPhrase(', '\n}\n', 'trailLastPhrase') + '\n}\n',
+    slice(
+      read('modules/capture.mjs'),
+      'function encounterTrail(',
+      '\nexport {',
+      'encounterTrail … renderEncounterTrail',
+    ),
+    slice(read('modules/drift.mjs'), 'function trailLastPhrase(', '\n}\n', 'trailLastPhrase') +
+      '\n}\n',
   ].join('\n');
-  const node = (tag, cls, text) => ({ tag, className: cls || '', textContent: text || '', children: [], append(...kids) { this.children.push(...kids); } });
+  const node = (tag, cls, text) => ({
+    tag,
+    className: cls || '',
+    textContent: text || '',
+    children: [],
+    append(...kids) {
+      this.children.push(...kids);
+    },
+  });
   const sheet = node('div');
   const context = {
     S: { obslog },
@@ -34,7 +49,10 @@ function trail(obslog, lang = 'bi') {
     srsKey: (t, id) => `${t}:${id}`,
     sheet,
   };
-  runInNewContext(`${source}\nresult = encounterTrail('kanji:一');\nrenderEncounterTrail(sheet, { t: 'kanji', id: '一' });`, context);
+  runInNewContext(
+    `${source}\nresult = encounterTrail('kanji:一');\nrenderEncounterTrail(sheet, { t: 'kanji', id: '一' });`,
+    context,
+  );
   const lines = sheet.children[0]?.children.slice(1).map((p) => p.textContent) || [];
   return { ...context.result, lines };
 }
@@ -42,7 +60,10 @@ function trail(obslog, lang = 'bi') {
 describe('the encounter trail after a drill undo', () => {
   const day = 1794315780338;
   it('one drill taken back: one encounter, no practice, and the last line says it was taken back', () => {
-    const t = trail([[day, 'dojo', 'kanji:一', 3, 'kanji'], [day + 1, 'dojo', 'kanji:一', 0]]);
+    const t = trail([
+      [day, 'dojo', 'kanji:一', 3, 'kanji'],
+      [day + 1, 'dojo', 'kanji:一', 0],
+    ]);
     expect(t.met).toBe(1);
     expect(t.counts.dojo || 0).toBe(0);
     expect(t.lines[0]).toMatch(/· 1 encounter so far$/u);
@@ -66,7 +87,13 @@ describe('the encounter trail after a drill undo', () => {
   });
 
   it('in Japanese the taken-back line reads 道場の稽古を取り消した', () => {
-    const t = trail([[day, 'dojo', 'kanji:一', 3, 'kanji'], [day + 1, 'dojo', 'kanji:一', 0]], 'ja');
+    const t = trail(
+      [
+        [day, 'dojo', 'kanji:一', 3, 'kanji'],
+        [day + 1, 'dojo', 'kanji:一', 0],
+      ],
+      'ja',
+    );
     expect(t.lines[0]).toMatch(/これまで 1回$/u);
     expect(t.lines[1]).toMatch(/道場の稽古を取り消した$/u);
   });
@@ -74,9 +101,16 @@ describe('the encounter trail after a drill undo', () => {
 
 describe('the colour stones keep Tab inside', () => {
   function ring() {
-    const source = slice(read('corridor.js'), 'function worldPickerTab(', '\n}\n', 'worldPickerTab') + '\n}\n';
+    const source =
+      slice(read('corridor.js'), 'function worldPickerTab(', '\n}\n', 'worldPickerTab') + '\n}\n';
     const focus = [];
-    const stones = ['墨', '朱', '藍'].map((name) => ({ name, focus: () => { context.document.activeElement = stones.find((s) => s.name === name); focus.push(name); } }));
+    const stones = ['墨', '朱', '藍'].map((name) => ({
+      name,
+      focus: () => {
+        context.document.activeElement = stones.find((s) => s.name === name);
+        focus.push(name);
+      },
+    }));
     const outside = { name: 'page' };
     const pop = { querySelectorAll: () => stones, contains: (n) => stones.includes(n) };
     const context = { worldPickerEls: [{}, pop], document: { activeElement: stones[0] }, focus };
@@ -84,7 +118,13 @@ describe('the colour stones keep Tab inside', () => {
     const press = (key, shiftKey, at) => {
       context.document.activeElement = at === 'outside' ? outside : stones[at];
       let prevented = false;
-      context.worldPickerTab({ key, shiftKey, preventDefault: () => { prevented = true; } });
+      context.worldPickerTab({
+        key,
+        shiftKey,
+        preventDefault: () => {
+          prevented = true;
+        },
+      });
       return { prevented, now: context.document.activeElement.name };
     };
     return press;
@@ -106,8 +146,18 @@ describe('the colour stones keep Tab inside', () => {
 
   it('the stones are a modal dialog, and opening and closing arm and disarm the ring', () => {
     const source = read('corridor.js');
-    const open = slice(source, 'function openWorldPicker(', 'const WORLD_PICKER_HOLD_MS', 'openWorldPicker');
-    const close = slice(source, 'function closeWorldPicker(', 'function openWorldPicker(', 'closeWorldPicker');
+    const open = slice(
+      source,
+      'function openWorldPicker(',
+      'const WORLD_PICKER_HOLD_MS',
+      'openWorldPicker',
+    );
+    const close = slice(
+      source,
+      'function closeWorldPicker(',
+      'function openWorldPicker(',
+      'closeWorldPicker',
+    );
     expect(open).toContain("pop.setAttribute('aria-modal', 'true');");
     expect(open).toContain("document.addEventListener('keydown', worldPickerTab, true);");
     expect(close).toContain("document.removeEventListener('keydown', worldPickerTab, true);");

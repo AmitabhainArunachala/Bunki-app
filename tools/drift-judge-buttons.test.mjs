@@ -1,3 +1,4 @@
+/* global URL, process */
 /**
  * Drift's two judgments as buttons (port of codex/kairo-drift-a11y-20260809, dba62c507): the slip a Drift word opens
  * carries まだ and 知っている, and each press grades that word through the sky's own grade(), the flick's path.
@@ -20,44 +21,82 @@ function slice(text, start, end, label) {
 
 describe('Drift judgment buttons', () => {
   it('the generated layer hands the host a judge that grades the touched node, as a flick does', () => {
-    const source = slice(read('drift-layer.js'), 'function hostedSlip(', 'function slipFor(', 'hostedSlip');
+    const source = slice(
+      read('drift-layer.js'),
+      'function hostedSlip(',
+      'function slipFor(',
+      'hostedSlip',
+    );
     const graded = [];
     let options = null;
-    const n = { kind: 'word', w: '出', r: 'で', g: 'exit', el: { isConnected: true, dataset: { ladderRung: '1' }, classList: { remove() {}, add() {} } } };
+    const n = {
+      kind: 'word',
+      w: '出',
+      r: 'で',
+      g: 'exit',
+      el: { isConnected: true, dataset: { ladderRung: '1' }, classList: { remove() {}, add() {} } },
+    };
     const context = {
       n,
       graded,
-      slipHost: () => ({ open: (_kind, _key, given) => { options = given; return 'opened'; } }),
+      slipHost: () => ({
+        open: (_kind, _key, given) => {
+          options = given;
+          return 'opened';
+        },
+      }),
       grade: (node, dir) => graded.push([node, dir]),
-      stack: [], lockOn: false, unfolded: null,
-      bloomFocus() {}, collapseUnfold() {}, mountHostedNodeReading() {}, getComputedStyle: () => ({}),
+      stack: [],
+      lockOn: false,
+      unfolded: null,
+      bloomFocus() {},
+      collapseUnfold() {},
+      mountHostedNodeReading() {},
+      getComputedStyle: () => ({}),
       performance: { now: () => 0 },
     };
     runInNewContext(`${source}\nhostedSlip(n);`, context);
     expect(typeof options?.judge).toBe('function');
     options.judge(1);
     options.judge(-1);
-    expect(graded).toEqual([[n, 1], [n, -1]]);
+    expect(graded).toEqual([
+      [n, 1],
+      [n, -1],
+    ]);
   });
 
   it('the generated layer is in step with its generator', () => {
-    execFileSync(process.execPath, [new URL('tools/build-drift-layer.mjs', corridor).pathname, '--check'], { stdio: 'pipe' });
+    execFileSync(
+      process.execPath,
+      [new URL('tools/build-drift-layer.mjs', corridor).pathname, '--check'],
+      { stdio: 'pipe' },
+    );
   });
 
   it('the slip row: まだ then 知っている in both languages; a press records the nomination, closes the slip, then grades', () => {
-    const source = slice(read('corridor.js'), 'function driftJudgeRow(', '\n}\n', 'driftJudgeRow') + '\n}\n';
+    const source =
+      slice(read('corridor.js'), 'function driftJudgeRow(', '\n}\n', 'driftJudgeRow') + '\n}\n';
     const make = (lang) => {
       const calls = [];
       const node = (tag, cls, text) => {
         const attrs = new Map();
         const listeners = new Map();
         return {
-          tag, className: cls || '', textContent: text || '', dataset: {}, children: [], type: '',
+          tag,
+          className: cls || '',
+          textContent: text || '',
+          dataset: {},
+          children: [],
+          type: '',
           setAttribute: (k, v) => attrs.set(k, String(v)),
           getAttribute: (k) => attrs.get(k) ?? null,
-          append(...kids) { this.children.push(...kids); },
+          append(...kids) {
+            this.children.push(...kids);
+          },
           addEventListener: (type, fn) => listeners.set(type, fn),
-          click(detail = 1) { listeners.get('click')({ detail, stopPropagation() {} }); },
+          click(detail = 1) {
+            listeners.get('click')({ detail, stopPropagation() {} });
+          },
         };
       };
       const context = {
@@ -66,11 +105,15 @@ describe('Drift judgment buttons', () => {
         el: node,
         tx: (ja, en) => (lang === 'bi' ? en : ja),
         bi: () => lang === 'bi',
-        interaction: (action, modality, sourceId) => calls.push(['interaction', action.kind, action.judgment, modality, sourceId]),
+        interaction: (action, modality, sourceId) =>
+          calls.push(['interaction', action.kind, action.judgment, modality, sourceId]),
         removeMini: () => calls.push(['removeMini']),
         focusDriftWordAfter: () => calls.push(['refocus']),
       };
-      runInNewContext(`${source}\nrow = driftJudgeRow('word', (dir) => calls.push(['judge', dir]), {});`, context);
+      runInNewContext(
+        `${source}\nrow = driftJudgeRow('word', (dir) => calls.push(['judge', dir]), {});`,
+        context,
+      );
       return { row: context.row, calls };
     };
     const en = make('bi');
