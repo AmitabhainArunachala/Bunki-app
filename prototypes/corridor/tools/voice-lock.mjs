@@ -17,6 +17,10 @@ export function readVoiceLock(path = VOICE_LOCK_PATH) {
     if (typeof lock[key] !== 'string' || !lock[key].trim()) throw new Error(`voice-lock: ${key} missing`);
   }
   if (typeof lock.render?.model !== 'string' || !lock.render.model.trim()) throw new Error('voice-lock: render.model missing');
+  // The corpus plan is live unless the lock retires it, and it says so in one of two words: a typo
+  // must not read as either.
+  if (lock.render.plan !== undefined && lock.render.plan !== 'active' && lock.render.plan !== 'retired')
+    throw new Error('voice-lock: render.plan must be "active" or "retired"');
   // The speaking room's model is a SEPARATE slot and starts unapproved. 'Kore' on the Live model
   // is not the Kore he auditioned; one model field for both would let the room inherit an
   // approval nobody gave it.
@@ -46,6 +50,12 @@ export function runtimeLock(lock = readVoiceLock()) {
     second: lock.voices.second.id,
     roles,
   };
+}
+
+/** Whether the lock retires its corpus plan. A retired plan owes nothing: no further clip is rendered
+ * to this lock. The clips already on disk stay under it and are checked exactly as before. */
+export function planRetired(lock = readVoiceLock()) {
+  return lock.render.plan === 'retired';
 }
 
 /** Which voice a role may use — the role law in one function. Unknown role → the main voice,

@@ -21,9 +21,9 @@
  *      the check bites today, before any spend, and the validators must still refuse a cue in
  *      the second voice, in a withdrawn voice, from another model and from another voice's folder.
  *
- * `--require-complete` adds coverage (PREP R3): red while any clip the plan owes is missing. It
- * is the after-render gate; the battery runs without it, because before the render that red is
- * the known state, not a regression.
+ * `--require-complete` adds coverage (PREP R3): red while any clip the plan owes is missing. A plan
+ * the lock retires (render.plan) owes nothing: its unplaced clips are counted in the receipt as
+ * `clipsUnplaced`, and every check above still runs on the clips that are on disk.
  *
  * Exit 0 green, 1 red. Receipt on stdout.
  */
@@ -224,6 +224,7 @@ export async function checkLock({ requireComplete = false } = {}) {
     model: runtime.model, main: runtime.main, second: runtime.second,
     approvedWords: lanes.approvedWords, narratedArticles: lanes.narratedArticles,
     clipsChecked: clips.length, cuesChecked: cueCount, stagedCuesChecked: stagedCues, clipsOwed: lanes.clipsOwed,
+    planRetired: lanes.planRetired, clipsUnplaced: lanes.clipsUnplaced,
     coverageRequired: requireComplete,
     problems,
   };

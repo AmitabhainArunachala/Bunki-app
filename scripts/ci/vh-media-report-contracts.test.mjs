@@ -360,6 +360,34 @@ test('voice lock requires actual owed media and compares pinned roles; synthetic
     }),
   };
   assert.equal(validateMediaReport('voice-lock', report, artifactContext).passed, true);
+  // A retired plan owes no listening cue, but only when the built lock itself says so, and the
+  // clips that ship stay required.
+  const retiredContext = {
+    ...artifactContext,
+    readArtifactJson: () => ({
+      v: 1,
+      render: { model: 'locked-model', plan: 'retired' },
+      voices: { main: { id: 'main' }, second: { id: 'second' } },
+    }),
+  };
+  const retiredReport = { ...report, planRetired: true, cuesChecked: 0 };
+  assert.equal(validateMediaReport('voice-lock', retiredReport, retiredContext).passed, true);
+  for (const change of [
+    { planRetired: false },
+    { planRetired: undefined },
+    { clipsOwed: 1 },
+    { clipsChecked: 0 },
+    { narratedArticles: 0 },
+    { stagedCuesChecked: 0 },
+    { coverageRequired: false },
+  ])
+    assert.equal(
+      validateMediaReport('voice-lock', { ...retiredReport, ...change }, retiredContext).passed,
+      false,
+    );
+  // a report cannot retire the plan by its own word: the built lock is live here
+  assert.equal(validateMediaReport('voice-lock', retiredReport, artifactContext).passed, false);
+  assert.equal(validateMediaReport('voice-lock', retiredReport, context).passed, false);
 });
 test('narration requires each manifest clip to decode, run in order, and match actual shipped bytes', () => {
   const { report, context } = fixture('narration-media');

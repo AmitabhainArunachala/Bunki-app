@@ -1004,10 +1004,17 @@ definitions['voice-lock'] = Object.freeze({
       report.stagedCuesChecked > 0, 'Synthetic selector comparison did not run');
     for (const key of ['approvedWords', 'narratedArticles', 'clipsChecked', 'cuesChecked'])
       require(Number.isInteger(report[key]) && report[key] >= 0, `${key} missing/invalid`);
+    // A plan the artifact's own lock retires owes no further clip, so the listening lane it never
+    // rendered is not a debt. The claim is read from the built lock, never taken from the report
+    // alone, and the clips that do ship are required and checked whatever the plan says.
+    const planRetired = lock?.v === 1 && lock.render?.plan === 'retired';
+    require((report.planRetired === true) ===
+      planRetired, 'Report and built lock disagree about whether the plan is retired');
     require(report.clipsChecked > 0 &&
       report.narratedArticles > 0 &&
-      report.cuesChecked >
-        0, 'Actual shipped corpus missing; synthetic placeholders cannot prove availability');
+      (planRetired ||
+        report.cuesChecked >
+          0), 'Actual shipped corpus missing; synthetic placeholders cannot prove availability');
     return { passed: errors.length === 0, errors, expectedCases, observedCases: expectedCases };
   },
 });

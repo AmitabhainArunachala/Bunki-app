@@ -61,7 +61,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, realpathSync, rena
 import { homedir, tmpdir } from 'node:os';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { readVoiceLock, runtimeLock, voiceForRole } from './voice-lock.mjs';
+import { planRetired, readVoiceLock, runtimeLock, voiceForRole } from './voice-lock.mjs';
 import { listeningSentences } from './build-listening-cues.mjs';
 
 const corridor = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -664,6 +664,7 @@ async function main() {
     }
     console.log(JSON.stringify({
       dryRun: true, model: job.model, mainVoice: LOCK.main, head: state.head, checkoutChangedOutsideAudio: state.dirty,
+      plan: planRetired() ? 'retired: the lock says nothing more is rendered to it; --render refuses' : 'active',
       rate: rate ? { source: rate.source, read: rate.read, standard: rate.standard, through: rate.through, from2027: rate.from2027.standard }
         : `no published rate recorded for ${job.model}: no price is shown rather than a wrong one`,
       corpora: Object.fromEntries(Object.entries(job.perCorpus).map(([k, v]) => [k, fmt(v)])),
@@ -717,6 +718,11 @@ async function main() {
     if (!flag('confirm')) {
       console.error(`Authorization ${go.file} releases this job, but --confirm was not given, so nothing was bought.`);
       return 4;
+    }
+    // a plan the lock retires is never bought, even with a go-ahead for this very HEAD
+    if (planRetired()) {
+      console.error('REFUSING TO SPEND: audio/voice-lock.json retires this plan (render.plan); nothing more is rendered to this lock.');
+      return 3;
     }
     maxUsd = go.maxUsd;
   }

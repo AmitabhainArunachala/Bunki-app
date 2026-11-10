@@ -4,6 +4,8 @@
   "endpoint": "https://generativelanguage.googleapis.com/v1beta",
   "render": {
     "model": "gemini-3.8-flash-tts",
+    "plan": "retired",
+    "planNote": "Retired 2026-11-10 by the lead's ruling on pull request #146 (John dropped this voice for on-demand voices). Nothing more is rendered to this lock, so its corpus plan owes no further clip. The clips already on disk stay under the lock and every check on them still runs.",
     "note": "The lead's 10-17 decision on John's 'for now just anything decent and we can swap later'. Swap = change this one value and re-render; nothing else in the tree names a model."
   },
   "live": {

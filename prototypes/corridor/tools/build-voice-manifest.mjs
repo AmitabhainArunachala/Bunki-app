@@ -24,7 +24,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { runtimeLock } from './voice-lock.mjs';
+import { planRetired, runtimeLock } from './voice-lock.mjs';
 import { ledgerPathFor, plan, provenanceOf, readLedger, shippedVouchers } from './render-corpus.mjs';
 
 const corridor = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -39,17 +39,19 @@ const secondsOf = (file) => {
   } catch { return 0; }
 };
 
-/** Every placement the plan asks for, split into the ones that exist and the ones still owed. */
-export function survey({ root = corridor, lock = runtimeLock() } = {}) {
+/** Every placement the plan asks for, split into the ones that exist and the ones still owed.
+ * A retired plan (audio/voice-lock.json, render.plan) owes nothing: its placements with no file are
+ * counted as `unplaced` and are not a debt. The ones that exist are surveyed exactly as before. */
+export function survey({ root = corridor, lock = runtimeLock(), retired = planRetired() } = {}) {
   const job = plan({ lock });
-  const have = [], want = [];
-  for (const item of job.placements) (existsSync(resolve(root, item.path)) ? have : want).push(item);
-  return { job, have, want };
+  const have = [], missing = [];
+  for (const item of job.placements) (existsSync(resolve(root, item.path)) ? have : missing).push(item);
+  return { job, have, want: retired ? [] : missing, unplaced: missing.length, retired };
 }
 
 /** The two v2 manifests, as values. Writing them is a separate, explicit step. */
 export function buildManifests({ root = corridor, lock = runtimeLock(), ledgerFile = ledgerPathFor(lock.model) } = {}) {
-  const { have, want } = survey({ root, lock });
+  const { have, want, unplaced, retired } = survey({ root, lock });
   const ledger = readLedger(ledgerFile, lock.model);
   const vouchers = shippedVouchers(root);
   // only the two lanes this tool writes; the listening lane's copies are checked by verify-voice-lock.
@@ -94,6 +96,8 @@ export function buildManifests({ root = corridor, lock = runtimeLock(), ledgerFi
     },
     narration: { v: 2, lock: { model: lock.model, main: lock.main, second: lock.second }, articles },
     owed: want.length,
+    unplaced,
+    planRetired: retired,
     unproven,
   };
 }
@@ -120,7 +124,8 @@ export function checkManifests({ root = corridor, lock = runtimeLock() } = {}) {
     if (current.v !== 2 && owns)
       problems.push(`${file} is still v1 while ${owns} approved clip(s) exist on disk; run --write`);
   }
-  return { problems, approvedWords: approved, narratedArticles: narrated, clipsOwed: built.owed, unproven: built.unproven.length };
+  return { problems, approvedWords: approved, narratedArticles: narrated, clipsOwed: built.owed,
+    clipsUnplaced: built.unplaced, planRetired: built.planRetired, unproven: built.unproven.length };
 }
 
 function main() {
@@ -136,7 +141,7 @@ function main() {
     approvedWords: Object.keys(built.words.words).length,
     legacyWords: Object.keys(built.words.legacyWords).length,
     narratedArticles: Object.keys(built.narration.articles).length,
-    clipsOwed: built.owed, unproven: built.unproven.length };
+    clipsOwed: built.owed, clipsUnplaced: built.unplaced, planRetired: built.planRetired, unproven: built.unproven.length };
   if (flag('write')) {
     // --only narration|words keeps a lane that has nothing to say from rewriting a shipped asset
     const at = process.argv.indexOf('--only');
