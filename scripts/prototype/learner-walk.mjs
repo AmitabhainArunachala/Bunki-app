@@ -767,10 +767,9 @@ async function soundWalk(browser) {
     if (narrated.length) {
       const title = (index?.articles || []).find((x) => x.id === narrated[0])?.title || '';
       await openFirstArticle(session);
-      const item = page
-        .locator('.shelf-open')
-        .filter({ hasText: title.slice(0, 6) })
-        .first();
+      // the whole title: its first six characters also begin another article ("第2次高市内閣が始動" beside
+      // "第2次高市内閣 (改造)"), and the shelf's daily order decides which of the two comes first
+      const item = page.locator('.shelf-open').filter({ hasText: title }).first();
       await intoView(page, item);
       await press(item);
       await settleReader(page);
