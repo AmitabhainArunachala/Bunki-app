@@ -304,6 +304,26 @@ for (const [name, kanji] of [['rajomon-ma', '間'], ['rajomon-bun', '聞'], ['ra
   });
 }
 
+await door('orbit', 'the orbit word field opens from the galaxy menu and returns', async ({ page }) => {
+  const label = await throughDoor(page, 'orbit');
+  await page.locator('#ginga-symbol').click();
+  const bubble = page.locator('#orbit-preview-door');
+  await bubble.waitFor();
+  const words = (await bubble.innerText()).replace(/\s+/g, ' ').trim();
+  must(/preview/.test(words), `the orbit door reads "${words}"`);
+  await bubble.click();
+  await page.locator('dialog#orbit-preview[open]').waitFor();
+  const bar = await text(page, '.orbit-preview-bar', 120);
+  must(/preview/.test(bar), `the orbit bar reads "${bar}"`);
+  const frame = page.frameLocator('.orbit-preview-frame');
+  await frame.locator('body').waitFor({ timeout: 20000 });
+  await page.waitForTimeout(2500);
+  await shot(page, 'orbit');
+  await page.locator('#orbit-preview-back').click();
+  await page.locator('dialog#orbit-preview').waitFor({ state: 'detached', timeout: 10000 });
+  return `"${label}" → the galaxy symbol → "${words}" → "${bar}" → Back → view "${await view(page)}"`;
+});
+
 await door('moments', 'guided practice shows its moments, style and sound choices', async ({ page }) => {
   const label = await throughDoor(page, 'moments');
   must(await view(page) === 'dojo', `the door opened "${await view(page)}"`);
