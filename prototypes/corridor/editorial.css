@@ -3356,8 +3356,10 @@ body:not(.ui-bi) .primary-tabs .primary-tab { font: 800 var(--type-label)/1 var(
   pointer-events: none;
 }
 .primary-tabs .station-due::after { content: attr(data-due); }
-/* the bookmark's count (the saved words) at the station's other shoulder, quieter than what is due */
+/* the bookmark's count (the saved words) at the station's other shoulder, quieter than what is due, behind the bar's own
+   bookmark glyph (drawn with #tray's) */
 .primary-tabs .station-kept { left: auto; right: calc(50% + 9px); color: var(--color-muted); }
+.primary-tabs .primary-tab .station-kept::before { display: inline-block; width: 7px; height: 10px; margin-right: 2px; vertical-align: -1px; }
 .primary-tabs .primary-tab[aria-current='page'] { background: transparent; color: var(--color-ink); font-weight: 700; }
 body:not(.ui-bi) .primary-tabs .primary-tab[aria-current='page'] { font-weight: 800; }
 .primary-tabs .primary-tab[aria-current='page'] .station-node { opacity: 0; }
@@ -4655,7 +4657,8 @@ body:not(.zen):not(.ui-bi) #app > .chrome > button#tray {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0;
 }
-body:not(.zen) #app > .chrome > button#tray::before {
+body:not(.zen) #app > .chrome > button#tray::before,
+.primary-tabs .station-kept::before {
   content: '';
   flex: 0 0 auto;
   width: 13px;
