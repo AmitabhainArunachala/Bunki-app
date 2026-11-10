@@ -98,6 +98,16 @@ const place = (page) => page.evaluate(() => ({ node: document.querySelector('#sh
   overflow: document.body.style.overflow }));
 // kairo-frames is the app's own frame sampler: it writes the row for the page that was opened when the browser next
 // idles, which can fall after the door is pressed. Every other device key must stay as it was.
+/** The page's scroll has stopped moving: two equal readings 250 ms apart. */
+async function settled(page) {
+  for (let last = NaN, tries = 0; tries < 20; tries += 1) {
+    const now = await page.locator('#sheet').evaluate((sheet) => sheet.scrollTop);
+    if (now === last) return;
+    last = now;
+    await page.waitForTimeout(250);
+  }
+  assert.fail('The page under the door kept scrolling');
+}
 const device = (page) => page.evaluate(() => JSON.stringify([
   Object.entries(localStorage).filter(([key]) => key !== 'kairo-frames').sort(), Object.entries(sessionStorage).sort()]));
 const stopNow = async (page) => ({ glyph: await page.locator('#passage-glyph').innerText(), count: await page.locator('#passage-count').innerText(),
@@ -169,8 +179,13 @@ async function walk(browser, engine, size) {
   await press('#sheet-back');
   await page.locator('#sheet .hero-glyph', { hasText: '職' }).waitFor();
   await page.locator('#passage-door', { hasText: 'Resume the passage · stop 3 of 7 · preview' }).waitFor();
+  // Back hands the page its own scroll a frame or two later: let that land, then choose the place to resume from.
+  await settled(page);
   await page.locator('#sheet').evaluate((sheet) => { sheet.scrollTop = 240; });
-  await page.waitForTimeout(400);
+  await settled(page);
+  const resumed = await place(page);
+  assert.equal(resumed.sheet, 240, 'The page under the door is scrolled again');
+  assert.equal(resumed.node, origin.node, 'Back returned to the same page');
   // the detour's own pages may keep what the app keeps for any page; the rest of the passage is measured from here
   const recordMid = await readAppRecordSnapshot(page), deviceMid = await device(page);
   await press(door);
@@ -211,7 +226,7 @@ async function walk(browser, engine, size) {
   await press('#passage-finish');
   await page.waitForFunction(() => !document.querySelector('#passage-dialog'));
   const after = await place(page);
-  assert.deepEqual(after, { ...origin, focused: 'passage-door' }, 'The end returns to the page, scroll and door it started from');
+  assert.deepEqual(after, { ...resumed, focused: 'passage-door' }, 'The end returns to the page, scroll and door it started from');
   assert.equal(await door.innerText(), 'Walk the 職・識・織 passage · preview', 'A finished passage is not offered for resuming');
   assert.deepEqual(await readAppRecordSnapshot(page), recordMid, 'Resuming, playing and finishing change no durable row and no revision');
   assert.equal(await device(page), deviceMid, 'Resuming, playing and finishing write no device marker');
