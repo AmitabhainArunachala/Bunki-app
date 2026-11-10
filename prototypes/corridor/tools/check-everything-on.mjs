@@ -111,8 +111,12 @@ async function quesWordFromReader(page) {
 const doorTexts = (page) => page.evaluate(() => Object.fromEntries(['kanji-course-unit-door', 'kanji-room-door', 'kanji-quest-door']
   .map((id) => [id, document.getElementById(id)?.textContent.trim() ?? null])));
 const frameOf = async (page, deck) => {
-  await page.waitForFunction((deck) => [...document.querySelectorAll('iframe')].some((f) => f.src.includes(`shared-frame.html?deck=${deck}`)), deck, { timeout: 30000 });
-  const frame = page.frames().find((f) => f.url().includes(`shared-frame.html?deck=${deck}`));
+  let frame = null;
+  for (let i = 0; i < 150 && !frame; i += 1) {
+    frame = page.frames().find((f) => f.url().includes(`shared-frame.html?deck=${deck}`)) || null;
+    if (!frame) await page.waitForTimeout(200);
+  }
+  must(frame, `no study frame for the ${deck} deck after 30 s`);
   await frame.waitForFunction(() => /NIHONGO STUDY/.test(document.body?.innerText || ''), null, { timeout: 30000 });
   return frame;
 };
@@ -135,8 +139,13 @@ await check('doors-page', 'the doors page is served, reads at phone width, and e
   must(!unlabelled.length, `doors without the word preview: ${unlabelled.map((d) => d.door).join(', ')}`);
   const scripts = await page.locator('script').count();
   must(scripts === 0, `${scripts} script elements on a page that is plain HTML and CSS`);
-  const face = await page.evaluate(() => getComputedStyle(document.querySelector('h1')).fontFamily);
-  must(await page.evaluate(() => document.fonts.check('800 34px "Shippori Mincho B1"', 'Prototype doors')), `the title did not get the app's own face (${face})`);
+  // the app's own faces, from the site's fonts.css: the title's display face and the body's text face both load for this page's words
+  const faces = await page.evaluate(async () => ({
+    title: (await document.fonts.load('800 34px "Shippori Mincho B1"', 'Prototype doors')).length,
+    body: (await document.fonts.load('400 16px "Noto Sans JP"', 'Each link opens the app')).length,
+    family: getComputedStyle(document.querySelector('h1')).fontFamily,
+  }));
+  must(faces.title > 0 && faces.body > 0, `the page did not get the app's own faces (title ${faces.title}, body ${faces.body}; ${faces.family})`);
   await shot(page, 'doors-page-desktop');
   const phone = await context.browser().newContext({ ...PHONE, locale: 'en-US' });
   const small = await phone.newPage();
