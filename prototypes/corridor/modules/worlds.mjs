@@ -1,6 +1,6 @@
 /** G3 worlds seam — declarations moved verbatim from ../corridor.js (pure move, no body edits). */
 import { BEYOND_JOYO, D, GLUE_STROKE, GRAMMAR, INK_TEMPO, INK_WORLDS, JOYO_JUDGEABLE, KANJI_QUEST_FAILED, KANJI_QUEST_STRUCTURAL, M4_COPY, MONTHS_EN, PARTICLES, PART_STROKES, PART_WRITTEN, ROMAJI, ROOM_NAMES, S, STROKE_SPEED_DEFAULT, STROKE_VIEWBOX, SVG_NS, THEME_UI, TOPIC_BLOCKS, TOPIC_KICKERS, TOPIC_ORDER, WW_CX, WW_CY, WW_KANJI_ANGLES, WW_REL, WW_RING2_ORDER, WW_RING2_SLOTS, WW_TRAIL_MAX, WW_WALK_KEY, _KDX_NPTS, _compsCache, _kdxDist, _kdxNorm, _kdxResample, _kdxTemplates, animcjkApproved, animcjkShards, bi, biLabel, chipsFor, closeWorldPicker, confusablesFor, currentJoyoKunNote, el, ensureArchiveIndex, ensureArticle, go, inkGroundFor, interaction, kanjiCourseApplyHelp, kanjiCourseRememberHelp, kanjiDisplayRecord, kanjiFamilyExposures, kanjiFamilyMounts, kanjiFamilyResolveExample, kanjiFamilyStamp, kanjiFamilyStampCurrent, kanjiFamilyTicket, kanjiFamilyTicketCurrent, kanjiFamilyViews, kanjiQuestFor, kanjiQuestLoading, kanjiQuestOwner, kanjiReadingsState, kanjiReferenceRows, kanjiStructureMounts, kanjiWorldEligible, kankenGradeLabel, kataToHira, keepNavigationReturn, loadReferenceExtra, motionEase, motionMs, openKanjiCourseUnit, openKanjiWorldEncounter, openPassage, openStrokePage, passage, recordReady, recordWritable, refreshStrokeReadings, removeMini, render, renderFamilyExampleNode, renderKanjiCourseDoor, renderKanjiFamily, renderKanjiStructure, renderKdxGrid, renderSentenceTokens, renderSourceKanjiDoor, renderStudyFold, renderWordWeb, retainedKanjiRecord, scaleOut, sentenceDraftBindings, sentenceDraftInputErrors, sentenceDraftWindowEdits, shelfDay, skipState, srsKey, strokePathsFor, strokeReduced, strokeSpeed, syncStrokeNumbers, tx, withEn, wordBrush, wordWeb, writtenFormNote, wwP, wwPartMembers, wwReduced, wwShort, wwSpread, wwTokenIndex, wwTrail } from '../corridor.js';
-import { entryRow, toSources } from '../corridor.js';
+import { creditSources, entryRow, exampleCredits, toSources } from '../corridor.js';
 import { encounterTrail, setTouchReadingShown } from './capture.mjs';
 import { bankExamplesFor, displayKunReading, displayPairs, ensureDictionaryRowsForForm, lookup, nameReaderToken, partGloss, partMeaning, readerGlossLine, readingLine } from './dictionary.mjs';
 import { themeIx } from './learner.mjs';
@@ -1595,7 +1595,8 @@ function renderSentenceNode(sheet, node) {
   });
   sheet.append(line);
   if (node.en) sheet.append(el('p', 'sent-reader-en', node.en));
-  if (node.source) sheet.append(el('p', 'example-src', node.source));
+  // where the sentence comes from stands in the page's Sources, complete, never as a dataset's name under it
+  creditSources(sheet, exampleCredits(node));
   // tighten pass (2026-11-10): the sentence's keep (Save, Practice it) stands under it; buildPage draws it here, unquoted
   sheet.append(el('div', 'sent-keep'));
   // …and on to the whole article. The rubric asks a review answer to return
@@ -1635,6 +1636,7 @@ function sentenceDoor(ex, target) {
       tokens: ex.tokens,
       en: ex.en || '',
       source: ex.source || '',
+      ...(ex.credit ? { credit: ex.credit } : {}),
       passage: ex.passage || null,
       start: ex.start,
       target: target || null,

@@ -22,7 +22,8 @@ export function corridorDeclarations(file, names, optional = []) {
       );
       if (!statement && optional.includes(name)) return '';
       if (!statement) throw new Error(`the corridor declares no ${name} in ${file}`);
-      return statement.getText(ast);
+      // an exported declaration is lifted as the plain declaration it exports
+      return statement.getText(ast).replace(/^export\s+/u, '');
     })
     .join('\n');
 }

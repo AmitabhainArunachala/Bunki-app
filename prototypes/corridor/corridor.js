@@ -29034,6 +29034,43 @@ export function toSources(sheet, ...lines) {
   return box;
 }
 
+/** Where an example sentence comes from, as the page's Sources says it (owed-2 repair 2): a dataset's name under each
+ * sentence ("examples corpus") is not the learner's; the full attribution stands once in the page's Sources. A shelf
+ * article's sentence names that article's own attribution; a bank sentence its corpus (the bank's manifest record); a
+ * sentence kept before the record carried it, every corpus its label names. */
+export function exampleCredits(ex) {
+  const p = ex?.passage ? D.passages?.find((row) => row.id === ex.passage) : null;
+  if (p) return [{ attribution: p.attribution || learnerSourceLabel(p), licence: p.licence || '', url: p.url || '' }];
+  if (ex?.credit) return [ex.credit];
+  const label = String(ex?.source || '');
+  const named = (D.exampleManifest?.sources || []).filter((src) => label && (label === src.labelEn || label === src.labelJa));
+  return named.length ? named : label ? [{ attribution: label }] : [];
+}
+/** Each credit once in the page's Sources: the attribution complete (a link where it has an address), then its licence. */
+export function creditSources(sheet, credits) {
+  const shown = new Set([...sheet.querySelectorAll(':scope > .entry-sources .example-credit')].map((n) => n.dataset.credit));
+  const lines = [];
+  for (const credit of credits) {
+    const key = `${credit.attribution}|${credit.licence || ''}`;
+    if (!credit.attribution || shown.has(key)) continue;
+    shown.add(key);
+    const line = el('p', 'dictionary-credit example-credit');
+    line.dataset.credit = key;
+    line.dataset.japaneseLookup = 'off';
+    line.append(document.createTextNode(`${tx('用例', 'Examples')}: `));
+    if (/^https:\/\//u.test(credit.url || '')) {
+      const link = el('a', null, credit.attribution);
+      link.href = credit.url;
+      link.target = '_blank';
+      link.rel = 'noreferrer';
+      line.append(link);
+    } else line.append(document.createTextNode(credit.attribution));
+    if (credit.licence && !credit.attribution.includes(credit.licence)) line.append(document.createTextNode(` · ${credit.licence}`));
+    lines.push(line);
+  }
+  if (lines.length) toSources(sheet, ...lines);
+}
+
 /** Variant A (#38): the SAME target word rendered both ways. */
 function renderCardVariant(container, target) {
   const source = target.from ? D.passages.find((p) => p.id === target.from.passage) : null;
@@ -29160,6 +29197,7 @@ async function ensureBankExamples(word) {
             tokens: row[0].map(inflateExampleToken),
             en: row[1] || '',
             source: src ? tx(src.labelJa, src.labelEn) : tx('用例', 'examples'),
+            ...(src ? { credit: { attribution: src.attribution, licence: src.licence || '', url: src.url || '' } } : {}),
             bank: true,
           });
         }
@@ -30594,10 +30632,10 @@ function renderWordNode(sheet, node) {
       text.append(sentenceDoor(ex, node.id));
       line.append(text);
       if (ex.en) line.append(el('p', 'example-en', ex.en));
-      line.append(el('span', 'example-src', ex.source));
       return line;
     };
     for (const ex of leadExamples) sheet.append(exampleLine(ex));
+    creditSources(sheet, [...leadExamples, ...moreExamples].flatMap(exampleCredits));
     if (moreExamples.length) {
       const fold = el('details', 'more-examples');
       fold.append(el('summary', null, tx(`ほかの用例（${moreExamples.length}）`, `More examples (${moreExamples.length})`)));
