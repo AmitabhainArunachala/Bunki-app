@@ -7,7 +7,7 @@ import { adjacentScaleOutTarget, backupCounts, keepSentencePracticeFocusVisible,
 import { GRAMMARS, activateKanjiFamily, activateKanjiStructure, animcjkGlyphFor, clearStoryHero, heroOf, inkCeremony, inkSpecFor, inkStrokeMs, joyoOnNote, kanjiCourseEntryNode, kanjiCourseEvidencePatch, kanjiCourseNodeUnit, kanjiCourseReferenceHelp, kanjiCourseReturnFrame, kanjiCourseTeachingHelp, kanjiEnterCourseDoor, kanjiFamilyAuthorize, kanjiFamilyCitations, kanjiFamilyControlId, kanjiFamilyCourseExpectation, kanjiFamilyHasExampleOrigin, kanjiFamilyLiveVisit, kanjiFamilyRefusal, kanjiFamilyStatus, kanjiFinderUniverse, kanjiQuestBound, kanjiQuestLine, kanjiQuestOpen, kanjiQuestQuote, kanjiQuestRedraw, kanjiQuestRender, kanjiQuestRunStarted, kanjiQuestSeed, kanjiQuestSelfCheck, kanjiQuestSettle, kanjiQuestStage, kanjiQuestStructural, kanjiQuestSummary, kanjiReference, kanjiReferenceView, kanjiSlipReading, kankenLevels, kdxFrequencyHits, kdxGlyphName, kdxGridShown, kdxLoadFailed, kdxPartHits, kdxRadicalResults, kdxTextResults, kkldLine, kkldNumberGlyphs, kkldOf, nameStoryHero, openKanjiRooms, paintStrokes, paintTok, renderGrammarNode, renderIdiomNode, renderKanjiFamilyDisclosure, renderKanjiNode, renderKanjiRoomChooser, renderKdxDraw, renderParticleNode, renderRadicalNode, renderSentenceNode, sentenceDoor, sentenceDraftCopyButton, sentenceDraftInputMatches, sentenceDraftStatus, sentenceKept, sentencePracticeError, sentenceSource, storyAccent, storyBlock, storyDate, storyHeroArriving, storyHeroOnScreen, storyInstrument, storyKicker, storyLede, storyLevel, storyPicture, storyPictureSource, storySeries, storyVersions, storyYourWords, strokeAwakeField, strokeClassicReadings, strokeClassificationLine, strokeControl, strokeMissing, strokeReadingField, strokeReferenceStatus, strokeRoomRecord, strokeStart, worldName, worldPickerEsc, wwDefault, wwExcerpt, wwInkLabel, wwKanjiPassage, wwLearn, wwMine, wwModel, wwOpenPassage, wwPassages, wwPush, wwReadingChoices, wwRecentre, wwSlipNode, wwValid } from './modules/worlds.mjs';
 import { approvedNarrationManifest, availableSentenceListeningCue, excerptListenLabel, paintListenProgress, receivedPracticeAlternativeLabel, receivedPracticeLoadKey, reconcileAssessmentResults, reconcileSheetActionLines, recordFrameRow, recordNoteEditable, recordNoteExpected, recordPickerSurface, recordSha256, recordSyncStatus, recordUnavailable, recordViewSurface, refreshListenRow, resolveSentenceListeningCue, speakChip, speakGateEvidence, speakSentence, stopReadAloud, transcriptRangeLabel, voiceForRole, voicePendingNote } from './modules/voice.mjs';
 import { maintenanceScreenName, meSection, mergeGrammar, portableRecord, primaryTabs, readRecordDrafts, renderLayoutChoice, renderMe, renderWritingChoice, showRecordBackup, stampRegister, storedArchiveRow, syncTrayCount, themeId, themeIx, updateMeasurements, validArchiveRows, validArchiveTurn, validImportJournal, validStoredArchiveRows } from './modules/learner.mjs';
-import { byLeadingDrops, byNewest, dateStamp, dayKey, depthBasisParts, depthDot, depthNodeOf, helpByMonth, landOnKeptWords, leadingDropDays, localDayOrdinal, localMonthKey, luminance, monthKey, monthLabel, notYetMarks, readerDateStamp, renderDrift, renderKagami, renderTodayLine, renderTodayWord, roughestThisWeek, startOfDay, syncDriftTheme, todayCity, todayDateline, todayDueKeys, todayHash, todayKanji, todayLearning, todayPartStrokes, todayPlaceSky, todayReadPick, todayRedrawSky, todaySecondsPerCard, todaySharedPart, todaySkyWhy, todaySkyWord, trayLine } from './modules/drift.mjs';
+import { byLeadingDrops, byNewest, dateStamp, dayKey, depthBasisParts, depthDot, depthNodeOf, helpByMonth, landOnKeptWords, leadingDropDays, localDayOrdinal, localMonthKey, luminance, monthKey, monthLabel, notYetMarks, readerDateStamp, renderDrift, renderKagami, renderTodayLine, renderTodayWord, roughestThisWeek, startOfDay, syncDriftTheme, todayCity, todayDateline, todayHash, todayKanji, todayLearning, todayPlaceSky, todayReadPick, todayRedrawSky, todaySecondsPerCard, todaySkyWhy, todaySkyWord, trayLine } from './modules/drift.mjs';
 import { articleFingerprint, catalogLabel, feedDate, levelChip, levelPhrase, libraryDiscoverable, libraryVisibilityPolicy, openReferenceEntry, placeSealStrip, publisherLink, readerChoiceMatch, readerChoiceTokenHolds, readerEntryNode, referenceCollectionChip, refreshReadingPlacesSurface, renderCatalogNode, renderPublisherContextSelection, renderReaderChoice, renderReaderChoiceNote, renderReferenceMetadata, renderReferenceNode, resolveReadingPlace, searchRowShownByCore, shelfBodyToken, shelfCurrentDay, shelfDailyOrder, shelfDateline, shelfStories, shelfTallyText } from './modules/library.mjs';
 import { activeTeacherContext, aiAsk, aiChatTurns, aiCreateCards, aiKey, aiProvider, aiQuizParse, aiReadingSegments, aiRequestTimeoutMs, aiTeachingSubject, aiTransport, askOnRequest, canonicalAiBaseUrl, refreshTeacherChatHistory, renderAiCoach, renderAiExamples, renderAiTutor, sizeTeacherQuestion, teacherChatStatus, teacherDoorKey, teacherDraftCopyButton, teacherDraftStatus, teacherSentence, teacherSourceError, teacherWindowDraftKey, validAiEvidenceTurn } from './modules/teacher.mjs';
 
@@ -14567,38 +14567,126 @@ const TODAY_JA_WORD = /^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}ー
 /** The one part every kanji of the word carries, from D.kanji parts only, and that is every one's radical; the part
  * with the most strokes wins, so 隹 outranks the 亻 hiding inside it. */
 /** A kanji's own radical, when the kanji's parts name it (海 → 氵): the one part of a single kanji worth a hook. */
-/** Every card the learner meets today: today's queue plus anything whose due falls before midnight. */
-let todayFreshPool = null;
-/** The day's word: one of the learner's saved words that is NOT due today (gate 1), else a fresh
- * graded word they have not saved. Deterministic per date; words whose kanji share a part first. */
+/** The words he marked "I know this" on their own page (met.entries[key].said.value 'known'), by spelling. Pure. */
+function todayKnownWords(record = S) {
+  const known = new Set();
+  if (!metReadable(record?.met)) return known;
+  for (const [key, entry] of Object.entries(record.met.entries)) {
+    if (!plainRecord(entry) || !plainRecord(entry.said) || entry.said.value !== 'known') continue;
+    let parsed;
+    try { parsed = JSON.parse(key); } catch { parsed = null; }
+    if (Array.isArray(parsed) && parsed[0] === 1 && parsed[1] === 'word' && nonEmptyString(parsed[2])) known.add(parsed[2]);
+  }
+  return known;
+}
+/** The day's word, from his own study, with the reason it is there (John, 2026-11-10: "how is the word connected to
+ * the user or the study or progress?"). The first rule that yields a word wins:
+ *   missed  a word card due today whose latest answer was wrong, given before today: the latest such miss
+ *   saved   the word he saved last, before today, and has not studied (no schedule, no review)
+ *   read    a word of today's reading (todayReadPick) he has neither marked "I know this" nor saved: N1 and N2 words
+ *           first, then N3, then the rest
+ *   deck    the next new word of the deck he studies (todayDeckNext, read from the deck's own ledger)
+ * Decided from the date and the record, never by chance: within a rule the word that ranks first by the day's hash
+ * wins, so it holds all day, saving or studying another word leaves it standing, and saving or studying it moves the
+ * next load on to the next candidate. Reads the record only; writes nothing. */
 function todayWordOfDay(today) {
   const day = dayKey();
-  const blocked = todayDueKeys(today);
-  const reading = (w) => D.dict?.[w]?.r || D.words?.[w]?.r || '';
+  const dayStart = startOfDay(new Date());
+  const dayEnd = dayStart + 86400000;
   // G2 · R's identity: a saved word is read as he saved it — its card's own answer (年 kept as ねん is ねん, never the
   // spelling's とし); a saved word whose answer cannot be confirmed shows no reading rather than another one
   const savedReading = (w) => { const answer = savedAnswerFor({ t: 'word', id: w }); return answer?.status === 'available' ? answer.reading || '' : ''; };
-  // a shared part of some weight (隹, 言, 門) makes the best hook; a bare 一 or 八 the weakest
-  const tierOf = (w) => {
-    const ks = todayKanji(w);
-    const part = todaySharedPart(ks);
-    return part && todayPartStrokes(part) >= 4 ? 0 : part ? 1 : ks.length >= 2 ? 2 : ks.length ? 3 : 4;
+  const saved = new Map();
+  for (const item of S.taken) {
+    if (item.t !== 'word' || !TODAY_JA_WORD.test(item.id) || S.suspended?.[srsKey('word', item.id)]) continue;
+    const ts = Number.isFinite(item.ts) ? item.ts : 0;
+    // a word in several lists is one word, saved when it was first saved
+    if (!saved.has(item.id) || ts < saved.get(item.id).ts) saved.set(item.id, { item, ts });
+  }
+  const savedPick = (from, word, at) => ({ word, reading: savedReading(word), from, at, item: saved.get(word).item });
+  // a · each card's latest answer, undone answers taken out (an undo row names the row it takes back)
+  const log = Array.isArray(S.revlog) ? S.revlog : [];
+  const revoked = new Set();
+  for (const row of log) if (Array.isArray(row) && row[2] === 0) revoked.add(row[3]);
+  const latest = new Map();
+  log.forEach((row, i) => {
+    if (!Array.isArray(row) || !(row[2] >= 1 && row[2] <= 4) || revoked.has(i) || !String(row[1]).startsWith('word:')) return;
+    if (!latest.has(row[1]) || row[0] >= latest.get(row[1])[0]) latest.set(row[1], row);
+  });
+  let missed = null;
+  for (const word of saved.keys()) {
+    const key = srsKey('word', word);
+    const row = latest.get(key);
+    if (!row || row[2] !== 1 || !(row[0] < dayStart) || !(Date.parse(S.srs?.[key]?.due) < dayEnd)) continue;
+    if (!missed || row[0] > missed.at || (row[0] === missed.at && word < missed.word)) missed = { word, at: row[0] };
+  }
+  if (missed) return savedPick('missed', missed.word, missed.at);
+  // b · saved before today and never studied: the latest
+  let kept = null;
+  for (const [word, { ts }] of saved) {
+    if (ts >= dayStart || wordStudied(S, word)) continue;
+    if (!kept || ts > kept.ts || (ts === kept.ts && word < kept.word)) kept = { word, ts };
+  }
+  if (kept) return savedPick('saved', kept.word, kept.ts || null);
+  // c · today's reading: a content word the core dictionary knows, his level's first; the day's hash orders each tier
+  const forms = todayReadPick()?.passage?.readingFacets?.forms || [];
+  const known = todayKnownWords();
+  const taken = new Set(S.taken.filter((item) => item.t === 'word').map((item) => item.id));
+  const tier = (w) => {
+    const level = Number(D.words?.[w]?.jlpt) || Number(String(D.dict[w]?.jlpt || '').replace(/^N/u, '')) || 0;
+    return level === 1 || level === 2 ? 0 : level === 3 ? 1 : level ? 3 : 2;
   };
-  const choose = (list, from) => {
-    if (!list.length) return null;
-    const tiers = list.map((w) => [w, tierOf(w)]);
-    const best = Math.min(...tiers.map(([, t]) => t));
-    if (best > 3) return null;
-    const tier = tiers.filter(([, t]) => t === best).map(([w]) => w).sort();
-    const word = tier[todayHash(`${day}:${from}`) % tier.length];
-    return { word, reading: from === 'saved' ? savedReading(word) : reading(word), from, item: S.taken.find((i) => i.t === 'word' && i.id === word) || null };
-  };
-  const savedIds = new Set(S.taken.filter((i) => i.t === 'word').map((i) => i.id));
-  const saved = [...savedIds].filter((w) => !blocked.has(srsKey('word', w)) && TODAY_JA_WORD.test(w) && savedReading(w));
-  const fromSaved = choose(saved, 'saved');
-  if (fromSaved) return fromSaved;
-  todayFreshPool ||= Object.keys(D.words || {}).filter((w) => TODAY_JA_WORD.test(w) && todaySharedPart(todayKanji(w)));
-  return choose(todayFreshPool.filter((w) => !savedIds.has(w)), 'fresh');
+  let read = null;
+  for (const w of forms) {
+    const n = [...w].length;
+    if (n < 2 || n > 4 || !/\p{Script=Han}/u.test(w) || !TODAY_JA_WORD.test(w) || !D.dict?.[w] || taken.has(w) || known.has(w)) continue;
+    const rank = [tier(w), todayHash(`${day}:${w}`)];
+    if (!read || rank[0] < read.rank[0] || (rank[0] === read.rank[0] && rank[1] < read.rank[1])) read = { word: w, rank };
+  }
+  if (read) return { word: read.word, reading: D.dict[read.word].r || '', from: 'read', item: null };
+  // d · the deck he studies, its next new word (arrives once the deck has loaded; Today draws it then)
+  const next = todayDeckNext();
+  if (next?.term && TODAY_JA_WORD.test(next.term)) return { word: next.term, reading: next.reading || '', from: 'deck', deck: next.deck, item: null };
+  return null;
+}
+/* d · the deck he studies, read through the deck player from its own ledger (read only): of the three word decks
+ * (LEARN_STAGE_DECKS) the one he answered in last, else the first, and the next word it would bring him new. The answer
+ * is kept for the ledgers it was read from, so a sitting in the deck moves it on; Today draws it in place when it comes. */
+let todayDeckAsk = null;
+function todayDeckNext() {
+  if (window.__CORRIDOR_STANDALONE__ === true || sharedStudyActive()) return null;
+  const ids = LEARN_STAGE_DECKS.map(([id]) => id);
+  let print = dayKey();
+  try {
+    for (const id of ids) {
+      const raw = localStorage.getItem(`bunki-cloze:${id}`);
+      print += `|${raw ? `${raw.length}:${raw.slice(-48)}` : '-'}`;
+    }
+  } catch { /* storage may be blocked */ }
+  if (todayDeckAsk?.print === print) return todayDeckAsk.word;
+  const asked = { print, word: null };
+  todayDeckAsk = asked;
+  loadDeckPlayer()
+    .then((mod) => mod.nextNewWord?.(ids))
+    .then((word) => {
+      if (!word || todayDeckAsk !== asked) return;
+      asked.word = word;
+      todayDrawLateWord();
+    })
+    .catch(() => {});
+  return null;
+}
+/** The day's word that arrived after Today was drawn (the deck's): its sky and its word, in their places, never by a
+ * full render and never under an open card. */
+function todayDrawLateWord() {
+  const hero = document.querySelector('#app main .today-hero');
+  if (S.view !== 'tray' || S.stack.length || !hero || hero.querySelector('.today-dayword') || document.getElementById('mini')) return;
+  const today = S.taken.length && scheduler ? todayQueue() : null;
+  const pick = todayWordOfDay(today);
+  if (!pick) return;
+  hero.querySelector('#today-universe')?.before(todaySky(pick.word, today, todayReadPick()));
+  hero.append(renderTodayWord(pick));
+  todayPlaceSky(hero);
 }
 /** The hook of wonder, from data: the part the word's kanji share, how many kanji carry it, and
  * how many of those already stand in the learner's own words. */
