@@ -248,7 +248,8 @@ export function createVoiceClient({ fetch: fetchFn = globalThis.fetch?.bind(glob
       return { bytes, contentType, voiceId: response.headers.get('X-NSRS-Audio-Voice-Id') || null, inputKey: input.inputKey };
     },
 
-    /** The shared budget: { capCents, spentCents, reservedCents, remainingCents }. */
+    /** The shared budget: { capCents, spentCents, reservedCents, remainingCents } and, when the server sends them,
+     * { dayCapCents, daySpentCents }. */
     async budget({ signal } = {}) {
       await ready();
       if (!pairing) throw new VoiceError('not-paired');
@@ -261,7 +262,10 @@ export function createVoiceClient({ fetch: fetchFn = globalThis.fetch?.bind(glob
       try { body = await response.json(); } catch { throw new VoiceError('invalid-response', 200); }
       const fields = ['capCents', 'spentCents', 'reservedCents', 'remainingCents'];
       if (!fields.every((name) => Number.isSafeInteger(body?.[name]))) throw new VoiceError('invalid-response', 200);
-      return Object.fromEntries(fields.map((name) => [name, body[name]]));
+      const budget = Object.fromEntries(fields.map((name) => [name, body[name]]));
+      // the day's own figures, once the server sends them (the speech team's next build); until then the total only
+      for (const name of ['dayCapCents', 'daySpentCents']) if (Number.isSafeInteger(body[name]) && body[name] >= 0) budget[name] = body[name];
+      return budget;
     },
 
     toJSON: () => ({ configured: !!server, paired: !!pairing }),

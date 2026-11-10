@@ -12839,9 +12839,13 @@ function deviceVoiceMessage(result) {
   return tx('この環境では端末の声を利用できません', 'Device voice is unavailable in this browser');
 }
 
-function speakCardReading(text, btn, word = '') {
+function speakCardReading(text, btn, word = '', { automatic = false } = {}) {
   if (document.hidden || (btn?.id === 'card-say' &&
       (S.view !== 'review' || !S.review?.revealed || S.review.pending || S.review.admitting || S.stack.length || S.strokes))) return;
+  // Said by itself (a card's answer shown, a word writing itself) is not his tap: the voice server is paid by the
+  // sentence, so it is asked only when he switched that on, and the device voice never speaks by itself. An approved
+  // recording of a single word would be free and could sound here; this app ships none. A tap on 音 always speaks.
+  if (automatic && wordVoice() !== 'on') return;
   retireCardSpeech();
   stopReadAloud(); stopRecAudio(); stopSentenceListening();
   // The current source is the voice seam (modules/voice-seam.mjs): a recorded clip, then the voice server, then the
@@ -12850,7 +12854,7 @@ function speakCardReading(text, btn, word = '') {
   if (!voiceLayer) { cardVoiceStatus(btn, tx('現在の音源が必要です', 'Current audio source required'), 'current-source-required'); return; }
   cardVoiceStatus(btn, '', null);
   // the server's voice needs no note; the device voice says why it is the one speaking; a failure says what to do
-  voiceLayer.sayWord({ text, word, button: btn,
+  voiceLayer.sayWord({ text, word, button: btn, automatic,
     onNote: (line, flag) => cardVoiceStatus(btn, flag ? line : '', flag && flag !== 'device' ? flag : null) });
 }
 
@@ -12907,10 +12911,8 @@ function autoSpeakReviewFace() {
   if (status) cardVoiceStatus(button, status.reason, status.flag);
   if (reviewVoiceFace.attempted) return;
   reviewVoiceFace.attempted = true;
-  if (wordVoice() !== 'on') {
-    cardVoiceStatus(button, tx('声はオフ · 音で再生', 'Voice is off · tap audio to play'), DEVICE_VOICE_REASONS.DISABLED);
-    return;
-  }
+  // by itself the answer is said only when the learner switched that on (Settings, 筆と声); otherwise 音 waits for his tap
+  if (wordVoice() !== 'on') return;
   speakCardReading(button.dataset.voiceText, button, button.dataset.voiceWord,
     { automatic: true, entrySeq: button.dataset.voiceEntrySeq });
 }
@@ -32674,8 +32676,13 @@ function renderStrokePage(root) {
  * stroke data (kana, a rare glyph) stands written from the first frame. */
 const WORD_BRUSH_KEY = 'kairo-word-brush-v1';
 const WORD_BRUSH = Object.freeze(['first', 'always', 'never']);
-const WORD_VOICE_KEY = 'kairo-word-voice-v1';
-const WORD_VOICE = Object.freeze(['on', 'off']);
+/* 声 — by itself. The voice server is paid by the sentence, so a word said as its box writes it, or a card's answer said
+ * as it is shown, would spend the learner's voice budget without a tap. That happens only when he switched it ON here
+ * (the program lead's ruling, 2026-11-10); OFF is the default. The switch has a key of its own: the older
+ * 'kairo-word-voice-v1' (on by default, from when the voice by itself was free device speech) is never read or written
+ * again, so an old "on" is never taken for a yes to spending. */
+const WORD_VOICE_KEY = 'kairo-voice-by-itself-v1';
+const WORD_VOICE = Object.freeze(['off', 'on']);
 /** A device choice (never the learner record), read once and kept for the session when storage cannot keep it — the
  * writing speed's own way. The first of `allowed` is the default. */
 function wordPref(key, field, allowed) {
@@ -32694,7 +32701,7 @@ function setWordPref(key, field, allowed, value) {
 }
 /** 筆 — when a word writes itself: 'first' (a first meeting: new or met), 'always', 'never'. */
 const wordBrush = () => wordPref(WORD_BRUSH_KEY, 'wordBrush', WORD_BRUSH);
-/** 声 — automatic speech: recorded audio first, device voice for gaps; 'on' or 'off'. */
+/** 声 — new words and answers said by themselves, through the voice server (it uses the voice budget): 'off' or 'on'. */
 const wordVoice = () => wordPref(WORD_VOICE_KEY, 'wordVoice', WORD_VOICE);
 
 /** One stroke's time: min(110 ms, 1400 ms ÷ strokes), never under 45 ms, at the middle 書く速さ — a word of up to 31
@@ -32864,8 +32871,10 @@ if (typeof window !== 'undefined') window.addEventListener('pagehide', () => ret
  * reading the stage shows (V's resolver under audio/voice-lock.json, Kore for a word), with a Japanese device voice
  * for gaps. Only ever after his own gesture, on an unsealed stage. An unavailable voice marks the 音 quietly
  * (its name says so); asked for with a tap, its note also says why. */
-function sayStageWord(button, { surface, reading }) {
+function sayStageWord(button, { surface, reading }, { automatic = false } = {}) {
   if (!button?.isConnected || !nonEmptyString(reading)) return;
+  // the word said as it writes itself is said by itself: only when the learner switched that on (speakCardReading)
+  if (automatic && wordVoice() !== 'on') return;
   if (!button.parentElement.querySelector('.say-note')) {
     const note = el('span', 'say-note mini-say-note');
     note.setAttribute('role', 'status');
@@ -32873,7 +32882,7 @@ function sayStageWord(button, { surface, reading }) {
     button.parentElement.append(note);
   }
   stageVoiceSpoke = true;
-  speakCardReading(reading, button, surface);
+  speakCardReading(reading, button, surface, { automatic });
 }
 
 /** A visit dresses the stage it opens before the stage mounts (showMini calls the visit's ceremony): the ceremony is
@@ -32906,7 +32915,8 @@ function dressStage(visit, stage, { word, label, token, kind, nodeFor, reading, 
     if (!ink && word.dataset.ink === 'arriving') delete word.dataset.ink;
     if (ink && voice && wordVoice() === 'on' && (speak === 'again' || (speak === 'first' && !plan.spoke))) {
       plan.spoke = true;
-      sayStageWord(voice, { surface: label, reading });
+      // with the writing, not with a tap on 音: said by itself
+      sayStageWord(voice, { surface: label, reading }, { automatic: true });
     }
     return ink;
   };

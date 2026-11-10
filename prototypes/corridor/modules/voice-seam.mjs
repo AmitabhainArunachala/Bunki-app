@@ -4,6 +4,8 @@
  *   1. an approved recorded clip, when the surface has one for that sentence;
  *   2. the voice server (modules/voice-client.mjs), when this device is paired and the server takes the text;
  *   3. the device's own Japanese voice: unpaired, offline, out of budget, or the server refusing.
+ * The device voice is the fallback for the learner's own tap only (`deviceFallback`): a read that starts by itself
+ * never uses it. Whether anything may start by itself is the app's rule, not this module's (corridor.js, WORD_VOICE).
  *
  * The contract's error codes each have one behaviour here:
  *   401 authentication-required   the client drops the token; device voice; the status says "pair again"
@@ -122,8 +124,9 @@ export function createVoiceSeam({ client, device, player, recorded = null, quiet
     for (const piece of pieces) { aborted(signal); parts.push(await fromServer(piece.text, voiceKey, signal)); }
     return { parts, source: 'server' };
   }
-  /** The clip for one sentence, from the first source that has one. */
-  async function clipFor(sentence, voiceKey, signal) {
+  /** The clip for one sentence, from the first source that has one. `useDevice` false: a read that is not the learner's
+   * own tap (something said by itself) never falls back to the device voice; with no clip it has nothing to say. */
+  async function clipFor(sentence, voiceKey, signal, useDevice = true) {
     if (sentence.recorded && typeof recorded === 'function') return { recorded: sentence.recorded, source: 'recorded' };
     let text = '';
     try { text = normaliseSpeechText(sentence.text); } catch { /* not text */ }
@@ -144,7 +147,7 @@ export function createVoiceSeam({ client, device, player, recorded = null, quiet
         tell();
       }
     }
-    if (!device.support()?.ok || !text) throw Object.assign(new Error('no-voice'), { code: 'no-voice', reason: why });
+    if (!useDevice || !device.support()?.ok || !text) throw Object.assign(new Error('no-voice'), { code: 'no-voice', reason: why });
     return { device: true, text, source: 'device', reason: why };
   }
 
@@ -205,12 +208,12 @@ export function createVoiceSeam({ client, device, player, recorded = null, quiet
   /** Read sentences aloud. `sentences` is [{ text, recorded? }]; one read at a time: this one ends whatever was speaking.
    * Returns the read's own controls. */
   function read({ sentences, voiceKey, from = 0, rate = 1, prefetch = 2, gapMs = 260, onSentence = () => {}, onState = () => {},
-    stopRecorded = null, rateRecorded = null } = {}) {
+    stopRecorded = null, rateRecorded = null, deviceFallback = true } = {}) {
     stop();
     try { quiet(); } catch { /* another lane's fault */ }
     const owner = { queue: null, stopRecorded, rateRecorded, ended: false, recordedStops: 0 };
     const queue = createSpeechQueue({
-      fetchClip: (sentence, _index, signal) => clipFor(sentence, voiceKey, signal),
+      fetchClip: (sentence, _index, signal) => clipFor(sentence, voiceKey, signal, deviceFallback),
       player: composite(owner),
       prefetch, gapMs, sleep,
       onSentence: (index) => { if (session === owner || index < 0) onSentence(index); },

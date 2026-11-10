@@ -31,7 +31,7 @@ import {
   parsePairing,
   isVoiceServer,
 } from '../prototypes/corridor/modules/voice-client.mjs';
-import { japaneseSentences } from '../prototypes/corridor/modules/voice-layer.mjs';
+import { daySpend, japaneseSentences } from '../prototypes/corridor/modules/voice-layer.mjs';
 import { createVoiceSeam, voiceKeyOf } from '../prototypes/corridor/modules/voice-seam.mjs';
 import { startFakeVoiceServer } from '../prototypes/corridor/tools/fake-voice-server.mjs';
 
@@ -474,6 +474,20 @@ describe('the client speaks the contract', () => {
     controller.abort();
     await expect(pending).rejects.toMatchObject({ name: 'AbortError' });
   });
+  it('passes on the day’s own figures when the server sends them, and only then', async () => {
+    const c = await paired();
+    expect('daySpentCents' in (await c.budget())).toBe(false);
+    fake.set({ dayFields: true, daySpent: 42 });
+    try {
+      expect(await c.budget()).toMatchObject({
+        capCents: 2500,
+        dayCapCents: 300,
+        daySpentCents: 42,
+      });
+    } finally {
+      fake.set({ dayFields: false, daySpent: 0 });
+    }
+  });
   it('reads the budget', async () => {
     const c = await paired();
     const budget = await c.budget();
@@ -657,6 +671,48 @@ describe('the seam: recorded clip, then the server, then the device', () => {
     expect(r.calls.speak).toHaveLength(0);
     expect(r.calls.deviceSaid).toHaveLength(1);
     expect(r.seam.status().last).toMatchObject({ source: 'device', reason: 'not-japanese' });
+  });
+  it('a read that is not his tap never uses the device voice: with no clip to be had it says nothing', async () => {
+    // unpaired: the server is not asked and the device stays silent
+    const unpaired = rig({ paired: false });
+    const first = await run(unpaired.seam, {
+      voiceKey: 'word:猫',
+      sentences: [{ text: 'ねこ' }],
+      deviceFallback: false,
+    });
+    expect(first.states.at(-1)).toBe('error:no-voice');
+    expect(unpaired.calls.speak).toHaveLength(0);
+    expect(unpaired.calls.deviceSaid).toHaveLength(0);
+    // paired, the server refusing: still no device voice
+    const refused = rig();
+    refused.fail({ code: 'day-budget', status: 429 });
+    const second = await run(refused.seam, {
+      voiceKey: 'word:猫',
+      sentences: [{ text: 'ねこ' }],
+      deviceFallback: false,
+    });
+    expect(second.states.at(-1)).toBe('error:no-voice');
+    expect(refused.calls.speak).toHaveLength(1);
+    expect(refused.calls.deviceSaid).toHaveLength(0);
+    // paired and answered: the server's clip plays
+    const answered = rig();
+    const third = await run(answered.seam, {
+      voiceKey: 'word:猫',
+      sentences: [{ text: 'ねこ' }],
+      deviceFallback: false,
+    });
+    expect(third.states.at(-1)).toBe('done');
+    expect(answered.calls.played).toHaveLength(1);
+    // a recorded clip is free and plays either way
+    const recorded = rig({ paired: false });
+    const fourth = await run(recorded.seam, {
+      voiceKey: 'article:a1',
+      deviceFallback: false,
+      sentences: [{ text: S3[0].text, recorded: { src: 'audio/narration/sakura/x-000.m4a' } }],
+    });
+    expect(fourth.states.at(-1)).toBe('done');
+    expect(recorded.calls.recorded).toHaveLength(1);
+    expect(recorded.calls.speak).toHaveLength(0);
   });
   it('neither a server nor a device voice: the read ends with no-voice', async () => {
     const r = rig({ paired: false, device: false });
@@ -901,6 +957,42 @@ describe('only the Japanese is read', () => {
     expect(texts('The particle は marks the topic.')).toEqual([]);
     expect(texts('')).toEqual([]);
     expect(texts(null)).toEqual([]);
+  });
+});
+
+describe('today’s spend, for the status line', () => {
+  const NOW = Date.parse('2026-11-10T14:30:00Z');
+  const total = (spentCents) => ({
+    capCents: 2500,
+    spentCents,
+    reservedCents: 0,
+    remainingCents: 2500 - spentCents,
+  });
+  it('counts from this device’s first look of the day until the server sends the day’s own figure', () => {
+    const first = daySpend(total(120), null, NOW);
+    expect(first).toMatchObject({ day: '2026-11-10', spentCents: 0, capCents: null, since: NOW });
+    expect(first.keep).toEqual({ day: '2026-11-10', spentCents: 120, at: NOW });
+    const later = daySpend(total(163), first.keep, NOW + 3600_000);
+    expect(later).toMatchObject({ spentCents: 43, since: NOW });
+    expect(later.keep).toEqual(first.keep);
+  });
+  it('starts again at 00:00 UTC, and after a kept figure that can no longer be right', () => {
+    const kept = { day: '2026-11-10', spentCents: 120, at: NOW };
+    const nextDay = daySpend(total(400), kept, Date.parse('2026-11-11T00:00:05Z'));
+    expect(nextDay).toMatchObject({ day: '2026-11-11', spentCents: 0 });
+    expect(nextDay.keep.spentCents).toBe(400);
+    expect(daySpend(total(100), kept, NOW + 1000).spentCents).toBe(0); // the total fell: a reset on the server
+    expect(
+      daySpend(total(150), { day: '2026-11-10', spentCents: 'x', at: NOW }, NOW).spentCents,
+    ).toBe(0);
+  });
+  it('shows the server’s own day figure as it is', () => {
+    const own = daySpend(
+      { ...total(900), dayCapCents: 300, daySpentCents: 57 },
+      { day: '2026-11-10', spentCents: 0, at: NOW },
+      NOW,
+    );
+    expect(own).toMatchObject({ spentCents: 57, capCents: 300, since: null, keep: null });
   });
 });
 

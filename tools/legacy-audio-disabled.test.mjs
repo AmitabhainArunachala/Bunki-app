@@ -52,6 +52,8 @@ test('unbound legacy speech and recording entry points fail closed', async () =>
     assert.equal(nodes.length, 1);
     return source.slice(nodes[0].getStart(ast), nodes[0].end);
   }
+  // the learner's switch for words and answers said by themselves (corridor.js, WORD_VOICE): 'on' or 'off'
+  let bySelf = 'on';
   let fetches = 0,
     starts = 0,
     retired = 0,
@@ -94,7 +96,7 @@ test('unbound legacy speech and recording entry points fail closed', async () =>
     stopSentenceListening: () => {},
     cardVoiceStatus: (...args) => status.push(args),
     tx: (ja, en) => en,
-    wordVoice: () => 'on',
+    wordVoice: () => bySelf,
     wordClipFor: () => ({ src: 'retained-synthetic.m4a' }),
     approvedWordManifest: (x) => x,
     refreshListenRow: () => {},
@@ -137,6 +139,29 @@ test('unbound legacy speech and recording entry points fail closed', async () =>
   assert.equal(said[0].text, 'きかい');
   assert.equal(said[0].word, '機械');
   assert.equal(typeof said[0].onNote, 'function');
+  assert.equal(fetches, 0);
+  assert.equal(starts, 0);
+  assert.equal(speaks, 0);
+  // Said by itself (a card's answer shown, a word writing itself) is not his tap. With the switch off, which is the
+  // default, nothing happens at all: no other sound is stopped and the seam is not asked.
+  bySelf = 'off';
+  const before = [retired, stopped, said.length];
+  await sandbox.speakCardReading('きかい', null, '機械', { automatic: true });
+  await Promise.resolve();
+  assert.deepEqual(
+    [retired, stopped, said.length],
+    before,
+    'by itself, with the switch off, nothing is asked or stopped',
+  );
+  // …and his own tap still speaks with the switch off
+  await sandbox.speakCardReading('きかい', null, '機械');
+  assert.equal(said.length, 2, 'a tap is his own act');
+  assert.equal(said[1].automatic, false);
+  // With the switch on the seam is asked, and told that this is not his tap (so it never uses the device voice)
+  bySelf = 'on';
+  await sandbox.speakCardReading('きかい', null, '機械', { automatic: true });
+  assert.equal(said.length, 3);
+  assert.equal(said[2].automatic, true);
   assert.equal(fetches, 0);
   assert.equal(starts, 0);
   assert.equal(speaks, 0);

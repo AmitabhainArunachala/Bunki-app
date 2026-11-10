@@ -51,6 +51,18 @@ export function japaneseSentences(text) {
     .filter((sentence) => isJapaneseEnough(sentence.text));
 }
 
+/** Today's spend, for the status line. The server's day runs from 00:00 UTC. When the server sends the day's own
+ * figures they are shown as they are; until then it is what the total has grown by since this device first looked today
+ * (`kept` is that first look: { day, spentCents, at }; `keep` is what to remember for the next look). */
+export function daySpend(budget, kept, now = Date.now()) {
+  const day = new Date(now).toISOString().slice(0, 10);
+  if (Number.isSafeInteger(budget?.daySpentCents))
+    return { day, spentCents: budget.daySpentCents, capCents: Number.isSafeInteger(budget.dayCapCents) ? budget.dayCapCents : null, since: null, keep: null };
+  const base = kept && kept.day === day && Number.isSafeInteger(kept.spentCents) && kept.spentCents >= 0 && kept.spentCents <= budget.spentCents &&
+    Number.isFinite(kept.at) ? kept : { day, spentCents: budget.spentCents, at: now };
+  return { day, spentCents: budget.spentCents - base.spentCents, capCents: null, since: base.at, keep: base };
+}
+
 export function installVoiceLayer(host) {
   const { tx, el, uiIcon, deviceVoice } = host;
   const doc = host.document || document;
@@ -112,10 +124,12 @@ export function installVoiceLayer(host) {
     ? tx('声を出せません。設定の「筆と声」で音声サーバーとつなぐ。', 'No voice here. Pair the voice server in Settings, Writing and voice.')
     : tx('再生できませんでした。もう一度。', 'Could not play. Tap to try again.');
 
-  /** Speak `sentences` from `button`: a second tap stops it; whatever else was speaking ends first. */
-  function speakFrom(button, { sentences, voiceKey, single = false, onNote = null, onDone = null }) {
+  /** Speak `sentences` from `button`: a second tap stops it; whatever else was speaking ends first. `automatic`: the
+   * read was not started by the learner's tap (a word or an answer said by itself, which the app allows only when he
+   * switched it on): it never falls back to the device voice, and when nothing can say it, it says nothing at all. */
+  function speakFrom(button, { sentences, voiceKey, single = false, onNote = null, onDone = null, automatic = false }) {
     if (button && spoken?.button === button && spoken.session && !spoken.session.ended) { seam.stop(); return null; }
-    if (!sentences.length) { onNote?.(failureLine('nothing'), 'no-text'); return null; }
+    if (!sentences.length) { if (!automatic) onNote?.(failureLine('nothing'), 'no-text'); return null; }
     prime();
     const mine = { button, session: null, over: false };
     const paint = (on) => {
@@ -124,7 +138,7 @@ export function installVoiceLayer(host) {
       if (on) button.setAttribute('aria-pressed', 'true'); else button.removeAttribute('aria-pressed');
     };
     mine.session = seam.read({
-      sentences, voiceKey, prefetch: single ? 0 : 2, gapMs: single ? 0 : 260, rate: reader.rate,
+      sentences, voiceKey, prefetch: single ? 0 : 2, gapMs: single ? 0 : 260, rate: reader.rate, deviceFallback: !automatic,
       onSentence: (index) => { if (index >= 0 && !mine.over) onNote?.(sourceLine(seam.status()), seam.status().last.source === 'device' ? 'device' : null); },
       onState: (state, code) => {
         if (mine.over) return;
@@ -134,7 +148,7 @@ export function installVoiceLayer(host) {
           paint(false);
           button?.removeAttribute('aria-busy');
           if (spoken === mine) spoken = null;
-          if (state === 'error') onNote?.(failureLine(code), code || 'failed');
+          if (state === 'error' && !automatic) onNote?.(failureLine(code), code || 'failed');
           onDone?.(state, code);
         }
       },
@@ -463,6 +477,7 @@ export function installVoiceLayer(host) {
 
   /* ------------------------------------------------------------------ Settings: pairing and the status line */
   const dollars = (cents) => `$${(cents / 100).toFixed(2)}`;
+  const DAY_KEY = 'kairo-voice-day'; // the total as this device first saw it today: two numbers and a time, no secret
   const PAIR_LINES = {
     'invalid-pairing': ['コードか学習者IDの形が違います。確かめてもう一度。', 'That does not look like a pairing code and learner id. Check them and try again.'],
     'authentication-required': ['コードが違うか、使用済みか、期限切れです。「Pair Bunki voice」をもう一度実行してください。', 'That code is wrong, already used or expired. Run “Pair Bunki voice” again for a new one.'],
@@ -481,8 +496,10 @@ export function installVoiceLayer(host) {
       (status.durable ? '' : tx(' このブラウザは保存できないため、今回の利用だけ有効。', ' This browser could not keep it, so it lasts for this visit only.'));
     else if (status.pairAgain) state = tx('音声サーバーがこの接続を終了しました。新しいコードでもう一度つないでください。', 'The voice server ended this pairing. Pair Bunki again with a new code.');
     else state = tx('未接続。つなぐまでは端末の声で読みます。', 'Not paired. The device voice speaks until you pair.');
+    // the server's day is the UTC day: its new start, in this device's own time
+    const newDay = new Date((Math.floor(Date.now() / 86400000) + 1) * 86400000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const blocked = {
-      'day-budget': tx('今日の3ドル分を使いました。日本時間の午前9時まで端末の声で読みます。', 'Today’s $3 is used. The device voice speaks until 9:00 in Japan (00:00 UTC).'),
+      'day-budget': tx(`今日の3ドル分を使いました。${newDay}（協定世界時0時）まで端末の声で読みます。`, `Today’s $3 is used. The device voice speaks until ${newDay} (00:00 UTC).`),
       'budget-exhausted': tx('合計25ドルを使い切りました。端末の声で読みます。', 'The $25 total is used. The device voice speaks.'),
       'not-in-release': tx('音声サーバーはいま新しい文を受け付けていません。端末の声で読みます。', 'The voice server is not taking new sentences right now. The device voice speaks.'),
       'request-rate-limit': tx('1分あたりの新しい文が多すぎました。1分ほど端末の声で読みます。', 'Too many new sentences in one minute. The device voice speaks for about a minute.'),
@@ -495,7 +512,22 @@ export function installVoiceLayer(host) {
       ? tx(`音声の予算：${dollars(status.budget.capCents)} のうち ${dollars(status.budget.spentCents)} 使用、残り ${dollars(status.budget.remainingCents)}（Nihongo Study と共通）。`,
         `Voice budget: ${dollars(status.budget.spentCents)} of ${dollars(status.budget.capCents)} used, ${dollars(status.budget.remainingCents)} left (shared with Nihongo Study).`)
       : status.paired ? tx('音声の予算：確認中…', 'Voice budget: checking…') : tx('音声の予算：接続すると表示されます。', 'Voice budget: shown once paired.');
-    return { state: blocked && status.paired ? `${state} ${blocked}` : state, last, budget };
+    // today's spend beside the budget, so a session's cost can be read off
+    let today = '';
+    if (status.budget) {
+      let kept = null;
+      try { kept = JSON.parse(view.localStorage.getItem(DAY_KEY)); } catch { /* nothing kept */ }
+      const spend = daySpend(status.budget, kept);
+      if (spend.keep && (!kept || kept.day !== spend.keep.day || kept.spentCents !== spend.keep.spentCents)) {
+        try { view.localStorage.setItem(DAY_KEY, JSON.stringify(spend.keep)); } catch { /* counted for this page only */ }
+      }
+      const cap = dollars(spend.capCents ?? 300);
+      today = spend.since === null
+        ? tx(`今日：${dollars(spend.spentCents)}（上限は1日${cap}、${newDay}に戻ります）。`, `Today: ${dollars(spend.spentCents)} of ${cap}. The day starts again at ${newDay}.`)
+        : tx(`今日：${dollars(spend.spentCents)}（この端末で${new Date(spend.since).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}から数えた分。上限は1日${cap}、${newDay}に戻ります）。`,
+          `Today: ${dollars(spend.spentCents)} since ${new Date(spend.since).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}, counted on this device. The limit is ${cap} a day and starts again at ${newDay}.`);
+    }
+    return { state: blocked && status.paired ? `${state} ${blocked}` : state, last, budget, today };
   }
   /** The block under Settings, 筆と声: paired or not, where the last sentence came from, the budget, and the pairing form. */
   function settingsBlock() {
@@ -505,6 +537,7 @@ export function installVoiceLayer(host) {
     const state = el('p', 'teacher-note'); state.id = 'voice-status'; state.setAttribute('role', 'status');
     const last = el('p', 'teacher-note'); last.id = 'voice-last';
     const budget = el('p', 'teacher-note'); budget.id = 'voice-budget';
+    const today = el('p', 'teacher-note'); today.id = 'voice-today';
     const form = el('form', 'listening-form settings-report-form'); form.id = 'voice-pair-form'; form.noValidate = true;
     const field = (id, ja, en, attrs) => {
       const wrap = el('div');
@@ -530,6 +563,7 @@ export function installVoiceLayer(host) {
       if (!block.isConnected && block.dataset.mounted) { listeners.delete(paint); return; }
       const lines = statusLines(status);
       state.textContent = lines.state; last.textContent = lines.last; budget.textContent = lines.budget;
+      today.textContent = lines.today; today.hidden = !lines.today;
       block.dataset.paired = String(status.paired); block.dataset.configured = String(status.configured);
       block.dataset.lastSource = status.last.source;
       form.hidden = status.paired;
@@ -554,7 +588,7 @@ export function installVoiceLayer(host) {
     });
     forget.addEventListener('click', async () => { seam.stop(); await client.forget(); seam.repaired(); note.textContent = ''; paint(); host.refreshListenRow?.(); });
     refresh.addEventListener('click', () => { budget.textContent = tx('音声の予算：確認中…', 'Voice budget: checking…'); void seam.refreshBudget(); });
-    block.append(name, state, last, budget, form, refresh, forget);
+    block.append(name, state, last, budget, today, form, refresh, forget);
     listeners.add(paint);
     paint();
     doc.defaultView.setTimeout(() => { block.dataset.mounted = '1'; }, 0);
@@ -568,10 +602,10 @@ export function installVoiceLayer(host) {
     status: () => seam.status(),
     onStatus: (listener) => { listeners.add(listener); return () => listeners.delete(listener); },
     /** A single word or reading from one of the app's own 音 buttons. */
-    sayWord({ text, word, button, onNote }) {
+    sayWord({ text, word, button, onNote, automatic = false }) {
       let normal = '';
       try { normal = normaliseSpeechText(String(text || '')); } catch { /* nothing to say */ }
-      return speakFrom(button, { sentences: normal ? [{ text: normal }] : [], voiceKey: voiceKeyOf('word', word || normal), single: true, onNote });
+      return speakFrom(button, { sentences: normal ? [{ text: normal }] : [], voiceKey: voiceKeyOf('word', word || normal), single: true, onNote, automatic });
     },
     /** The quote chip: the excerpt through the seam when the article has no recording of it. */
     sayExcerpt({ text, sourceId, button, onNote }) {

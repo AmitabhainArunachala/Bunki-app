@@ -46,7 +46,7 @@ export async function startFakeVoiceServer({ origins = [], port = 0, capCents = 
   const misses = [];                // times of the uncached speaks
   const scripted = [];
   const log = [];
-  let spentCents = 0, daySpent = 0, pairingOff = false, pairLimited = false;
+  let spentCents = 0, daySpent = 0, pairingOff = false, pairLimited = false, dayFields = false;
 
   const cors = (req) => {
     const origin = req.headers.origin;
@@ -108,7 +108,9 @@ export async function startFakeVoiceServer({ origins = [], port = 0, capCents = 
     }
     if (url.pathname === '/v1/audio/budget' && req.method === 'GET') {
       if (!bearer(req)) return done(401, { error: 'authentication-required' });
-      return done(200, { capCents, spentCents, reservedCents: 0, remainingCents: Math.max(0, capCents - spentCents) });
+      return done(200, { capCents, spentCents, reservedCents: 0, remainingCents: Math.max(0, capCents - spentCents),
+        // the day's own figures are not in the Worker tonight; a later build adds them
+        ...(dayFields ? { dayCapCents: dayCents, daySpentCents: daySpent } : {}) });
     }
     if (url.pathname === '/v1/audio/speak' && req.method === 'POST') {
       const body = jsonBody(req) ? await readJson(req) : undefined;
@@ -164,13 +166,16 @@ export async function startFakeVoiceServer({ origins = [], port = 0, capCents = 
     allow(origin) { allowed.add(origin); },
     failNext(...answers) { scripted.push(...answers.flat()); },
     revokeAll() { tokens.clear(); },
-    set({ pairingOff: off, pairLimited: limited, spentCents: spent, daySpent: day } = {}) {
+    set({ pairingOff: off, pairLimited: limited, spentCents: spent, daySpent: day, dayFields: fields } = {}) {
+      if (fields !== undefined) dayFields = fields;
       if (off !== undefined) pairingOff = off;
       if (limited !== undefined) pairLimited = limited;
       if (spent !== undefined) spentCents = spent;
       if (day !== undefined) daySpent = day;
     },
     speaks: () => log.filter((row) => row.path === '/v1/audio/speak' && row.method === 'POST'),
+    /** What the stand-in has charged so far, in cents. */
+    money: () => ({ spentCents, daySpent }),
     close: () => new Promise((resolve) => { server.closeAllConnections?.(); server.close(() => resolve()); }),
   };
 }
