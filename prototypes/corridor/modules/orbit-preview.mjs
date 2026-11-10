@@ -5,8 +5,9 @@
 // this file in orbit-preview/ and left as he made it; orbit-preview/frame.html lists its two differences. It is not
 // the Drift mode that spec S9-R11 plans (orbit-field.mjs, the corridor's own copy of the mechanics, stays unimported).
 //
-// corridor.js touches this module once: buildGingaChrome() imports it when the door's menu opens and calls
-// addOrbitDoor(). Nothing here loads at boot, and the standalone single-file build never asks for it.
+// corridor.js touches this module from the gate's menu (buildGateMenu): its Orbit row calls openOrbitPreview(), and the
+// layout under test's menu calls addOrbitDoor(). Nothing here loads at boot, and the standalone single-file build never
+// asks for it.
 //
 // Why a frame filled from text (srcdoc) and not a page address: Meguri is a whole document (its own :root tokens,
 // data-theme, fixed word page and key handling), so it keeps its own document; the service worker answers every

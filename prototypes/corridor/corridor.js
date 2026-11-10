@@ -5486,6 +5486,7 @@ function back({ instant = false } = {}) {
     return;
   }
   if (S.navOpen) {
+    if (document.getElementById('gate-menu')) { closeGateMenu(); return; }
     S.navOpen = false;
     render();
     return;
@@ -32906,6 +32907,8 @@ function composePage(node, path) {
   bar.dataset.bar = 'sheet';
   // the one back glyph (the frame draws it), one word at every depth: Back (tighten pass 2026-11-10; it said Close at the first)
   bar.append(barBack('sheet-back', 'sheet-back', (event) => back({ instant: event.detail === 0 }), true));
+  // the gate stands on the page's bar too (frame, 2026-11-10); a private collection's pages keep their own way
+  if (gateFrame() && !personalHost) bar.append(barGate('sheet-gate'));
   const thread = scaleThread();
   if (depth > 1 && !thread) {
     bar.append(el('span', 'sheet-depth', path.map((n) => nodeTitle(n)).join(' › ')));
@@ -33196,7 +33199,7 @@ function layerPathFor(view = S.view) {
  * also takes back, and only that: a child hidden for its own reasons keeps them. */
 const layerHidden = new WeakMap();
 function applyLayerLaw(root) {
-  const live = S.strokes ? 'stroke-page' : S.stack.length ? 'sheet' : null;
+  const live = S.strokes ? 'stroke-page' : root.querySelector(':scope > #gate-menu') ? 'gate-menu' : S.stack.length ? 'sheet' : null;
   for (const child of root.children) {
     const was = layerHidden.get(child);
     if (!live || child.id === live) {
@@ -34531,12 +34534,12 @@ function navForward() {
 function navBackFromGinga() {
   // one walk: back() itself surfaces a dive one level (R3-B), so the arrow
   // and the device Back gesture are the same operation. At the true galaxy
-  // home there is nowhere back; the arrow is disabled there.
+  // home there is nowhere back; the arrow is disabled there. Over another screen the menu's layer goes first.
+  if (document.getElementById('gate-menu')) closeGateMenu({ restoreFocus: false });
   S.navOpen = false;
   back();
 }
 
-/** The EN⇄日本語 pill: a sliding knob, not two buttons. */
 /** The torii bar's look-up field (operator, 2026-10-02: "the search bar is too narrow here"): a real
  * field, wide, ready to type. The first keystroke (or a finished IME composition, or Enter) carries
  * the text into the search room — the same lookup and rows as everywhere — with the caret where the
@@ -34578,22 +34581,6 @@ function buildNavSearchField() {
   });
   wrap.append(input);
   return wrap;
-}
-
-function buildLangSlider() {
-  const seg = el('button', 'lang-slide');
-  seg.type = 'button';
-  seg.id = 'lang';
-  seg.dataset.lang = S.lang; // 'bi' (EN) | 'ja'
-  seg.setAttribute('aria-label', tx('言語を切り替える', 'switch language'));
-  seg.append(el('span', 'lang-opt en', 'EN'));
-  seg.append(el('span', 'lang-opt ja', '日本語'));
-  seg.append(el('span', 'lang-knob'));
-  seg.addEventListener('click', () => {
-    S.lang = S.lang === 'ja' ? 'bi' : 'ja';
-    render();
-  });
-  return seg;
 }
 
 /** 検索の間 — search as its own room (operator, 2026-08-20). The bar used to
@@ -34946,9 +34933,12 @@ function buildGingaChrome(root) {
     S.navOpen ? tx('ナビを閉じる', 'close navigation') : tx('ナビをひらく', 'open navigation'),
   );
   symbol.innerHTML = GINGA_SYMBOL_SVG;
-  symbol.addEventListener('click', () => {
-    S.navOpen = !S.navOpen;
+  symbol.addEventListener('click', (event) => {
+    if (S.navOpen) { closeGateMenu(); return; }
+    S.navOpen = true;
     render();
+    // opened from the keyboard, the look-up field takes the keys
+    if (event.detail === 0) document.getElementById('nav-search-door')?.focus({ preventScroll: true });
   });
   root.append(symbol);
 
@@ -35010,15 +35000,17 @@ function buildGingaChrome(root) {
     root.append(quick);
   }
 
-  if (!S.navOpen) return;
-  // 廻 Orbit word field (Meguri), a labelled preview: the door and its host are modules/orbit-preview.mjs
-  if (window.__CORRIDOR_STANDALONE__ !== true) import('./modules/orbit-preview.mjs').then((m) => m.addOrbitDoor(root, { tx, biLabel, open: () => !!S.navOpen })).catch((err) => console.warn('orbit preview unavailable', err));
+  if (S.navOpen) buildGateMenu(root);
+}
 
+/** The gate's menu, one composed panel (frame, 2026-11-10): ‹ › at its top edge beside the look-up field; the five
+ * places of the tab bar, one row each with a plain line of what is inside, the one you are in marked; then the doors
+ * that are not places: Review (its count when cards wait), Focus, Tutor, Orbit, the look and the language. The first
+ * screen draws it with its own chrome; over any other screen a bar's gate lays it on its own layer (`over`: the layer,
+ * openGateMenu). The layout under test keeps its own menu (buildPlacesMenu), whose rows these are. */
+function buildGateMenu(root, over = false) {
   const scrim = el('div', 'nav-scrim');
-  scrim.addEventListener('click', () => {
-    S.navOpen = false;
-    render();
-  });
+  scrim.addEventListener('click', () => closeGateMenu());
   root.append(scrim);
 
   const bar = el('div', 'nav-bar');
@@ -35036,63 +35028,226 @@ function buildGingaChrome(root) {
   fwdB.addEventListener('click', navForward);
   arrows.append(backB, fwdB);
   bar.append(arrows);
-  // the bar (operator, 2026-10-02, note 1): ‹ › · a real, wide look-up field · 復習 N · 集中道場 ·
-  // EN/日本語. Reporting lives on the bug alone; the strip's own "Report a problem" is gone.
+  // the bar (operator, 2026-10-02, note 1): ‹ › · a real, wide look-up field. Reporting lives on the bug alone.
   bar.append(buildNavSearchField());
   if (placesLayout()) {
+    // 廻 Orbit word field (Meguri), a labelled preview: the door and its host are modules/orbit-preview.mjs
+    if (window.__CORRIDOR_STANDALONE__ !== true) import('./modules/orbit-preview.mjs').then((m) => m.addOrbitDoor(root, { tx, biLabel, open: () => !!S.navOpen })).catch((err) => console.warn('orbit preview unavailable', err));
     buildPlacesMenu(root, bar);
     return;
   }
-  // 復習 with today's due count, one tap into review; at 0 the count steps away, the door stays
-  const due = S.taken.length && scheduler ? todayQueue().order.length : 0;
-  const review = biLabel('button', 'nav-review', '復習', 'review');
-  review.type = 'button';
-  review.id = 'nav-review';
-  if (due) review.append(el('span', 'nav-count', String(due)));
-  review.setAttribute('aria-label', due ? tx(`復習 — 今日 ${due} 枚`, `review — ${due} due today`) : tx('復習', 'review'));
-  review.addEventListener('click', () => {
-    readerTicketDeparture('tray');
+  bar.classList.add('gate-panel');
+  // a door leaves the screen under the menu as the bar's own doors do: a page closes, an article keeps its place
+  const leave = () => {
     S.navOpen = false;
     keepScroll();
+    if (!over) return;
     S.stack = [];
-    S.trayFrom = { view: 'drift', scroll: 0 };
+    if (S.view === 'reader' && S.passageId) {
+      clearTimeout(readerPosTimer);
+      void saveReaderPosition(S.passageId, Math.round(window.scrollY));
+    }
+  };
+  const LINES = {
+    today: ['次の一歩と今日の読み物', "Your next step and today's reading"],
+    read: ['記事 · 今日のものから', "Articles, today's first"],
+    learn: ['カードとデッキ · 試験', 'Your cards and decks, tests'],
+    words: ['語と漢字を調べる · 言葉のつながり', 'Look up words and kanji, the word web'],
+    me: ['一年の記録 · 設定', 'Your year, settings'],
+  };
+  const places = el('div', 'nav-stations');
+  for (const tab of PRIMARY_TABS) {
+    const row = navStation(`nav-${tab.id}`, [tab.ja, tab.en], LINES[tab.id], () => {
+      if (S.view === tab.view && !S.stack.length) { closeGateMenu(); return; }
+      const go = () => enterTab(tab, row, !over);
+      if (tab.view === 'search') go();
+      else roomTransition(go);
+    });
+    // the bookshelf's door, by the class every walk presses
+    if (tab.id === 'read') row.classList.add('bubble-shelf');
+    if (tab.views.includes(S.view)) row.setAttribute('aria-current', 'page');
+    places.append(row);
+  }
+  const more = el('div', 'nav-stations nav-more');
+  // Review with today's due count, one tap into Today; at 0 the count steps away, the door stays
+  const due = S.taken.length && scheduler ? todayQueue().order.length : 0;
+  const review = navStation('nav-review', ['復習', 'Review'], null, () => {
+    readerTicketDeparture('tray');
+    // Today's Back returns to the screen the menu stood over
+    const from = !over ? { view: 'drift', scroll: 0 }
+      : S.view === 'reader' && S.passageId ? 'reader' : { view: S.view, scroll: Math.round(window.scrollY) };
+    leave();
+    S.stack = [];
+    S.trayFrom = from;
     S.view = 'tray';
     render();
     window.scrollTo(0, 0);
-  });
-  bar.append(review);
-  const dojo = biLabel('button', 'nav-dojo', '集中道場', 'focus');
-  dojo.type = 'button';
-  dojo.addEventListener('click', () => {
+  }, { count: due });
+  review.setAttribute('aria-label', due ? tx(`復習 — 今日 ${due} 枚`, `Review — ${due} due today`) : tx('復習', 'Review'));
+  const dojo = navStation(null, ['集中道場', 'Focus'], null, () => {
     readerTicketDeparture('dojo');
-    S.navOpen = false;
-    keepScroll();
+    leave();
     S.view = 'dojo';
     render();
   });
-  bar.append(dojo);
-  bar.append(buildLangSlider());
-  root.append(bar);
-
-  const shelf = biLabel('button', 'corner-bubble bubble-shelf', '本棚', 'bookshelf');
-  shelf.type = 'button';
-  shelf.setAttribute('data-drift-chrome', '');
-  shelf.addEventListener('click', () => {
-    S.navOpen = false;
-    S.view = 'shelf';
-    render();
-    window.scrollTo(0, S.shelfScroll);
-  });
-  const sensei = biLabel('button', 'corner-bubble bubble-sensei', '先生', 'tutor');
-  sensei.type = 'button';
-  sensei.setAttribute('data-drift-chrome', '');
-  sensei.addEventListener('click', () => {
-    S.navOpen = false;
-    keepScroll();
+  dojo.classList.add('nav-dojo');
+  const sensei = navStation(null, ['先生', 'Tutor'], null, () => {
+    leave();
     S.view = 'ai';
     render();
   });
-  root.append(shelf, sensei);
+  sensei.classList.add('bubble-sensei');
+  more.append(review, dojo, sensei);
+  // 廻 Orbit word field (Meguri), a labelled preview: its host is modules/orbit-preview.mjs; its row keeps the door's id
+  if (window.__CORRIDOR_STANDALONE__ !== true) {
+    const orbit = navStation('orbit-preview-door', ['廻 めぐり', 'Orbit'], null, () => {
+      import('./modules/orbit-preview.mjs').then((m) => m.openOrbitPreview({ tx })).catch((err) => console.warn('orbit preview unavailable', err));
+    }, { end: el('span', 'nav-station-v', 'preview') });
+    orbit.setAttribute('aria-label', tx('廻 めぐり、ことばの輪。プレビュー', 'Orbit word field, preview'));
+    more.append(orbit);
+  }
+  // the look: the bar's seal is one row here, opening the same stones
+  const seal = el('span', 'theme-seal', THEME_UI[themeIx()].seal);
+  seal.id = 'theme-seal';
+  seal.setAttribute('aria-hidden', 'true');
+  const look = navStation('nav-look', ['配色', 'Look'], null, () => {}, { end: seal });
+  look.setAttribute('aria-label', `${tx('配色', 'Look')} — ${worldName(THEME_UI[themeIx()])}`);
+  attachWorldPicker(look);
+  // the language: one row, the language in use, one tap changes it (the redraw keeps the menu open)
+  const ja = S.lang === 'ja';
+  const language = navStation('nav-lang', ['表示言語', 'Language'], null, () => {
+    S.lang = ja ? 'bi' : 'ja';
+    render();
+  }, { end: el('span', 'nav-station-v', ja ? '日本語' : 'EN'), door: false });
+  language.setAttribute('aria-label', `${tx('表示言語', 'Language')} — ${ja ? '日本語' : 'English'}`);
+  more.append(look, language);
+  bar.append(places, more);
+  root.append(bar);
+}
+/** One row of the gate's menu: its name, a plain line of what is inside (or a value at its end), a chevron for a door. */
+function navStation(id, [ja, en], sub, onClick, { count = 0, end = null, door = true } = {}) {
+  const station = el('button', 'nav-station');
+  station.type = 'button';
+  if (id) station.id = id;
+  station.append(el('span', 'nav-station-t', tx(ja, en)));
+  if (sub) station.append(el('span', 'nav-station-sub', tx(...sub)));
+  if (count) station.append(el('span', 'nav-count', String(count)));
+  if (end) station.append(end);
+  if (door) station.append(el('i', 'nav-station-go'));
+  if (sub) station.setAttribute('aria-label', `${tx(ja, en)} — ${tx(...sub)}`);
+  station.addEventListener('click', onClick);
+  return station;
+}
+/** Into a tab's room: from the first screen a door (its room keeps Back to the sky), elsewhere a peer of the tabs. */
+function enterTab(tab, invoker, fromSky) {
+  closeWorldPicker();
+  S.navOpen = false;
+  S.tabRoot = fromSky ? null : tab.view;
+  if (tab.view === 'search') { openSearchPage(); return; }
+  readerTicketDeparture(tab.view);
+  if (tab.view === 'me') keepNavigationReturn('me', invoker);
+  else keepScroll();
+  if (tab.view === 'tray') S.trayFrom = { view: S.view, scroll: Math.round(window.scrollY) };
+  S.stack = [];
+  S.view = tab.view;
+  render();
+  window.scrollTo(0, tab.view === 'shelf' ? S.shelfScroll : 0);
+}
+
+/** The gate on every bar but the first screen's (frame, 2026-11-10): the current layout with the five tabs. */
+function gateFrame() {
+  return S.variants.nav === 'tabs' && !placesLayout();
+}
+/** The first screen's torii as a bar's door: the same mark and name, at the screen's centre, opening the same menu over
+ * the screen it stands on. */
+function barGate(id) {
+  const gate = el('button', 'bar-gate');
+  gate.type = 'button';
+  gate.id = id;
+  gate.innerHTML = GINGA_SYMBOL_SVG;
+  paintGate(gate);
+  gate.addEventListener('click', (event) => (S.navOpen ? closeGateMenu() : openGateMenu(gate, { keyboard: event.detail === 0 })));
+  return gate;
+}
+function paintGate(gate) {
+  gate.setAttribute('aria-expanded', String(!!S.navOpen));
+  gate.setAttribute('aria-label', S.navOpen ? tx('ナビを閉じる', 'close navigation') : tx('ナビをひらく', 'open navigation'));
+}
+/** The menu over a screen: its own layer on top of the page and the room, which go inert under it (the layer law) and
+ * are never redrawn, so closing it leaves the scroll, the open page and the article's place exactly as they were. */
+let gateOpener = null;
+function openGateMenu(gate, { keyboard = false, focusId = 'nav-search-door' } = {}) {
+  const root = $('#app');
+  S.navOpen = true;
+  gateOpener = gate;
+  const layer = el('div', 'gate-menu');
+  layer.id = 'gate-menu';
+  layer.setAttribute('role', 'dialog');
+  layer.setAttribute('aria-modal', 'true');
+  layer.setAttribute('aria-label', tx('ナビ', 'Navigation'));
+  buildGateMenu(layer, true);
+  root.append(layer);
+  for (const node of document.querySelectorAll('.bar-gate')) paintGate(node);
+  applyLayerLaw(root);
+  // opened from the keyboard, the look-up field takes the keys; a pointer leaves nothing focused
+  if (keyboard) document.getElementById(focusId)?.focus({ preventScroll: true });
+  else if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
+  syncWalkSentinel();
+}
+/** Tap outside, Escape, or the gate again. On the first screen the menu is part of its chrome and goes with a redraw. */
+function closeGateMenu({ restoreFocus = true } = {}) {
+  const layer = document.getElementById('gate-menu');
+  S.navOpen = false;
+  if (!layer) {
+    render();
+    if (restoreFocus) document.getElementById('ginga-symbol')?.focus({ preventScroll: true });
+    return;
+  }
+  layer.remove();
+  for (const node of document.querySelectorAll('.bar-gate')) paintGate(node);
+  applyLayerLaw($('#app'));
+  // a page drawn again under the menu carries a new gate of the same id
+  const gate = gateOpener?.isConnected ? gateOpener : gateOpener && document.getElementById(gateOpener.id);
+  if (restoreFocus) gate?.focus({ preventScroll: true });
+  gateOpener = null;
+  syncWalkSentinel();
+}
+// Escape closes the menu wherever the keyboard is; the look's stones and an open dialog (orbit) take theirs first
+document.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape' || !S.navOpen || worldPickerEls || document.querySelector('dialog[open]')) return;
+  event.preventDefault();
+  event.stopPropagation();
+  closeGateMenu();
+}, true);
+/** The bar's search door — on EVERY surface, one tap from hearing a word to typing it (operator, 2026-08-27). */
+function chromeSearch() {
+  const quickSearch = el('button', 'chrome-search');
+  quickSearch.type = 'button';
+  quickSearch.id = 'chrome-search';
+  quickSearch.setAttribute('aria-label', tx('検索 — ことばをさがす', 'search — look up a word'));
+  quickSearch.innerHTML = SEARCH_SVG;
+  quickSearch.addEventListener('click', () => openSearchPage());
+  return quickSearch;
+}
+/** EN | 日本語 as one control (frame, 2026-11-10; John: "maybe a middle ground that is more subtle but still obvious"): the
+ * language in use, and one tap changes it. The group keeps the switch's id and name. */
+function langSwitch() {
+  const group = el('div', 'lang-switch');
+  group.id = 'lang';
+  group.setAttribute('role', 'group');
+  group.setAttribute('aria-label', tx('表示言語', 'Interface language'));
+  const ja = S.lang === 'ja';
+  const button = el('button', null, ja ? '日本語' : 'EN');
+  button.type = 'button';
+  button.dataset.lang = S.lang;
+  if (ja) button.lang = 'ja';
+  button.setAttribute('aria-label', ja ? '日本語 — English に切り替える' : 'EN — switch to 日本語');
+  button.addEventListener('click', () => {
+    S.lang = ja ? 'bi' : 'ja';
+    render();
+  });
+  group.append(button);
+  return group;
 }
 
 /** The door's menu in the layout under test: the five places, named and ordered as the tab bar,
@@ -35110,16 +35265,8 @@ function buildPlacesMenu(root, bar) {
   };
   const stations = el('div', 'nav-stations');
   for (const tab of PLACES_TABS) {
-    const station = el('button', 'nav-station');
-    station.type = 'button';
-    station.id = `nav-${tab.id}`;
-    station.dataset.tab = tab.id;
-    station.append(el('span', 'nav-station-t', tx(tab.ja, tab.en)), el('span', 'nav-station-sub', tx(...LINES[tab.id])));
     // Review's count is the tab bar's own (todayQueue); at 0 it steps away
-    if (tab.due && due) station.append(el('span', 'nav-count', String(due)));
-    station.append(el('i', 'nav-station-go'));
-    station.setAttribute('aria-label', `${tx(tab.ja, tab.en)} — ${tx(...LINES[tab.id])}`);
-    station.addEventListener('click', () => {
+    const station = navStation(`nav-${tab.id}`, [tab.ja, tab.en], LINES[tab.id], () => {
       S.navOpen = false;
       if (tab.view === 'search') { openSearchPage(); return; }
       readerTicketDeparture(tab.view);
@@ -35129,7 +35276,8 @@ function buildPlacesMenu(root, bar) {
       S.view = tab.view;
       render();
       window.scrollTo(0, tab.view === 'shelf' ? S.shelfScroll : 0);
-    });
+    }, { count: tab.due ? due : 0 });
+    station.dataset.tab = tab.id;
     stations.append(station);
   }
   bar.append(stations);
@@ -35296,9 +35444,9 @@ function observePrimaryDocks() {
         const available = nav.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
         const required = [...nav.querySelectorAll('.primary-tab')].reduce((sum, button) => {
           const label = button.querySelector('.primary-tab-label');
-          const due = button.querySelector('.station-due');
-          return sum + Math.max(44, (label?.getBoundingClientRect().width || 0) +
-            (due ? due.getBoundingClientRect().width + 8 : 0) + 16);
+          const counts = [...button.querySelectorAll('.station-due, .station-kept')]
+            .reduce((width, count) => width + count.getBoundingClientRect().width + 8, 0);
+          return sum + Math.max(44, (label?.getBoundingClientRect().width || 0) + counts + 16);
         }, 0);
         const wrapped = String(required > available);
         if (nav.dataset.wrapped !== wrapped) nav.dataset.wrapped = wrapped;
@@ -35336,14 +35484,18 @@ function observePrimaryDocks() {
 function skyTabs() {
   return S.view === 'drift' && !S.stack.length && !S.navOpen && S.variants.nav === 'tabs' && !placesLayout();
 }
+/** Whether the five tabs stand on this screen (render reads it before it draws them, for the bar's doors). */
+function primaryTabsShown(personal = false) {
+  return S.variants.nav === 'tabs' && (S.ready || personal) &&
+    ((S.ready && skyTabs()) || !['drift', 'entry'].includes(S.view)) && !document.body.classList.contains('zen');
+}
 function buildPrimaryTabs(root, { personal = false } = {}) {
   observePrimaryDocks();
   // a sheet, the stroke page or a menu never takes the tabs' layout away: the body keeps its class and its
   // --nav-clearance, and the CSS :has(#sheet, …) rule hides the bar itself (John, 2026-10-15: the top bar
   // re-laid itself and the page jumped under the scrim whenever a word opened)
   const sky = S.ready && skyTabs();
-  const show = S.variants.nav === 'tabs' && (S.ready || personal) &&
-    (sky || !['drift', 'entry'].includes(S.view)) && !document.body.classList.contains('zen');
+  const show = primaryTabsShown(personal);
   document.body.classList.toggle('has-primary-tabs', show);
   if (!show) return;
   const bar = el('nav', 'primary-tabs');
@@ -35377,6 +35529,8 @@ function buildPrimaryTabs(root, { personal = false } = {}) {
       button.append(count);
       button.setAttribute('aria-label', tx(`${tab.ja} · ${due}枚`, `${tab.en} · ${due} card${due === 1 ? '' : 's'}`));
     }
+    // the bookmark's count, once the bar's bookmark stands aside for this tab (frame, 2026-11-10)
+    if (tab.id === 'today' && !sky && !personal && gateFrame()) paintKeptCount(button);
     if (tab.views.includes(S.view)) button.setAttribute('aria-current', 'page');
     // A finished sitting is still Today's current station. Its explicit return above the
     // dock owns the exit; the active station remains visible without repeating that action.
@@ -35391,21 +35545,8 @@ function buildPrimaryTabs(root, { personal = false } = {}) {
         location.assign(url); return;
       }
       if (S.view === tab.view) return;
-      const navigate = () => {
-      closeWorldPicker();
-      S.navOpen = false;
       // from the first screen a tab is a door: its room keeps Back to the sky, as the lone Today door's did
-      S.tabRoot = sky ? null : tab.view;
-      if (tab.view === 'search') { openSearchPage(); return; }
-      readerTicketDeparture(tab.view);
-      if (tab.view === 'me') keepNavigationReturn('me', button);
-      else keepScroll();
-      if (tab.view === 'tray') S.trayFrom = { view: S.view, scroll: Math.round(window.scrollY) };
-      S.stack = [];
-      S.view = tab.view;
-      render();
-      window.scrollTo(0, tab.view === 'shelf' ? S.shelfScroll : 0);
-      };
+      const navigate = () => enterTab(tab, button, sky);
       if (tab.view === 'search') navigate();
       else roomTransition(navigate);
     });
@@ -35423,6 +35564,28 @@ function buildPrimaryTabs(root, { personal = false } = {}) {
     bar.append(car);
   }
   root.append(bar);
+}
+
+/** The Today tab carries the bookmark's count (the saved words) at its station's other shoulder; a save repaints it in
+ * place (syncTrayCount). Its name says both of Today's numbers. */
+function paintKeptCount(tab = document.getElementById('tab-today')) {
+  if (!tab) return;
+  const saved = S.taken.length;
+  let count = tab.querySelector('.station-kept');
+  if (!saved) count?.remove();
+  else {
+    if (!count) {
+      count = el('i', 'station-kept tray-count');
+      count.setAttribute('aria-hidden', 'true');
+      tab.append(count);
+    }
+    count.textContent = String(saved);
+  }
+  const due = Number(tab.querySelector('.station-due')?.dataset.due) || 0;
+  const name = [tx(...ROOM_NAMES.line.tray), due && tx(`${due}枚`, `${due} card${due === 1 ? '' : 's'}`),
+    saved && tx(`保存した語 ${saved}`, `${saved} saved word${saved === 1 ? '' : 's'}`)].filter(Boolean).join(' · ');
+  if (due || saved) tab.setAttribute('aria-label', name);
+  else tab.removeAttribute('aria-label');
 }
 
 /** Hub doors use the existing return frames, including exact reader positions. */
@@ -35893,6 +36056,9 @@ function render() {
     return { sel, ix, text: unique ? text : null };
   })();
   const root = $('#app');
+  // a redraw that is not a move (the record arriving, a page refreshing, the language) keeps the gate's menu open
+  const gateAgain = S.navOpen && document.getElementById('gate-menu') ? gateOpener?.id : null;
+  const gateFocus = gateAgain && document.activeElement?.closest('#gate-menu') ? document.activeElement.id : null;
   const playerPresentation = deckPlayer?.capturePresentation();
   if (playerPresentation) deckPresentation = playerPresentation;
   root.textContent = '';
@@ -35981,9 +36147,18 @@ function render() {
   // interface language live in Progress → Settings, and Review is a station on the tab bar. The
   // current layout, and any nav without the tab bar, keep the preferences and doors here.
   const barDoors = S.variants.nav !== 'tabs' || !placesLayout();
+  // The gate on every bar (frame, 2026-11-10; John: the first screen's torii is "the TOORI, and portal to the menu and
+  // navigation the whole app"; "the whole top is quite crowded"): in the current layout with the tabs the bar holds Back,
+  // the gate, search and the language (and the article's Save). The look lives in the gate's menu, and the Learn and Today
+  // doors stand aside while the tabs that say them show.
+  const gated = gateFrame();
+  if (gated) chrome.append(barGate('bar-gate'));
+  const tabDoors = barDoors && !primaryTabsShown();
+  if (gated && S.view !== 'search') chrome.append(chromeSearch());
+  if (gated) chrome.append(langSwitch());
   // the world seal, then EN | 日本語 — two visible states, the active one lit. The preferences
   // stand first in the right-hand cluster, the doors (search · Learn · Lists) after them.
-  if (barDoors) {
+  if (barDoors && !gated) {
     const seal = el('button', 'theme-seal', THEME_UI[themeIx()].seal);
     seal.type = 'button';
     seal.id = 'theme-seal';
@@ -36014,25 +36189,14 @@ function render() {
 
   // the search door — on EVERY surface, one tap from hearing a word to
   // typing it (operator, 2026-08-27); only the search room itself omits it
-  if (S.view !== 'search') {
-    const quickSearch = el('button', 'chrome-search');
-    quickSearch.type = 'button';
-    quickSearch.id = 'chrome-search';
-    quickSearch.setAttribute('aria-label', tx('検索 — ことばをさがす', 'search — look up a word'));
-    quickSearch.innerHTML =
-      SEARCH_SVG;
-    quickSearch.addEventListener('click', () => {
-      openSearchPage();
-    });
-    chrome.append(quickSearch);
-  }
+  if (S.view !== 'search' && !gated) chrome.append(chromeSearch());
 
   // the dojo door — on EVERY surface (operator, 2026-09-17: "THE DOJO, or
   // study room, needs to be accessible from ANY LOCATION WHATSOEVER"). It
   // used to live only behind the galaxy's tap-to-open nav; now it stands in
   // the ordinary chrome beside the search door. Inside the dojo family it is
   // the current room, so it shows as such and does nothing.
-  if (barDoors) {
+  if (tabDoors) {
     const inDojo = S.view === 'dojo' || S.view === 'probe' || (S.view === 'review' && !!S.focus);
     // the polish lane (2026-10-08): the door is the Learn tab's room, so it carries the tab's
     // name (to a screen reader) and a quiet card-stack glyph — never a second word in the bar
@@ -36115,7 +36279,7 @@ function render() {
     requestAnimationFrame(() => requestAnimationFrame(landOnKeptWords));
   }));
   // in the layout under test Review is a station on the tab bar; the bookmark stands without it
-  if (barDoors) chrome.append(trayBtn);
+  if (tabDoors) chrome.append(trayBtn);
   if (!heroMode && !zenReview) root.append(chrome);
   fitChromeKeep();
   if (S.ready) paintRoomScaleThread(root);
@@ -36216,6 +36380,8 @@ function render() {
   enhanceJapaneseProse(root);
 
   applyLayerLaw(root);
+  const gate = gateAgain && document.getElementById(gateAgain);
+  if (gate) openGateMenu(gate, { keyboard: !!gateFocus, focusId: gateFocus });
   // Resolve the new room's styles before store-alert positioning reads layout.
   stampRegister();
   safelySyncStoreAlert();
@@ -36522,4 +36688,4 @@ function deckHost() {
   return deckHostAdapter;
 }
 
-export { $, AI_DEFAULT_BASE_URL, AI_DEFAULT_MODEL, AI_DEVICE_STORE, AI_EVIDENCE_ROLES, AI_KEY_STORE, AI_MINE_MAX_ROWS, AI_READING_TIMEOUT_CAP_MS, AI_READING_TOKENS_PER_SECOND, AI_TIMEOUT_MS, ANNOTATION_DIGITS, BEYOND_JOYO, D, DEPTH_NAMES, DEPTH_OWNED_S, DEPTH_RECALLED_S, DEPTH_RECALL_R, DICTIONARY_INDEX_PATH, DICTIONARY_SHARD_PATH, DOJO_DECKS, DRAFT_KEY, DRIFT_THEME_BY_WORLD, EXAMPLE_DIR, FRAMES_CAP, FRAMES_STORE, GESTURE, GLOSS_LEAD, GLOSS_MESSY, GLUE_STROKE, GODAN_ROW, GODAN_TE, GRAMMAR, INK_DEPTH, INK_TEMPO, INK_WORLDS, ISO_DAY, JOYO_JUDGEABLE, JOYO_MARKS, KAGAMI_BAND_NAMES, KAGAMI_CLEAR, KAGAMI_CODE_BAND, KAGAMI_LEVELS, KAGAMI_MIN_SEEN, KAGAMI_MODEL_VERSION, KAGAMI_OOV, KANJI_QUEST_FAILED, KANJI_QUEST_STRUCTURAL, KATA_TO_HIRA_OFFSET, LEADING_DROP_DAYS, LEARN_STAGE_DECKS, LEMMA_NIDAN, LEMMA_ONBIN, LESSON_SIZE, LOOKUP_HELPER_POS, M4_COPY, ME_DECKS, ME_FIELDS, ME_MONTHS_EN, ME_N1_SITTING, MINI_INK, MONTHS_EN, NARRATION_VOICES, NEW_PER_DAY_DEFAULT, NODE_KIND, NOTE_TEXT, PARTICLES, PARTICLE_BY_SURFACE, PART_STROKES, PART_WRITTEN, PLACES_TABS, POS_FAMILY, POS_PLAIN, POS_SEGMENT_CODE, PRIMARY_TABS, READER_KANA, READER_KANJI, REGISTER_LINE_DOORS, REGISTER_ROOM_DOORS, REL, REPORT_RELAY_STORE, REVIEWS_PER_DAY_DEFAULT, ROMAJI, ROOM_IDS, ROOM_NAMES, S, SAVE_PRESS_MS, SENSEI_OBS_CODES, SENSE_BY_ANCHOR, SENSE_CLASS, SENSE_GAVE_UP, SENSE_LATE, SENSE_MUST_END, SENSE_MUST_NOT, SENSE_NUMBER, SENSE_NUMBER_WORD, SENSE_TAG_EN, SENSE_TAG_JA, SENSE_WAIT_MS, SENSE_WEEKDAY, SHORT_EXAMPLE_CHARS, SLIP_NODE, SLIP_OWN_MEANING, SOUND_PLAIN, SOUND_VOICED, SPEAK_JA, SRS_KINDS, SRS_PREF_LADDERS, SRS_PRESETS, STROKE_SPEED_DEFAULT, STROKE_VIEWBOX, SVG_NS, TE_FORM_AUXILIARY, TE_FORM_NOTE, THEME_STORE, THEME_UI, THES_RELS, TODAY_JA_WORD, TODAY_SKY_CAP, TODAY_SKY_MISS_DAYS, TODAY_SKY_WORD, TOKEN_CONTEXT, TOPIC_BLOCKS, TOPIC_KICKERS, TOPIC_ORDER, TOUCH_READING_FADES, TOUCH_READING_GAP, TOUCH_READING_MOTION, TOUCH_READING_ROWS, TOUCH_ROW_PINS, TRAIL_KINDS, VOICE_LOCK, WORD_BRUSH, WORD_BRUSH_KEY, WORD_VOICE, WORD_VOICE_KEY, WW_CX, WW_CY, WW_KANJI_ANGLES, WW_REL, WW_RING2_ORDER, WW_RING2_SLOTS, WW_TRAIL_MAX, WW_WALK_KEY, YOMI_DAKUTEN, YOMI_HANDAKU, _KDX_NPTS, _compsCache, _kdxDist, _kdxNorm, _kdxResample, _kdxTemplates, activateWordLadder, afterPressLands, aiChatLog, aiConverse, aiLogAll, aiSheetNotes, aiSheetTurns, allAssessmentEvidence, anchorBox, animcjkApproved, animcjkShards, annotationKana, applyAssessmentV2, approvedWordManifest, assertLearningSource, assessmentClockSession, back, bi, biLabel, boxLeadGloss, buildListenRow, buildTeacherChatLog, cacheDictionaryFormRows, cacheDictionaryRow, cancelExcerptPlayback, canonicalRecordJson, capturePending, captureScaleVisit, cardAudioSerial, cardRecall, chipsFor, clearReaderReadings, clearReaderSummons, clearWordLadder, closeSealStrip, closeWorldPicker, commitCapture, commitStorePatch, confusablesFor, contrastOf, controlsUnder, copyRecordWith, currentAssessmentV2, currentJoyoKunNote, currentRecordNoteView, currentSentenceListeningCue, deckSummaries, deeperDepth, depthIndexMemo, depthNodeCache, depthRank, depthRetrievability, dictionaryQueryOpening, dictionaryReadingSummaries, dictionaryRowBySeq, dictionaryWorkerRequest, diveFromMini, diveFromSlip, el, encounterKey, enhanceJapaneseProse, ensureArchiveIndex, ensureArticle, ensureDictionaryIndex, ensureDictionaryShard, ensureReadingPositionModule, ensureSenseSidecar, ensureSentenceListeningCatalog, entryKanaIndex, explicitWordSnapshot, fetchData, fieldsDeckHome, findLookupOccurrence, finishPageTransition, finiteNumber, fitChromeKeep, flowText, focusKanjiItem, foundationDoor, frameFoot, glyphBox, go, guidedTaken, heldWordCardNode, heroSource, hideReaderToast, holdPageUnderDrawer, inkGroundFor, installProseWordRoving, installScaleBridge, interaction, invalidateRecordNoteViews, isLeech, jaGroupSegments, jlptRank, kagamiBandFor, kagamiLevel, kagamiLevelOf, kagamiMockBand, kanaReadingKey, kanjiAnswerAvailable, kanjiCourseApplyHelp, kanjiCourseRememberHelp, kanjiDisplayRecord, kanjiFamilyExposures, kanjiFamilyMounts, kanjiFamilyResolveExample, kanjiFamilyStamp, kanjiFamilyStampCurrent, kanjiFamilyTicket, kanjiFamilyTicketCurrent, kanjiFamilyViews, kanjiQuestFor, kanjiQuestLoading, kanjiQuestOwner, kanjiReadingsState, kanjiReferenceRows, kanjiStructureMounts, kanjiWorldEligible, kankenGradeLabel, kataToHira, keepNavigationReturn, laneMembers, layersMarkTop, learnDeckSummary, learnStageFace, loadReferenceExtra, logicalArchiveRows, lookupWordKey, meBackPart, meDeckIndex, meNum, meSealsPart, metReadable, mockFailed, motionEase, motionMs, narrationVoiceName, nonEmptyString, notYetReleased, noteEncounter, openAssessmentQuestionReview, openDeck, openGuidedRoom, openJapaneseLookup, openKanjiCourseUnit, openKanjiWorldEncounter, openPassage, openPersonalCollection, openPlainSaveMenu, openReferenceCollection, openSealStrip, openSentencePractice, openSpeakRoom, openStrokePage, openVocabularyListPopover, openWordWeb, optional, ownSentenceExample, owns, pageCutAllowed, paintMiniPath, passage, performAssessmentReconciliation, placeFloating, placeKinsoku, placesLayout, plainRecord, proseWordRovers, protectStore, queueAssessmentWork, quietUsageTags, readAloud, readFrameRows, readHelpPatch, readHelpReadable, readerReadingFits, readerSummaryFor, readerTokenLead, recordReady, recordWritable, refreshStrokeReadings, refreshWordSheet, relayServiceUrl, removeMini, render, renderFamilyExampleNode, renderKanjiCourseDoor, renderKanjiFamily, renderKanjiStructure, renderKdxGrid, renderReferenceConnections, renderReviewHall, renderSentenceTokens, renderSourceInboxEntries, renderSourceKanjiDoor, renderStudyFold, renderStudyHall, renderTeacherDoor, renderTextSourceContextSelection, renderWordWeb, resolveReaderChoice, resolveTeacherSource, retainedKanjiRecord, retireScaleReturn, returnToScaleBead, revalidateTutorRequests, revealFloatingFocus, roomName, roomTransition, rubyNode, safeJsonValue, sameItem, sameWordIdentity, saveWord, savedAnswerFor, scaleIn, scaleNavigationAllowed, scaleOut, scalePassage, scaleThreadPath, scaleTokenFingerprint, sealListRecency, senseGlosses, senseLed, senseNumberBefore, sensePatch, senseWeekdayBracket, sentenceDraftBindings, sentenceDraftInputErrors, sentenceDraftWindowEdits, setGlossLine, setJaWords, setLayout, setLookupStop, setOwnRecordValue, setWordPref, shallowerDepth, sheetActionLine, sheetActionLineKeys, shelfDay, showMini, skipState, sourceInboxShelf, speakAvailable, srsDueItems, srsKey, srsParamsProblem, srsRoomBack, srsSchedulePolicy, stopPassageRead, stopSentenceListening, strokePathsFor, strokeReduced, strokeSpeed, studyHallDoors, suppressAssessmentCards, syncChromeKeep, syncStrokeNumbers, teacherDraftInputErrors, teacherDraftWindowEdits, teacherSourceProcessingUnavailable, teacherWindowDraftPrefix, todayQueue, todaySky, transcriptTime, trayItemPending, tx, uiIcon, updateReaderPlaceSave, updateReadingPlaces, validInstant, validNewPerDay, validPauseEvery, validPreset, validRetention, validReviewsPerDay, validStoreEnvelope, waitForLookupNameReadings, wireReaderWordMenu, withEn, wordBrush, wordCardIdentity, wordNodeIdentity, wordStudied, wordVoice, wordWeb, writtenFormNote, wwP, wwPartMembers, wwReduced, wwShort, wwSpread, wwTokenIndex, wwTrail, yomiVariantCache };
+export { $, AI_DEFAULT_BASE_URL, AI_DEFAULT_MODEL, AI_DEVICE_STORE, AI_EVIDENCE_ROLES, AI_KEY_STORE, AI_MINE_MAX_ROWS, AI_READING_TIMEOUT_CAP_MS, AI_READING_TOKENS_PER_SECOND, AI_TIMEOUT_MS, ANNOTATION_DIGITS, BEYOND_JOYO, D, DEPTH_NAMES, DEPTH_OWNED_S, DEPTH_RECALLED_S, DEPTH_RECALL_R, DICTIONARY_INDEX_PATH, DICTIONARY_SHARD_PATH, DOJO_DECKS, DRAFT_KEY, DRIFT_THEME_BY_WORLD, EXAMPLE_DIR, FRAMES_CAP, FRAMES_STORE, GESTURE, GLOSS_LEAD, GLOSS_MESSY, GLUE_STROKE, GODAN_ROW, GODAN_TE, GRAMMAR, INK_DEPTH, INK_TEMPO, INK_WORLDS, ISO_DAY, JOYO_JUDGEABLE, JOYO_MARKS, KAGAMI_BAND_NAMES, KAGAMI_CLEAR, KAGAMI_CODE_BAND, KAGAMI_LEVELS, KAGAMI_MIN_SEEN, KAGAMI_MODEL_VERSION, KAGAMI_OOV, KANJI_QUEST_FAILED, KANJI_QUEST_STRUCTURAL, KATA_TO_HIRA_OFFSET, LEADING_DROP_DAYS, LEARN_STAGE_DECKS, LEMMA_NIDAN, LEMMA_ONBIN, LESSON_SIZE, LOOKUP_HELPER_POS, M4_COPY, ME_DECKS, ME_FIELDS, ME_MONTHS_EN, ME_N1_SITTING, MINI_INK, MONTHS_EN, NARRATION_VOICES, NEW_PER_DAY_DEFAULT, NODE_KIND, NOTE_TEXT, PARTICLES, PARTICLE_BY_SURFACE, PART_STROKES, PART_WRITTEN, PLACES_TABS, POS_FAMILY, POS_PLAIN, POS_SEGMENT_CODE, PRIMARY_TABS, READER_KANA, READER_KANJI, REGISTER_LINE_DOORS, REGISTER_ROOM_DOORS, REL, REPORT_RELAY_STORE, REVIEWS_PER_DAY_DEFAULT, ROMAJI, ROOM_IDS, ROOM_NAMES, S, SAVE_PRESS_MS, SENSEI_OBS_CODES, SENSE_BY_ANCHOR, SENSE_CLASS, SENSE_GAVE_UP, SENSE_LATE, SENSE_MUST_END, SENSE_MUST_NOT, SENSE_NUMBER, SENSE_NUMBER_WORD, SENSE_TAG_EN, SENSE_TAG_JA, SENSE_WAIT_MS, SENSE_WEEKDAY, SHORT_EXAMPLE_CHARS, SLIP_NODE, SLIP_OWN_MEANING, SOUND_PLAIN, SOUND_VOICED, SPEAK_JA, SRS_KINDS, SRS_PREF_LADDERS, SRS_PRESETS, STROKE_SPEED_DEFAULT, STROKE_VIEWBOX, SVG_NS, TE_FORM_AUXILIARY, TE_FORM_NOTE, THEME_STORE, THEME_UI, THES_RELS, TODAY_JA_WORD, TODAY_SKY_CAP, TODAY_SKY_MISS_DAYS, TODAY_SKY_WORD, TOKEN_CONTEXT, TOPIC_BLOCKS, TOPIC_KICKERS, TOPIC_ORDER, TOUCH_READING_FADES, TOUCH_READING_GAP, TOUCH_READING_MOTION, TOUCH_READING_ROWS, TOUCH_ROW_PINS, TRAIL_KINDS, VOICE_LOCK, WORD_BRUSH, WORD_BRUSH_KEY, WORD_VOICE, WORD_VOICE_KEY, WW_CX, WW_CY, WW_KANJI_ANGLES, WW_REL, WW_RING2_ORDER, WW_RING2_SLOTS, WW_TRAIL_MAX, WW_WALK_KEY, YOMI_DAKUTEN, YOMI_HANDAKU, _KDX_NPTS, _compsCache, _kdxDist, _kdxNorm, _kdxResample, _kdxTemplates, activateWordLadder, afterPressLands, aiChatLog, aiConverse, aiLogAll, aiSheetNotes, aiSheetTurns, allAssessmentEvidence, anchorBox, animcjkApproved, animcjkShards, annotationKana, applyAssessmentV2, approvedWordManifest, assertLearningSource, assessmentClockSession, back, bi, biLabel, boxLeadGloss, buildListenRow, buildTeacherChatLog, cacheDictionaryFormRows, cacheDictionaryRow, cancelExcerptPlayback, canonicalRecordJson, capturePending, captureScaleVisit, cardAudioSerial, cardRecall, chipsFor, clearReaderReadings, clearReaderSummons, clearWordLadder, closeSealStrip, closeWorldPicker, commitCapture, commitStorePatch, confusablesFor, contrastOf, controlsUnder, copyRecordWith, currentAssessmentV2, currentJoyoKunNote, currentRecordNoteView, currentSentenceListeningCue, deckSummaries, deeperDepth, depthIndexMemo, depthNodeCache, depthRank, depthRetrievability, dictionaryQueryOpening, dictionaryReadingSummaries, dictionaryRowBySeq, dictionaryWorkerRequest, diveFromMini, diveFromSlip, el, encounterKey, enhanceJapaneseProse, ensureArchiveIndex, ensureArticle, ensureDictionaryIndex, ensureDictionaryShard, ensureReadingPositionModule, ensureSenseSidecar, ensureSentenceListeningCatalog, entryKanaIndex, explicitWordSnapshot, fetchData, fieldsDeckHome, findLookupOccurrence, finishPageTransition, finiteNumber, fitChromeKeep, flowText, focusKanjiItem, foundationDoor, frameFoot, gateFrame, glyphBox, go, guidedTaken, heldWordCardNode, heroSource, hideReaderToast, holdPageUnderDrawer, inkGroundFor, installProseWordRoving, installScaleBridge, interaction, invalidateRecordNoteViews, isLeech, jaGroupSegments, jlptRank, kagamiBandFor, kagamiLevel, kagamiLevelOf, kagamiMockBand, kanaReadingKey, kanjiAnswerAvailable, kanjiCourseApplyHelp, kanjiCourseRememberHelp, kanjiDisplayRecord, kanjiFamilyExposures, kanjiFamilyMounts, kanjiFamilyResolveExample, kanjiFamilyStamp, kanjiFamilyStampCurrent, kanjiFamilyTicket, kanjiFamilyTicketCurrent, kanjiFamilyViews, kanjiQuestFor, kanjiQuestLoading, kanjiQuestOwner, kanjiReadingsState, kanjiReferenceRows, kanjiStructureMounts, kanjiWorldEligible, kankenGradeLabel, kataToHira, keepNavigationReturn, laneMembers, layersMarkTop, learnDeckSummary, learnStageFace, loadReferenceExtra, logicalArchiveRows, lookupWordKey, meBackPart, meDeckIndex, meNum, meSealsPart, metReadable, mockFailed, motionEase, motionMs, narrationVoiceName, nonEmptyString, notYetReleased, noteEncounter, openAssessmentQuestionReview, openDeck, openGuidedRoom, openJapaneseLookup, openKanjiCourseUnit, openKanjiWorldEncounter, openPassage, openPersonalCollection, openPlainSaveMenu, openReferenceCollection, openSealStrip, openSentencePractice, openSpeakRoom, openStrokePage, openVocabularyListPopover, openWordWeb, optional, ownSentenceExample, owns, pageCutAllowed, paintKeptCount, paintMiniPath, passage, performAssessmentReconciliation, placeFloating, placeKinsoku, placesLayout, plainRecord, proseWordRovers, protectStore, queueAssessmentWork, quietUsageTags, readAloud, readFrameRows, readHelpPatch, readHelpReadable, readerReadingFits, readerSummaryFor, readerTokenLead, recordReady, recordWritable, refreshStrokeReadings, refreshWordSheet, relayServiceUrl, removeMini, render, renderFamilyExampleNode, renderKanjiCourseDoor, renderKanjiFamily, renderKanjiStructure, renderKdxGrid, renderReferenceConnections, renderReviewHall, renderSentenceTokens, renderSourceInboxEntries, renderSourceKanjiDoor, renderStudyFold, renderStudyHall, renderTeacherDoor, renderTextSourceContextSelection, renderWordWeb, resolveReaderChoice, resolveTeacherSource, retainedKanjiRecord, retireScaleReturn, returnToScaleBead, revalidateTutorRequests, revealFloatingFocus, roomName, roomTransition, rubyNode, safeJsonValue, sameItem, sameWordIdentity, saveWord, savedAnswerFor, scaleIn, scaleNavigationAllowed, scaleOut, scalePassage, scaleThreadPath, scaleTokenFingerprint, sealListRecency, senseGlosses, senseLed, senseNumberBefore, sensePatch, senseWeekdayBracket, sentenceDraftBindings, sentenceDraftInputErrors, sentenceDraftWindowEdits, setGlossLine, setJaWords, setLayout, setLookupStop, setOwnRecordValue, setWordPref, shallowerDepth, sheetActionLine, sheetActionLineKeys, shelfDay, showMini, skipState, sourceInboxShelf, speakAvailable, srsDueItems, srsKey, srsParamsProblem, srsRoomBack, srsSchedulePolicy, stopPassageRead, stopSentenceListening, strokePathsFor, strokeReduced, strokeSpeed, studyHallDoors, suppressAssessmentCards, syncChromeKeep, syncStrokeNumbers, teacherDraftInputErrors, teacherDraftWindowEdits, teacherSourceProcessingUnavailable, teacherWindowDraftPrefix, todayQueue, todaySky, transcriptTime, trayItemPending, tx, uiIcon, updateReaderPlaceSave, updateReadingPlaces, validInstant, validNewPerDay, validPauseEvery, validPreset, validRetention, validReviewsPerDay, validStoreEnvelope, waitForLookupNameReadings, wireReaderWordMenu, withEn, wordBrush, wordCardIdentity, wordNodeIdentity, wordStudied, wordVoice, wordWeb, writtenFormNote, wwP, wwPartMembers, wwReduced, wwShort, wwSpread, wwTokenIndex, wwTrail, yomiVariantCache };
