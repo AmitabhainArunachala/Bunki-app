@@ -362,6 +362,17 @@ test('the cap and the bookmark leave the bar with the tabs; the saved count move
   assert.equal(sky.tabs, false);
   assert.equal(sky.cap, true);
   assert.equal(sky.bookmark, true);
+  // a screen with neither tabs nor a trail (the Field front door) keeps the room's name in the bar, short of the gate
+  const field = await open(DESK, '?entry=field');
+  const named = await field.page.evaluate(() => {
+    const crumb = document.querySelector('#app > .chrome > .crumb').getBoundingClientRect();
+    const gate = document.querySelector('#app > .chrome > .bar-gate').getBoundingClientRect();
+    return { tabs: document.body.classList.contains('has-primary-tabs'), trail: !!document.querySelector('#app > .scale-thread'),
+      width: crumb.width, clear: crumb.right <= gate.left, text: document.querySelector('#app > .chrome > .crumb').textContent };
+  });
+  assert.equal(named.tabs, false);
+  assert.equal(named.trail, false);
+  assert.ok(named.width > 10 && named.clear && named.text === 'Field', JSON.stringify(named));
 });
 
 test('the language switch is one compact control that still switches', async () => {

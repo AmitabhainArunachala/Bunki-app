@@ -5162,7 +5162,7 @@ body [data-bar='sheet'] .sheet-take { margin-left: auto; height: 44px; min-heigh
 /* THE GATE ON EVERY BAR (frame, 2026-11-10). With the tabs, every bar carries the first screen's torii at the screen's
    centre, drawn as the first screen's (a hairline seal square in its 44), and holds Back, the gate, search and the
    language; an article or a page adds its Save. The doors after the gate gather at the bar's end and never reach under
-   it; the room's name is said to a screen reader only, as on a phone. The language is one word in a hairline slip. The
+   it. The language is one word in a hairline slip. The
    gate's menu over a screen is a layer of its own, above the page (corridor.js openGateMenu). */
 body:not(.zen) :is(#app > .chrome, #sheet > .sheet-bar) > button.bar-gate {
   position: absolute;
@@ -5189,10 +5189,13 @@ body:not(.zen) :is(#app > .chrome, #sheet > .sheet-bar) > button.bar-gate::after
 .bar-gate[aria-expanded='true'] svg { rotate: 90deg; }
 body:not(.zen) :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate + * { margin-left: auto; }
 body:not(.zen) #sheet > .sheet-bar:has(> .bar-gate) > .sheet-take { margin-left: 4px; }
-html:not([data-register='attempt']) body:not(.zen) #app > .chrome:has(> .bar-gate) > .crumb {
+/* the room's name and the article's level go where the tabs or the trail already say them (the name stays the bar's
+   words for a screen reader); a screen with neither keeps its name, short of the gate */
+html:not([data-register='attempt']) :is(body.has-primary-tabs, body:has(#app > .scale-thread)):not(.zen) #app > .chrome:has(> .bar-gate) > .crumb {
   position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
 }
-body:not(.zen) #app > .chrome:has(> .bar-gate) > .chrome-level { display: none; }
+body:not(.zen) #app > .chrome:has(> .bar-gate) > .crumb { flex: 0 1 auto; max-width: calc(50% - 100px); }
+body.has-primary-tabs:not(.zen) #app > .chrome:has(> .bar-gate) > .chrome-level { display: none; }
 /* the article's Save keeps a fixed room at the bar's end (touching a word moves no door), short of the gate:
    half the bar, less half the gate, a gap, search (44) and the language (52 at most) */
 body:not(.zen) #app > .chrome:has(> .bar-gate) > button.save-one.chrome-keep { flex: 0 0 min(calc(50% - 126px), 140px); }
