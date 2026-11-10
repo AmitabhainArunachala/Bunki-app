@@ -182,6 +182,8 @@ html:is([data-room='tray'], [data-room='search']) .dw-label {
   color: var(--color-muted);
 }
 html:is([data-room='tray'], [data-room='search']) body:not(.ui-bi) .dw-label { letter-spacing: 0.32em; font-size: var(--type-caption); }
+/* why the day's word is here (from your saved words / not yet saved): one quiet line between the label and the word */
+html:is([data-room='tray'], [data-room='search']) .dw-why { margin: 6px 0 0; font: 400 var(--type-caption)/1.3 var(--font-ui); color: var(--color-muted); }
 html:is([data-room='tray'], [data-room='search']) .dw-word {
   display: flex;
   flex-direction: column;

@@ -129,6 +129,14 @@ function todayIsRadical(part, c) {
   return !!row && row.n === D.kanji?.[c]?.rad;
 }
 
+/** A radical's Japanese name from the official table (radicals214 `name`), only for the written form that name belongs
+ * to: the positional variant (氵 さんずい) or a radical with one form (言 ごんべん, 門 もんがまえ). A standalone form whose
+ * table name is its variant's (水 beside 氵) gets none: a name is never guessed. */
+function todayRadicalName(part) {
+  const row = D.radByGlyph?.[part];
+  return row?.name && (row.var ? part === row.var : part === row.c) ? row.name : '';
+}
+
 function todaySharedPart(ks) {
   if (ks.length < 2) return null;
   const lists = ks.map((c) => D.kanji[c].parts || []);
@@ -168,7 +176,7 @@ function todayHook(word) {
   const mine = cap.mine;
   // its plain meaning (the written form's own, else its standalone form's: 氵 is water), never the catalogue's words
   const meaning = partMeaning(D.kanji?.[part]?.m) || partMeaning(D.kanji?.[(PART_WRITTEN[part] || [])[0]]?.m);
-  return { part, shared, host: host?.[0] || null, count: ks.length, family, mine, meaning };
+  return { part, shared, host: host?.[0] || null, kanji: ks, count: ks.length, family, mine, meaning };
 }
 
 function todaySecondsPerCard() {
@@ -412,6 +420,9 @@ function renderTodayWord(pick) {
   const label = el('p', 'dw-label', tx('今日のことば', "Today's word"));
   label.dataset.japaneseLookup = 'off';
   block.append(label);
+  // why this word is here, from the pick's own source only (John, 2026-11-10)
+  const why = { saved: tx('保存した語から', 'From your saved words'), fresh: tx('まだ保存していない語', 'Not in your saved words yet') }[pick.from];
+  if (why) block.append(el('p', 'dw-why', why));
   const word = el('button', 'dw-word');
   word.type = 'button';
   word.dataset.uiContentValue = `語|${pick.word}`;
@@ -425,20 +436,34 @@ function renderTodayWord(pick) {
   const hook = todayHook(pick.word);
   if (!hook) return block;
   const pk = () => todayLearning('span', 'dw-pk', hook.part);
+  // John, 2026-11-10: "it doesn't HIDE? it is A RADICAL ... it should be INSTRUCTIVE but accurate". The part is the
+  // classical radical (部首) of every kanji named (todayIsRadical), so the line says that, with the radical's own name
+  //   談 and 話 share the radical 言 (ごんべん, “say”).   「談」と「話」の部首は、どちらも 言（ごんべん）。
+  //   The radical of 海 is 氵 (さんずい, “water”).        「海」の部首は 氵（さんずい）。
+  const names = hook.shared ? hook.kanji : [hook.host];
+  const ref = (c) => todayLearning('span', 'dw-kref', c);
+  const radicalName = todayRadicalName(hook.part);
   const line = el('p', 'dw-hook');
-  const gloss = hook.meaning ? ` “${hook.meaning}”` : '';
-  if (hook.shared) {
-    const howMany = hook.count === 2 ? tx('二つの', 'both') : tx(`${hook.count}つの`, `all ${hook.count}`);
-    line.append(tx(`${howMany}漢字に、同じ部品 `, 'One part, '), pk(), tx(' が隠れている。', `${gloss}, hides inside ${howMany} kanji.`));
+  if (bi()) {
+    if (hook.shared) {
+      names.forEach((c, i) => line.append(i ? (i === names.length - 1 ? ' and ' : ', ') : '', ref(c)));
+      line.append(' share the radical ', pk());
+    } else line.append('The radical of ', ref(hook.host), ' is ', pk());
+    const gloss = [radicalName && todayLearning('span', 'dw-rn', radicalName), hook.meaning && `“${hook.meaning}”`].filter(Boolean);
+    if (gloss.length) line.append(' (', ...gloss.flatMap((g, i) => (i ? [', ', g] : [g])), ')');
+    line.append('.');
   } else {
-    line.append(tx('', 'Inside '), todayLearning('span', 'dw-pk', hook.host), tx(' の中に、部品 ', ' hides '), pk(),
-      tx(' が隠れている。', `${gloss}.`));
+    names.forEach((c, i) => line.append(i ? (i === names.length - 1 ? 'と' : '、') : '', '「', ref(c), '」'));
+    line.append(hook.shared ? (names.length === 2 ? 'の部首は、どちらも ' : 'の部首は、どれも ') : 'の部首は ', pk());
+    if (radicalName) line.append('（', todayLearning('span', 'dw-rn', radicalName), '）');
+    line.append('。');
   }
   block.append(line);
+  // the web's own count (kanji that carry this part), the same number the door below opens on
   if (hook.family) {
     block.append(el('p', 'dw-fam', hook.mine
-      ? tx(`この部品の漢字 ${hook.family} 字・うち ${hook.mine} 字はあなたの語に`, `${hook.family} kanji contain it · ${hook.mine} in your words`)
-      : tx(`この部品の漢字 ${hook.family} 字`, `${hook.family} kanji contain it`)));
+      ? tx(`この部首を含む漢字 ${hook.family} 字・うち ${hook.mine} 字はあなたの語に`, `${hook.family} kanji contain this radical · ${hook.mine} of them are in your words`)
+      : tx(`この部首を含む漢字 ${hook.family} 字`, `${hook.family} kanji contain this radical`)));
   }
   // plain words (LABELS.md, round 4): the door names where it goes, the kanji that hold this part
   const follow = el('button', 'dw-go');
