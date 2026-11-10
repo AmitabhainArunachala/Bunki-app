@@ -8,7 +8,8 @@
  * makes a sound (4). It only looks and presses the app's own controls. No product code is changed, and every run
  * starts from an empty browser profile that is thrown away afterwards. Sound is recorded as "the app asked for
  * it" and kept silent. A check also fails on any console error, failed request, HTTP error or request that
- * leaves the site's own address while it runs.
+ * leaves the site's own address while it runs. A request the browser drops because the page moved on is
+ * not a failed one; those are listed in results.json.
  *
  *   node scripts/prototype/learner-walk.mjs --site <built site>   serves that folder itself (or KAIRO_SITE_DIR)
  *   node scripts/prototype/learner-walk.mjs --base <url>          checks an address that is already served
@@ -83,6 +84,7 @@ const DEVICES = {
 const ORIGIN = new URL(BASE).origin;
 const results = [];
 const notes = {};
+const aborted = [];
 const sleep = (page, ms) => page.waitForTimeout(ms);
 
 // Runs in the page before the app: records every request for sound, and keeps the room quiet.
@@ -164,9 +166,16 @@ async function fresh(browser, device, url = BASE) {
   });
   page.on('pageerror', (e) => log.errors.push(`uncaught: ${String(e.message || e).slice(0, 300)}`));
   page.on('requestfailed', (r) => {
-    // The report sheet reads only the head of build-identity.json and drops the rest: that abort is the app's design.
-    if (r.url().endsWith('/build-identity.json') && r.failure()?.errorText === 'net::ERR_ABORTED')
+    // A dropped request is not a failed one. Two things drop requests here. The report sheet reads
+    // only the head of build-identity.json and lets the rest go, by design. And the app asks for
+    // /data/articles/senses.json on every load; when the walk opens the address again before the
+    // answer has arrived, the browser drops that request. On a slow runner that failed
+    // sound-article (next / core run 42773527715). A file that is missing or broken still fails
+    // its check: it arrives as an HTTP status or a console error. Drops are kept in results.json.
+    if (r.failure()?.errorText === 'net::ERR_ABORTED') {
+      aborted.push(r.url().replace(ORIGIN, ''));
       return;
+    }
     log.failed.push(`${r.failure()?.errorText} ${r.url().replace(ORIGIN, '')}`);
   });
   page.on('response', (r) => {
@@ -875,6 +884,7 @@ const summary = {
   failed: failed.length,
   results,
   notes,
+  abortedRequests: aborted,
 };
 writeFileSync(join(SHOTS, 'results.json'), `${JSON.stringify(summary, null, 2)}\n`);
 console.log(
