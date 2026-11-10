@@ -2,7 +2,7 @@
 //
 // A labelled PREVIEW (John, 2026-11-10: tonight's prototype switches everything on; rough screens are fine when they
 // say so). The experience is the author's standalone prototype (claude/meguri-20261016 @ aa567e27), restored beside
-// this file in orbit-preview/ and left as he made it; orbit-preview/frame.html lists its two differences. It is not
+// this file in orbit-preview/ and left as he made it; orbit-preview/frame.html lists its three differences. It is not
 // the Drift mode that spec S9-R11 plans (orbit-field.mjs, the corridor's own copy of the mechanics, stays unimported).
 //
 // corridor.js touches this module once: buildGingaChrome() imports it when the door's menu opens and calls
