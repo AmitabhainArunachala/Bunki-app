@@ -56,7 +56,6 @@ html:is([data-room='search'], [data-room='word-web']) .ww { position: relative; 
 @media (max-width: 520px) {
   /* the plate is the room's one wide object: it takes the gutters (10px a side) */
   html:is([data-room='search'], [data-room='word-web']) body:not(.zen) #app > main > .ww { margin-inline: -8px; }
-  html[data-room='search'] body:not(.zen) #app > main:has(> .room-sign) > .ww { margin-right: -26px; }
 }
 /* searching is one job: while rows, a finder lens or the SKIP wheel show, the web steps away */
 html[data-room='search'] #app > main > .search-page.search-page-busy ~ .ww { display: none; }
