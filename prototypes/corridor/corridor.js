@@ -542,6 +542,8 @@ const S = {
   srsPrefsOpen: false,
   /** a door that leads inside Today's Decks fold holds it open for that visit, whatever the device remembers */
   todayDetailHeld: false,
+  /** whether Today's record drawer (the closed row at its foot) is open: it stays so for the session */
+  todayRecordOpen: false,
   /** whether the Words room's other-tools disclosure is open: a return from one of its doors finds it so */
   wordsIndexOpen: false,
   /** articles marked finished: { passageId: ts } */
@@ -13744,7 +13746,7 @@ function renderSrsPrefs(main, { open = false } = {}) {
     toggle.type = 'button';
     toggle.id = 'srs-prefs-toggle';
     toggle.setAttribute('aria-expanded', String(!!S.srsPrefsOpen));
-    toggle.textContent = (S.srsPrefsOpen ? '▼ ' : '▶ ') + tx('ペース — 1日に覚える数', 'pace · how many cards a day');
+    toggle.textContent = (S.srsPrefsOpen ? '▼ ' : '▶ ') + tx('ペース — 1日に覚える数', 'Pace · how many cards a day');
     toggle.addEventListener('click', () => {
       S.srsPrefsOpen = !S.srsPrefsOpen;
       render();
@@ -14772,6 +14774,30 @@ function todayOpenUniverse(from) {
  * taste"): two plain lines on the page and no box — the cards waiting (#review-start, the one door into today's review,
  * built by renderTray) and today's reading — each under a hairline, in the house's type, the room's arrow at its end. */
 const TODAY_DETAIL_KEY = 'bunki-today-detail';
+/** "3 due · 15 new" from [n, ja, en] parts, every zero left out ('' when all are zero): a count of zero
+ * is not printed (tighten pass, 2026-11-10). Today's Decks row and Learn's Decks head read it. */
+function countsLine(parts, sepJa = '・', sepEn = ' · ') {
+  const shown = parts.filter(([n]) => n > 0);
+  return tx(shown.map(([n, ja]) => `${ja} ${n}`).join(sepJa), shown.map(([n, , en]) => `${n} ${en}`).join(sepEn));
+}
+/** Today's record drawer (tighten pass, John 2026-11-10: "keep what works, clean up all the noise"): the decks,
+ * bookmarks, saved notes, sync, backup and the note to the builder, folded into one closed row at the foot of
+ * the same page, every id inside unchanged. Once opened it stays open for the session; a door that lands inside
+ * (Settings → Review pace or Backup, the band's Export) opens it through S.todayDetailHeld or S.todayRecordOpen. */
+function renderTodayRecord() {
+  const fold = el('details', 'today-record');
+  fold.id = 'today-record';
+  fold.open = S.todayRecordOpen || S.todayDetailHeld;
+  const row = el('summary', 'today-detail-toggle today-record-toggle');
+  row.append(el('span', 'today-record-name', tx('記録とバックアップ', 'Your record and backup')), el('i', 'today-detail-caret'));
+  fold.append(row);
+  fold.addEventListener('toggle', () => {
+    if (!fold.isConnected) return;
+    S.todayRecordOpen = fold.open;
+    if (!fold.open) S.todayDetailHeld = false;
+  });
+  return fold;
+}
 /** The deck room, folded under the line: the counts, the forecast, the deck rows, the doors and
  * the pace. Open by default; a learner who folds it finds it folded next time (this device only). */
 function renderTodayDetail(today) {
@@ -14785,10 +14811,8 @@ function renderTodayDetail(today) {
   toggle.setAttribute('aria-controls', 'today-detail-body');
   toggle.setAttribute('aria-expanded', String(open));
   toggle.append(el('span', 'today-detail-name', tx('デッキ', 'Decks')));
-  if (today) {
-    toggle.append(el('span', 'today-detail-sum', tx(`新規 ${today.new.length}・学習 ${today.learn.length}・復習 ${today.review.length}`,
-      `${today.new.length} new · ${today.learn.length} learning · ${today.review.length} due`)));
-  }
+  const sum = today ? countsLine([[today.new.length, '新規', 'new'], [today.learn.length, '学習', 'learning'], [today.review.length, '復習', 'due']]) : '';
+  if (sum) toggle.append(el('span', 'today-detail-sum', sum));
   toggle.append(el('i', 'today-detail-caret'));
   const body = el('div', 'today-detail-body');
   body.id = 'today-detail-body';
@@ -14834,6 +14858,7 @@ function renderTray(main) {
   main.append(hero);
   requestAnimationFrame(() => todayPlaceSky(hero));
   let lineDoor = null;
+  const record = renderTodayRecord();
   // Anki's deck screen first (operator, 2026-09-28): what is waiting, one Study, the decks
   if (S.taken.length && scheduler) {
     // card-system slice 1 · the number is the truth: the button, the three counts and every
@@ -14857,7 +14882,7 @@ function renderTray(main) {
         : capped ? '復習する — 今日の上限まで済んだ' : laterToday ? '復習する — いまは予定なし' : '復習する — 予定なし',
       due.length
         ? `${due.length} card${due.length === 1 ? '' : 's'} waiting`
-        : capped ? "today's limit reached" : laterToday ? 'nothing due right now' : 'nothing due yet',
+        : capped ? "Today's limit reached" : laterToday ? 'Nothing due right now' : 'Nothing due yet',
     );
     btn.type = 'button';
     btn.id = 'review-start';
@@ -14874,7 +14899,8 @@ function renderTray(main) {
     if (due.length) btn.append(el('i', 'today-arrow'));
     lineDoor = btn;
     const detail = renderTodayDetail(today);
-    main.append(renderTodayLine(today, lineDoor, readPick), detail.section);
+    main.append(renderTodayLine(today, lineDoor, readPick));
+    record.append(detail.section);
     const fold = detail.body;
     fold.append(deckCounts(today));
     if (today.held) {
@@ -15034,238 +15060,13 @@ function renderTray(main) {
         ),
       ),
     );
-    main.append(renderReadingPlaces(), renderRecordNotes());
-    // a fresh device is exactly where bringing a record back matters most —
-    // and where first frictions surface, so the note door stands here too
-    renderPortRow(main);
-    renderNoteDoor(main);
-    return;
-  }
-
-  // month buckets fill themselves; named lists sit above them
-  const buckets = new Map();
-  for (const item of S.taken) {
-    const key = monthKey(item.ts || 0);
-    if (!buckets.has(key)) buckets.set(key, []);
-    buckets.get(key).push(item);
-  }
-  const sections = [
-    ...Object.entries(S.lists).map(([name, items]) => ({ name, items, manual: true })),
-    ...[...buckets.entries()].map(([name, items]) => ({ name, items, manual: false })),
-  ];
-  // つくる — a list is born HERE on the lists surface, with a quiet inline
-  // field. window.prompt was the only door, and only from inside an entry
-  // (P2, full-instrument review).
-  const maker = el('div', 'list-maker');
-  const nameField = el('input', 'list-maker-field');
-  nameField.type = 'text';
-  nameField.id = 'list-maker-field';
-  attachRecordDraft(nameField);
-  nameField.placeholder = tx('新しいリストの名前', 'name a new list');
-  nameField.setAttribute('aria-label', tx('新しいリストの名前', 'name for a new list'));
-  const makeBtn = biLabel('button', 'chip list-maker-make', '＋ 作る', 'create');
-  makeBtn.type = 'button';
-  makeBtn.id = 'list-maker-make';
-  makeBtn.disabled = listRecordPending.has('tray-create') || !recordWritable();
-  nameField.readOnly = listRecordPending.has('tray-create');
-  const tryMake = async () => {
-    if (listRecordPending.has('tray-create') || !recordWritable()) return;
-    const draft = nameField.value;
-    const name = nameField.value.trim();
-    if (!name || owns(S.lists, name)) {
-      nameField.setAttribute('aria-invalid', 'true');
-      nameField.placeholder = name
-        ? tx('その名はもうある', 'that name already exists')
-        : tx('名前を入れて', 'give it a name');
-      nameField.focus();
-      return;
-    }
-    listRecordPending.add('tray-create');
-    makeBtn.disabled = true;
-    nameField.readOnly = true;
-    try {
-      const saved = await commitStorePatch((latest) => {
-        if (owns(latest.lists, name)) throw new Error('list-name-changed');
-        const next = { ...latest.lists };
-        setOwnRecordValue(next, name, []);
-        return { lists: next };
-      });
-      listRecordPending.delete('tray-create');
-      if (saved) {
-        if (readRecordDrafts()[nameField.id] === draft) {
-          nameField.value = '';
-          rememberRecordDraft(nameField);
-        }
-        if (currentSurface()) render();
-      }
-    } finally {
-      listRecordPending.delete('tray-create');
-      makeBtn.disabled = !recordWritable();
-      nameField.readOnly = false;
-    }
-  };
-  makeBtn.addEventListener('click', tryMake);
-  nameField.addEventListener('keydown', (ev) => {
-    if (ev.key === 'Enter') tryMake();
-  });
-  maker.append(nameField, makeBtn);
-  // the maker used to stand ABOVE the learner's own words — admin furniture
-  // before the daily object (operator, 2026-08-20). It now waits below the
-  // lists it makes; the sections loop appends it after the last row.
-  const dueKeys = new Set(srsDueItems().map((i) => srsKey(i.t, i.id)));
-  for (const sec of sections) {
-    const label = sec.manual ? sec.name : monthLabel(sec.name);
-    const head = el('p', 'eyebrow list-head');
-    // G5 · the bookmark lands here: the kept words begin at the first list (landOnKeptWords)
-    head.dataset.keptSection = sec.manual ? 'list' : 'month';
-    if (sec === sections[0]) head.id = 'kept-words';
-    // the name is a door: every list, named or monthly, opens to its own
-    // page with its rows, its review, and its export (operator, 2026-08-27)
-    const openList = el('button', 'list-open');
-    openList.type = 'button';
-    openList.setAttribute('aria-label', tx(`「${label}」のページをひらく`, `open the ${label} list page`));
-    openList.append(document.createTextNode(`${label} — ${sec.items.length}`));
-    openList.append(el('span', 'list-open-arrow', '›'));
-    openList.addEventListener('click', () => {
-      readerTicketDeparture('list');
-      S.listOpen = { name: sec.name, manual: sec.manual };
-      keepScroll();
-      S.view = 'list';
-      render();
-      window.scrollTo(0, 0);
-    });
-    head.append(openList);
-    if (bi()) head.append(el('span', 'en-inline', sec.manual ? 'your list' : 'words saved that month'));
-    // the filtered deck, one tap wide: review only what today serves in this list
-    const dueHere = scheduler ? todayQueue(new Date(), sec.items).order : [];
-    if (dueHere.length && scheduler) {
-      const only = el('button', 'chip list-review', tx(`このリストを復習 ${dueHere.length}`, `Review this list · ${dueHere.length}`));
-      only.type = 'button';
-      only.dataset.listReview = sec.name;
-      only.addEventListener('click', () => startReview(sec.items));
-      head.append(only);
-    }
-    if (sec.manual) {
-      // 直す・消す — rename and delete live where the list lives; deleting a
-      // list never touches its items' taken status (the list is curation,
-      // the deck is the deck)
-      const ren = el('button', 'list-op', tx('名前', 'Rename'));
-      ren.type = 'button';
-      ren.setAttribute('aria-label', tx(`「${sec.name}」の名前を変える`, `rename ${sec.name}`));
-      ren.addEventListener('click', () => {
-        S.listRename = S.listRename === sec.name ? null : sec.name;
-        render();
-      });
-      const armed = S.listDeleteArm === sec.name;
-      const del = el('button', armed ? 'list-op armed' : 'list-op', armed ? tx('消す？', 'sure?') : '×');
-      del.type = 'button';
-      del.setAttribute(
-        'aria-label',
-        armed ? tx(`「${sec.name}」を本当に消す`, `really delete ${sec.name}`) : tx(`「${sec.name}」を消す`, `delete ${sec.name}`),
-      );
-      const deleteKey = `delete:${sec.name}`;
-      del.disabled = listRecordPending.has(deleteKey) || !recordWritable();
-      del.addEventListener('click', async () => {
-        if (listRecordPending.has(deleteKey) || !recordWritable()) return;
-        if (S.listDeleteArm !== sec.name) {
-          S.listDeleteArm = sec.name;
-          render();
-          setTimeout(() => {
-            if (S.listDeleteArm === sec.name && !listRecordPending.has(deleteKey)) {
-              S.listDeleteArm = null;
-              render();
-            }
-          }, 3200);
-          return;
-        }
-        listRecordPending.add(deleteKey);
-        del.disabled = true;
-        try {
-          const saved = await commitStorePatch((latest) => {
-            const next = { ...latest.lists };
-            delete next[sec.name];
-            return { lists: next };
-          });
-          if (saved) {
-            if (S.listDeleteArm === sec.name) S.listDeleteArm = null;
-            if (currentSurface()) render();
-          }
-        } finally {
-          listRecordPending.delete(deleteKey);
-          del.disabled = !recordWritable();
-        }
-      });
-      head.append(ren, del);
-    }
-    main.append(head);
-    if (sec.manual && S.listRename === sec.name) {
-      const row = el('div', 'list-maker list-rename');
-      const field = el('input', 'list-maker-field');
-      field.type = 'text';
-      field.id = `list-rename-name:${sec.name}`;
-      field.value = sec.name;
-      attachRecordDraft(field);
-      field.setAttribute('aria-label', tx('新しい名前', 'new name'));
-      const save = biLabel('button', 'chip list-maker-make', '保存', 'save');
-      save.type = 'button';
-      const renameKey = `rename:${sec.name}`;
-      save.disabled = listRecordPending.has(renameKey) || !recordWritable();
-      field.readOnly = listRecordPending.has(renameKey);
-      const trySave = async () => {
-        if (listRecordPending.has(renameKey) || !recordWritable()) return;
-        const draft = field.value;
-        const name = field.value.trim();
-        if (!name || (name !== sec.name && owns(S.lists, name))) {
-          field.setAttribute('aria-invalid', 'true');
-          field.focus();
-          return;
-        }
-        listRecordPending.add(renameKey);
-        save.disabled = true;
-        field.readOnly = true;
-        try {
-          const saved = await commitStorePatch((latest) => {
-            if (!owns(latest.lists, sec.name) || (name !== sec.name && owns(latest.lists, name)))
-              throw new Error('list-name-changed');
-            const next = {};
-            for (const [key, items] of Object.entries(latest.lists))
-              setOwnRecordValue(next, key === sec.name ? name : key, items);
-            return { lists: next };
-          });
-          if (saved) {
-            if (readRecordDrafts()[field.id] === draft) {
-              field.value = '';
-              rememberRecordDraft(field);
-            }
-            if (S.listRename === sec.name) S.listRename = null;
-            if (currentSurface()) render();
-          }
-        } finally {
-          listRecordPending.delete(renameKey);
-          save.disabled = !recordWritable();
-          field.readOnly = false;
-        }
-      };
-      save.addEventListener('click', trySave);
-      field.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter') trySave();
-        if (ev.key === 'Escape' && !listRecordPending.has(renameKey)) {
-          S.listRename = null;
-          render();
-        }
-      });
-      row.append(field, save);
-      main.append(row);
-    }
-    for (const item of sec.items) main.append(trayLine(item, dueKeys));
-  }
-  main.append(maker);
-  // notes, reading places and sync wait below the cards themselves (operator, 2026-09-28:
-  // the review page read as a kitchen sink)
-  main.append(renderReadingPlaces(), renderRecordNotes());
-
-  renderPortRow(main);
-  renderNoteDoor(main);
+  } else renderSavedLists(main);
+  // the record drawer closes the page (tighten pass): bookmarks, notes and sync, the backup (a fresh device brings a
+  // record back from here), and the note door; the lists above are Saved words & lists' own, drawn by its function
+  record.append(renderReadingPlaces(), renderRecordNotes());
+  renderPortRow(record);
+  renderNoteDoor(record);
+  main.append(record);
 }
 
 /** Review → Saved words & lists: what the learner has kept — the cards at a glance, every list with
@@ -15431,7 +15232,7 @@ function renderSavedLists(main) {
   nameField.type = 'text';
   nameField.id = 'list-maker-field';
   attachRecordDraft(nameField);
-  nameField.placeholder = tx('新しいリストの名前', 'name a new list');
+  nameField.placeholder = tx('新しいリストの名前', 'Name a new list');
   nameField.setAttribute('aria-label', tx('新しいリストの名前', 'name for a new list'));
   const makeBtn = biLabel('button', 'chip list-maker-make', '＋ 作る', 'Create');
   makeBtn.type = 'button';
@@ -16129,15 +15930,15 @@ function renderPortRow(main) {
  * command: nothing here grades, schedules, or touches learner state. */
 function renderNoteDoor(main) {
   const currentSurface = recordViewSurface();
-  main.append(withEn(el('p', 'eyebrow key-head', 'ひとこと'), 'a note to the builder', 'en-inline'));
+  main.append(withEn(el('p', 'eyebrow key-head', 'ひとこと'), 'A note to the builder', 'en-inline'));
   const row = el('div', 'chat-row');
   const input = el('input', 'search-field chat-field');
   input.type = 'text';
   input.id = 'note-input';
   attachRecordDraft(input);
   input.autocomplete = 'off';
-  input.placeholder = tx('気づいたことをここに…', 'anything that felt wrong or missing…');
-  const send = biLabel('button', 'take chat-send', '残す', 'keep it');
+  input.placeholder = tx('気づいたことをここに…', 'Anything that felt wrong or missing…');
+  const send = biLabel('button', 'take chat-send', '残す', 'Keep it');
   send.type = 'button';
   send.id = 'note-send';
   send.disabled = noteRecordPending || !recordWritable();
@@ -22186,12 +21987,14 @@ function renderWordWeb({ quiet = false } = {}) {
   const why = wwTrail()[0]?.why;
   const eyebrow = el('h2', 'eyebrow ww-eyebrow', tx('言葉の網', 'The word web'));
   head.append(eyebrow);
-  const whyText = { looked: tx('最後に引いた語から', 'from the word you last looked up'), saved: tx('あなたの語から', 'from your words'), day: tx('今日の語から', "from today's word") }[why];
+  const whyText = { looked: tx('最後に引いた語から', 'from the word you last looked up'), saved: tx('あなたの語から', 'from your words'), day: tx('例の一語から', 'from an example word') }[why];
   if (whyText) head.append(el('span', 'ww-why', whyText));
   const walk = el('nav', 'ww-walk');
   walk.setAttribute('aria-label', tx('たどった語', 'Words you visited'));
   walk.append(el('span', 'ww-walk-label', tx('たどった語', 'Words you visited')));
   const trail = wwTrail();
+  // one step is the centre itself, drawn on the plate: a walk is shown once there is a word to go back to (tighten pass)
+  walk.hidden = trail.length < 2;
   // a phone keeps the walk to one line: the last four steps, the rest folded into …
   const shown = trail.slice(-4);
   if (trail.length > shown.length) walk.append(el('span', 'ww-walk-sep ww-walk-fold', '…'));
@@ -27314,7 +27117,7 @@ function renderDeckTable(main, today) {
 }
 function renderDeckDoors(main) {
   const row = el('div', 'deck-doors');
-  for (const [id, view, ja, en] of [['deck-browse', 'browse', '札を探す', 'browse cards'], ['deck-stats', 'srs-stats', '統計', 'stats']]) {
+  for (const [id, view, ja, en] of [['deck-browse', 'browse', '札を探す', 'Browse cards'], ['deck-stats', 'srs-stats', '統計', 'Stats']]) {
     const door = biLabel('button', 'chip deck-door', ja, en);
     door.type = 'button';
     door.id = id;
@@ -28155,8 +27958,8 @@ function studyHallDoors() {
     }],
   ];
   const doors = {};
-  // the layout under test names every door in sentence case, as its places are named
-  const cap = (text) => (placesLayout() && bi() ? text.replace(/^[a-z]/, (c) => c.toUpperCase()) : text);
+  // every door in sentence case, as the places are named (tighten pass: both layouts)
+  const cap = (text) => (bi() ? text.replace(/^[a-z]/, (c) => c.toUpperCase()) : text);
   for (const [id, ja, en, sub, go] of defs) {
     const b = el('button', 'study-door');
     b.type = 'button';
@@ -28475,21 +28278,25 @@ function renderDojoDecks(main, n = '02') {
   let totalDue = 0;
   let totalFresh = 0;
   let counted = 0;
-  const row = (id, title, sub, onClick, sum = null) => {
-    const b = el('button', 'dojo-deck');
+  const row = (id, title, sub, onClick, sum = null, quiet = false) => {
+    const b = el('button', quiet ? 'dojo-deck is-quiet' : 'dojo-deck');
     b.type = 'button';
     b.dataset.deck = id;
     const name = el('span', 'dojo-deck-name');
     name.append(el('span', 'dojo-deck-t', title), el('span', 'dojo-deck-sub', sub));
     b.append(name);
     if (sum) {
+      // a count of zero is not printed (tighten pass): its span stays, hidden, for the readers of the row's numbers
+      const count = (cls, value, ja, en) => {
+        const span = el('span', cls);
+        span.append(el('b', '', String(value)), document.createTextNode(` ${tx(ja, en)}`));
+        span.hidden = !value;
+        return span;
+      };
       const n = el('span', 'dojo-deck-n');
-      const due = el('span', 'dojo-deck-due' + (sum.due ? ' is-due' : ''));
-      due.append(el('b', '', String(sum.due)), document.createTextNode(` ${tx('復習', 'due')}`));
-      const fresh = el('span', 'dojo-deck-new');
-      fresh.append(el('b', '', String(sum.fresh)), document.createTextNode(` ${tx('新', 'new')}`));
-      n.append(due, fresh);
+      n.append(count('dojo-deck-due' + (sum.due ? ' is-due' : ''), sum.due, '復習', 'due'), count('dojo-deck-new', sum.fresh, '新', 'new'));
       b.append(n);
+      if (!sum.due && !sum.fresh) b.classList.add('is-quiet');
       if (sum.words) {
         const begun = Math.min(sum.words, deckWordsBegun(id));
         const bar = el('span', 'dojo-deck-bar');
@@ -28527,19 +28334,20 @@ function renderDojoDecks(main, n = '02') {
   if (placesLayout()) {
     // the same number the stage's Begin and the tab's badge read (todayQueue), never a second count
     const mineToday = S.taken.length && scheduler ? todayQueue().order.length : 0;
-    row('mine', tx('保存した語', 'Your saved words'), tx(`今日 ${mineToday} 枚`, `${mineToday} to review today`), () => startReview());
+    row('mine', tx('保存した語', 'Your saved words'), mineToday ? tx(`今日 ${mineToday} 枚`, `${mineToday} to review today`) : '', () => startReview(), null, !mineToday);
   } else {
     const forecast = srsForecast();
-    row('mine', tx('保存した語', 'Your saved words'), tx(`復習 ${forecast.today + forecast.fresh} 枚`, `${forecast.today + forecast.fresh} to review`), () => startReview());
+    const waiting = forecast.today + forecast.fresh;
+    row('mine', tx('保存した語', 'Your saved words'), waiting ? tx(`復習 ${waiting} 枚`, `${waiting} to review`) : '', () => startReview(), null, !waiting);
   }
   for (const name of Object.keys(S.lists || {})) {
     const items = S.lists[name];
     if (!items.length) continue;
     const keys = new Set(items.map((x) => srsKey(x.t, x.id)));
     const waiting = srsDueItems().filter((i) => keys.has(srsKey(i.t, i.id))).length;
-    row(`list:${name}`, name, tx(`リスト ・ ${items.length} 語 ・ ${waiting} 枚 待っている`, `list · ${items.length} words · ${waiting} waiting`), () => startReview(items));
+    row(`list:${name}`, name, tx(`リスト ・ ${items.length} 語${waiting ? ` ・ ${waiting} 枚 待っている` : ''}`, `List · ${items.length} words${waiting ? ` · ${waiting} waiting` : ''}`), () => startReview(items), null, !waiting);
   }
-  main.append(learnHead(n, 'デッキ', 'Decks', counted ? tx(`復習 ${totalDue} · 新 ${totalFresh}`, `${totalDue} due · ${totalFresh} new`) : ''));
+  main.append(learnHead(n, 'デッキ', 'Decks', counted ? countsLine([[totalDue, '復習', 'due'], [totalFresh, '新', 'new']], ' · ') : ''));
   main.append(list);
 }
 
@@ -28628,7 +28436,7 @@ function renderFocusSitting(focus, n = '03') {
     ),
   );
   const pick = el('div', 'learn-focus-pick');
-  pick.append(el('p', 'learn-label', tx('時間', 'how long')));
+  pick.append(el('p', 'learn-label', tx('時間', 'How long')));
   const mins = el('div', 'focus-choices');
   for (const m of FOCUS_MINUTES) {
     const b = el('button', 'focus-chip' + (S.focusMin === m ? ' on' : ''));
@@ -28646,13 +28454,13 @@ function renderFocusSitting(focus, n = '03') {
   pick.append(mins);
   focus.append(pick);
 
-  focus.append(el('p', 'learn-label', tx('何を練習する', 'what to practise')));
+  focus.append(el('p', 'learn-label', tx('何を練習する', 'What to practise')));
   const modes = el('div', 'focus-modes');
   const modeDefs = [
     // the sub tells the whole truth (POL-12): the block reviews each waiting
     // card once; when the clock outlasts the pool, further laps are practice
-    ['due', '復習の札', 'Cards due', tx(`${due} 枚 待っている ・ その後は追加の練習`, `${due} waiting · then extra rounds`)],
-    ['kanji', '漢字だけ', 'kanji only', tx('やさしい順に', 'easiest first')],
+    ['due', '復習の札', 'Cards due', due ? tx(`${due} 枚 待っている ・ その後は追加の練習`, `${due} waiting · then extra rounds`) : tx('追加の練習', 'Extra rounds')],
+    ['kanji', '漢字だけ', 'Kanji only', tx('やさしい順に', 'easiest first')],
     ['yomi', '読みの確認', 'Reading check', tx('まだ保存していない熟語を読む', 'read compounds you haven’t saved')],
   ];
   S.focusMode = S.focusMode || 'due';
@@ -34860,16 +34668,16 @@ function renderSearchPage(main) {
   if (!Array.isArray(S.kdx.parts)) S.kdx.parts = [];
   if (typeof S.searchLens !== 'string') S.searchLens = 'words';
   const SEARCH_LENSES = [
-    ['words', 'ことば', 'words'],
+    ['words', 'ことば', 'Words'],
     ['skip', '形から', 'Find by shape'],
-    ['parts', '部品', 'parts'],
-    ['radical', '部首', 'radical'],
-    ['draw', '手書き', 'draw'],
-    ['reading', '音訓', 'reading'],
-    ['meaning', '意味', 'meaning'],
-    ['strokes', '画数', 'strokes'],
-    ['freq', '頻度', 'frequency'],
-    ['level', '漢検', 'level'],
+    ['parts', '部品', 'Parts'],
+    ['radical', '部首', 'Radical'],
+    ['draw', '手書き', 'Draw'],
+    ['reading', '音訓', 'Reading'],
+    ['meaning', '意味', 'Meaning'],
+    ['strokes', '画数', 'Strokes'],
+    ['freq', '頻度', 'Frequency'],
+    ['level', '漢検', 'Level'],
     ['kkld', '講談社番号', 'Kodansha number'],
   ];
   const lensRow = el('div', 'kdx-lenses search-lenses');
@@ -35660,9 +35468,9 @@ const meNum = (n) => Number(n).toLocaleString('en-US');
  * before its 中黒 (|・テクノロジー): each phrase, with the mark that ends it, is one unbreakable piece. */
 /** Where an unbegun goal's deck lives: Learn in the current layout, Review in the layout under test. Q · in the house voice
  * (G-14; Grok's walk: "THE FIELDS DECK IS IN LEARN"): a plain sentence, never set in capitals (.is-sentence). */
-function fieldsDeckHome() {
-  return placesLayout() ? tx('まだ始めていない。専門デッキは「復習」にある。', 'Not started yet. The fields deck is in Review.')
-    : tx('まだ始めていない。専門デッキは「学ぶ」にある。', 'Not started yet. The fields deck is in Learn.');
+function fieldsDeckHome(ja = '専門デッキ', en = 'The fields deck is') {
+  const [roomJa, roomEn] = placesLayout() ? ['復習', 'Review'] : ['学ぶ', 'Learn'];
+  return tx(`まだ始めていない。${ja}は「${roomJa}」にある。`, `Not started yet. ${en} in ${roomEn}.`);
 }
 /** One horizon: its name (a field also carries his own gloss), the figure held, the ruled scale. */
 /** The lead horizon: N1 in July 2027, the days to the July sitting from today, then N1 vocabulary. */
@@ -35725,8 +35533,9 @@ function meSealsPart(days, first) {
     k.append(s, el('span', '', tx(ja, en)));
     return k;
   };
-  foot.append(legend('習', '札', 'cards'), legend('読', '読むだけ', 'reading only'),
-    el('span', 'me-cal-count', tx(`この月 ${practised} 日`, `${practised} this month`)));
+  foot.append(legend('習', '札', 'cards'), legend('読', '読むだけ', 'reading only'));
+  // a count of zero is not printed (tighten pass)
+  if (practised) foot.append(el('span', 'me-cal-count', tx(`この月 ${practised} 日`, `${practised} this month`)));
   sec.append(head, dow, grid, foot);
   return sec;
 }
@@ -35883,7 +35692,9 @@ function renderWordsDoors(main) {
   const section = el('details', 'foundation-section words-index');
   section.open = S.wordsIndexOpen;
   section.addEventListener('toggle', () => { if (section.isConnected) S.wordsIndexOpen = section.open; });
-  section.append(el('summary', 'eyebrow', tx('ほかの調べ方', 'More language tools')));
+  const summary = el('summary', 'words-index-row', tx('ほかの調べ方', 'More language tools'));
+  summary.append(el('i', 'today-detail-caret'));
+  section.append(summary);
   const doors = el('div', 'foundation-doors');
   doors.append(
     foundationDoor('words-kanji', '漢字を調べる', 'Kanji by shape', 'kanjidex'),
