@@ -497,6 +497,30 @@ function kanjiReadingsInWord(chars, reading, word = '') {
   return out;
 }
 
+/** 常用まで on one token's pairs: a pair holding a kanji beyond jōyō (a mark takes the kanji before it) is set in its
+ * reading. The kanji it sets in kana go into `changed` when one is given (the dial's note, joyoDialChanges). */
+function joyoPairs(pairs, changed = null) {
+  let before = '';
+  return pairs.map((pair) => {
+    const rare = [];
+    for (const ch of pair.t) {
+      const mark = JOYO_MARKS.test(ch);
+      if (beyondJoyo(mark ? before : ch)) rare.push(mark ? before : ch);
+      if (!mark) before = ch;
+    }
+    if (!pair.r || !rare.length) return pair;
+    for (const ch of rare) changed?.add(ch);
+    return { t: pair.r };
+  });
+}
+
+/** The kanji 常用まで sets in kana in this text, each once, in reading order (origin/claude/corridor-live-verify, dialNote). */
+function joyoDialChanges(tokens) {
+  const changed = new Set();
+  for (const token of tokens || []) if (token.f) joyoPairs(token.f, changed);
+  return [...changed];
+}
+
 function displayPairs(token) {
   const mode = S.dials.kanji;
   if (mode === 0) return token.f;
@@ -508,17 +532,7 @@ function displayPairs(token) {
     if (!token.f) return [{ t: token.r || token.s }];
     return token.f.map((pair) => (pair.r ? { t: pair.r } : pair));
   }
-  let before = '';
-  return token.f.map((pair) => {
-    let rare = false;
-    for (const ch of pair.t) {
-      const mark = JOYO_MARKS.test(ch);
-      if (beyondJoyo(mark ? before : ch)) rare = true;
-      if (!mark) before = ch;
-    }
-    if (!pair.r) return pair;
-    return rare ? { t: pair.r } : pair;
-  });
+  return joyoPairs(token.f);
 }
 
 function inlineWordReading(anchor, reading) {
@@ -2541,4 +2555,4 @@ function displayKunReading(reading) {
   return dot < 0 ? value : `${value.slice(0, dot)}（${value.slice(dot + 1)}）`;
 }
 
-export { lookup, embeddedDictionaryJson, loadDictionaryJson, hasEmbeddedDictionaryIndex, dictionaryCoreMatch, dictionaryGlossSummary, dictionaryReadingSupportsForm, dictionarySummaryFor, validDictionaryRow, dictionaryRowsForForm, ensureDictionaryRowBySeq, ensureDictionaryRowsForForm, ensureDictionaryRowsForNode, dictionaryRowsFor, dictionaryDetailRowsFor, dictionaryShardNumber, dictionaryShardId, ensureDictionaryDetails, dictionaryDetailsFor, dictionaryTag, posCode, posLine, kanjiReadingsInWord, displayPairs, inlineWordReading, inlineGlossLine, inlineWordGloss, inlineTokenGloss, tokenGlossLine, readingLine, japaneseLookupRecord, japaneseLookupEntryRecord, lookupBlockWords, japaneseLookupHelpId, lookupOccurrence, lookupItemBlocks, annotationPieceReadings, annotationReadsAs, phoneticAnnotationCandidates, phoneticAnnotationRanges, phoneticAnnotationIndices, appendJapaneseLookup, inlineGloss, readerWordNote, readerGlossMissText, tokenReading, lemmaTakesForm, lemmaReading, kanaIru, readingForm, teFormSenseGlosses, teFormAnswer, ensureTeFormAnswer, teFormRecord, senseNeighbours, sidecarSense, senseNegation, senseSpelledReading, senseMustRun, senseExpression, senseChoice, senseDoor, senseIsQuick, senseRecord, senseNameHeldText, senseMoreElement, senseMoreLine, ensureSense, senseRefine, senseFillInPlace, senseWithin, narrowLemmaEntries, dictionaryRowsReadAs, alternateLemmaDoor, soundChangeReadings, kanjiReadingsOf, soundChangeDoor, readerLookupAnswer, readingAsksIndex, readyTokenReading, readingToken, readingTokenEntry, readerTokenAtIndex, readerRenderedTokens, dictionaryAnsweredForm, readerDoorGloss, readerDoorLead, readerGlossLine, tapLadderHint, readerWordHint, readerTokenState, nameReaderToken, readerHelp, glossaryCrossRefPlan, readerLayerParagraph, readerLayerReading, readingExpected, readingPlaceFailure, thesClusters, renderThesaurus, hiraToKata, normalizeGloss, dictionarySearchContext, dictionaryQueryKey, dictionaryQueryError, dictionaryQueryToken, activeDictionaryQuery, readerTokenAt, readerTokenNode, dictionaryEpoch, yomiVariantsOf, yomiReadingType, exampleIdentity, exampleKanji, exampleSenseKey, exampleOwnRows, exampleTokenIsWord, exampleHoldsWord, bankExamplesFor, findExamples, exampleFnv, fetchExampleJson, readingTargets, conjugations, renderConjugation, relationTarget, relationReadingQualifier, dictionaryRelationRoute, renderDictionaryRelations, renderDictionaryDetails, dictionaryHomographChoices, homographLines, dictionaryLoneDoor, renderDictionaryHomographs, requestDictionaryDetails, exampleOrder, partGloss, partMeaning, displayKunReading };
+export { lookup, joyoDialChanges, embeddedDictionaryJson, loadDictionaryJson, hasEmbeddedDictionaryIndex, dictionaryCoreMatch, dictionaryGlossSummary, dictionaryReadingSupportsForm, dictionarySummaryFor, validDictionaryRow, dictionaryRowsForForm, ensureDictionaryRowBySeq, ensureDictionaryRowsForForm, ensureDictionaryRowsForNode, dictionaryRowsFor, dictionaryDetailRowsFor, dictionaryShardNumber, dictionaryShardId, ensureDictionaryDetails, dictionaryDetailsFor, dictionaryTag, posCode, posLine, kanjiReadingsInWord, displayPairs, inlineWordReading, inlineGlossLine, inlineWordGloss, inlineTokenGloss, tokenGlossLine, readingLine, japaneseLookupRecord, japaneseLookupEntryRecord, lookupBlockWords, japaneseLookupHelpId, lookupOccurrence, lookupItemBlocks, annotationPieceReadings, annotationReadsAs, phoneticAnnotationCandidates, phoneticAnnotationRanges, phoneticAnnotationIndices, appendJapaneseLookup, inlineGloss, readerWordNote, readerGlossMissText, tokenReading, lemmaTakesForm, lemmaReading, kanaIru, readingForm, teFormSenseGlosses, teFormAnswer, ensureTeFormAnswer, teFormRecord, senseNeighbours, sidecarSense, senseNegation, senseSpelledReading, senseMustRun, senseExpression, senseChoice, senseDoor, senseIsQuick, senseRecord, senseNameHeldText, senseMoreElement, senseMoreLine, ensureSense, senseRefine, senseFillInPlace, senseWithin, narrowLemmaEntries, dictionaryRowsReadAs, alternateLemmaDoor, soundChangeReadings, kanjiReadingsOf, soundChangeDoor, readerLookupAnswer, readingAsksIndex, readyTokenReading, readingToken, readingTokenEntry, readerTokenAtIndex, readerRenderedTokens, dictionaryAnsweredForm, readerDoorGloss, readerDoorLead, readerGlossLine, tapLadderHint, readerWordHint, readerTokenState, nameReaderToken, readerHelp, glossaryCrossRefPlan, readerLayerParagraph, readerLayerReading, readingExpected, readingPlaceFailure, thesClusters, renderThesaurus, hiraToKata, normalizeGloss, dictionarySearchContext, dictionaryQueryKey, dictionaryQueryError, dictionaryQueryToken, activeDictionaryQuery, readerTokenAt, readerTokenNode, dictionaryEpoch, yomiVariantsOf, yomiReadingType, exampleIdentity, exampleKanji, exampleSenseKey, exampleOwnRows, exampleTokenIsWord, exampleHoldsWord, bankExamplesFor, findExamples, exampleFnv, fetchExampleJson, readingTargets, conjugations, renderConjugation, relationTarget, relationReadingQualifier, dictionaryRelationRoute, renderDictionaryRelations, renderDictionaryDetails, dictionaryHomographChoices, homographLines, dictionaryLoneDoor, renderDictionaryHomographs, requestDictionaryDetails, exampleOrder, partGloss, partMeaning, displayKunReading };
