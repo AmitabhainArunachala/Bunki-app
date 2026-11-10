@@ -5565,7 +5565,7 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
 /* every reader title, unconditionally: each title line holds its own font cell plus room for a reading above (a room the
    desktop title widens for its larger reading), laid out once for whatever arrives later (its words, a state, a reading, late
    name readings), so a title word's first tap moves no glyph in either engine (WebKit needs the most: 10px on the phone's 21px
-   title, 16px on the desktop's 34px). A stateful word's dot sits below its word's box and so below the hairline mark the word
+   title, 22px on the desktop's 34px, where 16px held one title and not another). A stateful word's dot sits below its word's box and so below the hairline mark the word
    shows while touched. The room was 22px / 31px, which also kept a lowered saved ring clear of a reading the next line shows;
    John (2026-11-10) asked for the title set tighter, so that rare pair (a saved word over a word whose reading is open on the
    line below) may now touch. The desktop query is the exact complement of the phone title font's. Repeating the same class
@@ -5578,7 +5578,7 @@ html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h
    different); with the token's clone WebKit re-broke the title's pretty-wrapped lines at the next rendering, moving 大賞 191px */
 html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title .japanese-lookup-word:focus-visible { -webkit-box-decoration-break: slice; box-decoration-break: slice; }
 @media not (max-width: 520px) {
-  html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title { line-height: calc(1.45em + 16px); }
+  html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title { line-height: calc(1.45em + 22px); }
   html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title .japanese-lookup-word:is([data-depth],[data-kept])::after { bottom: -9.25px; }
 }
 /* Ladder contract: only this occurrence steps aside while its inline English is open. Removing the attribute

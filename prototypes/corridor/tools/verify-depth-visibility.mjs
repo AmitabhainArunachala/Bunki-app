@@ -47,8 +47,8 @@ const LIVE = [{ name: 'live-daisho', id: STORY, query: 'スタートアップ大
   { name: 'live-daisho-saved-nihon', id: STORY, query: 'スタートアップ大賞', word: '大賞', reading: 'たいしょう', prior: '日本', nextLineOn: ['webkit/phone'], besideReading: true },
   { name: 'live-daijin-saved-meguru', id: 'wikinews:27998', archiveYear: '2015', query: '巡る', word: '大臣', reading: 'だいじん', prior: '巡る', nextLineOn: ['webkit/desktop', 'chromium/desktop'], uncover: true }];
 // Phone or desktop leading follows the page's own (max-width: 520px) match, never a rounded innerWidth.
-// Tighten pass (John, 2026-11-10): the title's room is 10px / 16px (was 22 / 31), the least that holds a title reading in WebKit.
-const titleLeading = (fontPx, phone) => fontPx * 1.45 + (phone ? 10 : 16);
+// Tighten pass (John, 2026-11-10): the title's room is 10px / 22px (was 22 / 31): what holds a title reading in WebKit, with margin on the desktop.
+const titleLeading = (fontPx, phone) => fontPx * 1.45 + (phone ? 10 : 22);
 const TITLE_FOOT = 2; // the title's padding-bottom (was 8)
 const DEVICES = { phone: { viewport: { width: 390, height: 844 }, touch: true, titleFont: '21px' }, desktop: { viewport: { width: 1440, height: 900 }, touch: false, titleFont: '34px' } };
 const defaultSize = (engine) => (engine === 'webkit' ? 'phone' : 'desktop');
