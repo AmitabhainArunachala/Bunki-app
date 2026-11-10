@@ -45,7 +45,11 @@ async function fixture() {
   return { adapter, supplied, seeded, writes: () => writes };
 }
 
-describe('Bunki host backlog connection after canonical re-pin', () => {
+// Each test decodes the whole shared content (8,508 tasks) and stands up the actual host. That is
+// about 1.5 s on an M5 and 2.8 s on a hosted runner doing little else; beside the suite's browser
+// tests it passed the default 5 s on next / core run 42770473278, where all three timed out. The
+// work is unchanged; only the budget is.
+describe('Bunki host backlog connection after canonical re-pin', { timeout: 30_000 }, () => {
   it('uses the frozen accepted pin through the actual host and presentation wrapper before the 50 cutoff', async () => {
     const f = await fixture();
     try {
