@@ -90,6 +90,7 @@ async function scan({ exclusions, plant, earPath }) {
     for (const el of stack) {
       if (el === parent || el.contains(parent) || parent.contains(el)) return null;
       if (getComputedStyle(el).pointerEvents !== 'none') continue;
+      if (el.checkVisibility && !el.checkVisibility({ opacityProperty: true, visibilityProperty: true })) continue;
       const bg = getComputedStyle(el).backgroundColor.match(/[\d.]+/g)?.map(Number) || [];
       if (bg.length >= 3 && (bg.length < 4 || bg[3] > 0.5)) return `${el.tagName.toLowerCase()}${el.className && typeof el.className === 'string' ? `.${el.className.split(/\s+/)[0]}` : ''} (passes the finger, painted over)`;
       for (const child of el.childNodes) {

@@ -466,9 +466,12 @@ function passThroughText(doc, x, y, hit) {
   let stack = [], caret = { node: null, offset: null };
   (doc.head || doc.documentElement).append(style);
   try { stack = doc.elementsFromPoint(x, y); caret = caretAt(doc, x, y); } catch { stack = []; } finally { style.remove(); }
+  const shows = (el) => (typeof el.checkVisibility === 'function' ? el.checkVisibility({ opacityProperty: true, visibilityProperty: true })
+    : doc.defaultView.getComputedStyle(el).visibility === 'visible');
   for (const el of stack) {
     if (el === hit || el.contains(hit) || hit.contains(el)) return null;
-    if (el.closest?.('[data-ear-own]')) continue;
+    // a word's reading the sky keeps at opacity 0 until it is touched is not what he sees there
+    if (el.closest?.('[data-ear-own]') || !shows(el)) continue;
     if (caret.node?.nodeType === 3 && caret.node.parentNode === el && hasJapanese(caret.node.nodeValue) && caretTouches(doc, caret.node, caret.offset, x, y))
       return { node: caret.node, offset: caret.offset };
     for (const child of el.childNodes) {
