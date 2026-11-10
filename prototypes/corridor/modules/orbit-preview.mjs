@@ -102,7 +102,7 @@ export async function openOrbitPreview({ tx = (ja, en) => en } = {}) {
   const dialog = node('dialog', 'orbit-preview');
   dialog.id = 'orbit-preview';
   dialog.setAttribute('aria-label', tx('廻 めぐり、ことばの輪。プレビュー', 'Orbit word field, preview'));
-  const back = node('button', 'orbit-preview-back', tx('← 戻る', '← Back'));
+  const back = node('button', 'orbit-preview-back', tx('‹ 戻る', '‹ Back'));
   back.type = 'button';
   back.id = 'orbit-preview-back';
   const bar = node('header', 'orbit-preview-bar');

@@ -326,7 +326,10 @@ function revealMountedScaleCurrent(thread) {
 
 function paintRoomScaleThread(root) {
   const old = root.querySelector(':scope > .scale-thread');
-  const thread = scaleThread();
+  // at the sky itself there is no trail to show (John, 2026-11-10): the first screen goes without the row; the shelf is
+  // the Read tab's. Every other screen, a dive into the sky included, keeps it.
+  const atSky = S.view === 'drift' && !S.stack.length && !(S.driftDepth > 0);
+  const thread = atSky ? null : scaleThread();
   if (!thread) { old?.remove(); return; }
   thread.dataset.scaleRoom = '';
   if (old) old.replaceWith(thread);

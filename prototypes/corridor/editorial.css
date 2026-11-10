@@ -3714,7 +3714,7 @@ body:has(#app .kp-study > .kp-reveal) #app { padding-bottom: 0; }
 
 /* Baseline repairs: raised study surfaces and world-consistent sheet paper.
    The v2 compatibility bridge above remains an exact baseline mapping. */
-:where(body:not([data-view='drift']), body[data-view='drift'] #sheet) {
+:where(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs)) {
   --color-relief-edge: color-mix(in srgb, var(--color-ink) 30%, transparent);
 }
 body.v-depth-layered :is(
@@ -3846,7 +3846,7 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
    --color-paper (the page fell back to a fixed cream in every world) and no frame material (its bar was see-through, on
    no hairline). Each role block (zero specificity) names that page too, so over the sky the page, its bar and its words
    take the world's roles exactly as in every other room. */
-:where(body:not([data-view='drift']), body[data-view='drift'] #sheet) {
+:where(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs)) {
   /* Colour roles: the world supplies pigments; the page supplies material. */
   --color-ground: var(--world-ground);
   --color-ground-2: var(--world-ground-2);
@@ -3962,7 +3962,7 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --elevation-focus: inset 0 -2px 0 var(--color-ink);
 }
 
-:where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
+:where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs))) {
   --color-surface: var(--color-paper);
   --color-surface-sunk: color-mix(in srgb, var(--color-paper) 70%, var(--color-ground));
   --color-separator: color-mix(in srgb, var(--color-ink) 16%, transparent);
@@ -4424,7 +4424,7 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
    --color-paper, card and zen grounds stay the world's own; everything
    derived from them (page, surface, ink ramp, lines, accents, light) moves.
    ========================================================================== */
-:where(body:not([data-view='drift']), body[data-view='drift'] #sheet) {
+:where(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs)) {
   --color-surface: color-mix(in srgb, var(--color-paper) 55%, #fffdf8);
   --color-surface-sunk: color-mix(in srgb, var(--color-ground) 70%, var(--color-ink) 4%);
   --color-ink-2: color-mix(in srgb, var(--color-ink) 82%, var(--color-paper));
@@ -4474,7 +4474,7 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
   --skin-ground: none;
 }
 /* ベロ藍・浪, the default world, is the concept's day palette exactly: sumi ink, 藍 structure */
-:where(:root:is(:not([data-theme]), [data-theme='']) :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
+:where(:root:is(:not([data-theme]), [data-theme='']) :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs))) {
   --color-ink: #1b1f26;
   --color-accent: #1f3a5f;
   --color-accent-wash: rgb(31 58 95 / 8%);
@@ -4482,7 +4482,7 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
 }
 /* night: lit, never inverted. Each night world keeps its own ground and paper; the
    light that crosses it is the city's (accent, live phosphor, lantern gold). */
-:where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
+:where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs))) {
   --color-surface: var(--color-paper);
   --color-surface-sunk: color-mix(in srgb, var(--color-ground) 70%, #000);
   --color-ink-2: color-mix(in srgb, var(--color-ink) 84%, var(--color-ground));
@@ -4527,7 +4527,7 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
    sentence's Save) read 4.24:1 on a door's hover wash and 3.97:1 on the chip's. That ink alone is lifted a fifth toward the
    paper, its own hue kept; the accent itself (its washes, its marks, every other ink) is as it was. Other worlds have no
    label ink of their own and keep their accent there. */
-:where(:root[data-theme='nami'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) { --color-accent-label: #a8c4db; }
+:where(:root[data-theme='nami'] :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs))) { --color-accent-label: #a8c4db; }
 /* 殻 is already phosphor: its own accent is the live light */
 :where(:root[data-theme='kaku'] body:not([data-view='drift'])) { --color-live: var(--world-accent); --color-live-glow: color-mix(in srgb, var(--world-accent) 45%, transparent); }
 
@@ -4783,7 +4783,8 @@ body:not([data-view='drift']) #app > main > .room-sign::after {
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) #app > main > .room-sign::after { box-shadow: 0 0 8px var(--color-seal); }
 /* the shelf's hidden lead eyebrow stays hidden behind the sign */
-body[data-view='shelf'] main > .room-sign:first-child + .eyebrow { display: none; }
+/* the shelf's kicker stays unsaid now that no room sign stands before it (tighten pass 2026-11-10): the tab names the room */
+body[data-view='shelf'] main > .eyebrow:first-child { display: none; }
 /* fields and filter capsules: ruled paper, not grey fill */
 html:not([data-register='tutor']) body:not([data-view='drift']) :is(.search-field, .record-note-input),
 body:not([data-view='drift']) .filter-chip {
@@ -5072,6 +5073,8 @@ html[data-room='door'] body.ginga #drift-layer #hint {
   text-shadow: 0 0 10px var(--ground-0, #f6f1e6), 0 0 2px var(--ground-0, #f6f1e6);
 }
 body.ginga:not(.ui-bi) #drift-layer #hint { font-style: normal; font-family: var(--serif, serif); }
+/* the first screen's five tabs (tighten pass 2026-11-10): the invitation stands above them, never under */
+body.ginga.has-primary-tabs #drift-layer #hint { bottom: calc(var(--primary-tabs-height, 60px) + 12px); }
 /* (b) the torii and the bug are seals of the family: a hairline square on thin paper, no lift */
 html[data-room='door'] body.ginga #ginga-symbol.nav-symbol {
   background: transparent;
@@ -5161,7 +5164,7 @@ html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
    Ink is near-black sumi; the quiet ramp moves up so nothing reads washed out. Values
    only and zero specificity: every room file and html[data-room] rule still wins.
    ========================================================================== */
-:where(body:not([data-view='drift']), body[data-view='drift'] #sheet) {
+:where(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs)) {
   /* each day world keeps its own paper (柿 stays persimmon, 赤 stays warm): the page is mostly the
      world's ground, raised paper and the frame are brighter papers tinted from it. The default
      world, his everyday one, has its own cooler values below. */
@@ -5195,14 +5198,14 @@ html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
   /* the page's light is Material II's (a white haze of its own here also fell on every night world: toward grey) */
 }
 /* ベロ藍・浪, the default world: sumi ink near-black, 藍 structure, a cleaner washi */
-:where(:root:is(:not([data-theme]), [data-theme='']) :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
+:where(:root:is(:not([data-theme]), [data-theme='']) :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs))) {
   --color-ink: #14171d;
   --color-surface: #fffefb;
   --color-bar: #fcfbf8;
 }
 /* night: the frame is the deepest tone, the page the world's ground, raised paper steps up
    in light with a lit top edge. Light is emitted (edges, glows), never a solid phosphor fill. */
-:where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
+:where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs))) {
   /* 96 + 4: percentages that sum under 100 make color-mix scale the alpha (0.92) — every night surface was quietly
      translucent (the word menu, the deck card); opaque paper now, the same tint */
   --color-surface: color-mix(in srgb, var(--color-paper) 96%, var(--color-ink) 4%);
@@ -5223,7 +5226,7 @@ html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
   --elevation-lift: inset 0 1px 0 rgb(255 255 255 / 8%), 0 2px 4px rgb(0 0 0 / 45%), 0 26px 48px -18px rgb(0 0 0 / 80%);
 }
 /* 殻 · the electric night: terminal black, phosphor edges */
-:where(:root[data-theme='kaku'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
+:where(:root[data-theme='kaku'] :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs))) {
   --color-bar: color-mix(in srgb, var(--color-ground) 70%, #000);
   --color-bar-line: color-mix(in srgb, var(--world-accent) 34%, transparent);
   --color-surface: color-mix(in srgb, var(--color-paper) 97%, var(--world-accent) 3%);
@@ -5536,7 +5539,7 @@ body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { ba
    every gradient names its bokashi, its surface and why (depth | light | brush | focus); contract §6 "Material
    II" tables them, and verify-contrast-sweep measures them in all eleven worlds, in WebKit and Chromium.
    ========================================================================== */
-:where(body:not([data-view='drift']), body[data-view='drift'] #sheet) {
+:where(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs)) {
   /* the ramp: ground (the page) · raised (the world's raised paper) · sunk (a breath under the page — half its
      second ground, so a sunk surface never sits 8 % below the page: no muddy surface) · shade (its deepest coat) */
   --tone-ground: var(--world-ground);
@@ -5570,20 +5573,20 @@ body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { ba
 }
 /* each day world's key pigment — the block its sky is printed from */
 /* ベロ藍・浪: Hokusai's Berlin blue, the sky band of the Thirty-six Views */
-:where(:root:is(:not([data-theme]), [data-theme='']) :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) { --tone-key: var(--world-accent); --tone-key-share: 8%; }
+:where(:root:is(:not([data-theme]), [data-theme='']) :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs))) { --tone-key: var(--world-accent); --tone-key-share: 8%; }
 /* 墨・楮紙: sumi itself, its 濃淡 */
-:where(:root[data-theme='sumi'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) { --tone-key: var(--world-ink); --tone-key-share: 6%; }
+:where(:root[data-theme='sumi'] :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs))) { --tone-key: var(--world-ink); --tone-key-share: 6%; }
 /* 朱・胡粉: the vermilion as a dawn band, at a whisper (the seal keeps its full red) */
-:where(:root[data-theme='shu'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) { --tone-key: var(--world-signal); --tone-key-share: 5%; }
+:where(:root[data-theme='shu'] :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs))) { --tone-key: var(--world-signal); --tone-key-share: 5%; }
 /* 凱風快晴: the Prussian-blue sky over the red mountain */
-:where(:root[data-theme='akafuji'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) { --tone-key: var(--world-accent); --tone-key-share: 8%; }
+:where(:root[data-theme='akafuji'] :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs))) { --tone-key: var(--world-accent); --tone-key-share: 8%; }
 /* 焦茶・柿渋: the umber deepening of the persimmon tannin */
-:where(:root[data-theme='iwa'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) { --tone-key: var(--world-ink); --tone-key-share: 6%; }
+:where(:root[data-theme='iwa'] :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs))) { --tone-key: var(--world-ink); --tone-key-share: 6%; }
 /* 板木・墨: the keyblock's sumi line */
-:where(:root[data-theme='keyblock'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) { --tone-key: var(--world-ink); --tone-key-share: 6%; }
+:where(:root[data-theme='keyblock'] :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs))) { --tone-key: var(--world-ink); --tone-key-share: 6%; }
 /* night: 漆の深み. The frame is the deepest coat, the page the world's ground, its sheen the raised lacquer; the light
    that crosses it is the world's own (lantern gold, its accent) */
-:where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
+:where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs))) {
   --tone-sunk: color-mix(in srgb, var(--tone-shade) 40%, var(--world-ground));
   --tone-depth: color-mix(in srgb, var(--tone-shade) 55%, var(--world-ground));
   --tone-sheen: var(--world-paper);
@@ -5611,7 +5614,7 @@ body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { ba
   --color-bar-quiet: color-mix(in srgb, var(--color-ink) 76%, var(--world-ground));
 }
 /* 殻 · the electric night emits: its frame is the deep coat, flat, and the phosphor bleeds from the lit hairlines */
-:where(:root[data-theme='kaku'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
+:where(:root[data-theme='kaku'] :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs))) {
   /* bokashi: emitted — the one top bar — light: phosphor rising from the bar's lit hairline, never a lit fill */
   --tone-bar-paint: linear-gradient(0deg, color-mix(in srgb, var(--world-accent) 4%, transparent), transparent 28px);
   /* bokashi: emitted — the Line — light: phosphor falling from the Line's lit hairline */
@@ -5657,16 +5660,16 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture.is-kanji {
    own ink taken a step deeper toward it, only where the quiet ramp falls under the line or within a shade of it (赤富士 3.9:1,
    柿渋 4.3:1, 木版 4.5:1, 朱 4.55:1); every other world keeps its quiet ink, and the shared ramp (--color-quiet, --faint) is
    unchanged. */
-:where(:root[data-theme='shu'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
+:where(:root[data-theme='shu'] :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs))) {
   --color-thes-label: color-mix(in srgb, var(--color-ink) 78%, var(--color-paper));
 }
-:where(:root[data-theme='akafuji'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
+:where(:root[data-theme='akafuji'] :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs))) {
   --color-thes-label: color-mix(in srgb, var(--color-ink) 84%, var(--color-paper));
 }
-:where(:root[data-theme='iwa'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
+:where(:root[data-theme='iwa'] :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs))) {
   --color-thes-label: color-mix(in srgb, var(--color-ink) 88%, var(--color-paper));
 }
-:where(:root[data-theme='keyblock'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
+:where(:root[data-theme='keyblock'] :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs))) {
   --color-thes-label: color-mix(in srgb, var(--color-ink) 80%, var(--color-paper));
 }
 :is(.thes-gloss, .thes-rel) { color: var(--color-thes-label, var(--faint)); }

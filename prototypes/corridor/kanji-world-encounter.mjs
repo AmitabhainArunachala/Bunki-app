@@ -58,7 +58,7 @@ export function createKanjiWorldEncounter({ container, content, imageUrl, onRetu
     root.replaceChildren();
     answerInput = null;
     const top = node('header', 'kw-top');
-    top.append(button('return', copy('← Return', '← 戻る'), true));
+    top.append(button('return', copy('‹ Back', '‹ 戻る'), true));
     top.append(node('span', 'kw-progress', stage === 5 ? copy('Practice complete', '練習完了') : `${Math.min(stage + 1, 5)} / 5`));
     root.append(top);
     const body = node('div', `kw-body${stage === 0 ? ' kw-body--place' : ''}`);

@@ -161,8 +161,8 @@ async function openPassage(invoker, node) {
   dialog.id = 'passage-dialog';
   dialog.setAttribute('aria-label', tx('職・識・織をたどる', 'Passage through 職, 識 and 織'));
   const page = el('div', 'passage-page'), bar = el('div', 'passage-bar'), body = el('div', 'passage-body');
-  const back = el('button', 'sheet-back', tx('戻る', 'Return'));
-  back.type = 'button'; back.id = 'passage-return';
+  const back = el('button', 'sheet-back', tx('戻る', 'Back'));
+  back.type = 'button'; back.id = 'passage-return'; back.dataset.barBack = '';
   bar.append(back, el('span', 'pool-tag', tx('試作', 'preview')));
   page.append(bar, body); dialog.append(page);
   const oldOverflow = document.body.style.overflow;
@@ -210,7 +210,7 @@ async function openPassage(invoker, node) {
     if (closed) return;
     if (!command(type)) {
       refuse('この道のりは、ここでは続けられなくなりました。戻って、もう一度開いてください。',
-        'This passage is no longer available here. Return and open it again.');
+        'This passage is no longer available here. Go back and open it again.');
       return;
     }
     paint();
@@ -239,7 +239,7 @@ async function openPassage(invoker, node) {
     const view = snapshot();
     if (!view) {
       refuse('この道のりは、ここでは続けられなくなりました。戻って、もう一度開いてください。',
-        'This passage is no longer available here. Return and open it again.');
+        'This passage is no longer available here. Go back and open it again.');
       return;
     }
     const { plan, family, kanji } = sources, { cursor, stop, incomingHop } = view;
@@ -318,7 +318,7 @@ async function openPassage(invoker, node) {
     parts.push(el('p', 'fine passage-note', done
       ? tx('試作です。ここでは何も保存せず、復習にも数えていません。', 'Preview. Nothing here was saved or counted as review.')
       : tx('試作です。ここでは何も保存せず、復習にも数えません。戻っても、アプリを再読み込みするまでは続きから再開できます。',
-        'Preview. Nothing here is saved or counted as review. Return keeps your place until the app is reloaded.')));
+        'Preview. Nothing here is saved or counted as review. Back keeps your place until the app is reloaded.')));
     body.replaceChildren(...parts);
     if (focused !== null) ((focused && body.querySelector('#' + CSS.escape(focused))) || actions.querySelector('button'))
       ?.focus({ preventScroll: true });
@@ -337,12 +337,12 @@ async function openPassage(invoker, node) {
     if (closed) return;
     if (error?.message === 'crypto-unavailable') refuse('この試作は、資料を確かめるために安全な（https の）アドレスが必要です。',
       'This preview needs a secure (https) address to check its sources.');
-    else refuse('道のりを読み込めませんでした。戻って、もう一度お試しください。', 'The passage could not load. Return and try again.');
+    else refuse('道のりを読み込めませんでした。戻って、もう一度お試しください。', 'The passage could not load. Go back and try again.');
     return;
   }
   if (closed) return;
   if (!here()) { close(false); return; }
-  const unavailable = () => refuse('道のりを読み込めませんでした。戻って、もう一度お試しください。', 'The passage could not load. Return and try again.');
+  const unavailable = () => refuse('道のりを読み込めませんでした。戻って、もう一度お試しください。', 'The passage could not load. Go back and try again.');
   if (!liveOwner()) { unavailable(); return; }
   const { passage, route } = sources;
   // the place kept on this page resumes exactly; anything else begins a new walk

@@ -4248,6 +4248,20 @@ function biLabel(tag, cls, ja, en) {
   node.append(el('span', 'l-ja', tag === 'button' && bi() && placesLayout() ? label.replace(/^[a-z]/, (c) => c.toUpperCase()) : label));
   return node;
 }
+/** The one way back of every bar (contract §2): one word, Back, at every depth; the frame draws its chevron on
+ * [data-bar-back]. The sheet and the writing room log the press as navigation.back, keyboard or pointer. */
+function barBack(id, cls, onBack, logged = false) {
+  const button = biLabel('button', cls, '戻る', 'Back');
+  button.type = 'button';
+  button.id = id;
+  button.dataset.barBack = '';
+  if (logged) button.dataset.action = 'navigation.back';
+  button.addEventListener('click', (event) => {
+    if (logged) interaction({ kind: 'navigation.back' }, event.detail === 0 ? 'keyboard' : 'pointer', id);
+    onBack(event);
+  });
+  return button;
+}
 
 /* ------------------------------------------------------------------ load */
 /** Discovery visibility never changes the source-resolution catalogue or learner records.
@@ -5632,6 +5646,14 @@ function back({ instant = false } = {}) {
       window.scrollTo(0, home.scroll || 0);
       return;
     }
+    // a reading opened from a room (Today's reading) returns to that room
+    if (S.view === 'reader' && S.readerReturn?.passageId === S.passageId) {
+      S.view = S.readerReturn.view;
+      S.readerReturn = null;
+      render();
+      window.scrollTo(0, 0);
+      return;
+    }
     // an archive article returns to its stack, not the curated shelf — and to
     // the year-list offset it was opened from, not wherever the reading ended
     if (S.view === 'reader' && String(passage()?.file || '').startsWith('archive/')) {
@@ -5905,6 +5927,8 @@ function openPassage(id, anchor = null) {
   }
   S.passageId = id;
   S.view = 'reader';
+  // the room a reading was opened from, when Back must return there rather than to the shelf (Today's reading)
+  S.readerReturn = anchor?.returnView ? { view: anchor.returnView, passageId: id } : null;
   // an article you have visited opens where you left it, like a bookmark
   S.readerScroll = scaleReturn ? scaleReturn.scroll : S.readerPos[id] || 0;
   S.stack = [];
@@ -31300,7 +31324,7 @@ function openKanjiWorldEncounter(invoker, node) {
   }
   kanjiWorldVisit = { dialog, close };
   dialog.addEventListener('cancel', event => { event.preventDefault(); close(); });
-  const back = el('button', 'kw-button', tx('戻る', 'Return'));
+  const back = el('button', 'kw-button', tx('戻る', 'Back'));
   back.type = 'button'; back.addEventListener('click', () => close());
   body.append(el('p', 'kw-loading', tx('風景を読み込み中…', 'Loading the scene…')), back);
   document.body.append(dialog); dialog.showModal(); document.body.style.overflow = 'hidden';
@@ -31320,7 +31344,7 @@ function openKanjiWorldEncounter(invoker, node) {
   }).catch(error => {
     if (closed || error.name === 'AbortError') return;
     if (!current()) { close(false); return; }
-    body.replaceChildren(el('p', 'kw-loading', tx('風景を読み込めませんでした。戻って、もう一度お試しください。', 'This scene could not load. Return and try again.')), back);
+    body.replaceChildren(el('p', 'kw-loading', tx('風景を読み込めませんでした。戻って、もう一度お試しください。', 'This scene could not load. Go back and try again.')), back);
     back.focus();
   });
 }
@@ -32296,22 +32320,10 @@ function renderStrokePage(root) {
 
   const bar = el('div', 'stroke-bar');
   bar.dataset.bar = 'stroke';
-  const backBtn = biLabel('button', 'stroke-back', '戻る', 'Back');
-  backBtn.type = 'button';
-  backBtn.id = 'strokes-back';
-  backBtn.dataset.barBack = '';
   // NOT part of the sleeping-inert chrome sweep: the back door must stay
   // tappable while the room sleeps (operator, 2026-08-15: "no functioning
   // back button" — a learner may never be trapped behind a history gesture)
-  backBtn.dataset.action = 'navigation.back';
-  backBtn.addEventListener('click', (event) => {
-    interaction(
-      { kind: 'navigation.back' },
-      event.detail === 0 ? 'keyboard' : 'pointer',
-      'strokes-back',
-    );
-    closeStrokePage();
-  });
+  const backBtn = barBack('strokes-back', 'stroke-back', () => closeStrokePage(), true);
   bar.append(backBtn);
 
   // the bar's middle is the character itself (the one top bar: each instance keeps only its own middle)
@@ -33048,23 +33060,8 @@ function composePage(node, path) {
   // the sheet carries its own way out — "NO BACK OPTION" (operator, on-device)
   const bar = el('div', 'sheet-bar');
   bar.dataset.bar = 'sheet';
-  // the one back glyph (the frame draws it); its word: Close at the first depth, Back deeper in
-  const backBtn = depth === 1
-    ? biLabel('button', 'sheet-back', '閉じる', 'Close')
-    : biLabel('button', 'sheet-back', '戻る', 'Back');
-  backBtn.type = 'button';
-  backBtn.id = 'sheet-back';
-  backBtn.dataset.barBack = '';
-  backBtn.dataset.action = 'navigation.back';
-  backBtn.addEventListener('click', (event) => {
-    interaction(
-      { kind: 'navigation.back' },
-      event.detail === 0 ? 'keyboard' : 'pointer',
-      'sheet-back',
-    );
-    back({ instant: event.detail === 0 });
-  });
-  bar.append(backBtn);
+  // the one back glyph (the frame draws it), one word at every depth: Back (tighten pass 2026-11-10; it said Close at the first)
+  bar.append(barBack('sheet-back', 'sheet-back', (event) => back({ instant: event.detail === 0 }), true));
   const thread = scaleThread();
   if (depth > 1 && !thread) {
     bar.append(el('span', 'sheet-depth', path.map((n) => nodeTitle(n)).join(' › ')));
@@ -35123,7 +35120,9 @@ function buildGingaChrome(root) {
   // Today, so it is always here and named for where it goes, whether the app just opened or the
   // learner rose from Today's sky. The count stays its first number (the truthful-count pins).
   // In the layout under test the one way down is the first job of the day, named as its place is.
-  if (S.view === 'drift' && !S.navOpen) {
+  // The tighten pass (2026-11-10): in the current layout the first screen carries the five tabs, whose Today tab is
+  // this door (#home-review); the lone pill stays for the layout under test.
+  if (S.view === 'drift' && !S.navOpen && !skyTabs()) {
     const waiting = S.taken.length && scheduler ? todayQueue().order.length : 0;
     const places = placesLayout();
     const [ja, en] = places ? ['復習', 'Review'] : ['今日', 'Today'];
@@ -35484,18 +35483,25 @@ function observePrimaryDocks() {
   window.addEventListener('scroll', schedule, { passive: true });
   schedule();
 }
+/** The first screen shows the five tabs (tighten pass 2026-11-10) in the current layout, while the gate is closed. */
+function skyTabs() {
+  return S.view === 'drift' && !S.stack.length && !S.navOpen && S.variants.nav === 'tabs' && !placesLayout();
+}
 function buildPrimaryTabs(root, { personal = false } = {}) {
   observePrimaryDocks();
   // a sheet, the stroke page or a menu never takes the tabs' layout away: the body keeps its class and its
   // --nav-clearance, and the CSS :has(#sheet, …) rule hides the bar itself (John, 2026-10-15: the top bar
   // re-laid itself and the page jumped under the scrim whenever a word opened)
+  const sky = S.ready && skyTabs();
   const show = S.variants.nav === 'tabs' && (S.ready || personal) &&
-    !['drift', 'entry'].includes(S.view) && !document.body.classList.contains('zen');
+    (sky || !['drift', 'entry'].includes(S.view)) && !document.body.classList.contains('zen');
   document.body.classList.toggle('has-primary-tabs', show);
   if (!show) return;
   const bar = el('nav', 'primary-tabs');
   bar.id = 'primary-tabs';
   bar.setAttribute('aria-label', tx('主な入口', 'Main destinations'));
+  // on the first screen the drift's words recede above the tabs, as they did above the lone Today door
+  if (sky) bar.setAttribute('data-drift-chrome', '');
   // the Line (concept D graft): five stations on one hairline track; the car is the one filled
   // square, and it slides (transform only) from the last station to this one. Stations and the
   // car carry no text, so each button's text stays exactly its label.
@@ -35510,7 +35516,8 @@ function buildPrimaryTabs(root, { personal = false } = {}) {
     const button = el('button', 'primary-tab');
     button.append(el('span', 'primary-tab-label', tx(tab.ja, tab.en)));
     button.type = 'button';
-    button.id = `tab-${tab.id}`;
+    // the first screen's Today tab is its one way down to Today, under the door's own name
+    button.id = sky && tab.view === 'tray' ? 'home-review' : `tab-${tab.id}`;
     const node = el('i', 'station-node');
     node.setAttribute('aria-hidden', 'true');
     button.append(node);
@@ -35538,7 +35545,8 @@ function buildPrimaryTabs(root, { personal = false } = {}) {
       const navigate = () => {
       closeWorldPicker();
       S.navOpen = false;
-      S.tabRoot = tab.view;
+      // from the first screen a tab is a door: its room keeps Back to the sky, as the lone Today door's did
+      S.tabRoot = sky ? null : tab.view;
       if (tab.view === 'search') { openSearchPage(); return; }
       readerTicketDeparture(tab.view);
       if (tab.view === 'me') keepNavigationReturn('me', button);
@@ -35566,37 +35574,6 @@ function buildPrimaryTabs(root, { personal = false } = {}) {
     bar.append(car);
   }
   root.append(bar);
-}
-
-/* The room sign (縦看板, concepts C/A): each primary room hangs its name at the right edge,
- * set vertically. In English the word is rotated a quarter turn, never stacked letter by letter;
- * in 日本語 the kanji stack. One honest datum may hang beneath it (Today's date, Learn's due). */
-function buildRoomSign() {
-  // the sign says the tab's word (ROOM_NAMES: the Line's words, or the place's own name)
-  const names = (placesLayout() ? ROOM_NAMES.places : ROOM_NAMES.line)[S.view];
-  if (!names || S.stack.length) return null;
-  const sign = el('div', 'room-sign');
-  sign.setAttribute('aria-hidden', 'true');
-  sign.dataset.script = bi() ? 'latin' : 'kanji';
-  sign.append(el('b', 'room-sign-name', tx(...names)));
-  let datum = '';
-  if (S.view === 'tray') {
-    const now = new Date();
-    datum = `${String(now.getMonth() + 1).padStart(2, '0')}·${String(now.getDate()).padStart(2, '0')}`;
-  } else if (S.view === 'dojo' && S.taken.length && scheduler) {
-    const due = todayQueue().order.length;
-    if (due) datum = String(due);
-  }
-  if (datum) {
-    // a number in a vertical sign stands upright (縦中横): a count turned on its side reads as
-    // another symbol (8 → ∞). Runs of up to two digits sit across the column; longer runs stack.
-    const node = el('i', 'room-sign-datum');
-    for (const run of datum.match(/[0-9]+|[^0-9]+/g)) {
-      node.append(/[0-9]/.test(run) ? el('span', run.length <= 2 ? 'rs-tcy' : 'rs-up', run) : document.createTextNode(run));
-    }
-    sign.append(node);
-  }
-  return sign;
 }
 
 /** Hub doors use the existing return frames, including exact reader positions. */
@@ -35974,6 +35951,9 @@ function paintCrumb(crumb) {
   const parts = [];
   if (placesLayout()) crumbPlaces(parts);
   else crumbLine(parts);
+  // a tab's room is named in the bar by its tab's word (Learn, not Up next; Read, not Bookshelf); its page heading stays
+  const tabWord = !placesLayout() && ROOM_NAMES.line[S.view];
+  if (tabWord && parts.length) parts[parts.length - 1] = tx(...tabWord);
   for (const node of S.stack) parts.push(nodeTitle(node));
   crumb.title = parts.join(' › ');
   if (S.stack.length) crumb.dataset.uiContentValue = S.stack.map(nodeTitle).join('|');
@@ -36116,10 +36096,7 @@ function render() {
   // the one top bar (contract §2): the room's chrome is the frame's first instance; its Back the one back glyph
   chrome.dataset.bar = 'room';
   if (S.view === 'reader') chrome.addEventListener('focusin', revealFocusedChromeDoor);
-  const backBtn = biLabel('button', null, '戻る', 'Back');
-  backBtn.type = 'button';
-  backBtn.id = 'back';
-  backBtn.dataset.barBack = '';
+  const backBtn = barBack('back', null, back);
   // a tab root entered from the tab bar is a peer of the other tabs: no Back (its target was
   // the previous tab, which the bar already shows). Leaving that tab's rooms forgets it, so a
   // root reached through a door (the front door's bubbles, the chrome's Lists/Learn/search,
@@ -36139,7 +36116,6 @@ function render() {
     backBtn.hidden = true;
     backBtn.dataset.sessionClosed = '';
   }
-  backBtn.addEventListener('click', back);
   chrome.append(backBtn);
 
   const crumb = el('div', 'crumb');
@@ -36376,8 +36352,7 @@ function render() {
     renderRoomError(main, S.view, error);
   }
   reviewExitUi(() => renderReviewExitNotice(main));
-  // the room's vertical sign hangs first in the page, floated into its right margin
-  { const sign = main.querySelector('.room-error') ? null : buildRoomSign(); if (sign) main.prepend(sign); }
+  // no vertical room sign (John, 2026-11-10): the tab and the bar already name the room, Today's heading its date
   // after the room, never inside its stage: the focused stage keeps its composition and every
   // state (probe, unavailable card, error) keeps a report entry one scroll away
   if (maintenanceReports && S.view !== 'drift') root.append(reportEntries('report-line-page'));
