@@ -90,9 +90,11 @@ async function firstScreen({ page }) {
   await page.locator('#ginga-symbol').waitFor();
 }
 async function toKanji({ page, press }, kanji, reading, { fromFirstScreen = false } = {}) {
-  if (fromFirstScreen) await press('#home-review');
-  await page.locator('#tab-words').waitFor();
-  await press('#tab-words');
+  if (fromFirstScreen) {
+    await press('#home-review');
+    await page.locator('#tab-words').waitFor();
+    await press('#tab-words');
+  } else await press('#sheet-back'); // from one kanji page: Close, and the search it came from is there again
   await page.locator('#nav-search-input').waitFor();
   await page.locator('#nav-search-input').fill(kanji);
   const hit = page.locator('.nav-search-row', { hasText: reading }).first();
@@ -141,6 +143,9 @@ async function walk(browser, device) {
     if (!/preview|試作/.test(words)) throw new Error(`the door does not say preview: "${words}"`);
     await door.scrollIntoViewIfNeeded();
     await shot('1-door');
+    // The app times each page's arrival for a second and then notes it in its own device key (kairo-frames, never
+    // the learning record). Let that land first, so every stored row can be compared with none left out.
+    await page.waitForTimeout(1500);
     before = await storage(page);
     return `first screen → Review → Words → search 職 → its row → the door reads "${words}"`;
   });
@@ -148,6 +153,7 @@ async function walk(browser, device) {
 
   await check(session, 'build', async () => {
     const scroll = await page.evaluate(() => [window.scrollX, window.scrollY]);
+    const hadReports = await page.evaluate(() => !!document.getElementById('bunki-reports-root'));
     await openDoor(session);
     const note = (await page.locator('#worldcraft-preview-note').innerText()).replace(/\s+/g, ' ');
     if (!/^(Preview|試作)/.test(note)) throw new Error(`the dialog is not labelled preview: "${note.slice(0, 80)}"`);
@@ -173,14 +179,18 @@ async function walk(browser, device) {
     await press(LEAVE);
     await dialogGone(page);
     const back = await page.evaluate(() => ({ focus: document.activeElement?.id, glyph: document.querySelector('#sheet .hero-glyph')?.textContent,
-      scroll: [window.scrollX, window.scrollY], locked: document.body.style.overflow }));
+      scroll: [window.scrollX, window.scrollY], locked: document.body.style.overflow,
+      // the app's report entry rides inside an open dialog: it must be back on the page, not gone with the dialog
+      reports: document.getElementById('bunki-reports-root')?.parentElement === document.body }));
     if (back.focus !== 'worldcraft-door' || back.glyph !== '職' || back.locked === 'hidden') throw new Error(`after Leave: focus ${back.focus}, page ${back.glyph}, body overflow "${back.locked}"`);
+    if (hadReports && !back.reports) throw new Error('the report entry did not return to the page');
     if (Math.abs(back.scroll[1] - scroll[1]) > 2) throw new Error(`scroll moved from ${scroll[1]} to ${back.scroll[1]}`);
     await shot('5-returned');
     return `"${note.slice(0, 60)}…"; 耳 + 戠 → "${built}" (18 strokes) → Keep → "${(await kept.join())}" in Kept characters → Leave → back on 職's page, focus on the door`;
   });
 
   await check(session, 'no record written', async () => {
+    await page.waitForTimeout(1500); // a deferred save would have landed by now
     const after = await storage(page);
     const diff = changed(before, after);
     if (diff.length) throw new Error(`storage changed during the visit: ${diff.slice(0, 6).join(' | ')}`);
@@ -209,6 +219,8 @@ async function walk(browser, device) {
     await page.locator('#worldcraft-dialog .wc-context:not([hidden])').waitFor();
     const viewing = (await lineOf(page, 'W-05').innerText()).trim();
     if (!viewing.includes('職')) throw new Error(`View this character shows "${viewing}"`);
+    const top = await page.evaluate(() => document.getElementById('worldcraft-dialog').scrollTop);
+    if (top !== 0) throw new Error(`the kept character opens out of sight: the dialog is scrolled ${top}px down`);
     await shot('6-viewing-kept');
     await press(LEAVE);
     await page.locator('#worldcraft-dialog .wc-context[hidden]').waitFor({ state: 'attached' });
@@ -232,13 +244,35 @@ async function walk(browser, device) {
     return `識's door lists the 職 kept on the other page; View shows "${viewing}" and Leave returns to the unkept "${returned}"; leaving it asks first (W-17); Remove empties the list (W-15)`;
   });
 
-  await check(session, 'a host navigation ends the visit', async () => {
+  await check(session, 'Escape and a host navigation end the visit', async () => {
+    const rest = () => page.evaluate(() => ({ dialog: document.getElementById('worldcraft-dialog')?.open ?? null, locked: document.body.style.overflow,
+      focus: document.activeElement?.id, door: !!document.getElementById('worldcraft-door') }));
+    await openDoor(session);
+    await page.keyboard.press('Escape');
+    await dialogGone(page);
+    let state = await rest();
+    if (state.locked === 'hidden' || state.focus !== 'worldcraft-door') throw new Error(`after Escape: body overflow "${state.locked}", focus ${state.focus}`);
+    await openDoor(session);
+    await press('#worldcraft-dialog [data-worldcraft-action="assemble"]');
+    await lineOf(page, 'W-05').waitFor();
+    await page.keyboard.press('Escape'); // an unkept build: Escape asks first, as Leave does
+    await lineOf(page, 'W-17').waitFor();
+    await page.keyboard.press('Escape'); // a browser may force a second Escape through: whatever it does, no dead page
+    await page.waitForTimeout(400);
+    state = await rest();
+    if (state.dialog === false || (state.dialog === null && state.locked === 'hidden')) throw new Error(`after a second Escape: dialog ${state.dialog}, body overflow "${state.locked}"`);
+    const second = state.dialog === null ? 'closed the builder' : 'kept the builder open';
+    if (state.dialog) {
+      if (!(await lineOf(page, 'W-17').count())) await press(LEAVE);
+      await press('#worldcraft-dialog [data-worldcraft-action="confirm-leave"]');
+      await dialogGone(page);
+    }
     await openDoor(session);
     await page.evaluate(() => history.back());
     await dialogGone(page);
-    const state = await page.evaluate(() => ({ locked: document.body.style.overflow, door: !!document.getElementById('worldcraft-door') }));
-    if (state.locked === 'hidden') throw new Error('the page stayed scroll-locked');
-    return `Back with the builder open closes it and unlocks the page (door still on screen: ${state.door})`;
+    state = await rest();
+    if (state.locked === 'hidden') throw new Error('the page stayed scroll-locked after Back');
+    return `Escape leaves and returns focus to the door; with an unkept build it asks first (W-17), and a second Escape ${second}; Back with the builder open closes it and unlocks the page (door still on screen: ${state.door})`;
   });
 
   await check(session, 'reload empties Kept characters; 門 has no door', async () => {
@@ -262,6 +296,27 @@ async function walk(browser, device) {
     await page.locator('#kanji-world-door').waitFor();
     if (await count(page, '#worldcraft-door')) throw new Error('門 has a Worldcraft door');
     return '織 kept, page reloaded: Kept characters is empty again. 門 shows the Rajōmon door and no Worldcraft door';
+  });
+
+  await check(session, 'without WebCrypto the door says so', async () => {
+    // The model hashes its five source files with WebCrypto, which a plain-http address other than localhost
+    // does not have. Take it away as such an address would, on a fresh load so nothing is admitted yet.
+    await firstScreen(session);
+    await toKanji(session, '識', 'シキ', { fromFirstScreen: true });
+    const door = page.locator('#worldcraft-door');
+    await door.waitFor();
+    await page.evaluate(() => Object.defineProperty(Object.getPrototypeOf(crypto), 'subtle', { configurable: true, get: () => undefined }));
+    await door.scrollIntoViewIfNeeded();
+    await press(door);
+    await page.waitForFunction(() => /https/.test(document.querySelector('#worldcraft-dialog[open] .wc-loading')?.textContent || ''));
+    const words = (await page.locator('#worldcraft-dialog .wc-loading').innerText()).trim();
+    if (await count(page, '#worldcraft-dialog .worldcraft-view')) throw new Error('a builder was shown without admitted sources');
+    await shot('8-no-webcrypto');
+    await press('#worldcraft-dialog .wc-body > .chip');
+    await dialogGone(page);
+    const focus = await page.evaluate(() => document.activeElement?.id);
+    if (focus !== 'worldcraft-door') throw new Error(`Return left focus on ${focus}`);
+    return `the dialog reads "${words}" and Return goes back to the door`;
   });
 
   await session.context.close();

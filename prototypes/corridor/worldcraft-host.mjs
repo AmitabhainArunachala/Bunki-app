@@ -219,7 +219,6 @@ async function admit() {
  */
 export async function openWorldcraftPreview({ document, invoker, form, biLabel, tx, isCurrent }) {
   if (visiting) return;
-  visiting = true;
   const window = document.defaultView;
   const make = (tag, cls, text) => { const node = document.createElement(tag); node.className = cls; if (text) node.textContent = text; return node; };
   const dialog = make('dialog', 'wc-dialog');
@@ -253,7 +252,10 @@ export async function openWorldcraftPreview({ document, invoker, form, biLabel, 
     const leave = view && dialog.querySelector('.worldcraft-view > [data-worldcraft-action="leave"]');
     if (leave) leave.click(); else close();
   });
+  // A browser may close a dialog over a prevented cancel (a second Escape): never leave the page locked behind it.
+  dialog.addEventListener('close', () => close());
   body.append(make('p', 'wc-loading', tx('読み込み中…', 'Loading…')), back);
+  visiting = true;
   document.body.append(dialog); dialog.showModal(); document.body.style.overflow = 'hidden';
   watcher.observe(document.body, { childList: true, subtree: true });
   try {
@@ -262,6 +264,7 @@ export async function openWorldcraftPreview({ document, invoker, form, biLabel, 
     const host = await page.catch((error) => { page = null; throw error; });
     if (!current()) { close(false); return; }
     view = createWorldcraftView({ document, biLabel });
+    let shown = null;
     session = host.visit(form, {
       render(dto) {
         context.hidden = !dto.viewing;
@@ -269,6 +272,8 @@ export async function openWorldcraftPreview({ document, invoker, form, biLabel, 
           `残した字「${dto.viewing}」を見ています。「離れる」で「${form}」の組み立てに戻ります。`,
           `Viewing a kept character: ${dto.viewing}. Leave returns to building ${form}.`) : '';
         view.render(dto, session.actions);
+        // The character changes at the top while the press was in the list below: bring the top into sight.
+        if (dto.viewing !== shown) { shown = dto.viewing; dialog.scrollTop = 0; }
       },
       close: () => close(),
     });
