@@ -478,15 +478,16 @@ function arrive() {
  * that felt:
  *   the light  the look follows the level the app's own trail names: the learner's look down to a sentence, dusk on a
  *              word, night on a kanji or a part, and the learner's look again on the way up;
- *   the cord   a red cord down the left edge with one bead per level of that trail. The app's breadcrumb row is hidden
- *              while the trial is on, and a bead presses that row's own control, so every move is the app's own.
+ *   the cord   a red cord with one bead per level of that trail: down the left edge of the glass on a narrow screen,
+ *              down the left edge of the page's column from 900 px, where it is one line with the red edge the depth
+ *              stylesheets give the heads of pages. The app's breadcrumb row is hidden while the trial is on, and a
+ *              bead presses that row's own control, so every move is the app's own.
  * Both are read from the app's trail row (`.scale-thread`, modules/return.mjs). The look is put on the root the way
  * setKairoTheme puts it, and the learner's saved choice is never written: this file has no write to `kairo-theme`. */
 const ITO_KEY = 'bunki-prototype:ito-depth:v1';
 const CORD_ID = 'bunki-prototype-cord';
 const NIGHT_LOOKS = ['rokusho', 'yoru', 'nami', 'hakuu', 'kaku']; // the app's own night list (setKairoTheme)
-const DUSK = 'iwa', NIGHT = 'yoru', DEEP_NIGHT = 'kaku';
-const KNOT = { sky: '宙', shelf: '棚', room: '間', article: '記', sentence: '文', word: '語', kanji: '字', part: '部', entry: '項' };
+const DUSK = 'akafuji', DUSK_TOO = 'iwa', NIGHT = 'yoru', DEEP_NIGHT = 'kaku';
 const SVG = 'http://www.w3.org/2000/svg';
 const CORD_EASE = 'cubic-bezier(.2,.8,.2,1)';
 const ito = {
@@ -499,7 +500,7 @@ const ito = {
   stirred: 0, // counts the changes the app makes to the screen: the light waits for a still page
   fade: null, // the cross-fade on the glass now
   press: null, // a mouse press that ended a fade: where its click is owed
-  cord: null, thread: null, ghost: null, holes: null, knots: [], length: 0, shape: '',
+  cord: null, thread: null, ghost: null, holes: null, knots: [], length: 0, shape: '', left: null,
 };
 const still = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { return false; } };
 
@@ -522,12 +523,16 @@ function readTrail(row) {
       off: node.tagName !== 'BUTTON' || node.disabled };
   });
 }
-/** the look a level wears, from the learner's own: a night look is already dusk, and its night is the phosphor night */
+/** The look a level wears, from the learner's own. A word is dusk: akafuji (lead, 2026-11-10 21:55: its warm rose is a
+ * dusk sky after the day page, where iwa turned the whole of a wide window persimmon); a learner whose own look is
+ * akafuji gets iwa, and one on iwa stays there. A kanji or a part is night: yoru. A learner on a night look is already
+ * past dusk, so a word keeps that look and the night is the phosphor night, kaku. */
 function lookFor(scale) {
   if (!ito.on || ito.held) return null;
   const home = ito.actual === null ? document.documentElement.getAttribute('data-theme') || 'hokusai' : ito.home.id;
   const night = NIGHT_LOOKS.includes(home);
-  const look = scale === 'word' ? (night ? home : DUSK) : scale === 'kanji' || scale === 'part' ? (night ? DEEP_NIGHT : NIGHT) : home;
+  const dusk = home === DUSK ? DUSK_TOO : home === DUSK_TOO ? home : DUSK;
+  const look = scale === 'word' ? (night ? home : dusk) : scale === 'kanji' || scale === 'part' ? (night ? DEEP_NIGHT : NIGHT) : home;
   return look === home ? null : look;
 }
 /** the phone's own bar follows the frame drawn, as the app's syncThemeColor has it; on a page that frame is the page's bar */
@@ -633,6 +638,28 @@ function onFadeClick(event) {
   under.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, composed: true, view: window, detail: 1,
     clientX: event.clientX, clientY: event.clientY, screenX: event.screenX, screenY: event.screenY, button: 0 }));
 }
+/** On a narrow screen a bead is small, so its box is 40 by 40: a tap that lands in that box on the page's bare ground is
+ * the bead's. Nothing of the page loses a tap to it: a word, a control, a picture or any text under the finger keeps its
+ * own, and so does a tap within 12 px of one (a finger that slips off the first word of a line is still reading, and a
+ * bead taken by mistake would carry the learner out of the text). So beside running text a bead is reached in its
+ * 16 px lane at the edge of the glass, and beside open ground in the whole box. */
+const PAGE_TAKES = '.tok, .japanese-lookup-word, .ja-unit, button, a[href], input, select, textarea, summary, label, [role="button"], [role="link"], [data-action], [contenteditable], img, canvas, svg, video, ruby';
+function pageTakes(x, y) {
+  const under = document.elementsFromPoint(x, y).find((node) => !ito.cord.contains(node) && !root.contains(node));
+  return !under || !!under.closest(PAGE_TAKES) || [...under.childNodes].some((node) => node.nodeType === 3 && node.textContent.trim());
+}
+function onNearKnot(event) {
+  const cord = ito.cord, target = event.target, x = event.clientX, y = event.clientY;
+  if (!cord || cord.hidden || cord.dataset.plCord === 'column' || !event.isTrusted || event.button !== 0 || x > 40) return;
+  if (!(target instanceof Element) || cord.contains(target) || root.contains(target)) return;
+  if (pageTakes(x, y) || pageTakes(x, y - 12) || pageTakes(x, y + 12) || pageTakes(x + 12, y)) return;
+  const knot = ito.knots.find((item) => !item.disabled && item.dataset.plKnot !== 'now' &&
+    Math.abs(item.getBoundingClientRect().top + item.offsetHeight / 2 - y) <= 20);
+  if (!knot) return;
+  event.preventDefault();
+  event.stopPropagation();
+  pressKnot(Number(knot.dataset.plKnotAt), event);
+}
 /** the learner's hand: a look chosen in the app while a depth look stands is theirs, and stays until the next level */
 function onRootLook(records) {
   // the lead's depth switch went on or off: the cord takes its other shape, now and once its stylesheet has arrived
@@ -648,26 +675,40 @@ function onRootLook(records) {
   ito.actual = null; ito.wanted = null; ito.home = null; ito.held = true;
 }
 
-// the cord: where each bead stands, and the thread through them
+// the cord: where it stands, where each bead stands, and the thread through them
+/** the left edge of the column the screen is set in: a page's text column with its 20 px gutter (where the depth
+ * stylesheets draw the red edge of a word's head and of a kanji's hero), else the room's own column (the article's sheet) */
+function columnEdge() {
+  const page = [...document.querySelectorAll('#sheet')].find((item) => !item.closest('[inert]'));
+  if (page) return Math.round(page.getBoundingClientRect().left + (parseFloat(getComputedStyle(page).paddingLeft) || 0) - 20);
+  const main = document.querySelector('#app > main');
+  return main ? Math.round(main.getBoundingClientRect().left) : 0;
+}
+/** Three shapes. From 900 px ("column"): a straight 3 px line on the left edge of the page's column, the beads small tabs
+ * on its outer side with their names beside them where the margin has room; it is the same line as the red edge of the
+ * page heads under the depth stylesheets, and stands in the same place without them. Under 900 px with those stylesheets
+ * on ("edge"): that same 3 px line at the edge of the glass, tabs on its inner side (two red lines three pixels apart
+ * fought). Under 900 px without them ("slim"): a swaying thread 6 px from the edge with ring beads, inside the gutter.
+ * The numbers are the ones prototype-layer.css draws the beads with. */
 function cordShape(count) {
-  const wide = innerWidth >= 1100;
-  // Under the lead's live depth stylesheet the heads of pages carry a red edge at the left of the glass ("the red
-  // thread", depth.css). Two red lines three pixels apart fight, so on a narrow screen the cord is then that same
-  // edge: a straight 3 px line at the edge of the glass, and each bead a small tab on it.
-  const edge = !wide && document.documentElement.getAttribute('data-live-depth') === '1';
-  const base = wide ? { wide, edge, cx: 23, first: 54, step: 58, sway: 2.4, waves: 1, ring: 5.5, now: 7.5 }
-    : edge ? { wide, edge, cx: 1.5, first: 30, step: 40, sway: 0, waves: 1, ring: 0, now: 5.5 }
-      : { wide, edge, cx: 6, first: 30, step: 40, sway: 1.2, waves: 1, ring: 3.5, now: 4.5 }; // --pl-cord-x and the bead sizes in the styles
+  let shape;
+  const column = innerWidth >= 900 ? Math.max(0, columnEdge()) : -1;
+  if (column >= 16) {
+    const margin = Math.min(column, 168);
+    shape = { mode: 'column', left: column - margin, width: margin + 3, cx: margin + 1.5, first: 24, step: 32, sway: 0, ring: 0, now: 6.5, names: margin >= 112 };
+  } else if (column >= 0 || document.documentElement.getAttribute('data-live-depth') === '1') {
+    shape = { mode: 'edge', left: Math.max(0, column), width: 16, cx: 1.5, first: 30, step: 40, sway: 0, ring: 0, now: 5.5, names: false };
+  } else shape = { mode: 'slim', left: 0, width: 16, cx: 6, first: 30, step: 40, sway: 1.2, ring: 3.5, now: 4.5, names: false };
   // the thread comes out from under the top bar; on the sky, which has no bar, from above the glass
-  base.from = document.body.dataset.view === 'drift' && !document.querySelector('#sheet') ? -64 : 0;
-  const room = innerHeight - 45 - base.first - (wide ? 56 : 156);
-  base.step = Math.max(26, Math.min(base.step, Math.floor(room / Math.max(1, count - 0.4))));
-  return base;
+  shape.from = document.body.dataset.view === 'drift' && !document.querySelector('#sheet') ? -64 : 0;
+  const space = innerHeight - 45 - shape.first - (shape.mode === 'column' ? 56 : 156);
+  shape.step = Math.max(26, Math.min(shape.step, Math.floor(space / Math.max(1, count - 0.4))));
+  return shape;
 }
 const knotY = (shape, index) => shape.first + index * shape.step;
 /** the thread from its start down to `to`, swaying, and through the middle of every bead; its length comes back with it */
 function threadPath(shape, to) {
-  const x = (y) => shape.cx + shape.sway * Math.sin((Math.PI * shape.waves * (y - shape.first)) / shape.step);
+  const x = (y) => shape.cx + shape.sway * Math.sin((Math.PI * (y - shape.first)) / shape.step);
   let d = '', length = 0, px = 0, py = 0;
   for (let y = shape.from; ; y = Math.min(y + 2, to)) {
     const nx = Math.round(x(y) * 100) / 100;
@@ -686,7 +727,7 @@ function buildCord() {
   svg.setAttribute('aria-hidden', 'true'); svg.setAttribute('focusable', 'false');
   const defs = document.createElementNS(SVG, 'defs'), mask = document.createElementNS(SVG, 'mask');
   mask.id = 'pl-cord-holes'; mask.setAttribute('maskUnits', 'userSpaceOnUse');
-  for (const [name, value] of [['x', '-40'], ['y', '-80'], ['width', '160'], ['height', '4000']]) mask.setAttribute(name, value);
+  for (const [name, value] of [['x', '-40'], ['y', '-80'], ['width', '400'], ['height', '4000']]) mask.setAttribute(name, value);
   defs.append(mask);
   ito.holes = mask;
   ito.thread = document.createElementNS(SVG, 'path');
@@ -713,36 +754,40 @@ function placeCord(row) {
 }
 function dropCord() {
   ito.cord?.remove();
-  ito.cord = ito.thread = ito.ghost = ito.holes = null; ito.knots = []; ito.length = 0; ito.shape = '';
+  ito.cord = ito.thread = ito.ghost = ito.holes = null; ito.knots = []; ito.length = 0; ito.shape = ''; ito.left = null;
 }
 function drawCord(trail) {
   if (!trail.length) { if (ito.cord) ito.cord.hidden = true; return; }
-  if (!ito.cord) buildCord();
   const cord = ito.cord, fresh = cord.hidden || !ito.knots.length, shape = cordShape(trail.length);
-  const key = `${shape.wide}:${shape.edge}:${shape.step}:${shape.from}`, moved = key !== ito.shape, calm = still() || fresh || moved;
-  ito.shape = key;
+  const key = `${shape.mode}:${shape.step}:${shape.from}:${shape.names}`, moved = key !== ito.shape, calm = still() || fresh || moved;
+  // from one column to another (an article's sheet to a page) the cord glides to its new edge
+  const slide = !calm && shape.mode === 'column' && ito.left !== null ? ito.left - (shape.left + shape.width) : 0;
+  ito.shape = key; ito.left = shape.mode === 'column' ? shape.left + shape.width : null;
   cord.hidden = false;
-  cord.dataset.plCord = shape.wide ? 'wide' : shape.edge ? 'edge' : 'slim';
+  cord.dataset.plCord = shape.mode;
+  cord.toggleAttribute('data-pl-names', shape.names);
   cord.setAttribute('aria-label', t('ことばの道すじ', 'The way through the text'));
   cord.style.setProperty('--pl-cord-step', `${shape.step}px`);
+  cord.style.left = shape.mode === 'column' || shape.left ? `${shape.left}px` : '';
+  cord.style.width = shape.mode === 'column' ? `${shape.width}px` : '';
   cord.style.height = `${knotY(shape, trail.length - 1) + shape.step}px`;
+  if (slide) cord.animate([{ transform: `translateX(${slide}px)` }, { transform: 'none' }], { duration: 360, easing: CORD_EASE });
 
   // the beads: one per place on the trail, kept by its place so a bead that stays never moves
   for (const [index, bead] of trail.entries()) {
     let knot = ito.knots[index];
     if (!knot) {
       knot = button('pl-knot', '', (event) => pressKnot(index, event));
-      knot.append(h('span', 'pl-knot-k'), h('span', 'pl-knot-o'), h('span', 'pl-knot-tip'));
+      knot.append(h('span', 'pl-knot-n'), h('span', 'pl-knot-o'), h('span', 'pl-knot-tip'));
       knot.dataset.plKnotAt = String(index);
       ito.knots[index] = knot;
       cord.append(knot);
       if (!calm) knot.animate([{ opacity: 0, transform: 'translateY(-12px)' }, { opacity: 1, transform: 'none' }], { duration: 460, easing: CORD_EASE });
     }
-    const glyph = (bead.scale === 'kanji' || bead.scale === 'part') && [...bead.label].length === 1 ? bead.label : KNOT[bead.scale] || KNOT.entry;
     knot.dataset.plKnot = bead.kind === 'in' ? 'in' : bead.current ? 'now' : 'bead';
     knot.dataset.plScale = bead.scale;
     knot.style.top = `${knotY(shape, index)}px`;
-    knot.children[0].textContent = glyph;
+    knot.children[0].textContent = bead.kind === 'in' ? `${bead.label} ›` : bead.label; // its name, as the app's row has it
     knot.children[2].textContent = bead.kind === 'bead' ? bead.label : bead.name;
     knot.setAttribute('aria-label', bead.name);
     if (bead.current) knot.setAttribute('aria-current', 'step'); else knot.removeAttribute('aria-current');
@@ -760,13 +805,13 @@ function drawCord(trail) {
   const at = Math.max(0, trail.findIndex((bead) => bead.current));
   const end = knotY(shape, at), next = trail.find((bead) => bead.kind === 'in');
   const path = threadPath(shape, end), before = ito.length;
-  // the thread does not cross the inside of a ring, nor (on the wide cord) the mark that stands over each bead
+  // the swaying thread does not cross the inside of a ring
   const cut = (tag, values) => { const node = document.createElementNS(SVG, tag); for (const [name, value] of Object.entries(values)) node.setAttribute(name, String(value)); return node; };
-  ito.holes.replaceChildren(cut('rect', { x: -40, y: -80, width: 160, height: 4000, fill: '#fff' }));
-  for (const [index, bead] of trail.entries()) {
-    const y = knotY(shape, index);
-    if (!bead.current && shape.ring) ito.holes.append(cut('circle', { cx: shape.cx, cy: y, r: bead.kind === 'in' ? shape.ring - 1 : shape.ring, fill: '#000' }));
-    if (shape.wide && bead.kind !== 'in') ito.holes.append(cut('rect', { x: shape.cx - 9, y: y - shape.now - 21, width: 18, height: 17, fill: '#000' }));
+  ito.holes.replaceChildren(cut('rect', { x: -40, y: -80, width: 400, height: 4000, fill: '#fff' }));
+  if (shape.ring) {
+    for (const [index, bead] of trail.entries()) {
+      if (!bead.current) ito.holes.append(cut('circle', { cx: shape.cx, cy: knotY(shape, index), r: bead.kind === 'in' ? shape.ring - 1 : shape.ring, fill: '#000' }));
+    }
   }
   for (const running of ito.thread.getAnimations()) running.cancel();
   const settle = () => {
@@ -818,8 +863,9 @@ function syncIto(redraw = false, records = null) {
   const level = `${scale}|${trail.map((bead) => `${bead.kind}:${bead.scale}:${bead.label}`).join('|')}`;
   const sig = `${level}|${trail.map((bead) => `${bead.current ? 1 : 0}${bead.off ? 1 : 0}`).join('')}|${lang()}`;
   if (level !== ito.level) { ito.level = level; ito.held = false; }
+  if (trail.length && !ito.cord) buildCord();
+  placeCord(trail.length ? row : null); // first to its place, so what is drawn and set moving is drawn where it stands
   if (redraw || sig !== ito.sig) { ito.sig = sig; drawCord(trail); }
-  placeCord(trail.length ? row : null);
   // a world's dialog or the writing room is on the glass: the learner's look, at once
   if (!row && (hostDialogs().length || document.querySelector('#stroke-page'))) setLook(null, true);
   else setLook(lookFor(scale));
@@ -835,6 +881,7 @@ function setIto(on) {
       ito.watch.observe(top, { attributes: true, attributeFilter: ['data-theme', 'data-live-depth'] });
       window.addEventListener('pointerdown', onFadePress, { capture: true, passive: true });
       window.addEventListener('click', onFadeClick, true);
+      window.addEventListener('click', onNearKnot, true);
     }
     ito.sig = ''; ito.level = '';
     syncIto();
@@ -843,6 +890,7 @@ function setIto(on) {
     ito.watch?.disconnect(); ito.watch = null;
     window.removeEventListener('pointerdown', onFadePress, { capture: true });
     window.removeEventListener('click', onFadeClick, true);
+    window.removeEventListener('click', onNearKnot, true);
     dropCord();
     delete top.dataset.plIto;
     ito.held = false; ito.sig = ''; ito.level = '';

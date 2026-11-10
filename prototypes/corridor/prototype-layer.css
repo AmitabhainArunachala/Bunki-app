@@ -309,9 +309,9 @@
  * colour is never on the glass. */
 :root[data-pl-ito-look] body { background-color: var(--pl-ito-home-ground) !important; }
 
-/* the cord: down the left edge, in the gutter, clear of the reading text. Where the screen is narrow its lane is the
- * 16 px of that gutter and the thread hangs 6 px from the edge, so a bead ends before the pictures that start at 10 px
- * and long before the text at 16 px. The numbers here are the ones cordShape() draws the thread with. */
+/* the cord. "slim", under 900 px: down the left edge of the glass, in the gutter, clear of the reading text. Its lane is
+ * the 16 px of that gutter and the thread hangs 6 px from the edge, so a bead ends before the pictures that start at
+ * 10 px and long before the text at 16 px. The numbers here are the ones cordShape() draws the thread with. */
 #bunki-prototype-cord {
   --pl-ink: var(--ink, #1c2f42);
   --pl-paper: var(--ground, #f1e9d3);
@@ -339,10 +339,8 @@
 }
 #bunki-prototype-cord, #bunki-prototype-cord * { box-sizing: border-box; }
 #bunki-prototype-cord[hidden] { display: none; }
-#bunki-prototype-cord[data-pl-cord='wide'] { --pl-cord-x: 23px; --pl-cord-ring: 11px; --pl-cord-now: 15px; --pl-cord-line: 2px; --pl-cord-halo: 3px; width: 46px; }
 #bunki-prototype-cord svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
 #bunki-prototype-cord .pl-cord-thread { fill: none; stroke: var(--pl-cord-red); stroke-width: 1.6; stroke-linecap: round; }
-#bunki-prototype-cord[data-pl-cord='wide'] .pl-cord-thread { stroke-width: 2.1; }
 #bunki-prototype-cord .pl-cord-ghost { fill: none; stroke: var(--pl-cord-red); stroke-width: 1.1; stroke-dasharray: 1 6; stroke-linecap: round; opacity: 0.5; }
 #bunki-prototype-cord .pl-knot {
   position: absolute;
@@ -394,28 +392,41 @@
 }
 #bunki-prototype-cord .pl-knot[data-pl-knot='in'] .pl-knot-o { width: calc(var(--pl-cord-ring) - 2px); height: calc(var(--pl-cord-ring) - 2px); border-width: 1px; opacity: 0.62; }
 #bunki-prototype-cord .pl-knot:focus-visible .pl-knot-o { outline: 2px solid var(--pl-ink); outline-offset: 2px; }
-/* with the lead's live depth stylesheet on (narrow screens): the cord is the red edge that stylesheet gives the heads of
- * pages, carried from the bar down to the place the learner stands at, and a bead is a small tab on that edge */
+/* "edge", under 900 px with the lead's live depth stylesheets on: the cord is the red edge those stylesheets give the
+ * heads of pages, carried from the bar down to the place the learner stands at, and a bead is a small tab on that edge */
 #bunki-prototype-cord[data-pl-cord='edge'] .pl-cord-thread { stroke-width: 3; stroke-linecap: butt; }
 #bunki-prototype-cord[data-pl-cord='edge'] .pl-cord-ghost { stroke-width: 1.5; }
 #bunki-prototype-cord[data-pl-cord='edge'] .pl-knot-o { left: 3px; width: 5px; height: 8px; border-left: 0; border-radius: 0 5px 5px 0; transform: translate(0, -50%); }
 #bunki-prototype-cord[data-pl-cord='edge'] .pl-knot[data-pl-knot='now'] .pl-knot-o { width: 7px; height: 12px; border-radius: 0 7px 7px 0; }
 #bunki-prototype-cord[data-pl-cord='edge'] .pl-knot[data-pl-knot='in'] .pl-knot-o { left: 3px; width: 4px; height: 6px; border-left: 0; }
-/* the mark over a bead: on the wide cord only, where the edge has room for it */
-#bunki-prototype-cord .pl-knot-k { display: none; }
-#bunki-prototype-cord[data-pl-cord='wide'] .pl-knot-k {
+/* "column", from 900 px: the same 3 px line on the left edge of the page's column (prototype-layer.mjs measures it and
+ * sets left and width), one line with the red edge of the page heads. The beads are tabs on its outer side, in the
+ * margin, and where that margin has room each has its name beside it. The whole of a name and its tab is the bead. */
+#bunki-prototype-cord[data-pl-cord='column'] .pl-cord-thread { stroke-width: 3; stroke-linecap: butt; }
+#bunki-prototype-cord[data-pl-cord='column'] .pl-cord-ghost { stroke-width: 1.5; }
+#bunki-prototype-cord[data-pl-cord='column'] .pl-knot-o { right: 3px; left: auto; width: 6px; height: 9px; border-right: 0; border-radius: 5px 0 0 5px; transform: translate(0, -50%); }
+#bunki-prototype-cord[data-pl-cord='column'] .pl-knot[data-pl-knot='now'] .pl-knot-o { width: 8px; height: 13px; border-radius: 7px 0 0 7px; }
+#bunki-prototype-cord[data-pl-cord='column'] .pl-knot[data-pl-knot='in'] .pl-knot-o { width: 5px; height: 7px; border-right: 0; }
+#bunki-prototype-cord .pl-knot-n { display: none; }
+#bunki-prototype-cord[data-pl-cord='column'][data-pl-names] .pl-knot-n {
   display: block;
   position: absolute;
-  right: 0;
-  bottom: calc(50% + 11px);
+  top: 50%;
+  right: 19px;
   left: 0;
-  color: color-mix(in srgb, var(--pl-ink) 52%, transparent);
-  font: 500 12px / 1 'Shippori Mincho B1', var(--serif, 'Hiragino Mincho ProN', serif);
-  text-align: center;
-  transition: color 300ms ease-out;
+  overflow: hidden;
+  color: color-mix(in srgb, var(--pl-ink) 66%, transparent);
+  font: 500 12px / 1.35 var(--sans, 'Noto Sans JP', system-ui, sans-serif);
+  letter-spacing: 0.02em;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transform: translateY(-50%);
+  transition: color 200ms ease-out;
 }
-#bunki-prototype-cord[data-pl-cord='wide'] .pl-knot[data-pl-knot='now'] .pl-knot-k { color: var(--pl-ink); }
-#bunki-prototype-cord[data-pl-cord='wide'] .pl-knot[data-pl-knot='in'] .pl-knot-k { display: none; }
+#bunki-prototype-cord[data-pl-cord='column'][data-pl-names] .pl-knot[data-pl-knot='now'] .pl-knot-n { color: var(--pl-ink); font-weight: 700; }
+#bunki-prototype-cord[data-pl-cord='column'][data-pl-names] .pl-knot[data-pl-knot='in'] .pl-knot-n { color: color-mix(in srgb, var(--pl-ink) 46%, transparent); }
+#bunki-prototype-cord[data-pl-cord='column'][data-pl-names] .pl-knot-tip { display: none; }
 /* the bead's name, beside it: under the pointer, or with the keyboard on it */
 #bunki-prototype-cord .pl-knot-tip {
   position: absolute;
@@ -438,12 +449,14 @@
 }
 #bunki-prototype-cord .pl-knot:focus-visible .pl-knot-tip { opacity: 1; transform: translate(0, -50%); }
 @media (hover: hover) {
+  #bunki-prototype-cord[data-pl-names] .pl-knot[data-pl-knot='bead']:not(:disabled):hover .pl-knot-n,
+  #bunki-prototype-cord[data-pl-names] .pl-knot[data-pl-knot='in']:not(:disabled):hover .pl-knot-n { color: var(--pl-ink); }
   #bunki-prototype-cord .pl-knot:not(:disabled):hover .pl-knot-tip { opacity: 1; transform: translate(0, -50%); }
   #bunki-prototype-cord .pl-knot[data-pl-knot='bead']:not(:disabled):hover .pl-knot-o,
   #bunki-prototype-cord .pl-knot[data-pl-knot='in']:not(:disabled):hover .pl-knot-o { background: color-mix(in srgb, var(--pl-cord-red) 38%, transparent); opacity: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
-  #bunki-prototype-cord .pl-knot-o, #bunki-prototype-cord .pl-knot-k, #bunki-prototype-cord .pl-knot-tip { transition: none; }
+  #bunki-prototype-cord .pl-knot-o, #bunki-prototype-cord .pl-knot-n, #bunki-prototype-cord .pl-knot-tip { transition: none; }
 }
 
 @media (max-width: 480px) {
