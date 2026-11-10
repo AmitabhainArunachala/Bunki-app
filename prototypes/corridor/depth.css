@@ -1,6 +1,6 @@
 /* depth.css · the app's surfaces: ground, sheet, slip, well, and the night windows its subjects stand in.
    FOLDED FILE. Do not edit here. Sources: ~/.dharma/bunki/PROGRAM/design/depth/depth.css and lead.css
-   (design version 1794318207, folded 2026-11-10 22:51 JST). Re-fold: ~/.dharma/bunki/PROGRAM/design/fold-depth.sh <worktree>.
+   (design version 1794320720, folded 2026-11-10 23:26 JST). Re-fold: ~/.dharma/bunki/PROGRAM/design/fold-depth.sh <worktree>.
    Every rule is scoped under html[data-live-depth='1']; index.html sets that attribute. */
 
 /* depth.css · the surface system: four planes made by light (地 ground, 紙 sheet, 札 slip, 窪 well).
@@ -87,6 +87,25 @@ html[data-live-depth='1'][data-theme='iwa'] :is(body:not([data-view='drift']), b
   --dp-ground-foot: color-mix(in oklab, var(--ground) 93%, var(--ink));
 }
 
+/* 凱風快晴: its ink is brown and its 藍 lighter than the other day looks'. Its night is taken deeper toward black and
+   its lit tone lifted toward white, so that light type keeps its distance in a window; quiet print takes nearly full
+   ink */
+html[data-live-depth='1'][data-theme='akafuji'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet) {
+  --dp-night: color-mix(in oklab, color-mix(in oklab, var(--ink) 82%, var(--world-accent)) 62%, #000);
+  --dp-night-mid: color-mix(in oklab, color-mix(in oklab, var(--ink) 62%, var(--world-accent)) 62%, #000);
+  --dp-night-foot: color-mix(in oklab, color-mix(in oklab, var(--ink) 36%, var(--world-accent)) 72%, #000);
+  --dp-star: color-mix(in oklab, var(--ground-0) 55%, #fff);
+  --dp-star-2: color-mix(in oklab, var(--ground-0) 70%, #fff);
+  --dp-quiet: color-mix(in oklab, var(--ink) 97%, var(--ground-0));
+  --dp-dim: color-mix(in srgb, var(--ink) 62%, transparent);
+}
+
+/* 凱風快晴 and the key block share a lighter 藍 (#2a5d8a). As the ink of a word on the deeper ground it read 3.6 to
+   4.4:1: it is set a step deeper, as the app already sets it for 柿渋 */
+html[data-live-depth='1']:is([data-theme='akafuji'], [data-theme='keyblock']) :is(body:not([data-view='drift']), body[data-view='drift'] #sheet) {
+  --color-accent: color-mix(in oklab, var(--world-accent) 82%, #000);
+}
+
 /* night looks: light lifts toward the look's own ink, depth falls toward black */
 html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(body:not([data-view='drift']), body[data-view='drift'] #sheet) {
   --dp-ground: color-mix(in oklab, var(--ground) 78%, #000);
@@ -117,25 +136,25 @@ html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-
 /* =====================================================================================
    2 · 地 the ground: deeper paper, fibre that travels with the page, light that stays
    ===================================================================================== */
-html[data-live-depth='1']:is([data-room='tray'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not([data-view='drift'])::before {
+html[data-live-depth='1']:is([data-room='tray'], [data-room='list'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not([data-view='drift'])::before {
   background:
     linear-gradient(100deg, color-mix(in srgb, var(--ai) 9%, transparent), transparent 42%, transparent 62%, color-mix(in srgb, var(--red) 6%, transparent)),
     radial-gradient(110% 62% at 22% -8%, var(--dp-ground-lit), transparent 72%),
     linear-gradient(180deg, var(--dp-ground) 0%, var(--dp-ground) 40%, var(--dp-ground-foot) 100%);
 }
-html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='tray'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not([data-view='drift'])::before {
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='tray'], [data-room='list'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not([data-view='drift'])::before {
   background:
     var(--skin-light),
     radial-gradient(110% 62% at 22% -8%, var(--dp-ground-lit), transparent 72%),
     linear-gradient(180deg, var(--dp-ground) 0%, var(--dp-ground) 40%, var(--dp-ground-foot) 100%);
 }
-html[data-live-depth='1']:is([data-room='tray'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not([data-view='drift']):not(.zen) #app {
+html[data-live-depth='1']:is([data-room='tray'], [data-room='list'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not([data-view='drift']):not(.zen) #app {
   background-image: var(--dp-fibre);
   background-size: 360px 360px;
 }
 /* what stands on the ground, in a room or on a word's or a character's page */
-html[data-live-depth='1']:is([data-room='tray'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not([data-view='drift']):not(.zen) #app > main,
-html[data-live-depth='1'] #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph)) {
+html[data-live-depth='1']:is([data-room='tray'], [data-room='list'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not([data-view='drift']):not(.zen) #app > main,
+html[data-live-depth='1'] #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph), :has(> p.sent-reader)) {
   /* quiet print takes a little more ink, so it still clears 4.5:1 on the deeper ground */
   --faint: var(--dp-quiet);
   --faint-2: var(--dp-quiet);
@@ -148,26 +167,26 @@ html[data-live-depth='1'] #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyp
   --dp-b-shade: inset 0 1px 0 var(--dp-catch), var(--dp-shadow-slip);
 }
 /* a door is a paper card (the control family draws it): here its shadow is the ink's too */
-html[data-live-depth='1']:is([data-room='tray'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) #app > main :where(.study-door:not(.learn-go-quiet), .foundation-door) { --elevation-card: var(--dp-shadow-slip); }
+html[data-live-depth='1']:is([data-room='tray'], [data-room='list'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) #app > main :where(.study-door:not(.learn-go-quiet), .foundation-door) { --elevation-card: var(--dp-shadow-slip); }
 
 /* =====================================================================================
    3 · the bars: the frame floats over the page
    ===================================================================================== */
-html[data-live-depth='1']:is([data-room='tray'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not(.zen):not([data-view='drift']) #app > .chrome {
+html[data-live-depth='1']:is([data-room='tray'], [data-room='list'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not(.zen):not([data-view='drift']) #app > .chrome {
   /* the long shade is kept short of the text that scrolls under the bar: past 3 px it darkens paper by less than a
      tenth, so the look's red (the level marks) still reads 4.5:1 there */
   box-shadow:
     0 1px 0 color-mix(in oklab, var(--dp-shade) 14%, transparent),
     0 10px 16px -12px color-mix(in oklab, var(--dp-shade) 36%, transparent);
 }
-html[data-live-depth='1']:is([data-room='tray'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body.has-primary-tabs:not([data-view='drift']) .primary-tabs {
+html[data-live-depth='1']:is([data-room='tray'], [data-room='list'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body.has-primary-tabs:not([data-view='drift']) .primary-tabs {
   box-shadow:
     inset 0 1px 0 var(--dp-catch),
     0 -1px 0 color-mix(in oklab, var(--dp-shade) 14%, transparent),
     0 -10px 16px -12px color-mix(in oklab, var(--dp-shade) 36%, transparent);
 }
 /* the place you are: the one red square on the line */
-html[data-live-depth='1']:is([data-room='tray'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not([data-view='drift']) .primary-tabs .line-car::before { background: var(--red); }
+html[data-live-depth='1']:is([data-room='tray'], [data-room='list'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not([data-view='drift']) .primary-tabs .line-car::before { background: var(--red); }
 
 /* =====================================================================================
    4 · Today
@@ -186,7 +205,7 @@ html[data-live-depth='1']:is([data-room='tray'], [data-room='learn'], [data-room
 }
 /* ---- 紙 from a tablet up the room is the sheet, with a real edge (and its controls stand on a sheet) ---- */
 @media (min-width: 521px) {
-  html[data-live-depth='1']:is([data-room='tray'], [data-room='learn'], [data-room='search']) body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
+  html[data-live-depth='1']:is([data-room='tray'], [data-room='list'], [data-room='learn'], [data-room='search']) body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
     background: linear-gradient(180deg, var(--dp-sheet) 0%, var(--dp-sheet) 420px, var(--dp-sheet-foot) 100%);
     border-color: color-mix(in oklab, var(--dp-shade) 12%, transparent);
     border-top-color: var(--dp-catch);
@@ -272,7 +291,7 @@ html[data-live-depth='1'][data-room='tray'] body:not([data-view='drift']) .today
 }
 
 /* ---- 窪 what you write into is sunk, in every room ---- */
-html[data-live-depth='1']:is([data-room='tray'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not([data-view='drift']) #app > main :is(.record-note-input, .search-field):not(:focus) {
+html[data-live-depth='1']:is([data-room='tray'], [data-room='list'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not([data-view='drift']) #app > main :is(.record-note-input, .search-field, .list-maker-field):not(:focus) {
   /* on the ground the full wash; on a sheet half of it (the plane says which), the inner top shadow kept */
   background-color: var(--dp-w-bg, var(--dp-well));
   box-shadow:
@@ -280,21 +299,21 @@ html[data-live-depth='1']:is([data-room='tray'], [data-room='learn'], [data-room
     inset 0 5px 8px -4px color-mix(in oklab, var(--dp-shade) 42%, transparent),
     0 1px 0 var(--dp-catch);
 }
-html[data-live-depth='1']:is([data-room='tray'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not([data-view='drift']) #app > main :is(.record-note-input, .search-field)::placeholder { color: color-mix(in oklab, var(--ink) 84%, var(--dp-w-bg, var(--dp-well))); }
+html[data-live-depth='1']:is([data-room='tray'], [data-room='list'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not([data-view='drift']) #app > main :is(.record-note-input, .search-field, .list-maker-field)::placeholder { color: color-mix(in oklab, var(--ink) 84%, var(--dp-w-bg, var(--dp-well))); }
 
 /* =====================================================================================
    5 · a word's page (the sheet that opens on a word)
    The headword stands lit in a night window on the red thread, like the character on its page;
    under it the ground is deeper paper, the doors are slips, the dictionary is a sheet.
    ===================================================================================== */
-html[data-live-depth='1'] #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph)) {
+html[data-live-depth='1'] #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph), :has(> p.sent-reader)) {
   background-color: var(--dp-ground);
   background-image: var(--dp-fibre), radial-gradient(110% 62% at 22% -8%, var(--dp-ground-lit), transparent 72%);
   background-size: 360px 360px, auto;
   background-attachment: local, scroll;
 }
-html[data-live-depth='1'] #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph)) > .scale-thread { box-shadow: 0 1px 0 color-mix(in oklab, var(--dp-shade) 16%, transparent), 0 10px 16px -12px color-mix(in oklab, var(--dp-shade) 50%, transparent); }
-html[data-live-depth='1'] #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph)) > .scale-thread .scale-current { color: var(--red); }
+html[data-live-depth='1'] #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph), :has(> p.sent-reader)) > .scale-thread { box-shadow: 0 1px 0 color-mix(in oklab, var(--dp-shade) 16%, transparent), 0 10px 16px -12px color-mix(in oklab, var(--dp-shade) 50%, transparent); }
+html[data-live-depth='1'] #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph), :has(> p.sent-reader)) > .scale-thread .scale-current { color: var(--red); }
 /* ---- 窪 the headword, its sound and what you know of it: one night window, three stacked panes ---- */
 html[data-live-depth='1'] #sheet:has(> h2.headword):not(:has(.hero > .hero-glyph)) > :is(h2.headword, p.reading, p.depth-basis) { position: relative; }
 html[data-live-depth='1'] #sheet:has(> h2.headword):not(:has(.hero > .hero-glyph)) > :is(h2.headword, p.reading, p.depth-basis)::before {
@@ -366,7 +385,10 @@ html[data-live-depth='1'] #sheet:has(> h2.headword):not(:has(.hero > .hero-glyph
 }
 html[data-live-depth='1'] #sheet:has(> h2.headword):not(:has(.hero > .hero-glyph)) > .conj-table::before { top: -2px; }
 /* an example is something you read too: each lies on its own sheet, its words where they were. The word in it keeps
-   the look's red, which reads 5.6:1 on the sheet and only 3.7:1 on the ground */
+   the look's red, which reads 5.6:1 on the sheet and only 3.7:1 on the ground. At night that red is lifted by the look's
+   light ink on a lit plane (an example's sheet, a door's slip), as the app lifts its level marks at night: 浪 and 雷
+   read 4.2 and 4.3 there */
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #sheet :is(.example, .kanji-doors > .chip) { --red: color-mix(in srgb, var(--color-signal) 70%, var(--color-ink)); }
 html[data-live-depth='1'] #sheet:has(> h2.headword):not(:has(.hero > .hero-glyph)) > .example,
 html[data-live-depth='1'] #sheet:has(> h2.headword):not(:has(.hero > .hero-glyph)) > .more-examples > .example {
   margin-inline: -8px;
@@ -485,11 +507,10 @@ html[data-live-depth='1'] #sheet .hero:has(> .hero-glyph) ~ dl.kv {
 html[data-live-depth='1'] #sheet .hero:has(> .hero-glyph) ~ dl.kv dt {
   font: 500 10.5px/1 'Roboto Mono', ui-monospace, monospace;
   letter-spacing: 0.14em;
-  text-transform: uppercase;
   color: var(--faint);
 }
 html[data-live-depth='1'] #sheet .hero:has(> .hero-glyph) ~ dl.kv :is(dd, dd .on, .reading-item),
-html[data-live-depth='1'] #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph)) .row-reading { color: var(--ai); }
+html[data-live-depth='1'] #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph), :has(> p.sent-reader)) .row-reading { color: var(--ai); }
 html[data-live-depth='1'] #sheet .hero:has(> .hero-glyph) ~ p.fine {
   margin-top: 16px;
   font: 400 10.5px/1.5 'Roboto Mono', ui-monospace, monospace;
@@ -605,7 +626,7 @@ html[data-live-depth='1'][data-room='shelf'] body:not([data-view='drift']):not(.
    an outline with light text. A primary keeps its fill and takes the catch and the slip's shadow. A text control
    takes no plane. Chosen, open and disabled controls stay as the control family draws them.
    ===================================================================================== */
-html[data-live-depth='1'] :is(.me-book, .learn-section, #sheet :is(.senses, .conj-table, dl.kv, .entry-rows, .example)) {
+html[data-live-depth='1'] :is(.me-book, .learn-section, #sheet :is(.senses, .conj-table, dl.kv, .entry-rows, .example, .note, .sem-group, .fold-body, .sent-keep)) {
   --dp-b-bg: transparent;
   --dp-b-line: var(--color-edge-strong);
   --dp-b-shade: var(--dp-shadow-slip-down);
@@ -617,27 +638,27 @@ html[data-live-depth='1'] :is(.today-sky, .me-n1, #sheet .hero:has(> .hero-glyph
   --dp-b-shade: 0 0 0 0 transparent;
   --dp-b-ink: var(--dp-star);
 }
-html[data-live-depth='1']:not(#\#):not(#\#) :is(html:is([data-room='tray'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not(.zen) #app > main, #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph))) :where(.chip:not(.btn-primary, .btn-tertiary, .t-kanji, .t-word, .t-radical, .t-idiom, .pool-tag, .cat-chip, .exam-level-card), .btn-secondary, .take:is(.taken, .quiet, .focus-start), #sheet > button.take, .shelf-tools-toggle, .focus-mode):where(:not(:disabled, [aria-disabled='true'], [aria-pressed='true'], [aria-checked='true'], [aria-expanded='true'], .on, .is-on)) {
+html[data-live-depth='1']:not(#\#):not(#\#) :is(html:is([data-room='tray'], [data-room='list'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not(.zen) #app > main, #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph), :has(> p.sent-reader))) :where(.chip:not(.btn-primary, .btn-tertiary, .t-kanji, .t-word, .t-radical, .t-idiom, .pool-tag, .cat-chip, .exam-level-card), .btn-secondary, .take:is(.taken, .quiet, .focus-start), #sheet > button.take, .shelf-tools-toggle, .focus-mode, .fold-head:not(.open)):where(:not(:disabled, [aria-disabled='true'], [aria-pressed='true'], [aria-checked='true'], [aria-expanded='true'], .on, .is-on)) {
   border-color: var(--dp-b-line);
   background: var(--dp-b-bg);
   color: var(--dp-b-ink, var(--color-ink));
   box-shadow: inset 3px 0 0 var(--dp-b-thread, transparent), var(--dp-b-shade);
 }
 /* a tile (a door to a kanji, a word, a part, an idiom) keeps its own wash and edge: on the ground the wash lies on slip paper */
-html[data-live-depth='1']:not(#\#):not(#\#) :is(html:is([data-room='tray'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not(.zen) #app > main, #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph))) :where(.chip:is(.t-kanji, .t-word, .t-radical, .t-idiom)):where(:not([aria-pressed='true'], .on)) {
+html[data-live-depth='1']:not(#\#):not(#\#) :is(html:is([data-room='tray'], [data-room='list'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not(.zen) #app > main, #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph), :has(> p.sent-reader))) :where(.chip:is(.t-kanji, .t-word, .t-radical, .t-idiom)):where(:not([aria-pressed='true'], .on)) {
   background-image: linear-gradient(var(--dp-b-bg), var(--dp-b-bg));
   background-blend-mode: multiply;
   box-shadow: var(--dp-b-shade);
 }
-html[data-live-depth='1']:not(#\#):not(#\#) :is(html:is([data-room='tray'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not(.zen) #app > main, #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph))) :where(.take:not(.taken, .quiet, .focus-start), .btn-primary:not(.save-one), .chat-send):where(:not(:disabled, [class*='ww-'], #sheet > button.take)) {
+html[data-live-depth='1']:not(#\#):not(#\#) :is(html:is([data-room='tray'], [data-room='list'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not(.zen) #app > main, #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph), :has(> p.sent-reader))) :where(.take:not(.taken, .quiet, .focus-start), .btn-primary:not(.save-one), .chat-send):where(:not(:disabled, [class*='ww-'], #sheet > button.take)) {
   box-shadow: var(--dp-a-face), var(--dp-shadow-slip);
 }
 /* both lift 1 px under the pointer and settle when pressed */
-html[data-live-depth='1']:not(#\#):not(#\#) :is(html:is([data-room='tray'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not(.zen) #app > main, #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph))) :where(.chip, .btn-secondary, .take, .btn-primary, .chat-send, .shelf-tools-toggle, .focus-mode):where(:not(:disabled, [aria-disabled='true'], .pool-tag, .cat-chip, .save-one, [class*='ww-'])) {
+html[data-live-depth='1']:not(#\#):not(#\#) :is(html:is([data-room='tray'], [data-room='list'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not(.zen) #app > main, #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph), :has(> p.sent-reader))) :where(.chip, .btn-secondary, .take, .btn-primary, .chat-send, .shelf-tools-toggle, .focus-mode):where(:not(:disabled, [aria-disabled='true'], .pool-tag, .cat-chip, .save-one, [class*='ww-'])) {
   transition: transform var(--motion-ma) var(--ease-standard), box-shadow var(--motion-ma) var(--ease-standard);
 }
 @media (hover: hover) {
-  html[data-live-depth='1']:not(#\#):not(#\#) :is(html:is([data-room='tray'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not(.zen) #app > main, #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph))) :where(.chip, .btn-secondary, .take, .btn-primary, .chat-send, .shelf-tools-toggle, .focus-mode):where(:not(:disabled, [aria-disabled='true'], .pool-tag, .cat-chip, .save-one, [class*='ww-'])):hover:not(:active) { transform: translateY(-1px); }
+  html[data-live-depth='1']:not(#\#):not(#\#) :is(html:is([data-room='tray'], [data-room='list'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not(.zen) #app > main, #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph), :has(> p.sent-reader))) :where(.chip, .btn-secondary, .take, .btn-primary, .chat-send, .shelf-tools-toggle, .focus-mode):where(:not(:disabled, [aria-disabled='true'], .pool-tag, .cat-chip, .save-one, [class*='ww-'])):hover:not(:active) { transform: translateY(-1px); }
 }
 
 /* =====================================================================================
@@ -702,6 +723,138 @@ html[data-live-depth='1']:not(#\#):not(#\#):not(#\#) :is(body:not([data-view='dr
   color: var(--dp-dim);
 }
 html[data-live-depth='1'] body .sheet .row-self { opacity: 1; color: var(--dp-dim); }
+
+/* =====================================================================================
+   13 · a sentence's page ("one sentence, read closely")
+   The sentence is what you read: it lies on a sheet under a night head, on the red thread, of the same family as the
+   word's box. Its keep (Save, Practise) stands on that sheet; the way on to its article is a slip on the ground.
+   The sheet is drawn behind the page's own blocks, which stay where they were.
+   ===================================================================================== */
+html[data-live-depth='1'] #sheet:has(> p.sent-reader) > :where(p.eyebrow:has(+ p.sent-reader), p.sent-reader, p.sent-reader-en, p.example-src, div.sent-keep) { position: relative; }
+html[data-live-depth='1'] #sheet:has(> p.sent-reader) > :where(p.sent-reader, p.sent-reader-en, p.example-src, div.sent-keep)::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0 -12px -18px;
+  background: var(--dp-sheet);
+  /* each block draws its part of the one sheet, lapping 2 px under the next. Its shadow is cut at its top only: the
+     next block lies over what falls behind it, so the sheet keeps one unbroken edge (a hard offset shadow too) */
+  box-shadow: inset 3px 0 0 var(--red), var(--dp-shadow-sheet);
+  clip-path: inset(1px -60px -60px -60px);
+  pointer-events: none;
+}
+/* the head (drawn on ::after: an eyebrow's ::before is the app's own rule mark) */
+html[data-live-depth='1'] #sheet:has(> p.sent-reader) > p.eyebrow:has(+ p.sent-reader) { border-top-color: transparent; color: var(--dp-star); }
+html[data-live-depth='1'] #sheet:has(> p.sent-reader) > p.eyebrow:has(+ p.sent-reader) * { color: inherit; }
+html[data-live-depth='1'] #sheet:has(> p.sent-reader) > p.eyebrow:has(+ p.sent-reader)::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -8px -12px -6px;
+  border-radius: 12px 12px 0 0;
+  background:
+    radial-gradient(70% 260% at 6% -60%, color-mix(in oklab, var(--dp-night-glow) 62%, transparent), transparent 70%),
+    linear-gradient(180deg, var(--dp-night) 0%, var(--dp-night-mid) 100%);
+  box-shadow: inset 3px 0 0 var(--red), inset 0 1px 0 color-mix(in srgb, var(--dp-star) 22%, transparent), var(--dp-shadow-sheet);
+  pointer-events: none;
+}
+html[data-live-depth='1'] #sheet:has(> p.sent-reader) > p.sent-reader::before { top: -4px; }
+html[data-live-depth='1'] #sheet:has(> p.sent-reader) > div.sent-keep::before { bottom: -8px; border-radius: 0 0 12px 12px; }
+/* Save on a sheet: its fill, the catch and the small shadow */
+html[data-live-depth='1'] #sheet:has(> p.sent-reader) > div.sent-keep { --elevation-press: var(--dp-a-face), var(--dp-shadow-slip-down); }
+
+/* =====================================================================================
+   14 · what was still the flat app's on these pages
+   A note and a group of near meanings are sheets (they were boxes of the deeper yellow paper). The study record is a
+   slip (section 10), and unfolded it is one sheet. A list of saved words is one ruled sheet; the band its doors stood
+   in goes, and the doors stand on the page as every other door does.
+   ===================================================================================== */
+html[data-live-depth='1'] #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph), :has(> p.sent-reader)) :is(.note, .sem-group) {
+  border-color: transparent;
+  border-radius: 12px;
+  background: var(--dp-sheet);
+  box-shadow: inset 0 1px 0 var(--dp-catch), var(--dp-shadow-card);
+}
+html[data-live-depth='1'] #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph), :has(> p.sent-reader)) .study-fold > .fold-head.open { border-color: transparent; background: var(--dp-sheet); box-shadow: inset 0 1px 0 var(--dp-catch); }
+html[data-live-depth='1'] #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph), :has(> p.sent-reader)) .study-fold > .fold-head.open + .fold-body {
+  border-color: transparent;
+  background: var(--dp-sheet);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--dp-shade) 12%, transparent), var(--dp-shadow-card);
+}
+/* inside it, the schedule's even rows take a thin ink wash, and the card's preview is a well you look into */
+html[data-live-depth='1'] #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph), :has(> p.sent-reader)) .fold-body .sched tr:nth-child(even) td { background: color-mix(in oklab, var(--dp-well) 26%, var(--dp-sheet)); }
+html[data-live-depth='1'] #sheet:is(:has(> h2.headword), :has(.hero > .hero-glyph), :has(> p.sent-reader)) .fold-body .card-preview {
+  border-color: transparent;
+  background: color-mix(in oklab, var(--dp-well) 50%, var(--dp-sheet));
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--dp-shade) 34%, transparent),
+    inset 0 5px 8px -4px color-mix(in oklab, var(--dp-shade) 42%, transparent),
+    0 1px 0 var(--dp-catch);
+}
+html[data-live-depth='1']:is([data-room='tray'], [data-room='list']) body:not([data-view='drift']):not(.zen) #app > main :is(.list-page-ops, .list-maker) { background: none; box-shadow: none; }
+html[data-live-depth='1']:is([data-room='tray'], [data-room='list']) body:not([data-view='drift']):not(.zen) #app > main .list-maker-field:not(:focus) { border-color: transparent; }
+/* the small chevron after a list's name keeps 3:1 on the ground */
+html[data-live-depth='1']:is([data-room='tray'], [data-room='list']) body:not([data-view='drift']):not(.zen) #app > main .list-open-arrow { opacity: 0.85; }
+/* on a phone the room is the ground: the rows lie on their own sheet, their words where they were */
+@media (max-width: 520px) {
+  html[data-live-depth='1']:is([data-room='tray'], [data-room='list']) body:not([data-view='drift']):not(.zen) #app > main > .tray-line {
+    margin-inline: -10px;
+    padding-inline: 12px;
+    background: var(--dp-sheet);
+    box-shadow: var(--dp-shadow-card);
+  }
+  html[data-live-depth='1']:is([data-room='tray'], [data-room='list']) body:not([data-view='drift']):not(.zen) #app > main > :not(.tray-line) + .tray-line { border-top-color: transparent; border-radius: 12px 12px 0 0; box-shadow: inset 0 1px 0 var(--dp-catch), var(--dp-shadow-card); }
+  html[data-live-depth='1']:is([data-room='tray'], [data-room='list']) body:not([data-view='drift']):not(.zen) #app > main > .tray-line:not(:has(+ .tray-line)) { border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
+}
+
+/* =====================================================================================
+   15 · an article with its reading settings open (lead.css draws the cover only while they are shut)
+   The cover folds up to its head: the picture's strip and the headline, lit in the same night on the red thread.
+   The settings are a sheet under it, each choice a small well with the chosen word inked. On a wide window the
+   article is still one sheet on the ground, the settings and the text are printed on it, and the text is set as it
+   was a moment before (the last three rules here are the open-settings half of lead.css section 2).
+   ===================================================================================== */
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader']:not(.zen) #app > main:has(> .dials) > .reader-card {
+  --color-ink: var(--dp-star);
+  --color-ink-2: color-mix(in oklab, var(--dp-star) 82%, var(--dp-night));
+  --color-muted: color-mix(in oklab, var(--dp-star) 68%, var(--dp-night));
+  --color-accent: var(--dp-night-read);
+  --ink: var(--dp-star);
+  border-color: transparent;
+  color: var(--dp-star);
+  background: linear-gradient(180deg, var(--dp-night) 0%, var(--dp-night-mid) 100%);
+  box-shadow: inset 3px 0 0 var(--red), 0 1px 0 var(--dp-catch), 0 18px 24px -18px color-mix(in oklab, var(--dp-shade) 70%, transparent);
+}
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader']:not(.zen) #app > main:has(> .dials) > .reader-card > h1.view-title,
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader']:not(.zen) #app > main:has(> .dials) > .reader-card > h1.view-title :is(.japanese-lookup-text, .japanese-lookup-word, .ja-unit) { color: var(--dp-star); }
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader']:not(.zen) #app > main:has(> .dials) > .reader-card > h1.view-title rt { color: var(--dp-night-read); }
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader']:not(.zen) #app > main:has(> .dials) > .reader-card > .view-title-en { border-left-color: color-mix(in srgb, var(--dp-star) 34%, transparent); color: color-mix(in oklab, var(--dp-star) 80%, var(--dp-night)); }
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader']:not(.zen) #app > main:has(> .dials) > .reader-card > .reader-head { border-top-color: color-mix(in oklab, var(--dp-star) 18%, transparent); }
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader']:not(.zen) #app > main:has(> .dials) > .reader-card .reader-meta,
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader']:not(.zen) #app > main:has(> .dials) > .reader-card .reader-meta :is(span, time) { color: color-mix(in oklab, var(--dp-star) 70%, var(--dp-night)); }
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader']:not(.zen) #app > main:has(> .dials) > .reader-card .level-chip { border-color: color-mix(in oklab, var(--dp-star) 46%, transparent); background: none; color: var(--dp-star); }
+html[data-live-depth='1'][data-room='reader']:not(#\#) body[data-view='reader'] #app > main:has(> .dials) > .reader-card .dials-toggle { color: var(--dp-star); }
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader']:not(.zen) #app > main:has(> .dials) > .dials { background: var(--dp-sheet); box-shadow: inset 0 1px 0 var(--dp-catch), var(--dp-shadow-card); }
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader']:not(.zen) #app > main:has(> .dials) > .dials .seg {
+  background: color-mix(in oklab, var(--dp-well) 50%, var(--dp-sheet));
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--dp-shade) 34%, transparent),
+    inset 0 5px 8px -4px color-mix(in oklab, var(--dp-shade) 42%, transparent),
+    0 1px 0 var(--dp-catch);
+}
+@media (min-width: 521px) {
+  html[data-live-depth='1'][data-room='reader'] body[data-view='reader']:not(.zen) #app > main:has(> .dials) {
+    border-color: transparent;
+    border-radius: 16px;
+    background: linear-gradient(180deg, var(--dp-sheet) 0%, var(--dp-sheet) 620px, var(--dp-sheet-foot) 100%);
+    box-shadow: inset 0 1px 0 var(--dp-catch), var(--dp-shadow-sheet), 0 60px 90px -60px color-mix(in oklab, var(--dp-shade) 40%, transparent);
+  }
+  html[data-live-depth='1'][data-room='reader'] body[data-view='reader']:not(.zen) #app > main:has(> .dials) > .dials { background: none; box-shadow: none; }
+  html[data-live-depth='1'][data-room='reader'] body[data-view='reader']:not(.zen) #app > main:has(> .dials) > #reader.reader { border-top-color: transparent; background: none; box-shadow: none; }
+}
+@media (min-width: 900px) {
+  html[data-live-depth='1'][data-room='reader'] body[data-view='reader']:not(.zen) #app > main:has(> .dials) > #reader.reader .reader-prose { font-size: 21px; line-height: 42px; }
+}
 
 /* lead.css · the lead's own live trials, attached with the depth sheet by the 深 switch.
    Every rule is scoped under html[data-live-depth='1']. Trials here are proposals John can switch off;
