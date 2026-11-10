@@ -274,6 +274,10 @@ test(
           '--disable-background-networking',
           '--disable-extensions',
           '--disable-sync',
+          // Full Chrome reads the OS credential store before its first request. Headless, with no
+          // one to answer the prompt, the navigation below never leaves the browser.
+          '--use-mock-keychain',
+          '--password-store=basic',
           `--user-data-dir=${profile}`,
           '--remote-debugging-port=0',
           'about:blank',
