@@ -35073,6 +35073,8 @@ function buildGingaChrome(root) {
   }
 
   if (!S.navOpen) return;
+  // 廻 Orbit word field (Meguri), a labelled preview: the door and its host are modules/orbit-preview.mjs
+  if (window.__CORRIDOR_STANDALONE__ !== true) import('./modules/orbit-preview.mjs').then((m) => m.addOrbitDoor(root, { tx, biLabel, open: () => !!S.navOpen })).catch((err) => console.warn('orbit preview unavailable', err));
 
   const scrim = el('div', 'nav-scrim');
   scrim.addEventListener('click', () => {
