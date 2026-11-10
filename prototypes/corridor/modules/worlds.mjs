@@ -1962,8 +1962,11 @@ function renderKanjiNode(sheet, node) {
   meta.append(chips);
   hero.append(meta);
   sheet.append(hero);
-  if (node.id === '門' && kanjiWorldEligible()) {
-    const worldDoor = el('button', 'chip kanji-world-door', tx('羅城門へ · 試作', 'Visit Rajōmon · preview'));
+  // everything-on prototype (inventory block 26): the door also stands on five kanji that hold 門, and says whose scene it is
+  const world = kanjiWorldEligible(node.id);
+  if (world) {
+    const worldDoor = el('button', 'chip kanji-world-door', world === node.id ? tx('羅城門へ · 試作', 'Visit Rajōmon · preview')
+      : tx(`羅城門へ · 「${node.id}」の中の「${world}」 · 試作`, `Visit Rajōmon, the ${world} inside ${node.id} · preview`));
     worldDoor.id = 'kanji-world-door'; worldDoor.type = 'button';
     worldDoor.addEventListener('click', () => openKanjiWorldEncounter(worldDoor, node));
     sheet.append(worldDoor);

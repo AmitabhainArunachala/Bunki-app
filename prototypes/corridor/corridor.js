@@ -31171,15 +31171,27 @@ function renderKanjiStructure(sheet, node) {
 // So the door waits while the sheet's readings are still on their way: their
 // arrival draws the sheet again, and that render would close an open encounter.
 let kanjiWorldVisit = null;
-function kanjiWorldEligible() {
+/** EVERYTHING-ON PROTOTYPE (inventory block 26): the kanji pages that lead to a kanji world, each with the character whose
+ * scene it is. Only 門 has a scene and a picture. The five others hold 門 inside them (kanji.json parts) and lead to 門's
+ * own scene, named as such on their door; a scene of their own needs one content packet and one picture each */
+const KANJI_WORLD_SCENES = Object.freeze({
+  門: Object.freeze({ content: './kanji-world/rajomon-content.json', image: './kanji-world/rajomon-r1.png' }),
+});
+const KANJI_WORLD_DOORS = Object.freeze({ 門: '門', 間: '門', 聞: '門', 問: '門', 開: '門', 閉: '門' });
+/** with no kanji, as before: whether a world may open from here. With a kanji: the character whose scene that kanji's page
+ * leads to, or false */
+function kanjiWorldEligible(id) {
   const exploration = new Set(['entry', 'reader', 'kanjidex', 'search', 'levels']);
   const graded = new Set(['review', 'lessons', 'mock', 'tests', 'probe', 'deckplay', 'aiquiz', 'guided', 'sentence-practice', 'contextdeck']);
-  return exploration.has(S.view) && !personalHost && !learningSourceVisit && !S.focus &&
+  const open = exploration.has(S.view) && !personalHost && !learningSourceVisit && !S.focus &&
     kanjiReadingsState() !== 'pending' &&
     !S.navigationReturns.some(frame => frame.kanjiCourseReturn || frame.learningSourceVisit || graded.has(frame.view));
+  if (id === undefined) return open;
+  return open && Object.hasOwn(KANJI_WORLD_DOORS, id) ? KANJI_WORLD_DOORS[id] : false;
 }
 function openKanjiWorldEncounter(invoker, node) {
-  if (kanjiWorldVisit || node.id !== '門' || !kanjiWorldEligible()) return;
+  const scene = KANJI_WORLD_SCENES[kanjiWorldEligible(node.id)];
+  if (kanjiWorldVisit || !scene) return;
   const epoch = recordEpoch;
   const origin = { view: S.view, node: S.stack.at(-1), x: window.scrollX, y: window.scrollY };
   const dialog = document.createElement('dialog');
@@ -31209,7 +31221,7 @@ function openKanjiWorldEncounter(invoker, node) {
   document.body.append(dialog); dialog.showModal(); document.body.style.overflow = 'hidden';
   Promise.all([
     import('./kanji-world-encounter.mjs'),
-    fetch('./kanji-world/rajomon-content.json', { signal: controller.signal }).then(response => {
+    fetch(scene.content, { signal: controller.signal }).then(response => {
       if (!response.ok) throw new Error('Encounter content unavailable');
       return response.json();
     }),
@@ -31217,7 +31229,7 @@ function openKanjiWorldEncounter(invoker, node) {
     if (!current()) { close(false); return; }
     body.replaceChildren();
     encounter = module.createKanjiWorldEncounter({ container: body, content,
-      imageUrl: new URL('./kanji-world/rajomon-r1.png', import.meta.url).href,
+      imageUrl: new URL(scene.image, import.meta.url).href,
       language: bi() ? 'en' : 'ja',
       isCurrent: current, onReturn: () => close() });
   }).catch(error => {
