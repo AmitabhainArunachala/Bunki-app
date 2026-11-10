@@ -7,7 +7,7 @@ import { adjacentScaleOutTarget, backupCounts, keepSentencePracticeFocusVisible,
 import { GRAMMARS, activateKanjiFamily, activateKanjiStructure, animcjkGlyphFor, clearStoryHero, heroOf, inkCeremony, inkSpecFor, inkStrokeMs, joyoOnNote, kanjiCourseEntryNode, kanjiCourseEvidencePatch, kanjiCourseNodeUnit, kanjiCourseReferenceHelp, kanjiCourseReturnFrame, kanjiCourseTeachingHelp, kanjiEnterCourseDoor, kanjiFamilyAuthorize, kanjiFamilyCitations, kanjiFamilyControlId, kanjiFamilyCourseExpectation, kanjiFamilyHasExampleOrigin, kanjiFamilyLiveVisit, kanjiFamilyRefusal, kanjiFamilyStatus, kanjiFinderUniverse, kanjiQuestBound, kanjiQuestLine, kanjiQuestOpen, kanjiQuestQuote, kanjiQuestRedraw, kanjiQuestRender, kanjiQuestRunStarted, kanjiQuestSeed, kanjiQuestSelfCheck, kanjiQuestSettle, kanjiQuestStage, kanjiQuestStructural, kanjiQuestSummary, kanjiReference, kanjiReferenceView, kanjiSlipReading, kankenLevels, kdxFrequencyHits, kdxGlyphName, kdxGridShown, kdxLoadFailed, kdxPartHits, kdxRadicalResults, kdxTextResults, kkldLine, kkldNumberGlyphs, kkldOf, nameStoryHero, openKanjiRooms, paintStrokes, paintTok, renderGrammarNode, renderIdiomNode, renderKanjiFamilyDisclosure, renderKanjiNode, renderKanjiRoomChooser, renderKdxDraw, renderParticleNode, renderRadicalNode, renderSentenceNode, sentenceDoor, sentenceDraftCopyButton, sentenceDraftInputMatches, sentenceDraftStatus, sentenceKept, sentencePracticeError, sentenceSource, storyAccent, storyBlock, storyDate, storyHeroArriving, storyHeroOnScreen, storyInstrument, storyKicker, storyLede, storyLevel, storyPicture, storyPictureSource, storySeries, storyVersions, storyYourWords, strokeAwakeField, strokeClassicReadings, strokeClassificationLine, strokeControl, strokeMissing, strokeReadingField, strokeReferenceStatus, strokeRoomRecord, strokeStart, worldName, worldPickerEsc, wwDefault, wwExcerpt, wwInkLabel, wwKanjiPassage, wwLearn, wwMine, wwModel, wwOpenPassage, wwPassages, wwPush, wwReadingChoices, wwRecentre, wwSlipNode, wwValid } from './modules/worlds.mjs';
 import { approvedNarrationManifest, availableSentenceListeningCue, excerptListenLabel, paintListenProgress, receivedPracticeAlternativeLabel, receivedPracticeLoadKey, reconcileAssessmentResults, reconcileSheetActionLines, recordFrameRow, recordNoteEditable, recordNoteExpected, recordPickerSurface, recordSha256, recordSyncStatus, recordUnavailable, recordViewSurface, refreshListenRow, resolveSentenceListeningCue, speakChip, speakGateEvidence, speakSentence, stopReadAloud, transcriptRangeLabel, voiceForRole, voicePendingNote } from './modules/voice.mjs';
 import { maintenanceScreenName, meSection, mergeGrammar, portableRecord, primaryTabs, readRecordDrafts, renderLayoutChoice, renderMe, renderWritingChoice, showRecordBackup, stampRegister, storedArchiveRow, syncTrayCount, themeId, themeIx, updateMeasurements, validArchiveRows, validArchiveTurn, validImportJournal, validStoredArchiveRows } from './modules/learner.mjs';
-import { byLeadingDrops, byNewest, dateStamp, dayKey, depthBasisParts, depthDot, depthNodeOf, helpByMonth, landOnKeptWords, leadingDropDays, localDayOrdinal, localMonthKey, luminance, monthKey, monthLabel, notYetMarks, readerDateStamp, renderDrift, renderKagami, renderTodayLine, renderTodayWord, roughestThisWeek, startOfDay, syncDriftTheme, todayCity, todayDateline, todayDueKeys, todayHash, todayKanji, todayLearning, todayPartStrokes, todayPlaceSky, todayReadPick, todayRedrawSky, todaySecondsPerCard, todaySharedPart, todaySkyWhy, todaySkyWord, trayLine } from './modules/drift.mjs';
+import { byLeadingDrops, byNewest, dateStamp, dayKey, depthBasisParts, depthDot, depthNodeOf, helpByMonth, landOnKeptWords, leadingDropDays, localDayOrdinal, localMonthKey, luminance, monthKey, monthLabel, notYetMarks, readerDateStamp, renderDrift, renderKagami, renderTodayLine, renderTodayWord, roughestThisWeek, startOfDay, syncDriftTheme, todayCity, todayDateline, todayHash, todayKanji, todayLearning, todayPlaceSky, todayReadPick, todayRedrawSky, todaySecondsPerCard, todaySkyWhy, todaySkyWord, trayLine } from './modules/drift.mjs';
 import { articleFingerprint, catalogLabel, feedDate, levelChip, levelPhrase, libraryDiscoverable, libraryVisibilityPolicy, openReferenceEntry, placeSealStrip, publisherLink, readerChoiceMatch, readerChoiceTokenHolds, readerEntryNode, referenceCollectionChip, refreshReadingPlacesSurface, renderCatalogNode, renderPublisherContextSelection, renderReaderChoice, renderReaderChoiceNote, renderReferenceMetadata, renderReferenceNode, resolveReadingPlace, searchRowShownByCore, shelfBodyToken, shelfCurrentDay, shelfDailyOrder, shelfDateline, shelfStories, shelfTallyText } from './modules/library.mjs';
 import { activeTeacherContext, aiAsk, aiChatTurns, aiCreateCards, aiKey, aiProvider, aiQuizParse, aiReadingSegments, aiRequestTimeoutMs, aiTeachingSubject, aiTransport, askOnRequest, canonicalAiBaseUrl, refreshTeacherChatHistory, renderAiCoach, renderAiExamples, renderAiTutor, sizeTeacherQuestion, teacherChatStatus, teacherDoorKey, teacherDraftCopyButton, teacherDraftStatus, teacherSentence, teacherSourceError, teacherWindowDraftKey, validAiEvidenceTurn } from './modules/teacher.mjs';
 
@@ -14614,38 +14614,126 @@ const TODAY_JA_WORD = /^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}ー
 /** The one part every kanji of the word carries, from D.kanji parts only, and that is every one's radical; the part
  * with the most strokes wins, so 隹 outranks the 亻 hiding inside it. */
 /** A kanji's own radical, when the kanji's parts name it (海 → 氵): the one part of a single kanji worth a hook. */
-/** Every card the learner meets today: today's queue plus anything whose due falls before midnight. */
-let todayFreshPool = null;
-/** The day's word: one of the learner's saved words that is NOT due today (gate 1), else a fresh
- * graded word they have not saved. Deterministic per date; words whose kanji share a part first. */
+/** The words he marked "I know this" on their own page (met.entries[key].said.value 'known'), by spelling. Pure. */
+function todayKnownWords(record = S) {
+  const known = new Set();
+  if (!metReadable(record?.met)) return known;
+  for (const [key, entry] of Object.entries(record.met.entries)) {
+    if (!plainRecord(entry) || !plainRecord(entry.said) || entry.said.value !== 'known') continue;
+    let parsed;
+    try { parsed = JSON.parse(key); } catch { parsed = null; }
+    if (Array.isArray(parsed) && parsed[0] === 1 && parsed[1] === 'word' && nonEmptyString(parsed[2])) known.add(parsed[2]);
+  }
+  return known;
+}
+/** The day's word, from his own study, with the reason it is there (John, 2026-11-10: "how is the word connected to
+ * the user or the study or progress?"). The first rule that yields a word wins:
+ *   missed  a word card due today whose latest answer was wrong, given before today: the latest such miss
+ *   saved   the word he saved last, before today, and has not studied (no schedule, no review)
+ *   read    a word of today's reading (todayReadPick) he has neither marked "I know this" nor saved: N1 and N2 words
+ *           first, then N3, then the rest
+ *   deck    the next new word of the deck he studies (todayDeckNext, read from the deck's own ledger)
+ * Decided from the date and the record, never by chance: within a rule the word that ranks first by the day's hash
+ * wins, so it holds all day, saving or studying another word leaves it standing, and saving or studying it moves the
+ * next load on to the next candidate. Reads the record only; writes nothing. */
 function todayWordOfDay(today) {
   const day = dayKey();
-  const blocked = todayDueKeys(today);
-  const reading = (w) => D.dict?.[w]?.r || D.words?.[w]?.r || '';
+  const dayStart = startOfDay(new Date());
+  const dayEnd = dayStart + 86400000;
   // G2 · R's identity: a saved word is read as he saved it — its card's own answer (年 kept as ねん is ねん, never the
   // spelling's とし); a saved word whose answer cannot be confirmed shows no reading rather than another one
   const savedReading = (w) => { const answer = savedAnswerFor({ t: 'word', id: w }); return answer?.status === 'available' ? answer.reading || '' : ''; };
-  // a shared part of some weight (隹, 言, 門) makes the best hook; a bare 一 or 八 the weakest
-  const tierOf = (w) => {
-    const ks = todayKanji(w);
-    const part = todaySharedPart(ks);
-    return part && todayPartStrokes(part) >= 4 ? 0 : part ? 1 : ks.length >= 2 ? 2 : ks.length ? 3 : 4;
+  const saved = new Map();
+  for (const item of S.taken) {
+    if (item.t !== 'word' || !TODAY_JA_WORD.test(item.id) || S.suspended?.[srsKey('word', item.id)]) continue;
+    const ts = Number.isFinite(item.ts) ? item.ts : 0;
+    // a word in several lists is one word, saved when it was first saved
+    if (!saved.has(item.id) || ts < saved.get(item.id).ts) saved.set(item.id, { item, ts });
+  }
+  const savedPick = (from, word, at) => ({ word, reading: savedReading(word), from, at, item: saved.get(word).item });
+  // a · each card's latest answer, undone answers taken out (an undo row names the row it takes back)
+  const log = Array.isArray(S.revlog) ? S.revlog : [];
+  const revoked = new Set();
+  for (const row of log) if (Array.isArray(row) && row[2] === 0) revoked.add(row[3]);
+  const latest = new Map();
+  log.forEach((row, i) => {
+    if (!Array.isArray(row) || !(row[2] >= 1 && row[2] <= 4) || revoked.has(i) || !String(row[1]).startsWith('word:')) return;
+    if (!latest.has(row[1]) || row[0] >= latest.get(row[1])[0]) latest.set(row[1], row);
+  });
+  let missed = null;
+  for (const word of saved.keys()) {
+    const key = srsKey('word', word);
+    const row = latest.get(key);
+    if (!row || row[2] !== 1 || !(row[0] < dayStart) || !(Date.parse(S.srs?.[key]?.due) < dayEnd)) continue;
+    if (!missed || row[0] > missed.at || (row[0] === missed.at && word < missed.word)) missed = { word, at: row[0] };
+  }
+  if (missed) return savedPick('missed', missed.word, missed.at);
+  // b · saved before today and never studied: the latest
+  let kept = null;
+  for (const [word, { ts }] of saved) {
+    if (ts >= dayStart || wordStudied(S, word)) continue;
+    if (!kept || ts > kept.ts || (ts === kept.ts && word < kept.word)) kept = { word, ts };
+  }
+  if (kept) return savedPick('saved', kept.word, kept.ts || null);
+  // c · today's reading: a content word the core dictionary knows, his level's first; the day's hash orders each tier
+  const forms = todayReadPick()?.passage?.readingFacets?.forms || [];
+  const known = todayKnownWords();
+  const taken = new Set(S.taken.filter((item) => item.t === 'word').map((item) => item.id));
+  const tier = (w) => {
+    const level = Number(D.words?.[w]?.jlpt) || Number(String(D.dict[w]?.jlpt || '').replace(/^N/u, '')) || 0;
+    return level === 1 || level === 2 ? 0 : level === 3 ? 1 : level ? 3 : 2;
   };
-  const choose = (list, from) => {
-    if (!list.length) return null;
-    const tiers = list.map((w) => [w, tierOf(w)]);
-    const best = Math.min(...tiers.map(([, t]) => t));
-    if (best > 3) return null;
-    const tier = tiers.filter(([, t]) => t === best).map(([w]) => w).sort();
-    const word = tier[todayHash(`${day}:${from}`) % tier.length];
-    return { word, reading: from === 'saved' ? savedReading(word) : reading(word), from, item: S.taken.find((i) => i.t === 'word' && i.id === word) || null };
-  };
-  const savedIds = new Set(S.taken.filter((i) => i.t === 'word').map((i) => i.id));
-  const saved = [...savedIds].filter((w) => !blocked.has(srsKey('word', w)) && TODAY_JA_WORD.test(w) && savedReading(w));
-  const fromSaved = choose(saved, 'saved');
-  if (fromSaved) return fromSaved;
-  todayFreshPool ||= Object.keys(D.words || {}).filter((w) => TODAY_JA_WORD.test(w) && todaySharedPart(todayKanji(w)));
-  return choose(todayFreshPool.filter((w) => !savedIds.has(w)), 'fresh');
+  let read = null;
+  for (const w of forms) {
+    const n = [...w].length;
+    if (n < 2 || n > 4 || !/\p{Script=Han}/u.test(w) || !TODAY_JA_WORD.test(w) || !D.dict?.[w] || taken.has(w) || known.has(w)) continue;
+    const rank = [tier(w), todayHash(`${day}:${w}`)];
+    if (!read || rank[0] < read.rank[0] || (rank[0] === read.rank[0] && rank[1] < read.rank[1])) read = { word: w, rank };
+  }
+  if (read) return { word: read.word, reading: D.dict[read.word].r || '', from: 'read', item: null };
+  // d · the deck he studies, its next new word (arrives once the deck has loaded; Today draws it then)
+  const next = todayDeckNext();
+  if (next?.term && TODAY_JA_WORD.test(next.term)) return { word: next.term, reading: next.reading || '', from: 'deck', deck: next.deck, item: null };
+  return null;
+}
+/* d · the deck he studies, read through the deck player from its own ledger (read only): of the three word decks
+ * (LEARN_STAGE_DECKS) the one he answered in last, else the first, and the next word it would bring him new. The answer
+ * is kept for the ledgers it was read from, so a sitting in the deck moves it on; Today draws it in place when it comes. */
+let todayDeckAsk = null;
+function todayDeckNext() {
+  if (window.__CORRIDOR_STANDALONE__ === true || sharedStudyActive()) return null;
+  const ids = LEARN_STAGE_DECKS.map(([id]) => id);
+  let print = dayKey();
+  try {
+    for (const id of ids) {
+      const raw = localStorage.getItem(`bunki-cloze:${id}`);
+      print += `|${raw ? `${raw.length}:${raw.slice(-48)}` : '-'}`;
+    }
+  } catch { /* storage may be blocked */ }
+  if (todayDeckAsk?.print === print) return todayDeckAsk.word;
+  const asked = { print, word: null };
+  todayDeckAsk = asked;
+  loadDeckPlayer()
+    .then((mod) => mod.nextNewWord?.(ids))
+    .then((word) => {
+      if (!word || todayDeckAsk !== asked) return;
+      asked.word = word;
+      todayDrawLateWord();
+    })
+    .catch(() => {});
+  return null;
+}
+/** The day's word that arrived after Today was drawn (the deck's): its sky and its word, in their places, never by a
+ * full render and never under an open card. */
+function todayDrawLateWord() {
+  const hero = document.querySelector('#app main .today-hero');
+  if (S.view !== 'tray' || S.stack.length || !hero || hero.querySelector('.today-dayword') || document.getElementById('mini')) return;
+  const today = S.taken.length && scheduler ? todayQueue() : null;
+  const pick = todayWordOfDay(today);
+  if (!pick) return;
+  hero.querySelector('#today-universe')?.before(todaySky(pick.word, today, todayReadPick()));
+  hero.append(renderTodayWord(pick));
+  todayPlaceSky(hero);
 }
 /** The hook of wonder, from data: the part the word's kanji share, how many kanji carry it, and
  * how many of those already stand in the learner's own words. */
@@ -21308,8 +21396,153 @@ function ensureKkld() {
   }
   return kkldPromise;
 }
-/** The kanji one Kodansha number names in one edition: every glyph the table maps, none filtered by the core
- * layer (K04 · #8 is 胤 in both editions; a glyph outside kanji.json opens its KANJIDIC2 entry). */
+/** One edition's kanji in the book's order, [number, kanji] (2013: 2,904 between 1 and 3,002; 1999: 2,230). */
+let kkldOrderMemo = null;
+function kkldOrder(ed) {
+  if (kkldOrderMemo?.table !== D.kkld) kkldOrderMemo = { table: D.kkld };
+  if (!kkldOrderMemo[ed]) {
+    const table = (ed === 'ed1999' ? D.kkld?.byNumber1999 : D.kkld?.byNumber2013) || {};
+    kkldOrderMemo[ed] = Object.entries(table).flatMap(([n, glyphs]) => glyphs.map((c) => [Number(n), c])).sort((a, b) => a[0] - b[0]);
+  }
+  return kkldOrderMemo[ed];
+}
+/** His kanji, as the record already knows them: in his saved words or saved themselves (wwMine), and met — in a word he
+ * opened (met) or a word or kanji he looked up (obslog taps). Reads the record only. */
+function kkldMarks() {
+  const saved = wwMine().kanji;
+  const met = new Set();
+  const take = (text) => { for (const c of String(text || '')) if (/\p{Script=Han}/u.test(c)) met.add(c); };
+  if (metReadable(S.met)) {
+    for (const key of Object.keys(S.met.entries)) {
+      try { const parsed = JSON.parse(key); if (Array.isArray(parsed) && parsed[1] === 'word') take(parsed[2]); } catch { /* not a key this build reads */ }
+    }
+  }
+  for (const row of S.obslog || []) if (Array.isArray(row) && row[1] === 'tap') take(String(row[2] || '').replace(/^[a-z]+:/u, ''));
+  return { saved, met };
+}
+/** The Kodansha map (John, 2026-11-10: "keep it but simplify and make it connect to something logical behind like the
+ * entire Kodansha map and Kodansha style navigation"): every kanji of one edition in the book's order, one grid read in
+ * rows, a small number at 1 and at every hundred, his kanji marked (data-mine saved | met). Only the rows near the view
+ * are drawn, so 2,904 cells scroll as freely as forty. light(n) lights number n (null: none) and brings it into view. */
+const KKLD_MAP_CELL = 46;
+const KKLD_MAP_GAP = 4;
+function renderKkldMap(host, ed, marks) {
+  const order = kkldOrder(ed);
+  const indexOf = new Map(order.map(([n], i) => [n, i]));
+  host.append(el('p', 'eyebrow kdx-kkld-map-head', tx(`講談社の番号順・${order.length.toLocaleString('en')} 字`,
+    `Kodansha order · ${order.length.toLocaleString('en')} kanji`)));
+  const box = el('div', 'kdx-kkld-map');
+  box.id = 'kdx-kkld-map';
+  box.setAttribute('role', 'group');
+  box.setAttribute('aria-label', tx('講談社の番号順のすべての字', 'every kanji in Kodansha order'));
+  const field = el('div', 'kdx-kkld-map-field');
+  box.append(field);
+  host.append(box);
+  const drawn = new Map();
+  let cols = 0;
+  let cell = KKLD_MAP_CELL;
+  let pitch = KKLD_MAP_CELL + KKLD_MAP_GAP;
+  let width = 0;
+  let lit = null;
+  let seek = null;
+  let frame = 0;
+  let span = '';
+  const cellAt = (i) => {
+    const [n, c] = order[i];
+    const b = el('button', 'kdx-glyph kdx-kkld-cell', c);
+    b.type = 'button';
+    b.lang = 'ja';
+    b.dataset.kdxHit = c;
+    b.dataset.kkld = String(n);
+    b.dataset.kkldEd = ed;
+    if (n === 1 || n % 100 === 0) b.dataset.mark = String(n);
+    const mine = marks?.saved?.has(c) ? 'saved' : marks?.met?.has(c) ? 'met' : '';
+    if (mine) b.dataset.mine = mine;
+    b.setAttribute('aria-label', `${n} ${kdxGlyphName(c)}`);
+    // the map keeps his place: Back from the kanji finds this number lit
+    b.addEventListener('click', () => { S.kdx.kkldQ = String(n); go({ t: 'kanji', id: c }, { invoker: b }); });
+    return b;
+  };
+  const place = (b, i) => {
+    b.style.width = `${cell}px`;
+    b.style.height = `${cell}px`;
+    b.style.transform = `translate(${((i % cols) * pitch).toFixed(1)}px, ${(Math.floor(i / cols) * pitch).toFixed(1)}px)`;
+    b.classList.toggle('is-lit', order[i][0] === lit);
+    if (order[i][0] === lit) b.setAttribute('aria-current', 'true');
+    else b.removeAttribute('aria-current');
+  };
+  // the columns fill the box's width; the field is as tall as every row, so the box scrolls over the whole order
+  const layout = () => {
+    const w = box.clientWidth;
+    if (!w) return false;
+    if (w === width && cols) return true;
+    width = w;
+    cols = Math.max(1, Math.floor((w + KKLD_MAP_GAP) / (KKLD_MAP_CELL + KKLD_MAP_GAP)));
+    cell = Math.floor(((w + KKLD_MAP_GAP) / cols - KKLD_MAP_GAP) * 10) / 10;
+    pitch = cell + KKLD_MAP_GAP;
+    field.style.height = `${Math.ceil(order.length / cols) * pitch - KKLD_MAP_GAP}px`;
+    span = '';
+    for (const [i, b] of drawn) place(b, i);
+    return true;
+  };
+  const paint = () => {
+    frame = 0;
+    if (!box.isConnected || !layout()) return;
+    if (seek != null) {
+      const i = indexOf.get(seek);
+      seek = null;
+      // the lit row a third of the way down the part of the box he can see (the window's foot and a bar fixed there,
+      // the rooms' tabs, cut it short), so the numbers before it stay in sight
+      if (i != null) {
+        const r = box.getBoundingClientRect();
+        let floor = innerHeight;
+        for (let n = document.elementFromPoint(r.left + r.width / 2, innerHeight - 2); n && n !== document.body; n = n.parentElement) {
+          if (box.contains(n)) break;
+          if (getComputedStyle(n).position === 'fixed') { floor = Math.min(floor, n.getBoundingClientRect().top); break; }
+        }
+        const from = Math.max(r.top, 0);
+        const seen = Math.min(r.bottom, floor) - from;
+        const at = seen > pitch ? from - r.top + (seen - pitch) / 3 : box.clientHeight / 3;
+        box.scrollTop = Math.max(0, Math.floor(i / cols) * pitch - at);
+      }
+    }
+    const top = box.scrollTop;
+    const first = Math.max(0, Math.floor(top / pitch) - 3) * cols;
+    const last = Math.min(order.length, (Math.ceil((top + box.clientHeight) / pitch) + 3) * cols);
+    if (span === `${first}:${last}`) return;
+    span = `${first}:${last}`;
+    for (const [i, b] of drawn) if (i < first || i >= last) { b.remove(); drawn.delete(i); }
+    const rows = [];
+    for (let i = first; i < last; i += 1) {
+      let b = drawn.get(i);
+      if (!b) { b = cellAt(i); place(b, i); drawn.set(i, b); }
+      rows.push(b);
+    }
+    // in the book's order in the document too, so Tab walks the numbers in order
+    field.replaceChildren(...rows);
+  };
+  const soon = () => { if (!frame) frame = requestAnimationFrame(paint); };
+  box.addEventListener('scroll', soon, { passive: true });
+  const watch = new ResizeObserver(() => {
+    if (!box.isConnected) { watch.disconnect(); return; }
+    if (lit != null && box.clientWidth !== width) seek = lit;
+    paint();
+  });
+  watch.observe(box);
+  return {
+    light(n) {
+      lit = Number.isFinite(n) ? n : null;
+      for (const [i, b] of drawn) place(b, i);
+      if (lit != null) seek = lit;
+      if (box.isConnected && box.clientWidth) paint();
+      else soon();
+    },
+  };
+}
+/** The Kodansha lens: the number field and the edition switch over the whole map (renderKkldMap). A number lights its
+ * kanji and brings it into view; a typed kanji says its numbers and lights itself. Every glyph the table maps is on the
+ * map, none filtered by the core layer (K04 · #8 is 胤 in both editions; a glyph outside kanji.json opens its KANJIDIC2
+ * entry). */
 function renderKdxKkld(main) {
   main.append(withEn(el('p', 'eyebrow', 'Kodansha 番号'), "Kodansha Kanji Learner's Dictionary entry number", 'en-inline'));
   const edRow = el('div', 'kdx-row');
@@ -21338,60 +21571,55 @@ function renderKdxKkld(main) {
   inp.value = S.kdx.kkldQ || '';
   const out = el('div');
   out.id = 'kdx-kkld-results';
+  // what the query found, in words, over the map; the map is drawn once and only lit again as he types
+  const said = el('div', 'kdx-kkld-said');
+  let map = null;
   const paintKkld = () => {
-    out.textContent = '';
+    said.textContent = '';
     const q = (S.kdx.kkldQ || '').trim();
     // K06 · the number table still on its way, or failed: said in the results, the typed query kept, and the
     // retry (or the arrival) answers that same query in place
     if (!D.kkld) {
+      out.replaceChildren(said);
       if (kkldError && !kkldPromise) {
-        kdxLoadFailed(out, 'kdx-kkld-retry', '番号表を読み込めなかった。', 'The Kodansha number table could not be loaded.', ensureKkld);
+        kdxLoadFailed(said, 'kdx-kkld-retry', '番号表を読み込めなかった。', 'The Kodansha number table could not be loaded.', ensureKkld);
         return;
       }
       const loading = el('p', 'sem-empty', tx('番号表を読み込み中…', 'loading the number table…'));
       loading.dataset.kdxLoad = 'pending';
-      out.append(loading);
+      said.append(loading);
       ensureKkld().then(() => {
         if (out.isConnected) paintKkld();
       });
       return;
     }
+    const ed = S.kdx.kkldEd || 'ed2013';
+    if (!map) {
+      out.replaceChildren(said);
+      map = renderKkldMap(out, ed, kkldMarks());
+    }
+    let lit = null;
     if (!q) {
-      out.append(el('p', 'fine', tx(
+      said.append(el('p', 'fine', tx(
         `${(D.kkld.counts?.ed2013 || 0).toLocaleString()} 字に 2013年版の番号、${(D.kkld.counts?.ed1999 || 0).toLocaleString()} 字に 1999年版の番号。2022年版の番号は載せていない。`,
         `${(D.kkld.counts?.ed2013 || 0).toLocaleString()} kanji carry a 2013 number, ${(D.kkld.counts?.ed1999 || 0).toLocaleString()} a 1999 number. The 2022 printing's numbers are not included.`,
       )));
-      return;
-    }
-    const ed = S.kdx.kkldEd || 'ed2013';
-    if (/^\d+$/.test(q)) {
+    } else if (/^\d+$/.test(q)) {
       const chars = kkldNumberGlyphs(ed, q);
-      renderKdxGrid(out, chars, 20, `kkld:${ed}:${q}`, { mark: (b) => { b.dataset.kkld = q; b.dataset.kkldEd = ed; } });
-      if (!chars.length) out.append(el('p', 'fine', tx('この番号の字はこの版にない。', 'No kanji carries that number in this edition.')));
-      // tighten pass (John, 2026-11-10: "the entire Kodansha map and Kodansha style navigation"): the numbers around this
-      // one in the book's order, each glyph a door and its number beside it, so a number opened from a kanji page lands
-      // among its neighbours
-      const n = Number(q), numberOf = new Map();
-      for (let i = Math.max(1, n - 6); i <= n + 6; i += 1) {
-        if (i !== n) for (const c of kkldNumberGlyphs(ed, i)) if (!numberOf.has(c)) numberOf.set(c, i);
+      if (chars.length) lit = Number(q);
+      for (const c of chars) said.append(el('p', 'fine', `${c} · ${kkldLine(c)}`));
+      if (!chars.length) said.append(el('p', 'fine', tx('この番号の字はこの版にない。', 'No kanji carries that number in this edition.')));
+    } else {
+      // a typed kanji is looked up whether or not the core layer holds it (胤 has its numbers too); the first with a
+      // number in this edition is lit
+      const chars = [...new Set([...q])].filter((c) => kkldOf(c) || D.kanji[c] || kanjiReference(c));
+      for (const c of chars) {
+        const line = kkldLine(c);
+        said.append(el('p', 'fine', `${c} · ${line || tx('Kodansha 番号なし', 'no Kodansha number')}`));
+        lit ??= kkldOf(c)?.[ed] ?? null;
       }
-      if (numberOf.size) {
-        const near = el('div', 'kdx-kkld-near');
-        renderKdxGrid(near, [...numberOf.keys()], 20, '', { empty: false, mark: (b, c) => { b.dataset.kkld = String(numberOf.get(c)); b.dataset.kkldEd = ed; } });
-        const span = [...numberOf.values()];
-        near.querySelector('.eyebrow').textContent = tx(`講談社の番号順 ${Math.min(...span)}〜${Math.max(...span)}`,
-          `Nearby in Kodansha order · ${Math.min(...span)}–${Math.max(...span)}`);
-        out.append(near);
-      }
-      return;
     }
-    // a typed kanji is looked up whether or not the core layer holds it (胤 has its numbers too)
-    const chars = [...new Set([...q])].filter((c) => kkldOf(c) || D.kanji[c] || kanjiReference(c));
-    renderKdxGrid(out, chars, 20, `kkld:${ed}:${q}`);
-    for (const c of chars) {
-      const line = kkldLine(c);
-      out.append(el('p', 'fine', `${c} · ${line || tx('Kodansha 番号なし', 'no Kodansha number')}`));
-    }
+    map.light(lit);
   };
   inp.addEventListener('input', () => {
     S.kdx.kkldQ = inp.value;
