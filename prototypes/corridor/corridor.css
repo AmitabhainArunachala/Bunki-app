@@ -440,7 +440,8 @@ body.ginga #drift-layer #hint.first-cue {
   position: fixed;
   inset: 0;
   z-index: 24;
-  background: transparent;
+  /* the page recedes while the gate's menu stands: the look's own ground, no blur */
+  background: color-mix(in srgb, var(--color-ground) 35%, transparent);
 }
 
 /* the ghost world-seal, upper right — super faint until touched, then it wakes

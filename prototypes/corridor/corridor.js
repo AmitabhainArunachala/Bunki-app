@@ -35093,7 +35093,7 @@ function buildGateMenu(root, over = false) {
   const more = el('div', 'nav-stations nav-more');
   // Review with today's due count, one tap into Today; at 0 the count steps away, the door stays. Where Review is one of
   // the five places (the layout under test) it is not said twice.
-  const review = navStation('nav-review', ['復習', 'Review'], null, () => {
+  const review = navStation('nav-review', ['復習', 'Review'], ['今日待っている札', 'Cards waiting today'], () => {
     readerTicketDeparture('tray');
     // Today's Back returns to the screen the menu stood over
     const from = !over ? { view: 'drift', scroll: 0 }
@@ -35105,15 +35105,15 @@ function buildGateMenu(root, over = false) {
     render();
     window.scrollTo(0, 0);
   }, { count: due });
-  review.setAttribute('aria-label', due ? tx(`復習 — 今日 ${due} 枚`, `Review — ${due} due today`) : tx('復習', 'Review'));
-  const dojo = navStation(null, ['集中道場', 'Focus'], null, () => {
+  if (due) review.setAttribute('aria-label', tx(`復習 — 今日 ${due} 枚`, `Review — ${due} due today`));
+  const dojo = navStation(null, ['集中道場', 'Focus'], ['時間を決めた稽古', 'A timed sitting'], () => {
     readerTicketDeparture('dojo');
     leave();
     S.view = 'dojo';
     render();
   });
   dojo.classList.add('nav-dojo');
-  const sensei = navStation(null, ['先生', 'Tutor'], null, () => {
+  const sensei = navStation(null, ['先生', 'Tutor'], ['日本語か英語で質問する', 'Ask in Japanese or English'], () => {
     leave();
     S.view = 'ai';
     render();
@@ -35123,9 +35123,9 @@ function buildGateMenu(root, over = false) {
   more.append(dojo, sensei);
   // 廻 Orbit word field (Meguri), a labelled preview: its host is modules/orbit-preview.mjs; its row keeps the door's id
   if (window.__CORRIDOR_STANDALONE__ !== true) {
-    const orbit = navStation('orbit-preview-door', ['廻 めぐり', 'Orbit'], null, () => {
+    const orbit = navStation('orbit-preview-door', ['廻 めぐり', 'Orbit'], ['つながる言葉の輪', 'A field of related words'], () => {
       import('./modules/orbit-preview.mjs').then((m) => m.openOrbitPreview({ tx })).catch((err) => console.warn('orbit preview unavailable', err));
-    }, { end: el('span', 'nav-station-v', tx('プレビュー', 'preview')) });
+    });
     orbit.setAttribute('aria-label', tx('廻 めぐり、ことばの輪。プレビュー', 'Orbit word field, preview'));
     more.append(orbit);
   }
@@ -35133,12 +35133,12 @@ function buildGateMenu(root, over = false) {
   const seal = el('span', 'theme-seal', THEME_UI[themeIx()].seal);
   seal.id = 'theme-seal';
   seal.setAttribute('aria-hidden', 'true');
-  const look = navStation('nav-look', ['配色', 'Look'], null, () => {}, { end: seal });
+  const look = navStation('nav-look', ['配色', 'Look'], ['アプリの色と紙', "The app's colours and paper"], () => {}, { end: seal });
   look.setAttribute('aria-label', `${tx('配色', 'Look')} — ${worldName(THEME_UI[themeIx()])}`);
   attachWorldPicker(look);
   // the language: one row, the language in use, one tap changes it (the redraw keeps the menu open)
   const ja = S.lang === 'ja';
-  const language = navStation('nav-lang', ['表示言語', 'Language'], null, () => {
+  const language = navStation('nav-lang', ['表示言語', 'Language'], ['英語か日本語', 'English or 日本語'], () => {
     S.lang = ja ? 'bi' : 'ja';
     render();
   }, { end: el('span', 'nav-station-v', ja ? '日本語' : 'EN'), door: false });

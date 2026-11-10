@@ -5233,12 +5233,19 @@ body:not(.zen) #app > .chrome > .lang-switch button:hover::before { background: 
   .gate-menu .nav-bar.gate-panel { top: calc(45px + env(safe-area-inset-top, 0px)); }
 }
 .gate-panel .nav-more { margin-top: 4px; border-top: var(--stroke-hairline) solid var(--color-edge-strong); }
-.gate-panel .nav-more .nav-station { min-height: 44px; }
 .gate-panel .nav-station[aria-current='page'] .nav-station-t { color: var(--color-ink); font-weight: 800; }
+/* the place you are in carries the square the tab bar's car is */
+.gate-panel .nav-station[aria-current='page'] .nav-station-t::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  background: var(--red, #b03a2e);
+  vertical-align: 0.08em;
+}
 .gate-panel .nav-station > :is(.nav-station-v, .theme-seal) { grid-area: n; }
 .gate-panel .nav-station-v { color: var(--color-muted); font: 500 var(--type-label)/1 var(--font-ui); }
-/* a row's mark (the prototype's new, on Orbit) sits under its name */
-.gate-panel .nav-station::after { grid-area: s; justify-self: start; }
 .gate-panel .nav-station > .theme-seal {
   width: 22px;
   height: 22px;
