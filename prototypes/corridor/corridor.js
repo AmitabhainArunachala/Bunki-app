@@ -35102,7 +35102,7 @@ function buildGateMenu(root, over = false) {
   if (window.__CORRIDOR_STANDALONE__ !== true) {
     const orbit = navStation('orbit-preview-door', ['廻 めぐり', 'Orbit'], null, () => {
       import('./modules/orbit-preview.mjs').then((m) => m.openOrbitPreview({ tx })).catch((err) => console.warn('orbit preview unavailable', err));
-    }, { end: el('span', 'nav-station-v', 'preview') });
+    }, { end: el('span', 'nav-station-v', tx('プレビュー', 'preview')) });
     orbit.setAttribute('aria-label', tx('廻 めぐり、ことばの輪。プレビュー', 'Orbit word field, preview'));
     more.append(orbit);
   }
