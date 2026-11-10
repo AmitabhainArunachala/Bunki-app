@@ -117,7 +117,9 @@ function hostDialogs() {
   return [...document.querySelectorAll('dialog[open]')].filter((d) => !root.contains(d) && !d.closest('#bunki-reports-root'));
 }
 function visibleHeading(dialog) {
-  const pick = (scope) => scope && [...scope.querySelectorAll('h1, h2, .headword, [role="heading"]')].find((n) => !root.contains(n) && seen(n));
+  // the screen's own name before any section's
+  const pick = (scope) => scope && ['h1, .headword, .view-title', 'h2, [role="heading"]']
+    .map((names) => [...scope.querySelectorAll(names)].find((n) => !root.contains(n) && seen(n))).find(Boolean);
   const found = pick(dialog) || pick(document.querySelector('#sheet')) || pick(document.querySelector('#app')) || pick(document.body);
   return found ? found.textContent.replace(/\s+/g, ' ').trim().slice(0, 120) : '';
 }
@@ -221,18 +223,18 @@ function openSheet(tab = active) {
   render();
   sheet.showModal();
   tabs.querySelector('[aria-current="page"]')?.focus();
-  if (active === 'notes') startPolling();
+  if (active === 'notes') loadNotes();
 }
 function closeSheet() { if (sheet.open) sheet.close(); }
 function onSheetClosed() {
-  stopPolling();
-  schedule();
-  if (!pointing) opener.focus({ preventScroll: true });
+  if (sheet.open || pointing) return; // closed to point at something: the sheet comes back by itself
+  keepReachable(); // the button shows again before it takes the focus back
+  opener.focus({ preventScroll: true });
 }
 function setTab(name) {
   active = name;
   render();
-  if (name === 'notes') startPolling(); else stopPolling();
+  if (name === 'notes') loadNotes();
   tabs.querySelector('[aria-current="page"]')?.focus();
 }
 function render() {
@@ -306,12 +308,11 @@ async function loadNotes() {
   }
   if (sheet.open && active === 'notes') renderNoteList();
 }
+/** one clock for the whole visit: it asks only while the sheet is open on the notes, so no close or reopen can stop it */
 function startPolling() {
-  stopPolling();
-  loadNotes();
-  pollTimer = setInterval(loadNotes, POLL_MS);
+  if (pollTimer) return;
+  pollTimer = setInterval(() => { if (sheet.open && active === 'notes') loadNotes(); }, POLL_MS);
 }
-function stopPolling() { clearInterval(pollTimer); pollTimer = null; }
 async function send() {
   const box = body.querySelector('#pl-text');
   const text = box.value.trim();
@@ -532,6 +533,7 @@ export function installPrototypeLayer(options) {
     schedule();
   }).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['open', 'inert', 'data-view', 'data-lang'] });
   window.addEventListener('resize', schedule);
+  startPolling();
   keepReachable();
   arrive();
 }
