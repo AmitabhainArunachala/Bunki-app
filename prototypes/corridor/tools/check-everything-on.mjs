@@ -304,6 +304,39 @@ for (const [name, kanji] of [['rajomon-ma', '間'], ['rajomon-bun', '聞'], ['ra
   });
 }
 
+await door('library', 'the bookshelf shows the 107 candidate readings after its own, each tagged', async ({ page }) => {
+  const label = await throughDoor(page, 'library');
+  must(await view(page) === 'shelf', `the door opened "${await view(page)}", not the bookshelf`);
+  await page.locator('.shelf-item').first().waitFor();
+  const shelf = await page.evaluate(() => {
+    const items = [...document.querySelectorAll('.shelf-item')];
+    const tagged = items.map((item, index) => (item.querySelector('.library-candidate-tag') ? index : -1)).filter((index) => index >= 0);
+    return { items: items.length, tagged: tagged.length, first: tagged[0], contiguous: tagged.every((index, n) => index === tagged[0] + n),
+      tag: items[tagged[0]]?.querySelector('.library-candidate-tag')?.textContent || '', title: items[tagged[0]]?.innerText.replace(/\s+/g, ' ').slice(0, 60) || '' };
+  });
+  must(shelf.tagged === 107, `${shelf.tagged} cards wear the candidate tag, not 107 (of ${shelf.items} cards)`);
+  must(shelf.contiguous && shelf.first + shelf.tagged === shelf.items, `the candidates do not stand together after the shelf's own readings (first at ${shelf.first} of ${shelf.items})`);
+  must(/candidate|候補/.test(shelf.tag), `the tag reads "${shelf.tag}"`);
+  const firstCandidate = page.locator('.shelf-item').nth(shelf.first);
+  await firstCandidate.scrollIntoViewIfNeeded();
+  await shot(page, 'library-shelf');
+  return `"${label}" → ${shelf.items} cards; cards ${shelf.first + 1} to ${shelf.items} wear "${shelf.tag}" (107), after the shelf's own ${shelf.first}; the first is "${shelf.title}"`;
+});
+
+await door('library-one', 'one candidate opens in the reader, tagged', async ({ page }) => {
+  const label = await throughDoor(page, 'library-one');
+  must(await view(page) === 'reader', `the door opened "${await view(page)}", not the reader`);
+  await page.locator('.reader .tok.content').first().waitFor();
+  const tag = (await page.locator('.reader-meta .library-candidate-tag').first().innerText()).trim();
+  must(/candidate|候補/.test(tag), `the reader's tag reads "${tag}"`);
+  const head = await text(page, '.reader-head', 160);
+  must(/去年の木/.test(await text(page, '#app', 2000)), `the reader does not show 去年の木: ${head}`);
+  const words = await page.locator('.reader .tok.content').count();
+  must(words > 20, `only ${words} words in the candidate`);
+  await shot(page, 'library-one');
+  return `"${label}" → the reader, tagged "${tag}", ${words} tappable words; its head reads "${head.slice(0, 90)}"`;
+});
+
 await door('orbit', 'the orbit word field opens from the galaxy menu and returns', async ({ page }) => {
   const label = await throughDoor(page, 'orbit');
   await page.locator('#ginga-symbol').click();
