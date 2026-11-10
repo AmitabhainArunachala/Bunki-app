@@ -41,6 +41,27 @@ export function voiceKeyOf(kind, id) {
   return isVoiceKey(key) ? key : 'word:bunki';
 }
 
+const KANJI = /[\p{Script=Han}々〆ヶ]/u;
+const WORD_BEFORE = /[\p{Script=Han}々〆ヶ\p{Script=Hiragana}\p{Script=Katakana}ー]+$/u;
+const BRACKETED_KANA = /[（(]([\p{Script=Hiragana}\p{Script=Katakana}ー]+)[）)]/gu;
+const hiragana = (text) => text.replace(/[ァ-ヶ]/gu, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0x60));
+/** The text that is SPOKEN: a reading in parentheses right after a word with kanji is left out, so the word is not
+ * said twice (the written tutor writes 機械（きかい）; 機械(きかい) the same). It counts as a reading only when it is kana
+ * alone, with no space, directly after the word, and ends with the word's own kana after its last kanji (食べる（たべる）).
+ * Anything else in parentheses stays: （笑）, （例：雨）, ねこ（ネコ）. What is shown is never changed. */
+export function withoutReadings(text) {
+  const source = String(text ?? '');
+  return source.replace(BRACKETED_KANA, (whole, reading, at) => {
+    const chars = [...(WORD_BEFORE.exec(source.slice(0, at))?.[0] || '')];
+    let last = -1;
+    chars.forEach((ch, i) => { if (KANJI.test(ch)) last = i; });
+    if (last < 0) return whole;
+    const tail = hiragana(chars.slice(last + 1).join(''));
+    const said = hiragana(reading);
+    return said.length > tail.length && said.endsWith(tail) ? '' : whole;
+  });
+}
+
 /** Text as sentences the server takes: canonical form, at most 400 code points each. */
 export function sentencesOf(text) {
   try { return splitSentences(normaliseSpeechText(String(text ?? ''))).map((piece) => ({ text: piece.text })); } catch { return []; }
@@ -94,7 +115,11 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
     const at = now();
     if (code === 'authentication-required') pairAgain = true;
     else if (code === 'budget-exhausted' || code === 'not-in-release') off = code;
-    else if (code === 'day-budget') blockedUntil['day-budget'] = (Math.floor(at / DAY) + 1) * DAY;
+    else if (code === 'day-budget') {
+      blockedUntil['day-budget'] = (Math.floor(at / DAY) + 1) * DAY;
+      // the line that says so names the server's own day ceiling: its figures are read (free) when it refuses
+      void refreshBudget();
+    }
     else if (code === 'request-rate-limit') blockedUntil['request-rate-limit'] = at + 60000;
     else if (code === 'network-failed' || code === 'voice-timeout') blockedUntil['network-failed'] = at + 15000;
   }
@@ -161,7 +186,8 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
   async function clipFor(sentence, voiceKey, signal) {
     if (sentence.recorded && typeof recorded === 'function') return { recorded: sentence.recorded, source: 'recorded' };
     let text = '';
-    try { text = normaliseSpeechText(sentence.text); } catch { /* not text */ }
+    // what is spoken: a reading in parentheses after its word is not said a second time (withoutReadings)
+    try { text = normaliseSpeechText(withoutReadings(sentence.text)); } catch { /* not text */ }
     // what the server would refuse as not Japanese (a line of Latin letters in an article) is passed over, never sent
     if (!text || !isJapaneseEnough(text)) return { skip: true, source: 'none', reason: 'not-japanese' };
     // a clip this device has kept plays at once, with no request, online or offline
@@ -295,7 +321,7 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
       const why = serverSkips(voiceKey);
       if (!why || text == null) return why;
       let normal = '';
-      try { normal = normaliseSpeechText(String(text)); } catch { /* not text */ }
+      try { normal = normaliseSpeechText(withoutReadings(String(text))); } catch { /* not text */ }
       const key = `${voiceKey}|${normal}`;
       let kept = false;
       try { kept = !!normal && (cache.has(key) || !!store?.has?.(key)); } catch { kept = false; }

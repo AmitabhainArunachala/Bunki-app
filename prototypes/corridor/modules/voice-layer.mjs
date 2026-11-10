@@ -19,7 +19,7 @@ import { isJapaneseEnough, normaliseSpeechText, splitSentences } from './nihongo
 import { createClipStore, createIndexedDbClipStorage } from './voice-clip-store.mjs';
 import { createDeviceTokenStore, createVoiceClient } from './voice-client.mjs';
 import { createArrivals, createReplyQueue, sameReply, serveReplies } from './voice-replies.mjs';
-import { SPEEDS, createVoiceSeam, sentencesOf, voiceKeyOf } from './voice-seam.mjs';
+import { SPEEDS, createVoiceSeam, sentencesOf, voiceKeyOf, withoutReadings } from './voice-seam.mjs';
 
 export const READER_RATES = Object.freeze([1, 1.25, 0.75]);
 const SKIP = new Set(['RT', 'RP', 'BUTTON', 'SCRIPT', 'STYLE', 'SVG', 'INPUT', 'TEXTAREA', 'SELECT']);
@@ -53,9 +53,11 @@ const JAPANESE_LETTER = /[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}]/
 /** Only the Japanese: text that is Japanese through and through is read as it stands; from a tutor's mixed reply
  * ("Use it like this: 雨が降っているのに、出かけました。") only the Japanese is read, and the English is left unread. */
 export function japaneseSentences(text) {
-  const whole = sentencesOf(text);
+  // a reading in parentheses after its word is left out first, so 機械(きかい) is never cut into two sentences
+  const spoken = withoutReadings(text);
+  const whole = sentencesOf(spoken);
   if (whole.length && whole.every((sentence) => isJapaneseEnough(sentence.text))) return whole;
-  const runs = String(text ?? '').match(JAPANESE_RUN) || [];
+  const runs = spoken.match(JAPANESE_RUN) || [];
   return runs.filter((run) => (run.match(JAPANESE_LETTER) || []).length >= 2).flatMap((run) => sentencesOf(run))
     .filter((sentence) => isJapaneseEnough(sentence.text));
 }
@@ -108,7 +110,13 @@ export function installVoiceLayer(host) {
       for (const listener of listeners) { try { listener(status); } catch { /* a listener's own fault */ } }
     },
   });
-  void client.ready().then(() => { for (const listener of listeners) listener(seam.status()); host.refreshListenRow?.(); });
+  // a paired device reads the budget (free) as the app opens, so a line naming a limit names the server's own figure,
+  // not a guess, whether or not Settings has been opened in this visit
+  void client.ready().then(() => {
+    for (const listener of listeners) listener(seam.status());
+    host.refreshListenRow?.();
+    if (client.paired()) void seam.refreshBudget();
+  });
 
   /** Inside his tap: the audio element is allowed to sound later, when the first clip has arrived. */
   function prime() {
