@@ -1986,7 +1986,7 @@ function renderKanjiNode(sheet, node) {
     sheet.append(worldDoor);
   }
   if (WORLDCRAFT_FORMS.has(node.id) && kanjiWorldEligible()) {
-    const craftDoor = el('button', 'chip kanji-world-door', tx(`「${node.id}」を部品から組み立てる · 試作`, `Build ${node.id} from its parts · preview`));
+    const craftDoor = el('button', 'chip worldcraft-door', tx(`「${node.id}」を部品から組み立てる · 試作`, `Build ${node.id} from its parts · preview`));
     craftDoor.id = 'worldcraft-door'; craftDoor.type = 'button';
     craftDoor.addEventListener('click', () => openWorldcraftDoor(craftDoor, node));
     sheet.append(craftDoor);
