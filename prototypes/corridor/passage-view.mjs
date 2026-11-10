@@ -7,6 +7,9 @@
  *    the schedule or the help record, and the model's reductions carry no effects.
  *  - The walk lives in page memory. Return keeps the place through the model's own
  *    interrupt and resume, bound to the page it was opened from; a reload forgets it.
+ *  - A kanji page opened from a word in a reading hands that occurrence to the model as its
+ *    carried word, when the word is one of the family's own (職業, 知識, 組織). The model copies
+ *    it and checks it; any other way in carries nothing.
  *  - No mechanics are added. Each control is one reducePassage command (next, play, pause,
  *    replay, motion); the interval below is the host timer the model's motion ticket expects.
  *
@@ -19,11 +22,12 @@ const TICK_MS = 100;
 // Identities the model compares and never reads into.
 const HOST = Object.freeze({}), BOOT = Object.freeze({}), VIEW = Object.freeze({}), NO_FRAME = Object.freeze({});
 
-let host = null; // { state, epoch, tx }: the live app, as the latest door mount handed it over
+let host = null; // { state, epoch, tx, sentence }: the live app, as the latest door mount handed it over
 let sources = null; // the admitted catalog, its route and what the stops show
 let loading = null;
 let owner = null;
 let ride = null; // { page, node, held }: the one walk in page memory; held is the model's return capability
+let carried = null; // what the owner snapshot offers the model: the reading occurrence of the current walk, or nothing
 let visit = null; // the open screen
 
 const el = (tag, cls, text) => {
@@ -41,7 +45,7 @@ const frame = () => {
 /** The whole owner snapshot the model samples. No capture, lifecycle or digest port exists beside it. */
 const read = () => ({
   owner: HOST, record: host.state, boot: BOOT, epoch: host.epoch(), generation: null, journeyId: null,
-  view: VIEW, navigation: frame(), visit: host.state.kanjiCourse ?? null, carried: null, root: null,
+  view: VIEW, navigation: frame(), visit: host.state.kanjiCourse ?? null, carried, root: null,
 });
 
 function ensureStyles() {
@@ -74,7 +78,7 @@ function load() {
     const decode = (buffer) => JSON.parse(new TextDecoder().decode(buffer));
     const family = decode(bytes.familyBytes);
     sources = { passage, world, catalog: admitted.value, route: route.value, plan: plan.value,
-      family: info.value.family, cited: new Map(family.sources.map((row) => [row.id, row])),
+      family: info.value.family, words: info.value.words, cited: new Map(family.sources.map((row) => [row.id, row])),
       kanji: decode(bytes.kanjiBytes).kanji };
     return sources;
   })().finally(() => { loading = null; });
@@ -83,7 +87,18 @@ function load() {
 
 function dropRide() {
   if (ride) sources?.passage.discardPassage(ride.page);
-  ride = null;
+  ride = null; carried = null;
+}
+/** The word the learner came with: an actual occurrence of one of the family's words in a loaded reading, else nothing. */
+function carriedFrom(node) {
+  const found = node.from ? host.sentence(node) : null; // { p, index, start, end, quote }
+  const token = found?.p.tokens[found.index];
+  const word = token && sources.words.find((row) => row.id === token.b && row.reading === token.r);
+  if (!word) return null;
+  return { word: { type: 'word', id: word.id, reading: word.reading },
+    sourceOccurrence: { source: 'passage', passage: found.p.id, token: found.index, sentence: [found.start, found.end],
+      quote: found.quote, title: found.p.title || '' },
+    sense: null };
 }
 function liveOwner() {
   if (owner && sources.world.readWorldOwner(owner).ok) return owner;
@@ -105,10 +120,10 @@ function paintDoor(door, node) {
 }
 
 /** Called on every mount of a kanji page: one door, in its current state, or none. */
-export function mountDoor({ sheet, node, state, tx: text, eligible, epoch }) {
+export function mountDoor({ sheet, node, state, tx: text, eligible, epoch, sentence }) {
   const old = sheet.querySelector('#' + DOOR_ID);
   if (!FORMS.has(node.id) || !eligible() || state.kanjiCourse) { old?.remove(); return; }
-  host = { state, epoch, tx: text };
+  host = { state, epoch, tx: text, sentence };
   ensureStyles();
   const door = old || el('button', 'chip passage-door');
   paintDoor(door, node);
@@ -228,6 +243,7 @@ async function openPassage(invoker, node) {
       return;
     }
     const { plan, family, kanji } = sources, { cursor, stop, incomingHop } = view;
+    const brought = view.carried;
     const total = plan.stops.length, done = cursor.status === 'complete';
     // the repaint replaces the control that holds the keyboard: hand it to the same control, or the first one
     const active = document.activeElement;
@@ -290,7 +306,16 @@ async function openPassage(invoker, node) {
         else button('passage-play', 'chip', '自動で進める', 'Play through', () => act('play'));
       }
     }
-    parts.push(actions, el('p', 'fine passage-note', done
+    parts.push(actions);
+    if (brought) {
+      // the model's own copy of the occurrence the learner came from
+      const word = el('p', 'passage-carried', brought.word.id);
+      word.append(el('span', 'row-reading', brought.word.reading));
+      parts.push(el('h3', 'list-head', tx('読んでいた文から', 'From your reading')), word,
+        el('p', 'passage-quote', brought.sourceOccurrence.quote));
+      if (brought.sourceOccurrence.title) parts.push(el('p', 'fine', `「${brought.sourceOccurrence.title}」`));
+    }
+    parts.push(el('p', 'fine passage-note', done
       ? tx('試作です。ここでは何も保存せず、復習にも数えていません。', 'Preview. Nothing here was saved or counted as review.')
       : tx('試作です。ここでは何も保存せず、復習にも数えません。戻っても、アプリを再読み込みするまでは続きから再開できます。',
         'Preview. Nothing here is saved or counted as review. Return keeps your place until the app is reloaded.')));
@@ -328,6 +353,8 @@ async function openPassage(invoker, node) {
   }
   if (!resumed) {
     dropRide();
+    carried = carriedFrom(node);
+    if (carried && !sources.world.readWorldOwner(owner).ok) carried = null; // the model refused it: walk without
     const made = passage.createPassage(owner, route, { motion: media?.matches ? 'reduced' : 'full' });
     if (!made.ok) { unavailable(); return; }
     ride = { page: made.value, node, held: null };

@@ -2,8 +2,10 @@
  *
  * From the app's first screen to the door on the 職 page, through the seven stops to the end,
  * and back to where it started; at 390x844 (touch) and at desktop size. Along the way: the
- * place kept by Return or Escape and resumed from the door, a played stretch, reduced motion,
- * a page without the door, and proof that the learner record and device storage did not change.
+ * place kept by Return or Escape and resumed from the door after a detour, a played stretch,
+ * reduced motion, a page without the door, and proof that the learner record and device
+ * storage did not change. A second walk starts from a word in a shelf article: that word
+ * travels with the passage, and the end leads back to the same line of the reading.
  *
  * KAIRO_SITE_DIR and KAIRO_EVIDENCE_DIR must point outside the checkout. KAIRO_BROWSER=webkit
  * or =all chooses the engines (default chromium). Writes result.json, verification-report.json
@@ -153,6 +155,7 @@ async function walk(browser, engine, size) {
   await expectStop(page, 0);
   assert.equal(await page.evaluate(() => document.activeElement?.id), 'passage-next', 'The keyboard starts on the next step');
   assert.equal(await page.locator('#passage-dialog .pool-tag').innerText(), 'preview');
+  assert.equal(await page.locator('.passage-carried, .passage-quote').count(), 0, 'A page opened from the dictionary carries no word');
   await shot('stop-1');
   await press('#passage-next'); await expectStop(page, 1);
   await shot('stop-2');
@@ -253,6 +256,76 @@ async function walk(browser, engine, size) {
   observations.push({ engine, size: size.name, viewport: size.viewport, status: 'PASS', checks: [...checks, 'no-console-errors'] });
 }
 
+/** From a reading: the word the learner tapped travels with the passage, and the end leads back to the reading. */
+async function fromReading(browser, engine, size) {
+  const session = await open(browser, size);
+  const { page, problems, press } = session;
+  await firstScreen(session);
+  await press('#ginga-symbol');
+  await press('.bubble-shelf');
+  const article = page.locator('.shelf-open', { hasText: '都市の匿名性と言語' }).first();
+  await article.waitFor();
+  await article.scrollIntoViewIfNeeded();
+  await press(article);
+  await page.locator('.reader .tok.content').first().waitFor();
+  // a new learner's first article opens its first word's box once, by itself: let it show, then put it away
+  if (await page.locator('#mini').waitFor({ timeout: 2500 }).then(() => true, () => false)) {
+    await page.waitForTimeout(900);
+    await page.keyboard.press('Escape');
+    await page.locator('#mini').waitFor({ state: 'hidden' });
+  }
+  const word = page.locator('.reader .tok.content', { hasText: '職業' }).first();
+  await word.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(300);
+  const reading = await page.evaluate(() => ({ view: document.body.dataset.view, y: Math.round(window.scrollY) }));
+  assert.equal(reading.view, 'reader');
+  for (let taps = 0; taps < 5 && !(await page.locator('#mini').isVisible()); taps += 1) { await press(word); await page.waitForTimeout(700); }
+  await press(page.locator('#mini .mini-kanji-row', { hasText: '職' }).first());
+  await page.locator('#sheet .hero-glyph', { hasText: '職' }).waitFor();
+  const door = page.locator('#passage-door');
+  await door.waitFor();
+  await door.scrollIntoViewIfNeeded();
+  await settled(page);
+  const origin = await place(page);
+  const recordBefore = await readAppRecordSnapshot(page), deviceBefore = await device(page);
+  await press(door);
+  await expectStop(page, 0);
+  const carried = () => page.evaluate(() => ({ word: document.querySelector('.passage-carried')?.firstChild?.textContent ?? null,
+    reading: document.querySelector('.passage-carried .row-reading')?.textContent ?? null,
+    quote: document.querySelector('.passage-quote')?.textContent ?? null,
+    title: document.querySelector('.passage-quote + .fine')?.textContent ?? null }));
+  const expected = { word: '職業', reading: 'しょくぎょう', quote: '出身も職業も伏せたまま、日々の用件だけで生活が成り立つ。', title: '「都市の匿名性と言語」' };
+  assert.deepEqual(await carried(), expected, 'The passage shows the word, its sentence and its article as the reading has them');
+  await page.screenshot({ path: resolve(evidence, `from-reading-${engine}-${size.name}.png`) });
+  await press('#passage-next'); await expectStop(page, 1);
+  await press('#passage-return');
+  await page.waitForFunction(() => !document.querySelector('#passage-dialog'));
+  await press(door);
+  await expectStop(page, 1);
+  assert.deepEqual(await carried(), expected, 'A resumed passage still carries the same occurrence');
+  for (let index = 2; index < STOPS.length; index += 1) { await press('#passage-next'); await expectStop(page, index); }
+  await press('#passage-next');
+  await page.locator('#passage-finish').waitFor();
+  assert.deepEqual(await carried(), expected);
+  await press('#passage-finish');
+  await page.waitForFunction(() => !document.querySelector('#passage-dialog'));
+  assert.deepEqual(await place(page), { ...origin, focused: 'passage-door' }, 'The end returns to the kanji page it was opened from');
+  assert.deepEqual(await readAppRecordSnapshot(page), recordBefore, 'All durable rows and the revision are unchanged');
+  assert.equal(await device(page), deviceBefore, 'No device marker was written');
+  await press('#sheet-back');
+  await page.locator('#sheet').waitFor({ state: 'detached' });
+  await page.waitForTimeout(600);
+  const back = await page.evaluate(() => ({ view: document.body.dataset.view, y: Math.round(window.scrollY) }));
+  assert.equal(back.view, 'reader', 'Closing the kanji page lands in the reading');
+  assert(Math.abs(back.y - reading.y) <= 2, `The reading is at the line it was left on (${reading.y} then ${back.y})`);
+  assert.equal(await word.isVisible(), true);
+  assert.deepEqual(problems, []);
+  await session.context.close(); activePage = null;
+  observations.push({ engine, size: `${size.name}-from-reading`, viewport: size.viewport, status: 'PASS',
+    checks: ['article-word-to-door', 'carried-word-sentence-and-title', 'carried-survives-resume', 'seven-stops', 'exact-return',
+      'unchanged-record-rows-and-revision', 'unchanged-device-storage', 'back-in-the-reading-at-the-same-line', 'no-console-errors'] });
+}
+
 /** Reduced motion: the model refuses a timer, so no Play is offered and each step is the learner's. */
 async function reduced(browser, engine, size) {
   const session = await open(browser, size, { reducedMotion: 'reduce' });
@@ -316,6 +389,7 @@ try {
     browser = await ENGINES[engine].launch({ headless: true });
     runtimes.push({ engine, version: browser.version() });
     for (const size of SIZES) await walk(browser, engine, size);
+    for (const size of SIZES) await fromReading(browser, engine, size);
     await reduced(browser, engine, SIZES[0]);
     await insecure(browser, engine, SIZES[0]);
     await browser.close(); browser = null;

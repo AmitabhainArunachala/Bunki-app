@@ -79,8 +79,11 @@
 .passage-dialog .kv dd { font-size: var(--type-lead); line-height: 1.7; }
 .passage-hop { margin: 0 0 6px; font-size: var(--type-lead); line-height: 1.75; color: var(--ed-ink, var(--ink)); }
 .passage-source { display: block; margin: 0 0 6px; }
-.passage-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 24px 0 20px; }
-.passage-note { margin: 0; padding-top: 14px; border-top: 1px solid var(--ed-rule-light, var(--line)); }
+.passage-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 24px 0 0; }
+.passage-carried { margin: 12px 0 4px; font: 400 var(--type-section)/1.6 var(--serif); color: var(--ed-ink, var(--ink)); }
+.passage-carried .row-reading { margin-left: 12px; font-size: var(--type-body); color: var(--accent, var(--red)); }
+.passage-quote { margin: 0 0 6px; font: 400 var(--type-lead)/1.9 var(--serif); color: var(--ed-ink, var(--ink)); }
+.passage-note { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid var(--ed-rule-light, var(--line)); }
 @media (max-width: 480px) {
   .passage-dialog .hero-glyph { width: 104px; height: 104px; font-size: calc(var(--type-headword) * 2); }
   .passage-route li { width: 36px; height: 36px; }

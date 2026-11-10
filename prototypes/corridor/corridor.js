@@ -33177,7 +33177,7 @@ function mountPageEffects(sheet, node) {
   activatePendingLookupReadings(sheet);
   activateKanjiStructure(sheet);
   activateKanjiFamily(sheet);
-  if (node.t === 'kanji') globalThis.__KAIRO_PASSAGE__?.mountDoor({ sheet, node, state: S, tx, eligible: kanjiWorldEligible, epoch: () => recordEpoch });
+  if (node.t === 'kanji') globalThis.__KAIRO_PASSAGE__?.mountDoor({ sheet, node, state: S, tx, eligible: kanjiWorldEligible, epoch: () => recordEpoch, sentence: teacherSentence });
   adoptSaveMenuOwner();
   // FULL-R1 · and its doors' lines, against the visit standing now (reconcileSheetActionLines)
   reconcileSheetActionLines(sheet);
