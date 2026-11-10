@@ -1,23 +1,18 @@
 /* global process, console, URL, AbortController */
-import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import vm from "node:vm";
-import ts from "typescript";
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import vm from 'node:vm';
+import ts from 'typescript';
 const { test } = await import(
-  process.env.VITEST === "true" && !process.env.NODE_TEST_CONTEXT
-    ? "vitest"
-    : "node:test"
+  process.env.VITEST === 'true' && !process.env.NODE_TEST_CONTEXT ? 'vitest' : 'node:test'
 );
-import {
-  createDeviceVoice,
-  REASONS,
-} from "../prototypes/corridor/device-voice.mjs";
-test("unbound legacy speech and recording entry points fail closed", async () => {
+import { createDeviceVoice, REASONS } from '../prototypes/corridor/device-voice.mjs';
+test('unbound legacy speech and recording entry points fail closed', async () => {
   let speaks = 0,
     cancels = 0;
   const env = {
     speechSynthesis: {
-      getVoices: () => [{ lang: "ja-JP", localService: true, name: "fixture" }],
+      getVoices: () => [{ lang: 'ja-JP', localService: true, name: 'fixture' }],
       speak: () => speaks++,
       cancel: () => cancels++,
     },
@@ -28,21 +23,21 @@ test("unbound legacy speech and recording entry points fail closed", async () =>
     },
   };
   const voice = createDeviceVoice(env);
-  for (const text of ["日本語。", "English only", "日本語 and English", ""]) {
+  for (const text of ['日本語。', 'English only', '日本語 and English', '']) {
     const before = cancels,
       r = voice.speak(text);
     assert.equal(r.spoken, false);
-    assert.equal(r.source, "none");
+    assert.equal(r.source, 'none');
     assert.equal(r.reason, REASONS.DISABLED);
-    assert(cancels > before, "cancel before refusing");
+    assert(cancels > before, 'cancel before refusing');
   }
   assert.equal(speaks, 0);
   const source = readFileSync(
-      new URL("../prototypes/corridor/corridor.js", import.meta.url),
-      "utf8",
+      new URL('../prototypes/corridor/corridor.js', import.meta.url),
+      'utf8',
     ),
     ast = ts.createSourceFile(
-      "corridor.js",
+      'corridor.js',
       source,
       ts.ScriptTarget.Latest,
       true,
@@ -69,7 +64,7 @@ test("unbound legacy speech and recording entry points fail closed", async () =>
     recManifestWait: null,
     recAudioEl: null,
     readAloud: { on: false },
-    S: { view: "review", review: { revealed: true } },
+    S: { view: 'review', review: { revealed: true } },
     deviceVoice: {
       cancel: () => cancels++,
       speak: () => {
@@ -95,49 +90,44 @@ test("unbound legacy speech and recording entry points fail closed", async () =>
     stopSentenceListening: () => {},
     cardVoiceStatus: (...args) => status.push(args),
     tx: (ja, en) => en,
-    wordVoice: () => "on",
-    wordClipFor: () => ({ src: "retained-synthetic.m4a" }),
+    wordVoice: () => 'on',
+    wordClipFor: () => ({ src: 'retained-synthetic.m4a' }),
     approvedWordManifest: (x) => x,
     refreshListenRow: () => {},
   };
   vm.createContext(sandbox);
   vm.runInContext(
-    actual("ensureRecManifest") +
-      ";" +
-      actual("playRecClip") +
-      ";" +
-      actual("speakCardReading") +
-      ";" +
-      actual("verifiedSentenceAudio"),
+    actual('ensureRecManifest') +
+      ';' +
+      actual('playRecClip') +
+      ';' +
+      actual('speakCardReading') +
+      ';' +
+      actual('verifiedSentenceAudio'),
     sandbox,
   );
   await sandbox.ensureRecManifest();
-  assert.equal(fetches, 0, "disabled legacy manifest cannot fetch");
-  assert.equal(
-    await sandbox.playRecClip("retained-synthetic.m4a", null),
-    false,
-  );
-  await sandbox.speakCardReading("日本語 and English", null, "term");
+  assert.equal(fetches, 0, 'disabled legacy manifest cannot fetch');
+  assert.equal(await sandbox.playRecClip('retained-synthetic.m4a', null), false);
+  await sandbox.speakCardReading('日本語 and English', null, 'term');
   await Promise.resolve();
   assert.equal(fetches, 0);
   assert.equal(starts, 0);
   assert.equal(speaks, 0);
   assert(retired > 0 || cancels > 4);
   assert(stopped > 0);
-  assert(status.some((row) => row[2] === "current-source-required"));
+  assert(status.some((row) => row[2] === 'current-source-required'));
   await assert.rejects(
-    sandbox.verifiedSentenceAudio?.(
-      { path: "retained.m4a" },
-      new AbortController().signal,
-    ) ?? Promise.reject(Error("missing verifiedSentenceAudio")),
+    sandbox.verifiedSentenceAudio?.({ path: 'retained.m4a' }, new AbortController().signal) ??
+      Promise.reject(Error('missing verifiedSentenceAudio')),
     /current-source-required/,
   );
   const roomSource = readFileSync(
-      new URL("../prototypes/corridor/speak.js", import.meta.url),
-      "utf8",
+      new URL('../prototypes/corridor/speak.js', import.meta.url),
+      'utf8',
     ),
     roomAst = ts.createSourceFile(
-      "speak.js",
+      'speak.js',
       roomSource,
       ts.ScriptTarget.Latest,
       true,
@@ -146,8 +136,7 @@ test("unbound legacy speech and recording entry points fail closed", async () =>
   function roomFunction(name) {
     const found = [];
     function visit(node) {
-      if (ts.isFunctionDeclaration(node) && node.name?.text === name)
-        found.push(node);
+      if (ts.isFunctionDeclaration(node) && node.name?.text === name) found.push(node);
       ts.forEachChild(node, visit);
     }
     visit(roomAst);
@@ -161,27 +150,21 @@ test("unbound legacy speech and recording entry points fail closed", async () =>
     Promise,
     post: () => {
       posts++;
-      throw Error("provider forbidden");
+      throw Error('provider forbidden');
     },
     ensureAudio: () => {
       media++;
-      throw Error("cached audio forbidden");
+      throw Error('cached audio forbidden');
     },
     stopVoice: () => stops++,
   };
   vm.createContext(room);
-  vm.runInContext(
-    roomFunction("voiceLine") + ";" + roomFunction("playClip"),
-    room,
-  );
-  for (const text of ["日本語", "English", "日本語 and English", ""]) {
+  vm.runInContext(roomFunction('voiceLine') + ';' + roomFunction('playClip'), room);
+  for (const text of ['日本語', 'English', '日本語 and English', '']) {
     const line = { text };
     assert.equal(room.voiceLine(line).length, 0);
     assert.equal(line.voice.length, 0);
-    assert.equal(
-      await room.playClip("blob:retained-cached-English", 1, 1),
-      "silent",
-    );
+    assert.equal(await room.playClip('blob:retained-cached-English', 1, 1), 'silent');
   }
   assert.equal(posts, 0);
   assert.equal(media, 0);
@@ -189,7 +172,7 @@ test("unbound legacy speech and recording entry points fail closed", async () =>
   assert.equal(fetches, 0);
   console.log(
     JSON.stringify({
-      status: "PASS",
+      status: 'PASS',
       deviceSpeakCalls: 0,
       recordingFetches: 0,
       mediaStarts: 0,
