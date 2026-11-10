@@ -23,7 +23,7 @@
   font-size: var(--type-caption, 13px);
   line-height: 1.65;
 }
-.wc-preview-mark { margin-right: 0.7em; color: var(--ink); letter-spacing: 0.08em; }
+.wc-preview-mark { color: var(--ink); letter-spacing: 0.08em; }
 .wc-context { border-style: solid; border-color: var(--line); color: var(--ink); }
 .wc-loading { margin: 0 0 18px; }
 

@@ -227,7 +227,7 @@ export async function openWorldcraftPreview({ document, invoker, form, biLabel, 
   const shell = make('div', 'wc-shell'), body = make('div', 'wc-body');
   const note = make('p', 'wc-preview');
   note.id = 'worldcraft-preview-note';
-  note.append(make('b', 'wc-preview-mark', tx('試作', 'Preview')), tx(
+  note.append(make('b', 'wc-preview-mark', tx('試作', 'Preview')), ' · ' + tx(
     'ここでは学習記録に何も保存されません。残した字は再読み込みすると消え、下にあるヘルプの扱いもまだ適用されません。',
     'Nothing here is saved to your record. Kept characters last until you reload, and the help rule described below is not applied yet.',
   ));
