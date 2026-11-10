@@ -34442,11 +34442,30 @@ window.addEventListener('resize', () => {
  * the picker is armed only while the pointer is down on the seal. */
 let worldPickerEls = null;
 let worldPickerOpener = null;
+/** The stones are a modal dialog: Tab and Shift+Tab wrap inside them and never walk into the page underneath
+ * (PR #77, origin/claude/renkan-round-b-2026-08-18, 3df6ed8f4). */
+function worldPickerTab(e) {
+  if (e.key !== 'Tab' || !worldPickerEls) return;
+  const stones = [...worldPickerEls[1].querySelectorAll('button')];
+  if (!stones.length) return;
+  const first = stones[0];
+  const last = stones[stones.length - 1];
+  const here = document.activeElement;
+  const inside = worldPickerEls[1].contains(here);
+  if (e.shiftKey && (here === first || !inside)) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && (here === last || !inside)) {
+    e.preventDefault();
+    first.focus();
+  }
+}
 function closeWorldPicker() {
   if (!worldPickerEls) return;
   for (const n of worldPickerEls) n.remove();
   worldPickerEls = null;
   document.removeEventListener('keydown', worldPickerEsc, true);
+  document.removeEventListener('keydown', worldPickerTab, true);
   // hand focus back to the seal that opened the stones (keyboard walkers)
   if (worldPickerOpener && document.contains(worldPickerOpener)) worldPickerOpener.focus();
   worldPickerOpener = null;
@@ -34458,6 +34477,7 @@ function openWorldPicker(anchor) {
   const scrim = el('div', 'world-picker-scrim');
   const pop = el('div', 'world-picker');
   pop.setAttribute('role', 'dialog');
+  pop.setAttribute('aria-modal', 'true');
   pop.setAttribute('aria-label', tx('配色を選ぶ', 'Colour theme'));
   let activeStone = null;
   // the stones are seals; a plain line beneath names the world in words (the current one, or
@@ -34514,6 +34534,7 @@ function openWorldPicker(anchor) {
   pop.style.top = `${Math.round(Math.min(rect.bottom + 8, window.innerHeight - pop.offsetHeight - 8))}px`;
   pop.style.left = `${Math.round(Math.min(Math.max(8, rect.right - pw), window.innerWidth - pw - 8))}px`;
   document.addEventListener('keydown', worldPickerEsc, true);
+  document.addEventListener('keydown', worldPickerTab, true);
   worldPickerEls = [scrim, pop];
   (activeStone || pop.querySelector('.world-stone')).focus();
 }
