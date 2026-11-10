@@ -92,6 +92,11 @@ export const CORRIDOR_REQUIRED_ROOTS = [
   'help-relevance.mjs',
   'journey-lifecycle.mjs',
   'm4-quest.mjs',
+  // Passage preview (prototype): the screen, and the two models it runs
+  'passage-view.mjs',
+  'passage-view.css',
+  'm4-passage.mjs',
+  'm4-worldcraft.mjs',
   'decks/context-dense/mount.js',
   'decks/context-dense/engine.js',
   'decks/context-dense/deck.json',

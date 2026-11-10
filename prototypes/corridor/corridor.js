@@ -31209,6 +31209,11 @@ function openKanjiWorldEncounter(invoker, node) {
   });
 }
 
+// Passage preview (prototype, 2026-11-10): its own module, loaded beside the app. It installs
+// globalThis.__KAIRO_PASSAGE__, which mountPageEffects asks for a door on the 職・識・織 pages.
+// The single-file build carries no such file and stays without the door.
+if (typeof window !== 'undefined' && !window.__CORRIDOR_BUNDLE__) void import('./passage-view.mjs').catch(() => {});
+
 
 /* ==================================================== 筆順 · stroke order ===
  * A kanji is written, not drawn — so the stroke diagram gets a page of its
@@ -33172,6 +33177,7 @@ function mountPageEffects(sheet, node) {
   activatePendingLookupReadings(sheet);
   activateKanjiStructure(sheet);
   activateKanjiFamily(sheet);
+  if (node.t === 'kanji') globalThis.__KAIRO_PASSAGE__?.mountDoor({ sheet, node, state: S, tx, eligible: kanjiWorldEligible, epoch: () => recordEpoch });
   adoptSaveMenuOwner();
   // FULL-R1 · and its doors' lines, against the visit standing now (reconcileSheetActionLines)
   reconcileSheetActionLines(sheet);
