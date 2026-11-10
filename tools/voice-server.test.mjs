@@ -3,9 +3,9 @@
  * "complete all surfaces from articles to cards to grammar points to words, end to end").
  *
  * The law these tests hold:
- *  - source order per sentence: an approved recorded clip, then the voice server, then the device voice;
- *  - the device voice speaks only as that fallback (unpaired, offline, out of budget, server refusing);
- *    the unbound legacy call still utters nothing;
+ *  - source order per sentence: an approved recorded clip, then the voice server, then silence;
+ *  - the device voice never speaks (John, 2026-11-10: "real voices or silence"): unpaired, offline, out of
+ *    budget or the server refusing, a read ends in silence and names the reason;
  *  - the request the browser sends is the one the speech team's contract v1 describes, built with their own
  *    modules, which are carried here unchanged from their commit;
  *  - every error code of the contract has one behaviour, and a 401 drops the token;
@@ -31,7 +31,11 @@ import {
   parsePairing,
   isVoiceServer,
 } from '../prototypes/corridor/modules/voice-client.mjs';
-import { daySpend, japaneseSentences } from '../prototypes/corridor/modules/voice-layer.mjs';
+import {
+  daySpend,
+  japaneseSentences,
+  shownText,
+} from '../prototypes/corridor/modules/voice-layer.mjs';
 import { createVoiceSeam, voiceKeyOf } from '../prototypes/corridor/modules/voice-seam.mjs';
 import { startFakeVoiceServer } from '../prototypes/corridor/tools/fake-voice-server.mjs';
 
@@ -69,21 +73,17 @@ describe('the speech modules are the speech team’s own, unchanged', () => {
   );
 });
 
-describe('the device voice is a fallback, never a first voice', () => {
-  const env = (
-    voices = [{ lang: 'ja-JP', localService: true, name: 'fixture', voiceURI: 'fixture' }],
-  ) => {
+describe('the device voice never speaks (John, 2026-11-10: "real voices or silence")', () => {
+  const env = () => {
     const spoken = [];
-    let cancels = 0;
     return {
       spoken,
-      cancels: () => cancels,
       speechSynthesis: {
-        getVoices: () => voices,
+        getVoices: () => [
+          { lang: 'ja-JP', localService: true, name: 'fixture', voiceURI: 'fixture' },
+        ],
         speak: (u) => spoken.push(u),
-        cancel: () => {
-          cancels += 1;
-        },
+        cancel: () => {},
       },
       SpeechSynthesisUtterance: class {
         constructor(text) {
@@ -92,57 +92,19 @@ describe('the device voice is a fallback, never a first voice', () => {
       },
     };
   };
-  it('the unbound legacy call still utters nothing', () => {
+  it('has no way to utter: no fallback, and the one call there is refuses', () => {
     const e = env(),
       voice = createDeviceVoice(e);
+    expect(voice.fallback).toBeUndefined();
+    expect(Object.keys(voice).sort()).toEqual(['cancel', 'speak', 'support']);
     for (const text of ['日本語。', 'English only', '']) {
-      const answer = voice.speak(text);
-      expect(answer).toMatchObject({ spoken: false, source: 'none', reason: REASONS.DISABLED });
+      expect(voice.speak(text)).toMatchObject({
+        spoken: false,
+        source: 'none',
+        reason: REASONS.DISABLED,
+      });
     }
     expect(e.spoken).toHaveLength(0);
-  });
-  it('the fallback speaks Japanese in a local Japanese voice at the asked speed', () => {
-    const e = env(),
-      voice = createDeviceVoice(e);
-    const ended = [];
-    const answer = voice.fallback('雨の日は本を読む。', {
-      rate: 1.25,
-      onEnd: () => ended.push('end'),
-    });
-    expect(answer).toMatchObject({ spoken: true, source: 'device' });
-    expect(e.spoken).toHaveLength(1);
-    expect(e.spoken[0]).toMatchObject({ text: '雨の日は本を読む。', lang: 'ja-JP', rate: 1.25 });
-    expect(e.spoken[0].voice.localService).toBe(true);
-    e.spoken[0].onend();
-    expect(ended).toEqual(['end']);
-  });
-  it('the fallback refuses text that is not Japanese, and a device with no local Japanese voice', () => {
-    const e = env(),
-      voice = createDeviceVoice(e);
-    expect(voice.fallback('English only')).toMatchObject({
-      spoken: false,
-      reason: REASONS.INVALID_TEXT,
-    });
-    expect(e.spoken).toHaveLength(0);
-    const remote = env([{ lang: 'ja-JP', localService: false, name: 'network voice' }]);
-    expect(createDeviceVoice(remote).fallback('日本語。')).toMatchObject({
-      spoken: false,
-      reason: REASONS.NO_JA_VOICE,
-    });
-    expect(remote.spoken).toHaveLength(0);
-  });
-  it('a cancel tells the fallback’s caller it was stopped, once', () => {
-    const e = env(),
-      voice = createDeviceVoice(e);
-    const stops = [];
-    voice.fallback('日本語。', {
-      onStop: () => stops.push('stop'),
-      onEnd: () => stops.push('end'),
-    });
-    voice.cancel();
-    voice.cancel();
-    expect(stops).toEqual(['stop']);
-    expect(e.cancels()).toBeGreaterThan(0);
   });
 });
 
@@ -502,7 +464,7 @@ describe('the client speaks the contract', () => {
 });
 
 /* ------------------------------------------------------------------ the seam */
-function rig({ paired = true, device = true, online = true } = {}) {
+function rig({ paired = true, online = true } = {}) {
   const calls = {
     speak: [],
     played: [],
@@ -563,16 +525,15 @@ function rig({ paired = true, device = true, online = true } = {}) {
       calls.rates.push(rate);
     },
   };
+  // A Japanese device voice stands ready in every test, so its silence is the seam's own choice: any call is counted.
+  const said = (text) => {
+    calls.deviceSaid.push({ text });
+    return { spoken: true, source: 'device' };
+  };
   const deviceVoice = {
-    support: () =>
-      device ? { ok: true, voice: { name: 'fixture' } } : { ok: false, reason: 'no-ja-voice' },
-    fallback(text, { rate, onEnd, onStop } = {}) {
-      if (!device) return { spoken: false, reason: 'no-ja-voice' };
-      calls.deviceSaid.push({ text, rate });
-      rigged.deviceHooks = { onEnd, onStop };
-      if (!rigged.holdDevice) Promise.resolve().then(() => onEnd?.());
-      return { spoken: true, source: 'device' };
-    },
+    support: () => ({ ok: true, voice: { name: 'fixture' } }),
+    fallback: said,
+    speak: said,
     cancel() {},
   };
   const rigged = {
@@ -624,7 +585,7 @@ const S3 = [
   { text: '駅の前で友達を待った。' },
 ];
 
-describe('the seam: recorded clip, then the server, then the device', () => {
+describe('the seam: a recorded clip, then the voice server, then silence', () => {
   it('a recorded clip wins and the server is not asked for it', async () => {
     const r = rig();
     const { states } = await run(r.seam, {
@@ -640,6 +601,16 @@ describe('the seam: recorded clip, then the server, then the device', () => {
     expect(r.calls.deviceSaid).toHaveLength(0);
     expect(r.seam.status().last.source).toBe('server');
   });
+  it('a recorded clip plays for a device that was never paired', async () => {
+    const r = rig({ paired: false });
+    const { states } = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: [{ text: S3[0].text, recorded: { src: 'audio/narration/sakura/x-000.m4a' } }],
+    });
+    expect(states.at(-1)).toBe('done');
+    expect(r.calls.recorded).toHaveLength(1);
+    expect(r.calls.speak).toHaveLength(0);
+  });
   it('paired and online: every sentence comes from the server, in order, two fetched ahead', async () => {
     const r = rig();
     await run(r.seam, { voiceKey: 'article:a1', sentences: S3 });
@@ -650,12 +621,9 @@ describe('the seam: recorded clip, then the server, then the device', () => {
   });
   it('the read is told where each sentence comes from as it starts, after being told which sentence it is', async () => {
     const told = [];
-    const options = {
+    await run(rig().seam, {
       onSentence: (index) => told.push(`sentence ${index}`),
       onSource: (source, reason) => told.push(reason ? `${source} (${reason})` : source),
-    };
-    await run(rig().seam, {
-      ...options,
       voiceKey: 'article:a1',
       sentences: [
         { text: S3[0].text, recorded: { src: 'audio/narration/sakura/x-000.m4a' } },
@@ -663,155 +631,159 @@ describe('the seam: recorded clip, then the server, then the device', () => {
       ],
     });
     expect(told).toEqual(['sentence 0', 'recorded', 'sentence 1', 'server', 'sentence -1']);
-    // the very first sentence of a read already says why the device voice is the one speaking
-    told.length = 0;
-    await run(rig({ paired: false }).seam, {
-      ...options,
-      voiceKey: 'word:猫',
-      sentences: [{ text: 'ねこ' }],
-    });
-    expect(told).toEqual(['sentence 0', 'device (not-paired)', 'sentence -1']);
   });
-  it('unpaired: the device voice, and the server is never asked', async () => {
+  it('unpaired: silence and the reason; the server is not asked and no other voice stands in', async () => {
     const r = rig({ paired: false });
     const { states } = await run(r.seam, { voiceKey: 'article:a1', sentences: S3 });
-    expect(states.at(-1)).toBe('done');
+    expect(states.at(-1)).toBe('error:not-paired');
     expect(r.calls.speak).toHaveLength(0);
-    expect(r.calls.deviceSaid.map((d) => d.text)).toEqual(S3.map((s) => s.text));
+    expect(r.calls.played).toHaveLength(0);
+    expect(r.calls.deviceSaid).toHaveLength(0);
     expect(r.seam.status()).toMatchObject({
       paired: false,
-      last: { source: 'device', reason: 'not-paired' },
+      last: { source: 'none' },
+      silent: { reason: 'not-paired' },
     });
   });
-  it('offline: the device voice, and the server is never asked', async () => {
+  it('offline: silence and the reason; the server is not asked', async () => {
+    const r = rig({ online: false });
+    const { states } = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
+    expect(states.at(-1)).toBe('error:offline');
+    expect(r.calls.speak).toHaveLength(0);
+    expect(r.calls.deviceSaid).toHaveLength(0);
+    expect(r.seam.status().silent).toMatchObject({ reason: 'offline' });
+  });
+  it('a sentence the server would refuse as not Japanese is passed over in silence, and the read goes on', async () => {
+    const r = rig();
+    const seen = [];
+    const { states } = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: [S3[0], { text: 'JR東日本のSuica' }, S3[1]],
+      onSentence: (index) => seen.push(index),
+    });
+    expect(states.at(-1)).toBe('done');
+    expect(r.calls.speak.map((c) => c.text)).toEqual([S3[0].text, S3[1].text]);
+    expect(r.calls.played).toHaveLength(2);
+    expect(r.calls.deviceSaid).toHaveLength(0);
+    expect(seen).toEqual([0, 1, 2, -1]);
+  });
+  it('a spoken sentence clears the reason for the last silence', async () => {
     const r = rig({ online: false });
     await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
-    expect(r.calls.speak).toHaveLength(0);
-    expect(r.seam.status().last).toMatchObject({ source: 'device', reason: 'offline' });
+    expect(r.seam.status().silent).toMatchObject({ reason: 'offline' });
+    const paired = rig();
+    paired.fail({ code: 'server-failed', status: 500 });
+    await run(paired.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
+    expect(paired.seam.status().silent).toMatchObject({ reason: 'server-failed' });
+    await run(paired.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
+    expect(paired.seam.status()).toMatchObject({ last: { source: 'server' }, silent: null });
   });
-  it('text the server would refuse as not Japanese goes to the device and never to the server', async () => {
+  it('says beforehand why it could not voice a sentence, so a read by itself can stay out of the way', async () => {
+    expect(rig().seam.cannot('word:猫')).toBe(null);
+    expect(rig({ paired: false }).seam.cannot('word:猫')).toBe('not-paired');
+    expect(rig({ online: false }).seam.cannot('word:猫')).toBe('offline');
+    expect(rig().seam.cannot()).toBe(null);
     const r = rig();
-    await run(r.seam, { voiceKey: 'word:Suica', sentences: [{ text: 'JR東日本のSuica' }] });
-    expect(r.calls.speak).toHaveLength(0);
-    expect(r.calls.deviceSaid).toHaveLength(1);
-    expect(r.seam.status().last).toMatchObject({ source: 'device', reason: 'not-japanese' });
-  });
-  it('a read that is not his tap never uses the device voice: with no clip to be had it says nothing', async () => {
-    // unpaired: the server is not asked and the device stays silent
-    const unpaired = rig({ paired: false });
-    const first = await run(unpaired.seam, {
-      voiceKey: 'word:猫',
-      sentences: [{ text: 'ねこ' }],
-      deviceFallback: false,
-    });
-    expect(first.states.at(-1)).toBe('error:no-voice');
-    expect(unpaired.calls.speak).toHaveLength(0);
-    expect(unpaired.calls.deviceSaid).toHaveLength(0);
-    // paired, the server refusing: still no device voice
-    const refused = rig();
-    refused.fail({ code: 'day-budget', status: 429 });
-    const second = await run(refused.seam, {
-      voiceKey: 'word:猫',
-      sentences: [{ text: 'ねこ' }],
-      deviceFallback: false,
-    });
-    expect(second.states.at(-1)).toBe('error:no-voice');
-    expect(refused.calls.speak).toHaveLength(1);
-    expect(refused.calls.deviceSaid).toHaveLength(0);
-    // paired and answered: the server's clip plays
-    const answered = rig();
-    const third = await run(answered.seam, {
-      voiceKey: 'word:猫',
-      sentences: [{ text: 'ねこ' }],
-      deviceFallback: false,
-    });
-    expect(third.states.at(-1)).toBe('done');
-    expect(answered.calls.played).toHaveLength(1);
-    // a recorded clip is free and plays either way
-    const recorded = rig({ paired: false });
-    const fourth = await run(recorded.seam, {
-      voiceKey: 'article:a1',
-      deviceFallback: false,
-      sentences: [{ text: S3[0].text, recorded: { src: 'audio/narration/sakura/x-000.m4a' } }],
-    });
-    expect(fourth.states.at(-1)).toBe('done');
-    expect(recorded.calls.recorded).toHaveLength(1);
-    expect(recorded.calls.speak).toHaveLength(0);
-  });
-  it('neither a server nor a device voice: the read ends with no-voice', async () => {
-    const r = rig({ paired: false, device: false });
-    const { states } = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
-    expect(states.at(-1)).toBe('error:no-voice');
+    r.fail({ code: 'day-budget', status: 429 });
+    await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
+    expect(r.seam.cannot('word:猫')).toBe('day-budget');
+    // asking is free: it sends nothing, plays nothing and stops nothing
+    expect(r.calls.speak).toHaveLength(1);
+    expect(r.calls.played).toHaveLength(0);
   });
 });
 
-describe('the seam: one behaviour per error code', () => {
-  it('503 voice-unavailable: once more after 2 s, then the device for that sentence only', async () => {
+describe('the seam: one behaviour per error code, and never a stand-in voice', () => {
+  it('503 voice-unavailable: once more after 2 s, then silence with that reason', async () => {
     const r = rig();
     r.fail({ code: 'voice-unavailable', status: 503 }, { code: 'voice-unavailable', status: 503 });
-    await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 2), prefetch: 0 });
+    const { states } = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: S3.slice(0, 2),
+      prefetch: 0,
+    });
+    expect(states.at(-1)).toBe('error:voice-unavailable');
     expect(r.calls.sleeps).toContain(2000);
-    expect(r.calls.speak.map((c) => c.text)).toEqual([S3[0].text, S3[0].text, S3[1].text]);
-    expect(r.calls.deviceSaid.map((d) => d.text)).toEqual([S3[0].text]);
-    expect(r.calls.played).toHaveLength(1);
+    expect(r.calls.speak.map((c) => c.text)).toEqual([S3[0].text, S3[0].text]);
+    expect(r.calls.played).toHaveLength(0);
+    expect(r.calls.deviceSaid).toHaveLength(0);
   });
   it('503 then a good answer: the server’s clip plays', async () => {
     const r = rig();
     r.fail({ code: 'voice-unavailable', status: 503 });
-    await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
+    const { states } = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
+    expect(states.at(-1)).toBe('done');
     expect(r.calls.speak).toHaveLength(2);
-    expect(r.calls.deviceSaid).toHaveLength(0);
     expect(r.calls.played).toHaveLength(1);
   });
-  it('429 day-budget: the device until 00:00 UTC, then the server again', async () => {
+  it('429 day-budget: silence until 00:00 UTC without asking again, then the server', async () => {
     const r = rig();
     r.fail({ code: 'day-budget', status: 429 });
-    await run(r.seam, { voiceKey: 'article:a1', sentences: S3, prefetch: 0 });
+    const first = await run(r.seam, { voiceKey: 'article:a1', sentences: S3, prefetch: 0 });
+    expect(first.states.at(-1)).toBe('error:day-budget');
     expect(r.calls.speak).toHaveLength(1);
-    expect(r.calls.deviceSaid).toHaveLength(3);
     expect(r.seam.status().blocked).toBe('day-budget');
     r.advance(11 * 3600 * 1000); // 23:00 UTC the same day
-    await run(r.seam, { voiceKey: 'article:a2', sentences: S3.slice(0, 1) });
+    const second = await run(r.seam, { voiceKey: 'article:a2', sentences: S3.slice(0, 1) });
+    expect(second.states.at(-1)).toBe('error:day-budget');
     expect(r.calls.speak).toHaveLength(1);
     r.advance(2 * 3600 * 1000); // past 00:00 UTC
-    await run(r.seam, { voiceKey: 'article:a3', sentences: S3.slice(0, 1) });
+    const third = await run(r.seam, { voiceKey: 'article:a3', sentences: S3.slice(0, 1) });
+    expect(third.states.at(-1)).toBe('done');
     expect(r.calls.speak).toHaveLength(2);
     expect(r.seam.status().blocked).toBe(null);
+    expect(r.calls.deviceSaid).toHaveLength(0);
   });
-  it('429 request-rate-limit: no request for 60 s', async () => {
+  it('429 request-rate-limit: silence, and no request for 60 s', async () => {
     const r = rig();
     r.fail({ code: 'request-rate-limit', status: 429 });
-    await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 2), prefetch: 0 });
+    const first = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: S3.slice(0, 2),
+      prefetch: 0,
+    });
+    expect(first.states.at(-1)).toBe('error:request-rate-limit');
     expect(r.calls.speak).toHaveLength(1);
-    expect(r.calls.deviceSaid).toHaveLength(2);
     r.advance(59_000);
-    await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(2) });
+    const second = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(2) });
+    expect(second.states.at(-1)).toBe('error:request-rate-limit');
     expect(r.calls.speak).toHaveLength(1);
     r.advance(2_000);
-    await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(2) });
+    const third = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(2) });
+    expect(third.states.at(-1)).toBe('done');
     expect(r.calls.speak).toHaveLength(2);
+    expect(r.calls.deviceSaid).toHaveLength(0);
   });
   it.each([
     ['404 not-in-release', { code: 'not-in-release', status: 404 }, 'not-in-release'],
     ['402 budget-exhausted', { code: 'budget-exhausted', status: 402 }, 'budget-exhausted'],
-  ])('%s: the device from then on', async (_name, failure, blocked) => {
-    const r = rig();
-    r.fail(failure);
-    await run(r.seam, { voiceKey: 'article:a1', sentences: S3, prefetch: 0 });
-    expect(r.calls.speak).toHaveLength(1);
-    expect(r.calls.deviceSaid).toHaveLength(3);
-    expect(r.seam.status().blocked).toBe(blocked);
-    r.advance(48 * 3600 * 1000);
-    await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
-    expect(r.calls.speak).toHaveLength(1);
-  });
-  it('401: unpaired from then on, the device speaks, the status says pair again', async () => {
+  ])(
+    '%s: silence from then on, and the server is not asked again',
+    async (_name, failure, blocked) => {
+      const r = rig();
+      r.fail(failure);
+      const first = await run(r.seam, { voiceKey: 'article:a1', sentences: S3, prefetch: 0 });
+      expect(first.states.at(-1)).toBe(`error:${blocked}`);
+      expect(r.calls.speak).toHaveLength(1);
+      expect(r.seam.status().blocked).toBe(blocked);
+      r.advance(48 * 3600 * 1000);
+      const second = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
+      expect(second.states.at(-1)).toBe(`error:${blocked}`);
+      expect(r.calls.speak).toHaveLength(1);
+      expect(r.calls.deviceSaid).toHaveLength(0);
+    },
+  );
+  it('401: unpaired from then on; silence, and the status says pair again', async () => {
     const r = rig();
     r.fail({ code: 'authentication-required', status: 401 });
-    await run(r.seam, { voiceKey: 'article:a1', sentences: S3, prefetch: 0 });
+    const first = await run(r.seam, { voiceKey: 'article:a1', sentences: S3, prefetch: 0 });
+    expect(first.states.at(-1)).toBe('error:authentication-required');
     expect(r.calls.speak).toHaveLength(1);
-    expect(r.calls.deviceSaid).toHaveLength(3);
     expect(r.seam.status()).toMatchObject({ paired: false, pairAgain: true });
+    const second = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
+    expect(second.states.at(-1)).toBe('error:not-paired');
+    expect(r.calls.speak).toHaveLength(1);
+    expect(r.calls.deviceSaid).toHaveLength(0);
   });
   it.each([
     ['speech-input-invalid', 400],
@@ -819,19 +791,41 @@ describe('the seam: one behaviour per error code', () => {
     ['japanese-only', 400],
     ['profile-not-approved', 400],
     ['server-failed', 500],
-    ['network-failed', 0],
   ])(
-    '%s: the device for that sentence, never asked twice, the next sentence asks again',
+    '%s: silence with that reason; the same sentence is not asked twice in that read, and a new read asks',
     async (code, status) => {
       const r = rig();
       r.fail({ code, status });
-      await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 2), prefetch: 0 });
-      expect(r.calls.speak.map((c) => c.text)).toEqual(
-        code === 'network-failed' ? [S3[0].text] : [S3[0].text, S3[1].text],
-      );
-      expect(r.calls.deviceSaid[0].text).toBe(S3[0].text);
+      const first = await run(r.seam, {
+        voiceKey: 'article:a1',
+        sentences: S3.slice(0, 2),
+        prefetch: 0,
+      });
+      expect(first.states.at(-1)).toBe(`error:${code}`);
+      expect(r.calls.speak.map((c) => c.text)).toEqual([S3[0].text]);
+      const second = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
+      expect(second.states.at(-1)).toBe('done');
+      expect(r.calls.speak).toHaveLength(2);
+      expect(r.calls.deviceSaid).toHaveLength(0);
     },
   );
+  it('the server out of reach: silence, and no request for 15 s', async () => {
+    const r = rig();
+    r.fail({ code: 'network-failed', status: 0 });
+    const first = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: S3.slice(0, 2),
+      prefetch: 0,
+    });
+    expect(first.states.at(-1)).toBe('error:network-failed');
+    const second = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
+    expect(second.states.at(-1)).toBe('error:network-failed');
+    expect(r.calls.speak).toHaveLength(1);
+    r.advance(16_000);
+    const third = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
+    expect(third.states.at(-1)).toBe('done');
+    expect(r.calls.deviceSaid).toHaveLength(0);
+  });
   it('413 speech-input-too-large: the sentence is split further and its parts are spoken in order', async () => {
     const r = rig();
     const long =
@@ -907,19 +901,6 @@ describe('the seam: one sound at a time, and the controls', () => {
     expect(() => session.setRate(0.8)).toThrow();
     session.stop();
   });
-  it('a device voice another lane silences ends the read, so it never stands playing with nothing to hear', async () => {
-    const r = rig({ paired: false });
-    r.holdDevice = true;
-    const states = [];
-    r.seam.read({ voiceKey: 'article:a1', sentences: S3, onState: (s) => states.push(s) });
-    await new Promise((done) => setTimeout(done, 5));
-    expect(states.at(-1)).toBe('playing');
-    r.deviceHooks.onStop(); // what device-voice.mjs tells its caller when something else cancels the utterance
-    await new Promise((done) => setTimeout(done, 5));
-    expect(states.at(-1)).toBe('stopped');
-    expect(r.calls.deviceSaid).toHaveLength(1);
-    expect(r.seam.active()).toBe(null);
-  });
   it('a recorded clip another lane stops ends the read; the seam’s own pause only holds it', async () => {
     const r = rig();
     r.holdRecorded = true;
@@ -981,6 +962,31 @@ describe('only the Japanese is read', () => {
     expect(texts('The particle は marks the topic.')).toEqual([]);
     expect(texts('')).toEqual([]);
     expect(texts(null)).toEqual([]);
+  });
+  it('the text a learner sees leaves out readings, controls and the line that says why there is no voice', () => {
+    const text = (value) => ({ nodeType: 3, nodeValue: value });
+    const element = (tagName, classes, ...childNodes) => ({
+      nodeType: 1,
+      tagName,
+      hidden: false,
+      childNodes,
+      classList: { contains: (name) => classes.includes(name) },
+      getAttribute: () => null,
+    });
+    const sentence = element(
+      'P',
+      ['review-example'],
+      text('雨の日は'),
+      element('RUBY', [], text('本'), element('RT', [], text('ほん'))),
+      text('を読む。'),
+      element('BUTTON', ['voice-say'], text('聞く')),
+      element(
+        'SPAN',
+        ['say-note', 'voice-note'],
+        text('声を出せません。設定の「筆と声」で音声サーバーとつなぐ。'),
+      ),
+    );
+    expect(shownText(sentence)).toBe('雨の日は本を読む。');
   });
 });
 

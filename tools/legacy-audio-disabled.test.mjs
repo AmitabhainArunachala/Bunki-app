@@ -127,12 +127,13 @@ test('unbound legacy speech and recording entry points fail closed', async () =>
   assert(retired > 0 || cancels > 4);
   assert(stopped > 0);
   assert(status.some((row) => row[2] === 'current-source-required'));
-  // With the voice layer the reading has ONE way out, the seam (a recorded clip, the voice server, the device voice as
-  // the fallback): this function still starts no fetch, no Audio and no utterance of its own.
+  // With the voice layer the reading has ONE way out, the seam (a recorded clip, then the voice server, otherwise
+  // silence): this function still starts no fetch, no Audio and no utterance of its own.
   const said = [];
-  sandbox.voiceLayer = { sayWord: (request) => said.push(request) };
-  status = [];
-  sandbox.status = status;
+  // whether the seam could voice a word right now (paired, online, within the budget)
+  let able = true;
+  sandbox.voiceLayer = { sayWord: (request) => said.push(request), canSay: () => able };
+  status.length = 0;
   await sandbox.speakCardReading('きかい', null, '機械');
   await Promise.resolve();
   assert.equal(said.length, 1, 'the reading goes to the seam once');
@@ -142,8 +143,22 @@ test('unbound legacy speech and recording entry points fail closed', async () =>
   assert.equal(fetches, 0);
   assert.equal(starts, 0);
   assert.equal(speaks, 0);
-  // Said by itself (a card's answer shown, a word writing itself) is not his tap. With the switch off, which is the
-  // default, nothing happens at all: no other sound is stopped and the seam is not asked.
+  // "Real voices or silence" (John, 2026-11-10): when his tap finds no voice, the seam's one plain line and its reason
+  // reach the note beside the control as they are; when a voice answers, the line is cleared.
+  status.length = 0;
+  said[0].onNote(
+    'No voice here. Pair the voice server in Settings, Writing and voice.',
+    'not-paired',
+  );
+  assert.deepEqual(status.at(-1), [
+    null,
+    'No voice here. Pair the voice server in Settings, Writing and voice.',
+    'not-paired',
+  ]);
+  said[0].onNote('', null);
+  assert.deepEqual(status.at(-1), [null, '', null]);
+  // Said by itself (a card's answer shown, a word opened) is not his tap. With the switch off nothing happens at
+  // all: no other sound is stopped and the seam is not asked.
   bySelf = 'off';
   const before = [retired, stopped, said.length];
   await sandbox.speakCardReading('きかい', null, '機械', { automatic: true });
@@ -157,11 +172,25 @@ test('unbound legacy speech and recording entry points fail closed', async () =>
   await sandbox.speakCardReading('きかい', null, '機械');
   assert.equal(said.length, 2, 'a tap is his own act');
   assert.equal(said[1].automatic, false);
-  // With the switch on the seam is asked, and told that this is not his tap (so it never uses the device voice)
+  // With the switch on the seam is asked, and told that this is not his tap (so a silence shows no line)
   bySelf = 'on';
   await sandbox.speakCardReading('きかい', null, '機械', { automatic: true });
   assert.equal(said.length, 3);
   assert.equal(said[2].automatic, true);
+  // With the switch on and no voice to be had (unpaired, offline, the budget used) a read by itself does nothing at
+  // all: it stops no other sound, asks nothing and shows nothing. His own tap is still passed on, to be told why.
+  able = false;
+  const quiet = [retired, stopped, said.length, status.length];
+  await sandbox.speakCardReading('きかい', null, '機械', { automatic: true });
+  await Promise.resolve();
+  assert.deepEqual(
+    [retired, stopped, said.length, status.length],
+    quiet,
+    'by itself, with no voice to be had, nothing is asked, stopped or shown',
+  );
+  await sandbox.speakCardReading('きかい', null, '機械');
+  assert.equal(said.length, 4, 'his tap reaches the seam, which answers with the reason');
+  able = true;
   assert.equal(fetches, 0);
   assert.equal(starts, 0);
   assert.equal(speaks, 0);
@@ -330,4 +359,76 @@ test('a clip of the narration provider the lock lists plays; an unlisted voice, 
   assert.equal(sandbox.articleNarration?.v, 2);
   await refuses(src(lock.main), "the render lock's clip does not play");
   assert.equal(created.length, 1, 'one Audio in all: the listed clip');
+});
+
+test('speak on reveal is on unless he turned it off, and an Off stored tonight stays Off (John, 2026-11-10)', () => {
+  const source = readFileSync(
+      new URL('../prototypes/corridor/corridor.js', import.meta.url),
+      'utf8',
+    ),
+    ast = ts.createSourceFile(
+      'corridor.js',
+      source,
+      ts.ScriptTarget.Latest,
+      true,
+      ts.ScriptKind.JS,
+    );
+  // the app's own statements: the switch's key, its two values (the first is the default), and the reader and writer
+  const statement = (name) => {
+    const nodes = ast.statements.filter(
+      (n) =>
+        (ts.isFunctionDeclaration(n) && n.name?.text === name) ||
+        (ts.isVariableStatement(n) &&
+          n.declarationList.declarations.some((d) => d.name.getText(ast) === name)),
+    );
+    assert.equal(nodes.length, 1, `corridor.js declares ${name} once`);
+    return source.slice(nodes[0].getStart(ast), nodes[0].end);
+  };
+  const KEY = 'kairo-voice-by-itself-v1'; // the key tonight's explicit Off was stored under
+  const device = (stored) => {
+    const kept = new Map(stored === undefined ? [] : [[KEY, stored]]);
+    const sandbox = {
+      Object,
+      S: {},
+      localStorage: {
+        getItem: (key) => (kept.has(key) ? kept.get(key) : null),
+        setItem: (key, value) => kept.set(key, value),
+      },
+      retireCardSpeech: () => {},
+      stopRecAudio: () => {},
+    };
+    vm.createContext(sandbox);
+    vm.runInContext(
+      ['WORD_VOICE_KEY', 'WORD_VOICE', 'wordPref', 'setWordPref'].map(statement).join(';\n') +
+        ";\nvar read = () => wordPref(WORD_VOICE_KEY, 'wordVoice', WORD_VOICE);" +
+        "\nvar write = (value) => setWordPref(WORD_VOICE_KEY, 'wordVoice', WORD_VOICE, value);" +
+        '\nvar key = WORD_VOICE_KEY;',
+      sandbox,
+    );
+    return { sandbox, kept };
+  };
+  assert.equal(device(undefined).sandbox.key, KEY, 'the switch keeps its key');
+  assert.equal(device(undefined).sandbox.read(), 'on', 'nothing stored: on');
+  assert.equal(device('off').sandbox.read(), 'off', 'a stored Off stays Off');
+  assert.equal(device('on').sandbox.read(), 'on');
+  assert.equal(device('sometimes').sandbox.read(), 'on', 'an unknown value is the default');
+  // reading the switch stores nothing: only his own press does
+  const fresh = device(undefined);
+  fresh.sandbox.read();
+  assert.equal(fresh.kept.size, 0, 'the default is not written to the device');
+  fresh.sandbox.write('off');
+  assert.equal(fresh.kept.get(KEY), 'off');
+  assert.equal(fresh.sandbox.read(), 'off');
+  fresh.sandbox.write('on');
+  assert.equal(fresh.kept.get(KEY), 'on');
+  assert.equal(fresh.sandbox.read(), 'on');
+  // the row in Settings says what it does and that it spends the voice budget
+  const settings = readFileSync(
+    new URL('../prototypes/corridor/modules/learner.mjs', import.meta.url),
+    'utf8',
+  );
+  assert.match(
+    settings,
+    /row\('settings-voice', '[^']+', '声 — say a card’s answer and an opened word once, by themselves \(uses the voice budget\)'/u,
+  );
 });

@@ -4,7 +4,13 @@
  * It owns no look of its own. A surface that already had a listen control keeps it (the reader's play bar, the card's
  * 音, the word box's 音); a surface with Japanese and no control gets the app's one quiet speaker mark (.play-mark),
  * or the study card's own small button on the study card. Everything speaks through modules/voice-seam.mjs: a
- * recorded clip, then the voice server, then the device voice; one sound at a time; a read ends when its screen goes.
+ * recorded clip, then the voice server, and otherwise nothing (John, 2026-11-10: "real voices or silence"). A control
+ * that finds no voice makes no sound and says why in one plain line beside it. One sound at a time; a read ends when
+ * its screen goes.
+ *
+ * On reveal (John, the same evening): a card's answer and an opened word say themselves once, unless the learner
+ * switched that off (corridor.js, WORD_VOICE). A read that starts by itself is voiced by the server or not at all,
+ * and when it cannot be voiced it shows nothing and stops nothing.
  *
  * corridor.js installs it beside the app (installVoiceLayer) and passes the few things it needs from the app. The
  * pairing screen and the status line stand under Settings, 筆と声 · Writing and voice. */
@@ -26,14 +32,15 @@ function silenceUrl(view) {
   return view.URL.createObjectURL(new view.Blob([bytes], { type: 'audio/wav' }));
 }
 
-/** The Japanese a learner sees in `element`: no readings above the words, no controls, nothing hidden. */
+/** The Japanese a learner sees in `element`: no readings above the words, no controls, nothing hidden, and not the
+ * line that says why a control found no voice (.say-note). */
 export function shownText(element) {
   let out = '';
   const visit = (node) => {
     if (node.nodeType === 3) { out += node.nodeValue; return; }
     if (node.nodeType !== 1) return;
     if (SKIP.has(node.tagName.toUpperCase()) || node.hidden || node.getAttribute('aria-hidden') === 'true' ||
-        node.classList.contains('visually-hidden')) return;
+        node.classList.contains('visually-hidden') || node.classList.contains('say-note')) return;
     for (const child of node.childNodes) visit(child);
   };
   if (element) visit(element);
@@ -64,7 +71,7 @@ export function daySpend(budget, kept, now = Date.now()) {
 }
 
 export function installVoiceLayer(host) {
-  const { tx, el, uiIcon, deviceVoice } = host;
+  const { tx, el, uiIcon } = host;
   const doc = host.document || document;
   // the client knows no server until a pairing line brings its address (voice-client.mjs)
   const client = createVoiceClient({ store: createDeviceTokenStore(globalThis) });
@@ -75,10 +82,11 @@ export function installVoiceLayer(host) {
   // where the last sentence came from outlives a reload of this tab (the status line in Settings); nothing else is kept
   const LAST = 'kairo-voice-last';
   const remembered = () => {
-    try { const row = JSON.parse(doc.defaultView.sessionStorage.getItem(LAST)); return row && typeof row.source === 'string' && Number.isFinite(row.at) ? row : null; } catch { return null; }
+    // (a tab that ran an earlier build may still hold a stand-in voice's row: only a real voice counts)
+    try { const row = JSON.parse(doc.defaultView.sessionStorage.getItem(LAST)); return row && ['server', 'recorded'].includes(row.source) && Number.isFinite(row.at) ? row : null; } catch { return null; }
   };
   const seam = createVoiceSeam({
-    client, device: deviceVoice, player,
+    client, player,
     recorded: (src, rate) => host.playRecorded(src, rate),
     quiet: () => host.quiet(),
     onStatus: (status) => {
@@ -101,55 +109,126 @@ export function installVoiceLayer(host) {
 
   /* ------------------------------------------------------------------ one read from one control */
   let spoken = null; // { button, session }
-  const sourceLine = (status) => {
-    const { source, reason } = status.last;
-    if (source === 'server') return tx('音声サーバー', 'Voice server');
-    if (source === 'recorded') return tx('収録音声', 'Recorded clip');
-    if (source === 'device') return tx(`端末の声（${reasonJa(reason)}）`, `Device voice (${reasonEn(reason)})`);
-    return '';
+  const sourceLine = (source) => source === 'server' ? tx('音声サーバー', 'Voice server') : source === 'recorded' ? tx('収録音声', 'Recorded clip') : '';
+  // the voice server's day is the UTC day: its new start, in this device's own time
+  const newDay = () => new Date((Math.floor(Date.now() / 86400000) + 1) * 86400000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  // the two limits are the speech team's (one budget for both apps): the server's own figures once it has sent them
+  const money = (cents) => { const n = cents % 100 ? (cents / 100).toFixed(2) : String(cents / 100); return { ja: `${n}ドル`, en: `$${n}` }; };
+  const dayCap = () => money(seam.status().budget?.dayCapCents ?? 300);
+  const totalCap = () => money(seam.status().budget?.capCents ?? 2500);
+  /** Why there is no voice, in one plain line: what a listen control says when it makes no sound. */
+  const silenceLine = (reason) => {
+    switch (reason) {
+      case 'not-paired': case 'not-configured':
+        return tx('声を出せません。設定の「筆と声」で音声サーバーとつなぐ。', 'No voice here. Pair the voice server in Settings, Writing and voice.');
+      case 'authentication-required':
+        return tx('声を出せません。音声サーバーがこの接続を終了しました。設定の「筆と声」でもう一度つなぐ。',
+          'No voice: the voice server ended this pairing. Pair again in Settings, Writing and voice.');
+      case 'offline': case 'network-failed':
+        return tx('声を出せません。音声サーバーに届きません。接続を確かめて、もう一度。', 'No voice: the voice server is out of reach. Check the connection, then tap again.');
+      case 'day-budget':
+        return tx(`声を出せません。今日の${dayCap().ja}分を使いました。声は${newDay()}に戻ります。`, `No voice: today’s ${dayCap().en} is used. The voice comes back at ${newDay()}.`);
+      case 'budget-exhausted':
+        return tx(`声を出せません。合計${totalCap().ja}を使い切りました。`, `No voice: the ${totalCap().en} total is used.`);
+      case 'not-in-release':
+        return tx('声を出せません。音声サーバーはいま新しい文を受け付けていません。', 'No voice: the voice server is not taking new sentences right now.');
+      case 'request-rate-limit':
+        return tx('声を出せません。1分あたりの新しい文が多すぎました。1分ほど待って、もう一度。', 'No voice: too many new sentences in one minute. Wait about a minute, then tap again.');
+      case 'voice-unavailable': case 'voice-timeout':
+        return tx('声を出せません。音声サーバーが混んでいます。もう一度。', 'No voice: the voice server is busy. Tap to try again.');
+      case 'nothing-to-say': case 'not-japanese':
+        return tx('ここには読み上げられる日本語がありません。', 'Nothing here can be read aloud.');
+      case 'audio-error':
+        return tx('再生できませんでした。もう一度。', 'Could not play. Tap to try again.');
+      default:
+        return tx('声を出せません。音声サーバーがこの文を読めませんでした。もう一度。', 'No voice: the voice server could not say this. Tap to try again.');
+    }
   };
-  const reasonEn = (reason) => ({
-    'not-configured': 'not paired', 'not-paired': 'not paired', offline: 'offline', 'not-japanese': 'text the server does not take',
-    'day-budget': 'today’s limit reached', 'budget-exhausted': 'budget used up', 'not-in-release': 'voice server not taking sentences',
-    'request-rate-limit': 'too many requests, wait a minute', 'voice-unavailable': 'voice server busy', 'server-failed': 'voice server error',
-    'network-failed': 'no connection', 'voice-timeout': 'voice server too slow', 'authentication-required': 'pair again',
-  }[reason] || 'voice server unavailable');
-  const reasonJa = (reason) => ({
-    'not-configured': '未接続', 'not-paired': '未接続', offline: 'オフライン', 'not-japanese': 'サーバーが読めない文',
-    'day-budget': '今日の上限', 'budget-exhausted': '予算切れ', 'not-in-release': 'サーバー停止中',
-    'request-rate-limit': '混雑、1分待つ', 'voice-unavailable': 'サーバー混雑', 'server-failed': 'サーバーエラー',
-    'network-failed': '接続なし', 'voice-timeout': 'サーバー遅延', 'authentication-required': '再接続が必要',
-  }[reason] || 'サーバー利用不可');
-  const failureLine = (code) => code === 'no-voice'
-    ? tx('声を出せません。設定の「筆と声」で音声サーバーとつなぐ。', 'No voice here. Pair the voice server in Settings, Writing and voice.')
-    : tx('再生できませんでした。もう一度。', 'Could not play. Tap to try again.');
+  /** The same reasons in a few words: the status line in Settings and the reader's bar. */
+  const reasonWords = (reason) => ({
+    'not-configured': tx('未接続', 'not paired'), 'not-paired': tx('未接続', 'not paired'), 'authentication-required': tx('再接続が必要', 'pair again'),
+    offline: tx('接続なし', 'no connection'), 'network-failed': tx('接続なし', 'no connection'),
+    'day-budget': tx('今日の上限', 'today’s limit reached'), 'budget-exhausted': tx('予算切れ', 'budget used up'),
+    'not-in-release': tx('サーバー停止中', 'voice server not taking sentences'), 'request-rate-limit': tx('混雑、1分待つ', 'too many requests, wait a minute'),
+    'voice-unavailable': tx('サーバー混雑', 'voice server busy'), 'voice-timeout': tx('サーバー混雑', 'voice server busy'),
+    'nothing-to-say': tx('読む文なし', 'nothing to read'), 'not-japanese': tx('読む文なし', 'nothing to read'), 'audio-error': tx('再生エラー', 'could not play'),
+  }[reason] || tx('サーバーエラー', 'voice server error'));
+  // reasons that pass by themselves or by his pairing: what is true now is what a control says
+  const PASSING = new Set(['not-paired', 'not-configured', 'authentication-required', 'offline', 'network-failed', 'day-budget', 'budget-exhausted',
+    'not-in-release', 'request-rate-limit']);
+  /** The one plain line beside a control the layer made (.say-note is the app's own small note): empty takes it away. */
+  function noteBeside(control, text) {
+    if (!control?.isConnected) return;
+    let note = control.nextElementSibling?.classList?.contains('voice-note') ? control.nextElementSibling : null;
+    if (!note) {
+      if (!text) return;
+      note = el('span', 'say-note voice-note');
+      note.setAttribute('role', 'status');
+      note.dataset.japaneseLookup = 'off';
+      control.after(note);
+    }
+    note.textContent = text || '';
+  }
 
-  /** Speak `sentences` from `button`: a second tap stops it; whatever else was speaking ends first. `automatic`: the
-   * read was not started by the learner's tap (a word or an answer said by itself, which the app allows only when he
-   * switched it on): it never falls back to the device voice, and when nothing can say it, it says nothing at all. */
+  /** A read belongs to its control, and the app may draw that control's screen again while the read goes on (a page
+   * settling as it opens, a box drawn again). For a control that stands once on the screen this returns how to find
+   * "the same control of the same word" afterwards; for any other control, null (its read ends with it). */
+  function anchorOf(button) {
+    const id = button?.id || '';
+    const lookup = id ? () => doc.getElementById(id)
+      : button?.dataset?.voiceSay === 'entry-headword' ? () => doc.querySelector('#sheet > .voice-say[data-voice-say="entry-headword"]') : null;
+    if (!lookup) return null;
+    const subject = (node) => node.closest('#mini')?.dataset.uiContentValue || node.closest('.kp-card')?.dataset.card || node.closest('#sheet')?.dataset.node ||
+      `${node.dataset.voiceWord || ''}|${node.dataset.voiceText || ''}`;
+    const was = subject(button);
+    return () => { const now = lookup(); return now && now !== button && subject(now) === was ? now : null; };
+  }
+
+  /** Speak `sentences` from `button`: a second tap stops it; whatever else was speaking ends first. With no voice to be
+   * had it makes no sound and hands `onNote` the reason in one plain line (and '' again once a voice answers).
+   * `automatic`: the read was not started by the learner's tap (a card's answer or an opened word saying itself): it
+   * does not start at all when it could not be voiced, so it stops no other sound, and it never shows a line. */
   function speakFrom(button, { sentences, voiceKey, single = false, onNote = null, onDone = null, automatic = false }) {
-    if (button && spoken?.button === button && spoken.session && !spoken.session.ended) { seam.stop(); return null; }
-    if (!sentences.length) { if (!automatic) onNote?.(failureLine('nothing'), 'no-text'); return null; }
+    // his second tap on a control that is speaking stops it; a read by itself is nobody's tap
+    if (!automatic && button && spoken?.button === button && spoken.session && !spoken.session.ended) { seam.stop(); return null; }
+    if (!sentences.length) { if (!automatic) onNote?.(silenceLine('nothing-to-say'), 'nothing-to-say'); return null; }
+    if (automatic) {
+      if (seam.cannot(voiceKey)) return null;
+      // a page nobody has touched yet may not sound: asking the server then would be paid for and never heard
+      const touched = doc.defaultView.navigator?.userActivation;
+      if (touched && !touched.hasBeenActive) return null;
+    }
     prime();
-    const mine = { button, session: null, over: false };
+    // `find`: the same control of the same word after the app has drawn its screen again (anchorOf)
+    const mine = { button, session: null, over: false, voiced: false, find: anchorOf(button) };
     const paint = (on) => {
-      if (!button?.isConnected) return;
-      button.classList.toggle('is-speaking', on);
-      if (on) button.setAttribute('aria-pressed', 'true'); else button.removeAttribute('aria-pressed');
+      if (!mine.button?.isConnected) return;
+      mine.button.classList.toggle('is-speaking', on);
+      if (on) mine.button.setAttribute('aria-pressed', 'true'); else mine.button.removeAttribute('aria-pressed');
+    };
+    /** The control was drawn again while its read goes on: the new one takes the read over, lit as the old one was. */
+    mine.adopt = (next) => {
+      mine.button = next;
+      mine.find = anchorOf(next);
+      const state = mine.session?.state;
+      paint(state === 'loading' || state === 'playing');
+      if (state === 'loading') next.setAttribute('aria-busy', 'true');
     };
     mine.session = seam.read({
-      sentences, voiceKey, prefetch: single ? 0 : 2, gapMs: single ? 0 : 260, rate: reader.rate, deviceFallback: !automatic,
-      // as each sentence starts: where it comes from (the device voice also says why it is the one speaking)
-      onSource: (source, reason) => { if (!mine.over) onNote?.(sourceLine({ last: { source, reason } }), source === 'device' ? 'device' : null); },
+      sentences, voiceKey, prefetch: single ? 0 : 2, gapMs: single ? 0 : 260, rate: reader.rate,
+      // a voice answered: the line an earlier silence left beside the control goes
+      onSource: () => { if (mine.over) return; mine.voiced = true; onNote?.('', null); },
       onState: (state, code) => {
         if (mine.over) return;
-        if (state === 'loading' || state === 'playing') { paint(true); button?.setAttribute('aria-busy', String(state === 'loading')); }
+        if (state === 'loading' || state === 'playing') { paint(true); mine.button?.setAttribute('aria-busy', String(state === 'loading')); }
         if (['done', 'stopped', 'error'].includes(state)) {
           mine.over = true;
           paint(false);
-          button?.removeAttribute('aria-busy');
+          mine.button?.removeAttribute('aria-busy');
           if (spoken === mine) spoken = null;
-          if (state === 'error' && !automatic) onNote?.(failureLine(code), code || 'failed');
+          // no sound was made: his tap is told why, in words; a read by itself says nothing
+          const why = state === 'error' ? code || 'speak-failed' : state === 'done' && !mine.voiced ? 'nothing-to-say' : null;
+          if (why && !automatic) onNote?.(silenceLine(why), why);
           onDone?.(state, code);
         }
       },
@@ -261,10 +340,10 @@ export function installVoiceLayer(host) {
         reader.index = index;
         showSentence(index);
       },
-      // the bar's note names where this sentence comes from: the recording, the voice server, or the device voice
-      onSource: (source, reason) => {
+      // the bar's note names where this sentence comes from: the recording or the voice server
+      onSource: (source) => {
         if (reader.owner !== mine) return;
-        reader.source = { source, reason };
+        reader.source = { source };
         host.refreshListenRow?.();
       },
       onState: (state, code) => {
@@ -286,19 +365,25 @@ export function installVoiceLayer(host) {
       const active = here && readerActive();
       const state = active ? reader.session.state : 'idle';
       const narrated = !!(host.narration?.(p) || []).length;
-      const status = seam.status();
+      // No voice for this article (a play that ended silent, or one that would): the bar says so in a few words, and
+      // `line` is the whole sentence. An article with its own recording plays it, paired or not.
+      const now = narrated ? null : seam.cannot(voiceKeyOf('article', p.id));
+      const failed = here && reader.failed ? reader.failed.code : null;
+      // a reason that passes (he paired, the minute went by, the connection came back) is read as it stands now; a
+      // read that is under way names its voice until it ends
+      let silent = failed && !PASSING.has(failed) ? failed : active ? null : now;
+      if (silent === 'not-paired' && seam.status().pairAgain) silent = 'authentication-required';
+      const brief = (reason) => reason === 'not-paired' || reason === 'not-configured' ? tx('設定でつなぐと聞けます', 'pair in Settings to hear this')
+        : reason === 'authentication-required' ? tx('設定でもう一度つなぐ', 'pair again in Settings') : reasonWords(reason);
       let note;
-      if (here && reader.failed) note = reader.failed.code === 'no-voice'
-        ? tx('声を出せません · 設定でつなぐ', 'no voice · pair in Settings') : tx('再生できませんでした', 'could not play');
+      if (silent) note = brief(silent);
       else if (narrated) note = host.narrationVoiceName?.() || tx('収録音声', 'Recorded clip');
-      else if (active && reader.source?.source === 'device') note = tx('端末の声', 'Device voice');
-      else if (active && reader.source?.source === 'server') note = tx('音声サーバー', 'Voice server');
-      else note = status.paired && status.configured && !status.blocked ? tx('音声サーバー', 'Voice server') : tx('端末の声', 'Device voice');
+      else note = tx('音声サーバー', 'Voice server');
       return {
         available: true, narrated, active, playing: active && (state === 'loading' || state === 'playing'), paused: active && state === 'paused',
         loading: active && state === 'loading', index: here ? reader.index : 0,
         total: here && reader.sentences.length ? reader.sentences.length : Math.max(1, (host.narration?.(p) || []).length || 1),
-        rate: reader.rate, failed: here && !!reader.failed, note,
+        rate: reader.rate, failed: here && !!reader.failed, note, silent: silent || null, line: silent ? silenceLine(silent) : '',
       };
     },
     /** Play, pause or resume. A read that was stopped starts again at the sentence it had reached. */
@@ -406,15 +491,23 @@ export function installVoiceLayer(host) {
     mark.append(uiIcon('speaker'));
     return mark;
   }
+  /** corridor.js says a word page was opened by the learner's own act (not a return to it, not a page restored, and
+   * not from that word's own box, which has just said it): its headword says itself once when the page stands. */
+  let openedPage = null; // { node: 'word:<id>', at }
+  // a mark placed before its text may have its no-voice line (noteBeside) standing between the two
   const markOf = (node, at) => {
-    const near = at === 'before' ? node.previousElementSibling : at === 'after' ? node.nextElementSibling : node.querySelector(':scope > .voice-say');
+    let near = at === 'before' ? node.previousElementSibling : at === 'after' ? node.nextElementSibling : node.querySelector(':scope > .voice-say');
+    if (at === 'before' && near?.classList?.contains('voice-note')) near = near.previousElementSibling;
     return near?.classList?.contains('voice-say') ? near : null;
   };
+  const dropMark = (mark) => { if (mark.nextElementSibling?.classList?.contains('voice-note')) mark.nextElementSibling.remove(); mark.remove(); };
   function mountMarks(root = doc) {
+    // a line whose mark has gone (the app drew its text again) goes with it
+    for (const note of root.querySelectorAll('.voice-note')) if (!note.previousElementSibling?.matches?.('.voice-say, .kp-word, .excerpt-listen')) note.remove();
     for (const rule of RULES) {
       for (const node of root.querySelectorAll(rule.find)) {
         const have = markOf(node, rule.at);
-        if (rule.when && !rule.when(node)) { have?.remove(); continue; }
+        if (rule.when && !rule.when(node)) { if (have) dropMark(have); continue; }
         if (have) continue;
         let plan = null;
         try { plan = rule.read(node); } catch { /* a surface that changed shape gets no mark */ }
@@ -426,44 +519,80 @@ export function installVoiceLayer(host) {
           let now = null;
           try { now = rule.read(node); } catch { /* the surface went */ }
           if (!now?.sentences?.length) return;
-          speakFrom(mark, { ...now, onNote: (line) => { mark.title = line || tx('聞く', 'Listen'); } });
+          speakFrom(mark, { ...now, onNote: (line) => { mark.title = line || tx('聞く', 'Listen'); noteBeside(mark, line); } });
         });
         if (rule.at === 'before') node.before(mark);
         else if (rule.at === 'after') node.after(mark);
         else node.append(mark);
+        // the word page he has just opened says its word once, as its mark arrives (opened(), below)
+        if (rule.id === 'entry-headword' && openedPage) {
+          const page = openedPage;
+          const sheet = node.closest('#sheet');
+          if (sheet?.dataset.node === page.node) {
+            openedPage = null;
+            if (Date.now() - page.at < 5000 && host.bySelf?.()) speakFrom(mark, { ...plan, automatic: true });
+          }
+        }
       }
     }
     mountStudyCard(root);
   }
-  /** The study card keeps its own look: one more of its own small buttons, on the answer side only. */
+  /** The study card keeps its own look: one more of its own small buttons, on the answer side only. Its answer says
+   * its word once as it is shown (John's "on reveal"), unless he switched that off. */
+  let saidCard = null; // the card whose answer was last shown: said once, not at every redraw of that answer
   function mountStudyCard(root) {
     for (const card of root.querySelectorAll('.kp .kp-card')) {
       const answer = card.querySelector('.kp-answer');
       const row = card.querySelector('.kp-eyebrow');
       const have = card.querySelector('.kp-listen');
-      if (!answer || !row) { have?.remove(); continue; }
+      if (!answer || !row) {
+        // the question side: no control stands there, and the answer shown next is a new one to say
+        for (const stale of card.querySelectorAll('.kp-listen, .voice-note')) stale.remove();
+        if (!answer) saidCard = null;
+        continue;
+      }
       if (have) continue;
       const sentence = card.querySelector('.kp-sentence .kp-s[data-focus="1"]') || card.querySelector('.kp-sentence');
       const term = shownText(card.querySelector('.kp-term'));
       const reading = shownText(card.querySelector('.kp-reading')) || term;
       const key = voiceKeyOf('word', term || card.dataset.card || 'card');
+      const word = answer.querySelector('.kp-word');
+      // one plain line for the card's two controls, on its own row under the word
+      const note = (line) => {
+        let at = word?.nextElementSibling?.classList?.contains('voice-note') ? word.nextElementSibling : null;
+        if (!at && line && word) {
+          at = el('span', 'say-note voice-note');
+          at.setAttribute('role', 'status');
+          at.dataset.japaneseLookup = 'off';
+          word.after(at);
+        }
+        if (at) at.textContent = line || '';
+      };
       const button = (label, read) => {
         const control = el('button', 'kp-zoom-btn kp-listen', label);
         control.type = 'button';
-        control.addEventListener('click', (event) => { event.stopPropagation(); const plan = read(); if (plan.length) speakFrom(control, { sentences: plan, voiceKey: key, onNote: (line) => { control.title = line || ''; } }); });
+        control.addEventListener('click', (event) => {
+          event.stopPropagation();
+          speakFrom(control, { sentences: read(), voiceKey: key, onNote: (line) => { control.title = line || ''; note(line); } });
+        });
         return control;
       };
       const listen = button(tx('聞く', 'Listen'), () => japaneseSentences(shownText(sentence)));
       listen.id = 'kp-listen';
       listen.setAttribute('aria-label', tx('この文を聞く', 'Listen to this sentence'));
       row.append(listen);
-      const word = answer.querySelector('.kp-word');
       if (word && reading) {
         const say = button(tx('音', '音'), () => [{ text: reading }, ...japaneseSentences(shownText(answer.querySelector('.kp-def'))), ...japaneseSentences(shownText(answer.querySelector('.kp-note-passage')))].filter((s) => isJapaneseEnough(s.text)));
         say.id = 'kp-listen-word';
         say.lang = 'ja';
         say.setAttribute('aria-label', tx('語と説明を聞く', 'Listen to the word and its definition'));
         word.append(say);
+        // the answer shown: its word, once, through the voice server or not at all
+        const shown = card.dataset.card || term;
+        if (saidCard !== shown) {
+          saidCard = shown;
+          if (host.bySelf?.() && isJapaneseEnough(reading)) speakFrom(say, { sentences: [{ text: reading }], voiceKey: key, single: true, automatic: true });
+        }
       }
     }
   }
@@ -472,9 +601,14 @@ export function installVoiceLayer(host) {
     if (scan) return;
     scan = doc.defaultView.setTimeout(() => {
       scan = 0;
-      // a read belongs to its control: when the control's screen goes, the read ends
-      if (spoken && !spoken.button.isConnected) { const gone = spoken; spoken = null; if (gone.session && !gone.session.ended) gone.session.stop(); }
       mountMarks(doc);
+      // A read belongs to its control. The control drawn again (the same one, of the same word) takes the read over;
+      // when the control's screen has gone, the read ends.
+      if (spoken?.button && !spoken.button.isConnected) {
+        const again = spoken.find?.();
+        if (again) spoken.adopt(again);
+        else { const gone = spoken; spoken = null; if (gone.session && !gone.session.ended) gone.session.stop(); }
+      }
     }, 60);
   };
   new doc.defaultView.MutationObserver(rescan).observe(doc.body, { childList: true, subtree: true });
@@ -500,19 +634,16 @@ export function installVoiceLayer(host) {
     if (status.paired) state = tx(`音声サーバーに接続済み（端末 …${status.installation.slice(-4)}）。`, `Paired with the voice server (install …${status.installation.slice(-4)}).`) +
       (status.durable ? '' : tx(' このブラウザは保存できないため、今回の利用だけ有効。', ' This browser could not keep it, so it lasts for this visit only.'));
     else if (status.pairAgain) state = tx('音声サーバーがこの接続を終了しました。新しいコードでもう一度つないでください。', 'The voice server ended this pairing. Pair Bunki again with a new code.');
-    else state = tx('未接続。つなぐまでは端末の声で読みます。', 'Not paired. The device voice speaks until you pair.');
-    // the server's day is the UTC day: its new start, in this device's own time
-    const newDay = new Date((Math.floor(Date.now() / 86400000) + 1) * 86400000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const blocked = {
-      'day-budget': tx(`今日の3ドル分を使いました。${newDay}（協定世界時0時）まで端末の声で読みます。`, `Today’s $3 is used. The device voice speaks until ${newDay} (00:00 UTC).`),
-      'budget-exhausted': tx('合計25ドルを使い切りました。端末の声で読みます。', 'The $25 total is used. The device voice speaks.'),
-      'not-in-release': tx('音声サーバーはいま新しい文を受け付けていません。端末の声で読みます。', 'The voice server is not taking new sentences right now. The device voice speaks.'),
-      'request-rate-limit': tx('1分あたりの新しい文が多すぎました。1分ほど端末の声で読みます。', 'Too many new sentences in one minute. The device voice speaks for about a minute.'),
-    }[status.blocked];
+    else state = tx('未接続。つなぐまで声は出ません（記事の収録音声を除く）。', 'Not paired. Nothing is spoken until you pair, except an article’s own recording.');
+    // paired, and the server is not answering for a reason that lasts: the same plain line a control gives
+    const blocked = ['day-budget', 'budget-exhausted', 'not-in-release', 'request-rate-limit'].includes(status.blocked) ? silenceLine(status.blocked) : '';
+    const clock = (at) => new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const said = status.last.source === 'none' ? remembered() : status.last;
-    const clock = said ? new Date(said.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-    const last = !said ? tx('最後に読んだ文：まだありません。', 'Last sentence: nothing spoken yet.')
-      : tx(`最後に読んだ文：${sourceLine({ last: said })}（${clock}）`, `Last sentence: ${sourceLine({ last: said }).replace(/^./, (c) => c.toLowerCase())}, at ${clock}.`);
+    // the newest thing that happened: a sentence spoken, or a tap that found no voice, and why
+    const last = status.silent && (!said || status.silent.at >= said.at)
+      ? tx(`最後のタップ：声なし（${reasonWords(status.silent.reason)}、${clock(status.silent.at)}）`, `Last tap: no voice (${reasonWords(status.silent.reason)}), at ${clock(status.silent.at)}.`)
+      : !said ? tx('最後に読んだ文：まだありません。', 'Last sentence: nothing spoken yet.')
+        : tx(`最後に読んだ文：${sourceLine(said.source)}（${clock(said.at)}）`, `Last sentence: ${sourceLine(said.source).replace(/^./, (c) => c.toLowerCase())}, at ${clock(said.at)}.`);
     const budget = status.budget
       ? tx(`音声の予算：${dollars(status.budget.capCents)} のうち ${dollars(status.budget.spentCents)} 使用、残り ${dollars(status.budget.remainingCents)}（Nihongo Study と共通）。`,
         `Voice budget: ${dollars(status.budget.spentCents)} of ${dollars(status.budget.capCents)} used, ${dollars(status.budget.remainingCents)} left (shared with Nihongo Study).`)
@@ -528,9 +659,9 @@ export function installVoiceLayer(host) {
       }
       const cap = dollars(spend.capCents ?? 300);
       today = spend.since === null
-        ? tx(`今日：${dollars(spend.spentCents)}（上限は1日${cap}、${newDay}に戻ります）。`, `Today: ${dollars(spend.spentCents)} of ${cap}. The day starts again at ${newDay}.`)
-        : tx(`今日：${dollars(spend.spentCents)}（この端末で${new Date(spend.since).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}から数えた分。上限は1日${cap}、${newDay}に戻ります）。`,
-          `Today: ${dollars(spend.spentCents)} since ${new Date(spend.since).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}, counted on this device. The limit is ${cap} a day and starts again at ${newDay}.`);
+        ? tx(`今日：${dollars(spend.spentCents)}（上限は1日${cap}、${newDay()}に戻ります）。`, `Today: ${dollars(spend.spentCents)} of ${cap}. The day starts again at ${newDay()}.`)
+        : tx(`今日：${dollars(spend.spentCents)}（この端末で${clock(spend.since)}から数えた分。上限は1日${cap}、${newDay()}に戻ります）。`,
+          `Today: ${dollars(spend.spentCents)} since ${clock(spend.since)}, counted on this device. The limit is ${cap} a day and starts again at ${newDay()}.`);
     }
     return { state: blocked && status.paired ? `${state} ${blocked}` : state, last, budget, today };
   }
@@ -538,7 +669,7 @@ export function installVoiceLayer(host) {
   function settingsBlock() {
     const block = el('div', 'settings-voice-server');
     block.id = 'settings-voice-server';
-    const name = el('p', 'settings-writing-name', tx('音声サーバー — 収録音声、音声サーバー、端末の声の順', 'Voice server — a recorded clip first, then the voice server, then the device voice'));
+    const name = el('p', 'settings-writing-name', tx('音声サーバー — 収録音声、次に音声サーバー。ほかの声は使いません', 'Voice server — a recorded clip first, then the voice server. No other voice is used'));
     const state = el('p', 'teacher-note'); state.id = 'voice-status'; state.setAttribute('role', 'status');
     const last = el('p', 'teacher-note'); last.id = 'voice-last';
     const budget = el('p', 'teacher-note'); budget.id = 'voice-budget';
@@ -572,6 +703,7 @@ export function installVoiceLayer(host) {
       today.textContent = lines.today; today.hidden = !lines.today;
       block.dataset.paired = String(status.paired); block.dataset.configured = String(status.configured);
       block.dataset.lastSource = status.last.source;
+      block.dataset.silent = status.silent?.reason || '';
       form.hidden = status.paired;
       forget.hidden = !status.paired; refresh.hidden = !status.paired;
       submit.disabled = busy;
@@ -613,10 +745,16 @@ export function installVoiceLayer(host) {
       try { normal = normaliseSpeechText(String(text || '')); } catch { /* nothing to say */ }
       return speakFrom(button, { sentences: normal ? [{ text: normal }] : [], voiceKey: voiceKeyOf('word', word || normal), single: true, onNote, automatic });
     },
-    /** The quote chip: the excerpt through the seam when the article has no recording of it. */
-    sayExcerpt({ text, sourceId, button, onNote }) {
+    /** The quote chip: the excerpt through the seam when the article has no recording of it. With no voice the reason
+     * stands in one line beside the chip. */
+    sayExcerpt({ text, sourceId, button, onNote = (line) => noteBeside(button, line) }) {
       return speakFrom(button, { sentences: japaneseSentences(text), voiceKey: sourceId ? voiceKeyOf('article', sourceId) : voiceKeyOf('word', 'sentence'), onNote });
     },
+    /** Whether a word could be voiced right now. A read that would start by itself asks first (corridor.js), so that
+     * with no voice to be had it stops no other sound. */
+    canSay: () => !seam.cannot(),
+    /** A word page opened by the learner's own act: its headword says itself once when the page stands (mountMarks). */
+    opened(node) { openedPage = node?.t && node.id != null ? { node: `${node.t}:${node.id}`, at: Date.now() } : null; },
     /** Every sound of the layer ends: the screen changed. `keepReader` leaves an article's read to the reader's own rule. */
     stop({ keepReader = false } = {}) {
       if (!keepReader) readerApi.stop();

@@ -5501,6 +5501,11 @@ function go(node, { invoker = null, from = null, instant = keyboardActivated(), 
   if (!S.stack.length && !S.dialogInvoker) {
     S.dialogInvoker = invokerKey(invoker || document.activeElement);
   }
+  // An opened word says itself once (John's "on reveal", 2026-11-10): a word's page opened by his own act says its
+  // word as it stands, unless its own box has just said it in this visit. A return (back) and a restored page never
+  // pass here. The voice layer says it, through the voice server or not at all.
+  if (node.t === 'word' && wordVoice() === 'on' && !(invoker && ladderVisit?.anchor === invoker && ladderVisit.ink?.spoke))
+    voiceLayer?.opened(node);
   enterWord(node, { from, invoker, instant, ticketCandidate });
 }
 
@@ -9677,8 +9682,8 @@ function enhanceJapaneseProse(root) {
     const text = quote.textContent;
     // the quote carries its own source, so the clip that plays is this article's and no other
     const owner = quote.dataset.sourceId || null;
-    // a quote from an article with no recording is said by the voice layer (the voice server, else the device voice):
-    // its chip is a plain "Listen", never the recorded voice's name
+    // a quote from an article with no recording is said by the voice layer (the voice server, or silence and the
+    // reason beside the chip): its chip is a plain "Listen", never the recorded voice's name
     const seam = !!voiceLayer && !!owner && !articleNarration.articles?.[owner];
     const listen = el('button', 'chip excerpt-listen', seam ? tx('聞く', 'Listen') : excerptListenLabel()); listen.type = 'button';
     listen.addEventListener('click', () => {
@@ -12617,7 +12622,7 @@ async function playNarratedExcerpt(text, button, sourceId = null) {
   }
   delete button.dataset.excerptUnresolved;
   if (!clips?.length) {
-    // no recording of this quote: the voice layer says it (the voice server, else the device voice)
+    // no recording of this quote: the voice layer says it (the voice server, or silence and the reason beside the chip)
     if (voiceLayer) { button.textContent = original; voiceLayer.sayExcerpt({ text, sourceId, button }); return; }
     button.textContent = tx('この引用の収録音声はありません', 'No recording for this excerpt'); return;
   }
@@ -12776,11 +12781,13 @@ function approvedWordManifest(m) {
 /** The one admissible clip for a (surface, reading) on a single-speaker surface. Returns null
  * rather than guessing: no spelling-only match, no other reading, no other voice, no other
  * model. `entrySeq`, when the card knows which dictionary entry it is showing, must agree too. */
-/** 音 — exact approved recordings first, ephemeral Japanese device speech for gaps. */
+/** The device voice never speaks (device-voice.mjs refuses every utterance; John, 2026-11-10: "real voices or
+ * silence"). It is kept for its cancel(), which ends anything the browser's own speech might still be saying. */
 const deviceVoice = createDeviceVoice();
 /** The voice layer (modules/voice-layer.mjs, 2026-11-10): the one seam every surface speaks through, a recorded clip,
- * then the voice server, then the device voice. It is loaded beside the app; null until it has arrived, and for good
- * in the single-file build, where every voice door then stays as it was. */
+ * then the voice server, and otherwise silence with the reason in words (John: "real voices or silence"; the device
+ * voice above never speaks). It is loaded beside the app; null until it has arrived, and for good in the single-file
+ * build, where every voice door then stays as it was. */
 let voiceLayer = null;
 let cardAudioSerial = 0, cardFaceKey = '', cardFaceReview = null, cardFaceItem = null;
 let reviewVoiceFace = null;
@@ -12843,20 +12850,21 @@ function deviceVoiceMessage(result) {
 function speakCardReading(text, btn, word = '', { automatic = false } = {}) {
   if (document.hidden || (btn?.id === 'card-say' &&
       (S.view !== 'review' || !S.review?.revealed || S.review.pending || S.review.admitting || S.stack.length || S.strokes))) return;
-  // Said by itself (a card's answer shown, a word writing itself) is not his tap: the voice server is paid by the
-  // sentence, so it is asked only when he switched that on, and the device voice never speaks by itself. An approved
-  // recording of a single word would be free and could sound here; this app ships none. A tap on 音 always speaks.
-  if (automatic && wordVoice() !== 'on') return;
+  // Said by itself (a card's answer shown, a word opened: John's "on reveal", 2026-11-10) is not his tap. It happens
+  // unless he switched it off (WORD_VOICE), through the voice server only; and when no voice is to be had (no layer,
+  // unpaired, offline, the budget used) nothing happens at all: no other sound is stopped and no line is shown.
+  // A tap on 音 always asks, and is told why when it finds no voice.
+  if (automatic && (wordVoice() !== 'on' || !voiceLayer?.canSay())) return;
   retireCardSpeech();
   stopReadAloud(); stopRecAudio(); stopSentenceListening();
-  // The current source is the voice seam (modules/voice-seam.mjs): a recorded clip, then the voice server, then the
-  // device voice. Nothing sounds from here itself: no manifest, fetch, or utterance starts in this function, and
-  // without the seam the reading stays retired.
+  // The current source is the voice seam (modules/voice-seam.mjs): a recorded clip, then the voice server, and
+  // otherwise silence ("real voices or silence"). Nothing sounds from here itself: no manifest, fetch, or utterance
+  // starts in this function, and without the seam the reading stays retired.
   if (!voiceLayer) { cardVoiceStatus(btn, tx('現在の音源が必要です', 'Current audio source required'), 'current-source-required'); return; }
   cardVoiceStatus(btn, '', null);
-  // the server's voice needs no note; the device voice says why it is the one speaking; a failure says what to do
+  // a voice needs no note; a tap that finds no voice gets the reason in one plain line beside the control
   voiceLayer.sayWord({ text, word, button: btn, automatic,
-    onNote: (line, flag) => cardVoiceStatus(btn, flag ? line : '', flag && flag !== 'device' ? flag : null) });
+    onNote: (line, flag) => cardVoiceStatus(btn, line, flag || null) });
 }
 
 /** Use only the answer on this face; never infer one of a kanji's several readings. */
@@ -12912,7 +12920,7 @@ function autoSpeakReviewFace() {
   if (status) cardVoiceStatus(button, status.reason, status.flag);
   if (reviewVoiceFace.attempted) return;
   reviewVoiceFace.attempted = true;
-  // by itself the answer is said only when the learner switched that on (Settings, 筆と声); otherwise 音 waits for his tap
+  // the answer shown says itself once, unless the learner switched that off (Settings, 筆と声); then 音 waits for his tap
   if (wordVoice() !== 'on') return;
   speakCardReading(button.dataset.voiceText, button, button.dataset.voiceWord,
     { automatic: true, entrySeq: button.dataset.voiceEntrySeq });
@@ -12964,7 +12972,8 @@ function buildListenRow(p) {
   listenRow.dataset.passage = p.id;
   const clips = narrationClips(p);
   // The voice layer reads every article (2026-11-10): its recorded clips where it has them, else sentence by sentence
-  // through the voice server, the device voice when that cannot answer. Without the layer the bar is as it was.
+  // through the voice server; when that cannot answer the bar makes no sound and its note says why in a few words
+  // (the whole sentence is the note's title). Without the layer the bar is as it was.
   const live = voiceLayer ? voiceLayer.reader.state(p) : null;
   const mark = el('button', 'play-mark');
   mark.type = 'button';
@@ -13011,6 +13020,7 @@ function buildListenRow(p) {
     ? tx('再生できませんでした', 'could not play')
     : narrationVoiceName());
   listenNote.id = 'listen-note';
+  if (live?.silent) { listenNote.title = live.line; listenRow.dataset.voiceSilent = live.silent; }
   const rate = el('button', 'play-rate', `${readAloud.rate}×`);
   rate.type = 'button';
   rate.id = 'listen-rate';
@@ -31644,13 +31654,16 @@ if (typeof window !== 'undefined' && !window.__CORRIDOR_BUNDLE__) void import('.
 // EVERYTHING-ON PROTOTYPE: the prototype layer (the first-open line, the 新 marks, the prototype button with its list of new
 // things and its notes) is its own module and stylesheet, loaded beside the app. The single-file build carries neither.
 // THE VOICE LAYER (2026-11-10; John: "complete all surfaces from articles to cards to grammar points to words, end to
-// end"): one seam every surface speaks through, a recorded clip first, then the voice server, then the device voice.
-// It is its own module, loaded beside the app; the app hands it only what it needs. The single-file build carries none.
+// end"): one seam every surface speaks through, a recorded clip first, then the voice server, and otherwise silence
+// with the reason in words. It is its own module, loaded beside the app; the app hands it only what it needs. The
+// single-file build carries none.
 if (typeof window !== 'undefined' && !window.__CORRIDOR_BUNDLE__) {
   void import(window.__KAIRO_VOICE_LAYER_URL__ || './modules/voice-layer.mjs').then((layer) => {
     voiceLayer = layer.installVoiceLayer({
-      tx, el, uiIcon, deviceVoice,
+      tx, el, uiIcon,
       view: () => S.view,
+      // on reveal: a card's answer and an opened word say themselves once, unless he switched that off
+      bySelf: () => wordVoice() === 'on',
       passage: () => (S.view === 'reader' ? passage() : null),
       cardRevealed: () => S.view === 'review' && !!S.review?.revealed,
       // one sound at a time: every other lane lets go before the seam speaks
@@ -33039,13 +33052,13 @@ function renderStrokePage(root) {
  * stroke data (kana, a rare glyph) stands written from the first frame. */
 const WORD_BRUSH_KEY = 'kairo-word-brush-v1';
 const WORD_BRUSH = Object.freeze(['first', 'always', 'never']);
-/* 声 — by itself. The voice server is paid by the sentence, so a word said as its box writes it, or a card's answer said
- * as it is shown, would spend the learner's voice budget without a tap. That happens only when he switched it ON here
- * (the program lead's ruling, 2026-11-10); OFF is the default. The switch has a key of its own: the older
- * 'kairo-word-voice-v1' (on by default, from when the voice by itself was free device speech) is never read or written
- * again, so an old "on" is never taken for a yes to spending. */
+/* 声 — on reveal. A card's answer and an opened word say themselves once, through the voice server (which is paid by
+ * the sentence, so this uses the learner's voice budget). ON is the default and this one switch turns it off: John's
+ * own answer, 2026-11-10 ("On reveal, both apps"), which replaced the same evening's OFF by default. The key is the
+ * one that evening's switch wrote, so an Off he chose then stays Off. The older 'kairo-word-voice-v1' (from when the
+ * voice by itself was free device speech) is never read or written again. */
 const WORD_VOICE_KEY = 'kairo-voice-by-itself-v1';
-const WORD_VOICE = Object.freeze(['off', 'on']);
+const WORD_VOICE = Object.freeze(['on', 'off']);
 /** A device choice (never the learner record), read once and kept for the session when storage cannot keep it — the
  * writing speed's own way. The first of `allowed` is the default. */
 function wordPref(key, field, allowed) {
@@ -33064,7 +33077,8 @@ function setWordPref(key, field, allowed, value) {
 }
 /** 筆 — when a word writes itself: 'first' (a first meeting: new or met), 'always', 'never'. */
 const wordBrush = () => wordPref(WORD_BRUSH_KEY, 'wordBrush', WORD_BRUSH);
-/** 声 — new words and answers said by themselves, through the voice server (it uses the voice budget): 'off' or 'on'. */
+/** 声 — a card's answer and an opened word said once by themselves, through the voice server (it uses the voice
+ * budget): 'on' unless he turned it 'off'. */
 const wordVoice = () => wordPref(WORD_VOICE_KEY, 'wordVoice', WORD_VOICE);
 
 /** One stroke's time: min(110 ms, 1400 ms ÷ strokes), never under 45 ms, at the middle 書く速さ — a word of up to 31
@@ -33230,13 +33244,12 @@ function retireStage({ refreshing = false } = {}) {
 }
 if (typeof window !== 'undefined') window.addEventListener('pagehide', () => retireStage());
 
-/** 音 / 声 — the word in the locked recorded voice, through the card's own voice door: keyed by the surface and the
- * reading the stage shows (V's resolver under audio/voice-lock.json, Kore for a word), with a Japanese device voice
- * for gaps. Only ever after his own gesture, on an unsealed stage. An unavailable voice marks the 音 quietly
- * (its name says so); asked for with a tap, its note also says why. */
+/** 音 / 声 — the word through the card's own voice door (speakCardReading): the voice seam, keyed by the surface and
+ * the reading the stage shows; a voice or silence, never a stand-in. Only ever after his own gesture, on an unsealed
+ * stage. An unavailable voice marks the 音 quietly (its name says so); asked for with a tap, its note also says why. */
 function sayStageWord(button, { surface, reading }, { automatic = false } = {}) {
   if (!button?.isConnected || !nonEmptyString(reading)) return;
-  // the word said as it writes itself is said by itself: only when the learner switched that on (speakCardReading)
+  // the word said as its box opens is said by itself: not when the learner switched that off (speakCardReading)
   if (automatic && wordVoice() !== 'on') return;
   if (!button.parentElement.querySelector('.say-note')) {
     const note = el('span', 'say-note mini-say-note');
@@ -33258,7 +33271,8 @@ function dressStage(visit, stage, { word, label, token, kind, nodeFor, reading, 
   // only a word with stroke data can write itself (kana and a rare glyph stand written)
   const written = [...String(label || '')].some((ch) => strokePathsFor(ch).length);
   const deliberate = arriving && !visit.restore && !visit.restoreNext && !visit.redo && !visit.demo;
-  visit.ink ||= { ...inkCeremony(stageDepth(node), deliberate && written), startedAt: null, ended: null, asked: {} };
+  // `opened`: the visit began with his own arrival (not a restore, a redo or the demonstration): its word says itself once
+  visit.ink ||= { ...inkCeremony(stageDepth(node), deliberate && written), startedAt: null, ended: null, asked: {}, opened: deliberate };
   const plan = visit.ink;
   stage.dataset.depth = plan.depth;
   stage.dataset.ceremony = plan.bare ? 'bare' : plan.write ? 'write' : 'written';
@@ -33268,7 +33282,7 @@ function dressStage(visit, stage, { word, label, token, kind, nodeFor, reading, 
   if (plan.bare) askOnRequest(stage, plan, readingLine);
   let voice = null;
   const marks = el('span', 'mini-marks');
-  // speak: 'first' says the word once per visit as it first writes (声 on); 'again' with the 筆 mark's own rewrite
+  // speak: 'again' says the word with the 筆 mark's own rewrite (声 on); the opening says it once by itself (sayOpened)
   const write = ({ after = null, elapsed = 0, speak = null } = {}) => {
     const ink = writeWord(word, { reading: plan.bare ? null : readingLine, after, elapsed,
       onBegin: (begun) => { plan.startedAt = begun.startedAt; },
@@ -33276,12 +33290,19 @@ function dressStage(visit, stage, { word, label, token, kind, nodeFor, reading, 
       onEnd: (why) => { if (why !== 'replaced') plan.ended = why; } });
     // a browser that cannot animate the ink shows the word written
     if (!ink && word.dataset.ink === 'arriving') delete word.dataset.ink;
-    if (ink && voice && wordVoice() === 'on' && (speak === 'again' || (speak === 'first' && !plan.spoke))) {
+    if (ink && voice && wordVoice() === 'on' && speak === 'again') {
       plan.spoke = true;
       // with the writing, not with a tap on 音: said by itself
       sayStageWord(voice, { surface: label, reading }, { automatic: true });
     }
     return ink;
+  };
+  // An opened word says itself once (John's "on reveal", 2026-11-10): once per visit, at his own arrival, whether or
+  // not the word writes itself. A redraw, a return from the page and a restored visit do not say it again.
+  const sayOpened = () => {
+    if (!voice || !plan.opened || plan.spoke || wordVoice() !== 'on') return;
+    plan.spoke = true;
+    sayStageWord(voice, { surface: label, reading }, { automatic: true });
   };
   if (written && !strokeReduced()) {
     const brush = el('button', 'mini-mark mini-brush', '筆');
@@ -33299,7 +33320,7 @@ function dressStage(visit, stage, { word, label, token, kind, nodeFor, reading, 
     });
     marks.append(brush);
   }
-  // 音 stands whenever something can say the word: the voice layer (a recorded clip, the voice server, the device voice)
+  // 音 stands whenever something can say the word: the voice layer (a recorded clip or the voice server)
   if (nonEmptyString(reading) && (recManifest !== null || voiceLayer)) {
     voice = el('button', 'mini-mark mini-voice', '音');
     voice.type = 'button';
@@ -33327,16 +33348,17 @@ function dressStage(visit, stage, { word, label, token, kind, nodeFor, reading, 
   }
   return {
     start(flight = null) {
+      sayOpened();
       if (!plan.write || plan.ended) return;
       // a stage drawn again mid-writing resumes it; a writing already done stays done
       if (plan.startedAt != null) {
-        write({ elapsed: (document.timeline?.currentTime ?? performance.now()) - plan.startedAt, speak: 'first' });
+        write({ elapsed: (document.timeline?.currentTime ?? performance.now()) - plan.startedAt });
         return;
       }
       // the first stroke waits for the word to land and for its page to be built ahead (G1, at idle, a moment after the
       // stage stands): the heavy work happens while the お手本 rests, never under a moving stroke — at most 400 ms
       const landed = flight ? flight.finished.then(() => {}, () => {}) : Promise.resolve();
-      write({ after: landed.then(() => Promise.race([pagePrebuildSettled, new Promise((done) => setTimeout(done, 400))])), speak: 'first' });
+      write({ after: landed.then(() => Promise.race([pagePrebuildSettled, new Promise((done) => setTimeout(done, 400))])) });
     },
   };
 }
@@ -36272,8 +36294,8 @@ function meBackPart() {
 /** Opening Settings at the record: the backup row in view and Export ready for a key press. */
 /** Settings → Layout: the current layout, or the one under test. Two visible states, the active one
  * lit, and one plain line of what changes and what does not. The choice re-renders where it stands. */
-/** Settings → 筆 and 声 (G4): when a word he brings closer writes itself (first meeting · always · never) and whether it is
- * said in recorded audio or the device voice (on · off). Device choices, never the learner record. The writing's speed is not here: it
+/** Settings → 筆 and 声 (G4): when a word he brings closer writes itself (first meeting · always · never) and whether a
+ * card's answer and an opened word say themselves once (on · off). Device choices, never the learner record. The writing's speed is not here: it
  * is his one 書く速さ slider, in one place — the writing room — and this note says where. */
 function renderSettings(main) {
   const places = placesLayout();

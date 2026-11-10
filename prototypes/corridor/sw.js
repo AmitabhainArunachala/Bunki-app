@@ -215,8 +215,8 @@ const BOOT_DATA = [
   'modules/record-core.mjs',
   // corridor.js imports device-voice.mjs at boot; first offline launch needs it.
   'device-voice.mjs',
-  // The voice layer is loaded beside the app at boot (corridor.js). Offline it is what lets the device voice speak, so
-  // it and everything it imports travel with the install.
+  // The voice layer is loaded beside the app at boot (corridor.js). Offline it is what plays an article's own recording
+  // and says in words why nothing else can be voiced, so it and everything it imports travel with the install.
   'modules/voice-layer.mjs',
   'modules/voice-seam.mjs',
   'modules/voice-client.mjs',

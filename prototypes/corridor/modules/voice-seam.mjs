@@ -1,22 +1,24 @@
 /** The voice seam: everything Bunki says aloud goes through here, one sound at a time.
  *
- * Source order for each sentence (speech team's contract v1, 2026-11-10):
+ * Real voices or silence (John, 2026-11-10). For each sentence:
  *   1. an approved recorded clip, when the surface has one for that sentence;
  *   2. the voice server (modules/voice-client.mjs), when this device is paired and the server takes the text;
- *   3. the device's own Japanese voice: unpaired, offline, out of budget, or the server refusing.
- * The device voice is the fallback for the learner's own tap only (`deviceFallback`): a read that starts by itself
- * never uses it. Whether anything may start by itself is the app's rule, not this module's (corridor.js, WORD_VOICE).
+ *   3. nothing. No other voice stands in: the read ends, silent, and names the reason, so the screen can say it in
+ *      plain words (unpaired, offline, out of budget, the server refusing).
+ * A sentence the server would not take as Japanese is passed over without a word and the read goes on.
  *
- * The contract's error codes each have one behaviour here:
- *   401 authentication-required   the client drops the token; device voice; the status says "pair again"
- *   402 budget-exhausted          device voice from then on (the $25 total is used)
- *   404 not-in-release            device voice from then on (the server's dynamic mode is off)
+ * The contract's error codes each have one behaviour here (speech team's contract v1):
+ *   401 authentication-required   the client drops the token; the status says "pair again"
+ *   402 budget-exhausted          the server is not asked again (the $25 total is used)
+ *   404 not-in-release            the server is not asked again on this page (its dynamic mode is off)
  *   413 speech-input-too-large    the sentence is split further and its parts are asked for in order
- *   429 day-budget                device voice until 00:00 UTC
- *   429 request-rate-limit        no request for 60 s; device voice meanwhile
- *   503 voice-unavailable         once more after 2 s, then device voice for that sentence
- *   400 (client bug), 500         device voice for that sentence; never asked twice
+ *   429 day-budget                the server is not asked again until 00:00 UTC
+ *   429 request-rate-limit        no request for 60 s
+ *   503 voice-unavailable         once more after 2 s
+ *   400 (client bug), 500         that sentence is not asked twice in the read
+ * In every one of these the read ends with the code as its reason.
  *
+ * Whether anything may start by itself is the app's rule, not this module's (corridor.js, WORD_VOICE).
  * The queue, the gap between sentences, the two-ahead fetch and the three speeds are the speech team's own
  * (./nihongo-speech/audio/speech-queue.mjs, unchanged). Nothing here touches the DOM. */
 import { SPEEDS, createSpeechQueue } from './nihongo-speech/audio/speech-queue.mjs';
@@ -40,18 +42,18 @@ export function sentencesOf(text) {
   try { return splitSentences(normaliseSpeechText(String(text ?? ''))).map((piece) => ({ text: piece.text })); } catch { return []; }
 }
 
-export function createVoiceSeam({ client, device, player, recorded = null, quiet = () => {},
+export function createVoiceSeam({ client, player, recorded = null, quiet = () => {},
   sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)), now = () => Date.now(),
   online = () => globalThis.navigator?.onLine !== false, onStatus = () => {} } = {}) {
-  if (!client || !device || !player) throw new TypeError('the seam needs a client, a device voice and a player');
+  if (!client || !player) throw new TypeError('the seam needs a client and a player');
   const cache = new Map();   // `${voiceKey}|${text}` → clip, most recent last
   let session = null;        // the one read that may sound
-  let last = { source: 'none', reason: null, at: 0 };
+  let last = { source: 'none', reason: null, at: 0 };   // the last sentence that was spoken
+  let silent = null;         // { reason, at }: why the last read ended without a voice; cleared by the next spoken sentence
   let blockedUntil = { 'day-budget': 0, 'request-rate-limit': 0, 'network-failed': 0 };
   let off = null;            // 'not-in-release' | 'budget-exhausted' for this page
   let pairAgain = false;
   let budget = null;
-  let deviceStop = null;     // settles the device utterance that is speaking
   let playing = null;        // the clip the player is on
 
   const blocked = () => {
@@ -68,15 +70,15 @@ export function createVoiceSeam({ client, device, player, recorded = null, quiet
     durable: typeof client.durable === 'function' ? !!client.durable() : true,
     blocked: blocked(),
     last: { ...last },
+    silent: silent ? { ...silent } : null,
     budget: budget ? { ...budget } : null,
   });
   const tell = () => { try { onStatus(status()); } catch { /* a listener's own fault */ } };
 
-  /** Why the server is not asked for this sentence right now, or null when it may be. */
-  function serverSkips(text, voiceKey) {
-    if (!client.configured()) return 'not-configured';
-    if (!client.paired()) return 'not-paired';
-    if (!isVoiceKey(voiceKey) || !isJapaneseEnough(text)) return 'not-japanese';
+  /** Why the server is not asked right now, or null when it may be. */
+  function serverSkips(voiceKey) {
+    if (!client.configured() || !client.paired()) return 'not-paired';
+    if (!isVoiceKey(voiceKey)) return 'not-speakable';
     if (off) return off;
     const at = now();
     for (const [code, until] of Object.entries(blockedUntil)) if (until > at) return code;
@@ -98,6 +100,8 @@ export function createVoiceSeam({ client, device, player, recorded = null, quiet
     while (cache.size > CACHE_CLIPS) cache.delete(cache.keys().next().value);
   };
   const aborted = (signal) => { if (signal?.aborted) { const error = new Error('aborted'); error.name = 'AbortError'; throw error; } };
+  /** No voice for this sentence: the read ends, and `code` is the reason the screen will give. */
+  const silence = (code) => Object.assign(new Error(code), { code });
 
   async function fromServer(text, voiceKey, signal) {
     const key = `${voiceKey}|${text}`;
@@ -119,63 +123,51 @@ export function createVoiceSeam({ client, device, player, recorded = null, quiet
   async function splitFurther(text, voiceKey, signal) {
     const half = Math.max(1, Math.ceil([...text].length / 2));
     const pieces = splitSentences(text, { max: Math.min(200, half) });
-    if (pieces.length < 2) throw Object.assign(new Error('speech-input-too-large'), { code: 'speech-input-too-large' });
+    if (pieces.length < 2) throw silence('speech-input-too-large');
     const parts = [];
     for (const piece of pieces) { aborted(signal); parts.push(await fromServer(piece.text, voiceKey, signal)); }
     return { parts, source: 'server' };
   }
-  /** The clip for one sentence, from the first source that has one. `useDevice` false: a read that is not the learner's
-   * own tap (something said by itself) never falls back to the device voice; with no clip it has nothing to say. */
-  async function clipFor(sentence, voiceKey, signal, useDevice = true) {
+  /** The clip for one sentence: its recording, or the server's clip; otherwise the read ends with the reason. */
+  async function clipFor(sentence, voiceKey, signal) {
     if (sentence.recorded && typeof recorded === 'function') return { recorded: sentence.recorded, source: 'recorded' };
     let text = '';
     try { text = normaliseSpeechText(sentence.text); } catch { /* not text */ }
-    let why = serverSkips(text, voiceKey);
-    if (!why) {
-      try {
-        return await fromServer(text, voiceKey, signal);
-      } catch (error) {
-        if (error?.name === 'AbortError') throw error;
-        why = typeof error?.code === 'string' ? error.code : 'speak-failed';
-        if (why === 'speech-input-too-large') {
-          try { return await splitFurther(text, voiceKey, signal); } catch (again) {
-            if (again?.name === 'AbortError') throw again;
-            why = typeof again?.code === 'string' ? again.code : 'speak-failed';
-          }
+    // what the server would refuse as not Japanese (a line of Latin letters in an article) is passed over, never sent
+    if (!text || !isJapaneseEnough(text)) return { skip: true, source: 'none', reason: 'not-japanese' };
+    let why = serverSkips(voiceKey);
+    if (why) throw silence(why);
+    try {
+      return await fromServer(text, voiceKey, signal);
+    } catch (error) {
+      if (error?.name === 'AbortError') throw error;
+      why = typeof error?.code === 'string' ? error.code : 'speak-failed';
+      if (why === 'speech-input-too-large') {
+        try { return await splitFurther(text, voiceKey, signal); } catch (again) {
+          if (again?.name === 'AbortError') throw again;
+          why = typeof again?.code === 'string' ? again.code : 'speak-failed';
         }
-        note(why);
-        tell();
       }
+      note(why);
+      tell();
+      throw silence(why);
     }
-    if (!useDevice || !device.support()?.ok || !text) throw Object.assign(new Error('no-voice'), { code: 'no-voice', reason: why });
-    return { device: true, text, source: 'device', reason: why };
   }
 
   const said = (clip) => {
-    last = { source: clip.source || 'none', reason: clip.reason || null, at: now() };
+    last = { source: clip.source || 'none', reason: null, at: now() };
+    silent = null;
     tell();
   };
-  // The seam's own stop settles the utterance first, so the device's cancel finds nothing left to report.
-  const stopDevice = () => { const settle = deviceStop; deviceStop = null; settle?.('stopped'); device.cancel(); };
-  /** Another lane silenced the sound this read was on (a card retired, a recording stopped): the read ends with it,
-   * so it never stands "playing" with nothing to hear. */
+  /** Another lane stopped the recording this read was on (the app's own stop): the read ends with it, so it never
+   * stands "playing" with nothing to hear. */
   const endedFromOutside = (owner) => { Promise.resolve().then(() => { if (!owner.ended) owner.queue.stop(); }); };
-  function sayOnDevice(clip, rate, owner) {
-    return new Promise((resolve, reject) => {
-      let settled = false;
-      const settle = (outcome) => { if (settled) return; settled = true; if (deviceStop === settle) deviceStop = null; resolve(outcome); };
-      const answer = device.fallback(clip.text, { rate, onEnd: () => settle('ended'),
-        onStop: () => { if (settled) return; settle('stopped'); endedFromOutside(owner); },
-        onError: () => { if (settled) return; settled = true; if (deviceStop === settle) deviceStop = null; reject(new Error('device-voice-failed')); } });
-      if (!answer?.spoken) { settled = true; reject(Object.assign(new Error('no-voice'), { code: 'no-voice' })); return; }
-      if (!settled) deviceStop = settle;
-    });
-  }
   async function playOne(clip, rate, owner) {
+    if (clip.skip) return 'ended';
     playing = clip;
     said(clip);
     // the read learns where this sentence comes from as it starts (onSentence comes first and does not know yet)
-    try { owner.onSource?.(clip.source || 'none', clip.reason || null); } catch { /* a listener's own fault */ }
+    try { owner.onSource?.(clip.source || 'none', null); } catch { /* a listener's own fault */ }
     if (clip.recorded) {
       const stops = owner.recordedStops;
       const outcome = await recorded(clip.recorded.src, rate);
@@ -183,10 +175,9 @@ export function createVoiceSeam({ client, device, player, recorded = null, quiet
       if (outcome === null) { if (owner.recordedStops === stops) endedFromOutside(owner); return 'stopped'; }
       throw new Error('audio-error');
     }
-    if (clip.device) return sayOnDevice(clip, rate, owner);
     try { return await player.play(clip, rate); } catch (error) { if (error?.name === 'AbortError') return 'stopped'; throw error; }
   }
-  /** The player the queue drives: one clip may be a recorded file, a server clip, its parts, or a device utterance. */
+  /** The player the queue drives: one clip may be a recorded file, a server clip, or the parts of a split sentence. */
   const composite = (owner) => ({
     async play(clip, rate) {
       if (!clip.parts) return playOne(clip, rate, owner);
@@ -196,32 +187,32 @@ export function createVoiceSeam({ client, device, player, recorded = null, quiet
       }
       return 'ended';
     },
-    // a recorded clip and a device utterance cannot be held mid-word: a pause ends them and resume says the sentence again
+    // a recorded clip cannot be held mid-word: a pause ends it and resume says the sentence again
     pause() {
-      if (playing?.device) stopDevice();
-      else if (playing?.recorded) { owner.recordedStops += 1; owner.stopRecorded?.(); }
+      if (playing?.recorded) { owner.recordedStops += 1; owner.stopRecorded?.(); }
       else player.pause?.();
     },
-    resume() { if (playing && !playing.device && !playing.recorded) player.resume?.(); },
-    stop() { stopDevice(); owner.recordedStops += 1; owner.stopRecorded?.(); player.stop?.(); playing = null; },
+    resume() { if (playing && !playing.recorded) player.resume?.(); },
+    stop() { owner.recordedStops += 1; owner.stopRecorded?.(); player.stop?.(); playing = null; },
     setRate(rate) { player.setRate?.(rate); owner.rateRecorded?.(rate); },
   });
 
   /** Read sentences aloud. `sentences` is [{ text, recorded? }]; one read at a time: this one ends whatever was speaking.
-   * `onSentence(index)` says which sentence starts; `onSource(source, reason)` then says where it comes from
-   * ('recorded', 'server' or 'device', and for the device why). Returns the read's own controls. */
+   * `onSentence(index)` says which sentence starts; `onSource(source)` then says where it comes from ('recorded' or
+   * 'server'). A read that cannot be voiced ends with onState('error', reason). Returns the read's own controls. */
   function read({ sentences, voiceKey, from = 0, rate = 1, prefetch = 2, gapMs = 260, onSentence = () => {}, onState = () => {},
-    onSource = null, stopRecorded = null, rateRecorded = null, deviceFallback = true } = {}) {
+    onSource = null, stopRecorded = null, rateRecorded = null } = {}) {
     stop();
     try { quiet(); } catch { /* another lane's fault */ }
     const owner = { queue: null, stopRecorded, rateRecorded, onSource, ended: false, recordedStops: 0 };
     const queue = createSpeechQueue({
-      fetchClip: (sentence, _index, signal) => clipFor(sentence, voiceKey, signal, deviceFallback),
+      fetchClip: (sentence, _index, signal) => clipFor(sentence, voiceKey, signal),
       player: composite(owner),
       prefetch, gapMs, sleep,
       onSentence: (index) => { if (session === owner || index < 0) onSentence(index); },
       onState: (state, code) => {
         if (['done', 'stopped', 'error'].includes(state)) { owner.ended = true; if (session === owner) session = null; }
+        if (state === 'error') { silent = { reason: code || 'speak-failed', at: now() }; tell(); }
         onState(state, code);
       },
     });
@@ -264,8 +255,12 @@ export function createVoiceSeam({ client, device, player, recorded = null, quiet
   }
   return {
     read, stop, status, refreshBudget,
+    /** Why a sentence could not be voiced right now ('not-paired', 'offline', 'day-budget', …), or null when the
+     * server may be asked. Asking is free: a read that would start by itself looks here first, and when there is no
+     * voice to be had it does not start, so it stops no other sound. */
+    cannot: (voiceKey = 'word:bunki') => serverSkips(voiceKey),
     active: () => (session && !session.ended ? session.controls : null),
     /** Pairing changed (paired, or the token was dropped): what was blocked is asked again. */
-    repaired() { pairAgain = false; off = null; blockedUntil = { 'day-budget': 0, 'request-rate-limit': 0, 'network-failed': 0 }; tell(); },
+    repaired() { pairAgain = false; off = null; silent = null; blockedUntil = { 'day-budget': 0, 'request-rate-limit': 0, 'network-failed': 0 }; tell(); },
   };
 }
