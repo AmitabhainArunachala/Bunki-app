@@ -2266,19 +2266,20 @@ body .sheet .hero .cat-chip {
 }
 body .sheet .hero .cat-chip:hover { border-color: var(--ai); background: var(--ai-wash); }
 body .sheet .hero-meta { min-width: 0; }
-/* tighten pass (2026-11-10) · the kanji page: its facts are one quiet line of text under the meaning (each still opens its
- * list); its doors stand together under the hero, one outlined family; its own kanji is drawn at list strength in the lists
- * below; the builder's sources wait in one closed disclosure at the foot of any entry page */
-body .sheet .hero .kanji-facts { display: flex; flex-wrap: wrap; align-items: center; column-gap: 7px; margin: 0; font: 500 var(--type-label)/1.4 var(--sans); color: var(--text-2); }
+/* tighten pass (2026-11-10) · an entry page's facts are one sleek line of text (the kanji page's under its meaning, the
+ * word page's JLPT level); its doors stand together under the hero, one outlined family; its own kanji is drawn at list
+ * strength in the lists below; the builder's sources wait in one closed disclosure at the foot of the page */
+body .sheet .entry-facts { display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px; margin: 0; font: 500 var(--type-label)/1.4 var(--sans); color: var(--text-2); }
 /* a fact that goes somewhere reads as linked text (a dotted rule under it); its 32px line keeps a 44px target */
-body .sheet .hero .kanji-facts :is(.cat-chip, .kanji-fact) {
+body .sheet .entry-facts :is(.cat-chip, .kanji-fact) {
   position: relative; display: inline-flex; align-items: center; min-height: 32px; padding: 0; border: 0; border-radius: 0;
   background: none; box-shadow: none; color: var(--text); font: inherit; letter-spacing: 0; white-space: nowrap; cursor: pointer;
   text-decoration: underline dotted 1px color-mix(in srgb, currentColor 45%, transparent); text-underline-offset: 0.32em;
 }
-body .sheet .hero .kanji-facts :is(.cat-chip, .kanji-fact)::before { content: ''; position: absolute; inset: -6px -3px; }
-body .sheet .hero .kanji-facts :is(.cat-chip, .kanji-fact):hover { background: none; color: var(--ai); text-decoration-color: currentColor; }
-body .sheet .hero .kanji-fact-sep { color: var(--text-2); opacity: 0.7; }
+body .sheet .entry-facts :is(.cat-chip, .kanji-fact)::before { content: ''; position: absolute; inset: -6px -3px; }
+body .sheet .entry-facts :is(.cat-chip, .kanji-fact):hover { background: none; color: var(--ai); text-decoration-color: currentColor; }
+/* with the radical row folded into the facts line, the readings' rule is the one rule above the next section */
+body .sheet .kv + .eyebrow { margin-top: 0; border-top: 0; }
 /* the Kodansha lens: each neighbour carries its number, as the book's own index does */
 .kdx-kkld-near .kdx-glyph { position: relative; width: 52px; height: 56px; padding-bottom: 10px; }
 .kdx-kkld-near .kdx-glyph::after { content: attr(data-kkld); position: absolute; inset: auto 0 4px; font: 500 10px/1 var(--sans); letter-spacing: 0.02em; color: var(--text-2); }

@@ -30688,7 +30688,8 @@ function renderWordNode(sheet, node) {
   }
   const jlpt = own?.jlpt || (!unresolved && legacy?.jlpt ? `N${legacy.jlpt}` : null);
   if (jlpt) {
-    const meta = el('div', 'shelf-meta');
+    // a fact is linked text, as on the kanji page's facts line (tighten pass, 2026-11-10)
+    const meta = el('div', 'shelf-meta entry-facts');
     const level = String(jlpt).replace(/^N?/, 'N');
     meta.append(referenceCollectionChip(`JLPT ${level}`, `jlpt:${level}`));
     sheet.append(meta);

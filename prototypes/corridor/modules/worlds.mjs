@@ -2048,15 +2048,8 @@ function renderKanjiNode(sheet, node) {
   const radical = renderKanjiClassifications(sheet, node.id, node, { fact: true });
   if (radical) facts.push(radical.door);
   if (facts.length) {
-    const line = el('p', 'kanji-facts');
-    facts.forEach((fact, i) => {
-      if (i) {
-        const sep = el('span', 'kanji-fact-sep', '·');
-        sep.setAttribute('aria-hidden', 'true');
-        line.append(sep);
-      }
-      line.append(fact);
-    });
+    const line = el('p', 'entry-facts');
+    line.append(...facts);
     meta.append(line);
   }
   hero.append(meta);
