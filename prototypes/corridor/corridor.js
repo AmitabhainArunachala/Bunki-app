@@ -21349,8 +21349,153 @@ function ensureKkld() {
   }
   return kkldPromise;
 }
-/** The kanji one Kodansha number names in one edition: every glyph the table maps, none filtered by the core
- * layer (K04 · #8 is 胤 in both editions; a glyph outside kanji.json opens its KANJIDIC2 entry). */
+/** One edition's kanji in the book's order, [number, kanji] (2013: 2,904 between 1 and 3,002; 1999: 2,230). */
+let kkldOrderMemo = null;
+function kkldOrder(ed) {
+  if (kkldOrderMemo?.table !== D.kkld) kkldOrderMemo = { table: D.kkld };
+  if (!kkldOrderMemo[ed]) {
+    const table = (ed === 'ed1999' ? D.kkld?.byNumber1999 : D.kkld?.byNumber2013) || {};
+    kkldOrderMemo[ed] = Object.entries(table).flatMap(([n, glyphs]) => glyphs.map((c) => [Number(n), c])).sort((a, b) => a[0] - b[0]);
+  }
+  return kkldOrderMemo[ed];
+}
+/** His kanji, as the record already knows them: in his saved words or saved themselves (wwMine), and met — in a word he
+ * opened (met) or a word or kanji he looked up (obslog taps). Reads the record only. */
+function kkldMarks() {
+  const saved = wwMine().kanji;
+  const met = new Set();
+  const take = (text) => { for (const c of String(text || '')) if (/\p{Script=Han}/u.test(c)) met.add(c); };
+  if (metReadable(S.met)) {
+    for (const key of Object.keys(S.met.entries)) {
+      try { const parsed = JSON.parse(key); if (Array.isArray(parsed) && parsed[1] === 'word') take(parsed[2]); } catch { /* not a key this build reads */ }
+    }
+  }
+  for (const row of S.obslog || []) if (Array.isArray(row) && row[1] === 'tap') take(String(row[2] || '').replace(/^[a-z]+:/u, ''));
+  return { saved, met };
+}
+/** The Kodansha map (John, 2026-11-10: "keep it but simplify and make it connect to something logical behind like the
+ * entire Kodansha map and Kodansha style navigation"): every kanji of one edition in the book's order, one grid read in
+ * rows, a small number at 1 and at every hundred, his kanji marked (data-mine saved | met). Only the rows near the view
+ * are drawn, so 2,904 cells scroll as freely as forty. light(n) lights number n (null: none) and brings it into view. */
+const KKLD_MAP_CELL = 46;
+const KKLD_MAP_GAP = 4;
+function renderKkldMap(host, ed, marks) {
+  const order = kkldOrder(ed);
+  const indexOf = new Map(order.map(([n], i) => [n, i]));
+  host.append(el('p', 'eyebrow kdx-kkld-map-head', tx(`講談社の番号順・${order.length.toLocaleString('en')} 字`,
+    `Kodansha order · ${order.length.toLocaleString('en')} kanji`)));
+  const box = el('div', 'kdx-kkld-map');
+  box.id = 'kdx-kkld-map';
+  box.setAttribute('role', 'group');
+  box.setAttribute('aria-label', tx('講談社の番号順のすべての字', 'every kanji in Kodansha order'));
+  const field = el('div', 'kdx-kkld-map-field');
+  box.append(field);
+  host.append(box);
+  const drawn = new Map();
+  let cols = 0;
+  let cell = KKLD_MAP_CELL;
+  let pitch = KKLD_MAP_CELL + KKLD_MAP_GAP;
+  let width = 0;
+  let lit = null;
+  let seek = null;
+  let frame = 0;
+  let span = '';
+  const cellAt = (i) => {
+    const [n, c] = order[i];
+    const b = el('button', 'kdx-glyph kdx-kkld-cell', c);
+    b.type = 'button';
+    b.lang = 'ja';
+    b.dataset.kdxHit = c;
+    b.dataset.kkld = String(n);
+    b.dataset.kkldEd = ed;
+    if (n === 1 || n % 100 === 0) b.dataset.mark = String(n);
+    const mine = marks?.saved?.has(c) ? 'saved' : marks?.met?.has(c) ? 'met' : '';
+    if (mine) b.dataset.mine = mine;
+    b.setAttribute('aria-label', `${n} ${kdxGlyphName(c)}`);
+    // the map keeps his place: Back from the kanji finds this number lit
+    b.addEventListener('click', () => { S.kdx.kkldQ = String(n); go({ t: 'kanji', id: c }, { invoker: b }); });
+    return b;
+  };
+  const place = (b, i) => {
+    b.style.width = `${cell}px`;
+    b.style.height = `${cell}px`;
+    b.style.transform = `translate(${((i % cols) * pitch).toFixed(1)}px, ${(Math.floor(i / cols) * pitch).toFixed(1)}px)`;
+    b.classList.toggle('is-lit', order[i][0] === lit);
+    if (order[i][0] === lit) b.setAttribute('aria-current', 'true');
+    else b.removeAttribute('aria-current');
+  };
+  // the columns fill the box's width; the field is as tall as every row, so the box scrolls over the whole order
+  const layout = () => {
+    const w = box.clientWidth;
+    if (!w) return false;
+    if (w === width && cols) return true;
+    width = w;
+    cols = Math.max(1, Math.floor((w + KKLD_MAP_GAP) / (KKLD_MAP_CELL + KKLD_MAP_GAP)));
+    cell = Math.floor(((w + KKLD_MAP_GAP) / cols - KKLD_MAP_GAP) * 10) / 10;
+    pitch = cell + KKLD_MAP_GAP;
+    field.style.height = `${Math.ceil(order.length / cols) * pitch - KKLD_MAP_GAP}px`;
+    span = '';
+    for (const [i, b] of drawn) place(b, i);
+    return true;
+  };
+  const paint = () => {
+    frame = 0;
+    if (!box.isConnected || !layout()) return;
+    if (seek != null) {
+      const i = indexOf.get(seek);
+      seek = null;
+      // the lit row a third of the way down the part of the box he can see (the window's foot and a bar fixed there,
+      // the rooms' tabs, cut it short), so the numbers before it stay in sight
+      if (i != null) {
+        const r = box.getBoundingClientRect();
+        let floor = innerHeight;
+        for (let n = document.elementFromPoint(r.left + r.width / 2, innerHeight - 2); n && n !== document.body; n = n.parentElement) {
+          if (box.contains(n)) break;
+          if (getComputedStyle(n).position === 'fixed') { floor = Math.min(floor, n.getBoundingClientRect().top); break; }
+        }
+        const from = Math.max(r.top, 0);
+        const seen = Math.min(r.bottom, floor) - from;
+        const at = seen > pitch ? from - r.top + (seen - pitch) / 3 : box.clientHeight / 3;
+        box.scrollTop = Math.max(0, Math.floor(i / cols) * pitch - at);
+      }
+    }
+    const top = box.scrollTop;
+    const first = Math.max(0, Math.floor(top / pitch) - 3) * cols;
+    const last = Math.min(order.length, (Math.ceil((top + box.clientHeight) / pitch) + 3) * cols);
+    if (span === `${first}:${last}`) return;
+    span = `${first}:${last}`;
+    for (const [i, b] of drawn) if (i < first || i >= last) { b.remove(); drawn.delete(i); }
+    const rows = [];
+    for (let i = first; i < last; i += 1) {
+      let b = drawn.get(i);
+      if (!b) { b = cellAt(i); place(b, i); drawn.set(i, b); }
+      rows.push(b);
+    }
+    // in the book's order in the document too, so Tab walks the numbers in order
+    field.replaceChildren(...rows);
+  };
+  const soon = () => { if (!frame) frame = requestAnimationFrame(paint); };
+  box.addEventListener('scroll', soon, { passive: true });
+  const watch = new ResizeObserver(() => {
+    if (!box.isConnected) { watch.disconnect(); return; }
+    if (lit != null && box.clientWidth !== width) seek = lit;
+    paint();
+  });
+  watch.observe(box);
+  return {
+    light(n) {
+      lit = Number.isFinite(n) ? n : null;
+      for (const [i, b] of drawn) place(b, i);
+      if (lit != null) seek = lit;
+      if (box.isConnected && box.clientWidth) paint();
+      else soon();
+    },
+  };
+}
+/** The Kodansha lens: the number field and the edition switch over the whole map (renderKkldMap). A number lights its
+ * kanji and brings it into view; a typed kanji says its numbers and lights itself. Every glyph the table maps is on the
+ * map, none filtered by the core layer (K04 · #8 is 胤 in both editions; a glyph outside kanji.json opens its KANJIDIC2
+ * entry). */
 function renderKdxKkld(main) {
   main.append(withEn(el('p', 'eyebrow', 'Kodansha 番号'), "Kodansha Kanji Learner's Dictionary entry number", 'en-inline'));
   const edRow = el('div', 'kdx-row');
@@ -21379,60 +21524,55 @@ function renderKdxKkld(main) {
   inp.value = S.kdx.kkldQ || '';
   const out = el('div');
   out.id = 'kdx-kkld-results';
+  // what the query found, in words, over the map; the map is drawn once and only lit again as he types
+  const said = el('div', 'kdx-kkld-said');
+  let map = null;
   const paintKkld = () => {
-    out.textContent = '';
+    said.textContent = '';
     const q = (S.kdx.kkldQ || '').trim();
     // K06 · the number table still on its way, or failed: said in the results, the typed query kept, and the
     // retry (or the arrival) answers that same query in place
     if (!D.kkld) {
+      out.replaceChildren(said);
       if (kkldError && !kkldPromise) {
-        kdxLoadFailed(out, 'kdx-kkld-retry', '番号表を読み込めなかった。', 'The Kodansha number table could not be loaded.', ensureKkld);
+        kdxLoadFailed(said, 'kdx-kkld-retry', '番号表を読み込めなかった。', 'The Kodansha number table could not be loaded.', ensureKkld);
         return;
       }
       const loading = el('p', 'sem-empty', tx('番号表を読み込み中…', 'loading the number table…'));
       loading.dataset.kdxLoad = 'pending';
-      out.append(loading);
+      said.append(loading);
       ensureKkld().then(() => {
         if (out.isConnected) paintKkld();
       });
       return;
     }
+    const ed = S.kdx.kkldEd || 'ed2013';
+    if (!map) {
+      out.replaceChildren(said);
+      map = renderKkldMap(out, ed, kkldMarks());
+    }
+    let lit = null;
     if (!q) {
-      out.append(el('p', 'fine', tx(
+      said.append(el('p', 'fine', tx(
         `${(D.kkld.counts?.ed2013 || 0).toLocaleString()} 字に 2013年版の番号、${(D.kkld.counts?.ed1999 || 0).toLocaleString()} 字に 1999年版の番号。2022年版の番号は載せていない。`,
         `${(D.kkld.counts?.ed2013 || 0).toLocaleString()} kanji carry a 2013 number, ${(D.kkld.counts?.ed1999 || 0).toLocaleString()} a 1999 number. The 2022 printing's numbers are not included.`,
       )));
-      return;
-    }
-    const ed = S.kdx.kkldEd || 'ed2013';
-    if (/^\d+$/.test(q)) {
+    } else if (/^\d+$/.test(q)) {
       const chars = kkldNumberGlyphs(ed, q);
-      renderKdxGrid(out, chars, 20, `kkld:${ed}:${q}`, { mark: (b) => { b.dataset.kkld = q; b.dataset.kkldEd = ed; } });
-      if (!chars.length) out.append(el('p', 'fine', tx('この番号の字はこの版にない。', 'No kanji carries that number in this edition.')));
-      // tighten pass (John, 2026-11-10: "the entire Kodansha map and Kodansha style navigation"): the numbers around this
-      // one in the book's order, each glyph a door and its number beside it, so a number opened from a kanji page lands
-      // among its neighbours
-      const n = Number(q), numberOf = new Map();
-      for (let i = Math.max(1, n - 6); i <= n + 6; i += 1) {
-        if (i !== n) for (const c of kkldNumberGlyphs(ed, i)) if (!numberOf.has(c)) numberOf.set(c, i);
+      if (chars.length) lit = Number(q);
+      for (const c of chars) said.append(el('p', 'fine', `${c} · ${kkldLine(c)}`));
+      if (!chars.length) said.append(el('p', 'fine', tx('この番号の字はこの版にない。', 'No kanji carries that number in this edition.')));
+    } else {
+      // a typed kanji is looked up whether or not the core layer holds it (胤 has its numbers too); the first with a
+      // number in this edition is lit
+      const chars = [...new Set([...q])].filter((c) => kkldOf(c) || D.kanji[c] || kanjiReference(c));
+      for (const c of chars) {
+        const line = kkldLine(c);
+        said.append(el('p', 'fine', `${c} · ${line || tx('Kodansha 番号なし', 'no Kodansha number')}`));
+        lit ??= kkldOf(c)?.[ed] ?? null;
       }
-      if (numberOf.size) {
-        const near = el('div', 'kdx-kkld-near');
-        renderKdxGrid(near, [...numberOf.keys()], 20, '', { empty: false, mark: (b, c) => { b.dataset.kkld = String(numberOf.get(c)); b.dataset.kkldEd = ed; } });
-        const span = [...numberOf.values()];
-        near.querySelector('.eyebrow').textContent = tx(`講談社の番号順 ${Math.min(...span)}〜${Math.max(...span)}`,
-          `Nearby in Kodansha order · ${Math.min(...span)}–${Math.max(...span)}`);
-        out.append(near);
-      }
-      return;
     }
-    // a typed kanji is looked up whether or not the core layer holds it (胤 has its numbers too)
-    const chars = [...new Set([...q])].filter((c) => kkldOf(c) || D.kanji[c] || kanjiReference(c));
-    renderKdxGrid(out, chars, 20, `kkld:${ed}:${q}`);
-    for (const c of chars) {
-      const line = kkldLine(c);
-      out.append(el('p', 'fine', `${c} · ${line || tx('Kodansha 番号なし', 'no Kodansha number')}`));
-    }
+    map.light(lit);
   };
   inp.addEventListener('input', () => {
     S.kdx.kkldQ = inp.value;

@@ -2204,9 +2204,24 @@ body .sheet .entry-facts :is(button.pool-tag.cat-chip, button.kanji-fact)::befor
 body .sheet .entry-facts :is(button.pool-tag.cat-chip, button.kanji-fact):hover { background: none; color: var(--ai); text-decoration-color: currentColor; }
 /* with the radical row folded into the facts line, the readings' rule is the one rule above the next section */
 body .sheet .kv + .eyebrow { margin-top: 0; border-top: 0; }
-/* the Kodansha lens: each neighbour carries its number, as the book's own index does */
-.kdx-kkld-near .kdx-glyph { position: relative; width: 52px; height: 56px; padding-bottom: 10px; }
-.kdx-kkld-near .kdx-glyph::after { content: attr(data-kkld); position: absolute; inset: auto 0 4px; font: 500 10px/1 var(--sans); letter-spacing: 0.02em; color: var(--text-2); }
+/* the Kodansha map (John, 2026-11-10): every kanji of an edition in the book's order, in a box of its own that scrolls
+   (corridor.js renderKkldMap places each cell); a number at 1 and at every hundred as the book's own index carries it, the
+   lit kanji inked as a chosen choice is (tighten.css), his kanji marked with the depth dots: met, and kept (ringed) */
+.kdx-kkld-map { position: relative; height: clamp(320px, 60vh, 680px); margin: 4px 0 20px; overflow: hidden auto; overscroll-behavior: contain; border-block: 1px solid var(--line-soft); }
+.kdx-kkld-map-field { position: relative; }
+.kdx-kkld-map .kdx-kkld-cell { position: absolute; top: 0; left: 0; display: grid; place-items: center; padding: 0 0 7px; font-size: 22px; line-height: 1; }
+.kdx-kkld-map .kdx-kkld-cell:hover { border-color: var(--color-edge-strong, var(--line-soft)); }
+.kdx-kkld-map .kdx-kkld-cell:is([data-mark], .is-lit)::after { content: attr(data-mark); position: absolute; inset: auto 0 4px; font: 500 10px/1 var(--sans); letter-spacing: 0.02em; color: var(--text-2); }
+.kdx-kkld-map .kdx-kkld-cell.is-lit { border-color: var(--color-ink); background: var(--color-ink); color: var(--color-surface); }
+.kdx-kkld-map .kdx-kkld-cell.is-lit::after { content: attr(data-kkld); color: inherit; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .kdx-kkld-map .kdx-kkld-cell.is-lit {
+  border-color: transparent; background: transparent; color: var(--color-ink); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-gold) 70%, transparent);
+}
+.kdx-kkld-map .kdx-kkld-cell[data-mine]::before { content: ''; position: absolute; top: 6px; right: 6px; width: 5px; height: 5px; border-radius: 50%; background: var(--depth-met); }
+.kdx-kkld-map .kdx-kkld-cell[data-mine='saved']::before { box-shadow: 0 0 0 1px var(--depth-ground), 0 0 0 2.5px var(--depth-ring); }
+.kdx-kkld-said .fine { margin: 2px 0; }
+/* the kanji page's Kodansha number, with the kanji before and after it in the book's order either side (‹ 788 殴 · 790 非 ›) */
+body .sheet .entry-facts .kanji-kkld-steps { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0 12px; }
 body .sheet .kanji-doors { display: flex; flex-wrap: wrap; gap: var(--s1); margin: var(--s2) 0 var(--s3); }
 body .sheet .kanji-doors > * { margin: 0; }
 body .sheet .kanji-doors .teacher-door { display: contents; }
