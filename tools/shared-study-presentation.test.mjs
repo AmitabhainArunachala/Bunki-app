@@ -1,14 +1,9 @@
 import assert from 'node:assert/strict';
 import process from 'node:process';
 import vm from 'node:vm';
-import { readFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { createServer } from 'node:http';
-import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
-import { once } from 'node:events';
-import { setTimeout, clearTimeout } from 'node:timers';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
 import { URL } from 'node:url';
 import { bindStudyPresentation } from '../prototypes/corridor/shared-study-presentation.mjs';
 import { decodeSharedContent, SHARED_DECKS } from '../prototypes/corridor/shared-study-content.mjs';
@@ -166,9 +161,7 @@ test(
   async () => {
     const { chromium } = createRequire(import.meta.url)('playwright-core');
     const executable =
-      process.env.CHROMIUM_PATH ||
-      (!acceptance && process.env.BUNKI_TEST_CHROME) ||
-      chromium.executablePath();
+      process.env.CHROMIUM_PATH || (!acceptance && process.env.BUNKI_TEST_CHROME) || '';
     const child = `
     import {bindStudyPresentation} from '/prototypes/corridor/shared-study-presentation.mjs';
     import {mountStudyApp} from '/prototypes/corridor/vendor/shared-study-engine/client/app/app.mjs';
@@ -262,120 +255,38 @@ test(
         res.end();
       }
     });
-    const profile = mkdtempSync(join(tmpdir(), 'bunki-manual-realm-'));
-    let browser, socket;
+    // The page is opened through Playwright's own launcher, as every other browser check here is.
+    // Starting Chrome by hand needs its own answer to each platform's credential store and
+    // sandbox: on a Mac it raised Keychain prompts, on the Linux runner it never finished.
+    let browser;
     try {
       await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
-      browser = spawn(
-        executable,
-        [
-          '--headless',
-          '--no-first-run',
-          '--disable-background-networking',
-          '--disable-extensions',
-          '--disable-sync',
-          // Full Chrome reads the OS credential store before its first request. Headless, with no
-          // one to answer the prompt, the navigation below never leaves the browser.
-          '--use-mock-keychain',
-          '--password-store=basic',
-          `--user-data-dir=${profile}`,
-          '--remote-debugging-port=0',
-          'about:blank',
-        ],
-        { stdio: ['ignore', 'ignore', 'pipe'] },
-      );
-      const endpoint = await new Promise((resolve, reject) => {
-        let stderr = '';
-        const timeout = setTimeout(
-          () => reject(Error('Chrome startup timed out: ' + stderr)),
-          10000,
-        );
-        browser.once('error', (error) => {
-          clearTimeout(timeout);
-          reject(error);
-        });
-        browser.stderr.on('data', (chunk) => {
-          stderr += chunk;
-          const url = stderr.match(/DevTools listening on (ws:\/\/\S+)/)?.[1];
-          if (url) {
-            clearTimeout(timeout);
-            resolve(url);
-          }
-        });
+      browser = await chromium.launch({
+        headless: true,
+        ...(executable ? { executablePath: executable } : {}),
       });
-      socket = new globalThis.WebSocket(endpoint);
-      await once(socket, 'open');
-      const pending = new Map();
-      let sequence = 0;
-      socket.addEventListener('message', (event) => {
-        const message = JSON.parse(event.data),
-          request = pending.get(message.id);
-        if (!request) return;
-        pending.delete(message.id);
-        clearTimeout(request.timeout);
-        if (message.error) request.reject(Error(JSON.stringify(message.error)));
-        else request.resolve(message.result);
+      const page = await browser.newPage();
+      await page.goto(`http://127.0.0.1:${server.address().port}/`, {
+        waitUntil: 'load',
+        timeout: 20000,
       });
-      const send = (method, params = {}, sessionId) =>
-        new Promise((resolve, reject) => {
-          const id = ++sequence,
-            timeout = setTimeout(() => {
-              pending.delete(id);
-              reject(Error('Chrome command timed out: ' + method));
-            }, 30000);
-          pending.set(id, { resolve, reject, timeout });
-          socket.send(JSON.stringify({ id, method, params, sessionId }));
-        });
-      const { targetId } = await send('Target.createTarget', { url: 'about:blank' });
-      const { sessionId } = await send('Target.attachToTarget', { targetId, flatten: true });
-      await send('Page.enable', {}, sessionId);
-      const loaded = new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => {
-          socket.removeEventListener('message', onMessage);
-          reject(Error('Fixture load timed out'));
-        }, 20000);
-        const onMessage = (event) => {
-          const message = JSON.parse(event.data);
-          if (message.sessionId === sessionId && message.method === 'Page.loadEventFired') {
-            clearTimeout(timeout);
-            socket.removeEventListener('message', onMessage);
-            resolve();
-          }
-        };
-        socket.addEventListener('message', onMessage);
+      const result = await page.evaluate(async () => {
+        for (let i = 0; i < 1000; i++) {
+          const text = globalThis.document.querySelector('#result')?.textContent;
+          if (text && text !== 'pending') return JSON.parse(text);
+          await new Promise((resolve) => globalThis.setTimeout(resolve, 10));
+        }
+        throw Error('Fixture result timed out');
       });
-      await send('Page.navigate', { url: `http://127.0.0.1:${server.address().port}/` }, sessionId);
-      await loaded;
-      const evaluated = await send(
-        'Runtime.evaluate',
-        {
-          expression: `(async()=>{for(let i=0;i<1000;i++){const text=document.querySelector('#result')?.textContent;if(text&&text!=='pending')return JSON.parse(text);await new Promise(r=>setTimeout(r,10));}throw Error('Fixture result timed out');})()`,
-          awaitPromise: true,
-          returnByValue: true,
-        },
-        sessionId,
-      );
-      assert.equal(
-        evaluated.exceptionDetails,
-        undefined,
-        JSON.stringify(evaluated.exceptionDetails),
-      );
-      const result = evaluated.result.value;
       assert.equal(result.status, 'passed', JSON.stringify(result));
       assert.equal(result.routes, 4);
       assert.equal(result.foreignRejected, true);
     } finally {
-      socket?.close();
-      if (browser && browser.exitCode === null) {
-        const exited = once(browser, 'exit');
-        browser.kill('SIGTERM');
-        await exited;
-      }
+      await browser?.close();
       await new Promise((resolve) => {
         server.close(resolve);
         server.closeAllConnections();
       });
-      rmSync(profile, { recursive: true, force: true });
     }
   },
 );

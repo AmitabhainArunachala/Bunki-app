@@ -1,0 +1,86 @@
+# The entry gate for `next`, the prototype line: what a change must pass before it joins.
+#
+# One job, named exactly `next / core`, so branch protection can require that one name. It builds
+# the site with the production builder, runs every unit test with CI set, the lint and the format
+# check, and walks the built site as a learner does (scripts/prototype/learner-walk.mjs, 27 checks).
+#
+# The whole battery (ci.yml) still runs on the same pull request. Its results are information:
+# the gates that are red there are a list to work down, not the door.
+name: next core
+on:
+  pull_request:
+    branches: [next]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: next-core-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  core:
+    name: next / core
+    runs-on: ubuntu-24.04
+    # First run (42767964278): 17 minutes, of which 6 were the runner's package download; the
+    # setup step took 15 to 148 seconds on twelve other runners at the same commit. With a usual
+    # setup the job is about 13 minutes. The cap leaves room for a slow one.
+    timeout-minutes: 25
+    steps:
+      - name: Name the build and report folders outside the checkout
+        run: |
+          echo "KAIRO_SITE_DIR=$RUNNER_TEMP/kairo-site" >> "$GITHUB_ENV"
+          echo "CORE_OUT=$RUNNER_TEMP/next-core" >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/next-core"
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/ci-setup
+        with:
+          browsers: chromium webkit
+      # The unit tests that open the built site in CI ask for the site, an evidence folder and the
+      # digest of the verified build, as the battery gives them. The digest is read back from the
+      # same verification the battery's build job runs.
+      - name: Build the site with the production builder and verify it
+        run: |
+          node scripts/build-corridor-site.mjs --out "$KAIRO_SITE_DIR" > "$CORE_OUT/build.json"
+          node scripts/verify-release-gates.mjs --verify-artifact "$KAIRO_SITE_DIR" --require-clean > "$CORE_OUT/artifact.json"
+          digest="$(node -e "console.log(JSON.parse(require('fs').readFileSync(process.argv[1], 'utf8')).artifactSha256)" "$CORE_OUT/artifact.json")"
+          test -n "$digest"
+          echo "KAIRO_ARTIFACT_SHA256=$digest" >> "$GITHUB_ENV"
+          echo "KAIRO_VERIFIED_ARTIFACT_SHA256=$digest" >> "$GITHUB_ENV"
+      # The walk, the lint and the format check only read the tree, so they start here and run
+      # beside the first, single-process part of `npm test` (the two shared-study verifiers, about
+      # 160 seconds on this runner; the walk took 166). The many-worker part that follows, with its
+      # short timeouts, then has the runner to itself. Each part is reported by its own step below.
+      - name: Start the learner walk, the lint and the format check
+        run: |
+          bash scripts/prototype/core-step.sh start walk node scripts/prototype/learner-walk.mjs --site "$KAIRO_SITE_DIR" --shots "$CORE_OUT/walk"
+          bash scripts/prototype/core-step.sh start lint npm run lint
+          bash scripts/prototype/core-step.sh start format npm run format:check
+      - name: Unit tests, every file, with CI set
+        env:
+          KAIRO_BROWSER: chromium
+          KAIRO_EVIDENCE_DIR: ${{ runner.temp }}/next-core/unit-evidence
+        run: |
+          bash scripts/prototype/core-step.sh run unit 'Unit tests' '^ FAIL |AssertionError' npm test
+      - name: Lint
+        if: ${{ !cancelled() }}
+        run: |
+          bash scripts/prototype/core-step.sh report lint 'Lint' ' error |^✖'
+      - name: Format check
+        if: ${{ !cancelled() }}
+        run: |
+          bash scripts/prototype/core-step.sh report format 'Format check' '^\[warn\]'
+      - name: Learner walk, 27 checks against the built site
+        if: ${{ !cancelled() }}
+        run: |
+          bash scripts/prototype/core-step.sh report walk 'Learner walk' '^FAIL'
+      - name: Keep the logs, the walk's results and its screenshots
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-core-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/next-core/*.log
+            ${{ runner.temp }}/next-core/build.json
+            ${{ runner.temp }}/next-core/artifact.json
+            ${{ runner.temp }}/next-core/walk
+          retention-days: 14
+          if-no-files-found: warn
