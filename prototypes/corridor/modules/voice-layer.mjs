@@ -342,7 +342,9 @@ export function installVoiceLayer(host) {
         voiceKey: sheetKey(node), single: false, gapMs: 320 }) },
     { id: 'example', find: '#sheet .example > p.example-ja, #sheet p.teacher-source-quote, #sheet p.sent-reader', at: 'before',
       read: (node) => ({ sentences: japaneseSentences(shownText(node)), voiceKey: sheetKey(node) }) },
-    { id: 'card-sentence', find: '.review-face p.review-cloze, .review-face p.review-example', at: 'before',
+    // on the card the mark follows the sentence on its own line's end, beside the ▷ that opens it: the card's face is
+    // centred, and a mark standing over the sentence would be a row of its own
+    { id: 'card-sentence', find: '.review-face p.review-cloze, .review-face p.review-example', at: 'append',
       when: () => host.cardRevealed(),
       read: (node) => ({ sentences: japaneseSentences(shownText(node)), voiceKey: voiceKeyOf('word', cardWord() || 'card') }) },
     { id: 'box-sentence', find: '#mini-sentence-pane p.mini-sentence-full', at: 'before',

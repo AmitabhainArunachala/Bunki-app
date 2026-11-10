@@ -234,7 +234,7 @@
    the pigment of sound: the mark while it speaks, and the sentence the reader is on. ---- */
 .voice-say { color: var(--color-ink-2, var(--text-2)); }
 /* beside a headword or a sentence the mark stands at the line's right end and adds no line of its own */
-.voice-say:is([data-voice-say='entry-headword'], [data-voice-say='example'], [data-voice-say='card-sentence'], [data-voice-say='box-sentence']) {
+.voice-say:is([data-voice-say='entry-headword'], [data-voice-say='example'], [data-voice-say='box-sentence']) {
   float: right;
   margin: -6px -8px 0 4px;
   /* over the line it floats beside: a positioned paragraph would otherwise take its taps */
@@ -242,7 +242,7 @@
   z-index: 1;
 }
 /* after a reading, a tutor's words or a quote it follows the text on its line */
-.voice-say:is([data-voice-say='kanji-reading'], [data-voice-say='tutor-turn'], [data-voice-say='coach'], [data-voice-say='speak-line'], [data-voice-say='quoted-sentence']) {
+.voice-say:is([data-voice-say='kanji-reading'], [data-voice-say='card-sentence'], [data-voice-say='tutor-turn'], [data-voice-say='coach'], [data-voice-say='speak-line'], [data-voice-say='quoted-sentence']) {
   display: inline-grid;
   vertical-align: middle;
   margin: -10px 0 -10px 4px;
