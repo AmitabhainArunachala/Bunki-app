@@ -278,7 +278,8 @@ async function suite(label, base, browser, { only = null } = {}) {
       `"${capped.button.trim()}" · session ${JSON.stringify(session)}`);
     await open('?ui=bi');
     await page.waitForSelector('#home-review', { state: 'attached' });
-    const pill = await page.locator('#home-review').textContent();
+    // the first screen's Today tab carries its count in its name (tighten pass 2026-11-10); the lone pill in its text
+    const pill = (await page.locator('#home-review').getAttribute('aria-label')) ?? (await page.locator('#home-review').textContent());
     check('cap-50 · the home pill reads the same 50', firstInt(pill) === 50, JSON.stringify(pill.trim()));
   }
   // the optional break (off by default: the walks above never met one): every 10 cards the
