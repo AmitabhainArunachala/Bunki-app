@@ -174,7 +174,8 @@ try {
       await wait(700);
       const bar = await page.evaluate(() => [...document.querySelectorAll('#app > .chrome > button, #app > .chrome > .lang-seg')]
         .filter((n) => { const r = n.getBoundingClientRect(); const s = getComputedStyle(n); return r.width && s.display !== 'none' && s.visibility !== 'hidden'; }).map((n) => n.id));
-      check(`${tab} · the top bar holds only Back and search`, bar.every((id) => ['back', 'chrome-search'].includes(id)), bar.join(',') || '(empty)');
+      // the gate on every bar (frame, 2026-11-10): Back, the gate, search
+      check(`${tab} · the top bar holds only Back, the gate and search`, bar.includes('bar-gate') && bar.every((id) => ['back', 'bar-gate', 'chrome-search'].includes(id)), bar.join(',') || '(empty)');
       check(`${tab} · its station is lit`, (await station(page)) === tab, await station(page));
     }
 
@@ -299,9 +300,11 @@ try {
       await page.locator('#ginga-symbol').click();
       await wait(400);
       if (tab === 'review') {
-        const rows = await page.locator('.nav-station').evaluateAll((ns) => ns.map((n) => `${n.querySelector('.nav-station-t').textContent} | ${n.querySelector('.nav-station-sub').textContent}`));
+        const rows = await page.locator('.gate-panel .nav-stations:not(.nav-more) .nav-station').evaluateAll((ns) => ns.map((n) => `${n.querySelector('.nav-station-t').textContent} | ${n.querySelector('.nav-station-sub').textContent}`));
         check('door · the menu: each place with a line saying what is inside', rows.length === 5 && rows.every((r) => r.split(' | ')[1].length > 5), rows.join(' ; '));
-        check('door · no language switch on the door', !(await page.locator('.nav-bar #lang, .nav-bar .lang-slide').count()));
+        // the gate's one panel (frame, 2026-11-10): after the places, the doors that are not places; Review is a place here
+        const more = await page.locator('.gate-panel .nav-more .nav-station .nav-station-t').allTextContents();
+        check('door · then Focus, Tutor, Orbit, Look and Language, and no second Review', more.join() === 'Focus,Tutor,Orbit,Look,Language', more.join());
       }
       await page.locator(`#nav-${tab}`).click();
       await wait(900);

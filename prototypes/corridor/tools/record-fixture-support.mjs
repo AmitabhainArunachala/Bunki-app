@@ -79,7 +79,8 @@ export async function restoreAppFixture(page, value, { archive, journal } = {}) 
   const backup = createAppBackupFixture(record, turns, journal);
   await page.goto(`${origin}/index.html?entry=shelf&ui=bi`);
   await page.waitForFunction(() => document.body.dataset.ready === '1');
-  await page.locator('#tray').click();
+  // Today: the bar's bookmark, or the Today tab where the tabs stand (the gate frame, 2026-11-10)
+  await page.locator('#tray, #tab-today').click();
   const marker = randomUUID();
   await page.evaluate((marker) => { window.__fixtureImportDocument = marker; }, marker);
   await selectBackupFile(page, { name: 'synthetic-fixture-backup.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(backup)) });

@@ -133,7 +133,7 @@ body:not(.zen) #app > .chrome > button.chrome-search { align-items: center; padd
 body:not(.zen) #app > .chrome > button.chrome-search svg { width: 20px; height: 20px; }
 /* during an attempt the bar still collapses to 戻る · progress · seal (register.css T8): the glass
    doors above must not bring the search, the dojo, the language or the lists back into a test */
-html[data-register='attempt'] body:not(.zen) #app > .chrome > :is(button.chrome-search, button.chrome-dojo, .lang-seg),
+html[data-register='attempt'] body:not(.zen) #app > .chrome > :is(button.chrome-search, button.chrome-dojo, .lang-seg, .lang-switch, .bar-gate),
 html[data-register='attempt'] body:not(.zen) #app > .chrome > button#tray { display: none; }
 /* 戻る: the one back glyph of every bar (the ONE TOP BAR block below draws it once) */
 body:not(.zen) #app > .chrome > button#back { padding-left: 6px; }
@@ -716,9 +716,9 @@ html[data-register='tutor'] main button.japanese-lookup-word { border: 0; backgr
   body:not(.zen) #app > .chrome > button#back { padding-left: 4px; }
   body:not(.zen) #app > .chrome > button#back:disabled { display: none; }
   /* in the reader the bar also carries the level, so 戻る keeps its chevron and says its name only
-     to a screen reader */
-  body[data-view='reader']:not(.zen) #app > .chrome > button#back .l-ja { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-  body[data-view='reader']:not(.zen) #app > .chrome > button#back { min-width: 44px; padding: 0 10px; }
+     to a screen reader (a bar with the gate says Back, as every bar does) */
+  body[data-view='reader']:not(.zen) #app > .chrome:not(:has(> .bar-gate)) > button#back .l-ja { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  body[data-view='reader']:not(.zen) #app > .chrome:not(:has(> .bar-gate)) > button#back { min-width: 44px; padding: 0 10px; }
   body:not(.zen) #app > .chrome > .level-chip.chrome-level { margin: 0 4px 0 0; }
   body:not(.zen) #app > .chrome > button .en-sub { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   body:not(.zen) #app > .chrome .lang-seg { margin: 0 2px; }
@@ -3356,7 +3356,7 @@ body:not(.ui-bi) .primary-tabs .primary-tab { font: 800 var(--type-label)/1 var(
   transform: rotate(45deg);
   pointer-events: none;
 }
-.primary-tabs .station-due {
+.primary-tabs :is(.station-due, .station-kept) {
   position: absolute;
   top: calc(var(--line-y) - 6px - 13px);
   left: calc(50% + 9px);
@@ -3371,6 +3371,10 @@ body:not(.ui-bi) .primary-tabs .primary-tab { font: 800 var(--type-label)/1 var(
   pointer-events: none;
 }
 .primary-tabs .station-due::after { content: attr(data-due); }
+/* the bookmark's count (the saved words) at the station's other shoulder, quieter than what is due, behind the bar's own
+   bookmark glyph (drawn with #tray's) */
+.primary-tabs .station-kept { left: auto; right: calc(50% + 9px); color: var(--color-muted); }
+.primary-tabs .primary-tab .station-kept::before { display: inline-block; width: 7px; height: 10px; margin-right: 2px; vertical-align: -1px; }
 .primary-tabs .primary-tab[aria-current='page'] { background: transparent; color: var(--color-ink); font-weight: 700; }
 body:not(.ui-bi) .primary-tabs .primary-tab[aria-current='page'] { font-weight: 800; }
 .primary-tabs .primary-tab[aria-current='page'] .station-node { opacity: 0; }
@@ -4668,7 +4672,8 @@ body:not(.zen):not(.ui-bi) #app > .chrome > button#tray {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0;
 }
-body:not(.zen) #app > .chrome > button#tray::before {
+body:not(.zen) #app > .chrome > button#tray::before,
+.primary-tabs .station-kept::before {
   content: '';
   flex: 0 0 auto;
   width: 13px;
@@ -4764,36 +4769,11 @@ body.has-primary-tabs .primary-tabs {
 }
 
 /* the tools group: glyph-only, quieter than the preferences, set off by one hairline */
-body.has-primary-tabs:not(.zen) #app > .chrome .lang-seg {
-  margin-right: 0;
-  padding-right: 7px;
-  /* drawn: the language pair's divider, one hairline */
-  background: linear-gradient(var(--color-rule), var(--color-rule)) right 3px center / 1px 16px no-repeat;
-}
-body.has-primary-tabs:not(.zen) #app > .chrome > button:is(.chrome-search, .chrome-dojo, #tray) { color: var(--color-muted); }
-body.has-primary-tabs:not(.zen) #app > .chrome :is(.chrome-search svg, .chrome-glyph) { width: 18px; height: 18px; }
-body.has-primary-tabs:not(.zen) #app > .chrome > button#tray .l-ja { font: 500 var(--type-caption)/1 var(--font-data); font-variant-numeric: tabular-nums; }
+body.has-primary-tabs:not(.zen) #app > .chrome > button.chrome-search { color: var(--color-muted); }
+body.has-primary-tabs:not(.zen) #app > .chrome .chrome-search svg { width: 18px; height: 18px; }
+/* (with the tabs the bar holds no Learn or Today door and one language control: the gate frame, ONE TOP BAR block) */
 @media (max-width: 360px) {
-  /* the narrowest phones keep ONE row: the Learn door yields to the Learn tab one thumb away,
-     and Lists becomes its bookmark with the count set small at its shoulder. The reader too (Q's G-12; the lead's ruling
-     of 2026-10-19 over G6's scrolling eight, closing Grok's H0-3): its seven 44 px doors fit the phone whole. G6's
-     overflow-x on the reader's toolbar (the 520 px rule) stays as a safety net only, so the page never widens. */
   body.has-primary-tabs:not(.zen) #app > .chrome { padding-inline: 2px; }
-  body.has-primary-tabs:not(.zen) #app > .chrome > button.chrome-dojo { display: none; }
-  body.has-primary-tabs:not(.zen) #app > .chrome .lang-seg { padding-right: 3px; background-position: right 1px center; }
-  body.has-primary-tabs:not(.zen) #app > .chrome > button#tray {
-    position: relative;
-    width: 44px;
-    min-width: 44px;
-    padding: 0;
-    justify-content: center;
-  }
-  body.has-primary-tabs:not(.zen) #app > .chrome > button#tray .l-ja {
-    position: absolute;
-    top: 9px;
-    left: calc(50% + 7px);
-    font-size: var(--type-caption);
-  }
 }
 
 /* ---- room entrances: one system, the view transition in rooms/motion.css (slice C). The chrome
@@ -5197,6 +5177,100 @@ body [data-bar='sheet'] .sheet-take { margin-left: auto; height: 44px; min-heigh
 }
 /* the galaxy's own strip (the door's menu) wears the frame's material too */
 .nav-bar { background: var(--color-bar, rgb(250 250 248 / 96%)); border: var(--stroke-hairline, 0.5px) solid var(--color-bar-line, rgb(0 0 0 / 12%)); -webkit-backdrop-filter: none; backdrop-filter: none; }
+/* THE GATE ON EVERY BAR (frame, 2026-11-10). With the tabs, every bar carries the first screen's torii at the screen's
+   centre, drawn as the first screen's (a hairline seal square in its 44), and holds Back, the gate, search and the
+   language; an article or a page adds its Save. The doors after the gate gather at the bar's end and never reach under
+   it. The language is one word in a hairline slip. The
+   gate's menu over a screen is a layer of its own, above the page (corridor.js openGateMenu). */
+body:not(.zen) :is(#app > .chrome, #sheet > .sheet-bar) > button.bar-gate {
+  position: absolute;
+  top: env(safe-area-inset-top, 0px);
+  left: calc(50% - 22px);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  padding: 0;
+  color: var(--color-bar-ink);
+  isolation: isolate;
+}
+body:not(.zen) :is(#app > .chrome, #sheet > .sheet-bar) > button.bar-gate::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  z-index: -1;
+  border: var(--stroke-hairline) solid color-mix(in srgb, currentColor 46%, transparent);
+  border-radius: var(--radius-seal);
+}
+.bar-gate svg { width: 18px; height: 18px; opacity: 0.86; transition: rotate var(--motion-sheet) var(--ease-standard); }
+.bar-gate[aria-expanded='true'] svg { rotate: 90deg; }
+body:not(.zen) :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate + * { margin-left: auto; }
+body:not(.zen) #sheet > .sheet-bar:has(> .bar-gate) > .sheet-take { margin-left: 4px; }
+/* the room's name and the article's level go where the tabs or the trail already say them (the name stays the bar's
+   words for a screen reader); a screen with neither keeps its name, short of the gate, as does the layout under test */
+html:not([data-register='attempt'], [data-layout='places']) :is(body.has-primary-tabs, body:has(#app > .scale-thread)):not(.zen) #app > .chrome:has(> .bar-gate) > .crumb {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+body:not(.zen) #app > .chrome:has(> .bar-gate) > .crumb { flex: 0 1 auto; max-width: calc(50% - 100px); }
+html:not([data-layout='places']) body.has-primary-tabs:not(.zen) #app > .chrome:has(> .bar-gate) > .chrome-level { display: none; }
+/* the article's Save keeps a fixed room at the bar's end (touching a word moves no door), short of the gate:
+   half the bar, less half the gate, a gap, search (44) and the language (52 at most) */
+body:not(.zen) #app > .chrome:has(> .bar-gate) > button.save-one.chrome-keep { flex: 0 0 min(calc(50% - 126px), 140px); }
+body:not(.zen) #app > .chrome > .lang-switch { display: flex; flex: 0 0 auto; }
+body:not(.zen) #app > .chrome > .lang-switch button {
+  position: relative;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink);
+  font: 500 var(--type-label)/44px var(--font-ui);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+body:not(.zen) #app > .chrome > .lang-switch button::before {
+  content: '';
+  position: absolute;
+  inset: 11px 2px;
+  border: var(--stroke-hairline) solid var(--color-edge-strong);
+  border-radius: var(--radius-control);
+}
+body:not(.zen) #app > .chrome > .lang-switch button:hover::before { background: var(--color-fill); }
+/* above the page (61), the tabs and the word box (70) and the lists (85); under the writing room (90) and the look's stones (120) */
+.gate-menu { position: fixed; inset: 0; z-index: 88; }
+/* the menu is one panel under the gate: the look-up field, the five places, then the doors that are not places */
+.nav-bar.gate-panel { width: min(calc(100vw - 24px), 560px); max-height: calc(100dvh - 76px); overflow-y: auto; }
+.gate-menu .nav-bar.gate-panel { top: calc(53px + env(safe-area-inset-top, 0px)); }
+@media (max-width: 600px) {
+  .nav-bar.gate-panel { width: 100vw; border-inline: 0; border-radius: 0 0 var(--radius-overlay) var(--radius-overlay); }
+  .gate-menu .nav-bar.gate-panel { top: calc(45px + env(safe-area-inset-top, 0px)); }
+}
+.gate-panel .nav-more { margin-top: 4px; border-top: var(--stroke-hairline) solid var(--color-edge-strong); }
+.gate-panel .nav-station[aria-current='page'] .nav-station-t { color: var(--color-ink); font-weight: 800; }
+/* the place you are in carries the square the tab bar's car is */
+.gate-panel .nav-station[aria-current='page'] .nav-station-t::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  background: var(--red, #b03a2e);
+  vertical-align: 0.08em;
+}
+.gate-panel .nav-station > :is(.nav-station-v, .theme-seal) { grid-area: n; }
+.gate-panel .nav-station-v { color: var(--color-muted); font: 500 var(--type-label)/1 var(--font-ui); }
+.gate-panel .nav-station > .theme-seal {
+  width: 22px;
+  height: 22px;
+  border: 1px solid color-mix(in srgb, var(--color-seal) 70%, transparent);
+  border-radius: var(--radius-seal);
+  background: none;
+  color: var(--color-seal);
+  font: 800 var(--type-caption)/20px var(--font-display);
+  text-align: center;
+}
 /* END ONE TOP BAR ========================================================== */
 
 /* ONE NOTE (contract §5): the honest notes of every room — guide · record — one element, quiet and small, a
@@ -5245,7 +5319,7 @@ body:not(.ui-bi) .primary-tabs .primary-tab[aria-current='page'] { font-weight: 
 }
 .primary-tabs[data-wrapped='true'] .primary-tab::before { content: none; }
 .primary-tabs[data-wrapped='true'] :is(.station-node, .line-car) { display: none; }
-.primary-tabs[data-wrapped='true'] .station-due { position: static; margin-left: 8px; background: transparent; }
+.primary-tabs[data-wrapped='true'] :is(.station-due, .station-kept) { position: static; margin-left: 8px; background: transparent; }
 .primary-tabs[data-wrapped='true'] .primary-tab[aria-current='page'] .primary-tab-label {
   text-decoration: underline;
   text-underline-offset: 0.25em;

@@ -15,7 +15,7 @@
 #worldcraft-dialog h1.view-title::after,                    /* Build a character: the top of its screen */
 #passage-door::after,                                       /* Passage: the door on 職 識 織 */
 #passage-dialog .passage-bar .pool-tag::after,              /* Passage: beside "preview" at the top of its screen */
-#orbit-preview-door::after,                                 /* Orbit: the bubble in the galaxy menu */
+#orbit-preview-door .nav-station-t::after,                  /* Orbit: beside its name, in the gate's menu */
 .orbit-preview-bar .orbit-preview-tag::after,               /* Orbit: beside "preview" at the top of its screen */
 .library-candidate-tag::after,                              /* candidate readings: each card, and the reader's head */
 .listen-row[data-passage='jawiki:5294446']::after,          /* the Sakura article's speaker bar */
