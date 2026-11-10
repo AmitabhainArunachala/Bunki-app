@@ -1621,7 +1621,8 @@ html[data-room='reader'] body:not([data-view='drift']) #app .reader-head > .list
   max-width: 44px;
   height: 44px;
   min-height: 44px;
-  margin: 0 34px 0 8px;
+  /* lifted with the settings icon (top: -6px), so the two marks and the line's text share one centre */
+  margin: -6px 34px 0 8px;
   padding: 0;
 }
 html[data-room='reader'] body[data-view='reader'] #app > main .reader-head:has(> .listen-row:not([hidden])) > .reader-meta::before { width: 0; }
