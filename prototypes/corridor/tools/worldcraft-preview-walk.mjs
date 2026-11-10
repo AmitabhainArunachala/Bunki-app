@@ -154,7 +154,9 @@ async function walk(browser, device) {
   await check(session, 'build', async () => {
     const scroll = await page.evaluate(() => [window.scrollX, window.scrollY]);
     const hadReports = await page.evaluate(() => !!document.getElementById('bunki-reports-root'));
+    const pressed = Date.now();
     await openDoor(session);
+    const opened = Date.now() - pressed;
     const note = (await page.locator('#worldcraft-preview-note').innerText()).replace(/\s+/g, ' ');
     if (!/^(Preview|試作)/.test(note)) throw new Error(`the dialog is not labelled preview: "${note.slice(0, 80)}"`);
     const parts = await page.locator('.worldcraft-parts figcaption').allInnerTexts();
@@ -186,7 +188,7 @@ async function walk(browser, device) {
     if (hadReports && !back.reports) throw new Error('the report entry did not return to the page');
     if (Math.abs(back.scroll[1] - scroll[1]) > 2) throw new Error(`scroll moved from ${scroll[1]} to ${back.scroll[1]}`);
     await shot('5-returned');
-    return `"${note.slice(0, 60)}…"; 耳 + 戠 → "${built}" (18 strokes) → Keep → "${(await kept.join())}" in Kept characters → Leave → back on 職's page, focus on the door`;
+    return `the builder is up ${opened} ms after the press, labelled "${note.slice(0, 44)}…"; 耳 + 戠 → "${built}" (18 strokes) → Keep → "${kept.join()}" in Kept characters → Leave → back on 職's page, focus on the door`;
   });
 
   await check(session, 'no record written', async () => {
@@ -242,6 +244,27 @@ async function walk(browser, device) {
     await press(LEAVE);
     await dialogGone(page);
     return `識's door lists the 職 kept on the other page; View shows "${viewing}" and Leave returns to the unkept "${returned}"; leaving it asks first (W-17); Remove empties the list (W-15)`;
+  });
+
+  await check(session, 'Keep from the leave prompt', async () => {
+    await openDoor(session);
+    await press('#worldcraft-dialog [data-worldcraft-action="assemble"]');
+    await lineOf(page, 'W-05').waitFor();
+    await press(LEAVE);
+    await lineOf(page, 'W-17').waitFor();
+    await press('#worldcraft-dialog [data-worldcraft-action="keep-before-leave"]');
+    await lineOf(page, 'W-09').waitFor();
+    const prompt = await lineOf(page, 'W-17').count(), kept = await page.locator('.worldcraft-view li[data-worldcraft-id] > p').allInnerTexts();
+    if (prompt || kept.join() !== '識') throw new Error(`after Keep in the prompt: ${prompt} prompt line(s), kept "${kept.join()}"`);
+    await press(LEAVE); // kept now, so Leave no longer asks
+    await dialogGone(page);
+    await openDoor(session);
+    await press('#worldcraft-dialog [data-worldcraft-action="request-remove"]');
+    await press('#worldcraft-dialog [data-worldcraft-action="confirm-remove"]');
+    await lineOf(page, 'W-15').waitFor();
+    await press(LEAVE);
+    await dialogGone(page);
+    return 'an unkept 識, Leave, then Keep this build in the prompt: kept (W-09), the prompt is gone, and Leave then closes without asking';
   });
 
   await check(session, 'Escape and a host navigation end the visit', async () => {
