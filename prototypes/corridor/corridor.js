@@ -12381,6 +12381,12 @@ const VOICE_LOCK = {
     "word": "kore",
     "example": "kore",
     "speaker-b": "charon"
+  },
+  "narration": {
+    "model": "fal elevenlabs/tts/eleven-v4",
+    "voices": {
+      "sakura": "Sakura"
+    }
   }
 };
 /* === end VOICE_LOCK === */
@@ -12414,7 +12420,13 @@ function ensureArticleNarration() {
 if (typeof window !== 'undefined') void ensureArticleNarration();
 /** The voice a narrated surface carries, named for the learner. It comes from the role law, not
  * from a manifest-wide field: v2 has no global voice, because each clip owns its own. */
-const narrationVoiceName = (role = 'narrator') => NARRATION_VOICES[voiceForRole(role)] || '';
+const narrationVoiceName = (role = 'narrator') => {
+  // the one voice the admitted manifest's clips are in, when they share one: the lock lists it, or
+  // the manifest would not have been admitted; otherwise, and before any manifest, the role law's
+  const voices = new Set(Object.values(articleNarration?.articles || {}).flatMap(article => article.clips.map(clip => clip.voice)));
+  const [only] = role === 'narrator' && voices.size === 1 ? voices : [];
+  return (only && (VOICE_LOCK.narration?.voices[only] || NARRATION_VOICES[only])) || NARRATION_VOICES[voiceForRole(role)] || '';
+};
 const narrationClips = (p) => (p && articleNarration?.articles?.[p.id]?.clips) || [];
 
 
@@ -12590,12 +12602,37 @@ if (typeof window !== 'undefined') ensureRecManifest();
 
 /** Play one recorded clip. Resolves true when it played to the end, false when it
  * could not play, and null when it was stopped (a replay, another clip, or 止める). */
-function playRecClip() {
+function playRecClip(src, btn, { rate = 1, onTime = null } = {}) {
   deviceVoice.cancel();
-  // ONE PLAYBACK OWNER (V): stop every legacy lane before refusing, but construct no Audio.
+  // ONE PLAYBACK OWNER (V): stop every other lane before refusing or playing. No Audio is
+  // constructed for a clip the lock does not list.
   if (typeof stopSentenceListening === 'function') stopSentenceListening();
   stopRecAudio();
-  return Promise.resolve(false);
+  if (!lockedNarrationClip(src)) return Promise.resolve(false);
+  return new Promise((done) => {
+    const a = new Audio(src);
+    recAudioEl = a;
+    a.playbackRate = rate;
+    if (onTime) a.ontimeupdate = () => onTime(a.duration ? a.currentTime / a.duration : 0);
+    const off = () => {
+      if (btn) btn.classList.remove('is-speaking');
+      if (recAudioEl === a) recAudioEl = null;
+    };
+    a.onplay = () => btn && btn.classList.add('is-speaking');
+    a.onended = () => { off(); done(true); };
+    a.onpause = () => { off(); done(a.ended ? true : null); };
+    a.onerror = () => { off(); done(false); };
+    a.play().catch(() => { off(); done(false); });
+  });
+}
+/** The one door to recorded sound. It opens for a clip the admitted narration manifest names under
+ * the lock's narration provider: that provider's model and a voice it lists. A path alone opens
+ * nothing, and the render lock's own recordings stay unplayed, as ceb954e0b left them. */
+function lockedNarrationClip(src) {
+  const provider = VOICE_LOCK.narration;
+  if (!provider || typeof src !== 'string') return false;
+  return Object.values(articleNarration?.articles || {}).some(article => article.clips.some(clip =>
+    clip.src === src && clip.model === provider.model && Object.hasOwn(provider.voices, clip.voice)));
 }
 
 /** Manifest v2 only: { v:2, lock:{model}, words:{ "<surface>|<reading>": {...} } }. A v1 manifest

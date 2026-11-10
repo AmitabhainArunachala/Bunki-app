@@ -39,7 +39,7 @@ const preferenceSource = between('let recManifest;', 'function ensureRecManifest
 // the slice must start at the generated lock, because the roster and the role law are read
 // from it: starting at NARRATION_VOICES would leave VOICE_LOCK undefined
 const voiceNamesSource = definitions(['VOICE_LOCK','NARRATION_VOICES','voiceForRole','approvedNarrationClip','approvedNarrationManifest']);
-const clipSource = definitions(['stopRecAudio','playRecClip','approvedWordManifest','wordClipKey','wordClipFor']);
+const clipSource = definitions(['stopRecAudio','playRecClip','lockedNarrationClip','approvedWordManifest','wordClipKey','wordClipFor']);
 const cardSource = definitions(['deviceVoice','cardAudioSerial','reviewVoiceFace','retireCardSpeech','retireCardAudioOnFaceChange','cardVoiceStatus','deviceVoiceMessage','speakCardReading','reviewVoiceTarget','appendReviewVoice','autoSpeakReviewFace','readAloud','buildListenRow','excerptPlayback','retireExcerptControl','cancelExcerptPlayback','excerptListenLabel','stopReadAloud','stopPassageRead','sentenceListeningCatalog','stopSentenceListening']);
 const quoteText = '「引用の始まり。続きです。引用の終わり。」';
 const LOCK = runtimeLock();

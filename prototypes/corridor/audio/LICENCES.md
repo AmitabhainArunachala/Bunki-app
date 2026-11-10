@@ -33,6 +33,23 @@ AAC 64 kbps mono 24 kHz, one clip per sentence, listed in
 reader fetches that manifest. An article without clips still shows the pending
 line (この記事の収録音声はありません) and nothing plays for it.
 
+## Article narration · November 2026
+
+On 10 November 2026 the one narrated article (`jawiki:5294446`) changed voice. Its six
+clips are now **Sakura**, an ElevenLabs voice rendered through fal
+(`fal elevenlabs/tts/eleven-v4`, voice id `EGPLqH9Wz2tNLu58EJVR`), under
+`narration/sakura/jawiki_5294446-*.m4a` (AAC mono 24 kHz, one clip per sentence, 73.6 s
+in all). They were rendered by the speech lane, not by `tools/render-corpus.mjs`; the
+render's record, with each clip's digest and the text that was spoken, is
+`~/.dharma/nihongo-srs/execution/bunki-narration-20261110/MANIFEST.json`. The terms are
+those of the ElevenLabs and fal accounts the render ran under; they are not restated or
+checked here.
+
+The [voice lock](../../../docs/operator/VOICE_LOCK.md#the-narration-provider-2026-11-10)
+lists that provider and voice, and only a clip it lists plays. The six Kore clips of the
+same article stay in `narration/kore/` as `superseded` records in
+`article-narration.json`: hashed and checked, played nowhere.
+
 Word and sentence playback follows the [voice lock's role assignments](../../../docs/operator/VOICE_LOCK.md#the-lock).
 The interim clips credited above remain in the repository but no longer play. Until approved word clips exist, the
 answer card stays silent and says the Kore voice is on its way; until approved

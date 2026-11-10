@@ -31,6 +31,13 @@ function approvedNarrationClip(clip, article = null) {
   if (!clip || typeof clip.text !== 'string' || !clip.text.trim() || typeof clip.src !== 'string') return false;
   // v2 identity is stated, never defaulted: a clip that does not say its role and model is not one
   const role = clip.speakerRole;
+  // The lock's narration provider is a second, separate admission: a clip of its model is prose
+  // narration in a voice that provider lists, from that voice's own folder, or it is nothing.
+  // It widens nothing for the render lock's clips, which are judged below as before.
+  const provider = VOICE_LOCK.narration;
+  if (provider && clip.model === provider.model)
+    return role === 'narrator' && Object.hasOwn(provider.voices, clip.voice) &&
+      new RegExp(`^audio/narration/${clip.voice}/[a-zA-Z0-9_-]+\\.(?:m4a|mp3|wav|ogg)$`, 'u').test(clip.src);
   if (typeof role !== 'string' || clip.model !== VOICE_LOCK.model) return false;
   if (!Object.hasOwn(NARRATION_VOICES, clip.voice)) return false;
   // the role law at the point of load: a clip whose voice disagrees with its role is refused,

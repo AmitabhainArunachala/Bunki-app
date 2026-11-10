@@ -29,6 +29,23 @@ export function readVoiceLock(path = VOICE_LOCK_PATH) {
     if (typeof lock.live.approved !== 'boolean') throw new Error('voice-lock: live.approved must be stated explicitly');
     if (lock.live.approved && lock.live.model === lock.render.model) throw new Error('voice-lock: live and render must be approved separately');
   }
+  // The narration provider is a second, separate admission. Stated in full or not at all: a model,
+  // and each listed voice with the name the learner is shown and the provider's own voice id.
+  if (lock.narration !== undefined) {
+    const n = lock.narration;
+    if (typeof n?.provider !== 'string' || !n.provider.trim() || typeof n.model !== 'string' || !n.model.trim())
+      throw new Error('voice-lock: narration.provider or narration.model missing');
+    if (n.model === lock.render.model) throw new Error('voice-lock: narration and render must name different models');
+    const listed = Object.entries(n.voices || {});
+    if (!listed.length) throw new Error('voice-lock: narration lists no voice');
+    for (const [id, voice] of listed) {
+      if (!/^[a-z][a-z0-9-]*$/u.test(id) || typeof voice?.name !== 'string' || !voice.name.trim()
+        || typeof voice.voiceId !== 'string' || !voice.voiceId.trim())
+        throw new Error(`voice-lock: narration voice ${id} malformed`);
+      if ([lock.voices?.main?.id, lock.voices?.second?.id].includes(id))
+        throw new Error(`voice-lock: narration voice ${id} is already a render voice`);
+    }
+  }
   for (const slot of ['main', 'second']) {
     const v = lock.voices?.[slot];
     if (!v || typeof v.id !== 'string' || typeof v.prebuilt !== 'string' || !Array.isArray(v.roles))
@@ -49,6 +66,9 @@ export function runtimeLock(lock = readVoiceLock()) {
     main: lock.voices.main.id,
     second: lock.voices.second.id,
     roles,
+    // the provider whose narration clips may play: its model, and each listed voice by its shown name
+    ...(lock.narration ? { narration: { model: lock.narration.model,
+      voices: Object.fromEntries(Object.entries(lock.narration.voices).map(([id, voice]) => [id, voice.name])) } } : {}),
   };
 }
 

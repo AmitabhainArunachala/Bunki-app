@@ -24,7 +24,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { planRetired, runtimeLock } from './voice-lock.mjs';
+import { planRetired, readVoiceLock, runtimeLock } from './voice-lock.mjs';
 import { ledgerPathFor, plan, provenanceOf, readLedger, shippedVouchers } from './render-corpus.mjs';
 
 const corridor = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -82,6 +82,30 @@ export function buildManifests({ root = corridor, lock = runtimeLock(), ledgerFi
     (articles[item.articleId] ||= { clips: [] }).clips.push({ text: item.spoken, ...stamp(item) });
   }
 
+  // the lock's narration provider — its clips come from that provider's own render, not from this
+  // job's plan, so the shipped manifest's record is their provenance. A record stands only while the
+  // file is still the very bytes it vouches for, in a voice the lock lists, from that voice's folder;
+  // then it is stamped again from the disk like every other clip. Anything else is reported.
+  const provider = readVoiceLock().narration;
+  const superseded = {};
+  const shipped = (() => { try { return JSON.parse(readFileSync(resolve(root, NARRATION_FILE), 'utf8')); } catch { return null; } })();
+  if (provider && shipped?.v === 2) for (const [id, article] of Object.entries(shipped.articles || {})) {
+    const kept = [];
+    for (const clip of (article.clips || []).filter((entry) => entry.model === provider.model)) {
+      const file = resolve(root, clip.src || '');
+      const listed = clip.speakerRole === 'narrator' && Object.hasOwn(provider.voices, clip.voice)
+        && new RegExp(`^audio/narration/${clip.voice}/[a-zA-Z0-9_-]+\\.m4a$`, 'u').test(clip.src || '');
+      if (!listed || !existsSync(file) || sha256(readFileSync(file)) !== clip.sha256) { unproven.push(clip.src); continue; }
+      kept.push({ text: clip.text, src: clip.src, voice: clip.voice, speakerRole: clip.speakerRole, model: provider.model,
+        seconds: +secondsOf(file).toFixed(3), sha256: clip.sha256, bytes: statSync(file).size });
+    }
+    if (!kept.length) continue;
+    // the render lock's own clips for this article step aside, records and all: nothing plays them,
+    // and their bytes stay vouched for and checked under `superseded`
+    if (articles[id]) superseded[id] = articles[id];
+    articles[id] = { clips: kept };
+  }
+
   const legacy = (() => { try { return JSON.parse(readFileSync(resolve(root, WORDS_FILE), 'utf8')); } catch { return {}; } })();
   return {
     words: {
@@ -94,7 +118,8 @@ export function buildManifests({ root = corridor, lock = runtimeLock(), ledgerFi
       // resolves through it: the runtime reads `words` only
       legacyWords: legacy.v === 2 ? legacy.legacyWords || {} : legacy.words || {},
     },
-    narration: { v: 2, lock: { model: lock.model, main: lock.main, second: lock.second }, articles },
+    narration: { v: 2, lock: { model: lock.model, main: lock.main, second: lock.second }, articles,
+      ...(Object.keys(superseded).length ? { superseded } : {}) },
     owed: want.length,
     unplaced,
     planRetired: retired,

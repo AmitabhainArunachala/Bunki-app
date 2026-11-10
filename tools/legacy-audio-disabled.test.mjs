@@ -7,6 +7,7 @@ const { test } = await import(
   process.env.VITEST === 'true' && !process.env.NODE_TEST_CONTEXT ? 'vitest' : 'node:test'
 );
 import { createDeviceVoice, REASONS } from '../prototypes/corridor/device-voice.mjs';
+import { runtimeLock } from '../prototypes/corridor/tools/voice-lock.mjs';
 test('unbound legacy speech and recording entry points fail closed', async () => {
   let speaks = 0,
     cancels = 0;
@@ -60,6 +61,9 @@ test('unbound legacy speech and recording entry points fail closed', async () =>
     Promise,
     window: { __KAIRO_AUDIO__: true },
     document: { hidden: false },
+    // the clip player asks the lock and the admitted narration manifest; none is loaded here
+    VOICE_LOCK: runtimeLock(),
+    articleNarration: null,
     recManifest: undefined,
     recManifestWait: null,
     recAudioEl: null,
@@ -100,6 +104,8 @@ test('unbound legacy speech and recording entry points fail closed', async () =>
     actual('ensureRecManifest') +
       ';' +
       actual('playRecClip') +
+      ';' +
+      actual('lockedNarrationClip') +
       ';' +
       actual('speakCardReading') +
       ';' +
@@ -179,4 +185,106 @@ test('unbound legacy speech and recording entry points fail closed', async () =>
       actualFunctions: true,
     }),
   );
+});
+
+test('a clip of the narration provider the lock lists plays; an unlisted voice, a bare path and the render lock do not', async () => {
+  const lock = runtimeLock(),
+    provider = lock.narration;
+  assert(
+    provider && Object.keys(provider.voices).length > 0,
+    'the lock lists a narration provider',
+  );
+  const [voice] = Object.keys(provider.voices);
+  // The actual functions: the manifest's admission from the voice seam, the player from corridor.js.
+  const lift = (file, names) => {
+    const source = readFileSync(new URL(`../prototypes/corridor/${file}`, import.meta.url), 'utf8'),
+      ast = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+    return names
+      .map((name) => {
+        const nodes = ast.statements.filter(
+          (n) => ts.isFunctionDeclaration(n) && n.name?.text === name,
+        );
+        assert.equal(nodes.length, 1, `${file} declares ${name} once`);
+        return source.slice(nodes[0].getStart(ast), nodes[0].end);
+      })
+      .join(';');
+  };
+  const created = [];
+  const sandbox = {
+    Promise,
+    Object,
+    RegExp,
+    VOICE_LOCK: lock,
+    NARRATION_VOICES: lock.voices,
+    articleNarration: null,
+    recAudioEl: null,
+    deviceVoice: { cancel() {} },
+    Audio: class {
+      constructor(src) {
+        this.src = src;
+        created.push(this);
+      }
+      play() {
+        return Promise.resolve();
+      }
+      pause() {}
+    },
+  };
+  vm.createContext(sandbox);
+  vm.runInContext(
+    lift('modules/voice.mjs', [
+      'voiceForRole',
+      'approvedNarrationClip',
+      'approvedNarrationManifest',
+    ]) +
+      ';' +
+      lift('corridor.js', ['stopRecAudio', 'playRecClip', 'lockedNarrationClip']),
+    sandbox,
+  );
+  const src = (name) => `audio/narration/${name}/fixture-000.m4a`;
+  const manifest = (name, model, role = 'narrator') => ({
+    v: 2,
+    lock: { model: lock.model, main: lock.main, second: lock.second },
+    articles: {
+      fixture: {
+        clips: [{ text: '最初の文。', src: src(name), voice: name, speakerRole: role, model }],
+      },
+    },
+  });
+
+  // A listed voice under the provider's model is admitted, and its clip is the one that sounds.
+  sandbox.articleNarration = sandbox.approvedNarrationManifest(manifest(voice, provider.model));
+  assert.equal(sandbox.articleNarration?.v, 2, 'the listed voice is admitted');
+  const playing = sandbox.playRecClip(src(voice), null);
+  assert.equal(created.length, 1);
+  assert.equal(created[0].src, src(voice));
+  created[0].ended = true;
+  created[0].onended();
+  assert.equal(await playing, true, 'and plays to its end');
+
+  // Nothing wider. Each of these is refused at admission, whole.
+  for (const [name, bad] of [
+    ['a voice the provider does not list', manifest('asahi', provider.model)],
+    ["the render lock's voice under the provider's model", manifest(lock.main, provider.model)],
+    ['a listed voice in another role', manifest(voice, provider.model, 'speaker-b')],
+    ['a listed voice under the render model', manifest(voice, lock.model)],
+  ])
+    assert.equal(sandbox.approvedNarrationManifest(bad), null, `${name} is refused`);
+
+  // And the player is its own door: a manifest that reached it some other way opens nothing.
+  // No Audio may exist before the answer, so the count is read first and the promise after.
+  const refuses = async (path, why) => {
+    const answer = sandbox.playRecClip(path, null);
+    assert.equal(created.length, 1, `${why}: no Audio is constructed`);
+    assert.equal(await answer, false, why);
+  };
+  sandbox.articleNarration = manifest('asahi', provider.model);
+  await refuses(src('asahi'), 'an unlisted voice does not play');
+  sandbox.articleNarration = null;
+  await refuses(src(voice), 'a path no manifest names does not play');
+  // The render lock's own narration is still admitted as a record and still does not sound.
+  sandbox.articleNarration = sandbox.approvedNarrationManifest(manifest(lock.main, lock.model));
+  assert.equal(sandbox.articleNarration?.v, 2);
+  await refuses(src(lock.main), "the render lock's clip does not play");
+  assert.equal(created.length, 1, 'one Audio in all: the listed clip');
 });

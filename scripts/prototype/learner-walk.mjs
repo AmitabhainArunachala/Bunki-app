@@ -756,8 +756,23 @@ async function soundWalk(browser) {
       await sleep(page, 2500);
       const note = (await page.locator('#listen-note').innerText()).trim();
       row.shots.push(await shot(page, 'sound-article-phone'));
-      sound.narratedArticle = { title, barBefore: bar, noteAfterPlay: note };
-      said += `; on "${title}" the speaker mark opens a bar "${bar}", and after Play it says "${note}"`;
+      // An article that ships a recording must play it: the app asks for one of its narration clips,
+      // and the bar does not report a failure.
+      const asked = (await heard()).filter(
+        (entry) => entry.kind === 'audio-play' && /\/audio\/narration\//.test(entry.src || ''),
+      );
+      sound.narratedArticle = {
+        title,
+        barBefore: bar,
+        noteAfterPlay: note,
+        clipsAskedFor: asked.length,
+        firstClip: asked[0]?.src.replace(ORIGIN, '') || '',
+      };
+      if (!asked.length || /could not play/i.test(note))
+        throw new Error(
+          `Play on "${title}" played nothing: the bar says "${note}" and the app asked for ${asked.length} narration clips`,
+        );
+      said += `; on "${title}" the speaker mark opens a bar "${bar}"; Play asks for ${asked[0].src.replace(ORIGIN, '')} and the bar says "${note}"`;
     }
     await collect('article');
     return said;
