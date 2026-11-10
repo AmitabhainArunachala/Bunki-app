@@ -8,6 +8,14 @@
     "planNote": "Retired 2026-11-10 by the lead's ruling on pull request #146 (John dropped this voice for on-demand voices). Nothing more is rendered to this lock, so its corpus plan owes no further clip. The clips already on disk stay under the lock and every check on them still runs.",
     "note": "The lead's 10-17 decision on John's 'for now just anything decent and we can swap later'. Swap = change this one value and re-render; nothing else in the tree names a model."
   },
+  "narration": {
+    "provider": "ElevenLabs through fal",
+    "model": "fal elevenlabs/tts/eleven-v4",
+    "voices": {
+      "sakura": { "name": "Sakura", "voiceId": "EGPLqH9Wz2tNLu58EJVR" }
+    },
+    "note": "A second provider, for article narration only (lead's ruling on pull request #146, 2026-11-10). A clip plays when the narration manifest names it with this model, the narrator role and a voice listed here, from that voice's own folder. Nothing else does: the render lock above is unchanged and its own recordings stay unplayed. One voice tonight; the other three of John's four (Asahi, Aki, Takumi) are added here when their clips are."
+  },
   "live": {
     "model": "gemini-3.8-live",
     "approved": false,

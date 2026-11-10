@@ -255,10 +255,17 @@ test('REAL · the shipped narration manifest plays the very clips this build shi
   assert(ids.length > 0);
   for (const id of ids) {
     const clips = narration.articles[id].clips;
+    // an article is narrated under one admission: the lock's narration provider, or the render lock
+    const provider = clips[0].model === LOCK.narration?.model ? LOCK.narration : null;
     for (const clip of clips) {
-      assert.equal(clip.voice, MAIN);
       assert.equal(clip.speakerRole, "narrator");
-      assert.equal(clip.model, LOCK.model);
+      if (provider) {
+        assert.equal(clip.model, provider.model);
+        assert(Object.hasOwn(provider.voices, clip.voice), `${clip.voice} is a voice the lock lists`);
+      } else {
+        assert.equal(clip.voice, MAIN);
+        assert.equal(clip.model, LOCK.model);
+      }
       assert(
         existsSync(new URL(`../${clip.src}`, import.meta.url)),
         clip.src + " is on disk",
@@ -269,19 +276,31 @@ test('REAL · the shipped narration manifest plays the very clips this build shi
     const row = f.bar();
     assert.equal(
       row.querySelector("#listen-note").textContent,
-      LOCK.voices[MAIN],
+      provider ? provider.voices[clips[0].voice] : LOCK.voices[MAIN],
     );
     row.querySelector("#listen-open").handlers.click();
     f.bar().querySelector("#listen-toggle").handlers.click();
     await settle();
-    assert.equal(
-      f.created.length,
-      0,
-      "shipped assets remain intact but unbound playback is disabled",
-    );
+    if (provider) {
+      assert.equal(f.created.length, 1, "the narration provider's first clip is the one that sounds");
+      assert.equal(f.created[0].src, clips[0].src);
+    } else {
+      assert.equal(
+        f.created.length,
+        0,
+        "the render lock's shipped assets remain intact but unbound playback is disabled",
+      );
+    }
     assert.equal(f.deviceVoiceCalls.length, 0);
     assert.deepEqual(f.writes, []);
   }
+  // the records a provider's narration replaced are kept, and nothing reaches them for playback
+  for (const article of Object.values(narration.superseded || {}))
+    for (const clip of article.clips) {
+      assert.equal(clip.voice, MAIN);
+      assert.equal(clip.model, LOCK.model);
+      assert(existsSync(new URL(`../${clip.src}`, import.meta.url)), clip.src + " is on disk");
+    }
 });
 
 test('REAL · a word with a shipped clip plays it, keyed by the reading the card shows', async () => {

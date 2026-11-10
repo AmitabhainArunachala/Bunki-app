@@ -307,7 +307,9 @@ export function shippedVouchers(root = corridor) {
   const vouchers = new Map();
   const read = (file) => { try { return JSON.parse(readFileSync(resolve(root, file), 'utf8')); } catch { return null; } };
   const narration = read('audio/article-narration.json');
-  if (narration?.v === 2) for (const article of Object.values(narration.articles || {}))
+  // `superseded` holds the records of clips another provider's narration has replaced: they play
+  // nowhere, but their bytes are still vouched for and checked like the rest
+  if (narration?.v === 2) for (const article of [...Object.values(narration.articles || {}), ...Object.values(narration.superseded || {})])
     for (const clip of article.clips || []) vouchers.set(clip.src, { model: clip.model, voice: clip.voice, role: clip.speakerRole,
       spoken: clip.text, reading: '', sha256: clip.sha256 });
   const words = read('audio/manifest.json');

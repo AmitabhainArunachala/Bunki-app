@@ -135,6 +135,9 @@ export async function checkLock({ requireComplete = false } = {}) {
     if (narration.lock?.model !== runtime.model) problems.push(`${NARRATION_FILE} names another model`);
     for (const [id, article] of Object.entries(narration.articles || {}))
       for (const clip of article.clips || []) clips.push({ where: `${NARRATION_FILE} ${id}`, clip });
+    // superseded records play nowhere; their clips are held to the same checks while they are on disk
+    for (const [id, article] of Object.entries(narration.superseded || {}))
+      for (const clip of article.clips || []) clips.push({ where: `${NARRATION_FILE} superseded ${id}`, clip });
   }
   const words = (() => { try { return json(WORDS_FILE); } catch { return null; } })();
   if (words?.v === 2) {
@@ -151,10 +154,13 @@ export async function checkLock({ requireComplete = false } = {}) {
     // as the runtime reads it: identity is stated, never defaulted, and one refused clip refuses
     // the whole narration manifest, so a missing role or model here is a silent build
     const role = clip.speakerRole;
+    // a clip of the lock's narration provider answers to that provider: narrator only, a listed voice
+    const provided = lock.narration && clip.model === lock.narration.model;
     if (typeof role !== 'string') problems.push(`${where}: clip states no speakerRole`);
-    else if (clip.voice !== voiceForRole(role, runtime))
+    else if (provided ? role !== 'narrator' || !Object.hasOwn(lock.narration.voices, clip.voice)
+      : clip.voice !== voiceForRole(role, runtime))
       problems.push(`${where}: voice '${clip.voice}' is not admissible for role '${role}'`);
-    if (clip.model !== runtime.model) problems.push(`${where}: clip names ${clip.model ? 'another model' : 'no model'}`);
+    if (!provided && clip.model !== runtime.model) problems.push(`${where}: clip names ${clip.model ? 'another model' : 'no model'}`);
     const file = resolve(corridor, clip.src || '');
     if (!clip.src || !existsSync(file)) { problems.push(`${where}: names a missing clip ${clip.src}`); continue; }
     const bytes = readFileSync(file);

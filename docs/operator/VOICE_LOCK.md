@@ -12,6 +12,14 @@ Slice V, 2026-10-17. This page describes the legacy Corridor narration lock. The
 - **Who reads it:** `tools/voice-lock.mjs` is its shared reader. `tools/sync-voice-lock.mjs --check|--write` carries it into the generated `VOICE_LOCK` block in corridor.js. Legacy Corridor rendering and playback take their model and role assignments from this lock.
 - **Second voice:** Charon is never a fallback. A missing clip is visibly missing; it is never device speech and never another speaker.
 
+## The narration provider (2026-11-10)
+- **What it is:** a second block in the lock, `narration`: a provider, its model, and the voices it lists, each with the name the learner is shown and the provider's own voice id. Tonight it lists one: **Sakura** (ElevenLabs through fal, `fal elevenlabs/tts/eleven-v4`).
+- **What plays:** only a clip the narration manifest names with that model, the `narrator` role and a listed voice, from that voice's own folder (`audio/narration/<voice>/`). `playRecClip` in corridor.js constructs no Audio for anything else. The render lock above is unchanged, and its own recordings still do not play.
+- **The plan is retired:** `render.plan` is `retired`. Nothing more is rendered to the render lock, so `verify-voice-lock --require-complete` counts its unplaced clips as `clipsUnplaced` and owes none of them.
+- **Superseded records:** where the provider narrates an article the render lock had clips for, those clips stay on disk and their records move to `superseded` in `article-narration.json`. They are hashed and checked like every other clip and play nowhere. Three speaking-room tools use them as audio fixtures.
+- **Adding a voice:** list it under `narration.voices`, run `sync-voice-lock.mjs --write`, place its clips under its own folder, name them in the manifest with their sha256 and bytes, and run `build-voice-manifest.mjs --write --only narration`. The manifest tool stamps a provider clip only while its bytes match the record that vouches for it.
+- **Where the clips come from:** the provider's own render, not `render-corpus.mjs`. Each render keeps its record outside the repository; the first is `~/.dharma/nihongo-srs/execution/bunki-narration-20261110/MANIFEST.json`.
+
 ## Temporary scope: dialogues are single-voice
 - **Which pieces:** the shelf holds two labelled scripts.
   - `bunki-read-n3-honda-quarter`: speakers ユキ and 森;
