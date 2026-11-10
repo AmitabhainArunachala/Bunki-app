@@ -635,7 +635,7 @@ function onRootLook() {
 function cordShape(count) {
   const wide = innerWidth >= 1100;
   const base = wide ? { wide, cx: 23, first: 54, step: 58, sway: 2.4, waves: 1, ring: 5.5, now: 7.5 }
-    : { wide, cx: 8, first: 30, step: 40, sway: 1.2, waves: 1, ring: 3.5, now: 5 };
+    : { wide, cx: 6, first: 30, step: 40, sway: 1.2, waves: 1, ring: 3.5, now: 4.5 }; // --pl-cord-x and the bead sizes in the styles
   // the thread comes out from under the top bar; on the sky, which has no bar, from above the glass
   base.from = document.body.dataset.view === 'drift' && !document.querySelector('#sheet') ? -64 : 0;
   const room = innerHeight - 45 - base.first - (wide ? 56 : 156);
