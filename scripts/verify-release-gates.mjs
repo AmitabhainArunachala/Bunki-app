@@ -4957,7 +4957,7 @@ export async function verifyWorkflows(root = ROOT) {
   for (const id of ['fast', 'battery', 'fast-retry', 'retry']) {
     const job = ci.jobs[id];
     assert.equal(job.strategy['fail-fast'], false, `${id} matrix must retain all shards`);
-    assert.equal(job['runs-on'], 'ubuntu-latest');
+    assert.equal(job['runs-on'], 'ubuntu-24.04');
     assert.equal(
       job.name,
       `${['fast', 'battery'].includes(id) ? 'battery' : 'retry'} / \${{ matrix.shard }}`,
