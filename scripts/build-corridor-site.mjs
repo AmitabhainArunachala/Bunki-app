@@ -94,6 +94,7 @@ try {
     'modules/voice-seam.mjs',
     'modules/voice-client.mjs',
     'modules/voice-clip-store.mjs',
+    'modules/voice-replies.mjs',
     'modules/learner.mjs',
     'modules/drift.mjs',
     'modules/library.mjs',

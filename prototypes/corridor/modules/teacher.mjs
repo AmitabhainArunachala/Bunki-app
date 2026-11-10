@@ -233,6 +233,13 @@ function aiSheetTurn(key) {
   return turn;
 }
 
+/** A tutor's or coach's reply has just arrived (B4, 2026-11-11): the voice layer says it once, by itself, when the 声
+ * switch is on and the reply stands with its listen mark (modules/voice-layer.mjs). A reply drawn again later is not
+ * announced, so it is never said twice. */
+function announceReply(text) {
+  try { document.dispatchEvent(new CustomEvent('bunki-reply', { detail: { text: String(text || '') } })); } catch { /* nothing listens */ }
+}
+
 function aiSheetSettle(box, paint) {
   if (box.isConnected) paint();
   else if ($('.sheet')) render();
@@ -269,6 +276,7 @@ function renderAiTutor(sheet, node, rec) {
       );
       aiSheetNotes.delete(`word-tutor|${ref}`);
       aiSheetSettle(out, () => { out.textContent = said; });
+      announceReply(said);
     } catch {
       if (aiSheetTurns.get(`word-tutor|${ref}`) === turn) {
         const line = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
@@ -377,6 +385,7 @@ function renderAiCoach(main, rv) {
         `Session grades:\n${lines.join('\n')}`,
         { surface: 'coach' },
       );
+      announceReply(said);
     } catch {
       said = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
     }
@@ -437,4 +446,4 @@ function askOnRequest(stage, plan, readingLine) {
   }
 }
 
-export { teacherWindowDraftKey, teacherDraftStatus, sizeTeacherQuestion, validAiEvidenceTurn, aiQuizParse, activeTeacherContext, teacherSentence, teacherSourceError, teacherDoorKey, aiChatTurns, refreshTeacherChatHistory, teacherChatStatus, teacherDraftCopyButton, aiKey, aiTeachingSubject, aiRequestTimeoutMs, canonicalAiBaseUrl, aiTransport, aiProvider, aiAsk, aiCreateCards, aiLastReply, aiSheetTurn, aiSheetSettle, renderAiTutor, renderAiExamples, renderAiCoach, aiReadingSegments, askOnRequest };
+export { announceReply, teacherWindowDraftKey, teacherDraftStatus, sizeTeacherQuestion, validAiEvidenceTurn, aiQuizParse, activeTeacherContext, teacherSentence, teacherSourceError, teacherDoorKey, aiChatTurns, refreshTeacherChatHistory, teacherChatStatus, teacherDraftCopyButton, aiKey, aiTeachingSubject, aiRequestTimeoutMs, canonicalAiBaseUrl, aiTransport, aiProvider, aiAsk, aiCreateCards, aiLastReply, aiSheetTurn, aiSheetSettle, renderAiTutor, renderAiExamples, renderAiCoach, aiReadingSegments, askOnRequest };

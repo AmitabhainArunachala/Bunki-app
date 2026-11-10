@@ -18,6 +18,7 @@ import { createAudioPlayer } from './nihongo-speech/audio/speech-player.mjs';
 import { isJapaneseEnough, normaliseSpeechText, splitSentences } from './nihongo-speech/audio/speech-text.mjs';
 import { createClipStore, createIndexedDbClipStorage } from './voice-clip-store.mjs';
 import { createDeviceTokenStore, createVoiceClient } from './voice-client.mjs';
+import { createArrivals, createReplyQueue, sameReply, serveReplies } from './voice-replies.mjs';
 import { SPEEDS, createVoiceSeam, sentencesOf, voiceKeyOf } from './voice-seam.mjs';
 
 export const READER_RATES = Object.freeze([1, 1.25, 0.75]);
@@ -186,10 +187,14 @@ export function installVoiceLayer(host) {
   /** Speak `sentences` from `button`: a second tap stops it; whatever else was speaking ends first. With no voice to be
    * had it makes no sound and hands `onNote` the reason in one plain line (and '' again once a voice answers).
    * `automatic`: the read was not started by the learner's tap (a card's answer or an opened word saying itself): it
-   * does not start at all when it could not be voiced, so it stops no other sound, and it never shows a line. */
-  function speakFrom(button, { sentences, voiceKey, single = false, onNote = null, onDone = null, automatic = false }) {
+   * does not start at all when it could not be voiced, so it stops no other sound, and it never shows a line.
+   * `toggle`: false for a read the app starts that is not a tap (the Speak room's line); `rate` overrides the reader's.
+   * `follow`: the control drawn anew for the same text, when the screen redraws it (a tutor reply in a refreshed chat
+   * log): the read goes on with that control instead of ending. */
+  function speakFrom(button, { sentences, voiceKey, single = false, onNote = null, onDone = null, automatic = false, toggle = true,
+    rate = null, follow = null }) {
     // his second tap on a control that is speaking stops it; a read by itself is nobody's tap
-    if (!automatic && button && spoken?.button === button && spoken.session && !spoken.session.ended) { seam.stop(); return null; }
+    if (!automatic && toggle && button && spoken?.button === button && spoken.session && !spoken.session.ended) { seam.stop(); return null; }
     if (!sentences.length) { if (!automatic) onNote?.(silenceLine('nothing-to-say'), 'nothing-to-say'); return null; }
     if (automatic) {
       // a clip kept on this device is a voice to be had, connection or not
@@ -199,23 +204,26 @@ export function installVoiceLayer(host) {
       if (touched && !touched.hasBeenActive) return null;
     }
     prime();
-    const mine = { button, session: null, over: false, voiced: false };
+    const mine = { button, session: null, over: false, voiced: false, follow };
+    // the control is the read's own: mine.button, which follow() may move to the same control drawn anew
     const paint = (on) => {
-      if (!button?.isConnected) return;
-      button.classList.toggle('is-speaking', on);
-      if (on) button.setAttribute('aria-pressed', 'true'); else button.removeAttribute('aria-pressed');
+      const control = mine.button;
+      if (!control?.isConnected) return;
+      control.classList.toggle('is-speaking', on);
+      if (on) control.setAttribute('aria-pressed', 'true'); else control.removeAttribute('aria-pressed');
     };
+    mine.paint = paint;
     mine.session = seam.read({
-      sentences, voiceKey, prefetch: single ? 0 : 2, gapMs: single ? 0 : 260, rate: reader.rate,
+      sentences, voiceKey, prefetch: single ? 0 : 2, gapMs: single ? 0 : 260, rate: rate ?? reader.rate,
       // a voice answered: the line an earlier silence left beside the control goes
       onSource: () => { if (mine.over) return; mine.voiced = true; onNote?.('', null); },
       onState: (state, code) => {
         if (mine.over) return;
-        if (state === 'loading' || state === 'playing') { paint(true); button?.setAttribute('aria-busy', String(state === 'loading')); }
+        if (state === 'loading' || state === 'playing') { paint(true); mine.button?.setAttribute('aria-busy', String(state === 'loading')); }
         if (['done', 'stopped', 'error'].includes(state)) {
           mine.over = true;
           paint(false);
-          button?.removeAttribute('aria-busy');
+          mine.button?.removeAttribute('aria-busy');
           if (spoken === mine) spoken = null;
           // no sound was made: his tap is told why, in words; a read by itself says nothing
           const why = state === 'error' ? code || 'speak-failed' : state === 'done' && !mine.voiced ? 'nothing-to-say' : null;
@@ -463,10 +471,11 @@ export function installVoiceLayer(host) {
     { id: 'quoted-sentence', find: 'main blockquote.sentence-original', at: 'after',
       when: (node) => !node.nextElementSibling?.classList.contains('excerpt-listen'),
       read: (node) => ({ sentences: japaneseSentences(shownText(node)), voiceKey: passageKey(node) || voiceKeyOf('word', 'sentence') }) },
-    { id: 'tutor-turn', find: '.chat-log > p.chat-turn.tutor:not(.thinking)', at: 'append',
+    // `reply`: a tutor's or coach's reply, said once by itself when it has just arrived (B4; serveArrivals, below)
+    { id: 'tutor-turn', find: '.chat-log > p.chat-turn.tutor:not(.thinking)', at: 'append', reply: true,
       read: (node) => ({ sentences: japaneseSentences(shownText(node)),
         voiceKey: voiceKeyOf('conv', `tutor-${doc.getElementById('chat-input')?.dataset.teacherContextRef || 'open'}`) }) },
-    { id: 'coach', find: '.ai-answer', at: 'append',
+    { id: 'coach', find: '.ai-answer', at: 'append', reply: true,
       read: (node) => ({ sentences: japaneseSentences(shownText(node)), voiceKey: voiceKeyOf('conv', `coach-${sheetNode(node).id || host.view()}`) }) },
     { id: 'speak-line', find: '.speak-script > li.speak-line:not([data-who="me"]) .speak-said', at: 'append',
       read: (node) => ({ sentences: japaneseSentences(shownText(node.querySelector('.speak-text'))),
@@ -527,7 +536,79 @@ export function installVoiceLayer(host) {
       }
     }
     mountStudyCard(root);
+    serveArrivals();
   }
+
+  /* ------------------------------------------------------------------ the tutor's and the coach's replies (B4) */
+  // The app says a reply has just come (the 'bunki-reply' event: corridor.js for the written tutor, modules/teacher.mjs
+  // for the coach). When it stands with its listen mark it is said once, by itself, with the 声 switch on, through the
+  // seam and the voice server only, its Japanese only; with the switch off only his tap on the mark speaks. Replies wait
+  // their turn; leaving the screen, or his tap on something else, stops the one being said and drops the waiting ones.
+  const REPLY_RULES = RULES.filter((rule) => rule.reply);
+  const arrivals = createArrivals();
+  /** The reply on the screen now that shows `text`, with its mark (the newest, when the screen holds two alike). */
+  const replyMark = (rule, text) => {
+    let found = null;
+    for (const node of doc.querySelectorAll(rule.find)) {
+      const mark = markOf(node, rule.at);
+      if (mark && sameReply(shownText(node), text)) found = { node, mark };
+    }
+    return found;
+  };
+  const replies = createReplyQueue({
+    start: ({ rule, text }, done) => {
+      const at = replyMark(rule, text);
+      if (!at || !host.bySelf?.()) return false;
+      let plan = null;
+      try { plan = rule.read(at.node); } catch { plan = null; }
+      if (!plan?.sentences?.length) return false;
+      return !!speakFrom(at.mark, { ...plan, automatic: true, follow: () => replyMark(rule, text)?.mark || null, onDone: (state) => done(state) });
+    },
+  });
+  function serveArrivals() {
+    if (!arrivals.size) return;
+    const shown = [];
+    for (const rule of REPLY_RULES) {
+      for (const node of doc.querySelectorAll(rule.find)) {
+        if (!markOf(node, rule.at)) continue;
+        const text = shownText(node);
+        shown.push({ text, item: { rule, text, live: () => !!replyMark(rule, text) } });
+      }
+    }
+    serveReplies({ shown, arrivals, bySelf: () => !!host.bySelf?.(), push: (item) => replies.push(item) });
+  }
+  doc.addEventListener('bunki-reply', (event) => {
+    arrivals.arrived(event?.detail?.text);
+    rescan();
+  });
+
+  /* ------------------------------------------------------------------ the Speak room's lines (B4) */
+  let roomRead = null;
+  /** Her line in the Speak room (speak.js, speakThenListen), said through the seam before the room listens: her
+   * Japanese, through a kept clip or the voice server, otherwise nothing. Resolves { state, code, line } when the read
+   * ends ('done', 'stopped' or 'error'); `line` is the plain line saying why no voice was had, for the room to show. */
+  function sayLine({ sentences = [], conversation = 'speak', rate = 1, node = null } = {}) {
+    return new Promise((resolve) => {
+      let session = null;
+      let line = '';
+      let settled = false;
+      const end = (state, code) => {
+        if (settled) return;
+        settled = true;
+        if (roomRead && roomRead === session) roomRead = null;
+        resolve({ state, code: code || null, line });
+      };
+      if (!Array.isArray(sentences) || !sentences.length) { end('error', 'nothing-to-say'); return; }
+      // her line's mark stands before her voice starts, so it shows that she is speaking
+      mountMarks(doc);
+      const mark = node?.isConnected ? markOf(node, 'append') : null;
+      session = speakFrom(mark, { sentences, voiceKey: voiceKeyOf('conv', conversation), rate, toggle: false,
+        onNote: (text) => { if (text) line = text; }, onDone: end });
+      if (!session) { end('error', 'not-started'); return; }
+      if (!settled) roomRead = session;
+    });
+  }
+
   /** The study card keeps its own look: one more of its own small buttons, on the answer side only. Its answer says
    * its word once as it is shown (John's "on reveal"), unless he switched that off. */
   let saidCard = null; // the card whose answer was last shown: said once, not at every redraw of that answer
@@ -592,9 +673,14 @@ export function installVoiceLayer(host) {
     if (scan) return;
     scan = doc.defaultView.setTimeout(() => {
       scan = 0;
-      // a read belongs to its control: when the control's screen goes, the read ends
-      if (spoken && !spoken.button.isConnected) { const gone = spoken; spoken = null; if (gone.session && !gone.session.ended) gone.session.stop(); }
       mountMarks(doc);
+      // a read belongs to its control: when the control's screen goes, the read ends. A reply whose control was drawn
+      // anew for the same text (the chat log refreshed as the next question is sent) goes on with the new control.
+      if (spoken?.button && !spoken.button.isConnected) {
+        const next = spoken.follow?.() || null;
+        if (next) { spoken.button = next; spoken.paint?.(true); }
+        else { const gone = spoken; spoken = null; if (gone.session && !gone.session.ended) gone.session.stop(); }
+      }
     }, 60);
   };
   new doc.defaultView.MutationObserver(rescan).observe(doc.body, { childList: true, subtree: true });
@@ -742,6 +828,13 @@ export function installVoiceLayer(host) {
       const ask = wordVoiceRequest(text, word);
       return !seam.cannot(ask.voiceKey, ask.text);
     },
+    /** The Speak room (speak.js, through corridor.js's host): her line's Japanese by the rule her listen mark reads, her
+     * line said through the seam before the room listens, and the room's own stop for it. */
+    sentencesOf: (text) => japaneseSentences(text),
+    sayLine,
+    stopLine() { const read = roomRead; roomRead = null; if (read && !read.ended) read.stop(); },
+    /** A tutor's or coach's reply has just arrived (the same as the 'bunki-reply' event). */
+    replied(text) { arrivals.arrived(text); rescan(); },
     /** A word page opened by the learner's own act: its headword says itself once when the page stands (mountMarks). */
     opened(node) { openedPage = node?.t && node.id != null ? { node: `${node.t}:${node.id}`, at: Date.now() } : null; },
     /** Every sound of the layer ends: the screen changed. `keepReader` leaves an article's read to the reader's own rule. */

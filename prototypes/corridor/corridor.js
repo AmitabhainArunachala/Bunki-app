@@ -9,7 +9,7 @@ import { approvedNarrationManifest, availableSentenceListeningCue, excerptListen
 import { maintenanceScreenName, meSection, mergeGrammar, portableRecord, primaryTabs, readRecordDrafts, renderLayoutChoice, renderMe, renderWritingChoice, showRecordBackup, stampRegister, storedArchiveRow, syncTrayCount, themeId, themeIx, updateMeasurements, validArchiveRows, validArchiveTurn, validImportJournal, validStoredArchiveRows } from './modules/learner.mjs';
 import { byLeadingDrops, byNewest, dateStamp, dayKey, depthBasisParts, depthDot, depthNodeOf, helpByMonth, landOnKeptWords, leadingDropDays, localDayOrdinal, localMonthKey, luminance, monthKey, monthLabel, notYetMarks, readerDateStamp, renderDrift, renderKagami, renderTodayLine, renderTodayWord, roughestThisWeek, startOfDay, syncDriftTheme, todayCity, todayDateline, todayHash, todayKanji, todayLearning, todayPlaceSky, todayReadPick, todayRedrawSky, todaySecondsPerCard, todaySkyWhy, todaySkyWord, trayLine } from './modules/drift.mjs';
 import { articleFingerprint, catalogLabel, feedDate, levelChip, levelPhrase, libraryDiscoverable, libraryVisibilityPolicy, openReferenceEntry, placeSealStrip, publisherLink, readerChoiceMatch, readerChoiceTokenHolds, readerEntryNode, referenceCollectionChip, refreshReadingPlacesSurface, renderCatalogNode, renderPublisherContextSelection, renderReaderChoice, renderReaderChoiceNote, renderReferenceMetadata, renderReferenceNode, resolveReadingPlace, searchRowShownByCore, shelfBodyToken, shelfCurrentDay, shelfDailyOrder, shelfDateline, shelfStories, shelfTallyText } from './modules/library.mjs';
-import { activeTeacherContext, aiAsk, aiChatTurns, aiCreateCards, aiKey, aiProvider, aiQuizParse, aiReadingSegments, aiRequestTimeoutMs, aiTeachingSubject, aiTransport, askOnRequest, canonicalAiBaseUrl, refreshTeacherChatHistory, renderAiCoach, renderAiExamples, renderAiTutor, sizeTeacherQuestion, teacherChatStatus, teacherDoorKey, teacherDraftCopyButton, teacherDraftStatus, teacherSentence, teacherSourceError, teacherWindowDraftKey, validAiEvidenceTurn } from './modules/teacher.mjs';
+import { activeTeacherContext, aiAsk, aiChatTurns, announceReply, aiCreateCards, aiKey, aiProvider, aiQuizParse, aiReadingSegments, aiRequestTimeoutMs, aiTeachingSubject, aiTransport, askOnRequest, canonicalAiBaseUrl, refreshTeacherChatHistory, renderAiCoach, renderAiExamples, renderAiTutor, sizeTeacherQuestion, teacherChatStatus, teacherDoorKey, teacherDraftCopyButton, teacherDraftStatus, teacherSentence, teacherSourceError, teacherWindowDraftKey, validAiEvidenceTurn } from './modules/teacher.mjs';
 
 /**
  * 回廊 KAIRO — the corridor prototype.
@@ -20408,6 +20408,8 @@ function renderAiChat(main, context = null) {
         } },
       );
       if (recordWritable(epoch) && aiChatLog.turns) aiChatLog.turns.push({ role: 'tutor', text: reply, ...ref });
+      // the tutor talks (B4): with the 声 switch on, her reply is said once as it stands in the log
+      announceReply(reply);
     } catch (error) {
       const line = error?.message?.startsWith('source-') || error?.name === 'TeacherContextError'
         ? teacherSourceError(error) : error?.message === 'tutor-connection-changed' ? tx(
@@ -28206,6 +28208,13 @@ function speakHost() {
       audioEl.addEventListener('pause', release);
     },
     stopAudio: () => stopRecAudio(),
+    // Her voice (B4, 2026-11-11): the app's one voice seam (modules/voice-layer.mjs), never a voice of the room's own and
+    // never the device's. Her line's Japanese by the rule her listen mark reads; her line said before the room listens,
+    // resolving { state, code, line } with the plain line when no voice was had; and the room's own stop for it.
+    // Without the layer (the single-file build) her lines stay silent and the room goes on as before.
+    lineSentences: (text) => (voiceLayer ? voiceLayer.sentencesOf(text) : []),
+    sayLine: (request) => (voiceLayer ? voiceLayer.sayLine(request) : Promise.resolve({ state: 'error', code: 'no-voice-layer', line: '' })),
+    stopLine: () => voiceLayer?.stopLine(),
     // one acknowledged write per turn: the archive rows and the gated evidence together, or nothing
     commitTurn: async (archiveRows, found, xid) => {
       if (!recordWritable() || !archiveRows.length || !archiveRows.every(validArchiveTurn)) return { ok: false, evidence: [] };

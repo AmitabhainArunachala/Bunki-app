@@ -7,6 +7,7 @@ const { test } = await import(
   process.env.VITEST === 'true' && !process.env.NODE_TEST_CONTEXT ? 'vitest' : 'node:test'
 );
 import { createDeviceVoice, REASONS } from '../prototypes/corridor/device-voice.mjs';
+import { japaneseSentences } from '../prototypes/corridor/modules/voice-layer.mjs';
 import { runtimeLock } from '../prototypes/corridor/tools/voice-lock.mjs';
 test('unbound legacy speech and recording entry points fail closed', async () => {
   let speaks = 0,
@@ -235,12 +236,17 @@ test('unbound legacy speech and recording entry points fail closed', async () =>
       throw Error('cached audio forbidden');
     },
     stopVoice: () => stops++,
+    // B4 (2026-11-11): her line goes to the app's one voice seam; the room asks the layer for its Japanese only
+    host: { lineSentences: (text) => japaneseSentences(text) },
+    String,
   };
   vm.createContext(room);
   vm.runInContext(roomFunction('voiceLine') + ';' + roomFunction('playClip'), room);
   for (const text of ['日本語', 'English', '日本語 and English', '']) {
     const line = { text };
-    assert.equal(room.voiceLine(line).length, 0);
+    // voiceLine yields only her line's Japanese, for the seam; no provider clip and no clip of the room's own
+    const said = room.voiceLine(line).map((sentence) => sentence.text);
+    assert.deepEqual(said, /日本語/u.test(text) ? ['日本語'] : []);
     assert.equal(line.voice.length, 0);
     assert.equal(await room.playClip('blob:retained-cached-English', 1, 1), 'silent');
   }
