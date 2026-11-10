@@ -439,6 +439,7 @@ ${read('rooms/me.css')}
 ${read('rooms/cards.css')}
 ${read('rooms/motion.css')}
 ${read('tighten.css')}
+${read('depth.css')}
 </style>
 ${BODY}
 `;
@@ -446,7 +447,7 @@ ${BODY}
 const FAVICON = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%239e2b25'/%3E%3Ctext x='8' y='12' font-size='11' text-anchor='middle' fill='%23fcfbf6' font-family='serif'%3E回%3C/text%3E%3C/svg%3E`;
 
 const html = `<!doctype html>
-<html lang="ja">
+<html lang="ja" data-live-depth="1">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -470,6 +471,7 @@ ${read('rooms/me.css')}
 ${read('rooms/cards.css')}
 ${read('rooms/motion.css')}
 ${read('tighten.css')}
+${read('depth.css')}
 </style>
 </head>
 <body>
