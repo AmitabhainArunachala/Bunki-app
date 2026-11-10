@@ -20,8 +20,10 @@ jobs:
   core:
     name: next / core
     runs-on: ubuntu-24.04
-    # The aim is under 15 minutes. The cap leaves room for a slow runner rather than losing the run.
-    timeout-minutes: 20
+    # First run (42767964278): 17 minutes, of which 6 were the runner's package download; the
+    # setup step took 15 to 148 seconds on twelve other runners at the same commit. With a usual
+    # setup the job is about 13 minutes. The cap leaves room for a slow one.
+    timeout-minutes: 25
     steps:
       - name: Name the build and report folders outside the checkout
         run: |
@@ -32,39 +34,44 @@ jobs:
       - uses: ./.github/actions/ci-setup
         with:
           browsers: chromium webkit
-      - name: Build the site with the production builder
-        run: node scripts/build-corridor-site.mjs --out "$KAIRO_SITE_DIR" > "$CORE_OUT/build.json"
-      # The walk, the lint and the format check are light and only read the tree, so they run beside
-      # the unit tests instead of after them. Each writes its own log and exit code; the steps below
-      # report them one by one.
+      # The unit tests that open the built site in CI ask for the site, an evidence folder and the
+      # digest of the verified build, as the battery gives them. The digest is read back from the
+      # same verification the battery's build job runs.
+      - name: Build the site with the production builder and verify it
+        run: |
+          node scripts/build-corridor-site.mjs --out "$KAIRO_SITE_DIR" > "$CORE_OUT/build.json"
+          node scripts/verify-release-gates.mjs --verify-artifact "$KAIRO_SITE_DIR" --require-clean > "$CORE_OUT/artifact.json"
+          digest="$(node -e "console.log(JSON.parse(require('fs').readFileSync(process.argv[1], 'utf8')).artifactSha256)" "$CORE_OUT/artifact.json")"
+          test -n "$digest"
+          echo "KAIRO_ARTIFACT_SHA256=$digest" >> "$GITHUB_ENV"
+          echo "KAIRO_VERIFIED_ARTIFACT_SHA256=$digest" >> "$GITHUB_ENV"
+      # The walk, the lint and the format check only read the tree, so they start here and run
+      # beside the first, single-process part of `npm test` (the two shared-study verifiers, about
+      # 160 seconds on this runner; the walk took 166). The many-worker part that follows, with its
+      # short timeouts, then has the runner to itself. Each part is reported by its own step below.
       - name: Start the learner walk, the lint and the format check
         run: |
-          (node scripts/prototype/learner-walk.mjs --site "$KAIRO_SITE_DIR" --shots "$CORE_OUT/walk" > "$CORE_OUT/walk.log" 2>&1; echo $? > "$CORE_OUT/walk.exit") &
-          (npm run lint > "$CORE_OUT/lint.log" 2>&1; echo $? > "$CORE_OUT/lint.exit") &
-          (npm run format:check > "$CORE_OUT/format.log" 2>&1; echo $? > "$CORE_OUT/format.exit") &
+          bash scripts/prototype/core-step.sh start walk node scripts/prototype/learner-walk.mjs --site "$KAIRO_SITE_DIR" --shots "$CORE_OUT/walk"
+          bash scripts/prototype/core-step.sh start lint npm run lint
+          bash scripts/prototype/core-step.sh start format npm run format:check
       - name: Unit tests, every file, with CI set
         env:
           KAIRO_BROWSER: chromium
           KAIRO_EVIDENCE_DIR: ${{ runner.temp }}/next-core/unit-evidence
-        shell: bash
         run: |
-          set +e
-          npm test 2>&1 | tee "$CORE_OUT/unit.log"
-          code=${PIPESTATUS[0]}
-          if [ "$code" != "0" ]; then
-            first="$(grep -m1 -E '^ +(FAIL|×) |AssertionError|Error: ' "$CORE_OUT/unit.log" || tail -n 1 "$CORE_OUT/unit.log")"
-            echo "::error title=Unit tests failed (exit $code)::$first"
-            exit 1
-          fi
+          bash scripts/prototype/core-step.sh run unit 'Unit tests' '^ FAIL |AssertionError' npm test
       - name: Lint
         if: ${{ !cancelled() }}
-        run: bash scripts/prototype/core-part.sh lint 'Lint' ' error |^✖'
+        run: |
+          bash scripts/prototype/core-step.sh report lint 'Lint' ' error |^✖'
       - name: Format check
         if: ${{ !cancelled() }}
-        run: bash scripts/prototype/core-part.sh format 'Format check' '^\[warn\]'
+        run: |
+          bash scripts/prototype/core-step.sh report format 'Format check' '^\[warn\]'
       - name: Learner walk, 27 checks against the built site
         if: ${{ !cancelled() }}
-        run: bash scripts/prototype/core-part.sh walk 'Learner walk' '^FAIL'
+        run: |
+          bash scripts/prototype/core-step.sh report walk 'Learner walk' '^FAIL'
       - name: Keep the logs, the walk's results and its screenshots
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
@@ -73,6 +80,7 @@ jobs:
           path: |
             ${{ runner.temp }}/next-core/*.log
             ${{ runner.temp }}/next-core/build.json
+            ${{ runner.temp }}/next-core/artifact.json
             ${{ runner.temp }}/next-core/walk
           retention-days: 14
           if-no-files-found: warn
