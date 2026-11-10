@@ -4,35 +4,13 @@
  * core-dictionary word they spell, read as they read (readerCompoundEnd). The actual reader functions are lifted from
  * the corridor source and run over the real articles and the real core dictionary. */
 import { readFileSync, existsSync } from 'node:fs';
-import { createRequire } from 'node:module';
 import vm from 'node:vm';
 import { describe, expect, test } from 'vitest';
+import { CORRIDOR, corridorDeclarations } from './corridor-declarations.mjs';
 
-const require = createRequire(import.meta.url);
-const ts = require('typescript');
-const CORRIDOR = new URL('../prototypes/corridor/', import.meta.url);
 const read = (path) => readFileSync(new URL(path, CORRIDOR), 'utf8');
 const json = (path) => JSON.parse(read(path));
-
-// `optional` names the helpers a reader may or may not have (the base had none of them): the test then fails on what
-// the reader draws, not on a missing name
-function declarations(file, names, optional = []) {
-  const source = read(file);
-  const ast = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
-  return names
-    .map((name) => {
-      const statement = ast.statements.find(
-        (node) =>
-          (ts.isFunctionDeclaration(node) && node.name?.text === name) ||
-          (ts.isVariableStatement(node) &&
-            node.declarationList.declarations.some((row) => row.name.getText(ast) === name)),
-      );
-      if (!statement && optional.includes(name)) return '';
-      if (!statement) throw new Error(`the corridor declares no ${name} in ${file}`);
-      return statement.getText(ast);
-    })
-    .join('\n');
-}
+const declarations = corridorDeclarations;
 
 const dict = json('data/share_alike/dict.json').words;
 const reader = vm.createContext({ D: { dict } });
