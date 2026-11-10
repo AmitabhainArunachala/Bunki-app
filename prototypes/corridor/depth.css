@@ -1,6 +1,6 @@
 /* depth.css · the app's surfaces: ground, sheet, slip, well, and the night windows its subjects stand in.
    FOLDED FILE. Do not edit here. Sources: ~/.dharma/bunki/PROGRAM/design/depth/depth.css and lead.css
-   (design version 1794316110, folded 2026-11-10 22:13 JST). Re-fold: ~/.dharma/bunki/PROGRAM/design/fold-depth.sh <worktree>.
+   (design version 1794317393, folded 2026-11-10 22:30 JST). Re-fold: ~/.dharma/bunki/PROGRAM/design/fold-depth.sh <worktree>.
    Every rule is scoped under html[data-live-depth='1']; index.html sets that attribute. */
 
 /* depth.css · the surface system: four planes made by light (地 ground, 紙 sheet, 札 slip, 窪 well).
@@ -1011,4 +1011,31 @@ html[data-live-depth='1'][data-theme='keyblock'] :is(body:not([data-view='drift'
   --dp-shadow-slip-up: 0 0 0 1.5px var(--ink), 5px 5px 0 0 var(--ink);
   --dp-shadow-slip-down: 0 0 0 1.5px var(--ink), 1px 1px 0 0 var(--ink);
   --dp-catch: transparent;
+}
+
+/* =====================================================================================
+   8 · on a wide screen the study room fills the window (lead, 2026-11-10 22:36)
+   On a phone the dark room runs edge to edge. On a wide screen it was a dark column inside a white frame on
+   cream paper. The page behind now is the room's own night (the same lacquer the player uses), and the frame
+   goes. Nothing inside the player is touched: the card, the keys and the bar are pixel for pixel as they were.
+   ===================================================================================== */
+@media (min-width: 521px) {
+  html[data-live-depth='1'][data-room='deckplay'] body:has(#app > main > .kp > .kp-study)::before {
+    background:
+      radial-gradient(52% 44% at 50% 0%, color-mix(in srgb, var(--world-paper, var(--ground-0)) 7%, transparent), transparent 72%),
+      var(--color-lacquer, #141a28);
+  }
+  html[data-live-depth='1'][data-room='deckplay'] body:has(#app > main > .kp > .kp-study) #app > main {
+    background: none;
+    border-color: transparent;
+    box-shadow: none;
+  }
+}
+
+/* the reading labels keep their own letters ("on", "kun"): small capitals by the font, not by rewriting the text,
+   so what a screen reader and the learner walk read is what the app wrote (lead, 2026-11-10 22:42) */
+html[data-live-depth='1'] #sheet .hero:has(> .hero-glyph) ~ dl.kv dt {
+  text-transform: none;
+  font-variant-caps: all-small-caps;
+  font-size: 12.5px;
 }
