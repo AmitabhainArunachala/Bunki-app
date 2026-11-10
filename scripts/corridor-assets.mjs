@@ -98,6 +98,10 @@ export const CORRIDOR_REQUIRED_ROOTS = [
   'worldcraft-view.mjs',
   'worldcraft-host.mjs',
   'worldcraft.css',
+  // Passage preview (prototype): the screen, and the two models it runs (m4-worldcraft.mjs is listed once, above)
+  'passage-view.mjs',
+  'passage-view.css',
+  'm4-passage.mjs',
   'decks/context-dense/mount.js',
   'decks/context-dense/engine.js',
   'decks/context-dense/deck.json',
