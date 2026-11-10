@@ -13606,6 +13606,37 @@ window.__BUNKI_OPEN_ENTRY = {
  *   entry   false: no door; a function: the surface's own way into the entry; otherwise go(node)
  *   redo    the caller already read the press (the reader's doors): never treat this call as the second tap
  * Returns 'reading', the stage element, or null after entering the page or dismissing a held stage. */
+/** Drift's two judgments on its slip (codex/kairo-drift-a11y-20260809, dba62c507): まだ and 知っている, in the flick's
+ * order (left, right), for a keyboard or a screen reader. A press records the nomination, puts the slip away, then the sky
+ * grades the word through its own grade(), exactly as the matching flick. */
+function driftJudgeRow(kind, judge, anchor) {
+  const row = el('div', 'mini-judge');
+  row.setAttribute('role', 'group');
+  row.setAttribute('aria-label', kind === 'kanji' ? tx('この字を判断する', 'Mark this kanji') : tx('この語を判断する', 'Mark this word'));
+  for (const [dir, judgment, ja, en, said] of [[-1, 'unknown', 'まだ', 'Not yet', 'まだ知らない'], [1, 'known', '知っている', 'I know it', '']]) {
+    const button = el('button', 'mini-judge-btn', tx(ja, en));
+    button.type = 'button';
+    button.dataset.action = 'judgment.nominate';
+    button.dataset.judgment = judgment;
+    if (said && !bi()) button.setAttribute('aria-label', said);
+    button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const keyboard = event.detail === 0;
+      interaction({ kind: 'judgment.nominate', judgment }, keyboard ? 'keyboard' : 'pointer', `drift-slip-${kind}`);
+      removeMini();
+      judge(dir);
+      if (keyboard) focusDriftWordAfter(anchor);
+    });
+    row.append(button);
+  }
+  return row;
+}
+/** After a judgment from the keyboard the judged word leaves the sky: focus goes on to the next word the keyboard can reach. */
+function focusDriftWordAfter(anchor) {
+  const words = [...document.querySelectorAll('#drift-layer .word[tabindex="0"]')].filter((word) => word !== anchor);
+  const next = words.find((word) => anchor.compareDocumentPosition(word) & Node.DOCUMENT_POSITION_FOLLOWING) || words[0];
+  next?.focus({ preventScroll: true });
+}
 /** A kanji's first reading for the slip's band: its first on reading in kana, else its first kun stem. */
 window.__BUNKI_OPEN_SLIP = {
   /** Canonical hosted annotations; reading a label never opens or records a visit. */
@@ -13624,14 +13655,19 @@ window.__BUNKI_OPEN_SLIP = {
   /** The hosted sky shares the occurrence ladder. The sky supplies its in-place reading paint;
    * holds use redo for an idempotent stage. Returns 'reading' | 'opened' | 'dived' | false. */
   open(kind, key, { anchor = null, onClose = null, redo = false, look = null, reveal = null,
-    clearReveal = null, readingVisible = null } = {}) {
+    clearReveal = null, readingVisible = null, judge = null } = {}) {
     if (S.view !== 'drift' || !this.has(kind, key) || !anchor?.isConnected) return false;
     const particle = kind === 'particle' && (PARTICLE_BY_SURFACE[key] || PARTICLES.find(item => item.id === key));
     const node = { t: kind, id: particle ? particle.id : key,
       ...(kind === 'word' && look?.reading ? { reading: look.reading } : {}) };
     const shown = particle ? { label: particle.p, surface: particle.p, reading: particle.r, gloss: bi() ? particle.role : particle.roleJa } : look;
     const before = !!standingSlip();
-    const slip = openSlip(node, { anchor, from: 'drift', onClose, redo, look: shown, reveal, clearReveal, readingVisible });
+    // a word reached by the keyboard hands its stage the focus (as the lookup's do), so Save and the judgments are in reach
+    const focus = anchor.matches(':focus-visible');
+    const onStage = typeof judge === 'function'
+      ? (stage) => (stage.querySelector('.mini-actions') || stage.querySelector('.mini-head'))?.after(driftJudgeRow(kind, judge, anchor))
+      : null;
+    const slip = openSlip(node, { anchor, from: 'drift', onClose, redo, look: shown, reveal, clearReveal, readingVisible, focus, onStage });
     if (slip === 'reading') return 'reading';
     if (slip) {
       interaction({ kind: 'quickLook.open' }, 'pointer', `drift-slip-${kind}`);
