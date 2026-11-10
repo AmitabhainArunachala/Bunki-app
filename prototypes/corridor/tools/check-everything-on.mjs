@@ -304,6 +304,32 @@ for (const [name, kanji] of [['rajomon-ma', '間'], ['rajomon-bun', '聞'], ['ra
   });
 }
 
+await door('sakura', 'the narrated article offers Sakura and Play asks for her first clip', async ({ page }) => {
+  const clips = [];
+  page.on('response', (r) => { if (r.url().includes('/audio/narration/')) clips.push(`${r.status()} ${new URL(r.url()).pathname}`); });
+  const label = await throughDoor(page, 'sakura');
+  must(await view(page) === 'reader', `the door opened "${await view(page)}", not the reader`);
+  await page.locator('.reader .tok.content').first().waitFor();
+  if (await page.locator('#mini').waitFor({ timeout: 2500 }).then(() => true, () => false)) { await page.keyboard.press('Escape'); await page.waitForTimeout(500); }
+  const open = page.locator('#listen-open');
+  await open.waitFor();
+  await open.scrollIntoViewIfNeeded();
+  await open.click();
+  await page.locator('.listen-row').waitFor();
+  const bar = (await page.locator('.listen-row').innerText()).replace(/\s+/g, ' ').trim();
+  must(/Sakura/.test(bar), `the bar reads "${bar}", not Sakura`);
+  await page.locator('#listen-toggle').click();
+  for (let i = 0; i < 40 && !clips.length; i += 1) await page.waitForTimeout(250);
+  const first = '/audio/narration/sakura/jawiki_5294446-000.m4a';
+  must(clips.some((row) => row.endsWith(first) && /^20[06] /.test(row)), `Play did not get ${first}: ${clips.join(', ') || 'no narration request'}`);
+  must(!clips.some((row) => /\/kore\//.test(row)), `a clip of the retired voice was asked for: ${clips.join(', ')}`);
+  await page.waitForTimeout(1500);
+  const note = (await page.locator('#listen-note').innerText().catch(() => '')).trim();
+  const playing = await page.evaluate(() => [...document.querySelectorAll('audio')].map((a) => ({ t: Math.round(a.currentTime * 10) / 10, paused: a.paused, error: a.error?.code ?? null })));
+  await shot(page, 'sakura');
+  return `"${label}" → the speaker mark → "${bar}" → Play → ${clips[0]}; the note reads "${note}"${playing.length ? `; audio elements: ${JSON.stringify(playing)}` : ''}`;
+});
+
 await door('library', 'the bookshelf shows the 107 candidate readings after its own, each tagged', async ({ page }) => {
   const label = await throughDoor(page, 'library');
   must(await view(page) === 'shelf', `the door opened "${await view(page)}", not the bookshelf`);
