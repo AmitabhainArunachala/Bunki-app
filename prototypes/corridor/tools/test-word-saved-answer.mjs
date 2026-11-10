@@ -120,8 +120,8 @@ function defineRows() {
     // S (2026-10-16): every keep is the one Save — the mini's, a lesson's and an older set's rows — built by one component
     // whose menu stands in its card or row (or a bar's drawer)
     'saveOne', 'reopenSaveMenu', 'openPlainSaveMenu', 'placeSaveMenu',
-    // the tray count repaints in place after a save or a removal (0b413f3f, 2026-10-15)
-    'syncTrayCount',
+    // the tray count repaints in place after a save or a removal (0b413f3f, 2026-10-15), on the Today tab too (gate frame)
+    'syncTrayCount', 'paintKeptCount',
     'assessmentSuppressionRetries', 'suppressAssessmentCards', 'performAssessmentSuppression',
     'listReading', 'listGloss', 'listToMarkdown', 'resolveAssessmentSubject', 'learningEnrollmentPending', 'commitLearningEnrollment',
     'reviewAnswerAvailable', 'reviewCardBack', 'reviewBack', 'kanjiAnswerAvailable', 'retainedKanjiRecord', 'validKanjiRecord',

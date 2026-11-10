@@ -381,7 +381,7 @@ h1.view-title {
 /* ---------------------------------------------------------- 銀河 hero nav
  * The galaxy is the hero. body.ginga hides the drift's own brand, depth crumb,
  * counters and hint so nothing but the galaxy and the single symbol shows. The
- * symbol opens a top bar and two corner bubbles; tapping the scrim closes it. */
+ * symbol opens the gate's menu, one panel; tapping the scrim closes it. */
 body.ginga #drift-layer #brand,
 body.ginga #drift-layer #depth,
 body.ginga #drift-layer #theme,
@@ -440,7 +440,8 @@ body.ginga #drift-layer #hint.first-cue {
   position: fixed;
   inset: 0;
   z-index: 24;
-  background: transparent;
+  /* the page recedes while the gate's menu stands: the look's own ground, no blur */
+  background: color-mix(in srgb, var(--color-ground) 35%, transparent);
 }
 
 /* the ghost world-seal, upper right — super faint until touched, then it wakes
@@ -603,45 +604,7 @@ body.ginga #drift-layer #hint.first-cue {
 .nav-search-door::-webkit-search-cancel-button {
   -webkit-appearance: none;
 }
-/* 復習 N and 集中道場: tinted doors in the one accent; the due count a small vermilion capsule */
-.nav-review,
-.nav-dojo {
-  flex: none;
-  display: inline-flex;
-  align-items: baseline;
-  gap: 5px;
-  min-height: 44px;
-  padding: 0 14px;
-  font-family: inherit;
-  font-size: var(--type-control);
-  font-weight: 600;
-  line-height: 44px;
-  letter-spacing: 0;
-  color: var(--ai, #2e4d6e);
-  background: color-mix(in srgb, var(--ai, #2e4d6e) 12%, transparent);
-  border: none;
-  border-radius: var(--radius-control);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: transform 0.14s ease;
-}
-.nav-review:hover,
-.nav-dojo:hover {
-  background: color-mix(in srgb, var(--ai, #2e4d6e) 18%, transparent);
-}
-.nav-review .l-ja,
-.nav-dojo .l-ja {
-  display: inline;
-  line-height: inherit;
-}
-.nav-review .en-sub,
-.nav-dojo .en-sub {
-  display: inline;
-  font-size: var(--type-caption);
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  opacity: 0.78;
-}
+/* a row's count (Review's due cards): a small vermilion capsule */
 .nav-count {
   align-self: center;
   min-width: 22px;
@@ -657,29 +620,23 @@ body.ginga #drift-layer #hint.first-cue {
   font-variant-numeric: tabular-nums;
 }
 @media (max-width: 600px) {
-  /* a phone keeps the field on the first row with the arrows; the doors and the language below */
+  /* a phone keeps the field on the first row with the arrows; the rows below */
   .nav-search-field {
     flex: 1 1 calc(100% - 96px);
   }
-  .nav-review,
-  .nav-dojo {
-    flex: 1 1 auto;
-    justify-content: center;
-    padding: 0 10px;
-  }
 }
 
-/* ---- the layout under test (2026-10-14) ---- */
-/* the door's five places, named and ordered as the tab bar (2026-10-13): a short menu, one row each —
+/* ---- the gate's menu, one row per place (the layout under test, 2026-10-14; the current layout since 2026-11-10) ---- */
+/* the five places, named and ordered as the tab bar (2026-10-13): a short menu, one row each —
  * the name, a few plain words of what is inside, Review's due count, a chevron */
-html[data-layout='places'] .nav-stations {
+.nav-stations {
   flex: 1 1 100%;
   display: flex;
   flex-direction: column;
   min-width: 0;
   margin-top: 2px;
 }
-html[data-layout='places'] .nav-station {
+.nav-station {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
   grid-template-areas: 't n g' 's n g';
@@ -698,20 +655,20 @@ html[data-layout='places'] .nav-station {
   cursor: pointer;
   transition: background-color 0.14s ease;
 }
-html[data-layout='places'] .nav-station:first-child {
+.nav-station:first-child {
   border-top: 0;
 }
-html[data-layout='places'] .nav-station:hover {
+.nav-station:hover {
   background: color-mix(in srgb, var(--ai, #2e4d6e) 8%, transparent);
 }
-html[data-layout='places'] .nav-station-t {
+.nav-station-t {
   grid-area: t;
   font-size: var(--type-body);
   font-weight: 600;
   line-height: 1.2;
   color: var(--ai, #2e4d6e);
 }
-html[data-layout='places'] .nav-station-sub {
+.nav-station-sub {
   grid-area: s;
   min-width: 0;
   overflow: hidden;
@@ -722,10 +679,10 @@ html[data-layout='places'] .nav-station-sub {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-html[data-layout='places'] .nav-station .nav-count {
+.nav-station .nav-count {
   grid-area: n;
 }
-html[data-layout='places'] .nav-station-go {
+.nav-station-go {
   grid-area: g;
   width: 7px;
   height: 7px;
@@ -734,91 +691,36 @@ html[data-layout='places'] .nav-station-go {
   border-right: 1.5px solid rgb(60 60 67 / 40%);
   transform: rotate(45deg);
 }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-layout='places'] .nav-bar {
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .nav-bar {
   /* at night the sheet is dark glass, so the rooms' gold reads on it (on pale glass it was lost) */
   background: color-mix(in srgb, var(--color-ground, #10141f) 80%, transparent);
   border-color: rgb(255 255 255 / 14%);
   box-shadow: 0 2px 6px rgb(0 0 0 / 30%), 0 18px 44px rgb(0 0 0 / 40%);
 }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-layout='places'] .nav-station {
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .nav-station {
   border-top-color: rgb(255 255 255 / 12%);
 }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-layout='places'] .nav-station:hover {
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .nav-station:hover {
   background: rgb(255 255 255 / 7%);
 }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-layout='places'] .nav-station-t {
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .nav-station-t {
   color: color-mix(in srgb, var(--color-gold, #d9b45a) 82%, var(--color-ink, #f4efe4));
 }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-layout='places'] .nav-station-sub {
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .nav-station-sub {
   color: rgb(255 255 255 / 58%);
 }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-layout='places'] .nav-station-go {
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .nav-station-go {
   border-color: rgb(255 255 255 / 40%);
 }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-layout='places'] .nav-search-door {
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .nav-search-door {
   color: var(--color-ink, #f4efe4);
   background: rgb(255 255 255 / 9%);
 }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-layout='places'] .nav-search-door::placeholder,
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-layout='places'] .nav-search-field svg { color: rgb(255 255 255 / 55%); }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-layout='places'] .nav-search-door:focus { background: rgb(255 255 255 / 14%); }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-layout='places'] .nav-arrow { color: color-mix(in srgb, var(--color-gold, #d9b45a) 82%, var(--color-ink, #f4efe4)); }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-layout='places'] .nav-arrow:disabled { color: rgb(255 255 255 / 25%); }
-/* EN⇄日本語: an iOS segmented control (one button that swaps the language) */
-.lang-slide {
-  position: relative;
-  flex: none;
-  display: flex;
-  align-items: stretch;
-  min-height: 44px;
-  padding: 6px 0;
-  background: transparent;
-  border: 0;
-  border-radius: var(--radius-control);
-  cursor: pointer;
-  font: inherit;
-}
-.lang-slide::before {
-  content: '';
-  position: absolute;
-  inset: 6px 0;
-  background: rgb(120 120 128 / 12%);
-  border-radius: var(--radius-control);
-}
-.lang-opt {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  padding: 0 11px;
-  font-size: var(--type-label);
-  letter-spacing: 0;
-  color: var(--ink-2, #55606c);
-  transition: none;
-}
-.lang-knob {
-  position: absolute;
-  z-index: 0;
-  top: 8px;
-  bottom: 8px;
-  left: 2px;
-  width: 40px;
-  background: #fff;
-  border-radius: var(--radius-control);
-  box-shadow: 0 1px 3px rgb(0 0 0 / 14%), 0 0 0 0.5px rgb(0 0 0 / 5%);
-  transition:
-    transform var(--motion-room) var(--ease-standard);
-}
-.lang-slide[data-lang='ja'] .lang-knob {
-  transform: translateX(39px);
-  width: 57px;
-}
-.lang-slide[data-lang='bi'] .lang-opt.en,
-.lang-slide[data-lang='ja'] .lang-opt.ja {
-  color: var(--ink, #23303f);
-  font-weight: 600;
-}
-
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .nav-search-door::placeholder,
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .nav-search-field svg { color: rgb(255 255 255 / 55%); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .nav-search-door:focus { background: rgb(255 255 255 / 14%); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .nav-arrow { color: color-mix(in srgb, var(--color-gold, #d9b45a) 82%, var(--color-ink, #f4efe4)); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .nav-arrow:disabled { color: rgb(255 255 255 / 25%); }
 /* 検索の間 — the search room: one big box, roomy rows, its own page */
 .nav-search-input {
   width: 100%;
@@ -917,7 +819,7 @@ html[data-layout='places'] .nav-station-go {
   color: var(--faint, #a9a293);
 }
 
-/* the two corner bubbles — 本棚 left, 先生 right */
+/* a corner bubble: the first screen's lone Review door in the layout under test */
 /* FEEL (2026-10-02): the corner doors are glass pills like the bar above them, each named in its
  * own pigment — no heavy slabs on the sky */
 .corner-bubble {
@@ -954,17 +856,6 @@ html[data-layout='places'] .nav-station-go {
   font-weight: 500;
   letter-spacing: 0.01em;
   opacity: 0.78;
-}
-.bubble-shelf {
-  left: 18px;
-}
-.bubble-sensei {
-  right: 18px;
-  color: #6a3b52; /* a warmer pigment for the tutor, distinct from the shelf */
-}
-/* while the corner bubbles stand, the report bug steps up out of 先生's way (it sat on top of it) */
-body:has(.bubble-sensei) #bunki-reports-root .br-rail {
-  bottom: calc(96px + env(safe-area-inset-bottom, 0px));
 }
 @keyframes bubble-rise {
   from {

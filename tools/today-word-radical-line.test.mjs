@@ -12,7 +12,11 @@ const index = readFileSync(new URL('index.html', CORRIDOR), 'utf8');
 const stylesheets = [...index.matchAll(/<link rel="stylesheet" href="([^"]+)"/gu)].map(
   (match) => match[1],
 );
-const source = corridorDeclarations('modules/drift.mjs', ['todayLearning', 'renderTodayWord']);
+const source = corridorDeclarations('modules/drift.mjs', [
+  'todayLearning',
+  'todayWordWhy',
+  'renderTodayWord',
+]);
 
 // Draws the day's word with a hook, and reads where the radical sits against the words that name it.
 const draw = (hook, word, lead) => `(() => {

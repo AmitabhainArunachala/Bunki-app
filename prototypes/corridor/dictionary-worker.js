@@ -332,6 +332,191 @@ function rowsForForms(forms) {
   };
 }
 
+// "Did you mean" (port of origin/agent/bunki-pillars-dict-srs 82d04591d, near-miss.ts and romaji.ts): asked only when a
+// search found nothing. A romaji query is compared as Latin against romanised readings (jikna → jikan is one swap, but
+// jikna read as kana is じkな, two edits from じかん); a kana query against readings; a kanji query against spellings.
+// Damerau–Levenshtein (adjacent swaps count one), bounded: no suggestion for a query of one or two characters, one edit
+// up to six, two beyond. English glosses are never compared: a gloss that misses has missed by meaning, not spelling.
+const NEAR_MISS_LIMIT = 5;
+const ROMA = {
+  あ: 'a', い: 'i', う: 'u', え: 'e', お: 'o', か: 'ka', き: 'ki', く: 'ku', け: 'ke', こ: 'ko',
+  さ: 'sa', し: 'shi', す: 'su', せ: 'se', そ: 'so', た: 'ta', ち: 'chi', つ: 'tsu', て: 'te', と: 'to',
+  な: 'na', に: 'ni', ぬ: 'nu', ね: 'ne', の: 'no', は: 'ha', ひ: 'hi', ふ: 'fu', へ: 'he', ほ: 'ho',
+  ま: 'ma', み: 'mi', む: 'mu', め: 'me', も: 'mo', や: 'ya', ゆ: 'yu', よ: 'yo',
+  ら: 'ra', り: 'ri', る: 'ru', れ: 're', ろ: 'ro', わ: 'wa', ゐ: 'i', ゑ: 'e', を: 'wo', ん: 'n',
+  が: 'ga', ぎ: 'gi', ぐ: 'gu', げ: 'ge', ご: 'go', ざ: 'za', じ: 'ji', ず: 'zu', ぜ: 'ze', ぞ: 'zo',
+  だ: 'da', ぢ: 'ji', づ: 'zu', で: 'de', ど: 'do', ば: 'ba', び: 'bi', ぶ: 'bu', べ: 'be', ぼ: 'bo',
+  ぱ: 'pa', ぴ: 'pi', ぷ: 'pu', ぺ: 'pe', ぽ: 'po', ゔ: 'vu',
+};
+const SMALL_Y = { ゃ: 'a', ゅ: 'u', ょ: 'o' };
+const SMALL_V = { ぁ: 'a', ぃ: 'i', ぅ: 'u', ぇ: 'e', ぉ: 'o', ゎ: 'a' };
+/** Hepburn as a learner types it (wapuro): しゃ sha, っか kka, っち tchi, ー repeats its vowel, を wo. */
+function kanaToRomaji(value) {
+  const kana = kataToHira(value);
+  let out = '';
+  let previous = '';
+  let double = false;
+  for (const character of kana) {
+    const syllable = ROMA[character];
+    if (syllable !== undefined) {
+      out += double ? (syllable.startsWith('ch') ? 't' : syllable[0]) + syllable : syllable;
+      previous = syllable;
+      double = false;
+      continue;
+    }
+    double = false;
+    const y = SMALL_Y[character];
+    const v = SMALL_V[character];
+    if (y && previous.endsWith('i')) {
+      // きゃ kya, but しゃ sha, ちゃ cha, じゃ ja
+      out = out.slice(0, -1) + (previous === 'shi' || previous === 'chi' || previous === 'ji' ? y : `y${y}`);
+    } else if (v && 'aiueo'.includes(previous.slice(-1)) && previous) {
+      // ふぁ fa, てぃ ti, ちぇ che, but うぃ wi
+      out = out.slice(0, -1) + (previous === 'u' ? `w${v}` : v);
+    } else if (character === 'っ') double = true;
+    else if (character === 'ー') out += 'aiueo'.includes(out.slice(-1)) ? out.slice(-1) : '';
+    else out += y ? `y${y}` : v || character;
+    previous = '';
+  }
+  return out;
+}
+const MACRONS = { ā: 'aa', ī: 'ii', ū: 'uu', ē: 'ee', ō: 'ou', â: 'aa', î: 'ii', û: 'uu', ê: 'ee', ô: 'ou' };
+
+/** A string's characters as 32 bits (a letter, or a code point folded to 5 bits), and a second word for the characters
+ * it holds twice. A character the other string lacks (or holds once where this one holds it twice) needs an edit of its
+ * own, so more such bits than the edits allowed rule the pair out before any distance is measured. */
+function letterMasks(text) {
+  let once = 0;
+  let twice = 0;
+  for (let i = 0; i < text.length; i += 1) {
+    const bit = 1 << (text.charCodeAt(i) & 31);
+    twice |= once & bit;
+    once |= bit;
+  }
+  return [once, twice];
+}
+function bitCount(value) {
+  let x = value - ((value >>> 1) & 0x55555555);
+  x = (x & 0x33333333) + ((x >>> 2) & 0x33333333);
+  return (((x + (x >>> 4)) & 0x0f0f0f0f) * 0x01010101) >>> 24;
+}
+
+const nearIndex = {};
+/** One lane's strings filed by length, built once, on the first near-miss ask that needs it: every reading romanised
+ * (latin), every reading (kana), every spelling with a kanji (written). */
+function nearMissIndex(lane) {
+  if (nearIndex[lane]) return nearIndex[lane];
+  const buckets = new Map();
+  const file = (text, at, form) => {
+    if (!text || text.length > 40) return;
+    let bucket = buckets.get(text.length);
+    if (!bucket) buckets.set(text.length, (bucket = { text: [], at: [], form: [], once: [], twice: [] }));
+    const [once, twice] = letterMasks(text);
+    bucket.text.push(text);
+    bucket.at.push(at);
+    bucket.form.push(form);
+    bucket.once.push(once);
+    bucket.twice.push(twice);
+  };
+  dictionaryEntries.forEach((row, at) => {
+    if (lane === 'written') {
+      for (const form of new Set([row[1], ...row[4]])) if (/[\u3400-\u9fff]/.test(form)) file(form, at, form);
+      return;
+    }
+    for (const reading of new Set(row[5].map(kataToHira))) file(lane === 'latin' ? kanaToRomaji(reading) : reading, at, reading);
+  });
+  nearIndex[lane] = buckets;
+  return buckets;
+}
+
+const OSA = [new Int32Array(64), new Int32Array(64), new Int32Array(64)];
+/** Optimal-string-alignment distance, abandoned (limit + 1) as soon as no path can stay within `limit`. */
+function nearDistance(a, b, limit) {
+  const n = a.length;
+  const m = b.length;
+  if (Math.abs(n - m) > limit || m >= 63) return limit + 1;
+  let two = OSA[0];
+  let previous = OSA[1];
+  let current = OSA[2];
+  for (let j = 0; j <= m; j += 1) previous[j] = j;
+  for (let i = 1; i <= n; i += 1) {
+    const ai = a.charCodeAt(i - 1);
+    current[0] = i;
+    let rowMin = i;
+    for (let j = 1; j <= m; j += 1) {
+      const bj = b.charCodeAt(j - 1);
+      let value = Math.min(current[j - 1] + 1, previous[j] + 1, previous[j - 1] + (ai === bj ? 0 : 1));
+      if (i > 1 && j > 1 && ai === b.charCodeAt(j - 2) && a.charCodeAt(i - 2) === bj && two[j - 2] + 1 < value) value = two[j - 2] + 1;
+      current[j] = value;
+      if (value < rowMin) rowMin = value;
+    }
+    if (rowMin > limit) return limit + 1;
+    const spent = two;
+    two = previous;
+    previous = current;
+    current = spent;
+  }
+  return previous[m];
+}
+
+/** At most five entries a mistyped query probably meant, nearest first, then common words, then JLPT words. */
+function nearMisses(context) {
+  if (!dictionaryEntries) return [];
+  const q = String(context?.q || '').trim();
+  let lane = 'written';
+  let needle = q;
+  if (!context?.hasKanji && context?.hasKana) {
+    lane = 'kana';
+    needle = kataToHira(q);
+  } else if (!context?.hasKanji) {
+    lane = 'latin';
+    needle = q.toLowerCase().replace(/[āīūēōâîûêô]/g, (c) => MACRONS[c]).replace(/[\s'-]/g, '');
+    if (!/^[a-z]+$/.test(needle)) return [];
+  }
+  const edits = needle.length <= 2 ? 0 : needle.length <= 6 ? 1 : 2;
+  if (!edits) return [];
+  const index = nearMissIndex(lane);
+  const best = new Map();
+  const [once, twice] = letterMasks(needle);
+  for (let length = needle.length - edits; length <= needle.length + edits; length += 1) {
+    const bucket = index.get(length);
+    if (!bucket) continue;
+    const ones = bucket.once;
+    const twos = bucket.twice;
+    for (let k = 0; k < bucket.text.length; k += 1) {
+      if (bitCount(once & ~ones[k]) + bitCount(twice & ~twos[k]) > edits ||
+        bitCount(ones[k] & ~once) + bitCount(twos[k] & ~twice) > edits) continue;
+      const distance = nearDistance(needle, bucket.text[k], edits);
+      if (distance > edits) continue;
+      const at = bucket.at[k];
+      const prior = best.get(at);
+      if (!prior || distance < prior.distance) best.set(at, { at, distance, form: bucket.form[k], text: bucket.text[k] });
+    }
+  }
+  const prefix = (text) => { let i = 0; while (i < text.length && text[i] === needle[i]) i += 1; return i; };
+  const ranked = [...best.values()].map((hit) => {
+    const row = dictionaryEntries[hit.at];
+    return { ...hit, row, common: row[8] ? 0 : 1, jlpt: jlptRank(coreWords?.[row[1]]?.jlpt), spread: Math.abs(hit.text.length - needle.length), shared: prefix(hit.text) };
+  });
+  ranked.sort((left, right) =>
+    left.distance - right.distance || left.common - right.common || left.jlpt - right.jlpt ||
+    left.spread - right.spread || right.shared - left.shared || Number(left.row[0]) - Number(right.row[0]));
+  return ranked.slice(0, NEAR_MISS_LIMIT).map(({ row, form, distance }) => {
+    const summaries = dictionaryReadingSummaries(row);
+    const summary = lane === 'written'
+      ? summaries.find((item) => dictionaryReadingSupportsForm(row, item[0], form))
+      : summaries.find((item) => kataToHira(item[0]) === form);
+    const [reading, displayHead, gloss] = summary
+      ? (lane === 'written' ? [summary[0], form, summary[2]] : summary)
+      : [row[2] || '', row[1] || '', row[3] || ''];
+    const head = displayHead || row[1];
+    return {
+      result: { t: 'word', id: head, seq: row[0], reading: reading || row[2] || '', w: head, r: reading || row[2] || '', g: gloss || row[3] || '', matchedGloss: gloss || row[3] || '' },
+      distance,
+    };
+  });
+}
+
 function scoreDictionary(context, matchingCoreIds) {
   if (!dictionaryEntries) throw new Error('dictionary worker is not ready');
   const started = performance.now();
@@ -496,15 +681,20 @@ function scoreDictionary(context, matchingCoreIds) {
       left.result.w.length - right.result.w.length,
   );
   const results = scored.slice(0, 40);
-  const forms = [...new Set(results.map((item) => item.result.id))];
+  const scannedAt = performance.now();
+  const near = results.length ? [] : nearMisses(context);
+  const nearMissMs = performance.now() - scannedAt;
+  const forms = [...new Set([...results, ...near].map((item) => item.result.id))];
   const families = rowsForForms(forms);
   return {
     results,
+    nearMisses: near,
     compatibleCoreIds: [...compatibleCoreIds],
     formRows: families.formRows,
     performance: {
       query: q,
-      scanAndRankMs: performance.now() - started,
+      scanAndRankMs: scannedAt - started,
+      nearMissMs,
       matchedEntries: scored.length,
       returnedEntries: results.length,
       returnedForms: forms.length,

@@ -1,5 +1,5 @@
 /** G3 learner seam — declarations moved verbatim from ../corridor.js (pure move, no body edits). */
-import { $, voiceSettingsBlock, AI_EVIDENCE_ROLES, D, DRAFT_KEY, GRAMMAR, ME_DECKS, ME_FIELDS, ME_MONTHS_EN, ME_N1_SITTING, PLACES_TABS, PRIMARY_TABS, REGISTER_LINE_DOORS, REGISTER_ROOM_DOORS, ROOM_IDS, ROOM_NAMES, S, SVG_NS, THEME_STORE, THEME_UI, WORD_BRUSH, WORD_BRUSH_KEY, WORD_VOICE, WORD_VOICE_KEY, bi, biLabel, contrastOf, el, fieldsDeckHome, finiteNumber, flowText, foundationDoor, logicalArchiveRows, meBackPart, meDeckIndex, meNum, meSealsPart, nonEmptyString, openPersonalCollection, optional, owns, passage, placesLayout, plainRecord, render, roomTransition, safeJsonValue, savedAnswerFor, setLayout, setWordPref, srsKey, tx, validStoreEnvelope, wordBrush, wordVoice } from '../corridor.js';
+import { $, voiceSettingsBlock, AI_EVIDENCE_ROLES, D, DRAFT_KEY, GRAMMAR, ME_DECKS, ME_FIELDS, ME_MONTHS_EN, ME_N1_SITTING, PLACES_TABS, PRIMARY_TABS, REGISTER_LINE_DOORS, REGISTER_ROOM_DOORS, ROOM_IDS, ROOM_NAMES, S, SVG_NS, THEME_STORE, THEME_UI, WORD_BRUSH, WORD_BRUSH_KEY, WORD_VOICE, WORD_VOICE_KEY, bi, biLabel, contrastOf, el, fieldsDeckHome, finiteNumber, flowText, foundationDoor, logicalArchiveRows, meBackPart, meDeckIndex, meNum, meSealsPart, nonEmptyString, openPersonalCollection, optional, owns, passage, paintKeptCount, placesLayout, plainRecord, render, roomTransition, safeJsonValue, savedAnswerFor, setLayout, setWordPref, srsKey, tx, validStoreEnvelope, wordBrush, wordVoice } from '../corridor.js';
 import { dayKey, helpByMonth } from './drift.mjs';
 import { articleReadChars } from './library.mjs';
 
@@ -39,6 +39,7 @@ function meHelpLine() {
 }
 
 function syncTrayCount() {
+  paintKeptCount();
   const tray = document.getElementById('tray');
   if (!tray) return;
   const saved = S.taken.length;

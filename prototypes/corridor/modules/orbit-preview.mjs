@@ -5,8 +5,8 @@
 // this file in orbit-preview/ and left as he made it; orbit-preview/frame.html lists its two differences. It is not
 // the Drift mode that spec S9-R11 plans (orbit-field.mjs, the corridor's own copy of the mechanics, stays unimported).
 //
-// corridor.js touches this module once: buildGingaChrome() imports it when the door's menu opens and calls
-// addOrbitDoor(). Nothing here loads at boot, and the standalone single-file build never asks for it.
+// corridor.js touches this module from the gate's menu (buildGateMenu): its Orbit row calls openOrbitPreview(). Nothing
+// here loads at boot, and the standalone single-file build never asks for it.
 //
 // Why a frame filled from text (srcdoc) and not a page address: Meguri is a whole document (its own :root tokens,
 // data-theme, fixed word page and key handling), so it keeps its own document; the service worker answers every
@@ -23,7 +23,6 @@ const SPEECH = new URLSearchParams(globalThis.location?.search || '').get('orbit
 const SAVE_GRACE_MS = 400; // the page writes its state 200 ms after a change; its document outlives the close by this much
 
 const STYLE = `
-.corner-bubble.bubble-orbit { left: 0; right: 0; width: max-content; margin: 0 auto; bottom: calc(92px + env(safe-area-inset-bottom)); color: #7a2a1c; }
 dialog.orbit-preview { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; overflow: hidden; background: #0d0d0d; color: #f1efd8; }
 dialog.orbit-preview[open] { display: flex; flex-direction: column; }
 dialog.orbit-preview::backdrop { background: #0d0d0d; }
@@ -73,26 +72,6 @@ function framePage() {
     pageText.catch(() => { pageText = null; }); // a failed load can be tried again from the door
   }
   return pageText;
-}
-
-/**
- * The door: one more corner bubble while the front door's menu is open, named in the interface language and tagged
- * "preview" in both. `root` is the app root that corridor.js is drawing, `open()` says whether the menu still stands
- * (this module arrives a moment after the first draw asks for it).
- */
-export function addOrbitDoor(root, { tx, biLabel, open }) {
-  if (!root?.isConnected || !open()) return null;
-  ensureStyle();
-  root.querySelector('.bubble-orbit')?.remove();
-  const door = biLabel('button', 'corner-bubble bubble-orbit', '廻', 'orbit');
-  door.type = 'button';
-  door.id = 'orbit-preview-door';
-  door.setAttribute('data-drift-chrome', '');
-  door.append(node('span', 'en-sub', 'preview'));
-  door.setAttribute('aria-label', tx('廻 めぐり、ことばの輪。プレビュー', 'Orbit word field, preview'));
-  door.addEventListener('click', () => { void openOrbitPreview({ tx }); });
-  root.append(door);
-  return door;
 }
 
 /** Opens the preview over the app as a modal dialog; Back (or Escape on the bar) closes it and the app is where it was. */

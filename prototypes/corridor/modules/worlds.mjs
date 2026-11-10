@@ -842,6 +842,21 @@ function kkldNumberGlyphs(ed, number) {
   return [...(table?.[String(Number(number))] || [])];
 }
 
+/** The kanji before and after number `n` in one edition's order, each as [number, kanji]; a number the edition lacks
+ * is stepped over (2013 has no #89), and the first and last have no neighbour on their open side. */
+function kkldNeighbours(ed, n) {
+  const table = ed === 'ed1999' ? D.kkld?.byNumber1999 : D.kkld?.byNumber2013;
+  const last = Math.max(0, ...Object.keys(table || {}).map(Number));
+  const step = (dir) => {
+    for (let i = n + dir; i >= 1 && i <= last; i += dir) {
+      const c = table[String(i)]?.[0];
+      if (c) return [i, c];
+    }
+    return null;
+  };
+  return { prev: step(-1), next: step(1) };
+}
+
 function kkldOf(c) {
   return D.kkld?.entries?.[c] || null;
 }
@@ -2045,9 +2060,23 @@ function renderKanjiNode(sheet, node) {
     const door = el('button', 'kanji-fact', ed === 'ed2013' ? tx(`講談社 ${number}`, `Kodansha ${number}`)
       : tx(`講談社 1999年版 ${number}`, `Kodansha 1999 ${number}`));
     door.type = 'button'; door.id = 'kanji-kkld-door';
-    door.setAttribute('aria-label', tx(`講談社の番号 ${number} をひらく（前後の字と）`, `Open Kodansha number ${number}, among its neighbours`));
+    door.setAttribute('aria-label', tx(`講談社の番号 ${number} をひらく（番号順のすべての字の中で）`, `Open Kodansha number ${number}, among every kanji in Kodansha order`));
     door.addEventListener('click', () => openKodanshaLookup(ed, number, door));
-    facts.push(door);
+    // Kodansha-style steps (John, 2026-11-10): the kanji before and after this one in the book's order, either side of
+    // its number, each a door to its own page — ‹ 788 殴 · Kodansha 789 · 790 非 ›
+    const near = kkldNeighbours(ed, number);
+    const steps = el('span', 'kanji-kkld-steps');
+    const stepDoor = (id, at, text, ja, en) => {
+      const b = el('button', 'kanji-fact kanji-kkld-step', text);
+      b.type = 'button'; b.id = id;
+      b.setAttribute('aria-label', tx(`${ja} ${at[0]} ${at[1]}`, `${en} ${at[0]}, ${at[1]}`));
+      b.addEventListener('click', () => go({ t: 'kanji', id: at[1], from: node.from }, { invoker: b }));
+      return b;
+    };
+    if (near.prev) steps.append(stepDoor('kanji-kkld-prev', near.prev, `‹ ${near.prev[0]} ${near.prev[1]}`, '講談社の前の字', 'Previous in Kodansha order:'));
+    steps.append(door);
+    if (near.next) steps.append(stepDoor('kanji-kkld-next', near.next, `${near.next[0]} ${near.next[1]} ›`, '講談社の次の字', 'Next in Kodansha order:'));
+    facts.push(steps);
   }
   const radical = renderKanjiClassifications(sheet, node.id, node, { fact: true });
   if (radical) facts.push(radical.door);
@@ -2770,4 +2799,4 @@ function worldName(t) {
   }[t.id]);
 }
 
-export { GRAMMARS, sentenceDraftInputMatches, sentenceDraftStatus, sentenceDraftCopyButton, beyondJoyo, storySeries, storyLevel, storyTopicKey, storyTopic, storyBlock, storyAccent, storyPictureSource, storyHeroKanji, storyPicture, storyKicker, storyVersions, storyYourWords, storyInstrument, storyLede, storyDate, paintTok, kanjiSlipReading, kanjiCourseEvidencePatch, kanjiCourseNodeUnit, kanjiCourseTeachingHelp, kanjiCourseReferenceHelp, kanjiCourseReturnFrame, kanjiCourseEntryNode, kanjiCourseRunKind, kanjiRoomEntry, kanjiChooseRoom, kanjiEnterCourseDoor, openKanjiRooms, renderKanjiRoomChooser, kanjiQuestStructural, kanjiQuestSeed, kanjiQuestSentences, kanjiQuestQuote, kanjiQuestStale, kanjiQuestLine, kanjiQuestLines, kanjiQuestBinding, kanjiQuestBound, kanjiQuestWordsDone, kanjiQuestRunStarted, kanjiQuestSettle, kanjiQuestSelfCheck, kanjiQuestRedraw, kanjiQuestAct, kanjiQuestCreate, kanjiQuestEnd, kanjiQuestClear, kanjiQuestOpen, kanjiQuestStage, kanjiQuestPool, kanjiQuestRender, kanjiQuestSummary, sentenceKept, kanjiFactsState, kanjiFacts, kanjiReferenceView, kanjiFactsStatus, kanjiReference, joyoOnNote, kanjiFinderUniverse, kanjiEntryRecord, strokeRoomRecord, kdxGridShown, kdxGlyphName, kdxPartHits, classicalRadicalHits, kdxRadicalResults, kdxFrequencyHits, kdxLoadFailed, kankenLevels, kkldNumberGlyphs, kkldOf, kkldLine, kdxTextResults, renderKdxDraw, kdxDrawResults, recognizeKanji, wwSaveTrail, wwPush, wwKanjiOf, wwParts, wwWord, wwMine, wwDueToday, wwDefault, wwPassageIndex, wwSentences, wwPassages, wwKanjiPassage, wwGrammarFor, wwExcerpt, wwOpenPassage, wwKanjiCap, wwPartName, wwPartCap, wwModel, wwLearn, wwInkLabel, wwReadingChoices, wwSlipNode, wwValid, wwRecentre, renderParticleNode, renderGrammarNode, renderSentenceNode, sentenceDoor, sentencePracticeError, sentenceSource, _strokeOf, _componentsOf, _allSub, mainParts, componentLabel, renderKanjiClassifications, kanjiFamilyLiveVisit, kanjiFamilyHelpRow, kanjiFamilyAuthorize, kanjiFamilyHasExampleOrigin, activateKanjiFamily, kanjiFamilyControlId, kanjiFamilyStatus, kanjiFamilyRefusal, kanjiFamilyCourseExpectation, renderKanjiFamilyDisclosure, kanjiFamilyCitations, activateKanjiStructure, renderKanjiNode, strokeStart, strokeThumb, strokeDoor, paintStrokes, strokeControl, strokeReadingRow, strokeAwakeField, strokeReadingField, strokeClassificationLine, strokeReferenceStatus, strokeClassicReadings, strokeReadingsStatus, strokeMissing, animcjkGlyphFor, inkSpecFor, inkStrokeMs, inkCeremony, renderRadicalNode, renderIdiomNode, heroOf, storyHeroOnScreen, storyHeroArriving, nameStoryHero, clearStoryHero, worldPickerEsc, worldName };
+export { GRAMMARS, sentenceDraftInputMatches, sentenceDraftStatus, sentenceDraftCopyButton, beyondJoyo, storySeries, storyLevel, storyTopicKey, storyTopic, storyBlock, storyAccent, storyPictureSource, storyHeroKanji, storyPicture, storyKicker, storyVersions, storyYourWords, storyInstrument, storyLede, storyDate, paintTok, kanjiSlipReading, kanjiCourseEvidencePatch, kanjiCourseNodeUnit, kanjiCourseTeachingHelp, kanjiCourseReferenceHelp, kanjiCourseReturnFrame, kanjiCourseEntryNode, kanjiCourseRunKind, kanjiRoomEntry, kanjiChooseRoom, kanjiEnterCourseDoor, openKanjiRooms, renderKanjiRoomChooser, kanjiQuestStructural, kanjiQuestSeed, kanjiQuestSentences, kanjiQuestQuote, kanjiQuestStale, kanjiQuestLine, kanjiQuestLines, kanjiQuestBinding, kanjiQuestBound, kanjiQuestWordsDone, kanjiQuestRunStarted, kanjiQuestSettle, kanjiQuestSelfCheck, kanjiQuestRedraw, kanjiQuestAct, kanjiQuestCreate, kanjiQuestEnd, kanjiQuestClear, kanjiQuestOpen, kanjiQuestStage, kanjiQuestPool, kanjiQuestRender, kanjiQuestSummary, sentenceKept, kanjiFactsState, kanjiFacts, kanjiReferenceView, kanjiFactsStatus, kanjiReference, joyoOnNote, kanjiFinderUniverse, kanjiEntryRecord, strokeRoomRecord, kdxGridShown, kdxGlyphName, kdxPartHits, classicalRadicalHits, kdxRadicalResults, kdxFrequencyHits, kdxLoadFailed, kankenLevels, kkldNumberGlyphs, kkldNeighbours, kkldOf, kkldLine, kdxTextResults, renderKdxDraw, kdxDrawResults, recognizeKanji, wwSaveTrail, wwPush, wwKanjiOf, wwParts, wwWord, wwMine, wwDueToday, wwDefault, wwPassageIndex, wwSentences, wwPassages, wwKanjiPassage, wwGrammarFor, wwExcerpt, wwOpenPassage, wwKanjiCap, wwPartName, wwPartCap, wwModel, wwLearn, wwInkLabel, wwReadingChoices, wwSlipNode, wwValid, wwRecentre, renderParticleNode, renderGrammarNode, renderSentenceNode, sentenceDoor, sentencePracticeError, sentenceSource, _strokeOf, _componentsOf, _allSub, mainParts, componentLabel, renderKanjiClassifications, kanjiFamilyLiveVisit, kanjiFamilyHelpRow, kanjiFamilyAuthorize, kanjiFamilyHasExampleOrigin, activateKanjiFamily, kanjiFamilyControlId, kanjiFamilyStatus, kanjiFamilyRefusal, kanjiFamilyCourseExpectation, renderKanjiFamilyDisclosure, kanjiFamilyCitations, activateKanjiStructure, renderKanjiNode, strokeStart, strokeThumb, strokeDoor, paintStrokes, strokeControl, strokeReadingRow, strokeAwakeField, strokeReadingField, strokeClassificationLine, strokeReferenceStatus, strokeClassicReadings, strokeReadingsStatus, strokeMissing, animcjkGlyphFor, inkSpecFor, inkStrokeMs, inkCeremony, renderRadicalNode, renderIdiomNode, heroOf, storyHeroOnScreen, storyHeroArriving, nameStoryHero, clearStoryHero, worldPickerEsc, worldName };

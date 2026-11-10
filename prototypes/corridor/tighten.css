@@ -229,6 +229,34 @@
   border-color: var(--color-sheet-line);
 }
 
+/* the slip over the sky (outside the scope above): Drift's まだ · 知っている are B slips, one row under Save. Over the sky
+   the house's edge, fill and face tokens are not set (editorial.css), so the slip's own stand in: its edge, its paper */
+#mini .mini-judge {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0 14px 8px;
+  background: var(--mini-paper);
+}
+#mini .mini-judge-btn {
+  min-height: var(--tc-h);
+  padding: 0 var(--tc-pad);
+  border: 1px solid var(--mini-edge);
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-ink);
+  box-shadow: none;
+  font-weight: 600;
+  font-size: var(--type-control);
+  line-height: 1.25;
+  letter-spacing: 0;
+  cursor: pointer;
+}
+@media (hover: hover) {
+  #mini .mini-judge-btn:hover { background: color-mix(in srgb, var(--color-accent) 6%, var(--mini-paper)); }
+}
+
 /* ---- the voice layer (2026-11-10): Japanese that had no listen control gets the app's one quiet speaker mark
    (.play-mark, as the reader's), never a new look; the study card gets one more of its own small buttons. Gold is
    the pigment of sound: the mark while it speaks, and the sentence the reader is on. ---- */
