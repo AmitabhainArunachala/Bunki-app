@@ -1510,7 +1510,7 @@ html[data-room='reader'] body:not([data-view='drift']) {
 /* the print on its mat */
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero {
   margin: 0 0 4px;
-  padding: 8px 8px 18px;
+  padding: 6px 8px 18px;
   border-radius: var(--radius-card);
   background: var(--reader-mat);
   -webkit-mask-image: none;
@@ -1520,19 +1520,19 @@ html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-her
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero .reader-picture-img {
   /* a phone shows the print as a band, never a sliver; the first sentence still opens on the first screen (R3), and on a
      390x844 phone the text starts near 440 px (John, 2026-11-10: "the first line of Japanese starts at 556 of 844") */
-  height: clamp(120px, calc(100svh - 716px - var(--nav-clearance, 0px)), 280px);
+  height: clamp(112px, calc(100svh - 724px - var(--nav-clearance, 0px)), 280px);
   border-radius: var(--radius-seal);
   box-shadow: 0 0 0 1px var(--reader-mat-edge), 0 8px 18px -8px rgb(0 0 0 / 70%);
 }
 /* night: the lamp and the rain fall on the print, not on its mat */
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero::before {
-  inset: 8px 8px 18px;
+  inset: 6px 8px 18px;
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero {
   box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--color-gold, #e2bd6c) 20%, transparent);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero::after {
-  clip-path: inset(calc(60% + 8px) 8px 18px 8px);
+  clip-path: inset(calc(60% + 6px) 8px 18px 8px);
 }
 @media (max-width: 520px) {
   html[data-room='reader'] body:not(.zen):not([data-view='drift']) #app > main > .reader-hero {
@@ -1549,8 +1549,8 @@ html[data-room='reader'] body:not([data-view='drift']) #app > main:has(> .dials)
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-card {
   position: relative;
   z-index: 2;
-  margin: 0 0 6px;
-  padding: 8px 16px 4px;
+  margin: 0 0 4px;
+  padding: 6px 16px 4px;
   border: 1px solid var(--reader-card-edge);
   border-radius: var(--radius-card);
   background: var(--reader-card-grain), var(--reader-card);
@@ -1701,7 +1701,7 @@ html[data-room='reader'] body #app > main .seg button { transition: none; }
 html[data-room='reader'] body.v-depth-layered:not([data-view='drift']) main #reader.reader,
 html[data-room='reader'] body:not([data-view='drift']) main #reader.reader {
   margin-top: 0;
-  padding: 10px var(--s2, 16px) 28px;
+  padding: 6px var(--s2, 16px) 28px;
   border-top: 1px solid var(--reader-paper-edge);
   border-radius: 0;
   background: var(--reader-grain), var(--reader-paper);
