@@ -66,11 +66,15 @@ const ids = rows.map((row) => row.id);
 check('the set says what it is: an unadmitted candidate, prototype-marked, not installable, no selection by John',
   set.schema === 1 && set.kind === 'bunki-unadmitted-library-candidate' && set.prototype === MARKER && set.installable === false &&
   set.johnSelection === null && set.missingInputs.length === 4);
-check('the shipped catalogue is untouched: the index bytes the candidate set was generated beside',
-  sha(indexBytes) === set.generatedFrom.shippedIndexSha256, sha(indexBytes).slice(0, 12));
-check('the shipped shelf is its 156 rows, a picture on every one, no candidate among them; the archive its 686',
-  shelf.length === 156 && shelf.every((row) => row.picture && !row.libraryCandidate) && archive.length === 686 &&
-  !archive.some((row) => row.libraryCandidate), `${shelf.length} shelf · ${archive.length} archive`);
+// The two pins the importer's own test holds (existing 156 and 686 untouched). If another change has since added to or
+// removed from the shelf, this one line fails and says so; the candidates themselves are judged by the lines after it.
+const shelfAsGenerated = sha(indexBytes) === set.generatedFrom.shippedIndexSha256 && shelf.length === 156 && archive.length === 686;
+check('the shipped catalogue is the one the candidate set was generated beside: the same index bytes, 156 shelf rows, 686 archive rows',
+  shelfAsGenerated, shelfAsGenerated ? sha(indexBytes).slice(0, 12)
+    : `the shelf has changed since (${shelf.length} shelf · ${archive.length} archive · index ${sha(indexBytes).slice(0, 12)}); not the candidates' doing unless this commit did it`);
+check('no candidate stands in the shipped shelf or archive, and every shelf row still has its picture',
+  shelf.every((row) => row.picture && !row.libraryCandidate) && !archive.some((row) => row.libraryCandidate),
+  `${shelf.length} shelf · ${archive.length} archive`);
 const known = new Set([...shelf, ...archive].map((row) => row.id));
 const knownFiles = new Set([...shelf, ...archive].map((row) => row.file));
 check('no candidate takes a shelf or archive reading\'s id or file, and no id repeats',
