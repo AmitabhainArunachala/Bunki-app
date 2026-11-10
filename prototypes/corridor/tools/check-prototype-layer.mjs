@@ -12,16 +12,22 @@
  *   no-endpoint  where /__feedback is missing the box says so and keeps the text
  *   japanese     in the Japanese interface the mark reads 新
  *
- * The note checks talk to an in-memory stand-in for /__feedback that follows the lead's contract, so John's real
- * notes are never touched. --live sends ONE marked test note to the real endpoint instead, answers it with
- * ../feedback/feedback.py and removes it again.
+ * JOHN'S REAL NOTES ARE NEVER TOUCHED (lead, 2026-11-10 17:15). Every request this check's browser makes for
+ * /__feedback is answered inside the browser by a stand-in that follows the lead's contract; nothing reaches the
+ * served store, to read or to write. --server proves the real endpoint code as well, on a throwaway copy: it starts a
+ * second server on a free port with its own empty store in a temporary folder, sends the note there, answers it with
+ * feedback.py pointed at that folder (BUNKI_FEEDBACK_DIR), then stops the server and deletes the folder. Every test
+ * note's text starts with "[check]".
  *
  *   node prototypes/corridor/tools/check-prototype-layer.mjs [--base http://127.0.0.1:18841/] [--engine webkit]
- *        [--only <name,name>] [--shots <dir>] [--live <path to the feedback folder>]
+ *        [--only <name,name>] [--shots <dir>]
+ *        [--server <built site folder> [--preview <folder holding serve.mjs and feedback-endpoints.mjs>]]
  */
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
-import { mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
+import { createServer } from 'node:net';
+import { homedir, tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -31,7 +37,8 @@ const arg = (name, fallback) => { const i = process.argv.indexOf(name); return i
 const BASE = arg('--base', 'http://127.0.0.1:18841/').replace(/\/?$/, '/');
 const ONLY = arg('--only', '').split(',').filter(Boolean);
 const SHOTS = arg('--shots', '');
-const LIVE = arg('--live', '');
+const SERVER_SITE = arg('--server', '');
+const PREVIEW = resolve(arg('--preview', join(homedir(), '.dharma/bunki/PROGRAM/preview')));
 const ENGINE = arg('--engine', 'chromium');
 if (SHOTS) mkdirSync(resolve(SHOTS), { recursive: true });
 const engines = createRequire(join(repo, 'package.json'))('playwright-core');
@@ -45,11 +52,30 @@ const results = [];
 const browser = await engines[ENGINE].launch({ headless: true });
 const must = (ok, message) => { if (!ok) throw new Error(message); };
 
-/** a fresh profile; `store` is the stand-in for /__feedback (null = the served endpoint, 'missing' = no endpoint) */
-async function fresh(device, { store = [], dismissed = false } = {}) {
+/** a throwaway server for the note check: the same site, the real endpoint code, its own empty store in a temp folder */
+async function throwawayServer() {
+  must(existsSync(join(resolve(SERVER_SITE), 'build-identity.json')), `--server needs a built site folder: ${SERVER_SITE}`);
+  must(existsSync(join(PREVIEW, 'feedback-endpoints.mjs')) && existsSync(join(PREVIEW, 'serve.mjs')), `no serve.mjs and feedback-endpoints.mjs in ${PREVIEW}`);
+  const port = await new Promise((done, fail) => { const probe = createServer(); probe.on('error', fail); probe.listen(0, '127.0.0.1', () => { const { port } = probe.address(); probe.close(() => done(port)); }); });
+  const folder = mkdtempSync(join(tmpdir(), 'bunki-check-feedback-'));
+  const child = spawn(process.execPath, ['--import', join(PREVIEW, 'feedback-endpoints.mjs'), join(PREVIEW, 'serve.mjs'), '--root', resolve(SERVER_SITE), '--host', '127.0.0.1', '--port', String(port), '--feedback', folder], { stdio: 'ignore' });
+  const base = `http://127.0.0.1:${port}/`;
+  for (let i = 0; i < 50; i += 1) {
+    const up = await fetch(`${base}__feedback`).then((r) => r.ok, () => false);
+    if (up) break;
+    await new Promise((wait) => setTimeout(wait, 200));
+  }
+  const tool = (...args) => execFileSync(join(PREVIEW, '../feedback/feedback.py'), args, { encoding: 'utf8', env: { ...process.env, BUNKI_FEEDBACK_DIR: folder } });
+  const stop = () => { child.kill(); rmSync(folder, { recursive: true, force: true }); };
+  return { base, folder, tool, stop };
+}
+
+/** a fresh profile; `store` is the stand-in for /__feedback ('missing' = no endpoint). Only a session given its own
+ * `base` (the throwaway server) lets those requests reach a server */
+async function fresh(device, { store = [], dismissed = false, base = null } = {}) {
   const context = await browser.newContext({ ...DEVICES[device], locale: 'en-US', timezoneId: 'Asia/Tokyo' });
   if (dismissed) await context.addInitScript(() => { try { localStorage.setItem('bunki-prototype:intro-dismissed:v1', '1'); } catch { /* none */ } });
-  if (store) await context.route(/\/(api\/)?__feedback$/, async (route) => {
+  if (!base) await context.route(/\/(api\/)?__feedback$/, async (route) => {
     if (store === 'missing') return route.fulfill({ status: 404, contentType: 'text/html', body: '<!doctype html><title>404</title>' });
     const request = route.request();
     if (request.method() === 'POST') {
@@ -68,7 +94,7 @@ async function fresh(device, { store = [], dismissed = false } = {}) {
   const press = (target) => (typeof target === 'string' ? page.locator(target).first() : target)[touch ? 'tap' : 'click']();
   const tapAt = (x, y) => (touch ? page.touchscreen.tap(x, y) : page.mouse.click(x, y));
   const open = async (path = '') => {
-    await page.goto(`${BASE}${path}`, { waitUntil: 'load' });
+    await page.goto(`${base || BASE}${path}`, { waitUntil: 'load' });
     await page.waitForFunction(() => document.body.dataset.ready === '1' || document.querySelector('[data-shared-study]'), null, { timeout: 45000 });
     await page.locator('#prototype-open').waitFor();
   };
@@ -226,9 +252,9 @@ await check('go', 'phone', 'on a phone Go lands on the quest word and on the can
 
 for (const device of ['phone', 'desktop']) {
   const store = [];
-  await check('note', device, 'a note with a pointed-at element is sent, shows as Received, and a reply shows', LIVE ? { store: null, dismissed: true } : { store, dismissed: true }, async ({ page, press, tapAt, open, openSheet, shot }) => {
-    const text = LIVE ? `[check-prototype-layer ${device}] automated test note, removed again by the check` : 'The wording on this door is too long.';
-    const run = (...args) => execFileSync(join(resolve(LIVE), 'feedback.py'), args, { encoding: 'utf8' });
+  const server = SERVER_SITE ? await throwawayServer() : null;
+  await check('note', device, 'a note with a pointed-at element is sent, shows as Received, and a reply shows', server ? { base: server.base, dismissed: true } : { store, dismissed: true }, async ({ page, press, tapAt, open, openSheet, shot }) => {
+    const text = `[check] The wording on this door is too long. (${device})`;
     await open(`?room=search&kanji=${encodeURIComponent('職')}`);
     await page.locator('#worldcraft-door').waitFor();
     await openSheet('notes');
@@ -249,31 +275,26 @@ for (const device of ['phone', 'desktop']) {
     must(await row.locator('.pl-status').getAttribute('data-pl-status') === 'received', 'the new note is not "received"');
     must(await page.locator('#pl-text').inputValue() === '', 'the box kept the sent text');
     const id = await row.getAttribute('data-pl-note');
-    let sent;
-    if (LIVE) sent = JSON.parse(run('list', '--json')).items.find((item) => item.id === id);
-    else sent = store[0];
-    try {
-      must(sent && sent.text === text, 'the store does not hold the note');
-      must(/page=kanji:職/.test(sent.route) && /view=search/.test(sent.route), `route: ${sent.route}`);
-      must(/^職 · /.test(sent.heading), `heading: "${sent.heading}"`);
-      must(/^[a-f0-9]{40}$/.test(sent.build), `build: ${sent.build}`);
-      must(sent.viewport.w === DEVICES[device].viewport.width && sent.viewport.h === DEVICES[device].viewport.height, `viewport: ${JSON.stringify(sent.viewport)}`);
-      must(sent.target && sent.target.path === '#worldcraft-door' && /Build 職/.test(sent.target.text) && sent.target.rect.w > 0, `target: ${JSON.stringify(sent.target)}`);
-      must(sent.lang === 'en', `lang: ${sent.lang}`);
-      const reply = 'Shortened on the next build.';
-      if (LIVE) run('reply', id, 'working', reply);
-      else Object.assign(store[0], { status: 'working', reply, replyTs: new Date().toISOString() });
-      // the list refreshes every 15 s while the sheet is open
-      await row.locator('.pl-reply').waitFor({ timeout: 20000 });
-      must(await row.locator('.pl-status').getAttribute('data-pl-status') === 'working', 'the status did not follow the store');
-      const shown = (await row.locator('.pl-reply').innerText()).replace(/\s+/g, ' ').trim();
-      must(shown.includes(reply), `the reply reads "${shown}"`);
-      await shot('layer-note-reply');
-      return `pointed at "${sent.target.text.slice(0, 40)}" (${sent.target.path}) without opening it; sent with heading "${sent.heading}", ${sent.route.split(' address=')[0]}, ${sent.viewport.w}×${sent.viewport.h}, build ${sent.build.slice(0, 9)}; listed as Received; the reply "${reply}" showed within the 15 s refresh${LIVE ? `; real endpoint, test note ${id} removed` : '; stand-in store'}`;
-    } finally {
-      if (LIVE && id) run('remove', id);
-    }
+    const sent = server ? JSON.parse(server.tool('list', '--json')).items.find((item) => item.id === id) : store[0];
+    must(sent && sent.text === text, 'the store does not hold the note');
+    must(/page=kanji:職/.test(sent.route) && /view=search/.test(sent.route), `route: ${sent.route}`);
+    must(/^職 · /.test(sent.heading), `heading: "${sent.heading}"`);
+    must(/^[a-f0-9]{40}$/.test(sent.build), `build: ${sent.build}`);
+    must(sent.viewport.w === DEVICES[device].viewport.width && sent.viewport.h === DEVICES[device].viewport.height, `viewport: ${JSON.stringify(sent.viewport)}`);
+    must(sent.target && sent.target.path === '#worldcraft-door' && /Build 職/.test(sent.target.text) && sent.target.rect.w > 0, `target: ${JSON.stringify(sent.target)}`);
+    must(sent.lang === 'en', `lang: ${sent.lang}`);
+    const reply = 'Shortened on the next build.';
+    if (server) server.tool('reply', id, 'working', reply);
+    else Object.assign(store[0], { status: 'working', reply, replyTs: new Date().toISOString() });
+    // the list refreshes every 15 s while the sheet is open
+    await row.locator('.pl-reply').waitFor({ timeout: 20000 });
+    must(await row.locator('.pl-status').getAttribute('data-pl-status') === 'working', 'the status did not follow the store');
+    const shown = (await row.locator('.pl-reply').innerText()).replace(/\s+/g, ' ').trim();
+    must(shown.includes(reply), `the reply reads "${shown}"`);
+    await shot('layer-note-reply');
+    return `pointed at "${sent.target.text.slice(0, 40)}" (${sent.target.path}) without opening it; sent with heading "${sent.heading}", ${sent.route.split(' address=')[0]}, ${sent.viewport.w}×${sent.viewport.h}, build ${sent.build.slice(0, 9)}; listed as Received; the reply "${reply}" showed within the 15 s refresh; ${server ? `throwaway server ${server.base} with its own store ${server.folder}, stopped and deleted afterwards` : 'stand-in store inside the browser'}`;
   });
+  server?.stop();
 }
 
 await check('no-endpoint', 'phone', 'with no /__feedback the box says so and keeps the text', { store: 'missing', dismissed: true }, async ({ page, press, open, openSheet }) => {
@@ -307,5 +328,5 @@ await check('japanese', 'phone', 'in the Japanese interface the mark reads 新',
 
 await browser.close();
 const failed = results.filter((row) => !row.pass);
-console.log(`\n${results.length - failed.length} passed, ${failed.length} failed. ${BASE} (${ENGINE}${LIVE ? ', live notes' : ''})`);
+console.log(`\n${results.length - failed.length} passed, ${failed.length} failed. ${BASE} (${ENGINE}${SERVER_SITE ? ', notes on a throwaway server' : ''}; the served store is never asked or written)`);
 process.exit(failed.length ? 1 : 0);
