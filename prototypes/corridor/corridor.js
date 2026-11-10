@@ -4259,6 +4259,28 @@ function installLibraryVisibility(articleIndex) {
   D.libraryDiscoverable = row => libraryDiscoverable(row, policy);
 }
 
+/** PROTOTYPE library110-20261110 — remove with data/articles/library-candidates/ once John has chosen.
+ * The unadmitted library candidates ride their own index: the shipped catalogue (data/articles/index.json) is untouched
+ * and nothing here admits, installs or activates a row. A candidate stands on the bookshelf after the shelf's own
+ * readings and opens in the reader, tagged 候補 / candidate in both. It stays outside every other discovery surface
+ * (the gate below) and is never bulk-prefetched. Neither the single-file build nor an installed app that starts
+ * offline carries it: the candidate set is not part of the worker's offline install, so it is not asked for there. */
+async function installLibraryCandidates() {
+  D.libraryCandidates = [];
+  if (window.__CORRIDOR_BUNDLE__ || (navigator.onLine === false && navigator.serviceWorker?.controller)) return;
+  try {
+    const res = await fetch('data/articles/library-candidates/index.json');
+    const set = res.ok ? await res.json() : null;
+    if (set?.prototype !== 'library110-20261110' || set.kind !== 'bunki-unadmitted-library-candidate' || set.installable !== false) return;
+    const known = new Set(D.passages.map((p) => p.id));
+    D.libraryCandidates = set.candidateRows.filter((row) => row.libraryCandidate?.installable === false && !known.has(row.id))
+      .map((row) => ({ ...row, file: `library-candidates/${row.file}` }));
+    D.passages.push(...D.libraryCandidates);
+    const discoverable = D.libraryDiscoverable;
+    D.libraryDiscoverable = (row) => !row?.libraryCandidate && discoverable(row);
+  } catch { /* no candidate set here: the shelf is the shipped catalogue alone */ }
+}
+
 async function boot() {
   const params = new URLSearchParams(location.search);
   // A reload cannot reconstruct the entry sheet until data has booted, so the
@@ -4438,6 +4460,7 @@ async function boot() {
   // — dozens of articles cost nothing until read.
   installLibraryVisibility(articleIndex);
   D.passages = articleIndex.articles;
+  await installLibraryCandidates(); // PROTOTYPE library110-20261110
   D.passageSources = articleIndex.sources.proprietary_safe;
   D.articleSources = articleIndex.sources;
   D.kanken = kanken.levels;
@@ -4721,7 +4744,7 @@ function prefetchArticles() {
   stopArticlePrefetch();
   if (articlePrefetchDeparted) return;
   // archive bodies are read-on-open only — never bulk-prefetched
-  const queue = D.passages.filter((p) => !p.tokens && !String(p.file || '').startsWith('archive/'));
+  const queue = D.passages.filter((p) => !p.tokens && !p.libraryCandidate && !String(p.file || '').startsWith('archive/')); // PROTOTYPE library110-20261110: candidates are read-on-open
   let stopped = false;
   let timer = null;
   stopArticlePrefetch = () => {
@@ -6291,6 +6314,7 @@ function renderShelfBody(search = null) {
   // one card per story: an N3 rewrite whose original stands on the shelf is that story's
   // やさしい版, reached by the toggle inside the article, never a second card
   const stories = shelfStories(curated);
+  stories.push(...(D.libraryCandidates || [])); // PROTOTYPE library110-20261110: candidates join the tally and the filters
   const day = shelfCurrentDay();
   // A magazine masthead: the room's name, today's date and one honest count. The count and the
   // results line below come from the same tally, so they cannot disagree.
@@ -6615,6 +6639,9 @@ function renderShelfBody(search = null) {
     // the level filter takes the level the card shows (N): the written-for level where the row has one, else the estimate
     return (!filters.topic || (f.topics || [p.topic]).includes(filters.topic)) && (!filters.jlpt || storyLevel(p).step===filters.jlpt) && (!filters.grade || f.schoolGrade===filters.grade) && (!filters.text || `${p.title} ${p.titleEn || ''} ${p.snippet || ''} ${(f.topics || []).join(' ')}`.toLocaleLowerCase().includes(filters.text.toLocaleLowerCase()));
   });
+  // PROTOTYPE library110-20261110: the candidates stand together after the shelf's own readings, whose order they never touch
+  const candidateMatches = matches.filter((p) => p.libraryCandidate).sort(shelfOrder);
+  matches = matches.filter((p) => !p.libraryCandidate);
   matches.sort(shelfOrder);
   // a series stands together in book order where its first member stands (N2): an earlier cut is pulled forward beside
   // the later cut a newer drop brought
@@ -6625,6 +6652,7 @@ function renderShelfBody(search = null) {
   let dropCount = 0;
   while (dropCount < matches.length && leading.has(matches[dropCount].addedAt)) dropCount += 1;
   if (filters.sort === 'today' && unfiltered) matches = [...matches.slice(0, dropCount), ...shelfDailyOrder(matches.slice(dropCount), day)];
+  matches.push(...candidateMatches); // PROTOTYPE library110-20261110
 
   const count=el('p','shelf-results-count',shelfTallyText(matches));count.setAttribute('role','status');controls.append(count);
   // unfiltered, the masthead already carries this same tally: the line stays for assistive tech only
@@ -8407,6 +8435,7 @@ function shelfCard(p, rank = 'grid') {
   // the shelf remembers with you: finished, or open to your bookmark
   if (owns(S.readDone, p.id)) foot.append(el('span', 'read-tag', tx('読了', 'finished')));
   else if ((S.readerPos[p.id] || 0) > 300) foot.append(el('span', 'read-tag', tx('途中', 'in progress')));
+  if (p.libraryCandidate) foot.append(el('span', 'read-tag library-candidate-tag', tx('候補', 'candidate'))); // PROTOTYPE library110-20261110
   if (rank !== 'teaser') head.append(foot);
   open.append(head);
   // a spine's English line and its date stand horizontally at its foot
@@ -13076,7 +13105,9 @@ function renderReader(main) {
   // one icon at its end. No provenance (S, John 2026-10-16: "no one wants to see a made by ai in red").
   const head = el('div', 'reader-head');
   const meta = el('div', 'eyebrow reader-meta');
+  if (p.libraryCandidate) meta.append(el('span', 'read-tag library-candidate-tag', tx('候補', 'candidate'))); // PROTOTYPE library110-20261110
   meta.append(el('span', 'reader-source', learnerSourceLabel(p)));
+  if (p.libraryCandidate) meta.lastChild.style.whiteSpace = 'normal'; // PROTOTYPE library110-20261110: a candidate's source label is its whole credit, so it wraps
   if (shelfDay(p)) meta.append(readerDateStamp(shelfDay(p)));
   meta.append(levelChip(p));
   // the record's own figure: the saved words the article holds. (Its length is the shelf's: the lead
