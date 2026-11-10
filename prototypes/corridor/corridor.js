@@ -21462,6 +21462,21 @@ function renderKdxKkld(main) {
       const chars = kkldNumberGlyphs(ed, q);
       renderKdxGrid(out, chars, 20, `kkld:${ed}:${q}`, { mark: (b) => { b.dataset.kkld = q; b.dataset.kkldEd = ed; } });
       if (!chars.length) out.append(el('p', 'fine', tx('この番号の字はこの版にない。', 'No kanji carries that number in this edition.')));
+      // tighten pass (John, 2026-11-10: "the entire Kodansha map and Kodansha style navigation"): the numbers around this
+      // one in the book's order, each glyph a door and its number beside it, so a number opened from a kanji page lands
+      // among its neighbours
+      const n = Number(q), numberOf = new Map();
+      for (let i = Math.max(1, n - 6); i <= n + 6; i += 1) {
+        if (i !== n) for (const c of kkldNumberGlyphs(ed, i)) if (!numberOf.has(c)) numberOf.set(c, i);
+      }
+      if (numberOf.size) {
+        const near = el('div', 'kdx-kkld-near');
+        renderKdxGrid(near, [...numberOf.keys()], 20, '', { empty: false, mark: (b, c) => { b.dataset.kkld = String(numberOf.get(c)); b.dataset.kkldEd = ed; } });
+        const span = [...numberOf.values()];
+        near.querySelector('.eyebrow').textContent = tx(`講談社の番号順 ${Math.min(...span)}〜${Math.max(...span)}`,
+          `Nearby in Kodansha order · ${Math.min(...span)}–${Math.max(...span)}`);
+        out.append(near);
+      }
       return;
     }
     // a typed kanji is looked up whether or not the core layer holds it (胤 has its numbers too)

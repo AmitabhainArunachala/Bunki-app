@@ -1763,32 +1763,62 @@ function componentLabel(c) {
   return tx('部品 — 漢検の部首表に名前がない', 'component — no name in the Kanji Kentei radical table');
 }
 
-function renderKanjiClassifications(sheet, id, node = {}) {
+/** The classical radical, named as a learner names it (tighten pass, 2026-11-10): a door to every kanji filed under it.
+ * On the kanji page (fact: true) it is one item of the facts line and is returned with its source lines; elsewhere it is
+ * a door row. Its scheme number, the Nelson radical and the dataset stand in Sources either way. */
+function renderKanjiClassifications(sheet, id, node = {}, { fact = false } = {}) {
   const facts = kanjiFacts(id);
-  if (!facts) return;
+  if (!facts) return null;
   const number = facts.radicalSchemes.classical;
   const rad = D.radInfo?.[number];
-  // tighten pass (2026-11-10): the radical is one door row, named as a learner names it; its scheme number and dataset
-  // stand in Sources, and a radical that is the page's own kanji is drawn at list strength (subject once)
   const glyph = rad?.c || String(number);
-  const text = el('span', 'rad-text');
-  text.append(el('span', 'rad-name', tx('部首', 'Radical')));
-  if (rad?.name) text.append(el('span', 'rad-sub', rad.name));
-  const door = entryRow('rad-door', (invoker) => go({
+  const open = (invoker) => go({
     t: 'catalog', id: `classical-radical:${number}`, by: 'classical-radical', value: number, from: node.from,
-  }, { invoker }), el('span', glyph === id ? 'rad-glyph row-self' : 'rad-glyph', glyph), text);
+  }, { invoker });
+  let door;
+  if (fact) {
+    // the radical's glyph is named only when it is not the page's own character (門 is its own radical)
+    const named = `${glyph !== id ? `${glyph} ` : ''}${rad?.name || number}`;
+    door = el('button', 'kanji-fact', tx(`部首 ${named}`, `Radical ${named}`));
+    door.type = 'button';
+    door.addEventListener('click', () => open(door));
+  } else {
+    const text = el('span', 'rad-text');
+    text.append(el('span', 'rad-name', tx('部首', 'Radical')));
+    if (rad?.name) text.append(el('span', 'rad-sub', rad.name));
+    door = entryRow('rad-door', open, el('span', glyph === id ? 'rad-glyph row-self' : 'rad-glyph', glyph), text);
+  }
   door.dataset.classicalRadical = String(number);
-  sheet.append(door);
-  const scheme = el('p', 'fine', tx(`伝統部首 ${number}・KANJIDIC2${rad?.name ? `・${rad.name}` : ''}`,
-    `Classical radical ${number} · KANJIDIC2${rad?.name ? ` · ${rad.name}` : ''}`));
+  const notes = [el('p', 'fine', tx(`伝統部首 ${number}・KANJIDIC2${rad?.name ? `・${rad.name}` : ''}`,
+    `Classical radical ${number} · KANJIDIC2${rad?.name ? ` · ${rad.name}` : ''}`))];
   const nelson = facts.radicalSchemes.nelson;
-  let nelsonLine = null;
   if (nelson != null) {
     const label = D.radInfo?.[nelson]?.c || '';
-    nelsonLine = el('p', 'fine', tx(`Nelson 部首 ${nelson} ${label} — KANJIDIC2`, `Nelson radical ${nelson} ${label} — KANJIDIC2`));
-    nelsonLine.dataset.nelsonRadical = String(nelson);
+    const line = el('p', 'fine', tx(`Nelson 部首 ${nelson} ${label} — KANJIDIC2`, `Nelson radical ${nelson} ${label} — KANJIDIC2`));
+    line.dataset.nelsonRadical = String(nelson);
+    notes.push(line);
   }
-  toSources(sheet, scheme, nelsonLine);
+  if (fact) return { door, notes };
+  sheet.append(door);
+  toSources(sheet, ...notes);
+  return null;
+}
+
+/** The Kodansha number (John, 2026-11-10: "connect to something logical behind like the entire Kodansha map"): the
+ * search room's Kodansha lens, opened at this number in its edition, among its neighbours in Kodansha order. Back
+ * returns here (keepNavigationReturn keeps the finder as it was). */
+function openKodanshaLookup(ed, number, invoker) {
+  const from = S.view;
+  keepNavigationReturn('search', invoker);
+  S.kdx ||= {};
+  S.kdx.kkldEd = ed;
+  S.kdx.kkldQ = String(number);
+  S.searchLens = 'kkld';
+  if (from !== 'search') S.searchFrom = from;
+  S.navOpen = false;
+  S.view = 'search';
+  render();
+  window.scrollTo(0, 0);
 }
 
 function kanjiFamilyLiveVisit() {
@@ -1993,7 +2023,8 @@ function renderKanjiNode(sheet, node) {
   const display = kanjiEntryRecord(node.id, node.referenceEntry) || k;
   const referenceView = kanjiReferenceView(node.id, display);
   meta.append(el('div', 'hero-mean', referenceView.meanings.join('; ') || tx('語義は未収録です。', 'Meaning not supplied.')));
-  // tighten pass (2026-11-10): the facts are one quiet line of text under the meaning; each stays the door to its list
+  // tighten pass (2026-11-10; John: "more facts, but more sleek"): the facts are one line of text under the meaning —
+  // strokes · Kanken · JLPT · Kodansha · radical — and each is the door to where it leads, drawn as quiet linked text
   const facts = [];
   if (Number.isInteger(k.st)) facts.push(catalogChip(`${k.st} 画`, `${k.st} strokes`, 'strokes', k.st, node.from));
   if (D.kanken[k.c]?.kk) {
@@ -2004,6 +2035,18 @@ function renderKanjiNode(sheet, node) {
   }
   if (D.kmeta?.[k.c]?.jlpt)
     facts.push(catalogChip(`JLPT ${D.kmeta[k.c].jlpt}`, `JLPT ${D.kmeta[k.c].jlpt}`, 'jlpt', D.kmeta[k.c].jlpt, node.from));
+  const kkld = kkldOf(k.c);
+  if (kkld?.ed2013 || kkld?.ed1999) {
+    const [ed, number] = kkld.ed2013 ? ['ed2013', kkld.ed2013] : ['ed1999', kkld.ed1999];
+    const door = el('button', 'kanji-fact', ed === 'ed2013' ? tx(`講談社 ${number}`, `Kodansha ${number}`)
+      : tx(`講談社 1999年版 ${number}`, `Kodansha 1999 ${number}`));
+    door.type = 'button'; door.id = 'kanji-kkld-door';
+    door.setAttribute('aria-label', tx(`講談社の番号 ${number} をひらく（前後の字と）`, `Open Kodansha number ${number}, among its neighbours`));
+    door.addEventListener('click', () => openKodanshaLookup(ed, number, door));
+    facts.push(door);
+  }
+  const radical = renderKanjiClassifications(sheet, node.id, node, { fact: true });
+  if (radical) facts.push(radical.door);
   if (facts.length) {
     const line = el('p', 'kanji-facts');
     facts.forEach((fact, i) => {
@@ -2059,14 +2102,15 @@ function renderKanjiNode(sheet, node) {
     if (referenceView.state === 'absent') sourceNotes.push(el('p', 'fine', tx('この字の辞書語義・部首分類は資料にありません。', 'This source does not supply dictionary meanings or classification for this form.')));
     kanjiFactsStatus(sheet, referenceView.state, 'kanji-facts-retry', () => { if (sheet.isConnected) render(); });
   }
-  // the entry number in the operator's paper dictionary (Kodansha KKLD), named by edition — the book on the desk and the
-  // sheet on the screen agree
-  if (kkldOf(k.c)) {
-    const kkld = el('p', 'fine kkld-chip', `Kodansha ${kkldLine(k.c)}`);
-    kkld.id = 'kanji-kkld';
-    kkld.title = tx('講談社 漢字学習字典の番号（版ごと）', "Kodansha Kanji Learner's Dictionary entry number, by edition");
-    sourceNotes.push(kkld);
+  // the entry number in the operator's paper dictionary (Kodansha KKLD), both editions — the book on the desk and the
+  // sheet on the screen agree; the facts line carries the 2013 number as a door
+  if (kkld) {
+    const line = el('p', 'fine kkld-chip', `Kodansha ${kkldLine(k.c)}`);
+    line.id = 'kanji-kkld';
+    line.title = tx('講談社 漢字学習字典の番号（版ごと）', "Kodansha Kanji Learner's Dictionary entry number, by edition");
+    sourceNotes.push(line);
   }
+  if (radical) sourceNotes.push(...radical.notes);
   if (retained) {
     sourceNotes.push(el('p', 'fine', tx(
       `保存した回答・以下の読みは KANJIDIC2 ${retained.sourceVersion.dictionaryDate} のままです。辞書を開いても書き換わりません。`,
@@ -2140,8 +2184,6 @@ function renderKanjiNode(sheet, node) {
     }
   }
   if (!doors.childElementCount) doors.remove();
-
-  renderKanjiClassifications(sheet, node.id, node);
 
   // a glyph row: the character, its line, a door to its page (look-alikes open a kanji, parts open a part)
   const glyphRow = (c, line, t) => entryRow('entry-row', (invoker) => go({ t, id: c, from: node.from }, { invoker }),

@@ -2269,9 +2269,19 @@ body .sheet .hero-meta { min-width: 0; }
 /* tighten pass (2026-11-10) · the kanji page: its facts are one quiet line of text under the meaning (each still opens its
  * list); its doors stand together under the hero, one outlined family; its own kanji is drawn at list strength in the lists
  * below; the builder's sources wait in one closed disclosure at the foot of any entry page */
-body .sheet .hero .kanji-facts { display: flex; flex-wrap: wrap; align-items: center; column-gap: 8px; margin: 0; font: 500 var(--type-label)/1.4 var(--sans); color: var(--text-2); }
-body .sheet .hero .kanji-facts .cat-chip { min-height: 44px; padding: 0; border: 0; border-radius: 0; background: none; color: inherit; font: inherit; letter-spacing: 0; }
-body .sheet .hero .kanji-facts .cat-chip:hover { background: none; color: var(--ai); text-decoration: underline; text-underline-offset: 0.2em; }
+body .sheet .hero .kanji-facts { display: flex; flex-wrap: wrap; align-items: center; column-gap: 7px; margin: 0; font: 500 var(--type-label)/1.4 var(--sans); color: var(--text-2); }
+/* a fact that goes somewhere reads as linked text (a dotted rule under it); its 32px line keeps a 44px target */
+body .sheet .hero .kanji-facts :is(.cat-chip, .kanji-fact) {
+  position: relative; display: inline-flex; align-items: center; min-height: 32px; padding: 0; border: 0; border-radius: 0;
+  background: none; box-shadow: none; color: var(--text); font: inherit; letter-spacing: 0; white-space: nowrap; cursor: pointer;
+  text-decoration: underline dotted 1px color-mix(in srgb, currentColor 45%, transparent); text-underline-offset: 0.32em;
+}
+body .sheet .hero .kanji-facts :is(.cat-chip, .kanji-fact)::before { content: ''; position: absolute; inset: -6px -3px; }
+body .sheet .hero .kanji-facts :is(.cat-chip, .kanji-fact):hover { background: none; color: var(--ai); text-decoration-color: currentColor; }
+body .sheet .hero .kanji-fact-sep { color: var(--text-2); opacity: 0.7; }
+/* the Kodansha lens: each neighbour carries its number, as the book's own index does */
+.kdx-kkld-near .kdx-glyph { position: relative; width: 52px; height: 56px; padding-bottom: 10px; }
+.kdx-kkld-near .kdx-glyph::after { content: attr(data-kkld); position: absolute; inset: auto 0 4px; font: 500 10px/1 var(--sans); letter-spacing: 0.02em; color: var(--text-2); }
 body .sheet .kanji-doors { display: flex; flex-wrap: wrap; gap: var(--s1); margin: var(--s2) 0 var(--s3); }
 body .sheet .kanji-doors > * { margin: 0; }
 body .sheet .kanji-doors .teacher-door { display: contents; }
@@ -5867,18 +5877,22 @@ html[data-room='tray'] .today-star:is([data-depth], [data-kept])::after {
 .sheet .depth-basis-said { flex: 1 1 100%; min-width: 0; }
 .sheet .depth-basis .depth-dot { margin: 0 0.5em 0 0; vertical-align: 0.12em; }
 .sheet .depth-word {
-  /* tighten pass (2026-11-10): the study engine's two answers for a word are real controls, outlined, a whole finger's
-   * reach (the app's 44 px floor, verify-corridor) */
+  /* tighten pass (2026-11-10): the study engine's two answers for a word are two real controls of equal weight, a quiet
+   * joined pair in the page's ink; a whole finger's reach (the app's 44 px floor, verify-corridor) */
   min-height: 44px;
-  padding: 0 16px;
-  border: 1px solid color-mix(in srgb, var(--color-accent, var(--world-accent)) 55%, transparent);
-  border-radius: var(--radius-control, 8px);
+  min-width: 9em;
+  padding: 0 18px;
+  border: 1px solid color-mix(in srgb, var(--color-ink, var(--world-ink)) 22%, transparent);
+  border-radius: var(--radius-control, 8px) 0 0 var(--radius-control, 8px);
   background: none;
-  font: 600 var(--type-label)/1.3 var(--font-ui, var(--sans));
-  color: var(--color-accent, var(--world-accent));
+  font: 500 var(--type-label)/1.3 var(--font-ui, var(--sans));
+  color: var(--color-ink, var(--world-ink));
   cursor: pointer;
 }
-.sheet .depth-word[aria-pressed='true'] { border-color: currentColor; background: color-mix(in srgb, var(--color-accent, var(--world-accent)) 12%, transparent); font-weight: 700; }
+.sheet .depth-basis { column-gap: 0; }
+.sheet .depth-word + .depth-word { border-left: 0; border-radius: 0 var(--radius-control, 8px) var(--radius-control, 8px) 0; }
+@media (hover: hover) { .sheet .depth-word:hover:not(:disabled) { background: color-mix(in srgb, var(--color-ink, var(--world-ink)) 5%, transparent); } }
+.sheet .depth-word[aria-pressed='true'] { background: color-mix(in srgb, var(--color-accent, var(--world-accent)) 12%, transparent); color: var(--color-accent, var(--world-accent)); font-weight: 600; }
 .sheet .depth-word:disabled { opacity: 0.6; cursor: default; }
 /* Me: the help signal beside "characters read unaided" */
 html[data-room='me'] .me-help { display: grid; gap: 2px; margin: var(--space-3, 12px) 0 0; }
