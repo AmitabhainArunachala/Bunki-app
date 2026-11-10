@@ -28,7 +28,10 @@ const PRODUCER_PINS = Object.freeze({
     '91974d35c3c352cf013e29798d298ba44c0d25d41a0f32b0fd6c90176ed13064',
   // 2026-11-06 (G3): the builder folds the eleven corridor seams back into the standalone document; the recordImports
   // map it declares is unchanged (9 rows) — reviewed re-pin of the producer bytes only
-  [`${P}build-standalone.mjs`]: '9ed12a3dad5da915a63f9d543bb1751906a58e72d41335f19119dc2953138422',
+  // 2026-11-10 (pull request #146): the builder also folds device-voice.mjs, which corridor.js has imported since
+  // 67e25a9a3 and without which the standalone page cannot boot; the recordImports map is unchanged (9 rows).
+  // Re-pin of the producer bytes only, by the builder that made the change: not yet read by a second reviewer.
+  [`${P}build-standalone.mjs`]: '1a16a0ac17408e8aeb1e0c0360a00f2ccec48692509d4f47955255e36dbb1536',
   [`${P}verify-sense-truth.mjs`]:
     '315786beb7763d8d847d5eb04a8e399df769aa1a07ece364a15795181c6854f6',
   [`${P}sense-grok-case.mjs`]: 'f968617684b38ece18d40cde2d645ae3f8c2de0eb0e59d5b7f7f0e5e3eaab367',
