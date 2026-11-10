@@ -20,10 +20,13 @@ function teacherDraftStatus(view, input) {
     'Draft recovery is unavailable. Copy any unsaved text before reloading.');
   if (view.state === 'pending' || view.state === 'saving') return tx('質問を保存中…', 'Saving your question…');
   if (!view.draft) return '';
-  return view.draft.consumed ? tx('質問と返事を保存した。次の質問を書ける。',
-    'Your question and reply are saved. You can write the next question.')
-    : tx('下書きをこの端末に保存した。閉じても続きを書ける。',
-      'Draft saved on this device. You can close the app and continue later.');
+  if (view.draft.consumed) return tx('質問と返事を保存した。次の質問を書ける。',
+    'Your question and reply are saved. You can write the next question.');
+  // with no key on this device nothing can be sent: the line says so and where the key goes, never only "saved"
+  if (!aiKey()) return tx('質問はこの端末に残したが、送っていない。先生が答えるには、この端末にあなた自身の AI の鍵が要る。下の「あなたの鍵」に入れる。',
+    'Your question is kept on this device but not sent: the tutor needs your own AI key on this device. Add it under Your key below.');
+  return tx('下書きをこの端末に保存した。閉じても続きを書ける。',
+    'Draft saved on this device. You can close the app and continue later.');
 }
 
 function sizeTeacherQuestion(input) {
