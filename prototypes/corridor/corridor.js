@@ -8276,7 +8276,14 @@ function freshWordLadderRecord() {
   const keysAre = (value, keys) => value && typeof value === 'object' && !Array.isArray(value) &&
     Object.keys(value).length === keys.length && keys.every(key => Object.hasOwn(value, key));
   const empty = value => keysAre(value, []);
-  const pristineExtras = Object.entries(S.storeExtras || {}).every(([key, value]) => key === 'driftState' &&
+  // everything-on prototype: with the journey ON every record gets its m4Journey root at first boot, and as an unknown
+  // extension it counted as history, so the demonstration never played for a new learner (the learner walk caught it).
+  // A root holding no help, answer, visit, quest, kept build or participation is not learner history either
+  const idleJourney = root => !!root && typeof root === 'object' && root.protocol === 'journey-r2' &&
+    !root.goals?.length && !root.projects?.length && !root.daily?.events?.length && !root.daily?.attempts?.length &&
+    !root.daily?.visits && !root.progress?.participated && !root.progress?.retiredGoals && !root.progress?.retiredProjects;
+  const pristineExtras = Object.entries(S.storeExtras || {}).every(([key, value]) => (key === 'm4Journey' && idleJourney(value)) ||
+    key === 'driftState' &&
     keysAre(value, ['format', 'version', 'store']) && value.format === 'kairo-drift-state' && value.version === 1 &&
     keysAre(value.store, ['known', 'unknown', 'lk', 'lu']) && empty(value.store.known) && empty(value.store.unknown) &&
     value.store.lk === 0 && value.store.lu === 0);
