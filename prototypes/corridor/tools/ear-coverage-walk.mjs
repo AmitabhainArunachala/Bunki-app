@@ -79,6 +79,27 @@ async function scan({ exclusions, plant, earPath }) {
   const excluded = exclusions.map((entry) => ({ ...entry, found: document.querySelectorAll(entry.selector).length }));
   const skip = exclusions.map((entry) => entry.selector).join(', ');
   const rows = { checked: 0, covered: 0, failures: [], units: {} };
+  /** A layer above `parent` at the point that takes no pointer and yet hides it: a solid background, or words of its own
+   * drawn there. Seen with every element taking the pointer for one look. */
+  const paintedOver = (x, y, parent) => {
+    const style = document.createElement('style');
+    style.textContent = '*, *::before, *::after { pointer-events: auto !important; }';
+    document.head.append(style);
+    let stack = [];
+    try { stack = document.elementsFromPoint(x, y); } finally { style.remove(); }
+    for (const el of stack) {
+      if (el === parent || el.contains(parent) || parent.contains(el)) return null;
+      if (getComputedStyle(el).pointerEvents !== 'none') continue;
+      const bg = getComputedStyle(el).backgroundColor.match(/[\d.]+/g)?.map(Number) || [];
+      if (bg.length >= 3 && (bg.length < 4 || bg[3] > 0.5)) return `${el.tagName.toLowerCase()}${el.className && typeof el.className === 'string' ? `.${el.className.split(/\s+/)[0]}` : ''} (passes the finger, painted over)`;
+      for (const child of el.childNodes) {
+        if (child.nodeType !== 3 || !child.nodeValue.trim()) continue;
+        const r = document.createRange(); r.selectNodeContents(child);
+        for (const box of r.getClientRects()) if (x >= box.left && x <= box.right && y >= box.top && y <= box.bottom) return `${el.tagName.toLowerCase()} (its own words over this text)`;
+      }
+    }
+    return null;
+  };
   // under a layer: the app makes what stands under a sheet or a modal inert (the layer law), so no finger reaches it
   const modal = document.querySelector('dialog:modal');
   const underLayer = (el) => !!el.closest('[inert]') || (modal && !modal.contains(el));
@@ -118,6 +139,9 @@ async function scan({ exclusions, plant, earPath }) {
         const reachable = hit && (hit === parent || parent.contains(hit) || hit.contains(parent));
         // under another layer that takes the finger: not what he sees there
         if (!reachable && document.elementsFromPoint(x, y).includes(parent)) { verdict ||= { covered: true, by: hit?.tagName?.toLowerCase() + (hit?.id ? `#${hit.id}` : '') }; continue; }
+        // under a layer that lets the finger pass but is painted over this text (an opaque panel, or its own words)
+        const over = paintedOver(x, y, parent);
+        if (over) { verdict ||= { covered: true, by: over }; continue; }
         // otherwise (the text itself lets the finger pass, or the finger lands on it) the ear must answer for this text
         if (!ear) { verdict = { problem: `the ear is not in this build (${loadError})` }; break; }
         let unit = null;
