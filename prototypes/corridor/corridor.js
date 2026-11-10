@@ -22491,9 +22491,16 @@ function dispatchQueuedDictionarySearch() {
         }
         return { e: { ...item.result, dictionaryRow: row }, score: item.score, tie: item.tie };
       });
+      // the worker's near misses for a search that found nothing: shown only as guesses (searchNearMisses)
+      const near = (Array.isArray(result.nearMisses) ? result.nearMisses : []).slice(0, 5).map((item) => {
+        const row = dictionaryRowBySeq(item?.result?.seq);
+        if (!row) throw new Error('dictionary worker near miss is missing its compact row');
+        return { ...item.result, dictionaryRow: row };
+      });
       D.dictionarySearchCache.set(queued.key, {
         scored,
         compatibleCoreIds: result.compatibleCoreIds,
+        near,
       });
       while (D.dictionarySearchCache.size > 12) {
         D.dictionarySearchCache.delete(D.dictionarySearchCache.keys().next().value);
@@ -22783,14 +22790,28 @@ function searchResults(query) {
  * Otherwise the row keeps its own numbered door: another gloss, another exact reading
  * (even one that normalises equal), another spelling, or no scored core row at all. */
 
+/** The words a mistyped search probably meant (origin/agent/bunki-pillars-dict-srs, 82d04591d): the full dictionary's
+ * worker looks for them only when a search found nothing; at most five, none for a query of one or two characters. */
+function searchNearMisses(query) {
+  return D.dictionarySearchCache?.get(dictionaryQueryKey(query))?.near || [];
+}
+
 function renderSearchResults(main, query) {
   const results = searchResults(query);
+  const near = results.length ? [] : searchNearMisses(query);
   const box = el('div', 'entry-rows');
   box.id = 'search-results';
-  for (const e of results) {
+  // nothing found says so first; under it, the words the search probably meant, as ordinary rows
+  if (!results.length) {
+    box.append(el('div', 'sem-empty', near.length
+      ? tx('見つからない。もしかして：', 'Nothing found. Did you mean:')
+      : tx('見つからない。', 'Nothing found for that yet.')));
+  }
+  for (const e of results.length ? results : near) {
     const row = el('button', 'entry-row compound');
     row.type = 'button';
     row.dataset.result = `${e.t}:${e.id}${e.seq ? `:${e.seq}` : ''}`;
+    if (!results.length) row.dataset.near = '';
     if (e.t === 'kanji') {
       row.append(el('span', 'row-glyph', e.w));
       const stack = el('span', 'row-stack');
@@ -22815,9 +22836,6 @@ function renderSearchResults(main, query) {
       ),
     );
     box.append(row);
-  }
-  if (!results.length) {
-    box.append(el('div', 'sem-empty', tx('見つからない。', 'Nothing found for that yet.')));
   }
   main.append(box);
 
@@ -34874,15 +34892,20 @@ function renderSearchPage(main) {
       return;
     }
     if (!q) return;
-    const hits = searchResults(q).slice(0, 24);
-    if (!hits.length) {
-      results.append(el('div', 'nav-search-empty', tx('見つからない。', 'Nothing found.')));
-      return;
+    const found = searchResults(q).slice(0, 24);
+    // nothing found says so; under it, the words the search probably meant (searchNearMisses), as ordinary rows
+    const hits = found.length ? found : searchNearMisses(q);
+    if (!found.length) {
+      results.append(el('div', 'nav-search-empty', hits.length
+        ? tx('見つからない。もしかして：', 'Nothing found. Did you mean:')
+        : tx('見つからない。', 'Nothing found.')));
+      if (!hits.length) return;
     }
     hits.forEach((e, ix) => {
       const row = el('button', 'nav-search-row');
       row.type = 'button';
       row.dataset.ix = String(ix);
+      if (!found.length) row.dataset.near = '';
       row.append(el('span', 'nsr-glyph', e.w));
       const stack = el('span', 'nsr-stack');
       if (e.r) stack.append(el('span', 'nsr-read', e.r));
