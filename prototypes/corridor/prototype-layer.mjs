@@ -7,9 +7,10 @@
  *   - a prototype button on every screen (it follows the app into an open dialog, as the report entry does);
  *   - a sheet with two tabs: "New in this build" (each new thing, one line, Go) and "Tell me what's off"
  *     (a note with the screen, its heading, the build, the viewport, and optionally one pointed-at element);
- *   - the language of the 新 / new mark, which prototype-layer.css draws on the new doors and screens.
- * It reads the app's state and never writes the learner record. Its own two keys in localStorage hold "the line was
- * dismissed" and an unsent note. Notes go to the same-origin /__feedback of the Mac prototype's server; where that
+ *   - the language of the 新 / new mark, which prototype-layer.css draws on the new doors and screens;
+ *   - 糸 depth, a trial that is off until its switch in the sheet is on (the section "糸 depth" below).
+ * It reads the app's state and never writes the learner record. Its own three keys in localStorage hold "the line was
+ * dismissed", an unsent note, and "the 糸 depth trial is on". Notes go to the same-origin /__feedback of the Mac prototype's server; where that
  * endpoint is missing the box says so and keeps the text.
  *
  * corridor.js touches this file once (one import beside the app); the single-file build has no such file.
@@ -263,7 +264,7 @@ function render() {
 }
 function mark() { const seal = h('span', 'pl-new', t('新', 'new')); seal.setAttribute('aria-hidden', 'true'); return seal; }
 function renderNew() {
-  body.append(h('p', 'pl-note', t('今日つくられた、またはつながったものです。アプリの中では「新」の印がついています。',
+  body.append(renderTrial(), h('p', 'pl-note', t('今日つくられた、またはつながったものです。アプリの中では「新」の印がついています。',
     'Built or connected today. In the app each one carries the mark.')));
   const list = h('ul', 'pl-list');
   for (const item of NEW) {
@@ -471,6 +472,379 @@ function arrive() {
   }, 250);
 }
 
+// ------------------------------------------------------------------------------------------------- 糸 depth · a trial
+/** 糸 depth (lead, 2026-11-10 evening). Off until its switch in the sheet is on; the switch is kept under ITO_KEY, this
+ * layer's own key. The app is one zoom, from the sky of words down into the inside of a character, and two things make
+ * that felt:
+ *   the light  the look follows the level the app's own trail names: the learner's look down to a sentence, dusk on a
+ *              word, night on a kanji or a part, and the learner's look again on the way up;
+ *   the cord   a red cord down the left edge with one bead per level of that trail. The app's breadcrumb row is hidden
+ *              while the trial is on, and a bead presses that row's own control, so every move is the app's own.
+ * Both are read from the app's trail row (`.scale-thread`, modules/return.mjs). The look is put on the root the way
+ * setKairoTheme puts it, and the learner's saved choice is never written: this file has no write to `kairo-theme`. */
+const ITO_KEY = 'bunki-prototype:ito-depth:v1';
+const CORD_ID = 'bunki-prototype-cord';
+const NIGHT_LOOKS = ['rokusho', 'yoru', 'nami', 'hakuu', 'kaku']; // the app's own night list (setKairoTheme)
+const DUSK = 'iwa', NIGHT = 'yoru', DEEP_NIGHT = 'kaku';
+const KNOT = { sky: '宙', shelf: '棚', room: '間', article: '記', sentence: '文', word: '語', kanji: '字', part: '部', entry: '項' };
+const SVG = 'http://www.w3.org/2000/svg';
+const CORD_EASE = 'cubic-bezier(.2,.8,.2,1)';
+const ito = {
+  on: false,
+  actual: null, // the depth look on the root now; null = the learner's own
+  wanted: null, // the look asked for (a cross-fade puts it on the root one frame later)
+  home: null, // the learner's look as the app set it, held while a depth look stands
+  held: false, // the learner chose a look by hand on this page: the light waits for the next level
+  level: '', sig: '', watch: null, fades: 0, asked: false,
+  stirred: 0, // counts the changes the app makes to the screen: the light waits for a still page
+  fade: null, // the cross-fade on the glass now
+  press: null, // a mouse press that ended a fade: where its click is owed
+  cord: null, thread: null, ghost: null, holes: null, knots: [], length: 0, shape: '',
+};
+const still = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { return false; } };
+
+/** the app's trail row for the screen on the glass; none in a room with its own light (a world's dialog, the writing room) */
+function trailRow() {
+  if (hostDialogs().length || document.querySelector('#stroke-page')) return null;
+  const rows = [...document.querySelectorAll('#sheet > .scale-thread, #app > .scale-thread')].filter((row) => !row.closest('[inert]'));
+  return rows.find((row) => row.parentElement.id === 'sheet') || rows[0] || null;
+}
+function readTrail(row) {
+  return [...row.children].map((node, index) => {
+    const into = node.hasAttribute('data-scale-in'), out = node.hasAttribute('data-scale-out');
+    const label = node.textContent.replace(/\s*›\s*$/, '').trim();
+    return { index, kind: into ? 'in' : out ? 'out' : 'bead', scale: (into ? node.dataset.scaleTarget : node.dataset.scaleBead) || 'entry',
+      current: node.getAttribute('aria-current') === 'step', label, name: node.getAttribute('aria-label') || label,
+      off: node.tagName !== 'BUTTON' || node.disabled };
+  });
+}
+/** the look a level wears, from the learner's own: a night look is already dusk, and its night is the phosphor night */
+function lookFor(scale) {
+  if (!ito.on || ito.held) return null;
+  const home = ito.actual === null ? document.documentElement.getAttribute('data-theme') || 'hokusai' : ito.home.id;
+  const night = NIGHT_LOOKS.includes(home);
+  const look = scale === 'word' ? (night ? home : DUSK) : scale === 'kanji' || scale === 'part' ? (night ? DEEP_NIGHT : NIGHT) : home;
+  return look === home ? null : look;
+}
+/** the phone's own bar follows the frame drawn, as the app's syncThemeColor has it; on a page that frame is the page's bar */
+function paintBarColour() {
+  const meta = document.querySelector('meta[name="theme-color"]');
+  const bar = document.querySelector('#sheet > .sheet-bar') || document.querySelector('#app > .chrome');
+  if (!meta || !bar) return;
+  const raw = getComputedStyle(bar).backgroundColor, nums = raw.match(/-?[0-9.]+/g)?.map(Number) || [];
+  if (nums.length < 3 || (nums.length > 3 && nums[3] === 0)) return;
+  const scale = raw.startsWith('color(') ? 255 : 1;
+  const hex = `#${nums.slice(0, 3).map((n) => Math.round(Math.max(0, Math.min(255, n * scale))).toString(16).padStart(2, '0')).join('')}`;
+  if (meta.getAttribute('content') !== hex) meta.setAttribute('content', hex);
+}
+/** Put a look on the root as setKairoTheme does: the attribute, the colour scheme and its meta. The saved choice is not
+ * touched. The app regrows its paper whenever the body's own ground changes (syncPaper), and that paper is the writing
+ * room's ground; so while a depth look stands the body keeps the learner's ground colour (prototype-layer.css). The body
+ * is under its own ::before layer and under the page, so that colour is never on the glass. */
+function writeLook(look) {
+  if (look === ito.actual) return;
+  const top = document.documentElement, meta = document.querySelector('meta[name="color-scheme"]');
+  if (ito.actual === null) {
+    const theme = top.getAttribute('data-theme');
+    ito.home = { theme, id: theme || 'hokusai', scheme: top.style.colorScheme, meta: meta ? meta.getAttribute('content') : null,
+      ground: getComputedStyle(document.body).backgroundColor };
+  }
+  if (look === null) {
+    if (ito.home.theme === null) top.removeAttribute('data-theme'); else top.setAttribute('data-theme', ito.home.theme);
+    top.style.colorScheme = ito.home.scheme;
+    if (meta && ito.home.meta !== null) meta.setAttribute('content', ito.home.meta);
+    delete top.dataset.plItoLook;
+    top.style.removeProperty('--pl-ito-home-ground');
+  } else {
+    const night = NIGHT_LOOKS.includes(look);
+    top.setAttribute('data-theme', look);
+    top.style.colorScheme = night ? 'dark' : 'light';
+    meta?.setAttribute('content', night ? 'dark' : 'light');
+    top.style.setProperty('--pl-ito-home-ground', ito.home.ground);
+    top.dataset.plItoLook = look;
+  }
+  ito.actual = look;
+  ito.watch?.takeRecords(); // these writes are this layer's own, not the learner's hand
+  paintBarColour();
+}
+/** One change of the whole glass: the browser holds the screen as it stands, the look changes under it, and the two are
+ * cross-faded (the timing is in prototype-layer.css). Nothing is laid out again, so no bar or line can move. The held
+ * picture is a still one, so the fade starts once the arriving page stands still: its headword has landed (the app
+ * flies it home for a third of a second, `.cut-word`) and its late lines are in; anything still moving would stand
+ * double in the fade. With no such transition in the browser, or where the system asks for less motion, the look
+ * changes at once, with the page. */
+function setLook(look) {
+  if (look === ito.wanted) return;
+  ito.wanted = look;
+  if (ito.asked) return; // the fade already asked for puts the newest look on the root
+  if (still() || typeof document.startViewTransition !== 'function' || document.hidden) { writeLook(look); return; }
+  ito.asked = true;
+  const asked = performance.now();
+  let seen = ito.stirred, quiet = 0;
+  const wait = () => {
+    const now = performance.now();
+    if (ito.stirred === seen) quiet += 1; else { seen = ito.stirred; quiet = 0; }
+    if ((quiet >= 2 && now - asked >= 90 && !document.querySelector('.cut-word')) || now - asked > 800) startFade();
+    else requestAnimationFrame(wait);
+  };
+  requestAnimationFrame(wait);
+}
+function startFade() {
+  const top = document.documentElement, look = ito.wanted;
+  if (look === ito.actual || !ito.on && look !== null) { ito.asked = false; return; }
+  const turn = ++ito.fades;
+  top.dataset.plItoFade = '';
+  let fade = null;
+  try { fade = document.startViewTransition(() => { ito.asked = false; writeLook(ito.wanted); }); } catch { fade = null; }
+  if (!fade) { ito.asked = false; writeLook(look); delete top.dataset.plItoFade; return; }
+  ito.fade = fade;
+  const done = () => { if (turn === ito.fades) { delete top.dataset.plItoFade; ito.fade = null; } };
+  fade.finished.then(done, done);
+  fade.ready.catch(() => {}); // skipped by a newer change: the look is on the root all the same
+}
+/** The light never blocks the hand. While the browser holds the glass for a cross-fade the page under it takes no taps
+ * (the app keeps its root out of its own transitions for this reason, rooms/motion.css). So the first touch ends the
+ * fade at once: the look is already on the root, and the tap lands on the page. A mouse press is the one case where the
+ * browser has by then given the press to the root; its click is handed to the thing under the pointer. */
+function onFadePress(event) {
+  if (!ito.fade) return;
+  ito.fade.skipTransition();
+  ito.press = event.pointerType === 'mouse' && event.button === 0 ? { x: event.clientX, y: event.clientY, at: performance.now() } : null;
+}
+function onFadeClick(event) {
+  const press = ito.press;
+  ito.press = null;
+  if (!press || event.target !== document.documentElement || !event.isTrusted || performance.now() - press.at > 900 ||
+      Math.hypot(event.clientX - press.x, event.clientY - press.y) > 6) return;
+  const under = document.elementFromPoint(event.clientX, event.clientY);
+  if (!under || under === document.documentElement) return;
+  under.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, composed: true, view: window, detail: 1,
+    clientX: event.clientX, clientY: event.clientY, screenX: event.screenX, screenY: event.screenY, button: 0 }));
+}
+/** the learner's hand: a look chosen in the app while a depth look stands is theirs, and stays until the next level */
+function onRootLook() {
+  const now = document.documentElement.getAttribute('data-theme');
+  if (ito.actual === null || now === ito.actual) return;
+  const top = document.documentElement;
+  delete top.dataset.plItoLook;
+  top.style.removeProperty('--pl-ito-home-ground');
+  ito.actual = null; ito.wanted = null; ito.home = null; ito.held = true;
+}
+
+// the cord: where each bead stands, and the thread through them
+function cordShape(count) {
+  const wide = innerWidth >= 1100;
+  const base = wide ? { wide, cx: 23, first: 54, step: 58, sway: 2.4, waves: 1, ring: 5.5, now: 7.5 }
+    : { wide, cx: 8, first: 30, step: 40, sway: 1.2, waves: 1, ring: 3.5, now: 5 };
+  // the thread comes out from under the top bar; on the sky, which has no bar, from above the glass
+  base.from = document.body.dataset.view === 'drift' && !document.querySelector('#sheet') ? -64 : 0;
+  const room = innerHeight - 45 - base.first - (wide ? 56 : 156);
+  base.step = Math.max(26, Math.min(base.step, Math.floor(room / Math.max(1, count - 0.4))));
+  return base;
+}
+const knotY = (shape, index) => shape.first + index * shape.step;
+/** the thread from its start down to `to`, swaying, and through the middle of every bead; its length comes back with it */
+function threadPath(shape, to) {
+  const x = (y) => shape.cx + shape.sway * Math.sin((Math.PI * shape.waves * (y - shape.first)) / shape.step);
+  let d = '', length = 0, px = 0, py = 0;
+  for (let y = shape.from; ; y = Math.min(y + 2, to)) {
+    const nx = Math.round(x(y) * 100) / 100;
+    if (d) length += Math.hypot(nx - px, y - py);
+    d += `${d ? 'L' : 'M'}${nx} ${y}`;
+    px = nx; py = y;
+    if (y >= to) break;
+  }
+  return { d, length };
+}
+function buildCord() {
+  const cord = h('div'); // a plain box with the navigation role: no rule the app has for <nav> reaches it
+  cord.id = CORD_ID;
+  cord.setAttribute('role', 'navigation');
+  const svg = document.createElementNS(SVG, 'svg');
+  svg.setAttribute('aria-hidden', 'true'); svg.setAttribute('focusable', 'false');
+  const defs = document.createElementNS(SVG, 'defs'), mask = document.createElementNS(SVG, 'mask');
+  mask.id = 'pl-cord-holes'; mask.setAttribute('maskUnits', 'userSpaceOnUse');
+  for (const [name, value] of [['x', '-40'], ['y', '-80'], ['width', '160'], ['height', '4000']]) mask.setAttribute(name, value);
+  defs.append(mask);
+  ito.holes = mask;
+  ito.thread = document.createElementNS(SVG, 'path');
+  ito.thread.setAttribute('class', 'pl-cord-thread'); ito.thread.setAttribute('mask', 'url(#pl-cord-holes)');
+  ito.ghost = document.createElementNS(SVG, 'path');
+  ito.ghost.setAttribute('class', 'pl-cord-ghost');
+  svg.append(defs, ito.thread, ito.ghost);
+  cord.append(svg);
+  cord.addEventListener('keydown', onCordKey);
+  ito.cord = cord; ito.knots = []; ito.length = 0; ito.shape = '';
+  root.prepend(cord);
+}
+/** The cord stands where the row it carries stands: right after that row, in the page or the room. So it is on the same
+ * keyboard ring as the row was (a page keeps Tab inside itself), and it leaves with its screen. With no trail it waits
+ * in this layer's root. */
+function placeCord(row) {
+  const cord = ito.cord;
+  if (!cord) return;
+  if (!row) { if (cord.parentElement !== root) root.prepend(cord); return; }
+  if (cord.previousElementSibling !== row) row.after(cord);
+  // the app's one-live-layer law marks everything beside an open page; the cord has by now moved into that page
+  if (cord.inert) cord.inert = false;
+  if (cord.hasAttribute('aria-hidden')) cord.removeAttribute('aria-hidden');
+}
+function dropCord() {
+  ito.cord?.remove();
+  ito.cord = ito.thread = ito.ghost = ito.holes = null; ito.knots = []; ito.length = 0; ito.shape = '';
+}
+function drawCord(trail) {
+  if (!trail.length) { if (ito.cord) ito.cord.hidden = true; return; }
+  if (!ito.cord) buildCord();
+  const cord = ito.cord, fresh = cord.hidden || !ito.knots.length, shape = cordShape(trail.length);
+  const key = `${shape.wide}:${shape.step}:${shape.from}`, moved = key !== ito.shape, calm = still() || fresh || moved;
+  ito.shape = key;
+  cord.hidden = false;
+  cord.dataset.plCord = shape.wide ? 'wide' : 'slim';
+  cord.setAttribute('aria-label', t('ことばの道すじ', 'The way through the text'));
+  cord.style.setProperty('--pl-cord-step', `${shape.step}px`);
+  cord.style.height = `${knotY(shape, trail.length - 1) + shape.step}px`;
+
+  // the beads: one per place on the trail, kept by its place so a bead that stays never moves
+  for (const [index, bead] of trail.entries()) {
+    let knot = ito.knots[index];
+    if (!knot) {
+      knot = button('pl-knot', '', (event) => pressKnot(index, event));
+      knot.append(h('span', 'pl-knot-k'), h('span', 'pl-knot-o'), h('span', 'pl-knot-tip'));
+      knot.dataset.plKnotAt = String(index);
+      ito.knots[index] = knot;
+      cord.append(knot);
+      if (!calm) knot.animate([{ opacity: 0, transform: 'translateY(-12px)' }, { opacity: 1, transform: 'none' }], { duration: 460, easing: CORD_EASE });
+    }
+    const glyph = (bead.scale === 'kanji' || bead.scale === 'part') && [...bead.label].length === 1 ? bead.label : KNOT[bead.scale] || KNOT.entry;
+    knot.dataset.plKnot = bead.kind === 'in' ? 'in' : bead.current ? 'now' : 'bead';
+    knot.dataset.plScale = bead.scale;
+    knot.style.top = `${knotY(shape, index)}px`;
+    knot.children[0].textContent = glyph;
+    knot.children[2].textContent = bead.kind === 'bead' ? bead.label : bead.name;
+    knot.setAttribute('aria-label', bead.name);
+    if (bead.current) knot.setAttribute('aria-current', 'step'); else knot.removeAttribute('aria-current');
+    // the bead of the place the learner stands at goes nowhere; the app's own row draws it as text, not as a control
+    knot.disabled = bead.off && !bead.current;
+    if (bead.current && bead.off) knot.setAttribute('aria-disabled', 'true'); else knot.removeAttribute('aria-disabled');
+  }
+  for (const knot of ito.knots.splice(trail.length)) {
+    if (calm) { knot.remove(); continue; }
+    knot.disabled = true;
+    knot.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 180, easing: 'ease-out' }).finished.then(() => knot.remove(), () => knot.remove());
+  }
+
+  // the thread ends in the bead of this place; past it, a dotted way further in where the app offers one
+  const at = Math.max(0, trail.findIndex((bead) => bead.current));
+  const end = knotY(shape, at), next = trail.find((bead) => bead.kind === 'in');
+  const path = threadPath(shape, end), before = ito.length;
+  // the thread does not cross the inside of a ring, nor (on the wide cord) the mark that stands over each bead
+  const cut = (tag, values) => { const node = document.createElementNS(SVG, tag); for (const [name, value] of Object.entries(values)) node.setAttribute(name, String(value)); return node; };
+  ito.holes.replaceChildren(cut('rect', { x: -40, y: -80, width: 160, height: 4000, fill: '#fff' }));
+  for (const [index, bead] of trail.entries()) {
+    const y = knotY(shape, index);
+    if (!bead.current) ito.holes.append(cut('circle', { cx: shape.cx, cy: y, r: bead.kind === 'in' ? shape.ring - 1 : shape.ring, fill: '#000' }));
+    if (shape.wide && bead.kind !== 'in') ito.holes.append(cut('rect', { x: shape.cx - 9, y: y - shape.now - 21, width: 18, height: 17, fill: '#000' }));
+  }
+  for (const running of ito.thread.getAnimations()) running.cancel();
+  const settle = () => {
+    ito.thread.setAttribute('d', path.d);
+    ito.thread.style.strokeDasharray = `${path.length} ${path.length}`;
+  };
+  if (calm || !before || Math.abs(path.length - before) < 1) settle();
+  else if (path.length > before) {
+    settle();
+    ito.thread.animate([{ strokeDashoffset: path.length - before }, { strokeDashoffset: 0 }], { duration: 520, easing: CORD_EASE });
+  } else {
+    // drawn back up along the thread that was there, then cut to the shorter one
+    const gone = before - path.length;
+    ito.thread.animate([{ strokeDashoffset: 0 }, { strokeDashoffset: gone }], { duration: 380, easing: CORD_EASE }).finished.then(settle, () => {});
+  }
+  ito.length = path.length;
+  const tail = next ? knotY(shape, next.index) - (shape.ring - 1) - 3 : trail[at].scale === 'part' ? 0 : end + shape.now + 3 + shape.step * 0.55;
+  ito.ghost.setAttribute('d', tail ? `M${shape.cx} ${end + shape.now + 4}L${shape.cx} ${tail}` : '');
+  if (!calm && tail) ito.ghost.animate([{ opacity: 0 }, { opacity: 0.5 }], { duration: 520, easing: 'ease-out' });
+}
+/** a bead pressed: the app's own control in its own row does the moving */
+function pressKnot(index, event) {
+  const row = trailRow(), control = row?.children[index];
+  if (!control || control.tagName !== 'BUTTON' || control.disabled) return;
+  const byKey = event.detail === 0;
+  control.click();
+  syncIto();
+  // the app hands the keyboard to its row, which is not on the glass now: the cord takes it
+  if (byKey) (ito.knots.find((knot) => knot.dataset.plKnot === 'in' && !knot.disabled) || ito.knots.filter((knot) => !knot.disabled && knot.dataset.plKnot === 'bead').at(-1))?.focus({ preventScroll: true });
+}
+function onCordKey(event) {
+  const step = { ArrowDown: 1, ArrowUp: -1, Home: -Infinity, End: Infinity }[event.key];
+  if (!step) return;
+  const open = ito.knots.filter((knot) => !knot.disabled && knot.isConnected);
+  const from = open.indexOf(document.activeElement);
+  if (from < 0 || !open.length) return;
+  event.preventDefault();
+  event.stopPropagation();
+  open[Math.max(0, Math.min(open.length - 1, from + step))].focus({ preventScroll: true });
+}
+
+/** the level on the glass now: its beads on the cord, its look on the root */
+function syncIto(redraw = false, records = null) {
+  if (!ito.on) return;
+  // the app's own changes to the screen (this layer's root and the cord's inside are not the app's)
+  if (records?.some((record) => !root.contains(record.target) && !ito.cord?.contains(record.target))) ito.stirred += 1;
+  const row = trailRow(), trail = row ? readTrail(row) : [];
+  const scale = row?.dataset.scale || '';
+  const level = `${scale}|${trail.map((bead) => `${bead.kind}:${bead.scale}:${bead.label}`).join('|')}`;
+  const sig = `${level}|${trail.map((bead) => `${bead.current ? 1 : 0}${bead.off ? 1 : 0}`).join('')}|${lang()}`;
+  if (level !== ito.level) { ito.level = level; ito.held = false; }
+  if (redraw || sig !== ito.sig) { ito.sig = sig; drawCord(trail); }
+  placeCord(trail.length ? row : null);
+  setLook(lookFor(scale));
+}
+function setIto(on) {
+  const top = document.documentElement;
+  ito.on = !!on;
+  write(ITO_KEY, ito.on ? '1' : null);
+  if (ito.on) {
+    top.dataset.plIto = 'on';
+    if (!ito.watch) {
+      ito.watch = new MutationObserver(onRootLook);
+      ito.watch.observe(top, { attributes: true, attributeFilter: ['data-theme'] });
+      window.addEventListener('pointerdown', onFadePress, { capture: true, passive: true });
+      window.addEventListener('click', onFadeClick, true);
+    }
+    ito.sig = ''; ito.level = '';
+    syncIto();
+  } else {
+    setLook(null);
+    ito.watch?.disconnect(); ito.watch = null;
+    window.removeEventListener('pointerdown', onFadePress, { capture: true });
+    window.removeEventListener('click', onFadeClick, true);
+    dropCord();
+    delete top.dataset.plIto;
+    ito.held = false; ito.sig = ''; ito.level = '';
+  }
+  const control = sheet?.querySelector('#pl-ito-switch');
+  if (control) control.setAttribute('aria-checked', String(ito.on));
+}
+/** the switch, at the head of "New in this build" */
+function renderTrial() {
+  const row = h('div', 'pl-trial');
+  const text = h('div', 'pl-item-text');
+  const name = h('p', 'pl-item-name', t('糸 深さ · 試し', '糸 Depth · trial'));
+  name.id = 'pl-ito-name';
+  name.append(mark());
+  text.append(name, h('p', 'pl-item-line', t('深くもぐるほど光が変わります。ことばで夕暮れ、字の中で夜。左の赤い糸が道すじです。',
+    'The light follows how deep you are: dusk on a word, night inside a character. The red cord on the left is the way back up.')));
+  const control = button('pl-switch', '', () => setIto(!ito.on));
+  control.id = 'pl-ito-switch';
+  control.setAttribute('role', 'switch');
+  control.setAttribute('aria-checked', String(ito.on));
+  control.setAttribute('aria-labelledby', 'pl-ito-name');
+  control.append(h('span', 'pl-switch-dot'));
+  row.append(text, control);
+  return row;
+}
+
 function build() {
   root = h('div');
   root.id = ROOT_ID;
@@ -539,12 +913,15 @@ export function installPrototypeLayer(options) {
   document.documentElement.dataset.prototype = 'everything-on';
   build();
   let spoken = lang();
-  new MutationObserver(() => {
+  new MutationObserver((records) => {
     if (lang() !== spoken) { spoken = lang(); paintWords(); if (sheet.open) render(); }
     schedule();
+    syncIto(false, records);
   }).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['open', 'inert', 'data-view', 'data-lang'] });
   window.addEventListener('resize', schedule);
+  window.addEventListener('resize', () => syncIto(true));
   startPolling();
   keepReachable();
+  if (read(ITO_KEY) === '1') setIto(true);
   arrive();
 }
