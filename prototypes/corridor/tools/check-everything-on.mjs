@@ -90,11 +90,8 @@ async function searchOpen(page, query, rowText) {
   await page.locator('#sheet').waitFor();
   await page.waitForTimeout(900);
 }
-/** 職業 as it stands in the essay: the word's box, then its page */
+/** 職業 as it stands in the essay the door opened: the word's box, then its page */
 async function quesWordFromReader(page) {
-  const card = page.locator('.shelf-item[data-passage="bunki-essay-n1-city"] .shelf-open').first();
-  await card.scrollIntoViewIfNeeded();
-  await card.click();
   await page.waitForFunction(() => document.body.dataset.view === 'reader', null, { timeout: 30000 });
   await page.locator('.reader .tok.content').first().waitFor();
   // a fresh record gets the app's one-time demonstration: the first word's box opens by itself
@@ -163,7 +160,9 @@ await check('doors-page', 'the doors page is served, reads at phone width, and e
 
 await door('quests', 'from the reader, 職業 offers the course, its rooms and a quest; the quest starts; from search it offers the course', async ({ page }) => {
   const label = await throughDoor(page, 'quests');
-  must(await view(page) === 'shelf', `the door opened "${await view(page)}", not the bookshelf`);
+  must(await view(page) === 'reader', `the door opened "${await view(page)}", not the essay`);
+  const essay = await text(page, '.reader', 60);
+  must(/都市の匿名性と言語/.test(await text(page, '#app', 3000)), `the door did not open the essay 都市の匿名性と言語: ${essay}`);
   const taps = await quesWordFromReader(page);
   const doors = await doorTexts(page);
   must(doors['kanji-course-unit-door'] && doors['kanji-room-door'] && doors['kanji-quest-door'], `doors on the word page: ${JSON.stringify(doors)}`);
@@ -186,7 +185,7 @@ await door('quests', 'from the reader, 職業 offers the course, its rooms and a
   must(/0 of 3 words done/.test(quest) && /End this quest/.test(quest), `the quest page reads: ${quest.slice(0, 200)}`);
   await shot(page, 'quests-started');
   // the quest is in the learner record: after a reload the same word offers to resume it, and Lessons lists it
-  await page.goto(`${BASE}?entry=shelf`, { waitUntil: 'load' }); await ready(page);
+  await page.goto(`${BASE}?read=bunki-essay-n1-city`, { waitUntil: 'load' }); await ready(page);
   await quesWordFromReader(page);
   const resumed = (await doorTexts(page))['kanji-quest-door'] || '';
   must(/Resume this quest/.test(resumed), `after a reload the quest door reads "${resumed}"`);
@@ -201,7 +200,7 @@ await door('quests', 'from the reader, 職業 offers the course, its rooms and a
   const fromSearch = await doorTexts(page);
   must(fromSearch['kanji-course-unit-door'] && fromSearch['kanji-room-door'], `doors from search: ${JSON.stringify(fromSearch)}`);
   must(fromSearch['kanji-quest-door'] === null, 'a page with no sentence offered a quest');
-  return `"${label}" → the essay → 職業 (${taps} taps) → "${doors['kanji-course-unit-door']}", "${doors['kanji-room-door']}", "${doors['kanji-quest-door']}" → Start quest (${presses} press${presses > 1 ? 'es' : ''}) → "0 of 3 words done"; after a reload "${resumed}" and Lessons shows "${lessons.slice(0, 40)}"; from search: the course and rooms doors, no quest`;
+  return `"${label}" → 都市の匿名性と言語 → 職業 (${taps} taps) → "${doors['kanji-course-unit-door']}", "${doors['kanji-room-door']}", "${doors['kanji-quest-door']}" → Start quest (${presses} press${presses > 1 ? 'es' : ''}) → "0 of 3 words done"; after a reload "${resumed}" and Lessons shows "${lessons.slice(0, 40)}"; from search: the course and rooms doors, no quest`;
 });
 
 for (const [name, deck] of [['shared-n2', 'n2'], ['shared-n1', 'n1'], ['shared-senmon', 'senmon'], ['shared-kotoba-master', 'kotoba-master'], ['shared-grammar', 'shared-grammar']]) {
@@ -252,7 +251,8 @@ await door('variants', 'the comparison strip shows', async ({ page }) => {
 await door('writing-room', 'the writing room opens with its full controls', async ({ page }) => {
   const label = await throughDoor(page, 'writing-room');
   must(await view(page) === 'search', `the door opened "${await view(page)}"`);
-  await searchOpen(page, '門', 'モン');
+  await page.locator('#sheet').waitFor();
+  must(/門/.test(await text(page, '#sheet', 80)), `the door did not open 門's page: ${await text(page, '#sheet', 80)}`);
   const box = page.locator('#sheet .stroke-door').first();
   await box.scrollIntoViewIfNeeded();
   await box.click();
@@ -263,40 +263,46 @@ await door('writing-room', 'the writing room opens with its full controls', asyn
   const room = await text(page, '[data-minimal]', 300);
   must(/strokes/.test(room), `the room shows no stroke counter: ${room.slice(0, 160)}`);
   await shot(page, 'writing-room');
-  return `"${label}" → 門 → its stroke-order box → "${room.slice(0, 110)}"`;
+  return `"${label}" → 門's page → its stroke-order box → "${room.slice(0, 110)}"`;
 });
 
-await door('rajomon', 'Rajōmon opens from 門 and from a kanji that holds 門; a kanji without the gate has no door', async ({ page }) => {
-  const label = await throughDoor(page, 'rajomon');
-  const visit = async (kanji, row, shotName) => {
-    await searchOpen(page, kanji, row);
-    const world = page.locator('#kanji-world-door');
-    await world.waitFor();
-    const words = (await world.innerText()).trim();
-    must(/preview/.test(words), `the Rajōmon door on ${kanji} reads "${words}"`);
-    await world.scrollIntoViewIfNeeded();
-    await world.click();
-    await page.locator('.kw-encounter').waitFor();
-    await page.locator('.kw-image').evaluate((image) => image.decode()).catch(() => {});
-    const first = await text(page, '.kw-encounter', 140);
-    await shot(page, shotName);
-    await page.locator('[data-kw-action="next"]').click();
-    await page.waitForTimeout(500);
-    const glyph = (await page.locator('.kw-glyph').innerText()).trim();
-    must(glyph === '門', `from ${kanji} the second step shows "${glyph}", not 門`);
-    return { words, first };
-  };
-  const own = await visit('門', 'モン', 'rajomon');
-  // one of the five kanji that hold the gate: its door names whose scene it is
-  await page.goto(`${BASE}?room=search`, { waitUntil: 'load' }); await ready(page);
-  const held = await visit('間', 'カン', 'rajomon-from-ma');
-  must(/門/.test(held.words) && /間/.test(held.words), `the door on 間 does not name the gate inside it: "${held.words}"`);
-  // a kanji with no gate: no door
-  await page.goto(`${BASE}?room=search`, { waitUntil: 'load' }); await ready(page);
-  await searchOpen(page, '職', 'ショク');
+/** a Rajōmon door on the doors page: the kanji's page opens, its door says preview, the scene opens and teaches 門 */
+async function rajomonFrom(page, doorName, kanji) {
+  const label = await throughDoor(page, doorName);
+  must(await view(page) === 'search', `the door opened "${await view(page)}"`);
+  await page.locator('#sheet').waitFor();
+  must((await text(page, '#sheet', 80)).includes(kanji), `the door did not open ${kanji}'s page: ${await text(page, '#sheet', 80)}`);
+  const world = page.locator('#kanji-world-door');
+  await world.waitFor();
+  const words = (await world.innerText()).trim();
+  must(/preview/.test(words), `the Rajōmon door on ${kanji} reads "${words}"`);
+  if (kanji !== '門') must(words.includes('門') && words.includes(kanji), `the door on ${kanji} does not name the gate inside it: "${words}"`);
+  await world.scrollIntoViewIfNeeded();
+  await world.click();
+  await page.locator('.kw-encounter').waitFor();
+  await page.locator('.kw-image').evaluate((image) => image.decode()).catch(() => {});
+  const first = await text(page, '.kw-encounter', 140);
+  await shot(page, doorName);
+  await page.locator('[data-kw-action="next"]').click();
+  await page.waitForTimeout(500);
+  const glyph = (await page.locator('.kw-glyph').innerText()).trim();
+  must(glyph === '門', `from ${kanji} the second step shows "${glyph}", not 門`);
+  return { label, words, first };
+}
+await door('rajomon', 'Rajōmon opens from the 門 page; a kanji without the gate has no door', async ({ page }) => {
+  const own = await rajomonFrom(page, 'rajomon', '門');
+  await page.goto(`${BASE}?room=search&kanji=${encodeURIComponent('職')}`, { waitUntil: 'load' }); await ready(page);
+  await page.locator('#sheet').waitFor();
+  await page.waitForTimeout(1500);
   must(await page.locator('#kanji-world-door').count() === 0, 'the 職 page has a Rajōmon door');
-  return `"${label}" → 門 → "${own.words}" → "${own.first.slice(0, 90)}"; 間 → "${held.words}" → the same scene, step two shows 門; 職 has no door`;
+  return `"${own.label}" → "${own.words}" → "${own.first.slice(0, 100)}"; step two shows 門; 職 has no door`;
 });
+for (const [name, kanji] of [['rajomon-ma', '間'], ['rajomon-bun', '聞'], ['rajomon-mon', '問'], ['rajomon-kai', '開'], ['rajomon-hei', '閉']]) {
+  await door(name, `Rajōmon opens from ${kanji}, named as the 門 inside it`, async ({ page }) => {
+    const held = await rajomonFrom(page, name, kanji);
+    return `"${held.label}" → "${held.words}" → 門's scene; step two shows 門`;
+  });
+}
 
 await door('moments', 'guided practice shows its moments, style and sound choices', async ({ page }) => {
   const label = await throughDoor(page, 'moments');

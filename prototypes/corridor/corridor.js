@@ -4548,8 +4548,16 @@ async function boot() {
   await installDriftRecord();
   S.ready = true;
   const retryRouteRendered = restoreRetryRoute();
+  // everything-on prototype: the doors page (prototype.html) opens one article or one kanji page by address, so that a door
+  // is one tap. ?read=<article id> is the call the retry route makes; ?kanji=<character> opens that page over the room the
+  // address chose. An unknown id or character, or a pending retry route, leaves the address without effect
+  const readDoor = retryRouteRendered ? null : params.get('read');
+  const readRendered = !!readDoor && D.passages.some((row) => row.id === readDoor);
+  if (readRendered) withoutRoomTransition(() => openPassage(readDoor));
   document.body.dataset.ready = '1';
-  if (!retryRouteRendered) render();
+  if (!retryRouteRendered && !readRendered) render();
+  const kanjiDoor = retryRouteRendered || readRendered ? null : params.get('kanji');
+  if (kanjiDoor && Object.hasOwn(D.kanji, kanjiDoor)) go({ t: 'kanji', id: kanjiDoor }, { instant: true });
   prefetchArticles();
 }
 
