@@ -2271,13 +2271,13 @@ body .sheet .hero-meta { min-width: 0; }
  * strength in the lists below; the builder's sources wait in one closed disclosure at the foot of the page */
 body .sheet .entry-facts { display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px; margin: 0; font: 500 var(--type-label)/1.4 var(--sans); color: var(--text-2); }
 /* a fact that goes somewhere reads as linked text (a dotted rule under it); its 32px line keeps a 44px target */
-body .sheet .entry-facts :is(.cat-chip, .kanji-fact) {
+body .sheet .entry-facts :is(button.pool-tag.cat-chip, button.kanji-fact) {
   position: relative; display: inline-flex; align-items: center; min-height: 32px; padding: 0; border: 0; border-radius: 0;
   background: none; box-shadow: none; color: var(--text); font: inherit; letter-spacing: 0; white-space: nowrap; cursor: pointer;
   text-decoration: underline dotted 1px color-mix(in srgb, currentColor 45%, transparent); text-underline-offset: 0.32em;
 }
-body .sheet .entry-facts :is(.cat-chip, .kanji-fact)::before { content: ''; position: absolute; inset: -6px -3px; }
-body .sheet .entry-facts :is(.cat-chip, .kanji-fact):hover { background: none; color: var(--ai); text-decoration-color: currentColor; }
+body .sheet .entry-facts :is(button.pool-tag.cat-chip, button.kanji-fact)::before { content: ''; position: absolute; inset: -6px -3px; }
+body .sheet .entry-facts :is(button.pool-tag.cat-chip, button.kanji-fact):hover { background: none; color: var(--ai); text-decoration-color: currentColor; }
 /* with the radical row folded into the facts line, the readings' rule is the one rule above the next section */
 body .sheet .kv + .eyebrow { margin-top: 0; border-top: 0; }
 /* the Kodansha lens: each neighbour carries its number, as the book's own index does */
