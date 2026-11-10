@@ -8,7 +8,6 @@ import {
   operationReference,
   parseActorIdentity,
   parseSyncBinding,
-  parseAnySyncOperation as parseSyncOperation,
   planReceive,
   SYNC_SCHEMA_VERSION,
   type ActorIdentity,
@@ -21,7 +20,10 @@ import {
 
 import { planJournalRestore, prepareRestoreRequest } from './backup.ts';
 import { ReplicationStoreError } from './errors.ts';
-import { assertCounter, assertLocalKey, encodeLocalJson, readLocalJson } from './json.ts';
+import { assertCounter, assertLocalKey, encodeLocalJson } from './json.ts';
+import { LocalJsonReadCache } from './read-cache.ts';
+import { ReplicaReadCache } from './replica-read-cache.ts';
+import { viewOf } from './replica-view.ts';
 import type {
   DurableCommitReceipt,
   LocalCommit,
@@ -112,14 +114,7 @@ function assertKeys(value: unknown, keys: readonly string[]): void {
 function id(...parts: string[]): string {
   return JSON.stringify(parts);
 }
-function viewOf(replica: SyncReplica) {
-  return encodeLocalJson({
-    ready: replica.ready,
-    pending: replica.pending,
-    quarantined: replica.quarantined,
-    projection: replica.projection,
-  });
-}
+
 function refEqual(a: OperationRef, b: OperationRef): boolean {
   return a.opId === b.opId && a.sha256 === b.sha256;
 }
@@ -131,6 +126,7 @@ class Rows {
     readonly scope: Scope,
     readonly store: IDBObjectStore,
     raw: readonly StoredRow[],
+    cache: LocalJsonReadCache,
   ) {
     try {
       for (const row of raw) {
@@ -145,7 +141,7 @@ class Rows {
           throw new ReplicationStoreError('corrupt-store');
         const table = this.#rows.get(row.kind);
         if (!table || table.has(row.id)) throw new ReplicationStoreError('corrupt-store');
-        table.set(row.id, readLocalJson(row.text, row.sha256));
+        table.set(row.id, cache.read(id(row.kind, row.id), row.text, row.sha256));
       }
     } catch {
       throw new ReplicationStoreError('corrupt-store');
@@ -190,6 +186,8 @@ export class IndexedDbReplicationStore implements ReplicationStore {
   readonly #actor: ActorIdentity;
   readonly #scope: Scope;
   readonly #active = new Set<Promise<unknown>>();
+  readonly #readCache = new LocalJsonReadCache();
+  readonly #replicaCache = new ReplicaReadCache();
   #closed = false;
 
   private constructor(db: IDBDatabase, policy: ReplicaPolicy, actor: ActorIdentity) {
@@ -399,7 +397,9 @@ export class IndexedDbReplicationStore implements ReplicationStore {
                 encodeLocalJson({ id: 'schema', format: SCHEMA, v: VERSION }).text
             )
               throw new ReplicationStoreError('unsupported-schema');
-            result = body(new Rows(this.#scope, table, stored.result as StoredRow[]));
+            result = body(
+              new Rows(this.#scope, table, stored.result as StoredRow[], this.#readCache),
+            );
             ready = true;
           } catch (error) {
             abort(error);
@@ -434,21 +434,13 @@ export class IndexedDbReplicationStore implements ReplicationStore {
 
   #load(rows: Rows): Current {
     const profile = this.#readPolicy(rows);
-    let replica = createReplica(profile.policy);
-    const operations = rows.all<SyncOperation>('operation').map(([key, raw]) => {
-      try {
-        const operation = parseSyncOperation(raw);
-        if (operation.opId !== key) throw new ReplicationStoreError('corrupt-store');
-        return operation;
-      } catch {
-        throw new ReplicationStoreError('corrupt-store');
-      }
-    });
-    for (let start = 0; start < operations.length; start += 1000)
-      replica = planReceive(replica, {
-        binding: profile.policy.binding,
-        operations: operations.slice(start, start + 1000),
-      }).next;
+    let checked: ReturnType<ReplicaReadCache['read']>;
+    try {
+      checked = this.#replicaCache.read(profile.policy, rows.all<SyncOperation>('operation'));
+    } catch {
+      throw new ReplicationStoreError('corrupt-store');
+    }
+    const { replica, operations } = checked;
     if (encodeLocalJson(profile.view).text !== viewOf(replica).text)
       throw new ReplicationStoreError('corrupt-store');
     const byId = new Map(operations.map((operation) => [operation.opId, operation]));
@@ -890,5 +882,7 @@ export class IndexedDbReplicationStore implements ReplicationStore {
     this.#closed = true;
     this.#db.close();
     await Promise.allSettled([...this.#active]);
+    this.#readCache.clear();
+    this.#replicaCache.clear();
   }
 }

@@ -45,8 +45,10 @@ const functions = new Set(['GRAMMARS', 'mergeGrammar', 'buildSearchIndex', 'sear
   'searchRowShownByCore', 'dictionaryHomographChoices', 'dictionaryRowsForForm']);
 // introduced by that D23 change: required of the candidate, absent from an older --baseline-site source
 const sinceD23 = new Set(['searchRowShownByCore', 'dictionaryHomographChoices']);
+// The speed pass's scheduler reads composition state even before choosing its search lane.
+const sinceBackendPerformance = new Set(['dictionaryComposing']);
 const variables = new Set(['GRAMMAR', 'PARTICLES', 'searchIndex', 'KATA_TO_HIRA_OFFSET', 'ROMAJI', 'GLOSS_MESSY', 'GLOSS_LEAD', 'JLPT_RANK', 'jlptRank',
-  'GODAN_ROW', 'INFLECTION_ROWS', 'INFLECTION_RULES']);
+  'GODAN_ROW', 'INFLECTION_ROWS', 'INFLECTION_RULES', 'dictionaryComposing']);
 function extract(source, baseline = false) {
   const ast = parse(source, { ecmaVersion: 'latest', sourceType: 'module', locations: true });
   const selected = [], found = new Set();
@@ -59,7 +61,7 @@ function extract(source, baseline = false) {
       }
     }
   }
-  for (const name of [...functions, ...variables]) assert.ok(found.has(name) || (baseline && sinceD23.has(name)), `Missing actual source binding ${name}`);
+  for (const name of [...functions, ...variables]) assert.ok(found.has(name) || (baseline && (sinceD23.has(name) || sinceBackendPerformance.has(name))), `Missing actual source binding ${name}`);
   return selected;
 }
 const words = readJson(site, 'data/share_alike/words.json').words, dict = readJson(site, 'data/share_alike/dict.json').words;

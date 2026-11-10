@@ -471,7 +471,16 @@ describe('transactional replication store — real file-backed node:sqlite (ci-s
   it('fails closed on corrupted document bytes instead of returning an apparently valid local snapshot', async () => {
     const { store, driver } = open();
     await store.commitLocal(local());
+    await store.snapshot(); // Warm the exact-byte decode cache before the out-of-band edit.
     driver.run('UPDATE kairo_replication_documents SET payload = ?', ['{"changed":"bytes"}']);
+    await expect(store.snapshot()).rejects.toMatchObject({ code: 'corrupt-store' });
+  });
+
+  it('checks operation metadata on disk even when the journal bytes were already admitted', async () => {
+    const { store, driver } = open();
+    await store.commitLocal(local());
+    await store.snapshot();
+    driver.run('UPDATE kairo_replication_operations SET sequence = sequence + 1');
     await expect(store.snapshot()).rejects.toMatchObject({ code: 'corrupt-store' });
   });
 

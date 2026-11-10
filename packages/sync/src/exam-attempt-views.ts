@@ -1,4 +1,5 @@
 import { immutable, SyncValidationError } from './common.ts';
+import { viewOperationIndex } from './view-index.ts';
 import type { OperationRef, RecordOperation } from './operations.ts';
 import { planReceive, type EntityProjection, type SyncReplica } from './replica.ts';
 
@@ -21,9 +22,11 @@ export interface ExamAttemptView {
   readonly projection: EntityProjection;
 }
 
+const viewCache = new WeakMap<SyncReplica, readonly ExamAttemptView[]>();
+
 /**
  * Read response history from a planner-owned in-process replica. An empty
- * receive validates the handle and derives the complete journal projection;
+ * receive validates the handle before reusing its immutable journal projection;
  * pending and quarantined operations cannot supply visible response content.
  * Serialized replicas must first be rebuilt through the existing planner.
  * No full attempt, question body, score, editorial admission, mastery or schedule
@@ -38,7 +41,9 @@ export function readExamAttemptViews(replica: SyncReplica): readonly ExamAttempt
     },
     operations: [],
   }).next;
-  const operations = new Map(checked.operations.map((operation) => [operation.opId, operation]));
+  const cached = viewCache.get(checked);
+  if (cached) return cached;
+  const operations = viewOperationIndex(checked);
   const views: ExamAttemptView[] = [];
   for (const projection of checked.projection.entities) {
     if (projection.target.kind !== 'exam-attempt') continue;
@@ -73,5 +78,7 @@ export function readExamAttemptViews(replica: SyncReplica): readonly ExamAttempt
       projection,
     });
   }
-  return immutable(views);
+  const result = immutable(views);
+  viewCache.set(checked, result);
+  return result;
 }

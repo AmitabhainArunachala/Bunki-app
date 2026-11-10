@@ -1,4 +1,5 @@
 import { immutable, SyncValidationError } from './common.ts';
+import { viewOperationIndex } from './view-index.ts';
 import type { OperationRef, RecordOperation } from './operations.ts';
 import { planReceive, type EntityProjection, type SyncReplica } from './replica.ts';
 
@@ -20,10 +21,11 @@ export interface ReadingView {
   readonly projection: EntityProjection;
 }
 
+const viewCache = new WeakMap<SyncReplica, readonly ReadingView[]>();
+
 /**
  * Read reading positions from a planner-owned in-process replica handle.
- * An empty receive validates the handle and derives the complete projection from
- * its journal. Serialized replicas must first be rebuilt through the core planner.
+ * An empty receive validates the handle before reusing its immutable journal projection. Serialized replicas must first be rebuilt through the core planner.
  * Pending and quarantined operations cannot supply a resume choice. Hidden and
  * restore-only entities remain visible with empty headResumes and full core state.
  * Neither timestamps nor distance choose a winner; source digests do not provide
@@ -38,7 +40,9 @@ export function readReadingViews(replica: SyncReplica): readonly ReadingView[] {
     },
     operations: [],
   }).next;
-  const operations = new Map(checked.operations.map((operation) => [operation.opId, operation]));
+  const cached = viewCache.get(checked);
+  if (cached) return cached;
+  const operations = viewOperationIndex(checked);
   const views: ReadingView[] = [];
   for (const projection of checked.projection.entities) {
     if (projection.target.kind !== 'reading-position') continue;
@@ -67,5 +71,7 @@ export function readReadingViews(replica: SyncReplica): readonly ReadingView[] {
     }
     views.push({ sourceId: projection.target.id, headResumes: [...resumes.values()], projection });
   }
-  return immutable(views);
+  const result = immutable(views);
+  viewCache.set(checked, result);
+  return result;
 }

@@ -9,7 +9,7 @@
  * equality prevents an uncooperative writer from changing bytes immediately
  * afterward. Observed divergence is quarantined; neither source is rolled back.
  */
-import { IndexedDbReplicationStore, encodeLocalJson } from './modules/record-core.mjs';
+import { IndexedDbReplicationStore, copyLocalJson, encodeLocalJson } from './modules/record-core.mjs';
 
 const LEGACY_KEY = 'kairo-corridor-v1';
 const DRIFT_KEY = 'bunki-drift-v1';
@@ -26,7 +26,7 @@ const own = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
 const plain = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 const equal = (a, b) => encodeLocalJson(a).text === encodeLocalJson(b).text;
 const hash = (value) => encodeLocalJson(value).sha256;
-const copy = (value) => encodeLocalJson(value).value;
+const copy = copyLocalJson;
 
 export class RecordControllerError extends Error {
   constructor(code) { super(`Record controller: ${code}`); this.name = 'RecordControllerError'; this.code = code; }

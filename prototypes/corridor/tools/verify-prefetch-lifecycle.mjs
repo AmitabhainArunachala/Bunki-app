@@ -83,6 +83,10 @@ function harness() {
   const scope = {
     D: { passages },
     S: { ready: true },
+    document: { hidden: false },
+    navigator: { onLine: true },
+    window: {},
+    performance: { now: () => 0 },
     console: { warn: (...args) => warnings.push(args) },
     addEventListener(name, fn) {
       const rows = listeners.get(name) || [];

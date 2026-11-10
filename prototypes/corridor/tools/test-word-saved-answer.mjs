@@ -134,8 +134,8 @@ function defineRows() {
     'learningEnrollHeldText', 'heldEnrollRoute', 'renderLessons', 'renderMockResult', 'mockSubjectKey',
     'hiraToKata', 'ROMAJI', 'JLPT_RANK', 'jlptRank', 'searchIndex', 'buildSearchIndex', 'dictionarySearchContext', 'searchResults',
     'searchRowShownByCore', 'renderSearchResults', 'dictionaryQueryKey', 'activeDictionaryQuery', 'clearDictionarySearchTimer',
-    'requestDictionarySearch', 'dispatchQueuedDictionarySearch', 'DICTIONARY_SEARCH_SETTLE_MS', 'dictionarySearchGeneration',
-    'dictionarySearchInFlight', 'dictionarySearchQueued', 'dictionarySearchTimer',
+    'requestDictionarySearch', 'dispatchQueuedDictionarySearch', 'DICTIONARY_SEARCH_SETTLE_MS', 'DICTIONARY_SEARCH_PREFIX_SETTLE_MS', 'dictionarySearchGeneration',
+    'dictionarySearchInFlight', 'dictionarySearchQueued', 'dictionarySearchTimer', 'dictionaryComposing',
     'dictionaryHomographChoices', 'renderDictionaryHomographs', 'dictionaryRowsFor', 'dictionaryDetailRowsFor',
     // G1 (2026-10-16): one line per gloss — the homograph doors are drawn from homographLines
     'homographLines',
@@ -433,7 +433,7 @@ function defineRows() {
     Object.assign(worker.S, { view: 'shelf', query });
     const immediate = ids(pageRows(worker, query));
     const timer = worker.timers.at(-1);
-    assert.equal(timer?.ms, 320, `${query}: the one request waits out the settle window`);
+    assert.equal(timer?.ms, 80, `${query}: the one request waits out the shorter settle window`);
     worker.clock += timer.ms;
     timer.run();
     for (let turn = 0; turn < 20 && !worker.D.dictionarySearchCache.has(query); turn += 1) await new Promise((done) => setImmediate(done));

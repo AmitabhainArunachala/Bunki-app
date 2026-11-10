@@ -6,7 +6,6 @@ import {
   operationReference,
   parseActorIdentity,
   parseSyncBinding,
-  parseAnySyncOperation as parseSyncOperation,
   planReceive,
   SYNC_SCHEMA_VERSION,
   type ActorIdentity,
@@ -21,6 +20,9 @@ import type { SqliteDriver } from '../sqlite/driver.ts';
 import { planJournalRestore, prepareRestoreRequest } from './backup.ts';
 import { ReplicationStoreError } from './errors.ts';
 import { assertCounter, assertLocalKey, encodeLocalJson, readLocalJson } from './json.ts';
+import { LocalJsonReadCache } from './read-cache.ts';
+import { ReplicaReadCache } from './replica-read-cache.ts';
+import { viewOf } from './replica-view.ts';
 import type {
   DurableCommitReceipt,
   LocalCommit,
@@ -78,15 +80,6 @@ function assertKeys(value: object, keys: readonly string[]): void {
   }
 }
 
-function viewOf(replica: SyncReplica) {
-  return encodeLocalJson({
-    ready: replica.ready,
-    pending: replica.pending,
-    quarantined: replica.quarantined,
-    projection: replica.projection,
-  });
-}
-
 /**
  * A transaction port, not an authenticated transport or a second merge kernel.
  * All statements run through the existing SQLite seam; no Node builtin enters
@@ -97,6 +90,8 @@ export class SqliteReplicationStore implements ReplicationStore {
   readonly #policy: ReplicaPolicy;
   readonly #actor: ActorIdentity;
   readonly #scope: readonly [string, string];
+  readonly #readCache = new LocalJsonReadCache();
+  readonly #replicaCache = new ReplicaReadCache();
   #closed = false;
   #uncertain = false;
   #inTransaction = false;
@@ -204,7 +199,7 @@ export class SqliteReplicationStore implements ReplicationStore {
     if (!row) throw new ReplicationStoreError('corrupt-store');
     assertCounter(row.revision);
     const policy = createReplica(
-      readLocalJson(row.policy, row.policy_sha256) as ReplicaPolicy,
+      this.#readCache.read('policy', row.policy, row.policy_sha256) as ReplicaPolicy,
     ).policy;
     planReceive(createReplica(policy), { binding: this.#policy.binding, operations: [] });
     if (encodeLocalJson(policy).text !== encodeLocalJson(this.#policy).text)
@@ -218,41 +213,37 @@ export class SqliteReplicationStore implements ReplicationStore {
 
   #load(): CurrentState {
     const { row, policy } = this.#readPolicy();
-    let replica = createReplica(policy);
-    const operations = this.#driver
-      .all<OperationRow>(
-        `SELECT * FROM kairo_replication_operations
-      WHERE ${WHERE_SCOPE} ORDER BY op_id`,
-        this.#scope,
-      )
-      .map((stored) => {
-        try {
-          const operation = parseSyncOperation(
-            readLocalJson(stored.payload, stored.payload_sha256),
-          );
-          const ref = operationReference(operation);
-          if (
-            ref.opId !== stored.op_id ||
-            ref.sha256 !== stored.sha256 ||
-            operation.actor.deviceId !== stored.device_id ||
-            operation.actor.incarnationId !== stored.incarnation_id ||
-            operation.actor.sequence !== stored.sequence
-          )
-            throw new ReplicationStoreError('corrupt-store');
-          return operation;
-        } catch {
+    const storedOperations = this.#driver.all<OperationRow>(
+      `SELECT * FROM kairo_replication_operations WHERE ${WHERE_SCOPE} ORDER BY op_id`,
+      this.#scope,
+    );
+    let checked: ReturnType<ReplicaReadCache['read']>;
+    try {
+      checked = this.#replicaCache.read(
+        policy,
+        storedOperations.map((stored) => [
+          stored.op_id,
+          this.#readCache.read('operation:' + stored.op_id, stored.payload, stored.payload_sha256),
+        ]),
+      );
+      const byId = new Map(checked.operations.map((operation) => [operation.opId, operation]));
+      for (const stored of storedOperations) {
+        const operation = byId.get(stored.op_id);
+        if (
+          !operation ||
+          operationReference(operation).sha256 !== stored.sha256 ||
+          operation.actor.deviceId !== stored.device_id ||
+          operation.actor.incarnationId !== stored.incarnation_id ||
+          operation.actor.sequence !== stored.sequence
+        )
           throw new ReplicationStoreError('corrupt-store');
-        }
-      });
-    // Only the sync core reconstructs readiness/conflict/tombstone semantics.
-    for (let start = 0; start < operations.length; start += 1000) {
-      replica = planReceive(replica, {
-        binding: policy.binding,
-        operations: operations.slice(start, start + 1000),
-      }).next;
+      }
+    } catch {
+      throw new ReplicationStoreError('corrupt-store');
     }
+    const { replica, operations } = checked;
     const view = viewOf(replica);
-    if (encodeLocalJson(readLocalJson(row.view, row.view_sha256)).text !== view.text)
+    if (encodeLocalJson(this.#readCache.read('view', row.view, row.view_sha256)).text !== view.text)
       throw new ReplicationStoreError('corrupt-store');
     const byId = new Map(operations.map((operation) => [operation.opId, operation]));
     const actors = this.#driver.all<ActorRow>(
@@ -405,7 +396,11 @@ export class SqliteReplicationStore implements ReplicationStore {
         .map((row) => ({
           collection: row.collection,
           id: row.document_id,
-          value: readLocalJson(row.payload, row.sha256),
+          value: this.#readCache.read(
+            JSON.stringify(['document', row.collection, row.document_id]),
+            row.payload,
+            row.sha256,
+          ),
         }));
       const outbox: SyncOperation[] = [];
       const acknowledgedOutbox: OperationRef[] = [];
@@ -780,6 +775,8 @@ export class SqliteReplicationStore implements ReplicationStore {
   }
 
   async close(): Promise<void> {
+    this.#readCache.clear();
+    this.#replicaCache.clear();
     if (!this.#closed) {
       this.#closed = true;
       this.#driver.close();
