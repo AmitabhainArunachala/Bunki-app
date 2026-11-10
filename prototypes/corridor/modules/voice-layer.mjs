@@ -141,7 +141,7 @@ export function installVoiceLayer(host) {
       case 'offline': case 'network-failed':
         return tx('声を出せません。音声サーバーに届きません。接続を確かめて、もう一度。', 'No voice: the voice server is out of reach. Check the connection, then tap again.');
       case 'day-budget':
-        return tx(`声を出せません。今日の${dayCap().ja}分を使いました。${newDay()}に戻ります。`, `No voice: today’s ${dayCap().en} is used. The voice comes back at ${newDay()}.`);
+        return tx(`声を出せません。今日の${dayCap().ja}分を使いました。声は${newDay()}に戻ります。`, `No voice: today’s ${dayCap().en} is used. The voice comes back at ${newDay()}.`);
       case 'budget-exhausted':
         return tx(`声を出せません。合計${totalCap().ja}を使い切りました。`, `No voice: the ${totalCap().en} total is used.`);
       case 'not-in-release':
@@ -184,6 +184,20 @@ export function installVoiceLayer(host) {
     note.textContent = text || '';
   }
 
+  /** A read belongs to its control, and the app may draw that control's screen again while the read goes on (a page
+   * settling as it opens, a box drawn again). For a control that stands once on the screen this returns how to find
+   * "the same control of the same word" afterwards; for any other control, null (its read ends with it). */
+  function anchorOf(button) {
+    const id = button?.id || '';
+    const lookup = id ? () => doc.getElementById(id)
+      : button?.dataset?.voiceSay === 'entry-headword' ? () => doc.querySelector('#sheet > .voice-say[data-voice-say="entry-headword"]') : null;
+    if (!lookup) return null;
+    const subject = (node) => node.closest('#mini')?.dataset.uiContentValue || node.closest('.kp-card')?.dataset.card || node.closest('#sheet')?.dataset.node ||
+      `${node.dataset.voiceWord || ''}|${node.dataset.voiceText || ''}`;
+    const was = subject(button);
+    return () => { const now = lookup(); return now && now !== button && subject(now) === was ? now : null; };
+  }
+
   /** Speak `sentences` from `button`: a second tap stops it; whatever else was speaking ends first. With no voice to be
    * had it makes no sound and hands `onNote` the reason in one plain line (and '' again once a voice answers).
    * `automatic`: the read was not started by the learner's tap (a card's answer or an opened word saying itself): it
@@ -204,15 +218,23 @@ export function installVoiceLayer(host) {
       if (touched && !touched.hasBeenActive) return null;
     }
     prime();
-    const mine = { button, session: null, over: false, voiced: false, follow };
-    // the control is the read's own: mine.button, which follow() may move to the same control drawn anew
+    // `find`: the same control of the same word after the app has drawn its screen again (anchorOf); a reply's read is
+    // given its own `follow` (the same reply drawn again in a refreshed chat log), kept across every redraw
+    const finder = (control) => follow || anchorOf(control);
+    const mine = { button, session: null, over: false, voiced: false, find: finder(button) };
     const paint = (on) => {
-      const control = mine.button;
-      if (!control?.isConnected) return;
-      control.classList.toggle('is-speaking', on);
-      if (on) control.setAttribute('aria-pressed', 'true'); else control.removeAttribute('aria-pressed');
+      if (!mine.button?.isConnected) return;
+      mine.button.classList.toggle('is-speaking', on);
+      if (on) mine.button.setAttribute('aria-pressed', 'true'); else mine.button.removeAttribute('aria-pressed');
     };
-    mine.paint = paint;
+    /** The control was drawn again while its read goes on: the new one takes the read over, lit as the old one was. */
+    mine.adopt = (next) => {
+      mine.button = next;
+      mine.find = finder(next);
+      const state = mine.session?.state;
+      paint(state === 'loading' || state === 'playing');
+      if (state === 'loading') next.setAttribute('aria-busy', 'true');
+    };
     mine.session = seam.read({
       sentences, voiceKey, prefetch: single ? 0 : 2, gapMs: single ? 0 : 260, rate: rate ?? reader.rate,
       // a voice answered: the line an earlier silence left beside the control goes
@@ -674,11 +696,11 @@ export function installVoiceLayer(host) {
     scan = doc.defaultView.setTimeout(() => {
       scan = 0;
       mountMarks(doc);
-      // a read belongs to its control: when the control's screen goes, the read ends. A reply whose control was drawn
-      // anew for the same text (the chat log refreshed as the next question is sent) goes on with the new control.
+      // A read belongs to its control. The control drawn again (the same one, of the same word; or the same reply in a
+      // refreshed chat log) takes the read over; when the control's screen has gone, the read ends.
       if (spoken?.button && !spoken.button.isConnected) {
-        const next = spoken.follow?.() || null;
-        if (next) { spoken.button = next; spoken.paint?.(true); }
+        const again = spoken.find?.();
+        if (again) spoken.adopt(again);
         else { const gone = spoken; spoken = null; if (gone.session && !gone.session.ended) gone.session.stop(); }
       }
     }, 60);
@@ -811,17 +833,11 @@ export function installVoiceLayer(host) {
     settingsBlock,
     status: () => seam.status(),
     onStatus: (listener) => { listeners.add(listener); return () => listeners.delete(listener); },
-    /** A single word or reading from one of the app's own 音 buttons. A word's box drawn again while its word is being
-     * said (with no connection its dictionary worker cannot load, and the box redraws its row of marks) does not cut
-     * the word off: the read goes on with the same button drawn anew, for the same word. */
+    /** A single word or reading from one of the app's own 音 buttons. (A box drawn again while its word is being said,
+     * as with no connection when its dictionary worker cannot load, hands the read to its new 音: anchorOf.) */
     sayWord({ text, word, button, onNote, automatic = false }) {
       const ask = wordVoiceRequest(text, word);
-      const follow = button?.id ? () => {
-        const next = doc.getElementById(button.id);
-        const owner = next?.dataset.voiceWord || next?.closest('[data-ui-content-value]')?.dataset.uiContentValue || '';
-        return next && next !== button && owner && owner === String(word || '') ? next : null;
-      } : null;
-      return speakFrom(button, { sentences: ask.text ? [{ text: ask.text }] : [], voiceKey: ask.voiceKey, single: true, onNote, automatic, follow });
+      return speakFrom(button, { sentences: ask.text ? [{ text: ask.text }] : [], voiceKey: ask.voiceKey, single: true, onNote, automatic });
     },
     /** The quote chip: the excerpt through the seam when the article has no recording of it. With no voice the reason
      * stands in one line beside the chip. */
