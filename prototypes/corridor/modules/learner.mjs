@@ -690,8 +690,9 @@ function renderWritingChoice() {
     row('settings-brush', '筆 — 語が自分で書かれる', '筆 — a word writes itself',
       [['first', '初めての語', 'First meeting'], ['always', 'いつも', 'Always'], ['never', '書かない', 'Never']],
       wordBrush(), (value) => setWordPref(WORD_BRUSH_KEY, 'wordBrush', WORD_BRUSH, value)),
-    // off by default: said by themselves, a word and an answer are paid for without a tap (corridor.js, WORD_VOICE)
-    row('settings-voice', '声 — 新しい語と答えを自動で読む（音声の予算を使います）', '声 — say new words and answers by themselves (uses the voice budget)',
+    // on unless he turns it off (John, 2026-11-10: "on reveal"): said by themselves, an answer and an opened word
+    // are paid for from the voice budget, and the row says so (corridor.js, WORD_VOICE)
+    row('settings-voice', '声 — カードの答えと開いた語を一度、自動で読む（音声の予算を使います）', '声 — say a card’s answer and an opened word once, by themselves (uses the voice budget)',
       [['on', 'オン', 'On'], ['off', 'オフ', 'Off']],
       wordVoice(), (value) => setWordPref(WORD_VOICE_KEY, 'wordVoice', WORD_VOICE, value)),
     el('p', 'settings-layout-note', tx('書く速さは、書の間のスライダー一つで決まります。',
