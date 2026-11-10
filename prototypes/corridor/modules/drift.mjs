@@ -420,8 +420,8 @@ function renderTodayWord(pick) {
   const label = el('p', 'dw-label', tx('今日のことば', "Today's word"));
   label.dataset.japaneseLookup = 'off';
   block.append(label);
-  // why this word is here, from the pick's own source only (John, 2026-11-10)
-  const why = { saved: tx('保存した語から', 'From your saved words'), fresh: tx('まだ保存していない語', 'Not in your saved words yet') }[pick.from];
+  // why this word is here, from the pick's own source only, as a plain noun (John, 2026-11-10)
+  const why = { saved: tx('保存した語', 'Saved word'), fresh: tx('新しい語', 'New word') }[pick.from];
   if (why) block.append(el('p', 'dw-why', why));
   const word = el('button', 'dw-word');
   word.type = 'button';

@@ -21987,11 +21987,12 @@ function renderWordWeb({ quiet = false } = {}) {
   const why = wwTrail()[0]?.why;
   const eyebrow = el('h2', 'eyebrow ww-eyebrow', tx('言葉の網', 'The word web'));
   head.append(eyebrow);
-  const whyText = { looked: tx('最後に引いた語から', 'from the word you last looked up'), saved: tx('あなたの語から', 'from your words'), day: tx('例の一語から', 'from an example word') }[why];
+  // plain nouns, never sentences about the learner (John, 2026-11-10)
+  const whyText = { looked: tx('最後に引いた語', 'Last looked up'), saved: tx('保存した語', 'Saved word'), day: tx('例', 'Example') }[why];
   if (whyText) head.append(el('span', 'ww-why', whyText));
   const walk = el('nav', 'ww-walk');
-  walk.setAttribute('aria-label', tx('たどった語', 'Words you visited'));
-  walk.append(el('span', 'ww-walk-label', tx('たどった語', 'Words you visited')));
+  walk.setAttribute('aria-label', tx('最近', 'Recent'));
+  walk.append(el('span', 'ww-walk-label', tx('最近', 'Recent')));
   const trail = wwTrail();
   // one step is the centre itself, drawn on the plate: a walk is shown once there is a word to go back to (tighten pass)
   walk.hidden = trail.length < 2;
@@ -28334,11 +28335,11 @@ function renderDojoDecks(main, n = '02') {
   if (placesLayout()) {
     // the same number the stage's Begin and the tab's badge read (todayQueue), never a second count
     const mineToday = S.taken.length && scheduler ? todayQueue().order.length : 0;
-    row('mine', tx('保存した語', 'Your saved words'), mineToday ? tx(`今日 ${mineToday} 枚`, `${mineToday} to review today`) : '', () => startReview(), null, !mineToday);
+    row('mine', tx('保存した語', 'Saved words'), mineToday ? tx(`今日 ${mineToday} 枚`, `${mineToday} to review today`) : '', () => startReview(), null, !mineToday);
   } else {
     const forecast = srsForecast();
     const waiting = forecast.today + forecast.fresh;
-    row('mine', tx('保存した語', 'Your saved words'), waiting ? tx(`復習 ${waiting} 枚`, `${waiting} to review`) : '', () => startReview(), null, !waiting);
+    row('mine', tx('保存した語', 'Saved words'), waiting ? tx(`復習 ${waiting} 枚`, `${waiting} to review`) : '', () => startReview(), null, !waiting);
   }
   for (const name of Object.keys(S.lists || {})) {
     const items = S.lists[name];
