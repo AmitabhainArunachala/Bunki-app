@@ -1,0 +1,78 @@
+# The entry gate for `next`, the prototype line: what a change must pass before it joins.
+#
+# One job, named exactly `next / core`, so branch protection can require that one name. It builds
+# the site with the production builder, runs every unit test with CI set, the lint and the format
+# check, and walks the built site as a learner does (scripts/prototype/learner-walk.mjs, 27 checks).
+#
+# The whole battery (ci.yml) still runs on the same pull request. Its results are information:
+# the gates that are red there are a list to work down, not the door.
+name: next core
+on:
+  pull_request:
+    branches: [next]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: next-core-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  core:
+    name: next / core
+    runs-on: ubuntu-24.04
+    # The aim is under 15 minutes. The cap leaves room for a slow runner rather than losing the run.
+    timeout-minutes: 20
+    steps:
+      - name: Name the build and report folders outside the checkout
+        run: |
+          echo "KAIRO_SITE_DIR=$RUNNER_TEMP/kairo-site" >> "$GITHUB_ENV"
+          echo "CORE_OUT=$RUNNER_TEMP/next-core" >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/next-core"
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/ci-setup
+        with:
+          browsers: chromium webkit
+      - name: Build the site with the production builder
+        run: node scripts/build-corridor-site.mjs --out "$KAIRO_SITE_DIR" > "$CORE_OUT/build.json"
+      # The walk, the lint and the format check are light and only read the tree, so they run beside
+      # the unit tests instead of after them. Each writes its own log and exit code; the steps below
+      # report them one by one.
+      - name: Start the learner walk, the lint and the format check
+        run: |
+          (node scripts/prototype/learner-walk.mjs --site "$KAIRO_SITE_DIR" --shots "$CORE_OUT/walk" > "$CORE_OUT/walk.log" 2>&1; echo $? > "$CORE_OUT/walk.exit") &
+          (npm run lint > "$CORE_OUT/lint.log" 2>&1; echo $? > "$CORE_OUT/lint.exit") &
+          (npm run format:check > "$CORE_OUT/format.log" 2>&1; echo $? > "$CORE_OUT/format.exit") &
+      - name: Unit tests, every file, with CI set
+        env:
+          KAIRO_BROWSER: chromium
+          KAIRO_EVIDENCE_DIR: ${{ runner.temp }}/next-core/unit-evidence
+        shell: bash
+        run: |
+          set +e
+          npm test 2>&1 | tee "$CORE_OUT/unit.log"
+          code=${PIPESTATUS[0]}
+          if [ "$code" != "0" ]; then
+            first="$(grep -m1 -E '^ +(FAIL|×) |AssertionError|Error: ' "$CORE_OUT/unit.log" || tail -n 1 "$CORE_OUT/unit.log")"
+            echo "::error title=Unit tests failed (exit $code)::$first"
+            exit 1
+          fi
+      - name: Lint
+        if: ${{ !cancelled() }}
+        run: bash scripts/prototype/core-part.sh lint 'Lint' ' error |^✖'
+      - name: Format check
+        if: ${{ !cancelled() }}
+        run: bash scripts/prototype/core-part.sh format 'Format check' '^\[warn\]'
+      - name: Learner walk, 27 checks against the built site
+        if: ${{ !cancelled() }}
+        run: bash scripts/prototype/core-part.sh walk 'Learner walk' '^FAIL'
+      - name: Keep the logs, the walk's results and its screenshots
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-core-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/next-core/*.log
+            ${{ runner.temp }}/next-core/build.json
+            ${{ runner.temp }}/next-core/walk
+          retention-days: 14
+          if-no-files-found: warn
