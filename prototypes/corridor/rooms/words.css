@@ -464,3 +464,12 @@ html[data-room='search'] body .search-page #search-skip-opener { display: none; 
 html[data-room='search'] body:not([data-view='drift']) { --today-halo: var(--color-page); }
 html[data-room='search'] #app > main > .today-dayword { margin: var(--space-6, 32px) auto 0; }
 html[data-room='search'] #app > main > .search-page.search-page-busy ~ .today-dayword { display: none; }
+
+/* EVERYTHING-ON PROTOTYPE (integrate/everything-on-20261110): with quests on, the course, rooms and quest doors draw side
+ * by side on the 職業 word page. They had never been seen together in a browser and sat edge to edge; this keeps them
+ * apart and lets them wrap on a phone. */
+#kanji-course-unit-door,
+#kanji-room-door,
+#kanji-quest-door {
+  margin: 0 8px 8px 0;
+}
