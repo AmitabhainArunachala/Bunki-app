@@ -2309,7 +2309,9 @@ async function openAppRecord() {
     const current = await recordApp.snapshot();
     if (current.status !== 'active') { recordFailure(current.reason, true); return false; }
     publishRecordSnapshot(current.snapshot);
-    void adoptJourney(epoch, recordApp);
+    // everything-on prototype: at boot the scheduler core is not loaded yet and this adoption gave up (adoptJourney's
+    // !srsCore; measured 2 of 2 loads, inventory block 16). boot() adopts once the core is in; a later open still adopts here
+    if (srsCore) void adoptJourney(epoch, recordApp);
     const drafts = await import(window.__KAIRO_TEACHER_DRAFT_CONTROLLER_URL__ || './teacher-draft-controller.mjs');
     if (!assertOwner()) throw new Error('record-owner-changed');
     const installation = recordInstallation;
@@ -4536,6 +4538,8 @@ async function boot() {
     console.warn('FSRS unavailable', err);
   }
   if (srsCore) await installHelpRelevance();
+  // everything-on prototype: the record opened before the core loaded, so its journey is adopted here (see openAppRecord)
+  if (srsCore && recordApp) void adoptJourney(recordEpoch, recordApp);
 
   // A kept word's projection includes its core dictionary identity. Publish
   // only after that catalog is hydrated, so loading it cannot change the
@@ -16391,8 +16395,10 @@ function kanjiCoursePrepareReview(visit, attemptId, actual) {
  * above grades, and the journey's only write is the date-only device marker bunki-journey:off-day. ON keeps the course's help
  * in the learner record's m4Journey root (journey-lifecycle.mjs): help shows once it is kept, an answer's snapshot, its
  * preparation and its dispatch are written first, the hook's lock rechecks them read-only, and the review day rotates at
- * srs-core's endOfDay. Every journey step runs on one queue, so a capture and the next snapshot never race on the root */
-const JOURNEY_WRITES = false;
+ * srs-core's endOfDay. Every journey step runs on one queue, so a capture and the next snapshot never race on the root.
+ * EVERYTHING-ON PROTOTYPE (integrate/everything-on-20261110 only): ON, by John's 2026-11-10 14:20 choice for tonight's
+ * prototype. main, next and the candidate keep it OFF; this line is not his release word */
+const JOURNEY_WRITES = true;
 /** the current record owner's journey: { epoch, module, lifecycle, queue, retained, dispatches, snapshots, batches, entered, fullDay } */
 let kanjiJourney = null;
 let kanjiJourneyModule = null;
@@ -16765,10 +16771,11 @@ function renderKanjiCourseDoor(sheet, node) {
   }
 }
 /** M4 v0 learner lines (UX r4.2 7eae4438 §6.1 and §6.3), verbatim on both keys: [Japanese, English] for tx(). Q-13 is
- * superseded by Q-13r */
+ * superseded by Q-13r. EVERYTHING-ON PROTOTYPE: the two door lines Q-01 and Q-01r end in " · 試作" / " · preview", as
+ * Rajōmon's door does; the UX r4.2 text is what stands before it */
 const M4_COPY = Object.freeze({
-  'Q-01': ['このことばでクエストをつくる', 'Make a quest from this word'],
-  'Q-01r': ['このクエストを再開', 'Resume this quest'],
+  'Q-01': ['このことばでクエストをつくる · 試作', 'Make a quest from this word · preview'],
+  'Q-01r': ['このクエストを再開 · 試作', 'Resume this quest · preview'],
   'Q-02': ['クエスト · 職・識・織をことばで', 'Quest · 職・識・織 in words'],
   'Q-03': ['職業・知識・組織の三つのことばの読みを答え、それぞれ確かめて、答えられたかどうかを選びます。', 'Answer the reading of all three words — 職業, 知識, 組織 — check each one, and say whether you knew it.'],
   'Q-04': ['読んでいた文から：', 'From the sentence you were reading:'],
@@ -30454,6 +30461,11 @@ function renderWordNode(sheet, node) {
   if (shownReading) sheet.append(el('p', 'reading', shownReading));
   // G2 · the dot's basis in one quiet line — days met, review state, the reading — and his "I know this" / "Not yet"
   renderDepthBasis(sheet, node, shownReading || '');
+  // everything-on prototype (inventory block 16, measured): a core word opened from the reader, search or a list carries no
+  // reading of its own, so the course, rooms and quest doors never drew for 職業. Where the course teaches this word as the
+  // page reads it, the page's reading becomes the node's (the same core entry: wordNodeIdentity stays 'core')
+  if (!unresolved && node.reading == null && shownReading &&
+      window.BunkiKanjiCourse?.unitForTask?.({ type: 'word', id: node.id, reading: shownReading })) node.reading = shownReading;
   if (!unresolved && shownReading === node.reading) renderKanjiCourseDoor(sheet, node);
 
   // KANJI IN THIS WORD — each row opens that kanji's full entry. G1: right under the word and its reading

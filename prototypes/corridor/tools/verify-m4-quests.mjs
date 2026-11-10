@@ -33,7 +33,9 @@ const entries = (text, declaration) => {
   assert.ok(body, `no ${declaration}`);
   return [...body.matchAll(/^\s*'([^']+)',/gm)].map((match) => match[1]);
 };
-const SWITCH = 'const JOURNEY_WRITES = false;';
+// everything-on prototype (integrate/everything-on-20261110): the authored switch is ON on this branch, so the OFF position
+// is the one made by substitution here (on main and the candidate it is the reverse)
+const SWITCH = 'const JOURNEY_WRITES = true;';
 const adapterFrom = (text) => import('data:text/javascript;base64,' + Buffer.from(text).toString('base64'));
 const BASE = ['ROOM_NAMES', 'roomName', 'M4_COPY', 'kanjiCourseRunKind', 'kanjiRoomEntry', 'kanjiChooseRoom', 'kanjiEnterCourseDoor',
   'openKanjiRooms', 'renderKanjiRoomChooser', 'renderKanjiCourseDoor', 'renderKanjiCourseMenu', 'renderKanjiCourse', 'kanjiCourseNodeUnit',
@@ -152,7 +154,7 @@ function page(m, day, { source = current?.source ?? SOURCE, names = [...BASE, ..
   context.recordReady = (epoch = context.recordEpoch) => epoch === context.recordEpoch;
   context.window = context; context.globalThis = context;
   vm.runInContext(COURSE, context);
-  vm.runInContext(liftCorridor(on ? source.replace(SWITCH, 'const JOURNEY_WRITES = true;') : source, names), context);
+  vm.runInContext(liftCorridor(on ? source : source.replace(SWITCH, 'const JOURNEY_WRITES = false;'), names), context);
   vm.runInContext(`Date.now = () => __now();
 function __copy(id) { return M4_COPY[id]; }
 function __room(id) { return ROOM_NAMES.rooms[id]; }

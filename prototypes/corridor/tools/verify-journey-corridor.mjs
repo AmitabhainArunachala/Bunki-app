@@ -34,10 +34,12 @@ const caller = await import(pathToFileURL(join(DIR, 'review-caller.mjs')));
 const catalog = JSON.parse(read('data/help-relevance-catalog.json'));
 const COURSE = read('kanji-course.js');
 export const SOURCE = read('corridor.js');
-const SWITCH = 'const JOURNEY_WRITES = false;';
+// everything-on prototype (integrate/everything-on-20261110): the authored switch is ON on this branch, so the OFF position
+// is the one made by substitution here (on main and the candidate it is the reverse)
+const SWITCH = 'const JOURNEY_WRITES = true;';
 assert.equal(SOURCE.split(SWITCH).length, 2, 'the one switch');
 const NAMES = [...layer.CORRIDOR_NAMES, ...layer.JOURNEY_NAMES];
-export const programs = (source = SOURCE) => ({ off: layer.liftCorridor(source, NAMES), on: layer.liftCorridor(source.replace(SWITCH, 'const JOURNEY_WRITES = true;'), NAMES) });
+export const programs = (source = SOURCE) => ({ off: layer.liftCorridor(source.replace(SWITCH, 'const JOURNEY_WRITES = false;'), NAMES), on: layer.liftCorridor(source, NAMES) });
 const BASE = 'a8b9cbff1157766ff56f722612e75a5515a58f38';
 const baseProgram = () => layer.liftCorridor(execFileSync('git', ['show', `${BASE}:prototypes/corridor/corridor.js`], { cwd: DIR, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }));
 

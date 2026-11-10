@@ -30,7 +30,9 @@ export const TEXTS = Object.freeze({ corridor: read('corridor.js'), course: read
 const fsrsApi = await import(pathToFileURL(join(DIR, 'vendor/ts-fsrs.mjs')));
 const pin = JSON.parse(read('data/fsrs-pin.json'));
 const caller = await import(pathToFileURL(join(DIR, 'review-caller.mjs')));
-const SWITCH = 'const JOURNEY_WRITES = false;';
+// everything-on prototype (integrate/everything-on-20261110): the authored switch is ON on this branch, so the OFF position
+// is the one made by substitution here (on main and the candidate it is the reverse)
+const SWITCH = 'const JOURNEY_WRITES = true;';
 const NAMES = [...layer.CORRIDOR_NAMES, ...layer.JOURNEY_NAMES, 'kanjiCourseReferenceHelp',
   'ROOM_NAMES', 'roomName', 'M4_COPY', 'kanjiCourseRunKind', 'kanjiRoomEntry', 'kanjiChooseRoom', 'kanjiEnterCourseDoor', 'openKanjiRooms',
   'renderKanjiRoomChooser', 'renderKanjiCourseDoor', 'renderKanjiCourseMenu', 'renderKanjiCourse', 'kanjiCourseNodeUnit',
@@ -85,7 +87,7 @@ function __copy(id) { return M4_COPY[id]; }
 async function page(env, modules, { controller, storage, time }) {
   const core = await import(url(env.core));
   const relevance = await import(url(env.relevance));
-  const program = layer.liftCorridor(env.corridor.replace(SWITCH, 'const JOURNEY_WRITES = true;'), NAMES);
+  const program = layer.liftCorridor(env.corridor.split(SWITCH).length === 2 ? env.corridor : env.corridor.replace('const JOURNEY_WRITES = false;', SWITCH), NAMES);
   const h = layer.corridorSandbox(program, { core, fsrsApi, pin, record: {}, dict, clock: () => new Date(time.now), storage });
   const ctx = h.sandbox;
   ctx.setTimeout = setTimeout; ctx.clearTimeout = clearTimeout;
