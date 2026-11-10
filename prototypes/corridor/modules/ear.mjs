@@ -415,13 +415,23 @@ export function findUnit(target, { offset = null, display = defaultDisplay, cont
   if (!block) return null;
   return sentenceUnit(block, target, offset, context);
 }
+const ATOMIC_INLINE = /^inline-(block|flex|grid|table)$/;
+/** The block whose text is the line this node stands in. A box inside an inline-level box (the reader's word span is
+ * inline-flex, and its own children are blockified flex items) is part of that box's line, not a block of its own. */
 function blockOf(node, display) {
+  const shown = (el) => { try { return display(el); } catch { return defaultDisplay(el); } };
   for (let at = node; at; at = parentOf(at)) {
     if (NO_HOST.has(tagOf(at))) return null;
-    let value = '';
-    try { value = display(at); } catch { value = defaultDisplay(at); }
-    if (value === 'none') continue;
-    if (!isInlineDisplay(value)) return at;
+    const value = shown(at);
+    if (value === 'none' || isInlineDisplay(value)) continue;
+    let inside = null;
+    for (let up = parentOf(at); up && !NO_HOST.has(tagOf(up)); up = parentOf(up)) {
+      const around = shown(up);
+      if (ATOMIC_INLINE.test(around)) { inside = up; break; }
+      if (!isInlineDisplay(around) && around !== 'none') break;
+    }
+    if (inside) { at = inside; continue; }
+    return at;
   }
   return null;
 }

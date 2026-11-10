@@ -407,7 +407,12 @@ describe('b. the unit that speaks', () => {
       h(
         'span',
         { class: 'token-door' },
-        h('span', { class: 'tok content', role: 'presentation', display: 'inline-flex' }, '伸びる'),
+        h(
+          'span',
+          { class: 'tok content', role: 'presentation', display: 'inline-flex' },
+          // a flex item is blockified: the word's own span computes as display: block
+          h('span', { class: 'tok-word', display: 'block' }, '伸びる'),
+        ),
       ),
       h('span', { class: 'tok plain' }, '。'),
       h('span', { class: 'tok annotation', 'data-reader-annotation': 'true' }, '（のびる）'),
