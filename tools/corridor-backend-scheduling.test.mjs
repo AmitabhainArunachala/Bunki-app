@@ -257,6 +257,60 @@ describe('deep dictionary scheduling', () => {
     expect(h.data.dictionarySearchCache.has('きょう')).toBe(false);
     expect(h.calls[1].payload.context.q).toBe('あした');
   });
+
+  // PR #134 review, finding 1: Chromium and the iPhone's keyboard deliver the composed word's last input while
+  // composition is still open, so the shelf painted that query before compositionend. A repaint stops at the
+  // render-token check; composition end itself must ask for the finished word.
+  it('sends the finished composed word to the full dictionary on composition end, with no further input', async () => {
+    const h = harness();
+    const target = { matches: () => true };
+    h.handlers.compositionstart({ target });
+    h.query('き');
+    h.query('きょう');
+    h.query('今日');
+    await vi.advanceTimersByTimeAsync(500);
+    expect(h.calls).toEqual([]);
+    h.handlers.compositionend({ target });
+    await vi.advanceTimersByTimeAsync(80);
+    expect(h.calls.map((call) => call.payload.context.q)).toEqual(['今日']);
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(h.calls).toHaveLength(1);
+  });
+
+  // PR #134 review, finding 2: a composition ended by focus leaving the field (a tap elsewhere on the phone) used to
+  // clear the flag only. It must send the composed word and restart a search that was queued before composing began.
+  it('sends the composed word and restarts a queued search when focus leaves a composing field', async () => {
+    const h = harness();
+    const target = { matches: () => true };
+    h.handlers.compositionstart({ target });
+    h.query('にほんご');
+    await vi.advanceTimersByTimeAsync(500);
+    expect(h.calls).toEqual([]);
+    h.handlers.focusout({ target });
+    await vi.advanceTimersByTimeAsync(80);
+    expect(h.calls.map((call) => call.payload.context.q)).toEqual(['にほんご']);
+    // A browser that also reports compositionend after the blur adds no second request.
+    h.handlers.compositionend({ target });
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(h.calls).toHaveLength(1);
+
+    const queued = harness();
+    queued.query('日本');
+    await vi.advanceTimersByTimeAsync(10);
+    queued.handlers.compositionstart({ target });
+    // The settle timer fires while composing and is dropped; the word stays queued and unsent.
+    await vi.advanceTimersByTimeAsync(500);
+    expect(queued.calls).toEqual([]);
+    queued.handlers.focusout({ target });
+    await vi.advanceTimersByTimeAsync(80);
+    expect(queued.calls.map((call) => call.payload.context.q)).toEqual(['日本']);
+
+    const idle = harness();
+    idle.query('日本');
+    idle.handlers.focusout({ target });
+    await vi.advanceTimersByTimeAsync(80);
+    expect(idle.calls).toHaveLength(1);
+  });
 });
 
 it('loads independent validators concurrently but admits no record before all have settled', async () => {
