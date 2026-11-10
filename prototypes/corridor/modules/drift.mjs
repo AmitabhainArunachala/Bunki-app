@@ -444,17 +444,25 @@ function renderTodayWord(pick) {
   const ref = (c) => todayLearning('span', 'dw-kref', c);
   const radicalName = todayRadicalName(hook.part);
   const line = el('p', 'dw-hook');
+  // the words that name the radical and the radical itself are one unbroken run (dw-keep), so the larger glyph never
+  // opens a line alone ("…share the radical / 言 (ごんべん…" at 390 and 1440 px, owed repair 4); the line balances
+  const keep = (...parts) => {
+    const run = el('span', 'dw-keep');
+    run.append(...parts);
+    return run;
+  };
   if (bi()) {
     if (hook.shared) {
       names.forEach((c, i) => line.append(i ? (i === names.length - 1 ? ' and ' : ', ') : '', ref(c)));
-      line.append(' share the radical ', pk());
-    } else line.append('The radical of ', ref(hook.host), ' is ', pk());
+      line.append(' share ', keep('the radical ', pk()));
+    } else line.append('The radical of ', ref(hook.host), ' ', keep('is ', pk()));
     const gloss = [radicalName && todayLearning('span', 'dw-rn', radicalName), hook.meaning && `“${hook.meaning}”`].filter(Boolean);
     if (gloss.length) line.append(' (', ...gloss.flatMap((g, i) => (i ? [', ', g] : [g])), ')');
     line.append('.');
   } else {
     names.forEach((c, i) => line.append(i ? (i === names.length - 1 ? 'と' : '、') : '', '「', ref(c), '」'));
-    line.append(hook.shared ? (names.length === 2 ? 'の部首は、どちらも ' : 'の部首は、どれも ') : 'の部首は ', pk());
+    if (hook.shared) line.append('の部首は、', keep(names.length === 2 ? 'どちらも ' : 'どれも ', pk()));
+    else line.append('の', keep('部首は ', pk()));
     if (radicalName) line.append('（', todayLearning('span', 'dw-rn', radicalName), '）');
     line.append('。');
   }

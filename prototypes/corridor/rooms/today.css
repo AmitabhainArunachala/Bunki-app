@@ -214,6 +214,8 @@ html:is([data-room='tray'], [data-room='search']) .dw-hook {
   color: var(--color-ink-2);
   text-wrap: balance;
 }
+/* the words naming the radical and the radical stay on one line (owed repair 4) */
+html:is([data-room='tray'], [data-room='search']) .dw-keep { white-space: nowrap; }
 html:is([data-room='tray'], [data-room='search']) .dw-pk {
   padding: 0 2px;
   font: 800 var(--type-reading)/1 var(--font-headword);

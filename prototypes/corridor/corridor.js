@@ -4149,16 +4149,46 @@ function appendJaFlow(node, text) {
   node.classList.add('ja-flow');
   return node;
 }
+/** A phrase inside 「」 or 『』 and what clings to its closing mark (a particle: 「成熟ノード」と) stay one unit when the whole
+ * is at most 12 characters, so a headline never breaks inside a short quote (「成熟｜ノード」と); a longer quote keeps the
+ * word rule (owed repair 7). Returns first word → last word of each such run of two or more words. */
+function jaQuotedRuns(words) {
+  const runs = new Map();
+  for (let i = 0; i < words.length; i += 1) {
+    const open = /^[「『]/u.exec(words[i])?.[0];
+    if (!open) continue;
+    const close = open === '「' ? '」' : '』';
+    let end = i, text = words[i];
+    while (text.indexOf(close, 1) < 0 && end + 1 < words.length && [...text].length <= 12) text += words[(end += 1)];
+    const at = text.indexOf(close, 1);
+    if (end > i && at > 0 && /^[\p{Script=Hiragana}、。，．！？…‥・：；!?]*$/u.test(text.slice(at + 1)) && [...text].length <= 12) {
+      runs.set(i, end);
+      i = end;
+    }
+  }
+  return runs;
+}
 /** Words into a node: a <wbr> between two words. A word that holds a mark is one no-break span, whole: WebKit's
  * keep-all still ends a line on 「 (の「｜不思議), its text-wrap: pretty inside 文化財！｜？, and it offers a break at
  * the edge of a no-break span (感じ｜る」), so a mark's span is never smaller than its word. A word too long to be sure
  * of its line (over 10 ems) keeps only its marks glued to their neighbours. */
 function appendJaPieces(node, words) {
   const unit = (text) => { const span = document.createElement('span'); span.className = 'ja-unit'; span.textContent = text; return span; };
+  const quoted = jaQuotedRuns(words);
+  let inside = -1;
   words.forEach((word, i) => {
+    if (i <= inside) return;
     // a plain space already lets the line end; an ideographic space (旅行記\u3000入蔵) does not under keep-all in WebKit, so
     // the break stands after it (never before it: no line opens on a space)
     if (i && !/^\s/u.test(word) && !/[ \u00a0]$/u.test(words[i - 1])) node.append(document.createElement('wbr'));
+    // a short quoted phrase is one unit, its words kept as their own text so each stays its own lookup door
+    if (quoted.has(i)) {
+      inside = quoted.get(i);
+      const span = unit('');
+      span.append(...words.slice(i, inside + 1));
+      node.append(span);
+      return;
+    }
     if (!/^[「『（〈《〔［｛(“"]|.[、。，．！？」』）〉》〕］｝〜…‥・：；!?]/u.test(word)) { node.append(word); return; }
     if (jaEms(word) <= 10) { node.append(unit(word)); return; }
     const open = /^[「『（〈《〔［｛(“"]+./u.exec(word);
@@ -13082,7 +13112,8 @@ function openReaderLayers(mark) {
   // its words' meanings in order (意) and its particles' roles (文) — so no reading crowds another and no line moves
   const reading = [], meanings = [], roles = [], seen = new Set(), seenRoles = new Set();
   for (const span of paragraph.querySelectorAll('.tok[data-index]')) {
-    const token = p.tokens[Number(span.dataset.index)];
+    // a word the reader joined (自動車, a katakana run) is read and glossed whole, not as its first piece
+    const token = readerTokenAt(p.id, Number(span.dataset.index));
     if (!token) continue;
     reading.push(readerLayerReading(token));
     if (span.classList.contains('particle') || span.dataset.targetKind === 'particle') {
@@ -14549,7 +14580,10 @@ function renderRecordNotes({ sync = true } = {}) {
   container.setAttribute('aria-labelledby', 'record-notes-heading');
   const heading = el('h2', 'section-title', tx('保存したメモ', 'Saved notes'));
   heading.id = 'record-notes-heading';
-  container.append(heading, ...(sync ? [renderRecordSync()] : []), renderPersonalNoteComposer(), el('p', 'record-notes-status'), el('div', 'record-notes-items'));
+  // each heading over its own content: the notes under "Saved notes", then the sync group under its own kicker (owed
+  // repair 6: the sync kicker sat between "Saved notes" and the note field)
+  container.append(heading, renderPersonalNoteComposer(), el('p', 'record-notes-status'), el('div', 'record-notes-items'),
+    ...(sync ? [renderRecordSync()] : []));
   updateRecordNotesContainer(container);
   return container;
 }
