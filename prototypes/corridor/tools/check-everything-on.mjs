@@ -45,7 +45,8 @@ async function fresh(device = DESKTOP) {
   page.on('response', (r) => { if (r.status() >= 400) problems.push(`http ${r.status()} ${r.url().replace(ORIGIN, '')}`); });
   page.on('requestfailed', (r) => {
     // the app reads only the head of build-identity.json and drops the rest; a frame swapped out mid-load aborts its own fetches
-    if (r.failure()?.errorText === 'net::ERR_ABORTED') return;
+    // (Chromium names that net::ERR_ABORTED, WebKit "cancelled")
+    if (['net::ERR_ABORTED', 'cancelled'].includes(r.failure()?.errorText)) return;
     problems.push(`request failed: ${r.failure()?.errorText} ${r.url().replace(ORIGIN, '')}`);
   });
   return { context, page, problems };
@@ -480,7 +481,8 @@ await door('moments', 'guided practice shows its moments, style and sound choice
   must(await view(page) === 'dojo', `the door opened "${await view(page)}"`);
   await page.locator('.study-door[data-study-door="guided"]').click();
   await page.locator('.gs-footer').waitFor();
-  const foot = await text(page, '.gs-footer', 300);
+  // the style choices are a menu: its options are in the text content in every engine, in innerText only in Chromium
+  const foot = await page.evaluate(() => document.querySelector('.gs-footer').textContent.replace(/\s+/g, ' ').trim().slice(0, 300));
   must(/moments/.test(foot) && /dramatic/.test(foot) && /sound/.test(foot), `the foot of the room reads "${foot}"`);
   await shot(page, 'moments');
   return `"${label}" → Guided test practice → "${foot.slice(0, 90)}"`;
