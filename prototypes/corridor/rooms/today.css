@@ -41,16 +41,20 @@ html[data-room='tray'] body:not([data-view='drift']) {
 
 /* ---- the hero: full-bleed under the chrome, the sky behind, the word in the middle ---- */
 html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero {
+  /* the city stands on the horizon (its foot) and under the whole word block: the hero's foot holds its height, so no
+     line of the day's word nor its link runs through the roofs (owed-3 repair 3) */
+  --today-city-foot: 44px;
+  --today-city-h: 84px;
   position: relative;
   isolation: isolate;
   display: flex;
   flex-direction: column;
   margin: -24px -18px 0;
-  padding: 24px 18px 70px;
+  padding: 24px 18px calc(var(--today-city-foot) + var(--today-city-h) + 8px);
   overflow: hidden;
 }
 @media (min-width: 521px) {
-  html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero { margin: 0; padding: 8px 8px 72px; }
+  html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero { margin: 0; padding: 8px 8px calc(var(--today-city-foot) + var(--today-city-h) + 8px); }
 }
 html[data-room='tray'] .today-head { position: relative; z-index: 3; align-self: flex-start; }
 html[data-room='tray'] .today-head .today-date { margin: 0 0 4px; }
@@ -132,9 +136,9 @@ html[data-room='tray'] .today-city {
   z-index: 0;
   left: 0;
   right: 0;
-  bottom: 44px;
+  bottom: var(--today-city-foot, 44px);
   width: 100%;
-  height: 84px;
+  height: var(--today-city-h, 84px);
   pointer-events: none;
 }
 html[data-room='tray'] .today-roofs { fill: var(--today-roof); }

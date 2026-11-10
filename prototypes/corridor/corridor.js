@@ -21529,15 +21529,20 @@ function renderKkldMap(host, ed, marks) {
     else b.removeAttribute('aria-current');
   };
   // the columns fill the box's width; the field is as tall as every row, so the box scrolls over the whole order
+  let height = 0;
   const layout = () => {
     const w = box.clientWidth;
     if (!w) return false;
-    if (w === width && cols) return true;
+    if (w === width && box.clientHeight === height && cols) return true;
     width = w;
+    height = box.clientHeight;
     cols = Math.max(1, Math.floor((w + KKLD_MAP_GAP) / (KKLD_MAP_CELL + KKLD_MAP_GAP)));
     cell = Math.floor(((w + KKLD_MAP_GAP) / cols - KKLD_MAP_GAP) * 10) / 10;
     pitch = cell + KKLD_MAP_GAP;
-    field.style.height = `${Math.ceil(order.length / cols) * pitch - KKLD_MAP_GAP}px`;
+    // the field runs on past the last row to a whole row's scroll, so even at the map's end the top row is whole
+    const full = Math.ceil(order.length / cols) * pitch - KKLD_MAP_GAP;
+    const over = full > height ? (full - height) % pitch : 0;
+    field.style.height = `${full + (over > 0.01 ? pitch - over : 0)}px`;
     span = '';
     for (const [i, b] of drawn) place(b, i);
     return true;
@@ -21560,7 +21565,8 @@ function renderKkldMap(host, ed, marks) {
         const from = Math.max(r.top, 0);
         const seen = Math.min(r.bottom, floor) - from;
         const at = seen > pitch ? from - r.top + (seen - pitch) / 3 : box.clientHeight / 3;
-        box.scrollTop = Math.max(0, Math.floor(i / cols) * pitch - at);
+        // a whole number of rows above it, so the top row of the box is never cut under the map's head (owed-3 repair 2)
+        box.scrollTop = Math.max(0, (Math.floor(i / cols) - Math.round(at / pitch)) * pitch);
       }
     }
     const top = box.scrollTop;
@@ -35369,6 +35375,19 @@ function renderSearchPage(main) {
   input.addEventListener('input', () => {
     S.navSourceContext = null;
     S.navQ = input.value; // the input node dies with every render; S carries it
+    // a word typed here is a word search, whatever finder a visit left open (the Kodansha map from a kanji page kept
+    // Words on its lens and found nothing): the lens gives way to Words; a number typed under the Kodansha lens stays
+    // that number's search (typedSearchLens, owed-3 repair 1)
+    const typed = typedSearchLens(S.searchLens, input.value);
+    if (typed.kkldQ != null) S.kdx.kkldQ = typed.kkldQ;
+    else if (typed.lens !== S.searchLens) {
+      S.searchLens = typed.lens;
+      for (const b of lensRow.querySelectorAll('.kdx-lens')) {
+        const on = b.dataset.searchLens === S.searchLens;
+        b.classList.toggle('on', on);
+        b.setAttribute('aria-pressed', String(on));
+      }
+    }
     if (input.value.trim() && window.BunkiSkipUI?.parse(input.value).kind !== 'text') skipState().searchOpen = true;
     else {
       if (S.skipUi) S.skipUi.searchOpen = false;
@@ -35399,6 +35418,17 @@ function renderSearchPage(main) {
       }
     });
   }
+}
+
+/** What a query typed into the search field asks for (owed-3 repair 1). The field is the word search: a finder lens left
+ * on (the Kodansha map opened from a kanji page) gives way to Words once something is typed, so the word is found; a
+ * number typed while the Kodansha lens is on stays a Kodansha number (its map lights it). The shape lens reads codes
+ * from this same field and keeps them. */
+function typedSearchLens(lens, query) {
+  const q = String(query || '').trim().normalize('NFKC');
+  if (!q || lens === 'words' || lens === 'skip') return { lens };
+  if (lens === 'kkld' && /^\d{1,4}$/u.test(q)) return { lens, kkldQ: q };
+  return { lens: 'words' };
 }
 
 /** Build the whole 銀河 chrome (symbol, and when open the bar + bubbles). */
