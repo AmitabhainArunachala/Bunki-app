@@ -7705,6 +7705,8 @@ var __KP_SHARED_CONTENT__=(()=>{var o=Object.defineProperty;var i=Object.getOwnP
  */
 const {
   RATINGS,
+  STATE_FORMAT,
+  VERSION,
   admitDeckGrade,
   buildQueue,
   buriedToday,
@@ -8024,6 +8026,19 @@ function save(state) {
  * ledger this window holds is never written over newer grades (sol, 10-19: four six-day dates were rolled back).
  * A stored ledger that cannot be read is not adopted. Returns { state, before } | { refused: true } | { failed: true }.
  */
+function readLedger(text, deck) {
+  let raw;
+  try {
+    raw = JSON.parse(text);
+  } catch {
+    return null;
+  }
+  if (!raw || raw.format !== STATE_FORMAT || raw.version !== VERSION || raw.deckId !== deck.id ||
+      !raw.cards || typeof raw.cards !== 'object' || Array.isArray(raw.cards)) return null;
+  const state = normalizeState(raw, deck);
+  return Object.keys(raw.cards).length && !Object.keys(state.cards).length ? null : state;
+}
+
 function writeLedger(change) {
   let text;
   try {
@@ -8032,14 +8047,8 @@ function writeLedger(change) {
     text = ctx.ledgerText;
   }
   if (text !== ctx.ledgerText && text != null) {
-    let raw = null;
-    try {
-      raw = JSON.parse(text);
-    } catch {
-      raw = null;
-    }
-    const read = raw ? normalizeState(raw, ctx.deck) : null;
-    if (read && (Object.keys(read.cards).length || !Object.keys(ctx.state.cards).length)) {
+    const read = readLedger(text, ctx.deck);
+    if (read) {
       ctx.state = read;
       ctx.ledgerText = text;
     }
@@ -8054,14 +8063,8 @@ function writeLedger(change) {
 /** another window wrote this deck's ledger: read it now, so what this one shows and answers is current */
 function onStorage(e) {
   if (!ctx?.root?.isConnected || e.storageArea !== ctx.storage || e.key !== stateKey(ctx.deck.id) || e.newValue == null || e.newValue === ctx.ledgerText) return;
-  let raw = null;
-  try {
-    raw = JSON.parse(e.newValue);
-  } catch {
-    return;
-  }
-  const read = normalizeState(raw, ctx.deck);
-  if (!Object.keys(read.cards).length && Object.keys(ctx.state.cards).length) return;
+  const read = readLedger(e.newValue, ctx.deck);
+  if (!read) return;
   ctx.state = read;
   ctx.ledgerText = e.newValue;
   // a close that is waiting on cards in a learning step counts them again; the card on screen is checked when answered
@@ -10627,10 +10630,14 @@ function retireRule() {
 
 async function commit(rating, { stay = false } = {}) {
   const id = ui.queue[ui.pos];
-  if (!id || ui.committing) return;
+  if (!id || !ctx || !ctx.root?.isConnected || ui.committing === ctx) return;
+  const owner = ctx, request = mountRequest, queue = ui.queue, pos = ui.pos, shown = ui.shown;
+  const schedule = owner.scheduler;
+  const current = () => ctx === owner && mountRequest === request && owner.root.isConnected &&
+    ui.screen === 'study' && ui.queue === queue && ui.pos === pos && ui.queue[pos] === id && ui.shown === shown;
   const sitting = sittingNow();
-  const indexed = ctx.index.cards.get(id);
-  ui.committing = true;
+  const indexed = owner.index.cards.get(id);
+  ui.committing = owner;
   let graded;
   try {
     // graded on the ledger as it is now, and only if the card is still the one put on screen and may be answered now
@@ -10639,22 +10646,22 @@ async function commit(rating, { stay = false } = {}) {
     // its mark reserved before the write); a 字 card's does not (it never rests)
     graded = await admitDeckGrade({
       locks: globalThis.navigator?.locks || null,
-      storage: ctx.storage,
-      deckId: ctx.deck.id,
+      storage: owner.storage,
+      deckId: owner.deck.id,
       id,
       word: indexed?.word,
       card: indexed?.card,
-      write: writeLedger,
+      write: change => current() ? writeLedger(change) : { refused: true },
       change: (fresh, now) => {
         const stored = fresh.cards[id] ?? null;
-        if (isSuspended(fresh, id) || JSON.stringify(stored) !== ui.shown || !servable(stored, now, { learnAhead: true })) return null;
-        return grade(fsrsApi, ctx.scheduler, fresh, id, rating, now);
+        if (isSuspended(fresh, id) || JSON.stringify(stored) !== shown || !servable(stored, now, { learnAhead: true })) return null;
+        return grade(fsrsApi, schedule, fresh, id, rating, now);
       },
     });
   } finally {
-    ui.committing = false;
+    if (ui.committing === owner) ui.committing = null;
   }
-  if (ui.queue[ui.pos] !== id) return;
+  if (!current()) return;
   const { result, r } = graded;
   if (result === 'refused' || result === 'answered-elsewhere') {
     dropFromQueue(id);
