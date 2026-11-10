@@ -47,7 +47,9 @@ const LIVE = [{ name: 'live-daisho', id: STORY, query: 'スタートアップ大
   { name: 'live-daisho-saved-nihon', id: STORY, query: 'スタートアップ大賞', word: '大賞', reading: 'たいしょう', prior: '日本', nextLineOn: ['webkit/phone'], besideReading: true },
   { name: 'live-daijin-saved-meguru', id: 'wikinews:27998', archiveYear: '2015', query: '巡る', word: '大臣', reading: 'だいじん', prior: '巡る', nextLineOn: ['webkit/desktop', 'chromium/desktop'], uncover: true }];
 // Phone or desktop leading follows the page's own (max-width: 520px) match, never a rounded innerWidth.
-const titleLeading = (fontPx, phone) => fontPx * 1.45 + (phone ? 22 : 31);
+// Tighten pass (John, 2026-11-10): the title's room is 10px / 16px (was 22 / 31), the least that holds a title reading in WebKit.
+const titleLeading = (fontPx, phone) => fontPx * 1.45 + (phone ? 10 : 16);
+const TITLE_FOOT = 2; // the title's padding-bottom (was 8)
 const DEVICES = { phone: { viewport: { width: 390, height: 844 }, touch: true, titleFont: '21px' }, desktop: { viewport: { width: 1440, height: 900 }, touch: false, titleFont: '34px' } };
 const defaultSize = (engine) => (engine === 'webkit' ? 'phone' : 'desktop');
 const RING_LIVE = LIVE.filter((l) => l.prior);
@@ -1041,7 +1043,7 @@ async function lateTitle(page, out, spec, result) {
     }
     const frames = result.frames, deltas = frames.map((f) => ({ label: f.label, delta: titleDelta(cold, f) }));
     add('native-title-not-deferred', frames.every((f) => !f.missing && f.titleText === cold.titleText && f.words === spec.words && !f.pending && !f.buttons.length), frames.map((f) => ({ label: f.label, words: f.words, pending: f.pending, buttons: f.buttons })));
-    add('unconditional-title-rhythm', frames.every((f) => Number.parseFloat(f.paddingBottom) === 8 && Math.abs(Number.parseFloat(f.lineHeight) - titleLeading(Number.parseFloat(f.fontSize), f.phone)) < 0.01), frames.map((f) => ({ label: f.label, viewportWidth: f.viewportWidth, phone: f.phone, fontSize: f.fontSize, lineHeight: f.lineHeight, paddingBottom: f.paddingBottom })));
+    add('unconditional-title-rhythm', frames.every((f) => Number.parseFloat(f.paddingBottom) === TITLE_FOOT && Math.abs(Number.parseFloat(f.lineHeight) - titleLeading(Number.parseFloat(f.fontSize), f.phone)) < 0.01), frames.map((f) => ({ label: f.label, viewportWidth: f.viewportWidth, phone: f.phone, fontSize: f.fontSize, lineHeight: f.lineHeight, paddingBottom: f.paddingBottom })));
     add('title-identical', deltas.every(({ delta: d }) => d && d.rhythm && Object.values(d.title).every((v) => v === 0)), deltas);
     add('card-identical', deltas.every(({ delta: d }) => d && Object.values(d.card).every((v) => v === 0)), deltas);
     add('glyphs-identical', deltas.every(({ delta: d }) => d && d.glyphShift === 0), deltas);
@@ -1108,7 +1110,7 @@ async function ringDevice(page, out, spec) {
     }
     return { live, frames, sheets: sheets.length };
   }, [{ width: 520 }, { width: 520.5 }, { width: 521 }, { width: 520.5, zoom: 2 }]);
-  const leads = (f) => Number.parseFloat(f.paddingBottom) === 8 && Math.abs(Number.parseFloat(f.lineHeight) - titleLeading(Number.parseFloat(f.fontSize), f.phone)) < 0.01;
+  const leads = (f) => Number.parseFloat(f.paddingBottom) === TITLE_FOOT && Math.abs(Number.parseFloat(f.lineHeight) - titleLeading(Number.parseFloat(f.fontSize), f.phone)) < 0.01;
   const [at520, fractional, at521, zoomed] = breakpoint.frames;
   breakpoint.fractionalWitness = { engine: out.engine, gap: !zoomed.phone && !zoomed.retiredDesktop, viewportWidth: zoomed.viewportWidth, fractional: !Number.isInteger(zoomed.viewportWidth),
     required: out.engine === 'chromium', note: out.engine === 'chromium' ? 'Chromium lays the zoomed frame out at a fractional width' : 'WebKit keeps the zoomed frame whole; recorded as observed' };
