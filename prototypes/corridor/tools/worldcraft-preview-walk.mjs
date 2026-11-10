@@ -70,22 +70,29 @@ async function fresh(browser, device) {
   const problems = [];
   page.on('console', (m) => { if (m.type() === 'error') problems.push(`console error: ${m.text().slice(0, 300)}${m.location()?.url ? ` @ ${m.location().url.replace(ORIGIN, '')}` : ''}`); });
   page.on('pageerror', (e) => problems.push(`uncaught: ${String(e.message || e).slice(0, 300)}`));
+  // Which load of the page each request began in. The walk reloads the address itself (firstScreen), and a reload
+  // drops whatever the app was still fetching in the background: those are the walk's doing, not a fault.
+  const load = { number: 0, reloading: false, began: new WeakMap() };
+  page.on('request', (r) => load.began.set(r, load.number));
   page.on('requestfailed', (r) => {
+    const reason = r.failure()?.errorText || '';
     // The report sheet reads only the head of build-identity.json and drops the rest: that abort is the app's design.
-    if (r.url().endsWith('/build-identity.json') && r.failure()?.errorText === 'net::ERR_ABORTED') return;
-    problems.push(`request failed: ${r.failure()?.errorText} ${r.url().replace(ORIGIN, '')}`);
+    if (r.url().endsWith('/build-identity.json') && reason === 'net::ERR_ABORTED') return;
+    if ((load.reloading || load.began.get(r) !== load.number) && /cancel|abort/i.test(reason)) return;
+    problems.push(`request failed: ${reason} ${r.url().replace(ORIGIN, '')}`);
   });
   page.on('response', (r) => { if (r.status() >= 400) problems.push(`http ${r.status()} ${r.url().replace(ORIGIN, '')}`); });
   page.on('request', (r) => { const u = new URL(r.url()); if (u.origin !== ORIGIN && !['data:', 'blob:', 'about:'].includes(u.protocol)) problems.push(`left this address: ${r.url().slice(0, 160)}`); });
   const touch = !!DEVICES[device].hasTouch;
   const press = (target) => (typeof target === 'string' ? page.locator(target).first() : target)[touch ? 'tap' : 'click']();
   const shot = async (name) => { if (SHOTS) await page.screenshot({ path: join(SHOTS, `${name}-${device}.png`) }); };
-  return { context, page, problems, press, shot, device };
+  return { context, page, problems, press, shot, device, load };
 }
 
 /** The first screen, then Words, then the kanji's own page through search: the way a learner gets there. */
-async function firstScreen({ page }) {
-  await page.goto(BASE, { waitUntil: 'load' });
+async function firstScreen({ page, load }) {
+  load.number += 1; load.reloading = true;
+  try { await page.goto(BASE, { waitUntil: 'load' }); } finally { load.reloading = false; }
   await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 45000 });
   await page.locator('#ginga-symbol').waitFor();
 }
@@ -94,11 +101,19 @@ async function toKanji({ page, press }, kanji, reading, { fromFirstScreen = fals
     await press('#home-review');
     await page.locator('#tab-words').waitFor();
     await press('#tab-words');
-  } else await press('#sheet-back'); // from one kanji page: Close, and the search it came from is there again
-  await page.locator('#nav-search-input').waitFor();
-  await page.locator('#nav-search-input').fill(kanji);
-  const hit = page.locator('.nav-search-row', { hasText: reading }).first();
-  await hit.waitFor();
+  } else {
+    // From one kanji page: Close, and the search it came from is there again with its old query. Typing before
+    // that return has finished is overwritten by it (seen in WebKit), so wait for the page to be gone first.
+    await press('#sheet-back');
+    await page.locator('#sheet').waitFor({ state: 'hidden' });
+  }
+  const input = page.locator('#nav-search-input'), hit = page.locator('.nav-search-row', { hasText: reading }).first();
+  await input.waitFor();
+  for (let attempt = 1; ; attempt += 1) {
+    await input.fill(kanji);
+    const shown = await hit.waitFor({ timeout: attempt < 3 ? 5000 : 20000 }).then(() => true, (error) => { if (attempt === 3) throw error; return false; });
+    if (shown) break;
+  }
   await press(hit);
   await page.locator('#sheet .hero-glyph', { hasText: kanji }).waitFor();
 }
@@ -123,7 +138,11 @@ async function check(session, name, fn) {
     const raised = session.problems.slice(before);
     if (raised.length) throw new Error(`${raised.length} problem(s): ${raised.slice(0, 3).join(' ; ')}`);
     row.pass = true;
-  } catch (error) { row.detail = `FAILED: ${String(error.message || error).split('\n')[0].slice(0, 400)}`; }
+  } catch (error) {
+    // Playwright names what it was waiting for on the lines after the first: keep them, and a picture of the moment.
+    row.detail = `FAILED: ${String(error.message || error).split('\n').map((line) => line.trim()).filter(Boolean).slice(0, 3).join(' · ').slice(0, 500)}`;
+    await session.shot(`failed-${name.replace(/[^a-z0-9]+/gi, '-').slice(0, 40)}`).catch(() => {});
+  }
   results.push(row);
   console.log(`${row.pass ? 'PASS' : 'FAIL'}  ${name} @ ${session.device}: ${row.detail}`);
   return row.pass;
