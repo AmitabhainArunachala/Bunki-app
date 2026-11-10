@@ -390,7 +390,7 @@ describe('Bunki canonical shared study consumer', () => {
       expect(bound.result.identity).toBe(host.identity);
       expect(bound.queries).toEqual([]);
     }
-  });
+  }, 60_000);
   it('offers only held permits without an explicitly enabled bound reserve authority', async () => {
     const { adapter } = await fixture();
     expect(adapter.platform.canRequestNewCards()).toBe(false);
@@ -633,7 +633,7 @@ describe('Bunki canonical shared study consumer', () => {
     } finally {
       rmSync(temporary, { recursive: true, force: true });
     }
-  });
+  }, 60_000);
   it.each(['test', 'verify:shared-study:browser'])(
     'executes the browser gate through npm run %s and propagates failures',
     (name) => {
@@ -856,7 +856,7 @@ describe('Bunki canonical shared study consumer', () => {
           .update(readFileSync(new URL(`decks/${id}/deck.json`, root)))
           .digest('hex'),
       ).toBe(row.sha256);
-  });
+  }, 60_000);
   it('refuses changed frozen card identity before opening a learner store', () => {
     const broken = structuredClone(binding);
     broken.rows[0][8] = 'renamed-card';

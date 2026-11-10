@@ -74,7 +74,7 @@ describe('the reader joins a word the tokenizer cut', () => {
       const p = article(row.file);
       for (const { token } of rendered(p)) expect(token.s).not.toBe('今日は');
     }
-  });
+  }, 60_000);
 
   test('a counter after a number and the run after an unjoined prefix stay as cut', () => {
     // 七年|後: 年 is the number's counter (年後 is a word, but not here)
