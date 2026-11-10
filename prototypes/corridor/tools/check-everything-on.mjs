@@ -11,6 +11,7 @@
  *   node prototypes/corridor/tools/check-everything-on.mjs --base <url>          another address
  *   node prototypes/corridor/tools/check-everything-on.mjs --only quests,places  some checks only
  *   node prototypes/corridor/tools/check-everything-on.mjs --shots <dir>         a screenshot per door
+ *   node prototypes/corridor/tools/check-everything-on.mjs --engine webkit       Playwright's WebKit instead of its Chromium
  */
 import { createRequire } from 'node:module';
 import { mkdirSync } from 'node:fs';
@@ -24,13 +25,15 @@ const BASE = arg('--base', 'http://127.0.0.1:18841/').replace(/\/?$/, '/');
 const ONLY = arg('--only', '').split(',').filter(Boolean);
 const SHOTS = arg('--shots', '');
 if (SHOTS) mkdirSync(resolve(SHOTS), { recursive: true });
-const { chromium } = createRequire(join(repo, 'package.json'))('playwright-core');
+const ENGINE = arg('--engine', 'chromium');
+const engines = createRequire(join(repo, 'package.json'))('playwright-core');
+if (!['chromium', 'webkit'].includes(ENGINE)) { console.error('--engine is chromium or webkit'); process.exit(2); }
 const ORIGIN = new URL(BASE).origin;
 
 const DESKTOP = { viewport: { width: 1280, height: 900 }, deviceScaleFactor: 1 };
 const PHONE = { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true };
 const results = [];
-const browser = await chromium.launch({ headless: true });
+const browser = await engines[ENGINE].launch({ headless: true });
 
 async function fresh(device = DESKTOP) {
   const context = await browser.newContext({ ...device, locale: 'en-US', timezoneId: 'Asia/Tokyo' });
@@ -409,5 +412,5 @@ await check('every-door-checked', 'every door on the page has a check in this fi
 
 await browser.close();
 const failed = results.filter((row) => !row.pass);
-console.log(`\n${results.length - failed.length} passed, ${failed.length} failed. ${BASE}`);
+console.log(`\n${results.length - failed.length} passed, ${failed.length} failed. ${BASE} (${ENGINE})`);
 process.exit(failed.length ? 1 : 0);
