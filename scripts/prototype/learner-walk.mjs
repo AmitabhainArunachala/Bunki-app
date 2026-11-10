@@ -669,7 +669,16 @@ async function backupWalk(browser) {
       if (!exported) throw new Error('no exported file to import');
       await toTab(b, 'today');
       await openRecord(b);
-      const before = await page.locator('#tray').getAttribute('aria-label');
+      // Today's saved-word count: on the bar's bookmark, or (gate frame, 2026-11-10) on the Today tab while the tabs
+      // show; the bar keeps no bookmark there, so reading #tray alone waited 20 s for a control that is not drawn
+      const todayName = () =>
+        page.evaluate(
+          () =>
+            (document.querySelector('#tray') || document.querySelector('#tab-today'))?.getAttribute(
+              'aria-label',
+            ) || '',
+        );
+      const before = await todayName();
       const button = page.locator('#import-store');
       await intoView(page, button);
       const [chooser] = await Promise.all([
@@ -680,7 +689,11 @@ async function backupWalk(browser) {
       await page.waitForFunction(
         () =>
           /1 card/.test(document.querySelector('#home-review')?.textContent || '') ||
-          /1 saved word/.test(document.querySelector('#tray')?.getAttribute('aria-label') || ''),
+          /1 saved word/.test(
+            (document.querySelector('#tray') || document.querySelector('#tab-today'))?.getAttribute(
+              'aria-label',
+            ) || '',
+          ),
         null,
         { timeout: 30000 },
       );
@@ -690,11 +703,7 @@ async function backupWalk(browser) {
         (await page
           .locator('#home-review')
           .innerText()
-          .catch(() => '')) ||
-        (await page
-          .locator('#tray')
-          .getAttribute('aria-label')
-          .catch(() => ''));
+          .catch(() => '')) || (await todayName());
       const deckAfter = await page.evaluate(() =>
         Object.keys(localStorage).filter(
           (k) => k.startsWith('bunki-cloze:') && !k.includes('prefs'),
@@ -758,10 +767,9 @@ async function soundWalk(browser) {
     if (narrated.length) {
       const title = (index?.articles || []).find((x) => x.id === narrated[0])?.title || '';
       await openFirstArticle(session);
-      const item = page
-        .locator('.shelf-open')
-        .filter({ hasText: title.slice(0, 6) })
-        .first();
+      // the whole title: its first six characters also begin another article ("第2次高市内閣が始動" beside
+      // "第2次高市内閣 (改造)"), and the shelf's daily order decides which of the two comes first
+      const item = page.locator('.shelf-open').filter({ hasText: title }).first();
       await intoView(page, item);
       await press(item);
       await settleReader(page);
