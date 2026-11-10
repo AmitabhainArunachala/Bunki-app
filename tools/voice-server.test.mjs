@@ -210,6 +210,19 @@ describe('pairing input', () => {
     for (const bad of ['https://evil.example', 'http://x.workers.dev', 'https://x.workers.dev/v1'])
       expect(parsePairing({ code: '', learner: line(bad) })).toEqual({ error: 'invalid-pairing' });
   });
+  it('takes the release seat’s exact line shape: a learner id that itself holds 32 hex characters is not the code', () => {
+    // the shape release confirmed at 22:25 (" · " separators, no trailing space), with stand-ins for the three values
+    const line =
+      'Bunki voice code: 0123456789AB (10 minutes) · learner: local-0123456789abcdef0123456789abcdef · server: https://nihongo-srs.example-account.workers.dev';
+    const expected = {
+      code: '0123456789AB',
+      learner: 'local-0123456789abcdef0123456789abcdef',
+      server: 'https://nihongo-srs.example-account.workers.dev',
+    };
+    expect(parsePairing({ code: '', learner: line })).toEqual(expected);
+    expect(parsePairing({ code: line, learner: '' })).toEqual(expected);
+    expect(parsePairing({ code: '', learner: `  ${line}  \n` })).toEqual(expected);
+  });
   it('takes the line the speech team’s pairing command prints, pasted into either box', () => {
     const printed = 'Bunki voice code: AB12CD34EF56 (10 minutes) · learner: John.Learner-1';
     expect(parsePairing({ code: '', learner: printed })).toEqual({
