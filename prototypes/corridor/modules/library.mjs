@@ -141,14 +141,6 @@ function levelChip(p, extra = '') {
   return chip;
 }
 
-function readerPictureCredit() {
-  const credit = el('figcaption', 'reader-picture-caption', tx('挿絵 · ', 'Illustration · '));
-  const mark = el('span', 'kairo-mark', '回廊');
-  mark.lang = 'ja';
-  credit.append(mark, ' KAIRO');
-  return credit;
-}
-
 function placeSealStrip(open) {
   const { strip, anchor } = open;
   const fixedEdge = (selector, edge) => {
@@ -694,4 +686,4 @@ function renderReaderChoiceNote(sheet, node) {
   sheet.append(note);
 }
 
-export { levelPhrase, libraryVisibilityPolicy, libraryDiscoverable, shelfStories, shelfTallyText, shelfDateline, shelfCurrentDay, shelfDailyOrder, feedDate, publisherLink, shelfDateLabel, levelChip, readerPictureCredit, placeSealStrip, readerReadingMissText, resolveReadingPlace, refreshReadingPlacesSurface, renderPublisherContextSelection, openReferenceEntry, renderReferenceMetadata, referenceCollectionChip, renderReferenceNode, shelfBodyToken, searchRowShownByCore, catalogLabel, catalogEn, catalogMatch, catalogChip, renderCatalogNode, articleFingerprint, articleReadChars, readerChoiceMatch, readerEntryNode, readerChoiceTokenHolds, renderReaderChoice, renderReaderChoiceNote };
+export { levelPhrase, libraryVisibilityPolicy, libraryDiscoverable, shelfStories, shelfTallyText, shelfDateline, shelfCurrentDay, shelfDailyOrder, feedDate, publisherLink, shelfDateLabel, levelChip, placeSealStrip, readerReadingMissText, resolveReadingPlace, refreshReadingPlacesSurface, renderPublisherContextSelection, openReferenceEntry, renderReferenceMetadata, referenceCollectionChip, renderReferenceNode, shelfBodyToken, searchRowShownByCore, catalogLabel, catalogEn, catalogMatch, catalogChip, renderCatalogNode, articleFingerprint, articleReadChars, readerChoiceMatch, readerEntryNode, readerChoiceTokenHolds, renderReaderChoice, renderReaderChoiceNote };
