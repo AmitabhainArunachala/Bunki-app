@@ -1903,6 +1903,23 @@ function activateKanjiStructure(sheet) {
   for (const section of sheet.querySelectorAll('[data-kanji-structure]')) kanjiStructureMounts.get(section)?.();
 }
 
+// Worldcraft preview (2026-11-10): the door's module loads on the press, so nothing of it is in the boot path.
+// It shows under the Rajōmon door's rule (an exploring page, never after a graded room) and writes no record.
+const WORLDCRAFT_FORMS = new Set(['職', '識', '織']);
+function openWorldcraftDoor(invoker, node) {
+  if (!kanjiWorldEligible()) return;
+  const origin = { view: S.view, node: S.stack.at(-1) };
+  const isCurrent = () => S.view === origin.view && S.stack.at(-1) === origin.node && invoker.isConnected;
+  import('../worldcraft-host.mjs')
+    .then(host => host.openWorldcraftPreview({ document, invoker, form: node.id, biLabel, tx, isCurrent }))
+    .catch(() => {
+      if (!isCurrent() || invoker.nextElementSibling?.id === 'worldcraft-unavailable') return;
+      const line = el('p', 'fine', tx('この試作を読み込めませんでした。', 'This preview could not load.'));
+      line.id = 'worldcraft-unavailable'; line.setAttribute('role', 'status');
+      invoker.after(line);
+    });
+}
+
 function renderKanjiNode(sheet, node) {
   const retained = retainedKanjiRecord(node.id);
   const k = retained || D.kanji[node.id] || window.BunkiSkipUI?.getKanji(S.skipUi, node.id);
@@ -1967,6 +1984,12 @@ function renderKanjiNode(sheet, node) {
     worldDoor.id = 'kanji-world-door'; worldDoor.type = 'button';
     worldDoor.addEventListener('click', () => openKanjiWorldEncounter(worldDoor, node));
     sheet.append(worldDoor);
+  }
+  if (WORLDCRAFT_FORMS.has(node.id) && kanjiWorldEligible()) {
+    const craftDoor = el('button', 'chip kanji-world-door', tx(`「${node.id}」を部品から組み立てる · 試作`, `Build ${node.id} from its parts · preview`));
+    craftDoor.id = 'worldcraft-door'; craftDoor.type = 'button';
+    craftDoor.addEventListener('click', () => openWorldcraftDoor(craftDoor, node));
+    sheet.append(craftDoor);
   }
   if (referenceView.state === 'complete') {
     const source = el('p', 'fine', tx(

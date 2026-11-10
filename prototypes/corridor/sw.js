@@ -111,6 +111,11 @@ const SHELL = [
   'journey-lifecycle.mjs',
   // M4 v0: the quest adapter, imported beside the lifecycle when the switch is ON
   'm4-quest.mjs',
+  // Worldcraft preview (2026-11-10): the door on 職 / 識 / 織 loads these on its first press
+  'm4-worldcraft.mjs',
+  'worldcraft-view.mjs',
+  'worldcraft-host.mjs',
+  'worldcraft.css',
   'dictionary-worker.js',
   'skip-core.js',
   'skip-ui.js',
