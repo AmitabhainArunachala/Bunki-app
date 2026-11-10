@@ -276,7 +276,9 @@
   margin: -10px 0 -10px 4px;
 }
 .voice-say.is-speaking, .mini-voice.is-speaking, .kp-listen.is-speaking { color: var(--color-gold, var(--accent)); }
-.voice-say[aria-busy='true'], .kp-listen[aria-busy='true'] { opacity: 0.6; }
+/* waiting for the voice server's answer: the control he pressed dims until the sentence starts */
+.voice-say[aria-busy='true'], .kp-listen[aria-busy='true'], .say[aria-busy='true'], .mini-voice[aria-busy='true'],
+.listen-row[data-voice-state='loading'] .play-toggle { opacity: 0.6; }
 ::highlight(bunki-speaking) { background-color: rgba(201, 162, 39, 0.28); }
 :root:not([data-voice-highlight='range']) #reader .tok[data-speaking] {
   background: color-mix(in srgb, var(--color-gold, #c9a227) 28%, transparent);
