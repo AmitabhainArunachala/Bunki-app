@@ -473,7 +473,13 @@ await door('orbit', 'the orbit word field opens from the galaxy menu and returns
   const bubble = page.locator('#orbit-preview-door');
   await bubble.waitFor();
   const words = (await bubble.innerText()).replace(/\s+/g, ' ').trim();
-  must(/preview/.test(words), `the orbit door reads "${words}"`);
+  // since the gate (2026-11-10) Orbit is a row of the gate's panel: it names Orbit and wears the new mark, drawn by the
+  // prototype layer's stylesheet after the row's name (the word "preview" left the door; the dialog's bar still says it)
+  const mark = await bubble.evaluate((row) => {
+    const name = row.querySelector('.nav-station-t');
+    return name ? getComputedStyle(name, '::after').content : '';
+  });
+  must(/Orbit|廻/.test(words) && /new|新/.test(mark), `the orbit door reads "${words}" and wears the mark ${mark || 'none'}`);
   await bubble.click();
   await page.locator('dialog#orbit-preview[open]').waitFor();
   const bar = await text(page, '.orbit-preview-bar', 120);

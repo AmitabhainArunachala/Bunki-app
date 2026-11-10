@@ -1,5 +1,5 @@
 /** G3 drift seam — declarations moved verbatim from ../corridor.js (pure move, no body edits). */
-import { D, DEPTH_NAMES, DRIFT_THEME_BY_WORLD, ISO_DAY, KAGAMI_BAND_NAMES, KAGAMI_CLEAR, KAGAMI_LEVELS, KAGAMI_MIN_SEEN, KAGAMI_OOV, LEADING_DROP_DAYS, MONTHS_EN, NODE_KIND, PART_WRITTEN, ROOM_NAMES, S, TODAY_JA_WORD, TODAY_SKY_CAP, TODAY_SKY_WORD, allAssessmentEvidence, bi, commitStorePatch, depthIndexMemo, depthNodeCache, el, finiteNumber, go, installScaleBridge, isLeech, kanaReadingKey, metReadable, nonEmptyString, notYetReleased, openAssessmentQuestionReview, openPassage, openSentencePractice, openWordWeb, owns, passage, plainRecord, readFrameRows, readHelpReadable, recordWritable, render, savedAnswerFor, setJaWords, setOwnRecordValue, shelfDay, srsKey, todaySky, trayItemPending, tx, uiIcon, withEn, wordCardIdentity } from '../corridor.js';
+import { D, DEPTH_NAMES, DRIFT_THEME_BY_WORLD, ISO_DAY, KAGAMI_BAND_NAMES, KAGAMI_CLEAR, KAGAMI_LEVELS, KAGAMI_MIN_SEEN, KAGAMI_OOV, LEADING_DROP_DAYS, LEARN_STAGE_DECKS, MONTHS_EN, NODE_KIND, PART_WRITTEN, ROOM_NAMES, S, TODAY_JA_WORD, TODAY_SKY_CAP, TODAY_SKY_WORD, allAssessmentEvidence, bi, commitStorePatch, depthIndexMemo, depthNodeCache, el, finiteNumber, go, installScaleBridge, isLeech, kanaReadingKey, metReadable, nonEmptyString, notYetReleased, openAssessmentQuestionReview, openPassage, openSentencePractice, openWordWeb, owns, passage, plainRecord, readFrameRows, readHelpReadable, recordWritable, render, savedAnswerFor, setJaWords, setOwnRecordValue, shelfDay, srsKey, todaySky, trayItemPending, tx, uiIcon, withEn, wordCardIdentity } from '../corridor.js';
 import { dictionaryAnsweredForm, dictionaryEpoch, dictionaryRowsReadAs, lookup, partMeaning, readerTokenAt, readerTokenNode } from './dictionary.mjs';
 import { themeId } from './learner.mjs';
 import { articleReadChars, libraryDiscoverable, shelfDateLabel, shelfStories } from './library.mjs';
@@ -415,13 +415,36 @@ function todayPlaceSky(hero) {
   });
 }
 
+/** The day's word's one line of why, from its rule (todayWordOfDay), dated in the app's style (8 Nov · 11月8日; the year
+ * only when it is not this one) (John, 2026-11-10: "how is the word connected to the user or the study or progress?"). */
+function todayWordWhy(pick) {
+  const on = (at) => {
+    const d = new Date(at);
+    const year = d.getFullYear() === new Date().getFullYear() ? null : d.getFullYear();
+    return { ja: `${year ? `${year}年` : ''}${d.getMonth() + 1}月${d.getDate()}日`, en: `${d.getDate()} ${MONTHS_EN[d.getMonth()]}${year ? ` ${year}` : ''}` };
+  };
+  if (pick.from === 'missed' && Number.isFinite(pick.at)) {
+    const day = on(pick.at);
+    return tx(`${day.ja}にまちがえた語`, `You missed this on ${day.en}.`);
+  }
+  if (pick.from === 'saved') {
+    if (!pick.at) return tx('保存した語', 'You saved this.');
+    const day = on(pick.at);
+    return tx(`${day.ja}に保存した語`, `You saved this on ${day.en}.`);
+  }
+  if (pick.from === 'read') return tx('今日の読み物から', "From today's reading.");
+  const deck = pick.from === 'deck' ? LEARN_STAGE_DECKS.find(([id]) => id === pick.deck) : null;
+  if (deck) return tx(`${deck[1]}デッキの次の語`, `Next in your ${deck[2]} deck.`);
+  return '';
+}
+
 function renderTodayWord(pick) {
   const block = el('div', 'today-dayword');
   const label = el('p', 'dw-label', tx('今日のことば', "Today's word"));
   label.dataset.japaneseLookup = 'off';
   block.append(label);
-  // why this word is here, from the pick's own source only, as a plain noun (John, 2026-11-10)
-  const why = { saved: tx('保存した語', 'Saved word'), fresh: tx('新しい語', 'New word') }[pick.from];
+  // why this word is here, from the pick's own source only (todayWordWhy)
+  const why = todayWordWhy(pick);
   if (why) block.append(el('p', 'dw-why', why));
   const word = el('button', 'dw-word');
   word.type = 'button';
@@ -1031,6 +1054,8 @@ function trailLastPhrase(row) {
   if (kind === 'lesson') return g === 3 ? tx('レッスンで正解', 'answered right in a lesson') : tx('レッスンで不正解', 'answered wrong in a lesson');
   if (kind === 'reveal') return g === 1 ? tx('復習で「思い出した」', 'declared recall in review') : tx('復習で「まだ」', 'declared not-yet in review');
   if (kind === 'dojo') {
+    // detail 0 is the revocation an undo files, not a grade
+    if (g === 0) return tx('道場の稽古を取り消した', 'took back a dojo practice');
     const seal = { 1: '再', 2: '難', 3: '良', 4: '易' }[g];
     return seal ? tx(`道場の稽古 — ${seal}`, `practised in the dojo — ${['', 'again', 'hard', 'good', 'easy'][g]}`) : tx('道場の稽古', 'practised in the dojo');
   }

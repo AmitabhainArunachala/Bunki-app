@@ -3625,6 +3625,31 @@ export async function missedTerms(deckId, storage = window.localStorage, since =
   return [...latest.values()].sort((a, b) => b.at - a.at);
 }
 
+/**
+ * Read-only, for the corridor's Today: of `deckIds`, the deck he studies — the one whose ledger holds the latest answer,
+ * else the first — and the next word it would bring him new (in the deck's own order, its group on, none of its cards
+ * begun or set aside, one card the answer mode serves), as { deck, term, reading }; null when every word is begun. It
+ * reads the ledgers as they stand and writes nothing.
+ */
+export async function nextNewWord(deckIds, storage = window.localStorage) {
+  if (isSharedStudyMode() || !deckIds?.length) return null;
+  const ledger = (id) => readJson(storage, stateKey(id));
+  const lastAnswer = (raw) => (Array.isArray(raw?.log) ? raw.log : []).reduce((at, row) => Math.max(at, (Array.isArray(row) && Date.parse(row[2])) || 0), 0);
+  let deckId = deckIds[0];
+  let latest = 0;
+  for (const id of deckIds) {
+    const at = lastAnswer(ledger(id));
+    if (at > latest) [deckId, latest] = [id, at];
+  }
+  const { deck } = await loadDeck(deckId);
+  const state = normalizeState(ledger(deckId), deck);
+  const skip = skipFor(prefsFor(storage, deck).mode);
+  const off = new Set(state.groupsOff);
+  const word = deck.words.find((w) => !off.has(w.group) && w.cards.some((card) => !skip?.(card))
+    && w.cards.every((card) => !state.cards[card.id] && !isSuspended(state, card.id)));
+  return word ? { deck: deckId, term: word.term, reading: word.reading || '' } : null;
+}
+
 export async function summary(deckId, storage = window.localStorage) {
   if (isSharedStudyMode() && (isSharedDeck(deckId) || deckId === 'shared-grammar')) return (await sharedPlayer()).summary(deckId);
   if (isSharedStudyMode()) return {due:0,fresh:0,total:0,words:0,authority:'unmapped'};

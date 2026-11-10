@@ -15,7 +15,7 @@
 #worldcraft-dialog h1.view-title::after,                    /* Build a character: the top of its screen */
 #passage-door::after,                                       /* Passage: the door on 職 識 織 */
 #passage-dialog .passage-bar .pool-tag::after,              /* Passage: beside "preview" at the top of its screen */
-#orbit-preview-door::after,                                 /* Orbit: the bubble in the galaxy menu */
+#orbit-preview-door .nav-station-t::after,                  /* Orbit: beside its name, in the gate's menu */
 .orbit-preview-bar .orbit-preview-tag::after,               /* Orbit: beside "preview" at the top of its screen */
 .library-candidate-tag::after,                              /* candidate readings: each card, and the reader's head */
 .listen-row[data-passage='jawiki:5294446']::after,          /* the Sakura article's speaker bar */
@@ -271,6 +271,192 @@
   color: var(--pl-paper);
   font-size: var(--type-label, 13px);
   pointer-events: none;
+}
+
+/* ------------------------------------------------------------------------------------------------- 糸 depth · a trial
+ * Off until its switch in the sheet is on (prototype-layer.mjs sets data-pl-ito='on' on the root; nothing below applies
+ * without it, except the switch's own drawing). */
+/* the switch, at the head of "New in this build" */
+#bunki-prototype-root .pl-trial { display: flex; align-items: center; gap: 14px; margin: 0 0 18px; padding: 0 0 16px; border-bottom: 1px solid var(--pl-line); }
+#bunki-prototype-root .pl-switch { position: relative; flex: none; width: 52px; height: 44px; min-height: 44px; padding: 0; border: 0; background: transparent; }
+#bunki-prototype-root .pl-switch::before { content: ''; position: absolute; inset: 8px 2px; border: 1px solid var(--pl-ink); border-radius: 14px; background: transparent; transition: background-color 180ms ease-out; }
+#bunki-prototype-root .pl-switch-dot { position: absolute; top: 12px; left: 6px; width: 20px; height: 20px; border-radius: 50%; background: var(--pl-ink); transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1), background-color 180ms ease-out; }
+#bunki-prototype-root .pl-switch[aria-checked='true']::before { background: var(--pl-ink); }
+#bunki-prototype-root .pl-switch[aria-checked='true'] .pl-switch-dot { transform: translateX(20px); background: var(--pl-paper); }
+
+/* the cord carries the trail, so the app's breadcrumb row leaves the glass; its controls stay in the page and are the
+ * ones a bead presses. The row keeps its place as a box of no height and is never set to display: none here: in a page
+ * the breath its own margin gives the first line stays as the app has it in every state (the save drawer opens between
+ * the bar and this row), and display: none stays the app's own word for "no trail on this screen", which the cord
+ * follows (trailRow in prototype-layer.mjs). */
+:root[data-pl-ito='on'] .scale-thread { visibility: hidden !important; height: 0 !important; min-height: 0 !important; padding-block: 0 !important; overflow: hidden !important; border: 0 !important; box-shadow: none !important; }
+:root[data-pl-ito='on'] body:not([data-view='drift']) #app:has(> .scale-thread) > main > .room-sign { top: calc(53px + env(safe-area-inset-top, 0px)); }
+
+/* the light. One cross-fade of the whole glass for a change of look (document.startViewTransition): 450 ms, eased, the
+ * root joins the transition for that change alone (the app keeps its root out of its own, rooms/motion.css: a held
+ * screen takes no taps), and prototype-layer.mjs ends the fade at the first touch. data-pl-ito-fade stands on the root
+ * only for the length of such a change. */
+:root[data-pl-ito-fade] { view-transition-name: root; }
+:root[data-pl-ito-fade]::view-transition-old(root),
+:root[data-pl-ito-fade]::view-transition-new(root) { animation-duration: 450ms; animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1); animation-fill-mode: both; }
+:root[data-pl-ito-fade]::view-transition { pointer-events: none; }
+@media (prefers-reduced-motion: reduce) {
+  :root[data-pl-ito-fade]::view-transition-old(root),
+  :root[data-pl-ito-fade]::view-transition-new(root) { animation: none; }
+}
+/* while a depth look stands the body keeps the learner's own ground colour: the app regrows its paper (the writing
+ * room's ground) whenever that colour changes. The body is under its own ::before layer and under the page, so this
+ * colour is never on the glass. */
+:root[data-pl-ito-look] body { background-color: var(--pl-ito-home-ground) !important; }
+
+/* the cord. "slim", under 900 px: down the left edge of the glass, in the gutter, clear of the reading text. Its lane is
+ * the 16 px of that gutter and the thread hangs 6 px from the edge, so a bead ends before the pictures that start at
+ * 10 px and long before the text at 16 px. The numbers here are the ones cordShape() draws the thread with. */
+#bunki-prototype-cord {
+  --pl-ink: var(--ink, #1c2f42);
+  --pl-paper: var(--ground, #f1e9d3);
+  --pl-cord-red: var(--red, #b03a2e);
+  --pl-cord-x: 6px;
+  --pl-cord-ring: 7px;
+  --pl-cord-now: 9px;
+  --pl-cord-line: 1.5px;
+  --pl-cord-halo: 2px;
+  position: fixed;
+  z-index: 62; /* over a page and its bars; under the tabs (70), the menus and every dialog */
+  top: calc(45px + env(safe-area-inset-top, 0px));
+  left: env(safe-area-inset-left, 0px);
+  display: block;
+  width: 16px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  animation: none;
+  pointer-events: none;
+}
+#bunki-prototype-cord, #bunki-prototype-cord * { box-sizing: border-box; }
+#bunki-prototype-cord[hidden] { display: none; }
+#bunki-prototype-cord svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+#bunki-prototype-cord .pl-cord-thread { fill: none; stroke: var(--pl-cord-red); stroke-width: 1.6; stroke-linecap: round; }
+#bunki-prototype-cord .pl-cord-ghost { fill: none; stroke: var(--pl-cord-red); stroke-width: 1.1; stroke-dasharray: 1 6; stroke-linecap: round; opacity: 0.5; }
+#bunki-prototype-cord .pl-knot {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: min(44px, var(--pl-cord-step, 40px));
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  margin: calc(min(44px, var(--pl-cord-step, 40px)) / -2) 0 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: inherit;
+  font: inherit;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: none;
+  cursor: pointer;
+  outline: 0;
+  appearance: none;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+#bunki-prototype-cord .pl-knot:disabled { opacity: 1; cursor: default; }
+#bunki-prototype-cord .pl-knot[data-pl-knot='now'] { cursor: default; }
+/* the bead, centred on its place on the thread */
+#bunki-prototype-cord .pl-knot-o {
+  position: absolute;
+  top: 50%;
+  left: var(--pl-cord-x);
+  width: var(--pl-cord-ring);
+  height: var(--pl-cord-ring);
+  border: var(--pl-cord-line) solid var(--pl-cord-red);
+  border-radius: 50%;
+  background: transparent;
+  transform: translate(-50%, -50%);
+  transition: width 350ms cubic-bezier(0.2, 0.8, 0.2, 1), height 350ms cubic-bezier(0.2, 0.8, 0.2, 1), background-color 350ms ease-out, box-shadow 350ms ease-out, opacity 350ms ease-out;
+}
+#bunki-prototype-cord .pl-knot[data-pl-knot='now'] .pl-knot-o {
+  width: var(--pl-cord-now);
+  height: var(--pl-cord-now);
+  background: var(--pl-cord-red);
+  box-shadow: 0 0 0 var(--pl-cord-halo) color-mix(in srgb, var(--pl-cord-red) 22%, transparent);
+}
+#bunki-prototype-cord .pl-knot[data-pl-knot='in'] .pl-knot-o { width: calc(var(--pl-cord-ring) - 2px); height: calc(var(--pl-cord-ring) - 2px); border-width: 1px; opacity: 0.62; }
+#bunki-prototype-cord .pl-knot:focus-visible .pl-knot-o { outline: 2px solid var(--pl-ink); outline-offset: 2px; }
+/* "edge", under 900 px with the lead's live depth stylesheets on: the cord is the red edge those stylesheets give the
+ * heads of pages, carried from the bar down to the place the learner stands at, and a bead is a small tab on that edge */
+#bunki-prototype-cord[data-pl-cord='edge'] .pl-cord-thread { stroke-width: 3; stroke-linecap: butt; }
+#bunki-prototype-cord[data-pl-cord='edge'] .pl-cord-ghost { stroke-width: 1.5; }
+#bunki-prototype-cord[data-pl-cord='edge'] .pl-knot-o { left: 3px; width: 5px; height: 8px; border-left: 0; border-radius: 0 5px 5px 0; transform: translate(0, -50%); }
+#bunki-prototype-cord[data-pl-cord='edge'] .pl-knot[data-pl-knot='now'] .pl-knot-o { width: 7px; height: 12px; border-radius: 0 7px 7px 0; }
+#bunki-prototype-cord[data-pl-cord='edge'] .pl-knot[data-pl-knot='in'] .pl-knot-o { left: 3px; width: 4px; height: 6px; border-left: 0; }
+/* "column", from 900 px: the same 3 px line on the left edge of the page's column (prototype-layer.mjs measures it and
+ * sets left and width), one line with the red edge of the page heads. The beads are tabs on its outer side, in the
+ * margin, and where that margin has room each has its name beside it. The whole of a name and its tab is the bead. */
+#bunki-prototype-cord[data-pl-cord='column'] .pl-cord-thread { stroke-width: 3; stroke-linecap: butt; }
+#bunki-prototype-cord[data-pl-cord='column'] .pl-cord-ghost { stroke-width: 1.5; }
+#bunki-prototype-cord[data-pl-cord='column'] .pl-knot-o { right: 3px; left: auto; width: 6px; height: 9px; border-right: 0; border-radius: 5px 0 0 5px; transform: translate(0, -50%); }
+#bunki-prototype-cord[data-pl-cord='column'] .pl-knot[data-pl-knot='now'] .pl-knot-o { width: 8px; height: 13px; border-radius: 7px 0 0 7px; }
+#bunki-prototype-cord[data-pl-cord='column'] .pl-knot[data-pl-knot='in'] .pl-knot-o { width: 5px; height: 7px; border-right: 0; }
+#bunki-prototype-cord .pl-knot-n { display: none; }
+#bunki-prototype-cord[data-pl-cord='column'][data-pl-names] .pl-knot-n {
+  display: block;
+  position: absolute;
+  top: 50%;
+  right: 19px;
+  left: 0;
+  overflow: hidden;
+  color: color-mix(in srgb, var(--pl-ink) 66%, transparent);
+  font: 500 12px / 1.35 var(--sans, 'Noto Sans JP', system-ui, sans-serif);
+  letter-spacing: 0.02em;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transform: translateY(-50%);
+  transition: color 200ms ease-out;
+}
+#bunki-prototype-cord[data-pl-cord='column'][data-pl-names] .pl-knot[data-pl-knot='now'] .pl-knot-n { color: var(--pl-ink); font-weight: 700; }
+#bunki-prototype-cord[data-pl-cord='column'][data-pl-names] .pl-knot[data-pl-knot='in'] .pl-knot-n { color: color-mix(in srgb, var(--pl-ink) 46%, transparent); }
+#bunki-prototype-cord[data-pl-cord='column'][data-pl-names] .pl-knot-tip { display: none; }
+/* the bead's name, beside it: under the pointer, or with the keyboard on it */
+#bunki-prototype-cord .pl-knot-tip {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 6px);
+  max-width: min(260px, calc(100vw - 72px));
+  padding: 6px 9px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--pl-ink);
+  color: var(--pl-paper);
+  font: 500 12px / 1.25 var(--sans, 'Noto Sans JP', system-ui, sans-serif);
+  letter-spacing: 0.03em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-4px, -50%);
+  transition: opacity 160ms ease-out, transform 160ms ease-out;
+}
+#bunki-prototype-cord .pl-knot:focus-visible .pl-knot-tip { opacity: 1; transform: translate(0, -50%); }
+@media (hover: hover) {
+  #bunki-prototype-cord[data-pl-names] .pl-knot[data-pl-knot='bead']:not(:disabled):hover .pl-knot-n,
+  #bunki-prototype-cord[data-pl-names] .pl-knot[data-pl-knot='in']:not(:disabled):hover .pl-knot-n { color: var(--pl-ink); }
+  #bunki-prototype-cord .pl-knot:not(:disabled):hover .pl-knot-tip { opacity: 1; transform: translate(0, -50%); }
+  #bunki-prototype-cord .pl-knot[data-pl-knot='bead']:not(:disabled):hover .pl-knot-o,
+  #bunki-prototype-cord .pl-knot[data-pl-knot='in']:not(:disabled):hover .pl-knot-o { background: color-mix(in srgb, var(--pl-cord-red) 38%, transparent); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #bunki-prototype-cord .pl-knot-o, #bunki-prototype-cord .pl-knot-n, #bunki-prototype-cord .pl-knot-tip { transition: none; }
 }
 
 @media (max-width: 480px) {

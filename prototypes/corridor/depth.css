@@ -1,6 +1,6 @@
 /* depth.css · the app's surfaces: ground, sheet, slip, well, and the night windows its subjects stand in.
    FOLDED FILE. Do not edit here. Sources: ~/.dharma/bunki/PROGRAM/design/depth/depth.css and lead.css
-   (design version 1794317393, folded 2026-11-10 22:30 JST). Re-fold: ~/.dharma/bunki/PROGRAM/design/fold-depth.sh <worktree>.
+   (design version 1794318207, folded 2026-11-10 22:51 JST). Re-fold: ~/.dharma/bunki/PROGRAM/design/fold-depth.sh <worktree>.
    Every rule is scoped under html[data-live-depth='1']; index.html sets that attribute. */
 
 /* depth.css · the surface system: four planes made by light (地 ground, 紙 sheet, 札 slip, 窪 well).
@@ -32,6 +32,9 @@ html[data-live-depth='1'] :is(body:not([data-view='drift']), body[data-view='dri
   --dp-night-read: color-mix(in oklab, var(--ai) 34%, #fff);
   --dp-lip: color-mix(in oklab, var(--ground-0) 24%, transparent);
   --dp-quiet: color-mix(in oklab, var(--ink) 88%, var(--ground-0));
+  /* one dim: the ink of a control that is switched off, and of a character that steps back beside its partner.
+     It still reads 3:1 on every plane of the look */
+  --dp-dim: color-mix(in srgb, var(--ink) 56%, transparent);
   --dp-deep: var(--color-lacquer, color-mix(in oklab, var(--ink) 38%, var(--ai)));
   --dp-deep-2: color-mix(in oklab, var(--dp-deep) 82%, #000);
   --dp-shadow-card:
@@ -77,6 +80,7 @@ html[data-live-depth='1']:is(:not([data-theme]), [data-theme=''], [data-theme='h
 /* 柿渋 is a mid-tone paper: quiet print on its ground takes nearly full ink to clear 4.5:1 */
 html[data-live-depth='1'][data-theme='iwa'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet) {
   --dp-quiet: color-mix(in oklab, var(--ink) 97%, var(--ground-0));
+  --dp-dim: color-mix(in srgb, var(--ink) 64%, transparent);
   /* and its ground is deepened only a little, so the look's own 藍 still reads on it */
   --dp-ground: color-mix(in oklab, var(--ground) 97%, var(--ink));
   --dp-ground-lit: var(--ground-0);
@@ -182,7 +186,7 @@ html[data-live-depth='1']:is([data-room='tray'], [data-room='learn'], [data-room
 }
 /* ---- 紙 from a tablet up the room is the sheet, with a real edge (and its controls stand on a sheet) ---- */
 @media (min-width: 521px) {
-  html[data-live-depth='1']:is([data-room='tray'], [data-room='learn'], [data-room='me']) body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
+  html[data-live-depth='1']:is([data-room='tray'], [data-room='learn'], [data-room='search']) body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
     background: linear-gradient(180deg, var(--dp-sheet) 0%, var(--dp-sheet) 420px, var(--dp-sheet-foot) 100%);
     border-color: color-mix(in oklab, var(--dp-shade) 12%, transparent);
     border-top-color: var(--dp-catch);
@@ -190,6 +194,13 @@ html[data-live-depth='1']:is([data-room='tray'], [data-room='learn'], [data-room
     --dp-b-bg: transparent;
     --dp-b-line: var(--color-edge-strong);
     --dp-b-shade: var(--dp-shadow-slip-down);
+    --dp-w-bg: color-mix(in oklab, var(--dp-well) 50%, var(--dp-sheet));
+  }
+  /* Me: the room is the ground and the book is the sheet, as on a phone (lead, 22:21) */
+  html[data-live-depth='1'][data-room='me'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
+    border-color: transparent;
+    background: none;
+    box-shadow: none;
   }
 }
 /* the word is printed on the sheet itself: no tinted halo behind it by day; at night the halo is the sheet's own tone */
@@ -262,13 +273,14 @@ html[data-live-depth='1'][data-room='tray'] body:not([data-view='drift']) .today
 
 /* ---- 窪 what you write into is sunk, in every room ---- */
 html[data-live-depth='1']:is([data-room='tray'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not([data-view='drift']) #app > main :is(.record-note-input, .search-field):not(:focus) {
-  background-color: var(--dp-well);
+  /* on the ground the full wash; on a sheet half of it (the plane says which), the inner top shadow kept */
+  background-color: var(--dp-w-bg, var(--dp-well));
   box-shadow:
     inset 0 1px 0 color-mix(in oklab, var(--dp-shade) 34%, transparent),
     inset 0 5px 8px -4px color-mix(in oklab, var(--dp-shade) 42%, transparent),
     0 1px 0 var(--dp-catch);
 }
-html[data-live-depth='1']:is([data-room='tray'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not([data-view='drift']) #app > main :is(.record-note-input, .search-field)::placeholder { color: color-mix(in oklab, var(--ink) 84%, var(--dp-well)); }
+html[data-live-depth='1']:is([data-room='tray'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not([data-view='drift']) #app > main :is(.record-note-input, .search-field)::placeholder { color: color-mix(in oklab, var(--ink) 84%, var(--dp-w-bg, var(--dp-well))); }
 
 /* =====================================================================================
    5 · a word's page (the sheet that opens on a word)
@@ -456,6 +468,9 @@ html[data-live-depth='1'] #sheet .hero:has(> .hero-glyph) :is(.shelf-meta, .entr
   text-decoration: none;
 }
 html[data-live-depth='1'] #sheet .hero:has(> .hero-glyph) :is(.shelf-meta, .entry-facts) :is(.cat-chip, .kanji-fact):hover { color: var(--dp-star); }
+/* the doors under the character stand in one even row: the app's own rule (no margins in that row) is restored over
+   the prototype layer's margin on one of them, which left that door 8 px short (lead, 22:21) */
+html[data-live-depth='1'] #sheet .kanji-doors > * { margin: 0; }
 /* ---- 札 the door to its world is the one slip on the red thread ---- */
 html[data-live-depth='1'] #sheet:has(.hero > .hero-glyph) #kanji-world-door { --dp-b-thread: var(--red); }
 /* ---- 紙 readings: a sheet; sound in the look's cool tone, an empty reading's dash included ---- */
@@ -523,7 +538,8 @@ html[data-live-depth='1'][data-room='learn'] body:not([data-view='drift']):not(.
    8 · Me: the book lies on the page with weight; the day of the test is the window you look toward
    ===================================================================================== */
 html[data-live-depth='1'][data-room='me'] body:not([data-view='drift']):not(.zen) .me-book {
-  box-shadow: 0 0 0 1px color-mix(in oklab, var(--dp-shade) 10%, transparent), inset 0 1px 0 var(--dp-catch), var(--dp-shadow-sheet);
+  /* the book lies on open ground: besides the sheet's own shadow, a soft shade all round it */
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--dp-shade) 10%, transparent), inset 0 1px 0 var(--dp-catch), 0 2px 18px -4px color-mix(in oklab, var(--dp-shade) 24%, transparent), var(--dp-shadow-sheet);
 }
 /* ---- 窪 the horizon: a night window; everything in it is re-inked in the lit tone ---- */
 html[data-live-depth='1'][data-room='me'] body:not([data-view='drift']):not(.zen) .me-n1 {
@@ -593,6 +609,7 @@ html[data-live-depth='1'] :is(.me-book, .learn-section, #sheet :is(.senses, .con
   --dp-b-bg: transparent;
   --dp-b-line: var(--color-edge-strong);
   --dp-b-shade: var(--dp-shadow-slip-down);
+  --dp-w-bg: color-mix(in oklab, var(--dp-well) 50%, var(--dp-sheet));
 }
 html[data-live-depth='1'] :is(.today-sky, .me-n1, #sheet .hero:has(> .hero-glyph), #sheet > p.depth-basis) {
   --dp-b-bg: transparent;
@@ -673,6 +690,19 @@ html[data-live-depth='1'] body:not([data-view='drift']) #mini .mini-sentence-ope
   pointer-events: none;
 }
 
+/* =====================================================================================
+   12 · one dim. A control that is switched off is dimmed once, by its ink, never by its ink and its opacity together,
+   and still reads 3:1 on its plane. The page's own character in a row of compounds steps back the same way: quieter
+   than its partner, still readable.
+   ===================================================================================== */
+html[data-live-depth='1']:not(#\#):not(#\#):not(#\#) :is(body:not([data-view='drift']), body[data-view='drift'] #sheet) :where(.chip, .take, .gs-button, .cd-btn, .stroke-btn, .skip-more, .skip-retry, .reference-button, .btn-tertiary, .gs-text, .focus-chip, .kdx-lens, .me-turn, .play-mark, .teacher-actions button, .reading-place-actions button, .chat-send):where(:disabled, [aria-disabled='true']):where(:not(.pool-tag, .cat-chip, .exam-level-card, .t-kanji, .t-word, .t-radical, .t-idiom, [class*='kp-'])) {
+  opacity: 1;
+}
+html[data-live-depth='1']:not(#\#):not(#\#):not(#\#) :is(body:not([data-view='drift']), body[data-view='drift'] #sheet) :where(.chip, .take:is(.taken, .quiet, .focus-start), .gs-button:not(.primary), .cd-btn:not(.cd-primary), .stroke-btn, .skip-more, .skip-retry, .reference-button, .btn-tertiary, .gs-text, .focus-chip, .kdx-lens, .me-turn, .play-mark, .teacher-actions button:not(.take, .btn-primary), .reading-place-actions button):where(:disabled, [aria-disabled='true']):where(:not(.btn-primary, .pool-tag, .cat-chip, .exam-level-card, .t-kanji, .t-word, .t-radical, .t-idiom, [class*='kp-'])) {
+  color: var(--dp-dim);
+}
+html[data-live-depth='1'] body .sheet .row-self { opacity: 1; color: var(--dp-dim); }
+
 /* lead.css · the lead's own live trials, attached with the depth sheet by the 深 switch.
    Every rule is scoped under html[data-live-depth='1']. Trials here are proposals John can switch off;
    an accepted one moves into the app's own code and leaves this file. */
@@ -715,7 +745,10 @@ html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > ma
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent 0%, transparent 22%, color-mix(in oklab, var(--dp-night) 70%, transparent) 50%, color-mix(in oklab, var(--dp-night) 95%, transparent) 80%, var(--dp-night) 100%);
+  /* the red thread runs the whole height of the cover, picture and headline alike, as one line */
+  background:
+    linear-gradient(90deg, var(--red) 0, var(--red) 3px, transparent 3px),
+    linear-gradient(180deg, transparent 0%, transparent 22%, color-mix(in oklab, var(--dp-night) 70%, transparent) 50%, color-mix(in oklab, var(--dp-night) 95%, transparent) 80%, var(--dp-night) 100%);
   /* the night looks clip their own lamp light here; the cover's shade is never clipped */
   clip-path: none;
   pointer-events: none;
@@ -730,6 +763,12 @@ html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > ma
   --cover-lap: 118px;
   position: relative;
   z-index: 1;
+  /* a short headline still covers the whole lap: the card is never shorter than its overlap with the picture,
+     and its words sit at the foot of the cover */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: var(--cover-lap);
   margin-top: calc(-1 * var(--cover-lap));
   border: 0;
   border-radius: 0;
@@ -991,7 +1030,8 @@ html[data-live-depth='1'][data-theme='sumi'] :is(body:not([data-view='drift']), 
   --dp-paper-white: color-mix(in oklab, var(--ground-0) 40%, #fff);
   --dp-ground: color-mix(in oklab, var(--dp-paper-white) 80%, var(--dp-wash));
   --dp-ground-lit: color-mix(in oklab, var(--dp-paper-white) 93%, var(--dp-wash));
-  --dp-ground-foot: color-mix(in oklab, var(--dp-paper-white) 72%, var(--dp-wash));
+  /* engineer, 22:45: 75%, was 72%. At the foot of a tall window the look's 藍 (Report a problem) read 4.40:1 */
+  --dp-ground-foot: color-mix(in oklab, var(--dp-paper-white) 75%, var(--dp-wash));
   --dp-well: color-mix(in oklab, var(--dp-paper-white) 66%, var(--dp-wash));
 }
 html[data-live-depth='1'][data-theme='shu'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet) {
@@ -1002,7 +1042,8 @@ html[data-live-depth='1'][data-theme='shu'] :is(body:not([data-view='drift']), b
   --dp-well: color-mix(in oklab, var(--dp-blush) 80%, var(--ink));
 }
 html[data-live-depth='1'][data-theme='keyblock'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet) {
-  --dp-ground: color-mix(in oklab, var(--ground-2) 96%, var(--ink));
+  /* engineer, 22:45: 98%, was 96%. The look's 藍 read 4.41:1 on the ground (Report a problem, a compound's reading) */
+  --dp-ground: color-mix(in oklab, var(--ground-2) 98%, var(--ink));
   --dp-ground-lit: var(--dp-ground);
   --dp-ground-foot: var(--dp-ground);
   --dp-shadow-sheet: 0 0 0 1.5px var(--ink), 6px 6px 0 0 var(--ink);
@@ -1014,7 +1055,7 @@ html[data-live-depth='1'][data-theme='keyblock'] :is(body:not([data-view='drift'
 }
 
 /* =====================================================================================
-   8 · on a wide screen the study room fills the window (lead, 2026-11-10 22:36)
+   8 · on a wide screen the study room fills the window (lead, 2026-11-10 22:28)
    On a phone the dark room runs edge to edge. On a wide screen it was a dark column inside a white frame on
    cream paper. The page behind now is the room's own night (the same lacquer the player uses), and the frame
    goes. Nothing inside the player is touched: the card, the keys and the bar are pixel for pixel as they were.
@@ -1033,7 +1074,7 @@ html[data-live-depth='1'][data-theme='keyblock'] :is(body:not([data-view='drift'
 }
 
 /* the reading labels keep their own letters ("on", "kun"): small capitals by the font, not by rewriting the text,
-   so what a screen reader and the learner walk read is what the app wrote (lead, 2026-11-10 22:42) */
+   so what a screen reader and the learner walk read is what the app wrote (lead, 2026-11-10 22:30) */
 html[data-live-depth='1'] #sheet .hero:has(> .hero-glyph) ~ dl.kv dt {
   text-transform: none;
   font-variant-caps: all-small-caps;

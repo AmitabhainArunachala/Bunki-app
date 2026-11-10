@@ -282,3 +282,31 @@ html[data-live-depth='1'] #sheet:has(> h2.headword):not(:has(.hero > .hero-glyph
   color: var(--color-sheet-ink);
   border-color: var(--color-sheet-line);
 }
+
+/* the slip over the sky (outside the scope above): Drift's まだ · 知っている are B slips, one row under Save. Over the sky
+   the house's edge, fill and face tokens are not set (editorial.css), so the slip's own stand in: its edge, its paper */
+#mini .mini-judge {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0 14px 8px;
+  background: var(--mini-paper);
+}
+#mini .mini-judge-btn {
+  min-height: var(--tc-h);
+  padding: 0 var(--tc-pad);
+  border: 1px solid var(--mini-edge);
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-ink);
+  box-shadow: none;
+  font-weight: 600;
+  font-size: var(--type-control);
+  line-height: 1.25;
+  letter-spacing: 0;
+  cursor: pointer;
+}
+@media (hover: hover) {
+  #mini .mini-judge-btn:hover { background: color-mix(in srgb, var(--color-accent) 6%, var(--mini-paper)); }
+}
