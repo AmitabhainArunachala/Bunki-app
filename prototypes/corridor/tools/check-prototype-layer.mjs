@@ -196,6 +196,10 @@ await check('go', 'desktop', 'every Go lands on its new thing, which wears the m
       const top = await page.evaluate((selector) => document.querySelector(selector).getBoundingClientRect().top, want.there);
       must(top > 0 && top < 800, `the first candidate is at ${Math.round(top)}px, not in view`);
     }
+    // the button is still on the glass there, and clear of the report entry (the orbit bar keeps that entry at its top)
+    const button = await box(page, '#prototype-open'), bug = await box(page, '#bunki-reports-root .br-rail');
+    must(button && button.y >= 0 && button.y + button.h <= 800 && button.x >= 0 && button.x + button.w <= 1280, `at "${id}" the button is off the screen: ${JSON.stringify(button)}`);
+    must(!overlap(button, bug), `at "${id}" the button covers the report entry`);
     await shot(`layer-go-${id}`);
     reached.push(id);
     if (id === 'places') {
@@ -251,7 +255,7 @@ for (const device of ['phone', 'desktop']) {
     try {
       must(sent && sent.text === text, 'the store does not hold the note');
       must(/page=kanji:職/.test(sent.route) && /view=search/.test(sent.route), `route: ${sent.route}`);
-      must(typeof sent.heading === 'string' && sent.heading.length > 0, `heading: "${sent.heading}"`);
+      must(/^職 · /.test(sent.heading), `heading: "${sent.heading}"`);
       must(/^[a-f0-9]{40}$/.test(sent.build), `build: ${sent.build}`);
       must(sent.viewport.w === DEVICES[device].viewport.width && sent.viewport.h === DEVICES[device].viewport.height, `viewport: ${JSON.stringify(sent.viewport)}`);
       must(sent.target && sent.target.path === '#worldcraft-door' && /Build 職/.test(sent.target.text) && sent.target.rect.w > 0, `target: ${JSON.stringify(sent.target)}`);

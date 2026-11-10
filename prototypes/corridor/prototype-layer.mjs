@@ -118,10 +118,13 @@ function hostDialogs() {
 }
 function visibleHeading(dialog) {
   // the screen's own name before any section's
-  const pick = (scope) => scope && ['h1, .headword, .view-title', 'h2, [role="heading"]']
+  const pick = (scope) => scope && ['h1, .headword, .view-title, .hero-mean', 'h2, [role="heading"]']
     .map((names) => [...scope.querySelectorAll(names)].find((n) => !root.contains(n) && seen(n))).find(Boolean);
   const found = pick(dialog) || pick(document.querySelector('#sheet')) || pick(document.querySelector('#app')) || pick(document.body);
-  return found ? found.textContent.replace(/\s+/g, ' ').trim().slice(0, 120) : '';
+  if (!found) return '';
+  // a kanji page is named by its character and its meaning
+  const glyph = found.classList.contains('hero-mean') ? found.closest('.hero')?.querySelector('.hero-glyph')?.textContent.trim() : '';
+  return `${glyph ? `${glyph} · ` : ''}${found.textContent.replace(/\s+/g, ' ').trim()}`.slice(0, 120);
 }
 function snapshot() {
   const state = host.state || {};
@@ -194,6 +197,14 @@ function fixedChrome(node) {
 /** above the report bug, wherever that stands now; one step further up while a floating control of the app is under the spot */
 function place() {
   const bug = document.querySelector('#bunki-reports-root .br-rail')?.getBoundingClientRect();
+  // where a screen keeps the report entry at its top (the writing room, the orbit bar) this button stands to its left
+  if (bug && bug.height && bug.top < innerHeight / 2) {
+    rail.dataset.plAt = 'top';
+    rail.style.setProperty('--pl-top', `${Math.round(Math.max(0, bug.top))}px`);
+    rail.style.setProperty('--pl-right', `${Math.round(Math.max(4, innerWidth - bug.left + 4))}px`);
+    return;
+  }
+  delete rail.dataset.plAt;
   const base = bug && bug.height ? Math.max(8, innerHeight - bug.top + 6) : 64;
   const right = bug && bug.height ? Math.max(4, innerWidth - bug.right) : 14;
   let bottom = base;

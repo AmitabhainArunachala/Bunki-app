@@ -92,6 +92,7 @@
   color: var(--pl-ink);
   pointer-events: none;
 }
+#bunki-prototype-root .pl-rail[data-pl-at='top'] { inset: var(--pl-top, 86px) var(--pl-right, 62px) auto auto; }
 #bunki-prototype-root .pl-rail[popover]:not(:popover-open) { display: none; }
 #bunki-prototype-root .pl-rail::backdrop { background: transparent; pointer-events: none; }
 #bunki-prototype-root .pl-open {
