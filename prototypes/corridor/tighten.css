@@ -228,3 +228,34 @@
   color: var(--color-sheet-ink);
   border-color: var(--color-sheet-line);
 }
+
+/* ---- the voice layer (2026-11-10): Japanese that had no listen control gets the app's one quiet speaker mark
+   (.play-mark, as the reader's), never a new look; the study card gets one more of its own small buttons. Gold is
+   the pigment of sound: the mark while it speaks, and the sentence the reader is on. ---- */
+.voice-say { color: var(--color-ink-2, var(--text-2)); }
+/* beside a headword or a sentence the mark stands at the line's right end and adds no line of its own */
+.voice-say:is([data-voice-say='entry-headword'], [data-voice-say='example'], [data-voice-say='card-sentence'], [data-voice-say='box-sentence']) {
+  float: right;
+  margin: -6px -8px 0 4px;
+  /* over the line it floats beside: a positioned paragraph would otherwise take its taps */
+  position: relative;
+  z-index: 1;
+}
+/* after a reading, a tutor's words or a quote it follows the text on its line */
+.voice-say:is([data-voice-say='kanji-reading'], [data-voice-say='tutor-turn'], [data-voice-say='coach'], [data-voice-say='speak-line'], [data-voice-say='quoted-sentence']) {
+  display: inline-grid;
+  vertical-align: middle;
+  margin: -10px 0 -10px 4px;
+}
+.voice-say.is-speaking, .mini-voice.is-speaking, .kp-listen.is-speaking { color: var(--color-gold, var(--accent)); }
+.voice-say[aria-busy='true'], .kp-listen[aria-busy='true'] { opacity: 0.6; }
+::highlight(bunki-speaking) { background-color: rgba(201, 162, 39, 0.28); }
+:root:not([data-voice-highlight='range']) #reader .tok[data-speaking] {
+  background: color-mix(in srgb, var(--color-gold, #c9a227) 28%, transparent);
+}
+/* a line the tutor's room could not voice by itself is heard through the mark beside it */
+.speak-said:has(> .voice-say) > .speak-silent { display: none; }
+.settings-voice-server { margin-top: 16px; }
+.settings-voice-server > .teacher-note { margin: 4px 0; }
+.settings-voice-server > .btn-tertiary { margin-right: 16px; }
+.settings-voice-server [hidden] { display: none !important; }

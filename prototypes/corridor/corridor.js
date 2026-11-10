@@ -9644,10 +9644,16 @@ function enhanceJapaneseProse(root) {
   for (const quote of articleNarration ? root.querySelectorAll('blockquote.sentence-original') : []) {
     if (quote.nextElementSibling?.classList.contains('excerpt-listen')) continue;
     const text = quote.textContent;
-    const listen = el('button', 'chip excerpt-listen', excerptListenLabel()); listen.type = 'button';
     // the quote carries its own source, so the clip that plays is this article's and no other
     const owner = quote.dataset.sourceId || null;
-    listen.addEventListener('click', () => void playNarratedExcerpt(text, listen, owner)); quote.after(listen);
+    // a quote from an article with no recording is said by the voice layer (the voice server, else the device voice):
+    // its chip is a plain "Listen", never the recorded voice's name
+    const seam = !!voiceLayer && !!owner && !articleNarration.articles?.[owner];
+    const listen = el('button', 'chip excerpt-listen', seam ? tx('聞く', 'Listen') : excerptListenLabel()); listen.type = 'button';
+    listen.addEventListener('click', () => {
+      if (seam) { cancelExcerptPlayback(); voiceLayer.sayExcerpt({ text, sourceId: owner, button: listen }); return; }
+      void playNarratedExcerpt(text, listen, owner);
+    }); quote.after(listen);
   }
 }
 
@@ -12579,7 +12585,11 @@ async function playNarratedExcerpt(text, button, sourceId = null) {
     return;
   }
   delete button.dataset.excerptUnresolved;
-  if (!clips?.length) { button.textContent = tx('この引用の収録音声はありません', 'No recording for this excerpt'); return; }
+  if (!clips?.length) {
+    // no recording of this quote: the voice layer says it (the voice server, else the device voice)
+    if (voiceLayer) { button.textContent = original; voiceLayer.sayExcerpt({ text, sourceId, button }); return; }
+    button.textContent = tx('この引用の収録音声はありません', 'No recording for this excerpt'); return;
+  }
   stopPassageRead();   // the reader's read yields to the quote; the excerpt lane is already clear
   excerptControl = button;
   button.classList.add('is-speaking'); button.textContent = tx(`止める · ${narrationVoiceName()}`, `Stop · ${narrationVoiceName()}`);
@@ -12611,6 +12621,8 @@ async function playNarratedExcerpt(text, button, sourceId = null) {
 /** Stop the passage read and nothing else. The quote is the room's other voice and it is
  * retired on its own, so a quote can take over from a read without cancelling itself. */
 function stopPassageRead() {
+  // the article's read is the voice layer's when the layer is here: leaving the passage, the view or pressing Back ends it
+  voiceLayer?.reader.stop();
   if (!readAloud.on) return;
   readAloud.on = false;
   readAloud.generation += 1;
@@ -12735,17 +12747,25 @@ function approvedWordManifest(m) {
  * model. `entrySeq`, when the card knows which dictionary entry it is showing, must agree too. */
 /** 音 — exact approved recordings first, ephemeral Japanese device speech for gaps. */
 const deviceVoice = createDeviceVoice();
+/** The voice layer (modules/voice-layer.mjs, 2026-11-10): the one seam every surface speaks through, a recorded clip,
+ * then the voice server, then the device voice. It is loaded beside the app; null until it has arrived, and for good
+ * in the single-file build, where every voice door then stays as it was. */
+let voiceLayer = null;
 let cardAudioSerial = 0, cardFaceKey = '', cardFaceReview = null, cardFaceItem = null;
 let reviewVoiceFace = null;
 function retireCardSpeech() {
   cardAudioSerial += 1;
+  // a word or a line the seam is saying ends with the card; an article being read is the reader's own to end
+  voiceLayer?.stop({ keepReader: true });
   deviceVoice.cancel();
   document.getElementById('card-say')?.classList.remove('is-speaking');
 }
-window.addEventListener('pagehide', retireCardSpeech);
-document.addEventListener('visibilitychange', () => { if (document.hidden) retireCardSpeech(); });
+window.addEventListener('pagehide', () => { voiceLayer?.stop(); retireCardSpeech(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) { voiceLayer?.stop(); retireCardSpeech(); } });
 // Also cover media owned by a mounted room (e.g. assessment audio).
 document.addEventListener('play', event => {
+  // the seam's own element is one of this app's lanes already: it retires nothing, least of all itself
+  if (event.target?.hasAttribute?.('data-speak-audio')) return;
   if (event.target === recAudioEl) deviceVoice.cancel();
   else retireCardSpeech();
 }, true);
@@ -12762,6 +12782,8 @@ function retireCardAudioOnFaceChange() {
   cardFaceKey = key;
   cardFaceReview = rv; cardFaceItem = item;
   cardAudioSerial += 1;
+  // the screen changed: a word, an example or a line being said ends with it (the seam's reads are stopped on navigation)
+  voiceLayer?.stop({ keepReader: true });
   deviceVoice.cancel();
   if (!readAloud.on) stopRecAudio();
 }
@@ -12787,13 +12809,19 @@ function deviceVoiceMessage(result) {
   return tx('この環境では端末の声を利用できません', 'Device voice is unavailable in this browser');
 }
 
-function speakCardReading(text, btn) {
+function speakCardReading(text, btn, word = '') {
   if (document.hidden || (btn?.id === 'card-say' &&
       (S.view !== 'review' || !S.review?.revealed || S.review.pending || S.review.admitting || S.stack.length || S.strokes))) return;
   retireCardSpeech();
   stopReadAloud(); stopRecAudio(); stopSentenceListening();
-  // UNBOUND legacy readings are retired before any manifest, fetch, or playback can start.
-  cardVoiceStatus(btn, tx('現在の音源が必要です', 'Current audio source required'), 'current-source-required');
+  // The current source is the voice seam (modules/voice-seam.mjs): a recorded clip, then the voice server, then the
+  // device voice. Nothing sounds from here itself: no manifest, fetch, or utterance starts in this function, and
+  // without the seam the reading stays retired.
+  if (!voiceLayer) { cardVoiceStatus(btn, tx('現在の音源が必要です', 'Current audio source required'), 'current-source-required'); return; }
+  cardVoiceStatus(btn, '', null);
+  // the server's voice needs no note; the device voice says why it is the one speaking; a failure says what to do
+  voiceLayer.sayWord({ text, word, button: btn,
+    onNote: (line, flag) => cardVoiceStatus(btn, flag ? line : '', flag && flag !== 'device' ? flag : null) });
 }
 
 /** Use only the answer on this face; never infer one of a kanji's several readings. */
@@ -12902,23 +12930,29 @@ function buildListenRow(p) {
   const listenRow = el('div', 'listen-row play-bar');
   listenRow.dataset.passage = p.id;
   const clips = narrationClips(p);
+  // The voice layer reads every article (2026-11-10): its recorded clips where it has them, else sentence by sentence
+  // through the voice server, the device voice when that cannot answer. Without the layer the bar is as it was.
+  const live = voiceLayer ? voiceLayer.reader.state(p) : null;
   const mark = el('button', 'play-mark');
   mark.type = 'button';
   mark.id = 'listen-open';
   mark.append(uiIcon('speaker'));
-  if (!clips.length) {
+  if (!clips.length && !live) {
     // F (the lead's ruling, 2026-10-18): with no recording for this article there is no mark at all — no dead control.
-    // The row stays as an empty, hidden place (its passage named, so a late manifest can arm it in place)
+    // The row stays as an empty, hidden place (its passage named, so a late manifest or the voice layer can arm it in place)
     listenRow.classList.add('is-pending');
     listenRow.dataset.open = 'false';
     listenRow.hidden = true;
     return listenRow;
   }
   if (readAloud.pid !== p.id) { readAloud.pid = p.id; readAloud.clip = 0; readAloud.failed = null; readAloud.barOpen = false; }
-  readAloud.total = clips.length;
-  // the bar stands open while it plays, or while the learner holds it open; otherwise it is the mark alone
-  const open = readAloud.on || !!readAloud.barOpen;
+  if (live) { readAloud.on = live.playing; readAloud.clip = live.index; readAloud.rate = live.rate; }
+  const total = live ? live.total : clips.length;
+  readAloud.total = total;
+  // the bar stands open while it plays or is paused, or while the learner holds it open; otherwise it is the mark alone
+  const open = (live ? live.active : readAloud.on) || !!readAloud.barOpen;
   listenRow.dataset.open = String(open);
+  if (live) listenRow.dataset.voiceState = live.playing ? (live.loading ? 'loading' : 'playing') : live.paused ? 'paused' : 'idle';
   mark.setAttribute('aria-expanded', String(open));
   mark.setAttribute('aria-label', open ? tx('音声の操作をとじる', 'Close the player') : tx('聞く', 'Listen'));
   mark.addEventListener('click', () => {
@@ -12929,7 +12963,7 @@ function buildListenRow(p) {
   listen.type = 'button';
   listen.id = 'listen-toggle';
   listen.setAttribute('aria-pressed', String(readAloud.on));
-  listen.setAttribute('aria-label', readAloud.on ? tx('止める', 'pause') : tx('聞く', 'listen'));
+  listen.setAttribute('aria-label', readAloud.on ? tx('止める', 'pause') : live?.paused ? tx('続きを聞く', 'resume') : tx('聞く', 'listen'));
   listen.append(uiIcon(readAloud.on ? 'pause' : 'play'));
   const track = el('div', 'play-track');
   track.id = 'listen-progress';
@@ -12937,10 +12971,10 @@ function buildListenRow(p) {
   track.setAttribute('aria-label', tx('再生位置', 'playback position'));
   track.setAttribute('aria-valuemin', '0');
   track.setAttribute('aria-valuemax', '100');
-  track.style.setProperty('--played', String(readAloud.clip / clips.length));
-  track.setAttribute('aria-valuenow', String(Math.round((readAloud.clip / clips.length) * 100)));
+  track.style.setProperty('--played', String(readAloud.clip / total));
+  track.setAttribute('aria-valuenow', String(Math.round((readAloud.clip / total) * 100)));
   const failedHere = readAloud.failed?.pid === p.id;
-  const listenNote = el('span', 'play-voice', failedHere
+  const listenNote = el('span', 'play-voice', live ? live.note : failedHere
     ? tx('再生できませんでした', 'could not play')
     : narrationVoiceName());
   listenNote.id = 'listen-note';
@@ -12949,12 +12983,22 @@ function buildListenRow(p) {
   rate.id = 'listen-rate';
   rate.setAttribute('aria-label', tx(`速さ ${readAloud.rate}倍`, `speed ${readAloud.rate}×`));
   rate.addEventListener('click', () => {
-    readAloud.rate = LISTEN_RATES[(LISTEN_RATES.indexOf(readAloud.rate) + 1) % LISTEN_RATES.length];
-    if (recAudioEl) recAudioEl.playbackRate = readAloud.rate;
+    // 1 · 1.25 · 0.75, the pitch kept (the voice layer's three speeds); without the layer the bar's older three
+    if (live) readAloud.rate = voiceLayer.reader.nextRate();
+    else {
+      readAloud.rate = LISTEN_RATES[(LISTEN_RATES.indexOf(readAloud.rate) + 1) % LISTEN_RATES.length];
+      if (recAudioEl) recAudioEl.playbackRate = readAloud.rate;
+    }
     rate.textContent = `${readAloud.rate}×`;
     rate.setAttribute('aria-label', tx(`速さ ${readAloud.rate}倍`, `speed ${readAloud.rate}×`));
   });
   listen.addEventListener('click', () => {
+    if (live) {
+      // play, pause and resume are the layer's; it repaints this row itself at every change
+      cancelExcerptPlayback();
+      voiceLayer.reader.toggle(p);
+      return;
+    }
     if (readAloud.on) {
       stopReadAloud();
       refreshListenRow();
@@ -31200,6 +31244,35 @@ if (typeof window !== 'undefined' && !window.__CORRIDOR_BUNDLE__) void import('.
 
 // EVERYTHING-ON PROTOTYPE: the prototype layer (the first-open line, the 新 marks, the prototype button with its list of new
 // things and its notes) is its own module and stylesheet, loaded beside the app. The single-file build carries neither.
+// THE VOICE LAYER (2026-11-10; John: "complete all surfaces from articles to cards to grammar points to words, end to
+// end"): one seam every surface speaks through, a recorded clip first, then the voice server, then the device voice.
+// It is its own module, loaded beside the app; the app hands it only what it needs. The single-file build carries none.
+if (typeof window !== 'undefined' && !window.__CORRIDOR_BUNDLE__) {
+  void import(window.__KAIRO_VOICE_LAYER_URL__ || './modules/voice-layer.mjs').then((layer) => {
+    voiceLayer = layer.installVoiceLayer({
+      tx, el, uiIcon, deviceVoice,
+      view: () => S.view,
+      passage: () => (S.view === 'reader' ? passage() : null),
+      cardRevealed: () => S.view === 'review' && !!S.review?.revealed,
+      // one sound at a time: every other lane lets go before the seam speaks
+      quiet: () => { stopRecAudio(); stopSentenceListening(); retireCardSpeech(); },
+      // a recorded clip still passes the lock's own door (playRecClip), and only that door
+      playRecorded: (src, rate) => playRecClip(src, null, { rate }),
+      stopRecorded: () => stopRecAudio(),
+      rateRecorded: (rate) => { if (recAudioEl) recAudioEl.playbackRate = rate; },
+      narration: (p) => narrationClips(p),
+      narrationVoiceName: () => narrationVoiceName(),
+      refreshListenRow: () => { if (S.view === 'reader') refreshListenRow(); },
+    });
+    // a reader or a Settings page drawn before the layer arrived gets its voice now
+    if (S.view === 'reader') refreshListenRow();
+    const writing = document.getElementById('settings-writing');
+    if (writing && !writing.querySelector('#settings-voice-server')) writing.append(voiceLayer.settingsBlock());
+  }).catch((err) => console.warn('voice layer unavailable', err));
+}
+/** Settings, 筆と声: the voice server's pairing and status block, or null before the layer has arrived. */
+function voiceSettingsBlock() { return voiceLayer ? voiceLayer.settingsBlock() : null; }
+
 if (typeof window !== 'undefined' && !window.__CORRIDOR_BUNDLE__) {
   void import('./prototype-layer.mjs').then((layer) => layer.installPrototypeLayer({ state: S, tx, served: maintenanceServedBuild }))
     .catch((err) => console.warn('prototype layer unavailable', err));
@@ -32819,12 +32892,13 @@ function dressStage(visit, stage, { word, label, token, kind, nodeFor, reading, 
     });
     marks.append(brush);
   }
-  if (nonEmptyString(reading) && recManifest !== null) {
+  // 音 stands whenever something can say the word: the voice layer (a recorded clip, the voice server, the device voice)
+  if (nonEmptyString(reading) && (recManifest !== null || voiceLayer)) {
     voice = el('button', 'mini-mark mini-voice', '音');
     voice.type = 'button';
     voice.id = 'mini-voice';
     voice.lang = 'ja';
-    voice.title = tx('読み上げる — 収録音声を優先、なければ端末の声', 'Hear it — recorded audio first, device voice for gaps');
+    voice.title = tx('読み上げる', 'Hear it');
     voice.setAttribute('aria-label', voice.title);
     // what the voice door said in this visit stays said: the stage drawn again (a return from the page, a redraw) shows it
     if (plan.voiceSaid) {
@@ -36522,4 +36596,4 @@ function deckHost() {
   return deckHostAdapter;
 }
 
-export { $, AI_DEFAULT_BASE_URL, AI_DEFAULT_MODEL, AI_DEVICE_STORE, AI_EVIDENCE_ROLES, AI_KEY_STORE, AI_MINE_MAX_ROWS, AI_READING_TIMEOUT_CAP_MS, AI_READING_TOKENS_PER_SECOND, AI_TIMEOUT_MS, ANNOTATION_DIGITS, BEYOND_JOYO, D, DEPTH_NAMES, DEPTH_OWNED_S, DEPTH_RECALLED_S, DEPTH_RECALL_R, DICTIONARY_INDEX_PATH, DICTIONARY_SHARD_PATH, DOJO_DECKS, DRAFT_KEY, DRIFT_THEME_BY_WORLD, EXAMPLE_DIR, FRAMES_CAP, FRAMES_STORE, GESTURE, GLOSS_LEAD, GLOSS_MESSY, GLUE_STROKE, GODAN_ROW, GODAN_TE, GRAMMAR, INK_DEPTH, INK_TEMPO, INK_WORLDS, ISO_DAY, JOYO_JUDGEABLE, JOYO_MARKS, KAGAMI_BAND_NAMES, KAGAMI_CLEAR, KAGAMI_CODE_BAND, KAGAMI_LEVELS, KAGAMI_MIN_SEEN, KAGAMI_MODEL_VERSION, KAGAMI_OOV, KANJI_QUEST_FAILED, KANJI_QUEST_STRUCTURAL, KATA_TO_HIRA_OFFSET, LEADING_DROP_DAYS, LEARN_STAGE_DECKS, LEMMA_NIDAN, LEMMA_ONBIN, LESSON_SIZE, LOOKUP_HELPER_POS, M4_COPY, ME_DECKS, ME_FIELDS, ME_MONTHS_EN, ME_N1_SITTING, MINI_INK, MONTHS_EN, NARRATION_VOICES, NEW_PER_DAY_DEFAULT, NODE_KIND, NOTE_TEXT, PARTICLES, PARTICLE_BY_SURFACE, PART_STROKES, PART_WRITTEN, PLACES_TABS, POS_FAMILY, POS_PLAIN, POS_SEGMENT_CODE, PRIMARY_TABS, READER_KANA, READER_KANJI, REGISTER_LINE_DOORS, REGISTER_ROOM_DOORS, REL, REPORT_RELAY_STORE, REVIEWS_PER_DAY_DEFAULT, ROMAJI, ROOM_IDS, ROOM_NAMES, S, SAVE_PRESS_MS, SENSEI_OBS_CODES, SENSE_BY_ANCHOR, SENSE_CLASS, SENSE_GAVE_UP, SENSE_LATE, SENSE_MUST_END, SENSE_MUST_NOT, SENSE_NUMBER, SENSE_NUMBER_WORD, SENSE_TAG_EN, SENSE_TAG_JA, SENSE_WAIT_MS, SENSE_WEEKDAY, SHORT_EXAMPLE_CHARS, SLIP_NODE, SLIP_OWN_MEANING, SOUND_PLAIN, SOUND_VOICED, SPEAK_JA, SRS_KINDS, SRS_PREF_LADDERS, SRS_PRESETS, STROKE_SPEED_DEFAULT, STROKE_VIEWBOX, SVG_NS, TE_FORM_AUXILIARY, TE_FORM_NOTE, THEME_STORE, THEME_UI, THES_RELS, TODAY_JA_WORD, TODAY_SKY_CAP, TODAY_SKY_MISS_DAYS, TODAY_SKY_WORD, TOKEN_CONTEXT, TOPIC_BLOCKS, TOPIC_KICKERS, TOPIC_ORDER, TOUCH_READING_FADES, TOUCH_READING_GAP, TOUCH_READING_MOTION, TOUCH_READING_ROWS, TOUCH_ROW_PINS, TRAIL_KINDS, VOICE_LOCK, WORD_BRUSH, WORD_BRUSH_KEY, WORD_VOICE, WORD_VOICE_KEY, WW_CX, WW_CY, WW_KANJI_ANGLES, WW_REL, WW_RING2_ORDER, WW_RING2_SLOTS, WW_TRAIL_MAX, WW_WALK_KEY, YOMI_DAKUTEN, YOMI_HANDAKU, _KDX_NPTS, _compsCache, _kdxDist, _kdxNorm, _kdxResample, _kdxTemplates, activateWordLadder, afterPressLands, aiChatLog, aiConverse, aiLogAll, aiSheetNotes, aiSheetTurns, allAssessmentEvidence, anchorBox, animcjkApproved, animcjkShards, annotationKana, applyAssessmentV2, approvedWordManifest, assertLearningSource, assessmentClockSession, back, bi, biLabel, boxLeadGloss, buildListenRow, buildTeacherChatLog, cacheDictionaryFormRows, cacheDictionaryRow, cancelExcerptPlayback, canonicalRecordJson, capturePending, captureScaleVisit, cardAudioSerial, cardRecall, chipsFor, clearReaderReadings, clearReaderSummons, clearWordLadder, closeSealStrip, closeWorldPicker, commitCapture, commitStorePatch, confusablesFor, contrastOf, controlsUnder, copyRecordWith, currentAssessmentV2, currentJoyoKunNote, currentRecordNoteView, currentSentenceListeningCue, deckSummaries, deeperDepth, depthIndexMemo, depthNodeCache, depthRank, depthRetrievability, dictionaryQueryOpening, dictionaryReadingSummaries, dictionaryRowBySeq, dictionaryWorkerRequest, diveFromMini, diveFromSlip, el, encounterKey, enhanceJapaneseProse, ensureArchiveIndex, ensureArticle, ensureDictionaryIndex, ensureDictionaryShard, ensureReadingPositionModule, ensureSenseSidecar, ensureSentenceListeningCatalog, entryKanaIndex, explicitWordSnapshot, fetchData, fieldsDeckHome, findLookupOccurrence, finishPageTransition, finiteNumber, fitChromeKeep, flowText, focusKanjiItem, foundationDoor, frameFoot, glyphBox, go, guidedTaken, heldWordCardNode, heroSource, hideReaderToast, holdPageUnderDrawer, inkGroundFor, installProseWordRoving, installScaleBridge, interaction, invalidateRecordNoteViews, isLeech, jaGroupSegments, jlptRank, kagamiBandFor, kagamiLevel, kagamiLevelOf, kagamiMockBand, kanaReadingKey, kanjiAnswerAvailable, kanjiCourseApplyHelp, kanjiCourseRememberHelp, kanjiDisplayRecord, kanjiFamilyExposures, kanjiFamilyMounts, kanjiFamilyResolveExample, kanjiFamilyStamp, kanjiFamilyStampCurrent, kanjiFamilyTicket, kanjiFamilyTicketCurrent, kanjiFamilyViews, kanjiQuestFor, kanjiQuestLoading, kanjiQuestOwner, kanjiReadingsState, kanjiReferenceRows, kanjiStructureMounts, kanjiWorldEligible, kankenGradeLabel, kataToHira, keepNavigationReturn, laneMembers, layersMarkTop, learnDeckSummary, learnStageFace, loadReferenceExtra, logicalArchiveRows, lookupWordKey, meBackPart, meDeckIndex, meNum, meSealsPart, metReadable, mockFailed, motionEase, motionMs, narrationVoiceName, nonEmptyString, notYetReleased, noteEncounter, openAssessmentQuestionReview, openDeck, openGuidedRoom, openJapaneseLookup, openKanjiCourseUnit, openKanjiWorldEncounter, openPassage, openPersonalCollection, openPlainSaveMenu, openReferenceCollection, openSealStrip, openSentencePractice, openSpeakRoom, openStrokePage, openVocabularyListPopover, openWordWeb, optional, ownSentenceExample, owns, pageCutAllowed, paintMiniPath, passage, performAssessmentReconciliation, placeFloating, placeKinsoku, placesLayout, plainRecord, proseWordRovers, protectStore, queueAssessmentWork, quietUsageTags, readAloud, readFrameRows, readHelpPatch, readHelpReadable, readerReadingFits, readerSummaryFor, readerTokenLead, recordReady, recordWritable, refreshStrokeReadings, refreshWordSheet, relayServiceUrl, removeMini, render, renderFamilyExampleNode, renderKanjiCourseDoor, renderKanjiFamily, renderKanjiStructure, renderKdxGrid, renderReferenceConnections, renderReviewHall, renderSentenceTokens, renderSourceInboxEntries, renderSourceKanjiDoor, renderStudyFold, renderStudyHall, renderTeacherDoor, renderTextSourceContextSelection, renderWordWeb, resolveReaderChoice, resolveTeacherSource, retainedKanjiRecord, retireScaleReturn, returnToScaleBead, revalidateTutorRequests, revealFloatingFocus, roomName, roomTransition, rubyNode, safeJsonValue, sameItem, sameWordIdentity, saveWord, savedAnswerFor, scaleIn, scaleNavigationAllowed, scaleOut, scalePassage, scaleThreadPath, scaleTokenFingerprint, sealListRecency, senseGlosses, senseLed, senseNumberBefore, sensePatch, senseWeekdayBracket, sentenceDraftBindings, sentenceDraftInputErrors, sentenceDraftWindowEdits, setGlossLine, setJaWords, setLayout, setLookupStop, setOwnRecordValue, setWordPref, shallowerDepth, sheetActionLine, sheetActionLineKeys, shelfDay, showMini, skipState, sourceInboxShelf, speakAvailable, srsDueItems, srsKey, srsParamsProblem, srsRoomBack, srsSchedulePolicy, stopPassageRead, stopSentenceListening, strokePathsFor, strokeReduced, strokeSpeed, studyHallDoors, suppressAssessmentCards, syncChromeKeep, syncStrokeNumbers, teacherDraftInputErrors, teacherDraftWindowEdits, teacherSourceProcessingUnavailable, teacherWindowDraftPrefix, todayQueue, todaySky, transcriptTime, trayItemPending, tx, uiIcon, updateReaderPlaceSave, updateReadingPlaces, validInstant, validNewPerDay, validPauseEvery, validPreset, validRetention, validReviewsPerDay, validStoreEnvelope, waitForLookupNameReadings, wireReaderWordMenu, withEn, wordBrush, wordCardIdentity, wordNodeIdentity, wordStudied, wordVoice, wordWeb, writtenFormNote, wwP, wwPartMembers, wwReduced, wwShort, wwSpread, wwTokenIndex, wwTrail, yomiVariantCache };
+export { $, voiceSettingsBlock, AI_DEFAULT_BASE_URL, AI_DEFAULT_MODEL, AI_DEVICE_STORE, AI_EVIDENCE_ROLES, AI_KEY_STORE, AI_MINE_MAX_ROWS, AI_READING_TIMEOUT_CAP_MS, AI_READING_TOKENS_PER_SECOND, AI_TIMEOUT_MS, ANNOTATION_DIGITS, BEYOND_JOYO, D, DEPTH_NAMES, DEPTH_OWNED_S, DEPTH_RECALLED_S, DEPTH_RECALL_R, DICTIONARY_INDEX_PATH, DICTIONARY_SHARD_PATH, DOJO_DECKS, DRAFT_KEY, DRIFT_THEME_BY_WORLD, EXAMPLE_DIR, FRAMES_CAP, FRAMES_STORE, GESTURE, GLOSS_LEAD, GLOSS_MESSY, GLUE_STROKE, GODAN_ROW, GODAN_TE, GRAMMAR, INK_DEPTH, INK_TEMPO, INK_WORLDS, ISO_DAY, JOYO_JUDGEABLE, JOYO_MARKS, KAGAMI_BAND_NAMES, KAGAMI_CLEAR, KAGAMI_CODE_BAND, KAGAMI_LEVELS, KAGAMI_MIN_SEEN, KAGAMI_MODEL_VERSION, KAGAMI_OOV, KANJI_QUEST_FAILED, KANJI_QUEST_STRUCTURAL, KATA_TO_HIRA_OFFSET, LEADING_DROP_DAYS, LEARN_STAGE_DECKS, LEMMA_NIDAN, LEMMA_ONBIN, LESSON_SIZE, LOOKUP_HELPER_POS, M4_COPY, ME_DECKS, ME_FIELDS, ME_MONTHS_EN, ME_N1_SITTING, MINI_INK, MONTHS_EN, NARRATION_VOICES, NEW_PER_DAY_DEFAULT, NODE_KIND, NOTE_TEXT, PARTICLES, PARTICLE_BY_SURFACE, PART_STROKES, PART_WRITTEN, PLACES_TABS, POS_FAMILY, POS_PLAIN, POS_SEGMENT_CODE, PRIMARY_TABS, READER_KANA, READER_KANJI, REGISTER_LINE_DOORS, REGISTER_ROOM_DOORS, REL, REPORT_RELAY_STORE, REVIEWS_PER_DAY_DEFAULT, ROMAJI, ROOM_IDS, ROOM_NAMES, S, SAVE_PRESS_MS, SENSEI_OBS_CODES, SENSE_BY_ANCHOR, SENSE_CLASS, SENSE_GAVE_UP, SENSE_LATE, SENSE_MUST_END, SENSE_MUST_NOT, SENSE_NUMBER, SENSE_NUMBER_WORD, SENSE_TAG_EN, SENSE_TAG_JA, SENSE_WAIT_MS, SENSE_WEEKDAY, SHORT_EXAMPLE_CHARS, SLIP_NODE, SLIP_OWN_MEANING, SOUND_PLAIN, SOUND_VOICED, SPEAK_JA, SRS_KINDS, SRS_PREF_LADDERS, SRS_PRESETS, STROKE_SPEED_DEFAULT, STROKE_VIEWBOX, SVG_NS, TE_FORM_AUXILIARY, TE_FORM_NOTE, THEME_STORE, THEME_UI, THES_RELS, TODAY_JA_WORD, TODAY_SKY_CAP, TODAY_SKY_MISS_DAYS, TODAY_SKY_WORD, TOKEN_CONTEXT, TOPIC_BLOCKS, TOPIC_KICKERS, TOPIC_ORDER, TOUCH_READING_FADES, TOUCH_READING_GAP, TOUCH_READING_MOTION, TOUCH_READING_ROWS, TOUCH_ROW_PINS, TRAIL_KINDS, VOICE_LOCK, WORD_BRUSH, WORD_BRUSH_KEY, WORD_VOICE, WORD_VOICE_KEY, WW_CX, WW_CY, WW_KANJI_ANGLES, WW_REL, WW_RING2_ORDER, WW_RING2_SLOTS, WW_TRAIL_MAX, WW_WALK_KEY, YOMI_DAKUTEN, YOMI_HANDAKU, _KDX_NPTS, _compsCache, _kdxDist, _kdxNorm, _kdxResample, _kdxTemplates, activateWordLadder, afterPressLands, aiChatLog, aiConverse, aiLogAll, aiSheetNotes, aiSheetTurns, allAssessmentEvidence, anchorBox, animcjkApproved, animcjkShards, annotationKana, applyAssessmentV2, approvedWordManifest, assertLearningSource, assessmentClockSession, back, bi, biLabel, boxLeadGloss, buildListenRow, buildTeacherChatLog, cacheDictionaryFormRows, cacheDictionaryRow, cancelExcerptPlayback, canonicalRecordJson, capturePending, captureScaleVisit, cardAudioSerial, cardRecall, chipsFor, clearReaderReadings, clearReaderSummons, clearWordLadder, closeSealStrip, closeWorldPicker, commitCapture, commitStorePatch, confusablesFor, contrastOf, controlsUnder, copyRecordWith, currentAssessmentV2, currentJoyoKunNote, currentRecordNoteView, currentSentenceListeningCue, deckSummaries, deeperDepth, depthIndexMemo, depthNodeCache, depthRank, depthRetrievability, dictionaryQueryOpening, dictionaryReadingSummaries, dictionaryRowBySeq, dictionaryWorkerRequest, diveFromMini, diveFromSlip, el, encounterKey, enhanceJapaneseProse, ensureArchiveIndex, ensureArticle, ensureDictionaryIndex, ensureDictionaryShard, ensureReadingPositionModule, ensureSenseSidecar, ensureSentenceListeningCatalog, entryKanaIndex, explicitWordSnapshot, fetchData, fieldsDeckHome, findLookupOccurrence, finishPageTransition, finiteNumber, fitChromeKeep, flowText, focusKanjiItem, foundationDoor, frameFoot, glyphBox, go, guidedTaken, heldWordCardNode, heroSource, hideReaderToast, holdPageUnderDrawer, inkGroundFor, installProseWordRoving, installScaleBridge, interaction, invalidateRecordNoteViews, isLeech, jaGroupSegments, jlptRank, kagamiBandFor, kagamiLevel, kagamiLevelOf, kagamiMockBand, kanaReadingKey, kanjiAnswerAvailable, kanjiCourseApplyHelp, kanjiCourseRememberHelp, kanjiDisplayRecord, kanjiFamilyExposures, kanjiFamilyMounts, kanjiFamilyResolveExample, kanjiFamilyStamp, kanjiFamilyStampCurrent, kanjiFamilyTicket, kanjiFamilyTicketCurrent, kanjiFamilyViews, kanjiQuestFor, kanjiQuestLoading, kanjiQuestOwner, kanjiReadingsState, kanjiReferenceRows, kanjiStructureMounts, kanjiWorldEligible, kankenGradeLabel, kataToHira, keepNavigationReturn, laneMembers, layersMarkTop, learnDeckSummary, learnStageFace, loadReferenceExtra, logicalArchiveRows, lookupWordKey, meBackPart, meDeckIndex, meNum, meSealsPart, metReadable, mockFailed, motionEase, motionMs, narrationVoiceName, nonEmptyString, notYetReleased, noteEncounter, openAssessmentQuestionReview, openDeck, openGuidedRoom, openJapaneseLookup, openKanjiCourseUnit, openKanjiWorldEncounter, openPassage, openPersonalCollection, openPlainSaveMenu, openReferenceCollection, openSealStrip, openSentencePractice, openSpeakRoom, openStrokePage, openVocabularyListPopover, openWordWeb, optional, ownSentenceExample, owns, pageCutAllowed, paintMiniPath, passage, performAssessmentReconciliation, placeFloating, placeKinsoku, placesLayout, plainRecord, proseWordRovers, protectStore, queueAssessmentWork, quietUsageTags, readAloud, readFrameRows, readHelpPatch, readHelpReadable, readerReadingFits, readerSummaryFor, readerTokenLead, recordReady, recordWritable, refreshStrokeReadings, refreshWordSheet, relayServiceUrl, removeMini, render, renderFamilyExampleNode, renderKanjiCourseDoor, renderKanjiFamily, renderKanjiStructure, renderKdxGrid, renderReferenceConnections, renderReviewHall, renderSentenceTokens, renderSourceInboxEntries, renderSourceKanjiDoor, renderStudyFold, renderStudyHall, renderTeacherDoor, renderTextSourceContextSelection, renderWordWeb, resolveReaderChoice, resolveTeacherSource, retainedKanjiRecord, retireScaleReturn, returnToScaleBead, revalidateTutorRequests, revealFloatingFocus, roomName, roomTransition, rubyNode, safeJsonValue, sameItem, sameWordIdentity, saveWord, savedAnswerFor, scaleIn, scaleNavigationAllowed, scaleOut, scalePassage, scaleThreadPath, scaleTokenFingerprint, sealListRecency, senseGlosses, senseLed, senseNumberBefore, sensePatch, senseWeekdayBracket, sentenceDraftBindings, sentenceDraftInputErrors, sentenceDraftWindowEdits, setGlossLine, setJaWords, setLayout, setLookupStop, setOwnRecordValue, setWordPref, shallowerDepth, sheetActionLine, sheetActionLineKeys, shelfDay, showMini, skipState, sourceInboxShelf, speakAvailable, srsDueItems, srsKey, srsParamsProblem, srsRoomBack, srsSchedulePolicy, stopPassageRead, stopSentenceListening, strokePathsFor, strokeReduced, strokeSpeed, studyHallDoors, suppressAssessmentCards, syncChromeKeep, syncStrokeNumbers, teacherDraftInputErrors, teacherDraftWindowEdits, teacherSourceProcessingUnavailable, teacherWindowDraftPrefix, todayQueue, todaySky, transcriptTime, trayItemPending, tx, uiIcon, updateReaderPlaceSave, updateReadingPlaces, validInstant, validNewPerDay, validPauseEvery, validPreset, validRetention, validReviewsPerDay, validStoreEnvelope, waitForLookupNameReadings, wireReaderWordMenu, withEn, wordBrush, wordCardIdentity, wordNodeIdentity, wordStudied, wordVoice, wordWeb, writtenFormNote, wwP, wwPartMembers, wwReduced, wwShort, wwSpread, wwTokenIndex, wwTrail, yomiVariantCache };

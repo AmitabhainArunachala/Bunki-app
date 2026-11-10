@@ -98,6 +98,8 @@ test('unbound legacy speech and recording entry points fail closed', async () =>
     wordClipFor: () => ({ src: 'retained-synthetic.m4a' }),
     approvedWordManifest: (x) => x,
     refreshListenRow: () => {},
+    // the voice layer has not arrived (and never does in the single-file build): a reading stays retired
+    voiceLayer: null,
   };
   vm.createContext(sandbox);
   vm.runInContext(
@@ -123,6 +125,22 @@ test('unbound legacy speech and recording entry points fail closed', async () =>
   assert(retired > 0 || cancels > 4);
   assert(stopped > 0);
   assert(status.some((row) => row[2] === 'current-source-required'));
+  // With the voice layer the reading has ONE way out, the seam (a recorded clip, the voice server, the device voice as
+  // the fallback): this function still starts no fetch, no Audio and no utterance of its own.
+  const said = [];
+  sandbox.voiceLayer = { sayWord: (request) => said.push(request) };
+  status = [];
+  sandbox.status = status;
+  await sandbox.speakCardReading('きかい', null, '機械');
+  await Promise.resolve();
+  assert.equal(said.length, 1, 'the reading goes to the seam once');
+  assert.equal(said[0].text, 'きかい');
+  assert.equal(said[0].word, '機械');
+  assert.equal(typeof said[0].onNote, 'function');
+  assert.equal(fetches, 0);
+  assert.equal(starts, 0);
+  assert.equal(speaks, 0);
+  sandbox.voiceLayer = null;
   await assert.rejects(
     sandbox.verifiedSentenceAudio?.({ path: 'retained.m4a' }, new AbortController().signal) ??
       Promise.reject(Error('missing verifiedSentenceAudio')),
