@@ -366,6 +366,43 @@ await door('library-one', 'one candidate opens in the reader, tagged', async ({ 
   return `"${label}" → the reader, tagged "${tag}", ${words} tappable words; its head reads "${head.slice(0, 90)}"`;
 });
 
+/** a Build-a-character door: the kanji's page opens, its door says preview, the builder opens over it */
+async function worldcraftFrom(page, doorName, kanji) {
+  const label = await throughDoor(page, doorName);
+  must(await view(page) === 'search', `the door opened "${await view(page)}"`);
+  await page.locator('#sheet').waitFor();
+  const craft = page.locator('#worldcraft-door');
+  await craft.waitFor();
+  const words = (await craft.innerText()).replace(/\s+/g, ' ').trim();
+  must(/preview/.test(words) && words.includes(kanji), `the door on ${kanji} reads "${words}"`);
+  await craft.scrollIntoViewIfNeeded();
+  await craft.click();
+  await page.locator('#worldcraft-dialog [data-worldcraft-action="assemble"]').waitFor({ timeout: 20000 });
+  const says = await text(page, '#worldcraft-dialog', 500);
+  must(/Nothing here is saved to your record/.test(says), `the builder does not say that nothing is saved: ${says.slice(0, 200)}`);
+  return { label, words };
+}
+await door('worldcraft', 'on 職 the builder opens, puts the parts together, keeps the build and returns', async ({ page }) => {
+  const own = await worldcraftFrom(page, 'worldcraft', '職');
+  const assemble = (await page.locator('#worldcraft-dialog [data-worldcraft-action="assemble"]').innerText()).replace(/\s+/g, ' ').trim();
+  await page.locator('#worldcraft-dialog [data-worldcraft-action="assemble"]').click();
+  await page.locator('#worldcraft-dialog [data-worldcraft-action="keep"]').waitFor();
+  await shot(page, 'worldcraft-built');
+  await page.locator('#worldcraft-dialog [data-worldcraft-action="keep"]').click();
+  await page.waitForFunction(() => /Kept\. It’s now in Kept characters\./.test(document.querySelector('#worldcraft-dialog')?.innerText || ''), null, { timeout: 10000 });
+  await shot(page, 'worldcraft-kept');
+  await page.locator('#worldcraft-dialog .worldcraft-view > [data-worldcraft-action="leave"]').click();
+  await page.locator('#worldcraft-dialog').waitFor({ state: 'detached', timeout: 10000 });
+  must(await page.locator('#worldcraft-door').count() === 1, 'after leaving, the door is not on the page');
+  return `"${own.label}" → "${own.words}" → "${assemble}" → Keep this build → "Kept. It’s now in Kept characters." → leave → back on 職's page`;
+});
+for (const [name, kanji] of [['worldcraft-shiki', '識'], ['worldcraft-ori', '織']]) {
+  await door(name, `on ${kanji} the builder opens`, async ({ page }) => {
+    const held = await worldcraftFrom(page, name, kanji);
+    return `"${held.label}" → "${held.words}" → the builder opens and says nothing is saved`;
+  });
+}
+
 await door('orbit', 'the orbit word field opens from the galaxy menu and returns', async ({ page }) => {
   const label = await throughDoor(page, 'orbit');
   await page.locator('#ginga-symbol').click();
