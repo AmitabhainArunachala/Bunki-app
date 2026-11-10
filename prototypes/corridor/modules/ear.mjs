@@ -615,8 +615,7 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}) }) {
     mark.type = 'button';
     mark.className = 'ear-mark';
     mark.setAttribute('data-ear-own', '');
-    mark.setAttribute('lang', 'ja');
-    mark.innerHTML = `<span class="ear-glyph" aria-hidden="true">耳</span>${RINGS}`;
+    mark.innerHTML = `<span class="ear-glyph" lang="ja" aria-hidden="true">耳</span>${RINGS}`;
     const why = doc.createElement('span');
     why.className = 'ear-why';
     why.setAttribute('role', 'status');
