@@ -1,0 +1,727 @@
+/** The ear (2026-11-11; John chose "one gesture everywhere"): one gesture that speaks any Japanese on any screen, so
+ * nothing is left silent, screens built later included. One layer for the whole document, no per-screen code.
+ *
+ *   off (the default)  耳 in a hairline box. Everything behaves as before; Option-click on Japanese speaks it.
+ *   armed (one tap)    a red 耳 on paper. The next tap on Japanese speaks it and does nothing else; the ear goes off.
+ *   held (long press)  a white 耳 on a vermilion seal. On a phone every tap on Japanese speaks it and does nothing else;
+ *                      on the Mac the pointer resting 0.4 s on Japanese speaks it and clicks behave as usual.
+ *   speaking           the seal with three arcs. A second tap on the same unit stops it.
+ *   novoice            the mark struck once and one plain line for about four seconds (not paired, no connection,
+ *                      budget used up); then it rests off.
+ *
+ * The unit that speaks: in running text the sentence under the pointer or finger; on a row, a label, a button or a web
+ * node, that element's Japanese, sent as its kana reading where the element carries one.
+ *
+ * This module holds the state machine (createEarMachine), the unit finding (findUnit, unitAt), the click verdict
+ * (earClick) and the wiring (installEar). It speaks only through what installEar is handed, which is the voice seam
+ * (voice-layer.mjs): the voice server when paired, otherwise silence and the plain line. The look is the Bunki design
+ * lead's (design/ear/ear-states.html, 2026-11-11 00:30): colours from the look's own variables. */
+import { isJapaneseEnough } from './nihongo-speech/audio/speech-text.mjs';
+import { sentencesOf, voiceKeyOf } from './voice-seam.mjs';
+import { splitSentences } from './nihongo-speech/audio/speech-text.mjs';
+
+export const REST_MS = 400;
+export const NOVOICE_MS = 4000;
+/** A press this long is a hold (the reader's hold saves a word at 500 ms): never the ear's tap. */
+export const TAP_MAX_MS = 450;
+export const LONG_PRESS_MS = 500;
+const TAP_MOVE_PX = 9;
+/** A read that ended this way had no voice: the ear is struck and says why. */
+const QUIET_ENDS = new Set(['nothing-to-say', 'not-japanese', 'aborted']);
+
+/* ------------------------------------------------------------------ the state machine */
+/** `speak(unit, done)` starts one read and returns its handle ({ stop() }); `done(outcome, reason)` is called once when
+ * it ends ('done' | 'stopped' | 'error'). `cannot(unit)` names why there is no voice right now, or null. */
+export function createEarMachine({ speak, cannot = () => null, schedule = (fn, ms) => setTimeout(fn, ms),
+  cancel = (timer) => clearTimeout(timer), restMs = REST_MS, noVoiceMs = NOVOICE_MS, onChange = () => {} } = {}) {
+  let mode = 'off';            // off | armed | held
+  let current = null;          // { key, handle, ended }
+  let noVoice = null;          // { reason, timer }
+  let rest = null;             // { key, timer, asked }
+  const changed = () => { try { onChange(); } catch { /* a painter's own fault */ } };
+  const clearRest = () => { if (rest?.timer) cancel(rest.timer); rest = null; };
+  const clearNoVoice = () => { if (noVoice?.timer) cancel(noVoice.timer); noVoice = null; };
+  const strike = (reason) => {
+    clearNoVoice();
+    mode = 'off';
+    clearRest();
+    const mine = { reason, timer: null };
+    mine.timer = schedule(() => { if (noVoice === mine) { noVoice = null; changed(); } }, noVoiceMs);
+    noVoice = mine;
+  };
+  function stopCurrent() {
+    const was = current;
+    current = null;
+    if (was && !was.ended) { was.ended = true; try { was.handle?.stop?.(); } catch { /* already gone */ } }
+  }
+  /** One sound at a time: whatever the ear was saying ends, then this unit is asked for, or the ear is struck. */
+  function start(unit) {
+    stopCurrent();
+    clearNoVoice();
+    let why = null;
+    try { why = cannot(unit); } catch { why = 'speak-failed'; }
+    if (why) { strike(why); changed(); return; }
+    const mine = { key: unit.key, handle: null, ended: false };
+    current = mine;
+    const done = (outcome, reason) => {
+      if (mine.ended && current !== mine) return;
+      mine.ended = true;
+      if (current === mine) current = null;
+      if (outcome === 'error' && reason && !QUIET_ENDS.has(reason)) strike(reason);
+      changed();
+    };
+    try { mine.handle = speak(unit, done); } catch { done('error', 'speak-failed'); return; }
+    changed();
+  }
+  const speakingNow = () => (current && !current.ended ? current : null);
+
+  return {
+    mode: () => mode,
+    reason: () => noVoice?.reason ?? null,
+    speaking: () => speakingNow()?.key ?? null,
+    voice: () => !!speakingNow(),
+    /** The one state the mark and the page show. Armed shows over a voice still speaking: he sees the ear waiting. */
+    display() {
+      if (noVoice) return 'novoice';
+      if (mode === 'armed') return 'armed';
+      if (speakingNow()) return 'speaking';
+      return mode;
+    },
+    tapEar() {
+      if (noVoice) { clearNoVoice(); mode = 'armed'; }
+      else mode = mode === 'off' ? 'armed' : 'off';
+      clearRest();
+      changed();
+    },
+    holdEar() {
+      clearNoVoice();
+      mode = 'held';
+      clearRest();
+      changed();
+    },
+    /** A click or tap that landed on `unit` (null: nothing Japanese there). 'consume': the ear took it, and the app must
+     * not see it; 'pass': it is the app's own. */
+    click({ unit, pointer = 'mouse', alt = false } = {}) {
+      if (!unit) return 'pass';
+      const now = speakingNow();
+      if (now && now.key === unit.key && mode !== 'armed') { stopCurrent(); changed(); return 'consume'; }
+      if (mode === 'armed') { mode = 'off'; start(unit); return 'consume'; }
+      if (mode === 'held' && pointer !== 'mouse') { start(unit); return 'consume'; }
+      if (alt) { start(unit); return 'consume'; }
+      return 'pass';
+    },
+    /** The Mac's pointer over `unit` (null: over nothing Japanese). Held on, a rest of `restMs` on one unit speaks it
+     * once; moving within the unit asks nothing more; a new rest cancels a read still in flight. */
+    hover({ unit, pointer = 'mouse' } = {}) {
+      if (mode !== 'held' || pointer !== 'mouse') { clearRest(); return; }
+      if (!unit) { clearRest(); return; }
+      if (rest && rest.key === unit.key) return;
+      clearRest();
+      const mine = { key: unit.key, timer: null, asked: false };
+      mine.timer = schedule(() => {
+        if (rest !== mine || mode !== 'held') return;
+        mine.timer = null;
+        mine.asked = true;
+        start(unit);
+      }, restMs);
+      rest = mine;
+    },
+    /** The 読む chip: a selection, read now, whatever the ear's state. */
+    speakNow(unit) { if (unit) start(unit); },
+    /** The screen changed, or the app stopped every sound: the ear's read ends; its mode stays. */
+    stop() { stopCurrent(); clearRest(); changed(); },
+  };
+}
+
+/* ------------------------------------------------------------------ the words it shows */
+export function earLabel(state, reason, tx) {
+  switch (state) {
+    case 'armed': return tx('耳：次のタップを読む', 'ear: armed for the next tap');
+    case 'held': return tx('耳：オン', 'ear: on');
+    case 'speaking': return tx('耳：読んでいます', 'ear: speaking');
+    case 'novoice': return tx(`耳：声なし、${reasonShort(reason, tx)}`, `ear: no voice, ${reasonShort(reason, tx)}`);
+    default: return tx('耳：オフ', 'ear: off');
+  }
+}
+function reasonShort(reason, tx) {
+  if (['not-paired', 'not-configured', 'authentication-required'].includes(reason)) return tx('未接続', 'not paired');
+  if (['offline', 'network-failed', 'voice-timeout'].includes(reason)) return tx('接続なし', 'no connection');
+  if (reason === 'day-budget') return tx('今日の予算切れ', 'today’s budget used up');
+  if (reason === 'budget-exhausted') return tx('予算切れ', 'budget used up');
+  return tx('サーバーが答えない', 'the voice server is not answering');
+}
+/** The one plain line beside the struck mark, in the interface language. */
+export function noVoiceLine(reason, tx) {
+  if (reason === 'authentication-required') return tx('声の接続が切れました。設定でつなぎ直してください', 'No voice: pair again in Settings');
+  if (['not-paired', 'not-configured'].includes(reason)) return tx('声はまだつないでいません', 'No voice yet: not paired');
+  if (['offline', 'network-failed', 'voice-timeout'].includes(reason)) return tx('声が届きません。接続がありません', 'No voice: no connection');
+  if (reason === 'day-budget') return tx('今日の声の予算を使い切りました', 'No voice: today’s budget is used up');
+  if (reason === 'budget-exhausted') return tx('声の予算を使い切りました', 'No voice: the voice budget is used up');
+  return tx('いま声を出せません', 'No voice right now');
+}
+
+/* ------------------------------------------------------------------ the unit that speaks */
+const SKIP_TAGS = new Set(['RT', 'RP', 'SCRIPT', 'STYLE', 'TEMPLATE', 'NOSCRIPT', 'INPUT', 'TEXTAREA', 'SELECT', 'CANVAS', 'IFRAME', 'SVG', 'MATH', 'OBJECT', 'VIDEO', 'AUDIO']);
+const FIELD_TAGS = new Set(['INPUT', 'TEXTAREA', 'SELECT', 'OPTION']);
+const CONTROL_TAGS = new Set(['BUTTON', 'A', 'SUMMARY', 'LABEL']);
+const CONTROL_ROLES = new Set(['button', 'link', 'option', 'menuitem', 'menuitemradio', 'menuitemcheckbox', 'tab', 'treeitem', 'switch', 'checkbox', 'radio']);
+const INLINE_TAGS = new Set(['RT', 'RP', 'RB', 'SPAN', 'A', 'B', 'I', 'EM', 'STRONG', 'RUBY', 'RB', 'SMALL', 'MARK', 'ABBR', 'CODE', 'SUB', 'SUP', 'TIME', 'Q', 'CITE', 'U', 'S', 'BR', 'WBR', 'BDI', 'BDO', 'DFN', 'KBD', 'SAMP', 'VAR', 'DATA', 'LABEL', 'IMG', 'FONT']);
+const NO_HOST = new Set(['BODY', 'HTML']);
+const READING_CLASS = /(?:^|[\s_-])(?:yomi|read|reading|kana|furigana)(?:$|[\s_-])/i;
+const KANA_ONLY = /^[\p{Script=Hiragana}\p{Script=Katakana}ー・･·、，,\s]+$/u;
+const JAPANESE_LETTER = /[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}]/u;
+const JAPANESE_LETTERS = /[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}]/gu;
+const JAPANESE_RUN = /[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}ー々〆ヶ、。・「」『』（）！？〜～…0-9０-９]+/gu;
+const BARE_RUN = /[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}ー々〆ヶ]+/gu;
+
+const tagOf = (node) => String(node?.tagName || '').toUpperCase();
+const attr = (node, name) => (typeof node?.getAttribute === 'function' ? node.getAttribute(name) : null);
+const hasClass = (node, name) => !!node?.classList?.contains?.(name);
+const classText = (node) => (typeof node?.className === 'string' ? node.className : String(node?.className?.baseVal || ''));
+const parentOf = (node) => node?.parentNode && node.parentNode.nodeType === 1 ? node.parentNode : null;
+const inside = (outer, node) => { for (let at = node; at; at = at.parentNode) if (at === outer) return true; return false; };
+const hasJapanese = (text) => JAPANESE_LETTER.test(String(text || ''));
+const defaultDisplay = (node) => node?.style?.display || (INLINE_TAGS.has(tagOf(node)) ? 'inline' : 'block');
+const isInlineDisplay = (value) => /^(inline|contents|ruby|ruby-base|ruby-text)$/.test(String(value || ''));
+const isControl = (node) => CONTROL_TAGS.has(tagOf(node)) || CONTROL_ROLES.has(String(attr(node, 'role') || '').toLowerCase());
+const isOwn = (node) => attr(node, 'data-ear-own') !== null;
+const isEditable = (node) => FIELD_TAGS.has(tagOf(node)) || ['', 'true', 'plaintext-only'].includes(attr(node, 'contenteditable') ?? 'no');
+const isHiddenText = (node) => node.hidden || attr(node, 'aria-hidden') === 'true' || hasClass(node, 'visually-hidden');
+const isNote = (node) => hasClass(node, 'say-note') || hasClass(node, 'voice-note') || attr(node, 'data-reader-annotation') === 'true';
+
+/** Japanese a voice can say: whole sentences when the text is Japanese through and through; from mixed text only its
+ * Japanese runs; and a lone character ("門 Products") when that is all the Japanese there is. */
+export function speakable(text) {
+  const raw = String(text ?? '');
+  if (!hasJapanese(raw)) return [];
+  const whole = sentencesOf(raw);
+  if (whole.length && whole.every((sentence) => isJapaneseEnough(sentence.text))) return whole;
+  const runs = (raw.match(JAPANESE_RUN) || []).filter((run) => (run.match(JAPANESE_LETTERS) || []).length >= 2)
+    .flatMap((run) => sentencesOf(run)).filter((sentence) => isJapaneseEnough(sentence.text));
+  if (runs.length) return runs;
+  const bare = (raw.match(BARE_RUN) || []).join('、');
+  return bare && isJapaneseEnough(bare) ? [{ text: bare }] : [];
+}
+
+/** The text nodes of `root` a learner reads as its words, in order: no readings above words, no notes, nothing hidden
+ * (unless `keep` is inside it: what he touched is what he sees), and with `controls` false nothing inside a control. */
+function textNodes(root, { keep = null, controls = true, skip = null } = {}) {
+  const out = [];
+  const visit = (node) => {
+    if (node.nodeType === 3) { if (node.nodeValue) out.push(node); return; }
+    if (node.nodeType !== 1) return;
+    if (node !== root) {
+      if (SKIP_TAGS.has(tagOf(node)) || isOwn(node) || isNote(node) || (skip && skip(node))) return;
+      if (isHiddenText(node) && !(keep && inside(node, keep))) return;
+      if (!controls && isControl(node)) return;
+    }
+    for (const child of node.childNodes || []) visit(child);
+  };
+  visit(root);
+  return out;
+}
+const joined = (nodes) => nodes.map((node) => node.nodeValue).join('');
+
+/** The reading an element carries: a kana attribute, or one descendant whose class names a reading and holds kana. */
+function readingOf(element) {
+  for (const name of ['data-reading', 'data-kana', 'data-yomi']) {
+    const value = attr(element, name);
+    if (value && KANA_ONLY.test(value) && hasJapanese(value)) return { text: value, node: null };
+  }
+  const stack = [...(element.childNodes || [])];
+  while (stack.length) {
+    const node = stack.shift();
+    if (node.nodeType !== 1 || SKIP_TAGS.has(tagOf(node)) || isOwn(node)) continue;
+    if (READING_CLASS.test(classText(node))) {
+      const value = joined(textNodes(node)).trim();
+      if (value && hasJapanese(value) && KANA_ONLY.test(value)) return { text: value, node };
+      continue;
+    }
+    stack.unshift(...(node.childNodes || []));
+  }
+  return null;
+}
+const readingSentence = (text) => String(text).replace(/\s*[・･·,，]\s*/gu, '、').replace(/、+$/u, '').replace(/\s+/gu, '');
+
+/** A short string that names a text, for a voice key: stable, no spaces. */
+function digest(text) {
+  let a = 0x811c9dc5, b = 0x01000193;
+  for (const ch of String(text)) {
+    const code = ch.codePointAt(0);
+    a = Math.imul(a ^ code, 0x01000193) >>> 0;
+    b = Math.imul(b + code, 0x5bd1e995) >>> 0;
+  }
+  return a.toString(36) + b.toString(36).slice(0, 3);
+}
+/** The voice key, by the existing kinds: a sentence of an article keeps article:<id>; a listen mark's own key where the
+ * text has one (a replay of what it said is free); a word or a row word:<word>; any other text one key per screen and
+ * paragraph, so a replay is free and one paragraph keeps one narrator. */
+function keyOf({ node, word, paragraph }, context) {
+  let article = null;
+  try { article = context.articleOf?.(node) || null; } catch { /* no article here */ }
+  if (article) return voiceKeyOf('article', article);
+  let mark = null;
+  try { mark = context.keyFor?.(node) || null; } catch { /* no mark here */ }
+  if (mark) return mark;
+  if (word) return voiceKeyOf('word', word);
+  return voiceKeyOf('word', `ear.${String(context.view || 'app').replace(/[^\w-]/g, '') || 'app'}.${digest(paragraph)}`);
+}
+
+let elementIds = new WeakMap();
+let nextId = 1;
+const idOf = (node) => { if (!elementIds.has(node)) elementIds.set(node, nextId++); return elementIds.get(node); };
+
+function elementUnit(element, context, keep) {
+  const reading = readingOf(element);
+  let nodes = textNodes(element, { skip: reading?.node ? (node) => node === reading.node : null });
+  if (!hasJapanese(joined(nodes))) nodes = textNodes(element, { keep: element, skip: reading?.node ? (node) => node === reading.node : null });
+  const own = joined(nodes);
+  const word = (own.match(BARE_RUN) || []).join('');
+  const sentences = reading ? [{ text: readingSentence(reading.text) }] : speakable(own);
+  if (!sentences.length) return null;
+  const wordLike = word && [...word].length <= 16 && !/[。！？]/u.test(own);
+  return {
+    kind: 'element', element, block: element, reading: reading?.text || null,
+    text: sentences.map((s) => s.text).join(''), sentences,
+    key: `e${idOf(element)}:${word || own}`,
+    voiceKey: keyOf({ node: element, word: wordLike ? word : null, paragraph: own }, context),
+    contains: (node) => inside(element, node),
+    keep,
+  };
+}
+
+/** The sentence of `block` that the text position (node, offset) stands in. */
+function sentenceUnit(block, target, offset, context) {
+  const nodes = textNodes(block, { keep: target });
+  const text = joined(nodes);
+  if (!hasJapanese(text)) return null;
+  const starts = [];
+  let total = 0;
+  for (const node of nodes) { starts.push(total); total += node.nodeValue.length; }
+  // where the touch is in the block's text: a text node it holds, else the first word after the touched element
+  let at = -1;
+  const index = nodes.indexOf(target);
+  if (index >= 0) at = starts[index] + Math.max(0, Math.min(Number.isFinite(offset) ? offset : 0, nodes[index].nodeValue.length - 1));
+  else {
+    let from = target;
+    // a reading above a word (rt) speaks the sentence that word stands in
+    for (let up = target; up && up !== block; up = up.parentNode) if (tagOf(up) === 'RUBY') { from = up; break; }
+    const first = nodes.findIndex((node) => inside(from, node));
+    if (first >= 0) at = starts[first];
+    else {
+      const after = nodes.findIndex((node) => precedes(from, node));
+      at = after >= 0 ? starts[after] : Math.max(0, total - 1);
+    }
+  }
+  let pieces = [];
+  try { pieces = earPieces(text); } catch { return null; }
+  if (!pieces.length) return null;
+  let piece = pieces.find((p) => at >= p.start && at < p.end);
+  if (!piece) piece = pieces.reduce((best, p) => (Math.abs(p.start - at) < Math.abs(best.start - at) ? p : best), pieces[0]);
+  const sentences = speakable(piece.text);
+  if (!sentences.length) return null;
+  const locate = (position, end) => {
+    for (let i = 0; i < nodes.length; i += 1) {
+      const from = starts[i], to = from + nodes[i].nodeValue.length;
+      if (end ? position > from && position <= to : position >= from && position < to) return { node: nodes[i], offset: position - from };
+    }
+    const last = nodes[nodes.length - 1];
+    return { node: last, offset: last.nodeValue.length };
+  };
+  const start = locate(piece.start, false), end = locate(piece.end, true);
+  return {
+    kind: 'sentence', element: block, block, reading: null,
+    text: piece.text, sentences,
+    range: { startNode: start.node, startOffset: start.offset, endNode: end.node, endOffset: end.offset },
+    key: `s${idOf(block)}:${piece.start}:${piece.text}`,
+    voiceKey: keyOf({ node: target.nodeType === 3 ? target.parentNode : target, word: null, paragraph: text }, context),
+    contains: (node) => inside(block, node),
+  };
+}
+/** The sentences of a block's text with their places: the speech team's own splitting, and an English full stop
+ * followed by a space ends a sentence too, so the English around Japanese in a mixed line is a sentence of its own. */
+function earPieces(text) {
+  const out = [];
+  const push = (start, end) => {
+    while (start < end && /\s/u.test(text[start])) start += 1;
+    while (end > start && /\s/u.test(text[end - 1])) end -= 1;
+    if (end > start) out.push({ start, end, text: text.slice(start, end).replace(/\s+/gu, ' ') });
+  };
+  for (const piece of splitSentences(text)) {
+    let from = piece.start;
+    const stop = /[.](?=\s)/gu;
+    stop.lastIndex = piece.start;
+    for (let match = stop.exec(text); match && match.index < piece.end; match = stop.exec(text)) { push(from, match.index + 1); from = match.index + 1; }
+    push(from, piece.end);
+  }
+  return out;
+}
+/** True when `a` comes before `b` in the document (both under one root). */
+function precedes(a, b) {
+  if (typeof a.compareDocumentPosition === 'function') return !!(a.compareDocumentPosition(b) & 4);
+  const path = (node) => { const out = []; for (let at = node; at; at = at.parentNode) out.unshift(at); return out; };
+  const pa = path(a), pb = path(b);
+  let i = 0;
+  while (i < pa.length && i < pb.length && pa[i] === pb[i]) i += 1;
+  if (i === 0 || i >= pa.length || i >= pb.length) return false;
+  const siblings = pa[i - 1].childNodes || [];
+  return siblings.indexOf(pa[i]) < siblings.indexOf(pb[i]);
+}
+
+/** The unit `target` (a text node or an element) stands in, or null when there is no Japanese to say there.
+ * `offset`: the position in a text node. `display(element)`: its CSS display (the page's computed one). `context`:
+ * { view, articleOf(node), keyFor(node) } for the voice key. */
+export function findUnit(target, { offset = null, display = defaultDisplay, context = {} } = {}) {
+  if (!target) return null;
+  const start = target.nodeType === 3 ? parentOf(target) : target;
+  if (!start || start.nodeType !== 1) return null;
+  for (let at = start; at; at = parentOf(at)) {
+    if (isOwn(at) || isEditable(at)) return null;
+    if (SKIP_TAGS.has(tagOf(at)) && tagOf(at) !== 'RT' && tagOf(at) !== 'RP') return null;
+  }
+  // a control: the row, label, button or web node is the unit, unless it is a word inside running text
+  let control = null;
+  for (let at = start; at && !NO_HOST.has(tagOf(at)); at = parentOf(at)) if (isControl(at)) { control = at; break; }
+  if (control) {
+    const outer = blockOf(parentOf(control), display);
+    const around = outer ? joined(textNodes(outer, { controls: false })) : '';
+    if (!outer || (around.match(JAPANESE_LETTERS) || []).length < 2) return elementUnit(control, context, target);
+  }
+  const block = blockOf(start, display);
+  if (!block) return null;
+  return sentenceUnit(block, target, offset, context);
+}
+function blockOf(node, display) {
+  for (let at = node; at; at = parentOf(at)) {
+    if (NO_HOST.has(tagOf(at))) return null;
+    let value = '';
+    try { value = display(at); } catch { value = defaultDisplay(at); }
+    if (value === 'none') continue;
+    if (!isInlineDisplay(value)) return at;
+  }
+  return null;
+}
+
+/** The unit under a point of the page: what a tap or a resting pointer there would speak. */
+export function unitAt(doc, x, y, options = {}) {
+  const view = doc.defaultView;
+  const hit = doc.elementFromPoint(x, y);
+  if (!hit) return null;
+  let node = hit, offset = null;
+  const caret = typeof doc.caretPositionFromPoint === 'function' ? doc.caretPositionFromPoint(x, y)
+    : typeof doc.caretRangeFromPoint === 'function' ? doc.caretRangeFromPoint(x, y) : null;
+  const caretNode = caret?.offsetNode ?? caret?.startContainer ?? null;
+  const caretOffset = caret?.offset ?? caret?.startOffset ?? null;
+  if (caretNode?.nodeType === 3 && inside(hit, caretNode) && caretTouches(doc, caretNode, caretOffset, x, y)) { node = caretNode; offset = caretOffset; }
+  return findUnit(node, { offset, display: (el) => view.getComputedStyle(el).display, ...options });
+}
+/** A caret is placed at the nearest character even beside the text; it counts when its character's box is under the
+ * point (or near it, for a gap between letters). */
+function caretTouches(doc, node, offset, x, y) {
+  try {
+    const range = doc.createRange();
+    const length = node.nodeValue.length;
+    const from = Math.max(0, Math.min(offset, length - 1));
+    range.setStart(node, from);
+    range.setEnd(node, Math.min(length, from + 1));
+    for (const box of range.getClientRects()) if (x >= box.left - 12 && x <= box.right + 12 && y >= box.top - 6 && y <= box.bottom + 6) return true;
+  } catch { /* not measurable */ }
+  return false;
+}
+
+/* ------------------------------------------------------------------ the click verdict */
+/** What a click means to the ear. Off, with no Option key and nothing of the ear's speaking, it reads only the Option
+ * key and returns: the click is the app's own, untouched. A press held as long as a hold (the reader's save) or moved
+ * like a drag is the app's too. */
+export function earClick(event, { machine, unitAt: find, press = null, now = Date.now() }) {
+  const alt = !!event.altKey;
+  if (!alt && machine.mode() === 'off' && !machine.voice()) return 'pass';
+  if (press && event.detail !== 0) {
+    if (now - press.at >= TAP_MAX_MS) return 'pass';
+    if (Math.hypot((event.clientX ?? press.x) - press.x, (event.clientY ?? press.y) - press.y) > TAP_MOVE_PX) return 'pass';
+  }
+  const pointer = event.detail === 0 ? 'keyboard' : event.pointerType || press?.pointerType || 'mouse';
+  let unit = null;
+  try { unit = find(event); } catch { unit = null; }
+  return machine.click({ unit, pointer: pointer === 'keyboard' ? 'touch' : pointer, alt });
+}
+
+/* ------------------------------------------------------------------ the look */
+const RINGS = '<svg class="ear-rings" viewBox="0 0 26 30" aria-hidden="true" focusable="false"><path d="M4 9a8 8 0 0 1 0 12"/><path d="M10 5a14 14 0 0 1 0 20"/><path d="M16 1a20 20 0 0 1 0 28"/></svg>';
+/** The design lead's CSS (design/ear/ear-states.html), on the app's own variables: --red, --ink, the paper white. */
+export const EAR_CSS = `
+.ear-mark { --ear-ink: var(--color-bar-ink, var(--ink)); --ear-red: var(--red); --ear-white: var(--print-white, var(--ground-0, var(--color-paper, var(--ground))));
+  position: relative; display: inline-grid; place-items: center; width: 44px; min-width: 44px; height: 44px; padding: 0; margin: 0; border: 0;
+  background: transparent; color: var(--ear-ink); cursor: pointer; isolation: isolate; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
+.ear-mark::before { content: ''; position: absolute; inset: 7px; z-index: -1; border-radius: 3px;
+  border: 1px solid color-mix(in oklab, var(--ear-ink) 30%, transparent); background: transparent;
+  transition: background-color 120ms ease-out, border-color 120ms ease-out, box-shadow 120ms ease-out, border-radius 120ms ease-out; }
+.ear-mark .ear-glyph { font: 500 16px/1 "Hiragino Mincho ProN", "Noto Serif JP", var(--serif, serif); color: color-mix(in oklab, var(--ear-ink) 58%, transparent); transition: color 120ms ease-out; pointer-events: none; }
+.ear-mark:focus-visible { outline: 2px solid var(--ai, var(--ear-ink)); outline-offset: -4px; }
+.ear-mark .ear-rings { position: absolute; left: calc(100% - 7px); top: 50%; width: 26px; height: 30px; transform: translate(2px, -50%); overflow: visible; display: none; pointer-events: none; }
+.ear-mark .ear-rings path { fill: none; stroke: var(--ear-red); stroke-width: 1.4; stroke-linecap: round; stroke-dasharray: 40; stroke-dashoffset: 0; }
+.ear-mark .ear-rings path:nth-child(2) { opacity: .66; } .ear-mark .ear-rings path:nth-child(3) { opacity: .36; }
+.ear-why { position: absolute; left: calc(100% - 4px); top: 50%; transform: translateY(-50%); z-index: 2; padding: 4px 8px; border-radius: 3px; white-space: nowrap;
+  font: 12px/1.2 "Hiragino Sans", "Noto Sans JP", var(--sans, sans-serif); color: color-mix(in oklab, var(--ear-ink, var(--ink)) 82%, transparent);
+  background: color-mix(in oklab, var(--print-white, var(--ground-0, var(--color-paper, var(--ground)))) 94%, transparent); pointer-events: none; }
+.ear-spot { position: absolute; width: 44px; height: 44px; }
+/* where the mark stands: beside the floating gate of the first screen, and beside the gate of every bar */
+#ginga-symbol + .ear-spot { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); left: calc(50% + 24px); z-index: 30; }
+:is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate + .ear-spot { top: env(safe-area-inset-top, 0px); left: calc(50% + 22px); z-index: 1; }
+:is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate + .ear-spot + * { margin-left: auto; }
+/* armed: 朱文, a red character on paper */
+html[data-ear='armed'] .ear-mark::before { border-color: var(--ear-red); background: var(--ear-white); box-shadow: 0 1px 0 color-mix(in oklab, var(--ink) 18%, transparent); }
+html[data-ear='armed'] .ear-mark .ear-glyph { color: var(--ear-red); }
+/* held on and speaking: 白文, the seal pressed */
+html:is([data-ear='held'], [data-ear='speaking']) .ear-mark::before { background: var(--ear-red); border-color: var(--ear-red); border-radius: 2.5px 3.5px 3px 2px;
+  box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--ear-red) 70%, var(--ink)), inset 0 0 0 2.5px color-mix(in oklab, var(--ear-white) 55%, transparent), 0 1px 1px color-mix(in oklab, var(--ink) 30%, transparent);
+  animation: ear-press 140ms ease-out; }
+html:is([data-ear='held'], [data-ear='speaking']) .ear-mark .ear-glyph { color: var(--ear-white); }
+html[data-ear='speaking'] .ear-mark .ear-rings, html[data-ear='armed'][data-ear-voice] .ear-mark .ear-rings { display: block; }
+html[data-ear='speaking'] .ear-mark .ear-rings path, html[data-ear='armed'][data-ear-voice] .ear-mark .ear-rings path { animation: ear-ring 600ms ease-out infinite; }
+.ear-mark .ear-rings path:nth-child(2) { animation-delay: 120ms !important; } .ear-mark .ear-rings path:nth-child(3) { animation-delay: 240ms !important; }
+/* no voice: struck once, like a cancelled stamp */
+html[data-ear='novoice'] .ear-mark .ear-glyph { color: color-mix(in oklab, var(--ear-ink) 40%, transparent); }
+html[data-ear='novoice'] .ear-mark::before { border-color: color-mix(in oklab, var(--ear-ink) 26%, transparent); }
+html[data-ear='novoice'] .ear-mark::after { content: ''; position: absolute; left: 4px; right: 4px; top: 50%; height: 1.4px; background: color-mix(in oklab, var(--ear-ink) 70%, transparent); transform: rotate(-38deg); pointer-events: none; }
+@keyframes ear-press { from { transform: scale(1.06); } to { transform: scale(1); } }
+@keyframes ear-ring { 0% { stroke-dashoffset: 40; } 60%, 100% { stroke-dashoffset: 0; } }
+/* what the page shows: the unit gets a red underline (armed), a wash along its foot (held on, speaking); nothing moves */
+[data-ear-unit='armed'] { text-decoration-line: underline; text-decoration-color: var(--red); text-decoration-thickness: 1.4px; text-underline-offset: 6px; }
+[data-ear-unit='held'] { background-image: linear-gradient(transparent 62%, color-mix(in oklab, var(--red) 22%, transparent) 62%); }
+[data-ear-unit='speaking'] { background-image: linear-gradient(transparent 62%, color-mix(in oklab, var(--red) 34%, transparent) 62%); }
+::highlight(bunki-ear-armed) { text-decoration-line: underline; text-decoration-color: var(--red); text-decoration-thickness: 1.4px; text-underline-offset: 6px; }
+::highlight(bunki-ear-held) { text-decoration-line: underline; text-decoration-color: color-mix(in oklab, var(--red) 22%, transparent); text-decoration-thickness: .38em; text-underline-offset: -.3em; text-decoration-skip-ink: none; }
+::highlight(bunki-ear-speaking) { text-decoration-line: underline; text-decoration-color: color-mix(in oklab, var(--red) 34%, transparent); text-decoration-thickness: .38em; text-underline-offset: -.3em; text-decoration-skip-ink: none; }
+/* select-then-読む */
+.ear-chip { position: fixed; z-index: 2147483000; min-width: 44px; height: 32px; padding: 0 10px; border-radius: 3px; border: 1px solid var(--red);
+  background: var(--print-white, var(--ground-0, var(--color-paper, var(--ground)))); color: var(--red); font: 500 15px/1 "Hiragino Mincho ProN", "Noto Serif JP", var(--serif, serif);
+  box-shadow: 0 1px 0 color-mix(in oklab, var(--ink) 18%, transparent), 0 8px 18px -10px color-mix(in oklab, var(--ink) 50%, transparent); cursor: pointer; -webkit-user-select: none; user-select: none; }
+@media (prefers-reduced-motion: reduce) {
+  .ear-mark::before, .ear-mark .ear-glyph { transition: none; }
+  html .ear-mark::before { animation: none !important; }
+  html .ear-mark .ear-rings path { animation: none !important; stroke-dashoffset: 0; }
+}
+`;
+
+/* ------------------------------------------------------------------ the wiring */
+/** Install the ear in `doc`. `speak(unit, done)` reads a unit through the voice seam and returns its handle;
+ * `cannot(unit)` names why there is no voice right now; `context()` gives { view, articleOf, keyFor } for voice keys.
+ * Returns { mount, stop, machine }: mount() places a mark beside every gate (call it when the page changes). */
+export function installEar({ doc, tx, speak, cannot, context = () => ({}) }) {
+  const view = doc.defaultView;
+  const root = doc.documentElement;
+  if (!doc.getElementById('ear-style')) {
+    const style = doc.createElement('style');
+    style.id = 'ear-style';
+    style.textContent = EAR_CSS;
+    doc.head.append(style);
+  }
+  const highlights = view.CSS?.highlights && typeof view.Highlight === 'function' ? view.CSS.highlights : null;
+  let shown = null; // { unit, state, element? }
+  const clearShown = () => {
+    if (!shown) return;
+    if (shown.marked?.isConnected !== false) shown.marked?.removeAttribute?.('data-ear-unit');
+    for (const name of ['armed', 'held', 'speaking']) highlights?.delete(`bunki-ear-${name}`);
+    shown = null;
+  };
+  /** The red underline or the wash, on the unit, without moving it: an element takes an attribute, a sentence a
+   * highlight (a browser without highlights washes the sentence's paragraph). */
+  function showUnit(unit, state) {
+    if (shown && shown.unit?.key === unit?.key && shown.state === state) return;
+    clearShown();
+    if (!unit || !state) return;
+    shown = { unit, state, marked: null };
+    if (unit.kind === 'sentence' && unit.range && highlights) {
+      try {
+        const range = doc.createRange();
+        range.setStart(unit.range.startNode, unit.range.startOffset);
+        range.setEnd(unit.range.endNode, unit.range.endOffset);
+        highlights.set(`bunki-ear-${state}`, new view.Highlight(range));
+        return;
+      } catch { /* the page changed under it */ }
+    }
+    const marked = unit.element;
+    if (marked?.isConnected) { marked.setAttribute('data-ear-unit', state); shown.marked = marked; }
+  }
+
+  const ctx = () => {
+    let given = {};
+    try { given = context() || {}; } catch { /* no context */ }
+    return given;
+  };
+  const find = (x, y) => { try { return unitAt(doc, x, y, { context: ctx() }); } catch { return null; } };
+  let speakingUnit = null;
+  let hoverUnit = null;
+  const machine = createEarMachine({
+    speak: (unit, done) => {
+      speakingUnit = unit;
+      return speak(unit, (outcome, reason) => { if (speakingUnit === unit) speakingUnit = null; done(outcome, reason); });
+    },
+    cannot: (unit) => cannot(unit),
+    schedule: (fn, ms) => view.setTimeout(fn, ms),
+    cancel: (timer) => view.clearTimeout(timer),
+    onChange: () => paint(),
+  });
+
+  /* the mark */
+  const marks = new Set();
+  function makeMark() {
+    const spot = doc.createElement('span');
+    spot.className = 'ear-spot';
+    spot.setAttribute('data-ear-own', '');
+    const mark = doc.createElement('button');
+    mark.type = 'button';
+    mark.className = 'ear-mark';
+    mark.setAttribute('data-ear-own', '');
+    mark.setAttribute('lang', 'ja');
+    mark.innerHTML = `<span class="ear-glyph" aria-hidden="true">耳</span>${RINGS}`;
+    const why = doc.createElement('span');
+    why.className = 'ear-why';
+    why.setAttribute('role', 'status');
+    why.setAttribute('data-ear-own', '');
+    why.hidden = true;
+    spot.append(mark, why);
+    let timer = 0, held = false;
+    mark.addEventListener('pointerdown', (event) => {
+      if (event.isPrimary === false || (event.pointerType === 'mouse' && event.button !== 0)) return;
+      held = false;
+      view.clearTimeout(timer);
+      timer = view.setTimeout(() => { held = true; machine.holdEar(); }, LONG_PRESS_MS);
+    });
+    const end = () => view.clearTimeout(timer);
+    mark.addEventListener('pointerup', end);
+    mark.addEventListener('pointercancel', end);
+    mark.addEventListener('pointerleave', end);
+    mark.addEventListener('contextmenu', (event) => { event.preventDefault(); view.clearTimeout(timer); if (!held) { held = true; machine.holdEar(); } });
+    mark.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (held) { held = false; return; }
+      // the keyboard's way to hold it on: Shift with Enter or Space
+      if (event.detail === 0 && event.shiftKey) { machine.holdEar(); return; }
+      machine.tapEar();
+    });
+    marks.add(spot);
+    paintMark(spot);
+    return spot;
+  }
+  function paintMark(spot) {
+    const state = machine.display();
+    const mark = spot.firstElementChild, why = spot.lastElementChild;
+    const label = earLabel(state, machine.reason(), tx);
+    mark.setAttribute('aria-label', label);
+    mark.title = state === 'off' ? tx('耳 — タップで次のタップを読む。長押しでずっと読む', 'Ear — tap: read what you tap next. Hold: keep reading') : label;
+    if (state === 'novoice') { why.textContent = noVoiceLine(machine.reason(), tx); why.hidden = false; }
+    else { why.hidden = true; why.textContent = ''; }
+  }
+  /** A mark beside the first screen's gate and beside the gate of every bar. */
+  function mount() {
+    for (const spot of [...marks]) if (!spot.isConnected) marks.delete(spot);
+    for (const gate of doc.querySelectorAll('#ginga-symbol, :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate')) {
+      if (gate.nextElementSibling?.classList?.contains('ear-spot')) continue;
+      gate.after(makeMark());
+    }
+  }
+  function paint() {
+    const state = machine.display();
+    root.dataset.ear = state;
+    if (machine.voice()) root.dataset.earVoice = ''; else delete root.dataset.earVoice;
+    for (const spot of marks) if (spot.isConnected) paintMark(spot);
+    // the unit: the one being read carries the wash; otherwise the one under the Mac's pointer shows what a tap would read
+    if (speakingUnit && machine.voice()) showUnit(speakingUnit, 'speaking');
+    else if (hoverUnit && (state === 'armed' || state === 'held')) showUnit(hoverUnit, state);
+    else showUnit(null, null);
+  }
+
+  /* the page */
+  let press = null;
+  view.addEventListener('pointerdown', (event) => {
+    if (event.isPrimary === false) return;
+    press = { at: Date.now(), x: event.clientX, y: event.clientY, pointerType: event.pointerType || 'mouse' };
+  }, true);
+  view.addEventListener('click', (event) => {
+    const verdict = earClick(event, {
+      machine, press, now: Date.now(),
+      unitAt: (e) => (e.detail === 0 || (!e.clientX && !e.clientY) ? findUnit(e.target, { display: (el) => view.getComputedStyle(el).display, context: ctx() }) : find(e.clientX, e.clientY)),
+    });
+    press = null;
+    if (verdict === 'consume') { event.preventDefault(); event.stopImmediatePropagation(); }
+  }, true);
+  let frame = 0, last = null;
+  view.addEventListener('pointermove', (event) => {
+    if (event.pointerType !== 'mouse') return;
+    const state = machine.display();
+    if (state !== 'armed' && state !== 'held' && !(state === 'speaking' && machine.mode() === 'held')) { if (hoverUnit) { hoverUnit = null; paint(); } return; }
+    last = { x: event.clientX, y: event.clientY };
+    if (frame) return;
+    frame = view.requestAnimationFrame(() => {
+      frame = 0;
+      const unit = last ? find(last.x, last.y) : null;
+      hoverUnit = unit;
+      machine.hover({ unit, pointer: 'mouse' });
+      paint();
+    });
+  }, { capture: true, passive: true });
+  doc.addEventListener('pointerleave', () => { hoverUnit = null; machine.hover({ unit: null, pointer: 'mouse' }); paint(); });
+  view.addEventListener('blur', () => { hoverUnit = null; machine.hover({ unit: null, pointer: 'mouse' }); });
+
+  /* select-then-読む */
+  const chip = doc.createElement('button');
+  chip.type = 'button';
+  chip.className = 'ear-chip';
+  chip.setAttribute('data-ear-own', '');
+  chip.setAttribute('lang', 'ja');
+  chip.textContent = '読む';
+  chip.hidden = true;
+  let picked = null; // { text, node }
+  chip.addEventListener('pointerdown', (event) => event.preventDefault());
+  chip.addEventListener('mousedown', (event) => event.preventDefault());
+  chip.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!picked) return;
+    const sentences = speakable(picked.text);
+    if (!sentences.length) return;
+    const context_ = ctx();
+    const anchor = picked.node?.nodeType === 3 ? picked.node.parentNode : picked.node;
+    const voiceKey = keyOf({ node: anchor, word: null, paragraph: picked.text }, context_);
+    machine.speakNow({ kind: 'selection', element: anchor, text: picked.text, sentences, voiceKey, key: `sel:${picked.text}`, contains: () => false });
+  });
+  let chipTimer = 0;
+  const hideChip = () => { chip.hidden = true; picked = null; };
+  doc.addEventListener('selectionchange', () => {
+    view.clearTimeout(chipTimer);
+    chipTimer = view.setTimeout(() => {
+      const selection = view.getSelection?.();
+      if (!selection || selection.isCollapsed || !selection.rangeCount) { hideChip(); return; }
+      const range = selection.getRangeAt(0);
+      const text = selection.toString();
+      const node = range.commonAncestorContainer;
+      const element = node?.nodeType === 3 ? node.parentNode : node;
+      if (!hasJapanese(text) || !element || element.closest?.('[data-ear-own], input, textarea, select, [contenteditable=""], [contenteditable="true"]')) { hideChip(); return; }
+      const boxes = [...range.getClientRects()].filter((box) => box.width || box.height);
+      const box = boxes[boxes.length - 1] || range.getBoundingClientRect();
+      if (!chip.isConnected) doc.body.append(chip);
+      picked = { text, node };
+      chip.setAttribute('aria-label', tx('選んだ日本語を読む', 'Read the selected Japanese'));
+      chip.hidden = false;
+      const width = chip.offsetWidth || 48, height = chip.offsetHeight || 32;
+      const left = Math.max(8, Math.min(view.innerWidth - width - 8, box.right + 6));
+      let top = box.bottom + 8;
+      if (top + height > view.innerHeight - 8) top = Math.max(8, box.top - height - 8);
+      chip.style.left = `${Math.round(left)}px`;
+      chip.style.top = `${Math.round(top)}px`;
+    }, 120);
+  });
+  view.addEventListener('scroll', () => { if (!chip.hidden) hideChip(); }, { capture: true, passive: true });
+
+  mount();
+  paint();
+  return {
+    machine,
+    mount,
+    stop: () => machine.stop(),
+    /** The unit under a point: what a tap there would speak (the coverage walk asks this). */
+    unitAt: (x, y) => find(x, y),
+  };
+}

@@ -16,6 +16,7 @@
  * pairing screen and the status line stand under Settings, 筆と声 · Writing and voice. */
 import { createAudioPlayer } from './nihongo-speech/audio/speech-player.mjs';
 import { isJapaneseEnough, normaliseSpeechText, splitSentences } from './nihongo-speech/audio/speech-text.mjs';
+import { installEar } from './ear.mjs';
 import { createDeviceTokenStore, createVoiceClient } from './voice-client.mjs';
 import { SPEEDS, createVoiceSeam, sentencesOf, voiceKeyOf } from './voice-seam.mjs';
 
@@ -573,6 +574,25 @@ export function installVoiceLayer(host) {
       }
     }
   }
+  /* ------------------------------------------------------------------ the ear (modules/ear.mjs, 2026-11-11) */
+  // one gesture that speaks any Japanese on any screen, through this seam and nothing else; its mark stands beside every
+  // gate. A sentence of an article keeps the article's key, and text a listen mark reads keeps that mark's key.
+  const markKey = (node) => {
+    const at = node?.closest?.('[data-voice-host]');
+    const rule = at && RULES.find((one) => one.id === at.dataset.voiceHost);
+    try { return rule ? rule.read(at)?.voiceKey || null : null; } catch { return null; }
+  };
+  const ear = installEar({
+    doc, tx,
+    speak: (unit, done) => {
+      prime();
+      return seam.read({ sentences: unit.sentences, voiceKey: unit.voiceKey, prefetch: unit.sentences.length > 1 ? 2 : 0, gapMs: 260, rate: reader.rate,
+        onState: (state, code) => { if (['done', 'stopped', 'error'].includes(state)) done(state, code); } });
+    },
+    cannot: (unit) => seam.cannot(unit.voiceKey),
+    context: () => ({ view: host.view(), keyFor: markKey,
+      articleOf: (node) => (host.view() === 'reader' && node?.closest?.('#reader') ? host.passage()?.id || null : null) }),
+  });
   let scan = 0;
   const rescan = () => {
     if (scan) return;
@@ -581,6 +601,7 @@ export function installVoiceLayer(host) {
       // a read belongs to its control: when the control's screen goes, the read ends
       if (spoken && !spoken.button.isConnected) { const gone = spoken; spoken = null; if (gone.session && !gone.session.ended) gone.session.stop(); }
       mountMarks(doc);
+      ear.mount();
     }, 60);
   };
   new doc.defaultView.MutationObserver(rescan).observe(doc.body, { childList: true, subtree: true });
