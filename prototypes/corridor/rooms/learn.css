@@ -392,6 +392,8 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .dojo-deck-n b { margin-right: 2px; font: 800 var(--type-reading)/1 var(--font-headword); color: var(--color-ink); font-variant-numeric: tabular-nums; }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .dojo-deck-due:not(.is-due) b { color: var(--color-muted); }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .dojo-deck-due.is-due b { color: var(--color-seal); }
+/* tighten pass: a deck with nothing due and nothing new today reads quiet (its zero counts are not printed) */
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .dojo-deck.is-quiet .dojo-deck-t { font-weight: 500; color: var(--color-muted); }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .dojo-deck-bar {
   position: absolute;
   left: 0;

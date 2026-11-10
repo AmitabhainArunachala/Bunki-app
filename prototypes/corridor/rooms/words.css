@@ -456,6 +456,15 @@ html[data-room='search'] body .search-page .kdx-lens.on {
 }
 html[data-room='search'] body .search-page .kdx-lens.on :is(.l-ja, .en-sub) { color: var(--color-ink); }
 html[data-room='search'] .words-index > summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; }
+/* tighten pass: closed, it reads as a door row (hairlines, a sentence-case name, the fold caret), never an empty heading */
+html[data-room='search'] .words-index > summary.words-index-row {
+  justify-content: space-between; gap: 10px; padding: 0 2px; list-style: none;
+  border-block: var(--stroke-hairline) solid var(--color-line);
+  font: 600 var(--type-control)/1.3 var(--font-ui); color: var(--color-ink);
+}
+html[data-room='search'] .words-index > summary.words-index-row::-webkit-details-marker { display: none; }
+html[data-room='search'] .words-index[open] > summary.words-index-row { margin-bottom: 12px; }
+html:is([data-room='search'], [data-room='word-web']) .ww-walk[hidden] { display: none; }
 /* The shape-code lens above is the one door to this wheel. */
 html[data-room='search'] body .search-page #search-skip-opener { display: none; }
 

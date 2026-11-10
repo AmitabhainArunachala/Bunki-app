@@ -698,10 +698,10 @@ function learnHead(n, ja, en, count) {
 function renderLearnStage(main, doors) {
   const stage = el('section', 'learn-stage');
   stage.setAttribute('aria-labelledby', 'learn-stage-title');
-  // in the layout under test this stage is Review's: the day, the place's name, the first job
+  // the day, the stage's name, the first job; the room's own name stands in its tab, not again here (tighten pass)
   const places = placesLayout();
   const head = el('header', 'learn-stage-head');
-  head.append(el('p', 'learn-stage-eyebrow', places ? todayDateline() : tx('学ぶ・今日', 'Learn · today')));
+  head.append(el('p', 'learn-stage-eyebrow', todayDateline()));
   const title = el('h1', 'view-title', tx(...roomName('dojo')));
   title.id = 'learn-stage-title';
   head.append(title);

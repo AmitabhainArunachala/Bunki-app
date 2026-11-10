@@ -1053,7 +1053,11 @@ function wwPush(node) {
 
 function wwKanjiOf(w) {
   const k = D.words[w]?.k?.length ? D.words[w].k : D.dict[w]?.k?.length ? D.dict[w].k : [...w];
-  return [...new Set(k)].filter((c) => D.kanji[c]);
+  // in reading order, left to right: words.json lists a word's kanji in its own order (業 before 職 for 職業, 2,564
+  // words), and the web hangs the first kanji on the left branch (John, 2026-11-10: 職業 was drawn backwards)
+  const word = [...w];
+  return [...new Set(k)].filter((c) => D.kanji[c])
+    .sort((a, b) => (word.indexOf(a) + 1 || Infinity) - (word.indexOf(b) + 1 || Infinity));
 }
 
 function wwParts(c) {

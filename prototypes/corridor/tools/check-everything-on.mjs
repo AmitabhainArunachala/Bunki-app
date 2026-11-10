@@ -212,10 +212,10 @@ for (const [name, deck] of [['shared-n2', 'n2'], ['shared-n1', 'n1'], ['shared-s
     const label = await throughDoor(page, name, { app: false });
     const frame = await frameOf(page, deck);
     const host = await text(page, '#app', 300);
-    must(/Isolated preview/.test(host), `the host does not say it is an isolated preview: ${host.slice(0, 160)}`);
+    must(/Trial copy/.test(host), `the host does not say it is a trial copy: ${host.slice(0, 160)}`);
     const inside = (await frame.evaluate(() => document.body.innerText)).replace(/\s+/g, ' ');
     await shot(page, name);
-    return `"${label}" → "${host.match(/Back to Bunki.*?history/)?.[0] || 'Isolated preview'}"; the frame reads "${inside.slice(0, 60)}…"`;
+    return `"${label}" → "${host.match(/Back to Bunki.*?as it is\./)?.[0] || 'Trial copy'}"; the frame reads "${inside.slice(0, 60)}…"`;
   });
 }
 

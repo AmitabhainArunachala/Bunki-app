@@ -291,6 +291,16 @@ async function toSky(session) {
   await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 45000 });
   await page.locator('#ginga-symbol').waitFor();
 }
+// Today's record drawer (tighten pass, 2026-11-10): the backup row sits inside a closed row at the foot of Today,
+// "Your record and backup"; a learner opens it first. A build without the drawer has nothing to open.
+async function openRecord(session) {
+  const { page, press } = session;
+  const row = page.locator('#today-record:not([open]) > summary');
+  if (!(await row.count())) return;
+  await intoView(page, row);
+  await press(row);
+  await page.waitForTimeout(400);
+}
 async function toTab(session, tab) {
   const { page, press } = session;
   await toSky(session);
@@ -596,6 +606,7 @@ async function backupWalk(browser) {
     await press('#kp-grade-good');
     await sleep(page, 1200);
     await toTab(a, 'today');
+    await openRecord(a);
     const button = page.locator('#export-store');
     await intoView(page, button);
     await sleep(page, 500);
@@ -612,7 +623,7 @@ async function backupWalk(browser) {
     );
     const inFile = JSON.stringify(exported).includes('bunki-cloze');
     notes.backup = {
-      where: 'Today tab, scrolled down to "Sync between devices"; also Me → Settings → Backup',
+      where: 'Today tab, the "Your record and backup" row at its foot; also Me → Settings → Backup',
       labels,
       file: download.suggestedFilename(),
       format: exported.format,
@@ -657,6 +668,7 @@ async function backupWalk(browser) {
       const { page, press, log } = b;
       if (!exported) throw new Error('no exported file to import');
       await toTab(b, 'today');
+      await openRecord(b);
       const before = await page.locator('#tray').getAttribute('aria-label');
       const button = page.locator('#import-store');
       await intoView(page, button);
