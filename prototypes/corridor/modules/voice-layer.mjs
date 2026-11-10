@@ -16,6 +16,7 @@
  * pairing screen and the status line stand under Settings, 筆と声 · Writing and voice. */
 import { createAudioPlayer } from './nihongo-speech/audio/speech-player.mjs';
 import { isJapaneseEnough, normaliseSpeechText, splitSentences } from './nihongo-speech/audio/speech-text.mjs';
+import { createClipStore, createIndexedDbClipStorage } from './voice-clip-store.mjs';
 import { createDeviceTokenStore, createVoiceClient } from './voice-client.mjs';
 import { SPEEDS, createVoiceSeam, sentencesOf, voiceKeyOf } from './voice-seam.mjs';
 
@@ -58,6 +59,14 @@ export function japaneseSentences(text) {
     .filter((sentence) => isJapaneseEnough(sentence.text));
 }
 
+/** What one word's control asks of the seam: the text in its canonical form and the word's voice key. His tap on 音 and
+ * the answer saying itself ask the same, so they share one kept clip (B3). */
+export function wordVoiceRequest(text, word = '') {
+  let normal = '';
+  try { normal = normaliseSpeechText(String(text || '')); } catch { /* nothing to say */ }
+  return { text: normal, voiceKey: voiceKeyOf('word', word || normal) };
+}
+
 /** Today's spend, for the status line. The server's day runs from 00:00 UTC. When the server sends the day's own
  * figures they are shown as they are; until then it is what the total has grown by since this device first looked today
  * (`kept` is that first look: { day, spentCents, at }; `keep` is what to remember for the next look). */
@@ -85,8 +94,12 @@ export function installVoiceLayer(host) {
     // (a tab that ran an earlier build may still hold a stand-in voice's row: only a real voice counts)
     try { const row = JSON.parse(doc.defaultView.sessionStorage.getItem(LAST)); return row && ['server', 'recorded'].includes(row.source) && Number.isFinite(row.at) ? row : null; } catch { return null; }
   };
+  // heard clips, kept on this device (B3): played first, at once and offline; its index is read now, so a read by itself
+  // can tell whether a kept clip is there
+  const clips = createClipStore({ storage: createIndexedDbClipStorage(globalThis) });
+  void clips.ready();
   const seam = createVoiceSeam({
-    client, player,
+    client, player, store: clips,
     recorded: (src, rate) => host.playRecorded(src, rate),
     quiet: () => host.quiet(),
     onStatus: (status) => {
@@ -179,7 +192,8 @@ export function installVoiceLayer(host) {
     if (!automatic && button && spoken?.button === button && spoken.session && !spoken.session.ended) { seam.stop(); return null; }
     if (!sentences.length) { if (!automatic) onNote?.(silenceLine('nothing-to-say'), 'nothing-to-say'); return null; }
     if (automatic) {
-      if (seam.cannot(voiceKey)) return null;
+      // a clip kept on this device is a voice to be had, connection or not
+      if (seam.cannot(voiceKey, sentences[0]?.text)) return null;
       // a page nobody has touched yet may not sound: asking the server then would be paid for and never heard
       const touched = doc.defaultView.navigator?.userActivation;
       if (touched && !touched.hasBeenActive) return null;
@@ -713,9 +727,8 @@ export function installVoiceLayer(host) {
     onStatus: (listener) => { listeners.add(listener); return () => listeners.delete(listener); },
     /** A single word or reading from one of the app's own 音 buttons. */
     sayWord({ text, word, button, onNote, automatic = false }) {
-      let normal = '';
-      try { normal = normaliseSpeechText(String(text || '')); } catch { /* nothing to say */ }
-      return speakFrom(button, { sentences: normal ? [{ text: normal }] : [], voiceKey: voiceKeyOf('word', word || normal), single: true, onNote, automatic });
+      const ask = wordVoiceRequest(text, word);
+      return speakFrom(button, { sentences: ask.text ? [{ text: ask.text }] : [], voiceKey: ask.voiceKey, single: true, onNote, automatic });
     },
     /** The quote chip: the excerpt through the seam when the article has no recording of it. With no voice the reason
      * stands in one line beside the chip. */
@@ -723,8 +736,12 @@ export function installVoiceLayer(host) {
       return speakFrom(button, { sentences: japaneseSentences(text), voiceKey: sourceId ? voiceKeyOf('article', sourceId) : voiceKeyOf('word', 'sentence'), onNote });
     },
     /** Whether a word could be voiced right now. A read that would start by itself asks first (corridor.js), so that
-     * with no voice to be had it stops no other sound. */
-    canSay: () => !seam.cannot(),
+     * with no voice to be had it stops no other sound. Given the word's text, a clip kept on this device counts. */
+    canSay: (text = null, word = '') => {
+      if (text == null) return !seam.cannot();
+      const ask = wordVoiceRequest(text, word);
+      return !seam.cannot(ask.voiceKey, ask.text);
+    },
     /** A word page opened by the learner's own act: its headword says itself once when the page stands (mountMarks). */
     opened(node) { openedPage = node?.t && node.id != null ? { node: `${node.t}:${node.id}`, at: Date.now() } : null; },
     /** Every sound of the layer ends: the screen changed. `keepReader` leaves an article's read to the reader's own rule. */

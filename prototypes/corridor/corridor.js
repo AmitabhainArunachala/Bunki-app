@@ -12852,9 +12852,10 @@ function speakCardReading(text, btn, word = '', { automatic = false } = {}) {
       (S.view !== 'review' || !S.review?.revealed || S.review.pending || S.review.admitting || S.stack.length || S.strokes))) return;
   // Said by itself (a card's answer shown, a word opened: John's "on reveal", 2026-11-10) is not his tap. It happens
   // unless he switched it off (WORD_VOICE), through the voice server only; and when no voice is to be had (no layer,
-  // unpaired, offline, the budget used) nothing happens at all: no other sound is stopped and no line is shown.
+  // unpaired, offline, the budget used) nothing happens at all: no other sound is stopped and no line is shown. A clip
+  // this device has kept for this word is a voice to be had, connection or not (B3).
   // A tap on 音 always asks, and is told why when it finds no voice.
-  if (automatic && (wordVoice() !== 'on' || !voiceLayer?.canSay())) return;
+  if (automatic && (wordVoice() !== 'on' || !voiceLayer?.canSay(text, word))) return;
   retireCardSpeech();
   stopReadAloud(); stopRecAudio(); stopSentenceListening();
   // The current source is the voice seam (modules/voice-seam.mjs): a recorded clip, then the voice server, and
