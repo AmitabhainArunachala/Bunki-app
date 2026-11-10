@@ -1116,12 +1116,14 @@ export function createSpeakRoom(host) {
   }
   function paintLineState(line) {
     const node = els.body?.querySelector(`.speak-line[data-index="${line.index}"] .speak-said`);
-    if (!node || node.querySelector('.speak-silent') || !line.silent) return;
+    if (!node || node.querySelector('.speak-silent, .speak-no-voice') || !line.silent) return;
     node.append(silentNote(line));
   }
-  /** Under a line that found no voice: the voice layer's plain line saying why, when it gave one. */
+  /** Under a line that found no voice: the voice layer's plain line saying why (its own class: tighten.css hides the old
+   * generic .speak-silent note once the line has its listen mark, and this line must be seen). */
   function silentNote(line) {
-    const note = el('p', 'speak-note speak-silent', typeof line.silent === 'string' ? line.silent : t('声を出せませんでした', 'No voice for this line'));
+    const why = typeof line.silent === 'string';
+    const note = el('p', why ? 'speak-note speak-no-voice' : 'speak-note speak-silent', why ? line.silent : t('声を出せませんでした', 'No voice for this line'));
     note.setAttribute('role', 'status');
     return note;
   }

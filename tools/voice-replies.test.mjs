@@ -297,4 +297,58 @@ describe('B4: the Speak room says her line before it listens', () => {
     expect(events.at(-1)).toBe('listen');
     expect(events.some((event) => event.startsWith('say '))).toBe(false);
   });
+
+  it('(j) the plain line is one the screen shows: no stylesheet hides it under a line that has its listen mark', () => {
+    const source = readFileSync(
+      new URL('../prototypes/corridor/speak.js', import.meta.url),
+      'utf8',
+    );
+    const ast = ts.createSourceFile(
+      'speak.js',
+      source,
+      ts.ScriptTarget.Latest,
+      true,
+      ts.ScriptKind.JS,
+    );
+    let found = null;
+    const visit = (node) => {
+      if (ts.isFunctionDeclaration(node) && node.name?.text === 'silentNote') found = node;
+      ts.forEachChild(node, visit);
+    };
+    visit(ast);
+    expect(found).not.toBe(null);
+    const made = [];
+    const sandbox = {
+      t: (ja, en) => en,
+      el: (tag, cls, text) => {
+        const node = {
+          tag,
+          className: cls,
+          textContent: text,
+          attrs: {},
+          setAttribute(name, value) {
+            this.attrs[name] = value;
+          },
+        };
+        made.push(node);
+        return node;
+      },
+    };
+    vm.createContext(sandbox);
+    vm.runInContext(source.slice(found.getStart(ast), found.end), sandbox);
+    const note = sandbox.silentNote({
+      silent: 'No voice here. Pair the voice server in Settings, Writing and voice.',
+    });
+    expect(note.textContent).toMatch(/^No voice here/u);
+    expect(note.attrs.role).toBe('status');
+    // every rule that hides a note in the room's line, in the stylesheets the app loads after the room's own
+    const sheets = ['tighten.css', 'depth.css', 'rooms/speak.css'].map((name) =>
+      readFileSync(new URL(`../prototypes/corridor/${name}`, import.meta.url), 'utf8'),
+    );
+    const hidden = sheets.flatMap((css) =>
+      [...css.matchAll(/([^{}]+)\{[^}]*display:\s*none/gu)].map((match) => match[1]),
+    );
+    for (const cls of note.className.split(/\s+/u).filter((name) => name !== 'speak-note'))
+      expect(hidden.filter((selector) => selector.includes(`.${cls}`))).toEqual([]);
+  });
 });
