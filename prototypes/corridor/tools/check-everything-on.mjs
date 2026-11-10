@@ -33,10 +33,18 @@ const ORIGIN = new URL(BASE).origin;
 const DESKTOP = { viewport: { width: 1280, height: 900 }, deviceScaleFactor: 1 };
 const PHONE = { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true };
 const results = [];
-const browser = await engines[ENGINE].launch({ headless: true });
+// No sound (John, 2026-11-10 18:58): Chromium is launched muted, and every page mutes its media and swallows speech
+// before the app runs. WebKit has no mute switch: do not point --engine webkit at a door that plays sound.
+const browser = await engines[ENGINE].launch({ headless: true, args: ENGINE === 'chromium' ? ['--mute-audio'] : [] });
+const SILENCE = () => {
+  const m = HTMLMediaElement.prototype, play = m.play;
+  m.play = function () { this.muted = true; return play.call(this); };
+  if (window.speechSynthesis) Object.getPrototypeOf(window.speechSynthesis).speak = function (u) { setTimeout(() => { try { u.dispatchEvent(new Event('end')); } catch {} }, 0); };
+};
 
 async function fresh(device = DESKTOP) {
   const context = await browser.newContext({ ...device, locale: 'en-US', timezoneId: 'Asia/Tokyo' });
+  await context.addInitScript(SILENCE);
   const page = await context.newPage();
   page.setDefaultTimeout(20000);
   const problems = [];
@@ -151,6 +159,7 @@ await check('doors-page', 'the doors page is served, reads at phone width, and e
   must(faces.title > 0 && faces.body > 0, `the page did not get the app's own faces (title ${faces.title}, body ${faces.body}; ${faces.family})`);
   await shot(page, 'doors-page-desktop');
   const phone = await context.browser().newContext({ ...PHONE, locale: 'en-US' });
+  await phone.addInitScript(SILENCE);
   const small = await phone.newPage();
   await small.goto(`${BASE}prototype.html`, { waitUntil: 'load' });
   await small.evaluate(() => document.fonts.ready);
