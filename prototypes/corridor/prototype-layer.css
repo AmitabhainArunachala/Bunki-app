@@ -21,7 +21,7 @@
 .listen-row[data-passage='jawiki:5294446']::after,          /* the Sakura article's speaker bar */
 [data-shared-study='ready'] > p::after,                     /* the new study screen and the grammar deck: the top line */
 .dojo-deck[data-deck='shared-grammar'] .dojo-deck-t::after, /* the grammar deck's row in the deck list */
-.kanji-world-door-held::after,                              /* Rajōmon from 間 聞 問 開 閉 */
+#kanji-world-door::after,                                   /* Rajōmon: its door on a kanji page (門, and 間 聞 問 開 閉) */
 #bunki-prototype-root .pl-new {
   content: var(--pl-new);
   display: inline-block;
@@ -39,7 +39,7 @@
   vertical-align: middle;
 }
 /* a chip stacks its children; these doors hold one line, so the mark stands beside it */
-#kanji-quest-door, #worldcraft-door, #passage-door, .kanji-world-door-held { flex-direction: row; align-items: center; }
+#kanji-quest-door, #worldcraft-door, #passage-door, #kanji-world-door { flex-direction: row; align-items: center; }
 /* on the orbit screen's dark bar the mark takes that bar's own tag colours */
 .orbit-preview-bar .orbit-preview-tag::after { border-color: #de5b43; color: #f1b3a5; }
 /* five places: the whole arrangement is the new thing, so its bar carries the mark */
@@ -285,9 +285,10 @@
 #bunki-prototype-root .pl-switch[aria-checked='true'] .pl-switch-dot { transform: translateX(20px); background: var(--pl-paper); }
 
 /* the cord carries the trail, so the app's breadcrumb row leaves the glass; its controls stay in the page and are the
- * ones a bead presses. The page keeps the breath the row's own margin gave its first line. */
-:root[data-pl-ito='on'] .scale-thread { display: none !important; }
-:root[data-pl-ito='on'] #sheet > .sheet-bar { margin-bottom: var(--space-3, 12px); }
+ * ones a bead presses. In a page the row keeps its place as a box of no height, so the breath its own margin gives the
+ * page's first line stays as the app has it in every state (the save drawer opens between the bar and this row). */
+:root[data-pl-ito='on'] .scale-thread:not(#sheet > .scale-thread) { display: none !important; }
+:root[data-pl-ito='on'] #sheet > .scale-thread { visibility: hidden !important; height: 0 !important; min-height: 0 !important; padding-block: 0 !important; overflow: hidden !important; box-shadow: none !important; }
 :root[data-pl-ito='on'] body:not([data-view='drift']) #app:has(> .scale-thread) > main > .room-sign { top: calc(53px + env(safe-area-inset-top, 0px)); }
 
 /* the light. One cross-fade of the whole glass for a change of look (document.startViewTransition): 450 ms, eased, the
