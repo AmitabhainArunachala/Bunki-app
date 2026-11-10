@@ -811,10 +811,17 @@ export function installVoiceLayer(host) {
     settingsBlock,
     status: () => seam.status(),
     onStatus: (listener) => { listeners.add(listener); return () => listeners.delete(listener); },
-    /** A single word or reading from one of the app's own 音 buttons. */
+    /** A single word or reading from one of the app's own 音 buttons. A word's box drawn again while its word is being
+     * said (with no connection its dictionary worker cannot load, and the box redraws its row of marks) does not cut
+     * the word off: the read goes on with the same button drawn anew, for the same word. */
     sayWord({ text, word, button, onNote, automatic = false }) {
       const ask = wordVoiceRequest(text, word);
-      return speakFrom(button, { sentences: ask.text ? [{ text: ask.text }] : [], voiceKey: ask.voiceKey, single: true, onNote, automatic });
+      const follow = button?.id ? () => {
+        const next = doc.getElementById(button.id);
+        const owner = next?.dataset.voiceWord || next?.closest('[data-ui-content-value]')?.dataset.uiContentValue || '';
+        return next && next !== button && owner && owner === String(word || '') ? next : null;
+      } : null;
+      return speakFrom(button, { sentences: ask.text ? [{ text: ask.text }] : [], voiceKey: ask.voiceKey, single: true, onNote, automatic, follow });
     },
     /** The quote chip: the excerpt through the seam when the article has no recording of it. With no voice the reason
      * stands in one line beside the chip. */
