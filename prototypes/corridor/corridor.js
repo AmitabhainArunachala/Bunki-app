@@ -28962,7 +28962,8 @@ function renderStudyFold(sheet, node, variantTarget) {
   head.append(el('span', 'fold-title', tx('学習の記録', 'Study progress')));
   // a count of zero, or no record yet, is not printed on the closed row (tighten pass, 2026-11-10)
   if (srs?.reps) head.append(el('span', 'fold-sub', tx(`復習 ${srs.reps} 回`, `${srs.reps} review${srs.reps === 1 ? '' : 's'}`)));
-  head.append(el('span', 'fold-arrow', open ? '▼' : '▶'));
+  // the fold row's own caret, as Today's record row and More examples carry it (owed-2 repair 3), never a ▶ in another face
+  head.append(el('i', 'today-detail-caret'));
   head.addEventListener('click', () => {
     S.studyOpen = open ? null : key;
     render();
@@ -29071,6 +29072,18 @@ export function creditSources(sheet, credits) {
   if (lines.length) toSources(sheet, ...lines);
 }
 
+/** A word page's part of speech in its facts line: the core entry's first part, named in sentence case in both languages;
+ * a part the core names by a code (n-suf, adj-f) is left out rather than shown as one. */
+const WORD_FACT_POS = Object.freeze({
+  noun: ['名詞', 'Noun'], 'godan verb': ['五段動詞', 'Godan verb'], 'ichidan verb': ['一段動詞', 'Ichidan verb'],
+  'suru verb': ['する動詞', 'Suru verb'], 'kuru verb': ['来る動詞', 'Kuru verb'], 'na-adjective': ['な形容詞', 'Na-adjective'],
+  'i-adjective': ['い形容詞', 'I-adjective'], 'no-adjective': ['の形容詞', 'No-adjective'], adverb: ['副詞', 'Adverb'],
+  expression: ['表現', 'Expression'], pronoun: ['代名詞', 'Pronoun'], interjection: ['感動詞', 'Interjection'],
+  conjunction: ['接続詞', 'Conjunction'], particle: ['助詞', 'Particle'], counter: ['助数詞', 'Counter'],
+  prefix: ['接頭辞', 'Prefix'], suffix: ['接尾辞', 'Suffix'], numeric: ['数詞', 'Number'],
+  'auxiliary verb': ['助動詞', 'Auxiliary verb'], 'pre-noun adjectival': ['連体詞', 'Pre-noun adjectival'],
+  'adj-pn': ['連体詞', 'Pre-noun adjectival'], 'adverb (to)': ['副詞', 'Adverb'], 'taru-adjective': ['タル形容詞', 'Taru-adjective'],
+});
 /** Variant A (#38): the SAME target word rendered both ways. */
 function renderCardVariant(container, target) {
   const source = target.from ? D.passages.find((p) => p.id === target.from.passage) : null;
@@ -30489,6 +30502,25 @@ function renderWordNode(sheet, node) {
   sheet.append(head);
   const shownReading = unresolved ? node.reading : rec?.r;
   if (shownReading) sheet.append(el('p', 'reading', shownReading));
+  const rowChars = (rec?.k?.length ? rec.k : [...node.id]).filter((c) => D.kanji[c]);
+  // owed-2 repair 4 · one quiet line of facts under the reading, as a kanji page has under its meaning (p.entry-facts):
+  // the level (a door to its collection), the part of speech and the number of kanji (plain text: they go nowhere yet).
+  // An unresolved page lends nothing of the entry (no level, no part of speech)
+  const facts = [];
+  const jlpt = own?.jlpt || (!unresolved && legacy?.jlpt ? `N${legacy.jlpt}` : null);
+  if (jlpt) {
+    const level = String(jlpt).replace(/^N?/, 'N');
+    facts.push(referenceCollectionChip(`JLPT ${level}`, `jlpt:${level}`));
+  }
+  const pos = WORD_FACT_POS[String(own?.p || '').split(' · ')[0]];
+  if (pos) facts.push(el('span', 'entry-fact', tx(...pos)));
+  if (rowChars.length) facts.push(el('span', 'entry-fact', tx(`漢字 ${rowChars.length} 字`, `${rowChars.length} kanji`)));
+  if (facts.length) {
+    const line = el('p', 'entry-facts');
+    line.dataset.japaneseLookup = 'off';
+    line.append(...facts);
+    sheet.append(line);
+  }
   // G2 · the dot's basis in one quiet line — days met, review state, the reading — and his "I know this" / "Not yet"
   renderDepthBasis(sheet, node, shownReading || '');
   // everything-on prototype (inventory block 16, measured): a core word opened from the reader, search or a list carries no
@@ -30500,7 +30532,6 @@ function renderWordNode(sheet, node) {
 
   // KANJI IN THIS WORD — each row opens that kanji's full entry. G1: right under the word and its reading
   // (John, 09-29: "kanji in the word needs to be more at the top!"; MASTER_SPEC §7.22)
-  const rowChars = (rec?.k?.length ? rec.k : [...node.id]).filter((c) => D.kanji[c]);
   if (rowChars.length) {
     sheet.append(withEn(el('p', 'eyebrow', 'この語の漢字'), 'kanji in this word', 'en-inline'));
     const rows = el('div', 'entry-rows');
@@ -30591,14 +30622,6 @@ function renderWordNode(sheet, node) {
     credit.append(licence);
     toSources(sheet, credit);
   }
-  const jlpt = own?.jlpt || (!unresolved && legacy?.jlpt ? `N${legacy.jlpt}` : null);
-  if (jlpt) {
-    // a fact is linked text, as on the kanji page's facts line (tighten pass, 2026-11-10)
-    const meta = el('div', 'shelf-meta entry-facts');
-    const level = String(jlpt).replace(/^N?/, 'N');
-    meta.append(referenceCollectionChip(`JLPT ${level}`, `jlpt:${level}`));
-    sheet.append(meta);
-  }
   renderConjugation(sheet, node.id, own?.p);
   if (!personalHost) renderAiTutor(sheet, node, own);
 
@@ -30638,7 +30661,9 @@ function renderWordNode(sheet, node) {
     creditSources(sheet, [...leadExamples, ...moreExamples].flatMap(exampleCredits));
     if (moreExamples.length) {
       const fold = el('details', 'more-examples');
-      fold.append(el('summary', null, tx(`ほかの用例（${moreExamples.length}）`, `More examples (${moreExamples.length})`)));
+      const more = el('summary');
+      more.append(el('span', 'fold-name', tx(`ほかの用例（${moreExamples.length}）`, `More examples (${moreExamples.length})`)), el('i', 'today-detail-caret'));
+      fold.append(more);
       for (const ex of moreExamples) fold.append(exampleLine(ex));
       fold.open = !!node.moreExamplesOpen;
       // the fold's state is the page's, written as the summary is pressed: the toggle event comes a task later, and a
