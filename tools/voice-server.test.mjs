@@ -648,6 +648,30 @@ describe('the seam: recorded clip, then the server, then the device', () => {
     expect(r.calls.deviceSaid).toHaveLength(0);
     expect(r.calls.sleeps.filter((ms) => ms === 260)).toHaveLength(2);
   });
+  it('the read is told where each sentence comes from as it starts, after being told which sentence it is', async () => {
+    const told = [];
+    const options = {
+      onSentence: (index) => told.push(`sentence ${index}`),
+      onSource: (source, reason) => told.push(reason ? `${source} (${reason})` : source),
+    };
+    await run(rig().seam, {
+      ...options,
+      voiceKey: 'article:a1',
+      sentences: [
+        { text: S3[0].text, recorded: { src: 'audio/narration/sakura/x-000.m4a' } },
+        S3[1],
+      ],
+    });
+    expect(told).toEqual(['sentence 0', 'recorded', 'sentence 1', 'server', 'sentence -1']);
+    // the very first sentence of a read already says why the device voice is the one speaking
+    told.length = 0;
+    await run(rig({ paired: false }).seam, {
+      ...options,
+      voiceKey: 'word:猫',
+      sentences: [{ text: 'ねこ' }],
+    });
+    expect(told).toEqual(['sentence 0', 'device (not-paired)', 'sentence -1']);
+  });
   it('unpaired: the device voice, and the server is never asked', async () => {
     const r = rig({ paired: false });
     const { states } = await run(r.seam, { voiceKey: 'article:a1', sentences: S3 });

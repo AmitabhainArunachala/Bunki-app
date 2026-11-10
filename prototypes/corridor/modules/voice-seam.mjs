@@ -174,6 +174,8 @@ export function createVoiceSeam({ client, device, player, recorded = null, quiet
   async function playOne(clip, rate, owner) {
     playing = clip;
     said(clip);
+    // the read learns where this sentence comes from as it starts (onSentence comes first and does not know yet)
+    try { owner.onSource?.(clip.source || 'none', clip.reason || null); } catch { /* a listener's own fault */ }
     if (clip.recorded) {
       const stops = owner.recordedStops;
       const outcome = await recorded(clip.recorded.src, rate);
@@ -206,12 +208,13 @@ export function createVoiceSeam({ client, device, player, recorded = null, quiet
   });
 
   /** Read sentences aloud. `sentences` is [{ text, recorded? }]; one read at a time: this one ends whatever was speaking.
-   * Returns the read's own controls. */
+   * `onSentence(index)` says which sentence starts; `onSource(source, reason)` then says where it comes from
+   * ('recorded', 'server' or 'device', and for the device why). Returns the read's own controls. */
   function read({ sentences, voiceKey, from = 0, rate = 1, prefetch = 2, gapMs = 260, onSentence = () => {}, onState = () => {},
-    stopRecorded = null, rateRecorded = null, deviceFallback = true } = {}) {
+    onSource = null, stopRecorded = null, rateRecorded = null, deviceFallback = true } = {}) {
     stop();
     try { quiet(); } catch { /* another lane's fault */ }
-    const owner = { queue: null, stopRecorded, rateRecorded, ended: false, recordedStops: 0 };
+    const owner = { queue: null, stopRecorded, rateRecorded, onSource, ended: false, recordedStops: 0 };
     const queue = createSpeechQueue({
       fetchClip: (sentence, _index, signal) => clipFor(sentence, voiceKey, signal, deviceFallback),
       player: composite(owner),

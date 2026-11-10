@@ -139,7 +139,8 @@ export function installVoiceLayer(host) {
     };
     mine.session = seam.read({
       sentences, voiceKey, prefetch: single ? 0 : 2, gapMs: single ? 0 : 260, rate: reader.rate, deviceFallback: !automatic,
-      onSentence: (index) => { if (index >= 0 && !mine.over) onNote?.(sourceLine(seam.status()), seam.status().last.source === 'device' ? 'device' : null); },
+      // as each sentence starts: where it comes from (the device voice also says why it is the one speaking)
+      onSource: (source, reason) => { if (!mine.over) onNote?.(sourceLine({ last: { source, reason } }), source === 'device' ? 'device' : null); },
       onState: (state, code) => {
         if (mine.over) return;
         if (state === 'loading' || state === 'playing') { paint(true); button?.setAttribute('aria-busy', String(state === 'loading')); }
@@ -258,8 +259,12 @@ export function installVoiceLayer(host) {
         if (reader.owner !== mine) return;
         if (index < 0) { clearSpeaking(); return; }
         reader.index = index;
-        reader.source = seam.status().last;
         showSentence(index);
+      },
+      // the bar's note names where this sentence comes from: the recording, the voice server, or the device voice
+      onSource: (source, reason) => {
+        if (reader.owner !== mine) return;
+        reader.source = { source, reason };
         host.refreshListenRow?.();
       },
       onState: (state, code) => {
