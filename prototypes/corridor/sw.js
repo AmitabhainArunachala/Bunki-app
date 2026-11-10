@@ -53,6 +53,7 @@ const SHELL = [
   'rooms/me.css',
   'rooms/cards.css',
   'tighten.css',
+  'depth.css',
   'design/ink-hoku-nami.png',
   'corridor.js',
   // G3 — the eleven seams corridor.js imports at boot
