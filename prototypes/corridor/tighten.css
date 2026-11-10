@@ -1,0 +1,230 @@
+/* tighten.css: one control family, one type scale (tighten pass, 2026-11-10). Loaded last.
+   Remove its <link> in index.html and the app is as it was. Colours come only from the house variables, so every
+   look keeps its own. The prefix weighs (2,1,1) on purpose: every family rule outranks the room sheets it replaces,
+   and inside this file the order alone decides. The study card (.kp), the word web (ww-), the drift and the worlds
+   are in no list. */
+
+/* ---- type: eight steps (12 14 16 18 reading 24 29 38; a label and a control share 14); a figure and a ruby are not steps ---- */
+:root {
+  --type-label: 14px;
+  --type-control: 14px;
+  --type-seal: var(--type-reading);
+  --type-display: var(--type-title);
+  --type-headword: var(--type-hero);
+}
+:where(.kp, body[data-view='drift'], [class^='ww-'], [class*=' ww-'], .kw-encounter, .kw-dialog, .worldcraft-view, .wc-dialog, .passage-dialog) {
+  --type-label: 13px;
+  --type-control: 15px;
+  --type-seal: 22px;
+  --type-display: 34px;
+  --type-headword: 42px;
+}
+@media (max-width: 520px) {
+  :where(.kp, body[data-view='drift'], [class^='ww-'], [class*=' ww-'], .kw-encounter, .kw-dialog, .worldcraft-view, .wc-dialog, .passage-dialog) { --type-display: 29px; }
+}
+/* a button with no size of its own takes its parent's, never the browser's 13.33 */
+:where(button:not(.learn-go, .learn-go-deck, [class^='ww-'], [class*=' ww-'], [class^='kp-'], [class*=' kp-'])) { font-size: inherit; }
+
+/* ---- the family: one height, one corner, one weight ---- */
+:root {
+  --tc-h: 44px;
+  --tc-pad: 16px;
+}
+
+/* A · primary: the screen's one filled key */
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(
+  .take:not(.taken, .quiet, .focus-start, .kp-take), .btn-primary:not(.save-one),
+  .gs-button.primary, .cd-btn.cd-primary, .cd-choice.cd-primary, .pc .pc-primary, #bunki-reports-root .br-primary,
+  .chat-send, .exam-confirm > .take
+) {
+  min-height: var(--tc-h);
+  padding: 0 calc(var(--tc-pad) + 4px);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--color-accent);
+  color: var(--color-paper, #f7f2e8);
+  box-shadow: none;
+  font: 600 var(--type-control) / 1.25 var(--font-ui);
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* B · secondary: a hairline slip */
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(
+  .chip:not(.btn-primary, .btn-tertiary, .t-kanji, .t-word, .t-radical, .t-idiom, .pool-tag, .cat-chip, .exam-level-card), .btn-secondary,
+  .take.taken, .take.quiet, .take.focus-start, #sheet > button.take,
+  .gs-button:not(.primary), .cd-btn:not(.cd-primary), .stroke-btn, .stroke-controls button,
+  #bunki-reports-root .br-actions button, #bunki-reports-root .br-context-summary button,
+  .skip-more, .skip-retry, .skip-search-opener, .skip-code-door, .reference-button,
+  .vocabulary-list-create, .vocabulary-list-form .chip, .vocabulary-list-dialog > .chip,
+  .shelf-tools-toggle
+) {
+  min-height: var(--tc-h);
+  padding: 0 var(--tc-pad);
+  border: 1px solid var(--color-edge-strong);
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-ink);
+  box-shadow: none;
+  font: 600 var(--type-control) / 1.25 var(--font-ui);
+  letter-spacing: 0;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* C · quiet: a word in the accent; a door takes a chevron */
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(
+  .btn-tertiary, .gs-text, .sheet-back, #bunki-reports-root .br-close, .reference-text-button,
+  .today-universe, .dw-go, .more-row, .shelf-beginner-start, .mini-web-open, .report-door, .details-toggle
+) {
+  min-height: var(--tc-h);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-accent);
+  box-shadow: none;
+  font: 600 var(--type-control) / 1.25 var(--font-ui);
+  letter-spacing: 0;
+  text-decoration: none;
+  cursor: pointer;
+}
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(.more-row, .shelf-beginner-start)::after {
+  content: ' ›';
+}
+
+/* F · segmented choice: words in a row; the chosen one is inked (day) or lit (night); one weight, so nothing shifts */
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(
+  .seg button, .gs-nav, #bunki-reports-root .br-nav button, .pc nav button,
+  .settings-language button, .settings-layout-choice button, .version-toggle .version-choice, .me-seg button,
+  #variants .vseg button, .focus-chip, .kdx-lens
+) {
+  min-height: var(--tc-h);
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-muted);
+  box-shadow: none;
+  font: 600 var(--type-control) / 1.25 var(--font-ui);
+  letter-spacing: 0;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* ---- states, in one place ---- */
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(
+  .take:not(.taken, .quiet, .focus-start, .kp-take), .btn-primary:not(.save-one),
+  .gs-button.primary, .cd-btn.cd-primary, .cd-choice.cd-primary, .pc .pc-primary, #bunki-reports-root .br-primary,
+  .chat-send, .exam-confirm > .take
+):hover:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 88%, var(--color-ink)); }
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(
+  .chip, .btn-secondary, .take, #sheet > button.take, .gs-button:not(.primary), .cd-btn:not(.cd-primary), .stroke-btn,
+  .stroke-controls button, .skip-more, .skip-retry, .reference-button, .shelf-tools-toggle,
+  .btn-tertiary, .gs-text, .sheet-back, .today-universe, .dw-go, .more-row, .mini-web-open, .details-toggle,
+  .focus-chip, .kdx-lens, .me-seg button, .settings-language button, .settings-layout-choice button, .seg button
+):where(:not(.btn-primary, .pool-tag, .cat-chip, .exam-level-card, .t-kanji, .t-word, .t-radical, .t-idiom, .save-one)):where(:not(.take:not(.taken, .quiet, .focus-start), [aria-pressed='true'], [aria-current='page'], [aria-checked='true'], .is-on, .on)):hover:not(:disabled, [aria-disabled='true']) {
+  background: var(--color-fill);
+}
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(.shelf-tools-toggle, .skip-search-opener):where([aria-expanded='true']) { background: var(--color-fill); }
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(
+  .chip, .take, .gs-button, .cd-btn, .stroke-btn, .skip-more, .skip-retry, .reference-button, .btn-tertiary, .gs-text,
+  .focus-chip, .kdx-lens
+):where(:disabled, [aria-disabled='true']):where(:not(.btn-primary, .pool-tag, .cat-chip, .exam-level-card, .t-kanji, .t-word, .t-radical, .t-idiom)) {
+  background: transparent;
+  color: color-mix(in srgb, var(--color-ink) 42%, transparent);
+  border-color: var(--color-line);
+  box-shadow: none;
+  cursor: default;
+}
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(
+  .take:not(.taken, .quiet, .focus-start, .kp-take), .btn-primary:not(.save-one),
+  .gs-button.primary, .cd-btn.cd-primary, .cd-choice.cd-primary, .pc .pc-primary, #bunki-reports-root .br-primary,
+  .chat-send, .exam-confirm > .take
+):where(:disabled) { background: var(--color-fill-strong); color: var(--color-muted); box-shadow: none; cursor: default; }
+/* chosen: a segment or a toggle slip is inked; at night it is lit by the accent edge instead */
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(
+  .seg button, .gs-nav, #bunki-reports-root .br-nav button, .pc nav button,
+  .settings-language button, .settings-layout-choice button, .version-toggle .version-choice, .me-seg button,
+  #variants .vseg button, .focus-chip, .kdx-lens, .stroke-btn, .stroke-controls button,
+  .chip:not(.btn-primary, .pool-tag, .cat-chip, .exam-level-card, .t-kanji, .t-word, .t-radical, .t-idiom)
+):where([aria-pressed='true'], [aria-current='page'], [aria-checked='true'], .is-on, .on, .read-fin.finished) {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-surface);
+  box-shadow: none;
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(
+  .seg button, .gs-nav, #bunki-reports-root .br-nav button, .pc nav button,
+  .settings-language button, .settings-layout-choice button, .version-toggle .version-choice, .me-seg button,
+  #variants .vseg button, .focus-chip, .kdx-lens, .stroke-btn, .stroke-controls button,
+  .chip:not(.btn-primary, .pool-tag, .cat-chip, .exam-level-card, .t-kanji, .t-word, .t-radical, .t-idiom)
+):where([aria-pressed='true'], [aria-current='page'], [aria-checked='true'], .is-on, .on, .read-fin.finished) {
+  border-color: transparent;
+  background: transparent;
+  color: var(--color-ink);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-gold) 70%, transparent);
+}
+
+/* inside a chosen choice every word takes the choice's own ink */
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(
+  .seg button, .gs-nav, #bunki-reports-root .br-nav button, .pc nav button,
+  .settings-language button, .settings-layout-choice button, .version-toggle .version-choice, .me-seg button,
+  #variants .vseg button, .focus-chip, .kdx-lens, .stroke-btn, .stroke-controls button,
+  .chip:not(.btn-primary, .pool-tag, .cat-chip, .exam-level-card, .t-kanji, .t-word, .t-radical, .t-idiom)
+):where([aria-pressed='true'], [aria-current='page'], [aria-checked='true'], .is-on, .on, .read-fin.finished) :where(*) { color: inherit; }
+
+/* at night the primary is lit, never a solid fill: the accent as an edge */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(
+  .take:not(.taken, .quiet, .focus-start, .kp-take), .btn-primary:not(.save-one),
+  .gs-button.primary, .cd-btn.cd-primary, .cd-choice.cd-primary, .pc .pc-primary, #bunki-reports-root .br-primary,
+  .chat-send, .exam-confirm > .take
+):not(:disabled) {
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-ground));
+  color: var(--color-accent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 72%, transparent);
+}
+
+/* ---- a door is one paper card; a choice tile is a slip that is ringed when chosen ---- */
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(
+  .study-door:not(.learn-go-quiet), .rad-door, .stroke-door, html:not([data-room='me'], [data-room='settings']) .foundation-door
+) {
+  border: 1px solid var(--color-edge-strong);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--elevation-card);
+}
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(.focus-mode) {
+  border: 1px solid var(--color-edge-strong);
+  border-radius: var(--radius-control);
+  background: transparent;
+  box-shadow: none;
+  font-size: var(--type-chrome);
+}
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(.focus-mode.on, .focus-mode[aria-pressed='true']) {
+  border-color: var(--color-ink);
+  box-shadow: inset 0 0 0 1px var(--color-ink);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(.focus-mode.on, .focus-mode[aria-pressed='true']) {
+  border-color: transparent;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-gold) 70%, transparent);
+}
+
+/* ---- three weights: 400 text, 600 emphasis and controls, 800 the display face ---- */
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(
+  .eyebrow, .mini-sentence-label, .kv dt, .focus-chip-n, .learn-split-n, .focus-mode-t, .list-head,
+  .mini-entry-chevron, .mini-sentence-chevron
+) { font-weight: 600; }
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(
+  .story-date, .story-fact, .learn-n, .learn-count, .reader-picture-caption, .kairo-mark,
+  .dateline-date, .dateline-sep, .tally-short, .me-set-l, .view-title-en, .dw-r,
+  .learn-due-u, .me-month-year, .tok-en-text, .mini-gloss, .mini-reading, .mini-kanji-readings, .section-title
+) { font-weight: 400; }
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(h3.list-head) { font-size: var(--type-lead); }
+
+/* on the guided session's lacquer a quiet word and a slip take the sheet's own ink and line */
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) .gs-lacquer :where(.gs-text, .gs-button:not(.primary)) {
+  color: var(--color-sheet-ink);
+  border-color: var(--color-sheet-line);
+}
