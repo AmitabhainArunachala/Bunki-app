@@ -172,6 +172,18 @@ describe('a. the ear’s state machine', () => {
     expect(calls.speak).toHaveLength(0);
   });
 
+  it('held on, on the Mac: a click during a rest is the app’s, and that rest then asks nothing', () => {
+    const { machine, calls, advance } = rig();
+    machine.holdEar();
+    machine.hover({ unit: A, pointer: 'mouse' });
+    advance(200);
+    expect(machine.click({ unit: A, pointer: 'mouse' })).toBe('pass');
+    advance(2000);
+    machine.hover({ unit: A, pointer: 'mouse' });
+    advance(2000);
+    expect(calls.speak).toHaveLength(0);
+  });
+
   it('a new rest cancels a request still in flight', () => {
     const { machine, calls, handles, advance } = rig();
     machine.holdEar();
@@ -573,6 +585,21 @@ describe('b. the unit that speaks', () => {
     expect(u.element).toBe(button);
     expect(said(u)).toEqual(['音']);
     expect(findUnit(textIn(loose, '絵'), { context })).toBe(null);
+  });
+
+  it('spaces the page puts between Japanese words are not read', () => {
+    const p = h(
+      'p',
+      {},
+      h('span', {}, '自動車 '),
+      '、 ',
+      h('span', {}, '産業 機械'),
+      ' と AI のデータセンター。',
+    );
+    page(p);
+    expect(said(findUnit(textIn(p, '産業'), { offset: 0, context }))).toEqual([
+      '自動車、産業機械とAIのデータセンター。',
+    ]);
   });
 
   it('a row that mixes English and one kanji says the kanji', () => {

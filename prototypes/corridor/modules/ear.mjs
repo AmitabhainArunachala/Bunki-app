@@ -108,6 +108,8 @@ export function createEarMachine({ speak, cannot = () => null, schedule = (fn, m
       if (mode === 'armed') { mode = 'off'; start(unit); return 'consume'; }
       if (mode === 'held' && pointer !== 'mouse') { start(unit); return 'consume'; }
       if (alt) { start(unit); return 'consume'; }
+      // a click is not a rest: the rest it lands in asks nothing (the app is about to act on that click)
+      if (mode === 'held' && rest && !rest.asked) { cancel(rest.timer); rest.timer = null; rest.asked = true; }
       return 'pass';
     },
     /** The Mac's pointer over `unit` (null: over nothing Japanese). Held on, a rest of `restMs` on one unit speaks it
@@ -191,7 +193,14 @@ const isNote = (node) => hasClass(node, 'say-note') || hasClass(node, 'voice-not
 
 /** Japanese a voice can say: whole sentences when the text is Japanese through and through; from mixed text only its
  * Japanese runs; and a lone character ("門 Products") when that is all the Japanese there is. */
+const JA_MARK = '[\\p{Script=Han}\\p{Script=Hiragana}\\p{Script=Katakana}ー々〆ヶ、。・「」『』（）！？〜～…]';
+const AROUND_JAPANESE = new RegExp(`\\s+(?=${JA_MARK})|(?<=${JA_MARK})\\s+`, 'gu');
+/** Spaces the page sets between Japanese words (word spans, line joins) are not read. */
+const tidy = (text) => String(text).replace(AROUND_JAPANESE, '');
 export function speakable(text) {
+  return speakableRaw(text).map((sentence) => ({ ...sentence, text: tidy(sentence.text) })).filter((sentence) => sentence.text);
+}
+function speakableRaw(text) {
   const raw = String(text ?? '');
   if (!hasJapanese(raw)) return [];
   const whole = sentencesOf(raw);
@@ -221,6 +230,20 @@ function textNodes(root, { keep = null, controls = true, skip = null } = {}) {
   return out;
 }
 const joined = (nodes) => nodes.map((node) => node.nodeValue).join('');
+/** The words a selection holds, as the page shows them: no readings above words, no notes, nothing hidden. */
+export function rangeText(range) {
+  const common = range.commonAncestorContainer;
+  const root = common?.nodeType === 3 ? common.parentNode : common;
+  if (!root) return '';
+  let out = '';
+  for (const node of textNodes(root, { keep: common?.nodeType === 3 ? common : null })) {
+    if (typeof range.intersectsNode === 'function' && !range.intersectsNode(node)) continue;
+    const from = node === range.startContainer ? range.startOffset : 0;
+    const to = node === range.endContainer ? range.endOffset : node.nodeValue.length;
+    out += node.nodeValue.slice(from, to);
+  }
+  return out;
+}
 
 /** The reading an element carries: a kana attribute, or one descendant whose class names a reading and holds kana. */
 function readingOf(element) {
@@ -701,7 +724,8 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}) }) {
       const selection = view.getSelection?.();
       if (!selection || selection.isCollapsed || !selection.rangeCount) { hideChip(); return; }
       const range = selection.getRangeAt(0);
-      const text = selection.toString();
+      let text = '';
+      try { text = rangeText(range); } catch { text = selection.toString(); }
       const node = range.commonAncestorContainer;
       const element = node?.nodeType === 3 ? node.parentNode : node;
       if (!hasJapanese(text) || !element || element.closest?.('[data-ear-own], input, textarea, select, [contenteditable=""], [contenteditable="true"]')) { hideChip(); return; }
