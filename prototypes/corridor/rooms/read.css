@@ -281,17 +281,6 @@ html[data-room='reader'] body main > .reader-hero .reader-picture-img {
   border-radius: 0;
   box-shadow: none;
 }
-html[data-room='reader'] main > .reader-hero .reader-picture-caption {
-  inset: 10px 12px auto auto;
-  padding: 3px 7px;
-  border-radius: var(--radius-seal);
-  background: rgb(10 12 16 / 55%);
-  font: 500 var(--type-caption)/1.2 var(--font-data);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  text-shadow: none;
-}
-html[data-room='reader'] body:not(.ui-bi) main > .reader-hero .reader-picture-caption { letter-spacing: 0.08em; }
 /* the title rests on the print's faded foot */
 html[data-room='reader'] body[data-view='reader'] #app > main > h1.view-title.on-hero { position: relative; z-index: 1; margin-top: -44px; }
 html[data-room='reader'] .reader-meta {
@@ -1521,7 +1510,7 @@ html[data-room='reader'] body:not([data-view='drift']) {
 /* the print on its mat */
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero {
   margin: 0 0 4px;
-  padding: 10px 10px 34px;
+  padding: 6px 8px 18px;
   border-radius: var(--radius-card);
   background: var(--reader-mat);
   -webkit-mask-image: none;
@@ -1529,26 +1518,21 @@ html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-her
   box-shadow: inset 0 -1px 0 rgb(255 255 255 / 6%);
 }
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero .reader-picture-img {
-  /* a phone shows the print as a band, never a sliver; the first sentence still opens on the first screen (R3) */
-  height: clamp(136px, calc(100svh - 700px - var(--nav-clearance, 0px)), 280px);
+  /* a phone shows the print as a band, never a sliver; the first sentence still opens on the first screen (R3), and on a
+     390x844 phone the text starts near 440 px (John, 2026-11-10: "the first line of Japanese starts at 556 of 844") */
+  height: clamp(112px, calc(100svh - 724px - var(--nav-clearance, 0px)), 280px);
   border-radius: var(--radius-seal);
   box-shadow: 0 0 0 1px var(--reader-mat-edge), 0 8px 18px -8px rgb(0 0 0 / 70%);
 }
-html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero .reader-picture-caption {
-  inset: 18px 18px auto auto;
-  border: 1px solid rgb(255 255 255 / 16%);
-  background: rgb(10 12 18 / 74%);
-  color: #f3ecdd;
-}
 /* night: the lamp and the rain fall on the print, not on its mat */
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero::before {
-  inset: 10px 10px 34px;
+  inset: 6px 8px 18px;
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero {
   box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--color-gold, #e2bd6c) 20%, transparent);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero::after {
-  clip-path: inset(calc(60% + 10px) 10px 34px 10px);
+  clip-path: inset(calc(60% + 6px) 8px 18px 8px);
 }
 @media (max-width: 520px) {
   html[data-room='reader'] body:not(.zen):not([data-view='drift']) #app > main > .reader-hero {
@@ -1559,29 +1543,27 @@ html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-her
 
 /* while the text settings are open the print folds to a slim band on its mat, at every width, so the
    panel does not push the article's first words under the tab bar (the phone already did this) */
-html[data-room='reader'] body:not([data-view='drift']) #app > main:has(> .dials) > .reader-hero { padding-bottom: 30px; }
 html[data-room='reader'] body:not([data-view='drift']) #app > main:has(> .dials) > .reader-hero .reader-picture-img { height: 44px; }
-html[data-room='reader'] body:not([data-view='drift']) #app > main:has(> .dials) > .reader-hero .reader-picture-caption { display: none; }
 
 /* the title card: raised paper in front of the mat */
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-card {
   position: relative;
   z-index: 2;
-  margin: 0 0 12px;
-  padding: 14px 16px 4px;
+  margin: 0 0 4px;
+  padding: 6px 16px 4px;
   border: 1px solid var(--reader-card-edge);
   border-radius: var(--radius-card);
   background: var(--reader-card-grain), var(--reader-card);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%), 0 2px 3px rgb(20 24 34 / 8%), 0 16px 32px -14px rgb(20 24 34 / 34%);
   color: var(--reader-ink);
 }
-html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero + .reader-card { margin-top: -26px; }
+html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero + .reader-card { margin-top: -14px; }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-card {
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%), 0 0 0 1px rgb(0 0 0 / 28%), 0 20px 44px -14px rgb(0 0 0 / 75%);
 }
 html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title {
   position: static;
-  margin: 0 0 4px;
+  margin: 0 0 2px;
   font: 800 var(--type-display)/1.4 var(--font-headword);
   letter-spacing: 0.01em;
   color: var(--reader-ink);
@@ -1620,12 +1602,12 @@ html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-card > .reader-head {
   position: relative;
   display: block;
-  margin: 8px 0 4px;
+  margin: 4px 0 2px;
   padding: 0;
   border: 0;
   border-top: 1px solid color-mix(in srgb, var(--color-ink) 9%, transparent);
 }
-html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .reader-head > .reader-meta { padding-top: 8px; }
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .reader-head > .reader-meta { padding-top: 4px; }
 /* F · the folded listen mark (the lead's ruling on Grok f-86, 2026-10-18): one glyph at the right end of the instrument
    line, in the head's flow — a float the line's text steps around, beside the settings icon (whose 34 px in the head its
    right margin keeps) — so it never sits over the reading column at any scroll. Open, the bar stands where it always has
@@ -1639,7 +1621,8 @@ html[data-room='reader'] body:not([data-view='drift']) #app .reader-head > .list
   max-width: 44px;
   height: 44px;
   min-height: 44px;
-  margin: 0 34px 0 8px;
+  /* lifted with the settings icon (top: -6px), so the two marks and the line's text share one centre */
+  margin: -6px 34px 0 8px;
   padding: 0;
 }
 html[data-room='reader'] body[data-view='reader'] #app > main .reader-head:has(> .listen-row:not([hidden])) > .reader-meta::before { width: 0; }
@@ -1647,7 +1630,7 @@ html[data-room='reader'] body[data-view='reader'] #app > main .reader-head:has(>
 html[data-room='reader'] body:not([data-view='drift']) #app > main .reader-head:has(> .listen-row:not([hidden])) { display: flow-root; }
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-card > .reader-head > .dials-toggle {
   position: absolute;
-  top: 0;
+  top: -6px;
   right: -10px;
   width: 44px;
   height: 44px;
@@ -1718,7 +1701,8 @@ html[data-room='reader'] body #app > main .seg button { transition: none; }
 /* the text on its own paper (both selectors: the layered variant's older rule names body.v-depth-layered) */
 html[data-room='reader'] body.v-depth-layered:not([data-view='drift']) main #reader.reader,
 html[data-room='reader'] body:not([data-view='drift']) main #reader.reader {
-  padding: 16px var(--s2, 16px) 28px;
+  margin-top: 0;
+  padding: 6px var(--s2, 16px) 28px;
   border-top: 1px solid var(--reader-paper-edge);
   border-radius: 0;
   background: var(--reader-grain), var(--reader-paper);

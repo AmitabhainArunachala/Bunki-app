@@ -1599,9 +1599,8 @@ body[data-view='reader'] #app > main > .view-title-en {
   letter-spacing: 0;
   color: var(--label-2);
 }
-/* the article's picture, the same as its card: full text width, 12px corners, its caption set
-   quietly in the picture's corner. Its height yields to a short screen, so the first sentence
-   still opens on the first screen. */
+/* the article's picture, the same as its card: full text width, 12px corners, no caption on it.
+   Its height yields to a short screen, so the first sentence still opens on the first screen. */
 .reader-picture { position: relative; margin: 4px 0 20px; }
 .reader-picture-img {
   display: block;
@@ -1614,29 +1613,12 @@ body[data-view='reader'] #app > main > .view-title-en {
   background: color-mix(in srgb, var(--topic, var(--tint)) 16%, var(--surface));
   box-shadow: 0 0 0 0.5px rgb(0 0 0 / 6%);
 }
-.reader-picture-caption {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: 0;
-  padding: 18px 12px 8px;
-  border-radius: 0 0 var(--radius-card) var(--radius-card);
-  /* bokashi: atenashi — a picture's caption ground — depth: the world's deepest coat rising under the caption so its words read on any print */
-  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--tone-shade, var(--zen-stage-deep)) 40%, transparent));
-  font: 600 var(--type-caption)/1.3 var(--sans);
-  letter-spacing: 0.04em;
-  color: #fff;
-  text-shadow: 0 1px 2px rgb(0 0 0 / 30%);
-  pointer-events: none;
-}
 @media (max-width: 520px) {
   .reader-picture-img { max-height: max(72px, calc(100svh - 800px)); }
   .reader-picture { margin-bottom: 16px; }
   /* while the text settings are open on a phone the picture folds to a slim band, so the panel does
      not push the article's opening words down under the dock; it returns when they close */
   body[data-view='reader'] #app > main:has(> .dials) .reader-picture-img { max-height: 44px; }
-  body[data-view='reader'] #app > main:has(> .dials) .reader-picture-caption { display: none; }
   body.v-depth-layered .dials { margin-bottom: var(--s2); padding: 10px 12px; gap: 4px; }
   body.v-depth-layered .dials .dials-hint { margin-top: 4px; }
 }
@@ -5788,22 +5770,23 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
   bottom: calc(-0.3em + 1px);
   transform: translateX(calc(-0.5em - var(--depth-size) / 2));
 }
-/* every reader title, unconditionally: each title line holds its own font cell plus room for a reading above and a ring below
-   (a room the desktop title widens for its larger reading), laid out once for whatever arrives later (its words, a state, a
-   reading, late name readings); a stateful word's dot sits in that room, below its word's box and so below the hairline mark
-   the word shows while touched, off the next title line, a reading shown there and the English caption. On the phone a saved
-   ring drops below that mark only while its own word is touched (a pointer, keyboard focus), and the phone's room is measured
-   to keep even that ring clear of a reading the next line shows (22px: WebKit's 大賞 reading under a hovered 日本 needed 1.85px
-   more than 20px). The desktop query is the exact complement of the phone title font's. Repeating the same class preserves the
-   matched titles and outranks the later rooms/read.css font shorthand and phone leading without an important declaration. */
-html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title { line-height: calc(1.45em + 22px); padding-bottom: 8px; }
+/* every reader title, unconditionally: each title line holds its own font cell plus room for a reading above (a room the
+   desktop title widens for its larger reading), laid out once for whatever arrives later (its words, a state, a reading, late
+   name readings), so a title word's first tap moves no glyph in either engine (WebKit needs the most: 10px on the phone's 21px
+   title, 16px on the desktop's 34px). A stateful word's dot sits below its word's box and so below the hairline mark the word
+   shows while touched. The room was 22px / 31px, which also kept a lowered saved ring clear of a reading the next line shows;
+   John (2026-11-10) asked for the title set tighter, so that rare pair (a saved word over a word whose reading is open on the
+   line below) may now touch. The desktop query is the exact complement of the phone title font's. Repeating the same class
+   preserves the matched titles and outranks the later rooms/read.css font shorthand and phone leading without an important
+   declaration. */
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title { line-height: calc(1.45em + 10px); padding-bottom: 2px; }
 html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title .japanese-lookup-word:is([data-depth],[data-kept])::after { bottom: -6.75px; }
 html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title .japanese-lookup-word[data-kept]:is(:hover,:focus-visible)::after { bottom: -9.25px; }
 /* a keyboard-focused title word keeps the focus token's decoration in one piece (a title word never wraps, so nothing looks
    different); with the token's clone WebKit re-broke the title's pretty-wrapped lines at the next rendering, moving 大賞 191px */
 html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title .japanese-lookup-word:focus-visible { -webkit-box-decoration-break: slice; box-decoration-break: slice; }
 @media not (max-width: 520px) {
-  html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title { line-height: calc(1.45em + 31px); }
+  html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title { line-height: calc(1.45em + 16px); }
   html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title .japanese-lookup-word:is([data-depth],[data-kept])::after { bottom: -9.25px; }
 }
 /* Ladder contract: only this occurrence steps aside while its inline English is open. Removing the attribute

@@ -8,7 +8,7 @@ import { GRAMMARS, activateKanjiFamily, activateKanjiStructure, animcjkGlyphFor,
 import { approvedNarrationManifest, availableSentenceListeningCue, excerptListenLabel, paintListenProgress, receivedPracticeAlternativeLabel, receivedPracticeLoadKey, reconcileAssessmentResults, reconcileSheetActionLines, recordFrameRow, recordNoteEditable, recordNoteExpected, recordPickerSurface, recordSha256, recordSyncStatus, recordUnavailable, recordViewSurface, refreshListenRow, resolveSentenceListeningCue, speakChip, speakGateEvidence, speakSentence, stopReadAloud, transcriptRangeLabel, voiceForRole, voicePendingNote } from './modules/voice.mjs';
 import { maintenanceScreenName, meSection, mergeGrammar, portableRecord, primaryTabs, readRecordDrafts, renderLayoutChoice, renderMe, renderWritingChoice, showRecordBackup, stampRegister, storedArchiveRow, syncTrayCount, themeId, themeIx, updateMeasurements, validArchiveRows, validArchiveTurn, validImportJournal, validStoredArchiveRows } from './modules/learner.mjs';
 import { byLeadingDrops, byNewest, dateStamp, dayKey, depthBasisParts, depthDot, depthNodeOf, helpByMonth, landOnKeptWords, leadingDropDays, localDayOrdinal, localMonthKey, luminance, monthKey, monthLabel, notYetMarks, readerDateStamp, renderDrift, renderKagami, renderTodayLine, renderTodayWord, roughestThisWeek, startOfDay, syncDriftTheme, todayCity, todayDateline, todayDueKeys, todayHash, todayKanji, todayLearning, todayPartStrokes, todayPlaceSky, todayReadPick, todayRedrawSky, todaySecondsPerCard, todaySharedPart, todaySkyWhy, todaySkyWord, trayLine } from './modules/drift.mjs';
-import { articleFingerprint, catalogLabel, feedDate, levelChip, levelPhrase, libraryDiscoverable, libraryVisibilityPolicy, openReferenceEntry, placeSealStrip, publisherLink, readerChoiceMatch, readerChoiceTokenHolds, readerEntryNode, readerPictureCredit, referenceCollectionChip, refreshReadingPlacesSurface, renderCatalogNode, renderPublisherContextSelection, renderReaderChoice, renderReaderChoiceNote, renderReferenceMetadata, renderReferenceNode, resolveReadingPlace, searchRowShownByCore, shelfBodyToken, shelfCurrentDay, shelfDailyOrder, shelfDateline, shelfStories, shelfTallyText } from './modules/library.mjs';
+import { articleFingerprint, catalogLabel, feedDate, levelChip, levelPhrase, libraryDiscoverable, libraryVisibilityPolicy, openReferenceEntry, placeSealStrip, publisherLink, readerChoiceMatch, readerChoiceTokenHolds, readerEntryNode, referenceCollectionChip, refreshReadingPlacesSurface, renderCatalogNode, renderPublisherContextSelection, renderReaderChoice, renderReaderChoiceNote, renderReferenceMetadata, renderReferenceNode, resolveReadingPlace, searchRowShownByCore, shelfBodyToken, shelfCurrentDay, shelfDailyOrder, shelfDateline, shelfStories, shelfTallyText } from './modules/library.mjs';
 import { activeTeacherContext, aiAsk, aiChatTurns, aiCreateCards, aiKey, aiProvider, aiQuizParse, aiReadingSegments, aiRequestTimeoutMs, aiTeachingSubject, aiTransport, askOnRequest, canonicalAiBaseUrl, refreshTeacherChatHistory, renderAiCoach, renderAiExamples, renderAiTutor, sizeTeacherQuestion, teacherChatStatus, teacherDoorKey, teacherDraftCopyButton, teacherDraftStatus, teacherSentence, teacherSourceError, teacherWindowDraftKey, validAiEvidenceTurn } from './modules/teacher.mjs';
 
 /**
@@ -8401,17 +8401,17 @@ function readerPicture(p) {
   const kept = readerPictureImg?.getAttribute('src') === `data/${pic.src}` ? readerPictureImg : null;
   const img = kept || el('img', 'reader-picture-img');
   readerPictureImg = img;
-  if (kept) { figure.append(img, readerPictureCredit()); return figure; }
+  // no caption on the print (John, 2026-11-10: the app's own credit printed on its own picture); its alt text stays
+  if (kept) { figure.append(img); return figure; }
   img.src = `data/${pic.src}`;
   img.alt = String(pic.alt || '');
   if (pic.w && pic.h) { img.width = pic.w; img.height = pic.h; }
   img.decoding = 'async';
   img.addEventListener('error', () => img.closest('figure')?.remove(), { once: true });
-  figure.append(img, readerPictureCredit());
+  figure.append(img);
   return figure;
 }
 let readerPictureImg = null;
-/** D3 (John: "回廊 KAIRO"): the credit names the app; 回廊 is a named mark in either language */
 
 /** One shelf card, text first (polish pass 2026-10-01: a brushed headline kanji on a navy slab
  * read as a random symbol to anyone who is not already a learner). A topic kicker, the Japanese
