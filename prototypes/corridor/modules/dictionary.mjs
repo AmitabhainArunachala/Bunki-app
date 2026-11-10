@@ -1532,6 +1532,52 @@ function readerTokenAtIndex(index, reader = document.getElementById('reader')) {
       Number(token.dataset.index) <= sourceIndex && sourceIndex <= Number(token.dataset.indexEnd)) || null;
 }
 
+/** R · a word the tokenizer cut in two (自動|車, 半|導体). A run of kanji pieces (nouns, prefixes, suffixes, adjectival
+ * nouns; never across `bounded`) is read from its first piece: the longest stretch of at most four pieces whose joined
+ * spelling is one core-dictionary word, read exactly as its pieces read, is that one word, and the reading goes on
+ * after it. The core is fixed once the app has started, so a text is always cut the same way. A particle is never a
+ * piece (今日|は stays two), nor a numeral (二〇二|六年 would cut a date apart). The piece right after a number is that
+ * number's counter, so it starts no two-piece word (七年|後, never 七|年後; 1990年|代; 15世紀|末); a longer one it may
+ * (47|都道府県). After a prefix that joined nothing the run is left as the tokenizer cut it: the prefix belongs to a
+ * word the core lacks (駄菓子|屋, never 駄|菓子屋). Returns the index of the last piece of the word that starts at
+ * `index`, or `index` when none does. */
+const READER_COMPOUND_POS = new Set(['名詞', '接頭辞', '接尾辞', '形状詞']);
+function readerCompoundEnd(tokens, index, bounded = () => false) {
+  const kanji = (token) => /^[\p{Script=Han}々〆ヶ]+$/u.test(token?.s || '');
+  const numeral = (token) => /^[0-9０-９〇一二三四五六七八九十百千万億兆]+$/u.test(token?.s || '');
+  const piece = (at) => !!tokens[at]?.r && READER_COMPOUND_POS.has(tokens[at].p) && kanji(tokens[at]) && !numeral(tokens[at]);
+  if (!piece(index)) return index;
+  let start = index;
+  while (start > 0 && !bounded(start) && piece(start - 1)) start -= 1;
+  for (let at = start; at <= index; at += 1) {
+    const counter = at > 0 && !bounded(at) && numeral(tokens[at - 1]);
+    let end = at, surface = tokens[at].s, reading = kataToHira(tokens[at].r);
+    for (let next = at + 1; next - at < 4 && !bounded(next) && piece(next); next += 1) {
+      surface += tokens[next].s;
+      reading += kataToHira(tokens[next].r);
+      const entry = D.dict[surface];
+      if (entry && kataToHira(String(entry.r || '')) === reading && !(counter && next === at + 1)) end = next;
+    }
+    if (at === index) return end;
+    // a prefix that joined nothing binds to a word the core does not know (駄菓子): the rest of its run stays as cut
+    if (end === at && tokens[at].p === '接頭辞') return index;
+    at = end;
+  }
+  return index;
+}
+
+/** The one token a joined run of the reader's stands for (readerRenderedTokens): a katakana run is a plain name-like
+ * word, as before; a compound (readerCompoundEnd) is the core's content word, its pieces' readings over their kanji. */
+function readerJoinedToken(pieces, end) {
+  const surface = pieces.map(piece => piece.s).join('');
+  const reading = pieces.map(piece => piece.r || '').join('');
+  if (pieces.every(piece => /^[\p{Script=Katakana}ー]+$/u.test(piece.s || ''))) {
+    return { s: surface, b: surface, p: '名詞', r: reading, f: [{ t: surface }], c: false, readerSourceEnd: end };
+  }
+  return { s: surface, b: surface, p: '名詞', r: reading, f: pieces.flatMap(piece => piece.f?.length ? piece.f : [{ t: piece.s, r: piece.r }]),
+    c: true, readerSourceEnd: end };
+}
+
 function readerRenderedTokens(p, crossRefs) {
   const result = [];
   const breaks = new Set(p.paras || []);
@@ -1540,14 +1586,19 @@ function readerRenderedTokens(p, crossRefs) {
   for (let index = 0; index < p.tokens.length; index += 1) {
     const original = p.tokens[index];
     let end = index;
-    if (katakanaNoun(original) && !crossRefs?.doors.has(index) && !crossRefs?.skip.has(index)) {
+    const free = !crossRefs?.doors.has(index) && !crossRefs?.skip.has(index);
+    if (katakanaNoun(original) && free) {
       while (end + 1 < p.tokens.length && !bounded(end + 1) && katakanaNoun(p.tokens[end + 1])) end += 1;
     }
     const pieces = p.tokens.slice(index, end + 1);
     if (end > index && pieces.some(piece => !piece.c)) {
-      const surface = pieces.map(piece => piece.s).join('');
-      result.push({ index, token: { s: surface, b: surface, p: '名詞', r: pieces.map(piece => piece.r || '').join(''),
-        f: [{ t: surface }], c: false, readerSourceEnd: end } });
+      result.push({ index, token: readerJoinedToken(pieces, end) });
+      index = end;
+      continue;
+    }
+    end = free ? readerCompoundEnd(p.tokens, index, bounded) : index;
+    if (end > index) {
+      result.push({ index, token: readerJoinedToken(p.tokens.slice(index, end + 1), end) });
       index = end;
     } else result.push({ index, token: original });
   }
@@ -1915,9 +1966,7 @@ function readerTokenAt(articleId, index) {
   const span = typeof document !== 'undefined' ? document.querySelector(`#reader .tok[data-index="${index}"]`) : null;
   const end = span?.dataset.indexEnd != null ? Number(span.dataset.indexEnd) : null;
   if (!Number.isInteger(end) || end <= index) return p.tokens[index];
-  const pieces = p.tokens.slice(index, end + 1);
-  const surface = pieces.map((piece) => piece.s).join('');
-  return { s: surface, b: surface, p: '名詞', r: pieces.map((piece) => piece.r || '').join(''), f: [{ t: surface }], c: false, readerSourceEnd: end };
+  return readerJoinedToken(p.tokens.slice(index, end + 1), end);
 }
 
 function readerTokenNode(token) {
@@ -2541,4 +2590,4 @@ function displayKunReading(reading) {
   return dot < 0 ? value : `${value.slice(0, dot)}（${value.slice(dot + 1)}）`;
 }
 
-export { lookup, embeddedDictionaryJson, loadDictionaryJson, hasEmbeddedDictionaryIndex, dictionaryCoreMatch, dictionaryGlossSummary, dictionaryReadingSupportsForm, dictionarySummaryFor, validDictionaryRow, dictionaryRowsForForm, ensureDictionaryRowBySeq, ensureDictionaryRowsForForm, ensureDictionaryRowsForNode, dictionaryRowsFor, dictionaryDetailRowsFor, dictionaryShardNumber, dictionaryShardId, ensureDictionaryDetails, dictionaryDetailsFor, dictionaryTag, posCode, posLine, kanjiReadingsInWord, displayPairs, inlineWordReading, inlineGlossLine, inlineWordGloss, inlineTokenGloss, tokenGlossLine, readingLine, japaneseLookupRecord, japaneseLookupEntryRecord, lookupBlockWords, japaneseLookupHelpId, lookupOccurrence, lookupItemBlocks, annotationPieceReadings, annotationReadsAs, phoneticAnnotationCandidates, phoneticAnnotationRanges, phoneticAnnotationIndices, appendJapaneseLookup, inlineGloss, readerWordNote, readerGlossMissText, tokenReading, lemmaTakesForm, lemmaReading, kanaIru, readingForm, teFormSenseGlosses, teFormAnswer, ensureTeFormAnswer, teFormRecord, senseNeighbours, sidecarSense, senseNegation, senseSpelledReading, senseMustRun, senseExpression, senseChoice, senseDoor, senseIsQuick, senseRecord, senseNameHeldText, senseMoreElement, senseMoreLine, ensureSense, senseRefine, senseFillInPlace, senseWithin, narrowLemmaEntries, dictionaryRowsReadAs, alternateLemmaDoor, soundChangeReadings, kanjiReadingsOf, soundChangeDoor, readerLookupAnswer, readingAsksIndex, readyTokenReading, readingToken, readingTokenEntry, readerTokenAtIndex, readerRenderedTokens, dictionaryAnsweredForm, readerDoorGloss, readerDoorLead, readerGlossLine, tapLadderHint, readerWordHint, readerTokenState, nameReaderToken, readerHelp, glossaryCrossRefPlan, readerLayerParagraph, readerLayerReading, readingExpected, readingPlaceFailure, thesClusters, renderThesaurus, hiraToKata, normalizeGloss, dictionarySearchContext, dictionaryQueryKey, dictionaryQueryError, dictionaryQueryToken, activeDictionaryQuery, readerTokenAt, readerTokenNode, dictionaryEpoch, yomiVariantsOf, yomiReadingType, exampleIdentity, exampleKanji, exampleSenseKey, exampleOwnRows, exampleTokenIsWord, exampleHoldsWord, bankExamplesFor, findExamples, exampleFnv, fetchExampleJson, readingTargets, conjugations, renderConjugation, relationTarget, relationReadingQualifier, dictionaryRelationRoute, renderDictionaryRelations, renderDictionaryDetails, dictionaryHomographChoices, homographLines, dictionaryLoneDoor, renderDictionaryHomographs, requestDictionaryDetails, exampleOrder, partGloss, partMeaning, displayKunReading };
+export { lookup, embeddedDictionaryJson, loadDictionaryJson, hasEmbeddedDictionaryIndex, dictionaryCoreMatch, dictionaryGlossSummary, dictionaryReadingSupportsForm, dictionarySummaryFor, validDictionaryRow, dictionaryRowsForForm, ensureDictionaryRowBySeq, ensureDictionaryRowsForForm, ensureDictionaryRowsForNode, dictionaryRowsFor, dictionaryDetailRowsFor, dictionaryShardNumber, dictionaryShardId, ensureDictionaryDetails, dictionaryDetailsFor, dictionaryTag, posCode, posLine, kanjiReadingsInWord, displayPairs, inlineWordReading, inlineGlossLine, inlineWordGloss, inlineTokenGloss, tokenGlossLine, readingLine, japaneseLookupRecord, japaneseLookupEntryRecord, lookupBlockWords, japaneseLookupHelpId, lookupOccurrence, lookupItemBlocks, annotationPieceReadings, annotationReadsAs, phoneticAnnotationCandidates, phoneticAnnotationRanges, phoneticAnnotationIndices, appendJapaneseLookup, inlineGloss, readerWordNote, readerGlossMissText, tokenReading, lemmaTakesForm, lemmaReading, kanaIru, readingForm, teFormSenseGlosses, teFormAnswer, ensureTeFormAnswer, teFormRecord, senseNeighbours, sidecarSense, senseNegation, senseSpelledReading, senseMustRun, senseExpression, senseChoice, senseDoor, senseIsQuick, senseRecord, senseNameHeldText, senseMoreElement, senseMoreLine, ensureSense, senseRefine, senseFillInPlace, senseWithin, narrowLemmaEntries, dictionaryRowsReadAs, alternateLemmaDoor, soundChangeReadings, kanjiReadingsOf, soundChangeDoor, readerLookupAnswer, readingAsksIndex, readyTokenReading, readingToken, readingTokenEntry, readerTokenAtIndex, readerCompoundEnd, readerJoinedToken, readerRenderedTokens, dictionaryAnsweredForm, readerDoorGloss, readerDoorLead, readerGlossLine, tapLadderHint, readerWordHint, readerTokenState, nameReaderToken, readerHelp, glossaryCrossRefPlan, readerLayerParagraph, readerLayerReading, readingExpected, readingPlaceFailure, thesClusters, renderThesaurus, hiraToKata, normalizeGloss, dictionarySearchContext, dictionaryQueryKey, dictionaryQueryError, dictionaryQueryToken, activeDictionaryQuery, readerTokenAt, readerTokenNode, dictionaryEpoch, yomiVariantsOf, yomiReadingType, exampleIdentity, exampleKanji, exampleSenseKey, exampleOwnRows, exampleTokenIsWord, exampleHoldsWord, bankExamplesFor, findExamples, exampleFnv, fetchExampleJson, readingTargets, conjugations, renderConjugation, relationTarget, relationReadingQualifier, dictionaryRelationRoute, renderDictionaryRelations, renderDictionaryDetails, dictionaryHomographChoices, homographLines, dictionaryLoneDoor, renderDictionaryHomographs, requestDictionaryDetails, exampleOrder, partGloss, partMeaning, displayKunReading };

@@ -13038,7 +13038,8 @@ function openReaderLayers(mark) {
   // its words' meanings in order (意) and its particles' roles (文) — so no reading crowds another and no line moves
   const reading = [], meanings = [], roles = [], seen = new Set(), seenRoles = new Set();
   for (const span of paragraph.querySelectorAll('.tok[data-index]')) {
-    const token = p.tokens[Number(span.dataset.index)];
+    // a word the reader joined (自動車, a katakana run) is read and glossed whole, not as its first piece
+    const token = readerTokenAt(p.id, Number(span.dataset.index));
     if (!token) continue;
     reading.push(readerLayerReading(token));
     if (span.classList.contains('particle') || span.dataset.targetKind === 'particle') {
