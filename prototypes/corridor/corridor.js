@@ -29256,7 +29256,8 @@ function renderStudyFold(sheet, node, variantTarget) {
   head.append(el('span', 'fold-title', tx('学習の記録', 'Study progress')));
   // a count of zero, or no record yet, is not printed on the closed row (tighten pass, 2026-11-10)
   if (srs?.reps) head.append(el('span', 'fold-sub', tx(`復習 ${srs.reps} 回`, `${srs.reps} review${srs.reps === 1 ? '' : 's'}`)));
-  head.append(el('span', 'fold-arrow', open ? '▼' : '▶'));
+  // the fold row's own caret, as Today's record row and More examples carry it (owed-2 repair 3), never a ▶ in another face
+  head.append(el('i', 'today-detail-caret'));
   head.addEventListener('click', () => {
     S.studyOpen = open ? null : key;
     render();
@@ -29328,6 +29329,55 @@ export function toSources(sheet, ...lines) {
   return box;
 }
 
+/** Where an example sentence comes from, as the page's Sources says it (owed-2 repair 2): a dataset's name under each
+ * sentence ("examples corpus") is not the learner's; the full attribution stands once in the page's Sources. A shelf
+ * article's sentence names that article's own attribution; a bank sentence its corpus (the bank's manifest record); a
+ * sentence kept before the record carried it, every corpus its label names. */
+export function exampleCredits(ex) {
+  const p = ex?.passage ? D.passages?.find((row) => row.id === ex.passage) : null;
+  if (p) return [{ attribution: p.attribution || learnerSourceLabel(p), licence: p.licence || '', url: p.url || '' }];
+  if (ex?.credit) return [ex.credit];
+  const label = String(ex?.source || '');
+  const named = (D.exampleManifest?.sources || []).filter((src) => label && (label === src.labelEn || label === src.labelJa));
+  return named.length ? named : label ? [{ attribution: label }] : [];
+}
+/** Each credit once in the page's Sources: the attribution complete (a link where it has an address), then its licence. */
+export function creditSources(sheet, credits) {
+  const shown = new Set([...sheet.querySelectorAll(':scope > .entry-sources .example-credit')].map((n) => n.dataset.credit));
+  const lines = [];
+  for (const credit of credits) {
+    const key = `${credit.attribution}|${credit.licence || ''}`;
+    if (!credit.attribution || shown.has(key)) continue;
+    shown.add(key);
+    const line = el('p', 'dictionary-credit example-credit');
+    line.dataset.credit = key;
+    line.dataset.japaneseLookup = 'off';
+    line.append(document.createTextNode(`${tx('用例', 'Examples')}: `));
+    if (/^https:\/\//u.test(credit.url || '')) {
+      const link = el('a', null, credit.attribution);
+      link.href = credit.url;
+      link.target = '_blank';
+      link.rel = 'noreferrer';
+      line.append(link);
+    } else line.append(document.createTextNode(credit.attribution));
+    if (credit.licence && !credit.attribution.includes(credit.licence)) line.append(document.createTextNode(` · ${credit.licence}`));
+    lines.push(line);
+  }
+  if (lines.length) toSources(sheet, ...lines);
+}
+
+/** A word page's part of speech in its facts line: the core entry's first part, named in sentence case in both languages;
+ * a part the core names by a code (n-suf, adj-f) is left out rather than shown as one. */
+const WORD_FACT_POS = Object.freeze({
+  noun: ['名詞', 'Noun'], 'godan verb': ['五段動詞', 'Godan verb'], 'ichidan verb': ['一段動詞', 'Ichidan verb'],
+  'suru verb': ['する動詞', 'Suru verb'], 'kuru verb': ['来る動詞', 'Kuru verb'], 'na-adjective': ['な形容詞', 'Na-adjective'],
+  'i-adjective': ['い形容詞', 'I-adjective'], 'no-adjective': ['の形容詞', 'No-adjective'], adverb: ['副詞', 'Adverb'],
+  expression: ['表現', 'Expression'], pronoun: ['代名詞', 'Pronoun'], interjection: ['感動詞', 'Interjection'],
+  conjunction: ['接続詞', 'Conjunction'], particle: ['助詞', 'Particle'], counter: ['助数詞', 'Counter'],
+  prefix: ['接頭辞', 'Prefix'], suffix: ['接尾辞', 'Suffix'], numeric: ['数詞', 'Number'],
+  'auxiliary verb': ['助動詞', 'Auxiliary verb'], 'pre-noun adjectival': ['連体詞', 'Pre-noun adjectival'],
+  'adj-pn': ['連体詞', 'Pre-noun adjectival'], 'adverb (to)': ['副詞', 'Adverb'], 'taru-adjective': ['タル形容詞', 'Taru-adjective'],
+});
 /** Variant A (#38): the SAME target word rendered both ways. */
 function renderCardVariant(container, target) {
   const source = target.from ? D.passages.find((p) => p.id === target.from.passage) : null;
@@ -29454,6 +29504,7 @@ async function ensureBankExamples(word) {
             tokens: row[0].map(inflateExampleToken),
             en: row[1] || '',
             source: src ? tx(src.labelJa, src.labelEn) : tx('用例', 'examples'),
+            ...(src ? { credit: { attribution: src.attribution, licence: src.licence || '', url: src.url || '' } } : {}),
             bank: true,
           });
         }
@@ -30745,6 +30796,25 @@ function renderWordNode(sheet, node) {
   sheet.append(head);
   const shownReading = unresolved ? node.reading : rec?.r;
   if (shownReading) sheet.append(el('p', 'reading', shownReading));
+  const rowChars = (rec?.k?.length ? rec.k : [...node.id]).filter((c) => D.kanji[c]);
+  // owed-2 repair 4 · one quiet line of facts under the reading, as a kanji page has under its meaning (p.entry-facts):
+  // the level (a door to its collection), the part of speech and the number of kanji (plain text: they go nowhere yet).
+  // An unresolved page lends nothing of the entry (no level, no part of speech)
+  const facts = [];
+  const jlpt = own?.jlpt || (!unresolved && legacy?.jlpt ? `N${legacy.jlpt}` : null);
+  if (jlpt) {
+    const level = String(jlpt).replace(/^N?/, 'N');
+    facts.push(referenceCollectionChip(`JLPT ${level}`, `jlpt:${level}`));
+  }
+  const pos = WORD_FACT_POS[String(own?.p || '').split(' · ')[0]];
+  if (pos) facts.push(el('span', 'entry-fact', tx(...pos)));
+  if (rowChars.length) facts.push(el('span', 'entry-fact', tx(`漢字 ${rowChars.length} 字`, `${rowChars.length} kanji`)));
+  if (facts.length) {
+    const line = el('p', 'entry-facts');
+    line.dataset.japaneseLookup = 'off';
+    line.append(...facts);
+    sheet.append(line);
+  }
   // G2 · the dot's basis in one quiet line — days met, review state, the reading — and his "I know this" / "Not yet"
   renderDepthBasis(sheet, node, shownReading || '');
   // everything-on prototype (inventory block 16, measured): a core word opened from the reader, search or a list carries no
@@ -30756,7 +30826,6 @@ function renderWordNode(sheet, node) {
 
   // KANJI IN THIS WORD — each row opens that kanji's full entry. G1: right under the word and its reading
   // (John, 09-29: "kanji in the word needs to be more at the top!"; MASTER_SPEC §7.22)
-  const rowChars = (rec?.k?.length ? rec.k : [...node.id]).filter((c) => D.kanji[c]);
   if (rowChars.length) {
     sheet.append(withEn(el('p', 'eyebrow', 'この語の漢字'), 'kanji in this word', 'en-inline'));
     const rows = el('div', 'entry-rows');
@@ -30847,14 +30916,6 @@ function renderWordNode(sheet, node) {
     credit.append(licence);
     toSources(sheet, credit);
   }
-  const jlpt = own?.jlpt || (!unresolved && legacy?.jlpt ? `N${legacy.jlpt}` : null);
-  if (jlpt) {
-    // a fact is linked text, as on the kanji page's facts line (tighten pass, 2026-11-10)
-    const meta = el('div', 'shelf-meta entry-facts');
-    const level = String(jlpt).replace(/^N?/, 'N');
-    meta.append(referenceCollectionChip(`JLPT ${level}`, `jlpt:${level}`));
-    sheet.append(meta);
-  }
   renderConjugation(sheet, node.id, own?.p);
   if (!personalHost) renderAiTutor(sheet, node, own);
 
@@ -30888,13 +30949,15 @@ function renderWordNode(sheet, node) {
       text.append(sentenceDoor(ex, node.id));
       line.append(text);
       if (ex.en) line.append(el('p', 'example-en', ex.en));
-      line.append(el('span', 'example-src', ex.source));
       return line;
     };
     for (const ex of leadExamples) sheet.append(exampleLine(ex));
+    creditSources(sheet, [...leadExamples, ...moreExamples].flatMap(exampleCredits));
     if (moreExamples.length) {
       const fold = el('details', 'more-examples');
-      fold.append(el('summary', null, tx(`ほかの用例（${moreExamples.length}）`, `More examples (${moreExamples.length})`)));
+      const more = el('summary');
+      more.append(el('span', 'fold-name', tx(`ほかの用例（${moreExamples.length}）`, `More examples (${moreExamples.length})`)), el('i', 'today-detail-caret'));
+      fold.append(more);
       for (const ex of moreExamples) fold.append(exampleLine(ex));
       fold.open = !!node.moreExamplesOpen;
       // the fold's state is the page's, written as the summary is pressed: the toggle event comes a task later, and a

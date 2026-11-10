@@ -113,6 +113,60 @@
   cursor: pointer;
 }
 
+/* G · a fold row: a sentence-case name on hairlines, the fold caret at its end (Today's "Your record and backup",
+   Words' "More language tools"); on an entry page, "More examples" and "Study progress" (owed-2 repair 3) */
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(.sheet .more-examples > summary, .study-fold > .fold-head) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: var(--tc-h);
+  margin: 0;
+  padding: 0 2px;
+  border: 0;
+  border-block: var(--stroke-hairline) solid var(--color-line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-ink);
+  box-shadow: none;
+  font: 600 var(--type-control) / 1.3 var(--font-ui);
+  letter-spacing: 0;
+  text-align: left;
+  list-style: none;
+  cursor: pointer;
+}
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(.sheet .more-examples > summary)::-webkit-details-marker { display: none; }
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(.study-fold > .fold-head .fold-title) { margin-right: auto; font: inherit; letter-spacing: 0; }
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(.sheet .more-examples > summary) > .fold-name { margin-right: auto; }
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(.study-fold > .fold-head[aria-expanded='false']) .today-detail-caret { transform: rotate(-45deg); }
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(.study-fold) { margin-top: 14px; }
+/* two closed fold rows in a row share one hairline */
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(.sheet .more-examples:not([open])) { margin-bottom: 0; }
+:is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(.sheet .more-examples:not([open]) + .study-fold) { margin-top: -1px; }
+
+/* a word page's facts line (owed-2 repair 4) stands under the reading; with the depth design on it is one more pane of the
+   head's night window, between the reading and what you know of the word, in the reading's own tone */
+html[data-live-depth='1'] #sheet:has(> h2.headword):not(:has(.hero > .hero-glyph)) > p.entry-facts {
+  position: relative;
+  margin: 0;
+  padding: 2px 0 4px;
+  color: var(--dp-night-read);
+}
+html[data-live-depth='1'] #sheet:has(> h2.headword):not(:has(.hero > .hero-glyph)) > p.entry-facts::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -16px -20px -14px;
+  background: var(--dp-night-mid);
+  box-shadow: inset 3px 0 0 var(--red);
+  pointer-events: none;
+}
+html[data-live-depth='1'] #sheet:has(> h2.headword):not(:has(.hero > .hero-glyph)) > p.entry-facts :is(button.pool-tag.cat-chip, .entry-fact) {
+  color: var(--dp-night-read);
+  text-transform: none;
+}
+html[data-live-depth='1'] #sheet:has(> h2.headword):not(:has(.hero > .hero-glyph)) > p.entry-facts button.pool-tag.cat-chip:hover { color: var(--dp-star); }
+
 /* ---- states, in one place ---- */
 :is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(
   .take:not(.taken, .quiet, .focus-start, .kp-take), .btn-primary:not(.save-one),

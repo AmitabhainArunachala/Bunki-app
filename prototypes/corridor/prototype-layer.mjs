@@ -195,14 +195,45 @@ function fixedChrome(node) {
   for (let n = node; n && n !== document.body; n = n.parentElement) if (getComputedStyle(n).position === 'fixed') return true;
   return false;
 }
+/** What of the app this button would cover in `box`: the app's topmost element at a few points across the button's
+ * face, when it is a control or carries its own text there. Its box (the control's, or the text's element's), or null. */
+function appUnder(box) {
+  for (const fy of [0.3, 0.5, 0.7]) {
+    for (const fx of [0.25, 0.5, 0.75]) {
+      const x = box.left + box.width * fx, y = box.top + box.height * fy;
+      if (x < 0 || y < 0 || x >= innerWidth || y >= innerHeight) continue;
+      const top = document.elementsFromPoint(x, y).find((n) => !root.contains(n));
+      if (!top || top === document.body || top === document.documentElement) continue;
+      const control = top.closest('button, a[href], [role="button"], input, select, textarea, summary');
+      if (control && control !== document.body) return control.getBoundingClientRect();
+      const range = document.createRange();
+      for (const t of top.childNodes) {
+        if (t.nodeType !== Node.TEXT_NODE || !t.data.trim()) continue;
+        range.selectNodeContents(t);
+        const r = range.getBoundingClientRect();
+        if (r.width && r.right > box.left && r.left < box.left + box.width && r.bottom > box.top && r.top < box.top + box.height) return top.getBoundingClientRect();
+      }
+    }
+  }
+  return null;
+}
 /** above the report bug, wherever that stands now; one step further up while a floating control of the app is under the spot */
 function place() {
   const bug = document.querySelector('#bunki-reports-root .br-rail')?.getBoundingClientRect();
-  // where a screen keeps the report entry at its top (the writing room, the orbit bar) this button stands to its left
+  // where a screen keeps the report entry at its top (the writing room, the orbit bar, the study card) this button stands
+  // to its left; where that spot covers the app's own text or a control (the study card's count, 試 over "1/15"), it
+  // steps left past it, its left edge less a small gap, at most three times
   if (bug && bug.height && bug.top < innerHeight / 2) {
     rail.dataset.plAt = 'top';
+    const size = opener.getBoundingClientRect().width || 44;
+    let right = Math.max(4, innerWidth - bug.left + 4);
+    for (let step = 0; step < 3; step += 1) {
+      const hit = appUnder({ left: innerWidth - right - size, top: Math.max(0, bug.top), width: size, height: size });
+      if (!hit) break;
+      right = Math.min(innerWidth - size - 4, Math.max(right + 1, innerWidth - hit.left + 4));
+    }
     rail.style.setProperty('--pl-top', `${Math.round(Math.max(0, bug.top))}px`);
-    rail.style.setProperty('--pl-right', `${Math.round(Math.max(4, innerWidth - bug.left + 4))}px`);
+    rail.style.setProperty('--pl-right', `${Math.round(right)}px`);
     return;
   }
   delete rail.dataset.plAt;
