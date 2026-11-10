@@ -1031,6 +1031,8 @@ function trailLastPhrase(row) {
   if (kind === 'lesson') return g === 3 ? tx('レッスンで正解', 'answered right in a lesson') : tx('レッスンで不正解', 'answered wrong in a lesson');
   if (kind === 'reveal') return g === 1 ? tx('復習で「思い出した」', 'declared recall in review') : tx('復習で「まだ」', 'declared not-yet in review');
   if (kind === 'dojo') {
+    // detail 0 is the revocation an undo files, not a grade
+    if (g === 0) return tx('道場の稽古を取り消した', 'took back a dojo practice');
     const seal = { 1: '再', 2: '難', 3: '良', 4: '易' }[g];
     return seal ? tx(`道場の稽古 — ${seal}`, `practised in the dojo — ${['', 'again', 'hard', 'good', 'easy'][g]}`) : tx('道場の稽古', 'practised in the dojo');
   }

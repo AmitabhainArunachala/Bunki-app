@@ -376,9 +376,20 @@ function encounterTrail(key) {
   const rows = (S.obslog || []).filter((row) => TRAIL_KINDS.has(row[1]) && row[2] === key);
   if (!rows.length) return null;
   const last = rows[rows.length - 1];
+  // a drill undo is a bare [t,'dojo',key,0] row revoking the most recent standing dojo grade (study-host's rule, PR #77
+  // 3df6ed8f4): neither is an encounter or a practice, so an undo never makes the trail claim more than before
+  const struck = new Set();
+  const standing = [];
+  rows.forEach((row, ix) => {
+    if (row[1] !== 'dojo') return;
+    if (row[3] === 0) {
+      struck.add(ix);
+      if (standing.length) struck.add(standing.pop());
+    } else standing.push(ix);
+  });
   const counts = {};
-  for (const row of rows) counts[row[1]] = (counts[row[1]] || 0) + 1;
-  return { rows, first: rows[0][0], last, counts };
+  rows.forEach((row, ix) => { if (!struck.has(ix)) counts[row[1]] = (counts[row[1]] || 0) + 1; });
+  return { rows, first: rows[0][0], last, counts, met: Math.max(1, rows.length - struck.size) };
 }
 
 function renderEncounterTrail(sheet, node) {
@@ -388,7 +399,7 @@ function renderEncounterTrail(sheet, node) {
   const box = el('div', 'encounter-trail');
   box.append(withEn(el('p', 'eyebrow', '出会い'), 'your encounters', 'en-inline'));
   const day = (t) => new Date(t).toLocaleDateString();
-  const n = trail.rows.length;
+  const n = trail.met;
   box.append(
     el(
       'p',

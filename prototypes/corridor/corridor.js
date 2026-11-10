@@ -1,5 +1,5 @@
 import { createDeviceVoice, REASONS as DEVICE_VOICE_REASONS } from './device-voice.mjs';
-import { activeDictionaryQuery, appendJapaneseLookup, conjugations, dictionaryAnsweredForm, dictionaryDetailsFor, dictionaryGlossSummary, dictionaryLoneDoor, dictionaryQueryError, dictionaryQueryKey, dictionaryReadingSupportsForm, dictionaryRowsForForm, dictionarySearchContext, dictionaryShardNumber, displayPairs, ensureDictionaryRowsForForm, ensureSense, exampleFnv, exampleOrder, fetchExampleJson, findExamples, glossaryCrossRefPlan, hasEmbeddedDictionaryIndex, inlineTokenGloss, inlineWordGloss, inlineWordReading, japaneseLookupEntryRecord, japaneseLookupHelpId, japaneseLookupRecord, kanjiReadingsInWord, loadDictionaryJson, lookup, lookupBlockWords, lookupItemBlocks, lookupOccurrence, nameReaderToken, normalizeGloss, phoneticAnnotationCandidates, phoneticAnnotationIndices, phoneticAnnotationRanges, posLine, readerDoorGloss, readerDoorLead, readerGlossLine, readerGlossMissText, readerHelp, readerLayerParagraph, readerLayerReading, readerLookupAnswer, readerRenderedTokens, readerTokenAt, readerTokenAtIndex, readerTokenNode, readerWordNote, readingAsksIndex, readingExpected, readingForm, readingPlaceFailure, readingTargets, readingToken, readingTokenEntry, readyTokenReading, renderConjugation, renderDictionaryDetails, renderDictionaryHomographs, renderThesaurus, requestDictionaryDetails, senseChoice, senseFillInPlace, senseMoreElement, senseMoreLine, senseNeighbours, senseRefine, senseWithin, tapLadderHint, tokenReading, validDictionaryRow, yomiReadingType } from './modules/dictionary.mjs';
+import { activeDictionaryQuery, appendJapaneseLookup, joyoDialChanges, conjugations, dictionaryAnsweredForm, dictionaryDetailsFor, dictionaryGlossSummary, dictionaryLoneDoor, dictionaryQueryError, dictionaryQueryKey, dictionaryReadingSupportsForm, dictionaryRowsForForm, dictionarySearchContext, dictionaryShardNumber, displayPairs, ensureDictionaryRowsForForm, ensureSense, exampleFnv, exampleOrder, fetchExampleJson, findExamples, glossaryCrossRefPlan, hasEmbeddedDictionaryIndex, inlineTokenGloss, inlineWordGloss, inlineWordReading, japaneseLookupEntryRecord, japaneseLookupHelpId, japaneseLookupRecord, kanjiReadingsInWord, loadDictionaryJson, lookup, lookupBlockWords, lookupItemBlocks, lookupOccurrence, nameReaderToken, normalizeGloss, phoneticAnnotationCandidates, phoneticAnnotationIndices, phoneticAnnotationRanges, posLine, readerDoorGloss, readerDoorLead, readerGlossLine, readerGlossMissText, readerHelp, readerLayerParagraph, readerLayerReading, readerLookupAnswer, readerRenderedTokens, readerTokenAt, readerTokenAtIndex, readerTokenNode, readerWordNote, readingAsksIndex, readingExpected, readingForm, readingPlaceFailure, readingTargets, readingToken, readingTokenEntry, readyTokenReading, renderConjugation, renderDictionaryDetails, renderDictionaryHomographs, renderThesaurus, requestDictionaryDetails, senseChoice, senseFillInPlace, senseMoreElement, senseMoreLine, senseNeighbours, senseRefine, senseWithin, tapLadderHint, tokenReading, validDictionaryRow, yomiReadingType } from './modules/dictionary.mjs';
 import { blankSlip, drawSheetActionLine, entryCueReading, findSheetDoor, flySeal, foldEntryForms, holdRing, keepFloatingBeside, keptState, keptWordProjection, listToMarkdown, listeningField, markStripMore, miniKanjiWeb, note, noteSealListUse, noteSlipDepth, openSlip, openWordWebLadder, paintWordSave, placeSaveMenu, rememberSheet, renderWordCaptureNote, reopenSaveMenu, saveAiDeviceConfig, saveOne, saveReaderPosition, saveReportRelay, saveReportRelayLink, savedNodeRecord, savedRecordNoteDraft, sealHostedWord, sealListOrder, setSaveDrawerPush, sheetActionVisitHolds, sheetTakeLabel, slipAllowed, slipHeadword, slipScroller, standingSlip, takenContext, toggleTaken, travelSlip, unsaveEverywhere, wordCaptureBasis, wordCaptureHeldText, wordCaptureOpenLabel, wordCaptureState, wordDepth, wordPresentationKey, wordRow, wordSaveFacts } from './modules/word-entry.mjs';
 import { clearTouchReadingSeat, encounterIdentity, encounterPatch, fileIntakeFailure, filePageLabel, finishTouchReadingFade, holdReaderCapture, readerCaptureReasonText, readerTakeCurrent, readerTakeNode, reconcileSourceInboxEntries, rememberFileDraft, renderEncounterTrail, seatInlineGloss, seatTouchReading, setTouchReadingShown, sourceInboxEntries, sourceLadderAction, sourceProcessingScope, stopTouchReadingFade, syncReaderTakeSeal, touchReading } from './modules/capture.mjs';
 import { cardDepth, cardInk, deckCounts, deckWordsBegun, focusPool, focusProseWord, focusReturnMarkOnce, focusSentencePracticeTarget, gradeTag, guidedCardStatus, guidedDoorInJlptRoom, learnHead, learnerModel, learnerSourceLabel, learningContextRef, learningEnrollHeldText, learningItemNode, lessonChoices, lessonMissedLast, lessonPlan, lessonPreviousRuns, markCardMore, mockSubjectKey, practiceIdentity, presentReviewAnswer, renderFocus, renderSrsStats, reviewAnswerAvailable, reviewBack, reviewCardBack, reviewCounts, sharedStudyActive, sharedStudyFence, srsCardKind, srsDecks, srsForecast, srsLearnerPolicy, srsPrefStep, srsPrefValue, srsPresetState, srsWhen } from './modules/study-host.mjs';
@@ -13280,6 +13280,17 @@ function renderReader(main) {
         ['すべて仮名', 'all kana'],
       ]),
     );
+    // set to 常用まで, one quiet line says which kanji it sets in kana in this text, or that it changes nothing here
+    // (origin/claude/corridor-live-verify, dialNote); the text's own rule (joyoPairs) draws the list
+    if (S.dials.kanji === 1 && p.tokens) {
+      const changed = joyoDialChanges(p.tokens);
+      const line = el('p', 'dials-hint', changed.length
+        ? tx(`「常用まで」で仮名になる字（${changed.length}字）：${changed.join('・')}`,
+          `Jōyō only puts ${changed.length} kanji in kana here: ${changed.join(' ')}`)
+        : tx('この文章では、「常用まで」で変わる字はない。', 'Jōyō only changes nothing in this text.'));
+      line.dataset.dialNote = changed.join('');
+      dials.append(line);
+    }
     dials.append(
       dialRow('ふりがな', 'readings', 'furigana', [
         ['なし', 'off'],
@@ -13637,6 +13648,37 @@ window.__BUNKI_OPEN_ENTRY = {
  *   entry   false: no door; a function: the surface's own way into the entry; otherwise go(node)
  *   redo    the caller already read the press (the reader's doors): never treat this call as the second tap
  * Returns 'reading', the stage element, or null after entering the page or dismissing a held stage. */
+/** Drift's two judgments on its slip (codex/kairo-drift-a11y-20260809, dba62c507): まだ and 知っている, in the flick's
+ * order (left, right), for a keyboard or a screen reader. A press records the nomination, puts the slip away, then the sky
+ * grades the word through its own grade(), exactly as the matching flick. */
+function driftJudgeRow(kind, judge, anchor) {
+  const row = el('div', 'mini-judge');
+  row.setAttribute('role', 'group');
+  row.setAttribute('aria-label', kind === 'kanji' ? tx('この字を判断する', 'Mark this kanji') : tx('この語を判断する', 'Mark this word'));
+  for (const [dir, judgment, ja, en, said] of [[-1, 'unknown', 'まだ', 'Not yet', 'まだ知らない'], [1, 'known', '知っている', 'I know it', '']]) {
+    const button = el('button', 'mini-judge-btn', tx(ja, en));
+    button.type = 'button';
+    button.dataset.action = 'judgment.nominate';
+    button.dataset.judgment = judgment;
+    if (said && !bi()) button.setAttribute('aria-label', said);
+    button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const keyboard = event.detail === 0;
+      interaction({ kind: 'judgment.nominate', judgment }, keyboard ? 'keyboard' : 'pointer', `drift-slip-${kind}`);
+      removeMini();
+      judge(dir);
+      if (keyboard) focusDriftWordAfter(anchor);
+    });
+    row.append(button);
+  }
+  return row;
+}
+/** After a judgment from the keyboard the judged word leaves the sky: focus goes on to the next word the keyboard can reach. */
+function focusDriftWordAfter(anchor) {
+  const words = [...document.querySelectorAll('#drift-layer .word[tabindex="0"]')].filter((word) => word !== anchor);
+  const next = words.find((word) => anchor.compareDocumentPosition(word) & Node.DOCUMENT_POSITION_FOLLOWING) || words[0];
+  next?.focus({ preventScroll: true });
+}
 /** A kanji's first reading for the slip's band: its first on reading in kana, else its first kun stem. */
 window.__BUNKI_OPEN_SLIP = {
   /** Canonical hosted annotations; reading a label never opens or records a visit. */
@@ -13655,14 +13697,19 @@ window.__BUNKI_OPEN_SLIP = {
   /** The hosted sky shares the occurrence ladder. The sky supplies its in-place reading paint;
    * holds use redo for an idempotent stage. Returns 'reading' | 'opened' | 'dived' | false. */
   open(kind, key, { anchor = null, onClose = null, redo = false, look = null, reveal = null,
-    clearReveal = null, readingVisible = null } = {}) {
+    clearReveal = null, readingVisible = null, judge = null } = {}) {
     if (S.view !== 'drift' || !this.has(kind, key) || !anchor?.isConnected) return false;
     const particle = kind === 'particle' && (PARTICLE_BY_SURFACE[key] || PARTICLES.find(item => item.id === key));
     const node = { t: kind, id: particle ? particle.id : key,
       ...(kind === 'word' && look?.reading ? { reading: look.reading } : {}) };
     const shown = particle ? { label: particle.p, surface: particle.p, reading: particle.r, gloss: bi() ? particle.role : particle.roleJa } : look;
     const before = !!standingSlip();
-    const slip = openSlip(node, { anchor, from: 'drift', onClose, redo, look: shown, reveal, clearReveal, readingVisible });
+    // a word reached by the keyboard hands its stage the focus (as the lookup's do), so Save and the judgments are in reach
+    const focus = anchor.matches(':focus-visible');
+    const onStage = typeof judge === 'function'
+      ? (stage) => (stage.querySelector('.mini-actions') || stage.querySelector('.mini-head'))?.after(driftJudgeRow(kind, judge, anchor))
+      : null;
+    const slip = openSlip(node, { anchor, from: 'drift', onClose, redo, look: shown, reveal, clearReveal, readingVisible, focus, onStage });
     if (slip === 'reading') return 'reading';
     if (slip) {
       interaction({ kind: 'quickLook.open' }, 'pointer', `drift-slip-${kind}`);
@@ -22478,9 +22525,16 @@ function dispatchQueuedDictionarySearch() {
         }
         return { e: { ...item.result, dictionaryRow: row }, score: item.score, tie: item.tie };
       });
+      // the worker's near misses for a search that found nothing: shown only as guesses (searchNearMisses)
+      const near = (Array.isArray(result.nearMisses) ? result.nearMisses : []).slice(0, 5).map((item) => {
+        const row = dictionaryRowBySeq(item?.result?.seq);
+        if (!row) throw new Error('dictionary worker near miss is missing its compact row');
+        return { ...item.result, dictionaryRow: row };
+      });
       D.dictionarySearchCache.set(queued.key, {
         scored,
         compatibleCoreIds: result.compatibleCoreIds,
+        near,
       });
       while (D.dictionarySearchCache.size > 12) {
         D.dictionarySearchCache.delete(D.dictionarySearchCache.keys().next().value);
@@ -22770,14 +22824,28 @@ function searchResults(query) {
  * Otherwise the row keeps its own numbered door: another gloss, another exact reading
  * (even one that normalises equal), another spelling, or no scored core row at all. */
 
+/** The words a mistyped search probably meant (origin/agent/bunki-pillars-dict-srs, 82d04591d): the full dictionary's
+ * worker looks for them only when a search found nothing; at most five, none for a query of one or two characters. */
+function searchNearMisses(query) {
+  return D.dictionarySearchCache?.get(dictionaryQueryKey(query))?.near || [];
+}
+
 function renderSearchResults(main, query) {
   const results = searchResults(query);
+  const near = results.length ? [] : searchNearMisses(query);
   const box = el('div', 'entry-rows');
   box.id = 'search-results';
-  for (const e of results) {
+  // nothing found says so first; under it, the words the search probably meant, as ordinary rows
+  if (!results.length) {
+    box.append(el('div', 'sem-empty', near.length
+      ? tx('見つからない。もしかして：', 'Nothing found. Did you mean:')
+      : tx('見つからない。', 'Nothing found for that yet.')));
+  }
+  for (const e of results.length ? results : near) {
     const row = el('button', 'entry-row compound');
     row.type = 'button';
     row.dataset.result = `${e.t}:${e.id}${e.seq ? `:${e.seq}` : ''}`;
+    if (!results.length) row.dataset.near = '';
     if (e.t === 'kanji') {
       row.append(el('span', 'row-glyph', e.w));
       const stack = el('span', 'row-stack');
@@ -22802,9 +22870,6 @@ function renderSearchResults(main, query) {
       ),
     );
     box.append(row);
-  }
-  if (!results.length) {
-    box.append(el('div', 'sem-empty', tx('見つからない。', 'Nothing found for that yet.')));
   }
   main.append(box);
 
@@ -34429,11 +34494,30 @@ window.addEventListener('resize', () => {
  * the picker is armed only while the pointer is down on the seal. */
 let worldPickerEls = null;
 let worldPickerOpener = null;
+/** The stones are a modal dialog: Tab and Shift+Tab wrap inside them and never walk into the page underneath
+ * (PR #77, origin/claude/renkan-round-b-2026-08-18, 3df6ed8f4). */
+function worldPickerTab(e) {
+  if (e.key !== 'Tab' || !worldPickerEls) return;
+  const stones = [...worldPickerEls[1].querySelectorAll('button')];
+  if (!stones.length) return;
+  const first = stones[0];
+  const last = stones[stones.length - 1];
+  const here = document.activeElement;
+  const inside = worldPickerEls[1].contains(here);
+  if (e.shiftKey && (here === first || !inside)) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && (here === last || !inside)) {
+    e.preventDefault();
+    first.focus();
+  }
+}
 function closeWorldPicker() {
   if (!worldPickerEls) return;
   for (const n of worldPickerEls) n.remove();
   worldPickerEls = null;
   document.removeEventListener('keydown', worldPickerEsc, true);
+  document.removeEventListener('keydown', worldPickerTab, true);
   // hand focus back to the seal that opened the stones (keyboard walkers)
   if (worldPickerOpener && document.contains(worldPickerOpener)) worldPickerOpener.focus();
   worldPickerOpener = null;
@@ -34445,6 +34529,7 @@ function openWorldPicker(anchor) {
   const scrim = el('div', 'world-picker-scrim');
   const pop = el('div', 'world-picker');
   pop.setAttribute('role', 'dialog');
+  pop.setAttribute('aria-modal', 'true');
   pop.setAttribute('aria-label', tx('配色を選ぶ', 'Colour theme'));
   let activeStone = null;
   // the stones are seals; a plain line beneath names the world in words (the current one, or
@@ -34501,6 +34586,7 @@ function openWorldPicker(anchor) {
   pop.style.top = `${Math.round(Math.min(rect.bottom + 8, window.innerHeight - pop.offsetHeight - 8))}px`;
   pop.style.left = `${Math.round(Math.min(Math.max(8, rect.right - pw), window.innerWidth - pw - 8))}px`;
   document.addEventListener('keydown', worldPickerEsc, true);
+  document.addEventListener('keydown', worldPickerTab, true);
   worldPickerEls = [scrim, pop];
   (activeStone || pop.querySelector('.world-stone')).focus();
 }
@@ -34840,15 +34926,20 @@ function renderSearchPage(main) {
       return;
     }
     if (!q) return;
-    const hits = searchResults(q).slice(0, 24);
-    if (!hits.length) {
-      results.append(el('div', 'nav-search-empty', tx('見つからない。', 'Nothing found.')));
-      return;
+    const found = searchResults(q).slice(0, 24);
+    // nothing found says so; under it, the words the search probably meant (searchNearMisses), as ordinary rows
+    const hits = found.length ? found : searchNearMisses(q);
+    if (!found.length) {
+      results.append(el('div', 'nav-search-empty', hits.length
+        ? tx('見つからない。もしかして：', 'Nothing found. Did you mean:')
+        : tx('見つからない。', 'Nothing found.')));
+      if (!hits.length) return;
     }
     hits.forEach((e, ix) => {
       const row = el('button', 'nav-search-row');
       row.type = 'button';
       row.dataset.ix = String(ix);
+      if (!found.length) row.dataset.near = '';
       row.append(el('span', 'nsr-glyph', e.w));
       const stack = el('span', 'nsr-stack');
       if (e.r) stack.append(el('span', 'nsr-read', e.r));

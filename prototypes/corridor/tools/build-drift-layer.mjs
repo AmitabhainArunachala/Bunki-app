@@ -1005,7 +1005,8 @@ function hostedSlip(n,{redo=false,bloom=false}={}){
     return reading.getClientRects().length>0&&s.display!=="none"&&s.visibility!=="hidden"&&Number(s.opacity)>0;
   };
   const look={surface:key,label:key,reading:n.r||"",gloss:n.g||""};
-  return h.open(kind,key,{anchor:n.el,redo,look,reveal,clearReveal,readingVisible,
+  // judge: the slip's 知っている · まだ grade this node through grade(), the flick's own path
+  return h.open(kind,key,{anchor:n.el,redo,look,reveal,clearReveal,readingVisible,judge:dir=>grade(n,dir),
     onClose:reason=>{if(reason!=="dive")clearReveal();}});
 }
 function slipFor(n){
