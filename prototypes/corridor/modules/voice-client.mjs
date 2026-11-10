@@ -117,6 +117,8 @@ export function createDeviceTokenStore(env = globalThis) {
     async read() {
       if (broken) return memory.read();
       try {
+        // a device that was never paired keeps nothing, not even an empty database (where the browser can tell)
+        if (typeof idb.databases === 'function' && !(await idb.databases()).some((db) => db.name === NAME)) return { server: null, token: null, scope: null };
         const [row, server] = await run('readonly', (store) => [store.get(KEY), store.get(ADDRESS)]);
         const address = typeof server === 'string' ? server : null;
         if (!row) return { server: address, token: null, scope: null };
