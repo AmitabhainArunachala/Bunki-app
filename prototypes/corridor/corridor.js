@@ -3708,21 +3708,29 @@ let dictionaryComposing = false;
 let navSearchRepaint = null;
 const dictionaryWorkerRequests = new Map();
 const isDictionaryInput = (target) => target?.matches?.('#search, #nav-search-input, #nav-search-door');
+// The finished word asks the full dictionary itself. Its last input arrived while composing and was already painted,
+// so a repaint stops at the shelf's render-token check and would never reach the worker. Composition end and focus
+// leaving a composing field (a tap elsewhere on the phone) both come here; a search queued before composing restarts.
+function finishDictionaryComposition() {
+  dictionaryComposing = false;
+  const query = activeDictionaryQuery();
+  if (query) searchResults(query);
+  if (dictionarySearchQueued && !dictionarySearchInFlight && dictionarySearchTimer == null) {
+    dictionarySearchTimer = setTimeout(
+      dispatchQueuedDictionarySearch,
+      Math.max(0, dictionarySearchQueued.eligibleAt - performance.now()),
+    );
+  }
+  queueMicrotask(refreshDictionaryBodies);
+}
 addEventListener('compositionstart', (event) => {
   if (isDictionaryInput(event.target)) dictionaryComposing = true;
 }, { capture: true });
 addEventListener('compositionend', (event) => {
-  if (!isDictionaryInput(event.target)) return;
-  dictionaryComposing = false;
-  queueMicrotask(refreshDictionaryBodies);
-  if (dictionarySearchQueued) {
-    dictionarySearchQueued.eligibleAt = performance.now() + DICTIONARY_SEARCH_SETTLE_MS;
-    clearDictionarySearchTimer();
-    dictionarySearchTimer = setTimeout(dispatchQueuedDictionarySearch, DICTIONARY_SEARCH_SETTLE_MS);
-  }
+  if (isDictionaryInput(event.target)) finishDictionaryComposition();
 }, { capture: true });
 addEventListener('focusout', (event) => {
-  if (isDictionaryInput(event.target)) dictionaryComposing = false;
+  if (isDictionaryInput(event.target) && dictionaryComposing) finishDictionaryComposition();
 }, { capture: true });
 
 
