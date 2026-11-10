@@ -41,7 +41,7 @@ export class VoiceError extends Error {
 }
 
 /** What John gives: the 12-character code and his learner id, typed, or one pasted line that fills everything.
- * The line the speech team's "Pair Bunki voice" prints is
+ * The line the pairing step of the speech team's "Bunki Voice" launcher prints is
  *   Bunki voice code: XXXXXXXXXXXX (10 minutes) · learner: <id> · server: https://<worker>.workers.dev
  * and "<learner> <code>" is taken too. The code is upper-cased; the learner id is taken as written. `server` is in
  * the answer only when the text carried one. */

@@ -480,14 +480,14 @@ export function installVoiceLayer(host) {
   const DAY_KEY = 'kairo-voice-day'; // the total as this device first saw it today: two numbers and a time, no secret
   const PAIR_LINES = {
     'invalid-pairing': ['コードか学習者IDの形が違います。確かめてもう一度。', 'That does not look like a pairing code and learner id. Check them and try again.'],
-    'authentication-required': ['コードが違うか、使用済みか、期限切れです。「Pair Bunki voice」をもう一度実行してください。', 'That code is wrong, already used or expired. Run “Pair Bunki voice” again for a new one.'],
-    'installation-exists': ['このコードの端末はすでに接続済みです。「Pair Bunki voice」をもう一度実行してください。', 'That code belongs to an install that is already paired. Run “Pair Bunki voice” again for a new one.'],
+    'authentication-required': ['コードが違うか、使用済みか、期限切れです。デスクトップの「Bunki Voice」をもう一度実行してください。', 'That code is wrong, already used or expired. Run “Bunki Voice” on the Desktop again for a new one.'],
+    'installation-exists': ['このコードの端末はすでに接続済みです。デスクトップの「Bunki Voice」をもう一度実行してください。', 'That code belongs to an install that is already paired. Run “Bunki Voice” on the Desktop again for a new one.'],
     'authentication-rate-limit': ['試行が多すぎます。1分待ってください。', 'Too many tries. Wait one minute.'],
     'pairing-unavailable': ['いま音声サーバーはつなげません。数分後にもう一度。', 'The voice server can’t pair right now. Try again in a few minutes.'],
     'network-failed': ['音声サーバーに届きませんでした。接続を確かめてください。', 'Could not reach the voice server. Check the connection.'],
     'voice-timeout': ['音声サーバーの返事が遅すぎました。もう一度。', 'The voice server took too long. Try again.'],
-    'server-missing': ['この端末はまだ音声サーバーの住所を知りません。「Pair Bunki voice」が表示した1行をそのまま貼ってください。',
-      'This device does not know the voice server’s address yet. Paste the whole line that “Pair Bunki voice” printed.'],
+    'server-missing': ['この端末はまだ音声サーバーの住所を知りません。「Bunki voice code:」で始まる1行をそのまま貼ってください。',
+      'This device does not know the voice server’s address yet. Paste the whole line that starts “Bunki voice code:”.'],
   };
   const pairLine = (code) => tx(...(PAIR_LINES[code] || ['接続できませんでした。もう一度。', 'Pairing did not work. Try again.']));
   function statusLines(status) {
@@ -552,8 +552,9 @@ export function installVoiceLayer(host) {
     const code = field('voice-pair-code', '接続コード（12文字）', 'Pairing code (12 characters)', { maxLength: 24 });
     const submit = el('button', 'chip', tx('つなぐ', 'Pair')); submit.type = 'submit'; submit.id = 'voice-pair-submit';
     const note = el('p', 'teacher-note'); note.id = 'voice-pair-note'; note.setAttribute('role', 'status');
-    const how = el('p', 'teacher-note', tx('デスクトップの「Pair Bunki voice」を実行し、表示された1行をそのまま最初の欄に貼って「つなぐ」。コードは10分で切れます。',
-      'Run “Pair Bunki voice” on the Desktop, paste the whole line it prints into the first box, and press Pair. The code lasts 10 minutes.'));
+    // the speech team's launcher on John's Desktop is "Bunki Voice"; its pairing step prints the one line (release, 22:25)
+    const how = el('p', 'teacher-note', tx('デスクトップの「Bunki Voice」を実行すると「Bunki voice code:」で始まる1行が出ます。その1行をそのまま最初の欄に貼って「つなぐ」。コードは10分で切れます。',
+      'Run “Bunki Voice” on the Desktop. It prints one line that starts “Bunki voice code:”. Paste that whole line into the first box and press Pair. The code lasts 10 minutes.'));
     how.id = 'voice-pair-how';
     form.append(how, learner.wrap, code.wrap, submit, note);
     const forget = el('button', 'btn-tertiary', tx('この端末の接続を消す', 'Forget the pairing on this device')); forget.type = 'button'; forget.id = 'voice-unpair';
