@@ -13,8 +13,9 @@
  *   node prototypes/corridor/tools/ear-coverage-walk.mjs --base http://127.0.0.1:19481/ [--device wide|phone]
  *        [--ui ja] [--plant] [--only door,search] [--shots DIR] [--out results.json]
  *
- * --plant puts two Japanese nodes outside any unit on every screen (one no finger reaches, one in a field being typed
- * in, which the ear never reads): the walk must then fail. Exit 0 only when every node has a unit. */
+ * --plant puts two Japanese nodes on every screen: one in a field being typed in, which the ear never reads (outside
+ * any unit: the walk must then fail, naming it), and one on a layer that lets the finger pass (a tap there must still
+ * read it: it must pass). Exit 0 only when every node has a unit. */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join, resolve } from 'node:path';
@@ -72,7 +73,8 @@ async function scan({ exclusions, plant, earPath }) {
     b.contentEditable = 'true';
     b.style.cssText = 'position:fixed;left:37%;top:52%;z-index:2147483646;font-size:22px;background:#fff;color:#000;padding:4px';
     b.textContent = '入力中の文は読まない。';
-    document.body.append(a, b);
+    // on a screen with a modal open, the plants stand in the modal (everything else is under its layer)
+    (document.querySelector('dialog:modal') || document.body).append(a, b);
   }
   const excluded = exclusions.map((entry) => ({ ...entry, found: document.querySelectorAll(entry.selector).length }));
   const skip = exclusions.map((entry) => entry.selector).join(', ');
@@ -114,11 +116,9 @@ async function scan({ exclusions, plant, earPath }) {
         const y = Math.min(innerHeight - 2, Math.max(1, box.top + box.height / 2));
         const hit = document.elementFromPoint(x, y);
         const reachable = hit && (hit === parent || parent.contains(hit) || hit.contains(parent));
-        if (!reachable) {
-          if (document.elementsFromPoint(x, y).includes(parent)) { verdict ||= { covered: true, by: hit?.tagName?.toLowerCase() + (hit?.id ? `#${hit.id}` : '') }; continue; }
-          verdict ||= { problem: `no finger reaches it (the point lands on ${hit?.tagName?.toLowerCase() || 'nothing'}${hit?.id ? `#${hit.id}` : ''})` };
-          continue;
-        }
+        // under another layer that takes the finger: not what he sees there
+        if (!reachable && document.elementsFromPoint(x, y).includes(parent)) { verdict ||= { covered: true, by: hit?.tagName?.toLowerCase() + (hit?.id ? `#${hit.id}` : '') }; continue; }
+        // otherwise (the text itself lets the finger pass, or the finger lands on it) the ear must answer for this text
         if (!ear) { verdict = { problem: `the ear is not in this build (${loadError})` }; break; }
         let unit = null;
         try { unit = ear.unitAt(document, x, y); } catch (error) { verdict = { problem: `unitAt threw ${error.message}` }; break; }

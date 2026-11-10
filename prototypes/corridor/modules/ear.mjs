@@ -437,17 +437,48 @@ function blockOf(node, display) {
 }
 
 /** The unit under a point of the page: what a tap or a resting pointer there would speak. */
-export function unitAt(doc, x, y, options = {}) {
+export function unitAt(doc, x, y, { through = true, ...options } = {}) {
   const view = doc.defaultView;
   const hit = doc.elementFromPoint(x, y);
   if (!hit) return null;
   let node = hit, offset = null;
+  const caret = caretAt(doc, x, y);
+  if (caret.node?.nodeType === 3 && inside(hit, caret.node) && caretTouches(doc, caret.node, caret.offset, x, y)) { node = caret.node; offset = caret.offset; }
+  // Japanese the eye sees on a layer that lets touches pass (the first-open line, the sky's first cue): a tap there
+  // lands on what is under it, but what he reads there is that line
+  if (through) {
+    const over = passThroughText(doc, x, y, hit);
+    if (over) { node = over.node; offset = over.offset; }
+  }
+  return findUnit(node, { offset, display: (el) => view.getComputedStyle(el).display, ...options });
+}
+function caretAt(doc, x, y) {
   const caret = typeof doc.caretPositionFromPoint === 'function' ? doc.caretPositionFromPoint(x, y)
     : typeof doc.caretRangeFromPoint === 'function' ? doc.caretRangeFromPoint(x, y) : null;
-  const caretNode = caret?.offsetNode ?? caret?.startContainer ?? null;
-  const caretOffset = caret?.offset ?? caret?.startOffset ?? null;
-  if (caretNode?.nodeType === 3 && inside(hit, caretNode) && caretTouches(doc, caretNode, caretOffset, x, y)) { node = caretNode; offset = caretOffset; }
-  return findUnit(node, { offset, display: (el) => view.getComputedStyle(el).display, ...options });
+  return { node: caret?.offsetNode ?? caret?.startContainer ?? null, offset: caret?.offset ?? caret?.startOffset ?? null };
+}
+/** Text drawn above `hit` on a layer that takes no pointer (pointer-events: none). For one look, every element takes
+ * the pointer; the layers above the one a tap reaches are walked from the top, and the first whose own Japanese text
+ * stands under the point is the text read. Asked once per tap, never per pointer move. */
+function passThroughText(doc, x, y, hit) {
+  const style = doc.createElement('style');
+  style.textContent = '*, *::before, *::after { pointer-events: auto !important; }';
+  let stack = [], caret = { node: null, offset: null };
+  (doc.head || doc.documentElement).append(style);
+  try { stack = doc.elementsFromPoint(x, y); caret = caretAt(doc, x, y); } catch { stack = []; } finally { style.remove(); }
+  for (const el of stack) {
+    if (el === hit || el.contains(hit) || hit.contains(el)) return null;
+    if (el.closest?.('[data-ear-own]')) continue;
+    if (caret.node?.nodeType === 3 && caret.node.parentNode === el && hasJapanese(caret.node.nodeValue) && caretTouches(doc, caret.node, caret.offset, x, y))
+      return { node: caret.node, offset: caret.offset };
+    for (const child of el.childNodes) {
+      if (child.nodeType !== 3 || !hasJapanese(child.nodeValue)) continue;
+      const range = doc.createRange();
+      range.selectNodeContents(child);
+      for (const box of range.getClientRects()) if (x >= box.left && x <= box.right && y >= box.top && y <= box.bottom) return { node: child, offset: 0 };
+    }
+  }
+  return null;
 }
 /** A caret is placed at the nearest character even beside the text; it counts when its character's box is under the
  * point (or near it, for a gap between letters). */
@@ -591,7 +622,7 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}) }) {
     try { given = context() || {}; } catch { /* no context */ }
     return given;
   };
-  const find = (x, y) => { try { return unitAt(doc, x, y, { context: ctx() }); } catch { return null; } };
+  const find = (x, y, through = true) => { try { return unitAt(doc, x, y, { through, context: ctx() }); } catch { return null; } };
   let speakingUnit = null;
   let hoverUnit = null;
   const machine = createEarMachine({
@@ -696,7 +727,7 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}) }) {
     if (frame) return;
     frame = view.requestAnimationFrame(() => {
       frame = 0;
-      const unit = last ? find(last.x, last.y) : null;
+      const unit = last ? find(last.x, last.y, false) : null;
       hoverUnit = unit;
       machine.hover({ unit, pointer: 'mouse' });
       paint();
