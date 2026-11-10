@@ -49,16 +49,46 @@ export function voiceDecision({ hasApprovedClip = false, enabled = true, support
 
 export function createDeviceVoice(env = globalThis) {
   // Keep the active utterance alive until completion, and detach stale callbacks before cancellation.
-  let active = null;
+  let active = null, stopped = null;
   function cancel() {
     if (active) active.onstart = active.onend = active.onerror = null;
     active = null;
+    const tell = stopped;
+    stopped = null;
     try { environment(env).synth?.cancel(); } catch { /* unavailable device */ }
+    tell?.();
   }
   function speak(text, { onStart, onEnd, onError } = {}) {
     cancel();
     // UNBOUND legacy speech stays disabled: never infer a language or start a device utterance.
     return { spoken: false, source: 'none', reason: REASONS.DISABLED };
   }
-  return { support: () => deviceVoiceSupport(env), speak, cancel };
+  /** The voice seam's last source (modules/voice-seam.mjs): Japanese text the seam could not get from a recorded clip or
+   * the voice server (unpaired, offline, out of budget, the server refusing). A local Japanese voice only; `onStop`
+   * tells the caller a cancel ended it, so a queue never waits on an utterance that will not finish. */
+  function fallback(text, { rate = 1, onStart, onEnd, onError, onStop } = {}) {
+    cancel();
+    const decision = voiceDecision({ support: deviceVoiceSupport(env), text });
+    if (decision.source !== 'device') return { spoken: false, ...decision };
+    try {
+      const { synth, Utterance } = environment(env);
+      const utterance = new Utterance(decision.text);
+      utterance.lang = 'ja-JP';
+      // a browser that will not take this voice object still speaks Japanese by the language alone
+      try { utterance.voice = decision.voice.ref; } catch { /* the language chooses */ }
+      utterance.rate = rate;
+      active = utterance;
+      stopped = onStop || null;
+      const settle = (tell, ...args) => { if (active !== utterance) return; active = null; stopped = null; tell?.(...args); };
+      utterance.onstart = () => { if (active === utterance) onStart?.(); };
+      utterance.onend = () => settle(onEnd);
+      utterance.onerror = () => settle(onError, REASONS.FAILED);
+      synth.speak(utterance);
+      return { spoken: true, ...decision };
+    } catch {
+      cancel();
+      return { spoken: false, source: 'none', reason: REASONS.FAILED };
+    }
+  }
+  return { support: () => deviceVoiceSupport(env), speak, fallback, cancel };
 }

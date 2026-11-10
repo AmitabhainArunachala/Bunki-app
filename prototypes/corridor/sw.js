@@ -215,6 +215,17 @@ const BOOT_DATA = [
   'modules/record-core.mjs',
   // corridor.js imports device-voice.mjs at boot; first offline launch needs it.
   'device-voice.mjs',
+  // The voice layer is loaded beside the app at boot (corridor.js). Offline it is what lets the device voice speak, so
+  // it and everything it imports travel with the install.
+  'modules/voice-layer.mjs',
+  'modules/voice-seam.mjs',
+  'modules/voice-client.mjs',
+  'modules/nihongo-speech/audio/speech-text.mjs',
+  'modules/nihongo-speech/audio/speech-queue.mjs',
+  'modules/nihongo-speech/audio/speech-player.mjs',
+  'modules/nihongo-speech/audio/speech-input.mjs',
+  'modules/nihongo-speech/audio/speak-keys.mjs',
+  'modules/nihongo-speech/schema/event.mjs',
 ];
 // The guided session (S.view 'guided') is imported only when its door is pressed, so an install
 // that stopped at the boot core left the room unable to open offline unless it had been opened

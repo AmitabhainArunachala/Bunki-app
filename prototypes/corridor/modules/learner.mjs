@@ -1,5 +1,5 @@
 /** G3 learner seam — declarations moved verbatim from ../corridor.js (pure move, no body edits). */
-import { $, AI_EVIDENCE_ROLES, D, DRAFT_KEY, GRAMMAR, ME_DECKS, ME_FIELDS, ME_MONTHS_EN, ME_N1_SITTING, PLACES_TABS, PRIMARY_TABS, REGISTER_LINE_DOORS, REGISTER_ROOM_DOORS, ROOM_IDS, ROOM_NAMES, S, SVG_NS, THEME_STORE, THEME_UI, WORD_BRUSH, WORD_BRUSH_KEY, WORD_VOICE, WORD_VOICE_KEY, bi, biLabel, contrastOf, el, fieldsDeckHome, finiteNumber, flowText, foundationDoor, logicalArchiveRows, meBackPart, meDeckIndex, meNum, meSealsPart, nonEmptyString, openPersonalCollection, optional, owns, passage, paintKeptCount, placesLayout, plainRecord, render, roomTransition, safeJsonValue, savedAnswerFor, setLayout, setWordPref, srsKey, tx, validStoreEnvelope, wordBrush, wordVoice } from '../corridor.js';
+import { $, voiceSettingsBlock, AI_EVIDENCE_ROLES, D, DRAFT_KEY, GRAMMAR, ME_DECKS, ME_FIELDS, ME_MONTHS_EN, ME_N1_SITTING, PLACES_TABS, PRIMARY_TABS, REGISTER_LINE_DOORS, REGISTER_ROOM_DOORS, ROOM_IDS, ROOM_NAMES, S, SVG_NS, THEME_STORE, THEME_UI, WORD_BRUSH, WORD_BRUSH_KEY, WORD_VOICE, WORD_VOICE_KEY, bi, biLabel, contrastOf, el, fieldsDeckHome, finiteNumber, flowText, foundationDoor, logicalArchiveRows, meBackPart, meDeckIndex, meNum, meSealsPart, nonEmptyString, openPersonalCollection, optional, owns, passage, paintKeptCount, placesLayout, plainRecord, render, roomTransition, safeJsonValue, savedAnswerFor, setLayout, setWordPref, srsKey, tx, validStoreEnvelope, wordBrush, wordVoice } from '../corridor.js';
 import { dayKey, helpByMonth } from './drift.mjs';
 import { articleReadChars } from './library.mjs';
 
@@ -690,11 +690,15 @@ function renderWritingChoice() {
     row('settings-brush', '筆 — 語が自分で書かれる', '筆 — a word writes itself',
       [['first', '初めての語', 'First meeting'], ['always', 'いつも', 'Always'], ['never', '書かない', 'Never']],
       wordBrush(), (value) => setWordPref(WORD_BRUSH_KEY, 'wordBrush', WORD_BRUSH, value)),
-    row('settings-voice', '声 — 収録音声を優先、なければ端末の声', '声 — recorded audio first, device voice for gaps',
+    // off by default: said by themselves, a word and an answer are paid for without a tap (corridor.js, WORD_VOICE)
+    row('settings-voice', '声 — 新しい語と答えを自動で読む（音声の予算を使います）', '声 — say new words and answers by themselves (uses the voice budget)',
       [['on', 'オン', 'On'], ['off', 'オフ', 'Off']],
       wordVoice(), (value) => setWordPref(WORD_VOICE_KEY, 'wordVoice', WORD_VOICE, value)),
     el('p', 'settings-layout-note', tx('書く速さは、書の間のスライダー一つで決まります。',
       'The writing speed is set in one place: the writing room’s slider.')));
+  // the voice server: paired or not, where the last sentence came from, the budget, and the one-time pairing
+  const voiceServer = voiceSettingsBlock();
+  if (voiceServer) section.append(voiceServer);
   return section;
 }
 
