@@ -22,6 +22,10 @@ const HERE = new URL('../prototypes/corridor/tools/', import.meta.url);
 const TEST_FILE = fileURLToPath(new URL('test-word-saved-answer.mjs', HERE));
 const LEARNING_RECORD_FILE = fileURLToPath(new URL('verify-learning-record.mjs', HERE));
 
+// The controls run 38 children one after another: 186 s on an M5, and on a hosted runner 368 s
+// (next / core run 42767964278), then 586, 593 and 601 s (runs 42770473278, 42773527715 and
+// 42776971188). The last of those crossed the 600 s this test had and failed a run in which every
+// other test was green. The work is unchanged; the budget is now 900 s.
 test('the actual saved-answer controls run and every declared child is killed', async () => {
   const authored = readAuthoredCorridor(
     fileURLToPath(new URL('../prototypes/corridor/', import.meta.url)),
@@ -132,4 +136,4 @@ test('the actual saved-answer controls run and every declared child is killed', 
   } finally {
     if (!owner) rmSync(evidence, { recursive: true, force: true });
   }
-}, 600_000);
+}, 900_000);
