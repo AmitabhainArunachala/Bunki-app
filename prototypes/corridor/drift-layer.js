@@ -89,7 +89,28 @@ if(navigator.serviceWorker){
   navigator.serviceWorker.addEventListener("controllerchange",()=>{canvasLabelsRetryAt.clear();});
   navigator.serviceWorker.ready.then(()=>{canvasLabelsRetryAt.clear();}).catch(()=>{});
 }
-const vw=()=>innerWidth, vh=()=>innerHeight, mind=()=>Math.min(vw(),vh());
+// ---- the glass ----
+// Everything here stands in ONE box. The words are DOM children of #sky, and
+// the stylesheet stretches the canvases over that same box (position:fixed;
+// inset:0). So the glass is measured from the box itself — the PAGE — and
+// never from window.innerWidth/innerHeight, which WebKit shrinks to the
+// VISIBLE area when a page is magnified (bugs.webkit.org 174362): a 1728px
+// window pinched to 1.2x says 1440. Canvases counted from that number were
+// stretched 1.2x under words that had not moved, so every line the canvas
+// drew to a word landed a fifth of the way further from the top-left corner.
+// A host may keep the whole layer display:none while another view is open;
+// its box is then empty and the page's own layout viewport stands in for it.
+// Read once per resize (sizeCanvases) and kept: the frame loop asks for
+// these numbers hundreds of times a frame and must not ask the layout.
+let glassW=1, glassH=1;
+function measureGlass(){
+  const box=document.getElementById("sky"), page=document.documentElement;
+  let w=box?box.clientWidth:0, h=box?box.clientHeight:0;
+  if(!(w>0&&h>0)){ w=page.clientWidth; h=page.clientHeight; }
+  glassW=Math.max(1,w); glassH=Math.max(1,h);
+}
+measureGlass();
+const vw=()=>glassW, vh=()=>glassH, mind=()=>Math.min(vw(),vh());
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
 // 分流の岸 — when a host app fuses its own chrome over this water, it names
@@ -312,6 +333,8 @@ const paper=document.createElement("canvas"), pctx=paper.getContext("2d");
 let fdpr=1;
 let canvasVW=0,canvasVH=0,resizeFrame=0;
 function sizeCanvases(){
+  // the one place the glass is read again: the words' box, as it stands now
+  measureGlass();
   const nextW=vw(),nextH=vh();
   // Safari's address bar and VisualViewport can change the glass without a
   // gesture. Keep the world point under the old glass fixed instead of letting
@@ -325,11 +348,93 @@ function sizeCanvases(){
   canvasVW=nextW; canvasVH=nextH;
   ink.width=Math.max(1,Math.round(vw()*0.5)); ink.height=Math.max(1,Math.round(vh()*0.5));
   stainCv.width=ink.width; stainCv.height=ink.height;
-  fdpr=1; // fx carries soft motes/lines only — 1x pixels, upscaled by the compositor;
-  // 1.5x tripled the per-frame raster upload for no visible gain in soft content
+  fdpr=1; // fx carries soft content only (motes, the web, hub suns, ripples) — 1x
+  // pixels, upscaled by the compositor; 1.5x tripled the per-frame raster upload
+  // for no visible gain in soft content. The one thing that must be sharp, the
+  // family's threads, is not ink on this canvas any more (see the threads below).
   fx.width=Math.round(vw()*fdpr); fx.height=Math.round(vh()*fdpr);
   renderPaper();
 }
+
+// ---- the family's threads ----
+// The lines that tie a tapped word to its family are not canvas ink. They are
+// SVG lines in an overlay that is a child of #sky and is laid out exactly as a
+// word is (absolute, left:0, top:0), so an end at (x,y) here and a word whose
+// transform is translate(x,y) are ONE point by construction — in any browser,
+// at any magnification, whatever the canvases behind them are doing — and
+// every end is handed the very numbers that place its word this frame.
+// Vector lines are also drawn at the screen's own scale: sharp at 2x while #fx
+// stays the 1x canvas it is. The overlay lies beneath every word (z-index:-1
+// in #sky's own stacking context, which is above both canvases), where the
+// ink was. Stroke, width and opacity are presentation attributes, so a
+// stylesheet rule on .threads line or .threads rect outranks them.
+const SVGNS="http://www.w3.org/2000/svg";
+const threads=document.createElementNS(SVGNS,"svg");
+threads.setAttribute("class","threads");
+threads.setAttribute("aria-hidden","true");
+threads.style.cssText="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:-1";
+const threadGroup=(name,tag)=>{
+  const g=document.createElementNS(SVGNS,"g");
+  g.setAttribute("class","threads-"+name);
+  g.setAttribute("stroke-linecap","round");
+  threads.appendChild(g);
+  return {g,tag,els:[],n:0};
+};
+// web: lines stroked as ONE body, as one canvas stroke was — where they cross
+// at the hub they do not darken · arms: lines stroked each by itself · ends:
+// the small squares at the far ends, over the lines
+const threadWebs=threadGroup("web","line"), threadArms=threadGroup("arms","line"),
+  threadEnds=threadGroup("ends","rect");
+threadArms.g.setAttribute("stroke-width","1.5");
+sky.insertBefore(threads,sky.firstChild);
+// an attribute is written only when its value changes, as a word's transform is
+function threadSet(el,name,value){
+  const last=el._th||(el._th={});
+  if(last[name]!==value){last[name]=value;el.setAttribute(name,value);}
+}
+function threadNext(set){
+  let el=set.els[set.n];
+  if(!el){el=document.createElementNS(SVGNS,set.tag);set.g.appendChild(el);set.els[set.n]=el;}
+  set.n++;
+  threadSet(el,"display","inline");
+  return el;
+}
+function threadSeg(el,x1,y1,x2,y2){
+  threadSet(el,"x1",x1.toFixed(2)); threadSet(el,"y1",y1.toFixed(2));
+  threadSet(el,"x2",x2.toFixed(2)); threadSet(el,"y2",y2.toFixed(2));
+}
+// the ink of the one-body stroke: its colour, how present it is, how wide
+function threadWebInk(color,alpha,width){
+  threadSet(threadWebs.g,"stroke",color);
+  threadSet(threadWebs.g,"opacity",String(alpha));
+  threadSet(threadWebs.g,"stroke-width",String(width));
+}
+function threadWeb(x1,y1,x2,y2){ threadSeg(threadNext(threadWebs),x1,y1,x2,y2); }
+function threadArm(x1,y1,x2,y2,color,alpha){
+  const el=threadNext(threadArms);
+  threadSeg(el,x1,y1,x2,y2);
+  threadSet(el,"stroke",color); threadSet(el,"stroke-opacity",String(alpha));
+}
+// a square of half-side r, centred on the end it marks
+function threadEnd(x,y,r,color,alpha){
+  const el=threadNext(threadEnds);
+  threadSet(el,"x",(x-r).toFixed(2)); threadSet(el,"y",(y-r).toFixed(2));
+  threadSet(el,"width",String(r*2)); threadSet(el,"height",String(r*2));
+  threadSet(el,"fill",color); threadSet(el,"fill-opacity",String(alpha));
+}
+// once a frame, after the family was drawn or was not: whatever this frame did
+// not draw is put away, so a family that is released leaves no line behind
+function threadsDone(){
+  for(const set of [threadWebs,threadArms,threadEnds]){
+    for(let i=set.n;i<set.els.length;i++) threadSet(set.els[i],"display","none");
+    set.n=0;
+  }
+}
+// where a family member stands this frame: the numbers its word's transform
+// was given (frame() writes translate(n.x+n.dragX, n.y+n.dragY)); a member
+// with no word left stands on its anchor, where its name is drawn
+const seatX=wr=>wr.node&&!wr.node.gone?wr.node.x+wr.node.dragX:wr.sx;
+const seatY=wr=>wr.node&&!wr.node.gone?wr.node.y+wr.node.dragY:wr.sy;
 
 // ---- layered parchment, pre-rendered once per theme ----
 function seeded(seed){
@@ -2755,53 +2860,39 @@ function drawWorld(){
       const ax=cam.x+dx3*cs3+dy3*sn3, ay=cam.y-dx3*sn3+dy3*cs3;
       layoutHeldRing(ax,ay);
     }
+    // The threads and their ends are SVG in the words' own box (see "the
+    // family's threads"): each runs from the numbers that place one word to
+    // the numbers that place another. The canvas keeps only the name of a
+    // member that has no word left to carry it.
     if(LOCK){
       const gold=th.dark?"#E6C86E":"#A8842C";
       const tyCol=t2=>t2==="syn"?th.pig1:t2==="fam"?th.pig2:
         t2==="col"?th.accent:t2?gold:th.pig2;
-      fctx.strokeStyle=rgba(th.pig1,0.55); fctx.lineWidth=1.7;
-      fctx.beginPath();
-      for(const it of LOCK.items) if(it.t==="g"&&!it.g.gone){
-        fctx.moveTo(fx2,fy2); fctx.lineTo(it.g.x,it.g.y);
-      }
-      fctx.stroke();
-      fctx.lineWidth=1.5;
+      threadWebInk(th.pig1,0.55,1.7);
+      for(const it of LOCK.items) if(it.t==="g"&&!it.g.gone)
+        threadWeb(fx2,fy2,it.g.x+it.g.dragX,it.g.y+it.g.dragY);
       for(const it of LOCK.items){
+        const p2=it.pg&&!it.pg.gone?it.pg:null;
+        const px3=p2?p2.x+p2.dragX:fx2, py3=p2?p2.y+p2.dragY:fy2;
         if(it.t==="w"&&it.wr.vis===frameCount){
-          const p2=it.pg&&!it.pg.gone?it.pg:null;
-          fctx.strokeStyle=rgba(tyCol(it.ty),0.55);
-          fctx.beginPath();
-          fctx.moveTo(p2?p2.x:fx2,p2?p2.y:fy2);
-          fctx.lineTo(it.wr.sx,it.wr.sy);
-          fctx.stroke();
+          threadArm(px3,py3,seatX(it.wr),seatY(it.wr),tyCol(it.ty),0.55);
         } else if(it.t==="s"&&it.node&&!it.node.gone){
-          // the label itself is a real DOM word now — canvas draws only the
-          // thread and the anchor dot, never a second copy of the text
-          const sp2=w2s(it.node.wx,it.node.wy);
-          const p2=it.pg&&!it.pg.gone?it.pg:null;
-          fctx.strokeStyle=rgba(tyCol(it.ty),0.5);
-          fctx.beginPath();
-          fctx.moveTo(p2?p2.x:fx2,p2?p2.y:fy2);
-          fctx.lineTo(sp2.x,sp2.y);
-          fctx.stroke();
-          fctx.fillStyle=rgba(tyCol(it.ty),0.55);
-          fctx.fillRect(sp2.x-2.2,sp2.y-2.2,4.4,4.4);
+          // the label itself is a real DOM word — only its thread and the
+          // square at its end are drawn, never a second copy of the text
+          const sx3=it.node.x+it.node.dragX, sy3=it.node.y+it.node.dragY;
+          threadArm(px3,py3,sx3,sy3,tyCol(it.ty),0.5);
+          threadEnd(sx3,sy3,2.2,tyCol(it.ty),0.55);
         }
       }
     } else {
-      const thr=th.dark?"#E6C86E":"#A8842C";
-      fctx.strokeStyle=rgba(thr,0.5); fctx.lineWidth=1.5;
-      fctx.beginPath();
-      for(const wr of FOCUS) if(wr.vis===frameCount){
-        fctx.moveTo(fx2,fy2); fctx.lineTo(wr.sx,wr.sy);
-      }
-      fctx.stroke();
+      threadWebInk(th.dark?"#E6C86E":"#A8842C",0.5,1.5);
+      for(const wr of FOCUS) if(wr.vis===frameCount)
+        threadWeb(fx2,fy2,seatX(wr),seatY(wr));
     }
     const dotc=lockOn?th.pig1:(th.dark?"#E6C86E":"#A8842C");
     const satc=lockOn?(th.dark?"#E6C86E":th.pig1):(th.dark?"#9FC2EE":th.pig2);
-    fctx.fillStyle=rgba(dotc,lockOn?0.55:0.8);
     for(const wr of FOCUS) if(wr.vis===frameCount)
-      fctx.fillRect(wr.sx-2.4,wr.sy-2.4,4.8,4.8);
+      threadEnd(seatX(wr),seatY(wr),2.4,dotc,lockOn?0.55:0.8);
     fctx.font='11px "Noto Serif JP"';
     fctx.textAlign="center";
     fctx.fillStyle=rgba(satc,lockOn?0.9:0.95);
@@ -3195,6 +3286,7 @@ function frame(t){
   if(FOCUS.length&&!lockOn&&t-bloomLast>10000) clearBloom();
   frameCount++;
   drawWorld();
+  threadsDone();
   drawFx(t,dt);
   drawTrail(t);
   drawScaleStars();
@@ -3206,6 +3298,13 @@ function scheduleCanvasSize(){
 }
 addEventListener("resize",scheduleCanvasSize);
 if(window.visualViewport) window.visualViewport.addEventListener("resize",scheduleCanvasSize);
+// The box itself says when it has changed — a browser bar that moved it with no
+// window event, a host that altered it. An empty box is a hidden layer, not a
+// size: a host that shows the layer again measures it then.
+if(window.ResizeObserver) new ResizeObserver(()=>{
+  const w=sky.clientWidth,h=sky.clientHeight;
+  if(w>0&&h>0&&(w!==canvasVW||h!==canvasVH)) scheduleCanvasSize();
+}).observe(sky);
 sizeCanvases();
 initBlobs();
 applyTheme(0);
