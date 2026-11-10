@@ -2459,6 +2459,7 @@ function renderDictionaryHomographs(container, node, { head = false } = {}) {
     const stack = el('span', 'row-stack');
     if (single) {
       choice.classList.add('dictionary-full-door');
+      choice.dataset.entryReading = reading || '';
       stack.append(el('span', 'row-main', tx('辞書の項目をひらく', 'Full dictionary entry')));
     } else {
       const top = el('span', 'row-word');

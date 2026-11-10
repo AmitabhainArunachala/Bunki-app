@@ -2273,6 +2273,7 @@ body .sheet .hero .kanji-facts { display: flex; flex-wrap: wrap; align-items: ce
 body .sheet .hero .kanji-facts .cat-chip { min-height: 44px; padding: 0; border: 0; border-radius: 0; background: none; color: inherit; font: inherit; letter-spacing: 0; }
 body .sheet .hero .kanji-facts .cat-chip:hover { background: none; color: var(--ai); text-decoration: underline; text-underline-offset: 0.2em; }
 body .sheet .kanji-doors { display: flex; flex-wrap: wrap; gap: var(--s1); margin: var(--s2) 0 var(--s3); }
+body .sheet .kanji-doors > * { margin: 0; }
 body .sheet .kanji-doors .teacher-door { display: contents; }
 body .sheet .kanji-doors .teacher-note:empty { display: none; }
 body .sheet .kanji-doors .chip { max-width: 100%; white-space: normal; text-align: start; }

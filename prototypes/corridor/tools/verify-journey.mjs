@@ -444,7 +444,7 @@ try {
     await page.click('[data-kdx-part="木"]');
     await page.waitForSelector('.kdx-glyph', { timeout: 5000 });
     await page.locator('.kdx-glyph').first().click();
-    await page.waitForSelector('#sheet #kanji-kkld', { timeout: 8000 });
+    await page.waitForSelector('#sheet #kanji-kkld', { state: 'attached', timeout: 8000 }); // in the closed Sources disclosure (tighten pass, 2026-11-10)
     const chip = await page.locator('#sheet #kanji-kkld').textContent();
     assert.match(chip, /Kodansha/, 'The kanji sheet names its Kodansha entry while offline');
     await shot('13-kodansha-offline');

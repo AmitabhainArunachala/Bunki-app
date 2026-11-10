@@ -16863,11 +16863,11 @@ function renderKanjiCourseDoor(sheet, node) {
   }
 }
 /** M4 v0 learner lines (UX r4.2 7eae4438 §6.1 and §6.3), verbatim on both keys: [Japanese, English] for tx(). Q-13 is
- * superseded by Q-13r. EVERYTHING-ON PROTOTYPE: the two door lines Q-01 and Q-01r end in " · 試作" / " · preview", as
- * Rajōmon's door does; the UX r4.2 text is what stands before it */
+ * superseded by Q-13r. EVERYTHING-ON PROTOTYPE: the " · preview" suffix the two door lines Q-01 and Q-01r
+ * carried is gone with Rajōmon's (tighten pass, 2026-11-10); the prototype layer's new mark names them */
 const M4_COPY = Object.freeze({
-  'Q-01': ['このことばでクエストをつくる · 試作', 'Make a quest from this word · preview'],
-  'Q-01r': ['このクエストを再開 · 試作', 'Resume this quest · preview'],
+  'Q-01': ['このことばでクエストをつくる', 'Make a quest from this word'],
+  'Q-01r': ['このクエストを再開', 'Resume this quest'],
   'Q-02': ['クエスト · 職・識・織をことばで', 'Quest · 職・識・織 in words'],
   'Q-03': ['職業・知識・組織の三つのことばの読みを答え、それぞれ確かめて、答えられたかどうかを選びます。', 'Answer the reading of all three words — 職業, 知識, 組織 — check each one, and say whether you knew it.'],
   'Q-04': ['読んでいた文から：', 'From the sentence you were reading:'],

@@ -460,7 +460,8 @@ function defineRows() {
   };
   /** The doors a sheet's entry block renders, as rendered. */
   const doorsOf = (container) => all(container, (node) => node.dataset?.dictionaryEntry != null).map((door) => ({ door,
-    seq: door.dataset.dictionaryEntry, reading: find(door, (node) => node.className === 'row-reading')?.textContent ?? '',
+    // tighten pass (2026-11-10): a lone entry's quiet door prints no reading; it carries its entry's reading as data
+    seq: door.dataset.dictionaryEntry, reading: find(door, (node) => node.className === 'row-reading')?.textContent ?? door.dataset.entryReading ?? '',
     pressed: door.getAttribute('aria-pressed'), active: door.className.split(' ').includes('active') }));
   /** A seq-less core word sheet as the app opens it from the core search row: the stack top is the core node, the
    * actual dictionaryDetailRowsFor chooses the entry the senses come from (setting the resolved seq where it does), and
@@ -1379,7 +1380,9 @@ function defineRows() {
     assert.deepEqual([exact(sameInBoth(kanji), '学校'), exact(sameInBoth(kana), '学校')], [['word:学校'], ['word:学校']]);
     assert.equal(kanji.worker.dictionaryHomographChoices('学校')[0].enabledOnCore, true);
     const sheet = coreSheet(app({ mode: 'main' }), '学校');
-    assert.deepEqual(sheet.title, ['Dictionary entry']);
+    // tighten pass (2026-11-10): the lone entry is one quiet door, "Full dictionary entry", with no title over it
+    assert.equal(sheet.title, null);
+    assert.equal(find(sheet.doors[0].door, (node) => node.className === 'row-main')?.textContent, 'Full dictionary entry');
     assert.deepEqual(sheet.doors.map(({ seq, reading, pressed, active }) => [seq, reading, pressed, active]), [['1206730', 'がっこう', 'false', false]]);
     assert.deepEqual(clickRow(kanji, 'word:学校'), { t: 'word', id: '学校' });
   });
