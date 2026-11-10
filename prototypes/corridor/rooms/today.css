@@ -235,15 +235,7 @@ html:is([data-room='tray'], [data-room='search']) .dw-go {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 44px;
   margin-top: 6px;
-  padding: 0 8px;
-  border: 0;
-  background: none;
-  font: 600 var(--type-chrome)/1 var(--font-ui);
-  letter-spacing: 0.02em;
-  color: var(--color-accent);
-  cursor: pointer;
 }
 html:is([data-room='tray'], [data-room='search']) .dw-go .dw-pk { font-size: var(--type-lead); color: inherit; padding: 0; }
 html:is([data-room='tray'], [data-room='search']) .dw-go-l:empty { display: none; }
@@ -501,11 +493,7 @@ html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero >
   transition: transform var(--motion-press) var(--ease-standard);
 }
 html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero > .today-sky + .today-universe { margin-top: -44px; }
-html[data-room='tray'] body:not(.ui-bi) #app > main > .today-hero > .today-universe { font: 800 var(--type-label)/1 var(--font-headword); letter-spacing: 0.06em; }
 html[data-room='tray'] .today-universe .today-arrow { width: 16px; margin-left: 0; }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray'] .today-universe {
-  color: color-mix(in srgb, var(--color-gold) 70%, var(--color-ink));
-}
 /* the town stands only at night, its lit windows under the word; by day the sky is left clear
    down to the horizon's hairline (round 4: by day its grey blocks read as a bar chart) */
 html[data-room='tray'] body:not([data-view='drift']) { --today-roof: transparent; }
@@ -729,7 +717,6 @@ html[data-room='review'] body:not(.zen) #app .close-doors :is(button.take.quiet,
   text-decoration-thickness: 0.5px;
   text-underline-offset: 4px;
 }
-html[data-room='review'] body:not(.zen) #app .close-doors button.chip.review-undo { color: var(--color-muted); }
 
 /* round 3 (r3-rooms): one 朱 on Today, and it is the day's part. The sign's square hangs in ink. */
 html[data-room='tray']:root body:not([data-view='drift']) #app > main > .room-sign::after {

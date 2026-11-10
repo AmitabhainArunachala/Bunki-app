@@ -552,9 +552,6 @@ body[data-view='levels'] main {
     justify-content: space-between;
     gap: 4px;
   }
-  .reference-page-controls .reference-button {
-    padding-inline: 8px;
-  }
 }
 
 

@@ -989,7 +989,6 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
   flex-direction: column;
   align-items: center;
   gap: 1px;
-  padding: 14px 6px;
 }
 .focus-chip-n {
   font-family: var(--serif);
@@ -1012,16 +1011,8 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
   gap: 3px;
   padding: 14px;
   text-align: left;
-  background: var(--ground-0, #fff);
-  border: 1px solid var(--line, #cfc7b5);
-  border-radius: var(--radius-card);
   cursor: pointer;
   color: var(--ink);
-}
-.focus-mode.on {
-  border-color: var(--ai, #2e4d6e);
-  background: color-mix(in srgb, var(--ai, #2e4d6e) 10%, var(--ground-0, #fff));
-  box-shadow: inset 0 0 0 1px var(--ai, #2e4d6e);
 }
 .focus-mode-t {
   font-family: var(--serif);
@@ -1433,12 +1424,6 @@ span.tok.named {
   overflow: hidden;
 }
 
-.seg button {
-  font: inherit;
-  min-height: var(--tap);
-  padding: 0 2px;
-}
-
 /* --------------------------------------------------------------- panel */
 .sheet {
   /* the sheet's place and measure only; its one skin (paper, edge, radius, shadow, rise) is
@@ -1714,9 +1699,7 @@ button.pool-tag.cat-chip {
 
 /* ------------------------------------------------------------- action */
 .take {
-  font: inherit;
   width: 100%;
-  min-height: 48px;
   margin: 4px 0 12px;
 }
 
@@ -1861,27 +1844,6 @@ button.pool-tag.cat-chip {
   border: 1px solid rgba(252, 251, 246, 0.4);
   border-radius: var(--radius-seal);
   overflow: hidden;
-}
-
-#variants .vseg button {
-  font: inherit;
-  font-size: var(--type-caption);
-  min-height: var(--tap);
-  background: transparent;
-  color: var(--ground);
-  border: 0;
-  border-left: 1px solid rgba(252, 251, 246, 0.22);
-  cursor: pointer;
-  padding: 0 4px;
-}
-
-#variants .vseg button:first-child {
-  border-left: 0;
-}
-
-#variants .vseg button[aria-pressed='true'] {
-  background: var(--ground);
-  color: var(--ink);
 }
 
 #variants .measure {
@@ -2569,10 +2531,6 @@ body.v-depth-layered .sched tr:nth-child(even) td {
   background: var(--ground-2);
 }
 
-body.v-depth-layered .take {
-  box-shadow: 0 2px 8px rgba(20, 24, 28, 0.18);
-}
-
 body.v-depth-layered .inline-link {
   color: var(--ai);
 }
@@ -2731,15 +2689,6 @@ body.v-depth-layered .inline-link {
 }
 
 .details-toggle {
-  font-family: var(--sans);
-  font-size: var(--type-caption);
-  letter-spacing: 0.08em;
-  color: var(--faint);
-  background: transparent;
-  border: 0;
-  padding: 6px 2px;
-  min-height: var(--tap);
-  cursor: pointer;
   display: block;
 }
 
@@ -2954,12 +2903,6 @@ svg.strokes text {
   padding-top: 12px;
 }
 
-.chip.on-list {
-  border-color: var(--ai, var(--ink));
-  color: var(--ai, var(--ink));
-  background: var(--ai-wash, transparent);
-}
-
 /* ==================================================== v1.5 · the search ===
  * One quiet field, four doors: kanji · kana · romaji · English. */
 .search-field {
@@ -3012,10 +2955,6 @@ svg.strokes text {
   text-align: left;
   font: inherit;
   color: inherit;
-  background: var(--ground-0, var(--ground));
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--ai, var(--ink-2));
-  border-radius: var(--radius-card);
   padding: 10px 14px;
   min-height: var(--tap);
   margin: 0 0 14px;
@@ -3068,13 +3007,9 @@ svg.strokes text {
   text-align: left;
   font: inherit;
   color: inherit;
-  background: var(--ground-0, var(--ground));
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
   padding: 12px;
   margin: 0 0 14px;
   cursor: pointer;
-  box-shadow: inset 0 0 0 1px var(--ground-0, var(--ground));
 }
 
 .stroke-door svg.strokes {
@@ -3497,12 +3432,10 @@ body:has(.stroke-page[data-numbers='on']) .stroke-nums-lift {
   align-items: center;
   justify-content: center;
   min-width: 96px;
-  padding: 6px 16px;
 }
 
 .stroke-btn:disabled {
   opacity: 0.4;
-  cursor: default;
 }
 
 .stroke-meta {
@@ -4932,11 +4865,6 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   margin: 18px 0 6px;
 }
 
-.read-fin.finished {
-  color: var(--red);
-  border-color: rgba(158, 43, 37, 0.35);
-}
-
 .pool-tag.read-tag {
   color: var(--red);
   border-color: rgba(158, 43, 37, 0.3);
@@ -5185,8 +5113,6 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 .chat-row .chat-send {
   flex: none;
   width: auto;
-  padding-left: 18px;
-  padding-right: 18px;
 }
 
 .teacher-door,
@@ -5818,15 +5744,6 @@ body.zen .review-example {
   display: block;
   width: 100%;
   text-align: left;
-  background: transparent;
-  border: 0;
-  border-top: 1px solid var(--line-soft);
-  padding: 13px 2px;
-  font-family: var(--sans);
-  font-size: var(--type-chrome);
-  letter-spacing: 0.02em;
-  color: var(--ai, #2e4d6e);
-  cursor: pointer;
 }
 
 /* AI-generated leveled example sentences (Phase 3, key-gated). Each card is a
@@ -5885,8 +5802,6 @@ body.zen .review-example {
 }
 .kdx-lens {
   flex: 1 1 auto;
-  min-height: 44px;
-  padding: 7px 12px;
   text-align: center;
 }
 .kdx-lens .l-ja {
@@ -6367,9 +6282,7 @@ body.zen .declare-row {
 .declare-row .take {
   flex: 1;
   margin: 0;
-  min-height: 58px;
   white-space: nowrap;
-  border-radius: var(--radius-control);
 }
 .declare-row .declare-notyet {
   background: transparent;
@@ -6769,9 +6682,6 @@ body.zen main .declare-row {
 }
 
 /* the two declarations, gofun and paper on the night */
-body.zen .declare-row .take {
-  border-radius: var(--radius-control);
-}
 body.zen .declare-recalled {
   background: var(--card-ground-0, var(--card-ground));
   color: var(--card-ink);
@@ -7622,9 +7532,7 @@ body:has(#app main .room-state[data-room-state='blocked']) #store-alert { displa
 /* The report entry, in the page's own flow (2026-09-25): quiet, last on the page,
  * never a layer over a control. The focused stage carries it in its more-row. */
 .report-line { display: flex; flex-wrap: wrap; gap: .25rem 1rem; justify-content: center; margin: 3rem 0 1.5rem; }
-.report-line .report-door { background: none; border: 0; min-height: var(--tap, 44px); padding: 0 .25rem; color: var(--faint); font-size: var(--type-label); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
-.report-line .report-door:hover, .report-line .report-door:focus-visible { color: var(--ink); }
-body.zen #app > .report-line-page .report-door { color: var(--zen-text); }
+.report-line .report-door { text-underline-offset: 3px; }
 .report-line-sheet { margin: 2rem 0 .5rem; }
 /* The waking field supplies its own gap; page margins push it over the glyph. */
 .stroke-awake-field .report-line-stroke { margin: 0; }
@@ -7996,11 +7904,6 @@ body.zen .reveal.r-4 {
 .stats-axis {
   margin: 4px 0 16px;
   color: var(--ink-2);
-}
-main .browse-filters .chip.browse-filter.on {
-  background: var(--ink);
-  color: var(--ground);
-  border-color: var(--ink);
 }
 /* 集中道場 › デッキ — the SRS decks, one tappable row each */
 .dojo-decks {

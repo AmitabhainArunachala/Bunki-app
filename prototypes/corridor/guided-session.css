@@ -141,9 +141,6 @@
 .gs-button.primary .gs-gloss {
   color: color-mix(in srgb, #f7f2e8 88%, transparent);
 }
-.gs-text:disabled {
-  color: var(--faint);
-}
 
 /* ---------- arrival ---------- */
 .gs-arrival {
@@ -766,7 +763,6 @@ legend.gs-instruction {
 }
 .gs-feedback .gs-text {
   margin-top: 8px;
-  font-size: var(--type-label);
 }
 .gs-return-link {
   margin-top: 16px;
@@ -790,7 +786,6 @@ legend.gs-instruction {
 .gs-aside .gs-text {
   display: block;
   margin-top: 8px;
-  font-size: var(--type-chrome);
   border-bottom: 0 !important;
 }
 .gs-aside .gs-text [lang='ja'] {
@@ -1035,7 +1030,6 @@ legend.gs-instruction {
   margin: 2px 0 6px !important;
 }
 .gs-row .gs-text {
-  font-size: var(--type-label);
   border-bottom-color: transparent !important;
 }
 .gs-row .gs-text [lang='ja'] {
@@ -1276,11 +1270,6 @@ legend.gs-instruction {
 .gs-footer-label {
   font-family: var(--serif);
   letter-spacing: 0.08em;
-}
-.gs-footer .gs-text {
-  font-size: var(--type-label);
-  color: var(--ink-2);
-  min-height: 34px;
 }
 .gs-footer-demos {
   display: inline-flex;
