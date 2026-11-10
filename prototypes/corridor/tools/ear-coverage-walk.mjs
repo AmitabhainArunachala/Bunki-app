@@ -13,8 +13,8 @@
  *   node prototypes/corridor/tools/ear-coverage-walk.mjs --base http://127.0.0.1:19481/ [--device wide|phone]
  *        [--ui ja] [--plant] [--only door,search] [--shots DIR] [--out results.json]
  *
- * --plant puts two Japanese nodes outside any unit on every screen (one under no finger, one in an SVG the ear does
- * not read): the walk must then fail. Exit 0 only when every node has a unit. */
+ * --plant puts two Japanese nodes outside any unit on every screen (one no finger reaches, one in a field being typed
+ * in, which the ear never reads): the walk must then fail. Exit 0 only when every node has a unit. */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join, resolve } from 'node:path';
@@ -67,14 +67,11 @@ async function scan({ exclusions, plant, earPath }) {
     a.id = 'ear-plant-a';
     a.style.cssText = 'position:fixed;left:37%;top:41%;z-index:2147483646;pointer-events:none;font-size:22px;background:#fff;color:#000;padding:4px';
     a.textContent = '植えた文はどこにも属さない。';
-    const b = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    const b = document.createElement('div');
     b.id = 'ear-plant-b';
-    b.setAttribute('width', '240'); b.setAttribute('height', '40');
-    b.style.cssText = 'position:fixed;left:37%;top:52%;z-index:2147483646;background:#fff';
-    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    t.setAttribute('x', '6'); t.setAttribute('y', '28'); t.setAttribute('font-size', '22');
-    t.textContent = '絵の中の言葉';
-    b.append(t);
+    b.contentEditable = 'true';
+    b.style.cssText = 'position:fixed;left:37%;top:52%;z-index:2147483646;font-size:22px;background:#fff;color:#000;padding:4px';
+    b.textContent = '入力中の文は読まない。';
     document.body.append(a, b);
   }
   const excluded = exclusions.map((entry) => ({ ...entry, found: document.querySelectorAll(entry.selector).length }));
@@ -83,17 +80,17 @@ async function scan({ exclusions, plant, earPath }) {
   // under a layer: the app makes what stands under a sheet or a modal inert (the layer law), so no finger reaches it
   const modal = document.querySelector('dialog:modal');
   const underLayer = (el) => !!el.closest('[inert]') || (modal && !modal.contains(el));
-  // clipped away: a box that clips its content (overflow, clip-path) leaves none of this text showing
-  const clippedAway = (el, box) => {
+  // the part of a text box that shows: every box that clips its content (overflow, clip-path) and the screen cut it down
+  const shownPart = (el, box) => {
+    let left = Math.max(box.left, 0), top = Math.max(box.top, 0), right = Math.min(box.right, innerWidth), bottom = Math.min(box.bottom, innerHeight);
     for (let at = el; at && at !== document.body; at = at.parentElement) {
       const style = getComputedStyle(at);
       const clips = style.clipPath !== 'none' || /hidden|clip|auto|scroll/.test(style.overflowX + style.overflowY);
       if (!clips) continue;
       const r = at.getBoundingClientRect();
-      const w = Math.min(box.right, r.right) - Math.max(box.left, r.left), h = Math.min(box.bottom, r.bottom) - Math.max(box.top, r.top);
-      if (w < 2 || h < 2) return true;
+      left = Math.max(left, r.left); top = Math.max(top, r.top); right = Math.min(right, r.right); bottom = Math.min(bottom, r.bottom);
     }
-    return false;
+    return right - left >= 2 && bottom - top >= 2 ? { left, top, right, bottom, width: right - left, height: bottom - top } : null;
   };
   const seen = new Set();
   const visit = () => {
@@ -105,8 +102,7 @@ async function scan({ exclusions, plant, earPath }) {
       if (parent.checkVisibility && !parent.checkVisibility({ opacityProperty: true, visibilityProperty: true, contentVisibilityAuto: true })) continue;
       const range = document.createRange();
       range.selectNodeContents(node);
-      const boxes = [...range.getClientRects()].filter((r) => r.width >= 2 && r.height >= 2 && r.right > 1 && r.bottom > 1 && r.left < innerWidth - 1 && r.top < innerHeight - 1)
-        .filter((r) => !clippedAway(parent, r));
+      const boxes = [...range.getClientRects()].filter((r) => r.width >= 2 && r.height >= 2).map((r) => shownPart(parent, r)).filter(Boolean);
       if (!boxes.length) continue;
       if (underLayer(parent)) { seen.add(node); rows.coveredByOther = (rows.coveredByOther || 0) + 1; continue; }
       seen.add(node);

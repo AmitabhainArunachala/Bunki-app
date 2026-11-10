@@ -515,10 +515,11 @@ html[data-ear='novoice'] .ear-mark::before { border-color: color-mix(in oklab, v
 html[data-ear='novoice'] .ear-mark::after { content: ''; position: absolute; left: 4px; right: 4px; top: 50%; height: 1.4px; background: color-mix(in oklab, var(--ear-ink) 70%, transparent); transform: rotate(-38deg); pointer-events: none; }
 @keyframes ear-press { from { transform: scale(1.06); } to { transform: scale(1); } }
 @keyframes ear-ring { 0% { stroke-dashoffset: 40; } 60%, 100% { stroke-dashoffset: 0; } }
-/* what the page shows: the unit gets a red underline (armed), a wash along its foot (held on, speaking); nothing moves */
-[data-ear-unit='armed'] { text-decoration-line: underline; text-decoration-color: var(--red); text-decoration-thickness: 1.4px; text-underline-offset: 6px; }
-[data-ear-unit='held'] { background-image: linear-gradient(transparent 62%, color-mix(in oklab, var(--red) 22%, transparent) 62%); }
-[data-ear-unit='speaking'] { background-image: linear-gradient(transparent 62%, color-mix(in oklab, var(--red) 34%, transparent) 62%); }
+/* what the page shows: the unit gets a red underline (armed), a wash along its foot (held on, speaking); nothing moves
+   (the marks outrank a row's own hover background: they are the ear's, and last only as long as it points or reads) */
+[data-ear-unit='armed'] { text-decoration-line: underline !important; text-decoration-color: var(--red) !important; text-decoration-thickness: 1.4px !important; text-underline-offset: 6px !important; }
+[data-ear-unit='held'] { background-image: linear-gradient(transparent 62%, color-mix(in oklab, var(--red) 22%, transparent) 62%) !important; }
+[data-ear-unit='speaking'] { background-image: linear-gradient(transparent 62%, color-mix(in oklab, var(--red) 34%, transparent) 62%) !important; }
 ::highlight(bunki-ear-armed) { text-decoration-line: underline; text-decoration-color: var(--red); text-decoration-thickness: 1.4px; text-underline-offset: 6px; }
 ::highlight(bunki-ear-held) { text-decoration-line: underline; text-decoration-color: color-mix(in oklab, var(--red) 22%, transparent); text-decoration-thickness: .38em; text-underline-offset: -.3em; text-decoration-skip-ink: none; }
 ::highlight(bunki-ear-speaking) { text-decoration-line: underline; text-decoration-color: color-mix(in oklab, var(--red) 34%, transparent); text-decoration-thickness: .38em; text-underline-offset: -.3em; text-decoration-skip-ink: none; }
@@ -691,7 +692,7 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}) }) {
       paint();
     });
   }, { capture: true, passive: true });
-  doc.addEventListener('pointerleave', () => { hoverUnit = null; machine.hover({ unit: null, pointer: 'mouse' }); paint(); });
+  root.addEventListener('pointerleave', () => { hoverUnit = null; machine.hover({ unit: null, pointer: 'mouse' }); paint(); });
   view.addEventListener('blur', () => { hoverUnit = null; machine.hover({ unit: null, pointer: 'mouse' }); });
 
   /* select-then-読む */
