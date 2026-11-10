@@ -403,6 +403,58 @@ for (const [name, kanji] of [['worldcraft-shiki', '識'], ['worldcraft-ori', '�
   });
 }
 
+/** a Passage door: the kanji's page opens, its door says preview, the walk opens over it at its first stop */
+async function passageFrom(page, doorName, kanji) {
+  const label = await throughDoor(page, doorName);
+  must(await view(page) === 'search', `the door opened "${await view(page)}"`);
+  await page.locator('#sheet').waitFor();
+  const walk = page.locator('#passage-door');
+  await walk.waitFor();
+  const words = (await walk.innerText()).replace(/\s+/g, ' ').trim();
+  must(/preview/.test(words) && /passage/i.test(words), `the passage door on ${kanji} reads "${words}"`);
+  await walk.scrollIntoViewIfNeeded();
+  await walk.click();
+  await page.locator('#passage-count').waitFor({ timeout: 20000 });
+  const count = (await page.locator('#passage-count').innerText()).trim();
+  must(/stop 1 of 7/.test(count), `the walk opened at "${count}"`);
+  return { label, words };
+}
+const passageCount = async (page) => (await page.locator('#passage-count').innerText()).trim();
+await door('passage', 'on 職 the passage walks its seven stops, keeps its place on Return, and finishes', async ({ page }) => {
+  const own = await passageFrom(page, 'passage', '職');
+  const first = (await page.locator('#passage-glyph').innerText()).trim();
+  await page.locator('#passage-next').click();
+  await page.waitForFunction(() => /stop 2 of 7/.test(document.getElementById('passage-count')?.textContent || ''), null, { timeout: 10000 });
+  await shot(page, 'passage-stop-2');
+  await page.locator('#passage-return').click();
+  await page.locator('#passage-dialog').waitFor({ state: 'detached', timeout: 10000 });
+  const resume = (await page.locator('#passage-door').innerText()).replace(/\s+/g, ' ').trim();
+  must(/Resume the passage · stop 2 of 7 · preview/.test(resume), `after Return the door reads "${resume}"`);
+  await page.locator('#passage-door').click();
+  await page.locator('#passage-count').waitFor();
+  must(/stop 2 of 7/.test(await passageCount(page)), `the walk resumed at "${await passageCount(page)}"`);
+  const stops = [first, (await page.locator('#passage-glyph').innerText()).trim()];
+  for (let stop = 3; stop <= 7; stop += 1) {
+    await page.locator('#passage-next').click();
+    await page.waitForFunction((stop) => new RegExp(`stop ${stop} of 7`).test(document.getElementById('passage-count')?.textContent || ''), stop, { timeout: 10000 });
+    stops.push((await page.locator('#passage-glyph').innerText()).trim());
+  }
+  must(stops.join('') === '職戠識戠織糸織', `the seven stops were ${stops.join(' ')}`);
+  const last = (await page.locator('#passage-next').innerText()).replace(/\s+/g, ' ').trim();
+  await page.locator('#passage-next').click();
+  await page.locator('#passage-replay').waitFor({ timeout: 10000 });
+  await shot(page, 'passage-finished');
+  await page.locator('#passage-return').click();
+  await page.locator('#passage-dialog').waitFor({ state: 'detached', timeout: 10000 });
+  return `"${own.label}" → "${own.words}" → ${stops.join(' → ')}; Return at stop 2 left "${resume}"; "${last}" ends it and offers "Walk it again"`;
+});
+for (const [name, kanji] of [['passage-shiki', '識'], ['passage-ori', '織']]) {
+  await door(name, `on ${kanji} the passage opens at its first stop`, async ({ page }) => {
+    const held = await passageFrom(page, name, kanji);
+    return `"${held.label}" → "${held.words}" → ${await passageCount(page)}`;
+  });
+}
+
 await door('orbit', 'the orbit word field opens from the galaxy menu and returns', async ({ page }) => {
   const label = await throughDoor(page, 'orbit');
   await page.locator('#ginga-symbol').click();
