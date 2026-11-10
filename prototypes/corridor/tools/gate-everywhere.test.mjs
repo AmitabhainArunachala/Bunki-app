@@ -63,14 +63,18 @@ after(async () => {
   await new Promise((done) => server?.close(done) ?? done());
 });
 
-async function open(device, address, { wait = null } = {}) {
+async function open(device, address, { wait = null, places = false } = {}) {
   const context = await browser.newContext({ ...device, locale: 'en-US', timezoneId: 'Asia/Tokyo' });
   contexts.push(context);
   await silenceBrowserAudio(context);
-  await context.addInitScript(() => {
+  await context.addInitScript((places) => {
     if (globalThis.speechSynthesis) Object.getPrototypeOf(globalThis.speechSynthesis).speak = function () {};
-    try { localStorage.setItem('bunki-prototype:intro-dismissed:v1', '1'); } catch { /* storage may be blocked */ }
-  });
+    try {
+      localStorage.setItem('bunki-prototype:intro-dismissed:v1', '1');
+      // the layout under test, as Settings or ?layout=places keeps it on this device
+      if (places) localStorage.setItem('kairo-layout', 'places');
+    } catch { /* storage may be blocked */ }
+  }, places);
   const page = await context.newPage();
   page.setDefaultTimeout(30000);
   const errors = [];
@@ -417,4 +421,56 @@ test('Back says Back in every bar, and the trail row waits for a second step', a
   assert.equal(await back('#back'), 'Back');
   await goto(page, `?read=${ARTICLE}&word=開催`, '#sheet');
   assert.equal(await back('#sheet-back'), 'Back', 'the word page says Back');
+});
+
+// The layout under test (?layout=places) gets the same gate and the same panel: its bar becomes Back, the gate, search
+// (its name stays on a wide screen, short of the gate); the panel lists its own five places and, since Review is one of
+// them, does not say Review twice.
+const PLACES_SCREENS = [
+  ['review', '?room=dojo', ['back', 'bar-gate', 'chrome-search']],
+  ['bookshelf', '?room=shelf', ['back', 'bar-gate', 'chrome-search']],
+  ['article', `?read=${ARTICLE}`, ['back', 'bar-gate', 'chrome-search', 'chrome-keep']],
+  ['kanji', '?room=shelf&kanji=産', ['sheet-back', 'sheet-gate', 'sheet-search', 'sheet-take']],
+];
+test('the layout under test: the gate on every bar, the same panel with its own places, the place kept', async () => {
+  for (const [device, size] of [['1728', WIDE], ['390', PHONE]]) {
+    const { page, errors } = await open(size, '', { places: true });
+    await page.locator('#ginga-symbol').waitFor();
+    assert.equal(await page.evaluate(() => document.documentElement.dataset.layout), 'places');
+    const skyX = await page.evaluate(() => { const r = document.getElementById('ginga-symbol').getBoundingClientRect(); return (r.left + r.right) / 2; });
+    // the first screen's gate opens the same panel
+    await page.locator('#ginga-symbol').click();
+    await page.locator('.gate-panel').waitFor();
+    const rows = await page.evaluate(() => [...document.querySelectorAll('.gate-panel .nav-station')].map((row) => row.id || row.className.replace('nav-station ', '')));
+    assert.deepEqual(rows, ['nav-review', 'nav-bookshelf', 'nav-dictionary', 'nav-tests', 'nav-progress',
+      'nav-dojo', 'bubble-sensei', 'orbit-preview-door', 'nav-look', 'nav-lang'], `${device}: the places, then the doors that are not places`);
+    assert.equal(await page.locator('#app .corner-bubble').count(), 0, `${device}: nothing loose in the corners`);
+    await page.keyboard.press('Escape');
+    await page.locator('.gate-panel').waitFor({ state: 'detached' });
+    for (const [name, address, controls] of PLACES_SCREENS) {
+      await goto(page, address, controls[0] === 'sheet-back' ? '#sheet' : null);
+      const bar = await page.evaluate(readBar);
+      const ids = bar.items.map((item) => item.id).filter((id) => !/crumb|chrome-level/.test(id));
+      assert.deepEqual(ids, controls, `${name}@${device}: the bar's controls`);
+      assert.ok(Math.abs((bar.gate.l + bar.gate.r) / 2 - skyX) <= 1, `${name}@${device}: the gate at the first screen's x`);
+      for (const item of bar.items) if (!/gate/.test(item.id)) {
+        assert.ok(item.r <= bar.gate.l || item.l >= bar.gate.r, `${name}@${device}: ${item.id} [${item.l}, ${item.r}] clears the gate`);
+      }
+    }
+    // over an article: opens, closes, the place kept
+    await goto(page, `?read=${ARTICLE}`);
+    await page.locator('#mini').waitFor({ timeout: 2500 }).catch(() => {});
+    await page.keyboard.press('Escape');
+    await page.evaluate(() => window.scrollTo(0, 900));
+    await page.waitForTimeout(300);
+    const y = await page.evaluate(() => window.scrollY);
+    await page.locator('#bar-gate').click();
+    await page.locator('#gate-menu .gate-panel').waitFor();
+    assert.equal(await page.locator('#gate-menu .nav-station[aria-current="page"]').getAttribute('id'), 'nav-bookshelf');
+    await page.keyboard.press('Escape');
+    await page.locator('#gate-menu').waitFor({ state: 'detached' });
+    const after = await page.evaluate(() => ({ y: window.scrollY, view: document.body.dataset.view, focus: document.activeElement?.id }));
+    assert.deepEqual(after, { y, view: 'reader', focus: 'bar-gate' }, `${device}: the article stays where it was`);
+    assert.deepEqual(errors, [], `${device}: no page errors`);
+  }
 });

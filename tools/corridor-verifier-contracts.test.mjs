@@ -33,5 +33,5 @@ test('pending save held-request contract executes without skips', () => {
   requireContracts('prototypes/corridor/tools/pending-save-held-request.test.mjs', 1, 240000);
 }, 270000);
 test('gate on every bar contracts execute every case without skips', () => {
-  requireContracts('prototypes/corridor/tools/gate-everywhere.test.mjs', 11, 420000);
+  requireContracts('prototypes/corridor/tools/gate-everywhere.test.mjs', 12, 420000);
 }, 450000);

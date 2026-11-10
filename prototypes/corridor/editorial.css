@@ -5190,12 +5190,12 @@ body:not(.zen) :is(#app > .chrome, #sheet > .sheet-bar) > button.bar-gate::after
 body:not(.zen) :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate + * { margin-left: auto; }
 body:not(.zen) #sheet > .sheet-bar:has(> .bar-gate) > .sheet-take { margin-left: 4px; }
 /* the room's name and the article's level go where the tabs or the trail already say them (the name stays the bar's
-   words for a screen reader); a screen with neither keeps its name, short of the gate */
-html:not([data-register='attempt']) :is(body.has-primary-tabs, body:has(#app > .scale-thread)):not(.zen) #app > .chrome:has(> .bar-gate) > .crumb {
+   words for a screen reader); a screen with neither keeps its name, short of the gate, as does the layout under test */
+html:not([data-register='attempt'], [data-layout='places']) :is(body.has-primary-tabs, body:has(#app > .scale-thread)):not(.zen) #app > .chrome:has(> .bar-gate) > .crumb {
   position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
 }
 body:not(.zen) #app > .chrome:has(> .bar-gate) > .crumb { flex: 0 1 auto; max-width: calc(50% - 100px); }
-body.has-primary-tabs:not(.zen) #app > .chrome:has(> .bar-gate) > .chrome-level { display: none; }
+html:not([data-layout='places']) body.has-primary-tabs:not(.zen) #app > .chrome:has(> .bar-gate) > .chrome-level { display: none; }
 /* the article's Save keeps a fixed room at the bar's end (touching a word moves no door), short of the gate:
    half the bar, less half the gate, a gap, search (44) and the language (52 at most) */
 body:not(.zen) #app > .chrome:has(> .bar-gate) > button.save-one.chrome-keep { flex: 0 0 min(calc(50% - 126px), 140px); }

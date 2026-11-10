@@ -381,7 +381,7 @@ h1.view-title {
 /* ---------------------------------------------------------- 銀河 hero nav
  * The galaxy is the hero. body.ginga hides the drift's own brand, depth crumb,
  * counters and hint so nothing but the galaxy and the single symbol shows. The
- * symbol opens a top bar and two corner bubbles; tapping the scrim closes it. */
+ * symbol opens the gate's menu, one panel; tapping the scrim closes it. */
 body.ginga #drift-layer #brand,
 body.ginga #drift-layer #depth,
 body.ginga #drift-layer #theme,
@@ -818,7 +818,7 @@ body.ginga #drift-layer #hint.first-cue {
   color: var(--faint, #a9a293);
 }
 
-/* the two corner bubbles — 本棚 left, 先生 right */
+/* a corner bubble: the first screen's lone Review door in the layout under test */
 /* FEEL (2026-10-02): the corner doors are glass pills like the bar above them, each named in its
  * own pigment — no heavy slabs on the sky */
 .corner-bubble {
@@ -855,14 +855,6 @@ body.ginga #drift-layer #hint.first-cue {
   font-weight: 500;
   letter-spacing: 0.01em;
   opacity: 0.78;
-}
-.corner-bubble.bubble-sensei {
-  right: 18px;
-  color: #6a3b52; /* a warmer pigment for the tutor, distinct from the shelf */
-}
-/* while the corner bubbles stand, the report bug steps up out of 先生's way (it sat on top of it) */
-body:has(.corner-bubble.bubble-sensei) #bunki-reports-root .br-rail {
-  bottom: calc(96px + env(safe-area-inset-bottom, 0px));
 }
 @keyframes bubble-rise {
   from {

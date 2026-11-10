@@ -34501,11 +34501,9 @@ function attachWorldPicker(sealBtn) {
 }
 
 /* ------------------------------------------------------------ 銀河 hero nav
- * The galaxy is the app's hero. At rest it carries one mark; tapping it opens a
- * top bar (back · forward · EN⇄日本語 · search · 集中道場) and two corner
- * bubbles (本棚 bottom-left, 先生 bottom-right). Everything hides again on
- * dismiss, leaving the galaxy uncovered. Only on 銀河 — inner pages keep the
- * ordinary top bar. */
+ * The galaxy is the app's hero. At rest it carries one mark; tapping it opens the
+ * gate's menu, one panel (buildGateMenu). Everything hides again on dismiss,
+ * leaving the galaxy uncovered. Every other bar carries the same mark (barGate). */
 // the 鳥居 gate (operator's pick) with a single star above — a threshold into
 // the galaxy: the two lintels (笠木・貫), two pillars, and one point of light.
 const GINGA_SYMBOL_SVG =
@@ -35003,11 +35001,11 @@ function buildGingaChrome(root) {
   if (S.navOpen) buildGateMenu(root);
 }
 
-/** The gate's menu, one composed panel (frame, 2026-11-10): ‹ › at its top edge beside the look-up field; the five
- * places of the tab bar, one row each with a plain line of what is inside, the one you are in marked; then the doors
- * that are not places: Review (its count when cards wait), Focus, Tutor, Orbit, the look and the language. The first
- * screen draws it with its own chrome; over any other screen a bar's gate lays it on its own layer (`over`: the layer,
- * openGateMenu). The layout under test keeps its own menu (buildPlacesMenu), whose rows these are. */
+/** The gate's menu, one composed panel in both layouts (frame, 2026-11-10): ‹ › at its top edge beside the look-up
+ * field; the five places of the layout's tab bar, one row each with a plain line of what is inside, the one you are in
+ * marked; then the doors that are not places: Review (its count when cards wait), Focus, Tutor, Orbit, the look and the
+ * language. The first screen draws it with its own chrome; over any other screen a bar's gate lays it on its own layer
+ * (`over`: the layer, openGateMenu). */
 function buildGateMenu(root, over = false) {
   const scrim = el('div', 'nav-scrim');
   scrim.addEventListener('click', () => closeGateMenu());
@@ -35030,12 +35028,6 @@ function buildGateMenu(root, over = false) {
   bar.append(arrows);
   // the bar (operator, 2026-10-02, note 1): ‹ › · a real, wide look-up field. Reporting lives on the bug alone.
   bar.append(buildNavSearchField());
-  if (placesLayout()) {
-    // 廻 Orbit word field (Meguri), a labelled preview: the door and its host are modules/orbit-preview.mjs
-    if (window.__CORRIDOR_STANDALONE__ !== true) import('./modules/orbit-preview.mjs').then((m) => m.addOrbitDoor(root, { tx, biLabel, open: () => !!S.navOpen })).catch((err) => console.warn('orbit preview unavailable', err));
-    buildPlacesMenu(root, bar);
-    return;
-  }
   bar.classList.add('gate-panel');
   // a door leaves the screen under the menu as the bar's own doors do: a page closes, an article keeps its place
   const leave = () => {
@@ -35048,29 +35040,25 @@ function buildGateMenu(root, over = false) {
       void saveReaderPosition(S.passageId, Math.round(window.scrollY));
     }
   };
-  const LINES = {
-    today: ['次の一歩と今日の読み物', "Your next step and today's reading"],
-    read: ['記事 · 今日のものから', "Articles, today's first"],
-    learn: ['カードとデッキ · 試験', 'Your cards and decks, tests'],
-    words: ['語と漢字を調べる · 言葉のつながり', 'Look up words and kanji, the word web'],
-    me: ['一年の記録 · 設定', 'Your year, settings'],
-  };
+  // the five places of the layout in use, as its tab bar names them, each with a plain line of what is inside
+  const due = S.taken.length && scheduler ? todayQueue().order.length : 0;
   const places = el('div', 'nav-stations');
-  for (const tab of PRIMARY_TABS) {
-    const row = navStation(`nav-${tab.id}`, [tab.ja, tab.en], LINES[tab.id], () => {
+  for (const tab of primaryTabs()) {
+    const row = navStation(`nav-${tab.id}`, [tab.ja, tab.en], placeLines(due)[tab.id], () => {
       if (S.view === tab.view && !S.stack.length) { closeGateMenu(); return; }
       const go = () => enterTab(tab, row, !over);
       if (tab.view === 'search') go();
       else roomTransition(go);
-    });
+    }, { count: tab.due ? due : 0 });
+    row.dataset.tab = tab.id;
     // the bookshelf's door, by the class every walk presses
-    if (tab.id === 'read') row.classList.add('bubble-shelf');
+    if (tab.view === 'shelf') row.classList.add('bubble-shelf');
     if (tab.views.includes(S.view)) row.setAttribute('aria-current', 'page');
     places.append(row);
   }
   const more = el('div', 'nav-stations nav-more');
-  // Review with today's due count, one tap into Today; at 0 the count steps away, the door stays
-  const due = S.taken.length && scheduler ? todayQueue().order.length : 0;
+  // Review with today's due count, one tap into Today; at 0 the count steps away, the door stays. Where Review is one of
+  // the five places (the layout under test) it is not said twice.
   const review = navStation('nav-review', ['復習', 'Review'], null, () => {
     readerTicketDeparture('tray');
     // Today's Back returns to the screen the menu stood over
@@ -35097,7 +35085,8 @@ function buildGateMenu(root, over = false) {
     render();
   });
   sensei.classList.add('bubble-sensei');
-  more.append(review, dojo, sensei);
+  if (!placesLayout()) more.append(review);
+  more.append(dojo, sensei);
   // 廻 Orbit word field (Meguri), a labelled preview: its host is modules/orbit-preview.mjs; its row keeps the door's id
   if (window.__CORRIDOR_STANDALONE__ !== true) {
     const orbit = navStation('orbit-preview-door', ['廻 めぐり', 'Orbit'], null, () => {
@@ -35154,9 +35143,9 @@ function enterTab(tab, invoker, fromSky) {
   window.scrollTo(0, tab.view === 'shelf' ? S.shelfScroll : 0);
 }
 
-/** The gate on every bar but the first screen's (frame, 2026-11-10): the current layout with the five tabs. */
+/** The gate on every bar but the first screen's (frame, 2026-11-10): either layout with its five tabs. */
 function gateFrame() {
-  return S.variants.nav === 'tabs' && !placesLayout();
+  return S.variants.nav === 'tabs';
 }
 /** The first screen's torii as a bar's door: the same mark and name, at the screen's centre, opening the same menu over
  * the screen it stands on. */
@@ -35250,48 +35239,23 @@ function langSwitch() {
   return group;
 }
 
-/** The door's menu in the layout under test: the five places, named and ordered as the tab bar,
- * one row each with a few plain words of what is inside (Review carries today's count), and the
- * tutor's own bubble. Each opens the room its tab opens; Back from there returns to this door. The
- * interface language lives in Progress → Settings. */
-function buildPlacesMenu(root, bar) {
-  const due = S.taken.length && scheduler ? todayQueue().order.length : 0;
-  const LINES = {
+/** Each place's plain line of what is inside, for the layout in use (Review's carries today's count in the layout under
+ * test, where the interface language and the colour theme also live in Progress → Settings). */
+function placeLines(due) {
+  if (!placesLayout()) return {
+    today: ['次の一歩と今日の読み物', "Your next step and today's reading"],
+    read: ['記事 · 今日のものから', "Articles, today's first"],
+    learn: ['カードとデッキ · 試験', 'Your cards and decks, tests'],
+    words: ['語と漢字を調べる · 言葉のつながり', 'Look up words and kanji, the word web'],
+    me: ['一年の記録 · 設定', 'Your year, settings'],
+  };
+  return {
     review: due ? [`今日 ${due} 枚`, `${due} card${due === 1 ? '' : 's'} for today`] : ['カードとデッキ', 'Your cards and decks'],
     bookshelf: ['記事 · 今日の読み物から', "Articles, today's reading first"],
     dictionary: ['語・漢字・文法を調べる', 'Look up words, kanji, grammar'],
     tests: ['JLPT の模擬試験と練習', 'JLPT practice tests'],
     progress: ['一年の記録 · 統計 · 設定', 'Your year, statistics, settings'],
   };
-  const stations = el('div', 'nav-stations');
-  for (const tab of PLACES_TABS) {
-    // Review's count is the tab bar's own (todayQueue); at 0 it steps away
-    const station = navStation(`nav-${tab.id}`, [tab.ja, tab.en], LINES[tab.id], () => {
-      S.navOpen = false;
-      if (tab.view === 'search') { openSearchPage(); return; }
-      readerTicketDeparture(tab.view);
-      if (tab.view === 'me') keepNavigationReturn('me', station);
-      else keepScroll();
-      S.stack = [];
-      S.view = tab.view;
-      render();
-      window.scrollTo(0, tab.view === 'shelf' ? S.shelfScroll : 0);
-    }, { count: tab.due ? due : 0 });
-    station.dataset.tab = tab.id;
-    stations.append(station);
-  }
-  bar.append(stations);
-  root.append(bar);
-  const sensei = biLabel('button', 'corner-bubble bubble-sensei', '先生', 'Tutor');
-  sensei.type = 'button';
-  sensei.setAttribute('data-drift-chrome', '');
-  sensei.addEventListener('click', () => {
-    S.navOpen = false;
-    keepScroll();
-    S.view = 'ai';
-    render();
-  });
-  root.append(sensei);
 }
 
 /** The narrow reader's top line scrolls inside itself, and neither engine finishes revealing a
@@ -35530,7 +35494,7 @@ function buildPrimaryTabs(root, { personal = false } = {}) {
       button.setAttribute('aria-label', tx(`${tab.ja} · ${due}枚`, `${tab.en} · ${due} card${due === 1 ? '' : 's'}`));
     }
     // the bookmark's count, once the bar's bookmark stands aside for this tab (frame, 2026-11-10)
-    if (tab.id === 'today' && !sky && !personal && gateFrame()) paintKeptCount(button);
+    if (tab.id === 'today' && !sky && !personal) paintKeptCount(button);
     if (tab.views.includes(S.view)) button.setAttribute('aria-current', 'page');
     // A finished sitting is still Today's current station. Its explicit return above the
     // dock owns the exit; the active station remains visible without repeating that action.
@@ -36155,7 +36119,7 @@ function render() {
   if (gated) chrome.append(barGate('bar-gate'));
   const tabDoors = barDoors && !primaryTabsShown();
   if (gated && S.view !== 'search') chrome.append(chromeSearch());
-  if (gated) chrome.append(langSwitch());
+  if (gated && barDoors) chrome.append(langSwitch());
   // the world seal, then EN | 日本語 — two visible states, the active one lit. The preferences
   // stand first in the right-hand cluster, the doors (search · Learn · Lists) after them.
   if (barDoors && !gated) {

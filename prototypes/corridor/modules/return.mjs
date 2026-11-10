@@ -1,5 +1,5 @@
 /** G3 return seam — declarations moved verbatim from ../corridor.js (pure move, no body edits). */
-import { D, S, applyAssessmentV2, assessmentClockSession, biLabel, captureScaleVisit, clearReaderReadings, clearReaderSummons, clearWordLadder, currentAssessmentV2, el, finishPageTransition, gateFrame, mockFailed, passage, removeMini, render, retireScaleReturn, returnToScaleBead, scaleIn, scaleNavigationAllowed, scaleOut, scalePassage, scaleThreadPath, scaleTokenFingerprint, stopSentenceListening, tx } from '../corridor.js';
+import { D, S, applyAssessmentV2, assessmentClockSession, biLabel, captureScaleVisit, clearReaderReadings, clearReaderSummons, clearWordLadder, currentAssessmentV2, el, finishPageTransition, gateFrame, mockFailed, passage, placesLayout, removeMini, render, retireScaleReturn, returnToScaleBead, scaleIn, scaleNavigationAllowed, scaleOut, scalePassage, scaleThreadPath, scaleTokenFingerprint, stopSentenceListening, tx } from '../corridor.js';
 import { lookup, readerTokenAtIndex } from './dictionary.mjs';
 import { readerEntryNode } from './library.mjs';
 import { stopReadAloud } from './voice.mjs';
@@ -332,7 +332,7 @@ function paintRoomScaleThread(root) {
   const thread = atSky ? null : scaleThread();
   // its first step alone ("宙 · shelf") says what Back and the Read tab say: the row shows once there is a second step
   // (frame, 2026-11-10)
-  if (!thread || (thread.dataset.scale === 'shelf' && gateFrame())) { old?.remove(); return; }
+  if (!thread || (thread.dataset.scale === 'shelf' && gateFrame() && !placesLayout())) { old?.remove(); return; }
   thread.dataset.scaleRoom = '';
   if (old) old.replaceWith(thread);
   else {
