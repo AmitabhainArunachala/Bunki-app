@@ -21,7 +21,7 @@
 .listen-row[data-passage='jawiki:5294446']::after,          /* the Sakura article's speaker bar */
 [data-shared-study='ready'] > p::after,                     /* the new study screen and the grammar deck: the top line */
 .dojo-deck[data-deck='shared-grammar'] .dojo-deck-t::after, /* the grammar deck's row in the deck list */
-.kanji-world-door-held::after,                              /* Rajōmon from 間 聞 問 開 閉 */
+#kanji-world-door::after,                                   /* Rajōmon: the door on 門, and on 間 聞 問 開 閉 (held) */
 #bunki-prototype-root .pl-new {
   content: var(--pl-new);
   display: inline-block;
@@ -39,7 +39,7 @@
   vertical-align: middle;
 }
 /* a chip stacks its children; these doors hold one line, so the mark stands beside it */
-#kanji-quest-door, #worldcraft-door, #passage-door, .kanji-world-door-held { flex-direction: row; align-items: center; }
+#kanji-quest-door, #worldcraft-door, #passage-door, #kanji-world-door { flex-direction: row; align-items: center; }
 /* on the orbit screen's dark bar the mark takes that bar's own tag colours */
 .orbit-preview-bar .orbit-preview-tag::after { border-color: #de5b43; color: #f1b3a5; }
 /* five places: the whole arrangement is the new thing, so its bar carries the mark */
