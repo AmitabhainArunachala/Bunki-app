@@ -179,7 +179,21 @@ for (const seam of seamImports) {
   seamScript += seamSource.trim() + '\n\n';
 }
 appScript = appScript.replace(/^import\s*\{[^}]*\}\s*from\s*'\.\/modules\/[^']+\.mjs';\n/gmu, '');
-appScript = seamScript + appScript;
+// Since 2026-11-08 corridor.js also imports ./device-voice.mjs (the review card's device speech).
+// A file:// document cannot fetch that sibling either, and with it unfetched the page never boots.
+// Fold it in the same way. Its declarations keep a scope of their own: only the two names
+// corridor.js imports cross into the application's.
+const DEVICE_VOICE_IMPORT = "import { createDeviceVoice, REASONS as DEVICE_VOICE_REASONS } from './device-voice.mjs';\n";
+assert.equal(appScript.split(DEVICE_VOICE_IMPORT).length - 1, 1, 'Standalone device-voice import changed');
+const deviceVoiceSource = read('device-voice.mjs');
+assert(!/^import\b/mu.test(deviceVoiceSource), 'Standalone device voice gained an import of its own');
+const deviceVoiceBody = deviceVoiceSource.replace(/^export\s+(?=(?:const|function)\b)/gmu, '');
+assert(!/^export\b/mu.test(deviceVoiceBody), 'Standalone device voice still carries module syntax');
+appScript = appScript.replace(DEVICE_VOICE_IMPORT, '');
+const deviceVoiceScript = `const { createDeviceVoice, REASONS: DEVICE_VOICE_REASONS } = (() => {\n${deviceVoiceBody.trim()}\nreturn { createDeviceVoice, REASONS };\n})();\n\n`;
+appScript = deviceVoiceScript + seamScript + appScript;
+// Any static sibling import left here is one the single file cannot fetch: fail the build, not the boot.
+assert(!/^import\b[^\n]*\bfrom\s*['"]\.{1,2}\//mu.test(appScript), 'Standalone application still imports a sibling module');
 let driftScript = read('drift-layer.js');
 assert.equal(driftScript.split('import("./record-controller.mjs")').length - 1, 1, 'Standalone Drift record import changed');
 driftScript = driftScript.replace('import("./record-controller.mjs")',
