@@ -466,7 +466,8 @@ function renderTodayLine(today, door, read) {
       todayPhrases(todayLearning('span', 'today-then-title'), read.passage.title));
     if (read.count) then.append(el('span', 'today-then-n', tx(`あなたの語 ${read.count}`, `${read.count} of your words`)));
     then.append(el('i', 'today-arrow'));
-    then.addEventListener('click', () => openPassage(read.passage.id));
+    // Back from the reading returns to Today, where it was opened (tighten pass 2026-11-10; it landed on the bookshelf)
+    then.addEventListener('click', () => openPassage(read.passage.id, { returnView: 'tray' }));
     line.append(then);
   }
   return line;

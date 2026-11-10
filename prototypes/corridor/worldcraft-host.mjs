@@ -233,7 +233,7 @@ export async function openWorldcraftPreview({ document, invoker, form, biLabel, 
   ));
   const context = make('p', 'wc-context'); context.setAttribute('role', 'status'); context.hidden = true;
   shell.append(note, context, body); dialog.append(shell);
-  const back = make('button', 'chip', tx('戻る', 'Return')); back.type = 'button';
+  const back = make('button', 'chip', tx('戻る', 'Back')); back.type = 'button';
   const origin = { x: window.scrollX, y: window.scrollY }, oldOverflow = document.body.style.overflow;
   let closed = false, view = null, session = null;
   const current = () => !closed && isCurrent();
@@ -270,7 +270,7 @@ export async function openWorldcraftPreview({ document, invoker, form, biLabel, 
         context.hidden = !dto.viewing;
         context.textContent = dto.viewing ? tx(
           `残した字「${dto.viewing}」を見ています。「離れる」で「${form}」の組み立てに戻ります。`,
-          `Viewing a kept character: ${dto.viewing}. Leave returns to building ${form}.`) : '';
+          `Viewing a kept character: ${dto.viewing}. Back returns to building ${form}.`) : '';
         view.render(dto, session.actions);
         // The character changes at the top while the press was in the list below: bring the top into sight.
         if (dto.viewing !== shown) { shown = dto.viewing; dialog.scrollTop = 0; }
@@ -288,7 +288,7 @@ export async function openWorldcraftPreview({ document, invoker, form, biLabel, 
     body.replaceChildren(make('p', 'wc-loading', error?.message === 'crypto-unavailable'
       ? tx('この試作は、https か、このパソコン自身のアドレス（localhost）でだけ開けます。',
         'This preview opens only over https, or on this computer’s own address (localhost).')
-      : tx('この試作を読み込めませんでした。戻って、もう一度お試しください。', 'This preview could not load. Return and try again.')), back);
+      : tx('この試作を読み込めませんでした。戻って、もう一度お試しください。', 'This preview could not load. Go back and try again.')), back);
     back.focus();
   }
 }
