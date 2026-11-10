@@ -14506,7 +14506,10 @@ function renderRecordNotes({ sync = true } = {}) {
   container.setAttribute('aria-labelledby', 'record-notes-heading');
   const heading = el('h2', 'section-title', tx('保存したメモ', 'Saved notes'));
   heading.id = 'record-notes-heading';
-  container.append(heading, ...(sync ? [renderRecordSync()] : []), renderPersonalNoteComposer(), el('p', 'record-notes-status'), el('div', 'record-notes-items'));
+  // each heading over its own content: the notes under "Saved notes", then the sync group under its own kicker (owed
+  // repair 6: the sync kicker sat between "Saved notes" and the note field)
+  container.append(heading, renderPersonalNoteComposer(), el('p', 'record-notes-status'), el('div', 'record-notes-items'),
+    ...(sync ? [renderRecordSync()] : []));
   updateRecordNotesContainer(container);
   return container;
 }
