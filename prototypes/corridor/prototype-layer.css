@@ -394,6 +394,13 @@
 }
 #bunki-prototype-cord .pl-knot[data-pl-knot='in'] .pl-knot-o { width: calc(var(--pl-cord-ring) - 2px); height: calc(var(--pl-cord-ring) - 2px); border-width: 1px; opacity: 0.62; }
 #bunki-prototype-cord .pl-knot:focus-visible .pl-knot-o { outline: 2px solid var(--pl-ink); outline-offset: 2px; }
+/* with the lead's live depth stylesheet on (narrow screens): the cord is the red edge that stylesheet gives the heads of
+ * pages, carried from the bar down to the place the learner stands at, and a bead is a small tab on that edge */
+#bunki-prototype-cord[data-pl-cord='edge'] .pl-cord-thread { stroke-width: 3; stroke-linecap: butt; }
+#bunki-prototype-cord[data-pl-cord='edge'] .pl-cord-ghost { stroke-width: 1.5; }
+#bunki-prototype-cord[data-pl-cord='edge'] .pl-knot-o { left: 3px; width: 5px; height: 8px; border-left: 0; border-radius: 0 5px 5px 0; transform: translate(0, -50%); }
+#bunki-prototype-cord[data-pl-cord='edge'] .pl-knot[data-pl-knot='now'] .pl-knot-o { width: 7px; height: 12px; border-radius: 0 7px 7px 0; }
+#bunki-prototype-cord[data-pl-cord='edge'] .pl-knot[data-pl-knot='in'] .pl-knot-o { left: 3px; width: 4px; height: 6px; border-left: 0; }
 /* the mark over a bead: on the wide cord only, where the edge has room for it */
 #bunki-prototype-cord .pl-knot-k { display: none; }
 #bunki-prototype-cord[data-pl-cord='wide'] .pl-knot-k {

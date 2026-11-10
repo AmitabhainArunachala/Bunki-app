@@ -634,7 +634,12 @@ function onFadeClick(event) {
     clientX: event.clientX, clientY: event.clientY, screenX: event.screenX, screenY: event.screenY, button: 0 }));
 }
 /** the learner's hand: a look chosen in the app while a depth look stands is theirs, and stays until the next level */
-function onRootLook() {
+function onRootLook(records) {
+  // the lead's depth switch went on or off: the cord takes its other shape, now and once its stylesheet has arrived
+  if (records?.some((record) => record.attributeName === 'data-live-depth')) {
+    syncIto(true);
+    for (const wait of [400, 1600]) setTimeout(() => syncIto(true), wait);
+  }
   const now = document.documentElement.getAttribute('data-theme');
   if (ito.actual === null || now === ito.actual) return;
   const top = document.documentElement;
@@ -646,8 +651,13 @@ function onRootLook() {
 // the cord: where each bead stands, and the thread through them
 function cordShape(count) {
   const wide = innerWidth >= 1100;
-  const base = wide ? { wide, cx: 23, first: 54, step: 58, sway: 2.4, waves: 1, ring: 5.5, now: 7.5 }
-    : { wide, cx: 6, first: 30, step: 40, sway: 1.2, waves: 1, ring: 3.5, now: 4.5 }; // --pl-cord-x and the bead sizes in the styles
+  // Under the lead's live depth stylesheet the heads of pages carry a red edge at the left of the glass ("the red
+  // thread", depth.css). Two red lines three pixels apart fight, so on a narrow screen the cord is then that same
+  // edge: a straight 3 px line at the edge of the glass, and each bead a small tab on it.
+  const edge = !wide && document.documentElement.getAttribute('data-live-depth') === '1';
+  const base = wide ? { wide, edge, cx: 23, first: 54, step: 58, sway: 2.4, waves: 1, ring: 5.5, now: 7.5 }
+    : edge ? { wide, edge, cx: 1.5, first: 30, step: 40, sway: 0, waves: 1, ring: 0, now: 5.5 }
+      : { wide, edge, cx: 6, first: 30, step: 40, sway: 1.2, waves: 1, ring: 3.5, now: 4.5 }; // --pl-cord-x and the bead sizes in the styles
   // the thread comes out from under the top bar; on the sky, which has no bar, from above the glass
   base.from = document.body.dataset.view === 'drift' && !document.querySelector('#sheet') ? -64 : 0;
   const room = innerHeight - 45 - base.first - (wide ? 56 : 156);
@@ -709,10 +719,10 @@ function drawCord(trail) {
   if (!trail.length) { if (ito.cord) ito.cord.hidden = true; return; }
   if (!ito.cord) buildCord();
   const cord = ito.cord, fresh = cord.hidden || !ito.knots.length, shape = cordShape(trail.length);
-  const key = `${shape.wide}:${shape.step}:${shape.from}`, moved = key !== ito.shape, calm = still() || fresh || moved;
+  const key = `${shape.wide}:${shape.edge}:${shape.step}:${shape.from}`, moved = key !== ito.shape, calm = still() || fresh || moved;
   ito.shape = key;
   cord.hidden = false;
-  cord.dataset.plCord = shape.wide ? 'wide' : 'slim';
+  cord.dataset.plCord = shape.wide ? 'wide' : shape.edge ? 'edge' : 'slim';
   cord.setAttribute('aria-label', t('ことばの道すじ', 'The way through the text'));
   cord.style.setProperty('--pl-cord-step', `${shape.step}px`);
   cord.style.height = `${knotY(shape, trail.length - 1) + shape.step}px`;
@@ -755,7 +765,7 @@ function drawCord(trail) {
   ito.holes.replaceChildren(cut('rect', { x: -40, y: -80, width: 160, height: 4000, fill: '#fff' }));
   for (const [index, bead] of trail.entries()) {
     const y = knotY(shape, index);
-    if (!bead.current) ito.holes.append(cut('circle', { cx: shape.cx, cy: y, r: bead.kind === 'in' ? shape.ring - 1 : shape.ring, fill: '#000' }));
+    if (!bead.current && shape.ring) ito.holes.append(cut('circle', { cx: shape.cx, cy: y, r: bead.kind === 'in' ? shape.ring - 1 : shape.ring, fill: '#000' }));
     if (shape.wide && bead.kind !== 'in') ito.holes.append(cut('rect', { x: shape.cx - 9, y: y - shape.now - 21, width: 18, height: 17, fill: '#000' }));
   }
   for (const running of ito.thread.getAnimations()) running.cancel();
@@ -773,7 +783,7 @@ function drawCord(trail) {
     ito.thread.animate([{ strokeDashoffset: 0 }, { strokeDashoffset: gone }], { duration: 380, easing: CORD_EASE }).finished.then(settle, () => {});
   }
   ito.length = path.length;
-  const tail = next ? knotY(shape, next.index) - (shape.ring - 1) - 3 : trail[at].scale === 'part' ? 0 : end + shape.now + 3 + shape.step * 0.55;
+  const tail = next ? knotY(shape, next.index) - Math.max(0, shape.ring - 1) - 3 : trail[at].scale === 'part' ? 0 : end + shape.now + 3 + shape.step * 0.55;
   ito.ghost.setAttribute('d', tail ? `M${shape.cx} ${end + shape.now + 4}L${shape.cx} ${tail}` : '');
   if (!calm && tail) ito.ghost.animate([{ opacity: 0 }, { opacity: 0.5 }], { duration: 520, easing: 'ease-out' });
 }
@@ -822,7 +832,7 @@ function setIto(on) {
     top.dataset.plIto = 'on';
     if (!ito.watch) {
       ito.watch = new MutationObserver(onRootLook);
-      ito.watch.observe(top, { attributes: true, attributeFilter: ['data-theme'] });
+      ito.watch.observe(top, { attributes: true, attributeFilter: ['data-theme', 'data-live-depth'] });
       window.addEventListener('pointerdown', onFadePress, { capture: true, passive: true });
       window.addEventListener('click', onFadeClick, true);
     }
