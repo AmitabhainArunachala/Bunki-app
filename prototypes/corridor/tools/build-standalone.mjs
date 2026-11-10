@@ -438,6 +438,7 @@ ${read('rooms/words.css')}
 ${read('rooms/me.css')}
 ${read('rooms/cards.css')}
 ${read('rooms/motion.css')}
+${read('tighten.css')}
 </style>
 ${BODY}
 `;
@@ -468,6 +469,7 @@ ${read('rooms/words.css')}
 ${read('rooms/me.css')}
 ${read('rooms/cards.css')}
 ${read('rooms/motion.css')}
+${read('tighten.css')}
 </style>
 </head>
 <body>

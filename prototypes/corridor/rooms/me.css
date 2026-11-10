@@ -95,7 +95,6 @@ html[data-room='me'] .me-lead-m { font-size: var(--type-label); line-height: 1.5
 html[data-room='me'] .me-help-n { font: 800 var(--type-section)/1 var(--font-headword); font-variant-numeric: tabular-nums; color: var(--color-ink); }
 html[data-room='me'] .me-help-l { font: 800 var(--type-lead)/1.3 var(--font-headword); }
 html[data-room='me'] .me-help-m { font: 400 var(--type-label)/1.5 var(--font-reading); font-variant-numeric: tabular-nums; color: var(--color-muted); }
-html[data-room='me'] .me-help:not(:has(.me-help-n)) { font: 400 var(--type-label)/1.55 var(--font-reading); color: var(--color-muted); }
 
 /* ruled sections */
 html[data-room='me'] .me-part {
@@ -340,11 +339,8 @@ html[data-room='me'] .me-set-l { font: 500 var(--type-control)/1.3 var(--font-ui
 html[data-room='me'] body:not(.ui-bi) .me-set-l { font: 800 var(--type-control)/1.3 var(--font-headword); letter-spacing: 0.06em; }
 html[data-room='me'] .me-seg { display: inline-flex; flex: none; padding: 2px; border-radius: var(--radius-control); box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-edge-strong); }
 html[data-room='me'] .me-seg button {
-  min-width: 60px; min-height: 44px; padding: 0 12px; border: 0; border-radius: var(--radius-control);
-  background: transparent; color: var(--color-ink-2); font: 500 var(--type-chrome)/1 var(--font-ui); cursor: pointer;
+  min-width: 60px;
 }
-html[data-room='me'] .me-seg button[lang='ja'] { font-family: var(--font-headword); font-weight: 800; }
-html[data-room='me'] .me-seg button[aria-pressed='true'] { background: var(--color-ink); color: var(--color-surface); font-weight: 700; }
 
 /* night: a lamp-lit book on 藍 — the page glows warm at the top right, the gold is lit */
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='me'] .me-book {
@@ -382,10 +378,6 @@ html[data-room='me'] .me-seg button[aria-pressed='true'] { background: var(--col
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='me'] .me-day.seal-read .me-seal { background: transparent; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-seal) 70%, transparent); text-shadow: none; }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='me'] .me-day.is-today { box-shadow: inset 0 0 0 1.5px var(--color-live), 0 0 12px -3px var(--color-live); }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='me'] .me-seg button[aria-pressed='true'] {
-  background: transparent; color: var(--color-ink);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-gold) 70%, transparent), 0 0 12px -4px var(--color-gold);
-}
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='me'] .me-key-seal { background: transparent; color: var(--color-seal); box-shadow: inset 0 0 0 1px var(--color-seal), 0 0 6px -2px var(--color-seal); }
 
 /* settings: the back pages of the same book */
@@ -398,10 +390,8 @@ html[data-room='settings'] main :is(.settings-language, .settings-layout-choice)
   box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-edge-strong);
 }
 html[data-room='settings'] main :is(.settings-language, .settings-layout-choice) button {
-  min-width: 72px; min-height: 44px; padding: 0 14px; border: 0; border-radius: var(--radius-control);
-  background: transparent; color: var(--color-ink-2); font: 500 var(--type-chrome)/1 var(--font-ui);
+  min-width: 72px;
 }
-html[data-room='settings'] main :is(.settings-language, .settings-layout-choice) button[aria-pressed='true'] { background: var(--color-ink); color: var(--color-surface); font-weight: 700; }
 /* G4 · 筆 and 声: two named rows of the same segmented choice as the language and the layout */
 html[data-room='settings'] main .settings-writing-row { display: grid; justify-items: start; gap: var(--space-2); margin: var(--space-3) 0 0; }
 html[data-room='settings'] main .settings-writing-name { margin: 0; font: 600 var(--type-control)/1.4 var(--font-ui); color: var(--color-ink); }
@@ -415,10 +405,6 @@ html[data-room='settings'] body.v-depth-layered #app main > .foundation-doors .f
 }
 html[data-room='settings'] body:not(.ui-bi) #app main > .foundation-doors .foundation-door { font: 800 var(--type-body)/1.3 var(--font-headword); letter-spacing: 0.06em; }
 html[data-room='settings'] body.v-depth-layered #app main > .foundation-doors .foundation-door:hover { background: var(--color-fill); }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='settings'] main :is(.settings-language, .settings-layout-choice) button[aria-pressed='true'] {
-  background: transparent; color: var(--color-ink);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-gold) 70%, transparent), 0 0 12px -4px var(--color-gold);
-}
 
 /* progress (kagami, review statistics): the same book's ink — mono figures on ruled cells, the
    reviews done in earned gold, the reviews ahead in 藍 outline */

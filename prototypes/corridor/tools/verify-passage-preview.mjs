@@ -136,7 +136,7 @@ async function walk(browser, engine, size) {
   await toKanji(session, '職', 'ショク');
   const door = page.locator('#passage-door');
   await door.waitFor();
-  assert.equal(await door.innerText(), 'Walk the 職・識・織 passage · preview', 'The door is labelled preview');
+  assert.equal(await door.innerText(), 'Walk the 職・識・織 passage', 'The door names the walk');
   assert.equal(await page.locator('#passage-door').count(), 1);
   // The page is scrolled before the door is pressed, so "returns to where it started" names a real place.
   await page.locator('#sheet').evaluate((sheet) => { sheet.scrollTop = 240; });
@@ -168,7 +168,7 @@ async function walk(browser, engine, size) {
   const away = await place(page);
   assert.deepEqual({ ...away, focused: 'passage-door' }, { ...origin, focused: 'passage-door' }, 'Leaving restores the page');
   assert.equal(away.focused, 'passage-door', 'Leaving hands the keyboard back to the door');
-  assert.equal(await door.innerText(), 'Resume the passage · stop 3 of 7 · preview');
+  assert.equal(await door.innerText(), 'Resume the passage · stop 3 of 7');
   assert.deepEqual(await readAppRecordSnapshot(page), recordBefore, 'Opening, stepping and leaving change no durable row and no revision');
   assert.equal(await device(page), deviceBefore, 'Opening, stepping and leaving write no device marker');
   // A detour and back: the page's own door to 戠 opens another page, which has no Passage door; Back
@@ -181,7 +181,7 @@ async function walk(browser, engine, size) {
   assert.equal(await page.locator('#passage-door').count(), 0, 'The detour page has no Passage door');
   await press('#sheet-back');
   await page.locator('#sheet .hero-glyph', { hasText: '職' }).waitFor();
-  await page.locator('#passage-door', { hasText: 'Resume the passage · stop 3 of 7 · preview' }).waitFor();
+  await page.locator('#passage-door', { hasText: 'Resume the passage · stop 3 of 7' }).waitFor();
   // Back hands the page its own scroll a frame or two later: let that land, then choose the place to resume from.
   await settled(page);
   await page.locator('#sheet').evaluate((sheet) => { sheet.scrollTop = 240; });
@@ -230,7 +230,7 @@ async function walk(browser, engine, size) {
   await page.waitForFunction(() => !document.querySelector('#passage-dialog'));
   const after = await place(page);
   assert.deepEqual(after, { ...resumed, focused: 'passage-door' }, 'The end returns to the page, scroll and door it started from');
-  assert.equal(await door.innerText(), 'Walk the 職・識・織 passage · preview', 'A finished passage is not offered for resuming');
+  assert.equal(await door.innerText(), 'Walk the 職・識・織 passage', 'A finished passage is not offered for resuming');
   assert.deepEqual(await readAppRecordSnapshot(page), recordMid, 'Resuming, playing and finishing change no durable row and no revision');
   assert.equal(await device(page), deviceMid, 'Resuming, playing and finishing write no device marker');
   checks.push('exact-return', 'unchanged-record-rows-and-revision', 'unchanged-device-storage');
@@ -372,7 +372,7 @@ async function insecure(browser, engine, size) {
   assert.equal(await page.locator('#passage-next, #passage-glyph').count(), 0);
   await press('#passage-return');
   await page.waitForFunction(() => !document.querySelector('#passage-dialog'));
-  assert.equal(await door.innerText(), 'Walk the 職・識・織 passage · preview');
+  assert.equal(await door.innerText(), 'Walk the 職・識・織 passage');
   await page.evaluate(() => { Object.defineProperty(Crypto.prototype, 'subtle', window.__subtle); delete window.__subtle; });
   await press(door);
   await expectStop(page, 0);

@@ -33,10 +33,18 @@ const ORIGIN = new URL(BASE).origin;
 const DESKTOP = { viewport: { width: 1280, height: 900 }, deviceScaleFactor: 1 };
 const PHONE = { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true };
 const results = [];
-const browser = await engines[ENGINE].launch({ headless: true });
+// No sound (John, 2026-11-10 18:58): Chromium is launched muted, and every page mutes its media and swallows speech
+// before the app runs. WebKit has no mute switch: do not point --engine webkit at a door that plays sound.
+const browser = await engines[ENGINE].launch({ headless: true, args: ENGINE === 'chromium' ? ['--mute-audio'] : [] });
+const SILENCE = () => {
+  const m = HTMLMediaElement.prototype, play = m.play;
+  m.play = function () { this.muted = true; return play.call(this); };
+  if (window.speechSynthesis) Object.getPrototypeOf(window.speechSynthesis).speak = function (u) { setTimeout(() => { try { u.dispatchEvent(new Event('end')); } catch {} }, 0); };
+};
 
 async function fresh(device = DESKTOP) {
   const context = await browser.newContext({ ...device, locale: 'en-US', timezoneId: 'Asia/Tokyo' });
+  await context.addInitScript(SILENCE);
   const page = await context.newPage();
   page.setDefaultTimeout(20000);
   const problems = [];
@@ -111,6 +119,8 @@ async function quesWordFromReader(page) {
 }
 const doorTexts = (page) => page.evaluate(() => Object.fromEntries(['kanji-course-unit-door', 'kanji-room-door', 'kanji-quest-door']
   .map((id) => [id, document.getElementById(id)?.textContent.trim() ?? null])));
+// tighten pass (2026-11-10): a new door on an app page no longer says "· preview"; it wears the prototype layer's new mark
+const markedNew = (locator) => locator.evaluate((node) => /new|新/.test(getComputedStyle(node, '::after').content));
 const frameOf = async (page, deck) => {
   let frame = null;
   for (let i = 0; i < 150 && !frame; i += 1) {
@@ -149,6 +159,7 @@ await check('doors-page', 'the doors page is served, reads at phone width, and e
   must(faces.title > 0 && faces.body > 0, `the page did not get the app's own faces (title ${faces.title}, body ${faces.body}; ${faces.family})`);
   await shot(page, 'doors-page-desktop');
   const phone = await context.browser().newContext({ ...PHONE, locale: 'en-US' });
+  await phone.addInitScript(SILENCE);
   const small = await phone.newPage();
   await small.goto(`${BASE}prototype.html`, { waitUntil: 'load' });
   await small.evaluate(() => document.fonts.ready);
@@ -170,7 +181,7 @@ await door('quests', 'from the reader, 職業 offers the course, its rooms and a
   const taps = await quesWordFromReader(page);
   const doors = await doorTexts(page);
   must(doors['kanji-course-unit-door'] && doors['kanji-room-door'] && doors['kanji-quest-door'], `doors on the word page: ${JSON.stringify(doors)}`);
-  must(/preview/.test(doors['kanji-quest-door']), `the quest door does not say preview: "${doors['kanji-quest-door']}"`);
+  must(!/preview/.test(doors['kanji-quest-door']) && await markedNew(page.locator('#kanji-quest-door')), `the quest door is not marked new, or still says preview: "${doors['kanji-quest-door']}"`);
   await shot(page, 'quests-word-page');
   await page.locator('#kanji-quest-door').click();
   await page.locator('#kanji-quest-start').waitFor();
@@ -212,10 +223,10 @@ for (const [name, deck] of [['shared-n2', 'n2'], ['shared-n1', 'n1'], ['shared-s
     const label = await throughDoor(page, name, { app: false });
     const frame = await frameOf(page, deck);
     const host = await text(page, '#app', 300);
-    must(/Isolated preview/.test(host), `the host does not say it is an isolated preview: ${host.slice(0, 160)}`);
+    must(/Trial copy/.test(host), `the host does not say it is a trial copy: ${host.slice(0, 160)}`);
     const inside = (await frame.evaluate(() => document.body.innerText)).replace(/\s+/g, ' ');
     await shot(page, name);
-    return `"${label}" → "${host.match(/Back to Bunki.*?history/)?.[0] || 'Isolated preview'}"; the frame reads "${inside.slice(0, 60)}…"`;
+    return `"${label}" → "${host.match(/Back to Bunki.*?as it is\./)?.[0] || 'Trial copy'}"; the frame reads "${inside.slice(0, 60)}…"`;
   });
 }
 
@@ -270,7 +281,7 @@ await door('writing-room', 'the writing room opens with its full controls', asyn
   return `"${label}" → 門's page → its stroke-order box → "${room.slice(0, 110)}"`;
 });
 
-/** a Rajōmon door on the doors page: the kanji's page opens, its door says preview, the scene opens and teaches 門 */
+/** a Rajōmon door on the doors page: the kanji's page opens, its door wears the new mark, the scene opens and teaches 門 */
 async function rajomonFrom(page, doorName, kanji) {
   const label = await throughDoor(page, doorName);
   must(await view(page) === 'search', `the door opened "${await view(page)}"`);
@@ -279,7 +290,7 @@ async function rajomonFrom(page, doorName, kanji) {
   const world = page.locator('#kanji-world-door');
   await world.waitFor();
   const words = (await world.innerText()).trim();
-  must(/preview/.test(words), `the Rajōmon door on ${kanji} reads "${words}"`);
+  must(!/preview/.test(words) && await markedNew(world), `the Rajōmon door on ${kanji} reads "${words}", or wears no new mark`);
   if (kanji !== '門') must(words.includes('門') && words.includes(kanji), `the door on ${kanji} does not name the gate inside it: "${words}"`);
   await world.scrollIntoViewIfNeeded();
   await world.click();
@@ -367,7 +378,7 @@ await door('library-one', 'one candidate opens in the reader, tagged', async ({ 
   return `"${label}" → the reader, tagged "${tag}", ${words} tappable words; its head reads "${head.slice(0, 90)}"`;
 });
 
-/** a Build-a-character door: the kanji's page opens, its door says preview, the builder opens over it */
+/** a Build-a-character door: the kanji's page opens, its door wears the new mark, the builder opens over it */
 async function worldcraftFrom(page, doorName, kanji) {
   const label = await throughDoor(page, doorName);
   must(await view(page) === 'search', `the door opened "${await view(page)}"`);
@@ -375,7 +386,7 @@ async function worldcraftFrom(page, doorName, kanji) {
   const craft = page.locator('#worldcraft-door');
   await craft.waitFor();
   const words = (await craft.innerText()).replace(/\s+/g, ' ').trim();
-  must(/preview/.test(words) && words.includes(kanji), `the door on ${kanji} reads "${words}"`);
+  must(!/preview/.test(words) && await markedNew(craft) && words.includes(kanji), `the door on ${kanji} reads "${words}"`);
   await craft.scrollIntoViewIfNeeded();
   await craft.click();
   await page.locator('#worldcraft-dialog [data-worldcraft-action="assemble"]').waitFor({ timeout: 20000 });
@@ -404,7 +415,7 @@ for (const [name, kanji] of [['worldcraft-shiki', '識'], ['worldcraft-ori', '�
   });
 }
 
-/** a Passage door: the kanji's page opens, its door says preview, the walk opens over it at its first stop */
+/** a Passage door: the kanji's page opens, its door wears the new mark, the walk opens over it at its first stop */
 async function passageFrom(page, doorName, kanji) {
   const label = await throughDoor(page, doorName);
   must(await view(page) === 'search', `the door opened "${await view(page)}"`);
@@ -412,7 +423,7 @@ async function passageFrom(page, doorName, kanji) {
   const walk = page.locator('#passage-door');
   await walk.waitFor();
   const words = (await walk.innerText()).replace(/\s+/g, ' ').trim();
-  must(/preview/.test(words) && /passage/i.test(words), `the passage door on ${kanji} reads "${words}"`);
+  must(!/preview/.test(words) && await markedNew(walk) && /passage/i.test(words), `the passage door on ${kanji} reads "${words}"`);
   await walk.scrollIntoViewIfNeeded();
   await walk.click();
   await page.locator('#passage-count').waitFor({ timeout: 20000 });
@@ -430,7 +441,7 @@ await door('passage', 'on 職 the passage walks its seven stops, keeps its place
   await page.locator('#passage-return').click();
   await page.locator('#passage-dialog').waitFor({ state: 'detached', timeout: 10000 });
   const resume = (await page.locator('#passage-door').innerText()).replace(/\s+/g, ' ').trim();
-  must(/Resume the passage · stop 2 of 7 · preview/.test(resume), `after Return the door reads "${resume}"`);
+  must(/Resume the passage · stop 2 of 7/.test(resume), `after Return the door reads "${resume}"`);
   await page.locator('#passage-door').click();
   await page.locator('#passage-count').waitFor();
   must(/stop 2 of 7/.test(await passageCount(page)), `the walk resumed at "${await passageCount(page)}"`);

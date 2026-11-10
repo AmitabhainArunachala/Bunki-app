@@ -2437,15 +2437,13 @@ function renderDictionaryHomographs(container, node, { head = false } = {}) {
   const currentSeq = String(node.seq || node.dictionaryResolvedSeq || '');
   const currentReading = kataToHira(node.reading || lookup(node.id, node.seq)?.r || '');
   const block = el('div', head ? 'dictionary-homographs is-entry-head' : 'dictionary-homographs');
-  block.append(
-    choices.length === 1
-      ? withEn(el('p', 'dictionary-rel-title', '辞書の項目'), 'Dictionary entry', 'en-inline')
-      : withEn(
-        el('p', 'dictionary-rel-title', `同じ形の ${choices.length} 項目`),
-        `${choices.length} readings or entries share this form`,
-        'en-inline',
-      ),
-  );
+  // tighten pass (2026-11-10): a lone entry is one quiet door that names where it goes and never reprints the word above it
+  const single = choices.length === 1;
+  if (!single) block.append(withEn(
+    el('p', 'dictionary-rel-title', `同じ形の ${choices.length} 項目`),
+    `${choices.length} readings or entries share this form`,
+    'en-inline',
+  ));
   // only an explicit sheet's own entry is no door to itself; on a seq-less core sheet the
   // resolved entry the senses below come from is still a door (D23, Codex 16:20:08Z)
   const isActive = ({ row, summary, enabledOnCore }) => !(seqless && enabledOnCore) && String(row[0]) === currentSeq &&
@@ -2459,18 +2457,24 @@ function renderDictionaryHomographs(container, node, { head = false } = {}) {
     if (also.length) choice.dataset.alsoEntries = also.map((member) => String(member.row[0])).join(' ');
     choice.setAttribute('aria-pressed', String(active));
     const stack = el('span', 'row-stack');
-    const top = el('span', 'row-word');
-    top.append(document.createTextNode(headForm));
-    if (reading) top.append(el('span', 'row-reading', reading));
-    if (also.length) {
-      const readings = also.map((member) => member.summary[0]).filter(Boolean);
-      const more = el('span', 'row-also', tx('ほかに ', 'also '));
-      const kana = el('span', null, readings.join(tx('、', ', ')));
-      kana.lang = 'ja';
-      more.append(kana);
-      top.append(more);
+    if (single) {
+      choice.classList.add('dictionary-full-door');
+      choice.dataset.entryReading = reading || '';
+      stack.append(el('span', 'row-main', tx('辞書の項目をひらく', 'Full dictionary entry')));
+    } else {
+      const top = el('span', 'row-word');
+      top.append(document.createTextNode(headForm));
+      if (reading) top.append(el('span', 'row-reading', reading));
+      if (also.length) {
+        const readings = also.map((member) => member.summary[0]).filter(Boolean);
+        const more = el('span', 'row-also', tx('ほかに ', 'also '));
+        const kana = el('span', null, readings.join(tx('、', ', ')));
+        kana.lang = 'ja';
+        more.append(kana);
+        top.append(more);
+      }
+      stack.append(top);
     }
-    stack.append(top);
     if (primaryGloss && !head) stack.append(el('span', 'row-gloss', primaryGloss));
     if (head) choice.setAttribute('aria-label', tx(`辞書の項目「${headForm}」${reading}をひらく`, `Open the dictionary entry ${headForm} ${reading}`));
     choice.append(stack, el('span', 'row-go', active ? '·' : '›'));

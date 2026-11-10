@@ -656,8 +656,9 @@ export const MEASURE_FN = `(() => {
     .map((n) => {
       const r = n.getBoundingClientRect();
       // a control whose press region is its ::before is measured by that region (the reader's words, the sentence and rest
-      // doors; G5 · L-2: a Save in a bar, its 28 px face inside the bar and its ::before the bar's full 44, as Close)
-      const expanded = n.matches('.tok, button.sent-door, button.rest-toggle, [data-bar] button.save-one:not(.chrome-keep), button.ww-reading-door') ? getComputedStyle(n, '::before') : null;
+      // doors; G5 · L-2: a Save in a bar, its 28 px face inside the bar and its ::before the bar's full 44, as Close; the kanji
+      // page's facts line, 32 px linked text whose ::before reaches 44, tighten pass 2026-11-10)
+      const expanded = n.matches('.tok, button.sent-door, button.rest-toggle, [data-bar] button.save-one:not(.chrome-keep), button.ww-reading-door, .entry-facts .cat-chip, .entry-facts .kanji-fact') ? getComputedStyle(n, '::before') : null;
       // A reading door's transparent reach must actually exist and receive input.
       const usableExpanded = !n.matches('button.ww-reading-door') || (expanded &&
         !['none', 'normal'].includes(expanded.content) && expanded.display !== 'none' && expanded.pointerEvents !== 'none');
@@ -1641,8 +1642,8 @@ async function main() {
     kanjiPage.node.startsWith('kanji:') && kanjiPage.glyph.length === 1 && kanjiPage.meaning.length > 0,
     `${kanjiPage.glyph} — ${kanjiPage.meaning}; ${kanjiPage.tags.join(' / ')}`);
   check('the kanji page carries its 漢検級',
-    kanjiPage.tags.some((t) => t.includes('Kanji Kentei')),
-    kanjiPage.tags.filter((t) => t.includes('Kanji Kentei')).join(','));
+    kanjiPage.tags.some((t) => /Kanken|Kanji Kentei/.test(t)), // the facts line says "Kanken 9" (tighten pass, 2026-11-10)
+    kanjiPage.tags.filter((t) => /Kanken|Kanji Kentei/.test(t)).join(','));
   await waitForFiniteMotion(page, '#sheet');
   const phoneSheet = await sheetViewportGeometry(page);
   report.measurements.kanjiPhoneViewport = phoneSheet;
@@ -4130,8 +4131,8 @@ async function main() {
     view: document.body.dataset.view,
   })`);
   check('R3-E · the dojo entered from the galaxy wears a galaxy crumb',
-    // one room-name table (one hand, slice E): the crumb names the dojo by its title's word, ROOM_NAMES' 次の稽古 · Up next
-    dojoProbe.view === 'dojo' && dojoProbe.crumb.trim() === 'Galaxy › Up next' && dojoProbe.room === 'Up next',
+    // one name per place (tighten pass 2026-11-10): the bar names the dojo by its tab's word, ROOM_NAMES.line 学ぶ · Learn
+    dojoProbe.view === 'dojo' && dojoProbe.crumb.trim() === 'Galaxy › Learn' && dojoProbe.room === 'Learn',
     `crumb "${dojoProbe.crumb}" · room "${dojoProbe.room}"`);
   await page.tap('#back');
   await page.waitForTimeout(600);

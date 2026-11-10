@@ -200,7 +200,7 @@ export function createWorldcraftView({ document, biLabel }) {
       list.append(item);
     }
     element.append(keptTitle, list);
-    button(element, 'leave', ['離れる', 'Leave'], () => true, () => {
+    button(element, 'leave', ['戻る', 'Back'], () => true, () => {
       if (hasResult() && state.phase === 'assembled' && !blocked()) {
         confirmation = { kind: 'leave' }; paint('keep-before-leave');
       } else leave();

@@ -91,7 +91,9 @@ const CONTROL = {
   'kanji-bead': { item: '8.', source: [['corridor.js', "  if (scale === 'word') return node?.enteredKanji && scaleWordKanji(node).includes(node.enteredKanji) ? 'kanji' : null;",
     "  if (scale === 'word') return scaleWordKanji(node).length ? 'kanji' : null;"]] },
   'open-title': { item: '9.', css: '#drift-layer .scale-star-caption.is-words { word-break: normal !important; overflow-wrap: anywhere !important; line-break: auto !important; }' },
-  'shelf-sign': { item: '10.', css: "body:not([data-view='drift']) #app:has(> .scale-thread) > main > .room-sign { top: calc(52px + env(safe-area-inset-top, 0px)) !important; right: 6px !important; }" },
+  // the room sign is gone (John, 2026-11-10): the mutant hangs one back in the page
+  'shelf-sign': { item: '10.', source: [['corridor.js', '  // no vertical room sign (John, 2026-11-10): the tab and the bar already name the room, Today\'s heading its date\n',
+    "  main.prepend(Object.assign(document.createElement('div'), { className: 'room-sign', textContent: 'TODAY' }));\n"]] },
   fullwidth: { item: '11.', css: '.tok-word .fw-run { font-feature-settings: normal !important; }' },
   'strip-lists': { item: '12.', source: [['corridor.js', '    const shownLists = window.innerWidth < 360 ? 3 : SEAL_LISTS_SHOWN;', '    const shownLists = SEAL_LISTS_SHOWN;'],
     ['corridor.js', '    open.fitLists = () => {', '    open.fitLists = () => { return;']] },
@@ -608,31 +610,15 @@ async function itemOpenTitle(browser, engine) {
 }
 
 async function itemShelfSign(browser, engine) {
-  // 10 · the shelf's vertical room sign stands whole on the glass: 8 px or more from its edges, under the bar and the thread
-  // (not behind them), clear of the Tools door and the first card; Today's sign keeps the same edge
+  // 10 · no vertical room sign (John, 2026-11-10: the tab and the bar already name the room): the shelf and Today, in the
+  // worlds and widths the sign was once pinned in, hang no .room-sign in the page
   for (const [world, width, room] of [['akafuji', 390, 'shelf'], ['shu', 390, 'shelf'], ['hokusai', 320, 'shelf'], ['hokusai', 390, 'tray']]) {
     const { context, page, errors } = await session(browser, { world, width, query: room === 'shelf' ? 'entry=shelf' : 'entry=shelf&room=tray' });
     try {
-      await page.waitForSelector('#app > main > .room-sign', { timeout: 15_000 });
+      await page.waitForFunction((view) => document.body.dataset.view === view && !!document.querySelector('#app > main > *'), room, { timeout: 15_000 });
       await settle(page, 500);
-      const f = await page.evaluate(() => {
-        const box = (n) => { if (!n) return null; const r = n.getBoundingClientRect(); return r.width ? { left: r.left, right: r.right, top: r.top, bottom: r.bottom } : null; };
-        const sign = document.querySelector('#app > main > .room-sign'), s = box(sign);
-        const glyphs = []; const walk = document.createTreeWalker(sign, NodeFilter.SHOW_TEXT);
-        while (walk.nextNode()) { const r = document.createRange(); r.selectNodeContents(walk.currentNode); glyphs.push(...[...r.getClientRects()].filter((q) => q.width > 0.5)); }
-        // what stands over the sign's glyphs (the sign itself takes no pointer: the topmost other thing at each glyph)
-        const over = glyphs.map((g) => document.elementFromPoint(g.left + g.width / 2, g.top + g.height / 2)).filter((n) => n?.closest('#app > .chrome, #app > .scale-thread')).length;
-        const frame = Math.max(box(document.querySelector('#app > .chrome'))?.bottom ?? 0, box(document.querySelector('#app > .scale-thread'))?.bottom ?? 0);
-        const hits = (a, b) => !!a && !!b && a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
-        const tools = box(document.getElementById('shelf-tools-toggle')), card = box(document.querySelector('#shelf-reading-results > *'));
-        return { sign: s, vw: document.documentElement.clientWidth, frame, over, glyphs: glyphs.length,
-          inside: glyphs.every((g) => g.left >= 8 - 0.5 && g.right <= document.documentElement.clientWidth - 8 + 0.5 && g.top >= frame - 0.5),
-          tools: hits(s, tools), card: hits(s, card), text: sign.textContent };
-      });
-      const edge = f.sign && f.sign.right <= f.vw - 8 + 0.5 && f.sign.left >= 8 - 0.5 && f.sign.top >= f.frame - 0.5;
-      check(`10.room-sign · ${engine} ${world} ${width} ${room} · the room sign (${f.text}) stands whole, 8 px from the edge, under the bar and thread, clear of Tools and the cards`,
-        edge && f.inside && f.glyphs > 0 && f.over === 0 && !f.tools && !f.card && !errors.length,
-        { sign: f.sign && Object.fromEntries(Object.entries(f.sign).map(([k, v]) => [k, Math.round(v)])), vw: f.vw, frame: f.frame, over: f.over, tools: f.tools, card: f.card, errors });
+      const signs = await page.evaluate(() => document.querySelectorAll('.room-sign').length);
+      check(`10.room-sign · ${engine} ${world} ${width} ${room} · no vertical room sign in the page`, signs === 0 && !errors.length, { signs, errors });
     } finally { await context.close(); }
   }
 }

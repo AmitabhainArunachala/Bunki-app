@@ -730,8 +730,8 @@ async function g2Walks(walk, browser, forcedControl = null) {
       return { text: line.querySelector('.depth-basis-said')?.textContent || '', depth: dot?.dataset.depth || null, kept: dot?.dataset.kept != null,
         words: [...line.querySelectorAll('.depth-word')].map((button) => button.textContent), painted: !!dot && getComputedStyle(dot).display !== 'none' }; });
     await page.screenshot({ path: resolve(evidence, `${engine}-G2-page-basis-ai.png`) });
-    check('G2.6', 'the page names the basis in one line — days met (eleven seeded and today\'s look-up), review state with present recall, the reading — and offers "I know this" / "Not yet"; never "mastered"',
-      /Familiar · met on 12 days/u.test(basis.text) && /in review · recall now \d+%/u.test(basis.text) && /read だいじん/u.test(basis.text) &&
+    check('G2.6', 'the page names the basis in one line — days met (eleven seeded and today\'s look-up), review state with present recall, never the reading the line above already shows (tighten pass, 2026-11-10) — and offers "I know this" / "Not yet"; never "mastered"',
+      /Familiar · met on 12 days/u.test(basis.text) && /in review · recall now \d+%/u.test(basis.text) && !/read だいじん/u.test(basis.text) &&
       !/master/iu.test(basis.text) && basis.words.join('|') === 'I know this|Not yet', basis);
     // the saved-words row, Today's stars, the mirror, Me
     await page.locator('#sheet-back').tap();

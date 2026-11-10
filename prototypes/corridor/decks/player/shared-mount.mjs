@@ -26,7 +26,7 @@ export async function render(main,{deckId,english=true,onLeave,autoStart}={}) {
   }
   if(request!==serial||!root.isConnected)return;root.replaceChildren();root.dataset.sharedStudy='ready';
   const back=element('button',english?'Back to Bunki':'Bunkiに戻る');back.type='button';back.onclick=onLeave;root.append(back);
-  if(adapter.identity.environment==='test-bunki-shared-preview')root.append(element('p',english?'Isolated preview · separate from existing study history':'試用用の記録 · 実際の学習記録とは別です'));
+  if(adapter.identity.environment==='test-bunki-shared-preview')root.append(element('p',english?'Trial copy. Your real study record stays as it is.':'試しの写し。実際の学習記録はそのままです。'));
   const frame=element('iframe');frame.title=english?'Shared study':'共通の学習';frame.dataset.sharedStudyFrame='';
   frame.style.cssText='display:block;width:100%;height:calc(100dvh - 9rem);min-height:38rem;border:0';
   const url=new URL('./shared-frame.html',import.meta.url);url.searchParams.set('deck',deckId);url.searchParams.set('ui',english?'en':'ja');if(autoStart)url.searchParams.set('start','1');

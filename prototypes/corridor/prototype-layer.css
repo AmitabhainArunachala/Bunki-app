@@ -21,7 +21,7 @@
 .listen-row[data-passage='jawiki:5294446']::after,          /* the Sakura article's speaker bar */
 [data-shared-study='ready'] > p::after,                     /* the new study screen and the grammar deck: the top line */
 .dojo-deck[data-deck='shared-grammar'] .dojo-deck-t::after, /* the grammar deck's row in the deck list */
-#kanji-world-door::after,                                   /* Rajōmon: its door on a kanji page (門, and 間 聞 問 開 閉) */
+#kanji-world-door::after,                                   /* Rajōmon: the door on 門, and on 間 聞 問 開 閉 (held) */
 #bunki-prototype-root .pl-new {
   content: var(--pl-new);
   display: inline-block;

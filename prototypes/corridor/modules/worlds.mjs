@@ -1,7 +1,8 @@
 /** G3 worlds seam — declarations moved verbatim from ../corridor.js (pure move, no body edits). */
 import { BEYOND_JOYO, D, GLUE_STROKE, GRAMMAR, INK_TEMPO, INK_WORLDS, JOYO_JUDGEABLE, KANJI_QUEST_FAILED, KANJI_QUEST_STRUCTURAL, M4_COPY, MONTHS_EN, PARTICLES, PART_STROKES, PART_WRITTEN, ROMAJI, ROOM_NAMES, S, STROKE_SPEED_DEFAULT, STROKE_VIEWBOX, SVG_NS, THEME_UI, TOPIC_BLOCKS, TOPIC_KICKERS, TOPIC_ORDER, WW_CX, WW_CY, WW_KANJI_ANGLES, WW_REL, WW_RING2_ORDER, WW_RING2_SLOTS, WW_TRAIL_MAX, WW_WALK_KEY, _KDX_NPTS, _compsCache, _kdxDist, _kdxNorm, _kdxResample, _kdxTemplates, animcjkApproved, animcjkShards, bi, biLabel, chipsFor, closeWorldPicker, confusablesFor, currentJoyoKunNote, el, ensureArchiveIndex, ensureArticle, go, inkGroundFor, interaction, kanjiCourseApplyHelp, kanjiCourseRememberHelp, kanjiDisplayRecord, kanjiFamilyExposures, kanjiFamilyMounts, kanjiFamilyResolveExample, kanjiFamilyStamp, kanjiFamilyStampCurrent, kanjiFamilyTicket, kanjiFamilyTicketCurrent, kanjiFamilyViews, kanjiQuestFor, kanjiQuestLoading, kanjiQuestOwner, kanjiReadingsState, kanjiReferenceRows, kanjiStructureMounts, kanjiWorldEligible, kankenGradeLabel, kataToHira, keepNavigationReturn, loadReferenceExtra, motionEase, motionMs, openKanjiCourseUnit, openKanjiWorldEncounter, openPassage, openStrokePage, passage, recordReady, recordWritable, refreshStrokeReadings, removeMini, render, renderFamilyExampleNode, renderKanjiCourseDoor, renderKanjiFamily, renderKanjiStructure, renderKdxGrid, renderSentenceTokens, renderSourceKanjiDoor, renderStudyFold, renderWordWeb, retainedKanjiRecord, scaleOut, sentenceDraftBindings, sentenceDraftInputErrors, sentenceDraftWindowEdits, shelfDay, skipState, srsKey, strokePathsFor, strokeReduced, strokeSpeed, syncStrokeNumbers, tx, withEn, wordBrush, wordWeb, writtenFormNote, wwP, wwPartMembers, wwReduced, wwShort, wwSpread, wwTokenIndex, wwTrail } from '../corridor.js';
+import { entryRow, toSources } from '../corridor.js';
 import { encounterTrail, setTouchReadingShown } from './capture.mjs';
-import { bankExamplesFor, displayKunReading, displayPairs, ensureDictionaryRowsForForm, lookup, nameReaderToken, partGloss, partMeaning, readerGlossLine, readingLine, tapLadderHint } from './dictionary.mjs';
+import { bankExamplesFor, displayKunReading, displayPairs, ensureDictionaryRowsForForm, lookup, nameReaderToken, partGloss, partMeaning, readerGlossLine, readingLine } from './dictionary.mjs';
 import { themeIx } from './learner.mjs';
 import { catalogChip, levelChip, libraryDiscoverable, readerChoiceMatch, shelfDateLabel } from './library.mjs';
 import { scaleNodeBelongs } from './return.mjs';
@@ -1053,7 +1054,11 @@ function wwPush(node) {
 
 function wwKanjiOf(w) {
   const k = D.words[w]?.k?.length ? D.words[w].k : D.dict[w]?.k?.length ? D.dict[w].k : [...w];
-  return [...new Set(k)].filter((c) => D.kanji[c]);
+  // in reading order, left to right: words.json lists a word's kanji in its own order (業 before 職 for 職業, 2,564
+  // words), and the web hangs the first kanji on the left branch (John, 2026-11-10: 職業 was drawn backwards)
+  const word = [...w];
+  return [...new Set(k)].filter((c) => D.kanji[c])
+    .sort((a, b) => (word.indexOf(a) + 1 || Infinity) - (word.indexOf(b) + 1 || Infinity));
 }
 
 function wwParts(c) {
@@ -1591,6 +1596,8 @@ function renderSentenceNode(sheet, node) {
   sheet.append(line);
   if (node.en) sheet.append(el('p', 'sent-reader-en', node.en));
   if (node.source) sheet.append(el('p', 'example-src', node.source));
+  // tighten pass (2026-11-10): the sentence's keep (Save, Practice it) stands under it; buildPage draws it here, unquoted
+  sheet.append(el('div', 'sent-keep'));
   // …and on to the whole article. The rubric asks a review answer to return
   // the learner to the source sentence AND its article (§9.5); the C1
   // demonstration found the sentence half present and this half missing.
@@ -1600,7 +1607,7 @@ function renderSentenceNode(sheet, node) {
   const home = node.passage && D.passages.some((p) => p.id === node.passage) ? node.passage : null;
   if (home) {
     const doorRow = el('div', 'sent-home-row');
-    const door = biLabel('button', 'chip sent-home', 'この記事を読む', 'read the source article');
+    const door = biLabel('button', 'chip sent-home', 'この記事を読む', 'Read the source article');
     door.type = 'button';
     door.id = 'sent-home';
     door.addEventListener('click', () => {
@@ -1613,7 +1620,8 @@ function renderSentenceNode(sheet, node) {
     doorRow.append(door);
     sheet.append(doorRow);
   }
-  sheet.append(el('p', 'gloss', tapLadderHint()));
+  // the reader's ladder in one quiet line (the reader's own settings keep the long hint)
+  sheet.append(el('p', 'sent-hint', tx('語をタップ：読み、意味、項目の順。長押しで保存。', 'Tap a word: reading, meaning, entry. Hold to save.')));
 }
 
 function sentenceDoor(ex, target) {
@@ -1759,32 +1767,62 @@ function componentLabel(c) {
   return tx('部品 — 漢検の部首表に名前がない', 'component — no name in the Kanji Kentei radical table');
 }
 
-function renderKanjiClassifications(sheet, id, node = {}) {
+/** The classical radical, named as a learner names it (tighten pass, 2026-11-10): a door to every kanji filed under it.
+ * On the kanji page (fact: true) it is one item of the facts line and is returned with its source lines; elsewhere it is
+ * a door row. Its scheme number, the Nelson radical and the dataset stand in Sources either way. */
+function renderKanjiClassifications(sheet, id, node = {}, { fact = false } = {}) {
   const facts = kanjiFacts(id);
-  if (!facts) return;
+  if (!facts) return null;
   const number = facts.radicalSchemes.classical;
   const rad = D.radInfo?.[number];
-  const heading = el('h3', 'list-head', tx('辞書の部首分類', 'Dictionary classification'));
-  sheet.append(heading);
-  const door = el('button', 'rad-door');
-  door.type = 'button';
-  door.dataset.classicalRadical = String(number);
-  door.append(el('span', 'rad-glyph', rad?.c || String(number)));
-  const text = el('span', 'rad-text');
-  text.append(el('span', 'rad-name', tx(`伝統部首 ${number}`, `Classical radical ${number}`)));
-  text.append(el('span', 'rad-sub', `KANJIDIC2${rad?.name ? ` · ${rad.name}` : ''}`));
-  door.append(text, el('span', 'row-go', '›'));
-  door.addEventListener('click', () => go({
+  const glyph = rad?.c || String(number);
+  const open = (invoker) => go({
     t: 'catalog', id: `classical-radical:${number}`, by: 'classical-radical', value: number, from: node.from,
-  }, { invoker: door }));
-  sheet.append(door);
+  }, { invoker });
+  let door;
+  if (fact) {
+    // the radical's glyph is named only when it is not the page's own character (門 is its own radical)
+    const named = `${glyph !== id ? `${glyph} ` : ''}${rad?.name || number}`;
+    door = el('button', 'kanji-fact', tx(`部首 ${named}`, `Radical ${named}`));
+    door.type = 'button';
+    door.addEventListener('click', () => open(door));
+  } else {
+    const text = el('span', 'rad-text');
+    text.append(el('span', 'rad-name', tx('部首', 'Radical')));
+    if (rad?.name) text.append(el('span', 'rad-sub', rad.name));
+    door = entryRow('rad-door', open, el('span', glyph === id ? 'rad-glyph row-self' : 'rad-glyph', glyph), text);
+  }
+  door.dataset.classicalRadical = String(number);
+  const notes = [el('p', 'fine', tx(`伝統部首 ${number}・KANJIDIC2${rad?.name ? `・${rad.name}` : ''}`,
+    `Classical radical ${number} · KANJIDIC2${rad?.name ? ` · ${rad.name}` : ''}`))];
   const nelson = facts.radicalSchemes.nelson;
   if (nelson != null) {
     const label = D.radInfo?.[nelson]?.c || '';
     const line = el('p', 'fine', tx(`Nelson 部首 ${nelson} ${label} — KANJIDIC2`, `Nelson radical ${nelson} ${label} — KANJIDIC2`));
     line.dataset.nelsonRadical = String(nelson);
-    sheet.append(line);
+    notes.push(line);
   }
+  if (fact) return { door, notes };
+  sheet.append(door);
+  toSources(sheet, ...notes);
+  return null;
+}
+
+/** The Kodansha number (John, 2026-11-10: "connect to something logical behind like the entire Kodansha map"): the
+ * search room's Kodansha lens, opened at this number in its edition, among its neighbours in Kodansha order. Back
+ * returns here (keepNavigationReturn keeps the finder as it was). */
+function openKodanshaLookup(ed, number, invoker) {
+  const from = S.view;
+  keepNavigationReturn('search', invoker);
+  S.kdx ||= {};
+  S.kdx.kkldEd = ed;
+  S.kdx.kkldQ = String(number);
+  S.searchLens = 'kkld';
+  if (from !== 'search') S.searchFrom = from;
+  S.navOpen = false;
+  S.view = 'search';
+  render();
+  window.scrollTo(0, 0);
 }
 
 function kanjiFamilyLiveVisit() {
@@ -1920,6 +1958,39 @@ function openWorldcraftDoor(invoker, node) {
     });
 }
 
+/** Subject once (tighten pass, 2026-11-10): in a list under the page's heading, the page's own kanji is drawn at list
+ * strength and the partner characters carry the line. */
+function dimSelf(root, self) {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const hits = [];
+  for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+    if (n.nodeValue.includes(self) && !n.parentElement?.classList.contains('row-self')) hits.push(n);
+  }
+  for (const n of hits) {
+    const line = document.createDocumentFragment();
+    n.nodeValue.split(self).forEach((part, i) => {
+      if (i) line.append(el('span', 'row-self', self));
+      if (part) line.append(part);
+    });
+    n.replaceWith(line);
+  }
+  return root;
+}
+
+/** "Show all": the rest of a long list, revealed in place (compounds, idioms). */
+function showAllRow(total, shown, id, reveal) {
+  const more = el('button', 'more-row');
+  more.type = 'button';
+  if (id) more.id = id;
+  const remain = total - shown;
+  more.textContent = tx(`のこり ${remain} 語をすべて見る`, `Show all ${total} — ${remain} more`);
+  more.addEventListener('click', () => {
+    reveal();
+    more.remove();
+  });
+  return more;
+}
+
 function renderKanjiNode(sheet, node) {
   const retained = retainedKanjiRecord(node.id);
   const k = retained || D.kanji[node.id] || window.BunkiSkipUI?.getKanji(S.skipUi, node.id);
@@ -1956,71 +2027,103 @@ function renderKanjiNode(sheet, node) {
   const display = kanjiEntryRecord(node.id, node.referenceEntry) || k;
   const referenceView = kanjiReferenceView(node.id, display);
   meta.append(el('div', 'hero-mean', referenceView.meanings.join('; ') || tx('語義は未収録です。', 'Meaning not supplied.')));
-  const chips = el('div', 'shelf-meta');
-  if (Number.isInteger(k.st)) chips.append(catalogChip(`${k.st} 画`, `${k.st} strokes`, 'strokes', k.st, node.from));
-  if (D.kanken[k.c]?.kk)
-    chips.append(catalogChip(`漢検 ${D.kanken[k.c].kk}`, `Kanji Kentei ${kankenGradeLabel(D.kanken[k.c].kk)}`, 'kanken', D.kanken[k.c].kk, node.from));
+  // tighten pass (2026-11-10; John: "more facts, but more sleek"): the facts are one line of text under the meaning —
+  // strokes · Kanken · JLPT · Kodansha · radical — and each is the door to where it leads, drawn as quiet linked text
+  const facts = [];
+  if (Number.isInteger(k.st)) facts.push(catalogChip(`${k.st} 画`, `${k.st} strokes`, 'strokes', k.st, node.from));
+  if (D.kanken[k.c]?.kk) {
+    const kk = D.kanken[k.c].kk, grade = kankenGradeLabel(kk);
+    const kanken = catalogChip(`漢検 ${kk}`, `Kanji Kentei ${grade}`, 'kanken', kk, node.from);
+    kanken.textContent = tx(`漢検 ${kk}`, grade.startsWith('grade ') ? `Kanken ${grade.slice(6)}` : grade);
+    facts.push(kanken);
+  }
   if (D.kmeta?.[k.c]?.jlpt)
-    chips.append(catalogChip(`JLPT ${D.kmeta[k.c].jlpt}`, `JLPT ${D.kmeta[k.c].jlpt}`, 'jlpt', D.kmeta[k.c].jlpt, node.from));
-  // the entry number in the operator's paper dictionary (Kodansha KKLD),
-  // named by edition — the book on the desk and the sheet on the screen agree
-  if (kkldOf(k.c)) {
-    const kchip = el('span', 'pool-tag kkld-chip', `Kodansha ${kkldLine(k.c)}`);
-    kchip.id = 'kanji-kkld';
-    kchip.title = tx('講談社 漢字学習字典の番号（版ごと）', "Kodansha Kanji Learner's Dictionary entry number, by edition");
-    chips.append(kchip);
+    facts.push(catalogChip(`JLPT ${D.kmeta[k.c].jlpt}`, `JLPT ${D.kmeta[k.c].jlpt}`, 'jlpt', D.kmeta[k.c].jlpt, node.from));
+  const kkld = kkldOf(k.c);
+  if (kkld?.ed2013 || kkld?.ed1999) {
+    const [ed, number] = kkld.ed2013 ? ['ed2013', kkld.ed2013] : ['ed1999', kkld.ed1999];
+    const door = el('button', 'kanji-fact', ed === 'ed2013' ? tx(`講談社 ${number}`, `Kodansha ${number}`)
+      : tx(`講談社 1999年版 ${number}`, `Kodansha 1999 ${number}`));
+    door.type = 'button'; door.id = 'kanji-kkld-door';
+    door.setAttribute('aria-label', tx(`講談社の番号 ${number} をひらく（前後の字と）`, `Open Kodansha number ${number}, among its neighbours`));
+    door.addEventListener('click', () => openKodanshaLookup(ed, number, door));
+    facts.push(door);
   }
-  if (window.BunkiSkipUI) {
-    const shapeDoor = el('button', 'chip', tx('形と画数で引く', 'look up by shape and strokes'));
-    shapeDoor.id = 'kanji-shape-lookup'; shapeDoor.type = 'button';
-    shapeDoor.addEventListener('click', () => go({ t: 'skip', id: 'skip:*', from: node.from }, { invoker: shapeDoor }));
-    chips.append(shapeDoor);
+  const radical = renderKanjiClassifications(sheet, node.id, node, { fact: true });
+  if (radical) facts.push(radical.door);
+  if (facts.length) {
+    const line = el('p', 'entry-facts');
+    line.append(...facts);
+    meta.append(line);
   }
-  meta.append(chips);
   hero.append(meta);
   sheet.append(hero);
+  // the page's doors stand together under the facts: look up by shape, the source sentence, Rajōmon, Build, the course,
+  // and (mounted later) the passage
+  const doors = el('div', 'kanji-doors');
+  sheet.append(doors);
+  if (window.BunkiSkipUI) {
+    const shapeDoor = el('button', 'chip', tx('形と画数で引く', 'Look up by shape and strokes'));
+    shapeDoor.id = 'kanji-shape-lookup'; shapeDoor.type = 'button';
+    shapeDoor.addEventListener('click', () => go({ t: 'skip', id: 'skip:*', from: node.from }, { invoker: shapeDoor }));
+    doors.append(shapeDoor);
+  }
+  renderSourceKanjiDoor(doors, node);
   // everything-on prototype (inventory block 26): the door also stands on five kanji that hold 門, and says whose scene it is
   const world = kanjiWorldEligible(node.id);
   if (world) {
-    const worldDoor = el('button', world === node.id ? 'chip kanji-world-door' : 'chip kanji-world-door kanji-world-door-held', world === node.id ? tx('羅城門へ · 試作', 'Visit Rajōmon · preview')
-      : tx(`羅城門へ · 「${node.id}」の中の「${world}」 · 試作`, `Visit Rajōmon, the ${world} inside ${node.id} · preview`));
+    const worldDoor = el('button', world === node.id ? 'chip kanji-world-door' : 'chip kanji-world-door kanji-world-door-held', world === node.id ? tx('羅城門へ', 'Visit Rajōmon')
+      : tx(`羅城門へ · 「${node.id}」の中の「${world}」`, `Visit Rajōmon, the ${world} inside ${node.id}`));
     worldDoor.id = 'kanji-world-door'; worldDoor.type = 'button';
     worldDoor.addEventListener('click', () => openKanjiWorldEncounter(worldDoor, node));
-    sheet.append(worldDoor);
+    doors.append(worldDoor);
   }
   if (WORLDCRAFT_FORMS.has(node.id) && kanjiWorldEligible()) {
-    const craftDoor = el('button', 'chip worldcraft-door', tx(`「${node.id}」を部品から組み立てる · 試作`, `Build ${node.id} from its parts · preview`));
+    const craftDoor = el('button', 'chip worldcraft-door', tx(`「${node.id}」を部品から組み立てる`, `Build ${node.id} from its parts`));
     craftDoor.id = 'worldcraft-door'; craftDoor.type = 'button';
     craftDoor.addEventListener('click', () => openWorldcraftDoor(craftDoor, node));
-    sheet.append(craftDoor);
+    doors.append(craftDoor);
   }
+  renderKanjiCourseDoor(doors, node);
+  // the builder's notes on where the meanings and readings come from stand in Sources, at the page's foot
+  const sourceNotes = [];
   if (referenceView.state === 'complete') {
     const source = el('p', 'fine', tx(
       `辞書の全語義 — KANJIDIC2 ${referenceView.referenceSource.dictionaryDate}`,
       `Complete dictionary meanings — KANJIDIC2 ${referenceView.referenceSource.dictionaryDate}`,
     ));
     source.dataset.kanjiMeaningsSource = referenceView.referenceSource.release;
-    sheet.append(source);
+    sourceNotes.push(source);
   } else {
-    sheet.append(el('p', 'fine', tx('上の語義は保存済み・レッスン用の語義です。', 'The meanings above are the saved or lesson keywords.')));
-    if (referenceView.state === 'absent') sheet.append(el('p', 'fine', tx('この字の辞書語義・部首分類は資料にありません。', 'This source does not supply dictionary meanings or classification for this form.')));
+    sourceNotes.push(el('p', 'fine', tx('上の語義は保存済み・レッスン用の語義です。', 'The meanings above are the saved or lesson keywords.')));
+    if (referenceView.state === 'absent') sourceNotes.push(el('p', 'fine', tx('この字の辞書語義・部首分類は資料にありません。', 'This source does not supply dictionary meanings or classification for this form.')));
     kanjiFactsStatus(sheet, referenceView.state, 'kanji-facts-retry', () => { if (sheet.isConnected) render(); });
   }
+  // the entry number in the operator's paper dictionary (Kodansha KKLD), both editions — the book on the desk and the
+  // sheet on the screen agree; the facts line carries the 2013 number as a door
+  if (kkld) {
+    const line = el('p', 'fine kkld-chip', `Kodansha ${kkldLine(k.c)}`);
+    line.id = 'kanji-kkld';
+    line.title = tx('講談社 漢字学習字典の番号（版ごと）', "Kodansha Kanji Learner's Dictionary entry number, by edition");
+    sourceNotes.push(line);
+  }
+  if (radical) sourceNotes.push(...radical.notes);
   if (retained) {
-    sheet.append(el('p', 'fine', tx(
+    sourceNotes.push(el('p', 'fine', tx(
       `保存した回答・以下の読みは KANJIDIC2 ${retained.sourceVersion.dictionaryDate} のままです。辞書を開いても書き換わりません。`,
       `Your saved answer and the readings below remain from KANJIDIC2 ${retained.sourceVersion.dictionaryDate}. Opening this dictionary does not rewrite them.`,
     )));
   }
   // K01 · an official Jōyō form kanji.json lacks (剝, 𠮟) says what it is; any other wider entry keeps its SKIP note
   const joyoForm = !D.kanji[k.c] && !!kanjiReferenceRows()?.records.has(k.c);
-  if (k.skipFallback) sheet.append(el('p', 'skip-fallback-note', joyoForm
+  if (k.skipFallback) sourceNotes.push(el('p', 'skip-fallback-note', joyoForm
     ? tx('常用漢字表（2010年）の字形。読みと意味は KANJIDIC2 から。このアプリにはこの字の部品のデータがまだない。',
       'An official Jōyō form (2010). Its readings and meanings come from KANJIDIC2; this app has no component data for it yet.')
     : tx(
       'SKIP 索引の KANJIDIC2 項目。このアプリの部品・用例・筆順が未収録のことがあります。',
       'KANJIDIC2 entry from the SKIP index. This app may not yet have its components, example words or stroke diagram.',
     )));
+  toSources(sheet, ...sourceNotes);
 
   // K01 · every reading of the kanji (kanjiReference): the lessons' selection first, then the rest. A reading
   // only the official 2010 table gives is starred and named under the list. Until every reading has arrived the
@@ -2077,10 +2180,11 @@ function renderKanjiNode(sheet, node) {
       sheet.append(retry);
     }
   }
-  renderSourceKanjiDoor(sheet, node);
-  renderKanjiCourseDoor(sheet, node);
+  if (!doors.childElementCount) doors.remove();
 
-  renderKanjiClassifications(sheet, node.id, node);
+  // a glyph row: the character, its line, a door to its page (look-alikes open a kanji, parts open a part)
+  const glyphRow = (c, line, t) => entryRow('entry-row', (invoker) => go({ t, id: c, from: node.from }, { invoker }),
+    el('span', 'row-glyph', c), el('span', 'row-main', line));
 
   // まぎらわしい字 — the look-alikes, laid side by side to break the spell
   const twins = confusablesFor(k.c);
@@ -2088,13 +2192,8 @@ function renderKanjiNode(sheet, node) {
     sheet.append(withEn(el('p', 'eyebrow', 'まぎらわしい字'), 'easily confused with', 'en-inline'));
     const rows = el('div', 'entry-rows');
     for (const c of twins) {
-      const row = el('button', 'entry-row');
-      row.type = 'button';
+      const row = glyphRow(c, D.kanji[c].m, 'kanji');
       row.dataset.confusable = c;
-      row.append(el('span', 'row-glyph', c));
-      row.append(el('span', 'row-main', D.kanji[c].m));
-      row.append(el('span', 'row-go', '›'));
-      row.addEventListener('click', () => go({ t: 'kanji', id: c, from: node.from }, { invoker: row }));
       rows.append(row);
     }
     sheet.append(rows);
@@ -2112,13 +2211,8 @@ function renderKanjiNode(sheet, node) {
     sheet.append(withEn(el('p', 'eyebrow', '部品一覧'), 'listed components', 'en-inline'));
     const rows = el('div', 'entry-rows');
     for (const c of parts) {
-      const row = el('button', 'entry-row');
-      row.type = 'button';
-      row.append(el('span', 'row-glyph', c));
+      const row = glyphRow(c, componentLabel(c), 'radical');
       row.dataset.component = c;
-      row.append(el('span', 'row-main', componentLabel(c)));
-      row.append(el('span', 'row-go', '›'));
-      row.addEventListener('click', () => go({ t: 'radical', id: c, from: node.from }, { invoker: row }));
       rows.append(row);
     }
     sheet.append(rows);
@@ -2147,10 +2241,6 @@ function renderKanjiNode(sheet, node) {
     const rows = el('div', 'entry-rows');
     const makeRow = (item) => {
       const g = item.seq ? { r: item.reading, m: [item.gloss] } : lookup(item.id);
-      const row = el('button', 'entry-row compound');
-      row.type = 'button';
-      if (item.form) row.dataset.wordSpelling = item.form;
-      if (item.seq) row.dataset.jmdictSeq = item.seq;
       const main = el('span', 'row-stack');
       const top = el('span', 'row-word');
       top.append(document.createTextNode(item.form || item.id));
@@ -2158,28 +2248,20 @@ function renderKanjiNode(sheet, node) {
       main.append(top);
       const gloss = [g?.m?.[0], writtenFormNote(item.tags)].filter(Boolean).join(' — ');
       if (gloss) main.append(el('span', 'row-gloss', gloss));
-      row.append(main);
-      row.append(el('span', 'row-go', '›'));
-      row.addEventListener('click', () => go(item.seq
+      const row = entryRow('entry-row compound', (invoker) => go(item.seq
         ? { t: 'word', id: item.form, seq: item.seq, reading: item.reading, from: node.from }
-        : { t: 'word', id: item.id, from: node.from }, { invoker: row }));
-      return row;
+        : { t: 'word', id: item.id, from: node.from }, { invoker }), main);
+      if (item.form) row.dataset.wordSpelling = item.form;
+      if (item.seq) row.dataset.jmdictSeq = item.seq;
+      return dimSelf(row, k.c);
     };
     const FIRST = 24;
     for (const item of (node.compoundsExpanded ? items : items.slice(0, FIRST))) rows.append(makeRow(item));
     sheet.append(rows);
-    if (items.length > FIRST && !node.compoundsExpanded) {
-      const more = el('button', 'more-row');
-      more.type = 'button';
-      const remain = items.length - FIRST;
-      more.textContent = tx(`のこり ${remain} 語をすべて見る`, `show all ${items.length} — ${remain} more`);
-      more.addEventListener('click', () => {
-        node.compoundsExpanded = true;
-        for (const item of items.slice(FIRST)) rows.append(makeRow(item));
-        more.remove();
-      });
-      sheet.append(more);
-    }
+    if (items.length > FIRST && !node.compoundsExpanded) sheet.append(showAllRow(items.length, FIRST, null, () => {
+      node.compoundsExpanded = true;
+      for (const item of items.slice(FIRST)) rows.append(makeRow(item));
+    }));
   } else {
     sheet.append(withEn(el('p', 'eyebrow', 'この字を含む語'), 'words that contain it', 'en-inline'));
     // K07 · a Jōyō kanji the build found in no shipped dictionary says so plainly
@@ -2200,21 +2282,12 @@ function renderKanjiNode(sheet, node) {
     const FIRST_IDIOMS = 24;
     const chipOf = (w) => ({ label: w, sub: D.idioms[w]?.r || '' });
     const openIdiom = (item, invoker) => go({ t: 'idiom', id: item.label, from: node.from }, { invoker });
-    const chips = chipsFor((node.idiomsExpanded ? idioms : idioms.slice(0, FIRST_IDIOMS)).map(chipOf), openIdiom, null, 'idiom');
+    const chips = dimSelf(chipsFor((node.idiomsExpanded ? idioms : idioms.slice(0, FIRST_IDIOMS)).map(chipOf), openIdiom, null, 'idiom'), k.c);
     sheet.append(chips);
-    if (idioms.length > FIRST_IDIOMS && !node.idiomsExpanded) {
-      const more = el('button', 'more-row');
-      more.type = 'button';
-      more.id = 'kanji-idioms-more';
-      const remain = idioms.length - FIRST_IDIOMS;
-      more.textContent = tx(`のこり ${remain} 語をすべて見る`, `show all ${idioms.length} — ${remain} more`);
-      more.addEventListener('click', () => {
-        node.idiomsExpanded = true;
-        chips.append(...chipsFor(idioms.slice(FIRST_IDIOMS).map(chipOf), openIdiom, null, 'idiom').children);
-        more.remove();
-      });
-      sheet.append(more);
-    }
+    if (idioms.length > FIRST_IDIOMS && !node.idiomsExpanded) sheet.append(showAllRow(idioms.length, FIRST_IDIOMS, 'kanji-idioms-more', () => {
+      node.idiomsExpanded = true;
+      chips.append(...dimSelf(chipsFor(idioms.slice(FIRST_IDIOMS).map(chipOf), openIdiom, null, 'idiom'), k.c).children);
+    }));
   }
 
 

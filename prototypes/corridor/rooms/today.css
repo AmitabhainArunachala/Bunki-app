@@ -49,11 +49,6 @@ html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero {
   padding: 24px 18px 70px;
   overflow: hidden;
 }
-/* the room sign keeps a 36px right margin on phones; only then does the hero reach under it.
-   (Under a sheet the sign is gone and main's margin is 18px: a fixed -36px would overflow.) */
-@media (max-width: 520px) {
-  html[data-room='tray'] body:not(.zen):not([data-view='drift']) #app > main:has(> .room-sign) > .today-hero { margin-right: -36px; padding-right: 36px; }
-}
 @media (min-width: 521px) {
   html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero { margin: 0; padding: 8px 8px 72px; }
 }
@@ -182,6 +177,8 @@ html:is([data-room='tray'], [data-room='search']) .dw-label {
   color: var(--color-muted);
 }
 html:is([data-room='tray'], [data-room='search']) body:not(.ui-bi) .dw-label { letter-spacing: 0.32em; font-size: var(--type-caption); }
+/* why the day's word is here (from your saved words / not yet saved): one quiet line between the label and the word */
+html:is([data-room='tray'], [data-room='search']) .dw-why { margin: 6px 0 0; font: 400 var(--type-caption)/1.3 var(--font-ui); color: var(--color-muted); }
 html:is([data-room='tray'], [data-room='search']) .dw-word {
   display: flex;
   flex-direction: column;
@@ -233,15 +230,7 @@ html:is([data-room='tray'], [data-room='search']) .dw-go {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 44px;
   margin-top: 6px;
-  padding: 0 8px;
-  border: 0;
-  background: none;
-  font: 600 var(--type-chrome)/1 var(--font-ui);
-  letter-spacing: 0.02em;
-  color: var(--color-accent);
-  cursor: pointer;
 }
 html:is([data-room='tray'], [data-room='search']) .dw-go .dw-pk { font-size: var(--type-lead); color: inherit; padding: 0; }
 html:is([data-room='tray'], [data-room='search']) .dw-go-l:empty { display: none; }
@@ -368,6 +357,7 @@ html[data-room='tray'] .today-detail-toggle {
   cursor: pointer;
 }
 html[data-room='tray'] .today-detail-name {
+  margin-right: auto;
   font: 600 var(--type-caption)/1 var(--font-ui);
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -375,12 +365,12 @@ html[data-room='tray'] .today-detail-name {
 }
 html[data-room='tray'] body:not(.ui-bi) .today-detail-name { letter-spacing: 0.2em; font-size: var(--type-caption); }
 html[data-room='tray'] .today-detail-sum {
-  margin-left: auto;
   font: 400 var(--type-caption)/1 var(--font-data);
   font-variant-numeric: tabular-nums;
   color: var(--color-ink-2);
 }
-html[data-room='tray'] .today-detail-caret {
+/* one caret for every fold row: Today's Decks and record rows, Words' "More language tools" */
+.today-detail-caret {
   flex: none;
   width: 7px;
   height: 7px;
@@ -390,7 +380,14 @@ html[data-room='tray'] .today-detail-caret {
   transform: rotate(45deg);
   transition: transform var(--motion-quick) var(--ease-standard);
 }
-html[data-room='tray'] .today-detail-toggle[aria-expanded='false'] .today-detail-caret { transform: rotate(-45deg); }
+:is(.today-detail-toggle[aria-expanded='false'], details:not([open]) > summary) .today-detail-caret { transform: rotate(-45deg); }
+/* the record drawer (tighten pass, 2026-11-10): one closed row at the foot, the Decks row first inside it */
+html[data-room='tray'] .today-record { margin: 30px 0 8px; }
+html[data-room='tray'] .today-record > summary { list-style: none; }
+html[data-room='tray'] .today-record > summary::-webkit-details-marker { display: none; }
+html[data-room='tray'] .today-record-name { margin-right: auto; font: 600 var(--type-control)/1.3 var(--font-ui); color: var(--color-ink); }
+html[data-room='tray'] .today-record > .today-detail { margin-top: 0; }
+html[data-room='tray'] .today-record > .today-detail > .today-detail-toggle { border-top: 0; }
 html[data-room='tray'] .today-detail-body { padding-top: 4px; }
 html[data-room='tray'] .today-detail-body .deck-counts {
   display: grid;
@@ -491,11 +488,7 @@ html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero >
   transition: transform var(--motion-press) var(--ease-standard);
 }
 html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero > .today-sky + .today-universe { margin-top: -44px; }
-html[data-room='tray'] body:not(.ui-bi) #app > main > .today-hero > .today-universe { font: 800 var(--type-label)/1 var(--font-headword); letter-spacing: 0.06em; }
 html[data-room='tray'] .today-universe .today-arrow { width: 16px; margin-left: 0; }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray'] .today-universe {
-  color: color-mix(in srgb, var(--color-gold) 70%, var(--color-ink));
-}
 /* the town stands only at night, its lit windows under the word; by day the sky is left clear
    down to the horizon's hairline (round 4: by day its grey blocks read as a bar chart) */
 html[data-room='tray'] body:not([data-view='drift']) { --today-roof: transparent; }
@@ -719,19 +712,11 @@ html[data-room='review'] body:not(.zen) #app .close-doors :is(button.take.quiet,
   text-decoration-thickness: 0.5px;
   text-underline-offset: 4px;
 }
-html[data-room='review'] body:not(.zen) #app .close-doors button.chip.review-undo { color: var(--color-muted); }
-
-/* round 3 (r3-rooms): one 朱 on Today, and it is the day's part. The sign's square hangs in ink. */
-html[data-room='tray']:root body:not([data-view='drift']) #app > main > .room-sign::after {
-  background: var(--color-ink);
-  opacity: 0.7;
-  box-shadow: none;
-}
 
 /* round 4 review: the door's Today pill is always at the universe's foot now, so while the
    universe's own card or its radical explainer is open it steps aside (it covered the card's last
-   row), and it returns when the card closes */
-html[data-room='door'] body.ginga:has(#drift-layer #card.open, #drift-layer #radoc.open) #home-review {
+   row), and it returns when the card closes; since 2026-11-10 the first screen's five tabs step aside with it */
+html[data-room='door'] body.ginga:has(#drift-layer #card.open, #drift-layer #radoc.open) :is(#home-review, #primary-tabs) {
   opacity: 0;
   pointer-events: none;
 }

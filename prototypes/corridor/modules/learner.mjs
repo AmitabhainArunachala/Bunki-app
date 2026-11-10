@@ -26,13 +26,8 @@ function meHelpLine() {
   line.id = 'me-help';
   const since = signal ? meDate(new Date(signal.since), true) : null;
   const month = signal?.months[0];
-  if (!month) {
-    // Q · through the one word rule (flowText), as every line the app sets: it broke 読み終｜えた at 320
-    flowText(line, since
-      ? tx(`千字あたりの手助けは、次に読み終えた記事から数える（${since}から）。`, `Help per 1,000 characters counts from the next article you finish (since ${since}).`)
-      : tx('千字あたりの手助けは、次に読み終えた記事から数える。', 'Help per 1,000 characters counts from the next article you finish.'));
-    return line;
-  }
+  // the line stands once there is a number (tighten pass, 2026-11-10); before that the book's own lede speaks
+  if (!month) return null;
   const [year, mm] = month.month.split('-').map(Number);
   const label = bi() ? new Date(year, mm - 1, 1).toLocaleDateString('en-GB', { month: 'long' }) : `${mm}月`;
   const per = month.per1000 === null ? '—' : month.per1000.toFixed(1);
@@ -423,8 +418,7 @@ function meHorizonRow(h, { quiet = false } = {}) {
   if (!h.begun) flowText(sub, {
     saved: tx('まだ札がない。読みながら言葉を保存する。', 'No cards yet. Save words as you read.'),
     kanken: tx('保存した言葉の漢字から数える。', 'Counted from the kanji in your saved words.'),
-    n1: placesLayout() ? tx('まだ始めていない。N1デッキは「復習」にある。', 'Not started yet. The N1 deck is in Review.')
-      : tx('まだ始めていない。N1デッキは「学ぶ」にある。', 'Not started yet. The N1 deck is in Learn.'),
+    n1: fieldsDeckHome('N1デッキ', 'The N1 deck is'),
   }[h.id] || fieldsDeckHome());
   else if (h.counting) sub.textContent = tx('専門デッキの札を数えている…', 'counting your fields deck…');
   else {
@@ -436,7 +430,7 @@ function meHorizonRow(h, { quiet = false } = {}) {
   return row;
 }
 
-function meN1Plate(h) {
+function meN1Plate(h, { quiet = false } = {}) {
   const plate = el('div', 'me-n1');
   const head = el('div', 'me-n1-head');
   head.append(el('span', 'me-n1-seal', 'N1'),
@@ -461,19 +455,24 @@ function meN1Plate(h) {
       `試験日 ${sitting.getFullYear()}年${sitting.getMonth() + 1}月${sitting.getDate()}日（日）の見込み`,
       `Test expected Sun ${sitting.getDate()} ${ME_MONTHS_EN[sitting.getMonth()].slice(0, 3)} ${sitting.getFullYear()}`)));
   }
-  plate.append(meHorizonRow(h));
+  plate.append(meHorizonRow(h, { quiet }));
   return plate;
 }
 
 function meHorizonsPart(decks) {
   const sec = meSection('horizons', '目標', 'Your goals');
   const rows = meHorizons(decks);
-  sec.append(meN1Plate(rows.find((h) => h.id === 'n1')));
-  sec.append(el('h3', 'me-hz-group', tx('あなたの三つの分野', 'Your three fields')));
+  const n1 = rows.find((h) => h.id === 'n1');
   const fields = rows.filter((h) => h.field);
-  // until the fields deck is opened, the three fields say so once, not three times
+  // until the fields deck is opened, the three fields say so once, not three times; while the N1 deck is
+  // unopened too, one line says it for both (tighten pass: "not started yet" once on the page)
   const unbegun = fields.length > 0 && fields.every((h) => !h.begun);
-  if (unbegun) sec.append(el('p', 'me-hz-sub me-hz-group-note is-sentence', fieldsDeckHome()));
+  const neither = unbegun && !n1.begun;
+  const note = (text) => el('p', 'me-hz-sub me-hz-group-note is-sentence', text);
+  sec.append(meN1Plate(n1, { quiet: neither }));
+  if (neither) sec.append(note(fieldsDeckHome('N1デッキと専門デッキ', 'The N1 and fields decks are')));
+  sec.append(el('h3', 'me-hz-group', tx('あなたの三つの分野', 'Your three fields')));
+  if (unbegun && !neither) sec.append(note(fieldsDeckHome()));
   for (const h of fields) sec.append(meHorizonRow(h, { quiet: unbegun }));
   sec.append(el('h3', 'me-hz-group', tx('あなたの言葉', 'Your words')));
   for (const h of rows) if (h.id === 'kanken' || h.id === 'saved') sec.append(meHorizonRow(h));
@@ -580,7 +579,8 @@ function renderMe(main) {
     head.append(lead);
   }
   // G2 · beside it, the help signal: help per 1,000 characters of the month's first readings (meHelpLine, read-only)
-  head.append(meHelpLine());
+  const help = meHelpLine();
+  if (help) head.append(help);
   book.append(head);
   let horizons = meHorizonsPart(decks);
   let home = meCameHomePart(decks, !!first);
@@ -623,6 +623,8 @@ function renderMe(main) {
 }
 
 function showRecordBackup() {
+  // the backup row sits in Today's record drawer: the door that lands on it opens it (tighten pass)
+  S.todayRecordOpen = true;
   requestAnimationFrame(() => {
     document.getElementById('record-backup')?.scrollIntoView({ block: 'center' });
     document.getElementById('export-store')?.focus({ preventScroll: true });
