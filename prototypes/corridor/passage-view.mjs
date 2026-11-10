@@ -115,8 +115,8 @@ function heldStop(node) {
 function paintDoor(door, node) {
   const stop = heldStop(node), total = stop && sources.plan.stops.length;
   door.textContent = stop
-    ? tx(`続きをたどる（${stop}／${total}）· 試作`, `Resume the passage · stop ${stop} of ${total} · preview`)
-    : tx('職・識・織をたどる · 試作', 'Walk the 職・識・織 passage · preview');
+    ? tx(`続きをたどる（${stop}／${total}）`, `Resume the passage · stop ${stop} of ${total}`)
+    : tx('職・識・織をたどる', 'Walk the 職・識・織 passage');
 }
 
 /** Called on every mount of a kanji page: one door, in its current state, or none. */
@@ -132,8 +132,12 @@ export function mountDoor({ sheet, node, state, tx: text, eligible, epoch, sente
   door.addEventListener('click', () => {
     if (!visit && eligible() && !state.kanjiCourse && state.stack.at(-1) === node) void openPassage(door, node);
   });
-  const anchor = sheet.querySelector('#kanji-course-unit-door') || sheet.querySelector('.hero');
-  if (anchor) anchor.after(door); else sheet.append(door);
+  // with the page's other doors (tighten pass, 2026-11-10): after the course door, else last in the doors' group
+  const anchor = sheet.querySelector('#kanji-course-unit-door'), group = sheet.querySelector('.kanji-doors');
+  if (anchor) anchor.after(door);
+  else if (group) group.append(door);
+  else if (sheet.querySelector('.hero')) sheet.querySelector('.hero').after(door);
+  else sheet.append(door);
 }
 
 function citation(evidence) {

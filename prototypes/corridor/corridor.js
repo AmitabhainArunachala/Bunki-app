@@ -19995,7 +19995,8 @@ function renderTextSourceContextSelection(main, saved, body, personal) {
 }
 /** Whether this sentence already stands on the tutor page (a kept sentence): read-only, from the record's entries. */
 /** A tutor door's item and the encounter it was met in: every drawing of one page's door agrees on it. */
-function renderTeacherDoor(container, getNode) {
+// quoted: false on the sentence's own page, where the sentence already stands above its keep (tighten pass, 2026-11-10)
+function renderTeacherDoor(container, getNode, { quoted = true } = {}) {
   const node = typeof getNode === 'function' ? getNode() : getNode;
   const wrap = el('div', 'teacher-door');
   const quote = el('p', 'teacher-source-quote');
@@ -20051,7 +20052,7 @@ function renderTeacherDoor(container, getNode) {
     });
     actions.append(practice);
   }
-  if (quote.textContent) wrap.append(quote);
+  if (quoted && quote.textContent) wrap.append(quote);
   wrap.append(actions, note);
   container.append(wrap);
 }
@@ -24030,7 +24031,7 @@ function renderSourceKanjiDoor(sheet, node) {
   const passage = D.passages.find(p => p.id === sourceId), token = passage?.tokens?.[index];
   if (!token?.s?.includes(node.id)) return;
   const section = el('section', 'teacher-door');
-  const button = biLabel('button', 'chip', `この文の「${token.s}」の読みを練習`, `practice reading 「${token.s}」 in this sentence`);
+  const button = biLabel('button', 'chip', `この文の「${token.s}」の読みを練習`, `Practice reading 「${token.s}」 in this sentence`);
   button.type = 'button'; button.id = 'source-kanji-practice'; button.dataset.focusKanji = node.id;
   button.disabled = !recordWritable();
   const note = el('p', 'teacher-note'); note.setAttribute('role', 'status');
@@ -29076,16 +29077,9 @@ function renderStudyFold(sheet, node, variantTarget) {
   const head = el('button', open ? 'fold-head open' : 'fold-head');
   head.type = 'button';
   head.setAttribute('aria-expanded', String(open));
-  head.append(el('span', 'fold-title', tx('学習の記録', 'study progress')));
-  head.append(
-    el(
-      'span',
-      'fold-sub',
-      srs
-        ? tx(`復習 ${srs.reps || 0} 回`, `${srs.reps || 0} review${(srs.reps || 0) === 1 ? '' : 's'}`)
-        : tx('まだ記録なし', 'no history yet'),
-    ),
-  );
+  head.append(el('span', 'fold-title', tx('学習の記録', 'Study progress')));
+  // a count of zero, or no record yet, is not printed on the closed row (tighten pass, 2026-11-10)
+  if (srs?.reps) head.append(el('span', 'fold-sub', tx(`復習 ${srs.reps} 回`, `${srs.reps} review${srs.reps === 1 ? '' : 's'}`)));
   head.append(el('span', 'fold-arrow', open ? '▼' : '▶'));
   head.addEventListener('click', () => {
     S.studyOpen = open ? null : key;
@@ -29132,6 +29126,30 @@ function renderStudyFold(sheet, node, variantTarget) {
   if (variantTarget) renderCardVariant(body, variantTarget);
   wrap.append(body);
   sheet.append(wrap);
+}
+
+/** One list row that is a door (a kanji page's look-alikes, parts and compounds; a word page's kanji): what it names, then
+ * a chevron; a press opens it, the row as its invoker. */
+export function entryRow(cls, open, ...parts) {
+  const row = el('button', cls);
+  row.type = 'button';
+  row.append(...parts.filter(Boolean), el('span', 'row-go', '›'));
+  row.addEventListener('click', () => open(row));
+  return row;
+}
+
+/** An entry page's one "Sources" disclosure, closed (tighten pass, 2026-11-10): dataset names, editions, licences and
+ * reference numbers stand here, never in the body. Made on first use; buildPage carries it to the page's foot. */
+export function toSources(sheet, ...lines) {
+  let box = sheet.querySelector(':scope > .entry-sources');
+  if (!box) {
+    box = el('details', 'entry-sources');
+    box.id = 'entry-sources';
+    box.append(el('summary', null, tx('出典', 'Sources')));
+    sheet.append(box);
+  }
+  box.append(...lines.filter(Boolean));
+  return box;
 }
 
 /** Variant A (#38): the SAME target word rendered both ways. */
@@ -30572,15 +30590,11 @@ function renderWordNode(sheet, node) {
     const wordReading = String(rec?.r || node.reading || '').trim();
     const inWord = S.lang === 'ja' ? kanjiReadingsInWord(rowChars, wordReading, label) : null;
     for (const [charIndex, c] of rowChars.entries()) {
-      const row = el('button', 'entry-row');
-      row.type = 'button';
-      row.dataset.kanjirow = c;
       const glyph = el('span', 'row-glyph', c);
-      row.append(glyph);
       const keyword = S.lang === 'ja' ? inWord[charIndex] : D.kanji[c].m;
-      if (keyword) row.append(el('span', 'row-main', keyword));
-      row.append(el('span', 'row-go', '›'));
-      row.addEventListener('click', () => go({ t: 'kanji', id: c, from: node.from }, { invoker: row, from: glyph }));
+      const row = entryRow('entry-row', (invoker) => go({ t: 'kanji', id: c, from: node.from }, { invoker, from: glyph }),
+        glyph, keyword && el('span', 'row-main', keyword));
+      row.dataset.kanjirow = c;
       rows.append(row);
     }
     sheet.append(rows);
@@ -30655,7 +30669,7 @@ function renderWordNode(sheet, node) {
     licence.target = '_blank';
     licence.rel = 'noreferrer';
     credit.append(licence);
-    sheet.append(credit);
+    toSources(sheet, credit);
   }
   const jlpt = own?.jlpt || (!unresolved && legacy?.jlpt ? `N${legacy.jlpt}` : null);
   if (jlpt) {
@@ -30973,6 +30987,7 @@ function renderKanjiFamily(sheet, node) {
   const paint = () => {
     if (!current()) return;
     section.replaceChildren(heading());
+    section.hidden = false;
     if (!kanjiFamilyRuntime) {
       const line = el('p', 'fine', kanjiFamilyError
         ? tx('字のつながりの資料を読み込めませんでした。', 'The relationship source could not load.')
@@ -30989,6 +31004,8 @@ function renderKanjiFamily(sheet, node) {
     if (view.status !== 'available') {
       section.append(el('p', 'fine', tx('この資料では、この字の音のつながりは未収録です。', 'This dataset has no sound relationship for this character.')),
         el('p', 'fine', tx('この資料では、この字の意味のつながりは未収録です。', 'This dataset has no meaning relationship for this character.')));
+      // tighten pass (2026-11-10): a missing fact is not announced; the heading goes with it
+      section.hidden = true;
       return;
     }
     const doorFor = (row, label) => {
@@ -31153,6 +31170,7 @@ function renderKanjiStructure(sheet, node) {
   const paint = (focus = false) => {
     if (!section.isConnected) return;
     section.replaceChildren(el('h3', 'list-head', tx('字の中を見る', 'Inside the character')));
+    section.hidden = false;
     if (!kanjiStructureModel) {
       const line = el('p', 'fine', kanjiStructureError
         ? tx('部品の筆画データを読み込めませんでした。', 'The source groups could not load.')
@@ -31173,6 +31191,7 @@ function renderKanjiStructure(sheet, node) {
         'この字の部品の位置・重なりは未収録です。下の部品一覧は配置や語源を示すものではありません。',
         'Source grouping is not bundled for this character. The listed components below do not establish their positions or origins.',
       )));
+      section.hidden = true; // tighten pass (2026-11-10): nothing to inspect, so no heading and no note about the gap
       return;
     }
     const whole = info.occurrences.find((item) => item.reference?.type === 'kanji' && item.reference.id === node.id);
@@ -33213,8 +33232,10 @@ function composePage(node, path) {
     sheet.append(notes);
   }
   if (node.t === 'kanji' && node.referenceEntry) renderReferenceConnections(sheet, node.referenceEntry);
+  const keepSlot = node.t === 'sent' ? sheet.querySelector(':scope > .sent-keep') : null;
   if (!node.familyExample && node.t !== 'word' && (capNode?.from?.passage || node.sourceContext))
-    renderTeacherDoor(sheet, { ...capNode, sourceContext: node.sourceContext });
+    renderTeacherDoor(keepSlot || sheet, { ...capNode, sourceContext: node.sourceContext }, { quoted: !keepSlot });
+  if (keepSlot && !keepSlot.childElementCount) keepSlot.remove();
   if (!node.familyExample) renderEncounterTrail(sheet, node);
   // reading position survives the doors: the sheet remembers where each
   // stack entry was scrolled and restores it when that entry returns —
@@ -33268,6 +33289,9 @@ function composePage(node, path) {
       first.focus();
     }
   });
+  // the page's one Sources disclosure stands at its foot, under everything the page drew after its body
+  const sources = sheet.querySelector(':scope > .entry-sources');
+  if (sources) sheet.append(sources);
   if (maintenanceReports) sheet.append(reportEntries('report-line-sheet'));
   if (!node.familyExample) enhanceJapaneseProse(sheet);
   return sheet;

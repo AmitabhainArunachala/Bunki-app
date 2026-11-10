@@ -941,7 +941,7 @@ function depthBasisParts(result) {
         : tx('覚えている途中', 'still learning'));
   } else if (result.match === 'other') parts.push(tx('保存したのは別の読み', 'your saved card is another reading'));
   else if (result.identity.kind === 'unresolved') parts.push(tx('この読みの項目はまだ定まらない', 'this reading’s entry is not settled'));
-  if (result.identity.reading) parts.push(tx(`読み ${result.identity.reading}`, `read ${result.identity.reading}`));
+  // the page's reading stands once, in the line above this one (tighten pass, 2026-11-10)
   if (result.said === 'known') parts.push(tx('自分で「知っている」', 'you said you know it'));
   if (result.said === 'not-yet') parts.push(result.cap === 'not-yet' || result.depth === 'again' || result.depth === 'met'
     ? tx('「まだ」— 次によく思い出せるまで', '“not yet” — until your next good review') : tx('「まだ」', '“not yet”'));
