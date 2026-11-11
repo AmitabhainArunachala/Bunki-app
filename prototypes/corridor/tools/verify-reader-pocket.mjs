@@ -565,7 +565,9 @@ const CASES = {
       // the word box's 音
       where = 'word box';
       await openArticle(s, { start: false });
-      const tok = page.locator('.reader .tok.content').nth(3);
+      // a word the quick dictionary has (two or more kanji), so its box has its 音
+      const nth = await page.evaluate(() => [...document.querySelectorAll('.reader .tok.content')].findIndex((t) => /^\p{Script=Han}{2,}$/u.test(t.textContent.trim())));
+      const tok = page.locator('.reader .tok.content').nth(Math.max(0, nth));
       await tok.scrollIntoViewIfNeeded();
       for (let i = 0; i < 4 && !(await page.locator('#mini').isVisible().catch(() => false)); i += 1) { await press(tok); await wait(450); }
       await page.locator('#mini-voice').waitFor();
