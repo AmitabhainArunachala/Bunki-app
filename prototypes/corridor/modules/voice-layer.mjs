@@ -660,8 +660,8 @@ export function installVoiceLayer(host) {
           japaneseSentences(shownText(answer.querySelector('.kp-note-passage')))).filter((one) => isJapaneseEnough(one.text));
         speakFrom(say, { sentences: reads, voiceKey: key, onNote: (line) => { say.title = line || ''; note(line); } });
       });
-      (word.querySelector('.kp-pitch, .kp-reading') || word.lastElementChild)?.after(say);
-      if (!say.isConnected) word.append(say);
+      // at the line's end, after the word type, where the old 音 stood (tighten.css keeps its share of the line to that 音's)
+      word.append(say);
       // the answer shown: its word, once, through the voice server or not at all
       const shown = card.dataset.card || term;
       if (saidCard !== shown) {
