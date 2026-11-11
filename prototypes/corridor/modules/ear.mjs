@@ -795,7 +795,7 @@ html[data-ear='novoice'] .ear-mark::after { content: ''; position: absolute; lef
 /** Install the ear in `doc`. `speak(unit, done)` reads a unit through the voice seam and returns its handle;
  * `cannot(unit)` names why there is no voice right now; `context()` gives { view, articleOf, keyFor } for voice keys.
  * Returns { mount, stop, machine }: mount() places a mark beside every gate (call it when the page changes). */
-export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain = null }) {
+export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain = null, highlight = () => true }) {
   const view = doc.defaultView;
   const root = doc.documentElement;
   if (!doc.getElementById('ear-style')) {
@@ -815,7 +815,11 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
     if (shown.range) bands.hide();
     shown = null;
   };
+  /** "Highlight what is being read" (Settings, 筆と声; the card audio's switch, 2026-11-11): off, the ear draws nothing
+   * on text, armed, held on or speaking; its mark still shows its state (the combine's I1). */
+  const lit = () => { try { return highlight() !== false; } catch { return true; } };
   function showUnit(unit, state) {
+    if (unit && state && !lit()) { clearShown(); return; }
     if (shown && shown.unit?.key === unit?.key && shown.state === state) return;
     clearShown();
     if (!unit || !state) return;
@@ -1045,6 +1049,8 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
     mount,
     /** The page was drawn again: the light on a sentence is measured again. */
     refresh: () => { if (bands.shown) bands.refresh(); },
+    /** The highlight switch changed: what the ear draws on text is drawn again by the switch's rule. */
+    repaint: () => paint(),
     stop: () => machine.stop(),
     /** The unit under a point: what a tap there would speak (the coverage walk asks this). */
     unitAt: (x, y) => find(x, y),

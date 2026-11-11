@@ -851,6 +851,8 @@ export function installVoiceLayer(host) {
       return session;
     },
     plain: { line: (reason) => silenceLine(reason), words: (reason) => reasonWords(reason) },
+    // the card audio's switch (Settings, 筆と声): off, the ear draws nothing on text either
+    highlight: () => highlighting(),
     cannot: (unit) => seam.cannot(unit.voiceKey),
     context: () => ({ view: host.view(), keyFor: markKey,
       articleOf: (node) => (host.view() === 'reader' && node?.closest?.('#reader') ? host.passage()?.id || null : null),
@@ -1035,6 +1037,7 @@ export function installVoiceLayer(host) {
     /** The switch "Highlight what is being read" was changed: a band that is drawn goes at once; with it on again the
      * sentence under way is lit again. */
     highlightChanged() {
+      ear.repaint();
       if (!highlighting()) { readBands.hide(); return; }
       if (reader.lit >= 0 && readerActive()) paintLit();
     },
