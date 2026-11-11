@@ -87,6 +87,8 @@ export const CORRIDOR_REQUIRED_ROOTS = [
   'reference-ui.css',
   'drift-layer.css',
   'drift-layer.js',
+  // 宙, the first screen's sky over the drift layer: its mount, loaded by index.html, and the engine it loads
+  'sky',
   'srs-core.mjs',
   'study-engine-adapter.mjs',
   'shared-study-content.mjs',
