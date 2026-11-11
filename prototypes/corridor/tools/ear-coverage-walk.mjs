@@ -13,6 +13,12 @@
  *   node prototypes/corridor/tools/ear-coverage-walk.mjs --base http://127.0.0.1:19481/ [--device wide|phone]
  *        [--ui ja] [--plant] [--only door,search] [--shots DIR] [--out results.json]
  *
+ * On the phone it also asks, for every one of those points, what a finger's tap there would do with the ear held on and
+ * with it armed (the review's ruling R-a, 2026-11-11): held on, a tap on one of the app's own controls (a button, a link,
+ * a field, a tab, a fold, a role, a block with a click action) or on a card's front is the app's and asks nothing, and a
+ * tap on text speaks; armed, every tap speaks. The verdict comes from the ear's own earClick, asked dry (nothing is
+ * spoken); which points are controls is read here on its own, from the page.
+ *
  * --plant puts two Japanese nodes on every screen: one in a field being typed in, which the ear never reads (outside
  * any unit: the walk must then fail, naming it), and one on a layer that lets the finger pass (a tap there must still
  * read it: it must pass). Exit 0 only when every node has a unit. */
@@ -57,7 +63,7 @@ function quiet() {
 }
 
 /** In the page: every visible Japanese text node, and what the ear would speak for it. */
-async function scan({ exclusions, plant, earPath }) {
+async function scan({ exclusions, plant, earPath, touch }) {
   const JAPANESE = /[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}]/u;
   let ear = null, loadError = '';
   try { ear = await import(new URL(earPath, location.href).href); } catch (error) { loadError = String(error?.message || error).slice(0, 160); }
@@ -86,7 +92,31 @@ async function scan({ exclusions, plant, earPath }) {
   }
   const excluded = exclusions.map((entry) => ({ ...entry, found: document.querySelectorAll(entry.selector).length }));
   const skip = exclusions.map((entry) => entry.selector).join(', ');
-  const rows = { checked: 0, covered: 0, failures: [], units: {} };
+  const rows = { checked: 0, covered: 0, failures: [], units: {}, taps: touch ? { controls: 0, text: 0 } : null };
+  // the walk's own reading of what is a control of the app (not the ear's): an element a tap acts on
+  const CONTROLS = 'button, a[href], summary, label, input, select, textarea, [role="button"], [role="link"], [role="tab"], [role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"], [role="option"], [role="switch"], [role="checkbox"], [role="radio"], [role="treeitem"], [onclick]';
+  const controlHere = (el) => {
+    if (!el?.closest || el.closest('[data-ear-own]')) return null;
+    const found = el.closest(CONTROLS);
+    if (found) return found;
+    const door = el.closest('[data-action]');
+    return door && !/^inline/.test(getComputedStyle(door).display) ? door : null;
+  };
+  /** Held on and armed, what a finger's tap at (x, y) would do: the ear's own verdict, asked dry. */
+  const tapVerdicts = (x, y, unit) => {
+    const hit = document.elementFromPoint(x, y);
+    const press = { at: Date.now(), x, y, pointerType: 'touch' };
+    // a real tap's click as WebKit gives it: trusted, detail 1, its pointer type mouse
+    const event = { altKey: false, target: hit, clientX: x, clientY: y, detail: 1, isTrusted: true, pointerType: 'mouse' };
+    const ask = (mode) => {
+      const machine = ear.createEarMachine({ speak: () => ({ stop() {} }), cannot: () => null });
+      if (mode === 'held') machine.holdEar(); else machine.tapEar();
+      return ear.earClick(event, { machine, unitAt: () => unit, press, now: press.at, dry: true,
+        controlAt: (target) => ear.appControlAt(target, { display: (el) => getComputedStyle(el).display }) });
+    };
+    const control = !!controlHere(hit) || !!unit.front;
+    return { control, held: ask('held'), armed: ask('armed'), hit };
+  };
   /** A layer above `parent` at the point that takes no pointer and yet hides it: a solid background, or words of its own
    * drawn there. Seen with every element taking the pointer for one look. */
   const paintedOver = (x, y, parent) => {
@@ -161,6 +191,14 @@ async function scan({ exclusions, plant, earPath }) {
         if (!unit) { verdict = { problem: `the ear finds no unit there (${Math.round(x)},${Math.round(y)} on ${hit?.tagName?.toLowerCase() || 'nothing'}${hit?.className && typeof hit.className === 'string' ? `.${hit.className.split(/\s+/)[0]}` : ''})` }; break; }
         if (!unit.contains(node)) { verdict = { problem: `the unit there (${unit.kind} "${String(unit.text).slice(0, 20)}") does not hold this text` }; break; }
         if (!unit.sentences?.length) { verdict = { problem: 'the unit has nothing to say' }; break; }
+        if (touch) {
+          const tap = tapVerdicts(x, y, unit);
+          const want = tap.control ? 'pass' : 'consume';
+          const name = `${tap.hit?.tagName?.toLowerCase() || '?'}${tap.hit?.className && typeof tap.hit.className === 'string' ? `.${tap.hit.className.trim().split(/\s+/)[0]}` : ''}`;
+          if (tap.held !== want) { verdict = { problem: tap.control ? `held on, a tap on this control (${name}) would be read aloud, not act` : `held on, a tap on this text (${name}) would not read it` }; break; }
+          if (tap.armed !== 'consume') { verdict = { problem: `armed, a tap here (${name}) would not read it` }; break; }
+          rows.taps[tap.control ? 'controls' : 'text'] += 1;
+        }
         verdict = { ok: true, kind: unit.kind, said: unit.sentences.map((s) => s.text).join('').slice(0, 24), key: unit.voiceKey };
         break;
       }
@@ -288,7 +326,7 @@ for (const [name, open] of SCREENS) {
   let row;
   try {
     await open();
-    row = await page.evaluate(scan, { exclusions: EXCLUSIONS, plant: PLANT, earPath: 'modules/ear.mjs' });
+    row = await page.evaluate(scan, { exclusions: EXCLUSIONS, plant: PLANT, earPath: 'modules/ear.mjs', touch });
     if (SHOTS) await page.screenshot({ path: join(SHOTS, `${name}-${DEVICE}-${UI}.png`) });
   } catch (error) {
     row = { checked: 0, covered: 0, failures: [{ text: '', where: name, problem: `the screen did not open: ${String(error.message).split('\n')[0].slice(0, 200)}` }], excluded: [] };
@@ -296,7 +334,7 @@ for (const [name, open] of SCREENS) {
   const pass = row.failures.length === 0;
   if (!pass) failures += 1;
   results.push({ screen: name, device: DEVICE, ui: UI, pass, ...row });
-  const kinds = Object.entries(row.units || {}).map(([k, n]) => `${n} ${k}`).join(', ');
+  const kinds = Object.entries(row.units || {}).map(([k, n]) => `${n} ${k}`).join(', ') + (row.taps ? `; held taps: ${row.taps.controls} on controls act, ${row.taps.text} on text read` : '');
   const ex = (row.excluded || []).filter((e) => e.found).map((e) => `${e.found} × ${e.name}`).join('; ');
   console.log(`${pass ? 'PASS' : 'FAIL'}  ${name} @ ${DEVICE}/${UI}: ${row.covered}/${row.checked} visible Japanese text nodes have a unit${kinds ? ` (${kinds})` : ''}${row.coveredByOther ? `; ${row.coveredByOther} under another layer` : ''}${ex ? `; left out: ${ex}` : ''}`);
   for (const f of row.failures.slice(0, 6)) console.log(`      ✗ "${f.text}" at ${f.where}: ${f.problem}`);
