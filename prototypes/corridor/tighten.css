@@ -360,14 +360,11 @@ html body:not(#\#):not(#\#) .vocabulary-list-popover.is-chooser .save-chooser-ti
   text-transform: none;
   color: var(--color-ink-2);
 }
+/* P4-1 · nothing in Save is cut with "…" but a list's name: the word asked about wraps whole when it is long */
 html body:not(#\#):not(#\#) .vocabulary-list-popover.is-chooser .save-chooser-word {
-  display: inline-block;
-  max-width: calc(100% - 6em);
+  display: inline;
   margin: 0 0.3em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  vertical-align: bottom;
+  overflow-wrap: anywhere;
   font: 700 var(--type-control) / 1.2 var(--font-reading, var(--font-display));
   color: var(--color-ink);
 }
@@ -820,3 +817,6 @@ html body:not(#\#):not(#\#) .vocabulary-list-popover.is-plain.is-one > .vocabula
 html body:not(#\#):not(#\#) #mini .vocabulary-list-popover.is-plain.is-one.is-inline { margin-top: -6px; margin-bottom: 0; padding-top: 0; border-top: 0; }
 /* the pane gives its foot's padding to the chooser while it asks (below the Save: nothing above it moves) */
 html body:not(#\#):not(#\#) #mini .mini-sentence-pane:has(.vocabulary-list-popover.is-inline) { padding-bottom: 0; }
+/* P4-2 · what a pick does, one quiet line under the question: every saved word becomes a card, a list is one more place */
+html body:not(#\#):not(#\#) .save-chooser-head { flex-wrap: wrap; row-gap: 0; }
+html body:not(#\#):not(#\#) .save-chooser-head > .save-chooser-what { flex: 1 0 100%; margin: 0 0 2px; font: 400 var(--type-caption, 12px) / 1.4 var(--font-ui); color: var(--color-muted, var(--color-ink-2)); }

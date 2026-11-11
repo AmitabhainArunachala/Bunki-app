@@ -9798,9 +9798,11 @@ function openPlainSaveMenu(invoker, { more = [], place = null, home = null, keep
   if (keep && home) {
     const title = el('p', 'vocabulary-list-title save-chooser-title');
     title.id = 'vocabulary-list-title';
-    const thing = el('span', 'save-chooser-word', label || tx('これ', 'this'));
-    if (bi()) title.append(now ? '' : 'Save ', thing, now ? ' is saved in' : ' to');
-    else title.append(thing, now ? 'の保存先' : 'の保存先');
+    // P4-1 · its one place stands on the same line as the question, so the question is short enough never to be cut:
+    // "Save to [先 Tutor page]" (保存先), "Saved in [先 Tutor page]" (保存済み); what is saved is the Save's own row above
+    if (bi()) title.append(now ? 'Saved in' : 'Save to');
+    else title.append(now ? '保存済み' : '保存先');
+    title.setAttribute('aria-label', tx(`${label || 'これ'}の保存先`, `Save ${label || 'this'} to`));
     pop.setAttribute('aria-labelledby', title.id);
     pop.removeAttribute('aria-label');
     const places = el('div', 'save-chooser-places');
@@ -9989,7 +9991,10 @@ function closeVocabularyListPopover({ restoreFocus = false } = {}) {
   const invoker = vocabularyListInvoker;
   vocabularyListInvoker = null; vocabularyListNode = null;
   invoker?.setAttribute('aria-expanded', 'false');
-  if (restoreFocus && invoker?.isConnected) invoker.focus({ preventScroll: true });
+  // the keyboard goes back to the Save that asked, or to the one drawn again under its name while the chooser stood (a
+  // page's Save repainted by the pick itself)
+  const owner = invoker?.isConnected ? invoker : invoker?.id ? document.getElementById(invoker.id) : null;
+  if (restoreFocus && owner) owner.focus({ preventScroll: true });
   return true;
 }
 
@@ -10170,6 +10175,11 @@ function buildPlaceChooser({ node, label, current, kind = 'menu', more = [], onP
   const places = el('div', 'save-chooser-places');
   places.setAttribute('role', 'group');
   places.setAttribute('aria-labelledby', title.id);
+  const what = el('p', 'save-chooser-what', tx('保存した語はどれもカードになる。リストはもう一つの置き場。',
+    'Every saved word becomes a card. A list is one more place for it.'));
+  what.id = `${ids.title}-what`;
+  places.setAttribute('aria-describedby', what.id);
+  head.append(what);
   const choices = [];
   const choice = (to, { id = '', count = null, sub = '' } = {}) => {
     const button = el('button', `save-place${to.kind === 'review' ? ' is-review' : ids.listClass}`);
@@ -10193,8 +10203,10 @@ function buildPlaceChooser({ node, label, current, kind = 'menu', more = [], onP
     choices.push(button);
     return button;
   };
+  // P4-2 · what a pick does, in words where he chooses: every saved word comes back as a card (a list pick keeps it as a
+  // card too: writeListMembership keeps the word, then lists it); Review is the card alone, a list is one more place
   places.append(choice({ kind: 'review' }, { id: ids.review, count: S.taken.length,
-    sub: tx('カードになって戻ってくる', 'Comes back to study as a card') }));
+    sub: tx('カードだけ', 'Card only') }));
   const order = listsByRecency(S.lists, S.saveMemory);
   const shownNames = order.slice(0, CHOOSER_LISTS_SHOWN);
   // the list it is on now stays in sight among the first ones, whatever its age
@@ -10400,6 +10412,12 @@ function openSaveChooser(node, label, invoker, { keep = null, saved = null, remo
     if (pop.isConnected) closeVocabularyListPopover({ restoreFocus: true });
     const owner = invoker?.isConnected ? invoker : invoker?.id ? document.getElementById(invoker.id) : null;
     paintPlacedSave(owner, node, label, isSaved);
+    // a page drawn again by the pick takes the focus with its old Save: the keyboard stays on the Save under the name
+    requestAnimationFrame(() => {
+      if (document.activeElement && document.activeElement !== document.body) return;
+      const now = invoker?.isConnected ? invoker : invoker?.id ? document.getElementById(invoker.id) : null;
+      if (now && !document.getElementById('vocabulary-list-popover')) now.focus({ preventScroll: true });
+    });
     // the naming Save may have been drawn again by its own repaint (the article bar's): the one under its name now counts
     const named = names && !!(owner?.isConnected || (owner?.id && document.getElementById(owner.id)));
     if (!named) sayPlaced(node, label, result, { saved, keep });
@@ -26080,7 +26098,7 @@ function chromeKeep() {
       return saveWord(now.node, now.label);
     },
     review: { saved: savedNow, toggle: () => { const now = chromeKeepTarget(); return now ? toggleWordSave(now.node, now.label) : false; } },
-    more: () => [{ id: 'chrome-keep-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(chromeKeepTarget()?.label || '') }],
+    // P4-3 · its drawer holds places only: the word's Copy is in its box and its strip
   });
   button.dataset.saveKey = target ? `${target.node.t}:${target.node.id}:${target.node.reading || ''}` : '';
   if (!target) button.dataset.saveRest = '';
