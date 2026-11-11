@@ -1,6 +1,7 @@
 /** G3 word-entry seam — declarations moved verbatim from ../corridor.js (pure move, no body edits). */
-import { $, AI_DEVICE_STORE, AI_KEY_STORE, D, DEPTH_OWNED_S, DEPTH_RECALLED_S, DEPTH_RECALL_R, GESTURE, NODE_KIND, NOTE_TEXT, REPORT_RELAY_STORE, S, SAVE_PRESS_MS, SLIP_NODE, SLIP_OWN_MEANING, TODAY_SKY_MISS_DAYS, VOICE_LOCK, activateWordLadder, anchorBox, bi, biLabel, capturePending, closeSealStrip, commitCapture, commitStorePatch, deeperDepth, depthRank, depthRetrievability, dictionaryRowBySeq, diveFromSlip, el, encounterKey, ensureArchiveIndex, ensureArticle, entryKanaIndex, explicitWordSnapshot, finiteNumber, fitChromeKeep, glyphBox, go, heldWordCardNode, hideReaderToast, holdPageUnderDrawer, kanaReadingKey, kataToHira, metReadable, motionEase, motionMs, nonEmptyString, notYetReleased, noteEncounter, openPlainSaveMenu, openSealStrip, openVocabularyListPopover, openWordWeb, owns, pageCutAllowed, paintMiniPath, passage, placeFloating, plainRecord, recordWritable, relayServiceUrl, removeMini, render, revalidateTutorRequests, revealFloatingFocus, rubyNode, sameItem, sameWordIdentity, saveWord, savedAnswerFor, sealListRecency, setOwnRecordValue, shallowerDepth, sheetActionLine, sheetActionLineKeys, showMini, srsKey, suppressAssessmentCards, tx, validInstant, wordCardIdentity, wordNodeIdentity, wordStudied } from '../corridor.js';
+import { $, savedInParts, savedPlace, AI_DEVICE_STORE, AI_KEY_STORE, D, DEPTH_OWNED_S, DEPTH_RECALLED_S, DEPTH_RECALL_R, GESTURE, NODE_KIND, NOTE_TEXT, REPORT_RELAY_STORE, S, SAVE_PRESS_MS, SLIP_NODE, SLIP_OWN_MEANING, TODAY_SKY_MISS_DAYS, VOICE_LOCK, activateWordLadder, anchorBox, bi, biLabel, capturePending, closeSealStrip, commitCapture, commitStorePatch, deeperDepth, depthRank, depthRetrievability, dictionaryRowBySeq, diveFromSlip, el, encounterKey, ensureArchiveIndex, ensureArticle, entryKanaIndex, explicitWordSnapshot, finiteNumber, fitChromeKeep, glyphBox, go, heldWordCardNode, hideReaderToast, holdPageUnderDrawer, kanaReadingKey, kataToHira, metReadable, motionEase, motionMs, nonEmptyString, notYetReleased, noteEncounter, openPlainSaveMenu, openSealStrip, openVocabularyListPopover, openWordWeb, owns, pageCutAllowed, paintMiniPath, passage, placeFloating, plainRecord, recordWritable, relayServiceUrl, removeMini, render, revalidateTutorRequests, revealFloatingFocus, rubyNode, sameItem, sameWordIdentity, saveWord, savedAnswerFor, sealListRecency, setOwnRecordValue, shallowerDepth, sheetActionLine, sheetActionLineKeys, showMini, srsKey, suppressAssessmentCards, tx, validInstant, wordCardIdentity, wordNodeIdentity, wordStudied } from '../corridor.js';
 import { encounterIdentity, readerQuickRecord } from './capture.mjs';
+import { listsByRecency } from './save-places.mjs';
 import { dictionaryAnsweredForm, inlineWordReading, lookup, partGloss, readyTokenReading, senseNameHeldText, senseRecord, teFormRecord } from './dictionary.mjs';
 import { dayKey, depthIdentityMatch, depthIndex, notYetMarks, todaySkyWhy } from './drift.mjs';
 import { readRecordDrafts } from './learner.mjs';
@@ -124,6 +125,20 @@ function paintWordSave(button, on) {
     if (button.isConnected) fitChromeKeep(button);
     return;
   }
+  // SAVE · a saved item's Save names the place it is in (John, 2026-11-11: "still don't know where it went?"): "Saved in
+  // Review ✓", "Saved in 旅 ✓"; the place's name may be long, so it is its own span and the line ends it with an ellipsis
+  const placed = on && typeof button.savePlaced === 'function' ? button.savePlaced() : null;
+  if (placed && !all) {
+    const [before, name, after] = savedInParts(placed);
+    // one line, one flex item: the key's gap never falls between its words
+    const said = el('span', 'save-place-said');
+    said.append(before, el('span', 'save-place-label', name), after);
+    button.replaceChildren(said);
+    button.title = `${before}${name}${after}`;
+    button.classList.toggle('taken', on);
+    button.setAttribute('aria-pressed', String(on));
+    return;
+  }
   button.textContent = all
     ? tx(`${all} 語をぜんぶ保存`, `Save all ${all}`)
     // the reader's keep before a word is touched: what it does, in words (never an unlabelled glyph)
@@ -137,7 +152,7 @@ function paintWordSave(button, on) {
 }
 
 function saveOne({ id = '', cls = '', label = '', saved, keep, review = null, node = null, more = () => [], place = null,
-  held = false, word = '', all = 0, data = {} } = {}) {
+  held = false, word = '', all = 0, data = {}, home = null, remove = undefined, show = null } = {}) {
   const button = el('button', `save-one btn-primary${cls ? ` ${cls}` : ''}`);
   button.type = 'button';
   if (id) button.id = id;
@@ -150,44 +165,37 @@ function saveOne({ id = '', cls = '', label = '', saved, keep, review = null, no
   button.setAttribute('aria-expanded', 'false');
   // a surface's own hooks (data-enroll, data-airead-take, data-feed-save, data-save-bar) ride the dataset
   Object.assign(button.dataset, data);
+  // SAVE · where the item is, once it is saved: a word-like item's place in the record (Review, or the list it is on), a
+  // plain item's home (the tutor page). The Save names it; Show, Move… and Remove act on it (paintPlaceLine)
+  // a bar's Save names whatever word is under the finger now: its node is asked for at the press (a function)
+  const nodeNow = () => (typeof node === 'function' ? node() : node);
+  Object.defineProperty(button, 'saveOneNode', { configurable: true, get: nodeNow });
+  button.saveOneLabel = label;
+  button.savePlaced = () => { const now = nodeNow(); return now ? savedPlace(now) : home ? { kind: 'home', names: home } : null; };
   paintWordSave(button, !!saved());
   if (held) {
     button.disabled = true;
     button.classList.add('reader-capture-held');
   }
   let pressedAt = -Infinity;
-  const openMenu = () => (node
-    ? openVocabularyListPopover(node, label, button, { menu: true, review: review || { saved, toggle: keep }, more: more(), place })
-    : openPlainSaveMenu(button, { more: more(), place }));
+  const openMenu = () => {
+    const now = nodeNow();
+    if (now) return openVocabularyListPopover(now, label, button, { menu: true, review: review || { saved, toggle: keep }, keep, remove, more: more(), place });
+    // a bar's Save with no word it can keep says why, as it always did (its keep's own toast)
+    if (typeof node === 'function' && !home) return keep();
+    return openPlainSaveMenu(button, { more: more(), place, home, keep, saved, label, show, remove });
+  };
   button.saveOneOpen = openMenu;
+  button.saveOneRemove = node ? (remove === undefined ? null : remove) : remove || null;
   button.saveOnePaint = () => paintWordSave(button, !!saved());
+  // SAVE · ask first, save second (the program lead's ruling, 2026-11-11, on John's "it happens too fast ... where it
+  // goes should be a conscious choice"): a press opens the chooser and keeps nothing; the item is kept only when he picks
+  // a place in it (openSaveChooser, openPlainSaveMenu). On a saved item a press opens the same chooser to move it
   button.addEventListener('click', (event) => {
     event.stopPropagation();
     if (button.disabled || button.getAttribute('aria-busy') === 'true' || Date.now() - pressedAt < SAVE_PRESS_MS) return undefined;
     pressedAt = Date.now();
-    if (saved()) return openMenu();
-    // busy, never disabled, while the item is kept: a disabled button drops the keyboard to the page
-    button.setAttribute('aria-busy', 'true');
-    const settle = (ok) => {
-      // idle again, said in the attribute itself (one write, the same in every DOM the corridor runs in)
-      button.setAttribute('aria-busy', 'false');
-      if (!button.isConnected) {
-        // the keep drew its control again (the reader's bar names its word afresh after a save): the Save standing in its
-        // place opens the menu, so one press keeps and opens wherever the press was made
-        const fresh = id && typeof document !== 'undefined' ? document.getElementById?.(id) : null;
-        if (fresh && fresh !== button && fresh.getAttribute('aria-pressed') === 'true' && fresh.getAttribute('aria-expanded') !== 'true') {
-          fresh.saveOneOpen?.();
-        }
-        return ok;
-      }
-      const now = !!saved();
-      paintWordSave(button, now);
-      paintMiniPath(button.closest('.mini-actions'), now);
-      // the menu follows a keep that went through (as the slip's Save did: its menu on the keep's own answer)
-      if (now || ok) openMenu();
-      return ok;
-    };
-    return Promise.resolve(keep()).then(settle, () => settle(false));
+    return openMenu();
   });
   return button;
 }
@@ -520,9 +528,8 @@ async function unsaveEverywhere(node) {
 }
 
 function sealListOrder() {
-  const names = Object.keys(S.lists);
-  const recent = sealListRecency.filter((name) => owns(S.lists, name));
-  return [...recent, ...names.filter((name) => !recent.includes(name))];
+  // SAVE · his lists in the order he last put a word on them, from the record (no longer this session's memory alone)
+  return listsByRecency(S.lists, S.saveMemory);
 }
 
 function holdRing(x, y) {
@@ -563,7 +570,8 @@ function holdRing(x, y) {
 }
 
 function sealTarget() {
-  for (const id of ['tray', 'tab-review', 'tab-today']) {
+  // SAVE · a fresh save's seal lands on Saved today, where he will find the word again
+  for (const id of ['saved-today', 'tray', 'tab-review', 'tab-today']) {
     const node = document.getElementById(id);
     const box = node?.getBoundingClientRect();
     if (box?.width && box.height && getComputedStyle(node).visibility !== 'hidden') return node;

@@ -597,7 +597,10 @@ async function backupWalk(browser) {
     await press(page.locator('.shelf-open').first());
     await settleReader(page);
     await page.locator('#mini-take').waitFor();
+    // Save asks where the word goes (SAVE, 2026-11-11): Review, the study queue, is picked
     await press('#mini-take');
+    await page.locator('#mini-review').waitFor();
+    await press('#mini-review');
     await sleep(page, 900);
     await toTab(a, 'learn');
     await press('.learn-go-deck');
@@ -825,7 +828,10 @@ async function soundWalk(browser) {
       await press(word);
       await sleep(page, 700);
     }
+    // Save asks where the word goes (SAVE, 2026-11-11): Review, the study queue, is picked
     await press('#mini-take');
+    await page.locator('#mini-review').waitFor();
+    await press('#mini-review');
     await sleep(page, 900);
     await toTab(session, 'today');
     await press('#review-start');

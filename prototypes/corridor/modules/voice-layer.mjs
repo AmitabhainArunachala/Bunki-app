@@ -286,10 +286,11 @@ export function installVoiceLayer(host) {
     for (const node of shown) if (!node.hasAttribute('data-speaking')) node.setAttribute('data-speaking', '');
     return shown;
   };
-  /** A word's box, a page or the save strip stands open over the article: the reader does not move the text under his
-   * finger; following takes up again with the next sentence once it has closed. */
+  /** A word's box, a page, the save strip, Save's chooser or a saved place's panel stands open over the article: the reader
+   * does not move the text under his finger; following takes up again with the next sentence once it has closed. */
   const coverOpen = () => !!doc.getElementById('mini')?.getClientRects().length || !!doc.getElementById('sheet')?.isConnected ||
-    !!doc.getElementById('seal-strip')?.isConnected;
+    !!doc.getElementById('seal-strip')?.isConnected || !!doc.getElementById('vocabulary-list-popover')?.isConnected ||
+    !!doc.getElementById('save-place-panel')?.isConnected;
   /** The app draws the article again (a word looked up, a dial moved): the sentences keep their text and take the new
    * page's words. False when the text itself is no longer the one being read (the other version of the story). */
   function remapReader() {

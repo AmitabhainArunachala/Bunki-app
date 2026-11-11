@@ -345,3 +345,300 @@ html[data-live-depth='1'] #sheet:has(> h2.headword):not(:has(.hero > .hero-glyph
 .settings-voice-server > .teacher-note { margin: 4px 0; }
 .settings-voice-server > .btn-tertiary { margin-right: 16px; }
 .settings-voice-server [hidden] { display: none !important; }
+
+/* ---- SAVE · ask first, save second (2026-11-11; John on his iPhone: "the save feature is unclear ... where it goes
+   should be a conscious choice"). The chooser, the named place, Saved today and the Words tab's Saved shelf. They are
+   printed like the rest of the house: paper on paper, one hairline, one contact shadow; a place is a 札 slip; Review is
+   the 藍 field the study queue has always been; a saved word's mark is the 朱 seal. The prefix weighs (2,0,2) so it
+   outranks the room sheets' (1,3,0) menu rules in every look, the sky included. ---- */
+html body:not(#\#):not(#\#) .vocabulary-list-popover.is-chooser { color: var(--color-ink); }
+html body:not(#\#):not(#\#) .vocabulary-list-popover.is-chooser .save-chooser-title {
+  display: block;
+  margin: 10px 8px 6px;
+  font: 600 var(--type-label) / 1.35 var(--font-ui);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-ink-2);
+}
+html body:not(#\#):not(#\#) .vocabulary-list-popover.is-chooser .save-chooser-word {
+  display: inline-block;
+  max-width: calc(100% - 6em);
+  margin: 0 0.3em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+  font: 700 var(--type-control) / 1.2 var(--font-reading, var(--font-display));
+  color: var(--color-ink);
+}
+html body:not(#\#):not(#\#) .save-chooser-places { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; margin: 0; }
+html body:not(#\#):not(#\#) .save-chooser-rest:not([hidden]) { display: grid; grid-template-columns: minmax(0, 1fr); }
+html body:not(#\#):not(#\#) .save-chooser-rest[hidden], html body:not(#\#):not(#\#) .save-chooser-form[hidden] { display: none; }
+html body:not(#\#):not(#\#) .save-place {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  grid-template-areas: 'mark name count' 'mark sub count';
+  align-items: center;
+  column-gap: 12px;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 48px;
+  margin: 0;
+  padding: 6px 10px;
+  border: 0;
+  border-top: var(--stroke-hairline, 1px) solid var(--mini-rule, var(--color-rule));
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--color-ink);
+  font: 600 var(--type-control) / 1.25 var(--font-ui);
+  text-align: start;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+html body:not(#\#):not(#\#) .save-chooser-places > .save-place:first-child { border-top: 0; }
+html body:not(#\#):not(#\#) .save-place::before {
+  /* the place's mark: Review a 藍 field with 復 printed through it; a list a bookmark, as the bar's bookmark is drawn */
+  content: '';
+  grid-area: mark;
+  justify-self: center;
+  width: 13px;
+  height: 17px;
+  background: var(--color-ink-2);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 17'%3E%3Cpath d='M1.75 1.75h9.5v13.5L6.5 11.6l-4.75 3.65z' fill='none' stroke='black' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 17'%3E%3Cpath d='M1.75 1.75h9.5v13.5L6.5 11.6l-4.75 3.65z' fill='none' stroke='black' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+html body:not(#\#):not(#\#) .save-place.is-review::before {
+  content: '復';
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-seal, 3px);
+  background: var(--color-accent);
+  color: var(--color-paper, #f7f2e8);
+  -webkit-mask: none;
+  mask: none;
+  font: 700 14px / 1 var(--font-seal, var(--font-display));
+}
+html body:not(#\#):not(#\#) .save-place.is-new::before, html body:not(#\#):not(#\#) .save-place.save-place-all::before {
+  content: '＋';
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px dashed var(--color-edge-strong, var(--color-rule));
+  border-radius: var(--radius-seal, 3px);
+  background: none;
+  color: var(--color-accent);
+  -webkit-mask: none;
+  mask: none;
+  font: 600 14px / 1 var(--font-ui);
+}
+html body:not(#\#):not(#\#) .save-place.save-place-all::before { content: '…'; border-style: solid; }
+html body:not(#\#):not(#\#) .save-place.is-home::before { content: '先'; display: grid; place-items: center; width: 26px; height: 26px;
+  border-radius: var(--radius-seal, 3px); background: var(--color-ink-2); color: var(--color-paper, #f7f2e8); -webkit-mask: none; mask: none;
+  font: 700 14px / 1 var(--font-seal, var(--font-display)); }
+html body:not(#\#):not(#\#) .save-place-name { grid-area: name; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html body:not(#\#):not(#\#) .save-place:not(:has(.save-place-sub)) .save-place-name { grid-row: 1 / span 2; }
+html body:not(#\#):not(#\#) .save-place-sub { grid-area: sub; font: 400 var(--type-caption, 12px) / 1.3 var(--font-ui); color: var(--color-muted); }
+html body:not(#\#):not(#\#) .save-place-count {
+  grid-area: count;
+  min-width: 2ch;
+  font: 500 var(--type-label) / 1 var(--font-data, var(--font-ui));
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  color: var(--color-muted);
+}
+html body:not(#\#):not(#\#) .save-place-here { grid-area: count; justify-self: end; color: var(--color-accent); font: 700 var(--type-control) / 1 var(--font-ui); }
+html body:not(#\#):not(#\#) .save-place:has(.save-place-here) .save-place-count { display: none; }
+html body:not(#\#):not(#\#) .save-place[aria-current='true'] { background: var(--color-accent-wash, color-mix(in srgb, var(--color-accent) 9%, transparent)); }
+html body:not(#\#):not(#\#) .save-place.is-new { color: var(--color-accent); }
+html body:not(#\#):not(#\#) .save-place:hover:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 7%, transparent); }
+html body:not(#\#):not(#\#) .save-place:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+html body:not(#\#):not(#\#) .save-place:disabled { opacity: 0.55; cursor: progress; }
+html body:not(#\#):not(#\#) .save-place[hidden] { display: none; }
+html body:not(#\#):not(#\#) .vocabulary-list-popover.is-chooser .save-chooser-form:not([hidden]) { display: flex; gap: 8px; margin: 6px 0 2px; padding: 0 8px; }
+html body:not(#\#):not(#\#) .vocabulary-list-popover.is-chooser .save-chooser-form .vocabulary-list-field { flex: 1 1 auto; min-width: 0; min-height: 44px; font-size: 16px; }
+html body:not(#\#):not(#\#) :is(.vocabulary-list-popover.is-chooser, .seal-strip) :is(.vocabulary-list-create, .seal-strip-create) {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--color-accent);
+  color: var(--color-paper, #f7f2e8);
+  font: 600 var(--type-control) / 1.25 var(--font-ui);
+}
+html body:not(#\#):not(#\#) .vocabulary-list-popover.is-chooser .vocabulary-list-status { margin: 6px 8px 0; }
+html body:not(#\#):not(#\#) .vocabulary-list-popover.is-chooser .save-chooser-foot { display: flex; flex-wrap: wrap; gap: 0 4px; margin: 6px 0 0; padding-top: 2px; }
+html body:not(#\#):not(#\#) .vocabulary-list-popover.is-chooser .save-chooser-foot > .vocabulary-list-action { flex: 0 1 auto; min-height: 44px; padding: 0 10px; font: 500 var(--type-control) / 1.25 var(--font-ui); }
+html body:not(#\#):not(#\#) .vocabulary-list-popover.is-chooser .save-chooser-foot > #save-chooser-show { color: var(--color-accent); font-weight: 600; }
+html body:not(#\#):not(#\#) .vocabulary-list-popover.is-chooser .save-chooser-foot > #save-chooser-remove { color: var(--color-ink-2); }
+/* the chooser outside a card (the article's bar, a page) stands on paper of its own */
+html body:not(#\#):not(#\#) .vocabulary-list-popover.is-chooser:not(.is-inline) { width: min(340px, calc(100vw - 16px)); padding: 4px 6px 8px; background: var(--color-paper, #f5efe0); }
+
+/* the Save says where the word is; a long list name ends in an ellipsis, the ✓ stays */
+html body:not(#\#):not(#\#) button.save-one .save-place-label {
+  display: inline-block;
+  max-width: 9.5em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+/* the place line under a saved word's Save: Show · Move… · Remove, each a finger's width tall */
+html body:not(#\#):not(#\#) .save-place-line {
+  display: flex;
+  flex: 1 0 100%;
+  order: 20;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 2px;
+  margin: -2px -8px 0;
+}
+html body:not(#\#):not(#\#) .save-place-act {
+  min-height: 44px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-ink-2);
+  font: 600 var(--type-control) / 1.25 var(--font-ui);
+  cursor: pointer;
+}
+html body:not(#\#):not(#\#) .save-place-act + .save-place-act::before { content: '·'; margin: 0 10px 0 -6px; color: var(--color-rule); font-weight: 400; }
+html body:not(#\#):not(#\#) #mini-place-show { color: var(--color-accent); }
+html body:not(#\#):not(#\#) .save-place-act:hover { color: var(--color-ink); }
+html body:not(#\#):not(#\#) .save-place-act:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+html body:not(#\#):not(#\#) #mini.is-sentence .save-place-line { display: none; }
+
+/* the long press's strip: Review stands first among the places; the placed row's acts are quiet words */
+html body:not(#\#):not(#\#) .seal-strip .seal-review { border-color: color-mix(in srgb, var(--color-accent) 60%, transparent); color: var(--color-accent); }
+html body:not(#\#):not(#\#) .seal-strip :is(.seal-place-show, .seal-place-move) { border-color: transparent; background: transparent; padding-inline: 8px; }
+html body:not(#\#):not(#\#) .seal-strip .seal-place-show { color: var(--color-accent); }
+html body:not(#\#):not(#\#) .seal-strip .seal-strip-lists > .seal-act[data-strip-action='remove'], html body:not(#\#):not(#\#) .seal-strip .seal-place-move { color: var(--color-ink-2); }
+html body:not(#\#):not(#\#) button.save-one .save-place-said { white-space: nowrap; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+html body:not(#\#):not(#\#) .seal-strip[data-mode='placed'] .seal-strip-status { color: var(--color-ink); font-weight: 600; }
+html body:not(#\#):not(#\#) .seal-strip[data-mode='choose'] .seal-strip-status, html body:not(#\#):not(#\#) .seal-strip[data-mode='move'] .seal-strip-status { flex: 1 0 100%; min-height: 0; margin: 2px 4px 2px; }
+html body:not(#\#):not(#\#) .seal-strip-form { align-items: center; }
+
+/* Saved today: a slip standing on the bottom bar's edge over Today, its count pressed in 朱 as the seal is */
+html body:not(#\#):not(#\#) #saved-today {
+  position: absolute;
+  bottom: 100%;
+  left: calc(var(--slip-left, 0px) + 8px);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  margin: 0 0 -1px;
+  padding: 0 10px 0 9px;
+  border: var(--stroke-hairline, 1px) solid var(--color-bar-line, var(--color-rule));
+  border-bottom: 0;
+  border-radius: 7px 7px 0 0;
+  background: var(--color-paper, #f5efe0);
+  box-shadow: 0 -2px 6px -3px color-mix(in srgb, var(--color-ink) 28%, transparent);
+  color: var(--color-ink);
+  font: 600 var(--type-label) / 1 var(--font-ui);
+  letter-spacing: 0;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+/* the finger's target is 44 high: the slip's own 34 and five above and below it */
+html body:not(#\#):not(#\#) #saved-today::after { content: ''; position: absolute; inset: -5px -4px -5px; }
+html body:not(#\#):not(#\#) #saved-today .saved-today-mark {
+  width: 11px;
+  height: 15px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 17'%3E%3Cpath d='M1.75 1.75h9.5v13.5L6.5 11.6l-4.75 3.65z' fill='none' stroke='black' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 17'%3E%3Cpath d='M1.75 1.75h9.5v13.5L6.5 11.6l-4.75 3.65z' fill='none' stroke='black' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+html body:not(#\#):not(#\#) #saved-today .saved-today-count {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  border-radius: var(--radius-seal, 3px);
+  background: var(--color-seal, #b5322a);
+  color: var(--color-paper, #f7f2e8);
+  font: 700 12px / 1 var(--font-data, var(--font-ui));
+  font-variant-numeric: tabular-nums;
+}
+html body:not(#\#):not(#\#) #saved-today:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+html body:not(#\#):not(#\#) .primary-tabs[data-wrapped='true'] #saved-today { bottom: 100%; }
+
+/* a saved place opened over the page: a sheet of paper above the bar (a phone), beside its door (wide) */
+html body:not(#\#):not(#\#) #save-place-panel {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  /* above the bar and the Saved today slip on its edge */
+  bottom: calc(var(--primary-tabs-height, 64px) + 46px + env(safe-area-inset-bottom, 0px));
+  z-index: 88;
+  display: flex;
+  flex-direction: column;
+  max-height: min(60vh, calc(100dvh - var(--primary-tabs-height, 64px) - 140px));
+  padding: 4px 0 6px;
+  border: var(--stroke-hairline, 1px) solid color-mix(in srgb, var(--color-ink) 22%, transparent);
+  border-radius: var(--radius-overlay, 12px);
+  background: var(--color-paper, #f5efe0);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 55%), 0 3px 8px -3px rgb(20 24 34 / 26%), 0 16px 44px -14px rgb(20 24 34 / 34%);
+  color: var(--color-ink);
+  animation: seal-strip-rise var(--motion-room, 240ms) var(--ease-enter, ease-out) backwards;
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not(#\#):not(#\#) #save-place-panel {
+  border-color: color-mix(in srgb, var(--color-gold, #e2bd6c) 34%, transparent);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%), 0 0 0 1px rgb(0 0 0 / 30%), 0 16px 48px -14px rgb(0 0 0 / 62%);
+}
+@media (min-width: 700px) {
+  html body:not(#\#):not(#\#) #save-place-panel { right: auto; left: var(--panel-left, 16px); width: 440px; max-height: min(62vh, 640px); }
+}
+html body:not(#\#):not(#\#) #save-place-panel:focus { outline: none; }
+html body:not(#\#):not(#\#) .save-place-head { display: flex; align-items: center; gap: 8px; padding: 2px 6px 2px 16px; }
+html body:not(#\#):not(#\#) .save-place-title { display: flex; flex: 1 1 auto; align-items: baseline; gap: 10px; min-width: 0; margin: 0; font: 700 var(--type-title, 22px) / 1.25 var(--font-display); color: var(--color-ink); }
+html body:not(#\#):not(#\#) .save-place-title-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html body:not(#\#):not(#\#) .save-place-title-count { flex: 0 0 auto; font: 500 var(--type-label) / 1 var(--font-ui); color: var(--color-muted); }
+html body:not(#\#):not(#\#) .save-place-close { min-height: 44px; padding: 0 10px; border: 0; background: transparent; color: var(--color-ink-2); font: 600 var(--type-control) / 1 var(--font-ui); cursor: pointer; }
+html body:not(#\#):not(#\#) .save-place-note { margin: 0 16px 6px; font: 400 var(--type-label) / 1.45 var(--font-ui); color: var(--color-ink-2); }
+html body:not(#\#):not(#\#) .save-place-words { flex: 1 1 auto; min-height: 0; margin: 0; padding: 0; overflow: auto; list-style: none; border-top: var(--stroke-hairline, 1px) solid var(--color-rule); }
+html body:not(#\#):not(#\#) .save-place-word { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 16px; border-bottom: var(--stroke-hairline, 1px) solid var(--color-rule-soft, var(--color-rule)); }
+html body:not(#\#):not(#\#) .save-place-w { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 18px / 1.3 var(--font-reading, var(--font-display)); }
+html body:not(#\#):not(#\#) .save-place-kind { flex: 0 0 auto; font: 500 var(--type-caption, 12px) / 1 var(--font-ui); color: var(--color-muted); }
+html body:not(#\#):not(#\#) .save-place-where { flex: 0 1 auto; max-width: 45%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 4px 8px; border: var(--stroke-hairline, 1px) solid var(--color-rule); border-radius: var(--radius-control); font: 600 var(--type-caption, 12px) / 1 var(--font-ui); color: var(--color-ink-2); }
+html body:not(#\#):not(#\#) .save-place-where:not(.is-list) { border-color: color-mix(in srgb, var(--color-accent) 45%, transparent); color: var(--color-accent); }
+html body:not(#\#):not(#\#) .save-place-word.is-this { background: var(--color-accent-wash, color-mix(in srgb, var(--color-accent) 9%, transparent)); }
+html body:not(#\#):not(#\#) .save-place-word.is-this::after { content: '印'; display: grid; place-items: center; width: 22px; height: 22px; border-radius: var(--radius-seal, 3px); background: var(--color-seal, #b5322a); color: var(--color-paper, #f7f2e8); font: 800 13px / 1 var(--font-seal, var(--font-display)); transform: rotate(-9deg); }
+html body:not(#\#):not(#\#) .save-place-empty { padding: 14px 16px; color: var(--color-muted); font: 400 var(--type-control) / 1.4 var(--font-ui); }
+html body:not(#\#):not(#\#) .save-place-door { align-self: stretch; min-height: 44px; margin: 4px 8px 0; padding: 0 8px; border: 0; background: transparent; color: var(--color-accent); font: 600 var(--type-control) / 1 var(--font-ui); text-align: start; cursor: pointer; }
+
+/* the Words tab's Saved shelf: Review a 藍 field, each list a paper slip with one shadow, the count in the data face */
+html body:not(#\#):not(#\#) .saved-shelf { margin: 18px 0 6px; }
+html[data-room='search'] body:not(#\#):not(#\#) #app > main > .search-page.search-page-busy ~ .saved-shelf { display: none; }
+html body:not(#\#):not(#\#) .saved-shelf-head { display: flex; align-items: baseline; gap: 12px; margin: 0 0 10px; }
+html body:not(#\#):not(#\#) .saved-shelf-title { margin: 0; font: 700 var(--type-title, 22px) / 1.2 var(--font-display); letter-spacing: 0; text-transform: none; color: var(--color-ink); }
+html body:not(#\#):not(#\#) .saved-shelf-today { font: 500 var(--type-label) / 1 var(--font-ui); color: var(--color-muted); }
+html body:not(#\#):not(#\#) .saved-shelf-places { display: flex; flex-wrap: wrap; gap: 10px; }
+html body:not(#\#):not(#\#) .saved-shelf-place {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 100%;
+  min-height: 48px;
+  padding: 0 14px 0 16px;
+  border: var(--stroke-hairline, 1px) solid color-mix(in srgb, var(--color-ink) 18%, transparent);
+  border-radius: var(--radius-control);
+  background: var(--color-paper, #f5efe0);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 50%) inset, 0 2px 5px -2px rgb(20 24 34 / 22%);
+  color: var(--color-ink);
+  font: 600 var(--type-control) / 1.2 var(--font-ui);
+  cursor: pointer;
+}
+html body:not(#\#):not(#\#) .saved-shelf-place.is-review { border-color: transparent; background: var(--color-accent); color: var(--color-paper, #f7f2e8); }
+html body:not(#\#):not(#\#) .saved-shelf-name { min-width: 0; max-width: 14em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html body:not(#\#):not(#\#) .saved-shelf-count { font: 500 var(--type-label) / 1 var(--font-data, var(--font-ui)); font-variant-numeric: tabular-nums; opacity: 0.75; }
+html body:not(#\#):not(#\#) .saved-shelf-place:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+html body:not(#\#):not(#\#) .saved-shelf-note { margin: 10px 0 0; font: 400 var(--type-label) / 1.45 var(--font-ui); color: var(--color-ink-2); }
