@@ -56,11 +56,13 @@ const where = () => page.evaluate(() => ({ view: document.body.dataset.view || '
   box: !!document.getElementById('mini')?.getClientRects().length, url: location.href, unfolded: document.querySelectorAll('#sky .unfolded, #sky .glossed').length,
   web: document.querySelector('.ww-plate')?.dataset.wwCentre || '' }));
 
-/** On the screen as it stands: arm, read the record, tap `point()`, read it again. */
-async function armedTap(name, point) {
+/** On the screen as it stands: arm, read the record, tap `point()`, read it again. `keys`: arm from the keyboard (the
+ * mark focused, Enter), for a screen a press outside would close (the word box closes on a press outside it). */
+async function armedTap(name, point, { keys = false } = {}) {
   try {
     await dismissFirstLine(s);
-    await press(await earMark(page));
+    if (keys) { await (await earMark(page)).focus(); await page.keyboard.press('Enter'); }
+    else await press(await earMark(page));
     await page.waitForFunction(() => document.documentElement.dataset.ear === 'armed', null, { timeout: 3000 });
     const before = await readRecord();
     const was = await where();
@@ -87,7 +89,11 @@ async function armedTap(name, point) {
 }
 /** The centre of the first element matching `selector` in plain view, clear of the bars, with Japanese in it. */
 const pick = (selector, inner = null) => () => page.evaluate(({ selector, inner }) => {
-  for (const el of document.querySelectorAll(selector)) {
+  // the first one brought into plain view when none stands there yet (a list below the fold)
+  const all = [...document.querySelectorAll(selector)];
+  const plain = (el) => { const r = el.getBoundingClientRect(); return r.top > 110 && r.bottom < innerHeight - 160; };
+  if (all.length && !all.some(plain)) all[0].scrollIntoView({ block: 'center' });
+  for (const el of all) {
     const target = inner ? el.querySelector(inner) || el : el;
     const r = target.getBoundingClientRect();
     if (r.width > 4 && r.top > 110 && r.bottom < innerHeight - 160 && r.left >= 0 && r.right <= innerWidth && /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(target.textContent)
@@ -115,7 +121,7 @@ try {
   {
     const word = page.locator('#reader .tok.content').nth(4);
     for (let i = 0; i < 4 && !(await page.locator('#mini').isVisible().catch(() => false)); i += 1) { await press(word); await s.sleep(700); }
-    await armedTap('the word box’s reading', pick('#mini .mini-reading'));
+    await armedTap('the word box’s reading', pick('#mini .mini-reading'), { keys: true });
   }
   // 4. Today: his own word's row
   await toTab('today');
