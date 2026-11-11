@@ -178,12 +178,12 @@ function saveOne({ id = '', cls = '', label = '', saved, keep, review = null, no
     button.classList.add('reader-capture-held');
   }
   let pressedAt = -Infinity;
-  const openMenu = () => {
+  const openMenu = ({ keyboard = false } = {}) => {
     const now = nodeNow();
-    if (now) return openVocabularyListPopover(now, label, button, { menu: true, review: review || { saved, toggle: keep }, keep, remove, more: more(), place });
+    if (now) return openVocabularyListPopover(now, label, button, { menu: true, review: review || { saved, toggle: keep }, keep, remove, more: more(), place, keyboard });
     // a bar's Save with no word it can keep says why, as it always did (its keep's own toast)
     if (typeof node === 'function' && !home) return keep();
-    return openPlainSaveMenu(button, { more: more(), place, home, keep, saved, label, show, remove });
+    return openPlainSaveMenu(button, { more: more(), place, home, keep, saved, label, show, remove, keyboard });
   };
   button.saveOneOpen = openMenu;
   button.saveOneRemove = node ? (remove === undefined ? null : remove) : remove || null;
@@ -195,7 +195,8 @@ function saveOne({ id = '', cls = '', label = '', saved, keep, review = null, no
     event.stopPropagation();
     if (button.disabled || button.getAttribute('aria-busy') === 'true' || Date.now() - pressedAt < SAVE_PRESS_MS) return undefined;
     pressedAt = Date.now();
-    return openMenu();
+    // a key press takes the keyboard into the chooser; a finger or a pointer leaves it where it pressed
+    return openMenu({ keyboard: event.detail === 0 });
   });
   return button;
 }
@@ -225,10 +226,13 @@ function setSaveDrawerPush(kind, px) {
   if (scroller && scroller.scrollTop !== top) scroller.scrollTop = top;
 }
 
-function keepMenuInCard(pop) {
+function keepMenuInCard(pop, target = null) {
   const card = pop.closest?.('#mini');
   if (!card || !(card.scrollHeight > card.clientHeight + 1) || typeof pop.getBoundingClientRect !== 'function') return;
-  const box = pop.getBoundingClientRect(), view = card.getBoundingClientRect();
+  // SAVE · a chooser opens without moving the Save under his finger: the card scrolls only if its first place (Review) is
+  // out of sight, and then only as far as that place; the rest of the chooser is a scroll of his own away
+  const shown = target || (pop.classList?.contains('is-chooser') ? pop.querySelector('.save-place') || pop : pop);
+  const box = shown.getBoundingClientRect(), view = card.getBoundingClientRect();
   const top = view.top + card.clientTop, foot = top + card.clientHeight;
   const lift = Math.min(box.bottom - foot, box.top - top);
   if (lift > 0) card.scrollTop += Math.ceil(lift);

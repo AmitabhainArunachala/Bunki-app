@@ -9770,7 +9770,7 @@ function adoptSaveMenuOwner() {
 /** The one Save's menu for an item with no lists (a sentence, a link). SAVE · ask first here too: before it is kept the
  * menu names the one place a press puts it (its home: the tutor page for a sentence) and keeps it only on that pick;
  * once kept, it names the place, with Show where the surface has one and its own rows (Copy, Remove). */
-function openPlainSaveMenu(invoker, { more = [], place = null, home = null, keep = null, saved = null, label = '', show = null } = {}) {
+function openPlainSaveMenu(invoker, { more = [], place = null, home = null, keep = null, saved = null, label = '', show = null, keyboard = true } = {}) {
   if (savePickInFlight) return;
   if (document.getElementById('vocabulary-list-popover')) {
     const same = vocabularyListInvoker === invoker;
@@ -9852,6 +9852,7 @@ function openPlainSaveMenu(invoker, { more = [], place = null, home = null, keep
   invoker?.setAttribute('aria-expanded', 'true');
   holdCardForChooser(invoker);
   placeSaveMenu(pop, invoker, place);
+  if (!keyboard && invoker?.isConnected && typeof invoker.focus === 'function') invoker.focus({ preventScroll: true });
 }
 /** A card that has grown to all the room it has scrolls itself, never the page, until its unfolded menu stands whole in
  * it: the menu's foot comes into view without its head leaving the card's top. */
@@ -10091,7 +10092,7 @@ function sayPlaced(node, label, result, { saved = null, keep = null } = {}) {
   showReaderToast(savedToastWords(result.place, !!result.from), [tx('元に戻す', 'Undo'), undo]);
 }
 
-function openSaveChooser(node, label, invoker, { keep = null, saved = null, remove = undefined, more = [], place = null } = {}) {
+function openSaveChooser(node, label, invoker, { keep = null, saved = null, remove = undefined, more = [], place = null, keyboard = true } = {}) {
   const allowed = personalHost?.captureAccess?.() || (() => true);
   if (!allowed() || savePickInFlight) return;
   if (document.getElementById('vocabulary-list-popover')) {
@@ -10285,8 +10286,10 @@ function openSaveChooser(node, label, invoker, { keep = null, saved = null, remo
   invoker?.setAttribute('aria-expanded', 'true');
   holdCardForChooser(invoker);
   placeSaveMenu(pop, invoker, place);
-  // the keyboard lands on the place it is in now, else on Review
-  (choices.find((button) => button.getAttribute('aria-current') === 'true') || choices[0])?.focus({ preventScroll: true });
+  // the keyboard lands on the place it is in now, else on Review; a finger's press leaves focus on the Save it pressed, so
+  // no card scrolls to reveal a row and the Save stays exactly under the finger
+  if (keyboard || !invoker?.isConnected) (choices.find((button) => button.getAttribute('aria-current') === 'true') || choices[0])?.focus({ preventScroll: true });
+  else invoker.focus({ preventScroll: true });
 }
 /* SAVE · the press on Save never moves the Save under his finger. A word's box keeps its top edge from its first chooser
  * on (the sentence pane's pin, placeFloating), and its kanji band and sentence door step aside while the chooser is open
@@ -10312,7 +10315,7 @@ function releaseCardFromChooser(pop) {
 }
 /** A menu that grew (its other lists unfolded) keeps its foot in sight: inside its card, or on the glass. */
 function keepMenuInView(pop) {
-  if (pop.closest('#mini')) { keepMenuInCard(pop); return; }
+  if (pop.closest('#mini')) { keepMenuInCard(pop, pop.querySelector('.save-chooser-rest') || pop); return; }
   const box = pop.getBoundingClientRect();
   const foot = (window.visualViewport?.height || window.innerHeight) - 8;
   if (box.bottom > foot && !pop.classList.contains('is-drawer')) pop.style.top = `${Math.max(8, parseFloat(pop.style.top || '0') - (box.bottom - foot))}px`;
@@ -10538,9 +10541,9 @@ function paintPlaceLine(actions, saved) {
   }
 }
 
-function openVocabularyListPopover(node, label, invoker, { menu = false, more = [], review = null, place = null, keep = null, remove = undefined } = {}) {
+function openVocabularyListPopover(node, label, invoker, { menu = false, more = [], review = null, place = null, keep = null, remove = undefined, keyboard = true } = {}) {
   // SAVE · every Save's menu is the one chooser: ask first, save second (openSaveChooser)
-  if (menu) return openSaveChooser(node, label, invoker, { keep, saved: review?.saved || null, remove, more, place });
+  if (menu) return openSaveChooser(node, label, invoker, { keep, saved: review?.saved || null, remove, more, place, keyboard });
   const allowed = personalHost?.captureAccess?.() || (() => true);
   if (!allowed()) return;
   if (document.getElementById('vocabulary-list-popover')) {
