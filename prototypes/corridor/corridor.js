@@ -13725,6 +13725,21 @@ function reviewVoiceMark(id) {
   button.type = 'button'; button.id = id;
   button.dataset.japaneseLookup = 'off';
   button.append(uiIcon('speaker'));
+  // A press on it only speaks (fix round 1 of the card audio): it never reaches the face (a practice block turns its card
+  // over on any click on the face), a pointer or touch press leaves no focus on it (so Space and Enter go on turning and
+  // grading, reviewKeys), and a keyboard user who tabbed to it gets its own act from Space or Enter and nothing else.
+  button.addEventListener('mousedown', (event) => event.preventDefault());
+  button.addEventListener('click', (event) => {
+    event.stopPropagation();
+    if (event.detail && document.activeElement === button) button.blur();
+  });
+  button.addEventListener('keydown', (event) => {
+    if ((event.key !== ' ' && event.key !== 'Enter') || event.altKey || event.ctrlKey || event.metaKey) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if (!event.repeat) button.click();
+  });
+  button.addEventListener('keyup', (event) => { if (event.key === ' ') event.preventDefault(); });
   return button;
 }
 function appendReviewVoice(row, target) {

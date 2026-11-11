@@ -566,6 +566,8 @@ export function installVoiceLayer(host) {
         if (!plan?.sentences?.length) continue;
         node.dataset.voiceHost = rule.id;
         const mark = makeMark(rule);
+        // the card's other sentences (under its fold) are part of the card: their mark only speaks, as the card's control does
+        if (rule.id === 'card-example') onlyItsOwn(mark);
         mark.addEventListener('click', (event) => {
           event.stopPropagation();
           let now = null;
@@ -589,6 +591,25 @@ export function installVoiceLayer(host) {
     }
     mountStudyCard(root);
   }
+  /** A study card's audio control does its own act and nothing else (fix round 1 of the card audio, 2026-11-11): a press
+   * on it never reaches the card (a practice block turns its face over on any click; the deck reveals on Space or Enter);
+   * a pointer or touch press leaves no focus on it, so Space and Enter go on turning and grading the card as before the
+   * press; and when a keyboard user has tabbed to it, Space or Enter presses it and goes no further. */
+  function onlyItsOwn(control) {
+    control.addEventListener('mousedown', (event) => event.preventDefault());
+    control.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (event.detail && doc.activeElement === control) control.blur();
+    });
+    control.addEventListener('keydown', (event) => {
+      if ((event.key !== ' ' && event.key !== 'Enter') || event.altKey || event.ctrlKey || event.metaKey) return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (!event.repeat) control.click();
+    });
+    control.addEventListener('keyup', (event) => { if (event.key === ' ') event.preventDefault(); });
+    return control;
+  }
   /** The quiet speaker of a study card (John, 2026-11-11: "the gawdy buttons more subtle, and simplified"): a hairline
    * glyph in the secondary ink of what surrounds it, no seal, circle, box or shadow; the accent only while it speaks. */
   const cardMark = (id) => {
@@ -597,7 +618,7 @@ export function installVoiceLayer(host) {
     control.id = id;
     control.dataset.japaneseLookup = 'off';
     control.append(uiIcon('speaker'));
-    return control;
+    return onlyItsOwn(control);
   };
   /** The study card has ONE audio control on each face. Answer side: it says the word by the card's reading, then the card's
    * sentence, then the definition and the note (what the old 聞く and 音 said between them), in one turn; a second tap stops
