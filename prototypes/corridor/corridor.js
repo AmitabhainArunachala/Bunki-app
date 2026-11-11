@@ -11,7 +11,6 @@ import { maintenanceScreenName, meSection, mergeGrammar, portableRecord, primary
 import { byLeadingDrops, byNewest, dateStamp, dayKey, depthBasisParts, depthDot, depthNodeOf, helpByMonth, landOnKeptWords, leadingDropDays, localDayOrdinal, localMonthKey, luminance, monthKey, monthLabel, notYetMarks, readerDateStamp, renderDrift, renderKagami, renderTodayLine, renderTodayWord, roughestThisWeek, startOfDay, syncDriftTheme, todayCity, todayDateline, todayHash, todayKanji, todayLearning, todayPlaceSky, todayReadPick, todayRedrawSky, todaySecondsPerCard, todaySkyWhy, todaySkyWord, trayLine } from './modules/drift.mjs';
 import { articleFingerprint, catalogLabel, feedDate, levelChip, levelPhrase, libraryDiscoverable, libraryVisibilityPolicy, openReferenceEntry, placeSealStrip, publisherLink, readerChoiceMatch, readerChoiceTokenHolds, readerEntryNode, referenceCollectionChip, refreshReadingPlacesSurface, renderCatalogNode, renderPublisherContextSelection, renderReaderChoice, renderReaderChoiceNote, renderReferenceMetadata, renderReferenceNode, resolveReadingPlace, searchRowShownByCore, shelfBodyToken, shelfCurrentDay, shelfDailyOrder, shelfDateline, shelfStories, shelfTallyText } from './modules/library.mjs';
 import { activeTeacherContext, aiAsk, aiChatTurns, aiCreateCards, aiKey, aiProvider, aiQuizParse, aiReadingSegments, aiRequestTimeoutMs, aiTeachingSubject, aiTransport, askOnRequest, canonicalAiBaseUrl, refreshTeacherChatHistory, renderAiCoach, renderAiExamples, renderAiTutor, sizeTeacherQuestion, teacherChatStatus, teacherDoorKey, teacherDraftCopyButton, teacherDraftStatus, teacherSentence, teacherSourceError, teacherWindowDraftKey, validAiEvidenceTurn } from './modules/teacher.mjs';
-import { highlightOn, reviewFrontVoice } from './modules/card-audio.mjs';
 
 /**
  * 回廊 KAIRO — the corridor prototype.
@@ -13688,7 +13687,7 @@ function speakCardReading(text, btn, word = '', { automatic = false, withSentenc
   // A tap on 音 always asks, and is told why when it finds no voice.
   if (automatic && (wordVoice() !== 'on' || !voiceLayer?.canSay())) return;
   // a second tap on the control that is speaking stops it (retireCardSpeech would otherwise end it and start it again)
-  if (!automatic && btn?.classList?.contains('is-speaking')) { retireCardSpeech(); return; }
+  if (!automatic && btn?.classList?.contains?.('is-speaking')) { retireCardSpeech(); return; }
   retireCardSpeech();
   stopReadAloud(); stopRecAudio(); stopSentenceListening();
   // The current source is the voice seam (modules/voice-seam.mjs): a recorded clip, then the voice server, and
@@ -13754,7 +13753,8 @@ function appendReviewFrontVoice(face, item, { printed, blanked }) {
     const display = kanjiDisplayRecord(item.id) || retainedKanjiRecord(item.id);
     readings = display?.readingsState === 'complete' ? [...(display.on || []), ...(display.kun || [])] : [];
   }
-  const target = reviewFrontVoice({ kind: item.t, printed, blanked, label: item.label, reading, readings });
+  // the decision is the voice layer's (modules/card-audio.mjs, loaded beside the app): without the layer there is no voice and no control
+  const target = voiceLayer?.frontVoice?.({ kind: item.t, printed, blanked, label: item.label, reading, readings });
   if (!target) return;
   const row = el('div', 'review-reading-row review-front-voice');
   const note = el('span', 'say-note');
@@ -32589,7 +32589,7 @@ if (typeof window !== 'undefined' && !window.__CORRIDOR_BUNDLE__) {
       // on reveal: a card's answer and an opened word say themselves once, unless he switched that off
       bySelf: () => wordVoice() === 'on',
       // the read-along light: off draws nothing over the text (Settings, 筆と声)
-      highlight: () => highlightOn(wordHighlight()),
+      highlight: () => wordHighlight() !== 'off',
       // the deck card's stored reading for a card id (the question side's control says the word by it)
       deckWordReading: (cardId) => deckCardReading(cardId),
       passage: () => (S.view === 'reader' ? passage() : null),

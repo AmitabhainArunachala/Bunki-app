@@ -16,7 +16,7 @@
  * pairing screen and the status line stand under Settings, 筆と声 · Writing and voice. */
 import { createAudioPlayer } from './nihongo-speech/audio/speech-player.mjs';
 import { isJapaneseEnough, normaliseSpeechText, splitSentences } from './nihongo-speech/audio/speech-text.mjs';
-import { answerReads, deckFrontVoice } from './card-audio.mjs';
+import { answerReads, deckFrontVoice, reviewFrontVoice } from './card-audio.mjs';
 import { baseBoxes, createBands } from './voice-bands.mjs';
 import { createDeviceTokenStore, createVoiceClient } from './voice-client.mjs';
 import { SPEEDS, createVoiceSeam, sentencesOf, voiceKeyOf } from './voice-seam.mjs';
@@ -835,6 +835,8 @@ export function installVoiceLayer(host) {
       return speakFrom(button, { sentences: normal ? answerReads(normal, sentence) : [], voiceKey: voiceKeyOf('word', word || normal),
         single: !sentence.length, onNote, automatic });
     },
+    /** What the review card's question side may say, from plain inputs (modules/card-audio.mjs): { text, word } or null. */
+    frontVoice: reviewFrontVoice,
     /** The switch "Highlight what is being read" was changed: a band that is drawn goes at once; with it on again the
      * sentence under way is lit again. */
     highlightChanged() {

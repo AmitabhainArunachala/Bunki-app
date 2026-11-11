@@ -222,6 +222,7 @@ const BOOT_DATA = [
   // and says in words why nothing else can be voiced, so it and everything it imports travel with the install.
   'modules/voice-layer.mjs',
   'modules/voice-bands.mjs',
+  'modules/card-audio.mjs',
   'modules/save-places.mjs',
   'modules/voice-seam.mjs',
   'modules/voice-client.mjs',

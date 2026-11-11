@@ -78,7 +78,7 @@ const names = new Set([
   'advanceReviewSession', 'resetAssessmentQuestionReview', 'commitReviewAction', 'commitDrillGrade', 'commitStandardGrade',
   'renderReview', 'renderReviewUndo', 'renderProbe', 'renderLessons', 'renderSrsPrefs',
   // the review face's audio row: appended by the actual renderReview, a no-op audio boundary here
-  'appendReviewVoice', 'reviewVoiceTarget',
+  'appendReviewVoice', 'reviewVoiceTarget', 'appendReviewFrontVoice', 'reviewVoiceMark',
   // the review's next card by the app's one schedule owner (srs-core.mjs, given to the sandbox below)
   'reviewNextStep', 'reviewPauseTimer', 'srsWordAnswerIdentity',
   'reviewCounts', 'srsCardKind', 'SRS_KINDS',
@@ -160,6 +160,8 @@ function fixture(overrides = {}, options = {}) {
     sharedStudyActive: () => false,
     render: () => { paints += 1; },
     window: { scrollY: 0, scrollTo: () => { scrolls += 1; }, __CORRIDOR_STANDALONE__: true },
+    // the review face's audio marks are drawn by the actual renderReview: a plain element for the glyph, and no voice layer (no control)
+    uiIcon: () => new Element('svg'), voiceLayer: null,
     document: { createTextNode: (text) => new Element('text', '', text) },
     el: (tag, cls, text) => new Element(tag, cls, text),
     biLabel: (tag, cls, ja, en) => new Element(tag, cls, en),
