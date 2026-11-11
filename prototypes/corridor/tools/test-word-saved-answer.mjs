@@ -122,6 +122,15 @@ function defineRows() {
     'saveOne', 'reopenSaveMenu', 'openPlainSaveMenu', 'placeSaveMenu',
     // the tray count repaints in place after a save or a removal (0b413f3f, 2026-10-15), on the Today tab too (gate frame)
     'syncTrayCount', 'paintKeptCount',
+    // SAVE (2026-11-11): ask first, save second; a saved word's Save names its place (modules/save-places.mjs), its box
+    // shows the place line, the bar shows Saved today, and each box opened is counted in the record
+    'noteBoxOpened', 'savedPlace', 'savedInParts', 'placeWords', 'paintPlaceLine', 'paintSavedToday', 'savedTodayCount', 'startOfDay',
+    'openSaveChooser', 'savePickInFlight', 'CHOOSER_LISTS_SHOWN', 'sameSaved', 'keepMenuInView', 'keepFieldAboveKeyboard', 'placeWord',
+    'placeFailureWords', 'paintPlacedSave', 'sayPlaced', 'savedToastWords', 'listRowFor',
+    'placeOf', 'listsHolding', 'listsByRecency', 'memoryOf', 'saveMemoryReadable', 'emptySaveMemory', 'SAVE_MEMORY_VERSION',
+    'withBoxOpened', 'withListUsed', 'moveLists', 'saveWritable', 'savePlain', 'saveCount', 'saveOwn', 'savePut', 'saveCopy', 'saveSame',
+    // its box's Remove (the place line) is the mini's remove route: out everywhere, its history kept
+    'removeKept', 'restoreKept', 'unsaveEverywhere', 'keptState', 'listsWithout', 'sameItem', 'setOwnRecordValue',
     'assessmentSuppressionRetries', 'suppressAssessmentCards', 'performAssessmentSuppression',
     'listReading', 'listGloss', 'listToMarkdown', 'resolveAssessmentSubject', 'learningEnrollmentPending', 'commitLearningEnrollment',
     'reviewAnswerAvailable', 'reviewCardBack', 'reviewBack', 'kanjiAnswerAvailable', 'retainedKanjiRecord', 'validKanjiRecord',
@@ -179,7 +188,9 @@ function defineRows() {
   // vm-realm values are JSON round-tripped before any deepEqual: node:assert/strict compares prototypes
   const roundTrip = (value) => JSON.parse(JSON.stringify(value));
   const apply = (record, patch) => roundTrip({ ...record, ...patch });
-  const bytes = (value) => JSON.stringify(value);
+  // SAVE (2026-11-11): opening a word's box counts one look in the record's saveMemory (shown nowhere); that count is the
+  // one write a look-up now makes. Every "wrote nothing" below is about saving, so a memory holding only counts is left out
+  const bytes = (value) => JSON.stringify(value, (key, v) => (key === 'saveMemory' && v && !Object.keys(v.listUsed || {}).length ? undefined : v));
   const pick = (answer) => ({ status: answer.status, seq: answer.seq, reading: answer.reading, first: answer.meanings[0] ?? null, source: answer.source });
   const firstLine = (markdown) => markdown.split('\n').find((line) => line.startsWith('- '));
   const now = new Date('2026-09-25T10:00:00Z');
@@ -370,23 +381,15 @@ function defineRows() {
   };
   /** Save ▾'s menu as it unfolded inside the actual mini, or undefined. */
   const menuOf = (mini) => find(mini.mini, (node) => node.id === 'vocabulary-list-popover');
-  /** Save ▾ (bea9517f, 2026-10-14): a press on Saved ✓ unfolds the word's menu inside the actual mini, and its first row,
-   * Review (checked while the word is saved), is the mini's remove route: unchecked, it runs toggleWordSave on the same
-   * node the seal stands for. Returns once that row has settled (its handler ran to its end). */
+  /** SAVE (2026-11-11, ask first, save second): a saved word's box names its place under its Save, with Show · Move… ·
+   * Remove; Remove is the mini's remove route (removeKept, on the same node the seal stands for). It replaced Save ▾'s
+   * Review checkbox (bea9517f). Returns once the route has settled; `checked` says whether the word is still saved there. */
   const reviewOff = async (mini) => {
-    await clickSeal(mini.seal);
-    const menu = menuOf(mini);
-    assert(menu, 'a press on Saved ✓ unfolds Save ▾’s menu');
-    assert(menu.classList.contains('is-save-menu') && menu.classList.contains('is-inline') && menu.parentNode === mini.mini,
-      'the menu is Save ▾’s own, unfolded inside the card');
-    const review = find(menu, (node) => node.id === 'mini-review');
-    assert.equal(review?.checked, true, 'its Review row is checked while the word is saved');
-    review.checked = false;
-    review.listeners.change();
-    assert.equal(review.disabled, true, 'the Review row holds while its route runs');
-    for (let tick = 0; tick < 50 && review.disabled; tick += 1) await new Promise((resolve) => setImmediate(resolve));
-    assert.equal(review.disabled, false, 'the Review row settles');
-    return review;
+    const remove = find(mini.mini, (node) => node.id === 'mini-place-remove');
+    assert(remove, 'a saved word’s box offers Remove under its Save');
+    remove.listeners.click({ stopPropagation() {} });
+    for (let tick = 0; tick < 50; tick += 1) await new Promise((resolve) => setImmediate(resolve));
+    return { checked: mini.seal.getAttribute('aria-pressed') === 'true' };
   };
 
   const NODES = {
@@ -831,7 +834,7 @@ function defineRows() {
     assert.equal(bytes(ctx.latest), before);
     assert.equal(ctx.sealSyncs, 0);
     assert.equal(menuOf(mini), undefined, 'a held seal unfolds no menu');
-    // the same mini on a plain core card removes that card through Save ▾'s Review row, and its handler runs to its end
+    // the same mini on a plain core card removes that card through its Remove (the place line), and its handler runs to its end
     ctx = app({ mode: 'none', record: core });
     mini = openMini(ctx, '上手');
     assert.equal(mini.seal.disabled, false);
@@ -846,7 +849,7 @@ function defineRows() {
     const refused = await reviewOff(mini);
     assert.equal(bytes(ctx.latest), before, 'a latest-state change after render refuses in the producer');
     assert.equal(ctx.sealSyncs, 0);
-    assert.equal(refused.checked, true, 'a refused route leaves Review checked');
+    assert.equal(refused.checked, true, 'a refused route leaves the word saved where it was');
     // H01's shape (no row cue; the snapshot reads うわて): the かみて door never removes the card; the うわて door does
     ctx = app({ mode: 'none', record: h01 });
     before = bytes(ctx.latest);
@@ -898,7 +901,7 @@ function defineRows() {
     const refused = await reviewOff(mini);
     assert.equal(bytes(ctx.latest), before);
     assert.deepEqual([roundTrip(ctx.suppressions), ctx.sealSyncs], [[], 0]);
-    assert.equal(refused.checked, true, 'a refused route leaves Review checked');
+    assert.equal(refused.checked, true, 'a refused route leaves the word saved where it was');
     // H01's shape: the かみて door suppresses nothing; the うわて door suppresses that card for real
     ctx = app({ mode: 'none', record: h01, authority });
     before = bytes(ctx.latest);
@@ -918,8 +921,10 @@ function defineRows() {
     assert.deepEqual(roundTrip(ctx.suppressions).map((input) => [input.kind, input.key]), [['remove', 'word:上手']]);
     const { v, ...rest } = roundTrip(ctx.latest);
     assert.equal(v, 2, 'the host transition stamps the record version');
-    assert.deepEqual({ ...rest, taken: prior.taken, assessmentLearning: prior.assessmentLearning }, prior,
-      'the suppression changes only taken, assessmentLearning and the record version');
+    // SAVE (2026-11-11): the box's Remove takes the word out everywhere (the lead's ruling of 2026-10-18), its lists too
+    assert.deepEqual(rest.lists, { 読んだ: [] }, 'Remove takes the word off the list it was on');
+    assert.deepEqual({ ...rest, taken: prior.taken, assessmentLearning: prior.assessmentLearning, lists: prior.lists }, prior,
+      'the suppression changes only taken, assessmentLearning, the lists that held the word and the record version');
   });
 
   row('T8.setup', 'A (ポンド 1126030), B (2855351 by the replace door) and the synthetic A′', () => {
@@ -1533,10 +1538,12 @@ function defineRows() {
     assert.equal(await ctx.toggleTaken(opened(ctx), '上手'), true, 'the opened route suppresses that card');
     assert.deepEqual(roundTrip(ctx.suppressions).map((input) => [input.kind, input.key]), [['remove', 'word:上手']]);
     assert.deepEqual(roundTrip(ctx.latest.assessmentLearning.suppressions.map((entry) => entry.key)), ['word:earlier', 'word:上手']);
-    const { v, ...rest } = roundTrip(ctx.latest);
+    // SAVE (2026-11-11): opening the box to reach the route counted one look in saveMemory (shown nowhere); nothing else
+    const { v, saveMemory, ...rest } = roundTrip(ctx.latest);
     assert.equal(v, 2);
+    assert.deepEqual(saveMemory?.listUsed, {}, 'opening a box remembers no list');
     assert.deepEqual({ ...rest, taken: prior.taken, assessmentLearning: prior.assessmentLearning }, prior,
-      'only taken, assessmentLearning and the record version change');
+      'only taken, assessmentLearning, the record version and the box-open count change');
   });
 
   row('V4.setup', 'a studied plain core 上手 card, an unstudied one, and the 1353320 door reached through the core sheet', () => {

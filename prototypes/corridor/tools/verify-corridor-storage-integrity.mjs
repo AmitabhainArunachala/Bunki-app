@@ -14,6 +14,7 @@ import { REVIEW_EXIT_NAMES, liftCorridor } from './srs-hooks-corridor-layer.mjs'
 import * as fsrs from '../vendor/ts-fsrs.mjs';
 import * as srsCore from '../srs-core.mjs';
 import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
+import { validSaveMemory } from '../modules/save-places.mjs';
 
 const corridorPath = fileURLToPath(new URL('../corridor.js', import.meta.url));
 const source = readFileSync(corridorPath, 'utf8');
@@ -206,7 +207,8 @@ function fakeDocument() {
 // It deliberately excludes removed saveStore/writeStore and all active host code.
 const legacySchemaBlock = between("const STORE_KEY = 'kairo-corridor-v1';", '// Only acknowledged changed roots') + '\n' + definitions('storeEnvelope');
 const document = fakeDocument();
-const storeContext = vm.createContext({ S: state(), document, localStorage: storage(),
+// SAVE · the record root saveMemory is validated by its own module (modules/save-places.mjs), imported by corridor.js
+const storeContext = vm.createContext({ S: state(), document, localStorage: storage(), validSaveMemory,
   tx: (_ja, en) => en, window: {}, crypto: webcrypto, recordWritable: () => false,
   recordApp: null, recordInstallation: null, recordEpoch: 1, recordDeparted: false, staleTab: false, storeSealed: false, queueMicrotask,
   el: (tag, cls, text) => { const node = document.createElement(tag); node.className = cls || ''; node.textContent = text || ''; return node; } });
@@ -668,7 +670,7 @@ verified('alert-layout-failure-stays-isolated-and-retryable', () => {
 function noticeAlertFixture(bytes = source, kind = 'legacy') {
   const doc = fakeDocument();
   doc.querySelector = () => null;
-  const ctx = vm.createContext({ S: state(), document: doc, localStorage: storage(), tx: (_ja, en) => en,
+  const ctx = vm.createContext({ S: state(), document: doc, localStorage: storage(), tx: (_ja, en) => en, validSaveMemory,
     window: { scrollY: 100 }, innerWidth: 390, innerHeight: 844, crypto: webcrypto,
     recordApp: {}, recordInstallation: { policy: { binding: { sessionId: 'fixture', accountId: 'a', learnerId: 'b' } }, assertCurrent: () => true },
     recordEpoch: 1, recordDeparted: false, staleTab: false, storeSealed: false, queueMicrotask,
@@ -853,6 +855,7 @@ verified('due-queue-overdueness-order-no-debt-daily-caps-and-today-queue', () =>
   );
   const dueContext = vm.createContext({
     S: {},
+    validSaveMemory,
     // the queue's burying across surfaces (srs-core): the real module, with nothing answered today in this storage
     srsCore,
     D: { dict: {} },

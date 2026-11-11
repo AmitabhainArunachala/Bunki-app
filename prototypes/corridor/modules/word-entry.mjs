@@ -262,7 +262,9 @@ function placeSaveMenu(pop, invoker, place = null) {
       pop.style.setProperty('--pop-top', pop.style.top);
     }
   }
-  (pop.querySelector('input[type="checkbox"]:not(:disabled)') || pop.querySelector('button:not(:disabled)') || pop).focus({ preventScroll: true });
+  // one selector at a time, as above: the first enabled box, else the first enabled button, else the menu
+  (pop.querySelector('input[type="checkbox"]:not(:disabled)') || [...pop.querySelectorAll('button')].find((button) => !button.disabled) || pop)
+    .focus({ preventScroll: true });
 }
 
 function wordSaveFacts(token, { reader = false, from = null, record } = {}) {

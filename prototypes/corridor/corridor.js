@@ -10283,7 +10283,7 @@ function openSaveChooser(node, label, invoker, { keep = null, saved = null, remo
   invoker?.setAttribute('aria-expanded', 'true');
   placeSaveMenu(pop, invoker, place);
   // the keyboard lands on the place it is in now, else on Review
-  (pop.querySelector('.save-place[aria-current="true"]') || pop.querySelector('#mini-review'))?.focus({ preventScroll: true });
+  (choices.find((button) => button.getAttribute('aria-current') === 'true') || choices[0])?.focus({ preventScroll: true });
 }
 /** A menu that grew (its other lists unfolded) keeps its foot in sight: inside its card, or on the glass. */
 function keepMenuInView(pop) {
@@ -10475,12 +10475,14 @@ if (typeof document !== 'undefined') document.addEventListener('pointerdown', (e
  * and Remove. Drawn and taken away with the Save's own paint, so it is there exactly while the word is saved. */
 function paintPlaceLine(actions, saved) {
   if (!actions) return;
-  const seal = actions.querySelector('button.save-one');
-  let line = actions.querySelector(':scope > .save-place-line');
+  // single selectors and a property (the corridor's own fake DOM, test-word-saved-answer, reads one selector at a time)
+  const seal = actions.querySelector('.save-one');
+  let line = actions.savePlaceLine?.isConnected !== false ? actions.savePlaceLine : null;
   const node = seal?.saveOneNode;
-  if (!saved || !node) { line?.remove(); return; }
+  if (!saved || !node) { line?.remove(); actions.savePlaceLine = null; return; }
   if (!line) {
     line = el('div', 'save-place-line');
+    actions.savePlaceLine = line;
     line.setAttribute('role', 'group');
     line.setAttribute('aria-label', tx('保存先', 'Where it is saved'));
     const act = (id, text, run) => {
@@ -11633,7 +11635,7 @@ async function removeKept(node, label) {
     return false;
   }
   refreshWordSaveControls(node, label);
-  if (S.stack.length) S.roomStale = true;
+  if (S.stack?.length) S.roomStale = true;
   else if (S.view === 'tray') render();
   showReaderToast(tx('外しました', 'Removed'), [tx('元に戻す', 'Undo'), () => allowed() && restoreKept(node, label, took)]);
   return true;
