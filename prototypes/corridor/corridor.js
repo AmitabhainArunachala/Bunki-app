@@ -9850,6 +9850,7 @@ function openPlainSaveMenu(invoker, { more = [], place = null, home = null, keep
   if (rest.childElementCount) pop.append(rest);
   vocabularyListInvoker = invoker; vocabularyListNode = null;
   invoker?.setAttribute('aria-expanded', 'true');
+  holdCardForChooser(invoker);
   placeSaveMenu(pop, invoker, place);
 }
 /** A card that has grown to all the room it has scrolls itself, never the page, until its unfolded menu stands whole in
@@ -9969,6 +9970,7 @@ function closeVocabularyListPopover({ restoreFocus = false } = {}) {
   }
   pop.remove();
   releasePageUnderDrawer(pop);
+  releaseCardFromChooser(pop);
   const invoker = vocabularyListInvoker;
   vocabularyListInvoker = null; vocabularyListNode = null;
   invoker?.setAttribute('aria-expanded', 'false');
@@ -10281,9 +10283,32 @@ function openSaveChooser(node, label, invoker, { keep = null, saved = null, remo
   paint();
   vocabularyListInvoker = invoker; vocabularyListNode = node;
   invoker?.setAttribute('aria-expanded', 'true');
+  holdCardForChooser(invoker);
   placeSaveMenu(pop, invoker, place);
   // the keyboard lands on the place it is in now, else on Review
   (choices.find((button) => button.getAttribute('aria-current') === 'true') || choices[0])?.focus({ preventScroll: true });
+}
+/* SAVE · the press on Save never moves the Save under his finger. A word's box keeps its top edge from its first chooser
+ * on (the sentence pane's pin, placeFloating), and its kanji band and sentence door step aside while the chooser is open
+ * (tighten.css), so the box does not grow past its seat and leap to the word's other side; after the pick it stays. */
+function holdCardForChooser(invoker) {
+  const card = invoker?.closest?.('#mini');
+  if (!card || card.dataset.pinTop) return;
+  const exactTop = card.dataset.floatingTop;
+  const moved = card.dataset.flow === 'text' ? window.scrollY - Number(card.dataset.seatScroll || window.scrollY) : 0;
+  const top = exactTop !== undefined && Number.isFinite(Number(exactTop)) ? Number(exactTop) - moved
+    : parseFloat(card.style.top) - (card.dataset.flow === 'text' ? window.scrollY : 0);
+  if (!Number.isFinite(top)) return;
+  card.dataset.pinTop = String(top);
+  card.dataset.chooserPin = '1';
+}
+function releaseCardFromChooser(pop) {
+  const card = pop?.closest?.('#mini') || document.getElementById('mini');
+  if (!card?.dataset.chooserPin) return;
+  delete card.dataset.chooserPin;
+  // the box keeps its top edge for the rest of its visit: after the pick its kanji band comes back below, and nothing
+  // he has just touched leaps to the word's other side
+  if (miniAnchor?.isConnected) placeFloating(card, anchorBox(miniAnchor));
 }
 /** A menu that grew (its other lists unfolded) keeps its foot in sight: inside its card, or on the glass. */
 function keepMenuInView(pop) {

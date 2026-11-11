@@ -809,7 +809,10 @@ async function pendingSaveEngine(browser, engine, base) {
   if (!(await page.locator('#mini-take.taken').count())) {
     const box = await page.locator('#mini-take').boundingBox();
     await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
-    // SAVE (2026-11-11): Save asks where the word goes first; Review, the study queue, is picked
+    // SAVE (2026-11-11): Save asks where the word goes first; Review, the study queue, is picked once the card that grew
+    // with the chooser has taken its seat again
+    await page.locator('#mini #mini-review').waitFor({ timeout: 10000 });
+    await page.waitForTimeout(500);
     const pick = await page.locator('#mini-review').boundingBox();
     await page.touchscreen.tap(pick.x + pick.width / 2, pick.y + pick.height / 2);
     await waitForAppRecord(page, (record) => (record.taken || []).some((entry) => entry.t === 'word' && entry.id === '上手'), { description: 'the kept 上手' });

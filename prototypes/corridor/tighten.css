@@ -480,6 +480,8 @@ html body:not(#\#):not(#\#) .vocabulary-list-popover.is-chooser .save-chooser-fo
 /* the chooser outside a card (the article's bar, a page) stands on paper of its own */
 html body:not(#\#):not(#\#) .vocabulary-list-popover.is-chooser:not(.is-inline) { width: min(340px, calc(100vw - 16px)); padding: 4px 6px 8px; background: var(--color-paper, #f5efe0); }
 
+/* while a word's box holds its chooser, its kanji band and sentence door step aside (corridor.js holdCardForChooser) */
+html body:not(#\#):not(#\#) #mini:has(> #vocabulary-list-popover.is-inline) > :is(.mini-web, .mini-sentence-wrap, .mini-why) { display: none; }
 /* the Save says where the word is; a long list name ends in an ellipsis, the ✓ stays */
 html body:not(#\#):not(#\#) button.save-one .save-place-label {
   display: inline-block;
