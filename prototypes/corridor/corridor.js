@@ -4669,14 +4669,21 @@ async function ensureArticle(p) {
   )
     .then((body) => {
       Object.assign(p, body);
+      delete p._loadFailed;
       // N2 · the text's te-form auxiliaries are marked as it arrives (markTeFormAuxiliaries); R3 · and every word's place
       markTeFormAuxiliaries(p.tokens);
       markSenseContext(p.tokens, p.id);
       void ensureSenseSidecar();
       return p;
     })
+    .catch((err) => {
+      // a load that failed settles what waited for it as much as one that arrived (a review face drawn printed)
+      p._loadFailed = true;
+      throw err;
+    })
     .finally(() => {
       delete p._loading;
+      settleShownFrontVoice();
     });
   return p._loading;
 }
@@ -4701,10 +4708,15 @@ function ensureArchiveIndex() {
       D.archive = index.articles.filter((a) => !known.has(a.id));
       D.passages.push(...D.archive);
       delete D.archiveLoading;
+      delete D.archiveFailed;
+      settleShownFrontVoice();
       return D.archive;
     })
     .catch((err) => {
       delete D.archiveLoading;
+      // the index that failed settles a review face waiting for an archive capture's sentence (it stays printed)
+      D.archiveFailed = true;
+      settleShownFrontVoice();
       throw err;
     });
   return D.archiveLoading;
@@ -13787,31 +13799,43 @@ function appendReviewFrontVoice(face, item, { printed, blanked }) {
 }
 
 /** A word saved with its sentence whose article (or the archive's index) is still on its way: takenContext answers null for
- * now, and the review draws the face again, blanked, when it lands (the printed first drawing dates from 6b4b7ad34). */
+ * now, and the review draws the face again, blanked, when it lands (the printed first drawing dates from 6b4b7ad34). A load
+ * that failed is not on its way: the face settles printed, as it does when the article arrives (lead's ruling I10). */
 function takenContextPending(item) {
   const ctx = item?.ctx;
   if (!ctx) return false;
   const p = D.passages.find((x) => x.id === ctx.p);
-  if (!p) return !D.archive && window.__CORRIDOR_STANDALONE__ !== true;
-  return !p.tokens;
+  if (!p) return !D.archive && !D.archiveFailed && window.__CORRIDOR_STANDALONE__ !== true;
+  return !p.tokens && !p._loadFailed;
 }
 /** Whether the search for a word's example sentence (findExamples) has its answer: the bank has answered for the word (or
- * the build has none) and every shelf article the background queue fetches has arrived. Until then a later drawing of a
- * second repetition's face may find a sentence and blank the word. */
+ * the build has none) and every shelf article the background queue fetches has arrived or failed to load. Until then a
+ * later drawing of a second repetition's face may find a sentence and blank the word. */
 function exampleSearchSettled(id) {
   if (window.__CORRIDOR_STANDALONE__ !== true && !D.exampleBank?.has(id)) return false;
-  return !D.passages.some((p) => !p.tokens && !p.libraryCandidate && !String(p.file || '').startsWith('archive/') && D.libraryDiscoverable?.(p) !== false);
+  return !D.passages.some((p) => !p.tokens && !p._loadFailed && !p.libraryCandidate && !String(p.file || '').startsWith('archive/') && D.libraryDiscoverable?.(p) !== false);
 }
-/** The bank has answered while this word's card is up face-down. The face is not drawn again; when it is now known to stay
- * printed (no sentence to ask the word in), its question-side control is put on the face as it stands. */
+/** The search for this word's sentence has settled while its card is up face-down (the bank answered, the last shelf article
+ * arrived or failed, the saved sentence's article failed). The face is not drawn again; when it is now known to stay printed
+ * (no sentence to ask the word in), its question-side control is put on the face as it stands. */
 function mountSettledFrontVoice(item) {
   const rv = S.review;
   if (S.view !== 'review' || !rv || rv.queue?.[rv.ix] !== item || rv.revealed || S.stack.length || document.getElementById('card-say-front')) return;
   const face = document.querySelector('.review-face');
   if (!face || face.querySelector('.review-cloze') || !face.querySelector('.review-front')) return;
-  if (takenContextPending(item) || takenContext(item)) return;
+  if (takenContextPending(item)) return;
+  // a saved sentence whose load failed leaves the face printed; takenContext would only ask for that article again
+  const saved = item.ctx ? D.passages.find((x) => x.id === item.ctx.p) : null;
+  if (saved?.tokens && takenContext(item)) return;
   if ((S.srs[srsKey('word', item.id)]?.reps || 0) % 2 === 1 && (!exampleSearchSettled(item.id) || findExamples(item.id, 1).length)) return;
   appendReviewFrontVoice(face, item, { printed: true, blanked: false });
+}
+/** An article or the archive's index has arrived or failed to load: the review card face-down now, if it is a word's, may
+ * just have settled printed (mountSettledFrontVoice decides). */
+function settleShownFrontVoice() {
+  const rv = S.review;
+  const item = rv?.queue?.[rv.ix];
+  if (item?.t === 'word') mountSettledFrontVoice(item);
 }
 
 function autoSpeakReviewFace() {
