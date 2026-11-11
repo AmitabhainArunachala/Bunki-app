@@ -87,6 +87,68 @@ function paper() {
 }
 const door = () => window.__BUNKI_OPEN_ENTRY;
 
+/* The ear (modules/ear.mjs, 2026-11-11): the sky draws its words on the graphics card, so the ear finds a canvas there
+ * and no text. The sky says which word stands under a point (host.earWordAt, the engine's own pick over what it drew
+ * in the latest frame), and before it acts on a lifted finger it asks the ear whether the tap is the ear's
+ * (window.__BUNKI_EAR.takes), as the old first screen does (drift-layer.js earTakes): an armed tap or an Option-click on
+ * a word is spoken and the sky does nothing with it. With the ear off and no Option key the ear answers no at once,
+ * and the sky acts on the same event, in the same order, as it would without the ear. */
+/** A reading the voice can say: the first of several (いく; ゆく), without the ～ of a counter or a note in brackets. */
+function sayable(reading) {
+  const first = String(reading || '').split(/[;；]/u)[0];
+  return first.replace(/[(（][^)）]*[)）]/gu, '').replace(/[～〜~]/gu, '').trim();
+}
+/** What the sky shows under a pick (sky-world.js pick): a word, a character, or a part of a character. */
+function said(sky, h) {
+  const W = sky.W, D = W.D;
+  const word = (i) => ({ text: D.words[i][0], reading: sayable(W.rd[i]), id: `w${i}` });
+  if (h.t === 'w') return word(h.i);
+  const it = h.item;
+  if (!it) return null;
+  if (it.kind === 'w') return word(it.id);
+  if (it.kind === 'k') return { text: D.kanji[it.id][0], reading: '', id: `k${it.id}` };
+  if (it.kind === 'p') return { text: D.parts[it.id][0], reading: D.parts[it.id][1] || '', id: `p${it.id}` };
+  return { text: it.text, reading: '', id: `x${it.text}` };
+}
+/** The word the sky drew under a point of the page (CSS px), as its own tap would pick it: an opened word's family
+ * first, then the drifting field, the nearest word first; a finger is given the engine's wider reach. */
+function wordAt(sky, x, y, pointer) {
+  const W = sky && sky.W;
+  if (!W || !W.ready || !sky.wrap) return null;
+  const box = sky.wrap.getBoundingClientRect();
+  const px = x - box.left, py = y - box.top, slop = pointer === 'touch' ? 14 : 5;
+  if (W.web) {
+    const h = W.web.pick(px, py, slop);
+    if (h) return said(sky, h);
+    if (W.web.isOpen()) return null;
+  }
+  let best = -1, near = Infinity;
+  for (const i of W.hits) {
+    const o = i * 5;
+    if (Math.abs(px - W.vis[o]) > W.vis[o + 4] / 2 + slop || Math.abs(py - W.vis[o + 1]) > W.vis[o + 2] * 0.62 + slop) continue;
+    if (W.hz[i] < near) { near = W.hz[i]; best = i; }
+  }
+  return best >= 0 ? said(sky, { t: 'w', i: best }) : null;
+}
+const earTakes = (event) => {
+  try {
+    return !!(window.__BUNKI_EAR && window.__BUNKI_EAR.takes(event));
+  } catch {
+    return false;
+  }
+};
+/** The sky acts on a lifted finger through W.web.tap (sky-world.js onUp, after its own pointer bookkeeping): the ear is
+ * asked there, so the engine's state is left as after any tap and only the word's opening is the ear's to withhold. */
+function askEarFirst(sky) {
+  const web = sky && sky.W && sky.W.web;
+  if (!web || typeof web.tap !== 'function') return;
+  const tap = web.tap;
+  web.tap = (h, event) => {
+    if (h && event && event.type === 'pointerup' && earTakes(event)) return;
+    return tap(h, event);
+  };
+}
+
 let api = null;
 let host = null;
 let lang = null;
@@ -152,6 +214,7 @@ function start() {
   if (!host) {
     host = document.createElement('div');
     host.id = 'bunki-sky';
+    host.earWordAt = (x, y, options) => wordAt(api, x, y, options && options.pointer);
     layer.appendChild(host);
     // the sky keeps its own touches: the old layer underneath never sees them
     for (const type of ['pointerdown', 'pointerup', 'pointermove', 'click', 'dblclick', 'wheel', 'touchstart', 'touchmove', 'touchend', 'mousedown', 'mouseup', 'contextmenu'])
@@ -186,6 +249,7 @@ function start() {
     },
   });
   window.__SKY__ = api;
+  askEarFirst(api);
   if (api && api.ok) settle('mounted');
 }
 

@@ -10,7 +10,8 @@
  *                      budget used up); then it rests off.
  *
  * The unit that speaks: in running text the sentence under the pointer or finger; on a row, a label, a button or a web
- * node, that element's Japanese, sent as its kana reading where the element carries one.
+ * node, that element's Japanese, sent as its kana reading where the element carries one; on a surface that draws its
+ * own words (the sky, in WebGL), the word the surface says stands under the point, sent as its reading.
  *
  * This module holds the state machine (createEarMachine), the unit finding (findUnit, unitAt), the click verdict
  * (earClick) and the wiring (installEar). It speaks only through what installEar is handed, which is the voice seam
@@ -527,14 +528,22 @@ function blockOf(node, display) {
   return null;
 }
 
-/** The unit under a point of the page: what a tap or a resting pointer there would speak. */
-export function unitAt(doc, x, y, { through = true, ...options } = {}) {
+/** The unit under a point of the page: what a tap or a resting pointer there would speak. `pointer`: the kind of pointer
+ * ('mouse', 'touch', 'pen'), for a surface that draws its words (a finger's touch is wider). */
+export function unitAt(doc, x, y, { through = true, pointer = 'mouse', ...options } = {}) {
   const view = doc.defaultView;
   const hit = doc.elementFromPoint(x, y);
   if (!hit) return null;
-  let node = hit, offset = null;
+  // what lies under the point inside an open shadow tree (the sky draws in one): its own buttons and words
+  const inner = innerAt(hit, x, y);
+  // a canvas has no text: the surface that draws there says which word stands under the point
+  if (tagOf(inner) === 'CANVAS' || typeof inner.earWordAt === 'function') {
+    const surface = drawnSurface(inner);
+    if (surface) return drawnUnit(surface, x, y, pointer, options.context || {});
+  }
+  let node = inner, offset = null;
   const caret = caretAt(doc, x, y);
-  if (caret.node?.nodeType === 3 && inside(hit, caret.node) && caretTouches(doc, caret.node, caret.offset, x, y)) { node = caret.node; offset = caret.offset; }
+  if (caret.node?.nodeType === 3 && inside(inner, caret.node) && caretTouches(doc, caret.node, caret.offset, x, y)) { node = caret.node; offset = caret.offset; }
   // Japanese the eye sees on a layer that lets touches pass (the first-open line, the sky's first cue): a tap there
   // lands on what is under it, but what he reads there is that line
   if (through) {
@@ -588,6 +597,49 @@ function caretTouches(doc, node, offset, x, y) {
   return false;
 }
 
+/* ------------------------------------------------------------------ a surface that draws its own words */
+/** The element under a point inside the open shadow trees `hit` hosts (the document answers with the host). */
+function innerAt(hit, x, y) {
+  let at = hit;
+  for (let depth = 0; depth < 6; depth += 1) {
+    const shadow = at.shadowRoot;
+    if (!shadow || typeof shadow.elementFromPoint !== 'function') break;
+    let inner = null;
+    try { inner = shadow.elementFromPoint(x, y); } catch { inner = null; }
+    if (!inner || inner === at || inner.nodeType !== 1) break;
+    at = inner;
+  }
+  return at;
+}
+/** Up the tree, across shadow roots to their hosts. */
+const composedParent = (node) => (node?.parentNode?.nodeType === 11 ? node.parentNode.host || null : parentOf(node));
+/** The element that says which of its drawn words stands under a point: it carries earWordAt(x, y, { pointer }), which
+ * answers { text, reading, id } or null (the sky's mount, sky/mount.mjs). */
+function drawnSurface(node) {
+  for (let at = node; at; at = composedParent(at)) if (typeof at.earWordAt === 'function') return at;
+  return null;
+}
+/** The word a surface draws under a point, as a unit: sent as its kana reading where the surface gives one. A word the
+ * surface draws is one of its controls (it opens on a tap): held on, a finger's tap on it is the surface's own (R-a). */
+function drawnUnit(surface, x, y, pointer, context) {
+  let said = null;
+  try { said = surface.earWordAt(x, y, { pointer }); } catch { said = null; }
+  const text = String(said?.text ?? '').trim();
+  if (!text || !hasJapanese(text)) return null;
+  const given = String(said.reading ?? '').trim();
+  const reading = given && KANA_ONLY.test(given) && hasJapanese(given) ? readingSentence(given) : null;
+  const sentences = reading ? [{ text: reading }] : speakable(text);
+  if (!sentences.length) return null;
+  return {
+    kind: 'drawn', element: surface, block: surface, reading,
+    text: sentences.map((one) => one.text).join(''), sentences,
+    key: `d${idOf(surface)}:${said.id ?? text}`,
+    voiceKey: keyOf({ node: surface, word: text, paragraph: text }, context),
+    typed: false, front: false, control: true,
+    contains: (node) => inside(surface, node),
+  };
+}
+
 /* ------------------------------------------------------------------ the app's own controls */
 const ACT_TAGS = new Set(['BUTTON', 'SUMMARY', 'LABEL', 'INPUT', 'TEXTAREA', 'SELECT', 'OPTION']);
 /** The app's own control a finger lands on, or null: a button, a link, a field, a tab, a fold, a menu item, anything
@@ -633,7 +685,8 @@ export function earClick(event, { machine, unitAt: find, press = null, now = Dat
   let unit = null;
   try { unit = find(event); } catch { unit = null; }
   let control = false;
-  if (unit && machine.mode() === 'held' && pointer !== 'mouse' && !alt) { try { control = !!controlAt?.(event.target); } catch { control = false; } }
+  // a word a surface draws (the sky's) is that surface's control, whatever element the event names
+  if (unit && machine.mode() === 'held' && pointer !== 'mouse' && !alt) { try { control = unit.control === true || !!controlAt?.(event.target); } catch { control = false; } }
   return machine.click({ unit, pointer, alt, control, dry });
 }
 
@@ -750,6 +803,8 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
     clearShown();
     if (!unit || !state) return;
     shown = { unit, state, marked: null, range: null };
+    // a word a surface draws is lit by that surface itself (the sky wakes the word under the pointer)
+    if (unit.kind === 'drawn') return;
     if (unit.kind === 'sentence' && unit.range) {
       try {
         const range = doc.createRange();
@@ -772,7 +827,7 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
     try { given = context() || {}; } catch { /* no context */ }
     return given;
   };
-  const find = (x, y, through = true) => { try { return unitAt(doc, x, y, { through, context: ctx() }); } catch { return null; } };
+  const find = (x, y, through = true, pointer = 'mouse') => { try { return unitAt(doc, x, y, { through, pointer, context: ctx() }); } catch { return null; } };
   let speakingUnit = null;
   let hoverUnit = null;
   const machine = createEarMachine({
@@ -868,15 +923,17 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
   const verdictOf = (event, dry) => earClick(event, {
     machine, press, now: Date.now(), dry,
     controlAt: (target) => appControlAt(target, { display: shownDisplay }),
-    unitAt: (e) => (!e.clientX && !e.clientY ? findUnit(e.target, { display: shownDisplay, context: ctx() }) : find(e.clientX, e.clientY)),
+    unitAt: (e) => (!e.clientX && !e.clientY ? findUnit(e.target, { display: shownDisplay, context: ctx() })
+      : find(e.clientX, e.clientY, true, press?.pointerType || e.pointerType || 'mouse')),
   });
   view.addEventListener('click', (event) => {
     const verdict = verdictOf(event, false);
     press = null;
     if (verdict === 'consume') { event.preventDefault(); event.stopImmediatePropagation(); }
   }, true);
-  // A surface that acts as the finger lifts, before the click (the sky: its word unfolds, its first cue is retired in
-  // his record), asks here first: true means the tap is the ear's, and the surface does nothing with it.
+  // A surface that acts as the finger lifts, before the click (the old first screen: its word unfolds, its first cue is
+  // retired in his record; the new sky, sky/mount.mjs: its word opens), asks here first: true means the tap is the
+  // ear's, and the surface does nothing with it. With the ear off and no Option key this answers false at once.
   view.__BUNKI_EAR = Object.freeze({ takes: (event) => { try { return verdictOf(event, true) === 'consume'; } catch { return false; } } });
   // Escape: on the window, before any of the app's own Escape (a sheet's Back, the word box, the save strip), so that
   // while the ear speaks one press stops it and does nothing else

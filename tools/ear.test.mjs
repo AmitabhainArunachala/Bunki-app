@@ -9,9 +9,15 @@
  *
  * Nothing here makes a sound or reaches a server: `speak` is a recording fake.
  */
+import vm from 'node:vm';
+
 import { describe, expect, it } from 'vitest';
 
-import {
+// one namespace, so that a name a base lacks fails its own tests and not the whole file
+import * as ear from '../prototypes/corridor/modules/ear.mjs';
+import { corridorDeclarations } from './corridor-declarations.mjs';
+
+const {
   EAR_CSS,
   appControlAt,
   createEarMachine,
@@ -21,7 +27,7 @@ import {
   findUnit,
   noVoiceLine,
   rangeText,
-} from '../prototypes/corridor/modules/ear.mjs';
+} = ear;
 
 /* ------------------------------------------------------------------ a fake clock and a fake voice */
 function rig({ cannot = () => null } = {}) {
@@ -1245,5 +1251,197 @@ describe('the mark’s words and look', () => {
         /(^|[;{\s])(padding|border|margin|font-size|line-height|letter-spacing|width|height)\s*:/,
       );
     expect(EAR_CSS).toMatch(/prefers-reduced-motion/);
+  });
+});
+
+/* ------------------------------------------------------------------ the re-check's N1, K2 and K3 (fix round 2) */
+/** The sky as the page holds it: a host whose open shadow tree holds the engine's canvas; the host says which word it
+ * drew under a point (sky/mount.mjs). `words(x, y, options)` answers for the host. */
+function skyPage(words) {
+  const canvas = h('canvas', { class: 'gl' });
+  const wrap = h('div', { class: 'sky' }, canvas);
+  const host = h('div', { id: 'bunki-sky' });
+  const asked = [];
+  host.earWordAt = (x, y, options) => {
+    asked.push(options?.pointer);
+    return words(x, y, options);
+  };
+  host.shadowRoot = { nodeType: 11, host, childNodes: [wrap], elementFromPoint: () => canvas };
+  wrap.parentNode = host.shadowRoot;
+  page(h('div', { id: 'drift-layer' }, host));
+  // the document answers with the host, as a browser does for a point inside a shadow tree; the rest is what the ear's
+  // search of the page uses (no caret there, no text on a layer above)
+  const doc = {
+    defaultView: { getComputedStyle: (el) => ({ display: el.style?.display || 'block' }) },
+    elementFromPoint: () => host,
+    elementsFromPoint: () => [host],
+    caretPositionFromPoint: () => null,
+    createElement: () => ({ textContent: '', remove() {} }),
+    head: { append() {} },
+  };
+  return { doc, host, asked };
+}
+
+describe('the sky draws its words: the ear asks the sky which word stands under the point (N1)', () => {
+  it('a word of the sky is one unit, sent as its reading, keyed as that word', () => {
+    const { doc, host, asked } = skyPage(() => ({ text: '読み', reading: 'よみ', id: 'w12' }));
+    const u = ear.unitAt?.(doc, 400, 300, { context });
+    expect(u).toMatchObject({ kind: 'drawn', element: host, reading: 'よみ', control: true });
+    expect(said(u)).toEqual(['よみ']);
+    expect(u.voiceKey).toBe('word:読み');
+    expect(asked).toEqual(['mouse']);
+    // the same word again is the same unit (a second tap stops it; a rest asks once)
+    expect(ear.unitAt(doc, 402, 301, { context }).key).toBe(u.key);
+  });
+  it('a finger is given the sky’s wider reach: the pointer is passed on', () => {
+    const { doc, asked } = skyPage(() => ({ text: '希望', reading: 'きぼう', id: 'w3' }));
+    ear.unitAt?.(doc, 10, 10, { pointer: 'touch', context });
+    expect(asked).toEqual(['touch']);
+  });
+  it('a character, or a reading that is not kana, is sent as the text the sky shows', () => {
+    const { doc } = skyPage(() => ({ text: '読', reading: '', id: 'k4' }));
+    expect(said(ear.unitAt?.(doc, 1, 1, { context }))).toEqual(['読']);
+    const odd = skyPage(() => ({ text: '行く', reading: 'iku', id: 'w9' }));
+    expect(said(ear.unitAt?.(odd.doc, 1, 1, { context }))).toEqual(['行く']);
+  });
+  it('where the sky drew no word, there is nothing to say', () => {
+    const { doc } = skyPage(() => null);
+    expect(ear.unitAt?.(doc, 1, 1, { context }) ?? null).toBe(null);
+  });
+  it('held on, a finger’s tap on a sky word is the sky’s own (R-a); armed or with Option it is the ear’s', () => {
+    const { doc } = skyPage(() => ({ text: '読み', reading: 'よみ', id: 'w12' }));
+    const word = ear.unitAt?.(doc, 400, 300, { context });
+    const { machine, calls } = rig();
+    const tap = (pointerType, extra = {}) =>
+      earClick(
+        {
+          altKey: false,
+          target: { nodeType: 1, tagName: 'DIV', getAttribute: () => null },
+          clientX: 400,
+          clientY: 300,
+          detail: 1,
+          isTrusted: true,
+          pointerType,
+          ...extra,
+        },
+        {
+          machine,
+          unitAt: () => word,
+          press: { at: 0, x: 400, y: 300, pointerType },
+          now: 80,
+          controlAt: () => null,
+        },
+      );
+    machine.holdEar();
+    expect(tap('touch')).toBe('pass');
+    expect(calls.speak).toHaveLength(0);
+    machine.tapEar();
+    machine.tapEar();
+    expect(machine.display()).toBe('armed');
+    expect(tap('touch')).toBe('consume');
+    expect(calls.speak.map((u) => u.sentences[0].text)).toEqual(['よみ']);
+    expect(machine.display()).not.toBe('armed');
+  });
+});
+
+/** The mount's own functions (sky/mount.mjs), lifted by name and run on a hand-built engine surface. */
+function skyMount() {
+  const sandbox = { window: {} };
+  vm.runInNewContext(
+    `${corridorDeclarations('sky/mount.mjs', ['sayable', 'said', 'wordAt', 'earTakes', 'askEarFirst'])}
+     this.sayable = sayable; this.wordAt = wordAt; this.askEarFirst = askEarFirst;`,
+    sandbox,
+  );
+  return sandbox;
+}
+/** An engine surface (sky-world.js, sky-web.js) with two words drawn: 読み near, 希望 deep, overlapping at x 100. */
+function engine({ open = false, item = null } = {}) {
+  const W = {
+    ready: true,
+    D: {
+      words: [
+        ['読み', 'よみ', 'reading', 5, []],
+        ['希望', 'きぼう', 'hope', 3, []],
+        ['行く', 'いく; ゆく', 'to go', 5, []],
+      ],
+      kanji: [['読', 'read', ['ドク'], ['よ.む'], 14, [], -1, '', 0, 1]],
+      parts: [['言', 'ごんべん', 'say', -1]],
+    },
+    rd: ['よみ', 'きぼう', 'いく; ゆく'],
+    hits: [1, 0, 2],
+    // x, y, size, alpha, width per word, as drawn in the latest frame (CSS px inside the sky)
+    vis: new Float32Array([100, 100, 30, 1, 60, 104, 98, 20, 1, 40, 300, 200, 20, 1, 40]),
+    hz: [400, 900, 500],
+    web: {
+      isOpen: () => open,
+      pick: (x, y) =>
+        item && Math.abs(x - 500) < 20 && Math.abs(y - 50) < 20 ? { t: 'i', item } : null,
+      tap: (...args) => calls.push(args),
+    },
+  };
+  const calls = [];
+  return { W, wrap: { getBoundingClientRect: () => ({ left: 10, top: 20 }) }, calls };
+}
+
+describe('the sky’s mount says which word it drew under a point, as its own tap would pick it (N1)', () => {
+  it('the nearest word under the point, in page coordinates; its reading made sayable', () => {
+    const m = skyMount();
+    const sky = engine();
+    expect(m.wordAt(sky, 110, 120, 'mouse')).toEqual({ text: '読み', reading: 'よみ', id: 'w0' });
+    expect(m.wordAt(sky, 310, 220, 'mouse')).toEqual({ text: '行く', reading: 'いく', id: 'w2' });
+    expect(m.wordAt(sky, 10 + 200, 20 + 300, 'mouse')).toBe(null);
+    expect(m.sayable('～えん')).toBe('えん');
+    expect(m.sayable('けっこん (する)')).toBe('けっこん');
+  });
+  it('a finger reaches as far as the engine lets it (14 px), a mouse 5 px', () => {
+    const m = skyMount();
+    const sky = engine();
+    // 読み spans x 70–130 and y 81.4–118.6 inside the sky; 10 px below its foot
+    expect(m.wordAt(sky, 10 + 100, 20 + 128.6, 'mouse')).toBe(null);
+    expect(m.wordAt(sky, 10 + 100, 20 + 128.6, 'touch')?.text).toBe('読み');
+  });
+  it('an opened word’s family comes first, and while it is open the field behind it says nothing', () => {
+    const m = skyMount();
+    const sky = engine({ open: true, item: { kind: 'k', id: 0, text: '読' } });
+    expect(m.wordAt(sky, 10 + 500, 20 + 50, 'mouse')).toEqual({
+      text: '読',
+      reading: '',
+      id: 'k0',
+    });
+    expect(m.wordAt(sky, 110, 120, 'mouse')).toBe(null);
+    const part = engine({ open: true, item: { kind: 'p', id: 0, text: '言' } });
+    expect(m.wordAt(part, 10 + 500, 20 + 50, 'mouse')).toEqual({
+      text: '言',
+      reading: 'ごんべん',
+      id: 'p0',
+    });
+  });
+  it('the sky asks the ear before it acts on a lifted finger; ear off, it acts on the same event as before', () => {
+    const m = skyMount();
+    const sky = engine();
+    m.askEarFirst(sky);
+    const up = { type: 'pointerup' };
+    const asked = [];
+    m.window.__BUNKI_EAR = { takes: (event) => (asked.push(event), false) };
+    sky.W.web.tap({ t: 'w', i: 0 }, up);
+    expect(sky.calls).toEqual([[{ t: 'w', i: 0 }, up]]);
+    m.window.__BUNKI_EAR = { takes: () => true };
+    sky.W.web.tap({ t: 'w', i: 0 }, up);
+    expect(sky.calls).toHaveLength(1);
+    // a tap on empty sky, and a cancelled pointer, are the sky's without a question
+    sky.W.web.tap(null, up);
+    sky.W.web.tap({ t: 'w', i: 0 }, { type: 'pointercancel' });
+    expect(sky.calls).toHaveLength(3);
+    // no ear in the page, or an ear that throws: the sky acts
+    m.window.__BUNKI_EAR = {
+      takes: () => {
+        throw new Error('x');
+      },
+    };
+    sky.W.web.tap({ t: 'w', i: 0 }, up);
+    delete m.window.__BUNKI_EAR;
+    sky.W.web.tap({ t: 'w', i: 0 }, up);
+    expect(sky.calls).toHaveLength(5);
+    expect(asked).toEqual([up]);
   });
 });
