@@ -595,3 +595,107 @@ async function pairedPage(fake) {
   });
   return { seam, storage, store, served };
 }
+
+describe('the store behind the ear’s shared requests (the combine, 2026-11-12)', () => {
+  /** A page whose server answers each request only when told to; the store over `storage` counts its writes. */
+  function heldPage({ storage = createMemoryClipStorage(), online = true } = {}) {
+    const asked = [];
+    const played = [];
+    const client = {
+      configured: () => true,
+      ready: async () => {},
+      paired: () => true,
+      scope: () => ({ installation: `bunki-${'c'.repeat(32)}` }),
+      speak({ text, voiceKey, signal }) {
+        return new Promise((resolve, reject) => {
+          const row = { text, voiceKey, aborted: false };
+          asked.push(row);
+          row.answer = () =>
+            resolve({ bytes: bytesOf(voiceKey, text), contentType: 'audio/wav', voiceId: 'v', inputKey: `${voiceKey}|${text}` });
+          signal?.addEventListener('abort', () => {
+            row.aborted = true;
+            reject(Object.assign(new Error('aborted'), { name: 'AbortError' }));
+          });
+        });
+      },
+      async budget() {
+        return { capCents: 2500, spentCents: 0, reservedCents: 0, remainingCents: 2500 };
+      },
+    };
+    const player = {
+      play: (clip) => (played.push(new TextDecoder().decode(clip.bytes)), Promise.resolve('ended')),
+      pause() {},
+      resume() {},
+      stop() {},
+      setRate() {},
+    };
+    const real = createClipStore({ storage });
+    const puts = [];
+    const store = { ...real, put: (key, clip) => (puts.push(key), real.put(key, clip)) };
+    const seam = createVoiceSeam({ client, player, store, sleep: async () => {}, online: () => online });
+    return { seam, asked, played, puts, store, storage };
+  }
+  const tick = () => new Promise((done) => setTimeout(done, 10));
+
+  it('a kept clip answers before any request is sent, online, even with a request for it able to travel', async () => {
+    const storage = createMemoryClipStorage();
+    const first = heldPage({ storage });
+    const one = run(first.seam, { voiceKey: 'article:a1', sentences: [S], prefetch: 0 });
+    await tick();
+    first.asked[0].answer();
+    expect((await one).at(-1)).toBe('done');
+    await settle(first.store);
+    const second = heldPage({ storage });
+    const states = await run(second.seam, { voiceKey: 'article:a1', sentences: [S], prefetch: 0 });
+    expect(states.at(-1)).toBe('done');
+    expect(second.asked).toHaveLength(0);
+    expect(second.played).toEqual([`clip article:a1|${S.text}`]);
+  });
+
+  it('a shared request is still one request with the store asked first: the same sentence twice in one read, and a second read after a give-up', async () => {
+    const { seam, asked, played, puts, store } = heldPage();
+    // two asks of one sentence in one read (the queue asks ahead): each looks in the store first, then they share one request
+    const twice = run(seam, { voiceKey: 'article:a1', sentences: [S, S], prefetch: 2 });
+    await tick();
+    expect(asked).toHaveLength(1);
+    asked[0].answer();
+    expect((await twice).at(-1)).toBe('done');
+    expect(played).toEqual([`clip article:a1|${S.text}`, `clip article:a1|${S.text}`]);
+    await settle(store);
+    expect(puts).toEqual([`article:a1|${S.text}`]);
+    // the ear's give-up (cut): a later read of the same sentence joins the request still on its way
+    const first = seam.read({ voiceKey: 'word:ear', sentences: [T], prefetch: 0 });
+    await tick();
+    expect(asked).toHaveLength(2);
+    first.cut();
+    await tick();
+    const again = run(seam, { voiceKey: 'word:ear', sentences: [T], prefetch: 0 });
+    await tick();
+    expect(asked).toHaveLength(2);
+    expect(asked[1].aborted).toBe(false);
+    asked[1].answer();
+    expect((await again).at(-1)).toBe('done');
+  });
+
+  it('a request given up on that later succeeds reaches the store: after a reload, offline, it plays with no request', async () => {
+    const storage = createMemoryClipStorage();
+    const first = heldPage({ storage });
+    const states = [];
+    const read = first.seam.read({ voiceKey: 'word:ear', sentences: [T], prefetch: 0, onState: (state) => states.push(state) });
+    await tick();
+    expect(first.asked).toHaveLength(1);
+    read.cut();
+    await tick();
+    expect(states.at(-1)).toBe('stopped');
+    first.asked[0].answer();
+    await tick();
+    await settle(first.store);
+    expect(first.puts).toEqual([`word:ear|${T.text}`]);
+    expect(first.played).toEqual([]);
+    const offline = heldPage({ storage, online: false });
+    const after = await run(offline.seam, { voiceKey: 'word:ear', sentences: [T], prefetch: 0 });
+    expect(after.at(-1)).toBe('done');
+    expect(offline.asked).toHaveLength(0);
+    expect(offline.played).toEqual([`clip word:ear|${T.text}`]);
+  });
+});
