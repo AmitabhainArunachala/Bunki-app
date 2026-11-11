@@ -1445,3 +1445,14 @@ describe('the sky’s mount says which word it drew under a point, as its own ta
     expect(asked).toEqual([up]);
   });
 });
+
+describe('on the sky the mark at rest is legible (K5)', () => {
+  it('on the sky the mark at rest stands on the gate’s plate; its other states keep their grounds (K5)', () => {
+    const rule = EAR_CSS.split('}').find((one) => one.includes("data-bunki-sky='1'"));
+    expect(rule).toMatch(/:is\(\[data-ear='off'\], \[data-ear='novoice'\]\)/);
+    expect(rule).toMatch(/#ginga-symbol \+ \.ear-spot \.ear-mark::before/);
+    expect(rule).toMatch(
+      /background: color-mix\(in srgb, var\(--ground-0, var\(--ear-white\)\) 70%, transparent\)/,
+    );
+  });
+});

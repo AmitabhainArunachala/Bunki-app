@@ -725,6 +725,10 @@ export const EAR_CSS = `
 #ginga-symbol + .ear-spot { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); left: calc(50% + 24px); z-index: 30; }
 :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate + .ear-spot { top: env(safe-area-inset-top, 0px); left: calc(50% + 22px); z-index: 1; }
 :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate + .ear-spot + * { margin-left: auto; }
+/* the new first screen, the sky (sky/mount.mjs), is night blue where the mark stands: at rest the mark stands on the
+   gate's own plate there (editorial.css, the door's gate: the paper at 70%), so it reads as the sheet's hairline box on
+   paper; armed, held on and speaking keep their own grounds */
+html[data-bunki-sky='1']:is([data-ear='off'], [data-ear='novoice']) #ginga-symbol + .ear-spot .ear-mark::before { background: color-mix(in srgb, var(--ground-0, var(--ear-white)) 70%, transparent); }
 @media (max-width: 640px) {
   #ginga-symbol + .ear-spot { left: calc(50% - 68px); }
   :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate + .ear-spot { left: calc(50% - 66px); }
