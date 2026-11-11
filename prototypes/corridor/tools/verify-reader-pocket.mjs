@@ -32,7 +32,26 @@
  *                 lock screen's play takes it up there; a clip that cannot play for any other reason ends the read, and
  *                 the bar says "could not play", not that the voice server failed.
  *  hidden-others  hidden still ends a deck card's control, the word box's 音 and the ear's voice, as before; a card's
- *                 answer shown while hidden says nothing until the page is shown.
+ *                 answer shown while hidden says nothing until the page is shown; and (fix round 1, the review's C4) a
+ *                 read that had given way to the word box's 音, and one that had given way to the ear, hidden: that voice
+ *                 ends and the read he started goes on, the bar and the lock screen saying playing.
+ *
+ * Fix round 1 (the review of da5a67960, 2026-11-12):
+ *  hidden-read     also judges "the lit sentence is the one being read" from sources other than the light itself (the
+ *                  review's C3): the clip the element is playing is followed back to the text it was asked for (fetch →
+ *                  bytes → Blob → object address → play), and that text, the lit words and the sentence the bar reports
+ *                  must agree; the text being read is among the last three asked (never more than two ahead).
+ *  busy-hidden     hidden with timers held, the stand-in answers one sentence "busy" (503): the read goes on to its end
+ *                  (the review's F2; L1-2: the retry waits on no timer while hidden).
+ *  deadline-hidden hidden with timers held, a clip the stand-in never sends in time: by the page's own clock (the wall
+ *                  clock read at the element's ticks) the read ends within the client's 20 s with its line, the silence
+ *                  stops, and the lock screen keeps the article, paused; its play then takes the read up at that sentence.
+ *  network-resume  hidden with timers held, the network gone: the read ends at the first sentence it could not get with
+ *                  "no connection"; the lock screen keeps the article, paused, with its play; the network back, the lock
+ *                  screen's play (hidden) and later the bar's play (shown) take it up at that sentence, not the start;
+ *                  leaving the article clears the lock screen.
+ *  outside-play    his read paused (from outside, from the bar, hidden), then the element started from outside: it is
+ *                  paused again at once; the bar and the lock screen stay paused; nothing is asked; his play goes on there.
  *
  * Exit code 0 when every case passes, 1 otherwise. One JSON line per case on stdout. */
 import { createReadStream, mkdirSync, statSync } from 'node:fs';
@@ -48,7 +67,7 @@ const WIDTH = Number(arg('--width', '390'));
 const LANG = arg('--lang', 'en');
 const PORT = Number(arg('--port', '19592'));
 const SHOTS = arg('--shots', '');
-const ONLY = new Set(String(arg('--only', 'hidden-read,late-clip,media,no-media,outside-pause,refused-play,hidden-others')).split(',').filter(Boolean));
+const ONLY = new Set(String(arg('--only', 'hidden-read,late-clip,media,no-media,outside-pause,refused-play,hidden-others,busy-hidden,deadline-hidden,network-resume,outside-play')).split(',').filter(Boolean));
 if (!SITE) { console.error('usage: verify-reader-pocket.mjs --site <built site>'); process.exit(2); }
 if (SHOTS) mkdirSync(SHOTS, { recursive: true });
 
@@ -72,9 +91,11 @@ await new Promise((resolve) => server.listen(PORT, '127.0.0.1', resolve));
 const ORIGIN = `http://127.0.0.1:${PORT}`;
 // per case: how long each clip lasts, and which request's good answer the stand-in holds back
 let clipSeconds = 0.4;
-let holdNth = 0;
+let holdNth = 0, holdFor = 5000;
 const fake = await startFakeVoiceServer({ origins: [ORIGIN], port: PORT + 1, missesPerMinute: 10000, capCents: 1_000_000, dayCents: 1_000_000,
-  clipSeconds: () => clipSeconds, holdMs: (_text, n) => (n === holdNth ? 5000 : 0) });
+  clipSeconds: () => clipSeconds, holdMs: (_text, n) => (n === holdNth ? holdFor : 0) });
+/** Letters and digits only: how two texts of one sentence are compared (spaces, quotes and punctuation aside). */
+const letters = (text) => String(text || '').normalize('NFC').replace(/[^\p{L}\p{N}]/gu, '');
 
 const phone = WIDTH < 700;
 const browser = await (ENGINE === 'webkit' ? webkit : chromium).launch({ headless: true, ...(ENGINE === 'chromium' ? { args: ['--mute-audio'] } : {}) });
@@ -89,7 +110,35 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms)); // the c
 /** Runs in the page before any of its scripts: silence, the speak requests and the lit sentences as the page makes them,
  * the stand-in for a locked screen (hidden, its timers frozen), and the lock screen's interface wrapped or taken away. */
 function probe({ media }) {
-  const P = (window.__pocket = { plays: [], asked: [], lit: [], cleared: 0, frozen: false, held: [], heldCount: 0, errors: [] });
+  const P = (window.__pocket = { plays: [], asked: [], lit: [], playing: [], cleared: 0, frozen: false, held: [], heldCount: 0, errors: [] });
+  // the text each clip the element plays was asked for (fix round 1, the review's C3): a speak answer's bytes are followed
+  // to the object address the element plays (fetch → arrayBuffer → Blob → createObjectURL → play), so "the sentence being
+  // read" is known without reading the light (data-speaking) the reader draws
+  const answerText = new WeakMap(), bytesText = new WeakMap(), blobText = new WeakMap(), urlText = new Map();
+  try {
+    const arrayBuffer = Response.prototype.arrayBuffer;
+    Response.prototype.arrayBuffer = async function () {
+      const bytes = await arrayBuffer.call(this);
+      if (answerText.has(this)) bytesText.set(bytes, answerText.get(this));
+      return bytes;
+    };
+    window.Blob = new Proxy(window.Blob, {
+      construct(target, args, newTarget) {
+        const blob = Reflect.construct(target, args, newTarget);
+        for (const part of Array.isArray(args[0]) ? args[0] : []) {
+          const text = bytesText.get(part?.buffer || part);
+          if (text !== undefined) blobText.set(blob, text);
+        }
+        return blob;
+      },
+    });
+    const objectUrl = URL.createObjectURL;
+    URL.createObjectURL = function (blob) {
+      const url = objectUrl.call(URL, blob);
+      if (blob && blobText.has(blob)) urlText.set(url, blobText.get(blob));
+      return url;
+    };
+  } catch (error) { P.errors.push(String(error)); }
   try {
     const proto = HTMLMediaElement.prototype, play = proto.play;
     proto.play = function () {
@@ -102,6 +151,7 @@ function probe({ media }) {
         return Promise.reject(new DOMException('refused by the case', name));
       }
       P.plays.push({ at: performance.now(), speak: this.hasAttribute('data-speak-audio'), loop: !!this.loop, hidden: document.hidden });
+      if (this.hasAttribute('data-speak-audio') && urlText.has(String(this.src))) P.playing.push({ text: urlText.get(String(this.src)), at: performance.now(), hidden: document.hidden });
       return play.call(this);
     };
     if (window.speechSynthesis) { const sp = Object.getPrototypeOf(window.speechSynthesis); sp.speak = function () { P.device = (P.device || 0) + 1; }; sp.cancel = function () {}; }
@@ -111,14 +161,17 @@ function probe({ media }) {
   // every speak request as the page sends it, with how many sentences had been lit by then
   const send = window.fetch;
   window.fetch = function (input, init) {
+    let text = null;
     try {
       const url = new URL(String(input?.url || input), location.href);
       if (url.pathname === '/v1/audio/speak' && String(init?.method || input?.method || '').toUpperCase() === 'POST') {
         const body = JSON.parse(String(init?.body || '{}'));
-        P.asked.push({ at: performance.now(), text: body.segments?.[0]?.text || '', key: body.voiceKey || '', lit: P.lit.length, hidden: document.hidden });
+        text = body.segments?.[0]?.text || '';
+        P.asked.push({ at: performance.now(), text, key: body.voiceKey || '', lit: P.lit.length, hidden: document.hidden });
       }
     } catch { /* not a speak request */ }
-    return send.apply(this, arguments);
+    const out = send.apply(this, arguments);
+    return text === null ? out : out.then((response) => { answerText.set(response, text); return response; });
   };
   // each sentence the reader lights, once, in order, with the bar's state at that moment
   const look = () => {
@@ -217,6 +270,9 @@ async function freshPage({ media = 'wrap' } = {}) {
   const s = { context, page, press, ready, errors, offMachine };
   s.bySelf = (value) => page.evaluate(async (value) => { const m = await import('/corridor.js'); m.setWordPref(m.WORD_VOICE_KEY, 'wordVoice', m.WORD_VOICE, value); }, value);
   await s.bySelf('off');
+  // the app's own module, so a look can read the sentence the bar reports (readAloud.clip) in the same moment as the rest
+  s.module = () => page.evaluate(async () => { window.__pocket.corridor = await import('/corridor.js'); });
+  await s.module();
   s.close = () => context.close().catch(() => {});
   return s;
 }
@@ -252,6 +308,11 @@ const look = (page) => page.evaluate(() => {
     audio: a ? { paused: a.paused, ended: a.ended, loop: a.loop, t: Math.round(a.currentTime * 100) / 100 } : null,
     lit: P.lit.length, litFirst: P.lit.at(-1)?.first ?? -1, asked: P.asked.length, plays: P.plays.length, hidden: document.hidden,
     media: P.media ? { state: P.media.state, title: P.media.current?.title ?? null, handlers: Object.keys(P.media.handlers).filter((k) => typeof P.media.handlers[k] === 'function').sort() } : null,
+    // the lit words' own text (no readings above them), the text of the clip the element is on, the sentence the bar reports
+    litText: toks.map((t) => { const c = t.cloneNode(true); for (const r of c.querySelectorAll('rt, rp')) r.remove(); return c.textContent; }).join(''),
+    playingText: P.playing.at(-1)?.text ?? null, playingCount: P.playing.length,
+    reported: Number.isInteger(P.corridor?.readAloud?.clip) ? P.corridor.readAloud.clip : null,
+    note: document.getElementById('listen-note')?.textContent?.trim() || '',
   };
 });
 /** Wait, by the case's own clock, until `test(view)` holds; the last view either way. */
@@ -651,6 +712,88 @@ const CASES = {
     }
     if (s.errors.length) problems.push(`page errors: ${s.errors.join(' | ')}`);
     report('hidden-others', problems, steps.join('; '));
+    await s.close();
+  },
+
+  async 'busy-hidden'() {
+    clipSeconds = 0.4; holdNth = 0;
+    const s = await freshPage();
+    const problems = [];
+    let detail = '';
+    try {
+      await openArticle(s);
+      const last = await lastToken(s.page);
+      const key = (await recordOf(s.page)).asked[0]?.key || '';
+      await until(s, (v) => v.lit >= 2, 15000);
+      await hide(s, true);
+      const from = fake.speaks().length;
+      // the next sentence asked of the stand-in is answered "busy" (503 voice-unavailable): the seam asks once more
+      fake.failNext({ status: 503, error: 'voice-unavailable' });
+      const end = await until(s, (v) => v.bar === 'idle' && v.first < 0, 40000);
+      const rec = await recordOf(s.page);
+      const busy = fake.speaks().slice(from).filter((r) => r.status === 503).length;
+      if (!busy) problems.push('the stand-in sent no busy answer (the case did not reach its point)');
+      const judged = judgeRead(rec, last, key);
+      // the busy sentence is asked twice (the one retry): every other sentence once
+      const texts = rec.asked.filter((a) => a.key === key).map((a) => a.text);
+      const twice = [...new Set(texts.filter((t, i) => texts.indexOf(t) !== i))];
+      problems.push(...judged.problems.filter((p) => !p.startsWith('asked more than once')));
+      if (twice.length > busy) problems.push(`asked more than once beyond the one retry: ${twice.map((t) => `"${t.slice(0, 12)}"`).join(', ')}`);
+      if (end.bar !== 'idle') {
+        const since = await s.page.evaluate(() => { const l = window.__pocket.lit.at(-1); return l ? Math.round((performance.now() - l.at) / 1000) : -1; });
+        problems.push(`hidden, one busy answer held the read: after 40 s the bar says ${end.bar}, the lock screen ${end.media?.state}, the last sentence lit ${since} s ago, the element ${JSON.stringify(end.audio)}`);
+      }
+      await hide(s, false);
+      detail = `busy answers ${busy}; ${judged.lit} sentences lit (${judged.hiddenLit} hidden), ${judged.asked} asked, asked twice ${twice.length}; end bar ${end.bar}; timer callbacks held ${rec.heldCount}`;
+    } catch (error) { problems.push(`the case broke: ${String(error.message).split('\n')[0].slice(0, 200)}`); }
+    if (s.errors.length) problems.push(`page errors: ${s.errors.join(' | ')}`);
+    report('busy-hidden', problems, detail);
+    await s.close();
+  },
+
+  async 'deadline-hidden'() {
+    clipSeconds = 0.4;
+    const s = await freshPage();
+    const problems = [];
+    let detail = '';
+    try {
+      // the fifth sentence's answer is held 45 s by the stand-in: past the client's 20 s
+      holdNth = fake.speaks().length + 5; holdFor = 45000;
+      await openArticle(s);
+      const title = await articleTitle(s.page);
+      await hide(s, true); // timers held from here: only the page's own clock can end the wait
+      const waiting = await until(s, (v) => v.bar === 'loading' && v.asked >= 5, 20000);
+      const t0 = Date.now();
+      const end = await until(s, (v) => v.bar !== 'loading' && v.bar !== 'playing', 35000);
+      const secs = Math.round((Date.now() - t0) / 1000);
+      await wait(500);
+      const after = await look(s.page);
+      const rec = await recordOf(s.page);
+      if (after.bar === 'loading' || after.bar === 'playing') problems.push(`hidden with timers held, a clip that never comes: after ${secs} s the bar still says ${after.bar}, the lock screen ${after.media?.state}, the element ${JSON.stringify(after.audio)} (${rec.heldCount} timer callbacks held)`);
+      if (after.bar === 'idle' && after.silent !== 'voice-timeout') problems.push(`the read ended with "${after.silent}" ("${after.note}"), not the client's deadline (voice-timeout)`);
+      if (after.audio && !after.audio.paused) problems.push(`the read is over and the element still plays (silence loop ${after.audio.loop})`);
+      if (after.media?.title !== title || after.media?.state !== 'paused' || !after.media?.handlers.includes('play')) problems.push(`the read ended on a sentence it could not get, and the lock screen does not keep the article paused with its play: ${JSON.stringify(after.media)}`);
+      const heard = after.litFirst;
+      const played = await s.page.evaluate(() => window.__pocket.playing.map((p) => p.text));
+      // the sentence it could not get: the one after the last heard, in the order the sentences were asked
+      const order = [...new Set(rec.asked.map((a) => a.text))];
+      const lost = order[order.indexOf(played.at(-1)) + 1];
+      // the seam does not ask the server for 15 s after a request ran out of time (its rule from before L1): then the lock
+      // screen's play takes the read up at the sentence it could not get
+      holdNth = 0;
+      await wait(16000);
+      await s.page.evaluate(() => window.__pocket.media.handlers.play?.());
+      const on = await until(s, (v) => v.litFirst > heard && v.lit >= after.lit + 1, 15000);
+      const first = (await s.page.evaluate(() => window.__pocket.playing.map((p) => p.text)))[played.length];
+      if (!(on.litFirst > heard)) problems.push(`the lock screen's play did not take the read up after word ${heard}: bar ${on.bar} (${on.silent}), lit word ${on.litFirst}`);
+      if (on.lit > after.lit && on.litFirst <= heard) problems.push(`the lock screen's play went back to word ${on.litFirst} (heard to word ${heard})`);
+      if (!lost || letters(first) !== letters(lost)) problems.push(`the first sentence played after play ("${String(first).slice(0, 12)}") is not the one it could not get ("${String(lost).slice(0, 12)}")`);
+      await hide(s, false);
+      detail = `waited from word ${waiting.litFirst}; ended after ${secs} s hidden: bar ${after.bar} (${after.silent}: "${after.note}"), element ${JSON.stringify(after.audio)}, lock screen ${after.media?.state} "${after.media?.title}"; play: on to word ${on.litFirst} (heard to ${heard}), first played "${String(first || '').slice(0, 10)}"`;
+    } catch (error) { problems.push(`the case broke: ${String(error.message).split('\n')[0].slice(0, 200)}`); }
+    holdNth = 0; holdFor = 5000;
+    if (s.errors.length) problems.push(`page errors: ${s.errors.join(' | ')}`);
+    report('deadline-hidden', problems, detail);
     await s.close();
   },
 };

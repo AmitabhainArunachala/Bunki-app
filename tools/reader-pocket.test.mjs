@@ -13,12 +13,17 @@
  *  - while a read waits for its next clip on a hidden page, the element plays silence in a loop, and lets go of it
  *    when the clip comes, when he pauses or when the read ends;
  *  - the lock screen (Media Session): the article's title, "Bunki", the app's icon, play, pause, next and previous;
- *    its state follows the read; cleared when the read ends; where the interface does not exist nothing breaks.
+ *    its state follows the read; cleared when the read ends; where the interface does not exist nothing breaks;
+ *  - (fix round 1) the element started by nobody in this app while his read is held paused is paused again at once;
+ *  - (fix round 1) a deadline in the path to the next sentence (the client's 20 s, the device store's 1.5 s) is read by
+ *    the wall clock at every tick of the sounding element and at every change of visibility, so a hidden page's held
+ *    timers cannot leave a read waiting without end (pageTimer).
  */
 /* global Event, EventTarget, setTimeout, clearTimeout */
 import { describe, expect, it } from 'vitest';
 
 import { createAudioPlayer } from '../prototypes/corridor/modules/nihongo-speech/audio/speech-player.mjs';
+import * as pocketModule from '../prototypes/corridor/modules/reader-pocket.mjs';
 import {
   createPocketPlayer,
   createReaderMediaSession,
@@ -266,6 +271,62 @@ describe('waiting on a hidden page: silence in a loop keeps the page playing', (
     await tick(5);
     expect(r.told).toEqual(['outside']);
     expect(r.audio.loop).toBe(false);
+  });
+});
+
+describe('a deadline a hidden page’s held timers cannot hold (pageTimer, fix round 1)', () => {
+  const { pageTimer } = pocketModule;
+  /** A page whose own timers are held (they never fire) unless `running`; `now` is the wall clock. */
+  const held = ({ hidden = true, running = false } = {}) => {
+    const doc = new EventTarget();
+    const set = [];
+    doc.hidden = hidden;
+    doc.defaultView = {
+      setTimeout: (fn, ms) => {
+        set.push(ms);
+        return running ? setTimeout(fn, ms) : set.length;
+      },
+      clearTimeout: (id) => clearTimeout(id),
+    };
+    return { doc, set, ticks: new EventTarget(), clock: { t: 1_000_000 } };
+  };
+  it('is the reader’s own clock (exported)', () => {
+    expect(typeof pageTimer).toBe('function');
+  });
+  it('fires by the wall clock at a tick of the sounding element while the page’s timers are held, once', () => {
+    const p = held();
+    const after = pageTimer({ doc: p.doc, ticks: p.ticks, now: () => p.clock.t });
+    const fired = [];
+    after(20_000, () => fired.push('deadline'));
+    expect(p.set).toEqual([20_000]); // a timer still stands, for a page whose timers run
+    p.ticks.dispatchEvent(new Event('timeupdate'));
+    p.clock.t += 19_999;
+    p.ticks.dispatchEvent(new Event('timeupdate'));
+    expect(fired).toEqual([]);
+    p.clock.t += 2;
+    p.ticks.dispatchEvent(new Event('timeupdate'));
+    p.ticks.dispatchEvent(new Event('timeupdate'));
+    expect(fired).toEqual(['deadline']);
+  });
+  it('a change of visibility reads the clock too; a cancel before the time stops it for good', () => {
+    const p = held();
+    const after = pageTimer({ doc: p.doc, ticks: p.ticks, now: () => p.clock.t });
+    const fired = [];
+    after(1500, () => fired.push('first'));
+    const cancel = after(1500, () => fired.push('cancelled'));
+    cancel();
+    p.clock.t += 1600;
+    p.doc.dispatchEvent(new Event('visibilitychange'));
+    p.ticks.dispatchEvent(new Event('timeupdate'));
+    expect(fired).toEqual(['first']);
+  });
+  it('shown, its timer fires as any timer does', async () => {
+    const p = held({ hidden: false, running: true });
+    const after = pageTimer({ doc: p.doc, ticks: p.ticks });
+    const fired = [];
+    after(10, () => fired.push('timer'));
+    await tick(40);
+    expect(fired).toEqual(['timer']);
   });
 });
 
