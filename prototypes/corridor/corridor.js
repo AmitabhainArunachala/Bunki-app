@@ -10198,7 +10198,7 @@ function openSaveChooser(node, label, invoker, { keep = null, saved = null, remo
     fresh.hidden = true;
     form.hidden = false;
     field.focus({ preventScroll: true });
-    keepFieldAboveKeyboard(field, pop);
+    keepFieldAboveKeyboard(field);
   });
   if (field.value) { fresh.hidden = true; form.hidden = false; }
   form.addEventListener('submit', (event) => {
@@ -10292,32 +10292,45 @@ function keepMenuInView(pop) {
   const foot = (window.visualViewport?.height || window.innerHeight) - 8;
   if (box.bottom > foot && !pop.classList.contains('is-drawer')) pop.style.top = `${Math.max(8, parseFloat(pop.style.top || '0') - (box.bottom - foot))}px`;
 }
-/** The phone's keyboard takes the lower half of the glass while he names a new list: the field stays above it. The
- * visual viewport says where the keyboard begins; the card (or the page) moves the field into what is left. */
-function keepFieldAboveKeyboard(field, pop) {
+/** The phone's keyboard takes the lower half of the glass while he names a new list: the field stays whole above it,
+ * and above the bottom bar where the bar still shows. The visual viewport says where the keyboard begins; the page moves
+ * the field (with its box or strip, which ride on the page) into what is left, else the box or strip lifts itself. */
+function keepFieldAboveKeyboard(field) {
   const view = window.visualViewport;
+  const floor = () => {
+    let bottom = view ? view.offsetTop + view.height : window.innerHeight;
+    const bar = document.getElementById('primary-tabs');
+    const r = bar?.getBoundingClientRect();
+    if (r?.height && r.top < bottom && getComputedStyle(bar).visibility !== 'hidden') bottom = Math.min(bottom, r.top);
+    return bottom - 8;
+  };
+  const ceiling = () => (view ? view.offsetTop : 0) + 8;
+  const card = () => field.closest('#mini, .seal-strip');
   const fit = () => {
     if (!field.isConnected || document.activeElement !== field) return;
-    const box = field.getBoundingClientRect();
-    const top = view ? view.offsetTop : 0;
-    const bottom = view ? view.offsetTop + view.height : window.innerHeight;
-    const card = field.closest('#mini, .seal-strip');
-    if (box.bottom + 8 > bottom) {
-      const lift = box.bottom + 8 - bottom;
-      if (card && card.scrollHeight > card.clientHeight) card.scrollTop += lift;
-      else if (card && /fixed|absolute/u.test(getComputedStyle(card).position)) card.style.translate = `0 ${-Math.ceil(lift)}px`;
-      else window.scrollBy(0, lift);
-    } else if (box.top < top + 8) field.scrollIntoView({ block: 'nearest' });
+    const over = field.getBoundingClientRect().bottom - floor();
+    if (over > 0) {
+      const holder = card();
+      if (holder && getComputedStyle(holder).position === 'fixed') holder.style.translate = `0 ${-Math.ceil(over)}px`;
+      else {
+        window.scrollBy(0, Math.ceil(over));
+        // a page at its end cannot scroll that far: the box or strip lifts the rest
+        const left = field.getBoundingClientRect().bottom - floor();
+        if (left > 1 && holder) holder.style.translate = `0 ${-Math.ceil(left)}px`;
+      }
+    } else if (field.getBoundingClientRect().top < ceiling()) field.scrollIntoView({ block: 'nearest' });
   };
   const settle = () => {
     view?.removeEventListener('resize', fit);
     view?.removeEventListener('scroll', fit);
+    window.removeEventListener('resize', fit);
     field.removeEventListener('blur', settle);
-    const card = field.closest('#mini, .seal-strip');
-    if (card) card.style.translate = '';
+    const holder = card();
+    if (holder) holder.style.translate = '';
   };
   view?.addEventListener('resize', fit);
   view?.addEventListener('scroll', fit);
+  window.addEventListener('resize', fit);
   field.addEventListener('blur', settle);
   requestAnimationFrame(fit);
 }
@@ -12008,7 +12021,7 @@ function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) 
       formOpen = true;
       paintMode();
       name.focus({ preventScroll: true });
-      keepFieldAboveKeyboard(name, strip);
+      keepFieldAboveKeyboard(name);
       placeSealStrip(open);
     });
     form.addEventListener('submit', (event) => {
@@ -16357,7 +16370,7 @@ function renderListPage(main) {
     renderTray(main);
     return;
   }
-  const back = inWords ? biLabel('button', 'chip list-back', '← 保存した語', 'Saved') : biLabel('button', 'chip list-back', '← リスト一覧へ', 'all lists');
+  const back = inWords ? biLabel('button', 'chip list-back', '← 保存した語', '← Saved') : biLabel('button', 'chip list-back', '← リスト一覧へ', 'all lists');
   back.type = 'button';
   back.id = 'list-back';
   back.addEventListener('click', () => {
@@ -36765,7 +36778,8 @@ function savedTodayCount() {
 function paintSavedToday() {
   if (typeof document === 'undefined') return;
   const bar = document.getElementById('primary-tabs');
-  const tab = document.getElementById('tab-today');
+  // over Today's station; in the layout under test (no Today tab) over Review's, where the saved words are studied
+  const tab = document.getElementById('tab-today') || document.getElementById('tab-review');
   let slip = document.getElementById('saved-today');
   const n = bar && tab && !bar.hasAttribute('data-drift-chrome') ? savedTodayCount() : 0;
   if (!n) { slip?.remove(); return; }

@@ -371,6 +371,8 @@ html body:not(#\#):not(#\#) .vocabulary-list-popover.is-chooser .save-chooser-wo
   font: 700 var(--type-control) / 1.2 var(--font-reading, var(--font-display));
   color: var(--color-ink);
 }
+/* in Japanese the word sits inside its 「」 with no space of its own */
+html body:not(.ui-bi):not(#\#):not(#\#) .vocabulary-list-popover.is-chooser .save-chooser-word { margin: 0; }
 html body:not(#\#):not(#\#) .save-chooser-places { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; margin: 0; }
 html body:not(#\#):not(#\#) .save-chooser-rest:not([hidden]) { display: grid; grid-template-columns: minmax(0, 1fr); }
 html body:not(#\#):not(#\#) .save-chooser-rest[hidden], html body:not(#\#):not(#\#) .save-chooser-form[hidden] { display: none; }

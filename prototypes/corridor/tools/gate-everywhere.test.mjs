@@ -348,10 +348,12 @@ test('the cap and the bookmark leave the bar with the tabs; the saved count move
   const { page } = await open(PHONE, '?room=shelf');
   const bar = () => page.evaluate(() => ({
     cap: !!document.querySelector('#app > .chrome #chrome-dojo'), bookmark: !!document.querySelector('#app > .chrome #tray'),
-    tabs: !!document.querySelector('#primary-tabs'), count: document.querySelector('#tab-today .station-kept')?.textContent ?? null,
+    // SAVE (2026-11-11): the count above Today names itself, "Saved today · N" (#saved-today), for the words saved today
+    tabs: !!document.querySelector('#primary-tabs'), count: document.querySelector('#saved-today .saved-today-count')?.textContent ?? null,
+    said: document.getElementById('saved-today')?.textContent ?? null,
     name: document.getElementById('tab-today')?.getAttribute('aria-label') || '',
   }));
-  assert.deepEqual(await bar(), { cap: false, bookmark: false, tabs: true, count: null, name: '' });
+  assert.deepEqual(await bar(), { cap: false, bookmark: false, tabs: true, count: null, said: null, name: '' });
   await page.evaluate(async () => {
     const app = await import('/corridor.js');
     app.S.taken.push(...['開催', '世界', '遺産'].map((id, i) => ({ t: 'word', id, ts: Date.now() - i })));
@@ -359,6 +361,7 @@ test('the cap and the bookmark leave the bar with the tabs; the saved count move
   });
   const kept = await bar();
   assert.equal(kept.count, '3');
+  assert.match(kept.said, /Saved today/);
   assert.match(kept.name, /3 saved words/);
   // where the tabs do not show (a page over the first screen), the bar keeps both doors
   await goto(page, '?kanji=産', '#sheet');
