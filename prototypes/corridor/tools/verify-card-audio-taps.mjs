@@ -40,6 +40,9 @@ const LANG = arg('--lang', 'en');
 const PORT = Number(arg('--port', '19574'));
 const SHOTS = arg('--shots', '');
 const ONLY = new Set(String(arg('--only', 'practice,keys-review,keys-deck,deck-row,sweep,reveal-tap,unsettled,deck-wait')).split(',').filter(Boolean));
+// the combine (I8): `--ear held` holds the ear (耳) on just before each card screen opens (Today or Learn has its mark; the
+// card screens have none, so the ear rests off there); every state compared before and after a tap then includes the ear's
+const EAR = arg('--ear', 'off');
 if (!SITE) { console.error('usage: verify-card-audio-taps.mjs --site <built site>'); process.exit(2); }
 if (SHOTS) mkdirSync(SHOTS, { recursive: true });
 
@@ -70,7 +73,7 @@ const browser = await (ENGINE === 'webkit' ? webkit : chromium).launch({ headles
 const results = [];
 const report = (name, problems, detail) => {
   results.push({ name, pass: !problems.length });
-  console.log(JSON.stringify({ case: name, engine: ENGINE, width: WIDTH, lang: LANG, pass: !problems.length, problems, detail }));
+  console.log(JSON.stringify({ case: name, engine: ENGINE, width: WIDTH, lang: LANG, ...(EAR !== 'off' ? { ear: EAR } : {}), pass: !problems.length, problems, detail }));
 };
 const tag = `${ENGINE}-${WIDTH}-${LANG}`;
 const opened = [];
@@ -132,14 +135,14 @@ const focusOf = () => { const a = document.activeElement; return a && a !== docu
 const reviewState = (page) => page.evaluate(async (focusSrc) => {
   const m = await import('/corridor.js'); const rv = m.S.review;
   return { view: m.S.view, card: rv?.queue?.[rv?.ix]?.label ?? null, ix: rv?.ix ?? null, revealed: !!rv?.revealed, graded: rv?.history?.length ?? null,
-    folded: !rv?.moreOpen, focus: new Function(`return (${focusSrc})()`)() };
+    folded: !rv?.moreOpen, focus: new Function(`return (${focusSrc})()`)(), ear: document.documentElement.dataset.ear || '' };
 }, focusOf.toString());
 const deckState = (page) => page.evaluate((focusSrc) => {
   const c = document.querySelector('#kp-card');
   return { card: c?.dataset.card ?? null, revealed: !!c?.querySelector('.kp-answer'),
     pressed: [...document.querySelectorAll('.kp [aria-pressed="true"]:not(.card-voice):not(.voice-say)')].map((b) => b.textContent.trim()).join('|'),
     folded: [...document.querySelectorAll('.kp [aria-expanded]')].map((b) => b.getAttribute('aria-expanded')).join('|'),
-    focus: new Function(`return (${focusSrc})()`)() };
+    focus: new Function(`return (${focusSrc})()`)(), ear: document.documentElement.dataset.ear || '' };
 }, focusOf.toString());
 const lit = (page, sel) => page.evaluate((sel) => { const b = document.querySelector(sel); return !!b && (b.classList.contains('is-speaking') || b.getAttribute('aria-busy') === 'true'); }, sel);
 const anyLit = (page) => page.evaluate(() => !!document.querySelector('.is-speaking'));
@@ -169,7 +172,7 @@ async function saveKanji(p, ch) {
 }
 /** Learn → Kanji only → Start: the practice block draws its pool, the saved kanji first */
 async function startKanjiBlock(p) {
-  await p.ready(); await p.toTab('learn');
+  await p.ready(); await p.toTab('learn'); await holdHere(p);
   const mode = p.page.locator('.focus-mode', { hasText: /Kanji only|漢字だけ/ }).first();
   await mode.scrollIntoViewIfNeeded(); await p.press(mode); await p.sleep(400);
   const start = p.page.locator('.focus-start').first(); await start.scrollIntoViewIfNeeded(); await p.press(start);
@@ -190,8 +193,25 @@ async function saveWords(p, indexes) {
     for (let i = 0; i < 3 && (await page.locator('#mini').isVisible().catch(() => false)); i += 1) { await page.keyboard.press('Escape'); await sleep(400); }
   }
 }
-async function startReview(p) { await p.toTab('today'); await p.press('#review-start'); await p.page.locator('.review-face').first().waitFor(); await p.sleep(1000); }
-async function startDeck(p) { await p.ready(); await p.toTab('learn'); await p.sleep(600); await p.press('.learn-go-deck'); await p.page.locator('#kp-card').waitFor(); await p.sleep(2500); }
+/** `--ear held`: a long press on the ear's mark of this screen, as a learner holds it on (the mouse held down on a wide
+ * window; on a phone the pointer events the mark listens to, as the ear review's harness does it in WebKit). */
+async function holdHere(p) {
+  if (EAR !== 'held') return;
+  const { page } = p;
+  const box = await page.evaluate(() => {
+    for (const mark of document.querySelectorAll('.ear-mark')) { const r = mark.getBoundingClientRect(); if (r.width && document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2)?.closest('.ear-mark') === mark) return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
+    return null;
+  });
+  if (!box) throw new Error('no ear mark to hold on this screen');
+  if (phone) {
+    await page.evaluate(({ x, y }) => { const mark = document.elementFromPoint(x, y).closest('.ear-mark'); mark.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, isPrimary: true, pointerType: 'touch', button: 0 })); }, box);
+    await p.sleep(700);
+    await page.evaluate(({ x, y }) => { const mark = document.elementFromPoint(x, y).closest('.ear-mark'); mark.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, isPrimary: true, pointerType: 'touch', button: 0 })); mark.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); }, box);
+  } else { await page.mouse.move(box.x, box.y); await page.mouse.down(); await p.sleep(700); await page.mouse.up(); await page.mouse.move(4, 400); }
+  await page.waitForFunction(() => document.documentElement.dataset.ear === 'held', null, { timeout: 4000 });
+}
+async function startReview(p) { await p.toTab('today'); await holdHere(p); await p.press('#review-start'); await p.page.locator('.review-face').first().waitFor(); await p.sleep(1000); }
+async function startDeck(p) { await p.ready(); await p.toTab('learn'); await p.sleep(600); await holdHere(p); await p.press('.learn-go-deck'); await p.page.locator('#kp-card').waitFor(); await p.sleep(2500); }
 
 let failed = false;
 const run = async (name, body) => {
@@ -400,6 +420,8 @@ try {
         const s1 = await stateOf(page);
         // a keyboard user's focus stays on the control he tabbed to; everything else is as it was
         const problems = same(s0, s1, Object.keys(s0).filter((k) => how !== 'keyboard' || k !== 'focus'));
+        // held on before the card screen opened: the screen has no ear mark, so the ear rests off there
+        if (EAR === 'held' && s0.ear !== 'off') problems.push(`the ear is ${s0.ear} on the card screen`);
         if (!said && (await plays(page)) === k) problems.push('it did not speak');
         rows.push({ label, how, problems });
       }
