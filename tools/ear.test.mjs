@@ -907,6 +907,27 @@ describe('the app’s own controls are never read as text', () => {
     expect(u.voiceKey).toBe('word:高学歴');
   });
 
+  it('a listen button in a row of marks reads the word one block up (the word box’s 音)', () => {
+    const say = h('button', { id: 'mini-voice', class: 'mini-mark mini-voice' }, '音');
+    const box = h(
+      'div',
+      { id: 'mini' },
+      h(
+        'div',
+        { class: 'mini-word' },
+        h('span', { class: 'mini-surface' }, '産業'),
+        h('span', { class: 'mini-reading' }, 'さんぎょう'),
+      ),
+      h('div', { class: 'mini-marks' }, h('button', { class: 'mini-mark mini-brush' }, '筆'), say),
+    );
+    const band = h('div', { class: 'mini-band' }, box);
+    page(band);
+    const u = findUnit(textIn(say, '音'), { context });
+    expect(u).not.toBe(null);
+    expect(said(u).join('')).not.toMatch(/音|筆/);
+    expect(said(u).join('')).toMatch(/産業|さんぎょう/);
+  });
+
   it('a control tapped inside running text reads the sentence around it, without the control', () => {
     const p = h('p', {}, '今日は', h('button', { class: 'voice-say' }, '聞く'), '雨が降る。');
     page(p);

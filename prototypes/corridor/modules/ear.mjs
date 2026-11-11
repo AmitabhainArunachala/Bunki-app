@@ -452,8 +452,15 @@ export function findUnit(target, { offset = null, display = defaultDisplay, cont
   // the one it stands in, with the control masked out
   if (control && LISTEN_CLASSES.some((name) => hasClass(control, name)) && attr(control, 'data-voice-text') === null &&
       attr(control, 'data-voice-word') === null && parentOf(control) && !NO_HOST.has(tagOf(parentOf(control)))) {
-    const holder = blockOf(parentOf(control), display);
-    if (holder) return wordOrSentence(holder, control, null, context);
+    // the nearest block around it that holds Japanese of its own (the word box's 音 stands in a row of marks; the
+    // word is one block up)
+    let holder = blockOf(parentOf(control), display);
+    for (let up = 0; holder && up < 4; up += 1) {
+      const unit = wordOrSentence(holder, control, null, context);
+      if (unit) return unit;
+      holder = parentOf(holder) && !NO_HOST.has(tagOf(parentOf(holder))) ? blockOf(parentOf(holder), display) : null;
+    }
+    return null;
   }
   if (control) {
     // a control is a word of running text only when it stands in the line (inline-level) among Japanese of its own
