@@ -8,10 +8,13 @@
  *  switch   I1 · "Highlight what is being read" off: the ear draws nothing on text, armed (a pointer over a sentence on the
  *           Mac), held (a rest) or speaking (a tap), in every look with --looks all; the 耳 mark still shows its state.
  *           With it on, the marks are there (the same steps, the check's positive control).
- *  closed   I2 · the study cards' question faces. The ear has no mark on the two card screens (ear.mjs mount: they keep
- *           their own look), so armed and held carried in from Today rest off there; on the Mac Option-click reaches the
- *           ear: on a face whose word is blanked nothing is sent; on a printed face the ear sends the reading the card's
- *           own control sends. The deck: the printed face reads; the blanked and the choices face send nothing.
+ *  closed   I2 · the study cards' question faces (the lead's ruling after the combine's review: on a question face the only
+ *           voice is the card's own control). The ear has no mark on the two card screens (ear.mjs mount: they keep their
+ *           own look), so armed and held carried in from Today rest off there; on the Mac Option-click reaches the ear, and
+ *           on both the 読む chip: on a face whose word is blanked nothing is sent; on a printed face Option-click sends the
+ *           reading the card's own control sends; no selection on a question face brings the chip (the phone's only ear
+ *           path to a card, now driven at 390). The deck: Option-click on the recall face's marked word sends its reading,
+ *           on any other word nothing; the blanked and the choices face send nothing; no chip on any of the three.
  *  offline  I3 · after a reload and offline: a reading and a sentence the review card's control said, and a sentence the
  *           ear said, play with no request; a sentence never heard shows the one plain line.
  *  ended    I13 · a 401 on a request nobody waits for (the ear gave it up): the next tap says the pairing was ended, and
@@ -143,6 +146,18 @@ const cases = {
     const s = await open({ engine: ENGINE, width: WIDTH, ui: UI, voicePort: PORT + 1, clipSeconds: () => 1 });
     const { page, press } = s;
     const optionClick = async (p) => { await s.page.keyboard.down('Alt'); await s.page.mouse.click(p.x, p.y); await s.page.keyboard.up('Alt'); };
+    /** What `selector` holds, selected (as a finger's or the keyboard's selection ends up): does the 読む chip stand? When it
+     * does it is pressed (its own click, as a tap's: Playwright's touch tap brings no click on it in headless WebKit), so a
+     * chip that should not stand shows what it would have sent. */
+    const selectChip = async (selector) => {
+      const made = await s.page.evaluate((sel) => { const n = document.querySelector(sel); if (!n) return false; const r = document.createRange(); r.selectNodeContents(n); const g = getSelection(); g.removeAllRanges(); g.addRange(r); return true; }, selector);
+      await s.sleep(600);
+      const chip = await s.page.locator('.ear-chip').isVisible().catch(() => false);
+      const n = s.fake.speaks().length;
+      if (chip) { await s.page.locator('.ear-chip').dispatchEvent('click', { detail: 1 }); await s.sleep(1500); }
+      await s.page.evaluate(() => getSelection().removeAllRanges()); await s.sleep(200);
+      return { made, chip, sent: sent(s, n) };
+    };
     try {
       await page.evaluate(async () => { const m = await import('/corridor.js'); m.setWordPref(m.WORD_VOICE_KEY, 'wordVoice', m.WORD_VOICE, 'off'); });
       // a word saved with its sentence (its review face asks it blanked in that sentence), and one saved from its page (printed)
@@ -165,31 +180,38 @@ const cases = {
       const problems = [];
       const n0 = s.fake.speaks().length;
       if (!face.cloze) problems.push('the saved word is not asked blanked (nothing to check)');
-      // taps on the blanked face: the sentence, the blank
-      for (const pick of ['sentence', 'blank']) {
-        const p = await page.evaluate((pick) => {
-          const line = document.querySelector('.review-face .review-cloze');
-          if (!line) return null;
-          if (pick === 'sentence') { const t = line.querySelector('.tok.content'); const r = t.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
-          const walker = document.createTreeWalker(line, NodeFilter.SHOW_TEXT);
-          for (let n = walker.nextNode(); n; n = walker.nextNode()) { const i = n.nodeValue.indexOf('＿'); if (i >= 0) { const range = document.createRange(); range.setStart(n, i); range.setEnd(n, i + 1); const r = range.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; } }
-          return null;
-        }, pick);
-        if (!p) { problems.push(`no ${pick} to tap`); continue; }
-        if (s.phone) await page.touchscreen.tap(p.x, p.y); else await optionClick(p);
-        await s.sleep(1200);
+      if (!s.phone) {
+        // the Mac: Option-click on the blanked face, on the sentence and on the blank
+        for (const pick of ['sentence', 'blank']) {
+          const p = await page.evaluate((pick) => {
+            const line = document.querySelector('.review-face .review-cloze');
+            if (!line) return null;
+            if (pick === 'sentence') { const t = line.querySelector('.tok.content'); const r = t.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
+            const walker = document.createTreeWalker(line, NodeFilter.SHOW_TEXT);
+            for (let n = walker.nextNode(); n; n = walker.nextNode()) { const i = n.nodeValue.indexOf('＿'); if (i >= 0) { const range = document.createRange(); range.setStart(n, i); range.setEnd(n, i + 1); const r = range.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; } }
+            return null;
+          }, pick);
+          if (!p) { problems.push(`no ${pick} to tap`); continue; }
+          await optionClick(p);
+          await s.sleep(1200);
+        }
       }
+      // the phone's way to the ear on a card (the 読む chip; armed and held rest off on card screens), and the Mac's too: the
+      // blanked sentence selected, the blank with it: no chip (the lead's ruling after the combine's review, F1)
+      const chipOnBlank = await selectChip('.review-face .review-cloze');
+      if (!chipOnBlank.made) problems.push('nothing to select on the blanked face');
+      if (chipOnBlank.chip) problems.push(`the 読む chip stood for the blanked sentence${chipOnBlank.sent.length ? ` and sent ${JSON.stringify(chipOnBlank.sent)}` : ''}`);
       const onBlank = sent(s, n0);
       if (onBlank.length) problems.push(`on the blanked face the ear sent ${JSON.stringify(onBlank)}`);
       if (onBlank.some((t) => (face.label && t.includes(face.label)))) problems.push('what was sent holds the hidden word');
       const still = await page.evaluate(() => ({ revealed: !!document.querySelector('.grade-row'), ear: document.documentElement.dataset.ear || '' }));
       if (still.revealed) problems.push('a tap turned the card over');
-      record(`I2 review card, blanked face: ${s.phone ? 'a tap' : 'Option-click'} on the sentence and on the blank sends nothing`, problems, JSON.stringify({ card: face.label, sent: onBlank, ...still }));
-      if (!s.phone) {
-        // the printed face, in a fresh profile: a word saved from its own page; Option-click on it and its own control send
-        // the same reading
-        await s.close();
-        Object.assign(s, await open({ engine: ENGINE, width: WIDTH, ui: UI, voicePort: PORT + 1, clipSeconds: () => 1 }));
+      record(`I2 review card, blanked face: ${s.phone ? '' : 'Option-click on the sentence and on the blank, and '}the sentence selected (no 読む chip) send nothing`, problems, JSON.stringify({ card: face.label, sent: onBlank, chip: chipOnBlank.chip, ...still }));
+      // the printed face, in a fresh profile: a word saved from its own page. The Mac: Option-click on it sends what its own
+      // control sends (the stored reading, one clip). Both: its selection brings no chip; the control sends the reading
+      await s.close();
+      Object.assign(s, await open({ engine: ENGINE, width: WIDTH, ui: UI, voicePort: PORT + 1, clipSeconds: () => 1 }));
+      {
         const { page, press } = s;
         await page.evaluate(async () => { const m = await import('/corridor.js'); m.setWordPref(m.WORD_VOICE_KEY, 'wordVoice', m.WORD_VOICE, 'off'); });
         await s.ready();
@@ -206,46 +228,77 @@ const cases = {
           reading: document.getElementById('card-say-front')?.dataset.voiceText || '' }));
         const p2 = [];
         if (!printed.control) p2.push(`no question-side control on the printed face of ${printed.card}`);
-        // the ear first, then the card's own control: the same reading under the same voice key is one clip, so the control
-        // then asks nothing (it plays the clip the ear's request brought); otherwise it must ask the same text
         const front = await page.locator('.review-face .review-front').first().boundingBox({ timeout: 4000 }).catch(() => null);
         if (!front) p2.push(`no printed word on the face (${JSON.stringify(await page.evaluate(() => document.querySelector('.review-face')?.textContent?.slice(0, 60) || document.body.dataset.view || ''))})`);
-        const m2 = s.fake.speaks().length;
-        if (front) await optionClick({ x: front.x + front.width / 2, y: front.y + front.height / 2 });
-        await s.sleep(1500);
-        const byEar = sent(s, m2);
+        let byEar = [];
+        if (!s.phone) {
+          // the ear first, then the card's own control: the same reading under the same voice key is one clip, so the control
+          // then asks nothing (it plays the clip the ear's request brought); otherwise it must ask the same text
+          const m2 = s.fake.speaks().length;
+          if (front) await optionClick({ x: front.x + front.width / 2, y: front.y + front.height / 2 });
+          await s.sleep(1500);
+          byEar = sent(s, m2);
+          if (!byEar.length) p2.push('Option-click on the printed word sent nothing');
+          if (printed.reading && byEar[0] !== printed.reading) p2.push(`the ear sent ${JSON.stringify(byEar[0])}, not the stored reading ${printed.reading}`);
+        }
+        const chipOnWord = await selectChip('.review-face .review-front');
+        if (chipOnWord.chip) p2.push(`the 読む chip stood for the printed word${chipOnWord.sent.length ? ` and sent ${JSON.stringify(chipOnWord.sent)}` : ''}`);
         const m1 = s.fake.speaks().length;
-        if (printed.control) { await page.locator('#card-say-front').click(); await s.sleep(1500); }
+        if (printed.control) { await press('#card-say-front'); await s.sleep(1500); }
         const byControl = sent(s, m1);
-        if (!byEar.length) p2.push('Option-click on the printed word sent nothing');
-        if (byControl.length && byControl[0] !== byEar[0]) p2.push(`the ear sent ${JSON.stringify(byEar[0])}, the card's control ${JSON.stringify(byControl[0])}`);
-        if (printed.reading && byEar[0] !== printed.reading) p2.push(`the ear sent ${JSON.stringify(byEar[0])}, not the stored reading ${printed.reading}`);
+        if (s.phone && printed.reading && (byControl.length !== 1 || byControl[0] !== printed.reading)) p2.push(`the control sent ${JSON.stringify(byControl)}, not ${printed.reading} once`);
+        if (byControl.length && byEar.length && byControl[0] !== byEar[0]) p2.push(`the ear sent ${JSON.stringify(byEar[0])}, the card's control ${JSON.stringify(byControl[0])}`);
         if (await page.evaluate(() => !!document.querySelector('.grade-row'))) p2.push('the card was turned over');
-        record('I2 review card, printed face: the ear and the card’s own control send the same reading', p2, JSON.stringify({ ...printed, byControl, byEar }));
-        // the deck: printed, blanked, choices
+        record(`I2 review card, printed face: ${s.phone ? 'its selection brings no 読む chip; its control sends the stored reading' : 'the ear and the card’s own control send the same reading; its selection brings no 読む chip'}`, p2, JSON.stringify({ ...printed, byControl, byEar, chip: chipOnWord.chip }));
+        // the deck: the recall face (its word marked), the blanked face, the choices
         const deckRows = [];
         for (const mode of ['read', 'self', 'choice']) {
           await page.evaluate((mode) => { for (const id of ['n2', 'n1', 'kotoba-master', 'kotoba-mcd', 'kotoba-mine', 'context-dense', 'senmon', 'personal']) { if (mode === 'read') localStorage.removeItem(`bunki-cloze:prefs:v3:${id}`); else localStorage.setItem(`bunki-cloze:prefs:v3:${id}`, JSON.stringify({ mode })); } }, mode);
           await s.ready(); await press('#home-review').catch(() => {}); await page.locator('#tab-learn').waitFor(); await press('#tab-learn'); await s.sleep(1000);
           await press('.learn-go-deck'); await page.locator('#kp-card').waitFor(); await s.sleep(3000);
-          const g = await page.evaluate(() => { const c = document.querySelector('#kp-card'); const t = c?.querySelector('.kp-sentence .kp-s[data-focus="1"] .tok, .kp-sentence .tok, .kp-sentence'); const r = t?.getBoundingClientRect();
-            return { blank: !!c?.querySelector('.kp-blank'), choices: !!c?.querySelector('.kp-choices'), target: !!c?.querySelector('.kp-sentence .kp-target'), p: r ? { x: r.left + Math.min(r.width / 2, 20), y: r.top + r.height / 2 } : null, card: c?.dataset.card || '' }; });
-          const k = s.fake.speaks().length;
-          if (g.p) await optionClick(g.p);
-          await s.sleep(1500);
-          const got = sent(s, k);
-          const shouldSpeak = mode === 'read';
+          const g = await page.evaluate(() => { const c = document.querySelector('#kp-card'); const box = (r) => (r ? { x: r.left + Math.min(r.width / 2, 20), y: r.top + r.height / 2 } : null);
+            const target = c?.querySelector('.kp-sentence .kp-target');
+            // another word of the sentence: the first Japanese letter outside the marked word
+            let other = null;
+            const walker = document.createTreeWalker(c?.querySelector('.kp-sentence') || document.body, NodeFilter.SHOW_TEXT);
+            for (let n = walker.nextNode(); n && !other; n = walker.nextNode()) {
+              if (target?.contains(n) || n.parentElement?.closest('rt')) continue;
+              const i = n.nodeValue.search(/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u);
+              if (i < 0) continue;
+              const r = document.createRange(); r.setStart(n, i); r.setEnd(n, i + 1);
+              const rect = r.getBoundingClientRect();
+              if (rect.width && rect.top > 0 && rect.bottom < innerHeight) other = box(rect);
+            }
+            return { blank: !!c?.querySelector('.kp-blank'), choices: !!c?.querySelector('.kp-choices'), target: box(target?.getBoundingClientRect()), other,
+              control: !!document.getElementById('kp-listen-front'), card: c?.dataset.card || '' }; });
           const rp = [];
-          if (!g.p) rp.push('nothing to click');
-          if (shouldSpeak && !got.length) rp.push('the printed face: Option-click sent nothing');
-          if (!shouldSpeak && got.length) rp.push(`the ${mode === 'self' ? 'blanked' : 'choices'} face: the ear sent ${JSON.stringify(got)}`);
-          if (got.some((t) => g.card && t.includes(g.card) && !shouldSpeak)) rp.push('what was sent holds the hidden word');
+          if (!s.phone) {
+            // the recall face: the marked word says the control's reading; any other word of the sentence says nothing. The
+            // blanked and the choices face: nothing anywhere (no control stands there)
+            if (mode === 'read') {
+              const k = s.fake.speaks().length;
+              if (g.target) await optionClick(g.target);
+              await s.sleep(1500);
+              const got = sent(s, k);
+              if (!g.target || !g.control) rp.push(`the recall face has no marked word or no control (${JSON.stringify(g)})`);
+              else if (got.length !== 1 || !/^[\p{Script=Hiragana}\p{Script=Katakana}ー]+$/u.test(got[0] || '')) rp.push(`Option-click on the marked word sent ${JSON.stringify(got)}, not one reading`);
+            }
+            const k = s.fake.speaks().length;
+            if (g.other) await optionClick(g.other);
+            await s.sleep(1500);
+            const got = sent(s, k);
+            if (!g.other) rp.push('no other word to click');
+            if (got.length) rp.push(`Option-click on another word of the sentence sent ${JSON.stringify(got)}`);
+          }
+          const chip = await selectChip('#kp-card .kp-sentence');
+          if (!chip.made) rp.push('nothing to select');
+          if (chip.chip) rp.push(`the 読む chip stood for the sentence${chip.sent.length ? ` and sent ${JSON.stringify(chip.sent)}` : ''}`);
           if (await page.evaluate(() => !!document.querySelector('#kp-card .kp-answer'))) rp.push('the click showed the answer');
           deckRows.push(...rp.map((x) => `${mode}: ${x}`));
           if (mode === 'self') await shot(s, 'closed-deck-blanked');
         }
         await page.evaluate(() => { for (const id of ['n2', 'n1', 'kotoba-master', 'kotoba-mcd', 'kotoba-mine', 'context-dense', 'senmon', 'personal']) localStorage.removeItem(`bunki-cloze:prefs:v3:${id}`); });
-        record('I2 deck card: Option-click reads the printed face; on the blanked and the choices face it sends nothing', deckRows, '');
+        record(`I2 deck card: ${s.phone ? '' : 'Option-click on the recall face’s marked word says its reading, and on any other word nothing; '}a selection brings no 読む chip on the recall, blanked and choices faces`, deckRows, '');
       }
     } finally { await s.close(); }
   },
