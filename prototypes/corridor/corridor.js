@@ -13574,7 +13574,10 @@ if (typeof window !== 'undefined') ensureRecManifest();
 /** Play one recorded clip. Resolves true when it played to the end, false when it
  * could not play, and null when it was stopped (a replay, another clip, or 止める). With
  * `pausable` (the voice layer's article reader, L1), a pause no lane of this app asked for (a
- * call, another app's sound, the lock screen) resolves 'paused': the read holds at that sentence. */
+ * call, another app's sound, the lock screen) resolves 'paused': the read holds at that sentence.
+ * So does a start the browser will not allow (NotAllowedError: a locked phone may refuse a new
+ * start), as for a server clip; play says that sentence again (L1 fix round 1, the review's F1).
+ * A recording that truly cannot play still resolves false, and the read ends with its line. */
 function playRecClip(src, btn, { rate = 1, onTime = null, pausable = false } = {}) {
   deviceVoice.cancel();
   // ONE PLAYBACK OWNER (V): stop every other lane before refusing or playing. No Audio is
@@ -13596,7 +13599,7 @@ function playRecClip(src, btn, { rate = 1, onTime = null, pausable = false } = {
     // the app's own stop (stopRecAudio) lets go of the element before its pause is told; anyone else's pause finds it held
     a.onpause = () => { const outside = pausable && !a.ended && recAudioEl === a; off(); done(a.ended ? true : outside ? 'paused' : null); };
     a.onerror = () => { off(); done(false); };
-    a.play().catch(() => { off(); done(false); });
+    a.play().catch((error) => { off(); done(pausable && error?.name === 'NotAllowedError' ? 'paused' : false); });
   });
 }
 /** The one door to recorded sound. It opens for a clip the admitted narration manifest names under

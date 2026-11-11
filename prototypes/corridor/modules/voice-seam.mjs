@@ -280,8 +280,9 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
       const stops = owner.recordedStops;
       const outcome = await recorded(clip.recorded.src, rate);
       if (outcome === true) return 'ended';
-      // paused by nobody in this app (a call, another app, the lock screen): the read holds at this sentence and says it
-      // again on play; nothing takes it up by itself (L1, John: only pause stops a read, and a pause is a pause)
+      // paused by nobody in this app (a call, another app, the lock screen), or a start the browser would not allow (a
+      // locked phone may refuse a new element: fix round 1, as for a server clip): the read holds at this sentence and
+      // says it again on play; nothing takes it up by itself (L1, John: only pause stops a read, and a pause is a pause)
       if (outcome === 'paused') { owner.queue.pause(); return 'stopped'; }
       if (outcome === null) { if (owner.recordedStops === stops) endedFromOutside(owner); return 'stopped'; }
       throw new Error('audio-error');
