@@ -134,6 +134,9 @@ test('the actual saved-answer controls run and every declared child is killed', 
     );
     assert.equal(verdict(run()), 'survived');
   } finally {
-    if (!owner) rmSync(evidence, { recursive: true, force: true });
+    // the whole run folder resolveCorridorEvidence() made for this process goes, not only this test's subfolder (it
+    // was left behind empty, one per run); KAIRO_KEEP_TEST_EVIDENCE=1 keeps it, a supplied KAIRO_EVIDENCE_DIR is never removed
+    if (!owner && process.env.KAIRO_KEEP_TEST_EVIDENCE !== '1')
+      rmSync(resolveCorridorEvidence(), { recursive: true, force: true });
   }
 }, 900_000);
