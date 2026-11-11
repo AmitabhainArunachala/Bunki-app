@@ -344,8 +344,10 @@ html[data-live-depth='1'] #sheet:has(> h2.headword):not(:has(.hero > .hero-glyph
 .kp-eyebrow > .card-voice { margin: -10px 0 -10px auto; }
 /* the deck answer's word line: the control stands after the word type, where the 音 it replaced stood, and takes no more of
    the line than that 音 did (12 px), so the word type stays on the word's line at phone width. Its 44 px tap target reaches
-   back over the gap before it and into the card's margin after it; the glyph keeps to the line's end. */
-.kp .kp-word > .card-voice { margin: -10px -20px -10px -12px; padding: 0 20px 0 0; justify-items: end; }
+   back over the gap before it and into the card's margin after it; the glyph keeps to the line's end. It takes the line's
+   height as that 音 did too (32 px on the word's baseline, the glyph standing on the baseline), so the word type and
+   everything below stand where they stood; its 44 px box reaches 2 px up and 10 px down, clear of the reading at 320. */
+.kp .kp-word > .card-voice { align-self: baseline; align-items: start; margin: -2px -20px -10px -12px; padding: 5px 20px 0 0; justify-items: end; }
 .voice-say.is-speaking, .mini-voice.is-speaking, .card-voice.is-speaking { color: var(--color-gold, var(--accent)); }
 /* waiting for the voice server's answer: the control he pressed dims until the sentence starts */
 .voice-say[aria-busy='true'], .mini-voice[aria-busy='true'],
