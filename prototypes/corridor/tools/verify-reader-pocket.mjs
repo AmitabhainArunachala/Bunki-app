@@ -270,6 +270,9 @@ const lastToken = (page) => page.evaluate(() => {
 const articleTitle = (page) => page.evaluate(() => document.querySelector('h1.view-title')?.textContent?.trim() || '');
 async function shot(page, name) {
   if (!SHOTS) return;
+  // the prototype's first-open line stands over the bar until it is answered: answered first, as a person would
+  const ok = page.locator('button', { hasText: /^(OK|わかった)$/ }).first();
+  if (await ok.isVisible().catch(() => false)) { await ok.click({ force: true }).catch(() => {}); await wait(400); }
   await page.screenshot({ path: join(SHOTS, `${tag}-${name}.png`) }).catch(() => {});
 }
 
