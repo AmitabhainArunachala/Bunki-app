@@ -795,12 +795,14 @@ export function installVoiceLayer(host) {
     const id = card.dataset.card;
     if (!id || !deckFrontVoice({ ...face(), reading: 'x' }) || card.dataset.voiceFront === id) return;
     card.dataset.voiceFront = id;
-    Promise.resolve(host.deckWordReading?.(id)).then((reading) => {
+    Promise.all([host.deckWordReading?.(id), host.deckWordTerm?.(id)]).then(([reading, term]) => {
       const row = card.querySelector('.kp-eyebrow');
       if (!reading || !row || !card.isConnected || card.dataset.card !== id || card.querySelector('.kp-answer') || card.querySelector('#kp-listen-front')) return;
       const plan = deckFrontVoice({ ...face(), reading });
       if (!plan) return;
-      const word = shownText(card.querySelector('.kp-sentence .kp-target')) || id;
+      // one word, one clip (the combine's review): the voice is keyed by the card's word as the answer side keys it (its
+      // dictionary form, else the card's id), never by the form the passage prints (an inflected 憧れた is 憧れる's)
+      const word = host.deckWordTerm ? term || id : shownText(card.querySelector('.kp-sentence .kp-target')) || id;
       const control = cardMark('kp-listen-front');
       control.setAttribute('aria-label', tx('語を聞く', 'Listen to the word'));
       // what it says, the ear says on the marked word (one clip: the same text under the same voice key)

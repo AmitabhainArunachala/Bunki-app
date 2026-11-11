@@ -32686,6 +32686,8 @@ if (typeof window !== 'undefined' && !window.__CORRIDOR_BUNDLE__) {
       highlight: () => wordHighlight() !== 'off',
       // the deck card's stored reading for a card id (the question side's control says the word by it)
       deckWordReading: (cardId) => deckCardReading(cardId),
+      // and its dictionary form: the control keys its voice by it, as the answer side does (one word, one clip)
+      deckWordTerm: (cardId) => deckCardReading(cardId, 'term'),
       passage: () => (S.view === 'reader' ? passage() : null),
       cardRevealed: () => S.view === 'review' && !!S.review?.revealed,
       // one sound at a time: every other lane lets go before the seam speaks
@@ -32705,9 +32707,10 @@ if (typeof window !== 'undefined' && !window.__CORRIDOR_BUNDLE__) {
   }).catch((err) => console.warn('voice layer unavailable', err));
 }
 /** A deck card's word's stored reading, from the deck's own file (the player's: the same address, kept in the browser's cache),
- * read once per deck. The deck player (decks/player) draws no reading on a question side, so this is where it is had. */
+ * read once per deck. The deck player (decks/player) draws no reading on a question side, so this is where it is had.
+ * `field` 'term': the word's dictionary form instead (the question side's control keys its voice by it, as the answer's does). */
 const deckReadings = new Map();
-function deckCardReading(cardId) {
+function deckCardReading(cardId, field = 'reading') {
   const id = S.view === 'deckplay' ? S.deckPlay : null;
   if (!id || !cardId || window.__CORRIDOR_STANDALONE__ === true) return Promise.resolve(null);
   if (!deckReadings.has(id)) {
@@ -32716,11 +32719,11 @@ function deckCardReading(cardId) {
       : fetch(new URL(`./decks/${id}/deck.json`, import.meta.url), { cache: 'force-cache' }).then((res) => (res.ok ? res.json() : null));
     deckReadings.set(id, loaded.then((deck) => {
       const map = new Map();
-      for (const word of deck?.words || []) for (const card of word.cards || []) if (word.reading) map.set(card.id, word.reading);
+      for (const word of deck?.words || []) for (const card of word.cards || []) if (word.reading) map.set(card.id, { reading: word.reading, term: word.term || '' });
       return map;
     }).catch(() => { deckReadings.delete(id); return new Map(); }));
   }
-  return deckReadings.get(id).then((map) => map.get(cardId) || null);
+  return deckReadings.get(id).then((map) => map.get(cardId)?.[field] || null);
 }
 /** Settings, 筆と声: the voice server's pairing and status block, or null before the layer has arrived. */
 function voiceSettingsBlock() { return voiceLayer ? voiceLayer.settingsBlock() : null; }

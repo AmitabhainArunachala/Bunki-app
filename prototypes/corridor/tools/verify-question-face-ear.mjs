@@ -3,7 +3,7 @@
  * (fake-voice-server.mjs). No sound, no real voice server, no token or pairing code.
  *
  *   node prototypes/corridor/tools/verify-question-face-ear.mjs --site <built site> [--engine chromium|webkit] [--width 1728|390]
- *        [--port 19562] [--only several,unread,deck,select,answer] [--shots <dir>]
+ *        [--port 19562] [--only several,unread,deck,select,onekey,answer] [--shots <dir>]
  *
  *  several  a kanji with several readings (一) face-down in a kanji-only practice block, with no control of its own: on the
  *           Mac Option-click on the character, on the phone (and the Mac) the character selected: nothing is asked,
@@ -17,6 +17,8 @@
  *  select   a selection that starts above a review card's question face and ends in it, starts in it and ends below it, or
  *           spans it: no 読む chip, nothing asked. Positive controls: a selection beside the face, and one on an answer face,
  *           bring the chip as before.
+ *  onekey   one word, one clip (the review's concern): an inflected word on the deck (its card printing 憧れた of 憧れる)
+ *           says its reading under one voice key on its question side and its answer side; the reading is made once.
  *  answer   answer faces are unchanged: Option-click (the Mac) on a revealed review card's word reads it.
  *
  * Exit code 0 when every check passes, 1 otherwise. One JSON line per check on stdout. */
@@ -32,7 +34,7 @@ const ENGINE = arg('--engine', 'chromium');
 const WIDTH = Number(arg('--width', '1728'));
 const PORT = Number(arg('--port', '19562'));
 const SHOTS = arg('--shots', '');
-const ONLY = new Set(arg('--only', 'several,unread,deck,select,answer').split(',').filter(Boolean));
+const ONLY = new Set(arg('--only', 'several,unread,deck,select,onekey,answer').split(',').filter(Boolean));
 if (!SITE) { console.error('usage: verify-question-face-ear.mjs --site <built site>'); process.exit(2); }
 if (SHOTS) mkdirSync(SHOTS, { recursive: true });
 
@@ -320,6 +322,58 @@ const cases = {
       if (runs.beside.made && !runs.beside.chip) problems.push(`a selection beside the face (${runs.beside.text}) brought no chip: the check cannot see the chip`);
       if (!(await faceDown(s))) problems.push('the card was turned over');
       report('select · a selection that starts above a question face and ends in it, starts in it and ends below, or spans it: no 読む chip, nothing sent (beside it: the chip)', problems, { card: shown.card, runs });
+    } finally { await s.context.close(); }
+  },
+
+  // ======================================================= one word, one clip (fix round 1, the review's concern)
+  // The deck's question side keyed its voice by the form printed in the passage (憧れた) and the answer side by the
+  // dictionary form (憧れる): one reading asked twice, possibly in two voices. A deck whose first new card is an inflected
+  // word's: every card of the words before it is put aside (suspended) in a fresh profile.
+  async onekey() {
+    const s = await freshPage();
+    const { page } = s;
+    try {
+      const staged = await page.evaluate(async () => {
+        const id = document.querySelector('.learn-go-deck')?.dataset.stageDeck;
+        if (!id) return { why: 'no deck door' };
+        for (const k of [`bunki-cloze:prefs:v3:${id}`]) localStorage.removeItem(k);
+        const deck = await (await fetch(`/decks/${id}/deck.json`)).json();
+        const at = new Date().toISOString();
+        const suspended = {};
+        let target = null;
+        for (const word of deck.words) {
+          const card = word.cards[0];
+          if (card?.type === 'word' && card.form && card.form !== word.term && word.reading && word.pos !== 'expression') { target = { id: card.id, form: card.form, term: word.term, reading: word.reading }; break; }
+          for (const c of word.cards) suspended[c.id] = { at, by: 'delete' };
+        }
+        if (!target) return { why: 'no inflected card' };
+        localStorage.setItem(`bunki-cloze:${id}`, JSON.stringify({ format: 'bunki-cloze-state', version: 1, deckId: id, cards: {}, groupsOff: [], log: [], suspended, repairs: {}, repairLog: [], lookups: [] }));
+        return { deck: id, ...target };
+      });
+      const problems = [];
+      if (!staged.id) throw new Error(`nothing to stage: ${staged.why}`);
+      await s.press(`.learn-go-deck[data-stage-deck="${staged.deck}"]`); await page.locator('#kp-card').waitFor();
+      await page.locator('#kp-listen-front').waitFor({ timeout: 8000 }).catch(() => {});
+      await s.sleep(600);
+      const shown = await page.evaluate(() => ({ card: document.querySelector('#kp-card')?.dataset.card || null, printed: document.querySelector('#kp-card .kp-sentence .kp-target')?.textContent || null }));
+      if (shown.card !== staged.id) problems.push(`the card shown is ${shown.card}, not ${staged.id}`);
+      // the question side's control: its reading under its voice key
+      let n = fake.speaks().length;
+      if (await page.locator('#kp-listen-front').count()) { await s.press('#kp-listen-front'); await s.sleep(1800); } else problems.push('no question-side control');
+      const front = rows(n);
+      // the answer side's control: its reading first (kept already, under one key), then the sentence and the rest
+      await s.press('#kp-reveal'); await page.locator('#kp-listen-word').waitFor({ timeout: 8000 }).catch(() => {});
+      await s.sleep(800);
+      n = fake.speaks().length;
+      if (await page.locator('#kp-listen-word').count()) { await s.press('#kp-listen-word'); await s.sleep(6000); } else problems.push('no answer-side control');
+      const answer = rows(n);
+      if (front.length !== 1 || front[0].text !== staged.reading) problems.push(`the question side sent ${JSON.stringify(front)}, not ${staged.reading} once`);
+      const keys = new Set([...front, ...answer].map((r) => r.voiceKey));
+      if (keys.size !== 1) problems.push(`one word, ${keys.size} voice keys: ${[...keys].join(', ')}`);
+      if (answer.some((r) => r.text === staged.reading)) problems.push(`the answer side asked for ${staged.reading} again: the same word made twice`);
+      if (!answer.length) problems.push('the answer side sent nothing (its sentence is new: nothing to compare)');
+      report(`onekey · an inflected word on the deck (${staged.form} of ${staged.term}): its two faces say it under one voice key, and its reading is made once`, problems,
+        { staged, shown, front, answer: answer.map((r) => `${r.voiceKey} ${String(r.text).slice(0, 14)}`) });
     } finally { await s.context.close(); }
   },
 
