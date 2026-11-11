@@ -652,9 +652,23 @@ export function installVoiceLayer(host) {
   const ear = installEar({
     doc, tx,
     speak: (unit, done) => {
+      // the ear is a deliberate act: a read of the article yields to it and takes itself up again at the same sentence
+      // when the ear's voice ends, as it does for the word box's 音 (John, 2026-11-11: only pause stops a read)
+      const playing = readerActive() && ['loading', 'playing'].includes(reader.session.state);
+      const yieldFrom = playing ? { pid: reader.pid, index: reader.index, paused: false }
+        : reader.yielding ? { pid: reader.yielding.pid, index: reader.yielding.index, paused: !reader.yielding.resume } : null;
+      const marker = {};
+      if (yieldFrom) { readerApi.stop(); reader.justStopped = null; }
       prime();
-      return seam.read({ sentences: unit.sentences, voiceKey: unit.voiceKey, prefetch: unit.sentences.length > 1 ? 2 : 0, gapMs: 260, rate: reader.rate,
-        onState: (state, code) => { if (['done', 'stopped', 'error'].includes(state)) done(state, code); } });
+      const session = seam.read({ sentences: unit.sentences, voiceKey: unit.voiceKey, prefetch: unit.sentences.length > 1 ? 2 : 0, gapMs: 260, rate: reader.rate,
+        onState: (state, code) => { if (['done', 'stopped', 'error'].includes(state)) { marker.over = true; done(state, code); yieldEnded(marker); } } });
+      if (yieldFrom) {
+        reader.yielding = { pid: yieldFrom.pid, index: yieldFrom.index, resume: !yieldFrom.paused, word: marker };
+        // a read refused at once ended before the read could yield to it: the read takes itself up again now
+        if (marker.over) yieldEnded(marker);
+        else host.refreshListenRow?.();
+      }
+      return session;
     },
     cannot: (unit) => seam.cannot(unit.voiceKey),
     context: () => ({ view: host.view(), keyFor: markKey,

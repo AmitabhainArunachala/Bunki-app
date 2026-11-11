@@ -17,6 +17,7 @@
  * (voice-layer.mjs): the voice server when paired, otherwise silence and the plain line. The look is the Bunki design
  * lead's (design/ear/ear-states.html, 2026-11-11 00:30): colours from the look's own variables. */
 import { isJapaneseEnough } from './nihongo-speech/audio/speech-text.mjs';
+import { createBands, rangeBoxes } from './voice-bands.mjs';
 import { sentencesOf, voiceKeyOf } from './voice-seam.mjs';
 import { splitSentences } from './nihongo-speech/audio/speech-text.mjs';
 
@@ -656,14 +657,15 @@ html[data-ear='novoice'] .ear-mark::after { content: ''; position: absolute; lef
 [data-ear-unit='armed'] { text-decoration-line: underline !important; text-decoration-color: var(--red) !important; text-decoration-thickness: 1.4px !important; text-underline-offset: 6px !important; }
 [data-ear-unit='held'] { background-image: linear-gradient(transparent 62%, color-mix(in oklab, var(--red) 22%, transparent) 62%) !important; }
 [data-ear-unit='speaking'] { background-image: linear-gradient(transparent 62%, color-mix(in oklab, var(--red) 34%, transparent) 62%) !important; }
-/* a sentence in running text: painted bands along each of its lines, in a layer of their own that takes no pointer and
-   touches nothing in the text (the Custom Highlight API's text-decoration does not paint in WebKit, the engine of Safari
-   and the iPhone, and its wash does not paint inside button words there) */
-.ear-bands { position: fixed; left: 0; top: 0; width: 0; height: 0; z-index: 2147482000; pointer-events: none; }
-.ear-band { position: fixed; display: block; pointer-events: none; }
-.ear-band[data-state='armed'] { background: var(--red); }
-.ear-band[data-state='held'] { background: color-mix(in oklab, var(--red) 22%, transparent); }
-.ear-band[data-state='speaking'] { background: color-mix(in oklab, var(--red) 34%, transparent); }
+/* a sentence in running text: the reader's own band painter (modules/voice-bands.mjs), one even band per line of its
+   base text, in a layer of its own that takes no pointer and touches nothing in the text (the Custom Highlight API's
+   text-decoration does not paint in WebKit, the engine of Safari and the iPhone): the underline just under the band
+   when armed, the wash along its lower part when held on or speaking, as on an element */
+.ear-bands { position: absolute; left: 0; top: 0; width: 0; height: 0; z-index: 2147482000; pointer-events: none; }
+.ear-band { position: absolute; display: block; pointer-events: none; }
+.ear-band[data-state='armed']::after { content: ''; position: absolute; left: 0; right: 0; top: calc(100% + 1px); height: 1.4px; background: var(--red); }
+.ear-band[data-state='held'] { background-image: linear-gradient(transparent 62%, color-mix(in oklab, var(--red) 22%, transparent) 62%); }
+.ear-band[data-state='speaking'] { background-image: linear-gradient(transparent 62%, color-mix(in oklab, var(--red) 34%, transparent) 62%); }
 /* select-then-読む */
 .ear-chip { position: fixed; z-index: 2147483000; min-width: 44px; height: 32px; padding: 0 10px; border-radius: 3px; border: 1px solid var(--red);
   background: var(--print-white, var(--ground-0, var(--color-paper, var(--ground)))); color: var(--red); font: 500 15px/1 "Hiragino Mincho ProN", "Noto Serif JP", var(--serif, serif);
@@ -691,34 +693,12 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}) }) {
   /* The marks on the unit, without moving it: an element takes an attribute its own CSS dresses (background and
    * text-decoration, which paint in every engine); a sentence of running text gets bands painted along its lines in a
    * layer of their own (an underline when armed, a wash along the foot when held on or speaking). */
-  const layer = doc.createElement('div');
-  layer.className = 'ear-bands';
-  layer.setAttribute('data-ear-own', '');
-  layer.setAttribute('aria-hidden', 'true');
+  const bands = createBands(doc, { layerClass: 'ear-bands', bandClass: 'ear-band', attributes: { 'data-ear-own': '' } });
   let shown = null; // { unit, state, marked, range }
-  const bandsFor = (range, state) => {
-    const rects = range ? [...range.getClientRects()].filter((r) => r.width >= 2 && r.height >= 2) : [];
-    // one band per line: rects of one line (several text nodes) are joined
-    const lines = [];
-    for (const r of rects) {
-      const line = lines.find((l) => Math.abs(l.top - r.top) < r.height / 2);
-      if (line) { line.left = Math.min(line.left, r.left); line.right = Math.max(line.right, r.right); line.bottom = Math.max(line.bottom, r.bottom); }
-      else lines.push({ left: r.left, right: r.right, top: r.top, bottom: r.bottom });
-    }
-    while (layer.children.length > lines.length) layer.lastElementChild.remove();
-    while (layer.children.length < lines.length) { const band = doc.createElement('i'); band.className = 'ear-band'; layer.append(band); }
-    lines.forEach((line, i) => {
-      const band = layer.children[i], height = line.bottom - line.top;
-      const top = state === 'armed' ? line.bottom + 1 : line.top + height * 0.62;
-      const tall = state === 'armed' ? 1.4 : height * 0.38;
-      band.dataset.state = state;
-      band.style.cssText = `left:${line.left}px;top:${top}px;width:${line.right - line.left}px;height:${tall}px`;
-    });
-  };
   const clearShown = () => {
     if (!shown) return;
     if (shown.marked?.isConnected) shown.marked.removeAttribute('data-ear-unit');
-    if (shown.range) bandsFor(null, null);
+    if (shown.range) bands.hide();
     shown = null;
   };
   function showUnit(unit, state) {
@@ -731,23 +711,15 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}) }) {
         const range = doc.createRange();
         range.setStart(unit.range.startNode, unit.range.startOffset);
         range.setEnd(unit.range.endNode, unit.range.endOffset);
-        if (!layer.isConnected) doc.body.append(layer);
         shown.range = range;
-        bandsFor(range, state);
+        // the painter follows the sentence when the page scrolls or the window changes size
+        bands.show(() => (range.startContainer.isConnected ? rangeBoxes(range) : []), state);
         return;
       } catch { /* the page changed under it */ }
     }
     const marked = unit.element;
     if (marked?.isConnected) { marked.setAttribute('data-ear-unit', state); shown.marked = marked; }
   }
-  // the bands follow their sentence when the page scrolls or the window changes size
-  let refit = 0;
-  const follow = () => {
-    if (!shown?.range || refit) return;
-    refit = view.requestAnimationFrame(() => { refit = 0; if (shown?.range) bandsFor(shown.range.startContainer.isConnected ? shown.range : null, shown.state); });
-  };
-  view.addEventListener('scroll', follow, { capture: true, passive: true });
-  view.addEventListener('resize', follow, { passive: true });
 
   const ctx = () => {
     let given = {};
