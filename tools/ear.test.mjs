@@ -111,7 +111,7 @@ describe('a. the ear’s state machine', () => {
     expect(calls.speak).toHaveLength(0);
   });
 
-  it('held on (a long press): on a phone every tap on Japanese speaks it, until the ear is tapped off', () => {
+  it('held on (a long press): on a phone a tap on running text speaks it, until the ear is tapped off (controls: R-a, below)', () => {
     const { machine, calls, handles } = rig();
     machine.holdEar();
     expect(machine.display()).toBe('held');
@@ -1469,5 +1469,23 @@ describe('the ear’s own time limit says the voice took too long, not that the 
     expect(noVoiceLine(ear.EAR_SLOW, en, plain)).not.toMatch(/busy/i);
     // "busy" stays the server's own word
     expect(noVoiceLine('voice-unavailable', en, plain)).toBe('seam line for voice-unavailable');
+  });
+});
+
+describe('words of running text that open a lookup are text for the ear (K2)', () => {
+  it('a .japanese-lookup-word span is no control: held on, a finger’s tap on it speaks', () => {
+    const word = h(
+      'span',
+      {
+        class: 'japanese-lookup-word',
+        lang: 'ja',
+        'aria-haspopup': 'dialog',
+        'data-lookup-text': '経済',
+      },
+      '経済',
+    );
+    const sentence = h('p', {}, word, 'が伸びている。');
+    page(sentence);
+    expect(appControlAt(textIn(word, '経済'))).toBe(null);
   });
 });

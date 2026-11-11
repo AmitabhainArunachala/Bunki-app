@@ -1,5 +1,7 @@
 // Review check (the behaviour table, "Held on", iPhone column): "A tap on Japanese text speaks it and does nothing else,
-// until the ear is tapped off." Held on at phone size, one tap on a word of an article's running text (no read playing)
+// until the ear is tapped off." (Under ruling R-a the column reads: a tap on running text speaks it; rows, sky words and
+// web nodes are the app's controls and act as always. This check taps running text.)
+// Held on at phone size, one tap on a word of an article's running text (no read playing)
 // must ask the voice for that sentence once and must not be the app's own tap (no reading shown, no box opened).
 // The negative control (--control): the same tap with the ear off asks nothing and is the app's own.
 //   node held-phone-tap-speaks.mjs --engine chromium|webkit [--width 390] [--control]

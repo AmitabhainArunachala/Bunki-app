@@ -3,8 +3,10 @@
  *
  *   off (the default)  耳 in a hairline box. Everything behaves as before; Option-click on Japanese speaks it.
  *   armed (one tap)    a red 耳 on paper. The next tap on Japanese speaks it and does nothing else; the ear goes off.
- *   held (long press)  a white 耳 on a vermilion seal. On a phone every tap on Japanese speaks it and does nothing else;
- *                      on the Mac the pointer resting 0.4 s on Japanese speaks it and clicks behave as usual.
+ *   held (long press)  a white 耳 on a vermilion seal. On a phone a tap on running text speaks it and does nothing else,
+ *                      and the app's own controls (rows, buttons, tabs, the sky's words, web nodes) act as always (the
+ *                      review's ruling R-a); on the Mac the pointer resting 0.4 s on Japanese speaks it and clicks behave
+ *                      as usual.
  *   speaking           the seal with three arcs. A second tap on the same unit stops it.
  *   novoice            the mark struck once and one plain line for about four seconds (not paired, no connection,
  *                      budget used up); then it rests off.
@@ -649,7 +651,11 @@ function drawnUnit(surface, x, y, pointer, context) {
 const ACT_TAGS = new Set(['BUTTON', 'SUMMARY', 'LABEL', 'INPUT', 'TEXTAREA', 'SELECT', 'OPTION']);
 /** The app's own control a finger lands on, or null: a button, a link, a field, a tab, a fold, a menu item, anything
  * with a button role or a click action of its own. A word of running text that the app makes a door (the reader's
- * words, data-action inline among the sentence's own Japanese) is text, not a control: held on, it speaks. */
+ * words, data-action inline among the sentence's own Japanese) is text, not a control: held on, it speaks.
+ * So is a word of running text that opens a lookup (.japanese-lookup-word, modules/dictionary.mjs): a span, not a
+ * button, with no role and its click listener added in script, so nothing below names it a control. That is meant: it
+ * is a word of its sentence, like a reader's word, and held on a finger's tap on it speaks (the review's fr1 census
+ * found no other kind of listener-bearing Japanese outside the controls named here). */
 export function appControlAt(target, { display = defaultDisplay } = {}) {
   const start = target?.nodeType === 3 ? parentOf(target) : target;
   const shown = (el) => { try { return display(el); } catch { return defaultDisplay(el); } };
