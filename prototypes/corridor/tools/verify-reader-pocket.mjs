@@ -281,6 +281,7 @@ async function freshPage({ media = 'wrap' } = {}) {
 async function openArticle(s, { start = true } = {}) {
   const { page, press } = s;
   await s.ready();
+  await s.module(); // a fresh load: the handle on the app's module is taken again
   await press('#ginga-symbol'); await press('.bubble-shelf');
   await page.locator('.shelf-open').first().waitFor();
   await press(page.locator('.shelf-open').first());
@@ -373,7 +374,17 @@ const CASES = {
       const shown = await look(s.page);
       await shot(s.page, 'hidden-read-shown-again');
       if (shown.bar !== 'playing' && shown.bar !== 'loading') problems.push(`shown again mid-read, the bar says ${shown.bar || 'nothing'}`);
-      if (shown.first < 0 || shown.first !== shown.litFirst) problems.push(`shown again, the lit sentence (word ${shown.first}) is not the one being read (word ${shown.litFirst})`);
+      // the lit sentence is the one being read, judged from what is not the light (the review's C3): the text of the clip
+      // the element is on, the texts asked of the stand-in (the one being read is among the last three: at most two
+      // ahead), and the sentence the bar reports (checked at the end, once it is known no sentence was passed over)
+      const askedNow = (await recordOf(s.page)).asked.filter((a) => a.key === key).map((a) => letters(a.text));
+      const L = letters(shown.litText), T = letters(shown.playingText);
+      const readAt = T ? askedNow.lastIndexOf(T) : -1;
+      if (shown.first < 0 || !T || !(L === T || (L.includes(T) && L.length - T.length <= 6)))
+        problems.push(`shown again, the lit words ("${shown.litText.slice(0, 24)}") are not the sentence being played ("${String(shown.playingText).slice(0, 24)}")`);
+      if (T && (readAt < 0 || readAt < askedNow.length - 3))
+        problems.push(`shown again, the sentence being played is ${readAt < 0 ? 'not one the stand-in was asked for' : `request ${readAt + 1} of ${askedNow.length}: more than two behind the last asked`}`);
+      const midReported = { reported: shown.reported, readAt };
       if (shown.first >= 0 && !shown.inView) problems.push('shown again, the page is not at the sentence being read');
       if (shown.first >= 0 && !shown.bands) problems.push('shown again, no band is drawn on the sentence being read');
       if (!shown.audio || shown.audio.paused) problems.push(`shown again, the audio is ${JSON.stringify(shown.audio)}`);
@@ -389,7 +400,10 @@ const CASES = {
       if (end.bar !== 'idle') problems.push(`the read did not end: the bar says ${end.bar}`);
       if (after.bar !== 'idle' || after.first >= 0 || after.silent) problems.push(`after the end the bar says ${after.bar}${after.silent ? ` (${after.silent})` : ''}, word ${after.first} lit`);
       if (after.media?.title !== null) problems.push(`after the end the lock screen still shows ${JSON.stringify(after.media)}`);
-      detail = `${judged.lit} sentences lit (${judged.hiddenLit} while hidden), ${judged.asked} asked, last word ${last}; shown mid-read at word ${shown.first} (${shown.bar}); timer callbacks held while hidden: ${rec.heldCount}`;
+      // every sentence was asked (none passed over as not Japanese): the bar's sentence number is the request's place
+      if (judged.asked === judged.lit && midReported.reported !== midReported.readAt)
+        problems.push(`shown again, the bar reports sentence ${midReported.reported} while sentence ${midReported.readAt} is being played`);
+      detail = `${judged.lit} sentences lit (${judged.hiddenLit} while hidden), ${judged.asked} asked, last word ${last}; shown mid-read at word ${shown.first} (${shown.bar}), playing request ${midReported.readAt + 1}, the bar's sentence ${midReported.reported}; timer callbacks held while hidden: ${rec.heldCount}`;
     } catch (error) { problems.push(`the case broke: ${String(error.message).split('\n')[0].slice(0, 200)}`); }
     if (s.errors.length) problems.push(`page errors: ${s.errors.join(' | ')}`);
     if (s.offMachine.length) problems.push(`tried to leave this machine: ${s.offMachine.join(', ')}`);
@@ -710,6 +724,60 @@ const CASES = {
       if (!target) throw new Error('no word in view for the ear');
       if (phone) await page.touchscreen.tap(target.x, target.y); else await page.mouse.click(target.x, target.y);
       await endsWhenHidden('the ear\'s voice', () => page.evaluate(() => document.documentElement.dataset.ear === 'speaking' || document.documentElement.hasAttribute('data-ear-voice')));
+      // fix round 1 (the review's C4; its yield-hide is the model): a read he started had given way to the word box's 音,
+      // or to the ear, and then the page is hidden: that voice ends, and the read goes on, the bar and the lock screen
+      // saying playing; shown again, the lit sentence is the one being read
+      for (const by of ['word box', 'ear']) {
+        where = `a read under the ${by}, hidden`;
+        clipSeconds = 1.2;
+        // each in a page of its own: in a page that has read the article before, its clips come from the device's store
+        // and the probe cannot follow them back to the text they were asked for
+        const t = by === 'word box' ? s : await freshPage({ media: 'wrap' });
+        const { page, press } = t;
+        await openArticle(t);
+        const title = await articleTitle(page);
+        await until(t, (x) => x.lit >= 2, 15000);
+        clipSeconds = 3; // the word or the ear's sentence speaks long enough to be hidden while it speaks
+        const voice = by === 'word box'
+          ? () => page.evaluate(() => !!document.querySelector('#mini-voice.is-speaking'))
+          : () => page.evaluate(() => document.documentElement.dataset.ear === 'speaking' || document.documentElement.hasAttribute('data-ear-voice'));
+        if (by === 'word box') {
+          const n = await page.evaluate(() => [...document.querySelectorAll('.reader .tok.content')].findIndex((t) => /^\p{Script=Han}{2,}$/u.test(t.textContent.trim())));
+          const word = page.locator('.reader .tok.content').nth(Math.max(0, n));
+          await word.scrollIntoViewIfNeeded();
+          for (let i = 0; i < 4 && !(await page.locator('#mini').isVisible().catch(() => false)); i += 1) { await press(word); await wait(450); }
+          await page.locator('#mini-voice').waitFor();
+          await press('#mini-voice');
+        } else {
+          await press(page.locator('.ear-mark').first());
+          await page.waitForFunction(() => document.documentElement.dataset.ear === 'armed', null, { timeout: 3000 });
+          const spot = await page.evaluate(() => {
+            const t = [...document.querySelectorAll('#reader .tok.content')].find((x) => { const r = x.getBoundingClientRect(); return r.top > 160 && r.bottom < innerHeight - 220 && /\p{Script=Han}/u.test(x.textContent); });
+            const r = t?.getBoundingClientRect();
+            return r ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : null;
+          });
+          if (!spot) throw new Error('no word in view for the ear');
+          if (phone) await page.touchscreen.tap(spot.x, spot.y); else await page.mouse.click(spot.x, spot.y);
+        }
+        const started = await (async () => { const t = Date.now(); while (Date.now() - t < 8000) { if (await voice()) return true; await wait(100); } return false; })();
+        if (!started) { problems.push(`${by}: it never spoke over the read (the step did not reach its point)`); if (t !== s) await t.close(); continue; }
+        const litBefore = (await look(page)).lit;
+        await hide(t, true);
+        clipSeconds = 1.2;
+        const went = await until(t, (x) => x.lit >= litBefore + 2, 20000);
+        const still = await voice();
+        if (still) problems.push(`${by}: hidden, its voice did not end`);
+        if (went.lit < litBefore + 2) problems.push(`${by}: hidden, the read that had given way to it did not go on: ${went.lit - litBefore} sentence(s) lit after the hide, bar ${went.bar}, lock screen ${JSON.stringify(went.media)}`);
+        if (went.bar !== 'playing' && went.bar !== 'loading') problems.push(`${by}: hidden, the bar says ${went.bar}`);
+        if (went.media?.title !== title || went.media?.state !== 'playing') problems.push(`${by}: hidden, the lock screen shows ${JSON.stringify(went.media)} (the article is "${title}")`);
+        await hide(t, false);
+        await wait(800);
+        const shownAgain = await look(page);
+        const L = letters(shownAgain.litText), T = letters(shownAgain.playingText);
+        if (shownAgain.first < 0 || !T || !(L === T || (L.includes(T) && L.length - T.length <= 6))) problems.push(`${by}: shown again, the lit words ("${shownAgain.litText.slice(0, 20)}") are not the sentence being played ("${String(shownAgain.playingText).slice(0, 20)}")`);
+        steps.push(`a read under the ${by}, hidden: ${went.lit - litBefore} more sentence(s), bar ${went.bar}, lock screen ${went.media?.state}`);
+        if (t !== s) { if (t.errors.length) problems.push(`${by}: page errors: ${t.errors.join(' | ')}`); await t.close(); }
+      }
     } catch (error) {
       problems.push(`the case broke at "${where}": ${String(error.message).split('\n')[0].slice(0, 200)}`);
       await shot(page, `hidden-others-broke`);
