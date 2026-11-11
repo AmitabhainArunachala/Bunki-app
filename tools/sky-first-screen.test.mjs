@@ -200,7 +200,7 @@ beforeAll(async () => {
   origin = `http://127.0.0.1:${server.address().port}`;
 }, 300000);
 afterAll(async () => {
-  await new Promise((done) => server?.close(done));
+  if (server) await new Promise((done) => server.close(done));
   // the run folder resolveCorridorEvidence() made for this file goes (an assembled site is about 0.5 GB);
   // KAIRO_KEEP_TEST_EVIDENCE=1 keeps it, and a supplied KAIRO_EVIDENCE_DIR is never removed
   if (!process.env.KAIRO_EVIDENCE_DIR && process.env.KAIRO_KEEP_TEST_EVIDENCE !== '1')
