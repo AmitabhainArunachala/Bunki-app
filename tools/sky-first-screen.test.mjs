@@ -1,4 +1,4 @@
-/* global process, console, URL, document, window, navigator, getComputedStyle, localStorage, HTMLMediaElement, HTMLCanvasElement */
+/* global process, console, URL, document, window, navigator, getComputedStyle, localStorage, requestAnimationFrame, HTMLMediaElement, HTMLCanvasElement */
 /** The new first screen, 宙 (the sky), is part of the app (John, 2026-11-11 14:58: "lock it in, merge it if it is
  * ready").
  *
@@ -233,8 +233,9 @@ describe.each(engines)('the sky (宙) as the app’s first screen, in %s', (engi
     before = [],
     refuse = null,
     until = ['mounted', 'off', 'stood-down', 'gave-back'],
+    device = {},
   } = {}) {
-    const context = await browser.newContext({ viewport, deviceScaleFactor: 1 });
+    const context = await browser.newContext({ viewport, deviceScaleFactor: 1, ...device });
     await context.addInitScript(silence);
     for (const [script, arg] of before) await context.addInitScript(script, arg);
     if (refuse) await context.route(`**/${refuse}`, (route) => route.abort());
@@ -380,7 +381,7 @@ describe.each(engines)('the sky (宙) as the app’s first screen, in %s', (engi
               centre: items.filter((i) => i.role === 'centre').map((i) => i.text),
               hubs: items.filter((i) => i.role === 'hub').map((i) => i.text),
               family: items
-                .filter((i) => i.role === 'fam')
+                .filter((i) => i.role === 'fam' && i.kind === 'w')
                 .map((i) => ({ text: i.text, hub: i.from?.text, marks: i.marks })),
               sem: items.filter((i) => i.role === 'sem').map((i) => ({ text: i.text, ...note(i) })),
             };
@@ -543,6 +544,392 @@ describe.each(engines)('the sky (宙) as the app’s first screen, in %s', (engi
       }, 90000);
     });
 
+  // ---------------------------------------------------------------- version 3 (fixed copy sky-v3-*, 2026-11-11)
+  /** A word on the screen that the page can be asked about: in the middle, clear, large, one the app's door holds. */
+  function pickWord() {
+    const W = window.__SKY__.W;
+    const box = window.__SKY__.wrap.getBoundingClientRect();
+    const door = window.__BUNKI_OPEN_ENTRY;
+    const pick = W.hits
+      .map((i) => ({
+        i,
+        x: W.vis[i * 5],
+        y: W.vis[i * 5 + 1],
+        size: W.vis[i * 5 + 2],
+        alpha: W.vis[i * 5 + 3],
+      }))
+      .filter(
+        (h) =>
+          h.alpha > 0.5 &&
+          h.size >= 16 &&
+          h.x > box.width * 0.2 &&
+          h.x < box.width * 0.8 &&
+          h.y > box.height * 0.2 &&
+          h.y < box.height * 0.65 &&
+          door.has('word', W.D.words[h.i][0]),
+      )
+      .sort((a, b) => b.size - a.size)[0];
+    return pick ? { x: box.left + pick.x, y: box.top + pick.y } : null;
+  }
+  const isOpen = () => {
+    const web = window.__SKY__.W.web;
+    return web.isOpen() && web.cur.kind === 'w' && window.__SKY__.W.D.words[web.cur.id][0];
+  };
+
+  describe.skipIf(!draws)(
+    'version 3: the context, the orders, the view from above, a word opened, grammar, the keyboard',
+    () => {
+      let session;
+      beforeAll(async () => {
+        session = await open({ query: '?sky=1', until: ['mounted'] });
+        await waitDrawn(session.page);
+        await session.page.waitForFunction(() => !!window.__SKY__.W.gram?.length, null, {
+          timeout: 30000,
+        });
+      }, 90000);
+      afterAll(async () => {
+        await session?.context.close();
+      });
+
+      test('the three context files are joined and handed to the engine; each grammar pattern is shown once', async () => {
+        const seen = await session.page.evaluate(() => {
+          const W = window.__SKY__.W;
+          return {
+            context: window.__bunkiSkyApp.context,
+            sentences: W.ctx.sentences.length,
+            articles: W.ctx.articles.length,
+            rows: W.ctx.grammar.length,
+            twins: W.ctx.grammarTwin.filter((t) => t >= 0).length,
+            shown: W.gram.length,
+            patterns: new Set(W.gram.map((g) => g.p)).size,
+          };
+        });
+        expect(seen).toMatchObject({
+          context: 'joined',
+          sentences: 12713,
+          articles: 156,
+          rows: 244,
+        });
+        expect(seen.shown).toBe(seen.rows - seen.twins);
+        expect(seen.patterns).toBe(seen.shown);
+      }, 30000);
+
+      test("orders: setLens('sound' | 'mean' | 'read' | 'form') sets W.lens and names parts of the ring; in 'mean' the first realms are the largest radicals", async () => {
+        const { page } = session;
+        for (const lens of ['sound', 'mean', 'read', 'form']) {
+          const seen = await page.evaluate((name) => {
+            const api = window.__SKY__;
+            api.setLens(name);
+            const W = api.W;
+            const sectors = W.sectors();
+            const out = { lens: W.lens, sectors: sectors.length };
+            if (name === 'mean') {
+              out.sizes = W.mOrder.realms.map((r) => r.words.length);
+              out.first = sectors.slice(0, 3).map((s) => s.name);
+              out.largest = W.mOrder.realms.slice(0, 3).map((r) => r.ch);
+            }
+            return out;
+          }, lens);
+          expect(seen.lens).toBe(lens);
+          expect(seen.sectors, `${lens}: parts of the ring`).toBeGreaterThan(0);
+          if (lens === 'mean') {
+            for (let i = 1; i < seen.sizes.length; i += 1)
+              expect(seen.sizes[i]).toBeLessThanOrEqual(seen.sizes[i - 1]);
+            expect(seen.sizes[0]).toBeGreaterThan(seen.sizes[3]);
+            expect(seen.first).toEqual(seen.largest);
+          }
+          await page.waitForFunction(() => (window.__SKY__.W.morph?.x ?? 1) >= 1, null, {
+            timeout: 15000,
+          });
+        }
+      }, 90000);
+
+      test('from above: overview(true) rises over the whole ring; a vertical drag tilts it within 0.44 to 1.32; a touch on the ring comes down there', async () => {
+        const { page } = session;
+        await page.evaluate(() => window.__SKY__.overview(true));
+        await page.waitForFunction(() => window.__SKY__.S.view.over >= 0.95, null, {
+          timeout: 15000,
+        });
+        const at = await page.evaluate(() => {
+          const r = window.__SKY__.wrap.getBoundingClientRect();
+          return { x: r.left + r.width * 0.45, y: r.top + r.height * 0.4 };
+        });
+        const phi = () => page.evaluate(() => window.__SKY__.W.tgt.phi);
+        const drag = async (from, to) => {
+          await page.mouse.move(at.x, at.y + from);
+          await page.mouse.down();
+          await page.mouse.move(at.x, at.y + to, { steps: 24 });
+          await page.mouse.up();
+        };
+        const phi0 = await phi();
+        await drag(0, 120);
+        const phi1 = await phi();
+        expect(phi1).toBeGreaterThan(phi0 + 0.1);
+        await drag(-200, 450);
+        const phi2 = await phi();
+        await drag(400, -300);
+        const phi3 = await phi();
+        for (const p of [phi1, phi2, phi3]) {
+          expect(p).toBeGreaterThanOrEqual(0.44);
+          expect(p).toBeLessThanOrEqual(1.32);
+        }
+        expect(phi2).toBe(1.32);
+        expect(phi3).toBeLessThan(phi2);
+        await page.waitForFunction(() => window.__SKY__.S.view.over >= 0.95);
+        // a point of the ring as the eye sees it from above, away from where the eye stands now
+        const ring = await page.evaluate(() => {
+          const { S, W, wrap } = window.__SKY__;
+          const v = S.view;
+          const r = wrap.getBoundingClientRect();
+          for (const d of [1.0, -1.0, 1.5, -1.5, 0.7, -0.7, 2.2, -2.2]) {
+            const th = W.cam.a + d;
+            const q = [4200 * Math.sin(th) - v.eye[0], -v.eye[1], 4200 * Math.cos(th) - v.eye[2]];
+            const dot = (u) => q[0] * u[0] + q[1] * u[1] + q[2] * u[2];
+            const z = dot(v.fwd);
+            if (z < 50) continue;
+            const x = S.px + (dot(v.right) * S.F) / z;
+            const y = S.py - (dot(v.up) * S.F) / z;
+            if (x > 80 && x < S.W - 160 && y > 80 && y < S.H - 180)
+              return { x: r.left + x, y: r.top + y, th, a: W.cam.a };
+          }
+          return null;
+        });
+        expect(ring, 'a point of the ring is in view from above').toBeTruthy();
+        await page.mouse.click(ring.x, ring.y);
+        await page.waitForFunction(() => window.__SKY__.S.view.over < 0.02, null, {
+          timeout: 15000,
+        });
+        const turned = await page.evaluate((a0) => {
+          let d = (window.__SKY__.W.cam.a - a0) % (2 * Math.PI);
+          if (d > Math.PI) d -= 2 * Math.PI;
+          if (d < -Math.PI) d += 2 * Math.PI;
+          return d;
+        }, ring.a);
+        expect(Math.abs(turned), 'the eye came down at another place of the ring').toBeGreaterThan(
+          0.3,
+        );
+      }, 90000);
+
+      test('a word opens: its centre and characters are items, its notes wait 0.3 s, its stored sentence shows; Escape closes, and nothing is left leaving after 3 s', async () => {
+        const { page } = session;
+        const word = await page.evaluate(() => {
+          const W = window.__SKY__.W;
+          const has = (w) => !!W.ctx.wordSent[W.byWord.get(w)];
+          return has('学校') ? '学校' : null;
+        });
+        expect(word, '学校 has a stored sentence').toBe('学校');
+        const early = await page.evaluate(
+          (w) =>
+            new Promise((done) => {
+              const { S, W } = window.__SKY__;
+              window.__SKY__.open(w);
+              const t0 = W.web.cur.t0;
+              let most = 0;
+              let samples = 0;
+              const look = () => {
+                if (S.t - t0 >= 0.3) {
+                  done({ most, samples });
+                  return;
+                }
+                for (const cap of W.web.caps)
+                  most = Math.max(most, Number(cap.node.style.opacity || 0));
+                samples += 1;
+                requestAnimationFrame(look);
+              };
+              requestAnimationFrame(look);
+            }),
+          word,
+        );
+        expect(early.samples).toBeGreaterThan(2);
+        expect(early.most, 'no note shows before 0.3 s').toBe(0);
+        await page.waitForTimeout(2500);
+        const seen = await page.evaluate(() => {
+          const W = window.__SKY__.W;
+          const items = [...W.web.items.values()];
+          const shown = (n) => Number(n.style.opacity || 0) > 0.5;
+          const sentence = W.web.caps
+            .map((c) => c.node)
+            .filter(shown)
+            .map((n) => n.querySelector('.cx'))
+            .find(Boolean);
+          return {
+            centre: items.filter((i) => i.role === 'centre').map((i) => i.text),
+            hubs: items.filter((i) => i.role === 'hub').map((i) => i.text),
+            sentence: sentence ? sentence.textContent : null,
+            marked: sentence?.querySelector('b')?.textContent ?? null,
+          };
+        });
+        expect(seen.centre).toEqual([word]);
+        expect(seen.hubs).toEqual(['学', '校']);
+        expect(seen.sentence, 'a stored sentence holding the word').toBeTruthy();
+        expect(seen.marked).toBe(word);
+        await page.keyboard.press('Escape');
+        await page.waitForFunction(() => !window.__SKY__.W.web.isOpen(), null, { timeout: 5000 });
+        await page.waitForTimeout(3000);
+        expect(await page.evaluate(() => window.__SKY__.W.web.leaving.length)).toBe(0);
+      }, 60000);
+
+      test('grammar: a look upward shows the patterns; a touch on one opens it with its stored examples', async () => {
+        const { page } = session;
+        await page.evaluate(() => window.__SKY__.W.lookUp());
+        await page.waitForTimeout(2600);
+        const hit = await page.evaluate(() => {
+          const { W, wrap } = window.__SKY__;
+          const r = wrap.getBoundingClientRect();
+          const h = W.gHits
+            .filter(
+              (g) =>
+                g.i >= 0 && g.x > 200 && g.x < r.width - 300 && g.y > 140 && g.y < r.height * 0.6,
+            )
+            .sort((a, b) => Math.abs(a.x - r.width / 2) - Math.abs(b.x - r.width / 2))[0];
+          return h ? { x: r.left + h.x, y: r.top + h.y } : null;
+        });
+        expect(hit, 'a pattern in view overhead').toBeTruthy();
+        await page.mouse.click(hit.x, hit.y);
+        await page.waitForFunction(() => window.__SKY__.W.web.cur?.kind === 'g', null, {
+          timeout: 5000,
+        });
+        await page.waitForTimeout(2000);
+        const seen = await page.evaluate(() => {
+          const W = window.__SKY__.W;
+          const g = W.gramById.get(W.web.cur.id);
+          const centre = [...W.web.items.values()].find((i) => i.role === 'centre');
+          const shown = W.web.caps
+            .map((c) => c.node)
+            .filter((n) => n.classList.contains('gram'))
+            .flatMap((n) => [...n.querySelectorAll('.exj')].map((x) => x.textContent));
+          return {
+            pattern: g.p,
+            centre: centre.text,
+            stored: g.ex.slice(0, 2).map((e) => e[0]),
+            shown,
+          };
+        });
+        expect(seen.centre).toBe(seen.pattern);
+        expect(seen.stored.length).toBeGreaterThan(0);
+        expect(seen.shown).toEqual(seen.stored);
+        await page.keyboard.press('Escape');
+        await page.waitForFunction(() => !window.__SKY__.W.web.isOpen(), null, { timeout: 5000 });
+        await page.evaluate(() => window.__SKY__.resetView());
+      }, 60000);
+
+      test('the keyboard: Tab from the page reaches a word of the sky; Enter opens it, the live region says so; Escape closes', async () => {
+        const { page } = session;
+        await page.waitForTimeout(1500);
+        await page.evaluate(() => document.activeElement?.blur?.());
+        let reached = null;
+        for (let n = 0; n < 90 && !reached; n += 1) {
+          await page.keyboard.press('Tab');
+          reached = await page.evaluate(() => {
+            const host = document.getElementById('bunki-sky');
+            const inner = host?.shadowRoot?.activeElement;
+            return document.activeElement === host && inner?.closest('.reach')
+              ? inner.textContent
+              : null;
+          });
+        }
+        expect(reached, 'Tab reaches a .reach button in the sky').toBeTruthy();
+        await page.keyboard.press('Enter');
+        await page.waitForFunction(() => window.__SKY__.W.web.isOpen(), null, { timeout: 5000 });
+        const said = await page.evaluate(
+          () => document.getElementById('bunki-sky').shadowRoot.querySelector('.say').textContent,
+        );
+        expect(said.trim().length, 'the live region has text').toBeGreaterThan(0);
+        await page.keyboard.press('Escape');
+        await page.waitForFunction(() => !window.__SKY__.W.web.isOpen(), null, { timeout: 5000 });
+      }, 90000);
+
+      test('no page errors through all of the above', () => {
+        expect(session.errors).toEqual([]);
+      });
+    },
+  );
+
+  describe.skipIf(!draws)('version 3, reduced motion (the browser asks for less motion)', () => {
+    test('S.reduced; the eye stands still for a second; an order change is instant; no page errors', async () => {
+      const { context, page, errors } = await open({
+        query: '?sky=1',
+        until: ['mounted'],
+        device: { reducedMotion: 'reduce' },
+      });
+      try {
+        await waitDrawn(page);
+        expect(await page.evaluate(() => window.__SKY__.S.reduced)).toBe(true);
+        const a0 = await page.evaluate(() => window.__SKY__.W.cam.a);
+        await page.waitForTimeout(1000);
+        expect(await page.evaluate(() => window.__SKY__.W.cam.a)).toBe(a0);
+        const changed = await page.evaluate(() => {
+          const W = window.__SKY__.W;
+          window.__SKY__.setLens('sound');
+          let same = true;
+          for (let i = 0; i < W.P.length; i += 1) if (W.P[i] !== W.Pb[i]) same = false;
+          return { lens: W.lens, morph: W.morph.x, same };
+        });
+        expect(changed).toEqual({ lens: 'sound', morph: 1, same: true });
+        expect(errors).toEqual([]);
+      } finally {
+        await context.close();
+      }
+    }, 90000);
+  });
+
+  describe.skipIf(!draws)(
+    'version 3 on a phone, 390 x 844 (the window that kept the old screen until now)',
+    () => {
+      test('it mounts, a touched word opens, the view from above works, no page errors', async () => {
+        const { context, page, errors } = await open({
+          query: '?sky=1',
+          viewport: { width: 390, height: 844 },
+          until: ['mounted'],
+          device: { deviceScaleFactor: 2, hasTouch: true },
+        });
+        try {
+          await waitDrawn(page);
+          let word = null;
+          for (let attempt = 0; attempt < 10 && !word; attempt += 1) {
+            const target = await page.evaluate(pickWord);
+            if (!target) {
+              await page.waitForTimeout(400);
+              continue;
+            }
+            await page.touchscreen.tap(target.x, target.y);
+            word = await page.waitForFunction(isOpen, null, { timeout: 2500 }).then(
+              (handle) => handle.jsonValue(),
+              () => null,
+            );
+          }
+          expect(word, 'a touched word opens on the phone').toBeTruthy();
+          await page.waitForTimeout(1500);
+          const laid = await page.evaluate(() => {
+            const W = window.__SKY__.W;
+            const r = window.__SKY__.wrap.getBoundingClientRect();
+            const items = [...W.web.items.values()].filter((i) => i.kind !== 'a' && i.born);
+            return {
+              items: items.length,
+              inside: items.filter(
+                (i) => i.x.x >= 0 && i.x.x <= r.width && i.y.x >= 0 && i.y.x <= r.height,
+              ).length,
+            };
+          });
+          expect(laid.items).toBeGreaterThan(2);
+          expect(laid.inside, 'what opened stands on the phone screen').toBe(laid.items);
+          await page.evaluate(() => window.__SKY__.close());
+          await page.evaluate(() => window.__SKY__.overview(true));
+          await page.waitForFunction(() => window.__SKY__.S.view.over >= 0.95, null, {
+            timeout: 15000,
+          });
+          await page.evaluate(() => window.__SKY__.overview(false));
+          await page.waitForFunction(() => window.__SKY__.S.view.over < 0.02, null, {
+            timeout: 15000,
+          });
+          expect(errors).toEqual([]);
+        } finally {
+          await context.close();
+        }
+      }, 90000);
+    },
+  );
+
   describe('the old first screen stays, or comes back whole', () => {
     const hideDriver = () =>
       Object.defineProperty(navigator, 'webdriver', { get: () => false, configurable: true });
@@ -614,12 +1001,6 @@ describe.each(engines)('the sky (宙) as the app’s first screen, in %s', (engi
         name: 'the stored switch bunki-live:sky = 0',
         options: { before: [[hideDriver], [switchedOff]] },
         want: { state: 'off', reason: 'asked' },
-        quiet: true,
-      },
-      {
-        name: 'a window 390 wide',
-        options: { query: '?sky=1', viewport: { width: 390, height: 844 } },
-        want: { state: 'off', reason: 'narrow' },
         quiet: true,
       },
       {
