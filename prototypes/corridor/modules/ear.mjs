@@ -171,7 +171,8 @@ const CONTROL_TAGS = new Set(['BUTTON', 'A', 'SUMMARY', 'LABEL']);
 const CONTROL_ROLES = new Set(['button', 'link', 'option', 'menuitem', 'menuitemradio', 'menuitemcheckbox', 'tab', 'treeitem', 'switch', 'checkbox', 'radio']);
 const INLINE_TAGS = new Set(['RT', 'RP', 'RB', 'SPAN', 'A', 'B', 'I', 'EM', 'STRONG', 'RUBY', 'RB', 'SMALL', 'MARK', 'ABBR', 'CODE', 'SUB', 'SUP', 'TIME', 'Q', 'CITE', 'U', 'S', 'BR', 'WBR', 'BDI', 'BDO', 'DFN', 'KBD', 'SAMP', 'VAR', 'DATA', 'LABEL', 'IMG', 'FONT']);
 const NO_HOST = new Set(['BODY', 'HTML']);
-const READING_CLASS = /(?:^|[\s_-])(?:yomi|read|reading|kana|furigana)(?:$|[\s_-])/i;
+/** A class that names a reading: yomi, read, reading, kana, furigana, or a short name ending in -r (Today's dw-r). */
+const READING_CLASS = /(?:^|[\s_-])(?:yomi|read|reading|kana|furigana)(?:$|[\s_-])|-r(?:$|\s)/i;
 const KANA_ONLY = /^[\p{Script=Hiragana}\p{Script=Katakana}ー・･·、，,\s]+$/u;
 const JAPANESE_LETTER = /[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}]/u;
 const JAPANESE_LETTERS = /[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}]/gu;
@@ -185,7 +186,7 @@ const classText = (node) => (typeof node?.className === 'string' ? node.classNam
 const parentOf = (node) => node?.parentNode && node.parentNode.nodeType === 1 ? node.parentNode : null;
 const inside = (outer, node) => { for (let at = node; at; at = at.parentNode) if (at === outer) return true; return false; };
 const hasJapanese = (text) => JAPANESE_LETTER.test(String(text || ''));
-const defaultDisplay = (node) => node?.style?.display || (INLINE_TAGS.has(tagOf(node)) ? 'inline' : 'block');
+const defaultDisplay = (node) => node?.style?.display || (INLINE_TAGS.has(tagOf(node)) ? 'inline' : tagOf(node) === 'BUTTON' ? 'inline-block' : 'block');
 /** Inline in the flow of a line: the reader's word spans are inline-flex boxes, and still words of one sentence. */
 const isInlineDisplay = (value) => /^(inline(-block|-flex|-grid|-table)?|contents|ruby|ruby-base|ruby-text)$/.test(String(value || ''));
 const isControl = (node) => CONTROL_TAGS.has(tagOf(node)) || CONTROL_ROLES.has(String(attr(node, 'role') || '').toLowerCase());
@@ -425,7 +426,11 @@ export function findUnit(target, { offset = null, display = defaultDisplay, cont
   let control = null, outer = null;
   for (let at = start; at && !NO_HOST.has(tagOf(at)); at = parentOf(at)) if (isControl(at)) { control = at; break; }
   if (control) {
-    outer = blockOf(parentOf(control), display);
+    // a control is a word of running text only when it stands in the line (inline-level) among Japanese of its own
+    // block; a button that stands as a block or a flex row (Today's word, a search row) is its own unit
+    let shown = '';
+    try { shown = display(control); } catch { shown = defaultDisplay(control); }
+    outer = isInlineDisplay(shown) ? blockOf(parentOf(control), display) : null;
     const around = outer ? joined(textNodes(outer, { controls: false })) : '';
     if (!outer || (around.match(JAPANESE_LETTERS) || []).length < 2) return elementUnit(control, context, target);
   }

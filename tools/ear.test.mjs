@@ -830,6 +830,35 @@ describe('the app’s own controls are never read as text', () => {
     }
   });
 
+  it('a word button that stands as a block beside running text is its own unit, sent as its reading', () => {
+    // Today's word: a flex button holding 成熟 and せいじゅく, beside a line about its radical
+    const word = h(
+      'button',
+      { class: 'dw-word', display: 'flex' },
+      h(
+        'span',
+        { class: 'dw-glyph' },
+        h('span', { class: 'dw-k' }, '成'),
+        h('span', { class: 'dw-k' }, '熟'),
+      ),
+      h('span', { class: 'dw-r' }, 'せいじゅく'),
+    );
+    const day = h(
+      'div',
+      { class: 'today-dayword', display: 'flex' },
+      word,
+      h('p', {}, 'The radical of 成 is 戈 (ほこづくり).'),
+    );
+    page(day);
+    for (const where of ['成', 'せいじゅく']) {
+      const u = findUnit(textIn(word, where), { offset: 0, context });
+      expect(u.kind).toBe('element');
+      expect(u.element).toBe(word);
+      expect(said(u)).toEqual(['せいじゅく']);
+      expect(u.voiceKey).toBe('word:成熟');
+    }
+  });
+
   it('a control tapped inside running text reads the sentence around it, without the control', () => {
     const p = h('p', {}, '今日は', h('button', { class: 'voice-say' }, '聞く'), '雨が降る。');
     page(p);
