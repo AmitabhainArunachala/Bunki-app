@@ -110,7 +110,8 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
     cache.set(key, clip);
     while (cache.size > CACHE_CLIPS) cache.delete(cache.keys().next().value);
   };
-  const aborted = (signal) => { if (signal?.aborted) { const error = new Error('aborted'); error.name = 'AbortError'; throw error; } };
+  const abortError = () => { const error = new Error('aborted'); error.name = 'AbortError'; return error; };
+  const aborted = (signal) => { if (signal?.aborted) throw abortError(); };
   /** No voice for this sentence: the read ends, and `code` is the reason the screen will give. */
   const silence = (code) => Object.assign(new Error(code), { code });
   /** A store's fault is never the read's: what it throws is swallowed. */
@@ -168,35 +169,92 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
     for (const piece of pieces) { aborted(signal); parts.push(await fromServer(piece.text, voiceKey, signal)); }
     return { parts, source: 'server' };
   }
+  async function serverClip(text, voiceKey, signal) {
+    try {
+      return await fromServer(text, voiceKey, signal);
+    } catch (error) {
+      if (error?.code !== 'speech-input-too-large') throw error;
+      return splitFurther(text, voiceKey, signal);
+    }
+  }
+
+  /* A sentence on its way to the server is one request, whoever asks for it while it travels (the re-check's R1, fr2).
+   * Each asker waits for it, leaves it (its read stopped: a request nobody waits for and nobody kept is aborted, as
+   * before) or gives it up (its read was cut by the ear's own time limit: the request runs on, and its clip is kept so
+   * the next ask plays at once, the review's K3). Asking again while it travels joins it: never a second request.
+   * A request its only asker gave up on belongs to nobody: however it ends, nothing is recorded against the server,
+   * nothing is told and nothing else is paused. While anyone waits, its end is theirs, as it always was: a refusal is
+   * recorded once and each asker's read ends with it. One end is not the joiner's: the time a request ran out of, or the
+   * connection it lost, was its sender's; when the sender no longer waits, whoever joined it asks once on its own, now
+   * that the first is over, and that request's end is theirs (otherwise the ear's lost request ends the read that
+   * reached its sentence: John, 2026-11-11, only pause stops a read). */
+  const flights = new Map();   // `${voiceKey}|${text}` → { key, askers, sender, kept, stop }
+  const ON_THE_WAY = new Set(['voice-timeout', 'network-failed']);
+  function launch(key, text, voiceKey) {
+    const flight = { key, askers: new Set(), sender: null, kept: false, stop: new AbortController() };
+    flights.set(key, flight);
+    serverClip(text, voiceKey, flight.stop.signal).then(
+      (clip) => land(flight, { clip }),
+      (error) => land(flight, error?.name === 'AbortError' ? { aborted: true }
+        : { code: typeof error?.code === 'string' ? error.code : 'speak-failed', figures: error?.figures }));
+    return flight;
+  }
+  function join(flight, signal, owner) {
+    return new Promise((resolve, reject) => {
+      const asker = { resolve };
+      flight.sender ||= asker;
+      flight.askers.add(asker);
+      const leave = () => {
+        if (!flight.askers.delete(asker)) return;
+        if (owner.keep) flight.kept = true;
+        else if (!flight.askers.size && !flight.kept) {
+          if (flights.get(flight.key) === flight) flights.delete(flight.key);
+          flight.stop.abort();
+        }
+        reject(abortError());
+      };
+      if (signal?.aborted) leave(); else signal?.addEventListener('abort', leave, { once: true });
+    });
+  }
+  function land(flight, outcome) {
+    if (flights.get(flight.key) === flight) flights.delete(flight.key);
+    const waiting = [...flight.askers];
+    flight.askers.clear();
+    if (outcome.clip || !waiting.length) { for (const asker of waiting) asker.resolve(outcome); return; }
+    if (outcome.aborted || (ON_THE_WAY.has(outcome.code) && !waiting.includes(flight.sender))) {
+      for (const asker of waiting) asker.resolve({ again: true });
+      return;
+    }
+    // a ceiling the refusal names in its own words is kept beside the budget (the server's figure, never Bunki's)
+    const figures = outcome.figures && typeof outcome.figures === 'object' ? outcome.figures : {};
+    for (const name of ['dayCapCents', 'capCents']) if (Number.isSafeInteger(figures[name])) limits = { ...(limits || {}), [name]: figures[name] };
+    note(outcome.code);
+    tell();
+    for (const asker of waiting) asker.resolve(outcome);
+  }
+
   /** The clip for one sentence: its recording, or the server's clip; otherwise the read ends with the reason. */
-  async function clipFor(sentence, voiceKey, signal) {
+  async function clipFor(sentence, voiceKey, signal, owner) {
     if (sentence.recorded && typeof recorded === 'function') return { recorded: sentence.recorded, source: 'recorded' };
     let text = '';
     try { text = normaliseSpeechText(sentence.text); } catch { /* not text */ }
     // what the server would refuse as not Japanese (a line of Latin letters in an article) is passed over, never sent
     if (!text || !isJapaneseEnough(text)) return { skip: true, source: 'none', reason: 'not-japanese' };
-    // a clip this device has kept plays at once, with no request, online or offline
-    const kept = await keptClip(`${voiceKey}|${text}`, signal);
+    const key = `${voiceKey}|${text}`;
+    // a clip this device has kept plays at once, with no request, online or offline (B3): this page's memory, then the store
+    const kept = await keptClip(key, signal);
     if (kept) return kept;
-    let why = serverSkips(voiceKey);
-    if (why) throw silence(why);
-    try {
-      return await fromServer(text, voiceKey, signal);
-    } catch (error) {
-      if (error?.name === 'AbortError') throw error;
-      why = typeof error?.code === 'string' ? error.code : 'speak-failed';
-      if (why === 'speech-input-too-large') {
-        try { return await splitFurther(text, voiceKey, signal); } catch (again) {
-          if (again?.name === 'AbortError') throw again;
-          why = typeof again?.code === 'string' ? again.code : 'speak-failed';
-        }
-      }
-      // a ceiling the refusal names in its own words is kept beside the budget (the server's figure, never Bunki's)
-      const figures = error?.figures && typeof error.figures === 'object' ? error.figures : {};
-      for (const name of ['dayCapCents', 'capCents']) if (Number.isSafeInteger(figures[name])) limits = { ...(limits || {}), [name]: figures[name] };
-      note(why);
-      tell();
-      throw silence(why);
+    for (;;) {
+      aborted(signal);
+      // a sentence this page already holds never needs the server: a block on the server (a refusal of another turn a
+      // moment ago, the minute's limit) does not silence it (the review's B3: a refusal belongs to the turn refused)
+      const near = cache.get(key);
+      if (near) return near;
+      const why = serverSkips(voiceKey);
+      if (why) throw silence(why);
+      const answer = await join(flights.get(key) || launch(key, text, voiceKey), signal, owner);
+      if (answer.clip) return answer.clip;
+      if (!answer.again) throw silence(answer.code);
     }
   }
 
@@ -250,9 +308,10 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
     onSource = null, stopRecorded = null, rateRecorded = null } = {}) {
     stop();
     try { quiet(); } catch { /* another lane's fault */ }
-    const owner = { queue: null, stopRecorded, rateRecorded, onSource, ended: false, recordedStops: 0 };
+    // the queue gives up a sentence still on its way when the read ends (`keep`: after cut(), see join above)
+    const owner = { queue: null, stopRecorded, rateRecorded, onSource, ended: false, recordedStops: 0, keep: false };
     const queue = createSpeechQueue({
-      fetchClip: (sentence, _index, signal) => clipFor(sentence, voiceKey, signal),
+      fetchClip: (sentence, _index, signal) => clipFor(sentence, voiceKey, signal, owner),
       player: composite(owner),
       prefetch, gapMs, sleep,
       onSentence: (index) => { if (session === owner || index < 0) onSentence(index); },
@@ -267,6 +326,10 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
       pause: () => queue.pause(),
       resume: () => queue.resume(),
       stop: () => { queue.stop(); },
+      /** The read ends now, as stop() does, but a sentence already asked of the server is still received and kept, so
+       * asking for it again plays at once (the ear's own time limit, the review's K3); if nobody else asks for it, its
+       * end, whatever it is, is nobody's (the re-check's R1). */
+      cut: () => { owner.keep = true; queue.stop(); },
       jump: (index) => { if (!owner.ended) queue.jump(index); },
       setRate: (next) => queue.setRate(next),
       get state() { return queue.state; },

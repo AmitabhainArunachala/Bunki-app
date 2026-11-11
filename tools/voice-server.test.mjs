@@ -754,6 +754,38 @@ describe('the seam: one behaviour per error code, and never a stand-in voice', (
     expect(r.calls.speak).toHaveLength(2);
     expect(r.calls.deviceSaid).toHaveLength(0);
   });
+  it('a clip this page already holds is served while the server is blocked; a new one is not asked (the review’s B3)', async () => {
+    const r = rig();
+    const first = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: S3.slice(0, 1),
+      prefetch: 0,
+    });
+    expect(first.states.at(-1)).toBe('done');
+    expect(r.calls.speak).toHaveLength(1);
+    r.fail({ code: 'request-rate-limit', status: 429 });
+    const refused = await run(r.seam, {
+      voiceKey: 'word:ear',
+      sentences: S3.slice(1, 2),
+      prefetch: 0,
+    });
+    expect(refused.states.at(-1)).toBe('error:request-rate-limit');
+    expect(r.calls.speak).toHaveLength(2);
+    const again = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: S3.slice(0, 1),
+      prefetch: 0,
+    });
+    expect(again.states.at(-1)).toBe('done');
+    expect(r.calls.speak).toHaveLength(2);
+    const fresh = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: S3.slice(2),
+      prefetch: 0,
+    });
+    expect(fresh.states.at(-1)).toBe('error:request-rate-limit');
+    expect(r.calls.speak).toHaveLength(2);
+  });
   it.each([
     ['404 not-in-release', { code: 'not-in-release', status: 404 }, 'not-in-release'],
     ['402 budget-exhausted', { code: 'budget-exhausted', status: 402 }, 'budget-exhausted'],
@@ -935,6 +967,336 @@ describe('the seam: one sound at a time, and the controls', () => {
     await run(r.seam, { voiceKey: 'word:猫', sentences: [{ text: 'ねこ' }] });
     expect(r.calls.speak).toHaveLength(1);
     expect(r.calls.played).toHaveLength(2);
+  });
+});
+
+describe('the ear’s own time limit cuts a read, and a sentence on its way is kept (the review’s K3)', () => {
+  /** A server that answers only when told to, and a client that gives up its request when the read aborts it. */
+  function slowRig() {
+    const asked = [];
+    const played = [];
+    const client = {
+      configured: () => true,
+      ready: async () => {},
+      paired: () => true,
+      scope: () => ({ installation: 'bunki-' + 'b'.repeat(32) }),
+      speak({ text, voiceKey, signal }) {
+        return new Promise((resolve, reject) => {
+          const row = { text, voiceKey, aborted: false };
+          asked.push(row);
+          row.answer = () =>
+            resolve({
+              bytes: new Uint8Array([1]),
+              contentType: 'audio/wav',
+              voiceId: 'v',
+              inputKey: `${voiceKey}|${text}`,
+            });
+          signal?.addEventListener('abort', () => {
+            row.aborted = true;
+            reject(Object.assign(new Error('aborted'), { name: 'AbortError' }));
+          });
+        });
+      },
+      async budget() {
+        return { capCents: 2500, spentCents: 0, reservedCents: 0, remainingCents: 2500 };
+      },
+    };
+    const player = {
+      play: (clip) => (played.push(clip.inputKey), Promise.resolve('ended')),
+      stop() {},
+    };
+    const seam = createVoiceSeam({ client, player, sleep: async () => {} });
+    return { seam, asked, played };
+  }
+  const tick = () => new Promise((done) => setTimeout(done, 5));
+  it('cut: the read ends at once; the sentence arrives later and the next read plays it without asking again', async () => {
+    const { seam, asked, played } = slowRig();
+    const states = [];
+    const first = seam.read({
+      voiceKey: 'word:猫',
+      sentences: [{ text: 'ねこ' }],
+      onState: (s) => states.push(s),
+    });
+    await tick();
+    expect(asked).toHaveLength(1);
+    expect(typeof first.cut).toBe('function');
+    first.cut();
+    await tick();
+    expect(states.at(-1)).toBe('stopped');
+    expect(asked[0].aborted).toBe(false);
+    asked[0].answer();
+    await tick();
+    expect(played).toEqual([]);
+    const { states: again } = await run(seam, {
+      voiceKey: 'word:猫',
+      sentences: [{ text: 'ねこ' }],
+    });
+    expect(again.at(-1)).toBe('done');
+    expect(asked).toHaveLength(1);
+    expect(played).toEqual(['word:猫|ねこ']);
+  });
+  it('stop (any other end): the request is given up and nothing is kept, as before', async () => {
+    const { seam, asked } = slowRig();
+    const first = seam.read({ voiceKey: 'word:猫', sentences: [{ text: 'ねこ' }] });
+    await tick();
+    first.stop();
+    await tick();
+    expect(asked[0].aborted).toBe(true);
+    const second = seam.read({ voiceKey: 'word:猫', sentences: [{ text: 'ねこ' }] });
+    await tick();
+    expect(asked).toHaveLength(2);
+    second.stop();
+  });
+});
+
+describe('a request its only asker gave up on belongs to nobody (the re-check’s R1, fr2)', () => {
+  /** A server that answers or refuses each request only when told to; time the test moves; every status told. */
+  function heldRig() {
+    const asked = [];
+    const played = [];
+    const told = [];
+    let clock = Date.parse('2026-11-10T12:00:00Z');
+    const client = {
+      configured: () => true,
+      ready: async () => {},
+      paired: () => true,
+      scope: () => ({ installation: 'bunki-' + 'b'.repeat(32) }),
+      speak({ text, voiceKey, signal }) {
+        return new Promise((resolve, reject) => {
+          const row = { text, voiceKey, aborted: false, over: false };
+          asked.push(row);
+          row.answer = () => {
+            row.over = true;
+            resolve({
+              bytes: new Uint8Array([1]),
+              contentType: 'audio/wav',
+              voiceId: 'v',
+              inputKey: `${voiceKey}|${text}`,
+            });
+          };
+          row.fail = (code, status = 0) => {
+            row.over = true;
+            reject(new VoiceError(code, status));
+          };
+          signal?.addEventListener('abort', () => {
+            row.aborted = true;
+            row.over = true;
+            reject(Object.assign(new Error('aborted'), { name: 'AbortError' }));
+          });
+        });
+      },
+      async budget() {
+        return { capCents: 2500, spentCents: 0, reservedCents: 0, remainingCents: 2500 };
+      },
+    };
+    const player = {
+      play: (clip) => (played.push(clip.inputKey), Promise.resolve('ended')),
+      stop() {},
+    };
+    const seam = createVoiceSeam({
+      client,
+      player,
+      sleep: async () => {},
+      now: () => clock,
+      onStatus: (status) => told.push(status),
+    });
+    return { seam, asked, played, told, advance: (ms) => (clock += ms) };
+  }
+  const tick = () => new Promise((done) => setTimeout(done, 5));
+  const KEY = 'article:a1';
+  const [X, Y] = S3;
+  /** A read and how it ends, as 'state' or 'state:code'. */
+  function reading(seam, options) {
+    const states = [];
+    const session = seam.read({
+      voiceKey: KEY,
+      prefetch: 0,
+      ...options,
+      onState: (state, code) => states.push(code ? `${state}:${code}` : state),
+    });
+    return { states, session };
+  }
+  /** The ear's read of X, cut by its own time limit while X is on its way. */
+  async function givenUp(r) {
+    const { session } = reading(r.seam, { sentences: [X] });
+    await tick();
+    expect(r.asked).toHaveLength(1);
+    session.cut();
+    await tick();
+    expect(r.asked[0].aborted).toBe(false);
+    return r.asked[0];
+  }
+  /** Every request still open ends with `code` (a 503 is asked once more after 2 s, and that one ends too). */
+  async function failOpen(r, code) {
+    for (let round = 0; round < 3; round += 1) {
+      for (const row of r.asked.filter((one) => !one.over)) row.fail(code);
+      await tick();
+    }
+  }
+  const STATUS = {
+    'voice-timeout': 0,
+    'network-failed': 0,
+    'day-budget': 429,
+    'request-rate-limit': 429,
+    'budget-exhausted': 402,
+    'not-in-release': 404,
+    'authentication-required': 401,
+    'voice-unavailable': 503,
+    'speak-failed': 500,
+  };
+
+  it.each(Object.keys(STATUS))(
+    'given up, then %s: nothing recorded against the server, nothing told, the next sentence is asked as before',
+    async (code) => {
+      const r = heldRig();
+      await givenUp(r);
+      const told = r.told.length;
+      await failOpen(r, code);
+      expect(r.told.length).toBe(told);
+      expect(r.seam.cannot(KEY)).toBe(null);
+      expect(r.seam.status()).toMatchObject({ blocked: null, pairAgain: false, silent: null });
+      const next = reading(r.seam, { sentences: [Y] });
+      await tick();
+      expect(r.asked.at(-1).text).toBe(Y.text);
+      r.asked.at(-1).answer();
+      await tick();
+      expect(next.states.at(-1)).toBe('done');
+      expect(r.played).toEqual([`${KEY}|${Y.text}`]);
+    },
+  );
+  it('given up, then answered: the clip is kept, and asking for it again plays at once', async () => {
+    const r = heldRig();
+    const row = await givenUp(r);
+    row.answer();
+    await tick();
+    expect(r.played).toEqual([]);
+    const again = reading(r.seam, { sentences: [X] });
+    await tick();
+    expect(again.states.at(-1)).toBe('done');
+    expect(r.asked).toHaveLength(1);
+    expect(r.played).toEqual([`${KEY}|${X.text}`]);
+  });
+  it('a request someone still waits for keeps today’s behaviour: a timeout is told and holds the server for 15 s', async () => {
+    const r = heldRig();
+    const read = reading(r.seam, { sentences: [X] });
+    await tick();
+    const told = r.told.length;
+    r.asked[0].fail('voice-timeout');
+    await tick();
+    expect(read.states.at(-1)).toBe('error:voice-timeout');
+    expect(r.told.length).toBeGreaterThan(told);
+    expect(r.seam.cannot(KEY)).toBe('network-failed');
+    r.advance(15_001);
+    expect(r.seam.cannot(KEY)).toBe(null);
+  });
+  it('tapped again while it is on its way: no second request, and it plays when it arrives', async () => {
+    const r = heldRig();
+    const row = await givenUp(r);
+    const again = reading(r.seam, { sentences: [X] });
+    await tick();
+    expect(r.asked).toHaveLength(1);
+    row.answer();
+    await tick();
+    expect(again.states.at(-1)).toBe('done');
+    expect(r.played).toEqual([`${KEY}|${X.text}`]);
+  });
+  it('joined after the give-up and then refused: the refusal is the joiner’s, recorded once and shown', async () => {
+    const r = heldRig();
+    const row = await givenUp(r);
+    const again = reading(r.seam, { sentences: [X] });
+    await tick();
+    const told = r.told.length;
+    row.fail('day-budget', 429);
+    await tick();
+    expect(r.asked).toHaveLength(1);
+    expect(again.states.at(-1)).toBe('error:day-budget');
+    expect(r.seam.cannot(KEY)).toBe('day-budget');
+    // one status for the refusal, and the read's own end, which names it
+    const after = r.told.slice(told);
+    expect(after.filter((status) => !status.silent)).toHaveLength(1);
+    expect(after.filter((status) => status.silent?.reason === 'day-budget')).toHaveLength(1);
+  });
+  it('joined after the give-up, and the first asker’s request runs out of time on the way: not the joiner’s; it asks once on its own', async () => {
+    const r = heldRig();
+    const row = await givenUp(r);
+    const again = reading(r.seam, { sentences: [X] });
+    await tick();
+    const told = r.told.length;
+    row.fail('voice-timeout');
+    await tick();
+    expect(r.asked).toHaveLength(2);
+    expect(r.told.length).toBe(told);
+    expect(r.seam.cannot(KEY)).toBe(null);
+    r.asked[1].answer();
+    await tick();
+    expect(again.states.at(-1)).toBe('done');
+    expect(r.played).toEqual([`${KEY}|${X.text}`]);
+  });
+  it('…and when its own request runs out of time too, that one is its own: recorded once, told, and the read ends', async () => {
+    const r = heldRig();
+    const row = await givenUp(r);
+    const again = reading(r.seam, { sentences: [X] });
+    await tick();
+    row.fail('voice-timeout');
+    await tick();
+    const told = r.told.length;
+    r.asked[1].fail('voice-timeout');
+    await tick();
+    expect(again.states.at(-1)).toBe('error:voice-timeout');
+    expect(r.seam.cannot(KEY)).toBe('network-failed');
+    expect(r.told.slice(told).filter((status) => !status.silent)).toHaveLength(1);
+    expect(r.asked).toHaveLength(2);
+  });
+  it('the read reaches the sentence the ear gave up on (fr2-k3-late-block): it joins, and the lost request never ends the read', async () => {
+    const r = heldRig();
+    const ear = reading(r.seam, { sentences: [S3[2]] });
+    await tick();
+    ear.session.cut();
+    await tick();
+    const article = reading(r.seam, { sentences: S3, prefetch: 2 });
+    await tick();
+    expect(r.asked.map((row) => row.text)).toEqual([S3[2].text, S3[0].text, S3[1].text]);
+    r.asked[1].answer();
+    r.asked[2].answer();
+    await tick();
+    expect(article.states).not.toContain('done');
+    r.asked[0].fail('voice-timeout');
+    await tick();
+    expect(r.seam.cannot(KEY)).toBe(null);
+    expect(r.asked).toHaveLength(4);
+    r.asked[3].answer();
+    await tick();
+    expect(article.states.at(-1)).toBe('done');
+    expect(r.played).toEqual(S3.map((s) => `${KEY}|${s.text}`));
+    expect(r.seam.status().blocked).toBe(null);
+  });
+  it('a joiner that stops leaves the kept request on its way, and its answer is kept', async () => {
+    const r = heldRig();
+    const row = await givenUp(r);
+    const again = reading(r.seam, { sentences: [X] });
+    await tick();
+    again.session.stop();
+    await tick();
+    expect(row.aborted).toBe(false);
+    row.answer();
+    await tick();
+    const third = reading(r.seam, { sentences: [X] });
+    await tick();
+    expect(third.states.at(-1)).toBe('done');
+    expect(r.asked).toHaveLength(1);
+  });
+  it('the only asker stops: the request is aborted and a new ask sends a new one (nobody joins an aborted request)', async () => {
+    const r = heldRig();
+    const first = reading(r.seam, { sentences: [X] });
+    await tick();
+    first.session.stop();
+    const second = reading(r.seam, { sentences: [X] });
+    await tick();
+    expect(r.asked[0].aborted).toBe(true);
+    expect(r.asked).toHaveLength(2);
+    r.asked[1].answer();
+    await tick();
+    expect(second.states.at(-1)).toBe('done');
   });
 });
 

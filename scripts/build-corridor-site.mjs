@@ -91,6 +91,7 @@ try {
     'modules/worlds.mjs',
     'modules/voice.mjs',
     'modules/voice-layer.mjs',
+    'modules/ear.mjs',
     'modules/voice-bands.mjs',
     'modules/card-audio.mjs',
     'modules/save-places.mjs',

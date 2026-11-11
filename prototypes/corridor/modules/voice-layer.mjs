@@ -17,6 +17,7 @@
 import { createAudioPlayer } from './nihongo-speech/audio/speech-player.mjs';
 import { isJapaneseEnough, normaliseSpeechText, splitSentences } from './nihongo-speech/audio/speech-text.mjs';
 import { answerReads, deckFrontVoice, reviewFrontVoice } from './card-audio.mjs';
+import { EAR_SLOW, installEar } from './ear.mjs';
 import { baseBoxes, createBands } from './voice-bands.mjs';
 import { createClipStore, createIndexedDbClipStorage } from './voice-clip-store.mjs';
 import { createDeviceTokenStore, createVoiceClient } from './voice-client.mjs';
@@ -313,7 +314,9 @@ export function installVoiceLayer(host) {
     return mine.session;
   }
   /** The word the read yielded to has ended (said, failed, or stopped): the read takes itself up again at the same
-   * sentence, unless he paused it meanwhile, left the article, or another sound took over. */
+   * sentence, unless he paused it meanwhile, left the article, or another sound took over. A refusal is the word's own:
+   * the read goes on (the seam serves the clips it already holds). A read he had paused stays paused, on the bar too:
+   * it waits at its sentence for his play. */
   function yieldEnded(word) {
     const y = reader.yielding;
     if (!y || y.word !== word) return;
@@ -321,7 +324,10 @@ export function installVoiceLayer(host) {
     reader.index = y.index;
     const p = host.passage();
     if (y.resume && p && p.id === y.pid && !seam.active()) startReader(p, y.index);
-    else host.refreshListenRow?.();
+    else {
+      if (!y.resume && p && p.id === y.pid) reader.yielding = { pid: y.pid, index: y.index, resume: false, word: null };
+      host.refreshListenRow?.();
+    }
   }
 
   /* ------------------------------------------------------------------ the article reader */
@@ -365,6 +371,12 @@ export function installVoiceLayer(host) {
     return true;
   }
   const stale = (sentence) => sentence.els.length > 0 && !sentence.els.some((node) => node.isConnected);
+  /** The bands on the lit sentence: the lit words, their paragraph, the article and the page are watched, so a change of
+   * size of any of them moves the light (the ear's branch). */
+  const paintLit = () => readBands.show(() => baseBoxes(litWords()), '', () => {
+    const words = litWords();
+    return [...words, ...words.map((node) => node.closest('p') || node.parentElement), doc.getElementById('reader'), doc.body];
+  });
   function showSentence(index) {
     clearSpeaking();
     if (!reader.sentences[index]) return;
@@ -373,7 +385,7 @@ export function installVoiceLayer(host) {
     if (!first) return;
     // "no highlighting at all" (Settings, 筆と声): nothing is drawn over the text; the words still carry data-speaking
     // (state, no style), the read goes on in its order, and the page follows the sentence below
-    if (highlighting()) readBands.show(() => baseBoxes(litWords()));
+    if (highlighting()) paintLit();
     if (coverOpen()) return;
     const box = first.getBoundingClientRect();
     if (box.top < 96 || box.bottom > view.innerHeight - 140)
@@ -421,6 +433,8 @@ export function installVoiceLayer(host) {
     return sentences;
   }
   const readerActive = () => !!reader.session && !reader.session.ended;
+  /** How long the ear waits for its sentence to begin sounding before it gives up on it (the client's own wait is 20 s). */
+  const EAR_FIRST_CLIP_MS = 8000;
   const readerBusy = () => readerActive() || !!reader.yielding;
   let readSessions = 0;
   function startReader(p, from = 0) {
@@ -524,7 +538,8 @@ export function installVoiceLayer(host) {
       // read yields to it (speakFrom); otherwise it has ended (leaving the article, Back, another passage)
       const yielding = reader.yielding;
       reader.yielding = null;
-      if (session && !session.ended && ['loading', 'playing'].includes(session.state)) reader.justStopped = { pid: reader.pid, index: reader.index };
+      if (session && !session.ended && ['loading', 'playing', 'paused'].includes(session.state))
+        reader.justStopped = { pid: reader.pid, index: reader.index, paused: session.state === 'paused' };
       else if (yielding) reader.justStopped = { pid: yielding.pid, index: yielding.index, paused: !yielding.resume };
       if (reader.justStopped) Promise.resolve().then(() => { reader.justStopped = null; });
       reader.session = null;
@@ -792,6 +807,60 @@ export function installVoiceLayer(host) {
       row.append(control);
     }).catch(() => { /* no reading to be had: no control */ });
   }
+  /* ------------------------------------------------------------------ the ear (modules/ear.mjs, 2026-11-11) */
+  // one gesture that speaks any Japanese on any screen, through this seam and nothing else; its mark stands beside every
+  // gate. A sentence of an article keeps the article's key, and text a listen mark reads keeps that mark's key.
+  const markKey = (node) => {
+    const at = node?.closest?.('[data-voice-host]');
+    const rule = at && RULES.find((one) => one.id === at.dataset.voiceHost);
+    try { return rule ? rule.read(at)?.voiceKey || null : null; } catch { return null; }
+  };
+  const ear = installEar({
+    doc, tx,
+    speak: (unit, done) => {
+      // the ear is a deliberate act: a read of the article yields to it and takes itself up again at the same sentence
+      // when the ear's voice ends, as it does for the word box's 音 (John, 2026-11-11: only pause stops a read); a read he
+      // had paused yields too and stays paused
+      const state = readerActive() ? reader.session.state : null;
+      const yieldFrom = ['loading', 'playing', 'paused'].includes(state) ? { pid: reader.pid, index: reader.index, paused: state === 'paused' }
+        : reader.yielding ? { pid: reader.yielding.pid, index: reader.yielding.index, paused: !reader.yielding.resume } : null;
+      const marker = {};
+      if (yieldFrom) { readerApi.stop(); reader.justStopped = null; }
+      prime();
+      // the ear's own limit: a sentence that has not begun to sound in EAR_FIRST_CLIP_MS is given up (the struck mark and
+      // the plain line, which says the voice took too long: "busy" only when the server said so), and the read it took
+      // the place of goes on; giving up is the ear's alone and blocks no one. The cut lets the sentence on its way
+      // arrive and be kept, so the next tap on it plays at once (the review's K3)
+      let timedOut = false;
+      const limit = view.setTimeout(() => { if (!marker.over && !marker.sounding) { timedOut = true; session.cut(); } }, EAR_FIRST_CLIP_MS);
+      const session = seam.read({ sentences: unit.sentences, voiceKey: unit.voiceKey, prefetch: unit.sentences.length > 1 ? 2 : 0, gapMs: 260, rate: reader.rate,
+        onState: (now, code) => {
+          if (now === 'playing') { marker.sounding = true; view.clearTimeout(limit); }
+          if (!['done', 'stopped', 'error'].includes(now)) return;
+          view.clearTimeout(limit);
+          marker.over = true;
+          if (timedOut && now === 'stopped') done('error', EAR_SLOW); else done(now, code);
+          yieldEnded(marker);
+        } });
+      if (yieldFrom) {
+        reader.yielding = { pid: yieldFrom.pid, index: yieldFrom.index, resume: !yieldFrom.paused, word: marker };
+        // a read refused at once ended before the read could yield to it: the read takes itself up again now
+        if (marker.over) yieldEnded(marker);
+        else host.refreshListenRow?.();
+      }
+      return session;
+    },
+    plain: { line: (reason) => silenceLine(reason), words: (reason) => reasonWords(reason) },
+    cannot: (unit) => seam.cannot(unit.voiceKey),
+    context: () => ({ view: host.view(), keyFor: markKey,
+      articleOf: (node) => (host.view() === 'reader' && node?.closest?.('#reader') ? host.passage()?.id || null : null),
+      // a study card's front (a review card before its answer, a deck card on its question side)
+      cardFront: (node) => {
+        if (node?.closest?.('.review-face')) return !host.cardRevealed();
+        const card = node?.closest?.('.kp .kp-card');
+        return !!card && !card.querySelector('.kp-answer');
+      } }),
+  });
   let scan = 0;
   const rescan = () => {
     if (scan) return;
@@ -800,6 +869,7 @@ export function installVoiceLayer(host) {
       mountMarks(doc);
       // the page drawn again (a word looked up, a box opened, a dial moved): the bands follow the sentence's new words
       if (readBands.shown) readBands.refresh();
+      ear.refresh();
       // A read belongs to its control. The control drawn again (the same one, of the same word) takes the read over;
       // when the control's screen has gone, the read ends.
       if (spoken?.button && !spoken.button.isConnected) {
@@ -807,6 +877,7 @@ export function installVoiceLayer(host) {
         if (again) spoken.adopt(again);
         else { const gone = spoken; spoken = null; if (gone.session && !gone.session.ended) gone.session.stop(); }
       }
+      ear.mount();
     }, 60);
   };
   new doc.defaultView.MutationObserver(rescan).observe(doc.body, { childList: true, subtree: true });
@@ -965,7 +1036,7 @@ export function installVoiceLayer(host) {
      * sentence under way is lit again. */
     highlightChanged() {
       if (!highlighting()) { readBands.hide(); return; }
-      if (reader.lit >= 0 && readerActive()) readBands.show(() => baseBoxes(litWords()));
+      if (reader.lit >= 0 && readerActive()) paintLit();
     },
     /** The quote chip: the excerpt through the seam when the article has no recording of it. With no voice the reason
      * stands in one line beside the chip. */

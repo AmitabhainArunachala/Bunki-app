@@ -4,6 +4,8 @@
 // over the screen it stands on; the bar holds Back, the gate, search and the language (and Save in an article); the cap
 // and the bookmark leave it while the tabs show, the bookmark's count moving to the Today tab; the look moves into the
 // menu; the language is one compact control; Back says Back everywhere; the trail row waits for a second step.
+// The ear (B2, 2026-11-11) stands beside every bar's gate, as the design lead placed it (design/ear), and clears the gate
+// like every other control.
 // Served from the source folder at 390x844 (touch) and 1440x900, Chromium only, silent (--mute-audio, media muted,
 // speech stubbed). Run: node --test prototypes/corridor/tools/gate-everywhere.test.mjs
 import assert from 'node:assert/strict';
@@ -31,14 +33,14 @@ const withLang = (address, lang) => (lang === 'bi' ? address : `${address}${addr
 const ARTICLE = 'wikinews:1403';
 // [name, address, the bar's visible controls in order]
 const SCREENS = [
-  ['today', '?room=tray', ['back', 'bar-gate', 'chrome-search', 'lang']],
-  ['read', '?room=shelf', ['back', 'bar-gate', 'chrome-search', 'lang']],
-  ['article', `?read=${ARTICLE}`, ['back', 'bar-gate', 'chrome-search', 'lang', 'chrome-keep']],
-  ['learn', '?room=dojo', ['back', 'bar-gate', 'chrome-search', 'lang']],
-  ['words', '?room=search', ['back', 'bar-gate', 'lang']],
-  ['me', '?room=me', ['back', 'bar-gate', 'chrome-search', 'lang']],
-  ['word', `?read=${ARTICLE}&word=開催`, ['sheet-back', 'sheet-gate', 'sheet-search', 'sheet-take']],
-  ['kanji', '?room=shelf&kanji=産', ['sheet-back', 'sheet-gate', 'sheet-search', 'sheet-take']],
+  ['today', '?room=tray', ['back', 'bar-gate', 'ear-spot', 'chrome-search', 'lang']],
+  ['read', '?room=shelf', ['back', 'bar-gate', 'ear-spot', 'chrome-search', 'lang']],
+  ['article', `?read=${ARTICLE}`, ['back', 'bar-gate', 'ear-spot', 'chrome-search', 'lang', 'chrome-keep']],
+  ['learn', '?room=dojo', ['back', 'bar-gate', 'ear-spot', 'chrome-search', 'lang']],
+  ['words', '?room=search', ['back', 'bar-gate', 'ear-spot', 'lang']],
+  ['me', '?room=me', ['back', 'bar-gate', 'ear-spot', 'chrome-search', 'lang']],
+  ['word', `?read=${ARTICLE}&word=開催`, ['sheet-back', 'sheet-gate', 'ear-spot', 'sheet-search', 'sheet-take']],
+  ['kanji', '?room=shelf&kanji=産', ['sheet-back', 'sheet-gate', 'ear-spot', 'sheet-search', 'sheet-take']],
 ];
 
 let server, base, browser;
@@ -430,10 +432,10 @@ test('Back says Back in every bar, and the trail row waits for a second step', a
 // (its name stays on a wide screen, short of the gate); the panel lists its own five places and, since Review is one of
 // them, does not say Review twice.
 const PLACES_SCREENS = [
-  ['review', '?room=dojo', ['back', 'bar-gate', 'chrome-search']],
-  ['bookshelf', '?room=shelf', ['back', 'bar-gate', 'chrome-search']],
-  ['article', `?read=${ARTICLE}`, ['back', 'bar-gate', 'chrome-search', 'chrome-keep']],
-  ['kanji', '?room=shelf&kanji=産', ['sheet-back', 'sheet-gate', 'sheet-search', 'sheet-take']],
+  ['review', '?room=dojo', ['back', 'bar-gate', 'ear-spot', 'chrome-search']],
+  ['bookshelf', '?room=shelf', ['back', 'bar-gate', 'ear-spot', 'chrome-search']],
+  ['article', `?read=${ARTICLE}`, ['back', 'bar-gate', 'ear-spot', 'chrome-search', 'chrome-keep']],
+  ['kanji', '?room=shelf&kanji=産', ['sheet-back', 'sheet-gate', 'ear-spot', 'sheet-search', 'sheet-take']],
 ];
 test('the layout under test: the gate on every bar, the same panel with its own places, the place kept', async () => {
   for (const [device, size] of [['1728', WIDE], ['390', PHONE]]) {

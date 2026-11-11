@@ -84,8 +84,10 @@ export function rangeBoxes(range) {
 }
 
 /** A painter of bands. `layerClass` and `bandClass` dress the layer and its bands (position, colour, stacking); each band
- * carries data-state. The bands are placed in the layer's own coordinates, so a layer that scrolls with the page carries
- * them with it, and every scroll, resize and refresh() measures them again. */
+ * carries data-state. The bands are placed in the layer's own coordinates and measured again whenever what they light
+ * may have moved: a scroll, a resize, refresh() (the page drawn again), and a change of size of the elements `watch()`
+ * names (the lit words, their block, the page), whatever made it (a style that grows the text, a reading shown above a
+ * word). While no light is on the painter keeps no listener, observer or frame. */
 export function createBands(doc, { layerClass = 'voice-bands', bandClass = 'voice-band', attributes = {} } = {}) {
   const view = doc.defaultView;
   const layer = doc.createElement('div');
@@ -93,11 +95,33 @@ export function createBands(doc, { layerClass = 'voice-bands', bandClass = 'voic
   layer.setAttribute('aria-hidden', 'true');
   layer.setAttribute('data-voice-bands', '');
   for (const [name, value] of Object.entries(attributes)) layer.setAttribute(name, value);
-  let source = null, state = '', frame = 0;
+  let source = null, watch = null, state = '', frame = 0, listening = false;
+  let observer = null, watched = [];
+  const sizes = new WeakMap();
+  function observe() {
+    if (!watch || typeof view.ResizeObserver !== 'function') return;
+    let next = [];
+    try { next = [...new Set((watch() || []).filter((el) => el?.nodeType === 1 && el.isConnected))]; } catch { next = []; }
+    if (next.length === watched.length && next.every((el, i) => el === watched[i])) return;
+    observer ||= new view.ResizeObserver((entries) => {
+      let changed = false;
+      for (const entry of entries) {
+        const box = entry.contentRect, was = sizes.get(entry.target);
+        sizes.set(entry.target, { width: box.width, height: box.height });
+        // the first report of an element is its size now; a later one is a change
+        if (was && (Math.abs(was.width - box.width) > 0.25 || Math.abs(was.height - box.height) > 0.25)) changed = true;
+      }
+      if (changed) follow();
+    });
+    observer.disconnect();
+    watched = next;
+    for (const el of next) observer.observe(el);
+  }
   function paint() {
     let boxes = [];
     try { boxes = source ? source() : []; } catch { boxes = []; }
     const lines = bandLines(boxes);
+    observe();
     if (!lines.length) { layer.replaceChildren(); return lines; }
     if (!layer.isConnected) doc.body.append(layer);
     const origin = layer.getBoundingClientRect();
@@ -110,18 +134,31 @@ export function createBands(doc, { layerClass = 'voice-bands', bandClass = 'voic
     });
     return lines;
   }
-  const follow = () => {
+  function follow() {
     if (!source || frame) return;
     frame = view.requestAnimationFrame(() => { frame = 0; paint(); });
+  }
+  const listen = (on) => {
+    if (on === listening) return;
+    listening = on;
+    const method = on ? 'addEventListener' : 'removeEventListener';
+    view[method]('scroll', follow, { capture: true, passive: true });
+    view[method]('resize', follow, { passive: true });
   };
-  view.addEventListener('scroll', follow, { capture: true, passive: true });
-  view.addEventListener('resize', follow, { passive: true });
   return {
-    /** Paint the boxes `next()` returns (it is asked again at every repaint), with `nextState` on every band. */
-    show(next, nextState = '') { source = next; state = nextState; return paint(); },
+    /** Paint the boxes `next()` returns (it is asked again at every repaint), with `nextState` on every band; `watchNext()`
+     * names the elements whose change of size moves them. */
+    show(next, nextState = '', watchNext = null) { source = next; state = nextState; watch = watchNext; listen(true); return paint(); },
     /** The page was drawn again: measure again. */
     refresh() { return source ? paint() : []; },
-    hide() { source = null; state = ''; layer.replaceChildren(); },
+    hide() {
+      source = null; watch = null; state = '';
+      layer.replaceChildren();
+      listen(false);
+      if (frame) { view.cancelAnimationFrame(frame); frame = 0; }
+      observer?.disconnect();
+      watched = [];
+    },
     get shown() { return !!source; },
     layer,
   };

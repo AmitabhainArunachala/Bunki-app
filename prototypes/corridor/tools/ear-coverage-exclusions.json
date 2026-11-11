@@ -1,0 +1,15 @@
+{
+  "about": "The ear's coverage walk (ear-coverage-walk.mjs) requires a speakable unit for every visible Japanese text node of the learner walk. Only these places are left out, each for a reason no ear can change. The walk refuses to run if this list holds anything but these two.",
+  "entries": [
+    {
+      "name": "the galaxy's canvas-drawn labels",
+      "selector": "#drift-layer canvas",
+      "why": "The galaxy draws some of its labels into a canvas. A canvas holds pixels, not text: there is no node for the ear to find. The galaxy's own word buttons are DOM and are walked."
+    },
+    {
+      "name": "the Nihongo study frame",
+      "selector": "iframe[data-shared-study-frame]",
+      "why": "Nihongo Study's own page inside Bunki, a separate document with its own voice path (the speech team's N2 ear)."
+    }
+  ]
+}
