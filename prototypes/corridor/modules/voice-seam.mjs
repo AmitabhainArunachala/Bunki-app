@@ -13,7 +13,7 @@
  *
  * The contract's error codes each have one behaviour here (speech team's contract v1):
  *   401 authentication-required   the client drops the token; the status says "pair again"
- *   402 budget-exhausted          the server is not asked again (the $25 total is used)
+ *   402 budget-exhausted          the server is not asked again (its total budget is used; the server sets the amount)
  *   404 not-in-release            the server is not asked again on this page (its dynamic mode is off)
  *   413 speech-input-too-large    the sentence is split further and its parts are asked for in order
  *   429 day-budget                the server is not asked again until 00:00 UTC
@@ -79,6 +79,7 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
   let off = null;            // 'not-in-release' | 'budget-exhausted' for this page
   let pairAgain = false;
   let budget = null;
+  let limits = null;         // { dayCapCents?, capCents? } a refusal named in its own words
   let playing = null;        // the clip the player is on
 
   const blocked = () => {
@@ -97,6 +98,7 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
     last: { ...last },
     silent: silent ? { ...silent } : null,
     budget: budget ? { ...budget } : null,
+    limits: limits ? { ...limits } : null,
   });
   const tell = () => { try { onStatus(status()); } catch { /* a listener's own fault */ } };
 
@@ -206,6 +208,9 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
           why = typeof again?.code === 'string' ? again.code : 'speak-failed';
         }
       }
+      // a ceiling the refusal names in its own words is kept beside the budget (the server's figure, never Bunki's)
+      const figures = error?.figures && typeof error.figures === 'object' ? error.figures : {};
+      for (const name of ['dayCapCents', 'capCents']) if (Number.isSafeInteger(figures[name])) limits = { ...(limits || {}), [name]: figures[name] };
       note(why);
       tell();
       throw silence(why);

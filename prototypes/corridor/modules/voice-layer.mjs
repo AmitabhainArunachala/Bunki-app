@@ -82,6 +82,31 @@ export function daySpend(budget, kept, now = Date.now()) {
   return { day, spentCents: budget.spentCents - base.spentCents, capCents: null, since: base.at, keep: base };
 }
 
+/** The voice server's ceilings as far as it has said them (the seam's status): its budget answer first, then a
+ * refusal's own figure. Bunki holds none of its own (the server's are set by the owner: 10,000 cents in total and
+ * 1,000 a day, or 30,000 and 3,000); null where the server has said nothing. */
+export function voiceLimits(status) {
+  const cents = (value) => (Number.isSafeInteger(value) && value >= 0 ? value : null);
+  return {
+    dayCapCents: cents(status?.budget?.dayCapCents) ?? cents(status?.limits?.dayCapCents),
+    capCents: cents(status?.budget?.capCents) ?? cents(status?.limits?.capCents),
+  };
+}
+const amount = (cents) => { const n = cents % 100 ? (cents / 100).toFixed(2) : String(cents / 100); return { ja: `${n}ドル`, en: `$${n}` }; };
+/** The no-voice line for a limit reached, { ja, en }: the amount the server said, or no amount at all when it said none.
+ * `at` is when the voice comes back (the server's new day, in this device's own time). */
+export function limitLine(reason, limits, at) {
+  const day = limits?.dayCapCents ?? null, total = limits?.capCents ?? null;
+  if (reason === 'day-budget') {
+    return day === null
+      ? { ja: `声を出せません。今日の音声の上限を使いました。声は${at}に戻ります。`, en: `No voice: today’s voice limit is used. The voice comes back at ${at}.` }
+      : { ja: `声を出せません。今日の${amount(day).ja}分を使いました。声は${at}に戻ります。`, en: `No voice: today’s ${amount(day).en} is used. The voice comes back at ${at}.` };
+  }
+  return total === null
+    ? { ja: '声を出せません。音声の予算の合計を使い切りました。', en: 'No voice: the voice budget’s total is used.' }
+    : { ja: `声を出せません。合計${amount(total).ja}を使い切りました。`, en: `No voice: the ${amount(total).en} total is used.` };
+}
+
 export function installVoiceLayer(host) {
   const { tx, el, uiIcon } = host;
   const doc = host.document || document;
@@ -134,10 +159,8 @@ export function installVoiceLayer(host) {
   const sourceLine = (source) => source === 'server' ? tx('音声サーバー', 'Voice server') : source === 'recorded' ? tx('収録音声', 'Recorded clip') : '';
   // the voice server's day is the UTC day: its new start, in this device's own time
   const newDay = () => new Date((Math.floor(Date.now() / 86400000) + 1) * 86400000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  // the two limits are the speech team's (one budget for both apps): the server's own figures once it has sent them
-  const money = (cents) => { const n = cents % 100 ? (cents / 100).toFixed(2) : String(cents / 100); return { ja: `${n}ドル`, en: `$${n}` }; };
-  const dayCap = () => money(seam.status().budget?.dayCapCents ?? 300);
-  const totalCap = () => money(seam.status().budget?.capCents ?? 2500);
+  // the two limits are the speech team's (one budget for both apps): only the server's own figures, never a guess
+  const limitWords = (reason) => { const words = limitLine(reason, voiceLimits(seam.status()), newDay()); return tx(words.ja, words.en); };
   /** Why there is no voice, in one plain line: what a listen control says when it makes no sound. */
   const silenceLine = (reason) => {
     switch (reason) {
@@ -148,10 +171,8 @@ export function installVoiceLayer(host) {
           'No voice: the voice server ended this pairing. Pair again in Settings, Writing and voice.');
       case 'offline': case 'network-failed':
         return tx('声を出せません。音声サーバーに届きません。接続を確かめて、もう一度。', 'No voice: the voice server is out of reach. Check the connection, then tap again.');
-      case 'day-budget':
-        return tx(`声を出せません。今日の${dayCap().ja}分を使いました。声は${newDay()}に戻ります。`, `No voice: today’s ${dayCap().en} is used. The voice comes back at ${newDay()}.`);
-      case 'budget-exhausted':
-        return tx(`声を出せません。合計${totalCap().ja}を使い切りました。`, `No voice: the ${totalCap().en} total is used.`);
+      case 'day-budget': case 'budget-exhausted':
+        return limitWords(reason);
       case 'not-in-release':
         return tx('声を出せません。音声サーバーはいま新しい文を受け付けていません。', 'No voice: the voice server is not taking new sentences right now.');
       case 'request-rate-limit':
@@ -759,11 +780,19 @@ export function installVoiceLayer(host) {
       if (spend.keep && (!kept || kept.day !== spend.keep.day || kept.spentCents !== spend.keep.spentCents)) {
         try { view.localStorage.setItem(DAY_KEY, JSON.stringify(spend.keep)); } catch { /* counted for this page only */ }
       }
-      const cap = dollars(spend.capCents ?? 300);
-      today = spend.since === null
-        ? tx(`今日：${dollars(spend.spentCents)}（上限は1日${cap}、${newDay()}に戻ります）。`, `Today: ${dollars(spend.spentCents)} of ${cap}. The day starts again at ${newDay()}.`)
-        : tx(`今日：${dollars(spend.spentCents)}（この端末で${clock(spend.since)}から数えた分。上限は1日${cap}、${newDay()}に戻ります）。`,
-          `Today: ${dollars(spend.spentCents)} since ${clock(spend.since)}, counted on this device. The limit is ${cap} a day and starts again at ${newDay()}.`);
+      // the day's ceiling only as the server said it; with none said, no ceiling is named
+      const capCents = spend.capCents ?? voiceLimits(status).dayCapCents;
+      const cap = capCents === null ? null : dollars(capCents);
+      const spent = dollars(spend.spentCents);
+      if (spend.since === null) {
+        today = cap ? tx(`今日：${spent}（上限は1日${cap}、${newDay()}に戻ります）。`, `Today: ${spent} of ${cap}. The day starts again at ${newDay()}.`)
+          : tx(`今日：${spent}（${newDay()}に戻ります）。`, `Today: ${spent}. The day starts again at ${newDay()}.`);
+      } else {
+        today = cap ? tx(`今日：${spent}（この端末で${clock(spend.since)}から数えた分。上限は1日${cap}、${newDay()}に戻ります）。`,
+          `Today: ${spent} since ${clock(spend.since)}, counted on this device. The limit is ${cap} a day and starts again at ${newDay()}.`)
+          : tx(`今日：${spent}（この端末で${clock(spend.since)}から数えた分。${newDay()}に戻ります）。`,
+            `Today: ${spent} since ${clock(spend.since)}, counted on this device. The day starts again at ${newDay()}.`);
+      }
     }
     return { state: blocked && status.paired ? `${state} ${blocked}` : state, last, budget, today };
   }
