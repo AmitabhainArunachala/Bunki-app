@@ -118,7 +118,10 @@ export function installVoiceLayer(host) {
   const speechPlayer = createAudioPlayer(doc);
   const audio = doc.querySelector('audio[data-speak-audio]');
   let heldSilence = null;
-  const pocket = createPocketPlayer({ player: speechPlayer, audio, silence: () => (heldSilence ||= silenceUrl(doc.defaultView)) });
+  const pocket = createPocketPlayer({ player: speechPlayer, audio, silence: () => (heldSilence ||= silenceUrl(doc.defaultView)),
+    // a clip the browser will not let start (a locked phone may refuse) pauses the article's read at its sentence, so
+    // the lock screen's play takes it up; any other read fails as before
+    refusalIsPause: () => readerActive() && seam.active() === reader.session });
   const player = pocket.player;
   /** The play bar and the lock screen say what the article reader is doing: every change of the read repaints both. */
   const barChanged = () => { host.refreshListenRow?.(); syncMedia(); };
@@ -193,7 +196,8 @@ export function installVoiceLayer(host) {
         return tx('声を出せません。音声サーバーが混んでいます。もう一度。', 'No voice: the voice server is busy. Tap to try again.');
       case 'nothing-to-say': case 'not-japanese':
         return tx('ここには読み上げられる日本語がありません。', 'Nothing here can be read aloud.');
-      case 'audio-error':
+      // 'decode': the clip came but this device would not play it (the speech team's queue names it so): not the server
+      case 'audio-error': case 'decode':
         return tx('再生できませんでした。もう一度。', 'Could not play. Tap to try again.');
       default:
         return tx('声を出せません。音声サーバーがこの文を読めませんでした。もう一度。', 'No voice: the voice server could not say this. Tap to try again.');
@@ -207,6 +211,7 @@ export function installVoiceLayer(host) {
     'not-in-release': tx('サーバー停止中', 'voice server not taking sentences'), 'request-rate-limit': tx('混雑、1分待つ', 'too many requests, wait a minute'),
     'voice-unavailable': tx('サーバー混雑', 'voice server busy'), 'voice-timeout': tx('サーバー混雑', 'voice server busy'),
     'nothing-to-say': tx('読む文なし', 'nothing to read'), 'not-japanese': tx('読む文なし', 'nothing to read'), 'audio-error': tx('再生エラー', 'could not play'),
+    decode: tx('再生エラー', 'could not play'),
   }[reason] || tx('サーバーエラー', 'voice server error'));
   // reasons that pass by themselves or by his pairing: what is true now is what a control says
   const PASSING = new Set(['not-paired', 'not-configured', 'authentication-required', 'offline', 'network-failed', 'day-budget', 'budget-exhausted',

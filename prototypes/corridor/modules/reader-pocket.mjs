@@ -7,7 +7,8 @@
  *    hidden there is no pause at all: the next sentence starts from the end of the one before. Shown, it is as before.
  *  - createPocketPlayer: the one audio element as the seam drives it, plus what the reader needs from it. A pause this
  *    app did not ask for (a call, another app's sound, the lock screen's own button, headphones taken out) is told, so
- *    the read is paused there and the bar and the lock screen say so; a resume the browser refuses is told the same way.
+ *    the read is paused there and the bar and the lock screen say so; a resume the browser refuses is told the same way,
+ *    and so is a next clip it will not let start (for the article's read only: refusalIsPause).
  *    While a read waits for its next clip on a hidden page, the element plays silence in a loop (hold), so the page is
  *    still playing sound when the clip comes; it lets go when the clip plays, when he pauses and when the read ends.
  *  - createReaderMediaSession: the lock screen. The article's title, "Bunki", the app's icon; play, pause, next and
@@ -29,8 +30,10 @@ export function gapSleep(doc, view = doc.defaultView) {
 }
 
 /** `player` is the speech team's player on `audio` (speech-player.mjs, unchanged); `silence()` gives the address of a
- * short silent clip. Returns { player, hold, letGo, holding, onOutsidePause }: `player` is what the seam drives. */
-export function createPocketPlayer({ player, audio, silence }) {
+ * short silent clip. `refusalIsPause()` says whether the read now playing takes a clip the browser will not let sound
+ * (a locked phone may refuse a new start) as a pause from outside, held at its sentence; otherwise that clip fails as
+ * before. Returns { player, hold, letGo, holding, onOutsidePause }: `player` is what the seam drives. */
+export function createPocketPlayer({ player, audio, silence, refusalIsPause = () => false }) {
   // what this app last asked of the element: a clip to play, silence to hold, or nothing sounding
   let intent = 'still';
   let serial = 0;
@@ -53,8 +56,15 @@ export function createPocketPlayer({ player, audio, silence }) {
         unkeep();
         intent = 'play';
         const mine = ++serial;
-        const pending = player.play(clip, rate);
-        Promise.resolve(pending).then(settled(mine), settled(mine));
+        const pending = Promise.resolve(player.play(clip, rate)).catch((error) => {
+          if (error?.name !== 'NotAllowedError' || serial !== mine || !refusalIsPause()) throw error;
+          // told first, so the read is paused while this clip is still its own; the clip ends as stopped, and play says
+          // its sentence again
+          intent = 'still';
+          tell();
+          return 'stopped';
+        });
+        pending.then(settled(mine), settled(mine));
         return pending;
       },
       pause() { intent = 'still'; unkeep(); player.pause?.(); },
