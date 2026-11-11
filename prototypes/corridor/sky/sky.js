@@ -177,7 +177,7 @@
       float b1 = (1. - smoothstep(0.055, 0.135, abs(ml.y + 0.20 - wob)))*smoothstep(-1.15, -0.55, ml.x - 0.5*vn(vec2(uT*0.008, 1.3)))*(1. - smoothstep(0.30, 0.95, ml.x));
       float b2 = (1. - smoothstep(0.035, 0.105, abs(ml.y + 0.47 + wob*0.7)))*smoothstep(-0.45, 0.10, ml.x)*(1. - smoothstep(0.75, 1.20, ml.x + 0.3*vn(vec2(uT*0.006, 8.1))));
       float strip = max(b1, b2);
-      c = mix(c, mix(mc, uBand, 0.80*strip), disc*(1. - 0.80*uDim));   // while a word is open the moon steps back: one thing at a time
+      c = mix(c, mix(mc, uBand, 0.80*strip), disc*(1. - 0.93*uDim));   // while a word is open the moon steps back: one thing at a time
     }
     o = vec4(c, 1.);
   }`;
@@ -328,7 +328,8 @@
     }
     function step(now) {
       S.tick = (S.tick || 0) + 1; if (opt.paused && S.tick % 8 === 1) S.paused = !!opt.paused();
-      if (S.tick % 32 === 1) { const ft = opt.foot ? Math.max(0, Math.round(opt.foot() || 0)) : 0; if (ft !== S.foot) { S.foot = ft; wrap.style.setProperty('--sky-foot', ft + 'px'); } }   // how much of the bottom the app's own bar covers
+      if (S.tick % 32 === 1) { const ft = opt.foot ? Math.max(0, Math.round(opt.foot() || 0)) : 0; if (ft !== S.foot) { S.foot = ft; wrap.style.setProperty('--sky-foot', ft + 'px'); }   // how much of the bottom the app's own bar covers
+        S.clear = opt.clear ? opt.clear() || [] : []; }   // the boxes of the app's own buttons that lie over the sky: no word prints under them
       if (!S.running || S.paused || !wrap.isConnected || wrap.getClientRects().length === 0) { S.last = now; return; }
       resize();
       const dt = Math.min(0.05, Math.max(0.001, (now - S.last) / 1000)); S.last = now; S.t += dt; S.frame += 1;

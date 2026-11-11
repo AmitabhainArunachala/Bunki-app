@@ -232,14 +232,18 @@
       const arts = C.articles.map((r, a) => a).filter((a) => C.articleWords[a] && C.articleWords[a].some((wi) => home[wi] === a)).sort((a, b) => (LV[C.articles[a][3]] ?? 5) - (LV[C.articles[b][3]] ?? 5) || a - b);
       const members = new Map(arts.map((a) => [a, []])); let rest = []; for (let i = 0; i < n; i += 1) { if (home[i] >= 0 && members.has(home[i])) members.get(home[i]).push(i); else rest.push(i); }
       rest.sort((x, y) => W.thOf(W.D.pos.w[x * 3]) - W.thOf(W.D.pos.w[y * 3]));
-      const th = new Float32Array(n), total = n + arts.length * 6, signs = []; let at = 0;
-      for (const a of arts) { const m = members.get(a); m.sort((x, y) => rk[x] - rk[y]); const span = (m.length + 6) / total * TAU; m.forEach((wi, q) => { th[wi] = at + (q + 3.5) / (m.length + 6) * span; }); signs.push({ a, th: at + span / 2, th0: at, n: m.length }); at += span; }
-      const restStart = at; rest.forEach((wi, q) => { th[wi] = at + (q + 0.5) / rest.length * (TAU - at); });
+      const th = new Float32Array(n), yv = new Float32Array(n), total = n + arts.length * 6, signs = [], pairs = []; let at = 0, ai = 0;
+      /* an article is a group: its words hang together at the article's own height, tied by threads, under its title */
+      for (const a of arts) { const m = members.get(a); m.sort((x, y) => rk[x] - rk[y]); const cnt = m.length, span = (cnt + 6) / total * TAU, yA = (((ai * 0.6180339887) % 1) - 0.5) * 880, rF = clamp(56 + 30 * Math.sqrt(cnt), 80, 320); ai += 1;
+        m.forEach((wi, q) => { th[wi] = at + (q + 3.5) / (cnt + 6) * span; yv[wi] = yA + (((0.5 + q * 0.7548776662466927) % 1) - 0.5) * 2 * rF; });
+        const byY = m.slice().sort((x, y) => yv[x] - yv[y]); for (let j = 1; j < cnt; j += 1) pairs.push(byY[j - 1], byY[j]);
+        signs.push({ a, th: at + span / 2, th0: at, n: cnt, y: yA + rF + 80 }); at += span; }
+      const restStart = at; rest.forEach((wi, q) => { th[wi] = at + (q + 0.5) / rest.length * (TAU - at); yv[wi] = (((wi * 0.6180339887) % 1) - 0.5) * 1560; });
       if (rest.length) for (let t = restStart + 0.16; t < TAU - 0.1; t += 0.42) signs.push({ a: -1, th: t, th0: t, n: 0 });   // the words no article holds yet carry a heading too, all along their part of the ring
-      W.rOrder = { th, home, signs, restStart, rest: rest.length }; return W.rOrder;
+      W.rOrder = { th, yv, home, signs, pairs: Int32Array.from(pairs), restStart, rest: rest.length }; return W.rOrder;
     }
     function layoutRead(out) {
-      const ro = readOrder(), n = W.n; for (let i = 0; i < n; i += 1) { if (W.front[i]) continue; const t = ro.th[i], rad = RE + depthOf(i); out[i * 3] = rad * Math.sin(t); out[i * 3 + 1] = (((i * 0.6180339887) % 1) - 0.5) * 1560; out[i * 3 + 2] = rad * Math.cos(t); }
+      const ro = readOrder(), n = W.n; for (let i = 0; i < n; i += 1) { if (W.front[i]) continue; const t = ro.th[i], rad = RE + depthOf(i); out[i * 3] = rad * Math.sin(t); out[i * 3 + 1] = ro.yv[i]; out[i * 3 + 2] = rad * Math.cos(t); }
     }
     /** Meaning: round the ring by the radical of each word's first character, the largest realm first (person, water,
      * mouth, hand, tree ...). A radical is the part a dictionary files a character under, and it usually says what the
@@ -284,13 +288,13 @@
       if (!signs || !W.fonts) return; const mph = W.morph ? Math.min(1, W.morph.x) : 1, a0 = base.alpha.x * mph * (1 - 0.85 * S.dim.x) * (1 - view.over); if (a0 < 0.03) return;
       const C = W.ctx, E = view.eye, f = view.fwd, r = view.right, u = view.up, R = RE + 2900; W.sHits = W.sHits || []; W.sHits.length = 0;
       /* only signs with room: the ones nearest the middle of the view first; the others wait, fading, until there is room */
-      const cand = []; signs.forEach((sg, q) => { const dx = R * Math.sin(sg.th) - E[0], dy = [-250, 60, 370][q % 3] - E[1], dz = R * Math.cos(sg.th) - E[2], z2 = dx * f[0] + dy * f[1] + dz * f[2]; if (z2 < 300 || z2 > 5200) return;
+      const cand = []; signs.forEach((sg, q) => { const dx = R * Math.sin(sg.th) - E[0], dy = (sg.y != null ? sg.y : [-250, 60, 370][q % 3]) - E[1], dz = R * Math.cos(sg.th) - E[2], z2 = dx * f[0] + dy * f[1] + dz * f[2]; if (z2 < 300 || z2 > 5200) return;
         const sc = S.F / z2, x = S.px + (dx * r[0] + dy * r[1] + dz * r[2]) * sc; if (x < -260 || x > S.W + 260) return; const y = S.py - (dx * u[0] + dy * u[1] + dz * u[2]) * sc; if (y < 20 || y > S.H * 0.74) return;
         const row = sg.a >= 0 && C ? C.articles[sg.a] : null, chars = Array.from(sg.title != null ? sg.title : row ? row[1] || '' : (opt.lang === 'ja' ? 'まだ記事にない言葉' : 'not yet in an article')), title = chars.length > 22 ? chars.slice(0, 21).join('') + '…' : chars.join(''), size = clamp(20 * 3000 / z2, 13, 22);
         cand.push({ sg, x, y, z2, title, size, hw: Math.min(22, chars.length) * size * (row ? 0.53 : 0.34) + 14, hh: size * 0.8 + 8 }); });
       cand.sort((p1, p2) => Math.abs(p1.x - S.px) - Math.abs(p2.x - S.px)); const shown = [];
       const fr = W.frontList, fv = W.vis, fa = W.visAt, fnow = S.frame;
-      for (const c of cand) { let free = !shown.some((o) => Math.abs(c.x - o.x) < c.hw + o.hw && Math.abs(c.y - o.y) < c.hh + o.hh);
+      for (const c of cand) { let free = c.x - c.hw > 16 && c.x + c.hw < S.W - (S.small ? 56 : 72) && !shown.some((o) => Math.abs(c.x - o.x) < c.hw + o.hw && Math.abs(c.y - o.y) < c.hh + o.hh);   // a title shows only where the whole of it fits
         if (free) for (const wi of fr) { if (fa[wi] < fnow - 2) continue; const o = wi * 5; if (Math.abs(c.x - fv[o]) < c.hw + fv[o + 4] / 2 + 8 && Math.abs(c.y - fv[o + 1]) < c.hh + fv[o + 2] * 0.62 + 6) { free = false; break; } }   // a sign waits while one of his own words stands in front of it
         if (free) shown.push(c); const st = c.sg.fade || (c.sg.fade = { x: 0, v: 0 }); spring(st, free ? 1 : 0, 5, dtSign);
         if (st.x < 0.03) continue; const sp = spriteFor('sign' + (c.sg.key || c.sg.a), c.title, c.sg.a >= 0 || c.sg.title != null || opt.lang === 'ja' ? 'w' : 'e', c.size * S.dpr, null, 500, false);
@@ -322,7 +326,10 @@
     api.setFront = setFront;
     /** Re-form the whole sky by another order: every word flies to its new place, a few at a time. */
     function setLens(name) {
-      if (!W.ready || !W.layout[name] || name === W.lens) return; W.prevLens = W.lens; W.lens = name; W.secCache = null; W.Pa.set(W.P); W.layout[name](W.Pb); placeFront(W.Pb); W.morph = { x: S.reduced ? 1 : 0, v: 0 }; if (S.reduced) W.P.set(W.Pb); if (W.onLens) W.onLens(name);
+      if (!W.ready || !W.layout[name] || name === W.lens) return; W.prevLens = W.lens; W.lens = name; W.secCache = null; W.Pa.set(W.P); W.layout[name](W.Pb); placeFront(W.Pb); W.morph = { x: S.reduced ? 1 : 0, v: 0 }; if (S.reduced) W.P.set(W.Pb);
+      /* choosing the order of reading turns the eye to the nearest article, so what he sees first is a group with its title */
+      if (name === 'read' && W.rOrder) { const a = ((cam.a % TAU) + TAU) % TAU, rs = W.rOrder.restStart; if (rs > 1 && (a > rs - 0.5 || a < 0.5)) cam.aTo = a - rs < TAU - a && a > rs - 0.5 ? rs - 0.6 : 0.6; }
+      if (W.onLens) W.onLens(name);
     }
     api.setLens = setLens; W.setLens = setLens;
 
@@ -395,6 +402,7 @@
       for (const h of W.gHits) { const c0 = Math.max(0, ((h.x - h.w / 2 - 6) / CW) | 0), c1 = Math.min(cols - 1, ((h.x + h.w / 2 + 6) / CW) | 0), r0 = Math.max(0, ((h.y - h.s * 0.8) / CH) | 0), r1 = Math.min(rows - 1, ((h.y + h.s * 0.8) / CH) | 0); for (let rr = r0; rr <= r1; rr += 1) for (let cc = c0; cc <= c1; cc += 1) occ[rr * cols + cc] = 2; }   // a pattern of grammar keeps its room too
       /* a touched word keeps room for its reading above and its meaning below: its neighbours step back while it is touched */
       for (const [wi, sw] of awake) { if (sw.x < 0.3 || W.visAt[wi] < S.frame - 2) continue; const o = wi * 5, hw = W.vis[o + 4] / 2 + 16, hh = W.vis[o + 2] * 0.62 + 26, c0 = Math.max(0, ((W.vis[o] - hw) / CW) | 0), c1 = Math.min(cols - 1, ((W.vis[o] + hw) / CW) | 0), r0 = Math.max(0, ((W.vis[o + 1] - hh) / CH) | 0), r1 = Math.min(rows - 1, ((W.vis[o + 1] + hh) / CH) | 0); for (let rr = r0; rr <= r1; rr += 1) for (let cc = c0; cc <= c1; cc += 1) occ[rr * cols + cc] = 3; }
+      if (S.clear) for (const bx of S.clear) { const c0 = Math.max(0, ((bx[0] - 8) / CW) | 0), c1 = Math.min(cols - 1, ((bx[0] + bx[2] + 8) / CW) | 0), r0 = Math.max(0, ((bx[1] - 6) / CH) | 0), r1 = Math.min(rows - 1, ((bx[1] + bx[3] + 6) / CH) | 0); for (let rr = r0; rr <= r1; rr += 1) for (let cc = c0; cc <= c1; cc += 1) occ[rr * cols + cc] = 4; }   // under one of the app's own buttons no word prints, his own included
       if ((W.lens === 'read' || W.lens === 'mean') && W.sHits) for (const h of W.sHits) { const c0 = Math.max(0, ((h.x - h.w / 2) / CW) | 0), c1 = Math.min(cols - 1, ((h.x + h.w / 2) / CW) | 0), r0 = Math.max(0, ((h.y - h.s * 0.7) / CH) | 0), r1 = Math.min(rows - 1, ((h.y + h.s * 0.7) / CH) | 0); for (let rr = r0; rr <= r1; rr += 1) for (let cc = c0; cc <= c1; cc += 1) occ[rr * cols + cc] = 2; }   // a title keeps its room: far words step back from it
       if (cI.length < n) { cI = new Int32Array(n); cX = new Float32Array(n); cY = new Float32Array(n); cS = new Float32Array(n); cZ = new Float32Array(n); cD = new Float32Array(n); cR = new Float32Array(n); W.clr = new Float32Array(n).fill(1); W.hid = new Uint8Array(n); }
       const clr = W.clr, hid = W.hid, ease = Math.min(1, dt * 10);
@@ -402,7 +410,7 @@
       const mph = W.morph ? Math.min(1, W.morph.x) : 1, giantsOf = (lens) => (lens === 'form' ? ghost.list : lens === 'sound' ? ghost.kana : lens === 'mean' ? ghost.rad : []);
       if (ghost.done) for (const g of giantsOf(mph > 0.5 ? W.lens : W.prevLens)) { const gw = Math.abs(mph - 0.5) * 2; const dx = g.x - E0, dy = g.y - E1, dz = g.z - E2, z2 = dx * f[0] + dy * f[1] + dz * f[2]; if (z2 < 400) continue; const sc = F / z2, x = S.px + (dx * r[0] + dy * r[1] + dz * r[2]) * sc; if (x < -500 || x > Wd + 500) continue;
         const y = S.py - (dx * u[0] + dy * u[1] + dz * u[2]) * sc, size = 880 * sc, dep = -dy / Math.hypot(dx, dy, dz);
-        const fade = (1 - smooth(0.17, 0.27, dep)) * (1 - smooth(0, 0.6, over)) * fieldA; if (fade < 0.01 || y < -size || y > Hd + size) continue; const ga = (W.lens === 'form' && mph > 0.5 ? 0.32 : 0.44) * fade * gw * (1 - 0.55 * dim); pushLabel(x, y, size, null, 0, pal.ghost, ga, mk, 0, 0.3, g);   // from above the rim of the chart names them instead
+        const fade = (1 - smooth(0.17, 0.27, dep)) * (1 - smooth(0, 0.6, over)) * fieldA; if (fade < 0.01 || y < -size || y > Hd + size) continue; const ga = (W.lens === 'form' && mph > 0.5 ? 0.32 : 0.44) * fade * gw * (1 - dim); pushLabel(x, y, size, null, 0, pal.ghost, ga, mk, 0, 0.3, g);   // (while a word is open the landmarks withdraw altogether)   // from above the rim of the chart names them instead
         if (W.fonts && ga > 0.12 && size > 60) { const nm = g.nm != null ? g.nm : g.k >= 0 ? (opt.lang === 'ja' ? (D.kanji[g.k][2][0] || D.kanji[g.k][3][0] || '') : D.kanji[g.k][1] || '') : ''; if (nm) { const sp = spriteFor('gn' + nm, nm, opt.lang === 'ja' ? 'w' : 'e', 14 * dpr, null, 620, true); if (sp) pushLabel(x, y + size * 0.47 + 12, 14, sp, 0, mk, Math.min(0.85, ga * 1.9), mk, 0, 0, null, true); } } }
       const taken = web ? web.taken : null, kinSet = W.kin, kinK = W.kinK || 0;
       /* pass 0: where is each word; far ones are points of light, near ones are candidates for print */
@@ -426,21 +434,23 @@
       for (let q = 0; q < nc; q += 1) {
         const c = ord[q], i = cI[c], x = cX[c], y = cY[c], size = cS[c], isF = W.front[i] === 1, len = W.len[i], nearK = cZ[c] < 350 ? 0.22 * size : 0, hw = len * size * 0.52 + (isF ? 10 : 3) + nearK, hh = size * 0.62 + (isF ? 6 : 2) + nearK * 0.5;
         const c0 = Math.max(0, ((x - hw) / CW) | 0), c1 = Math.min(cols - 1, ((x + hw) / CW) | 0), r0 = Math.max(0, ((y - hh) / CH) | 0), r1 = Math.min(rows - 1, ((y + hh) / CH) | 0);
-        let hit = 0, tot = 0; for (let rr = r0; rr <= r1; rr += 1) { const ro = rr * cols; for (let cc = c0; cc <= c1; cc += 1) { tot += 1; const v = occ[ro + cc]; if (v === 1 || v === 3 || (v === 2 && !isF)) hit += 1; } }
-        const ratio = tot === 0 ? 0 : hit / tot, free = awake.has(i) || (hid[i] ? ratio < 0.03 : ratio < 0.20); hid[i] = free ? 0 : 1;
-        if (free) for (let rr = r0; rr <= r1; rr += 1) { const ro = rr * cols; for (let cc = c0; cc <= c1; cc += 1) occ[ro + cc] = 1; }
+        let hit = 0, tot = 0, h4 = 0; for (let rr = r0; rr <= r1; rr += 1) { const ro = rr * cols; for (let cc = c0; cc <= c1; cc += 1) { tot += 1; const v = occ[ro + cc]; if (v === 4) h4 += 1; if (v === 1 || v === 3 || v === 4 || (v === 2 && !isF)) hit += 1; } }
+        const ratio = tot === 0 ? 0 : hit / tot, free = h4 < 2 && (awake.has(i) || (hid[i] ? ratio < 0.03 : ratio < 0.20)); hid[i] = free ? 0 : 1;
+        if (free) for (let rr = r0; rr <= r1; rr += 1) { const ro = rr * cols; for (let cc = c0; cc <= c1; cc += 1) if (occ[ro + cc] !== 4) occ[ro + cc] = 1; }
         clr[i] += ((free ? 1 : 0) - clr[i]) * ease;
       }
+      const morphing = !!(W.morph && W.morph.x < 1), edgeW = S.small ? 52 : 88;
       /* pass 2, far to near: print */
       for (let q = nc - 1; q >= 0; q -= 1) {
         const c = ord[q], i = cI[c]; if (clr[i] < 0.02) continue; const x = cX[c], y = cY[c], size = cS[c], z2 = cZ[c], isF = W.front[i] === 1;
         const rd = cR[c]; let a = (isF ? 1 : lerp(0.82, 0.27, smooth(700, 2900, z2)) * lerp(1, 0.5, smooth(3200, 8000, z2))) * smooth(90, 250, rd) * smooth(70, 150, z2) * cD[c] * smooth(-30, 26, y) * clr[i] * smooth(5.2, 7, size);
-        const far = smooth(700, 2600, z2); let blur = 2.6 * (1 - smooth(110, 290, rd)) + (isF ? 0 : 0.30 * far);
+        const far = smooth(700, 2600, z2); let blur = (morphing ? 0 : 2.6 * (1 - smooth(110, 290, rd))) + (isF ? 0 : 0.30 * far);   // (a word on its way to a new place is never blurred)
+        a *= smooth(Wd - 10, Wd - edgeW, x + W.len[i] * size * 0.5) * smooth(10, edgeW, x - W.len[i] * size * 0.5 + (isF ? 30 : 0));   // words come in and go out softly at the two sides, clear of the seals
         const aw = awake.get(i), wk = aw ? aw.x : 0, kin = kinSet && kinSet.has(i) ? kinK : 0, lit = Math.max(wk, kin);
         a *= fieldA * (1 - 0.88 * dim * (1 - wk)); blur += 2.3 * dim; if (a < 0.02) continue;
         const devPx = Math.max(size, kin > 0.01 ? 14 : 0) * dpr; let sp = null;
         if (devPx > BASE_PX * 1.14 || W.lvl[i] > 3 || !base.done) { sp = spriteFor(i, D.words[i][0], 'w', devPx, null, devPx + (isF ? 400 : 0)); if (!sp && (W.lvl[i] > 3 || !base.done)) continue; }
-        const ownK = isF ? 0.30 : 0, r0 = lerp(lerp(tc[0], tf[0], far), mk[0], ownK), g0 = lerp(lerp(tc[1], tf[1], far), mk[1], ownK), b0 = lerp(lerp(tc[2], tf[2], far), mk[2], ownK);
+        const ownK = isF ? 0.52 : 0, r0 = lerp(lerp(tc[0], tf[0], far), mk[0], ownK), g0 = lerp(lerp(tc[1], tf[1], far), mk[1], ownK), b0 = lerp(lerp(tc[2], tf[2], far), mk[2], ownK);
         const col = lit > 0.01 ? [lerp(r0, lerp(tc[0], mk[0], kin), lit), lerp(g0, lerp(tc[1], mk[1], kin), lit), lerp(b0, lerp(tc[2], mk[2], kin), lit)] : [r0, g0, b0];
         const s2 = lerp(size * (1 + 0.07 * wk), Math.max(size, 14), kin);
         if (s2 >= 15 && sp) pushLabel(x, y + s2 * 0.015, s2 * 1.035, sp, i, pal.c[0], 0.66 * a * smooth(15, 24, s2), mk, 0, blur + 3.0);   // a soft ground of the sky's own ink directly under the letters (no offset shadow: this is a print)
@@ -515,18 +525,18 @@
       if (f[1] > 0.12) { const k0 = smooth(0.12, 0.34, f[1]), yawC = Math.atan2(f[0], f[2]), BANDS = [[0.425, 'N5 · N4 · N3'], [0.612, 'N2'], [0.962, 'N1']];
         const dirOf = (az, el) => [Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el)], scr = (d) => { const z2 = d[0] * f[0] + d[1] * f[1] + d[2] * f[2]; return z2 < 0.2 ? null : [S.px + S.F * (d[0] * r[0] + d[1] * r[1] + d[2] * r[2]) / z2, S.py - S.F * (d[0] * u[0] + d[1] * u[1] + d[2] * u[2]) / z2]; };
         for (const [el, name] of BANDS) { let p0 = null; for (let q = -28; q <= 28; q += 1) { const p1 = scr(dirOf(yawC + q * 0.05, el)); if (p1 && p0 && p1[1] < S.H * 0.76 && p0[1] < S.H * 0.76) pushLine(p0[0], p0[1], p1[0], p1[1], 0, 0.7, S.pal.line, 0.20 * a0 * k0, 1); p0 = p1; }
-          for (let q = Math.floor((yawC - 1.3) / 0.7); q <= Math.ceil((yawC + 1.3) / 0.7); q += 1) { const p1 = scr(dirOf(q * 0.7 + 0.35, el - 0.020)); if (!p1 || p1[0] < 40 || p1[0] > S.W - 80 || p1[1] < 50 || p1[1] > S.H * 0.72) continue; const sp = spriteFor('band' + name, name, 'w', 11 * S.dpr, null, 610, true); if (sp) { const bx = pushLabel(p1[0], p1[1], 11, sp, 0, S.pal.text, 0.62 * a0 * k0, S.pal.mark, 0, 0, null, true); if (bx) W.gHits.push({ i: -1, x: p1[0], y: p1[1], w: bx.w, s: 11 }); } } } }
+          for (let q = Math.floor((yawC - 1.3) / 0.7); q <= Math.ceil((yawC + 1.3) / 0.7); q += 1) { const p1 = scr(dirOf(q * 0.7 + 0.35, el + 0.030)); if (!p1 || p1[0] < 40 || p1[0] > S.W - 80 || p1[1] < 50 || p1[1] > S.H * 0.72) continue; const sp = spriteFor('band' + name, name, 'w', 12.5 * S.dpr, null, 610, true); if (sp) { const bx = pushLabel(p1[0], p1[1], 12.5, sp, 0, S.pal.text, 0.80 * a0 * k0, S.pal.mark, 0, 0, null, true); if (bx) W.gHits.push({ i: -1, x: p1[0], y: p1[1], w: bx.w + 16, s: 14 }); } } } }   // each band's name stands inside the band it names, just above its line
       for (const x of g) { const d = x.dir, z2 = d[0] * f[0] + d[1] * f[1] + d[2] * f[2]; if (z2 < 0.25) continue;
         const X = S.px + S.F * (d[0] * r[0] + d[1] * r[1] + d[2] * r[2]) / z2, Y = S.py - S.F * (d[0] * u[0] + d[1] * u[1] + d[2] * u[2]) / z2, on = X > -200 && X < S.W + 200 && Y > -60 && Y < S.H * 0.74;
         const cur = on ? { x: X, y: Y, lv: x.lv, w: 0, s: x.sz } : null;
         if (cur && !(taken && taken.has(x.i))) { const size = x.sz, sp = spriteFor('gram' + x.i, x.p, 'w', size * S.dpr, null, 600, false), fade = smooth(S.H * 0.74, S.H * 0.60, Y) * smooth(-40, 30, Y);
-          if (sp) { const box = pushLabel(X, Y, size, sp, 0, S.pal.mark, 0.92 * a0 * fade, S.pal.mark, 0, 0); if (box) { cur.w = box.w; W.gHits.push({ i: x.i, x: X, y: Y, w: box.w, s: size }); } } }
+          if (sp) { const box = pushLabel(X, Y, size, sp, 0, S.pal.mark, (x.lv >= 3 ? 0.94 : x.lv === 2 ? 0.76 : 0.62) * a0 * fade, S.pal.mark, 0, 2.6 * S.dim.x); if (box) { cur.w = box.w; W.gHits.push({ i: x.i, x: X, y: Y, w: box.w, s: size }); } } }   // the lowest band reads first, the highest last; behind an opened pattern the others go soft
         prev = cur; }
     }
     function drawThreads() {
-      if (W.lens === 'read') return; const pr = W.lens === 'sound' ? soundOrder().pairs : W.lens === 'mean' ? meanOrder().pairs : W.pairs, f = S.frame, vis = W.vis, at = W.visAt, col = S.pal.line, dim = S.dim.x; if (!pr || dim > 0.97 || (W.morph && W.morph.x < 1)) return; let n = 0;
+      const pr = W.lens === 'sound' ? soundOrder().pairs : W.lens === 'mean' ? meanOrder().pairs : W.lens === 'read' ? (W.rOrder ? W.rOrder.pairs : null) : W.pairs, f = S.frame, vis = W.vis, at = W.visAt, col = S.pal.line, dim = S.dim.x; if (!pr || dim > 0.97 || (W.morph && W.morph.x < 1)) return; let n = 0;
       for (let q = 0; q < pr.length && n < 220; q += 2) { const a = pr[q], b = pr[q + 1]; if (at[a] !== f || at[b] !== f || W.front[a] || W.front[b]) continue;
-        const oa = a * 5, ob = b * 5, ax = vis[oa], ay = vis[oa + 1], bx = vis[ob], by = vis[ob + 1], dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy); if (len < 24 || len > (W.lens === 'mean' ? 260 : 400)) continue;
+        const oa = a * 5, ob = b * 5, ax = vis[oa], ay = vis[oa + 1], bx = vis[ob], by = vis[ob + 1], dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy); if (len < 24 || len > (W.lens === 'mean' || W.lens === 'read' ? 260 : 400)) continue;
         const al = Math.min(vis[oa + 3], vis[ob + 3]); if (al < 0.16) continue;
         const k0 = 1 / Math.max(Math.abs(dx) / (vis[oa + 4] / 2 + 3), Math.abs(dy) / (vis[oa + 2] * 0.6 + 3), 1e-6), k1 = 1 / Math.max(Math.abs(dx) / (vis[ob + 4] / 2 + 3), Math.abs(dy) / (vis[ob + 2] * 0.6 + 3), 1e-6); if (k0 + k1 >= 0.92) continue;
         pushLine(ax + dx * k0, ay + dy * k0, bx - dx * k1, by - dy * k1, 0, 0.8, col, 0.22 * al * (1 - dim) * base.alpha.x, 1); n += 1; }

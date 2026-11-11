@@ -9,9 +9,9 @@
   const HAN = /[㐀-鿿豈-﫿]/;
   const VARIANT = { '灬': '火', '氵': '水', '氺': '水', '忄': '心', '⺗': '心', '扌': '手', '亻': '人', '刂': '刀', '犭': '犬', '礻': '示', '衤': '衣', '飠': '食', '艹': '艸', '辶': '辵', '罒': '网', '⺮': '竹', '糹': '糸', '訁': '言', '釒': '金', '牜': '牛' };
   const TXT = {
-    ja: { sky: '宙', open: 'ページを開く', more: (n) => 'ほか ' + n, hint: 'ドラッグで見回す　・　スクロールで奥へ　・　言葉に触れると開く', hintOver: '輪に触れると、そこへ降りる。横に引くと回り、縦に引くと傾く。', hintOverTouch: '輪に触れると降りる。横になぞると回り、縦で傾く。', lensMean: '意：部首の順（部首は字の意味の手がかり）', ownLegend: '金色の言葉はあなたの言葉。いつもそばにある', pathLegend: '赤い糸は、開いた言葉の道', overLegend: '赤い線は、立っていた場所と、そこから見えていた範囲。', legendParts: 'この字の部品', legendOwn: 'この字をもつ言葉と、同じ部品をもつ字', legendEx: '例文の言葉', legendCarry: 'この部品をもつ字', skyLabel: '言葉の宙。Tab で見えている言葉へ進む。', reach: '見えている言葉', reachOver: '降りる場所', sayOpen: (w, parts, n) => w + ' を開いた。' + (parts ? '字：' + parts + '。' : '') + (n ? 'つながる言葉 ' + n + '。' : ''), sayBack: '宙へ戻った。', sayDown: (w) => w + ' のあたりへ降りる', hintTouch: 'なぞって見回す　・　指を広げて奥へ　・　言葉に触れると開く', hintTurn: 'ドラッグで回す　・　宙か空に触れると放す', over: '上から見る', down: '中へ降りる', front: '正面へ戻る', lensForm: '形：字の家族の順', gram: '文法を見上げる', gramWords: 'この例文の言葉', ctxMore: '次の文', seenIn: '出典', lensSound: '音：よみの順', lensRead: '読：出会った文章ごと', out: 'この字は字の表にまだありません', both: (p) => 'どちらも「' + p + '」をもつ', sound: '音', rad: '部首', homo: '同じ音', legendCord: 'この言葉の字', legendFam: '同じ字をもつ言葉', legendSem: '意味のつながり', legendTurn: 'ドラッグで回す', words: (n) => n + ' 語', strokes: (n) => n + ' 画', back: '宙へ戻る',
+    ja: { sky: '宙', open: 'ページを開く', more: (n) => 'ほか ' + n, hint: 'ドラッグで見回す　・　スクロールで奥へ　・　言葉に触れると開く', hintOver: '輪に触れると、そこへ降りる。横に引くと回り、縦に引くと傾く。', hintOverTouch: '輪に触れると降りる。横になぞると回り、縦で傾く。', lensMean: '意：部首の順（部首は字の意味の手がかり）', ownLegend: 'いちばん大きな言葉はあなたの言葉。いつもそばにある', pathLegend: '赤い糸は、開いた言葉の道', overLegend: '赤い線は、立っていた場所と、そこから見えていた範囲。', legendParts: 'この字の部品', legendOwn: 'この字をもつ言葉と、同じ部品をもつ字', legendEx: '例文の言葉', legendCarry: 'この部品をもつ字', skyLabel: '言葉の宙。Tab で見えている言葉へ進む。', reach: '見えている言葉', reachOver: '降りる場所', sayOpen: (w, parts, n) => w + ' を開いた。' + (parts ? '字：' + parts + '。' : '') + (n ? 'つながる言葉 ' + n + '。' : ''), sayBack: '宙へ戻った。', sayDown: (w) => w + ' のあたりへ降りる', hintTouch: 'なぞって見回す　・　指を広げて奥へ　・　言葉に触れると開く', hintTurn: 'ドラッグで回す　・　宙か空に触れると放す', over: '上から見る', down: '中へ降りる', front: '正面へ戻る', lensForm: '形：字の家族の順', gram: '文法を見上げる', gramWords: 'この例文の言葉', ctxMore: '次の文', seenIn: '出典', lensSound: '音：よみの順', lensRead: '読：出会った文章ごと', out: 'この字は字の表にまだありません', both: (p) => 'どちらも「' + p + '」をもつ', sound: '音', rad: '部首', homo: '同じ音', legendCord: 'この言葉の字', legendFam: '同じ字をもつ言葉', legendSem: '意味のつながり', legendTurn: 'ドラッグで回す', words: (n) => n + ' 語', strokes: (n) => n + ' 画', back: '宙へ戻る',
       rel: { syn: '類義', ant: '対義', reg: '語感', fam: '同族', col: '共起', thm: '主題' } },
-    en: { sky: '宙', open: 'Open the page', more: (n) => n + ' more', hint: 'Drag to look around　・　scroll to go deeper　・　touch a word to open it', hintOver: 'Touch the ring to come down there. Drag sideways to turn it, up or down to tilt it.', hintOverTouch: 'Touch the ring to come down. Drag sideways to turn it, up or down to tilt it.', lensMean: 'Meaning: by radical, the part that says what a character is about', ownLegend: 'the words in gold are your own and stay near you', pathLegend: 'the red thread joins the words you opened', overLegend: 'The red lines show where you stood and what you saw from there.', legendParts: 'the parts of this character', legendOwn: 'words that carry it, and characters that share a part', legendEx: 'words in its examples', legendCarry: 'characters that carry this part', skyLabel: 'The sky of words. Tab reaches the words in view.', reach: 'Words in view', reachOver: 'Places to come down', sayOpen: (w, parts, n) => 'Opened ' + w + '. ' + (parts ? 'Characters: ' + parts + '. ' : '') + (n ? n + ' related words shown.' : ''), sayBack: 'Back in the sky.', sayDown: (w) => 'Come down near ' + w, hintTouch: 'Drag to look around　・　spread two fingers to go deeper　・　touch a word', hintTurn: 'Drag to turn it　・　touch 宙 or the sky to let go', over: 'See it from above', down: 'Come down', front: 'Face front again', lensForm: 'Form: by families of characters', gram: 'Look up at the grammar', gramWords: 'words in these examples', ctxMore: 'next sentence', seenIn: 'from', lensSound: 'Sound: by reading', lensRead: 'Read: by the article each word comes from', out: 'This character is not in the character table yet', both: (p) => 'Both carry ' + p, sound: 'sound', rad: 'radical', homo: 'same sound', legendCord: 'the characters of this word', legendFam: 'words that carry the same character', legendSem: 'linked by meaning', legendTurn: 'drag to turn it', words: (n) => n + ' words', strokes: (n) => n + ' strokes', back: 'Back to the sky',
+    en: { sky: '宙', open: 'Open the page', more: (n) => n + ' more', hint: 'Drag to look around　・　scroll to go deeper　・　touch a word to open it', hintOver: 'Touch the ring to come down there. Drag sideways to turn it, up or down to tilt it.', hintOverTouch: 'Touch the ring to come down. Drag sideways to turn it, up or down to tilt it.', lensMean: 'Meaning: by radical, the part that says what a character is about', ownLegend: 'the largest words are your own and stay near you', pathLegend: 'the red thread joins the words you opened', overLegend: 'The red lines show where you stood and what you saw from there.', legendParts: 'the parts of this character', legendOwn: 'words that carry it, and characters that share a part', legendEx: 'words in its examples', legendCarry: 'characters that carry this part', skyLabel: 'The sky of words. Tab reaches the words in view.', reach: 'Words in view', reachOver: 'Places to come down', sayOpen: (w, parts, n) => 'Opened ' + w + '. ' + (parts ? 'Characters: ' + parts + '. ' : '') + (n ? n + ' related words shown.' : ''), sayBack: 'Back in the sky.', sayDown: (w) => 'Come down near ' + w, hintTouch: 'Drag to look around　・　spread two fingers to go deeper　・　touch a word', hintTurn: 'Drag to turn it　・　touch 宙 or the sky to let go', over: 'See it from above', down: 'Come down', front: 'Face front again', lensForm: 'Form: by families of characters', gram: 'Look up at the grammar', gramWords: 'words in these examples', ctxMore: 'next sentence', seenIn: 'from', lensSound: 'Sound: by reading', lensRead: 'Read: by the article each word comes from', out: 'This character is not in the character table yet', both: (p) => 'Both carry ' + p, sound: 'sound', rad: 'radical', homo: 'same sound', legendCord: 'the characters of this word', legendFam: 'words that carry the same character', legendSem: 'linked by meaning', legendTurn: 'drag to turn it', words: (n) => n + ' words', strokes: (n) => n + ' strokes', back: 'Back to the sky',
       rel: { syn: 'near in meaning', ant: 'opposite', reg: 'same sense, other tone', fam: 'same family', col: 'goes with', thm: 'same theme' } },
   };
   const REL_ORDER = { syn: 0, ant: 1, reg: 2, col: 3, fam: 4, thm: 5 };
@@ -36,7 +36,7 @@
   .cap.hub .kin button { font-family: 'Yuji Syuku', 'Shippori Mincho B1', serif; font-size: 17px; margin: 0 1px; border-bottom: 1px solid transparent; }
   .cap.hub .kin button:hover { color: var(--sky-mark); border-bottom-color: currentColor; }
   .cap .act { margin-top: 12px; font-size: 13px; letter-spacing: 0.1em; padding: 6px 15px 7px; border: 1px solid color-mix(in srgb, var(--sky-text) 46%, transparent); border-radius: 2px; background: color-mix(in srgb, var(--sky-deep) 55%, transparent); transition: background 160ms, border-color 160ms, color 160ms; }
-  .cap .act:hover, .cap .act:focus-visible { background: var(--sky-text); color: var(--sky-ink); border-color: var(--sky-text); outline: none; }
+  .cap .act:hover, .cap .act:focus-visible { background: var(--sky-text); color: var(--sky-deep); border-color: var(--sky-text); outline: none; }
   .cap.note { font-size: 11.5px; line-height: 1.45; }
   .cap.note .nt { font-family: 'Noto Serif', serif; font-style: italic; opacity: 0.86; }
   .cap.bond { font-size: 12px; letter-spacing: 0.06em; color: var(--sky-mark); }
@@ -52,6 +52,7 @@
   .cap.gram .fm { font-size: 13px; letter-spacing: 0.04em; opacity: 0.88; margin-top: 2px; }
   .cap.gram .exj { font-size: 15.5px; margin-top: 12px; letter-spacing: 0.03em; }
   .cap.gram .exe { font-family: 'Noto Serif', serif; font-style: italic; font-size: 13px; opacity: 0.8; }
+  .cap.gram .exj b { color: var(--sky-mark); font-weight: 800; }
   @media (max-width: 719px) { .cap .cx { display: none; } .cap.gram { width: 300px; } .cap.gram .exj { font-size: 14px; } }
   .tip { position: absolute; left: 0; top: 0; pointer-events: none; text-align: center; white-space: nowrap; opacity: 0; transition: opacity 140ms; color: var(--sky-text); }
   .tip .rd { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); font-size: 13px; letter-spacing: 0.12em; }
@@ -65,6 +66,7 @@
   .trail .knot { width: 7px; height: 7px; border-radius: 50%; background: var(--sky-cord); margin-right: 2px; }
   .hint { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(var(--sky-foot, 0px) + 13px); font-size: 12.5px; letter-spacing: 0.14em; white-space: nowrap; opacity: 0; transition: opacity 600ms; color: var(--sky-ink); pointer-events: none; text-shadow: 0 0 7px var(--sky-paper), 0 0 2px var(--sky-paper); }
   .hint.on { opacity: 0.86; }
+  .hint { white-space: pre; text-align: center; line-height: 1.75; }
   .hint.line { letter-spacing: 0.07em; }
   .hint.top { bottom: auto; top: 60px; left: 30px; transform: none; text-align: left; white-space: normal; width: 232px; line-height: 1.75; letter-spacing: 0.08em; color: var(--sky-text); text-shadow: 0 0 8px var(--sky-deep), 0 0 3px var(--sky-deep); }
   .legend { position: absolute; left: 30px; top: 98px; display: flex; flex-direction: column; gap: 5px; letter-spacing: 0.06em; font-size: 11.5px; white-space: nowrap; opacity: 0; transition: opacity 600ms; color: var(--sky-text); pointer-events: none; }
@@ -82,7 +84,7 @@
   .tools.away { opacity: 0; pointer-events: none; }
   .tools button { position: relative; width: 34px; height: 34px; padding: 0; font: 400 17px/1 'Yuji Syuku', 'Shippori Mincho B1', serif; color: var(--sky-text); background: color-mix(in srgb, var(--sky-deep) 95%, transparent); border: 1px solid color-mix(in srgb, var(--sky-text) 46%, transparent); border-radius: 3px; cursor: pointer; transition: background 160ms, color 160ms, border-color 160ms, opacity 240ms; }
   .tools button:hover { border-color: var(--sky-text); }
-  .tools button[aria-pressed='true'] { background: var(--sky-text); color: var(--sky-ink); border-color: var(--sky-text); }
+  .tools button[aria-pressed='true'] { background: var(--sky-text); color: var(--sky-deep); border-color: var(--sky-text); }
   .tools button[hidden] { display: none; }
   .tools button:active { transform: scale(0.96); }
   .tools button::after { content: attr(data-tip); position: absolute; right: calc(100% + 10px); top: 50%; transform: translateY(-50%); white-space: nowrap; font: 500 12px/1 'Shippori Mincho B1', serif; letter-spacing: 0.06em; color: var(--sky-ink); background: var(--sky-paper); padding: 7px 10px 8px; border-radius: 2px; box-shadow: 0 1px 0 color-mix(in srgb, var(--sky-ink) 22%, transparent); opacity: 0; pointer-events: none; transition: opacity 140ms cubic-bezier(0.23, 1, 0.32, 1); }
@@ -146,8 +148,9 @@
       if (web.cur) text = '';
       else if (above) { if (over > 0.84) { text = (coarse || !wide ? L.hintOverTouch : L.hintOver) + (wide ? ' ' + L.overLegend : ''); cls = 'top'; } }
       else if (over < 0.12 && W.fieldAlpha && W.fieldAlpha() > 0.9 && S.view.fwd[1] > -0.2 && S.view.fwd[1] < 0.05 && Math.abs(S.view.eye[1]) < 130) {   // only while the paper margin is what lies at the foot of the view
-        if (!hinted) text = HINT;
-        else { text = GLYPH[W.lens] + '　' + W.lensCaption(W.lens).replace(/^.[：:]\s*/, ''); if (wide) { text += '　・　' + L.ownLegend; if (web.walk.length > 1) text += '　・　' + L.pathLegend; } cls = 'line'; }
+        /* from the first moment: what the order is and which words are his; until the first touch, also how to move */
+        let line = GLYPH[W.lens] + '　' + W.lensCaption(W.lens).replace(/^.[：:]\s*/, ''); if (wide) { line += '　・　' + L.ownLegend; if (web.walk.length > 1) line += '　・　' + L.pathLegend; }
+        if (!hinted) { text = wide ? HINT + '\n' + line : HINT; } else { text = line; cls = 'line'; }
       }
       const key = cls + '|' + text; if (key === marginKey) return; marginKey = key;
       if (text) { hint.textContent = text; hint.className = 'hint on' + (cls ? ' ' + cls : ''); } else hint.classList.remove('on');
@@ -176,8 +179,8 @@
     /* ---------------------------------------------------------------- building a constellation */
     const HUBS = { 1: [[-335, 0]], 2: [[-345, 0], [345, 0]], 3: [[-405, 36], [0, -236], [405, 36]], 4: [[-435, 54], [-152, -238], [152, -238], [435, 54]] };
     const DIRS = { 1: [Math.PI], 2: [Math.PI, 0], 3: [Math.PI, -Math.PI / 2, 0], 4: [Math.PI - 0.12, -Math.PI / 2 - 0.42, -Math.PI / 2 + 0.42, 0.12] };
-    const TOP = [[0, -236], [-252, -196], [252, -196], [-152, -318], [152, -318]];   // wide enough apart that the note under one never runs into the next
-    const BOT = [[0, 240], [-205, 256], [205, 256], [-104, 318], [104, 318]];
+    const TOP = [[0, -300], [-150, -260], [150, -260], [-260, -150], [260, -150]];   // on an arc: the lines run out like rays and never cross, each note has its own room, and nothing reaches into a character's family
+    const BOT = [[0, 340], [-160, 290], [160, 290], [-290, 215], [290, 215]];   // the same arc below, clear of the sentence under the word
     /* places for a character's family, nearest first; they keep clear of the note under the character */
     /* (the outer places stand on rays that pass between the inner ones, so no line to an outer word runs through an inner word) */
     const SIDE = [[182, -14, 25], [152, -98, 25], [178, 76, 25], [304, -99, 20], [316, 53, 20], [222, -230, 20], [256, 193, 20], [112, -208, 20], [142, 226, 20]];
@@ -203,7 +206,7 @@
         const sem = (W.sem.get(id) || []).slice().sort((a, b) => REL_ORDER[a.rel] - REL_ORDER[b.rel]).slice(0, 5), semSlots = n >= 3 ? BOT : TOP;
         sem.forEach((e, q) => { const it = add({ key: 'w' + e.w, kind: 'w', id: e.w, text: D.words[e.w][0], font: 'w', role: 'sem', q, tx: semSlots[q][0], ty: semSlots[q][1], size: 24, depth: 640, delay: 0.62 + q * 0.05, from: centre });
           lines.push({ a: centre, b: it, kind: 'sem', delay: 0.60 + q * 0.05 });
-          caps.push({ of: it, dy: 20, cls: 'cap note', build: (n2) => { n2.append(el('span', 'tag', L.rel[e.rel])); if (e.note) n2.append(el('span', 'nt', e.note)); } }); });
+          caps.push({ of: it, dy: semSlots === TOP ? -40 : 20, cls: 'cap note', wait: 0.9 + q * 0.05, build: (n2) => { n2.append(el('span', 'tag', L.rel[e.rel])); if (e.note) n2.append(el('span', 'nt', e.note)); } }); });   // above the word when the word stands above: its line arrives from below and never crosses the note
         /* its characters, each with its own family */
         const hubItems = [];
         hubsCh.slice(0, 4).forEach((ch, h) => { const ki = W.byKanji.get(ch), [hx, hy] = HUBS[n][h], dir = DIRS[n][h], up = Math.abs(Math.sin(dir)) > 0.6, hs = [98, 98, 84, 76][n - 1];
@@ -230,7 +233,7 @@
         const famAll = W.fam[id], page = web.page % Math.max(1, Math.ceil(famAll.length / 10)), mine = famAll.slice(page * 10, page * 10 + 10), slots = TOP.concat(BOT);
         mine.forEach((wi, q) => { const it = add({ key: 'w' + wi, kind: 'w', id: wi, text: D.words[wi][0], font: 'w', role: 'own', q, tx: slots[q][0] * 1.06, ty: slots[q][1] + (q < 5 ? -16 : 40), size: 25, depth: 610, marks: wordMarks(wi, k[0]), delay: 0.40 + q * 0.04, from: centre });
           lines.push({ a: centre, b: it, kind: 'fam', delay: 0.38 + q * 0.04 }); });
-        if (famAll.length > 10) caps.push({ of: centre, dx: 0, dy: mine.length > 5 ? 408 : 132 * 0.56 + 62 + (canOpen('k', id) ? 46 : 0), cls: 'cap more', wait: 0.9, build: (n2) => { const b = el('button', '', L.words(famAll.length) + '  ·  ' + (page + 1) + ' / ' + Math.ceil(famAll.length / 10) + '  →'); b.type = 'button'; b.addEventListener('click', (e) => { e.stopPropagation(); web.page += 1; open('k', id, true); }); n2.append(b); } });
+        if (famAll.length > 10) caps.push({ of: centre, dx: 0, dy: mine.length > 5 ? 428 : 132 * 0.56 + 62 + (canOpen('k', id) ? 46 : 0), cls: 'cap more', wait: 0.9, build: (n2) => { const b = el('button', '', L.words(famAll.length) + '  ·  ' + (page + 1) + ' / ' + Math.ceil(famAll.length / 10) + '  →'); b.type = 'button'; b.addEventListener('click', (e) => { e.stopPropagation(); web.page += 1; open('k', id, true); }); n2.append(b); } });
         parts.forEach((p, h) => { const part = D.parts[p], asK = part[3], [hx, hy] = (n === 1 ? [[-470, 0]] : n === 2 ? [[-470, 0], [470, 0]] : n === 3 ? [[-480, -150], [480, -30], [-480, 180]] : [[-480, -150], [480, -150], [-480, 180], [480, 180]])[h], out = hx < 0 ? -1 : 1;
           const hub = add({ key: asK >= 0 ? 'k' + asK : 'p' + p, kind: asK >= 0 ? 'k' : 'p', id: asK >= 0 ? asK : p, text: part[0], font: 'k', role: 'hub', tx: hx, ty: hy, size: 66, depth: 470, delay: 0.24 + h * 0.07, glyph: { of: centre, at: 0, k: 0.5 } });
           lines.push({ a: centre, b: hub, kind: 'cord', delay: 0.24 + h * 0.07 });
@@ -242,7 +245,9 @@
         const g = W.gramById.get(id), len = Array.from(g.p).length, cs = len <= 5 ? 62 : len <= 9 ? 46 : 34;
         const centre = add({ key: 'g' + id, kind: 'g', id, text: g.p, font: 'w', role: 'centre', tx: 0, ty: -150, size: cs, depth: 520, capH: 150 });
         caps.push({ of: centre, dy: -cs * 0.6 - 28, cls: 'cap', build: (n2) => { n2.append(el('span', 'tag', g.lvName)); n2.append(el('span', 'gl', opt.lang === 'ja' && g.mJa ? g.mJa : g.mEn)); } });
-        caps.push({ of: centre, dy: cs * 0.6 + 6, cls: 'cap gram', build: (n2) => { if (g.form) n2.append(el('div', 'fm', g.form)); for (const ex of g.ex.slice(0, 2)) { n2.append(el('div', 'exj', ex[0])); if (ex[1]) n2.append(el('div', 'exe', ex[1])); } } });
+        caps.push({ of: centre, dy: cs * 0.6 + 6, cls: 'cap gram', build: (n2) => { if (g.form) n2.append(el('div', 'fm', g.form)); for (const ex of g.ex.slice(0, 2)) { const row = el('div', 'exj'), linked = g.words.slice(0, 8).map((wi) => D.words[wi][0]).filter((w2) => ex[0].includes(w2)).sort((a, b) => b.length - a.length); let rest = ex[0];   // the words the lines lead to are marked where they stand in the sentence
+            while (rest) { let at = -1, hit = ''; for (const w2 of linked) { const k = rest.indexOf(w2); if (k >= 0 && (at < 0 || k < at)) { at = k; hit = w2; } } if (at < 0) { row.append(document.createTextNode(rest)); break; } if (at > 0) row.append(document.createTextNode(rest.slice(0, at))); row.append(el('b', '', hit)); rest = rest.slice(at + hit.length); }
+            n2.append(row); if (ex[1]) n2.append(el('div', 'exe', ex[1])); } } });
         g.words.slice(0, 8).forEach((wi, q) => { const x = (q - (Math.min(8, g.words.length) - 1) / 2) * 150, it = add({ key: 'w' + wi, kind: 'w', id: wi, text: D.words[wi][0], font: 'w', role: 'own', q, tx: x, ty: 250 + (q % 2) * 46, size: 23, depth: 610, delay: 0.14 + q * 0.04 }); lines.push({ a: centre, b: it, kind: 'fam', delay: 0.1 + q * 0.04, under: true }); });
       } else {
         const part = D.parts[id];
@@ -279,7 +284,7 @@
         c.fit = () => { hubs.forEach((hub, h) => { const cp = capOf(hub)[0], hgt = cp && cp.node ? cp.node.offsetHeight : ch, start = top + hs * 0.58 + hgt + 34; hub.capH = P(hgt + 10);
           for (const it of c.items) { if (it.kind === 'a' && it.id === h) it.ty = P(start + 4 * 32 + 2); else if (it.role === 'fam' && it.from === hub) it.ty = P(start + it.q * 32); } });
           const low = Math.max(...c.items.filter((it) => it.role === 'fam' || it.kind === 'a').map((it) => it.ty), P(col0)); for (const it of c.items) if (it.role === 'sem') it.ty = low + P(56); };
-        c.lines = c.lines.filter((l) => l.kind === 'cord' || (l.kind === 'fam' && l.b.q === 0));   // under each character its words hang in a plain column; one line joins the character to the column
+        c.lines = c.lines.filter((l) => l.kind === 'cord');   // under each character its words hang in a plain column: the place says the tie, no line is needed
         for (const l of c.lines) l.under = true;
       } else if (kind === 'k') {
         const HX = { 1: [0], 2: [-80, 80], 3: [-110, 0, 110], 4: [-132, -44, 44, 132] }[n] || [0], top = 196, row0 = top + 40 * 0.58 + 52;
@@ -407,7 +412,8 @@
         if (l.kind === 'cord') W.pushLine(x0, y0, x1, y1, 0, 2.3, pal.cord, 0.95 * al, l.p.x);
         else if (l.kind === 'fam') W.pushLine(x0, y0, x1, y1, l.bend != null ? l.bend * scaleU() : (x1 - x0) * (y1 - y0) > 0 ? 9 : -9, 1.1, pal.line, 0.62 * al, l.p.x);
         else if (l.kind === 'bond') W.pushLine(A.x.x, A.y.x - A.s.x * 0.62, B.x.x, B.y.x - B.s.x * 0.62, l.bow * scaleU(), 1.2, pal.mark, 0.6 * al, l.p.x);
-        else { if (A.bondTop && B.y.x < A.y.x && Math.abs(B.x.x - A.x.x) < 90 * scaleU()) { x0 = A.x.x + (B.x.x - A.x.x) * 0.3; y0 = A.y.x - A.bondTop * scaleU(); if (y0 < y1 + 10) continue; } dashed(x0, y0, x1, y1, pal.text, 0.5 * al, l.p.x); } }
+        else { if (A.role === 'centre' && B.y.x < A.y.x - A.s.x && !A.bondTop) { x0 = A.x.x + (B.x.x - A.x.x) * 0.16; y0 = A.y.x - A.s.x * 0.6 - 50 * scaleU(); if (y0 < y1 + 10) continue; }   // a link upward starts above the reading that stands over the word
+          if (A.bondTop && B.y.x < A.y.x && Math.abs(B.x.x - A.x.x) < 90 * scaleU()) { x0 = A.x.x + (B.x.x - A.x.x) * 0.3; y0 = A.y.x - A.bondTop * scaleU(); if (y0 < y1 + 10) continue; } dashed(x0, y0, x1, y1, pal.text, 0.5 * al, l.p.x); } }
       const order = [...web.items.values()].filter((it) => it.born).sort((a, b) => b.zz - a.zz); for (const it of order) drawItem(it);
     };
     function dashed(x0, y0, x1, y1, col, a, prog) { const len = Math.hypot(x1 - x0, y1 - y0), n = Math.max(2, Math.round(len / 11)); for (let q = 0; q < n; q += 2) { const t0 = q / n, t1 = Math.min(1, (q + 1) / n); if (t0 > prog) break; W.pushLine(lerp(x0, x1, t0), lerp(y0, y1, t0), lerp(x0, x1, t1), lerp(y0, y1, t1), 0, 1.0, col, a, 1); } }
@@ -454,6 +460,8 @@
       if (wake.k.x < 0.02 || !wake.lines.length || wake.i < 0 && !W.kin) return; const i = wake.i >= 0 ? wake.i : wake.last; if (i == null || i < 0 || W.visAt[i] < S.frame - 1) return; wake.last = i;
       const o = i * 5, ax = W.vis[o], ay = W.vis[o + 1], aw = W.vis[o + 4] / 2, ah = W.vis[o + 2] * 0.6;
       for (const wi of wake.lines) { if (W.visAt[wi] < S.frame - 1) continue; const q = wi * 5, bx = W.vis[q], by = W.vis[q + 1], dx = bx - ax, dy = by - ay, k0 = 1 / Math.max(Math.abs(dx) / (aw + 6), Math.abs(dy) / (ah + 6), 1e-6), k1 = 1 / Math.max(Math.abs(dx) / (W.vis[q + 4] / 2 + 4), Math.abs(dy) / (W.vis[q + 2] * 0.6 + 4), 1e-6); if (k0 + k1 >= 1) continue;
+        let cross = false; for (const fw of W.frontList) { if (fw === i || fw === wi || W.visAt[fw] < S.frame - 1) continue; const fo = fw * 5, fx = W.vis[fo], fy = W.vis[fo + 1], fhw = W.vis[fo + 4] / 2 + 8, fhh = W.vis[fo + 2] * 0.62 + 8; for (let t = 0.1; t < 0.95 && !cross; t += 0.1) if (Math.abs(ax + dx * t - fx) < fhw && Math.abs(ay + dy * t - fy) < fhh) cross = true; if (cross) break; }
+        if (cross) continue;   // a thread never runs through one of his large words: that kin is lit without a thread
         W.pushLine(ax + dx * k0, ay + dy * k0, bx - dx * k1, by - dy * k1, dx * dy > 0 ? 7 : -7, 1.0, S.pal.line, 0.5 * wake.k.x, wake.k.x); }
     };
     api.open = (word) => { const i = W.byWord.get(word); if (i != null) open('w', i); return i != null; };

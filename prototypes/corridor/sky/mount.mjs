@@ -2,7 +2,7 @@
  * of version 2: "keep polishing, keep creating"). Loaded by index.html beside drift-layer.js, the old first screen.
  * The engine (sky.js, sky-world.js, sky-web.js in this folder) is a fixed copy from PROGRAM/design (sky-v3-*), byte for
  * byte; this file is the app's own mount, kept level with that copy's mount.js (the foot the tab bar covers, the
- * context file).
+ * app's buttons over the sky, the context file).
  *
  * The old first screen stays in the page, unseen and untouched: its words are the learner's own (read here, and again
  * whenever they change), its level control (#lvl) stays visible on top, and every automated check still meets the
@@ -175,6 +175,8 @@ function paper() {
   return m && (m[4] == null || Number(m[4]) > 0.9) ? [m[1] / 255, m[2] / 255, m[3] / 255] : null;
 }
 const door = () => window.__BUNKI_OPEN_ENTRY;
+/** the app's own buttons that can stand over the first screen */
+const OVER_SKY = ['#ginga-symbol', '#ginga-search', '#ginga-theme-seal', '#live-depth-switch', '#prototype-open'];
 
 let api = null;
 let host = null;
@@ -272,6 +274,21 @@ function start() {
       const bar = tabs.getBoundingClientRect();
       const box = host.getBoundingClientRect();
       return bar.height > 0 && bar.top < box.bottom ? box.bottom - bar.top : 0;
+    },
+    /* the app's own buttons that lie over the sky, as boxes in the sky's own coordinates: no word prints under them
+     * (the prototype's 試 and the design layer's 深 are not in every build: what is not there is skipped) */
+    clear: () => {
+      if (!host) return [];
+      const box = host.getBoundingClientRect();
+      const out = [];
+      for (const sel of OVER_SKY) {
+        const e = document.querySelector(sel);
+        if (!e || !e.getClientRects().length) continue;
+        const q = e.getBoundingClientRect();
+        if (q.width > 0 && q.width < 120 && q.bottom > box.top && q.top < box.bottom)
+          out.push([q.left - box.left, q.top - box.top, q.width, q.height]);
+      }
+      return out;
     },
     canOpen: (t) => {
       const d = door();

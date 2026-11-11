@@ -638,6 +638,13 @@ describe.each(engines)('the sky (宙) as the app’s first screen, in %s', (engi
             expect(seen.sizes[0]).toBeGreaterThan(seen.sizes[3]);
             expect(seen.first).toEqual(seen.largest);
           }
+          // in the reading order an article's title stands over its words like a sign: one is in view within 4 s
+          if (lens === 'read')
+            await page.waitForFunction(
+              () => (window.__SKY__.W.sHits || []).some((h) => h.a >= 0),
+              null,
+              { timeout: 4000 },
+            );
           await page.waitForFunction(() => (window.__SKY__.W.morph?.x ?? 1) >= 1, null, {
             timeout: 15000,
           });
@@ -838,6 +845,63 @@ describe.each(engines)('the sky (宙) as the app’s first screen, in %s', (engi
         await page.keyboard.press('Escape');
         await page.waitForFunction(() => !window.__SKY__.W.web.isOpen(), null, { timeout: 5000 });
       }, 90000);
+
+      test("the app's own buttons over the sky: the mount gives their boxes and skips what is not there; no word prints under a box", async () => {
+        const { page } = session;
+        const given = await page.evaluate(() => {
+          const sels = [
+            '#ginga-symbol',
+            '#ginga-search',
+            '#ginga-theme-seal',
+            '#live-depth-switch',
+            '#prototype-open',
+          ];
+          const host = document.getElementById('bunki-sky').getBoundingClientRect();
+          const over = sels
+            .map((sel) => document.querySelector(sel))
+            .filter((e) => e && e.getClientRects().length)
+            .map((e) => e.getBoundingClientRect())
+            .filter(
+              (q) => q.width > 0 && q.width < 120 && q.bottom > host.top && q.top < host.bottom,
+            )
+            .map((q) => [q.left - host.left, q.top - host.top, q.width, q.height]);
+          return {
+            boxes: window.__SKY__.opt.clear(),
+            over,
+            present: sels.filter((sel) => document.querySelector(sel)),
+          };
+        });
+        expect(given.boxes).toEqual(given.over);
+        // a box laid over the place of a word in view, following it as it drifts: that word is no longer printed
+        const word = await page.evaluate(() => {
+          const W = window.__SKY__.W;
+          const i = W.hits
+            .filter((h) => W.vis[h * 5 + 2] >= 16 && !W.front[h])
+            .sort((a, b) => W.vis[b * 5 + 2] - W.vis[a * 5 + 2])[0];
+          if (i == null) return null;
+          const own = (window.__ownClear = window.__SKY__.opt.clear);
+          window.__SKY__.opt.clear = () => {
+            const p = W.project(i);
+            const w = W.len[i] * (p ? p.size : 0) * 1.1 + 60;
+            return p ? [...own(), [p.x - w / 2, p.y - p.size - 30, w, p.size * 2 + 60]] : own();
+          };
+          window.__clearedWord = i;
+          return W.D.words[i][0];
+        });
+        expect(word, 'a word in view to clear').toBeTruthy();
+        await page.waitForFunction(
+          () => !window.__SKY__.W.hits.includes(window.__clearedWord),
+          null,
+          { timeout: 5000 },
+        );
+        await page.waitForTimeout(800);
+        expect(
+          await page.evaluate(() => window.__SKY__.W.hits.includes(window.__clearedWord)),
+        ).toBe(false);
+        await page.evaluate(() => {
+          window.__SKY__.opt.clear = window.__ownClear;
+        });
+      }, 30000);
 
       test('no page errors through all of the above', () => {
         expect(session.errors).toEqual([]);
