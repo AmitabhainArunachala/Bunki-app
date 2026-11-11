@@ -13784,6 +13784,34 @@ function appendReviewFrontVoice(face, item, { printed, blanked }) {
   face.append(row);
 }
 
+/** A word saved with its sentence whose article (or the archive's index) is still on its way: takenContext answers null for
+ * now, and the review draws the face again, blanked, when it lands (the printed first drawing dates from 6b4b7ad34). */
+function takenContextPending(item) {
+  const ctx = item?.ctx;
+  if (!ctx) return false;
+  const p = D.passages.find((x) => x.id === ctx.p);
+  if (!p) return !D.archive && window.__CORRIDOR_STANDALONE__ !== true;
+  return !p.tokens;
+}
+/** Whether the search for a word's example sentence (findExamples) has its answer: the bank has answered for the word (or
+ * the build has none) and every shelf article the background queue fetches has arrived. Until then a later drawing of a
+ * second repetition's face may find a sentence and blank the word. */
+function exampleSearchSettled(id) {
+  if (window.__CORRIDOR_STANDALONE__ !== true && !D.exampleBank?.has(id)) return false;
+  return !D.passages.some((p) => !p.tokens && !p.libraryCandidate && !String(p.file || '').startsWith('archive/') && D.libraryDiscoverable?.(p) !== false);
+}
+/** The bank has answered while this word's card is up face-down. The face is not drawn again; when it is now known to stay
+ * printed (no sentence to ask the word in), its question-side control is put on the face as it stands. */
+function mountSettledFrontVoice(item) {
+  const rv = S.review;
+  if (S.view !== 'review' || !rv || rv.queue?.[rv.ix] !== item || rv.revealed || S.stack.length || document.getElementById('card-say-front')) return;
+  const face = document.querySelector('.review-face');
+  if (!face || face.querySelector('.review-cloze') || !face.querySelector('.review-front')) return;
+  if (takenContextPending(item) || takenContext(item)) return;
+  if ((S.srs[srsKey('word', item.id)]?.reps || 0) % 2 === 1 && (!exampleSearchSettled(item.id) || findExamples(item.id, 1).length)) return;
+  appendReviewFrontVoice(face, item, { printed: true, blanked: false });
+}
+
 function autoSpeakReviewFace() {
   if (S.view !== 'review' || !S.review?.revealed || S.review.pending || S.review.admitting ||
       S.stack.length || S.strokes || document.hidden) return;
@@ -28098,6 +28126,10 @@ function renderReview(main) {
   // at capture (この文 / 段落) outranks the corpus draw and shows every
   // time. No hand-made cards; the schedule is the same one card either way.
   let cloze = null;
+  // The question side's control stands only on a face known to stay as drawn (card audio, fix round 1): a face drawn with
+  // the word printed while the sentence it is asked in is still on its way (the saved sentence's article; for a second
+  // repetition, the example search) may be drawn again with the word blanked, and the hidden answer is never spoken.
+  let faceSettled = true;
   if (item.t === 'word') {
     // warm the bank; if it lands while THIS answer face is up, repaint once
     // so the reveal never sits on an emptiness the corpus could fill
@@ -28105,13 +28137,15 @@ function renderReview(main) {
       ensureBankExamples(item.id).then((entries) => {
         if (entries.length && S.view === 'review' && S.review?.queue[S.review.ix] === item && S.review.revealed) {
           render();
-        }
+        } else mountSettledFrontVoice(item);
       });
     }
     cloze = takenContext(item);
-    if (!cloze && (S.srs[srsKey('word', item.id)]?.reps || 0) % 2 === 1) {
+    const inSentence = (S.srs[srsKey('word', item.id)]?.reps || 0) % 2 === 1;
+    if (!cloze && inSentence) {
       cloze = findExamples(item.id, 1)[0] || null;
     }
+    faceSettled = !!cloze || (!takenContextPending(item) && (!inSentence || exampleSearchSettled(item.id)));
   }
   const face = el('div', 'review-face');
   const wordLen = String(Math.min(8, [...String(item.label || '')].length || 1));
@@ -28148,7 +28182,7 @@ function renderReview(main) {
   }
   // voice on the front (John, 2026-11-11): only where the asked word is printed on this face. A word asked inside its
   // sentence has the word blanked out (`cloze`), and there the hidden answer is never spoken.
-  if (!rv.revealed && ['word', 'kanji'].includes(item.t)) appendReviewFrontVoice(face, item, { printed: !cloze, blanked: !!cloze });
+  if (!rv.revealed && ['word', 'kanji'].includes(item.t) && faceSettled) appendReviewFrontVoice(face, item, { printed: !cloze, blanked: !!cloze });
   if (rv.revealed && !['sentence', 'question'].includes(item.t)) {
     const backc = reviewCardBack(item, presented?.answer) || { reading: '', senses: [] };
     const assessment = assessmentReviewContext(item);

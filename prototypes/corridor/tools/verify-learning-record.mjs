@@ -172,6 +172,7 @@ function fixture(overrides = {}, options = {}) {
     D: { exampleBank: new Map(), dict: { 学校: { r: 'がっこう', m: ['school'] } }, kanji: options.kanji || {} },
     lookup: (id) => ({ r: 'がっこう', m: [id], seq: 'synthetic-' + id }),
     findExamples: () => [], takenContext: () => null, ensureBankExamples: async () => [],
+    takenContextPending: () => false, exampleSearchSettled: () => true, mountSettledFrontVoice: () => {},
     reviewBack: () => ({ reading: '', senses: ['synthetic meaning'] }),
     isLeech: () => false, renderAiCoach: () => {},
     // D23: the revealed answer face is now rendered here; it reads no assessment context or source note
