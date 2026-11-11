@@ -31,7 +31,9 @@ const WIDTH = Number(arg('--width', '390'));
 const LANG = arg('--lang', 'en');
 const PORT = Number(arg('--port', '19567'));
 const SHOTS = arg('--shots', '');
-const ONLY = new Set(String(arg('--only', 'minivoice,settle-saved,settle-second')).split(',').filter(Boolean));
+// deck-rhythm compares with a built site of e74cffd7e (the Save head, before the card audio), served on PORT + 2
+const BASE_SITE = arg('--base', '');
+const ONLY = new Set(String(arg('--only', `minivoice,settle-saved,settle-second${BASE_SITE ? ',deck-rhythm' : ''}`)).split(',').filter(Boolean));
 if (!SITE) { console.error('usage: verify-speech-lane-all.mjs --site <built site>'); process.exit(2); }
 if (SHOTS) mkdirSync(SHOTS, { recursive: true });
 
@@ -39,9 +41,9 @@ const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; ch
   '.json': 'application/json; charset=utf-8', '.webmanifest': 'application/manifest+json', '.png': 'image/png', '.webp': 'image/webp', '.woff2': 'font/woff2',
   '.svg': 'image/svg+xml', '.m4a': 'audio/mp4', '.wasm': 'application/wasm', '.gz': 'application/gzip' };
 const ROOTS = SITE.split(':').filter(Boolean);
-const server = createServer((req, res) => {
+const serveFrom = (roots) => createServer((req, res) => {
   const path = normalize(decodeURIComponent(new URL(req.url, 'http://x').pathname)).replace(/^(\.\.[/\\])+/, '');
-  for (const root of ROOTS) {
+  for (const root of roots) {
     let file = join(root, path.endsWith('/') ? `${path}index.html` : path);
     try { if (statSync(file).isDirectory()) file = join(file, 'index.html'); statSync(file); } catch { continue; }
     res.writeHead(200, { 'Content-Type': TYPES[extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-store' });
@@ -50,6 +52,7 @@ const server = createServer((req, res) => {
   }
   res.writeHead(404); res.end('not found');
 });
+const server = serveFrom(ROOTS);
 await new Promise((resolve) => server.listen(PORT, '127.0.0.1', resolve));
 const ORIGIN = `http://127.0.0.1:${PORT}`;
 let clipSeconds = 1.2;
@@ -173,6 +176,33 @@ async function saveWords(p, indexes) {
   return file;
 }
 async function startReview(p) { await p.toTab('today'); await p.press('#review-start'); await p.page.locator('.review-face').first().waitFor(); }
+
+/** The first deck card's answer, its word line measured: the word, the reading, the word type, the control, what follows.
+ * Unpaired and 声 off: nothing is asked of any voice. */
+async function deckRow(origin) {
+  const context = await browser.newContext({ viewport: { width: WIDTH, height: phone ? 844 : 1117 }, deviceScaleFactor: phone ? 2 : 1, hasTouch: phone, isMobile: phone,
+    locale: LANG === 'ja' ? 'ja-JP' : 'en-US', timezoneId: 'Asia/Tokyo', serviceWorkers: 'block' });
+  opened.push(context);
+  await context.addInitScript(() => { const m = HTMLMediaElement.prototype, play = m.play; m.play = function () { this.muted = true; return play.call(this); }; try { localStorage.setItem('kairo-voice-by-itself-v1', 'off'); } catch { /* none */ } });
+  await context.route('**/*', (route) => { const u = new URL(route.request().url()); return ['127.0.0.1', 'localhost'].includes(u.hostname) || !/^https?:$/.test(u.protocol) ? route.continue() : route.abort(); });
+  const page = await context.newPage();
+  page.setDefaultTimeout(30000);
+  const press = (sel) => (phone ? page.locator(sel).first().tap() : page.locator(sel).first().click());
+  await page.goto(`${origin}/?ui=${LANG === 'ja' ? 'ja' : 'bi'}`, { waitUntil: 'load' });
+  await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 45000 });
+  const ok = page.locator('button', { hasText: /^(OK|わかった)$/ }).first(); if (await ok.isVisible().catch(() => false)) await ok.click().catch(() => {});
+  await press('#home-review'); await page.locator('#tab-learn').waitFor(); await press('#tab-learn'); await page.waitForTimeout(1200);
+  await press('.learn-go-deck'); await page.locator('#kp-reveal').waitFor(); await page.waitForTimeout(2000);
+  await press('#kp-reveal'); await page.waitForTimeout(1800);
+  const row = await page.evaluate(() => {
+    const box = (n) => { if (!n) return null; const r = n.getBoundingClientRect(); return { t: Math.round(r.top), b: Math.round(r.bottom), l: Math.round(r.left), r: Math.round(r.right), h: Math.round(r.height), w: Math.round(r.width) }; };
+    const card = document.querySelector('#kp-card'), word = card?.querySelector('.kp-word');
+    return { word: box(word), term: box(word?.querySelector('.kp-term')), reading: box(word?.querySelector('.kp-reading')), badge: box(word?.querySelector('.kp-posbadge')),
+      control: box(document.getElementById('kp-listen-word')), def: box(card?.querySelector('.kp-answer > .kp-def')), card: box(card) };
+  });
+  if (SHOTS) await page.screenshot({ path: join(SHOTS, `${tag}-deck-rhythm-${origin.split(':').pop()}.png`) });
+  return row;
+}
 
 /** Watch a face-down review card for `ms`: every look, the first look's Show answer, whether the control came. */
 async function watchFace(p, ms) {
@@ -336,6 +366,35 @@ try {
     }
     report('I10 a second repetition with no example sentence: the control comes once the search has settled, whatever settles last',
       rows.flatMap((r) => r.problems.map((x) => `${r.label}: ${x}`)), { word, rows });
+  });
+
+  // ============================================================ I11 · the deck answer's rhythm, as at e74cffd7e
+  await run('deck-rhythm', async () => {
+    if (!BASE_SITE) throw new Error('deck-rhythm needs --base <a built site of e74cffd7e>');
+    const baseServer = serveFrom(BASE_SITE.split(':').filter(Boolean));
+    await new Promise((resolve) => baseServer.listen(PORT + 2, '127.0.0.1', resolve));
+    try {
+      const base = await deckRow(`http://127.0.0.1:${PORT + 2}`);
+      const head = await deckRow(ORIGIN);
+      const problems = [];
+      if (!base.term || !head.term) problems.push('no deck answer to measure');
+      else {
+        // every vertical position on the word line and below it, measured from the word's own top, as at the base
+        const rel = (row, part, edge) => (row[part] ? row[part][edge] - row.term.t : null);
+        for (const [part, edge, name] of [['word', 'b', 'the word line’s bottom'], ['badge', 't', 'the word type'], ['reading', 't', 'the reading'], ['def', 't', 'the definition']]) {
+          const was = rel(base, part, edge), now = rel(head, part, edge);
+          if (was !== now) problems.push(`${name} at ${now} from the word’s top, ${was} at e74cffd7e (${now - was > 0 ? '+' : ''}${now - was} px)`);
+        }
+        const c = head.control, r = head.reading;
+        if (!c) problems.push('no #kp-listen-word');
+        else {
+          if (c.w < 44 || c.h < 44) problems.push(`tap target ${c.w}x${c.h}`);
+          if (r && r.r > c.l && r.l < c.r && r.b > c.t && r.t < c.b) problems.push(`the control’s box covers the reading’s (${JSON.stringify(c)} over ${JSON.stringify(r)})`);
+          if (head.card && c.r > head.card.r) problems.push('the control runs out of the card');
+        }
+      }
+      report('I11 the deck answer: the word line, the word type and the definition stand where they stood at e74cffd7e; the control keeps clear of the reading', problems, { base, head });
+    } finally { baseServer.close(); }
   });
 } finally {
   await browser.close().catch(() => {});
