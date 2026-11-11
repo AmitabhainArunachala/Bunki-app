@@ -10291,6 +10291,15 @@ function openSaveChooser(node, label, invoker, { keep = null, saved = null, remo
   if (keyboard || !invoker?.isConnected) (choices.find((button) => button.getAttribute('aria-current') === 'true') || choices[0])?.focus({ preventScroll: true });
   else invoker.focus({ preventScroll: true });
 }
+/* SAVE · Escape folds one layer at a time: with the chooser open and the keyboard still on the Save that opened it (a
+ * pointer's press leaves it there), Escape closes the chooser and nothing else; the box stays, nothing is saved. */
+if (typeof document !== 'undefined') document.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape' || !vocabularyListInvoker || event.target !== vocabularyListInvoker) return;
+  if (!document.getElementById('vocabulary-list-popover')) return;
+  event.preventDefault();
+  event.stopPropagation();
+  closeVocabularyListPopover({ restoreFocus: true });
+}, true);
 /* SAVE · the press on Save never moves the Save under his finger. A word's box keeps its top edge from its first chooser
  * on (the sentence pane's pin, placeFloating), and its kanji band and sentence door step aside while the chooser is open
  * (tighten.css), so the box does not grow past its seat and leap to the word's other side; after the pick it stays. */
@@ -26002,7 +26011,8 @@ function fitChromeKeep(button = document.getElementById('chrome-keep')) {
   if (!verb) return;
   const on = button.getAttribute('aria-pressed') === 'true';
   button.classList.remove('is-verb-only', 'is-short');
-  verb.textContent = on ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save');
+  const verbText = on ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save');
+  if (verb.textContent !== verbText) verb.textContent = verbText;
   const fits = () => button.scrollWidth <= button.clientWidth + 0.5;
   if (fits()) return;
   button.classList.add('is-verb-only');

@@ -114,10 +114,21 @@ function paintWordSave(button, on) {
   // ✓, until the line fits the room the bar's doors leave; its accessible name always says the whole of it
   if (button.dataset.saveBar != null) {
     // one word on one line: set as plain text, never with the word rule's breaks (Chromium honours a <wbr> in a no-break label)
-    const name = el('span', `save-bar-word${word ? '' : ' is-rest'}`);
-    name.textContent = word || tx('語をタップ', 'a word');
-    button.replaceChildren(el('span', 'save-bar-verb', on ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save')),
-      document.createTextNode(' '), name);
+    // SAVE · painted in place, its spans kept: a repaint during a press (the bar's word put bare by the press itself) must
+    // not take the element under the pointer out of the page, or the browser sends no click and the press is lost (seen
+    // on a Mac at 1728: the first click on "Saved ✓ 産業" after touching the word did nothing, in the base build too)
+    const verbText = on ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save');
+    const wordText = word || tx('語をタップ', 'a word');
+    const verbNow = button.querySelector('.save-bar-verb'), nameNow = button.querySelector('.save-bar-word');
+    if (verbNow && nameNow) {
+      if (verbNow.textContent !== verbText) verbNow.textContent = verbText;
+      if (nameNow.textContent !== wordText) nameNow.textContent = wordText;
+      nameNow.classList.toggle('is-rest', !word);
+    } else {
+      const name = el('span', `save-bar-word${word ? '' : ' is-rest'}`);
+      name.textContent = wordText;
+      button.replaceChildren(el('span', 'save-bar-verb', verbText), document.createTextNode(' '), name);
+    }
     button.classList.remove('is-verb-only', 'is-short');
     button.classList.toggle('taken', on);
     button.setAttribute('aria-pressed', String(on));
