@@ -896,6 +896,9 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
       view.clearTimeout(timer);
       timer = view.setTimeout(() => { held = true; machine.holdEar(); }, LONG_PRESS_MS);
     });
+    // a pointer or touch press leaves no focus on the mark, so Space and Enter go on doing what they did before it (the
+    // card audio's rule for its controls; the combine's I8); a keyboard user who tabbed to it keeps it
+    mark.addEventListener('mousedown', (event) => event.preventDefault());
     const end = () => view.clearTimeout(timer);
     mark.addEventListener('pointerup', end);
     mark.addEventListener('pointercancel', end);
@@ -903,6 +906,7 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
     mark.addEventListener('contextmenu', (event) => { event.preventDefault(); view.clearTimeout(timer); if (!held) { held = true; machine.holdEar(); } });
     mark.addEventListener('click', (event) => {
       event.stopPropagation();
+      if (event.detail && doc.activeElement === mark) mark.blur();
       if (held) { held = false; return; }
       // the keyboard's way to hold it on: Shift with Enter or Space
       if (event.detail === 0 && event.shiftKey) { machine.holdEar(); return; }
