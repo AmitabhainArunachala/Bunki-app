@@ -186,13 +186,16 @@ export function installVoiceLayer(host) {
     return () => { const now = lookup(); return now && now !== button && subject(now) === was ? now : null; };
   }
 
+  /** Whether `button` is saying a turn its own tap started (not a read that started by itself). */
+  const tapSpeaking = (button) => !!button && spoken?.button === button && !spoken.automatic && !!spoken.session && !spoken.session.ended;
   /** Speak `sentences` from `button`: a second tap stops it; whatever else was speaking ends first. With no voice to be
    * had it makes no sound and hands `onNote` the reason in one plain line (and '' again once a voice answers).
    * `automatic`: the read was not started by the learner's tap (a card's answer or an opened word saying itself): it
    * does not start at all when it could not be voiced, so it stops no other sound, and it never shows a line. */
   function speakFrom(button, { sentences, voiceKey, single = false, onNote = null, onDone = null, automatic = false }) {
-    // his second tap on a control that is speaking stops it; a read by itself is nobody's tap
-    if (!automatic && button && spoken?.button === button && spoken.session && !spoken.session.ended) { seam.stop(); return null; }
+    // his second tap on a control that is speaking its own turn stops it. A read by itself (the answer's word said as it
+    // is shown) is nobody's tap: a tap then ends it and starts the control's own turn from the top (lead's ruling, 11-11)
+    if (!automatic && tapSpeaking(button)) { seam.stop(); return null; }
     if (!sentences.length) { if (!automatic) onNote?.(silenceLine('nothing-to-say'), 'nothing-to-say'); return null; }
     if (automatic) {
       // a read of the article is under way (or yields to a word): nothing says itself over it (John, 2026-11-11)
@@ -208,7 +211,7 @@ export function installVoiceLayer(host) {
     const yieldFrom = automatic ? null : reader.justStopped;
     reader.justStopped = null;
     // `find`: the same control of the same word after the app has drawn its screen again (anchorOf)
-    const mine = { button, session: null, over: false, voiced: false, find: anchorOf(button) };
+    const mine = { button, session: null, over: false, voiced: false, automatic, find: anchorOf(button) };
     const paint = (on) => {
       if (!mine.button?.isConnected) return;
       mine.button.classList.toggle('is-speaking', on);
@@ -856,6 +859,9 @@ export function installVoiceLayer(host) {
       return speakFrom(button, { sentences: normal ? answerReads(normal, sentence) : [], voiceKey: voiceKeyOf('word', word || normal),
         single: !sentence.length, onNote, automatic });
     },
+    /** Whether a control is saying the turn its own tap started: a further tap stops it (corridor.js asks this before it
+     * ends the card's other sounds, so that a tap during the answer's word said by itself starts the control's turn). */
+    tapSpeaking,
     /** What the review card's question side may say, from plain inputs (modules/card-audio.mjs): { text, word } or null. */
     frontVoice: reviewFrontVoice,
     /** The switch "Highlight what is being read" was changed: a band that is drawn goes at once; with it on again the

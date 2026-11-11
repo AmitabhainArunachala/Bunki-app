@@ -13686,8 +13686,9 @@ function speakCardReading(text, btn, word = '', { automatic = false, withSentenc
   // unpaired, offline, the budget used) nothing happens at all: no other sound is stopped and no line is shown.
   // A tap on 音 always asks, and is told why when it finds no voice.
   if (automatic && (wordVoice() !== 'on' || !voiceLayer?.canSay())) return;
-  // a second tap on the control that is speaking stops it (retireCardSpeech would otherwise end it and start it again)
-  if (!automatic && btn?.classList?.contains?.('is-speaking')) { retireCardSpeech(); return; }
+  // a second tap on the control that is speaking its own turn stops it (retireCardSpeech would otherwise end it and start it
+  // again). A tap while the answer's word says itself is not a second tap: that word ends and the control's own turn starts.
+  if (!automatic && voiceLayer?.tapSpeaking?.(btn)) { retireCardSpeech(); return; }
   retireCardSpeech();
   stopReadAloud(); stopRecAudio(); stopSentenceListening();
   // The current source is the voice seam (modules/voice-seam.mjs): a recorded clip, then the voice server, and
