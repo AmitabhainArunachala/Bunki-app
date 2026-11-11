@@ -21,12 +21,12 @@ function quiet() {
 
 /** A fresh browser on the head, paired with the stand-in through the app's own Settings. `ui`: 'bi' (English chrome,
  * the default) or 'ja'. `hold`: a function (route) to hold some speak requests back (a clip that never loads). */
-export async function open({ engine = 'chromium', width = 390, clipSeconds = () => 6, ui = 'bi', voicePort = 19532, pair = true, args = [] } = {}) {
+export async function open({ engine = 'chromium', width = 390, clipSeconds = () => 6, ui = 'bi', voicePort = 19532, pair = true, args = [], touch = null, height = null } = {}) {
   const fake = await startFakeVoiceServer({ origins: [new URL(BASE).origin], port: voicePort, clipSeconds });
   const launcher = engine === 'webkit' ? webkit : chromium;
   const browser = await launcher.launch({ headless: true, ...(engine === 'chromium' ? { args: ['--mute-audio', '--host-resolver-rules=MAP * ~NOTFOUND , EXCLUDE 127.0.0.1 , EXCLUDE localhost', ...args] } : {}) });
-  const phone = width < 700;
-  const context = await browser.newContext({ viewport: { width, height: phone ? 844 : 1117 }, deviceScaleFactor: phone ? 2 : 1, hasTouch: phone, isMobile: phone,
+  const phone = touch === null ? width < 700 : touch;
+  const context = await browser.newContext({ viewport: { width, height: height || (width < 700 ? 844 : 1117) }, deviceScaleFactor: phone ? 2 : 1, hasTouch: phone, isMobile: phone,
     locale: 'en-US', timezoneId: 'Asia/Tokyo', serviceWorkers: 'block' });
   await context.addInitScript(quiet);
   const offMachine = [];
