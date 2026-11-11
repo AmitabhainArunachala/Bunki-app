@@ -200,20 +200,24 @@ const cases = {
         await press('#sheet-take'); await page.locator('#mini-review').waitFor(); await press('#mini-review'); await s.sleep(900);
         await s.ready(); await press('#home-review').catch(() => {}); await page.locator('#tab-today').waitFor(); await press('#tab-today'); await s.sleep(1000);
         await press('#review-start'); await page.locator('.review-face').first().waitFor(); await s.sleep(1500);
-        const printed = await page.evaluate(() => ({ card: document.querySelector('.review-face .review-front')?.textContent?.trim() || '', control: !!document.getElementById('card-say-front') }));
+        const printed = await page.evaluate(() => ({ card: document.querySelector('.review-face .review-front')?.textContent?.trim() || '', control: !!document.getElementById('card-say-front'),
+          reading: document.getElementById('card-say-front')?.dataset.voiceText || '' }));
         const p2 = [];
         if (!printed.control) p2.push(`no question-side control on the printed face of ${printed.card}`);
-        const m1 = s.fake.speaks().length;
-        if (printed.control) { await page.locator('#card-say-front').click(); await s.sleep(1500); }
-        const byControl = sent(s, m1);
+        // the ear first, then the card's own control: the same reading under the same voice key is one clip, so the control
+        // then asks nothing (it plays the clip the ear's request brought); otherwise it must ask the same text
         const front = await page.locator('.review-face .review-front').first().boundingBox({ timeout: 4000 }).catch(() => null);
         if (!front) p2.push(`no printed word on the face (${JSON.stringify(await page.evaluate(() => document.querySelector('.review-face')?.textContent?.slice(0, 60) || document.body.dataset.view || ''))})`);
         const m2 = s.fake.speaks().length;
         if (front) await optionClick({ x: front.x + front.width / 2, y: front.y + front.height / 2 });
         await s.sleep(1500);
         const byEar = sent(s, m2);
+        const m1 = s.fake.speaks().length;
+        if (printed.control) { await page.locator('#card-say-front').click(); await s.sleep(1500); }
+        const byControl = sent(s, m1);
         if (!byEar.length) p2.push('Option-click on the printed word sent nothing');
-        if (byControl.length && byEar.length && byEar[0] !== byControl[0]) p2.push(`the ear sent ${JSON.stringify(byEar[0])}, the card's control ${JSON.stringify(byControl[0])}`);
+        if (byControl.length && byControl[0] !== byEar[0]) p2.push(`the ear sent ${JSON.stringify(byEar[0])}, the card's control ${JSON.stringify(byControl[0])}`);
+        if (printed.reading && byEar[0] !== printed.reading) p2.push(`the ear sent ${JSON.stringify(byEar[0])}, not the stored reading ${printed.reading}`);
         if (await page.evaluate(() => !!document.querySelector('.grade-row'))) p2.push('the card was turned over');
         record('I2 review card, printed face: the ear and the card’s own control send the same reading', p2, JSON.stringify({ ...printed, byControl, byEar }));
         // the deck: printed, blanked, choices
