@@ -107,6 +107,9 @@ async function scan({ exclusions, plant, earPath }) {
   // the part of a text box that shows: every box that clips its content (overflow, clip-path) and the screen cut it down
   const shownPart = (el, box) => {
     let left = Math.max(box.left, 0), top = Math.max(box.top, 0), right = Math.min(box.right, innerWidth), bottom = Math.min(box.bottom, innerHeight);
+    // the text's own element too: a glyph box can stand past its element's box, where no finger reaches that element
+    const own = el.getBoundingClientRect();
+    left = Math.max(left, own.left); top = Math.max(top, own.top); right = Math.min(right, own.right); bottom = Math.min(bottom, own.bottom);
     for (let at = el; at && at !== document.body; at = at.parentElement) {
       const style = getComputedStyle(at);
       const clips = style.clipPath !== 'none' || /hidden|clip|auto|scroll/.test(style.overflowX + style.overflowY);
@@ -147,7 +150,7 @@ async function scan({ exclusions, plant, earPath }) {
         if (!ear) { verdict = { problem: `the ear is not in this build (${loadError})` }; break; }
         let unit = null;
         try { unit = ear.unitAt(document, x, y); } catch (error) { verdict = { problem: `unitAt threw ${error.message}` }; break; }
-        if (!unit) { verdict = { problem: 'the ear finds no unit there' }; break; }
+        if (!unit) { verdict = { problem: `the ear finds no unit there (${Math.round(x)},${Math.round(y)} on ${hit?.tagName?.toLowerCase() || 'nothing'}${hit?.className && typeof hit.className === 'string' ? `.${hit.className.split(/\s+/)[0]}` : ''})` }; break; }
         if (!unit.contains(node)) { verdict = { problem: `the unit there (${unit.kind} "${String(unit.text).slice(0, 20)}") does not hold this text` }; break; }
         if (!unit.sentences?.length) { verdict = { problem: 'the unit has nothing to say' }; break; }
         verdict = { ok: true, kind: unit.kind, said: unit.sentences.map((s) => s.text).join('').slice(0, 24), key: unit.voiceKey };
