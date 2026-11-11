@@ -37,7 +37,9 @@ export function silentWav(seconds = 0.6, rate = 8000) {
 }
 
 export async function startFakeVoiceServer({ origins = [], port = 0, capCents = 2500, dayCents = 300, missesPerMinute = 20,
-  centsPer1k = 8, clipSeconds = (text) => Math.min(1.6, 0.35 + [...text].length * 0.04), now = () => Date.now() } = {}) {
+  centsPer1k = 8, clipSeconds = (text) => Math.min(1.6, 0.35 + [...text].length * 0.04), now = () => Date.now(),
+  // a clip that arrives late: `holdMs(text, n)` (n counts speak requests from 1) is how long its good answer is held back
+  holdMs = () => 0 } = {}) {
   const allowed = new Set(origins);
   const codes = new Map();          // code → { learner, installation }
   const tokens = new Map();         // token → { learner, installation }
@@ -46,7 +48,7 @@ export async function startFakeVoiceServer({ origins = [], port = 0, capCents = 
   const misses = [];                // times of the uncached speaks
   const scripted = [];
   const log = [];
-  let spentCents = 0, daySpent = 0, pairingOff = false, pairLimited = false, dayFields = false;
+  let spentCents = 0, daySpent = 0, pairingOff = false, pairLimited = false, dayFields = false, speakCount = 0;
 
   const cors = (req) => {
     const origin = req.headers.origin;
@@ -117,6 +119,7 @@ export async function startFakeVoiceServer({ origins = [], port = 0, capCents = 
       row.bodyKeys = body && typeof body === 'object' ? Object.keys(body).sort() : null;
       row.voiceKey = body?.voiceKey ?? null;
       row.text = body?.segments?.[0]?.text ?? null;
+      row.nth = ++speakCount;
       if (!bearer(req)) return done(401, { error: 'authentication-required' });
       if (scripted.length) { const next = scripted.shift(); return done(next.status, { error: next.error }, next.headers); }
       if (!body || Object.keys(body).sort().join('|') !== 'format|inputKey|profile|segments|version|voiceKey') return done(400, { error: 'speech-input-invalid' });
@@ -146,6 +149,8 @@ export async function startFakeVoiceServer({ origins = [], port = 0, capCents = 
         cache.add(key);
       }
       row.voice = voice;
+      const late = Number(holdMs(text, row.nth)) || 0;
+      if (late > 0) { row.heldMs = late; await new Promise((resolve) => setTimeout(resolve, late)); }
       return done(200, silentWav(clipSeconds(text)), { 'X-NSRS-Audio-Voice-Id': voice });
     }
     // every other route refuses a speak-only token, sync included
