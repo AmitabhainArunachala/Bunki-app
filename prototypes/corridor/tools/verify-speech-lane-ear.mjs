@@ -248,7 +248,20 @@ const cases = {
   async offline() {
     const s = await open({ engine: ENGINE, width: WIDTH, ui: UI, voicePort: PORT + 1, clipSeconds: () => 0.8 });
     const { page, press, context } = s;
-    const plays = () => page.evaluate(() => (window.__sound || []).filter((x) => x.kind === 'audio-play').length);
+    // a clip that sounds: the voice's own element starts playing a clip longer than the 50 ms silence that primes it
+    await context.addInitScript(() => {
+      window.__clips = 0;
+      document.addEventListener('playing', (e) => { const a = e.target; if (a?.matches?.('audio[data-speak-audio]') && a.duration > 0.2) window.__clips += 1; }, true);
+    });
+    const plays = () => page.evaluate(() => window.__clips || 0);
+    // No connection. Chromium: Playwright's offline mode. WebKit: Playwright's offline mode also refuses the blob: address
+    // a kept clip plays from (media error 4, seen in a probe: the same clip plays from the store online with no request),
+    // so there the page is told it is offline (navigator.onLine, the offline event) and the voice server is unreachable.
+    const goOffline = async () => {
+      if (ENGINE !== 'webkit') { await context.setOffline(true); return; }
+      await page.route(`${s.fake.origin}/**`, (route) => route.abort());
+      await page.evaluate(() => { Object.defineProperty(Navigator.prototype, 'onLine', { configurable: true, get: () => false }); window.dispatchEvent(new Event('offline')); });
+    };
     const failedRequests = [];
     page.on('requestfailed', (request) => { if (/\/v1\/audio\//.test(request.url())) failedRequests.push(`${request.method()} ${new URL(request.url()).pathname} ${request.failure()?.errorText || ''}`); });
     try {
@@ -275,7 +288,7 @@ const cases = {
       // a reload (the device's store is all that is kept), the article opened online (no service worker in this harness:
       // its text comes from the network), then no connection
       await openArticle(s, { start: false });
-      await context.setOffline(true);
+      await goOffline();
       const problems = [];
       if (cardSaid.length < 2) problems.push(`online, the card's control sent ${JSON.stringify(cardSaid)} (a reading and a sentence expected)`);
       if (!earSaid.length) problems.push('online, the ear sent nothing');
@@ -340,7 +353,10 @@ const cases = {
       await tapAt(s, await wordPoint(s, 30));
       await waitEar(page, ['novoice'], 4000);
       const line = await page.evaluate(() => [...document.querySelectorAll('.ear-spot')].map((x) => x.lastElementChild).find((x) => x && !x.hidden)?.textContent || '');
-      await s.ready(); await press('#home-review').catch(() => {}); await page.locator('#tab-me').waitFor(); await press('#tab-me'); await s.sleep(900);
+      // Settings, reached inside the app (the reason is kept by this page; a reload starts from what the device keeps)
+      await earOff(s);
+      for (let i = 0; i < 4 && !(await page.locator('#home-review').isVisible().catch(() => false)); i += 1) { await press('#back').catch(() => {}); await s.sleep(800); }
+      await press('#home-review').catch(() => {}); await page.locator('#tab-me').waitFor(); await press('#tab-me'); await s.sleep(900);
       await page.locator('#me-settings').scrollIntoViewIfNeeded(); await press('#me-settings'); await s.sleep(900);
       const settings = await page.evaluate(() => document.getElementById('settings-voice-server')?.textContent || '');
       const problems = [];
