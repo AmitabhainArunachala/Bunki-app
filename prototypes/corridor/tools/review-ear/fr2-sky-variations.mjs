@@ -109,8 +109,10 @@ await run('double', async () => {
     const [w] = await clearWords(s.page);
     await arm(s);
     const n = s.fake.speaks().length;
-    await s.page.mouse.click(w.x, w.y, { clickCount: 1 });
-    await s.page.mouse.click(w.x, w.y, { clickCount: 2 });
+    // a real double-click: two presses, the second with click count 2 (mouse.click with clickCount 2 sends three)
+    await s.page.mouse.move(w.x, w.y);
+    await s.page.mouse.down({ clickCount: 1 }); await s.page.mouse.up({ clickCount: 1 });
+    await s.page.mouse.down({ clickCount: 2 }); await s.page.mouse.up({ clickCount: 2 });
     await s.sleep(1500);
     await verdict(s, 'armed, two quick clicks on one sky word: asked once, the sky never opens it', n, { ear: null }, `"${w.word}"`);
   } finally { await s.close(); }
