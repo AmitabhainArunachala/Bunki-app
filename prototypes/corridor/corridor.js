@@ -10413,11 +10413,12 @@ function openSaveChooser(node, label, invoker, { keep = null, saved = null, remo
     const owner = invoker?.isConnected ? invoker : invoker?.id ? document.getElementById(invoker.id) : null;
     paintPlacedSave(owner, node, label, isSaved);
     // a page drawn again by the pick takes the focus with its old Save: the keyboard stays on the Save under the name
-    requestAnimationFrame(() => {
-      if (document.activeElement && document.activeElement !== document.body) return;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const active = document.activeElement;
+      if (active && active !== document.body && active.isConnected && active.matches?.('button, input, select, textarea, a[href]')) return;
       const now = invoker?.isConnected ? invoker : invoker?.id ? document.getElementById(invoker.id) : null;
       if (now && !document.getElementById('vocabulary-list-popover')) now.focus({ preventScroll: true });
-    });
+    }));
     // the naming Save may have been drawn again by its own repaint (the article bar's): the one under its name now counts
     const named = names && !!(owner?.isConnected || (owner?.id && document.getElementById(owner.id)));
     if (!named) sayPlaced(node, label, result, { saved, keep });
