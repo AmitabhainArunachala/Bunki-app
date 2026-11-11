@@ -13687,9 +13687,10 @@ function speakCardReading(text, btn, word = '', { automatic = false, withSentenc
   // this device has kept for this word is a voice to be had, connection or not (B3).
   // A tap on 音 always asks, and is told why when it finds no voice.
   if (automatic && (wordVoice() !== 'on' || !voiceLayer?.canSay(text, word))) return;
-  // a second tap on the control that is speaking its own turn stops it (retireCardSpeech would otherwise end it and start it
-  // again). A tap while the answer's word says itself is not a second tap: that word ends and the control's own turn starts.
-  if (!automatic && voiceLayer?.tapSpeaking?.(btn)) { retireCardSpeech(); return; }
+  // a second tap on a card's control that is speaking its own turn stops it (retireCardSpeech would otherwise end it and start
+  // it again). A tap while the answer's word says itself is not a second tap: that word ends and the control's own turn starts.
+  // The word box's 音 stays as it was (R7, 2026-11-11): a second tap says its word again from the top.
+  if (!automatic && btn?.id !== 'mini-voice' && voiceLayer?.tapSpeaking?.(btn)) { retireCardSpeech(); return; }
   retireCardSpeech();
   stopReadAloud(); stopRecAudio(); stopSentenceListening();
   // The current source is the voice seam (modules/voice-seam.mjs): a recorded clip, then the voice server, and
