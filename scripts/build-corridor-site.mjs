@@ -91,6 +91,7 @@ try {
     'modules/worlds.mjs',
     'modules/voice.mjs',
     'modules/voice-layer.mjs',
+    'modules/voice-bands.mjs',
     'modules/voice-seam.mjs',
     'modules/voice-client.mjs',
     'modules/learner.mjs',

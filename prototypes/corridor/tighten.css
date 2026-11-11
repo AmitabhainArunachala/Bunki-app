@@ -333,10 +333,12 @@ html[data-live-depth='1'] #sheet:has(> h2.headword):not(:has(.hero > .hero-glyph
 /* waiting for the voice server's answer: the control he pressed dims until the sentence starts */
 .voice-say[aria-busy='true'], .kp-listen[aria-busy='true'], .say[aria-busy='true'], .mini-voice[aria-busy='true'],
 .listen-row[data-voice-state='loading'] .play-toggle { opacity: 0.6; }
-::highlight(bunki-speaking) { background-color: rgba(201, 162, 39, 0.28); }
-:root:not([data-voice-highlight='range']) #reader .tok[data-speaking] {
-  background: color-mix(in srgb, var(--color-gold, #c9a227) 28%, transparent);
-}
+/* the sentence being read: one even band per line, in a layer of its own that takes no pointer and moves no layout
+   (modules/voice-bands.mjs; the Custom Highlight API painted it in patches in WebKit). It lies over the text like a
+   highlighter on paper: multiplied on the light grounds, so the ink stays ink; plain on the night grounds. */
+.read-bands { position: absolute; left: 0; top: 0; width: 0; height: 0; z-index: 1; pointer-events: none; }
+.read-band { position: absolute; display: block; pointer-events: none; background: rgba(201, 162, 39, 0.28); mix-blend-mode: multiply; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .read-band { mix-blend-mode: normal; }
 /* a line the tutor's room could not voice by itself is heard through the mark beside it */
 .speak-said:has(> .voice-say) > .speak-silent { display: none; }
 .settings-voice-server { margin-top: 16px; }
