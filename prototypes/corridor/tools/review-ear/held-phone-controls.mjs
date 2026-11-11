@@ -77,13 +77,17 @@ try {
   await heldTap('Back', '#app > .chrome [data-bar-back], #app > .chrome button.back', (b, a) => a.view !== b.view);
   await heldTap('the prototype’s notes button 試', '#prototype-open', (b, a) => a.notes);
 
-  // 6. a screen he reaches with the ear held on keeps a mark to turn it off (the review card)
-  await toToday();
-  if ((await earState(page)) !== 'off') { await press(await earMark(page)); await s.sleep(300); }
+  // 6. a screen he reaches with the ear held on keeps a mark to turn it off (the review card). The coordinator's ruling C1
+  // (2026-11-11, after this review): the study card's look does not change, so the ear is never left on where its mark is
+  // not shown; entering a screen without one turns the ear off, silently. Held on from Today, then the review card.
+  await heldOnToday();
   await press('#review-start');
   await page.locator('#reveal').waitFor();
+  await s.sleep(600);
   const review = await at();
-  record('the review card has an ear mark to turn the ear off', review.marks ? [] : ['no ear mark on the review card'], `${review.marks} mark(s) on ${review.view}`);
+  const earNow = await earState(page);
+  record('the review card: the ear is not left on without a mark to turn it off (ruling C1)',
+    review.marks || CONTROL || earNow === 'off' ? [] : [`no ear mark on the review card and the ear is "${earNow}"`], `${review.marks} mark(s) on ${review.view}; ear ${earNow}`);
 } catch (error) {
   record('the check ran to its end', [String(error.message).split('\n')[0].slice(0, 200)]);
   await page.screenshot({ path: `${OUT}/held-${tag}-error.png` }).catch(() => {});
