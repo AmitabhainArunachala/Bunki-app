@@ -13683,9 +13683,10 @@ function speakCardReading(text, btn, word = '', { automatic = false, withSentenc
   if (btn?.id === 'card-say-front' && (automatic || S.view !== 'review' || S.review?.revealed || S.review?.pending || S.review?.admitting || S.stack.length || S.strokes)) return;
   // Said by itself (a card's answer shown, a word opened: John's "on reveal", 2026-11-10) is not his tap. It happens
   // unless he switched it off (WORD_VOICE), through the voice server only; and when no voice is to be had (no layer,
-  // unpaired, offline, the budget used) nothing happens at all: no other sound is stopped and no line is shown.
+  // unpaired, offline, the budget used) nothing happens at all: no other sound is stopped and no line is shown. A clip
+  // this device has kept for this word is a voice to be had, connection or not (B3).
   // A tap on 音 always asks, and is told why when it finds no voice.
-  if (automatic && (wordVoice() !== 'on' || !voiceLayer?.canSay())) return;
+  if (automatic && (wordVoice() !== 'on' || !voiceLayer?.canSay(text, word))) return;
   // a second tap on the control that is speaking its own turn stops it (retireCardSpeech would otherwise end it and start it
   // again). A tap while the answer's word says itself is not a second tap: that word ends and the control's own turn starts.
   if (!automatic && voiceLayer?.tapSpeaking?.(btn)) { retireCardSpeech(); return; }
@@ -29185,6 +29186,13 @@ function speakHost() {
       audioEl.addEventListener('pause', release);
     },
     stopAudio: () => stopRecAudio(),
+    // Her voice (B4, 2026-11-11): the app's one voice seam (modules/voice-layer.mjs), never a voice of the room's own and
+    // never the device's. Her line's Japanese by the rule her listen mark reads; her line said before the room listens,
+    // resolving { state, code, line } with the plain line when no voice was had; and the room's own stop for it.
+    // Without the layer (the single-file build) her lines stay silent and the room goes on as before.
+    lineSentences: (text) => (voiceLayer ? voiceLayer.sentencesOf(text) : []),
+    sayLine: (request) => (voiceLayer ? voiceLayer.sayLine(request) : Promise.resolve({ state: 'error', code: 'no-voice-layer', line: '' })),
+    stopLine: () => voiceLayer?.stopLine(),
     // one acknowledged write per turn: the archive rows and the gated evidence together, or nothing
     commitTurn: async (archiveRows, found, xid) => {
       if (!recordWritable() || !archiveRows.length || !archiveRows.every(validArchiveTurn)) return { ok: false, evidence: [] };

@@ -96,6 +96,7 @@ try {
     'modules/save-places.mjs',
     'modules/voice-seam.mjs',
     'modules/voice-client.mjs',
+    'modules/voice-clip-store.mjs',
     'modules/learner.mjs',
     'modules/drift.mjs',
     'modules/library.mjs',

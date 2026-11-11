@@ -181,11 +181,17 @@ export function createVoiceClient({ fetch: fetchFn = globalThis.fetch?.bind(glob
       signal?.removeEventListener('abort', stop);
     }
   }
-  const errorCode = async (response, known, fallback) => {
-    let code = null;
-    try { code = (await response.json())?.error; } catch { /* not JSON */ }
-    return typeof code === 'string' && known.has(code) ? code : fallback;
+  /** A refusal's code, and any ceiling it names in whole cents (`figures`: dayCapCents, capCents). The Worker sends no
+   * figure with a refusal today; one that does is taken as it says, and nothing is ever made up. */
+  const refusal = async (response, known, fallback) => {
+    let body = null;
+    try { body = await response.json(); } catch { /* not JSON */ }
+    const code = typeof body?.error === 'string' && known.has(body.error) ? body.error : fallback;
+    const figures = {};
+    for (const name of ['dayCapCents', 'capCents']) if (Number.isSafeInteger(body?.[name]) && body[name] >= 0) figures[name] = body[name];
+    return { code, figures };
   };
+  const errorCode = async (response, known, fallback) => (await refusal(response, known, fallback)).code;
 
   return {
     /** True once this device has been given a voice server's address. */
@@ -234,9 +240,9 @@ export function createVoiceClient({ fetch: fetchFn = globalThis.fetch?.bind(glob
         headers: { Authorization: `Bearer ${pairing.token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ format: input.format, version: input.version, inputKey: input.inputKey, segments: input.segments, profile: input.profile, voiceKey }) }, signal);
       if (response.status !== 200) {
-        const code = await errorCode(response, SPEAK_CODES, response.status === 401 ? 'authentication-required' : 'speak-failed');
+        const { code, figures } = await refusal(response, SPEAK_CODES, response.status === 401 ? 'authentication-required' : 'speak-failed');
         if (response.status === 401) await forget();
-        throw new VoiceError(code, response.status);
+        throw Object.assign(new VoiceError(code, response.status), { figures });
       }
       const contentType = response.headers.get('Content-Type') || '';
       let bytes;

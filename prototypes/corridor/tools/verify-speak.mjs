@@ -71,8 +71,8 @@ const require = createRequire(import.meta.url);
 
 const FAULTS = {
   'device-voice': { file: 'speak.js', witness: { S2: /no device voice after a line/u, S9: /device voice is never asked/u },
-    from: '    host.stopAudio();\n    const clips = line.voice || voiceLine(line);',
-    to: '    host.stopAudio(); window.speechSynthesis?.speak(new SpeechSynthesisUtterance(line.text));\n    const clips = line.voice || voiceLine(line);' },
+    from: '    host.stopAudio();\n    const sentences = voiceLine(line);',
+    to: '    host.stopAudio(); window.speechSynthesis?.speak(new SpeechSynthesisUtterance(line.text));\n    const sentences = voiceLine(line);' },
   'charon-main': { file: 'speak-core.mjs', witness: { S9: /said by Kore/u },
     from: '  return lock.mainVoice.prebuilt;\n}', to: '  return lock.secondaryVoice.prebuilt;\n}' },
   revlog: { file: 'corridor.js', witness: { S4: /byte-identical/u },

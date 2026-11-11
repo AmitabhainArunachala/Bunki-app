@@ -254,13 +254,14 @@ export function createSpeakRoom(host) {
     return { ...answer, model: tp.ears, englishNote };
   }
 
-  /** The voice of one line: one request per sentence, in the lock's model and the line's voice. Sentence two renders
-   * while sentence one plays. A failure leaves that sentence silent; the model gone (Nov 17) stops the voice. */
+  /** Her line for the app's one voice seam (B4, 2026-11-11): its Japanese, sentence by sentence, by the same rule a tap
+   * on the line's listen mark reads (host.lineSentences, the voice layer's), so a tap later asks for the clip already
+   * said. Text and transcripts stay as they are; no provider audio is requested and the room keeps no clip of its own:
+   * line.voice stays empty. Without the voice layer (the single-file build) there is nothing to say. */
   function voiceLine(line) {
-    // Text/transcripts remain available; unbound lines cannot request provider audio.
     line.voice = [];
-    return [];
-}
+    return typeof host.lineSentences === 'function' ? host.lineSentences(String(line?.text || '')) : [];
+  }
   function splitLine(line) {
     const tokens = Array.isArray(line.tokens) ? line.tokens : null;
     if (!tokens) return core.splitSentences(line.text).map((text) => ({ text, tokens: null }));
@@ -322,25 +323,49 @@ export function createSpeakRoom(host) {
     });
     return ctx;
   }
-  /** Play one line's sentences through the one element; resolves 'done', 'stopped' or 'silent'. */
+  /** Resolves when the page is shown: at once when it already is. */
+  function whenShown() {
+    return new Promise((resolve) => {
+      if (!document.hidden) { resolve(); return; }
+      const shown = () => {
+        if (document.hidden) return;
+        document.removeEventListener('visibilitychange', shown);
+        resolve();
+      };
+      document.addEventListener('visibilitychange', shown);
+    });
+  }
+  /** Say her line through the app's one voice seam (host.sayLine: a kept clip, then the voice server, otherwise
+   * silence); resolves 'done', 'stopped' or 'silent'. With no voice the room carries on without sound, and the plain
+   * line saying why is shown once in a conversation, under the first line that found none. */
   async function playLine(line, { rate = 1 } = {}) {
     const token = ++st.playToken;
-    host.stopAudio();
-    const clips = line.voice || voiceLine(line);
-    let played = 0;
-    setPhase('speaking');
-    for (const clipPromise of clips) {
-      const clip = await clipPromise;
-      if (token !== st.playToken) return 'stopped';
-      if (!clip) continue;
-      const result = await playClip(clip.url, rate, token);
-      if (result !== 'ended') return 'stopped';
-      played += 1;
+    // Nothing is said on a page he is not looking at, and nothing is asked for it: a line that arrives while the page is
+    // hidden waits until it is shown, and is said then only if the room and its talk are still the ones showing
+    // (otherwise it stays on the page, with its listen mark).
+    if (document.hidden) {
+      const s = st.session;
+      await whenShown();
+      if (token !== st.playToken || st.session !== s || !host.isCurrent()) return 'stopped';
     }
+    host.stopAudio();
+    const sentences = voiceLine(line);
+    if (!sentences.length || typeof host.sayLine !== 'function') return 'silent';
+    setPhase('speaking');
+    st.playing = { kind: 'line', rate };
+    const node = els.body?.querySelector?.(`.speak-line[data-index="${line.index}"] .speak-said`) || null;
+    const said = await host.sayLine({ sentences, conversation: st.session?.id || 'speak', rate, node });
     if (token !== st.playToken) return 'stopped';
     st.playing = null;
-    if (!played) paintLineState(line);
-    return played ? 'done' : 'silent';
+    if (said?.state === 'done') return 'done';
+    if (said?.state === 'stopped') return 'stopped';
+    const s = st.session;
+    if (said?.line && s && !s.voiceNoted) {
+      s.voiceNoted = true;
+      line.silent = said.line;
+      paintLineState(line);
+    }
+    return 'silent';
   }
   function playClip(url, rate, token) {
     // Includes shadow replay of a previously cached unbound clip.
@@ -351,6 +376,8 @@ export function createSpeakRoom(host) {
     st.playToken += 1;
     st.playing = null;
     if (audio && !audio.paused) { try { audio.pause(); } catch { /* already quiet */ } }
+    // her line in the app's seam ends with it
+    host.stopLine?.();
     // her voice stopped by the room (橋, 影, 了, his tap): the ring rests unless what stopped her starts something else
     if (st.phase === 'speaking') setPhase('rest');
   }
@@ -1022,7 +1049,7 @@ export function createSpeakRoom(host) {
     said.append(text);
     if (line.who === 'me' && line.corrections?.length > VISIBLE_MARKS) said.append(moreMarks(line));
     if (line.englishNote) said.append(el('p', 'speak-note', t('この返事は英語でした。', 'This reply came in English.')));
-    if (line.silent) said.append(el('p', 'speak-note speak-silent', t('声を出せませんでした', 'No voice for this line')));
+    if (line.silent) said.append(silentNote(line));
     li.append(seal, said);
     return li;
   }
@@ -1109,8 +1136,16 @@ export function createSpeakRoom(host) {
   }
   function paintLineState(line) {
     const node = els.body?.querySelector(`.speak-line[data-index="${line.index}"] .speak-said`);
-    if (!node || node.querySelector('.speak-silent') || !line.silent) return;
-    node.append(el('p', 'speak-note speak-silent', t('声を出せませんでした', 'No voice for this line')));
+    if (!node || node.querySelector('.speak-silent, .speak-no-voice') || !line.silent) return;
+    node.append(silentNote(line));
+  }
+  /** Under a line that found no voice: the voice layer's plain line saying why (its own class: tighten.css hides the old
+   * generic .speak-silent note once the line has its listen mark, and this line must be seen). */
+  function silentNote(line) {
+    const why = typeof line.silent === 'string';
+    const note = el('p', why ? 'speak-note speak-no-voice' : 'speak-note speak-silent', why ? line.silent : t('声を出せませんでした', 'No voice for this line'));
+    note.setAttribute('role', 'status');
+    return note;
   }
   function paintBridgeHint(check) {
     st.lastBridgeCheck = check;
@@ -1647,7 +1682,7 @@ export function createSpeakRoom(host) {
       slot.append(note);
       return false;
     };
-    const clips = (await Promise.all(line.voice || voiceLine(line))).filter(Boolean);
+    const clips = (await Promise.all(line.voice || [])).filter(Boolean);
     const bytes = clips.reduce((n, clip) => n + clip.wav.length, 0);
     const existing = await savedLines();
     const used = existing.reduce((n, item) => n + (item.bytes || 0), 0);

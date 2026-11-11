@@ -219,13 +219,15 @@ const BOOT_DATA = [
   // corridor.js imports device-voice.mjs at boot; first offline launch needs it.
   'device-voice.mjs',
   // The voice layer is loaded beside the app at boot (corridor.js). Offline it is what plays an article's own recording
-  // and says in words why nothing else can be voiced, so it and everything it imports travel with the install.
+  // and says in words why nothing else can be voiced, so it and everything it imports travel with the install. Offline it
+  // also plays every clip this device has kept (voice-clip-store.mjs).
   'modules/voice-layer.mjs',
   'modules/voice-bands.mjs',
   'modules/card-audio.mjs',
   'modules/save-places.mjs',
   'modules/voice-seam.mjs',
   'modules/voice-client.mjs',
+  'modules/voice-clip-store.mjs',
   'modules/nihongo-speech/audio/speech-text.mjs',
   'modules/nihongo-speech/audio/speech-queue.mjs',
   'modules/nihongo-speech/audio/speech-player.mjs',

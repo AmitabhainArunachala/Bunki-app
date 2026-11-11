@@ -18,6 +18,7 @@ import { createAudioPlayer } from './nihongo-speech/audio/speech-player.mjs';
 import { isJapaneseEnough, normaliseSpeechText, splitSentences } from './nihongo-speech/audio/speech-text.mjs';
 import { answerReads, deckFrontVoice, reviewFrontVoice } from './card-audio.mjs';
 import { baseBoxes, createBands } from './voice-bands.mjs';
+import { createClipStore, createIndexedDbClipStorage } from './voice-clip-store.mjs';
 import { createDeviceTokenStore, createVoiceClient } from './voice-client.mjs';
 import { SPEEDS, createVoiceSeam, sentencesOf, voiceKeyOf } from './voice-seam.mjs';
 
@@ -60,6 +61,14 @@ export function japaneseSentences(text) {
     .filter((sentence) => isJapaneseEnough(sentence.text));
 }
 
+/** What one word's control asks of the seam: the text in its canonical form and the word's voice key. His tap on 音 and
+ * the answer saying itself ask the same, so they share one kept clip (B3). */
+export function wordVoiceRequest(text, word = '') {
+  let normal = '';
+  try { normal = normaliseSpeechText(String(text || '')); } catch { /* nothing to say */ }
+  return { text: normal, voiceKey: voiceKeyOf('word', word || normal) };
+}
+
 /** Today's spend, for the status line. The server's day runs from 00:00 UTC. When the server sends the day's own
  * figures they are shown as they are; until then it is what the total has grown by since this device first looked today
  * (`kept` is that first look: { day, spentCents, at }; `keep` is what to remember for the next look). */
@@ -70,6 +79,31 @@ export function daySpend(budget, kept, now = Date.now()) {
   const base = kept && kept.day === day && Number.isSafeInteger(kept.spentCents) && kept.spentCents >= 0 && kept.spentCents <= budget.spentCents &&
     Number.isFinite(kept.at) ? kept : { day, spentCents: budget.spentCents, at: now };
   return { day, spentCents: budget.spentCents - base.spentCents, capCents: null, since: base.at, keep: base };
+}
+
+/** The voice server's ceilings as far as it has said them (the seam's status): its budget answer first, then a
+ * refusal's own figure. Bunki holds none of its own (the server's are set by the owner: 10,000 cents in total and
+ * 1,000 a day, or 30,000 and 3,000); null where the server has said nothing. */
+export function voiceLimits(status) {
+  const cents = (value) => (Number.isSafeInteger(value) && value >= 0 ? value : null);
+  return {
+    dayCapCents: cents(status?.budget?.dayCapCents) ?? cents(status?.limits?.dayCapCents),
+    capCents: cents(status?.budget?.capCents) ?? cents(status?.limits?.capCents),
+  };
+}
+const amount = (cents) => { const n = cents % 100 ? (cents / 100).toFixed(2) : String(cents / 100); return { ja: `${n}ドル`, en: `$${n}` }; };
+/** The no-voice line for a limit reached, { ja, en }: the amount the server said, or no amount at all when it said none.
+ * `at` is when the voice comes back (the server's new day, in this device's own time). */
+export function limitLine(reason, limits, at) {
+  const day = limits?.dayCapCents ?? null, total = limits?.capCents ?? null;
+  if (reason === 'day-budget') {
+    return day === null
+      ? { ja: `声を出せません。今日の音声の上限を使いました。声は${at}に戻ります。`, en: `No voice: today’s voice limit is used. The voice comes back at ${at}.` }
+      : { ja: `声を出せません。今日の${amount(day).ja}分を使いました。声は${at}に戻ります。`, en: `No voice: today’s ${amount(day).en} is used. The voice comes back at ${at}.` };
+  }
+  return total === null
+    ? { ja: '声を出せません。音声の予算の合計を使い切りました。', en: 'No voice: the voice budget’s total is used.' }
+    : { ja: `声を出せません。合計${amount(total).ja}を使い切りました。`, en: `No voice: the ${amount(total).en} total is used.` };
 }
 
 export function installVoiceLayer(host) {
@@ -87,8 +121,12 @@ export function installVoiceLayer(host) {
     // (a tab that ran an earlier build may still hold a stand-in voice's row: only a real voice counts)
     try { const row = JSON.parse(doc.defaultView.sessionStorage.getItem(LAST)); return row && ['server', 'recorded'].includes(row.source) && Number.isFinite(row.at) ? row : null; } catch { return null; }
   };
+  // heard clips, kept on this device (B3): played first, at once and offline; its index is read now, so a read by itself
+  // can tell whether a kept clip is there
+  const clips = createClipStore({ storage: createIndexedDbClipStorage(globalThis) });
+  void clips.ready();
   const seam = createVoiceSeam({
-    client, player,
+    client, player, store: clips,
     recorded: (src, rate) => host.playRecorded(src, rate),
     quiet: () => host.quiet(),
     onStatus: (status) => {
@@ -96,7 +134,13 @@ export function installVoiceLayer(host) {
       for (const listener of listeners) { try { listener(status); } catch { /* a listener's own fault */ } }
     },
   });
-  void client.ready().then(() => { for (const listener of listeners) listener(seam.status()); host.refreshListenRow?.(); });
+  // a paired device reads the budget (free) as the app opens, so a line naming a limit names the server's own figure,
+  // not a guess, whether or not Settings has been opened in this visit
+  void client.ready().then(() => {
+    for (const listener of listeners) listener(seam.status());
+    host.refreshListenRow?.();
+    if (client.paired()) void seam.refreshBudget();
+  });
 
   /** Inside his tap: the audio element is allowed to sound later, when the first clip has arrived. */
   function prime() {
@@ -114,10 +158,8 @@ export function installVoiceLayer(host) {
   const sourceLine = (source) => source === 'server' ? tx('音声サーバー', 'Voice server') : source === 'recorded' ? tx('収録音声', 'Recorded clip') : '';
   // the voice server's day is the UTC day: its new start, in this device's own time
   const newDay = () => new Date((Math.floor(Date.now() / 86400000) + 1) * 86400000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  // the two limits are the speech team's (one budget for both apps): the server's own figures once it has sent them
-  const money = (cents) => { const n = cents % 100 ? (cents / 100).toFixed(2) : String(cents / 100); return { ja: `${n}ドル`, en: `$${n}` }; };
-  const dayCap = () => money(seam.status().budget?.dayCapCents ?? 300);
-  const totalCap = () => money(seam.status().budget?.capCents ?? 2500);
+  // the two limits are the speech team's (one budget for both apps): only the server's own figures, never a guess
+  const limitWords = (reason) => { const words = limitLine(reason, voiceLimits(seam.status()), newDay()); return tx(words.ja, words.en); };
   /** Why there is no voice, in one plain line: what a listen control says when it makes no sound. */
   const silenceLine = (reason) => {
     switch (reason) {
@@ -128,10 +170,8 @@ export function installVoiceLayer(host) {
           'No voice: the voice server ended this pairing. Pair again in Settings, Writing and voice.');
       case 'offline': case 'network-failed':
         return tx('声を出せません。音声サーバーに届きません。接続を確かめて、もう一度。', 'No voice: the voice server is out of reach. Check the connection, then tap again.');
-      case 'day-budget':
-        return tx(`声を出せません。今日の${dayCap().ja}分を使いました。声は${newDay()}に戻ります。`, `No voice: today’s ${dayCap().en} is used. The voice comes back at ${newDay()}.`);
-      case 'budget-exhausted':
-        return tx(`声を出せません。合計${totalCap().ja}を使い切りました。`, `No voice: the ${totalCap().en} total is used.`);
+      case 'day-budget': case 'budget-exhausted':
+        return limitWords(reason);
       case 'not-in-release':
         return tx('声を出せません。音声サーバーはいま新しい文を受け付けていません。', 'No voice: the voice server is not taking new sentences right now.');
       case 'request-rate-limit':
@@ -188,19 +228,37 @@ export function installVoiceLayer(host) {
 
   /** Whether `button` is saying a turn its own tap started (not a read that started by itself). */
   const tapSpeaking = (button) => !!button && spoken?.button === button && !spoken.automatic && !!spoken.session && !spoken.session.ended;
+
+  /** A read by itself held while the page is hidden: run when the page is shown again (a newer one replaces it). */
+  let heldUntilShown = null;
+  const whenShown = (run) => { heldUntilShown = run; };
+  doc.addEventListener('visibilitychange', () => {
+    if (doc.hidden || !heldUntilShown) return;
+    const run = heldUntilShown;
+    heldUntilShown = null;
+    run();
+  });
+
   /** Speak `sentences` from `button`: a second tap stops it; whatever else was speaking ends first. With no voice to be
    * had it makes no sound and hands `onNote` the reason in one plain line (and '' again once a voice answers).
    * `automatic`: the read was not started by the learner's tap (a card's answer or an opened word saying itself): it
-   * does not start at all when it could not be voiced, so it stops no other sound, and it never shows a line. */
-  function speakFrom(button, { sentences, voiceKey, single = false, onNote = null, onDone = null, automatic = false }) {
+   * does not start at all when it could not be voiced, so it stops no other sound, and it never shows a line.
+   * `toggle`: false for a read the app starts that is not a tap (the Speak room's line); `rate` overrides the reader's. */
+  function speakFrom(button, request) {
+    const { sentences, voiceKey, single = false, onNote = null, onDone = null, automatic = false, toggle = true, rate = null } = request;
     // his second tap on a control that is speaking its own turn stops it. A read by itself (the answer's word said as it
-    // is shown) is nobody's tap: a tap then ends it and starts the control's own turn from the top (lead's ruling, 11-11)
-    if (!automatic && tapSpeaking(button)) { seam.stop(); return null; }
+    // is shown) is nobody's tap: a tap then ends it and starts the control's own turn from the top (lead's ruling, 11-11).
+    // A read the app starts that is not a tap (`toggle` false: the Speak room's line) never stops itself this way.
+    if (!automatic && toggle && tapSpeaking(button)) { seam.stop(); return null; }
     if (!sentences.length) { if (!automatic) onNote?.(silenceLine('nothing-to-say'), 'nothing-to-say'); return null; }
     if (automatic) {
       // a read of the article is under way (or yields to a word): nothing says itself over it (John, 2026-11-11)
       if (readerBusy()) return null;
-      if (seam.cannot(voiceKey)) return null;
+      // Nothing speaks by itself on a page he is not looking at, and nothing is asked for it. It is not used up: when the
+      // page is shown again it is said if its control (its screen) still stands; otherwise it stays tappable.
+      if (doc.hidden) { whenShown(() => { if (button?.isConnected) speakFrom(button, request); }); return null; }
+      // a clip kept on this device is a voice to be had, connection or not
+      if (seam.cannot(voiceKey, sentences[0]?.text)) return null;
       // a page nobody has touched yet may not sound: asking the server then would be paid for and never heard
       const touched = doc.defaultView.navigator?.userActivation;
       if (touched && !touched.hasBeenActive) return null;
@@ -226,7 +284,7 @@ export function installVoiceLayer(host) {
       if (state === 'loading') next.setAttribute('aria-busy', 'true');
     };
     mine.session = seam.read({
-      sentences, voiceKey, prefetch: single ? 0 : 2, gapMs: single ? 0 : 260, rate: reader.rate,
+      sentences, voiceKey, prefetch: single ? 0 : 2, gapMs: single ? 0 : 260, rate: rate ?? reader.rate,
       // a voice answered: the line an earlier silence left beside the control goes
       onSource: () => { if (mine.over) return; mine.voiced = true; onNote?.('', null); },
       onState: (state, code) => {
@@ -594,6 +652,36 @@ export function installVoiceLayer(host) {
     }
     mountStudyCard(root);
   }
+
+  /* ------------------------------------------------------------------ the Speak room's lines (B4) */
+  let roomRead = null;
+  /** Her line in the Speak room (speak.js, speakThenListen), said through the seam before the room listens: her
+   * Japanese, through a kept clip or the voice server, otherwise nothing. Resolves { state, code, line } when the read
+   * ends ('done', 'stopped' or 'error'); `line` is the plain line saying why no voice was had, for the room to show. */
+  function sayLine({ sentences = [], conversation = 'speak', rate = 1, node = null } = {}) {
+    return new Promise((resolve) => {
+      let session = null;
+      let line = '';
+      let settled = false;
+      const end = (state, code) => {
+        if (settled) return;
+        settled = true;
+        if (roomRead && roomRead === session) roomRead = null;
+        resolve({ state, code: code || null, line });
+      };
+      if (!Array.isArray(sentences) || !sentences.length) { end('error', 'nothing-to-say'); return; }
+      // nothing is asked or said on a page he is not looking at (the room waits for the page to be shown: speak.js)
+      if (doc.hidden) { end('stopped'); return; }
+      // her line's mark stands before her voice starts, so it shows that she is speaking
+      mountMarks(doc);
+      const mark = node?.isConnected ? markOf(node, 'append') : null;
+      session = speakFrom(mark, { sentences, voiceKey: voiceKeyOf('conv', conversation), rate, toggle: false,
+        onNote: (text) => { if (text) line = text; }, onDone: end });
+      if (!session) { end('error', 'not-started'); return; }
+      if (!settled) roomRead = session;
+    });
+  }
+
   /** A study card's audio control does its own act and nothing else (fix round 1 of the card audio, 2026-11-11): a press
    * on it never reaches the card (a practice block turns its face over on any click; the deck reveals on Space or Enter);
    * a pointer or touch press leaves no focus on it, so Space and Enter go on turning and grading the card as before the
@@ -767,11 +855,19 @@ export function installVoiceLayer(host) {
       if (spend.keep && (!kept || kept.day !== spend.keep.day || kept.spentCents !== spend.keep.spentCents)) {
         try { view.localStorage.setItem(DAY_KEY, JSON.stringify(spend.keep)); } catch { /* counted for this page only */ }
       }
-      const cap = dollars(spend.capCents ?? 300);
-      today = spend.since === null
-        ? tx(`今日：${dollars(spend.spentCents)}（上限は1日${cap}、${newDay()}に戻ります）。`, `Today: ${dollars(spend.spentCents)} of ${cap}. The day starts again at ${newDay()}.`)
-        : tx(`今日：${dollars(spend.spentCents)}（この端末で${clock(spend.since)}から数えた分。上限は1日${cap}、${newDay()}に戻ります）。`,
-          `Today: ${dollars(spend.spentCents)} since ${clock(spend.since)}, counted on this device. The limit is ${cap} a day and starts again at ${newDay()}.`);
+      // the day's ceiling only as the server said it; with none said, no ceiling is named
+      const capCents = spend.capCents ?? voiceLimits(status).dayCapCents;
+      const cap = capCents === null ? null : dollars(capCents);
+      const spent = dollars(spend.spentCents);
+      if (spend.since === null) {
+        today = cap ? tx(`今日：${spent}（上限は1日${cap}、${newDay()}に戻ります）。`, `Today: ${spent} of ${cap}. The day starts again at ${newDay()}.`)
+          : tx(`今日：${spent}（${newDay()}に戻ります）。`, `Today: ${spent}. The day starts again at ${newDay()}.`);
+      } else {
+        today = cap ? tx(`今日：${spent}（この端末で${clock(spend.since)}から数えた分。上限は1日${cap}、${newDay()}に戻ります）。`,
+          `Today: ${spent} since ${clock(spend.since)}, counted on this device. The limit is ${cap} a day and starts again at ${newDay()}.`)
+          : tx(`今日：${spent}（この端末で${clock(spend.since)}から数えた分。${newDay()}に戻ります）。`,
+            `Today: ${spent} since ${clock(spend.since)}, counted on this device. The day starts again at ${newDay()}.`);
+      }
     }
     return { state: blocked && status.paired ? `${state} ${blocked}` : state, last, budget, today };
   }
@@ -849,14 +945,15 @@ export function installVoiceLayer(host) {
     settingsBlock,
     status: () => seam.status(),
     onStatus: (listener) => { listeners.add(listener); return () => listeners.delete(listener); },
-    /** A single word or reading from one of the app's own 音 buttons. */
+    /** A single word or reading from one of the app's own 音 buttons. (A box drawn again while its word is being said,
+     * as with no connection when its dictionary worker cannot load, hands the read to its new 音: anchorOf.) */
     sayWord({ text, word, button, onNote, automatic = false, withSentence = false }) {
-      let normal = '';
-      try { normal = normaliseSpeechText(String(text || '')); } catch { /* nothing to say */ }
+      // the text and voice key are the ones the answer saying itself asks for, so both share one kept clip (B3)
+      const ask = wordVoiceRequest(text, word);
       // the answer side's one control (John, 2026-11-11): by his tap it says the word and then the card's own sentence, in
       // one turn; said by itself, as the answer is shown, it is the word alone
       const sentence = withSentence && !automatic ? cardSentence() : [];
-      return speakFrom(button, { sentences: normal ? answerReads(normal, sentence) : [], voiceKey: voiceKeyOf('word', word || normal),
+      return speakFrom(button, { sentences: ask.text ? answerReads(ask.text, sentence) : [], voiceKey: ask.voiceKey,
         single: !sentence.length, onNote, automatic });
     },
     /** Whether a control is saying the turn its own tap started: a further tap stops it (corridor.js asks this before it
@@ -876,8 +973,19 @@ export function installVoiceLayer(host) {
       return speakFrom(button, { sentences: japaneseSentences(text), voiceKey: sourceId ? voiceKeyOf('article', sourceId) : voiceKeyOf('word', 'sentence'), onNote });
     },
     /** Whether a word could be voiced right now. A read that would start by itself asks first (corridor.js), so that
-     * with no voice to be had it stops no other sound. */
-    canSay: () => !seam.cannot() && !readerBusy(),
+     * with no voice to be had it stops no other sound. Given the word's text, a clip kept on this device counts. While an
+     * article is being read (or yields to a word) nothing says itself over it. */
+    canSay: (text = null, word = '') => {
+      if (readerBusy()) return false;
+      if (text == null) return !seam.cannot();
+      const ask = wordVoiceRequest(text, word);
+      return !seam.cannot(ask.voiceKey, ask.text);
+    },
+    /** The Speak room (speak.js, through corridor.js's host): her line's Japanese by the rule her listen mark reads, her
+     * line said through the seam before the room listens, and the room's own stop for it. */
+    sentencesOf: (text) => japaneseSentences(text),
+    sayLine,
+    stopLine() { const read = roomRead; roomRead = null; if (read && !read.ended) read.stop(); },
     /** A word page opened by the learner's own act: its headword says itself once when the page stands (mountMarks). */
     opened(node) { openedPage = node?.t && node.id != null ? { node: `${node.t}:${node.id}`, at: Date.now() } : null; },
     /** Every sound of the layer ends: the screen changed. `keepReader` leaves an article's read to the reader's own rule. */

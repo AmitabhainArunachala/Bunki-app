@@ -2,14 +2,19 @@
  *
  * Real voices or silence (John, 2026-11-10). For each sentence:
  *   1. an approved recorded clip, when the surface has one for that sentence;
- *   2. the voice server (modules/voice-client.mjs), when this device is paired and the server takes the text;
- *   3. nothing. No other voice stands in: the read ends, silent, and names the reason, so the screen can say it in
+ *   2. a clip this device has kept (modules/voice-clip-store.mjs, B3): a clip the server made never changes, so a kept
+ *      one plays at once, online or offline, and the server is not asked;
+ *   3. the voice server (modules/voice-client.mjs), when this device is paired and the server takes the text; a
+ *      successful audio answer is kept on the device, an error never;
+ *   4. nothing. No other voice stands in: the read ends, silent, and names the reason, so the screen can say it in
  *      plain words (unpaired, offline, out of budget, the server refusing).
+ * The store never breaks speech: an error from it is a miss; a wait over 1.5 seconds is a miss and switches the store
+ * off for the rest of the page, so no later sentence waits for it.
  * A sentence the server would not take as Japanese is passed over without a word and the read goes on.
  *
  * The contract's error codes each have one behaviour here (speech team's contract v1):
  *   401 authentication-required   the client drops the token; the status says "pair again"
- *   402 budget-exhausted          the server is not asked again (the $25 total is used)
+ *   402 budget-exhausted          the server is not asked again (its total budget is used; the server sets the amount)
  *   404 not-in-release            the server is not asked again on this page (its dynamic mode is off)
  *   413 speech-input-too-large    the sentence is split further and its parts are asked for in order
  *   429 day-budget                the server is not asked again until 00:00 UTC
@@ -42,11 +47,11 @@ export function sentencesOf(text) {
   try { return splitSentences(normaliseSpeechText(String(text ?? ''))).map((piece) => ({ text: piece.text })); } catch { return []; }
 }
 
-export function createVoiceSeam({ client, player, recorded = null, quiet = () => {},
+export function createVoiceSeam({ client, player, recorded = null, store = null, storeWaitMs = 1500, quiet = () => {},
   sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)), now = () => Date.now(),
   online = () => globalThis.navigator?.onLine !== false, onStatus = () => {} } = {}) {
   if (!client || !player) throw new TypeError('the seam needs a client and a player');
-  const cache = new Map();   // `${voiceKey}|${text}` → clip, most recent last
+  const cache = new Map();   // `${voiceKey}|${text}` → clip, most recent last (this page's own; the device store is below)
   let session = null;        // the one read that may sound
   let last = { source: 'none', reason: null, at: 0 };   // the last sentence that was spoken
   let silent = null;         // { reason, at }: why the last read ended without a voice; cleared by the next spoken sentence
@@ -54,6 +59,7 @@ export function createVoiceSeam({ client, player, recorded = null, quiet = () =>
   let off = null;            // 'not-in-release' | 'budget-exhausted' for this page
   let pairAgain = false;
   let budget = null;
+  let limits = null;         // { dayCapCents?, capCents? } a refusal named in its own words
   let playing = null;        // the clip the player is on
 
   const blocked = () => {
@@ -72,6 +78,7 @@ export function createVoiceSeam({ client, player, recorded = null, quiet = () =>
     last: { ...last },
     silent: silent ? { ...silent } : null,
     budget: budget ? { ...budget } : null,
+    limits: limits ? { ...limits } : null,
   });
   const tell = () => { try { onStatus(status()); } catch { /* a listener's own fault */ } };
 
@@ -90,7 +97,11 @@ export function createVoiceSeam({ client, player, recorded = null, quiet = () =>
     const at = now();
     if (code === 'authentication-required') pairAgain = true;
     else if (code === 'budget-exhausted' || code === 'not-in-release') off = code;
-    else if (code === 'day-budget') blockedUntil['day-budget'] = (Math.floor(at / DAY) + 1) * DAY;
+    else if (code === 'day-budget') {
+      blockedUntil['day-budget'] = (Math.floor(at / DAY) + 1) * DAY;
+      // the line that says so names the server's own day ceiling: its figures are read (free) when it refuses
+      void refreshBudget();
+    }
     else if (code === 'request-rate-limit') blockedUntil['request-rate-limit'] = at + 60000;
     else if (code === 'network-failed' || code === 'voice-timeout') blockedUntil['network-failed'] = at + 15000;
   }
@@ -102,6 +113,33 @@ export function createVoiceSeam({ client, player, recorded = null, quiet = () =>
   const aborted = (signal) => { if (signal?.aborted) { const error = new Error('aborted'); error.name = 'AbortError'; throw error; } };
   /** No voice for this sentence: the read ends, and `code` is the reason the screen will give. */
   const silence = (code) => Object.assign(new Error(code), { code });
+  /** A store's fault is never the read's: what it throws is swallowed. */
+  const quietly = (work) => { try { const out = work(); if (out && typeof out.catch === 'function') out.catch(() => {}); } catch { /* the store's own */ } };
+
+  // a store that once did not answer in time is off for the rest of this page: no later sentence waits for it
+  let storeOff = false;
+  const storeOn = () => !!store && !storeOff;
+  /** The clip this device keeps for `key`, asked before the server, online or offline: this page's memory first, then
+   * the device store. A store that fails is a miss; one that does not answer within storeWaitMs is a miss, and is then
+   * switched off for the page. */
+  async function keptClip(key, signal) {
+    const near = cache.get(key);
+    if (near) { remember(key, near); if (storeOn()) quietly(() => store.touch?.(key)); return near; }
+    if (!storeOn()) return null;
+    let timer = null;
+    let clip = null;
+    try {
+      clip = await Promise.race([
+        Promise.resolve().then(() => store.get(key)),
+        new Promise((resolve) => { timer = setTimeout(() => { storeOff = true; resolve(null); }, storeWaitMs); }),
+      ]);
+    } catch { clip = null; } finally { clearTimeout(timer); }
+    aborted(signal);
+    if (!(clip?.bytes instanceof Uint8Array) || !clip.bytes.length) return null;
+    const kept = { bytes: clip.bytes, contentType: clip.contentType || 'audio/mpeg', voiceId: clip.voiceId ?? null, inputKey: null, source: 'server', kept: true };
+    remember(key, kept);
+    return kept;
+  }
 
   async function fromServer(text, voiceKey, signal) {
     const key = `${voiceKey}|${text}`;
@@ -118,6 +156,8 @@ export function createVoiceSeam({ client, player, recorded = null, quiet = () =>
     }
     const served = { ...clip, source: 'server' };
     remember(key, served);
+    // only a successful audio answer reaches here (the client throws every error): it is kept on the device
+    if (storeOn()) quietly(() => store.put(key, served));
     return served;
   }
   async function splitFurther(text, voiceKey, signal) {
@@ -135,6 +175,9 @@ export function createVoiceSeam({ client, player, recorded = null, quiet = () =>
     try { text = normaliseSpeechText(sentence.text); } catch { /* not text */ }
     // what the server would refuse as not Japanese (a line of Latin letters in an article) is passed over, never sent
     if (!text || !isJapaneseEnough(text)) return { skip: true, source: 'none', reason: 'not-japanese' };
+    // a clip this device has kept plays at once, with no request, online or offline
+    const kept = await keptClip(`${voiceKey}|${text}`, signal);
+    if (kept) return kept;
     let why = serverSkips(voiceKey);
     if (why) throw silence(why);
     try {
@@ -148,6 +191,9 @@ export function createVoiceSeam({ client, player, recorded = null, quiet = () =>
           why = typeof again?.code === 'string' ? again.code : 'speak-failed';
         }
       }
+      // a ceiling the refusal names in its own words is kept beside the budget (the server's figure, never Bunki's)
+      const figures = error?.figures && typeof error.figures === 'object' ? error.figures : {};
+      for (const name of ['dayCapCents', 'capCents']) if (Number.isSafeInteger(figures[name])) limits = { ...(limits || {}), [name]: figures[name] };
       note(why);
       tell();
       throw silence(why);
@@ -257,8 +303,18 @@ export function createVoiceSeam({ client, player, recorded = null, quiet = () =>
     read, stop, status, refreshBudget,
     /** Why a sentence could not be voiced right now ('not-paired', 'offline', 'day-budget', …), or null when the
      * server may be asked. Asking is free: a read that would start by itself looks here first, and when there is no
-     * voice to be had it does not start, so it stops no other sound. */
-    cannot: (voiceKey = 'word:bunki') => serverSkips(voiceKey),
+     * voice to be had it does not start, so it stops no other sound. Given the sentence's `text`, a clip this device
+     * keeps for it is a voice to be had, with or without the server. */
+    cannot: (voiceKey = 'word:bunki', text = null) => {
+      const why = serverSkips(voiceKey);
+      if (!why || text == null) return why;
+      let normal = '';
+      try { normal = normaliseSpeechText(String(text)); } catch { /* not text */ }
+      const key = `${voiceKey}|${normal}`;
+      let kept = false;
+      try { kept = !!normal && (cache.has(key) || (storeOn() && !!store.has?.(key))); } catch { kept = false; }
+      return kept ? null : why;
+    },
     active: () => (session && !session.ended ? session.controls : null),
     /** Pairing changed (paired, or the token was dropped): what was blocked is asked again. */
     repaired() { pairAgain = false; off = null; silent = null; blockedUntil = { 'day-budget': 0, 'request-rate-limit': 0, 'network-failed': 0 }; tell(); },
