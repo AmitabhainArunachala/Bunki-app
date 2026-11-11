@@ -256,7 +256,8 @@
           const byY = ws.slice().sort((x, y) => yv[x] - yv[y]); for (let j = 1; j < m; j += 1) pairs.push(byY[j - 1], byY[j]); }
         let best = -1, bn = -1; for (const [p, c] of g.forms) if (c > bn) { bn = c; best = p; }
         g.th0 = at; g.mid = at + span / 2; g.span = span; g.ch = best >= 0 ? D.parts[best][0] : g.key; g.nameJa = best >= 0 ? D.parts[best][1] || '' : ''; g.gloss = best >= 0 ? D.parts[best][2] || '' : ''; at += span; });
-      W.mOrder = { th, rank, realmOf, yv, realms, pairs: Int32Array.from(pairs) }; return W.mOrder;
+      const signs = []; realms.forEach((g, q) => { if (g.span >= 0.05 && !(g.span > 0.16 && q < 14)) signs.push({ a: -2, key: 'm' + q, th: g.mid, th0: g.th0, title: g.ch + '　' + (opt.lang === 'ja' ? g.nameJa : g.gloss) }); });   // a realm with no giant of its own carries its name on a sign, as an article carries its title
+      W.mOrder = { th, rank, realmOf, yv, realms, signs, pairs: Int32Array.from(pairs) }; return W.mOrder;
     }
     function layoutMean(out) {
       const mo = meanOrder(), n = W.n; for (let i = 0; i < n; i += 1) { if (W.front[i]) continue; const t = mo.th[i], rad = RE + depthOf(i); out[i * 3] = rad * Math.sin(t); out[i * 3 + 1] = mo.yv[i]; out[i * 3 + 2] = rad * Math.cos(t); }
@@ -279,17 +280,21 @@
     /** The titles of the articles stand beyond their words like signs along a road, in three rows so neighbours do not touch. */
     let dtSign = 0.016;
     function drawSigns() {
-      if (W.lens !== 'read' || !W.rOrder || !W.fonts) return; const mph = W.morph ? Math.min(1, W.morph.x) : 1, a0 = base.alpha.x * mph * (1 - 0.85 * S.dim.x) * (1 - view.over); if (a0 < 0.03) return;
+      const signs = W.lens === 'read' && W.rOrder ? W.rOrder.signs : W.lens === 'mean' && W.mOrder ? W.mOrder.signs : null;   // reading: the titles of articles; meaning: the names of the realms that have no giant of their own
+      if (!signs || !W.fonts) return; const mph = W.morph ? Math.min(1, W.morph.x) : 1, a0 = base.alpha.x * mph * (1 - 0.85 * S.dim.x) * (1 - view.over); if (a0 < 0.03) return;
       const C = W.ctx, E = view.eye, f = view.fwd, r = view.right, u = view.up, R = RE + 2900; W.sHits = W.sHits || []; W.sHits.length = 0;
       /* only signs with room: the ones nearest the middle of the view first; the others wait, fading, until there is room */
-      const cand = []; W.rOrder.signs.forEach((sg, q) => { const dx = R * Math.sin(sg.th) - E[0], dy = [-250, 60, 370][q % 3] - E[1], dz = R * Math.cos(sg.th) - E[2], z2 = dx * f[0] + dy * f[1] + dz * f[2]; if (z2 < 300 || z2 > 5200) return;
+      const cand = []; signs.forEach((sg, q) => { const dx = R * Math.sin(sg.th) - E[0], dy = [-250, 60, 370][q % 3] - E[1], dz = R * Math.cos(sg.th) - E[2], z2 = dx * f[0] + dy * f[1] + dz * f[2]; if (z2 < 300 || z2 > 5200) return;
         const sc = S.F / z2, x = S.px + (dx * r[0] + dy * r[1] + dz * r[2]) * sc; if (x < -260 || x > S.W + 260) return; const y = S.py - (dx * u[0] + dy * u[1] + dz * u[2]) * sc; if (y < 20 || y > S.H * 0.74) return;
-        const row = sg.a >= 0 ? C.articles[sg.a] : null, chars = Array.from(row ? row[1] || '' : (opt.lang === 'ja' ? 'まだ記事にない言葉' : 'not yet in an article')), title = chars.length > 22 ? chars.slice(0, 21).join('') + '…' : chars.join(''), size = clamp(20 * 3000 / z2, 13, 22);
-        cand.push({ sg, x, y, z2, title, size, hw: Math.min(22, chars.length) * size * (row ? 0.53 : 0.30) + 14, hh: size * 0.8 + 8 }); });
+        const row = sg.a >= 0 && C ? C.articles[sg.a] : null, chars = Array.from(sg.title != null ? sg.title : row ? row[1] || '' : (opt.lang === 'ja' ? 'まだ記事にない言葉' : 'not yet in an article')), title = chars.length > 22 ? chars.slice(0, 21).join('') + '…' : chars.join(''), size = clamp(20 * 3000 / z2, 13, 22);
+        cand.push({ sg, x, y, z2, title, size, hw: Math.min(22, chars.length) * size * (row ? 0.53 : 0.34) + 14, hh: size * 0.8 + 8 }); });
       cand.sort((p1, p2) => Math.abs(p1.x - S.px) - Math.abs(p2.x - S.px)); const shown = [];
-      for (const c of cand) { const free = !shown.some((o) => Math.abs(c.x - o.x) < c.hw + o.hw && Math.abs(c.y - o.y) < c.hh + o.hh); if (free) shown.push(c); const st = c.sg.fade || (c.sg.fade = { x: 0, v: 0 }); spring(st, free ? 1 : 0, 5, dtSign);
-        if (st.x < 0.03) continue; const sp = spriteFor('sign' + c.sg.a, c.title, c.sg.a >= 0 || opt.lang === 'ja' ? 'w' : 'e', c.size * S.dpr, null, 500, false);
-        if (sp) { const al = (c.sg.a >= 0 ? 0.92 : 0.72) * a0 * st.x * smooth(5200, 4200, c.z2), box = pushLabel(c.x, c.y, c.size, sp, 0, S.pal.mark, al, S.pal.mark, 0, 0); if (box) { pushLine(c.x - box.w / 2 + 10, c.y + c.size * 0.76, c.x + box.w / 2 - 10, c.y + c.size * 0.76, 0, 0.8, S.pal.mark, 0.5 * al, 1); if (st.x > 0.5) W.sHits.push({ a: c.sg.a, x: c.x, y: c.y, w: box.w, s: c.size }); } } }
+      const fr = W.frontList, fv = W.vis, fa = W.visAt, fnow = S.frame;
+      for (const c of cand) { let free = !shown.some((o) => Math.abs(c.x - o.x) < c.hw + o.hw && Math.abs(c.y - o.y) < c.hh + o.hh);
+        if (free) for (const wi of fr) { if (fa[wi] < fnow - 2) continue; const o = wi * 5; if (Math.abs(c.x - fv[o]) < c.hw + fv[o + 4] / 2 + 8 && Math.abs(c.y - fv[o + 1]) < c.hh + fv[o + 2] * 0.62 + 6) { free = false; break; } }   // a sign waits while one of his own words stands in front of it
+        if (free) shown.push(c); const st = c.sg.fade || (c.sg.fade = { x: 0, v: 0 }); spring(st, free ? 1 : 0, 5, dtSign);
+        if (st.x < 0.03) continue; const sp = spriteFor('sign' + (c.sg.key || c.sg.a), c.title, c.sg.a >= 0 || c.sg.title != null || opt.lang === 'ja' ? 'w' : 'e', c.size * S.dpr, null, 500, false);
+        if (sp) { const al = (c.sg.a >= 0 || c.sg.title != null ? 0.92 : 0.72) * a0 * st.x * smooth(5200, 4200, c.z2), box = pushLabel(c.x, c.y, c.size, sp, 0, S.pal.mark, al, S.pal.mark, 0, 0); if (box) { pushLine(c.x - box.w / 2 + 10, c.y + c.size * 0.76, c.x + box.w / 2 - 10, c.y + c.size * 0.76, 0, 0.8, S.pal.mark, 0.5 * al, 1); if (st.x > 0.5) W.sHits.push({ a: c.sg.a, x: c.x, y: c.y, w: box.w, s: c.size }); } } }
     }
     /** The learner's own words do not belong to one place on the ring: they keep him company. They stand in a small
      * ring of their own round the eye's place on its circle and turn slowly, so they too pass from right to left,
@@ -388,7 +393,9 @@
       hits.length = 0;
       const cols = Math.ceil(Wd / CW) + 2, rows = Math.ceil(Hd / CH) + 2; if (oc !== cols || orw !== rows) { oc = cols; orw = rows; occ = new Uint8Array(cols * rows); } else occ.fill(0);
       for (const h of W.gHits) { const c0 = Math.max(0, ((h.x - h.w / 2 - 6) / CW) | 0), c1 = Math.min(cols - 1, ((h.x + h.w / 2 + 6) / CW) | 0), r0 = Math.max(0, ((h.y - h.s * 0.8) / CH) | 0), r1 = Math.min(rows - 1, ((h.y + h.s * 0.8) / CH) | 0); for (let rr = r0; rr <= r1; rr += 1) for (let cc = c0; cc <= c1; cc += 1) occ[rr * cols + cc] = 2; }   // a pattern of grammar keeps its room too
-      if (W.lens === 'read' && W.sHits) for (const h of W.sHits) { const c0 = Math.max(0, ((h.x - h.w / 2) / CW) | 0), c1 = Math.min(cols - 1, ((h.x + h.w / 2) / CW) | 0), r0 = Math.max(0, ((h.y - h.s * 0.7) / CH) | 0), r1 = Math.min(rows - 1, ((h.y + h.s * 0.7) / CH) | 0); for (let rr = r0; rr <= r1; rr += 1) for (let cc = c0; cc <= c1; cc += 1) occ[rr * cols + cc] = 2; }   // a title keeps its room: far words step back from it
+      /* a touched word keeps room for its reading above and its meaning below: its neighbours step back while it is touched */
+      for (const [wi, sw] of awake) { if (sw.x < 0.3 || W.visAt[wi] < S.frame - 2) continue; const o = wi * 5, hw = W.vis[o + 4] / 2 + 16, hh = W.vis[o + 2] * 0.62 + 26, c0 = Math.max(0, ((W.vis[o] - hw) / CW) | 0), c1 = Math.min(cols - 1, ((W.vis[o] + hw) / CW) | 0), r0 = Math.max(0, ((W.vis[o + 1] - hh) / CH) | 0), r1 = Math.min(rows - 1, ((W.vis[o + 1] + hh) / CH) | 0); for (let rr = r0; rr <= r1; rr += 1) for (let cc = c0; cc <= c1; cc += 1) occ[rr * cols + cc] = 3; }
+      if ((W.lens === 'read' || W.lens === 'mean') && W.sHits) for (const h of W.sHits) { const c0 = Math.max(0, ((h.x - h.w / 2) / CW) | 0), c1 = Math.min(cols - 1, ((h.x + h.w / 2) / CW) | 0), r0 = Math.max(0, ((h.y - h.s * 0.7) / CH) | 0), r1 = Math.min(rows - 1, ((h.y + h.s * 0.7) / CH) | 0); for (let rr = r0; rr <= r1; rr += 1) for (let cc = c0; cc <= c1; cc += 1) occ[rr * cols + cc] = 2; }   // a title keeps its room: far words step back from it
       if (cI.length < n) { cI = new Int32Array(n); cX = new Float32Array(n); cY = new Float32Array(n); cS = new Float32Array(n); cZ = new Float32Array(n); cD = new Float32Array(n); cR = new Float32Array(n); W.clr = new Float32Array(n).fill(1); W.hid = new Uint8Array(n); }
       const clr = W.clr, hid = W.hid, ease = Math.min(1, dt * 10);
       /* giant characters, far beyond the ring: tone on tone */
@@ -419,7 +426,7 @@
       for (let q = 0; q < nc; q += 1) {
         const c = ord[q], i = cI[c], x = cX[c], y = cY[c], size = cS[c], isF = W.front[i] === 1, len = W.len[i], nearK = cZ[c] < 350 ? 0.22 * size : 0, hw = len * size * 0.52 + (isF ? 10 : 3) + nearK, hh = size * 0.62 + (isF ? 6 : 2) + nearK * 0.5;
         const c0 = Math.max(0, ((x - hw) / CW) | 0), c1 = Math.min(cols - 1, ((x + hw) / CW) | 0), r0 = Math.max(0, ((y - hh) / CH) | 0), r1 = Math.min(rows - 1, ((y + hh) / CH) | 0);
-        let hit = 0, tot = 0; for (let rr = r0; rr <= r1; rr += 1) { const ro = rr * cols; for (let cc = c0; cc <= c1; cc += 1) { tot += 1; const v = occ[ro + cc]; if (v === 1 || (v === 2 && !isF)) hit += 1; } }
+        let hit = 0, tot = 0; for (let rr = r0; rr <= r1; rr += 1) { const ro = rr * cols; for (let cc = c0; cc <= c1; cc += 1) { tot += 1; const v = occ[ro + cc]; if (v === 1 || v === 3 || (v === 2 && !isF)) hit += 1; } }
         const ratio = tot === 0 ? 0 : hit / tot, free = awake.has(i) || (hid[i] ? ratio < 0.03 : ratio < 0.20); hid[i] = free ? 0 : 1;
         if (free) for (let rr = r0; rr <= r1; rr += 1) { const ro = rr * cols; for (let cc = c0; cc <= c1; cc += 1) occ[ro + cc] = 1; }
         clr[i] += ((free ? 1 : 0) - clr[i]) * ease;
@@ -519,7 +526,7 @@
     function drawThreads() {
       if (W.lens === 'read') return; const pr = W.lens === 'sound' ? soundOrder().pairs : W.lens === 'mean' ? meanOrder().pairs : W.pairs, f = S.frame, vis = W.vis, at = W.visAt, col = S.pal.line, dim = S.dim.x; if (!pr || dim > 0.97 || (W.morph && W.morph.x < 1)) return; let n = 0;
       for (let q = 0; q < pr.length && n < 220; q += 2) { const a = pr[q], b = pr[q + 1]; if (at[a] !== f || at[b] !== f || W.front[a] || W.front[b]) continue;
-        const oa = a * 5, ob = b * 5, ax = vis[oa], ay = vis[oa + 1], bx = vis[ob], by = vis[ob + 1], dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy); if (len < 24 || len > 400) continue;
+        const oa = a * 5, ob = b * 5, ax = vis[oa], ay = vis[oa + 1], bx = vis[ob], by = vis[ob + 1], dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy); if (len < 24 || len > (W.lens === 'mean' ? 260 : 400)) continue;
         const al = Math.min(vis[oa + 3], vis[ob + 3]); if (al < 0.16) continue;
         const k0 = 1 / Math.max(Math.abs(dx) / (vis[oa + 4] / 2 + 3), Math.abs(dy) / (vis[oa + 2] * 0.6 + 3), 1e-6), k1 = 1 / Math.max(Math.abs(dx) / (vis[ob + 4] / 2 + 3), Math.abs(dy) / (vis[ob + 2] * 0.6 + 3), 1e-6); if (k0 + k1 >= 0.92) continue;
         pushLine(ax + dx * k0, ay + dy * k0, bx - dx * k1, by - dy * k1, 0, 0.8, col, 0.22 * al * (1 - dim) * base.alpha.x, 1); n += 1; }
