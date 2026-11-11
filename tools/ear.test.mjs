@@ -859,6 +859,54 @@ describe('the app’s own controls are never read as text', () => {
     }
   });
 
+  it('a listen control the app labels with what it reads (the review card’s 音) reads that, never its glyph', () => {
+    const say = h(
+      'button',
+      {
+        id: 'card-say',
+        class: 'say',
+        display: 'flex',
+        'data-voice-text': 'じどうしゃ',
+        'data-voice-word': '自動車',
+      },
+      h(
+        'svg',
+        { 'aria-hidden': 'true', display: 'inline' },
+        h('text', { display: 'inline' }, '音'),
+      ),
+    );
+    const row = h(
+      'div',
+      { class: 'review-reading-row', display: 'flex' },
+      h('div', { class: 'review-reading' }, 'じどうしゃ'),
+      say,
+    );
+    page(row);
+    const u = findUnit(textIn(say, '音'), { context });
+    expect(u.element).toBe(say);
+    expect(said(u)).toEqual(['じどうしゃ']);
+    expect(u.voiceKey).toBe('word:自動車');
+  });
+
+  it('a listen button standing as a block (a flex item) reads the word it stands beside, never its own glyph', () => {
+    const say = h(
+      'button',
+      { id: 'kp-listen-word', class: 'kp-zoom-btn kp-listen', display: 'block' },
+      '音',
+    );
+    const word = h(
+      'div',
+      { class: 'kp-word', display: 'flex' },
+      h('span', { class: 'kp-term' }, '高学歴'),
+      h('span', { class: 'kp-reading' }, 'こうがくれき'),
+      say,
+    );
+    page(word);
+    const u = findUnit(textIn(say, '音'), { context });
+    expect(said(u)).toEqual(['こうがくれき']);
+    expect(u.voiceKey).toBe('word:高学歴');
+  });
+
   it('a control tapped inside running text reads the sentence around it, without the control', () => {
     const p = h('p', {}, '今日は', h('button', { class: 'voice-say' }, '聞く'), '雨が降る。');
     page(p);

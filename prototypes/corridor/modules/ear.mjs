@@ -197,7 +197,9 @@ const isNote = (node) => hasClass(node, 'say-note') || hasClass(node, 'voice-not
 /** The app's own controls inside a unit (a listen mark, a button, an icon's glyph): masked out of what is sent. A link
  * in running text is a word of its sentence and stays. */
 const MASKED_ROLES = new Set(['button', 'switch', 'checkbox', 'radio', 'tab', 'option', 'menuitem', 'menuitemradio', 'menuitemcheckbox', 'treeitem']);
-const MASKED_CLASSES = ['voice-say', 'play-mark', 'kp-listen', 'mini-voice', 'say', 'icon-button'];
+/** The app's listen controls: their glyph (音, 聞く) is an icon. */
+const LISTEN_CLASSES = ['voice-say', 'play-mark', 'kp-listen', 'mini-voice', 'say'];
+const MASKED_CLASSES = [...LISTEN_CLASSES, 'icon-button'];
 const isAppControl = (node) => tagOf(node) === 'BUTTON' || MASKED_ROLES.has(String(attr(node, 'role') || '').toLowerCase()) ||
   MASKED_CLASSES.some((name) => hasClass(node, name));
 /** What the learner wrote, shown back as text (his tutor turns, his spoken lines, his notes and drafts, his notes to the
@@ -313,7 +315,28 @@ let elementIds = new WeakMap();
 let nextId = 1;
 const idOf = (node) => { if (!elementIds.has(node)) elementIds.set(node, nextId++); return elementIds.get(node); };
 
+/** A control that says what it reads (the review card's 音: data-voice-text, data-voice-word) is read as that, never as
+ * its glyph. */
+function declaredUnit(element, context, keep) {
+  const text = attr(element, 'data-voice-text') || '';
+  const word = attr(element, 'data-voice-word') || '';
+  const sentences = speakable(text || word);
+  if (!sentences.length) return null;
+  return {
+    kind: 'element', element, block: element, reading: text && KANA_ONLY.test(text) ? text : null,
+    text: sentences.map((one) => one.text).join(''), sentences,
+    key: `e${idOf(element)}:${word || text}`,
+    voiceKey: keyOf({ node: element, word: word || null, paragraph: text || word }, context),
+    typed: typedAt(element),
+    contains: (node) => inside(element, node),
+    keep,
+  };
+}
 function elementUnit(element, context, keep, reading = readingOf(element)) {
+  if (attr(element, 'data-voice-text') !== null || attr(element, 'data-voice-word') !== null) {
+    const declared = declaredUnit(element, context, keep);
+    if (declared) return declared;
+  }
   let nodes = textNodes(element, { mask: true, skip: reading?.node ? (node) => node === reading.node : null });
   if (!hasJapanese(joined(nodes))) nodes = textNodes(element, { keep: element, mask: true, skip: reading?.node ? (node) => node === reading.node : null });
   const own = joined(nodes);
@@ -425,6 +448,13 @@ export function findUnit(target, { offset = null, display = defaultDisplay, cont
   // a control: the row, label, button or web node is the unit, unless it is a word inside running text
   let control = null, outer = null;
   for (let at = start; at && !NO_HOST.has(tagOf(at)); at = parentOf(at)) if (isControl(at)) { control = at; break; }
+  // one of the app's own listen controls (its glyph is an icon, 音 or 聞く) that does not say what it reads: the unit is
+  // the one it stands in, with the control masked out
+  if (control && LISTEN_CLASSES.some((name) => hasClass(control, name)) && attr(control, 'data-voice-text') === null &&
+      attr(control, 'data-voice-word') === null && parentOf(control) && !NO_HOST.has(tagOf(parentOf(control)))) {
+    const holder = blockOf(parentOf(control), display);
+    if (holder) return wordOrSentence(holder, control, null, context);
+  }
   if (control) {
     // a control is a word of running text only when it stands in the line (inline-level) among Japanese of its own
     // block; a button that stands as a block or a flex row (Today's word, a search row) is its own unit
@@ -437,7 +467,11 @@ export function findUnit(target, { offset = null, display = defaultDisplay, cont
   // a control standing in running text (a link, a listen mark) is read as the sentence around it
   const block = outer || blockOf(start, display);
   if (!block) return null;
-  // a word that carries its reading (the study card's 高学歴 こうがくれき): one unit, sent as its reading
+  return wordOrSentence(block, target, offset, context);
+}
+/** In a block: a word that carries its reading (the study card's 高学歴 こうがくれき) is one unit sent as its reading;
+ * otherwise the sentence the touch stands in. */
+function wordOrSentence(block, target, offset, context) {
   const reading = readingOf(block);
   if (reading?.node) {
     const word = joined(textNodes(block, { mask: true, skip: (node) => node === reading.node }));
