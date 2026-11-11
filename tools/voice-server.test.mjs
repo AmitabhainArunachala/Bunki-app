@@ -754,6 +754,38 @@ describe('the seam: one behaviour per error code, and never a stand-in voice', (
     expect(r.calls.speak).toHaveLength(2);
     expect(r.calls.deviceSaid).toHaveLength(0);
   });
+  it('a clip this page already holds is served while the server is blocked; a new one is not asked (the review’s B3)', async () => {
+    const r = rig();
+    const first = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: S3.slice(0, 1),
+      prefetch: 0,
+    });
+    expect(first.states.at(-1)).toBe('done');
+    expect(r.calls.speak).toHaveLength(1);
+    r.fail({ code: 'request-rate-limit', status: 429 });
+    const refused = await run(r.seam, {
+      voiceKey: 'word:ear',
+      sentences: S3.slice(1, 2),
+      prefetch: 0,
+    });
+    expect(refused.states.at(-1)).toBe('error:request-rate-limit');
+    expect(r.calls.speak).toHaveLength(2);
+    const again = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: S3.slice(0, 1),
+      prefetch: 0,
+    });
+    expect(again.states.at(-1)).toBe('done');
+    expect(r.calls.speak).toHaveLength(2);
+    const fresh = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: S3.slice(2),
+      prefetch: 0,
+    });
+    expect(fresh.states.at(-1)).toBe('error:request-rate-limit');
+    expect(r.calls.speak).toHaveLength(2);
+  });
   it.each([
     ['404 not-in-release', { code: 'not-in-release', status: 404 }, 'not-in-release'],
     ['402 budget-exhausted', { code: 'budget-exhausted', status: 402 }, 'budget-exhausted'],

@@ -2570,6 +2570,8 @@ radoc.addEventListener("click",e=>{ if(e.target===radoc) closeRadoc(); });
 addEventListener("keydown",e=>{ if(!DRIFT_ON||e.key!=="Escape")return; const slip=window.__BUNKI_OPEN_SLIP; if(slip&&typeof slip.isOpen==="function"&&slip.isOpen()){slip.close();return;} closeRadoc(); });
 
 // ---- interaction ----
+/** The ear (modules/ear.mjs) is asked as the finger lifts: true when this tap is the ear's to speak. */
+function earTakes(e){ try{ return !!(window.__BUNKI_EAR&&window.__BUNKI_EAR.takes(e)); }catch(_){ return false; } }
 function tapNode(n){
   if(recordPending.size){setHint("判断を保存しています。");return;}
   cueRetire(n,"tap");   // retain the identity of the answered gesture
@@ -2898,6 +2900,9 @@ addEventListener("pointerup",e=>{
   if(lpFired){lpFired=false; if(n){n.dragX=0;n.dragY=0;} return;}
   if(e.target.closest&&e.target.closest("#theme,#card,#lvl,#radoc")) return;
   if(hostChrome(e.target)) return;
+  // the ear's tap (armed, held on with a finger, Option-click): the ear speaks it and the sky does nothing with it,
+  // neither the ladder nor the first cue's retirement in his record (modules/ear.mjs, the review's B5)
+  if(earTakes(e)){ if(n){n.x+=n.dragX;n.y+=n.dragY;n.dragX=0;n.dragY=0;} return; }
   const dx=e.clientX-px, dy=e.clientY-py, held=Date.now()-pt;
   const terminalMoved=moved||Math.abs(dx)>8||Math.abs(dy)>8;
   if(n){
@@ -2964,6 +2969,7 @@ addEventListener("pointerup",e=>{
 card.addEventListener("pointerdown",e=>e.stopPropagation());
 card.addEventListener("pointerup",e=>{
   e.stopPropagation();
+  if(earTakes(e)) return;
   // tapping the card's own paper (not a row or button) closes it
   if(e.target===card||e.target.classList.contains("note")||
      e.target.classList.contains("gloss")) card.classList.remove("open");

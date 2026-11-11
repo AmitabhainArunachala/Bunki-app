@@ -13,6 +13,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   EAR_CSS,
+  appControlAt,
   createEarMachine,
   earClick,
   earKey,
@@ -1044,21 +1045,122 @@ describe('a study card’s front is never read by a resting pointer', () => {
     ).toBeFalsy();
   });
 
-  it('held on, a rest on the front asks nothing; a held tap on the phone, an armed tap and Option-click still read it', () => {
+  it('held on, a rest on the front and a tap on it on the phone ask nothing (the card acts); an armed tap and Option-click read it', () => {
     const { machine, calls, advance, handles } = rig();
     const front = { ...unit('持つ'), front: true };
     machine.holdEar();
     machine.hover({ unit: front, pointer: 'mouse' });
     advance(3000);
     expect(calls.speak).toHaveLength(0);
-    expect(machine.click({ unit: front, pointer: 'touch' })).toBe('consume');
-    handles[0].done('done', null);
+    expect(machine.click({ unit: front, pointer: 'touch' })).toBe('pass');
+    expect(calls.speak).toHaveLength(0);
     machine.tapEar();
     machine.tapEar();
     expect(machine.click({ unit: front, pointer: 'mouse' })).toBe('consume');
-    handles[1].done('done', null);
+    handles[0].done('done', null);
     expect(machine.click({ unit: front, pointer: 'mouse', alt: true })).toBe('consume');
-    expect(calls.speak).toHaveLength(3);
+    expect(calls.speak).toHaveLength(2);
+  });
+});
+
+describe('held on, on the phone, the app’s own controls act and are never spoken (the review’s B1, ruling R-a)', () => {
+  it('a held tap on a control is the app’s and asks nothing; on Japanese text it speaks', () => {
+    const { machine, calls } = rig();
+    machine.holdEar();
+    expect(machine.click({ unit: A, pointer: 'touch', control: true })).toBe('pass');
+    expect(calls.speak).toHaveLength(0);
+    expect(machine.display()).toBe('held');
+    expect(machine.click({ unit: A, pointer: 'touch' })).toBe('consume');
+    expect(calls.speak.map((u) => u.key)).toEqual(['雨']);
+  });
+  it('an armed tap and Option-click on a control still speak it', () => {
+    const { machine, calls, handles } = rig();
+    machine.tapEar();
+    expect(machine.click({ unit: A, pointer: 'touch', control: true })).toBe('consume');
+    handles[0].done('done', null);
+    expect(machine.click({ unit: B, pointer: 'mouse', alt: true, control: true })).toBe('consume');
+    expect(calls.speak.map((u) => u.key)).toEqual(['雨', '晴れ']);
+  });
+  it('a dry verdict (the sky asking as the finger lifts) changes nothing', () => {
+    const { machine, calls } = rig();
+    machine.tapEar();
+    expect(machine.click({ unit: A, pointer: 'touch', dry: true })).toBe('consume');
+    expect(machine.display()).toBe('armed');
+    expect(calls.speak).toHaveLength(0);
+    machine.holdEar();
+    expect(machine.click({ unit: A, pointer: 'touch', control: true, dry: true })).toBe('pass');
+    expect(machine.click({ unit: A, pointer: 'touch', dry: true })).toBe('consume');
+    expect(calls.speak).toHaveLength(0);
+  });
+  it('the app’s controls: buttons, links, fields, tabs, folds, roles, click actions; a word of running text is not one', () => {
+    const button = h('button', {}, h('span', {}, '学ぶ'));
+    const link = h('a', { href: '#x' }, '戻る');
+    const tab = h('div', { role: 'tab' }, '辞書');
+    const fold = h('summary', {}, '記録');
+    const row = h('div', { 'data-action': 'open.row' }, '1 枚 待っている');
+    const word = h('span', { 'data-action': 'target.activate' }, '経済');
+    const sentence = h('p', {}, word, '産業省によると、半導体だ。');
+    const plain = h('p', {}, '今日は雨が降っている。');
+    const own = h('button', { 'data-ear-own': '' }, '耳');
+    page(button, link, tab, fold, row, sentence, plain, own);
+    expect(appControlAt(textIn(button, '学ぶ'))).toBe(button);
+    expect(appControlAt(textIn(link, '戻る'))).toBe(link);
+    expect(appControlAt(textIn(tab, '辞書'))).toBe(tab);
+    expect(appControlAt(textIn(fold, '記録'))).toBe(fold);
+    expect(appControlAt(textIn(row, '待って'))).toBe(row);
+    expect(appControlAt(textIn(word, '経済'))).toBe(null);
+    expect(appControlAt(textIn(plain, '雨'))).toBe(null);
+    expect(appControlAt(textIn(own, '耳'))).toBe(null);
+  });
+  it('the review’s keys: a click the keyboard or the app raised is never an ear tap, held on or armed', () => {
+    const { machine, calls } = rig();
+    machine.holdEar();
+    const tap = (extra) =>
+      earClick(
+        {
+          altKey: false,
+          target: {},
+          clientX: 5,
+          clientY: 5,
+          detail: 1,
+          isTrusted: true,
+          pointerType: 'touch',
+          ...extra,
+        },
+        { machine, unitAt: () => A, press: null, now: 0 },
+      );
+    expect(tap({ detail: 0 })).toBe('pass');
+    expect(tap({ isTrusted: false })).toBe('pass');
+    machine.tapEar();
+    machine.tapEar();
+    expect(machine.display()).toBe('armed');
+    expect(tap({ detail: 0, pointerType: 'mouse' })).toBe('pass');
+    expect(calls.speak).toHaveLength(0);
+  });
+  it('touch or mouse is the pointer that went down: WebKit’s click after a touch says mouse', () => {
+    const { machine, calls } = rig();
+    machine.holdEar();
+    const verdict = earClick(
+      {
+        altKey: false,
+        target: {},
+        clientX: 5,
+        clientY: 5,
+        detail: 1,
+        isTrusted: true,
+        pointerType: 'mouse',
+      },
+      { machine, unitAt: () => A, press: { at: 0, x: 5, y: 5, pointerType: 'touch' }, now: 100 },
+    );
+    expect(verdict).toBe('consume');
+    expect(calls.speak.map((u) => u.key)).toEqual(['雨']);
+  });
+  it('a screen with no mark turns the ear off, silently', () => {
+    const { machine } = rig();
+    machine.holdEar();
+    machine.rest();
+    expect(machine.display()).toBe('off');
+    expect(machine.reason()).toBe(null);
   });
 });
 
@@ -1121,6 +1223,16 @@ describe('the mark’s words and look', () => {
     expect(noVoiceLine('network-failed', en)).toMatch(/no connection/i);
     expect(noVoiceLine('day-budget', en)).toMatch(/today’s .*budget.* used up/i);
     expect(noVoiceLine('budget-exhausted', en)).toMatch(/budget.* used up/i);
+  });
+  it('a reason the ear’s own list does not name says the voice seam’s plain line (the per-minute limit)', () => {
+    const en = (ja, english) => english;
+    const plain = { line: (r) => `seam line for ${r}`, words: (r) => `seam words for ${r}` };
+    expect(noVoiceLine('request-rate-limit', en, plain)).toBe('seam line for request-rate-limit');
+    expect(earLabel('novoice', 'request-rate-limit', en, plain)).toMatch(
+      /seam words for request-rate-limit/,
+    );
+    expect(noVoiceLine('day-budget', en, plain)).toMatch(/today’s budget/i);
+    expect(noVoiceLine('request-rate-limit', en)).toMatch(/no voice right now/i);
   });
   it('colours come from the look; the text marks never move the layout', () => {
     expect(EAR_CSS).toMatch(/\.ear-mark/);

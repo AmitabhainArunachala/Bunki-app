@@ -101,16 +101,21 @@ export function createEarMachine({ speak, cannot = () => null, schedule = (fn, m
       changed();
     },
     /** A click or tap that landed on `unit` (null: nothing Japanese there). 'consume': the ear took it, and the app must
-     * not see it; 'pass': it is the app's own. */
-    click({ unit, pointer = 'mouse', alt = false } = {}) {
+     * not see it; 'pass': it is the app's own. `control`: the tap landed on one of the app's own controls. Held on, on
+     * the phone, the app's controls and a study card's front act as they always do and are never spoken by a tap (the
+     * review's ruling R-a, as in Nihongo Study); an armed tap and Option-click still speak them. `dry`: only the verdict,
+     * nothing done (the sky asks it as the finger lifts, before the click). */
+    click({ unit, pointer = 'mouse', alt = false, control = false, dry = false } = {}) {
       if (!unit) return 'pass';
+      const touch = pointer !== 'mouse';
+      const appTap = mode === 'held' && touch && !alt && (control || !!unit.front);
       const now = speakingNow();
-      if (now && now.key === unit.key && mode !== 'armed') { stopCurrent(); changed(); return 'consume'; }
-      if (mode === 'armed') { mode = 'off'; start(unit); return 'consume'; }
-      if (mode === 'held' && pointer !== 'mouse') { start(unit); return 'consume'; }
-      if (alt) { start(unit); return 'consume'; }
+      if (now && now.key === unit.key && mode !== 'armed' && !appTap) { if (!dry) { stopCurrent(); changed(); } return 'consume'; }
+      if (mode === 'armed') { if (!dry) { mode = 'off'; start(unit); } return 'consume'; }
+      if (mode === 'held' && touch && !appTap) { if (!dry) start(unit); return 'consume'; }
+      if (alt) { if (!dry) start(unit); return 'consume'; }
       // a click is not a rest: the rest it lands in asks nothing (the app is about to act on that click)
-      if (mode === 'held' && rest && !rest.asked) { cancel(rest.timer); rest.timer = null; rest.asked = true; }
+      if (!dry && mode === 'held' && rest && !rest.asked) { cancel(rest.timer); rest.timer = null; rest.asked = true; }
       return 'pass';
     },
     /** The Mac's pointer over `unit` (null: over nothing Japanese). Held on, a rest of `restMs` on one unit speaks it
@@ -135,34 +140,41 @@ export function createEarMachine({ speak, cannot = () => null, schedule = (fn, m
     speakNow(unit) { if (unit) start(unit); },
     /** The screen changed, or the app stopped every sound: the ear's read ends; its mode stays. */
     stop() { stopCurrent(); clearRest(); changed(); },
+    /** A screen with no mark to turn the ear off: the ear rests off, silently (no struck line); a voice speaking goes on. */
+    rest() { if (mode === 'off') return; mode = 'off'; clearRest(); changed(); },
   };
 }
 
 /* ------------------------------------------------------------------ the words it shows */
-export function earLabel(state, reason, tx) {
+/** `plain`: the voice seam's own words for a reason ({ line(reason), words(reason) }, the listen marks' lines): used for
+ * every reason the ear's short list does not name (the per-minute limit, a sentence too long, a server not taking new
+ * sentences), so a struck ear says why as the listen marks do. */
+export function earLabel(state, reason, tx, plain = null) {
   switch (state) {
     case 'armed': return tx('耳：次のタップを読む', 'ear: armed for the next tap');
     case 'held': return tx('耳：オン', 'ear: on');
     case 'speaking': return tx('耳：読んでいます', 'ear: speaking');
-    case 'novoice': return tx(`耳：声なし、${reasonShort(reason, tx)}`, `ear: no voice, ${reasonShort(reason, tx)}`);
+    case 'novoice': return tx(`耳：声なし、${reasonShort(reason, tx, plain)}`, `ear: no voice, ${reasonShort(reason, tx, plain)}`);
     default: return tx('耳：オフ', 'ear: off');
   }
 }
-function reasonShort(reason, tx) {
+function reasonShort(reason, tx, plain = null) {
   if (['not-paired', 'not-configured', 'authentication-required'].includes(reason)) return tx('未接続', 'not paired');
-  if (['offline', 'network-failed', 'voice-timeout'].includes(reason)) return tx('接続なし', 'no connection');
+  if (['offline', 'network-failed'].includes(reason)) return tx('接続なし', 'no connection');
   if (reason === 'day-budget') return tx('今日の予算切れ', 'today’s budget used up');
   if (reason === 'budget-exhausted') return tx('予算切れ', 'budget used up');
-  return tx('サーバーが答えない', 'the voice server is not answering');
+  const own = reason && plain?.words ? plain.words(reason) : '';
+  return own || tx('サーバーが答えない', 'the voice server is not answering');
 }
 /** The one plain line beside the struck mark, in the interface language. */
-export function noVoiceLine(reason, tx) {
+export function noVoiceLine(reason, tx, plain = null) {
   if (reason === 'authentication-required') return tx('声の接続が切れました。設定でつなぎ直してください', 'No voice: pair again in Settings');
   if (['not-paired', 'not-configured'].includes(reason)) return tx('声はまだつないでいません', 'No voice yet: not paired');
-  if (['offline', 'network-failed', 'voice-timeout'].includes(reason)) return tx('声が届きません。接続がありません', 'No voice: no connection');
+  if (['offline', 'network-failed'].includes(reason)) return tx('声が届きません。接続がありません', 'No voice: no connection');
   if (reason === 'day-budget') return tx('今日の声の予算を使い切りました', 'No voice: today’s budget is used up');
   if (reason === 'budget-exhausted') return tx('声の予算を使い切りました', 'No voice: the voice budget is used up');
-  return tx('いま声を出せません', 'No voice right now');
+  const own = reason && plain?.line ? plain.line(reason) : '';
+  return own || tx('いま声を出せません', 'No voice right now');
 }
 
 /* ------------------------------------------------------------------ the unit that speaks */
@@ -576,21 +588,53 @@ function caretTouches(doc, node, offset, x, y) {
   return false;
 }
 
+/* ------------------------------------------------------------------ the app's own controls */
+const ACT_TAGS = new Set(['BUTTON', 'SUMMARY', 'LABEL', 'INPUT', 'TEXTAREA', 'SELECT', 'OPTION']);
+/** The app's own control a finger lands on, or null: a button, a link, a field, a tab, a fold, a menu item, anything
+ * with a button role or a click action of its own. A word of running text that the app makes a door (the reader's
+ * words, data-action inline among the sentence's own Japanese) is text, not a control: held on, it speaks. */
+export function appControlAt(target, { display = defaultDisplay } = {}) {
+  const start = target?.nodeType === 3 ? parentOf(target) : target;
+  const shown = (el) => { try { return display(el); } catch { return defaultDisplay(el); } };
+  for (let at = start; at && at.nodeType === 1 && !NO_HOST.has(tagOf(at)); at = parentOf(at)) {
+    if (isOwn(at)) return null;
+    const tag = tagOf(at);
+    if (ACT_TAGS.has(tag) || (tag === 'A' && attr(at, 'href') !== null)) return at;
+    if (CONTROL_ROLES.has(String(attr(at, 'role') || '').toLowerCase())) return at;
+    if (attr(at, 'onclick') !== null || typeof at.onclick === 'function') return at;
+    if (attr(at, 'data-action') !== null) {
+      // a door in the line, among Japanese of its own block, is a word of the sentence
+      const block = isInlineDisplay(shown(at)) ? blockOf(parentOf(at), shown) : null;
+      const around = block ? joined(textNodes(block, { controls: false })) : '';
+      if (!block || (around.match(JAPANESE_LETTERS) || []).length < 2) return at;
+    }
+  }
+  return null;
+}
+
 /* ------------------------------------------------------------------ the click verdict */
 /** What a click means to the ear. Off, with no Option key and nothing of the ear's speaking, it reads only the Option
  * key and returns: the click is the app's own, untouched. A press held as long as a hold (the reader's save) or moved
- * like a drag is the app's too. */
-export function earClick(event, { machine, unitAt: find, press = null, now = Date.now() }) {
+ * like a drag is the app's too. Only a real tap or click of a pointer is ever the ear's: a click the keyboard raised
+ * (Space, Enter, the review's 1–4) or the app's own code dispatched (node.click()) is the app's, in every mode. Touch or
+ * mouse is the pointer that went down for this tap (`press`, from its pointerdown): WebKit, the iPhone's engine, calls the
+ * click after a touch a mouse click. `controlAt(target)`: the app's own control the finger landed on, if any. `dry`: the
+ * verdict for a finger lifting now, nothing done (the event is its pointerup). */
+export function earClick(event, { machine, unitAt: find, press = null, now = Date.now(), controlAt = null, dry = false }) {
   const alt = !!event.altKey;
   if (!alt && machine.mode() === 'off' && !machine.voice()) return 'pass';
-  if (press && event.detail !== 0) {
+  if (event.isTrusted === false) return 'pass';
+  if (!dry && event.detail === 0) return 'pass';
+  if (press) {
     if (now - press.at >= TAP_MAX_MS) return 'pass';
     if (Math.hypot((event.clientX ?? press.x) - press.x, (event.clientY ?? press.y) - press.y) > TAP_MOVE_PX) return 'pass';
   }
-  const pointer = event.detail === 0 ? 'keyboard' : event.pointerType || press?.pointerType || 'mouse';
+  const pointer = press?.pointerType || event.pointerType || 'mouse';
   let unit = null;
   try { unit = find(event); } catch { unit = null; }
-  return machine.click({ unit, pointer: pointer === 'keyboard' ? 'touch' : pointer, alt });
+  let control = false;
+  if (unit && machine.mode() === 'held' && pointer !== 'mouse' && !alt) { try { control = !!controlAt?.(event.target); } catch { control = false; } }
+  return machine.click({ unit, pointer, alt, control, dry });
 }
 
 /** What a key means to the ear: Escape stops the ear's own voice, in every mode, and that press is the ear's alone (it
@@ -681,7 +725,7 @@ html[data-ear='novoice'] .ear-mark::after { content: ''; position: absolute; lef
 /** Install the ear in `doc`. `speak(unit, done)` reads a unit through the voice seam and returns its handle;
  * `cannot(unit)` names why there is no voice right now; `context()` gives { view, articleOf, keyFor } for voice keys.
  * Returns { mount, stop, machine }: mount() places a mark beside every gate (call it when the page changes). */
-export function installEar({ doc, tx, speak, cannot, context = () => ({}) }) {
+export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain = null }) {
   const view = doc.defaultView;
   const root = doc.documentElement;
   if (!doc.getElementById('ear-style')) {
@@ -713,7 +757,9 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}) }) {
         range.setEnd(unit.range.endNode, unit.range.endOffset);
         shown.range = range;
         // the painter follows the sentence when the page scrolls or the window changes size
-        bands.show(() => (range.startContainer.isConnected ? rangeBoxes(range) : []), state);
+        const parent = (node) => (node.nodeType === 3 ? node.parentElement : node);
+        bands.show(() => (range.startContainer.isConnected ? rangeBoxes(range) : []), state,
+          () => [parent(range.startContainer), parent(range.endContainer), parent(range.commonAncestorContainer), doc.body]);
         return;
       } catch { /* the page changed under it */ }
     }
@@ -783,10 +829,10 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}) }) {
   function paintMark(spot) {
     const state = machine.display();
     const mark = spot.firstElementChild, why = spot.lastElementChild;
-    const label = earLabel(state, machine.reason(), tx);
+    const label = earLabel(state, machine.reason(), tx, plain);
     mark.setAttribute('aria-label', label);
     mark.title = state === 'off' ? tx('耳 — タップで次のタップを読む。長押しでずっと読む', 'Ear — tap: read what you tap next. Hold: keep reading') : label;
-    if (state === 'novoice') { why.textContent = noVoiceLine(machine.reason(), tx); why.hidden = false; }
+    if (state === 'novoice') { why.textContent = noVoiceLine(machine.reason(), tx, plain); why.hidden = false; }
     else { why.hidden = true; why.textContent = ''; }
   }
   /** A mark beside the first screen's gate and beside the gate of every bar. */
@@ -796,6 +842,9 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}) }) {
       if (gate.nextElementSibling?.classList?.contains('ear-spot')) continue;
       gate.after(makeMark());
     }
+    // the ear is never left on where its mark is not shown (the review card and the deck card keep their own look, with
+    // no mark): a screen without one turns it off, silently
+    if (machine.mode() !== 'off' && ![...marks].some((spot) => spot.isConnected && spot.getClientRects().length)) machine.rest();
   }
   function paint() {
     const state = machine.display();
@@ -812,16 +861,23 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}) }) {
   let press = null;
   view.addEventListener('pointerdown', (event) => {
     if (event.isPrimary === false) return;
-    press = { at: Date.now(), x: event.clientX, y: event.clientY, pointerType: event.pointerType || 'mouse' };
+    press = { id: event.pointerId, at: Date.now(), x: event.clientX, y: event.clientY, pointerType: event.pointerType || 'mouse' };
   }, true);
+  view.addEventListener('pointercancel', (event) => { if (press && press.id === event.pointerId) press = null; }, true);
+  const shownDisplay = (el) => view.getComputedStyle(el).display;
+  const verdictOf = (event, dry) => earClick(event, {
+    machine, press, now: Date.now(), dry,
+    controlAt: (target) => appControlAt(target, { display: shownDisplay }),
+    unitAt: (e) => (!e.clientX && !e.clientY ? findUnit(e.target, { display: shownDisplay, context: ctx() }) : find(e.clientX, e.clientY)),
+  });
   view.addEventListener('click', (event) => {
-    const verdict = earClick(event, {
-      machine, press, now: Date.now(),
-      unitAt: (e) => (e.detail === 0 || (!e.clientX && !e.clientY) ? findUnit(e.target, { display: (el) => view.getComputedStyle(el).display, context: ctx() }) : find(e.clientX, e.clientY)),
-    });
+    const verdict = verdictOf(event, false);
     press = null;
     if (verdict === 'consume') { event.preventDefault(); event.stopImmediatePropagation(); }
   }, true);
+  // A surface that acts as the finger lifts, before the click (the sky: its word unfolds, its first cue is retired in
+  // his record), asks here first: true means the tap is the ear's, and the surface does nothing with it.
+  view.__BUNKI_EAR = Object.freeze({ takes: (event) => { try { return verdictOf(event, true) === 'consume'; } catch { return false; } } });
   // Escape: on the window, before any of the app's own Escape (a sheet's Back, the word box, the save strip), so that
   // while the ear speaks one press stops it and does nothing else
   view.addEventListener('keydown', (event) => {
@@ -902,6 +958,8 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}) }) {
   return {
     machine,
     mount,
+    /** The page was drawn again: the light on a sentence is measured again. */
+    refresh: () => { if (bands.shown) bands.refresh(); },
     stop: () => machine.stop(),
     /** The unit under a point: what a tap there would speak (the coverage walk asks this). */
     unitAt: (x, y) => find(x, y),

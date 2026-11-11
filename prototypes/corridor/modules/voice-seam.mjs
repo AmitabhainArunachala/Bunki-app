@@ -135,6 +135,10 @@ export function createVoiceSeam({ client, player, recorded = null, quiet = () =>
     try { text = normaliseSpeechText(sentence.text); } catch { /* not text */ }
     // what the server would refuse as not Japanese (a line of Latin letters in an article) is passed over, never sent
     if (!text || !isJapaneseEnough(text)) return { skip: true, source: 'none', reason: 'not-japanese' };
+    // a sentence this page already holds never needs the server: a block on the server (a refusal of another turn a
+    // moment ago, the minute's limit) does not silence it (the review's B3: a refusal belongs to the turn refused)
+    const kept = cache.get(`${voiceKey}|${text}`);
+    if (kept) return kept;
     let why = serverSkips(voiceKey);
     if (why) throw silence(why);
     try {
