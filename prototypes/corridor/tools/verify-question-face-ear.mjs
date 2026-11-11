@@ -3,7 +3,7 @@
  * (fake-voice-server.mjs). No sound, no real voice server, no token or pairing code.
  *
  *   node prototypes/corridor/tools/verify-question-face-ear.mjs --site <built site> [--engine chromium|webkit] [--width 1728|390]
- *        [--port 19562] [--only several,unread,deck,select,onekey,answer] [--shots <dir>]
+ *        [--port 19562] [--only several,unread,deck,select,onekey,probe,answer] [--shots <dir>]
  *
  *  several  a kanji with several readings (一) face-down in a kanji-only practice block, with no control of its own: on the
  *           Mac Option-click on the character, on the phone (and the Mac) the character selected: nothing is asked,
@@ -19,6 +19,8 @@
  *           bring the chip as before.
  *  onekey   one word, one clip (the review's concern): an inflected word on the deck (its card printing 憧れた of 憧れる)
  *           says its reading under one voice key on its question side and its answer side; the reading is made once.
+ *  probe    a practice block's reading check (読みの確認): its compound is the question, with no control: nothing is said and
+ *           no chip stands on it.
  *  answer   answer faces are unchanged: Option-click (the Mac) on a revealed review card's word reads it.
  *
  * Exit code 0 when every check passes, 1 otherwise. One JSON line per check on stdout. */
@@ -34,7 +36,7 @@ const ENGINE = arg('--engine', 'chromium');
 const WIDTH = Number(arg('--width', '1728'));
 const PORT = Number(arg('--port', '19562'));
 const SHOTS = arg('--shots', '');
-const ONLY = new Set(arg('--only', 'several,unread,deck,select,onekey,answer').split(',').filter(Boolean));
+const ONLY = new Set(arg('--only', 'several,unread,deck,select,onekey,probe,answer').split(',').filter(Boolean));
 if (!SITE) { console.error('usage: verify-question-face-ear.mjs --site <built site>'); process.exit(2); }
 if (SHOTS) mkdirSync(SHOTS, { recursive: true });
 
@@ -374,6 +376,37 @@ const cases = {
       if (!answer.length) problems.push('the answer side sent nothing (its sentence is new: nothing to compare)');
       report(`onekey · an inflected word on the deck (${staged.form} of ${staged.term}): its two faces say it under one voice key, and its reading is made once`, problems,
         { staged, shown, front, answer: answer.map((r) => `${r.voiceKey} ${String(r.text).slice(0, 14)}`) });
+    } finally { await s.context.close(); }
+  },
+
+  // ======================================================= the reading check: the reading is the question
+  // A practice block's reading check (読みの確認) prints a compound and asks its reading: the face has no control, and the
+  // ear must not say the word there (that would give the answer). After the reading is shown, the face is an answer face.
+  async probe() {
+    const s = await freshPage();
+    const { page } = s;
+    try {
+      const mode = page.locator('.focus-mode', { hasText: /Reading check|読みの確認/ }).first();
+      await mode.scrollIntoViewIfNeeded(); await s.press(mode); await s.sleep(400);
+      const start = page.locator('.focus-start').first(); await start.scrollIntoViewIfNeeded(); await s.press(start);
+      await page.locator('.review-face .review-front').first().waitFor({ timeout: 15000 }); await s.sleep(1200);
+      const shown = await page.evaluate(async () => { const m = await import('/corridor.js'); const f = document.querySelector('.review-face');
+        const r = f?.querySelector('.review-front')?.getBoundingClientRect();
+        return { view: m.S.view, word: f?.querySelector('.review-front')?.textContent || null, cardFace: f?.dataset.cardFace || null,
+          at: r ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : null }; });
+      const revealed = () => page.evaluate(async () => { const m = await import('/corridor.js'); return !!m.S.probe?.revealed; });
+      const problems = [];
+      if (shown.view !== 'probe' || !shown.at) problems.push(`no reading check face (${JSON.stringify(shown)})`);
+      const n = fake.speaks().length, q = await s.plays();
+      if (shown.at && !phone) { await optionClick(s, shown.at); await s.sleep(1800); }
+      const onFace = { sent: rows(n).map((r) => r.text), plays: (await s.plays()) - q, revealed: await revealed() };
+      if (onFace.sent.length) problems.push(`Option-click on the asked compound sent ${JSON.stringify(onFace.sent)}`);
+      if (onFace.plays) problems.push(`${onFace.plays} clip(s) played`);
+      if (onFace.revealed) problems.push('the Option-click showed the reading');
+      const sel = await selectThen(s, { from: 'face', to: 'face', face: '.review-face' });
+      if (sel.chip) problems.push(`the 読む chip stood for the compound${sel.sent.length ? ` and sent ${JSON.stringify(sel.sent)}` : ''}`);
+      if (await revealed()) problems.push('the reading was shown');
+      report(`probe · the reading check's question face (${shown.word}): ${phone ? '' : 'Option-click and '}a selection say nothing, no chip, the reading stays hidden`, problems, { ...shown, onFace, sel });
     } finally { await s.context.close(); }
   },
 
