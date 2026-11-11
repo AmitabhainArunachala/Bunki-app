@@ -1456,3 +1456,18 @@ describe('on the sky the mark at rest is legible (K5)', () => {
     );
   });
 });
+
+describe('the ear’s own time limit says the voice took too long, not that the server is busy (K3)', () => {
+  const ja = (j) => j;
+  const en = (_j, e) => e;
+  const plain = { line: (r) => `seam line for ${r}`, words: (r) => `seam words for ${r}` };
+  it('its own reason, its own plain line, in both languages', () => {
+    expect(ear.EAR_SLOW).toBeTruthy();
+    expect(noVoiceLine(ear.EAR_SLOW, en, plain)).toBe('No voice: the voice took too long');
+    expect(noVoiceLine(ear.EAR_SLOW, ja, plain)).toBe('声が届くまでに時間がかかりすぎました');
+    expect(earLabel('novoice', ear.EAR_SLOW, en, plain)).toBe('ear: no voice, took too long');
+    expect(noVoiceLine(ear.EAR_SLOW, en, plain)).not.toMatch(/busy/i);
+    // "busy" stays the server's own word
+    expect(noVoiceLine('voice-unavailable', en, plain)).toBe('seam line for voice-unavailable');
+  });
+});

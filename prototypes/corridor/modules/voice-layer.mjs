@@ -16,7 +16,7 @@
  * pairing screen and the status line stand under Settings, 筆と声 · Writing and voice. */
 import { createAudioPlayer } from './nihongo-speech/audio/speech-player.mjs';
 import { isJapaneseEnough, normaliseSpeechText, splitSentences } from './nihongo-speech/audio/speech-text.mjs';
-import { installEar } from './ear.mjs';
+import { EAR_SLOW, installEar } from './ear.mjs';
 import { baseBoxes, createBands } from './voice-bands.mjs';
 import { createDeviceTokenStore, createVoiceClient } from './voice-client.mjs';
 import { SPEEDS, createVoiceSeam, sentencesOf, voiceKeyOf } from './voice-seam.mjs';
@@ -674,16 +674,18 @@ export function installVoiceLayer(host) {
       if (yieldFrom) { readerApi.stop(); reader.justStopped = null; }
       prime();
       // the ear's own limit: a sentence that has not begun to sound in EAR_FIRST_CLIP_MS is given up (the struck mark and
-      // the plain line), and the read it took the place of goes on; giving up is the ear's alone and blocks no one
+      // the plain line, which says the voice took too long: "busy" only when the server said so), and the read it took
+      // the place of goes on; giving up is the ear's alone and blocks no one. The cut lets the sentence on its way
+      // arrive and be kept, so the next tap on it plays at once (the review's K3)
       let timedOut = false;
-      const limit = view.setTimeout(() => { if (!marker.over && !marker.sounding) { timedOut = true; session.stop(); } }, EAR_FIRST_CLIP_MS);
+      const limit = view.setTimeout(() => { if (!marker.over && !marker.sounding) { timedOut = true; session.cut(); } }, EAR_FIRST_CLIP_MS);
       const session = seam.read({ sentences: unit.sentences, voiceKey: unit.voiceKey, prefetch: unit.sentences.length > 1 ? 2 : 0, gapMs: 260, rate: reader.rate,
         onState: (now, code) => {
           if (now === 'playing') { marker.sounding = true; view.clearTimeout(limit); }
           if (!['done', 'stopped', 'error'].includes(now)) return;
           view.clearTimeout(limit);
           marker.over = true;
-          if (timedOut && now === 'stopped') done('error', 'voice-timeout'); else done(now, code);
+          if (timedOut && now === 'stopped') done('error', EAR_SLOW); else done(now, code);
           yieldEnded(marker);
         } });
       if (yieldFrom) {

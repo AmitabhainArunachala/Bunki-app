@@ -30,6 +30,9 @@ export const LONG_PRESS_MS = 500;
 const TAP_MOVE_PX = 9;
 /** A read that ended this way had no voice: the ear is struck and says why. */
 const QUIET_ENDS = new Set(['nothing-to-say', 'not-japanese', 'aborted']);
+/** The ear's own limit ran out (voice-layer.mjs, EAR_FIRST_CLIP_MS): its sentence had not begun to sound. Not the server
+ * saying it is busy: that is 'voice-unavailable', in the seam's own words. */
+export const EAR_SLOW = 'ear-too-slow';
 
 /* ------------------------------------------------------------------ the state machine */
 /** `speak(unit, done)` starts one read and returns its handle ({ stop() }); `done(outcome, reason)` is called once when
@@ -164,6 +167,7 @@ function reasonShort(reason, tx, plain = null) {
   if (['offline', 'network-failed'].includes(reason)) return tx('接続なし', 'no connection');
   if (reason === 'day-budget') return tx('今日の予算切れ', 'today’s budget used up');
   if (reason === 'budget-exhausted') return tx('予算切れ', 'budget used up');
+  if (reason === EAR_SLOW) return tx('時間がかかりすぎ', 'took too long');
   const own = reason && plain?.words ? plain.words(reason) : '';
   return own || tx('サーバーが答えない', 'the voice server is not answering');
 }
@@ -174,6 +178,7 @@ export function noVoiceLine(reason, tx, plain = null) {
   if (['offline', 'network-failed'].includes(reason)) return tx('声が届きません。接続がありません', 'No voice: no connection');
   if (reason === 'day-budget') return tx('今日の声の予算を使い切りました', 'No voice: today’s budget is used up');
   if (reason === 'budget-exhausted') return tx('声の予算を使い切りました', 'No voice: the voice budget is used up');
+  if (reason === EAR_SLOW) return tx('声が届くまでに時間がかかりすぎました', 'No voice: the voice took too long');
   const own = reason && plain?.line ? plain.line(reason) : '';
   return own || tx('いま声を出せません', 'No voice right now');
 }

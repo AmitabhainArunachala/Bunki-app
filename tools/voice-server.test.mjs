@@ -970,6 +970,85 @@ describe('the seam: one sound at a time, and the controls', () => {
   });
 });
 
+describe('the ear’s own time limit cuts a read, and a sentence on its way is kept (the review’s K3)', () => {
+  /** A server that answers only when told to, and a client that gives up its request when the read aborts it. */
+  function slowRig() {
+    const asked = [];
+    const played = [];
+    const client = {
+      configured: () => true,
+      ready: async () => {},
+      paired: () => true,
+      scope: () => ({ installation: 'bunki-' + 'b'.repeat(32) }),
+      speak({ text, voiceKey, signal }) {
+        return new Promise((resolve, reject) => {
+          const row = { text, voiceKey, aborted: false };
+          asked.push(row);
+          row.answer = () =>
+            resolve({
+              bytes: new Uint8Array([1]),
+              contentType: 'audio/wav',
+              voiceId: 'v',
+              inputKey: `${voiceKey}|${text}`,
+            });
+          signal?.addEventListener('abort', () => {
+            row.aborted = true;
+            reject(Object.assign(new Error('aborted'), { name: 'AbortError' }));
+          });
+        });
+      },
+      async budget() {
+        return { capCents: 2500, spentCents: 0, reservedCents: 0, remainingCents: 2500 };
+      },
+    };
+    const player = {
+      play: (clip) => (played.push(clip.inputKey), Promise.resolve('ended')),
+      stop() {},
+    };
+    const seam = createVoiceSeam({ client, player, sleep: async () => {} });
+    return { seam, asked, played };
+  }
+  const tick = () => new Promise((done) => setTimeout(done, 5));
+  it('cut: the read ends at once; the sentence arrives later and the next read plays it without asking again', async () => {
+    const { seam, asked, played } = slowRig();
+    const states = [];
+    const first = seam.read({
+      voiceKey: 'word:猫',
+      sentences: [{ text: 'ねこ' }],
+      onState: (s) => states.push(s),
+    });
+    await tick();
+    expect(asked).toHaveLength(1);
+    expect(typeof first.cut).toBe('function');
+    first.cut();
+    await tick();
+    expect(states.at(-1)).toBe('stopped');
+    expect(asked[0].aborted).toBe(false);
+    asked[0].answer();
+    await tick();
+    expect(played).toEqual([]);
+    const { states: again } = await run(seam, {
+      voiceKey: 'word:猫',
+      sentences: [{ text: 'ねこ' }],
+    });
+    expect(again.at(-1)).toBe('done');
+    expect(asked).toHaveLength(1);
+    expect(played).toEqual(['word:猫|ねこ']);
+  });
+  it('stop (any other end): the request is given up and nothing is kept, as before', async () => {
+    const { seam, asked } = slowRig();
+    const first = seam.read({ voiceKey: 'word:猫', sentences: [{ text: 'ねこ' }] });
+    await tick();
+    first.stop();
+    await tick();
+    expect(asked[0].aborted).toBe(true);
+    const second = seam.read({ voiceKey: 'word:猫', sentences: [{ text: 'ねこ' }] });
+    await tick();
+    expect(asked).toHaveLength(2);
+    second.stop();
+  });
+});
+
 describe('only the Japanese is read', () => {
   const texts = (text) => japaneseSentences(text).map((sentence) => sentence.text);
   it('Japanese text is read as it stands, sentence by sentence', () => {

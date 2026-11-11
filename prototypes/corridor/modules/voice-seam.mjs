@@ -208,9 +208,17 @@ export function createVoiceSeam({ client, player, recorded = null, quiet = () =>
     onSource = null, stopRecorded = null, rateRecorded = null } = {}) {
     stop();
     try { quiet(); } catch { /* another lane's fault */ }
-    const owner = { queue: null, stopRecorded, rateRecorded, onSource, ended: false, recordedStops: 0 };
+    const owner = { queue: null, stopRecorded, rateRecorded, onSource, ended: false, recordedStops: 0, keep: false };
+    // the queue aborts a sentence still on its way when the read ends; after cut() it is let arrive and kept instead
+    const keepable = (signal) => {
+      if (!signal) return signal;
+      const relay = new AbortController();
+      const end = () => { if (!owner.keep) relay.abort(); };
+      if (signal.aborted) end(); else signal.addEventListener('abort', end, { once: true });
+      return relay.signal;
+    };
     const queue = createSpeechQueue({
-      fetchClip: (sentence, _index, signal) => clipFor(sentence, voiceKey, signal),
+      fetchClip: (sentence, _index, signal) => clipFor(sentence, voiceKey, keepable(signal)),
       player: composite(owner),
       prefetch, gapMs, sleep,
       onSentence: (index) => { if (session === owner || index < 0) onSentence(index); },
@@ -225,6 +233,9 @@ export function createVoiceSeam({ client, player, recorded = null, quiet = () =>
       pause: () => queue.pause(),
       resume: () => queue.resume(),
       stop: () => { queue.stop(); },
+      /** The read ends now, as stop() does, but a sentence already asked of the server is still received and kept, so
+       * asking for it again plays at once (the ear's own time limit, the review's K3). */
+      cut: () => { owner.keep = true; queue.stop(); },
       jump: (index) => { if (!owner.ended) queue.jump(index); },
       setRate: (next) => queue.setRate(next),
       get state() { return queue.state; },
