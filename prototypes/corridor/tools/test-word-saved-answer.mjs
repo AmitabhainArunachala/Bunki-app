@@ -136,6 +136,8 @@ function defineRows() {
     'SAVE_NEWS_MS', 'saveNews', 'saveNewsTimer', 'saveNewsQuiet', 'saySaveNews', 'saveNamesPlace',
     // pass 3 (P3-4): the article bar's Save, saved, names the place ("Review ✓")
     'barSavedVerb',
+    // the Save memory is the app's own root; a host surface leaves it alone
+    'saveMemoryWritable',
     'assessmentSuppressionRetries', 'suppressAssessmentCards', 'performAssessmentSuppression',
     'listReading', 'listGloss', 'listToMarkdown', 'resolveAssessmentSubject', 'learningEnrollmentPending', 'commitLearningEnrollment',
     'reviewAnswerAvailable', 'reviewCardBack', 'reviewBack', 'kanjiAnswerAvailable', 'retainedKanjiRecord', 'validKanjiRecord',

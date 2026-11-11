@@ -10010,6 +10010,10 @@ let saveNewsQuiet = false; // a pick whose own Save names the place: the keep sa
  * its pick needs no news. A word's anchor (the strip's sentence) names nothing. */
 const saveNamesPlace = (invoker) => !!invoker?.isConnected && invoker.dataset?.saveOne != null;
 const sameSaved = (node) => (row) => !!row && row.t === node.t && row.id === node.id;
+/** The record's Save memory (saveMemory) is the app's own root: a host surface (the personal deck's private lookup) may
+ * write only the saved words and the lists (commitStorePatchOutcome refuses any other root there), so there Save keeps
+ * its places and leaves the memory alone. */
+const saveMemoryWritable = () => !personalHost;
 /** A place's name as a pair: Review, a list's own name, or a plain item's home (the tutor page). */
 function placeWords(place) {
   if (!place) return ['', ''];
@@ -10072,7 +10076,7 @@ async function placeWord(node, label, to, { keep = null, saved = null } = {}) {
       const listed = Object.values(latest.lists || {}).flat().find(same);
       if (!item && !listed) { unmatched = true; throw declineWrite('not-saved'); }
       const patch = { lists: moveLists(latest.lists, listed || listRowFor(node, label, item), to) };
-      if (to.kind === 'list') {
+      if (to.kind === 'list' && saveMemoryWritable()) {
         const memory = withListUsed(latest.saveMemory, to.name, Date.now());
         if (memory) patch.saveMemory = memory;
       }
@@ -10924,7 +10928,7 @@ function openVocabularyListPopover(node, label, invoker, { menu = false, more = 
  * box a redraw puts back, or the same visit's box drawn again with its answer. A write that cannot be made is let go:
  * a count is never worth a warning. */
 function noteBoxOpened(span, key) {
-  if (!key || !recordWritable()) return;
+  if (!key || !recordWritable() || !saveMemoryWritable()) return;
   const visit = ladderVisit?.anchor === span ? ladderVisit : null;
   if (visit && (visit.countable === false || visit.boxCounted)) return;
   if (visit) visit.boxCounted = true;
@@ -11974,7 +11978,7 @@ async function writeListMembership(node, label, listName, on) {
         { t: node.t, id: node.id, label, kind: NODE_KIND[node.t]?.[0], kindEn: NODE_KIND[node.t]?.[1], ts: item.ts,
           ...(item.sourceContextRef ? { sourceContextRef: item.sourceContextRef } : {}) }]);
       // SAVE · the record remembers when he last put a word on this list: the chooser offers his recent lists first
-      const memory = withListUsed(latest.saveMemory, listName, Date.now());
+      const memory = saveMemoryWritable() ? withListUsed(latest.saveMemory, listName, Date.now()) : null;
       return memory ? { lists, saveMemory: memory } : { lists };
     });
   } catch { saved = false; }
@@ -16412,7 +16416,7 @@ function renderSavedLists(main) {
             const next = { ...latest.lists };
             delete next[sec.name];
             // SAVE · a deleted list leaves the chooser's memory too
-            const memory = latest.saveMemory ? withListDropped(latest.saveMemory, sec.name) : null;
+            const memory = latest.saveMemory && saveMemoryWritable() ? withListDropped(latest.saveMemory, sec.name) : null;
             return memory ? { lists: next, saveMemory: memory } : { lists: next };
           });
           if (saved) {
@@ -16460,7 +16464,7 @@ function renderSavedLists(main) {
             for (const [key, items] of Object.entries(latest.lists))
               setOwnRecordValue(next, key === sec.name ? name : key, items);
             // SAVE · a renamed list keeps its place among his recent lists
-            const memory = latest.saveMemory ? withListRenamed(latest.saveMemory, sec.name, name) : null;
+            const memory = latest.saveMemory && saveMemoryWritable() ? withListRenamed(latest.saveMemory, sec.name, name) : null;
             return memory ? { lists: next, saveMemory: memory } : { lists: next };
           });
           if (saved) {

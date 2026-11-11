@@ -455,6 +455,9 @@ async function main() {
       review: !!document.querySelector('#seal-strip #seal-strip-review:not([hidden])'),
       items: [...document.querySelectorAll('#seal-strip [data-strip-action]')].filter((node) => !node.hidden).map((node) => node.textContent.trim()),
       status: document.getElementById('seal-strip-status')?.textContent.trim() ?? '',
+      // SAVE pass 2 (P2-2): the strip holds the one chooser, whose title asks ("Save 共和国 to"); its acts follow the
+      // interface language ("Full entry")
+      title: document.getElementById('seal-strip-title')?.textContent.trim() ?? '',
       focusInMenu: !!document.activeElement?.closest('#seal-strip'),
     }))()`);
     await page.keyboard.press('Escape');
@@ -462,8 +465,8 @@ async function main() {
     check(
       'focused word exposes the strip (Shift+F10: it asks where the word goes) and the full entry (Ctrl+Enter) as non-hold alternatives',
       focusProbe.tokenFocused && focusProbe.role === 'group' && !!focusProbe.name && /Shift\+F10/.test(focusProbe.help) && /Ctrl\+Enter/.test(focusProbe.help) &&
-        menuProbe.menu === 'dialog' && menuProbe.focusInMenu && menuProbe.items.includes('全項目 · Full entry') && menuProbe.mode === 'choose' &&
-        /^Save\b/u.test(menuProbe.status) && menuProbe.review && !menuProbe.items.includes('Remove') && menuBack,
+        menuProbe.menu === 'dialog' && menuProbe.focusInMenu && menuProbe.items.some((text) => /Full entry|全項目/u.test(text)) && menuProbe.mode === 'choose' &&
+        /^Save\b/u.test(menuProbe.title) && menuProbe.review && !menuProbe.items.includes('Remove') && menuBack,
       JSON.stringify({ ...focusProbe, ...menuProbe, menuBack }),
     );
     // the strip's Review keeps the word, and Remove, the one way out, leaves the record as this walk found it
@@ -526,7 +529,8 @@ async function main() {
     check(
       'screen-reader tree exposes prose keyboard help and the strip\'s actions',
       describedProse.some((text) => /Shift\+F10/.test(text) && /Enter/.test(text)) && !!stripDialog &&
-        menuItems.includes('全項目 · Full entry') && menuItems.includes('Save the sentence') &&
+        // SAVE pass 2 (P2-3): the strip's acts follow the interface language ("Full entry"); the dots between them say nothing
+        menuItems.some((name) => /^(全項目 · )?Full entry$|^全項目$/u.test(name)) && menuItems.includes('Save the sentence') &&
         // Hfix-1B (item 11): no tutor is set up here, so the strip names no tutor action
         // SAVE (2026-11-11): the strip asks first, so its places (Review, New list…) are its buttons and Remove is not yet one
         !menuItems.some((name) => /tutor/iu.test(name)) && menuItems.some((name) => /^Review\b/u.test(name)) && menuItems.some((name) => /^New list…/u.test(name)) &&

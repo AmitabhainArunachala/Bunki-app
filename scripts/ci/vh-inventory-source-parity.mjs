@@ -26,8 +26,10 @@ const P = 'prototypes/corridor/tools/';
 const PRODUCER_PINS = Object.freeze({
   // 2026-11-11 (SAVE, ask first, save second): Shift+F10 opens the strip as the chooser; one check renamed and the
   // strip's Remove reached through the pick of Review. Re-pin of the producer bytes only; its expansion is unchanged.
+  // SAVE pass 2 and 3: the strip's chooser is read by its title ("Save 共和国 to") and its acts by their names in the
+  // interface's language ("Full entry"). Re-pin of the producer bytes only; its expansion is unchanged.
   [`${P}verify-corridor-accessibility.mjs`]:
-    'a7825880dd4e9a919387fa9ad0bfc263402b63abed10ce76bd70a4a5ac458140',
+    '54c0ffad5590e6713b05eeabcc0e0c8469ec61838c3086294818f0d885915d5b',
   // 2026-11-06 (G3): the builder folds the eleven corridor seams back into the standalone document; the recordImports
   // map it declares is unchanged (9 rows) — reviewed re-pin of the producer bytes only
   // 2026-11-10 (pull request #146): the builder also folds device-voice.mjs, which corridor.js has imported since

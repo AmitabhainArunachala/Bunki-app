@@ -411,7 +411,7 @@ html body:not(#\#):not(#\#) .save-place::before {
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 17'%3E%3Cpath d='M1.75 1.75h9.5v13.5L6.5 11.6l-4.75 3.65z' fill='none' stroke='black' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 html body:not(#\#):not(#\#) .save-place.is-review::before {
-  content: '復';
+  content: '復'; content: '復' / '';
   display: grid;
   place-items: center;
   width: 26px;
@@ -424,7 +424,7 @@ html body:not(#\#):not(#\#) .save-place.is-review::before {
   font: 700 14px / 1 var(--font-seal, var(--font-display));
 }
 html body:not(#\#):not(#\#) .save-place.is-new::before, html body:not(#\#):not(#\#) .save-place.save-place-all::before {
-  content: '＋';
+  content: '＋'; content: '＋' / '';
   display: grid;
   place-items: center;
   width: 24px;
@@ -437,8 +437,8 @@ html body:not(#\#):not(#\#) .save-place.is-new::before, html body:not(#\#):not(#
   mask: none;
   font: 600 14px / 1 var(--font-ui);
 }
-html body:not(#\#):not(#\#) .save-place.save-place-all::before { content: '…'; border-style: solid; }
-html body:not(#\#):not(#\#) .save-place.is-home::before { content: '先'; display: grid; place-items: center; width: 26px; height: 26px;
+html body:not(#\#):not(#\#) .save-place.save-place-all::before { content: '…'; content: '…' / ''; border-style: solid; }
+html body:not(#\#):not(#\#) .save-place.is-home::before { content: '先'; content: '先' / ''; display: grid; place-items: center; width: 26px; height: 26px;
   border-radius: var(--radius-seal, 3px); background: var(--color-ink-2); color: var(--color-paper, #f7f2e8); -webkit-mask: none; mask: none;
   font: 700 14px / 1 var(--font-seal, var(--font-display)); }
 html body:not(#\#):not(#\#) .save-place-name { grid-area: name; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -511,7 +511,7 @@ html body:not(#\#):not(#\#) .save-place-act {
   font: 600 var(--type-control) / 1.25 var(--font-ui);
   cursor: pointer;
 }
-html body:not(#\#):not(#\#) .save-place-act + .save-place-act::before { content: '·'; margin: 0 10px 0 -6px; color: var(--color-rule); font-weight: 400; }
+html body:not(#\#):not(#\#) .save-place-act + .save-place-act::before { content: '·'; content: '·' / ''; margin: 0 10px 0 -6px; color: var(--color-rule); font-weight: 400; }
 html body:not(#\#):not(#\#) #mini-place-show { color: var(--color-accent); }
 html body:not(#\#):not(#\#) .save-place-act:hover { color: var(--color-ink); }
 html body:not(#\#):not(#\#) .save-place-act:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
@@ -713,7 +713,7 @@ html body:not(#\#):not(#\#) .save-place-kind { flex: 0 0 auto; font: 500 var(--t
 html body:not(#\#):not(#\#) .save-place-where { flex: 0 1 auto; max-width: 45%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 4px 8px; border: var(--stroke-hairline, 1px) solid var(--color-rule); border-radius: var(--radius-control); font: 600 var(--type-caption, 12px) / 1 var(--font-ui); color: var(--color-ink-2); }
 html body:not(#\#):not(#\#) .save-place-where:not(.is-list) { border-color: color-mix(in srgb, var(--color-accent) 45%, transparent); color: var(--color-accent); }
 html body:not(#\#):not(#\#) .save-place-word.is-this { background: var(--color-accent-wash, color-mix(in srgb, var(--color-accent) 9%, transparent)); }
-html body:not(#\#):not(#\#) .save-place-word.is-this::after { content: '印'; display: grid; place-items: center; width: 22px; height: 22px; border-radius: var(--radius-seal, 3px); background: var(--color-seal, #b5322a); color: var(--color-paper, #f7f2e8); font: 800 13px / 1 var(--font-seal, var(--font-display)); transform: rotate(-9deg); }
+html body:not(#\#):not(#\#) .save-place-word.is-this::after { content: '印'; content: '印' / ''; display: grid; place-items: center; width: 22px; height: 22px; border-radius: var(--radius-seal, 3px); background: var(--color-seal, #b5322a); color: var(--color-paper, #f7f2e8); font: 800 13px / 1 var(--font-seal, var(--font-display)); transform: rotate(-9deg); }
 html body:not(#\#):not(#\#) .save-place-empty { padding: 14px 16px; color: var(--color-muted); font: 400 var(--type-control) / 1.4 var(--font-ui); }
 html body:not(#\#):not(#\#) .save-place-door { align-self: stretch; min-height: 44px; margin: 4px 8px 0; padding: 0 8px; border: 0; background: transparent; color: var(--color-accent); font: 600 var(--type-control) / 1 var(--font-ui); text-align: start; cursor: pointer; }
 
@@ -750,13 +750,13 @@ html body:not(#\#):not(#\#) .save-chooser-head { display: flex; align-items: cen
 html body:not(#\#):not(#\#) .save-chooser-head > .save-chooser-title { flex: 1 1 auto; min-width: 0; margin: 0; }
 html body:not(#\#):not(#\#) .save-chooser-acts { display: flex; flex: 0 0 auto; gap: 0; }
 html body:not(#\#):not(#\#) .save-chooser-act { min-height: 44px; padding: 0 10px; border: 0; border-radius: var(--radius-control); background: transparent; color: var(--color-ink-2); font: 500 var(--type-label) / 1 var(--font-ui); cursor: pointer; }
-html body:not(#\#):not(#\#) .save-chooser-act + .save-chooser-act::before { content: '·'; margin: 0 8px 0 -4px; color: var(--color-rule); }
+html body:not(#\#):not(#\#) .save-chooser-act + .save-chooser-act::before { content: '·'; content: '·' / ''; margin: 0 8px 0 -4px; color: var(--color-rule); }
 html body:not(#\#):not(#\#) .save-chooser-act:hover { color: var(--color-ink); }
 html body:not(#\#):not(#\#) .save-chooser-act:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
 html body:not(#\#):not(#\#) .save-chooser-status { margin: 4px 8px 0; font: 400 var(--type-label) / 1.4 var(--font-ui); color: var(--color-accent); }
 html body:not(#\#):not(#\#) .save-chooser-status:empty { display: none; }
 html body:not(#\#):not(#\#) .save-chooser-foot { display: flex; flex-wrap: wrap; gap: 0 2px; margin: 4px 0 0; padding: 2px 0 0; border-top: var(--stroke-hairline, 1px) solid var(--color-rule-soft, var(--color-rule)); }
-html body:not(#\#):not(#\#) .save-chooser-foot > .save-place-act + .save-place-act::before { content: '·'; margin: 0 10px 0 -6px; color: var(--color-rule); font-weight: 400; }
+html body:not(#\#):not(#\#) .save-chooser-foot > .save-place-act + .save-place-act::before { content: '·'; content: '·' / ''; margin: 0 10px 0 -6px; color: var(--color-rule); font-weight: 400; }
 html body:not(#\#):not(#\#) .save-chooser-foot > #save-chooser-show { color: var(--color-accent); }
 /* the strip holds the same chooser: full rows, Review's seal and line, the counts (P2-2) */
 html body:not(#\#):not(#\#) .seal-strip .seal-strip-chooser { display: block; margin: 0 -4px; }
@@ -768,11 +768,11 @@ html body:not(#\#):not(#\#) .seal-strip .seal-strip-chooser .save-chooser-form .
 html body:not(#\#):not(#\#) .seal-strip .seal-strip-lists[hidden] { display: none; }
 html body:not(#\#):not(#\#) .seal-strip[data-mode='placed'] .seal-strip-lists { gap: 0 2px; }
 html body:not(#\#):not(#\#) .seal-strip[data-mode='placed'] .seal-strip-lists > .save-place-act { min-height: 44px; margin: 0; padding: 0 10px; }
-html body:not(#\#):not(#\#) .seal-strip .seal-strip-lists > .save-place-act + .save-place-act::before { content: '·'; margin: 0 10px 0 -6px; color: var(--color-rule); font-weight: 400; }
+html body:not(#\#):not(#\#) .seal-strip .seal-strip-lists > .save-place-act + .save-place-act::before { content: '·'; content: '·' / ''; margin: 0 10px 0 -6px; color: var(--color-rule); font-weight: 400; }
 /* the strip's acts: separate words, a dot between them (P2-3) */
 html body:not(#\#):not(#\#) .seal-strip .seal-strip-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 0 2px; margin: 6px 0 0; padding-top: 2px; }
 html body:not(#\#):not(#\#) .seal-strip .seal-strip-acts > .seal-act { min-height: 44px; padding: 0 10px; color: var(--color-accent); }
-html body:not(#\#):not(#\#) .seal-strip .seal-strip-acts > .seal-act:not([hidden]) ~ .seal-act:not([hidden])::before { content: '·'; margin: 0 10px 0 -6px; color: var(--color-rule); font-weight: 400; }
+html body:not(#\#):not(#\#) .seal-strip .seal-strip-acts > .seal-act:not([hidden]) ~ .seal-act:not([hidden])::before { content: '·'; content: '·' / ''; margin: 0 10px 0 -6px; color: var(--color-rule); font-weight: 400; }
 html body:not(#\#):not(#\#) .seal-strip .seal-strip-lists > [data-strip-action='remove'] { color: var(--color-ink-2); }
 
 /* P3-3 · Copy is the word's own act, never a place. In the word's box it stands in the word's band, beside the door to the
@@ -807,7 +807,7 @@ html body:not(#\#):not(#\#) .mini-sentence-keep-row > .mini-sentence-copy { flex
 html body:not(#\#):not(#\#) .mini-sentence-keep-row > .mini-sentence-copy { min-height: 44px; padding: 0 10px; color: var(--color-accent); }
 html body:not(#\#):not(#\#) .save-chooser-word-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 0 2px; margin: 6px 0 0; padding: 2px 0 0; border-top: var(--stroke-hairline, 1px) solid var(--color-rule-soft, var(--color-rule)); }
 html body:not(#\#):not(#\#) .save-chooser-word-acts > .save-place-act { min-height: 44px; padding: 0 10px; color: var(--color-accent); }
-html body:not(#\#):not(#\#) .save-chooser-word-acts > .save-place-act + .save-place-act::before { content: '·'; margin: 0 10px 0 -6px; color: var(--color-rule); font-weight: 400; }
+html body:not(#\#):not(#\#) .save-chooser-word-acts > .save-place-act + .save-place-act::before { content: '·'; content: '·' / ''; margin: 0 10px 0 -6px; color: var(--color-rule); font-weight: 400; }
 
 /* the one-place chooser (Save the sentence → the tutor page): the question and its answer on one line, wrapping when the
    column is too narrow for both */
