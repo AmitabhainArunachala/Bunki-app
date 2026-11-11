@@ -8,7 +8,8 @@
  *    stopped); shown, the pause between sentences is as before;
  *  - a pause of the one audio element that this app did not ask for (a call, another app's sound, the lock screen,
  *    headphones out) is told, so the read is paused there; the app's own pause, a stop, a new clip and a clip's end
- *    are not; a resume the browser refuses is told too;
+ *    are not; a resume the browser refuses is told too, and so is a next clip it will not let start, for the article's
+ *    read only (any other read fails as before);
  *  - while a read waits for its next clip on a hidden page, the element plays silence in a loop, and lets go of it
  *    when the clip comes, when he pauses or when the read ends;
  *  - the lock screen (Media Session): the article's title, "Bunki", the app's icon, play, pause, next and previous;
@@ -47,7 +48,8 @@ function page({ hidden = false } = {}) {
 
 /** The one audio element as a browser keeps it: a pause the page or anyone else asks for is told a moment later (the
  * browser's own task), a clip that reaches its end is paused and ended at once, a new address while playing pauses it
- * without the page asking (some engines tell that too). `refuse` makes the next play() refused. */
+ * without the page asking (some engines tell that too). `refuse` makes the next play() refused (true: NotAllowedError, or
+ * the error's name). */
 class FakeAudio extends EventTarget {
   constructor() {
     super();
@@ -76,9 +78,9 @@ class FakeAudio extends EventTarget {
   setAttribute() {}
   play() {
     if (this.refuse) {
+      const error = new Error('refused');
+      error.name = typeof this.refuse === 'string' ? this.refuse : 'NotAllowedError';
       this.refuse = false;
-      const error = new Error('not allowed');
-      error.name = 'NotAllowedError';
       return Promise.reject(error);
     }
     this.paused = false;
@@ -101,7 +103,7 @@ class FakeAudio extends EventTarget {
 }
 
 /** The speech team's own player (speech-player.mjs, unchanged) on a fake element, wrapped as the reader uses it. */
-function rig() {
+function rig({ refusalIsPause = () => false } = {}) {
   const audio = new FakeAudio();
   let blobs = 0;
   const document = {
@@ -114,7 +116,12 @@ function rig() {
     },
   };
   const inner = createAudioPlayer(document);
-  const pocket = createPocketPlayer({ player: inner, audio, silence: () => 'blob:silence' });
+  const pocket = createPocketPlayer({
+    player: inner,
+    audio,
+    silence: () => 'blob:silence',
+    refusalIsPause,
+  });
   const told = [];
   pocket.onOutsidePause(() => told.push('outside'));
   const clip = () => ({ bytes: new Uint8Array([1, 2, 3]), contentType: 'audio/wav' });
@@ -201,6 +208,25 @@ describe('the one audio element: a pause from outside is told; the app’s own a
     r.player.resume();
     await tick(5);
     expect(r.told).toEqual(['outside']);
+  });
+  it('a next clip the browser will not let start: for the article’s read a pause from outside, the clip stopped', async () => {
+    const r = rig({ refusalIsPause: () => true });
+    r.audio.refuse = true;
+    const outcome = await r.player.play(r.clip(), 1);
+    expect(outcome).toBe('stopped');
+    expect(r.told).toEqual(['outside']);
+  });
+  it('…and for any other read it fails as before, and nothing is told', async () => {
+    const r = rig({ refusalIsPause: () => false });
+    r.audio.refuse = true;
+    await expect(r.player.play(r.clip(), 1)).rejects.toMatchObject({ name: 'NotAllowedError' });
+    expect(r.told).toEqual([]);
+  });
+  it('a clip that cannot play for another reason fails as before, for the article’s read too', async () => {
+    const r = rig({ refusalIsPause: () => true });
+    r.audio.refuse = 'NotSupportedError';
+    await expect(r.player.play(r.clip(), 1)).rejects.toMatchObject({ name: 'NotSupportedError' });
+    expect(r.told).toEqual([]);
   });
 });
 

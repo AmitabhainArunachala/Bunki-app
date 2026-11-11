@@ -28,6 +28,9 @@
  *  outside-pause  the app's audio element paused by the case, shown and hidden: the reader pauses at that sentence and
  *                 the bar and the lock screen say so; nothing resumes in 3 s or on being shown, and nothing more is asked;
  *                 the bar's play takes it up at the same sentence and place.
+ *  refused-play   hidden: the next clip refused as a locked phone may refuse a new start: the read is paused at it and the
+ *                 lock screen's play takes it up there; a clip that cannot play for any other reason ends the read, and
+ *                 the bar says "could not play", not that the voice server failed.
  *  hidden-others  hidden still ends a deck card's control, the word box's 音 and the ear's voice, as before; a card's
  *                 answer shown while hidden says nothing until the page is shown.
  *
@@ -45,7 +48,7 @@ const WIDTH = Number(arg('--width', '390'));
 const LANG = arg('--lang', 'en');
 const PORT = Number(arg('--port', '19592'));
 const SHOTS = arg('--shots', '');
-const ONLY = new Set(String(arg('--only', 'hidden-read,late-clip,media,no-media,outside-pause,hidden-others')).split(',').filter(Boolean));
+const ONLY = new Set(String(arg('--only', 'hidden-read,late-clip,media,no-media,outside-pause,refused-play,hidden-others')).split(',').filter(Boolean));
 if (!SITE) { console.error('usage: verify-reader-pocket.mjs --site <built site>'); process.exit(2); }
 if (SHOTS) mkdirSync(SHOTS, { recursive: true });
 
@@ -91,6 +94,13 @@ function probe({ media }) {
     const proto = HTMLMediaElement.prototype, play = proto.play;
     proto.play = function () {
       this.muted = true; this.volume = 0;
+      // the case can make the browser refuse the next clip of the app's element (P.refuse names the error)
+      if (P.refuse && this.hasAttribute('data-speak-audio') && !this.loop) {
+        const name = P.refuse;
+        P.refuse = null;
+        P.refused = (P.refused || 0) + 1;
+        return Promise.reject(new DOMException('refused by the case', name));
+      }
       P.plays.push({ at: performance.now(), speak: this.hasAttribute('data-speak-audio'), loop: !!this.loop, hidden: document.hidden });
       return play.call(this);
     };
@@ -512,6 +522,44 @@ const CASES = {
     } catch (error) { problems.push(`the case broke: ${String(error.message).split('\n')[0].slice(0, 200)}`); }
     if (s.errors.length) problems.push(`page errors: ${s.errors.join(' | ')}`);
     report('outside-pause', problems, steps.join('; '));
+    await s.close();
+  },
+
+  async 'refused-play'() {
+    clipSeconds = 1.2; holdNth = 0;
+    const s = await freshPage({ media: 'wrap' });
+    const problems = [];
+    const steps = [];
+    const call = (action) => s.page.evaluate((action) => window.__pocket.media.handlers[action]?.(), action);
+    try {
+      await openArticle(s);
+      await until(s, (x) => x.lit >= 2, 15000);
+      await hide(s, true);
+      // the next clip, refused as a locked phone may refuse a new start: the read is paused at it, not ended
+      await s.page.evaluate(() => { window.__pocket.refuse = 'NotAllowedError'; });
+      let v = await until(s, (x) => x.bar === 'paused' || x.bar === 'idle', 8000);
+      const at = v.first;
+      const refused = await s.page.evaluate(() => window.__pocket.refused || 0);
+      if (!refused) problems.push('no clip was refused (the case did not reach its point)');
+      if (v.bar !== 'paused' || v.media?.state !== 'paused' || v.media?.title === null) problems.push(`a refused clip: the bar says ${v.bar}${v.silent ? ` (${v.silent})` : ''}, the lock screen ${JSON.stringify(v.media)}`);
+      await wait(1500);
+      v = await look(s.page);
+      if (v.bar !== 'paused' || !v.audio?.paused) problems.push(`after a refused clip it did not stay paused: bar ${v.bar}, audio ${JSON.stringify(v.audio)}`);
+      await call('play');
+      v = await until(s, (x) => x.bar === 'playing' && !x.audio?.paused, 4000);
+      if (v.bar !== 'playing' || v.first !== at) problems.push(`the lock screen's play after a refused clip: bar ${v.bar} at word ${v.first} (refused at ${at})`);
+      steps.push(`refused at word ${at}: paused; the lock screen's play took it up at word ${v.first}`);
+      // a clip that cannot play for any other reason ends the read, and the bar says so in true words
+      await s.page.evaluate(() => { window.__pocket.refuse = 'NotSupportedError'; });
+      v = await until(s, (x) => x.bar === 'idle', 8000);
+      const note = await s.page.evaluate(() => document.getElementById('listen-note')?.textContent || '');
+      if (v.bar !== 'idle' || v.silent !== 'decode' || !/could not play|再生エラー/u.test(note)) problems.push(`a clip that cannot play: the bar says ${v.bar} (${v.silent || 'no reason'}), "${note}"`);
+      if (v.media?.title !== null) problems.push(`the read ended, and the lock screen still shows ${JSON.stringify(v.media)}`);
+      steps.push(`a clip that cannot play ended the read: "${note}"`);
+      await hide(s, false);
+    } catch (error) { problems.push(`the case broke: ${String(error.message).split('\n')[0].slice(0, 200)}`); }
+    if (s.errors.length) problems.push(`page errors: ${s.errors.join(' | ')}`);
+    report('refused-play', problems, steps.join('; '));
     await s.close();
   },
 
