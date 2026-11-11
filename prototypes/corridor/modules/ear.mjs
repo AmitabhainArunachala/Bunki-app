@@ -514,7 +514,9 @@ export function findUnit(target, { offset = null, display = defaultDisplay, cont
  * otherwise the sentence the touch stands in. */
 function wordOrSentence(block, target, offset, context) {
   const reading = readingOf(block);
-  if (reading?.node) {
+  // a block that names its own reading (data-reading: the review card's printed word, by the card's stored reading, as
+  // its question-side control says it; the combine's I2) is that word too
+  if (reading?.node || (reading && attr(block, 'data-reading') !== null)) {
     const word = joined(textNodes(block, { mask: true, skip: (node) => node === reading.node }));
     if (/\p{Script=Han}/u.test(word) && [...(word.match(BARE_RUN) || []).join('')].length <= 16 && !/[。！？]/u.test(word))
       return elementUnit(block, context, target, reading);
