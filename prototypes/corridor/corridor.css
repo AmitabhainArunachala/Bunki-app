@@ -6415,7 +6415,7 @@ body.zen .review-reading-row {
   justify-content: center;
   gap: 10px;
 }
-body.zen .review-reading-row > .say { flex-shrink: 0; }
+body.zen .review-reading-row > .card-voice { flex-shrink: 0; }
 body.zen .review-reading {
   font-family: 'Yuji Syuku', var(--serif);
   font-size: var(--type-title);
@@ -6442,36 +6442,6 @@ body.zen [data-kanji-readings] .sense-pos {
 body.zen [data-kanji-readings] > .sense-pos {
   margin: 8px 0 0;
 }
-/* 音 — the fifth seal: the card's voice door */
-.say {
-  width: 44px;
-  height: 44px;
-  margin: -10px 0;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: 0;
-  color: var(--card-ink-2, #6f514c);
-  cursor: pointer;
-  position: relative;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  transition: none;
-}
-.say.is-speaking {
-  color: var(--card-red, #b7282e);
-}
-.say.is-speaking::after {
-  content: '';
-  position: absolute;
-  inset: 7px;
-  border: 1px solid currentColor;
-  border-radius: 50%;
-  opacity: 0.3;
-}
-
 /* ------------------------------------------------ one sense decides the grade */
 body.zen .review-sense-primary {
   font-family: 'Noto Serif', 'Noto Serif JP', Georgia, serif;
@@ -6695,19 +6665,6 @@ body.zen .grade-row .grade:nth-child(3) {
 body.zen .grade-row .grade:nth-child(4) {
   animation-delay: 200ms;
 }
-.say.is-speaking svg {
-  animation: kairo-say-breath 6s ease-in-out infinite;
-}
-@keyframes kairo-say-breath {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
-  }
-}
-
 /* ---- 2026-08-27 operator live session: quick search · folds · list pages */
 
 /* the search ghost — beside the world seal, the same barely-there skin;

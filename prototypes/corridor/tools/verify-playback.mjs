@@ -330,7 +330,7 @@ const cardState = (page) => page.evaluate(() => ({
   view: document.body.dataset.view,
   clips: window.__playbackFixture.clips.map((a) => ({ src: a.src, paused: a.paused })),
   utterances: window.__playbackFixture.utterances.length,
-  speaking: document.querySelectorAll('.say.is-speaking').length,
+  speaking: document.querySelectorAll('.say.is-speaking, .card-voice.is-speaking').length,
   sayNote: document.querySelector('#card-say-note')?.textContent ?? null,
   unrevealed: !!document.querySelector('#reveal'),
 }));

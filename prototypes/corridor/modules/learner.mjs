@@ -1,5 +1,5 @@
 /** G3 learner seam — declarations moved verbatim from ../corridor.js (pure move, no body edits). */
-import { $, voiceSettingsBlock, AI_EVIDENCE_ROLES, D, DRAFT_KEY, GRAMMAR, ME_DECKS, ME_FIELDS, ME_MONTHS_EN, ME_N1_SITTING, PLACES_TABS, PRIMARY_TABS, REGISTER_LINE_DOORS, REGISTER_ROOM_DOORS, ROOM_IDS, ROOM_NAMES, S, SVG_NS, THEME_STORE, THEME_UI, WORD_BRUSH, WORD_BRUSH_KEY, WORD_VOICE, WORD_VOICE_KEY, bi, biLabel, contrastOf, el, fieldsDeckHome, finiteNumber, flowText, foundationDoor, logicalArchiveRows, meBackPart, meDeckIndex, meNum, meSealsPart, nonEmptyString, openPersonalCollection, optional, owns, passage, paintKeptCount, placesLayout, plainRecord, render, roomTransition, safeJsonValue, savedAnswerFor, setLayout, setWordPref, srsKey, tx, validStoreEnvelope, wordBrush, wordVoice } from '../corridor.js';
+import { $, voiceSettingsBlock, AI_EVIDENCE_ROLES, D, DRAFT_KEY, GRAMMAR, ME_DECKS, ME_FIELDS, ME_MONTHS_EN, ME_N1_SITTING, PLACES_TABS, PRIMARY_TABS, REGISTER_LINE_DOORS, REGISTER_ROOM_DOORS, ROOM_IDS, ROOM_NAMES, S, SVG_NS, THEME_STORE, THEME_UI, WORD_BRUSH, WORD_BRUSH_KEY, WORD_VOICE, WORD_HIGHLIGHT, WORD_HIGHLIGHT_KEY, WORD_VOICE_KEY, bi, biLabel, contrastOf, el, fieldsDeckHome, finiteNumber, flowText, foundationDoor, logicalArchiveRows, meBackPart, meDeckIndex, meNum, meSealsPart, nonEmptyString, openPersonalCollection, optional, owns, passage, paintKeptCount, placesLayout, plainRecord, render, roomTransition, safeJsonValue, savedAnswerFor, setLayout, setWordPref, srsKey, tx, validStoreEnvelope, wordBrush, wordHighlight, wordVoice } from '../corridor.js';
 import { dayKey, helpByMonth } from './drift.mjs';
 import { articleReadChars } from './library.mjs';
 
@@ -695,6 +695,11 @@ function renderWritingChoice() {
     row('settings-voice', '声 — カードの答えと開いた語を一度、自動で読む（音声の予算を使います）', '声 — say a card’s answer and an opened word once, by themselves (uses the voice budget)',
       [['on', 'オン', 'On'], ['off', 'オフ', 'Off']],
       wordVoice(), (value) => setWordPref(WORD_VOICE_KEY, 'wordVoice', WORD_VOICE, value)),
+    // on unless he turns it off (John, 2026-11-11: "the option to have no highlighting at all"): nothing is drawn over a
+    // sentence being read, anywhere; the reading goes on as it was and the page still follows it
+    row('settings-highlight', '読んでいる文をハイライト', 'Highlight what is being read',
+      [['on', 'オン', 'On'], ['off', 'オフ', 'Off']],
+      wordHighlight(), (value) => setWordPref(WORD_HIGHLIGHT_KEY, 'readHighlight', WORD_HIGHLIGHT, value)),
     el('p', 'settings-layout-note', tx('書く速さは、書の間のスライダー一つで決まります。',
       'The writing speed is set in one place: the writing room’s slider.')));
   // the voice server: paired or not, where the last sentence came from, the budget, and the one-time pairing

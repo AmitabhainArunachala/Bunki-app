@@ -324,14 +324,27 @@ html[data-live-depth='1'] #sheet:has(> h2.headword):not(:has(.hero > .hero-glyph
   z-index: 1;
 }
 /* after a reading, a tutor's words or a quote it follows the text on its line */
-.voice-say:is([data-voice-say='kanji-reading'], [data-voice-say='card-sentence'], [data-voice-say='tutor-turn'], [data-voice-say='coach'], [data-voice-say='speak-line'], [data-voice-say='quoted-sentence']) {
+.voice-say:is([data-voice-say='kanji-reading'], [data-voice-say='card-example'], [data-voice-say='tutor-turn'], [data-voice-say='coach'], [data-voice-say='speak-line'], [data-voice-say='quoted-sentence']) {
   display: inline-grid;
   vertical-align: middle;
   margin: -10px 0 -10px 4px;
 }
-.voice-say.is-speaking, .mini-voice.is-speaking, .kp-listen.is-speaking { color: var(--color-gold, var(--accent)); }
+/* A study card's one audio control (John, 2026-11-11: "more subtle, and simplified"): a hairline speaker in the secondary ink
+   of what surrounds it. No seal, no circle, no box, no shadow; the accent only while it speaks. 44 px to tap, 18 px drawn. */
+.card-voice {
+  display: inline-grid; place-items: center; flex: none;
+  width: 44px; min-width: 44px; height: 44px; margin: -10px 0; padding: 0;
+  border: 0; border-radius: 0; background: none; box-shadow: none;
+  color: var(--card-ink-2, var(--kp-mute, var(--text-2)));
+  cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+.card-voice svg { width: 18px; height: 18px; stroke-width: 1.15; }
+.card-voice[aria-busy='true'] { opacity: 0.6; }
+.kp-card .card-voice { align-self: center; }
+.kp-eyebrow > .card-voice { margin: -10px 0 -10px auto; }
+.voice-say.is-speaking, .mini-voice.is-speaking, .card-voice.is-speaking { color: var(--color-gold, var(--accent)); }
 /* waiting for the voice server's answer: the control he pressed dims until the sentence starts */
-.voice-say[aria-busy='true'], .kp-listen[aria-busy='true'], .say[aria-busy='true'], .mini-voice[aria-busy='true'],
+.voice-say[aria-busy='true'], .mini-voice[aria-busy='true'],
 .listen-row[data-voice-state='loading'] .play-toggle { opacity: 0.6; }
 /* the sentence being read: one even band per line, in a layer of its own that takes no pointer and moves no layout
    (modules/voice-bands.mjs; the Custom Highlight API painted it in patches in WebKit). It lies over the text like a

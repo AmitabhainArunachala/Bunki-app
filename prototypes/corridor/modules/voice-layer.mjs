@@ -16,6 +16,7 @@
  * pairing screen and the status line stand under Settings, 筆と声 · Writing and voice. */
 import { createAudioPlayer } from './nihongo-speech/audio/speech-player.mjs';
 import { isJapaneseEnough, normaliseSpeechText, splitSentences } from './nihongo-speech/audio/speech-text.mjs';
+import { answerReads, deckFrontVoice } from './card-audio.mjs';
 import { baseBoxes, createBands } from './voice-bands.mjs';
 import { createDeviceTokenStore, createVoiceClient } from './voice-client.mjs';
 import { SPEEDS, createVoiceSeam, sentencesOf, voiceKeyOf } from './voice-seam.mjs';
@@ -272,6 +273,7 @@ export function installVoiceLayer(host) {
   // Highlight API painted it in patches in WebKit (John's iPhone, 2026-11-11). The words carry data-speaking.
   const view = doc.defaultView;
   const readBands = createBands(doc, { layerClass: 'read-bands', bandClass: 'read-band' });
+  const highlighting = () => host.highlight?.() !== false;
   const clearSpeaking = () => {
     for (const node of doc.querySelectorAll('#reader [data-speaking]')) node.removeAttribute('data-speaking');
     reader.lit = -1;
@@ -308,7 +310,9 @@ export function installVoiceLayer(host) {
     reader.lit = index;
     const first = litWords()[0];
     if (!first) return;
-    readBands.show(() => baseBoxes(litWords()));
+    // "no highlighting at all" (Settings, 筆と声): nothing is drawn over the text; the words still carry data-speaking
+    // (state, no style), the read goes on in its order, and the page follows the sentence below
+    if (highlighting()) readBands.show(() => baseBoxes(litWords()));
     if (coverOpen()) return;
     const box = first.getBoundingClientRect();
     if (box.top < 96 || box.bottom > view.innerHeight - 140)
@@ -473,6 +477,9 @@ export function installVoiceLayer(host) {
   // lists work, and the read goes on. Only the pause control stops it (John, 2026-11-11: "when i hit play, the only
   // thing that should stop that is hitting the pause button itself").
 
+  /** The review card's own sentence on the answer side, as sentences to read (none when the card has no sentence). */
+  const cardSentence = () => { const node = doc.querySelector('.review-face p.review-cloze'); return node ? japaneseSentences(shownText(node)) : []; };
+
   /* ------------------------------------------------------------------ the quiet speaker mark */
   const sheetNode = (node) => {
     const raw = node.closest('#sheet')?.dataset.node || '';
@@ -507,9 +514,9 @@ export function installVoiceLayer(host) {
         voiceKey: sheetKey(node), single: false, gapMs: 320 }) },
     { id: 'example', find: '#sheet .example > p.example-ja, #sheet p.teacher-source-quote, #sheet p.sent-reader', at: 'before',
       read: (node) => ({ sentences: japaneseSentences(shownText(node)), voiceKey: sheetKey(node) }) },
-    // on the card the mark follows the sentence on its own line's end, beside the ▷ that opens it: the card's face is
-    // centred, and a mark standing over the sentence would be a row of its own
-    { id: 'card-sentence', find: '.review-face p.review-cloze, .review-face p.review-example', at: 'append',
+    // The card's own sentence has no mark of its own any more: the card's one control (#card-say) says the word and then
+    // that sentence. The other sentences, opened under the fold (more), keep a quiet mark at their line's end, beside the ▷.
+    { id: 'card-example', find: '.review-face p.review-example', at: 'append',
       when: () => host.cardRevealed(),
       read: (node) => ({ sentences: japaneseSentences(shownText(node)), voiceKey: voiceKeyOf('word', cardWord() || 'card') }) },
     { id: 'box-sentence', find: '#mini-sentence-pane p.mini-sentence-full', at: 'before',
@@ -548,7 +555,7 @@ export function installVoiceLayer(host) {
   const dropMark = (mark) => { if (mark.nextElementSibling?.classList?.contains('voice-note')) mark.nextElementSibling.remove(); mark.remove(); };
   function mountMarks(root = doc) {
     // a line whose mark has gone (the app drew its text again) goes with it
-    for (const note of root.querySelectorAll('.voice-note')) if (!note.previousElementSibling?.matches?.('.voice-say, .kp-word, .excerpt-listen')) note.remove();
+    for (const note of root.querySelectorAll('.voice-note')) if (!note.previousElementSibling?.matches?.('.voice-say, .kp-word, .excerpt-listen, .card-voice')) note.remove();
     for (const rule of RULES) {
       for (const node of root.querySelectorAll(rule.find)) {
         const have = markOf(node, rule.at);
@@ -582,30 +589,41 @@ export function installVoiceLayer(host) {
     }
     mountStudyCard(root);
   }
-  /** The study card keeps its own look: one more of its own small buttons, on the answer side only. Its answer says
-   * its word once as it is shown (John's "on reveal"), unless he switched that off. */
+  /** The quiet speaker of a study card (John, 2026-11-11: "the gawdy buttons more subtle, and simplified"): a hairline
+   * glyph in the secondary ink of what surrounds it, no seal, circle, box or shadow; the accent only while it speaks. */
+  const cardMark = (id) => {
+    const control = el('button', 'card-voice');
+    control.type = 'button';
+    control.id = id;
+    control.dataset.japaneseLookup = 'off';
+    control.append(uiIcon('speaker'));
+    return control;
+  };
+  /** The study card has ONE audio control on each face. Answer side: it says the word by the card's reading, then the card's
+   * sentence, then the definition and the note (what the old 聞く and 音 said between them), in one turn; a second tap stops
+   * it. Its word says itself once as the answer is shown (John's "on reveal"), unless he switched that off. */
   let saidCard = null; // the card whose answer was last shown: said once, not at every redraw of that answer
   function mountStudyCard(root) {
     for (const card of root.querySelectorAll('.kp .kp-card')) {
       const answer = card.querySelector('.kp-answer');
-      const row = card.querySelector('.kp-eyebrow');
-      const have = card.querySelector('.kp-listen');
-      if (!answer || !row) {
-        // the question side: no control stands there, and the answer shown next is a new one to say
-        for (const stale of card.querySelectorAll('.kp-listen, .voice-note')) stale.remove();
-        if (!answer) saidCard = null;
-        continue;
+      if (!answer) { mountDeckFront(card); saidCard = null; continue; }
+      // the answer is shown: the front's audio ends first, and its control goes
+      const front = card.querySelector('#kp-listen-front');
+      if (front) {
+        if (spoken?.button === front) { const was = spoken; spoken = null; if (was.session && !was.session.ended) was.session.stop(); }
+        for (const stale of card.querySelectorAll('#kp-listen-front, .voice-note')) stale.remove();
       }
-      if (have) continue;
-      const sentence = card.querySelector('.kp-sentence .kp-s[data-focus="1"]') || card.querySelector('.kp-sentence');
+      if (card.querySelector('#kp-listen-word')) continue;
+      const sentence = () => card.querySelector('.kp-sentence .kp-s[data-focus="1"]') || card.querySelector('.kp-sentence');
       const term = shownText(card.querySelector('.kp-term'));
       const reading = shownText(card.querySelector('.kp-reading')) || term;
       const key = voiceKeyOf('word', term || card.dataset.card || 'card');
       const word = answer.querySelector('.kp-word');
-      // one plain line for the card's two controls, on its own row under the word
+      if (!word || !reading) continue;
+      // one plain line for the card's one control, on its own row under the word
       const note = (line) => {
-        let at = word?.nextElementSibling?.classList?.contains('voice-note') ? word.nextElementSibling : null;
-        if (!at && line && word) {
+        let at = word.nextElementSibling?.classList?.contains('voice-note') ? word.nextElementSibling : null;
+        if (!at && line) {
           at = el('span', 'say-note voice-note');
           at.setAttribute('role', 'status');
           at.dataset.japaneseLookup = 'off';
@@ -613,33 +631,54 @@ export function installVoiceLayer(host) {
         }
         if (at) at.textContent = line || '';
       };
-      const button = (label, read) => {
-        const control = el('button', 'kp-zoom-btn kp-listen', label);
-        control.type = 'button';
-        control.addEventListener('click', (event) => {
-          event.stopPropagation();
-          speakFrom(control, { sentences: read(), voiceKey: key, onNote: (line) => { control.title = line || ''; note(line); } });
-        });
-        return control;
-      };
-      const listen = button(tx('聞く', 'Listen'), () => japaneseSentences(shownText(sentence)));
-      listen.id = 'kp-listen';
-      listen.setAttribute('aria-label', tx('この文を聞く', 'Listen to this sentence'));
-      row.append(listen);
-      if (word && reading) {
-        const say = button(tx('音', '音'), () => [{ text: reading }, ...japaneseSentences(shownText(answer.querySelector('.kp-def'))), ...japaneseSentences(shownText(answer.querySelector('.kp-note-passage')))].filter((s) => isJapaneseEnough(s.text)));
-        say.id = 'kp-listen-word';
-        say.lang = 'ja';
-        say.setAttribute('aria-label', tx('語と説明を聞く', 'Listen to the word and its definition'));
-        word.append(say);
-        // the answer shown: its word, once, through the voice server or not at all
-        const shown = card.dataset.card || term;
-        if (saidCard !== shown) {
-          saidCard = shown;
-          if (host.bySelf?.() && isJapaneseEnough(reading)) speakFrom(say, { sentences: [{ text: reading }], voiceKey: key, single: true, automatic: true });
-        }
+      const say = cardMark('kp-listen-word');
+      say.setAttribute('aria-label', tx('語と文を聞く', 'Listen to the word and its sentence'));
+      say.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const reads = answerReads(reading, japaneseSentences(shownText(sentence())), japaneseSentences(shownText(answer.querySelector('.kp-def'))),
+          japaneseSentences(shownText(answer.querySelector('.kp-note-passage')))).filter((one) => isJapaneseEnough(one.text));
+        speakFrom(say, { sentences: reads, voiceKey: key, onNote: (line) => { say.title = line || ''; note(line); } });
+      });
+      (word.querySelector('.kp-pitch, .kp-reading') || word.lastElementChild)?.after(say);
+      if (!say.isConnected) word.append(say);
+      // the answer shown: its word, once, through the voice server or not at all
+      const shown = card.dataset.card || term;
+      if (saidCard !== shown) {
+        saidCard = shown;
+        if (host.bySelf?.() && isJapaneseEnough(reading)) speakFrom(say, { sentences: [{ text: reading }], voiceKey: key, single: true, automatic: true });
       }
     }
+  }
+  /** The question side: one control only where the card's word is printed marked in its passage (not blanked out, not a face
+   * with choices, not a character or a grammar card), saying that word by the deck's stored reading. Nothing speaks by
+   * itself here, and where there is nothing to say there is no control and no line. */
+  function mountDeckFront(card) {
+    for (const stale of card.querySelectorAll('#kp-listen-word')) stale.remove();
+    const face = () => ({ kind: card.dataset.kind, printed: !!card.querySelector('.kp-sentence .kp-target'), blanked: !!card.querySelector('.kp-blank'),
+      choices: !!card.querySelector('.kp-choices') });
+    const have = card.querySelector('#kp-listen-front');
+    if (have) {
+      if (!deckFrontVoice({ ...face(), reading: 'x' })) { if (spoken?.button === have) seam.stop(); have.nextElementSibling?.classList?.contains('voice-note') && have.nextElementSibling.remove(); have.remove(); }
+      return;
+    }
+    const id = card.dataset.card;
+    if (!id || !deckFrontVoice({ ...face(), reading: 'x' }) || card.dataset.voiceFront === id) return;
+    card.dataset.voiceFront = id;
+    Promise.resolve(host.deckWordReading?.(id)).then((reading) => {
+      const row = card.querySelector('.kp-eyebrow');
+      if (!reading || !row || !card.isConnected || card.dataset.card !== id || card.querySelector('.kp-answer') || card.querySelector('#kp-listen-front')) return;
+      const plan = deckFrontVoice({ ...face(), reading });
+      if (!plan) return;
+      const word = shownText(card.querySelector('.kp-sentence .kp-target')) || id;
+      const control = cardMark('kp-listen-front');
+      control.setAttribute('aria-label', tx('語を聞く', 'Listen to the word'));
+      control.addEventListener('click', (event) => {
+        event.stopPropagation();
+        speakFrom(control, { sentences: [{ text: plan.text }], voiceKey: voiceKeyOf('word', word), single: true,
+          onNote: (line) => { control.title = line || ''; noteBeside(control, line); } });
+      });
+      row.append(control);
+    }).catch(() => { /* no reading to be had: no control */ });
   }
   let scan = 0;
   const rescan = () => {
@@ -787,10 +826,20 @@ export function installVoiceLayer(host) {
     status: () => seam.status(),
     onStatus: (listener) => { listeners.add(listener); return () => listeners.delete(listener); },
     /** A single word or reading from one of the app's own 音 buttons. */
-    sayWord({ text, word, button, onNote, automatic = false }) {
+    sayWord({ text, word, button, onNote, automatic = false, withSentence = false }) {
       let normal = '';
       try { normal = normaliseSpeechText(String(text || '')); } catch { /* nothing to say */ }
-      return speakFrom(button, { sentences: normal ? [{ text: normal }] : [], voiceKey: voiceKeyOf('word', word || normal), single: true, onNote, automatic });
+      // the answer side's one control (John, 2026-11-11): by his tap it says the word and then the card's own sentence, in
+      // one turn; said by itself, as the answer is shown, it is the word alone
+      const sentence = withSentence && !automatic ? cardSentence() : [];
+      return speakFrom(button, { sentences: normal ? answerReads(normal, sentence) : [], voiceKey: voiceKeyOf('word', word || normal),
+        single: !sentence.length, onNote, automatic });
+    },
+    /** The switch "Highlight what is being read" was changed: a band that is drawn goes at once; with it on again the
+     * sentence under way is lit again. */
+    highlightChanged() {
+      if (!highlighting()) { readBands.hide(); return; }
+      if (reader.lit >= 0 && readerActive()) readBands.show(() => baseBoxes(litWords()));
     },
     /** The quote chip: the excerpt through the seam when the article has no recording of it. With no voice the reason
      * stands in one line beside the chip. */
