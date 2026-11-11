@@ -350,6 +350,8 @@ async function main() {
   check('the missed words are offered, never taken', adopt.offered === true, adopt.label);
   if (adopt.offered) {
     await page.click('#mock-enroll-all');
+    // SAVE (2026-11-11): Save all asks for its one place (Review) and keeps the words only on that pick
+    await page.click('#save-chooser-home');
     await waitForAppRecord(page, (record) => record.taken?.length > before.taken,
       { description: 'explicitly adopted missed words' });
   }

@@ -12,7 +12,9 @@
  *   W7-key    Shift+F10 on a focused web word does the same, its strip taking the keyboard (Chromium). Red on the base.
  *   W7-tap    guard: a quick press still walks the node's ladder, never seals.
  * Controls (HFIX2E_MODE=control) serve corridor.js mutated: the web's hold ignores the mouse again (Chromium), or its
- * commit opens the slip instead of sealing (WebKit); W7-hold must go red. */
+ * commit opens the slip instead of sealing (WebKit); W7-hold must go red.
+ * SAVE (2026-11-11, ask first, save second): a hold, right-click or Shift+F10 opens the strip as the chooser and keeps nothing;
+ * the kept count rises and the 印 presses on at the pick of Review in it (pickReview). */
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -128,7 +130,7 @@ const facts = (page, key) => page.evaluate((key) => {
   }
   return { covered,
     count: Number(document.getElementById('tray')?.dataset.count ?? NaN),
-    strip: !!strip, stripSays: strip?.querySelector('#seal-strip-status')?.textContent.trim() || '',
+    strip: !!strip, stripSays: strip?.querySelector('#seal-strip-status')?.textContent.trim() || '', mode: strip?.dataset.mode || null,
     stripLabel: strip?.getAttribute('aria-label') || '',
     mini: !!document.getElementById('mini'), rung: node?.dataset.ladderRung || null,
     ring: document.querySelectorAll('.hold-ring').length, seen: { ...window.__h2e },
@@ -165,6 +167,27 @@ async function holdOn(page, locator, key, { ms = 760, at = 300, drag = 0 } = {})
   });
   return { mid, after: await facts(page, key) };
 }
+/** SAVE (2026-11-11, ask first, save second): a hold opens the strip as the chooser and keeps nothing; the word is kept by
+ * the pick of Review in it, made as the device makes it, and only then does its 印 press on. Returns the strip's facts at
+ * rest after the pick. */
+async function pickReview(page, key) {
+  const review = page.locator('#seal-strip[data-mode="choose"] #seal-strip-review');
+  if (phone) await review.tap(); else await review.click();
+  await page.waitForFunction(() => document.getElementById('seal-strip')?.dataset.mode === 'placed', null, { timeout: 5000 }).catch(() => {});
+  await delay(900);
+  await page.evaluate(async () => {
+    const strip = document.getElementById('seal-strip');
+    if (strip) await Promise.all(strip.getAnimations({ subtree: true }).map((run) => run.finished.catch(() => {})));
+    await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
+  });
+  return facts(page, key);
+}
+/** What a hold (or its other doors) must leave before the pick: the chooser open, nothing kept, no 印. */
+function asked(after, c0, how, detail) {
+  if (after.mode !== 'choose') throw fail(`${how}: the strip did not open as the chooser (mode ${after.mode})`, detail);
+  if (after.count !== c0) throw fail(`${how}: the kept count went ${c0} → ${after.count} before a place was picked`, detail);
+  if (after.seen.stamp) throw fail(`${how}: the 印 pressed on before a place was picked`, detail);
+}
 async function shot(page, name) { await page.screenshot({ path: join(out, `${engine}-${mode}-${name}.png`) }).catch(() => {}); }
 async function row(name, body) {
   if (only && only !== name) return;
@@ -187,10 +210,13 @@ async function sealRow(page, { node, type, key }) {
   const detail = { held: { type, key }, by: phone ? 'finger' : 'mouse', c0, first };
   if (!(first.mid.ring >= 1)) throw fail(`the ring did not fill under the ${detail.by} (300 ms in)`, detail);
   if (!first.after.strip) throw fail('the hold opened no strip', detail);
+  detail.asked = first.after;
+  asked(first.after, c0, 'the hold', detail);
+  first.after = await pickReview(page, key);
   if (!(first.after.count === c0 + 1)) throw fail(`the kept count went ${c0} → ${first.after.count}, not +1`, detail);
   if (!(first.after.seen.stamp >= 1)) throw fail('no 印 pressed on', detail);
   if (first.after.mini || first.after.rung) throw fail('the release climbed the walk', detail);
-  if (!/Saved ✓|保存済み/u.test(first.after.stripSays)) throw fail('the strip does not say the word is saved', detail);
+  if (!/Saved( in .+)? ✓|保存済み/u.test(first.after.stripSays)) throw fail('the strip does not say the word is saved', detail);
   if (first.after.covered.length) throw fail(`the strip covers other controls: ${JSON.stringify(first.after.covered)}`, detail);
   // the plate's late passages (wwWatchPassages draws the plate again 1.8 s after it opens) never take the strip's room
   // or its word away while it stands
@@ -229,7 +255,8 @@ if (!phone) await row('W7-drag', async ({ page }) => {
   if (dragged.after.strip || dragged.after.count !== c0 || dragged.after.seen.stamp) throw fail('a drag sealed', detail);
   return detail;
 });
-/** One seal by another door than the hold (right-click or Shift+F10): the strip, +1 kept, the 印, no slip, nothing covered. */
+/** One seal by another door than the hold (right-click or Shift+F10): the strip, +1 kept on the pick of Review, the 印, no
+ * slip, nothing covered. */
 async function sealedBy(page, key, c0, how) {
   await delay(900);
   await page.evaluate(async () => {
@@ -237,9 +264,13 @@ async function sealedBy(page, key, c0, how) {
     if (strip) await Promise.all(strip.getAnimations({ subtree: true }).map((run) => run.finished.catch(() => {})));
     await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
   });
-  const after = await facts(page, key);
-  const detail = { key, c0, how, after, focusInStrip: await page.evaluate(() => !!document.getElementById('seal-strip')?.contains(document.activeElement)) };
-  if (!after.strip) throw fail(`${how} opened no strip`, detail);
+  const opened = await facts(page, key);
+  const detail = { key, c0, how, asked: opened, focusInStrip: await page.evaluate(() => !!document.getElementById('seal-strip')?.contains(document.activeElement)) };
+  if (!opened.strip) throw fail(`${how} opened no strip`, detail);
+  asked(opened, c0, how, detail);
+  const after = await pickReview(page, key);
+  detail.after = after;
+  if (!after.strip) throw fail(`${how}: the strip went with the pick`, detail);
   if (after.mini) throw fail(`${how} opened the slip`, detail);
   if (after.count !== c0 + 1) throw fail(`${how}: the kept count went ${c0} → ${after.count}, not +1`, detail);
   if (!(after.seen.stamp >= 1)) throw fail(`${how}: no 印 pressed on`, detail);

@@ -252,6 +252,8 @@ try {
         () => document.querySelector('#feed-refresh-all')?.disabled === false,
       );
       await current.page.locator('.feed-save').first().click();
+      // SAVE (2026-11-11): the link's Save asks for its one place (Saved articles) and keeps it only on that pick
+      await current.page.locator('#save-chooser-home').click();
       await current.page.locator('#feed-panel-saved').click();
       assert.equal(await current.page.locator('.feed-entry').count(), 1);
       assert.equal(await current.page.locator('.feed-entry img, .feed-entry script').count(), 0);

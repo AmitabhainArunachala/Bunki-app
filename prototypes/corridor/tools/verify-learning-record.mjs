@@ -1229,7 +1229,9 @@ async function browserChecks() {
           await boot(page); const before = await disk(page); const { learned } = await finishLesson(page);
           await page.locator('#lesson-enroll-all').waitFor(); const completed = await disk(page);
           assert.deepEqual(completed.taken, before.taken); assert.equal(completed.obslog.filter((row) => row[1] === 'lesson').length, learned);
+          // SAVE (2026-11-11): Save all asks for its one place (Review) and keeps on that pick; both presses are doubled
           await page.locator('#lesson-enroll-all').evaluate((node) => { node.click(); node.click(); });
+          await page.locator('#save-chooser-home').evaluate((node) => { node.click(); node.click(); });
           await page.locator('#lesson-enroll-all').waitFor({ state: 'detached' }); const enrolled = await disk(page);
           assert(enrolled.taken.length > before.taken.length); assert.equal(new Set(enrolled.taken.map((row) => row.t + ':' + row.id)).size, enrolled.taken.length);
           assert.deepEqual(enrolled.srs, before.srs); assert.deepEqual(enrolled.revlog, before.revlog); assert.deepEqual(enrolled.futureRoot, before.futureRoot);

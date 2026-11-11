@@ -249,14 +249,17 @@ try {
     assert.deepEqual(await evidence(), initial); assert.deepEqual(errors, []);
   });
   await check('explicit Memorize updates shared My Study once, with no retrieval credit', async () => {
-    await entry(); await page.click('#sheet-take'); await page.waitForFunction(() => document.querySelector('#sheet-take')?.getAttribute('aria-pressed') === 'true');
+    // SAVE (2026-11-11): Save asks where the word goes first (a drawer under the bar); Review, the study queue, is picked
+    await entry(); await page.click('#sheet-take'); await page.click('#vocabulary-list-popover.is-drawer #mini-review');
+    await page.waitForFunction(() => document.querySelector('#sheet-take')?.getAttribute('aria-pressed') === 'true');
     await page.click('#sheet-reference-return'); assert.ok(await page.locator('[data-entry-id="学校"] .reference-entry-saved').isVisible());
     const after = await evidence(); assert.equal(after.taken.length, (initial.taken?.length || 0) + 1); assert.deepEqual(after.revlog, initial.revlog);
     await page.click('#reference-study'); assert.ok((await page.locator('main').innerText()).includes('学校')); await page.click('#back');
-    // S · on Saved ✓ the page's one Save opens its menu (a drawer under the bar), whose Review row takes the card out — this
-    // pinned a second press on the page's seal as the removal
+    // S · on Saved ✓ the page's one Save opens its menu (a drawer under the bar) — this pinned a second press on the page's
+    // seal as the removal. SAVE (2026-11-11): the menu is the chooser in move mode, and its Remove takes the card out (its
+    // Review checkbox is gone)
     await page.click('[data-entry-id="学校"]'); await page.click('#sheet-take');
-    await page.click('#vocabulary-list-popover.is-drawer #mini-review');
+    await page.click('#vocabulary-list-popover.is-drawer #save-chooser-remove');
     const removed = await waitForAppRecord(page, record => !record.taken.some(item => item.t === 'word' && item.id === '学校'));
     assert.equal(removed.taken.length, initial.taken?.length || 0);
   });

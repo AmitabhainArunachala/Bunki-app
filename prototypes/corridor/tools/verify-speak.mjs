@@ -80,7 +80,8 @@ const FAULTS = {
     to: 'const ok = await commitStorePatch((latest) => (evidence.length ? { obslog: [...latest.obslog, ...evidence], revlog: [...latest.revlog, [Date.now(), evidence[0][2], 3, 2, null, null, null, null, 0, 0, 0, 0]] } : {}), archiveRows);' },
   'auto-save': { file: 'speak.js', witness: { S8: /nothing is saved without his tap/u },
     from: '    for (const r of tr.reached) if (!s.reached.some((x) => x.word === r.word)) s.reached.push(r);',
-    to: '    for (const r of tr.reached) if (!s.reached.some((x) => x.word === r.word)) { s.reached.push(r); host.saveOne({ word: r.word, reading: r.reading }).click(); }' },
+    // SAVE (2026-11-11): a Save asks first, so the mutant that saves on its own presses Save and picks Review itself
+    to: '    for (const r of tr.reached) if (!s.reached.some((x) => x.word === r.word)) { s.reached.push(r); host.saveOne({ word: r.word, reading: r.reading }).click(); document.getElementById(\'mini-review\')?.click(); }' },
   'mic-on-entry': { file: 'speak.js', witness: { S3: /never called on entry/u },
     from: '    st.offline = navigator.onLine === false;\n    st.sceneAsked = scene;',
     to: '    st.offline = navigator.onLine === false; navigator.mediaDevices?.getUserMedia({ audio: true }).catch(() => {});\n    st.sceneAsked = scene;' },
@@ -135,7 +136,7 @@ const DOWNSTREAM = {
   'device-voice': { S9: ['a failed voice leaves the line visibly silent ("声を出せませんでした"), never Charon, never the device'] },
   'charon-main': { S9: ["with V's lock in the app, the room voices in the lock's model, not its own pin",
     'a two-person scene uses Charon only for the second character', 'a failed voice leaves the line visibly silent ("声を出せませんでした"), never Charon, never the device'] },
-  'auto-save': { S8: ['FSRS untouched: no review row, no card state', 'one tap on Save makes the card'] },
+  'auto-save': { S8: ['FSRS untouched: no review row, no card state', 'Save, then the pick of Review, makes the card'] },
   'mic-on-entry': { S3: ['the ring opens to listen on its own after her line, and only then asks for the microphone',
     'every take ends with all tracks stopped', 'leaving the room stops every track'] },
   'tracks-kept': { S3: ['leaving the room stops every track'] },
@@ -908,6 +909,8 @@ const CASES = {
       const save = page.locator('#mini #mini-take');
       if (await save.count()) {
         await save.click();
+        // SAVE (2026-11-11): Save asks where the word goes first; Review, the study queue, is picked
+        await page.locator('#mini #mini-review').click();
         await page.waitForTimeout(900);
       }
       const saved = (await T(page).record()).taken;
@@ -1031,9 +1034,11 @@ const CASES = {
       check('the evidence rows were written on their own, during the talk', sensei.length >= 2 && sensei.some((row) => row[2] === 'word:命名'), JSON.stringify(sensei));
       check('FSRS untouched: no review row, no card state', JSON.stringify(mid.srs) === '{}' && mid.revlog.length === 0);
       await page.locator('.speak-reached button.save-one').first().click();
+      // SAVE (2026-11-11): the press asks where the word goes and keeps nothing; the pick of Review makes the card
+      await page.locator('#vocabulary-list-popover #mini-review').click();
       await page.waitForTimeout(900);
       const after = await T(page).record();
-      check('one tap on Save makes the card', after.taken.length === before.taken.length + 1, `${before.taken.length} → ${after.taken.length}`);
+      check('Save, then the pick of Review, makes the card', after.taken.length === before.taken.length + 1, `${before.taken.length} → ${after.taken.length}`);
       check('the look back names his planted words with their reasons', (await page.locator('.speak-page-lookback .speak-row-why').count()) >= 3);
     } finally { await f.context.close(); }
   },
@@ -1186,13 +1191,15 @@ const CASES = {
       const before = await page.evaluate((sel) => ({ pressed: document.querySelector(sel)?.getAttribute('aria-pressed'),
         others: [...document.querySelectorAll('.speak-shadow button:not(.save-one)')].map((b) => (b.textContent || '').trim()).filter((x) => /keep|残す|保存/iu.test(x)) }), lineSave);
       await page.locator(lineSave).click();
+      // SAVE (2026-11-11): the line's Save asks for its one place (Shadowing) and keeps the line only on that pick; the pick
+      // closes the chooser (Remove waits in the Save's menu for the next press, below)
+      await page.locator('#save-chooser-home').click();
       await waitPage(page, (sel) => document.querySelector(sel)?.getAttribute('aria-pressed') === 'true', lineSave, 15000, 'S12 keep a line');
       // the saved list is drawn again from the store after the keep (an IndexedDB read): its row comes a moment after Saved
       await waitPage(page, () => document.querySelectorAll('.speak-saved .speak-row').length >= 1, null, 5000, 'S12 the kept line listed').catch(() => {});
-      const after = await page.evaluate(() => ({ rows: document.querySelectorAll('.speak-saved .speak-row').length, menu: !!document.getElementById('speak-line-remove') }));
-      check('a line is kept for 影 by the one Save ▾ alone: Saved once the store holds it, its menu open with Remove',
-        before.pressed === 'false' && before.others.length === 0 && after.rows === 1 && after.menu, JSON.stringify({ before, after }));
-      await page.keyboard.press('Escape');
+      const after = await page.evaluate(() => ({ rows: document.querySelectorAll('.speak-saved .speak-row').length, menu: !!document.getElementById('vocabulary-list-popover') }));
+      check('a line is kept for 影 by the one Save ▾ alone: it asks for its place, Saved once the store holds it',
+        before.pressed === 'false' && before.others.length === 0 && after.rows === 1 && !after.menu, JSON.stringify({ before, after }));
       await waitPage(page, () => !document.getElementById('vocabulary-list-popover'), null, 5000, 'S12 the menu closes');
       await page.evaluate(() => window.__SPEAK_TEST__.back());
       await until(page, '!s.layer', 5000);

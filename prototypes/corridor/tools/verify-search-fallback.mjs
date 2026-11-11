@@ -203,6 +203,8 @@ try {
     indexMode = 'missing'; await search('原典'); await exactRow('原典', source.r).click(); await sheetIdentity('原典', source.r, source.g);
     const before = await readAppRecord(page); assert.equal(before.taken.length, 0, 'Isolated UI steps must start with no captures');
     await page.locator('#sheet-take').click();
+    // SAVE (2026-11-11): Save asks where the word goes first (a drawer under the bar); Review, the study queue, is picked
+    await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
     const captured = await waitForAppRecord(page, (record) => record.taken.some((entry) => entry.t === 'word' && entry.id === '原典'));
     assert.equal(captured.taken.length, 1); const item = captured.taken[0];
     check('ordinary capture commits one exact fallback identity without a fabricated sequence or recall grade', () => {

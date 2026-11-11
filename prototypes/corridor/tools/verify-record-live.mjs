@@ -441,7 +441,8 @@ try {
           driftRecordState: document.querySelector('#drift-layer')?.dataset.recordState || null,
           saveMenu: [...document.querySelectorAll('#vocabulary-list-popover')].map((node) => ({
             expanded: document.querySelector('#sheet #sheet-take')?.getAttribute('aria-expanded'),
-            lists: [...node.querySelectorAll('input[data-list]')].map((box) => ({ list: box.dataset.list, checked: box.checked, disabled: box.disabled })),
+            // SAVE (2026-11-11): the chooser's places
+            lists: [...node.querySelectorAll('.save-place[data-list]')].map((box) => ({ list: box.dataset.list, here: box.getAttribute('aria-current') === 'true', disabled: box.disabled })),
           })),
         })).catch((problem) => ({ unavailable: problem.message }));
         const committed = await disk(page).catch((problem) => ({ unavailable: problem.message }));
@@ -486,6 +487,8 @@ try {
         const initial = await boot(page);
         const word = await openCapture(page);
         await page.locator('#sheet #sheet-take').click();
+        // SAVE (2026-11-11): Save asks where the word goes first (a drawer under the bar); Review, the study queue, is picked
+        await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
         await page.waitForFunction(() => document.querySelector('#sheet #sheet-take')?.getAttribute('aria-pressed') === 'true');
         const captured = await disk(page);
         assert.equal(captured.record.taken.filter((item) => item.t === 'word' && item.id === word).length, 1);
@@ -551,17 +554,24 @@ try {
         await page.locator('.list-rename .list-maker-make').click();
         await page.getByRole('button', { name: 'rename 旅の記録', exact: true }).waitFor();
         await page.locator('.tray-line').filter({ has: page.locator('.w', { hasText: '犬' }) }).first().click();
-        // S · 犬 is saved: a press on its page's one Save opens the menu (a drawer under the bar) with one box per list and
-        // a new list that asks its name once — this pinned the foot's picker, its chips and its list maker
-        await page.locator('#sheet #sheet-take').click();
+        // S · 犬 is saved: a press on its page's one Save opens the menu (a drawer under the bar) with its lists and a new
+        // list that asks its name once — this pinned the foot's picker, its chips and its list maker. SAVE (2026-11-11): the
+        // menu is the chooser, one place per word: New list… names __proto__ and moves 犬 there in one act, then a second
+        // press moves it on to 旅の記録 (each pick closes the chooser; the Save names the place)
+        const save = page.locator('#sheet #sheet-take');
         const drawer = page.locator('#vocabulary-list-popover.is-drawer');
-        // one click (a box redrawn by its own commit is not clicked twice)
-        await drawer.locator('[data-list="旅の記録"]').click();
-        await drawer.locator('[data-list="旅の記録"]:checked').waitFor();
+        await save.click();
         await drawer.locator('#vocabulary-list-new').click();
         await drawer.locator('#vocabulary-list-name').fill('__proto__');
         await drawer.locator('#vocabulary-list-create').click();
-        await drawer.locator('[data-list="__proto__"]:checked').waitFor();
+        await page.waitForFunction(() => /__proto__/u.test(document.querySelector('#sheet #sheet-take')?.textContent || ''));
+        const onProto = await disk(page);
+        assert.equal(onProto.record.lists.__proto__.filter((row) => row.id === '犬').length, 1, 'New list… puts the word on the own key __proto__');
+        // a press within a breath (SAVE_PRESS_MS) of the last press on the same Save is the same press: it waits that out
+        await page.waitForTimeout(650);
+        await save.click();
+        await drawer.locator('.save-place[data-list="旅の記録"]').click();
+        await page.waitForFunction(() => /旅の記録/u.test(document.querySelector('#sheet #sheet-take')?.textContent || ''));
         await page.locator(await entryCloseSelector(page)).click();
         await page.getByRole('button', { name: 'delete __proto__', exact: true }).click();
         await page.getByRole('button', { name: 'really delete __proto__', exact: true }).click();
@@ -685,14 +695,15 @@ try {
         await page.waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'));
         await page.waitForLoadState('networkidle');
         // S · the lists live in the page's one Save's menu (it pinned the foot's picker and its chips): 犬 is saved, so a
-        // press on Saved ✓ opens the drawer with one box per list and its New list…
+        // press on Saved ✓ opens the drawer with its lists and its New list…. SAVE (2026-11-11): the menu is the chooser, its
+        // lists places (one per word); a pick moves the word and closes it, and a name typed meanwhile waits for the next visit
         await page.locator('#sheet #sheet-take').click();
         await page.locator('#vocabulary-list-popover.is-drawer #vocabulary-list-new').waitFor();
         // Both are real displayed controls. Issue the second UI action in the
         // same task, before the first native IDB transaction can acknowledge.
         // No app function, store adapter, or replacement runtime is called.
         await page.evaluate(() => {
-          const membership = document.querySelector('#vocabulary-list-popover input[data-list="Concurrent list"]');
+          const membership = document.querySelector('#vocabulary-list-popover .save-place[data-list="Concurrent list"]');
           if (!membership || membership.disabled) throw new Error('Visible membership control unavailable');
           membership.click();
           document.querySelector('#vocabulary-list-popover #vocabulary-list-new').click();
@@ -700,12 +711,13 @@ try {
           input.value = 'Unsent next list';
           input.dispatchEvent(new Event('input', { bubbles: true }));
         });
-        await page.locator('#vocabulary-list-popover #vocabulary-list-name').waitFor();
-        await page.locator('#vocabulary-list-popover input[data-list="Concurrent list"]:checked').waitFor();
-        await page.waitForFunction(() => document.querySelector('#vocabulary-list-popover input[data-list="Concurrent list"]')?.disabled === false);
+        await page.locator('#vocabulary-list-popover').waitFor({ state: 'detached' });
         const after = await disk(page);
         assert.equal(after.record.lists['Concurrent list'].filter((row) => row.id === '犬').length, 1);
-        assert.equal(await page.locator('#vocabulary-list-popover input[data-list="Concurrent list"]').isDisabled(), false);
+        await page.waitForTimeout(650);
+        await page.locator('#sheet #sheet-take').click();
+        await page.locator('#vocabulary-list-popover .save-place[data-list="Concurrent list"][aria-current="true"]').waitFor();
+        assert.equal(await page.locator('#vocabulary-list-popover .save-place[data-list="Concurrent list"]').isDisabled(), false);
         assert.equal(await page.locator('#vocabulary-list-popover #vocabulary-list-name').inputValue(), 'Unsent next list', 'The acknowledged repaint preserves a newer list draft');
         details.input = 'Two displayed controls activated before the native IDB acknowledgement';
       });
@@ -736,6 +748,8 @@ try {
         const initial = await boot(page);
         const word = await openCapture(page);
         await page.locator('#sheet #sheet-take').click();
+        // SAVE (2026-11-11): Save asks where the word goes first (a drawer under the bar); Review, the study queue, is picked
+        await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
         await page.waitForFunction(() => document.querySelector('#sheet #sheet-take')?.getAttribute('aria-pressed') === 'true');
         await page.locator(await entryCloseSelector(page)).click();
         await page.locator('#tray').click();
@@ -802,12 +816,15 @@ try {
             const before = await disk(page);
             await armFault(page, mode, root);
             await page.locator(action === 'capture' ? '#sheet #sheet-take' : '#read-fin').click();
+            // SAVE (2026-11-11): the Save asks first; the faulted capture is the pick of Review
+            if (action === 'capture') await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
             await page.waitForFunction(() => window.__recordLiveFault?.fired === true);
             await page.locator('#store-alert').waitFor({ state: 'visible' });
             if (action === 'capture') {
               // S · the page's one Save (it pinned the foot's #take and its "saved to" drawer, .list-picker)
               assert.equal(await page.locator('#sheet #sheet-take').getAttribute('aria-pressed'), 'false', 'Unconfirmed capture cannot publish its pressed state');
-              assert.equal(await page.locator('#vocabulary-list-popover').count(), 0, 'Unconfirmed capture cannot open its menu');
+              // SAVE (2026-11-11): the chooser it was asked from may stand with its notice; it names no place the word is in
+              assert.equal(await page.locator('#vocabulary-list-popover [aria-current="true"]').count(), 0, 'Unconfirmed capture cannot name a place');
             } else {
               assert.equal(await page.locator('#read-fin').evaluate((node) => node.classList.contains('finished')), false, 'Unconfirmed completion cannot show a finished mark');
             }

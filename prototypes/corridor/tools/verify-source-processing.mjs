@@ -383,7 +383,9 @@ for (const engine of engines) for (const width of sizes) {
       await screenshot('synthetic-contextual-reply');
       await page.locator('#teacher-target-open').click(); await page.locator('#sheet .teacher-discuss').waitFor();
       assert.equal(await page.locator('#sheet .teacher-source-quote').first().textContent(), topic.quote);
-      await page.locator('#sheet-take').click(); await waitForAppRecord(page, (record) => record.taken.length === 1);
+      // SAVE (2026-11-11): Save asks where the word goes first (a drawer under the bar); Review, the study queue, is picked
+      await page.locator('#sheet-take').click(); await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
+      await waitForAppRecord(page, (record) => record.taken.length === 1);
       const learned = await readAppRecordSnapshot(page);
       assert(learned.record.taken[0].sourceContextRef); assert.deepEqual(learned.record.revlog, before.record.revlog);
       await page.locator('#sheet .teacher-discuss').click();

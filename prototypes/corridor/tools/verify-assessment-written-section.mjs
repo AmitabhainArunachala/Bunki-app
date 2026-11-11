@@ -1645,7 +1645,12 @@ try {
       assert.equal(recordBefore.taken.some(row => row.t === 'word' && row.id === word), false, 'The fixture starts with this word unsaved');
       await lookupWord.click({ button: 'right' });
       await menu.waitFor();
+      // SAVE (2026-11-11): the right-click asks where the word goes and keeps nothing; the keep is the pick of Review
+      assert.equal(await menu.getAttribute('data-mode'), 'choose', 'The hold opens the strip as the chooser');
+      assert.deepEqual(await disk(page), recordBefore, 'The hold alone keeps nothing');
+      await menu.locator('#seal-strip-review').click();
       const savedRecord = await pollRecord(page, row => row.taken.some(saved => saved.t === 'word' && saved.id === word));
+      await page.waitForFunction(() => document.getElementById('seal-strip')?.dataset.mode === 'placed');
       const sealed = await stripActions();
       const savedRows = savedRecord.taken.filter(row => row.t === 'word' && row.id === word);
       assert.equal(savedRows.length, 1, 'The keep durably adds the selected word once');
@@ -1653,7 +1658,7 @@ try {
       assert.deepEqual(savedRecord.srs, recordBefore.srs, 'The keep does not invent a review grade');
       assert.deepEqual(savedRecord.revlog, recordBefore.revlog);
       assert.deepEqual(selectAssessmentV2(savedRecord.assessmentLibraryV2).attempt, before, 'The keep records no assistance or answer');
-      assert(/Saved ✓/u.test(sealed.status) && sealed.actions.includes('remove'), `The strip says the word is kept: ${JSON.stringify(sealed)}`);
+      assert(/Saved in Review ✓/u.test(sealed.status) && sealed.actions.includes('remove'), `The strip says the word is kept: ${JSON.stringify(sealed)}`);
       await page.keyboard.press('Escape');
       await menu.waitFor({ state: 'detached' });
       await bare('The kept word');
@@ -1895,10 +1900,11 @@ try {
       await assertEnglishRung(page, repeatWord);
       await page.keyboard.press('Space');
       await page.locator('#mini').waitFor();
-      // Save ▾ (1.3.0): the press saves the word and unfolds its menu inside the card, never a window
+      // Save ▾ (1.3.0): the press unfolds its menu inside the card, never a window. SAVE (2026-11-11): the menu is the
+      // chooser, and the press keeps nothing until a place is picked
       await page.locator('#mini-take').click();
-      await page.waitForFunction(() => document.querySelector('#mini-take')?.getAttribute('aria-pressed') === 'true');
-      await page.locator('#mini #vocabulary-list-popover.is-inline').waitFor();
+      await page.locator('#mini #vocabulary-list-popover.is-inline.is-chooser').waitFor();
+      assert.equal(await page.locator('#mini-take').getAttribute('aria-pressed'), 'false', 'The press alone keeps nothing');
       await page.keyboard.press('Escape');
       await page.waitForFunction(() => !document.getElementById('vocabulary-list-popover'));
       assert.equal(await page.locator('#mini').count(), 1, 'Esc in the menu closes only the menu');

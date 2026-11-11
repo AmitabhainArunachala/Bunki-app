@@ -169,10 +169,14 @@ const barFacts = (page) => page.evaluate(() => {
     pressed: b.getAttribute('aria-pressed'), rect: [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)] };
 });
 const taken = (page) => page.evaluate(() => window.__H2E__.taken());
-/** One press on the bar's Save, as the device makes it: does it keep the word (S.taken grows by one)? */
+/** One press on the bar's Save, as the device makes it: does it keep the word (S.taken grows by one)? SAVE (2026-11-11, ask
+ * first, save second): the press opens the chooser (a drawer under the bar) and keeps nothing; the word is kept by the pick
+ * of Review, made the same way. The press itself must still land (the defect: a Save drawn afresh under it lost it). */
 async function pressBar(page, facts, key) {
   const before = await taken(page);
   await press(page.locator('#chrome-keep'));
+  const chooser = await page.locator('#vocabulary-list-popover.is-drawer #mini-review').waitFor({ timeout: 6000 }).then(() => true, () => false);
+  if (chooser) await press(page.locator('#vocabulary-list-popover.is-drawer #mini-review'));
   await settle(page, 700);
   facts[key] = { before, after: await taken(page), card: !!(await page.locator('#mini').count()), bar: await barFacts(page) };
   await shot(page, `X10-${key}`);

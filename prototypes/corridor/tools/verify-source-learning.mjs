@@ -201,6 +201,8 @@ for (const engine of engines) for (const width of sizes) {
     await page.locator('.nav-search-row').first().click();
     await page.locator('#sheet-take').waitFor();
     await page.locator('#sheet-take').click();
+    // SAVE (2026-11-11): Save asks where the word goes first (a drawer under the bar); Review, the study queue, is picked
+    await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
     await waitForAppRecord(page, (record) => record.taken.length === 1);
     const learned = await readAppRecordSnapshot(page), item = learned.record.taken[0];
     assert(Number.isFinite(item.started));
@@ -228,7 +230,9 @@ for (const engine of engines) for (const width of sizes) {
       result.observations.push({ sourceControls: controls });
       await screenshot('learned-source');
       // S · the page's lists live in its one Save's menu (a drawer under the bar), one tap each, a new list asking its name
-      // once — this pinned the foot's "saved to" drawer and its list maker (#new-list, .list-maker-field, .list-maker-make)
+      // once — this pinned the foot's "saved to" drawer and its list maker (#new-list, .list-maker-field, .list-maker-make).
+      // SAVE (2026-11-11): on the saved word the menu is the chooser in move mode; New list… makes the list and moves the
+      // word onto it in one act
       await page.locator('#sheet-take').click();
       await page.locator('#vocabulary-list-popover.is-drawer #vocabulary-list-new').click();
       await page.locator('#vocabulary-list-popover #vocabulary-list-name').fill('図書館で出会った言葉');
@@ -344,15 +348,20 @@ for (const engine of engines) for (const width of sizes) {
       await page.locator('#source-capture-save').click(); await page.locator('#source-reader-body').waitFor();
       await selectWord(page); await page.locator('#source-selection-lookup').click();
       await page.locator('.nav-search-row').first().click();
-      // S · on Saved ✓ the page's one Save opens its menu; its Review row is the way out (it pinned a second press on the seal)
+      // S · on Saved ✓ the page's one Save opens its menu; its Review row was the way out (it pinned a second press on the
+      // seal). SAVE (2026-11-11): the menu is the chooser in move mode and its Remove is the way out; Remove takes the word
+      // out of Review and off every list (the lead's ruling of 2026-10-18), its encounter kept in the record
       await page.locator('#sheet-take').click();
-      await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
+      await page.locator('#vocabulary-list-popover.is-drawer #save-chooser-remove').click();
       await waitForAppRecord(page, (record) => record.taken.length === 0);
       const stopped = await readAppRecordSnapshot(page);
-      assert.equal(stopped.record.lists['図書館で出会った言葉'][0].sourceContextRef, encounter.id);
+      assert.deepEqual(stopped.record.lists['図書館で出会った言葉'], [], 'Remove takes the word off its list too');
+      assert(stopped.record.teacherContexts.entries.some((entry) => entry.id === encounter.id), 'Remove keeps the old encounter');
       assert.deepEqual(stopped.record.srs, reviewed.record.srs);
       await armRecordWriteFailure(page, 'quota', { roots: ['taken', 'teacherContexts'] });
+      // the faulted enrollment is the pick of Review in the chooser
       await page.locator('#sheet-take').click();
+      await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
       await page.locator('#store-alert').waitFor({ state: 'visible' });
       const failed = await readAppRecordSnapshot(page);
       for (const key of ['taken', 'teacherContexts', 'srs', 'revlog', 'lists'])
@@ -367,22 +376,23 @@ for (const engine of engines) for (const width of sizes) {
       await selectWord(page); await page.locator('#source-selection-lookup').click();
       await page.locator('.nav-search-row').first().click();
       await page.locator('#sheet-take').click();
+      await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
       await waitForAppRecord(page, (record) => record.taken.length === 1);
       const retried = await readAppRecordSnapshot(page), newRef = retried.record.taken[0].sourceContextRef;
       assert.notEqual(newRef, encounter.id);
       assert.equal(retried.record.teacherContexts.entries.find((entry) => entry.id === newRef).quote, nextText);
       assert(retried.record.teacherContexts.entries.some((entry) => entry.id === encounter.id));
-      assert.equal(retried.record.lists['図書館で出会った言葉'][0].sourceContextRef, encounter.id);
+      // SAVE (2026-11-11): Review re-enrolls the word on no list (Remove took it off the named list, which stays, empty)
+      assert.deepEqual(retried.record.lists['図書館で出会った言葉'], [], 'Review re-enrolls the word without putting it on a list');
       assert.deepEqual(retried.record.srs, reviewed.record.srs);
       assert.equal(retried.record.teacherDrafts.entries.find((draft) => draft.contextRef === encounter.id).text, QUESTION);
-      await page.locator(await entryCloseSelector(page)).click(); await openLists(page);
-      await page.getByRole('button', { name: 'open the 図書館で出会った言葉 list page', exact: true }).click();
-      await page.locator('.tray-line').click(); await page.locator('#sheet .learning-source summary').click();
+      // the re-enrolled word's page returns to its own new encounter (the old one stays in the record, above)
+      await page.locator('#sheet .learning-source summary').click();
       await page.locator('#learning-source-return').click(); await page.locator('#source-context-return').waitFor();
-      assert.equal(await page.locator('#source-reader-body').textContent(), TEXT, 'The original named list keeps its own encounter after re-enrollment elsewhere');
-      await screenshot('original-list-encounter-retained');
+      assert.equal(await page.locator('#source-reader-body').textContent(), nextText, 'The re-enrolled word returns to its new encounter');
+      await screenshot('re-enrolled-encounter');
       result.observations.push({ syntheticFault: 'Native enrollment transaction quota failure', enrollmentAndContextAtomic: true,
-        retryRetainsOldEncounterAndSchedule: true, oldRef: encounter.id, newRef });
+        retryRetainsOldEncounterAndSchedule: true, removeTakesWordOffLists: true, oldRef: encounter.id, newRef });
     }
     assert.deepEqual(result.errors, []); assert.deepEqual(result.externalRequests, []);
     result.passed = true;

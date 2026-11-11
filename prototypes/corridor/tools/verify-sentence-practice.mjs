@@ -160,7 +160,8 @@ for (const engine of engines) for (const width of sizes) {
     await page.locator('#source-capture-title').fill('図書館での一日'); await page.locator('#source-capture-text').fill(TEXT);
     await page.locator('#source-capture-save').click(); await page.locator('#source-reader-body').waitFor();
     const captured = (await readAppRecordSnapshot(page)).record; unchanged(before, captured);
-    await selectTown(page); await page.locator('#source-context-save').click();
+    // SAVE (2026-11-11): the selection's Save asks for its one place, the tutor page, and keeps it only on that pick
+    await selectTown(page); await page.locator('#source-context-save').click(); await page.locator('#save-chooser-home').click();
     await waitForAppRecord(page, r => r.teacherContexts?.entries.length === 1);
     await page.locator('#source-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
     assert.equal(await page.locator('.sentence-original').textContent(), SENTENCE);

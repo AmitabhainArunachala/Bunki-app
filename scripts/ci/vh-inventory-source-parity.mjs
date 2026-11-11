@@ -24,14 +24,19 @@ const digest = (value) => createHash('sha256').update(value).digest('hex');
 const P = 'prototypes/corridor/tools/';
 // These pins protect copied expansion semantics; changing producer selection requires review.
 const PRODUCER_PINS = Object.freeze({
+  // 2026-11-11 (SAVE, ask first, save second): Shift+F10 opens the strip as the chooser; one check renamed and the
+  // strip's Remove reached through the pick of Review. Re-pin of the producer bytes only; its expansion is unchanged.
   [`${P}verify-corridor-accessibility.mjs`]:
-    '91974d35c3c352cf013e29798d298ba44c0d25d41a0f32b0fd6c90176ed13064',
+    'a7825880dd4e9a919387fa9ad0bfc263402b63abed10ce76bd70a4a5ac458140',
   // 2026-11-06 (G3): the builder folds the eleven corridor seams back into the standalone document; the recordImports
   // map it declares is unchanged (9 rows) — reviewed re-pin of the producer bytes only
   // 2026-11-10 (pull request #146): the builder also folds device-voice.mjs, which corridor.js has imported since
   // 67e25a9a3 and without which the standalone page cannot boot; the recordImports map is unchanged (9 rows).
   // Re-pin of the producer bytes only, by the builder that made the change: not yet read by a second reviewer.
-  [`${P}build-standalone.mjs`]: '1a16a0ac17408e8aeb1e0c0360a00f2ccec48692509d4f47955255e36dbb1536',
+  // 2026-11-11 (SAVE): the pin above was already stale on the line (the file read 7c0de19a… there); the builder now folds
+  // twelve seams (modules/save-places.mjs is the twelfth); the recordImports map is unchanged (9 rows). Re-pin of the
+  // producer bytes only, by the builder that made the change: not yet read by a second reviewer.
+  [`${P}build-standalone.mjs`]: '85b64c800336098ca9c48c42937419d6158c97a08203b9e55458d8896831246a',
   [`${P}verify-sense-truth.mjs`]:
     '315786beb7763d8d847d5eb04a8e399df769aa1a07ece364a15795181c6854f6',
   [`${P}sense-grok-case.mjs`]: 'f968617684b38ece18d40cde2d645ae3f8c2de0eb0e59d5b7f7f0e5e3eaab367',

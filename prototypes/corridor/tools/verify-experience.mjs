@@ -128,7 +128,8 @@ try{
   await check('E06-pre-capture-no-debt','Passive reading/lookups create no review debt',async()=>{assert.equal(debt(await state()),debt(initial));});
   await page.locator('#sheet-take').waitFor();const label=await page.locator('#sheet-take').getAttribute('aria-label');
   await check('E06-explicit-enrollment-label','The chosen take control says Save — the one verb the slip and the menu use — with aria-pressed carrying its state',()=>{assert.equal(label,'Save');return `User explicitly chose ${label}: one verb for one act on this sheet.`;});
-  await click('#sheet-take');await sleep(600);captured=await state();await shot('reader-explicit-memorize','Chosen word is visibly marked memorizing and offers list filing');
+  // SAVE (2026-11-11): Save asks where the word goes first (a drawer under the bar); Review, the study queue, is picked
+  await click('#sheet-take');await click('#vocabulary-list-popover.is-drawer #mini-review');await sleep(600);captured=await state();await shot('reader-explicit-memorize','Chosen word is visibly marked memorizing and offers list filing');
   await check('E06-enrollment','Only explicit memorize adds one learning item; no retrieval grade is fabricated',()=>{assert.equal(captured.taken.length,1);assert.equal(captured.revlog.length,0);assert.equal(Object.keys(captured.srs).length,0);return `One explicitly memorized item: ${captured.taken[0].id}; started=${!!captured.taken[0].started}; no FSRS grade yet`;});
   await closeSheet();await page.mouse.wheel(0,350);await sleep(950);await shot('reader-resumed','Reader context and learner mark remain after entry close');await click('#back');await sleep(350);
  });

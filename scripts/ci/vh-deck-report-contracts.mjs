@@ -556,7 +556,7 @@ export const KOTOBA_SITES = Object.freeze([
   {
     id: 'K035',
     phase: 'browser',
-    name: 'host: take() is the corridor’s one-tap save (A51) — the word and a 字 land in the shared review pool (覚えるの札) of the durable record at once, with the Saved toast and 元に戻す and no chooser; a second take writes nothing; isTaken() then says so; the deck ledger, the observation log and the schedule are untouched',
+    name: 'host: take() is the corridor’s one-tap save (A51) — the word and a 字 land in the shared review pool (覚えるの札) of the durable record at once, with no chooser; a second take writes nothing; isTaken() then says so; the deck ledger, the observation log and the schedule are untouched',
     dynamic: false,
   },
   {
@@ -718,7 +718,7 @@ export const KOTOBA_SITES = Object.freeze([
   {
     id: 'K064',
     phase: 'browser',
-    name: 'tap: Save is one tap through the corridor’s save path (A51) — no chooser appears; the word is in the shared review pool (覚えるの札) at once, still one row; the button reads 保存済み ✓ · Saved ✓ and its menu (review · + New list · copy) unfolds inside the slip, which stays on the same word',
+    name: 'tap: Save asks first, then saves through the corridor’s save path (A51) — no deck chooser appears; the press unfolds the corridor’s chooser (Review · + New list · copy) inside the slip and keeps nothing; the pick of Review puts the word in the shared review pool (覚えるの札), still one row, and the button reads 復習に保存済み ✓ · Saved in Review ✓, the slip staying on the same word',
     dynamic: false,
   },
   {
@@ -1236,7 +1236,7 @@ export const KOTOBA_SITES = Object.freeze([
   {
     id: 'K157',
     phase: 'browser',
-    name: "one tap on the page's one Save saves the word and opens its menu (review ticked, lists one tap away), nothing more written yet",
+    name: "the page's one Save asks first (Review, his lists, New list…) and keeps nothing; the pick of Review saves the word, nothing more written yet",
     dynamic: false,
   },
   {
@@ -1248,7 +1248,7 @@ export const KOTOBA_SITES = Object.freeze([
   {
     id: 'K159',
     phase: 'browser',
-    name: "the Save's menu then says where the word went",
+    name: 'the Save then names where the word went',
     dynamic: false,
   },
   {

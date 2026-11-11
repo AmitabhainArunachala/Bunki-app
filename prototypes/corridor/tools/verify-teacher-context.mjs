@@ -329,6 +329,8 @@ async function saveDiscuss(fixture, source, index, word, neutral = false) {
   const before = await readAppRecordSnapshot(page);
   if (neutral) {
     await page.locator('#sheet .teacher-save').click();
+    // SAVE (2026-11-11): the sentence's Save asks for its one place, the tutor page, and keeps it only on that pick
+    await page.locator('#save-chooser-home').click();
     await waitForAppRecord(
       page,
       (record) =>
@@ -750,6 +752,8 @@ try {
     await settled(page, '#sheet');
     assert.equal(await page.locator('#sheet #sheet-take').getAttribute('aria-pressed'), 'false');
     await page.locator('#sheet #sheet-take').click();
+    // SAVE (2026-11-11): Save asks where the word goes first (a drawer under the bar); Review, the study queue, is picked
+    await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
     await waitForAppRecord(
       page,
       (record) => record.taken.some((item) => item.t === 'word' && item.id === '窓'),

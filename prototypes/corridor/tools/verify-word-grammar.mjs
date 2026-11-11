@@ -1727,12 +1727,12 @@ async function g6ReceivedSourceReturn(page,{emit}){
 
 async function g6KeptProjection(page,{emit}){
   const home=await g6OpenOrigin(page,'touch'),origin=page.locator(`#reader .tok[data-index="${home.origin.index}"]`);
+  // SAVE (2026-11-11): Save asks where the word goes first; New list… names the list and saves the word there in one act
   await stage(page,origin);await page.locator('#mini-take').tap();
-  await waitForAppRecord(page,r=>r.taken.some(n=>n.t==='word'&&n.id===G6_ORIGIN.word));
   await page.locator('#vocabulary-list-new').tap();
   await page.locator('#vocabulary-list-name').fill('G6 projection');await page.locator('#vocabulary-list-create').tap();
-  await waitForAppRecord(page,r=>r.lists['G6 projection']?.some(n=>n.t==='word'&&n.id===G6_ORIGIN.word));
-  await page.keyboard.press('Escape');await leaveStage(page);
+  await waitForAppRecord(page,r=>r.taken.some(n=>n.t==='word'&&n.id===G6_ORIGIN.word)&&r.lists['G6 projection']?.some(n=>n.t==='word'&&n.id===G6_ORIGIN.word));
+  if(await page.locator('#vocabulary-list-popover').count())await page.keyboard.press('Escape');await leaveStage(page);
   const saved=await readAppRecordSnapshot(page),row=saved.record.taken.find(n=>n.t==='word'&&n.id===G6_ORIGIN.word);
   for(const [from,to]of [['article','shelf'],['shelf','sky']]){const result=await g6Move(page,{from,to,home,modality:'touch'});assert(result.ok);}
   await page.waitForFunction(id=>[...document.querySelectorAll('#drift-layer .scale-star-kept')].filter(n=>JSON.parse(n.dataset.keptKey)[0]===id).length===1,G6_ORIGIN.word,{timeout:10000});
@@ -1748,21 +1748,20 @@ async function g6KeptProjection(page,{emit}){
   emit('kept.no-record-write','projection, native pan and point opening do not change the native learner record',before.revision===after.revision&&JSON.stringify(before.record)===JSON.stringify(after.record),{beforeRevision:before.revision,afterRevision:after.revision});
   await page.locator('#sheet-back').tap();await page.waitForFunction(()=>!document.getElementById('sheet'));
   for(const [from,to]of [['sky','shelf'],['shelf','article']]){const result=await g6Move(page,{from,to,home,modality:'touch'});assert(result.ok);}
-  await stage(page,page.locator(`#reader .tok[data-index="${home.origin.index}"]`));await page.locator('#mini-take').tap();await page.locator('#mini-review').uncheck();
-  await waitForAppRecord(page,r=>!r.taken.some(n=>n.t==='word'&&n.id===G6_ORIGIN.word));
-  await page.keyboard.press('Escape');await leaveStage(page);
+  // SAVE (2026-11-11): a saved word has one place, Review or a list; Review off with the list kept no longer exists (the
+  // box's Remove takes it out everywhere). The one membership left is Review: Move… takes the word off the list into Review
+  await stage(page,page.locator(`#reader .tok[data-index="${home.origin.index}"]`));await page.locator('#mini-place-move').tap();await page.locator('#vocabulary-list-popover #mini-review').tap();
+  await waitForAppRecord(page,r=>!r.lists['G6 projection'].some(n=>n.t==='word'&&n.id===G6_ORIGIN.word)&&r.taken.some(n=>n.t==='word'&&n.id===G6_ORIGIN.word));
+  if(await page.locator('#vocabulary-list-popover').count())await page.keyboard.press('Escape');await leaveStage(page);
   for(const [from,to]of [['article','shelf'],['shelf','sky']]){const result=await g6Move(page,{from,to,home,modality:'touch'});assert(result.ok);}
   const listOnly=await g6SkyFacts(page),listRecord=await readAppRecordSnapshot(page);
-  emit('kept.list-only','acknowledged Review removal retains the same point while list membership remains',listOnly.stars.filter(n=>n.key===key).length===1&&listRecord.revision>saved.revision&&listRecord.record.lists['G6 projection'].some(n=>n.id===G6_ORIGIN.word),{stars:listOnly.stars,savedRevision:saved.revision,listRevision:listRecord.revision});
+  emit('kept.list-only','a move off the list into Review retains the same point while one membership remains',listOnly.stars.filter(n=>n.key===key).length===1&&listRecord.revision>saved.revision&&!listRecord.record.lists['G6 projection'].some(n=>n.id===G6_ORIGIN.word)&&listRecord.record.taken.some(n=>n.t==='word'&&n.id===G6_ORIGIN.word),{stars:listOnly.stars,savedRevision:saved.revision,listRevision:listRecord.revision});
   for(const [from,to]of [['sky','shelf'],['shelf','article']]){const result=await g6Move(page,{from,to,home,modality:'touch'});assert(result.ok);}
   await stage(page,page.locator(`#reader .tok[data-index="${home.origin.index}"]`));
-  // The real Save re-saves and opens its menu. Remove Review again before
-  // removing the remaining list membership; each change waits for native durability.
-  await page.locator('#mini-take').tap();await waitForAppRecord(page,r=>r.taken.some(n=>n.t==='word'&&n.id===G6_ORIGIN.word));
-  await page.locator('#mini-review').uncheck();await waitForAppRecord(page,r=>!r.taken.some(n=>n.t==='word'&&n.id===G6_ORIGIN.word));
-  await page.locator('#vocabulary-list-popover input[data-list="G6 projection"]').uncheck();
-  await waitForAppRecord(page,r=>!r.lists['G6 projection'].some(n=>n.t==='word'&&n.id===G6_ORIGIN.word));
-  await page.keyboard.press('Escape');await leaveStage(page);
+  // The box's Remove takes the last membership away; the change waits for native durability.
+  await page.locator('#mini-place-remove').tap();
+  await waitForAppRecord(page,r=>!r.taken.some(n=>n.t==='word'&&n.id===G6_ORIGIN.word)&&!r.lists['G6 projection'].some(n=>n.t==='word'&&n.id===G6_ORIGIN.word));
+  if(await page.locator('#vocabulary-list-popover').count())await page.keyboard.press('Escape');await leaveStage(page);
   for(const [from,to]of [['article','shelf'],['shelf','sky']]){const result=await g6Move(page,{from,to,home,modality:'touch'});assert(result.ok);}
   await page.waitForFunction(key=>![...document.querySelectorAll('#drift-layer .scale-star-kept')].some(n=>n.dataset.keptKey===key),key,{timeout:10000});
   const removed=await g6SkyFacts(page),removedRecord=await readAppRecordSnapshot(page);
@@ -2007,9 +2006,10 @@ async function g6StarNearRail(page,{emit,star}){
   if(star==='article'){await g6SkyHome(page);spec={articleId:G6_ORIGIN.passage};}
   else{
     const home=await g6OpenOrigin(page,'touch');
-    await stage(page,page.locator(`#reader .tok[data-index="${home.origin.index}"]`));await page.locator('#mini-take').tap();
+    // SAVE (2026-11-11): Save asks where the word goes first; Review is picked
+    await stage(page,page.locator(`#reader .tok[data-index="${home.origin.index}"]`));await page.locator('#mini-take').tap();await page.locator('#mini #mini-review').tap();
     await waitForAppRecord(page,r=>r.taken.some(n=>n.t==='word'&&n.id===G6_ORIGIN.word));
-    await page.keyboard.press('Escape');await leaveStage(page);
+    if(await page.locator('#vocabulary-list-popover').count())await page.keyboard.press('Escape');await leaveStage(page);
     for(const [from,to]of [['article','shelf'],['shelf','sky']]){const moved=await g6Move(page,{from,to,home,modality:'touch'});assert(moved.ok,JSON.stringify(moved.observed));}
     await page.waitForFunction(id=>[...document.querySelectorAll('#drift-layer .scale-star-kept')].some(n=>JSON.parse(n.dataset.keptKey)[0]===id),G6_ORIGIN.word,{timeout:10000});
     spec={keptWord:G6_ORIGIN.word};
@@ -3517,10 +3517,13 @@ try {
       await delay(300);
       const ring = await page.locator('.hold-ring').count();
       await delay(450); await page.mouse.up(); await delay(900);
-      const first = { ring, strip: await page.locator('#seal-strip').count(), saved: [s0, await saved()], flights: await flights(), ladder: await ladderFacts(page, word),
+      // SAVE (2026-11-11): the hold asks first; Review, picked, keeps the word and its seal presses then
+      const asked = { strip: await page.locator('#seal-strip[data-mode="choose"]').count(), saved: await saved() };
+      if (asked.strip) { await page.locator('#seal-strip #seal-strip-review').click(); await page.locator('#seal-strip[data-mode="placed"]').waitFor({ timeout: 5000 }).catch(() => {}); await delay(900); }
+      const first = { ring, asked, strip: await page.locator('#seal-strip').count(), saved: [s0, await saved()], flights: await flights(), ladder: await ladderFacts(page, word),
         rung: await word.getAttribute('data-ladder-rung') };
-      check('M.hold', 'a mouse held still on the word: its ring by 300 ms, then the seal, the strip and +1 saved; its release climbs no rung',
-        first.ring === 1 && first.strip === 1 && first.saved[1] === s0 + 1 && first.flights === 1 && !first.ladder.reading && !first.ladder.english && !first.ladder.stages && !first.rung, first);
+      check('M.hold', 'a mouse held still on the word: its ring by 300 ms, then the strip asks where it goes, and Review gives the seal and +1 saved; its release climbs no rung',
+        first.ring === 1 && first.asked.strip === 1 && first.asked.saved === s0 && first.strip === 1 && first.saved[1] === s0 + 1 && first.flights === 1 && !first.ladder.reading && !first.ladder.english && !first.ladder.stages && !first.rung, first);
       await page.keyboard.press('Escape'); await delay(400);
       at = await centre();
       await page.mouse.move(at.x, at.y); await page.mouse.down(); await delay(750); await page.mouse.up(); await delay(900);
@@ -4236,12 +4239,14 @@ try {
       const plain = await page.waitForFunction(() => { const word = document.querySelector('#mini .mini-word'); return !!word && !word.querySelector('.ink-char') && !word.dataset.ink; }, null, { timeout: 1000 }).then(() => true, () => false);
       check('G4.interrupt.save-at-once', 'the tap finished the writing at once — ended by that input, every stroke drawn — and the plain word stood once the tap was released',
         after.ended >= 1 && (after.chars === 0 || after.drawn) && plain, { ...after, plain });
+      // SAVE (2026-11-11): the same tap still acts: it opens the Save's chooser (ask first), where Review is picked
+      if (await page.locator('#mini #mini-review').waitFor({ timeout: 3000 }).then(() => true, () => false)) await page.locator('#mini #mini-review').click();
       const saved = await page.waitForFunction(() => {
         const seal = document.querySelector('#mini #mini-take');
         return seal?.getAttribute('aria-pressed') === 'true' || seal?.classList.contains('taken') ? true : null;
       }, null, { timeout: 5000 }).then(() => true, () => false);
       const record = await readAppRecord(page);
-      check('G4.interrupt.save-acts', 'the same tap still saved the word: the record keeps it and the Save says so',
+      check('G4.interrupt.save-acts', 'the same tap still acted on Save: its chooser opened, and with Review picked the record keeps the word and the Save says so',
         saved && record.taken.some((item) => item.t === 'word' && item.id === WORD), { saved, taken: record.taken.map((item) => `${item.t}:${item.id}`) });
     };
     /* The ghost schedule the negative control replays: the stroke page's first frame already holds the whole character as
@@ -4518,6 +4523,8 @@ try {
       await stage(page, readerWord(page, DEPTH_WORDS.met));
       await midWriting(page);
       await page.locator('#mini #mini-take').click();
+      // SAVE (2026-11-11): the click opens the Save's chooser (ask first); Review is picked
+      if (await page.locator('#mini #mini-review').waitFor({ timeout: 3000 }).then(() => true, () => false)) await page.locator('#mini #mini-review').click();
       const saved = await page.waitForFunction(() => { const seal = document.querySelector('#mini #mini-take'); return seal?.getAttribute('aria-pressed') === 'true' || seal?.classList.contains('taken') ? true : null; },
         null, { timeout: 5000 }).then(() => true, () => false);
       const record = await readAppRecord(page);
@@ -4942,6 +4949,23 @@ try {
     });
     const sealTrail = (page) => page.evaluate(() => { const trail = window.__g5Trail || []; window.__g5Trail = null; return trail; });
     const landed = (page) => page.waitForFunction(() => !document.querySelector('.seal-flight'), null, { timeout: 5000 }).then(() => delay(120));
+    /** SAVE (2026-11-11): ask first, save second. A hold opens the strip as the chooser and keeps nothing; a pick keeps the word
+     * there, and only then does its 印 press and fly. A strip that already names the word's place (a kept word) is left as it
+     * is. Returns whether a place was picked. */
+    const pickStripPlace = async (page, chip = '#seal-strip-review') => {
+      if (!(await page.locator('#seal-strip[data-mode="choose"]').count())) return false;
+      await page.locator(`#seal-strip ${chip}`).click();
+      await page.locator('#seal-strip[data-mode="placed"]').waitFor({ timeout: 5000 }).catch(() => {});
+      return true;
+    };
+    /** New list… from the strip: the name asked once, and the word saved there (or moved there from where it is). */
+    const stripNewList = async (page, name) => {
+      if (await page.locator('#seal-strip[data-mode="placed"]').count()) await page.locator('#seal-strip-move').click();
+      await page.locator('#seal-strip-new').click();
+      await page.locator('#seal-strip-name').fill(name);
+      await page.locator('#seal-strip-create').click();
+      await page.locator('#seal-strip[data-mode="placed"]').waitFor({ timeout: 5000 }).catch(() => {});
+    };
     /** The strip's place: its height against the screen, and every control drawn under it (its centre or a corner on the glass
      * under the strip), the held word's glyphs included. */
     const stripCover = (page, wordSelector) => page.evaluate((wordSelector) => {
@@ -4973,9 +4997,10 @@ try {
       const word = readerWord(page);
       await holdOn(page, word);
       await page.locator('#seal-strip').waitFor();
+      await pickStripPlace(page);
       await landed(page);
       const first = await g5Facts(page), firstRecord = await readAppRecord(page);
-      check('G5.first-hold', 'the first hold keeps the word once and the bookmark counts +1', cardsOf(firstRecord) === 1 && first.strip && first.count === 1, { first, cards: cardsOf(firstRecord) });
+      check('G5.first-hold', 'the first hold and its pick keep the word once and the bookmark counts +1', cardsOf(firstRecord) === 1 && first.strip && first.count === 1, { first, cards: cardsOf(firstRecord) });
       await page.keyboard.press('Escape');
       await delay(200);
       await traceSeal(page);
@@ -5036,9 +5061,14 @@ try {
       const { mid } = await holdOn(page, word);
       check('G5.ring', 'a held finger fills a ring under it before the hold commits; nothing is kept yet', mid.rings === 1 && mid.ringRunning && !mid.strip && mid.count === start.count, mid);
       await page.locator('#seal-strip').waitFor();
-      const opened = await g5Facts(page);
-      // the strip answers in the commit's frame; the seal presses in the next one
+      // SAVE (2026-11-11): the hold opens the strip as the chooser and keeps nothing; Review, picked, keeps the word
+      const asked = await g5Facts(page), askedRecord = await readAppRecord(page);
+      const askedNew = await page.locator('#seal-strip-new').isVisible(), askedReview = await page.locator('#seal-strip-review').isVisible();
+      await page.locator('#seal-strip #seal-strip-review').click();
+      // the strip answers in the pick's frame; the seal presses in the next one
       const pressed = await page.waitForFunction(() => document.querySelectorAll('.seal-flight').length, null, { timeout: 2000 }).then((handle) => handle.jsonValue()).catch(() => 0);
+      await page.locator('#seal-strip[data-mode="placed"]').waitFor({ timeout: 5000 }).catch(() => {});
+      const opened = await g5Facts(page);
       await landed(page);
       const trail = await sealTrail(page);
       const done = await g5Facts(page), record = await readAppRecord(page);
@@ -5053,11 +5083,13 @@ try {
         Math.hypot(from[0] - (wordBox.left + wordBox.width), from[1] - wordBox.top) <= 40 && Math.hypot(to[0] - centre[0], to[1] - centre[1]) <= 24 && done.seals === 0,
         { pressed, frames: shown.length, from, to, centre, wordBox });
       // Hfix-1B (item 11): no tutor is set up here, so no "Ask the tutor" (verify-hfix-rooms holds the strip with one)
-      check('G5.seal.strip', 'the strip opens with the word kept: Saved ✓ and Remove beside it, his lists, New list…, then 全項目 · Full entry, Save the sentence and Copy (no tutor set up: no tutor door)',
-        opened.strip && /Saved/u.test(opened.status) && JSON.stringify(opened.acts.map((act) => act.action)) === JSON.stringify(['remove', 'entry', 'sentence', 'copy']) &&
-        await page.locator('#seal-strip .seal-strip-lists > #seal-strip-status + [data-strip-action="remove"]').count() === 1 &&
-        await page.locator('#seal-strip-new').isVisible(), opened);
-      check('G5.labels', 'plain full verbs: never the rejected row "this sentence · save · ask the tutor · practice", nor "Open the web"', labelsClean(opened), opened.acts);
+      check('G5.seal.strip', 'the strip asks first (Review, his lists, New list…; nothing kept) and after the pick names the place: Saved in Review ✓ with Show, Move… and Remove, then 全項目 · Full entry, Save the sentence and Copy (no tutor set up: no tutor door)',
+        asked.strip && /^Save /u.test(asked.status) && cardsOf(askedRecord) === cardsOf(startRecord) && askedNew && askedReview &&
+        JSON.stringify(asked.acts.map((act) => act.action)) === JSON.stringify(['entry', 'sentence', 'copy']) &&
+        opened.strip && /^Saved in Review/u.test(opened.status) && JSON.stringify(opened.acts.map((act) => act.action)) === JSON.stringify(['remove', 'entry', 'sentence', 'copy']) &&
+        await page.locator('#seal-strip .seal-strip-lists > #seal-strip-move + [data-strip-action="remove"]').count() === 1 &&
+        await page.locator('#seal-strip-show').isVisible(), { asked, askedNew, askedReview, opened });
+      check('G5.labels', 'plain full verbs: never the rejected row "this sentence · save · ask the tutor · practice", nor "Open the web"', labelsClean(asked) && labelsClean(opened), { asked: asked.acts, opened: opened.acts });
       await page.screenshot({ path: resolve(evidence, `${engine}-G5-strip.png`) });
       // Remove: the one way out, its review history kept
       const beforeRemove = await readAppRecord(page);
@@ -5073,6 +5105,7 @@ try {
       await traceSeal(page);
       await holdOn(page, word, { id: 43 });
       await page.locator('#seal-strip').waitFor();
+      await pickStripPlace(page);
       await delay(1000);
       const failedTrail = await sealTrail(page);
       const fault = await clearRecordWriteFailure(page);
@@ -5089,9 +5122,11 @@ try {
       const start = await g5Facts(page);
       await word.click({ button: 'right' });
       await page.locator('#seal-strip').waitFor();
+      const rightAsked = cardsOf(await readAppRecord(page));
+      await pickStripPlace(page);
       await landed(page);
       const right = await g5Facts(page), rightRecord = await readAppRecord(page);
-      check('G5.right-click', 'a right-click does what a hold does: the word is kept once and the strip opens', right.strip && cardsOf(rightRecord) === 1 && right.count === start.count + 1, right);
+      check('G5.right-click', 'a right-click does what a hold does: the strip opens and asks, and the pick keeps the word once', right.strip && rightAsked === 0 && cardsOf(rightRecord) === 1 && right.count === start.count + 1, { ...right, rightAsked });
       await page.keyboard.press('Escape');
       await delay(200);
       const back = await page.evaluate(() => ({ strip: !!document.getElementById('seal-strip'), focus: document.activeElement?.dataset?.proseLabel || null }));
@@ -5116,16 +5151,16 @@ try {
       await holdOn(page, word);
       await page.locator('#seal-strip').waitFor();
       await landed(page);
+      // SAVE (2026-11-11): a saved word has one place: New list… names a list and saves the word there; Move… then New list…
+      // moves it to the second (the first list stays, empty)
       for (const name of ['仕事', '旅']) {
-        await page.locator('#seal-strip-new').tap();
-        await page.locator('#seal-strip-name').fill(name);
-        await page.locator('#seal-strip-create').tap();
+        await stripNewList(page, name);
         await waitForAppRecord(page, (r) => r.lists?.[name]?.some((row) => row.id === WORD), { description: `the new list ${name}` }).catch(() => {});
-        await page.locator(`#seal-strip .seal-list[data-list="${name}"]`).waitFor().catch(() => {});
       }
       const made = await g5Facts(page), madeRecord = await readAppRecord(page);
-      check('G5.new-list', 'New list… asks a name once and puts the word on it', ['仕事', '旅'].every((name) => madeRecord.lists?.[name]?.length === 1 &&
-        made.lists.some((row) => row.name === name && row.pressed === 'true')), { lists: madeRecord.lists, strip: made.lists });
+      check('G5.new-list', 'New list… asks a name once and saves the word there; Move… and New list… again move it to the new list, the first kept',
+        Array.isArray(madeRecord.lists?.['仕事']) && madeRecord.lists['仕事'].length === 0 && madeRecord.lists?.['旅']?.length === 1 && cardsOf(madeRecord) === 1 &&
+        made.status === 'Saved in 旅 ✓', { lists: madeRecord.lists, status: made.status });
       await page.keyboard.press('Escape');
       const other = page.locator('#reader .tok[data-prose-label="大賞"]').first();
       await holdOn(page, other, { id: 44 });
@@ -5136,8 +5171,9 @@ try {
       const onList = await waitForAppRecord(page, (r) => r.lists?.['旅']?.some((row) => row.id === '大賞'), { description: 'one tap on a list' }).catch(() => null);
       await delay(250);
       const after = await g5Facts(page);
-      check('G5.list.one-tap', 'his lists stand in the strip, and one tap puts the word on one', offered.lists.map((row) => row.name).sort().join() === ['仕事', '旅'].sort().join() &&
-        offered.lists.every((row) => row.pressed === 'false') && !!onList && after.lists.find((row) => row.name === '旅')?.pressed === 'true' && after.strip, { offered: offered.lists, after: after.lists });
+      // SAVE (2026-11-11): after the tap the strip names the place ("Saved in 旅 ✓") instead of ticking the list
+      check('G5.list.one-tap', 'his lists stand in the strip, and one tap saves the word on one', offered.lists.map((row) => row.name).sort().join() === ['仕事', '旅'].sort().join() &&
+        offered.lists.every((row) => row.pressed === 'false') && !!onList && after.status === 'Saved in 旅 ✓' && after.strip, { offered: offered.lists, after: { lists: after.lists, status: after.status } });
       check('G5.list.labels', 'the strip with lists still speaks in plain full verbs', labelsClean(after), after.acts);
     });
 
@@ -5196,14 +5232,18 @@ try {
       const start = await g5Facts(page), before = await readAppRecord(page);
       await holdOn(page, inside, { id: 46 });
       await page.locator('#sheet #seal-strip').waitFor();
+      // SAVE (2026-11-11): the strip is measured as the hold opens it (asking) and again once the pick names the place
+      await delay(250);
+      const askingPlace = await stripCover(page, '[data-g5-held]');
+      await pickStripPlace(page);
       await landed(page);
       const held = await g5Facts(page), after = await readAppRecord(page);
       const place = await stripCover(page, '[data-g5-held]');
       const word = await inside.evaluate((node) => { const copy = node.cloneNode(true); copy.querySelectorAll('rt, rp, .tok-state, .tok-en').forEach((n) => n.remove()); return copy.textContent.trim(); });
       check('G5.page.kept', `a word held inside the page (${word}) is kept once, and the page stays`, held.page && (after.taken || []).length === (before.taken || []).length + 1 &&
         held.count === start.count + 1 && /Saved/u.test(held.status), { held, word });
-      check('G5.page.strip', 'its strip stands in the page under 40 % of the screen, over no button and not over the word', held.strip && !!place &&
-        place.share <= 0.4 && place.covered.length === 0 && !place.overWord, place);
+      check('G5.page.strip', 'its strip stands in the page under 40 % of the screen, over no button and not over the word, asking and once placed', held.strip && !!place && !!askingPlace &&
+        [askingPlace, place].every((at) => at.share <= 0.4 && at.covered.length === 0 && !at.overWord), { asking: askingPlace, placed: place });
       await page.keyboard.press('Escape');
       await delay(250);
       const gone = await g5Facts(page);
@@ -5318,8 +5358,11 @@ try {
         check(`G5.bar-save.${form}.save`, `${form}: the page bar’s Save stands inside its bar, at least 8 px from every screen edge, its target the height of Close and search`,
           barSaveOk(before) && /Save/u.test(before.text), before);
         await page.locator('#sheet-take').tap();
+        // SAVE (2026-11-11): the page's Save asks first (a drawer under the bar); Review, picked, saves and folds the chooser
+        await page.locator('#vocabulary-list-popover.is-drawer #mini-review').tap();
         await page.waitForFunction(() => /Saved/u.test(document.getElementById('sheet-take')?.textContent || ''), null, { timeout: 8000 });
-        await page.keyboard.press('Escape'); await delay(300);
+        if (await page.locator('#vocabulary-list-popover').count()) await page.keyboard.press('Escape');
+        await delay(300);
         const after = await barSaveFacts(page);
         check(`G5.bar-save.${form}.saved`, `${form}: as Saved ✓ it stands the same way, inside its bar and 8 px clear of the screen’s edges`,
           barSaveOk(after) && /Saved/u.test(after.text), after);
@@ -5345,6 +5388,7 @@ try {
       });
       const { mid } = await holdOn(page, word);
       await page.locator('#seal-strip').waitFor();
+      await pickStripPlace(page);
       const pressed = await page.evaluate(() => ({ still: document.querySelectorAll('.seal-flight.is-still').length, moving: document.querySelectorAll('.seal-flight:not(.is-still)').length }));
       await delay(1000);
       const anims = await page.evaluate(() => { const list = [...new Set(window.__g5Anims || [])]; window.__g5Anims = null; return list; });
@@ -5383,7 +5427,8 @@ try {
         .map((n) => { const r = n.getBoundingClientRect(); return { id: n.id || n.dataset.stripAction || n.dataset.list || n.textContent.trim().slice(0, 16), top: Math.round(r.top), bottom: Math.round(r.bottom), inside: r.top >= inner.top - 0.5 && r.bottom <= inner.bottom + 0.5 && r.left >= inner.left - 0.5 && r.right <= inner.right + 0.5 }; });
       const remove = strip.querySelector('[data-strip-action="remove"]');
       return { scrollHeight: strip.scrollHeight, clientHeight: strip.clientHeight, more: strip.dataset.more ?? null, scrollTop: strip.scrollTop,
-        removeInFirstRow: !!remove?.closest('.seal-strip-lists') && remove.previousElementSibling?.id === 'seal-strip-status',
+        // SAVE (2026-11-11): the first row of a kept word reads Saved in Review ✓ · Show · Move… · Remove
+        removeInFirstRow: !!remove?.closest('.seal-strip-lists') && remove.previousElementSibling?.id === 'seal-strip-move',
         controls, outside: controls.filter((c) => !c.inside).map((c) => c.id) };
     });
     /** Put a content word of the reader (kanji, on the left half, so no fixed door at the foot is over it) at `y` on the
@@ -5437,22 +5482,23 @@ try {
           await holdOn(page, word, { id: id++ });
           await page.locator('#seal-strip').waitFor();
           await landed(page);
+          // SAVE (2026-11-11): the hold's strip is the chooser; it is measured asking, then once the pick names the place
           const glass = await glassFacts(page), place = await stripCover(page, '[data-g5-held]'), fits = await stripFit(page);
           glass.wordTopBeforeHold = word.before ?? null;
-          check(`G5.strip.fits.${form}.${name}`, `${form}, ${name}${name === 'first' ? '' : ' (with his three lists)'}: every control of the strip stands wholly inside its painted box, Remove beside Saved ✓, and nothing scrolls inside it`,
-            !!fits && fits.outside.length === 0 && fits.scrollHeight <= fits.clientHeight && fits.more !== 'true' && fits.removeInFirstRow, fits);
-          check(`G5.glass.${form}.${name}`, `${form}, a word ${name === 'first' ? 'where the story opens' : `near the ${name}`}: the strip stands wholly on the glass, over no button, under 40 % of the screen, the word still on the glass`,
-            glass.stripOnGlass && glass.wordOnGlass && !!place && place.covered.length === 0 && place.share <= 0.4 && !place.overWord, { ...glass, covered: place?.covered, share: place?.share, overWord: place?.overWord });
+          // his lists for the holds that follow: three, as a learner keeps them (New list… saves the word there; the next two
+          // move it on, so all three stand in the strip of every later hold)
+          if (name === 'first') for (const list of ['仕事', '旅', 'ニュースの語']) await stripNewList(page, list);
+          else await pickStripPlace(page);
+          await landed(page);
+          const placed = await stripFit(page), placedGlass = await glassFacts(page), placedPlace = await stripCover(page, '[data-g5-held]');
+          check(`G5.strip.fits.${form}.${name}`, `${form}, ${name}${name === 'first' ? '' : ' (with his three lists)'}: every control of the strip stands wholly inside its painted box, asking and once placed (Remove in its first row), and nothing scrolls inside it`,
+            !!fits && fits.outside.length === 0 && fits.scrollHeight <= fits.clientHeight && fits.more !== 'true' &&
+            !!placed && placed.outside.length === 0 && placed.scrollHeight <= placed.clientHeight && placed.more !== 'true' && placed.removeInFirstRow, { asking: fits, placed });
+          check(`G5.glass.${form}.${name}`, `${form}, a word ${name === 'first' ? 'where the story opens' : `near the ${name}`}: the strip stands wholly on the glass, over no button, under 40 % of the screen, the word still on the glass, asking and once placed`,
+            [[glass, place], [placedGlass, placedPlace]].every(([at, cover]) => at.stripOnGlass && at.wordOnGlass && !!cover && cover.covered.length === 0 && cover.share <= 0.4 && !cover.overWord),
+            { ...glass, covered: place?.covered, share: place?.share, overWord: place?.overWord,
+              placed: { stripOnGlass: placedGlass.stripOnGlass, wordOnGlass: placedGlass.wordOnGlass, strip: placedGlass.strip, covered: placedPlace?.covered, share: placedPlace?.share, overWord: placedPlace?.overWord } });
           if (name === 'foot') await page.screenshot({ path: resolve(evidence, `${engine}-G5-glass-${form}-foot.png`) });
-          if (name === 'first') {
-            // his lists for the holds that follow: three, as a learner keeps them
-            for (const list of ['仕事', '旅', 'ニュースの語']) {
-              await page.locator('#seal-strip-new').tap();
-              await page.locator('#seal-strip-name').fill(list);
-              await page.locator('#seal-strip-create').tap();
-              await page.locator(`#seal-strip .seal-list[data-list="${list}"]`).waitFor();
-            }
-          }
           await page.keyboard.press('Escape'); await delay(250);
         }
         // the bookmark lands on the row it focuses (the newest kept word's), on the glass at this size. At 320 the room's bar
@@ -5497,9 +5543,8 @@ try {
         lists: Object.entries(record.lists || {}).flatMap(([name, rows]) => (rows || []).map((row, index) => ({ name, index, row })).filter(({ row }) => row.t === 'word' && row.id === id)) });
       await holdOn(page, first, { id: 90 });
       await page.locator('#seal-strip').waitFor(); await landed(page);
-      await page.locator('#seal-strip-new').tap();
-      await page.locator('#seal-strip-name').fill('朝');
-      await page.locator('#seal-strip-create').tap();
+      // SAVE (2026-11-11): New list… names 朝 and saves the word there in one act
+      await stripNewList(page, '朝');
       await waitForAppRecord(page, (r) => r.lists?.['朝']?.some((row) => row.id === WORD), { description: 'the list 朝' });
       await page.keyboard.press('Escape'); await delay(250);
       await holdOn(page, other, { id: 91 });
@@ -5545,6 +5590,7 @@ try {
       const word = readerWord(page);
       await holdOn(page, word);
       await page.locator('#seal-strip').waitFor();
+      await pickStripPlace(page);
       await landed(page);
       await page.keyboard.press('Escape');
       await page.locator('#tray').tap();
@@ -5697,7 +5743,8 @@ try {
         await openStory(page);
         const word = readerWord(page);
         await word.scrollIntoViewIfNeeded(); await delay(400);
-        const seal = await measureMove(page, () => holdOn(page, word, { id: 50 + sample, settle: 0 }), 1900);
+        // SAVE (2026-11-11): the 印 presses on the pick, so the measured move is the hold and its pick of Review
+        const seal = await measureMove(page, async () => { await holdOn(page, word, { id: 50 + sample, settle: 0 }); await pickStripPlace(page); }, 1900);
         if (seal) frames.push({ engine, move: `G5 hold → seal → bookmark #${sample + 1}`, ...seal, deltas: undefined });
         await landed(page).catch(() => {});
         await page.keyboard.press('Escape'); await delay(250);
@@ -5727,9 +5774,11 @@ try {
       const specs = [
         { id: 'second-hold-unkeeps', run: 'G5-second', probe: g5SecondProbe, kill: 'G5.second-hold',
           witness: (row) => row.observed.cards === 0,
+          // SAVE (2026-11-11): a hold keeps nothing by itself (keepWord runs on the pick), so the naive toggle is served where
+          // the hold reads whether the word is kept
           edits: [{ file: 'corridor.js', key: 'second-hold-toggles',
-            from: "  if (before === 'taken') return { status: 'already-kept', key };",
-            to: "  if (before === 'taken') { await toggleTaken(node, label); return { status: 'already-kept', key }; } // G5 negative: the naive toggle" }] },
+            from: "  const kept = keepable && keptState(facts.node) === 'taken';",
+            to: "  const kept = keepable && keptState(facts.node) === 'taken'; if (kept) await toggleTaken(facts.node, door.label); // G5 negative: the naive toggle" }] },
         { id: 'strip-covers-a-button', run: 'G5-place', probe: g5PlaceProbe, kill: 'G5.strip.place',
           witness: (row) => row.observed?.covered?.length > 0,
           edits: [{ file: 'corridor.js', key: 'strip-over-the-foot',

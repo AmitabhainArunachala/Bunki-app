@@ -82,6 +82,8 @@ try {
   results.push({ name: 'all-twenty-passages-survive-reload-without-promotion', pass: true });
   await openShelfDoor(page, '#airead-link');
   await page.locator('[data-airead-take="犬"]').click();
+  // SAVE (2026-11-11): the suggestion's Save asks where the word goes first; Review, the study queue, is picked
+  await page.locator('#vocabulary-list-popover #mini-review').click();
   const promoted = await waitForAppRecord(page, (record) => record.taken?.length === 1);
   assert.deepEqual(promoted.taken.map((item) => item.id), ['犬']);
   assert.deepEqual(promoted.revlog || [], [], 'explicit learning does not invent recall');

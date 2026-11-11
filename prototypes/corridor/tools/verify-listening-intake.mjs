@@ -249,7 +249,9 @@ for (const engine of engines) for (const width of sizes) {
     assert.equal(await page.locator('#source-reader-original').getAttribute('href'), parent.url);
     await screenshot('saved-excerpt-and-original-time', '#source-reader-body');
     await selectWord(page); await page.locator('#source-selection-lookup').click(); await page.locator('.nav-search-row').first().click();
-    await page.locator('#sheet-take').click(); await waitForAppRecord(page, (record) => record.taken.length === 1);
+    // SAVE (2026-11-11): Save asks where the word goes first (a drawer under the bar); Review, the study queue, is picked
+    await page.locator('#sheet-take').click(); await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
+    await waitForAppRecord(page, (record) => record.taken.length === 1);
     const learned = await readAppRecordSnapshot(page), item = learned.record.taken[0];
     assert.equal(item.id, '町'); const topic = learned.record.teacherContexts.entries.find((entry) => entry.id === item.sourceContextRef);
     assert.equal(topic.sourceId, excerpt.captureId); assert.equal(topic.quote, '  町の図書館で本を読んだ。');

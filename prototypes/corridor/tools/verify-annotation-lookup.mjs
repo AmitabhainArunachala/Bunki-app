@@ -26,17 +26,22 @@ const expose = ['S', 'D', 'openJapaneseLookup', 'appendJapaneseLookup', 'enhance
   'toggleTaken', 'wordCaptureState', 'wordCardIdentity', 'recordWritable'];
 const shim = '\nObject.defineProperty(window,"annotationFixture",{value:{' + expose.map(name => `get ${name}(){return ${name}}`).join(',') + '}});\n';
 const fixture = Buffer.concat([original, Buffer.from(shim)]);
-// Negative control: a build that re-enables the list form before reload must fail the read-only case.
-const reenable = ['create.disabled = busy || !recordWritable();', 'create.disabled = busy;'];
+// Negative control: a build that re-enables the list form before reload must fail the read-only case. SAVE (2026-11-11):
+// the form stands in two surfaces now, the Save's chooser (its name field `field`) and the lists popover a caller opens
+// directly (`name`); each control re-enables the one its case reaches
+const reenable = ['create.disabled = busy || !recordWritable();\n    field.readOnly = busy;', 'create.disabled = busy;\n    field.readOnly = busy;'];
 assert.equal(original.toString().split(reenable[0]).length, 2, 'The control mutation must target one exact line');
 const reenabled = Buffer.concat([Buffer.from(original.toString().replace(...reenable)), Buffer.from(shim)]);
+const reenablePopover = ['create.disabled = busy || !recordWritable();\n    name.readOnly = busy;', 'create.disabled = busy;\n    name.readOnly = busy;'];
+assert.equal(original.toString().split(reenablePopover[0]).length, 2, 'The control mutation must target one exact line');
+const reenabledPopover = Buffer.concat([Buffer.from(original.toString().replace(...reenablePopover)), Buffer.from(shim)]);
 // Negative control: a build that declares every kana parenthetical after a kanji an annotation by its shape alone must
 // fail the plain-prose case at its first door.
 const byShape = ['.filter(([open, , inner]) => annotationReadsAs(source, open, annotationKana(inner), tokenReadings, wordStarts))', '.filter(() => true)'];
 assert.equal(original.toString().split(byShape[0]).length, 2, 'The control mutation must target one exact line');
 const shapeOnly = Buffer.concat([Buffer.from(original.toString().replace(...byShape)), Buffer.from(shim)]);
 const controls = [['failed-list-write-is-honest-and-recoverable', 'list-form-reenabled-before-reload', reenabled, /must stay disabled until reload/],
-  ['failed-capture-inside-a-list-is-honest-and-recoverable', 'list-form-reenabled-before-reload-after-capture', reenabled, /A failed native write protects the host until reload/],
+  ['failed-capture-inside-a-list-is-honest-and-recoverable', 'list-form-reenabled-before-reload-after-capture', reenabledPopover, /A failed native write protects the host until reload/],
   ['plain-prose-parentheticals-are-annotations-only-when-they-read', 'annotation-by-kana-shape', shapeOnly, /keeps its door/]];
 const sourceFiles = new Map(identity.files.map(file => [file.path, file.sha256]));
 assert.equal(sha(original), sourceFiles.get('corridor.js'));
@@ -89,14 +94,13 @@ async function openLookup(page, text = '電車') {
   assert.equal(await page.locator('#annotation-anchor').evaluate(node => node.querySelector(':scope > .tok-en > .tok-en-text')?.textContent.trim() ?? null),
     expected, 'The stage keeps the English under the word');
 }
-// Save ▾ (1.3.0; one-hand pass 2026-10-15): the popup has one Save and no list button. On a word not yet saved the
-// press saves it and unfolds its menu (Review · lists · + New list · Copy) inside the card, under the button; on a
-// saved word the same press opens the menu. The big list window is gone.
+// Save ▾ (1.3.0; one-hand pass 2026-10-15): the popup has one Save and no list button; its menu unfolds inside the card,
+// under the button. The big list window is gone. SAVE (2026-11-11, ask first, save second): the menu is the chooser —
+// Review · his lists · New list… — and a press keeps nothing; a word is kept, or moved, by the one place picked there.
 async function chooser(page, text = '電車') {
   await openLookup(page, text);
   assert.equal(await page.locator('#mini #mini-lists, #mini .mini-entry').count(), 0, 'The popup has one Save ▾ and no list or entry button');
-  if (await page.locator('#mini #mini-take').getAttribute('aria-pressed') !== 'true') await saveInPopup(page);
-  else await page.locator('#mini #mini-take').click();
+  await page.locator('#mini #mini-take').click();
   await menuOpen(page);
 }
 /** Save ▾'s menu: inside the card under its own button, never a window. */
@@ -107,6 +111,8 @@ async function menuOpen(page) {
 }
 async function saveInPopup(page) {
   await page.locator('#mini #mini-take').click();
+  // SAVE (2026-11-11): the press asks; Review, the study queue, is picked
+  await page.locator('#mini #vocabulary-list-popover #mini-review').click();
   await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true');
 }
 async function createList(page, name) {
@@ -120,28 +126,45 @@ async function closeChooser(page) {
   await page.locator('#vocabulary-list-popover').press('Escape');
   await page.locator('#vocabulary-list-popover').waitFor({ state: 'detached' });
 }
+/** SAVE (2026-11-11): a pick in the chooser keeps or moves the word and closes the chooser. */
+async function picked(page) {
+  await page.locator('#vocabulary-list-popover').waitFor({ state: 'detached' });
+}
+/** A press on the saved word's Save opens the chooser again, to move it; a press within a breath (SAVE_PRESS_MS, 600 ms)
+ * of the last press on the same Save is the same press, so it waits that breath out, as a finger would. */
+async function reopen(page) {
+  await page.waitForTimeout(650);
+  await page.locator('#mini #mini-take').click(); await menuOpen(page);
+}
+const place = (list) => `#vocabulary-list-popover .save-place[data-list=${JSON.stringify(list)}]`;
 const member = (record, list, word) => record.lists?.[list]?.some(row => row.t === 'word' && row.id === word);
 const cases = [
   ['list-new-existing-and-retained-card', async page => {
+    // SAVE (2026-11-11): New list… on an unsaved word makes the list and keeps the word there in one act
     await chooser(page); await createList(page, 'Morning Japanese');
-    await waitForAppRecord(page, record => member(record, 'Morning Japanese', '電車'));
+    await waitForAppRecord(page, record => member(record, 'Morning Japanese', '電車')); await picked(page);
     const enrolled = await state(page);
     assert.equal(enrolled.record.taken.filter(row => row.t === 'word' && row.id === '電車').length, 1);
-    // the list's own tick on an enrolled card: off and on again, it never unenrolls or resets the card
-    const tick = page.locator('#vocabulary-list-popover input[data-list="Morning Japanese"]');
-    assert.equal(await tick.isChecked(), true, 'The new list is ticked for the word');
-    await tick.uncheck(); await waitForAppRecord(page, record => !member(record, 'Morning Japanese', '電車'));
-    await tick.check(); await waitForAppRecord(page, record => member(record, 'Morning Japanese', '電車'));
-    assert.deepEqual(targetRows((await state(page)).record), targetRows(enrolled.record), 'A list tick on an enrolled card must not unenroll or reset it');
+    // a move off the list (to Review) and back again never unenrolls or resets the card
+    await reopen(page);
+    assert.equal(await page.locator(place('Morning Japanese')).getAttribute('aria-current'), 'true', 'The chooser names the list the word is on');
+    await page.locator('#vocabulary-list-popover #mini-review').click(); await picked(page);
+    await waitForAppRecord(page, record => !member(record, 'Morning Japanese', '電車'));
+    await reopen(page);
+    await page.locator(place('Morning Japanese')).click(); await picked(page);
+    await waitForAppRecord(page, record => member(record, 'Morning Japanese', '電車'));
+    assert.deepEqual(targetRows((await state(page)).record), targetRows(enrolled.record), 'A move on an enrolled card must not unenroll or reset it');
     assert.equal(await page.locator('#mini #mini-take').getAttribute('aria-pressed'), 'true', 'The popup shows the word saved');
+    // New list… on a saved word makes the list and moves the word there, off the list it was on
+    await reopen(page);
     await createList(page, 'Evening Japanese');
-    await waitForAppRecord(page, record => member(record, 'Evening Japanese', '電車'));
+    await waitForAppRecord(page, record => member(record, 'Evening Japanese', '電車') && !member(record, 'Morning Japanese', '電車'));
+    await picked(page);
     assert.deepEqual(targetRows((await state(page)).record), targetRows(enrolled.record));
-    await closeChooser(page);
     await chooser(page, '駅');
-    await page.locator('#vocabulary-list-popover input[data-list="Morning Japanese"]').check();
+    await page.locator(place('Morning Japanese')).click(); await picked(page);
     const withStation = await waitForAppRecord(page, record => member(record, 'Morning Japanese', '駅'));
-    assert(member(withStation, 'Morning Japanese', '電車'));
+    assert(member(withStation, 'Evening Japanese', '電車'), 'The other word stays where it was put');
     const beforeReload = await state(page);
     await page.reload(); await page.waitForFunction(() => document.body.dataset.ready === '1');
     const afterReload = await state(page);
@@ -152,7 +175,8 @@ const cases = [
   ['failed-list-write-is-honest-and-recoverable', async page => {
     await openLookup(page); await saveInPopup(page);
     await waitForAppRecord(page, record => record.taken.some(row => row.id === '電車'));
-    await menuOpen(page); // the save unfolded Save ▾'s menu
+    // SAVE (2026-11-11): the pick closed the chooser; a press on the saved word's Save opens it again, to move it
+    await picked(page); await reopen(page);
     const before = await state(page);
     await armRecordWriteFailure(page, 'abort', { roots: ['lists'] });
     await createList(page, 'Retry this list');
@@ -172,13 +196,17 @@ const cases = [
     assert.deepEqual((await state(page)).record, before.record);
     await chooser(page);
     assert.equal(await page.locator('#vocabulary-list-name').inputValue(), 'Retry this list', 'The typed list name survives the reload as a session draft');
-    // in Save ▾'s fresh menu the draft waits behind "+ New list": the row becomes the field, the draft in it
-    await page.locator('#vocabulary-list-popover #vocabulary-list-new').click();
+    // SAVE (2026-11-11): in the chooser a waiting draft shows its name field at once, in place of New list…
+    assert.equal(await page.locator('#vocabulary-list-popover #vocabulary-list-new').isVisible(), false);
     assert.equal(await page.locator('#vocabulary-list-name').isVisible(), true, 'The name field shows with the draft');
     assert.equal(await page.locator('#vocabulary-list-name').inputValue(), 'Retry this list');
     await page.locator('#vocabulary-list-popover [type="submit"]').click();
     await waitForAppRecord(page, record => member(record, 'Retry this list', '電車'));
-    await page.waitForFunction(() => document.getElementById('vocabulary-list-name')?.value === '');
+    // the pick closes the chooser and spends the draft: the next visit offers New list… again, its field empty
+    await picked(page); await reopen(page);
+    assert.equal(await page.locator('#vocabulary-list-popover #vocabulary-list-new').isVisible(), true);
+    assert.equal(await page.locator('#vocabulary-list-name').inputValue(), '');
+    await closeChooser(page);
     assert.deepEqual(targetRows((await state(page)).record), targetRows(before.record));
   }],
   ['failed-capture-inside-a-list-is-honest-and-recoverable', async page => {
@@ -232,11 +260,12 @@ const cases = [
     });
     assert.equal(await page.locator('#mini .mini-reading').textContent(), 'うわて', 'The explicit JMdict entry must survive the quick look');
     assert.match(await page.locator('#mini .mini-gloss').textContent(), /upper part/);
-    await saveInPopup(page); await menuOpen(page); await createList(page, 'Exact reading');
+    // SAVE (2026-11-11): New list… on the unsaved word keeps it with its exact entry and puts it on the list in one act
+    await page.locator('#mini #mini-take').click(); await menuOpen(page); await createList(page, 'Exact reading');
     const saved = await waitForAppRecord(page, record => member(record, 'Exact reading', '上手'));
     const card = saved.taken.find(row => row.id === '上手');
     assert.equal(card.entrySeq, '1580400'); assert.equal(card.cueReading, 'うわて');
-    await closeChooser(page);
+    await picked(page);
     const prior = await state(page);
     await openLookup(page, '上手');
     assert.equal(await page.locator('#mini .mini-reading').textContent(), 'じょうず');
@@ -246,7 +275,11 @@ const cases = [
     const core = JSON.stringify([1, 'word', '上手', 'core', null, 'じょうず']);
     await waitForAppRecord(page, record => !!record.met?.entries?.[core], { description: 'the look-up\'s own encounter' });
     const before = await state(page);
-    assert.deepEqual(Object.keys({ ...prior.record, ...before.record }).filter(key => JSON.stringify(prior.record[key]) !== JSON.stringify(before.record[key])), ['met'],
+    // SAVE (2026-11-11): opening a word's box counts one look in the record's saveMemory (shown nowhere); a memory whose
+    // lists are as they were is that count alone, not a write of the look-up's, and is left out
+    const countsOnly = JSON.stringify(prior.record.saveMemory?.listUsed ?? {}) === JSON.stringify(before.record.saveMemory?.listUsed ?? {});
+    assert.deepEqual(Object.keys({ ...prior.record, ...before.record }).filter(key => JSON.stringify(prior.record[key]) !== JSON.stringify(before.record[key])
+      && !(key === 'saveMemory' && countsOnly)), ['met'],
       'A look-up writes the encounter ledger and no other root');
     assert.deepEqual(Object.keys(before.record.met.entries).filter(key => !Object.hasOwn(prior.record.met?.entries || {}, key)), [core],
       'It adds exactly its own identity: 上手 read じょうず, the core record');

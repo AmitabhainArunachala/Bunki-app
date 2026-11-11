@@ -120,7 +120,7 @@ export function unitFixture(suite, engine) {
       seen: { stamp: 1 },
       covered: [],
       rung: null,
-      stripSays: 'Saved ✓',
+      stripSays: 'Saved in Review ✓',
     });
     const noSeal = () => ({
       strip: false,

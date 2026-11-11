@@ -752,7 +752,11 @@ async function ui() {
     await page.waitForFunction(() => document.getElementById('publisher-context-save')?.disabled === false);
     await page.screenshot({ path: resolve(out, `publisher-selected-preview-${suffix}.png`), fullPage: true });
     await page.locator('#publisher-context-save').click();
-    await page.waitForFunction(() => /Saved with its source/u.test(document.getElementById('publisher-context-status')?.textContent || ''));
+    // SAVE (2026-11-11): the selection's Save asks for its one place, the tutor page, and keeps it only on that pick
+    await page.locator('#save-chooser-home').click();
+    // the chooser names the place; the keep is read from the record (its status line no longer says "Saved with its source")
+    await waitForAppRecord(page, (value) => (value.teacherContexts?.entries || []).some((entry) => entry.sourceKind === 'publisher-reading' && entry.quote === text),
+      { description: 'the selected original kept with its source' });
     const kept = await record(page), selected = kept.teacherContexts.entries.at(-1);
     assert.equal(selected.sourceKind, 'publisher-reading');
     assert.equal(selected.sourceId, original.receiptSha256);

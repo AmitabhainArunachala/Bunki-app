@@ -199,7 +199,8 @@ for (const engine of engines) for (const width of sizes) {
     assert.equal(source.candidate.article.body.text, TEXT);
     assert.equal(source.candidate.article.lineage.kind, 'user-supplied');
     assert.equal(source.candidate.article.capabilities['ai-transform'].status, 'unknown');
-    const start = await selectWord(page); await page.locator('#source-context-save').click();
+    // SAVE (2026-11-11): the selection's Save asks for its one place, the tutor page, and keeps it only on that pick
+    const start = await selectWord(page); await page.locator('#source-context-save').click(); await page.locator('#save-chooser-home').click();
     await waitForAppRecord(page, (record) => record.teacherContexts?.entries.length === 1);
     const neutral = await readAppRecordSnapshot(page), topic = neutral.record.teacherContexts.entries[0];
     assert.equal(neutral.record.teacherContexts.activeRef, null); noReviewChange(before, neutral);

@@ -217,7 +217,7 @@ export const MEDIA_CASES = Object.freeze({
     'J7c Back restores the exact teaching occurrence and stage, with focus and no extra learning event',
     'M9 the crane carries the saved word',
     'M10 the crane says what was saved',
-    'M11 saving reads Saved ✓ and unfolds its lists menu inside the slip, Review checked, the keyboard on the menu',
+    'M11 saving asks first: Save unfolds the chooser inside the slip and keeps nothing; the pick of Review keeps the word and Save names its place',
     'S1 the saved word is recorded once, with its source',
     'S2 saving never changes a recorded answer',
     'S3 覚える reached the real deck (the 覚 count moved)',

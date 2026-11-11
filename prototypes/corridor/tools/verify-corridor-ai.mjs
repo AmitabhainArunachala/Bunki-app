@@ -528,6 +528,8 @@ async function main() {
 
   const scheduleBeforeTake = { srs: readingRecord.srs || {}, revlog: readingRecord.revlog || [] };
   await page.click('[data-airead-take="犬"]');
+  // SAVE (2026-11-11): the suggestion's Save asks where the word goes first; Review, the study queue, is picked
+  await page.click('#vocabulary-list-popover #mini-review');
   const takenRecord = await waitForAppRecord(page, (record) => wordCaptures(record, '犬').length === 1,
     { description: 'explicit reading capture' });
   const explicitReadingTake = { dog: wordCaptures(takenRecord, '犬'), cat: wordCaptures(takenRecord, '猫'),

@@ -1735,7 +1735,7 @@ export const SPEAK_CHECK_NAMES = Object.freeze({
     'nothing is saved without his tap, during the talk or in the look back',
     'the evidence rows were written on their own, during the talk',
     'FSRS untouched: no review row, no card state',
-    'one tap on Save makes the card',
+    'Save, then the pick of Review, makes the card',
     'the look back names his planted words with their reasons',
   ],
   S9: [
@@ -1761,7 +1761,7 @@ export const SPEAK_CHECK_NAMES = Object.freeze({
     "the removal folds into the next session's prompt",
   ],
   S12: [
-    'a line is kept for 影 by the one Save ▾ alone: Saved once the store holds it, its menu open with Remove',
+    'a line is kept for 影 by the one Save ▾ alone: it asks for its place, Saved once the store holds it',
     'offline: the ensō is open, with one line',
     'offline: zero requests',
     'past conversations open',
@@ -1875,7 +1875,10 @@ export const SPEAK_MUTANT_SPEC = Object.freeze({
       S8: 'nothing is saved without his tap',
     },
     downstream: {
-      S8: ['FSRS untouched: no review row, no card state', 'one tap on Save makes the card'],
+      S8: [
+        'FSRS untouched: no review row, no card state',
+        'Save, then the pick of Review, makes the card',
+      ],
     },
   },
   'mic-on-entry': {

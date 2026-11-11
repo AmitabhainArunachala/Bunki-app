@@ -61,6 +61,8 @@ try {
       await page.locator('#mini-take').waitFor({ state: 'visible' });
       assert((await page.locator('#mini .mini-gloss').innerText()).length > 0, 'Lookup supplies a real meaning');
       await page.locator('#mini-take').click();
+      // SAVE (2026-11-11): Save asks where the word goes first; Review, the study queue, is picked
+      await page.locator('#mini #mini-review').click();
       await waitForAppRecord(page, record => record.taken.some(row => row.t === 'word' && row.id === '朝'), { description: 'the learner-saved morning word' });
       const saved = await readAppRecord(page);
       assert.equal(saved.taken.length, 1, 'Only the word explicitly saved is enrolled');

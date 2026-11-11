@@ -99,9 +99,12 @@ async function tapGeometry(page, selector, index = 0) {
   });
 }
 
-/** G5 · the focused word's Shift+F10 keeps it; its strip's Remove takes it out again and gives the keyboard back. */
+/** G5 · the focused word's Shift+F10 opens its strip; its strip's Remove takes it out again and gives the keyboard back.
+ * SAVE (2026-11-11): the strip asks where the word goes and keeps nothing until a place is picked; Review is picked here so
+ * that Remove, the one way out, has a kept word to take out. */
 async function removeKeptByStrip(page) {
   await page.keyboard.press('Shift+F10');
+  await page.locator('#seal-strip[data-mode="choose"] #seal-strip-review').click();
   await page.waitForSelector('#seal-strip [data-strip-action="remove"]:not([hidden])', { timeout: 6000 });
   await page.locator('#seal-strip [data-strip-action="remove"]').click();
   await page.waitForSelector('#seal-strip', { state: 'detached', timeout: 6000 });
@@ -441,11 +444,15 @@ async function main() {
       ).filter((node) => node.tabIndex >= 0 && !node.disabled && node.offsetParent !== null).length,
     }))()`);
     // reader lane 2026-10-02; G5 (hold = seal, 2026-10-18): the press-and-hold's non-hold doors are the strip (Shift+F10
-    // or the ContextMenu key: the word is kept and its strip opens) and the full entry (Ctrl+Enter), declared on the word
+    // or the ContextMenu key: the word's strip opens) and the full entry (Ctrl+Enter), declared on the word. SAVE
+    // (2026-11-11): the strip asks where the word goes (Review, his lists, New list…) and keeps nothing until he picks, so it
+    // opens in its choose mode, names no saved place and offers no Remove
     await page.keyboard.press('Shift+F10');
     await page.waitForSelector('#seal-strip', { timeout: 6000 }).catch(() => {});
     const menuProbe = await page.evaluate(`(() => ({
       menu: document.getElementById('seal-strip')?.getAttribute('role') ?? null,
+      mode: document.getElementById('seal-strip')?.dataset.mode ?? null,
+      review: !!document.querySelector('#seal-strip #seal-strip-review:not([hidden])'),
       items: [...document.querySelectorAll('#seal-strip [data-strip-action]')].filter((node) => !node.hidden).map((node) => node.textContent.trim()),
       status: document.getElementById('seal-strip-status')?.textContent.trim() ?? '',
       focusInMenu: !!document.activeElement?.closest('#seal-strip'),
@@ -453,13 +460,13 @@ async function main() {
     await page.keyboard.press('Escape');
     const menuBack = await page.evaluate('document.activeElement?.matches("#reader .tok.content") && !document.getElementById("seal-strip")');
     check(
-      'focused word exposes the strip (Shift+F10: the word is kept) and the full entry (Ctrl+Enter) as non-hold alternatives',
+      'focused word exposes the strip (Shift+F10: it asks where the word goes) and the full entry (Ctrl+Enter) as non-hold alternatives',
       focusProbe.tokenFocused && focusProbe.role === 'group' && !!focusProbe.name && /Shift\+F10/.test(focusProbe.help) && /Ctrl\+Enter/.test(focusProbe.help) &&
-        menuProbe.menu === 'dialog' && menuProbe.focusInMenu && menuProbe.items.includes('全項目 · Full entry') && /^Saved/u.test(menuProbe.status) &&
-        menuProbe.items.includes('Remove') && menuBack,
+        menuProbe.menu === 'dialog' && menuProbe.focusInMenu && menuProbe.items.includes('全項目 · Full entry') && menuProbe.mode === 'choose' &&
+        /^Save\b/u.test(menuProbe.status) && menuProbe.review && !menuProbe.items.includes('Remove') && menuBack,
       JSON.stringify({ ...focusProbe, ...menuProbe, menuBack }),
     );
-    // Shift+F10 kept the word (hold = seal): Remove, the one way out, leaves the record as this walk found it
+    // the strip's Review keeps the word, and Remove, the one way out, leaves the record as this walk found it
     await removeKeptByStrip(page);
     check(
       'hidden Corridor controls leave the tab order',
@@ -521,10 +528,13 @@ async function main() {
       describedProse.some((text) => /Shift\+F10/.test(text) && /Enter/.test(text)) && !!stripDialog &&
         menuItems.includes('全項目 · Full entry') && menuItems.includes('Save the sentence') &&
         // Hfix-1B (item 11): no tutor is set up here, so the strip names no tutor action
-        !menuItems.some((name) => /tutor/iu.test(name)) && menuItems.some((name) => /^Remove\b/u.test(name)),
+        // SAVE (2026-11-11): the strip asks first, so its places (Review, New list…) are its buttons and Remove is not yet one
+        !menuItems.some((name) => /tutor/iu.test(name)) && menuItems.some((name) => /^Review\b/u.test(name)) && menuItems.some((name) => /^New list…/u.test(name)) &&
+        !menuItems.some((name) => /^Remove\b/u.test(name)),
       `${menuItems.length} strip control(s): ${menuItems.join(' · ')}`,
     );
-    await page.locator('#seal-strip [data-strip-action="remove"]').click();
+    // nothing was kept: Escape puts the strip away (its Remove, which stood here, needs a kept word)
+    await page.keyboard.press('Escape');
     await page.waitForSelector('#seal-strip', { state: 'detached', timeout: 6000 }).catch(() => {});
     await focusProseOccurrence(page, word);
     await page.waitForTimeout(80);

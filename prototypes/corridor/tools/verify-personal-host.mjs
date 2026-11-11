@@ -70,19 +70,23 @@ async function sharedRecord(page) {
  assert.equal(await page.locator('#sheet .gloss').first().isVisible(),false);
  await page.locator('.personal-dictionary-meaning > summary').click();assert((await page.locator('#sheet .senses').innerText()).includes('library'));
  assert.equal((await sharedRecord(page)).taken.length,0,'dictionary lookup does not enroll a card');
- // S · the page keeps through its one Save in the bar (#sheet-take): one press keeps and opens its own menu (review, lists, Copy)
- // as a drawer under the bar; it pinned the foot's #take and a list popover that opened only on request
+ // S · the page keeps through its one Save in the bar (#sheet-take), its menu a drawer under the bar; it pinned the foot's #take
+ // and a list popover that opened only on request. SAVE (2026-11-11, ask first, save second): the press opens the chooser
+ // (Review, his lists, New list…) and keeps nothing; the pick of Review keeps the word and closes it
  await page.locator('#sheet-take').click();
+ await page.locator('#vocabulary-list-popover.is-drawer.is-chooser').waitFor();
+ assert.equal((await sharedRecord(page)).taken.length,0,'the press alone keeps nothing');
+ assert.equal(await page.locator('#take-chooser, #take-save, #take').count(),0,'the page has one Save, and its chooser is the one menu');
+ await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
  await page.locator('#sheet-take[aria-pressed="true"]').waitFor();
- assert.equal(await page.locator('#take-chooser, #take-save, #take').count(),0,'Save commits in one tap without a destination chooser, and the page has one Save');
- await page.locator('#vocabulary-list-popover.is-drawer').waitFor();
- await page.keyboard.press('Escape');
+ await page.locator('#vocabulary-list-popover').waitFor({state:'detached'});
  const savedWord=(await sharedRecord(page)).taken.find(t=>t.t==='word'&&t.id==='図書館');
  assert(savedWord,'one tap saves the canonical word to the shared learner record');
  assert(Number.isFinite(savedWord.started),'one-tap 覚える keeps the host explicit-review enrollment contract');
  assert.equal(savedWord.from,null);assert.equal(savedWord.ctx,undefined);assert.equal(savedWord.sourceContextRef,undefined);
  // S · the lists live in the one Save's menu (it pinned the foot's "Add to list…", #personal-add-list): Saved ✓ opens it,
- // and its New list… asks the name once
+ // and its New list… asks the name once (after the Save's breath, SAVE_PRESS_MS: a second press within it is the same press)
+ await page.waitForTimeout(650);
  await page.locator('#sheet-take').click();
  await page.locator('#vocabulary-list-popover.is-drawer #vocabulary-list-new').click();
  await page.locator('#vocabulary-list-name').fill('Synthetic host list');
@@ -90,17 +94,20 @@ async function sharedRecord(page) {
  assert(dictionaryPending,'the full dictionary is still loading when the list draft is entered');
  releaseDictionary();await page.locator('#sheet .dictionary-opening').waitFor({state:'detached'});
  assert.equal(await page.locator('#vocabulary-list-name').inputValue(),'Synthetic host list','a background dictionary refresh must preserve the typed list name');
+ // SAVE (2026-11-11): New list… makes the list and moves the saved word onto it in one act; the Save names the place
  await page.locator('#vocabulary-list-create').click();
- await page.locator('[data-list="Synthetic host list"]:checked').waitFor();
+ await page.waitForFunction(()=>!document.getElementById('vocabulary-list-popover')||/\S/u.test(document.querySelector('#vocabulary-list-popover .vocabulary-list-status')?.textContent||''));
+ assert.equal(await page.locator('#vocabulary-list-popover').count(),0,`the pick makes the list and closes the chooser: ${await page.locator('#vocabulary-list-popover .vocabulary-list-status').textContent().catch(()=>'')}`);
+ for(let i=0;i<120&&!((await sharedRecord(page)).lists?.['Synthetic host list']||[]).some(t=>t.id==='図書館');i++)await page.waitForTimeout(250);
  const canonical=await sharedRecord(page);
  assert(canonical.taken.some(t=>t.id==='図書館'));assert(canonical.lists['Synthetic host list'].some(t=>t.id==='図書館'));
  assert.equal(canonical.taken.filter(t=>t.t==='word'&&t.id==='図書館').length,1,'adding a list does not duplicate the saved card');
  assert.deepEqual(canonical.taken.find(t=>t.t==='word'&&t.id==='図書館'),savedWord,'list membership preserves the enrolled card');
  assert.deepEqual(canonical.srs,{});assert.deepEqual(canonical.revlog,[]);
- // S · in the Save's menu the name field folds back into its row once the list is made, and the keyboard stays in the menu
- // on the new list's box, where Escape closes it (this pressed Escape in the old popover's always-open name field)
- await page.waitForFunction(()=>document.activeElement?.matches?.('#vocabulary-list-popover input[data-list="Synthetic host list"]'));
- await page.keyboard.press('Escape');await page.locator('#vocabulary-list-popover').waitFor({state:'detached'});
+ // S · this pressed Escape in the old popover's always-open name field. SAVE (2026-11-11): the pick closes the chooser and
+ // gives the keyboard back to the Save that asked
+ await page.locator('#vocabulary-list-popover').waitFor({state:'detached'});
+ await page.waitForFunction(()=>document.activeElement?.id==='sheet-take');
  await page.locator('[data-kanjirow="図"]').click();await page.locator('#sheet[data-node="kanji:図"]').waitFor();await page.locator('#sheet-back').click();await page.locator('#sheet[data-node="word:図書館"]').waitFor();
  await page.goBack();await page.locator('#sheet').waitFor({state:'detached'});
  assert.equal(new URL(page.url()).searchParams.get('deck'),'personal');
@@ -108,20 +115,20 @@ async function sharedRecord(page) {
  assert(after.sameRoot);assert.equal(after.id,before.id);assert.equal(after.progress,before.progress);assert.equal(after.inert,false);
  await page.locator('.pc-answer-tools [data-lookup]').filter({hasText:'にあたって'}).first().click();await page.locator('#sheet[data-node^=\"grammar:\"]').waitFor();
  const grammarId=(await page.locator('#sheet').getAttribute('data-node')).slice('grammar:'.length);
+ // S · the lists live in the one Save's menu (it pinned #personal-add-list). SAVE (2026-11-11): the press opens the chooser
+ // and keeps nothing; the pick of the list keeps the point and puts it there in one act, and the Save names the place
  await page.locator('#sheet-take').click();
+ await page.locator('#vocabulary-list-popover.is-drawer').waitFor();await page.locator('#vocabulary-list-popover .save-place[data-list="Synthetic host list"]').click();
  await page.locator('#sheet-take[aria-pressed="true"]').waitFor();
- // S · the lists live in the one Save's menu (it pinned #personal-add-list): the press that kept the point opened it
- await page.locator('#vocabulary-list-popover.is-drawer').waitFor();await page.locator('[data-list="Synthetic host list"]').click();
- await page.locator('[data-list="Synthetic host list"]:checked').waitFor();
- await page.waitForFunction(()=>document.querySelector('.vocabulary-list-status')?.textContent.includes('Synthetic host list'));
+ for(let i=0;i<120&&!((await sharedRecord(page)).lists?.['Synthetic host list']||[]).some(t=>t.t==='grammar'&&t.id===grammarId);i++)await page.waitForTimeout(250);
  const grammarSaved=await sharedRecord(page);
  const grammarCard=grammarSaved.taken.find(t=>t.t==='grammar'&&t.id===grammarId);
  assert(grammarCard);assert(Number.isFinite(grammarCard.started));assert.equal(grammarCard.from,null);
  assert(grammarSaved.lists['Synthetic host list'].some(t=>t.t==='grammar'&&t.id===grammarId));
  assert.deepEqual(grammarSaved.srs,{});assert.deepEqual(grammarSaved.revlog,[]);
- // S · the keyboard is on the list's box it just ticked, in the menu; Escape closes it (the name field was never opened)
- await page.waitForFunction(()=>document.activeElement?.matches?.('#vocabulary-list-popover input[data-list="Synthetic host list"]'));
- await page.keyboard.press('Escape');await page.locator('#vocabulary-list-popover').waitFor({state:'detached'});
+ // SAVE (2026-11-11): the pick closed the chooser and the keyboard is back on the Save (the name field was never opened)
+ await page.locator('#vocabulary-list-popover').waitFor({state:'detached'});
+ await page.waitForFunction(()=>document.activeElement?.id==='sheet-take');
  await page.setViewportSize({width:1440,height:900});
  // S · the one Save toggles its own menu (it pinned #personal-add-list's popover): a press on Saved ✓ opens it, the next press
  // folds it — after the Save's breath (SAVE_PRESS_MS: a second press within it is the same press)

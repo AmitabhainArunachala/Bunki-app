@@ -54,9 +54,9 @@
  *   W1 ダマスカス saves  — (glance pass; reader lane 2026-10-02) at 1368 and 390, the word popup for
  *                         ダマスカス (Damascus, the fixture article's first word, read だますかす by the
  *                         article and ダマスカス by the dictionary: one reading in two scripts) offers a live
- *                         Save at full strength with no held reason, and one press saves it: the button
- *                         reads "Saved ✓", the record holds exactly one ダマスカス card, and no list window
- *                         opens. A genuinely different reading stays held, in plain words
+ *                         Save at full strength with no held reason, and Save then Review saves it (SAVE,
+ *                         2026-11-11: ask first, save second): the button reads "Saved in Review ✓", the
+ *                         record holds exactly one ダマスカス card, and no list window opens. A genuinely different reading stays held, in plain words
  *                         (test-word-saved-answer K1). Control: 7ef0e985 (seal disabled) and 3166ded3
  *                         (the press opened the list window and saved nothing).
  *   W2 one word, one card — (gate review on 8dea3c2e) at 1368, ダマスカス saved from the popup and then
@@ -67,8 +67,9 @@
  *   G1 stage meaning   — G3's known on-touch word reveals its reading, then opens the stage with
  *                         its meaning, Save and full-entry band. Switching words yields exactly one stage;
  *                         Escape closes it and restores focus. verify-word-grammar pins every rung.
- *   G2 hold → one card  — (John #11 "right click and choose save"; G5 hold = seal, 2026-10-18) a right-click on
- *                         郊外 seals it: exactly one 郊外 card carrying its sentence (the capture path's ctx),
+ *   G2 hold → one card  — (John #11 "right click and choose save"; G5 hold = seal, 2026-10-18; SAVE 2026-11-11: the
+ *                         strip asks first, a pick of Review seals) a right-click on 郊外 and Review keep it:
+ *                         exactly one 郊外 card carrying its sentence (the capture path's ctx),
  *                         and the strip opens beside the word (never over it) with a polite status that says
  *                         Saved and the word's acts in plain full verbs: 全項目 · Full entry · Save the
  *                         sentence · Copy · Remove (Ask the tutor about the word only with a tutor set up:
@@ -76,14 +77,15 @@
  *                         same strip and still one card. A right-click off the words keeps the browser's own
  *                         menu. Control: 3166ded3, which had no word menu; 92e5492f, whose menu saved nothing
  *                         until its Save was chosen.
- *   G3 Save + Review off — (John #17; 1.3.0 Save ▾) at 1368 and 390, the popup's Save makes one card in one
- *                         press, no list window opens, the button reads "Saved ✓" and its menu unfolds inside
- *                         the card with Review checked; Review off takes the card back out and the button
- *                         reads "Save" again.
+ *   G3 Save + Review off — (John #17; 1.3.0 Save ▾; SAVE 2026-11-11) at 1368 and 390, the popup's Save unfolds its
+ *                         chooser inside the card and keeps nothing; Review makes one card, no list window
+ *                         opens, the button reads "Saved in Review ✓" and the place line under it offers
+ *                         Remove, which takes the card back out; the button reads "Save" again.
  *                         Control: 3166ded3, whose Save opened dialog#vocabulary-list-dialog.
- *   G4 keyboard strip   — the focused word's Shift+F10 (and the ContextMenu key) seals it and opens the strip
- *                         with its first control focused (New list… on a record with no lists); ↓ moves to
- *                         全項目 · Full entry; Escape closes it and focus returns to the word.
+ *   G4 keyboard strip   — the focused word's Shift+F10 (and the ContextMenu key) opens the strip as the chooser,
+ *                         keeping nothing, with its first place focused (Review); ↓ moves to New list… (a
+ *                         record with no lists), ↓ again to 全項目 · Full entry; Escape closes it and focus
+ *                         returns to the word.
  *                         Enter on the word opens the popup with focus on Save; Escape returns to the word.
  *                         Control: 3166ded3 (no menu).
  *   G5 lists popover    — (John #17; round 4 T5, "click save and then add to list from there") the popup
@@ -1718,6 +1720,8 @@ try {
         await openArticle(page, ARTICLE);
         await tapToken(page, 1);
         await page.locator('#mini #mini-take:not([disabled])').click();
+        // SAVE (2026-11-11): Save asks where the word goes first; Review, the study queue, is picked
+        await page.locator('#mini #mini-review').click();
         page.__verifierPhase = 'save history';
         const saved = await waitForAppRecord(page, (r) => r.taken.some((item) => item.t === 'word' && item.id === '郊外'),
           { description: 'history fixture saved through the real stage' });
@@ -1777,6 +1781,10 @@ try {
         assert(!probe.disabled && !probe.held && probe.opacity >= 0.9 && probe.reason === null,
           `ダマスカス (read だますかす in the article, ダマスカス in the dictionary: one reading) cannot be saved: ${JSON.stringify(probe)}`);
         await page.locator('#mini #mini-take').click();
+        // SAVE (2026-11-11): Save asks where the word goes first and keeps nothing; Review is picked
+        await page.locator('#mini #mini-review').waitFor();
+        const asked = (await readAppRecord(page)).taken.filter((t) => t.t === 'word' && t.id === 'ダマスカス').length;
+        await page.locator('#mini #mini-review').click();
         const record = await waitForAppRecord(page, (r) => r.taken.some((t) => t.t === 'word' && t.id === 'ダマスカス'), { description: 'ダマスカス saved in one press' });
         // the durable write lands a beat before the app repaints its button: wait for the page, then read it
         await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 }).catch(() => {});
@@ -1784,7 +1792,7 @@ try {
           // Save ▾'s own menu unfolds inside the card (1.3.0): a dialog, but no window
           window: [...document.querySelectorAll('dialog[open], [role="dialog"]:not(#mini):not(#mini *)')].some((n) => n.getClientRects().length > 0) }));
         const cards = record.taken.filter((t) => t.t === 'word' && t.id === 'ダマスカス').length;
-        assert(saved.label === 'Saved ✓' && saved.pressed === 'true' && !saved.window && cards === 1, `one press did not save ダマスカス once: ${JSON.stringify({ ...saved, cards })}`);
+        assert(asked === 0 && saved.label === 'Saved in Review ✓' && saved.pressed === 'true' && !saved.window && cards === 1, `Save then Review did not save ダマスカス once: ${JSON.stringify({ ...saved, asked, cards })}`);
         return { reading: probe.reading, saved: saved.label, cards };
       });
     }
@@ -1795,6 +1803,8 @@ try {
       await climbToBox(page, page.locator('#reader .tok[data-index="0"]'));
       await page.waitForSelector('#mini #mini-take:not([disabled])');
       await page.locator('#mini #mini-take').click();
+      // SAVE (2026-11-11): Save asks where the word goes first; Review is picked
+      await page.locator('#mini #mini-review').click();
       await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
     };
     // S · the page's one Save is its bar's (#sheet-take); the foot's 覚える (#take) these pinned is gone
@@ -1823,6 +1833,8 @@ try {
       await page.locator('#mini button.mini-word').click();
       await page.waitForSelector('#sheet #sheet-take:not([disabled])');
       await page.locator('#sheet #sheet-take').click();
+      // SAVE (2026-11-11): the page's Save asks first (a drawer under the bar); Review is picked
+      await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
       await page.waitForFunction(() => document.querySelector('#sheet #sheet-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
       await page.locator(await entryCloseSelector(page)).click();
       await page.waitForFunction(() => !document.querySelector('#sheet'), null, { timeout: 5_000 });
@@ -1889,25 +1901,34 @@ try {
       const wordBox = await tok.evaluate((node) => { const r = node.getBoundingClientRect(); return { left: r.left, right: r.right, top: r.top, bottom: r.bottom }; });
       await page.mouse.click(at.x, at.y, { button: 'right' });
       await page.waitForSelector('#seal-strip');
-      const record = await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length > 0, { description: '郊外 sealed by the right-click' });
+      // SAVE (2026-11-11): ask first, save second. The right-click opens the strip as the chooser and keeps nothing; a pick
+      // of Review keeps the word (and its seal presses then)
+      await page.waitForTimeout(300);
+      const asked = { mode: await page.locator('#seal-strip').getAttribute('data-mode'), cards: cardsFor(await readAppRecord(page), '郊外').length };
+      assert.deepEqual(asked, { mode: 'choose', cards: 0 }, `the right-click kept the word before a place was picked: ${JSON.stringify(asked)}`);
+      await page.locator('#seal-strip #seal-strip-review').click();
+      const record = await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length > 0, { description: '郊外 sealed by the right-click and Review' });
+      await page.waitForSelector('#seal-strip[data-mode="placed"]');
       await page.waitForTimeout(300);
       const strip = await page.evaluate(() => {
         const node = document.getElementById('seal-strip'), box = node.getBoundingClientRect(), status = document.getElementById('seal-strip-status');
         return { role: node.getAttribute('role'), items: [...node.querySelectorAll('[data-strip-action]')].filter((item) => !item.hidden).map((item) => item.textContent.trim()),
           status: status && { text: status.textContent.trim(), role: status.getAttribute('role') }, top: box.top, bottom: box.bottom, left: box.left, right: box.right };
       });
-      // the word's one way out stands beside Saved ✓ in the first row (lead's ruling, 2026-10-18); the acts follow under the hairline
+      // the word's one way out stands in the first row (lead's ruling, 2026-10-18), after Saved in Review ✓ · Show · Move… (SAVE);
+      // the acts follow under the hairline
       // Hfix-1B (item 11): no tutor is set up here, so the strip has no "Ask the tutor about the word"
       assert.deepEqual(strip.items, ['Remove', '全項目 · Full entry', 'Save the sentence', 'Copy'], `the strip: ${JSON.stringify(strip.items)}`);
-      assert.equal(await page.locator('#seal-strip .seal-strip-lists > #seal-strip-status + [data-strip-action="remove"]').count(), 1, 'Remove does not stand beside Saved ✓');
+      assert.equal(await page.locator('#seal-strip .seal-strip-lists > #seal-strip-move + [data-strip-action="remove"]').count(), 1, 'Remove does not stand in the first row');
       const overWord = !(strip.right <= wordBox.left || strip.left >= wordBox.right || strip.bottom <= wordBox.top || strip.top >= wordBox.bottom);
       assert(strip.role === 'dialog' && !overWord, `the strip is not beside its word: ${JSON.stringify({ strip, wordBox })}`);
       const after = await readAppRecord(page);
       const cards = cardsFor(after, '郊外');
       assert.equal(cards.length, 1, `the right-click made ${cards.length} 郊外 cards`);
       assert(cards[0].ctx?.scope === 'sent' && cards[0].ctx.p === ARTICLE && cards[0].ctx.i === SUBURB, `the card lost its sentence: ${JSON.stringify(cards[0])}`);
-      // S · what the keep says, it says once and politely (Saved), and nothing about review
-      assert(strip.status && /^Saved\b/u.test(strip.status.text) && !/review/iu.test(strip.status.text) && strip.status.role === 'status', `no polite status: ${JSON.stringify(strip.status)}`);
+      // S · what the keep says, it says once and politely. SAVE (2026-11-11): it names the place the pick put it ("Saved in
+      // Review ✓"; it said only "Saved" before the place was asked for)
+      assert(strip.status && strip.status.text === 'Saved in Review ✓' && strip.status.role === 'status', `no polite status: ${JSON.stringify(strip.status)}`);
       await page.keyboard.press('Escape');
       assert.equal(await page.locator('#seal-strip').count(), 0, 'Escape left the strip open');
       await page.mouse.click(at.x, at.y, { button: 'right' });
@@ -1915,7 +1936,7 @@ try {
       await page.waitForTimeout(300);
       const again = await page.evaluate(() => ({ status: document.getElementById('seal-strip-status')?.textContent.trim(),
         remove: !document.querySelector('#seal-strip [data-strip-action="remove"]')?.hidden }));
-      assert.deepEqual(again, { status: 'Saved ✓', remove: true }, `the second right-click does not show the word kept: ${JSON.stringify(again)}`);
+      assert.deepEqual(again, { status: 'Saved in Review ✓', remove: true }, `the second right-click does not show the word kept: ${JSON.stringify(again)}`);
       assert.equal(cardsFor(await readAppRecord(page), '郊外').length, 1, 'a second right-click duplicated or removed the card');
       await page.keyboard.press('Escape');
       // the browser keeps its own menu off the words
@@ -1933,25 +1954,31 @@ try {
         await openArticle(page, ARTICLE);
         await tapToken(page, SUBURB);
         await page.locator('#mini #mini-take').click();
-        await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length === 1, { description: 'one press saves 郊外' });
-        // the durable write lands a beat before the app repaints its button and raises the toast: wait for the page
+        // SAVE (2026-11-11): ask first, save second. The press unfolds the chooser inside the card and keeps nothing; Review,
+        // picked, makes the one card and folds the chooser
+        await page.locator('#mini #vocabulary-list-popover.is-inline #mini-review').waitFor();
+        const asked = cardsFor(await readAppRecord(page), '郊外').length;
+        await page.locator('#mini #mini-review').click();
+        await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length === 1, { description: 'Save then Review saves 郊外' });
+        // the durable write lands a beat before the app repaints its button: wait for the page
         await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true'
-          && !!document.querySelector('#mini #vocabulary-list-popover.is-inline'), null, { timeout: 5_000 }).catch(() => {});
+          && !!document.querySelector('#mini #mini-place-remove'), null, { timeout: 5_000 }).catch(() => {});
         const saved = await page.evaluate(() => ({ label: document.querySelector('#mini #mini-take')?.textContent, pressed: document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed'),
           window: !!document.querySelector('#vocabulary-list-dialog, dialog[open]'),
           toast: document.querySelector('#reader-toast:not([hidden])')?.innerText.replace(/\s+/gu, ' ').trim() ?? null,
           role: document.querySelector('#reader-toast')?.getAttribute('role') }));
-        assert(saved.label === 'Saved ✓' && saved.pressed === 'true' && !saved.window, `one press did not save in place: ${JSON.stringify(saved)}`);
-        // Save ▾ (1.3.0): the press that saves unfolds the word's menu inside the card, its Review row checked —
-        // that row is the way back out (the menu's opening puts the Save toast away)
-        const menu = await page.evaluate(() => { const pop = document.querySelector('#mini #vocabulary-list-popover.is-inline'), review = pop?.querySelector('#mini-review');
-          return { inline: !!pop, review: review ? review.checked : null }; });
-        assert(menu.inline && menu.review === true, `Save ▾ did not unfold its menu with Review checked: ${JSON.stringify(menu)}`);
-        await page.locator('#mini #mini-review').uncheck();
-        const undone = await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length === 0, { description: 'Review off takes the card out' });
+        assert(asked === 0 && saved.label === 'Saved in Review ✓' && saved.pressed === 'true' && !saved.window, `Save then Review did not save in place: ${JSON.stringify({ ...saved, asked })}`);
+        // SAVE (2026-11-11): the saved word's box names its place under its Save, Show · Move… · Remove; its Remove is the way
+        // back out (it replaced Save ▾'s Review checkbox)
+        const menu = await page.evaluate(() => ({ chooser: !!document.querySelector('#mini #vocabulary-list-popover'),
+          line: [...document.querySelectorAll('#mini .save-place-line button')].map((node) => node.id) }));
+        assert(!menu.chooser && JSON.stringify(menu.line) === JSON.stringify(['mini-place-show', 'mini-place-move', 'mini-place-remove']),
+          `the saved box does not name its place with Show, Move… and Remove: ${JSON.stringify(menu)}`);
+        await page.locator('#mini #mini-place-remove').click();
+        const undone = await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length === 0, { description: 'Remove takes the card out' });
         await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'false', null, { timeout: 5_000 }).catch(() => {});
         const label2 = await page.locator('#mini #mini-take').textContent();
-        assert.equal(label2, 'Save', 'after Review off the button does not read Save');
+        assert.equal(label2, 'Save', 'after Remove the button does not read Save');
         return { saved: saved.label, toast: saved.toast, afterUndo: cardsFor(undone, '郊外').length };
       });
     }
@@ -1963,16 +1990,21 @@ try {
       await page.keyboard.press('Shift+F10');
       await page.waitForSelector('#seal-strip');
       const control = () => page.evaluate(() => document.activeElement?.closest('#seal-strip') ? document.activeElement.dataset.stripAction || document.activeElement.id : null);
+      // SAVE (2026-11-11): the strip asks first: the keyboard lands on Review, the first place; nothing is kept yet
       const first = await control();
+      const kept = cardsFor(await readAppRecord(page), '郊外').length;
       await page.keyboard.press('ArrowDown');
       const second = await control();
+      await page.keyboard.press('ArrowDown');
+      const third = await control();
       await page.keyboard.press('Escape');
       const back = await page.evaluate(() => ({ menu: !!document.getElementById('seal-strip'), focus: document.activeElement?.dataset.index }));
-      assert.deepEqual([first, second, back.menu, back.focus], ['seal-strip-new', 'entry', false, String(1)], `Shift+F10, ↓, Escape: ${JSON.stringify({ first, second, back })}`);
+      assert.deepEqual([first, kept, second, third, back.menu, back.focus], ['seal-strip-review', 0, 'seal-strip-new', 'entry', false, String(1)],
+        `Shift+F10, ↓, ↓, Escape: ${JSON.stringify({ first, kept, second, third, back })}`);
       await page.keyboard.press('ContextMenu');
       await page.waitForSelector('#seal-strip');
       const byKey = await control();
-      assert.equal(byKey, 'seal-strip-new', 'the ContextMenu key did not open the strip with the keyboard inside it');
+      assert.equal(byKey, 'seal-strip-review', 'the ContextMenu key did not open the strip with the keyboard inside it');
       await page.keyboard.press('Escape');
       await page.keyboard.press('Enter');
       const reveal = await word.evaluate((node) => node.dataset.ladderRung === 'reading');
@@ -1987,38 +2019,48 @@ try {
       await page.keyboard.press('Escape');
       const after = await page.evaluate(() => ({ mini: !!document.getElementById('mini'), focus: document.activeElement?.dataset.index }));
       assert(popup === 'mini-take' && !after.mini && after.focus === String(1), `Enter, then Escape: ${JSON.stringify({ popup, after })}`);
-      return { first, second, popupFocus: popup };
+      return { first, second, third, popupFocus: popup };
     });
 
     for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
       await run(`G5-lists-popover-${label}`, viewport, async (page) => {
         await openArticle(page, ARTICLE);
         await tapToken(page, SUBURB);
-        // one path (round 4, T5; 1.3.0 Save ▾): the popup has no list button; Save saves the word and unfolds its
-        // menu inside the card, under the button — never a window, never over another band
+        // one path (round 4, T5; 1.3.0 Save ▾): the popup has no list button; Save unfolds its menu inside the card, under
+        // the button — never a window, never over another band. SAVE (2026-11-11): the menu is the chooser, and it keeps
+        // nothing until a place is picked
         assert.equal(await page.locator('#mini #mini-lists, #mini .mini-entry').count(), 0, 'the popup carries a list or entry button');
         assert.equal(await page.locator('#vocabulary-list-popover').count(), 0, 'a menu is open before Save');
         await page.locator('#mini #mini-take').click();
-        await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
         await page.waitForSelector('#mini #vocabulary-list-popover.is-inline');
+        assert.equal(cardsFor(await readAppRecord(page), '郊外').length, 0, 'Save kept the word before a place was picked');
         const shape = await page.evaluate(() => {
           const mini = document.getElementById('mini'), pop = document.getElementById('vocabulary-list-popover'), box = pop.getBoundingClientRect(), card = mini.getBoundingClientRect(), take = document.getElementById('mini-take').getBoundingClientRect();
           const bands = [...mini.querySelectorAll('.mini-web, .mini-sentence-wrap')].map((n) => n.getBoundingClientRect()).filter((r) => r.height);
+          // SAVE (2026-11-11): the chooser is taller than the old menu; it may run past the card's foot inside the card's own
+          // scroll (the card scrolls only to bring Review, its first place, into sight: keepMenuInCard), never out of the card
+          const review = pop.querySelector('#mini-review')?.getBoundingClientRect(), scrolls = ['auto', 'scroll'].includes(getComputedStyle(mini).overflowY);
           return { modal: !!document.querySelector('dialog[open], #vocabulary-list-dialog'), inCard: pop.closest('#mini') === mini, position: getComputedStyle(pop).position,
-            inside: box.left >= card.left - 0.5 && box.right <= card.right + 0.5 && box.top >= card.top - 0.5 && box.bottom <= card.bottom + 0.5,
+            inside: box.left >= card.left - 0.5 && box.right <= card.right + 0.5 && box.top >= card.top - 0.5 && (box.bottom <= card.bottom + 0.5 || scrolls),
+            reviewInside: !!review && review.top >= card.top - 0.5 && review.bottom <= card.bottom + 0.5,
+            card: { top: Math.round(card.top), bottom: Math.round(card.bottom), scrolls }, box: { top: Math.round(box.top), bottom: Math.round(box.bottom) },
             underSave: box.top >= take.bottom - 1, aboveBands: bands.every((r) => r.top >= box.bottom - 0.5), expanded: document.getElementById('mini-take').getAttribute('aria-expanded'),
             newList: !!pop.querySelector('#vocabulary-list-new'), width: Math.round(box.width), height: Math.round(box.height), viewport: [innerWidth, innerHeight] };
         });
-        assert(!shape.modal && shape.inCard && shape.position === 'static' && shape.inside && shape.underSave && shape.aboveBands && shape.expanded === 'true' && shape.newList,
+        assert(!shape.modal && shape.inCard && shape.position === 'static' && shape.inside && shape.reviewInside && shape.underSave && shape.aboveBands && shape.expanded === 'true' && shape.newList,
           `Save ▾'s menu is not inside the card under its button: ${JSON.stringify(shape)}`);
+        // New list… names the list and saves the word there in one act (its one card made with it)
         await page.locator('#vocabulary-list-new').click();
         await page.locator('#vocabulary-list-name').fill('Syria');
         await page.locator('#vocabulary-list-create').click();
         await waitForAppRecord(page, (r) => r.lists?.Syria?.some((m) => m.t === 'word' && m.id === '郊外') && cardsFor(r, '郊外').length === 1,
           { description: 'a new list holding 郊外, and its one card' });
-        const box = page.locator('#vocabulary-list-popover input[data-list="Syria"]');
-        assert(await box.isChecked(), 'the new list is not ticked');
-        await box.uncheck();
+        // SAVE (2026-11-11): the list's checkbox is gone; Move… opens the chooser with the list ticked (aria-current), and
+        // Review takes the word off the list while the card stays
+        await page.locator('#mini #mini-place-move').click();
+        const box = page.locator('#vocabulary-list-popover .save-place[data-list="Syria"]');
+        assert.equal(await box.getAttribute('aria-current'), 'true', 'the new list is not ticked');
+        await page.locator('#vocabulary-list-popover #mini-review').click();
         const off = await waitForAppRecord(page, (r) => r.lists?.Syria && !r.lists.Syria.some((m) => m.id === '郊外'), { description: '郊外 off the list' });
         assert.equal(cardsFor(off, '郊外').length, 1, 'taking it off a list removed the card');
         await page.keyboard.press('Escape');
@@ -2060,7 +2102,8 @@ try {
         const mini = document.getElementById('mini'), take = mini?.querySelector('#mini-take'), menu = mini?.querySelector('#vocabulary-list-popover.is-inline');
         const shown = (node) => !!node && node.getClientRects().length > 0 && getComputedStyle(node).visibility !== 'hidden';
         return { view: document.body.dataset.view, word: mini?.querySelector('.mini-word')?.textContent ?? null, save: take?.textContent ?? null,
-          pressed: take?.getAttribute('aria-pressed') ?? null, held: take?.disabled ?? null, hasMenu: !!take?.dataset.saveMenu, list: shown(menu), note: shown(mini?.querySelector('.mini-take-note')) };
+          pressed: take?.getAttribute('aria-pressed') ?? null, held: take?.disabled ?? null, hasMenu: !!take?.dataset.saveMenu, list: shown(menu), note: shown(mini?.querySelector('.mini-take-note')),
+          remove: shown(mini?.querySelector('#mini-place-remove')) };
       });
       // a word of an example sentence whose Save is live and not yet pressed
       let before = null;
@@ -2099,20 +2142,24 @@ try {
       assert(band.band.left >= band.card.left - 1 && band.band.right <= band.card.right + 1 && band.band.top >= band.card.top - 1 && band.band.bottom <= band.card.bottom + 1
         && band.band.left >= 0 && band.band.right <= band.screen.width && band.band.top >= 0 && band.band.bottom <= band.screen.height,
         `the galaxy popup's band leaves its card or the screen: ${JSON.stringify(band)}`);
+      // SAVE (2026-11-11): Save unfolds the chooser and keeps nothing; Review, picked, saves it and folds the chooser
       await page.locator('#mini #mini-take').click();
+      const asking = await path();
+      assert(asking.list && asking.pressed === 'false' && cardsFor(await readAppRecord(page), before.word).length === 0,
+        `Save in the galaxy popup did not ask first: ${JSON.stringify(asking)}`);
+      await page.locator('#mini #mini-review').click();
       await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
       await waitForAppRecord(page, (r) => cardsFor(r, before.word).length === 1, { description: 'the galaxy popup saved one card' });
       const saved = await path();
-      assert(saved.save === 'Saved ✓' && saved.list && !saved.note, `after Save the galaxy popup does not unfold its menu: ${JSON.stringify(saved)}`);
-      // the menu's Review row is the way back out; Escape folds the menu away and the card is as before
-      await page.locator('#mini #mini-review').uncheck();
-      await waitForAppRecord(page, (r) => cardsFor(r, before.word).length === 0, { description: 'Review off takes the card out' });
+      assert(saved.save === 'Saved in Review ✓' && !saved.list && saved.remove && !saved.note, `after the pick the galaxy popup does not name its place: ${JSON.stringify(saved)}`);
+      // the place line's Remove is the way back out (it replaced the menu's Review row); the card is as before
+      await page.locator('#mini #mini-place-remove').click();
+      await waitForAppRecord(page, (r) => cardsFor(r, before.word).length === 0, { description: 'Remove takes the card out' });
       await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'false', null, { timeout: 5_000 });
-      await page.keyboard.press('Escape');
       await page.waitForFunction(() => !document.getElementById('vocabulary-list-popover'), null, { timeout: 5_000 });
       const undone = await path();
-      assert(undone.save === 'Save' && !undone.list && !undone.note, `after Review off the galaxy popup still shows its menu, or a caption beside Save: ${JSON.stringify(undone)}`);
-      return { taps, entry: entry.node, word: before.word, before, saved, undone, band: { rows: band.rows.map((row) => `${row.part}@${Math.round(row.top)}`), entry: [Math.round(band.entry.width), Math.round(band.entry.height)] } };
+      assert(undone.save === 'Save' && !undone.list && !undone.note, `after Remove the galaxy popup still shows its menu, or a caption beside Save: ${JSON.stringify(undone)}`);
+      return { taps, entry: entry.node, word: before.word, before, asking, saved, undone, band: { rows: band.rows.map((row) => `${row.part}@${Math.round(row.top)}`), entry: [Math.round(band.entry.width), Math.round(band.entry.height)] } };
     });
 
     await run('G6-sentence-row', DESK, async (page) => {
@@ -2140,6 +2187,8 @@ try {
       // the sentence's own Save keeps it on the tutor page, in the reader, without making it the active sentence
       const unkept = await readAppRecord(page);
       await page.locator('#mini #reader-context-save').click();
+      // SAVE (2026-11-11): the sentence's Save asks for its one place, the tutor page, and keeps it only on that pick
+      await page.locator('#save-chooser-home').click();
       const kept = await waitForAppRecord(page, (r) => (r.teacherContexts?.entries || []).some((entry) => entry.sourceId === ARTICLE && entry.quote?.startsWith('ダマスカス郊外')),
         { description: 'the sentence kept on the tutor page' });
       assert.equal(kept.teacherContexts.activeRef ?? null, unkept.teacherContexts?.activeRef ?? null, 'Save the sentence made it the active sentence');
@@ -2270,6 +2319,8 @@ try {
         assert.equal(await page.locator('#mini #mini-take').isVisible(), false, 'The sentence view still offers the word Save');
         const before = await readAppRecord(page);
         await page.locator('#mini #reader-context-save').click();
+        // SAVE (2026-11-11): the sentence's Save asks for its one place, the tutor page, and keeps it only on that pick
+        await page.locator('#save-chooser-home').click();
         const kept = await waitForAppRecord(page, (r) => (r.teacherContexts?.entries || []).some((entry) => entry.sourceId === ARTICLE && entry.quote?.startsWith('ダマスカス郊外')));
         assert.equal(kept.teacherContexts.entries.filter((entry) => entry.sourceId === ARTICLE && entry.quote?.startsWith('ダマスカス郊外')).length, 1, 'Save the sentence keeps exactly one tutor entry');
         assert.equal(kept.teacherContexts.activeRef ?? null, before.teacherContexts?.activeRef ?? null, 'Save the sentence must not activate it');
@@ -2436,8 +2487,7 @@ try {
         // the popup's own path, by its public controls: Save, its toast, then Add to a list and the sheet's Add
         await page.locator('#mini #mini-sentence-back').click();
         await page.locator('#mini #mini-take').click();
-        await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
-        // Save ▾ (1.3.0): the save unfolds the menu inside the card (its opening puts the Save toast away)
+        // SAVE (2026-11-11): Save unfolds its chooser inside the card (it keeps nothing until a place is picked)
         await page.waitForSelector('#mini #vocabulary-list-popover.is-inline #vocabulary-list-new');
         const saved = await page.evaluate(measureReaderMotion);
         assert(saved.animations > word.animations - 1, `motion check did not observe the saved popup and its menu: ${JSON.stringify(saved.covered)}`);

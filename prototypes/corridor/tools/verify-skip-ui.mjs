@@ -198,6 +198,8 @@ try {
   await query('4-6-4');
   await page.locator('[data-skip-hit="㐆"]').click();
   await page.locator('#sheet-take').click();
+  // SAVE (2026-11-11): Save asks where the kanji goes first (a drawer under the bar); Review, the study queue, is picked
+  await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
   const captured = await waitForAppRecord(page, record => !!record.taken.find(item => item.t === 'kanji' && item.id === '㐆')?.kanjiRecord);
   const kept = captured.taken.find(item => item.t === 'kanji' && item.id === '㐆').kanjiRecord;
   const source = data.entries.find(entry => entry.literal === '㐆');
@@ -259,10 +261,11 @@ try {
   const afterInvalid = await readAppRecord(page);
   check('wrong-literal imported snapshot leaves the accepted record unchanged', JSON.stringify(afterInvalid) === JSON.stringify(beforeInvalid));
   await page.locator('.tray-line').filter({ hasText: '㐆' }).click();
-  // S · on Saved ✓ the page's one Save opens its menu (a drawer under the bar), whose Review row takes the card out — this
-  // pinned a second press on the page's seal as the removal
+  // S · on Saved ✓ the page's one Save opens its menu (a drawer under the bar) — this pinned a second press on the page's
+  // seal as the removal. SAVE (2026-11-11): the menu is the chooser in move mode, and its Remove takes the card out (its
+  // Review checkbox is gone)
   await page.locator('#sheet-take').click();
-  await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
+  await page.locator('#vocabulary-list-popover.is-drawer #save-chooser-remove').click();
   await waitForAppRecord(page, record => !record.taken.some(item => item.id === '㐆'));
   await page.locator(await entryCloseSelector(page)).click();
   await Promise.all([page.waitForEvent('load'), selectBackupFile(page, backupPath)]);

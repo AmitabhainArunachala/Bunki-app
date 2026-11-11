@@ -444,7 +444,17 @@ async function journey(browser, browserName, viewport) {
     const trayBefore = await page.locator('#tray').innerText();
     const answersBeforeSave = JSON.stringify((await stored(page)).answers);
     await page.locator('#mini[data-from="guided"] #mini-take').waitFor({ timeout: 5_000 });
+    const keptBeforeSave = (await stored(page)).savedWords.length;
     await page.locator('#mini #mini-take').click();
+    // SAVE (2026-11-11): ask first, save second: the press unfolds the chooser inside the slip and keeps nothing; the pick
+    // of Review, the study queue, is the session's save
+    await page.locator('#mini #vocabulary-list-popover.is-inline.is-chooser').waitFor({ timeout: 5_000 });
+    const asked = {
+      pressed: await page.locator('#mini-take').getAttribute('aria-pressed'),
+      chooser: await page.locator('#vocabulary-list-popover').getAttribute('data-chooser'),
+      kept: (await stored(page)).savedWords.length,
+    };
+    await page.locator('#mini #mini-review').click();
     if (MOMENTS) {
       await page.locator('.bunki-moment').waitFor({ timeout: 5_000 });
       check(
@@ -466,16 +476,15 @@ async function journey(browser, browserName, viewport) {
       await shot(page, dir, '08-saved');
     }
     await page.waitForFunction(() => document.getElementById('mini-take')?.getAttribute('aria-pressed') === 'true');
-    // the one Save ▾ menu, as everywhere (John, 2026-10-15 17:20): Saved ✓ stays live and its menu unfolds inside the
-    // slip, its first row Review checked by the session's own save; the keyboard lands on that row
-    await page.locator('#mini #vocabulary-list-popover.is-inline').waitFor({ timeout: 5_000 });
+    // the one Save ▾ menu, as everywhere (John, 2026-10-15 17:20): Saved ✓ stays live. SAVE (2026-11-11): the menu is the
+    // chooser, asked before anything is kept; the pick closes it and the Save names the place
+    await page.locator('#vocabulary-list-popover').waitFor({ state: 'detached', timeout: 5_000 });
     check(
-      'M11 saving reads Saved ✓ and unfolds its lists menu inside the slip, Review checked, the keyboard on the menu',
-      /^(保存済み ✓|Saved ✓)$/u.test(await page.locator('#mini-take').innerText()) && !(await page.locator('#mini-take').isDisabled()) &&
-        (await page.locator('#mini-take').getAttribute('aria-expanded')) === 'true' &&
-        (await page.locator('#mini #mini-review').isChecked()) &&
-        (await page.evaluate(() => !!document.activeElement?.closest('#vocabulary-list-popover'))),
-      await activeAction(page),
+      'M11 saving asks first: Save unfolds the chooser inside the slip and keeps nothing; the pick of Review keeps the word and Save names its place',
+      asked.pressed === 'false' && asked.chooser === 'save' && asked.kept === keptBeforeSave &&
+        /^(復習に保存済み ✓|Saved in Review ✓)$/u.test(await page.locator('#mini-take').innerText()) && !(await page.locator('#mini-take').isDisabled()) &&
+        (await page.locator('#mini-take').getAttribute('aria-expanded')) === 'false',
+      `${JSON.stringify(asked)} ${await activeAction(page)}`,
     );
     const afterSave = await stored(page);
     check(
@@ -500,7 +509,12 @@ async function journey(browser, browserName, viewport) {
       (await dueKeys(page)).includes('word:専門家'),
     );
     if (MOMENTS) await page.locator('.bunki-moment').waitFor({ state: 'detached', timeout: 5_000 });
-    // Escape steps out one layer at a time: the menu first, back to Save; then the slip
+    // Escape steps out one layer at a time: the menu first, back to Save; then the slip. SAVE (2026-11-11): the pick closed
+    // the chooser, so a press on the saved word's Save opens it again (to move the word) before Escape folds it
+    // (a press within a breath, SAVE_PRESS_MS, of the last press on the same Save is the same press: it waits that out)
+    await page.waitForTimeout(650);
+    await page.locator('#mini #mini-take').click();
+    await page.locator('#mini #vocabulary-list-popover.is-chooser[data-chooser="move"]').waitFor({ timeout: 5_000 });
     await page.keyboard.press('Escape');
     await page.locator('#vocabulary-list-popover').waitFor({ state: 'detached', timeout: 5_000 });
     check('M11b Escape on the menu folds it and gives the keyboard back to Save', await page.evaluate(() => document.activeElement?.id === 'mini-take'), await activeAction(page));
@@ -553,6 +567,8 @@ async function journey(browser, browserName, viewport) {
       JSON.stringify({ coveredNext, sheet: covered.sheet }),
     );
     await page.locator('#sheet #sheet-take').click();
+    // SAVE (2026-11-11): Save asks where the word goes first (a drawer under the bar); Review, the study queue, is picked
+    await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
     await page.waitForFunction(
       () => document.querySelector('#sheet #sheet-take')?.getAttribute('aria-pressed') === 'true',
     );
@@ -566,7 +582,8 @@ async function journey(browser, browserName, viewport) {
     check(
       'S0b the word’s slip reads that card as already saved: Saved ✓, live, its lists menu one press away',
       !(await page.locator('#mini #mini-take').isDisabled()) &&
-        /^(保存済み ✓|Saved ✓)$/u.test(await page.locator('#mini #mini-take').innerText()) &&
+        // SAVE (2026-11-11): a saved word's Save names its place
+        /^(復習に保存済み ✓|Saved in Review ✓)$/u.test(await page.locator('#mini #mini-take').innerText()) &&
         (await page.locator('#mini #mini-take').getAttribute('data-save-menu')) === 'true' &&
         (await page.locator('#mini #mini-take').getAttribute('aria-expanded')) === 'false',
     );
@@ -1107,6 +1124,8 @@ async function switches(browser, browserName) {
     await teachingStage(reduced, reduced.locator('.guided-room .gs-word').first());
     await reduced.locator('#mini[data-from="guided"] #mini-take').waitFor({ timeout: 5_000 });
     await reduced.locator('#mini #mini-take').click();
+    // SAVE (2026-11-11): the crane flies on the pick, not the press
+    await reduced.locator('#mini #mini-review').click();
     await reduced.locator('.bunki-moment').waitFor();
     check(
       'M37 under reduced motion the crane stays still: only the line',

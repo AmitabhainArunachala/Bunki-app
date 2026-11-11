@@ -925,7 +925,9 @@ try {
         await page.evaluate(() => document.querySelector('dialog.br-sheet[open]')?.close());
         if (MODE === 'verify') {
           // K · one behaviour on every kind of place a Save stands: a card (the reader's, the sky's), a row (the page's
-          // sentence), a bar (the page's, the reader's) — one press keeps and opens its menu, which covers nothing in reach
+          // sentence), a bar (the page's, the reader's) — one press opens its menu, which covers nothing in reach. SAVE
+          // (2026-11-11, ask first, save second): the menu is the chooser and the press keeps nothing; the item is then kept
+          // by its first place (Review, or a sentence's tutor page), as the press used to keep it, for the rooms after
           const menu = async (id, scope, prepare, save) => {
             const label = `${engine} ${lang} · K ${id}`;
             try {
@@ -935,6 +937,7 @@ try {
                 // the negative control: the page no longer steps down for a bar's drawer — the drawer lies over the page
                 await page.addStyleTag({ content: "html[data-save-drawer] :is(#app > .chrome, #sheet > .sheet-bar) { margin-bottom: 0 !important; }" });
               }
+              const was = await page.evaluate((sel) => document.querySelector(sel)?.getAttribute('aria-pressed') ?? null, save);
               await tap(save);
               await page.waitForSelector('#vocabulary-list-popover', { timeout: 6000 });
               await settle(500);
@@ -943,12 +946,15 @@ try {
                 return b ? { pressed: b.getAttribute('aria-pressed'), expanded: b.getAttribute('aria-expanded'), text: b.textContent.replace(/\s+/gu, ' ').trim() } : null;
               }, save);
               const cover = await page.evaluate(coveredBy, { before, scope });
-              check(`${label} · one press keeps it and opens its menu`, state?.pressed === 'true' && state.expanded === 'true' && cover.open,
-                JSON.stringify({ state, place: cover.place }), `S29/${label}`);
+              check(`${label} · one press opens its chooser and keeps nothing`, state?.pressed === was && state.expanded === 'true' && cover.open,
+                JSON.stringify({ was, state, place: cover.place }), `S29/${label}`);
               check(`${label} · its menu covers no control that was in reach`, cover.open && cover.checked > 0 && cover.covered.length === 0,
                 JSON.stringify(cover), `S30/${label}`);
+              await tap('#vocabulary-list-popover :is(#mini-review, #save-chooser-home)');
+              await page.waitForSelector('#vocabulary-list-popover', { state: 'detached', timeout: 6000 }).catch(() => {});
+              await settle(400);
             } catch (error) {
-              check(`${label} · one press keeps it and opens its menu`, false, error.message, `S29/${label}`);
+              check(`${label} · one press opens its chooser and keeps nothing`, false, error.message, `S29/${label}`);
             }
             await page.keyboard.press('Escape');
             await settle(250);

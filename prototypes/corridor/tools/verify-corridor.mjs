@@ -1504,21 +1504,33 @@ async function main() {
   // press and hold → the seal and its strip (John #11: "right click and choose save"; G5 hold = seal): the word is kept,
   // the strip opens beside it with the word's acts; a tap anywhere else puts it away
   const keptBefore = await page.evaluate(`Number(document.getElementById('tray')?.dataset.count ?? NaN)`);
+  const takenBeforeHold = (await readAppRecord(page)).taken.length;
   await touchAt(page, '#reader .tok.content', 6, 700);
   await page.waitForSelector('#seal-strip', { timeout: 6000 }).catch(() => {});
   await page.waitForTimeout(200);
+  // SAVE (2026-11-11): ask first, save second. The hold opens the strip as the chooser and keeps nothing; a pick of Review
+  // keeps the word, and only then does its seal press. The strip then names the place, with Show, Move… and Remove
+  const asked = await page.evaluate(`(() => ({ mode: document.querySelector('#seal-strip')?.dataset.mode ?? null,
+    review: !!document.querySelector('#seal-strip #seal-strip-review') }))()`);
+  const takenWhileAsking = (await readAppRecord(page)).taken.length;
+  if (asked.review) await page.locator('#seal-strip #seal-strip-review').click();
+  await page.waitForSelector('#seal-strip[data-mode="placed"]', { timeout: 6000 }).catch(() => {});
+  await page.waitForTimeout(200);
+  const takenAfterPick = (await readAppRecord(page)).taken.length;
   const menu = await page.evaluate(`(() => {
     const m = document.querySelector('#seal-strip');
     return m ? { role: m.getAttribute('role'), status: document.getElementById('seal-strip-status')?.textContent.trim() ?? '',
       items: [...m.querySelectorAll('[data-strip-action]')].filter((n) => !n.hidden).map((n) => n.dataset.stripAction),
-      // Remove stands beside Saved ✓ in the first row (lead's ruling, 2026-10-18)
-      removeBesideSaved: !!m.querySelector('.seal-strip-lists > #seal-strip-status + [data-strip-action="remove"]'),
+      // Remove stands in the first row (lead's ruling, 2026-10-18), after Saved in Review ✓ · Show · Move… (SAVE)
+      removeBesideSaved: !!m.querySelector('.seal-strip-lists > #seal-strip-move + [data-strip-action="remove"]'),
       kept: Number(document.getElementById('tray')?.dataset.count ?? NaN) } : null;
   })()`);
   check('grammar · a press and hold seals the word and opens its strip', !!menu && menu.role === 'dialog' && /^Saved/u.test(menu.status) &&
+    asked.mode === 'choose' && asked.review && takenWhileAsking === takenBeforeHold && takenAfterPick === takenBeforeHold + 1 &&
     // Hfix-1B (item 11): no tutor is set up on this device, so the strip carries no "Ask the tutor" (verify-hfix-rooms holds
     // the strip with a tutor set up, where it returns)
-    menu.kept === keptBefore + 1 && menu.items.join(',') === 'remove,entry,sentence,copy' && menu.removeBesideSaved, JSON.stringify({ keptBefore, ...menu }));
+    menu.kept === keptBefore + 1 && menu.items.join(',') === 'remove,entry,sentence,copy' && menu.removeBesideSaved,
+    JSON.stringify({ keptBefore, asked, takenBeforeHold, takenWhileAsking, takenAfterPick, ...menu }));
   // "anywhere else": a point on the page's own margin, beside the text, that carries no control
   const elsewhere = await page.evaluate(`(() => {
     for (const x of [innerWidth - 3, 3]) for (const y of [0.35, 0.5, 0.65].map((f) => Math.round(innerHeight * f))) {
@@ -1800,19 +1812,26 @@ async function main() {
   console.log('\n— step 5 · 覚える (S: the page\'s one Save)');
   // S · the page keeps through its one Save in the bar (#sheet-take); the foot's 覚える (#take) and its "saved to" drawer
   // (.list-picker .fold-sub), which this pinned, are gone: the Save's own menu says where the word went
+  // SAVE (2026-11-11): the Save asks where the word goes first (its chooser, a drawer under the bar); Review is picked
   await tap(page, '#sheet-take');
-  await page.waitForSelector('#vocabulary-list-popover.is-drawer', { timeout: 5000 }).catch(() => {});
+  await page.waitForSelector('#vocabulary-list-popover.is-drawer #mini-review', { timeout: 5000 }).catch(() => {});
+  await tap(page, '#vocabulary-list-popover.is-drawer #mini-review');
+  await page.waitForSelector('#vocabulary-list-popover', { state: 'detached', timeout: 5000 }).catch(() => {});
   const taken = await page.locator('#tray').textContent();
   check('any node can be taken into study', /^Today\s+[1-9][0-9]*$/u.test(taken.trim()), `chrome reads "${taken.trim()}"`);
+  // once saved, a press opens the same chooser to move it: Review carries the tick (aria-current), the lists follow
+  await tap(page, '#sheet-take');
+  await page.waitForSelector('#vocabulary-list-popover.is-drawer', { timeout: 5000 }).catch(() => {});
   const bucket = await page.evaluate(`(() => {
     const pop = document.querySelector('#vocabulary-list-popover.is-drawer');
     const review = pop?.querySelector('#mini-review');
     const save = document.querySelector('#sheet-take');
-    return pop ? { review: review ? review.checked : null, row: review?.closest('label')?.textContent.trim() ?? null,
-      pressed: save?.getAttribute('aria-pressed'), one: !!save?.matches('button.save-one[data-save-one]'), under: Math.round(pop.getBoundingClientRect().top) } : null;
+    return pop ? { review: review ? review.getAttribute('aria-current') === 'true' : null, row: review?.querySelector('.save-place-name')?.textContent.trim() ?? null,
+      lists: !!pop.querySelector('#vocabulary-list-new'), pressed: save?.getAttribute('aria-pressed'), one: !!save?.matches('button.save-one[data-save-one]'),
+      under: Math.round(pop.getBoundingClientRect().top) } : null;
   })()`);
   check('after saving, the page\'s one Save opens its menu under the bar: the word is in review (Review ticked), its lists one tap away',
-    !!bucket && bucket.review === true && /^(復習|Review)$/u.test(bucket.row) && bucket.pressed === 'true' && bucket.one, JSON.stringify(bucket));
+    !!bucket && bucket.review === true && /^(復習|Review)$/u.test(bucket.row) && bucket.lists && bucket.pressed === 'true' && bucket.one, JSON.stringify(bucket));
   await page.keyboard.press('Escape');
   await page.waitForTimeout(160);
   // the schedule preview lives one named fold deep since 2026-08-27 —
@@ -2603,6 +2622,9 @@ async function main() {
   await page.waitForFunction(() => document.querySelector('#sheet')?.dataset.node === 'word:上手', null, { timeout: 10000 });
   await page.waitForSelector('#sheet-take');
   await tap(page, '#sheet-take');
+  // SAVE (2026-11-11): the Save asks first; Review is picked
+  await page.waitForSelector('#vocabulary-list-popover.is-drawer #mini-review');
+  await tap(page, '#vocabulary-list-popover.is-drawer #mini-review');
   const d23Core = await waitForAppRecord(page, (record) => d23Cards(record).length === 1, { description: 'the core 上手 card' });
   const [d23CoreCard] = d23Cards(d23Core);
   check('D23 · 覚 on the core row saves a core card: no entry number, no cue, no 上手 snapshot',
@@ -2613,10 +2635,10 @@ async function main() {
   check('D23 · the reader’s 上手 door is taken: the mini seal is inked and live, nothing held',
     d23Taken.word === '上手' && d23Taken.taken && d23Taken.pressed === 'true' && !d23Taken.disabled && d23Taken.reason === null && !d23Taken.open,
     JSON.stringify(d23Taken));
-  // the core card leaves through its own door: Saved ✓ ▾ opens the word's menu, whose Review row takes it out
-  await tap(page, '#mini-take');
-  await page.waitForSelector('#mini #vocabulary-list-popover.is-inline #mini-review');
-  await tap(page, '#mini-review');
+  // the core card leaves through its own door. SAVE (2026-11-11): a saved word's box names its place under its Save, with
+  // Show · Move… · Remove; Remove takes it out (Save ▾'s Review row is gone)
+  await page.waitForSelector('#mini #mini-place-remove');
+  await tap(page, '#mini-place-remove');
   await waitForAppRecord(page, (record) => d23Cards(record).length === 0, { description: 'the core 上手 card removed' });
 
   // (3) 1353320 through the core sheet's own live door → 覚 → an explicit card
@@ -2631,6 +2653,9 @@ async function main() {
   check('D23 · the core sheet’s 1353320 door opens that entry and its exact reading',
     d23Explicit.reading === 'じょうず' && JSON.stringify(d23Explicit.active) === JSON.stringify([['1353320', 'じょうず']]), JSON.stringify(d23Explicit));
   await tap(page, '#sheet-take');
+  // SAVE (2026-11-11): the Save asks first; Review is picked
+  await page.waitForSelector('#vocabulary-list-popover.is-drawer #mini-review');
+  await tap(page, '#vocabulary-list-popover.is-drawer #mini-review');
   const d23Seq = await waitForAppRecord(page, (record) => d23Cards(record).length === 1, { description: 'the 1353320 card' });
   const [d23SeqCard] = d23Cards(d23Seq);
   check('D23 · the capture through that door stays explicit: 1353320, cue じょうず, its own selection',
@@ -2711,15 +2736,12 @@ async function main() {
       d23Opened.take?.taken === true && d23Opened.take.pressed === 'true' && d23Opened.take.disabled === false,
     JSON.stringify({ opened: d23Opened, ...(d23ActionError ? { actionError: d23ActionError } : {}) }));
   // through that route the card leaves by its own door, and the record is as it began. S · the page's one Save behaves as
-  // every Save: on Saved ✓ a press opens its menu (a drawer under the bar), whose Review row takes the card out — this
-  // pinned a second press on the page's seal as the removal
+  // every Save: on Saved ✓ a press opens its menu (a drawer under the bar) — this pinned a second press on the page's seal
+  // as the removal. SAVE (2026-11-11): the menu is the chooser in move mode, whose Remove takes the card out and closes it
   await tap(page, '#sheet-take');
-  await page.waitForSelector('#vocabulary-list-popover.is-drawer #mini-review');
-  await tap(page, '#vocabulary-list-popover.is-drawer #mini-review');
+  await page.waitForSelector('#vocabulary-list-popover.is-drawer #save-chooser-remove');
+  await tap(page, '#vocabulary-list-popover.is-drawer #save-chooser-remove');
   await waitForAppRecord(page, (record) => d23Cards(record).length === 0, { description: 'the 1353320 card removed through its own door' });
-  // the page drawn again under the open menu keeps the keyboard in the menu, on its Review row: Escape there closes it
-  await page.waitForFunction(() => document.activeElement?.id === 'mini-review' && !!document.activeElement.closest('#vocabulary-list-popover.is-drawer'));
-  await page.keyboard.press('Escape');
   await page.waitForSelector('#vocabulary-list-popover', { state: 'detached' });
   check('D23 · through the opened route the 1353320 card is removed by its own door', true, 'no 上手 card remains');
   await shoot(page, shotsDir, '12b-d23-core-row');
@@ -3111,6 +3133,9 @@ async function main() {
     .waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 8000 })
     .catch(() => {});
   await tap(page, '#sheet #sheet-take');
+  // SAVE (2026-11-11): the Save asks first; Review is picked (the pick closes the chooser)
+  await page.waitForSelector('#vocabulary-list-popover.is-drawer #mini-review', { timeout: 8000 });
+  await tap(page, '#vocabulary-list-popover.is-drawer #mini-review');
   await page.waitForSelector('[data-ctx-scope]', { timeout: 8000 });
   if (await page.locator('#vocabulary-list-popover').count()) { await page.keyboard.press('Escape'); await page.waitForTimeout(200); }
   await tap(page, '[data-ctx-scope="sent"]');
@@ -3207,6 +3232,11 @@ async function main() {
   // The full entry is also one choice in the strip; Back answers immediately.
   await touchAt(page, '#reader .tok.content', 4, 700); // past GESTURE.MENU_MS
   await page.waitForSelector('#seal-strip', { timeout: 6000 });
+  // SAVE (2026-11-11): the hold asks first; Review is picked, and the strip then names the place with Remove beside it
+  if (await page.locator('#seal-strip[data-mode="choose"] #seal-strip-review').count()) {
+    await page.locator('#seal-strip #seal-strip-review').click();
+    await page.waitForSelector('#seal-strip[data-mode="placed"]', { timeout: 6000 });
+  }
   const menuUp = await page.evaluate(`[...document.querySelectorAll('#seal-strip [data-strip-action]')].filter((n) => !n.hidden).map((n) => n.dataset.stripAction)`);
   check('a press and hold opens the strip, the full entry in it and the word kept (Remove offered)', menuUp.includes('entry') && menuUp.includes('remove'),
     `strip: ${menuUp.join(' · ')}`);
@@ -3317,15 +3347,12 @@ async function main() {
   })()`);
   check('R2-B · the sheet seal wears taken-state where 覚える was taken',
     sealBefore.taken && sealBefore.pressed === 'true', JSON.stringify(sealBefore));
-  // S · on Saved ✓ the page's one Save opens its menu (a drawer under the bar); its Review row is the way back out — this
-  // pinned a second press on the seal as the un-memorize
+  // S · on Saved ✓ the page's one Save opens its menu (a drawer under the bar) — this pinned a second press on the seal as
+  // the un-memorize. SAVE (2026-11-11): the menu is the chooser in move mode; its Remove is the way back out and closes it
   await tap(page, '#sheet-take');
-  await page.waitForSelector('#vocabulary-list-popover.is-drawer #mini-review');
-  await tap(page, '#vocabulary-list-popover.is-drawer #mini-review');
-  await waitForAppRecord(page, (record) => !(record.taken || []).length, { description: 'the 学校 card un-memorized through the Review row' });
-  // the page drawn again under the open menu keeps the keyboard in the menu, on its Review row: Escape there closes it
-  await page.waitForFunction(() => document.activeElement?.id === 'mini-review' && !!document.activeElement.closest('#vocabulary-list-popover.is-drawer'));
-  await page.keyboard.press('Escape');
+  await page.waitForSelector('#vocabulary-list-popover.is-drawer #save-chooser-remove');
+  await tap(page, '#vocabulary-list-popover.is-drawer #save-chooser-remove');
+  await waitForAppRecord(page, (record) => !(record.taken || []).length, { description: 'the 学校 card un-memorized through Remove' });
   await page.waitForSelector('#vocabulary-list-popover', { state: 'detached' });
   await page.waitForTimeout(300);
   await waitForAppRecord(page, (r) => (r.taken || []).length === 0, { timeout: 8000 }).catch(() => {});
@@ -3352,6 +3379,9 @@ async function main() {
   await tap(page, '[data-result^="word:学校"]');
   await page.waitForSelector('#sheet #sheet-take');
   await tap(page, '#sheet-take');
+  // SAVE (2026-11-11): the Save asks first; Review is picked
+  await page.waitForSelector('#vocabulary-list-popover.is-drawer #mini-review', { timeout: 8000 }).catch(() => {});
+  await tap(page, '#vocabulary-list-popover.is-drawer #mini-review');
   await page.waitForTimeout(300);
   await waitForAppRecord(page, (r) => (r.taken || []).length === 1, { timeout: 8000 }).catch(() => {});
   const reTaken = await evaluateAppRecord(page, `(() => {
@@ -3460,10 +3490,22 @@ async function main() {
     return { taken: (e.taken || []).length, revlog: (e.revlog || []).length };
   })()`);
   // reader lane 2026-10-02 (John #17), round 4 (T5, "click save and then add to list from there"), 1.3.0 Save ▾:
-  // Save is one tap; the slip has no list button, and Save ▾ unfolds its menu inside the card only once the word is
-  // saved; the menu enrolls nothing more.
+  // the slip has no list button; its Save unfolds the chooser inside the card. (SAVE, 2026-11-11, replaced "Save is one
+  // tap, and Save ▾ unfolds its menu only once the word is saved")
   const listsBeforeSave = await page.evaluate(`!!document.querySelector('#mini #mini-lists, #mini .mini-entry, #vocabulary-list-popover')`);
+  // SAVE (2026-11-11): ask first, save second. The press unfolds the chooser inside the card and keeps nothing; the pick of
+  // Review keeps the word (and closes the chooser)
   await tap(page, '#mini-take');
+  await page.waitForSelector('#mini #vocabulary-list-popover.is-inline #mini-review');
+  const popoverBits = await page.evaluate(`(() => ({
+    modal: !!document.querySelector('dialog[open], #vocabulary-list-dialog'),
+    role: document.querySelector('#vocabulary-list-popover')?.getAttribute('role'),
+    inCard: !!document.querySelector('#mini #vocabulary-list-popover.is-inline'),
+    chooser: document.querySelector('#vocabulary-list-popover')?.dataset.chooser ?? null,
+    newList: !!document.querySelector('#vocabulary-list-popover #vocabulary-list-new'),
+  }))()`);
+  const takenWhileChoosing = (await readAppRecord(page)).taken.length;
+  await tap(page, '#mini-review');
   await waitForAppRecord(page, record => record.taken.some(row => row.t === 'word' && row.id === touched.word),
     { description: 'the slip\'s save' });
   const captured = await evaluateAppRecord(page, `(() => {
@@ -3475,19 +3517,12 @@ async function main() {
     captured.taken === envBefore.taken + 1 && captured.t === 'word' && captured.id === touched.word &&
       captured.ctx?.scope === 'sent' && captured.ctx?.i === touched.index && typeof captured.ctx?.p === 'string',
     JSON.stringify(captured.ctx));
-  await page.waitForSelector('#mini #mini-take[aria-pressed="true"]'); // Saved ✓ ▾: its menu unfolds by itself
-  await page.waitForSelector('#mini #vocabulary-list-popover.is-inline');
-  const popoverBits = await page.evaluate(`(() => ({
-    modal: !!document.querySelector('dialog[open], #vocabulary-list-dialog'),
-    role: document.querySelector('#vocabulary-list-popover')?.getAttribute('role'),
-    inCard: !!document.querySelector('#mini #vocabulary-list-popover.is-inline'),
-    newList: !!document.querySelector('#vocabulary-list-popover #vocabulary-list-new'),
-  }))()`);
-  check('R2-B · Save ▾ opens its menu only once the word is saved; it unfolds inside the card, not a window, and enrolls nothing more',
-    !listsBeforeSave && (await readAppRecord(page)).taken.length === captured.taken && !popoverBits.modal && popoverBits.role === 'dialog' && popoverBits.inCard && popoverBits.newList,
-    JSON.stringify({ listsBeforeSave, ...popoverBits }));
-  await page.keyboard.press('Escape');
+  await page.waitForSelector('#mini #mini-take[aria-pressed="true"]');
   await page.waitForSelector('#vocabulary-list-popover', { state: 'detached' });
+  check('R2-B · Save asks where the word goes before it keeps anything; its chooser unfolds inside the card, not a window, and one pick enrolls once',
+    !listsBeforeSave && takenWhileChoosing === envBefore.taken && (await readAppRecord(page)).taken.length === captured.taken && !popoverBits.modal &&
+      popoverBits.role === 'dialog' && popoverBits.inCard && popoverBits.chooser === 'save' && popoverBits.newList,
+    JSON.stringify({ listsBeforeSave, takenWhileChoosing, ...popoverBits }));
   // the old order's last press (覚える, outside the popup) put the popup away before the next step opens it
   // again; here Escape on the popup does that
   if (await page.locator('#mini').count()) {
@@ -3539,14 +3574,14 @@ async function main() {
   await shoot(page, shotsDir, '19-capture-sovereignty');
   await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
   await page.waitForSelector('#sheet', { state: 'detached' });
-  // Back has restored this word's stage; Save opens its menu without another word activation.
+  // Back has restored this word's stage; its Remove stands under the Save without another word activation. SAVE
+  // (2026-11-11): a saved word's box names its place, with Show · Move… · Remove (Save ▾'s Review row is gone)
   await page.waitForSelector('#mini');
   assert.equal(await page.locator('#reader .tok.content').nth(9).getAttribute('data-ladder-rung'), 'stage');
   assert(await captureOrigin.evaluate(word => word.isConnected && word.dataset.ladderRung === 'stage'), 'Context saves return to the original occurrence stage');
   await page.waitForSelector('#mini #mini-take[aria-pressed="true"]');
-  await tap(page, '#mini-take');
-  await page.waitForSelector('#mini #vocabulary-list-popover.is-inline #mini-review');
-  await tap(page, '#mini-review');
+  await page.waitForSelector('#mini #mini-place-remove');
+  await tap(page, '#mini-place-remove');
   await waitForAppRecord(page, record => !record.taken.some(row => row.t === 'word' && row.id === touched.word),
     { description: 'explicit stop memorizing' });
   const undone = await evaluateAppRecord(page, `(() => {
@@ -3590,9 +3625,15 @@ async function main() {
     await page.waitForTimeout(120);
   }
   const miniWordText = await page.evaluate(`document.querySelector('#mini .mini-word')?.childNodes[0]?.textContent ?? ''`);
+  // SAVE (2026-11-11): the Save asks first; Review is picked in the chooser that unfolds inside the card
   await tap(page, '#mini-take');
+  if (miniIx >= 0) {
+    await page.waitForSelector('#mini #vocabulary-list-popover.is-inline #mini-review');
+    await tap(page, '#mini-review');
+  }
   await waitForAppRecord(page, record => record.taken.some(row => row.t === 'word' && row.id === miniWordText),
     { description: 'popup one-tap save' });
+  await page.waitForSelector('#mini #mini-take[aria-pressed="true"]', { timeout: 5000 }).catch(() => {});
   const miniCap = await evaluateAppRecord(page, `(() => {
     const e = record;
     const it = (e.taken || [])[(e.taken || []).length - 1];
@@ -3600,14 +3641,16 @@ async function main() {
     return { id: it?.id, scope: it?.ctx?.scope ?? null, sealTaken: seal?.classList.contains('taken') ?? null, miniUp: !!document.querySelector('#mini'),
       label: seal?.textContent ?? null, window: !!document.querySelector('#vocabulary-list-dialog, dialog[open]') };
   })()`);
-  check('R2-B · one tap on the popup\'s Save keeps it in place, marked saved, with the sentence context',
-    miniIx >= 0 && miniCap.miniUp && miniCap.sealTaken === true && miniCap.id === miniWordText && miniCap.scope === 'sent' && !miniCap.window,
+  // …and the Save names the place it went (SAVE: "Saved in Review ✓")
+  check('R2-B · the popup\'s Save and one pick keep it in place, marked saved, with the sentence context',
+    miniIx >= 0 && miniCap.miniUp && miniCap.sealTaken === true && miniCap.id === miniWordText && miniCap.scope === 'sent' && !miniCap.window &&
+      /Review|復習/u.test(miniCap.label || ''),
     JSON.stringify({ ...miniCap, word: miniWordText, skipped: miniSkipped }));
   if (miniIx >= 0) {
-    // the save unfolded Save ▾'s menu; its Review row takes the card back out (a second press on Save ▾ within a
-    // breath is the same press, and past it only opens the menu again: Save cannot undo itself)
-    await page.waitForSelector('#mini #vocabulary-list-popover.is-inline #mini-review');
-    await tap(page, '#mini-review');
+    // the box's place line takes the card back out: its Remove (Save ▾'s Review row is gone; a press on the saved Save
+    // only opens the chooser again to move it: Save cannot undo itself)
+    await page.waitForSelector('#mini #mini-place-remove');
+    await tap(page, '#mini-place-remove');
     await waitForAppRecord(page, record => !record.taken.some(row => row.t === 'word' && row.id === miniWordText),
       { description: 'popup stop memorizing' });
   }
@@ -3636,6 +3679,9 @@ async function main() {
   check('R2-B · the sentence page seal names the word it captures',
     sentSeal.present && sentSeal.label.includes('半島'), JSON.stringify(sentSeal));
   await tap(page, '#sheet-take');
+  // SAVE (2026-11-11): the Save asks first; Review is picked
+  await page.waitForSelector('#vocabulary-list-popover.is-drawer #mini-review', { timeout: 8000 }).catch(() => {});
+  await tap(page, '#vocabulary-list-popover.is-drawer #mini-review');
   await page.waitForTimeout(300);
   await waitForAppRecord(page, (r) => (r.taken || []).at(-1)?.id === '半島', { timeout: 8000 }).catch(() => {});
   const sentCap = await evaluateAppRecord(page, `(() => {
@@ -4988,6 +5034,9 @@ async function main() {
     `${lessonDone.rows.length} lesson rows for ${lessonDone.done[0]}`);
   const chosenWord = await page.evaluate(`document.querySelector('[data-enroll]')?.dataset.enroll ?? null`);
   await page.evaluate(`document.querySelector('[data-enroll]').click()`);
+  // SAVE (2026-11-11): the row's Save asks where the word goes first; Review, the study queue, is picked
+  await page.waitForSelector('#vocabulary-list-popover #mini-review', { timeout: 8000 });
+  await page.evaluate(`document.querySelector('#vocabulary-list-popover #mini-review').click()`);
   await page.waitForTimeout(250);
   await waitForAppRecord(page, (r) => (r.taken || []).length === 1 && Number.isFinite(r.taken[0].started), { timeout: 8000 }).catch(() => {});
   const afterOne = await evaluateAppRecord(page, `(() => {
@@ -5003,6 +5052,9 @@ async function main() {
     `${JSON.stringify(afterOne.taken)} for choice ${chosenWord}`);
   await shoot(page, shotsDir, '23-r4b-lesson-enroll-choice');
   await page.evaluate(`document.querySelector('#lesson-enroll-all').click()`);
+  // SAVE (2026-11-11): "Save all" asks for its one place, Review, and keeps the words only on that pick
+  await page.waitForSelector('#vocabulary-list-popover #save-chooser-home', { timeout: 8000 });
+  await page.evaluate(`document.querySelector('#vocabulary-list-popover #save-chooser-home').click()`);
   await page.waitForTimeout(250);
   await waitForAppRecord(page, (r) => (r.taken || []).length === 10 && r.taken.every((t) => Number.isFinite(t.started)), { timeout: 8000 }).catch(() => {});
   const afterAll = await evaluateAppRecord(page, `(() => {

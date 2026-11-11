@@ -103,7 +103,8 @@ const NEG_SOURCE = {
   parts: [['modules/worlds.mjs', 'function mainParts(c) {\n  const k = D.kanji[c];', "function mainParts(c) {\n  if (c === '総') return ['糸', '忩', '公'];\n  const k = D.kanji[c];"]],
   hook: [['modules/drift.mjs', 'function todayIsRadical(part, c) {', 'function todayIsRadical(part, c) { return true;']],
   count: [['modules/library.mjs', 'function shelfTallyText(list) {', 'function shelfTallyText(list) { list = [...list, list[0]];']],
-  focus: [['corridor.js', "box.addEventListener('change', () => { focusList = listName; void setMembership(listName, box.checked); });", "box.addEventListener('change', () => void setMembership(listName, box.checked));"]],
+  // SAVE (2026-11-11): 13a picks a list in the Save's chooser; the control lets the pick close it without giving the keyboard back
+  focus: [['corridor.js', "    if (pop.isConnected) closeVocabularyListPopover({ restoreFocus: true });\n    const owner = invoker?.isConnected ? invoker : invoker?.id ? document.getElementById(invoker.id) : null;\n    paintPlacedSave(owner, node, label, isSaved);", "    if (pop.isConnected) closeVocabularyListPopover({ restoreFocus: false });\n    const owner = invoker?.isConnected ? invoker : invoker?.id ? document.getElementById(invoker.id) : null;\n    paintPlacedSave(owner, node, label, isSaved);"]],
   // the base's seating: only the definition is budgeted above the pads (the note and the rest may sit under them), and
   // only the folds' summaries are rows the pads may not cut
   gradebar: [['decks/player/mount.js', 'function answerSaid(def) {', 'function answerSaid(def) { return def;'],
@@ -708,11 +709,13 @@ try {
           await settle(page, 600);
           await page.locator('#sheet-take').click();
           await page.locator('#vocabulary-list-popover').waitFor();
-          await page.locator('#vocabulary-list-popover input[data-list="Q list"]').click();
-          await page.locator('#vocabulary-list-popover input[data-list="Q list"]:checked').waitFor();
+          // SAVE (2026-11-11): the menu is the chooser; picking a list saves the word there in one press and closes it, and
+          // the keyboard goes back to the Save that asked, which names the list (there is no box left to stay on)
+          await page.locator('#vocabulary-list-popover .save-place[data-list="Q list"]').click();
+          await page.locator('#vocabulary-list-popover').waitFor({ state: 'detached' });
           await page.waitForTimeout(600);
-          const focused = await page.evaluate(() => document.activeElement?.matches?.('#vocabulary-list-popover input[data-list="Q list"]') || false);
-          check(`13a · ${tag} · ticking a list in the Save menu keeps the keyboard on that box`, focused, String(await page.evaluate(() => document.activeElement?.outerHTML?.slice(0, 120))), `C20/${tag}`);
+          const focused = await page.evaluate(() => document.activeElement?.id === 'sheet-take' && /Q list/u.test(document.activeElement.textContent || ''));
+          check(`13a · ${tag} · picking a list in the Save chooser saves there and gives the keyboard back to Save`, focused, String(await page.evaluate(() => document.activeElement?.outerHTML?.slice(0, 120))), `C20/${tag}`);
           await context.close();
         }
 

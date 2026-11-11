@@ -278,13 +278,18 @@ try {
         assert.equal(recordBefore.taken.some(row => row.t === 'word' && row.id === word), false);
         await occurrence.click({ button: 'right' });
         await strip.waitFor();
+        // SAVE (2026-11-11): the right-click asks where the word goes and keeps nothing; the keep is the pick of Review
+        assert.equal(await strip.getAttribute('data-mode'), 'choose', 'The right-click opens the strip as the chooser');
+        assert.deepEqual(await readAppRecord(page), recordBefore, 'The right-click alone keeps nothing');
+        await strip.locator('#seal-strip-review').click();
+        await page.waitForFunction(() => document.getElementById('seal-strip')?.dataset.mode === 'placed');
         const savedRecord = await waitForAppRecord(page, row => row.taken.some(saved => saved.t === 'word' && saved.id === word),
           { description: 'the deliberate keep (right-click = hold = seal)' });
         const sealed = await stripFacts();
         assert.deepEqual(await stored(page), before, 'The keep records no Guided assistance or session change');
         const savedRows = savedRecord.taken.filter(row => row.t === 'word' && row.id === word);
         assert.equal(savedRows.length, 1);
-        assert(/Saved ✓/u.test(sealed.status) && sealed.actions.includes('remove'), `The strip says the word is kept: ${JSON.stringify(sealed)}`);
+        assert(/Saved in Review ✓/u.test(sealed.status) && sealed.actions.includes('remove'), `The strip says the word is kept: ${JSON.stringify(sealed)}`);
         await page.keyboard.press('Escape');
         await strip.waitFor({ state: 'detached' });
         await bare('The kept word');

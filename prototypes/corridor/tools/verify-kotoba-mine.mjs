@@ -963,9 +963,10 @@ async function verifyHost(browser, base) {
       JSON.stringify({ word: o.word && { id: o.word.id, label: o.word.label, reading: o.word.reading, gloss: o.word.gloss }, kanji: o.kanji, grammar: o.grammar, other: o.other, particle: o.particle }),
     );
     check(
-      "K035", 'host: take() is the corridor’s one-tap save (A51) — the word and a 字 land in the shared review pool (覚えるの札) of the durable record at once, with the Saved toast and 元に戻す and no chooser; a second take writes nothing; isTaken() then says so; the deck ledger, the observation log and the schedule are untouched',
-      // S · the toast says what Save says (保存しました · Saved), nothing about review (it pinned 復習に保存しました|Saved to review)
-      !o.takenBefore && o.took && o.again && o.kanjiTook && o.takenAfter && o.kanjiTaken && o.rows.length === 2 && /^(保存しました|Saved)$/u.test(o.toast) && o.undo && o.chooser === 0 && o.obs === 0 && o.srsSame && ledgerAfter === ledgerBefore,
+      "K035", 'host: take() is the corridor’s one-tap save (A51) — the word and a 字 land in the shared review pool (覚えるの札) of the durable record at once, with no chooser; a second take writes nothing; isTaken() then says so; the deck ledger, the observation log and the schedule are untouched',
+      // S · the toast said what Save says (保存しました · Saved). SAVE (2026-11-11): a save's news names its place and moves to
+      // the bar's own row; the record is the proof here (the news it said stays in the detail below)
+      !o.takenBefore && o.took && o.again && o.kanjiTook && o.takenAfter && o.kanjiTaken && o.rows.length === 2 && o.chooser === 0 && o.obs === 0 && o.srsSame && ledgerAfter === ledgerBefore,
       JSON.stringify({ rows: o.rows, toast: o.toast, undo: o.undo, chooser: o.chooser, obs: o.obs, srsSame: o.srsSame, ledgerSame: ledgerAfter === ledgerBefore }),
     );
     await page.evaluate(`(async () => {
@@ -1410,29 +1411,34 @@ async function verifyTap(browser, base) {
     );
     await page.click('#mini-take');
     const id = sheet.key.replace(/^\w+:/, '');
-    await waitForAppRecord(page, (r) => r.taken.some((t) => `${t.t}:${t.id}` === sheet.key), { description: 'one-tap deck capture' });
-    await page.waitForSelector('#mini #mini-take.taken[aria-pressed="true"]');
-    // Save ▾: the press that saves unfolds the word's menu inside the slip (review · lists · + New list · copy)
-    await page.waitForSelector('#mini #vocabulary-list-popover.is-save-menu.is-inline', { timeout: 5000 });
-    const saved = await page.evaluate(`({ chooser: document.querySelectorAll('#kp-chooser, .kp-chooser, #kp-take-save, #kp-new-list, #kp-take-list, #kp-take').length, label: document.getElementById('mini-take')?.textContent || '', expanded: document.getElementById('mini-take')?.getAttribute('aria-expanded'), menu: [...document.querySelectorAll('#vocabulary-list-popover .vocabulary-list-action')].map((n) => n.id), review: document.getElementById('mini-review')?.checked, sheet: document.getElementById('mini')?.dataset.key })`);
-    const after = { sched: await page.evaluate(SCHEDULE_OF(KEY)), env: await env(page) };
-    check(
-      "K064", 'tap: Save is one tap through the corridor’s save path (A51) — no chooser appears; the word is in the shared review pool (覚えるの札) at once, still one row; the button reads 保存済み ✓ · Saved ✓ and its menu (review · + New list · copy) unfolds inside the slip, which stays on the same word',
-      saved.chooser === 0 && after.env.taken.filter((k) => k === sheet.key).length === 1 && after.env.taken.length === before.env.taken.length + 1 && /^(保存済み ✓|Saved ✓)$/.test(saved.label) && saved.expanded === 'true' && saved.menu.includes('vocabulary-list-new') && saved.menu.includes('mini-copy') && saved.review === true && saved.sheet === sheet.key,
-      JSON.stringify({ ...saved, taken: after.env.taken }),
-    );
+    // Save ▾: the press unfolds the word's menu inside the slip. SAVE (2026-11-11, ask first, save second): the menu is the
+    // corridor's chooser (Review · his lists · New list… · copy) and the press keeps nothing; the pick of Review keeps the
+    // word through the corridor's save path (A51), and the Save then names the place
+    await page.waitForSelector('#mini #vocabulary-list-popover.is-save-menu.is-inline.is-chooser', { timeout: 5000 });
+    const asked = await page.evaluate(`({ chooser: document.querySelectorAll('#kp-chooser, .kp-chooser, #kp-take-save, #kp-new-list, #kp-take-list, #kp-take').length, kind: document.getElementById('vocabulary-list-popover')?.dataset.chooser || '', expanded: document.getElementById('mini-take')?.getAttribute('aria-expanded'), menu: [...document.querySelectorAll('#vocabulary-list-popover button[id]')].map((n) => n.id), copy: !!document.querySelector('#mini #mini-copy') })`);
+    asked.kept = (await env(page)).taken.filter((k) => k === sheet.key).length;
     // the menu is the corridor's own list popover, inside the slip under its button: a list written here is the same guarded commit
     // Its 220ms unfold begins 6px above the resting box; measure the final layout,
     // not an arbitrary frame during that documented entry animation.
     await page.waitForFunction(() => document.getElementById('vocabulary-list-popover')?.getAnimations()
       .every(animation => animation.playState === 'finished'), null, { timeout: 5000 });
-    const pop = await page.evaluate(`(() => { const p = document.getElementById('vocabulary-list-popover'); const m = document.getElementById('mini'); const r = p.getBoundingClientRect(); const mr = m.getBoundingClientRect(); const br = document.getElementById('mini-take').getBoundingClientRect(); const x = r.left + r.width / 2, y = r.top + Math.min(20, r.height / 2); const top = document.elementFromPoint(x, y); return { title: p.querySelector('.vocabulary-list-title')?.textContent || '', onTop: !!top && p.contains(top), inside: r.left >= mr.left - 0.5 && r.right <= mr.right + 0.5 && r.top >= mr.top - 0.5 && r.bottom <= mr.bottom + 0.5 && r.top >= br.bottom - 0.5, inSlip: m.contains(p), boxes: { menu: r.toJSON(), stage: mr.toJSON(), save: br.toJSON() } }; })()`);
+    const pop = await page.evaluate(`(() => { const p = document.getElementById('vocabulary-list-popover'); const m = document.getElementById('mini'); const r = p.getBoundingClientRect(); const mr = m.getBoundingClientRect(); const br = document.getElementById('mini-take').getBoundingClientRect(); const x = r.left + r.width / 2, y = r.top + Math.min(20, r.height / 2); const top = document.elementFromPoint(x, y); return { title: p.querySelector('.vocabulary-list-title')?.textContent || '', chooser: p.dataset.chooser || '', onTop: !!top && p.contains(top), inside: r.left >= mr.left - 0.5 && r.right <= mr.right + 0.5 && r.top >= mr.top - 0.5 && r.bottom <= mr.bottom + 0.5 && r.top >= br.bottom - 0.5, inSlip: m.contains(p), boxes: { menu: r.toJSON(), stage: mr.toJSON(), save: br.toJSON() } }; })()`);
+    await page.click('#mini #mini-review');
+    await waitForAppRecord(page, (r) => r.taken.some((t) => `${t.t}:${t.id}` === sheet.key), { description: 'deck capture on the pick of Review' });
+    await page.waitForSelector('#mini #mini-take.taken[aria-pressed="true"]');
+    const saved = await page.evaluate(`({ chooser: document.querySelectorAll('#kp-chooser, .kp-chooser, #kp-take-save, #kp-new-list, #kp-take-list, #kp-take').length, label: document.getElementById('mini-take')?.textContent || '', expanded: document.getElementById('mini-take')?.getAttribute('aria-expanded'), menu: !!document.getElementById('vocabulary-list-popover'), sheet: document.getElementById('mini')?.dataset.key })`);
+    const after = { sched: await page.evaluate(SCHEDULE_OF(KEY)), env: await env(page) };
+    check(
+      "K064", 'tap: Save asks first, then saves through the corridor’s save path (A51) — no deck chooser appears; the press unfolds the corridor’s chooser (Review · + New list · copy) inside the slip and keeps nothing; the pick of Review puts the word in the shared review pool (覚えるの札), still one row, and the button reads 復習に保存済み ✓ · Saved in Review ✓, the slip staying on the same word',
+      asked.chooser === 0 && asked.kind === 'save' && asked.expanded === 'true' && asked.kept === 0 && asked.menu.includes('mini-review') && asked.menu.includes('vocabulary-list-new') && asked.copy && saved.chooser === 0 && after.env.taken.filter((k) => k === sheet.key).length === 1 && after.env.taken.length === before.env.taken.length + 1 && /^(復習に保存済み ✓|Saved in Review ✓)$/.test(saved.label) && saved.expanded === 'false' && !saved.menu && saved.sheet === sheet.key,
+      JSON.stringify({ asked, ...saved, taken: after.env.taken }),
+    );
     check(
       "K065", 'tap: after its entry animation Save ▾’s list popover rests inside the slip under Save, covering no other control',
-      ['リスト', 'Lists'].includes(pop.title) && pop.onTop && pop.inside && pop.inSlip,
+      pop.chooser === 'save' && /保存先|^Save .+ to$/u.test(pop.title) && pop.onTop && pop.inside && pop.inSlip,
       JSON.stringify(pop),
     );
-    await page.keyboard.press('Escape');
+    // the pick closed the chooser; the slip stays open on the word for the grade keys below
     await page.waitForFunction(() => !document.getElementById('vocabulary-list-popover'), null, { timeout: 5000 }).catch(() => {});
     check(
       "K066", 'tap: a tap is capture, never evidence — the deck ledger’s cards, log, suspensions and repairs are byte-identical, no card was added, the observation log and the corridor schedule did not move; the three activations are exactly depths1/2/3 in lookups[]',
@@ -3128,16 +3134,21 @@ async function main() {
     await page.waitForSelector('[data-result^="word:金利"]', { timeout: 15000 });
     await page.click('[data-result^="word:金利"]');
     await page.waitForSelector('#sheet #sheet-take');
+    // SAVE (2026-11-11, ask first, save second): the press opens the chooser (a drawer under the bar) and keeps nothing; the
+    // pick of Review saves the word and closes it; a second press opens it again, to move the word
     await page.click('#sheet #sheet-take');
-    await waitForAppRecord(page, (record) => record.taken.some((t) => t.id === '金利'),
-      { description: 'one-tap sheet save' });
-    await page.waitForSelector('#vocabulary-list-popover.is-drawer #mini-review:checked', { timeout: 5000 });
+    await page.waitForSelector('#vocabulary-list-popover.is-drawer.is-chooser #mini-review', { timeout: 5000 });
+    const askedRecord = await readAppRecord(page);
+    await page.click('#vocabulary-list-popover.is-drawer #mini-review');
     const saved = await waitForAppRecord(page, (record) => record.taken.some((t) => t.id === '金利'),
       { description: 'saved word record' });
-    check("K157", 'one tap on the page\'s one Save saves the word and opens its menu (review ticked, lists one tap away), nothing more written yet',
-      saved.taken.length === 1 && Object.keys(saved.lists || {}).length === 0,
-      `${saved.taken.length} rows · lists ${Object.keys(saved.lists || {}).length}`);
-    // a list named in the menu receives the word through the same guarded commit
+    check("K157", 'the page\'s one Save asks first (Review, his lists, New list…) and keeps nothing; the pick of Review saves the word, nothing more written yet',
+      askedRecord.taken.length === 0 && saved.taken.length === 1 && Object.keys(saved.lists || {}).length === 0,
+      `${askedRecord.taken.length} → ${saved.taken.length} rows · lists ${Object.keys(saved.lists || {}).length}`);
+    // a list named in the chooser receives the word through the same guarded commit
+    await page.waitForFunction(() => !document.getElementById('vocabulary-list-popover'), null, { timeout: 5000 });
+    await page.waitForTimeout(650); // a press within the Save's breath (SAVE_PRESS_MS) is the same press
+    await page.click('#sheet #sheet-take');
     await page.click('#vocabulary-list-popover #vocabulary-list-new');
     await page.fill('#vocabulary-list-popover #vocabulary-list-name', '経済ニュース');
     await page.click('#vocabulary-list-popover #vocabulary-list-create');
@@ -3145,10 +3156,10 @@ async function main() {
       (record.lists?.['経済ニュース'] || []).some((x) => x.id === '金利'), { description: 'new list membership' });
     check("K158", 'the new list receives the word, still one card', listed.taken.length === 1 &&
       listed.taken.filter((t) => t.id === '金利').length === 1, JSON.stringify(Object.keys(listed.lists || {})));
-    // the menu then shows the list ticked: where the word went, in the Save's own menu
-    await page.waitForFunction(() => !!document.querySelector('#vocabulary-list-popover input[data-list="経済ニュース"]:checked'), null, { timeout: 5000 }).catch(() => {});
-    const where = await page.evaluate(`[...document.querySelectorAll('#vocabulary-list-popover .vocabulary-list-choice')].filter((row) => row.querySelector('input:checked')).map((row) => row.textContent.trim()).join(' · ')`);
-    check("K159", 'the Save\'s menu then says where the word went', where.includes('経済ニュース'), where);
+    // SAVE (2026-11-11): the pick closes the chooser and the Save itself names where the word went
+    await page.waitForFunction(() => /経済ニュース/u.test(document.querySelector('#sheet #sheet-take')?.textContent || ''), null, { timeout: 5000 }).catch(() => {});
+    const where = await page.evaluate(`document.querySelector('#sheet #sheet-take')?.textContent.trim() || ''`);
+    check("K159", 'the Save then names where the word went', where.includes('経済ニュース'), where);
     check("K160", 'no console errors', consoleErrors.length === 0, consoleErrors.slice(0, 2).join(' | '));
 
     console.log('\n— a grade is saved before the card moves on');

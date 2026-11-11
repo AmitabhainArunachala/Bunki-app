@@ -618,6 +618,8 @@ async function captureCase(browser, contextOptions) {
     const { settled } = await slip(page, tok(page, 2));
     check('A3.ready', 'the card for 年 in 令和8年 offers Save', settled?.reading === 'ねん' && settled.take && !settled.take.disabled, settled);
     await page.locator('#mini #mini-take').click();
+    // SAVE (2026-11-11): Save asks where the word goes first; Review, the study queue, is picked (each save below too)
+    await page.locator('#mini #mini-review').click();
     const saved = await waitForAppRecord(page, (rec) => (rec.taken || []).some((row) => row.t === 'word' && row.id === '年'),
       { description: 'the 年 card', timeout: 15000 });
     const row = saved.taken.find((r) => r.t === 'word' && r.id === '年'), snap = saved.deepWords?.['年'];
@@ -633,6 +635,7 @@ async function captureCase(browser, contextOptions) {
       check('R2.capture.ready', 'the card for 云っ (いっ) is 云う read いう and offers Save', iu.settled?.word === '云う' && k2h(iu.settled.reading) === 'いう'
         && iu.settled.take && !iu.settled.take.disabled, iu.settled);
       await page.locator('#mini #mini-take').click();
+      await page.locator('#mini #mini-review').click();
       const both = await waitForAppRecord(page, (rec) => (rec.taken || []).some((r) => r.t === 'word' && r.id === '云う'),
         { description: 'the 云う card', timeout: 15000 });
       const iuRow = both.taken.find((r) => r.t === 'word' && r.id === '云う'), iuSnap = both.deepWords?.['云う'];
@@ -650,6 +653,7 @@ async function captureCase(browser, contextOptions) {
       check('R2.capture.stem.ready', `the card for い (ている) is いる read いる, entry ${stem.seq}'s meaning for the te-form ("${stem.te[0]}"), and offers Save`, iru.settled?.word === 'いる'
         && iru.settled.gloss === stem.te[0] && iru.settled.take && !iru.settled.take.disabled, iru.settled);
       await page.locator('#mini #mini-take').click();
+      await page.locator('#mini #mini-review').click();
       const three = await waitForAppRecord(page, (rec) => (rec.taken || []).some((r) => r.t === 'word' && r.id === 'いる'),
         { description: 'the いる card', timeout: 15000 });
       const iruRow = three.taken.find((r) => r.t === 'word' && r.id === 'いる'), iruSnap = three.deepWords?.['いる'];

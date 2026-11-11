@@ -179,6 +179,8 @@ for (const engine of engines) for (const width of sizes) {
     await setUpDeviceTutor(page);
     await page.locator('#sheet-back').click(); await page.locator('#sheet[data-node="word:窓"]').waitFor();
     await page.waitForTimeout(800); await page.locator('#sheet .teacher-save').click();
+    // SAVE (2026-11-11): the sentence's Save asks for its one place, the tutor page, and keeps it only on that pick
+    await page.locator('#save-chooser-home').click();
     await waitForAppRecord(page, record => record.teacherContexts?.entries.length === 1);
     const neutral = await snapshot('neutral-context'); unchanged(initial, neutral);
     assert.deepEqual(neutral.sentencePractice, initial.sentencePractice);

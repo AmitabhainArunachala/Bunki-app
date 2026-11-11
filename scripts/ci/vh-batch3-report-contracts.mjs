@@ -503,7 +503,8 @@ function validateHold(v, p) {
       positive(d.first.mid.ring);
       seal(d.first.after, d.c0 + 1);
       assert.equal(d.first.after.rung, null);
-      assert(/Saved ✓|保存済み/u.test(d.first.after.stripSays));
+      // SAVE (2026-11-11): the strip names the place the pick put the word in (Saved in Review ✓)
+      assert(/Saved( in .+)? ✓|保存済み/u.test(d.first.after.stripSays));
       seal(d.second.after, d.c0 + 1);
       assert.equal(d.second.after.rung, null);
       assert.equal(d.later.strip, true);
