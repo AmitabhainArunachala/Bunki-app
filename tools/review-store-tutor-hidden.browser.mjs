@@ -25,12 +25,15 @@ const { startStaticHost } = require('../prototypes/bunki-desktop/lib/static-host
 
 const SITE = process.env.KAIRO_SITE_DIR;
 if (!SITE) throw new Error('KAIRO_SITE_DIR must name a built site');
-const ORIGIN = 'http://127.0.0.1:19491';
+// the ports may be given (REVIEW_SITE_PORT, REVIEW_VOICE_PORT) so another seat runs this on its own; the defaults stand
+const SITE_PORT = Number(process.env.REVIEW_SITE_PORT || 19491);
+const VOICE_PORT = Number(process.env.REVIEW_VOICE_PORT || 19492);
+const ORIGIN = `http://127.0.0.1:${SITE_PORT}`;
 const AI = 'https://tutor.invalid';
 const REPLY = '雨が降っているのに、出かけました。頑張ったのに、試験に落ちた。';
 
-const host = await startStaticHost({ site: SITE, port: 19491 });
-const fake = await startFakeVoiceServer({ origins: [ORIGIN], port: 19492 });
+const host = await startStaticHost({ site: SITE, port: SITE_PORT });
+const fake = await startFakeVoiceServer({ origins: [ORIGIN], port: VOICE_PORT });
 const browser = await chromium.launch({
   headless: true,
   args: [
