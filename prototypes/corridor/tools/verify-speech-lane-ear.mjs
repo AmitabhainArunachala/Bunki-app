@@ -140,7 +140,7 @@ const cases = {
   async closed() {
     const s = await open({ engine: ENGINE, width: WIDTH, ui: UI, voicePort: PORT + 1, clipSeconds: () => 1 });
     const { page, press } = s;
-    const optionClick = async (p) => { await page.keyboard.down('Alt'); await page.mouse.click(p.x, p.y); await page.keyboard.up('Alt'); };
+    const optionClick = async (p) => { await s.page.keyboard.down('Alt'); await s.page.mouse.click(p.x, p.y); await s.page.keyboard.up('Alt'); };
     try {
       await page.evaluate(async () => { const m = await import('/corridor.js'); m.setWordPref(m.WORD_VOICE_KEY, 'wordVoice', m.WORD_VOICE, 'off'); });
       // a word saved with its sentence (its review face asks it blanked in that sentence), and one saved from its page (printed)
@@ -184,9 +184,14 @@ const cases = {
       if (still.revealed) problems.push('a tap turned the card over');
       record(`I2 review card, blanked face: ${s.phone ? 'a tap' : 'Option-click'} on the sentence and on the blank sends nothing`, problems, JSON.stringify({ card: face.label, sent: onBlank, ...still }));
       if (!s.phone) {
-        // the printed face: a word saved from its own page; Option-click on it and its own control send the same reading
-        await page.keyboard.press('Space'); await s.sleep(900);
-        await page.locator('.grade-row .grade.g-good').first().click().catch(() => {}); await s.sleep(1200);
+        // the printed face, in a fresh profile: a word saved from its own page; Option-click on it and its own control send
+        // the same reading
+        await s.close();
+        Object.assign(s, await open({ engine: ENGINE, width: WIDTH, ui: UI, voicePort: PORT + 1, clipSeconds: () => 1 }));
+        const { page, press } = s;
+        await page.evaluate(async () => { const m = await import('/corridor.js'); m.setWordPref(m.WORD_VOICE_KEY, 'wordVoice', m.WORD_VOICE, 'off'); });
+        await s.ready();
+        await page.waitForFunction(async () => { const m = await import('/corridor.js'); return !m.D.passages.some((x) => !x.tokens && !x.libraryCandidate && !String(x.file || '').startsWith('archive/') && m.D.libraryDiscoverable?.(x) !== false); }, null, { timeout: 60000, polling: 500 });
         const word = await page.evaluate(async () => { const m = await import('/corridor.js'); const dict = await import('/modules/dictionary.mjs');
           const words = [...new Set(Object.values(m.D.kanjiWords || {}).flat())].filter((w) => /^\p{Script=Han}{2}$/u.test(w));
           return words.find((w) => !dict.findExamples(w, 1).length) || words[0]; });
