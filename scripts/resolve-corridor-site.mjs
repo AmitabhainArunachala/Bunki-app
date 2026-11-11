@@ -7,6 +7,7 @@ import {
   mkdtempSync,
   readFileSync,
   realpathSync,
+  rmSync,
   writeFileSync,
 } from 'node:fs';
 import { homedir } from 'node:os';
@@ -58,7 +59,25 @@ export function resolveCorridorEvidence() {
   );
   mkdirSync(out, { recursive: true });
   evidence = supplied === undefined ? mkdtempSync(join(out, 'run-')) : out;
+  if (supplied === undefined) discardWhenTestExits(evidence);
   return evidence;
+}
+
+// A test file run as its own process (node --test makes each *.test.* file the main script) gets a
+// throwaway run folder, removed when the process exits, pass or fail: it holds a ~0.5 GB assembled
+// site and every full npm test used to leave one. KAIRO_KEEP_TEST_EVIDENCE=1 keeps it to look at.
+// A verifier run by hand, or as a test's child, keeps its evidence; a supplied KAIRO_EVIDENCE_DIR
+// is never removed.
+function discardWhenTestExits(dir) {
+  if (process.env.KAIRO_KEEP_TEST_EVIDENCE === '1') return;
+  if (!/\.test\.[cm]?[jt]s$/u.test(process.argv[1] || '')) return;
+  process.once('exit', () => {
+    try {
+      rmSync(dir, { recursive: true, force: true });
+    } catch (error) {
+      console.error(`could not remove test run folder ${dir}: ${error.message}`);
+    }
+  });
 }
 
 export function resolveCorridorSite() {

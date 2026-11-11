@@ -1,6 +1,6 @@
 /* depth.css · the app's surfaces: ground, sheet, slip, well, and the night windows its subjects stand in.
    FOLDED FILE. Do not edit here. Sources: ~/.dharma/bunki/PROGRAM/design/depth/depth.css and lead.css
-   (design version 1794325899, folded 2026-11-11 01:03 JST). Re-fold: ~/.dharma/bunki/PROGRAM/design/fold-depth.sh <worktree>.
+   (design version 1794364712, folded 2026-11-11 11:51 JST). Re-fold: ~/.dharma/bunki/PROGRAM/design/fold-depth.sh <worktree>.
    Every rule is scoped under html[data-live-depth='1']; index.html sets that attribute. */
 
 /* depth.css · the surface system: four planes made by light (地 ground, 紙 sheet, 札 slip, 窪 well).
@@ -1260,3 +1260,15 @@ html[data-live-depth='1'] #sheet .hero:has(> .hero-glyph) ~ dl.kv dt {
   font-variant-caps: all-small-caps;
   font-size: 12.5px;
 }
+
+/* ---- 9 · the listen mark beside a word's headword stands on the dark headword block, so it takes the lit ink
+   (voice lead's finding, 2026-11-11: it was dark on dark at 1728) ---- */
+html[data-live-depth='1'] #sheet > .voice-say[data-voice-say='entry-headword'] { color: var(--dp-star, #f4efe2); }
+html[data-live-depth='1'] #sheet > .voice-say[data-voice-say='entry-headword']:is(:hover, :focus-visible) { color: #fff; }
+/* the headword is ink on the night block, not a lamp: no glow behind it (a blurred patch read as a smudge at 1728) */
+html[data-live-depth='1'] #sheet:has(> h2.headword):not(:has(.hero > .hero-glyph)) > h2.headword { text-shadow: none; }
+/* the word web's legend: its separators stand in the night window, so they take the lit ink (measured 1.12:1 before) */
+html[data-live-depth='1'] section.ww .ww-plate > .ww-legend > span::before { color: color-mix(in oklab, var(--dp-star, #f4efe2) 62%, transparent); }
+/* night looks, a character's page: an idiom chip showed its other characters in dark ink on the dark chip
+   (1.12 to 1.43 to 1, contrast walk 2026-11-11). They take the look's own light ink; the page's character stays brightest. */
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #sheet .chips > .chip.t-idiom > .big { color: color-mix(in oklab, var(--ink) 80%, transparent); }
