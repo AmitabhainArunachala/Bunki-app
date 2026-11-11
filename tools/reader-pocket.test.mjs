@@ -88,9 +88,12 @@ class FakeAudio extends EventTarget {
       this.refuse = false;
       return Promise.reject(error);
     }
+    const was = this.paused;
     this.paused = false;
     this.ended = false;
     this.started.push(this._src);
+    // a start is told a moment later, as the browser's own task
+    if (was) setTimeout(() => this.dispatchEvent(new Event('play')), 0);
     return Promise.resolve();
   }
   pause() {
@@ -108,7 +111,7 @@ class FakeAudio extends EventTarget {
 }
 
 /** The speech team's own player (speech-player.mjs, unchanged) on a fake element, wrapped as the reader uses it. */
-function rig({ refusalIsPause = () => false } = {}) {
+function rig({ refusalIsPause = () => false, heldPaused = () => false } = {}) {
   const audio = new FakeAudio();
   let blobs = 0;
   const document = {
@@ -126,6 +129,7 @@ function rig({ refusalIsPause = () => false } = {}) {
     audio,
     silence: () => 'blob:silence',
     refusalIsPause,
+    heldPaused,
   });
   const told = [];
   pocket.onOutsidePause(() => told.push('outside'));
@@ -271,6 +275,51 @@ describe('waiting on a hidden page: silence in a loop keeps the page playing', (
     await tick(5);
     expect(r.told).toEqual(['outside']);
     expect(r.audio.loop).toBe(false);
+  });
+});
+
+describe('started from outside while his read is held paused: his pause wins (fix round 1)', () => {
+  it('the element started by nobody in this app is paused again at once, and nothing is told', async () => {
+    let held = false;
+    const r = rig({ heldPaused: () => held });
+    void r.player.play(r.clip(), 1);
+    await tick();
+    r.player.pause(); // his pause, from the bar or the lock screen
+    held = true;
+    await tick(5);
+    void r.audio.play(); // the system starts the element again (an interruption that ends, a headset button)
+    await tick(5);
+    expect(r.audio.paused).toBe(true);
+    expect(r.told).toEqual([]);
+  });
+  it('the app’s own resume, the silence it holds and a new clip are left alone', async () => {
+    let held = true;
+    const r = rig({ heldPaused: () => held });
+    void r.player.play(r.clip(), 1);
+    await tick();
+    r.player.pause();
+    await tick(5);
+    held = false; // his play: the read is no longer held paused when the element starts
+    r.player.resume();
+    await tick(5);
+    expect(r.audio.paused).toBe(false);
+    r.pocket.hold(); // the silence while a read waits
+    await tick(5);
+    expect(r.audio.paused).toBe(false);
+    void r.player.play(r.clip(), 1);
+    await tick(5);
+    expect(r.audio.paused).toBe(false);
+    expect(r.told).toEqual([]);
+  });
+  it('while nothing holds the read paused, a start from outside is not touched', async () => {
+    const r = rig({ heldPaused: () => false });
+    void r.player.play(r.clip(), 1);
+    await tick();
+    r.player.pause();
+    await tick(5);
+    void r.audio.play();
+    await tick(5);
+    expect(r.audio.paused).toBe(false);
   });
 });
 

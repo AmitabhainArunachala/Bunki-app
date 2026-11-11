@@ -883,6 +883,67 @@ const CASES = {
     report('network-resume', problems, steps.join('; '));
     await s.close();
   },
+
+  async 'outside-play'() {
+    clipSeconds = 3; holdNth = 0;
+    const s = await freshPage({ media: 'wrap' });
+    const problems = [];
+    const steps = [];
+    const element = (what) => s.page.evaluate((what) => { const a = document.querySelector('audio[data-speak-audio]'); return what === 'play' ? void a.play().catch(() => {}) : void a.pause(); }, what);
+    /** His read is paused; the element is started from outside: within a moment it is still again, and stays so. */
+    const startedFromOutside = async (label) => {
+      const before = await look(s.page);
+      const asked = before.asked;
+      await element('play');
+      const soon = await until(s, (x) => x.audio?.paused, 400);
+      await wait(1500);
+      const v = await look(s.page);
+      if (!soon.audio?.paused) problems.push(`${label}: started from outside, the element was still playing 400 ms later`);
+      if (!v.audio?.paused || v.bar !== 'paused' || v.media?.state !== 'paused') problems.push(`${label}: started from outside, the element is ${v.audio?.paused ? 'still' : 'playing'}, the bar says ${v.bar}, the lock screen ${v.media?.state}`);
+      if (v.asked !== asked) problems.push(`${label}: ${v.asked - asked} sentence(s) asked while paused`);
+      if (v.first !== before.first) problems.push(`${label}: the lit sentence moved from word ${before.first} to ${v.first}`);
+      return v;
+    };
+    try {
+      await openArticle(s);
+      await until(s, (x) => x.lit >= 2, 15000);
+      await wait(600);
+      // paused from outside, then started from outside
+      await element('pause');
+      let v = await until(s, (x) => x.bar === 'paused', 2000);
+      if (v.bar !== 'paused') problems.push(`paused from outside: the bar says ${v.bar}`);
+      const pausedAt = v.audio?.t ?? 0;
+      v = await startedFromOutside('after a pause from outside');
+      // his play goes on at that sentence and place
+      await s.press('#listen-toggle');
+      v = await until(s, (x) => x.bar === 'playing' && !x.audio?.paused, 3000);
+      if (v.bar !== 'playing' || v.audio?.paused) problems.push(`his play after it: bar ${v.bar}, audio ${JSON.stringify(v.audio)}`);
+      if (v.audio && v.audio.t + 0.05 < pausedAt) problems.push(`his play started the sentence again (at ${v.audio.t}s, paused at ${pausedAt}s)`);
+      steps.push(`paused from outside at ${pausedAt}s, started from outside: still; his play on at ${v.audio?.t}s`);
+      // paused from the bar, then started from outside
+      await wait(500);
+      await s.press('#listen-toggle');
+      await until(s, (x) => x.bar === 'paused', 2000);
+      await startedFromOutside('after his pause on the bar');
+      steps.push('paused on the bar, started from outside: still');
+      // hidden: paused from the lock screen, started from outside
+      await hide(s, true);
+      await s.page.evaluate(() => window.__pocket.media.handlers.play?.());
+      await until(s, (x) => x.bar === 'playing' && !x.audio?.paused, 3000);
+      await wait(500);
+      await s.page.evaluate(() => window.__pocket.media.handlers.pause?.());
+      await until(s, (x) => x.bar === 'paused', 2000);
+      await startedFromOutside('hidden, after the lock screen\'s pause');
+      await s.page.evaluate(() => window.__pocket.media.handlers.play?.());
+      v = await until(s, (x) => x.bar === 'playing' && !x.audio?.paused, 3000);
+      if (v.bar !== 'playing') problems.push(`hidden, the lock screen's play after it: bar ${v.bar}, audio ${JSON.stringify(v.audio)}`);
+      steps.push('hidden, paused on the lock screen, started from outside: still; its play goes on');
+      await hide(s, false);
+    } catch (error) { problems.push(`the case broke: ${String(error.message).split('\n')[0].slice(0, 200)}`); }
+    if (s.errors.length) problems.push(`page errors: ${s.errors.join(' | ')}`);
+    report('outside-play', problems, steps.join('; '));
+    await s.close();
+  },
 };
 
 for (const [name, run] of Object.entries(CASES)) if (ONLY.has(name)) await run();
