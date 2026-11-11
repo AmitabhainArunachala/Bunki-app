@@ -13,6 +13,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { TextDecoder } from 'node:util';
 
 import { describe, expect, it } from 'vitest';
 
@@ -611,7 +612,12 @@ describe('the store behind the ear’s shared requests (the combine, 2026-11-12)
           const row = { text, voiceKey, aborted: false };
           asked.push(row);
           row.answer = () =>
-            resolve({ bytes: bytesOf(voiceKey, text), contentType: 'audio/wav', voiceId: 'v', inputKey: `${voiceKey}|${text}` });
+            resolve({
+              bytes: bytesOf(voiceKey, text),
+              contentType: 'audio/wav',
+              voiceId: 'v',
+              inputKey: `${voiceKey}|${text}`,
+            });
           signal?.addEventListener('abort', () => {
             row.aborted = true;
             reject(Object.assign(new Error('aborted'), { name: 'AbortError' }));
@@ -632,7 +638,13 @@ describe('the store behind the ear’s shared requests (the combine, 2026-11-12)
     const real = createClipStore({ storage });
     const puts = [];
     const store = { ...real, put: (key, clip) => (puts.push(key), real.put(key, clip)) };
-    const seam = createVoiceSeam({ client, player, store, sleep: async () => {}, online: () => online });
+    const seam = createVoiceSeam({
+      client,
+      player,
+      store,
+      sleep: async () => {},
+      online: () => online,
+    });
     return { seam, asked, played, puts, store, storage };
   }
   const tick = () => new Promise((done) => setTimeout(done, 10));
@@ -681,7 +693,12 @@ describe('the store behind the ear’s shared requests (the combine, 2026-11-12)
     const storage = createMemoryClipStorage();
     const first = heldPage({ storage });
     const states = [];
-    const read = first.seam.read({ voiceKey: 'word:ear', sentences: [T], prefetch: 0, onState: (state) => states.push(state) });
+    const read = first.seam.read({
+      voiceKey: 'word:ear',
+      sentences: [T],
+      prefetch: 0,
+      onState: (state) => states.push(state),
+    });
     await tick();
     expect(first.asked).toHaveLength(1);
     read.cut();
