@@ -1,5 +1,5 @@
 /** G3 word-entry seam — declarations moved verbatim from ../corridor.js (pure move, no body edits). */
-import { $, savedInParts, savedPlace, AI_DEVICE_STORE, AI_KEY_STORE, D, DEPTH_OWNED_S, DEPTH_RECALLED_S, DEPTH_RECALL_R, GESTURE, NODE_KIND, NOTE_TEXT, REPORT_RELAY_STORE, S, SAVE_PRESS_MS, SLIP_NODE, SLIP_OWN_MEANING, TODAY_SKY_MISS_DAYS, VOICE_LOCK, activateWordLadder, anchorBox, bi, biLabel, capturePending, closeSealStrip, commitCapture, commitStorePatch, deeperDepth, depthRank, depthRetrievability, dictionaryRowBySeq, diveFromSlip, el, encounterKey, ensureArchiveIndex, ensureArticle, entryKanaIndex, explicitWordSnapshot, finiteNumber, fitChromeKeep, glyphBox, go, heldWordCardNode, hideReaderToast, holdPageUnderDrawer, kanaReadingKey, kataToHira, metReadable, motionEase, motionMs, nonEmptyString, notYetReleased, noteEncounter, openPlainSaveMenu, openSealStrip, openVocabularyListPopover, openWordWeb, owns, pageCutAllowed, paintMiniPath, passage, placeFloating, plainRecord, recordWritable, relayServiceUrl, removeMini, render, revalidateTutorRequests, revealFloatingFocus, rubyNode, sameItem, sameWordIdentity, saveWord, savedAnswerFor, sealListRecency, setOwnRecordValue, shallowerDepth, sheetActionLine, sheetActionLineKeys, showMini, srsKey, suppressAssessmentCards, tx, validInstant, wordCardIdentity, wordNodeIdentity, wordStudied } from '../corridor.js';
+import { $, barSavedVerb, savedInParts, savedPlace, AI_DEVICE_STORE, AI_KEY_STORE, D, DEPTH_OWNED_S, DEPTH_RECALLED_S, DEPTH_RECALL_R, GESTURE, NODE_KIND, NOTE_TEXT, REPORT_RELAY_STORE, S, SAVE_PRESS_MS, SLIP_NODE, SLIP_OWN_MEANING, TODAY_SKY_MISS_DAYS, VOICE_LOCK, activateWordLadder, anchorBox, bi, biLabel, capturePending, closeSealStrip, commitCapture, commitStorePatch, deeperDepth, depthRank, depthRetrievability, dictionaryRowBySeq, diveFromSlip, el, encounterKey, ensureArchiveIndex, ensureArticle, entryKanaIndex, explicitWordSnapshot, finiteNumber, fitChromeKeep, glyphBox, go, heldWordCardNode, hideReaderToast, holdPageUnderDrawer, kanaReadingKey, kataToHira, metReadable, motionEase, motionMs, nonEmptyString, notYetReleased, noteEncounter, openPlainSaveMenu, openSealStrip, openVocabularyListPopover, openWordWeb, owns, pageCutAllowed, paintMiniPath, passage, placeFloating, plainRecord, recordWritable, relayServiceUrl, removeMini, render, revalidateTutorRequests, revealFloatingFocus, rubyNode, sameItem, sameWordIdentity, saveWord, savedAnswerFor, sealListRecency, setOwnRecordValue, shallowerDepth, sheetActionLine, sheetActionLineKeys, showMini, srsKey, suppressAssessmentCards, tx, validInstant, wordCardIdentity, wordNodeIdentity, wordStudied } from '../corridor.js';
 import { encounterIdentity, readerQuickRecord } from './capture.mjs';
 import { listsByRecency } from './save-places.mjs';
 import { dictionaryAnsweredForm, inlineWordReading, lookup, partGloss, readyTokenReading, senseNameHeldText, senseRecord, teFormRecord } from './dictionary.mjs';
@@ -117,7 +117,8 @@ function paintWordSave(button, on) {
     // SAVE · painted in place, its spans kept: a repaint during a press (the bar's word put bare by the press itself) must
     // not take the element under the pointer out of the page, or the browser sends no click and the press is lost (seen
     // on a Mac at 1728: the first click on "Saved ✓ 産業" after touching the word did nothing, in the base build too)
-    const verbText = on ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save');
+    // P3-4 · saved, it names the place: "Review ✓ 産業", "旅 ✓ 産業" (barSavedVerb)
+    const verbText = on ? barSavedVerb(button) : tx('保存', 'Save');
     const wordText = word || tx('語をタップ', 'a word');
     const verbNow = button.querySelector('.save-bar-verb'), nameNow = button.querySelector('.save-bar-word');
     if (verbNow && nameNow) {
@@ -132,6 +133,7 @@ function paintWordSave(button, on) {
     button.classList.remove('is-verb-only', 'is-short');
     button.classList.toggle('taken', on);
     button.setAttribute('aria-pressed', String(on));
+    if (!on && word) button.setAttribute('aria-label', tx(`「${word}」を保存`, `Save ${word}`));
     button.title = '';
     if (button.isConnected) fitChromeKeep(button);
     return;

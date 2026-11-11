@@ -9780,7 +9780,9 @@ function openPlainSaveMenu(invoker, { more = [], place = null, home = null, keep
   const isSaved = () => !!saved?.();
   const now = isSaved();
   const where = { kind: 'home', names: home || ['保存', 'Saved'] };
-  const pop = el('div', 'vocabulary-list-popover is-save-menu is-plain is-chooser');
+  // one place only (the tutor page): the question and its one answer share a line, so the chooser asks in the room a
+  // sentence pane has under its Save without the pane scrolling the Save away (P3-1)
+  const pop = el('div', `vocabulary-list-popover is-save-menu is-plain is-chooser${keep && home ? ' is-one' : ''}`);
   pop.id = 'vocabulary-list-popover';
   pop.dataset.driftChrome = 'true';
   pop.dataset.chooser = now ? 'saved' : 'save';
@@ -9834,10 +9836,10 @@ function openPlainSaveMenu(invoker, { more = [], place = null, home = null, keep
     places.append(one);
     pop.append(title, places, notice);
   }
-  const rest = el('div', 'vocabulary-list-more');
-  if (now && show) more = [{ id: 'save-chooser-show', label: tx(`${where.names[0]}を見る`, `Show ${where.names[1]}`), run: show }, ...more];
-  for (const item of more) {
-    const button = el('button', 'vocabulary-list-action', item.label);
+  // P3-3 · the place's own Show stands at the places' foot; the thing's own acts (Copy) in a quiet row apart, never as a
+  // row among the places
+  const act = (item, cls) => {
+    const button = el('button', `save-place-act vocabulary-list-action ${cls}`, item.label);
     button.type = 'button';
     button.id = item.id;
     if (item.disabled) button.disabled = true;
@@ -9846,9 +9848,20 @@ function openPlainSaveMenu(invoker, { more = [], place = null, home = null, keep
       closeVocabularyListPopover({ restoreFocus: true });
       void item.run();
     });
-    rest.append(button);
+    return button;
+  };
+  if (now && show) {
+    const foot = el('div', 'save-chooser-foot');
+    foot.append(act({ id: 'save-chooser-show', label: tx(`${where.names[0]}を見る`, `Show ${where.names[1]}`), run: show }, ''));
+    pop.append(foot);
   }
-  if (rest.childElementCount) pop.append(rest);
+  if (more.length) {
+    const rest = el('div', 'vocabulary-list-more save-chooser-word-acts');
+    rest.setAttribute('role', 'group');
+    rest.setAttribute('aria-label', tx('これ', 'This'));
+    for (const item of more) rest.append(act(item, 'save-chooser-act'));
+    pop.append(rest);
+  }
   vocabularyListInvoker = invoker; vocabularyListNode = null;
   invoker?.setAttribute('aria-expanded', 'true');
   holdCardForChooser(invoker);
@@ -9993,9 +10006,9 @@ function closeVocabularyListPopover({ restoreFocus = false } = {}) {
 const CHOOSER_LISTS_SHOWN = 5;
 let savePickInFlight = false; // a pick's keep can draw its room again; no Save reopens a chooser while it lands
 let saveNewsQuiet = false; // a pick whose own Save names the place: the keep says nothing (P2-5)
-/** A Save that names the place it saved into (the box's, a row's, a page's): its pick needs no news. The article bar's
- * Save names only its word, and a word's anchor (the strip's sentence) names nothing. */
-const saveNamesPlace = (invoker) => !!invoker?.isConnected && invoker.dataset?.saveOne != null && invoker.dataset.saveBar == null;
+/** A Save that names the place it saved into (the box's, a row's, a page's, and since P3-4 the article bar's, "Review ✓"):
+ * its pick needs no news. A word's anchor (the strip's sentence) names nothing. */
+const saveNamesPlace = (invoker) => !!invoker?.isConnected && invoker.dataset?.saveOne != null;
 const sameSaved = (node) => (row) => !!row && row.t === node.t && row.id === node.id;
 /** A place's name as a pair: Review, a list's own name, or a plain item's home (the tutor page). */
 function placeWords(place) {
@@ -10124,18 +10137,22 @@ function buildPlaceChooser({ node, label, current, kind = 'menu', more = [], onP
   if (bi()) title.append(current ? 'Move ' : 'Save ', word, ' to');
   else title.append('「', word, current ? '」の移動先' : '」の保存先');
   head.append(title);
-  // the word's own acts (Copy, the deck's Remove from review) are not places: they stand in the head, apart (P2-4)
+  // P3-3 · a chooser holds places and nothing else. The word's own acts a surface hands it (Copy, the deck's Remove from
+  // review) stand apart, in a quiet row of their own under the places, as the strip's lower row stands under its chooser
+  // (the word's box and its sentence pane keep Copy outside the chooser altogether)
+  let acts = null;
   if (more.length) {
-    const acts = el('span', 'save-chooser-acts');
+    acts = el('div', 'save-chooser-word-acts');
+    acts.setAttribute('role', 'group');
+    acts.setAttribute('aria-label', tx('この語', 'This word'));
     for (const item of more) {
-      const button = el('button', 'save-chooser-act', item.label);
+      const button = el('button', 'save-place-act save-chooser-act', item.label);
       button.type = 'button';
       button.id = item.id;
       if (item.disabled) button.disabled = true;
       button.addEventListener('click', (event) => { event.stopPropagation(); onMore?.(item); });
       acts.append(button);
     }
-    head.append(acts);
   }
   const places = el('div', 'save-chooser-places');
   places.setAttribute('role', 'group');
@@ -10237,7 +10254,7 @@ function buildPlaceChooser({ node, label, current, kind = 'menu', more = [], onP
   const notice = el('p', 'vocabulary-list-status save-chooser-status');
   notice.setAttribute('role', 'status');
   const chooser = {
-    head, title, places, notice, choices, form, field, create, fresh, here,
+    head, title, places, notice, choices, form, field, create, fresh, here, acts,
     paint(busy) {
       for (const button of choices) button.disabled = busy || !recordWritable();
       create.disabled = busy || !recordWritable();
@@ -10345,12 +10362,14 @@ function openSaveChooser(node, label, invoker, { keep = null, saved = null, remo
     if (removeHere) footButton('save-chooser-remove', tx('保存を外す', 'Remove'), () => { closeVocabularyListPopover({ restoreFocus: true }); return removeHere(); });
     pop.append(foot);
   }
+  if (chooser.acts) pop.append(chooser.acts);
   const pick = async (to, { typed = false } = {}) => {
     if (busy || !allowed()) return;
     if (current && chooser.here(to)) { closeVocabularyListPopover({ restoreFocus: true }); return; }
     busy = true;
     savePickInFlight = true;
-    const names = saveNamesPlace(invoker);
+    // the Save that opened the chooser, or the one drawn again under its name while it stood (adoptSaveMenuOwner)
+    const names = saveNamesPlace(invoker?.isConnected ? invoker : invoker?.id ? document.getElementById(invoker.id) : null);
     saveNewsQuiet = true;
     chooser.notice.textContent = '';
     chooser.paint(true);
@@ -10368,7 +10387,9 @@ function openSaveChooser(node, label, invoker, { keep = null, saved = null, remo
     if (pop.isConnected) closeVocabularyListPopover({ restoreFocus: true });
     const owner = invoker?.isConnected ? invoker : invoker?.id ? document.getElementById(invoker.id) : null;
     paintPlacedSave(owner, node, label, isSaved);
-    if (!names || !owner?.isConnected) sayPlaced(node, label, result, { saved, keep });
+    // the naming Save may have been drawn again by its own repaint (the article bar's): the one under its name now counts
+    const named = names && !!(owner?.isConnected || (owner?.id && document.getElementById(owner.id)));
+    if (!named) sayPlaced(node, label, result, { saved, keep });
     // the word went somewhere: a seal presses onto it and flies to Saved today (G5's seal, now on his pick)
     if (result.created) {
       const anchor = owner?.closest?.('#mini') ? miniAnchor : null;
@@ -10385,9 +10406,11 @@ function openSaveChooser(node, label, invoker, { keep = null, saved = null, remo
   vocabularyListInvoker = invoker; vocabularyListNode = node;
   invoker?.setAttribute('aria-expanded', 'true');
   holdCardForChooser(invoker);
+  // P3-7 · the chooser opens under the Save that opened it, inside its box, at every width: it reads as that button's
+  // list (beside the box in a wide window's margin it stood apart, a card of its own). The box takes the room its seat
+  // has (over its own word while choosing) and folds its oldest lists behind More lists when that is short (P2-6)
   const card = invoker?.closest?.('#mini');
-  if (card && placeBeside(pop, card, invoker)) chooser.onGrow = () => placeBeside(pop, card, invoker);
-  else {
+  {
     placeSaveMenu(pop, invoker, place);
     if (card && pop.closest('#mini')) {
       // seated now, on the room its pinned top has (the box's own watcher would seat it only before the next paint),
@@ -10427,7 +10450,9 @@ if (typeof document !== 'undefined') document.addEventListener('keydown', (event
  * (tighten.css), so the box does not grow past its seat and leap to the word's other side; after the pick it stays. */
 function holdCardForChooser(invoker) {
   const card = invoker?.closest?.('#mini');
-  if (!card || card.dataset.pinTop) return;
+  if (!card) return;
+  // a sentence pane already keeps its top edge: the chooser only marks that it is open (placeFloating holds the seat)
+  if (card.dataset.pinTop) { card.dataset.chooserPin = '1'; return; }
   const exactTop = card.dataset.floatingTop;
   const moved = card.dataset.flow === 'text' ? window.scrollY - Number(card.dataset.seatScroll || window.scrollY) : 0;
   const top = exactTop !== undefined && Number.isFinite(Number(exactTop)) ? Number(exactTop) - moved
@@ -10571,7 +10596,10 @@ function showSavePlace(place, { node = null, invoker = null } = {}) {
   if (!rows.length) list.append(el('li', 'save-place-empty', tx('まだ空。', 'Nothing here yet.')));
   panel.append(list);
   if (rows.length > SHOWN) panel.append(el('p', 'save-place-note', tx(`ほか ${rows.length - SHOWN} 語`, `and ${rows.length - SHOWN} more`)));
-  const door = el('button', 'save-place-door', tx(`${ja}のページへ ›`, `Open ${en} ›`));
+  // P3-8 · the door says where it goes, not the panel's own title again: the place's full page, on the Words tab
+  const door = el('button', 'save-place-door', place.kind === 'today'
+    ? tx('今日の語をすべて辞書タブで見る ›', 'All of today’s words, on the Words tab ›')
+    : tx(`${ja}の語をすべて辞書タブで見る ›`, `All of ${en}, on the Words tab ›`));
   door.type = 'button';
   door.id = 'save-place-open';
   door.addEventListener('click', (event) => {
@@ -10587,11 +10615,10 @@ function showSavePlace(place, { node = null, invoker = null } = {}) {
     closeSavePlace({ restoreFocus: true });
   });
   if (card) {
-    if (!placeBeside(panel, card, invoker)) {
-      panel.classList.add('is-inline');
-      (card.querySelector(':scope > .mini-actions') || card.lastElementChild).after(panel);
-      keepMenuInCard(panel, head);
-    }
+    // under the Save's place line, inside the box, at every width (P3-7: tied to what opened it)
+    panel.classList.add('is-inline');
+    (card.querySelector(':scope > .mini-actions') || card.lastElementChild).after(panel);
+    keepMenuInCard(panel, head);
   } else if (strip) {
     panel.classList.add('is-inline');
     (strip.querySelector('.seal-strip-lists') || strip.firstElementChild).after(panel);
@@ -11061,6 +11088,14 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     said.append(line);
   }
   head.append(said);
+  // P3-3 · the word's Copy: a quiet act in the word's own band, beside the door to its full entry, outside the Save's
+  // chooser (it was a row of the chooser's head, where it read as "copy it to a list")
+  const copy = el('button', 'mini-copy', tx('コピー', 'Copy'));
+  copy.type = 'button';
+  copy.id = 'mini-copy';
+  copy.setAttribute('aria-label', tx(`「${label}」をコピー`, `Copy ${label}`));
+  copy.addEventListener('click', (event) => { event.stopPropagation(); copyReaderText(token.s || token.b); });
+  head.append(copy);
   mini.append(head);
   // S · a star of Today's sky says, in one plain line, why it is in the sky (missed yesterday · due today · …)
   if (why) {
@@ -11095,7 +11130,8 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
       review: save === 'host'
         ? { saved: hostSaved, toggle: () => (host.saved?.() ? host.untake?.() : host.take()) }
         : { saved: appSaved, toggle: () => toggleWordSave(captureNode, label) },
-      more: () => [{ id: 'mini-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(token.s || token.b) }],
+      // P3-3 · Copy is not a place: it stands in the word's band (above), not in the Save's chooser
+      more: () => [],
       // SAVE · Remove takes the word out where it was kept: the surface's own way for a host, else out everywhere
       ...(save === 'host' && host?.untake ? { remove: () => host.untake() } : {}),
       held: !canSave,
@@ -11365,7 +11401,10 @@ function placeFloating(card, r) {
   }
   // The sentence pane replaces the word card and keeps its top edge. It may grow past
   // the former word's anchor, using the whole screen below that saved edge.
-  const pinned = card.dataset.pinTop ? Number(card.dataset.pinTop) : NaN;
+  // SAVE · P3-1: a sentence pane keeps its top edge, but never above the top bar's foot (a word near the top whose card the
+  // page had carried under the bar opened its pane with its head, and a word of the sentence, under the bar)
+  const pinnedAt = card.dataset.pinTop ? Number(card.dataset.pinTop) : NaN;
+  const pinned = sentence && Number.isFinite(pinnedAt) && pinnedAt < ceiling ? ceiling : pinnedAt;
   // SAVE · while the box holds the chooser it may reach down over its own word (the box's head and the chooser's title
   // both name it): eight lists then have the glass down to the bar, not the strip of room above the word (P2-6)
   const pinnedRoom = !sentence && pinned < r.top && !card.dataset.chooserPin ? Math.min(floor, r.top - 10) - pinned : floor - pinned;
@@ -11373,8 +11412,10 @@ function placeFloating(card, r) {
     && (sentence || pinned < r.top || pinned >= r.bottom + 10);
   // A long sentence is a full document card on a phone: the page carries its text and actions.
   // Keep the short word card's fixed seat, and restore that reading position on Back.
+  // SAVE · P3-1: the pane's chooser never turns a floating pane into a page card (that moved the Save he pressed from
+  // 180 to 387 and ran the pane under the bottom bar): with the chooser open the pane holds its seat and scrolls inside
   const documentFlow = window.innerWidth <= 520 && sentence
-    && (wasDocument || m.height > (pinHolds ? pinnedRoom : Math.max(roomAbove, roomBelow, 96)));
+    && (wasDocument || (!card.dataset.chooserPin && m.height > (pinHolds ? pinnedRoom : Math.max(roomAbove, roomBelow, 96))));
   if (documentFlow) {
     if (!wasDocument) card.dataset.flowScroll = String(window.scrollY);
     card.dataset.flow = 'document';
@@ -11705,12 +11746,18 @@ function readerSentenceRow(node, index, sourceEnd = index) {
   const keep = saveOne({
     id: 'reader-context-save', cls: 'mini-sentence-keep', label: tx('この文', 'this sentence'), home: ['先生のページ', 'Tutor page'], 
     saved: () => sentenceKept(node),
-    keep: () => (recordWritable() ? sendSentenceToTutor(node, false, () => keep.isConnected, say) : false),
-    more: () => [{ id: 'reader-context-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(sentence?.quote || '') }],
+    // P3-5 · its Save says "Saved in Tutor page ✓" itself: no toast over the text he is reading repeats it (a failure
+    // still says why)
+    keep: () => (recordWritable() ? sendSentenceToTutor(node, false, () => keep.isConnected, say, { sayKept: false }) : false),
   });
   keep.disabled = !recordWritable();
   buttons.push(keep);
-  keepRow.append(keep);
+  // P3-3 · the sentence's Copy stands beside its Save, a quiet act of the sentence's own, not a row of the chooser
+  const copySentence = el('button', 'save-place-act mini-sentence-copy', tx('コピー', 'Copy'));
+  copySentence.type = 'button';
+  copySentence.id = 'reader-context-copy';
+  copySentence.addEventListener('click', (event) => { event.stopPropagation(); copyReaderText(sentence?.quote || ''); });
+  keepRow.append(keep, copySentence);
   pane.append(keepRow);
   // The door and pane trade places. Keep the top edge for long quotes too; placeFloating limits
   // the pane to the available space. Back on the word, the card sits beside its word again.
@@ -11740,7 +11787,7 @@ function readerSentenceRow(node, index, sourceEnd = index) {
 
 /** Keep a sentence on the tutor page, or (discuss) open the tutor with it. One guarded write; the
  * navigation happens only while the surface that asked is still there. */
-async function sendSentenceToTutor(node, discuss, currentSurface, say) {
+async function sendSentenceToTutor(node, discuss, currentSurface, say, { sayKept = true } = {}) {
   const epoch = recordEpoch;
   const selectionSerial = discuss ? ++teacherContextSelectionSerial : null;
   try {
@@ -11757,7 +11804,7 @@ async function sendSentenceToTutor(node, discuss, currentSurface, say) {
       keepScroll(); stopReadAloud(); S.stack = [];
       S.view = 'ai'; S.aiChatShown = AI_CHAT_PAGE;
       render(); window.scrollTo(0, 0);
-    } else say(tx('先生のページに保存した。', 'Saved on the tutor page.'));
+    } else if (sayKept) say(tx('先生のページに保存した。', 'Saved on the tutor page.'));
     return true;
   } catch (error) {
     if (recordReady(epoch)) say(teacherSourceError(error));
@@ -26094,14 +26141,29 @@ function fitChromeKeep(button = document.getElementById('chrome-keep')) {
   if (!verb) return;
   const on = button.getAttribute('aria-pressed') === 'true';
   button.classList.remove('is-verb-only', 'is-short');
-  const verbText = on ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save');
+  const verbText = on ? barSavedVerb(button) : tx('保存', 'Save');
   if (verb.textContent !== verbText) verb.textContent = verbText;
   const fits = () => button.scrollWidth <= button.clientWidth + 0.5;
   if (fits()) return;
   button.classList.add('is-verb-only');
   if (fits() || !on) return;
   button.classList.add('is-short');
-  verb.textContent = tx('保存済み', 'Saved');
+  verb.textContent = barSavedVerb(button, { mark: false });
+}
+/** P3-4 · the article bar's Save, saved, names the place in the room the bar has (the ruling's point 3: never a bare
+ * "Saved ✓"): "Review ✓", "旅 ✓", a long list's name cut with "…" and said whole in its title. */
+function barSavedVerb(button, { mark = true } = {}) {
+  const place = typeof button?.savePlaced === 'function' ? button.savePlaced() : null;
+  const name = place ? tx(...placeWords(place)) : tx('保存済み', 'Saved');
+  const chars = [...name];
+  const cut = chars.length > 10 ? `${chars.slice(0, 9).join('')}…` : name;
+  // a name cut short is said whole in the Save's title; its accessible name says the word and the place
+  if (button) {
+    button.title = cut === name ? '' : name;
+    const word = button.dataset.saveWord || '';
+    if (place && word) button.setAttribute('aria-label', tx(`「${word}」${placeWords(place)[0]}に保存済み`, `${word}, saved in ${placeWords(place)[1]}`));
+  }
+  return mark ? `${cut} ✓` : cut;
 }
 
 /** The capture node the reader's door commits: the word as encountered —
@@ -38088,4 +38150,4 @@ function deckHost() {
   return deckHostAdapter;
 }
 
-export { $, savedInParts, savedPlace, voiceSettingsBlock, AI_DEFAULT_BASE_URL, AI_DEFAULT_MODEL, AI_DEVICE_STORE, AI_EVIDENCE_ROLES, AI_KEY_STORE, AI_MINE_MAX_ROWS, AI_READING_TIMEOUT_CAP_MS, AI_READING_TOKENS_PER_SECOND, AI_TIMEOUT_MS, ANNOTATION_DIGITS, BEYOND_JOYO, D, DEPTH_NAMES, DEPTH_OWNED_S, DEPTH_RECALLED_S, DEPTH_RECALL_R, DICTIONARY_INDEX_PATH, DICTIONARY_SHARD_PATH, DOJO_DECKS, DRAFT_KEY, DRIFT_THEME_BY_WORLD, EXAMPLE_DIR, FRAMES_CAP, FRAMES_STORE, GESTURE, GLOSS_LEAD, GLOSS_MESSY, GLUE_STROKE, GODAN_ROW, GODAN_TE, GRAMMAR, INK_DEPTH, INK_TEMPO, INK_WORLDS, ISO_DAY, JOYO_JUDGEABLE, JOYO_MARKS, KAGAMI_BAND_NAMES, KAGAMI_CLEAR, KAGAMI_CODE_BAND, KAGAMI_LEVELS, KAGAMI_MIN_SEEN, KAGAMI_MODEL_VERSION, KAGAMI_OOV, KANJI_QUEST_FAILED, KANJI_QUEST_STRUCTURAL, KATA_TO_HIRA_OFFSET, LEADING_DROP_DAYS, LEARN_STAGE_DECKS, LEMMA_NIDAN, LEMMA_ONBIN, LESSON_SIZE, LOOKUP_HELPER_POS, M4_COPY, ME_DECKS, ME_FIELDS, ME_MONTHS_EN, ME_N1_SITTING, MINI_INK, MONTHS_EN, NARRATION_VOICES, NEW_PER_DAY_DEFAULT, NODE_KIND, NOTE_TEXT, PARTICLES, PARTICLE_BY_SURFACE, PART_STROKES, PART_WRITTEN, PLACES_TABS, POS_FAMILY, POS_PLAIN, POS_SEGMENT_CODE, PRIMARY_TABS, READER_KANA, READER_KANJI, REGISTER_LINE_DOORS, REGISTER_ROOM_DOORS, REL, REPORT_RELAY_STORE, REVIEWS_PER_DAY_DEFAULT, ROMAJI, ROOM_IDS, ROOM_NAMES, S, SAVE_PRESS_MS, SENSEI_OBS_CODES, SENSE_BY_ANCHOR, SENSE_CLASS, SENSE_GAVE_UP, SENSE_LATE, SENSE_MUST_END, SENSE_MUST_NOT, SENSE_NUMBER, SENSE_NUMBER_WORD, SENSE_TAG_EN, SENSE_TAG_JA, SENSE_WAIT_MS, SENSE_WEEKDAY, SHORT_EXAMPLE_CHARS, SLIP_NODE, SLIP_OWN_MEANING, SOUND_PLAIN, SOUND_VOICED, SPEAK_JA, SRS_KINDS, SRS_PREF_LADDERS, SRS_PRESETS, STROKE_SPEED_DEFAULT, STROKE_VIEWBOX, SVG_NS, TE_FORM_AUXILIARY, TE_FORM_NOTE, THEME_STORE, THEME_UI, THES_RELS, TODAY_JA_WORD, TODAY_SKY_CAP, TODAY_SKY_MISS_DAYS, TODAY_SKY_WORD, TOKEN_CONTEXT, TOPIC_BLOCKS, TOPIC_KICKERS, TOPIC_ORDER, TOUCH_READING_FADES, TOUCH_READING_GAP, TOUCH_READING_MOTION, TOUCH_READING_ROWS, TOUCH_ROW_PINS, TRAIL_KINDS, VOICE_LOCK, WORD_BRUSH, WORD_BRUSH_KEY, WORD_VOICE, WORD_VOICE_KEY, WW_CX, WW_CY, WW_KANJI_ANGLES, WW_REL, WW_RING2_ORDER, WW_RING2_SLOTS, WW_TRAIL_MAX, WW_WALK_KEY, YOMI_DAKUTEN, YOMI_HANDAKU, _KDX_NPTS, _compsCache, _kdxDist, _kdxNorm, _kdxResample, _kdxTemplates, activateWordLadder, afterPressLands, aiChatLog, aiConverse, aiLogAll, aiSheetNotes, aiSheetTurns, allAssessmentEvidence, anchorBox, animcjkApproved, animcjkShards, annotationKana, applyAssessmentV2, approvedWordManifest, assertLearningSource, assessmentClockSession, back, bi, biLabel, boxLeadGloss, buildListenRow, buildTeacherChatLog, cacheDictionaryFormRows, cacheDictionaryRow, cancelExcerptPlayback, canonicalRecordJson, capturePending, captureScaleVisit, cardAudioSerial, cardRecall, chipsFor, clearReaderReadings, clearReaderSummons, clearWordLadder, closeSealStrip, closeWorldPicker, commitCapture, commitStorePatch, confusablesFor, contrastOf, controlsUnder, copyRecordWith, currentAssessmentV2, currentJoyoKunNote, currentRecordNoteView, currentSentenceListeningCue, deckSummaries, deeperDepth, depthIndexMemo, depthNodeCache, depthRank, depthRetrievability, dictionaryQueryOpening, dictionaryReadingSummaries, dictionaryRowBySeq, dictionaryWorkerRequest, diveFromMini, diveFromSlip, el, encounterKey, enhanceJapaneseProse, ensureArchiveIndex, ensureArticle, ensureDictionaryIndex, ensureDictionaryShard, ensureReadingPositionModule, ensureSenseSidecar, ensureSentenceListeningCatalog, entryKanaIndex, explicitWordSnapshot, fetchData, fieldsDeckHome, findLookupOccurrence, finishPageTransition, finiteNumber, fitChromeKeep, flowText, focusKanjiItem, foundationDoor, frameFoot, gateFrame, glyphBox, go, guidedTaken, heldWordCardNode, heroSource, hideReaderToast, holdPageUnderDrawer, inkGroundFor, installProseWordRoving, installScaleBridge, interaction, invalidateRecordNoteViews, isLeech, jaGroupSegments, jlptRank, kagamiBandFor, kagamiLevel, kagamiLevelOf, kagamiMockBand, kanaReadingKey, kanjiAnswerAvailable, kanjiCourseApplyHelp, kanjiCourseRememberHelp, kanjiDisplayRecord, kanjiFamilyExposures, kanjiFamilyMounts, kanjiFamilyResolveExample, kanjiFamilyStamp, kanjiFamilyStampCurrent, kanjiFamilyTicket, kanjiFamilyTicketCurrent, kanjiFamilyViews, kanjiQuestFor, kanjiQuestLoading, kanjiQuestOwner, kanjiReadingsState, kanjiReferenceRows, kanjiStructureMounts, kanjiWorldEligible, kankenGradeLabel, kataToHira, keepNavigationReturn, laneMembers, layersMarkTop, learnDeckSummary, learnStageFace, loadReferenceExtra, logicalArchiveRows, lookupWordKey, meBackPart, meDeckIndex, meNum, meSealsPart, metReadable, mockFailed, motionEase, motionMs, narrationVoiceName, nonEmptyString, notYetReleased, noteEncounter, openAssessmentQuestionReview, openDeck, openGuidedRoom, openJapaneseLookup, openKanjiCourseUnit, openKanjiWorldEncounter, openPassage, openPersonalCollection, openPlainSaveMenu, openReferenceCollection, openSealStrip, openSentencePractice, openSpeakRoom, openStrokePage, openVocabularyListPopover, openWordWeb, optional, ownSentenceExample, owns, pageCutAllowed, paintKeptCount, paintMiniPath, passage, performAssessmentReconciliation, placeFloating, placeKinsoku, placesLayout, plainRecord, proseWordRovers, protectStore, queueAssessmentWork, quietUsageTags, readAloud, readFrameRows, readHelpPatch, readHelpReadable, readerReadingFits, readerSummaryFor, readerTokenLead, recordReady, recordWritable, refreshStrokeReadings, refreshWordSheet, relayServiceUrl, removeMini, render, renderFamilyExampleNode, renderKanjiCourseDoor, renderKanjiFamily, renderKanjiStructure, renderKdxGrid, renderReferenceConnections, renderReviewHall, renderSentenceTokens, renderSourceInboxEntries, renderSourceKanjiDoor, renderStudyFold, renderStudyHall, renderTeacherDoor, renderTextSourceContextSelection, renderWordWeb, resolveReaderChoice, resolveTeacherSource, retainedKanjiRecord, retireScaleReturn, returnToScaleBead, revalidateTutorRequests, revealFloatingFocus, roomName, roomTransition, rubyNode, safeJsonValue, sameItem, sameWordIdentity, saveWord, savedAnswerFor, scaleIn, scaleNavigationAllowed, scaleOut, scalePassage, scaleThreadPath, scaleTokenFingerprint, sealListRecency, senseGlosses, senseLed, senseNumberBefore, sensePatch, senseWeekdayBracket, sentenceDraftBindings, sentenceDraftInputErrors, sentenceDraftWindowEdits, setGlossLine, setJaWords, setLayout, setLookupStop, setOwnRecordValue, setWordPref, shallowerDepth, sheetActionLine, sheetActionLineKeys, shelfDay, showMini, skipState, sourceInboxShelf, speakAvailable, srsDueItems, srsKey, srsParamsProblem, srsRoomBack, srsSchedulePolicy, stopPassageRead, stopSentenceListening, strokePathsFor, strokeReduced, strokeSpeed, studyHallDoors, suppressAssessmentCards, syncChromeKeep, syncStrokeNumbers, teacherDraftInputErrors, teacherDraftWindowEdits, teacherSourceProcessingUnavailable, teacherWindowDraftPrefix, todayQueue, todaySky, transcriptTime, trayItemPending, tx, uiIcon, updateReaderPlaceSave, updateReadingPlaces, validInstant, validNewPerDay, validPauseEvery, validPreset, validRetention, validReviewsPerDay, validStoreEnvelope, waitForLookupNameReadings, wireReaderWordMenu, withEn, wordBrush, wordCardIdentity, wordNodeIdentity, wordStudied, wordVoice, wordWeb, writtenFormNote, wwP, wwPartMembers, wwReduced, wwShort, wwSpread, wwTokenIndex, wwTrail, yomiVariantCache };
+export { $, barSavedVerb, savedInParts, savedPlace, voiceSettingsBlock, AI_DEFAULT_BASE_URL, AI_DEFAULT_MODEL, AI_DEVICE_STORE, AI_EVIDENCE_ROLES, AI_KEY_STORE, AI_MINE_MAX_ROWS, AI_READING_TIMEOUT_CAP_MS, AI_READING_TOKENS_PER_SECOND, AI_TIMEOUT_MS, ANNOTATION_DIGITS, BEYOND_JOYO, D, DEPTH_NAMES, DEPTH_OWNED_S, DEPTH_RECALLED_S, DEPTH_RECALL_R, DICTIONARY_INDEX_PATH, DICTIONARY_SHARD_PATH, DOJO_DECKS, DRAFT_KEY, DRIFT_THEME_BY_WORLD, EXAMPLE_DIR, FRAMES_CAP, FRAMES_STORE, GESTURE, GLOSS_LEAD, GLOSS_MESSY, GLUE_STROKE, GODAN_ROW, GODAN_TE, GRAMMAR, INK_DEPTH, INK_TEMPO, INK_WORLDS, ISO_DAY, JOYO_JUDGEABLE, JOYO_MARKS, KAGAMI_BAND_NAMES, KAGAMI_CLEAR, KAGAMI_CODE_BAND, KAGAMI_LEVELS, KAGAMI_MIN_SEEN, KAGAMI_MODEL_VERSION, KAGAMI_OOV, KANJI_QUEST_FAILED, KANJI_QUEST_STRUCTURAL, KATA_TO_HIRA_OFFSET, LEADING_DROP_DAYS, LEARN_STAGE_DECKS, LEMMA_NIDAN, LEMMA_ONBIN, LESSON_SIZE, LOOKUP_HELPER_POS, M4_COPY, ME_DECKS, ME_FIELDS, ME_MONTHS_EN, ME_N1_SITTING, MINI_INK, MONTHS_EN, NARRATION_VOICES, NEW_PER_DAY_DEFAULT, NODE_KIND, NOTE_TEXT, PARTICLES, PARTICLE_BY_SURFACE, PART_STROKES, PART_WRITTEN, PLACES_TABS, POS_FAMILY, POS_PLAIN, POS_SEGMENT_CODE, PRIMARY_TABS, READER_KANA, READER_KANJI, REGISTER_LINE_DOORS, REGISTER_ROOM_DOORS, REL, REPORT_RELAY_STORE, REVIEWS_PER_DAY_DEFAULT, ROMAJI, ROOM_IDS, ROOM_NAMES, S, SAVE_PRESS_MS, SENSEI_OBS_CODES, SENSE_BY_ANCHOR, SENSE_CLASS, SENSE_GAVE_UP, SENSE_LATE, SENSE_MUST_END, SENSE_MUST_NOT, SENSE_NUMBER, SENSE_NUMBER_WORD, SENSE_TAG_EN, SENSE_TAG_JA, SENSE_WAIT_MS, SENSE_WEEKDAY, SHORT_EXAMPLE_CHARS, SLIP_NODE, SLIP_OWN_MEANING, SOUND_PLAIN, SOUND_VOICED, SPEAK_JA, SRS_KINDS, SRS_PREF_LADDERS, SRS_PRESETS, STROKE_SPEED_DEFAULT, STROKE_VIEWBOX, SVG_NS, TE_FORM_AUXILIARY, TE_FORM_NOTE, THEME_STORE, THEME_UI, THES_RELS, TODAY_JA_WORD, TODAY_SKY_CAP, TODAY_SKY_MISS_DAYS, TODAY_SKY_WORD, TOKEN_CONTEXT, TOPIC_BLOCKS, TOPIC_KICKERS, TOPIC_ORDER, TOUCH_READING_FADES, TOUCH_READING_GAP, TOUCH_READING_MOTION, TOUCH_READING_ROWS, TOUCH_ROW_PINS, TRAIL_KINDS, VOICE_LOCK, WORD_BRUSH, WORD_BRUSH_KEY, WORD_VOICE, WORD_VOICE_KEY, WW_CX, WW_CY, WW_KANJI_ANGLES, WW_REL, WW_RING2_ORDER, WW_RING2_SLOTS, WW_TRAIL_MAX, WW_WALK_KEY, YOMI_DAKUTEN, YOMI_HANDAKU, _KDX_NPTS, _compsCache, _kdxDist, _kdxNorm, _kdxResample, _kdxTemplates, activateWordLadder, afterPressLands, aiChatLog, aiConverse, aiLogAll, aiSheetNotes, aiSheetTurns, allAssessmentEvidence, anchorBox, animcjkApproved, animcjkShards, annotationKana, applyAssessmentV2, approvedWordManifest, assertLearningSource, assessmentClockSession, back, bi, biLabel, boxLeadGloss, buildListenRow, buildTeacherChatLog, cacheDictionaryFormRows, cacheDictionaryRow, cancelExcerptPlayback, canonicalRecordJson, capturePending, captureScaleVisit, cardAudioSerial, cardRecall, chipsFor, clearReaderReadings, clearReaderSummons, clearWordLadder, closeSealStrip, closeWorldPicker, commitCapture, commitStorePatch, confusablesFor, contrastOf, controlsUnder, copyRecordWith, currentAssessmentV2, currentJoyoKunNote, currentRecordNoteView, currentSentenceListeningCue, deckSummaries, deeperDepth, depthIndexMemo, depthNodeCache, depthRank, depthRetrievability, dictionaryQueryOpening, dictionaryReadingSummaries, dictionaryRowBySeq, dictionaryWorkerRequest, diveFromMini, diveFromSlip, el, encounterKey, enhanceJapaneseProse, ensureArchiveIndex, ensureArticle, ensureDictionaryIndex, ensureDictionaryShard, ensureReadingPositionModule, ensureSenseSidecar, ensureSentenceListeningCatalog, entryKanaIndex, explicitWordSnapshot, fetchData, fieldsDeckHome, findLookupOccurrence, finishPageTransition, finiteNumber, fitChromeKeep, flowText, focusKanjiItem, foundationDoor, frameFoot, gateFrame, glyphBox, go, guidedTaken, heldWordCardNode, heroSource, hideReaderToast, holdPageUnderDrawer, inkGroundFor, installProseWordRoving, installScaleBridge, interaction, invalidateRecordNoteViews, isLeech, jaGroupSegments, jlptRank, kagamiBandFor, kagamiLevel, kagamiLevelOf, kagamiMockBand, kanaReadingKey, kanjiAnswerAvailable, kanjiCourseApplyHelp, kanjiCourseRememberHelp, kanjiDisplayRecord, kanjiFamilyExposures, kanjiFamilyMounts, kanjiFamilyResolveExample, kanjiFamilyStamp, kanjiFamilyStampCurrent, kanjiFamilyTicket, kanjiFamilyTicketCurrent, kanjiFamilyViews, kanjiQuestFor, kanjiQuestLoading, kanjiQuestOwner, kanjiReadingsState, kanjiReferenceRows, kanjiStructureMounts, kanjiWorldEligible, kankenGradeLabel, kataToHira, keepNavigationReturn, laneMembers, layersMarkTop, learnDeckSummary, learnStageFace, loadReferenceExtra, logicalArchiveRows, lookupWordKey, meBackPart, meDeckIndex, meNum, meSealsPart, metReadable, mockFailed, motionEase, motionMs, narrationVoiceName, nonEmptyString, notYetReleased, noteEncounter, openAssessmentQuestionReview, openDeck, openGuidedRoom, openJapaneseLookup, openKanjiCourseUnit, openKanjiWorldEncounter, openPassage, openPersonalCollection, openPlainSaveMenu, openReferenceCollection, openSealStrip, openSentencePractice, openSpeakRoom, openStrokePage, openVocabularyListPopover, openWordWeb, optional, ownSentenceExample, owns, pageCutAllowed, paintKeptCount, paintMiniPath, passage, performAssessmentReconciliation, placeFloating, placeKinsoku, placesLayout, plainRecord, proseWordRovers, protectStore, queueAssessmentWork, quietUsageTags, readAloud, readFrameRows, readHelpPatch, readHelpReadable, readerReadingFits, readerSummaryFor, readerTokenLead, recordReady, recordWritable, refreshStrokeReadings, refreshWordSheet, relayServiceUrl, removeMini, render, renderFamilyExampleNode, renderKanjiCourseDoor, renderKanjiFamily, renderKanjiStructure, renderKdxGrid, renderReferenceConnections, renderReviewHall, renderSentenceTokens, renderSourceInboxEntries, renderSourceKanjiDoor, renderStudyFold, renderStudyHall, renderTeacherDoor, renderTextSourceContextSelection, renderWordWeb, resolveReaderChoice, resolveTeacherSource, retainedKanjiRecord, retireScaleReturn, returnToScaleBead, revalidateTutorRequests, revealFloatingFocus, roomName, roomTransition, rubyNode, safeJsonValue, sameItem, sameWordIdentity, saveWord, savedAnswerFor, scaleIn, scaleNavigationAllowed, scaleOut, scalePassage, scaleThreadPath, scaleTokenFingerprint, sealListRecency, senseGlosses, senseLed, senseNumberBefore, sensePatch, senseWeekdayBracket, sentenceDraftBindings, sentenceDraftInputErrors, sentenceDraftWindowEdits, setGlossLine, setJaWords, setLayout, setLookupStop, setOwnRecordValue, setWordPref, shallowerDepth, sheetActionLine, sheetActionLineKeys, shelfDay, showMini, skipState, sourceInboxShelf, speakAvailable, srsDueItems, srsKey, srsParamsProblem, srsRoomBack, srsSchedulePolicy, stopPassageRead, stopSentenceListening, strokePathsFor, strokeReduced, strokeSpeed, studyHallDoors, suppressAssessmentCards, syncChromeKeep, syncStrokeNumbers, teacherDraftInputErrors, teacherDraftWindowEdits, teacherSourceProcessingUnavailable, teacherWindowDraftPrefix, todayQueue, todaySky, transcriptTime, trayItemPending, tx, uiIcon, updateReaderPlaceSave, updateReadingPlaces, validInstant, validNewPerDay, validPauseEvery, validPreset, validRetention, validReviewsPerDay, validStoreEnvelope, waitForLookupNameReadings, wireReaderWordMenu, withEn, wordBrush, wordCardIdentity, wordNodeIdentity, wordStudied, wordVoice, wordWeb, writtenFormNote, wwP, wwPartMembers, wwReduced, wwShort, wwSpread, wwTokenIndex, wwTrail, yomiVariantCache };

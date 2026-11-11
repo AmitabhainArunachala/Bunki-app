@@ -544,8 +544,62 @@ html body:not(#\#):not(#\#) .primary-tabs > #saved-row {
   border-bottom: var(--stroke-hairline, 1px) solid color-mix(in srgb, var(--color-edge-strong, var(--color-rule)) 60%, transparent);
   color: var(--color-ink);
 }
-/* the moving car rides the tabs' track, a row lower while the row stands */
+/* the moving car rides the tabs' track, a row lower while the row stands in the bar's flow */
 html body:not(#\#):not(#\#) .primary-tabs[data-saved-row] > .line-car { top: calc(var(--line-y) - 6px + 40px); }
+@media (max-width: 699px) {
+  html body:not(#\#):not(#\#) .primary-tabs > #saved-row { padding-right: 38px; }
+}
+/* P3-2 (a) · a phone's reader with the player docked: the dock band holds the player and the row is the bar's first row;
+   the gap the player leaves above the bar is closed in the dock's own paper, so no line of the article shows between the
+   player and the row */
+@media (max-width: 520px) {
+  html body.has-primary-tabs[data-view='reader']:not(.zen):not(#\#):not(#\#):has(.listen-row.play-bar[data-open='true']) #primary-tabs[data-saved-row]::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    height: 8px;
+    background: var(--raised, var(--color-bar));
+  }
+}
+/* P3-2 · where the foot already has a band the row takes its place instead of adding to the bar, so the bar is one closed
+   surface, the reading room keeps its height, and nothing (試, 層, a dock) moves when the first word is saved:
+   · a phone's reader, 層 resting on the reader's dock (the 52 px band above the bar, #app::after): the row stands in that
+     band, left of 層 and a finger's width short of it; the band paints it. (With the play bar open the band holds the
+     player, and the row is the bar's first row again.)
+   · a window wide enough to have room beside the five stations (1400 px and more): the row stands in the bar's own left
+     margin, level with the stations. */
+@media (max-width: 520px) {
+  html body.has-primary-tabs[data-view='reader']:not(.zen):not(#\#):not(#\#):has(#layers-mark:not([data-docked])):not(:has(.listen-row.play-bar[data-open='true'])) .primary-tabs > #saved-row {
+    position: absolute;
+    grid-column: auto;
+    left: var(--tabs-pad, 8px);
+    right: calc(92px + env(safe-area-inset-right, 0px));
+    bottom: 100%;
+    height: 52px;
+    margin: 0;
+    padding: 0;
+    border-bottom: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  html body.has-primary-tabs[data-view='reader']:not(.zen):not(#\#):not(#\#):has(#layers-mark:not([data-docked])):not(:has(.listen-row.play-bar[data-open='true'])) .primary-tabs[data-saved-row] > .line-car { top: calc(var(--line-y) - 6px); }
+}
+@media (min-width: 1400px) {
+  html body:not(#\#):not(#\#) .primary-tabs > #saved-row {
+    position: absolute;
+    grid-column: auto;
+    top: 8px;
+    left: 24px;
+    width: calc(var(--tabs-pad) - 56px);
+    height: 44px;
+    margin: 0;
+    padding: 0;
+    border-bottom: 0;
+  }
+  html body:not(#\#):not(#\#) .primary-tabs[data-saved-row] > .line-car { top: calc(var(--line-y) - 6px); }
+}
 html body:not(#\#):not(#\#) #saved-today {
   display: inline-flex;
   flex: 0 0 auto;
@@ -586,9 +640,11 @@ html body:not(#\#):not(#\#) #saved-today .saved-today-count {
 }
 html body:not(#\#):not(#\#) #saved-today:hover { background: color-mix(in srgb, var(--color-accent) 7%, transparent); }
 html body:not(#\#):not(#\#) #saved-today:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
-html body:not(#\#):not(#\#) #saved-news { display: flex; flex: 1 1 auto; align-items: center; justify-content: flex-end; gap: 4px; min-width: 0; margin: 0; font: 500 var(--type-label) / 1.2 var(--font-ui); color: var(--color-ink-2); }
+/* P3-6 · the news starts at the left, right after Saved today's mark, and its Undo keeps a finger's width (44 px) clear of
+   試 and 層 at the bar's right end: the row stops that far short of them */
+html body:not(#\#):not(#\#) #saved-news { display: flex; flex: 1 1 auto; align-items: center; justify-content: flex-start; gap: 4px; min-width: 0; margin: 0; font: 500 var(--type-label) / 1.2 var(--font-ui); color: var(--color-ink-2); }
 html body:not(#\#):not(#\#) #saved-news[hidden] { display: none; }
-html body:not(#\#):not(#\#) #saved-news .saved-news-text { display: -webkit-box; min-width: 0; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow-wrap: anywhere; text-align: end; }
+html body:not(#\#):not(#\#) #saved-news .saved-news-text { display: -webkit-box; min-width: 0; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow-wrap: anywhere; text-align: start; }
 /* on a phone, while a save's news stands, Saved today keeps its mark and its number and lends its words' room to the
    news, so the news can name the place whole ("Saved 産業 in Review · Undo") */
 @media (max-width: 699px) {
@@ -718,3 +774,49 @@ html body:not(#\#):not(#\#) .seal-strip .seal-strip-acts { display: flex; flex-w
 html body:not(#\#):not(#\#) .seal-strip .seal-strip-acts > .seal-act { min-height: 44px; padding: 0 10px; color: var(--color-accent); }
 html body:not(#\#):not(#\#) .seal-strip .seal-strip-acts > .seal-act:not([hidden]) ~ .seal-act:not([hidden])::before { content: '·'; margin: 0 10px 0 -6px; color: var(--color-rule); font-weight: 400; }
 html body:not(#\#):not(#\#) .seal-strip .seal-strip-lists > [data-strip-action='remove'] { color: var(--color-ink-2); }
+
+/* P3-3 · Copy is the word's own act, never a place. In the word's box it stands in the word's band, beside the door to the
+   full entry (the band's chevron), quiet in the band's own ink and above the band's door so a press copies and opens
+   nothing; in the sentence pane it stands beside the sentence's Save; anywhere else a chooser is handed acts of the
+   thing's own, they stand apart under the places, a quiet row like the strip's lower row */
+html body:not(#\#):not(#\#) #mini .mini-head > .mini-copy {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: 34px;
+  min-width: 44px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  box-shadow: none;
+  color: var(--mini-head-ink-2);
+  font: 500 var(--type-label) / 1 var(--font-ui);
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+html body:not(#\#):not(#\#) #mini .mini-head > .mini-copy:hover { color: var(--mini-head-ink); }
+html body:not(#\#):not(#\#) #mini .mini-head:has(> .mini-copy) { padding-right: 92px; }
+html body:not(#\#):not(#\#) #mini.is-sentence .mini-head > .mini-copy { display: none; }
+html body:not(#\#):not(#\#) #mini.is-sentence .mini-head:has(> .mini-copy) { padding-right: 40px; }
+html body:not(#\#):not(#\#) .mini-sentence-keep-row { display: flex; flex-wrap: nowrap; align-items: center; gap: 0 8px; }
+html body:not(#\#):not(#\#) .mini-sentence-keep-row > .mini-sentence-keep { flex: 1 1 auto; width: auto; min-width: 0; }
+html body:not(#\#):not(#\#) .mini-sentence-keep-row > .mini-sentence-copy { flex: 0 0 auto; }
+html body:not(#\#):not(#\#) .mini-sentence-keep-row > .mini-sentence-copy { min-height: 44px; padding: 0 10px; color: var(--color-accent); }
+html body:not(#\#):not(#\#) .save-chooser-word-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 0 2px; margin: 6px 0 0; padding: 2px 0 0; border-top: var(--stroke-hairline, 1px) solid var(--color-rule-soft, var(--color-rule)); }
+html body:not(#\#):not(#\#) .save-chooser-word-acts > .save-place-act { min-height: 44px; padding: 0 10px; color: var(--color-accent); }
+html body:not(#\#):not(#\#) .save-chooser-word-acts > .save-place-act + .save-place-act::before { content: '·'; margin: 0 10px 0 -6px; color: var(--color-rule); font-weight: 400; }
+
+/* the one-place chooser (Save the sentence → the tutor page): the question and its answer on one line, wrapping when the
+   column is too narrow for both */
+html body:not(#\#):not(#\#) .vocabulary-list-popover.is-plain.is-one { display: flex; flex-wrap: wrap; align-items: center; column-gap: 8px; }
+html body:not(#\#):not(#\#) .vocabulary-list-popover.is-plain.is-one > .save-chooser-title { flex: 1 1 9em; min-width: 0; margin-block: 0; }
+html body:not(#\#):not(#\#) .vocabulary-list-popover.is-plain.is-one > .save-chooser-places { flex: 0 1 auto; min-width: 0; }
+html body:not(#\#):not(#\#) .vocabulary-list-popover.is-plain.is-one > .save-chooser-places > .save-place { border-top: 0; }
+html body:not(#\#):not(#\#) .vocabulary-list-popover.is-plain.is-one > :not(.save-chooser-title):not(.save-chooser-places) { flex: 1 0 100%; }
+html body:not(#\#):not(#\#) .vocabulary-list-popover.is-plain.is-one > .vocabulary-list-status:empty { display: none; }
+html body:not(#\#):not(#\#) #mini .vocabulary-list-popover.is-plain.is-one.is-inline { margin-top: -6px; margin-bottom: 0; padding-top: 0; border-top: 0; }
+/* the pane gives its foot's padding to the chooser while it asks (below the Save: nothing above it moves) */
+html body:not(#\#):not(#\#) #mini .mini-sentence-pane:has(.vocabulary-list-popover.is-inline) { padding-bottom: 0; }

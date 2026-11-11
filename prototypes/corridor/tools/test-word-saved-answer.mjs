@@ -134,6 +134,8 @@ function defineRows() {
     // pass 2 (P2-1, P2-5): a save's news is said in the bottom bar's row beside Saved today, only where the Save that was
     // pressed does not name the place itself
     'SAVE_NEWS_MS', 'saveNews', 'saveNewsTimer', 'saveNewsQuiet', 'saySaveNews', 'saveNamesPlace',
+    // pass 3 (P3-4): the article bar's Save, saved, names the place ("Review ✓")
+    'barSavedVerb',
     'assessmentSuppressionRetries', 'suppressAssessmentCards', 'performAssessmentSuppression',
     'listReading', 'listGloss', 'listToMarkdown', 'resolveAssessmentSubject', 'learningEnrollmentPending', 'commitLearningEnrollment',
     'reviewAnswerAvailable', 'reviewCardBack', 'reviewBack', 'kanjiAnswerAvailable', 'retainedKanjiRecord', 'validKanjiRecord',
