@@ -1069,6 +1069,182 @@ describe('a study card’s front is never read by a resting pointer', () => {
   });
 });
 
+describe('on a card’s question face the only voice is the card’s own control (the lead’s ruling after the combine’s review, F1)', () => {
+  const within = (outer, node) => {
+    for (let at = node; at; at = at.parentNode) if (at === outer) return true;
+    return false;
+  };
+  /** The voice layer's answer, faked: on `face`, the asked word and the control are open (where a control stands) and say
+   * what the control says; anywhere else on the face nothing is open; off the face, null. */
+  const asking = ({ face, asked = null, control = null, say = null }) => ({
+    ...context,
+    cardQuestion: (node) => {
+      if (!within(face, node)) return null;
+      const open = control ? [asked, control].find((at) => at && within(at, node)) || null : null;
+      return { open, say: control ? say : null };
+    },
+  });
+  const deckFace = () => {
+    const target = h('span', { class: 'kp-target' }, '高学歴');
+    const sentence = h('p', { class: 'kp-sentence' }, '彼は', target, 'の人だ。');
+    const control = h('button', { id: 'kp-listen-front', class: 'card-voice' });
+    const card = h(
+      'article',
+      { class: 'kp-card' },
+      h('div', { class: 'kp-eyebrow' }, '意味は？', control),
+      sentence,
+    );
+    const above = h('p', {}, '前の段落です。');
+    const below = h('p', {}, '後の段落です。');
+    page(above, card, below);
+    return { target, sentence, control, card, above, below };
+  };
+  const SAY = { text: 'こうがくれき', voiceKey: 'word:高学歴' };
+
+  it('a face with no control of its own (a kanji with several readings, a word with no stored reading): every text on it is closed', () => {
+    const front = h('div', { class: 'review-front' }, '一');
+    const face = h('div', { class: 'review-face' }, front, h('p', {}, '思い出してください。'));
+    page(face);
+    const ctx = asking({ face });
+    for (const node of [textIn(front, '一'), textIn(face, '思い出して'), face]) {
+      const found = findUnit(node, { context: ctx });
+      expect(found?.closed).toBe(true);
+      expect(found.sentences).toEqual([]);
+    }
+  });
+
+  it('with its control: the asked word says the control’s own text under its voice key (one clip); the rest of the sentence is closed', () => {
+    const { target, sentence, control } = deckFace();
+    const ctx = asking({ face: control.parentNode.parentNode, asked: target, control, say: SAY });
+    const onWord = findUnit(textIn(target, '高学歴'), { context: ctx });
+    expect(onWord.closed).toBeFalsy();
+    expect(said(onWord)).toEqual(['こうがくれき']);
+    expect(onWord.voiceKey).toBe('word:高学歴');
+    expect(onWord.front).toBe(true);
+    const onControl = findUnit(control, { context: ctx });
+    expect(said(onControl)).toEqual(['こうがくれき']);
+    expect(onControl.voiceKey).toBe('word:高学歴');
+    expect(findUnit(textIn(sentence, '彼は'), { context: ctx })?.closed).toBe(true);
+    expect(findUnit(textIn(sentence, 'の人だ'), { context: ctx })?.closed).toBe(true);
+  });
+
+  it('a control with nothing to say, or an app that cannot tell, leaves the face closed', () => {
+    const { target, control, card } = deckFace();
+    expect(
+      findUnit(textIn(target, '高学歴'), {
+        context: asking({ face: card, asked: target, control, say: null }),
+      })?.closed,
+    ).toBe(true);
+    expect(
+      findUnit(textIn(target, '高学歴'), {
+        context: asking({ face: card, asked: target, control, say: { text: 'こうがくれき' } }),
+      })?.closed,
+    ).toBe(true);
+    const failing = {
+      ...context,
+      cardQuestion: () => {
+        throw new Error('the app’s own fault');
+      },
+    };
+    expect(findUnit(textIn(target, '高学歴'), { context: failing })?.closed).toBe(true);
+  });
+
+  it('off a question face the ear reads as before', () => {
+    const { card, above } = deckFace();
+    const found = findUnit(textIn(above, '前の段落'), { context: asking({ face: card }) });
+    expect(found.closed).toBeFalsy();
+    expect(said(found)).toEqual(['前の段落です。']);
+  });
+
+  it('on a closed face Option-click and an armed tap are taken and say nothing; a plain click, a held tap and a held click are the app’s', () => {
+    const { machine, calls } = rig();
+    expect(machine.click({ unit: ear.CLOSED, pointer: 'mouse', alt: true })).toBe('consume');
+    expect(machine.click({ unit: ear.CLOSED, pointer: 'touch', alt: true })).toBe('consume');
+    expect(machine.click({ unit: ear.CLOSED, pointer: 'mouse' })).toBe('pass');
+    machine.tapEar();
+    expect(machine.click({ unit: ear.CLOSED, pointer: 'touch' })).toBe('consume');
+    expect(machine.mode()).toBe('off');
+    machine.holdEar();
+    expect(machine.click({ unit: ear.CLOSED, pointer: 'touch' })).toBe('pass');
+    expect(machine.click({ unit: ear.CLOSED, pointer: 'mouse' })).toBe('pass');
+    machine.hover({ unit: ear.CLOSED, pointer: 'mouse' });
+    expect(calls.speak).toHaveLength(0);
+    expect(machine.click({ unit: ear.CLOSED, pointer: 'mouse', alt: true, dry: true })).toBe(
+      'consume',
+    );
+    expect(calls.speak).toHaveLength(0);
+  });
+
+  it('the whole click: Option-click on the rest of the sentence is taken with nothing said; on the asked word it says the control’s text', () => {
+    const { target, sentence, control, card } = deckFace();
+    const ctx = asking({ face: card, asked: target, control, say: SAY });
+    const { machine, calls } = rig();
+    const click = (node) =>
+      earClick(
+        { altKey: true, target: node, clientX: 5, clientY: 5, detail: 1 },
+        {
+          machine,
+          unitAt: () => findUnit(node, { context: ctx }),
+          press: { at: 0, x: 5, y: 5, pointerType: 'mouse' },
+          now: 100,
+        },
+      );
+    expect(click(textIn(sentence, '彼は'))).toBe('consume');
+    expect(calls.speak).toHaveLength(0);
+    expect(click(textIn(target, '高学歴'))).toBe('consume');
+    expect(calls.speak.map((u) => [said(u), u.voiceKey])).toEqual([
+      [['こうがくれき'], 'word:高学歴'],
+    ]);
+  });
+
+  it('the 読む chip: a selection that lies in, starts in, ends in or spans a question face is closed; one beside it is not', () => {
+    const { target, sentence, control, card, above, below } = deckFace();
+    // the control stands: even its asked word, open to Option-click, is never offered to the chip
+    const ctx = asking({ face: card, asked: target, control, say: SAY });
+    const main = card.parentNode;
+    const all = (...roots) => {
+      const out = new Set();
+      const walk = (node) => {
+        out.add(node);
+        for (const kid of node.childNodes || []) walk(kid);
+      };
+      roots.forEach(walk);
+      return out;
+    };
+    const range = (start, end, common, inRange) => ({
+      startContainer: start,
+      startOffset: 0,
+      endContainer: end,
+      endOffset: 1,
+      commonAncestorContainer: common,
+      intersectsNode: (node) => inRange.has(node),
+    });
+    const word = textIn(target, '高学歴');
+    expect(ear.selectionClosed(range(word, word, word, all(word)), ctx)).toBe(true);
+    expect(ear.selectionClosed(range(textIn(above, '前'), word, main, all(above, card)), ctx)).toBe(
+      true,
+    );
+    expect(
+      ear.selectionClosed(
+        range(textIn(sentence, 'の人だ'), textIn(below, '後'), main, all(card, below)),
+        ctx,
+      ),
+    ).toBe(true);
+    expect(
+      ear.selectionClosed(
+        range(textIn(above, '前'), textIn(below, '後'), main, all(above, card, below)),
+        ctx,
+      ),
+    ).toBe(true);
+    expect(
+      ear.selectionClosed(range(textIn(above, '前'), textIn(above, '前'), above, all(above)), ctx),
+    ).toBe(false);
+    expect(
+      ear.selectionClosed(range(textIn(below, '後'), textIn(below, '後'), below, all(below)), ctx),
+    ).toBe(false);
+  });
+});
+
 describe('held on, on the phone, the app’s own controls act and are never spoken (the review’s B1, ruling R-a)', () => {
   it('a held tap on a control is the app’s and asks nothing; on Japanese text it speaks', () => {
     const { machine, calls } = rig();

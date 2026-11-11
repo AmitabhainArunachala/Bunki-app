@@ -196,7 +196,9 @@ export function installVoiceLayer(host) {
         return tx('声を出せません。音声サーバーが混んでいます。もう一度。', 'No voice: the voice server is busy. Tap to try again.');
       case 'nothing-to-say': case 'not-japanese':
         return tx('ここには読み上げられる日本語がありません。', 'Nothing here can be read aloud.');
-      // 'decode': the clip came but this device would not play it (the speech team's queue names it so): not the server
+      // a clip that would not play (the speech queue names every failed play 'decode'): the clip is not kept any more, and
+      // the next tap asks again (voice-seam.mjs). It is not the server refusing (the combine's review). A start the
+      // browser does not allow (NotAllowedError) during the article's read is a pause instead (reader-pocket.mjs, L1)
       case 'audio-error': case 'decode':
         return tx('再生できませんでした。もう一度。', 'Could not play. Tap to try again.');
       default:
@@ -812,6 +814,8 @@ export function installVoiceLayer(host) {
     control.append(uiIcon('speaker'));
     return onlyItsOwn(control);
   };
+  /** What each deck card's question-side control says ({ text, voiceKey }): the ear says the same on the marked word. */
+  const frontSays = new WeakMap();
   /** The study card has ONE audio control on each face. Answer side: it says the word by the card's reading, then the card's
    * sentence, then the definition and the note (what the old 聞く and 音 said between them), in one turn; a second tap stops
    * it. Its word says itself once as the answer is shown (John's "on reveal"), unless he switched that off. */
@@ -877,17 +881,22 @@ export function installVoiceLayer(host) {
     const id = card.dataset.card;
     if (!id || !deckFrontVoice({ ...face(), reading: 'x' }) || card.dataset.voiceFront === id) return;
     card.dataset.voiceFront = id;
-    Promise.resolve(host.deckWordReading?.(id)).then((reading) => {
+    Promise.all([host.deckWordReading?.(id), host.deckWordTerm?.(id)]).then(([reading, term]) => {
       const row = card.querySelector('.kp-eyebrow');
       if (!reading || !row || !card.isConnected || card.dataset.card !== id || card.querySelector('.kp-answer') || card.querySelector('#kp-listen-front')) return;
       const plan = deckFrontVoice({ ...face(), reading });
       if (!plan) return;
-      const word = shownText(card.querySelector('.kp-sentence .kp-target')) || id;
+      // one word, one clip (the combine's review): the voice is keyed by the card's word as the answer side keys it (its
+      // dictionary form, else the card's id), never by the form the passage prints (an inflected 憧れた is 憧れる's)
+      const word = host.deckWordTerm ? term || id : shownText(card.querySelector('.kp-sentence .kp-target')) || id;
       const control = cardMark('kp-listen-front');
       control.setAttribute('aria-label', tx('語を聞く', 'Listen to the word'));
+      // what it says, the ear says on the marked word (one clip: the same text under the same voice key)
+      const says = { text: plan.text, voiceKey: voiceKeyOf('word', word) };
+      frontSays.set(control, says);
       control.addEventListener('click', (event) => {
         event.stopPropagation();
-        speakFrom(control, { sentences: [{ text: plan.text }], voiceKey: voiceKeyOf('word', word), single: true,
+        speakFrom(control, { sentences: [{ text: says.text }], voiceKey: says.voiceKey, single: true,
           onNote: (line) => { control.title = line || ''; noteBeside(control, line); } });
       });
       row.append(control);
@@ -954,14 +963,25 @@ export function installVoiceLayer(host) {
         const card = node?.closest?.('.kp .kp-card');
         return !!card && !card.querySelector('.kp-answer');
       },
-      // a question face that does not print the word it asks: the review card marks its own (corridor.js: blanked, a
-      // sentence or a question card, or a face still settling); the deck card's blank and its choices (the card audio's
-      // rule for its question-side control, modules/card-audio.mjs)
-      cardClosed: (node) => {
+      // a study card's question face (the lead's ruling after the combine's review, F1): the only voice there is the card's
+      // own control. The review card marks its question faces (corridor.js: data-card-face="question", the reading
+      // probe's too); a deck card is on its question side until its answer is shown. There the ear may read only the
+      // asked word where the face's control stands (the review card's printed word, the deck card's marked word), or that
+      // control, and says what the control says; everywhere else on the face nothing (modules/ear.mjs, questionUnit)
+      cardQuestion: (node) => {
         const face = node?.closest?.('.review-face');
-        if (face) return !host.cardRevealed() && face.dataset.earClosed === '1';
+        if (face) {
+          if (face.dataset.cardFace !== 'question') return null;
+          const control = face.querySelector('#card-say-front');
+          const open = control ? node.closest('#card-say-front, .review-front') : null;
+          return { open: open && face.contains(open) ? open : null,
+            say: control ? wordVoiceRequest(control.dataset.voiceText, control.dataset.voiceWord) : null };
+        }
         const card = node?.closest?.('.kp .kp-card');
-        return !!card && !card.querySelector('.kp-answer') && !!card.querySelector('.kp-blank, .kp-choices');
+        if (!card || card.querySelector('.kp-answer')) return null;
+        const control = card.querySelector('#kp-listen-front');
+        const open = control ? node.closest('#kp-listen-front, .kp-sentence .kp-target') : null;
+        return { open: open && card.contains(open) ? open : null, say: control ? frontSays.get(control) || null : null };
       } }),
   });
   let scan = 0;

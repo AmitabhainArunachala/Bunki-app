@@ -189,6 +189,19 @@ export function createClipStore({ storage = createMemoryClipStorage(), capBytes 
     },
     /** A clip played again from the page's own memory: it is still the most recently played. */
     touch,
+    /** A kept clip that would not play (a media error): it goes, so the next ask goes to the server again. has() answers
+     * false for it at once; the device's copy goes in turn with the writes. */
+    drop(key) {
+      const row = rows?.get(key);
+      if (row) { rows.delete(key); total -= row.size; }
+      return queue(async () => {
+        await load();
+        const late = rows.get(key);
+        if (late) { rows.delete(key); total -= late.size; }
+        await storage.remove([key]);
+        return !!(row || late);
+      });
+    },
     /** Keep a clip the server has just answered with. Audio bytes only; a clip larger than the whole cap is not kept. */
     put(key, clip) {
       return queue(async () => {

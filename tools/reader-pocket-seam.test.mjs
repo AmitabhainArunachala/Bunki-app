@@ -5,11 +5,16 @@
  *  - the pause between two sentences is asked of the page's own gap (modules/reader-pocket.mjs, gapSleep: none while
  *    the page is hidden), never of the seam's own sleep, which keeps its other waits (the 2 s after a 503);
  *  - a recorded clip paused from outside (a call, another app, the lock screen) pauses the read at that sentence; it
- *    does not end it, nothing takes it up by itself, and play says that sentence again.
+ *    does not end it, nothing takes it up by itself, and play says that sentence again;
+ *  - with the repaired head merged (349769763, a kept clip that will not play is dropped): a start the browser does not
+ *    allow (NotAllowedError) pauses the article's read and its clip is kept; a clip that will not play for any other
+ *    reason is dropped from the page and the device and the read ends with 'decode'. They are told apart by the error's
+ *    name, as the browser gives it.
  */
-/* global setTimeout */
+/* global EventTarget, setTimeout */
 import { describe, expect, it } from 'vitest';
 
+import { createPocketPlayer } from '../prototypes/corridor/modules/reader-pocket.mjs';
 import { createVoiceSeam } from '../prototypes/corridor/modules/voice-seam.mjs';
 
 const tick = (ms = 0) => new Promise((done) => setTimeout(done, ms));
@@ -115,5 +120,87 @@ describe('the seam: the queue’s gap is the page’s gap; its own waits are its
     expect(session.index).toBe(0);
     expect(states.at(-1)).toBe('playing');
     session.stop();
+  });
+  it('a start the browser blocks pauses the article’s read and keeps its clip; a clip that will not play is dropped', async () => {
+    const dropped = [];
+    const store = {
+      has: () => false,
+      get: async () => null,
+      put: async () => {},
+      touch() {},
+      drop: async (key) => dropped.push(key),
+    };
+    const refuse = { name: null };
+    const inner = {
+      async play() {
+        if (!refuse.name) return 'ended';
+        const error = new Error('refused');
+        error.name = refuse.name;
+        refuse.name = null;
+        throw error;
+      },
+      pause() {},
+      stop() {},
+      setRate() {},
+    };
+    const audio = Object.assign(new EventTarget(), {
+      paused: true,
+      ended: false,
+      loop: false,
+      play: async () => {},
+      pause() {},
+    });
+    let reading = null;
+    let seam = null;
+    const article = () => !!reading && seam.active() === reading;
+    const pocket = createPocketPlayer({
+      player: inner,
+      audio,
+      silence: () => 'blob:silence',
+      refusalIsPause: article,
+    });
+    pocket.onOutsidePause(() => {
+      if (article() && reading.state === 'playing') reading.pause();
+    });
+    seam = createVoiceSeam({
+      client: client(),
+      player: pocket.player,
+      store,
+      sleep: async () => {},
+      gapSleep: async () => {},
+    });
+    // blocked: the article's read is paused at its sentence, and the clip stays
+    refuse.name = 'NotAllowedError';
+    const states = [];
+    const ended = new Promise((done) => {
+      reading = seam.read({
+        voiceKey: 'article:a1',
+        sentences: S3,
+        onState: (state, code) => {
+          states.push(code ? `${state}:${code}` : state);
+          if (['done', 'stopped', 'error'].includes(state)) done(state);
+        },
+      });
+    });
+    await tick(5);
+    expect(reading.state).toBe('paused');
+    expect(reading.index).toBe(0);
+    expect(dropped).toEqual([]);
+    reading.resume();
+    expect(await ended).toBe('done');
+    expect(dropped).toEqual([]);
+    // will not play (a media error): dropped from the device, and the read ends with 'decode'
+    reading = null;
+    refuse.name = 'NotSupportedError';
+    const end = await new Promise((done) =>
+      seam.read({
+        voiceKey: 'word:猫',
+        sentences: [{ text: 'ねこが好き。' }],
+        onState: (state, code) =>
+          ['done', 'stopped', 'error'].includes(state) && done(`${state}:${code}`),
+      }),
+    );
+    expect(end).toBe('error:decode');
+    expect(dropped).toEqual(['word:猫|ねこが好き。']);
   });
 });

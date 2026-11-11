@@ -13793,8 +13793,8 @@ function appendReviewFrontVoice(face, item, { printed, blanked }) {
   // the decision is the voice layer's (modules/card-audio.mjs, loaded beside the app): without the layer there is no voice and no control
   const target = voiceLayer?.frontVoice?.({ kind: item.t, printed, blanked, label: item.label, reading, readings });
   if (!target) return;
-  // the ear reads the printed word as this control does, by the card's stored reading (the combine's I2)
-  face.querySelector('.review-front')?.setAttribute('data-reading', target.text);
+  // with this control on the face, the ear may read the printed word, and says there what this control says (the voice
+  // layer's cardQuestion; the lead's ruling after the combine's review, F1)
   const row = el('div', 'review-reading-row review-front-voice');
   const note = el('span', 'say-note');
   note.id = 'card-say-front-note'; note.setAttribute('role', 'status'); note.setAttribute('aria-live', 'polite');
@@ -13837,8 +13837,7 @@ function mountSettledFrontVoice(item) {
   const saved = item.ctx ? D.passages.find((x) => x.id === item.ctx.p) : null;
   if (saved?.tokens && takenContext(item)) return;
   if ((S.srs[srsKey('word', item.id)]?.reps || 0) % 2 === 1 && (!exampleSearchSettled(item.id) || findExamples(item.id, 1).length)) return;
-  // settled printed: the ear may read the word now, as the control below does
-  delete face.dataset.earClosed;
+  // settled printed: the control stands now, and with it the ear may read the printed word, saying what the control says
   appendReviewFrontVoice(face, item, { printed: true, blanked: false });
 }
 /** An article or the archive's index has arrived or failed to load: the review card face-down now, if it is a word's, may
@@ -28108,6 +28107,8 @@ function renderReview(main) {
     moreBtn.remove();
     const unavailable = el('div', 'review-face');
     unavailable.id = 'review-answer-unavailable';
+    // it prints the card's word with no answer and no control: closed to the ear, as a question face is (no reading guessed)
+    unavailable.dataset.cardFace = 'question';
     // D23: a word whose saved answer is missing or contradicts its card is shown
     // honestly and never graded, in the same face as a kanji without its record
     const wordAnswer = item.t === 'word' ? savedAnswerFor(item) : null;
@@ -28141,6 +28142,7 @@ function renderReview(main) {
     moreBtn.remove();
     const changed = el('div', 'review-face');
     changed.id = 'review-answer-changed';
+    changed.dataset.cardFace = 'question';
     changed.append(el('div', 'review-front', item.label || item.id));
     changed.append(el('p', 'review-sense', tx(
       'この語の答えが変わりました。評価する前に、カードをもう一度めくってください。',
@@ -28220,9 +28222,9 @@ function renderReview(main) {
   // voice on the front (John, 2026-11-11): only where the asked word is printed on this face. A word asked inside its
   // sentence has the word blanked out (`cloze`), and there the hidden answer is never spoken.
   if (!rv.revealed && ['word', 'kanji'].includes(item.t) && faceSettled) appendReviewFrontVoice(face, item, { printed: !cloze, blanked: !!cloze });
-  // the ear (modules/ear.mjs) reads nothing on a question face that does not print its word, or does not yet for sure: a
-  // word blanked in its sentence, a sentence or a question card, a face still settling (the combine's I2)
-  if (!rv.revealed && (cloze || !faceSettled || ['sentence', 'question'].includes(item.t))) face.dataset.earClosed = '1';
+  // on a question face the only voice is the card's own control (the lead's ruling after the combine's review, F1): the ear
+  // (modules/ear.mjs) reads only the printed word where that control stands, and says what it says; nothing else here
+  if (!rv.revealed) face.dataset.cardFace = 'question';
   if (rv.revealed && !['sentence', 'question'].includes(item.t)) {
     const backc = reviewCardBack(item, presented?.answer) || { reading: '', senses: [] };
     const assessment = assessmentReviewContext(item);
@@ -30163,6 +30165,8 @@ function renderProbe(main) {
   main.append(progress);
 
   const face = el('div', 'review-face');
+  // the reading is the question: before it is shown the ear reads nothing on this face (it has no control of its own)
+  if (!pr.revealed) face.dataset.cardFace = 'question';
   face.append(el('div', 'review-front', it.w));
   const context = findExamples(it.w, 1)[0];
   if (context) {
@@ -32689,6 +32693,8 @@ if (typeof window !== 'undefined' && !window.__CORRIDOR_BUNDLE__) {
       highlight: () => wordHighlight() !== 'off',
       // the deck card's stored reading for a card id (the question side's control says the word by it)
       deckWordReading: (cardId) => deckCardReading(cardId),
+      // and its dictionary form: the control keys its voice by it, as the answer side does (one word, one clip)
+      deckWordTerm: (cardId) => deckCardReading(cardId, 'term'),
       passage: () => (S.view === 'reader' ? passage() : null),
       cardRevealed: () => S.view === 'review' && !!S.review?.revealed,
       // one sound at a time: every other lane lets go before the seam speaks
@@ -32709,9 +32715,10 @@ if (typeof window !== 'undefined' && !window.__CORRIDOR_BUNDLE__) {
   }).catch((err) => console.warn('voice layer unavailable', err));
 }
 /** A deck card's word's stored reading, from the deck's own file (the player's: the same address, kept in the browser's cache),
- * read once per deck. The deck player (decks/player) draws no reading on a question side, so this is where it is had. */
+ * read once per deck. The deck player (decks/player) draws no reading on a question side, so this is where it is had.
+ * `field` 'term': the word's dictionary form instead (the question side's control keys its voice by it, as the answer's does). */
 const deckReadings = new Map();
-function deckCardReading(cardId) {
+function deckCardReading(cardId, field = 'reading') {
   const id = S.view === 'deckplay' ? S.deckPlay : null;
   if (!id || !cardId || window.__CORRIDOR_STANDALONE__ === true) return Promise.resolve(null);
   if (!deckReadings.has(id)) {
@@ -32720,11 +32727,11 @@ function deckCardReading(cardId) {
       : fetch(new URL(`./decks/${id}/deck.json`, import.meta.url), { cache: 'force-cache' }).then((res) => (res.ok ? res.json() : null));
     deckReadings.set(id, loaded.then((deck) => {
       const map = new Map();
-      for (const word of deck?.words || []) for (const card of word.cards || []) if (word.reading) map.set(card.id, word.reading);
+      for (const word of deck?.words || []) for (const card of word.cards || []) if (word.reading) map.set(card.id, { reading: word.reading, term: word.term || '' });
       return map;
     }).catch(() => { deckReadings.delete(id); return new Map(); }));
   }
-  return deckReadings.get(id).then((map) => map.get(cardId) || null);
+  return deckReadings.get(id).then((map) => map.get(cardId)?.[field] || null);
 }
 /** Settings, 筆と声: the voice server's pairing and status block, or null before the layer has arrived. */
 function voiceSettingsBlock() { return voiceLayer ? voiceLayer.settingsBlock() : null; }
