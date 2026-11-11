@@ -23,7 +23,10 @@
  *                    sentences may depend on a timer while the page is hidden).
  *  yield-hide        a read yields to the word box's 音; the page is hidden: the word ends, and the read he started goes on.
  *  never-arrives     hidden with timers running, a clip the server never sends in time: the read ends with its line within
- *                    the client's 20 s, the silence stops and the lock screen is cleared (a true state).
+ *                    the client's 20 s, the silence stops and the lock screen says paused (a true state). (Changed in the
+ *                    builder's fix round 1, by the lead's brief: a read that ended on a sentence it could not get keeps
+ *                    the article on the lock screen, paused, with its play, for as long as the bar offers one; it was
+ *                    "cleared" here before.)
  *  outside-play      (a concern, not in the default run) a pause from outside, then the element started again from
  *                    outside: the bar and the sound agree.
  *
@@ -389,7 +392,7 @@ const CASES = {
       if (after.bar === 'loading' || after.bar === 'playing') problems.push(`hidden (timers running), a clip that never comes: after ${secs} s the bar still says ${after.bar}`);
       if (after.audio && !after.audio.paused) problems.push(`the read is over and the element still plays (silence loop ${after.audio.loop})`);
       if (after.bar === 'idle' && !after.silent) problems.push('the read ended with no line');
-      if (after.bar === 'idle' && after.media.title !== null) problems.push(`the read ended and the lock screen still shows ${JSON.stringify(after.media)}`);
+      if (after.bar === 'idle' && (after.media.state !== 'paused' || after.media.title === null)) problems.push(`the read ended and the lock screen does not keep the article, paused: ${JSON.stringify(after.media)}`);
       await hide(s, false);
       detail = `waiting from word ${waitStart.litFirst}: ${secs} s until bar ${end.bar}; then bar ${after.bar} (${after.silent}: "${after.note}"), audio ${JSON.stringify(after.audio)}, lock screen ${JSON.stringify(after.media)}`;
     } catch (error) { problems.push(`the case broke: ${String(error.message).split('\n')[0].slice(0, 200)}`); }

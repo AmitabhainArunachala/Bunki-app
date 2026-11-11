@@ -618,7 +618,11 @@ const CASES = {
       v = await until(s, (x) => x.bar === 'idle', 8000);
       const note = await s.page.evaluate(() => document.getElementById('listen-note')?.textContent || '');
       if (v.bar !== 'idle' || v.silent !== 'decode' || !/could not play|再生エラー/u.test(note)) problems.push(`a clip that cannot play: the bar says ${v.bar} (${v.silent || 'no reason'}), "${note}"`);
-      if (v.media?.title !== null) problems.push(`the read ended, and the lock screen still shows ${JSON.stringify(v.media)}`);
+      // fix round 1 (the lead's brief): a read that ended on a sentence it could not get or play keeps the lock screen,
+      // paused, with its play, for as long as the bar offers one (here: he is still on the article)
+      const title = await articleTitle(s.page);
+      if (v.media?.title !== title || v.media?.state !== 'paused' || !v.media?.handlers.includes('play')) problems.push(`the read ended on a clip that cannot play, and the lock screen does not keep the article paused with its play: ${JSON.stringify(v.media)}`);
+      if (v.audio && !v.audio.paused) problems.push(`the read ended and the element still plays: ${JSON.stringify(v.audio)}`);
       steps.push(`a clip that cannot play ended the read: "${note}"`);
       await hide(s, false);
     } catch (error) { problems.push(`the case broke: ${String(error.message).split('\n')[0].slice(0, 200)}`); }
@@ -794,6 +798,89 @@ const CASES = {
     holdNth = 0; holdFor = 5000;
     if (s.errors.length) problems.push(`page errors: ${s.errors.join(' | ')}`);
     report('deadline-hidden', problems, detail);
+    await s.close();
+  },
+
+  async 'network-resume'() {
+    clipSeconds = 0.4; holdNth = 0;
+    const s = await freshPage();
+    const problems = [];
+    const steps = [];
+    const playedTexts = () => s.page.evaluate(() => window.__pocket.playing.map((p) => p.text));
+    const lostAt = async () => {
+      const end = await look(s.page);
+      return { end, heard: end.litFirst, lit: end.lit, played: await playedTexts() };
+    };
+    /** After a read ended for want of the network: does `play` take it up at the sentence it could not get (the one after
+     * the last heard, in the order the sentences were asked), not at the article's start or the sentence heard before? */
+    const takenUp = async (lost, play, label) => {
+      let on = null;
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        await play();
+        on = await until(s, (v) => (v.lit > lost.lit && v.litFirst > lost.heard) || (v.bar === 'idle' && v.lit === lost.lit), 6000);
+        if (on.lit > lost.lit) break;
+        // a request that was on its way when the network went blocks the server for 15 s (the seam's rule): wait it out
+        await wait(16000);
+      }
+      if (!(on.lit > lost.lit)) { problems.push(`${label}: play did not take the read up: bar ${on.bar} (${on.silent}), lit word ${on.litFirst}`); return on; }
+      if (on.litFirst <= lost.heard) problems.push(`${label}: play went back to word ${on.litFirst} (heard to word ${lost.heard})`);
+      const order = [...new Set((await recordOf(s.page)).asked.map((a) => letters(a.text)))];
+      const expected = order[order.indexOf(letters(lost.played.at(-1))) + 1];
+      const first = (await playedTexts())[lost.played.length];
+      if (!expected || letters(first) !== expected) problems.push(`${label}: the first sentence played after play ("${String(first).slice(0, 12)}") is not the one after the last heard ("${String(lost.played.at(-1)).slice(0, 12)}")`);
+      return on;
+    };
+    try {
+      await openArticle(s);
+      const title = await articleTitle(s.page);
+      await until(s, (v) => v.lit >= 2, 15000);
+      // hidden, timers held, the network gone: the read ends at the first sentence it could not get
+      await hide(s, true);
+      await s.context.setOffline(true);
+      await until(s, (v) => v.bar === 'idle', 20000);
+      await wait(400);
+      let lost = await lostAt();
+      let end = lost.end;
+      if (end.bar !== 'idle' || !['offline', 'network-failed'].includes(end.silent)) problems.push(`hidden and offline: the bar says ${end.bar} (${end.silent || 'no reason'}: "${end.note}")`);
+      if (end.audio && !end.audio.paused) problems.push(`hidden and offline: the read ended and the element still plays (${JSON.stringify(end.audio)})`);
+      if (end.media?.title !== title || end.media?.state !== 'paused' || !end.media?.handlers.includes('play')) problems.push(`hidden and offline: the lock screen does not keep the article paused with its play: ${JSON.stringify(end.media)}`);
+      await wait(1500);
+      const still = await look(s.page);
+      if (still.media?.title !== title || still.media?.state !== 'paused') problems.push(`hidden and offline, 1.5 s later: the lock screen ${JSON.stringify(still.media)}`);
+      steps.push(`hidden, offline: ended at word ${lost.heard} with "${end.silent}", lock screen ${end.media?.state}`);
+      // the network back, still hidden: the lock screen's play takes it up at that sentence
+      await s.context.setOffline(false);
+      await wait(500);
+      const on = await takenUp(lost, () => s.page.evaluate(() => window.__pocket.media.handlers.play?.()), 'the lock screen\'s play, hidden');
+      steps.push(`the lock screen's play: on to word ${on.litFirst} (heard to ${lost.heard})`);
+      // again, shown this time: the network goes, the read ends, and the bar's own play takes it up there
+      await hide(s, false);
+      await until(s, (v) => v.lit >= on.lit + 1, 10000);
+      await s.context.setOffline(true);
+      await until(s, (v) => v.bar === 'idle', 20000);
+      await wait(400);
+      lost = await lostAt();
+      if (lost.end.media?.title !== title || lost.end.media?.state !== 'paused') problems.push(`shown and offline: the lock screen does not keep the article paused: ${JSON.stringify(lost.end.media)}`);
+      await s.context.setOffline(false);
+      await wait(500);
+      const bar = await takenUp(lost, async () => {
+        if (!(await s.page.locator('#listen-toggle').isVisible().catch(() => false))) await s.press('#listen-open');
+        await s.press('#listen-toggle');
+      }, 'the bar\'s play, shown');
+      steps.push(`shown, offline: ended at word ${lost.heard} ("${lost.end.silent}"); the bar's play: on to word ${bar.litFirst}`);
+      // ended once more for want of the network, then he leaves the article: the lock screen lets go
+      await s.context.setOffline(true);
+      const third = await until(s, (v) => v.bar === 'idle', 20000);
+      if (third.media?.title !== title) problems.push(`a third end for want of the network: the lock screen ${JSON.stringify(third.media)}`);
+      await s.context.setOffline(false);
+      await s.press(s.page.locator('#app > .chrome [data-bar-back], #app > .chrome button.back').first());
+      const left = await until(s, (v) => v.media?.title === null, 4000);
+      if (left.media?.title !== null || left.media?.state !== 'none') problems.push(`after leaving the article the lock screen still has ${JSON.stringify(left.media)}`);
+      steps.push('left the article: cleared');
+    } catch (error) { problems.push(`the case broke: ${String(error.message).split('\n')[0].slice(0, 200)}`); }
+    await s.context.setOffline(false).catch(() => {});
+    if (s.errors.length) problems.push(`page errors: ${s.errors.join(' | ')}`);
+    report('network-resume', problems, steps.join('; '));
     await s.close();
   },
 };
