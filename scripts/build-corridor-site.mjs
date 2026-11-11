@@ -92,6 +92,7 @@ try {
     'modules/voice.mjs',
     'modules/voice-layer.mjs',
     'modules/ear.mjs',
+    'modules/voice-bands.mjs',
     'modules/voice-seam.mjs',
     'modules/voice-client.mjs',
     'modules/learner.mjs',

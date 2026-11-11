@@ -219,6 +219,7 @@ const BOOT_DATA = [
   // and says in words why nothing else can be voiced, so it and everything it imports travel with the install.
   'modules/voice-layer.mjs',
   'modules/ear.mjs',
+  'modules/voice-bands.mjs',
   'modules/voice-seam.mjs',
   'modules/voice-client.mjs',
   'modules/nihongo-speech/audio/speech-text.mjs',

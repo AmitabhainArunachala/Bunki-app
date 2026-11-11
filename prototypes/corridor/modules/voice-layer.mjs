@@ -17,6 +17,7 @@
 import { createAudioPlayer } from './nihongo-speech/audio/speech-player.mjs';
 import { isJapaneseEnough, normaliseSpeechText, splitSentences } from './nihongo-speech/audio/speech-text.mjs';
 import { installEar } from './ear.mjs';
+import { baseBoxes, createBands } from './voice-bands.mjs';
 import { createDeviceTokenStore, createVoiceClient } from './voice-client.mjs';
 import { SPEEDS, createVoiceSeam, sentencesOf, voiceKeyOf } from './voice-seam.mjs';
 
@@ -194,12 +195,18 @@ export function installVoiceLayer(host) {
     if (!automatic && button && spoken?.button === button && spoken.session && !spoken.session.ended) { seam.stop(); return null; }
     if (!sentences.length) { if (!automatic) onNote?.(silenceLine('nothing-to-say'), 'nothing-to-say'); return null; }
     if (automatic) {
+      // a read of the article is under way (or yields to a word): nothing says itself over it (John, 2026-11-11)
+      if (readerBusy()) return null;
       if (seam.cannot(voiceKey)) return null;
       // a page nobody has touched yet may not sound: asking the server then would be paid for and never heard
       const touched = doc.defaultView.navigator?.userActivation;
       if (touched && !touched.hasBeenActive) return null;
     }
     prime();
+    // a read of the article that was playing and was ended in this same tap (the word box's 音: the app ends the read
+    // before the word is said) yields to the word and takes itself up again when the word ends (yieldEnded)
+    const yieldFrom = automatic ? null : reader.justStopped;
+    reader.justStopped = null;
     // `find`: the same control of the same word after the app has drawn its screen again (anchorOf)
     const mine = { button, session: null, over: false, voiced: false, find: anchorOf(button) };
     const paint = (on) => {
@@ -231,26 +238,59 @@ export function installVoiceLayer(host) {
           const why = state === 'error' ? code || 'speak-failed' : state === 'done' && !mine.voiced ? 'nothing-to-say' : null;
           if (why && !automatic) onNote?.(silenceLine(why), why);
           onDone?.(state, code);
+          yieldEnded(mine);
         }
       },
     });
     // the read is this control's from here: the lanes it quieted on the way in have all let go
     if (!mine.over) spoken = mine;
+    if (yieldFrom) {
+      reader.yielding = { pid: yieldFrom.pid, index: yieldFrom.index, resume: !yieldFrom.paused, word: mine };
+      if (mine.over) yieldEnded(mine);
+      else host.refreshListenRow?.();
+    }
     return mine.session;
+  }
+  /** The word the read yielded to has ended (said, failed, or stopped): the read takes itself up again at the same
+   * sentence, unless he paused it meanwhile, left the article, or another sound took over. */
+  function yieldEnded(word) {
+    const y = reader.yielding;
+    if (!y || y.word !== word) return;
+    reader.yielding = null;
+    reader.index = y.index;
+    const p = host.passage();
+    if (y.resume && p && p.id === y.pid && !seam.active()) startReader(p, y.index);
+    else host.refreshListenRow?.();
   }
 
   /* ------------------------------------------------------------------ the article reader */
   // `owner` names the read that may repaint the bar: a read that was replaced or stopped says nothing more
-  const reader = { pid: null, session: null, owner: null, sentences: [], index: 0, rate: 1, failed: null, source: null };
-  // The sentence being read is one unbroken wash (the CSS Custom Highlight API, as in Nihongo Study); a browser without
-  // it paints the sentence's words instead. The words carry data-speaking either way.
+  // `lit`: the sentence the bands are on; `yielding`: the read gave way to a word (the box's 音) and takes itself up again;
+  // `justStopped`: a playing read was ended in this very task (a word said now is what it yields to)
+  const reader = { pid: null, session: null, owner: null, sentences: [], index: 0, rate: 1, failed: null, source: null,
+    lit: -1, yielding: null, justStopped: null };
+  // The sentence being read is one even band per line (modules/voice-bands.mjs), the same in every engine: the CSS Custom
+  // Highlight API painted it in patches in WebKit (John's iPhone, 2026-11-11). The words carry data-speaking.
   const view = doc.defaultView;
-  const washes = view.CSS?.highlights && typeof view.Highlight === 'function' ? view.CSS.highlights : null;
-  if (washes) doc.documentElement.dataset.voiceHighlight = 'range';
+  const readBands = createBands(doc, { layerClass: 'read-bands', bandClass: 'read-band' });
   const clearSpeaking = () => {
     for (const node of doc.querySelectorAll('#reader [data-speaking]')) node.removeAttribute('data-speaking');
-    washes?.delete('bunki-speaking');
+    reader.lit = -1;
+    readBands.hide();
   };
+  /** The words of the lit sentence as the page stands now: drawn again, the sentence takes the page's new words. */
+  const litWords = () => {
+    const sentence = reader.sentences[reader.lit];
+    if (!sentence) return [];
+    if (stale(sentence)) remapReader();
+    const shown = sentence.els.filter((node) => node.isConnected);
+    for (const node of shown) if (!node.hasAttribute('data-speaking')) node.setAttribute('data-speaking', '');
+    return shown;
+  };
+  /** A word's box, a page or the save strip stands open over the article: the reader does not move the text under his
+   * finger; following takes up again with the next sentence once it has closed. */
+  const coverOpen = () => !!doc.getElementById('mini')?.getClientRects().length || !!doc.getElementById('sheet')?.isConnected ||
+    !!doc.getElementById('seal-strip')?.isConnected;
   /** The app draws the article again (a word looked up, a dial moved): the sentences keep their text and take the new
    * page's words. False when the text itself is no longer the one being read (the other version of the story). */
   function remapReader() {
@@ -264,19 +304,12 @@ export function installVoiceLayer(host) {
   const stale = (sentence) => sentence.els.length > 0 && !sentence.els.some((node) => node.isConnected);
   function showSentence(index) {
     clearSpeaking();
-    const sentence = reader.sentences[index];
-    if (!sentence) return;
-    if (stale(sentence)) remapReader();
-    const shown = sentence.els.filter((node) => node.isConnected);
-    for (const node of shown) node.setAttribute('data-speaking', '');
-    const first = shown[0];
+    if (!reader.sentences[index]) return;
+    reader.lit = index;
+    const first = litWords()[0];
     if (!first) return;
-    if (washes) {
-      const range = doc.createRange();
-      range.setStartBefore(first);
-      range.setEndAfter(shown[shown.length - 1]);
-      washes.set('bunki-speaking', new view.Highlight(range));
-    }
+    readBands.show(() => baseBoxes(litWords()));
+    if (coverOpen()) return;
     const box = first.getBoundingClientRect();
     if (box.top < 96 || box.bottom > view.innerHeight - 140)
       first.scrollIntoView({ block: 'center', behavior: view.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
@@ -323,8 +356,12 @@ export function installVoiceLayer(host) {
     return sentences;
   }
   const readerActive = () => !!reader.session && !reader.session.ended;
+  const readerBusy = () => readerActive() || !!reader.yielding;
+  let readSessions = 0;
   function startReader(p, from = 0) {
     reader.pid = p.id;
+    // which read this is, on the page: a read that goes on keeps its number (the checks read it)
+    doc.documentElement.dataset.readSession = String(++readSessions);
     reader.sentences = articleSentences(p);
     reader.failed = null;
     if (!reader.sentences.length) { reader.failed = { pid: p.id, code: 'nothing-to-say' }; host.refreshListenRow?.(); return; }
@@ -363,8 +400,10 @@ export function installVoiceLayer(host) {
     /** What the play bar shows for this article. */
     state(p) {
       const here = reader.pid === p.id;
-      const active = here && readerActive();
-      const state = active ? reader.session.state : 'idle';
+      // a read that yields to a word shows as playing (paused, if he paused it meanwhile)
+      const y = here && reader.yielding ? reader.yielding : null;
+      const active = here && (readerActive() || !!y);
+      const state = y ? (y.resume ? 'playing' : 'paused') : active ? reader.session.state : 'idle';
       const narrated = !!(host.narration?.(p) || []).length;
       // No voice for this article (a play that ended silent, or one that would): the bar says so in a few words, and
       // `line` is the whole sentence. An article with its own recording plays it, paired or not.
@@ -389,6 +428,14 @@ export function installVoiceLayer(host) {
     },
     /** Play, pause or resume. A read that was stopped starts again at the sentence it had reached. */
     toggle(p) {
+      // while the read yields to a word: pause holds it where it is; play again takes it up now
+      const y = reader.yielding && reader.yielding.pid === p.id ? reader.yielding : null;
+      if (y) {
+        if (y.resume) { y.resume = false; host.refreshListenRow?.(); return; }
+        reader.yielding = null;
+        startReader(p, y.index);
+        return;
+      }
       if (reader.pid === p.id && readerActive()) {
         const state = reader.session.state;
         if (state !== 'paused') reader.session.pause();
@@ -408,6 +455,13 @@ export function installVoiceLayer(host) {
     },
     stop() {
       const session = reader.session;
+      // the app ends a playing read before the word box's 音 says its word: if a word is said in this same task, the
+      // read yields to it (speakFrom); otherwise it has ended (leaving the article, Back, another passage)
+      const yielding = reader.yielding;
+      reader.yielding = null;
+      if (session && !session.ended && ['loading', 'playing'].includes(session.state)) reader.justStopped = { pid: reader.pid, index: reader.index };
+      else if (yielding) reader.justStopped = { pid: yielding.pid, index: yielding.index, paused: !yielding.resume };
+      if (reader.justStopped) Promise.resolve().then(() => { reader.justStopped = null; });
       reader.session = null;
       reader.owner = null;
       if (session && !session.ended) session.stop();
@@ -415,19 +469,9 @@ export function installVoiceLayer(host) {
     },
     active: readerActive,
   };
-  // While the article is being read, a tap on any of its words starts the reading there; paused or idle, a tap is the
-  // word's own (the reading ladder), as always.
-  doc.addEventListener('click', (event) => {
-    if (!readerActive() || !['loading', 'playing'].includes(reader.session.state)) return;
-    const word = event.target?.closest?.('#reader .tok[data-index]');
-    if (!word) return;
-    let index = reader.sentences.findIndex((sentence) => sentence.els.includes(word));
-    if (index < 0 && reader.sentences.some(stale) && remapReader()) index = reader.sentences.findIndex((sentence) => sentence.els.includes(word));
-    if (index < 0) return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    reader.session.jump(index);
-  }, true);
+  // A tap on a word while the article is being read is the word's own, as when it is idle: its box opens, Save and the
+  // lists work, and the read goes on. Only the pause control stops it (John, 2026-11-11: "when i hit play, the only
+  // thing that should stop that is hitting the pause button itself").
 
   /* ------------------------------------------------------------------ the quiet speaker mark */
   const sheetNode = (node) => {
@@ -628,6 +672,8 @@ export function installVoiceLayer(host) {
     scan = doc.defaultView.setTimeout(() => {
       scan = 0;
       mountMarks(doc);
+      // the page drawn again (a word looked up, a box opened, a dial moved): the bands follow the sentence's new words
+      if (readBands.shown) readBands.refresh();
       // A read belongs to its control. The control drawn again (the same one, of the same word) takes the read over;
       // when the control's screen has gone, the read ends.
       if (spoken?.button && !spoken.button.isConnected) {
@@ -779,7 +825,7 @@ export function installVoiceLayer(host) {
     },
     /** Whether a word could be voiced right now. A read that would start by itself asks first (corridor.js), so that
      * with no voice to be had it stops no other sound. */
-    canSay: () => !seam.cannot(),
+    canSay: () => !seam.cannot() && !readerBusy(),
     /** A word page opened by the learner's own act: its headword says itself once when the page stands (mountMarks). */
     opened(node) { openedPage = node?.t && node.id != null ? { node: `${node.t}:${node.id}`, at: Date.now() } : null; },
     /** Every sound of the layer ends: the screen changed. `keepReader` leaves an article's read to the reader's own rule. */
