@@ -102,6 +102,8 @@ async function freshPage({ net = {} } = {}) {
       if ((net.fail || []).includes(file)) {
         net.seen.failed += 1;
         if (net.failMs) await new Promise((r) => setTimeout(r, net.failMs));
+        // when the last of these loads failed: the face may settle only after it
+        net.seen.failedAt = Date.now();
         return route.fulfill({ status: 404, body: 'gone' }).catch(() => {});
       }
       if (net.articleMs) { net.seen.articles += 1; await new Promise((r) => setTimeout(r, net.articleMs)); }
@@ -279,9 +281,12 @@ try {
     await p.ready();
     const n = speaks().length;
     await startReview(p);
+    const watching = Date.now();
     const looks = await watchFace(p, 12000);
     if (looks[0]?.control) looks[0].early = true;
-    const settledAt = null;
+    // every look is judged until the face has settled (the combine's review: the first look alone let a control that came
+    // 1 to 5 s in, before the 404 at 6 s, pass): the face settles when the article's load has failed, not before
+    const settledAt = net.seen.failedAt ? net.seen.failedAt - watching : Number.POSITIVE_INFINITY;
     const problems = [];
     if (!net.seen.failed) problems.push('the saved sentence’s article was never asked for (nothing to check)');
     if (!looks[0]?.printed) problems.push('the face was not drawn printed');
@@ -300,7 +305,7 @@ try {
       if (speaks().length !== m + 1) problems.push(`the tap sent ${JSON.stringify(speaks().slice(m))}, not one reading`);
     }
     report('I10 a word saved with its sentence whose article answers 404: the printed face gets its control once that load has failed', problems,
-      { file, failedLoads: net.seen.failed, looks: looks.length, firstControlAt: looks.find((f) => f.control)?.at ?? null, card: looks[0]?.card, tapped });
+      { file, failedLoads: net.seen.failed, settledAt, looks: looks.length, firstControlAt: looks.find((f) => f.control)?.at ?? null, card: looks[0]?.card, tapped });
   });
 
   // ============================================================ I10 · a second repetition with no example sentence
