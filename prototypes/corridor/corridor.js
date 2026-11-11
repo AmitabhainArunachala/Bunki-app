@@ -10064,12 +10064,13 @@ async function placeWord(node, label, to, { keep = null, saved = null } = {}) {
   }
   const same = sameSaved(node);
   let ok;
+  let unmatched = false;
   try {
     ok = await commitStorePatch((latest) => {
       if (!allowed()) throw new Error('personal-capture-not-allowed');
       const item = latest.taken.find(same);
       const listed = Object.values(latest.lists || {}).flat().find(same);
-      if (!item && !listed) throw declineWrite('not-saved');
+      if (!item && !listed) { unmatched = true; throw declineWrite('not-saved'); }
       const patch = { lists: moveLists(latest.lists, listed || listRowFor(node, label, item), to) };
       if (to.kind === 'list') {
         const memory = withListUsed(latest.saveMemory, to.name, Date.now());
@@ -10078,6 +10079,14 @@ async function placeWord(node, label, to, { keep = null, saved = null } = {}) {
       return patch;
     });
   } catch { ok = false; }
+  // a word its surface reports saved (a host's own keep) whose row the record cannot match by the word's identity: a list
+  // pick puts it on the list the way the list's own door does (it keeps the word if need be); Review leaves it where it is
+  if (!ok && unmatched && to.kind === 'list') {
+    const result = await writeListMembership(node, label, to.name, true);
+    if (result === 'ok') { if (S.stack.length) S.roomStale = true; return { status: 'ok', place: { kind: 'list', name: to.name }, from: before }; }
+    return { status: result === 'ok' ? 'ok' : 'list-failed' };
+  }
+  if (!ok && unmatched && to.kind === 'review') return { status: 'ok', place: { kind: 'review' }, from: before };
   if (!ok) return { status: 'list-failed' };
   if (S.stack.length) S.roomStale = true;
   return { status: 'ok', place: to.kind === 'list' ? { kind: 'list', name: to.name } : { kind: 'review' }, from: before };
@@ -20812,7 +20821,13 @@ function renderTextSourceContextSelection(main, saved, body, personal) {
   const keepSave = saveOne({
     id: `${controlPrefix}-context-save`, cls: 'context-save', label: tx('選んだ文章', 'the selected text'), home: ['先生のページ', 'Tutor page'], 
     saved: () => !!state.selection && keptAt === selectionKey(state.selection),
-    keep: () => keepSelection(false, keepSave),
+    // SAVE · the keep runs at the chooser's pick, not at the Save's own press: a word's raised reading or English in the
+    // text (the double click that made the selection climbs its ladder) is put away first, as the Save's press used to put
+    // it away before its one-tap keep, so the action finds its bare source text (currentSurface)
+    keep: () => {
+      if (ladderVisit?.anchor && body.contains(ladderVisit.anchor)) clearWordLadder(ladderVisit);
+      return keepSelection(false, keepSave);
+    },
     more: () => [{ id: `${controlPrefix}-context-copy`, label: tx('コピー', 'Copy'), run: () => copyReaderText(state.selection?.quote || '') }],
   });
   controls.push(keepSave); actions.append(keepSave);
