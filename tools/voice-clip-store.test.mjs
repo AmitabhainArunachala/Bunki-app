@@ -396,6 +396,86 @@ describe('B3: heard clips play offline', () => {
     expect(source.slice(Math.max(0, at - 600), at)).toMatch(/voice profile/u);
   });
 
+  it('(8) only OLDER clip databases go when the store loads: a newer version, the pairing and the record stay', async () => {
+    /** A browser's IndexedDB as far as the clean-up sees it: the databases it lists, and each delete it is asked for. */
+    const browser = (names, outcome = {}) => {
+      const asked = [];
+      const indexedDB = {
+        open() {
+          const request = {};
+          setTimeout(() => request.onerror?.(), 0);
+          return request;
+        },
+        async databases() {
+          return names.map((name) => ({ name, version: 1 }));
+        },
+        deleteDatabase(name) {
+          asked.push(name);
+          if (outcome[name] === 'throws') throw new Error('refused');
+          const request = {};
+          setTimeout(
+            () =>
+              (outcome[name] === 'error'
+                ? request.onerror
+                : outcome[name] === 'blocked'
+                  ? request.onblocked
+                  : request.onsuccess)?.(),
+            0,
+          );
+          return request;
+        },
+      };
+      return { asked, env: { indexedDB } };
+    };
+    const settle = () => new Promise((done) => setTimeout(done, 30));
+    const planted = [
+      'bunki-voice-clips',
+      CLIP_DB,
+      `bunki-voice-clips-v${CLIP_STORE_VERSION + 1}`,
+      'bunki-voice',
+      'bunki-voice-clips-proof',
+      'bunki-personal-collections-v1',
+    ];
+    // a load of this build's store: only the unversioned name of the first builds goes
+    const one = browser(planted);
+    await createClipStore({ storage: clipStore.createIndexedDbClipStorage(one.env) }).ready();
+    await settle();
+    expect(one.asked).toEqual(['bunki-voice-clips']);
+    // a store of a later version removes the lower ones and leaves a newer one (a rollback, or two builds on one origin)
+    const later = browser([
+      'bunki-voice-clips',
+      'bunki-voice-clips-v1',
+      'bunki-voice-clips-v2',
+      'bunki-voice-clips-v3',
+      'bunki-voice-clips-v4',
+      'bunki-voice',
+    ]);
+    await clipStore
+      .createIndexedDbClipStorage(later.env, { name: 'bunki-voice-clips-v3' })
+      .dropOlder();
+    expect(later.asked).toEqual([
+      'bunki-voice-clips',
+      'bunki-voice-clips-v1',
+      'bunki-voice-clips-v2',
+    ]);
+    // a storage under any other name (the proof's own) removes nothing
+    const other = browser(planted);
+    await clipStore
+      .createIndexedDbClipStorage(other.env, { name: 'bunki-voice-clips-proof' })
+      .dropOlder();
+    expect(other.asked).toEqual([]);
+    // a delete that fails, is blocked or throws still lets the clean-up end, quietly
+    for (const outcome of ['error', 'blocked', 'throws']) {
+      const stuck = browser(['bunki-voice-clips', 'bunki-voice-clips-v0'], {
+        'bunki-voice-clips': outcome,
+      });
+      await expect(
+        clipStore.createIndexedDbClipStorage(stuck.env).dropOlder(),
+      ).resolves.toBeUndefined();
+      expect(stuck.asked).toEqual(['bunki-voice-clips', 'bunki-voice-clips-v0']);
+    }
+  });
+
   it('(f) the stored bytes equal the served bytes', async () => {
     const fake = await startFakeVoiceServer({ origins: [PAGE] });
     try {

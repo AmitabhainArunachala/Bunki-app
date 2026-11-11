@@ -20,7 +20,8 @@
  * set is never played beside one made by the newer set, and the older database is removed when the store first reads. */
 export const CLIP_STORE_VERSION = 1;
 export const CLIP_DB = `bunki-voice-clips-v${CLIP_STORE_VERSION}`;
-const ANY_CLIP_DB = /^bunki-voice-clips(?:-v\d+)?$/u;
+const UNVERSIONED_CLIP_DB = 'bunki-voice-clips';
+const VERSIONED_CLIP_DB = /^bunki-voice-clips-v(\d+)$/u;
 export const CLIP_CAP_BYTES = 300 * 1024 * 1024;
 const BYTES = 'clips';
 const INDEX = 'index';
@@ -100,12 +101,22 @@ export function createIndexedDbClipStorage(env = globalThis, { name = CLIP_DB } 
       if (!keys.length) return;
       await run([BYTES, INDEX], 'readwrite', (tx) => { for (const key of keys) { tx.objectStore(BYTES).delete(key); tx.objectStore(INDEX).delete(key); } });
     },
-    /** The clips of an older version (an older voice roster or profile) go: their databases are deleted. */
+    /** The clips of an OLDER version (an older voice roster or profile) go: the unversioned database of the first builds
+     * and every lower number. A newer number belongs to another build on this origin (after a rollback, or two builds
+     * side by side) and is left alone, so neither wipes the other's clips. A delete that fails or is blocked is let go. */
     async dropOlder() {
-      if (name !== CLIP_DB || typeof idb.databases !== 'function' || typeof idb.deleteDatabase !== 'function') return;
+      const own = VERSIONED_CLIP_DB.exec(name);
+      if (!own || typeof idb.databases !== 'function' || typeof idb.deleteDatabase !== 'function') return;
       for (const db of await idb.databases()) {
-        if (db.name === name || !ANY_CLIP_DB.test(db.name || '')) continue;
-        await new Promise((resolve) => { const request = idb.deleteDatabase(db.name); request.onsuccess = request.onerror = request.onblocked = () => resolve(); });
+        const other = String(db?.name || '');
+        const version = VERSIONED_CLIP_DB.exec(other);
+        if (other !== UNVERSIONED_CLIP_DB && !(version && Number(version[1]) < Number(own[1]))) continue;
+        await new Promise((resolve) => {
+          try {
+            const request = idb.deleteDatabase(other);
+            request.onsuccess = request.onerror = request.onblocked = () => resolve();
+          } catch { resolve(); }
+        });
       }
     },
   };
