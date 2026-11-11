@@ -856,3 +856,57 @@ test('render boundary retires pending old face before automatic playback and nev
   assert.equal(f.deviceVoiceCalls.length, 0);
   assert.deepEqual(f.writes, []);
 });
+
+/* ============================================================ CARD AUDIO (2026-11-11, John: "the duplication gone, the gawdy
+ * buttons more subtle and simplified, voice on the front as well, and the option to have no highlighting at all").
+ * Plain inputs to modules/card-audio.mjs; the browser checks (stand-in voice, muted) prove the same on the screen. */
+import { answerReads, deckFrontVoice, highlightOn, reviewFrontVoice } from '../modules/card-audio.mjs';
+
+test('CARD AUDIO R4 · the hidden answer is never spoken: no control on a face where the asked word is blanked out', () => {
+  // the earlier attempt put the control on the cloze face (a word asked inside its sentence), where one tap said the answer
+  assert.equal(reviewFrontVoice({ kind: 'word', printed: false, blanked: true, label: '電車', reading: 'でんしゃ' }), null);
+  assert.equal(reviewFrontVoice({ kind: 'word', printed: true, blanked: true, label: '電車', reading: 'でんしゃ' }), null,
+    'blanked wins even when the word also stands printed somewhere on the face');
+  assert.equal(reviewFrontVoice({ kind: 'word', printed: false, blanked: false, label: '電車', reading: 'でんしゃ' }), null);
+  assert.equal(deckFrontVoice({ kind: 'go', printed: false, blanked: true, choices: false, reading: 'でんしゃ' }), null);
+  assert.equal(deckFrontVoice({ kind: 'go', printed: true, blanked: true, choices: false, reading: 'でんしゃ' }), null);
+  assert.equal(deckFrontVoice({ kind: 'go', printed: true, blanked: false, choices: true, reading: 'でんしゃ' }), null,
+    'a face with choices prints other words and gaps: no control');
+});
+
+test('CARD AUDIO R3 · the question side says the printed word by the card’s stored reading, never the written form alone', () => {
+  assert.deepEqual(reviewFrontVoice({ kind: 'word', printed: true, blanked: false, label: '今日', reading: 'きょう' }),
+    { text: 'きょう', word: '今日' });
+  assert.deepEqual(reviewFrontVoice({ kind: 'word', printed: true, blanked: false, label: 'さくら', reading: '' }),
+    { text: 'さくら', word: 'さくら' }, 'a kana word is its own reading');
+  assert.equal(reviewFrontVoice({ kind: 'word', printed: true, blanked: false, label: '一日', reading: '' }), null,
+    'kanji with no stored reading: nothing to say, no control');
+  assert.deepEqual(deckFrontVoice({ kind: 'go', printed: true, blanked: false, choices: false, reading: 'いちにち' }), { text: 'いちにち' });
+  assert.equal(deckFrontVoice({ kind: 'go', printed: true, blanked: false, choices: false, reading: '' }), null);
+});
+
+test('CARD AUDIO R3 · several readings, sentence cards, question cards and non-word deck cards get no control at all', () => {
+  assert.equal(reviewFrontVoice({ kind: 'kanji', printed: true, blanked: false, label: '生', readings: ['せい', 'しょう', 'い'] }), null);
+  assert.deepEqual(reviewFrontVoice({ kind: 'kanji', printed: true, blanked: false, label: '鮨', readings: ['すし'] }), { text: 'すし', word: '鮨' });
+  assert.equal(reviewFrontVoice({ kind: 'kanji', printed: true, blanked: false, label: '鮨', readings: [] }), null);
+  assert.equal(reviewFrontVoice({ kind: 'sentence', printed: true, blanked: false, label: '雨が降る。', reading: 'あめがふる' }), null);
+  assert.equal(reviewFrontVoice({ kind: 'question', printed: true, blanked: false, label: '問題', reading: 'もんだい' }), null);
+  assert.equal(deckFrontVoice({ kind: 'ji', printed: true, blanked: false, choices: false, reading: 'せい' }), null);
+  assert.equal(deckFrontVoice({ kind: 'bun', printed: true, blanked: false, choices: false, reading: 'のに' }), null);
+});
+
+test('CARD AUDIO R2 · the answer side says the word, then the sentence, then (deck) the definition and the note, in one turn', () => {
+  assert.deepEqual(answerReads('でんしゃ', [{ text: '電車に乗る。' }]), [{ text: 'でんしゃ' }, { text: '電車に乗る。' }]);
+  assert.deepEqual(answerReads('でんしゃ', [{ text: '電車に乗る。' }], [{ text: '線路を走る乗り物。' }], [{ text: '駅で使う。' }]),
+    [{ text: 'でんしゃ' }, { text: '電車に乗る。' }, { text: '線路を走る乗り物。' }, { text: '駅で使う。' }]);
+  assert.deepEqual(answerReads('でんしゃ', []), [{ text: 'でんしゃ' }], 'a card with no sentence says its word alone');
+  assert.deepEqual(answerReads('', [{ text: '電車に乗る。' }, { text: ' ' }]), [{ text: '電車に乗る。' }], 'nothing empty is sent');
+});
+
+test('CARD AUDIO R6 · highlighting is on by default and off only when the learner said off', () => {
+  assert.equal(highlightOn(null), true);
+  assert.equal(highlightOn(undefined), true);
+  assert.equal(highlightOn('on'), true);
+  assert.equal(highlightOn('garbage'), true);
+  assert.equal(highlightOn('off'), false);
+});
