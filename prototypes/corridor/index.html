@@ -76,6 +76,9 @@
     <!-- the Drift universe (Phase 2): self-mounts #drift-layer, sleeps until
          the corridor's drift entry view wakes it via window.__DRIFT__ -->
     <script defer src="drift-layer.js"></script>
+    <!-- 宙, the first screen's sky (2026-11-11): puts itself over #drift-layer and keeps the old layer
+         unseen beneath it; a driven browser keeps the old screen unless the address says ?sky=1 -->
+    <script type="module" src="sky/mount.mjs"></script>
     <!-- Optional lookup lens: its JSON sidecar is fetched only on demand. -->
     <script defer src="skip-core.js"></script>
     <script defer src="skip-ui.js"></script>
