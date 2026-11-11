@@ -1,6 +1,7 @@
 /* 宙 — puts the sky on the app's first screen (John, 2026-11-11 14:58: "lock it in, merge it if it is ready").
  * Loaded by index.html beside drift-layer.js, the old first screen. The engine (sky.js, sky-world.js, sky-web.js in
- * this folder) is the approved copy of PROGRAM/design/sky-v1-20261111-1458, unchanged; this file is the app's own
+ * this folder) is the approved copy of PROGRAM/design/sky-v1-20261111-1458, unchanged but for one line the lead added
+ * in the design copy since (sky.js asks for its context with failIfMajorPerformanceCaveat); this file is the app's own
  * mount, modelled on that copy's mount.js.
  *
  * The old first screen stays in the page, unseen and untouched: its words are the learner's own (read here, and again
@@ -9,12 +10,13 @@
  * says ?sky=1. ?sky=0, or localStorage 'bunki-live:sky' = '0', keeps it too, and so does a window narrower than 720 px
  * when the sky would mount (an opened word is not laid out for a phone yet). If window.__bunkiSkyMount is set by then,
  * or the live design layer has put its own sky in the page, this one stands down: in the 18841 preview the lead's
- * newer copy wins. Anything wrong (a data file refused, no WebGL2, the graphics context lost, five frames failing)
- * gives the old first screen back, whole.
+ * newer copy wins. A browser that can draw only in software (no graphics card) never gets the sky (lead, 2026-11-11:
+ * right for learners on weak machines): the drawing is checked before anything is fetched. Anything else wrong (a data
+ * file refused, no WebGL2, the graphics context lost, five frames failing) gives the old first screen back, whole.
  *
  * The data is two files, one per licence pool, joined here in memory (joinSkyData). Reads nothing of the learner's
  * record and writes nothing; pages open through the app's own door (window.__BUNKI_OPEN_ENTRY). The decision is left
- * in window.__bunkiSkyApp = { state, reason } (waiting, off, stood-down, loading, mounted, gave-back). */
+ * in window.__bunkiSkyApp = { state, reason, renderer } (waiting, off, stood-down, loading, mounted, gave-back). */
 
 /** The two pool files into the one object the engine reads (sky-world.js): each meaning link's two words become row
  * numbers of the share_alike file. A link naming a word the file does not hold fails the join, and with it the sky. */
@@ -91,10 +93,45 @@ let lang = null;
 let dataUrl = null;
 let gaveBack = false;
 
+/** Renderers that draw in software: Chromium's SwiftShader, Mesa's llvmpipe, softpipe and lavapipe, Windows' basic
+ * render driver. */
+const SOFTWARE = /swiftshader|llvmpipe|softpipe|lavapipe|software|basic render driver/iu;
+/** '' where the sky can be drawn on a graphics card, else why not: 'software drawing' or 'no webgl2'. The engine asks
+ * for its context with failIfMajorPerformanceCaveat, but headless Chromium, drawing in SwiftShader by default, is given
+ * one all the same (measured 2026-11-11, Chromium 153 on macOS; only --use-gl=swiftshader is refused), so the
+ * renderer's own name is read too. A plain request tells software from no WebGL2 at all. */
+function drawingRefused() {
+  const ask = (attributes) => {
+    try {
+      return document.createElement('canvas').getContext('webgl2', attributes);
+    } catch {
+      return null;
+    }
+  };
+  const fast = ask({ failIfMajorPerformanceCaveat: true });
+  const gl = fast || ask();
+  if (!gl) return 'no webgl2';
+  try {
+    const info = gl.getExtension('WEBGL_debug_renderer_info');
+    status.renderer = String(gl.getParameter(info ? info.UNMASKED_RENDERER_WEBGL : gl.RENDERER));
+    const lose = gl.getExtension('WEBGL_lose_context');
+    if (lose) lose.loseContext();
+  } catch {
+    /* a renderer that will not say its name is taken at its word */
+  }
+  return !fast || SOFTWARE.test(status.renderer || '') ? 'software drawing' : '';
+}
+/** The engine says only 'no webgl2' when it is given no context; say which. */
+function failure(err) {
+  const said = String((err && err.message) || err);
+  return said === 'no webgl2' ? drawingRefused() || said : said;
+}
+
 /** anything wrong with the new sky: the old first screen comes back, whole */
 function giveBack(err) {
   if (gaveBack) return;
   gaveBack = true;
+  const reason = failure(err);
   try {
     console.error('SKY gave the first screen back', err);
     document.documentElement.removeAttribute('data-bunki-sky');
@@ -106,7 +143,7 @@ function giveBack(err) {
   host = null;
   api = null;
   window.__SKY__ = null;
-  settle('gave-back', String((err && err.message) || err));
+  settle('gave-back', reason);
 }
 
 function start() {
@@ -186,7 +223,12 @@ function load(src) {
   });
 }
 async function json(path) {
-  const response = await fetch(here(path));
+  let response;
+  try {
+    response = await fetch(here(path));
+  } catch (err) {
+    throw new Error(`sky: ${path} did not arrive (${(err && err.message) || err})`);
+  }
   if (!response.ok) throw new Error(`sky: ${path} answered ${response.status}`);
   return response.json();
 }
@@ -197,6 +239,8 @@ async function mountOnce() {
   if (window.__bunkiSkyMount || document.querySelector('script[src*="/design/sky/"]'))
     return settle('stood-down', 'another sky is mounting');
   if (window.innerWidth < 720) return settle('off', 'narrow');
+  const refused = drawingRefused();
+  if (refused) return giveBack(new Error(refused));
   window.__bunkiSkyMount = 'app';
   settle('loading');
   try {

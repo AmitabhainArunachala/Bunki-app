@@ -196,7 +196,9 @@
     const wrap = document.createElement('div'); wrap.className = 'sky'; root.appendChild(wrap);
     const canvas = document.createElement('canvas'); canvas.className = 'gl'; wrap.appendChild(canvas);
     const ui = document.createElement('div'); ui.className = 'ui'; wrap.appendChild(ui);
-    const gl = canvas.getContext('webgl2', { alpha: false, antialias: false, premultipliedAlpha: true, powerPreference: 'high-performance' });
+    // failIfMajorPerformanceCaveat: where the browser can only draw in software (no graphics card), no context is given,
+    // so the old first screen stays instead of a sky at one frame a second
+    const gl = canvas.getContext('webgl2', { alpha: false, antialias: false, premultipliedAlpha: true, powerPreference: 'high-performance', failIfMajorPerformanceCaveat: true });
     if (!gl) { root.innerHTML = ''; if (opt.onFail) setTimeout(() => opt.onFail(new Error('no webgl2')), 0); return { destroy() { root.innerHTML = ''; }, ok: false }; }
 
     const S = {
