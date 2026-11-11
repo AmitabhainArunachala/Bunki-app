@@ -96,7 +96,11 @@ async function freshPage({ net = {} } = {}) {
     if (['http:', 'https:'].includes(u.protocol) && !['127.0.0.1', 'localhost'].includes(u.hostname)) return route.abort();
     const file = u.pathname.split('/').pop();
     if (/\/data\/articles\//.test(u.pathname)) {
-      if ((net.fail || []).includes(file)) { net.seen.failed += 1; return route.fulfill({ status: 404, body: 'gone' }); }
+      if ((net.fail || []).includes(file)) {
+        net.seen.failed += 1;
+        if (net.failMs) await new Promise((r) => setTimeout(r, net.failMs));
+        return route.fulfill({ status: 404, body: 'gone' }).catch(() => {});
+      }
       if (net.articleMs) { net.seen.articles += 1; await new Promise((r) => setTimeout(r, net.articleMs)); }
     }
     if (net.bankMs && /\/data\/proprietary_safe\/examples\//.test(u.pathname)) { net.seen.bank += 1; await new Promise((r) => setTimeout(r, net.bankMs)); }
@@ -240,15 +244,18 @@ try {
     const { page } = p;
     const file = await saveWords(p, [2]);
     if (!file) throw new Error('the open article has no file');
-    net.fail = [file];
+    // the article answers 404 after 6 s, so the face is up face-down while its load is still on its way
+    net.fail = [file]; net.failMs = 6000;
     await p.ready();
     const n = speaks().length;
     await startReview(p);
-    const looks = await watchFace(p, 9000);
+    const looks = await watchFace(p, 12000);
+    if (looks[0]?.control) looks[0].early = true;
     const settledAt = null;
     const problems = [];
     if (!net.seen.failed) problems.push('the saved sentence’s article was never asked for (nothing to check)');
     if (!looks[0]?.printed) problems.push('the face was not drawn printed');
+    if (looks[0]?.early) problems.push('a control stood at once, while the saved sentence\u2019s article was still on its way');
     problems.push(...settledProblems(looks, settledAt));
     if (speaks().length !== n) problems.push(`sent without a tap: ${JSON.stringify(speaks().slice(n))}`);
     await p.shot('settle-saved');
