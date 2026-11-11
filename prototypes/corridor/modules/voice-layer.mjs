@@ -853,7 +853,13 @@ export function installVoiceLayer(host) {
     plain: { line: (reason) => silenceLine(reason), words: (reason) => reasonWords(reason) },
     // the card audio's switch (Settings, 筆と声): off, the ear draws nothing on text either
     highlight: () => highlighting(),
-    cannot: (unit) => seam.cannot(unit.voiceKey),
+    cannot: (unit) => {
+      const why = seam.cannot(unit.voiceKey);
+      if (!why) return null;
+      // a unit whose every sentence this device keeps is a voice to be had, connection or not (the offline clips, B3)
+      const all = unit.sentences || [];
+      return all.length && all.every((one) => !seam.cannot(unit.voiceKey, one.text)) ? null : why;
+    },
     context: () => ({ view: host.view(), keyFor: markKey,
       articleOf: (node) => (host.view() === 'reader' && node?.closest?.('#reader') ? host.passage()?.id || null : null),
       // a study card's front (a review card before its answer, a deck card on its question side)
