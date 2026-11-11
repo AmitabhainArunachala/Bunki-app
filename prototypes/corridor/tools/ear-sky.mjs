@@ -143,20 +143,26 @@ await run('look', async () => {
   const full = await page.screenshot({ clip: { x: clip.x - 300, y: 0, width: 760, height: 160 } });
   writeFileSync(`${OUT}/ear-sky-mark-wide-${tag}.png`, full);
   // inside the mark: its glyph is the inner 16 x 16 px; its ground the ring between the glyph and the hairline box
-  const png = PNG.sync.read(shot);
-  const px = (x, y) => { const o = (Math.round(y) * png.width + Math.round(x)) * 4; return [png.data[o], png.data[o + 1], png.data[o + 2]]; };
-  const cx = box.x - clip.x + box.w / 2, cy = box.y - clip.y + box.h / 2;
-  const glyph = [], ground = [];
-  for (let y = -8; y <= 8; y += 1) for (let x = -8; x <= 8; x += 1) glyph.push(px(cx + x, cy + y));
-  for (let y = -13; y <= 13; y += 1) for (let x = -13; x <= 13; x += 1) if (Math.max(Math.abs(x), Math.abs(y)) >= 11) ground.push(px(cx + x, cy + y));
-  const byLum = (list) => list.map((c) => [luminance(c), c]).sort((a, b) => a[0] - b[0]);
-  const g = byLum(ground), groundMid = g[Math.floor(g.length / 2)][1];
-  // the glyph's strokes: the pixels of its box furthest from the ground's own brightness
-  const gl = byLum(glyph), mid = luminance(groundMid);
-  const ink = gl.reduce((best, cur) => (Math.abs(cur[0] - mid) > Math.abs(best[0] - mid) ? cur : best))[1];
-  const contrast = ratio(ink, groundMid);
-  record('K5: the mark at rest on the sky stands out from its ground (glyph against ground, 3:1 or more)', contrast >= 3 ? [] : [`contrast ${contrast.toFixed(2)}`],
-    `ear ${box.ear}; glyph rgb(${ink.join(',')}) on ground rgb(${groundMid.join(',')}): ${contrast.toFixed(2)}:1; picture ear-sky-mark-${tag}.png`);
+  // a seal's glyph against its own ground: inside the seal, the inner 16 x 16 px hold the glyph; the ring between the
+  // glyph and the seal's hairline box is its ground. The gate beside it is measured the same way, for comparison.
+  const measure = async (selector) => {
+    const r = await page.evaluate((sel) => { const el = document.querySelector(sel); const b = el.getBoundingClientRect(); return { x: b.left, y: b.top, w: b.width, h: b.height }; }, selector);
+    const png = PNG.sync.read(await page.screenshot({ clip: { x: r.x, y: r.y, width: r.w, height: r.h } }));
+    const px = (x, y) => { const o = (Math.round(y) * png.width + Math.round(x)) * 4; return [png.data[o], png.data[o + 1], png.data[o + 2]]; };
+    const cx = r.w / 2, cy = r.h / 2, glyph = [], ground = [];
+    for (let y = -8; y <= 8; y += 1) for (let x = -8; x <= 8; x += 1) glyph.push(px(cx + x, cy + y));
+    for (let y = -13; y <= 13; y += 1) for (let x = -13; x <= 13; x += 1) if (Math.max(Math.abs(x), Math.abs(y)) >= 11) ground.push(px(cx + x, cy + y));
+    const byLum = (list) => list.map((c) => [luminance(c), c]).sort((a, b) => a[0] - b[0]);
+    const g = byLum(ground), groundMid = g[Math.floor(g.length / 2)][1], mid = luminance(groundMid);
+    // the glyph's strokes: the pixel of its box furthest from the ground's own brightness
+    const ink = byLum(glyph).reduce((best, cur) => (Math.abs(cur[0] - mid) > Math.abs(best[0] - mid) ? cur : best))[1];
+    return { ink, ground: groundMid, contrast: ratio(ink, groundMid) };
+  };
+  const mark = await measure('#ginga-symbol + .ear-spot .ear-mark');
+  const gate = await measure('#ginga-symbol');
+  const show = (m) => `rgb(${m.ink.join(',')}) on rgb(${m.ground.join(',')}): ${m.contrast.toFixed(2)}:1`;
+  record('K5: the mark at rest on the sky stands out from its ground (glyph against ground, 3:1 or more)', mark.contrast >= 3 ? [] : [`contrast ${mark.contrast.toFixed(2)}`],
+    `ear ${box.ear}; the mark ${show(mark)}; the gate beside it ${show(gate)}; pictures ear-sky-mark-${tag}.png, ear-sky-mark-wide-${tag}.png`);
 });
 
 /* ------------------------------------------------------------------ N1: armed, Option, held */

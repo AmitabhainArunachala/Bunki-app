@@ -1455,6 +1455,14 @@ describe('on the sky the mark at rest is legible (K5)', () => {
       /background: color-mix\(in srgb, var\(--ground-0, var\(--ear-white\)\) 70%, transparent\)/,
     );
   });
+  it('at rest on the sky its character takes the gate’s own ink; struck, it keeps the sheet’s faded one', () => {
+    const glyph = EAR_CSS.split('}').find((one) =>
+      one.includes(
+        "html[data-bunki-sky='1'][data-ear='off'] #ginga-symbol + .ear-spot .ear-mark .ear-glyph",
+      ),
+    );
+    expect(glyph).toMatch(/color: color-mix\(in oklab, var\(--ear-ink\) 86%, transparent\)/);
+  });
 });
 
 describe('the ear’s own time limit says the voice took too long, not that the server is busy (K3)', () => {

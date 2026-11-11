@@ -738,8 +738,10 @@ export const EAR_CSS = `
 :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate + .ear-spot + * { margin-left: auto; }
 /* the new first screen, the sky (sky/mount.mjs), is night blue where the mark stands: at rest the mark stands on the
    gate's own plate there (editorial.css, the door's gate: the paper at 70%), so it reads as the sheet's hairline box on
-   paper; armed, held on and speaking keep their own grounds */
+   paper, and at rest its character takes the gate's own ink (the torii at 86%): the sheet's 58% on that thinner, greyer
+   paper measured 2.8:1 (tools/ear-sky.mjs look). Armed, held on and speaking keep their own grounds */
 html[data-bunki-sky='1']:is([data-ear='off'], [data-ear='novoice']) #ginga-symbol + .ear-spot .ear-mark::before { background: color-mix(in srgb, var(--ground-0, var(--ear-white)) 70%, transparent); }
+html[data-bunki-sky='1'][data-ear='off'] #ginga-symbol + .ear-spot .ear-mark .ear-glyph { color: color-mix(in oklab, var(--ear-ink) 86%, transparent); }
 @media (max-width: 640px) {
   #ginga-symbol + .ear-spot { left: calc(50% - 68px); }
   :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate + .ear-spot { left: calc(50% - 66px); }
