@@ -11,13 +11,14 @@
  *
  *  practice   F1 · a practice block (Learn → Kanji only → Start) draws a saved one-reading kanji face-down with its
  *             control; a tap on that control keeps the card face-down and asks for the stored reading, once.
- *  keys       F5, F6 · a key on a focused audio control does the control's action and nothing else (review card front
- *             and back, deck card front and back); after a pointer or touch activation focus is not left on the
- *             control, so Space does what it did before the tap (turns the card).
+ *  keys-review F5 · a key on a focused audio control of the review card (front, in a practice block, and back) does
+ *             the control's action and nothing else; after a pointer or touch activation focus is not left on the
+ *             control, so Space does what it did before the tap (turns the card, grades it).
+ *  keys-deck  F6 · the same on the deck card (front and back), whose player takes Space and Enter on the document.
  *  deck-row   F2 · the deck answer's word type stays on the word's line; the control keeps a 44 px tap target.
  *  sweep      F7 · "a tap only speaks": #card-say-front, #card-say, a card-example mark, #kp-listen-front and
- *             #kp-listen-word, each by pointer and by touch: it speaks, and revealed, graded, folded and focused state
- *             are the same before and after.
+ *             #kp-listen-word, each by pointer, by touch and by keyboard (focused, Enter): it speaks, and revealed,
+ *             graded, folded and focused state are the same before and after (focus aside for the keyboard).
  *  reveal-tap F3 · 声 on: a tap while the answer's word says itself ends that and starts the control's own turn (the
  *             reading, then the sentence); a tap during the control's own turn stops it. Review card and deck card.
  *  unsettled  F4 · words saved with their sentence, a fresh load with the article held 6 s: no question-side control
@@ -38,7 +39,7 @@ const WIDTH = Number(arg('--width', '390'));
 const LANG = arg('--lang', 'en');
 const PORT = Number(arg('--port', '19574'));
 const SHOTS = arg('--shots', '');
-const ONLY = new Set(String(arg('--only', 'practice,keys,deck-row,sweep,reveal-tap,unsettled,deck-wait')).split(',').filter(Boolean));
+const ONLY = new Set(String(arg('--only', 'practice,keys-review,keys-deck,deck-row,sweep,reveal-tap,unsettled,deck-wait')).split(',').filter(Boolean));
 if (!SITE) { console.error('usage: verify-card-audio-taps.mjs --site <built site>'); process.exit(2); }
 if (SHOTS) mkdirSync(SHOTS, { recursive: true });
 
@@ -227,7 +228,7 @@ try {
   });
 
   // ============================================================ F5, F6 · keys on the controls, and after a tap
-  await run('keys', async () => {
+  await run('keys-review', async () => {
     const p = await freshPage();
     const { page } = p;
     await saveKanji(p, '週'); await saveKanji(p, '駅');
@@ -288,7 +289,11 @@ try {
       }
       report('F5 review back: Enter and Space on the focused control speak and never grade; after a tap Space grades', problems, null);
     }
-    // the deck card
+    return p;
+  });
+  await run('keys-deck', async () => {
+    const p = await freshPage();
+    const { page } = p;
     await startDeck(p);
     {
       const problems = [];
@@ -377,7 +382,7 @@ try {
     const { page } = p;
     clipSeconds = 0.8;
     const rows = [];
-    const tapOnly = async (label, sel, stateOf, ways = ['pointer', 'touch']) => {
+    const tapOnly = async (label, sel, stateOf, ways = ['pointer', 'touch', 'keyboard']) => {
       for (const how of ways) {
         await quiet(page);
         await page.evaluate(() => document.activeElement?.blur?.());
@@ -385,11 +390,13 @@ try {
         await page.locator(sel).first().scrollIntoViewIfNeeded();
         const s0 = await stateOf(page);
         const n = speaks().length, k = await plays(page);
-        await p.press(sel, how);
+        if (how === 'keyboard') { await page.locator(sel).first().focus(); await page.keyboard.press('Enter'); }
+        else await p.press(sel, how);
         const said = await spoke(page, sel, n);
         await p.sleep(500);
         const s1 = await stateOf(page);
-        const problems = same(s0, s1, Object.keys(s0));
+        // a keyboard user's focus stays on the control he tabbed to; everything else is as it was
+        const problems = same(s0, s1, Object.keys(s0).filter((k) => how !== 'keyboard' || k !== 'focus'));
         if (!said && (await plays(page)) === k) problems.push('it did not speak');
         rows.push({ label, how, problems });
       }
@@ -424,7 +431,7 @@ try {
     await p.press('#kp-reveal'); await p.sleep(1500);
     await tapOnly('#kp-listen-word (deck)', '#kp-listen-word', deckState);
     const problems = rows.flatMap((r) => r.problems.map((x) => `${r.label} by ${r.how}: ${x}`));
-    report('F7 a tap only speaks: five controls by pointer and by touch leave revealed, graded, folded and focused state as they were', problems, rows.map((r) => `${r.label}/${r.how}: ${r.problems.length ? 'FAIL' : 'ok'}`));
+    report('F7 a tap only speaks: five controls by pointer, touch and keyboard leave revealed, graded, folded and focused state as they were', problems, rows.map((r) => `${r.label}/${r.how}: ${r.problems.length ? 'FAIL' : 'ok'}`));
     clipSeconds = 1.2;
     return p;
   });
