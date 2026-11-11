@@ -937,12 +937,23 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
   }, true);
   view.addEventListener('pointercancel', (event) => { if (press && press.id === event.pointerId) press = null; }, true);
   const shownDisplay = (el) => view.getComputedStyle(el).display;
-  const verdictOf = (event, dry) => earClick(event, {
-    machine, press, now: Date.now(), dry,
-    controlAt: (target) => appControlAt(target, { display: shownDisplay }),
-    unitAt: (e) => (!e.clientX && !e.clientY ? findUnit(e.target, { display: shownDisplay, context: ctx() })
-      : find(e.clientX, e.clientY, true, press?.pointerType || e.pointerType || 'mouse')),
-  });
+  // One pick for one tap: what a surface asking as the finger lifts (takes, below) was told stands under the finger,
+  // word or nothing, is what the click a moment later acts on, though the words drift between the two (the sky's
+  // field moves every frame; the re-check's fr2, Q2)
+  const verdictOf = (event, dry) => {
+    const tap = press;
+    return earClick(event, {
+      machine, press, now: Date.now(), dry,
+      controlAt: (target) => appControlAt(target, { display: shownDisplay }),
+      unitAt: (e) => {
+        if (!dry && tap?.lifted) return tap.lifted.unit;
+        const unit = !e.clientX && !e.clientY ? findUnit(e.target, { display: shownDisplay, context: ctx() })
+          : find(e.clientX, e.clientY, true, press?.pointerType || e.pointerType || 'mouse');
+        if (dry && tap && e.type === 'pointerup' && e.pointerId === tap.id) tap.lifted = { unit };
+        return unit;
+      },
+    });
+  };
   view.addEventListener('click', (event) => {
     const verdict = verdictOf(event, false);
     press = null;

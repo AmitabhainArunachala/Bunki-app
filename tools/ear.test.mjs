@@ -1416,22 +1416,33 @@ describe('the sky’s mount says which word it drew under a point, as its own ta
       id: 'p0',
     });
   });
-  it('the sky asks the ear before it acts on a lifted finger; ear off, it acts on the same event as before', () => {
+  it('the sky asks the ear before it acts on a lifted finger or a cancelled one; ear off, it acts on the same event as before', () => {
     const m = skyMount();
     const sky = engine();
     m.askEarFirst(sky);
     const up = { type: 'pointerup' };
+    const cancel = { type: 'pointercancel' };
     const asked = [];
     m.window.__BUNKI_EAR = { takes: (event) => (asked.push(event), false) };
     sky.W.web.tap({ t: 'w', i: 0 }, up);
-    expect(sky.calls).toEqual([[{ t: 'w', i: 0 }, up]]);
+    sky.W.web.tap({ t: 'w', i: 0 }, cancel);
+    // a lift on empty sky is asked too, so the click after it meets the same pick (fix round 3, S2)
+    sky.W.web.tap(null, up);
+    expect(sky.calls).toEqual([
+      [{ t: 'w', i: 0 }, up],
+      [{ t: 'w', i: 0 }, cancel],
+      [null, up],
+    ]);
+    expect(asked).toEqual([up, cancel, up]);
     m.window.__BUNKI_EAR = { takes: () => true };
     sky.W.web.tap({ t: 'w', i: 0 }, up);
-    expect(sky.calls).toHaveLength(1);
-    // a tap on empty sky, and a cancelled pointer, are the sky's without a question
-    sky.W.web.tap(null, up);
-    sky.W.web.tap({ t: 'w', i: 0 }, { type: 'pointercancel' });
+    // the engine runs its tap on a cancelled touch as well: one the ear would have taken opens nothing (S3)
+    sky.W.web.tap({ t: 'w', i: 0 }, cancel);
     expect(sky.calls).toHaveLength(3);
+    // any other way in (another event, or none) is the sky's without a question
+    sky.W.web.tap({ t: 'w', i: 0 }, { type: 'click' });
+    sky.W.web.tap({ t: 'w', i: 0 });
+    expect(sky.calls).toHaveLength(5);
     // no ear in the page, or an ear that throws: the sky acts
     m.window.__BUNKI_EAR = {
       takes: () => {
@@ -1441,8 +1452,7 @@ describe('the sky’s mount says which word it drew under a point, as its own ta
     sky.W.web.tap({ t: 'w', i: 0 }, up);
     delete m.window.__BUNKI_EAR;
     sky.W.web.tap({ t: 'w', i: 0 }, up);
-    expect(sky.calls).toHaveLength(5);
-    expect(asked).toEqual([up]);
+    expect(sky.calls).toHaveLength(7);
   });
 });
 

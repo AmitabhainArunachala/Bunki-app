@@ -138,13 +138,16 @@ const earTakes = (event) => {
   }
 };
 /** The sky acts on a lifted finger through W.web.tap (sky-world.js onUp, after its own pointer bookkeeping): the ear is
- * asked there, so the engine's state is left as after any tap and only the word's opening is the ear's to withhold. */
+ * asked there, so the engine's state is left as after any tap and only the word's opening is the ear's to withhold.
+ * onUp runs on pointercancel too (a touch the browser cancelled), so the ear is asked on both: armed, a cancelled touch
+ * on a word opens nothing (and, no tap made, speaks nothing). The ear is asked on empty sky as well, so the click that
+ * follows a lift meets the same pick, word or nothing, though the field drifts between the two (ear.mjs takes). */
 function askEarFirst(sky) {
   const web = sky && sky.W && sky.W.web;
   if (!web || typeof web.tap !== 'function') return;
   const tap = web.tap;
   web.tap = (h, event) => {
-    if (h && event && event.type === 'pointerup' && earTakes(event)) return;
+    if (event && (event.type === 'pointerup' || event.type === 'pointercancel') && earTakes(event)) return;
     return tap(h, event);
   };
 }
