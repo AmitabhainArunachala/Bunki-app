@@ -5,7 +5,7 @@
  * own figure when it carries one); when the server has said no amount, the line names none ("today's voice limit is
  * used") rather than a wrong one.
  */
-/* global fetch, URL */
+/* global fetch, setTimeout, URL */
 import { readFileSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
@@ -21,6 +21,53 @@ import { startFakeVoiceServer } from '../prototypes/corridor/tools/fake-voice-se
 
 const PAGE = 'http://127.0.0.1:18841';
 const at = '09:00';
+
+describe('the day-limit line follows the server’s own figure', () => {
+  it('after the server refuses for the day, the seam reads the budget (free) once, and its day ceiling is the server’s', async () => {
+    let budgets = 0;
+    const client = {
+      configured: () => true,
+      ready: async () => {},
+      paired: () => true,
+      scope: () => ({ installation: `bunki-${'e'.repeat(32)}` }),
+      async speak() {
+        throw new VoiceError('day-budget', 429);
+      },
+      async budget() {
+        budgets += 1;
+        return {
+          capCents: 10000,
+          spentCents: 1000,
+          reservedCents: 0,
+          remainingCents: 9000,
+          dayCapCents: 1000,
+          daySpentCents: 1000,
+        };
+      },
+    };
+    const player = {
+      play: () => Promise.resolve('ended'),
+      pause() {},
+      resume() {},
+      stop() {},
+      setRate() {},
+    };
+    const seam = createVoiceSeam({ client, player, sleep: async () => {}, online: () => true });
+    expect(seam.status().budget).toBe(null);
+    await new Promise((done) =>
+      seam.read({
+        voiceKey: 'word:機械',
+        sentences: [{ text: 'きかい' }],
+        onState: (state) => {
+          if (['done', 'stopped', 'error'].includes(state)) done();
+        },
+      }),
+    );
+    await new Promise((done) => setTimeout(done, 5));
+    expect(budgets).toBe(1);
+    expect(seam.status().budget).toMatchObject({ dayCapCents: 1000 });
+  });
+});
 
 describe('the no-voice lines name only the server’s own amounts', () => {
   const line = (reason, limits, english = true) => {

@@ -323,11 +323,31 @@ export function createSpeakRoom(host) {
     });
     return ctx;
   }
+  /** Resolves when the page is shown: at once when it already is. */
+  function whenShown() {
+    return new Promise((resolve) => {
+      if (!document.hidden) { resolve(); return; }
+      const shown = () => {
+        if (document.hidden) return;
+        document.removeEventListener('visibilitychange', shown);
+        resolve();
+      };
+      document.addEventListener('visibilitychange', shown);
+    });
+  }
   /** Say her line through the app's one voice seam (host.sayLine: a kept clip, then the voice server, otherwise
    * silence); resolves 'done', 'stopped' or 'silent'. With no voice the room carries on without sound, and the plain
    * line saying why is shown once in a conversation, under the first line that found none. */
   async function playLine(line, { rate = 1 } = {}) {
     const token = ++st.playToken;
+    // Nothing is said on a page he is not looking at, and nothing is asked for it: a line that arrives while the page is
+    // hidden waits until it is shown, and is said then only if the room and its talk are still the ones showing
+    // (otherwise it stays on the page, with its listen mark).
+    if (document.hidden) {
+      const s = st.session;
+      await whenShown();
+      if (token !== st.playToken || st.session !== s || !host.isCurrent()) return 'stopped';
+    }
     host.stopAudio();
     const sentences = voiceLine(line);
     if (!sentences.length || typeof host.sayLine !== 'function') return 'silent';

@@ -16,12 +16,15 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
+import * as clipStore from '../prototypes/corridor/modules/voice-clip-store.mjs';
 import {
   CLIP_CAP_BYTES,
   CLIP_DB,
   createClipStore,
   createMemoryClipStorage,
 } from '../prototypes/corridor/modules/voice-clip-store.mjs';
+
+const { CLIP_STORE_VERSION } = clipStore;
 import {
   VoiceError,
   createMemoryTokenStore,
@@ -278,24 +281,119 @@ describe('B3: heard clips play offline', () => {
     const f = page({ storage: failing });
     expect((await run(f.seam, { voiceKey: 'article:a1', sentences: [S] })).at(-1)).toBe('done');
     expect(f.calls.played).toHaveLength(1);
-    // a store that never answers: the wait is 1.5 s, then the server is asked as now
-    let hung = 0;
+  });
+
+  it('(6) a store that does not answer in time is switched off for the page after its first wait: no later sentence waits', async () => {
+    let hung = 0,
+      puts = 0;
     const hanging = {
       get: () => {
         hung += 1;
         return new Promise(() => {});
       },
-      put: () => new Promise(() => {}),
-      has: () => false,
+      put: () => {
+        puts += 1;
+        return new Promise(() => {});
+      },
+      has: () => true,
     };
     const h = page({ store: hanging });
-    const started = Date.now();
+    // the first sentence waits once, up to 1.5 s, then the server is asked as now
+    let started = Date.now();
     expect((await run(h.seam, { voiceKey: 'article:a1', sentences: [S] })).at(-1)).toBe('done');
-    const waited = Date.now() - started;
+    const first = Date.now() - started;
+    expect(first).toBeGreaterThanOrEqual(1400);
+    expect(first).toBeLessThan(4000);
+    // every later sentence, in this read or the next, does not wait at all and the store is not asked again
+    started = Date.now();
+    expect(
+      (
+        await run(h.seam, {
+          voiceKey: 'article:a1',
+          sentences: [T, { text: '雨の日は本を読む。' }],
+        })
+      ).at(-1),
+    ).toBe('done');
+    expect(Date.now() - started).toBeLessThan(300);
     expect(hung).toBe(1);
-    expect(h.calls.speak).toHaveLength(1);
-    expect(waited).toBeGreaterThanOrEqual(1400);
-    expect(waited).toBeLessThan(4000);
+    expect(puts).toBe(0);
+    expect(h.calls.speak).toHaveLength(3);
+    // and a store that is off is not counted as a voice for a read by itself
+    h.net.online = false;
+    expect(h.seam.cannot('article:a1', 'まだ聞いていない文です。')).toBe('offline');
+  });
+
+  it('(7) a write refused for lack of space evicts the least recently played until the clip fits, tries once more, then gives up', async () => {
+    let clock = 1000;
+    /** a device with room for `room` bytes: a write past it is refused as the browser refuses it */
+    const tight = (room) => {
+      const inner = createMemoryClipStorage();
+      let used = 0,
+        refused = 0;
+      const sizes = new Map();
+      return {
+        refused: () => refused,
+        storage: {
+          ...inner,
+          async write(row, data) {
+            const before = sizes.get(row.key) || 0;
+            if (used - before + data.length > room) {
+              refused += 1;
+              throw Object.assign(new Error('The quota has been exceeded.'), {
+                name: 'QuotaExceededError',
+              });
+            }
+            await inner.write(row, data);
+            used += data.length - before;
+            sizes.set(row.key, data.length);
+          },
+          async remove(keys) {
+            await inner.remove(keys);
+            for (const key of keys) {
+              used -= sizes.get(key) || 0;
+              sizes.delete(key);
+            }
+          },
+        },
+      };
+    };
+    const clip = (n, size = 4) => ({
+      bytes: new Uint8Array(size).fill(n),
+      contentType: 'audio/wav',
+      voiceId: 'v',
+    });
+    const device = tight(10);
+    const store = createClipStore({ storage: device.storage, now: () => clock });
+    await store.put('k1', clip(1));
+    clock += 10;
+    await store.put('k2', clip(2));
+    clock += 10;
+    await store.get('k1'); // k1 played again: k2 is the least recently played
+    clock += 10;
+    expect(await store.put('k3', clip(3))).toBe(true);
+    expect(device.refused()).toBe(1);
+    expect((await device.storage.readIndex()).map((row) => row.key).sort()).toEqual(['k1', 'k3']);
+    // a clip that cannot fit even after evicting: one more refusal, then it gives up, silently
+    clock += 10;
+    expect(await store.put('k4', clip(4, 11))).toBe(false);
+    expect(device.refused()).toBe(3);
+    // and speech is never delayed or broken by it
+    const d = page({ store: createClipStore({ storage: tight(0).storage }) });
+    expect((await run(d.seam, { voiceKey: 'article:a1', sentences: [S] })).at(-1)).toBe('done');
+    expect(d.calls.played).toHaveLength(1);
+  });
+
+  it('(8) the store’s name carries a version, to change whenever the voice roster or the voice profile changes', () => {
+    expect(Number.isSafeInteger(CLIP_STORE_VERSION) && CLIP_STORE_VERSION >= 1).toBe(true);
+    expect(CLIP_DB).toBe(`bunki-voice-clips-v${CLIP_STORE_VERSION}`);
+    const source = readFileSync(
+      join(ROOT, 'prototypes/corridor/modules/voice-clip-store.mjs'),
+      'utf8',
+    );
+    const at = source.indexOf('export const CLIP_STORE_VERSION');
+    expect(at).toBeGreaterThan(0);
+    expect(source.slice(Math.max(0, at - 600), at)).toMatch(/voice roster/u);
+    expect(source.slice(Math.max(0, at - 600), at)).toMatch(/voice profile/u);
   });
 
   it('(f) the stored bytes equal the served bytes', async () => {
@@ -357,14 +455,16 @@ describe('B3: heard clips play offline', () => {
   });
 
   it('the store is not read by any export of the learner’s record: its database is named by its own module only', () => {
-    expect(CLIP_DB).toBe('bunki-voice-clips');
+    // the name's stem, which every version of the name carries
+    const stem = 'bunki-voice-clips';
+    expect(CLIP_DB.startsWith(stem)).toBe(true);
     const named = [];
     const walk = (dir) => {
       for (const name of readdirSync(dir)) {
         if (name === 'node_modules' || name.startsWith('.')) continue;
         const path = join(dir, name);
         if (statSync(path).isDirectory()) walk(path);
-        else if (/\.(m?js|ts)$/u.test(name) && readFileSync(path, 'utf8').includes(CLIP_DB))
+        else if (/\.(m?js|ts)$/u.test(name) && readFileSync(path, 'utf8').includes(stem))
           named.push(path.slice(ROOT.length + 1));
       }
     };

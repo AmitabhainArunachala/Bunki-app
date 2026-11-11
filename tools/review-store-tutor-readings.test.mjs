@@ -50,14 +50,21 @@ async function sentFor(reply) {
 }
 
 describe('review: a reading in parentheses is not said twice, and nothing shown is dropped', () => {
-  it('a reading written as English text writes it (a space before the bracket) is not sent as its own sentence', async () => {
-    // The tutor is told to "add readings in parentheses where helpful" and to "use English where it helps"; English
-    // puts a space before "(". The reply shows 機械 (きかい) twice.
-    const sent = await sentFor(
-      'The word 機械 (きかい) means machine. 例：工場の機械 (きかい) を使う。',
-    );
-    expect(sent.filter((text) => /きかい/u.test(text))).toEqual([]);
-  });
+  // RED BY DECISION (the coordinator's ruling on findings 2 and 3, 2026-11-11): what is sent to the voice is exactly
+  // what is shown, so a reading the tutor writes is said as written, twice where it is shown twice. The tutor project
+  // will have the tutor mark readings explicitly. `it.fails` keeps this check running and passes only while it fails:
+  // when the tutor project makes it pass, this line must become `it` again.
+  it.fails(
+    'a reading written as English text writes it (a space before the bracket) is not sent as its own sentence',
+    async () => {
+      // The tutor is told to "add readings in parentheses where helpful" and to "use English where it helps"; English
+      // puts a space before "(". The reply shows 機械 (きかい) twice.
+      const sent = await sentFor(
+        'The word 機械 (きかい) means machine. 例：工場の機械 (きかい) を使う。',
+      );
+      expect(sent.filter((text) => /きかい/u.test(text))).toEqual([]);
+    },
+  );
 
   it('an aside in kana after a word that ends in kanji is said: the screen shows it, so the voice says it', async () => {
     const sent = await sentFor('明日は雪（たぶん）。');

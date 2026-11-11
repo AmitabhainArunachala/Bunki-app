@@ -222,7 +222,6 @@ const BOOT_DATA = [
   'modules/voice-seam.mjs',
   'modules/voice-client.mjs',
   'modules/voice-clip-store.mjs',
-  'modules/voice-replies.mjs',
   'modules/nihongo-speech/audio/speech-text.mjs',
   'modules/nihongo-speech/audio/speech-queue.mjs',
   'modules/nihongo-speech/audio/speech-player.mjs',

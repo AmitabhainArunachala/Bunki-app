@@ -8,7 +8,8 @@
  *      successful audio answer is kept on the device, an error never;
  *   4. nothing. No other voice stands in: the read ends, silent, and names the reason, so the screen can say it in
  *      plain words (unpaired, offline, out of budget, the server refusing).
- * The store never breaks speech: an error from it, or a wait over 1.5 seconds, is a miss.
+ * The store never breaks speech: an error from it is a miss; a wait over 1.5 seconds is a miss and switches the store
+ * off for the rest of the page, so no later sentence waits for it.
  * A sentence the server would not take as Japanese is passed over without a word and the read goes on.
  *
  * The contract's error codes each have one behaviour here (speech team's contract v1):
@@ -39,27 +40,6 @@ export function voiceKeyOf(kind, id) {
   const cleaned = [...String(id ?? '').normalize('NFC').replace(/[\s\p{Cc}]+/gu, '')].slice(0, 120).join('') || 'bunki';
   const key = `${KINDS.has(kind) ? kind : 'word'}:${cleaned}`;
   return isVoiceKey(key) ? key : 'word:bunki';
-}
-
-const KANJI = /[\p{Script=Han}々〆ヶ]/u;
-const WORD_BEFORE = /[\p{Script=Han}々〆ヶ\p{Script=Hiragana}\p{Script=Katakana}ー]+$/u;
-const BRACKETED_KANA = /[（(]([\p{Script=Hiragana}\p{Script=Katakana}ー]+)[）)]/gu;
-const hiragana = (text) => text.replace(/[ァ-ヶ]/gu, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0x60));
-/** The text that is SPOKEN: a reading in parentheses right after a word with kanji is left out, so the word is not
- * said twice (the written tutor writes 機械（きかい）; 機械(きかい) the same). It counts as a reading only when it is kana
- * alone, with no space, directly after the word, and ends with the word's own kana after its last kanji (食べる（たべる）).
- * Anything else in parentheses stays: （笑）, （例：雨）, ねこ（ネコ）. What is shown is never changed. */
-export function withoutReadings(text) {
-  const source = String(text ?? '');
-  return source.replace(BRACKETED_KANA, (whole, reading, at) => {
-    const chars = [...(WORD_BEFORE.exec(source.slice(0, at))?.[0] || '')];
-    let last = -1;
-    chars.forEach((ch, i) => { if (KANJI.test(ch)) last = i; });
-    if (last < 0) return whole;
-    const tail = hiragana(chars.slice(last + 1).join(''));
-    const said = hiragana(reading);
-    return said.length > tail.length && said.endsWith(tail) ? '' : whole;
-  });
 }
 
 /** Text as sentences the server takes: canonical form, at most 400 code points each. */
@@ -136,18 +116,22 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
   /** A store's fault is never the read's: what it throws is swallowed. */
   const quietly = (work) => { try { const out = work(); if (out && typeof out.catch === 'function') out.catch(() => {}); } catch { /* the store's own */ } };
 
+  // a store that once did not answer in time is off for the rest of this page: no later sentence waits for it
+  let storeOff = false;
+  const storeOn = () => !!store && !storeOff;
   /** The clip this device keeps for `key`, asked before the server, online or offline: this page's memory first, then
-   * the device store. A store that fails, or does not answer within storeWaitMs, is a miss. */
+   * the device store. A store that fails is a miss; one that does not answer within storeWaitMs is a miss, and is then
+   * switched off for the page. */
   async function keptClip(key, signal) {
     const near = cache.get(key);
-    if (near) { remember(key, near); quietly(() => store?.touch?.(key)); return near; }
-    if (!store) return null;
+    if (near) { remember(key, near); if (storeOn()) quietly(() => store.touch?.(key)); return near; }
+    if (!storeOn()) return null;
     let timer = null;
     let clip = null;
     try {
       clip = await Promise.race([
         Promise.resolve().then(() => store.get(key)),
-        new Promise((resolve) => { timer = setTimeout(() => resolve(null), storeWaitMs); }),
+        new Promise((resolve) => { timer = setTimeout(() => { storeOff = true; resolve(null); }, storeWaitMs); }),
       ]);
     } catch { clip = null; } finally { clearTimeout(timer); }
     aborted(signal);
@@ -173,7 +157,7 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
     const served = { ...clip, source: 'server' };
     remember(key, served);
     // only a successful audio answer reaches here (the client throws every error): it is kept on the device
-    if (store) quietly(() => store.put(key, served));
+    if (storeOn()) quietly(() => store.put(key, served));
     return served;
   }
   async function splitFurther(text, voiceKey, signal) {
@@ -188,8 +172,7 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
   async function clipFor(sentence, voiceKey, signal) {
     if (sentence.recorded && typeof recorded === 'function') return { recorded: sentence.recorded, source: 'recorded' };
     let text = '';
-    // what is spoken: a reading in parentheses after its word is not said a second time (withoutReadings)
-    try { text = normaliseSpeechText(withoutReadings(sentence.text)); } catch { /* not text */ }
+    try { text = normaliseSpeechText(sentence.text); } catch { /* not text */ }
     // what the server would refuse as not Japanese (a line of Latin letters in an article) is passed over, never sent
     if (!text || !isJapaneseEnough(text)) return { skip: true, source: 'none', reason: 'not-japanese' };
     // a clip this device has kept plays at once, with no request, online or offline
@@ -326,10 +309,10 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
       const why = serverSkips(voiceKey);
       if (!why || text == null) return why;
       let normal = '';
-      try { normal = normaliseSpeechText(withoutReadings(String(text))); } catch { /* not text */ }
+      try { normal = normaliseSpeechText(String(text)); } catch { /* not text */ }
       const key = `${voiceKey}|${normal}`;
       let kept = false;
-      try { kept = !!normal && (cache.has(key) || !!store?.has?.(key)); } catch { kept = false; }
+      try { kept = !!normal && (cache.has(key) || (storeOn() && !!store.has?.(key))); } catch { kept = false; }
       return kept ? null : why;
     },
     active: () => (session && !session.ended ? session.controls : null),
