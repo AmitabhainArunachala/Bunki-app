@@ -5083,8 +5083,9 @@ try {
         Math.hypot(from[0] - (wordBox.left + wordBox.width), from[1] - wordBox.top) <= 40 && Math.hypot(to[0] - centre[0], to[1] - centre[1]) <= 24 && done.seals === 0,
         { pressed, frames: shown.length, from, to, centre, wordBox });
       // Hfix-1B (item 11): no tutor is set up here, so no "Ask the tutor" (verify-hfix-rooms holds the strip with one)
-      check('G5.seal.strip', 'the strip asks first (Review, his lists, New list…; nothing kept) and after the pick names the place: Saved in Review ✓ with Show, Move… and Remove, then 全項目 · Full entry, Save the sentence and Copy (no tutor set up: no tutor door)',
-        asked.strip && /^Save /u.test(asked.status) && cardsOf(askedRecord) === cardsOf(startRecord) && askedNew && askedReview &&
+      check('G5.seal.strip', 'the strip asks first (Review, his lists, New list…; nothing kept) and after the pick names the place: Saved in Review ✓ with Show, Move… and Remove, then Full entry, Save the sentence and Copy (no tutor set up: no tutor door)',
+        // SAVE pass 2 (P2-2): the strip holds the one chooser, whose title asks ("Save 総理 to"); its status line stays empty
+        asked.strip && /^Save /u.test(asked.status || asked.text || '') && cardsOf(askedRecord) === cardsOf(startRecord) && askedNew && askedReview &&
         JSON.stringify(asked.acts.map((act) => act.action)) === JSON.stringify(['entry', 'sentence', 'copy']) &&
         opened.strip && /^Saved in Review/u.test(opened.status) && JSON.stringify(opened.acts.map((act) => act.action)) === JSON.stringify(['remove', 'entry', 'sentence', 'copy']) &&
         await page.locator('#seal-strip .seal-strip-lists > #seal-strip-move + [data-strip-action="remove"]').count() === 1 &&
@@ -5173,7 +5174,8 @@ try {
       const after = await g5Facts(page);
       // SAVE (2026-11-11): after the tap the strip names the place ("Saved in 旅 ✓") instead of ticking the list
       check('G5.list.one-tap', 'his lists stand in the strip, and one tap saves the word on one', offered.lists.map((row) => row.name).sort().join() === ['仕事', '旅'].sort().join() &&
-        offered.lists.every((row) => row.pressed === 'false') && !!onList && after.status === 'Saved in 旅 ✓' && after.strip, { offered: offered.lists, after: { lists: after.lists, status: after.status } });
+        // SAVE pass 2: a list is a place in the one chooser (no toggle), so none of them reads pressed before the tap
+        offered.lists.every((row) => row.pressed !== 'true') && !!onList && after.status === 'Saved in 旅 ✓' && after.strip, { offered: offered.lists, after: { lists: after.lists, status: after.status } });
       check('G5.list.labels', 'the strip with lists still speaks in plain full verbs', labelsClean(after), after.acts);
     });
 

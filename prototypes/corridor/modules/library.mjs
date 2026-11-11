@@ -157,9 +157,9 @@ function placeSealStrip(open) {
   const scroller = onPage ? anchor.closest('#sheet') : null;
   const ceiling = Math.max(glassTop + 8, frameFoot(onPage, fixedEdge) ?? 0);
   const view = vv?.height || window.innerHeight;
-  // SAVE · a strip that holds the chooser, or a place's words (Show), may take more of the glass than a strip that names
-  // the place
-  const share = ['choose', 'move'].includes(strip.dataset.mode) || strip.querySelector('#save-place-panel') ? 0.56 : 0.4;
+  // SAVE · the strip stays under 40 % of the glass while it asks too (G5: its chooser folds its older lists behind More
+  // lists to fit); only a place's words (Show) may take more
+  const share = strip.querySelector('#save-place-panel') ? 0.56 : 0.4;
   strip.style.maxHeight = `${Math.max(96, Math.floor(view * share))}px`;
   // Hfix-1A · measured without its own "more" fade: in Chromium the fade's sticky foot adds 4 px of overflow, so a strip
   // seated again while it showed measured as not fitting, was cut a row short, and kept its fade (markStripMore sets it
