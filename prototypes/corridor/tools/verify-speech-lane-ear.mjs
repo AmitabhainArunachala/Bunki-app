@@ -424,7 +424,9 @@ const cases = {
           const after = await state();
           if (after.ear !== expect) problems.push(`${where}: after a tap the ear is ${after.ear}, not ${expect}`);
           for (const k of ['view', 'passage', 'stack', 'scroll', 'mini']) if (after[k] !== before[k]) problems.push(`${where}: ${k} ${JSON.stringify(before[k])} → ${JSON.stringify(after[k])}`);
-          if (after.focus.includes('ear-mark') && s.phone) problems.push(`${where}: focus left on the mark after a touch`);
+          // a pointer or touch press leaves no focus on the mark: Space and Enter go on doing what they did (the card audio's
+          // rule for its controls, fix round 1's F5)
+          if (after.focus.includes('ear-mark')) problems.push(`${where}: focus left on the mark after a ${s.phone ? 'touch' : 'click'}`);
         }
         if (s.fake.speaks().length !== n) problems.push(`${where}: a tap on the mark asked ${JSON.stringify(sent(s, n))}`);
       }
