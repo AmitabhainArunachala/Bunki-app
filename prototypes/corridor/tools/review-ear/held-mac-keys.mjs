@@ -17,7 +17,8 @@ try {
   await openArticle(s, { start: false });
   const word = page.locator('.reader .tok.content').first();
   for (let i = 0; i < 4 && !(await page.locator('#mini').isVisible().catch(() => false)); i += 1) { await press(word); await s.sleep(700); }
-  await press('#mini-take'); await s.sleep(900);
+  // since Save asks first (e74cffd7e, merged in the combine) Save opens its chooser: Review is a pick of its own
+  await press('#mini-take'); await page.locator('#mini-review').waitFor(); await press('#mini-review'); await s.sleep(900);
   await s.ready();
   await press('#home-review').catch(() => {});
   await page.locator('#tab-today').waitFor();

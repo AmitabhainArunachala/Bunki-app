@@ -27,6 +27,9 @@ const skyWords = () => page.evaluate(() => {
     .sort((a, b) => b.h - a.h);
 });
 const webOpen = () => page.evaluate(() => !!window.__SKY__?.W?.web?.isOpen?.());
+// the combine (voice/speech-lane-all-20261111): with the offline clips (B3) a word said once plays from the device's store
+// the next time with no request, so the Option-click case says a word the armed case did not
+const said = [];
 async function run(name, body) {
   if (!CASES.includes(name)) return;
   try { await body(); } catch (error) {
@@ -45,6 +48,7 @@ await run('mark', async () => {
 await run('armed', async () => {
   await toSky();
   const [w] = await skyWords();
+  if (w) said.push(w.word);
   if (!w) throw new Error('no sky word drawn in plain view');
   await (await earMark(page)).click();
   await page.waitForFunction(() => document.documentElement.dataset.ear === 'armed', null, { timeout: 3000 });
@@ -60,7 +64,7 @@ await run('armed', async () => {
 
 await run('option', async () => {
   await toSky();
-  const [w] = await skyWords();
+  const w = (await skyWords()).find((one) => !said.includes(one.word));
   if (!w) throw new Error('no sky word drawn in plain view');
   const n = fake.speaks().length;
   await page.keyboard.down('Alt');

@@ -36,6 +36,11 @@ const OUT = arg('--out', process.env.REVIEW_OUT || '.');
 const tag = `${ENGINE}-1728`;
 const { rows, record } = reporter(tag);
 const ALLOWED = new Set(['ls:kairo-voice-day']);
+// The combine (voice/speech-lane-all-20261111): the offline clips (B3) keep every clip the server makes in the device's own
+// database (bunki-voice-clips-v<n>): that is the voice's store, not the learner's record, so a write there is allowed; and a
+// word said once plays from it the next time with no request, so each case that counts one request says a word not said yet.
+const keptClips = (key) => /^idb:bunki-voice-clips-v\d+(\/|$)/u.test(key);
+const said = [];
 const s = await open({ engine: ENGINE, width: 1728, clipSeconds: () => 1, voicePort: Number(arg('--voice-port', '19532')),
   args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist'] });
 const { page, fake } = s;
@@ -173,7 +178,8 @@ await run('armed', async () => {
   const before = await readRecord();
   const was = await where();
   const n = fake.speaks().length;
-  const w = await cleanWord();
+  const w = await cleanWord(said);
+  said.push(w.word);
   await page.mouse.click(w.x, w.y);
   await s.sleep(1600);
   const asked = fake.speaks().slice(n);
@@ -183,7 +189,7 @@ await run('armed', async () => {
   const ear = await earState(page);
   await page.screenshot({ path: `${OUT}/ear-sky-armed-${tag}.png` });
   const changed = [...new Set([...Object.keys(before), ...Object.keys(after)])].filter((key) => before[key] !== after[key]);
-  const written = changed.filter((key) => !ALLOWED.has(key));
+  const written = changed.filter((key) => !ALLOWED.has(key) && !keptClips(key));
   const moved = Object.keys(was).filter((key) => was[key] !== now[key]);
   const want = sayable(w.reading) || w.word;
   const problems = [];
@@ -200,7 +206,8 @@ await run('armed', async () => {
 await run('option', async () => {
   await toSky();
   const n = fake.speaks().length;
-  const w = await cleanWord();
+  const w = await cleanWord(said);
+  said.push(w.word);
   await page.keyboard.down('Alt');
   await page.mouse.click(w.x, w.y);
   await page.keyboard.up('Alt');
@@ -217,12 +224,13 @@ await run('held', async () => {
   await toSky();
   await holdOn(s);
   const n = fake.speaks().length;
-  const a = await cleanWord();
+  const a = await cleanWord(said);
+  said.push(a.word);
   await page.mouse.move(a.x, a.y, { steps: 6 });
   await s.sleep(900);
   const rested = fake.speaks().slice(n);
   const m = fake.speaks().length;
-  const b = await cleanWord([a.word]);
+  const b = await cleanWord([...said]);
   await page.mouse.move(b.x, b.y, { steps: 2 });
   await page.mouse.click(b.x, b.y);
   await s.sleep(900);

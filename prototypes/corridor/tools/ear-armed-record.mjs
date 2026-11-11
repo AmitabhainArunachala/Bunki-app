@@ -21,6 +21,9 @@ const WIDTH = Number(arg('--width', '390'));
 const tag = `${ENGINE}-${WIDTH}`;
 const { rows, record } = reporter(tag);
 const ALLOWED = new Set(['ls:kairo-voice-day']);
+// The combine (voice/speech-lane-all-20261111): the offline clips (B3) keep every clip the server makes in the device's own
+// database (bunki-voice-clips-v<n>): the voice's store, not the learner's record, so a write there is allowed too.
+const keptClips = (key) => /^idb:bunki-voice-clips-v\d+(\/|$)/u.test(key);
 const s = await open({ engine: ENGINE, width: WIDTH, clipSeconds: () => 0.6, voicePort: Number(arg('--voice-port', '19532')) });
 const { page, press, fake } = s;
 
@@ -75,7 +78,7 @@ async function armedTap(name, point, { keys = false } = {}) {
     const now = await where();
     const asked = fake.speaks().slice(n);
     const changed = [...new Set([...Object.keys(before), ...Object.keys(after)])].filter((key) => before[key] !== after[key]);
-    const written = changed.filter((key) => !ALLOWED.has(key));
+    const written = changed.filter((key) => !ALLOWED.has(key) && !keptClips(key));
     const moved = Object.keys(was).filter((key) => was[key] !== now[key]);
     const problems = [];
     if (asked.length !== 1) problems.push(`${asked.length} requests, not 1`);
@@ -109,7 +112,8 @@ try {
   await openArticle(s, { start: false });
   const first = page.locator('.reader .tok.content').first();
   for (let i = 0; i < 4 && !(await page.locator('#mini').isVisible().catch(() => false)); i += 1) { await press(first); await s.sleep(700); }
-  await press('#mini-take'); await s.sleep(900);
+  // since Save asks first (e74cffd7e, merged in the combine) Save opens its chooser: Review is a pick of its own
+  await press('#mini-take'); await page.locator('#mini-review').waitFor(); await press('#mini-review'); await s.sleep(900);
 
   // 1. the first screen's sky: a word (its first cue still standing on a fresh first screen)
   await s.ready(); await s.sleep(1800);

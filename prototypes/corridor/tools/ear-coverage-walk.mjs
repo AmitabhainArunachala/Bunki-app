@@ -306,7 +306,8 @@ const SCREENS = [
     await openArticle();
     const word = page.locator('.reader .tok.content').first();
     for (let i = 0; i < 4 && !(await page.locator('#mini').isVisible().catch(() => false)); i += 1) { await press(word); await sleep(700); }
-    await press('#mini-take'); await sleep(900);
+    // since Save asks first (e74cffd7e, merged in the combine) Save opens its chooser: Review is a pick of its own
+    await press('#mini-take'); await page.locator('#mini-review').waitFor(); await press('#mini-review'); await sleep(900);
     await toTab('today'); await press('#review-start'); await page.locator('#reveal').waitFor(); await press('#reveal');
     await page.locator('#card-say').waitFor(); await sleep(1200);
   }],
