@@ -164,16 +164,34 @@ function moveOverlay(transform) {
 }
 
 const apart = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
-const nearest = (point, places) => Math.min(...places.map((place) => apart(point, place)));
-// how far the lines stand from their words: the worst start and the worst end, in CSS px
+// how far a point stands from a line's course: the straight line through its two ends, drawn on both ways
+const offCourse = (line, point) =>
+  Math.abs(
+    (point.x - line.from.x) * (line.to.y - line.from.y) -
+      (point.y - line.from.y) * (line.to.x - line.from.x),
+  ) / apart(line.from, line.to);
+// both ends of a line lie on the way from one middle to the other
+const onTheWay = (line, from, to) =>
+  [line.from, line.to].every((end) => {
+    const t =
+      ((end.x - from.x) * (to.x - from.x) + (end.y - from.y) * (to.y - from.y)) /
+      ((to.x - from.x) ** 2 + (to.y - from.y) ** 2);
+    return t >= 0 && t <= 1;
+  });
+/** How far the lines stand from their words: the worst start and the worst end, in CSS px. Since 2026-11-11 a line
+ * stops a gap short of the words it ties and never runs through a character (first-screen-lines-edge.test.mjs), so
+ * a line is registered by its course: drawn on, it runs through the middle of the tapped word and the middle of a
+ * relative. */
 function misses(seen) {
   return {
-    start: Math.max(...seen.lines.map((line) => apart(line.from, seen.centre))),
-    end: Math.max(...seen.lines.map((line) => nearest(line.to, seen.family))),
+    start: Math.max(...seen.lines.map((line) => offCourse(line, seen.centre))),
+    end: Math.max(
+      ...seen.lines.map((line) => Math.min(...seen.family.map((place) => offCourse(line, place)))),
+    ),
   };
 }
-/** Every line starts on the tapped word and ends on a relative. `whole` also asks for one line to each relative,
- * which holds once the family stands: while it gathers, a relative still outside the glass has no line yet. */
+/** Every line runs from the tapped word toward a relative. `whole` also asks that each relative is tied, which holds
+ * once the family stands: while it gathers, a relative still outside the glass has no line yet. */
 function expectRegistered(seen, { whole }) {
   expect(seen.centre, 'a tapped word stands at the centre').not.toBeNull();
   expect(seen.family.length, 'the family has gathered').toBeGreaterThanOrEqual(3);
@@ -182,11 +200,28 @@ function expectRegistered(seen, { whole }) {
   expect(miss.start, 'every line starts on the tapped word').toBeLessThanOrEqual(TOLERANCE);
   expect(miss.end, 'every line ends on a relative').toBeLessThanOrEqual(TOLERANCE);
   if (!whole) return;
-  expect(seen.lines.length, 'one line to each relative').toBe(seen.family.length);
   for (const relative of seen.family) {
-    const tied = seen.lines.filter((line) => apart(line.to, relative) <= TOLERANCE);
-    expect(tied.length, 'each relative is tied once').toBe(1);
+    const tied = seen.lines.filter(
+      (line) => offCourse(line, relative) <= TOLERANCE && onTheWay(line, seen.centre, relative),
+    );
+    expect(tied.length, 'each relative is tied').toBeGreaterThanOrEqual(1);
   }
+}
+// where the courses of the two lines that cross most squarely meet: the hub the lines point to
+function hubOf(seen) {
+  let best = null;
+  for (const a of seen.lines)
+    for (const b of seen.lines) {
+      const ax = a.to.x - a.from.x;
+      const ay = a.to.y - a.from.y;
+      const bx = b.to.x - b.from.x;
+      const by = b.to.y - b.from.y;
+      const cross = (ax * by - ay * bx) / (Math.hypot(ax, ay) * Math.hypot(bx, by));
+      if (!best || Math.abs(cross) > Math.abs(best.cross)) best = { a, ax, ay, bx, by, b, cross };
+    }
+  const { a, ax, ay, bx, by, b } = best;
+  const s = ((b.from.x - a.from.x) * by - (b.from.y - a.from.y) * bx) / (ax * by - ay * bx);
+  return { x: a.from.x + s * ax, y: a.from.y + s * ay };
 }
 // canvas#fx and canvas#ink hold as many pixels as their boxes ask for (#ink is drawn at half scale)
 function expectCanvasesFitTheirBoxes(seen) {
@@ -323,7 +358,7 @@ describe.each(engines)('the family lines stand on the words, in %s', (engine) =>
       expect(moved.start).toBeLessThan(6.5);
       // John's picture: the hub of the lines stands a fifth of the word's own position right of and below the word
       expect(() => expectRegistered(shots.stretched, { whole: true })).toThrow();
-      const hub = shots.stretched.lines[0].from;
+      const hub = hubOf(shots.stretched);
       const word = shots.stretched.centre;
       expect(hub.x - word.x).toBeCloseTo(word.x * 0.2, 0);
       expect(hub.y - word.y).toBeCloseTo(word.y * 0.2, 0);

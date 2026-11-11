@@ -409,11 +409,23 @@ function threadWebInk(color,alpha,width){
   threadSet(threadWebs.g,"opacity",String(alpha));
   threadSet(threadWebs.g,"stroke-width",String(width));
 }
-function threadWeb(x1,y1,x2,y2){ threadSeg(threadNext(threadWebs),x1,y1,x2,y2); }
-function threadArm(x1,y1,x2,y2,color,alpha){
-  const el=threadNext(threadArms);
-  threadSeg(el,x1,y1,x2,y2);
-  threadSet(el,"stroke",color); threadSet(el,"stroke-opacity",String(alpha));
+// A line from one member to another is drawn as the pieces of it that keep out
+// of every gathered word (threadPieces, below). Each returns the point where it
+// reaches the word it runs to, or null when no piece reaches it, so the square
+// that marks that word is set on the line's real end.
+function threadWeb(from,to){
+  const n=threadPieces(from,to);
+  for(let i=0;i<n;i++) threadSeg(threadNext(threadWebs),PIECES[i*4],PIECES[i*4+1],PIECES[i*4+2],PIECES[i*4+3]);
+  return threadReach();
+}
+function threadArm(from,to,color,alpha){
+  const n=threadPieces(from,to);
+  for(let i=0;i<n;i++){
+    const el=threadNext(threadArms);
+    threadSeg(el,PIECES[i*4],PIECES[i*4+1],PIECES[i*4+2],PIECES[i*4+3]);
+    threadSet(el,"stroke",color); threadSet(el,"stroke-opacity",String(alpha));
+  }
+  return threadReach();
 }
 // a square of half-side r, centred on the end it marks
 function threadEnd(x,y,r,color,alpha){
@@ -430,11 +442,285 @@ function threadsDone(){
     set.n=0;
   }
 }
-// where a family member stands this frame: the numbers its word's transform
-// was given (frame() writes translate(n.x+n.dragX, n.y+n.dragY)); a member
-// with no word left stands on its anchor, where its name is drawn
-const seatX=wr=>wr.node&&!wr.node.gone?wr.node.x+wr.node.dragX:wr.sx;
-const seatY=wr=>wr.node&&!wr.node.gone?wr.node.y+wr.node.dragY:wr.sy;
+
+// ---- where a word stands, and the room around it ----
+// A line never runs through a character. It leaves the tapped word at the edge
+// of its box and stops at the edge of the relative it ties, a gap short of it
+// (0.3 of that word's font size as drawn, never under 4px); where it would
+// cross another gathered word on the way it parts round it. A word's box is
+// its characters, and its reading and its English while they show: the
+// reading stands centred above the word, the English centred below.
+//
+// The box is the word's own untransformed size, measured once and kept. It is
+// measured again only when what shapes it changes: its classes or the
+// furigana setting (the cache key), or the box itself, which a ResizeObserver
+// reports (a late web font, a host's weight). So the frame loop reads no
+// layout. Everything else is the numbers that place the word this frame —
+// frame() writes translate(n.x+n.dragX, n.y+n.dragY) translate(-50%,-50%)
+// scale(k) rotate(n.cr) about the word's middle — so a point d from the
+// middle of the box stands at the centre plus k·turn(d), and the box goes
+// with its word through the gather, a drag, a zoom and a magnified page.
+const LINE_GAP=0.3, LINE_GAP_MIN=4;
+// the furigana setting, read once a frame (farPass) for every box key
+let boxFuri="";
+const charsOf=n=>n.nch||(n.nch=Math.max(1,[...(n.w||n.ch||"")].length));
+const boxWatch=window.ResizeObserver?new ResizeObserver(entries=>{
+  for(const en of entries){
+    const t=en.target;
+    if(!t.isConnected){boxWatch.unobserve(t);continue;}
+    const n=nodeOf.get(t)||nodeOf.get(t.parentElement);
+    if(n) n.bxKey=null;
+  }
+}):null;
+// the untransformed box about the word's middle: bxW wide, bxUp above the
+// middle and bxDn below it, and the font size its gap is taken from
+function nodeBox(n){
+  const el=n.el;
+  const furi=boxFuri;
+  const key=el.className+"|"+furi;
+  // with no observer to say a box changed, a kept size is trusted for a second
+  if(n.bxKey===key&&(boxWatch||frameCount-n.bxAt<60)) return true;
+  if(!el.isConnected) return n.bxW>0;
+  const w=el.offsetWidth,h=el.offsetHeight;
+  if(!(w>0&&h>0)) return n.bxW>0;
+  const cl=el.classList, lod=cl.contains("lod");
+  const yo=el.querySelector(":scope > .yomi"), gl=el.querySelector(":scope > .gloss");
+  // the same rules the stylesheet shows them by: one tap shows the reading,
+  // two the English too; furigana "2" always shows the reading, "0" never; a
+  // far zoom (lod) hides both
+  const ys=!!yo&&!lod&&furi!=="0"&&(cl.contains("unfolded")||cl.contains("glossed")||furi==="2");
+  const gs=!!gl&&!lod&&cl.contains("glossed");
+  n.bxW=Math.max(w,ys?yo.offsetWidth:0,gs?gl.offsetWidth:0);
+  n.bxUp=h/2+(ys?yo.offsetHeight:0); n.bxDn=h/2+(gs?gl.offsetHeight:0);
+  const txt=el.querySelector(":scope > .base, :scope > .g, :scope > .pch")||el;
+  n.bxFont=parseFloat(getComputedStyle(txt).fontSize)||n.fpx||14;
+  n.bxKey=key; n.bxAt=frameCount;
+  if(boxWatch&&!n.bxSeen){
+    n.bxSeen=true; boxWatch.observe(el);
+    if(yo) boxWatch.observe(yo);
+    if(gl) boxWatch.observe(gl);
+  }
+  return true;
+}
+// a node's seat this frame: its middle (cx,cy), its turn (c,s), its box about
+// the middle in glass px (l..r across, u..d down, in its own turned frame), the
+// gap its lines keep, and the radius that holds all of it
+function nodeSeat(n){
+  const st=n.seat||(n.seat={});
+  const k=n.s*((n.mode==="free"||n.mode==="glide")?cam.z:1);
+  const a=(n.cr||0)*Math.PI/180;
+  st.cx=n.x+n.dragX; st.cy=n.y+n.dragY; st.c=Math.cos(a); st.s=Math.sin(a);
+  if(nodeBox(n)){
+    st.l=-n.bxW*k/2; st.r=-st.l; st.u=-n.bxUp*k; st.d=n.bxDn*k;
+    st.g=Math.max(LINE_GAP_MIN,LINE_GAP*n.bxFont*k);
+  } else {
+    // not laid out yet: the box its characters would fill, as the arbiter
+    // estimates it
+    const f=(n.fpx||14)*k;
+    st.r=charsOf(n)*f*0.55; st.l=-st.r;
+    st.d=f*0.62; st.u=-st.d;
+    st.g=Math.max(LINE_GAP_MIN,LINE_GAP*f);
+  }
+  st.R=Math.hypot(st.r,Math.max(st.d,-st.u))+st.g;
+  return st;
+}
+// a member with no word left is drawn as its name, 11px, above its anchor (see
+// the bloom in drawWorld); its seat is that name
+function nameSeat(wr){
+  const st=wr.nameSeat||(wr.nameSeat={c:1,s:0,u:-6.5,d:6.5,g:LINE_GAP_MIN});
+  st.cx=wr.sx; st.cy=wr.sy-12;
+  st.r=[...wr.e[0]].length*5.5+1; st.l=-st.r;
+  st.R=Math.hypot(st.r,st.d)+st.g;
+  return st;
+}
+// the seat of a node, or of a family member through its word or its name
+const seatOf=m=>m.el?nodeSeat(m):m.node&&!m.node.gone?nodeSeat(m.node):nameSeat(m);
+// The stretch of the line p+t·v (t unbounded) that comes within a seat's gap of
+// its box, as SPAN[0..1], or false. The box grown by a round gap is convex, so
+// the stretch is one interval: the hull of where the line crosses the two
+// slabs (box widened, box heightened) and the four corner discs.
+const SPAN=[0,0];
+let spanLo=0, spanHi=0;
+function spanSlab(ox,oy,wx,wy,x0,x1,y0,y1){
+  let a=-Infinity,b=Infinity;
+  if(Math.abs(wx)<1e-9){ if(ox<x0||ox>x1) return; }
+  else { let t0=(x0-ox)/wx,t1=(x1-ox)/wx; if(t0>t1){const q=t0;t0=t1;t1=q;} if(t0>a)a=t0; if(t1<b)b=t1; }
+  if(Math.abs(wy)<1e-9){ if(oy<y0||oy>y1) return; }
+  else { let t0=(y0-oy)/wy,t1=(y1-oy)/wy; if(t0>t1){const q=t0;t0=t1;t1=q;} if(t0>a)a=t0; if(t1<b)b=t1; }
+  if(a<=b){ if(a<spanLo)spanLo=a; if(b>spanHi)spanHi=b; }
+}
+function spanDisc(ox,oy,wx,wy,cx,cy,g,A){
+  const qx=ox-cx, qy=oy-cy;
+  const B=qx*wx+qy*wy, C=qx*qx+qy*qy-g*g, D=B*B-A*C;
+  if(D<0) return;
+  const sq=Math.sqrt(D);
+  const t0=(-B-sq)/A, t1=(-B+sq)/A;
+  if(t0<spanLo)spanLo=t0; if(t1>spanHi)spanHi=t1;
+}
+function seatSpan(st,px,py,vx,vy){
+  // into the seat's own turned frame, measured from its middle
+  const dx=px-st.cx, dy=py-st.cy;
+  const ox=st.c*dx+st.s*dy, oy=st.c*dy-st.s*dx;
+  const wx=st.c*vx+st.s*vy, wy=st.c*vy-st.s*vx;
+  const A=wx*wx+wy*wy, g=st.g;
+  if(A<1e-12) return false;
+  spanLo=Infinity; spanHi=-Infinity;
+  spanSlab(ox,oy,wx,wy,st.l-g,st.r+g,st.u,st.d);
+  spanSlab(ox,oy,wx,wy,st.l,st.r,st.u-g,st.d+g);
+  spanDisc(ox,oy,wx,wy,st.l,st.u,g,A); spanDisc(ox,oy,wx,wy,st.r,st.u,g,A);
+  spanDisc(ox,oy,wx,wy,st.l,st.d,g,A); spanDisc(ox,oy,wx,wy,st.r,st.d,g,A);
+  if(!(spanLo<=spanHi)) return false;
+  SPAN[0]=spanLo; SPAN[1]=spanHi;
+  return true;
+}
+// The gathered words this frame, each with its seat: the tapped word, its
+// relatives, the glyphs and ghosts of a lock. Filled once a frame before the
+// family's lines are drawn (threadSeats in drawWorld).
+const SEATS=[];
+// The pieces of the line from one member's middle to another's left once every
+// gathered word has its room, as x1,y1,x2,y2 quadruples in PIECES (the count is
+// returned). threadReach then says where the last piece reaches the member the
+// line runs to: only a piece that ends on that member's own room does.
+const PIECES=[], PIECE_T=[], PIECE_U=[];
+let pieceTo=null, pieceV=null;
+function threadPieces(from,to){
+  const a=seatOf(from), b=seatOf(to);
+  pieceTo=null;
+  const x1=a.cx, y1=a.cy, vx=b.cx-x1, vy=b.cy-y1, len2=vx*vx+vy*vy;
+  PIECES.length=0;
+  if(len2<1) return 0;
+  // [t0,t1] pairs still drawn, starting with the whole line; every seat in
+  // reach takes its own stretch out (the two ends' own seats among them)
+  PIECE_T.length=0; PIECE_T.push(0,1);
+  const cut=(st)=>{
+    const ux=st.cx-x1, uy=st.cy-y1;
+    const tt=clamp((ux*vx+uy*vy)/len2,0,1);
+    const ex=ux-tt*vx, ey=uy-tt*vy;
+    if(ex*ex+ey*ey>st.R*st.R) return;     // nowhere near the line
+    if(!seatSpan(st,x1,y1,vx,vy)) return;
+    const s0=SPAN[0], s1=SPAN[1];
+    if(st===b) pieceV=s0;
+    PIECE_U.length=0;
+    for(let i=0;i<PIECE_T.length;i+=2){
+      const p0=PIECE_T[i], p1=PIECE_T[i+1];
+      if(s1<=p0||s0>=p1){PIECE_U.push(p0,p1);continue;}
+      if(s0>p0) PIECE_U.push(p0,s0);
+      if(s1<p1) PIECE_U.push(s1,p1);
+    }
+    PIECE_T.length=0;
+    for(const t of PIECE_U) PIECE_T.push(t);
+  };
+  pieceV=1;
+  for(const st of SEATS) cut(st);
+  if(SEATS.indexOf(a)<0) cut(a);
+  if(SEATS.indexOf(b)<0) cut(b);
+  // a sliver under two pixels between two rooms is not a line
+  const minT=2/Math.sqrt(len2);
+  let last=-1;
+  for(let i=0;i<PIECE_T.length;i+=2){
+    const t0=PIECE_T[i], t1=PIECE_T[i+1];
+    if(t1-t0<minT) continue;
+    PIECES.push(x1+vx*t0,y1+vy*t0,x1+vx*t1,y1+vy*t1);
+    last=t1;
+  }
+  if(last>=0&&Math.abs(last-pieceV)<1e-9) pieceTo=PIECES.length-2;
+  return PIECES.length/4;
+}
+const REACH={x:0,y:0};
+function threadReach(){
+  if(pieceTo==null) return null;
+  REACH.x=PIECES[pieceTo]; REACH.y=PIECES[pieceTo+1];
+  return REACH;
+}
+// the gathered words of this frame, in SEATS
+function threadSeats(){
+  SEATS.length=0;
+  if(focusN&&!focusN.gone) SEATS.push(nodeSeat(focusN));
+  for(const wr of FOCUS){
+    if(wr.node&&!wr.node.gone) SEATS.push(nodeSeat(wr.node));
+    else if(wr.vis===frameCount) SEATS.push(nameSeat(wr));
+  }
+  for(const g of LOCKG) if(!g.gone) SEATS.push(nodeSeat(g));
+  for(const s of LOCKS) if(!s.gone) SEATS.push(nodeSeat(s));
+}
+
+// ---- nothing faint under a word that can be read ----
+// Anything the layer draws under reading presence (FAR_OP) — a far word, a
+// receded ghost, a big hub character — never lies under a word drawn at it or
+// above, the tapped word and its family included. While their boxes meet, the
+// faint thing fades out over FAR_FADE_MS and comes back once they part. It
+// fades whole: a character with a word-shaped bite taken out of it reads as a
+// broken character, where a faded one reads as simply not there.
+// The boxes are the ones the lines use (nodeSeat), turned into the glass's own
+// axes. The figures' boxes are gathered after the frame loop has drawn every
+// node (farPass), when layout is read at most for a box whose cache went stale,
+// and the faint things' fades step there too; the frame loop multiplies by the
+// fade its last pass left (farFade), a frame late at most. A figure's box is
+// grown by FAR_ROOM so that a faint thing drifting toward it is gone before
+// the two meet. Only at the surface: a dive keeps its own grammar.
+const FAR_OP=0.3, FAR_FADE_MS=300, FAR_ROOM=6;
+const LEGIBLE=[], LEGIBLE_WHO=[];
+const BOX={l:0,t:0,r:0,b:0};
+let farDt=16;
+// a node's box in the glass's own axes, from its seat
+function seatAxes(st,grow){
+  const mid=(st.u+st.d)/2, half=(st.d-st.u)/2;
+  const hx=Math.abs(st.c)*st.r+Math.abs(st.s)*half;
+  const hy=Math.abs(st.s)*st.r+Math.abs(st.c)*half;
+  const my=st.c*mid, mx=-st.s*mid;
+  BOX.l=st.cx+mx-hx-grow; BOX.r=st.cx+mx+hx+grow;
+  BOX.t=st.cy+my-hy-grow; BOX.b=st.cy+my+hy+grow;
+  return BOX;
+}
+function underFigure(box,who){
+  for(let i=0,j=0;i<LEGIBLE.length;i+=4,j++){
+    if(LEGIBLE_WHO[j]===who) continue;
+    if(box.l<LEGIBLE[i+2]&&box.r>LEGIBLE[i]&&box.t<LEGIBLE[i+3]&&box.b>LEGIBLE[i+1]) return true;
+  }
+  return false;
+}
+// in the frame loop: a node's presence as drawn, after its own far fade
+function farFade(n,op){
+  n.farOp=op;
+  if(op>=FAR_OP||n.farK==null) return op;
+  return op*n.farK;
+}
+const farStep=(k,under)=>under?Math.max(0,k-farDt/FAR_FADE_MS):Math.min(1,k+farDt/FAR_FADE_MS);
+// after the frame loop: this frame's figures, and every faint node's fade
+function farPass(dt){
+  farDt=dt; boxFuri=document.body.dataset.furigana||"";
+  LEGIBLE.length=0; LEGIBLE_WHO.length=0;
+  const surface=stack.length===0;
+  if(surface) for(const n of nodes){
+    if(n.removed||n.frozen||!(n.farOp>=FAR_OP)||!n.el.isConnected) continue;
+    const b=seatAxes(nodeSeat(n),FAR_ROOM);
+    LEGIBLE.push(b.l,b.t,b.r,b.b); LEGIBLE_WHO.push(n);
+  }
+  for(const n of nodes){
+    if(n.removed||n.frozen) continue;
+    if(!surface||!(n.farOp<FAR_OP)){ n.farK=1; continue; }
+    if(!(n.farOp>0.001)) continue;
+    let under=false;
+    if(LEGIBLE.length){
+      // first by a rough box with room to spare; only a faint thing that may
+      // be near a figure has its own box looked at
+      const k=n.s*((n.mode==="free"||n.mode==="glide")?cam.z:1), f=(n.fpx||14)*k;
+      const hw=charsOf(n)*f*0.6+24, hh=f*1.4+24;
+      const cx=n.x+n.dragX, cy=n.y+n.dragY;
+      BOX.l=cx-hw; BOX.r=cx+hw; BOX.t=cy-hh; BOX.b=cy+hh;
+      if(underFigure(BOX,n)) under=underFigure(seatAxes(nodeSeat(n),0),n);
+    }
+    n.farK=farStep(n.farK==null?1:n.farK,under);
+  }
+}
+// a hub character's fade, by the same rule (drawWorld)
+const HUB_FAR=Object.create(null);
+function hubFar(h,x,y,side){
+  BOX.l=x; BOX.t=y; BOX.r=x+side; BOX.b=y+side;
+  const k=farStep(HUB_FAR[h]==null?1:HUB_FAR[h],underFigure(BOX,null));
+  HUB_FAR[h]=k;
+  return k;
+}
 
 // ---- layered parchment, pre-rendered once per theme ----
 function seeded(seed){
@@ -2706,6 +2992,10 @@ function drawWorld(){
   for(const h of HUBS){
     const p=HUBPOS[h], s=w2s(p.x,p.y);
     if(s.x<-180||s.x>vw()+180||s.y<-180||s.y>vh()+180) continue;
+    // a hub character is far ink: it steps out from under any word drawn at
+    // reading presence (see "nothing faint under a word that can be read")
+    const hk=hubFar(h,s.x-fs*0.57,s.y-fs*0.5,fs*1.14);
+    if(hk<=0.004) continue;
     let sp2=HUBSPR[h];
     if(!sp2){
       if(!canvasLabelReady(h))continue;
@@ -2716,7 +3006,7 @@ function drawWorld(){
       c2.fillText(h,48,76);
       HUBSPR[h]=sp2;
     }
-    fctx.globalAlpha=hubA;
+    fctx.globalAlpha=hubA*hk;
     fctx.drawImage(sp2,s.x-fs*0.57,s.y-fs*0.5,fs*1.14,fs*1.14);
     fctx.globalAlpha=1;
   }
@@ -2861,38 +3151,40 @@ function drawWorld(){
       layoutHeldRing(ax,ay);
     }
     // The threads and their ends are SVG in the words' own box (see "the
-    // family's threads"): each runs from the numbers that place one word to
-    // the numbers that place another. The canvas keeps only the name of a
-    // member that has no word left to carry it.
+    // family's threads"): each runs between the seats of two words — the
+    // numbers that place them this frame — and keeps out of every gathered
+    // word (see "where a word stands"). The canvas keeps only the name of a
+    // member that has no word left to carry it. Where a line reaches a family
+    // member, that point is kept on it for its end square.
+    threadSeats();
+    const reach=(wr,at)=>{ if(at){wr.thF=frameCount; wr.thX=at.x; wr.thY=at.y;} };
     if(LOCK){
       const gold=th.dark?"#E6C86E":"#A8842C";
       const tyCol=t2=>t2==="syn"?th.pig1:t2==="fam"?th.pig2:
         t2==="col"?th.accent:t2?gold:th.pig2;
       threadWebInk(th.pig1,0.55,1.7);
       for(const it of LOCK.items) if(it.t==="g"&&!it.g.gone)
-        threadWeb(fx2,fy2,it.g.x+it.g.dragX,it.g.y+it.g.dragY);
+        threadWeb(focusN,it.g);
       for(const it of LOCK.items){
-        const p2=it.pg&&!it.pg.gone?it.pg:null;
-        const px3=p2?p2.x+p2.dragX:fx2, py3=p2?p2.y+p2.dragY:fy2;
+        const p2=it.pg&&!it.pg.gone?it.pg:focusN;
         if(it.t==="w"&&it.wr.vis===frameCount){
-          threadArm(px3,py3,seatX(it.wr),seatY(it.wr),tyCol(it.ty),0.55);
+          reach(it.wr,threadArm(p2,it.wr,tyCol(it.ty),0.55));
         } else if(it.t==="s"&&it.node&&!it.node.gone){
           // the label itself is a real DOM word — only its thread and the
           // square at its end are drawn, never a second copy of the text
-          const sx3=it.node.x+it.node.dragX, sy3=it.node.y+it.node.dragY;
-          threadArm(px3,py3,sx3,sy3,tyCol(it.ty),0.5);
-          threadEnd(sx3,sy3,2.2,tyCol(it.ty),0.55);
+          const at=threadArm(p2,it.node,tyCol(it.ty),0.5);
+          if(at) threadEnd(at.x,at.y,2.2,tyCol(it.ty),0.55);
         }
       }
     } else {
       threadWebInk(th.dark?"#E6C86E":"#A8842C",0.5,1.5);
       for(const wr of FOCUS) if(wr.vis===frameCount)
-        threadWeb(fx2,fy2,seatX(wr),seatY(wr));
+        reach(wr,threadWeb(focusN,wr));
     }
     const dotc=lockOn?th.pig1:(th.dark?"#E6C86E":"#A8842C");
     const satc=lockOn?(th.dark?"#E6C86E":th.pig1):(th.dark?"#9FC2EE":th.pig2);
-    for(const wr of FOCUS) if(wr.vis===frameCount)
-      threadEnd(seatX(wr),seatY(wr),2.4,dotc,lockOn?0.55:0.8);
+    for(const wr of FOCUS) if(wr.vis===frameCount&&wr.thF===frameCount)
+      threadEnd(wr.thX,wr.thY,2.4,dotc,lockOn?0.55:0.8);
     fctx.font='11px "Noto Serif JP"';
     fctx.textAlign="center";
     fctx.fillStyle=rgba(satc,lockOn?0.9:0.95);
@@ -3273,6 +3565,8 @@ function frame(t){
         outOp*=ef*ef;
       }
     }
+    // a faint node steps out from under a word that can be read (farPass)
+    outOp=farFade(n,outOp);
     const opStr=outOp.toFixed(3);
     if(n.kind==="word"){const tab=DRIFT_ON&&!n.gone&&!n.removed&&n.el.isConnected&&Number(opStr)>0?0:-1;if(n.el.tabIndex!==tab)n.el.tabIndex=tab;}
     if(n._lop!==opStr){n._lop=opStr;n.el.style.opacity=opStr;}
@@ -3280,6 +3574,8 @@ function frame(t){
     const tfStr="translate("+(n.x+n.dragX).toFixed(2)+"px,"+(n.y+n.dragY).toFixed(2)+"px) translate(-50%,-50%) scale("+(n.s*zs).toFixed(3)+") rotate("+n.cr.toFixed(2)+"deg)";
     if(n._ltf!==tfStr){n._ltf=tfStr;n.el.style.transform=tfStr;}
   }
+  // every node is drawn: gather this frame's figures and step the faint ones
+  farPass(dt);
   // A still finger emits no move events. Refresh from the tracked touch set
   // each frame so cancellation starts a fresh, honest inactivity interval.
   if(touches.size) bloomLast=t;
