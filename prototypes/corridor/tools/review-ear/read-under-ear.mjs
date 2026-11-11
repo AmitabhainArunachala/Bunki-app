@@ -108,6 +108,7 @@ async function run(name, body) {
 
 await run('two', async () => {
   const was = await freshRead();
+  const asksBefore = fake.speaks().length;
   const [a, b] = await twoOtherWords();
   if (!a || !b) throw new Error('no word before and after the lit sentence in view');
   await earTurn(a);
@@ -123,6 +124,9 @@ await run('two', async () => {
   if (!ended) problems.push('the ear’s second voice did not end');
   if (!back) problems.push(`the read did not take itself up at word ${was.first} (it is at ${after.first}, ${after.state})`);
   if (after.earBands) problems.push(`${after.earBands} ear band(s) left`);
+  // the two sentences are ones the read has already fetched (the one before it, the next one): the ear asks nothing new
+  const earAsks = fake.speaks().slice(asksBefore).filter((r) => r.status === 200 && !r.cached).map((r) => `"${String(r.text).slice(0, 14)}"`);
+  console.log(`  two: new clips asked during the two ear turns and after: ${earAsks.length} ${earAsks.join(', ')}; read's own texts: ${fake.speaks().slice(0, asksBefore).map((r) => `"${String(r.text).slice(0, 14)}"`).join(', ')}`);
   record('two ear turns in a row during a read: the read takes itself up at the sentence it had reached', problems,
     `read at ${was.first} (session ${was.session}); during ${during.state} (session ${during.session}); after ${after.first} ${after.state} (session ${after.session})`);
 });
