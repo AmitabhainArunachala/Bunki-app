@@ -12,6 +12,7 @@
  *
  *   node prototypes/corridor/tools/verify-reader-pocket.mjs --site <built site> [--engine webkit|chromium]
  *        [--width 390] [--lang en|ja] [--port 19592] [--only hidden-read,late-clip,...] [--shots <dir>]
+ *   (--site a:b serves the first folder that holds a path: a negative control lays a changed file over a build)
  *
  *  hidden-read    a read started, the page hidden after its first sentence: it reaches the article's last sentence; each
  *                 sentence is asked once and never more than two ahead; the bar says playing at every sentence; shown
@@ -51,12 +52,18 @@ if (SHOTS) mkdirSync(SHOTS, { recursive: true });
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.json': 'application/json; charset=utf-8', '.webmanifest': 'application/manifest+json', '.png': 'image/png', '.webp': 'image/webp', '.woff2': 'font/woff2',
   '.svg': 'image/svg+xml', '.m4a': 'audio/mp4', '.wasm': 'application/wasm', '.gz': 'application/gzip' };
+// `--site a:b`: the first folder that holds a path answers it (a negative control lays a changed file over a build)
+const ROOTS = SITE.split(':').filter(Boolean);
 const server = createServer((req, res) => {
   const path = normalize(decodeURIComponent(new URL(req.url, 'http://x').pathname)).replace(/^(\.\.[/\\])+/, '');
-  let file = join(SITE, path.endsWith('/') ? `${path}index.html` : path);
-  try { if (statSync(file).isDirectory()) file = join(file, 'index.html'); statSync(file); } catch { res.writeHead(404); res.end('not found'); return; }
-  res.writeHead(200, { 'Content-Type': TYPES[extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-store' });
-  createReadStream(file).pipe(res);
+  for (const root of ROOTS) {
+    let file = join(root, path.endsWith('/') ? `${path}index.html` : path);
+    try { if (statSync(file).isDirectory()) file = join(file, 'index.html'); statSync(file); } catch { continue; }
+    res.writeHead(200, { 'Content-Type': TYPES[extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-store' });
+    createReadStream(file).pipe(res);
+    return;
+  }
+  res.writeHead(404); res.end('not found');
 });
 await new Promise((resolve) => server.listen(PORT, '127.0.0.1', resolve));
 const ORIGIN = `http://127.0.0.1:${PORT}`;
