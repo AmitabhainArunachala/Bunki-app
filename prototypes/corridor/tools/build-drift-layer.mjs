@@ -1302,6 +1302,18 @@ patch("  recordView=view;recordReady=true;",
   "  recordView=view;recordReady=true;\n  paintScaleStars();", "G6 publish kept points only after committed record view");
 patch("  recordReady=false;__layer.dataset.recordState=\"recovery-required\";",
   "  recordReady=false;__layer.dataset.recordState=\"recovery-required\";\n  paintScaleStars();", "G6 retire unconfirmed record projection");
+// The ear (modules/ear.mjs, the review's B5, 2026-11-11): an armed tap, a finger's tap with the ear held on, or an
+// Option-click on a word of the sky is the ear's to speak, and the sky does nothing with it: the sky acts as the finger
+// lifts, before the click the ear takes, so it asks the ear first (window.__BUNKI_EAR.takes) and leaves the ladder, the
+// unfolded word and the first cue's retirement in his record alone.
+patch("  if(hostChrome(e.target)) return;\n  const dx=e.clientX-px, dy=e.clientY-py, held=Date.now()-pt;",
+  "  if(hostChrome(e.target)) return;\n  if(earTakes(e)){ if(n){n.x+=n.dragX;n.y+=n.dragY;n.dragX=0;n.dragY=0;} return; }\n  const dx=e.clientX-px, dy=e.clientY-py, held=Date.now()-pt;",
+  "the ear's tap on the sky is the ear's alone");
+patch("  e.stopPropagation();\n  // tapping the card's own paper (not a row or button) closes it",
+  "  e.stopPropagation();\n  if(earTakes(e)) return;\n  // tapping the card's own paper (not a row or button) closes it", "the ear's tap on the card is the ear's alone");
+patch("// ---- interaction ----\nfunction tapNode(n){",
+  "// ---- interaction ----\n/** The ear (modules/ear.mjs) is asked as the finger lifts: true when this tap is the ear's to speak. */\nfunction earTakes(e){ try{ return !!(window.__BUNKI_EAR&&window.__BUNKI_EAR.takes(e)); }catch(_){ return false; } }\nfunction tapNode(n){",
+  "the sky asks the ear");
 
 js += `
 function canNavigate(){return !recordPending.size&&!recordCueRun;}
