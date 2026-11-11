@@ -71,7 +71,8 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
   const status = () => ({
     configured: !!client.configured(),
     paired: !!client.paired(),
-    pairAgain: pairAgain && !client.paired(),
+    // a 401 the seam saw, or one the client saw on a request nobody waited for (the combine's I13)
+    pairAgain: (pairAgain || !!client.ended?.()) && !client.paired(),
     installation: client.scope()?.installation || null,
     durable: typeof client.durable === 'function' ? !!client.durable() : true,
     blocked: blocked(),

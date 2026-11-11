@@ -161,6 +161,10 @@ export function createVoiceClient({ fetch: fetchFn = globalThis.fetch?.bind(glob
     return reading;
   };
   const forget = async () => { pairing = null; try { await store.clear(); } catch { /* nothing kept */ } };
+  // the server ended the pairing (a 401), whoever asked: the dropped token keeps its reason until a new pairing, so a
+  // later tap and Settings say "the voice server ended this pairing", not "not paired" (the combine's I13)
+  let ended = false;
+  const endedByServer = async () => { ended = true; await forget(); };
 
   /** One request with the client's own deadline; a caller's stop is an AbortError, never an error code. */
   async function ask(origin, path, init, signal) {
@@ -198,6 +202,8 @@ export function createVoiceClient({ fetch: fetchFn = globalThis.fetch?.bind(glob
     configured: () => !!server,
     ready,
     paired: () => !!pairing,
+    /** Whether the server ended this device's pairing (a 401) since it was last paired. */
+    ended: () => ended && !pairing,
     /** What may be shown: which install this is. Never the token. */
     scope: () => (pairing ? { installation: pairing.scope.installation, learner: pairing.scope.learner } : null),
     durable: () => store.durable !== false,
@@ -223,6 +229,7 @@ export function createVoiceClient({ fetch: fetchFn = globalThis.fetch?.bind(glob
           typeof scope.learner !== 'string' || !INSTALLATION.test(scope.installation || '')) return { ok: false, code: 'invalid-response' };
       server = target;
       pairing = { token: body.token, scope: { environment: 'prod', learner: scope.learner, installation: scope.installation } };
+      ended = false;
       try { await store.write({ server, token: pairing.token, scope: pairing.scope }); } catch { /* paired for this page only */ }
       return { ok: true, installation: scope.installation };
     },
@@ -241,7 +248,7 @@ export function createVoiceClient({ fetch: fetchFn = globalThis.fetch?.bind(glob
         body: JSON.stringify({ format: input.format, version: input.version, inputKey: input.inputKey, segments: input.segments, profile: input.profile, voiceKey }) }, signal);
       if (response.status !== 200) {
         const { code, figures } = await refusal(response, SPEAK_CODES, response.status === 401 ? 'authentication-required' : 'speak-failed');
-        if (response.status === 401) await forget();
+        if (response.status === 401) await endedByServer();
         throw Object.assign(new VoiceError(code, response.status), { figures });
       }
       const contentType = response.headers.get('Content-Type') || '';
@@ -261,7 +268,7 @@ export function createVoiceClient({ fetch: fetchFn = globalThis.fetch?.bind(glob
       if (!pairing) throw new VoiceError('not-paired');
       const response = await ask(server, '/v1/audio/budget', { method: 'GET', headers: { Authorization: `Bearer ${pairing.token}` } }, signal);
       if (response.status !== 200) {
-        if (response.status === 401) await forget();
+        if (response.status === 401) await endedByServer();
         throw new VoiceError(response.status === 401 ? 'authentication-required' : 'budget-unavailable', response.status);
       }
       let body;

@@ -162,8 +162,10 @@ export function installVoiceLayer(host) {
   // the two limits are the speech team's (one budget for both apps): only the server's own figures, never a guess
   const limitWords = (reason) => { const words = limitLine(reason, voiceLimits(seam.status()), newDay()); return tx(words.ja, words.en); };
   /** Why there is no voice, in one plain line: what a listen control says when it makes no sound. */
+  /** "Not paired" after the server ended the pairing (a 401) is that 401's reason, whoever saw it (the combine's I13). */
+  const told = (reason) => (reason === 'not-paired' && seam.status().pairAgain ? 'authentication-required' : reason);
   const silenceLine = (reason) => {
-    switch (reason) {
+    switch (told(reason)) {
       case 'not-paired': case 'not-configured':
         return tx('声を出せません。設定の「筆と声」で音声サーバーとつなぐ。', 'No voice here. Pair the voice server in Settings, Writing and voice.');
       case 'authentication-required':
@@ -839,7 +841,7 @@ export function installVoiceLayer(host) {
           if (!['done', 'stopped', 'error'].includes(now)) return;
           view.clearTimeout(limit);
           marker.over = true;
-          if (timedOut && now === 'stopped') done('error', EAR_SLOW); else done(now, code);
+          if (timedOut && now === 'stopped') done('error', EAR_SLOW); else done(now, told(code));
           yieldEnded(marker);
         } });
       if (yieldFrom) {
@@ -858,7 +860,7 @@ export function installVoiceLayer(host) {
       if (!why) return null;
       // a unit whose every sentence this device keeps is a voice to be had, connection or not (the offline clips, B3)
       const all = unit.sentences || [];
-      return all.length && all.every((one) => !seam.cannot(unit.voiceKey, one.text)) ? null : why;
+      return all.length && all.every((one) => !seam.cannot(unit.voiceKey, one.text)) ? null : told(why);
     },
     context: () => ({ view: host.view(), keyFor: markKey,
       articleOf: (node) => (host.view() === 'reader' && node?.closest?.('#reader') ? host.passage()?.id || null : null),
