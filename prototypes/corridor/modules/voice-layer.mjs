@@ -861,6 +861,15 @@ export function installVoiceLayer(host) {
         if (node?.closest?.('.review-face')) return !host.cardRevealed();
         const card = node?.closest?.('.kp .kp-card');
         return !!card && !card.querySelector('.kp-answer');
+      },
+      // a question face that does not print the word it asks: the review card marks its own (corridor.js: blanked, a
+      // sentence or a question card, or a face still settling); the deck card's blank and its choices (the card audio's
+      // rule for its question-side control, modules/card-audio.mjs)
+      cardClosed: (node) => {
+        const face = node?.closest?.('.review-face');
+        if (face) return !host.cardRevealed() && face.dataset.earClosed === '1';
+        const card = node?.closest?.('.kp .kp-card');
+        return !!card && !card.querySelector('.kp-answer') && !!card.querySelector('.kp-blank, .kp-choices');
       } }),
   });
   let scan = 0;

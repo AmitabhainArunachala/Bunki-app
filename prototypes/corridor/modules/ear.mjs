@@ -232,6 +232,13 @@ const isTypedText = (node) => attr(node, 'data-ear-typed') !== null || (hasClass
 const typedAt = (node) => { for (let at = node; at && at.nodeType === 1; at = at.parentNode) if (isTypedText(at)) return true; return false; };
 /** On a study card's front (the app says which: context.cardFront): read on a deliberate act, never from a rest. */
 const frontAt = (node, context) => { try { return !!context.cardFront?.(node); } catch { return false; } };
+/** On a study card's question face that does not print the word it asks (blanked, offered among choices, still settling;
+ * the app says which: context.cardClosed): nothing there is read, by any act, so the hidden answer never leaves (the
+ * combine's I2). */
+const closedAt = (node, context) => {
+  const element = node?.nodeType === 3 ? node.parentElement : node;
+  try { return !!element && !!context.cardClosed?.(element); } catch { return true; }
+};
 
 /** Japanese a voice can say: whole sentences when the text is Japanese through and through; from mixed text only its
  * Japanese runs; and a lone character ("門 Products") when that is all the Japanese there is. */
@@ -557,6 +564,7 @@ export function unitAt(doc, x, y, { through = true, pointer = 'mouse', ...option
     const over = passThroughText(doc, x, y, hit);
     if (over) { node = over.node; offset = over.offset; }
   }
+  if (closedAt(node, options.context || {})) return null;
   return findUnit(node, { offset, display: (el) => view.getComputedStyle(el).display, ...options });
 }
 function caretAt(doc, x, y) {
@@ -1025,7 +1033,7 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
       try { text = rangeText(range); } catch { text = selection.toString(); }
       const node = range.commonAncestorContainer;
       const element = node?.nodeType === 3 ? node.parentNode : node;
-      if (!hasJapanese(text) || !element || element.closest?.('[data-ear-own], input, textarea, select, [contenteditable=""], [contenteditable="true"]')) { hideChip(); return; }
+      if (!hasJapanese(text) || !element || element.closest?.('[data-ear-own], input, textarea, select, [contenteditable=""], [contenteditable="true"]') || closedAt(element, ctx())) { hideChip(); return; }
       const boxes = [...range.getClientRects()].filter((box) => box.width || box.height);
       const box = boxes[boxes.length - 1] || range.getBoundingClientRect();
       if (!chip.isConnected) doc.body.append(chip);

@@ -13786,6 +13786,8 @@ function appendReviewFrontVoice(face, item, { printed, blanked }) {
   // the decision is the voice layer's (modules/card-audio.mjs, loaded beside the app): without the layer there is no voice and no control
   const target = voiceLayer?.frontVoice?.({ kind: item.t, printed, blanked, label: item.label, reading, readings });
   if (!target) return;
+  // the ear reads the printed word as this control does, by the card's stored reading (the combine's I2)
+  face.querySelector('.review-front')?.setAttribute('data-reading', target.text);
   const row = el('div', 'review-reading-row review-front-voice');
   const note = el('span', 'say-note');
   note.id = 'card-say-front-note'; note.setAttribute('role', 'status'); note.setAttribute('aria-live', 'polite');
@@ -13828,6 +13830,8 @@ function mountSettledFrontVoice(item) {
   const saved = item.ctx ? D.passages.find((x) => x.id === item.ctx.p) : null;
   if (saved?.tokens && takenContext(item)) return;
   if ((S.srs[srsKey('word', item.id)]?.reps || 0) % 2 === 1 && (!exampleSearchSettled(item.id) || findExamples(item.id, 1).length)) return;
+  // settled printed: the ear may read the word now, as the control below does
+  delete face.dataset.earClosed;
   appendReviewFrontVoice(face, item, { printed: true, blanked: false });
 }
 /** An article or the archive's index has arrived or failed to load: the review card face-down now, if it is a word's, may
@@ -28209,6 +28213,9 @@ function renderReview(main) {
   // voice on the front (John, 2026-11-11): only where the asked word is printed on this face. A word asked inside its
   // sentence has the word blanked out (`cloze`), and there the hidden answer is never spoken.
   if (!rv.revealed && ['word', 'kanji'].includes(item.t) && faceSettled) appendReviewFrontVoice(face, item, { printed: !cloze, blanked: !!cloze });
+  // the ear (modules/ear.mjs) reads nothing on a question face that does not print its word, or does not yet for sure: a
+  // word blanked in its sentence, a sentence or a question card, a face still settling (the combine's I2)
+  if (!rv.revealed && (cloze || !faceSettled || ['sentence', 'question'].includes(item.t))) face.dataset.earClosed = '1';
   if (rv.revealed && !['sentence', 'question'].includes(item.t)) {
     const backc = reviewCardBack(item, presented?.answer) || { reading: '', senses: [] };
     const assessment = assessmentReviewContext(item);
