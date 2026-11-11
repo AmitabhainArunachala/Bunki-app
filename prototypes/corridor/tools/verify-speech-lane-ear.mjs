@@ -16,6 +16,8 @@
  *           ear said, play with no request; a sentence never heard shows the one plain line.
  *  ended    I13 · a 401 on a request nobody waits for (the ear gave it up): the next tap says the pairing was ended, and
  *           Settings says so, as for any 401.
+ *  turns    I4 · the Mac: Option-click on the answer's sentence while the review card's control speaks: the control ends,
+ *           the ear speaks, never two sounds at once.
  *  mark     I8 · a tap on the 耳 mark changes its state and nothing else (no request, the screen, scroll and focus stay).
  *
  * Exit code 0 when every check passes, 1 otherwise. */
@@ -30,7 +32,7 @@ const WIDTH = Number(argOf('--width', '390'));
 const UI = argOf('--ui', 'bi');
 const PORT = Number(argOf('--port', '19563'));
 const SHOTS = argOf('--shots', '');
-const ONLY = new Set(argOf('--only', 'switch,closed,offline,ended,mark').split(',').filter(Boolean));
+const ONLY = new Set(argOf('--only', 'switch,closed,offline,ended,turns,mark').split(',').filter(Boolean));
 const ALL_LOOKS = argOf('--looks', '') === 'all';
 if (!SITE) { console.error('usage: verify-speech-lane-ear.mjs --site <built site>'); process.exit(2); }
 if (SHOTS) mkdirSync(SHOTS, { recursive: true });
@@ -367,6 +369,39 @@ const cases = {
       if (/not paired|つないでいません/u.test(line) || !/pair again|つなぎ直/u.test(line)) problems.push(`the next tap says ${JSON.stringify(line)}`);
       if (!/ended this pairing|接続を終了/u.test(settings)) problems.push(`Settings says ${JSON.stringify(settings.slice(0, 160))}`);
       record('I13 a 401 on a request nobody waits for: the next tap and Settings say the pairing was ended', problems, JSON.stringify({ line, settings: settings.slice(0, 160) }));
+    } finally { await s.close(); }
+  },
+
+  // ============================================================ I4 · the ear during a card control's turn (the Mac: Option-click)
+  async turns() {
+    if (WIDTH < 700) return;
+    const s = await open({ engine: ENGINE, width: WIDTH, ui: UI, voicePort: PORT + 1, clipSeconds: () => 4 });
+    const { page, press } = s;
+    try {
+      await page.evaluate(async () => { const m = await import('/corridor.js'); m.setWordPref(m.WORD_VOICE_KEY, 'wordVoice', m.WORD_VOICE, 'off'); });
+      await openArticle(s, { start: false });
+      const token = page.locator('.reader .tok.content').nth(2);
+      for (let i = 0; i < 4 && !(await page.locator('#mini').isVisible().catch(() => false)); i += 1) { await press(token); await s.sleep(700); }
+      await press('#mini-take'); await page.locator('#mini-review').waitFor(); await press('#mini-review'); await s.sleep(900);
+      await s.ready(); await press('#home-review').catch(() => {}); await page.locator('#tab-today').waitFor(); await press('#tab-today'); await s.sleep(1000);
+      await press('#review-start'); await page.locator('.review-face').first().waitFor(); await s.sleep(800);
+      await page.keyboard.press('Space'); await page.locator('#card-say').waitFor(); await s.sleep(600);
+      await page.evaluate(() => { window.__most = 0; setInterval(() => { const n = [...document.querySelectorAll('audio')].filter((a) => !a.paused && !a.ended && a.currentTime > 0).length; window.__most = Math.max(window.__most, n); }, 50); });
+      await page.locator('#card-say').click();
+      const lit = await page.waitForFunction(() => document.getElementById('card-say')?.classList.contains('is-speaking') && [...document.querySelectorAll('audio')].some((a) => !a.paused && a.currentTime > 0), null, { timeout: 6000 }).then(() => true, () => false);
+      const p = await page.evaluate(() => { const t = document.querySelector('.review-face .review-cloze .tok.content') || document.querySelector('.review-face .tok.content'); const r = t?.getBoundingClientRect(); return r ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : null; });
+      const n = s.fake.speaks().length;
+      if (p) { await page.keyboard.down('Alt'); await page.mouse.click(p.x, p.y); await page.keyboard.up('Alt'); }
+      const earSpeaks = await waitEar(page, ['speaking'], 6000);
+      await s.sleep(500);
+      const after = await page.evaluate(() => ({ cardLit: !!document.getElementById('card-say')?.classList.contains('is-speaking'), most: window.__most, ear: document.documentElement.dataset.ear || '' }));
+      const problems = [];
+      if (!lit) problems.push('the card’s control never sounded (nothing to check)');
+      if (!p) problems.push('no sentence on the answer face');
+      if (!earSpeaks) problems.push(`the ear did not take the turn (asked ${JSON.stringify(sent(s, n))})`);
+      if (after.cardLit) problems.push('the card’s control still speaks under the ear');
+      if (after.most > 1) problems.push(`${after.most} audio elements sounded at once`);
+      record('I4 the ear during a card control’s turn: the control ends, the ear speaks, one sound at a time', problems, JSON.stringify({ ...after, asked: sent(s, n) }));
     } finally { await s.close(); }
   },
 
