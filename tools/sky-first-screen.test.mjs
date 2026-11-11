@@ -437,6 +437,10 @@ describe.each(engines)('the sky (宙) as the app’s first screen, in %s', (engi
         }),
         'the family is still open',
       ).toBe(word);
+      // In a fresh headless profile the app's record band ("Your learning is not being saved") stands over the top
+      // left, where the path is: the base this branch starts from (8efcbdf7a) shows it over the old first screen as
+      // well. It is set aside so that the press lands on the path as a learner's does.
+      await page.addStyleTag({ content: '#record-band{display:none!important}' });
       const home = page.locator('#bunki-sky .trail button').first();
       expect(await home.textContent()).toBe('宙');
       await home.click();
@@ -463,6 +467,15 @@ describe.each(engines)('the sky (宙) as the app’s first screen, in %s', (engi
     const anotherSky = () => {
       window.__bunkiSkyMount = true;
     };
+    // the live design layer of the 18841 preview, as it loads today: its deferred live.js adds the design copy's
+    // mount script after the app's own module has run, and that script sets the flag only once it has arrived
+    const designLayer = () =>
+      document.addEventListener('DOMContentLoaded', () => {
+        const script = document.createElement('script');
+        script.src = '/design/sky/mount.js?v=test';
+        script.async = true;
+        document.head.appendChild(script);
+      });
 
     test('control: a browser that is not driven gets the sky without asking', async () => {
       const { context, page } = await open({ before: [[hideDriver]], until: ['mounted'] });
@@ -502,6 +515,12 @@ describe.each(engines)('the sky (宙) as the app’s first screen, in %s', (engi
       {
         name: 'another sky already mounting (window.__bunkiSkyMount set)',
         options: { query: '?sky=1', before: [[anotherSky]] },
+        state: 'stood-down',
+        quiet: true,
+      },
+      {
+        name: 'the live design layer has put its own sky in the page (its flag not yet set)',
+        options: { query: '?sky=1', before: [[designLayer]] },
         state: 'stood-down',
         quiet: true,
       },
