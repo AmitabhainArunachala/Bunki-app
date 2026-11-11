@@ -15,6 +15,7 @@ import {
   EAR_CSS,
   createEarMachine,
   earClick,
+  earKey,
   earLabel,
   findUnit,
   noVoiceLine,
@@ -1023,6 +1024,82 @@ describe('c. with the ear off and no Option key, a click is the app’s own', ()
     );
     expect(verdict).toBe('consume');
     expect(spoken).toEqual(['雨']);
+  });
+});
+
+describe('a study card’s front is never read by a resting pointer', () => {
+  it('a unit on a card’s front is marked as the front', () => {
+    const front = h('p', { class: 'review-cloze' }, '彼は＿＿を持っている。');
+    const back = h('p', { class: 'review-example' }, '答えの文です。');
+    page(front, back);
+    const cardFront = (node) => {
+      for (let at = node; at; at = at.parentNode) if (at === front) return true;
+      return false;
+    };
+    expect(
+      findUnit(textIn(front, '彼'), { offset: 0, context: { ...context, cardFront } }).front,
+    ).toBe(true);
+    expect(
+      findUnit(textIn(back, '答え'), { offset: 0, context: { ...context, cardFront } }).front,
+    ).toBeFalsy();
+  });
+
+  it('held on, a rest on the front asks nothing; a held tap on the phone, an armed tap and Option-click still read it', () => {
+    const { machine, calls, advance, handles } = rig();
+    const front = { ...unit('持つ'), front: true };
+    machine.holdEar();
+    machine.hover({ unit: front, pointer: 'mouse' });
+    advance(3000);
+    expect(calls.speak).toHaveLength(0);
+    expect(machine.click({ unit: front, pointer: 'touch' })).toBe('consume');
+    handles[0].done('done', null);
+    machine.tapEar();
+    machine.tapEar();
+    expect(machine.click({ unit: front, pointer: 'mouse' })).toBe('consume');
+    handles[1].done('done', null);
+    expect(machine.click({ unit: front, pointer: 'mouse', alt: true })).toBe('consume');
+    expect(calls.speak).toHaveLength(3);
+  });
+});
+
+describe('Escape stops the ear’s voice, and does nothing else then', () => {
+  const key = (name, extra = {}) => {
+    const reads = [];
+    const event = new Proxy(
+      { key: name, isComposing: false, ...extra },
+      { get: (target, prop) => (reads.push(String(prop)), target[prop]) },
+    );
+    return { event, reads };
+  };
+  it('while the ear speaks, in any mode, Escape stops it and is the ear’s alone', () => {
+    for (const setup of [(m) => m.tapEar(), (m) => m.holdEar(), () => {}]) {
+      const { machine, handles } = rig();
+      setup(machine);
+      machine.speakNow(A);
+      const mode = machine.mode();
+      expect(earKey(key('Escape').event, { machine })).toBe('consume');
+      expect(handles[0].stopped).toBe(true);
+      expect(machine.voice()).toBe(false);
+      expect(machine.mode()).toBe(mode);
+    }
+  });
+  it('with no voice of the ear’s speaking, Escape and every other key are the app’s, untouched', () => {
+    const { machine, calls } = rig();
+    machine.holdEar();
+    const esc = key('Escape');
+    expect(earKey(esc.event, { machine })).toBe('pass');
+    expect(esc.reads).toEqual(['key']);
+    machine.speakNow(A);
+    const other = key('Enter');
+    expect(earKey(other.event, { machine })).toBe('pass');
+    expect(other.reads).toEqual(['key']);
+    expect(calls.stops).toEqual([]);
+  });
+  it('Escape while a Japanese input method is composing is the input’s', () => {
+    const { machine } = rig();
+    machine.speakNow(A);
+    expect(earKey(key('Escape', { isComposing: true }).event, { machine })).toBe('pass');
+    expect(machine.voice()).toBe(true);
   });
 });
 

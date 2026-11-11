@@ -614,7 +614,13 @@ export function installVoiceLayer(host) {
     },
     cannot: (unit) => seam.cannot(unit.voiceKey),
     context: () => ({ view: host.view(), keyFor: markKey,
-      articleOf: (node) => (host.view() === 'reader' && node?.closest?.('#reader') ? host.passage()?.id || null : null) }),
+      articleOf: (node) => (host.view() === 'reader' && node?.closest?.('#reader') ? host.passage()?.id || null : null),
+      // a study card's front (a review card before its answer, a deck card on its question side)
+      cardFront: (node) => {
+        if (node?.closest?.('.review-face')) return !host.cardRevealed();
+        const card = node?.closest?.('.kp .kp-card');
+        return !!card && !card.querySelector('.kp-answer');
+      } }),
   });
   let scan = 0;
   const rescan = () => {

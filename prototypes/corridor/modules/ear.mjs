@@ -116,8 +116,9 @@ export function createEarMachine({ speak, cannot = () => null, schedule = (fn, m
      * once; moving within the unit asks nothing more; a new rest cancels a read still in flight. */
     hover({ unit, pointer = 'mouse' } = {}) {
       if (mode !== 'held' || pointer !== 'mouse') { clearRest(); return; }
-      // what the learner wrote is read on a deliberate tap only, never from a resting pointer
-      if (!unit || unit.typed) { clearRest(); return; }
+      // what the learner wrote, and a study card's front (hearing it would give the answer away), are read on a
+      // deliberate act only, never from a resting pointer
+      if (!unit || unit.typed || unit.front) { clearRest(); return; }
       if (rest && rest.key === unit.key) return;
       clearRest();
       const mine = { key: unit.key, timer: null, asked: false };
@@ -208,6 +209,8 @@ const isTypedText = (node) => attr(node, 'data-ear-typed') !== null || (hasClass
   (hasClass(node, 'speak-line') && attr(node, 'data-who') === 'me') ||
   ['record-note-segment', 'teacher-draft-quote', 'pl-note-text'].some((name) => hasClass(node, name));
 const typedAt = (node) => { for (let at = node; at && at.nodeType === 1; at = at.parentNode) if (isTypedText(at)) return true; return false; };
+/** On a study card's front (the app says which: context.cardFront): read on a deliberate act, never from a rest. */
+const frontAt = (node, context) => { try { return !!context.cardFront?.(node); } catch { return false; } };
 
 /** Japanese a voice can say: whole sentences when the text is Japanese through and through; from mixed text only its
  * Japanese runs; and a lone character ("門 Products") when that is all the Japanese there is. */
@@ -328,6 +331,7 @@ function declaredUnit(element, context, keep) {
     key: `e${idOf(element)}:${word || text}`,
     voiceKey: keyOf({ node: element, word: word || null, paragraph: text || word }, context),
     typed: typedAt(element),
+    front: frontAt(element, context),
     contains: (node) => inside(element, node),
     keep,
   };
@@ -350,6 +354,7 @@ function elementUnit(element, context, keep, reading = readingOf(element)) {
     key: `e${idOf(element)}:${word || own}`,
     voiceKey: keyOf({ node: element, word: wordLike ? word : null, paragraph: own }, context),
     typed: typedAt(element),
+    front: frontAt(element, context),
     contains: (node) => inside(element, node),
     keep,
   };
@@ -401,6 +406,7 @@ function sentenceUnit(block, target, offset, context) {
     key: `s${idOf(block)}:${piece.start}:${piece.text}`,
     voiceKey: keyOf({ node: target.nodeType === 3 ? target.parentNode : target, word: null, paragraph: text }, context),
     typed: typedAt(block),
+    front: frontAt(block, context),
     contains: (node) => inside(block, node),
   };
 }
@@ -586,6 +592,17 @@ export function earClick(event, { machine, unitAt: find, press = null, now = Dat
   return machine.click({ unit, pointer: pointer === 'keyboard' ? 'touch' : pointer, alt });
 }
 
+/** What a key means to the ear: Escape stops the ear's own voice, in every mode, and that press is the ear's alone (it
+ * does not also close a sheet or leave a screen). Any other key, or Escape with no voice of the ear's speaking (or while
+ * an input method is composing), is the app's own and is not touched. */
+export function earKey(event, { machine }) {
+  if (event.key !== 'Escape') return 'pass';
+  if (!machine.voice()) return 'pass';
+  if (event.isComposing) return 'pass';
+  machine.stop();
+  return 'consume';
+}
+
 /* ------------------------------------------------------------------ the look */
 const RINGS = '<svg class="ear-rings" viewBox="0 0 26 30" aria-hidden="true" focusable="false"><path d="M4 9a8 8 0 0 1 0 12"/><path d="M10 5a14 14 0 0 1 0 20"/><path d="M16 1a20 20 0 0 1 0 28"/></svg>';
 /** The design lead's CSS (design/ear/ear-states.html), on the app's own variables: --red, --ink, the paper white. */
@@ -613,6 +630,8 @@ export const EAR_CSS = `
 @media (max-width: 640px) {
   #ginga-symbol + .ear-spot { left: calc(50% - 68px); }
   :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate + .ear-spot { left: calc(50% - 66px); }
+  /* the mark stands on the gate's left here: its arcs open away from the gate, to the left */
+  .ear-mark .ear-rings { left: auto; right: calc(100% - 7px); transform: translate(-2px, -50%) scaleX(-1); }
   .ear-why { left: 4px; top: calc(100% + 2px); transform: none; }
 }
 /* armed: 朱文, a red character on paper */
@@ -831,6 +850,11 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}) }) {
     press = null;
     if (verdict === 'consume') { event.preventDefault(); event.stopImmediatePropagation(); }
   }, true);
+  // Escape: on the window, before any of the app's own Escape (a sheet's Back, the word box, the save strip), so that
+  // while the ear speaks one press stops it and does nothing else
+  view.addEventListener('keydown', (event) => {
+    if (earKey(event, { machine }) === 'consume') { event.preventDefault(); event.stopImmediatePropagation(); }
+  }, true);
   let frame = 0, last = null;
   view.addEventListener('pointermove', (event) => {
     if (event.pointerType !== 'mouse') return;
@@ -841,8 +865,8 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}) }) {
     frame = view.requestAnimationFrame(() => {
       frame = 0;
       const unit = last ? find(last.x, last.y, false) : null;
-      // held on, what the learner wrote shows no wash under a resting pointer: it is not read from there
-      hoverUnit = unit?.typed && machine.mode() === 'held' ? null : unit;
+      // held on, what the learner wrote and a card's front show no wash under a resting pointer: not read from there
+      hoverUnit = (unit?.typed || unit?.front) && machine.mode() === 'held' ? null : unit;
       machine.hover({ unit, pointer: 'mouse' });
       paint();
     });
