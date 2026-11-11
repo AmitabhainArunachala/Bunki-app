@@ -37,7 +37,8 @@
   .cap.hub .kin button:hover { color: var(--sky-mark); border-bottom-color: currentColor; }
   .cap .act { margin-top: 12px; font-size: 13px; letter-spacing: 0.1em; padding: 6px 15px 7px; border: 1px solid color-mix(in srgb, var(--sky-text) 46%, transparent); border-radius: 2px; background: color-mix(in srgb, var(--sky-deep) 55%, transparent); transition: background 160ms, border-color 160ms, color 160ms; }
   .cap .act:hover, .cap .act:focus-visible { background: var(--sky-text); color: var(--sky-deep); border-color: var(--sky-text); outline: none; }
-  .cap.note { font-size: 11.5px; line-height: 1.45; }
+  .cap.note { font-size: 11.5px; line-height: 1.45; max-width: 148px; white-space: normal; }
+  .cap.count { font-size: 12px; letter-spacing: 0.08em; opacity: 0.82; }
   .cap.note .nt { font-family: 'Noto Serif', serif; font-style: italic; opacity: 0.86; }
   .cap.bond { font-size: 12px; letter-spacing: 0.06em; color: var(--sky-mark); }
   .cap.more button { pointer-events: auto; cursor: pointer; font: inherit; font-size: 12px; letter-spacing: 0.08em; color: var(--sky-text); background: none; border: 0; border-bottom: 1px solid color-mix(in srgb, var(--sky-text) 40%, transparent); padding: 1px 2px; opacity: 0.8; }
@@ -179,8 +180,8 @@
     /* ---------------------------------------------------------------- building a constellation */
     const HUBS = { 1: [[-335, 0]], 2: [[-345, 0], [345, 0]], 3: [[-405, 36], [0, -236], [405, 36]], 4: [[-435, 54], [-152, -238], [152, -238], [435, 54]] };
     const DIRS = { 1: [Math.PI], 2: [Math.PI, 0], 3: [Math.PI, -Math.PI / 2, 0], 4: [Math.PI - 0.12, -Math.PI / 2 - 0.42, -Math.PI / 2 + 0.42, 0.12] };
-    const TOP = [[0, -300], [-150, -260], [150, -260], [-260, -150], [260, -150]];   // on an arc: the lines run out like rays and never cross, each note has its own room, and nothing reaches into a character's family
-    const BOT = [[0, 340], [-160, 290], [160, 290], [-290, 215], [290, 215]];   // the same arc below, clear of the sentence under the word
+    const TOP = [[0, -306], [-178, -258], [178, -258], [-318, -160], [318, -160]];   // on an arc: the lines run out like rays and never cross, each note has its own room, and nothing reaches into a character's family
+    const BOT = [[0, 344], [-182, 290], [182, 290], [-322, 212], [322, 212]];   // the same arc below, clear of the sentence under the word
     /* places for a character's family, nearest first; they keep clear of the note under the character */
     /* (the outer places stand on rays that pass between the inner ones, so no line to an outer word runs through an inner word) */
     const SIDE = [[182, -14, 25], [152, -98, 25], [178, 76, 25], [304, -99, 20], [316, 53, 20], [222, -230, 20], [256, 193, 20], [112, -208, 20], [142, 226, 20]];
@@ -206,7 +207,7 @@
         const sem = (W.sem.get(id) || []).slice().sort((a, b) => REL_ORDER[a.rel] - REL_ORDER[b.rel]).slice(0, 5), semSlots = n >= 3 ? BOT : TOP;
         sem.forEach((e, q) => { const it = add({ key: 'w' + e.w, kind: 'w', id: e.w, text: D.words[e.w][0], font: 'w', role: 'sem', q, tx: semSlots[q][0], ty: semSlots[q][1], size: 24, depth: 640, delay: 0.62 + q * 0.05, from: centre });
           lines.push({ a: centre, b: it, kind: 'sem', delay: 0.60 + q * 0.05 });
-          caps.push({ of: it, dy: semSlots === TOP ? -40 : 20, cls: 'cap note', wait: 0.9 + q * 0.05, build: (n2) => { n2.append(el('span', 'tag', L.rel[e.rel])); if (e.note) n2.append(el('span', 'nt', e.note)); } }); });   // above the word when the word stands above: its line arrives from below and never crosses the note
+          caps.push({ of: it, dy: semSlots === TOP ? -27 : 27, up: semSlots === TOP, cls: 'cap note', wait: 0.9 + q * 0.05, build: (n2) => { n2.append(el('span', 'tag', L.rel[e.rel])); if (e.note) n2.append(el('span', 'nt', e.note)); } }); });   // above the word when the word stands above: its line arrives from below and never crosses the note
         /* its characters, each with its own family */
         const hubItems = [];
         hubsCh.slice(0, 4).forEach((ch, h) => { const ki = W.byKanji.get(ch), [hx, hy] = HUBS[n][h], dir = DIRS[n][h], up = Math.abs(Math.sin(dir)) > 0.6, hs = [98, 98, 84, 76][n - 1];
@@ -225,7 +226,7 @@
         if (n <= 2) { const homo = (W.rd[id] ? W.byReading.get(W.rd[id]) || [] : []).filter((wi) => wi !== id && !used.has(wi)).slice(0, 3);
           homo.forEach((wi, q) => { const it = add({ key: 'w' + wi, kind: 'w', id: wi, text: D.words[wi][0], font: 'w', role: 'homo', tx: BOT[q][0], ty: BOT[q][1] + 26 + (W.ctx && W.ctx.wordSent && W.ctx.wordSent[id] ? 78 : 0), size: 21, depth: 660, delay: 0.78 + q * 0.05, from: centre });
             lines.push({ a: centre, b: it, kind: 'homo', delay: 0.76 + q * 0.05 });
-            caps.push({ of: it, dy: 18, cls: 'cap note', build: (n2) => { n2.append(el('span', 'tag', L.homo)); if (D.words[wi][2]) n2.append(el('span', 'nt', D.words[wi][2])); } }); }); }
+            caps.push({ of: it, dy: 25, cls: 'cap note', build: (n2) => { n2.append(el('span', 'tag', L.homo)); if (D.words[wi][2]) n2.append(el('span', 'nt', D.words[wi][2])); } }); }); }
       } else if (kind === 'k') {
         const k = D.kanji[id], parts = k[5].slice(0, 4), n = parts.length;
         const centre = add({ key: 'k' + id, kind: 'k', id, text: k[0], font: 'k', role: 'centre', tx: 0, ty: -4, size: 132, depth: 520, capH: 58 + (canOpen('k', id) ? 46 : 0) });
@@ -287,12 +288,13 @@
         c.lines = c.lines.filter((l) => l.kind === 'cord');   // under each character its words hang in a plain column: the place says the tie, no line is needed
         for (const l of c.lines) l.under = true;
       } else if (kind === 'k') {
-        const HX = { 1: [0], 2: [-80, 80], 3: [-110, 0, 110], 4: [-132, -44, 44, 132] }[n] || [0], top = 196, row0 = top + 40 * 0.58 + 52;
-        centre.size = P(96); centre.tx = 0; centre.ty = 0; const cc = capOf(centre); if (cc[0]) cc[0].dy = P(96 * 0.56 + 2); if (cc[1]) cc[1].dy = P(96 * 0.56 + 60 + (c.caps[0] && cc[0] && cc[0].node ? 0 : 0));
+        const HX = { 1: [0], 2: [-80, 80], 3: [-110, 0, 110], 4: [-132, -44, 44, 132] }[n] || [0], top = 214, row0 = top + 40 * 0.58 + 52 + 40;
+        centre.size = P(96); centre.tx = 0; centre.ty = 0; let cc = capOf(centre); if (!cc[1] && W.fam[c.id] && W.fam[c.id].length) { const cnt = W.fam[c.id].length; c.caps.push({ of: centre, dy: 0, cls: 'cap count', wait: 0.9, build: (n2) => n2.append(document.createTextNode(L.words(cnt))) }); cc = capOf(centre); }
+        if (cc[0]) cc[0].dy = P(96 * 0.56 + 2); if (cc[1]) cc[1].dy = P(row0 - 30);
         hubs.forEach((hub, h) => { hub.tx = P(HX[h]); hub.ty = P(top); hub.size = P(40); hub.dz = -30; for (const cp of capOf(hub)) { cp.dy = P(40 * 0.58 + 2); cp.cls = 'cap hub tight'; } });
-        for (const it of c.items) { if (it.role === 'kin') drop.add(it); else if (it.role === 'own') { if (it.q > 7) { drop.add(it); continue; } it.tx = P(it.q % 2 ? 90 : -90); it.ty = P(row0 + Math.floor(it.q / 2) * 34); it.size = P(19); it.dz = 70; } }
-        c.lines = c.lines.filter((l) => l.kind === 'cord'); for (const l of c.lines) l.under = true; centre.capH = P(112);
-        c.fit = () => { const h0 = cc[0] && cc[0].node ? cc[0].node.offsetHeight : 92, base0 = 96 * 0.56 + 2 + h0; if (cc[1]) cc[1].dy = P(base0 + 6); const top2 = base0 + (cc[1] ? 30 : 6) + 40, row2 = top2 + 40 * 0.58 + 52; centre.capH = P(h0 + (cc[1] ? 34 : 8));
+        for (const it of c.items) { if (it.role === 'kin') drop.add(it); else if (it.role === 'own') { if (it.q > 7) { drop.add(it); continue; } it.tx = P(it.q % 2 ? 84 : -84); it.ty = P(row0 + Math.floor(it.q / 2) * 34); it.size = P(19); it.dz = 70; } }
+        c.lines = c.lines.filter((l) => l.kind === 'cord'); c.lines.forEach((l, q) => { l.drop = true; if (q === 0) l.span = [hubs[0], hubs[hubs.length - 1]]; }); centre.capH = P(112);
+        c.fit = () => { const h0 = cc[0] && cc[0].node ? cc[0].node.offsetHeight : 92, base0 = 96 * 0.56 + 2 + h0; const top2 = base0 + 62, hubH = Math.max(40, ...hubs.map((hub) => { const cp = capOf(hub)[0]; return cp && cp.node ? cp.node.offsetHeight : 40; })), head = top2 + 40 * 0.58 + hubH + 12, row2 = head + 62; if (cc[1]) cc[1].dy = P(head); centre.capH = P(h0 + 8);
           hubs.forEach((hub) => { hub.ty = P(top2); }); for (const it of c.items) if (it.role === 'own') it.ty = P(row2 + Math.floor(it.q / 2) * 34); };
       } else { for (const it of c.items) if (it !== centre) { it.tx *= 0.44; it.ty = it.ty * 0.9 + 190; it.size = P(30); } centre.size = P(84); centre.ty = 0; }
       c.items = c.items.filter((it) => !drop.has(it)); c.lines = c.lines.filter((l) => !drop.has(l.a) && !drop.has(l.b)); c.caps = c.caps.filter((cp) => !drop.has(cp.of) && cp.cls !== 'cap bond');
@@ -407,6 +409,8 @@
       const pal = S.pal;
       for (const it of web.leaving) drawItem(it);
       for (const l of web.linesOut.concat(web.lines)) { if (l.p.x < 0.01) continue; const A = l.a, B = l.b, al = Math.min(A.a.x, B.a.x);
+        if (l.drop) { const U2 = scaleU(), top = B.y.x - B.s.x * 0.62, by = top - 20 * U2; W.pushLine(B.x.x, by, B.x.x, top - 5 * U2, 0, 1.5, pal.cord, 0.9 * al, l.p.x);   // a narrow screen, a character: one stem, one bar, one equal drop to each part
+          if (l.span) { if (l.span[0] !== l.span[1]) W.pushLine(l.span[0].x.x, by, l.span[1].x.x, by, 0, 1.5, pal.cord, 0.9 * al, l.p.x); W.pushLine(A.x.x, by - 13 * U2, A.x.x, by, 0, 1.5, pal.cord, 0.9 * al, l.p.x); } continue; }
         const pad = l.kind === 'cord' ? 10 : B.role === 'kin' ? 3 : 7; let [x0, y0] = edge(A, B.x.x, B.y.x, pad); const [x1, y1] = edge(B, A.x.x, A.y.x, pad);
         if (A.capH && B.y.x > A.y.x + A.s.x * 0.5 && (l.under || (A.role === 'centre' && A.kind !== 'w' && l.kind === 'fam') || (A.role === 'hub' && l.kind === 'fam' && B.ty > A.ty + 100))) { const ux = A.x.x + clamp((B.x.x - A.x.x) * 0.22, -70, 70), uy = A.y.x + A.s.x * 0.56 + A.capH * scaleU(); if (uy <= y1 - 8) { x0 = ux; y0 = uy; } else if (A.role !== 'hub') continue; }   // start under the notes, never through them (where a character's note is too tall for that, the line keeps its plain course)
         if (l.kind === 'cord') W.pushLine(x0, y0, x1, y1, 0, 2.3, pal.cord, 0.95 * al, l.p.x);
@@ -425,7 +429,7 @@
       if (frontBtn && W.tgt) { const g = W.tgt, away = !web.cur && g.ov < 0.5 && (Math.abs(g.yaw) > 0.06 || Math.abs(g.pitch) > 0.06 || Math.abs(g.offY) > 25 || Math.abs(g.offZ) > 50); if (frontBtn.hidden === away) frontBtn.hidden = !away; }
       const tOpen = web.cur ? S.t - web.cur.t0 : 9;
       for (const cp of web.caps) { const it = cp.of, node = cp.node, a = it.born ? clamp((it.a.x - 0.35) / 0.65, 0, 1) * (cp.wait ? clamp((tOpen - cp.wait) / 0.24, 0, 1) : 1) : 0; node.style.opacity = a.toFixed(3); if (a <= 0) continue;
-        const x = it.x.x + (cp.dx || 0) * u, y = it.y.x + cp.dy * (it.s.x / (it.size * u || 1)) * u; node.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)' + (cp.left ? '' : ' translateX(-50%)'); }
+        const x = it.x.x + (cp.dx || 0) * u, y = it.y.x + cp.dy * (it.s.x / (it.size * u || 1)) * u; node.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)' + (cp.left ? '' : ' translateX(-50%)') + (cp.up ? ' translateY(-100%)' : ''); }
       if (tipOn) { let x = 0, y = 0, s = 0, ok = false; if (tipOn.t === 'g') { const q = W.gHits.find((z) => z.i === tipOn.q.i); if (q) { x = q.x; y = q.y; s = q.s; ok = true; } } else if (tipOn.t === 'w') { if (W.visAt[tipOn.i] >= S.frame - 1) { const o = tipOn.i * 5; x = W.vis[o]; y = W.vis[o + 1]; s = W.vis[o + 2]; ok = true; } } else { const it = tipOn.item; x = it.x.x; y = it.y.x; s = it.s.x; ok = web.items.has(it.key); }
         if (ok) { tip.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)'; tip.firstChild.style.bottom = (s * 0.62 + 5) + 'px'; tip.lastChild.style.top = (s * 0.62 + 4) + 'px'; tip.style.opacity = '1'; } else tip.style.opacity = '0'; }
     };
@@ -465,6 +469,7 @@
         W.pushLine(ax + dx * k0, ay + dy * k0, bx - dx * k1, by - dy * k1, dx * dy > 0 ? 7 : -7, 1.0, S.pal.line, 0.5 * wake.k.x, wake.k.x); }
     };
     api.open = (word) => { const i = W.byWord.get(word); if (i != null) open('w', i); return i != null; };
+    api.openKanji = (ch) => { const i = W.byKanji.get(ch); if (i != null) open('k', i); return i != null; };
     api.close = close;
   };
 })();
