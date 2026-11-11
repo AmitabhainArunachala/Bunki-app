@@ -1211,10 +1211,13 @@ describe('a request its only asker gave up on belongs to nobody (the re-check’
     expect(r.asked).toHaveLength(1);
     expect(again.states.at(-1)).toBe('error:day-budget');
     expect(r.seam.cannot(KEY)).toBe('day-budget');
-    // one status for the refusal, and the read's own end, which names it
+    // one status for the refusal, and the read's own end, which names it. Since the offline clips (B3, merged in the
+    // combine) a day-budget refusal also reads the server's budget (free) so that its line names the server's own
+    // ceiling; that read tells once more, carrying the budget: it is not a second telling of the refusal.
     const after = r.told.slice(told);
-    expect(after.filter((status) => !status.silent)).toHaveLength(1);
+    expect(after.filter((status) => !status.silent && !status.budget)).toHaveLength(1);
     expect(after.filter((status) => status.silent?.reason === 'day-budget')).toHaveLength(1);
+    expect(after.filter((status) => !status.silent && status.budget)).toHaveLength(1);
   });
   it('joined after the give-up, and the first asker’s request runs out of time on the way: not the joiner’s; it asks once on its own', async () => {
     const r = heldRig();
