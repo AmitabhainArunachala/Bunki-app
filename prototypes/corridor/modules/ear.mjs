@@ -113,6 +113,13 @@ export function createEarMachine({ speak, cannot = () => null, schedule = (fn, m
      * nothing done (the sky asks it as the finger lifts, before the click). */
     click({ unit, pointer = 'mouse', alt = false, control = false, dry = false } = {}) {
       if (!unit) return 'pass';
+      // a card's question face where the ear may not read (CLOSED): its own gesture there (Option-click, an armed tap) is
+      // taken and nothing is asked or played, so the card is not turned over by it; any other click is the app's
+      if (unit.closed) {
+        if (!alt && mode !== 'armed') return 'pass';
+        if (!dry && mode === 'armed') { mode = 'off'; clearRest(); changed(); }
+        return 'consume';
+      }
       const touch = pointer !== 'mouse';
       const appTap = mode === 'held' && touch && !alt && (control || !!unit.front);
       const now = speakingNow();
@@ -232,13 +239,58 @@ const isTypedText = (node) => attr(node, 'data-ear-typed') !== null || (hasClass
 const typedAt = (node) => { for (let at = node; at && at.nodeType === 1; at = at.parentNode) if (isTypedText(at)) return true; return false; };
 /** On a study card's front (the app says which: context.cardFront): read on a deliberate act, never from a rest. */
 const frontAt = (node, context) => { try { return !!context.cardFront?.(node); } catch { return false; } };
-/** On a study card's question face that does not print the word it asks (blanked, offered among choices, still settling;
- * the app says which: context.cardClosed): nothing there is read, by any act, so the hidden answer never leaves (the
- * combine's I2). */
-const closedAt = (node, context) => {
-  const element = node?.nodeType === 3 ? node.parentElement : node;
-  try { return !!element && !!context.cardClosed?.(element); } catch { return true; }
+/** On a study card's question face the only voice is the card's own control (the lead's ruling after the combine's
+ * review, F1, 2026-11-12). The app says where such a face is: context.cardQuestion(element) answers null off a question
+ * face; on one it answers { open, say }: `open` the element the ear may read there (the asked word where the face's
+ * control stands, or that control itself) or null, and `say` what that control says ({ text, voiceKey }). On `open` the
+ * ear says exactly that: one clip, the control's text under the control's voice key. Everywhere else on the face (a face
+ * with no control: several readings, no stored reading, blanked, still settling, a sentence or a question card; on a face
+ * with a control, every text that is not the asked word) the ear finds CLOSED: nothing is asked or played, and its own
+ * gesture there (Option-click, an armed tap) is taken, so it does not also turn the card over. */
+export const CLOSED = Object.freeze({ kind: 'closed', closed: true, front: true, typed: false, text: '', sentences: Object.freeze([]),
+  key: 'closed', contains: () => false });
+const elementOf = (node) => (node?.nodeType === 3 ? node.parentElement || node.parentNode : node);
+const questionAt = (node, context) => {
+  const element = elementOf(node);
+  if (!element || element.nodeType !== 1) return null;
+  try { return context.cardQuestion?.(element) || null; } catch { return CLOSED; }
 };
+/** What the ear finds at `node` on a card's question face: the control's own words on its asked word (or on the control),
+ * CLOSED anywhere else on the face, or null off any question face. */
+export function questionUnit(node, context = {}) {
+  const face = questionAt(node, context);
+  if (!face) return null;
+  if (face === CLOSED) return CLOSED;
+  const open = face.open;
+  const text = String(face.say?.text ?? '').trim();
+  if (!open || !text || !face.say?.voiceKey || !hasJapanese(text) || !inside(open, elementOf(node))) return CLOSED;
+  return {
+    kind: 'element', element: open, block: open, reading: KANA_ONLY.test(text) ? text : null,
+    text, sentences: [{ text }],
+    key: `q${idOf(open)}:${text}`,
+    voiceKey: face.say.voiceKey,
+    typed: false,
+    front: true,
+    contains: (other) => inside(open, other),
+  };
+}
+/** A selection the 読む chip never offers to read: one that lies in, starts in, ends in or spans a card's question face
+ * (the same ruling: on a question face the only voice is the card's own control). */
+export function selectionClosed(range, context = {}) {
+  if (!range) return false;
+  const on = (node) => !!questionAt(node, context);
+  if ([range.startContainer, range.endContainer, range.commonAncestorContainer].some(on)) return true;
+  const common = range.commonAncestorContainer;
+  const stack = [...((common?.nodeType === 3 ? common.parentNode : common)?.childNodes || [])];
+  while (stack.length) {
+    const node = stack.pop();
+    if (node?.nodeType !== 1) continue;
+    if (typeof range.intersectsNode === 'function' && !range.intersectsNode(node)) continue;
+    if (on(node)) return true;
+    stack.push(...(node.childNodes || []));
+  }
+  return false;
+}
 
 /** Japanese a voice can say: whole sentences when the text is Japanese through and through; from mixed text only its
  * Japanese runs; and a lone character ("門 Products") when that is all the Japanese there is. */
@@ -470,11 +522,14 @@ function precedes(a, b) {
 
 /** The unit `target` (a text node or an element) stands in, or null when there is no Japanese to say there.
  * `offset`: the position in a text node. `display(element)`: its CSS display (the page's computed one). `context`:
- * { view, articleOf(node), keyFor(node) } for the voice key. */
+ * { view, articleOf(node), keyFor(node) } for the voice key; cardQuestion(node) for a study card's question face (CLOSED
+ * there, or the card's control's own words on its asked word: questionUnit). */
 export function findUnit(target, { offset = null, display = defaultDisplay, context = {} } = {}) {
   if (!target) return null;
   const start = target.nodeType === 3 ? parentOf(target) : target;
   if (!start || start.nodeType !== 1) return null;
+  const question = questionUnit(start, context);
+  if (question) return question;
   for (let at = start; at; at = parentOf(at)) {
     if (isOwn(at) || isEditable(at)) return null;
     if (SKIP_TAGS.has(tagOf(at)) && tagOf(at) !== 'RT' && tagOf(at) !== 'RP') return null;
@@ -514,8 +569,7 @@ export function findUnit(target, { offset = null, display = defaultDisplay, cont
  * otherwise the sentence the touch stands in. */
 function wordOrSentence(block, target, offset, context) {
   const reading = readingOf(block);
-  // a block that names its own reading (data-reading: the review card's printed word, by the card's stored reading, as
-  // its question-side control says it; the combine's I2) is that word too
+  // a block that names its own reading (data-reading) is that word too
   if (reading?.node || (reading && attr(block, 'data-reading') !== null)) {
     const word = joined(textNodes(block, { mask: true, skip: (node) => node === reading.node }));
     if (/\p{Script=Han}/u.test(word) && [...(word.match(BARE_RUN) || []).join('')].length <= 16 && !/[。！？]/u.test(word))
@@ -566,7 +620,6 @@ export function unitAt(doc, x, y, { through = true, pointer = 'mouse', ...option
     const over = passThroughText(doc, x, y, hit);
     if (over) { node = over.node; offset = over.offset; }
   }
-  if (closedAt(node, options.context || {})) return null;
   return findUnit(node, { offset, display: (el) => view.getComputedStyle(el).display, ...options });
 }
 function caretAt(doc, x, y) {
@@ -996,9 +1049,10 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
     frame = view.requestAnimationFrame(() => {
       frame = 0;
       const unit = last ? find(last.x, last.y, false) : null;
-      // held on, what the learner wrote and a card's front show no wash under a resting pointer: not read from there
-      hoverUnit = (unit?.typed || unit?.front) && machine.mode() === 'held' ? null : unit;
-      machine.hover({ unit, pointer: 'mouse' });
+      // held on, what the learner wrote and a card's front show no wash under a resting pointer: not read from there; a
+      // closed card face shows nothing in any state (the ear reads nothing there)
+      hoverUnit = unit?.closed || ((unit?.typed || unit?.front) && machine.mode() === 'held') ? null : unit;
+      machine.hover({ unit: unit?.closed ? null : unit, pointer: 'mouse' });
       paint();
     });
   }, { capture: true, passive: true });
@@ -1019,7 +1073,8 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
   chip.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
-    if (!picked) return;
+    // a card turned to its question side under the selection since the chip was offered: nothing is read there
+    if (!picked || selectionClosed(picked.range, ctx())) { hideChip(); return; }
     const sentences = speakable(picked.text);
     if (!sentences.length) return;
     const context_ = ctx();
@@ -1039,11 +1094,13 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
       try { text = rangeText(range); } catch { text = selection.toString(); }
       const node = range.commonAncestorContainer;
       const element = node?.nodeType === 3 ? node.parentNode : node;
-      if (!hasJapanese(text) || !element || element.closest?.('[data-ear-own], input, textarea, select, [contenteditable=""], [contenteditable="true"]') || closedAt(element, ctx())) { hideChip(); return; }
+      // a selection that lies in, starts in, ends in or spans a card's question face: no chip (the only voice there is the
+      // card's own control)
+      if (!hasJapanese(text) || !element || element.closest?.('[data-ear-own], input, textarea, select, [contenteditable=""], [contenteditable="true"]') || selectionClosed(range, ctx())) { hideChip(); return; }
       const boxes = [...range.getClientRects()].filter((box) => box.width || box.height);
       const box = boxes[boxes.length - 1] || range.getBoundingClientRect();
       if (!chip.isConnected) doc.body.append(chip);
-      picked = { text, node };
+      picked = { text, node, range };
       chip.setAttribute('aria-label', tx('選んだ日本語を読む', 'Read the selected Japanese'));
       chip.hidden = false;
       const width = chip.offsetWidth || 48, height = chip.offsetHeight || 32;
