@@ -384,9 +384,9 @@ html body:not(#\#):not(#\#) .save-place {
   column-gap: 12px;
   box-sizing: border-box;
   width: 100%;
-  min-height: 48px;
+  min-height: 44px;
   margin: 0;
-  padding: 6px 10px;
+  padding: 4px 10px;
   border: 0;
   border-top: var(--stroke-hairline, 1px) solid var(--mini-rule, var(--color-rule));
   border-radius: 0;
@@ -523,27 +523,41 @@ html body:not(#\#):not(#\#) .seal-strip :is(.seal-place-show, .seal-place-move) 
 html body:not(#\#):not(#\#) .seal-strip .seal-place-show { color: var(--color-accent); }
 html body:not(#\#):not(#\#) .seal-strip .seal-strip-lists > .seal-act[data-strip-action='remove'], html body:not(#\#):not(#\#) .seal-strip .seal-place-move { color: var(--color-ink-2); }
 html body:not(#\#):not(#\#) button.save-one .save-place-said { white-space: nowrap; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-html body:not(#\#):not(#\#) .seal-strip[data-mode='placed'] .seal-strip-status { color: var(--color-ink); font-weight: 600; }
+html body:not(#\#):not(#\#) .seal-strip[data-mode='placed'] .seal-strip-status { flex: 1 0 100%; min-height: 0; margin: 2px 8px 0; color: var(--color-ink); font-weight: 600; }
 html body:not(#\#):not(#\#) .seal-strip[data-mode='choose'] .seal-strip-status, html body:not(#\#):not(#\#) .seal-strip[data-mode='move'] .seal-strip-status { flex: 1 0 100%; min-height: 0; margin: 2px 4px 2px; }
 html body:not(#\#):not(#\#) .seal-strip-form { align-items: center; }
 
-/* Saved today: a slip standing on the bottom bar's edge over Today, its count pressed in 朱 as the seal is */
+/* Saved today and a save's news: a row of the bottom bar itself (P2-1), its paper and its edge; its height is counted in
+   the bar's (corridor.js observePrimaryDocks), so every control docked above the bar rises with it and nothing is under it */
+html body:not(#\#):not(#\#) .primary-tabs > #saved-row {
+  /* the bar's first row, across its five columns: the tabs and their track sit in the row below, as before */
+  position: relative;
+  grid-column: 1 / -1;
+  order: -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  height: 44px;
+  margin: -6px 0 2px;
+  padding: 0;
+  border-bottom: var(--stroke-hairline, 1px) solid color-mix(in srgb, var(--color-edge-strong, var(--color-rule)) 60%, transparent);
+  color: var(--color-ink);
+}
+/* the moving car rides the tabs' track, a row lower while the row stands */
+html body:not(#\#):not(#\#) .primary-tabs[data-saved-row] > .line-car { top: calc(var(--line-y) - 6px + 40px); }
 html body:not(#\#):not(#\#) #saved-today {
-  position: absolute;
-  bottom: 100%;
-  left: calc(var(--slip-left, 0px) + 8px);
-  z-index: 2;
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: 7px;
-  height: 34px;
-  margin: 0 0 -1px;
-  padding: 0 10px 0 9px;
-  border: var(--stroke-hairline, 1px) solid var(--color-bar-line, var(--color-rule));
-  border-bottom: 0;
-  border-radius: 7px 7px 0 0;
-  background: var(--color-paper, #f5efe0);
-  box-shadow: 0 -2px 6px -3px color-mix(in srgb, var(--color-ink) 28%, transparent);
+  height: 44px;
+  margin: 0;
+  padding: 0 10px 0 6px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  box-shadow: none;
   color: var(--color-ink);
   font: 600 var(--type-label) / 1 var(--font-ui);
   letter-spacing: 0;
@@ -551,8 +565,6 @@ html body:not(#\#):not(#\#) #saved-today {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-/* the finger's target is 44 high: the slip's own 34 and five above and below it */
-html body:not(#\#):not(#\#) #saved-today::after { content: ''; position: absolute; inset: -5px -4px -5px; }
 html body:not(#\#):not(#\#) #saved-today .saved-today-mark {
   width: 11px;
   height: 15px;
@@ -572,35 +584,64 @@ html body:not(#\#):not(#\#) #saved-today .saved-today-count {
   font: 700 12px / 1 var(--font-data, var(--font-ui));
   font-variant-numeric: tabular-nums;
 }
-html body:not(#\#):not(#\#) #saved-today:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
-html body:not(#\#):not(#\#) .primary-tabs[data-wrapped='true'] #saved-today { bottom: 100%; }
+html body:not(#\#):not(#\#) #saved-today:hover { background: color-mix(in srgb, var(--color-accent) 7%, transparent); }
+html body:not(#\#):not(#\#) #saved-today:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+html body:not(#\#):not(#\#) #saved-news { display: flex; flex: 1 1 auto; align-items: center; justify-content: flex-end; gap: 4px; min-width: 0; margin: 0; font: 500 var(--type-label) / 1.2 var(--font-ui); color: var(--color-ink-2); }
+html body:not(#\#):not(#\#) #saved-news[hidden] { display: none; }
+html body:not(#\#):not(#\#) #saved-news .saved-news-text { display: -webkit-box; min-width: 0; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow-wrap: anywhere; text-align: end; }
+/* on a phone, while a save's news stands, Saved today keeps its mark and its number and lends its words' room to the
+   news, so the news can name the place whole ("Saved 産業 in Review · Undo") */
+@media (max-width: 699px) {
+  html body:not(#\#):not(#\#) #saved-row[data-news] #saved-today .saved-today-words { display: none; }
+}
+html body:not(#\#):not(#\#) #saved-news .saved-news-action { flex: 0 0 auto; min-height: 44px; padding: 0 10px; border: 0; border-radius: var(--radius-control); background: transparent; color: var(--color-accent); font: 600 var(--type-label) / 1 var(--font-ui); cursor: pointer; }
+html body:not(#\#):not(#\#) #saved-news .saved-news-action:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
 
-/* a saved place opened over the page: a sheet of paper above the bar (a phone), beside its door (wide) */
+/* a saved place's words (Show): where the Save that asked stands — in the box, in the strip, in the bar's drawer, or
+   beside the box in a wide window's margin. It lies over nothing of the page's */
 html body:not(#\#):not(#\#) #save-place-panel {
-  position: fixed;
-  left: 12px;
-  right: 12px;
-  /* above the bar and the Saved today slip on its edge */
-  bottom: calc(var(--primary-tabs-height, 64px) + 46px + env(safe-area-inset-bottom, 0px));
-  z-index: 88;
   display: flex;
   flex-direction: column;
-  max-height: min(60vh, calc(100dvh - var(--primary-tabs-height, 64px) - 140px));
-  padding: 4px 0 6px;
+  box-sizing: border-box;
+  color: var(--color-ink);
+}
+html body:not(#\#):not(#\#) #save-place-panel.is-inline { margin: 0 10px 8px; padding: 2px 0 4px; border-top: var(--stroke-hairline, 1px) solid var(--mini-rule, var(--color-rule)); }
+html body:not(#\#):not(#\#) .seal-strip #save-place-panel.is-inline { margin: 6px 0 4px; }
+html body:not(#\#):not(#\#) #save-place-panel.is-beside,
+html body:not(#\#):not(#\#) .vocabulary-list-popover.is-chooser.is-beside {
+  position: fixed;
+  z-index: 86;
+  overflow: auto;
+  padding: 6px 4px 8px;
   border: var(--stroke-hairline, 1px) solid color-mix(in srgb, var(--color-ink) 22%, transparent);
   border-radius: var(--radius-overlay, 12px);
   background: var(--color-paper, #f5efe0);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 55%), 0 3px 8px -3px rgb(20 24 34 / 26%), 0 16px 44px -14px rgb(20 24 34 / 34%);
-  color: var(--color-ink);
   animation: seal-strip-rise var(--motion-room, 240ms) var(--ease-enter, ease-out) backwards;
 }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not(#\#):not(#\#) #save-place-panel {
+html body:not(#\#):not(#\#) #save-place-panel.is-drawer {
+  position: fixed;
+  top: var(--drawer-top, 0px);
+  right: 0;
+  left: 0;
+  z-index: 86;
+  max-width: 560px;
+  max-height: calc(100dvh - var(--drawer-top, 0px) - 24px);
+  margin: 0 auto;
+  padding: 6px 14px 12px;
+  overflow: auto;
+  border-bottom: var(--stroke-hairline, 1px) solid var(--color-bar-line, var(--color-rule));
+  background: var(--color-paper, #f5efe0);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not(#\#):not(#\#) :is(#save-place-panel, .vocabulary-list-popover.is-chooser).is-beside {
   border-color: color-mix(in srgb, var(--color-gold, #e2bd6c) 34%, transparent);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%), 0 0 0 1px rgb(0 0 0 / 30%), 0 16px 48px -14px rgb(0 0 0 / 62%);
 }
-@media (min-width: 700px) {
-  html body:not(#\#):not(#\#) #save-place-panel { right: auto; left: var(--panel-left, 16px); width: 440px; max-height: min(62vh, 640px); }
-}
+/* a chooser beside the box is no sheet over the page: the bar stays, with Saved today, and a tab still leaves the screen
+   (P2-8; editorial.css takes the bar away under any chooser that is not inline) */
+html body.has-primary-tabs:not(#\#):not(#\#):has(#vocabulary-list-popover.is-beside):not(:has(#sheet, #stroke-page, [role='dialog'][aria-modal='true']:not([hidden]), .world-picker, #app .kp-study, #app .kp-done)) .primary-tabs:not([data-wrapped='true']) { display: grid; }
+/* while the box holds a place's words, its kanji band and sentence door step aside, as for its chooser */
+html body:not(#\#):not(#\#) #mini:has(> #save-place-panel.is-inline) > :is(.mini-web, .mini-sentence-wrap, .mini-why) { display: none; }
 html body:not(#\#):not(#\#) #save-place-panel:focus { outline: none; }
 html body:not(#\#):not(#\#) .save-place-head { display: flex; align-items: center; gap: 8px; padding: 2px 6px 2px 16px; }
 html body:not(#\#):not(#\#) .save-place-title { display: flex; flex: 1 1 auto; align-items: baseline; gap: 10px; min-width: 0; margin: 0; font: 700 var(--type-title, 22px) / 1.25 var(--font-display); color: var(--color-ink); }
@@ -609,6 +650,7 @@ html body:not(#\#):not(#\#) .save-place-title-count { flex: 0 0 auto; font: 500 
 html body:not(#\#):not(#\#) .save-place-close { min-height: 44px; padding: 0 10px; border: 0; background: transparent; color: var(--color-ink-2); font: 600 var(--type-control) / 1 var(--font-ui); cursor: pointer; }
 html body:not(#\#):not(#\#) .save-place-note { margin: 0 16px 6px; font: 400 var(--type-label) / 1.45 var(--font-ui); color: var(--color-ink-2); }
 html body:not(#\#):not(#\#) .save-place-words { flex: 1 1 auto; min-height: 0; margin: 0; padding: 0; overflow: auto; list-style: none; border-top: var(--stroke-hairline, 1px) solid var(--color-rule); }
+html body:not(#\#):not(#\#) #save-place-panel.is-inline .save-place-title { font-size: var(--type-control); }
 html body:not(#\#):not(#\#) .save-place-word { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 16px; border-bottom: var(--stroke-hairline, 1px) solid var(--color-rule-soft, var(--color-rule)); }
 html body:not(#\#):not(#\#) .save-place-w { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 18px / 1.3 var(--font-reading, var(--font-display)); }
 html body:not(#\#):not(#\#) .save-place-kind { flex: 0 0 auto; font: 500 var(--type-caption, 12px) / 1 var(--font-ui); color: var(--color-muted); }
@@ -646,3 +688,33 @@ html body:not(#\#):not(#\#) .saved-shelf-name { min-width: 0; max-width: 14em; o
 html body:not(#\#):not(#\#) .saved-shelf-count { font: 500 var(--type-label) / 1 var(--font-data, var(--font-ui)); font-variant-numeric: tabular-nums; opacity: 0.75; }
 html body:not(#\#):not(#\#) .saved-shelf-place:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 html body:not(#\#):not(#\#) .saved-shelf-note { margin: 10px 0 0; font: 400 var(--type-label) / 1.45 var(--font-ui); color: var(--color-ink-2); }
+
+/* the one chooser's head: what it does on the left, the word's own acts (Copy) apart on the right (P2-4) */
+html body:not(#\#):not(#\#) .save-chooser-head { display: flex; align-items: center; gap: 8px; margin: 6px 0 4px; padding: 0 2px 0 8px; }
+html body:not(#\#):not(#\#) .save-chooser-head > .save-chooser-title { flex: 1 1 auto; min-width: 0; margin: 0; }
+html body:not(#\#):not(#\#) .save-chooser-acts { display: flex; flex: 0 0 auto; gap: 0; }
+html body:not(#\#):not(#\#) .save-chooser-act { min-height: 44px; padding: 0 10px; border: 0; border-radius: var(--radius-control); background: transparent; color: var(--color-ink-2); font: 500 var(--type-label) / 1 var(--font-ui); cursor: pointer; }
+html body:not(#\#):not(#\#) .save-chooser-act + .save-chooser-act::before { content: '·'; margin: 0 8px 0 -4px; color: var(--color-rule); }
+html body:not(#\#):not(#\#) .save-chooser-act:hover { color: var(--color-ink); }
+html body:not(#\#):not(#\#) .save-chooser-act:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+html body:not(#\#):not(#\#) .save-chooser-status { margin: 4px 8px 0; font: 400 var(--type-label) / 1.4 var(--font-ui); color: var(--color-accent); }
+html body:not(#\#):not(#\#) .save-chooser-status:empty { display: none; }
+html body:not(#\#):not(#\#) .save-chooser-foot { display: flex; flex-wrap: wrap; gap: 0 2px; margin: 4px 0 0; padding: 2px 0 0; border-top: var(--stroke-hairline, 1px) solid var(--color-rule-soft, var(--color-rule)); }
+html body:not(#\#):not(#\#) .save-chooser-foot > .save-place-act + .save-place-act::before { content: '·'; margin: 0 10px 0 -6px; color: var(--color-rule); font-weight: 400; }
+html body:not(#\#):not(#\#) .save-chooser-foot > #save-chooser-show { color: var(--color-accent); }
+/* the strip holds the same chooser: full rows, Review's seal and line, the counts (P2-2) */
+html body:not(#\#):not(#\#) .seal-strip .seal-strip-chooser { display: block; margin: 0 -4px; }
+html body:not(#\#):not(#\#) .seal-strip .seal-strip-chooser:empty { display: none; }
+html body:not(#\#):not(#\#) .seal-strip .save-place.seal-list { max-width: none; overflow: visible; text-overflow: clip; white-space: normal; }
+html body:not(#\#):not(#\#) .seal-strip .save-place.seal-list[aria-pressed]::after { content: none; }
+html body:not(#\#):not(#\#) .seal-strip .seal-strip-chooser .save-chooser-form:not([hidden]) { display: flex; gap: 8px; margin: 6px 0 2px; padding: 0 8px; }
+html body:not(#\#):not(#\#) .seal-strip .seal-strip-chooser .save-chooser-form .vocabulary-list-field { flex: 1 1 auto; min-width: 0; min-height: 44px; font-size: 16px; }
+html body:not(#\#):not(#\#) .seal-strip .seal-strip-lists[hidden] { display: none; }
+html body:not(#\#):not(#\#) .seal-strip[data-mode='placed'] .seal-strip-lists { gap: 0 2px; }
+html body:not(#\#):not(#\#) .seal-strip[data-mode='placed'] .seal-strip-lists > .save-place-act { min-height: 44px; margin: 0; padding: 0 10px; }
+html body:not(#\#):not(#\#) .seal-strip .seal-strip-lists > .save-place-act + .save-place-act::before { content: '·'; margin: 0 10px 0 -6px; color: var(--color-rule); font-weight: 400; }
+/* the strip's acts: separate words, a dot between them (P2-3) */
+html body:not(#\#):not(#\#) .seal-strip .seal-strip-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 0 2px; margin: 6px 0 0; padding-top: 2px; }
+html body:not(#\#):not(#\#) .seal-strip .seal-strip-acts > .seal-act { min-height: 44px; padding: 0 10px; color: var(--color-accent); }
+html body:not(#\#):not(#\#) .seal-strip .seal-strip-acts > .seal-act:not([hidden]) ~ .seal-act:not([hidden])::before { content: '·'; margin: 0 10px 0 -6px; color: var(--color-rule); font-weight: 400; }
+html body:not(#\#):not(#\#) .seal-strip .seal-strip-lists > [data-strip-action='remove'] { color: var(--color-ink-2); }

@@ -157,7 +157,10 @@ function placeSealStrip(open) {
   const scroller = onPage ? anchor.closest('#sheet') : null;
   const ceiling = Math.max(glassTop + 8, frameFoot(onPage, fixedEdge) ?? 0);
   const view = vv?.height || window.innerHeight;
-  strip.style.maxHeight = `${Math.max(96, Math.floor(view * 0.4))}px`;
+  // SAVE · a strip that holds the chooser, or a place's words (Show), may take more of the glass than a strip that names
+  // the place
+  const share = ['choose', 'move'].includes(strip.dataset.mode) || strip.querySelector('#save-place-panel') ? 0.56 : 0.4;
+  strip.style.maxHeight = `${Math.max(96, Math.floor(view * share))}px`;
   // Hfix-1A · measured without its own "more" fade: in Chromium the fade's sticky foot adds 4 px of overflow, so a strip
   // seated again while it showed measured as not fitting, was cut a row short, and kept its fade (markStripMore sets it
   // again once seated)
@@ -173,7 +176,7 @@ function placeSealStrip(open) {
   const floorAt = (x) => Math.min(glassBottom, fixedEdge('.listen-row', 'top') ?? glassBottom, fixedEdge('#primary-tabs', 'top') ?? glassBottom,
     fixedEdge('.kp-grades', 'top') ?? glassBottom, layersMarkTop(x, w) ?? glassBottom) - 8;
   let floor = floorAt(left);
-  const cap = Math.max(96, Math.floor(Math.min(view * 0.4, floor - ceiling)));
+  const cap = Math.max(96, Math.floor(Math.min(view * share, floor - ceiling)));
   strip.style.maxHeight = `${cap}px`;
   const h = Math.min(strip.offsetHeight, cap);
   const rect = (top, tall) => ({ left, right: left + w, top, bottom: top + tall });

@@ -9828,7 +9828,8 @@ function openPlainSaveMenu(invoker, { more = [], place = null, home = null, keep
       if (pop.isConnected) closeVocabularyListPopover({ restoreFocus: true });
       const owner = invoker?.isConnected ? invoker : invoker?.id ? document.getElementById(invoker.id) : null;
       if (owner?.dataset?.saveOne != null) paintWordSave(owner, true);
-      showReaderToast(savedToastWords(where, false), show ? [tx('見る', 'Show'), show] : null);
+      // the Save that asked names the place now; a word's anchor (the strip's sentence) names nothing, so the bar says it
+      if (!saveNamesPlace(owner)) saySaveNews(savedToastWords(where, false), show ? [tx('見る', 'Show'), show] : null);
     });
     places.append(one);
     pop.append(title, places, notice);
@@ -9991,12 +9992,17 @@ function closeVocabularyListPopover({ restoreFocus = false } = {}) {
  * its history and when it is due stay as they are. */
 const CHOOSER_LISTS_SHOWN = 5;
 let savePickInFlight = false; // a pick's keep can draw its room again; no Save reopens a chooser while it lands
+let saveNewsQuiet = false; // a pick whose own Save names the place: the keep says nothing (P2-5)
+/** A Save that names the place it saved into (the box's, a row's, a page's): its pick needs no news. The article bar's
+ * Save names only its word, and a word's anchor (the strip's sentence) names nothing. */
+const saveNamesPlace = (invoker) => !!invoker?.isConnected && invoker.dataset?.saveOne != null && invoker.dataset.saveBar == null;
 const sameSaved = (node) => (row) => !!row && row.t === node.t && row.id === node.id;
 /** A place's name as a pair: Review, a list's own name, or a plain item's home (the tutor page). */
 function placeWords(place) {
   if (!place) return ['', ''];
   if (place.kind === 'review') return ['復習', 'Review'];
   if (place.kind === 'list') return [place.name, place.name];
+  if (place.kind === 'today') return ['今日の保存', 'Saved today'];
   return place.names || ['', ''];
 }
 /** "Saved in Review ✓" in three parts, the place's own name in the middle (a long name ends with an ellipsis there). */
@@ -10080,8 +10086,8 @@ function paintPlacedSave(invoker, node, label, saved) {
     paintMiniPath(invoker.closest('.mini-actions'), now);
   }
 }
-/** The toast after a pick names the place, and its Undo takes the pick back: out again for a new save, back to where it
- * was for a move. */
+/** The news after a pick names the place, and its Undo takes the pick back: out again for a new save, back to where it
+ * was for a move. Said in the bar's row, only when the Save that asked does not name the place itself (P2-5). */
 function sayPlaced(node, label, result, { saved = null, keep = null } = {}) {
   const allowed = personalHost?.captureAccess?.() || (() => true);
   const undo = result.from
@@ -10089,7 +10095,211 @@ function sayPlaced(node, label, result, { saved = null, keep = null } = {}) {
       if (back.status === 'ok') paintPlacedSave(null, node, label, saved);
     })
     : () => allowed() && removeKept(node, label);
-  showReaderToast(savedToastWords(result.place, !!result.from), [tx('元に戻す', 'Undo'), undo]);
+  const [ja, en] = placeWords(result.place);
+  const where = result.place?.kind === 'list' ? `「${ja}」` : ja;
+  saySaveNews(result.from ? tx(`「${label}」を${where}に移しました`, `Moved ${label} to ${en}`)
+    : tx(`「${label}」を${where}に保存しました`, `Saved ${label} in ${en}`), [tx('元に戻す', 'Undo'), undo]);
+}
+
+/* SAVE · THE ONE CHOOSER (pass 2, P2-2: "one chooser, one look"). One component, built here, wherever a Save asks where
+ * a word goes: in its box, in the article bar's drawer, in a page's or a row's menu, beside the box on a wide window, and
+ * in the long press's strip. Its head names the act ("Save 自動車 to") with the word's own quiet acts (Copy) apart from
+ * the places, at its right; then the places as one list: Review first with its seal 復, its one line of explanation and
+ * its count, then his lists the one he used last first (five, then "More lists · N"), each with its count, then New
+ * list…, which asks the name and saves there in the same act. The ids of each place follow where it stands. */
+const CHOOSER_IDS = {
+  menu: { title: 'vocabulary-list-title', review: 'mini-review', more: 'save-chooser-more', fresh: 'vocabulary-list-new',
+    field: 'vocabulary-list-name', create: 'vocabulary-list-create', listClass: '' },
+  strip: { title: 'seal-strip-title', review: 'seal-strip-review', more: 'seal-strip-all', fresh: 'seal-strip-new',
+    field: 'seal-strip-name', create: 'seal-strip-create', listClass: ' seal-list' },
+};
+function buildPlaceChooser({ node, label, current, kind = 'menu', more = [], onPick, onMore = null }) {
+  const ids = CHOOSER_IDS[kind];
+  const here = (to) => !!current && current.kind === to.kind && (to.kind === 'review' || current.name === to.name);
+  const head = el('div', 'save-chooser-head');
+  const title = el('p', 'vocabulary-list-title save-chooser-title');
+  title.id = ids.title;
+  const word = el('span', 'save-chooser-word', label);
+  word.lang = 'ja';
+  if (bi()) title.append(current ? 'Move ' : 'Save ', word, ' to');
+  else title.append('「', word, current ? '」の移動先' : '」の保存先');
+  head.append(title);
+  // the word's own acts (Copy, the deck's Remove from review) are not places: they stand in the head, apart (P2-4)
+  if (more.length) {
+    const acts = el('span', 'save-chooser-acts');
+    for (const item of more) {
+      const button = el('button', 'save-chooser-act', item.label);
+      button.type = 'button';
+      button.id = item.id;
+      if (item.disabled) button.disabled = true;
+      button.addEventListener('click', (event) => { event.stopPropagation(); onMore?.(item); });
+      acts.append(button);
+    }
+    head.append(acts);
+  }
+  const places = el('div', 'save-chooser-places');
+  places.setAttribute('role', 'group');
+  places.setAttribute('aria-labelledby', title.id);
+  const choices = [];
+  const choice = (to, { id = '', count = null, sub = '' } = {}) => {
+    const button = el('button', `save-place${to.kind === 'review' ? ' is-review' : ids.listClass}`);
+    button.type = 'button';
+    if (id) button.id = id;
+    if (to.kind === 'list') button.dataset.list = to.name;
+    else button.dataset.place = 'review';
+    const [ja, en] = placeWords(to);
+    button.append(el('span', 'save-place-name', tx(ja, en)));
+    if (sub) button.append(el('span', 'save-place-sub', sub));
+    if (count != null) {
+      const n = el('span', 'save-place-count', String(count));
+      n.setAttribute('aria-label', tx(`${count}語`, `${count} saved`));
+      button.append(n);
+    }
+    if (here(to)) {
+      button.setAttribute('aria-current', 'true');
+      button.append(el('span', 'save-place-here', '✓'));
+    }
+    button.addEventListener('click', (event) => { event.stopPropagation(); void onPick(to, { button }); });
+    choices.push(button);
+    return button;
+  };
+  places.append(choice({ kind: 'review' }, { id: ids.review, count: S.taken.length,
+    sub: tx('カードになって戻ってくる', 'Comes back to study as a card') }));
+  const order = listsByRecency(S.lists, S.saveMemory);
+  const shownNames = order.slice(0, CHOOSER_LISTS_SHOWN);
+  // the list it is on now stays in sight among the first ones, whatever its age
+  if (current?.kind === 'list' && !shownNames.includes(current.name) && order.includes(current.name)) shownNames.splice(CHOOSER_LISTS_SHOWN - 1, 1, current.name);
+  for (const name of shownNames) places.append(choice({ kind: 'list', name }, { count: S.lists[name].length }));
+  const restNames = order.filter((name) => !shownNames.includes(name));
+  // the lists past the first ones wait behind "More lists · N"; a seat too short for them all folds more of them there
+  // (fold, below), so every place it shows stands whole and none scrolls inside a small box (P2-6)
+  const rest = el('div', 'save-chooser-rest');
+  rest.hidden = true;
+  for (const name of restNames) rest.append(choice({ kind: 'list', name }, { count: S.lists[name].length }));
+  const all = el('button', 'save-place save-place-all');
+  const allName = el('span', 'save-place-name');
+  all.append(allName);
+  all.type = 'button';
+  all.id = ids.more;
+  all.setAttribute('aria-expanded', 'false');
+  const paintAll = () => {
+    const n = rest.children.length;
+    allName.textContent = tx(`ほかのリスト · ${n}`, `More lists · ${n}`);
+    all.hidden = !n || !rest.hidden;
+  };
+  all.addEventListener('click', (event) => {
+    event.stopPropagation();
+    rest.hidden = false;
+    all.hidden = true;
+    all.setAttribute('aria-expanded', 'true');
+    rest.querySelector('button')?.focus({ preventScroll: true });
+    chooser.onGrow?.(rest);
+  });
+  places.append(all, rest);
+  paintAll();
+  const fresh = el('button', 'save-place is-new vocabulary-list-action vocabulary-list-new');
+  fresh.append(el('span', 'save-place-name', tx('新しいリスト…', 'New list…')));
+  fresh.type = 'button';
+  fresh.id = ids.fresh;
+  const form = el('form', 'vocabulary-list-form save-chooser-form');
+  form.hidden = true;
+  const field = el('input', 'vocabulary-list-field');
+  field.type = 'text';
+  field.id = ids.field;
+  field.maxLength = 80;
+  field.enterKeyHint = 'done';
+  field.autocomplete = 'off';
+  field.placeholder = tx('新しいリストの名前', 'Name the new list');
+  field.setAttribute('aria-label', tx('新しいリストの名前', 'Name a new list'));
+  // one draft per word, shared by the menu's field and the strip's: a name typed in either survives a failed write
+  field.dataset.recordDraftKey = `vocabulary-list:${JSON.stringify([node.t, node.id, node.seq ?? null, node.reading ?? null])}`;
+  attachRecordDraft(field);
+  const create = el('button', 'chip btn-primary vocabulary-list-create', current ? tx('ここに移す', 'Move here') : tx('ここに保存', 'Save here'));
+  create.type = 'submit';
+  create.id = ids.create;
+  form.append(field, create);
+  const openForm = () => {
+    fresh.hidden = true;
+    form.hidden = false;
+    field.focus({ preventScroll: true });
+    keepFieldAboveKeyboard(field);
+    chooser.onGrow?.(form);
+  };
+  fresh.addEventListener('click', (event) => { event.stopPropagation(); openForm(); });
+  if (field.value) { fresh.hidden = true; form.hidden = false; }
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const value = field.value.trim();
+    if (!value) { field.focus(); return; }
+    void onPick({ kind: 'list', name: value }, { typed: true });
+  });
+  places.append(fresh, form);
+  const notice = el('p', 'vocabulary-list-status save-chooser-status');
+  notice.setAttribute('role', 'status');
+  const chooser = {
+    head, title, places, notice, choices, form, field, create, fresh, here,
+    paint(busy) {
+      for (const button of choices) button.disabled = busy || !recordWritable();
+      create.disabled = busy || !recordWritable();
+      field.readOnly = busy;
+    },
+    clearTyped() { field.value = ''; rememberRecordDraft(field); form.hidden = true; fresh.hidden = false; },
+    /** While its seat is too short (overflows), the oldest shown list steps behind "More lists"; the list it is on now and
+     * Review always stay. Runs on the glass only: a seat with no measure never overflows. */
+    fold(overflows) {
+      if (!rest.hidden) return;
+      for (let guard = 0; guard < 64 && overflows(); guard += 1) {
+        const shown = choices.filter((button) => button.dataset.list && button.parentElement === places && button.getAttribute('aria-current') !== 'true');
+        const last = shown[shown.length - 1];
+        if (!last) break;
+        rest.prepend(last);
+        paintAll();
+      }
+    },
+    first: () => choices.find((button) => button.getAttribute('aria-current') === 'true') || choices[0],
+    onGrow: null,
+  };
+  return chooser;
+}
+
+/* SAVE · a wide window keeps an empty margin beside the page: there the chooser (and a place's words) stands beside the
+ * box, as tall as it needs, covering no text and no control (P2-6: at 1728 a word near the top with eight lists showed
+ * its chooser scrolled inside a box with no room). Narrower windows and phones keep it inside the box. */
+const BESIDE_WIDTH = 340;
+function besideBox(card, invoker = null) {
+  if (!card || typeof window === 'undefined' || window.innerWidth < 1000) return null;
+  const page = document.querySelector('#app > main')?.getBoundingClientRect();
+  if (!page || !page.width) return null;
+  // the margin is free only outside both the page's column and the box (a box near the column's edge reaches into it)
+  const box = card.getBoundingClientRect();
+  const leftEdge = Math.min(page.left, box.left), rightEdge = Math.max(page.right, box.right);
+  const leftRoom = leftEdge - 32, rightRoom = window.innerWidth - rightEdge - 32;
+  const width = Math.min(BESIDE_WIDTH, Math.max(leftRoom, rightRoom));
+  if (width < 300) return null;
+  // the side of the control that asked (Saved today's own end of the bar), else the box's side
+  const from = invoker?.getBoundingClientRect?.();
+  const preferLeft = (from?.width ? from.left + from.width / 2 : box.left + box.width / 2) < window.innerWidth / 2;
+  const side = (preferLeft && leftRoom >= width) || rightRoom < width ? 'left' : 'right';
+  return { side, width, left: side === 'left' ? Math.round(leftEdge - 16 - width) : Math.round(rightEdge + 16) };
+}
+function placeBeside(panel, card, invoker) {
+  const room = besideBox(card, invoker);
+  if (!room) return false;
+  panel.classList.add('is-beside');
+  panel.dataset.side = room.side;
+  document.body.append(panel);
+  const chrome = document.querySelector('#app > .chrome')?.getBoundingClientRect();
+  const ceiling = Math.max(8, chrome?.bottom || 0) + 12;
+  const bar = document.getElementById('primary-tabs');
+  const barTop = bar?.getClientRects().length ? bar.getBoundingClientRect().top : window.innerHeight;
+  const floor = barTop - 12;
+  const anchorTop = (invoker?.getBoundingClientRect?.() || card.getBoundingClientRect()).top;
+  panel.style.left = `${room.left}px`;
+  panel.style.width = `${room.width}px`;
+  panel.style.maxHeight = `${Math.max(160, floor - ceiling)}px`;
+  const height = Math.min(panel.getBoundingClientRect().height, floor - ceiling);
+  panel.style.top = `${Math.round(Math.max(ceiling, Math.min(anchorTop, floor - height)))}px`;
+  return true;
 }
 
 function openSaveChooser(node, label, invoker, { keep = null, saved = null, remove = undefined, more = [], place = null, keyboard = true } = {}) {
@@ -10099,6 +10309,7 @@ function openSaveChooser(node, label, invoker, { keep = null, saved = null, remo
     const same = vocabularyListInvoker === invoker;
     if (!closeVocabularyListPopover({ restoreFocus: same }) || same) return;
   }
+  closeSavePlace();
   hideReaderToast();
   const isSaved = () => (saved ? !!saved() : keptState(node) === 'taken');
   const current = isSaved() ? savedPlace(node) || { kind: 'review' } : null;
@@ -10111,164 +10322,53 @@ function openSaveChooser(node, label, invoker, { keep = null, saved = null, remo
   pop.dataset.chooser = current ? 'move' : 'save';
   pop.tabIndex = -1;
   pop.setAttribute('role', 'dialog');
-  const title = el('p', 'vocabulary-list-title save-chooser-title');
-  title.id = 'vocabulary-list-title';
-  const word = el('span', 'save-chooser-word', label);
-  word.lang = 'ja';
-  if (bi()) title.append(current ? 'Move ' : 'Save ', word, ' to');
-  else title.append('「', word, current ? '」の移動先' : '」の保存先');
-  pop.setAttribute('aria-labelledby', title.id);
-  const places = el('div', 'save-chooser-places');
-  places.setAttribute('role', 'group');
-  places.setAttribute('aria-labelledby', title.id);
-  const notice = el('p', 'vocabulary-list-status');
-  notice.setAttribute('role', 'status');
   let busy = false;
-  const choices = [];
-  const here = (to) => !!current && current.kind === to.kind && (to.kind === 'review' || current.name === to.name);
-  const choice = (to, { id = '', count = null, sub = '' } = {}) => {
-    const button = el('button', `save-place${to.kind === 'review' ? ' is-review' : ''}`);
-    button.type = 'button';
-    if (id) button.id = id;
-    if (to.kind === 'list') button.dataset.list = to.name;
-    else button.dataset.place = 'review';
-    const [ja, en] = placeWords(to);
-    const name = el('span', 'save-place-name', tx(ja, en));
-    button.append(name);
-    if (sub) button.append(el('span', 'save-place-sub', sub));
-    if (count != null) {
-      const n = el('span', 'save-place-count', String(count));
-      n.setAttribute('aria-label', tx(`${count}語`, `${count} saved`));
-      button.append(n);
-    }
-    if (here(to)) {
-      button.setAttribute('aria-current', 'true');
-      button.append(el('span', 'save-place-here', '✓'));
-    }
-    button.addEventListener('click', (event) => { event.stopPropagation(); void pick(to); });
-    choices.push(button);
-    return button;
-  };
-  places.append(choice({ kind: 'review' }, { id: 'mini-review', count: S.taken.length,
-    sub: tx('カードになって戻ってくる', 'Comes back to study as a card') }));
-  const order = listsByRecency(S.lists, S.saveMemory);
-  // the list it is on now stays in sight among the first ones, whatever its age
-  const shownNames = order.slice(0, CHOOSER_LISTS_SHOWN);
-  if (current?.kind === 'list' && !shownNames.includes(current.name) && order.includes(current.name)) shownNames.splice(CHOOSER_LISTS_SHOWN - 1, 1, current.name);
-  for (const name of shownNames) places.append(choice({ kind: 'list', name }, { count: S.lists[name].length }));
-  const restNames = order.filter((name) => !shownNames.includes(name));
-  if (restNames.length) {
-    const rest = el('div', 'save-chooser-rest');
-    rest.hidden = true;
-    for (const name of restNames) rest.append(choice({ kind: 'list', name }, { count: S.lists[name].length }));
-    const all = el('button', 'save-place save-place-all');
-    all.append(el('span', 'save-place-name', tx(`ほかのリスト · ${restNames.length}`, `More lists · ${restNames.length}`)));
-    all.type = 'button';
-    all.id = 'save-chooser-more';
-    all.setAttribute('aria-expanded', 'false');
-    all.addEventListener('click', (event) => {
-      event.stopPropagation();
-      rest.hidden = false;
-      all.hidden = true;
-      rest.querySelector('button')?.focus({ preventScroll: true });
-      keepMenuInView(pop);
-    });
-    places.append(all, rest);
-  }
-  // New list…: one row until it is asked for; then its name field and one button that makes the list and puts the word in
-  const fresh = el('button', 'save-place is-new vocabulary-list-action vocabulary-list-new');
-  fresh.append(el('span', 'save-place-name', tx('新しいリスト…', 'New list…')));
-  fresh.type = 'button';
-  fresh.id = 'vocabulary-list-new';
-  const form = el('form', 'vocabulary-list-form save-chooser-form');
-  form.hidden = true;
-  const field = el('input', 'vocabulary-list-field');
-  field.type = 'text';
-  field.id = 'vocabulary-list-name';
-  field.maxLength = 80;
-  field.enterKeyHint = 'done';
-  field.autocomplete = 'off';
-  field.placeholder = tx('新しいリストの名前', 'Name the new list');
-  field.setAttribute('aria-label', tx('新しいリストの名前', 'Name a new list'));
-  field.dataset.recordDraftKey = `vocabulary-list:${JSON.stringify([node.t, node.id, node.seq ?? null, node.reading ?? null])}`;
-  attachRecordDraft(field);
-  const create = el('button', 'chip btn-primary vocabulary-list-create', current ? tx('ここに移す', 'Move here') : tx('ここに保存', 'Save here'));
-  create.type = 'submit';
-  create.id = 'vocabulary-list-create';
-  form.append(field, create);
-  fresh.addEventListener('click', (event) => {
-    event.stopPropagation();
-    fresh.hidden = true;
-    form.hidden = false;
-    field.focus({ preventScroll: true });
-    keepFieldAboveKeyboard(field);
-  });
-  if (field.value) { fresh.hidden = true; form.hidden = false; }
-  form.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const value = field.value.trim();
-    if (!value) { field.focus(); return; }
-    void pick({ kind: 'list', name: value }, { typed: true });
-  });
-  places.append(fresh, form);
-  pop.append(title, places, notice);
-  // the foot: a saved word's Show and Remove; then the surface's own rows (Copy, …)
-  const foot = el('div', 'vocabulary-list-more save-chooser-foot');
-  const footButton = (id, text, run, { keepOpen = false } = {}) => {
-    const button = el('button', 'vocabulary-list-action', text);
-    button.type = 'button';
-    button.id = id;
-    button.addEventListener('click', (event) => {
-      event.stopPropagation();
-      if (!keepOpen) closeVocabularyListPopover({ restoreFocus: true });
-      void run();
-    });
-    foot.append(button);
-    return button;
-  };
-  // in a word's box the place line above the chooser already holds Show and Remove (paintPlaceLine)
-  if (current && !invoker?.closest?.('.mini-actions')) {
+  const chooser = buildPlaceChooser({ node, label, current, kind: 'menu', more,
+    onMore: (item) => { closeVocabularyListPopover({ restoreFocus: true }); void item.run(); },
+    onPick: (to, opts) => pick(to, opts) });
+  pop.setAttribute('aria-labelledby', chooser.title.id);
+  pop.append(chooser.head, chooser.places, chooser.notice);
+  // a saved word's Show and Remove: in a word's box the place line above already holds them
+  const inBox = !!invoker?.closest?.('.mini-actions');
+  if (current && !inBox) {
+    const foot = el('div', 'save-chooser-foot');
+    const footButton = (id, text, run) => {
+      const button = el('button', 'save-place-act', text);
+      button.type = 'button';
+      button.id = id;
+      button.addEventListener('click', (event) => { event.stopPropagation(); void run(button); });
+      foot.append(button);
+      return button;
+    };
     footButton('save-chooser-show', tx(`${placeWords(current)[0]}を見る`, `Show ${placeWords(current)[1]}`),
-      () => showSavePlace(savedPlace(node) || current, { node, invoker }));
-    if (removeHere) footButton('save-chooser-remove', tx('保存を外す', 'Remove'), removeHere);
+      (button) => showSavePlace(savedPlace(node) || current, { node, invoker: button }));
+    if (removeHere) footButton('save-chooser-remove', tx('保存を外す', 'Remove'), () => { closeVocabularyListPopover({ restoreFocus: true }); return removeHere(); });
+    pop.append(foot);
   }
-  for (const item of more) {
-    const button = footButton(item.id, item.label, item.run);
-    if (item.disabled) button.disabled = true;
-  }
-  if (foot.childElementCount) pop.append(foot);
-  const paint = () => {
-    for (const button of choices) button.disabled = busy || !recordWritable();
-    create.disabled = busy || !recordWritable();
-    field.readOnly = busy;
-    pop.setAttribute('aria-busy', String(busy));
-  };
   const pick = async (to, { typed = false } = {}) => {
     if (busy || !allowed()) return;
-    if (current && here(to)) { closeVocabularyListPopover({ restoreFocus: true }); return; }
-    if (to.kind === 'list' && typed && owns(S.lists, to.name) && current && here({ kind: 'list', name: to.name })) {
-      closeVocabularyListPopover({ restoreFocus: true });
-      return;
-    }
+    if (current && chooser.here(to)) { closeVocabularyListPopover({ restoreFocus: true }); return; }
     busy = true;
     savePickInFlight = true;
-    notice.textContent = '';
-    paint();
+    const names = saveNamesPlace(invoker);
+    saveNewsQuiet = true;
+    chooser.notice.textContent = '';
+    chooser.paint(true);
     let result;
     try { result = await placeWord(node, label, to, { keep, saved }); }
     catch { result = { status: 'failed' }; }
-    finally { busy = false; savePickInFlight = false; }
+    finally { busy = false; savePickInFlight = false; saveNewsQuiet = false; }
     if (result.status !== 'ok') {
       if (!pop.isConnected) return;
-      notice.textContent = result.status === 'held' ? wordCaptureHeldText(node, { route: false }) : placeFailureWords(result.status);
-      paint();
+      chooser.notice.textContent = result.status === 'held' ? wordCaptureHeldText(node, { route: false }) : placeFailureWords(result.status);
+      chooser.paint(false);
       return;
     }
-    if (typed) { field.value = ''; rememberRecordDraft(field); }
+    if (typed) chooser.clearTyped();
     if (pop.isConnected) closeVocabularyListPopover({ restoreFocus: true });
     const owner = invoker?.isConnected ? invoker : invoker?.id ? document.getElementById(invoker.id) : null;
     paintPlacedSave(owner, node, label, isSaved);
-    sayPlaced(node, label, result, { saved, keep });
+    if (!names || !owner?.isConnected) sayPlaced(node, label, result, { saved, keep });
     // the word went somewhere: a seal presses onto it and flies to Saved today (G5's seal, now on his pick)
     if (result.created) {
       const anchor = owner?.closest?.('#mini') ? miniAnchor : null;
@@ -10281,16 +10381,38 @@ function openSaveChooser(node, label, invoker, { keep = null, saved = null, remo
     event.stopPropagation();
     closeVocabularyListPopover({ restoreFocus: true });
   });
-  paint();
+  chooser.paint(false);
   vocabularyListInvoker = invoker; vocabularyListNode = node;
   invoker?.setAttribute('aria-expanded', 'true');
   holdCardForChooser(invoker);
-  placeSaveMenu(pop, invoker, place);
+  const card = invoker?.closest?.('#mini');
+  if (card && placeBeside(pop, card, invoker)) chooser.onGrow = () => placeBeside(pop, card, invoker);
+  else {
+    placeSaveMenu(pop, invoker, place);
+    if (card && pop.closest('#mini')) {
+      // seated now, on the room its pinned top has (the box's own watcher would seat it only before the next paint),
+      // so the fold measures the seat it really gets
+      card._kept?.again?.();
+      chooser.fold(() => card.scrollHeight > card.clientHeight + 1);
+      card._kept?.again?.();
+      keepMenuInCard(pop);
+    }
+    chooser.onGrow = (part) => keepMenuInView(pop, part);
+  }
   // the keyboard lands on the place it is in now, else on Review; a finger's press leaves focus on the Save it pressed, so
   // no card scrolls to reveal a row and the Save stays exactly under the finger
-  if (keyboard || !invoker?.isConnected) (choices.find((button) => button.getAttribute('aria-current') === 'true') || choices[0])?.focus({ preventScroll: true });
+  if (keyboard || !invoker?.isConnected) chooser.first()?.focus({ preventScroll: true });
   else invoker.focus({ preventScroll: true });
 }
+/* SAVE · P2-8: a page put away (another app, the phone locked) ends a choice in the middle: the chooser, a place's words
+ * and the strip close, nothing is kept and nothing is said, and he comes back to the word as he left it before the press.
+ * Back (the app's and the browser's) and a tab of the bar already close them with the screen they belong to. */
+if (typeof document !== 'undefined') document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) return;
+  closeVocabularyListPopover();
+  closeSavePlace();
+  if (sealStrip) closeSealStrip();
+});
 /* SAVE · Escape folds one layer at a time: with the chooser open and the keyboard still on the Save that opened it (a
  * pointer's press leaves it there), Escape closes the chooser and nothing else; the box stays, nothing is saved. */
 if (typeof document !== 'undefined') document.addEventListener('keydown', (event) => {
@@ -10322,9 +10444,9 @@ function releaseCardFromChooser(pop) {
   // he has just touched leaps to the word's other side
   if (miniAnchor?.isConnected) placeFloating(card, anchorBox(miniAnchor));
 }
-/** A menu that grew (its other lists unfolded) keeps its foot in sight: inside its card, or on the glass. */
-function keepMenuInView(pop) {
-  if (pop.closest('#mini')) { keepMenuInCard(pop, pop.querySelector('.save-chooser-rest') || pop); return; }
+/** A menu that grew (its other lists unfolded, its name field) keeps the new part in sight: inside its card, or on the glass. */
+function keepMenuInView(pop, part = null) {
+  if (pop.closest('#mini')) { keepMenuInCard(pop, part || pop); return; }
   const box = pop.getBoundingClientRect();
   const foot = (window.visualViewport?.height || window.innerHeight) - 8;
   if (box.bottom > foot && !pop.classList.contains('is-drawer')) pop.style.top = `${Math.max(8, parseFloat(pop.style.top || '0') - (box.bottom - foot))}px`;
@@ -10377,7 +10499,7 @@ function keepFieldAboveKeyboard(field) {
  * Escape, Close) puts him back exactly where he was. The same panel answers the small mark above the bottom bar,
  * "Saved today": today's saved words, each with the place it went. */
 function placeItems(place) {
-  if (place?.kind === 'today') return savedBetween(S, startOfDay(new Date()), startOfDay(new Date()) + 86400000).map((row) => row);
+  if (place?.kind === 'today') return savedBetween(S, startOfDay(new Date()), startOfDay(new Date()) + 86400000);
   const rows = place?.kind === 'list' ? (owns(S.lists, place.name) ? S.lists[place.name] : []) : S.taken;
   return rows.map((item, index) => ({ item, index })).sort((a, b) => ((b.item.ts || 0) - (a.item.ts || 0)) || (b.index - a.index))
     .map(({ item }) => ({ item, place: null }));
@@ -10386,12 +10508,27 @@ function closeSavePlace({ restoreFocus = false } = {}) {
   const panel = document.getElementById('save-place-panel');
   if (!panel) return;
   const invoker = panel.invoker;
+  const strip = panel.closest('.seal-strip');
   panel.remove();
+  releasePageUnderDrawer(panel);
+  if (strip && sealStrip?.strip === strip) placeSealStrip(sealStrip);
   if (restoreFocus && invoker?.isConnected) invoker.focus({ preventScroll: true });
 }
+/* SAVE · Show (pass 2, P2-1: Save's own elements lie over nothing). The place opens where the Save that asked stands: in
+ * the word's box, in the strip, in the article bar's drawer, or beside the box in a wide window's margin; its name and
+ * count, its words newest first with this one marked (eight here, the rest on its page), and a door to the place's own
+ * page in the Words tab. A read goes on beneath it. Asked from anywhere else, Show goes to that page. */
 function showSavePlace(place, { node = null, invoker = null } = {}) {
   closeSavePlace();
   if (!place) return;
+  const card = invoker?.closest?.('#mini');
+  const strip = invoker?.closest?.('.seal-strip');
+  const drawerOwner = invoker?.closest?.('#vocabulary-list-popover.is-drawer') ? vocabularyListInvoker : null;
+  // Saved today pressed during a reading: its words open over the article (a drawer under the article's bar, or beside
+  // the page in a wide window), so a read goes on; from any other screen it opens its page in the Words tab
+  const roomBar = invoker?.id === 'saved-today' && S.view === 'reader' ? document.querySelector('#app > .chrome[data-bar]') : null;
+  if (!card && !strip && !drawerOwner && !roomBar) { openSavedPlacePage(place, invoker); return; }
+  if (drawerOwner) closeVocabularyListPopover();
   const rows = placeItems(place);
   const panel = el('div', 'save-place-panel');
   panel.id = 'save-place-panel';
@@ -10399,11 +10536,11 @@ function showSavePlace(place, { node = null, invoker = null } = {}) {
   panel.dataset.place = place.kind;
   panel.tabIndex = -1;
   panel.setAttribute('role', 'dialog');
-  panel.invoker = invoker;
+  panel.invoker = drawerOwner || invoker;
   const head = el('div', 'save-place-head');
   const title = el('h2', 'save-place-title');
   title.id = 'save-place-title';
-  const [ja, en] = place.kind === 'today' ? ['今日の保存', 'Saved today'] : placeWords(place);
+  const [ja, en] = placeWords(place);
   title.append(el('span', 'save-place-title-name', tx(ja, en)), el('span', 'save-place-title-count',
     tx(`${rows.length}語`, `${rows.length} ${rows.length === 1 ? 'word' : 'words'}`)));
   panel.setAttribute('aria-labelledby', title.id);
@@ -10416,29 +10553,31 @@ function showSavePlace(place, { node = null, invoker = null } = {}) {
   if (place.kind === 'review') panel.append(el('p', 'save-place-note', tx('保存した語はすべてここにあり、カードになって戻ってくる。',
     'Every saved word is here, and comes back to study as a card.')));
   const list = el('ul', 'save-place-words');
-  const SHOWN = 60;
-  for (const { item, place: at } of rows.slice(0, SHOWN)) {
+  const SHOWN = 8;
+  // this word first, then the newest
+  const mine = node ? rows.findIndex(({ item }) => sameSaved(node)(item)) : -1;
+  const ordered = mine > 0 ? [rows[mine], ...rows.slice(0, mine), ...rows.slice(mine + 1)] : rows;
+  for (const { item, place: at } of ordered.slice(0, SHOWN)) {
     const row = el('li', 'save-place-word');
     const w = el('span', 'save-place-w', item.label || item.id);
     w.lang = 'ja';
     row.append(w);
     if (item.t !== 'word') row.append(el('span', 'save-place-kind', tx(item.kind || NODE_KIND[item.t]?.[0] || '', item.kindEn || NODE_KIND[item.t]?.[1] || '')));
-    if (at) row.append(el('span', `save-place-where${at.kind === 'list' ? ' is-list' : ''}`, tx(...placeWords(at))));
     if (node && sameSaved(node)(item)) { row.classList.add('is-this'); row.setAttribute('aria-current', 'true'); }
+    // today's words each say where they went
+    if (at) row.append(el('span', `save-place-where${at.kind === 'list' ? ' is-list' : ''}`, tx(...placeWords(at))));
     list.append(row);
   }
-  if (!rows.length) list.append(el('li', 'save-place-empty', place.kind === 'today'
-    ? tx('今日はまだ何も保存していない。', 'Nothing saved yet today.') : tx('まだ空。', 'Nothing here yet.')));
+  if (!rows.length) list.append(el('li', 'save-place-empty', tx('まだ空。', 'Nothing here yet.')));
   panel.append(list);
   if (rows.length > SHOWN) panel.append(el('p', 'save-place-note', tx(`ほか ${rows.length - SHOWN} 語`, `and ${rows.length - SHOWN} more`)));
-  const doorPlace = place.kind === 'today' ? null : place;
-  const door = el('button', 'save-place-door', doorPlace ? tx(`${ja}のページへ ›`, `Open ${en} ›`) : tx('保存した語とリスト ›', 'All your saved words ›'));
+  const door = el('button', 'save-place-door', tx(`${ja}のページへ ›`, `Open ${en} ›`));
   door.type = 'button';
   door.id = 'save-place-open';
   door.addEventListener('click', (event) => {
     event.stopPropagation();
     closeSavePlace();
-    openSavedPlacePage(doorPlace || { kind: 'review' }, door);
+    openSavedPlacePage(place, door);
   });
   panel.append(door);
   panel.addEventListener('keydown', (event) => {
@@ -10447,25 +10586,28 @@ function showSavePlace(place, { node = null, invoker = null } = {}) {
     event.stopPropagation();
     closeSavePlace({ restoreFocus: true });
   });
-  // the toast's news is the panel's now; the panel lies over no control of the page's corner (the prototype's 試, 層)
-  hideReaderToast();
-  document.body.append(panel);
-  const anchor = invoker?.getBoundingClientRect?.();
-  if (anchor && window.innerWidth >= 700) panel.style.setProperty('--panel-left', `${Math.round(Math.max(16, Math.min(window.innerWidth - 456, anchor.left)))}px`);
-  liftOverCornerControls(panel);
-  panel.querySelector('.is-this')?.scrollIntoView({ block: 'nearest' });
-  close.focus({ preventScroll: true });
-}
-/** A panel standing above the bar rises past any floating control it would lie over (the prototype's 試, the 層 mark). */
-function liftOverCornerControls(panel) {
-  const box = panel.getBoundingClientRect();
-  let top = Infinity;
-  for (const node of document.querySelectorAll('#prototype-open, #layers-mark, .pl-rail')) {
-    const r = node.getBoundingClientRect();
-    if (!r.width || !r.height || r.right <= box.left || r.left >= box.right || r.bottom <= box.top || r.top >= box.bottom) continue;
-    top = Math.min(top, r.top);
+  if (card) {
+    if (!placeBeside(panel, card, invoker)) {
+      panel.classList.add('is-inline');
+      (card.querySelector(':scope > .mini-actions') || card.lastElementChild).after(panel);
+      keepMenuInCard(panel, head);
+    }
+  } else if (strip) {
+    panel.classList.add('is-inline');
+    (strip.querySelector('.seal-strip-lists') || strip.firstElementChild).after(panel);
+    if (sealStrip?.strip === strip) placeSealStrip(sealStrip);
+  } else if (roomBar) {
+    const page = document.querySelector('#app > main');
+    if (!(page && placeBeside(panel, page, invoker))) {
+      placeSaveMenu(panel, roomBar, 'drawer');
+      panel.classList.remove('is-inline');
+    }
+  } else {
+    // the article bar's drawer, as its chooser was: under the bar, the page a step down beneath it
+    placeSaveMenu(panel, drawerOwner, 'drawer');
+    panel.classList.remove('is-inline');
   }
-  if (top !== Infinity) panel.style.bottom = `${Math.ceil(window.innerHeight - top + 8)}px`;
+  close.focus({ preventScroll: true });
 }
 /** A place's own page, in the Words tab (the one home of what he saved): Review's words, or a list's, with its review
  * door and its export (the list page). Its Back returns to where he was. */
@@ -10474,7 +10616,8 @@ function openSavedPlacePage(place, invoker) {
     if (S.view !== 'search' || S.stack.length) keepNavigationReturn('search', invoker);
     else keepScroll();
     S.stack = [];
-    S.listOpen = place.kind === 'list' ? { name: place.name, manual: true } : { name: 'review', review: true };
+    S.listOpen = place.kind === 'list' ? { name: place.name, manual: true }
+      : place.kind === 'today' ? { name: 'today', today: true } : { name: 'review', review: true };
     S.wordsList = true;
     S.view = 'search';
     render();
@@ -10518,7 +10661,7 @@ function renderSavedShelf(main) {
 // a press outside the panel puts it away, as a press outside a menu does
 if (typeof document !== 'undefined') document.addEventListener('pointerdown', (event) => {
   const panel = document.getElementById('save-place-panel');
-  if (panel && !panel.contains(event.target) && !event.target?.closest?.('#saved-today, #mini-place-show, #save-chooser-show, .seal-strip')) closeSavePlace();
+  if (panel && !panel.contains(event.target) && !event.target?.closest?.('#saved-today, #mini-place-show, #save-chooser-show, #seal-strip-show')) closeSavePlace();
 }, true);
 
 /* SAVE · the place line under a saved word's Save in its box: Show (the place, over the page), Move… (the chooser again)
@@ -11223,7 +11366,9 @@ function placeFloating(card, r) {
   // The sentence pane replaces the word card and keeps its top edge. It may grow past
   // the former word's anchor, using the whole screen below that saved edge.
   const pinned = card.dataset.pinTop ? Number(card.dataset.pinTop) : NaN;
-  const pinnedRoom = !sentence && pinned < r.top ? Math.min(floor, r.top - 10) - pinned : floor - pinned;
+  // SAVE · while the box holds the chooser it may reach down over its own word (the box's head and the chooser's title
+  // both name it): eight lists then have the glass down to the bar, not the strip of room above the word (P2-6)
+  const pinnedRoom = !sentence && pinned < r.top && !card.dataset.chooserPin ? Math.min(floor, r.top - 10) - pinned : floor - pinned;
   const pinHolds = Number.isFinite(pinned) && pinned >= ceiling && pinnedRoom >= 96
     && (sentence || pinned < r.top || pinned >= r.bottom + 10);
   // A long sentence is a full document card on a phone: the page carries its text and actions.
@@ -11669,8 +11814,9 @@ async function saveWord(node, label) {
     return false;
   }
   refreshWordSaveControls(node, label);
-  // SAVE · the toast names the place a keep puts the word: Review (John, 2026-11-11: "still don't know where it went?")
-  if (outcome.status === 'created') showReaderToast(tx('復習に保存しました', 'Saved in Review'), [tx('元に戻す', 'Undo'), () => allowed() && removeKept(node, label)]);
+  // SAVE · the news names the place a keep puts the word: Review (John, 2026-11-11: "still don't know where it went?"), in
+  // the bar's row where it covers nothing; a keep picked in a chooser whose Save names the place says nothing (P2-5)
+  if (outcome.status === 'created' && !saveNewsQuiet) saySaveNews(tx('復習に保存しました', 'Saved in Review'), [tx('元に戻す', 'Undo'), () => allowed() && removeKept(node, label)]);
   return true;
 }
 /** Remove: the one way a kept word goes out — the strip's Remove, a Save's toast Undo. Explicit only; its review history
@@ -11687,7 +11833,8 @@ async function removeKept(node, label) {
   refreshWordSaveControls(node, label);
   if (S.stack?.length) S.roomStale = true;
   else if (S.view === 'tray') render();
-  showReaderToast(tx('外しました', 'Removed'), [tx('元に戻す', 'Undo'), () => allowed() && restoreKept(node, label, took)]);
+  // SAVE · said in the bar's row (it covers no text and no play bar), with its Undo
+  saySaveNews(tx(`「${label}」を外しました`, `Removed ${label}`), [tx('元に戻す', 'Undo'), () => allowed() && restoreKept(node, label, took)]);
   return true;
 }
 /* Remove un-saves the word everywhere (lead's ruling, 2026-10-18): out of taken and off every list he put it on, so Today
@@ -11962,27 +12109,19 @@ function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) 
   if (!node) strip.append(status);
   const controls = [];
   let busy = false;
-  // row 1 · SAVE · ask first (the program lead's ruling, 2026-11-11): a hold on a word he has not saved opens the strip as
-  // the chooser: "Save 自動車 to", then Review, his lists with the one he used last first (past five, "More lists · N"
-  // unfolds the rest inside the strip), and New list…, which asks its name once. Nothing is kept until he picks; one pick
-  // keeps the word there, a seal presses onto it and flies to Saved today, and the row names the place: "Saved in
-  // Review ✓  Show  Move…  Remove". Move… opens the chooser again with the place ticked; Show opens the place over the
-  // page; Remove takes it out everywhere. A hold on a saved word opens on that named row.
+  // row 1 · SAVE · the strip asks with the one chooser (P2-2: the same head, the same places, Review's seal, its line and
+  // the counts, as in the box): a hold on a word he has not saved opens it; nothing is kept until he picks; one pick keeps
+  // the word there, a seal presses onto it and flies to Saved today, and the row names the place: "Saved in Review ✓ ·
+  // Show · Move… · Remove". Move… opens the chooser again with the place ticked; Show opens the place's words in the
+  // strip; Remove takes it out everywhere. A hold on a saved word opens on the named row.
   if (node) {
     const lists = el('div', 'seal-strip-lists');
     lists.setAttribute('role', 'group');
     lists.setAttribute('aria-label', tx('保存先', 'Where it goes'));
     lists.append(status);
-    const more = el('div', 'seal-strip-more');
-    more.hidden = true;
     let choosing = !kept();
-    let formOpen = false;
-    const here = (to) => {
-      const at = kept() ? savedPlace(node) || { kind: 'review' } : null;
-      return !!at && at.kind === to.kind && (to.kind === 'review' || at.name === to.name);
-    };
     const placedButton = (cls, id, text, run) => {
-      const button = el('button', `chip ${cls}`, text);
+      const button = el('button', `save-place-act ${cls}`, text);
       button.type = 'button';
       button.id = id;
       button.addEventListener('click', (event) => { event.stopPropagation(); if (!button.disabled) void run(button); });
@@ -11993,147 +12132,76 @@ function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) 
     const moveButton = placedButton('seal-place-move', 'seal-strip-move', tx('移す…', 'Move…'), () => {
       choosing = true;
       paintMode();
-      (strip.querySelector('.seal-list[aria-pressed="true"]') || strip.querySelector('.seal-list'))?.focus({ preventScroll: true });
-      placeSealStrip(open);
+      chooser?.first()?.focus({ preventScroll: true });
     });
-    const chips = [];
-    const chip = (to) => {
-      const [ja, en] = placeWords(to);
-      const button = el('button', `chip seal-list${to.kind === 'review' ? ' seal-review' : ''}`, tx(ja, en));
-      button.type = 'button';
-      if (to.kind === 'list') button.dataset.list = to.name;
-      else { button.dataset.place = 'review'; button.id = 'seal-strip-review'; }
-      button.addEventListener('click', (event) => {
-        event.stopPropagation();
-        void pickPlace(to, button);
-      });
-      chips.push({ button, to });
-      return button;
-    };
-    const order = listsByRecency(S.lists, S.saveMemory);
-    // Hfix-1A (G5-1): under 360 px three lists stand in the row, then "More lists · N"
-    const shownLists = window.innerWidth < 360 ? 3 : CHOOSER_LISTS_SHOWN;
-    lists.append(showButton, moveButton, chip({ kind: 'review' }));
-    for (const name of order.slice(0, shownLists)) lists.append(chip({ kind: 'list', name }));
-    let all = null;
-    if (order.length > shownLists) {
-      for (const name of order.slice(shownLists)) more.append(chip({ kind: 'list', name }));
-      all = el('button', 'chip seal-list-all', tx(`ほかのリスト · ${order.length - shownLists}`, `More lists · ${order.length - shownLists}`));
-      all.type = 'button';
-      all.id = 'seal-strip-all';
-      all.setAttribute('aria-expanded', 'false');
-      all.addEventListener('click', (event) => {
-        event.stopPropagation();
-        more.hidden = !more.hidden;
-        all.setAttribute('aria-expanded', String(!more.hidden));
-        if (!more.hidden) more.querySelector('button')?.focus({ preventScroll: true });
-        placeSealStrip(open);
-      });
-      lists.append(all, more);
-    }
-    const fresh = el('button', 'chip seal-list-new', tx('新しいリスト…', 'New list…'));
-    fresh.type = 'button';
-    fresh.id = 'seal-strip-new';
-    const form = el('form', 'seal-strip-form');
-    form.hidden = true;
-    const name = el('input', 'vocabulary-list-field');
-    name.type = 'text';
-    name.id = 'seal-strip-name';
-    name.maxLength = 80;
-    name.enterKeyHint = 'done';
-    name.autocomplete = 'off';
-    name.placeholder = tx('新しいリストの名前', 'Name the new list');
-    name.setAttribute('aria-label', tx('新しいリストの名前', 'Name a new list'));
-    // one draft per word, shared with the chooser's field: a name typed in either survives a failed write and a reload
-    name.dataset.recordDraftKey = `vocabulary-list:${JSON.stringify([node.t, node.id, node.seq ?? null, node.reading ?? null])}`;
-    attachRecordDraft(name);
-    // the strip's own Add (its line differs from the chooser's, whose form a control mutates by its exact line)
-    const addList = el('button', 'chip btn-primary seal-strip-create', tx('ここに保存', 'Save here'));
-    addList.type = 'submit';
-    addList.id = 'seal-strip-create';
-    form.append(name, addList);
-    if (name.value) formOpen = true;
-    fresh.addEventListener('click', (event) => {
-      event.stopPropagation();
-      formOpen = true;
-      paintMode();
-      name.focus({ preventScroll: true });
-      keepFieldAboveKeyboard(name);
-      placeSealStrip(open);
-    });
-    form.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const value = name.value.trim();
-      if (!value) { name.focus(); return; }
-      void pickPlace({ kind: 'list', name: value }, null, true);
-    });
-    lists.append(fresh, form);
+    lists.append(showButton, moveButton);
     strip.append(lists);
-    const paintMode = () => {
-      const saved = kept();
-      if (!saved) choosing = true;
-      const placed = saved && !choosing;
-      strip.dataset.mode = placed ? 'placed' : saved ? 'move' : 'choose';
-      if (placed) say(savedInWords(savedPlace(node) || { kind: 'review' }));
-      else if (!busy && !status.dataset.failed) say(saved ? tx(`「${label}」の移動先`, `Move ${label} to`) : tx(`「${label}」の保存先`, `Save ${label} to`));
-      showButton.hidden = moveButton.hidden = !placed;
-      if (removeButton) removeButton.hidden = !placed;
-      for (const { button, to } of chips) {
-        button.hidden = placed;
-        button.setAttribute('aria-pressed', String(saved && here(to)));
-      }
-      if (all) all.hidden = placed;
-      if (placed) more.hidden = true;
-      fresh.hidden = placed || formOpen;
-      form.hidden = placed || !formOpen;
-      addList.textContent = saved ? tx('ここに移す', 'Move here') : tx('ここに保存', 'Save here');
-    };
-    const paint = () => {
-      for (const { button } of chips) button.disabled = busy || !recordWritable();
-      addList.disabled = busy || !recordWritable();
-      name.readOnly = busy;
-    };
-    open.paint = () => { paint(); paintMode(); };
-    const pickPlace = async (to, button, typed = false) => {
+    let chooser = null;
+    const chooserHost = el('div', 'seal-strip-chooser');
+    strip.append(chooserHost);
+    const pickPlace = async (to, { typed = false } = {}) => {
       if (busy) return;
-      if (kept() && here(to)) { choosing = false; paintMode(); showButton.focus({ preventScroll: true }); placeSealStrip(open); return; }
+      if (kept() && chooser?.here(to)) { choosing = false; paintMode(); showButton.focus({ preventScroll: true }); return; }
       busy = true;
-      delete status.dataset.failed;
-      paint();
+      chooser.notice.textContent = '';
+      chooser.paint(true);
       let result;
+      saveNewsQuiet = true;
       try { result = await placeWord(node, label, to); }
       catch { result = { status: 'failed' }; }
-      finally { busy = false; }
+      finally { busy = false; saveNewsQuiet = false; }
       if (!strip.isConnected) return;
       if (result.status === 'ok') {
-        if (typed) {
-          name.value = '';
-          rememberRecordDraft(name);
-          formOpen = false;
-        }
+        if (typed) chooser.clearTyped();
         choosing = false;
         open.kept = kept();
         refreshWordSaveControls(node, label);
         // the word went somewhere: the seal presses onto it and flies to Saved today (G5's seal, now on his pick)
         if (result.created) requestAnimationFrame(() => { if (anchor.isConnected) flySeal(anchor); });
+        paintMode();
+        showButton.focus({ preventScroll: true });
       } else {
-        status.dataset.failed = '1';
-        say(result.status === 'held' ? wordCaptureHeldText(node, { route: false }) : placeFailureWords(result.status));
+        chooser.notice.textContent = result.status === 'held' ? wordCaptureHeldText(node, { route: false }) : placeFailureWords(result.status);
+        chooser.paint(false);
       }
-      paint();
-      paintMode();
-      (result.status === 'ok' ? showButton : button?.isConnected ? button : name).focus({ preventScroll: true });
-      placeSealStrip(open);
     };
-    paint();
+    const paintMode = () => {
+      const saved = kept();
+      if (!saved) choosing = true;
+      const placed = saved && !choosing;
+      strip.dataset.mode = placed ? 'placed' : saved ? 'move' : 'choose';
+      say(placed ? savedInWords(savedPlace(node) || { kind: 'review' }) : '');
+      status.hidden = !placed;
+      showButton.hidden = moveButton.hidden = !placed;
+      if (removeButton) removeButton.hidden = !placed;
+      lists.hidden = !placed;
+      chooserHost.replaceChildren();
+      chooser = null;
+      if (!placed) {
+        closeSavePlace();
+        chooser = buildPlaceChooser({ node, label, current: saved ? savedPlace(node) || { kind: 'review' } : null, kind: 'strip',
+          onPick: (to, opts) => pickPlace(to, opts) });
+        chooser.onGrow = () => placeSealStrip(open);
+        chooserHost.append(chooser.head, chooser.places, chooser.notice);
+        chooser.paint(busy);
+      }
+      placeSealStrip(open);
+      if (chooser) {
+        const before = strip.getBoundingClientRect().height;
+        chooser.fold(() => strip.scrollHeight > strip.clientHeight + 1);
+        if (strip.getBoundingClientRect().height !== before || strip.scrollHeight <= strip.clientHeight + 1) placeSealStrip(open);
+      }
+    };
+    open.paint = () => paintMode();
   }
   // row 2 · the word's acts, quiet, in plain full verbs; Remove (only while the word is kept) stands in row 1 beside
   // Saved ✓
   const acts = el('div', 'seal-strip-acts');
   acts.setAttribute('role', 'group');
   acts.setAttribute('aria-label', tx('ほかの操作', 'More'));
+  // SAVE · P2-3: the word's acts are separate words with a dot between them, in the interface's own language
   const act = (action, text, run, { hidden = false, name = '' } = {}) => {
-    const button = el('button', 'btn-tertiary seal-act', text);
+    const button = el('button', 'save-place-act seal-act', text);
     button.type = 'button';
     button.dataset.stripAction = action;
     if (name) button.setAttribute('aria-label', name);
@@ -12150,7 +12218,7 @@ function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) 
   const sentence = door.sentence?.();
   const here = { view: S.view, passageId: S.passageId };
   const stillHere = () => S.view === here.view && S.passageId === here.passageId && !S.stack.length;
-  if (door.entryAvailable !== false) act('entry', tx('全項目', '全項目 · Full entry'), () => door.openEntry(keyboard ? 'keyboard' : 'pointer'));
+  if (door.entryAvailable !== false) act('entry', tx('全項目', 'Full entry'), () => door.openEntry(keyboard ? 'keyboard' : 'pointer'));
   if (sentence) {
     // SAVE · the sentence's Save asks too: its one place, the tutor page, picked in the same chooser
     const keep = act('sentence', tx('文を保存', 'Save the sentence'), () => openPlainSaveMenu(anchor, {
@@ -16390,9 +16458,12 @@ function renderSavedLists(main) {
 function renderListPage(main) {
   const open = S.listOpen;
   // SAVE · Review is a place too: every saved word, newest first
+  // SAVE · and Saved today: today's words, newest first, each with the place it went
+  const todayRows = open?.today ? savedBetween(S, startOfDay(new Date()), startOfDay(new Date()) + 86400000) : null;
   const items = open
     ? open.review
       ? S.taken.map((item, index) => ({ item, index })).sort((a, b) => ((b.item.ts || 0) - (a.item.ts || 0)) || (b.index - a.index)).map(({ item }) => item)
+      : todayRows ? todayRows.map((row) => row.item)
       : open.manual
       ? owns(S.lists, open.name)
         ? S.lists[open.name]
@@ -16418,14 +16489,16 @@ function renderListPage(main) {
   });
   main.append(back);
   main.append(
-    open.review ? withEn(el('p', 'eyebrow', '復習 — 保存した語すべて'), 'every saved word, back to study as cards', 'en-inline')
+    open.today ? withEn(el('p', 'eyebrow', '今日の保存 — それぞれの保存先'), 'what you saved today, and where each one went', 'en-inline')
+    : open.review ? withEn(el('p', 'eyebrow', '復習 — 保存した語すべて'), 'every saved word, back to study as cards', 'en-inline')
       : withEn(el('p', 'eyebrow', open.manual ? 'リスト' : 'リスト — 月別・自動'), open.manual ? 'your list' : 'words saved that month', 'en-inline'),
   );
   main.append(
     el(
       'h1',
       'view-title',
-      open.review ? tx(`復習 — ${items.length} 件`, `Review — ${items.length} item${items.length === 1 ? '' : 's'}`)
+      open.today ? tx(`今日の保存 — ${items.length} 件`, `Saved today — ${items.length} item${items.length === 1 ? '' : 's'}`)
+      : open.review ? tx(`復習 — ${items.length} 件`, `Review — ${items.length} item${items.length === 1 ? '' : 's'}`)
         : tx(`${open.name} — ${items.length} 件`, `${open.manual ? open.name : monthLabel(open.name)} — ${items.length} item${items.length === 1 ? '' : 's'}`),
     ),
   );
@@ -16466,7 +16539,17 @@ function renderListPage(main) {
     main.append(el('div', 'sem-empty', tx('このリストはまだ空。', 'This list is still empty.')));
     return;
   }
-  for (const item of items) main.append(trayLine(item, dueKeys));
+  // SAVE · on Saved today each word says where it went: Review, or its list
+  for (const item of items) {
+    const line = trayLine(item, dueKeys);
+    const at = todayRows?.find((row) => row.item === item)?.place;
+    if (at) {
+      const chip = el('span', `save-place-where${at.kind === 'list' ? ' is-list' : ''}`, tx(...placeWords(at)));
+      chip.dataset.place = at.kind === 'list' ? at.name : 'review';
+      line.querySelector('.w')?.after(chip);
+    }
+    main.append(line);
+  }
 }
 
 /* One recoverable file retains portable local documents and any replicated
@@ -36648,7 +36731,7 @@ let primaryDockObserver;
 /** Keep the report rail above live room controls, including wrapped labels. */
 function observePrimaryDocks() {
   if (primaryDockObserver) return;
-  const selector = '.kp-grades, .pc-controls, .cd-dock, .listen-row.play-bar, .pc-status:not(:empty):not(.pc-status-inline), .reader-toast, #primary-tabs, .primary-tab-label, #saved-today';
+  const selector = '.kp-grades, .pc-controls, .cd-dock, .listen-row.play-bar, .pc-status:not(:empty):not(.pc-status-inline), .reader-toast, #primary-tabs, .primary-tab-label, #saved-row';
   let frame = 0;
   const watched = new Set();
   const schedule = () => {
@@ -36680,11 +36763,10 @@ function observePrimaryDocks() {
       let clearance = 0;
       if (document.body.classList.contains('has-primary-tabs')) {
         for (const node of nodes) {
-          if (node === nav || node.matches('.primary-tab-label')) continue;
+          if (node === nav || node.id === 'saved-row' || node.matches('.primary-tab-label')) continue;
           const style = getComputedStyle(node), rect = node.getBoundingClientRect();
           if (!rect.width || !rect.height || rect.bottom <= 0 || rect.top >= innerHeight || style.visibility === 'hidden') continue;
-          // SAVE · the Saved today slip rides on the fixed bar's edge: the page's foot clears it as it clears the bar
-          if (style.position !== 'fixed' && node.id !== 'saved-today' && !(style.position === 'sticky' && rect.bottom >= innerHeight - navHeight - 1)) continue;
+          if (style.position !== 'fixed' && !(style.position === 'sticky' && rect.bottom >= innerHeight - navHeight - 1)) continue;
           clearance = Math.max(clearance, Math.ceil(innerHeight - rect.top));
         }
       }
@@ -36805,38 +36887,102 @@ function paintKeptCount(tab = document.getElementById('tab-today')) {
   else tab.removeAttribute('aria-label');
 }
 
-/* SAVE · Saved today: a paper slip standing on the bottom bar's top edge over Today's station, there only on a day he
- * saved something: "Saved today · 2" (今日の保存 2). A press opens today's saved words, each with the place it went
- * (showSavePlace), over whatever he is reading, so a read goes on beneath it. Its words are its name; it is 44 px tall
- * to the finger and covers no control. The seal of a fresh save flies to it (sealTarget). */
+/* SAVE · Saved today and Save's news live in a row of the bottom bar itself (pass 2, P2-1: the slip that stood on the
+ * bar's edge lay over the article's play bar at 390). The row is in the bar's own grid, the bar's first row: its paper,
+ * its height part of the bar's (observePrimaryDocks measures it), so every control docked above the bar (the play bar,
+ * 層, the toast, a word's box and strip) stands above it and nothing lies under it. It stands only on a day he saved something, or while a save has news to say:
+ *   left   "Saved today · 2" (今日の保存 2): a press opens today's saved words with their places — over the article during a
+ *          reading (a read goes on), else on their page in the Words tab;
+ *   right  the news of a save whose own control no longer names the place (the article bar's Save, a Remove): "Saved
+ *          産業 in Review · Undo", for six seconds. A save the control names itself (the box, the strip) says nothing. */
+const SAVE_NEWS_MS = 6000;
+let saveNews = null; // { text, action: [label, run], until }
+let saveNewsTimer = null;
 function savedTodayCount() {
   const from = startOfDay(new Date());
   return S.taken.filter((item) => Number.isFinite(item?.ts) && item.ts >= from && item.ts < from + 86400000).length;
 }
+/** Where a save's news is said: in the bar's row while the bar stands, else in the page's toast (a screen with no bar). */
+function saySaveNews(text, action = null) {
+  const bar = typeof document === 'undefined' ? null : document.getElementById('primary-tabs');
+  if (!bar || bar.hasAttribute('data-drift-chrome') || !bar.getClientRects().length) { showReaderToast(text, action); return; }
+  hideReaderToast();
+  saveNews = { text, action, until: Date.now() + SAVE_NEWS_MS };
+  clearTimeout(saveNewsTimer);
+  saveNewsTimer = setTimeout(() => { saveNews = null; paintSavedToday(); }, SAVE_NEWS_MS);
+  paintSavedToday();
+}
 function paintSavedToday() {
   if (typeof document === 'undefined') return;
   const bar = document.getElementById('primary-tabs');
-  // over Today's station; in the layout under test (no Today tab) over Review's, where the saved words are studied
-  const tab = document.getElementById('tab-today') || document.getElementById('tab-review');
-  let slip = document.getElementById('saved-today');
-  const n = bar && tab && !bar.hasAttribute('data-drift-chrome') ? savedTodayCount() : 0;
-  if (!n) { slip?.remove(); return; }
-  if (!slip) {
-    slip = el('button', 'saved-today');
-    slip.type = 'button';
-    slip.id = 'saved-today';
-    slip.dataset.driftChrome = 'true';
-    slip.addEventListener('click', (event) => {
-      event.stopPropagation();
-      if (document.getElementById('save-place-panel')?.dataset.place === 'today') { closeSavePlace({ restoreFocus: true }); return; }
-      showSavePlace({ kind: 'today' }, { invoker: slip });
-    });
-    bar.append(slip);
+  let row = document.getElementById('saved-row');
+  const n = bar && !bar.hasAttribute('data-drift-chrome') ? savedTodayCount() : 0;
+  const news = saveNews && saveNews.until > Date.now() ? saveNews : null;
+  if (!bar || bar.hasAttribute('data-drift-chrome') || (!n && !news)) {
+    row?.remove();
+    if (bar) delete bar.dataset.savedRow;
+    return;
   }
-  slip.replaceChildren(el('span', 'saved-today-mark'), el('span', 'saved-today-words', tx('今日の保存', 'Saved today')),
-    el('span', 'saved-today-count', String(n)));
-  slip.setAttribute('aria-label', tx(`今日の保存 ${n}語 — どこに保存したかを見る`, `Saved today: ${n} — see where ${n === 1 ? 'it' : 'they'} went`));
-  slip.style.setProperty('--slip-left', `${Math.max(0, tab.offsetLeft)}px`);
+  if (!row || row.parentElement !== bar) {
+    row?.remove();
+    row = el('div', 'saved-row');
+    row.id = 'saved-row';
+    row.dataset.driftChrome = 'true';
+    bar.append(row);
+  }
+  bar.dataset.savedRow = 'true';
+  row.toggleAttribute('data-news', !!news);
+  let slip = document.getElementById('saved-today');
+  if (!n) slip?.remove();
+  else {
+    if (!slip || slip.parentElement !== row) {
+      slip?.remove();
+      slip = el('button', 'saved-today');
+      slip.type = 'button';
+      slip.id = 'saved-today';
+      slip.addEventListener('click', (event) => {
+        event.stopPropagation();
+        if (document.getElementById('save-place-panel')?.invoker === slip) { closeSavePlace({ restoreFocus: true }); return; }
+        showSavePlace({ kind: 'today' }, { invoker: slip });
+      });
+      row.prepend(slip);
+    }
+    slip.replaceChildren(el('span', 'saved-today-mark'), el('span', 'saved-today-words', tx('今日の保存', 'Saved today')),
+      el('span', 'saved-today-count', String(n)));
+    slip.setAttribute('aria-label', tx(`今日の保存 ${n}語 — どこに保存したかを見る`, `Saved today: ${n} — see where ${n === 1 ? 'it' : 'they'} went`));
+  }
+  let line = document.getElementById('saved-news');
+  if (!line || line.parentElement !== row) {
+    line?.remove();
+    line = el('p', 'saved-news');
+    line.id = 'saved-news';
+    line.setAttribute('role', 'status');
+    line.setAttribute('aria-live', 'polite');
+    row.append(line);
+  }
+  const key = news ? `${news.text}|${news.until}` : '';
+  if (line.dataset.key !== key) {
+    line.dataset.key = key;
+    line.replaceChildren();
+    if (news) {
+      line.append(el('span', 'saved-news-text', news.text));
+      if (news.action) {
+        const [label, run] = news.action;
+        const undo = el('button', 'saved-news-action', label);
+        undo.type = 'button';
+        undo.id = 'saved-news-action';
+        undo.addEventListener('click', (event) => {
+          event.stopPropagation();
+          saveNews = null;
+          clearTimeout(saveNewsTimer);
+          paintSavedToday();
+          void run();
+        });
+        line.append(undo);
+      }
+    }
+  }
+  line.hidden = !news;
 }
 
 /** Hub doors use the existing return frames, including exact reader positions. */

@@ -131,6 +131,9 @@ function defineRows() {
     'withBoxOpened', 'withListUsed', 'moveLists', 'saveWritable', 'savePlain', 'saveCount', 'saveOwn', 'savePut', 'saveCopy', 'saveSame',
     // its box's Remove (the place line) is the mini's remove route: out everywhere, its history kept
     'removeKept', 'restoreKept', 'unsaveEverywhere', 'keptState', 'listsWithout', 'sameItem', 'setOwnRecordValue',
+    // pass 2 (P2-1, P2-5): a save's news is said in the bottom bar's row beside Saved today, only where the Save that was
+    // pressed does not name the place itself
+    'SAVE_NEWS_MS', 'saveNews', 'saveNewsTimer', 'saveNewsQuiet', 'saySaveNews', 'saveNamesPlace',
     'assessmentSuppressionRetries', 'suppressAssessmentCards', 'performAssessmentSuppression',
     'listReading', 'listGloss', 'listToMarkdown', 'resolveAssessmentSubject', 'learningEnrollmentPending', 'commitLearningEnrollment',
     'reviewAnswerAvailable', 'reviewCardBack', 'reviewBack', 'kanjiAnswerAvailable', 'retainedKanjiRecord', 'validKanjiRecord',
