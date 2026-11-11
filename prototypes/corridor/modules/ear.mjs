@@ -116,7 +116,8 @@ export function createEarMachine({ speak, cannot = () => null, schedule = (fn, m
      * once; moving within the unit asks nothing more; a new rest cancels a read still in flight. */
     hover({ unit, pointer = 'mouse' } = {}) {
       if (mode !== 'held' || pointer !== 'mouse') { clearRest(); return; }
-      if (!unit) { clearRest(); return; }
+      // what the learner wrote is read on a deliberate tap only, never from a resting pointer
+      if (!unit || unit.typed) { clearRest(); return; }
       if (rest && rest.key === unit.key) return;
       clearRest();
       const mine = { key: unit.key, timer: null, asked: false };
@@ -163,8 +164,9 @@ export function noVoiceLine(reason, tx) {
 }
 
 /* ------------------------------------------------------------------ the unit that speaks */
-const SKIP_TAGS = new Set(['RT', 'RP', 'SCRIPT', 'STYLE', 'TEMPLATE', 'NOSCRIPT', 'INPUT', 'TEXTAREA', 'SELECT', 'CANVAS', 'IFRAME', 'TITLE', 'DESC', 'MATH', 'OBJECT', 'VIDEO', 'AUDIO']);
-const FIELD_TAGS = new Set(['INPUT', 'TEXTAREA', 'SELECT', 'OPTION']);
+const SKIP_TAGS = new Set(['RT', 'RP', 'SCRIPT', 'STYLE', 'TEMPLATE', 'NOSCRIPT', 'INPUT', 'TEXTAREA', 'SELECT', 'OPTION', 'DATALIST', 'CANVAS', 'IFRAME', 'TITLE', 'DESC', 'MATH', 'OBJECT', 'VIDEO', 'AUDIO']);
+/** Fields: what is typed into them never leaves the device, whatever unit they stand in. */
+const FIELD_TAGS = new Set(['INPUT', 'TEXTAREA', 'SELECT', 'OPTION', 'DATALIST']);
 const CONTROL_TAGS = new Set(['BUTTON', 'A', 'SUMMARY', 'LABEL']);
 const CONTROL_ROLES = new Set(['button', 'link', 'option', 'menuitem', 'menuitemradio', 'menuitemcheckbox', 'tab', 'treeitem', 'switch', 'checkbox', 'radio']);
 const INLINE_TAGS = new Set(['RT', 'RP', 'RB', 'SPAN', 'A', 'B', 'I', 'EM', 'STRONG', 'RUBY', 'RB', 'SMALL', 'MARK', 'ABBR', 'CODE', 'SUB', 'SUP', 'TIME', 'Q', 'CITE', 'U', 'S', 'BR', 'WBR', 'BDI', 'BDO', 'DFN', 'KBD', 'SAMP', 'VAR', 'DATA', 'LABEL', 'IMG', 'FONT']);
@@ -191,6 +193,18 @@ const isOwn = (node) => attr(node, 'data-ear-own') !== null;
 const isEditable = (node) => FIELD_TAGS.has(tagOf(node)) || ['', 'true', 'plaintext-only'].includes(attr(node, 'contenteditable') ?? 'no');
 const isHiddenText = (node) => node.hidden || attr(node, 'aria-hidden') === 'true' || hasClass(node, 'visually-hidden');
 const isNote = (node) => hasClass(node, 'say-note') || hasClass(node, 'voice-note') || attr(node, 'data-reader-annotation') === 'true';
+/** The app's own controls inside a unit (a listen mark, a button, an icon's glyph): masked out of what is sent. A link
+ * in running text is a word of its sentence and stays. */
+const MASKED_ROLES = new Set(['button', 'switch', 'checkbox', 'radio', 'tab', 'option', 'menuitem', 'menuitemradio', 'menuitemcheckbox', 'treeitem']);
+const MASKED_CLASSES = ['voice-say', 'play-mark', 'kp-listen', 'mini-voice', 'say', 'icon-button'];
+const isAppControl = (node) => tagOf(node) === 'BUTTON' || MASKED_ROLES.has(String(attr(node, 'role') || '').toLowerCase()) ||
+  MASKED_CLASSES.some((name) => hasClass(node, name));
+/** What the learner wrote, shown back as text (his tutor turns, his spoken lines, his notes and drafts, his notes to the
+ * prototype): read on a deliberate tap, never from a resting pointer. A later screen marks its own with data-ear-typed. */
+const isTypedText = (node) => attr(node, 'data-ear-typed') !== null || (hasClass(node, 'chat-turn') && hasClass(node, 'me')) ||
+  (hasClass(node, 'speak-line') && attr(node, 'data-who') === 'me') ||
+  ['record-note-segment', 'teacher-draft-quote', 'pl-note-text'].some((name) => hasClass(node, name));
+const typedAt = (node) => { for (let at = node; at && at.nodeType === 1; at = at.parentNode) if (isTypedText(at)) return true; return false; };
 
 /** Japanese a voice can say: whole sentences when the text is Japanese through and through; from mixed text only its
  * Japanese runs; and a lone character ("門 Products") when that is all the Japanese there is. */
@@ -214,16 +228,19 @@ function speakableRaw(text) {
 }
 
 /** The text nodes of `root` a learner reads as its words, in order: no readings above words, no notes, nothing hidden
- * (unless `keep` is inside it: what he touched is what he sees), and with `controls` false nothing inside a control. */
-function textNodes(root, { keep = null, controls = true, skip = null } = {}) {
+ * (unless `keep` is inside it: what he touched is what he sees), never a field or anything in one, with `controls`
+ * false nothing inside a control, and with `mask` nothing inside one of the app's own controls. */
+function textNodes(root, { keep = null, controls = true, skip = null, mask = false } = {}) {
   const out = [];
+  if (isEditable(root)) return out;
   const visit = (node) => {
     if (node.nodeType === 3) { if (node.nodeValue) out.push(node); return; }
     if (node.nodeType !== 1) return;
     if (node !== root) {
-      if (SKIP_TAGS.has(tagOf(node)) || isOwn(node) || isNote(node) || (skip && skip(node))) return;
+      if (SKIP_TAGS.has(tagOf(node)) || isEditable(node) || isOwn(node) || isNote(node) || (skip && skip(node))) return;
       if (isHiddenText(node) && !(keep && inside(node, keep))) return;
       if (!controls && isControl(node)) return;
+      if (mask && isAppControl(node)) return;
     }
     for (const child of node.childNodes || []) visit(child);
   };
@@ -237,7 +254,7 @@ export function rangeText(range) {
   const root = common?.nodeType === 3 ? common.parentNode : common;
   if (!root) return '';
   let out = '';
-  for (const node of textNodes(root, { keep: common?.nodeType === 3 ? common : null })) {
+  for (const node of textNodes(root, { keep: common?.nodeType === 3 ? common : null, mask: true })) {
     if (typeof range.intersectsNode === 'function' && !range.intersectsNode(node)) continue;
     const from = node === range.startContainer ? range.startOffset : 0;
     const to = node === range.endContainer ? range.endOffset : node.nodeValue.length;
@@ -295,10 +312,9 @@ let elementIds = new WeakMap();
 let nextId = 1;
 const idOf = (node) => { if (!elementIds.has(node)) elementIds.set(node, nextId++); return elementIds.get(node); };
 
-function elementUnit(element, context, keep) {
-  const reading = readingOf(element);
-  let nodes = textNodes(element, { skip: reading?.node ? (node) => node === reading.node : null });
-  if (!hasJapanese(joined(nodes))) nodes = textNodes(element, { keep: element, skip: reading?.node ? (node) => node === reading.node : null });
+function elementUnit(element, context, keep, reading = readingOf(element)) {
+  let nodes = textNodes(element, { mask: true, skip: reading?.node ? (node) => node === reading.node : null });
+  if (!hasJapanese(joined(nodes))) nodes = textNodes(element, { keep: element, mask: true, skip: reading?.node ? (node) => node === reading.node : null });
   const own = joined(nodes);
   const word = (own.match(BARE_RUN) || []).join('');
   const sentences = reading ? [{ text: readingSentence(reading.text) }] : speakable(own);
@@ -309,6 +325,7 @@ function elementUnit(element, context, keep) {
     text: sentences.map((s) => s.text).join(''), sentences,
     key: `e${idOf(element)}:${word || own}`,
     voiceKey: keyOf({ node: element, word: wordLike ? word : null, paragraph: own }, context),
+    typed: typedAt(element),
     contains: (node) => inside(element, node),
     keep,
   };
@@ -316,7 +333,7 @@ function elementUnit(element, context, keep) {
 
 /** The sentence of `block` that the text position (node, offset) stands in. */
 function sentenceUnit(block, target, offset, context) {
-  const nodes = textNodes(block, { keep: target });
+  const nodes = textNodes(block, { keep: target, mask: true });
   const text = joined(nodes);
   if (!hasJapanese(text)) return null;
   const starts = [];
@@ -359,6 +376,7 @@ function sentenceUnit(block, target, offset, context) {
     range: { startNode: start.node, startOffset: start.offset, endNode: end.node, endOffset: end.offset },
     key: `s${idOf(block)}:${piece.start}:${piece.text}`,
     voiceKey: keyOf({ node: target.nodeType === 3 ? target.parentNode : target, word: null, paragraph: text }, context),
+    typed: typedAt(block),
     contains: (node) => inside(block, node),
   };
 }
@@ -404,15 +422,23 @@ export function findUnit(target, { offset = null, display = defaultDisplay, cont
     if (SKIP_TAGS.has(tagOf(at)) && tagOf(at) !== 'RT' && tagOf(at) !== 'RP') return null;
   }
   // a control: the row, label, button or web node is the unit, unless it is a word inside running text
-  let control = null;
+  let control = null, outer = null;
   for (let at = start; at && !NO_HOST.has(tagOf(at)); at = parentOf(at)) if (isControl(at)) { control = at; break; }
   if (control) {
-    const outer = blockOf(parentOf(control), display);
+    outer = blockOf(parentOf(control), display);
     const around = outer ? joined(textNodes(outer, { controls: false })) : '';
     if (!outer || (around.match(JAPANESE_LETTERS) || []).length < 2) return elementUnit(control, context, target);
   }
-  const block = blockOf(start, display);
+  // a control standing in running text (a link, a listen mark) is read as the sentence around it
+  const block = outer || blockOf(start, display);
   if (!block) return null;
+  // a word that carries its reading (the study card's 高学歴 こうがくれき): one unit, sent as its reading
+  const reading = readingOf(block);
+  if (reading?.node) {
+    const word = joined(textNodes(block, { mask: true, skip: (node) => node === reading.node }));
+    if (/\p{Script=Han}/u.test(word) && [...(word.match(BARE_RUN) || []).join('')].length <= 16 && !/[。！？]/u.test(word))
+      return elementUnit(block, context, target, reading);
+  }
   return sentenceUnit(block, target, offset, context);
 }
 const ATOMIC_INLINE = /^inline-(block|flex|grid|table)$/;
@@ -565,9 +591,14 @@ html[data-ear='novoice'] .ear-mark::after { content: ''; position: absolute; lef
 [data-ear-unit='armed'] { text-decoration-line: underline !important; text-decoration-color: var(--red) !important; text-decoration-thickness: 1.4px !important; text-underline-offset: 6px !important; }
 [data-ear-unit='held'] { background-image: linear-gradient(transparent 62%, color-mix(in oklab, var(--red) 22%, transparent) 62%) !important; }
 [data-ear-unit='speaking'] { background-image: linear-gradient(transparent 62%, color-mix(in oklab, var(--red) 34%, transparent) 62%) !important; }
-::highlight(bunki-ear-armed) { text-decoration-line: underline; text-decoration-color: var(--red); text-decoration-thickness: 1.4px; text-underline-offset: 6px; }
-::highlight(bunki-ear-held) { text-decoration-line: underline; text-decoration-color: color-mix(in oklab, var(--red) 22%, transparent); text-decoration-thickness: .38em; text-underline-offset: -.3em; text-decoration-skip-ink: none; }
-::highlight(bunki-ear-speaking) { text-decoration-line: underline; text-decoration-color: color-mix(in oklab, var(--red) 34%, transparent); text-decoration-thickness: .38em; text-underline-offset: -.3em; text-decoration-skip-ink: none; }
+/* a sentence in running text: painted bands along each of its lines, in a layer of their own that takes no pointer and
+   touches nothing in the text (the Custom Highlight API's text-decoration does not paint in WebKit, the engine of Safari
+   and the iPhone, and its wash does not paint inside button words there) */
+.ear-bands { position: fixed; left: 0; top: 0; width: 0; height: 0; z-index: 2147482000; pointer-events: none; }
+.ear-band { position: fixed; display: block; pointer-events: none; }
+.ear-band[data-state='armed'] { background: var(--red); }
+.ear-band[data-state='held'] { background: color-mix(in oklab, var(--red) 22%, transparent); }
+.ear-band[data-state='speaking'] { background: color-mix(in oklab, var(--red) 34%, transparent); }
 /* select-then-読む */
 .ear-chip { position: fixed; z-index: 2147483000; min-width: 44px; height: 32px; padding: 0 10px; border-radius: 3px; border: 1px solid var(--red);
   background: var(--print-white, var(--ground-0, var(--color-paper, var(--ground)))); color: var(--red); font: 500 15px/1 "Hiragino Mincho ProN", "Noto Serif JP", var(--serif, serif);
@@ -592,33 +623,66 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}) }) {
     style.textContent = EAR_CSS;
     doc.head.append(style);
   }
-  const highlights = view.CSS?.highlights && typeof view.Highlight === 'function' ? view.CSS.highlights : null;
-  let shown = null; // { unit, state, element? }
+  /* The marks on the unit, without moving it: an element takes an attribute its own CSS dresses (background and
+   * text-decoration, which paint in every engine); a sentence of running text gets bands painted along its lines in a
+   * layer of their own (an underline when armed, a wash along the foot when held on or speaking). */
+  const layer = doc.createElement('div');
+  layer.className = 'ear-bands';
+  layer.setAttribute('data-ear-own', '');
+  layer.setAttribute('aria-hidden', 'true');
+  let shown = null; // { unit, state, marked, range }
+  const bandsFor = (range, state) => {
+    const rects = range ? [...range.getClientRects()].filter((r) => r.width >= 2 && r.height >= 2) : [];
+    // one band per line: rects of one line (several text nodes) are joined
+    const lines = [];
+    for (const r of rects) {
+      const line = lines.find((l) => Math.abs(l.top - r.top) < r.height / 2);
+      if (line) { line.left = Math.min(line.left, r.left); line.right = Math.max(line.right, r.right); line.bottom = Math.max(line.bottom, r.bottom); }
+      else lines.push({ left: r.left, right: r.right, top: r.top, bottom: r.bottom });
+    }
+    while (layer.children.length > lines.length) layer.lastElementChild.remove();
+    while (layer.children.length < lines.length) { const band = doc.createElement('i'); band.className = 'ear-band'; layer.append(band); }
+    lines.forEach((line, i) => {
+      const band = layer.children[i], height = line.bottom - line.top;
+      const top = state === 'armed' ? line.bottom + 1 : line.top + height * 0.62;
+      const tall = state === 'armed' ? 1.4 : height * 0.38;
+      band.dataset.state = state;
+      band.style.cssText = `left:${line.left}px;top:${top}px;width:${line.right - line.left}px;height:${tall}px`;
+    });
+  };
   const clearShown = () => {
     if (!shown) return;
-    if (shown.marked?.isConnected !== false) shown.marked?.removeAttribute?.('data-ear-unit');
-    for (const name of ['armed', 'held', 'speaking']) highlights?.delete(`bunki-ear-${name}`);
+    if (shown.marked?.isConnected) shown.marked.removeAttribute('data-ear-unit');
+    if (shown.range) bandsFor(null, null);
     shown = null;
   };
-  /** The red underline or the wash, on the unit, without moving it: an element takes an attribute, a sentence a
-   * highlight (a browser without highlights washes the sentence's paragraph). */
   function showUnit(unit, state) {
     if (shown && shown.unit?.key === unit?.key && shown.state === state) return;
     clearShown();
     if (!unit || !state) return;
-    shown = { unit, state, marked: null };
-    if (unit.kind === 'sentence' && unit.range && highlights) {
+    shown = { unit, state, marked: null, range: null };
+    if (unit.kind === 'sentence' && unit.range) {
       try {
         const range = doc.createRange();
         range.setStart(unit.range.startNode, unit.range.startOffset);
         range.setEnd(unit.range.endNode, unit.range.endOffset);
-        highlights.set(`bunki-ear-${state}`, new view.Highlight(range));
+        if (!layer.isConnected) doc.body.append(layer);
+        shown.range = range;
+        bandsFor(range, state);
         return;
       } catch { /* the page changed under it */ }
     }
     const marked = unit.element;
     if (marked?.isConnected) { marked.setAttribute('data-ear-unit', state); shown.marked = marked; }
   }
+  // the bands follow their sentence when the page scrolls or the window changes size
+  let refit = 0;
+  const follow = () => {
+    if (!shown?.range || refit) return;
+    refit = view.requestAnimationFrame(() => { refit = 0; if (shown?.range) bandsFor(shown.range.startContainer.isConnected ? shown.range : null, shown.state); });
+  };
+  view.addEventListener('scroll', follow, { capture: true, passive: true });
+  view.addEventListener('resize', follow, { passive: true });
 
   const ctx = () => {
     let given = {};
@@ -731,7 +795,8 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}) }) {
     frame = view.requestAnimationFrame(() => {
       frame = 0;
       const unit = last ? find(last.x, last.y, false) : null;
-      hoverUnit = unit;
+      // held on, what the learner wrote shows no wash under a resting pointer: it is not read from there
+      hoverUnit = unit?.typed && machine.mode() === 'held' ? null : unit;
       machine.hover({ unit, pointer: 'mouse' });
       paint();
     });

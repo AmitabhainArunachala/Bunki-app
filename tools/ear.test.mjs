@@ -18,6 +18,7 @@ import {
   earLabel,
   findUnit,
   noVoiceLine,
+  rangeText,
 } from '../prototypes/corridor/modules/ear.mjs';
 
 /* ------------------------------------------------------------------ a fake clock and a fake voice */
@@ -679,6 +680,163 @@ describe('b. the unit that speaks', () => {
 });
 
 /* ------------------------------------------------------------------ c. off is inert */
+describe('nothing typed leaves the device', () => {
+  it('a field inside a label that is the unit is never part of what is sent', () => {
+    const label = h(
+      'label',
+      {},
+      'メモ',
+      h('span', { contenteditable: 'true' }, '下書きの文'),
+      h('textarea', {}, '書きかけの返事'),
+      h('select', {}, h('option', {}, '選んだ語')),
+      h('input', { value: '入力した語' }),
+    );
+    page(label);
+    const u = findUnit(textIn(label, 'メモ'), { context });
+    expect(u.element).toBe(label);
+    expect(said(u).join('')).toBe('メモ');
+  });
+
+  it('a field inside a paragraph is never part of its sentence', () => {
+    const p = h(
+      'p',
+      {},
+      '説明の文は',
+      h('span', { contenteditable: 'plaintext-only' }, '私の下書き'),
+      'ここで終わる。',
+    );
+    page(p);
+    const u = findUnit(textIn(p, '説明'), { offset: 1, context });
+    expect(said(u)).toEqual(['説明の文はここで終わる。']);
+    expect(u.text).not.toMatch(/下書き/);
+  });
+
+  it('a list of suggestions (datalist options) is never read', () => {
+    const p = h('p', {}, '候補：', h('datalist', {}, h('option', {}, '私の検索語')), '三つ。');
+    page(p);
+    expect(said(findUnit(textIn(p, '候補'), { offset: 0, context })).join('')).not.toMatch(
+      /検索語/,
+    );
+  });
+
+  it('tapping inside a field finds no unit, and nor does tapping text inside a field’s own label part', () => {
+    const editable = h('div', { contenteditable: '' }, h('span', {}, '入力中'));
+    page(editable);
+    expect(findUnit(textIn(editable, '入力中'), { context })).toBe(null);
+  });
+
+  it('a selection read by the 読む chip leaves out a field it runs across', () => {
+    const p = h(
+      'p',
+      {},
+      '前の文。',
+      h('span', { contenteditable: 'true' }, '下書き。'),
+      '後の文。',
+    );
+    page(p);
+    const range = {
+      commonAncestorContainer: p,
+      startContainer: textIn(p, '前の文'),
+      startOffset: 0,
+      endContainer: textIn(p, '後の文'),
+      endOffset: 4,
+      intersectsNode: () => true,
+    };
+    expect(rangeText(range)).toBe('前の文。後の文。');
+  });
+
+  it('what the learner wrote, shown as text, speaks on a tap and never from a resting pointer', () => {
+    const mine = h('p', { class: 'chat-turn me' }, '昨日は雨でした。');
+    const theirs = h('p', { class: 'chat-turn tutor' }, 'そうでしたか。');
+    const said2 = h(
+      'li',
+      { class: 'speak-line', 'data-who': 'me' },
+      h('span', { class: 'speak-said' }, '行きました。'),
+    );
+    const note = h('p', { class: 'record-note-segment' }, '覚えにくい語。');
+    const marked = h('p', { 'data-ear-typed': '' }, '自分の文。');
+    page(mine, theirs, said2, note, marked);
+    for (const node of [mine, said2, note, marked])
+      expect(findUnit(textIn(node, '。'), { offset: 0, context }).typed).toBe(true);
+    expect(findUnit(textIn(theirs, 'そう'), { offset: 0, context }).typed).toBeFalsy();
+    const { machine, calls, advance } = rig();
+    const typed = { ...unit('昨日'), typed: true };
+    machine.holdEar();
+    machine.hover({ unit: typed, pointer: 'mouse' });
+    advance(2000);
+    expect(calls.speak).toHaveLength(0);
+    expect(machine.click({ unit: typed, pointer: 'touch' })).toBe('consume');
+    expect(calls.speak).toHaveLength(1);
+  });
+});
+
+describe('the app’s own controls are never read as text', () => {
+  it('a listen mark inside a sentence is masked, and the sentence’s place still lines up', () => {
+    const p = h(
+      'p',
+      {},
+      '雨が',
+      h('button', { class: 'play-mark voice-say' }, '音'),
+      '降っている。',
+      h('button', {}, '聞く'),
+      '晴れた。',
+    );
+    page(p);
+    const u = findUnit(textIn(p, '降って'), { offset: 2, context });
+    expect(said(u)).toEqual(['雨が降っている。']);
+    expect(u.range).toMatchObject({
+      startNode: textIn(p, '雨が'),
+      startOffset: 0,
+      endNode: textIn(p, '降って'),
+      endOffset: 6,
+    });
+    const next = findUnit(textIn(p, '晴れた'), { offset: 0, context });
+    expect(said(next)).toEqual(['晴れた。']);
+    expect(next.range).toMatchObject({
+      startNode: textIn(p, '晴れた'),
+      startOffset: 0,
+      endOffset: 4,
+    });
+  });
+
+  it('a button inside a row is masked from the row’s word', () => {
+    const word = h(
+      'div',
+      { class: 'word', role: 'button' },
+      h('span', { class: 'base' }, '単なる'),
+      h('button', { class: 'kp-listen' }, '音'),
+    );
+    page(word);
+    const u = findUnit(textIn(word, '単なる'), { context });
+    expect(said(u)).toEqual(['単なる']);
+    expect(u.voiceKey).toBe('word:単なる');
+  });
+
+  it('the study card’s word: its reading, not the 音 button the voice layer puts beside it', () => {
+    const card = h(
+      'div',
+      { class: 'kp-word' },
+      h('span', { class: 'kp-term' }, '高学歴'),
+      h('span', { class: 'kp-reading' }, 'こうがくれき'),
+      h('span', { class: 'kp-pitch' }, '3'),
+      h('span', { class: 'kp-badge' }, 'noun'),
+      h('button', { id: 'kp-listen-word', class: 'kp-zoom-btn kp-listen' }, '音'),
+    );
+    page(card);
+    for (const where of ['高学歴', 'こうがくれき']) {
+      const u = findUnit(textIn(card, where), { offset: 0, context });
+      expect(said(u)).toEqual(['こうがくれき']);
+      expect(u.voiceKey).toBe('word:高学歴');
+    }
+  });
+
+  it('a control tapped inside running text reads the sentence around it, without the control', () => {
+    const p = h('p', {}, '今日は', h('button', { class: 'voice-say' }, '聞く'), '雨が降る。');
+    page(p);
+    expect(said(findUnit(textIn(p, '聞く'), { offset: 0, context }))).toEqual(['今日は雨が降る。']);
+  });
+});
+
 describe('c. with the ear off and no Option key, a click is the app’s own', () => {
   const watched = (fields) => {
     const reads = [];

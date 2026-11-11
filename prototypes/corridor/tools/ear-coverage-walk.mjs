@@ -74,7 +74,7 @@ async function scan({ exclusions, plant, earPath }) {
     b.style.cssText = 'position:fixed;left:37%;top:52%;z-index:2147483646;font-size:22px;background:#fff;color:#000;padding:4px';
     b.textContent = '入力中の文は読まない。';
     // on a screen with a modal open, the plants stand in the modal (everything else is under its layer)
-    (document.querySelector('dialog:modal') || document.body).append(a, b);
+    (document.querySelector('dialog:modal') || [...document.querySelectorAll('dialog[open]')].pop() || document.body).append(a, b);
   }
   const excluded = exclusions.map((entry) => ({ ...entry, found: document.querySelectorAll(entry.selector).length }));
   const skip = exclusions.map((entry) => entry.selector).join(', ');
