@@ -90,7 +90,7 @@ const pick = (selector, inner = null) => () => page.evaluate(({ selector, inner 
   for (const el of document.querySelectorAll(selector)) {
     const target = inner ? el.querySelector(inner) || el : el;
     const r = target.getBoundingClientRect();
-    if (r.width > 4 && r.top > 110 && r.bottom < innerHeight - 160 && r.left > 20 && r.right < innerWidth - 20 && /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(target.textContent)
+    if (r.width > 4 && r.top > 110 && r.bottom < innerHeight - 160 && r.left >= 0 && r.right <= innerWidth && /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(target.textContent)
       && document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2)?.closest(selector) === el)
       return { x: r.left + r.width / 2, y: r.top + r.height / 2, label: target.textContent.trim().slice(0, 16) };
   }
@@ -115,7 +115,7 @@ try {
   {
     const word = page.locator('#reader .tok.content').nth(4);
     for (let i = 0; i < 4 && !(await page.locator('#mini').isVisible().catch(() => false)); i += 1) { await press(word); await s.sleep(700); }
-    await armedTap('the word box’s word', pick('#mini .mini-word, #mini h2, #mini [lang="ja"]'));
+    await armedTap('the word box’s reading', pick('#mini .mini-reading'));
   }
   // 4. Today: his own word's row
   await toTab('today');
