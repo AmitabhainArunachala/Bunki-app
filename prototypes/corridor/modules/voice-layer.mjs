@@ -183,7 +183,9 @@ export function installVoiceLayer(host) {
         return tx('声を出せません。音声サーバーが混んでいます。もう一度。', 'No voice: the voice server is busy. Tap to try again.');
       case 'nothing-to-say': case 'not-japanese':
         return tx('ここには読み上げられる日本語がありません。', 'Nothing here can be read aloud.');
-      case 'audio-error':
+      // a clip that would not play (the speech queue names every failed play 'decode'): the clip is not kept any more, and
+      // the next tap asks again (voice-seam.mjs). It is not the server refusing (the combine's review)
+      case 'audio-error': case 'decode':
         return tx('再生できませんでした。もう一度。', 'Could not play. Tap to try again.');
       default:
         return tx('声を出せません。音声サーバーがこの文を読めませんでした。もう一度。', 'No voice: the voice server could not say this. Tap to try again.');
@@ -197,6 +199,7 @@ export function installVoiceLayer(host) {
     'not-in-release': tx('サーバー停止中', 'voice server not taking sentences'), 'request-rate-limit': tx('混雑、1分待つ', 'too many requests, wait a minute'),
     'voice-unavailable': tx('サーバー混雑', 'voice server busy'), 'voice-timeout': tx('サーバー混雑', 'voice server busy'),
     'nothing-to-say': tx('読む文なし', 'nothing to read'), 'not-japanese': tx('読む文なし', 'nothing to read'), 'audio-error': tx('再生エラー', 'could not play'),
+    decode: tx('再生エラー', 'could not play'),
   }[reason] || tx('サーバーエラー', 'voice server error'));
   // reasons that pass by themselves or by his pairing: what is true now is what a control says
   const PASSING = new Set(['not-paired', 'not-configured', 'authentication-required', 'offline', 'network-failed', 'day-budget', 'budget-exhausted',

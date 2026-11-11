@@ -3,7 +3,7 @@
  * server, no token or pairing code. Built on the ear review's harness (tools/review-ear/lib.mjs).
  *
  *   node prototypes/corridor/tools/verify-speech-lane-ear.mjs --site <built site> [--engine webkit|chromium] [--width 390|1728]
- *        [--ui bi|ja] [--port 19563] [--only switch,closed,offline,ended,mark] [--looks all] [--shots <dir>]
+ *        [--ui bi|ja] [--port 19563] [--only switch,closed,offline,unplayable,ended,mark] [--looks all] [--shots <dir>]
  *
  *  switch   I1 · "Highlight what is being read" off: the ear draws nothing on text, armed (a pointer over a sentence on the
  *           Mac), held (a rest) or speaking (a tap), in every look with --looks all; the 耳 mark still shows its state.
@@ -17,6 +17,8 @@
  *           on any other word nothing; the blanked and the choices face send nothing; no chip on any of the three.
  *  offline  I3 · after a reload and offline: a reading and a sentence the review card's control said, and a sentence the
  *           ear said, play with no request; a sentence never heard shows the one plain line.
+ *  unplayable  fix round 1 · WebKit: a kept clip that will not play (a media error): the struck ear's line says the clip could
+ *           not play (not that the voice server could not say it), the clip leaves the device, the next tap asks again.
  *  ended    I13 · a 401 on a request nobody waits for (the ear gave it up): the next tap says the pairing was ended, and
  *           Settings says so, as for any 401.
  *  turns    I4 · the Mac: Option-click on the answer's sentence while the review card's control speaks: the control ends,
@@ -35,7 +37,7 @@ const WIDTH = Number(argOf('--width', '390'));
 const UI = argOf('--ui', 'bi');
 const PORT = Number(argOf('--port', '19563'));
 const SHOTS = argOf('--shots', '');
-const ONLY = new Set(argOf('--only', 'switch,closed,offline,ended,turns,mark').split(',').filter(Boolean));
+const ONLY = new Set(argOf('--only', 'switch,closed,offline,unplayable,ended,turns,mark').split(',').filter(Boolean));
 const ALL_LOOKS = argOf('--looks', '') === 'all';
 if (!SITE) { console.error('usage: verify-speech-lane-ear.mjs --site <built site>'); process.exit(2); }
 if (SHOTS) mkdirSync(SHOTS, { recursive: true });
@@ -388,6 +390,63 @@ const cases = {
       record('I3 offline after a reload: the reading and the sentence the card’s control said play with no request', problems.splice(0), JSON.stringify({ online: cardSaid, offline: cardOffline, failedRequests }));
       await context.setOffline(false);
     } finally { await s.close(); }
+  },
+
+  // ============================================================ a kept clip that will not play (fix round 1)
+  // WebKit only: Playwright's offline switch there refuses the blob: address a kept clip plays from (media error 4, the
+  // review's probe), which is a real media error on a kept clip. Chromium plays it, so there is nothing to see there.
+  async unplayable() {
+    if (ENGINE !== 'webkit') return;
+    const s = await open({ engine: ENGINE, width: WIDTH, ui: UI, voicePort: PORT + 1, clipSeconds: () => 0.8 });
+    const { page, press, context } = s;
+    const keptKeys = () => page.evaluate(() => new Promise((done) => {
+      const req = indexedDB.open('bunki-voice-clips-v1');
+      req.onsuccess = () => { const db = req.result; try { const r = db.transaction(['index'], 'readonly').objectStore('index').getAllKeys(); r.onsuccess = () => { done(r.result.map(String)); db.close(); }; } catch (e) { done([]); } };
+      req.onerror = () => done([]);
+    }));
+    const line = () => page.evaluate(() => [...document.querySelectorAll('.ear-spot')].map((x) => x.lastElementChild).find((x) => x && !x.hidden)?.textContent || '');
+    try {
+      await page.evaluate(async () => { const m = await import('/corridor.js'); m.setWordPref(m.WORD_VOICE_KEY, 'wordVoice', m.WORD_VOICE, 'off'); });
+      await openArticle(s, { start: false });
+      // online: the ear says one sentence, and its clip is kept
+      await press(await earMark(page)); await waitEar(page, ['armed']);
+      const e0 = s.fake.speaks().length;
+      await tapAt(s, await wordPoint(s, 8));
+      await waitEar(page, ['off'], 8000);
+      const said = sent(s, e0);
+      await s.sleep(600);
+      const keptBefore = await keptKeys();
+      // a reload, then the kept clip meets a media error
+      await openArticle(s, { start: false });
+      await context.setOffline(true);
+      await press(await earMark(page)); await waitEar(page, ['armed']);
+      const a0 = s.fake.speaks().length;
+      await tapAt(s, await wordPoint(s, 8));
+      const struck = await waitEar(page, ['novoice'], 5000);
+      const why = await line();
+      await s.sleep(800);
+      const keptAfter = await keptKeys();
+      await context.setOffline(false);
+      await waitEar(page, ['off'], 6000);
+      await earOff(s);
+      // the next tap asks the server again, and plays
+      await press(await earMark(page)); await waitEar(page, ['armed']);
+      const b0 = s.fake.speaks().length;
+      await tapAt(s, await wordPoint(s, 8));
+      await waitEar(page, ['off'], 8000);
+      const again = sent(s, b0);
+      const problems = [];
+      const text = said[0];
+      if (!said.length) problems.push('online, the ear sent nothing (nothing to keep)');
+      if (!keptBefore.some((k) => k.endsWith(`|${text}`))) problems.push('the clip was not kept online (nothing to check)');
+      if (sent(s, a0).length - again.length > 0) problems.push('offline, the ear asked the server');
+      if (!struck) problems.push('the media error did not strike the mark');
+      if (/voice server could not say|音声サーバーがこの文を読めません/u.test(why) || !/Could not play|再生できません/u.test(why)) problems.push(`the line says ${JSON.stringify(why)}, not that the clip could not play`);
+      if (keptAfter.some((k) => k.endsWith(`|${text}`))) problems.push('the clip that would not play is still kept on the device');
+      if (again.length !== 1 || again[0] !== text) problems.push(`the next tap sent ${JSON.stringify(again)}, not ${JSON.stringify(text)} again`);
+      record('a kept clip that will not play (a media error): one true line, the clip leaves the device, and the next tap asks again', problems,
+        JSON.stringify({ said, keptBefore: keptBefore.length, struck, why, keptAfter: keptAfter.length, again }));
+    } finally { await context.setOffline(false).catch(() => {}); await s.close(); }
   },
 
   // ============================================================ I13 · a 401 nobody waits for keeps its reason

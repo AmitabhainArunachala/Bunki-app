@@ -49,6 +49,9 @@ function page({
   paired = true,
   fail = [],
   store = null,
+  // plays the player cannot make, in order: each rejects with this error (a media error: speech-player.mjs's
+  // Error('audio-error'), or WebKit's play() refusing a source it cannot load: NotSupportedError)
+  unplayable = [],
 } = {}) {
   const calls = { speak: [], played: [] };
   const client = {
@@ -71,8 +74,13 @@ function page({
       return { capCents: 2500, spentCents: 0, reservedCents: 0, remainingCents: 2500 };
     },
   };
+  const left = [...unplayable];
   const player = {
     play(clip) {
+      if (left.length) {
+        calls.refused = (calls.refused || 0) + 1;
+        return Promise.reject(left.shift());
+      }
       calls.played.push({ bytes: [...clip.bytes], contentType: clip.contentType });
       return Promise.resolve('ended');
     },
@@ -126,6 +134,66 @@ describe('B3: heard clips play offline', () => {
     expect((await run(third.seam, { voiceKey: 'article:a1', sentences: [S] })).at(-1)).toBe('done');
     expect(third.calls.speak).toHaveLength(0);
     expect(third.calls.played).toHaveLength(1);
+  });
+
+  const mediaError = () => new Error('audio-error');
+  const unsupported = () =>
+    Object.assign(new Error('The operation is not supported.'), { name: 'NotSupportedError' });
+  for (const [label, refusal] of [
+    ['a media error', mediaError],
+    ['WebKit refusing its source (NotSupportedError)', unsupported],
+  ]) {
+    it(`(h) a kept clip that will not play (${label}): the read ends saying it could not play (not that the server refused), the clip leaves the page and the device, and the next tap asks again`, async () => {
+      const storage = createMemoryClipStorage();
+      const key = `article:a1|${S.text}`;
+      const first = page({ storage });
+      await run(first.seam, { voiceKey: 'article:a1', sentences: [S] });
+      await settle(first.store);
+      expect(first.store.has(key)).toBe(true);
+      // a reload; the kept clip will not play
+      const second = page({ storage, unplayable: [refusal()] });
+      const states = await run(second.seam, { voiceKey: 'article:a1', sentences: [S] });
+      expect(second.calls.refused).toBe(1);
+      expect(second.calls.speak).toHaveLength(0);
+      // the speech team's queue names every failed play 'decode' (speech-queue.mjs, unchanged): the layer's line for it
+      // says the clip could not play (voice-layer.mjs silenceLine), not that the voice server could not say it
+      expect(states.at(-1)).toBe('error:decode');
+      expect(second.seam.status().silent).toMatchObject({ reason: 'decode' });
+      await settle(second.store);
+      expect(second.store.has(key)).toBe(false);
+      expect(second.store.size()).toEqual({ clips: 0, bytes: 0 });
+      expect(await storage.readIndex()).toEqual([]);
+      expect(await storage.readBytes(key)).toBe(null);
+      // the next tap asks the server again (the clip is not in this page's memory either), plays, and keeps the answer
+      expect((await run(second.seam, { voiceKey: 'article:a1', sentences: [S] })).at(-1)).toBe(
+        'done',
+      );
+      expect(second.calls.speak).toHaveLength(1);
+      expect(second.calls.played).toHaveLength(1);
+      await settle(second.store);
+      expect(second.store.has(key)).toBe(true);
+    });
+  }
+
+  it('(i) a play the browser does not allow (no tap yet: NotAllowedError) is not the clip’s fault: the clip stays kept', async () => {
+    const storage = createMemoryClipStorage();
+    const key = `article:a1|${S.text}`;
+    const first = page({ storage });
+    await run(first.seam, { voiceKey: 'article:a1', sentences: [S] });
+    await settle(first.store);
+    const notAllowed = Object.assign(new Error('play() needs a user gesture'), {
+      name: 'NotAllowedError',
+    });
+    const second = page({ storage, unplayable: [notAllowed] });
+    expect((await run(second.seam, { voiceKey: 'article:a1', sentences: [S] })).at(-1)).toBe(
+      'error:decode',
+    );
+    await settle(second.store);
+    expect(second.store.has(key)).toBe(true);
+    expect((await run(second.seam, { voiceKey: 'article:a1', sentences: [S] })).at(-1)).toBe(
+      'done',
+    );
+    expect(second.calls.speak).toHaveLength(0);
   });
 
   it('(b) an unheard sentence offline is silence with the reason: nothing played, nothing asked, the store asked first', async () => {

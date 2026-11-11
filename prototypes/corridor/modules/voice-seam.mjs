@@ -138,7 +138,7 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
     } catch { clip = null; } finally { clearTimeout(timer); }
     aborted(signal);
     if (!(clip?.bytes instanceof Uint8Array) || !clip.bytes.length) return null;
-    const kept = { bytes: clip.bytes, contentType: clip.contentType || 'audio/mpeg', voiceId: clip.voiceId ?? null, inputKey: null, source: 'server', kept: true };
+    const kept = { bytes: clip.bytes, contentType: clip.contentType || 'audio/mpeg', voiceId: clip.voiceId ?? null, inputKey: null, source: 'server', kept: true, key };
     remember(key, kept);
     return kept;
   }
@@ -156,7 +156,7 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
       aborted(signal);
       clip = await client.speak({ text, voiceKey, signal });
     }
-    const served = { ...clip, source: 'server' };
+    const served = { ...clip, source: 'server', key };
     remember(key, served);
     // only a successful audio answer reaches here (the client throws every error): it is kept on the device
     if (storeOn()) quietly(() => store.put(key, served));
@@ -280,7 +280,20 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
       if (outcome === null) { if (owner.recordedStops === stops) endedFromOutside(owner); return 'stopped'; }
       throw new Error('audio-error');
     }
-    try { return await player.play(clip, rate); } catch (error) { if (error?.name === 'AbortError') return 'stopped'; throw error; }
+    try { return await player.play(clip, rate); } catch (error) {
+      if (error?.name === 'AbortError') return 'stopped';
+      // a clip the player could not play (a media error, or WebKit's play() refusing its source) is kept no longer, in this
+      // page or on the device: the next ask goes to the server again (the combine's review). A play the browser does not
+      // allow yet (no tap: NotAllowedError) is not the clip's fault, and it stays. The read ends; its reason is the
+      // queue's 'decode', whose line says the clip could not play (voice-layer.mjs), not that the server could not say it
+      if (error?.name !== 'NotAllowedError' && clip.key) forget(clip);
+      throw error;
+    }
+  }
+  /** A clip that would not play leaves this page's memory and the device's store. */
+  function forget(clip) {
+    if (cache.get(clip.key) === clip) cache.delete(clip.key);
+    if (store) quietly(() => store.drop?.(clip.key));
   }
   /** The player the queue drives: one clip may be a recorded file, a server clip, or the parts of a split sentence. */
   const composite = (owner) => ({
