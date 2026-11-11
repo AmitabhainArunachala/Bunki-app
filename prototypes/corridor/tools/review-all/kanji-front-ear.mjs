@@ -15,7 +15,8 @@
  *      Option-click on the printed character; on the phone, the character selected and the ear's 読む chip pressed.
  *      Nothing may be sent (the voice would choose one of its readings, a reading the face does not print), and the card
  *      stays face-down.
- * K2 · the positive control: a kanji with one complete reading (its control stands): the ear sends exactly that reading.
+ * K2 · a kanji with one complete reading (its control stands, saying that reading): the ear sends exactly that reading, as
+ *      the control does (on the Mac this is the positive control; on the phone the 読む chip sends the selected text).
  *
  * Exit code 0 when every case passes, 1 otherwise. One JSON line per case on stdout. */
 import { createReadStream, statSync } from 'node:fs';
@@ -117,7 +118,9 @@ async function earOn(s, shown) {
   });
   await s.sleep(500);
   const visible = await s.page.locator('.ear-chip').isVisible().catch(() => false);
-  if (chip && visible) await s.page.locator('.ear-chip').tap();
+  // Playwright's touch tap on the chip brings no click in headless WebKit (on an article too: a probe sent nothing by
+  // touch and three sentences by a click); the chip's own click, as a real tap's click is, is dispatched instead
+  if (chip && visible) await s.page.locator('.ear-chip').dispatchEvent('click', { detail: 1 });
   return visible ? 'select-then-読む' : 'select (no 読む chip)';
 }
 
@@ -138,7 +141,7 @@ try {
         report('K1 a kanji with several readings, face-down in a practice block (no control of its own): the ear sends nothing', pass,
           { ...shown, act, sent, revealed });
       } else {
-        pass = !!shown.card && !!shown.control && (phone || (sent.length === 1 && sent[0] === shown.control)) && !revealed;
+        pass = !!shown.card && !!shown.control && sent.length === 1 && sent[0] === shown.control && !revealed;
         report('K2 positive control: a kanji with one complete reading: the ear sends that reading and nothing else', pass, { ...shown, act, sent, revealed });
       }
       failed ||= !pass;
