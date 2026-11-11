@@ -254,6 +254,7 @@ try {
     {
       const problems = [];
       await page.evaluate(() => document.activeElement?.blur?.());
+      if (!(await page.locator('#card-say-front').count())) throw new Error('#card-say-front is gone before the tap (the keys above turned the card)');
       await p.press('#card-say-front'); await p.sleep(900);
       const s1 = await reviewState(page);
       if (s1.focus !== 'body') problems.push(`focus stayed on ${s1.focus}`);
@@ -311,12 +312,14 @@ try {
         problems.push(...same(d0, d2, ['card', 'revealed']).map((d) => `Space: ${d}`));
         await quiet(page);
         await page.evaluate(() => document.activeElement?.blur?.());
+        if (await page.locator('#kp-listen-front').count()) {
         await p.press('#kp-listen-front'); await p.sleep(900);
         const d3 = await deckState(page);
         if (d3.focus !== 'body') problems.push(`focus stayed on ${d3.focus} after the tap`);
         await page.keyboard.press(' '); await p.sleep(1200);
         const d4 = await deckState(page);
         if (!d4.revealed) problems.push('Space after the tap did not show the answer');
+        } else problems.push('the control is gone: the keys showed the answer');
       }
       report('F6 deck front: Enter and Space on the focused control speak and never show the answer; after a tap Space shows it', problems, { card: d0.card });
     }
@@ -428,7 +431,8 @@ try {
     await startDeck(p);
     await tapOnly('#kp-listen-front (deck)', '#kp-listen-front', deckState);
     await quiet(page);
-    await p.press('#kp-reveal'); await p.sleep(1500);
+    if (await page.locator('#kp-reveal').count()) { await p.press('#kp-reveal'); await p.sleep(1500); }
+    else rows.push({ label: '#kp-listen-front (deck)', how: 'all', problems: ['Show answer was gone after its presses (the card was shown)'] });
     await tapOnly('#kp-listen-word (deck)', '#kp-listen-word', deckState);
     const problems = rows.flatMap((r) => r.problems.map((x) => `${r.label} by ${r.how}: ${x}`));
     report('F7 a tap only speaks: five controls by pointer, touch and keyboard leave revealed, graded, folded and focused state as they were', problems, rows.map((r) => `${r.label}/${r.how}: ${r.problems.length ? 'FAIL' : 'ok'}`));
