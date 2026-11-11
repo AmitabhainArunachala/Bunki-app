@@ -47,8 +47,11 @@ export function sentencesOf(text) {
   try { return splitSentences(normaliseSpeechText(String(text ?? ''))).map((piece) => ({ text: piece.text })); } catch { return []; }
 }
 
+/** `gapSleep` is the pause between two sentences of a read (the queue's `sleep`); the page gives one that does not wait
+ * while it is hidden (modules/reader-pocket.mjs, L1). Without it the seam's own `sleep` is the gap, as before; the seam's
+ * other waits (the 2 s after a 503) stay its own `sleep`. */
 export function createVoiceSeam({ client, player, recorded = null, store = null, storeWaitMs = 1500, quiet = () => {},
-  sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)), now = () => Date.now(),
+  sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)), gapSleep = null, now = () => Date.now(),
   online = () => globalThis.navigator?.onLine !== false, onStatus = () => {} } = {}) {
   if (!client || !player) throw new TypeError('the seam needs a client and a player');
   const cache = new Map();   // `${voiceKey}|${text}` → clip, most recent last (this page's own; the device store is below)
@@ -277,6 +280,9 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
       const stops = owner.recordedStops;
       const outcome = await recorded(clip.recorded.src, rate);
       if (outcome === true) return 'ended';
+      // paused by nobody in this app (a call, another app, the lock screen): the read holds at this sentence and says it
+      // again on play; nothing takes it up by itself (L1, John: only pause stops a read, and a pause is a pause)
+      if (outcome === 'paused') { owner.queue.pause(); return 'stopped'; }
       if (outcome === null) { if (owner.recordedStops === stops) endedFromOutside(owner); return 'stopped'; }
       throw new Error('audio-error');
     }
@@ -314,7 +320,7 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
     const queue = createSpeechQueue({
       fetchClip: (sentence, _index, signal) => clipFor(sentence, voiceKey, signal, owner),
       player: composite(owner),
-      prefetch, gapMs, sleep,
+      prefetch, gapMs, sleep: gapSleep || sleep,
       onSentence: (index) => { if (session === owner || index < 0) onSentence(index); },
       onState: (state, code) => {
         if (['done', 'stopped', 'error'].includes(state)) { owner.ended = true; if (session === owner) session = null; }

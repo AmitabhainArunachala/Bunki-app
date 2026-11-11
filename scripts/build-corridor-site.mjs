@@ -98,6 +98,7 @@ try {
     'modules/voice-seam.mjs',
     'modules/voice-client.mjs',
     'modules/voice-clip-store.mjs',
+    'modules/reader-pocket.mjs',
     'modules/learner.mjs',
     'modules/drift.mjs',
     'modules/library.mjs',

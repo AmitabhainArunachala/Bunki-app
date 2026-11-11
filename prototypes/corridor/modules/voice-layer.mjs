@@ -21,6 +21,7 @@ import { EAR_SLOW, installEar } from './ear.mjs';
 import { baseBoxes, createBands } from './voice-bands.mjs';
 import { createClipStore, createIndexedDbClipStorage } from './voice-clip-store.mjs';
 import { createDeviceTokenStore, createVoiceClient } from './voice-client.mjs';
+import { createPocketPlayer, createReaderMediaSession, gapSleep } from './reader-pocket.mjs';
 import { SPEEDS, createVoiceSeam, sentencesOf, voiceKeyOf } from './voice-seam.mjs';
 
 export const READER_RATES = Object.freeze([1, 1.25, 0.75]);
@@ -112,8 +113,15 @@ export function installVoiceLayer(host) {
   const doc = host.document || document;
   // the client knows no server until a pairing line brings its address (voice-client.mjs)
   const client = createVoiceClient({ store: createDeviceTokenStore(globalThis) });
-  const player = createAudioPlayer(doc);
+  // the one audio element, as an article read in his pocket needs it (L1, modules/reader-pocket.mjs): a pause nobody in
+  // this app asked for is told, and a read that waits for its next clip on a hidden page holds the element with silence
+  const speechPlayer = createAudioPlayer(doc);
   const audio = doc.querySelector('audio[data-speak-audio]');
+  let heldSilence = null;
+  const pocket = createPocketPlayer({ player: speechPlayer, audio, silence: () => (heldSilence ||= silenceUrl(doc.defaultView)) });
+  const player = pocket.player;
+  /** The play bar and the lock screen say what the article reader is doing: every change of the read repaints both. */
+  const barChanged = () => { host.refreshListenRow?.(); syncMedia(); };
   let primed = false;
   const listeners = new Set();
   // where the last sentence came from outlives a reload of this tab (the status line in Settings); nothing else is kept
@@ -128,6 +136,8 @@ export function installVoiceLayer(host) {
   void clips.ready();
   const seam = createVoiceSeam({
     client, player, store: clips,
+    // between two sentences nothing waits on a timer while the page is hidden (L1): a hidden page's timers stop
+    gapSleep: gapSleep(doc),
     recorded: (src, rate) => host.playRecorded(src, rate),
     quiet: () => host.quiet(),
     onStatus: (status) => {
@@ -311,7 +321,7 @@ export function installVoiceLayer(host) {
     if (yieldFrom) {
       reader.yielding = { pid: yieldFrom.pid, index: yieldFrom.index, resume: !yieldFrom.paused, word: mine };
       if (mine.over) yieldEnded(mine);
-      else host.refreshListenRow?.();
+      else barChanged();
     }
     return mine.session;
   }
@@ -328,16 +338,17 @@ export function installVoiceLayer(host) {
     if (y.resume && p && p.id === y.pid && !seam.active()) startReader(p, y.index);
     else {
       if (!y.resume && p && p.id === y.pid) reader.yielding = { pid: y.pid, index: y.index, resume: false, word: null };
-      host.refreshListenRow?.();
+      barChanged();
     }
   }
 
   /* ------------------------------------------------------------------ the article reader */
   // `owner` names the read that may repaint the bar: a read that was replaced or stopped says nothing more
   // `lit`: the sentence the bands are on; `yielding`: the read gave way to a word (the box's 音) and takes itself up again;
-  // `justStopped`: a playing read was ended in this very task (a word said now is what it yields to)
+  // `justStopped`: a playing read was ended in this very task (a word said now is what it yields to); `title`: the
+  // article's title, for the lock screen
   const reader = { pid: null, session: null, owner: null, sentences: [], index: 0, rate: 1, failed: null, source: null,
-    lit: -1, yielding: null, justStopped: null };
+    lit: -1, yielding: null, justStopped: null, title: '' };
   // The sentence being read is one even band per line (modules/voice-bands.mjs), the same in every engine: the CSS Custom
   // Highlight API painted it in patches in WebKit (John's iPhone, 2026-11-11). The words carry data-speaking.
   const view = doc.defaultView;
@@ -441,11 +452,12 @@ export function installVoiceLayer(host) {
   let readSessions = 0;
   function startReader(p, from = 0) {
     reader.pid = p.id;
+    reader.title = String(p.title || '');
     // which read this is, on the page: a read that goes on keeps its number (the checks read it)
     doc.documentElement.dataset.readSession = String(++readSessions);
     reader.sentences = articleSentences(p);
     reader.failed = null;
-    if (!reader.sentences.length) { reader.failed = { pid: p.id, code: 'nothing-to-say' }; host.refreshListenRow?.(); return; }
+    if (!reader.sentences.length) { reader.failed = { pid: p.id, code: 'nothing-to-say' }; barChanged(); return; }
     prime();
     const mine = {};
     reader.owner = mine;
@@ -463,19 +475,24 @@ export function installVoiceLayer(host) {
       onSource: (source) => {
         if (reader.owner !== mine) return;
         reader.source = { source };
-        host.refreshListenRow?.();
+        // a recording plays on its own element: the silence held on this one is not needed under it
+        if (source === 'recorded') pocket.letGo();
+        barChanged();
       },
       onState: (state, code) => {
         if (reader.owner !== mine) return;
         if (state === 'done') reader.index = 0;
         if (state === 'error') reader.failed = { pid: p.id, code: code || 'failed' };
         if (['done', 'stopped', 'error'].includes(state)) clearSpeaking();
+        // waiting for the next clip on a hidden page, the element holds silence so the page goes on sounding (L1); a clip
+        // that starts takes the element itself, and a pause or an end lets the silence go
+        if (state === 'loading') { if (doc.hidden) pocket.hold(); } else if (state !== 'playing') pocket.letGo();
         // the first states arrive while the read is still being set up; the bar is painted once it stands (below)
-        if (reader.session) host.refreshListenRow?.();
+        if (reader.session) barChanged();
       },
     });
     if (reader.owner === mine) reader.session = session;
-    host.refreshListenRow?.();
+    barChanged();
   }
   const readerApi = {
     /** What the play bar shows for this article. */
@@ -512,7 +529,7 @@ export function installVoiceLayer(host) {
       // while the read yields to a word: pause holds it where it is; play again takes it up now
       const y = reader.yielding && reader.yielding.pid === p.id ? reader.yielding : null;
       if (y) {
-        if (y.resume) { y.resume = false; host.refreshListenRow?.(); return; }
+        if (y.resume) { y.resume = false; barChanged(); return; }
         reader.yielding = null;
         startReader(p, y.index);
         return;
@@ -523,7 +540,7 @@ export function installVoiceLayer(host) {
         // the page may have been drawn again while paused; if it now shows another text, the read starts over on it
         else if (reader.sentences.some(stale) && !remapReader()) { startReader(p, 0); return; }
         else { prime(); reader.session.resume(); showSentence(reader.session.index); }
-        host.refreshListenRow?.();
+        barChanged();
         return;
       }
       startReader(p, reader.pid === p.id ? reader.index : 0);
@@ -548,9 +565,71 @@ export function installVoiceLayer(host) {
       reader.owner = null;
       if (session && !session.ended) session.stop();
       clearSpeaking();
+      pocket.letGo();
+      // the lock screen lets go of a read that has ended (it shows itself again if the read yields to a word now)
+      syncMedia();
     },
     active: readerActive,
   };
+
+  /* ------------------------------------------------------------------ in his pocket (L1, 2026-11-12) */
+  // "An article plays through with the screen locked." Hidden, the read goes on (corridor.js ends only the other sounds);
+  // between sentences nothing waits on a timer (gapSleep); a wait for a clip holds the element with silence; the lock
+  // screen shows the read with play, pause, next and previous; a pause from outside is a pause.
+  const icon = (name, sizes) => ({ src: new URL(name, doc.baseURI).href, sizes, type: 'image/png' });
+  const media = createReaderMediaSession({ navigator: view.navigator, MediaMetadata: view.MediaMetadata,
+    artwork: [icon('icon-512.png', '512x512'), icon('icon-192.png', '192x192')] });
+  /** The article being read, while he is still on it. */
+  const readHere = () => { const p = host.passage(); return p && p.id === reader.pid ? p : null; };
+  /** One sentence on or back, from the lock screen. A read paused there stays paused, at its new sentence. */
+  function step(by) {
+    if (!readerActive()) return;
+    const at = reader.session.index, to = Math.min(Math.max(0, at + by), reader.sentences.length - 1);
+    if (by > 0 && to === at) return;
+    reader.session.jump(to);
+    reader.index = to;
+    if (reader.session.state === 'paused') showSentence(to);
+    // the clip of the new sentence is still on its way: a hidden page holds the element with silence meanwhile
+    else if (reader.session.state === 'loading' && doc.hidden) pocket.hold();
+    barChanged();
+  }
+  const mediaActions = {
+    play: () => {
+      const p = readHere(), y = reader.yielding;
+      if (p && ((y && !y.resume) || (!y && readerActive() && reader.session.state === 'paused'))) readerApi.toggle(p);
+    },
+    pause: () => {
+      const p = readHere(), y = reader.yielding;
+      if (p && ((y && y.resume) || (!y && readerActive() && reader.session.state !== 'paused'))) readerApi.toggle(p);
+    },
+    nexttrack: () => step(1),
+    previoustrack: () => step(-1),
+  };
+  /** While a read exists (playing or paused, or giving way to a word) the lock screen shows it; otherwise it is clear. */
+  function syncMedia() {
+    const y = reader.yielding;
+    if (!readerActive() && !y) { media.clear(); return; }
+    media.show({ title: reader.title, playing: y ? !!y.resume : reader.session.state !== 'paused', actions: mediaActions });
+  }
+  // A pause nobody in this app asked for (a call, another app's sound, the lock screen's own button, headphones out): the
+  // read is paused at its sentence, and the bar and the lock screen say so; nothing takes it up again by itself.
+  pocket.onOutsidePause(() => {
+    const y = reader.yielding;
+    // the read had given way to a word or the ear: that voice ends, and the read waits paused at its sentence for his play
+    if (y) { if (y.resume) { y.resume = false; if (seam.active()) seam.stop(); barChanged(); } return; }
+    if (!readerActive() || seam.active() !== reader.session) return;
+    if (reader.session.state === 'playing' || reader.session.state === 'loading') reader.session.pause();
+  });
+  doc.addEventListener('visibilitychange', () => {
+    if (!readerActive()) return;
+    const state = reader.session.state;
+    if (doc.hidden) { if (state === 'loading') pocket.hold(); return; }
+    if (state === 'loading') pocket.letGo();
+    // shown again: the sentence being read is lit and the page is at it (showSentence leaves the page still under an open
+    // word box), and the bar says where the read is
+    if (reader.lit >= 0) showSentence(reader.lit);
+    barChanged();
+  });
   // A tap on a word while the article is being read is the word's own, as when it is idle: its box opens, Save and the
   // lists work, and the read goes on. Only the pause control stops it (John, 2026-11-11: "when i hit play, the only
   // thing that should stop that is hitting the pause button itself").
@@ -848,7 +927,7 @@ export function installVoiceLayer(host) {
         reader.yielding = { pid: yieldFrom.pid, index: yieldFrom.index, resume: !yieldFrom.paused, word: marker };
         // a read refused at once ended before the read could yield to it: the read takes itself up again now
         if (marker.over) yieldEnded(marker);
-        else host.refreshListenRow?.();
+        else barChanged();
       }
       return session;
     },
