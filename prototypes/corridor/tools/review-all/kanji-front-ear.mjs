@@ -17,6 +17,9 @@
  *      turned over is reported only.
  * K2 · a kanji with one complete reading (its control stands, saying that reading): the ear sends exactly that reading, as
  *      the control does (on the Mac this is the positive control; on the phone the 読む chip sends the selected text).
+ *      Changed in the builder's fix round 1 (the lead's ruling, 2026-11-12: "the 読む chip never appears for a selection that
+ *      lies in, starts in, ends in or spans a card's question face"): on the phone the selected character brings no chip
+ *      and sends nothing, and the card's own control, tapped, sends its reading once and leaves the card face-down.
  *
  * Exit code 0 when every case passes, 1 otherwise. One JSON line per case on stdout. */
 import { createReadStream, statSync } from 'node:fs';
@@ -142,6 +145,15 @@ try {
         pass = !!shown.card && !shown.control && !sent.length;
         report('K1 a kanji with several readings, face-down in a practice block (no control of its own): the ear sends nothing', pass,
           { ...shown, act, sent, revealed });
+      } else if (phone) {
+        // the phone (fix round 1, the lead's ruling): no 読む chip on a question face; the card's own control is its voice
+        const from = speaks().length;
+        if (shown.control) { await s.press('#card-say-front'); await s.sleep(1500); }
+        const byControl = speaks().slice(from);
+        const stillDown = await s.page.evaluate(async () => { const m = await import('/corridor.js'); return !m.S.review?.revealed; });
+        pass = !!shown.card && !!shown.control && act === 'select (no 読む chip)' && !sent.length && byControl.length === 1 && byControl[0] === shown.control && !revealed && stillDown;
+        report('K2 positive control (the phone): a kanji with one complete reading: no 読む chip for its selection, and its control sends that reading',
+          pass, { ...shown, act, sent, byControl, revealed, stillDown });
       } else {
         pass = !!shown.card && !!shown.control && sent.length === 1 && sent[0] === shown.control && !revealed;
         report('K2 positive control: a kanji with one complete reading: the ear sends that reading and nothing else', pass, { ...shown, act, sent, revealed });
