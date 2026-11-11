@@ -125,6 +125,9 @@ const SHELL = [
   'data/share_alike/skip.json',
   'drift-layer.css',
   'drift-layer.js',
+  // 宙's mount, a boot script of index.html; the engine and its data load only where the sky shows, and offline
+  // without them the mount gives the old first screen back
+  'sky/mount.mjs',
   'manifest.webmanifest',
   'apple-touch-icon.png',
   'icon-192.png',
