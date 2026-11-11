@@ -128,7 +128,7 @@ export function installVoiceLayer(host) {
       case 'offline': case 'network-failed':
         return tx('声を出せません。音声サーバーに届きません。接続を確かめて、もう一度。', 'No voice: the voice server is out of reach. Check the connection, then tap again.');
       case 'day-budget':
-        return tx(`声を出せません。今日の${dayCap().ja}分を使いました。${newDay()}に戻ります。`, `No voice: today’s ${dayCap().en} is used. The voice comes back at ${newDay()}.`);
+        return tx(`声を出せません。今日の${dayCap().ja}分を使いました。声は${newDay()}に戻ります。`, `No voice: today’s ${dayCap().en} is used. The voice comes back at ${newDay()}.`);
       case 'budget-exhausted':
         return tx(`声を出せません。合計${totalCap().ja}を使い切りました。`, `No voice: the ${totalCap().en} total is used.`);
       case 'not-in-release':
@@ -171,6 +171,20 @@ export function installVoiceLayer(host) {
     note.textContent = text || '';
   }
 
+  /** A read belongs to its control, and the app may draw that control's screen again while the read goes on (a page
+   * settling as it opens, a box drawn again). For a control that stands once on the screen this returns how to find
+   * "the same control of the same word" afterwards; for any other control, null (its read ends with it). */
+  function anchorOf(button) {
+    const id = button?.id || '';
+    const lookup = id ? () => doc.getElementById(id)
+      : button?.dataset?.voiceSay === 'entry-headword' ? () => doc.querySelector('#sheet > .voice-say[data-voice-say="entry-headword"]') : null;
+    if (!lookup) return null;
+    const subject = (node) => node.closest('#mini')?.dataset.uiContentValue || node.closest('.kp-card')?.dataset.card || node.closest('#sheet')?.dataset.node ||
+      `${node.dataset.voiceWord || ''}|${node.dataset.voiceText || ''}`;
+    const was = subject(button);
+    return () => { const now = lookup(); return now && now !== button && subject(now) === was ? now : null; };
+  }
+
   /** Speak `sentences` from `button`: a second tap stops it; whatever else was speaking ends first. With no voice to be
    * had it makes no sound and hands `onNote` the reason in one plain line (and '' again once a voice answers).
    * `automatic`: the read was not started by the learner's tap (a card's answer or an opened word saying itself): it
@@ -186,11 +200,20 @@ export function installVoiceLayer(host) {
       if (touched && !touched.hasBeenActive) return null;
     }
     prime();
-    const mine = { button, session: null, over: false, voiced: false };
+    // `find`: the same control of the same word after the app has drawn its screen again (anchorOf)
+    const mine = { button, session: null, over: false, voiced: false, find: anchorOf(button) };
     const paint = (on) => {
-      if (!button?.isConnected) return;
-      button.classList.toggle('is-speaking', on);
-      if (on) button.setAttribute('aria-pressed', 'true'); else button.removeAttribute('aria-pressed');
+      if (!mine.button?.isConnected) return;
+      mine.button.classList.toggle('is-speaking', on);
+      if (on) mine.button.setAttribute('aria-pressed', 'true'); else mine.button.removeAttribute('aria-pressed');
+    };
+    /** The control was drawn again while its read goes on: the new one takes the read over, lit as the old one was. */
+    mine.adopt = (next) => {
+      mine.button = next;
+      mine.find = anchorOf(next);
+      const state = mine.session?.state;
+      paint(state === 'loading' || state === 'playing');
+      if (state === 'loading') next.setAttribute('aria-busy', 'true');
     };
     mine.session = seam.read({
       sentences, voiceKey, prefetch: single ? 0 : 2, gapMs: single ? 0 : 260, rate: reader.rate,
@@ -198,11 +221,11 @@ export function installVoiceLayer(host) {
       onSource: () => { if (mine.over) return; mine.voiced = true; onNote?.('', null); },
       onState: (state, code) => {
         if (mine.over) return;
-        if (state === 'loading' || state === 'playing') { paint(true); button?.setAttribute('aria-busy', String(state === 'loading')); }
+        if (state === 'loading' || state === 'playing') { paint(true); mine.button?.setAttribute('aria-busy', String(state === 'loading')); }
         if (['done', 'stopped', 'error'].includes(state)) {
           mine.over = true;
           paint(false);
-          button?.removeAttribute('aria-busy');
+          mine.button?.removeAttribute('aria-busy');
           if (spoken === mine) spoken = null;
           // no sound was made: his tap is told why, in words; a read by itself says nothing
           const why = state === 'error' ? code || 'speak-failed' : state === 'done' && !mine.voiced ? 'nothing-to-say' : null;
@@ -598,9 +621,14 @@ export function installVoiceLayer(host) {
     if (scan) return;
     scan = doc.defaultView.setTimeout(() => {
       scan = 0;
-      // a read belongs to its control: when the control's screen goes, the read ends
-      if (spoken && !spoken.button.isConnected) { const gone = spoken; spoken = null; if (gone.session && !gone.session.ended) gone.session.stop(); }
       mountMarks(doc);
+      // A read belongs to its control. The control drawn again (the same one, of the same word) takes the read over;
+      // when the control's screen has gone, the read ends.
+      if (spoken?.button && !spoken.button.isConnected) {
+        const again = spoken.find?.();
+        if (again) spoken.adopt(again);
+        else { const gone = spoken; spoken = null; if (gone.session && !gone.session.ended) gone.session.stop(); }
+      }
       ear.mount();
     }, 60);
   };
