@@ -348,10 +348,42 @@ html[data-live-depth='1'] #sheet:has(> h2.headword):not(:has(.hero > .hero-glyph
    height as that 音 did too (32 px on the word's baseline, the glyph standing on the baseline), so the word type and
    everything below stand where they stood; its 44 px box reaches 2 px up and 10 px down, clear of the reading at 320. */
 .kp .kp-word > .card-voice { align-self: baseline; align-items: start; margin: -2px -20px -10px -12px; padding: 5px 20px 0 0; justify-items: end; }
-.voice-say.is-speaking, .mini-voice.is-speaking, .card-voice.is-speaking { color: var(--color-gold, var(--accent)); }
-/* waiting for the voice server's answer: the control he pressed dims until the sentence starts */
+/* One language of states for every voice control (the lead's ruling, 2026-11-12): the colours come from the ground the
+   control really stands on (ear.mjs toneFor, set by voice-layer.mjs as --vt-* on the control), never from a guess about
+   the look. At rest it keeps its own quiet ink, lifted to the look's nearest ink only where that would sink under 3:1.
+   Speaking, it is the seal (the look's own red, the first of its reds that stands 3:1 off the ground, with a paper glyph
+   on it at 4.5:1) and the three arcs, the same sign everywhere the voice is speaking: a listen mark, a card's speaker,
+   the word box's 音, the play bar's mark (the 耳 draws its own, ear.mjs). Waiting, the ink fades toward its ground,
+   never under 3:1. */
+:is(.voice-say, .mini-voice, .card-voice, .play-mark)[style*='--vt-ink']:not(.is-speaking):not([aria-busy='true']) { color: var(--vt-ink); }
+:is(.voice-say, .card-voice).is-speaking,
+.listen-row[data-voice-state='playing'] > .play-mark { position: relative; color: var(--vt-seal-ink, var(--ground-0)) !important; }
+:is(.voice-say, .card-voice).is-speaking svg,
+.listen-row[data-voice-state='playing'] > .play-mark svg {
+  color: var(--vt-seal-ink, var(--ground-0)); background: var(--vt-seal, var(--card-red)); border-radius: 1.5px;
+  box-shadow: 0 0 0 5px var(--vt-seal, var(--card-red));
+  /* on the seal the hairline speaker is drawn a little heavier, so its paper reads at full strength */
+  stroke-width: 1.8;
+}
+:is(.voice-say, .card-voice).is-speaking::after,
+.listen-row[data-voice-state='playing'] > .play-mark::after,
+html body #mini .mini-voice.is-speaking::after {
+  content: ''; position: absolute; left: calc(50% + 15px); top: 50%; width: 12px; height: 22px; transform: translateY(-50%);
+  background: var(--vt-seal, var(--card-red)); pointer-events: none;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 30'%3E%3Cg fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M4 9a8 8 0 0 1 0 12'/%3E%3Cpath d='M10 5a14 14 0 0 1 0 20' stroke-opacity='.7'/%3E%3Cpath d='M16 1a20 20 0 0 1 0 28' stroke-opacity='.45'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 30'%3E%3Cg fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M4 9a8 8 0 0 1 0 12'/%3E%3Cpath d='M10 5a14 14 0 0 1 0 20' stroke-opacity='.7'/%3E%3Cpath d='M16 1a20 20 0 0 1 0 28' stroke-opacity='.45'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+}
+/* the deck answer's word line: its glyph keeps to the line's end (the rule above), so the seal's arcs follow it there */
+.kp .kp-word > .card-voice.is-speaking::after { left: calc(100% - 13px); top: 14px; }
+/* the word box's 音: a printed key of the box; speaking, the key itself is the seal */
+html body #mini .mini-voice.is-speaking { position: relative; isolation: isolate; color: var(--vt-seal-ink, var(--ground-0)) !important; }
+html body #mini .mini-voice.is-speaking::before { z-index: -1; background: var(--vt-seal, var(--card-red)) !important; border-color: var(--vt-seal, var(--card-red)) !important; box-shadow: none !important; }
+html:not([data-live-depth='1']) body #mini .mini-voice.is-speaking { background: var(--vt-seal, var(--card-red)); }
+html body #mini .mini-voice.is-speaking::after { left: calc(100% + 1px); width: 9px; height: 18px; }
+/* waiting for the voice server's answer: the control he pressed fades until the sentence starts */
 .voice-say[aria-busy='true'], .mini-voice[aria-busy='true'],
 .listen-row[data-voice-state='loading'] .play-toggle { opacity: 0.6; }
+:is(.voice-say, .mini-voice, .card-voice)[aria-busy='true'][style*='--vt-wait'] { opacity: 1; color: var(--vt-wait); }
 /* the sentence being read: one even band per line, in a layer of its own that takes no pointer and moves no layout
    (modules/voice-bands.mjs; the Custom Highlight API painted it in patches in WebKit). It lies over the text like a
    highlighter on paper: multiplied on the light grounds, so the ink stays ink; plain on the night grounds. */

@@ -19,7 +19,12 @@ import { corridorDeclarations } from './corridor-declarations.mjs';
 
 const {
   EAR_CSS,
+  FLOOR,
   appControlAt,
+  chooseTone,
+  contrast,
+  luminance,
+  rgbaOf,
   createEarMachine,
   earClick,
   earKey,
@@ -1524,7 +1529,7 @@ describe('the sky draws its words: the ear asks the sky which word stands under 
 function skyMount() {
   const sandbox = { window: {} };
   vm.runInNewContext(
-    `${corridorDeclarations('sky/mount.mjs', ['sayable', 'OPTIONAL_AFTER_KANJI', 'KANA_SAID', 'formSaid', 'patternSaid', 'said', 'enginePick', 'lifted', 'wordAt', 'earTakes', 'askEarFirst'])}
+    `${corridorDeclarations('sky/mount.mjs', ['sayable', 'OPTIONAL_AFTER_KANJI', 'KANA_SAID', 'formSaid', 'patternSaid', 'said', 'enginePick', 'lifted', 'sentenceAt', 'wordAt', 'earTakes', 'askEarFirst'])}
      this.sayable = sayable; this.wordAt = wordAt; this.askEarFirst = askEarFirst;`,
     sandbox,
   );
@@ -1694,22 +1699,127 @@ describe('the sky’s mount says which word it drew under a point, as its own ta
   });
 });
 
-describe('on the sky the mark at rest is legible (K5)', () => {
-  it('on the sky the mark at rest stands on the gate’s plate; its other states keep their grounds (K5)', () => {
-    const rule = EAR_CSS.split('}').find((one) => one.includes("data-bunki-sky='1'"));
-    expect(rule).toMatch(/:is\(\[data-ear='off'\], \[data-ear='novoice'\]\)/);
-    expect(rule).toMatch(/#ginga-symbol \+ \.ear-spot \.ear-mark::before/);
-    expect(rule).toMatch(
-      /background: color-mix\(in srgb, var\(--ground-0, var\(--ear-white\)\) 70%, transparent\)/,
-    );
+describe('one language of states: the mark takes its colours from where it stands (K5, the print look)', () => {
+  // the rule (lead, 2026-11-12): at rest the mark looks like the gate beside it, on any screen, the sky included; armed,
+  // a red glyph on that plate, outlined in the same red; held on and speaking, the seal with its paper glyph; struck, the
+  // rest ink with one line; the struck line under the bar, wrapped inside the screen
+  const rule = (needle) => EAR_CSS.split('}').find((one) => one.includes(needle)) || '';
+  it('at rest the mark reads the gate’s ink, plate and hairline (toneFor), the old colours only as fallbacks', () => {
+    expect(rule('.ear-mark { --ear-ink')).toMatch(/--ear-ink: var\(--vt-ink, /);
+    expect(rule('.ear-mark::before {')).toMatch(/border: 1px solid var\(--vt-line, /);
+    expect(rule('.ear-mark::before {')).toMatch(/background: var\(--vt-fill, transparent\)/);
+    expect(rule('.ear-mark .ear-glyph {')).toMatch(/color: var\(--vt-ink, /);
+    // no screen keeps a colour of its own for the mark at rest: the sky's gate is read like any bar's
+    expect(EAR_CSS).not.toMatch(/data-bunki-sky='1'\][^{]*\.ear-mark/);
   });
-  it('at rest on the sky its character takes the gate’s own ink; struck, it keeps the sheet’s faded one', () => {
-    const glyph = EAR_CSS.split('}').find((one) =>
-      one.includes(
-        "html[data-bunki-sky='1'][data-ear='off'] #ginga-symbol + .ear-spot .ear-mark .ear-glyph",
-      ),
+  it('armed: the red the tone chose, on the rest plate, outlined in it; held on and speaking: the seal and its ink', () => {
+    expect(rule("html[data-ear='armed'] .ear-mark::before")).toMatch(
+      /border-color: var\(--ear-red\); background: var\(--vt-fill, /,
     );
-    expect(glyph).toMatch(/color: color-mix\(in oklab, var\(--ear-ink\) 86%, transparent\)/);
+    expect(rule("html[data-ear='armed'] .ear-mark .ear-glyph")).toMatch(/color: var\(--ear-red\)/);
+    expect(rule('.ear-mark { --ear-ink')).toMatch(/--ear-red: var\(--vt-red, var\(--red\)\)/);
+    expect(rule('.ear-mark { --ear-ink')).toMatch(/--ear-seal: var\(--vt-seal, /);
+    expect(rule("html:is([data-ear='held'], [data-ear='speaking']) .ear-mark::before")).toMatch(
+      /background: var\(--ear-seal\)/,
+    );
+    expect(rule("html:is([data-ear='held'], [data-ear='speaking']) .ear-mark .ear-glyph")).toMatch(
+      /color: var\(--ear-seal-ink\)/,
+    );
+    expect(rule('.ear-mark .ear-rings path {')).toMatch(/stroke: var\(--ear-seal\)/);
+  });
+  it('struck: the rest ink; its line fixed under the bar, wrapped, 16 px inside the screen on each side', () => {
+    expect(rule("html[data-ear='novoice'] .ear-mark .ear-glyph")).toMatch(/color: var\(--vt-ink, /);
+    const why = rule('.ear-why {');
+    expect(why).toMatch(/position: fixed/);
+    expect(why).toMatch(/max-width: calc\(100vw - 32px\)/);
+    expect(why).toMatch(/white-space: normal/);
+    expect(why).toMatch(/color: var\(--vt-why-ink, /);
+    expect(why).toMatch(/background: var\(--vt-plate, /);
+  });
+});
+
+describe('the choice of colours (chooseTone): from what is there, the look’s own reds, to the floors', () => {
+  const hex = (h) => [
+    parseInt(h.slice(1, 3), 16),
+    parseInt(h.slice(3, 5), 16),
+    parseInt(h.slice(5, 7), 16),
+    1,
+  ];
+  const pass = (t) => ({
+    rest: contrast(t.restInk, t.plate),
+    armed: contrast(t.red, t.plate),
+    seal: contrast(t.seal, t.ground),
+    sealInk: contrast(t.sealInk, t.seal),
+    wait: contrast(t.waitInk, t.plate),
+    why: contrast(t.whyInk, t.plate),
+  });
+  it('yoru under the print look: the bar is pale khaki and its own red is a deep one; the look’s coral never wins there', () => {
+    // what the browser reported on the merged head (2026-11-12): the bar, the gate's ink, the bar's and the page's reds
+    const bar = [171, 150, 106, 1];
+    const t = chooseTone({
+      ground: bar,
+      plate: bar,
+      ink: hex('#121c36'),
+      reds: [hex('#450a05'), hex('#ef8079'), hex('#a02a1e'), hex('#ef8079')],
+      papers: [hex('#1d2645'), hex('#f4ecd9'), hex('#131a30')],
+    });
+    const r = pass(t);
+    expect(r.rest).toBeGreaterThanOrEqual(FLOOR.rest);
+    expect(r.armed).toBeGreaterThanOrEqual(FLOOR.active);
+    expect(r.seal).toBeGreaterThanOrEqual(FLOOR.plate);
+    expect(r.sealInk).toBeGreaterThanOrEqual(FLOOR.active);
+    expect(r.wait).toBeGreaterThanOrEqual(FLOOR.rest);
+    expect(r.why).toBeGreaterThanOrEqual(FLOOR.text);
+    expect(t.red).toEqual(hex('#450a05'));
+  });
+  it('a night card on a dark ground takes the light red with a dark glyph; a pale card the deep red with a paper glyph', () => {
+    const navy = hex('#262e4b');
+    const dark = chooseTone({
+      ground: navy,
+      plate: navy,
+      ink: hex('#bebab0'),
+      reds: [hex('#a02a1e'), hex('#ef8079')],
+      papers: [hex('#1d2645'), hex('#f4ecd9')],
+    });
+    expect(dark.seal).toEqual(hex('#ef8079'));
+    expect(contrast(dark.sealInk, dark.seal)).toBeGreaterThanOrEqual(FLOOR.active);
+    const paper = hex('#f7f3e6');
+    const pale = chooseTone({
+      ground: paper,
+      plate: paper,
+      ink: hex('#4a453a'),
+      reds: [hex('#a02a1e'), hex('#ef8079')],
+      papers: [hex('#1d2645'), hex('#f4ecd9')],
+    });
+    expect(pale.seal).toEqual(hex('#a02a1e'));
+    expect(luminance(pale.sealInk)).toBeGreaterThan(luminance(pale.seal));
+    expect(contrast(pale.sealInk, pale.seal)).toBeGreaterThanOrEqual(FLOOR.active);
+  });
+  it('a rest ink that would sink under 3:1 is lifted to the look’s nearest ink; one that holds is kept', () => {
+    const paper = hex('#f7f3e6');
+    const faint = chooseTone({
+      ground: paper,
+      plate: paper,
+      ink: hex('#e2bd6c'),
+      reds: [hex('#a02a1e')],
+      papers: [hex('#f4ecd9'), hex('#1d2645')],
+    });
+    expect(contrast(faint.restInk, paper)).toBeGreaterThanOrEqual(FLOOR.rest);
+    const held = chooseTone({
+      ground: paper,
+      plate: paper,
+      ink: hex('#4a453a'),
+      reds: [hex('#a02a1e')],
+      papers: [],
+    });
+    expect(held.restInk.slice(0, 3)).toEqual(hex('#4a453a').slice(0, 3));
+  });
+  it('colours as browsers compute them are read (rgb, rgba, hex)', () => {
+    expect(rgbaOf('rgb(1, 2, 3)')).toEqual([1, 2, 3, 1]);
+    expect(rgbaOf('rgba(1, 2, 3, 0.5)')).toEqual([1, 2, 3, 0.5]);
+    expect(rgbaOf('rgb(1 2 3 / 50%)')).toEqual([1, 2, 3, 0.5]);
+    expect(rgbaOf('#ef8079')).toEqual([239, 128, 121, 1]);
+    expect(rgbaOf('transparent')).toEqual([0, 0, 0, 0]);
   });
 });
 

@@ -254,11 +254,48 @@ function enginePick(W, view, hits, px, py, slop) {
 /** The engine's own pick on a lifted finger, while the ear is asked about that lift (askEarFirst): the ear is told what
  * the engine itself chose for that event, not a second pick of its own. */
 let lifted = null;
+/* The sentences under an opened word (sky-web.js sentenceBlock: the caption's .cx block, a sentence from his own
+ * reading) and an opened pattern's examples (its caption's .exj rows): the engine prints them as captions it does not
+ * pick (a tap there lets the family go). They are what a learner most wants to hear, so the ear reads them: armed or
+ * held on, a tap on one says that sentence and the family stays open (the ear takes the tap, so the engine never sees
+ * it); with the ear off the engine acts as before (the ear is not asked). Its Japanese only: the English under it
+ * (.en), its source and the next-sentence button (.src) are left out. A sentence is running text, not one of the sky's
+ * controls (ear.mjs drawnUnit, control: false): held on, a finger's tap on it speaks. */
+function sentenceAt(sky, x, y) {
+  const ui = sky.ui, web = sky.W && sky.W.web;
+  if (!ui || !web || !web.isOpen()) return null;
+  const doc = ui.ownerDocument;
+  for (const block of ui.querySelectorAll('.cap .cx, .cap .exj')) {
+    const cap = block.closest('.cap');
+    if (!cap || Number(getComputedStyle(cap).opacity) < 0.5 || !block.getClientRects().length) continue;
+    const nodes = [];
+    const walk = (node) => {
+      for (const child of node.childNodes) {
+        if (child.nodeType === 3) nodes.push(child);
+        else if (child.nodeType === 1 && !child.matches('.en, .src, button')) walk(child);
+      }
+    };
+    walk(block);
+    const range = doc.createRange();
+    for (const node of nodes) {
+      range.selectNodeContents(node);
+      for (const r of range.getClientRects()) {
+        if (x >= r.left - 3 && x <= r.right + 3 && y >= r.top - 3 && y <= r.bottom + 3) {
+          const text = nodes.map((n) => n.nodeValue).join('').trim();
+          return text ? { text, reading: '', id: `s${text}`, control: false } : null;
+        }
+      }
+    }
+  }
+  return null;
+}
 /** What the sky shows under a point of the page (CSS px), as the engine would pick it there: a finger is given the
- * engine's wider reach (14 px; a mouse or a pen 5). */
+ * engine's wider reach (14 px; a mouse or a pen 5). A sentence caption under an opened word is the ear's own. */
 function wordAt(sky, x, y, pointer) {
   const W = sky && sky.W;
   if (!W || !W.ready || !sky.wrap || !sky.S || !sky.S.view) return null;
+  const sentence = sentenceAt(sky, x, y);
+  if (sentence) return sentence;
   if (lifted && lifted.sky === sky && Math.abs(lifted.x - x) < 0.5 && Math.abs(lifted.y - y) < 0.5) return lifted.h ? said(sky, lifted.h) : null;
   const box = sky.wrap.getBoundingClientRect();
   const px = x - box.left, py = y - box.top, slop = pointer === 'touch' ? 14 : 5;
@@ -425,6 +462,7 @@ function start() {
   });
   window.__SKY__ = api;
   askEarFirst(api);
+  sayGround();
   if (api && api.ok) settle('mounted');
 }
 
@@ -446,10 +484,19 @@ function watch() {
     }).observe(sky, { childList: true });
   new MutationObserver(() => {
     if (api && api.ok) api.setLook(lookOf());
+    sayGround();
   }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   new MutationObserver(() => {
     if (api && langOf() !== lang) start();
   }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+}
+
+/** The sky draws its own ground on the graphics card: the app's marks over it (the 耳 beside the gate) take their colours
+ * from the ground they really stand on (modules/ear.mjs groundOf), so the host says what that ground is: the deep sky of
+ * the chosen look, as the engine sets it on its wrap (sky.js setLook: --sky-deep). */
+function sayGround() {
+  const deep = host && api && api.wrap ? api.wrap.style.getPropertyValue('--sky-deep').trim() : '';
+  if (deep) host.style.setProperty('--voice-ground', deep);
 }
 
 function load(src) {

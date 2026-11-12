@@ -17,7 +17,7 @@
 import { createAudioPlayer } from './nihongo-speech/audio/speech-player.mjs';
 import { isJapaneseEnough, normaliseSpeechText, splitSentences } from './nihongo-speech/audio/speech-text.mjs';
 import { answerReads, deckFrontVoice, reviewFrontVoice } from './card-audio.mjs';
-import { EAR_SLOW, installEar } from './ear.mjs';
+import { EAR_SLOW, FLOOR, applyTone, contrast, groundUp, installEar, over, rgbaOf, toneFor } from './ear.mjs';
 import { baseBoxes, createBands } from './voice-bands.mjs';
 import { createClipStore, createIndexedDbClipStorage } from './voice-clip-store.mjs';
 import { createDeviceTokenStore, createVoiceClient } from './voice-client.mjs';
@@ -1033,10 +1033,35 @@ export function installVoiceLayer(host) {
         else { const gone = spoken; spoken = null; if (gone.session && !gone.session.ended) gone.session.stop(); }
       }
       ear.mount();
+      // a control drawn again while it speaks or waits (the play bar is built anew at each change) takes its tone again
+      for (const control of doc.querySelectorAll(`.listen-row[data-voice-state] > .play-mark, :is(${VOICE_CONTROL}):is(.is-speaking, [aria-busy='true'])`)) toneControl(control);
+      // at rest a control keeps its own quiet ink, unless that ink would sink under 3:1 on the ground it stands on
+      const look = `${doc.documentElement.getAttribute('data-theme') || ''}|${doc.documentElement.getAttribute('data-live-depth') || ''}`;
+      for (const control of doc.querySelectorAll(VOICE_CONTROL)) {
+        if (control.dataset.vtLook === look || !control.getClientRects().length) continue;
+        control.dataset.vtLook = look;
+        try {
+          const ink = rgbaOf(doc.defaultView.getComputedStyle(control).color, doc), ground = groundUp(control);
+          if (ink && contrast(over(ink, ground), ground) < FLOOR.rest) toneControl(control);
+        } catch { /* its own ink stands */ }
+      }
     }, 60);
   };
   new doc.defaultView.MutationObserver(rescan).observe(doc.body, { childList: true, subtree: true });
   rescan();
+  /* One language of states for every voice control (ear.mjs toneFor): when a listen mark, a card's speaker, the word
+   * box's 音 or the play bar starts to speak or to wait, it takes the seal and the dimmed ink of the ground it really
+   * stands on (tighten.css reads --vt-seal, --vt-seal-ink, --vt-wait). */
+  const VOICE_CONTROL = '.card-voice, .mini-voice, .voice-say, .play-mark';
+  const toneControl = (control) => { try { if (control?.isConnected && control.getClientRects().length) applyTone(control, toneFor(control)); } catch { /* its styles' fallbacks stand */ } };
+  new doc.defaultView.MutationObserver((changes) => {
+    for (const change of changes) {
+      const target = change.target;
+      if (target.nodeType !== 1) continue;
+      if (target.matches?.(VOICE_CONTROL) && (target.classList.contains('is-speaking') || target.getAttribute('aria-busy') === 'true')) toneControl(target);
+      else if (target.matches?.('.listen-row')) toneControl(target.querySelector(':scope > .play-mark'));
+    }
+  }).observe(doc.body, { attributes: true, subtree: true, attributeFilter: ['class', 'aria-busy', 'data-voice-state'] });
 
   /* ------------------------------------------------------------------ Settings: pairing and the status line */
   const dollars = (cents) => `$${(cents / 100).toFixed(2)}`;

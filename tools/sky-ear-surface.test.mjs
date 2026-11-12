@@ -47,8 +47,13 @@ const NEEDS = [
   ],
   [
     'sky.js',
-    'the api mount returns, with ok, S, wrap and destroy (the hook measures against sky.wrap, reads sky.S.view)',
-    (t) => /const api = \{ ok: true, S,[^\n]*\bwrap\b[^\n]*\bdestroy\(\)/u.test(t),
+    'the api mount returns, with ok, S, wrap, ui and destroy (the hook measures against sky.wrap, reads sky.S.view, finds the captions in sky.ui)',
+    (t) => /const api = \{ ok: true, S,[^\n]*\bwrap, ui\b[^\n]*\bdestroy\(\)/u.test(t),
+  ],
+  [
+    'sky.js',
+    "setLook writes the deep sky of the look on the wrap as --sky-deep (the mount says it as the marks' ground)",
+    (t) => /wrap\.style\.setProperty\('--sky-deep', L\.c\[1\]\)/u.test(t),
   ],
   [
     'sky.js',
@@ -198,6 +203,28 @@ const NEEDS = [
         new RegExp(`kind: '${kind}', id[:,][^\\n]*?text: `, 'u').test(t),
       ) && /kind: 'g', id, text: g\.p,/u.test(t),
   ],
+  [
+    'sky-web.js',
+    'captions are DOM in the sky’s ui, each a div of class cap…, that take no pointer (a tap on one reaches the canvas)',
+    (t) =>
+      /web\.caps = c\.caps\.map\(\(cp\) => \{ const node = el\('div', cp\.cls\); cp\.build\(node\); ui\.append\(node\);/u.test(
+        t,
+      ) && /\n {2}\.cap \{[^}]*pointer-events: none;/u.test(t),
+  ],
+  [
+    'sky-web.js',
+    'a word’s sentence: a .cx block in its caption, its English in a span .en, its source and next button in a span .src',
+    (t) =>
+      /const w = W\.D\.words\[id\]\[0\], box = el\('div', 'cx'\)/u.test(t) &&
+      /box\.append\(el\('span', 'en', row\[2\]\)\)/u.test(t) &&
+      /src = el\('span', 'src', /u.test(t) &&
+      /src\.append\(b\)/u.test(t),
+  ],
+  [
+    'sky-web.js',
+    "an opened pattern's examples: each a .exj row in the caption 'cap gram'",
+    (t) => /cls: 'cap gram'/u.test(t) && /const row = el\('div', 'exj'\)/u.test(t),
+  ],
 ];
 
 /** What mount.mjs leans on that the engine no longer has, by name. */
@@ -240,7 +267,10 @@ describe("what the ear on the sky leans on in the sky's engine", () => {
     ]);
     expect(names(mount.replace(hook, ''), 'W')).toEqual([]);
     expect(names(hook, 'web')).toEqual(['isOpen', 'pick', 'tap']);
-    expect(names(hook, 'sky')).toEqual(['S', 'W', 'wrap']);
+    expect(names(hook, 'sky')).toEqual(['S', 'W', 'ui', 'wrap']);
+    // the captions: by these classes, and nothing else of the ui
+    const classes = [...new Set([...hook.matchAll(/'(\.[a-z][^']*)'/gu)].map((m) => m[1]))].sort();
+    expect(classes).toEqual(['.cap', '.cap .cx, .cap .exj', '.en, .src, button']);
     expect(names(hook, 'S')).toEqual(['view']);
     expect(names(hook, 'view')).toEqual(['over']);
     expect(names(hook, 'D')).toEqual(['kanji', 'parts', 'words']);
@@ -346,6 +376,19 @@ describe("what the ear on the sky leans on in the sky's engine", () => {
         'built inside mount',
       ],
       ['sky.js', 'const api = { ok: true, S, gl,', 'const api = { ok: true, gl,', 'the api mount'],
+      [
+        'sky.js',
+        "wrap.style.setProperty('--sky-deep', L.c[1])",
+        "wrap.style.setProperty('--sky-ground', L.c[1])",
+        'setLook writes the deep sky',
+      ],
+      ['sky-web.js', "box = el('div', 'cx')", "box = el('div', 'sentence')", 'a word’s sentence'],
+      [
+        'sky-web.js',
+        "const row = el('div', 'exj')",
+        "const row = el('div', 'example')",
+        'examples',
+      ],
     ])('%s: %s → named', (file, from, to, named) => {
       const said = broken(file, from, to);
       expect(said.some((line) => line.startsWith(`${file}:`) && line.includes(named))).toBe(true);

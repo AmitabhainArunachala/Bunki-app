@@ -705,7 +705,8 @@ function drawnUnit(surface, x, y, pointer, context) {
     text: sentences.map((one) => one.text).join(''), sentences,
     key: `d${idOf(surface)}:${said.id ?? text}`,
     voiceKey: keyOf({ node: surface, word: text, paragraph: text }, context),
-    typed: false, front: false, control: true,
+    // a word the surface draws is one of its controls (R-a); running text it prints (the sky's sentence captions) is not
+    typed: false, front: false, control: said.control !== false,
     contains: (node) => inside(surface, node),
   };
 }
@@ -775,57 +776,194 @@ export function earKey(event, { machine }) {
   return 'consume';
 }
 
+/* ------------------------------------------------------------------ the colours a voice control takes */
+/* One language of states for every voice control (the lead's ruling, 2026-11-12, after the print look came into the
+ * build): a control takes its colours from the ground it really stands on, never from a guess about the look (under
+ * the print look a night look's bars and cards are pale). At rest it looks like its neighbour (the 耳 like the gate
+ * beside it); armed, a red 耳 on that plate, outlined in the same red; held on and speaking, the seal: the look's own
+ * red, with a paper-coloured glyph on it and, while it speaks, the three arcs; waiting, dimmed; no voice, struck. The
+ * reds are the look's own tokens (the red of the surface, the page's, the card's, the zen room's), taken in that order,
+ * the first that meets the floor against what is really behind: 3:1 at rest and for a seal against its ground, 4.5:1 for
+ * a glyph in any active state and for text. Where no token meets a floor the one that comes nearest is used. */
+export const FLOOR = Object.freeze({ rest: 3, active: 4.5, plate: 3, text: 4.5 });
+/* What a choice aims at: a little over each floor, because a glyph's thin strokes print a little lighter than its colour
+ * (the floors are measured on the pixels, tools/verify-voice-legibility.mjs). */
+const AIM = Object.freeze({ rest: 3.4, active: 5.2, plate: 3.3, text: 5 });
+let colourProbe = null;
+/** [r, g, b, a] (0-255, alpha 0-1) of a computed CSS colour; any form a browser computes (rgb, oklab, color()) is painted
+ * once on a 1 px canvas and read back. null when it is not a colour. */
+export function rgbaOf(text, doc = globalThis.document) {
+  const value = String(text ?? '').trim();
+  if (!value) return null;
+  if (value === 'transparent') return [0, 0, 0, 0];
+  const m = /^rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)(?:\s*[,/]\s*([\d.]+%?))?\s*\)$/iu.exec(value);
+  if (m) return [+m[1], +m[2], +m[3], m[4] == null ? 1 : m[4].endsWith('%') ? parseFloat(m[4]) / 100 : +m[4]];
+  const h = /^#([0-9a-f]{3,8})$/iu.exec(value);
+  if (h) {
+    const x = h[1].length <= 4 ? [...h[1]].map((c) => c + c).join('') : h[1];
+    return [parseInt(x.slice(0, 2), 16), parseInt(x.slice(2, 4), 16), parseInt(x.slice(4, 6), 16), x.length === 8 ? parseInt(x.slice(6, 8), 16) / 255 : 1];
+  }
+  if (!doc?.createElement) return null;
+  try {
+    if (!colourProbe) { const c = doc.createElement('canvas'); c.width = 1; c.height = 1; colourProbe = c.getContext('2d', { willReadFrequently: true }); }
+    const ctx = colourProbe;
+    ctx.fillStyle = '#010203';
+    ctx.fillStyle = value;
+    if (ctx.fillStyle === '#010203' && value !== '#010203') return null;
+    ctx.clearRect(0, 0, 1, 1);
+    ctx.fillRect(0, 0, 1, 1);
+    const d = ctx.getImageData(0, 0, 1, 1).data;
+    return [d[0], d[1], d[2], d[3] / 255];
+  } catch { return null; }
+}
+/** `top` laid over an opaque `bottom`. */
+export const over = (top, bottom) => (!top ? bottom : [0, 1, 2].map((i) => top[i] * top[3] + bottom[i] * (1 - top[3])).concat(1));
+const channel = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+export const luminance = (c) => 0.2126 * channel(c[0]) + 0.7152 * channel(c[1]) + 0.0722 * channel(c[2]);
+/** WCAG contrast of two opaque colours. */
+export const contrast = (a, b) => { const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x); return (hi + 0.05) / (lo + 0.05); };
+export const cssOf = (c) => `rgb(${c.slice(0, 3).map((v) => Math.round(v)).join(' ')})`;
+/** The first candidate that passes, else the one that comes nearest. */
+export function pick(candidates, passes, nearness) {
+  const list = candidates.filter(Boolean);
+  return list.find(passes) || list.slice().sort((a, b) => nearness(b) - nearness(a))[0] || null;
+}
+/** The colour a CSS custom property holds where `el` stands (scoped tokens included; the computed value has its var()
+ * references resolved), or null when it is not set or not a colour. Read only: nothing is added to the page. */
+function tokenAt(el, name) {
+  const c = rgbaOf(el.ownerDocument.defaultView.getComputedStyle(el).getPropertyValue(name), el.ownerDocument);
+  return c && c[3] > 0 ? c : null;
+}
+/** What lies behind the centre of `el`, `el` itself left out: the colours of the layers under that point, from the top
+ * down to the first opaque one, laid over each other. A surface that draws its own ground (the sky, in WebGL) says
+ * what it is with --voice-ground. */
+export function groundOf(el) {
+  const doc = el.ownerDocument, view = doc.defaultView, r = el.getBoundingClientRect();
+  const x = r.left + r.width / 2, y = r.top + r.height / 2;
+  const inView = x >= 0 && y >= 0 && x < view.innerWidth && y < view.innerHeight;
+  const layers = [];
+  // out of view, nothing can be asked at its point: its own ancestors are its ground
+  const under = inView ? doc.elementsFromPoint(x, y) : (() => { const up = []; for (let at = el.parentElement; at; at = at.parentElement) up.push(at); return up; })();
+  for (const node of under) {
+    if (node === el || el.contains(node)) continue;
+    const own = node.style?.getPropertyValue('--voice-ground').trim();
+    if (own) { const c = rgbaOf(own, doc); if (c) { layers.push([c[0], c[1], c[2], 1]); break; } }
+    const bg = rgbaOf(view.getComputedStyle(node).backgroundColor, doc);
+    if (bg && bg[3] > 0) { layers.push(bg); if (bg[3] >= 0.99) break; }
+  }
+  return layers.reverse().reduce((under, layer) => over(layer, under), [255, 255, 255, 1]);
+}
+/** The ground of `el` from its own ancestors only (cheap: no point asked of the page). */
+export function groundUp(el) {
+  const doc = el.ownerDocument, view = doc.defaultView, layers = [];
+  for (let at = el.parentElement; at; at = at.parentElement) {
+    const bg = rgbaOf(view.getComputedStyle(at).backgroundColor, doc);
+    if (bg && bg[3] > 0) { layers.push(bg); if (bg[3] >= 0.99) break; }
+  }
+  return layers.reverse().reduce((under, layer) => over(layer, under), [255, 255, 255, 1]);
+}
+/** The colours of a voice control where it stands. `neighbour`: the control it looks like at rest (the gate beside the
+ * 耳); without one it keeps its own rest colours. */
+export function toneFor(el, { neighbour = null } = {}) {
+  const doc = el.ownerDocument, view = doc.defaultView, root = doc.documentElement;
+  const ground = groundOf(el);
+  const cs = view.getComputedStyle(neighbour || el);
+  const before = neighbour ? view.getComputedStyle(neighbour, '::before') : null;
+  const filled = (text) => { const c = rgbaOf(text, doc); return c && c[3] > 0 ? text : null; };
+  const fill = (before && filled(before.backgroundColor)) || filled(cs.backgroundColor) || 'transparent';
+  const plate = over(rgbaOf(fill, doc), ground);
+  const lined = (style) => style && parseFloat(style.borderTopWidth) > 0 && filled(style.borderTopColor);
+  const line = lined(before) || lined(cs) || null;
+  const own = [tokenAt(el, '--red'), tokenAt(root, '--red'), tokenAt(el, '--card-red'), tokenAt(el, '--zen-red'), tokenAt(root, '--zen-red')];
+  const papers = [tokenAt(root, '--print-white'), tokenAt(root, '--ground-0'), tokenAt(el, '--ground-0'), tokenAt(root, '--ink'), tokenAt(el, '--ink'), tokenAt(root, '--ground')];
+  return { ...chooseTone({ ground, plate, ink: rgbaOf(cs.color, doc), reds: own, papers }), fill, line };
+}
+/** The choice itself, from plain colours ([r, g, b, a]): what lies behind (`ground`), the plate the control stands on at
+ * rest (`plate`), its rest ink (`ink`), the look's reds in the order they are preferred, its papers and inks. */
+export function chooseTone({ ground, plate, ink, reds: given = [], papers: paperTokens = [] }) {
+  const seen = new Set();
+  const reds = given.filter((c) => { if (!c || !(c[3] > 0)) return false; const k = c.slice(0, 3).map(Math.round).join(); if (seen.has(k)) return false; seen.add(k); return true; }).map((c) => over(c, ground));
+  const papers = paperTokens.filter((c) => c && c[3] > 0).concat([plate]).map((c) => over(c, ground)).sort((a, b) => luminance(b) - luminance(a));
+  let restInk = over(ink || [0, 0, 0, 1], plate);
+  if (contrast(restInk, plate) < AIM.rest) restInk = pick(papers, (c) => contrast(c, plate) >= AIM.rest, (c) => contrast(c, plate));
+  const red = pick(reds, (c) => contrast(c, plate) >= AIM.active, (c) => contrast(c, plate)) || restInk;
+  // on the seal: the paper or ink of the look that stands furthest from it (paper on a deep red, ink on a light one)
+  const inkOn = (seal) => papers.slice().sort((a, b) => contrast(b, seal) - contrast(a, seal))[0] || restInk;
+  const seal = pick(reds, (c) => contrast(c, ground) >= AIM.plate && contrast(inkOn(c), c) >= AIM.active,
+    (c) => Math.min(contrast(c, ground) / AIM.plate, contrast(inkOn(c), c) / AIM.active)) || red;
+  const sealInk = inkOn(seal);
+  // waiting: the rest ink faded toward its ground, never under the rest floor
+  let waitInk = restInk;
+  for (let t = 0.4; t > 0; t -= 0.05) {
+    const c = [0, 1, 2].map((i) => restInk[i] * (1 - t) + plate[i] * t).concat(1);
+    if (contrast(c, plate) >= AIM.rest) { waitInk = c; break; }
+  }
+  const whyInk = contrast(restInk, plate) >= AIM.text ? restInk : pick(papers.concat([restInk]), (c) => contrast(c, plate) >= AIM.text, (c) => contrast(c, plate));
+  return { ground, plate, restInk, red, seal, sealInk, waitInk, whyInk };
+}
+/** The tone as the custom properties the voice controls' styles read. */
+export function toneVars(t) {
+  return {
+    '--vt-ink': cssOf(t.restInk), '--vt-fill': t.fill, '--vt-line': t.line || `color-mix(in oklab, ${cssOf(t.restInk)} 30%, transparent)`,
+    '--vt-plate': cssOf(t.plate), '--vt-red': cssOf(t.red), '--vt-seal': cssOf(t.seal), '--vt-seal-ink': cssOf(t.sealInk),
+    '--vt-wait': cssOf(t.waitInk), '--vt-wait-opacity': '1', '--vt-why-ink': cssOf(t.whyInk),
+  };
+}
+export function applyTone(target, t) {
+  for (const [name, value] of Object.entries(toneVars(t))) target.style.setProperty(name, value);
+}
+
 /* ------------------------------------------------------------------ the look */
-const RINGS = '<svg class="ear-rings" viewBox="0 0 26 30" aria-hidden="true" focusable="false"><path d="M4 9a8 8 0 0 1 0 12"/><path d="M10 5a14 14 0 0 1 0 20"/><path d="M16 1a20 20 0 0 1 0 28"/></svg>';
+const RINGS ='<svg class="ear-rings" viewBox="0 0 26 30" aria-hidden="true" focusable="false"><path d="M4 9a8 8 0 0 1 0 12"/><path d="M10 5a14 14 0 0 1 0 20"/><path d="M16 1a20 20 0 0 1 0 28"/></svg>';
 /** The design lead's CSS (design/ear/ear-states.html), on the app's own variables: --red, --ink, the paper white. */
 export const EAR_CSS = `
-.ear-mark { --ear-ink: var(--color-bar-ink, var(--ink)); --ear-red: var(--red); --ear-white: var(--print-white, var(--ground-0, var(--color-paper, var(--ground))));
+.ear-mark { --ear-ink: var(--vt-ink, var(--color-bar-ink, var(--ink))); --ear-red: var(--vt-red, var(--red)); --ear-white: var(--print-white, var(--ground-0, var(--color-paper, var(--ground))));
+  --ear-seal: var(--vt-seal, var(--ear-red)); --ear-seal-ink: var(--vt-seal-ink, var(--ear-white));
   position: relative; display: inline-grid; place-items: center; width: 44px; min-width: 44px; height: 44px; padding: 0; margin: 0; border: 0;
   background: transparent; color: var(--ear-ink); cursor: pointer; isolation: isolate; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
 .ear-mark::before { content: ''; position: absolute; inset: 7px; z-index: -1; border-radius: 3px;
-  border: 1px solid color-mix(in oklab, var(--ear-ink) 30%, transparent); background: transparent;
+  border: 1px solid var(--vt-line, color-mix(in oklab, var(--ear-ink) 30%, transparent)); background: var(--vt-fill, transparent);
   transition: background-color 120ms ease-out, border-color 120ms ease-out, box-shadow 120ms ease-out, border-radius 120ms ease-out; }
-.ear-mark .ear-glyph { font: 500 16px/1 "Hiragino Mincho ProN", "Noto Serif JP", var(--serif, serif); color: color-mix(in oklab, var(--ear-ink) 58%, transparent); transition: color 120ms ease-out; pointer-events: none; }
+.ear-mark .ear-glyph { font: 500 16px/1 "Hiragino Mincho ProN", "Noto Serif JP", var(--serif, serif); color: var(--vt-ink, color-mix(in oklab, var(--ear-ink) 58%, transparent)); transition: color 120ms ease-out; pointer-events: none; }
 .ear-mark:focus-visible { outline: 2px solid var(--ai, var(--ear-ink)); outline-offset: -4px; }
 .ear-mark .ear-rings { position: absolute; left: calc(100% - 7px); top: 50%; width: 26px; height: 30px; transform: translate(2px, -50%); overflow: visible; display: none; pointer-events: none; }
-.ear-mark .ear-rings path { fill: none; stroke: var(--ear-red); stroke-width: 1.4; stroke-linecap: round; stroke-dasharray: 40; stroke-dashoffset: 0; }
+.ear-mark .ear-rings path { fill: none; stroke: var(--ear-seal); stroke-width: 1.4; stroke-linecap: round; stroke-dasharray: 40; stroke-dashoffset: 0; }
 .ear-mark .ear-rings path:nth-child(2) { opacity: .66; } .ear-mark .ear-rings path:nth-child(3) { opacity: .36; }
-.ear-why { position: absolute; left: calc(100% - 4px); top: 50%; transform: translateY(-50%); z-index: 2; padding: 4px 8px; border-radius: 3px; white-space: nowrap;
-  font: 12px/1.2 "Hiragino Sans", "Noto Sans JP", var(--sans, sans-serif); color: color-mix(in oklab, var(--ear-ink, var(--ink)) 82%, transparent);
-  background: color-mix(in oklab, var(--print-white, var(--ground-0, var(--color-paper, var(--ground)))) 94%, transparent); pointer-events: none; }
+/* the one plain line beside a struck mark: under the bar, never over its controls, inside the screen with 16 px to spare
+   on each side (it wraps), in the ink and on the plate the mark stands on (ear.mjs places it: --ear-why-left, -top) */
+.ear-why { position: fixed; left: var(--ear-why-left, 16px); top: var(--ear-why-top, 56px); transform: none; z-index: 40; box-sizing: border-box;
+  width: max-content; max-width: calc(100vw - 32px); padding: 6px 10px; border-radius: 3px; white-space: normal; overflow-wrap: anywhere;
+  font: 13px/1.35 "Hiragino Sans", "Noto Sans JP", var(--sans, sans-serif); color: var(--vt-why-ink, color-mix(in oklab, var(--ear-ink, var(--ink)) 82%, transparent));
+  background: var(--vt-plate, color-mix(in oklab, var(--print-white, var(--ground-0, var(--color-paper, var(--ground)))) 94%, transparent));
+  box-shadow: 0 0 0 1px var(--vt-line, color-mix(in oklab, var(--ear-ink, var(--ink)) 26%, transparent)), 0 6px 14px -8px color-mix(in oklab, var(--ink) 40%, transparent); pointer-events: none; }
 .ear-spot { position: absolute; width: 44px; height: 44px; }
 /* where the mark stands: beside the floating gate of the first screen, and beside the gate of every bar; on a narrow
    screen on the gate's other side, where the bar's own doors (search, the language, Save) never reach */
 #ginga-symbol + .ear-spot { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); left: calc(50% + 24px); z-index: 30; }
 :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate + .ear-spot { top: env(safe-area-inset-top, 0px); left: calc(50% + 22px); z-index: 1; }
 :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate + .ear-spot + * { margin-left: auto; }
-/* the new first screen, the sky (sky/mount.mjs), is night blue where the mark stands: at rest the mark stands on the
-   gate's own plate there (editorial.css, the door's gate: the paper at 70%), so it reads as the sheet's hairline box on
-   paper, and at rest its character takes the gate's own ink (the torii at 86%): the sheet's 58% on that thinner, greyer
-   paper measured 2.8:1 (tools/ear-sky.mjs look). Armed, held on and speaking keep their own grounds */
-html[data-bunki-sky='1']:is([data-ear='off'], [data-ear='novoice']) #ginga-symbol + .ear-spot .ear-mark::before { background: color-mix(in srgb, var(--ground-0, var(--ear-white)) 70%, transparent); }
-html[data-bunki-sky='1'][data-ear='off'] #ginga-symbol + .ear-spot .ear-mark .ear-glyph { color: color-mix(in oklab, var(--ear-ink) 86%, transparent); }
+/* the first screen (the sky, sky/mount.mjs): the mark stands beside the floating gate and takes that gate's plate and
+   ink at rest, as it takes a bar's gate's anywhere else (toneFor) */
 @media (max-width: 640px) {
   #ginga-symbol + .ear-spot { left: calc(50% - 68px); }
   :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate + .ear-spot { left: calc(50% - 66px); }
   /* the mark stands on the gate's left here: its arcs open away from the gate, to the left */
   .ear-mark .ear-rings { left: auto; right: calc(100% - 7px); transform: translate(-2px, -50%) scaleX(-1); }
-  .ear-why { left: 4px; top: calc(100% + 2px); transform: none; }
 }
 /* armed: 朱文, a red character on paper */
-html[data-ear='armed'] .ear-mark::before { border-color: var(--ear-red); background: var(--ear-white); box-shadow: 0 1px 0 color-mix(in oklab, var(--ink) 18%, transparent); }
-html[data-ear='armed'] .ear-mark .ear-glyph { color: var(--ear-red); }
+html[data-ear='armed'] .ear-mark::before { border-color: var(--ear-red); background: var(--vt-fill, var(--ear-white)); box-shadow: 0 1px 0 color-mix(in oklab, var(--ink) 18%, transparent); }
+html[data-ear='armed'] .ear-mark .ear-glyph { color: var(--ear-red); font-weight: 700; }
 /* held on and speaking: 白文, the seal pressed */
-html:is([data-ear='held'], [data-ear='speaking']) .ear-mark::before { background: var(--ear-red); border-color: var(--ear-red); border-radius: 2.5px 3.5px 3px 2px;
-  box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--ear-red) 70%, var(--ink)), inset 0 0 0 2.5px color-mix(in oklab, var(--ear-white) 55%, transparent), 0 1px 1px color-mix(in oklab, var(--ink) 30%, transparent);
+html:is([data-ear='held'], [data-ear='speaking']) .ear-mark::before { background: var(--ear-seal); border-color: var(--ear-seal); border-radius: 2.5px 3.5px 3px 2px;
+  box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--ear-seal) 70%, var(--ink)), inset 0 0 0 2.5px color-mix(in oklab, var(--ear-seal-ink) 55%, transparent), 0 1px 1px color-mix(in oklab, var(--ink) 30%, transparent);
   animation: ear-press 140ms ease-out; }
-html:is([data-ear='held'], [data-ear='speaking']) .ear-mark .ear-glyph { color: var(--ear-white); }
+html:is([data-ear='held'], [data-ear='speaking']) .ear-mark .ear-glyph { color: var(--ear-seal-ink); font-weight: 700; }
 html[data-ear='speaking'] .ear-mark .ear-rings, html[data-ear='armed'][data-ear-voice] .ear-mark .ear-rings { display: block; }
 html[data-ear='speaking'] .ear-mark .ear-rings path, html[data-ear='armed'][data-ear-voice] .ear-mark .ear-rings path { animation: ear-ring 600ms ease-out infinite; }
 .ear-mark .ear-rings path:nth-child(2) { animation-delay: 120ms !important; } .ear-mark .ear-rings path:nth-child(3) { animation-delay: 240ms !important; }
 /* no voice: struck once, like a cancelled stamp */
-html[data-ear='novoice'] .ear-mark .ear-glyph { color: color-mix(in oklab, var(--ear-ink) 40%, transparent); }
-html[data-ear='novoice'] .ear-mark::before { border-color: color-mix(in oklab, var(--ear-ink) 26%, transparent); }
+html[data-ear='novoice'] .ear-mark .ear-glyph { color: var(--vt-ink, color-mix(in oklab, var(--ear-ink) 40%, transparent)); }
+html[data-ear='novoice'] .ear-mark::before { border-color: var(--vt-line, color-mix(in oklab, var(--ear-ink) 26%, transparent)); }
 html[data-ear='novoice'] .ear-mark::after { content: ''; position: absolute; left: 4px; right: 4px; top: 50%; height: 1.4px; background: color-mix(in oklab, var(--ear-ink) 70%, transparent); transform: rotate(-38deg); pointer-events: none; }
 @keyframes ear-press { from { transform: scale(1.06); } to { transform: scale(1); } }
 @keyframes ear-ring { 0% { stroke-dashoffset: 40; } 60%, 100% { stroke-dashoffset: 0; } }
@@ -977,6 +1115,20 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
     mark.title = state === 'off' ? tx('耳 — タップで次のタップを読む。長押しでずっと読む', 'Ear — tap: read what you tap next. Hold: keep reading') : label;
     if (state === 'novoice') { why.textContent = noVoiceLine(machine.reason(), tx, plain); why.hidden = false; }
     else { why.hidden = true; why.textContent = ''; }
+    // its colours, from the gate beside it and the ground it stands on (toneFor), each time it is drawn
+    if (spot.isConnected && spot.getClientRects().length) {
+      try { applyTone(spot, toneFor(mark, { neighbour: spot.previousElementSibling })); } catch { /* the styles' own fallbacks stand */ }
+      if (!why.hidden) placeWhy(spot, why);
+    }
+  }
+  /** The struck mark's line: under the mark (below the bar, clear of its controls), inside the screen with 16 px on each
+   * side, wrapped to that width. */
+  function placeWhy(spot, why) {
+    const r = spot.getBoundingClientRect(), side = 16, room = view.innerWidth - 2 * side;
+    why.style.setProperty('--ear-why-top', `${Math.round(r.bottom + 6)}px`);
+    why.style.setProperty('--ear-why-left', `${side}px`);
+    const width = Math.min(room, why.getBoundingClientRect().width || room);
+    why.style.setProperty('--ear-why-left', `${Math.round(Math.max(side, Math.min(r.left, view.innerWidth - side - width)))}px`);
   }
   /** A mark beside the first screen's gate and beside the gate of every bar. */
   function mount() {
@@ -988,6 +1140,8 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
     // the ear is never left on where its mark is not shown (the review card and the deck card keep their own look, with
     // no mark): a screen without one turns it off, silently
     if (machine.mode() !== 'off' && ![...marks].some((spot) => spot.isConnected && spot.getClientRects().length)) machine.rest();
+    // a mark on a screen that has just come up takes the colours of where it now stands
+    for (const spot of marks) if (spot.isConnected && spot.getClientRects().length) paintMark(spot);
   }
   function paint() {
     const state = machine.display();
@@ -1115,6 +1269,8 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
 
   mount();
   paint();
+  // a look chosen, or the print look turned on or off: every mark takes its colours again
+  try { new view.MutationObserver(() => paint()).observe(root, { attributes: true, attributeFilter: ['data-theme', 'data-live-depth', 'data-bunki-sky'] }); } catch { /* no observer: the marks keep the colours they had */ }
   return {
     machine,
     mount,
