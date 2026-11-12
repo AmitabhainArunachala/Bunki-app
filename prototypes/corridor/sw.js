@@ -620,7 +620,6 @@ self.addEventListener('fetch', (event) => {
   // The canonical study UI is an actual document inside Bunki, not an app route.
   // Preserve its own document under control; other navigations keep the shell.
   const sharedFrame = url.pathname === new URL('decks/player/shared-frame.html', SCOPE).pathname;
-  const cacheFirst = navigation || PRECACHE_URLS.has(url.href) || isContent;
   const task = (async () => {
     const cache = await caches.open(CACHE_NAME).catch(() => null);
     if (STAMPED) {
@@ -642,6 +641,7 @@ self.addEventListener('fetch', (event) => {
     }
     const cachedRequest = navigation ? new URL(sharedFrame ? 'decks/player/shared-frame.html' : 'index.html', SCOPE).href : request;
     const hit = cache ? await cache.match(cachedRequest).catch(() => undefined) : undefined;
+    const cacheFirst = navigation || PRECACHE_URLS.has(url.href) || isContent;
     if (cacheFirst && hit) return { response: hit };
     try {
       return await fetchAndStore(request, cache);
