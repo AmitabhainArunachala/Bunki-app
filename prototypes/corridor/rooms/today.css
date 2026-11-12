@@ -601,7 +601,6 @@ html[data-room='review'] .review-rise-w {
   font: 600 var(--type-reading)/1.2 var(--font-reading);
   color: var(--color-muted);
   opacity: 0.62;
-  transform: translateY(calc(var(--i, 0) % 3 * 6px));
   animation: review-rise var(--motion-sheet) var(--ease-ink) min(240ms, calc(var(--i, 0) * 40ms)) backwards;
 }
 html[data-room='review'] .review-rise-w.again { color: var(--color-ink); opacity: 1; font-family: var(--font-headword); font-weight: 800; }
