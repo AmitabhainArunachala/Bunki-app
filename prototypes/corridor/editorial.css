@@ -72,7 +72,6 @@ body, body.v-contrast-wcag {
    a sheet slides up, a room cross-fades in. Every one is off under prefers-reduced-motion. */
 @keyframes feel-pop { from { opacity: 0; transform: scale(0.96); } }
 @keyframes feel-pop-centred { from { opacity: 0; transform: translateX(-50%) scale(0.96); } to { transform: translateX(-50%); } }
-@keyframes feel-rise { from { opacity: 0; transform: translateY(18px); } }
 @keyframes feel-fade { from { opacity: 0; } }
 
 ::selection { background: var(--ink); color: var(--ground-0, #faf6ea); }

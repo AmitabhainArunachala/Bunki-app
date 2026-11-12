@@ -1285,13 +1285,6 @@ span.tok.named {
   transform: translateY(0);
 }
 
-@keyframes rise {
-  from {
-    transform: translateY(14px);
-    opacity: 0.4;
-  }
-}
-
 .headword {
   font-family: var(--serif);
   font-size: var(--type-hero);
