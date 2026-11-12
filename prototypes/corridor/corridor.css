@@ -6200,24 +6200,6 @@ body.zen .focus-hud-end {
   min-height: var(--tap);
 }
 
-/* the beat between learning steps — a soft count while the next card ripens */
-.zen-wait {
-  gap: 18px;
-}
-.zen-wait-clock {
-  font-family: var(--serif);
-  font-size: var(--type-headword);
-  color: var(--ink-2);
-  letter-spacing: 0.1em;
-  font-variant-numeric: tabular-nums;
-}
-.zen-wait-note {
-  margin: 0;
-  color: var(--faint);
-  font-size: var(--type-chrome);
-  letter-spacing: 0.06em;
-}
-
 /* ---- list management (覚える stage 2): inline maker, rename, armed delete.
  * The maker waits BELOW the learner's own words (operator, 2026-08-20). */
 .list-maker {
@@ -6536,12 +6518,6 @@ body.zen .zen-more-row .chip {
   color: var(--zen-text);
   border-color: color-mix(in srgb, var(--zen-text) 32%, transparent);
   background: transparent;
-}
-body.zen .zen-wait-clock {
-  color: var(--card-ink);
-}
-body.zen .zen-wait-note {
-  color: var(--card-ink);
 }
 body.zen .review-cloze {
   color: var(--card-ink);
