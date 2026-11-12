@@ -1,4 +1,4 @@
-/* global process, document, window, getComputedStyle, HTMLMediaElement, localStorage, URL */
+/* global process, document, window, getComputedStyle, HTMLMediaElement, localStorage, URL, performance, requestAnimationFrame */
 /** The print look is part of the build (PRINT-FOLD, 2026-11-12).
  *
  * Until now the Mac preview (18841) showed the app plus a live design layer that its server injects from a folder
@@ -40,6 +40,9 @@ const engines =
       ? ['webkit']
       : ['chromium'];
 const GLASS = { width: 1728, height: 1084 };
+// A hosted runner draws in software on two slow cores. PRINT_FOLD_CPU_SLOWDOWN=<n> slows Chromium's CPU n times (DevTools
+// throttling), so a run on a fast machine can show what the runner sees.
+const SLOWDOWN = Number(process.env.PRINT_FOLD_CPU_SLOWDOWN || 0);
 const TYPES = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
@@ -225,6 +228,12 @@ describe.each(engines)('the print look reads the page, in %s', (engine) => {
     for (const script of before) await context.addInitScript(script);
     if (refuse) await context.route(`**/${refuse}`, (route) => route.abort());
     const page = await context.newPage();
+    if (SLOWDOWN > 1 && engine === 'chromium')
+      await (
+        await context.newCDPSession(page)
+      ).send('Emulation.setCPUThrottlingRate', {
+        rate: SLOWDOWN,
+      });
     const errors = [];
     page.on('pageerror', (error) => errors.push(String(error)));
     await page.goto(`${origin}/`);
@@ -263,40 +272,75 @@ describe.each(engines)('the print look reads the page, in %s', (engine) => {
       return !!img && img.complete && img.naturalWidth > 0;
     });
   }
-  /** The words of the first screen, read twice half a second apart: a word that moved or changed its faintness in
-   * between is left out, since the reader marks them at its own pace (every 450 ms). */
-  const steadyWords = (page) =>
+  /** The words of the first screen, read twice a second apart (two rounds of the reader, which marks them every 450 ms):
+   * a word counts as settled when it kept its faintness and its marks in between and moved less than 8 px (the words
+   * drift a few pixels a second for as long as the screen is open, so their place is never quite still). Also what kept
+   * the others from settling, and how many frames the page drew in that second. */
+  const readSettled = (page) =>
     page.evaluate(async () => {
-      const read = () =>
-        [...document.querySelectorAll('#drift-layer #sky > .word')].map((word) => {
-          const r = word.getBoundingClientRect();
-          return {
-            word: word.textContent.trim().slice(0, 12),
-            top: r.top,
-            left: r.left,
-            right: r.right,
-            bottom: r.bottom,
-            width: r.width,
-            opacity: word.style.opacity,
-            ink: word.getAttribute('data-ink'),
-            wisp: word.getAttribute('data-wisp'),
-            depth: word.getAttribute('data-depth'),
-          };
-        });
-      const first = read();
-      await new Promise((done) => window.setTimeout(done, 500));
-      const second = read();
-      return second.filter((now, i) => {
-        const then = first[i];
-        return (
-          then &&
-          then.opacity === now.opacity &&
-          Math.abs(then.top - now.top) < 2 &&
-          then.ink === now.ink &&
-          then.depth === now.depth
-        );
+      const read = (word) => {
+        const r = word.getBoundingClientRect();
+        return {
+          word: word.textContent.trim().slice(0, 12),
+          top: r.top,
+          left: r.left,
+          right: r.right,
+          bottom: r.bottom,
+          width: r.width,
+          opacity: word.style.opacity,
+          ink: word.getAttribute('data-ink'),
+          wisp: word.getAttribute('data-wisp'),
+          depth: word.getAttribute('data-depth'),
+        };
+      };
+      const words = () => [...document.querySelectorAll('#drift-layer #sky > .word')];
+      const first = new Map(words().map((word) => [word, read(word)]));
+      let frames = 0;
+      const until = performance.now() + 1000;
+      await new Promise((done) => {
+        const frame = () => {
+          frames += 1;
+          if (performance.now() < until) requestAnimationFrame(frame);
+          else done();
+        };
+        requestAnimationFrame(frame);
       });
+      const seen = { settled: [], tappable: 0, fading: 0, moving: 0, remarked: 0, frames };
+      for (const word of words()) {
+        const now = read(word);
+        const then = first.get(word);
+        if (Number(now.opacity) >= 0.3) seen.tappable += 1;
+        if (!then) continue;
+        const fading = then.opacity !== now.opacity;
+        const moving = Math.abs(then.top - now.top) >= 8 || Math.abs(then.left - now.left) >= 8;
+        const remarked = then.ink !== now.ink || then.wisp !== now.wisp || then.depth !== now.depth;
+        if (fading) seen.fading += 1;
+        if (moving) seen.moving += 1;
+        if (remarked) seen.remarked += 1;
+        if (!fading && !moving && !remarked) seen.settled.push(now);
+      }
+      return seen;
     });
+  /** Waits until at least eight words a learner can tap (0.3 or more) have settled, and `ready` holds of the settled
+   * words (`what` names it in the failure), and returns the settled words. The
+   * layer fades its words in and drifts them into place over a few seconds, and a slow machine takes longer (GitHub's
+   * runner draws in software on two cores: a fixed wait read every word there mid-fade, run 43143633615). So this
+   * waits for the screen, not for a time, and says what it last saw if the screen never settles. */
+  async function settledWords(page, ready = () => true, what = '') {
+    const deadline = Date.now() + 45000;
+    for (;;) {
+      const seen = await readSettled(page);
+      const tappable = seen.settled.filter((w) => Number(w.opacity) >= 0.3);
+      if (tappable.length >= 8 && ready(seen.settled)) return seen.settled;
+      if (Date.now() > deadline)
+        throw new Error(
+          `the first screen's words did not settle within 45 s${what ? ` with ${what}` : ''}: in the last second ` +
+            `${seen.tappable} words stood at 0.3 or more and ${tappable.length} of them kept their faintness, place ` +
+            `and marks (${seen.fading} were still fading, ${seen.moving} moving, ${seen.remarked} re-marked); the ` +
+            `page drew ${seen.frames} frames`,
+        );
+    }
+  }
 
   test('(a) an article: data-cover and its two pigments on entering, all three gone on leaving', async () => {
     const { context, page, errors } = await open();
@@ -329,7 +373,7 @@ describe.each(engines)('the print look reads the page, in %s', (engine) => {
     } finally {
       await context.close();
     }
-  }, 90000);
+  }, 120000);
 
   test('(b) the old first screen: inked from the printed sky under each word', async () => {
     const { context, page, errors } = await open();
@@ -341,20 +385,21 @@ describe.each(engines)('the print look reads the page, in %s', (engine) => {
           timeout: 10000,
         },
       );
-      // a few rounds of the reader, so the plate it reads the sky from has arrived
-      await page.waitForTimeout(1600);
-      const words = await steadyWords(page);
       // where the default look's plate lies on this page (drawn 50% 0 / max(100%, 1500px) auto; 843 by 2400, and the
       // deep pigment ends at 0.40 of its height: print-look.mjs SKY)
       const width = await page.evaluate(() => document.documentElement.clientWidth);
       const plateHeight = (Math.max(width, 1500) * 843) / 2400;
       const deepLine = plateHeight * 0.4;
       // the plate starts at the window's top edge and spans its width: a word still drifting in from outside the window
-      // stands on no plate at all, so only words wholly inside it are held to the rule
+      // stands on no plate at all, so only words wholly inside it are held to the rule; 12 px of margin cover the drift
+      // between the reader's last round and this reading
       const inDeepSky = (w) =>
-        w.width && w.top >= 0 && w.left >= 0 && w.right <= width && w.bottom < deepLine - 4;
-      const tappable = words.filter((w) => Number(w.opacity) >= 0.3);
-      expect(tappable.length).toBeGreaterThanOrEqual(8);
+        w.width && w.top >= 12 && w.left >= 12 && w.right <= width - 12 && w.bottom < deepLine - 12;
+      const words = await settledWords(
+        page,
+        (settled) => settled.some(inDeepSky),
+        'a word standing in the deep sky',
+      );
       for (const w of words) {
         const o = Number(w.opacity);
         expect(w.depth, w.word).toBe(!(o >= 0.3) ? null : o >= 0.5 ? 'near' : 'mid');
@@ -365,7 +410,7 @@ describe.each(engines)('the print look reads the page, in %s', (engine) => {
         }
         if (!w.width) continue;
         if (inDeepSky(w)) expect(w.ink, `${w.word} in the deep sky`).not.toBeNull();
-        if (w.top > plateHeight + 4) expect(w.ink, `${w.word} on bare paper`).toBeNull();
+        if (w.top > plateHeight + 12) expect(w.ink, `${w.word} on bare paper`).toBeNull();
       }
       const deep = words.filter(inDeepSky);
       expect(deep.length, 'words standing in the deep sky').toBeGreaterThan(0);
@@ -373,29 +418,32 @@ describe.each(engines)('the print look reads the page, in %s', (engine) => {
     } finally {
       await context.close();
     }
-  }, 90000);
+  }, 120000);
 
   test('(b) a night look (金): its words are marked near or mid, and nothing is inked', async () => {
     const { context, page, errors } = await open({ look: 'yoru' });
     try {
-      await page.waitForTimeout(1600);
       expect(await page.evaluate(() => document.documentElement.getAttribute('data-theme'))).toBe(
         'yoru',
       );
-      const words = await steadyWords(page);
-      expect(words.filter((w) => w.depth).length).toBeGreaterThanOrEqual(8);
+      const words = await settledWords(page);
+      for (const w of words) {
+        const o = Number(w.opacity);
+        expect(w.depth, w.word).toBe(!(o >= 0.3) ? null : o >= 0.5 ? 'near' : 'mid');
+      }
       expect(words.filter((w) => w.ink || w.wisp)).toEqual([]);
       expect((await rootState(page)).skyInk).toBeNull();
       expect(errors).toEqual([]);
     } finally {
       await context.close();
     }
-  }, 90000);
+  }, 120000);
 
   test('control: with print-look.mjs refused, no attribute of it appears', async () => {
     const { context, page } = await open({ refuse: 'print-look.mjs' });
     try {
-      await page.waitForTimeout(1600);
+      // settled for a second: the reader, had it been there, would have marked the words twice by now
+      await settledWords(page);
       const marked = await page.evaluate(
         () =>
           document.querySelectorAll(
@@ -405,12 +453,13 @@ describe.each(engines)('the print look reads the page, in %s', (engine) => {
       expect(marked).toBe(0);
       expect((await rootState(page)).skyInk).toBeNull();
       await openArticle(page);
-      await page.waitForTimeout(1200);
+      // the article's picture is in: the reader, had it been there, sets data-cover 90 ms after the page changes
+      await page.waitForTimeout(1500);
       expect(await rootState(page)).toMatchObject({ cover: null, a: '', b: '', status: null });
     } finally {
       await context.close();
     }
-  }, 90000);
+  }, 120000);
 
   test('control: where the design layer is in the page (18841), the reader stands down', async () => {
     const { context, page } = await open({
@@ -421,7 +470,7 @@ describe.each(engines)('the print look reads the page, in %s', (engine) => {
       ],
     });
     try {
-      await page.waitForTimeout(1600);
+      await settledWords(page);
       expect((await rootState(page)).status).toBe('stood-down');
       expect(
         await page.evaluate(
@@ -430,10 +479,11 @@ describe.each(engines)('the print look reads the page, in %s', (engine) => {
         ),
       ).toBe(0);
       await openArticle(page);
-      await page.waitForTimeout(1200);
+      // the article's picture is in: the reader, had it been there, sets data-cover 90 ms after the page changes
+      await page.waitForTimeout(1500);
       expect(await rootState(page)).toMatchObject({ cover: null, skyInk: null });
     } finally {
       await context.close();
     }
-  }, 90000);
+  }, 120000);
 });
