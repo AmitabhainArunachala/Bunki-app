@@ -1,5 +1,5 @@
 /** return seam: split out of corridor.js (G3); now edited here directly. */
-import { D, S, applyAssessmentV2, assessmentClockSession, biLabel, captureScaleVisit, clearReaderReadings, clearReaderSummons, clearWordLadder, currentAssessmentV2, el, finishPageTransition, gateFrame, mockFailed, passage, placesLayout, removeMini, render, retireScaleReturn, returnToScaleBead, scaleIn, scaleNavigationAllowed, scaleOut, scalePassage, scaleThreadPath, scaleTokenFingerprint, stopSentenceListening, tx } from '../corridor.js';
+import { D, S, applyAssessmentV2, assessmentClockSession, biLabel, captureScaleVisit, clearReaderReadings, clearReaderSummons, clearWordLadder, currentAssessmentV2, el, finishPageTransition, gateFrame, passage, placesLayout, removeMini, render, retireScaleReturn, returnToScaleBead, scaleIn, scaleNavigationAllowed, scaleOut, scalePassage, scaleThreadPath, scaleTokenFingerprint, stopSentenceListening, tx } from '../corridor.js';
 import { lookup, readerTokenAtIndex } from './dictionary.mjs';
 import { readerEntryNode } from './library.mjs';
 import { stopReadAloud } from './voice.mjs';
