@@ -360,8 +360,10 @@ export function installVoiceLayer(host) {
   // `lit`: the sentence the bands are on; `yielding`: the read gave way to a word (the box's 音) and takes itself up again;
   // `justStopped`: a playing read was ended in this very task (a word said now is what it yields to); `title`: the
   // article's title, for the lock screen
+  // `halted`: the read ended on a sentence it could not get or play (its reason stands on the bar); the lock screen keeps
+  // the article, paused, and play takes it up at that sentence (fix round 1)
   const reader = { pid: null, session: null, owner: null, sentences: [], index: 0, rate: 1, failed: null, source: null,
-    lit: -1, yielding: null, justStopped: null, title: '' };
+    lit: -1, yielding: null, justStopped: null, title: '', halted: false };
   // The sentence being read is one even band per line (modules/voice-bands.mjs), the same in every engine: the CSS Custom
   // Highlight API painted it in patches in WebKit (John's iPhone, 2026-11-11). The words carry data-speaking.
   const view = doc.defaultView;
@@ -470,11 +472,15 @@ export function installVoiceLayer(host) {
     doc.documentElement.dataset.readSession = String(++readSessions);
     reader.sentences = articleSentences(p);
     reader.failed = null;
+    reader.halted = false;
     if (!reader.sentences.length) { reader.failed = { pid: p.id, code: 'nothing-to-say' }; barChanged(); return; }
     prime();
     const mine = {};
     reader.owner = mine;
     reader.session = null;
+    // whether this read has sounded: only a read he has heard keeps the lock screen when it ends on a sentence it could
+    // not get (a read that never found a voice leaves nothing there)
+    let voiced = false;
     const session = seam.read({
       sentences: reader.sentences, voiceKey: voiceKeyOf('article', p.id), from: Math.min(from, reader.sentences.length - 1), rate: reader.rate,
       stopRecorded: () => host.stopRecorded?.(), rateRecorded: (rate) => host.rateRecorded?.(rate),
@@ -487,6 +493,7 @@ export function installVoiceLayer(host) {
       // the bar's note names where this sentence comes from: the recording or the voice server
       onSource: (source) => {
         if (reader.owner !== mine) return;
+        voiced = true;
         reader.source = { source };
         // a recording plays on its own element: the silence held on this one is not needed under it
         if (source === 'recorded') pocket.letGo();
@@ -495,7 +502,12 @@ export function installVoiceLayer(host) {
       onState: (state, code) => {
         if (reader.owner !== mine) return;
         if (state === 'done') reader.index = 0;
-        if (state === 'error') reader.failed = { pid: p.id, code: code || 'failed' };
+        if (state === 'error') {
+          reader.failed = { pid: p.id, code: code || 'failed' };
+          // the sentence it could not get (or play) is where play takes it up, not the one heard before it (fix round 1)
+          if (Number.isInteger(reader.session?.index)) reader.index = reader.session.index;
+          reader.halted = voiced;
+        }
         if (['done', 'stopped', 'error'].includes(state)) clearSpeaking();
         // waiting for the next clip on a hidden page, the element holds silence so the page goes on sounding (L1); a clip
         // that starts takes the element itself, and a pause or an end lets the silence go
@@ -576,6 +588,7 @@ export function installVoiceLayer(host) {
       if (reader.justStopped) Promise.resolve().then(() => { reader.justStopped = null; });
       reader.session = null;
       reader.owner = null;
+      reader.halted = false;
       if (session && !session.ended) session.stop();
       clearSpeaking();
       pocket.letGo();
@@ -609,7 +622,8 @@ export function installVoiceLayer(host) {
   const mediaActions = {
     play: () => {
       const p = readHere(), y = reader.yielding;
-      if (p && ((y && !y.resume) || (!y && readerActive() && reader.session.state === 'paused'))) readerApi.toggle(p);
+      // a read that ended on a sentence it could not get is taken up at that sentence, as the bar's play does
+      if (p && ((y && !y.resume) || (!y && readerActive() && reader.session.state === 'paused') || (!y && !readerActive() && reader.halted))) readerApi.toggle(p);
     },
     pause: () => {
       const p = readHere(), y = reader.yielding;
@@ -618,10 +632,16 @@ export function installVoiceLayer(host) {
     nexttrack: () => step(1),
     previoustrack: () => step(-1),
   };
-  /** While a read exists (playing or paused, or giving way to a word) the lock screen shows it; otherwise it is clear. */
+  /** While a read exists (playing or paused, or giving way to a word) the lock screen shows it. A read that ended on a
+   * sentence it could not get stays there too, paused, while he is on the article (the bar offers its play): its play
+   * takes it up at that sentence (fix round 1). Otherwise it is clear. */
   function syncMedia() {
     const y = reader.yielding;
-    if (!readerActive() && !y) { media.clear(); return; }
+    if (!readerActive() && !y) {
+      if (reader.halted && readHere()) media.show({ title: reader.title, playing: false, actions: mediaActions });
+      else media.clear();
+      return;
+    }
     media.show({ title: reader.title, playing: y ? !!y.resume : reader.session.state !== 'paused', actions: mediaActions });
   }
   // A pause nobody in this app asked for (a call, another app's sound, the lock screen's own button, headphones out): the
