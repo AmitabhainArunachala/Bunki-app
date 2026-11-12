@@ -61,7 +61,10 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
   let session = null;        // the one read that may sound
   let last = { source: 'none', reason: null, at: 0 };   // the last sentence that was spoken
   let silent = null;         // { reason, at }: why the last read ended without a voice; cleared by the next spoken sentence
-  let blockedUntil = { 'day-budget': 0, 'request-rate-limit': 0, 'network-failed': 0 };
+  // the 15 s wait after a request that ran out of time or lost the connection keeps its cause's name, so a play inside it
+  // ends with the same reason as the first stop (L1 fix round 2, the re-check's F3); neither is shown as blocked
+  let blockedUntil = { 'day-budget': 0, 'request-rate-limit': 0, 'network-failed': 0, 'voice-timeout': 0 };
+  const WAITS = new Set(['network-failed', 'voice-timeout']);
   let off = null;            // 'not-in-release' | 'budget-exhausted' for this page
   let pairAgain = false;
   let budget = null;
@@ -71,7 +74,7 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
   const blocked = () => {
     if (off) return off;
     const at = now();
-    for (const [code, until] of Object.entries(blockedUntil)) if (until > at) return code === 'network-failed' ? null : code;
+    for (const [code, until] of Object.entries(blockedUntil)) if (until > at) return WAITS.has(code) ? null : code;
     return null;
   };
   const status = () => ({
@@ -110,7 +113,11 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
       void refreshBudget();
     }
     else if (code === 'request-rate-limit') blockedUntil['request-rate-limit'] = at + 60000;
-    else if (code === 'network-failed' || code === 'voice-timeout') blockedUntil['network-failed'] = at + 15000;
+    else if (WAITS.has(code)) {
+      // the last cause names the wait
+      for (const wait of WAITS) blockedUntil[wait] = 0;
+      blockedUntil[code] = at + 15000;
+    }
   }
   const remember = (key, clip) => {
     cache.delete(key);
@@ -406,6 +413,6 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
     },
     active: () => (session && !session.ended ? session.controls : null),
     /** Pairing changed (paired, or the token was dropped): what was blocked is asked again. */
-    repaired() { pairAgain = false; off = null; silent = null; blockedUntil = { 'day-budget': 0, 'request-rate-limit': 0, 'network-failed': 0 }; tell(); },
+    repaired() { pairAgain = false; off = null; silent = null; blockedUntil = { 'day-budget': 0, 'request-rate-limit': 0, 'network-failed': 0, 'voice-timeout': 0 }; tell(); },
   };
 }
