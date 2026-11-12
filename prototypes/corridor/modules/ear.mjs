@@ -1121,11 +1121,30 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
       if (!why.hidden) placeWhy(spot, why);
     }
   }
-  /** The struck mark's line: under the mark (below the bar, clear of its controls), inside the screen with 16 px on each
-   * side, wrapped to that width. */
+  /** Below `y`, past any bar held at the top right under it (a reading page's thread of places is sticky under the top
+   * bar on a phone): the struck line never stands over a bar's controls. */
+  function belowBars(x, y) {
+    for (let step = 0; step < 4; step += 1) {
+      let bar = null;
+      for (const hit of doc.elementsFromPoint(x, Math.min(view.innerHeight - 1, y + 2))) {
+        if (hit.closest('.ear-why')) continue;
+        for (let at = hit; at && at !== doc.body && !bar; at = at.parentElement) {
+          const pos = view.getComputedStyle(at).position, b = at.getBoundingClientRect();
+          if ((pos === 'sticky' || pos === 'fixed') && b.top <= y + 2 && b.bottom > y + 2 && b.height <= 120) bar = b;
+        }
+        break;
+      }
+      if (!bar) return y;
+      y = bar.bottom;
+    }
+    return y;
+  }
+  /** The struck mark's line: under the mark and below the bars under it (clear of their controls), inside the screen with
+   * 16 px on each side, wrapped to that width. */
   function placeWhy(spot, why) {
     const r = spot.getBoundingClientRect(), side = 16, room = view.innerWidth - 2 * side;
-    why.style.setProperty('--ear-why-top', `${Math.round(r.bottom + 6)}px`);
+    const x = Math.max(side, Math.min(view.innerWidth - side - 1, r.left + r.width / 2));
+    why.style.setProperty('--ear-why-top', `${Math.round(belowBars(x, r.bottom) + 6)}px`);
     why.style.setProperty('--ear-why-left', `${side}px`);
     const width = Math.min(room, why.getBoundingClientRect().width || room);
     why.style.setProperty('--ear-why-left', `${Math.round(Math.max(side, Math.min(r.left, view.innerWidth - side - width)))}px`);

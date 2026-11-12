@@ -136,6 +136,19 @@ async function markShot(where, state) {
     const mark = await page.evaluate(() => { const m = document.querySelector('.ear-mark[data-review-ear]'); const b = m?.getBoundingClientRect(); return b ? { bottom: b.bottom } : null; });
     const inside = t && t.left >= 16 && t.right <= t.vw - 16 && mark && t.top >= mark.bottom;
     floor(`${where}-ear-novoice`, 'its line inside the screen with 16 px a side, under the mark', inside ? 1 : 0, 1, t ? `left ${t.left}, right ${t.right} of ${t.vw}, top ${t.top} (mark bottom ${Math.round(mark?.bottom ?? -1)})` : 'no line');
+    // never over a bar's controls: no button or link of a bar held on the screen (sticky or fixed) under the line
+    const over = await page.evaluate(() => {
+      const why = [...document.querySelectorAll('.ear-why')].find((e) => !e.hidden && e.getClientRects().length);
+      if (!why) return null;
+      const w = why.getBoundingClientRect();
+      const held = (el) => { for (let at = el; at && at !== document.body; at = at.parentElement) { const p = getComputedStyle(at).position; if (p === 'sticky' || p === 'fixed') return at; } return null; };
+      return [...document.querySelectorAll('button, a[href], [role="button"], input, select')].filter((c) => {
+        if (why.contains(c) || c.closest('.ear-spot') || !c.getClientRects().length || getComputedStyle(c).visibility === 'hidden') return false;
+        const b = c.getBoundingClientRect();
+        return held(c) && b.width > 2 && b.height > 2 && b.left < w.right && b.right > w.left && b.top < w.bottom && b.bottom > w.top;
+      }).map((c) => `${c.tagName.toLowerCase()}.${String(c.className).split(' ')[0]} "${(c.textContent || c.getAttribute('aria-label') || '').trim().slice(0, 16)}"`);
+    });
+    floor(`${where}-ear-novoice`, "its line over none of a bar's controls", over && !over.length ? 1 : 0, 1, over ? (over.length ? `over ${over.slice(0, 4).join(', ')}` : 'over none') : 'no line');
   }
   return row;
 }
