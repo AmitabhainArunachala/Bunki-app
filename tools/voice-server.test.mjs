@@ -1185,7 +1185,8 @@ describe('a request its only asker gave up on belongs to nobody (the re-check’
     await tick();
     expect(read.states.at(-1)).toBe('error:voice-timeout');
     expect(r.told.length).toBeGreaterThan(told);
-    expect(r.seam.cannot(KEY)).toBe('network-failed');
+    // the wait is named by its cause, a slow server, not a lost connection (L1 fix round 2, the re-check's F3)
+    expect(r.seam.cannot(KEY)).toBe('voice-timeout');
     r.advance(15_001);
     expect(r.seam.cannot(KEY)).toBe(null);
   });
@@ -1246,7 +1247,7 @@ describe('a request its only asker gave up on belongs to nobody (the re-check’
     r.asked[1].fail('voice-timeout');
     await tick();
     expect(again.states.at(-1)).toBe('error:voice-timeout');
-    expect(r.seam.cannot(KEY)).toBe('network-failed');
+    expect(r.seam.cannot(KEY)).toBe('voice-timeout');
     expect(r.told.slice(told).filter((status) => !status.silent)).toHaveLength(1);
     expect(r.asked).toHaveLength(2);
   });

@@ -343,3 +343,94 @@ describe('fix round 1: nothing in the path to the next sentence waits on a timer
     );
   });
 });
+
+describe('fix round 2: the wait after a slow server or a lost connection is named by its cause (the re-check’s F3)', () => {
+  const X = { text: '雨の日は本を読む。' };
+  const quietPlayer = {
+    play: async () => 'ended',
+    pause() {},
+    resume() {},
+    stop() {},
+    setRate() {},
+  };
+  /** A seam on a client whose next requests end with the codes in `next` (as the client throws them), on a clock the
+   * test moves; `online` is the browser's word on the network. */
+  const rig = () => {
+    const r = { at: Date.parse('2026-11-12T02:00:00Z'), asked: [], next: [], online: true };
+    const client = {
+      configured: () => true,
+      ready: async () => {},
+      paired: () => true,
+      scope: () => ({ installation: 'bunki-' + 'b'.repeat(32) }),
+      async speak({ text }) {
+        r.asked.push(text);
+        const code = r.next.shift();
+        if (code) throw new VoiceError(code, 0);
+        return {
+          bytes: new Uint8Array([1]),
+          contentType: 'audio/wav',
+          voiceId: 'v',
+          inputKey: text,
+        };
+      },
+    };
+    r.seam = createVoiceSeam({
+      client,
+      player: quietPlayer,
+      sleep: async () => {},
+      gapSleep: async () => {},
+      now: () => r.at,
+      online: () => r.online,
+    });
+    r.read = () =>
+      new Promise((done) =>
+        r.seam.read({
+          voiceKey: 'article:a1',
+          sentences: [X],
+          onState: (state, code) =>
+            ['done', 'stopped', 'error'].includes(state) && done(code ? `${state}:${code}` : state),
+        }),
+      );
+    return r;
+  };
+  it('after a slow server, a play inside its 15 s wait ends at once as that slow server (voice-timeout), asking nothing', async () => {
+    const r = rig();
+    r.next.push('voice-timeout');
+    expect(await r.read()).toBe('error:voice-timeout');
+    expect(r.asked).toHaveLength(1);
+    r.at += 3000;
+    expect(await r.read()).toBe('error:voice-timeout');
+    expect(r.asked).toHaveLength(1);
+    expect(r.seam.cannot('article:a1')).toBe('voice-timeout');
+    // a wait, not a refusal: nothing is shown as blocked
+    expect(r.seam.status().blocked).toBe(null);
+    r.at += 12_001;
+    expect(r.seam.cannot('article:a1')).toBe(null);
+    expect(await r.read()).toBe('done');
+    expect(r.asked).toHaveLength(2);
+  });
+  it('after a lost connection, a play inside its 15 s wait ends at once as no connection (network-failed)', async () => {
+    const r = rig();
+    r.next.push('network-failed');
+    expect(await r.read()).toBe('error:network-failed');
+    r.at += 3000;
+    expect(await r.read()).toBe('error:network-failed');
+    expect(r.asked).toHaveLength(1);
+    expect(r.seam.cannot('article:a1')).toBe('network-failed');
+    expect(r.seam.status().blocked).toBe(null);
+  });
+  it('the last cause names the wait: a slow server, then a lost connection, is no connection; the network gone, offline', async () => {
+    const r = rig();
+    r.next.push('voice-timeout');
+    expect(await r.read()).toBe('error:voice-timeout');
+    r.at += 15_001;
+    r.next.push('network-failed');
+    expect(await r.read()).toBe('error:network-failed');
+    r.at += 1000;
+    expect(r.seam.cannot('article:a1')).toBe('network-failed');
+    r.at += 15_001;
+    r.online = false;
+    expect(await r.read()).toBe('error:offline');
+    expect(r.asked).toHaveLength(2);
+  });
+});

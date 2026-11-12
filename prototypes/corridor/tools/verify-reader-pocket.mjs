@@ -53,6 +53,27 @@
  *  outside-play    his read paused (from outside, from the bar, hidden), then the element started from outside: it is
  *                  paused again at once; the bar and the lock screen stay paused; nothing is asked; his play goes on there.
  *
+ * Fix round 2 (the re-check of b61fa7ce4, 2026-11-12; its F3 and F4):
+ *  retry-busy      hidden with timers held, a clip the stand-in never sends in time: the read ends with "voice server
+ *                  busy". Inside the server's 15 s wait that follows, the lock screen's play (hidden) and the bar's play
+ *                  (shown) fail before they sound and ask nothing: the bar still offers play and its line still says
+ *                  "voice server busy" (not "no connection"), and the lock screen keeps the article, paused, with its
+ *                  play. Once the wait is over the lock screen's play takes the read up at the sentence it could not get.
+ *  retry-lost      hidden with timers held, the connection lost (every speak request fails on the way): the read ends with
+ *                  "no connection". The lock screen's play with the connection still gone, and again with it back within
+ *                  15 s of the loss: nothing sounds, nothing is asked, the line says "no connection", the lock screen
+ *                  keeps the article, paused, with its play. After the wait its play takes the read up there. Then the
+ *                  network gone as the browser knows it (offline): the lock screen's play while it is still gone keeps
+ *                  the article there in the same way.
+ *  recorded-outside the one article with a recording of its own (jawiki:5294446; Chromium, where the recording sounds): its
+ *                  recording paused from outside (the read pauses), then that element started from outside (an
+ *                  interruption that ends): it is paused again at once and stays still; the bar and the lock screen stay
+ *                  paused; the lock screen's play then says that sentence again, from its recording.
+ *  store-wait      the device store's 1.5 s wait is on the page's clock: clips kept by a first read, the page loaded again
+ *                  and read from those clips; hidden with timers held, the store stops answering (its reads of a clip
+ *                  never complete): about 1.5 s after the first unanswered read the sentence is asked of the server, and
+ *                  the read goes on to its end, hidden.
+ *
  * Exit code 0 when every case passes, 1 otherwise. One JSON line per case on stdout. */
 import { createReadStream, mkdirSync, statSync } from 'node:fs';
 import { createServer } from 'node:http';
@@ -67,7 +88,8 @@ const WIDTH = Number(arg('--width', '390'));
 const LANG = arg('--lang', 'en');
 const PORT = Number(arg('--port', '19592'));
 const SHOTS = arg('--shots', '');
-const ONLY = new Set(String(arg('--only', 'hidden-read,late-clip,media,no-media,outside-pause,refused-play,hidden-others,busy-hidden,deadline-hidden,network-resume,outside-play')).split(',').filter(Boolean));
+const ONLY = new Set(String(arg('--only', 'hidden-read,late-clip,media,no-media,outside-pause,refused-play,hidden-others,busy-hidden,deadline-hidden,network-resume,outside-play,retry-busy,retry-lost,recorded-outside,store-wait')).split(',').filter(Boolean));
+const RECORDED = 'jawiki:5294446';
 if (!SITE) { console.error('usage: verify-reader-pocket.mjs --site <built site>'); process.exit(2); }
 if (SHOTS) mkdirSync(SHOTS, { recursive: true });
 
@@ -150,13 +172,28 @@ function probe({ media }) {
         P.refused = (P.refused || 0) + 1;
         return Promise.reject(new DOMException('refused by the case', name));
       }
-      P.plays.push({ at: performance.now(), speak: this.hasAttribute('data-speak-audio'), loop: !!this.loop, hidden: document.hidden });
+      P.plays.push({ at: performance.now(), speak: this.hasAttribute('data-speak-audio'), loop: !!this.loop, hidden: document.hidden, src: String(this.src).slice(-60) });
+      // the recorded article's own elements (one per recording), so a case can pause and start one from outside
+      if (!this.hasAttribute('data-speak-audio')) P.recEls = (P.recEls || []).filter((x) => x !== this).concat(this).slice(-3);
       if (this.hasAttribute('data-speak-audio') && urlText.has(String(this.src))) P.playing.push({ text: urlText.get(String(this.src)), at: performance.now(), hidden: document.hidden });
       return play.call(this);
     };
     if (window.speechSynthesis) { const sp = Object.getPrototypeOf(window.speechSynthesis); sp.speak = function () { P.device = (P.device || 0) + 1; }; sp.cancel = function () {}; }
     const AC = window.AudioContext || window.webkitAudioContext;
     if (AC) { const connect = AudioNode.prototype.connect; AudioNode.prototype.connect = function (dest, ...rest) { if (dest instanceof AudioDestinationNode) { const gain = this.context.createGain(); gain.gain.value = 0; connect.call(this, gain); return connect.call(gain, dest, ...rest); } return connect.call(this, dest, ...rest); }; }
+  } catch (error) { P.errors.push(String(error)); }
+  // the device store that stops answering (fix round 2, store-wait): with P.storeHang, a read of its clips is a
+  // transaction that never completes; each one is noted with its time
+  P.hung = [];
+  try {
+    const transaction = IDBDatabase.prototype.transaction;
+    IDBDatabase.prototype.transaction = function (stores, mode) {
+      if (P.storeHang && (mode || 'readonly') === 'readonly' && [].concat(stores).includes('clips')) {
+        P.hung.push(performance.now());
+        return { objectStore: () => ({ get: () => ({}), getAll: () => ({}) }), abort() {} };
+      }
+      return transaction.apply(this, arguments);
+    };
   } catch (error) { P.errors.push(String(error)); }
   // every speak request as the page sends it, with how many sentences had been lit by then
   const send = window.fetch;
@@ -277,14 +314,17 @@ async function freshPage({ media = 'wrap' } = {}) {
   return s;
 }
 
-/** The first article from the shelf, its first-open word box put away; with `start` the read started from the play bar. */
-async function openArticle(s, { start = true } = {}) {
+/** An article from the shelf (the first, or `id`), its first-open word box put away; with `start` the read started from
+ * the play bar. */
+async function openArticle(s, { start = true, id = null } = {}) {
   const { page, press } = s;
   await s.ready();
   await s.module(); // a fresh load: the handle on the app's module is taken again
   await press('#ginga-symbol'); await press('.bubble-shelf');
   await page.locator('.shelf-open').first().waitFor();
-  await press(page.locator('.shelf-open').first());
+  const door = id ? page.locator(`[data-passage="${id}"]:not([data-recommendation]) .shelf-open`).first() : page.locator('.shelf-open').first();
+  if (id) await door.scrollIntoViewIfNeeded();
+  await press(door);
   await page.locator('.reader .tok.content').first().waitFor();
   await wait(1500);
   for (let i = 0; i < 3 && (await page.locator('#mini').isVisible().catch(() => false)); i += 1) { await page.keyboard.press('Escape'); await wait(500); }
@@ -330,6 +370,44 @@ const lastToken = (page) => page.evaluate(() => {
   return toks.length ? Number(toks[toks.length - 1].dataset.index) : -1;
 });
 const articleTitle = (page) => page.evaluate(() => document.querySelector('h1.view-title')?.textContent?.trim() || '');
+/** The lock screen's play, as the handler the app registered (none: nothing happens). */
+const lockPlay = (s) => s.page.evaluate(() => window.__pocket.media.handlers.play?.());
+/** Whether the recorded article's own element is sounding (its time has moved), within `ms`. */
+async function recordingSounds(s, ms = 8000) {
+  const start = Date.now();
+  while (Date.now() - start < ms) {
+    if (await s.page.evaluate(() => (window.__pocket.recEls || []).some((a) => !a.paused && a.currentTime > 0.1))) return true;
+    await wait(150);
+  }
+  return false;
+}
+const playedTexts = (s) => s.page.evaluate(() => window.__pocket.playing.map((p) => p.text));
+/** After a play on a read that ended on a sentence it could not get, and that could not sound yet (fix round 2): nothing
+ * sounds, nothing more is asked (when `asked` is given), the bar still offers play and its reason is among `reasons`,
+ * and the lock screen keeps the article, paused, with its play. */
+async function stillThere(s, title, problems, { label, reasons, asked = null }) {
+  const v = await look(s.page);
+  const offered = await s.page.locator('#listen-toggle').isVisible().catch(() => false);
+  if (asked !== null && v.asked !== asked) problems.push(`${label}: ${v.asked - asked} sentence(s) asked`);
+  if (v.audio && !v.audio.paused) problems.push(`${label}: the element sounds (${JSON.stringify(v.audio)})`);
+  if (v.bar !== 'idle' || !offered) problems.push(`${label}: the bar says ${v.bar}, play offered ${offered}`);
+  if (!reasons.includes(v.silent)) problems.push(`${label}: the line says "${v.note}" (${v.silent || 'no reason'}), not ${reasons.join(' or ')}`);
+  if (v.media?.title !== title || v.media?.state !== 'paused' || !v.media?.handlers.includes('play')) problems.push(`${label}: the lock screen lets the article go while the bar still offers play: ${JSON.stringify(v.media)}`);
+  return v;
+}
+/** The lock screen's play takes the read up at the sentence it could not get: the one after the last played, in the
+ * order the sentences were asked (`where`: the last lit word, how many were lit, the texts played). */
+async function takenUpAt(s, where, problems, label) {
+  await lockPlay(s);
+  const on = await until(s, (v) => v.lit > where.lit && v.litFirst > where.heard, 15000);
+  if (!(on.lit > where.lit && on.litFirst > where.heard)) { problems.push(`${label}: the read was not taken up after word ${where.heard}: bar ${on.bar} (${on.silent || 'no reason'}: "${on.note}"), lock screen ${JSON.stringify(on.media)}`); return on; }
+  const order = [...new Set((await recordOf(s.page)).asked.map((a) => letters(a.text)))];
+  const expected = order[order.indexOf(letters(where.played.at(-1))) + 1];
+  const first = (await playedTexts(s))[where.played.length];
+  if (!expected || letters(first) !== expected) problems.push(`${label}: the first sentence played ("${String(first).slice(0, 12)}") is not the one it could not get`);
+  return on;
+}
+const notRun = (name, why) => console.log(JSON.stringify({ case: name, engine: ENGINE, width: WIDTH, lang: LANG, pass: null, problems: [], detail: `not run: ${why}` }));
 async function shot(page, name) {
   if (!SHOTS) return;
   // the prototype's first-open line stands over the bar until it is answered: answered first, as a person would
@@ -1016,6 +1094,189 @@ const CASES = {
     } catch (error) { problems.push(`the case broke: ${String(error.message).split('\n')[0].slice(0, 200)}`); }
     if (s.errors.length) problems.push(`page errors: ${s.errors.join(' | ')}`);
     report('outside-play', problems, steps.join('; '));
+    await s.close();
+  },
+
+  async 'retry-busy'() {
+    clipSeconds = 0.4;
+    const s = await freshPage();
+    const problems = [];
+    const steps = [];
+    try {
+      // the fifth sentence's answer is held 45 s by the stand-in: past the client's 20 s
+      holdNth = fake.speaks().length + 5; holdFor = 45000;
+      await openArticle(s);
+      const title = await articleTitle(s.page);
+      await hide(s, true);
+      await until(s, (v) => v.bar !== 'loading' && v.bar !== 'playing' && v.asked >= 5, 40000);
+      const lostAt = Date.now();
+      await wait(400);
+      const end = await look(s.page);
+      const where = { heard: end.litFirst, lit: end.lit, played: await playedTexts(s) };
+      if (end.bar !== 'idle' || end.silent !== 'voice-timeout' || end.media?.state !== 'paused' || end.media?.title !== title) problems.push(`the case did not reach its point: the read ended with bar ${end.bar} (${end.silent || 'no reason'}), the lock screen ${JSON.stringify(end.media)}`);
+      steps.push(`ended at word ${end.litFirst}: bar ${end.bar}, "${end.note}" (${end.silent}), lock screen ${end.media?.state}`);
+      // inside the server's 15 s wait after a slow answer: the lock screen's play (hidden), then the bar's play (shown)
+      await lockPlay(s);
+      await wait(1500);
+      let v = await stillThere(s, title, problems, { label: 'the lock screen\'s play inside the wait, hidden', reasons: ['voice-timeout'], asked: end.asked });
+      steps.push(`the lock screen's play inside the wait: bar ${v.bar}, "${v.note}" (${v.silent}), lock screen ${v.media?.state}, ${v.asked - end.asked} asked`);
+      await hide(s, false);
+      await s.press('#listen-toggle');
+      await wait(1500);
+      v = await stillThere(s, title, problems, { label: 'the bar\'s play inside the wait, shown', reasons: ['voice-timeout'], asked: end.asked });
+      steps.push(`the bar's play inside the wait: bar ${v.bar}, "${v.note}" (${v.silent}), lock screen ${v.media?.state}, ${v.asked - end.asked} asked`);
+      if (Date.now() - lostAt > 14000) problems.push(`the case was too slow to press play inside the wait (${Math.round((Date.now() - lostAt) / 1000)} s)`);
+      // the wait over: the lock screen's play takes the read up at the sentence it could not get
+      holdNth = 0;
+      await hide(s, true);
+      await wait(Math.max(0, lostAt + 16000 - Date.now()));
+      const on = await takenUpAt(s, where, problems, 'the lock screen\'s play after the wait');
+      steps.push(`after the wait the lock screen's play: on to word ${on.litFirst} (heard to ${where.heard})`);
+      await hide(s, false);
+    } catch (error) { problems.push(`the case broke: ${String(error.message).split('\n')[0].slice(0, 200)}`); }
+    holdNth = 0; holdFor = 5000;
+    if (s.errors.length) problems.push(`page errors: ${s.errors.join(' | ')}`);
+    report('retry-busy', problems, steps.join('; '));
+    await s.close();
+  },
+
+  async 'retry-lost'() {
+    clipSeconds = 0.4; holdNth = 0;
+    const s = await freshPage();
+    const problems = [];
+    const steps = [];
+    // a lost connection: every speak request fails on its way (the network, not the server)
+    const cut = (route) => route.abort('internetdisconnected');
+    try {
+      await openArticle(s);
+      const title = await articleTitle(s.page);
+      await until(s, (v) => v.lit >= 2, 15000);
+      await hide(s, true);
+      await s.context.route('**/v1/audio/speak', cut);
+      await until(s, (v) => v.bar === 'idle', 20000);
+      const lostAt = Date.now();
+      await wait(400);
+      const end = await look(s.page);
+      const where = { heard: end.litFirst, lit: end.lit, played: await playedTexts(s) };
+      if (end.bar !== 'idle' || end.silent !== 'network-failed' || end.media?.state !== 'paused' || end.media?.title !== title) problems.push(`the case did not reach its point: the read ended with bar ${end.bar} (${end.silent || 'no reason'}), the lock screen ${JSON.stringify(end.media)}`);
+      steps.push(`connection lost: ended at word ${end.litFirst}, "${end.note}" (${end.silent}), lock screen ${end.media?.state}`);
+      await lockPlay(s);
+      await wait(1500);
+      let v = await stillThere(s, title, problems, { label: 'the lock screen\'s play with the connection still gone', reasons: ['network-failed', 'offline'], asked: end.asked });
+      steps.push(`the lock screen's play, the connection still gone: bar ${v.bar}, "${v.note}" (${v.silent}), lock screen ${v.media?.state}, ${v.asked - end.asked} asked`);
+      await s.context.unroute('**/v1/audio/speak', cut);
+      await lockPlay(s);
+      await wait(1500);
+      v = await stillThere(s, title, problems, { label: 'the lock screen\'s play with the connection back, within 15 s of its loss', reasons: ['network-failed'], asked: end.asked });
+      steps.push(`the connection back within 15 s, the lock screen's play: bar ${v.bar}, "${v.note}" (${v.silent}), lock screen ${v.media?.state}, ${v.asked - end.asked} asked`);
+      if (Date.now() - lostAt > 14000) problems.push(`the case was too slow to press play inside the wait (${Math.round((Date.now() - lostAt) / 1000)} s)`);
+      await wait(Math.max(0, lostAt + 16000 - Date.now()));
+      const on = await takenUpAt(s, where, problems, 'the lock screen\'s play after the wait');
+      steps.push(`after the wait the lock screen's play: on to word ${on.litFirst} (heard to ${where.heard})`);
+      // the network gone as the browser knows it (offline): the read ends; the lock screen's play while it is still gone
+      await s.context.setOffline(true);
+      await until(s, (x) => x.bar === 'idle', 20000);
+      await wait(400);
+      const off = await look(s.page);
+      // Playwright's WebKit offline switch also stops blob clips from playing (see network-resume)
+      const offReasons = ENGINE === 'webkit' ? ['offline', 'network-failed', 'decode'] : ['offline', 'network-failed'];
+      if (!offReasons.includes(off.silent) || off.media?.state !== 'paused' || off.media?.title !== title) problems.push(`offline: the read ended with bar ${off.bar} (${off.silent || 'no reason'}), the lock screen ${JSON.stringify(off.media)}`);
+      await lockPlay(s);
+      await wait(1500);
+      v = await stillThere(s, title, problems, { label: 'offline, the lock screen\'s play while the network is still gone', reasons: ['offline', 'network-failed'] });
+      steps.push(`offline: ended at word ${off.litFirst} ("${off.silent}"); the lock screen's play while still offline: bar ${v.bar}, "${v.note}" (${v.silent}), lock screen ${v.media?.state}`);
+      await s.context.setOffline(false);
+      await hide(s, false);
+    } catch (error) { problems.push(`the case broke: ${String(error.message).split('\n')[0].slice(0, 200)}`); }
+    await s.context.setOffline(false).catch(() => {});
+    if (s.errors.length) problems.push(`page errors: ${s.errors.join(' | ')}`);
+    report('retry-lost', problems, steps.join('; '));
+    await s.close();
+  },
+
+  async 'recorded-outside'() {
+    const s = await freshPage();
+    const problems = [];
+    const steps = [];
+    // the recorded article's own element: paused or started from outside, or only looked at
+    const recording = (what) => s.page.evaluate((what) => {
+      const a = window.__pocket.recEls.at(-1);
+      if (what === 'pause') a.pause();
+      if (what === 'play') void a.play().catch(() => {});
+      return { t: Math.round(a.currentTime * 100) / 100, paused: a.paused, src: String(a.src).slice(-60) };
+    }, what);
+    try {
+      await openArticle(s, { id: RECORDED });
+      const title = await articleTitle(s.page);
+      if (!(await recordingSounds(s))) { notRun('recorded-outside', 'this engine does not sound the recording'); await s.close(); return; }
+      if (!/Sakura/u.test(await s.page.locator('.listen-row').innerText())) problems.push('the bar does not name the recording (the case is not on the recorded article)');
+      await wait(600);
+      const before = await look(s.page);
+      // a call comes in: the recording's own element is paused by nobody in this app
+      const at = await recording('pause');
+      let v = await until(s, (x) => x.bar === 'paused', 3000);
+      if (v.bar !== 'paused' || v.media?.state !== 'paused' || v.media?.title !== title) problems.push(`the case did not reach its point: paused from outside, bar ${v.bar}, lock screen ${JSON.stringify(v.media)}`);
+      // the call ends: the system starts that element again
+      await recording('play');
+      let soon = await recording('look');
+      for (const t0 = Date.now(); !soon.paused && Date.now() - t0 < 400;) { await wait(50); soon = await recording('look'); }
+      await wait(1500);
+      const after = await recording('look');
+      v = await look(s.page);
+      if (!soon.paused) problems.push('started from outside while his read is paused: the recording was still playing 400 ms later');
+      if (!after.paused || after.t - at.t > 0.5) problems.push(`started from outside while his read is paused: the recording plays on (${(after.t - at.t).toFixed(2)} s more, paused ${after.paused})`);
+      if (v.bar !== 'paused' || v.media?.state !== 'paused' || v.media?.title !== title) problems.push(`after the start from outside: bar ${v.bar}, lock screen ${JSON.stringify(v.media)}`);
+      steps.push(`paused from outside at ${at.t} s; started from outside: still after 400 ms ${soon.paused}, after 1.5 s ${JSON.stringify({ t: after.t, paused: after.paused })}, bar ${v.bar}, lock screen ${v.media?.state}`);
+      // his play (the lock screen's) says that sentence again, from its recording
+      const plays = await s.page.evaluate(() => window.__pocket.plays.length);
+      await lockPlay(s);
+      v = await until(s, (x) => x.bar === 'playing', 3000);
+      const again = await s.page.evaluate((n) => window.__pocket.plays.slice(n).filter((p) => !p.speak).map((p) => p.src), plays);
+      if (v.bar !== 'playing' || again[0] !== at.src) problems.push(`his play after it: bar ${v.bar}, recordings started ${JSON.stringify(again)} (the paused one was ${at.src})`);
+      if (v.first !== before.first) problems.push(`his play lit word ${v.first}; the read was paused at word ${before.first}`);
+      steps.push(`the lock screen's play: bar ${v.bar}, the same recording again ${again[0] === at.src}, word ${v.first} (paused at ${before.first})`);
+      await s.page.evaluate(() => window.__pocket.media.handlers.pause?.());
+    } catch (error) { problems.push(`the case broke: ${String(error.message).split('\n')[0].slice(0, 200)}`); }
+    if (s.errors.length) problems.push(`page errors: ${s.errors.join(' | ')}`);
+    report('recorded-outside', problems, steps.join('; '));
+    await s.close();
+  },
+
+  async 'store-wait'() {
+    clipSeconds = 0.4; holdNth = 0;
+    const s = await freshPage();
+    const problems = [];
+    let detail = '';
+    try {
+      // a first read keeps its clips on this device (the store); paused after a few sentences
+      await openArticle(s);
+      await until(s, (v) => v.lit >= 8, 20000);
+      await s.press('#listen-toggle');
+      await until(s, (v) => v.bar === 'paused', 3000);
+      await wait(1500); // the store's writes settle
+      // the page loaded again: the read starts from the clips the store keeps
+      await openArticle(s);
+      const last = await lastToken(s.page);
+      await until(s, (v) => v.lit >= 2, 15000);
+      const kept = (await recordOf(s.page)).asked.length;
+      if (kept) problems.push(`the case did not reach its point: after the page was loaded again ${kept} sentence(s) were asked of the server, not read from the store`);
+      // hidden, timers held, and the store stops answering
+      await s.page.evaluate(() => { window.__pocket.storeHang = true; window.__pocket.setHidden(true); });
+      const end = await until(s, (v) => v.bar === 'idle' && v.first < 0, 30000);
+      const rec = await s.page.evaluate(() => ({ hung: window.__pocket.hung, asked: window.__pocket.asked.map((a) => a.at), lit: window.__pocket.lit, held: window.__pocket.heldCount }));
+      const h0 = rec.hung[0];
+      const a0 = rec.asked.find((at) => at > h0);
+      if (!rec.hung.length) problems.push('the case did not reach its point: the store was never asked for a clip once it stopped answering');
+      else if (a0 === undefined) problems.push(`hidden with timers held, the store not answering: nothing was asked of the server in 30 s; the bar says ${end.bar}, the element ${JSON.stringify(end.audio)} (${rec.held} timer callbacks held)`);
+      else if (a0 - h0 < 1000 || a0 - h0 > 5000) problems.push(`the server was asked ${Math.round(a0 - h0)} ms after the store's first unanswered read, not about 1.5 s`);
+      if (!rec.lit.some((l) => l.last >= last)) problems.push(`hidden, the read never reached the last sentence (word ${last}); the last lit was word ${rec.lit.at(-1)?.first}`);
+      const wrongBar = rec.lit.filter((l) => l.hidden && l.bar !== 'playing');
+      if (wrongBar.length) problems.push(`the bar said ${[...new Set(wrongBar.map((l) => l.bar || 'nothing'))].join('/')} at ${wrongBar.length} sentence(s) lit while hidden`);
+      await hide(s, false);
+      detail = `${rec.hung.length} unanswered store read(s); the server asked ${a0 === undefined ? 'never' : `${Math.round(a0 - h0)} ms`} after the first; ${rec.lit.length} sentences lit (${rec.lit.filter((l) => l.hidden).length} hidden); end bar ${end.bar}; timer callbacks held ${rec.held}`;
+    } catch (error) { problems.push(`the case broke: ${String(error.message).split('\n')[0].slice(0, 200)}`); }
+    if (s.errors.length) problems.push(`page errors: ${s.errors.join(' | ')}`);
+    report('store-wait', problems, detail);
     await s.close();
   },
 };
