@@ -178,48 +178,92 @@ const door = () => window.__BUNKI_OPEN_ENTRY;
 /** the app's own buttons that can stand over the first screen */
 const OVER_SKY = ['#ginga-symbol', '#ginga-search', '#ginga-theme-seal', '#live-depth-switch', '#prototype-open'];
 
-/* The ear (modules/ear.mjs, 2026-11-11): the sky draws its words on the graphics card, so the ear finds a canvas there
- * and no text. The sky says which word stands under a point (host.earWordAt, the engine's own pick over what it drew
- * in the latest frame), and before it acts on a lifted finger it asks the ear whether the tap is the ear's
+/* The ear (modules/ear.mjs, 2026-11-11; ported to the engine's version 3 on 2026-11-12): the sky draws its words on the
+ * graphics card, so the ear finds a canvas there and no text. The sky says what stands under a point (host.earWordAt)
+ * by the engine's own rule, and before it acts on a lifted finger it asks the ear whether the tap is the ear's
  * (window.__BUNKI_EAR.takes), as the old first screen does (drift-layer.js earTakes): an armed tap or an Option-click on
  * a word is spoken and the sky does nothing with it. With the ear off and no Option key the ear answers no at once,
- * and the sky acts on the same event, in the same order, as it would without the ear. */
+ * and the sky acts on the same event, in the same order, as it would without the ear.
+ *
+ * What the engine leans on here, and nothing else (tools/sky-ear-surface.test.mjs pins every name and fails when the
+ * engine changes under them): api.W, api.S.view.over, api.wrap; W.ready, W.D (words, kanji, parts), W.rd, W.gramById,
+ * W.gHits, W.hits, W.vis (five numbers a word: x, y, size, alpha, width), W.pick when the engine hands one out;
+ * W.web.pick, W.web.isOpen, W.web.tap. */
 /** A reading the voice can say: the first of several (いく; ゆく), without the ～ of a counter or a note in brackets. */
 function sayable(reading) {
   const first = String(reading || '').split(/[;；]/u)[0];
   return first.replace(/[(（][^)）]*[)）]/gu, '').replace(/[～〜~]/gu, '').trim();
 }
-/** What the sky shows under a pick (sky-world.js pick): a word, a character, or a part of a character. */
+/* A grammar pattern as said: the lane's rule, as Nihongo Study's card audio has it (client/app/card-audio.mjs
+ * patternSpeech, 6319f18): a 〜 at the start or the end goes, a 〜 inside is a pause (、), forms joined by ／ (or ・)
+ * are said with a pause between them, a bracket of kana after a kanji is that kanji's reading and is said in its place
+ * unless it is one of the optional particles, and any other bracket of kana is an optional part whose words are kept.
+ * One addition for the sky's own patterns: a bracket that holds a kanji is a note (〜そうだ（伝聞）, 〜と（条件）) and
+ * is not said, as sayable() leaves out a note. */
+const OPTIONAL_AFTER_KANJI = new Set(['に', 'は', 'も', 'の', 'を', 'が', 'て', 'で', 'と', 'へ', 'には', 'では', 'とも', 'して']);
+const KANA_SAID = /^[\p{Script=Hiragana}\p{Script=Katakana}ー、]+$/u;
+function formSaid(form) {
+  return form
+    .replace(/[（(][^）)]*\p{Script=Han}[^）)]*[）)]/gu, '')
+    .replace(/(\p{Script=Han})[（(]([\p{Script=Hiragana}ー]+)[）)]/gu, (all, kanji, kana) => (OPTIONAL_AFTER_KANJI.has(kana) ? kanji + kana : kana))
+    .replace(/[（）()［］[\]]/gu, '')
+    .replace(/\s+/gu, ' ')
+    .trim()
+    .replace(/[〜～~…]+/gu, '〜')
+    .replace(/^〜+|〜+$/gu, '')
+    .replace(/\s*〜\s*/gu, '、');
+}
+function patternSaid(pattern) {
+  const text = String(pattern || '').split(/[／/・･]/u).map(formSaid).filter(Boolean).join('、').replace(/、{2,}/gu, '、').replace(/^、+|、+$/gu, '');
+  return /[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}]/u.test(text) ? text : '';
+}
+/** What the sky shows under a pick (sky-world.js pick): a word of the field or of an opened family, a grammar sign
+ * overhead or an opened pattern, a character, a part of a character. */
 function said(sky, h) {
   const W = sky.W, D = W.D;
   const word = (i) => ({ text: D.words[i][0], reading: sayable(W.rd[i]), id: `w${i}` });
+  const pattern = (i, printed) => {
+    const text = patternSaid(printed);
+    return text ? { text, reading: KANA_SAID.test(text) ? text : '', id: `g${i}` } : null;
+  };
   if (h.t === 'w') return word(h.i);
+  if (h.t === 'g') {
+    const g = W.gramById && W.gramById.get(h.i);
+    return g ? pattern(h.i, g.p) : null;
+  }
   const it = h.item;
   if (!it) return null;
   if (it.kind === 'w') return word(it.id);
   if (it.kind === 'k') return { text: D.kanji[it.id][0], reading: '', id: `k${it.id}` };
   if (it.kind === 'p') return { text: D.parts[it.id][0], reading: D.parts[it.id][1] || '', id: `p${it.id}` };
+  if (it.kind === 'g') return pattern(it.id, it.text);
   return { text: it.text, reading: '', id: `x${it.text}` };
 }
-/** The word the sky drew under a point of the page (CSS px), as its own tap would pick it: an opened word's family
- * first, then the drifting field, the nearest word first; a finger is given the engine's wider reach. */
+/* The engine's own rule for what stands under a point (sky-world.js pick, version 3), copied line for line: the opened
+ * family first (and nothing else while one is open); nothing while he looks down from above; then the grammar signs
+ * overhead; then the drawn words, the largest drawn first. The engine keeps its pick to itself; when it hands one out
+ * (W.pick) that is asked instead and this copy is not used. The contract test compares the body below with the
+ * engine's, character for character. */
+function enginePick(W, view, hits, px, py, slop) {
+      if (W.web) { const h = W.web.pick(px, py, slop); if (h) return h; if (W.web.isOpen()) return null; }
+      if (view.over > 0.3) return null;
+      for (const h of W.gHits) if (h.i >= 0 && Math.abs(px - h.x) <= h.w / 2 + slop && Math.abs(py - h.y) <= h.s * 0.7 + slop) return { t: 'g', i: h.i };
+      let best = -1, bz = 1e9; for (const i of hits) { const o = i * 5, hw = W.vis[o + 4] / 2 + slop, hh = W.vis[o + 2] * 0.62 + slop; if (Math.abs(px - W.vis[o]) <= hw && Math.abs(py - W.vis[o + 1]) <= hh) { const z = -W.vis[o + 2]; if (z < bz) { bz = z; best = i; } } }
+      return best >= 0 ? { t: 'w', i: best } : null;
+}
+/** The engine's own pick on a lifted finger, while the ear is asked about that lift (askEarFirst): the ear is told what
+ * the engine itself chose for that event, not a second pick of its own. */
+let lifted = null;
+/** What the sky shows under a point of the page (CSS px), as the engine would pick it there: a finger is given the
+ * engine's wider reach (14 px; a mouse or a pen 5). */
 function wordAt(sky, x, y, pointer) {
   const W = sky && sky.W;
-  if (!W || !W.ready || !sky.wrap) return null;
+  if (!W || !W.ready || !sky.wrap || !sky.S || !sky.S.view) return null;
+  if (lifted && lifted.sky === sky && Math.abs(lifted.x - x) < 0.5 && Math.abs(lifted.y - y) < 0.5) return lifted.h ? said(sky, lifted.h) : null;
   const box = sky.wrap.getBoundingClientRect();
   const px = x - box.left, py = y - box.top, slop = pointer === 'touch' ? 14 : 5;
-  if (W.web) {
-    const h = W.web.pick(px, py, slop);
-    if (h) return said(sky, h);
-    if (W.web.isOpen()) return null;
-  }
-  let best = -1, near = Infinity;
-  for (const i of W.hits) {
-    const o = i * 5;
-    if (Math.abs(px - W.vis[o]) > W.vis[o + 4] / 2 + slop || Math.abs(py - W.vis[o + 1]) > W.vis[o + 2] * 0.62 + slop) continue;
-    if (W.hz[i] < near) { near = W.hz[i]; best = i; }
-  }
-  return best >= 0 ? said(sky, { t: 'w', i: best }) : null;
+  const h = typeof W.pick === 'function' ? W.pick(px, py, slop) : enginePick(W, sky.S.view, W.hits, px, py, slop);
+  return h ? said(sky, h) : null;
 }
 const earTakes = (event) => {
   try {
@@ -228,17 +272,29 @@ const earTakes = (event) => {
     return false;
   }
 };
-/** The sky acts on a lifted finger through W.web.tap (sky-world.js onUp, after its own pointer bookkeeping): the ear is
- * asked there, so the engine's state is left as after any tap and only the word's opening is the ear's to withhold.
- * onUp runs on pointercancel too (a touch the browser cancelled), so the ear is asked on both: armed, a cancelled touch
- * on a word opens nothing (and, no tap made, speaks nothing). The ear is asked on empty sky as well, so the click that
- * follows a lift meets the same pick, word or nothing, though the field drifts between the two (ear.mjs takes). */
+/** The sky acts on a lifted finger through W.web.tap (sky-world.js onUp, after its own pointer bookkeeping, with the
+ * engine's own pick h): the ear is asked there, about that pick, so the engine's state is left as after any tap and
+ * only the word's opening is the ear's to withhold. onUp returns before the tap for a drag and for a touch on the ring
+ * seen from above: the ear is not asked there. onUp runs on pointercancel too (a touch the browser cancelled), so the
+ * ear is asked on both: armed, a cancelled touch on a word opens nothing (and, no tap made, speaks nothing). The ear is
+ * asked on empty sky as well, so the click that follows a lift meets the same pick, word or nothing, though the field
+ * drifts between the two (ear.mjs takes). The sky's own keyboard and screen-reader buttons call W.web.tap with no
+ * event: those are never the ear's. */
 function askEarFirst(sky) {
   const web = sky && sky.W && sky.W.web;
   if (!web || typeof web.tap !== 'function') return;
   const tap = web.tap;
   web.tap = (h, event) => {
-    if (event && (event.type === 'pointerup' || event.type === 'pointercancel') && earTakes(event)) return;
+    if (event && (event.type === 'pointerup' || event.type === 'pointercancel')) {
+      lifted = { sky, x: event.clientX, y: event.clientY, h: h || null };
+      let mine = false;
+      try {
+        mine = earTakes(event);
+      } finally {
+        lifted = null;
+      }
+      if (mine) return;
+    }
     return tap(h, event);
   };
 }
