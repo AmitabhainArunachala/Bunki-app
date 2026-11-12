@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>宙 · Bunki</title>
+<link rel="stylesheet" href="/fonts.css">
+<style>
+  html, body { margin: 0; height: 100%; background: #040a1b; overflow: hidden; }
+  #host { position: fixed; inset: 0; }
+</style>
+</head>
+<body>
+<div id="host"></div>
+<script src="sky.js"></script>
+<script src="sky-world.js"></script>
+<script src="sky-web.js"></script>
+<script>
+  const q = new URLSearchParams(location.search);
+  const FRONT = ["出","炊く","単なる","万一","謎","武器","順","書物","男の人","今にも","納める","差別","取り上げる","印刷","悔しい","大統領","天候","技師","触れる","外出","件","手間","判断","新鮮","預ける","開始","暮らす","増加","煮える","写る","虫歯","量","日光","日中","掃く","症状","材料","徹底","精巧","救う","起こる","気味","小銭","生物","一生","人気","信号","成人","会合","年中","活気","読み","計る","同志","悲しむ","希望","急に","得意","反省","先日","高価","石炭","支配","渇く","熾烈","猛烈","組織"];
+  window.__SKY__ = BunkiSky.mount(document.getElementById('host'), { look: q.get('look') || 'hokusai', lang: q.get('lang') || 'en', dataUrl: 'sky-data.json', contextUrl: 'sky-context.json', standalone: true, front: FRONT });
+</script>
+</body>
+</html>

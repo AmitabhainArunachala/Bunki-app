@@ -1,0 +1,404 @@
+/* lead.css · the lead's own live trials, attached with the depth sheet by the 深 switch.
+   Every rule is scoped under html[data-live-depth='1']. Trials here are proposals John can switch off;
+   an accepted one moves into the app's own code and leaves this file. */
+
+/* =====================================================================================
+   1 · the top bar: one door per place per screen (lead, 2026-11-10 21:00)
+   The cap is a door to Learn and the bookmark is a door to Today. Both places are in the bar along the
+   bottom of the same screen, so the top bar says them twice. With the tabs showing, the top bar keeps
+   Back, the look, the language and search (and Save in an article).
+   ===================================================================================== */
+/* @no-fold-start: the gate builder lands these in the app's own code with their tests; until then they stay a live trial only */
+html[data-live-depth='1'] body.has-primary-tabs #app > .chrome > :is(#chrome-dojo, #tray) { display: none; }
+/* the three that stay gather at the right end; Back keeps the left */
+html[data-live-depth='1'] body.has-primary-tabs #app > .chrome > #theme-seal { margin-left: auto; }
+
+/* the trail's first step alone ("宙 · shelf") repeats Back and the room's own title: it shows once there is a second step */
+html[data-live-depth='1'] #app > .scale-thread[data-scale='shelf'] { display: none; }
+/* in the Words room nothing follows the language switch, so its closing hairline goes */
+html[data-live-depth='1'] body.has-primary-tabs #app > .chrome > #lang:has(+ #chrome-dojo) { background-image: none; }
+/* @no-fold-end */
+
+/* =====================================================================================
+   2 · the article opens on a cover (lead, 2026-11-10 21:18; wide screens 21:40)
+   The picture is the cover, the headline is lit on it in the same night as every other subject in the app
+   (the word, the character, the deck), on the red thread. Headline at headline size; the line pitch stays
+   generous, because a tapped title word still shows its reading above it. Not while the reading settings
+   are open. On a phone the cover runs edge to edge; on a wide screen it is one plate, the width of the text.
+   ===================================================================================== */
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero {
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+  background: var(--dp-night);
+  box-shadow: none;
+}
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero .reader-picture-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  object-fit: cover;
+  object-position: 50% 28%;
+}
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 0%, transparent 22%, color-mix(in oklab, var(--dp-night) 70%, transparent) 50%, color-mix(in oklab, var(--dp-night) 95%, transparent) 80%, var(--dp-night) 100%);
+  /* the night looks clip their own lamp light here; the cover's shade is never clipped */
+  clip-path: none;
+  pointer-events: none;
+}
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero::before { inset: 0; }
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero + .reader-card {
+  --color-ink: var(--dp-star);
+  --color-ink-2: color-mix(in oklab, var(--dp-star) 82%, var(--dp-night));
+  --color-muted: color-mix(in oklab, var(--dp-star) 68%, var(--dp-night));
+  --color-accent: var(--dp-night-read);
+  --ink: var(--dp-star);
+  --cover-lap: 118px;
+  position: relative;
+  z-index: 1;
+  /* a short headline still covers the whole lap: the card is never shorter than its overlap with the picture,
+     and its words sit at the foot of the cover */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: var(--cover-lap);
+  margin-top: calc(-1 * var(--cover-lap));
+  border: 0;
+  border-radius: 0;
+  color: var(--dp-star);
+  background: linear-gradient(180deg, transparent 0, var(--dp-night) var(--cover-lap), var(--dp-night-mid) 100%);
+  box-shadow: 0 1px 0 var(--dp-catch), 0 22px 28px -22px color-mix(in oklab, var(--dp-shade) 70%, transparent);
+}
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero + .reader-card > h1.view-title {
+  letter-spacing: 0.012em;
+  color: var(--dp-star);
+  text-shadow: 0 1px 14px color-mix(in oklab, var(--dp-night) 80%, transparent), 0 0 2px color-mix(in oklab, var(--dp-night) 70%, transparent);
+  text-wrap: pretty;
+}
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero + .reader-card > h1.view-title :is(.japanese-lookup-text, .japanese-lookup-word, .ja-unit) { color: inherit; }
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero + .reader-card > h1.view-title rt { color: var(--dp-night-read); }
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero + .reader-card > .view-title-en {
+  margin-top: 2px;
+  padding-left: 0;
+  border-left: 0;
+  color: color-mix(in oklab, var(--dp-star) 80%, var(--dp-night));
+}
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero + .reader-card > .reader-head { border-top-color: color-mix(in oklab, var(--dp-star) 18%, transparent); }
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero + .reader-card .reader-meta,
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero + .reader-card .reader-meta > * { color: color-mix(in oklab, var(--dp-star) 70%, var(--dp-night)); }
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero + .reader-card .reader-meta .date-abs { color: inherit; }
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero + .reader-card .level-chip { color: var(--dp-star); border-color: color-mix(in oklab, var(--dp-star) 46%, transparent); background: none; }
+html[data-live-depth='1'][data-room='reader']:not(#\#) body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero + .reader-card .dials-toggle { color: var(--dp-star); }
+/* a phone: edge to edge */
+@media (max-width: 520px) {
+  html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero { height: clamp(196px, calc(100svh - 632px), 300px); }
+  html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero + .reader-card {
+    margin-inline: calc(50% - 50vw);
+    padding: 0 20px 12px 23px;
+  }
+  html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero + .reader-card > h1.view-title { font-size: 26px; line-height: 40px; }
+}
+/* a wide screen: the article is one sheet of paper on the ground; the cover heads the sheet from edge to edge */
+html[data-live-depth='1'][data-room='reader'] body:not([data-view='drift'])::before {
+  background:
+    linear-gradient(100deg, color-mix(in srgb, var(--ai) 9%, transparent), transparent 42%, transparent 62%, color-mix(in srgb, var(--red) 6%, transparent)),
+    radial-gradient(110% 62% at 22% -8%, var(--dp-ground-lit), transparent 72%),
+    linear-gradient(180deg, var(--dp-ground) 0%, var(--dp-ground) 40%, var(--dp-ground-foot) 100%);
+}
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] body:not([data-view='drift'])::before {
+  background:
+    var(--skin-light),
+    radial-gradient(110% 62% at 22% -8%, var(--dp-ground-lit), transparent 72%),
+    linear-gradient(180deg, var(--dp-ground) 0%, var(--dp-ground) 40%, var(--dp-ground-foot) 100%);
+}
+html[data-live-depth='1'][data-room='reader'] body:not([data-view='drift']):not(.zen) #app { background-image: var(--dp-fibre); background-size: 360px 360px; }
+/* the bar does not say the article's name a second time: the trail under it and the cover carry it */
+/* @no-fold-start: same, the bar's contents belong to the gate builder */
+html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > .chrome > :is(.crumb, .chrome-level) { display: none; }
+/* @no-fold-end */
+@media (min-width: 521px) {
+  html[data-live-depth='1'][data-room='reader'] body[data-view='reader']:not(.zen) #app > main:not(:has(> .dials)) {
+    --rd-pad: clamp(24px, 6vw, 72px);
+    padding: 0 var(--rd-pad) 96px;
+    border-radius: 16px;
+    background: linear-gradient(180deg, var(--dp-sheet) 0%, var(--dp-sheet) 620px, var(--dp-sheet-foot) 100%);
+    box-shadow: inset 0 1px 0 var(--dp-catch), var(--dp-shadow-sheet), 0 60px 90px -60px color-mix(in oklab, var(--dp-shade) 40%, transparent);
+    overflow: clip;
+  }
+  html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero {
+    height: clamp(320px, 38svh, 440px);
+    margin: 0 calc(-1 * var(--rd-pad)) 0;
+    border-radius: 0;
+  }
+  html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero + .reader-card {
+    --cover-lap: 178px;
+    margin-inline: calc(-1 * var(--rd-pad));
+    margin-bottom: 22px;
+    padding: 0 var(--rd-pad) 18px calc(var(--rd-pad) + 16px);
+    box-shadow: 0 20px 24px -20px color-mix(in oklab, var(--dp-shade) 60%, transparent);
+  }
+  html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero + .reader-card > h1.view-title { font-size: 36px; line-height: 56px; }
+  html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero + .reader-card > .view-title-en { font-size: 16px; line-height: 1.5; }
+  /* the text is printed on the sheet itself: no second paper, no ruled grain, no inner shadow */
+  html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > #reader.reader { background: none; box-shadow: none; border-top: 0; }
+  html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > #reader.reader::before { content: none; }
+}
+
+/* =====================================================================================
+   3 · Learn opens on a desk at night: one deck under a lamp (lead, 2026-11-10 21:25)
+   The room you study in is dark with one lit card. Its doorway is the same: the deck lies under a pool of
+   light, its thickness drawn as card edges, on the red thread. The two loose sheets behind it go.
+   ===================================================================================== */
+html[data-live-depth='1']:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app > main > .learn-stage {
+  background:
+    radial-gradient(84% 40% at 50% 37%, color-mix(in oklab, var(--dp-night-glow) 46%, transparent) 0, transparent 72%),
+    linear-gradient(180deg, var(--dp-deep-2) 0%, var(--dp-deep) 46%, var(--dp-deep-2) 100%);
+}
+html[data-live-depth='1']:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-ghost { display: none; }
+html[data-live-depth='1']:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-fan { margin-bottom: 30px; }
+html[data-live-depth='1']:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-card {
+  border-radius: 10px;
+  /* the card keeps the room's own lit paper (--learn-card) in every look, night looks too */
+  background: linear-gradient(180deg, color-mix(in oklab, var(--learn-card) 55%, #fff) 0%, var(--learn-card) 26%, var(--learn-card) 100%);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--learn-card) 30%, #fff),
+    0 3px 0 -1px color-mix(in oklab, var(--learn-card) 84%, var(--dp-deep)),
+    0 6px 0 -2px color-mix(in oklab, var(--learn-card) 70%, var(--dp-deep)),
+    0 9px 0 -3px color-mix(in oklab, var(--learn-card) 56%, var(--dp-deep)),
+    0 12px 0 -4px color-mix(in oklab, var(--learn-card) 42%, var(--dp-deep)),
+    0 15px 0 -5px color-mix(in oklab, var(--learn-card) 30%, var(--dp-deep)),
+    0 44px 46px -22px rgb(0 0 0 / 72%),
+    0 0 60px color-mix(in oklab, var(--dp-night-glow) 26%, transparent);
+}
+html[data-live-depth='1']:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-card::before { border-radius: 10px 0 0 10px; background: transparent; }
+/* nothing is waiting: the second door is a line of text, not a second button */
+html[data-live-depth='1']:is([data-room='learn'], [data-room='tests']):not(#\#) body:not([data-view='drift']) #app .learn-stage .learn-go-quiet:not(.learn-go-home) {
+  min-height: 44px;
+  border-color: transparent;
+  box-shadow: none;
+  background: none;
+}
+
+/* =====================================================================================
+   4 · "I know this" and "Not yet" answer in the study card's own hand (lead, 2026-11-10 21:27)
+   They are the two answers the study engine needs about a new word. The card's four answer keys are the
+   standard: a quiet translucent key with one coloured top edge. Here the same key, two of them, the width
+   of the word's night window. Green edge for known, amber for not yet; the pressed one fills with its colour.
+   ===================================================================================== */
+html[data-live-depth='1']:not(#\#) #sheet:has(> h2.headword) > p.depth-basis:has(> .depth-word) {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  align-items: stretch;
+}
+html[data-live-depth='1']:not(#\#) #sheet:has(> h2.headword) > p.depth-basis:has(> .depth-word) > .depth-basis-said { grid-column: 1 / -1; }
+html[data-live-depth='1']:not(#\#) #sheet:has(> h2.headword) > p.depth-basis > .depth-word {
+  --answer: oklch(0.878 0.14 150);
+  min-height: 48px;
+  margin: 0;
+  padding: 0 12px;
+  border: 1px solid color-mix(in srgb, var(--dp-star) 18%, transparent);
+  border-top: 2px solid var(--answer);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--dp-star) 6%, transparent);
+  color: var(--dp-star);
+  font: 500 15px/1.2 var(--font-ui);
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  box-shadow: none;
+}
+html[data-live-depth='1']:not(#\#) #sheet:has(> h2.headword) > p.depth-basis > #depth-not-yet { --answer: oklch(0.878 0.14 75); }
+html[data-live-depth='1']:not(#\#) #sheet:has(> h2.headword) > p.depth-basis > .depth-word[aria-pressed='true'] {
+  border-color: color-mix(in oklch, var(--answer) 45%, transparent);
+  border-top-color: var(--answer);
+  background: color-mix(in oklch, var(--answer) 16%, transparent);
+}
+@media (hover: hover) {
+  html[data-live-depth='1']:not(#\#) #sheet:has(> h2.headword) > p.depth-basis > .depth-word:hover { background: color-mix(in srgb, var(--dp-star) 11%, transparent); }
+}
+
+/* =====================================================================================
+   5 · the first screen's words carry more ink (lead, 2026-11-10 21:29)
+   The drifting words keep their three blues, their sizes and their fades; each blue is deepened and the
+   strokes are a step heavier, so the field reads before the chrome does. The layer itself is not touched.
+   ===================================================================================== */
+html[data-live-depth='1'] body[data-view='drift'] #drift-layer #sky > .word[style*='rgb(58, 95, 138)'] { color: rgb(38, 66, 104) !important; }
+html[data-live-depth='1'] body[data-view='drift'] #drift-layer #sky > .word[style*='rgb(30, 80, 162)'] { color: rgb(18, 54, 132) !important; }
+html[data-live-depth='1'] body[data-view='drift'] #drift-layer #sky > .word[style*='rgb(22, 94, 131)'] { color: rgb(10, 66, 98) !important; }
+html[data-live-depth='1'] body[data-view='drift'] #drift-layer #sky > .word { font-weight: 500; }
+
+/* =====================================================================================
+   6 · the word web is a window into 宙 (lead, 2026-11-10 21:36)
+   Same shapes, same places, same taps. The plate becomes night: the word stands lit at the centre, kanji
+   are lit discs, parts are open squares, the wires are light. It is the near view of the sky the first
+   screen shows from far away. Rooms: Words (and the Dictionary in the five-places layout).
+   ===================================================================================== */
+html[data-live-depth='1'] body:not([data-view='drift']) #app .ww .ww-plate {
+  --ww-night: var(--dp-night);
+  --ww-lit: var(--dp-star);
+  --ww-dim: color-mix(in oklab, var(--dp-star) 62%, var(--dp-night));
+  border-color: transparent;
+  border-radius: var(--radius-card);
+  background:
+    radial-gradient(1px 1px at 12% 18%, color-mix(in srgb, var(--dp-star) 70%, transparent) 50%, transparent 51%),
+    radial-gradient(1px 1px at 82% 12%, color-mix(in srgb, var(--dp-star) 55%, transparent) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 68% 78%, color-mix(in srgb, var(--dp-star) 45%, transparent) 50%, transparent 51%),
+    radial-gradient(1px 1px at 24% 84%, color-mix(in srgb, var(--dp-star) 50%, transparent) 50%, transparent 51%),
+    radial-gradient(1px 1px at 91% 52%, color-mix(in srgb, var(--dp-star) 40%, transparent) 50%, transparent 51%),
+    radial-gradient(1px 1px at 6% 56%, color-mix(in srgb, var(--dp-star) 40%, transparent) 50%, transparent 51%),
+    radial-gradient(70% 52% at 50% 46%, color-mix(in oklab, var(--dp-night-glow) 44%, transparent) 0, transparent 74%),
+    linear-gradient(180deg, var(--dp-night) 0%, var(--dp-night-mid) 100%);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, #000 60%, transparent),
+    inset 0 10px 14px -8px color-mix(in oklab, #000 70%, transparent),
+    inset 0 -1px 0 var(--dp-lip),
+    0 1px 0 var(--dp-catch),
+    0 22px 30px -22px color-mix(in oklab, var(--dp-shade) 70%, transparent);
+  color: var(--ww-lit);
+}
+html[data-live-depth='1'] body:not([data-view='drift']) #app .ww .ww-plate .ww-wire { stroke: color-mix(in srgb, var(--dp-star) 46%, transparent); }
+html[data-live-depth='1'] body:not([data-view='drift']) #app .ww .ww-plate .ww-ring { stroke: color-mix(in srgb, var(--dp-star) 34%, transparent); }
+html[data-live-depth='1'] body:not([data-view='drift']) #app .ww .ww-plate .ww-ticks { stroke: color-mix(in srgb, var(--dp-star) 40%, transparent); color: color-mix(in srgb, var(--dp-star) 40%, transparent); }
+/* the word itself: lit, with its sound in the look's cool tone */
+html[data-live-depth='1'] body:not([data-view='drift']) #app .ww .ww-plate .ww-c-glyph { color: var(--ww-lit); text-shadow: 0 0 26px color-mix(in oklab, var(--dp-night-glow) 90%, transparent); }
+html[data-live-depth='1'] body:not([data-view='drift']) #app .ww .ww-plate :is(.ww-c-r, .ww-c-m, .ww-cap, .ww-st) { background: var(--ww-night); color: var(--ww-dim); }
+html[data-live-depth='1'] body:not([data-view='drift']) #app .ww .ww-plate .ww-c-r { color: var(--dp-night-read); }
+/* kanji: lit discs. parts: open squares. words: light type. passages and grammar: small slips */
+html[data-live-depth='1'] body:not([data-view='drift']) #app .ww .ww-plate .ww-n-kanji .ww-nb { background: var(--ww-lit); color: var(--dp-night); box-shadow: 0 0 18px color-mix(in oklab, var(--dp-night-glow) 80%, transparent); }
+html[data-live-depth='1'] body:not([data-view='drift']) #app .ww .ww-plate .ww-n-kanji .ww-g { color: var(--dp-night); }
+html[data-live-depth='1'] body:not([data-view='drift']) #app .ww .ww-plate .ww-n-part .ww-nb { background: var(--ww-night); border-color: color-mix(in srgb, var(--dp-star) 70%, transparent); color: var(--ww-lit); }
+html[data-live-depth='1'] body:not([data-view='drift']) #app .ww .ww-plate .ww-n-part .ww-g { color: var(--ww-lit); }
+/* a related word: the kanji it shares with the centre is lit, the rest of the word is dimmer light */
+html[data-live-depth='1'] body:not([data-view='drift']) #app .ww .ww-plate .ww-n-word .ww-g { background: var(--ww-night); color: var(--ww-dim); }
+html[data-live-depth='1'] body:not([data-view='drift']) #app .ww .ww-plate .ww-n-word .ww-g b { color: var(--ww-lit); text-shadow: 0 0 14px color-mix(in oklab, var(--dp-night-glow) 90%, transparent); }
+html[data-live-depth='1'] body:not([data-view='drift']) #app .ww .ww-plate .ww-n-word .ww-nb { background: none; }
+html[data-live-depth='1'] body:not([data-view='drift']) #app .ww .ww-plate :is(.ww-n-passage, .ww-n-grammar) .ww-nb { background: var(--dp-slip); border-color: transparent; box-shadow: var(--dp-shadow-slip-down); }
+html[data-live-depth='1'] body:not([data-view='drift']) #app .ww .ww-plate :is(.ww-n-passage, .ww-n-grammar) .ww-g { color: var(--ink); }
+html[data-live-depth='1'] body:not([data-view='drift']) #app .ww .ww-plate .ww-legend { color: var(--ww-dim); border-top-color: color-mix(in srgb, var(--dp-star) 16%, transparent); }
+html[data-live-depth='1'] body:not([data-view='drift']) #app .ww .ww-plate .ww-legend .ww-lg-k { background: var(--ww-lit); }
+html[data-live-depth='1'] body:not([data-view='drift']) #app .ww .ww-plate .ww-legend .ww-lg-p { border-color: color-mix(in srgb, var(--dp-star) 70%, transparent); }
+html[data-live-depth='1'] body:not([data-view='drift']) #app .ww .ww-plate .ww-legend .ww-lg-w { background: var(--ww-lit); }
+/* the legend's stroke-count sample ("10 = strokes", i.ww-lg-st) kept the page's dark quiet ink: 1.1:1 on the night plate.
+   It takes the legend's own light (engineer, 21:50, at the lead's word; nothing else in this file is touched) */
+html[data-live-depth='1'] body:not([data-view='drift']) #app .ww .ww-plate .ww-legend .ww-lg-st { color: var(--ww-dim); }
+
+/* Learn on a wide screen: the deck keeps a card's shape on the left, under its lamp; the count and the two doors stand to its right */
+@media (min-width: 900px) {
+  html[data-live-depth='1']:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app > main > .learn-stage {
+    display: grid;
+    grid-template-columns: minmax(0, 430px) minmax(0, 1fr);
+    column-gap: 56px;
+    align-items: center;
+    background:
+      radial-gradient(46% 62% at 26% 56%, color-mix(in oklab, var(--dp-night-glow) 46%, transparent) 0, transparent 72%),
+      linear-gradient(180deg, var(--dp-deep-2) 0%, var(--dp-deep) 46%, var(--dp-deep-2) 100%);
+  }
+  html[data-live-depth='1']:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage > .learn-stage-head { grid-column: 1 / -1; }
+  html[data-live-depth='1']:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage > .learn-fan { grid-column: 1; grid-row: 2 / span 3; margin: 14px 0 34px; }
+  html[data-live-depth='1']:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage > .learn-stage-row { grid-column: 2; grid-row: 2; align-self: end; }
+  html[data-live-depth='1']:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage > .learn-go { grid-column: 2; grid-row: 3; }
+  html[data-live-depth='1']:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage > .learn-go-quiet { grid-column: 2; grid-row: 4; align-self: start; }
+  html[data-live-depth='1']:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-card { min-height: 210px; padding-top: 22px; }
+}
+/* on a wide screen the two answer keys keep a key's width; they do not stretch across the window */
+@media (min-width: 521px) {
+  html[data-live-depth='1']:not(#\#) #sheet:has(> h2.headword) > p.depth-basis:has(> .depth-word) { grid-template-columns: repeat(2, minmax(0, 208px)); justify-content: start; }
+}
+/* on a wide screen the article is set like a book, not large print: 21 on 42 instead of 23 on 53.
+   A tapped word still has room for its reading above and its meaning below (checked at 1728 wide). */
+@media (min-width: 900px) {
+  html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > #reader.reader .reader-prose { font-size: 21px; line-height: 42px; }
+}
+/* on a wide screen the trail starts under Back, on the same left edge as the bar above it (it used to start at the window's edge) */
+@media (min-width: 900px) {
+  html[data-live-depth='1'] #app > .scale-thread { padding-inline: max(0px, calc((100vw - 1184px) / 2 - 14px)); }
+}
+
+/* =====================================================================================
+   7 · three day looks that read as one become three (lead, 2026-11-10 22:10)
+   With one ink wash for all, 墨, 朱 and the key block shared a ground and differed only in a hair of hue.
+   Each now takes its ground and its edges from what its name means.
+   墨 sumi: grey ink wash, cool and neutral, paper and black. 朱 shu: the paper blushes with its vermilion.
+   Key block: the black outline block of a print: hard ink lines and hard offset shadows, nothing soft.
+   ===================================================================================== */
+html[data-live-depth='1'][data-theme='sumi'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet) {
+  --dp-wash: #2b2e33;
+  --dp-paper-white: color-mix(in oklab, var(--ground-0) 40%, #fff);
+  --dp-ground: color-mix(in oklab, var(--dp-paper-white) 80%, var(--dp-wash));
+  --dp-ground-lit: color-mix(in oklab, var(--dp-paper-white) 93%, var(--dp-wash));
+  /* engineer, 22:45: 75%, was 72%. At the foot of a tall window the look's 藍 (Report a problem) read 4.40:1 */
+  --dp-ground-foot: color-mix(in oklab, var(--dp-paper-white) 75%, var(--dp-wash));
+  --dp-well: color-mix(in oklab, var(--dp-paper-white) 66%, var(--dp-wash));
+}
+html[data-live-depth='1'][data-theme='shu'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet) {
+  --dp-blush: color-mix(in oklab, var(--ground-0) 86%, var(--red));
+  --dp-ground: color-mix(in oklab, var(--dp-blush) 93%, var(--ink));
+  --dp-ground-lit: color-mix(in oklab, var(--ground-0) 94%, var(--red));
+  --dp-ground-foot: color-mix(in oklab, var(--dp-blush) 86%, var(--ink));
+  --dp-well: color-mix(in oklab, var(--dp-blush) 80%, var(--ink));
+}
+html[data-live-depth='1'][data-theme='keyblock'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet) {
+  --dp-ground: color-mix(in oklab, var(--ground-2) 96%, var(--ink));
+  --dp-ground-lit: var(--dp-ground);
+  --dp-ground-foot: var(--dp-ground);
+  --dp-shadow-sheet: 0 0 0 1.5px var(--ink), 6px 6px 0 0 var(--ink);
+  --dp-shadow-card: 0 0 0 1.5px var(--ink), 5px 5px 0 0 var(--ink);
+  --dp-shadow-slip: 0 0 0 1.5px var(--ink), 3px 3px 0 0 var(--ink);
+  --dp-shadow-slip-up: 0 0 0 1.5px var(--ink), 5px 5px 0 0 var(--ink);
+  --dp-shadow-slip-down: 0 0 0 1.5px var(--ink), 1px 1px 0 0 var(--ink);
+  --dp-catch: transparent;
+}
+
+/* =====================================================================================
+   8 · on a wide screen the study room fills the window (lead, 2026-11-10 22:28)
+   On a phone the dark room runs edge to edge. On a wide screen it was a dark column inside a white frame on
+   cream paper. The page behind now is the room's own night (the same lacquer the player uses), and the frame
+   goes. Nothing inside the player is touched: the card, the keys and the bar are pixel for pixel as they were.
+   ===================================================================================== */
+@media (min-width: 521px) {
+  html[data-live-depth='1'][data-room='deckplay'] body:has(#app > main > .kp > .kp-study)::before {
+    background:
+      radial-gradient(52% 44% at 50% 0%, color-mix(in srgb, var(--world-paper, var(--ground-0)) 7%, transparent), transparent 72%),
+      var(--color-lacquer, #141a28);
+  }
+  html[data-live-depth='1'][data-room='deckplay'] body:has(#app > main > .kp > .kp-study) #app > main {
+    background: none;
+    border-color: transparent;
+    box-shadow: none;
+  }
+}
+
+/* the reading labels keep their own letters ("on", "kun"): small capitals by the font, not by rewriting the text,
+   so what a screen reader and the learner walk read is what the app wrote (lead, 2026-11-10 22:30) */
+html[data-live-depth='1'] #sheet .hero:has(> .hero-glyph) ~ dl.kv dt {
+  text-transform: none;
+  font-variant-caps: all-small-caps;
+  font-size: 12.5px;
+}
+
+/* ---- 9 · the listen mark beside a word's headword stands on the dark headword block, so it takes the lit ink
+   (voice lead's finding, 2026-11-11: it was dark on dark at 1728) ---- */
+html[data-live-depth='1'] #sheet > .voice-say[data-voice-say='entry-headword'] { color: var(--dp-star, #f4efe2); }
+html[data-live-depth='1'] #sheet > .voice-say[data-voice-say='entry-headword']:is(:hover, :focus-visible) { color: #fff; }
+/* the headword is ink on the night block, not a lamp: no glow behind it (a blurred patch read as a smudge at 1728) */
+html[data-live-depth='1'] #sheet:has(> h2.headword):not(:has(.hero > .hero-glyph)) > h2.headword { text-shadow: none; }
+/* the word web's legend: its separators stand in the night window, so they take the lit ink (measured 1.12:1 before) */
+html[data-live-depth='1'] section.ww .ww-plate > .ww-legend > span::before { color: color-mix(in oklab, var(--dp-star, #f4efe2) 62%, transparent); }
+/* night looks, a character's page: an idiom chip showed its other characters in dark ink on the dark chip
+   (1.12 to 1.43 to 1, contrast walk 2026-11-11). They take the look's own light ink; the page's character stays brightest. */
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #sheet .chips > .chip.t-idiom > .big { color: color-mix(in oklab, var(--ink) 80%, transparent); }
+
+/* 10 · no red rail on cards (ruling 2026-11-11). The red belongs to the path: the cord of the bookmark slip, the
+   current place on the row of five places, the current step of the path row. A red left edge on a card is the cord
+   used as a border. The rails this layer drew are deleted above; this takes off the one the app's own sheet draws. */
+html[data-live-depth='1'] #sheet:has(> h2.headword):not(:has(.hero > .hero-glyph)) > p.entry-facts::before { box-shadow: none; }
