@@ -312,7 +312,7 @@ html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-fam.ww-cho
 }
 
 /* ---- the quiet index under the web: four doors, two by two ---- */
-html[data-room='search'] .words-index { margin-top: var(--space-7, 40px); }
+html[data-room='search'] .words-index { margin-top: 40px; }
 html[data-room='search'] .words-index .foundation-doors { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 html[data-room='search'] .words-index .foundation-door { min-height: 52px; font-size: var(--type-control); }
 
