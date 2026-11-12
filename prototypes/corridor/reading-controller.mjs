@@ -13,7 +13,7 @@ import {
 } from './modules/reading-core.mjs';
 
 export { parseArticleCandidate, parseGenerationBrief };
-export const READING_PROMPT_VERSION = 'kairo-personal-reading/1';
+const READING_PROMPT_VERSION = 'kairo-personal-reading/1';
 export const DEFAULT_READING_SETTINGS = Object.freeze({
   mode: 'original-factual',
   genre: 'explainer',
@@ -70,7 +70,7 @@ export function prepareReadingRequest({ owner, job, createdAt, modelId, settings
   });
 }
 
-export const TEACHING_CONTEXT_LIMITS = Object.freeze({
+const TEACHING_CONTEXT_LIMITS = Object.freeze({
   dimensions: 4, cellsPerDimension: 6, targets: 6, confusions: 4,
   formCharacters: 80, serializedCharacters: 8000,
 });
@@ -155,7 +155,7 @@ export function prepareTeachingContext({ model, targets = [], confusions = [] } 
   return freezeTree(result);
 }
 
-export function decodeReadingDraft(raw) {
+function decodeReadingDraft(raw) {
   if (typeof raw !== 'string' || raw.length > 200_000) {
     throw new ReadingValidationError('invalid-input', ['provider-response']);
   }

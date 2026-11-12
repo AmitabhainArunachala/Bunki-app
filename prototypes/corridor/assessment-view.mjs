@@ -62,7 +62,7 @@ const paperPlain = text => text.replace(/\uE002([^\uE003]*)\uE003[^\uE004]*\uE00
 const minutes = ms => Math.max(0, Math.ceil(ms / 60_000));
 const clockText = ms => `${Math.floor(ms / 60_000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}`;
 /** Display structure comes from the retained item; no answer key is read. */
-export function assessmentQuestionLayout(form, question) {
+function assessmentQuestionLayout(form, question) {
   const groups = [];
   for (const item of form.items) {
     if (groups.at(-1)?.task !== item.task || groups.at(-1)?.skill !== item.skill)
@@ -168,7 +168,7 @@ export function officialInstruction(level, task, context = {}) {
   const make = table?.[task] ?? (/^compact-/u.test(task) ? table?.['claim-reading'] ?? table?.['mid-reading'] : null);
   return make ? make({ passages: 1, ...context }) : null;
 }
-export const mondaiLabel = (level, number) => `${level === 'N4' || level === 'N5' ? 'もんだい' : '問題'}${WIDE(number)}`;
+const mondaiLabel = (level, number) => `${level === 'N4' || level === 'N5' ? 'もんだい' : '問題'}${WIDE(number)}`;
 
 /** Marks in authored text, as segments: 【X】 an underlined target (【 】 an underlined
  * blank), （ ） a blank, ＿★＿ the star slot, ＿＿＿ a slot, and （n） a numbered gap when
@@ -213,7 +213,7 @@ export function paperStem(item) {
 const paperStemDropsLine = item => !(item.task === 'text-grammar' && item.passages.length) &&
   !((PASSAGE_TASKS.has(item.task) && item.passages.length) || /^compact-/u.test(item.task) || item.prompt.split('\n').length < 2);
 /** The text-grammar gap an item asks about: 「文章の（２）に…」 → 2. */
-export const textGrammarGap = item => {
+const textGrammarGap = item => {
   const gap = item.task === 'text-grammar' ? item.prompt.match(/（([０-９0-9]+)）/u)?.[1] : null;
   return gap ? Number(gap.normalize('NFKC')) : null;
 };

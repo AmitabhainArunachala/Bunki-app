@@ -5,7 +5,7 @@
 import {encodeLocalJson} from './modules/record-core.mjs';
 export const LIMITS=Object.freeze({events:128,attempts:96,visits:32,goals:8,projects:16,bytes:262144,dataBytes:258048});
 export const digest=x=>encodeLocalJson(x).sha256;
-export const MARKERS=Object.freeze({off:'bunki-journey:off-day',hold:'bunki-journey:hold'});
+const MARKERS=Object.freeze({off:'bunki-journey:off-day',hold:'bunki-journey:hold'});
 export const dayKey=t=>{const d=new Date(t);return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');};
 const cp=x=>structuredClone(x);
 const freeze=x=>{if(x&&typeof x==='object'){Object.values(x).forEach(freeze);Object.freeze(x);}return x;};

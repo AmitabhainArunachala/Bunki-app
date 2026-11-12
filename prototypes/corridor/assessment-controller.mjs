@@ -17,8 +17,8 @@ import {
 } from './modules/assessment-core.mjs';
 import { encodeLocalJson, inputHashOf, recordOperationSchema } from './modules/record-core.mjs';
 
-export const ASSESSMENT_LIBRARY_FORMAT = 'kairo-assessment-library';
-export const ASSESSMENT_LIBRARY_VERSION = 1;
+const ASSESSMENT_LIBRARY_FORMAT = 'kairo-assessment-library';
+const ASSESSMENT_LIBRARY_VERSION = 1;
 export const ASSESSMENT_LIBRARY_LIMITS = Object.freeze({
   forms: 512,
   attempts: 5000,
