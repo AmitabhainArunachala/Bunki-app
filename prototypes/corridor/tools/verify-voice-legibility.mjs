@@ -46,17 +46,21 @@ function luminance([r, g, b]) { const c = (v) => { v /= 255; return v <= 0.03928
 const ratio = (a, b) => { const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x); return (hi + 0.05) / (lo + 0.05); };
 /** A control's glyph against its own ground, from a picture of it (CSS pixels). The ground is the colour that covers
  * most of the control's inner square (a seal's fill, a plate, the paper behind an icon), counted in coarse buckets; the
- * ink is the pixel of the glyph's own square (the middle 72%) furthest in brightness from that ground. */
-async function contrast(selector, ring0 = 0, ring1 = 6) {
+ * ink is the pixel of the glyph's own square (the middle 72%) furthest in brightness from that ground. What lies around a
+ * seal is read in a ring `ring0` to `ring1` px outside the seal; `inset`: the seal stands that far inside the control's
+ * box (the 耳's seal is 7 px inside its 44 px button: the ring is then the bar round the seal, not what lies past the
+ * button, such as an article's picture under a 44 px bar). */
+async function contrast(selector, ring0 = 0, ring1 = 6, inset = 0) {
   const r = await page.evaluate((sel) => { const el = [...document.querySelectorAll(sel)].find((e) => e.getClientRects().length && e.getBoundingClientRect().width > 4); if (!el) return null; const b = el.getBoundingClientRect(); return { x: b.left, y: b.top, w: b.width, h: b.height }; }, selector);
   if (!r || r.w < 6 || r.h < 6 || r.y < 0 || r.y + r.h > page.viewportSize().height) return null;
+  const sb = { x: r.x + inset, y: r.y + inset, w: r.w - 2 * inset, h: r.h - 2 * inset };
   const vp = page.viewportSize(), pad = ring1;
-  const outer = { x: Math.max(0, r.x - pad), y: Math.max(0, r.y - pad) };
-  outer.width = Math.min(vp.width - outer.x, r.w + 2 * pad); outer.height = Math.min(vp.height - outer.y, r.h + 2 * pad);
+  const outer = { x: Math.max(0, sb.x - pad), y: Math.max(0, sb.y - pad) };
+  outer.width = Math.min(vp.width - outer.x, sb.x + sb.w + pad - outer.x); outer.height = Math.min(vp.height - outer.y, sb.y + sb.h + pad - outer.y);
   const ring = PNG.sync.read(await page.screenshot({ clip: outer, scale: 'css' }));
   const rb = new Map();
   for (let y = 0; y < ring.height; y += 1) for (let x = 0; x < ring.width; x += 1) {
-    const dx = Math.max(r.x - outer.x - x, x - (r.x - outer.x + r.w - 1), 0), dy = Math.max(r.y - outer.y - y, y - (r.y - outer.y + r.h - 1), 0);
+    const dx = Math.max(sb.x - outer.x - x, x - (sb.x - outer.x + sb.w - 1), 0), dy = Math.max(sb.y - outer.y - y, y - (sb.y - outer.y + sb.h - 1), 0);
     if (Math.max(dx, dy) <= ring0) continue;
     const o = (y * ring.width + x) * 4, c = [ring.data[o], ring.data[o + 1], ring.data[o + 2]], k = c.map((v) => v >> 4).join(',');
     const b = rb.get(k) || { n: 0, sum: [0, 0, 0] }; b.n += 1; b.sum = b.sum.map((v, i) => v + c[i]); rb.set(k, b);
@@ -97,7 +101,7 @@ function floor(name, what, value, need, detail = '') {
   floorRows.push({ look: LOOK, width: WIDTH, name, what, value, need, pass, detail });
   console.log(`${pass ? 'PASS' : 'FAIL'}  ${LOOK} ${WIDTH} · ${name} · ${what}: ${value ?? 'not measured'} (floor ${need})${detail ? ` ${detail}` : ''}`);
 }
-async function shot(name, { sel = null, measure = null, note = '', kind = null, seal = false, ring = [0, 6] } = {}) {
+async function shot(name, { sel = null, measure = null, note = '', kind = null, seal = false, ring = [0, 6], inset = 0 } = {}) {
   n += 1;
   const base = `${String(n).padStart(2, '0')}-${name}`;
   const row = { look: LOOK, width: WIDTH, n, name, file: `${base}.jpg`, ear: await earState(page).catch(() => ''), note };
@@ -113,7 +117,7 @@ async function shot(name, { sel = null, measure = null, note = '', kind = null, 
       row.covered = await page.evaluate(({ s0, b }) => { const el = [...document.querySelectorAll(s0)].find((e) => e.getClientRects().length && e.getBoundingClientRect().width > 2); const hit = document.elementFromPoint(b.x + b.w / 2, b.y + b.h / 2); return !el || !hit ? 'unknown' : el === hit || el.contains(hit) ? '' : `${hit.tagName.toLowerCase()}#${hit.id}.${String(hit.className).split(' ')[0]}`; }, { s0: sel, b: box }).catch(() => 'unknown');
     } else row.missing = true;
   }
-  if (measure) row.contrast = await contrast(measure, ring[0], ring[1]).catch(() => null);
+  if (measure) row.contrast = await contrast(measure, ring[0], ring[1], inset).catch(() => null);
   if (kind) floor(name, `glyph (${kind})`, row.contrast?.ratio ?? null, FLOORS[kind], row.contrast ? `${row.contrast.ink} on ${row.contrast.ground}` : '');
   if (seal) floor(name, 'seal against what lies around it', row.contrast?.sealRatio ?? null, FLOORS.seal, row.contrast ? `${row.contrast.ground} on ${row.contrast.behind}` : '');
   rows.push(row);
@@ -124,7 +128,7 @@ const MARK = '.ear-mark[data-review-ear]';
 async function markShot(where, state) {
   await earMark(page).catch(() => null);
   const active = ['armed', 'held', 'speaking'].includes(state);
-  const row = await shot(`${where}-ear-${state}`, { sel: MARK, measure: MARK, kind: active ? 'active' : 'rest', seal: state === 'held' || state === 'speaking' });
+  const row = await shot(`${where}-ear-${state}`, { sel: MARK, measure: MARK, kind: active ? 'active' : 'rest', seal: state === 'held' || state === 'speaking', ring: [1, 6], inset: 7 });
   if (state === 'novoice') {
     const t = await textContrast('.ear-why');
     row.why = t;
