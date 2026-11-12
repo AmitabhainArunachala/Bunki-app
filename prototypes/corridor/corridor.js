@@ -29091,6 +29091,26 @@ function learnTestCounts() {
   };
 }
 
+function mockLengthsRow() {
+  // the lengths a mock comes in, with how many of each are ready — the catalog's own numbers
+  const entries = assessmentCatalog?.entries || [];
+  const lengths = el('div', 'learn-lengths');
+  for (const [mode, ja, en] of [['short', '短め', 'Short'], ['medium', '中', 'Medium'], ['full', '本番', 'Full']]) {
+    const rows = entries.filter((entry) => entry.mode === mode);
+    if (!rows.length) continue;
+    const readyN = rows.filter((entry) => entry.availability?.ready).length;
+    if (!readyN) continue;
+    const minutes = rows.map((entry) => entry.durationMinutes).filter(Number.isFinite);
+    const cell = el('p', 'learn-length');
+    cell.dataset.mockMode = mode;
+    cell.append(el('b', 'learn-length-t', tx(ja, en)));
+    if (minutes.length) cell.append(el('span', 'learn-length-m', tx(`${Math.min(...minutes)} 分`, `${Math.min(...minutes)} min`)));
+    cell.append(el('span', 'learn-length-n', tx(`${readyN} 組`, `${readyN} ready`)));
+    lengths.append(cell);
+  }
+  return lengths.childNodes.length ? lengths : null;
+}
+
 /** The study hall's doors, by id: the same seven rooms and the same entries as ever. */
 function studyHallDoors() {
   const due = S.taken.length && scheduler ? todayQueue().order.length : 0;
@@ -29236,23 +29256,8 @@ function renderStudyHall(main, doors) {
   const total = counts.tests + counts.sections + counts.written;
   tests.append(learnHead('04', '試験', 'Tests', counts.loaded ? tx(`${total} 組`, `${total} set${total === 1 ? '' : 's'}`) : ''));
   tests.append(doors.mock);
-  // the lengths a mock comes in, with how many of each are ready — the catalog's own numbers
-  const entries = assessmentCatalog?.entries || [];
-  const lengths = el('div', 'learn-lengths');
-  for (const [mode, ja, en] of [['short', '短め', 'Short'], ['medium', '中', 'Medium'], ['full', '本番', 'Full']]) {
-    const rows = entries.filter((entry) => entry.mode === mode);
-    if (!rows.length) continue;
-    const readyN = rows.filter((entry) => entry.availability?.ready).length;
-    if (!readyN) continue;
-    const minutes = rows.map((entry) => entry.durationMinutes).filter(Number.isFinite);
-    const cell = el('p', 'learn-length' + (readyN ? '' : ' is-pending'));
-    cell.dataset.mockMode = mode;
-    cell.append(el('b', 'learn-length-t', tx(ja, en)));
-    if (minutes.length) cell.append(el('span', 'learn-length-m', tx(`${Math.min(...minutes)} 分`, `${Math.min(...minutes)} min`)));
-    cell.append(el('span', 'learn-length-n', tx(`${readyN} 組`, `${readyN} ready`)));
-    lengths.append(cell);
-  }
-  if (lengths.childNodes.length) tests.append(lengths);
+  const lengths = mockLengthsRow();
+  if (lengths) tests.append(lengths);
   tests.append(el('p', 'fine study-hall-note', tx(
     '模試で見つけた課題は、覚えるリスト・復習・先生との学習につながります。',
     'Use your test results to guide Learn, your review cards and your next session with the tutor.',
@@ -29359,23 +29364,8 @@ function renderTests(main) {
   const total = counts.tests + counts.sections + counts.written;
   tests.append(learnHead('01', '模擬試験', 'Practice tests', counts.loaded ? tx(`${total} 組`, `${total} set${total === 1 ? '' : 's'}`) : ''));
   tests.append(doors.mock);
-  // the lengths a mock comes in, with how many of each are ready — the catalog's own numbers
-  const entries = assessmentCatalog?.entries || [];
-  const lengths = el('div', 'learn-lengths');
-  for (const [mode, ja, en] of [['short', '短め', 'Short'], ['medium', '中', 'Medium'], ['full', '本番', 'Full']]) {
-    const rows = entries.filter((entry) => entry.mode === mode);
-    if (!rows.length) continue;
-    const readyN = rows.filter((entry) => entry.availability?.ready).length;
-    if (!readyN) continue;
-    const minutes = rows.map((entry) => entry.durationMinutes).filter(Number.isFinite);
-    const cell = el('p', 'learn-length' + (readyN ? '' : ' is-pending'));
-    cell.dataset.mockMode = mode;
-    cell.append(el('b', 'learn-length-t', tx(ja, en)));
-    if (minutes.length) cell.append(el('span', 'learn-length-m', tx(`${Math.min(...minutes)} 分`, `${Math.min(...minutes)} min`)));
-    cell.append(el('span', 'learn-length-n', tx(`${readyN} 組`, `${readyN} ready`)));
-    lengths.append(cell);
-  }
-  if (lengths.childNodes.length) tests.append(lengths);
+  const lengths = mockLengthsRow();
+  if (lengths) tests.append(lengths);
 
   const guided = el('section', 'learn-section');
   guided.dataset.learnSection = 'guided';
