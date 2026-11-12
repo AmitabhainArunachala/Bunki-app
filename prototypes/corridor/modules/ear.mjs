@@ -868,15 +868,22 @@ export function toneFor(el, { neighbour = null } = {}) {
   const doc = el.ownerDocument, view = doc.defaultView, root = doc.documentElement;
   const ground = groundOf(el);
   const cs = view.getComputedStyle(neighbour || el);
-  const before = neighbour ? view.getComputedStyle(neighbour, '::before') : null;
-  const filled = (text) => { const c = rgbaOf(text, doc); return c && c[3] > 0 ? text : null; };
-  const fill = (before && filled(before.backgroundColor)) || filled(cs.backgroundColor) || 'transparent';
+  // the neighbour's plate wherever it draws it: its ::after (the first screen's gate), its ::before or its own background
+  const drawn = (pseudo) => { const s = view.getComputedStyle(neighbour, pseudo); return s.content && s.content !== 'none' && s.content !== 'normal' ? s : null; };
+  const { fill, line } = plateOf(neighbour ? [drawn('::after'), drawn('::before'), cs] : [cs], (text) => rgbaOf(text, doc));
   const plate = over(rgbaOf(fill, doc), ground);
-  const lined = (style) => style && parseFloat(style.borderTopWidth) > 0 && filled(style.borderTopColor);
-  const line = lined(before) || lined(cs) || null;
   const own = [tokenAt(el, '--red'), tokenAt(root, '--red'), tokenAt(el, '--card-red'), tokenAt(el, '--zen-red'), tokenAt(root, '--zen-red')];
   const papers = [tokenAt(root, '--print-white'), tokenAt(root, '--ground-0'), tokenAt(el, '--ground-0'), tokenAt(root, '--ink'), tokenAt(el, '--ink'), tokenAt(root, '--ground')];
   return { ...chooseTone({ ground, plate, ink: rgbaOf(cs.color, doc), reds: own, papers }), fill, line };
+}
+/** A plate as a control's layers draw it, from plain computed styles listed top first (a neighbour's ::after, its
+ * ::before, its own box; null for a layer it does not draw): the fill of the first that is filled, the line colour of the
+ * first that has a line. `colour(text)` reads a CSS colour as [r, g, b, a]. */
+export function plateOf(layers, colour = rgbaOf) {
+  const filled = (text) => { const c = colour(text); return c && c[3] > 0 ? text : null; };
+  const fillOf = layers.find((s) => s && filled(s.backgroundColor));
+  const lineOf = layers.find((s) => s && parseFloat(s.borderTopWidth) > 0 && filled(s.borderTopColor));
+  return { fill: fillOf ? fillOf.backgroundColor : 'transparent', line: lineOf ? lineOf.borderTopColor : null };
 }
 /** The choice itself, from plain colours ([r, g, b, a]): what lies behind (`ground`), the plate the control stands on at
  * rest (`plate`), its rest ink (`ink`), the look's reds in the order they are preferred, its papers and inks. */

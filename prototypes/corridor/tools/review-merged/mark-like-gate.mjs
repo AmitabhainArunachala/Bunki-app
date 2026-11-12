@@ -5,7 +5,7 @@
 // and the two inks must be alike (plates under 1.5:1 apart; inks under 2.5:1 apart, since the gate's torii is drawn in thin
 // SVG strokes that a browser lightens more than the 耳's type). The first screen (the sky, drawn on the graphics
 // card: Chromium with --use-angle=metal, or headless WebKit) and, as the control, a reading page's bar.
-//   node mark-like-gate.mjs --engine chromium|webkit [--width 1728|390] [--looks hokusai,sumi,yoru] [--where sky,bar]
+//   node mark-like-gate.mjs --engine chromium|webkit [--width 1728|390] [--looks hokusai,sumi,yoru (default: all 11)] [--where sky,bar]
 import { createRequire } from 'node:module';
 import { writeFileSync } from 'node:fs';
 import { arg, dismissFirstLine, open, reporter } from '../review-ear/lib.mjs';
@@ -14,7 +14,8 @@ const require = createRequire(new URL('../../../../package.json', import.meta.ur
 const { PNG } = require('pngjs');
 const ENGINE = arg('--engine', 'chromium');
 const WIDTH = Number(arg('--width', '1728'));
-const LOOKS = arg('--looks', 'hokusai,sumi,yoru').split(',');
+// every look the app offers (the brief of the fix: all 11)
+const LOOKS = arg('--looks', 'sumi,shu,iwa,hokusai,akafuji,keyblock,rokusho,yoru,kaku,nami,hakuu').split(',');
 const WHERE = arg('--where', 'sky,bar').split(',');
 const OUT = process.env.REVIEW_OUT || '.';
 const tag = `${ENGINE}-${WIDTH}`;

@@ -1821,6 +1821,33 @@ describe('the choice of colours (chooseTone): from what is there, the look’s o
     expect(rgbaOf('#ef8079')).toEqual([239, 128, 121, 1]);
     expect(rgbaOf('transparent')).toEqual([0, 0, 0, 0]);
   });
+  it('the neighbour’s plate is read wherever it draws it, what is painted on top first: ::after, ::before, its own box', () => {
+    // the first screen's gate draws its plate with ::after (a paper fill and a hairline); a bar's gate only a hairline
+    const none = {
+      backgroundColor: 'rgba(0, 0, 0, 0)',
+      borderTopWidth: '0px',
+      borderTopColor: 'rgb(0, 0, 0)',
+    };
+    const sky = {
+      backgroundColor: 'rgba(246, 241, 230, 0.7)',
+      borderTopWidth: '0.5px',
+      borderTopColor: 'rgba(35, 48, 63, 0.46)',
+    };
+    expect(ear.plateOf([sky, null, none])).toEqual({
+      fill: 'rgba(246, 241, 230, 0.7)',
+      line: 'rgba(35, 48, 63, 0.46)',
+    });
+    const hairline = { ...none, borderTopWidth: '0.5px', borderTopColor: 'rgba(52, 53, 55, 0.46)' };
+    expect(ear.plateOf([hairline, null, none])).toEqual({
+      fill: 'transparent',
+      line: 'rgba(52, 53, 55, 0.46)',
+    });
+    const before = { ...none, backgroundColor: 'rgb(1, 2, 3)' };
+    const own = { ...none, backgroundColor: 'rgb(9, 9, 9)' };
+    expect(ear.plateOf([null, before, own]).fill).toBe('rgb(1, 2, 3)');
+    expect(ear.plateOf([sky, before, own]).fill).toBe('rgba(246, 241, 230, 0.7)');
+    expect(ear.plateOf([null, null, own])).toEqual({ fill: 'rgb(9, 9, 9)', line: null });
+  });
 });
 
 describe('the ear’s own time limit says the voice took too long, not that the server is busy (K3)', () => {
