@@ -79,6 +79,9 @@
     <!-- 宙, the first screen's sky (2026-11-11): puts itself over #drift-layer and keeps the old layer
          unseen beneath it; a driven browser keeps the old screen unless the address says ?sky=1 -->
     <script type="module" src="sky/mount.mjs"></script>
+    <!-- the print look (depth.css) reads two things from the page: an article's two pigments from its picture, and the
+         ink of each word on the old first screen from the printed sky under it (folded from the design layer's live.js) -->
+    <script type="module" src="print-look.mjs"></script>
     <!-- Optional lookup lens: its JSON sidecar is fetched only on demand. -->
     <script defer src="skip-core.js"></script>
     <script defer src="skip-ui.js"></script>

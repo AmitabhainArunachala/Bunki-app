@@ -26,6 +26,9 @@ export const CORRIDOR_REQUIRED_ROOTS = [
   'rooms/cards.css',
   'tighten.css',
   'depth.css',
+  // the print look, folded from the design layer by scripts/fold-print-look.mjs: its plates and its page reader
+  'print',
+  'print-look.mjs',
   'corridor.js',
   'device-voice.mjs',
   'modules',
