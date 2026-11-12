@@ -60,7 +60,7 @@ async function sky() {
   const s = await open({ engine: ENGINE, width: WIDTH, touch: true, clipSeconds: () => 1, voicePort: port, args: GPU });
   await s.context.addInitScript(drifter);
   await s.ready('sky=1');
-  const ok = await s.page.waitForFunction(() => window.__bunkiSkyApp?.state === 'mounted' && window.__SKY__?.W?.ready && window.__SKY__.W.fonts && window.__SKY__.W.hits.length > (innerWidth < 700 ? 8 : 20), null, { timeout: 45000 }).then(() => true, () => false);
+  const ok = await s.page.waitForFunction(() => window.__bunkiSkyApp?.state === 'mounted' && window.__SKY__?.W?.ready && window.__SKY__.W.fonts && window.__SKY__.W.hits.length > (Math.min(innerWidth, innerHeight) < 700 ? 8 : 20), null, { timeout: 45000 }).then(() => true, () => false);
   if (!ok) { const st = await s.page.evaluate(() => JSON.stringify(window.__bunkiSkyApp)); await s.close(); throw new Error(`the sky did not mount: ${st}`); }
   await s.sleep(2500);
   return s;

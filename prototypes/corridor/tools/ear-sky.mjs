@@ -58,7 +58,7 @@ const toSky = async () => {
   await page.waitForFunction(() => ['mounted', 'gave-back', 'off', 'stood-down'].includes(window.__bunkiSkyApp?.state), null, { timeout: 45000 });
   const app = await page.evaluate(() => ({ ...window.__bunkiSkyApp }));
   if (app.state !== 'mounted') throw new Error(`the sky did not mount here: ${JSON.stringify(app)}`);
-  await page.waitForFunction(() => window.__SKY__?.W?.ready && window.__SKY__.W.fonts && window.__SKY__.W.hits.length > (innerWidth < 700 ? 8 : 20), null, { timeout: 45000 });
+  await page.waitForFunction(() => window.__SKY__?.W?.ready && window.__SKY__.W.fonts && window.__SKY__.W.hits.length > (Math.min(innerWidth, innerHeight) < 700 ? 8 : 20), null, { timeout: 45000 });
   await s.sleep(2500);
   return app;
 };
