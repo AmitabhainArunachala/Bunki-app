@@ -1612,7 +1612,7 @@ body .dial-label { font-family: var(--sans); color: var(--label-2); letter-spaci
 
 /* the play bar: one speaker mark when idle (John, 2026-10-15 17:20); open, the clean bar — play · progress ·
    voice · speed — with the mark as its close */
-.listen-row[hidden], .reader-actions[hidden], .teacher-door.reader-actions[hidden] { display: none !important; }
+.listen-row[hidden] { display: none !important; }
 body.v-depth-layered .listen-row.play-bar, .listen-row.play-bar {
   display: flex;
   align-items: center;
@@ -1764,46 +1764,6 @@ body[data-view='reader'] main > blockquote {
   font: var(--type-reading)/2.25 var(--serif);
   color: var(--text);
 }
-
-/* the floating sentence bar, and the one-time tip that holds its place */
-.teacher-door.reader-actions {
-  position: fixed;
-  z-index: 60;
-  left: 50%;
-  bottom: calc(var(--s2) + env(safe-area-inset-bottom));
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
-  align-items: center;
-  gap: var(--s1) var(--s2);
-  width: min(680px, calc(100vw - 2 * var(--s2)));
-  margin: 0;
-  padding: 10px 10px 10px var(--s3);
-  transform: translateX(-50%);
-  border: 1px solid var(--raised-edge);
-  border-radius: var(--radius-overlay);
-  background: var(--raised);
-  box-shadow: var(--float-shadow);
-  animation: float-in var(--motion-room) var(--ease-standard);
-}
-@keyframes float-in { from { opacity: 0; transform: translate(-50%, 14px); } }
-@keyframes float-in-phone { from { opacity: 0; transform: translateY(14px); } }
-.reader-actions #reader-context-note.teacher-note {
-  min-height: 0;
-  margin: 0;
-  font: 700 var(--type-control)/1.4 var(--sans);
-  color: var(--text);
-  overflow-wrap: anywhere;
-}
-.reader-actions .teacher-actions { flex-wrap: nowrap; gap: var(--s1); }
-.reader-actions .teacher-actions .chip {
-  flex-direction: column;
-  min-height: 48px;
-  padding: 4px var(--s2);
-  border-radius: var(--radius-control);
-  font: 700 var(--type-control)/1.2 var(--sans);
-  white-space: nowrap;
-}
-.reader-actions .teacher-actions .en-sub { font-size: var(--type-caption); letter-spacing: 0.02em; text-transform: none; opacity: 0.9; }
 
 /* the article's foot: finish, then everything about the text */
 .article-footer { margin: var(--s5) 0 0; padding: var(--s3) 0 0; border-top: 2px solid var(--rule-strong); }
@@ -1975,18 +1935,6 @@ body .article-about .note .inline-link:hover { color: var(--ai); text-decoration
   /* folded on a phone: the mark alone at the bottom right, above the tabs; its bed (the dock strip) is not drawn */
   body[data-view='reader'] .listen-row.play-bar[data-open='false'] { left: auto; right: var(--s2); width: 44px; max-width: 44px; min-height: 44px; padding: 0; }
   body[data-view='reader']:not(.zen):has(.listen-row.play-bar[data-open='false']):not(:has(.reader-actions:not([hidden]))) #app::after { display: none; }
-  /* the sentence bar rises above the dock, clear of the bug and the voice state */
-  .teacher-door.reader-actions {
-    left: var(--s1);
-    width: calc(100vw - 2 * var(--s1));
-    bottom: calc(72px + env(safe-area-inset-bottom));
-    transform: none;
-    animation-name: float-in-phone;
-  }
-  .teacher-door.reader-actions { grid-template-columns: minmax(0, 1fr) auto; padding: 10px 6px 10px 14px; }
-  .reader-actions .teacher-actions { grid-column: 1 / -1; grid-row: 2; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .reader-actions .teacher-actions .chip { padding: 4px 6px; font-size: var(--type-chrome); }
-  .reader-actions-close { grid-column: 2; grid-row: 1; }
   .article-about { padding: var(--s2); }
   .article-facts { grid-template-columns: minmax(0, 1fr); gap: 2px; }
   .article-facts dd { margin-bottom: var(--s1); }
@@ -3623,7 +3571,6 @@ body:has(#app .kp-study > .kp-reveal) #app { padding-bottom: 0; }
   }
   body.has-primary-tabs.v-depth-layered[data-view='reader'] .listen-row.play-bar,
   body.has-primary-tabs[data-view='reader'] .listen-row.play-bar { bottom: calc(var(--nav-clearance) + 8px); }
-  body.has-primary-tabs .teacher-door.reader-actions { bottom: calc(var(--nav-clearance) + 72px); }
   body.has-primary-tabs .reader-toast { bottom: calc(var(--nav-clearance) + 84px); }
 }
 @media (min-width: 521px) {
