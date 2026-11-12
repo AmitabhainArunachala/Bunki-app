@@ -4,14 +4,19 @@
 // otherwise), 1728 x 1117 (John's window; the sky shows only at 720 and wider).
 // The rulings: B5, "an armed tap speaks and does nothing else on every surface"; the table, held on, on the Mac, a rest of the
 // pointer on Japanese speaks it; Option-click on any Japanese speaks it; C1, the ear never left on where its mark is not shown.
-//   node fr1-sky-ear.mjs [--cases mark,armed,option,rest]
+// The engine's version 3 (2026-11-12) puts the sky on a phone as well: --engine webkit and --width 390 run the cases a
+// finger can make (mark, armed, by a tap); Option-click and a resting pointer need a Mac and are named as skipped there.
+//   node fr1-sky-ear.mjs [--cases mark,armed,option,rest] [--engine chromium|webkit] [--width 1728|390]
 import { arg, earMark, earState, holdOn, open, reporter } from './lib.mjs';
 
 const CASES = arg('--cases', 'mark,armed,option,rest').split(',');
-const tag = 'chromium-metal-1728';
+const ENGINE = arg('--engine', 'chromium');
+const WIDTH = Number(arg('--width', '1728'));
+const PHONE = WIDTH < 700;
+const tag = ENGINE === 'chromium' && WIDTH === 1728 ? 'chromium-metal-1728' : `${ENGINE}-${WIDTH}`;
 const { rows, record } = reporter(tag);
 const OUT = process.env.REVIEW_OUT || '.';
-const s = await open({ engine: 'chromium', width: 1728, clipSeconds: () => 1, voicePort: Number(arg('--voice-port', '19532')),
+const s = await open({ engine: ENGINE, width: WIDTH, clipSeconds: () => 1, voicePort: Number(arg('--voice-port', '19532')),
   args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist'] });
 const { page, fake } = s;
 const toSky = async () => {
@@ -23,7 +28,7 @@ const toSky = async () => {
 const skyWords = () => page.evaluate(() => {
   const W = window.__SKY__.W, r = window.__SKY__.wrap.getBoundingClientRect();
   return W.hits.map((i) => ({ i, word: W.D.words[i][0], x: r.left + W.vis[i * 5], y: r.top + W.vis[i * 5 + 1], h: W.vis[i * 5 + 2] }))
-    .filter((w) => w.y > 160 && w.y < innerHeight - 220 && w.x > 200 && w.x < innerWidth - 200 && w.h > 14 && /\p{Script=Han}/u.test(w.word))
+    .filter((w) => w.y > 160 && w.y < innerHeight - 220 && w.x > Math.min(200, innerWidth * 0.15) && w.x < innerWidth - Math.min(200, innerWidth * 0.15) && w.h > 14 && /\p{Script=Han}/u.test(w.word))
     .sort((a, b) => b.h - a.h);
 });
 const webOpen = () => page.evaluate(() => !!window.__SKY__?.W?.web?.isOpen?.());
@@ -33,6 +38,7 @@ const webOpen = () => page.evaluate(() => !!window.__SKY__?.W?.web?.isOpen?.());
 const said = [];
 async function run(name, body) {
   if (!CASES.includes(name)) return;
+  if (PHONE && (name === 'option' || name === 'rest')) { console.log(`SKIP  ${tag} · ${name}: needs a Mac's keyboard or resting pointer; not run at phone size`); return; }
   try { await body(); } catch (error) {
     record(`${name}: the case ran to its end`, [String(error.message).split('\n')[0].slice(0, 200)]);
     await page.screenshot({ path: `${OUT}/fr1-sky-${name}-error.png` }).catch(() => {});
@@ -51,10 +57,10 @@ await run('armed', async () => {
   const [w] = await skyWords();
   if (w) said.push(w.word);
   if (!w) throw new Error('no sky word drawn in plain view');
-  await (await earMark(page)).click();
+  await s.press(await earMark(page));
   await page.waitForFunction(() => document.documentElement.dataset.ear === 'armed', null, { timeout: 3000 });
   const n = fake.speaks().length;
-  await page.mouse.click(w.x, w.y);
+  if (PHONE) await page.touchscreen.tap(w.x, w.y); else await page.mouse.click(w.x, w.y);
   await s.sleep(1500);
   const asked = fake.speaks().slice(n).map((r) => `${r.voiceKey} "${r.text}"`);
   const opened = await webOpen();

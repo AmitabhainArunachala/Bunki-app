@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 /** The ear on the new first screen, the sky (宙, sky/mount.mjs), at John's window, 1728 x 1117: the re-check's N1 and K5
- * (fix round 2, 2026-11-11). The sky draws its words in WebGL; headless Chromium on this Mac draws it on the graphics
+ * (fix round 2, 2026-11-11). Brought to the engine's version 3 (2026-11-12): the sky now also stands at phone size, so
+ * --width 390 runs the cases a finger can make (look, armed, off's tap); the rule for the word under a point is
+ * version 3's (no W.hz: the largest drawn word wins, a grammar sign overhead before any word); the eye is W.cam and
+ * W.tgt (version 1's S.cam stays at 0); the base the off case compares with serves the line's own version 3 mount
+ * (--sky-base), because the old base's mount was written for version 1's engine. The sky draws its words in WebGL; headless Chromium on this Mac draws it on the graphics
  * card with --use-angle=metal --enable-gpu (the reviewer's fr1-sky-probe.mjs), and ?sky=1 gets past the mount's check
  * for a driven browser. A browser that cannot draw it keeps the old first screen: every case then says so and fails.
  *
@@ -18,7 +22,8 @@
  * the device voice swallowed, the local stand-in voice server, nothing but this machine reached.
  *
  *   REVIEW_BASE=http://127.0.0.1:19481/ node prototypes/corridor/tools/ear-sky.mjs [--engine chromium|webkit]
- *        [--cases look,armed,option,held,off] [--voice-port 19482] [--base <commit>] [--out DIR]
+ *        [--width 1728|390] [--cases look,armed,option,held,off] [--voice-port 19482] [--base <commit>]
+ *        [--sky-base <commit>] [--out DIR]
  */
 import { execFileSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
@@ -32,8 +37,11 @@ const REPO = new URL('../../../', import.meta.url).pathname;
 const ENGINE = arg('--engine', 'chromium');
 const CASES = arg('--cases', 'look,armed,option,held,off').split(',');
 const BASE = arg('--base', '7a7715f784c9f19db4658388b6e7d87c1d8fb8e3');
+const SKY_BASE = arg('--sky-base', 'bf0e89e0c0c3ddf2d222ecb6de704a2dad4807cd');
 const OUT = arg('--out', process.env.REVIEW_OUT || '.');
-const tag = `${ENGINE}-1728`;
+const WIDTH = Number(arg('--width', '1728'));
+const PHONE = WIDTH < 700;
+const tag = `${ENGINE}-${WIDTH}`;
 const { rows, record } = reporter(tag);
 const ALLOWED = new Set(['ls:kairo-voice-day']);
 // The combine (voice/speech-lane-all-20261111): the offline clips (B3) keep every clip the server makes in the device's own
@@ -41,7 +49,7 @@ const ALLOWED = new Set(['ls:kairo-voice-day']);
 // word said once plays from it the next time with no request, so each case that counts one request says a word not said yet.
 const keptClips = (key) => /^idb:bunki-voice-clips-v\d+(\/|$)/u.test(key);
 const said = [];
-const s = await open({ engine: ENGINE, width: 1728, clipSeconds: () => 1, voicePort: Number(arg('--voice-port', '19532')),
+const s = await open({ engine: ENGINE, width: WIDTH, clipSeconds: () => 1, voicePort: Number(arg('--voice-port', '19532')),
   args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist'] });
 const { page, fake } = s;
 
@@ -59,20 +67,25 @@ const toSky = async () => {
 const skyWords = () => page.evaluate(() => {
   const W = window.__SKY__.W, r = window.__SKY__.wrap.getBoundingClientRect();
   return W.hits.map((i) => ({ i, word: W.D.words[i][0], reading: W.rd[i], x: r.left + W.vis[i * 5], y: r.top + W.vis[i * 5 + 1], h: W.vis[i * 5 + 2] }))
-    .filter((w) => w.y > 160 && w.y < innerHeight - 220 && w.x > 200 && w.x < innerWidth - 200 && w.h > 18 && /\p{Script=Han}/u.test(w.word))
+    .filter((w) => w.y > 160 && w.y < innerHeight - 220 && w.x > Math.min(200, innerWidth * 0.15) && w.x < innerWidth - Math.min(200, innerWidth * 0.15) && w.h > (innerWidth < 700 ? 14 : 18) && /\p{Script=Han}/u.test(w.word))
     .sort((a, b) => b.h - a.h);
 });
-/** The word under a point as the engine's own tap picks it in the drifting field (sky-world.js pick, a mouse's 5 px),
- * worked out here and not asked of the mount under test. */
-const skyAt = (x, y) => page.evaluate(({ x, y }) => {
-  const W = window.__SKY__.W, r = window.__SKY__.wrap.getBoundingClientRect(), px = x - r.left, py = y - r.top;
-  let best = -1, near = Infinity;
+/** The word under a point as the engine's own tap picks it in the drifting field (sky-world.js pick, version 3, a
+ * mouse's 5 px or a finger's 14), worked out here and not asked of the mount under test: nothing while a family is
+ * open or from above, a grammar sign overhead before any word, then the largest drawn word. */
+const skyAt = (x, y) => page.evaluate(({ x, y, slop }) => {
+  const sky = window.__SKY__, W = sky.W, r = sky.wrap.getBoundingClientRect(), px = x - r.left, py = y - r.top;
+  if (W.web?.isOpen?.() || sky.S.view.over > 0.3) return null;
+  for (const h of W.gHits) if (h.i >= 0 && Math.abs(px - h.x) <= h.w / 2 + slop && Math.abs(py - h.y) <= h.s * 0.7 + slop) return { text: `grammar ${h.i}` };
+  let best = -1, size = -Infinity;
   for (const i of W.hits) {
     const o = i * 5;
-    if (Math.abs(px - W.vis[o]) <= W.vis[o + 4] / 2 + 5 && Math.abs(py - W.vis[o + 1]) <= W.vis[o + 2] * 0.62 + 5 && W.hz[i] < near) { near = W.hz[i]; best = i; }
+    if (Math.abs(px - W.vis[o]) <= W.vis[o + 4] / 2 + slop && Math.abs(py - W.vis[o + 1]) <= W.vis[o + 2] * 0.62 + slop && W.vis[o + 2] > size) { size = W.vis[o + 2]; best = i; }
   }
   return best >= 0 ? { text: W.D.words[best][0] } : null;
-}, { x, y });
+}, { x, y, slop: PHONE ? 14 : 5 });
+/** A finger's tap at phone size, a mouse's click on the Mac. */
+const tapAt = (x, y) => (PHONE ? page.touchscreen.tap(x, y) : page.mouse.click(x, y));
 const webOpen = () => page.evaluate(() => {
   const W = window.__SKY__?.W, web = W?.web;
   return web?.isOpen?.() ? (web.cur.kind === 'w' ? W.D.words[web.cur.id][0] : `${web.cur.kind}${web.cur.id}`) : null;
@@ -109,8 +122,12 @@ const readRecord = () => page.evaluate(async () => {
   return out;
 });
 const sayable = (reading) => String(reading || '').split(/[;；]/u)[0].replace(/[(（][^)）]*[)）]/gu, '').replace(/[～〜~]/gu, '').trim();
+/** The cases that need a Mac's mouse or keyboard (Option-click, a resting pointer, a mouse drag) are not run at phone
+ * size: they are named as skipped, never counted as passed. */
+const MAC_ONLY = new Set(['option', 'held', 'off']);
 async function run(name, body) {
   if (!CASES.includes(name)) return;
+  if (PHONE && MAC_ONLY.has(name)) { console.log(`SKIP  ${tag} · ${name}: needs a Mac's mouse or keyboard; not run at phone size`); return; }
   try { await body(); } catch (error) {
     record(`${name}: the case ran to its end`, [String(error.message).split('\n')[0].slice(0, 220)]);
     await page.screenshot({ path: `${OUT}/ear-sky-${tag}-${name}-error.png` }).catch(() => {});
@@ -145,7 +162,7 @@ await run('look', async () => {
   const clip = { x: Math.max(0, box.x - 70), y: Math.max(0, box.y - 6), width: box.w + 140, height: box.h + 12 };
   const shot = await page.screenshot({ clip });
   writeFileSync(`${OUT}/ear-sky-mark-${tag}.png`, shot);
-  const full = await page.screenshot({ clip: { x: clip.x - 300, y: 0, width: 760, height: 160 } });
+  const full = await page.screenshot({ clip: { x: Math.max(0, clip.x - 300), y: 0, width: Math.min(760, WIDTH - Math.max(0, clip.x - 300)), height: 160 } });
   writeFileSync(`${OUT}/ear-sky-mark-wide-${tag}.png`, full);
   // inside the mark: its glyph is the inner 16 x 16 px; its ground the ring between the glyph and the hairline box
   // a seal's glyph against its own ground: inside the seal, the inner 16 x 16 px hold the glyph; the ring between the
@@ -173,14 +190,14 @@ await run('look', async () => {
 /* ------------------------------------------------------------------ N1: armed, Option, held */
 await run('armed', async () => {
   await toSky();
-  await (await earMark(page)).click();
+  await s.press(await earMark(page));
   await page.waitForFunction(() => document.documentElement.dataset.ear === 'armed', null, { timeout: 3000 });
   const before = await readRecord();
   const was = await where();
   const n = fake.speaks().length;
   const w = await cleanWord(said);
   said.push(w.word);
-  await page.mouse.click(w.x, w.y);
+  await tapAt(w.x, w.y);
   await s.sleep(1600);
   const asked = fake.speaks().slice(n);
   const after = await readRecord();
@@ -246,8 +263,10 @@ await run('held', async () => {
 });
 
 /* ------------------------------------------------------------------ ear off: the sky as without the ear */
-const BASE_FILES = { 'sky/mount.mjs': 'prototypes/corridor/sky/mount.mjs', 'modules/ear.mjs': 'prototypes/corridor/modules/ear.mjs',
-  'modules/voice-layer.mjs': 'prototypes/corridor/modules/voice-layer.mjs', 'modules/voice-seam.mjs': 'prototypes/corridor/modules/voice-seam.mjs' };
+// the base: the ear's modules as they were before the round (--base), and the sky's mount as the line has it for the
+// engine's version 3, with no ear in it (--sky-base): the base's own mount was written for version 1's engine
+const BASE_FILES = { 'sky/mount.mjs': [SKY_BASE, 'prototypes/corridor/sky/mount.mjs'], 'modules/ear.mjs': [BASE, 'prototypes/corridor/modules/ear.mjs'],
+  'modules/voice-layer.mjs': [BASE, 'prototypes/corridor/modules/voice-layer.mjs'], 'modules/voice-seam.mjs': [BASE, 'prototypes/corridor/modules/voice-seam.mjs'] };
 async function sequence(label) {
   await toSky();
   const wrapped = await page.evaluate(() => String(window.__SKY__.W.web.tap).includes('earTakes'));
@@ -262,7 +281,8 @@ async function sequence(label) {
       });
   });
   const n = fake.speaks().length;
-  const W = () => page.evaluate(() => ({ x: window.__SKY__.S.cam.xTotal, hover: window.__SKY__.W.hoverKey || '' }));
+  // where the eye looks, in thousandths of a radian round the ring (version 3: W.cam.a and W.tgt.yaw; S.cam is version 1's)
+  const W = () => page.evaluate(() => ({ x: 1000 * (window.__SKY__.W.cam.a + window.__SKY__.W.tgt.yaw), hover: window.__SKY__.W.hoverKey || '' }));
   // a click on a word
   const w = await cleanWord();
   await page.mouse.click(w.x, w.y);
@@ -292,10 +312,10 @@ async function sequence(label) {
 }
 await run('off', async () => {
   const served = await sequence('this head');
-  const contents = Object.fromEntries(Object.entries(BASE_FILES).map(([url, path]) => [url, execFileSync('git', ['-C', REPO, 'show', `${BASE}:${path}`], { encoding: 'utf8' })]));
+  const contents = Object.fromEntries(Object.entries(BASE_FILES).map(([url, [commit, path]]) => [url, execFileSync('git', ['-C', REPO, 'show', `${commit}:${path}`], { encoding: 'utf8' })]));
   for (const [url, body] of Object.entries(contents))
     await s.context.route(`**/${url}`, (route) => route.fulfill({ status: 200, contentType: 'text/javascript; charset=utf-8', body }));
-  const base = await sequence(`the base ${BASE.slice(0, 9)}`);
+  const base = await sequence(`the base ${BASE.slice(0, 9)} with the line's mount ${SKY_BASE.slice(0, 9)}`);
   for (const url of Object.keys(contents)) await s.context.unroute(`**/${url}`);
   const problems = [];
   if (!served.wrapped) problems.push('this head does not ask the ear before the sky taps (the comparison would prove nothing)');

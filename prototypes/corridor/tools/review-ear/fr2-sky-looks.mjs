@@ -1,7 +1,9 @@
 // Re-check, round 2 (K5): the ear's mark at rest on the sky, in every look the app has (the sky follows the look:
 // mount.mjs setLook on data-theme). The measure is the builder's own (tools/ear-sky.mjs look): the glyph's most distant
 // pixel from the mark's ground, against that ground. Chromium on the graphics card, ?sky=1, 1728 x 1117, muted, loopback.
-//   node fr2-sky-looks.mjs [--engine chromium]
+// Version 3 (2026-11-12) puts the sky on a phone too, where the mark stands on the gate's other side: --engine webkit and
+// --width 390 measure it there.
+//   node fr2-sky-looks.mjs [--engine chromium|webkit] [--width 1728|390]
 import { writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { arg, open, reporter } from './lib.mjs';
@@ -9,9 +11,12 @@ import { arg, open, reporter } from './lib.mjs';
 const require = createRequire(new URL('../../../../package.json', import.meta.url));
 const { PNG } = require('pngjs');
 const OUT = process.env.REVIEW_OUT || '.';
-const { rows, record } = reporter('chromium-metal-1728');
+const ENGINE = arg('--engine', 'chromium');
+const WIDTH = Number(arg('--width', '1728'));
+const tag = ENGINE === 'chromium' && WIDTH === 1728 ? 'chromium-metal-1728' : `${ENGINE}-${WIDTH}`;
+const { rows, record } = reporter(tag);
 const LOOKS = ['hokusai', 'sumi', 'shu', 'akafuji', 'iwa', 'rokusho', 'yoru', 'nami', 'keyblock', 'hakuu', 'kaku'];
-const s = await open({ engine: 'chromium', width: 1728, clipSeconds: () => 1, voicePort: Number(arg('--voice-port', '19532')), args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist'] });
+const s = await open({ engine: ENGINE, width: WIDTH, clipSeconds: () => 1, voicePort: Number(arg('--voice-port', '19532')), args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist'] });
 const { page } = s;
 function luminance([r, g, b]) { const c = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * c(r) + 0.7152 * c(g) + 0.0722 * c(b); }
 const ratio = (a, b) => { const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x); return (hi + 0.05) / (lo + 0.05); };
@@ -37,7 +42,8 @@ try {
     const state = await page.evaluate(() => ({ ear: document.documentElement.dataset.ear, sky: document.documentElement.dataset.bunkiSky }));
     const m = await measure('#ginga-symbol + .ear-spot .ear-mark');
     const shot = await page.evaluate(() => { const b = document.querySelector('#ginga-symbol + .ear-spot .ear-mark').getBoundingClientRect(); return { x: b.left - 90, y: Math.max(0, b.top - 6), width: b.width + 180, height: b.height + 12 }; });
-    writeFileSync(`${OUT}/fr2-sky-look-${look}.png`, await page.screenshot({ clip: shot }));
+    shot.x = Math.max(0, shot.x); shot.width = Math.min(shot.width, WIDTH - shot.x);
+    writeFileSync(`${OUT}/fr2-sky-look-${look}${tag === 'chromium-metal-1728' ? '' : `-${tag}`}.png`, await page.screenshot({ clip: shot }));
     record(`look ${look}: the mark at rest stands out from its ground (3:1 or more)`, m.contrast >= 3 ? [] : [`${m.contrast.toFixed(2)}:1`],
       `ear ${state.ear}, sky ${state.sky}; rgb(${m.ink.join(',')}) on rgb(${m.ground.join(',')}): ${m.contrast.toFixed(2)}:1`);
   }
@@ -46,5 +52,5 @@ try {
 }
 await s.close();
 const failed = rows.filter((r) => !r.pass).length;
-console.log(`chromium-metal-1728: ${rows.length - failed} passed, ${failed} failed`);
+console.log(`${tag}: ${rows.length - failed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /** One pick for one tap on the sky, and every way into the sky's tap (fix round 3 of the ear, S2 and S3; the re-check's
  * fr2 concerns Q2 and Q3). A touch screen 1728 wide, the sky drawn on the graphics card (Chromium with
- * --use-angle=metal, or headless WebKit), ?sky=1.
+ * --use-angle=metal, or headless WebKit), ?sky=1. The engine's version 3 (2026-11-12) also puts the sky on a phone:
+ * --width 390 runs the same cases on a phone's screen, with the margins for a word in plain view scaled to it.
  *
  *   drift-away    armed: a finger lifts on a sky word, and before the click the field drifts so that nothing stands
  *                 under the point. The sky asked the ear as the finger lifted and was told the tap is the ear's; the click
@@ -21,7 +22,8 @@
  * the device voice swallowed, the local stand-in voice server, nothing but this machine reached.
  *
  *   REVIEW_BASE=http://127.0.0.1:19481/ node prototypes/corridor/tools/ear-sky-lift.mjs [--engine chromium|webkit]
- *        [--cases drift-away,drift-other,cancel-armed,cancel-off,cancel-held] [--voice-port 19482] [--out DIR]
+ *        [--width 1728|390] [--cases drift-away,drift-other,cancel-armed,cancel-off,cancel-held] [--voice-port 19482]
+ *        [--out DIR]
  */
 import { arg, earMark, earState, holdOn, open, reporter } from './review-ear/lib.mjs';
 
@@ -30,7 +32,8 @@ const ALL = ENGINE === 'chromium' ? 'drift-away,drift-other,cancel-armed,cancel-
 const CASES = arg('--cases', ALL).split(',');
 const OUT = arg('--out', process.env.REVIEW_OUT || '.');
 const port = Number(arg('--voice-port', '19532'));
-const tag = `${ENGINE}-touch-1728`;
+const WIDTH = Number(arg('--width', '1728'));
+const tag = `${ENGINE}-touch-${WIDTH}`;
 const { rows, record } = reporter(tag);
 const GPU = ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist'];
 
@@ -54,7 +57,7 @@ function drifter() {
 }
 
 async function sky() {
-  const s = await open({ engine: ENGINE, width: 1728, touch: true, clipSeconds: () => 1, voicePort: port, args: GPU });
+  const s = await open({ engine: ENGINE, width: WIDTH, touch: true, clipSeconds: () => 1, voicePort: port, args: GPU });
   await s.context.addInitScript(drifter);
   await s.ready('sky=1');
   const ok = await s.page.waitForFunction(() => window.__bunkiSkyApp?.state === 'mounted' && window.__SKY__?.W?.ready && window.__SKY__.W.fonts && window.__SKY__.W.hits.length > 20, null, { timeout: 45000 }).then(() => true, () => false);
@@ -66,7 +69,7 @@ async function sky() {
 const clearWords = (page) => page.evaluate(() => {
   const sky = window.__SKY__, W = sky.W, r = sky.wrap.getBoundingClientRect(), host = document.getElementById('bunki-sky');
   return W.hits.map((i) => ({ i, word: W.D.words[i][0], x: r.left + W.vis[i * 5], y: r.top + W.vis[i * 5 + 1], h: W.vis[i * 5 + 2] }))
-    .filter((w) => w.y > 170 && w.y < innerHeight - 200 && w.x > 160 && w.x < innerWidth - 160 && w.h > 12 && /\p{Script=Han}/u.test(w.word))
+    .filter((w) => w.y > 170 && w.y < innerHeight - 200 && w.x > Math.min(160, innerWidth * 0.12) && w.x < innerWidth - Math.min(160, innerWidth * 0.12) && w.h > 12 && /\p{Script=Han}/u.test(w.word))
     .map((w) => ({ ...w, said: host.earWordAt(w.x, w.y, { pointer: 'touch' }) }))
     .filter((w) => w.said?.text === w.word)
     .sort((a, b) => b.h - a.h);
