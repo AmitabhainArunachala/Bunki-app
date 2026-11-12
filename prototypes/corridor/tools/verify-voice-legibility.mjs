@@ -36,7 +36,9 @@ const ENGINE = arg('--engine', 'webkit');
 mkdirSync(OUT, { recursive: true });
 const rows = [];
 let n = 0;
-const s = await open({ engine: ENGINE, width: WIDTH, clipSeconds: () => 4, voicePort: Number(arg('--voice-port', '19601')) });
+// Chromium draws the sky only on the graphics card (as ear-sky-compare and mark-like-gate launch it)
+const s = await open({ engine: ENGINE, width: WIDTH, clipSeconds: () => 4, voicePort: Number(arg('--voice-port', '19601')),
+  args: ENGINE === 'chromium' ? ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist'] : [] });
 const { page, fake } = s;
 await s.context.addInitScript((look) => { try { localStorage.setItem('kairo-theme', look); } catch { /* none */ } }, LOOK);
 const plates = [];

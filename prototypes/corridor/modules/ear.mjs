@@ -868,13 +868,20 @@ export function toneFor(el, { neighbour = null } = {}) {
   const doc = el.ownerDocument, view = doc.defaultView, root = doc.documentElement;
   const ground = groundOf(el);
   const cs = view.getComputedStyle(neighbour || el);
-  // the neighbour's plate wherever it draws it: its ::after (the first screen's gate), its ::before or its own background
+  const read = (text) => rgbaOf(text, doc);
   const drawn = (pseudo) => { const s = view.getComputedStyle(neighbour, pseudo); return s.content && s.content !== 'none' && s.content !== 'normal' ? s : null; };
-  const { fill, line } = plateOf(neighbour ? [drawn('::after'), drawn('::before'), cs] : [cs], (text) => rgbaOf(text, doc));
-  const plate = over(rgbaOf(fill, doc), ground);
+  const layers = neighbour ? [drawn('::before'), cs] : [cs];
+  const { fill, line } = plateOf(layers, read);
   const own = [tokenAt(el, '--red'), tokenAt(root, '--red'), tokenAt(el, '--card-red'), tokenAt(el, '--zen-red'), tokenAt(root, '--zen-red')];
   const papers = [tokenAt(root, '--print-white'), tokenAt(root, '--ground-0'), tokenAt(el, '--ground-0'), tokenAt(root, '--ink'), tokenAt(el, '--ink'), tokenAt(root, '--ground')];
-  return { ...chooseTone({ ground, plate, ink: rgbaOf(cs.color, doc), reds: own, papers }), fill, line };
+  const choose = (plate) => chooseTone({ ground, plate, ink: read(cs.color), reds: own, papers });
+  const tone = { ...choose(over(read(fill), ground)), fill, line };
+  if (!neighbour) return tone;
+  // at rest the mark looks like its neighbour wherever the neighbour draws its plate: its ::after (the first screen's
+  // gate), its ::before or its own background, what is painted on top first. Armed, held on, speaking and struck keep
+  // the colours above (the lead's ruling on the review's F1: they stay as they are)
+  const top = plateOf([drawn('::after'), ...layers], read);
+  return { ...tone, rest: { fill: top.fill, line: top.line, ink: choose(over(read(top.fill), ground)).restInk } };
 }
 /** A plate as a control's layers draw it, from plain computed styles listed top first (a neighbour's ::after, its
  * ::before, its own box; null for a layer it does not draw): the fill of the first that is filled, the line colour of the
@@ -914,6 +921,8 @@ export function toneVars(t) {
     '--vt-ink': cssOf(t.restInk), '--vt-fill': t.fill, '--vt-line': t.line || `color-mix(in oklab, ${cssOf(t.restInk)} 30%, transparent)`,
     '--vt-plate': cssOf(t.plate), '--vt-red': cssOf(t.red), '--vt-seal': cssOf(t.seal), '--vt-seal-ink': cssOf(t.sealInk),
     '--vt-wait': cssOf(t.waitInk), '--vt-wait-opacity': '1', '--vt-why-ink': cssOf(t.whyInk),
+    ...(t.rest ? { '--vt-rest-ink': cssOf(t.rest.ink), '--vt-rest-fill': t.rest.fill,
+      '--vt-rest-line': t.rest.line || `color-mix(in oklab, ${cssOf(t.rest.ink)} 30%, transparent)` } : {}),
   };
 }
 /** Writes only what differs: a tone applied again with nothing changed touches no attribute. */
@@ -958,6 +967,10 @@ export const EAR_CSS = `
   /* the mark stands on the gate's left here: its arcs open away from the gate, to the left */
   .ear-mark .ear-rings { left: auto; right: calc(100% - 7px); transform: translate(-2px, -50%) scaleX(-1); }
 }
+/* at rest: the neighbour's plate, line and ink wherever the neighbour draws its plate (toneFor's rest; the first screen's
+   gate draws it with ::after) */
+html[data-ear='off'] .ear-mark::before { border-color: var(--vt-rest-line, var(--vt-line, color-mix(in oklab, var(--ear-ink) 30%, transparent))); background: var(--vt-rest-fill, var(--vt-fill, transparent)); }
+html[data-ear='off'] .ear-mark .ear-glyph { color: var(--vt-rest-ink, var(--vt-ink, color-mix(in oklab, var(--ear-ink) 58%, transparent))); }
 /* armed: 朱文, a red character on paper */
 html[data-ear='armed'] .ear-mark::before { border-color: var(--ear-red); background: var(--vt-fill, var(--ear-white)); box-shadow: 0 1px 0 color-mix(in oklab, var(--ink) 18%, transparent); }
 html[data-ear='armed'] .ear-mark .ear-glyph { color: var(--ear-red); font-weight: 700; }

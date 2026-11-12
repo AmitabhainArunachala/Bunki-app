@@ -1711,6 +1711,17 @@ describe('one language of states: the mark takes its colours from where it stand
     expect(rule('.ear-mark .ear-glyph {')).toMatch(/color: var\(--vt-ink, /);
     // no screen keeps a colour of its own for the mark at rest: the sky's gate is read like any bar's
     expect(EAR_CSS).not.toMatch(/data-bunki-sky='1'\][^{]*\.ear-mark/);
+    // at rest (only): the neighbour's plate wherever it draws it, its ::after included (F1); the states keep theirs
+    expect(rule("html[data-ear='off'] .ear-mark::before")).toMatch(
+      /background: var\(--vt-rest-fill, var\(--vt-fill, transparent\)\)/,
+    );
+    expect(rule("html[data-ear='off'] .ear-mark::before")).toMatch(
+      /border-color: var\(--vt-rest-line, /,
+    );
+    expect(rule("html[data-ear='off'] .ear-mark .ear-glyph")).toMatch(
+      /color: var\(--vt-rest-ink, /,
+    );
+    expect(EAR_CSS).not.toMatch(/data-ear='(armed|held|speaking|novoice)'[^{]*\{[^}]*--vt-rest-/);
   });
   it('armed: the red the tone chose, on the rest plate, outlined in it; held on and speaking: the seal and its ink', () => {
     expect(rule("html[data-ear='armed'] .ear-mark::before")).toMatch(
@@ -1847,6 +1858,21 @@ describe('the choice of colours (chooseTone): from what is there, the look’s o
     expect(ear.plateOf([null, before, own]).fill).toBe('rgb(1, 2, 3)');
     expect(ear.plateOf([sky, before, own]).fill).toBe('rgba(246, 241, 230, 0.7)');
     expect(ear.plateOf([null, null, own])).toEqual({ fill: 'rgb(9, 9, 9)', line: null });
+    // the plate read that way is the rest's only: the states' own colours stay as they were (the lead's ruling)
+    const paper = hex('#f7f3e6');
+    const base = {
+      ...chooseTone({ ground: paper, plate: paper, ink: hex('#4a453a'), reds: [hex('#a02a1e')] }),
+      fill: 'transparent',
+      line: null,
+    };
+    expect(ear.toneVars(base)).not.toHaveProperty('--vt-rest-fill');
+    const rested = ear.toneVars({
+      ...base,
+      rest: { fill: sky.backgroundColor, line: sky.borderTopColor, ink: hex('#23303f') },
+    });
+    expect(rested['--vt-rest-fill']).toBe(sky.backgroundColor);
+    expect(rested['--vt-rest-line']).toBe(sky.borderTopColor);
+    expect(rested['--vt-fill']).toBe('transparent');
   });
   it('a tone applied again with nothing changed writes nothing (F2: no write wakes the page’s rescan)', () => {
     const props = new Map();
