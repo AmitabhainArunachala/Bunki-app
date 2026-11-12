@@ -1032,7 +1032,6 @@ export function installVoiceLayer(host) {
         if (again) spoken.adopt(again);
         else { const gone = spoken; spoken = null; if (gone.session && !gone.session.ended) gone.session.stop(); }
       }
-      ear.mount();
       // a control drawn again while it speaks or waits (the play bar is built anew at each change) takes its tone again
       for (const control of doc.querySelectorAll(`.listen-row[data-voice-state] > .play-mark, :is(${VOICE_CONTROL}):is(.is-speaking, [aria-busy='true'])`)) toneControl(control);
       // at rest a control keeps its own quiet ink, unless that ink would sink under 3:1 on the ground it stands on
@@ -1045,6 +1044,8 @@ export function installVoiceLayer(host) {
           if (ink && contrast(over(ink, ground), ground) < FLOOR.rest) toneControl(control);
         } catch { /* its own ink stands */ }
       }
+      // the ear's marks come last: a mark that cannot be placed throws here, with the rest of the look already done
+      ear.mount();
     }, 60);
   };
   // the ear's own writes (its marks, their struck line, its bands: [data-ear-own]) are no reason to look at the page

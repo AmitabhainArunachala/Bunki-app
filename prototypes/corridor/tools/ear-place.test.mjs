@@ -77,7 +77,7 @@ function watchFrames() {
   try { localStorage.setItem('bunki-prototype:intro-dismissed:v1', '1'); } catch { /* storage may be blocked */ }
   const seen = (globalThis.__earPlace = {
     frames: 0, bare: 0, bareByHome: {}, shownByHome: {}, worst: 0, run: 0, firstMark: null, ready: null,
-    hidden: 0, jumps: 0, wrongHome: 0, rest: false, addedAtRest: 0,
+    hidden: 0, jumps: 0, wrongHome: 0, lastChange: performance.now(), rest: false, changedAtRest: 0, addedAtRest: 0,
   });
   const GATES = '#ginga-symbol, :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate';
   const homeOf = (gate) => (gate.id === 'ginga-symbol' ? 'sky' : gate.parentElement?.matches?.('.sheet-bar') ? 'sheet' : 'bar');
@@ -106,10 +106,21 @@ function watchFrames() {
     requestAnimationFrame(frame);
   };
   requestAnimationFrame(frame);
+  // when the page itself last changed (the ear's own nodes apart), and what was added while it rested
+  const own = (node) => node.nodeType === 1 && node.hasAttribute('data-ear-own');
   new MutationObserver((records) => {
-    if (!seen.rest) return;
-    for (const record of records) for (const node of record.addedNodes) if (node.nodeType === 1 && node.classList.contains('ear-spot')) seen.addedAtRest += 1;
+    for (const record of records) {
+      const nodes = [...record.addedNodes, ...record.removedNodes];
+      const ears = !!(record.target.nodeType === 1 && record.target.closest('[data-ear-own]')) || (nodes.length > 0 && nodes.every(own));
+      if (!ears) { seen.lastChange = performance.now(); if (seen.rest) seen.changedAtRest += 1; }
+      if (seen.rest) for (const node of record.addedNodes) if (node.nodeType === 1 && node.classList.contains('ear-spot')) seen.addedAtRest += 1;
+    }
   }).observe(document, { childList: true, subtree: true });
+}
+/** The page has stopped changing: nothing but the ear's own nodes added or removed for a second. A room goes on drawing
+ * after it says ready, for longer on a slow machine; what is read at rest is read after this, not after a fixed time. */
+async function settled(page) {
+  await page.waitForFunction(() => performance.now() - globalThis.__earPlace.lastChange > 1000, null, { timeout: 90000, polling: 100 });
 }
 
 async function open(device, address, { wait = null } = {}) {
@@ -128,13 +139,18 @@ async function open(device, address, { wait = null } = {}) {
   await page.waitForFunction(() => 'ear' in document.documentElement.dataset, null, { timeout: 120000 });
   if (wait) await page.locator(wait).waitFor({ timeout: 60000 });
   await page.evaluate(() => document.fonts?.ready);
-  await page.waitForTimeout(2000);
+  await settled(page);
   return { page, errors, context };
 }
-/** The page rests for a second; then what the frames showed. */
+/** A second in which the page itself does not change (tried again if it did); then what the frames showed. */
 async function rested(page) {
-  await page.evaluate(() => { globalThis.__earPlace.rest = true; });
-  await page.waitForTimeout(1000);
+  for (let turn = 0; turn < 5; turn += 1) {
+    await settled(page);
+    await page.evaluate(() => Object.assign(globalThis.__earPlace, { rest: true, changedAtRest: 0, addedAtRest: 0 }));
+    await page.waitForTimeout(1000);
+    const seen = await page.evaluate(() => { globalThis.__earPlace.rest = false; return { ...globalThis.__earPlace, ear: document.documentElement.dataset.ear }; });
+    if (seen.changedAtRest === 0) return seen;
+  }
   return page.evaluate(() => ({ ...globalThis.__earPlace, ear: document.documentElement.dataset.ear }));
 }
 function assertPlaced(name, seen, errors, homes) {
@@ -146,6 +162,7 @@ function assertPlaced(name, seen, errors, homes) {
   assert.equal(seen.hidden, 0, `${where}: a mark beside a shown gate is shown too`);
   assert.equal(seen.jumps, 0, `${where}: no mark moved to a gate of another bar`);
   assert.equal(seen.wrongHome, 0, `${where}: each mark is named for the bar it stands on`);
+  assert.equal(seen.changedAtRest, 0, `${where}: the page came to rest`);
   assert.equal(seen.addedAtRest, 0, `${where}: no mark is added while the page rests`);
   assert.deepEqual(errors, [], `${where}: no page errors`);
 }
@@ -183,7 +200,7 @@ test('the armed ear goes through the five tabs with its mark on every bar and st
   for (const [tab, view] of [['#tab-learn', 'dojo'], ['#tab-read', 'shelf'], ['#tab-words', 'search'], ['#tab-me', 'me'], ['#tab-today', 'tray']]) {
     await page.locator(tab).first().click();
     await page.waitForFunction((view) => document.body.dataset.view === view, view);
-    await page.waitForTimeout(700);
+    await settled(page);
     walked.push(await page.evaluate(() => `${document.body.dataset.view}:${document.documentElement.dataset.ear}:${
       [...document.querySelectorAll('#app > .chrome > .bar-gate + .ear-spot')].filter((spot) => spot.getClientRects().length).length}`));
   }
@@ -195,7 +212,6 @@ test('the armed ear goes through the five tabs with its mark on every bar and st
 
 test('a placement that fails does not cost the page the voice layer\'s next look, and is not hidden', async () => {
   const { page, errors, context } = await open(WIDE, '?room=dojo');
-  await page.waitForTimeout(500);
   const during = await page.evaluate(async () => {
     const gate = document.querySelector('#app > .chrome > .bar-gate');
     const mark = gate?.nextElementSibling;
@@ -219,17 +235,26 @@ test('a placement that fails does not cost the page the voice layer\'s next look
     mark.remove();
     gate.replaceWith(again);
     document.querySelector('main').append(quote);
-    await new Promise((done) => setTimeout(done, 900));
-    return {
-      setup: 'ok', refused: state.refused,
-      listen: !!quote.nextElementSibling?.classList.contains('voice-say'),
-      marked: !!again.nextElementSibling?.classList.contains('ear-spot'),
+    // each thing is waited for, not a fixed time (a slow machine takes longer; a lost look never comes)
+    const until = async (read, ms) => {
+      for (const end = performance.now() + ms; performance.now() < end;) {
+        if (read()) return true;
+        await new Promise((done) => setTimeout(done, 50));
+      }
+      return !!read();
     };
+    const control = () => (quote.nextElementSibling?.classList.contains('voice-say') ? quote.nextElementSibling : null);
+    const listen = await until(control, 8000);
+    // the look's last part: every voice control it finds is weighed against the ground it stands on (data-vt-look)
+    const weighed = listen && await until(() => 'vtLook' in control().dataset, 3000);
+    await new Promise((done) => setTimeout(done, 300));
+    return { setup: 'ok', refused: state.refused, listen, weighed, marked: !!again.nextElementSibling?.classList.contains('ear-spot') };
   });
   assert.equal(during.setup, 'ok');
   assert.ok(during.refused >= 1, 'the mark was to be placed with the new gate, and that was refused');
   assert.equal(during.marked, false, 'while every placement is refused the gate has no mark');
   assert.equal(during.listen, true, 'the quoted sentence still got its listen control: the look at the page was not lost with the mark');
+  assert.equal(during.weighed, true, 'and the look went on to its end: the new control was weighed against its ground');
   assert.ok(errors.length >= 1 && errors.every((line) => line.includes('this placement is refused')), `the failure is reported, and nothing else is: ${JSON.stringify(errors)}`);
   // the refusal ends; at the page's next change the mark is back beside its gate
   const afterwards = await page.evaluate(async () => {
@@ -237,8 +262,9 @@ test('a placement that fails does not cost the page the voice layer\'s next look
     state.on = false;
     Element.prototype.after = state.place;
     document.querySelector('main').append(document.createComment('one more change'));
-    await new Promise((done) => setTimeout(done, 400));
-    return !!document.querySelector('#app > .chrome > .bar-gate')?.nextElementSibling?.classList.contains('ear-spot');
+    const marked = () => !!document.querySelector('#app > .chrome > .bar-gate')?.nextElementSibling?.classList.contains('ear-spot');
+    for (const end = performance.now() + 5000; performance.now() < end && !marked();) await new Promise((done) => setTimeout(done, 50));
+    return marked();
   });
   await context.close();
   assert.equal(afterwards, true, 'the mark is back at the next change to the page');
