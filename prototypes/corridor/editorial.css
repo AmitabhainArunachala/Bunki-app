@@ -3168,33 +3168,11 @@ body[data-view='contextdeck'] :is(.cd-btn, .cd-choice, .cd-seal, .cd-swatch):foc
   box-shadow: var(--focus-ring);
   outline-offset: 3px;
 }
-body[data-view='decks'] .vocabulary-module-row {
-  display: flex;
-  width: 100%;
-  border: 0;
-  border-bottom: 0.5px solid var(--separator);
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-}
-body[data-view='decks'] .vocabulary-module-row:hover { background: var(--fill); }
-body[data-view='decks'] .deck-card {
-  padding: 14px 0;
-  border: 0;
-  border-bottom: 0.5px solid var(--separator);
-  font-family: var(--sans);
-}
-body[data-view='decks'] .deck-card .lesson-enroll-word { flex-basis: 6.5em; }
-body[data-view='decks'] .deck-actions .chip { max-width: 100%; white-space: normal; padding-block: 10px; }
 @media (max-width: 720px) {
   body[data-view='contextdeck'] .cd-title { font-size: var(--type-title); }
   body[data-view='contextdeck'] .cd-room[data-writing='vertical'] .cd-sheet { padding-right: 0; }
-  body[data-view='decks'] .deck-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 12px; }
-  body[data-view='decks'] .deck-card .deck-card-body { grid-column: 1 / -1; grid-row: 2; }
-  body[data-view='decks'] .deck-card .lesson-enroll-word { flex-basis: auto; }
 }
 
-body[data-view='decks'] .deck-level,
 body[data-view='contextdeck'] .cd-level { display: inline-flex; margin: 0 0 12px; }
 @media (max-width: 720px) {
   body[data-view='contextdeck'] .cd-room[data-writing='vertical'] .cd-column {
