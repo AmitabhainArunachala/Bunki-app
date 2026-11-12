@@ -13,7 +13,6 @@
     0 1px 0 rgba(28, 47, 66, 0.06),
     0 10px 28px rgba(28, 47, 66, 0.1)
   );
-  --gs-edge: var(--paper-edge, 1px solid color-mix(in srgb, var(--ink) 30%, transparent));
   color: var(--ink);
   font-family: var(--sans);
   font-size: var(--type-body);
@@ -1092,9 +1091,6 @@ legend.gs-instruction {
 .gs-card[data-deck='failed'] span,
 .gs-card[data-deck='held'] span {
   color: var(--red);
-}
-.gs-deck-line {
-  margin-top: 10px !important;
 }
 .gs-deck-summary {
   border-top: 1px solid var(--line);

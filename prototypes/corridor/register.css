@@ -83,7 +83,7 @@ main h1.exam-heading,
 }
 /* the red rule above an eyebrow was the only red in the hall — ink now; red
    is for what is wrong, what is read aloud, and 再 */
-.eyebrow::before, .shelf-eyebrow::before, .section-rule::before { background: var(--ink) !important; }
+.eyebrow::before, .section-rule::before { background: var(--ink) !important; }
 main h2 {
   font-family: var(--display);
   font-weight: 500;

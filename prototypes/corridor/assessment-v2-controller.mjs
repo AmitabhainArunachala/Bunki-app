@@ -21,7 +21,7 @@ export function jlptOfficialFacts(level) {
   return score && blueprint ? { score, blueprint } : null;
 }
 
-export const ASSESSMENT_LIBRARY_V2_LIMITS = Object.freeze({
+const ASSESSMENT_LIBRARY_V2_LIMITS = Object.freeze({
   forms: 128, attempts: 5000, jsonCharacters: 96_000_000, jsonNodes: 4_000_000,
 });
 const owned = new WeakSet();
@@ -241,7 +241,7 @@ function dictionaryEventFor(attempt, answer, event) {
     event.kind === 'assistance' && event.detail === `dictionary:${answer.item.sha256}` &&
     event.at >= attempt.startedAt && event.at <= attempt.recordedAt;
 }
-export function assessmentDictionaryAssistanceV2(attempt, itemId) {
+function assessmentDictionaryAssistanceV2(attempt, itemId) {
   const answer = attempt?.answers?.find(row => row.item.id === itemId);
   const event = answer && attempt.events.find(row => dictionaryEventFor(attempt, answer, row));
   return event ? { kind: 'dictionary', at: event.at } : null;

@@ -96,7 +96,7 @@ export function prepareAssessmentEnrichment({ binding, snapshot, meta, input: ra
       { kind: 'put', collection: 'kairo:record-host-commands', id: meta.changeId, value: row }], operations: intents });
 }
 
-export function validateAssessmentEnrichmentProof(raw) {
+function validateAssessmentEnrichmentProof(raw) {
   const proof = copy(raw);
   fields(proof, ['followupIds', 'remaining', 'intentsSha256', 'operations']);
   insist(Array.isArray(proof.followupIds) && proof.followupIds.length > 0 && proof.followupIds.length <= 20 &&

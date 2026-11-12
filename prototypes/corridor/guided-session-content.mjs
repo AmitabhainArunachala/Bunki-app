@@ -28,9 +28,9 @@
  * when the form's or the item's digest differs from the one the teaching was written against.
  */
 
-export const GUIDED_SET_SCHEMA = 'kairo-guided-set/1';
-export const GUIDED_INDEX_SCHEMA = 'kairo-guided-sets/1';
-export const GUIDED_INDEX_PATH = 'guided/sets/index.json';
+const GUIDED_SET_SCHEMA = 'kairo-guided-set/1';
+const GUIDED_INDEX_SCHEMA = 'kairo-guided-sets/1';
+const GUIDED_INDEX_PATH = 'guided/sets/index.json';
 
 const LEVELS = new Set(['N5', 'N4', 'N3', 'N2', 'N1']);
 const KINDS = new Set(['vocabulary', 'grammar', 'reading']);
@@ -234,7 +234,7 @@ export async function resolveBankQuestions(raw, fetchJson) {
   };
 }
 
-export function validateGuidedIndex(raw) {
+function validateGuidedIndex(raw) {
   if (!plain(raw) || raw.schema !== GUIDED_INDEX_SCHEMA || !Array.isArray(raw.sets)) {
     fail('the set index is unreadable');
   }

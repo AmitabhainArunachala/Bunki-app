@@ -493,9 +493,9 @@ function createInputRecovery({ storage, installationText, assertCurrent, key, pa
 // nothing: the capture's policy stays what createSourceCapture derives from the learner's own action. An exact anchor
 // is {source id, text sha256, token}; when the text behind it is not the text it was written against, the anchor is
 // invalid, never moved. Inbox version 5 adds the two arrays; versions 1-4 still parse and upgrade only when written to.
-export const SOURCE_INTAKE_ORIGINS = Object.freeze(['library', 'intake', 'clipboard', 'share']);
-export const SOURCE_INTAKE_CAPABILITIES = Object.freeze(['retained-body', 'pointer']);
-export const SOURCE_ANCHOR_LIMIT = 4000;
+const SOURCE_INTAKE_ORIGINS = Object.freeze(['library', 'intake', 'clipboard', 'share']);
+const SOURCE_INTAKE_CAPABILITIES = Object.freeze(['retained-body', 'pointer']);
+const SOURCE_ANCHOR_LIMIT = 4000;
 const SHA256 = /^[0-9a-f]{64}$/u;
 const captureCapability = (capture) => (capture.candidate.article.body ? 'retained-body' : 'pointer');
 const captureTextSha256 = (capture) => capture.candidate.article.body?.contentSha256 ?? null;

@@ -33,9 +33,7 @@ body, body.v-contrast-wcag {
   --ed-muted: color-mix(in srgb, var(--ink) 84%, var(--ground-0, #faf6ea));
   --ed-rule: color-mix(in srgb, var(--ink) 38%, var(--ground-0, #faf6ea));
   --ed-rule-light: color-mix(in srgb, var(--ink) 18%, var(--ground-0, #faf6ea));
-  --ed-mast: var(--glass-solid);
   --ed-mast-ink: var(--ink);
-  --ed-shadow: var(--shadow-card);
   --ink-2: color-mix(in srgb, var(--ink) 84%, var(--ground-0, #faf6ea));
   --faint: color-mix(in srgb, var(--ink) 80%, var(--ground-0, #faf6ea));
   --faint-2: color-mix(in srgb, var(--ink) 76%, var(--ground-0, #faf6ea));
@@ -46,7 +44,7 @@ body, body.v-contrast-wcag {
 
 /* a night world lifts each topic's colour toward its own light ink, so a kicker or a calm block's
    word still reads on a dark card */
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(.story-kicker, .story-picture-word) {
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .story-kicker {
   color: var(--kicker, color-mix(in srgb, var(--topic, var(--tint)) 45%, var(--ink)));
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body {
@@ -63,16 +61,13 @@ body, body.v-contrast-wcag {
   --shadow-lift: 0 2px 4px rgb(0 0 0 / 34%), 0 16px 36px rgb(0 0 0 / 44%);
   --shadow-float: 0 2px 6px rgb(0 0 0 / 36%), 0 20px 48px rgb(0 0 0 / 50%);
   --grain: none;
-  --ed-mast: var(--glass-solid);
   --ed-mast-ink: var(--ink);
-  --ed-shadow: var(--shadow-card);
 }
 
 /* the motion vocabulary (FEEL): 180–280ms on one curve. A popover scales in from .96 with a fade,
    a sheet slides up, a room cross-fades in. Every one is off under prefers-reduced-motion. */
 @keyframes feel-pop { from { opacity: 0; transform: scale(0.96); } }
 @keyframes feel-pop-centred { from { opacity: 0; transform: translateX(-50%) scale(0.96); } to { transform: translateX(-50%); } }
-@keyframes feel-rise { from { opacity: 0; transform: translateY(18px); } }
 @keyframes feel-fade { from { opacity: 0; } }
 
 ::selection { background: var(--ink); color: var(--ground-0, #faf6ea); }
@@ -220,7 +215,6 @@ body.v-depth-layered main > .eyebrow::before,
 body.v-depth-layered .eyebrow.shelf-section::before { content: none; }
 body.v-depth-layered main > .eyebrow { padding-top: 0; }
 .note { font-size: var(--type-chrome); line-height: 1.75; border-left-width: 1px; }
-.gesture-hint { font-size: var(--type-label); line-height: 1.65; color: var(--ed-muted); }
 .pool-tag { font-size: var(--type-caption); line-height: 1.7; letter-spacing: 0.01em; color: var(--ed-muted); }
 body .sheet button.pool-tag.cat-chip { min-width: 44px; min-height: 44px; }
 .level-chip { font-size: var(--type-caption); letter-spacing: 0.025em; border-radius: var(--radius-seal); padding: 4px 9px; }
@@ -425,20 +419,6 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
 }
 /* A source you quote from stays selectable: a drag across its words picks an excerpt to keep. */
 .publisher-body .japanese-lookup-word { -webkit-user-select: text; user-select: text; }
-.vocabulary-list-dialog {
-  width: min(520px, calc(100vw - 32px));
-  max-height: calc(100dvh - 48px);
-  padding: 28px;
-  border: 0;
-  border-top: 4px solid var(--red);
-  border-radius: 0;
-  background: var(--ed-paper);
-  color: var(--ed-ink);
-  box-shadow: 0 18px 64px rgb(7 15 23 / 35%);
-}
-.vocabulary-list-dialog::backdrop { background: rgb(9 18 27 / 58%); }
-.vocabulary-list-dialog h2 { margin: 0 0 12px; font: 800 var(--type-title)/1.5 var(--display); overflow-wrap: anywhere; }
-.vocabulary-list-dialog > p { font: var(--type-body)/1.75 var(--sans); color: var(--ed-muted); }
 .vocabulary-list-choices { display: grid; margin: 22px 0; border-top: 2px solid var(--ed-ink); }
 .vocabulary-list-choices .chip {
   width: 100%;
@@ -461,8 +441,6 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
 .vocabulary-list-choices .chip[aria-pressed='true'] { background: var(--ed-ink); color: var(--ed-paper); }
 .vocabulary-list-form { display: grid; gap: 12px; }
 .vocabulary-list-form .search-field { width: 100%; min-width: 0; min-height: 50px; margin: 0; padding: 12px; border: 1px solid var(--ed-rule); border-radius: var(--radius-seal); font: var(--type-body)/1.5 var(--sans); color: var(--ed-ink); background: var(--ed-paper); }
-.vocabulary-list-dialog > .chip { display: block; margin-left: auto; background: var(--ed-ink); color: var(--ed-paper); }
-.vocabulary-list-dialog .vocabulary-list-status { min-height: 1.7em; font-size: var(--type-control); color: var(--ai); }
 
 /* Reference work: navigation, collection information, then an index table. */
 .reference-library { padding-top: 0; }
@@ -484,16 +462,6 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
 .reference-level:hover { background: var(--ai-wash); }
 .reference-level-name { font-family: var(--display); font-size: var(--type-display); color: var(--ed-ink); }
 .reference-level-count { font-size: var(--type-body); line-height: 1.6; margin-top: 8px; }
-.reference-level-saved { font-size: var(--type-label); line-height: 1.6; color: var(--ed-muted); }
-.reference-guide { margin: 24px 0 30px; border-block: 1px solid var(--ed-rule); }
-.reference-guide > summary { padding: 15px 0; cursor: pointer; font-size: var(--type-body); font-weight: 600; color: var(--ai); }
-.reference-guide[open] > summary { border-bottom: 1px solid var(--ed-rule-light); }
-.reference-guide-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; padding: 22px 0; }
-.reference-guide-grid > * { min-width: 0; padding: 0; }
-.reference-guide-grid :is(h2, h3) { font-family: var(--display); font-size: var(--type-reading); margin: 0 0 12px; }
-.reference-guide-grid p { font-size: var(--type-control); line-height: 1.8; color: var(--ed-muted); margin: 0 0 12px; }
-.reference-guide-grid a { color: var(--ai); font-size: var(--type-chrome); }
-.reference-guide-note { margin: 0 0 18px; font-size: var(--type-chrome); line-height: 1.75; color: var(--ed-muted); }
 .reference-provenance { border-color: var(--ed-rule); font-size: var(--type-chrome); line-height: 1.8; }
 .reference-toolbar {
   padding: 22px;
@@ -624,7 +592,6 @@ html[data-register='attempt'] .exam-paper .exam-option-row .exam-option-number {
   font: 600 var(--type-lead)/1 var(--sans);
 }
 html[data-register='attempt'] .exam-paper .exam-option-row[data-selected='true'] .exam-option-number { border-color: var(--ed-ink); }
-html[data-register='attempt'] .exam-paper .exam-option-row[data-selected='true'] { background: var(--ai-wash); }
 html[data-register='attempt'] .mock-nav { gap: 16px; margin: 24px 0 16px; }
 html[data-register='attempt'] #exam-flag, html[data-register='attempt'] .chip#exam-flag { min-height: 44px; font-size: var(--type-chrome); color: var(--ai); }
 html[data-register='attempt'] :is(.exam-question-map summary, .exam-leave-controls .chip) { font-size: var(--type-chrome); }
@@ -704,7 +671,6 @@ html[data-register='tutor'] main button.japanese-lookup-word { border: 0; backgr
 @media (max-width: 760px) {
   body:not(.zen) #app > .chrome { gap: 0; padding-inline: 8px; }
   body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main { width: calc(100% - 24px); margin-top: 16px; padding: 26px 24px 64px; }
-  .reference-guide-grid { grid-template-columns: minmax(0, 1fr); gap: 22px; }
 }
 @media (max-width: 520px) {
   /* a phone's bar keeps every door on one row: the English words stay in each door's name for a
@@ -737,12 +703,10 @@ html[data-register='tutor'] main button.japanese-lookup-word { border: 0; backgr
   .reference-toolbar { padding: 14px 12px; }
   .reference-results-header { align-items: flex-start; }
   .reference-library .reference-level { padding: 16px; min-height: 135px; }
-  .reference-guide-grid { padding: 18px 0; }
   .reference-other-rooms { gap: 4px 14px; }
   .assessment-room .exam-paper { padding-top: 22px; }
   .assessment-room .exam-task-heading { font-size: var(--type-reading); }
   .exam-task-instruction { font-size: var(--type-body); }
-  html[data-register='attempt'] .exam-paper .exam-prompt { font-size: var(--type-reading); }
   html[data-register='attempt'] .exam-paper .exam-passage { padding: 18px 14px; font-size: var(--type-reading); }
   .exam-option-row { gap: 12px; }
   .exam-option-text { font-size: var(--type-reading); }
@@ -768,7 +732,6 @@ html[data-register='tutor'] main button.japanese-lookup-word { border: 0; backgr
    The word-sky home (data-view='drift') is left exactly as it was.
    ========================================================================== */
 body, body.v-contrast-wcag {
-  --s-half: 4px;
   --s1: 8px;
   --s2: 16px;
   --s3: 24px;
@@ -786,8 +749,6 @@ body, body.v-contrast-wcag {
   --float-shadow: var(--shadow-float);
   --chrome: var(--glass-solid);
   --chrome-ink: var(--label);
-  --art-field: color-mix(in srgb, var(--ai) 58%, #07101d);
-  --art-ink: #f3ecdc;
   --accent: var(--red);
   /* keyboard focus: an ink underline over a soft vermilion wash, never the browser blue */
   --focus-wash: color-mix(in srgb, var(--red) 16%, transparent);
@@ -798,7 +759,6 @@ body, body.v-contrast-wcag {
   --hairline: var(--separator);
   --rule-strong: var(--separator);
   --washi: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='a' filterUnits='userSpaceOnUse' x='0' y='0' width='300' height='300' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='4' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.33 0 0 0 0 0.2 1.0 0 0 0 -0.3'/%3E%3C/filter%3E%3Cfilter id='b' filterUnits='userSpaceOnUse' x='0' y='0' width='300' height='300' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.11 0 0 0 0 0.16 0 0 0 0 0.24 2.0 0 0 0 -1.0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23a)' opacity='0.085'/%3E%3Crect width='300' height='300' filter='url(%23b)' opacity='0.1'/%3E%3C/svg%3E");
-  --washi-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='a' filterUnits='userSpaceOnUse' x='0' y='0' width='300' height='300' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='4' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.96 0 0 0 0 0.93 0 0 0 0 0.86 1.0 0 0 0 -0.3'/%3E%3C/filter%3E%3Cfilter id='b' filterUnits='userSpaceOnUse' x='0' y='0' width='300' height='300' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.96 0 0 0 0 0.93 0 0 0 0 0.86 2.0 0 0 0 -1.0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23a)' opacity='0.14'/%3E%3Crect width='300' height='300' filter='url(%23b)' opacity='0.12'/%3E%3C/svg%3E");
 
 }
 
@@ -885,7 +845,6 @@ body .chip .big { font-family: var(--serif); }
    field, one row of grey capsule filters, then pictures — a lead story with a large picture,
    two seconds, today's six, and a grid of picture cards, each in its topic's colour with its
    level on the picture. The short word definitions stand apart as compact text cards. */
-body[data-view='shelf'] main > .eyebrow:first-child { display: none; }
 :root body[data-view='shelf']:not(.zen):not([data-view='entry']) #app > main {
   width: calc(100% - 2 * var(--s3));
   max-width: 1160px;
@@ -1313,15 +1272,6 @@ body #shelf-body .story-card:focus-within { outline: 2px solid var(--tint); outl
   transition: transform 600ms var(--ease-standard);
 }
 /* (the calm topic-coloured placeholder block is gone: a picture-less story wears its key-kanji sheet, Material II) */
-.story-picture-word {
-  padding: 0 12px;
-  font: 600 var(--type-label)/1.2 var(--sans);
-  font-variant: small-caps;
-  letter-spacing: 0.16em;
-  text-transform: lowercase;
-  color: color-mix(in srgb, var(--topic, var(--tint)) 82%, #000);
-  opacity: 0.82;
-}
 /* N · a picture-less story's key kanji (heroKanji), one 書 sheet: the world's ink on the world's paper, set large and
    centred in the picture's own 3:2 box, so nothing moves; no category word, no block. The glyph scales with its box. */
 .story-picture.is-kanji,
@@ -1445,7 +1395,6 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture.is-kanji {
 #shelf-body .story-teaser .story-foot { padding-top: 6px; gap: 6px; }
 #shelf-body .story-teaser .level-badge { top: 8px; right: 8px; min-height: 20px; padding: 0 7px; font-size: var(--type-caption); }
 #shelf-body .story-teaser .story-date { font-size: var(--type-caption); }
-#shelf-body .story-teaser .story-picture-word { font-size: var(--type-caption); letter-spacing: 0.12em; }
 
 /* the short word definitions: compact text cards in their own band, no picture */
 #shelf-body .shelf-definition-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
@@ -1612,7 +1561,7 @@ body .dial-label { font-family: var(--sans); color: var(--label-2); letter-spaci
 
 /* the play bar: one speaker mark when idle (John, 2026-10-15 17:20); open, the clean bar — play · progress ·
    voice · speed — with the mark as its close */
-.listen-row[hidden], .reader-actions[hidden], .teacher-door.reader-actions[hidden] { display: none !important; }
+.listen-row[hidden] { display: none !important; }
 body.v-depth-layered .listen-row.play-bar, .listen-row.play-bar {
   display: flex;
   align-items: center;
@@ -1765,62 +1714,6 @@ body[data-view='reader'] main > blockquote {
   color: var(--text);
 }
 
-/* the floating sentence bar, and the one-time tip that holds its place */
-.teacher-door.reader-actions {
-  position: fixed;
-  z-index: 60;
-  left: 50%;
-  bottom: calc(var(--s2) + env(safe-area-inset-bottom));
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
-  align-items: center;
-  gap: var(--s1) var(--s2);
-  width: min(680px, calc(100vw - 2 * var(--s2)));
-  margin: 0;
-  padding: 10px 10px 10px var(--s3);
-  transform: translateX(-50%);
-  border: 1px solid var(--raised-edge);
-  border-radius: var(--radius-overlay);
-  background: var(--raised);
-  box-shadow: var(--float-shadow);
-  animation: float-in var(--motion-room) var(--ease-standard);
-}
-@keyframes float-in { from { opacity: 0; transform: translate(-50%, 14px); } }
-@keyframes float-in-phone { from { opacity: 0; transform: translateY(14px); } }
-.reader-actions #reader-context-note.teacher-note {
-  min-height: 0;
-  margin: 0;
-  font: 700 var(--type-control)/1.4 var(--sans);
-  color: var(--text);
-  overflow-wrap: anywhere;
-}
-.reader-actions .teacher-actions { flex-wrap: nowrap; gap: var(--s1); }
-.reader-actions .teacher-actions .chip {
-  flex-direction: column;
-  min-height: 48px;
-  padding: 4px var(--s2);
-  border-radius: var(--radius-control);
-  font: 700 var(--type-control)/1.2 var(--sans);
-  white-space: nowrap;
-}
-.reader-actions .teacher-actions .en-sub { font-size: var(--type-caption); letter-spacing: 0.02em; text-transform: none; opacity: 0.9; }
-.reader-tip {
-  /* a note in the page, above the article's text: it never floats over the words (glance pass) */
-  display: flex;
-  align-items: center;
-  gap: var(--s1);
-  max-width: 40em;
-  margin: 0 0 var(--s3);
-  padding: 4px 2px 4px var(--s2);
-  border: 1px solid var(--raised-edge);
-  border-left: 3px solid var(--ai);
-  border-radius: var(--radius-card);
-  color: var(--text);
-  background: color-mix(in srgb, var(--ai) 6%, var(--raised));
-}
-.reader-tip-text { flex: 1 1 auto; margin: 0; font: 500 var(--type-chrome)/1.55 var(--sans); }
-.reader-tip .icon-button { flex: 0 0 auto; color: var(--text-2); }
-
 /* the article's foot: finish, then everything about the text */
 .article-footer { margin: var(--s5) 0 0; padding: var(--s3) 0 0; border-top: 2px solid var(--rule-strong); }
 .article-footer .read-done { margin: 0 0 var(--s4); }
@@ -1854,11 +1747,6 @@ body .article-about .note .inline-link { color: var(--text-2); text-decoration-c
 body .article-about .note .inline-link:hover { color: var(--ai); text-decoration-color: currentColor; }
 .article-about .details-toggle { margin: var(--s1) 0 0; }
 
-/* a fixed bar never hides the page's last lines */
-/* the room the sentence bar needs at the page's foot is reserved from the first visit's tip on, so
-   the page does not grow under the reader when the first word is chosen (the tip itself is inline) */
-body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip) #app { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
-:root body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip):not(.zen):not([data-view='entry']) #app > main { padding-bottom: 176px; }
 /* pending (no recording in the locked voice): the same mark, dimmed; its reason is its description, out of sight.
    The reader's bar only: sentence practice has no mark, so there its reason is the one visible sign that the
    recording is missing (V, 2026-10-17 — unscoped, this hid it too and left the listening section blank) */
@@ -1888,7 +1776,6 @@ body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip) #app { 
   #shelf-reading-results > .story-grid .story-picture { grid-column: 2; grid-row: 1; margin: 16px 16px 16px 0; border-radius: var(--radius-card); }
   #shelf-reading-results > .story-grid .shelf-head { grid-column: 1; grid-row: 1; padding: 14px 12px 16px 16px; }
   #shelf-reading-results > .story-grid .level-badge { top: 6px; right: 6px; min-height: 20px; padding: 0 7px; font-size: var(--type-caption); }
-  #shelf-reading-results > .story-grid .story-picture-word { font-size: var(--type-caption); letter-spacing: 0.1em; }
   #shelf-body .shelf-definition-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .shelf-encounter-choices { grid-template-columns: minmax(0, 1fr); }
 }
@@ -1996,20 +1883,6 @@ body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip) #app { 
   /* folded on a phone: the mark alone at the bottom right, above the tabs; its bed (the dock strip) is not drawn */
   body[data-view='reader'] .listen-row.play-bar[data-open='false'] { left: auto; right: var(--s2); width: 44px; max-width: 44px; min-height: 44px; padding: 0; }
   body[data-view='reader']:not(.zen):has(.listen-row.play-bar[data-open='false']):not(:has(.reader-actions:not([hidden]))) #app::after { display: none; }
-  /* the sentence bar rises above the dock, clear of the bug and the voice state */
-  .teacher-door.reader-actions {
-    left: var(--s1);
-    width: calc(100vw - 2 * var(--s1));
-    bottom: calc(72px + env(safe-area-inset-bottom));
-    transform: none;
-    animation-name: float-in-phone;
-  }
-  .teacher-door.reader-actions { grid-template-columns: minmax(0, 1fr) auto; padding: 10px 6px 10px 14px; }
-  .reader-actions .teacher-actions { grid-column: 1 / -1; grid-row: 2; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .reader-actions .teacher-actions .chip { padding: 4px 6px; font-size: var(--type-chrome); }
-  .reader-actions-close { grid-column: 2; grid-row: 1; }
-  .reader-tip { margin-bottom: var(--s2); padding-left: 12px; }
-  :root body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip):not(.zen):not([data-view='entry']) #app > main { padding-bottom: 210px; }
   .article-about { padding: var(--s2); }
   .article-facts { grid-template-columns: minmax(0, 1fr); gap: 2px; }
   .article-facts dd { margin-bottom: var(--s1); }
@@ -2259,14 +2132,12 @@ body .sheet .rad-door {
   margin: 0 0 var(--s2);
   padding: 12px var(--s2);
 }
-@media (hover: hover) { }
 body .sheet .rad-glyph { font-size: var(--type-hero); color: var(--text); }
 body .sheet .rad-name { font: 600 var(--type-lead)/1.4 var(--sans); color: var(--text); }
 body .sheet .rad-sub { font: var(--type-label)/1.5 var(--sans); color: var(--text-2); }
 body .sheet .stroke-door {
   padding: 10px;
 }
-@media (hover: hover) { }
 
 /* the writing room */
 #stroke-page .ink-sheet {
@@ -2815,48 +2686,6 @@ html[data-register='attempt'] .mock-nav .chip { min-height: 48px; padding: 0 var
    words. The focused word wears the focus token; the pill shows its keys. */
 #reader .tok:focus-visible { outline: none; background: transparent; }
 #reader .tok:focus-visible > .tok-word { background: var(--focus-wash); box-shadow: var(--focus-ring); border-radius: var(--radius-seal) var(--radius-seal) 0 0; }
-.token-actions .tok-kbd {
-  margin-left: 6px;
-  padding: 1px 5px;
-  border: 1px solid var(--raised-edge-strong);
-  border-radius: var(--radius-card);
-  font: 600 var(--type-caption)/1.2 var(--sans);
-  color: var(--text-2);
-}
-@media (hover: none) { .token-actions .tok-kbd { display: none; } }
-
-/* the list chooser's Done: an outlined secondary that reads on its paper */
-body .vocabulary-list-dialog > .chip {
-  border: 1px solid var(--ink);
-  background: var(--raised);
-  color: var(--ink);
-  font-weight: 600;
-}
-body .vocabulary-list-dialog > .chip:hover { background: var(--ai-wash); }
-body .token-actions {
-  max-width: calc(100vw - 16px);
-  width: max-content;
-  gap: 2px;
-  padding: 4px;
-  border: 1px solid var(--raised-edge);
-  border-radius: var(--radius-overlay);
-  background: var(--raised);
-  box-shadow: var(--float-shadow);
-}
-body .token-actions button {
-  display: inline-flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 6px;
-  min-height: 44px;
-  padding: 0 12px;
-  border-radius: var(--radius-control);
-  color: var(--ai);
-  font: 700 var(--type-chrome)/1 var(--sans);
-  white-space: nowrap;
-}
-body .token-actions button .en-sub { display: inline; font-size: var(--type-caption); font-weight: 500; letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
-body .token-actions button:hover { background: var(--ai-wash); }
 
 /* reference pages: the pager wraps rather than pushing past a 320px screen */
 .reference-library .reference-page-controls { flex-wrap: wrap; row-gap: var(--s1); min-width: 0; }
@@ -2967,12 +2796,9 @@ body .token-actions button:hover { background: var(--ai-wash); }
 .seal-strip-lists > .seal-strip-status { display: inline-flex; align-items: center; min-height: 44px; margin: 0 6px 0 4px; }
 .seal-strip-lists > .seal-act[data-strip-action='remove'] { margin-inline: -4px 6px; }
 .seal-strip-lists > .seal-strip-status:empty { display: none; }
-.seal-strip-more { display: contents; }
-.seal-strip-more[hidden], .seal-strip-form[hidden], .seal-strip [hidden] { display: none; }
+.seal-strip [hidden] { display: none; }
 .seal-strip .seal-list { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .seal-strip .seal-list[aria-pressed='true']::after { content: ' ✓'; }
-.seal-strip-form { display: flex; flex: 1 1 100%; gap: 6px; }
-.seal-strip-form .vocabulary-list-field { flex: 1 1 auto; min-width: 0; }
 .seal-strip-acts { display: flex; flex-wrap: wrap; gap: 0 2px; margin: 8px -6px 0; padding-top: 4px; border-top: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent); }
 /* two verbs to a line even on a 320 phone (全項目 · Full entry | Save the sentence), so the acts take two lines, not three */
 .seal-strip .seal-strip-acts > button.seal-act { padding-inline: 6px; }
@@ -3127,7 +2953,6 @@ body .token-actions button:hover { background: var(--ai-wash); }
 .vocabulary-list-action { min-height: 44px; padding: 0 8px; border: 0; border-radius: var(--radius-control); background: none; color: inherit; font: var(--type-control)/1.3 var(--sans); text-align: start; cursor: pointer; }
 .vocabulary-list-action:hover { background: var(--ai-wash); }
 .vocabulary-list-action:focus-visible { outline: none; box-shadow: var(--focus-ring); }
-.vocabulary-list-action#mini-unsave { color: var(--text-2); }
 .vocabulary-list-title { margin: 0 0 4px; font: 700 var(--type-control)/1.4 var(--sans); overflow-wrap: anywhere; }
 .vocabulary-list-popover .vocabulary-list-choices { display: grid; max-height: 40vh; margin: 0 0 8px; overflow: auto; border: 0; }
 /* G5 · Save ▾'s menu, his lists and all, stays under 40 % of the screen: its title, Review, New list… and Copy take about
@@ -3157,15 +2982,10 @@ body .token-actions button:hover { background: var(--ai-wash); }
 .vocabulary-list-popover .vocabulary-list-status:empty { display: none; }
 .vocabulary-list-popover :is(.vocabulary-list-form, .vocabulary-list-new)[hidden] { display: none; }
 
-/* The one-time hint keeps its space after the first word opens. */
-.reader-tip.is-done { opacity: 0; pointer-events: none; transition: opacity 200ms ease; }
-.reader-tip.is-done[data-faded] { visibility: hidden; }
-
 /* 原文 / やさしい版: a two-sided switch that says what each side is and its level, and one line on what the
    simplified version is */
 .version-block { margin: 0 0 var(--s3); }
 .version-block .version-toggle { margin: 0; }
-.version-toggle .version-choice .version-name { font-weight: 500; }
 .version-toggle .version-choice .version-level { font: 600 var(--type-label)/1 var(--sans); letter-spacing: 0.02em; color: var(--text-2); }
 .version-toggle .version-choice[aria-pressed='true'] .version-level { color: var(--accent); }
 .version-toggle .version-choice:focus-visible { outline: 2px solid var(--ai); outline-offset: 2px; }
@@ -3249,33 +3069,11 @@ body[data-view='contextdeck'] :is(.cd-btn, .cd-choice, .cd-seal, .cd-swatch):foc
   box-shadow: var(--focus-ring);
   outline-offset: 3px;
 }
-body[data-view='decks'] .vocabulary-module-row {
-  display: flex;
-  width: 100%;
-  border: 0;
-  border-bottom: 0.5px solid var(--separator);
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-}
-body[data-view='decks'] .vocabulary-module-row:hover { background: var(--fill); }
-body[data-view='decks'] .deck-card {
-  padding: 14px 0;
-  border: 0;
-  border-bottom: 0.5px solid var(--separator);
-  font-family: var(--sans);
-}
-body[data-view='decks'] .deck-card .lesson-enroll-word { flex-basis: 6.5em; }
-body[data-view='decks'] .deck-actions .chip { max-width: 100%; white-space: normal; padding-block: 10px; }
 @media (max-width: 720px) {
   body[data-view='contextdeck'] .cd-title { font-size: var(--type-title); }
   body[data-view='contextdeck'] .cd-room[data-writing='vertical'] .cd-sheet { padding-right: 0; }
-  body[data-view='decks'] .deck-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 12px; }
-  body[data-view='decks'] .deck-card .deck-card-body { grid-column: 1 / -1; grid-row: 2; }
-  body[data-view='decks'] .deck-card .lesson-enroll-word { flex-basis: auto; }
 }
 
-body[data-view='decks'] .deck-level,
 body[data-view='contextdeck'] .cd-level { display: inline-flex; margin: 0 0 12px; }
 @media (max-width: 720px) {
   body[data-view='contextdeck'] .cd-room[data-writing='vertical'] .cd-column {
@@ -3376,7 +3174,6 @@ body:not(.ui-bi) .primary-tabs .primary-tab { font: 800 var(--type-label)/1 var(
 .primary-tabs .station-kept { left: auto; right: calc(50% + 9px); color: var(--color-muted); }
 .primary-tabs .primary-tab .station-kept::before { display: inline-block; width: 7px; height: 10px; margin-right: 2px; vertical-align: -1px; }
 .primary-tabs .primary-tab[aria-current='page'] { background: transparent; color: var(--color-ink); font-weight: 700; }
-body:not(.ui-bi) .primary-tabs .primary-tab[aria-current='page'] { font-weight: 800; }
 .primary-tabs .primary-tab[aria-current='page'] .station-node { opacity: 0; }
 .primary-tabs .primary-tab:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
 /* the car: one filled square that travels the line */
@@ -3652,7 +3449,6 @@ body:has(#app .kp-study > .kp-reveal) #app { padding-bottom: 0; }
   }
   body.has-primary-tabs.v-depth-layered[data-view='reader'] .listen-row.play-bar,
   body.has-primary-tabs[data-view='reader'] .listen-row.play-bar { bottom: calc(var(--nav-clearance) + 8px); }
-  body.has-primary-tabs .teacher-door.reader-actions { bottom: calc(var(--nav-clearance) + 72px); }
   body.has-primary-tabs .reader-toast { bottom: calc(var(--nav-clearance) + 84px); }
 }
 @media (min-width: 521px) {
@@ -3715,7 +3511,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
      the reader's Back says its name as it does in every other room */
   html[data-layout='places'] body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > button#back { min-width: 0; padding: 0 10px 0 4px; }
   html[data-layout='places'] body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > button#back .l-ja { position: static; width: auto; height: auto; overflow: visible; clip-path: none; }
-  body:not(.zen) #app > .chrome .lang-seg button { padding-inline: 4px; }
   body:not(.zen) #app > .chrome > button.chrome-dojo { padding-inline: 4px; }
   body:not(.zen) #app > .chrome > .level-chip.chrome-level { padding-inline: 4px; margin-inline: 0 2px; }
   body:not(.zen) #app > .chrome > button#tray {
@@ -3723,7 +3518,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
     font-size: var(--type-chrome);
     font-variant-numeric: tabular-nums;
   }
-  body.has-primary-tabs[data-view='reader'] #reader-tip { margin-bottom: 4px; }
   body.has-primary-tabs[data-view='reader'] #app > main > .view-title-en { margin-bottom: 4px; }
   body.has-primary-tabs[data-view='reader'] .reader-head { margin-bottom: 8px; }
   body.has-primary-tabs[data-view='reader'] #app::after { height: calc(44px + env(safe-area-inset-bottom)); }
@@ -3878,11 +3672,8 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --weight-regular: 400;
   --weight-medium: 500;
   --weight-semibold: 600;
-  --weight-bold: 700;
 
   /* Four-point base, with the current eight-point room rhythm preserved. */
-  --space-0: 0;
-  --space-hair: 2px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -3893,8 +3684,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --space-10: 40px;
   --space-12: 48px;
   --space-16: 64px;
-  --space-20: 80px;
-  --space-24: 96px;
   --hit: 44px;
   --size-seal: 56px;
   --stroke-hairline: 0.5px;
@@ -3902,7 +3691,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --stroke-focus: 2px;
 
   /* Relief remains an edge plus a shadow, independent of a concept's skin. */
-  --elevation-none: none;
   --elevation-paper: var(--world-paper-shadow);
   --elevation-card: 0 1px 2px rgb(0 0 0 / 4%), 0 8px 24px rgb(0 0 0 / 8%);
   --elevation-lift: 0 2px 4px rgb(0 0 0 / 5%), 0 16px 36px rgb(0 0 0 / 12%);
@@ -3965,8 +3753,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --raised-edge-strong: var(--color-edge-strong);
   --chrome: var(--color-glass-solid);
   --chrome-ink: var(--color-ink);
-  --art-field: var(--color-art-ground);
-  --art-ink: var(--color-art-ink);
   --focus-wash: var(--color-focus-wash);
   --focus-ring: var(--elevation-focus);
   --ed-paper: var(--color-surface);
@@ -3974,7 +3760,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --ed-muted: var(--color-ink-2);
   --ed-rule: var(--color-rule);
   --ed-rule-light: var(--color-rule-soft);
-  --ed-mast: var(--color-glass-solid);
   --ed-mast-ink: var(--color-ink);
   --sheet-ground: var(--color-sheet-ground);
   --sheet-ground-2: var(--color-sheet-ground-2);
@@ -4012,7 +3797,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --sans: var(--font-ui);
   --serif: var(--font-reading);
   --display: var(--font-display);
-  --s-half: var(--space-1);
   --s1: var(--space-2);
   --s2: var(--space-4);
   --s3: var(--space-6);
@@ -4029,7 +3813,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --raised-shadow-hover: var(--elevation-lift);
   --float-shadow: var(--elevation-float);
   --paper-shadow: var(--elevation-paper);
-  --ed-shadow: var(--elevation-card);
   --paper-edge: var(--stroke-relief) solid color-mix(in srgb, var(--color-ink) 30%, transparent);
   --rule: var(--stroke-relief) solid var(--color-line);
 }
@@ -4042,7 +3825,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
    sheet 320 · long 400 · ambient 9 s. prefers-reduced-motion re-values the set in one rule (the
    shell, below). ---- */
 :root {
-  --motion-instant: 0ms;
   --motion-ma: 120ms;
   --motion-press: 150ms;
   --motion-quick: 160ms;
@@ -4056,8 +3838,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);
   --ease-ink: cubic-bezier(0.65, 0, 0.35, 1);
-  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
-  --ease-linear: linear;
   /* the four radii (one hand, slice D): control 6 · card 4 · overlay 18 · seal 3 — on :root, so the
      drift layer and the deck's standalone pages read the same four */
   --radius-seal: 3px;
@@ -4183,7 +3963,6 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.kdx-lens:where(.on), .focus-chip:where(.on)) :where(.l-ja, .en-sub) { color: inherit; }
 /* a graph's node kinds keep a quiet tint of their own, never a coloured or dashed edge */
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) .chip:where(.t-kanji) { border: 0; background: color-mix(in srgb, var(--color-seal) 10%, transparent); color: color-mix(in srgb, var(--color-seal) 88%, var(--color-ink)); }
-:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) .chip:where(.t-radical) { border: 0; background: var(--color-fill); color: var(--color-ink); }
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) .chip:where(.t-idiom) { border: 0; background: color-mix(in srgb, #6a4a7a 11%, transparent); color: #5a3c69; }
 
 /* ---- C · Quiet: a word, no box ---- */
@@ -4347,7 +4126,6 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
   --color-live-wash: rgb(11 111 120 / 12%);
   --color-live-glow: rgb(11 111 120 / 0%);
   --color-gold: #94702a;
-  --color-gold-wash: rgb(148 112 42 / 14%);
   --color-lacquer: #141a28;
   --color-lacquer-2: #1d2638;
   --color-lacquer-ink: #e9e2d2;
@@ -4359,7 +4137,6 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
      chrome, Roboto Mono for data. Sizes stay the foundation's (reader ranges are pinned). */
   --font-data: 'Roboto Mono', 'Noto Sans JP', ui-monospace, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace;
   --font-headword: 'Shippori Mincho B1', var(--world-serif);
-  --weight-display: 800;
 
 
   --elevation-paper: 0 1px 0 rgb(25 28 34 / 6%), 0 6px 18px rgb(25 28 34 / 5%);
@@ -4404,7 +4181,6 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
   --color-live-wash: rgb(93 242 214 / 13%);
   --color-live-glow: rgb(93 242 214 / 45%);
   --color-gold: #e2bd6c;
-  --color-gold-wash: rgb(226 189 108 / 14%);
   --color-lacquer: color-mix(in srgb, var(--color-ground) 45%, #000);
   --color-lacquer-2: color-mix(in srgb, var(--color-ground) 75%, #000);
   --color-lacquer-ink: var(--color-ink);
@@ -4461,7 +4237,7 @@ main h1.view-title, main h1.exam-heading, .assessment-room > h1 {
 }
 body[data-view='reader'] main > h1.view-title { font-family: var(--font-reading); }
 main h2 { font-family: var(--font-headword); font-weight: 800; letter-spacing: 0.01em; }
-.data, .skin-data { font-family: var(--font-data); font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+.data { font-family: var(--font-data); font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
 
 /* ---- section eyebrows: small caps chrome with the 朱 accent rule ---- */
 body:not([data-view='drift']) main .eyebrow,
@@ -4478,7 +4254,6 @@ body:not([data-view='drift']) #sheet .eyebrow {
 body:not(.ui-bi):not([data-view='drift']) main .eyebrow,
 body:not(.ui-bi):not([data-view='drift']) #sheet .eyebrow { font-size: var(--type-caption); letter-spacing: 0.2em; text-transform: none; }
 body.v-depth-layered:not([data-view='drift']) .eyebrow.shelf-section::before,
-body:not([data-view='drift']) main > .eyebrow.skin-ruled::before,
 body:not([data-view='drift']) main section > h2.eyebrow::before {
   content: '';
   display: block;
@@ -4581,7 +4356,6 @@ body:not(.zen) #app > .chrome > button.chrome-search {
 body:not(.zen) #app > .chrome > button#back { color: var(--color-ink); }
 body:not(.zen) #app > .chrome > button.chrome-dojo { font: 600 var(--type-caption)/44px var(--font-ui); letter-spacing: 0.14em; text-transform: uppercase; }
 body:not(.zen):not(.ui-bi) #app > .chrome > button.chrome-dojo { font: 800 var(--type-control)/44px var(--font-display); letter-spacing: 0.08em; text-transform: none; }
-body:not(.zen) #app > .chrome > button.chrome-dojo[aria-current='page'] { color: var(--color-seal); }
 body:not(.zen) #app > .chrome > button.theme-seal {
   background: none;
   color: var(--color-seal);
@@ -4600,7 +4374,6 @@ body:not(.zen) #app > .chrome > button.theme-seal:hover { background: none; }
 body:not(.zen) #app > .chrome .lang-seg::before { inset: 9px 0; border-radius: var(--radius-control); background: transparent; box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-edge-strong); }
 body:not(.zen) #app > .chrome .lang-seg button { color: var(--color-muted); font: 500 var(--type-caption)/1 var(--font-ui); }
 body:not(.zen) #app > .chrome .lang-seg button::before { inset: 9px 0; border-radius: var(--radius-control); }
-body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true'] { color: var(--color-ink); font-weight: 700; }
 body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { background: var(--color-surface); box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-edge-strong), 0 1px 2px rgb(0 0 0 / 8%); }
 body:not(.zen) #app > .chrome > button#tray { color: var(--color-ink); font: 500 var(--type-label)/44px var(--font-data); font-variant-numeric: tabular-nums; letter-spacing: 0; }
 body:not(.zen):not(.ui-bi) #app > .chrome > button#tray { font: 800 var(--type-control)/44px var(--font-display); }
@@ -5794,7 +5567,6 @@ body[data-view='search'] #chrome-search { visibility: hidden; pointer-events: no
    (the drift's and the moments' are JS gates), so the blanket leaves them be. ---- */
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --motion-instant: 0ms;
     --motion-ma: 0ms;
     --motion-press: 0ms;
     --motion-quick: 0ms;
@@ -5808,7 +5580,6 @@ body[data-view='search'] #chrome-search { visibility: hidden; pointer-events: no
     --ease-enter: linear;
     --ease-exit: linear;
     --ease-ink: linear;
-    --ease-sheet: linear;
   }
   body *:where(:not(#drift-layer, #drift-layer *, .kp, .kp *, .samurai-effect, .samurai-effect *)),
   body *:where(:not(#drift-layer, #drift-layer *, .kp, .kp *, .samurai-effect, .samurai-effect *))::before,

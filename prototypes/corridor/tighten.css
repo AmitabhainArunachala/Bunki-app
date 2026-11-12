@@ -57,7 +57,7 @@
   .gs-button:not(.primary), .cd-btn:not(.cd-primary), .stroke-btn, .stroke-controls button,
   #bunki-reports-root .br-actions button, #bunki-reports-root .br-context-summary button,
   .skip-more, .skip-retry, .skip-search-opener, .skip-code-door, .reference-button,
-  .vocabulary-list-create, .vocabulary-list-form .chip, .vocabulary-list-dialog > .chip,
+  .vocabulary-list-create, .vocabulary-list-form .chip,
   .shelf-tools-toggle
 ) {
   min-height: var(--tc-h);
@@ -271,7 +271,7 @@ html[data-live-depth='1'] #sheet:has(> h2.headword):not(:has(.hero > .hero-glyph
   .mini-entry-chevron, .mini-sentence-chevron
 ) { font-weight: 600; }
 :is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(
-  .story-date, .story-fact, .learn-n, .learn-count, .reader-picture-caption, .kairo-mark,
+  .story-date, .story-fact, .learn-n, .learn-count,
   .dateline-date, .dateline-sep, .tally-short, .me-set-l, .view-title-en, .dw-r,
   .learn-due-u, .me-month-year, .tok-en-text, .mini-gloss, .mini-reading, .mini-kanji-readings, .section-title
 ) { font-weight: 400; }
@@ -566,14 +566,12 @@ html body:not(#\#):not(#\#) .save-place-act:focus-visible { outline: 2px solid v
 html body:not(#\#):not(#\#) #mini.is-sentence .save-place-line { display: none; }
 
 /* the long press's strip: Review stands first among the places; the placed row's acts are quiet words */
-html body:not(#\#):not(#\#) .seal-strip .seal-review { border-color: color-mix(in srgb, var(--color-accent) 60%, transparent); color: var(--color-accent); }
 html body:not(#\#):not(#\#) .seal-strip :is(.seal-place-show, .seal-place-move) { border-color: transparent; background: transparent; padding-inline: 8px; }
 html body:not(#\#):not(#\#) .seal-strip .seal-place-show { color: var(--color-accent); }
 html body:not(#\#):not(#\#) .seal-strip .seal-strip-lists > .seal-act[data-strip-action='remove'], html body:not(#\#):not(#\#) .seal-strip .seal-place-move { color: var(--color-ink-2); }
 html body:not(#\#):not(#\#) button.save-one .save-place-said { white-space: nowrap; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 html body:not(#\#):not(#\#) .seal-strip[data-mode='placed'] .seal-strip-status { flex: 1 0 100%; min-height: 0; margin: 2px 8px 0; color: var(--color-ink); font-weight: 600; }
 html body:not(#\#):not(#\#) .seal-strip[data-mode='choose'] .seal-strip-status, html body:not(#\#):not(#\#) .seal-strip[data-mode='move'] .seal-strip-status { flex: 1 0 100%; min-height: 0; margin: 2px 4px 2px; }
-html body:not(#\#):not(#\#) .seal-strip-form { align-items: center; }
 
 /* Saved today and a save's news: a row of the bottom bar itself (P2-1), its paper and its edge; its height is counted in
    the bar's (corridor.js observePrimaryDocks), so every control docked above the bar rises with it and nothing is under it */
@@ -796,7 +794,6 @@ html body:not(#\#):not(#\#) .saved-shelf-note { margin: 10px 0 0; font: 400 var(
 /* the one chooser's head: what it does on the left, the word's own acts (Copy) apart on the right (P2-4) */
 html body:not(#\#):not(#\#) .save-chooser-head { display: flex; align-items: center; gap: 8px; margin: 6px 0 4px; padding: 0 2px 0 8px; }
 html body:not(#\#):not(#\#) .save-chooser-head > .save-chooser-title { flex: 1 1 auto; min-width: 0; margin: 0; }
-html body:not(#\#):not(#\#) .save-chooser-acts { display: flex; flex: 0 0 auto; gap: 0; }
 html body:not(#\#):not(#\#) .save-chooser-act { min-height: 44px; padding: 0 10px; border: 0; border-radius: var(--radius-control); background: transparent; color: var(--color-ink-2); font: 500 var(--type-label) / 1 var(--font-ui); cursor: pointer; }
 html body:not(#\#):not(#\#) .save-chooser-act + .save-chooser-act::before { content: '·'; content: '·' / ''; margin: 0 8px 0 -4px; color: var(--color-rule); }
 html body:not(#\#):not(#\#) .save-chooser-act:hover { color: var(--color-ink); }

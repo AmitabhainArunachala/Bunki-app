@@ -1,5 +1,5 @@
-/** G3 word-entry seam — declarations moved verbatim from ../corridor.js (pure move, no body edits). */
-import { $, barSavedVerb, savedInParts, savedPlace, AI_DEVICE_STORE, AI_KEY_STORE, D, DEPTH_OWNED_S, DEPTH_RECALLED_S, DEPTH_RECALL_R, GESTURE, NODE_KIND, NOTE_TEXT, REPORT_RELAY_STORE, S, SAVE_PRESS_MS, SLIP_NODE, SLIP_OWN_MEANING, TODAY_SKY_MISS_DAYS, VOICE_LOCK, activateWordLadder, anchorBox, bi, biLabel, capturePending, closeSealStrip, commitCapture, commitStorePatch, deeperDepth, depthRank, depthRetrievability, dictionaryRowBySeq, diveFromSlip, el, encounterKey, ensureArchiveIndex, ensureArticle, entryKanaIndex, explicitWordSnapshot, finiteNumber, fitChromeKeep, glyphBox, go, heldWordCardNode, hideReaderToast, holdPageUnderDrawer, kanaReadingKey, kataToHira, metReadable, motionEase, motionMs, nonEmptyString, notYetReleased, noteEncounter, openPlainSaveMenu, openSealStrip, openVocabularyListPopover, openWordWeb, owns, pageCutAllowed, paintMiniPath, passage, placeFloating, plainRecord, recordWritable, relayServiceUrl, removeMini, render, revalidateTutorRequests, revealFloatingFocus, rubyNode, sameItem, sameWordIdentity, saveWord, savedAnswerFor, sealListRecency, setOwnRecordValue, shallowerDepth, sheetActionLine, sheetActionLineKeys, showMini, srsKey, suppressAssessmentCards, tx, validInstant, wordCardIdentity, wordNodeIdentity, wordStudied } from '../corridor.js';
+/** word-entry seam: split out of corridor.js (G3); now edited here directly. */
+import { $, barSavedVerb, savedInParts, savedPlace, AI_DEVICE_STORE, AI_KEY_STORE, D, DEPTH_OWNED_S, DEPTH_RECALLED_S, DEPTH_RECALL_R, GESTURE, NODE_KIND, NOTE_TEXT, REPORT_RELAY_STORE, S, SAVE_PRESS_MS, SLIP_NODE, SLIP_OWN_MEANING, TODAY_SKY_MISS_DAYS, VOICE_LOCK, activateWordLadder, anchorBox, bi, biLabel, capturePending, closeSealStrip, commitCapture, commitStorePatch, deeperDepth, depthRank, depthRetrievability, dictionaryRowBySeq, diveFromSlip, el, encounterKey, ensureArchiveIndex, ensureArticle, entryKanaIndex, explicitWordSnapshot, finiteNumber, fitChromeKeep, glyphBox, go, heldWordCardNode, hideReaderToast, holdPageUnderDrawer, kanaReadingKey, kataToHira, metReadable, motionEase, motionMs, nonEmptyString, notYetReleased, noteEncounter, openPlainSaveMenu, openSealStrip, openVocabularyListPopover, owns, pageCutAllowed, placeFloating, plainRecord, recordWritable, relayServiceUrl, removeMini, render, revalidateTutorRequests, revealFloatingFocus, rubyNode, sameItem, sameWordIdentity, savedAnswerFor, setOwnRecordValue, shallowerDepth, sheetActionLine, sheetActionLineKeys, showMini, srsKey, suppressAssessmentCards, tx, validInstant, wordCardIdentity, wordNodeIdentity, wordStudied } from '../corridor.js';
 import { encounterIdentity, readerQuickRecord } from './capture.mjs';
 import { listsByRecency } from './save-places.mjs';
 import { dictionaryAnsweredForm, inlineWordReading, lookup, partGloss, readyTokenReading, senseNameHeldText, senseRecord, teFormRecord } from './dictionary.mjs';
@@ -487,12 +487,6 @@ function travelSlip(card) {
   card.style.clipPath = cutTop || cutBottom ? `inset(${cutTop}px 0 ${cutBottom}px 0)` : '';
 }
 
-function noteSealListUse(name) {
-  const at = sealListRecency.indexOf(name);
-  if (at >= 0) sealListRecency.splice(at, 1);
-  sealListRecency.unshift(name);
-}
-
 function keptState(node) {
   if (node.t === 'word') return wordCaptureState(node);
   return S.taken.some((row) => row.t === node.t && row.id === node.id) ? 'taken' : 'take';
@@ -544,11 +538,6 @@ async function unsaveEverywhere(node) {
     return ok ? took : null;
   } catch { return null; }
   finally { capturePending.delete(key); }
-}
-
-function sealListOrder() {
-  // SAVE · his lists in the order he last put a word on them, from the record (no longer this session's memory alone)
-  return listsByRecency(S.lists, S.saveMemory);
 }
 
 function holdRing(x, y) {
@@ -1235,4 +1224,4 @@ function saveReportRelayLink(text) {
   return params.has('report-relay') ? saveReportRelay(params.get('report-relay') || '', params.get('report-key') || '') : '';
 }
 
-export { keptWordProjection, noteText, note, saveReaderPosition, sheetDoorKey, findSheetDoor, rememberSheet, wordRow, listeningField, standingSlip, blankSlip, slipHeadword, paintWordSave, saveOne, reopenSaveMenu, saveDrawerScroller, setSaveDrawerPush, keepMenuInCard, placeSaveMenu, wordSaveFacts, slipAllowed, miniKanjiWeb, keepFloatingBeside, slipScroller, travelSlip, noteSealListUse, keptState, listsWithout, unsaveEverywhere, sealListOrder, holdRing, sealTarget, flySeal, markStripMore, sealHostedWord, wordClipKey, wordClipFor, openSlip, savedRecordNoteDraft, keptStarWhy, sheetTakeLabel, listReading, listGloss, listToMarkdown, openWordWebLadder, takenContext, wordIdentityRelation, entryCueReading, wordDepth, noteSlipDepth, savedNodeRecord, keptItemNode, wordArchiveRef, sheetActionVisitHolds, drawSheetActionLine, toggleTaken, replaceWordCard, wordCaptureState, wordCaptureReadingMismatch, wordCaptureHeldText, wordCaptureNoteText, wordCaptureBasis, wordCaptureOpenLabel, renderWordCaptureNote, wordPresentationKey, saveAiDeviceConfig, foldEntryForms, saveReportRelay, saveReportRelayLink };
+export { keptWordProjection, noteText, note, saveReaderPosition, sheetDoorKey, findSheetDoor, rememberSheet, wordRow, listeningField, standingSlip, blankSlip, slipHeadword, paintWordSave, saveOne, reopenSaveMenu, saveDrawerScroller, setSaveDrawerPush, keepMenuInCard, placeSaveMenu, wordSaveFacts, slipAllowed, miniKanjiWeb, keepFloatingBeside, slipScroller, travelSlip, keptState, listsWithout, unsaveEverywhere, holdRing, sealTarget, flySeal, markStripMore, sealHostedWord, wordClipKey, wordClipFor, openSlip, savedRecordNoteDraft, keptStarWhy, sheetTakeLabel, listReading, listGloss, listToMarkdown, openWordWebLadder, takenContext, wordIdentityRelation, entryCueReading, wordDepth, noteSlipDepth, savedNodeRecord, keptItemNode, wordArchiveRef, sheetActionVisitHolds, drawSheetActionLine, toggleTaken, replaceWordCard, wordCaptureState, wordCaptureReadingMismatch, wordCaptureHeldText, wordCaptureNoteText, wordCaptureBasis, wordCaptureOpenLabel, renderWordCaptureNote, wordPresentationKey, saveAiDeviceConfig, foldEntryForms, saveReportRelay, saveReportRelayLink };

@@ -210,7 +210,7 @@ export function articleScene(article) {
 }
 
 /** A bounded excerpt of the article: quoted source, never instructions. */
-export function boundedExcerpt(text, max = 700) {
+function boundedExcerpt(text, max = 700) {
   const clean = String(text || '').replace(/\s+/gu, ' ').trim();
   if (clean.length <= max) return clean;
   const cut = clean.slice(0, max);
@@ -222,9 +222,9 @@ export function boundedExcerpt(text, max = 700) {
  * normalized or trimmed: it is the learner's exact draft (up to 4000 characters), and an overlong draft is refused
  * instead of silently cut. The transcript is the recent rows of THIS context, never another thread and never an
  * app/system notice pretending to be either speaker. */
-export const INQUIRY_QUESTION_LIMIT = 4000;
-export const INQUIRY_HISTORY_LIMIT = 8;
-export const INQUIRY_HISTORY_TEXT_LIMIT = 400;
+const INQUIRY_QUESTION_LIMIT = 4000;
+const INQUIRY_HISTORY_LIMIT = 8;
+const INQUIRY_HISTORY_TEXT_LIMIT = 400;
 
 export function inquiryScene(rawContext, { question, history = [] } = {}) {
   const context = parseTeacherContext(rawContext);
@@ -261,7 +261,7 @@ export function sceneById(id, articles = []) {
  * Up to six of his words, in the order and with the reasons of Today's sky (todaySkyPicks): missed lately, marked
  * not yet, looked up twice and not kept, due today, today's story, its kanji family. Each carries the reading he met
  * it in. An article scene adds up to four words he looked up in that article. Single kanji stars stay in the sky. */
-export const PLANT_KINDS = Object.freeze(['missed', 'unknown', 'looked', 'due', 'read', 'kin']);
+const PLANT_KINDS = Object.freeze(['missed', 'unknown', 'looked', 'due', 'read', 'kin']);
 const JA_WORD = /^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}ー々〆ヶ]+$/u;
 
 export function selectPlants({ picks = [], articleTaps = [], max = 6, articleMax = 4 } = {}) {
@@ -295,7 +295,7 @@ export function selectPlants({ picks = [], articleTaps = [], max = 6, articleMax
  * planted words with their readings, his notebook, the openings not to reuse, the learner's level, the mode. Nothing
  * else in his record is ever in it. */
 export const SENSEI_CODES = Object.freeze(['misread', 'sense-miss', 'particle-drop', 'prod-gap', 'collocation', 'form-miss']);
-export const TURN_MODES = Object.freeze(['open', 'talk', 'bridge', 'sayit', 'shadow']);
+const TURN_MODES = Object.freeze(['open', 'talk', 'bridge', 'sayit', 'shadow']);
 const REGISTER_TEXT = Object.freeze({
   keigo: 'Business-polite keigo, as on the phone with a client (お世話になっております、〜でございます).',
   polite: 'Polite です・ます style.',
@@ -590,7 +590,7 @@ export function splitSentences(text) {
 }
 
 /** Words whose reading a voice may choose wrongly: what is shown is what is said, so the voice is given kana. */
-export const TRAP_WORDS = Object.freeze(new Set(['年', '月', '日', '今日', '明日', '昨日', '一日', '同年', '何', '方', '間', '上手', '下手', '人気', '大人', '生物', '風車', '色紙', '工場', '市場', '一行', '最中', '大事', '心中']));
+const TRAP_WORDS = Object.freeze(new Set(['年', '月', '日', '今日', '明日', '昨日', '一日', '同年', '何', '方', '間', '上手', '下手', '人気', '大人', '生物', '風車', '色紙', '工場', '市場', '一行', '最中', '大事', '心中']));
 
 /** The text a voice is asked to say: each token as written, except a reading trap, which is given in its kana so the
  * voice cannot read it another way (年 in 令和8年 is said ねん). force(token) may widen the trap list. */

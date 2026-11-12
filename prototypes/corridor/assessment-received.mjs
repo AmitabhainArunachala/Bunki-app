@@ -166,7 +166,7 @@ function resolveTarget(subject, item, record, resolver) {
 const studied = (record, key) => !!record.srs?.[key] || (record.revlog || []).some((row) => row[1] === key);
 
 /** Pure recomputation against the latest owned record and genuine replica. */
-export function projectReceivedAssessments({ snapshot, resolveForm, resolveSubject, at }) {
+function projectReceivedAssessments({ snapshot, resolveForm, resolveSubject, at }) {
   const record = snapshot.documents.find((entry) => entry.collection === 'learner-record' && entry.id === 'current')?.value;
   const scope = scopeOf(snapshot.policy.binding), views = assessmentReceivedViews(snapshot);
   if (!record.assessmentReceived && !views.results.some((row) => row.headResults.length) &&

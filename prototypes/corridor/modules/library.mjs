@@ -1,9 +1,9 @@
-/** G3 library seam — declarations moved verbatim from ../corridor.js (pure move, no body edits). */
-import { D, MONTHS_EN, READER_KANA, READER_KANJI, S, bi, biLabel, controlsUnder, el, ensureArchiveIndex, ensureArticle, ensureReadingPositionModule, finiteNumber, frameFoot, glyphBox, go, kankenGradeLabel, kataToHira, layersMarkTop, openReferenceCollection, owns, passage, readHelpReadable, readerReadingFits, readerSummaryFor, render, renderReferenceConnections, renderTextSourceContextSelection, resolveReaderChoice, tx, updateReadingPlaces, withEn } from '../corridor.js';
+/** library seam: split out of corridor.js (G3); now edited here directly. */
+import { D, MONTHS_EN, READER_KANA, READER_KANJI, S, bi, biLabel, controlsUnder, el, ensureArchiveIndex, ensureArticle, ensureReadingPositionModule, finiteNumber, frameFoot, glyphBox, go, kankenGradeLabel, kataToHira, layersMarkTop, openReferenceCollection, owns, readHelpReadable, readerReadingFits, readerSummaryFor, render, renderReferenceConnections, renderTextSourceContextSelection, resolveReaderChoice, tx, updateReadingPlaces, withEn } from '../corridor.js';
 import { readerCaptureReason } from './capture.mjs';
 import { dictionaryAnsweredForm, dictionaryHomographChoices, dictionaryQueryToken, dictionaryRowsForForm, readerGlossMissText, readingAsksIndex, readingToken, tokenReading } from './dictionary.mjs';
 import { dayAge, dayKey } from './drift.mjs';
-import { markStripMore, note } from './word-entry.mjs';
+import { markStripMore } from './word-entry.mjs';
 import { classicalRadicalHits, joyoOnNote, kanjiFactsState, kanjiFactsStatus, kanjiReference, kanjiReferenceView, renderKanjiClassifications, storyLevel } from './worlds.mjs';
 
 function levelPhrase(grading) {
