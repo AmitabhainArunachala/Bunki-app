@@ -1,7 +1,7 @@
 /** word-entry seam: split out of corridor.js (G3); now edited here directly. */
 import { $, barSavedVerb, savedInParts, savedPlace, AI_DEVICE_STORE, AI_KEY_STORE, D, DEPTH_OWNED_S, DEPTH_RECALLED_S, DEPTH_RECALL_R, GESTURE, NODE_KIND, NOTE_TEXT, REPORT_RELAY_STORE, S, SAVE_PRESS_MS, SLIP_NODE, SLIP_OWN_MEANING, TODAY_SKY_MISS_DAYS, VOICE_LOCK, activateWordLadder, anchorBox, bi, biLabel, capturePending, closeSealStrip, commitCapture, commitStorePatch, deeperDepth, depthRank, depthRetrievability, dictionaryRowBySeq, diveFromSlip, el, encounterKey, ensureArchiveIndex, ensureArticle, entryKanaIndex, explicitWordSnapshot, finiteNumber, fitChromeKeep, glyphBox, go, heldWordCardNode, hideReaderToast, holdPageUnderDrawer, kanaReadingKey, kataToHira, metReadable, motionEase, motionMs, nonEmptyString, notYetReleased, noteEncounter, openPlainSaveMenu, openSealStrip, openVocabularyListPopover, owns, pageCutAllowed, placeFloating, plainRecord, recordWritable, relayServiceUrl, removeMini, render, revalidateTutorRequests, revealFloatingFocus, rubyNode, sameItem, sameWordIdentity, savedAnswerFor, setOwnRecordValue, shallowerDepth, sheetActionLine, sheetActionLineKeys, showMini, srsKey, suppressAssessmentCards, tx, validInstant, wordCardIdentity, wordNodeIdentity, wordStudied } from '../corridor.js';
 import { encounterIdentity, readerQuickRecord } from './capture.mjs';
-import './save-places.mjs';
+import { listsByRecency } from './save-places.mjs';
 import { dictionaryAnsweredForm, inlineWordReading, lookup, partGloss, readyTokenReading, senseNameHeldText, senseRecord, teFormRecord } from './dictionary.mjs';
 import { dayKey, depthIdentityMatch, depthIndex, notYetMarks, todaySkyWhy } from './drift.mjs';
 import { readRecordDrafts } from './learner.mjs';

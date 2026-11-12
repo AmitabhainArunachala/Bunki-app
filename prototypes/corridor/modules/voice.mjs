@@ -1,7 +1,7 @@
 /** voice seam: split out of corridor.js (G3); now edited here directly. */
 import { AI_MINE_MAX_ROWS, D, FRAMES_CAP, FRAMES_STORE, NARRATION_VOICES, S, SENSEI_OBS_CODES, SPEAK_JA, VOICE_LOCK, assertLearningSource, bi, buildListenRow, cancelExcerptPlayback, canonicalRecordJson, currentRecordNoteView, currentSentenceListeningCue, el, ensureSentenceListeningCatalog, invalidateRecordNoteViews, narrationVoiceName, openSpeakRoom, passage, performAssessmentReconciliation, plainRecord, protectStore, queueAssessmentWork, readAloud, readFrameRows, renderSentenceTokens, resolveTeacherSource, sheetActionLine, sheetActionLineKeys, speakAvailable, srsKey, stopPassageRead, transcriptTime, tx, uiIcon } from '../corridor.js';
 import { appendJapaneseLookup, lookup } from './dictionary.mjs';
-import './word-entry.mjs';
+import { note } from './word-entry.mjs';
 
 function recordSyncStatus(raw) {
   if (!plainRecord(raw) || !['unavailable', 'disconnected', 'connecting', 'ready', 'syncing', 'error'].includes(raw.state))
