@@ -1848,6 +1848,30 @@ describe('the choice of colours (chooseTone): from what is there, the look’s o
     expect(ear.plateOf([sky, before, own]).fill).toBe('rgba(246, 241, 230, 0.7)');
     expect(ear.plateOf([null, null, own])).toEqual({ fill: 'rgb(9, 9, 9)', line: null });
   });
+  it('a tone applied again with nothing changed writes nothing (F2: no write wakes the page’s rescan)', () => {
+    const props = new Map();
+    let writes = 0;
+    const target = {
+      style: {
+        getPropertyValue: (name) => props.get(name) ?? '',
+        setProperty: (name, value) => {
+          writes += 1;
+          props.set(name, value);
+        },
+      },
+    };
+    const paper = hex('#f7f3e6');
+    const t = {
+      ...chooseTone({ ground: paper, plate: paper, ink: hex('#4a453a'), reds: [hex('#a02a1e')] }),
+      fill: 'transparent',
+      line: null,
+    };
+    ear.applyTone(target, t);
+    const first = writes;
+    expect(first).toBeGreaterThan(0);
+    ear.applyTone(target, t);
+    expect(writes).toBe(first);
+  });
 });
 
 describe('the ear’s own time limit says the voice took too long, not that the server is busy (K3)', () => {

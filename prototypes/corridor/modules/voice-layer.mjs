@@ -1047,7 +1047,15 @@ export function installVoiceLayer(host) {
       }
     }, 60);
   };
-  new doc.defaultView.MutationObserver(rescan).observe(doc.body, { childList: true, subtree: true });
+  // the ear's own writes (its marks, their struck line, its bands: [data-ear-own]) are no reason to look at the page
+  // again; a rescan woken by them repaints the marks, whose writes would wake the next one
+  const earOwn = (node) => !!(node?.nodeType === 1 ? node : node?.parentElement)?.closest?.('[data-ear-own]');
+  const earsOnly = (change) => {
+    if (earOwn(change.target)) return true;
+    const nodes = [...change.addedNodes, ...change.removedNodes];
+    return nodes.length > 0 && nodes.every((node) => node.nodeType === 1 && node.hasAttribute('data-ear-own'));
+  };
+  new doc.defaultView.MutationObserver((changes) => { if (!changes.every(earsOnly)) rescan(); }).observe(doc.body, { childList: true, subtree: true });
   rescan();
   /* One language of states for every voice control (ear.mjs toneFor): when a listen mark, a card's speaker, the word
    * box's 音 or the play bar starts to speak or to wait, it takes the seal and the dimmed ink of the ground it really

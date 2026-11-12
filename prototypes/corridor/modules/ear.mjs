@@ -916,8 +916,9 @@ export function toneVars(t) {
     '--vt-wait': cssOf(t.waitInk), '--vt-wait-opacity': '1', '--vt-why-ink': cssOf(t.whyInk),
   };
 }
+/** Writes only what differs: a tone applied again with nothing changed touches no attribute. */
 export function applyTone(target, t) {
-  for (const [name, value] of Object.entries(toneVars(t))) target.style.setProperty(name, value);
+  for (const [name, value] of Object.entries(toneVars(t))) if (target.style.getPropertyValue(name) !== value) target.style.setProperty(name, value);
 }
 
 /* ------------------------------------------------------------------ the look */
@@ -1071,6 +1072,8 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
   });
 
   /* the mark */
+  const setAttr = (el, name, value) => { if (el.getAttribute(name) !== value) el.setAttribute(name, value); };
+  const setVar = (el, name, value) => { if (el.style.getPropertyValue(name) !== value) el.style.setProperty(name, value); };
   const marks = new Set();
   function makeMark() {
     const spot = doc.createElement('span');
@@ -1118,10 +1121,13 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
     const state = machine.display();
     const mark = spot.firstElementChild, why = spot.lastElementChild;
     const label = earLabel(state, machine.reason(), tx, plain);
-    mark.setAttribute('aria-label', label);
-    mark.title = state === 'off' ? tx('耳 — タップで次のタップを読む。長押しでずっと読む', 'Ear — tap: read what you tap next. Hold: keep reading') : label;
-    if (state === 'novoice') { why.textContent = noVoiceLine(machine.reason(), tx, plain); why.hidden = false; }
-    else { why.hidden = true; why.textContent = ''; }
+    // only what differs is written: a mark painted again with nothing changed touches no node, attribute or text (each
+    // write under body is a reason for the voice layer to look at the page again)
+    setAttr(mark, 'aria-label', label);
+    setAttr(mark, 'title', state === 'off' ? tx('耳 — タップで次のタップを読む。長押しでずっと読む', 'Ear — tap: read what you tap next. Hold: keep reading') : label);
+    const struck = state === 'novoice', line = struck ? noVoiceLine(machine.reason(), tx, plain) : '';
+    if (why.textContent !== line) why.textContent = line;
+    if (why.hidden === struck) why.hidden = !struck;
     // its colours, from the gate beside it and the ground it stands on (toneFor), each time it is drawn
     if (spot.isConnected && spot.getClientRects().length) {
       try { applyTone(spot, toneFor(mark, { neighbour: spot.previousElementSibling })); } catch { /* the styles' own fallbacks stand */ }
@@ -1151,10 +1157,10 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
   function placeWhy(spot, why) {
     const r = spot.getBoundingClientRect(), side = 16, room = view.innerWidth - 2 * side;
     const x = Math.max(side, Math.min(view.innerWidth - side - 1, r.left + r.width / 2));
-    why.style.setProperty('--ear-why-top', `${Math.round(belowBars(x, r.bottom) + 6)}px`);
-    why.style.setProperty('--ear-why-left', `${side}px`);
+    // its width does not hang on where it stands (as wide as its words, at most the screen less 16 px a side)
     const width = Math.min(room, why.getBoundingClientRect().width || room);
-    why.style.setProperty('--ear-why-left', `${Math.round(Math.max(side, Math.min(r.left, view.innerWidth - side - width)))}px`);
+    setVar(why, '--ear-why-top', `${Math.round(belowBars(x, r.bottom) + 6)}px`);
+    setVar(why, '--ear-why-left', `${Math.round(Math.max(side, Math.min(r.left, view.innerWidth - side - width)))}px`);
   }
   /** A mark beside the first screen's gate and beside the gate of every bar. */
   function mount() {
@@ -1171,8 +1177,9 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
   }
   function paint() {
     const state = machine.display();
-    root.dataset.ear = state;
-    if (machine.voice()) root.dataset.earVoice = ''; else delete root.dataset.earVoice;
+    if (root.dataset.ear !== state) root.dataset.ear = state;
+    const voiced = !!machine.voice();
+    if (voiced !== ('earVoice' in root.dataset)) { if (voiced) root.dataset.earVoice = ''; else delete root.dataset.earVoice; }
     for (const spot of marks) if (spot.isConnected) paintMark(spot);
     // the unit: the one being read carries the wash; otherwise the one under the Mac's pointer shows what a tap would read
     if (speakingUnit && machine.voice()) showUnit(speakingUnit, 'speaking');
