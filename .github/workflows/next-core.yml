@@ -23,7 +23,10 @@ jobs:
     # First run (42767964278): 17 minutes, of which 6 were the runner's package download; the
     # setup step took 15 to 148 seconds on twelve other runners at the same commit. With a usual
     # setup the job is about 13 minutes. The cap leaves room for a slow one.
-    timeout-minutes: 25
+    # 2026-11-13: run 43327018616 took 20 min 54 s on a runner about a quarter slower than usual
+    # (unit step 18 min 30 s against 14 min 56 s at the commit before; the corridor contract tests
+    # alone 396 s). Four minutes under a cap of 25 is a false red waiting to happen, so the cap is 35.
+    timeout-minutes: 35
     steps:
       - name: Name the build and report folders outside the checkout
         run: |
