@@ -94,6 +94,13 @@ class FakeAudio extends EventTarget {
     this.started.push(this._src);
     // a start is told a moment later, as the browser's own task
     if (was) setTimeout(() => this.dispatchEvent(new Event('play')), 0);
+    // a source that cannot be played: the start is rejected and, as in a browser, the element is left not paused
+    if (this.failLoad) {
+      const error = new Error('cannot play');
+      error.name = this.failLoad;
+      this.failLoad = false;
+      return Promise.reject(error);
+    }
     return Promise.resolve();
   }
   pause() {
@@ -229,6 +236,14 @@ describe('the one audio element: a pause from outside is told; the app’s own a
     const r = rig({ refusalIsPause: () => false });
     r.audio.refuse = true;
     await expect(r.player.play(r.clip(), 1)).rejects.toMatchObject({ name: 'NotAllowedError' });
+    expect(r.told).toEqual([]);
+  });
+  it('a clip whose source cannot play leaves the element still, and that is not a pause from outside (fix round 1)', async () => {
+    const r = rig({ refusalIsPause: () => true });
+    r.audio.failLoad = 'NotSupportedError';
+    await expect(r.player.play(r.clip(), 1)).rejects.toMatchObject({ name: 'NotSupportedError' });
+    expect(r.audio.paused).toBe(true);
+    await tick(5);
     expect(r.told).toEqual([]);
   });
   it('a clip that cannot play for another reason fails as before, for the article’s read too', async () => {
