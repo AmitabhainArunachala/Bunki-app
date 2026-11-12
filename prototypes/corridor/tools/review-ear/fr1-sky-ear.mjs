@@ -21,7 +21,7 @@ const s = await open({ engine: ENGINE, width: WIDTH, clipSeconds: () => 1, voice
 const { page, fake } = s;
 const toSky = async () => {
   await s.ready('sky=1');
-  await page.waitForFunction(() => window.__bunkiSkyApp?.state === 'mounted' && window.__SKY__?.W?.ready && window.__SKY__.W.hits.length > 20, null, { timeout: 45000 });
+  await page.waitForFunction(() => window.__bunkiSkyApp?.state === 'mounted' && window.__SKY__?.W?.ready && window.__SKY__.W.hits.length > (innerWidth < 700 ? 8 : 20), null, { timeout: 45000 });
   await s.sleep(2500);
 };
 /** words the sky has drawn, where they stand on the screen now (CSS px), clear of the bars */

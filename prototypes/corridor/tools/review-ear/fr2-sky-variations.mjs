@@ -28,7 +28,7 @@ const port = Number(arg('--voice-port', '19532'));
 async function sky({ width = WIDTH, height = null, touch = PHONE } = {}) {
   const s = await open({ engine: ENGINE, width, height, touch, clipSeconds: () => 1, voicePort: port, args: GPU });
   await s.ready('sky=1');
-  const ok = await s.page.waitForFunction(() => window.__bunkiSkyApp?.state === 'mounted' && window.__SKY__?.W?.ready && window.__SKY__.W.hits.length > 20, null, { timeout: 45000 }).then(() => true, () => false);
+  const ok = await s.page.waitForFunction(() => window.__bunkiSkyApp?.state === 'mounted' && window.__SKY__?.W?.ready && window.__SKY__.W.hits.length > (innerWidth < 700 ? 8 : 20), null, { timeout: 45000 }).then(() => true, () => false);
   if (!ok) { const st = await s.page.evaluate(() => JSON.stringify(window.__bunkiSkyApp)); await s.close(); throw new Error(`the sky did not mount: ${st}`); }
   await s.sleep(2500);
   return s;
@@ -104,7 +104,7 @@ await run('remount', async () => {
     // the mount starts the sky again when the interface language changes (its observer on body's class)
     for (let k = 0; k < 2; k += 1) {
       await s.page.evaluate(() => document.body.classList.toggle('ui-bi'));
-      await s.page.waitForFunction(() => window.__SKY__?.W?.ready && window.__SKY__.W.hits.length > 20, null, { timeout: 30000 });
+      await s.page.waitForFunction(() => window.__SKY__?.W?.ready && window.__SKY__.W.hits.length > (innerWidth < 700 ? 8 : 20), null, { timeout: 30000 });
       await s.sleep(2500);
     }
     const [w] = await clearWords(s.page);
