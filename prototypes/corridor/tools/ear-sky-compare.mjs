@@ -3,7 +3,8 @@
  * with what stands under a point (host.earWordAt); the engine decides the same thing for its own tap (sky-world.js
  * onUp: pick(x, y, a finger's 14 px or a mouse's 5), handed to W.web.tap). This check taps the sky at sampled points
  * and, at the moment the engine hands its pick to W.web.tap, asks the mount about the same point: the two must name the
- * same thing (a word, a grammar sign, an item of an opened family) or both nothing.
+ * same thing (a word, a grammar sign, an item of an opened family) or both nothing. A sentence the engine prints under
+ * an opened word or pattern is the ear's own (2026-11-12): where the mount names one, the engine must pick nothing.
  *
  * How the engine's own choice is seen: W.web.tap is replaced for the run by a spy that writes down the engine's pick
  * and the mount's answer, in the same frame, and does not act on the pick, so the sky's state stays for the next sample
@@ -65,7 +66,7 @@ if (app.state !== 'mounted') {
     W.web.tap = (h, e) => {
       let hook = null, threw = '';
       try { hook = host.earWordAt(e.clientX, e.clientY, { pointer: e.pointerType }); } catch (error) { threw = String(error && error.message || error).slice(0, 120); }
-      window.__cmp.log.push({ type: e.type, x: e.clientX, y: e.clientY, pointer: e.pointerType, engine: idOf(h), hook: hook ? hook.id : null, said: hook ? hook.text : null, threw });
+      window.__cmp.log.push({ type: e.type, x: e.clientX, y: e.clientY, pointer: e.pointerType, engine: idOf(h), hook: hook ? hook.id : null, said: hook ? hook.text : null, sentence: !!hook && hook.control === false, threw });
     };
   });
 }
@@ -111,20 +112,23 @@ async function tapAll(list) {
 }
 function judge(state, results, { needNamed = 5 } = {}) {
   const problems = [], seen = results.filter((r) => r.got.length);
-  let same = 0, named = 0;
+  let same = 0, named = 0, sentences = 0;
   const wrong = [];
   for (const r of seen) {
     const g = r.got[r.got.length - 1];
     if (g.threw) { wrong.push(`${r.kind} ${r.x},${r.y}: the mount threw (${g.threw})`); continue; }
+    // a sentence printed under an opened word or pattern is the ear's own (sky/mount.mjs sentenceAt): the engine picks
+    // nothing there (its tap lets the family go); the ear, armed or held on, says the sentence
+    if (g.sentence) { if (g.engine === null) sentences += 1; else wrong.push(`${r.kind} ${r.x},${r.y}: engine ${g.engine}, mount the sentence "${String(g.said).slice(0, 20)}"`); continue; }
     if (g.engine === g.hook) { same += 1; if (g.engine) named += 1; } else wrong.push(`${r.kind} ${r.x},${r.y}: engine ${g.engine}, mount ${g.hook}`);
   }
   if (!seen.length) problems.push('no tap reached the engine');
   if (wrong.length) problems.push(`${wrong.length} differ: ${wrong.slice(0, 6).join('; ')}`);
   if (named < needNamed) problems.push(`only ${named} points named something (want ${needNamed} or more): the comparison would be empty`);
   const kinds = {}; for (const r of seen) kinds[r.kind] = (kinds[r.kind] || 0) + 1;
-  detail[state] = { sampled: results.length, reachedEngine: seen.length, same, named, differ: wrong.length, kinds, wrong };
+  detail[state] = { sampled: results.length, reachedEngine: seen.length, same, named, sentences, differ: wrong.length, kinds, wrong };
   record(`${state}: the mount names what the engine picks, at every sampled point`, problems,
-    `${results.length} points, ${seen.length} reached the engine's tap, ${same} the same (${named} naming something, ${same - named} nothing), ${wrong.length} differ; ${JSON.stringify(kinds)}`);
+    `${results.length} points, ${seen.length} reached the engine's tap, ${same} the same (${named} naming something, ${same - named} nothing), ${sentences} on a sentence the engine does not pick, ${wrong.length} differ; ${JSON.stringify(kinds)}`);
 }
 const settle = (ms) => s.sleep(ms);
 const shot = (name) => page.screenshot({ path: `${OUT}/ear-sky-compare-${tag}-${name}.png` }).catch(() => {});
