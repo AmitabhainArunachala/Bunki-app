@@ -65,10 +65,11 @@
   const FS_SKY = `#version 300 es
   precision highp float;
   in vec2 vUv; out vec4 o;
-  uniform vec2 uRes, uPP; uniform float uT, uF, uMode, uDim, uOver;
+  uniform vec2 uRes, uPP; uniform float uT, uF, uMode, uDim, uOver, uStereo, uFs, uZen;   // (uStereo, uFs: the order of the stars sees through a wide-angle eye; 0 in every other order, where nothing below changes)
   uniform vec3 uFwd, uRight, uUp, uEye;
   uniform vec3 uC0, uC1, uC2, uC3, uMistA, uMistM, uMistB, uGlow;
   uniform vec3 uMoon, uMoonCol; uniform float uMoonR;
+  uniform sampler2D uRad; uniform vec4 uPl[16]; uniform float uPk[16]; uniform vec4 uGl[4]; uniform vec4 uGc[4];   // the radical order: a pool of light for each family in view (centre and radii in px, strength), and up to four radicals written in that light (centre, size, strength; cell of the glyph sheet and its blur)
   ${NOISE}
   ${NOISE3}
   const float LY[6] = float[6](-300., -400., -510., -640., -790., -960.);
@@ -95,14 +96,16 @@
   void main(){
     vec2 px = vec2(vUv.x*uRes.x, (1.-vUv.y)*uRes.y);
     vec3 d = normalize(uFwd*uF + uRight*(px.x-uPP.x) + uUp*(uPP.y-px.y));
+    if (uStereo > 0.) { vec2 q = vec2(px.x-uPP.x, uPP.y-px.y)/(2.*uFs); d = normalize(mix(d, normalize(uFwd*(1.-dot(q,q)) + (uRight*q.x + uUp*q.y)*2.), uStereo)); }   // the stars' eye: equal angles keep equal shapes out to the edge of a very wide view
     float e = d.y, near = (1. - smoothstep(0., 0.42, uOver))*(1. - 0.72*smoothstep(-0.10, -0.55, uFwd.y));   // looking down, the haze thins and the sea shows its depth; rising, it is gone before the eye is high
+    near *= 1. - 0.4*uZen;   // (the farthest view of the stars: the pale haze round the ring is thinner, so the rim of cloud reads as cloud and not as a lamp; 0 in every other order)
     float hz = smoothstep(-0.279, -0.369, e)*near;
     vec3 hzc = ramp(pow(smoothstep(-0.279, -0.449, e), 0.85));
     if (uMode > 0.5) {
       float fa = smoothstep(-0.305, -0.385, e)*near;
       vec3 c = hzc*fa; float al = fa;
       for (int i=3;i<6;i++){ vec4 m = layer(d, i); m.a *= 1.-smoothstep(0., 0.35, uOver); c = c*(1.-m.a) + m.rgb*m.a; al = al*(1.-m.a) + m.a; }
-      o = vec4(c*(1. - 0.55*uDim), al); return;
+      o = vec4(c*(1. - 0.55*uDim), al)*(1. - uZen*0.97*smoothstep(-0.22, -0.38, e)); return;   // (uZen: in the farthest view of the stars the near haze, too, is only a rim round the horizon)
     }
     float s = e + 0.020*(vn3(d*2.3 + 3.7) - .5);
     vec3 c = mix(uC1, uC0, smoothstep(0.10, 0.34, s));
@@ -117,6 +120,12 @@
     float up = 1. - 0.75*smoothstep(-0.185, -0.31, e);
     c += uC3*(0.74*smoothstep(0.38, 0.86, cl)*river + 0.22*smoothstep(0.52, 0.92, cl))*up + uMistA*0.07*river*smoothstep(0.3, 0.8, w)*up;
     c *= 1. - 0.34*smoothstep(0.56, 0.22, cl)*(1.-river)*smoothstep(-0.37, 0.13, e);
+    /* light and mist carry the families (the radical order only; all strengths are zero otherwise): each family's pool of light is the sky's own lighter blue,
+       grained by the same cloud as the river of heaven, and the radical of the nearest families is written in it, soft-edged: cloud, never a sign */
+    float fam = 0., gly = 0.;
+    for (int i=0;i<16;i++){ if (uPk[i] > 0.) { vec2 q = (px - uPl[i].xy)/uPl[i].zw; fam += uPk[i]*exp(-1.5*dot(q, q)); } }
+    for (int i=0;i<4;i++){ if (uGl[i].w > 0.) { vec2 q = (px - uGl[i].xy)/uGl[i].z; vec2 aq = abs(q); if (aq.x < 0.5 && aq.y < 0.5) gly += uGl[i].w*smoothstep(0.5, 0.36, max(aq.x, aq.y))*textureLod(uRad, uGc[i].xy + (q + 0.5)*uGc[i].z, uGc[i].w).r; } }
+    c += ((uC3*0.62 + uMistA*0.07)*fam*(0.56 + 0.44*smoothstep(0.30, 0.80, cl)) + mix(uC3*1.35, uMistA, 0.30)*gly*(0.62 + 0.38*smoothstep(0.25, 0.75, w)))*up;
     float st = vn3(vec3(d.x*3.5, e*130., d.z*3.5)) - .5;
     c *= 1. + 0.085*st*smoothstep(-0.26, 0.26, e);
     /* the moon: its light is a graded halo printed into the sky (the disc itself is cut at full resolution, with the stars) */
@@ -125,11 +134,13 @@
     c += (uMoonCol*0.26*exp(-pow(mo/0.85, 1.25)) + mix(uMoonCol, uC3*1.35, 0.78)*(0.17*exp(-pow(mo/3.1, 1.15)) + 0.045*exp(-md*md/0.22)))*up*(1.-uOver);   // bokashi: cream close to the disc, then the sky's own lighter blue
     c = mix(c, max(c*0.42, uC2*0.44*smoothstep(0.10, 0.55, e)), uDim*smoothstep(-0.32, -0.117, e));   // high up, where the sky is darkest, an open pattern keeps the look's own blue under it
     c += uGlow*0.10*smoothstep(-0.13, -0.30, e)*(1.-hz);
-    c = mix(c, mix(uC1, uC0, 0.35 + 0.35*uOver), smoothstep(mix(-0.40, -0.16, uOver), mix(-0.92, -0.50, uOver), e)*mix(0.55, 0.97, uOver));   // under the ring the deep sky goes on
+    float ovz = max(uOver, uZen);   // (uZen: the farthest view of the stars, straight up; there too the sea is only a rim round the horizon. 0 in every other order)
+    c = mix(c, mix(uC1, uC0, 0.35 + 0.35*ovz), smoothstep(mix(-0.40, -0.16, ovz), mix(-0.92, -0.50, ovz), e)*mix(0.55, 0.97, ovz));   // under the ring the deep sky goes on
     for (int i=0;i<3;i++){ vec4 m = layer(d, i); c = mix(c, m.rgb, m.a*(1.-0.5*uDim)); }
     c = mix(c, hzc, hz);
     for (int i=3;i<6;i++){ vec4 m = layer(d, i); c = mix(c, m.rgb, m.a); }
     c *= 1. - 0.55*uDim*smoothstep(-0.06, -0.26, e);   // while a word is open the sea steps back with the sky
+    if (uZen > 0.) c = mix(c, mix(mix(uC2, uC1, 0.35), uC0, smoothstep(-0.24, -0.92, e))*(1. + 0.10*(cl - 0.5)), uZen*0.96*smoothstep(-0.22, -0.38, e));   // the farthest view of the stars: the sea of clouds is a narrow rim round the horizon; beyond it the sky's own indigo goes on, deepening outward
     o = vec4(c, 1.);
   }`;
 
@@ -138,7 +149,8 @@
   const FS_COMP = `#version 300 es
   precision highp float;
   in vec2 vUv; out vec4 o;
-  uniform sampler2D uSky; uniform vec2 uRes, uPP; uniform float uT, uF, uDim, uDpr, uOver; uniform vec3 uStar, uFwd, uRight, uUp, uMoon, uMoonCol, uBand; uniform float uMoonR; uniform vec2 uTilt; uniform float uN[6];
+  uniform sampler2D uSky; uniform vec2 uRes, uPP; uniform float uT, uF, uDim, uDpr, uOver, uStereo, uFs, uStarK, uMoonH, uZen; uniform vec3 uStar, uFwd, uRight, uUp, uMoon, uMoonCol, uBand; uniform float uMoonR; uniform vec2 uTilt; uniform float uN[6];
+  float gF;   // the focal length in force (uF; in the order of the stars uFs)
   ${NOISE}
   vec3 faceDir(int f, vec2 uv){ return f==0 ? vec3(1., uv.y, -uv.x) : f==1 ? vec3(-1., uv.y, uv.x) : f==2 ? vec3(uv.x, 1., -uv.y) : f==3 ? vec3(uv.x, -1., uv.y) : f==4 ? vec3(uv.x, uv.y, 1.) : vec3(-uv.x, uv.y, -1.); }
   float stars(vec3 d, float N, float seed, float dens, float t){
@@ -151,22 +163,23 @@
     vec2 c = (g + 0.18 + 0.64*h22(sd))/N*2.-1.;
     vec3 s = normalize(faceDir(f, c));
     float big = pow(h12(sd+9.2), 7.), r = mix(0.60, 2.5, big)*uDpr;
-    float dist = length(d - s)*uF;
+    float dist = length(d - s)*gF;
     float tw = 0.72 + 0.28*sin(t*(0.25+h12(sd+5.)*0.8) + 6.283*h12(sd+7.) + dot(uTilt, g)*0.9);
     return has*smoothstep(r, r*0.30, dist)*tw*(0.30+0.70*h12(sd+11.));
   }
   void main(){
     vec3 c = texture(uSky, vUv).rgb;
     vec2 px = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y);
-    vec3 d = normalize(uFwd*uF + uRight*(px.x-uPP.x) + uUp*(uPP.y-px.y));
+    vec3 d = normalize(uFwd*uF + uRight*(px.x-uPP.x) + uUp*(uPP.y-px.y)); gF = uF;
+    if (uStereo > 0.) { vec2 q = vec2(px.x-uPP.x, uPP.y-px.y)/(2.*uFs); d = normalize(mix(d, normalize(uFwd*(1.-dot(q,q)) + (uRight*q.x + uUp*q.y)*2.), uStereo)); gF = mix(uF, uFs*2./(1. + max(dot(d, uFwd), -0.6)), uStereo); }   // (the wide eye magnifies toward its edge: the measure of a pixel is taken where the star is, so a star is round and small out to the rim and never a flake)
     float e = d.y, az = atan(d.x, d.z);
     float river = exp(-pow((e - (0.135 + 0.075*sin(2.*az + 0.6)))/0.094, 2.));
-    float fade = 1. - smoothstep(-0.207, -0.294, e);
+    float fade = max(1. - smoothstep(-0.207, -0.294, e), 0.5*uZen*smoothstep(-0.25, -0.42, e));   // (uZen: in the farthest view of the stars the night, with its dust of stars, goes on beyond the rim of cloud)
     float s = stars(d, uN[0], 1., 0.55, uT)*0.50 + stars(d, uN[1], 2., 0.58, uT)*0.82 + stars(d, uN[2], 3., 0.66, uT)*1.15;
     s += (stars(d, uN[3], 4., 0.70, uT)*0.46 + stars(d, uN[4], 5., 0.6, uT)*0.62 + stars(d, uN[5], 6., 0.5, uT)*0.22)*river;
     /* the moon: a disc of the paper's own light, cut clean like a block, with faint seas and a strip of mist across it */
-    float md = length(d - uMoon), aa = 1.5/uF, disc = (1. - smoothstep(uMoonR - aa, uMoonR + aa, md))*(1.-uOver);
-    c += uStar*s*fade*(1.-0.55*uDim)*(1.-disc);
+    float md = length(d - uMoon), aa = 1.5/gF, disc = (1. - smoothstep(uMoonR - aa, uMoonR + aa, md))*(1.-uOver);
+    c += uStar*s*fade*(1.-0.55*uDim)*(1.-disc)*(uStarK + 0.7*uZen*smoothstep(0.24, 0.50, e));   // (uStarK: 1; in the order of the stars the spatter steps back, because there the stars are the kanji. uZen: in their farthest view the zenith, inside the ring of constellations, keeps the sky's own stars: it is the deep sky, not a hole)
     if (disc > 0.) {
       vec3 mr = normalize(cross(vec3(0.,1.,0.), uMoon)), mu = cross(uMoon, mr);
       vec2 ml = vec2(dot(d, mr), dot(d, mu))/uMoonR;
@@ -177,7 +190,7 @@
       float b1 = (1. - smoothstep(0.055, 0.135, abs(ml.y + 0.20 - wob)))*smoothstep(-1.15, -0.55, ml.x - 0.5*vn(vec2(uT*0.008, 1.3)))*(1. - smoothstep(0.30, 0.95, ml.x));
       float b2 = (1. - smoothstep(0.035, 0.105, abs(ml.y + 0.47 + wob*0.7)))*smoothstep(-0.45, 0.10, ml.x)*(1. - smoothstep(0.75, 1.20, ml.x + 0.3*vn(vec2(uT*0.006, 8.1))));
       float strip = max(b1, b2);
-      c = mix(c, mix(mc, uBand, 0.80*strip), disc*(1. - 0.93*uDim));   // while a word is open the moon steps back: one thing at a time
+      c = mix(c, mix(mc, uBand, 0.80*strip), disc*(1. - 0.93*uDim)*(1. - 0.8*uMoonH));   // while a word is open the moon steps back: one thing at a time (uMoonH: so it does, in the order of the stars, while a family stands in front of it; 0 in every other order)
     }
     o = vec4(c, 1.);
   }`;
@@ -198,10 +211,11 @@
   const FS_LAB = `#version 300 es
   precision highp float;
   in vec2 vUv; in vec4 vCol; in vec4 vMark; in vec4 vMisc; in vec4 vBox; out vec4 o;
-  uniform sampler2D uBase, uNearA, uNearB, uGhost;
-  uniform vec3 uMoon, uInk, uFwd, uRight, uUp; uniform vec2 uPP; uniform float uMoonR, uF, uResH, uMoonOn;
+  uniform sampler2D uBase, uNearA, uNearB, uGhost, uStarT, uSkyT;   // (uSkyT: the printed sky of this frame, for the margin of sky round what is written among the stars)
+  uniform vec3 uMoon, uInk, uFwd, uRight, uUp; uniform vec2 uPP; uniform float uMoonR, uF, uResH, uMoonOn, uStereo, uFs;
   uniform vec4 uBx[6]; uniform float uBr[6]; uniform float uBk[6]; uniform vec2 uEdgeM; uniform float uResW;
   vec2 samp(vec2 uv, float lod){
+    if (vMisc.y > 4.5) return vec2(textureLod(uStarT, uv, lod).r, 0.);   // the sheet of every kanji, for the order of the stars
     if (vMisc.y < 0.5) return vec2(textureLod(uBase, uv, lod).r, 0.);
     if (vMisc.y < 1.5) return textureLod(uNearA, uv, lod).rg;
     if (vMisc.y < 2.5) return textureLod(uNearB, uv, lod).rg;
@@ -210,18 +224,23 @@
   void main(){
     vec2 fp = vec2(gl_FragCoord.x, uResH - gl_FragCoord.y);
     vec3 dd = normalize(uFwd*uF + uRight*(fp.x - uPP.x) + uUp*(uPP.y - fp.y));
+    if (uStereo > 0.) { vec2 sq = vec2(fp.x - uPP.x, uPP.y - fp.y)/(2.*uFs); dd = normalize(mix(dd, normalize(uFwd*(1.-dot(sq,sq)) + (uRight*sq.x + uUp*sq.y)*2.), uStereo)); }
     float onMoon = (1. - smoothstep(uMoonR - 2./uF, uMoonR + 2./uF, length(dd - uMoon)))*uMoonOn;   // over the moon, light writing turns to ink and dark shade steps aside
     float isLight = step(0.30, dot(vCol.rgb, vec3(0.299, 0.587, 0.114)));
     float msk = smoothstep(0., uEdgeM.x, fp.x)*smoothstep(0., uEdgeM.y, uResW - fp.x);   // the soft margins of the view and the room round each button: writing slides under them letter by letter, a whole word never turns grey
     for (int i = 0; i < 6; i++) { if (uBr[i] > 0.) { vec2 q = abs(fp - uBx[i].xy) - uBx[i].zw; msk *= mix(1., smoothstep(0., uBr[i], length(max(q, 0.)) + min(max(q.x, q.y), 0.)), uBk[i]); } }
     vec3 colr = mix(vCol.rgb, uInk, onMoon*isLight); float keep = 1. - onMoon*(1. - isLight);
-    if (vMisc.y > 3.5) { float q = length(vUv - 0.5)*2.; float a = ((1. - smoothstep(0.16, 0.46, q)) + 0.38*pow(1. - min(q, 1.), 2.2))*vCol.a*keep; a = min(a, 1.)*msk; o = vec4(colr*a, a); return; }
+    if (vMisc.y > 3.5 && vMisc.y < 4.5) { float q = length(vUv - 0.5)*2.; float a = ((1. - smoothstep(0.16, 0.46, q)) + 0.38*pow(1. - min(q, 1.), 2.2))*vCol.a*keep; a = min(a, 1.)*msk; o = vec4(colr*a, a); return; }
     float lod = max(vMisc.x, 0.);
     vec2 px = vMisc.zw*exp2(lod);
     vec2 lo = min(vBox.xy, vBox.zw) + px*0.5, hi = max(vBox.xy, vBox.zw) - px*0.5;
     vec2 uv = clamp(vUv, lo, hi);
     vec2 s = samp(uv, lod);
     if (lod > 0.8) { vec2 r = px*0.9; s = s*0.36 + 0.16*(samp(clamp(uv+r, lo, hi), lod) + samp(clamp(uv-r, lo, hi), lod) + samp(clamp(uv+vec2(r.x,-r.y), lo, hi), lod) + samp(clamp(uv+vec2(-r.x,r.y), lo, hi), lod)); }
+    /* a margin of sky (the order of the stars only; vMark.a is -1 for it and never negative otherwise): the glyph, widened by a few px, painted in the sky's own colour at this place.
+       It lies over the lines and under the writing, so a line that meets a character passes behind it */
+    if (vMark.a < -0.5) { vec2 bq = abs((vUv - vBox.xy)/(vBox.zw - vBox.xy) - 0.5) - vMark.xy;   // (vMark.xy: half the glyph's own box, as a part of the rectangle)
+      float kc = max(smoothstep(0.03, 0.20, max(s.r, s.g)), step(0.001, vMark.x)*(1. - smoothstep(-0.035, 0.035, max(bq.x, bq.y))))*vCol.a*msk; o = vec4(texture(uSkyT, vec2(gl_FragCoord.x/uResW, gl_FragCoord.y/uResH)).rgb*kc, kc); return; }
     float a = s.r*vCol.a*keep, m = s.g*vMark.a;
     o = vec4(colr*a*(1.-m) + mix(vMark.rgb, uInk, onMoon)*m, a + m - a*m)*msk;
   }`;
@@ -233,6 +252,19 @@
   const FS_LINE = `#version 300 es
   precision highp float; in vec4 vCol; in vec3 vS; out vec4 o;
   void main(){ float e = 1. - smoothstep(0.45, 1., abs(vS.x)); float tip = 1. - smoothstep(vS.z-0.06, vS.z, vS.y); float a = vCol.a*e*tip; o = vec4(vCol.rgb*a, a); }`;
+
+  /* The dust of the stars' order: every word that is not written is one round soft point of light, and all of them are
+   * one draw. aP = centre (device px), diameter (device px), glint (0, or how strongly a fine four-rayed glint is laid over it: his own words). */
+  const VS_PT = `#version 300 es
+  in vec4 aP; in vec4 aCol; uniform vec2 uRes; out vec4 vCol; out float vG;
+  void main(){ vCol = aCol; vG = aP.w; gl_Position = vec4(aP.x/uRes.x*2.-1., 1.-aP.y/uRes.y*2., 0., 1.); gl_PointSize = aP.z; }`;
+  const FS_PT = `#version 300 es
+  precision highp float; in vec4 vCol; in float vG; out vec4 o;
+  void main(){ vec2 c = (gl_PointCoord - 0.5)*2.; float q = length(c);
+    float a = (1. - smoothstep(0.16, 0.46, q)) + 0.38*pow(1. - min(q, 1.), 2.2);
+    if (vG > 0.) { a *= 1. - smoothstep(0.10, 0.30, q) + 0.25*(1. - smoothstep(0.2, 0.6, q)); vec2 b = abs(c); float ray = max((1. - smoothstep(0., 0.085, b.y))*pow(1. - min(b.x, 1.), 2.4), (1. - smoothstep(0., 0.085, b.x))*pow(1. - min(b.y, 1.), 2.4)); a = max(a, ray*vG); }
+    if (vG < 0.) a = exp(-5.*q*q);   // (a wide soft glow: the milk of the river of kana)
+    a = min(a, 1.)*vCol.a*(1. - smoothstep(0.92, 1., q)); o = vec4(vCol.rgb*a, a); }`;
 
   function program(gl, vs, fs) {
     const mk = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error('sky shader: ' + gl.getShaderInfoLog(s)); return s; };
@@ -263,6 +295,8 @@
       cam: { x: 0, xTotal: 0, y: 0, z: 0 }, camTo: { x: 0, y: 0, z: 0 }, sx: { x: 0, v: 0 }, sy: { x: 0, v: 0 }, sz: { x: 0, v: 0 },
       par: { x: 0, y: 0 }, parS: { x: { x: 0, v: 0 }, y: { x: 0, v: 0 } }, panV: { x: 0, y: 0 },
       drift: 5.4, driftK: { x: 1, v: 0 }, dim: { x: 0, v: 0 },
+      stereo: 0, Fz: 1000, starK: 1,   // the order of the stars: how far its wide-angle eye is in force (0..1), that eye's focal length, and how bright the spatter of unnamed stars stays
+      pools: new Float32Array(64), poolK: new Float32Array(16), glyphs: new Float32Array(16), glyphC: new Float32Array(16), radTex: null,   // the light of the radical families (filled by the world each frame; all zero in the other orders)
       pointer: { x: -1, y: -1, down: false, moved: 0, id: -1, sx: 0, sy: 0, lx: 0, ly: 0, lt: 0, inside: false },
     };
     const setLook = (name) => { S.look = LOOKS[name] ? name : 'hokusai'; const L = LOOKS[S.look]; S.pal = { c: L.c.map(hex), mistA: hex(L.mistA), mistM: hex(L.mistM), mistB: hex(L.mistB), glow: hex(L.glow), star: hex(L.star), text: hex(L.text), textFar: hex(L.textFar), mark: hex(L.mark), cord: hex(L.cord), line: hex(L.line), ghost: hex(L.ghost), ink: hex(L.ink), paper: hex(L.paper), moon: hex(L.moon || L.glow) }; { const k = S.pal.ink; S.pal.moonInk = 0.2126 * k[0] + 0.7152 * k[1] + 0.0722 * k[2] > 0.5 ? S.pal.c[1] : k; }   // what is written across the moon must be dark: a look whose ink is light (dark paper) writes there in its deep sky
@@ -271,7 +305,7 @@
     setLook(S.look);
 
     /* programs and static geometry */
-    const P = { sky: program(gl, VS_FULL, FS_SKY), comp: program(gl, VS_FULL, FS_COMP), tex: program(gl, VS_FULL, FS_TEX), lab: program(gl, VS_LAB, FS_LAB), line: program(gl, VS_LINE, FS_LINE) };
+    const P = { sky: program(gl, VS_FULL, FS_SKY), comp: program(gl, VS_FULL, FS_COMP), tex: program(gl, VS_FULL, FS_TEX), lab: program(gl, VS_LAB, FS_LAB), line: program(gl, VS_LINE, FS_LINE), pt: program(gl, VS_PT, FS_PT) };
     const vaoFull = gl.createVertexArray(); gl.bindVertexArray(vaoFull);
     const bFull = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, bFull); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
     for (const pr of [P.sky, P.comp, P.tex]) { const loc = gl.getAttribLocation(pr.p, 'aP'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0); }
@@ -279,11 +313,12 @@
 
     const mkTex = (w, h, internal, format, type, filter, wrapMode) => { const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t); gl.texImage2D(gl.TEXTURE_2D, 0, internal, w, h, 0, format, type, null); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapMode || gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapMode || gl.CLAMP_TO_EDGE); return t; };
     const fbo = { sky: null, mist: null, tSky: null, tMist: null, w: 0, h: 0 };
+    const tNone = mkTex(1, 1, gl.R8, gl.RED, gl.UNSIGNED_BYTE, gl.LINEAR), NOGLYPH = new Float32Array(16);   // what the sky reads until the sheet of radicals exists
     function sizeTargets(w, h) {
       if (fbo.w === w && fbo.h === h) return; fbo.w = w; fbo.h = h;
       for (const k of ['tSky', 'tMist']) if (fbo[k]) gl.deleteTexture(fbo[k]);
       for (const k of ['sky', 'mist']) if (fbo[k]) gl.deleteFramebuffer(fbo[k]);
-      fbo.tSky = mkTex(w, h, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, gl.LINEAR); fbo.tMist = mkTex(w, h, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, gl.LINEAR);
+      fbo.tSky = mkTex(w, h, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, gl.LINEAR); fbo.tMist = mkTex(w, h, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, gl.LINEAR); S.skyTex = fbo.tSky;
       fbo.sky = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, fbo.sky); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, fbo.tSky, 0);
       fbo.mist = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, fbo.mist); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, fbo.tMist, 0);
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -319,10 +354,11 @@
     function drawSky(mode, target) {
       gl.bindFramebuffer(gl.FRAMEBUFFER, target); gl.viewport(0, 0, fbo.w, fbo.h); gl.disable(gl.BLEND);
       const { p, u } = P.sky; gl.useProgram(p); const c = S.pal.c, v = S.view || IDENT;
-      gl.uniform2f(u.uRes, fbo.w, fbo.h); gl.uniform2f(u.uPP, S.px, S.py); gl.uniform1f(u.uF, S.F); gl.uniform1f(u.uT, S.t); gl.uniform1f(u.uMode, mode); gl.uniform1f(u.uDim, S.dim.x); gl.uniform1f(u.uOver, v.over);
+      gl.uniform2f(u.uRes, fbo.w, fbo.h); gl.uniform2f(u.uPP, S.px, S.py); gl.uniform1f(u.uF, S.F); gl.uniform1f(u.uStereo, S.stereo); gl.uniform1f(u.uFs, S.Fz); gl.uniform1f(u.uZen, S.zen || 0); gl.uniform1f(u.uT, S.t); gl.uniform1f(u.uMode, mode); gl.uniform1f(u.uDim, S.dim.x); gl.uniform1f(u.uOver, v.over);
       gl.uniform3fv(u.uFwd, v.fwd); gl.uniform3fv(u.uRight, v.right); gl.uniform3fv(u.uUp, v.up); gl.uniform3fv(u.uEye, v.eye);
       gl.uniform3fv(u.uC0, c[0]); gl.uniform3fv(u.uC1, c[1]); gl.uniform3fv(u.uC2, c[2]); gl.uniform3fv(u.uC3, c[3]); gl.uniform3fv(u.uMistA, S.pal.mistA); gl.uniform3fv(u.uMistM, S.pal.mistM); gl.uniform3fv(u.uMistB, S.pal.mistB); gl.uniform3fv(u.uGlow, S.pal.glow);
       gl.uniform3fv(u.uMoon, MOON.dir); gl.uniform1f(u.uMoonR, MOON.r); gl.uniform3fv(u.uMoonCol, S.pal.moon);
+      gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, S.radTex || tNone); gl.uniform1i(u.uRad, 0); gl.uniform4fv(u.uPl, S.pools); gl.uniform1fv(u.uPk, S.poolK); gl.uniform4fv(u.uGl, S.radTex ? S.glyphs : NOGLYPH); gl.uniform4fv(u.uGc, S.glyphC);
       gl.bindVertexArray(vaoFull); gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
     function frame(now) {
@@ -344,7 +380,7 @@
       drawSky(0, fbo.sky); drawSky(1, fbo.mist);
       gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, canvas.width, canvas.height); gl.disable(gl.BLEND);
       { const { p, u } = P.comp; gl.useProgram(p); const v = S.view || IDENT, d = S.dpr; gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, fbo.tSky); gl.uniform1i(u.uSky, 0);
-        gl.uniform2f(u.uRes, canvas.width, canvas.height); gl.uniform2f(u.uPP, S.px * d, S.py * d); gl.uniform1f(u.uF, S.F * d); gl.uniform1f(u.uT, S.t); gl.uniform1f(u.uDim, S.dim.x); gl.uniform1f(u.uDpr, d); gl.uniform1f(u.uOver, v.over); gl.uniform3fv(u.uStar, S.pal.star); gl.uniform2f(u.uTilt, S.parS.x.x * 0.08, S.parS.y.x * 0.08);
+        gl.uniform2f(u.uRes, canvas.width, canvas.height); gl.uniform2f(u.uPP, S.px * d, S.py * d); gl.uniform1f(u.uF, S.F * d); gl.uniform1f(u.uStereo, S.stereo); gl.uniform1f(u.uFs, S.Fz * d); gl.uniform1f(u.uStarK, S.starK); gl.uniform1f(u.uMoonH, S.moonH || 0); gl.uniform1f(u.uZen, S.zen || 0); gl.uniform1f(u.uT, S.t); gl.uniform1f(u.uDim, S.dim.x); gl.uniform1f(u.uDpr, d); gl.uniform1f(u.uOver, v.over); gl.uniform3fv(u.uStar, S.pal.star); gl.uniform2f(u.uTilt, S.parS.x.x * 0.08, S.parS.y.x * 0.08);
         gl.uniform3fv(u.uFwd, v.fwd); gl.uniform3fv(u.uRight, v.right); gl.uniform3fv(u.uUp, v.up);
         gl.uniform3fv(u.uMoon, MOON.dir); gl.uniform1f(u.uMoonR, MOON.r); gl.uniform3fv(u.uMoonCol, S.pal.moon); { const c2 = S.pal.c[2], c3 = S.pal.c[3]; const m = S.pal.moon; gl.uniform3f(u.uBand, m[0] * 0.44 + c3[0] * 0.50 + c2[0] * 0.12, m[1] * 0.44 + c3[1] * 0.50 + c2[1] * 0.12, m[2] * 0.44 + c3[2] * 0.50 + c2[2] * 0.12); }
         gl.uniform1fv(u.uN, [21, 39, 91, 11, 27, 7].map((cell) => Math.max(4, Math.round(2 * S.F / cell))));
