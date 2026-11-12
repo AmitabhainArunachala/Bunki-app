@@ -13572,8 +13572,13 @@ function stopRecAudio() {
 if (typeof window !== 'undefined') ensureRecManifest();
 
 /** Play one recorded clip. Resolves true when it played to the end, false when it
- * could not play, and null when it was stopped (a replay, another clip, or 止める). */
-function playRecClip(src, btn, { rate = 1, onTime = null } = {}) {
+ * could not play, and null when it was stopped (a replay, another clip, or 止める). With
+ * `pausable` (the voice layer's article reader, L1), a pause no lane of this app asked for (a
+ * call, another app's sound, the lock screen) resolves 'paused': the read holds at that sentence.
+ * So does a start the browser will not allow (NotAllowedError: a locked phone may refuse a new
+ * start), as for a server clip; play says that sentence again (L1 fix round 1, the review's F1).
+ * A recording that truly cannot play still resolves false, and the read ends with its line. */
+function playRecClip(src, btn, { rate = 1, onTime = null, pausable = false } = {}) {
   deviceVoice.cancel();
   // ONE PLAYBACK OWNER (V): stop every other lane before refusing or playing. No Audio is
   // constructed for a clip the lock does not list.
@@ -13589,11 +13594,18 @@ function playRecClip(src, btn, { rate = 1, onTime = null } = {}) {
       if (btn) btn.classList.remove('is-speaking');
       if (recAudioEl === a) recAudioEl = null;
     };
-    a.onplay = () => btn && btn.classList.add('is-speaking');
+    // the article reader's recording this app has let go of (paused from outside, stopped, at its end, replaced), started
+    // by anyone else (an interruption that ends, a headset's button): paused again at once, so it never sounds while the
+    // bar and the lock screen say paused; his play says the sentence again (L1 fix round 2, the re-check's F4)
+    a.onplay = () => {
+      if (pausable && recAudioEl !== a) { try { a.pause(); } catch { /* already still */ } return; }
+      if (btn) btn.classList.add('is-speaking');
+    };
     a.onended = () => { off(); done(true); };
-    a.onpause = () => { off(); done(a.ended ? true : null); };
+    // the app's own stop (stopRecAudio) lets go of the element before its pause is told; anyone else's pause finds it held
+    a.onpause = () => { const outside = pausable && !a.ended && recAudioEl === a; off(); done(a.ended ? true : outside ? 'paused' : null); };
     a.onerror = () => { off(); done(false); };
-    a.play().catch(() => { off(); done(false); });
+    a.play().catch((error) => { off(); done(pausable && error?.name === 'NotAllowedError' ? 'paused' : false); });
   });
 }
 /** The one door to recorded sound. It opens for a clip the admitted narration manifest names under
@@ -13640,7 +13652,11 @@ function retireCardSpeech() {
   document.getElementById('card-say-front')?.classList.remove('is-speaking');
 }
 window.addEventListener('pagehide', () => { voiceLayer?.stop(); retireCardSpeech(); });
-document.addEventListener('visibilitychange', () => { if (document.hidden) { voiceLayer?.stop(); retireCardSpeech(); } });
+// Hidden (the screen locked, another app, another tab): a card's speech, a word's 音, the tutor's line and the ear's voice
+// end as before (retireCardSpeech); an article read he started goes on, the reader's own to end (L1, 2026-11-12; John:
+// "when i hit play, the only thing that should stop that is hitting the pause button itself"). Leaving for good
+// (pagehide, above) still ends everything.
+document.addEventListener('visibilitychange', () => { if (document.hidden) retireCardSpeech(); });
 // Also cover media owned by a mounted room (e.g. assessment audio).
 document.addEventListener('play', event => {
   // the seam's own element is one of this app's lanes already: it retires nothing, least of all itself
@@ -32693,7 +32709,8 @@ if (typeof window !== 'undefined' && !window.__CORRIDOR_BUNDLE__) {
       // one sound at a time: every other lane lets go before the seam speaks
       quiet: () => { stopRecAudio(); stopSentenceListening(); retireCardSpeech(); },
       // a recorded clip still passes the lock's own door (playRecClip), and only that door
-      playRecorded: (src, rate) => playRecClip(src, null, { rate }),
+      // (a pause from outside holds the read at its sentence: L1)
+      playRecorded: (src, rate) => playRecClip(src, null, { rate, pausable: true }),
       stopRecorded: () => stopRecAudio(),
       rateRecorded: (rate) => { if (recAudioEl) recAudioEl.playbackRate = rate; },
       narration: (p) => narrationClips(p),

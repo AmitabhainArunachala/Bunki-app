@@ -19,7 +19,7 @@
  *   413 speech-input-too-large    the sentence is split further and its parts are asked for in order
  *   429 day-budget                the server is not asked again until 00:00 UTC
  *   429 request-rate-limit        no request for 60 s
- *   503 voice-unavailable         once more after 2 s
+ *   503 voice-unavailable         once more after 2 s (at once while the page is hidden: L1, fix round 1)
  *   400 (client bug), 500         that sentence is not asked twice in the read
  * In every one of these the read ends with the code as its reason.
  *
@@ -47,15 +47,24 @@ export function sentencesOf(text) {
   try { return splitSentences(normaliseSpeechText(String(text ?? ''))).map((piece) => ({ text: piece.text })); } catch { return []; }
 }
 
+/** `gapSleep` is the pause between two sentences of a read (the queue's `sleep`); the page gives one that does not wait
+ * while it is hidden (modules/reader-pocket.mjs, L1). The one retry after a 503 waits on it too (fix round 1, the
+ * review's F2: hidden, the retry goes at once; shown, after 2 s as before). Without it the seam's own `sleep` is both.
+ * `after(ms, run)` is the clock of the device store's wait (storeWaitMs); the page gives one that a hidden page's held
+ * timers cannot hold (reader-pocket.mjs, pageTimer); it returns a cancel. */
 export function createVoiceSeam({ client, player, recorded = null, store = null, storeWaitMs = 1500, quiet = () => {},
-  sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)), now = () => Date.now(),
+  sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)), gapSleep = null, now = () => Date.now(),
+  after = (ms, run) => { const timer = setTimeout(run, ms); return () => clearTimeout(timer); },
   online = () => globalThis.navigator?.onLine !== false, onStatus = () => {} } = {}) {
   if (!client || !player) throw new TypeError('the seam needs a client and a player');
   const cache = new Map();   // `${voiceKey}|${text}` → clip, most recent last (this page's own; the device store is below)
   let session = null;        // the one read that may sound
   let last = { source: 'none', reason: null, at: 0 };   // the last sentence that was spoken
   let silent = null;         // { reason, at }: why the last read ended without a voice; cleared by the next spoken sentence
-  let blockedUntil = { 'day-budget': 0, 'request-rate-limit': 0, 'network-failed': 0 };
+  // the 15 s wait after a request that ran out of time or lost the connection keeps its cause's name, so a play inside it
+  // ends with the same reason as the first stop (L1 fix round 2, the re-check's F3); neither is shown as blocked
+  let blockedUntil = { 'day-budget': 0, 'request-rate-limit': 0, 'network-failed': 0, 'voice-timeout': 0 };
+  const WAITS = new Set(['network-failed', 'voice-timeout']);
   let off = null;            // 'not-in-release' | 'budget-exhausted' for this page
   let pairAgain = false;
   let budget = null;
@@ -65,7 +74,7 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
   const blocked = () => {
     if (off) return off;
     const at = now();
-    for (const [code, until] of Object.entries(blockedUntil)) if (until > at) return code === 'network-failed' ? null : code;
+    for (const [code, until] of Object.entries(blockedUntil)) if (until > at) return WAITS.has(code) ? null : code;
     return null;
   };
   const status = () => ({
@@ -104,7 +113,11 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
       void refreshBudget();
     }
     else if (code === 'request-rate-limit') blockedUntil['request-rate-limit'] = at + 60000;
-    else if (code === 'network-failed' || code === 'voice-timeout') blockedUntil['network-failed'] = at + 15000;
+    else if (WAITS.has(code)) {
+      // the last cause names the wait
+      for (const wait of WAITS) blockedUntil[wait] = 0;
+      blockedUntil[code] = at + 15000;
+    }
   }
   const remember = (key, clip) => {
     cache.delete(key);
@@ -128,14 +141,14 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
     const near = cache.get(key);
     if (near) { remember(key, near); if (storeOn()) quietly(() => store.touch?.(key)); return near; }
     if (!storeOn()) return null;
-    let timer = null;
+    let cancel = null;
     let clip = null;
     try {
       clip = await Promise.race([
         Promise.resolve().then(() => store.get(key)),
-        new Promise((resolve) => { timer = setTimeout(() => { storeOff = true; resolve(null); }, storeWaitMs); }),
+        new Promise((resolve) => { cancel = after(storeWaitMs, () => { storeOff = true; resolve(null); }); }),
       ]);
-    } catch { clip = null; } finally { clearTimeout(timer); }
+    } catch { clip = null; } finally { cancel?.(); }
     aborted(signal);
     if (!(clip?.bytes instanceof Uint8Array) || !clip.bytes.length) return null;
     const kept = { bytes: clip.bytes, contentType: clip.contentType || 'audio/mpeg', voiceId: clip.voiceId ?? null, inputKey: null, source: 'server', kept: true, key };
@@ -152,7 +165,8 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
       clip = await client.speak({ text, voiceKey, signal });
     } catch (error) {
       if (error?.code !== 'voice-unavailable') throw error;
-      await sleep(2000);
+      // once more, after 2 s; on the page's gap, so a hidden page asks again at once instead of waiting on a held timer
+      await (gapSleep || sleep)(2000);
       aborted(signal);
       clip = await client.speak({ text, voiceKey, signal });
     }
@@ -277,6 +291,10 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
       const stops = owner.recordedStops;
       const outcome = await recorded(clip.recorded.src, rate);
       if (outcome === true) return 'ended';
+      // paused by nobody in this app (a call, another app, the lock screen), or a start the browser would not allow (a
+      // locked phone may refuse a new element: fix round 1, as for a server clip): the read holds at this sentence and
+      // says it again on play; nothing takes it up by itself (L1, John: only pause stops a read, and a pause is a pause)
+      if (outcome === 'paused') { owner.queue.pause(); return 'stopped'; }
       if (outcome === null) { if (owner.recordedStops === stops) endedFromOutside(owner); return 'stopped'; }
       throw new Error('audio-error');
     }
@@ -285,7 +303,8 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
       // a clip the player could not play (a media error, or WebKit's play() refusing its source) is kept no longer, in this
       // page or on the device: the next ask goes to the server again (the combine's review). A play the browser does not
       // allow yet (no tap: NotAllowedError) is not the clip's fault, and it stays. The read ends; its reason is the
-      // queue's 'decode', whose line says the clip could not play (voice-layer.mjs), not that the server could not say it
+      // queue's 'decode', whose line says the clip could not play (voice-layer.mjs), not that the server could not say it.
+      // (During the article's read a NotAllowedError never comes here: the page's player makes it a pause, L1.)
       if (error?.name !== 'NotAllowedError' && clip.key) forget(clip);
       throw error;
     }
@@ -327,7 +346,7 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
     const queue = createSpeechQueue({
       fetchClip: (sentence, _index, signal) => clipFor(sentence, voiceKey, signal, owner),
       player: composite(owner),
-      prefetch, gapMs, sleep,
+      prefetch, gapMs, sleep: gapSleep || sleep,
       onSentence: (index) => { if (session === owner || index < 0) onSentence(index); },
       onState: (state, code) => {
         if (['done', 'stopped', 'error'].includes(state)) { owner.ended = true; if (session === owner) session = null; }
@@ -394,6 +413,6 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
     },
     active: () => (session && !session.ended ? session.controls : null),
     /** Pairing changed (paired, or the token was dropped): what was blocked is asked again. */
-    repaired() { pairAgain = false; off = null; silent = null; blockedUntil = { 'day-budget': 0, 'request-rate-limit': 0, 'network-failed': 0 }; tell(); },
+    repaired() { pairAgain = false; off = null; silent = null; blockedUntil = { 'day-budget': 0, 'request-rate-limit': 0, 'network-failed': 0, 'voice-timeout': 0 }; tell(); },
   };
 }
