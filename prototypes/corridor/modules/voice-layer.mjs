@@ -1055,7 +1055,15 @@ export function installVoiceLayer(host) {
     const nodes = [...change.addedNodes, ...change.removedNodes];
     return nodes.length > 0 && nodes.every((node) => node.nodeType === 1 && node.hasAttribute('data-ear-own'));
   };
-  new doc.defaultView.MutationObserver((changes) => { if (!changes.every(earsOnly)) rescan(); }).observe(doc.body, { childList: true, subtree: true });
+  new doc.defaultView.MutationObserver((changes) => {
+    if (changes.every(earsOnly)) return;
+    // a bar the app has just drawn takes the ear's mark in the same turn, before the screen is painted: the mark is not
+    // missing from a bar between its drawing and the next look at the page (on a slow machine that was many frames,
+    // and the line's check on GitHub read the Learn bar inside them)
+    ear.place();
+    rescan();
+  }).observe(doc.body, { childList: true, subtree: true });
+  ear.place();
   rescan();
   /* One language of states for every voice control (ear.mjs toneFor): when a listen mark, a card's speaker, the word
    * box's 音 or the play bar starts to speak or to wait, it takes the seal and the dimmed ink of the ground it really

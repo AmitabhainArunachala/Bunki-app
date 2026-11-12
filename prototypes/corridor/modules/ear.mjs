@@ -1175,13 +1175,26 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
     setVar(why, '--ear-why-top', `${Math.round(belowBars(x, r.bottom) + 6)}px`);
     setVar(why, '--ear-why-left', `${Math.round(Math.max(side, Math.min(r.left, view.innerWidth - side - width)))}px`);
   }
-  /** A mark beside the first screen's gate and beside the gate of every bar. */
-  function mount() {
-    for (const spot of [...marks]) if (!spot.isConnected) marks.delete(spot);
+  /** A mark beside the first screen's gate and beside the gate of every bar, put there in the same turn as the gate.
+   * The app draws a room's bar again several times while the room loads; the new bar takes the mark its old bar had,
+   * with the colours and the state it wore, so the mark never leaves a bar that is on screen (the voice layer calls
+   * this at each change to the page; the painting waits for mount). */
+  function place() {
+    const spare = [];
+    for (const spot of [...marks]) if (!spot.isConnected) { marks.delete(spot); spare.push(spot); }
     for (const gate of doc.querySelectorAll('#ginga-symbol, :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate')) {
       if (gate.nextElementSibling?.classList?.contains('ear-spot')) continue;
-      gate.after(makeMark());
+      const home = gate.id === 'ginga-symbol' ? 'sky' : gate.parentElement?.matches?.('.sheet-bar') ? 'sheet' : 'bar';
+      const at = spare.findIndex((spot) => spot.getAttribute('data-ear-home') === home);
+      const spot = at >= 0 ? spare.splice(at, 1)[0] : makeMark();
+      spot.setAttribute('data-ear-home', home);
+      marks.add(spot);
+      gate.after(spot);
     }
+  }
+  /** The marks in their places, and each one that shows painted for where it now stands. */
+  function mount() {
+    place();
     // the ear is never left on where its mark is not shown (the review card and the deck card keep their own look, with
     // no mark): a screen without one turns it off, silently
     if (machine.mode() !== 'off' && ![...marks].some((spot) => spot.isConnected && spot.getClientRects().length)) machine.rest();
@@ -1320,6 +1333,7 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
   return {
     machine,
     mount,
+    place,
     /** The page was drawn again: the light on a sentence is measured again. */
     refresh: () => { if (bands.shown) bands.refresh(); },
     /** The highlight switch changed: what the ear draws on text is drawn again by the switch's rule. */
