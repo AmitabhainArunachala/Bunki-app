@@ -1,10 +1,10 @@
 /* depth.css · the app's surfaces (ground, sheet, slip, well, the night windows) and its print look.
    FOLDED FILE. Do not edit here. Folded by scripts/fold-print-look.mjs from the design folder ~/.dharma/bunki/PROGRAM/design
-   (design version 1794442571), in the order the design layer attaches them, @no-fold blocks left out:
+   (design version 1794452842), in the order the design layer attaches them, @no-fold blocks left out:
      depth/depth.css  sha256 e2810e69e4cdb4a5
      depth/kanji.css  sha256 4eb33ea6acec3986
      depth/lead.css   sha256 8bf7bb856273f6a2
-     depth/print.css  sha256 4c8d7d3b27c88068
+     depth/print.css  sha256 3b3dcc88263ce333
    Plates: the design layer names them under the preview server; here they are print/<plate>, beside this file.
    Every rule is meant to be scoped under html[data-live-depth='1']; index.html sets that attribute.
    The two values the print look reads from the page come from print-look.mjs (an article's pigments, the old
@@ -2032,8 +2032,10 @@ html[data-live-depth='1']:not(#\#):is(:not([data-theme]), [data-theme=''], [data
   }
   html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] > #mini > .mini-head { border-radius: 2px 2px 0 0; }
 }
-/* (5) the block-drawn city under Today's word is not of the same hand as the prints: taken out of the night looks, where it shows */
-html[data-live-depth='1']:is([data-theme='yoru'], [data-theme='rokusho'], [data-theme='nami'], [data-theme='hakuu'])[data-room='tray'] .today-city { display: none; }
+/* (5) Today's night city stays in the night looks. It was hidden here from 2026-11-11 ("not of the same hand as the
+   prints", the lead's own call); put back 2026-11-12 12:07: it is life under the day's word, the repository's test
+   owed-3 requires it under the whole word block in every look, and John asked the same morning for the line from the
+   old masters through to a little cyberpunk. Restyling it in each look's own craft is a later piece, not a reason to hide it. */
 /* (2) the gold mount is gold leaf: the faint seams between leaves, a sheen, and a printed edge where it meets the picture.
    Toned down 13:36 on John's note 70 ("the above header color is too crass"): an aged, matte gold (#ab966a, was #c9a455),
    seams and sheen at half strength. */
