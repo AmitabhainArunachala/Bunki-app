@@ -1,20 +1,21 @@
-/* 宙 — puts the sky on the app's first screen (John, 2026-11-11 14:58: "lock it in, merge it if it is ready").
- * Loaded by index.html beside drift-layer.js, the old first screen. The engine (sky.js, sky-world.js, sky-web.js in
- * this folder) is the approved copy of PROGRAM/design/sky-v1-20261111-1458, unchanged but for one line the lead added
- * in the design copy since (sky.js asks for its context with failIfMajorPerformanceCaveat); this file is the app's own
- * mount, modelled on that copy's mount.js.
+/* 宙 — puts the sky on the app's first screen (John, 2026-11-11 14:58: "lock it in, merge it if it is ready"; 21:03,
+ * of version 2: "keep polishing, keep creating"). Loaded by index.html beside drift-layer.js, the old first screen.
+ * The engine (sky.js, sky-world.js, sky-web.js in this folder) is a fixed copy from PROGRAM/design (sky-v3-*), byte for
+ * byte; this file is the app's own mount, kept level with that copy's mount.js (the foot the tab bar covers, the
+ * app's buttons over the sky, the context file).
  *
  * The old first screen stays in the page, unseen and untouched: its words are the learner's own (read here, and again
  * whenever they change), its level control (#lvl) stays visible on top, and every automated check still meets the
  * screen it was written for, because a driven browser (navigator.webdriver) keeps the old screen unless the address
- * says ?sky=1. ?sky=0, or localStorage 'bunki-live:sky' = '0', keeps it too, and so does a window narrower than 720 px
- * when the sky would mount (an opened word is not laid out for a phone yet). If window.__bunkiSkyMount is set by then,
+ * says ?sky=1. ?sky=0, or localStorage 'bunki-live:sky' = '0', keeps it too. If window.__bunkiSkyMount is set by then,
  * or the live design layer has put its own sky in the page, this one stands down: in the 18841 preview the lead's
  * newer copy wins. A browser that can draw only in software (no graphics card) never gets the sky (lead, 2026-11-11:
  * right for learners on weak machines): the drawing is checked before anything is fetched. Anything else wrong (a data
  * file refused, no WebGL2, the graphics context lost, five frames failing) gives the old first screen back, whole.
  *
- * The data is two files, one per licence pool, joined here in memory (joinSkyData). Reads nothing of the learner's
+ * The data is two files, one per licence pool, joined here in memory (joinSkyData); the context (sentences from the
+ * app's own reading, articles, grammar) is three, one per pool, joined the same way (joinSkyContext). The sky stands
+ * without its context if those files fail; the reason is left in __bunkiSkyApp.context. Reads nothing of the learner's
  * record and writes nothing; pages open through the app's own door (window.__BUNKI_OPEN_ENTRY). The decision is left
  * in window.__bunkiSkyApp = { state, reason, renderer } (waiting, off, stood-down, loading, mounted, gave-back). */
 
@@ -39,6 +40,94 @@ function joinSkyData(sky, sem) {
     sem: sem.sem.map(([a, b, rel, note]) => [rowOf(a), rowOf(b), rel, note]),
     sound: sky.sound,
     pos: sky.pos,
+  };
+}
+
+/** The three pool files of the sky's context into the one object the engine reads (sky-world.js, setContext):
+ * articles, their sentences, which words stand in which sentence and where, and grammar. Each file's rows carry their
+ * place in the whole; a word is named by its text and becomes its row number in the sky's words. A row placed twice, a
+ * gap, a sentence of an article that is not there, or an unknown word fails the join, and the sky goes on without it. */
+function joinSkyContext(sky, files) {
+  const rows = new Map(sky.words.map((row, i) => [row[0], i]));
+  const rowOf = (word) => {
+    const i = rows.get(word);
+    if (i === undefined) throw new Error(`sky context: ${word} is not a word of the sky`);
+    return i;
+  };
+  const place = (list, at, value, what) => {
+    if (!Number.isInteger(at) || at < 0 || list[at] !== undefined)
+      throw new Error(`sky context: ${what} ${at} is out of range or placed twice`);
+    list[at] = value;
+  };
+  const whole = (list, what) => {
+    for (let i = 0; i < list.length; i += 1)
+      if (list[i] === undefined) throw new Error(`sky context: ${what} ${i} is missing`);
+  };
+  const articles = [];
+  const articleWords = [];
+  const sentences = [];
+  const grammar = [];
+  const grammarSource = [];
+  const grammarTwin = [];
+  const links = new Map();
+  const notes = [];
+  for (const file of files) {
+    for (const [ai, id, title, titleEn, level, label, words] of file.articles || []) {
+      place(articles, ai, [id, title, titleEn, level, label], 'article');
+      articleWords[ai] = words.map(rowOf);
+    }
+    for (const [si, code, text, en] of file.sentences || []) place(sentences, si, [code, text, en], 'sentence');
+    for (const [word, si, start, length, rank] of file.links || []) {
+      const wi = rowOf(word);
+      if (!links.has(wi)) links.set(wi, []);
+      links.get(wi).push([rank, si, start, length]);
+    }
+    for (const [gi, id, pattern, level, mEn, mJa, form, ex, words, source, twin] of file.grammar || []) {
+      place(grammar, gi, [id, pattern, level, mEn, mJa, form, ex, words.map(rowOf)], 'grammar row');
+      grammarSource[gi] = source;
+      grammarTwin[gi] = twin;
+    }
+    notes.push(...(file.notes || []));
+  }
+  whole(articles, 'article');
+  whole(sentences, 'sentence');
+  whole(grammar, 'grammar row');
+  for (const [code] of sentences)
+    if (code >= 0 ? code >= articles.length : ![-1, -2, -3].includes(code))
+      throw new Error(`sky context: a sentence names source ${code}, which is not there`);
+  const wordSent = {};
+  const wordSentAt = {};
+  for (const wi of [...links.keys()].sort((a, b) => a - b)) {
+    const list = links.get(wi).sort((a, b) => a[0] - b[0]);
+    for (const [, si] of list)
+      if (sentences[si] === undefined) throw new Error(`sky context: sentence ${si} is not there`);
+    wordSent[wi] = list.map((x) => x[1]);
+    wordSentAt[wi] = list.map((x) => [x[2], x[3]]);
+  }
+  const linkCount = Object.values(wordSent).reduce((n, list) => n + list.length, 0);
+  return {
+    v: 1,
+    built: files.map((f) => f.built).sort()[0],
+    counts: {
+      articles: articles.length,
+      sentences: sentences.length,
+      wordsWithSentence: Object.keys(wordSent).length,
+      sentencesFromArticles: sentences.filter((s) => s[0] >= 0).length,
+      sentencesFromExamples: sentences.filter((s) => s[0] < 0).length,
+      sentencesWithEnglish: sentences.filter((s) => s[2]).length,
+      wordSentenceLinks: linkCount,
+      articleWordLinks: articleWords.reduce((n, list) => n + list.length, 0),
+      grammar: grammar.length,
+    },
+    notes,
+    articles,
+    sentences,
+    wordSent,
+    wordSentAt,
+    articleWords,
+    grammar,
+    grammarSource,
+    grammarTwin,
   };
 }
 
@@ -86,6 +175,8 @@ function paper() {
   return m && (m[4] == null || Number(m[4]) > 0.9) ? [m[1] / 255, m[2] / 255, m[3] / 255] : null;
 }
 const door = () => window.__BUNKI_OPEN_ENTRY;
+/** the app's own buttons that can stand over the first screen */
+const OVER_SKY = ['#ginga-symbol', '#ginga-search', '#ginga-theme-seal', '#live-depth-switch', '#prototype-open'];
 
 /* The ear (modules/ear.mjs, 2026-11-11): the sky draws its words on the graphics card, so the ear finds a canvas there
  * and no text. The sky says which word stands under a point (host.earWordAt, the engine's own pick over what it drew
@@ -156,6 +247,7 @@ let api = null;
 let host = null;
 let lang = null;
 let dataUrl = null;
+let contextUrl = null;
 let gaveBack = false;
 
 /** Renderers that draw in software: Chromium's SwiftShader, Mesa's llvmpipe, softpipe and lavapipe, Windows' basic
@@ -236,10 +328,34 @@ function start() {
     look: lookOf(),
     lang,
     dataUrl,
+    contextUrl: contextUrl || undefined,
     front: ownWords(),
     paused: covered,
     onFail: giveBack,
     paper,
+    /* how much of the bottom of the sky the app's tab bar covers, so nothing of the sky stands under it */
+    foot: () => {
+      const tabs = document.querySelector('.primary-tabs');
+      if (!tabs || !host) return 0;
+      const bar = tabs.getBoundingClientRect();
+      const box = host.getBoundingClientRect();
+      return bar.height > 0 && bar.top < box.bottom ? box.bottom - bar.top : 0;
+    },
+    /* the app's own buttons that lie over the sky, as boxes in the sky's own coordinates: no word prints under them
+     * (the prototype's 試 and the design layer's 深 are not in every build: what is not there is skipped) */
+    clear: () => {
+      if (!host) return [];
+      const box = host.getBoundingClientRect();
+      const out = [];
+      for (const sel of OVER_SKY) {
+        const e = document.querySelector(sel);
+        if (!e || !e.getClientRects().length) continue;
+        const q = e.getBoundingClientRect();
+        if (q.width > 0 && q.width < 120 && q.bottom > box.top && q.top < box.bottom)
+          out.push([q.left - box.left, q.top - box.top, q.width, q.height]);
+      }
+      return out;
+    },
     canOpen: (t) => {
       const d = door();
       return !!d && d.has(t.kind, t.kind === 'word' ? t.word : t.char);
@@ -300,12 +416,17 @@ async function json(path) {
   return response.json();
 }
 
-/** The moment the sky would mount: another sky in the page wins, a narrow window keeps the old screen; otherwise the
- * engine and both data files are fetched, and the sky goes up only once all of them are here. */
+const CONTEXT = ['share_alike', 'proprietary_safe', 'original'].map(
+  (pool) => `../data/${pool}/sky-context.json`,
+);
+
+/** The moment the sky would mount: another sky in the page wins, and a browser that draws only in software keeps the
+ * old screen; otherwise the engine, both data files and the three context files are fetched, and the sky goes up only
+ * once they are here. (Until version 3 a window under 720 px kept the old screen too: the engine now lays an opened
+ * word out for a phone, proved in WebKit at 390 x 844 by tools/sky-first-screen.test.mjs.) */
 async function mountOnce() {
   if (window.__bunkiSkyMount || document.querySelector('script[src*="/design/sky/"]'))
     return settle('stood-down', 'another sky is mounting');
-  if (window.innerWidth < 720) return settle('off', 'narrow');
   const refused = drawingRefused();
   if (refused) return giveBack(new Error(refused));
   window.__bunkiSkyMount = 'app';
@@ -314,14 +435,29 @@ async function mountOnce() {
     const engine = load('sky.js')
       .then(() => load('sky-world.js'))
       .then(() => load('sky-web.js'));
-    const [sky, sem] = await Promise.all([
-      json('../data/share_alike/sky.json'),
+    const skyFile = json('../data/share_alike/sky.json');
+    const blob = (value) =>
+      URL.createObjectURL(new Blob([JSON.stringify(value)], { type: 'application/json' }));
+    const context = Promise.all([skyFile, ...CONTEXT.map(json)]).then(
+      ([sky, ...files]) => {
+        const url = blob(joinSkyContext(sky, files));
+        status.context = 'joined';
+        return url;
+      },
+      (err) => {
+        status.context = `left out: ${(err && err.message) || err}`;
+        console.warn('SKY stands without its context', err);
+        return null;
+      },
+    );
+    const [sky, sem, , ctx] = await Promise.all([
+      skyFile,
       json('../data/proprietary_safe/sky-sem.json'),
       engine,
+      context,
     ]);
-    dataUrl = URL.createObjectURL(
-      new Blob([JSON.stringify(joinSkyData(sky, sem))], { type: 'application/json' }),
-    );
+    dataUrl = blob(joinSkyData(sky, sem));
+    contextUrl = ctx;
     start();
     if (!gaveBack) watch();
   } catch (err) {
