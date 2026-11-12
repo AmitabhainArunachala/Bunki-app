@@ -13,7 +13,6 @@
     0 1px 0 rgba(28, 47, 66, 0.06),
     0 10px 28px rgba(28, 47, 66, 0.1)
   );
-  --gs-edge: var(--paper-edge, 1px solid color-mix(in srgb, var(--ink) 30%, transparent));
   color: var(--ink);
   font-family: var(--sans);
   font-size: var(--type-body);

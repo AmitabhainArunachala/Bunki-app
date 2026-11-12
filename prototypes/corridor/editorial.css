@@ -33,9 +33,7 @@ body, body.v-contrast-wcag {
   --ed-muted: color-mix(in srgb, var(--ink) 84%, var(--ground-0, #faf6ea));
   --ed-rule: color-mix(in srgb, var(--ink) 38%, var(--ground-0, #faf6ea));
   --ed-rule-light: color-mix(in srgb, var(--ink) 18%, var(--ground-0, #faf6ea));
-  --ed-mast: var(--glass-solid);
   --ed-mast-ink: var(--ink);
-  --ed-shadow: var(--shadow-card);
   --ink-2: color-mix(in srgb, var(--ink) 84%, var(--ground-0, #faf6ea));
   --faint: color-mix(in srgb, var(--ink) 80%, var(--ground-0, #faf6ea));
   --faint-2: color-mix(in srgb, var(--ink) 76%, var(--ground-0, #faf6ea));
@@ -63,9 +61,7 @@ body, body.v-contrast-wcag {
   --shadow-lift: 0 2px 4px rgb(0 0 0 / 34%), 0 16px 36px rgb(0 0 0 / 44%);
   --shadow-float: 0 2px 6px rgb(0 0 0 / 36%), 0 20px 48px rgb(0 0 0 / 50%);
   --grain: none;
-  --ed-mast: var(--glass-solid);
   --ed-mast-ink: var(--ink);
-  --ed-shadow: var(--shadow-card);
 }
 
 /* the motion vocabulary (FEEL): 180–280ms on one curve. A popover scales in from .96 with a fade,
@@ -738,7 +734,6 @@ html[data-register='tutor'] main button.japanese-lookup-word { border: 0; backgr
    The word-sky home (data-view='drift') is left exactly as it was.
    ========================================================================== */
 body, body.v-contrast-wcag {
-  --s-half: 4px;
   --s1: 8px;
   --s2: 16px;
   --s3: 24px;
@@ -756,8 +751,6 @@ body, body.v-contrast-wcag {
   --float-shadow: var(--shadow-float);
   --chrome: var(--glass-solid);
   --chrome-ink: var(--label);
-  --art-field: color-mix(in srgb, var(--ai) 58%, #07101d);
-  --art-ink: #f3ecdc;
   --accent: var(--red);
   /* keyboard focus: an ink underline over a soft vermilion wash, never the browser blue */
   --focus-wash: color-mix(in srgb, var(--red) 16%, transparent);
@@ -768,7 +761,6 @@ body, body.v-contrast-wcag {
   --hairline: var(--separator);
   --rule-strong: var(--separator);
   --washi: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='a' filterUnits='userSpaceOnUse' x='0' y='0' width='300' height='300' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='4' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.33 0 0 0 0 0.2 1.0 0 0 0 -0.3'/%3E%3C/filter%3E%3Cfilter id='b' filterUnits='userSpaceOnUse' x='0' y='0' width='300' height='300' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.11 0 0 0 0 0.16 0 0 0 0 0.24 2.0 0 0 0 -1.0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23a)' opacity='0.085'/%3E%3Crect width='300' height='300' filter='url(%23b)' opacity='0.1'/%3E%3C/svg%3E");
-  --washi-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='a' filterUnits='userSpaceOnUse' x='0' y='0' width='300' height='300' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='4' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.96 0 0 0 0 0.93 0 0 0 0 0.86 1.0 0 0 0 -0.3'/%3E%3C/filter%3E%3Cfilter id='b' filterUnits='userSpaceOnUse' x='0' y='0' width='300' height='300' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.96 0 0 0 0 0.93 0 0 0 0 0.86 2.0 0 0 0 -1.0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23a)' opacity='0.14'/%3E%3Crect width='300' height='300' filter='url(%23b)' opacity='0.12'/%3E%3C/svg%3E");
 
 }
 
@@ -3685,11 +3677,8 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --weight-regular: 400;
   --weight-medium: 500;
   --weight-semibold: 600;
-  --weight-bold: 700;
 
   /* Four-point base, with the current eight-point room rhythm preserved. */
-  --space-0: 0;
-  --space-hair: 2px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -3700,8 +3689,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --space-10: 40px;
   --space-12: 48px;
   --space-16: 64px;
-  --space-20: 80px;
-  --space-24: 96px;
   --hit: 44px;
   --size-seal: 56px;
   --stroke-hairline: 0.5px;
@@ -3709,7 +3696,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --stroke-focus: 2px;
 
   /* Relief remains an edge plus a shadow, independent of a concept's skin. */
-  --elevation-none: none;
   --elevation-paper: var(--world-paper-shadow);
   --elevation-card: 0 1px 2px rgb(0 0 0 / 4%), 0 8px 24px rgb(0 0 0 / 8%);
   --elevation-lift: 0 2px 4px rgb(0 0 0 / 5%), 0 16px 36px rgb(0 0 0 / 12%);
@@ -3772,8 +3758,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --raised-edge-strong: var(--color-edge-strong);
   --chrome: var(--color-glass-solid);
   --chrome-ink: var(--color-ink);
-  --art-field: var(--color-art-ground);
-  --art-ink: var(--color-art-ink);
   --focus-wash: var(--color-focus-wash);
   --focus-ring: var(--elevation-focus);
   --ed-paper: var(--color-surface);
@@ -3781,7 +3765,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --ed-muted: var(--color-ink-2);
   --ed-rule: var(--color-rule);
   --ed-rule-light: var(--color-rule-soft);
-  --ed-mast: var(--color-glass-solid);
   --ed-mast-ink: var(--color-ink);
   --sheet-ground: var(--color-sheet-ground);
   --sheet-ground-2: var(--color-sheet-ground-2);
@@ -3819,7 +3802,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --sans: var(--font-ui);
   --serif: var(--font-reading);
   --display: var(--font-display);
-  --s-half: var(--space-1);
   --s1: var(--space-2);
   --s2: var(--space-4);
   --s3: var(--space-6);
@@ -3836,7 +3818,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --raised-shadow-hover: var(--elevation-lift);
   --float-shadow: var(--elevation-float);
   --paper-shadow: var(--elevation-paper);
-  --ed-shadow: var(--elevation-card);
   --paper-edge: var(--stroke-relief) solid color-mix(in srgb, var(--color-ink) 30%, transparent);
   --rule: var(--stroke-relief) solid var(--color-line);
 }
@@ -3849,7 +3830,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
    sheet 320 · long 400 · ambient 9 s. prefers-reduced-motion re-values the set in one rule (the
    shell, below). ---- */
 :root {
-  --motion-instant: 0ms;
   --motion-ma: 120ms;
   --motion-press: 150ms;
   --motion-quick: 160ms;
@@ -3863,8 +3843,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);
   --ease-ink: cubic-bezier(0.65, 0, 0.35, 1);
-  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
-  --ease-linear: linear;
   /* the four radii (one hand, slice D): control 6 · card 4 · overlay 18 · seal 3 — on :root, so the
      drift layer and the deck's standalone pages read the same four */
   --radius-seal: 3px;
@@ -4153,7 +4131,6 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
   --color-live-wash: rgb(11 111 120 / 12%);
   --color-live-glow: rgb(11 111 120 / 0%);
   --color-gold: #94702a;
-  --color-gold-wash: rgb(148 112 42 / 14%);
   --color-lacquer: #141a28;
   --color-lacquer-2: #1d2638;
   --color-lacquer-ink: #e9e2d2;
@@ -4165,7 +4142,6 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
      chrome, Roboto Mono for data. Sizes stay the foundation's (reader ranges are pinned). */
   --font-data: 'Roboto Mono', 'Noto Sans JP', ui-monospace, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace;
   --font-headword: 'Shippori Mincho B1', var(--world-serif);
-  --weight-display: 800;
 
 
   --elevation-paper: 0 1px 0 rgb(25 28 34 / 6%), 0 6px 18px rgb(25 28 34 / 5%);
@@ -4210,7 +4186,6 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
   --color-live-wash: rgb(93 242 214 / 13%);
   --color-live-glow: rgb(93 242 214 / 45%);
   --color-gold: #e2bd6c;
-  --color-gold-wash: rgb(226 189 108 / 14%);
   --color-lacquer: color-mix(in srgb, var(--color-ground) 45%, #000);
   --color-lacquer-2: color-mix(in srgb, var(--color-ground) 75%, #000);
   --color-lacquer-ink: var(--color-ink);
@@ -5599,7 +5574,6 @@ body[data-view='search'] #chrome-search { visibility: hidden; pointer-events: no
    (the drift's and the moments' are JS gates), so the blanket leaves them be. ---- */
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --motion-instant: 0ms;
     --motion-ma: 0ms;
     --motion-press: 0ms;
     --motion-quick: 0ms;
@@ -5613,7 +5587,6 @@ body[data-view='search'] #chrome-search { visibility: hidden; pointer-events: no
     --ease-enter: linear;
     --ease-exit: linear;
     --ease-ink: linear;
-    --ease-sheet: linear;
   }
   body *:where(:not(#drift-layer, #drift-layer *, .kp, .kp *, .samurai-effect, .samurai-effect *)),
   body *:where(:not(#drift-layer, #drift-layer *, .kp, .kp *, .samurai-effect, .samurai-effect *))::before,
