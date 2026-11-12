@@ -19,7 +19,11 @@
 import { describe, expect, it } from 'vitest';
 
 import { createPocketPlayer } from '../prototypes/corridor/modules/reader-pocket.mjs';
-import { createMemoryTokenStore, createVoiceClient, VoiceError } from '../prototypes/corridor/modules/voice-client.mjs';
+import {
+  createMemoryTokenStore,
+  createVoiceClient,
+  VoiceError,
+} from '../prototypes/corridor/modules/voice-client.mjs';
 import { createVoiceSeam } from '../prototypes/corridor/modules/voice-seam.mjs';
 
 const tick = (ms = 0) => new Promise((done) => setTimeout(done, ms));
@@ -212,7 +216,13 @@ describe('the seam: the queue’s gap is the page’s gap; its own waits are its
 
 describe('fix round 1: nothing in the path to the next sentence waits on a timer of its own', () => {
   const S2 = [{ text: '雨の日は本を読む。' }, { text: '猫が窓の外を見ている。' }];
-  const quietPlayer = { play: async () => 'ended', pause() {}, resume() {}, stop() {}, setRate() {} };
+  const quietPlayer = {
+    play: async () => 'ended',
+    pause() {},
+    resume() {},
+    stop() {},
+    setRate() {},
+  };
   const settle = (seam, sentences) =>
     new Promise((done) =>
       seam.read({
@@ -296,7 +306,11 @@ describe('fix round 1: nothing in the path to the next sentence waits on a timer
     await store.write({
       server: 'http://127.0.0.1:19599',
       token: `nsrs_prod_abcd.${'a'.repeat(64)}`,
-      scope: { environment: 'prod', learner: 'test-learner', installation: `bunki-${'c'.repeat(32)}` },
+      scope: {
+        environment: 'prod',
+        learner: 'test-learner',
+        installation: `bunki-${'c'.repeat(32)}`,
+      },
     });
     const deadlines = [];
     let fire = null;
@@ -324,6 +338,8 @@ describe('fix round 1: nothing in the path to the next sentence waits on a timer
     await tick(5);
     expect(deadlines).toEqual([20000]);
     fire?.(); // the page's clock says the 20 s have passed (a tick of the element, or the page shown again)
-    expect(await Promise.race([asking, tick(200).then(() => 'still waiting')])).toBe('voice-timeout');
+    expect(await Promise.race([asking, tick(200).then(() => 'still waiting')])).toBe(
+      'voice-timeout',
+    );
   });
 });
