@@ -101,7 +101,6 @@ const SHELL = [
   'source-inbox.mjs',
   'source-processing.mjs',
   'corridor-ink.js',
-  'fonts.css',
   'vendor/ts-fsrs.mjs',
   // the one schedule owner every deck, review and practice asks
   'srs-core.mjs',
