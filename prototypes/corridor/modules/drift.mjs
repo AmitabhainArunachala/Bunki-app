@@ -1,4 +1,4 @@
-/** G3 drift seam — declarations moved verbatim from ../corridor.js (pure move, no body edits). */
+/** drift seam: split out of corridor.js (G3); now edited here directly. */
 import { D, DEPTH_NAMES, DRIFT_THEME_BY_WORLD, ISO_DAY, KAGAMI_BAND_NAMES, KAGAMI_CLEAR, KAGAMI_LEVELS, KAGAMI_MIN_SEEN, KAGAMI_OOV, LEADING_DROP_DAYS, LEARN_STAGE_DECKS, MONTHS_EN, NODE_KIND, PART_WRITTEN, ROOM_NAMES, S, TODAY_JA_WORD, TODAY_SKY_CAP, TODAY_SKY_WORD, allAssessmentEvidence, bi, commitStorePatch, depthIndexMemo, depthNodeCache, el, finiteNumber, go, installScaleBridge, isLeech, kanaReadingKey, metReadable, nonEmptyString, notYetReleased, openAssessmentQuestionReview, openPassage, openSentencePractice, openWordWeb, owns, passage, plainRecord, readFrameRows, readHelpReadable, recordWritable, render, savedAnswerFor, setJaWords, setOwnRecordValue, shelfDay, srsKey, todaySky, trayItemPending, tx, uiIcon, withEn, wordCardIdentity } from '../corridor.js';
 import { dictionaryAnsweredForm, dictionaryEpoch, dictionaryRowsReadAs, lookup, partMeaning, readerTokenAt, readerTokenNode } from './dictionary.mjs';
 import { themeId } from './learner.mjs';

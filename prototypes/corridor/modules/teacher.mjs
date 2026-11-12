@@ -1,4 +1,4 @@
-/** G3 teacher seam — declarations moved verbatim from ../corridor.js (pure move, no body edits). */
+/** teacher seam: split out of corridor.js (G3); now edited here directly. */
 import { $, AI_DEFAULT_BASE_URL, AI_DEFAULT_MODEL, AI_DEVICE_STORE, AI_KEY_STORE, AI_READING_TIMEOUT_CAP_MS, AI_READING_TOKENS_PER_SECOND, AI_TIMEOUT_MS, D, S, aiChatLog, aiConverse, aiLogAll, aiSheetNotes, aiSheetTurns, bi, biLabel, buildTeacherChatLog, commitCapture, el, enhanceJapaneseProse, kagamiLevel, nonEmptyString, owns, passage, plainRecord, render, renderTeacherDoor, teacherDraftInputErrors, teacherDraftWindowEdits, teacherSourceProcessingUnavailable, teacherWindowDraftPrefix, tx, withEn } from '../corridor.js';
 import { dictionaryRowsForForm, lookup, readingLine } from './dictionary.mjs';
 import { validArchiveTurn } from './learner.mjs';

@@ -1,4 +1,4 @@
-/** G3 study-host seam — declarations moved verbatim from ../corridor.js (pure move, no body edits). */
+/** study-host seam: split out of corridor.js (G3); now edited here directly. */
 import { D, DOJO_DECKS, INK_DEPTH, KAGAMI_CODE_BAND, KAGAMI_MODEL_VERSION, LEARN_STAGE_DECKS, LESSON_SIZE, MINI_INK, NEW_PER_DAY_DEFAULT, PARTICLES, REVIEWS_PER_DAY_DEFAULT, ROOM_NAMES, S, SRS_KINDS, SRS_PREF_LADDERS, SRS_PRESETS, allAssessmentEvidence, bi, cardRecall, deckSummaries, el, finiteNumber, focusKanjiItem, go, guidedTaken, isLeech, jlptRank, kagamiBandFor, kagamiLevelOf, kagamiMockBand, kanjiAnswerAvailable, kataToHira, laneMembers, learnDeckSummary, learnStageFace, nonEmptyString, openDeck, openGuidedRoom, owns, placesLayout, plainRecord, proseWordRovers, renderReviewHall, renderStudyHall, retainedKanjiRecord, roomName, savedAnswerFor, srsDueItems, srsKey, srsParamsProblem, srsRoomBack, srsSchedulePolicy, studyHallDoors, todayQueue, tx, validNewPerDay, validPauseEvery, validPreset, validRetention, validReviewsPerDay, withEn } from '../corridor.js';
 import { readerCaptureReasonText } from './capture.mjs';
 import { lookup } from './dictionary.mjs';

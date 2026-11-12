@@ -1,4 +1,4 @@
-/** G3 capture seam — declarations moved verbatim from ../corridor.js (pure move, no body edits). */
+/** capture seam: split out of corridor.js (G3); now edited here directly. */
 import { D, S, TOUCH_READING_FADES, TOUCH_READING_GAP, TOUCH_READING_MOTION, TOUCH_READING_ROWS, TOUCH_ROW_PINS, TRAIL_KINDS, copyRecordWith, dictionaryRowBySeq, el, encounterKey, entryKanaIndex, kanaReadingKey, kataToHira, metReadable, nonEmptyString, owns, passage, plainRecord, readHelpPatch, renderSourceInboxEntries, sourceInboxShelf, srsKey, syncChromeKeep, tx, updateReaderPlaceSave, withEn } from '../corridor.js';
 import { lookup, readerTokenAtIndex, readingLine, senseRecord, teFormRecord } from './dictionary.mjs';
 import { localDayOrdinal, trailLastPhrase } from './drift.mjs';
