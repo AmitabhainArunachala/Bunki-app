@@ -162,7 +162,22 @@ await run('bare', async () => {
   const s = await sky();
   try {
     let words = [];
-    for (let k = 0; k < 10 && !words.length; k += 1) { words = await clearWords(s.page, "W.rd[i] === ''"); if (!words.length) { if (s.phone) { for (let q = 0; q < 3; q += 1) await s.page.keyboard.press('ArrowUp'); } else await s.page.mouse.wheel(0, 400); await s.sleep(1500); } }   // a phone's WebKit has no wheel: the sky's own arrow key flies forward there, as the wheel does
+    // a phone draws about fifteen words, and the 57 of the sky's 7,693 words with no reading all have no level, so they
+    // stand deepest and print too small to touch from the eye's circle: there the eye is turned to face one such word
+    // (the engine's own W.cam.aTo, as its read order does) and flies toward it with the sky's own arrow key, one word after
+    // another until one stands clear; on the Mac the wheel flies on as before (a phone's WebKit has no wheel)
+    const bare = s.phone ? await s.page.evaluate(() => { const W = window.__SKY__.W; const out = []; for (let i = 0; i < W.n && out.length < 12; i += 1) if (W.rd[i] === '' && !W.front[i]) out.push(i); return out; }) : [];
+    for (let k = 0; k < (s.phone ? bare.length : 10) && !words.length; k += 1) {
+      words = await clearWords(s.page, "W.rd[i] === ''");
+      if (words.length) break;
+      if (s.phone) {
+        await s.page.evaluate((i) => { const W = window.__SKY__.W; W.resetView(); W.cam.aTo = Math.atan2(W.P[i * 3], W.P[i * 3 + 2]); }, bare[k]);
+        await s.sleep(1500);
+        for (let q = 0; q < 8; q += 1) await s.page.keyboard.press('ArrowUp');
+        await s.sleep(2200);
+      } else { await s.page.mouse.wheel(0, 400); await s.sleep(1500); }
+    }
+    if (!words.length) words = await clearWords(s.page, "W.rd[i] === ''");
     const w = words[0];
     if (!w) throw new Error('no clear sky word without a reading in view');
     await arm(s);
