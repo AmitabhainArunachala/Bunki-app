@@ -285,20 +285,26 @@
     let dtSign = 0.016;
     function drawSigns() {
       const signs = W.lens === 'read' && W.rOrder ? W.rOrder.signs : W.lens === 'mean' && W.mOrder ? W.mOrder.signs : null;   // reading: the titles of articles; meaning: the names of the realms that have no giant of their own
-      if (!signs || !W.fonts) return; const mph = W.morph ? Math.min(1, W.morph.x) : 1, a0 = base.alpha.x * mph * (1 - 0.85 * S.dim.x) * (1 - view.over); if (a0 < 0.03) return;
-      const C = W.ctx, E = view.eye, f = view.fwd, r = view.right, u = view.up, R = RE + 2900; W.sHits = W.sHits || []; W.sHits.length = 0;
+      W.sHits = W.sHits || []; W.sHits.length = 0;
+      if (!signs || !W.fonts) return; const late = W.morphAt != null ? smooth(1.4, 2.0, S.t - W.morphAt) : 1, a0 = base.alpha.x * late * (1 - Math.min(1, 1.3 * S.dim.x)) * (1 - view.over); if (a0 < 0.03) return;   // (while a word is open the titles leave altogether: nothing stands behind its notes)   // after a re-forming the titles come last, when every word has landed
+      const C = W.ctx, E = view.eye, f = view.fwd, r = view.right, u = view.up, R = RE + 2900, isRead = W.lens === 'read', maxC = S.small ? 13 : 22, maxS = S.small ? 16 : 22;
       /* only signs with room: the ones nearest the middle of the view first; the others wait, fading, until there is room */
       const cand = []; signs.forEach((sg, q) => { const dx = R * Math.sin(sg.th) - E[0], dy = (sg.y != null ? sg.y : [-250, 60, 370][q % 3]) - E[1], dz = R * Math.cos(sg.th) - E[2], z2 = dx * f[0] + dy * f[1] + dz * f[2]; if (z2 < 300 || z2 > 5200) return;
         const sc = S.F / z2, x = S.px + (dx * r[0] + dy * r[1] + dz * r[2]) * sc; if (x < -260 || x > S.W + 260) return; const y = S.py - (dx * u[0] + dy * u[1] + dz * u[2]) * sc; if (y < 20 || y > S.H * 0.74) return;
-        const row = sg.a >= 0 && C ? C.articles[sg.a] : null, chars = Array.from(sg.title != null ? sg.title : row ? row[1] || '' : (opt.lang === 'ja' ? 'まだ記事にない言葉' : 'not yet in an article')), title = chars.length > 22 ? chars.slice(0, 21).join('') + '…' : chars.join(''), size = clamp(20 * 3000 / z2, 13, 22);
-        cand.push({ sg, x, y, z2, title, size, hw: Math.min(22, chars.length) * size * (row ? 0.53 : 0.34) + 14, hh: size * 0.8 + 8 }); });
-      cand.sort((p1, p2) => Math.abs(p1.x - S.px) - Math.abs(p2.x - S.px)); const shown = [];
+        const row = sg.a >= 0 && C ? C.articles[sg.a] : null, chars = Array.from(sg.title != null ? sg.title : row ? row[1] || '' : (opt.lang === 'ja' ? 'まだ記事にない言葉' : 'not yet in an article')), title = chars.length > maxC ? chars.slice(0, maxC - 1).join('') + '…' : chars.join(''), size = clamp(20 * 3000 / z2, 13, maxS);
+        cand.push({ sg, x, y, z2, title, size, hw: Math.min(maxC, chars.length) * size * (row ? 0.53 : 0.34) + 14, hh: size * 0.8 + 8 }); });
+      const near = (c) => Math.abs(c.x - S.px) - (c.sg.fade && c.sg.fade.x > 0.5 ? 150 : 0);   // a title that is showing keeps its place until another is clearly nearer the middle
+      cand.sort((p1, p2) => near(p1) - near(p2)); const shown = [], most = S.small ? 3 : 6, turn = (a, b) => Math.abs(((a - b + 9.42477796) % 6.2831853) - 3.14159265);
       const fr = W.frontList, fv = W.vis, fa = W.visAt, fnow = S.frame;
-      for (const c of cand) { let free = c.x - c.hw > 16 && c.x + c.hw < S.W - (S.small ? 56 : 72) && !shown.some((o) => Math.abs(c.x - o.x) < c.hw + o.hw && Math.abs(c.y - o.y) < c.hh + o.hh);   // a title shows only where the whole of it fits
-        if (free) for (const wi of fr) { if (fa[wi] < fnow - 2) continue; const o = wi * 5; if (Math.abs(c.x - fv[o]) < c.hw + fv[o + 4] / 2 + 8 && Math.abs(c.y - fv[o + 1]) < c.hh + fv[o + 2] * 0.62 + 6) { free = false; break; } }   // a sign waits while one of his own words stands in front of it
-        if (free) shown.push(c); const st = c.sg.fade || (c.sg.fade = { x: 0, v: 0 }); spring(st, free ? 1 : 0, 5, dtSign);
+      const tie = (c, box, al) => { const list = C && C.articleWords ? C.articleWords[c.sg.a] : null; if (!list) return; const home = W.rOrder.home, uy = c.y + c.size * 0.76, best = [];   // a hairline from a title to the five nearest of its own words: whose words these are is drawn, not guessed
+        for (const wi of list) { if (home[wi] !== c.sg.a || fa[wi] < fnow - 2) continue; const o = wi * 5, wx = fv[o], wy = fv[o + 1]; if (fv[o + 3] < 0.2 || Math.abs(wy - c.y) < c.hh + 8) continue; const d = Math.hypot(wx - c.x, (wy - uy) * 1.3); if (d < 470) best.push([d, wx, wy, fv[o + 2]]); }
+        best.sort((p1, p2) => p1[0] - p2[0]); for (const b of best.slice(0, 5)) { const below = b[2] > uy, x0 = clamp(b[1], c.x - box.w / 2 + 12, c.x + box.w / 2 - 12); pushLine(x0, below ? uy + 3 : c.y - c.size * 0.62, b[1], b[2] + (below ? -1 : 1) * b[3] * 0.64, 0, 0.7, S.pal.mark, 0.32 * al, 1); } };
+      for (const c of cand) { if (c.sg.seen !== S.frame - 1 && c.sg.fade) { c.sg.fade.x = 0; c.sg.fade.v = 0; } c.sg.seen = S.frame;
+        let free = shown.length < most && c.z2 < 4500 && c.x - c.hw > 16 && c.x + c.hw < S.W - (S.small ? 56 : 72) && !shown.some((o) => (Math.abs(c.x - o.x) < c.hw + o.hw + 12 && Math.abs(c.y - o.y) < c.hh + o.hh + 6) || (isRead && turn(c.sg.th, o.sg.th) < 0.52));   // a title shows only where the whole of it fits, and in the reading order one to every twelfth of the ring
+        if (free) for (const wi of fr) { if (fa[wi] < fnow - 2) continue; const o = wi * 5; if (Math.abs(c.x - fv[o]) < c.hw + fv[o + 4] / 2 + 34 && Math.abs(c.y - fv[o + 1]) < c.hh + fv[o + 2] * 0.62 + 14) { free = false; break; } }   // a sign steps aside before one of his own words reaches it
+        if (free) shown.push(c); const st = c.sg.fade || (c.sg.fade = { x: 0, v: 0 }); spring(st, free ? 1 : 0, 9, dtSign);
         if (st.x < 0.03) continue; const sp = spriteFor('sign' + (c.sg.key || c.sg.a), c.title, c.sg.a >= 0 || c.sg.title != null || opt.lang === 'ja' ? 'w' : 'e', c.size * S.dpr, null, 500, false);
-        if (sp) { const al = (c.sg.a >= 0 || c.sg.title != null ? 0.92 : 0.72) * a0 * st.x * smooth(5200, 4200, c.z2), box = pushLabel(c.x, c.y, c.size, sp, 0, S.pal.mark, al, S.pal.mark, 0, 0); if (box) { pushLine(c.x - box.w / 2 + 10, c.y + c.size * 0.76, c.x + box.w / 2 - 10, c.y + c.size * 0.76, 0, 0.8, S.pal.mark, 0.5 * al, 1); if (st.x > 0.5) W.sHits.push({ a: c.sg.a, x: c.x, y: c.y, w: box.w, s: c.size }); } } }
+        if (sp) { const al = (c.sg.a >= 0 || c.sg.title != null ? 0.92 : 0.72) * a0 * st.x, box = pushLabel(c.x, c.y, c.size, sp, 0, S.pal.mark, al, S.pal.mark, 0, 0); if (box) { pushLine(c.x - box.w / 2 + 10, c.y + c.size * 0.76, c.x + box.w / 2 - 10, c.y + c.size * 0.76, 0, 0.8, S.pal.mark, 0.5 * al, 1); W.sHits.push({ a: c.sg.a, x: c.x, y: c.y, w: box.w, s: c.size }); if (isRead && c.sg.a >= 0 && st.x > 0.4) tie(c, box, al); } } }
     }
     /** The learner's own words do not belong to one place on the ring: they keep him company. They stand in a small
      * ring of their own round the eye's place on its circle and turn slowly, so they too pass from right to left,
@@ -326,7 +332,7 @@
     api.setFront = setFront;
     /** Re-form the whole sky by another order: every word flies to its new place, a few at a time. */
     function setLens(name) {
-      if (!W.ready || !W.layout[name] || name === W.lens) return; W.prevLens = W.lens; W.lens = name; W.secCache = null; W.Pa.set(W.P); W.layout[name](W.Pb); placeFront(W.Pb); W.morph = { x: S.reduced ? 1 : 0, v: 0 }; if (S.reduced) W.P.set(W.Pb);
+      if (!W.ready || !W.layout[name] || name === W.lens) return; W.prevLens = W.lens; W.lens = name; W.secCache = null; W.Pa.set(W.P); W.layout[name](W.Pb); placeFront(W.Pb); W.morph = { x: S.reduced ? 1 : 0, v: 0 }; W.morphAt = S.reduced ? S.t - 9 : S.t; if (S.reduced) W.P.set(W.Pb);
       /* choosing the order of reading turns the eye to the nearest article, so what he sees first is a group with its title */
       if (name === 'read' && W.rOrder) { const a = ((cam.a % TAU) + TAU) % TAU, rs = W.rOrder.restStart; if (rs > 1 && (a > rs - 0.5 || a < 0.5)) cam.aTo = a - rs < TAU - a && a > rs - 0.5 ? rs - 0.6 : 0.6; }
       if (W.onLens) W.onLens(name);
@@ -393,6 +399,7 @@
     const DOT = { u: 0, v: 0 }, ptc = [0, 0, 0], hubc = [0, 0, 0];
     /* a far word is a point of light: by level, index 0 = no level, 5 = N5. Common words bright, large and warm; rare ones small and cool */
     const PT_A = [0.26, 0.32, 0.38, 0.48, 0.60, 0.72], PT_S = [2.0, 2.1, 2.4, 2.8, 3.3, 3.8], PT_C = [1, 1, 0.85, 0.62, 0.34, 0.10];
+    function maskAt(x, y) { let m = smooth(0, 28, x) * smooth(0, S.small ? 18 : 28, S.W - x); const list = S.mask; if (list) for (const b of list) { const qx = Math.abs(x - b[0]) - b[2], qy = Math.abs(y - b[1]) - b[3], d = Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0); m *= 1 - b[5] * (1 - smooth(0, b[4], d)); } return m; }
     function drawField(dt) {
       const D = W.D, pal = S.pal, n = W.n, F = S.F, Wd = S.W, Hd = S.H, dpr = S.dpr, P = W.P;
       const E = view.eye, f = view.fwd, r = view.right, u = view.up, over = view.over, dim = S.dim.x, web = W.web;
@@ -402,8 +409,7 @@
       for (const h of W.gHits) { const c0 = Math.max(0, ((h.x - h.w / 2 - 6) / CW) | 0), c1 = Math.min(cols - 1, ((h.x + h.w / 2 + 6) / CW) | 0), r0 = Math.max(0, ((h.y - h.s * 0.8) / CH) | 0), r1 = Math.min(rows - 1, ((h.y + h.s * 0.8) / CH) | 0); for (let rr = r0; rr <= r1; rr += 1) for (let cc = c0; cc <= c1; cc += 1) occ[rr * cols + cc] = 2; }   // a pattern of grammar keeps its room too
       /* a touched word keeps room for its reading above and its meaning below: its neighbours step back while it is touched */
       for (const [wi, sw] of awake) { if (sw.x < 0.3 || W.visAt[wi] < S.frame - 2) continue; const o = wi * 5, hw = W.vis[o + 4] / 2 + 16, hh = W.vis[o + 2] * 0.62 + 26, c0 = Math.max(0, ((W.vis[o] - hw) / CW) | 0), c1 = Math.min(cols - 1, ((W.vis[o] + hw) / CW) | 0), r0 = Math.max(0, ((W.vis[o + 1] - hh) / CH) | 0), r1 = Math.min(rows - 1, ((W.vis[o + 1] + hh) / CH) | 0); for (let rr = r0; rr <= r1; rr += 1) for (let cc = c0; cc <= c1; cc += 1) occ[rr * cols + cc] = 3; }
-      if (S.clear) for (const bx of S.clear) { const c0 = Math.max(0, ((bx[0] - 8) / CW) | 0), c1 = Math.min(cols - 1, ((bx[0] + bx[2] + 8) / CW) | 0), r0 = Math.max(0, ((bx[1] - 6) / CH) | 0), r1 = Math.min(rows - 1, ((bx[1] + bx[3] + 6) / CH) | 0); for (let rr = r0; rr <= r1; rr += 1) for (let cc = c0; cc <= c1; cc += 1) occ[rr * cols + cc] = 4; }   // under one of the app's own buttons no word prints, his own included
-      if ((W.lens === 'read' || W.lens === 'mean') && W.sHits) for (const h of W.sHits) { const c0 = Math.max(0, ((h.x - h.w / 2) / CW) | 0), c1 = Math.min(cols - 1, ((h.x + h.w / 2) / CW) | 0), r0 = Math.max(0, ((h.y - h.s * 0.7) / CH) | 0), r1 = Math.min(rows - 1, ((h.y + h.s * 0.7) / CH) | 0); for (let rr = r0; rr <= r1; rr += 1) for (let cc = c0; cc <= c1; cc += 1) occ[rr * cols + cc] = 2; }   // a title keeps its room: far words step back from it
+      if ((W.lens === 'read' || W.lens === 'mean') && W.sHits) for (const h of W.sHits) { const c0 = Math.max(0, ((h.x - h.w / 2 - 10) / CW) | 0), c1 = Math.min(cols - 1, ((h.x + h.w / 2 + 10) / CW) | 0), r0 = Math.max(0, ((h.y - h.s * 0.7 - 10) / CH) | 0), r1 = Math.min(rows - 1, ((h.y + h.s * 1.0 + 10) / CH) | 0); for (let rr = r0; rr <= r1; rr += 1) for (let cc = c0; cc <= c1; cc += 1) occ[rr * cols + cc] = 2; }   // a title keeps its room: far words step back from it
       if (cI.length < n) { cI = new Int32Array(n); cX = new Float32Array(n); cY = new Float32Array(n); cS = new Float32Array(n); cZ = new Float32Array(n); cD = new Float32Array(n); cR = new Float32Array(n); W.clr = new Float32Array(n).fill(1); W.hid = new Uint8Array(n); }
       const clr = W.clr, hid = W.hid, ease = Math.min(1, dt * 10);
       /* giant characters, far beyond the ring: tone on tone */
@@ -439,13 +445,13 @@
         if (free) for (let rr = r0; rr <= r1; rr += 1) { const ro = rr * cols; for (let cc = c0; cc <= c1; cc += 1) if (occ[ro + cc] !== 4) occ[ro + cc] = 1; }
         clr[i] += ((free ? 1 : 0) - clr[i]) * ease;
       }
-      const morphing = !!(W.morph && W.morph.x < 1), edgeW = S.small ? 52 : 88;
+      const tr = W.morphAt != null ? 1 - smooth(1.9, 2.5, S.t - W.morphAt) : 0;   // 1 while the sky is re-forming: nothing passes blurred, and a word that would pass very large steps back instead
       /* pass 2, far to near: print */
       for (let q = nc - 1; q >= 0; q -= 1) {
         const c = ord[q], i = cI[c]; if (clr[i] < 0.02) continue; const x = cX[c], y = cY[c], size = cS[c], z2 = cZ[c], isF = W.front[i] === 1;
         const rd = cR[c]; let a = (isF ? 1 : lerp(0.82, 0.27, smooth(700, 2900, z2)) * lerp(1, 0.5, smooth(3200, 8000, z2))) * smooth(90, 250, rd) * smooth(70, 150, z2) * cD[c] * smooth(-30, 26, y) * clr[i] * smooth(5.2, 7, size);
-        const far = smooth(700, 2600, z2); let blur = (morphing ? 0 : 2.6 * (1 - smooth(110, 290, rd))) + (isF ? 0 : 0.30 * far);   // (a word on its way to a new place is never blurred)
-        a *= smooth(Wd - 10, Wd - edgeW, x + W.len[i] * size * 0.5) * smooth(10, edgeW, x - W.len[i] * size * 0.5 + (isF ? 30 : 0));   // words come in and go out softly at the two sides, clear of the seals
+        const far = smooth(700, 2600, z2); let blur = (1 - tr) * (2.6 * (1 - smooth(110, 290, rd)) + (isF ? 0 : 0.30 * far));   // (a word on its way to a new place is never blurred)
+        a *= 1 - tr * smooth(40, 58, size);   // (the sides and the buttons are a mask in the shader now: a word slides under it, see FS_LAB)
         const aw = awake.get(i), wk = aw ? aw.x : 0, kin = kinSet && kinSet.has(i) ? kinK : 0, lit = Math.max(wk, kin);
         a *= fieldA * (1 - 0.88 * dim * (1 - wk)); blur += 2.3 * dim; if (a < 0.02) continue;
         const devPx = Math.max(size, kin > 0.01 ? 14 : 0) * dpr; let sp = null;
@@ -455,7 +461,7 @@
         const s2 = lerp(size * (1 + 0.07 * wk), Math.max(size, 14), kin);
         if (s2 >= 15 && sp) pushLabel(x, y + s2 * 0.015, s2 * 1.035, sp, i, pal.c[0], 0.66 * a * smooth(15, 24, s2), mk, 0, blur + 3.0);   // a soft ground of the sky's own ink directly under the letters (no offset shadow: this is a print)
         const box = pushLabel(x, y, s2, sp, i, col, Math.min(1, a + 0.6 * lit), mk, 0, blur * (1 - lit));
-        if (box) { const o = i * 5; W.vis[o] = x; W.vis[o + 1] = y; W.vis[o + 2] = s2; W.vis[o + 3] = a; W.vis[o + 4] = box.w; W.visAt[i] = S.frame; if (size >= 8.5 && a > 0.12) hits.push(i); }
+        if (box) { const o = i * 5; W.vis[o] = x; W.vis[o + 1] = y; W.vis[o + 2] = s2; W.vis[o + 3] = a; W.vis[o + 4] = box.w; W.visAt[i] = S.frame; if (size >= 8.5 && a > 0.12 && maskAt(x, y) > 0.45) hits.push(i); }
       }
     }
     const RINGS = [ZR.f[0] - 60, ZR[5][0] - 40, ZR[4][0] - 20, ZR[3][0] - 30, ZR[2][0] - 60, ZR[1][0] - 75, ZR[1][1] + 60];
@@ -546,6 +552,8 @@
       if (W.fonts) { if (!ghost.done) buildGhosts(); else buildBaseStep(); }
       spring(base.alpha, W.fonts ? 1 : 0, 1.6, dt);
       nLab = 0; nLin = 0;
+      { const tb = S.toolsBox, away = !tb || !S.toolsEl || S.toolsEl.classList.contains('away'), k0 = W.toolsK == null ? (away ? 0 : 1) : W.toolsK; W.toolsK = k0 + ((away ? 0 : 1) - k0) * Math.min(1, dt * 7);   // the seals' room goes with the seals
+        const list = (S.maskBoxes || []).slice(); if (tb && W.toolsK > 0.01) list.push([tb[0], tb[1], tb[2], tb[3], tb[4], W.toolsK]); S.mask = list; }
       dtSign = dt; drawRings(); drawGrammar(); drawSigns(); drawField(dt); const fieldCount = nLab; drawThreads();
       if (W.drawPath) W.drawPath();
       if (W.drawWake) W.drawWake(dt);
@@ -556,6 +564,9 @@
       if (nLab) { const uu = P.lab.u; gl.useProgram(P.lab.p); gl.uniform2f(uu.uRes, rw, rh);
         gl.uniform3fv(uu.uMoon, S.moon.dir); gl.uniform1f(uu.uMoonR, S.moon.r); gl.uniform3fv(uu.uInk, S.pal.moonInk || S.pal.ink); gl.uniform3fv(uu.uFwd, view.fwd); gl.uniform3fv(uu.uRight, view.right); gl.uniform3fv(uu.uUp, view.up);
         gl.uniform2f(uu.uPP, S.px * S.dpr, S.py * S.dpr); gl.uniform1f(uu.uF, S.F * S.dpr); gl.uniform1f(uu.uResH, rh); gl.uniform1f(uu.uMoonOn, (1 - view.over) * (1 - S.dim.x));
+        { const d = S.dpr, bx = W.mBx || (W.mBx = new Float32Array(24)), br = W.mBr || (W.mBr = new Float32Array(6)), bk = W.mBk || (W.mBk = new Float32Array(6)), list = S.mask || []; bx.fill(0); br.fill(0); bk.fill(0);
+          for (let q = 0; q < Math.min(6, list.length); q += 1) { const b = list[q]; bx[q * 4] = b[0] * d; bx[q * 4 + 1] = b[1] * d; bx[q * 4 + 2] = b[2] * d; bx[q * 4 + 3] = b[3] * d; br[q] = b[4] * d; bk[q] = b[5]; }
+          gl.uniform4fv(uu.uBx, bx); gl.uniform1fv(uu.uBr, br); gl.uniform1fv(uu.uBk, bk); gl.uniform2f(uu.uEdgeM, 28 * d, (S.small ? 18 : 28) * d); gl.uniform1f(uu.uResW, rw); }
         gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, tBase); gl.uniform1i(uu.uBase, 0); gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, near[0].tex); gl.uniform1i(uu.uNearA, 1);
         gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, near[1].tex); gl.uniform1i(uu.uNearB, 2); gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, tGhost); gl.uniform1i(uu.uGhost, 3);
         gl.bindVertexArray(vaoLab); gl.bindBuffer(gl.ARRAY_BUFFER, bLab); gl.bufferSubData(gl.ARRAY_BUFFER, 0, lab.subarray(0, nLab * LSTR)); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, nLab); gl.activeTexture(gl.TEXTURE0); }

@@ -123,7 +123,7 @@
     float md = length(d - uMoon);
     float mo = max(md - uMoonR, 0.)/uMoonR;
     c += (uMoonCol*0.26*exp(-pow(mo/0.85, 1.25)) + mix(uMoonCol, uC3*1.35, 0.78)*(0.17*exp(-pow(mo/3.1, 1.15)) + 0.045*exp(-md*md/0.22)))*up*(1.-uOver);   // bokashi: cream close to the disc, then the sky's own lighter blue
-    c = mix(c, c*0.42, uDim*smoothstep(-0.32, -0.117, e));
+    c = mix(c, max(c*0.42, uC2*0.44*smoothstep(0.10, 0.55, e)), uDim*smoothstep(-0.32, -0.117, e));   // high up, where the sky is darkest, an open pattern keeps the look's own blue under it
     c += uGlow*0.10*smoothstep(-0.13, -0.30, e)*(1.-hz);
     c = mix(c, mix(uC1, uC0, 0.35 + 0.35*uOver), smoothstep(mix(-0.40, -0.16, uOver), mix(-0.92, -0.50, uOver), e)*mix(0.55, 0.97, uOver));   // under the ring the deep sky goes on
     for (int i=0;i<3;i++){ vec4 m = layer(d, i); c = mix(c, m.rgb, m.a*(1.-0.5*uDim)); }
@@ -200,6 +200,7 @@
   in vec2 vUv; in vec4 vCol; in vec4 vMark; in vec4 vMisc; in vec4 vBox; out vec4 o;
   uniform sampler2D uBase, uNearA, uNearB, uGhost;
   uniform vec3 uMoon, uInk, uFwd, uRight, uUp; uniform vec2 uPP; uniform float uMoonR, uF, uResH, uMoonOn;
+  uniform vec4 uBx[6]; uniform float uBr[6]; uniform float uBk[6]; uniform vec2 uEdgeM; uniform float uResW;
   vec2 samp(vec2 uv, float lod){
     if (vMisc.y < 0.5) return vec2(textureLod(uBase, uv, lod).r, 0.);
     if (vMisc.y < 1.5) return textureLod(uNearA, uv, lod).rg;
@@ -211,8 +212,10 @@
     vec3 dd = normalize(uFwd*uF + uRight*(fp.x - uPP.x) + uUp*(uPP.y - fp.y));
     float onMoon = (1. - smoothstep(uMoonR - 2./uF, uMoonR + 2./uF, length(dd - uMoon)))*uMoonOn;   // over the moon, light writing turns to ink and dark shade steps aside
     float isLight = step(0.30, dot(vCol.rgb, vec3(0.299, 0.587, 0.114)));
+    float msk = smoothstep(0., uEdgeM.x, fp.x)*smoothstep(0., uEdgeM.y, uResW - fp.x);   // the soft margins of the view and the room round each button: writing slides under them letter by letter, a whole word never turns grey
+    for (int i = 0; i < 6; i++) { if (uBr[i] > 0.) { vec2 q = abs(fp - uBx[i].xy) - uBx[i].zw; msk *= mix(1., smoothstep(0., uBr[i], length(max(q, 0.)) + min(max(q.x, q.y), 0.)), uBk[i]); } }
     vec3 colr = mix(vCol.rgb, uInk, onMoon*isLight); float keep = 1. - onMoon*(1. - isLight);
-    if (vMisc.y > 3.5) { float q = length(vUv - 0.5)*2.; float a = ((1. - smoothstep(0.16, 0.46, q)) + 0.38*pow(1. - min(q, 1.), 2.2))*vCol.a*keep; a = min(a, 1.); o = vec4(colr*a, a); return; }
+    if (vMisc.y > 3.5) { float q = length(vUv - 0.5)*2.; float a = ((1. - smoothstep(0.16, 0.46, q)) + 0.38*pow(1. - min(q, 1.), 2.2))*vCol.a*keep; a = min(a, 1.)*msk; o = vec4(colr*a, a); return; }
     float lod = max(vMisc.x, 0.);
     vec2 px = vMisc.zw*exp2(lod);
     vec2 lo = min(vBox.xy, vBox.zw) + px*0.5, hi = max(vBox.xy, vBox.zw) - px*0.5;
@@ -220,7 +223,7 @@
     vec2 s = samp(uv, lod);
     if (lod > 0.8) { vec2 r = px*0.9; s = s*0.36 + 0.16*(samp(clamp(uv+r, lo, hi), lod) + samp(clamp(uv-r, lo, hi), lod) + samp(clamp(uv+vec2(r.x,-r.y), lo, hi), lod) + samp(clamp(uv+vec2(-r.x,r.y), lo, hi), lod)); }
     float a = s.r*vCol.a*keep, m = s.g*vMark.a;
-    o = vec4(colr*a*(1.-m) + mix(vMark.rgb, uInk, onMoon)*m, a + m - a*m);
+    o = vec4(colr*a*(1.-m) + mix(vMark.rgb, uInk, onMoon)*m, a + m - a*m)*msk;
   }`;
 
   /* Threads: screen-space ribbons with soft edges; aT runs 0..1 along the line, uniform-free so one draw call. */
@@ -329,7 +332,9 @@
     function step(now) {
       S.tick = (S.tick || 0) + 1; if (opt.paused && S.tick % 8 === 1) S.paused = !!opt.paused();
       if (S.tick % 32 === 1) { const ft = opt.foot ? Math.max(0, Math.round(opt.foot() || 0)) : 0; if (ft !== S.foot) { S.foot = ft; wrap.style.setProperty('--sky-foot', ft + 'px'); }   // how much of the bottom the app's own bar covers
-        S.clear = opt.clear ? opt.clear() || [] : []; }   // the boxes of the app's own buttons that lie over the sky: no word prints under them
+        S.clear = opt.clear ? opt.clear() || [] : [];   // the boxes of the app's own buttons that lie over the sky: writing fades out round them
+        S.maskBoxes = S.clear.slice(0, 5).map((q) => [q[0] + q[2] / 2, q[1] + q[3] / 2, q[2] / 2, q[3] / 2, 30, 1]);
+        const tl = wrap.querySelector('.tools'); S.toolsEl = tl || null; if (tl && tl.getClientRects().length) { const q = tl.getBoundingClientRect(), cv = wrap.getBoundingClientRect(); S.toolsBox = [q.left - cv.left + q.width / 2, q.top - cv.top + q.height / 2, q.width / 2, q.height / 2 + 4, S.small ? 34 : 72]; } else S.toolsBox = null; }
       if (!S.running || S.paused || !wrap.isConnected || wrap.getClientRects().length === 0) { S.last = now; return; }
       resize();
       const dt = Math.min(0.05, Math.max(0.001, (now - S.last) / 1000)); S.last = now; S.t += dt; S.frame += 1;

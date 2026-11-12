@@ -623,6 +623,21 @@ describe.each(engines)('the sky (宙) as the app’s first screen, in %s', (engi
             const W = api.W;
             const sectors = W.sectors();
             const out = { lens: W.lens, sectors: sectors.length };
+            if (name === 'read') {
+              // the titles wait until the words have landed: none in view for 1.4 s after the order changes
+              const t0 = api.S.t;
+              window.__earlySigns = { most: 0, samples: 0 };
+              const look = () => {
+                if (api.S.t - t0 >= 1.35) return;
+                window.__earlySigns.most = Math.max(
+                  window.__earlySigns.most,
+                  (W.sHits || []).length,
+                );
+                window.__earlySigns.samples += 1;
+                requestAnimationFrame(look);
+              };
+              requestAnimationFrame(look);
+            }
             if (name === 'mean') {
               out.sizes = W.mOrder.realms.map((r) => r.words.length);
               out.first = sectors.slice(0, 3).map((s) => s.name);
@@ -638,13 +653,22 @@ describe.each(engines)('the sky (宙) as the app’s first screen, in %s', (engi
             expect(seen.sizes[0]).toBeGreaterThan(seen.sizes[3]);
             expect(seen.first).toEqual(seen.largest);
           }
-          // in the reading order an article's title stands over its words like a sign: one is in view within 4 s
-          if (lens === 'read')
+          // in the reading order an article's title stands over its words like a sign: none for the first 1.4 s,
+          // one in view within 4 s, and never more than six at once on a wide screen
+          if (lens === 'read') {
             await page.waitForFunction(
               () => (window.__SKY__.W.sHits || []).some((h) => h.a >= 0),
               null,
               { timeout: 4000 },
             );
+            const signs = await page.evaluate(() => ({
+              early: window.__earlySigns,
+              now: window.__SKY__.W.sHits.length,
+            }));
+            expect(signs.early.samples).toBeGreaterThan(3);
+            expect(signs.early.most, 'no title while the words are still landing').toBe(0);
+            expect(signs.now).toBeLessThanOrEqual(6);
+          }
           await page.waitForFunction(() => (window.__SKY__.W.morph?.x ?? 1) >= 1, null, {
             timeout: 15000,
           });
@@ -846,7 +870,7 @@ describe.each(engines)('the sky (宙) as the app’s first screen, in %s', (engi
         await page.waitForFunction(() => !window.__SKY__.W.web.isOpen(), null, { timeout: 5000 });
       }, 90000);
 
-      test("the app's own buttons over the sky: the mount gives their boxes and skips what is not there; no word prints under a box", async () => {
+      test("the app's own buttons over the sky: the mount gives their boxes and skips what is not there; the sky masks them, and a word under one is not a touch target", async () => {
         const { page } = session;
         const given = await page.evaluate(() => {
           const sels = [
@@ -872,7 +896,24 @@ describe.each(engines)('the sky (宙) as the app’s first screen, in %s', (engi
           };
         });
         expect(given.boxes).toEqual(given.over);
-        // a box laid over the place of a word in view, following it as it drifts: that word is no longer printed
+        // the sky masks each box it is given: S.mask carries every box of the app's own buttons (half sizes, a 30 px edge)
+        await page.waitForTimeout(800);
+        const masked = await page.evaluate(() => {
+          const { S } = window.__SKY__;
+          const want = window.__SKY__.opt
+            .clear()
+            .slice(0, 5)
+            .map((q) => [q[0] + q[2] / 2, q[1] + q[3] / 2, q[2] / 2, q[3] / 2, 30, 1]);
+          const close = (a, b) =>
+            a.length === b.length && a.every((v, k) => Math.abs(v - b[k]) < 0.5);
+          return {
+            want: want.length,
+            found: want.filter((w) => (S.mask || []).some((b) => close(w, b))).length,
+          };
+        });
+        expect(masked.found).toBe(masked.want);
+        // a box laid over a word in view, following it as it drifts: its place is masked (under 0.45), and the word is
+        // no longer something a touch can reach
         const word = await page.evaluate(() => {
           const W = window.__SKY__.W;
           const i = W.hits
@@ -883,7 +924,7 @@ describe.each(engines)('the sky (宙) as the app’s first screen, in %s', (engi
           window.__SKY__.opt.clear = () => {
             const p = W.project(i);
             const w = W.len[i] * (p ? p.size : 0) * 1.1 + 60;
-            return p ? [...own(), [p.x - w / 2, p.y - p.size - 30, w, p.size * 2 + 60]] : own();
+            return p ? [[p.x - w / 2, p.y - p.size - 30, w, p.size * 2 + 60], ...own()] : own();
           };
           window.__clearedWord = i;
           return W.D.words[i][0];
@@ -895,9 +936,28 @@ describe.each(engines)('the sky (宙) as the app’s first screen, in %s', (engi
           { timeout: 5000 },
         );
         await page.waitForTimeout(800);
-        expect(
-          await page.evaluate(() => window.__SKY__.W.hits.includes(window.__clearedWord)),
-        ).toBe(false);
+        const under = await page.evaluate(() => {
+          const { S, W } = window.__SKY__;
+          const smooth = (a, b, v) => {
+            const t = Math.min(1, Math.max(0, (v - a) / (b - a)));
+            return t * t * (3 - 2 * t);
+          };
+          const maskAt = (x, y) => {
+            let m = smooth(0, 28, x) * smooth(0, S.small ? 18 : 28, S.W - x);
+            for (const b of S.mask || []) {
+              const qx = Math.abs(x - b[0]) - b[2];
+              const qy = Math.abs(y - b[1]) - b[3];
+              const d =
+                Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0);
+              m *= 1 - b[5] * (1 - smooth(0, b[4], d));
+            }
+            return m;
+          };
+          const p = W.project(window.__clearedWord);
+          return { mask: p ? maskAt(p.x, p.y) : null, hit: W.hits.includes(window.__clearedWord) };
+        });
+        expect(under.mask, 'the word stands in a masked place').toBeLessThan(0.45);
+        expect(under.hit).toBe(false);
         await page.evaluate(() => {
           window.__SKY__.opt.clear = window.__ownClear;
         });
