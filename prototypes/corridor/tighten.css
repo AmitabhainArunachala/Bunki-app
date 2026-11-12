@@ -271,7 +271,7 @@ html[data-live-depth='1'] #sheet:has(> h2.headword):not(:has(.hero > .hero-glyph
   .mini-entry-chevron, .mini-sentence-chevron
 ) { font-weight: 600; }
 :is(body:not([data-view='drift']), body[data-view='drift'] #sheet):not(#\#) :where(
-  .story-date, .story-fact, .learn-n, .learn-count, .reader-picture-caption, .kairo-mark,
+  .story-date, .story-fact, .learn-n, .learn-count,
   .dateline-date, .dateline-sep, .tally-short, .me-set-l, .view-title-en, .dw-r,
   .learn-due-u, .me-month-year, .tok-en-text, .mini-gloss, .mini-reading, .mini-kanji-readings, .section-title
 ) { font-weight: 400; }

@@ -46,7 +46,7 @@ body, body.v-contrast-wcag {
 
 /* a night world lifts each topic's colour toward its own light ink, so a kicker or a calm block's
    word still reads on a dark card */
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(.story-kicker, .story-picture-word) {
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .story-kicker {
   color: var(--kicker, color-mix(in srgb, var(--topic, var(--tint)) 45%, var(--ink)));
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body {
@@ -4268,7 +4268,7 @@ main h1.view-title, main h1.exam-heading, .assessment-room > h1 {
 }
 body[data-view='reader'] main > h1.view-title { font-family: var(--font-reading); }
 main h2 { font-family: var(--font-headword); font-weight: 800; letter-spacing: 0.01em; }
-.data, .skin-data { font-family: var(--font-data); font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+.data { font-family: var(--font-data); font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
 
 /* ---- section eyebrows: small caps chrome with the 朱 accent rule ---- */
 body:not([data-view='drift']) main .eyebrow,
@@ -4285,7 +4285,6 @@ body:not([data-view='drift']) #sheet .eyebrow {
 body:not(.ui-bi):not([data-view='drift']) main .eyebrow,
 body:not(.ui-bi):not([data-view='drift']) #sheet .eyebrow { font-size: var(--type-caption); letter-spacing: 0.2em; text-transform: none; }
 body.v-depth-layered:not([data-view='drift']) .eyebrow.shelf-section::before,
-body:not([data-view='drift']) main > .eyebrow.skin-ruled::before,
 body:not([data-view='drift']) main section > h2.eyebrow::before {
   content: '';
   display: block;
